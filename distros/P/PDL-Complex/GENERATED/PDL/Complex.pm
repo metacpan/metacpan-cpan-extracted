@@ -27,7 +27,7 @@ BEGIN {
 use strict;
 use warnings;
 use Carp;
-our $VERSION = '2.010';
+our $VERSION = '2.011';
 
 =encoding utf8
 
@@ -472,7 +472,7 @@ BEGIN {*i2C = \&PDL::Complex::i2C;
 
 =for sig
 
-  Signature: (r(m=2); float+ [o]p(m=2))
+  Signature: (r(m=2); [o]p(m=2))
 
 =for ref
 
@@ -861,7 +861,7 @@ BEGIN {*Ccos = \&PDL::Complex::Ccos;
 
 
 
-#line 712 "complex.pd"
+#line 713 "complex.pd"
 
 =head2 Ctan
 
@@ -1040,7 +1040,7 @@ BEGIN {*Cacos = \&PDL::Complex::Cacos;
 
 
 
-#line 858 "complex.pd"
+#line 859 "complex.pd"
 
 =head2 Catan
 
@@ -1282,7 +1282,7 @@ BEGIN {*Croots = \&PDL::Complex::Croots;
 
 
 
-#line 1026 "complex.pd"
+#line 1027 "complex.pd"
 
 =head2 re, im
 
@@ -1452,7 +1452,7 @@ BEGIN {*Caugment = \&PDL::Complex::Caugment;
 
 
 
-#line 1168 "complex.pd"
+#line 1169 "complex.pd"
 
 # undocumented compatibility functions (thanks to Luis Mochan!)
 sub Catan2 { Clog( $_[1] + i()*$_[0])/i }

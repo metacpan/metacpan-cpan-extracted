@@ -9,7 +9,7 @@ App::Codit::Macro - Little applets for line to line text tasks.
 use strict;
 use warnings;
 use vars qw ($VERSION);
-$VERSION =  0.11;
+$VERSION =  0.14;
 use Tk;
 
 =head1 SYNOPSIS

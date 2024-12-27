@@ -10,7 +10,7 @@ class TestCase::IO::Socket::SSL {
     $FILE_DIR = FindBin->Bin . "/file";
   }
   
-  static method run_echo_server_accept_once : void ($port : int) {
+  static method run_echo_server_accept_once_with_options : void ($port : int) {
     
     my $localhost = "127.0.0.1";
     
@@ -20,13 +20,12 @@ class TestCase::IO::Socket::SSL {
       Listen    => 5,
       ReuseAddr => 1,
       SSL_startHandshake => 0,
+      SSL_cert_file => "$FILE_DIR/simple-cert.cert.pem",
+      SSL_key_file => "$FILE_DIR/simple-cert.key.pem",
+      SSL_alpn_protocols => ["spdy/1", "http/1.1"],
     });
     
     my $ssl_ctx = $server_socket->ssl_ctx;
-    
-    $ssl_ctx->use_PrivateKey_file("$FILE_DIR/simple-cert.key.pem");
-    
-    $ssl_ctx->use_certificate_file("$FILE_DIR/simple-cert.cert.pem");
     
     $ssl_ctx->use_certificate_chain_file("$FILE_DIR/simple-cert.certchain.pem");
     
@@ -35,22 +34,24 @@ class TestCase::IO::Socket::SSL {
       
       $set_tlsext_servername_callback_result->[0] = 1;
       
-      warn "[Test Output][set_tlsext_servername_callback]\$ssl->get_servername:" . $ssl->get_servername(SSL->TLSEXT_NAMETYPE_host_name);
+      my $servername = $ssl->get_servername(SSL->TLSEXT_NAMETYPE_host_name);
+      
+      warn "[Test Output][set_tlsext_servername_callback]\$ssl->get_servername:" . (string)Fn->or($servername, "undef");
       
       warn "[Test Output][set_tlsext_servername_callback]\$\$al_ref:$$al_ref";
       
       return 1;
     });
     
-    my $protocols = ["spdy/1", "http/1.1"];
+    my $accepted_socket = (IO::Socket::SSL)undef;
+    eval {
+      $accepted_socket = $server_socket->accept;
+      $accepted_socket->accept_SSL;
+    }
     
-    $ssl_ctx->set_alpn_select_cb_with_protocols($protocols);
-    
-    my $accepted_socket = $server_socket->accept;
-    
-    $accepted_socket->accept_SSL;
-    
-    my $ssl = $server_socket->ssl;
+    if ($@) {
+      warn "[Test Output][IO::Socket::SSL#accept]$@";
+    }
     
     while (1) {
       
@@ -71,6 +72,47 @@ class TestCase::IO::Socket::SSL {
     
   }
   
+  static method run_echo_server_accept_once : void ($port : int) {
+    
+    my $localhost = "127.0.0.1";
+    
+    my $server_socket = IO::Socket::SSL->new({
+      LocalAddr => $localhost,
+      LocalPort => $port,
+      Listen    => 5,
+      ReuseAddr => 1,
+      SSL_cert_file => "$FILE_DIR/simple-cert.cert.pem",
+      SSL_key_file => "$FILE_DIR/simple-cert.key.pem",
+    });
+    
+    my $accepted_socket = (IO::Socket::SSL)undef;
+    eval { $accepted_socket = $server_socket->accept; }
+    
+    if ($@) {
+      warn "[Test Output][IO::Socket::SSL#accept]$@";
+    }
+    
+    if ($accepted_socket) {
+      while (1) {
+        
+        my $data = (mutable string)new_string_len 1;
+        my $read_length = $accepted_socket->read($data);
+        
+        if ($read_length > 0) {
+          if ($data eq "\0") {
+            last;
+          }
+          
+          $accepted_socket->write($data);
+        }
+        else {
+          last;
+        }
+      }
+    }
+    
+  }
+  
   static method client_and_server_basic : int ($port : int) {
     
     my $success_ref = [1];
@@ -83,16 +125,22 @@ class TestCase::IO::Socket::SSL {
     my $go_server_ref = [0];
     Go->go([$go_server_ref : int[], $wg : Go::Sync::WaitGroup, $port : int] method : void () {
       
+      Fn->defer([$wg : Go::Sync::WaitGroup] method : void () {
+        $wg->done;
+      });
+      
       $go_server_ref->[0] = 1;
       
-      &run_echo_server_accept_once($port);
-      
-      $wg->done;
+      &run_echo_server_accept_once_with_options($port);
     });
     
     # Tests
     my $go_tests_ref = [0];
     Go->go([$go_tests_ref : int[], $wg : Go::Sync::WaitGroup, $success_ref : int[], $port : int] method : void () {
+      
+      Fn->defer([$wg : Go::Sync::WaitGroup] method : void () {
+        $wg->done;
+      });
       
       $go_tests_ref->[0] = 1;
       
@@ -113,17 +161,19 @@ class TestCase::IO::Socket::SSL {
           PeerPort => $port,
           SSL_startHandshake => 0,
           SSL_verify_mode => SSL->SSL_VERIFY_NONE,
+          SSL_cert_file => "$FILE_DIR/simple-cert.cert.pem",
           SSL_key_file => "$FILE_DIR/simple-cert.key.enc.pem",
           SSL_passwd_cb => $default_passwd_cb,
+          SSL_alpn_protocols => ["http/1.1"],
+          SSL_hostname => "localhost",
+          SSL_crl_file => "$FILE_DIR/simple-cert.csr.pem",
+          SSL_check_crl => 1,
+          SSL_hostname => "localhost",
         });
         
         my $ssl_ctx = $socket->ssl_ctx;
         
-        $ssl_ctx->use_certificate_file("$FILE_DIR/simple-cert.cert.pem");
-        
         $ssl_ctx->set_post_handshake_auth(1);
-        
-        $ssl_ctx->set_alpn_protos_with_protocols(["http/1.1"]);
         
         my $msg_callback_results = new object[10];
         
@@ -146,15 +196,8 @@ class TestCase::IO::Socket::SSL {
           }
         };
         
-        my $host_name = "localhost";
-        
-        my $verify_param = $ssl_ctx->get0_param;
-        
-        $verify_param->set1_host($host_name);
-        
-        $socket->add_before_connect_SSL_cb([$msg_callback : Net::SSLeay::Callback::Msg, $host_name : string] method : void ($socket : IO::Socket::SSL, $ssl : Net::SSLeay) {
+        $socket->add_before_connect_SSL_cb([$msg_callback : Net::SSLeay::Callback::Msg] method : void ($socket : IO::Socket::SSL, $ssl : Net::SSLeay) {
           $ssl->set_msg_callback($msg_callback);
-          $ssl->set_tlsext_host_name($host_name);
         });
         
         $socket->connect_SSL;
@@ -280,7 +323,6 @@ class TestCase::IO::Socket::SSL {
         $socket->shutdown_SSL;
       }
       
-      $wg->done;
     });
     
     Go->gosched;
@@ -297,13 +339,184 @@ class TestCase::IO::Socket::SSL {
     
     return $success_ref->[0];
   }
-
-=pod TODO
-
-"SSL_cipher_list", "DEFAULT !EXP !MEDIUM !LOW !eNULL !aNULL !RC4 !DES !MD5 !PSK !SRP"
-
-"SSL_ciphersuites", "DEFAULT"
-
-=cut
-
+  
+  static method client_and_server_no_connect_SSL : int ($port : int) {
+    
+    my $success_ref = [1];
+    
+    my $wg = Go::Sync::WaitGroup->new;
+    
+    $wg->add(2);
+    
+    # Run a echo server
+    my $go_server_ref = [0];
+    Go->go([$go_server_ref : int[], $wg : Go::Sync::WaitGroup, $port : int] method : void () {
+      
+      Fn->defer([$wg : Go::Sync::WaitGroup] method : void () {
+        $wg->done;
+      });
+      
+      $go_server_ref->[0] = 1;
+      
+      &run_echo_server_accept_once($port);
+    });
+    
+    # Tests
+    my $go_tests_ref = [0];
+    Go->go([$go_tests_ref : int[], $wg : Go::Sync::WaitGroup, $success_ref : int[], $port : int] method : void () {
+      
+      Fn->defer([$wg : Go::Sync::WaitGroup] method : void () {
+        $wg->done;
+      });
+      
+      $go_tests_ref->[0] = 1;
+      
+      {
+        my $host = "127.0.0.1";
+        my $socket = IO::Socket::SSL->new({
+          PeerAddr => $host,
+          PeerPort => $port,
+          SSL_startHandshake => 0,
+          SSL_verify_mode => SSL->SSL_VERIFY_NONE,
+        });
+        
+      }
+      
+    });
+    
+    Go->gosched;
+    
+    $wg->wait;
+    
+    unless ($go_server_ref->[0]) {
+      return 0;
+    }
+    
+    unless ($go_tests_ref->[0]) {
+      return 0;
+    }
+    
+    return $success_ref->[0];
+  }
+  
+  static method client_and_server_SSL_key_SSL_cert : int ($port : int) {
+    
+    my $success_ref = [1];
+    
+    my $wg = Go::Sync::WaitGroup->new;
+    
+    $wg->add(2);
+    
+    # Run a echo server
+    my $go_server_ref = [0];
+    Go->go([$go_server_ref : int[], $wg : Go::Sync::WaitGroup, $port : int] method : void () {
+      
+      Fn->defer([$wg : Go::Sync::WaitGroup] method : void () {
+        $wg->done;
+      });
+      
+      $go_server_ref->[0] = 1;
+      
+      &run_echo_server_accept_once($port);
+    });
+    
+    # Tests
+    my $go_tests_ref = [0];
+    Go->go([$go_tests_ref : int[], $wg : Go::Sync::WaitGroup, $success_ref : int[], $port : int] method : void () {
+      
+      Fn->defer([$wg : Go::Sync::WaitGroup] method : void () {
+        $wg->done;
+      });
+      
+      $go_tests_ref->[0] = 1;
+      
+      {
+        my $certs_list = List->new(new Net::SSLeay::X509[0]);
+        
+        my $bio_cert = Net::SSLeay::BIO->new_file( "$FILE_DIR/simple-cert.cert.pem", "r");
+        
+        my $cert = Net::SSLeay::PEM->read_bio_X509($bio_cert);
+        $certs_list->push($cert);
+        
+        my $bio_chain_certs = Net::SSLeay::BIO->new_file("$FILE_DIR/simple-cert.certchain.pem", "r");
+        
+        my $chain_certs_list = List->new(new Net::SSLeay::X509[0]);
+        while (1) {
+          my $chain_cert = (Net::SSLeay::X509)undef;
+          
+          eval { $chain_cert = Net::SSLeay::PEM->read_bio_X509($bio_chain_certs); }
+          
+          if ($@) {
+            if (eval_error_id isa_error Net::SSLeay::Error::PEM_R_NO_START_LINE) {
+              last;
+            }
+            else {
+              die $@;
+            }
+          }
+          
+          $certs_list->push($chain_cert);
+        }
+        
+        my $certs = (Net::SSLeay::X509[])$certs_list->to_array;
+        
+        my $bio_pkey = Net::SSLeay::BIO->new_file("$FILE_DIR/simple-cert.key.pem", "r");
+        
+        my $pkey = Net::SSLeay::PEM->read_bio_PrivateKey($bio_pkey);
+        
+        my $host = "127.0.0.1";
+        my $socket = IO::Socket::SSL->new({
+          PeerAddr => $host,
+          PeerPort => $port,
+          SSL_verify_mode => SSL->SSL_VERIFY_NONE,
+          SSL_cert => $certs,
+          SSL_key => $pkey,
+        });
+        
+        my $write_buffer = "abc";
+          
+        $socket->write($write_buffer);
+        
+        $socket->write("\0");
+        
+        my $string_buffer = StringBuffer->new;
+        
+        my $recv_buffer = (mutable string)new_string_len 1;
+        
+        while (1) {
+          
+          my $recv_length = -1;
+          
+          eval { $recv_length = $socket->read($recv_buffer); }
+          
+          if ($recv_length > 0) {
+            $string_buffer->push($recv_buffer);
+          }
+          else {
+            last;
+          }
+        }
+        
+        unless ($string_buffer->to_string eq "abc") {
+          $success_ref->[0] = 0;
+        }
+      }
+      
+    });
+    
+    Go->gosched;
+    
+    $wg->wait;
+    
+    unless ($go_server_ref->[0]) {
+      return 0;
+    }
+    
+    unless ($go_tests_ref->[0]) {
+      return 0;
+    }
+    
+    return $success_ref->[0];
+  }
+  
 }

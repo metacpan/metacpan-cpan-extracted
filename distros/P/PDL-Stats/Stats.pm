@@ -3,19 +3,19 @@ package PDL::Stats;
 use strict;
 use warnings;
 
-our $VERSION = '0.84';
+our $VERSION = '0.851';
 
 sub import {
   my $pkg = (caller())[0];
-  eval { require PDL::Core; require PDL::GSL::CDF; };
-  my $cdf = !$@;
+  my $cdf = eval { require PDL::Core; require PDL::GSL::CDF; 1 };
+  my $distr = eval { require PDL::Core; require PDL::Stats::Distr; 1 };
   my $use = <<"EOD";
 package $pkg;
 use PDL::Stats::Basic;
 use PDL::Stats::GLM;
 use PDL::Stats::Kmeans;
 use PDL::Stats::TS;
-@{[ $cdf ? 'use PDL::Stats::Distr;' : '' ]}
+@{[ $distr ? 'use PDL::Stats::Distr;' : '' ]}
 @{[ $cdf ? 'use PDL::GSL::CDF;' : '' ]}
 EOD
   eval $use;
@@ -34,20 +34,18 @@ Properly formatted documentations online at http://pdl-stats.sf.net
 
 =head1 SYNOPSIS
 
-    use PDL::LiteF;        # loads less modules
+    use PDL::LiteF;        # loads fewer modules
     use PDL::NiceSlice;    # preprocessor for easier pdl indexing syntax
 
     use PDL::Stats;
 
     # Is equivalent to the following:
-
     use PDL::Stats::Basic;
     use PDL::Stats::GLM;
     use PDL::Stats::Kmeans;
     use PDL::Stats::TS;
 
     # and the following if installed;
-
     use PDL::Stats::Distr;
     use PDL::GSL::CDF;
 

@@ -10331,6 +10331,76 @@ sub post_convert_text{
 }
 
 #
+# PostRemoveDuplicatesRequest
+#
+# 
+# 
+# @removeDuplicatesOptions  RemoveDuplicatesOptions (required)     
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostRemoveDuplicatesRequest',
+            description => 'PostRemoveDuplicates Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_remove_duplicates' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'FileInfo',
+    };
+}
+#
+# @return FileInfo
+#
+sub post_remove_duplicates{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FileInfo', $response);
+    return $_response_object;
+}
+
+#
+# PostExtractTextRequest
+#
+# 
+# 
+# @extractTextOptions  ExtractTextOptions (required)     
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostExtractTextRequest',
+            description => 'PostExtractText Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_extract_text' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'FileInfo',
+    };
+}
+#
+# @return FileInfo
+#
+sub post_extract_text{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FileInfo', $response);
+    return $_response_object;
+}
+
+#
 # GetWorkbookDefaultStyleRequest
 #
 # Retrieve the description of the default style for the workbook .

@@ -1,2 +1,5 @@
+2.011 2024-12-27
+- fix Cr2p having Inplace but a type-spec (https://github.com/PDLPorters/pdl/issues/511)
+
 2.010 2024-11-26
 - split out from PDL 2.095

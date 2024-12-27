@@ -25,9 +25,9 @@ Of course, they also work in perl scripts.
 
   The required PDL version is 2.057.
 
-- GSL (Optional)
+- PDL::GSL (Optional)
 
-  GNU Scientific Library. This is required by PDL::Stats::Distr
+  PDL interface to GNU Scientific Library. This provides PDL::Stats::Distr
   and PDL::GSL::CDF, the latter of which provides p-values for
   PDL::Stats::GLM. GSL is otherwise NOT required for the core PDL::Stats
   modules to work, ie Basic, Kmeans, and GLM.

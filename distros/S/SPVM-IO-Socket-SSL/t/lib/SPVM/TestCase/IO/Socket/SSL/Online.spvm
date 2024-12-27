@@ -1,6 +1,17 @@
 class TestCase::IO::Socket::SSL::Online {
   
   use IO::Socket::SSL;
+  use Mozilla::CA;
+  use File::Temp;
+  use IO;
+  use FindBin;
+  use Net::SSLeay::Constant as SSL;
+  
+  our $FILE_TMP_DIR : string;
+  
+  INIT {
+    $FILE_TMP_DIR = FindBin->Bin . "/file_tmp";
+  }
   
   static method https_google : int () {
     
@@ -106,4 +117,186 @@ class TestCase::IO::Socket::SSL::Online {
     
     return 1;
   }
+  
+  static method https_google_with_mozilla_ca : int () {
+    
+    {
+      my $ca_content = Mozilla::CA->SSL_ca;
+      
+      my $bio = Net::SSLeay::BIO->new;
+      
+      $bio->write($ca_content);
+      
+      my $cas_list = List->new(new Net::SSLeay::X509[0]);
+      while (1) {
+        my $ca = (Net::SSLeay::X509)undef;
+        
+        eval { $ca = Net::SSLeay::PEM->read_bio_X509($bio); }
+        
+        if ($@) {
+          if (eval_error_id isa_error Net::SSLeay::Error::PEM_R_NO_START_LINE) {
+            last;
+          }
+          else {
+            die $@;
+          }
+        }
+        
+        $cas_list->push($ca);
+      }
+      
+      my $cas = (Net::SSLeay::X509[])$cas_list->to_array;
+      
+      # Socket
+      my $host = "www.google.com";
+      my $port = 443;
+      my $socket = IO::Socket::SSL->new({
+        PeerAddr => $host,
+        PeerPort => $port,
+        SSL_ca => $cas,
+      });
+      
+      my $write_buffer = "GET / HTTP/1.0\r\nHost: $host\r\n\r\n";
+      $socket->write($write_buffer);
+      
+      my $read_buffer = (mutable string)new_string_len 100000;
+      while (1) {
+        my $read_length = $socket->read($read_buffer);
+        
+        if ($read_length < 0) {
+          die "Read error";
+        }
+        
+        if ($read_length < length $read_buffer) {
+          last;
+        }
+      }
+      
+      unless (Fn->contains($read_buffer, "200")) {
+        return 0;
+      }
+      
+      
+      unless (Fn->contains($read_buffer, "OK")) {
+        return 0;
+      }
+      
+      unless (Fn->contains($read_buffer, "google")) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method https_google_with_mozilla_ca_SSL_ca_file : int () {
+    
+    {
+      my $ca_content = Mozilla::CA->SSL_ca;
+      
+      my $ca_file = "$FILE_TMP_DIR/ca.pem";
+      
+      my $ca_fh = IO->open(">", $ca_file);
+      $ca_fh->print($ca_content);
+      $ca_fh->close;
+      
+      # Socket
+      my $host = "www.google.com";
+      my $port = 443;
+      my $socket = IO::Socket::SSL->new({
+        PeerAddr => $host,
+        PeerPort => $port,
+        SSL_ca_file => $ca_file,
+      });
+      
+      my $write_buffer = "GET / HTTP/1.0\r\nHost: $host\r\n\r\n";
+      $socket->write($write_buffer);
+      
+      my $read_buffer = (mutable string)new_string_len 100000;
+      while (1) {
+        my $read_length = $socket->read($read_buffer);
+        
+        if ($read_length < 0) {
+          die "Read error";
+        }
+        
+        if ($read_length < length $read_buffer) {
+          last;
+        }
+      }
+      
+      unless (Fn->contains($read_buffer, "200")) {
+        return 0;
+      }
+      
+      
+      unless (Fn->contains($read_buffer, "OK")) {
+        return 0;
+      }
+      
+      unless (Fn->contains($read_buffer, "google")) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method https_google_with_mozilla_ca_SSL_ca_path : int () {
+    
+    {
+      my $ca_content = Mozilla::CA->SSL_ca;
+      
+      my $ca_path = "$FILE_TMP_DIR/ca_path";
+      
+      eval { Sys->mkdir($ca_path, 0755); }
+      
+      my $ca_file = "$ca_path/ca.pem";
+      
+      my $ca_fh = IO->open(">", $ca_file);
+      $ca_fh->print($ca_content);
+      $ca_fh->close;
+      
+      # Socket
+      my $host = "www.google.com";
+      my $port = 443;
+      my $socket = IO::Socket::SSL->new({
+        PeerAddr => $host,
+        PeerPort => $port,
+        SSL_ca_path => $ca_path,
+        SSL_verify_mode => SSL->SSL_VERIFY_NONE,
+      });
+      
+      my $write_buffer = "GET / HTTP/1.0\r\nHost: $host\r\n\r\n";
+      $socket->write($write_buffer);
+      
+      my $read_buffer = (mutable string)new_string_len 100000;
+      while (1) {
+        my $read_length = $socket->read($read_buffer);
+        
+        if ($read_length < 0) {
+          die "Read error";
+        }
+        
+        if ($read_length < length $read_buffer) {
+          last;
+        }
+      }
+      
+      unless (Fn->contains($read_buffer, "200")) {
+        return 0;
+      }
+      
+      unless (Fn->contains($read_buffer, "OK")) {
+        return 0;
+      }
+      
+      unless (Fn->contains($read_buffer, "google")) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
 }

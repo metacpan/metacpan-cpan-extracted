@@ -2,7 +2,7 @@
 # MIT License
 
 class IO::Socket::SSL extends IO::Socket::IP {
-  version "0.007";
+  version "0.008";
   
   use IO::Socket::SSL::Callback::BeforeConnectSSL;
   use IO::Socket::SSL::Callback::BeforeAcceptSSL;
@@ -15,6 +15,7 @@ class IO::Socket::SSL extends IO::Socket::IP {
   use Net::SSLeay::BIO;
   use Net::SSLeay::PEM;
   use Net::SSLeay::X509;
+  use Net::SSLeay::X509_STORE;
   use Net::SSLeay::EVP;
   use Net::SSLeay::EVP_PKEY;
   use Net::SSLeay::Error::SSL_ERROR_WANT_READ;
@@ -45,6 +46,8 @@ class IO::Socket::SSL extends IO::Socket::IP {
   has before_accept_SSL_cbs_list : ro List of IO::Socket::SSL::Callback::BeforeAcceptSSL;
   
   # Undocumented Fields
+  has SocketCategory : int;
+  
   has SSL_startHandshake : int;
   
   has SSL_verify_mode_option : Int;
@@ -53,31 +56,29 @@ class IO::Socket::SSL extends IO::Socket::IP {
   
   has SSL_verify_callback : Net::SSLeay::Callback::Verify;
   
+  has SSL_hostname : string;
+  
   has SSL_passwd_cb : Net::SSLeay::Callback::PemPassword;
   
-  has SSL_check_crl : int;
-  
-  has SSL_crl_file : string;
-  
-  has SSL_alpn_protocols : string[];
+  has SSL_ca : Net::SSLeay::X509[];
   
   has SSL_ca_file : string;
   
   has SSL_ca_path : string;
   
-  has SSL_ca : Net::SSLeay::X509[];
+  has SSL_cert : Net::SSLeay::X509[];
   
   has SSL_cert_file : string;
   
-  has SSL_cert : Net::SSLeay::X509[];
+  has SSL_key : Net::SSLeay::EVP_PKEY;
   
   has SSL_key_file : string;
   
-  has SSL_key : Net::SSLeay::EVP_PKEY;
+  has SSL_crl_file : string;
   
-  has SocketCategory : int;
+  has SSL_check_crl : int;
   
-  has SSL_hostname : string;
+  has SSL_alpn_protocols : string[];
   
   # Class Methods
   static method new : IO::Socket::SSL ($options : object[] = undef) {
@@ -100,17 +101,17 @@ class IO::Socket::SSL extends IO::Socket::IP {
         "SSL_startHandshake",
         "SSL_verify_mode",
         "SSL_verify_callback",
-        "SSL_check_crl",
-        "SSL_crl_file",
+        "SSL_hostname",
+        "SSL_passwd_cb",
+        "SSL_ca",
         "SSL_ca_file",
         "SSL_ca_path",
-        "SSL_ca",
-        "SSL_cert_file",
+        "SSL_crl_file",
+        "SSL_check_crl",
         "SSL_cert",
-        "SSL_key_file",
+        "SSL_cert_file",
         "SSL_key",
-        "SSL_passwd_cb",
-        "SSL_hostname",
+        "SSL_key_file",
         "SSL_alpn_protocols",
       ],
     );
@@ -134,19 +135,26 @@ class IO::Socket::SSL extends IO::Socket::IP {
     my $SSL_verify_callback = (Net::SSLeay::Callback::Verify)$options_h->get_or_default("SSL_verify_callback", undef);
     $self->{SSL_verify_callback} = $SSL_verify_callback;
     
+    my $SSL_hostname = $options_h->get_or_default_string("SSL_hostname", undef);
+    
+    $self->{SSL_hostname} = $SSL_hostname;
+    
     my $SSL_passwd_cb = (Net::SSLeay::Callback::PemPassword)$options_h->get_or_default("SSL_passwd_cb", undef);
     $self->{SSL_passwd_cb} = $SSL_passwd_cb;
+    
+    my $SSL_crl_file = $options_h->get_or_default_string("SSL_crl_file", undef);
+    
+    $self->{SSL_crl_file} = $SSL_crl_file;
     
     my $SSL_check_crl = $options_h->get_or_default_int("SSL_check_crl", 0);
     
     $self->{SSL_check_crl} = $SSL_check_crl;
     
-    my $SSL_crl_file = $options_h->get_or_default_string("SSL_crl_file", 0);
-    
-    $self->{SSL_crl_file} = $SSL_crl_file;
-    
     my $SSL_startHandshake = $options_h->get_or_default_int("SSL_startHandshake", 1);
     $self->{SSL_startHandshake} = $SSL_startHandshake;
+    
+    my $SSL_ca = (Net::SSLeay::X509[])$options_h->get_or_default("SSL_ca", undef);
+    $self->{SSL_ca} = $SSL_ca;
     
     my $SSL_ca_file = $options_h->get_or_default_string("SSL_ca_file", undef);
     $self->{SSL_ca_file} = $SSL_ca_file;
@@ -154,36 +162,29 @@ class IO::Socket::SSL extends IO::Socket::IP {
     my $SSL_ca_path = $options_h->get_or_default_string("SSL_ca_path", undef);
     $self->{SSL_ca_path} = $SSL_ca_path;
     
-    my $SSL_ca = (Net::SSLeay::X509[])$options_h->get_or_default("SSL_ca", undef);
-    $self->{SSL_ca} = $SSL_ca;
-    
     if ($SSL_ca && ($SSL_ca_file || $SSL_ca_path)) {
       die "If SSL_ca option is specified, SSL_ca_file option or SSL_ca_path option cannot be specified.";
     }
     
-    my $SSL_cert_file = $options_h->get_or_default_string("SSL_cert_file", undef);
-    $self->{SSL_cert_file} = $SSL_cert_file;
-    
     my $SSL_cert = (Net::SSLeay::X509[])$options_h->get_or_default("SSL_cert", undef);
     $self->{SSL_cert} = $SSL_cert;
+    
+    my $SSL_cert_file = $options_h->get_or_default_string("SSL_cert_file", undef);
+    $self->{SSL_cert_file} = $SSL_cert_file;
     
     if ($SSL_cert && $SSL_cert_file) {
       die "If SSL_cert option is specified, SSL_cert_file option cannot be specified.";
     }
     
-    my $SSL_key_file = $options_h->get_or_default_string("SSL_key_file", undef);
-    $self->{SSL_key_file} = $SSL_key_file;
-    
     my $SSL_key = $options_h->get_or_default("SSL_key", undef);
     $self->{SSL_key} = (Net::SSLeay::EVP_PKEY)$SSL_key;
+    
+    my $SSL_key_file = $options_h->get_or_default_string("SSL_key_file", undef);
+    $self->{SSL_key_file} = $SSL_key_file;
     
     if ($SSL_key && $SSL_key_file) {
       die "If SSL_key option is specified, SSL_key_file option cannot be specified.";
     }
-    
-    my $SSL_hostname = $options_h->get_or_default_string("SSL_hostname", undef);
-    
-    $self->{SSL_hostname} = $SSL_hostname;
     
     my $SSL_alpn_protocols = (string[])$options_h->get_or_default("SSL_alpn_protocols", undef);
     $self->{SSL_alpn_protocols} = $SSL_alpn_protocols;
@@ -269,16 +270,53 @@ class IO::Socket::SSL extends IO::Socket::IP {
     my $SSL_verify_callback = $self->{SSL_verify_callback};
     $ssl_ctx->set_verify($SSL_verify_mode, $SSL_verify_callback);
     
+    # verify_param
+    my $verify_param = $ssl_ctx->get0_param;
+    $verify_param->set_hostflags(SSL->X509_CHECK_FLAG_NO_PARTIAL_WILDCARDS);
+    my $PeerAddr_is_ip_address = 0;
+    if ($PeerAddr) {
+      # Maybe IPv6
+      if (Fn->contains($PeerAddr, ":")) {
+        $PeerAddr_is_ip_address = 1;
+      }
+      # IPv4
+      elsif (Regex->new("^(\d+)(?:\.(\d+)\.(\d+)\.(\d+)|[\d\.]*)$")->match($PeerAddr)) {
+        $PeerAddr_is_ip_address = 1;
+      }
+      
+      unless ($PeerAddr_is_ip_address) {
+        $verify_param->set1_host($PeerAddr);
+      }
+    }
+    
+    # SSL_hostname
+    my $SSL_hostname = $self->{SSL_hostname};
+    if ($SocketCategory == &SOCKET_CATEGORY_CLIENT) {
+      unless ($SSL_hostname) {
+        if ($PeerAddr && !$PeerAddr_is_ip_address) {
+          $SSL_hostname = $PeerAddr;
+        }
+      }
+      
+      if (length $SSL_hostname) {
+        $self->add_before_connect_SSL_cb([$SSL_hostname : string] method : void ($socket : IO::Socket::SSL, $ssl : Net::SSLeay) {
+          $ssl->set_tlsext_host_name($SSL_hostname);
+        });
+      }
+    }
+    
     # SSL_passwd_cb
     my $SSL_passwd_cb = $self->{SSL_passwd_cb};
     $ssl_ctx->set_default_passwd_cb($SSL_passwd_cb);
     
     # x509_store
     my $x509_store = $ssl_ctx->get_cert_store;
+    my $x509_store_flags = 0;
     
-    # SSL_ca_file, SSL_ca_path, SSL_ca
+    # SSL_ca, SSL_ca_file, SSL_ca_path
     my $SSL_ca_file = $self->{SSL_ca_file};
     my $SSL_ca_path = $self->{SSL_ca_path};
+    
     my $SSL_ca = $self->{SSL_ca};
     if ($SSL_ca) {
       for (my $i = 0; $i < @$SSL_ca; $i++) {
@@ -298,29 +336,10 @@ class IO::Socket::SSL extends IO::Socket::IP {
       }
     }
     
-    # SSL_check_crl, SSL_crl_file
-    my $SSL_check_crl = $self->{SSL_check_crl};
-    my $SSL_crl_file = $self->{SSL_crl_file};
-    my $x509_store_flags = 0;
-    if ($SSL_check_crl) {
-      $x509_store_flags |= SSL->X509_V_FLAG_CRL_CHECK;
-      
-      if ($SSL_crl_file) {
-        my $bio = Net::SSLeay::BIO->new_file($SSL_crl_file, "r");
-        my $crl = Net::SSLeay::PEM->read_bio_X509_CRL($bio);
-        my $cert_store = $ssl_ctx->get_cert_store;
-        $cert_store->add_crl($crl);
-      }
-    }
-    $x509_store->set_flags($x509_store_flags);
-    
-    # SSL_cert_file, SSL_cert
-    my $SSL_cert_file = $self->{SSL_cert_file};
+    # SSL_cert, SSL_cert_file
     my $SSL_cert = $self->{SSL_cert};
-    if ($SSL_cert_file) {
-      $ssl_ctx->use_certificate_chain_file($SSL_cert_file);
-    }
-    elsif ($SSL_cert) {
+    my $SSL_cert_file = $self->{SSL_cert_file};
+    if ($SSL_cert) {
       for (my $i = 0; $i < @$SSL_cert; $i++) {
         my $x509 = $SSL_cert->[$i];
         if ($i == 0) {
@@ -331,62 +350,61 @@ class IO::Socket::SSL extends IO::Socket::IP {
         }
       }
     }
-    
-    # SSL_key_file, SSL_key
-    my $SSL_key_file = $self->{SSL_key_file};
-    my $SSL_key = $self->{SSL_key};
-    if ($SSL_key_file) {
-      $ssl_ctx->use_PrivateKey_file($SSL_key_file, SSL->SSL_FILETYPE_PEM);
+    elsif ($SSL_cert_file) {
+      $ssl_ctx->use_certificate_chain_file($SSL_cert_file);
     }
-    elsif ($SSL_key) {
+    
+    # SSL_key, SSL_key_file
+    my $SSL_key = $self->{SSL_key};
+    my $SSL_key_file = $self->{SSL_key_file};
+    if ($SSL_key) {
       $ssl_ctx->use_PrivateKey($SSL_key);
     }
+    elsif ($SSL_key_file) {
+      $ssl_ctx->use_PrivateKey_file($SSL_key_file, SSL->SSL_FILETYPE_PEM);
+    }
     
-    # verify_param
-    my $verify_param = $ssl_ctx->get0_param;
-    $verify_param->set_hostflags(SSL->X509_CHECK_FLAG_NO_PARTIAL_WILDCARDS);
-    my $PeerAddr_is_ip_address = 0;
-    if ($PeerAddr) {
-      # Maybe IPv6
-      if (Fn->contains($PeerAddr, ":")) {
-        $PeerAddr_is_ip_address = 1;
-      }
-      # IPv4
-      elsif (Regex->new("^(\d+)(?:\.(\d+)\.(\d+)\.(\d+)|[\d\.]*)$")->match($PeerAddr)) {
-        $PeerAddr_is_ip_address = 1;
-      }
-      
-      if ($PeerAddr_is_ip_address) {
-        $verify_param->set1_ip_asc($PeerAddr);
-      }
-      else {
-        $verify_param->set1_host($PeerAddr);
+    # SSL_crl_file
+    my $SSL_crl_file = $self->{SSL_crl_file};
+    if ($SSL_crl_file) {
+      my $bio = Net::SSLeay::BIO->new_file($SSL_crl_file, "r");
+      my $x509s_list = List->new(new Net::SSLeay::X509_CRL[0]);
+      while (1) {
+        my $x509_crl = (Net::SSLeay::X509_CRL)undef;
+        
+        eval { $x509_crl = Net::SSLeay::PEM->read_bio_X509_CRL($bio); }
+        
+        if ($@) {
+          if (eval_error_id isa_error Net::SSLeay::Error::PEM_R_NO_START_LINE) {
+            last;
+          }
+          else {
+            die $@;
+          }
+        }
+        
+        $x509_store->add_crl($x509_crl);
       }
     }
     
-    # SSL_hostname
-    my $SSL_hostname = $self->{SSL_hostname};
-    unless ($SSL_hostname) {
-      if ($PeerAddr && !$PeerAddr_is_ip_address) {
-        $SSL_hostname = $PeerAddr;
-      }
-    }
-    if ($SSL_hostname && $SSL_hostname ne "") {
-      $self->add_before_connect_SSL_cb([$SSL_hostname : string] method : void ($socket : IO::Socket::SSL, $ssl : Net::SSLeay) {
-        $ssl->set_tlsext_host_name($SSL_hostname);
-      });
+    # SSL_check_crl
+    my $SSL_check_crl = $self->{SSL_check_crl};
+    if ($SSL_check_crl) {
+      $x509_store_flags |= SSL->X509_V_FLAG_CRL_CHECK;
     }
     
     # SSL_alpn_protocols
     my $SSL_alpn_protocols = $self->{SSL_alpn_protocols};
     if ($SSL_alpn_protocols) {
-      if ($SocketCategory == &SOCKET_CATEGORY_SERVER) {
-        $ssl_ctx->set_alpn_select_cb_with_protocols($SSL_alpn_protocols);
-      }
-      elsif ($SocketCategory == &SOCKET_CATEGORY_CLIENT) {
+      if ($SocketCategory == &SOCKET_CATEGORY_CLIENT) {
         $ssl_ctx->set_alpn_protos_with_protocols($SSL_alpn_protocols);
       }
+      elsif ($SocketCategory == &SOCKET_CATEGORY_SERVER) {
+        $ssl_ctx->set_alpn_select_cb_with_protocols($SSL_alpn_protocols);
+      }
     }
+    
+    $x509_store->set_flags($x509_store_flags);
     
     $self->{ssl_ctx} = $ssl_ctx;
     
@@ -496,7 +514,7 @@ class IO::Socket::SSL extends IO::Socket::IP {
     my $SSL_startHandshake = $self->{SSL_startHandshake};
     
     if ($SSL_startHandshake) {
-      $self->accept_SSL;
+      $accepted_socket->accept_SSL;
     }
     
     return $accepted_socket;
@@ -615,15 +633,6 @@ class IO::Socket::SSL extends IO::Socket::IP {
     return $status;
   }
   
-  method dump_peer_certificate : string () {
-    
-    my $ssl = $self->{ssl};
-    
-    my $dump = $ssl->dump_peer_certificate;
-    
-    return $dump;
-  }
-  
   method alpn_selected : string () {
     
     my $ssl = $self->{ssl};
@@ -712,6 +721,15 @@ class IO::Socket::SSL extends IO::Socket::IP {
     return $cert;
   }
   
+  method dump_peer_certificate : string () {
+    
+    my $ssl = $self->{ssl};
+    
+    my $dump = $ssl->dump_peer_certificate;
+    
+    return $dump;
+  }
+  
   method add_before_connect_SSL_cb : void ($cb : IO::Socket::SSL::Callback::BeforeConnectSSL) {
     
     my $before_connect_SSL_cbs_list = $self->{before_connect_SSL_cbs_list};
@@ -754,12 +772,7 @@ class IO::Socket::SSL extends IO::Socket::IP {
       my $ssl = $self->{ssl};
       
       if ($ssl) {
-        my $Listen = $self->{Listen};
-        
-        # Only client sockets and accpected sockets
-        unless ($Listen > 0) {
-          $self->shutdown_SSL;
-        }
+        $self->shutdown_SSL;
       }
       
       $self->close;

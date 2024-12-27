@@ -5,15 +5,7 @@ use PDL::LiteF;
 use PDL::Stats;
 use PDL::NiceSlice;
 use Test::More;
-
-sub tapprox {
-  my($a,$b, $eps) = @_;
-  $eps ||= 1e-6;
-  my $diff = abs($a-$b);
-    # use max to make it perl scalar
-  ref $diff eq 'PDL' and $diff = $diff->max;
-  return $diff < $eps;
-}
+use Test::PDL;
 
 # This is the example from Lorch and Myers (1990),
 # a study on how characteristics of sentences affected reading time
@@ -23,19 +15,16 @@ sub tapprox {
 # NEW -- number of new arguments in sentence
 
 my ($data, $idv, $ido) = rtable \*DATA, {V=>0};
-
 my %r = $data( ,4)->ols_rptd( $data( ,3), $data( ,(0)), $data( ,1), $data( ,2) );
+#print "\n$_\t$r{$_}\n" for (sort keys %r);
 
-print "\n";
-print "$_\t$r{$_}\n" for (sort keys %r);
-
-is( tapprox( $r{'(ss_total)'}, 405.188241771429 ) , 1, 'ss_total' );
-is( tapprox( $r{'(ss_residual)'}, 58.3754646504336 ) , 1, 'ss_residual' );
-is( tapprox( $r{'(ss_subject)'}, 51.8590337714289 ) , 1, 'ss_subject' );
-is( tapprox( sumover($r{ss} - pdl(18.450705, 73.813294, 0.57026483)), 0 ) , 1, 'ss' );
-is( tapprox( sumover($r{ss_err} - pdl(23.036272, 10.827623, 5.0104731)), 0 ) , 1, 'ss_err' );
-is( tapprox( sumover($r{coeff} - pdl(0.33337285, 0.45858933, 0.15162986)), 0 ) , 1, 'coeff' );
-is( tapprox( sumover($r{F} - pdl(7.208473, 61.354153, 1.0243311)), 0 ) , 1, 'F' );
+is_pdl $r{'(ss_total)'}, pdl( 405.188241771429 ), 'ss_total';
+is_pdl $r{'(ss_residual)'}, pdl( 58.3754646504336 ), 'ss_residual';
+is_pdl $r{'(ss_subject)'}, pdl( 51.8590337714289 ), 'ss_subject';
+is_pdl $r{ss}, pdl(18.450705, 73.813294, 0.57026483), 'ss';
+is_pdl $r{ss_err}, pdl(23.036272, 10.827623, 5.0104731), 'ss_err';
+is_pdl $r{coeff}, pdl(0.33337285, 0.45858933, 0.15162986), 'coeff';
+is_pdl $r{F}, pdl(7.208473, 61.354153, 1.0243311), 'F';
 
 done_testing();
 

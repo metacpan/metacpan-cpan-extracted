@@ -22,6 +22,10 @@ my $port = Test::SPVM::Sys::Socket::Util::get_available_port();
 
 ok(SPVM::TestCase::IO::Socket::SSL->client_and_server_basic($port));
 
+ok(SPVM::TestCase::IO::Socket::SSL->client_and_server_SSL_key_SSL_cert($port));
+
+ok(SPVM::TestCase::IO::Socket::SSL->client_and_server_no_connect_SSL($port));
+
 # Version check
 {
   my $version_string = SPVM::Fn->get_version_string("IO::Socket::SSL");

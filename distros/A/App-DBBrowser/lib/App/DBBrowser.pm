@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.014;
 
-our $VERSION = '2.419';
+our $VERSION = '2.420';
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile catdir );
@@ -545,7 +545,7 @@ sub run {
                         if ( ! eval {
                             my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
                             $qt_table = $ax->quote_table( $sf->{d}{tables_info}{$table} );
-                            my $alias = $ax->alias( $sql, 'table', $qt_table, 't1' );
+                            my $alias = $ax->alias( $sql, 'ordinary_table', $qt_table, 't1' );
                             if ( length $alias ) {
                                 $qt_table .= " " . $ax->quote_alias( $alias );
                             }
@@ -637,7 +637,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.419
+Version 2.420
 
 =head1 DESCRIPTION
 

@@ -8,6 +8,7 @@ use AsposeCellsCloud::Object::Top10Filter;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
+**FieldIndex** | **int** |  |
 **Criteria** | **string** |   |
 **IsPercent** | **boolean** | Indicates whether the items is percent.  |
 **IsTop** | **boolean** | Indicates whether it's top filter.  |

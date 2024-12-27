@@ -105,7 +105,7 @@ sub select {
                 $sql->{alias} = $complex_col;
             }
             else {
-                my $alias = $ax->alias( $sql, 'select_complex_col', $complex_col );
+                my $alias = $ax->alias( $sql, 'complex_cols_select', $complex_col );
                 if ( length $alias ) {
                     $sql->{alias}{$complex_col} = $ax->quote_alias( $alias );
                 }
@@ -205,7 +205,7 @@ sub aggregate {
             next AGGREGATE;
         }
         push @{$sql->{aggr_cols}}, $prepared_aggr;
-        my $alias = $ax->alias( $sql, 'select_complex_col', $prepared_aggr );
+        my $alias = $ax->alias( $sql, 'complex_cols_select', $prepared_aggr );
         if ( length $alias ) {
             $sql->{alias}{$prepared_aggr} = $ax->quote_alias( $alias );
         }
@@ -287,9 +287,10 @@ sub group_by {
         push @pre, $sf->{i}{menu_addition};
     }
     my $menu = [ @pre, @{$sql->{columns}} ];
+    my $aliases = $sf->{o}{alias}{use_in_group_by} ? $sql->{alias} : {};
 
     GROUP_BY: while ( 1 ) {
-        $sql->{group_by_stmt} = "GROUP BY " . join ', ', @{$sql->{group_by_cols}};
+        $sql->{group_by_stmt} = "GROUP BY " . join ', ', map { length $aliases->{$_} ? $aliases->{$_} : $_ } @{$sql->{group_by_cols}};
         my $info = $ax->get_sql_info( $sql );
         # Choose
         my @idx = $tc->choose(
@@ -331,7 +332,7 @@ sub group_by {
                 $sql->{order_by_stmt} = '';
             }
             if ( @{$sql->{group_by_cols}} ) {
-                $sql->{group_by_stmt} = "GROUP BY " . join ', ', @{$sql->{group_by_cols}};
+                $sql->{group_by_stmt} = "GROUP BY " . join ', ', map { length $aliases->{$_} ? $aliases->{$_} : $_ } @{$sql->{group_by_cols}};
             }
             else {
                 $sql->{group_by_stmt} = '';
@@ -342,7 +343,7 @@ sub group_by {
             my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
             my $complex_col = $ext->column( $sql, $clause );
             if ( defined $complex_col ) {
-                my $alias = $ax->alias( $sql, 'select_complex_col', $complex_col );
+                my $alias = $ax->alias( $sql, 'complex_cols_select', $complex_col );
                 # this alias is used in select
                 if ( length $alias ) {
                     $sql->{alias}{$complex_col} = $ax->quote_alias( $alias );
@@ -360,7 +361,12 @@ sub having {
     my ( $sf, $sql ) = @_;
     my $clause = 'having';
     my $substmt_type = "HAVING";
-    my $items = [ map( '@' . $_, @{$sql->{aggr_cols}} ), @{$sf->{i}{avail_aggr}} ];
+    my $aliases = $sf->{o}{alias}{use_in_having} ? $sql->{alias} : {};
+    my $items = [ uniq(
+            map( length $aliases->{$_} ? $aliases->{$_} : $_, @{$sql->{aggr_cols}} ),
+            @{$sf->{i}{avail_aggr}}
+        )
+    ];
     my $ret = $sf->add_condition( $sql, $clause, $substmt_type, $items );
     return $ret;
 }
@@ -375,23 +381,20 @@ sub order_by {
     if ( $sf->{o}{enable}{extended_cols} ) {
         push @pre, $sf->{i}{menu_addition};
     }
-    my @tmp_cols;
+    my $aliases = $sf->{o}{alias}{use_in_order_by} ? $sql->{alias} : {};
+    my @cols;
     if ( $sql->{aggregate_mode} ) {
-        @tmp_cols = ( @{$sql->{group_by_cols}}, map( '@' . $_, @{$sql->{aggr_cols}} ), @{$sf->{i}{avail_aggr}} );
+        @cols = uniq(
+            map( length $aliases->{$_} ? $aliases->{$_} : $_, @{$sql->{group_by_cols}}, @{$sql->{aggr_cols}} ),
+            @{$sf->{i}{avail_aggr}}
+        );
     }
     else {
-        @tmp_cols = @{$sql->{columns}};
+        @cols = uniq(
+            map( length $aliases->{$_} ? $aliases->{$_} : $_, @{$sql->{selected_cols}} ),
+            @{$sql->{columns}}
+        );
     }
-    my ( @selected_cols_no_alias, @aliases );
-    for my $col ( @{$sql->{selected_cols}} ) {
-        if ( length $sql->{alias}{$col} ) {
-            push @aliases, $sql->{alias}{$col};
-        }
-        else {
-            push @selected_cols_no_alias, $col;
-        }
-    }
-    my @cols = uniq @tmp_cols, @selected_cols_no_alias, @aliases;
     my @bu = @{$sql->{bu_order_by}//[]};
     $sql->{order_by_stmt} = pop ( @bu ) // "ORDER BY";
 
@@ -660,9 +663,6 @@ sub get_prepared_aggr_func {
     my $rx_aggr_requires_col = join '|', map { quotemeta } grep { /\(X\)\z/ } @{$sf->{i}{avail_aggr}};
     my $prepared_aggr;
     if ( $aggr !~ /^(?:$rx_aggr_requires_col)\z/ ) {
-        if ( any { '@' . $_ eq $aggr } @{$sql->{aggr_cols}} ) {
-            $aggr =~ s/^\@//;
-        }
         $prepared_aggr = $aggr;
     }
     else {

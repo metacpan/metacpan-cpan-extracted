@@ -109,9 +109,8 @@ pp_def('_random_cluster',
   Pars  => 'short a(o,c); short [o]b(o,c)',
   Inplace   => 1,
   GenericTypes => [U],
+  RedoDimsCode => 'if ($SIZE(c) > $SIZE(o)) $CROAK("more cluster than obs!");',
   Code  => '
-if ($SIZE(c) > $SIZE(o))
-  barf("more cluster than obs!");
 /* threading w time only srand produces identical clusters */
 long r;
 srand( time( NULL ) + r++);
@@ -122,11 +121,8 @@ loop (o) %{
     $b() = (c == cl)? 1 : 0;
   %}
 %}
-
   ',
-
   Doc   => undef,
-
 );
 
 pp_def('which_cluster',
@@ -134,45 +130,18 @@ pp_def('which_cluster',
   GenericTypes => [U,L],
   HandleBad    => 1,
   Code  => '
-
-PDL_Indx cl;
-
 loop(o) %{
-  cl=-1;
+  PDL_Indx cl=-1;
   loop(c) %{
-    if ($a()) {
-      cl = c;
-      break;
-    }
+    PDL_IF_BAD(if ($ISBAD($a())) continue;,)
+    if (!$a()) continue;
+    cl = c;
+    break;
   %}
+  PDL_IF_BAD(if (cl==-1) { $SETBAD(b()); continue; },)
   $b() = cl;
 %}
-
-  ',
-
-  BadCode  => '
-
-PDL_Indx cl;
-
-loop(o) %{
-  cl=-1;
-  loop(c) %{
-    if ($ISBAD(a()) || !$a()) {  }
-    else {
-      cl = c;
-      break;
-    }
-  %}
-  if (cl==-1) {
-    $SETBAD(b());
-  }
-  else {
-    $b() = cl;
-  }
-%}
-
-  ',
-
+',
   Doc   => 'Given cluster mask dim [obs x clu], returns the cluster index to which an obs belong.
 
 Does not support overlapping clusters. If an obs has TRUE value for multiple clusters, the returned index is the first cluster the obs belongs to. If an obs has no TRUE value for any cluster, the return val is set to -1 or BAD if the input mask has badflag set.
@@ -189,11 +158,7 @@ Usage:
       # get cluster membership list dim [obs]
     perldl> p $ic = $c_mask->which_cluster                
     [0 0 1 1 2 2]
-
-=cut
-
 ',
-
 );
 
 pp_def('assign',
@@ -201,46 +166,16 @@ pp_def('assign',
   GenericTypes => [F,D],
   HandleBad => 1,
   Code  => '
-
-$GENERIC(centroid) ssc, ssmin;
 PDL_Indx cl = 0;
-
 loop (o) %{
-  ssmin = -1;
+  $GENERIC(centroid) ssmin = -1;
   loop (c) %{
-    ssc = 0;
+    $GENERIC(centroid) ssc = 0;
+    PDL_Indx nvc = 0;
     loop (v) %{
+      PDL_IF_BAD(if ($ISBAD($data()) || $ISBAD($centroid())) continue;,)
       ssc += pow($data() - $centroid(), 2);
-    %}
-/* notice that if multiple ssc == ssmin the 1st is taken as cluster */
-    if (ssmin < 0 || ssmin > ssc) {
-      cl = c;
-      ssmin = ssc;
-    }
-  %}
-  loop (c) %{
-    $cluster() = (c == cl)? 1 : 0;
-  %}
-%}
-
-  ',
-  BadCode  => '
-
-$GENERIC(centroid) ssc, ssmin;
-PDL_Indx cl, nvc;
-cl = 0;
-
-loop (o) %{
-  ssmin = -1;
-  loop (c) %{
-    ssc = 0;
-    nvc = 0;
-    loop (v) %{
-      if ($ISBAD( $data() ) || $ISBAD( $centroid() )) {  }
-      else {
-        ssc += pow($data() - $centroid(), 2);
-        nvc ++;
-      }
+      nvc ++;
     %}
     if (nvc) {
       ssc /= nvc;
@@ -257,35 +192,26 @@ loop (o) %{
     }
   %}
   loop (c) %{
-    if (ssmin >= 0) {
-      $cluster() = (c == cl)? 1 : 0;
-    }
-    else {
-      $SETBAD($cluster());
-    }
+    PDL_IF_BAD(if (ssmin < 0) { $SETBAD($cluster()); continue; },)
+    $cluster() = (c == cl)? 1 : 0;
   %}
 %}
-
-  ',
+',
   Doc   => '
-
 =for ref
 
 Takes data pdl dim [obs x var] and centroid pdl dim [cluster x var] and returns mask dim [obs x cluster] to cluster membership. An obs is assigned to the first cluster with the smallest distance (ie sum squared error) to cluster centroid. With bad value, obs is assigned by smallest mean squared error across variables.
 
 =for usage
 
-    perldl> $centroid = ones 2, 3
-    perldl> $centroid(0,) .= 0
-    perldl> p $centroid
+    perldl> p $centroid = xvals 2, 3
     [
      [0 1]
      [0 1]
      [0 1]
     ]
 
-    perldl> $b = qsort( random 4, 3 )
-    perldl> p $b
+    perldl> p $b = qsort( random 4, 3 )
     [
      [0.022774068 0.032513883  0.13890034  0.30942479]
      [ 0.16943853  0.50262636  0.56251531   0.7152271]
@@ -298,11 +224,7 @@ Takes data pdl dim [obs x var] and centroid pdl dim [cluster x var] and returns 
      [1 1 1 0]    # cluster 0 membership
      [0 0 0 1]    # cluster 1 membership
     ]
-
-=cut
-
-  ',
-
+',
 );
 
 pp_def('centroid',
@@ -311,76 +233,38 @@ pp_def('centroid',
   HandleBad => 1,
   Code  => '
 $GENERIC(m) s[ $SIZE(c) ][ $SIZE(v) ], s2[ $SIZE(c) ][ $SIZE(v) ];
-PDL_Indx n[ $SIZE(c) ];
-
+PDL_Indx n[ $SIZE(c) ]PDL_IF_BAD([ $SIZE(v) ],);
 loop (c) %{
   loop (v) %{
     s[c][v]  = 0.0;
     s2[c][v] = 0.0;
+    PDL_IF_BAD(n[c][v]  = 0;,)
   %}
-  n[c] = 0;
+  PDL_IF_BAD(,n[c] = 0;)
   loop (o) %{
-    if ($cluster()) {
-      n[c] ++;
-      loop (v) %{
-        s[c][v]  += $data();
-        s2[c][v] += pow($data(), 2);
-      }
-    %}
-  %}
-
-  if (n[c]) {
+    PDL_IF_BAD(if ($ISBAD($cluster())) continue;,)
+    if (!$cluster()) continue;
+    PDL_IF_BAD(,n[c]++;)
     loop (v) %{
-      $m()  = s[c][v] / n[c];
-      $ss() = s2[c][v] - pow(s[c][v] / n[c], 2) * n[c];
+      PDL_IF_BAD(if ($ISBAD($data())) continue;,)
+      s[c][v]  += $data();
+      s2[c][v] += pow($data(), 2);
+      PDL_IF_BAD(n[c][v]++;,)
     %}
-  }
-  else {
-    loop (v) %{
-      $m() = 0;
-      $ss() = 0;
-    %}
-/*    barf("please make sure there is no empty cluster!");  */
-  }
-%}
-
-  ',
-  BadCode  => '
-$GENERIC(m) s[ $SIZE(c) ][ $SIZE(v) ], s2[ $SIZE(c) ][ $SIZE(v) ];
-PDL_Indx n[ $SIZE(c) ][ $SIZE(v) ];
-
-loop (c) %{
-  loop (v) %{
-    s[c][v]  = 0.0;
-    s2[c][v] = 0.0;
-    n[c][v]  = 0;
   %}
-  loop (o) %{
-    if ($ISBAD($cluster()) || !$cluster()) { }
-    else {
-      loop (v) %{
-        if ($ISGOOD( $data() )) {
-          s[c][v]  += $data();
-          s2[c][v] += pow($data(), 2);
-          n[c][v]  ++;
-        }
-      %}
-    }
-  %}
-
   loop (v) %{
-    if (n[c][v]) {
-      $m()  = s[c][v] / n[c][v];
-      $ss() = s2[c][v] / n[c][v] - pow(s[c][v] / n[c][v], 2);
+    if (n[c]PDL_IF_BAD([v],)) {
+      $m()  = s[c][v] / n[c]PDL_IF_BAD([v],);
+      $ss() = s2[c][v] PDL_IF_BAD(/ n[c][v],) - pow(s[c][v] / n[c]PDL_IF_BAD([v],), 2) PDL_IF_BAD(,* n[c]);
     }
     else {
       $m() = 0;
       $ss() = 0;
+/*    $CROAK("please make sure there is no empty cluster!");  */
     }
   %}
 %}
-
-  ',
+',
   Doc   => '
 =for ref
 
@@ -421,11 +305,7 @@ Takes data dim [obs x var] and mask dim [obs x cluster], returns mean and ss (ms
      [17.5    5]
      [17.5    5]
     ]
-
-=cut
-
   ',
-
 );
 
 pp_addpm pp_line_numbers(__LINE__, <<'EOD');
@@ -468,31 +348,18 @@ pp_def('_d_p2l',
   Pars      => 'xc(); yc(); xa(); ya(); xb(); yb(); float+ [o]d()',
   GenericTypes => [F, D],
   HandleBad => 1,
-  Code      => '
-    $GENERIC(d) xba, yba;
-    xba = $xb() - $xa();
-    yba = $yb() - $ya();
-
-    $d() = fabs( xba * ($ya() - $yc()) - ($xa() - $xc()) * yba )
-         / sqrt( pow(xba,2) + pow(yba,2) );
-  ',
-  BadCode   => '
-    if ($ISBAD(xc()) || $ISBAD(yc()) || $ISBAD(xa()) || $ISBAD(ya()) || $ISBAD(xb()) || $ISBAD(yb()) )
-         {  $SETBAD(d());  }
-    else {
-      $GENERIC(d) xba, yba;
-      xba = $xb() - $xa();
-      yba = $yb() - $ya();
-  
-      $d() = fabs( xba * ($ya() - $yc()) - ($xa() - $xc()) * yba )
-           / sqrt( pow(xba,2) + pow(yba,2) );
-    }
+  Code   => '
+PDL_IF_BAD(if ($ISBAD(xc()) || $ISBAD(yc()) || $ISBAD(xa()) || $ISBAD(ya()) || $ISBAD(xb()) || $ISBAD(yb()) ) { $SETBAD(d()); continue; },)
+$GENERIC(d) xba, yba;
+xba = $xb() - $xa();
+yba = $yb() - $ya();
+$d() = fabs( xba * ($ya() - $yc()) - ($xa() - $xc()) * yba )
+     / sqrt( pow(xba,2) + pow(yba,2) );
   ',
   Doc      => undef,
 );
 
 pp_addpm pp_line_numbers(__LINE__, <<'EOD');
-
 =head2 kmeans
 
 =for ref
@@ -857,6 +724,5 @@ All rights reserved. There is no warranty. You are allowed to redistribute this 
 =cut
 
 EOD
-
 
 pp_done();

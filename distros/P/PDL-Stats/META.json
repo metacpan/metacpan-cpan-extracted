@@ -22,12 +22,12 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "PDL::Core" : "2.008"
+            "PDL" : "2.073"
          }
       },
       "configure" : {
          "requires" : {
-            "PDL::Core" : "2.008"
+            "PDL" : "2.073"
          }
       },
       "develop" : {
@@ -37,17 +37,19 @@
       },
       "runtime" : {
          "recommends" : {
+            "PDL::GSL" : "0",
             "PDL::Graphics::PGPLOT" : "0",
             "PDL::Slatec" : "0"
          },
          "requires" : {
-            "PDL" : "2.057"
+            "PDL" : "2.073",
+            "perl" : "5.016"
          }
       },
       "test" : {
          "requires" : {
-            "PDL::Core" : "2.008",
-            "Test::More" : "0.88"
+            "Test::More" : "0.88",
+            "Test::PDL" : "0.21"
          }
       }
    },
@@ -59,6 +61,6 @@
          "web" : "https://github.com/PDLPorters/PDL-Stats"
       }
    },
-   "version" : "0.84",
+   "version" : "0.851",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -9,7 +9,7 @@ App::Codit::Plugins::PerlSubs - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.11;
+$VERSION = 0.14;
 use base qw( App::Codit::BaseClasses::TextModPlugin );
 
 use Data::Compare;
@@ -24,11 +24,13 @@ Easily find the subs in your document.
 =head1 DETAILS
 
 PerlSubs scans the current selected document for lines that begin
-with 'sub someName' and displays it in a list with the line number. 
+with 'sub someName' and displays it in a list with the line number.
 The list is refreshed after an edit.
 
 When you click on and item in the list, the insert cursor is moved to that
 line and it is scrolled into visibility.
+
+Both colums are sizable and sortable.
 
 =cut
 
@@ -160,9 +162,9 @@ sub Sort {
 	my @new;
 	if ($on eq 'Sub') {
 		if ($order eq 'ascending') {
-			@new = sort {$a->[0] cmp $b->[0]} @list
+			@new = sort {lc($a->[0]) cmp lc($b->[0])} @list
 		} elsif ($order eq 'descending') {
-			@new = reverse sort {$a->[0] cmp $b->[0]} @list
+			@new = reverse sort {lc($a->[0]) cmp lc($b->[0])} @list
 		}
 	} elsif ($on eq 'Line') {
 		if ($order eq 'ascending') {

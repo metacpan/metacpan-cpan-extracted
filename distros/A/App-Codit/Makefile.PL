@@ -8,9 +8,9 @@ my %prereq = (
 	'Getopt::Long'        => '2.54',
 	'Test::Tk'            => '3.04',
 	'Tk'                  => '804.032',
-	'Tk::AppWindow'       => '0.17',
-	'Tk::CodeText'        => '0.55',
-	'Tk::FileBrowser'     =>	'0.06',
+	'Tk::AppWindow'       => '0.18',
+	'Tk::CodeText'        => '0.59',
+	'Tk::FileBrowser'     =>	'0.07',
 	'Tk::PodViewer'       =>	'0.05',
 	'Tk::Terminal'        =>	'0.03',
 );

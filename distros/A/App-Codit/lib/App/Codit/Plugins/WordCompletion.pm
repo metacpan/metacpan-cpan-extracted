@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw( $VERSION );
-$VERSION = 0.10;
+$VERSION = 0.14;
 
 require Tk::HList;
 require Tk::LabFrame;
@@ -28,7 +28,7 @@ Make your life easy with word completion.
 
 This plugin will scan open documents for words longer than five characters
 and store them in a database. Whenever you start typing similar words it
-will pop a list with suggestions. You can close this popup with the escape key. 
+will pop a list with suggestions. You can close this popup with the escape key.
 You can traverse the list with your keyboard and select and entry with the
 mouse or the return key.
 
@@ -74,7 +74,8 @@ sub new {
 	$self->{TRIGGERWORD} = '';
 
 	$self->cmdHookBefore('deferred_open', 'docOpen', $self);
-	$self->cmdHookAfter('modified', 'activate', $self);
+	$self->cmdHookBefore('key_released', 'activate', $self);
+	$self->cmdHookBefore('modified', 'modified', $self);
 	$self->cmdHookAfter('doc_close', 'docClose', $self);
 
 	$self->cmdConfig('wc_settings', ['ConfigureSettings', $self]);
@@ -126,6 +127,12 @@ sub activeDelay {
 
 sub activate {
 	my $self = shift;
+	my ($dummy, $key) = @_;
+#	print "$dummy, '$key'\n";
+	if ($key eq '') {
+		$self->activateCancel;
+		return @_
+	}
 	return @_ if $self->{POPBLOCK};
 	return @_ unless $self->configGet('-wordcompletion');
 
@@ -142,11 +149,17 @@ sub activate {
 
 	my ($name) = @_;
 	$name = $self->extGet('CoditMDI')->docSelected unless defined $name;
-	my $id = $self->{'active_id'};
-	$self->afterCancel($id) if defined $id;
+	$self->activateCancel;
 	return @_ unless (defined $name) and ($name ne '');
 	$self->{'active_id'} = $self->after($self->activeDelay, ['postChoices', $self, $name]);
 	return @_;
+}
+
+sub activateCancel {
+	my $self = shift;
+	my $id = $self->{'active_id'};
+	$self->afterCancel($id) if defined $id;
+	delete $self->{'active_id'};
 }
 
 sub CanQuit {
@@ -164,75 +177,27 @@ sub CanQuit {
 sub ConfigureSettings {
 	my $self = shift;
 
-	my $delay = $self->activeDelay;
-	my $popsize = $self->PopSize;
-	my $scansize = $self->ScanSize;
+	my %iv = (
+		delay => $self->activeDelay,
+		popsize => $self->PopSize,
+		scansize => $self->ScanSize,
+	);
+	my %options = $self->popForm(
+		-initialvalues => \%iv,
+		-structure => [
+			'*section' => 'Settings',
+			delay => ['spin', 'Active delay'],
+			popsize => ['spin', 'Pop size'],
+			scansize => ['spin', 'Scan size'],
+			'*end',
+		],
+		-title => 'Word completion'
+	);
 
-	my @padding = (
-		-padx => 2, 
-		-pady => 2
-	);
-	my @l1opt = (		
-		-width => 12,
-		-anchor => 'e',
-	);
-	my @l2opt = (		
-		-width => 3,
-		-anchor => 'w',
-	);
-	my @spbopt = (
-		-from => 0,
-		-to => 5000,
-		-width => 8,
-	);
-	my $q = $self->YADialog(
-		-title => 'Word Completion',
-		-buttons => ['Ok', 'Cancel'],
-		-defaultbutton => 'Ok',
-	);
-	my $f = $q->LabFrame(
-		-label => 'Settings',
-		-labelside => 'acrosstop',
-	)->pack(@padding, -expand => 1, -fill => 'both');
-
-	my $row = 0;
-	for (
-		[\$delay, 'Active delay', 'ms'],
-		[\$popsize, 'Pop size', 'ch'],
-		[\$scansize, 'Scan size', 'ch'],
-	) {
-		my ($variable, $label, $unit) = @$_;
-		$f->Label(@l1opt,
-			-text => $label,
-		)->grid(@padding, -row => $row, -column => 0);
-		$f->Spinbox(@spbopt,
-			-textvariable => $variable,
-		)->grid(@padding, -row => $row, -column => 1);
-		$f->Label(@l2opt,
-			-text => $unit,
-		)->grid(-row => $row, -column => 2);
-		$row ++;
-	}
-
-	my $answer = $q->Show(-popover => $self->GetAppWindow);
-	if ($answer eq 'Ok') {
-		if ($delay =~ /^\d+$/) {
-			$self->activeDelay($delay);
-		} else {
-			$self->popMessage("Invalid value '$delay' for Active delay", 'dialog-warning');
-		}
-		if ($popsize =~ /^\d+$/) {
-			$self->PopSize($popsize);
-		} else {
-			$self->popMessage("Invalid value '$popsize' for Pop size", 'dialog-warning');
-		}
-		if ($scansize =~ /^\d+$/) {
-			$self->ScanSize($scansize);
-		} else {
-			$self->popMessage("Invalid value '$scansize' for Scan size", 'dialog-warning');
-		}
-	}
-	$q->destroy;
+	return unless %options;
+	$self->activeDelay($options{'delay'});
+	$self->PopSize($options{'popsize'});
+	$self->ScanSize($options{'scansize'});
 }
 
 sub docClose {
@@ -346,9 +311,16 @@ sub getWord {
 sub MenuItems {
 	my $self = shift;
 	return (
-      [ 'menu_check',  'Tools::Wrap',  'W~ord completion',    undef,   '-wordcompletion', undef, 0, 1],
-      [ 'menu_normal', 'Tools::Wrap',  '~Configure word completion',   'wc_settings'],
+		[ 'menu_check',  'Tools::Wrap',  'W~ord completion',    undef,   '-wordcompletion', undef, 0, 1],
+		[ 'menu_normal', 'Tools::Wrap',  '~Configure word completion',   'wc_settings'],
 	)
+}
+
+sub modified {
+	my $self = shift;
+	my ($name) = @_;
+	$self->ScanStart($name);
+	return @_;
 }
 
 sub popDown {
@@ -373,13 +345,11 @@ sub PopSize {
 sub postChoices {
 	my ($self, $name) = @_;
 	return if $self->{POPBLOCK};
-	$self->ScanStart($name);
 
 	my $word = $self->getWord;
 	my $doc = $self->getWidget;
 	return unless defined $doc;
 	return unless defined $word;
-#	my $ins = $doc->index('insert');
 	my @choices = $self->getChoices($name, $word);
 	if (@choices) {
 		my $lb = $self->_listbox;
@@ -531,7 +501,8 @@ sub TriggerWord {
 sub Unload {
 	my $self = shift;
 	$self->cmdUnhookBefore('deferred_open', 'docOpen', $self);
-	$self->cmdUnhookAfter('modified', 'activate', $self);
+	$self->cmdUnhookBefore('key_released', 'activate', $self);
+	$self->cmdUnhookBefore('modified', 'modified', $self);
 	$self->cmdUnhookAfter('doc_close', 'docClose', $self);
 	$self->configRemove('-wordcompletion');
 	$self->cmdRemove('wc_settings');

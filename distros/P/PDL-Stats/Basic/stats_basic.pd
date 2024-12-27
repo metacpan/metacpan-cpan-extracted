@@ -46,33 +46,17 @@ pp_def('stdv',
   Pars      => 'a(n); float+ [o]b()',
   GenericTypes => [F, D],
   HandleBad => 1,
-  Code      => '
-    $GENERIC(b) sa, a2;
-    sa = 0; a2 = 0;
-    PDL_Indx N = $SIZE(n);
+  Code  => '
+    $GENERIC(b) sa = 0, a2 = 0;
+    PDL_Indx N = PDL_IF_BAD(0,$SIZE(n));
     loop (n) %{
+      PDL_IF_BAD(if ($ISBAD($a())) continue;,)
       sa += $a();
       a2 += pow($a(), 2);
+      PDL_IF_BAD(N++;,)
     %}
+    if (N < 1) { $SETBAD(b()); continue; }
     $b() = sqrt( a2 / N - pow(sa/N,2) );
-  ',
-  BadCode  => '
-    $GENERIC(b) sa, a2;
-    sa = 0; a2 = 0;
-    PDL_Indx N = 0;
-    loop (n) %{
-      if ( $ISGOOD($a()) ) {
-	sa += $a();
-	a2 += pow($a(), 2);
-	N  ++;
-      }
-    %}
-    if (N) {
-      $b() = sqrt( a2 / N - pow(sa/N,2) );
-    }
-    else {
-      $SETBAD(b());
-    }
   ',
   Doc      => '
 
@@ -89,33 +73,17 @@ pp_def('stdv_unbiased',
   Pars      => 'a(n); float+ [o]b()',
   GenericTypes => [F, D],
   HandleBad => 1,
-  Code      => '
-    $GENERIC(b) sa, a2;
-    sa = 0; a2 = 0;
-    PDL_Indx N = $SIZE(n);
+  Code  => '
+    $GENERIC(b) sa = 0, a2 = 0;
+    PDL_Indx N = PDL_IF_BAD(0,$SIZE(n));
     loop (n) %{
+      PDL_IF_BAD(if ($ISBAD($a())) continue;,)
       sa += $a();
       a2 += pow($a(), 2);
+      PDL_IF_BAD(N++;,)
     %}
+    if (N < 2) { $SETBAD(b()); continue; }
     $b() = pow( a2/(N-1) - pow(sa/N,2) * N/(N-1), .5 );
-  ',
-  BadCode  => '
-    $GENERIC(b) sa, a2;
-    sa = 0; a2 = 0;
-    PDL_Indx N = 0;
-    loop (n) %{
-      if ( $ISGOOD($a()) ) {
-	sa += $a();
-	a2 += pow($a(), 2);
-	N  ++;
-      }
-    %}
-    if (N-1) {
-      $b() = pow( a2/(N-1) - pow(sa/N,2) * N/(N-1), .5 );
-    }
-    else {
-      $SETBAD(b());
-    }
   ',
   Doc      => '
 
@@ -132,33 +100,17 @@ pp_def('var',
   Pars      => 'a(n); float+ [o]b()',
   GenericTypes => [F, D],
   HandleBad => 1,
-  Code      => '
-    $GENERIC(b) a2, sa;
-    a2 = 0; sa = 0;
-    PDL_Indx N = $SIZE(n);
+  Code  => '
+    $GENERIC(b) a2 = 0, sa = 0;
+    PDL_Indx N = PDL_IF_BAD(0,$SIZE(n));
     loop (n) %{
+      PDL_IF_BAD(if ($ISBAD($a())) continue;,)
       a2 += pow($a(), 2);
       sa += $a();
+      PDL_IF_BAD(N++;,)
     %}
+    if (N < 1) { $SETBAD(b()); continue; }
     $b() = a2 / N - pow(sa/N, 2);
-  ',
-  BadCode  => '
-    $GENERIC(b) a2, sa;
-    a2 = 0; sa = 0;
-    PDL_Indx N = 0;
-    loop (n) %{
-      if ( $ISGOOD($a()) ) {
-        a2 += pow($a(), 2);
-        sa += $a();
-	N  ++;
-      }
-    %}
-    if (N) {
-      $b() = a2 / N - pow(sa/N, 2);
-    }
-    else {
-      $SETBAD(b());
-    }
   ',
   Doc      => '
 
@@ -175,33 +127,17 @@ pp_def('var_unbiased',
   Pars      => 'a(n); float+ [o]b()',
   GenericTypes => [F, D],
   HandleBad => 1,
-  Code      => '
-    $GENERIC(b) a2, sa;
-    a2 = 0; sa = 0;
-    PDL_Indx N = $SIZE(n);
+  Code  => '
+    $GENERIC(b) a2 = 0, sa = 0;
+    PDL_Indx N = PDL_IF_BAD(0,$SIZE(n));
     loop (n) %{
+      PDL_IF_BAD(if ($ISBAD($a())) continue;,)
       a2 += pow($a(), 2);
       sa += $a();
+      PDL_IF_BAD(N++;,)
     %}
+    if (N < 2) { $SETBAD(b()); continue; }
     $b() = (a2 - pow(sa/N, 2) * N) / (N-1);
-  ',
-  BadCode  => '
-    $GENERIC(b) a2, sa;
-    a2 = 0; sa = 0;
-    PDL_Indx N = 0;
-    loop (n) %{
-      if ( $ISGOOD($a()) ) {
-        a2 += pow($a(), 2);
-        sa += $a();
-	N  ++;
-      }
-    %}
-    if (N-1) {
-      $b() = (a2 - pow(sa/N, 2) * N) / (N-1);
-    }
-    else {
-      $SETBAD(b());
-    }
   ',
   Doc      => '
 
@@ -218,33 +154,17 @@ pp_def('se',
   Pars      => 'a(n); float+ [o]b()',
   GenericTypes => [F, D],
   HandleBad => 1,
-  Code      => '
-    $GENERIC(b) sa, a2;
-    sa = 0; a2 = 0;
-    PDL_Indx N = $SIZE(n);
+  Code  => '
+    $GENERIC(b) sa = 0, a2 = 0;
+    PDL_Indx N = PDL_IF_BAD(0,$SIZE(n));
     loop (n) %{
+      PDL_IF_BAD(if ($ISBAD($a())) continue;,)
       sa += $a();
       a2 += pow($a(), 2);
+      PDL_IF_BAD(N++;,)
     %}
+    if (N < 2) { $SETBAD(b()); continue; }
     $b() = sqrt( (a2/(N-1) - pow(sa/N,2) * N/(N-1)) / N );
-  ',
-  BadCode  => '
-    $GENERIC(b) sa, a2;
-    sa = 0; a2 = 0;
-    PDL_Indx N = 0;
-    loop (n) %{
-      if ( $ISGOOD($a()) ) {
-	sa += $a();
-	a2 += pow($a(), 2);
-	N  ++;
-      }
-    %}
-    if (N-1) {
-      $b() = sqrt( (a2/(N-1) - pow(sa/N,2) * N/(N-1)) / N );
-    }
-    else {
-      $SETBAD(b());
-    }
   ',
   Doc      => '
 
@@ -269,33 +189,17 @@ pp_def('ss',
   Pars      => 'a(n); float+ [o]b()',
   GenericTypes => [F, D],
   HandleBad => 1,
-  Code      => '
-    $GENERIC(b) sa, a2;
-    sa = 0; a2 = 0;
-    PDL_Indx N = $SIZE(n);
+  Code  => '
+    $GENERIC(b) sa = 0, a2 = 0;
+    PDL_Indx N = PDL_IF_BAD(0,$SIZE(n));
     loop (n) %{
+      PDL_IF_BAD(if ($ISBAD($a())) continue;,)
       sa += $a();
       a2 += pow($a(), 2);
+      PDL_IF_BAD(N++;,)
     %}
+    if (N < 1) { $SETBAD(b()); continue; }
     $b() = a2 - N * pow(sa/N,2);
-  ',
-  BadCode  => '
-    $GENERIC(b) sa, a2;
-    sa = 0; a2 = 0;
-    PDL_Indx N = 0;
-    loop (n) %{
-      if ( $ISGOOD($a()) ) {
-	sa += $a();
-	a2 += pow($a(), 2);
-	N  ++;
-      }
-    %}
-    if (N) {
-      $b() = a2 - N * pow(sa/N,2);
-    }
-    else {
-      $SETBAD(b());
-    }
   ',
   Doc      => '
 
@@ -312,45 +216,24 @@ pp_def('skew',
   Pars      => 'a(n); float+ [o]b()',
   GenericTypes => [F, D],
   HandleBad => 1,
-  Code      => '
-    $GENERIC(b) sa, m, d, d2, d3;
-    sa = 0; d2 = 0; d3 = 0;
-    PDL_Indx N = $SIZE(n);
+  Code  => '
+    $GENERIC(b) sa = 0, m = 0, d=0, d2 = 0, d3 = 0;
+    PDL_Indx N = PDL_IF_BAD(0,$SIZE(n));
     loop (n) %{
+      PDL_IF_BAD(if ($ISBAD($a())) continue;,)
       sa += $a();
+      PDL_IF_BAD(N++;,)
     %}
+    if (N < 1) { $SETBAD(b()); continue; }
     m = sa / N;
     loop (n) %{
-      d   = $a() - m;
-      d2 += pow(d, 2);
-      d3 += pow(d, 3);
-    %}
-    $b() = d3/N / pow(d2/N, 1.5);
-  ',
-  BadCode  => '
-    $GENERIC(b) sa, m, d, d2, d3;
-    sa = 0; m = 0; d=0; d2 = 0; d3 = 0;
-    PDL_Indx N = 0;
-    loop (n) %{
       if ( $ISGOOD($a()) ) {
-        sa += $a();
-        N ++;
+        d   = $a() - m;
+        d2 += pow(d, 2);
+        d3 += pow(d, 3);
       }
     %}
-    if (N) {
-      m = sa / N;
-      loop (n) %{
-        if ( $ISGOOD($a()) ) {
-      	  d   = $a() - m;
-      	  d2 += pow(d, 2);
-      	  d3 += pow(d, 3);
-        }
-      %}
-      $b() = d3/N / pow(d2/N, 1.5);
-    }
-    else {
-      $SETBAD(b());
-    }
+    $b() = d3/N / pow(d2/N, 1.5);
   ',
   Doc      => '
 
@@ -367,45 +250,23 @@ pp_def('skew_unbiased',
   Pars      => 'a(n); float+ [o]b()',
   GenericTypes => [F, D],
   HandleBad => 1,
-  Code      => '
-    $GENERIC(b) sa, m, d, d2, d3;
-    sa = 0; d2 = 0; d3 = 0;
-    PDL_Indx N = $SIZE(n);
+  Code  => '
+    $GENERIC(b) sa = 0, m = 0, d=0, d2 = 0, d3 = 0;
+    PDL_Indx N = PDL_IF_BAD(0,$SIZE(n));
     loop (n) %{
+      PDL_IF_BAD(if ($ISBAD($a())) continue;,)
       sa += $a();
+      PDL_IF_BAD(N++;,)
     %}
+    if (N < 3) { $SETBAD(b()); continue; }
     m = sa / N;
     loop (n) %{
+      PDL_IF_BAD(if ($ISBAD($a())) continue;,)
       d   = $a() - m;
       d2 += pow(d, 2);
       d3 += pow(d, 3);
     %}
     $b() = sqrt(N*(N-1)) / (N-2) * d3/N / pow(d2/N, 1.5);
-  ',
-  BadCode  => '
-    $GENERIC(b) sa, m, d, d2, d3;
-    sa = 0; m = 0; d=0; d2 = 0; d3 = 0;
-    PDL_Indx N = 0;
-    loop (n) %{
-      if ( $ISGOOD($a()) ) {
-        sa += $a();
-        N ++;
-      }
-    %}
-    if (N-2) {
-      m = sa / N;
-      loop (n) %{
-        if ( $ISGOOD($a()) ) {
-          d   = $a() - m;
-          d2 += pow(d, 2);
-          d3 += pow(d, 3);
-        }
-      %}
-      $b() = sqrt(N*(N-1)) / (N-2) * d3/N / pow(d2/N, 1.5);
-    }
-    else {
-      $SETBAD(b());
-    }
   ',
   Doc      => '
 
@@ -422,45 +283,23 @@ pp_def('kurt',
   Pars      => 'a(n); float+ [o]b()',
   GenericTypes => [F, D],
   HandleBad => 1,
-  Code      => '
-    $GENERIC(b) sa, m, d, d2, d4;
-    sa = 0; d2 = 0; d4 = 0;
-    PDL_Indx N = $SIZE(n);
+  Code  => '
+    $GENERIC(b) sa = 0, m = 0, d=0, d2 = 0, d4 = 0;
+    PDL_Indx N = PDL_IF_BAD(0,$SIZE(n));
     loop (n) %{
+      PDL_IF_BAD(if ($ISBAD($a())) continue;,)
       sa += $a();
+      PDL_IF_BAD(N++;,)
     %}
+    if (N < 1) { $SETBAD(b()); continue; }
     m = sa / N;
     loop (n) %{
+      PDL_IF_BAD(if ($ISBAD($a())) continue;,)
       d   = $a() - m;
       d2 += pow(d, 2);
       d4 += pow(d, 4);
     %}
     $b() = N * d4 / pow(d2,2) - 3;
-  ',
-  BadCode  => '
-    $GENERIC(b) sa, m, d, d2, d4;
-    sa = 0; m = 0; d=0; d2 = 0; d4 = 0;
-    PDL_Indx N = 0;
-    loop (n) %{
-      if ( $ISGOOD($a()) ) {
-        sa += $a();
-        N ++;
-      }
-    %}
-    if (N) {
-      m = sa / N;
-      loop (n) %{
-        if ( $ISGOOD($a()) ) {
-          d   = $a() - m;
-          d2 += pow(d, 2);
-          d4 += pow(d, 4);
-        }
-      %}
-      $b() = N * d4 / pow(d2,2) - 3;
-    }
-    else {
-      $SETBAD(b());
-    }
   ',
   Doc      => '
 
@@ -477,45 +316,23 @@ pp_def('kurt_unbiased',
   Pars      => 'a(n); float+ [o]b()',
   GenericTypes => [F, D],
   HandleBad => 1,
-  Code      => '
-    $GENERIC(b) sa, m, d, d2, d4;
-    sa = 0; d2 = 0; d4 = 0;
-    PDL_Indx N = $SIZE(n);
+  Code  => '
+    $GENERIC(b) sa = 0, m = 0, d=0, d2 = 0, d4 = 0;
+    PDL_Indx N = PDL_IF_BAD(0,$SIZE(n));
     loop (n) %{
+      PDL_IF_BAD(if ($ISBAD($a())) continue;,)
       sa += $a();
+      PDL_IF_BAD(N++;,)
     %}
+    if (N < 4) { $SETBAD(b()); continue; }
     m = sa / N;
     loop (n) %{
+      PDL_IF_BAD(if ($ISBAD($a())) continue;,)
       d   = $a() - m;
       d2 += pow(d, 2);
       d4 += pow(d, 4);
     %}
     $b() = ((N-1)*N*(N+1) * d4 / pow(d2,2) - 3 * pow(N-1,2)) / ((N-2)*(N-3));
-  ',
-  BadCode  => '
-    $GENERIC(b) sa, m, d, d2, d4;
-    sa = 0; m = 0; d=0; d2 = 0; d4 = 0;
-    PDL_Indx N = 0;
-    loop (n) %{
-      if ( $ISGOOD($a()) ) {
-        sa += $a();
-        N ++;
-      }
-    %}
-    if (N-3) {
-      m = sa / N;
-      loop (n) %{
-        if ( $ISGOOD($a()) ) {
-          d   = $a() - m;
-          d2 += pow(d, 2);
-          d4 += pow(d, 4);
-        }
-      %}
-      $b() = ((N-1)*N*(N+1) * d4 / pow(d2,2) - 3 * pow(N-1,2)) / ((N-2)*(N-3));
-    }
-    else {
-      $SETBAD(b());
-    }
   ',
   Doc      => '
 
@@ -528,41 +345,22 @@ Unbiased estimate of population kurtosis. This is the number in GNumeric Descrip
 
 );
 
-
 pp_def('cov',
   Pars      => 'a(n); b(n); float+ [o]c()',
   GenericTypes => [F, D],
   HandleBad => 1,
-  Code      => '
-    $GENERIC(c) ab, sa, sb;
-    ab = 0; sa = 0; sb = 0;
-    PDL_Indx N = $SIZE(n);
+  Code  => '
+    $GENERIC(c) ab = 0, sa = 0, sb = 0;
+    PDL_Indx N = PDL_IF_BAD(0,$SIZE(n));
     loop (n) %{
+      PDL_IF_BAD(if ($ISBAD($a()) || $ISBAD($b())) continue;,)
       ab += $a() * $b();
       sa += $a();
       sb += $b();
+      PDL_IF_BAD(N++;,)
     %}
+    if (N < 1) { $SETBAD(c()); continue; }
     $c() = ab / N - (sa/N) * (sb/N);
-  ',
-  BadCode  => '
-    $GENERIC(c) ab, sa, sb;
-    ab = 0; sa = 0; sb = 0;
-    PDL_Indx N = 0;
-    loop (n) %{
-      if ( $ISBAD($a()) || $ISBAD($b()) ) { }
-      else {
-	ab += $a() * $b();
-	sa += $a();
-	sb += $b();
-	N  ++;
-      }
-    %}
-    if (N) {
-      $c() = ab / N - (sa/N) * (sb/N);
-    }
-    else {
-      $SETBAD(c());
-    }
   ',
   Doc      => '
 
@@ -578,76 +376,33 @@ Sample covariance. see B<corr> for ways to call
 pp_def('cov_table',
   Pars      => 'a(n,m); float+ [o]c(m,m)',
   HandleBad => 1,
-  Code      => '
-
-PDL_Indx N, M;
-N = $SIZE(n); M = $SIZE(m);
+  RedoDimsCode => 'if ($SIZE(n) < 2) $CROAK("too few N");',
+  Code  => '
 $GENERIC(a) a_, b_;
-$GENERIC(c) ab, sa, sb, cov;
-
-if (N > 1 ) {
-  PDL_Indx i, j;
-  for (i=0; i<M; i++) {
-    for (j=i; j<M; j++) {
-      ab = 0; sa = 0; sb = 0;
-      loop (n) %{
-        a_ = $a(n=>n,m=>i);
-        b_ = $a(n=>n,m=>j);
-    	ab += a_ * b_;
-    	sa += a_;
-    	sb += b_;
-      %}
-      cov = ab - (sa * sb) / N;
-      $c(m0=>i, m1=>j) =
-      $c(m0=>j, m1=>i) = cov / N;
+PDL_Indx M = $SIZE(m), i, j;
+for (i=0; i<M; i++) {
+  for (j=i; j<M; j++) {
+    $GENERIC(c) ab = 0, sa = 0, sb = 0;
+    PDL_Indx N = PDL_IF_BAD(0,$SIZE(n));
+    loop (n) %{
+      PDL_IF_BAD(if ($ISBAD($a(m=>i)) || $ISBAD($a(m=>j))) continue;,)
+      sa += a_ = $a(m=>i);
+      sb += b_ = $a(m=>j);
+      ab += a_ * b_;
+      PDL_IF_BAD(N++;,)
+    %}
+    if (N < 2) {
+      $SETBAD($c(m0=>i, m1=>j));
+      $SETBAD($c(m0=>j, m1=>i));
+      continue;
     }
+    $GENERIC(c) cov = ab - (sa * sb) / N;
+    $c(m0=>i, m1=>j) =
+    $c(m0=>j, m1=>i) = cov / N;
   }
 }
-else {
-  barf( "too few N" );
-}
-
-  ',
-  BadCode  => '
-
-if ($SIZE(n) >= 2 ) {
-  $GENERIC(a) a_, b_;
-  $GENERIC(c) ab, sa, sb, cov;
-  PDL_Indx N, M, i, j;
-  M = $SIZE(m);
-  for (i=0; i<M; i++) {
-    for (j=i; j<M; j++) {
-      ab=0; sa=0; sb=0; N=0;
-      loop (n) %{
-        if ($ISBAD($a(n=>n, m=>i)) || $ISBAD($a(n=>n, m=>j))) { }
-        else { 
-          a_ = $a(n=>n,m=>i);
-          b_ = $a(n=>n,m=>j);
-          ab += a_ * b_;
-          sa += a_;
-          sb += b_;
-          N ++;
-        }
-      %}
-      if (N > 1) {
-        cov = ab - (sa * sb) / N;
-        $c(m0=>i, m1=>j) =
-        $c(m0=>j, m1=>i) = cov / N;
-      }
-      else {
-        $SETBAD($c(m0=>i, m1=>j));
-        $SETBAD($c(m0=>j, m1=>i));
-      }
-    }
-  }
-}
-else {
-  barf( "too few N" );
-}
-
-  ',
+',
   Doc      => '
-
 =for ref
 
 Square covariance table. Gives the same result as threading using B<cov> but it calculates only half the square, hence much faster. And it is easier to use with higher dimension pdls.
@@ -694,55 +449,27 @@ pp_def('corr',
   Pars      => 'a(n); b(n); float+ [o]c()',
   GenericTypes => [F, D],
   HandleBad => 1,
-  Code      => '
-    $GENERIC(c) ab, sa, sb, a2, b2, cov, va, vb;
-    ab=0; sa=0; sb=0; a2=0; b2=0; cov=0; va=0; vb=0;
-    PDL_Indx N = $SIZE(n);
-    if (N > 1 ) {
-      loop (n) %{
-	ab += $a() * $b();
-	sa += $a();
-	sb += $b();
-	a2 += pow($a(), 2);
-	b2 += pow($b(), 2);
-      %}
-/*  in fact cov * N, va * N, and vb * N  */
-      cov = ab - (sa * sb) / N;
-      va  = a2 - pow(sa,2) / N;
-      vb  = b2 - pow(sb,2) / N;
-      $c() = cov / sqrt( va * vb );
-    }
-    else {
-      barf( "too few N" );
-    }
-  ',
-  BadCode  => '
+  RedoDimsCode => 'if ($SIZE(n) < 2) $CROAK("too few N");',
+  Code  => '
     $GENERIC(c) ab, sa, sb, a2, b2, cov, va, vb;
     ab=0; sa=0; sb=0; a2=0; b2=0;
-    PDL_Indx N = 0;
+    PDL_Indx N = PDL_IF_BAD(0,$SIZE(n));
     loop (n) %{
-      if ( $ISBAD($a()) || $ISBAD($b()) ) { }
-      else {
-	ab += $a() * $b();
-	sa += $a();
-	sb += $b();
-	a2 += pow($a(), 2);
-	b2 += pow($b(), 2);
-	N  ++;
-      }
+      PDL_IF_BAD(if ($ISBAD($a()) || $ISBAD($b())) continue;,)
+      ab += $a() * $b();
+      sa += $a();
+      sb += $b();
+      a2 += pow($a(), 2);
+      b2 += pow($b(), 2);
+      PDL_IF_BAD(N++;,)
     %}
-    if ( N > 1 ) {
-      cov = ab - (sa * sb) / N;
-      va  = a2 - pow(sa,2) / N;
-      vb  = b2 - pow(sb,2) / N;
-      $c() = cov / sqrt( va * vb );
-    }
-    else {
-      $SETBAD(c());
-    }
+    if (N < 2) { $SETBAD(c()); continue; }
+    cov = ab - (sa * sb) / N;
+    va  = a2 - pow(sa,2) / N;
+    vb  = b2 - pow(sb,2) / N;
+    $c() = cov / sqrt( va * vb );
   ',
   Doc      => '
-
 =for ref
 
 Pearson correlation coefficient. r = cov(X,Y) / (stdv(X) * stdv(Y)).
@@ -777,96 +504,48 @@ but it is easier and faster to use B<corr_table>.
 pp_def('corr_table',
   Pars      => 'a(n,m); float+ [o]c(m,m)',
   HandleBad => 1,
-  Code      => '
-
-PDL_Indx N, M;
-N = $SIZE(n); M = $SIZE(m);
+  RedoDimsCode => 'if ($SIZE(n) < 2) $CROAK("too few N");',
+  Code  => '
 $GENERIC(a) a_, b_;
 $GENERIC(c) ab, sa, sb, a2, b2, cov, va, vb, r;
-
-if (N > 1 ) {
-  PDL_Indx i, j;
-  for (i=0; i<M; i++) {
-    for (j=i+1; j<M; j++) {
-      ab = 0; sa = 0; sb = 0; a2 = 0; b2 = 0;
-      loop (n) %{
-        a_ = $a(n=>n,m=>i);
-        b_ = $a(n=>n,m=>j);
-    	ab += a_ * b_;
-    	sa += a_;
-    	sb += b_;
-    	a2 += pow(a_, 2);
-    	b2 += pow(b_, 2);
-      %}
-      cov = ab - (sa * sb) / N;
-      va  = a2 - pow(sa,2) / N;
-      vb  = b2 - pow(sb,2) / N;
-      r   = cov / sqrt( va * vb );
-      $c(m0=>i, m1=>j) =
-      $c(m0=>j, m1=>i) = r;
-    }
-    $c(m0=>i, m1=>i) = 1.0;
-  }
-}
-else {
-  barf( "too few N" );
-}
-
-  ',
-  BadCode  => '
-
-if ($SIZE(n) >= 2 ) {
-  $GENERIC(a) a_, b_;
-  $GENERIC(c) ab, sa, sb, a2, b2, cov, va, vb, r;
-  PDL_Indx N, M, i, j;
-  M = $SIZE(m);
-  for (i=0; i<M; i++) {
-    for (j=i+1; j<M; j++) {
-      ab=0; sa=0; sb=0; a2=0; b2=0; N=0;
-      loop (n) %{
-        if ($ISBAD($a(n=>n, m=>i)) || $ISBAD($a(n=>n, m=>j))) { }
-        else { 
-          a_ = $a(n=>n,m=>i);
-          b_ = $a(n=>n,m=>j);
-          ab += a_ * b_;
-          sa += a_;
-          sb += b_;
-          a2 += pow(a_, 2);
-          b2 += pow(b_, 2);
-          N ++;
-        }
-      %}
-      if (N > 1) {
-        cov = ab - (sa * sb) / N;
-        va  = a2 - pow(sa,2) / N;
-        vb  = b2 - pow(sb,2) / N;
-        r   = cov / sqrt( va * vb );
-        $c(m0=>i, m1=>j) =
-        $c(m0=>j, m1=>i) = r;
-      }
-      else {
-        $SETBAD($c(m0=>i, m1=>j));
-        $SETBAD($c(m0=>j, m1=>i));
-      }
-    }
-    N=0;
+PDL_Indx M = $SIZE(m), i, j;
+for (i=0; i<M; i++) {
+  for (j=i+1; j<M; j++) {
+    ab=0; sa=0; sb=0; a2=0; b2=0;
+    PDL_Indx N = PDL_IF_BAD(0,$SIZE(n));
     loop (n) %{
-      if ($ISGOOD($a(n=>n,m=>i)))
-        N ++;
-      if (N > 1)
-        break;
+      PDL_IF_BAD(if ($ISBAD($a(m=>i)) || $ISBAD($a(m=>j))) continue;,)
+      sa += a_ = $a(m=>i);
+      sb += b_ = $a(m=>j);
+      ab += a_ * b_;
+      a2 += pow(a_, 2);
+      b2 += pow(b_, 2);
+      PDL_IF_BAD(N++;,)
     %}
-    if (N > 1) {  $c(m0=>i, m1=>i) = 1.0;  }
-    else       {  $SETBAD($c(m0=>i, m1=>i)); }
+    if (N < 2) {
+      $SETBAD($c(m0=>i, m1=>j));
+      $SETBAD($c(m0=>j, m1=>i));
+      continue;
+    }
+    cov = ab - (sa * sb) / N;
+    va  = a2 - pow(sa,2) / N;
+    vb  = b2 - pow(sb,2) / N;
+    r   = cov / sqrt( va * vb );
+    $c(m0=>i, m1=>j) =
+    $c(m0=>j, m1=>i) = r;
   }
+  PDL_IF_BAD(PDL_Indx N = 0;
+  loop (n) %{
+    if ($ISGOOD($a(m=>i)))
+      N ++;
+    if (N > 1)
+      break;
+  %}
+  if (N < 2) { $SETBAD($c(m0=>i, m1=>i)); continue; },)
+  $c(m0=>i, m1=>i) = 1.0;
 }
-else {
-  barf( "too few N" );
-}
-
   ',
   Doc      => '
-
 =for ref
 
 Square Pearson correlation table. Gives the same result as threading using B<corr> but it calculates only half the square, hence much faster. And it is easier to use with higher dimension pdls.
@@ -909,24 +588,14 @@ pp_def('t_corr',
   Pars      => 'r(); n(); [o]t()',
   GenericTypes => [F, D],
   HandleBad => 1,
-  Code      => '
+  Code   => '
+    PDL_IF_BAD(
+    if ($ISBAD(r()) || $ISBAD(n()) ) { $SETBAD( $t() ); continue; }
+    if ($n() <= 2) { $SETBAD(t()); continue; }
+    ,)
     $t() = $r() / pow( (1 - pow($r(), 2)) / ($n() - 2) , .5);
   ',
-  BadCode   => '
-    if ($ISBAD(r()) || $ISBAD(n()) ) {
-      $SETBAD( $t() );
-    }
-    else {
-      if ($n() > 2) {
-        $t() = $r() / pow( (1 - pow($r(), 2)) / ($n() - 2) , .5);
-      }
-      else {
-        $SETBAD(t());
-      }
-    }
-  ',
   Doc       => '
-
 =for usage
 
     $corr   = $data->corr( $data->dummy(1) );
@@ -950,17 +619,12 @@ pp_def('n_pair',
   Pars      => 'a(n); b(n); indx [o]c()',
   GenericTypes => [qw/L Q/],
   HandleBad => 1,
-  Code      => '
-    $c() = $SIZE(n);
-  ',
-  BadCode   => '
-    PDL_Indx N = 0;
-    loop(n) %{
-      if ( $ISBAD($a()) || $ISBAD($b()) ) { }
-      else {
-        N ++;
-      }
-    %}
+  Code   => '
+    PDL_Indx N = PDL_IF_BAD(0,$SIZE(n));
+    PDL_IF_BAD(loop(n) %{
+      if ($ISBAD($a()) || $ISBAD($b())) continue;
+      N++;
+    %},)
     $c() = N;
   ',
   Doc       => '
@@ -978,50 +642,25 @@ pp_def('corr_dev',
   Pars      => 'a(n); b(n); float+ [o]c()',
   GenericTypes => [F, D],
   HandleBad => 1,
-  Code      => '
+  RedoDimsCode => 'if ($SIZE(n) < 2) $CROAK("too few N");',
+  Code   => '
     $GENERIC(c) ab, a2, b2, cov, va, vb;
     ab = 0; a2 = 0; b2 = 0;
-    PDL_Indx N = $SIZE(n);
-    if (N > 1) {
-      loop (n) %{
-	ab += $a() * $b();
-	a2 += pow($a(), 2);
-	b2 += pow($b(), 2);
-      %}
-      cov = ab / N;
-      va  = a2 / N;
-      vb  = b2 / N;
-      $c() = cov / sqrt( va * vb );
-    }
-    else {
-      barf( "too few N" );
-    }
-  ',
-  BadCode   => '
-    $GENERIC(c) ab, a2, b2, cov, va, vb;
-    ab = 0; a2 = 0; b2 = 0;
-    PDL_Indx N = 0;
+    PDL_Indx N = PDL_IF_BAD(0,$SIZE(n));
     loop (n) %{
-      if ( $ISBAD($a()) || $ISBAD($b()) ) { }
-      else {
-	ab += $a() * $b();
-	a2 += pow($a(), 2);
-	b2 += pow($b(), 2);
-        N  ++;
-      }
+      PDL_IF_BAD(if ($ISBAD($a()) || $ISBAD($b())) continue;,)
+      ab += $a() * $b();
+      a2 += pow($a(), 2);
+      b2 += pow($b(), 2);
+      PDL_IF_BAD(N++;,)
     %}
-    if (N > 1) {
-      cov = ab / N;
-      va  = a2 / N;
-      vb  = b2 / N;
-      $c() = cov / sqrt( va * vb );
-    }
-    else {
-      $SETBAD(c());
-    }
+    if (N < 2) { $SETBAD(c()); continue; }
+    cov = ab / N;
+    va  = a2 / N;
+    vb  = b2 / N;
+    $c() = cov / sqrt( va * vb );
   ',
   Doc       => '
-
 =for usage
 
     $corr = $a->dev_m->corr_dev($b->dev_m);
@@ -1038,63 +677,34 @@ pp_def('t_test',
   Pars      => 'a(n); b(m); float+ [o]t(); [o]d()',
   GenericTypes => [F, D],
   HandleBad => 1,
-  Code      => '
-    $GENERIC(t) N, M, sa, sb, a2, b2, va, vb, sdiff;
-    sa = 0; sb = 0; a2 = 0; b2 = 0;
-    N = $SIZE(n);
-    M = $SIZE(m);
-    if (N < 2 || M < 2) {
-      barf( "too few N" );
-    }
-    else {
-      loop (n) %{
-        sa += $a();
-	a2 += pow($a(), 2);
-      %}
-      loop (m) %{
-        sb += $b();
-	b2 += pow($b(), 2);
-      %}
-
-      $d() = N + M - 2;
-
-      va = (a2 - pow(sa/N, 2) * N) / (N-1);
-      vb = (b2 - pow(sb/M, 2) * M) / (M-1);
-      sdiff = sqrt( (1/N + 1/M) * ((N-1)*va + (M-1)*vb) / $d() );
-      $t() = (sa/N - sb/M) / sdiff;
-    }
+  RedoDimsCode => '
+    if ($SIZE(n) < 2) $CROAK("too few N");
+    if ($SIZE(m) < 2) $CROAK("too few M");
   ',
-  BadCode   => '
-    $GENERIC(t) N, M, sa, sb, a2, b2, va, vb, sdiff;
-    sa = 0; sb = 0; a2 = 0; b2 = 0;
-    N = 0;
-    M = 0;
+  Code   => '
+    $GENERIC(t) N = PDL_IF_BAD(0,$SIZE(n)), M = PDL_IF_BAD(0,$SIZE(m)), sa = 0, sb = 0, a2 = 0, b2 = 0;
     loop (n) %{
-      if ( $ISGOOD($a()) ) {
-        sa += $a();
-	a2 += pow($a(), 2);
-        N ++;
-      }
+      PDL_IF_BAD(if ($ISBAD($a())) continue;,)
+      sa += $a();
+      a2 += pow($a(), 2);
+      PDL_IF_BAD(N++;,)
     %}
     loop (m) %{
-      if ( $ISGOOD($b()) ) {
-        sb += $b();
-	b2 += pow($b(), 2);
-        M ++;
-      }
+      PDL_IF_BAD(if ($ISBAD($b())) continue;,)
+      sb += $b();
+      b2 += pow($b(), 2);
+      PDL_IF_BAD(M++;,)
     %}
     if (N < 2 || M < 2) {
       $SETBAD($t());
       $SETBAD($d());
+      continue;
     }
-    else {
-      $d() = N + M - 2;
-
-      va = (a2 - pow(sa/N, 2) * N) / (N-1);
-      vb = (b2 - pow(sb/M, 2) * M) / (M-1);
-      sdiff = sqrt( (1/N + 1/M) * ((N-1)*va + (M-1)*vb) / $d() );
-      $t() = (sa/N - sb/M) / sdiff;
-    }
+    $d() = N + M - 2;
+    $GENERIC(t) va = (a2 - pow(sa/N, 2) * N) / (N-1);
+    $GENERIC(t) vb = (b2 - pow(sb/M, 2) * M) / (M-1);
+    $GENERIC(t) sdiff = sqrt( (1/N + 1/M) * ((N-1)*va + (M-1)*vb) / $d() );
+    $t() = (sa/N - sb/M) / sdiff;
   ',
   Doc       => '
 
@@ -1118,68 +728,37 @@ pp_def('t_test_nev',
   Pars      => 'a(n); b(m); float+ [o]t(); [o]d()',
   GenericTypes => [F, D],
   HandleBad => 1,
-  Code      => '
-    $GENERIC(t) N, M, sa, sb, a2, b2, se_a_2, se_b_2, sdiff;
-    sa = 0; sb = 0; a2 = 0; b2 = 0;
-    N = $SIZE(n);
-    M = $SIZE(m);
-    if (N < 2 || M < 2) {
-      barf( "too few N" );
-    }
-    else {
-      loop (n) %{
-        sa += $a();
-	a2 += pow($a(), 2);
-      %}
-      loop (m) %{
-        sb += $b();
-	b2 += pow($b(), 2);
-      %}
-
-      se_a_2 = (a2 - pow(sa/N,2)*N) / (N*(N-1));
-      se_b_2 = (b2 - pow(sb/M,2)*M) / (M*(M-1));
-      sdiff = sqrt( se_a_2 + se_b_2 );
-
-      $t() = (sa/N - sb/M) / sdiff;
-      $d() = pow(se_a_2 + se_b_2, 2)
-           / ( pow(se_a_2,2) / (N-1) + pow(se_b_2,2) / (M-1) )
-           ;
-    }
+  RedoDimsCode => '
+    if ($SIZE(n) < 2) $CROAK("too few N");
+    if ($SIZE(m) < 2) $CROAK("too few M");
   ',
-  BadCode   => '
-    $GENERIC(t) N, M, sa, sb, a2, b2, se_a_2, se_b_2, sdiff;
-    sa = 0; sb = 0; a2 = 0; b2 = 0;
-    N = 0;
-    M = 0;
+  Code   => '
+    $GENERIC(t) N = PDL_IF_BAD(0,$SIZE(n)), M = PDL_IF_BAD(0,$SIZE(m)), sa = 0, sb = 0, a2 = 0, b2 = 0;
     loop (n) %{
-      if ( $ISGOOD($a()) ) {
-        sa += $a();
-	a2 += pow($a(), 2);
-        N ++;
-      }
+      PDL_IF_BAD(if ($ISBAD($a())) continue;,)
+      sa += $a();
+      a2 += pow($a(), 2);
+      PDL_IF_BAD(N++;,)
     %}
     loop (m) %{
-      if ( $ISGOOD($b()) ) {
-        sb += $b();
-	b2 += pow($b(), 2);
-        M ++;
-      }
+      PDL_IF_BAD(if ($ISBAD($b())) continue;,)
+      sb += $b();
+      b2 += pow($b(), 2);
+      PDL_IF_BAD(M++;,)
     %}
     if (N < 2 || M < 2) {
       $SETBAD($t());
       $SETBAD($d());
+      continue;
     }
-    else {
-      se_a_2 = (a2 - pow(sa/N,2)*N) / (N*(N-1));
-      se_b_2 = (b2 - pow(sb/M,2)*M) / (M*(M-1));
-      sdiff = sqrt( se_a_2 + se_b_2 );
-
-      $t() = (sa/N - sb/M) / sdiff;
-      $d() = pow(se_a_2 + se_b_2, 2)
-           / ( pow(se_a_2,2) / (N-1) + pow(se_b_2,2) / (M-1) )
-           ;
-    }
-  ',
+    $GENERIC(t) se_a_2 = (a2 - pow(sa/N,2)*N) / (N*(N-1));
+    $GENERIC(t) se_b_2 = (b2 - pow(sb/M,2)*M) / (M*(M-1));
+    $GENERIC(t) sdiff = sqrt( se_a_2 + se_b_2 );
+    $t() = (sa/N - sb/M) / sdiff;
+    $d() = pow(se_a_2 + se_b_2, 2)
+         / ( pow(se_a_2,2) / (N-1) + pow(se_b_2,2) / (M-1) )
+         ;
+',
   Doc       => '
 
 =for ref
@@ -1198,48 +777,25 @@ pp_def('t_test_paired',
   Pars      => 'a(n); b(n); float+ [o]t(); [o]d()',
   GenericTypes => [F, D],
   HandleBad => 1,
-  Code      => '
-    $GENERIC(t) N, diff, s_dif, diff2;
-    s_dif = 0; diff2 = 0;
-    N = $SIZE(n);
-    if (N > 1) {
-      loop (n) %{
-        diff = $a() - $b();
-        s_dif += diff;
-	diff2 += pow(diff, 2);
-      %}
-
-      $d() = N - 1;
-      $t() = s_dif / sqrt( N * ( diff2 - pow(s_dif/N,2)*N ) / (N-1) );
-    }
-    else {
-      barf( "too few N" );
-    }
-  ',
-  BadCode   => '
-    $GENERIC(t) N, diff, s_dif, diff2;
-    s_dif = 0; diff2 = 0;
-    N = 0;
+  RedoDimsCode => 'if ($SIZE(n) < 2) $CROAK("too few N");',
+  Code   => '
+    $GENERIC(t) N = PDL_IF_BAD(0,$SIZE(n)), s_dif = 0, diff2 = 0;
     loop (n) %{
-      if ( $ISBAD($a()) || $ISBAD($b()) ) { }
-      else {
-        diff = $a() - $b();
-        s_dif += diff;
-	diff2 += pow(diff, 2);
-        N ++;
-      }
+      PDL_IF_BAD(if ($ISBAD($a()) || $ISBAD($b())) continue;,)
+      $GENERIC(t) diff = $a() - $b();
+      s_dif += diff;
+      diff2 += pow(diff, 2);
+      PDL_IF_BAD(N++;,)
     %}
-    if (N > 1) {
-      $d() = N - 1;
-      $t() = s_dif / sqrt( N * ( diff2 - pow(s_dif/N,2)*N ) / (N-1) );
-    }
-    else {
+    if (N < 2) {
       $SETBAD($t());
       $SETBAD($d());
+      continue;
     }
+    $d() = N - 1;
+    $t() = s_dif / sqrt( N * ( diff2 - pow(s_dif/N,2)*N ) / (N-1) );
   ',
   Doc       => '
-
 =for ref
 
 Paired sample t-test.

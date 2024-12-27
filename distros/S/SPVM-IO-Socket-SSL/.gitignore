@@ -13,3 +13,5 @@ core
 *.tmp
 *.o
 *.bs
+/t/file_tmp/*
+!/t/file_tmp/.gitkeep

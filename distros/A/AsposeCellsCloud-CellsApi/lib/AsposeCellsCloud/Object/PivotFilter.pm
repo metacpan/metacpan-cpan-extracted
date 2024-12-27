@@ -35,7 +35,8 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
-use AsposeCellsCloud::Object::AutoFilter; 
+use AsposeCellsCloud::Object::AutoFilter;
+use AsposeCellsCloud::Object::Top10Filter; 
 
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
@@ -153,9 +154,9 @@ __PACKAGE__->method_documentation({
      	format => '',
      	read_only => '',
      		},
-     'measure_fld_index' => {
+     'value_field_index' => {
      	datatype => 'int',
-     	base_name => 'MeasureFldIndex',
+     	base_name => 'ValueFieldIndex',
      	description => 'Gets the measure field index of the pivot filter.            ',
      	format => '',
      	read_only => '',
@@ -187,6 +188,13 @@ __PACKAGE__->method_documentation({
      	description => 'Gets the string value2 of the label pivot filter.            ',
      	format => '',
      	read_only => '',
+     		},
+     'top10_filter' => {
+     	datatype => 'Top10Filter',
+     	base_name => 'Top10Filter',
+     	description => '',
+     	format => '',
+     	read_only => '',
      		},    
 });
 
@@ -195,11 +203,12 @@ __PACKAGE__->swagger_types( {
     'evaluation_order' => 'int',
     'field_index' => 'int',
     'filter_type' => 'string',
-    'measure_fld_index' => 'int',
+    'value_field_index' => 'int',
     'member_property_field_index' => 'int',
     'name' => 'string',
     'value1' => 'string',
-    'value2' => 'string' 
+    'value2' => 'string',
+    'top10_filter' => 'Top10Filter' 
 } );
 
 __PACKAGE__->attribute_map( {
@@ -207,11 +216,12 @@ __PACKAGE__->attribute_map( {
     'evaluation_order' => 'EvaluationOrder',
     'field_index' => 'FieldIndex',
     'filter_type' => 'FilterType',
-    'measure_fld_index' => 'MeasureFldIndex',
+    'value_field_index' => 'ValueFieldIndex',
     'member_property_field_index' => 'MemberPropertyFieldIndex',
     'name' => 'Name',
     'value1' => 'Value1',
-    'value2' => 'Value2' 
+    'value2' => 'Value2',
+    'top10_filter' => 'Top10Filter' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

@@ -20,7 +20,7 @@ provides:
     file: lib/AsposeCellsCloud/ApiFactory.pm
   AsposeCellsCloud::CellsApi:
     file: lib/AsposeCellsCloud/CellsApi.pm
-    version: 24.11
+    version: 24.12
   AsposeCellsCloud::Configuration:
     file: lib/AsposeCellsCloud/Configuration.pm
   AsposeCellsCloud::Role:
@@ -667,12 +667,16 @@ provides:
     file: lib/AsposeCellsCloud/Object/BaseOperateOptions.pm
   AsposeCellsCloud::Object::ConvertTextOptions:
     file: lib/AsposeCellsCloud/Object/ConvertTextOptions.pm
+  AsposeCellsCloud::Object::ExtractTextOptions:
+    file: lib/AsposeCellsCloud/Object/ExtractTextOptions.pm
   AsposeCellsCloud::Object::RemoveCharactersByCharacter:
     file: lib/AsposeCellsCloud/Object/RemoveCharactersByCharacter.pm
   AsposeCellsCloud::Object::RemoveCharactersByPosition:
     file: lib/AsposeCellsCloud/Object/RemoveCharactersByPosition.pm
   AsposeCellsCloud::Object::RemoveCharactersOptions:
     file: lib/AsposeCellsCloud/Object/RemoveCharactersOptions.pm
+  AsposeCellsCloud::Object::RemoveDuplicatesOptions:
+    file: lib/AsposeCellsCloud/Object/RemoveDuplicatesOptions.pm
   AsposeCellsCloud::Object::ScopeItem:
     file: lib/AsposeCellsCloud/Object/ScopeItem.pm
   AsposeCellsCloud::Object::ScopeOptions:
@@ -1383,6 +1387,10 @@ provides:
     file: lib/AsposeCellsCloud/Request/PostRemoveCharactersRequest.pm
   AsposeCellsCloud::Request::PostConvertTextRequest:
     file: lib/AsposeCellsCloud/Request/PostConvertTextRequest.pm
+  AsposeCellsCloud::Request::PostRemoveDuplicatesRequest:
+    file: lib/AsposeCellsCloud/Request/PostRemoveDuplicatesRequest.pm
+  AsposeCellsCloud::Request::PostExtractTextRequest:
+    file: lib/AsposeCellsCloud/Request/PostExtractTextRequest.pm
   AsposeCellsCloud::Request::GetWorkbookDefaultStyleRequest:
     file: lib/AsposeCellsCloud/Request/GetWorkbookDefaultStyleRequest.pm
   AsposeCellsCloud::Request::GetWorkbookTextItemsRequest:
@@ -1574,5 +1582,5 @@ requires:
   strict: '0'
   utf8: '0'
   warnings: '0'
-version: 24.11
+version: 24.12
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

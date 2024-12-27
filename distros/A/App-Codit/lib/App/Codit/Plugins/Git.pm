@@ -9,7 +9,7 @@ App::Codit::Plugins::FileBrowser - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.13;
+$VERSION = 0.14;
 
 use base qw( Tk::AppWindow::BaseClasses::Plugin );
 
@@ -444,7 +444,11 @@ sub selectInternal {
 	my ($self, $name) = @_;
 	my $mdi = $self->mdi;
 	unless ($mdi->docExists($name)) {
-		$self->cmdExecute('doc_open', $name) if -T $name;
+		if (-T $name) {
+			$self->cmdExecute('doc_open', $name);
+		} else {
+			$self->openURL($name)
+		}
 	}
 	$self->cmdExecute('doc_select', $name) if $mdi->docExists($name);
 }
@@ -453,11 +457,11 @@ sub Unload {
 	my $self = shift;
 	$self->ToolNavigPageRemove('Git');
 	for (
-		'git_add', 
-		'git_collapse', 
+		'git_add',
+		'git_collapse',
 		'git_command',
-		'git_expand',	
-		'git_open_all', 
+		'git_expand',
+		'git_open_all',
 		'git_remove',
 		'git_remove_dialog',
 	) {

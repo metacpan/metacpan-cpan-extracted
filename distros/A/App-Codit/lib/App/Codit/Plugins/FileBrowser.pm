@@ -9,7 +9,7 @@ App::Codit::Plugins::FileBrowser - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.13;
+$VERSION = 0.14;
 
 use base qw( Tk::AppWindow::BaseClasses::Plugin );
 
@@ -21,24 +21,39 @@ Browse your file system.
 
 =head1 DETAILS
 
-The FileBrowser plugin lets you browse your harddrive and open multiple
-documents at once through its context menu (left-click).
+The FileBrowser plugin lets you browse and manage your harddrive.
 
-All columns are sortable and sizable. If you left-click the header
-it will give you options to display hidden files (that start with a '.'), Sort case dependant or not and directories first.
+Double clicking a file will open it in Codit if it is a text file.
+Otherwise it will open in the appropriate application of your desktop.
 
-Pressing CTRL+F when the file browser has the focus invokes a filter entry at the bottom.
+Clicking the right mouse button will open a context menu with options for opening, copy, cut, paste and delete selected files.
+
+All columns are sortable and sizable. If you left-click the header it will give you options to display hidden files (that start with a ‘.’), Sort case dependant or not and directories first.
+
+The following keyboard shortcuts are available when the file list has the focus:
+
+=over 4
+
+=item CTRL+C		Copy selected files to the file clipboard.
+
+=item CTRL+X		Copy selected files to the file clipboard. Delete them after paste.
+
+=item CTRL+V		Paste files in the file clipboard into the main folder.
+
+=item CTRL+F		Pop the filter entry.
+
+=back
 
 =cut
 
 my @contextmenu = (
-	[ 'menu_normal', undef, 'Open', 'fb_open',	'document-open', 'CTRL+SHIFT+I'], 
+	[ 'menu_normal', undef, 'Open', 'fb_open',	'document-open', 'CTRL+SHIFT+I'],
 	[ 'menu_separator', undef, 'f1'],
-	[ 'menu_normal', undef, 'Copy', 'fb_copy',	'edit-copy', '*CTRL+C'], 
-	[ 'menu_normal', undef, 'Cut', 'fb_cut',	'edit-cut', '*CTRL+X'], 
-	[ 'menu_normal', undef, 'Paste', 'fb_paste',	'edit-paste', '*CTRL+V'], 
+	[ 'menu_normal', undef, 'Copy', 'fb_copy',	'edit-copy', '*CTRL+C'],
+	[ 'menu_normal', undef, 'Cut', 'fb_cut',	'edit-cut', '*CTRL+X'],
+	[ 'menu_normal', undef, 'Paste', 'fb_paste',	'edit-paste', '*CTRL+V'],
 	[ 'menu_separator', undef, 'f2'],
-	[ 'menu_normal', undef, 'Delete', 'fb_delete',	'edit-delete', '*SHIFT+DELETE'], 
+	[ 'menu_normal', undef, 'Delete', 'fb_delete',	'edit-delete', '*SHIFT+DELETE'],
 );
 
 sub new {
@@ -83,6 +98,9 @@ sub new {
 }
 
 sub browser { return $_[0]->{BROWSER} }
+
+sub fbDir {
+}
 
 sub fbInvoke {
 	my ($self, $file) = @_;

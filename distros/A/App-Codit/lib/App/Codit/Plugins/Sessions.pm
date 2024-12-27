@@ -86,6 +86,15 @@ sub bookmarksInitialize {
 	$self->after(200, ['Initialize', $bookmarks]) if defined $bookmarks;
 }
 
+sub browserDir {
+	my ($self, $dir) = @_;
+	my $b = $self->extGet('Plugins')->plugGet('FileBrowser');
+	return unless defined $b;
+	my $browser = $b->browser;
+	$browser->load($dir) if defined $dir;
+	return $browser->folder;
+}
+
 sub CanQuit {
 	my $self = shift;
 	$self->sessionSave unless $self->sessionCurrent eq '';
@@ -261,12 +270,14 @@ sub sessionOpen {
 	my $select;
 	my $workdir; #plugin Console
 	my $project; #plugin Git
+	my $browserdir; #plugin FileBrowser
 	for (@list) {
 		my ($file, $options) = @$_;
 		if ($file eq 'general') {
 			$select = $options->{'selected'};
 			$workdir = $options->{'workdir'};
 			$project = $options->{'project'};
+			$browserdir = $options->{'browserdir'};
 			$count ++
 		} else {
 			if ($self->cmdExecute('doc_open', $file)) {
@@ -291,6 +302,7 @@ sub sessionOpen {
 	}
 	$self->consoleDir($workdir) if defined $workdir;
 	$self->projectName($project) if defined $project;
+	$self->browserDir($browserdir) if defined $browserdir;
 	$self->bookmarksInitialize;
 	$self->update;
 	$self->StatusMessage("Session '$name' loaded");
@@ -312,6 +324,9 @@ sub sessionSave {
 	#workdir of plugin Console
 	my $workdir = $self->consoleDir;
 	push @genopt, 'workdir', $workdir if defined $workdir;
+	#workdir of plugin FileBrowser
+	my $browserdir = $self->browserDir;
+	push @genopt, 'browserdir', $browserdir if defined $browserdir;
 	#project name of plugin Git
 	my $project = $self->projectName;
 	push @genopt, 'project', $project if $project ne '';

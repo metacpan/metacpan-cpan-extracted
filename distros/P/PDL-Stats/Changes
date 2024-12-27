@@ -1,3 +1,13 @@
+0.851 2024-12-27
+- relax the tests' type requirement
+
+0.850 2024-12-27
+- removed TS::inte (identical to cumusumover)
+- moved TS::diff (unused here) to Ufunc
+- move PDL::Stats::Distr into PDL::GSL since needs GSL
+- minimum 5.16 as some 5.15 broke PDL::Stats (https://github.com/Perl/perl5/issues/11835)
+- fix unnecessary type-specs that cause problems for Inplace (https://github.com/PDLPorters/pdl/issues/511)
+
 0.84 2024-05-27
 - effect_code exception if only one unique value
 - fix for Distr so M_PI found - thanks @shawnlaffan

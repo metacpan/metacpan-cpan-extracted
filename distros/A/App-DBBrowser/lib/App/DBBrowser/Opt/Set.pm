@@ -76,11 +76,12 @@ sub _options {
             { name => '_e_write_access', text => "- Write access",       section => 'enable' },
         ],
         group_sql_settings => [
-            { name => '_meta',                   text => "- System data",      section => 'G'      },
-            { name => 'operators',               text => "- Operators",        section => 'G'      },
-            { name => '_alias',                  text => "- Alias",            section => 'alias'  },
-            { name => '_sql_identifiers',        text => "- Identifiers",      section => 'G'      },
-            { name => '_view_name_prefix',       text => "- View prefix",      section => 'create' }, ##
+            { name => '_meta',               text => "- System data",        section => 'G'      },
+            { name => 'operators',           text => "- Operators",          section => 'G'      },
+            { name => '_add_aliases',        text => "- Add aliases",        section => 'alias'  },
+            { name => '_aliases_in_clauses', text => "- Aliases in clauses", section => 'alias'  },
+            { name => '_sql_identifiers',    text => "- Identifiers",        section => 'G'      },
+            { name => '_view_name_prefix',   text => "- View prefix",        section => 'create' }, ##
         ],
         group_create => [
             { name => '_enable_ct_opt',          text => "- Enable options",                     section => 'create' },
@@ -341,14 +342,23 @@ sub set_options {
                 my $prompt = 'Choose operators';
                 $sf->__choose_a_subset_wrap( $section, $opt, $sf->{avail_operators}, $prompt );
             }
-            elsif ( $opt eq '_alias' ) {
-                my $prompt = 'Enable alias for:';
+            elsif ( $opt eq '_add_aliases' ) {
+                my $prompt = 'Add alias:';
                 my $sub_menu = [
-                    [ 'select_complex_col', "- Functions/Subqueries in SELECT",  [ 'NO',   undef, 'ASK',   undef     ] ],
-                    [ 'join_table',         "- Tables in join",                  [ undef, 'AUTO',  undef, 'ASK/AUTO' ] ],
-                    [ 'join_columns',       "- Non-unique columns in join",      [ 'NO',  'AUTO', 'ASK',  'ASK/AUTO' ] ],
-                    [ 'derived_table',      "- Derived table",                   [ 'NO',  'AUTO', 'ASK',  'ASK/AUTO' ] ],
-                    [ 'table',              "- Ordinary table",                  [ 'NO',  'AUTO', 'ASK',  'ASK/AUTO' ] ],
+                    [ 'complex_cols_select', "- Functions/Subqueries in select",  [ 'NO',   undef, 'ASK',   undef     ] ],
+                    [ 'tables_in_join',      "- Tables in join",                  [ undef, 'AUTO',  undef, 'ASK/AUTO' ] ],
+                    [ 'join_columns',        "- Non-unique columns in join",      [ 'NO',  'AUTO', 'ASK',  'ASK/AUTO' ] ],
+                    [ 'derived_table',       "- Derived table",                   [ 'NO',  'AUTO', 'ASK',  'ASK/AUTO' ] ],
+                    [ 'ordinary_table',      "- Ordinary table",                  [ 'NO',  'AUTO', 'ASK',  'ASK/AUTO' ] ],
+                ];
+                $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
+            }
+            elsif ( $opt eq '_aliases_in_clauses' ) {
+                my $prompt = 'Use aliases in: ';
+                my $sub_menu = [
+                    [ 'use_in_group_by', "- Group by", [ $no, $yes ] ],
+                    [ 'use_in_having',   "- Having",   [ $no, $yes ] ],
+                    [ 'use_in_order_by', "- Order by", [ $no, $yes ] ],
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }

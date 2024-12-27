@@ -9,7 +9,7 @@ App::Codit::Plugins::Colors - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.11;
+$VERSION = 0.14;
 
 require Tk::ColorPicker;
 use Tie::Watch;
@@ -22,9 +22,9 @@ Easily select and insert colors.
 
 =head1 DETAILS
 
-The Colors plugin lets you choose a color and insert it's hex value into your document. 
+The Colors plugin lets you choose a color and insert it's hex value into your document.
 
-You can select a color in RGB, CMY and HSV space. Whenever you select a color it is added to the Recent tab. 
+You can select a color in RGB, CMY and HSV space. Whenever you select a color it is added to the Recent tab.
 
 It allows you to specify color depths 4, 8, 12 and 16 bits per color.
 
@@ -95,7 +95,7 @@ sub new {
 	return $self;
 }
 
-sub _ent { 
+sub _ent {
 	my ($self, $value) = @_;
 	my $entry = $self->{ENTRY};
 	if (defined $value) {
@@ -105,13 +105,13 @@ sub _ent {
 	return $entry
 }
 
-sub _ind { 
+sub _ind {
 	my ($self, $value) = @_;
 	$self->{INDICATOR}->configure(-background => $value) if defined $value;
 	return $self->{INDICATOR}
 }
 
-sub _pick { 
+sub _pick {
 	my ($self, $value) = @_;
 	$self->{PICKER}->put($value) if defined $value;
 	return $self->{PICKER}

@@ -1,9 +1,6 @@
 Basic/Makefile.PL
 Basic/stats_basic.pd
 Changes
-Distr/distr.pd
-Distr/Makefile.PL
-Distr/t/stats_distr.t
 GLM/glm.pd
 GLM/Makefile.PL
 Kmeans/kmeans.pd
@@ -23,7 +20,6 @@ TS/ts.pd
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
 GENERATED/PDL/Stats/Basic.pm             mod=PDL::Stats::Basic pd=Basic/stats_basic.pd (added by pdlpp_mkgen)
-GENERATED/PDL/Stats/Distr.pm             mod=PDL::Stats::Distr pd=Distr/distr.pd (added by pdlpp_mkgen)
 GENERATED/PDL/Stats/GLM.pm               mod=PDL::Stats::GLM pd=GLM/glm.pd (added by pdlpp_mkgen)
 GENERATED/PDL/Stats/Kmeans.pm            mod=PDL::Stats::Kmeans pd=Kmeans/kmeans.pd (added by pdlpp_mkgen)
 GENERATED/PDL/Stats/TS.pm                mod=PDL::Stats::TS pd=TS/ts.pd (added by pdlpp_mkgen)

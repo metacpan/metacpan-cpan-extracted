@@ -1,3 +1,15 @@
+0.008 2024-12-27
+  [Bug Fix]
+    * Fix a bug that accept method does not work well.
+    * Fix a bug of SSL_crl_file option.
+  [Test Improvement]
+    * Add many tests.
+  [Stability Improvement]
+    * Improve stability. Finish writing tests and documents.
+  [Incompatible Changes]
+    * Remove IP address verification.
+  [Requirement Changes]
+    * Require SPVM::File::Temp 0.022 for tests.
 0.007 2024-12-25
   [New Features]
     * Add IO::Socket::SSL#DESTROY method.

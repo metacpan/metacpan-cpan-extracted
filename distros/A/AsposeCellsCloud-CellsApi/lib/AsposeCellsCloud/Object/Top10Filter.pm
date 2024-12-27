@@ -125,6 +125,13 @@ __PACKAGE__->class_documentation({description => '           Represents the top 
 
 
 __PACKAGE__->method_documentation({
+     'field_index' => {
+     	datatype => 'int',
+     	base_name => 'FieldIndex',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
      'criteria' => {
      	datatype => 'string',
      	base_name => 'Criteria',
@@ -156,6 +163,7 @@ __PACKAGE__->method_documentation({
 });
 
 __PACKAGE__->swagger_types( {
+    'field_index' => 'int',
     'criteria' => 'string',
     'is_percent' => 'boolean',
     'is_top' => 'boolean',
@@ -163,6 +171,7 @@ __PACKAGE__->swagger_types( {
 } );
 
 __PACKAGE__->attribute_map( {
+    'field_index' => 'FieldIndex',
     'criteria' => 'Criteria',
     'is_percent' => 'IsPercent',
     'is_top' => 'IsTop',

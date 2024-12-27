@@ -1,5 +1,5 @@
 #
-# GENERATED WITH PDL::PP! Don't modify!
+# GENERATED WITH PDL::PP from glm.pd! Don't modify!
 #
 package PDL::Stats::GLM;
 
@@ -87,7 +87,7 @@ P-values, where appropriate, are provided if PDL::GSL::CDF is installed.
 
 =for sig
 
-  Signature: (a(n); float+ [o]b(n))
+  Signature: (a(n); [o]b(n))
 
 =for ref
 
@@ -106,7 +106,6 @@ Replaces bad values with sample mean. Mean is set to 0 if all obs are bad. Can b
       [      5     3.5       2     3.5]
       [      7       3       7 5.66667]
      ]
-
   
 
 =for bad
@@ -151,12 +150,9 @@ Replaces bad values with random sample (with replacement) of good observations f
      [7 3 7 7]
     ]
 
-  
-
 =for bad
 
 The output pdl badflag is cleared.
-  
 
 =cut
 
@@ -174,13 +170,11 @@ The output pdl badflag is cleared.
 
 =for sig
 
-  Signature: (a(n); float+ [o]b(n))
+  Signature: (a(n); [o]b(n))
 
 =for ref
 
 Replaces values with deviations from the mean. Can be done inplace.
-
-  
 
 =for bad
 
@@ -203,13 +197,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); float+ [o]b(n))
+  Signature: (a(n); [o]b(n))
 
 =for ref
 
 Standardize ie replace values with z_scores based on sample standard deviation from the mean (replace with 0s if stdv==0). Can be done inplace.
-
-  
 
 =for bad
 
@@ -232,13 +224,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); b(n); float+ [o]c())
+  Signature: (a(n); b(n); [o]c())
 
 =for ref
 
 Sum of squared errors between actual and predicted values.
-
-  
 
 =for bad
 
@@ -261,13 +251,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); b(n); float+ [o]c())
+  Signature: (a(n); b(n); [o]c())
 
 =for ref
 
 Mean of squared errors between actual and predicted values, ie variance around predicted value.
-
-  
 
 =for bad
 
@@ -290,13 +278,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); b(n); float+ [o]c())
+  Signature: (a(n); b(n); [o]c())
 
 =for ref
 
 Root mean squared error, ie stdv around predicted value.
-
-  
 
 =for bad
 
@@ -319,7 +305,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n,m); b(m); float+ [o]c(n))
+  Signature: (a(n,m); b(m); [o]c(n))
 
 =for ref
 
@@ -328,10 +314,7 @@ Calculates predicted prob value for logistic regression.
 =for usage
 
     # glue constant then apply coeff returned by the logistic method
-
     $pred = $x->glue(1,ones($x->dim(0)))->pred_logistic( $m{b} );
-
-  
 
 =for bad
 
@@ -354,7 +337,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); float+ [o]c())
+  Signature: (a(n); [o]c())
 
 =for usage
 
@@ -363,8 +346,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for ref
 
 Null deviance for logistic regression.
-
-  
 
 =for bad
 
@@ -387,7 +368,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); b(n); float+ [o]c())
+  Signature: (a(n); b(n); [o]c())
 
 =for usage
 
@@ -399,8 +380,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for ref
 
 Model deviance for logistic regression.
-
-  
 
 =for bad
 
@@ -423,13 +402,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(); b(); float+ [o]c())
+  Signature: (a(); b(); [o]c())
 
 =for ref
 
 Deviance residual for logistic regression.
-
-  
 
 =for bad
 
@@ -447,9 +424,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 593 "glm.pd"
+#line 389 "glm.pd"
 
-#line 594 "glm.pd"
+#line 390 "glm.pd"
 
 # my tmp var for PDL 2.007 slice upate
 my $_tmp;
@@ -2510,7 +2487,7 @@ Copyright (C) 2009 Maggie J. Xiong <maggiexyz users.sourceforge.net>
 All rights reserved. There is no warranty. You are allowed to redistribute this software / documentation as described in the file COPYING in the PDL distribution.
 
 =cut
-#line 2514 "GLM.pm"
+#line 2491 "GLM.pm"
 
 # Exit with OK status
 

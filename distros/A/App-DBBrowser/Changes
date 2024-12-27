@@ -1,5 +1,7 @@
 Revision history for App-DBBrowser
 
+2.420  2024-12-27
+        - New option: use aliases in 'group by', 'having' or 'order by'.
 
 2.419  2024-12-20
         - Update input filter Range_Rows.

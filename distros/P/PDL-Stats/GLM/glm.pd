@@ -61,46 +61,31 @@ pp_addhdr('
 );
 
 pp_def('fill_m',
-  Pars      => 'a(n); float+ [o]b(n)',
+  Pars      => 'a(n); [o]b(n)',
   Inplace   => 1,
   GenericTypes => [F, D],
   HandleBad => 1,
-  Code      => '
-    loop (n) %{
-      $b() = $a();
-    %}
-  ',
-  BadCode   => '
-    $GENERIC(b) sa, m;
-    sa = 0;
+  Code   => '
+    PDL_IF_BAD($GENERIC(b) sa = 0;
     PDL_Indx N = 0;
     loop (n) %{
-      if ( $ISGOOD($a()) ) {
-        sa += $a();
-        N  ++;
-      }
+      if ($ISBAD($a())) continue;
+      sa += $a();
+      N++;
     %}
-    m = N?   sa / N : 0;
+    $GENERIC(b) m = N ? sa / N : 0;,)
     loop (n) %{
-      if ( $ISGOOD($a()) ) {
-        $b() = $a();
-      }
-      else {
-        $b() = m;
-      }
+      $b() = PDL_IF_BAD($ISBAD($a()) ? m :,) $a();
     %}
   ',
   CopyBadStatusCode => '
     /* propagate badflag if inplace AND it has changed */
     if ( a == b && $ISPDLSTATEBAD(a) )
       PDL->propagate_badflag( b, 0 );
-
     /* always make sure the output is "good" */
     $SETPDLSTATEGOOD(b);
-
   ',
   Doc      => '
-
 =for ref
 
 Replaces bad values with sample mean. Mean is set to 0 if all obs are bad. Can be done inplace.
@@ -118,57 +103,43 @@ Replaces bad values with sample mean. Mean is set to 0 if all obs are bad. Can b
       [      5     3.5       2     3.5]
       [      7       3       7 5.66667]
      ]
-
-=cut
-
   ',
   BadDoc  => '
 The output pdl badflag is cleared.
   ',
-
 );
 
 pp_def('fill_rand',
   Pars      => 'a(n); [o]b(n)',
   Inplace   => 1,
   HandleBad => 1,
-  Code      => '
-    loop (n) %{
-      $b() = $a();
-    %}
-  ',
-  BadCode   => '
-    $GENERIC(a) *g[ $SIZE(n) ];
-    PDL_Indx i, j;
-    i = 0;
+  Code   => '
+    PDL_IF_BAD($GENERIC(a) *g[ $SIZE(n) ];
+    PDL_Indx i = 0;
     srand( time( NULL ) );
     loop (n) %{
       if ( $ISGOOD($a()) ) {
         g[i++] = &$a();
       }
-    %}
+    %},)
     loop (n) %{
-      if ( $ISGOOD($a()) ) {
-        $b() = $a();
-      }
-      else {
+      PDL_IF_BAD(if ($ISBAD($a())) {
         /* XXX-FIXME works on 64bit, but rand() is quite limited */
-        j = (PDL_Indx) ((i-1) * (double)(rand()) / (double)(RAND_MAX) + .5);
+        PDL_Indx j = (PDL_Indx) ((i-1) * (double)(rand()) / (double)(RAND_MAX) + .5);
         $b() = *g[j];
-      }
+        continue;
+      },)
+      $b() = $a();
     %}
-  ',
+',
   CopyBadStatusCode => '
     /* propagate badflag if inplace AND it has changed */
     if ( a == b && $ISPDLSTATEBAD(a) )
       PDL->propagate_badflag( b, 0 );
-
     /* always make sure the output is "good" */
     $SETPDLSTATEGOOD(b);
-
-  ',
+',
   Doc      => '
-
 =for ref
 
 Replaces bad values with random sample (with replacement) of good observations from the same variable. Can be done inplace.
@@ -187,265 +158,148 @@ Replaces bad values with random sample (with replacement) of good observations f
      [5 2 2 5]
      [7 3 7 7]
     ]
-
-=cut
-
-  ',
+',
   BadDoc  => '
 The output pdl badflag is cleared.
-  ',
-
+',
 );
 
 pp_def('dev_m',
-  Pars      => 'a(n); float+ [o]b(n)',
+  Pars      => 'a(n); [o]b(n)',
   Inplace   => 1,
   GenericTypes => [F, D],
   HandleBad => 1,
-  Code      => '
-    $GENERIC(b) sa, m;
-    sa = 0; m = 0;
-    PDL_Indx N = $SIZE(n);
+  Code   => '
+    $GENERIC(b) sa = 0, m = 0;
+    PDL_Indx N = PDL_IF_BAD(0,$SIZE(n));
     loop (n) %{
+      PDL_IF_BAD(if ($ISBAD($a())) continue;,)
       sa += $a();
-    %}
-    m  = sa / N;
-    loop (n) %{
-      $b() = $a() - m;
-    %}
-  ',
-  BadCode   => '
-    $GENERIC(b) sa, m;
-    sa = 0; m = 0;
-    PDL_Indx N = 0;
-    loop (n) %{
-      if ( $ISGOOD($a()) ) {
-        sa += $a();
-        N  ++;
-      }
+      PDL_IF_BAD(N++;,)
     %}
     m = sa / N;
     loop (n) %{
-      if ( $ISGOOD($a()) ) {
-        $b() = $a() - m;
-      }
-      else {
-        $SETBAD($b());
-      }
+      if ($ISBAD($a())) { $SETBAD(b()); continue; }
+      $b() = $a() - m;
     %}
-  ',
+',
   Doc      => '
-
 =for ref
 
 Replaces values with deviations from the mean. Can be done inplace.
-
-=cut
-
-  ',
-
+',
 );
 
 pp_def('stddz',
-  Pars      => 'a(n); float+ [o]b(n)',
+  Pars      => 'a(n); [o]b(n)',
   Inplace   => 1,
   GenericTypes => [F, D],
   HandleBad => 1,
-  Code      => '
-    $GENERIC(b) sa, a2, m, sd;
-    sa = 0; a2 = 0;
-    PDL_Indx N = $SIZE(n);
+  Code   => '
+    $GENERIC(b) sa = 0, a2 = 0, m = 0, sd = 0;
+    PDL_Indx N = PDL_IF_BAD(0,$SIZE(n));
     loop (n) %{
+      PDL_IF_BAD(if ($ISBAD($a())) continue;,)
       sa += $a();
       a2 += pow($a(),2);
+      PDL_IF_BAD(N++;,)
     %}
+    PDL_IF_BAD(if (N < 1) { loop (n) %{ $SETBAD(b()); %} continue; },)
     m  = sa / N;
     sd = pow( a2/N - pow(m,2), .5 );
     loop (n) %{
-      $b() = (sd>0)?  (($a() - m) / sd) : 0;
-    %}
-  ',
-  BadCode   => '
-    $GENERIC(b) sa, a2, m, sd;
-    sa = 0; a2 = 0; m = 0; sd = 0;
-    PDL_Indx N = 0;
-    loop (n) %{
-      if ( $ISGOOD($a()) ) {
-        sa += $a();
-        a2 += pow($a(),2);
-        N  ++;
-      }
-    %}
-    if (N) {
-      m  = sa / N;
-      sd = pow( a2/N - pow(m,2), .5 );
-      loop (n) %{
-        if ( $ISGOOD(a()) ) {
+      PDL_IF_BAD(if ($ISBAD(a())) { $SETBAD(b()); continue; },)
 /* sd? does not work, presumably due to floating point */
-          $b() = (sd>0)? (($a() - m) / sd) : 0;
-        }
-        else {
-          $SETBAD(b());
-        }
-      %}
-    }
-    else {
-      loop (n) %{
-        $SETBAD(b());
-      %}
-    }
-  ',
+      $b() = (sd>0)? (($a() - m) / sd) : 0;
+    %}
+',
   Doc       => '
 =for ref
 
 Standardize ie replace values with z_scores based on sample standard deviation from the mean (replace with 0s if stdv==0). Can be done inplace.
-
-=cut
-
-  ',
-
+',
 );
 
 pp_def('sse',
-  Pars      => 'a(n); b(n); float+ [o]c()',
+  Pars      => 'a(n); b(n); [o]c()',
   GenericTypes => [F, D],
   HandleBad => 1,
-  Code      => '
+  Code  => '
     $GENERIC(c) ss = 0;
     loop (n) %{
+      PDL_IF_BAD(if ( $ISBAD($a()) || $ISBAD($b()) ) continue;,)
       ss += pow($a() - $b(), 2);
     %}
     $c() = ss;
   ',
-  BadCode  => '
-    $GENERIC(c) ss = 0;
-    loop (n) %{
-      if ( $ISBAD($a()) || $ISBAD($b()) ) { }
-      else {
-        ss += pow($a() - $b(), 2);
-      }
-    %}
-    $c() = ss;
-  ',
   Doc      => '
-
 =for ref
 
 Sum of squared errors between actual and predicted values.
-
-=cut
-
-  ',
-
+',
 );
 
 pp_def('mse',
-  Pars      => 'a(n); b(n); float+ [o]c()',
+  Pars      => 'a(n); b(n); [o]c()',
   GenericTypes => [F, D],
   HandleBad => 1,
-  Code      => '
+  Code  => '
     $GENERIC(c) ss = 0;
+    PDL_Indx N = PDL_IF_BAD(0,$SIZE(n));
     loop (n) %{
+      PDL_IF_BAD(if ( $ISBAD($a()) || $ISBAD($b()) ) continue;,)
       ss += pow($a() - $b(), 2);
+      PDL_IF_BAD(N++;,)
     %}
-    $c() = ss / $SIZE(n);
-  ',
-  BadCode  => '
-    $GENERIC(c) ss = 0;
-    PDL_Indx N = 0;
-    loop (n) %{
-      if ( $ISBAD($a()) || $ISBAD($b()) ) { }
-      else {
-        ss += pow($a() - $b(), 2);
-        N ++;
-      }
-    %}
-    if (N) { $c() = ss/N;  }
-    else   { $SETBAD(c()); }
-  ',
+    if (N < 1) { $SETBAD(c()); continue; }
+    $c() = ss/N;
+',
   Doc      => '
-
 =for ref
 
 Mean of squared errors between actual and predicted values, ie variance around predicted value.
-
-=cut
-
-  ',
-
+',
 );
 
-
 pp_def('rmse',
-  Pars      => 'a(n); b(n); float+ [o]c()',
+  Pars      => 'a(n); b(n); [o]c()',
   GenericTypes => [F, D],
   HandleBad => 1,
-  Code      => '
-    $GENERIC(c) d2;
-    d2 = 0;
-    PDL_Indx N = $SIZE(n);
+  Code  => '
+    $GENERIC(c) d2 = 0;
+    PDL_Indx N = PDL_IF_BAD(0,$SIZE(n));
     loop (n) %{
+      PDL_IF_BAD(if ( $ISBAD($a()) || $ISBAD($b()) ) continue;,)
       d2 += pow($a() - $b(), 2);
+      PDL_IF_BAD(N++;,)
     %}
+    if (N < 1) { $SETBAD(c()); continue; }
     $c() = sqrt( d2 / N );
   ',
-  BadCode  => '
-    $GENERIC(c) d2;
-    d2 = 0;
-    PDL_Indx N = 0;
-    loop (n) %{
-      if ( $ISBAD($a()) || $ISBAD($b()) ) { }
-      else {
-        d2 += pow($a() - $b(), 2);
-        N  ++;
-      }
-    %}
-    if (N)  { $c() = sqrt( d2 / N ); }
-    else    { $SETBAD(c()); }
-  ',
   Doc      => '
-
 =for ref
 
 Root mean squared error, ie stdv around predicted value.
-
-=cut
-
-  ',
-
+',
 );
 
 pp_def('pred_logistic',
-  Pars      => 'a(n,m); b(m); float+ [o]c(n)',
+  Pars      => 'a(n,m); b(m); [o]c(n)',
   GenericTypes => [F, D],
   HandleBad => 1,
-  Code      => '
+  Code  => '
     loop (n) %{
       $GENERIC(c) l = 0;
+      PDL_IF_BAD(PDL_Indx bad = 0;,)
       loop (m) %{
+        PDL_IF_BAD(if ($ISBAD($a()) || $ISBAD($b())) { bad = 1; continue; },)
         l += $a() * $b();
       %}
+      PDL_IF_BAD(if (bad) { $SETBAD($c()); continue; },)
       $c() = 1 / ( 1 + exp(-l) );
     %}
-  ',
-  BadCode  => '
-    loop (n) %{
-      $GENERIC(c) l = 0;
-      PDL_Indx bad = 0;
-      loop (m) %{
-        if ( $ISBAD($a()) || $ISBAD($b()) ) {
-          bad = 1;
-        }
-        else {
-          l += $a() * $b();
-        }
-      %}
-      if (bad) { $SETBAD( $c() ); }
-      else     { $c() = 1 / ( 1 + exp(-l) ); }
-    %}
-  ',
+',
   Doc      => '
-
 =for ref
 
 Calculates predicted prob value for logistic regression.
@@ -453,54 +307,30 @@ Calculates predicted prob value for logistic regression.
 =for usage
 
     # glue constant then apply coeff returned by the logistic method
-
     $pred = $x->glue(1,ones($x->dim(0)))->pred_logistic( $m{b} );
-
-=cut
-
-  ',
-
+',
 );
 
 pp_def('d0',
-  Pars      => 'a(n); float+ [o]c()',
+  Pars      => 'a(n); [o]c()',
   GenericTypes => [F, D],
   HandleBad => 1,
-  Code      => '
-    $GENERIC(c) p, ll;
-    p = 0; ll = 0;
-    PDL_Indx N = $SIZE(n);
+  Code  => '
+    $GENERIC(c) p = 0, ll = 0;
+    PDL_Indx N = PDL_IF_BAD(0,$SIZE(n));
     loop (n) %{
+      PDL_IF_BAD(if ($ISBAD($a())) continue;,)
       p += $a();
+      PDL_IF_BAD(N++;,)
     %}
+    if (N < 1) { $SETBAD(c()); continue; }
     p /= N;
     loop (n) %{
+      PDL_IF_BAD(if ($ISBAD($a())) continue;,)
       ll += $a()? log( p ) : log( 1 - p );
     %}
     $c() = -2 * ll;
-  ',
-  BadCode  => '
-    $GENERIC(c) p, ll;
-    p = 0; ll = 0;
-    PDL_Indx N = 0;
-    loop (n) %{
-      if ($ISGOOD( $a() )) {
-        p += $a();
-        N ++;
-      }
-    %}
-    if (N) {
-      p /= N;
-      loop (n) %{
-        if ($ISGOOD( $a() ))
-          ll += $a()? log( p ) : log( 1 - p );
-      %}
-      $c() = -2 * ll;
-    }
-    else {
-      $SETBAD(c());
-    }
-  ',
+',
   Doc      => '
 =for usage
 
@@ -509,33 +339,19 @@ pp_def('d0',
 =for ref
 
 Null deviance for logistic regression.
-
-=cut
-
-  ',
-
+',
 );
 
 pp_def('dm',
-  Pars      => 'a(n); b(n); float+ [o]c()',
+  Pars      => 'a(n); b(n); [o]c()',
   GenericTypes => [F, D],
   HandleBad => 1,
-  Code      => '
+  Code  => '
     $GENERIC(c) ll;
     ll = 0;
     loop (n) %{
+      PDL_IF_BAD(if ($ISBAD($a()) || $ISBAD($b())) continue;,)
       ll += $a()? log( $b() ) : log( 1 - $b() );
-    %}
-    $c() = -2 * ll;
-  ',
-  BadCode  => '
-    $GENERIC(c) ll;
-    ll = 0;
-    loop (n) %{
-      if ( $ISBAD($a()) || $ISBAD($b()) ) { }
-      else {
-        ll += $a()? log( $b() ) : log( 1 - $b() );
-      }
     %}
     $c() = -2 * ll;
   ',
@@ -550,44 +366,24 @@ pp_def('dm',
 =for ref
 
 Model deviance for logistic regression.
-
-=cut
-
-  ',
-
+',
 );
 
-
 pp_def('dvrs',
-  Pars      => 'a(); b(); float+ [o]c()',
+  Pars      => 'a(); b(); [o]c()',
   GenericTypes => [F, D],
   HandleBad => 1,
-  Code      => '
-    $c() = $a()?       sqrt( -2 * log($b()) )
-         :        -1 * sqrt( -2 * log(1-$b()) )
-         ;
-  ',
-  BadCode  => '
-  if ( $ISBAD($a()) || $ISBAD($b()) ) {
-    $SETBAD( $c() );
-  }
-  else {
-    $c() = $a()?       sqrt( -2 * log($b()) )
-         :        -1 * sqrt( -2 * log(1-$b()) )
-         ;
-  }
-
-  ',
+  Code  => '
+  PDL_IF_BAD(if ($ISBAD($a()) || $ISBAD($b())) { $SETBAD( $c() ); continue; },)
+  $c() = $a()?       sqrt( -2 * log($b()) )
+       :        -1 * sqrt( -2 * log(1-$b()) )
+       ;
+',
   Doc      => '
-
 =for ref
 
 Deviance residual for logistic regression.
-
-=cut
-
-  ',
-
+',
 );
 
 pp_addpm pp_line_numbers(__LINE__, <<'EOD');

@@ -95878,3 +95878,11 @@ T/TR/TRSKI/Proc-Forkmap-0.2201.tar.gz
 K/KI/KIMOTO/SPVM-IO-Socket-SSL-0.007.tar.gz
 P/PE/PETDANCE/Carp-Assert-More-2.7.0.tar.gz
 M/MR/MRDVT/Date-Holidays-US-0.06.tar.gz
+H/HA/HANJE/App-Codit-0.14.tar.gz
+K/KU/KUERBIS/App-DBBrowser-2.420.tar.gz
+A/AS/ASPOSEAPI/AsposeCellsCloud-CellsApi-24.12.tar.gz
+J/JA/JANESKIL/Tools/Daje-Workflow-Database-0.03.tar.gz
+E/ET/ETJ/PDL-Complex-2.011.tar.gz
+E/ET/ETJ/PDL-Stats-0.851.tar.gz
+K/KI/KIMOTO/SPVM-IO-Socket-SSL-0.008.tar.gz
+R/RR/RRWO/Sys-GetRandom-FFI-v0.1.0.tar.gz

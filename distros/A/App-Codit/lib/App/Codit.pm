@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.13";
+$VERSION="0.14";
 use Tk;
 use App::Codit::CodeTextManager;
 
@@ -23,11 +23,11 @@ It is written in Perl/Tk and based on the L<Tk::AppWindow> application framework
 
 It uses the L<Tk::CodeText> text widget for editing.
 
-Codit has been under development for about one year now. It has gone quite some miles on our systems 
+Codit has been under development for about one year now. It has gone quite some miles on our systems
 and can be considered beta software as of version 0.10.
 
 It features a multi document interface that can hold an unlimited number of documents,
-navigable through the tab bar at the top and a document list in the left side panel. 
+navigable through the tab bar at the top and a document list in the left side panel.
 
 It has a plugin system designed to invite users to write their own plugins.
 
@@ -38,6 +38,9 @@ L<Tk::CodeText> offers syntax highlighting and code folding in plenty formats an
 It has and advanced word based undo/redo stack that keeps track of selections and save points.
 It does auto indent, bookmarks, comment, uncomment, indent and unindent. Tab size and indent style are
 fully user configurable.
+
+An online manual can be found here:
+L<http://www.perlgui.org/wp-content/uploads/2024/12/manual-0.14.pdf>
 
 =head1 RUNNING CODIT
 
@@ -79,8 +82,8 @@ Loads a session at launch. The plugin Sessions must be loaded for this to work.
 
 =item I<-y> or I<-syntax>
 
-Specify the default syntax to use for syntax highlighting. Codit will determine the syntax 
-of documents by their extension. This options comes in handy when the file you are 
+Specify the default syntax to use for syntax highlighting. Codit will determine the syntax
+of documents by their extension. This options comes in handy when the file you are
 loading does not have an extension.
 
 =item I<-v> or I<-version>
@@ -205,6 +208,8 @@ Codit comes with these plugins:
 =item B<Colors> see L<App::Codit::Plugins::Colors>
 
 =item B<Console> see L<App::Codit::Plugins::Console>
+
+=item B<Exporter> see L<App::Codit::Plugins::Exporter>
 
 =item B<FileBrowser> see L<App::Codit::Plugins::FileBrowser>
 
@@ -335,9 +340,9 @@ sub Populate {
 			components => [
 				'FreeDesktop::Icons',
 				'Imager',
-				'Syntax::Kamelon', 
-				'Tk', 
-				'Tk::AppWindow', 
+				'Syntax::Kamelon',
+				'Tk',
+				'Tk::AppWindow',
 				'Tk::CodeText',
 				'Tk::ColorEntry',
 				'Tk::DocumentTree',
@@ -350,23 +355,25 @@ sub Populate {
 			],
 			http => 'https://github.com/haje61/App-Codit',
 		},
-		-helpfile => 'http://www.perlgui.org/wp-content/uploads/2024/09/manual-0.10.pdf',
+		-helpfile => 'http://www.perlgui.org/wp-content/uploads/2024/12/manual-0.14.pdf',
 
 		-contentmanagerclass => 'CodeTextManager',
 		-contentmanageroptions => [
-			'-contentautoindent', 
+			'-contentautoindent',
 			'-contentbackground',
 			'-contentbgdspace',
 			'-contentbgdtab',
 			'-contentbookmarkcolor',
-			'-contentfont', 
-			'-contentforeground', 
-			'-contentindent', 
-			'-contentinsertbg', 
-			'-contentmatchbg', 
-			'-contentmatchfg', 
-			'-contentsyntax', 
-			'-contenttabs', 
+			'-contentfindbg',
+			'-contentfindfg',
+			'-contentfont',
+			'-contentforeground',
+			'-contentindent',
+			'-contentinsertbg',
+			'-contentmatchbg',
+			'-contentmatchfg',
+			'-contentsyntax',
+			'-contenttabs',
 			'-contentwrap',
 			'-showfolds',
 			'-shownumbers',
@@ -389,25 +396,33 @@ sub Populate {
 			-shownumbers => ['boolean', 'Line numbers'],
 			-showstatus => ['boolean', 'Doc status'],
 			'*end',
-	
+
 			'*page' => 'Colors',
 			'*section' => 'Editing',
 			-contentforeground => ['color', 'Foreground', -width => 8],
 			-contentbackground => ['color', 'Background', -width => 8],
+			'*column',
 			-contentinsertbg => ['color', 'Insert bg', -width => 8],
+			'*end',
+			'*section' => 'Find',
+			-contentfindfg => ['color', 'Foreground', -width => 8],
+			'*column',
+			-contentfindbg => ['color', 'Background', -width => 8],
 			'*end',
 			'*section' => 'Spaces and tabs',
 			-contentbgdspace => ['color', 'Space bg', -width => 8],
+			'*column',
 			-contentbgdtab => ['color', 'Tab bg', -width => 8],
 			'*end',
 			'*section' => 'Matching {}, [] and ()',
 			-contentmatchfg => ['color', 'Foreground', -width => 8],
+			'*column',
 			-contentmatchbg => ['color', 'Background', -width => 8],
 			'*end',
 			'*section' => 'Bookmarks',
 			-contentbookmarkcolor => ['color', 'Background', -width => 8],
 			'*end',
-	
+
 			'*page' => 'GUI',
 			'*section' => 'Icon sizes',
 			-iconsize => ['spin', 'General', -width => 4],
@@ -432,7 +447,7 @@ sub Populate {
 			-tooltextposition => ['radio', 'Text position', -values => [qw[none left right top bottom]]],
 			'*end',
 		],
-		-contentautoindent => 1, 
+		-contentautoindent => 1,
 		-contentindent => 'tab',
 		-contenttabs => '8m',
 		-contentwrap => 'none',
@@ -475,7 +490,7 @@ sub abbreviate {
 		my $lastsize = $size - $firstsize - 5;
 		my $last = substr($string, $length - $lastsize, $lastsize);
 		$string = $first . $last;
-	} 
+	}
 	return $string;
 }
 
@@ -728,9 +743,9 @@ sub uniqueinstance {
 		my $daem = $self->extGet('Daemons');
 		my $job = 'codit_lock_scan';
 		if ($val) {
-			$self->after(100, sub { 
+			$self->after(100, sub {
 				$self->lockReset;
-				$daem->jobAdd($job, 100, 'lockScan', $self) unless $daem->jobExists($job) 
+				$daem->jobAdd($job, 100, 'lockScan', $self) unless $daem->jobExists($job)
 			});
 		} else {
 			unlink $file;

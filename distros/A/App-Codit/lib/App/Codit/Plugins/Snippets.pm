@@ -9,7 +9,7 @@ App::Codit::Plugins::Snippets - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.13;
+$VERSION = 0.14;
 
 use Carp;
 
@@ -202,7 +202,7 @@ sub snippetCopy {
 	if (defined $new) {
 		$self->snippetAdd($new);
 		$self->listSelect($self->itemName($new));
-		$self->_text->insert('end', $text);                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+		$self->_text->insert('end', $text);
 	}
 }
 

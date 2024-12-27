@@ -35,11 +35,15 @@ sub defaults {
             db2_encoding         => 'utf8',
         },
         alias => {
-            select_complex_col => 0,
-            join_table         => 0,
-            join_columns       => 0,
-            derived_table      => 1,
-            table              => 0,
+            complex_cols_select => 0,
+            tables_in_join      => 0,
+            join_columns        => 0,
+            derived_table       => 1,
+            ordinary_table      => 0,
+
+            use_in_group_by     => 0,       # if SQLite, MySQL, MariaDB, Pg, Firebird, Informix, Oracle >= 23ai
+            use_in_having       => 0,       # if SQLite, MySQL, MariaDB, Oracle >= 23ai
+            use_in_order_by     => 1,
         },
         enable => {
             create_table => 0,

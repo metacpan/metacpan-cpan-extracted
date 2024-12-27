@@ -1,5 +1,5 @@
 #
-# GENERATED WITH PDL::PP! Don't modify!
+# GENERATED WITH PDL::PP from stats_basic.pd! Don't modify!
 #
 package PDL::Stats::Basic;
 
@@ -777,9 +777,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1251 "stats_basic.pd"
+#line 807 "stats_basic.pd"
 
-#line 1252 "stats_basic.pd"
+#line 808 "stats_basic.pd"
 
 =head2 binomial_test
 

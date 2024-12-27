@@ -9,7 +9,7 @@ App::Codit::Plugins::Bookmarks - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.11;
+$VERSION = 0.14;
 
 use Data::Compare;
 require Tk::ITree;
@@ -72,12 +72,12 @@ sub bmAdd {
 	my $t = $self->tree;
 	
 	#add parent unless already exists
-	unless ($t->infoExists($name)) { 
+	unless ($t->infoExists($name)) {
 
 		#calculate position
 		my @ch = $t->infoChildren('');
 		my @op;
-		for (@ch) { 
+		for (@ch) {
 			if ($_ gt $name) {
 				push @op, -before => $_;
 				last;

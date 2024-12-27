@@ -34,13 +34,15 @@ use Mojo::Base -base, -signatures;
 use Mojo::Pg;
 use Daje::Workflow::Database::Connector;
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
 has 'pg';
 has 'db';
 has 'workflow_pkey';
 has 'workflow';
 has 'connector';
+has 'context';
+has 'wfl_data';
 
 sub start($self) {
     my $connector = Daje::Workflow::Database::Connector->new(
@@ -48,6 +50,7 @@ sub start($self) {
         workflow      => $self->workflow(),
         pg            => $self->pg,
         db            => $self->db,
+        context       => $self->context,
     );
     $self->connector($connector);
     return $self->connector->start();
@@ -64,6 +67,9 @@ sub stop($self, $workflow_data, $context_data) {
 
 1;
 __END__
+
+
+
 
 
 
@@ -95,10 +101,22 @@ Daje::Workflow::Database is ...
 
 =head1 REQUIRES
 
+L<Daje::Workflow::Database::Connector> 
+
+L<Mojo::Pg> 
+
 L<Mojo::Base> 
 
 
 =head1 METHODS
+
+=head2 start($self)
+
+ start($self)();
+
+=head2 stop($self,
+
+ stop($self,();
 
 
 =head1 AUTHOR

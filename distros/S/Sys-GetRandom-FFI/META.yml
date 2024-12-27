@@ -1,0 +1,43 @@
+---
+abstract: 'get random bytes from the system'
+author:
+  - 'Robert Rothenberg <rrwo@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  Module::Metadata: '0'
+  Test2::V0: '0'
+  Test::More: '0'
+  strict: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - random
+  - getrandom
+  - entropy
+  - getentropy
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Sys-GetRandom-FFI
+provides:
+  Sys::GetRandom::FFI:
+    file: lib/Sys/GetRandom/FFI.pm
+    version: v0.1.0
+requires:
+  Exporter: '0'
+  FFI::Platypus: '2.00'
+  constant: '0'
+  experimental: '0'
+  perl: v5.20.0
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/robrwo/perl-Sys-GetRandom-FFI/issues
+  repository: git://github.com/robrwo/perl-Sys-GetRandom-FFI.git
+version: v0.1.0
+x_authority: cpan:RRWO
+x_generated_by_perl: v5.34.3
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: Artistic-2.0

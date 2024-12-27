@@ -1,5 +1,5 @@
 #
-# GENERATED WITH PDL::PP! Don't modify!
+# GENERATED WITH PDL::PP from kmeans.pd! Don't modify!
 #
 package PDL::Stats::Kmeans;
 
@@ -186,17 +186,14 @@ Takes data pdl dim [obs x var] and centroid pdl dim [cluster x var] and returns 
 
 =for usage
 
-    perldl> $centroid = ones 2, 3
-    perldl> $centroid(0,) .= 0
-    perldl> p $centroid
+    perldl> p $centroid = xvals 2, 3
     [
      [0 1]
      [0 1]
      [0 1]
     ]
 
-    perldl> $b = qsort( random 4, 3 )
-    perldl> p $b
+    perldl> p $b = qsort( random 4, 3 )
     [
      [0.022774068 0.032513883  0.13890034  0.30942479]
      [ 0.16943853  0.50262636  0.56251531   0.7152271]
@@ -209,8 +206,6 @@ Takes data pdl dim [obs x var] and centroid pdl dim [cluster x var] and returns 
      [1 1 1 0]    # cluster 0 membership
      [0 0 0 1]    # cluster 1 membership
     ]
-
-  
 
 =for bad
 
@@ -274,7 +269,6 @@ Takes data dim [obs x var] and mask dim [obs x cluster], returns mean and ss (ms
      [17.5    5]
      [17.5    5]
     ]
-
   
 
 =for bad
@@ -293,9 +287,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 431 "kmeans.pd"
+#line 311 "kmeans.pd"
 
-#line 432 "kmeans.pd"
+#line 312 "kmeans.pd"
 
 sub _scree_ind {
   # use as scree cutoff the point with max distance to the line formed
@@ -328,7 +322,7 @@ sub _d_point2line {
 
   return _d_p2l( $self->mv(0,-1)->dog, $p1->mv(0,-1)->dog, $p2->mv(0,-1)->dog );
 }
-#line 332 "Kmeans.pm"
+#line 326 "Kmeans.pm"
 
 *_d_p2l = \&PDL::_d_p2l;
 
@@ -336,10 +330,9 @@ sub _d_point2line {
 
 
 
-#line 494 "kmeans.pd"
+#line 362 "kmeans.pd"
 
-#line 495 "kmeans.pd"
-
+#line 363 "kmeans.pd"
 =head2 kmeans
 
 =for ref
@@ -702,7 +695,7 @@ Copyright (C) 2009 Maggie J. Xiong <maggiexyz users.sourceforge.net>
 All rights reserved. There is no warranty. You are allowed to redistribute this software / documentation as described in the file COPYING in the PDL distribution.
 
 =cut
-#line 706 "Kmeans.pm"
+#line 699 "Kmeans.pm"
 
 # Exit with OK status
 

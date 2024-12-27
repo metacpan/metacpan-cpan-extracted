@@ -1,9 +1,9 @@
 #
-# GENERATED WITH PDL::PP! Don't modify!
+# GENERATED WITH PDL::PP from ts.pd! Don't modify!
 #
 package PDL::Stats::TS;
 
-our @EXPORT_OK = qw(_acf _acvf diff inte dseason _fill_ma filter_exp filter_ma mae mape wmape portmanteau _pred_ar );
+our @EXPORT_OK = qw(acf acvf dseason fill_ma filter_exp filter_ma mae mape wmape portmanteau pred_ar );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
@@ -32,7 +32,7 @@ PDL::Stats::TS -- basic time series functions
 
 =head1 DESCRIPTION
 
-The terms FUNCTIONS and METHODS are arbitrarily used to refer to methods that are threadable and methods that are NOT threadable, respectively. Plots require PDL::Graphics::PGPLOT.
+The terms FUNCTIONS and METHODS are arbitrarily used to refer to methods that are broadcastable and methods that are NOT broadcastable, respectively. Plots require L<PDL::Graphics::PGPLOT>.
 
 ***EXPERIMENTAL!*** In particular, bad value support is spotty and may be shaky. USE WITH DISCRETION! 
 
@@ -63,26 +63,13 @@ my $DEV = ($^O =~ /win/i)? '/png' : '/xs';
 
 
 
-*_acf = \&PDL::_acf;
 
-
-
-
-*_acvf = \&PDL::_acvf;
-
-
-
-
-
-#line 112 "ts.pd"
-
-#line 113 "ts.pd"
 
 =head2 acf
 
 =for sig
 
-  Signature: (x(t); int h(); [o]r(h+1))
+  Signature: (x(t); [o]r(h); IV lag=>h)
 
 =for ref
 
@@ -101,20 +88,38 @@ usage:
     perldl> p $a->acf(5)
     [1 0.7 0.41212121 0.14848485 -0.078787879 -0.25757576]
 
+=for bad
+
+acf does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-*acf = \&PDL::acf;
+
+
+
+
+#line 74 "ts.pd"
 sub PDL::acf {
   my ($self, $h) = @_;
   $h ||= $self->dim(0) - 1;
-  return $self->_acf($h+1);
+  PDL::_acf_int($self, my $r = PDL->null, $h+1);
+  $r;
 }
+#line 110 "TS.pm"
+
+*acf = \&PDL::acf;
+
+
+
+
+
 
 =head2 acvf
 
 =for sig
 
-  Signature: (x(t); int h(); [o]v(h+1))
+  Signature: (x(t); [o]v(h); IV lag=>h)
 
 =for ref
 
@@ -138,65 +143,27 @@ usage:
     perldl> p $a->acvf(5) / $a->acvf(0)
     [1 0.7 0.41212121 0.14848485 -0.078787879 -0.25757576]
 
+=for bad
+
+acvf does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-*acvf = \&PDL::acvf;
+
+
+
+
+#line 129 "ts.pd"
 sub PDL::acvf {
   my ($self, $h) = @_;
   $h ||= $self->dim(0) - 1;
-  return $self->_acvf($h+1);
+  PDL::_acvf_int($self, my $v = PDL->null, $h+1);
+  $v;
 }
-#line 150 "TS.pm"
+#line 165 "TS.pm"
 
-
-=head2 diff
-
-=for sig
-
-  Signature: (x(t); [o]dx(t))
-
-=for ref
-
-Differencing. DX(t) = X(t) - X(t-1), DX(0) = X(0). Can be done inplace.
-
-=for bad
-
-diff does not process bad values.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
-
-=cut
-
-
-
-
-*diff = \&PDL::diff;
-
-
-
-
-
-
-=head2 inte
-
-=for sig
-
-  Signature: (x(n); [o]ix(n))
-
-=for ref
-
-Integration. Opposite of differencing. IX(t) = X(t) + X(t-1), IX(0) = X(0). Can be done inplace.
-
-=for bad
-
-inte does not process bad values.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
-
-=cut
-
-
-
-
-*inte = \&PDL::inte;
+*acvf = \&PDL::acvf;
 
 
 
@@ -212,8 +179,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for ref
 
 Deseasonalize data using moving average filter the size of period d.
-
-  
 
 =for bad
 
@@ -231,43 +196,46 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 362 "ts.pd"
-
-#line 363 "ts.pd"
 
 =head2 fill_ma
 
 =for sig
 
-  Signature: (x(t); int q(); [o]xf(t))
+  Signature: (x(t); indx q(); [o]xf(t))
 
 =for ref
 
 Fill missing value with moving average. xf(t) = sum(x(t-q .. t-1, t+1 .. t+q)) / 2q.
 
 fill_ma does handle bad values. Output pdl bad flag is cleared unless the specified window size q is too small and there are still bad values.
- 
+
 =for usage
 
   my $x_filled = $x->fill_ma( $q );
 
+=for bad
+
+fill_ma processes bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-*fill_ma = \&PDL::fill_ma;
+
+
+
+
+#line 252 "ts.pd"
 sub PDL::fill_ma {
   my ($x, $q) = @_;
-
-  my $x_filled = $x->_fill_ma($q);
+  PDL::_fill_ma_int($x, $q, my $x_filled = PDL->null);
   $x_filled->check_badflag;
-
 #  carp "ma window too small, still has bad value"
 #    if $x_filled->badflag;
-
   return $x_filled;
 }
-#line 269 "TS.pm"
+#line 237 "TS.pm"
 
-*_fill_ma = \&PDL::_fill_ma;
+*fill_ma = \&PDL::fill_ma;
 
 
 
@@ -283,10 +251,6 @@ sub PDL::fill_ma {
 =for ref
 
 Filter, exponential smoothing. xf(t) = a * x(t) + (1-a) * xf(t-1)
-
-=for usage
-
-  
 
 =for bad
 
@@ -314,8 +278,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for ref
 
 Filter, moving average. xf(t) = sum(x(t-q .. t+q)) / (2q + 1)
-
-  
 
 =for bad
 
@@ -460,7 +422,6 @@ Usage:
     perldl> use PDL::GSL::CDF
     perldl> p 1 - gsl_cdf_chisq_P( $chisq, 5 )
     0.0480112934306748
-
   
 
 =for bad
@@ -479,15 +440,12 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 700 "ts.pd"
-
-#line 701 "ts.pd"
 
 =head2 pred_ar
 
 =for sig
 
-  Signature: (x(d); b(p|p+1); int t(); [o]pred(t))
+  Signature: (x(p); b(p); [o]pred(t); IV end=>t)
 
 =for ref
 
@@ -515,40 +473,46 @@ Usage:
     perldl> p $x->pred_ar($b(0:1), 7, {const=>0})
     [0       1     0.8    0.44   0.192  0.0656 0.01408]
 
+=for bad
+
+pred_ar does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
+
+
+
+
+#line 468 "ts.pd"
 sub PDL::pred_ar {
   my ($x, $b, $t, $opt) = @_;
   my %opt = ( CONST => 1 );
   $opt and $opt{uc $_} = $opt->{$_} for (keys %$opt);
-
-  $b = pdl $b
-    unless ref $b eq 'PDL';        # allows passing simple number
-
+  $b = PDL->topdl($b); # allows passing simple number
   my $ext;
   if ($opt{CONST}) {
     my $t_ = $t - ( $x->dim(0) - $b->dim(0) + 1 );
-    $ext = $x(-$b->dim(0)+1:-1, )->_pred_ar($b(0:-2), $t_);
+    PDL::_pred_ar_int($x(-$b->dim(0)+1:-1, ), $b(0:-2), $ext = PDL->null, $t_);
     $ext($b->dim(0)-1:-1) += $b(-1);
     return $x->append( $ext( $b->dim(0)-1 : -1 ) );
-  }
-  else {
+  } else {
     my $t_ = $t - ( $x->dim(0) - $b->dim(0) );
-    $ext = $x(-$b->dim(0):-1, )->_pred_ar($b, $t_);
+    PDL::_pred_ar_int($x(-$b->dim(0):-1, ), $b, $ext = PDL->null, $t_);
     return $x->append($ext($b->dim(0) : -1));
   }
 }
-#line 542 "TS.pm"
+#line 506 "TS.pm"
 
-*_pred_ar = \&PDL::_pred_ar;
-
-
+*pred_ar = \&PDL::pred_ar;
 
 
 
-#line 790 "ts.pd"
 
-#line 791 "ts.pd"
+
+#line 515 "ts.pd"
+
+#line 516 "ts.pd"
 
 =head2 season_m
 
@@ -763,7 +727,7 @@ sub PDL::plot_acf {
 
 =head1 	REFERENCES
 
-Brockwell, P.J., & Davis, R.A. (2002). Introcution to Time Series and Forecasting (2nd ed.). New York, NY: Springer.
+Brockwell, P.J., & Davis, R.A. (2002). Introduction to Time Series and Forecasting (2nd ed.). New York, NY: Springer.
 
 Schütz, W., & Kolassa, S. (2006). Foresight: advantages of the MAD/Mean ratio over the MAPE. Retrieved Jan 28, 2010, from http://www.saf-ag.com/226+M5965d28cd19.html
 
@@ -774,7 +738,7 @@ Copyright (C) 2009 Maggie J. Xiong <maggiexyz users.sourceforge.net>
 All rights reserved. There is no warranty. You are allowed to redistribute this software / documentation as described in the file COPYING in the PDL distribution.
 
 =cut
-#line 778 "TS.pm"
+#line 742 "TS.pm"
 
 # Exit with OK status
 

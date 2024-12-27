@@ -2,7 +2,7 @@
 use warnings;
 use strict;
 use 5.014;
-our $VERSION = '2.419';
+our $VERSION = '2.420';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -46,7 +46,7 @@ C<db-browser> - Browse SQL databases and their tables interactively.
 
 =head1 VERSION
 
-Version 2.419
+Version 2.420
 
 =head1 SYNOPSIS
 
@@ -910,7 +910,7 @@ With C<Firebird>, C<SIMILAR TO> is used instead of C<REGEXP>.
 
 With C<Informix>, C<MATCHES> is used instead of C<REGEXP>.
 
-=head3 Aliases
+=head3 Add Aliases
 
 Alias settings for:
 
@@ -971,6 +971,28 @@ the user is asked for the alias; if nothing is entered, a default alias is added
 =back
 
 Not all of these settings are available for any alias type.
+
+=head3 Aliases in Clauses
+
+Use aliases in
+
+=over
+
+=item
+
+GROUP BY
+
+=item
+
+HAVING
+
+=item
+
+ORDER BY
+
+=back
+
+Not all databases support aliases in GROUP BY and HAVING.
 
 =head3 Identifiers
 

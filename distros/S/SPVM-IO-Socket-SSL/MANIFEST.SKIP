@@ -16,3 +16,4 @@
 \.BAK$
 \.o$
 \.bs$
+(^|\/)t/file_tmp/ca

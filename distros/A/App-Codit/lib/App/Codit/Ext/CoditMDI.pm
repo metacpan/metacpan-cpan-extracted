@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.13";
+$VERSION="0.14";
 
 use base qw( Tk::AppWindow::Ext::MDI );
 
@@ -29,10 +29,10 @@ my @navcontextmenu = (
 
 =head1 SYNOPSIS
 
- my $app = new App::Codit(@options,
-    -extensions => ['CoditMDI'],
- );
- $app->MainLoop;
+my $app = new App::Codit(@options,
+	-extensions => ['CoditMDI'],
+);
+$app->MainLoop;
 
 =head1 DESCRIPTION
 
@@ -152,6 +152,15 @@ Deletes text in the currently selected document. It takes two indices as paramet
 
 Inserts text in the currently selected document. It takes an index and a string as parameters.
 
+=item B<edit_replace>, I<$begin>, I<$end>, I<$text>
+
+Replaces text in the currently selected document. It takes two indices and a text as parameters.
+
+=item B<key_released>, I<$doc>, I<$key>
+
+Dummy command only meant for hooking on by plugins. Called every time a visible character
+key was pressed. The plugin WordCompletion hooks on to this.
+
 =item B<modified>, I<$doc>, I<$index>
 
 Called every time you make an edit, it gets a document name and an index as parameters.
@@ -205,6 +214,8 @@ sub new {
 		doc_wrap => ['docWrap', $self],
 		edit_delete => ['editDelete', $self],
 		edit_insert => ['editInsert', $self],
+		edit_replace => ['editReplace', $self],
+		key_released => ['keyReleased', $self],
 		modified => ['contentModified', $self],
 		nav_collapse => ['navCollapse', $self],
 		nav_expand => ['navExpand', $self],
@@ -326,20 +337,20 @@ sub contentModified {
 sub ContextMenu {
 	my $self = shift;
 	return $self->extGet('MenuBar')->menuContext($self->GetAppWindow,
-     [ 'menu_normal',    undef,  '~Copy',       '<Control-c>',	 'edit-copy',       '*CTRL+C'],
-     [ 'menu_normal',    undef,  'C~ut',        '<Control-x>',	 'edit-cut',        '*CTRL+X'],
-     [ 'menu_normal',    undef,  '~Paste',      '<Control-v>',	 'edit-paste',      '*CTRL+V'],
-     [ 'menu_separator', undef,  'c1'],
-     [ 'menu_normal',    undef,  '~Select all', '<Control-a>',  'edit-select-all', '*CTRL+A'],
-     [ 'menu_separator', undef,  'c2'],
-     [ 'menu_normal',    undef,  'Co~mment',    '<Control-g>',   undef,            '*CTRL+G'],
-     [ 'menu_normal',    undef,  '~Uncomment',  '<Control-G>',   undef,            '*CTRL+SHIFT+G'],
-     [ 'menu_separator', undef,  'c3' ],
-     [ 'menu_normal',    undef,  '~Indent',     '<Control-j>',   'format-indent-more','*CTRL+J'],
-     [ 'menu_normal',    undef,  'Unin~dent',   '<Control-J>',   'format-indent-less','*CTRL+SHIFT+J'],
-     [ 'menu_separator', undef,  'c4' ],
-     [ 'menu_check',     undef,  'A~uto indent', undef, '-doc_autoindent', undef, 0, 1],
-     [ 'menu_radio_s',   undef,  '~Wrap',  [qw/char word none/],  'text-wrap', '-doc_wrap'],
+		[ 'menu_normal',    undef,  '~Copy',       '<Control-c>',	 'edit-copy',       '*CTRL+C'],
+		[ 'menu_normal',    undef,  'C~ut',        '<Control-x>',	 'edit-cut',        '*CTRL+X'],
+		[ 'menu_normal',    undef,  '~Paste',      '<Control-v>',	 'edit-paste',      '*CTRL+V'],
+		[ 'menu_separator', undef,  'c1'],
+		[ 'menu_normal',    undef,  '~Select all', '<Control-a>',  'edit-select-all', '*CTRL+A'],
+		[ 'menu_separator', undef,  'c2'],
+		[ 'menu_normal',    undef,  'Co~mment',    '<Control-g>',   undef,            '*CTRL+G'],
+		[ 'menu_normal',    undef,  '~Uncomment',  '<Control-G>',   undef,            '*CTRL+SHIFT+G'],
+		[ 'menu_separator', undef,  'c3' ],
+		[ 'menu_normal',    undef,  '~Indent',     '<Control-j>',   'format-indent-more','*CTRL+J'],
+		[ 'menu_normal',    undef,  'Unin~dent',   '<Control-J>',   'format-indent-less','*CTRL+SHIFT+J'],
+		[ 'menu_separator', undef,  'c4' ],
+		[ 'menu_check',     undef,  'A~uto indent', undef, '-doc_autoindent', undef, 0, 1],
+		[ 'menu_radio_s',   undef,  '~Wrap',  [qw/char word none/],  'text-wrap', '-doc_wrap'],
 	)
 }
 
@@ -641,7 +652,7 @@ sub docWidget {
 	return undef unless defined $doc;
 	return $doc->CWidg;
 }
- 
+
 sub docWrap {
 	my $self = shift;
 	return $self->docOption('-contentwrap', @_);
@@ -663,7 +674,7 @@ sub editDelete {
 
 =item B<editInsert>I<($index, $text)>
 
-Inserts text in the currently selected document. It takes an index and the text parameters.
+Inserts text in the currently selected document. It takes an index and the text as parameters.
 
 =cut
 
@@ -672,6 +683,23 @@ sub editInsert {
 	my $doc = $self->docSelected;
 	return unless defined $doc;
 	$self->docGet($doc)->insert(@_);
+}
+
+=item B<editReplace>I<($begin, $end, $text)>
+
+Inserts text in the currently selected document. It takes indices $begin and $end and the text as parameters.
+
+=cut
+
+sub editReplace {
+	my $self = shift;
+	my $doc = $self->docSelected;
+	return unless defined $doc;
+	$self->docGet($doc)->replace(@_);
+}
+
+sub keyReleased {
+#	my ($self, $name, $key) = @_;
 }
 
 =back
@@ -789,50 +817,50 @@ sub MenuItems {
 
 	my @items = $self->SUPER::MenuItems;
 	return (@items,
-      [ 'menu',           undef,             '~Edit'],
-      [ 'menu_normal',    'Edit::',           '~Copy',             '<Control-c>',	      'edit-copy',      '*CTRL+C'],
-      [ 'menu_normal',    'Edit::',          'C~ut',					          '<Control-x>',			    'edit-cut',	      '*CTRL+X'],
-      [ 'menu_normal',    'Edit::',          '~Paste',             '<Control-v>',	      'edit-paste',     '*CTRL+V'],
-      [ 'menu_separator', 'Edit::',          'e1' ],
-      [ 'menu_normal',    'Edit::',          'U~ndo',              '<Control-z>',       'edit-undo',      '*CTRL+Z'],
-      [ 'menu_normal',    'Edit::',          '"~Redo',             '<Control-Z>',       'edit-redo',      '*CTRL+SHIFT+Z'],
-      [ 'menu_separator', 'Edit::',          'e2'],
-      [ 'menu_normal',    'Edit::',          'Co~mment',           '<Control-g>',       undef,            '*CTRL+G'],
-      [ 'menu_normal',    'Edit::',          '~Uncomment',         '<Control-G>',       undef,            '*CTRL+SHIFT+G'],
-      [ 'menu_separator', 'Edit::',          'e3' ],
-      [ 'menu_normal',    'Edit::',          '~Indent',            '<Control-j>',       'format-indent-more','*CTRL+J'],
-      [ 'menu_normal',    'Edit::',          'Unin~dent',          '<Control-J>',       'format-indent-less','*CTRL+SHIFT+J'],
-      [ 'menu_separator', 'Edit::',          'e4' ],
-      [ 'menu_normal',    'Edit::',          'U~pper case',        'doc_case_upper',    'format-text-uppercase','CTRL+U'],
-      [ 'menu_normal',    'Edit::',          '~Lower case',        'doc_case_lower',    'format-text-lowercase','ALT+U'],
-      [ 'menu_separator', 'Edit::',          'e5' ],
-      [ 'menu_normal',    'Edit::',          '~Select all',        '<Control-a>',       'edit-select-all','*CTRL+A'],
+		[ 'menu',           undef,             '~Edit'],
+		[ 'menu_normal',    'Edit::',           '~Copy',             '<Control-c>',	      'edit-copy',      '*CTRL+C'],
+		[ 'menu_normal',    'Edit::',          'C~ut',					          '<Control-x>',			    'edit-cut',	      '*CTRL+X'],
+		[ 'menu_normal',    'Edit::',          '~Paste',             '<Control-v>',	      'edit-paste',     '*CTRL+V'],
+		[ 'menu_separator', 'Edit::',          'e1' ],
+		[ 'menu_normal',    'Edit::',          'U~ndo',              '<Control-z>',       'edit-undo',      '*CTRL+Z'],
+		[ 'menu_normal',    'Edit::',          '"~Redo',             '<Control-Z>',       'edit-redo',      '*CTRL+SHIFT+Z'],
+		[ 'menu_separator', 'Edit::',          'e2'],
+		[ 'menu_normal',    'Edit::',          'Co~mment',           '<Control-g>',       undef,            '*CTRL+G'],
+		[ 'menu_normal',    'Edit::',          '~Uncomment',         '<Control-G>',       undef,            '*CTRL+SHIFT+G'],
+		[ 'menu_separator', 'Edit::',          'e3' ],
+		[ 'menu_normal',    'Edit::',          '~Indent',            '<Control-j>',       'format-indent-more','*CTRL+J'],
+		[ 'menu_normal',    'Edit::',          'Unin~dent',          '<Control-J>',       'format-indent-less','*CTRL+SHIFT+J'],
+		[ 'menu_separator', 'Edit::',          'e4' ],
+		[ 'menu_normal',    'Edit::',          'U~pper case',        'doc_case_upper',    'format-text-uppercase','CTRL+U'],
+		[ 'menu_normal',    'Edit::',          '~Lower case',        'doc_case_lower',    'format-text-lowercase','ALT+U'],
+		[ 'menu_separator', 'Edit::',          'e5' ],
+		[ 'menu_normal',    'Edit::',          '~Select all',        '<Control-a>',       'edit-select-all','*CTRL+A'],
 
-      [ 'menu',           undef,             '~Bookmarks',         'bookmark_fill'],
-      [ 'menu_normal',    'Bookmarks::',     '~Add bookmark',      'bookmark_add',      'bookmark_new',      'CTRL+B',],
-      [ 'menu_normal',    'Bookmarks::',     '~Remove bookmark',   'bookmark_remove',   'bookmark_remove',   'CTRL+SHIFT+B',],
-      [ 'menu_normal',    'Bookmarks::',     '~Clear bookmarks',   'bookmark_clear',    undef],
-      [ 'menu_separator', 'Bookmarks::',     'b1' ],
-      [ 'menu_normal',    'Bookmarks::',     '~Previous bookmark', 'bookmark_prev',     'bookmark_previous'],
-      [ 'menu_normal',    'Bookmarks::',     '~Next bookmark',     'bookmark_next',     'bookmark_next'],
-      [ 'menu_separator', 'Bookmarks::',     'b2' ],
+		[ 'menu',           undef,             '~Bookmarks',         'bookmark_fill'],
+		[ 'menu_normal',    'Bookmarks::',     '~Add bookmark',      'bookmark_add',      'bookmark_new',      'CTRL+B',],
+		[ 'menu_normal',    'Bookmarks::',     '~Remove bookmark',   'bookmark_remove',   'bookmark_remove',   'CTRL+SHIFT+B',],
+		[ 'menu_normal',    'Bookmarks::',     '~Clear bookmarks',   'bookmark_clear',    undef],
+		[ 'menu_separator', 'Bookmarks::',     'b1' ],
+		[ 'menu_normal',    'Bookmarks::',     '~Previous bookmark', 'bookmark_prev',     'bookmark_previous'],
+		[ 'menu_normal',    'Bookmarks::',     '~Next bookmark',     'bookmark_next',     'bookmark_next'],
+		[ 'menu_separator', 'Bookmarks::',     'b2' ],
 
-      [ 'menu_separator', 'View::',          'v1' ],
-      [ 'menu_check',     'View::',          'Show ~folds',          undef,   '-doc_view_folds', undef, 0, 1],
-      [ 'menu_check',     'View::',          'Show ~line numbers',   undef,   '-doc_view_numbers', undef, 0, 1],
-      [ 'menu_check',     'View::',          'Show ~document status',undef,   '-doc_view_status', undef, 0, 1],
-      [ 'menu_separator', 'View::',          'v2' ],
-      [ 'menu_check',     'View::',          'Show ~spaces and tabs','show-spaces', '-doc_show_spaces', undef, 0, 1],
+		[ 'menu_separator', 'View::',          'v1' ],
+		[ 'menu_check',     'View::',          'Show ~folds',          undef,   '-doc_view_folds', undef, 0, 1],
+		[ 'menu_check',     'View::',          'Show ~line numbers',   undef,   '-doc_view_numbers', undef, 0, 1],
+		[ 'menu_check',     'View::',          'Show ~document status',undef,   '-doc_view_status', undef, 0, 1],
+		[ 'menu_separator', 'View::',          'v2' ],
+		[ 'menu_check',     'View::',          'Show ~spaces and tabs','show-spaces', '-doc_show_spaces', undef, 0, 1],
 
-      [ 'menu',           undef,             '~Tools'],
-      [ 'menu_normal',    'Tools::',         '~Find',              'doc_find',          'edit-find',      '*CTRL+F',],
-      [ 'menu_normal',    'Tools::',         '~Replace',	          'doc_replace',       'edit-find-replace','*CTRL+R',],
-      [ 'menu_separator', 'Tools::',          't1' ],
-      [ 'menu_check',     'Tools::',          'A~uto indent',        undef,   '-doc_autoindent', undef, 0, 1],
-      [ 'menu_radio_s',   'Tools::',          '~Wrap',  [qw/char word none/],  undef, '-doc_wrap'],
-      [ 'menu_separator', 'Tools::',          't1' ],
-      [ 'menu_normal',    'Tools::',          'R~emove trailing spaces',   'doc_remove_trailing',],
-      [ 'menu_normal',    'Tools::',          'F~ix indentation',   'doc_fix_indent',],
+		[ 'menu',           undef,             '~Tools'],
+		[ 'menu_normal',    'Tools::',         '~Find',              'doc_find',          'edit-find',      '*CTRL+F',],
+		[ 'menu_normal',    'Tools::',         '~Replace',	          'doc_replace',       'edit-find-replace','*CTRL+R',],
+		[ 'menu_separator', 'Tools::',          't1' ],
+		[ 'menu_check',     'Tools::',          'A~uto indent',        undef,   '-doc_autoindent', undef, 0, 1],
+		[ 'menu_radio_s',   'Tools::',          '~Wrap',  [qw/char word none/],  undef, '-doc_wrap'],
+		[ 'menu_separator', 'Tools::',          't1' ],
+		[ 'menu_normal',    'Tools::',          'R~emove trailing spaces',   'doc_remove_trailing',],
+		[ 'menu_normal',    'Tools::',          'F~ix indentation',   'doc_fix_indent',],
 	);
 }
 
@@ -850,7 +878,7 @@ sub navContextMenu {
 	#checking if Git is loaded;
 	my $git = $self->extGet('Plugins')->plugGet('Git');
 	push @items, [ 'menu_normal', 'c1', '~Add to project', 'git_add', 'git-icon',] if defined $git;
- 
+
 	my $stack = $self->extGet('MenuBar')->menuStack(@items);
 	$nav->configure('-contextmenu', $stack);
 }

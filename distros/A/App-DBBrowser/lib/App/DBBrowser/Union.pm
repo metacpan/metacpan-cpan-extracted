@@ -252,7 +252,7 @@ sub __choose_table_columns {
             }
             else {
                 my $default = 'col_' . ( @{$data->[$idx]{chosen_qt_cols}} + 1 );
-                my $alias = $ax->alias( $sql, 'select_complex_col', $complex_col, $default );
+                my $alias = $ax->alias( $sql, 'complex_cols_select', $complex_col, $default );
                 push @bu, $ax->clone_data( $data->[$idx] );
                 push @{$data->[$idx]{chosen_qt_cols}}, $complex_col;
                 $data->[$idx]{qt_alias}{$complex_col} = $ax->quote_alias( $alias );

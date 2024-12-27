@@ -9,7 +9,7 @@ App::Codit::Plugins::Console - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.10;
+$VERSION = 0.14;
 
 use Config;
 my $mswin = $Config{'osname'} eq 'MSWin32';
@@ -18,6 +18,7 @@ my $mswin = $Config{'osname'} eq 'MSWin32';
 use base qw( Tk::AppWindow::BaseClasses::Plugin );
 
 require Tk::HList;
+require Tk::Menu;
 require Tk::LabFrame;
 require Tk::NoteBook;
 require Tk::Terminal;
@@ -81,6 +82,7 @@ sub new {
 		-linkcall => ['linkSelect', $self],
 		-linkreg => qr/[^\s]+\sline\s\d+/,
 	)->pack(@pad, -expand => 1, -fill => 'both');
+	$text->bind('<Button-3>', [$self, 'popMenu']);
 	$self->{TXT} = $text;
 	$workdir = $text->cget('-workdir');
 	my $sb = $self->sidebars;
@@ -116,7 +118,7 @@ sub docWidget {
 	return undef unless defined $doc;
 	return $doc->CWidg;
 }
- 
+
 sub linkSelect {
 	my ($self, $text) = @_;
 	if ($text =~ /^([^\s]+)\s+line\s+(\d+)/) {
@@ -135,6 +137,92 @@ sub linkSelect {
 			$widg->goTo("$line.0");
 			$widg->see("$line.0");
 		}
+	}
+}
+
+sub popMenu {
+	my $self = shift;
+
+	#refreshing commands
+	my $txt = $self->_txt;
+	my $dir = $txt->cget('-workdir');
+	my $maketype = '';
+	my @menuitems = ();
+#	my $iconsize = $self->configGet('-menuiconsize');
+	my $iconsize = 16;
+	if (-e "$dir/Makefile.PL") {
+		$maketype = 'make';
+		for (
+			'perl Makefile.PL',
+			'make',
+			'make clean',
+			'make dist',
+			'make disttest',
+			'make manifest',
+			'make realclean',
+			'make test',
+		) {
+			my $cmd = $_;
+			push @menuitems, ['command', $cmd,
+				-command => ['launch', $txt, $cmd],
+#				-image => $self->getArt('application-x-executable', $iconsize),
+				-label => $cmd,
+			];
+		}
+	}
+	if (-e "$dir/Build.PL") {
+		$maketype = './Build';
+		for (
+			'perl Build.PL',
+			'./Build',
+			'./Build clean',
+			'./Build dist',
+			'./Build disttest',
+			'./Build manifest',
+			'./Build realclean',
+			'./Build test',
+		) {
+			my $cmd = $_;
+			push @menuitems, ['command', $cmd,
+				-command => ['launch', $txt, $cmd],
+#				-image => $self->getArt('application-x-executable', $iconsize),
+				-label => $cmd,
+			];
+		}
+	}
+	
+	#refreshing tests
+	my $tdir = "$dir/t";
+	my @tests = ();
+	if ((-e $tdir) and (-d $tdir)) {
+		if (opendir my $dh, $tdir) {
+			while (my $entry = readdir $dh) {
+				next unless $entry =~ /\.t$/;
+				push @tests, $entry
+			}
+			closedir $dh;
+		}
+	}
+	push @menuitems, ['separator', '-'] if @tests and @menuitems;
+	for (sort @tests) {
+		my $cmd = $_;
+		push @menuitems, ['command', $cmd,
+			-command => ['launch', $txt, "$maketype; perl -Mblib t/$cmd"],
+#			-image => $self->getArt('application-x-executable-script', $iconsize),
+			-label => $cmd,
+		];
+	}
+	my ($x, $y) = $self->pointerxy;
+	if (@menuitems) {
+		my $menu = $self->Menu(
+			-menuitems => \@menuitems,
+			-tearoff => 0,
+		);
+		$menu->bind('<Leave>', sub {
+			$menu->unpost;
+			$menu->destroy;
+		});
+		$menu->post($x - 2, $y - 2);
 	}
 }
 

@@ -1,6 +1,5 @@
 bin/codit
 Changes
-codit_logo.png
 lib/App/Codit.pm
 lib/App/Codit/BaseClasses/TextModPlugin.pm
 lib/App/Codit/CodeTextManager.pm
@@ -21,6 +20,7 @@ lib/App/Codit/Plugins/Backups.pm
 lib/App/Codit/Plugins/Bookmarks.pm
 lib/App/Codit/Plugins/Colors.pm
 lib/App/Codit/Plugins/Console.pm
+lib/App/Codit/Plugins/Exporter.pm
 lib/App/Codit/Plugins/FileBrowser.pm
 lib/App/Codit/Plugins/Git.pm
 lib/App/Codit/Plugins/PerlSubs.pm
@@ -43,6 +43,7 @@ t/050-App-Codit-Plugins-Backups.t
 t/060-App-Codit-Plugins-Bookmarks.t
 t/070-App-Codit-Plugins-Colors.t
 t/075-App-Codit-Plugins-Console.t
+t/078-App-Codit-Plugins-Exporter.t
 t/080-App-Codit-Plugins-FileBrowser.t
 t/090-App-Codit-Plugins-Git.t
 t/100-App-Codit-Plugins-PerlSubs.t

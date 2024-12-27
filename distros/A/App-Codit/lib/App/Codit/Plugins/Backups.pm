@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw( $VERSION );
-$VERSION = 0.05;
+$VERSION = 0.14;
 
 use File::Basename;
 use File::Path qw(make_path);
@@ -23,12 +23,12 @@ Protect yourself against crashes. This plugin keeps backups of your unsaved file
 
 =head1 DETAILS
 
-The Backups plugin protects you against crashes of all kinds. 
-It silently does it's job in the background and only reports when it 
-finds an existing backup of a file you open. 
+The Backups plugin protects you against crashes of all kinds.
+It silently does it's job in the background and only reports when it
+finds an existing backup of a file you open.
 
-It keeps backups of all open and unsaved files. Whenever a file is saved or closed 
-the backup is removed. 
+It keeps backups of all open and unsaved files. Whenever a file is saved or closed
+the backup is removed.
 
 It keeps the backups in the configuration folder, it does not pollute your working folders.
 
@@ -59,7 +59,7 @@ sub backupCheck {
 
 	unless ($mdi->docExists($name)) {
 		$self->jobEnd($name);
-		return 
+		return
 	}
 
 	my $mod = $self->{MODIFIED};
@@ -115,8 +115,8 @@ sub backupList {
 			push @names, $self->backupName($file);
 		}
 		closedir $dh
-   }
-   return @names
+	}
+	return @names
 }
 
 sub backupName {

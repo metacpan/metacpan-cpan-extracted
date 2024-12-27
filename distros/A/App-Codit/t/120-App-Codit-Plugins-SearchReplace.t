@@ -4,7 +4,7 @@ use warnings;
 use Tk;
 
 use Test::Tk;
-use Test::More tests => 8;
+use Test::More tests => 9;
 use File::Spec;
 use Config;
 my $mswin = $Config{'osname'} eq 'MSWin32';
@@ -31,7 +31,7 @@ if (defined $app) {
 	$sr = $pext->plugGet('SearchReplace');
 }
 
-testaccessors($sr, 'repl', 'skipped');
+testaccessors($sr, 'Current', 'repl', 'skipped');
 
 push @tests, (
 	[ sub { 

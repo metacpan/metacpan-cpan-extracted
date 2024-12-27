@@ -2,7 +2,7 @@ package App::Codit::CoditTagsEditor;
 
 =head1 NAME
 
-App::Codit - IDE for and in Perl
+App::Codit::CoditTagsEditor - Tags editor for the syntax highlight tags of Tk::CodeText
 
 =cut
 
@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.01";
+$VERSION="0.14";
 use Tk;
 use Tie::Watch;
 require Tk::CodeText::TagsEditor;
@@ -78,10 +78,10 @@ sub Populate {
 		DEFAULT => [$te],
 	);
 
-	$self->after(50, sub { 
+	$self->after(50, sub {
 		my $theme = Tk::CodeText::Theme->new;
 		$theme->load($themefile);
-		$te->put($theme->get) 
+		$te->put($theme->get)
 	});
 }
 

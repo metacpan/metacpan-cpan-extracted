@@ -118,7 +118,7 @@ sub join_tables {
         push @{$data->{used_tables}}, $master;
         $data->{default_alias} = 'a';
         # Alias
-        my $master_alias = $ax->alias( $sql, 'join_table', $qt_master, $data->{default_alias} );
+        my $master_alias = $ax->alias( $sql, 'tables_in_join', $qt_master, $data->{default_alias} );
         push @{$data->{aliases}}, [ $master, $master_alias ];
         push @{$sql->{join_data}}, { table => $qt_master . " " . $ax->quote_alias( $master_alias ) };
         ( $data->{col_names}{$master}, undef ) = $ax->column_names_and_types( $qt_master . " " . $ax->quote_alias( $master_alias ), $sql->{ctes} );
@@ -279,7 +279,7 @@ sub __add_slave_with_join_condition {
         }
         push @{$data->{used_tables}}, $slave;
         # Alias
-        my $slave_alias = $ax->alias( $sql, 'join_table', $qt_slave, ++$data->{default_alias} );
+        my $slave_alias = $ax->alias( $sql, 'tables_in_join', $qt_slave, ++$data->{default_alias} );
         $sql->{join_data}[-1]{table} = $qt_slave . " " . $ax->quote_alias( $slave_alias );
         push @{$data->{aliases}}, [ $slave, $slave_alias ];
         ( $data->{col_names}{$slave}, undef ) = $ax->column_names_and_types( $qt_slave . " " . $ax->quote_alias( $slave_alias ), $sql->{ctes} );

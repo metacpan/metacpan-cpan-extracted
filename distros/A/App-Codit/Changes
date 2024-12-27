@@ -1,8 +1,21 @@
 Revision history for Perl extension App::Codit.
 
+0.14 Fri Dec 27 2024
+	- Search input in plugin SearchReplace is validated and quoted.
+	- Replaces can be made with $1, $2 etc captures from the search on regular expression.
+	- Results in searches are now shown in the text using the Tk::XText Find tag.
+	- Plugin WordCompletion responds to command key_released instead of modified.
+	- Plugin Sessions loads and saves the current folder of the FileBrowser plugin.
+	- New plugin: Exporter.
+	- Added a context menu to plugin Console.
+	- Plugin Git opens files in external application if they  cannot be opened in Codit.
+	- Fixed sorting on subs in plugin PerlSubs.
+	- Updated manual and documentation.
+
 0.13 Mon Dec 02 2024
 	- New file dialogs. Opening multiple files.
 	- Added file management capabilities to plugin FileBrowser.
+	- Changed bug tracker.
 
 0.12 Mon Nov 11 2024
 	- Left and right side bars have rotated labels

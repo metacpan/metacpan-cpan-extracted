@@ -9,7 +9,7 @@ App::Codit::Plugins::PodViewer - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.10;
+$VERSION = 0.14;
 
 use base qw( App::Codit::BaseClasses::TextModPlugin );
 
@@ -22,8 +22,8 @@ Add a Perl pod viewer to your open files.
 
 =head1 DETAILS
 
-PodViewer adds a I<Pod> button to the toolbar. 
-When you click it the frame of the current selected document 
+PodViewer adds a I<Pod> button to the toolbar.
+When you click it the frame of the current selected document
 will split and the bottom half will show the pod documentation
 in your document.
 
@@ -43,7 +43,7 @@ sub new {
 	$self->{VISIBLE} = 0;
 
 	my $page = $self->ToolBottomPageAdd('Pod', 'documentation', undef, 'Show the documentation in your file');
-	$self->sidebars->pageSelectCall('Pod', sub { 
+	$self->sidebars->pageSelectCall('Pod', sub {
 		$self->after(10, sub { $self->Refresh })
 	});
 	my $art = $self->extGet('Art');

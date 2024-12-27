@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.10";
+$VERSION='0.14';
 use Tk;
 require Tk::CodeText;
 
@@ -19,10 +19,10 @@ Construct Tk::Widget 'CodeTextManager';
 
 sub Populate {
 	my ($self,$args) = @_;
-	
+
 	$self->SUPER::Populate($args);
 	my $ext = $self->Extension;
-	
+
 	my $text = $self->CodeText(
 		-contextmenu => $ext->ContextMenu,
 		-height => 8,
@@ -36,6 +36,7 @@ sub Populate {
 	my $xt = $text->Subwidget('XText');
 	$xt->bind('<Control-f>', sub { $ext->cmdExecute('doc_find') });
 	$xt->bind('<Control-r>', sub { $ext->cmdExecute('doc_replace') });
+	$xt->bind('<KeyRelease>', [$self, 'KeyReleased', Ev('A')]);
 	$self->{NAME} = '';
 
 	$self->ConfigSpecs(
@@ -44,9 +45,11 @@ sub Populate {
 		-contentbgdspace => ['PASSIVE', undef, undef, '#E600A8'],
 		-contentbgdtab => ['PASSIVE', undef, undef, '#B5C200'],
 		-contentbookmarkcolor => [{-bookmarkcolor => $text}],
+		-contentfindbg => ['PASSIVE'],
+		-contentfindfg => ['PASSIVE'],
 		-contentinsertbg => ['PASSIVE', undef, undef, '#000000'],
-		-contentmatchbg => ['PASSIVE', undef, undef, '#0000FF'],
-		-contentmatchfg => ['PASSIVE', undef, undef, '#FFFF00'],
+		-contentmatchbg => ['PASSIVE'],
+		-contentmatchfg => ['PASSIVE'],
 		-contentforeground => [{-foreground => $xt}],
 		-contentfont => [{-font => $xt}],
 		-contentindent => [{-indentstyle => $xt}],
@@ -105,12 +108,20 @@ sub configureTags {
 		);
 	}
 
+	#configuring the find options
+	my @findoptions = ();
+	my $fbg = $self->cget('-contentfindbg');
+	push @findoptions, '-background', $fbg if (defined $fbg) and ($fbg ne '');
+	my $ffg = $self->cget('-contentfindfg');
+	push @findoptions, '-foreground', $ffg if (defined $ffg) and ($ffg ne '');
+	$widg->configure('-findoptions', \@findoptions) if @findoptions;
+	
 	#configuring the match options
 	my @matchoptions = ();
-	my $bg = $self->cget('-contentmatchbg');
-	push @matchoptions, '-background', $bg if defined $bg;
-	my $fg = $self->cget('-contentmatchfg');
-	push @matchoptions, '-foreground', $fg if defined $fg;
+	my $mbg = $self->cget('-contentmatchbg');
+	push @matchoptions, '-background', $mbg if  (defined $mbg) and ($mbg ne '');
+	my $mfg = $self->cget('-contentmatchfg');
+	push @matchoptions, '-foreground', $mfg if  (defined $mfg) and ($mfg ne '');;
 	$widg->configure('-matchoptions', \@matchoptions) if @matchoptions;
 	
 	#configuring insert background
@@ -141,6 +152,12 @@ sub doSave {
 
 sub doSelect {
 	$_[0]->CWidg->focus
+}
+
+sub KeyReleased {
+	my ($self, $key) = @_;
+	$self->Extension->cmdExecute('key_released', $self->Name, $key);
+	$self->CWidg->Subwidget('XText')->matchCheck;
 }
 
 sub Modified {
