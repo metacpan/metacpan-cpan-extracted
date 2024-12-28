@@ -73,7 +73,7 @@ package Comics::Plugin::Sigmund;
 
 use parent qw(Comics::Fetcher::Single);
 
-our $VERSION = "1.01";
+our $VERSION = "1.02";
 
 # Mandatory variables:
 #
@@ -81,7 +81,7 @@ our $VERSION = "1.01";
 # $url  : the base url of this comic
 
 our $name    = "Sigmund";
-our $url     = "http://sigmund.nl/";
+our $url     = "https://sigmund.nl/";
 
 # Optional variables:
 #
@@ -128,7 +128,7 @@ our $url     = "http://sigmund.nl/";
 
 our $pattern =
   qr{ <img \s+ id="strook" \s+
-       src="?(?<url>http://www.sigmund.nl/strips/(?<image>sig.+\.\w+))"?
+       src="?(?<url>https?://www.sigmund.nl/strips/(?<image>sig.+\.\w+))"?
     }x;
 
 # Important: Return the package name!

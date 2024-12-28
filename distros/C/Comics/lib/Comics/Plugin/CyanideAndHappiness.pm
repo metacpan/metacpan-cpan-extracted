@@ -7,13 +7,13 @@ package Comics::Plugin::CyanideAndHappiness;
 
 use parent qw(Comics::Fetcher::Single);
 
-our $VERSION = "1.01";
+our $VERSION = "1.02";
 
 our $name    = "Cyanide & Happiness (Explosm.net)";
-our $url     = "https://explosm.net/";
+our $url     = "https://explosm.net/comics/latest";
 our $pattern =
-	    qr{ <img \s+
-		src="(?<url>https://static.explosm.net
+	    qr{ as="image" \s+
+		href="(?<url>https://static.explosm.net
 		    /\d+/\d+/\d+/
 		    (?<image>[^.]+\.\w+))
 	      }x;

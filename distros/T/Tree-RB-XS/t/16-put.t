@@ -2,7 +2,7 @@
 use FindBin;
 use lib "$FindBin::RealBin/lib";
 use Test2WithExplain;
-use Tree::RB::XS qw( CMP_INT CMP_FLOAT CMP_MEMCMP );
+use Tree::RB::XS qw( :cmp );
 use Time::HiRes 'time';
 
 subtest int_tree => sub {
@@ -42,6 +42,22 @@ subtest str_tree => sub {
 	is( $tree->put(x => 5), 1, 'put existing key returns old value' );
 	is( $tree->put(x => 2), 5, 'put existing key returns old value' );
 	is( $tree->size, 2, 'size=2' );
+	ok(eval { $tree->_assert_structure; 1 }, 'structure OK' )
+		or diag $@;
+	undef $tree; # test destructor
+};
+
+subtest foldcase_tree => sub {
+	my $tree= Tree::RB::XS->new(compare_fn => CMP_FOLDCASE);
+	is( $tree->put(M => 1), undef, 'put new key returns undef' );
+	is( $tree->size, 1, 'size=1' );
+	is( $tree->put(f => 1), undef, 'put new key returns undef' );
+	is( $tree->size, 2, 'size=2' );
+	is( [ $tree->keys ], [ 'f', 'M' ], 'Keys are sorted case-insensitive' );
+
+	is( $tree->put(m => 5), 1, 'put existing key returns old value' );
+	is( $tree->size, 2, 'size=2' );
+	is( [ $tree->keys ], [ 'f', 'm' ], 'Keys are sorted case-insensitive, and in same case as last inserted' );
 	ok(eval { $tree->_assert_structure; 1 }, 'structure OK' )
 		or diag $@;
 	undef $tree; # test destructor

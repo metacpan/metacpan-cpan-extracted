@@ -38,6 +38,7 @@ sub fetch {
 ################ Subroutines ################
 
 use File::Spec;
+use File::LoadLines;
 
 =head1 METHODS
 
@@ -68,6 +69,9 @@ sub urlabs {
     if ( $path =~ m;^/; ) {
 	if ( $path =~ m;^//; ) {
 	    $path = "http:" . $path;
+	}
+	elsif ( $path =~ m;^/static\.nrc\.nl/; ) { # TODO
+	    $path = "https:/" . $path;
 	}
 	else {
 	    $url =~ s;(^\w+://.*?)/.*;$1;;
@@ -128,12 +132,12 @@ See also: B<spoolfile>.
 sub load_html {
     my ( $self, $html ) = @_;
     my $f = $self->spoolfile($html);
-    open( my $fd, "<:utf8", $f );
-    unless ( $fd ) {
-	::debug("Cannot reuse $html: $!\n");
+    my $opts = { split => 0, fail => "soft" };
+    my $data = loadlines( $f, $opts );
+    if ( $opts->{error} || !$data ) {
+	::debug("Cannot reuse $html: ", $opts->{error}, "\n");
 	return;
     }
-    my $data = do { local $/; <$fd> };
     ::debug("Read: $f");
     return $data;
 }

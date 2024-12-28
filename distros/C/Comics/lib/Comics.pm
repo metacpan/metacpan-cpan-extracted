@@ -2,9 +2,9 @@
 
 # Author          : Johan Vromans
 # Created On      : Fri Oct 21 09:18:23 2016
-# Last Modified By: Johan Vromans
-# Last Modified On: Fri Nov 16 10:49:04 2018
-# Update Count    : 389
+# Last Modified By: 
+# Last Modified On: Mon Feb 26 09:40:52 2024
+# Update Count    : 393
 # Status          : Unknown, Use with caution!
 
 use 5.012;
@@ -68,6 +68,8 @@ my $pluginfilter;
 ################ Presets ################
 
 ################ The Process ################
+
+use File::LoadLines;
 
 # Statistics.
 our $stats;
@@ -149,24 +151,24 @@ use JSON;
 my $state;
 
 sub get_state {
-    if ( open( my $fd, '<', $statefile ) ) {
-	my $data = do { local $/; <$fd>; };
+    my $opts = { split => 0, fail => "soft" };
+    my $data = loadlines( $statefile, $opts );
+    if ( $opts->{error} ) {
+	$state = { comics => { } };
+    }
+    else {
 	$state = JSON->new->decode($data);
 	if ( $refresh ) {
 	    delete( $_->{md5} )
 	      foreach values( %{ $state->{comics} } );
 	}
     }
-    else {
-	$state = { comics => { } };
-
-    }
 }
 
 sub save_state {
     unlink($statefile."~");
     rename( $statefile, $statefile."~" );
-    open( my $fd, '>', $statefile );
+    open( my $fd, '>:utf8', $statefile );
     print $fd JSON->new->canonical->pretty(1)->encode($state);
     close($fd);
 }
@@ -519,7 +521,7 @@ sub app_options {
 		   'disable'	=> sub { $activate = -1 },
 		   'list'	=> \$list,
 		   'force'	=> \$force,
-		   'reuser'	=> \$reuse,
+		   'reuse'	=> \$reuse,
 		   'ident'	=> \$ident,
 		   'verbose+'	=> \$verbose,
 		   'quiet'	=> sub { $verbose = 0 },

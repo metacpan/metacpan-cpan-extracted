@@ -65,6 +65,7 @@ my @files = (
     't/bump_safely/117_isa.data',
     't/bump_safely/118_indirect.data',
     't/bump_safely/119_multidimensional.data',
+    't/bump_safely/120_bareword_filehandles.data',
     't/bump_safely/121_try.data',
     't/bump_safely/122_defer.data',
     't/bump_safely/125_class.data',

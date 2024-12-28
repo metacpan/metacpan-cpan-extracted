@@ -3,13 +3,13 @@ package Net::DNS::Parameters;
 ################################################
 ##
 ##	Domain Name System (DNS) Parameters
-##	(last updated 2024-10-24)
+##	(last updated 2024-12-10)
 ##
 ################################################
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: Parameters.pm 1993 2024-11-07 14:06:53Z willem $)[2];
+our $VERSION = (qw$Id: Parameters.pm 1996 2024-12-16 13:05:08Z willem $)[2];
 
 use integer;
 use Carp;
@@ -89,7 +89,7 @@ my @typebyname = (
 	CERT	   => 37,					# RFC4398
 	A6	   => 38,					# RFC2874 RFC3226 RFC6563
 	DNAME	   => 39,					# RFC6672
-	SINK	   => 40,					# draft-eastlake-kitchen-sink
+	SINK	   => 40,					# draft-eastlake-kitchen-sink-02
 	OPT	   => 41,					# RFC3225 RFC6891
 	APL	   => 42,					# RFC3123
 	DS	   => 43,					# RFC4034
@@ -114,6 +114,7 @@ my @typebyname = (
 	ZONEMD	   => 63,					# RFC8976
 	SVCB	   => 64,					# RFC9460
 	HTTPS	   => 65,					# RFC9460
+	DSYNC	   => 66,					# draft-ietf-dnsop-generalized-notify-03
 	SPF	   => 99,					# RFC7208
 	UINFO	   => 100,					# IANA-Reserved
 	UID	   => 101,					# IANA-Reserved
@@ -136,7 +137,7 @@ my @typebyname = (
 	URI	   => 256,					# RFC7553
 	CAA	   => 257,					# RFC8659
 	AVC	   => 258,					#
-	DOA	   => 259,					# draft-durand-doa-over-dns
+	DOA	   => 259,					# draft-durand-doa-over-dns-02
 	AMTRELAY   => 260,					# RFC8777
 	RESINFO	   => 261,					# RFC9606
 	WALLET	   => 262,					#
@@ -210,8 +211,8 @@ my @ednsoptionbyname = (
 	CHAIN		 => 13,					# RFC7901
 	'KEY-TAG'	 => 14,					# RFC8145
 	'EXTENDED-ERROR' => 15,					# RFC8914
-	'CLIENT-TAG'	 => 16,					# draft-bellis-dnsop-edns-tags
-	'SERVER-TAG'	 => 17,					# draft-bellis-dnsop-edns-tags
+	'CLIENT-TAG'	 => 16,					# draft-bellis-dnsop-edns-tags-01
+	'SERVER-TAG'	 => 17,					# draft-bellis-dnsop-edns-tags-01
 	'REPORT-CHANNEL' => 18,					# RFC9567
 	ZONEVERSION	 => 19,					# RFC9660
 	'UMBRELLA-IDENT' => 20292,				# https://developer.cisco.com/docs/cloud-security/#!integrating-network-devic

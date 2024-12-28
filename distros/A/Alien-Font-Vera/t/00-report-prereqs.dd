@@ -14,6 +14,12 @@ do { my $x = {
                                       'Test::Pod' => '1.41'
                                     }
                     },
+       'runtime' => {
+                      'requires' => {
+                                      'File::ShareDir' => '0',
+                                      'File::Spec' => '0'
+                                    }
+                    },
        'test' => {
                    'recommends' => {
                                      'CPAN::Meta' => '2.120900'

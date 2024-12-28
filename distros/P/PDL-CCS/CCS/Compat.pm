@@ -12,7 +12,7 @@ use PDL::CCS::Ufunc;
 use PDL::CCS::Ops;
 use strict;
 
-our $VERSION = '1.23.28'; ##-- update with perl-reversion from Perl::Version module
+our $VERSION = '1.23.29'; ##-- update with perl-reversion from Perl::Version module
 our @ISA = ('PDL::Exporter');
 our @ccs_binops = (qw(plus minus mult divide modulo power),
 		   qw(gt ge lt le eq ne spaceship),

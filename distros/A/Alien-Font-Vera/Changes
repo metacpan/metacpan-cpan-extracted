@@ -1,5 +1,11 @@
 Revision history for Alien-Font-Vera
 
+0.016     2024-12-27 18:15:03 CET
+    - Add test for path (thanks to E. Choroba)
+
+0.015     2024-12-27 18:03:48 CET (TRIAL RELEASE)
+    - Add dependencies from cpanfile to fix missing dependencies
+
 0.014     2024-02-04 19:28:35 CET
     - Small update to documentation (Thanks to Håkon Hægland and the perl pull request club).
 

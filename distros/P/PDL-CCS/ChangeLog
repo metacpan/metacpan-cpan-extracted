@@ -1,3 +1,7 @@
+v1.23.29 Fri, 27 Dec 2024 17:59:08 +0100
+	+ support BAD non-missing values in ccs_matmult2d_zdd
+	  - TODO: support BAD values (including missing) in ccs_matmult2d_sdd
+
 v1.23.28 Fri, 20 Dec 2024 20:12:18 +0100
 	+ fix 'Runtime error: Tried to convert(null)' when multiplying all-missing CCS::Nd
 	  - reported as https://github.com/moocow-the-bovine/PDL-CCS/issues/14#issuecomment-2556862635

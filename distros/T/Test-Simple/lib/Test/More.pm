@@ -17,7 +17,7 @@ sub _carp {
     return warn @_, " at $file line $line\n";
 }
 
-our $VERSION = '1.302206';
+our $VERSION = '1.302207';
 
 use Test::Builder::Module;
 our @ISA    = qw(Test::Builder::Module);
@@ -395,7 +395,7 @@ different from some other value:
   isnt $obj, $clone, "clone() produces a different object";
 
 Historically we supported an C<isn't()> function as an alias of
-C<isnt()>, however in Perl 5.37.9 support for the use of aprostrophe as
+C<isnt()>, however in Perl 5.37.9 support for the use of apostrophe as
 a package separator was deprecated and by Perl 5.42.0 support for it
 will have been removed completely. Accordingly use of C<isn't()> is also
 deprecated, and will produce warnings when used unless 'deprecated'
@@ -2001,6 +2001,10 @@ comes from.
 =head2 BUNDLES
 
 L<Test::Most> Most commonly needed test functions and features.
+
+=head1 ENVIRONMENT VARIABLES
+
+See L<Test2::Env> for a list of meaningul environment variables.
 
 =head1 AUTHORS
 

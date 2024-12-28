@@ -2,7 +2,7 @@ package Net::DNS::Resolver::Base;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: Base.pm 1982 2024-07-23 16:16:53Z willem $)[2];
+our $VERSION = (qw$Id: Base.pm 1996 2024-12-16 13:05:08Z willem $)[2];
 
 
 #
@@ -453,14 +453,16 @@ sub _send_tcp {
 		$socket->send($tcp_packet);
 		$self->errorstring($!);
 
-		my $buffer = _read_tcp($socket);
-		my $peer   = $self->{replyfrom} = $socket->peerhost;
-		$self->_diag( 'packet from', "[$peer]", length($buffer), 'octets' );
+		my ($peer) = $select->can_read($timeout);
+		next unless $peer;				# uncoverable branch true
+		my $buffer = _read_tcp($peer);
+		my $host   = $self->{replyfrom} = $peer->peerhost;
+		$self->_diag( 'packet from', "[$host]", length($buffer), 'octets' );
 
 		my $reply = Net::DNS::Packet->decode( \$buffer, $self->{debug} );
 		$self->errorstring($@);
 		next unless $self->_accept_reply( $reply, $query );
-		$reply->from($peer);
+		$reply->from($host);
 
 		if ( $self->{tsig_rr} && !$reply->verify($query) ) {
 			$self->errorstring( $reply->verifyerr );
@@ -835,11 +837,12 @@ sub _read_socket {
 sub _read_tcp {
 	my $socket = shift;
 
+	my $buffer = '';
 	my $header = _read_socket( $socket, 2 );
 	$header .= _read_socket( $socket, 2 - length $header );
+	return $buffer if length($header) < 2;			# uncoverable branch true
 	my $size = unpack 'n', $header;
 
-	my $buffer = '';
 	while ( my $fragment = _read_socket( $socket, $size - length $buffer ) ) {
 		$buffer .= $fragment;
 	}

@@ -3,7 +3,7 @@ package Net::DNS::Nameserver;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Nameserver.pm 1990 2024-09-18 13:16:07Z willem $)[2];
+our $VERSION = (qw$Id: Nameserver.pm 1996 2024-12-16 13:05:08Z willem $)[2];
 
 
 =head1 NAME
@@ -76,7 +76,14 @@ use constant MSWin => scalar( $^O =~ /MSWin/i );
 #------------------------------------------------------------------------------
 
 sub new {
-	my ( $class, %self ) = @_;
+	my ( $class, %config ) = @_;
+
+	my %self = (
+		LocalAddr => [DEFAULT_ADDR],
+		LocalPort => [DEFAULT_PORT],
+		Truncate  => 1,
+		%config
+		);
 	my $self = bless \%self, $class;
 
 	$self->ReadZoneFile( $self{ZoneFile} ) if exists $self{ZoneFile};
@@ -84,13 +91,11 @@ sub new {
 	croak 'No reply handler!' unless ref( $self{ReplyHandler} ) eq "CODE";
 
 	# local server addresses need to be accepted by a resolver
-	my $LocalAddr = $self{LocalAddr} || [DEFAULT_ADDR];
+	my $LocalAddr = $self{LocalAddr};
 	my $resolver  = Net::DNS::Resolver->new( nameservers => $LocalAddr );
-	$resolver->force_v4(1) if $self{Force_IPv4};
-	$resolver->force_v6(1) if $self{Force_IPv6};
+	$resolver->force_v4( $self{Force_IPv4} );
+	$resolver->force_v6( $self{Force_IPv6} );
 	$self{LocalAddr} = [$resolver->nameservers];
-	$self{LocalPort} ||= DEFAULT_PORT;
-	$self{Truncate} = 1 unless defined( $self{Truncate} );
 	return $self;
 }
 
@@ -164,9 +169,8 @@ sub ReplyHandler {
 				s/^\*//;			# delete leading asterisk
 				s/([.?*+])/\\$1/g;		# escape dots and regex quantifiers
 				next unless $qname =~ /[.]?([^.]+$_)$/i;
-				my $encloser = $1;		# check no ENT encloses qname
-				$rcode = 'NOERROR';
-				last if grep {/(^|\.)$encloser$/i} @RRname;    # [NODATA]
+				my $cover = $1;			# check for name covering wildcard
+				next if grep {/[.]?$cover$/i} @RRname;
 
 				my ($q) = $query->question;	# synthesise RR at qname
 				foreach my $rr ( @{$RRhash->{$wildcard}} ) {
@@ -174,6 +178,7 @@ sub ReplyHandler {
 					$clone->{owner} = $q->{qname};
 					push @match, $clone;
 				}
+				$rcode = 'NOERROR';
 				last;
 			}
 		}
@@ -184,9 +189,10 @@ sub ReplyHandler {
 		push @ans, grep { $_->type eq $qtype } @match;
 		unless (@ans) {
 			foreach ( @{$self->{zonelist}} ) {
+				my $RRlist = $RRhash->{lc $_};
 				s/([.?*+])/\\$1/g;		# escape dots and regex quantifiers
 				next unless $qname =~ /[^.]+[.]$_[.]?$/i;
-				push @auth, grep { $_->type eq 'SOA' } @{$RRhash->{$_}};
+				push @auth, grep { $_->type eq 'SOA' } @$RRlist;
 				last;
 			}
 		}

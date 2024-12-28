@@ -215,6 +215,28 @@ sub remove_header ($message, $header_name) {
   }
 }
 
+# prints the method and path of the request, or the response code and message of the response
+sub to_str ($message) {
+  my $str;
+  if ($message->isa('Mojo::Message::Request') or $message->isa('HTTP::Request')) {
+    return $message->method.' '.$message->url;
+  }
+  elsif ($message->isa('Plack::Request') or $message->isa('Catalyst::Request')) {
+    return $message->method.' '.$message->uri;
+  }
+  if ($message->isa('Mojo::Message::Response')) {
+    return $message->code.' '.($message->message//$message->default_message);
+  }
+  elsif ($message->isa('HTTP::Response')) {
+    return $message->code.' '.$message->message;
+  }
+  elsif ($message->isa('Plack::Response') or $message->isa('Catalyst::Response')) {
+    return $message->status.' '.HTTP::Status::status_message($message->status);
+  }
+
+  die 'unrecognized type '.ref($message);
+}
+
 # create a Result object out of the document errors; suitable for stringifying
 # as the OpenAPI::Modern constructor might do.
 sub document_result ($document) {
@@ -235,6 +257,11 @@ my $encoder = JSON::Schema::Modern::_JSON_BACKEND()->new
   ->indent_length(2);
 
 *UNIVERSAL::TO_JSON = sub ($obj) { $obj.'' };
+*Mojo::Message::Request::TO_JSON = sub ($obj) { $obj->to_string };
+*Mojo::Message::Response = sub ($obj) { $obj->to_string };
+*HTTP::Request::TO_JSON = sub ($obj) { $obj->as_string };
+*HTTP::Response::TO_JSON = sub ($obj) { $obj->as_string };
+# Plack and Catalyst don't have serializers
 
 # deep comparison, with strict typing
 sub is_equal ($got, $expected, $test_name = undef) {

@@ -3,7 +3,7 @@ package Alien::Font::Vera;
 use strict;
 use warnings;
 
-our $VERSION = '0.014';
+our $VERSION = '0.016';
 
 use File::ShareDir 'dist_dir';
 use File::Spec;

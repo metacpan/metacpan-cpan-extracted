@@ -1,3 +1,11 @@
+Version 0.15 - 2024-12-27
+  - New comparison functions CMP_FOLDCASE, CMP_NUMSPLIT_FOLDCASE,
+     along with a new internal mechanism for applying a transformation
+     function to incoming keys before comparing them.  Access to this API
+     can be expanded in future versions.
+  - Renamed comparison function CMP_UTF8 => CMP_STR, but old name still works
+  - New methods keys, reverse_keys, values, reverse_values, kv, reverse_kv
+
 Version 0.14 - 2024-08-17
   - Fix threaded perl support
 

@@ -7,7 +7,7 @@ package Comics::Plugin::SlackWyrm;
 
 use parent qw(Comics::Fetcher::Single);
 
-our $VERSION = "1.02";
+our $VERSION = "1.04";
 
 our $name    = "Slack Wyrm";
 our $url     = "https://www.joshuawright.net/";

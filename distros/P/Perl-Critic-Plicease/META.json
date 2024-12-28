@@ -25,7 +25,7 @@
             "Dist::Zilla::Plugin::Author::Plicease::Core" : "0",
             "Dist::Zilla::Plugin::Author::Plicease::Thanks" : "0",
             "Dist::Zilla::Plugin::Author::Plicease::Upload" : "0",
-            "Dist::Zilla::PluginBundle::Author::Plicease" : "2.69",
+            "Dist::Zilla::PluginBundle::Author::Plicease" : "2.79",
             "Perl::Critic::Policy::BuiltinFunctions::ProhibitBooleanGrep" : "0",
             "Perl::Critic::Policy::BuiltinFunctions::ProhibitStringySplit" : "0",
             "Perl::Critic::Policy::BuiltinFunctions::ProhibitVoidGrep" : "0",
@@ -126,13 +126,14 @@
          "web" : "https://github.com/uperl/Perl-Critic-Plicease"
       }
    },
-   "version" : "0.07",
+   "version" : "0.09",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Ville Skytt\u00e4 (SCOP)",
-      "Yoshikazu Sawa (yoshikazusawa)"
+      "Yoshikazu Sawa (yoshikazusawa)",
+      "Christian Walde (wchristian, MITHALDU)"
    ],
-   "x_generated_by_perl" : "v5.38.2",
+   "x_generated_by_perl" : "v5.40.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0

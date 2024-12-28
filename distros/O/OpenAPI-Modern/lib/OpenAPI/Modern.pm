@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.074-16-g8e9b53f
+package OpenAPI::Modern; # git description: v0.075-8-g306ffee
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.1 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.1 Swagger HTTP request response
 
-our $VERSION = '0.075';
+our $VERSION = '0.076';
 
 use 5.020;
 use utf8;
@@ -362,22 +362,23 @@ sub find_path ($self, $options, $state = {}) {
 
     my @bits = unjsonp($operation_path);
     ($path_template, $method) = @bits[-2,-1];
-
-    # path_template not found if path is not directly under /paths (FIXME: does not support $refs to
-    # path-items - in this case we will do a URI -> path_template lookup later on, if the operation
-    # does not correspond to a webhook or callback)
-    undef $path_template if $operation_path ne jsonp('/paths', $path_template, $method);
-
     pop @bits;  # remove method from operation_path to get path-item path
-    $path_item_path = jsonp(@bits);
+    $path_item_path = jsonp(@bits); # perhaps ('', 'paths', $path_template)
 
-    # the path_template need not be provided, but if it is, the operation must be located at the
-    # path-item directly underneath that /paths/<path_template>.
-    # TODO: revise for 3.1.1, as provided path_template may be correct but require resolving $refs
-    # in order to verify the operation matches (which we will do later on)
-    return E({ %$state, schema_path => $path_item_path },
-        'operation at operation_id does not match provided path_template')
-      if exists $options->{path_template} and $options->{path_template} ne ($path_template//'');
+    # The path_template cannot be found if the operation path is not directly under /paths (such as
+    # for path-items reached by a $ref): we will do a URI -> path_template lookup later on,
+    # which will work as long as the operation does not correspond to a webhook or callback.
+    # TODO: need a mechanism for specifying these
+    if ($operation_path ne jsonp('/paths', $path_template, $method)) {
+      undef $path_template;
+    }
+    else {
+      # the path_template need not be provided, but if it is, the operation must be located at the
+      # path-item directly underneath that /paths/<path_template>.
+      return E({ %$state, schema_path => $path_item_path },
+          'operation at operation_id does not match provided path_template')
+        if exists $options->{path_template} and $options->{path_template} ne $path_template;
+    }
 
     if ($options->{method} and lc $options->{method} ne $method) {
       delete $options->{operation_id};
@@ -409,10 +410,6 @@ sub find_path ($self, $options, $state = {}) {
   if (not $path_template and not $options->{request}) {
     # some operations don't exist directly under a /paths/$path_template - e.g. webhooks or
     # callbacks, but they are still usable
-    # TODO: only return successfully here if the operation corresponds to a webhook or callback,
-    # or we were not provided a request object.
-    # otherwise, we need to continue on and match the request uri against /paths/* and possibly fail
-    # if there is no match found.
     $state->{schema_path} = $path_item_path;
     $options->{_path_item} = $self->openapi_document->get($path_item_path);
 
@@ -458,9 +455,14 @@ sub find_path ($self, $options, $state = {}) {
   # derived it from looking upward from the operation_id
   $options->{path_template} = $path_template;
 
-  # FIXME: follow $ref chain in path-item
+  # TODO: possibly support looking for paths in other documents?
+  my $path_item = $schema->{paths}{$path_template};
   $state->{schema_path} = $path_item_path = jsonp('/paths', $path_template);
-  $options->{_path_item} = my $path_item = $schema->{paths}{$path_template};
+  while (my $ref = $path_item->{'$ref'}) {
+    $path_item = $self->_resolve_ref('path-item', $ref, $state);
+    $path_item_path = $state->{initial_schema_uri}->fragment; # FIXME include full document location
+  }
+  $options->{_path_item} = $path_item;
 
   # this can only happen if we were not able to derive the path_template from the provided
   # operation_id earlier, but we still matched the request against some other path-item
@@ -923,7 +925,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.1 d
 
 =head1 VERSION
 
-version 0.075
+version 0.076
 
 =head1 SYNOPSIS
 
@@ -1358,7 +1360,7 @@ OpenAPI descriptions must be contained in a single document; C<$ref>erences to o
 
 =item *
 
-The use of C<$ref> within a path-item object is not permitted.
+The use of C<$ref> within a path-item object is only allowed when not adjacent to any other path-item properties ('parameters', 'servers', request methods)
 
 =item *
 

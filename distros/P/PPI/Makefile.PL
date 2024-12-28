@@ -25,13 +25,16 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "List::Util" => "1.33",
     "Params::Util" => "1.00",
+    "Safe::Isa" => 0,
     "Scalar::Util" => 0,
     "Storable" => "2.17",
     "Task::Weaken" => 0,
+    "YAML::PP" => 0,
     "constant" => 0,
     "if" => 0,
     "overload" => 0,
-    "strict" => 0
+    "strict" => 0,
+    "version" => "0.77"
   },
   "TEST_REQUIRES" => {
     "B" => 0,
@@ -51,7 +54,7 @@ my %WriteMakefileArgs = (
     "utf8" => 0,
     "warnings" => 0
   },
-  "VERSION" => "1.279",
+  "VERSION" => "1.281",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -74,6 +77,7 @@ my %FallbackPrereqs = (
   "File::Temp" => 0,
   "List::Util" => "1.33",
   "Params::Util" => "1.00",
+  "Safe::Isa" => 0,
   "Scalar::Util" => 0,
   "Storable" => "2.17",
   "Task::Weaken" => 0,
@@ -81,6 +85,7 @@ my %FallbackPrereqs = (
   "Test::NoWarnings" => 0,
   "Test::Object" => "0.07",
   "Test::SubCalls" => "1.07",
+  "YAML::PP" => 0,
   "constant" => 0,
   "if" => 0,
   "lib" => 0,
@@ -88,6 +93,7 @@ my %FallbackPrereqs = (
   "parent" => 0,
   "strict" => 0,
   "utf8" => 0,
+  "version" => "0.77",
   "warnings" => 0
 );
 

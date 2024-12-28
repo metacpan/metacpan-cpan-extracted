@@ -1,5 +1,14 @@
 Revision history for Comics
 
+1.21	2024-12-27
+
+	Fix pattern for FokkeEnSukke.
+	Fix pattern for CyanideAndHappiness, SlackWyrm, BerkeleyMews.
+	Fix pattern for Sigmund, MonkeyUser, SkeletonClaw, PoorlyDrawnLines.
+	Disabled AMultiverse (diseased), MrLovenstein (out of reach).
+	Disabled Nozzman (changed), WhatTheDuck, GeeknPoke (stopped).
+	Use File::LoadLines.
+
 1.20	2023-06-29
 
 	Fix site for all comics.com plugins.

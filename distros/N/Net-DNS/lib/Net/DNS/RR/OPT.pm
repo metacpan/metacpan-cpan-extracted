@@ -2,7 +2,7 @@ package Net::DNS::RR::OPT;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: OPT.pm 1980 2024-06-02 10:16:33Z willem $)[2];
+our $VERSION = (qw$Id: OPT.pm 1998 2024-12-18 14:16:04Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -38,17 +38,13 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 	$self->_ttl($ttl) if defined $ttl;
 
 	my $limit = $offset + $self->{rdlength} - 4;
-	my @index;
-	eval {
-		while ( $offset <= $limit ) {
-			my ( $code, $length ) = unpack "\@$offset nn", $$data;
-			my $value = unpack "\@$offset x4 a$length", $$data;
-			$self->{option}{$code} = $value;
-			push @index, $code;
-			$offset += $length + 4;
-		}
-	};
-	@{$self->{index}} = @index;
+	while ( $offset <= $limit ) {
+		my ( $code, $length ) = unpack "\@$offset nn", $$data;
+		my $value = unpack "\@$offset x4 a$length", $$data;
+		my @value = map { ref($_) ? @$_ : defined($_) ? $_ : () } $self->{option}{$code}, $value;
+		$self->{option}{$code} = ( scalar(@value) == 1 ) ? $value : \@value;
+		$offset += $length + 4;
+	}
 	return;
 }
 
@@ -57,7 +53,12 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
 	my $option = $self->{option} || {};
-	return join '', map { pack( 'nna*', $_, length $option->{$_}, $option->{$_} ) } $self->options;
+	my @option = $self->options;
+	foreach my $item (@option) {
+		my @value = map { ref($_) ? @$_ : $_ } $option->{$item};
+		$item = join '', map { pack( 'nna*', $item, length($_), $_ ) } @value;
+	}
+	return join '', @option;
 }
 
 
@@ -175,8 +176,8 @@ sub flags {
 sub options {
 	my $self   = shift;
 	my $option = $self->{option} || {};
-	my @option = defined( $self->{index} ) ? @{$self->{index}} : sort { $a <=> $b } keys %$option;
-	return @option;
+	@{$self->{index}} = sort { $a <=> $b } keys %$option unless defined $self->{index};
+	return @{$self->{index}};
 }
 
 sub option {
@@ -194,17 +195,24 @@ sub _get_option {
 	my ( $self, $number ) = @_;
 
 	my $options = $self->{option} || {};
-	my $payload = $options->{$number};
-	return $payload unless wantarray;
-	my $package = join '::', __PACKAGE__, ednsoptionbyval($number);
+	my @payload = map { ref($_) ? @$_ : $_ } $options->{$number};
+	return shift @payload unless wantarray;
+	my $optname = ednsoptionbyval($number);
+	my $package = join '::', __PACKAGE__, $optname;
 	$package =~ s/-/_/g;
-	if ( $package->can('_decompose') ) {
-		return {'OPTION-LENGTH' => 0} unless length $payload;
-		my @structure = eval { $package->_decompose($payload) };
-		return @structure if scalar @structure;
+	my $structured = $package->can('_decompose');
+	foreach my $value (@payload) {
+		my @value;
+		if ( length $value ) {
+			@value = eval { $package->_decompose($value) } if $structured;
+			@value = {BASE16 => unpack 'H*', $value} unless scalar @value;
+			warn $@ if $@;
+		} else {
+			@value = $structured ? {'OPTION-LENGTH' => 0} : '';
+		}
+		$value = {$optname => @value};
 	}
-	warn $@ if $@;
-	return length($payload) ? {BASE16 => unpack 'H*', $payload} : '';
+	return @payload;
 }
 
 
@@ -214,6 +222,7 @@ sub _set_option {
 
 	my $options = $self->{option} || {};
 	delete $options->{$number};
+	delete $self->{index};
 	delete $self->{option} unless scalar( keys %$options );
 
 	return unless defined $arg;
@@ -246,9 +255,8 @@ sub _specified {
 
 sub _format_option {
 	my ( $self, $number ) = @_;
-	my $option = ednsoptionbyval($number);
-	my ($content) = $self->_get_option($number);
-	return Net::DNS::RR::_wrap( _JSONify( {$option => $content} ) );
+	my @option = $self->_get_option($number);
+	return map { Net::DNS::RR::_wrap( _JSONify($_) ) } @option;
 }
 
 
@@ -466,6 +474,27 @@ sub _decompose {
 	return {'AGENT-DOMAIN' => Net::DNS::DomainName->decode( \$argument )->string};
 }
 
+
+package Net::DNS::RR::OPT::ZONEVERSION;				# RFC9660
+
+my @field19 = qw(LABELCOUNT TYPE VERSION);
+
+sub _compose {
+	my ( undef, @argument ) = @_;
+	for ( ref( $argument[0] ) ) {
+		/HASH/	&& ( @argument = @{$argument[0]}{@field19} );
+		/ARRAY/ && ( @argument = @{$argument[0]} );
+	}
+	return scalar(@argument) ? pack( 'C2H*', @argument ) : '';
+}
+
+sub _decompose {
+	my %object;
+	my ( $l, $t, $v ) = unpack 'C2H*', pop @_;
+	@object{@field19} = ( $l, $t, pack 'U0a*', $v );	# mark hex data as UTF-8
+	return \%object;
+}
+
 ########################################
 
 
@@ -482,11 +511,11 @@ __END__
 
     $packet->edns->UDPsize(1232);	# UDP payload size
 
-    $packet->edns->option( 'NSID'	    => {'OPTION-DATA' => 'rawbytes'} );
-    $packet->edns->option( 'DAU'	    => [8, 10, 13, 14, 15, 16] );
+    $packet->edns->option( 'NSID'	=> {'OPTION-DATA' => 'rawbytes'} );
+    $packet->edns->option( 'DAU'	=> [8, 10, 13, 14, 15, 16] );
     $packet->edns->option( 'TCP-KEEPALIVE'  => 200 );
     $packet->edns->option( 'EXTENDED-ERROR' => {'INFO-CODE' => 123} );
-    $packet->edns->option( '65023'	    => {'BASE16' => '076578616d706c6500'} );
+    $packet->edns->option( '65023'	=> {'BASE16' => '076578616d706c6500'} );
 
     $packet->edns->print;
 
@@ -554,45 +583,50 @@ header.
 
 16 bit field containing EDNS extended header flags.
 
-=head2 options, option
+=head2 options
 
-	my @option = $packet->edns->options;
+	my @options = $packet->edns->options;
 
 When called in a list context, options() returns a list of option codes
 found in the OPT record.
 
+
+=head2 option
+
 	my $octets = $packet->edns->option('COOKIE');
 	my $base16 = unpack 'H*', $octets;
 
-	$packet->edns->option( 'COOKIE' => {'OPTION-DATA' => $octets} );
-	$packet->edns->option( '10'	=> {'BASE16'	  => $base16} );
-
 When called in a scalar context with a single argument,
-option() returns the uninterpreted octet string
-corresponding to the specified option.
+option() returns the value of the specified option as
+an  uninterpreted octet string.
 The method returns undef if the option is absent.
 
-Options can be added or replaced by providing the (name => value) pair.
+	$packet->edns->option( 'COOKIE'	=> {'OPTION-DATA' => $octets} );
+	$packet->edns->option( '10'	=> {'BASE16' => $base16} );
+
+An option can be added or replaced by providing the (name,value) pair.
 The option is deleted if the value is undefined.
 
-When called in a list context with a single argument,
-option() returns a structured representation of the option value.
 
-For example:
-
-	my ($structure) = $packet->edns->option('DAU');
-	my @algorithms	= @$structure;
+	my ($structure) = $packet->edns->option("DAU");
+	my $array	= $$structure{"DAU"};
+	my @algorithms	= @$array;
 
 	my ($structure) = $packet->edns->option(15);
-	my $info_code	= $$structure{'INFO-CODE'};
-	my $extra_text	= $$structure{'EXTRA-TEXT'};
+	my $table	= $$structure{"EXTENDED-ERROR"};
+	my $info_code	= $$table{'INFO-CODE'};
+	my $extra_text	= $$table{'EXTRA-TEXT'};
+
+When called in a list context with a single argument,
+option() returns a structured representation of the specified option.
+
 
 Similar forms of array or hash syntax may be used to construct the
 option value:
 
 	$packet->edns->option( 'DAU' => [8, 10, 13, 14, 15, 16] );
 
-	$packet->edns->option( 'EXTENDED-ERROR' => {'INFO-CODE'	 => 123,
+	$packet->edns->option( 'EXTENDED-ERROR' => {'INFO-CODE' => 123,
 						    'EXTRA-TEXT' => ""} );
 
 
@@ -600,7 +634,7 @@ option value:
 
 Copyright (c)2001,2002 RIPE NCC.  Author Olaf M. Kolkman.
 
-Portions Copyright (c)2012,2017-2023 Dick Franks.
+Portions Copyright (c)2012,2017-2024 Dick Franks.
 
 All rights reserved.
 

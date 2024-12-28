@@ -49,6 +49,7 @@ lib/Net/DNS/RR/DHCID.pm
 lib/Net/DNS/RR/DNAME.pm
 lib/Net/DNS/RR/DNSKEY.pm
 lib/Net/DNS/RR/DS.pm
+lib/Net/DNS/RR/DSYNC.pm
 lib/Net/DNS/RR/EUI48.pm
 lib/Net/DNS/RR/EUI64.pm
 lib/Net/DNS/RR/GPOS.pm
@@ -138,6 +139,7 @@ t/05-DHCID.t
 t/05-DNAME.t
 t/05-DNSKEY.t
 t/05-DS.t
+t/05-DSYNC.t
 t/05-EUI48.t
 t/05-EUI64.t
 t/05-HINFO.t

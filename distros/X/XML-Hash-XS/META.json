@@ -63,6 +63,6 @@
          "web" : "https://github.com/yoreek/XML-Hash-XS"
       }
    },
-   "version" : "0.59",
+   "version" : "0.62",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

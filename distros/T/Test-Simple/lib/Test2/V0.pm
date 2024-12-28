@@ -4,7 +4,7 @@ use warnings;
 
 use Test2::Util::Importer;
 
-our $VERSION = '1.302206';
+our $VERSION = '1.302207';
 
 use Carp qw/croak/;
 
@@ -286,6 +286,10 @@ import arguments.
 See L<Test2::Plugin::ExitSummary>.
 
 This plugin has no configuration.
+
+=head1 ENVIRONMENT VARIABLES
+
+See L<Test2::Env> for a list of meaningul environment variables.
 
 =head1 API FUNCTIONS
 

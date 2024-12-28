@@ -7,10 +7,12 @@ package Comics::Plugin::GeekAndPoke;
 
 use parent qw(Comics::Fetcher::Single);
 
-our $VERSION = "1.03";
+our $VERSION = "1.04";
 
 our $name    = "Geek&Poke";
-our $url     = "http://geek-and-poke.com/";
+our $url     = "https://geek-and-poke.com/";
+our $disabled = 1;		# stopped
+
 our $pattern =
   qr{ <noscript>
       <img \s+

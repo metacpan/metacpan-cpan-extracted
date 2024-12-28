@@ -104,17 +104,22 @@ static TreeRBXS_cmp_fn TreeRBXS_cmp_numsplit;
 static TreeRBXS_cmp_fn TreeRBXS_cmp_perl;
 static TreeRBXS_cmp_fn TreeRBXS_cmp_perl_cb;
 
+typedef SV* TreeRBXS_xform_fn(struct TreeRBXS *tree, SV *orig_key);
+static TreeRBXS_xform_fn TreeRBXS_xform_fc;
+
 /* These get serialized as bytes for Storable, so should not change,
  * or else STORABLE_thaw needs adapted.
  */
-#define CMP_PERL    1
-#define CMP_INT     2
-#define CMP_FLOAT   3
-#define CMP_MEMCMP  4
-#define CMP_UTF8    5
-#define CMP_SUB     6
-#define CMP_NUMSPLIT 7
-#define CMP_MAX     7
+#define CMP_PERL        1
+#define CMP_INT         2
+#define CMP_FLOAT       3
+#define CMP_MEMCMP      4
+#define CMP_STR         5
+#define CMP_SUB         6
+#define CMP_NUMSPLIT    7
+#define CMP_FOLDCASE    8
+#define CMP_NUMSPLIT_FOLDCASE 9
+#define CMP_MAX         9
 
 static int parse_cmp_fn(SV *cmp_sv) {
 	const char *str;
@@ -133,12 +138,15 @@ static int parse_cmp_fn(SV *cmp_sv) {
 			str += 4;
 			len -= 4;
 		}
-		cmp_id= (len == 4 && foldEQ(str, "PERL",   4))? CMP_PERL
-		      : (len == 3 && foldEQ(str, "INT",    3))? CMP_INT
-		      : (len == 5 && foldEQ(str, "FLOAT",  5))? CMP_FLOAT
-		      : (len == 6 && foldEQ(str, "MEMCMP", 6))? CMP_MEMCMP
-		      : (len == 4 && foldEQ(str, "UTF8",   4))? CMP_UTF8
-		      : (len == 8 && foldEQ(str, "NUMSPLIT", 8))? CMP_NUMSPLIT
+		cmp_id= (len == 3 && foldEQ(str, "INT",          3))? CMP_INT
+		      : (len == 3 && foldEQ(str, "STR",          3))? CMP_STR
+		      : (len == 4 && foldEQ(str, "UTF8",         4))? CMP_STR // back-compat name
+		      : (len == 4 && foldEQ(str, "PERL",         4))? CMP_PERL
+		      : (len == 5 && foldEQ(str, "FLOAT",        5))? CMP_FLOAT
+		      : (len == 6 && foldEQ(str, "MEMCMP",       6))? CMP_MEMCMP
+		      : (len == 8 && foldEQ(str, "FOLDCASE",     8))? CMP_FOLDCASE
+		      : (len == 8 && foldEQ(str, "NUMSPLIT",     8))? CMP_NUMSPLIT
+		      : (len ==17 && foldEQ(str, "NUMSPLIT_FOLDCASE", 17))? CMP_NUMSPLIT_FOLDCASE
 		    //: (len == 7 && foldEQ(str, "SUB",    3))? CMP_SUB   can only be requested by a CV*
 		      : -1;
 	}
@@ -150,9 +158,12 @@ static const char * get_cmp_name(int cmp_id) {
 	case CMP_PERL:   return "CMP_PERL";
 	case CMP_INT:    return "CMP_INT";
 	case CMP_FLOAT:  return "CMP_FLOAT";
+	case CMP_STR:    return "CMP_STR";
+	case CMP_SUB:    return "CMP_SUB";
 	case CMP_MEMCMP: return "CMP_MEMCMP";
-	case CMP_UTF8:   return "CMP_UTF8";
-	case CMP_NUMSPLIT: return "CMP_NUMSPLIT";
+	case CMP_NUMSPLIT:    return "CMP_NUMSPLIT";
+	case CMP_FOLDCASE:     return "CMP_FOLDCASE";
+	case CMP_NUMSPLIT_FOLDCASE: return "CMP_NUMSPLIT_FOLDCASE";
 	default: return NULL;
 	}
 }
@@ -248,6 +259,7 @@ struct dllist_node {
 struct TreeRBXS {
 	SV *owner;                     // points to Tree::RB::XS internal HV (not ref)
 	TreeRBXS_cmp_fn *compare;      // internal compare function.  Always set and never changed.
+	TreeRBXS_xform_fn *transform;  // internal key-transformation function, applied before key comparisons.
 	SV *compare_callback;          // user-supplied compare.  May be NULL, but can never be changed.
 	int key_type;                  // must always be set and never changed
 	int compare_fn_id;             // indicates which compare is in use, for debugging
@@ -305,7 +317,8 @@ struct TreeRBXS_item {
 	struct TreeRBXS_iter *iter; // linked list of iterators who reference this item
 	struct dllist_node recent;  // doubly linked list of insertion order tracking
 	SV *value;            // value will be set unless struct is just used as a search key
-	size_t key_type: 4,
+	size_t key_type: 3,
+	       orig_key_stored: 1,
 #if SIZE_MAX == 0xFFFFFFFF
 #define CKEYLEN_MAX ((((size_t)1)<<28)-1)
 	       ckeylen: 28;
@@ -315,6 +328,16 @@ struct TreeRBXS_item {
 #endif
 	char extra[];
 };
+
+static SV* GET_TreeRBXS_item_ORIG_KEY(struct TreeRBXS_item *item) {
+	SV *k= NULL;
+	if (item->orig_key_stored)
+		memcpy(&k, item->extra, sizeof(SV*));
+	return k;
+}
+#define SET_TreeRBXS_item_ORIG_KEY(item, key) memcpy(item->extra, &key, sizeof(SV*))
+#define GET_TreeRBXS_stack_item_ORIG_KEY(item) ((item)->owner)
+#define SET_TreeRBXS_stack_item_ORIG_KEY(item, key) ((item)->owner= (key))
 
 static void TreeRBXS_init_tmp_item(struct TreeRBXS_item *item, struct TreeRBXS *tree, SV *key, SV *value);
 static struct TreeRBXS_item * TreeRBXS_new_item_from_tmp_item(struct TreeRBXS_item *src);
@@ -417,6 +440,7 @@ struct TreeRBXS_iter * TreeRBXS_get_hashiter(struct TreeRBXS *tree) {
  * This initializes a temporary incomplete item on the stack that can be
  * used for searching without the expense of allocating buffers etc.
  * The temporary item does not require any destructor/cleanup.
+ * (and, the destructor *must not* be called on the stack item)
  */
 static void TreeRBXS_init_tmp_item(struct TreeRBXS_item *item, struct TreeRBXS *tree, SV *key, SV *value) {
 	size_t len= 0;
@@ -425,7 +449,16 @@ static void TreeRBXS_init_tmp_item(struct TreeRBXS_item *item, struct TreeRBXS *
 	memset(item, 0, sizeof(*item));
 	// copy key type from tree
 	item->key_type= tree->key_type;
+	// If there's a transform function, apply that first
+	if (tree->transform) {
+		SET_TreeRBXS_stack_item_ORIG_KEY(item, key); // temporary storage for original key
+		item->orig_key_stored= 1;
+		key= tree->transform(tree, key); // returns a mortal SV
+	}
+	else item->orig_key_stored= 0;
+
 	// set up the keys.  
+	item->ckeylen= 0;
 	switch (item->key_type) {
 	case KEY_TYPE_ANY:
 	case KEY_TYPE_CLAIM: item->keyunion.svkey= key; break;
@@ -456,17 +489,50 @@ static void TreeRBXS_init_tmp_item(struct TreeRBXS_item *item, struct TreeRBXS *
  */
 static struct TreeRBXS_item * TreeRBXS_new_item_from_tmp_item(struct TreeRBXS_item *src) {
 	struct TreeRBXS_item *dst;
-	size_t len;
+	size_t keyptr_len, strbuf_len;
+	bool is_buffered_key= src->key_type == KEY_TYPE_USTR || src->key_type == KEY_TYPE_BSTR;
 	/* If the item references a string that is not managed by a SV,
-	  copy that into the space at the end of the allocated block. */
-	if (src->key_type == KEY_TYPE_USTR || src->key_type == KEY_TYPE_BSTR) {
-		len= src->ckeylen;
-		Newxc(dst, sizeof(struct TreeRBXS_item) + len + 1, char, struct TreeRBXS_item);
+	   copy that into the space at the end of the allocated block.
+	   Also, if 'owner' is set, it is holding the original SV key
+	   which the stack item was initialized from, and also means that
+	   a transform function is in effect.
+	   The node needs to hold onto the original key, which gets stored
+	   at the end of the buffer area */
+	if (src->orig_key_stored || is_buffered_key) {
+		strbuf_len= is_buffered_key? src->ckeylen+1 : 0;
+		keyptr_len= src->orig_key_stored? sizeof(SV*) : 0;
+		Newxc(dst, sizeof(struct TreeRBXS_item) + keyptr_len + strbuf_len, char, struct TreeRBXS_item);
 		memset(dst, 0, sizeof(struct TreeRBXS_item));
-		memcpy(dst->extra, src->keyunion.ckey, len);
-		dst->extra[len]= '\0';
-		dst->keyunion.ckey= dst->extra;
-		dst->ckeylen= src->ckeylen;
+		if (keyptr_len) {
+			// make a copy of the SV, unless requested to take ownership of keys
+			SV *kept= GET_TreeRBXS_stack_item_ORIG_KEY(src);
+			kept= src->key_type == KEY_TYPE_CLAIM? SvREFCNT_inc(kept) : newSVsv(kept);
+			SvREADONLY_on(kept);
+			// I don't want to bother aligning this since it's seldomly accessed anyway.
+			SET_TreeRBXS_item_ORIG_KEY(dst, kept);
+		}
+		if (is_buffered_key) {
+			char *dst_buf= dst->extra + keyptr_len;
+			memcpy(dst_buf, src->keyunion.ckey, src->ckeylen);
+			dst_buf[src->ckeylen]= '\0';
+			dst->keyunion.ckey= dst_buf;
+			dst->ckeylen= src->ckeylen;
+		}
+		else {
+			switch (src->key_type) {
+			// when the key has been transformed, it is a mortal pointer and waiting to be claimed
+			// so TYPE_ANY and TYPE_CLAIM do the same thing here.
+			case KEY_TYPE_ANY:
+			case KEY_TYPE_CLAIM:
+				dst->keyunion.svkey= src->keyunion.svkey;
+				SvREADONLY_on(dst->keyunion.svkey);
+				break;
+			case KEY_TYPE_INT:   dst->keyunion.ikey=  src->keyunion.ikey; break;
+			case KEY_TYPE_FLOAT: dst->keyunion.nkey=  src->keyunion.nkey; break;
+			default:
+				croak("BUG: un-handled key_type %d", src->key_type);
+			}
+		}
 	}
 	else {
 		Newxz(dst, 1, struct TreeRBXS_item);
@@ -482,6 +548,7 @@ static struct TreeRBXS_item * TreeRBXS_new_item_from_tmp_item(struct TreeRBXS_it
 			croak("BUG: un-handled key_type %d", src->key_type);
 		}
 	}
+	dst->orig_key_stored= src->orig_key_stored;
 	dst->key_type= src->key_type;
 	dst->value= newSVsv(src->value);
 	return dst;
@@ -508,6 +575,10 @@ static void TreeRBXS_item_free(struct TreeRBXS_item *item) {
 	switch (item->key_type) {
 	case KEY_TYPE_ANY:
 	case KEY_TYPE_CLAIM: SvREFCNT_dec(item->keyunion.svkey); break;
+	}
+	if (item->orig_key_stored) {
+		SV *tmp= GET_TreeRBXS_item_ORIG_KEY(item);
+		SvREFCNT_dec(tmp);
 	}
 	if (item->value)
 		SvREFCNT_dec(item->value);
@@ -907,8 +978,9 @@ TreeRBXS_insert_item(struct TreeRBXS *tree, struct TreeRBXS_item *stack_item, bo
 	struct TreeRBXS_item *item;
 	rbtree_node_t *hint, *tmpnode, *first, *last;
 	int cmp;
-	// If newly inserted items have been adjacent to prev_inserted_item 3 or more times in a row,
-	// It is worth comparing them with that first.
+	/* If newly inserted items have been adjacent to prev_inserted_item 3 or more times in a row,
+	   It is worth comparing them with that first.  This optimization results in nearly linear
+	   insertion time when the keys are pre-sorted. */
 	if (tree->prev_inserted_trend >= INSERT_TREND_TRIGGER) {
 		if (tree->prev_inserted_trend > INSERT_TREND_CAP)
 			tree->prev_inserted_trend= INSERT_TREND_CAP;
@@ -978,6 +1050,19 @@ TreeRBXS_insert_item(struct TreeRBXS *tree, struct TreeRBXS_item *stack_item, bo
 			if (oldval_out)
 				*oldval_out= item->value; // return the old value
 			item->value= newSVsv(stack_item->value); // store new copy of supplied param
+			/* If the tree is applying a transform to the items, the new key might not be identical
+			   to the old, even though the transformed keys are equal.  (i.e. different case)
+			   So, store the new key in its place. */
+			if (item->orig_key_stored) {
+				SV *orig_key= GET_TreeRBXS_item_ORIG_KEY(item);
+				SV *new_key= GET_TreeRBXS_stack_item_ORIG_KEY(stack_item);
+				if (sv_cmp(orig_key, new_key)) {
+					SvREFCNT_dec(orig_key);
+					orig_key= newSVsv(new_key);
+					SvREADONLY_on(orig_key);
+					SET_TreeRBXS_item_ORIG_KEY(item, orig_key);
+				}
+			}
 			if (tree->track_recent || item->recent.next)
 				TreeRBXS_recent_insert_before(tree, item, &tree->recent);
 			tree->prev_inserted_dup= false;
@@ -1232,6 +1317,31 @@ static int TreeRBXS_cmp_perl_cb(struct TreeRBXS *tree, struct TreeRBXS_item *a, 
     return ret;
 }
 
+// Equivalent of "return fc($key)"  (case folding)
+static SV* TreeRBXS_xform_fc(struct TreeRBXS *tree, SV *orig_key) {
+	SV *folded_mortal;
+	dSP;
+	/* Annoyingly, the 'fc' implementation is not packaged into the perl api
+	 * as a callable function, so I just have to invoke the perl op itself :-(
+	 * For 5.16 and onward I can call CORE::fc, but before that I even need
+	 * to wrap the op in my own sub.  (see XS.pm)
+	 */
+	ENTER;
+	PUSHMARK(SP);
+	XPUSHs(orig_key);
+	PUTBACK;
+#if PERL_VERSION_GE(5,16,0)
+	call_pv("CORE::fc", G_SCALAR);
+#else
+	call_pv("Tree::RB::XS::_fc_impl", G_SCALAR);
+#endif
+	SPAGAIN;
+	folded_mortal= POPs;
+	PUTBACK;
+	LEAVE;
+	return folded_mortal;
+}
+
 /*------------------------------------------------------------------------------------
  * Definitions of Perl MAGIC that attach C structs to Perl SVs
  * All instances of Tree::RB::XS have a magic-attached struct TreeRBXS
@@ -1400,6 +1510,10 @@ static SV* TreeRBXS_wrap_item(struct TreeRBXS_item *item) {
 static SV* TreeRBXS_item_wrap_key(struct TreeRBXS_item *item) {
 	if (!item)
 		return &PL_sv_undef;
+	if (item->orig_key_stored) {
+		SV *tmp= GET_TreeRBXS_item_ORIG_KEY(item);
+		return SvREFCNT_inc(tmp);
+	}
 	switch (item->key_type) {
 	case KEY_TYPE_ANY:
 	case KEY_TYPE_CLAIM: return SvREFCNT_inc(item->keyunion.svkey);
@@ -1615,7 +1729,7 @@ ssize_t init_tree_from_attr_list(
 			  key_type == KEY_TYPE_INT?   CMP_INT
 			: key_type == KEY_TYPE_FLOAT? CMP_FLOAT
 			: key_type == KEY_TYPE_BSTR?  CMP_MEMCMP
-			: key_type == KEY_TYPE_USTR?  CMP_UTF8
+			: key_type == KEY_TYPE_USTR?  CMP_STR
 			: key_type == KEY_TYPE_ANY?   CMP_PERL /* use Perl's cmp operator */
 			: key_type == KEY_TYPE_CLAIM? CMP_PERL
 			: CMP_PERL;
@@ -1630,7 +1744,9 @@ ssize_t init_tree_from_attr_list(
 		if (key_type != KEY_TYPE_CLAIM) tree->key_type= KEY_TYPE_ANY;
 		tree->compare= TreeRBXS_cmp_perl_cb;
 		break;
-	case CMP_UTF8:
+	case CMP_FOLDCASE:
+		tree->transform= TreeRBXS_xform_fc;
+	case CMP_STR:
 		tree->key_type= KEY_TYPE_USTR;
 		tree->compare= TreeRBXS_cmp_memcmp;
 		break;
@@ -1649,6 +1765,11 @@ ssize_t init_tree_from_attr_list(
 	case CMP_MEMCMP:
 		tree->key_type= KEY_TYPE_BSTR;
 		tree->compare= TreeRBXS_cmp_memcmp;
+		break;
+	case CMP_NUMSPLIT_FOLDCASE:
+		tree->key_type= KEY_TYPE_USTR;
+		tree->transform= TreeRBXS_xform_fc;
+		tree->compare= TreeRBXS_cmp_numsplit;
 		break;
 	case CMP_NUMSPLIT:
 		if (key_type != KEY_TYPE_USTR && key_type != KEY_TYPE_ANY && key_type != KEY_TYPE_CLAIM)
@@ -2017,10 +2138,10 @@ STORABLE_thaw(objref, cloning, serialized, attrs)
 		sb= (const unsigned char*) SvPV(serialized, sb_len);
 		if (sb_len < 10)
 			croak("Expected at least 10 bytes of serialized data");
-		version=  sb[0] + (sb[1] << 8) + (sb[2] << 16) + (sb[3] << 24);
-		key_type= sb[4] + (sb[5] << 8);
-		cmp_id=   sb[6] + (sb[7] << 8);
-		flags=    sb[8] + (sb[9] << 8);
+		version=  sb[0] + (sb[1] << 8) + (sb[2] << 16) + (sb[3] << 24); // 4 bytes LE
+		key_type= sb[4] + (sb[5] << 8);                                 // 2 bytes LE
+		cmp_id=   sb[6] + (sb[7] << 8);                                 // 2 bytes LE
+		flags=    sb[8] + (sb[9] << 8);                                 // 2 bytes LE
 
 		if (version <= 0)
 			croak("Invalid serialized version");
@@ -2040,6 +2161,9 @@ STORABLE_thaw(objref, cloning, serialized, attrs)
 		if (cmp_id <= 0 || cmp_id > CMP_MAX)
 			croak("Invalid serialized compare_fn");
 		tree->compare_fn_id= cmp_id;
+		/* These two comparison function codes imply a transform function */
+		if (cmp_id == CMP_FOLDCASE || cmp_id == CMP_NUMSPLIT_FOLDCASE)
+			tree->transform= TreeRBXS_xform_fc;
 
 		/* attr_vec gets modified, so make a copy of attrs' AvARRAY */
 		Newx(attr_list, attr_len, SV*);
@@ -2594,6 +2718,53 @@ newest_node(tree, newval= NULL)
 			: GET_TreeRBXS_item_FROM_recent(tree->recent.prev);
 	OUTPUT:
 		RETVAL
+
+void
+keys(tree)
+	struct TreeRBXS *tree
+	ALIAS:
+		Tree::RB::XS::values             = 1
+		Tree::RB::XS::kv                 = 2
+		Tree::RB::XS::reverse_keys       = 4
+		Tree::RB::XS::reverse_values     = 5
+		Tree::RB::XS::reverse_kv         = 6
+	INIT:
+		size_t n_ret, i, node_count= TreeRBXS_get_count(tree);
+		rbtree_node_t *node;
+		rbtree_node_t *(*start)(rbtree_node_t *)= (ix & 4)? rbtree_node_right_leaf : rbtree_node_left_leaf;
+		rbtree_node_t *(*step)(rbtree_node_t *)= (ix & 4)? rbtree_node_prev : rbtree_node_next;
+	PPCODE:
+		if (GIMME_V == G_VOID) {
+			n_ret= 0;
+		}
+		else if (GIMME_V == G_SCALAR) {
+			n_ret= 1;
+			ST(0)= sv_2mortal(newSViv(node_count));
+		}
+		else {
+			n_ret= ix == 2? node_count*2 : node_count;
+			EXTEND(SP, n_ret);
+			node= start(TreeRBXS_get_root(tree));
+			if ((ix & 3) == 0) {
+				for (i= 0; i < n_ret && node; i++, node= step(node))
+					ST(i)= sv_2mortal(TreeRBXS_item_wrap_key(GET_TreeRBXS_item_FROM_rbnode(node)));
+			}
+			else if ((ix & 3) == 1) {
+				for (i= 0; i < n_ret && node; i++, node= step(node))
+					ST(i)= GET_TreeRBXS_item_FROM_rbnode(node)->value;
+			}
+			else {
+				for (i= 0; i < n_ret && node; node= step(node)) {
+					ST(i)= sv_2mortal(TreeRBXS_item_wrap_key(GET_TreeRBXS_item_FROM_rbnode(node)));
+					i++;
+					ST(i)= GET_TreeRBXS_item_FROM_rbnode(node)->value;
+					i++;
+				}
+			}
+			if (i != n_ret || node != NULL)
+				croak("BUG: expected %ld nodes but found %ld", (long) (n_ret>>1), (long) ((ix & 3) == 2? i : (i>>1)));
+		}
+		XSRETURN(n_ret);
 
 SV *
 FIRSTKEY(tree)
@@ -3254,9 +3425,11 @@ BOOT:
 	EXPORT_ENUM(CMP_PERL);
 	EXPORT_ENUM(CMP_INT);
 	EXPORT_ENUM(CMP_FLOAT);
-	EXPORT_ENUM(CMP_UTF8);
+	EXPORT_ENUM(CMP_STR);
+	EXPORT_ENUM(CMP_FOLDCASE);
 	EXPORT_ENUM(CMP_MEMCMP);
 	EXPORT_ENUM(CMP_NUMSPLIT);
+	EXPORT_ENUM(CMP_NUMSPLIT_FOLDCASE);
 	EXPORT_ENUM(GET_EQ);
 	EXPORT_ENUM(GET_OR_ADD);
 	EXPORT_ENUM(GET_EQ_LAST);

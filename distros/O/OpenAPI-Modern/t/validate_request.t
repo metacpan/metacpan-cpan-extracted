@@ -84,9 +84,15 @@ components:
     my_path_item2:
       description: this should be useable, as it is $ref'd by a /paths/<template> path item
       post:
+        parameters:
+          - name: Alpha
+            in: header
+            required: true
+            schema: {}
         operationId: my_reffed_component_operation
 paths:
-  /foo: {}  # TODO: $ref to #/components/pathItems/my_path_item2
+  /foo:
+    $ref: '#/components/pathItems/my_path_item2'
   /foo/bar:
     post:
       callbacks:
@@ -116,7 +122,7 @@ YAML
         },
       ],
     },
-    'operation is not under a path-item with a path template',
+    to_str($request).': operation is not under a path-item with a path template',
   );
 
   cmp_result(
@@ -126,13 +132,13 @@ YAML
       errors => [
         {
           instanceLocation => '/request',
-          keywordLocation => '/components/pathItems/my_path_item',
-          absoluteKeywordLocation => $doc_uri->clone->fragment('/components/pathItems/my_path_item')->to_string,
-          error => 'operation at operation_id does not match provided path_template',
+          keywordLocation => jsonp(qw(/paths /foo/bar)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/bar)))->to_string,
+          error => 'templated operation does not match provided operation_id',
         },
       ],
     },
-    'providing a path template will never work here',
+    'operation is not under a path-item with a path template',
   );
 
   cmp_result(
@@ -148,7 +154,7 @@ YAML
         },
       ],
     },
-    'operation is not under a path-item with a path template',
+    to_str($request).': operation is not under a path-item with a path template',
   );
 
   cmp_result(
@@ -164,7 +170,7 @@ YAML
         },
       ],
     },
-    'operation is not directly under a path-item with a path template',
+    to_str($request).': operation is not directly under a path-item with a path template',
   );
 
   cmp_result(
@@ -180,7 +186,7 @@ YAML
         },
       ],
     },
-    'operation is not under a path-item with a path template',
+    to_str($request).': operation is not under a path-item with a path template',
   );
 
   # TODO test: path-item exists, under paths with a template, but a $ref is followed before finding
@@ -202,7 +208,7 @@ YAML
         },
       ],
     },
-    'no matching entry under /paths for URI',
+    to_str($request).': no matching entry under /paths for URI',
   );
 
   cmp_result(
@@ -218,7 +224,23 @@ YAML
         },
       ],
     },
-    'provided path_template does not exist in /paths',
+    to_str($request).': provided path_template does not exist in /paths',
+  );
+
+  cmp_result(
+    $openapi->validate_request(request('POST', 'http://example.com/foo'))->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request/header/Alpha',
+          keywordLocation => jsonp(qw(/paths /foo $ref post parameters 0 required)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment('/components/pathItems/my_path_item2/post/parameters/0/required')->to_string,
+          error => 'missing header: Alpha',
+        },
+      ],
+    },
+    'path specification was correctly found on the far side of a $ref; error locations are correct',
   );
 };
 

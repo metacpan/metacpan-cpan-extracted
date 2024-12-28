@@ -37,7 +37,6 @@ WriteMakefile(
           recommends => {
             'PDL::Graphics::PGPLOT' => 0,
             'PDL::GSL' => 0,
-            'PDL::Slatec' => 0,
           },
         },
       },

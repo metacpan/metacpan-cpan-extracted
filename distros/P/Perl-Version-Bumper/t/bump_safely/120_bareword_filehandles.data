@@ -1,0 +1,17 @@
+########## use feature 'bareword_filehandles' DIE < v5.34
+use feature 'bareword_filehandles';
+open FH, '< file.txt' or die $!;
+---
+use VERSION;
+open FH, '< file.txt' or die $!;
+--- v5.38
+use VERSION;
+use feature 'bareword_filehandles';
+open FH, '< file.txt' or die $!;
+########## no feature 'bareword_filehandles' DIE < v5.34
+no feature 'bareword_filehandles';
+---
+use VERSION;
+no feature 'bareword_filehandles';
+--- v5.38
+use VERSION;

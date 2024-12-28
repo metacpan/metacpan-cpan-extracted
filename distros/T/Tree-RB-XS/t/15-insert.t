@@ -9,9 +9,9 @@ my $node_cnt= $ENV{TREERBXS_TEST_NODE_COUNT} || 10000;
 
 note "$_=$ENV{$_}" for grep /perl/i, keys %ENV;
 
-for my $type (qw( KEY_TYPE_ANY KEY_TYPE_INT KEY_TYPE_FLOAT KEY_TYPE_BSTR KEY_TYPE_USTR )) {
-	subtest $type => sub {
-		my $tree= Tree::RB::XS->new(key_type => Tree::RB::XS->$type);
+for my $cmp (qw( CMP_PERL CMP_INT CMP_FLOAT CMP_MEMCMP CMP_STR CMP_FOLDCASE CMP_NUMSPLIT CMP_NUMSPLIT_FOLDCASE )) {
+	subtest $cmp => sub {
+		my $tree= Tree::RB::XS->new(compare_fn => Tree::RB::XS->$cmp);
 		is( $tree->insert(1 => 1), 0, 'insert, returns index' );
 		is( $tree->size, 1, 'size=1' );
 		
@@ -60,6 +60,12 @@ subtest custom_tree => sub {
 	ok(eval { $tree->_assert_structure; 1 }, 'structure OK' )
 		or diag $@;
 	undef $tree; # test destructor
+};
+
+subtest foldcase_tree => sub {
+	my $tree= Tree::RB::XS->new(compare_fn => Tree::RB::XS::CMP_FOLDCASE);
+	is( $tree->insert_multi(a => 1, B => 1, a => 2, A => 2, b => 3), 2, 'insert multiple conflicting keys' );
+	is( [ $tree->keys ], [ 'a', 'B' ], 'only first 2 keys added' );
 };
 
 done_testing;

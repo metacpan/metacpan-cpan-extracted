@@ -53,7 +53,7 @@ YAML
   # start line is missing "HTTP/1.1"
   my $request = HTTP::Request->new(GET => 'http://example.com/', [ Host => 'example.com' ]);
   ok(!$openapi->find_path($options = { request => $request }),
-    'find_path returns false');
+    to_str($request).': find_path returns false');
   cmp_result(
     $options,
     {
@@ -95,7 +95,7 @@ YAML
 
   my $request = request('GET', 'gopher://example.com/boop');
   ok(!$openapi->find_path(my $options = { request => $request, path_template => '/blurp' }),
-    'find_path returns false');
+    to_str($request).': find_path returns false');
   cmp_result(
     $options,
     {
@@ -116,7 +116,7 @@ YAML
 
   ok(!$openapi->find_path($options = { request => request('GET', 'http://example.com/foo/bar'),
       path_template => '/foo/baz' }),
-    'find_path returns false');
+    to_str($request).': find_path returns false');
   cmp_result(
     $options,
     {
@@ -137,7 +137,7 @@ YAML
 
   $request = request('GET', 'http://example.com/foo/bar');
   ok(!$openapi->find_path($options = { request => $request, operation_id => 'bloop' }),
-    'find_path returns false');
+    to_str($request).': find_path returns false');
   cmp_result(
     $options,
     {
@@ -157,7 +157,7 @@ YAML
   );
 
   ok(!$openapi->find_path($options = { request => request('PUT', 'http://example.com/foo/bloop') }),
-    'find_path returns false');
+    to_str($request).': find_path returns false');
   cmp_result(
     $options,
     {
@@ -179,7 +179,7 @@ YAML
 
   ok(!$openapi->find_path($options = { request => $request = request('POST', 'http://example.com/foo/bar'),
       path_template => '/foo/{foo_id}', operation_id => 'my-get-operation' }),
-    'find_path returns false');
+    to_str($request).': find_path returns false');
   cmp_result(
     $options,
     {
@@ -200,7 +200,7 @@ YAML
   );
 
   ok(!$openapi->find_path($options = { request => $request, operation_id => 'my-get-operation' }),
-    'find_path returns false');
+    to_str($request).': find_path returns false');
   cmp_result(
     $options,
     {
@@ -219,7 +219,7 @@ YAML
   );
 
   ok(!$openapi->find_path($options = { request => $request, method => 'GET' }),
-    'find_path returns false');
+    to_str($request).': find_path returns false');
   cmp_result(
     $options,
     {
@@ -238,7 +238,7 @@ YAML
   );
 
   ok($openapi->find_path($options = { request => $request, method => 'PoST' }),
-    'find_path returns true');
+    to_str($request).': find_path returns true');
   cmp_result(
     $options,
     {
@@ -256,7 +256,7 @@ YAML
 
   ok(!$openapi->find_path($options = { request => $request,
         path_template => '/foo/{foo_id}', path_captures => { bloop => 'bar' } }),
-    'find_path returns false');
+    to_str($request).': find_path returns false');
   cmp_result(
     $options,
     {
@@ -280,7 +280,7 @@ YAML
   );
 
   ok(!$openapi->find_path($options = { request => $request, path_captures => { bloop => 'bar' } }),
-    'find_path returns false');
+    to_str($request).': find_path returns false');
   cmp_result(
     $options,
     {
@@ -305,7 +305,7 @@ YAML
 
   ok($openapi->find_path($options = { request => request('GET', 'http://example.com/foo/bar'),
       path_template => '/foo/bar', method => 'get', operation_id => 'my-get-operation', path_captures => {} }),
-    'find_path returns successfully');
+    to_str($request).': find_path returns successfully');
   cmp_result(
     $options,
     {
@@ -323,7 +323,7 @@ YAML
 
   ok(!$openapi->find_path($options = { request => request('GET', 'http://example.com/something/else'),
       path_template => '/foo/bar' }),
-    'find_path returns false');
+    to_str($request).': find_path returns false');
   cmp_result(
     $options,
     {
@@ -344,7 +344,7 @@ YAML
 
   ok(!$openapi->find_path($options = { request => $request = request('POST', 'http://example.com/something/else'),
       path_template => '/foo/{foo_id}', path_captures => { foo_id => 123 } }),
-    'find_path returns false');
+    to_str($request).': find_path returns false');
   cmp_result(
     $options,
     {
@@ -365,7 +365,7 @@ YAML
   );
 
   ok(!$openapi->find_path($options = { request => $request, path_template => '/foo/{foo_id}' }),
-    'find_path returns false');
+    to_str($request).': find_path returns false');
   cmp_result(
     $options,
     {
@@ -385,7 +385,7 @@ YAML
   );
 
   ok(!$openapi->find_path($options = { request => request('GET', 'http://example.com/foo/123'), path_template => '/foo/bar' }),
-    'find_path returns false');
+    to_str($request).': find_path returns false');
   cmp_result(
     $options,
     {
@@ -405,7 +405,7 @@ YAML
   );
 
   ok(!$openapi->find_path($options = { request => request('POST', 'http://example.com/foo/123'), path_template => '/foo/bar', operation_id => 'my-post-operation' }),
-    'find_path returns false');
+    to_str($request).': find_path returns false');
   cmp_result(
     $options,
     {
@@ -427,7 +427,7 @@ YAML
 
   ok(!$openapi->find_path($options = { request => request('GET', 'http://example.com/something/else'),
       operation_id => 'my-get-operation' }),
-    'find_path returns false');
+    to_str($request).': find_path returns false');
   cmp_result(
     $options,
     {
@@ -447,7 +447,7 @@ YAML
 
   ok(!$openapi->find_path($options = { request => request('POST', 'http://example.com/foo/123'),
       operation_id => 'another-post-operation' }),
-    'find_path returns false');
+    to_str($request).': find_path returns false');
   cmp_result(
     $options,
     {
@@ -469,7 +469,7 @@ YAML
 
   ok(!$openapi->find_path($options = { request => request('POST', 'http://example.com/foo/hello'),
       operation_id => 'my-post-operation', path_captures => { foo_id => 'goodbye' } }),
-    'find_path returns false');
+    to_str($request).': find_path returns false');
   cmp_result(
     $options,
     {
@@ -494,7 +494,7 @@ YAML
 
   ok($openapi->find_path($options = { request => request('POST', 'http://example.com/foo/123'),
       operation_id => 'my-post-operation', path_captures => { foo_id => 123 } }),
-    'find_path returns successfully');
+    to_str($request).': find_path returns successfully');
   cmp_result(
     $options,
     {
@@ -513,7 +513,7 @@ YAML
 
   ok($openapi->find_path($options = { request => request('POST', 'http://example.com/foo/123'),
       path_captures => { foo_id => 123 } }),
-    'find_path returns successfully');
+    to_str($request).': find_path returns successfully');
   cmp_result(
     $options,
     {
@@ -541,7 +541,7 @@ YAML
 
   ok(!$openapi->find_path($options = { request => request('POST', 'http://example.com/foo/blah'),
       path_template => '/foo/{foo_id}', path_captures => { foo_id => 'blah' } }),
-    'find_path returns false');
+    to_str($request).': find_path returns false');
   cmp_result(
     $options,
     {
@@ -563,7 +563,7 @@ YAML
   );
 
   ok($openapi->find_path($options = { request => $request = request('GET', 'http://example.com/foo/123') }),
-    'find_path returns successfully');
+    to_str($request).': find_path returns successfully');
   cmp_result(
     $options,
     my $expected = {
@@ -581,7 +581,7 @@ YAML
   is(get_type($options->{path_captures}{foo_id}), 'string', 'captured path value is parsed as a string');
 
   ok($openapi->find_path($options = { request => $request, path_captures => { foo_id => '123' } }),
-    'find_path returns successfully');
+    to_str($request).': find_path returns successfully');
   cmp_result(
     $options,
     $expected,
@@ -590,7 +590,7 @@ YAML
   is(get_type($options->{path_captures}{foo_id}), 'string', 'passed-in path value is preserved as a string');
 
   ok($openapi->find_path($options = { request => $request, path_template => '/foo/{foo_id}', path_captures => { foo_id => 123 } }),
-    'find_path returns successfully');
+    to_str($request).': find_path returns successfully');
   cmp_result(
     $options,
     $expected,
@@ -600,7 +600,7 @@ YAML
 
   my $val = 123; my $str = sprintf("%s\n", $val);
   ok($openapi->find_path($options = { request => $request, path_captures => { foo_id => $val } }),
-    'find_path returns successfully');
+    to_str($request).': find_path returns successfully');
   cmp_result(
     $options,
     $expected,
@@ -609,7 +609,7 @@ YAML
   ok(Scalar::Util::isdual($options->{path_captures}{foo_id}), 'passed-in path value is preserved as a dualvar');
 
   ok(!$openapi->find_path($options = { request => $request, path_captures => { foo_id => 'a' } }),
-    'find_path returns false');
+    to_str($request).': find_path returns false');
   cmp_result(
     $options,
     {
@@ -633,7 +633,7 @@ YAML
   );
 
   ok(!$openapi->find_path($options = { request => request('GET', 'http://example.com/bloop/blah') }),
-    'find_path returns false');
+    to_str($request).': find_path returns false');
   cmp_result(
     $options,
     {
@@ -654,7 +654,7 @@ YAML
   my $uri = uri('http://example.com', '', 'foo', 'hello // there ಠ_ಠ!');
   ok($openapi->find_path($options = { request => request('GET', $uri),
       path_template => '/foo/{foo_id}', path_captures => { foo_id => 'hello // there ಠ_ಠ!' } }),
-    'find_path returns successfully');
+    to_str($request).': find_path returns successfully');
   cmp_result(
     $options,
     $expected = {
@@ -670,7 +670,7 @@ YAML
     'path_capture values are found to be consistent with the URI when some values are url-escaped',
   );
 
-  ok($openapi->find_path($options = { request => request('GET', $uri) }), 'find_path returns successfully');
+  ok($openapi->find_path($options = { request => request('GET', $uri) }), to_str($request).': find_path returns successfully');
   cmp_result(
     $options,
     $expected,
@@ -697,7 +697,7 @@ paths:
 YAML
 
   $request = request('GET', 'http://example.com/foo/bar');
-  ok($openapi->find_path($options = { request => $request }), 'find_path returns successfully');
+  ok($openapi->find_path($options = { request => $request }), to_str($request).': find_path returns successfully');
   cmp_result(
     $options,
     $expected = {
@@ -731,7 +731,7 @@ YAML
     'provided operation_id and inferred path_template does not match request uri',
   );
 
-  ok($openapi->find_path($options = { request => $request, operation_id => 'concrete-foo-bar' }), 'find_path returns successfully');
+  ok($openapi->find_path($options = { request => $request, operation_id => 'concrete-foo-bar' }), to_str($request).': find_path returns successfully');
   cmp_result(
     $options,
     $expected,
@@ -739,7 +739,7 @@ YAML
   );
 
   $request = request('GET', 'http://example.com/foo/x.bar');
-  ok($openapi->find_path($options = { request => $request }), 'find_path returns successfully');
+  ok($openapi->find_path($options = { request => $request }), to_str($request).': find_path returns successfully');
   cmp_result(
     my $got_options = $options,
     {
@@ -773,7 +773,7 @@ YAML
     'provided operation_id and inferred path_template does not match request uri',
   );
 
-  ok($openapi->find_path($options = { request => $request, operation_id => 'templated-foo-bar' }), 'find_path returns successfully');
+  ok($openapi->find_path($options = { request => $request, operation_id => 'templated-foo-bar' }), to_str($request).': find_path returns successfully');
   cmp_result(
     $options,
     { %$got_options, request => isa('Mojo::Message::Request'), operation_uri => str($got_options->{operation_uri}) },
@@ -790,7 +790,7 @@ paths:
 YAML
 
   $request = request('GET', 'http://example.com/foo/bar');
-  ok($openapi->find_path($options = { request => $request }), 'find_path returns successfully');
+  ok($openapi->find_path($options = { request => $request }), to_str($request).': find_path returns successfully');
   cmp_result(
     $options,
     {
@@ -806,7 +806,7 @@ YAML
   );
 
   ok($openapi->find_path($options = { request => $request, path_template => '/foo/{foo_id}' }),
-    'find_path returns successfully');
+    to_str($request).': find_path returns successfully');
   cmp_result(
     $options,
     {
@@ -874,7 +874,8 @@ components:
       post:
         operationId: my_reffed_component_operation
 paths:
-  /foo: {}  # TODO: $ref to #/components/pathItems/my_path_item2
+  /foo:
+    $ref: '#/components/pathItems/my_path_item2'
   /foo/bar:
     post:
       callbacks:
@@ -891,7 +892,7 @@ YAML
 
   $request = request('POST', 'http://example.com/foo/bar');
   ok(!$openapi->find_path($options = { request => $request, operation_id => 'my_components_pathItem_operation' }),
-    'find_path returns false');
+    to_str($request).': find_path returns false');
   cmp_result(
     $options,
     {
@@ -913,28 +914,31 @@ YAML
   );
 
   ok(!$openapi->find_path($options = { request => $request, path_template => '/foo/bar', operation_id => 'my_components_pathItem_operation' }),
-    'find_path returns false');
+    to_str($request).': find_path returns false');
   cmp_result(
     $options,
     {
       request => isa('Mojo::Message::Request'),
       path_template => '/foo/bar',
+      _path_item => { post => ignore },
       method => 'post',
       operation_id => 'my_components_pathItem_operation',
       errors => [
         methods(TO_JSON => {
           instanceLocation => '',
-          keywordLocation => '/components/pathItems/my_path_item',
-          absoluteKeywordLocation => $doc_uri->clone->fragment('/components/pathItems/my_path_item')->to_string,
-          error => 'operation at operation_id does not match provided path_template',
+          keywordLocation => jsonp(qw(/paths /foo/bar)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/bar)))->to_string,
+          error => 'templated operation does not match provided operation_id',
         }),
       ],
     },
-    'providing a path template will never work here',
+    'this operation cannot be reached by using this path template',
   );
 
+  # TODO: no way at present to match a webhook request to its path-item (and OpenAPI 3.1 does not
+  # provide for specifying a path_template for webhooks)
   ok(!$openapi->find_path($options = { request => $request, operation_id => 'my_webhook_operation' }),
-    'find_path returns false');
+    to_str($request).': find_path returns false');
   cmp_result(
     $options,
     {
@@ -955,8 +959,10 @@ YAML
     'operation is not under a path-item with a path template',
   );
 
+  # TODO: no way at present to match a callback request to its path-item embedded under the
+  # operation, rather than to the top level /paths/*
   ok(!$openapi->find_path($options = { request => $request, operation_id => 'my_paths_pathItem_callback_operation' }),
-    'find_path returns false');
+    to_str($request).': find_path returns false');
   cmp_result(
     $options,
     {
@@ -978,7 +984,7 @@ YAML
   );
 
   ok(!$openapi->find_path($options = { request => $request, operation_id => 'my_components_pathItem_callback_operation' }),
-    'find_path returns false');
+    to_str($request).': find_path returns false');
   cmp_result(
     $options,
     {
@@ -999,18 +1005,86 @@ YAML
     'operation is not under a path-item with a path template',
   );
 
-  # TODO test: path-item exists, under paths with a template, but a $ref is followed before finding
-  # the actual definition: should be usable.
-  # we need to make sure that the URI matches the path_template above all the $refs.
-  # the destination path-item could be under /components/pathItems or /webhooks or in a callback,
-  # or shared by a path-item in another /path/<path_template>.
+  $request = request('POST', 'http://example.com/foo');
+
+  ok($openapi->find_path($options = { request => $request }), to_str($request).': find_path succeeded');
+  cmp_result(
+    $options,
+    {
+      request => isa('Mojo::Message::Request'),
+      operation_id => 'my_reffed_component_operation',
+      path_captures => {},
+      path_template => '/foo',
+      method => 'post',
+      _path_item => { description => ignore, post => { operationId => 'my_reffed_component_operation' }},
+      operation_uri => str($doc_uri_rel->clone->fragment('/components/pathItems/my_path_item2/post')),
+      errors => [],
+    },
+    'found path-item on the far side of a $ref using the request uri',
+  );
+
+  ok($openapi->find_path($options = { request => $request, operation_id => 'my_reffed_component_operation' }), to_str($request).': find_path succeeded');
+  cmp_result(
+    $options,
+    {
+      request => isa('Mojo::Message::Request'),
+      operation_id => 'my_reffed_component_operation',
+      path_captures => {},
+      path_template => '/foo',
+      method => 'post',
+      _path_item => { description => ignore, post => { operationId => 'my_reffed_component_operation' }},
+      operation_uri => str($doc_uri_rel->clone->fragment('/components/pathItems/my_path_item2/post')),
+      errors => [],
+    },
+    'found path-item on the far side of a $ref using an operationId, and verified against the request uri',
+  );
+
+  ok($openapi->find_path($options = { request => $request, path_template => '/foo' }), to_str($request).': find_path succeeded');
+  cmp_result(
+    $options,
+    {
+      request => isa('Mojo::Message::Request'),
+      operation_id => 'my_reffed_component_operation',
+      path_captures => {},
+      path_template => '/foo',
+      method => 'post',
+      _path_item => { description => ignore, post => { operationId => 'my_reffed_component_operation' }},
+      operation_uri => str($doc_uri_rel->clone->fragment('/components/pathItems/my_path_item2/post')),
+      errors => [],
+    },
+    'found path-item and method on the far side of a $ref using path_template, and verified against the request uri',
+  );
+
+  ok($openapi->find_path($options = { request => $request, path_template => '/foo', operation_id => 'my_reffed_component_operation' }),
+    to_str($request).': find_path returns success');
+  cmp_result(
+    $options,
+    {
+      request => isa('Mojo::Message::Request'),
+      _path_item => { description => ignore, post => { operationId => 'my_reffed_component_operation' }},
+      path_template => '/foo',
+      path_captures => {},
+      method => 'post',
+      operation_id => 'my_reffed_component_operation',
+      operation_uri => str($doc_uri_rel->clone->fragment('/components/pathItems/my_path_item2/post')),
+      errors => [],
+    },
+    'can find a path-item by operation_id, and then verify the provided path_template against the request despite there being a $ref in the way',
+  );
 };
 
 subtest 'no request is provided: options are relied on as the sole source of truth' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+components:
+  pathItems:
+    my_path_item:
+      post:
+        operationId: my_reffed_component_operation
 paths:
+  /foo:
+    $ref: '#/components/pathItems/my_path_item'
   /foo/{foo_id}:
     get:
       operationId: my-get-operation
@@ -1258,6 +1332,34 @@ YAML
     'path_template and operation_id are inconsistent',
   );
 
+  ok($openapi->find_path($options = { operation_id => 'my_reffed_component_operation' }), 'find_path succeeded');
+  cmp_result(
+    $options,
+    {
+      operation_id => 'my_reffed_component_operation',
+      # note: no path_captures or path_template
+      method => 'post',
+      _path_item => { post => { operationId => 'my_reffed_component_operation' }},
+      operation_uri => str($doc_uri_rel->clone->fragment('/components/pathItems/my_path_item/post')),
+      errors => [],
+    },
+    'found path_item on the far side of a $ref using operation_id',
+  );
+
+  ok($openapi->find_path($options = { path_template => '/foo', method => 'post' }), 'find_path succeeded');
+  cmp_result(
+    $options,
+    {
+      operation_id => 'my_reffed_component_operation',
+      # note: no path_captures
+      path_template => '/foo',
+      method => 'post',
+      _path_item => { post => { operationId => 'my_reffed_component_operation' }},
+      operation_uri => str($doc_uri_rel->clone->fragment('/components/pathItems/my_path_item/post')),
+      errors => [],
+    },
+    'found path_item on the far side of a $ref using path_template and method',
+  );
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
@@ -1320,17 +1422,19 @@ YAML
     $options,
     {
       path_template => '/foo/bar',
+      _path_item => { post => ignore },
+      method => 'post',
       operation_id => 'my_components_pathItem_operation',
       errors => [
         methods(TO_JSON => {
           instanceLocation => '',
-          keywordLocation => '/components/pathItems/my_path_item',
-          absoluteKeywordLocation => $doc_uri_rel->clone->fragment('/components/pathItems/my_path_item')->to_string,
-          error => 'operation at operation_id does not match provided path_template',
+          keywordLocation => jsonp(qw(/paths /foo/bar)),
+          absoluteKeywordLocation => $doc_uri_rel->clone->fragment(jsonp(qw(/paths /foo/bar)))->to_string,
+          error => 'templated operation does not match provided operation_id',
         }),
       ],
     },
-    'providing a path template will never work here',
+    'this operation cannot be reached by using this path template',
   );
 
   ok($openapi->find_path($options = { operation_id => 'my_webhook_operation' }),
@@ -1374,12 +1478,6 @@ YAML
     },
     'operation is not under a path-item with a path template, but still exists',
   );
-
-  # TODO test: path-item exists, under paths with a template, but a $ref is followed before finding
-  # the actual definition: should be usable.
-  # the destination path-item could be under /components/pathItems or /webhooks or in a callback,
-  # or shared by a path-item in another /path/<path_template>.
-  # (test both operation_id and path_template+method)
 };
 
 goto START if ++$type_index < @::TYPES;

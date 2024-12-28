@@ -2,7 +2,7 @@ package Net::DNS::RR::SVCB;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: SVCB.pm 1993 2024-11-07 14:06:53Z willem $)[2];
+our $VERSION = (qw$Id: SVCB.pm 1996 2024-12-16 13:05:08Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -33,6 +33,11 @@ my %keybyname = (
 	dohpath		       => 'key7',			# RFC9461
 	ohttp		       => 'key8',			# RFC9540(4)
 	'tls-supported-groups' => 'key9',
+	);
+
+my %boolean = (
+	'no-default-alpn' => 'key2',
+	ohttp		  => 'key8',
 	);
 
 
@@ -132,12 +137,14 @@ Amen
 				s/\\,/\\044/g;			# disguise (RFC1035) escaped comma
 				push @value, split /,/;
 			} else {
-				push @value, '' unless $keybyname{lc $_};    # empty | Boolean
+				push @value, '' unless $keybyname{$_};	  # unregistered boolean key
 			}
 
-			s/[-]/_/g;				# extract identifier
-			m/^([^=]+)/;
-			$self->$1(@value);
+			m/^([^=]+)/;				# extract identifier
+			my $key = $1;
+			push @value, 1 if $boolean{$key};
+			$key =~ s/[-]/_/g;
+			$self->$key(@value);
 		}
 	}
 	return;
@@ -205,7 +212,7 @@ sub alpn {				## alpn=h3,h2,...
 
 sub no_default_alpn {			## no-default-alpn	(Boolean)
 	my ( $self, @value ) = @_;				# uncoverable pod
-	return $self->key2( defined(wantarray) ? () : _boolean(@value) );
+	return $self->key2( _boolean(@value) );
 }
 
 sub port {				## port=1234
@@ -235,7 +242,7 @@ sub dohpath {				## dohpath=/dns-query{?dns}
 
 sub ohttp {				## ohttp
 	my ( $self, @value ) = @_;				# uncoverable pod
-	return $self->key8( defined(wantarray) ? () : _boolean(@value) );
+	return $self->key8( _boolean(@value) );
 }
 
 sub tls_supported_groups {		## tls_supported_groups=29,23
@@ -255,7 +262,10 @@ sub _presentation {			## represent octet string(s) using local charset
 
 sub _boolean {
 	my @arg = @_;
-	return ( '', @arg );
+	return @arg unless scalar @arg;				# read key
+	my $arg = shift @arg;
+	return $arg unless defined $arg;			# delete key.
+	return ( $arg ? '' : undef, @arg );			# set key
 }
 
 sub _string {
@@ -310,8 +320,7 @@ sub AUTOLOAD {				## Dynamic constructor/accessor methods
 		die( $self->type . qq[: no value specified for "key$key"] ) unless defined wantarray;
 	}
 
-	my $value = $svcparams{$key};
-	return defined($value) ? _presentation($value) : $value;
+	return $svcparams{$key};
 }
 
 ########################################
@@ -371,12 +380,12 @@ owner name of this record must be used as the effective TargetName.
     $rr = Net::DNS::RR->new( 'svcb.example. SVCB 1 svcb.example. port=1234' );
 
     $rr->port(1234);
-    $string = $rr->port();	# \004\210
-    $rr->key3($string);
+    $octets = $rr->port();	# 0x04 0xD2
+    $octets = $rr->key3();
 
 Constructor methods for mnemonic SvcParams prescribed by RFC9460.
-When invoked without arguments, the methods return the presentation format
-value for the underlying key.
+When invoked without arguments, the methods return the value
+of the underlying key as an uninterpreted octet string.
 The behaviour with undefined arguments is not specified.
 
 =head2 keyNN
@@ -387,14 +396,15 @@ The behaviour with undefined arguments is not specified.
 
 Generic constructor and accessor methods for SvcParams.
 The key index NN is a decimal integer in the range 0 .. 65535.
-The method argument and returned value are both presentation format strings.
+The method argument is a presentation format character string.
+The returned value is an uninterpreted octet string.
 The method returns the undefined value if the key is not present.
-The specified key will be deleted if the value is undefined.
+The specified key will be deleted if the argument is undefined.
 
 
 =head1 COPYRIGHT
 
-Copyright (c)2020-2022 Dick Franks. 
+Copyright (c)2020-2024 Dick Franks. 
 
 All rights reserved.
 

@@ -7,7 +7,7 @@ use Perl::Critic::Utils qw( $SEVERITY_HIGH );
 use base qw( Perl::Critic::Policy );
 
 # ABSTRACT: Prohibit the use of specific modules or pragmas
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 
 sub supported_parameters
@@ -57,7 +57,7 @@ Perl::Critic::Policy::Plicease::ProhibitSpecificModules - Prohibit the use of sp
 
 =head1 VERSION
 
-version 0.07
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -106,6 +106,8 @@ Contributors:
 Ville Skyttä (SCOP)
 
 Yoshikazu Sawa (yoshikazusawa)
+
+Christian Walde (wchristian, MITHALDU)
 
 =head1 COPYRIGHT AND LICENSE
 

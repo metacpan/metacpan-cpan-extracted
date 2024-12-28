@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.07
+    version 0.09
 
 DESCRIPTION
 
@@ -17,6 +17,14 @@ DESCRIPTION
 
       This is a slight remix on the prohibit leading zeros policy with some
       helpful exceptions.
+
+    Perl::Critic::Policy::Plicease::ProhibitSignaturesAndAtUnderscore
+
+      Prohibit the use of @_ in subroutine using signatures
+
+    Perl::Critic::Policy::Plicease::ProhibitSpecificModules
+
+      Prohibit the use of specific modules or pragmas
 
     Plicease::ProhibitUnicodeDigitInRegexp
 
@@ -32,6 +40,8 @@ AUTHOR
     Ville Skyttä (SCOP)
 
     Yoshikazu Sawa (yoshikazusawa)
+
+    Christian Walde (wchristian, MITHALDU)
 
 COPYRIGHT AND LICENSE
 

@@ -25,3 +25,23 @@ sub foo ($a) {
 sub foo ($$) {
   my @x = @_;
 }
+
+## name code ref inside sub with sig
+## failures 0
+## cut
+
+use experimental qw( signatures );
+
+sub foo ($a) {
+    return sub { return @_ }
+}
+
+## name code ref inside sub with sig
+## failures 0
+## cut
+
+use experimental qw( signatures );
+
+sub foo ($a) {
+    sub bar { return @_ }
+}

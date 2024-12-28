@@ -2,11 +2,12 @@ use strict;
 use warnings;
 
 BEGIN {
-    if (eval 'use  Test2::Tools::Tiny 1.302097; 1; ' ) {
-        print "# Using Test2::Tools::Tiny\n";
+    if (eval { require Test2::Tools::Tiny; Test2::Tools::Tiny->VERSION(1.302097); 1 }) {
+        print STDERR "# Using Test2::Tools::Tiny " . Test2::Tools::Tiny->VERSION . "\n";
+        Test2::Tools::Tiny->import;
     }
     elsif (eval { require Test::More; Test::More->can('done_testing') ? 1 : 0 }) {
-        print "# Using Test::More " . Test::More->VERSION . "\n";
+        print STDERR "# Using Test::More " . Test::More->VERSION . "\n";
         Test::More->import();
     }
     else {

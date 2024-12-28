@@ -1,5 +1,14 @@
 Revision history for perl module XML::Hash::XS
 
+0.62    2024-12-28
+    - Fix for Win32.
+
+0.61    2024-12-27
+    - Another fix for big endian.
+
+0.60    2024-12-24
+    - Another fix for big endian.
+
 0.59    2024-12-21
     - Fix typo
 

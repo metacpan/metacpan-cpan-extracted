@@ -5,7 +5,7 @@
 ##======================================================================
 
 use PDL::VectorValued::Dev;
-my $VERSION = '1.23.28'; ##-- update with perl-reversion from Perl::Version module
+my $VERSION = '1.23.29'; ##-- update with perl-reversion from Perl::Version module
 pp_setversion($VERSION);
 
 ##-- for integer-type keys
@@ -74,6 +74,13 @@ pp_addhdr( $PDL::CCS::Config::ccsConfig{INDX_TYPEDEF} );
 ## Operations: matmult2d
 ##======================================================================
 
+# TODO: support BAD values in ccs_matmult2d_sdd (especially missing==BAD).
+#  + Problematic because we use $zc() as an initializer, which for missing==BAD
+#    winds up setting the entire result to BAD.
+#  + missing==BAD support might need a temporary to count the number
+#    of (non-)missing per "N", and only add in $zc() if required (in which
+#    case we wouldn't want/need to pass in $zc() at all)
+
 ##--------------------------------------------------------------
 pp_def
   ('ccs_matmult2d_sdd',
@@ -133,7 +140,8 @@ pp_def
 		  "$INDX ixa(Ndimsa,NnzA); nza(NnzA);", ## a(M,N) (M~i, N~x)
 		  'b(O,M);',                          ## b(O,M) (O~z, M~i)
 		  '[o]c(O,N)',                        ## c(O,N) (O~z, N~x)
-		  '')),
+              '')),
+   HandleBad => 1,
    Code =>
 (q(
  //-- initialize output to zero
@@ -148,10 +156,19 @@ pp_def
    CCS_Indx Mi = $ixa(Ndimsa=>0);
    CCS_Indx Ni = $ixa(Ndimsa=>1);
    loop (O) %{
+     PDL_IF_BAD( if ( $ISBAD(nza()) || $ISBAD(b(M=>Mi)) || $ISBAD(c(N=>Ni)) ) { $SETBAD(c(N=>Ni)); continue; },)
      $c(N=>Ni) += $nza() * $b(M=>Mi);
    %}
  %}
 )),
+  CopyBadStatusCode => q{
+  if ( $ISPDLSTATEBAD(nza) || $ISPDLSTATEBAD(b) ) {
+    $SETPDLSTATEBAD(c);
+  } else {
+    $SETPDLSTATEGOOD(c);
+    PDL->propagate_badflag(c, 0);
+  }
+},
   Doc =>
 (q{
 Two-dimensional matrix multiplication of a sparse index-encoded PDL

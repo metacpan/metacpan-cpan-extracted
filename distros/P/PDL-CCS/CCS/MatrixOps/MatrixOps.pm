@@ -11,7 +11,7 @@ use PDL::Exporter;
 use DynaLoader;
 
 
-   our $VERSION = '1.23.28';
+   our $VERSION = '1.23.29';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::CCS::MatrixOps $VERSION;
@@ -142,8 +142,8 @@ $SIZE(Ndimsa) is assumed to be 2.
 
 =for bad
 
-ccs_matmult2d_zdd does not process bad values.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+ccs_matmult2d_zdd processes bad values.
+The state of the bad-value flag of the output ndarrays is unknown.
 
 
 =cut
@@ -201,7 +201,7 @@ ccs_vnorm() always clears the bad-status flag on $vnorm().
 
 
 
-#line 235 "ccsmatops.pd"
+#line 252 "ccsmatops.pd"
 
 
 =pod
@@ -356,7 +356,7 @@ ccs_vcos_pzd() always clears the bad status flag on the output piddle $vcos.
 
 
 
-#line 480 "ccsmatops.pd"
+#line 497 "ccsmatops.pd"
 
 
 ##---------------------------------------------------------------------

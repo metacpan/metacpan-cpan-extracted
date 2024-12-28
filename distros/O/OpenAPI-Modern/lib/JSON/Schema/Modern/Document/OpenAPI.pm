@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document::OpenAPI;
 # ABSTRACT: One OpenAPI v3.1 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.075';
+our $VERSION = '0.076';
 
 use 5.020;
 use Moo;
@@ -94,7 +94,7 @@ sub traverse ($self, $evaluator) {
     depth => 0,
   };
 
-  # this is an abridged form of https://spec.openapis.org/oas/3.1/schema/latest
+  # this is an abridged form of https://spec.openapis.org/oas/3.1/schema/2024-10-25
   # just to validate the parts of the document we need to verify before parsing jsonSchemaDialect
   # and switching to the real metaschema for this document
   state $top_schema = {
@@ -156,17 +156,20 @@ sub traverse ($self, $evaluator) {
 
   # evaluate the document against its metaschema to find any errors, to identify all schema
   # resources within to add to the global resource index, and to extract all operationIds
-  my (@json_schema_paths, @operation_paths, @path_item_refs, @servers_paths);
+  my (@json_schema_paths, @operation_paths, %bad_path_item_refs, @servers_paths);
   my $result = $self->evaluator->evaluate(
     $schema, $self->metaschema_uri,
     {
       short_circuit => 1,
       collect_annotations => 0,
       callbacks => {
-        # Note that if we are using the default metaschema https://spec.openapis.org/oas/3.1/schema/latest,
-        # we will only find the root of each schema, not all subschemas. We will traverse each
-        # of these schemas later using jsonSchemaDialect to find all subschemas and their $ids.
+        # we avoid producing errors here so we don't create extra errors for "not all additional
+        # properties are valid" etc
         '$dynamicRef' => sub ($, $schema, $state) {
+          # Note that if we are using the default metaschema
+          # https://spec.openapis.org/oas/3.1/schema/2024-10-25, we will only find the root of each
+          # schema, not all subschemas. We will traverse each of these schemas later using
+          # jsonSchemaDialect to find all subschemas and their $ids.
           push @json_schema_paths, $state->{data_path} if $schema->{'$dynamicRef'} eq '#meta';
           return 1;
         },
@@ -180,8 +183,13 @@ sub traverse ($self, $evaluator) {
           push @operation_paths, [ $data->{operationId} => $state->{data_path} ]
             if $schema->{'$ref'} eq '#/$defs/operation' and defined $data->{operationId};
 
-          # for now, we will reject all uses of $ref in a path-item
-          push @path_item_refs, $state->{data_path} if $entity and $entity eq 'path-item' and exists $data->{'$ref'};
+          # path-items are weird and allow mixing of fields adjacent to a $ref, which is burdensome
+          # to properly support (see https://github.com/OAI/OpenAPI-Specification/issues/3734)
+          if ($entity and $entity eq 'path-item' and exists $data->{'$ref'}) {
+            my %path_item = $data->%*;
+            delete @path_item{qw(summary description $ref)};
+            $bad_path_item_refs{$state->{data_path}} = join(', ', sort keys %path_item) if keys %path_item;
+          }
 
           # will contain duplicates; filter out later
           push @servers_paths, ($state->{data_path} =~ s{/[0-9]+$}{}r)
@@ -222,10 +230,10 @@ sub traverse ($self, $evaluator) {
     $seen_path{$normalized} = $path;
   }
 
-  foreach my $path_item (sort @path_item_refs) {
+  foreach my $path_item (sort keys %bad_path_item_refs) {
     ()= E({ %$state, data_path => $path_item,
-      initial_schema_uri => Mojo::URL->new(DEFAULT_METASCHEMA) },
-      'use of $ref in a path-item is not currently supported');
+        initial_schema_uri => Mojo::URL->new(DEFAULT_METASCHEMA) },
+      'invalid keywords used adjacent to $ref in a path-item: %s', $bad_path_item_refs{$path_item});
   }
 
   my %seen_servers;
@@ -401,7 +409,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.1 document
 
 =head1 VERSION
 
-version 0.075
+version 0.076
 
 =head1 SYNOPSIS
 
@@ -422,7 +430,7 @@ Provides structured parsing of an OpenAPI document, suitable as the base for mor
 request and response validation, code generation or form generation.
 
 The provided document must be a valid OpenAPI document, as specified by the schema identified by
-C<https://spec.openapis.org/oas/3.1/schema-base/latest> (an alias for the latest document available)
+L<https://spec.openapis.org/oas/3.1/schema-base/2024-10-25>.
 
 and the L<OpenAPI v3.1 specification|https://spec.openapis.org/oas/v3.1>.
 
@@ -447,8 +455,7 @@ schemas in the document, either manually or perhaps via a web framework plugin (
 =head2 metaschema_uri
 
 The URI of the schema that describes the OpenAPI document itself. Defaults to
-C<https://spec.openapis.org/oas/3.1/schema-base/latest> (an alias for the latest document
-available).
+L<https://spec.openapis.org/oas/3.1/schema-base/2024-10-25>.
 
 =head2 json_schema_dialect
 

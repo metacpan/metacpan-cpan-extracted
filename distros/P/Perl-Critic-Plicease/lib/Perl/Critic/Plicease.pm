@@ -5,7 +5,7 @@ use warnings;
 use 5.010001;
 
 # ABSTRACT: Some Perl::Critic policies used by Plicease
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 
 1;
@@ -22,7 +22,7 @@ Perl::Critic::Plicease - Some Perl::Critic policies used by Plicease
 
 =head1 VERSION
 
-version 0.07
+version 0.09
 
 =head1 DESCRIPTION
 
@@ -36,6 +36,14 @@ case basis.
 =item L<Plicease::ProhibitLeadingZeros|Perl::Critic::Policy::Plicease::ProhibitLeadingZeros>
 
 This is a slight remix on the prohibit leading zeros policy with some helpful exceptions.
+
+=item L<Perl::Critic::Policy::Plicease::ProhibitSignaturesAndAtUnderscore>
+
+Prohibit the use of C<@_> in subroutine using signatures
+
+=item L<Perl::Critic::Policy::Plicease::ProhibitSpecificModules>
+
+Prohibit the use of specific modules or pragmas
 
 =item L<Plicease::ProhibitUnicodeDigitInRegexp|Perl::Critic::Policy::Plicease::ProhibitUnicodeDigitInRegexp>
 
@@ -52,6 +60,8 @@ Contributors:
 Ville Skyttä (SCOP)
 
 Yoshikazu Sawa (yoshikazusawa)
+
+Christian Walde (wchristian, MITHALDU)
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -77,9 +77,36 @@ subtest custom_tree => sub {
 	is( $tref, undef, 'tree freed' );
 };
 
+subtest foldcase_tree => sub {
+	my $tree= Tree::RB::XS->new(compare_fn => CMP_FOLDCASE);
+	weaken(my $tref= $tree);
+	like( $tree, $looks_like_tree, 'is a tree obj' );
+	is( $tree->key_type, KEY_TYPE_USTR, 'key_type' );
+	is( $tree->compare_fn, CMP_FOLDCASE, 'compare_fn' );
+	undef $tree; # test destructor
+	is( $tref, undef, 'tree freed' );
+};
+
+subtest numsplit_fc_tree => sub {
+	my $tree= Tree::RB::XS->new(compare_fn => CMP_NUMSPLIT_FOLDCASE);
+	weaken(my $tref= $tree);
+	like( $tree, $looks_like_tree, 'is a tree obj' );
+	is( $tree->key_type, KEY_TYPE_USTR, 'key_type' );
+	is( $tree->compare_fn, CMP_NUMSPLIT_FOLDCASE, 'compare_fn' );
+	undef $tree; # test destructor
+	is( $tref, undef, 'tree freed' );
+};
+
 subtest type_by_name => sub {
 	my $tree= Tree::RB::XS->new(key_type => 'KEY_TYPE_BSTR');
 	is( $tree->key_type, KEY_TYPE_BSTR, 'key_type' );
+};
+
+subtest cmp_by_name => sub {
+	my $tree= Tree::RB::XS->new(compare_fn => 'CMP_NUMSPLIT_FOLDCASE');
+	is( $tree->compare_fn, CMP_NUMSPLIT_FOLDCASE, 'compare_fn' );
+	$tree= Tree::RB::XS->new(compare_fn => 'numsplit_foldcase');
+	is( $tree->compare_fn, CMP_NUMSPLIT_FOLDCASE, 'compare_fn' );
 };
 
 { package Mock::Array;
@@ -106,25 +133,22 @@ subtest initial_kv_list => sub {
 	my $tree= Tree::RB::XS->new(kv => [1..10]);
 	is( $tree->size, 5, 'added 5 nodes' );
 	$tree= Tree::RB::XS->new(kv => [1,2,1,3]);
-	is( $tree, object { call size => 1; call min => object { call value => 3; }; }, 'overwrite value' );
+	is( [ $tree->kv ], [1,3], 'overwrite value' );
 	$tree= Tree::RB::XS->new(kv => [1,2,1,3], allow_duplicates => 1);
-	is( $tree, object { call size => 2; call min => object { call value => 2; }; }, 'dup keys' );
+	is( [ $tree->kv ], [1,2,1,3], 'dup keys' );
 
 	tie my @array, 'Mock::Array';
 	$tree= Tree::RB::XS->new(kv => \@array);
-	is( $tree, object {
-		call size => 5;
-		call iter => object { call sub { [ $_[0]->next_kv(10) ] } => [ map "el_$_", 0..9 ] };
-	}, 'from tied array' );
+	is( [ $tree->kv ], [ map "el_$_", 0..9 ], 'from tied array' );
 };
 
 subtest initial_keys => sub {
 	my $tree= Tree::RB::XS->new(keys => [1..10]);
 	is( $tree->size, 10, 'added 10 nodes' );
 	$tree= Tree::RB::XS->new(keys => [1,2,1,3]);
-	is( $tree, object { call size => 3; call [nth => 1] => object { call key => 2; }; }, 'no dup keys' );
+	is( [ $tree->keys ], [1,2,3], 'no dup keys' );
 	$tree= Tree::RB::XS->new(keys => [1,2,1,3], allow_duplicates => 1);
-	is( $tree, object { call size => 4; call [nth => 1] => object { call key => 1; }; }, 'dup keys' );
+	is( [ $tree->keys ], [1,1,2,3], 'dup keys' );
 };
 
 done_testing;

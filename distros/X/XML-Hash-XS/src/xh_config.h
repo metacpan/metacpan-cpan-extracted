@@ -22,7 +22,56 @@
 #else
 #include <sys/mman.h>
 #endif
-#include <endian.h>
+
+#if defined(sun) || defined(__sun)
+#  include <sys/isa_defs.h>
+#  if defined(_LITTLE_ENDIAN)
+#    define XH_LITTLE_ENDIAN
+#  else
+#    define XH_BIG_ENDIAN
+#  endif
+#else
+#  if defined(SVR4) || defined(__SVR4)
+#    include <sys/types.h>
+#    include <sys/byteorder.h>
+#  elif defined(_AIX) || defined(__TOS_AIX__)
+#    include <sys/machine.h>
+#  elif defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__DragonFly__) \
+          || defined(__APPLE__)
+#    if defined(__NetBSD__) || defined(__OpenBSD__)
+#      include <sys/types.h>
+#    endif
+#    include <machine/endian.h>
+#  elif defined(__linux__) || defined(__CYGWIN__)
+#    include <endian.h>
+#  endif
+#  ifndef LITTLE_ENDIAN
+#    ifdef __LITTLE_ENDIAN
+#      define LITTLE_ENDIAN __LITTLE_ENDIAN
+#    else
+#      define LITTLE_ENDIAN _LITTLE_ENDIAN
+#    endif
+#  endif
+#  ifndef BIG_ENDIAN
+#    ifdef __BIG_ENDIAN
+#      define BIG_ENDIAN __BIG_ENDIAN
+#    else
+#      define BIG_ENDIAN _BIG_ENDIAN
+#    endif
+#  endif
+#  ifndef BYTE_ORDER
+#    ifdef __BYTE_ORDER
+#      define BYTE_ORDER __BYTE_ORDER
+#    else
+#      define BYTE_ORDER _BYTE_ORDER
+#    endif
+#  endif
+#  if BYTE_ORDER == LITTLE_ENDIAN
+#    define XH_LITTLE_ENDIAN
+#  else
+#    define XH_BIG_ENDIAN
+#  endif
+#endif
 
 #ifndef MUTABLE_PTR
 #if defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)

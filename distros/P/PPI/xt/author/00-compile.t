@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More 0.94;
 
-plan tests => 95;
+plan tests => 96;
 
 my @module_files = (
     'PPI.pm',
@@ -49,6 +49,7 @@ my @module_files = (
     'PPI/Structure/For.pm',
     'PPI/Structure/Given.pm',
     'PPI/Structure/List.pm',
+    'PPI/Structure/Signature.pm',
     'PPI/Structure/Subscript.pm',
     'PPI/Structure/Unknown.pm',
     'PPI/Structure/When.pm',

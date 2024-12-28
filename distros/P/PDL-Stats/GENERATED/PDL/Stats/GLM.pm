@@ -37,10 +37,6 @@ use PDL::Stats::Kmeans;
 eval { require PDL::Core; require PDL::GSL::CDF; };
 my $CDF = 1 if !$@;
 
-eval { require PDL::Slatec; };
-my $SLATEC = 1 if !$@;
-my $MATINV = $SLATEC ? \&PDL::Slatec::matinv : \&inv;
-
 my $DEV = ($^O =~ /win/i)? '/png' : '/xs';
 
 =head1 NAME
@@ -49,7 +45,7 @@ PDL::Stats::GLM -- general and generalized linear modeling methods such as ANOVA
 
 =head1 DESCRIPTION
 
-The terms FUNCTIONS and METHODS are arbitrarily used to refer to methods that are threadable and methods that are NOT threadable, respectively. FUNCTIONS except B<ols_t> support bad value. B<PDL::Slatec> strongly recommended for most METHODS, and it is required for B<logistic>.
+The terms FUNCTIONS and METHODS are arbitrarily used to refer to methods that are threadable and methods that are NOT threadable, respectively. FUNCTIONS except B<ols_t> support bad value.
 
 P-values, where appropriate, are provided if PDL::GSL::CDF is installed.
 
@@ -71,7 +67,7 @@ P-values, where appropriate, are provided if PDL::GSL::CDF is installed.
     print "$_\t$m{$_}\n" for (sort keys %m);
 
 =cut
-#line 75 "GLM.pm"
+#line 71 "GLM.pm"
 
 
 =head1 FUNCTIONS
@@ -424,9 +420,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 389 "glm.pd"
+#line 385 "glm.pd"
 
-#line 390 "glm.pd"
+#line 386 "glm.pd"
 
 # my tmp var for PDL 2.007 slice upate
 my $_tmp;
@@ -435,7 +431,7 @@ my $_tmp;
 
 =for ref
 
-Threaded version of ordinary least squares regression (B<ols>). The price of threading was losing significance tests for coefficients (but see B<r2_change>). The fitting function was shamelessly copied then modified from PDL::Fit::Linfit. Uses PDL::Slatec when possible but otherwise uses PDL::MatrixOps. Intercept is LAST of coeff if CONST => 1.
+Threaded version of ordinary least squares regression (B<ols>). The price of threading was losing significance tests for coefficients (but see B<r2_change>). The fitting function was shamelessly copied then modified from PDL::Fit::Linfit. Intercept is LAST of coeff if CONST => 1.
 
 ols_t does not handle bad values. consider B<fill_m> or B<fill_rand> if there are bad values.
 
@@ -599,7 +595,7 @@ sub _ols_common {
 
   my $Y = $ivs x $y2->dummy(0);
 
-  my $C = &$MATINV( $ivs x $ivs->xchg(0,1) ); # avoid niceslice
+  my $C = inv( $ivs x $ivs->xchg(0,1) );
 
     # Fitted coefficients vector
   my $coeff = PDL::squeeze( $C x $Y );
@@ -1748,7 +1744,7 @@ sub PDL::ols_rptd {
 
 =for ref
 
-Logistic regression with maximum likelihood estimation using PDL::Fit::LM (requires PDL::Slatec. Hence loaded with "require" in the sub instead of "use" at the beginning).
+Logistic regression with maximum likelihood estimation using PDL::Fit::LM.
 
 IVs ($x) should be pdl dims $y->nelem or $y->nelem x n_iv. Do not supply the constant vector in $x. It is included in the model and returned as LAST of coeff. Returns full model in list context and coeff in scalar context.
 
@@ -1815,7 +1811,7 @@ Usage:
 
 *logistic = \&PDL::logistic;
 sub PDL::logistic {
-  require PDL::Fit::LM;              # uses PDL::Slatec
+  require PDL::Fit::LM;
 
   my ( $self, $ivs, $opt ) = @_;
 
@@ -1947,7 +1943,7 @@ sub _logistic_no_intercept {
 
 =for ref
 
-Principal component analysis. Based on corr instead of cov (bad values are ignored pair-wise. OK when bad values are few but otherwise probably should fill_m etc before pca). Use PDL::Slatec::eigsys() if installed, otherwise use PDL::MatrixOps::eigens_sym().
+Principal component analysis. Based on corr instead of cov (bad values are ignored pair-wise. OK when bad values are few but otherwise probably should fill_m etc before pca). Uses L<PDL::MatrixOps/eigens_sym>.
 
 =for options
 
@@ -2010,15 +2006,8 @@ sub PDL::pca {
   my $var_var = $opt{CORR}? $self->corr_table : $self->cov_table;
 
     # value is axis pdl and score is var x axis
-  my ($eigval, $eigvec);
-  if ( $SLATEC ) {
-    ($eigval, $eigvec) = $var_var->PDL::Slatec::eigsys;
-  }
-  else {
-    ($eigvec, $eigval) = $var_var->eigens_sym;
-      # compatibility with PDL::Slatec::eigsys
-    $eigvec = $eigvec->inplace->transpose->sever;
-  }
+  my ($eigvec, $eigval) = $var_var->eigens_sym;
+  $eigvec = $eigvec->transpose; # compatibility with PDL::Slatec::eigsys
 
     # ind is sticky point for threading
   my $ind_sorted = $eigval->qsorti->(-1:0);
@@ -2487,7 +2476,7 @@ Copyright (C) 2009 Maggie J. Xiong <maggiexyz users.sourceforge.net>
 All rights reserved. There is no warranty. You are allowed to redistribute this software / documentation as described in the file COPYING in the PDL distribution.
 
 =cut
-#line 2491 "GLM.pm"
+#line 2480 "GLM.pm"
 
 # Exit with OK status
 

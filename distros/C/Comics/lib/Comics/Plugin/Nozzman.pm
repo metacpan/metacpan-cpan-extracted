@@ -7,10 +7,11 @@ package Comics::Plugin::Nozzman;
 
 use parent qw(Comics::Fetcher::Single);
 
-our $VERSION = "1.01";
+our $VERSION = "1.02";
 
 our $name    = "Nozzman";
 our $url     = "https://nozzman.nl/persoonlijk-werk";
+our $disabled = 1;		# Changed
 
 our $pattern =
   qr{ <div \s+ class="grid__image-wrapper"> \s*

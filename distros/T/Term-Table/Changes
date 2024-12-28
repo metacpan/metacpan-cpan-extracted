@@ -1,3 +1,7 @@
+0.024     2024-12-27 18:52:06-08:00 America/Los_Angeles
+
+    - Additional changes to t/honor_env_in_non_tty.t, and adding debugging
+
 0.023     2024-10-26 20:30:20-07:00 America/Los_Angeles
 
     - t/honor_env_in_non_tty.t requires Test2::Tools::Tiny >= 1.30297;

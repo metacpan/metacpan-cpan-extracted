@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 05-SVCB.t 1993 2024-11-07 14:06:53Z willem $	-*-perl-*-
+# $Id: 05-SVCB.t 1996 2024-12-16 13:05:08Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -14,7 +14,7 @@ exit( plan skip_all => 'unresolved AUTOLOAD regression	[perl #120694]' )
 		unless ( $] > 5.018001 )
 		or ( $] < 5.018 );
 
-plan tests => 47;
+plan tests => 48;
 
 
 my $name = 'SVCB.example';
@@ -62,8 +62,10 @@ for my $rr ( Net::DNS::RR->new(". $type") ) {
 	$rr->svcpriority(1);
 	$rr->targetname('.');
 	my $l0 = length $rr->encode;
-	$rr->key3(1234);
-	$rr->key3(undef);
+	$rr->no_default_alpn(0);
+	$rr->no_default_alpn(1);
+	isnt( length( $rr->encode ), $l0, 'insert SvcParams key' );
+	$rr->no_default_alpn(undef);
 	is( length( $rr->encode ), $l0, 'delete SvcParams key' );
 }
 

@@ -1,5 +1,10 @@
 Revision history for Perl-Version-Bumper
 
+0.181 2024-12-27 BOOK
+    - default to the latest stable when running under a dev release of perl
+    - fix some tests that were failing with perl versions below v5.20
+    - load version.pm explicitely, to compile with perl5.10.0
+
 0.175 2024-12-23 BOOK
     - properly preserve indentation when replacing a `use VERSION`
     - put the `use VERSION` line as the first statement of the

@@ -289,6 +289,7 @@ xh_parse_param(xh_opts_t *opts, xh_int_t first, I32 ax, I32 items)
                     opts->force_content = xh_param_assign_bool(v);
                     break;
                 }
+                goto error;
             case 14:
                 if (xh_str_equal14(p, 's', 'u', 'p', 'p', 'r', 'e', 's', 's', '_', 'e', 'm', 'p', 't', 'y')) {
                     if (SvOK(v)) {

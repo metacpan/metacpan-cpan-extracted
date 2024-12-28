@@ -95,7 +95,7 @@ use PPI::Node      ();
 use PPI::Exception ();
 use PPI::Singletons '%_PARENT';
 
-our $VERSION = '1.279';
+our $VERSION = '1.281';
 
 our @ISA = "PPI::Node";
 
@@ -108,6 +108,7 @@ use PPI::Structure::List        ();
 use PPI::Structure::Subscript   ();
 use PPI::Structure::Unknown     ();
 use PPI::Structure::When        ();
+use PPI::Structure::Signature   ();
 
 
 

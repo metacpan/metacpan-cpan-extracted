@@ -1,5 +1,12 @@
 Revision history for Perl-Critic-Plicease
 
+0.09      2024-12-27 16:09:09 -0700
+  - (ProhibitSignaturesAndAtUnderscore) Do not detect @_ inside nested sub (gh#10, gh#11)
+
+0.08      2024-12-27 09:48:41 -0700
+  - Documentation fixes and improvements.
+  - (ProhibitSignaturesAndAtUnderscore) More accurately detect signatures (MITHALDU++, gh#9)
+
 0.07      2024-05-29 20:01:09 -0600
   - (ProhibitUnicodeDigitInRegexp) Treat digit character class /[:digit:]/
     the same as \d (gh#7, Thanks Yoshikazu Sawa)

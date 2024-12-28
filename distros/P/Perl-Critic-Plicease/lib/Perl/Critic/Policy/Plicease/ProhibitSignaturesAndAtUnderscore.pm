@@ -7,7 +7,7 @@ use Perl::Critic::Utils qw( $SEVERITY_HIGH );
 use base qw( Perl::Critic::Policy );
 
 # ABSTRACT: Prohibit the use of @_ in subroutine using signatures
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 
 use constant DESC => 'Using @_ in a function with signatures';
@@ -51,16 +51,35 @@ sub violates {
 
     my $subs = $elem->find('PPI::Statement::Sub') || [];
     foreach my $sub (@$subs) {
-      next unless defined $sub->prototype;
-      my $symbols = $sub->find('PPI::Token::Symbol') || [];
-      foreach my $symbol (@$symbols) {
-        next unless $symbol->symbol eq '@_';
+      next unless( $PPI::Document::VERSION > 1.279 ?
+        @{$sub->find('PPI::Structure::Signature') || []} : defined $sub->prototype );
+
+      foreach my $symbol ( _recurse($sub->schildren) ) {
         push @violations, $self->violation(DESC, EXPL, $symbol);
       }
     }
   }
 
   return @violations;
+}
+
+# since PPI doesn't detect anonymous subroutines...
+# look to ignore a PPI::Token::Word with `sub` followed by sibling PPI::Structure::Block
+
+sub _recurse {
+  my @ret;
+  my(@children) = @_;
+  for my $i (0..$#children) {
+    next if $children[$i]->isa('PPI::Statement::Sub');
+    next if $i >= 1 && $children[$i]->isa('PPI::Structure::Block') && $children[$i-1]->isa('PPI::Token::Word') && $children[$i-1]->literal eq 'sub';
+
+    if($children[$i]->isa('PPI::Token::Symbol') && $children[$i]->symbol eq '@_') {
+      push @ret, $children[$i];
+    } elsif($children[$i]->can('schildren')) {
+      push @ret, _recurse($children[$i]->schildren);
+    }
+  }
+  return @ret;
 }
 
 1;
@@ -77,7 +96,7 @@ Perl::Critic::Policy::Plicease::ProhibitSignaturesAndAtUnderscore - Prohibit the
 
 =head1 VERSION
 
-version 0.07
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -100,14 +119,16 @@ None.
 This policy can be configured to recognize additional modules as enabling the signatures feature, by
 putting an entry in a .perlcriticrc file like this:
 
- [Community::Prototypes]
- signature_enablers = Plicease::ProhibitSignaturesAndAtUnderscore
+ [Plicease::ProhibitSignaturesAndAtUnderscore]
+ signature_enablers = Foo::Bar
 
 =head1 CAVEATS
 
-This module assumes that "prototypes" detected in a source file that has signatures enabled are actually
-subroutine signatures.  This is because through static analysis alone it is not possible to determine if
-a "prototype" is really a prototype and not a signature.  There thus may be false negatives/positives.
+For older versions of L<PPI> (newer version is yet unreleased as of this writing), this module assumes
+that "prototypes" detected in a source file that has signatures enabled are actually subroutine signatures.
+This is because through static analysis alone it is not possible to determine if a "prototype" is really a
+prototype and not a signature.  There thus may be false negatives/positives.  Future versions of this module
+will require a L<PPI> with better signature detection.
 
 =head1 AUTHOR
 
@@ -118,6 +139,8 @@ Contributors:
 Ville Skyttä (SCOP)
 
 Yoshikazu Sawa (yoshikazusawa)
+
+Christian Walde (wchristian, MITHALDU)
 
 =head1 COPYRIGHT AND LICENSE
 

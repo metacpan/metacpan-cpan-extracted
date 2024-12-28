@@ -3,7 +3,7 @@
 ---
     use VERSION;
     print "Hello, world!\n";
-########## remove warnings
+########## remove warnings DIE < v5.20
     use v5.20;
     use feature 'signatures';
     no warnings 'experimental::signatures';
@@ -22,7 +22,7 @@
 
     sub greeting ( $who ) { "Hello, $who!" }
     say greeting "world";
-########## rewrite prototyp
+########## rewrite prototype
     use v5.10;
     sub greeting ( $ ) { sprintf "Hello, %s!", shift }
     say greeting "world";

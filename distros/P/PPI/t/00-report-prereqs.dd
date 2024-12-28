@@ -42,14 +42,17 @@ do { my $x = {
                                       'File::Spec' => '0',
                                       'List::Util' => '1.33',
                                       'Params::Util' => '1.00',
+                                      'Safe::Isa' => '0',
                                       'Scalar::Util' => '0',
                                       'Storable' => '2.17',
                                       'Task::Weaken' => '0',
+                                      'YAML::PP' => '0',
                                       'constant' => '0',
                                       'if' => '0',
                                       'overload' => '0',
                                       'perl' => '5.006',
-                                      'strict' => '0'
+                                      'strict' => '0',
+                                      'version' => '0.77'
                                     }
                     },
        'test' => {

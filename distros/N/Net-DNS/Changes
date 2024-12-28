@@ -1,4 +1,22 @@
-$Id: Changes 1995 2024-11-08 13:20:54Z willem $                       -*-text-*-
+$Id: Changes 1999 2024-12-27 11:58:05Z willem $                       -*-text-*-
+
+
+**** 1.49 Dec 27, 2024
+
+	Add DSYNC package for Generalized Notification.
+	EDNS: Add support for ZONEVERSION option.
+
+Fix rt.cpan.org #157700
+	"Use of uninitialized value" errors when using TCP connections
+
+Fix rt.cpan.org #157669
+	Net::DNS::Nameserver: SOA not present in NODATA response
+
+Fix rt.cpan.org #157195
+	EDNS option structure does not match JSON from $packet->edns->print
+
+Fix rt.cpan.org #157043
+	User-hostile return value from SVCB key methods
 
 
 **** 1.48 Nov 8, 2024

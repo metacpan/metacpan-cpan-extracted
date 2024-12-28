@@ -27,6 +27,7 @@ do { my $x = {
                                       'Pod::Usage' => '0',
                                       'perl' => '5.010',
                                       'strict' => '0',
+                                      'version' => '0',
                                       'warnings' => '0'
                                     }
                     },

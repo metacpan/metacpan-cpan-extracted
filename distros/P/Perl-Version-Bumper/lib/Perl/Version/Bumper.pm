@@ -1,10 +1,11 @@
 use v5.10;
 
 package Perl::Version::Bumper;
-$Perl::Version::Bumper::VERSION = '0.175';
+$Perl::Version::Bumper::VERSION = '0.181';
 
 use strict;
 use warnings;
+use version;
 
 use Path::Tiny;
 use PPI::Document;
@@ -130,7 +131,7 @@ sub new {
     ;
 
     # handle the version attribute
-    my $version_arg = $args->{version} // $];
+    my $version_arg = $args->{version} // stable_version($]);
     my $version_num = version_fmt( $version_arg );
     croak "Unsupported Perl version: $version_arg (greater than $feature_version)"
       if $version_num > $feature_version;

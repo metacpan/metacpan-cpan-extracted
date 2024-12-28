@@ -25,12 +25,13 @@ resources:
   bugtracker: https://github.com/uperl/Perl-Critic-Plicease/issues
   homepage: https://metacpan.org/pod/Perl::Critic::Plicease
   repository: git://github.com/uperl/Perl-Critic-Plicease.git
-version: '0.07'
+version: '0.09'
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Ville Skyttä (SCOP)'
   - 'Yoshikazu Sawa (yoshikazusawa)'
-x_generated_by_perl: v5.38.2
+  - 'Christian Walde (wchristian, MITHALDU)'
+x_generated_by_perl: v5.40.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_use_unsafe_inc: 0

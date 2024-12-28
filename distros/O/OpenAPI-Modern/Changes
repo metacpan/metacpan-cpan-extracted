@@ -1,5 +1,9 @@
 Revision history for OpenAPI-Modern
 
+0.076     2024-12-27 22:25:32Z
+          - now supporting $refs in path-item objects (e.g. those under
+            /paths/<path template>)
+
 0.075     2024-12-22 19:51:49Z
           - now using metaschemas published for OpenAPI 3.1.1 in November 2024.
 

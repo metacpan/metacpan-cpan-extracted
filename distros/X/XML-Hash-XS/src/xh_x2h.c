@@ -104,18 +104,18 @@ xh_x2h_pass_matched_node(SV *cb, SV *val)
 
 #define NEW_STRING(s, l, f)                                             \
     (                                                                   \
-        !(f & XH_X2H_IS_NOT_BLANK) && ctx->opts.suppress_empty == XH_SUPPRESS_EMPTY_TO_UNDEF\
+        !((f) & XH_X2H_IS_NOT_BLANK) && ctx->opts.suppress_empty == XH_SUPPRESS_EMPTY_TO_UNDEF\
             ? newSV(0)                                                  \
-            : !(f & XH_X2H_IS_NOT_BLANK) && ctx->opts.suppress_empty == XH_SUPPRESS_EMPTY_TO_STRING\
+            : !((f) & XH_X2H_IS_NOT_BLANK) && ctx->opts.suppress_empty == XH_SUPPRESS_EMPTY_TO_STRING\
                 ? newSVpvn_utf8("", 0, ctx->opts.utf8)                  \
                 : newSVpvn_utf8((const char *) (s), (l), ctx->opts.utf8)\
     )
 
 #define SET_STRING(v, s, l, f)                                             \
-    if (!(f & XH_X2H_IS_NOT_BLANK) && ctx->opts.suppress_empty == XH_SUPPRESS_EMPTY_TO_UNDEF) {\
+    if (!((f) & XH_X2H_IS_NOT_BLANK) && ctx->opts.suppress_empty == XH_SUPPRESS_EMPTY_TO_UNDEF) {\
         sv_setsv((v), &PL_sv_undef);                                    \
     }                                                                   \
-    else if (!(f & XH_X2H_IS_NOT_BLANK) && ctx->opts.suppress_empty == XH_SUPPRESS_EMPTY_TO_STRING) {\
+    else if (!((f) & XH_X2H_IS_NOT_BLANK) && ctx->opts.suppress_empty == XH_SUPPRESS_EMPTY_TO_STRING) {\
         sv_setpvn((v), "", 0);                                          \
         if (ctx->opts.utf8) SvUTF8_on(v);                               \
     }                                                                   \
@@ -125,7 +125,7 @@ xh_x2h_pass_matched_node(SV *cb, SV *val)
     }
 
 #define CAT_STRING(v, s, l, f)                                          \
-    if ((f & XH_X2H_IS_NOT_BLANK) || ctx->opts.suppress_empty == XH_SUPPRESS_EMPTY_NONE) {\
+    if (((f) & XH_X2H_IS_NOT_BLANK) || ctx->opts.suppress_empty == XH_SUPPRESS_EMPTY_NONE) {\
         if ( SvOK(v) ) {                                                \
             sv_catpvn((v), (const char *) (s), (l));                    \
         }                                                               \

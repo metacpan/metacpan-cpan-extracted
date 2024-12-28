@@ -38,8 +38,7 @@
       "runtime" : {
          "recommends" : {
             "PDL::GSL" : "0",
-            "PDL::Graphics::PGPLOT" : "0",
-            "PDL::Slatec" : "0"
+            "PDL::Graphics::PGPLOT" : "0"
          },
          "requires" : {
             "PDL" : "2.073",
@@ -61,6 +60,6 @@
          "web" : "https://github.com/PDLPorters/PDL-Stats"
       }
    },
-   "version" : "0.851",
+   "version" : "0.852",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

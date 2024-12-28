@@ -10,7 +10,9 @@ use parent qw(Comics::Fetcher::Single);
 our $VERSION = "1.00";
 
 our $name    = "What the Duck";
-our $url     = "http://www.whattheduck.net/";
+our $url     = "https://www.whattheduck.net/";
+our $disabled = 1;		# stopped
+
 our $pattern =
 	    qr{ <img \s+
 		src="(?<url>https?://\d+\.media\.tumblr\.com/

@@ -352,7 +352,7 @@ YAML
 ERRORS
 };
 
-subtest 'disallowed $refs in path-items' => sub {
+subtest 'disallowed fields adjacent to $refs in path-items' => sub {
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
     metaschema_uri => 'https://spec.openapis.org/oas/3.1/schema',
@@ -373,26 +373,45 @@ YAML
 components:
   callbacks:
     my_callback0:
-      '{$request.query.queryUrl}': # note this is a path-item
+      '{$request.query.queryUrl}':
+        description: my callback
         $ref: '#/components/pathItems/path0'
+    my_callback1:
+      '{$request.query.queryUrl}':
+        summary: blah
+        parameters: []
+        $ref: '#/components/pathItems/path1'
   pathItems:
     path0:
+      description: my first path
       $ref: '#/components/pathItems/path1'
     path1:
       description: my second path
+    path2:
+      x-furble: some extra metadata
+      post: {}
+      $ref: '#/components/pathItems/path1'
 paths:
   /foo/{foo_id}:
+    description: a path
     $ref: '#/components/pathItems/path0'
+  /bar/{bar_id}:
+    servers: []
+    $ref: '#/components/pathItems/path1'
 webhooks:
   my_webhook0:
+    description: my webhook
     $ref: '#/components/pathItems/path0'
+  my_webhook1:
+    get: {}
+    $ref: '#/components/pathItems/path1'
 YAML
 
   is(document_result($doc), substr(<<'ERRORS', 0, -1), 'stringified errors');
-'/components/callbacks/my_callback0/{$request.query.queryUrl}': use of $ref in a path-item is not currently supported
-'/components/pathItems/path0': use of $ref in a path-item is not currently supported
-'/paths/~1foo~1{foo_id}': use of $ref in a path-item is not currently supported
-'/webhooks/my_webhook0': use of $ref in a path-item is not currently supported
+'/components/callbacks/my_callback1/{$request.query.queryUrl}': invalid keywords used adjacent to $ref in a path-item: parameters
+'/components/pathItems/path2': invalid keywords used adjacent to $ref in a path-item: post, x-furble
+'/paths/~1bar~1{bar_id}': invalid keywords used adjacent to $ref in a path-item: servers
+'/webhooks/my_webhook1': invalid keywords used adjacent to $ref in a path-item: get
 ERRORS
 };
 

@@ -1,5 +1,5 @@
 ---
-abstract: "It's new $module"
+abstract: "It's the database migrate plugin for Daje::Workflow"
 author:
   - 'janeskil1525 <janeskil1525@gmail.com>'
 build_requires:
@@ -26,22 +26,15 @@ no_index:
 provides:
   Daje::Workflow::Database:
     file: lib/Daje/Workflow/Database.pm
-    version: '0.03'
-  Daje::Workflow::Database::Connector:
-    file: lib/Daje/Workflow/Database/Connector.pm
-  Daje::Workflow::Database::Model::Context:
-    file: lib/Daje/Workflow/Database/Model/Context.pm
-  Daje::Workflow::Database::Model::History:
-    file: lib/Daje/Workflow/Database/Model/History.pm
-  Daje::Workflow::Database::Model::Workflow:
-    file: lib/Daje/Workflow/Database/Model/Workflow.pm
+    version: '0.05'
 requires:
+  Mojo::Base: '0'
   Mojo::Pg: '0'
-  perl: '5.008001'
+  perl: '5.40'
 resources:
   bugtracker: https://github.com/janeskil1525/Daje-Workflow-Database/issues
   homepage: https://github.com/janeskil1525/Daje-Workflow-Database
   repository: https://github.com/janeskil1525/Daje-Workflow-Database.git
-version: '0.03'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1
