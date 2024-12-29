@@ -52,7 +52,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.222';
+our $VERSION = '1.223';
 
 use Quiq::Path;
 use Quiq::LockedCounter;
@@ -117,22 +117,57 @@ sub new {
 
 =head4 Synopsis
 
-  $path = $pst->add($file);
+  $path = $pst->add($file,@opt);
+
+=head4 Arguments
+
+=over 4
+
+=item $file
+
+Pfad der Fotodatei.
+
+=back
+
+=head4 Options
+
+=over 4
+
+=item -removeName = $bool (Default: 0)
+
+Entferne den urprünglichen Dateinamen. Wenn nicht gesetzt, wird der
+ursprüngliche Dateiname (in Kleinschreibung und ohne "Sonderzeichen")
+mit "-" getrennt an den Zähler angefügt.
+
+=back
+
+=head4 Returns
+
+(String) Pfad der Datei im Speicher.
 
 =head4 Description
 
 Füge Fotodatei $file zum Speicher hinzu und liefere den Pfad der Datei
-zurück.
+im Speicher zurück.
 
 =cut
 
 # -----------------------------------------------------------------------------
 
 sub add {
-    my ($self,$file) = @_;
+    my $self = shift;
+    # @_: $file,@opt
 
     my ($dir,$cnt,$h) = $self->get(qw/dir cnt h/);
 
+    # Optionen und Argumente
+
+    my $removeName = 0;
+
+    my $argA = $self->parameters(1,1,\@_,
+        -removeName => \$removeName,
+    );
+    my $file = Quiq::Path->expandTilde(shift @$argA);
 
     my $p = Quiq::Path->new;
     my $sha1 = $p->sha1($file);
@@ -160,9 +195,15 @@ sub add {
     }
 
     my $n = $cnt->increment->count;
-    $basename =~ s/[^-_a-zA-Z0-9]/_/g;
-    my $destFile = sprintf '%s/%s/%07d-%s.jpg',$dir,$doublet? 'dup': 'pic',
-        $n,$basename;
+    my $destFile;
+    if ($removeName) {
+        $destFile = sprintf '%s/%s/%07d.jpg',$dir,$doublet? 'dup': 'pic',$n;
+    }
+    else {
+        $basename =~ s/[^-_a-zA-Z0-9]/_/g;
+        $destFile = sprintf '%s/%s/%07d-%s.jpg',$dir,$doublet? 'dup': 'pic',
+            $n,$basename;
+    }
     $p->duplicate('move',$file,$destFile);
     say $destFile;
     $h->{$sha1}++;
@@ -172,11 +213,37 @@ sub add {
 
 # -----------------------------------------------------------------------------
 
-=head3 addAllByTime() - Füge Fotodateien zum Speicher hinzu
+=head3 addAllByTime() - Füge Fotodateien zum Fotospeicher hinzu
 
 =head4 Synopsis
 
-  @paths = $pst->addAllByTime(@files);
+  @paths = $pst->addAllByTime(@files,@opt);
+
+=head4 Arguments
+
+=over 4
+
+=item $file
+
+Pfad der Fotodatei.
+
+=back
+
+=head4 Options
+
+=over 4
+
+=item -removeName = $bool (Default: 0)
+
+Entferne den urprünglichen Dateinamen. Wenn nicht gesetzt, wird der
+ursprüngliche Dateiname (in Kleinschreibung und ohne "Sonderzeichen")
+mit "-" getrennt an den Zähler angefügt.
+
+=back
+
+=head4 Returns
+
+(Array of Strings) Liste der Pfade der Dateien im Speicher.
 
 =head4 Description
 
@@ -189,14 +256,27 @@ im Speicher zurück.
 # -----------------------------------------------------------------------------
 
 sub addAllByTime {
-    my ($self,@files) = @_;
+    my $self = shift;
+    # @_: @files,@opt
 
     my $p = Quiq::Path->new;
+    
+    # Optionen und Argumente
+
+    my $removeName = 0;
+
+    my $argA = $self->parameters(0,undef,\@_,
+        -removeName => \$removeName,
+    );
+    my @files = map {$p->expandTilde($_)} @$argA;
+
+    # Führe Operation aus
+
     @files = sort {$p->mtime($a) <=> $p->mtime($b)} @files;
 
     my @paths;
     for my $file (@files) {
-        push @paths,$self->add($file);
+        push @paths,$self->add($file,-removeName=>$removeName);
     }
 
     return @paths;
@@ -206,7 +286,7 @@ sub addAllByTime {
 
 =head1 VERSION
 
-1.222
+1.223
 
 =head1 AUTHOR
 

@@ -114,6 +114,10 @@ POLICIES
 
       Don't use function prototypes
 
+    Perl::Critic::Policy::Community::SplitQuotedPattern
+
+      Quote the split() pattern argument with regex slashes
+
     Perl::Critic::Policy::Community::StrictWarnings
 
       Always use strict and warnings, or a module that imports these

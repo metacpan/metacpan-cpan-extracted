@@ -9,6 +9,7 @@ our @ISA    = qw(Exporter);
 our @EXPORT = qw(
     get_xmlsec_features
     get_openssl_features
+    get_cryptx_features
  );
 
 our @EXPORT_OK;
@@ -53,6 +54,7 @@ sub get_xmlsec_features {
                     ripemd160   => ($major >= 1 and $minor >= 3) ? 1 : 0,
                     aes_gcm     => ($major <= 1 and $minor <= 2 and $patch <= 27) ? 0 : 1,
                     lax_key_search => ($major >= 1 and $minor >= 3) ? 1 : 0,
+                    rsa_oaep    => ($major >= 1 and $minor >= 3) ? 1 : 0,
                 );
     return \%xmlsec;
 }
@@ -85,6 +87,35 @@ sub get_openssl_features {
                     ripemd160   => ($major eq '3.0' and ($minor >= 0) and ($minor <= 7)) ? 0 : 1,
                 );
     return \%openssl;
+}
+
+#########################################################################
+# get_cryptx_features
+#
+# Parameter:    none
+#
+# Returns a hash of the version and any features that are needed
+# if proper the version is installed
+#
+# Response: hash
+#
+#       %features = (
+#                   version         => '0.077',
+#                   oaem_mgf_digest => 0,
+#       );
+##########################################################################
+sub get_cryptx_features {
+
+    require CryptX;
+
+    my $version = $CryptX::VERSION;
+
+    my %cryptx = (
+                    version         => $version,
+                    oaem_mgf_digest => ($version ge '0.081') ? 1 : 0,
+                );
+
+    return \%cryptx;
 }
 
 1;

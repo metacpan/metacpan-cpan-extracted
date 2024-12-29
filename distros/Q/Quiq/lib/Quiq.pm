@@ -3,7 +3,7 @@ package Quiq;
 use strict;
 use warnings;
 
-our $VERSION = '1.222';
+our $VERSION = '1.223';
 
 =encoding utf8
 
@@ -69,6 +69,10 @@ L<Quiq::Cascm> - Schnittstelle zu CA Harvest SCM
 =item *
 
 L<Quiq::ChartJs::TimeSeries> - Erzeuge Zeitreihen-Plot auf Basis von Chart.js
+
+=item *
+
+L<Quiq::Chrome> - Operationen im Zusammenhang mit dem Chrome Browser
 
 =item *
 
@@ -944,6 +948,10 @@ L<Quiq::Trash> - Operationen auf dem Trash von XFCE
 
 =item *
 
+L<Quiq::Tree> - Operatonen auf Baumstrukturen
+
+=item *
+
 L<Quiq::TreeFormatter> - Erzeugung von Baumdarstellungen
 
 =item *
@@ -978,6 +986,10 @@ L<Quiq::Xml> - Einfache XML-Operationen
 
 L<Quiq::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
+=item *
+
+L<Quiq::Zugferd> - Generiere/Akzeptiere XML einer ZUGFeRD-Rechnung
+
 =back
 
 =head1 INSTALLATION
@@ -986,7 +998,7 @@ L<Quiq::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 VERSION
 
-1.222
+1.223
 
 =head1 AUTHOR
 

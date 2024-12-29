@@ -17,6 +17,7 @@ sub new {
         __rules__     => [],
         __optional__  => 0,
         __default__   => undef,
+        transform     => [],
     }, $class;
     return $self;
 }

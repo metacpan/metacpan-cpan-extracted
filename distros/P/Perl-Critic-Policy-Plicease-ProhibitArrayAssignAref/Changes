@@ -1,0 +1,396 @@
+Copyright 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019, 2021 Kevin Ryde
+
+This file is part of Perl-Critic-Policy-Plicease-ProhibitArrayAssignAref.
+
+Perl-Critic-Policy-Plicease-ProhibitArrayAssignAref is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 3, or (at
+your option) any later version.
+
+Perl-Critic-Policy-Plicease-ProhibitArrayAssignAref is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with Perl-Critic-Policy-Plicease-ProhibitArrayAssignAref.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
+Version 100, December 2024
+    - Forked from Perl-Critic-Pulp, previous history includes Policies
+      that were not forked.
+
+Version 99, February 2021
+    - RequireFinalSemicolon keep the "List" check for PPI 1.220
+
+Version 98, February 2021
+    - ProhibitUnknownBackslash new charnames option
+
+Version 97, October 2019
+    - RequireFinalSemicolon allow hashref in arrayref (which PPI 1.270
+      says code block), as reported by Andy Lester RT#130725
+
+Version 96, December 2017
+    - ProhibitUnknownBackslash allow for non-ascii in strings, as
+      reported by Mark Fowler RT#123922
+
+Version 95, October 2017
+    - RequireFinalSemicolon also sort{} blocks are an expression
+
+Version 94, June 2017
+    - ProhibitUnknownBackslash \N also Perl 5.16, as reported by
+      Ed Davis RT#122064
+
+Version 93, April 2017
+    - some doubtfulness in Makefile.PL meta bits
+
+Version 92, November 2016
+    - ProhibitPOSIXimport oops, don't use // operator, per paul RT#118959
+
+Version 91, November 2016
+    - RequireFinalCut allow no blank line before =cut, as reported by
+      Andy Lester RT#118722
+    - RequireLinkedURLs allow example.com
+
+Version 90, March 2015
+    - PerlMinimumVersionAndWhy actually check Modern::Perl
+    - ProhibitNullStatements beware of extra stuff after try/catch
+
+Version 89, January 2015
+    - PerlMinimumVersionAndWhy experiment Modern::Perl meaning 5.10,
+      as proposed by Ed Avis RT#100290
+    - RequireFinalSemicolon recognise try/catch of Try.pm, TryCatch.pm
+      and Syntax::Feature::Try, as proposed by Ed Avis RT#100291.
+      Various List::Util functions as expression blocks.
+    - RequireTrailingCommaAtNewline exception for single here-documents,
+      as proposed by Ed Avis RT#100292
+    - ProhibitNullStatements report null ; on try/catch, and look
+      inside try/catch/finally blocks
+
+Version 88, November 2014
+    - ConstantBeforeLt oops again, PPI incompatibility too much, must
+      do and depend on its 1.220
+
+Version 87, November 2014
+    - ConstantBeforeLt really allow for PPI
+
+Version 86, November 2014
+    - ConstantBeforeLt allow for PPI incompatible change to ->prototype()
+
+Version 85, May 2014
+    - oops forgot Pod::Escapes in PREREQ_PM, per Petr Pisar RT#95440
+
+Version 84, May 2014
+    - new Documentation::RequireFilenameMarkup
+
+Version 83, May 2014
+    - PerlMinimumVersionAndWhy new 5.10 -e -x stacked filetest per
+      Kent Fredric RT#95208
+
+Version 82, April 2014
+    - ProhibitAdjacentLinks, ProhibitLinkToSelf,
+      ProhibitParagraphTwoDots, ProhibitUnbalancedParens,
+      ProhibitVerbatimMarkup, RequireLinkedURLs check =begin blocks
+      only for POD-type ":"
+    - ProhibitBadAproposMarkup check =begin :man and :roff only
+    - ProhibitDuplicateSeeAlso ignore all =begin blocks
+
+Version 81, April 2014
+    - ProhibitAdjacentLinks fix warnings when internal and external
+      links adjacent, as reported by Mike O'Regan RT#94318
+    - ConstantPragmaHash and ConstantLeadingUnderscore pass ->content
+      to version.pm as it enquires too much into a PPI object ref,
+      per RT#92100 dmacks and ppisar
+
+Version 80, July 2013
+    - new policy Documentation::ProhibitParagraphEndComma
+    - tests UnexpandedSpecialLiteral.t don't exercise __PACKAGE__ =>
+      across newline since that might be going to change in Perl 5.20,
+      as reported by Reini Urban RT#87307
+
+Version 79, March 2013
+    - fix ProhibitFatCommaNewline load version.pm for perl 5.8, as
+      reported by paul RT#83990
+
+Version 78, March 2013
+    - new policies CodeLayout::ProhibitIfIfSameLine,
+                   CodeLayout::ProhibitFatCommaNewline
+
+Version 77, February 2013
+    - new policy Documentation::ProhibitDuplicateHeadings
+    - fix POD parse losing violations across =cut gaps
+
+Version 76, January 2013
+    - RequireNumericVersion explicit check for exponential strings "1e6" 
+
+Version 75, November 2012
+    - ProhibitEmptyCommas fix for [{%a},{}] reported by Mike O'Regan
+      RT#81390
+
+Version 74, October 2012
+    - tests RequireNumericVersion skip version.pm 1e6 uncertain quite yet
+
+Version 73, June 2012
+    - tests fix for File::Temp in perl pre-5.10
+
+Version 72, June 2012
+    - TextDomainPlaceholders fix #line regexp plain \2 for perl before 5.10
+
+Version 71, June 2012
+    - RequireLinkedURLs - skip "=begin html" etc blocks
+    - RequireFinalCut - cut not required if only =begin foo/=end foo block
+
+Version 70, May 2012
+    - new policy Documentation::RequireFinalCut
+
+Version 69, January 2012
+    - new policy ValuesAndExpressions::ProhibitDuplicateHashKeys
+    - PerlMinimumVersionAndWhy
+      - new keys @array, values @array and each @array are 5.12
+      - new eval '#line' with #line the very first thing is 5.8
+    - Perl::Critic::Pulp::Utils new elem_is_comma_operator()
+
+Version 68, January 2012
+    - RequireNumericVersion
+      - recognise fully-qualified $Foo::VERSION
+      - recognise "$VERSION = eval $VERSION" trick
+
+Version 67, December 2011
+    - RequireTrailingCommaAtNewline allow "return(123 newline );"
+
+Version 66, December 2011
+    - new policy Documentation::ProhibitDuplicateSeeAlso
+
+Version 65, September 2011
+    - PerlMinimumVersionAndWhy
+      - new UNIVERSAL.pm methods in 5.004 and 5.10
+      - new "Foo->$method" no-args without parens is 5.6 
+
+Version 64, August 2011
+    - fix ProhibitLinkToSelf warnings on no L<> display part
+
+Version 63, August 2011
+    - new policy Documentation::ProhibitLinkToSelf
+
+Version 62, July 2011
+    - Makefile.PL depends PPI 1.212 for literal()
+
+Version 61, June 2011
+    - new policies ProhibitArrayAssignAref, RequireTrailingCommaAtNewline,
+      ProhibitUnbalancedParens
+
+Version 60, May 2011
+    - PerlMinimumVersionAndWhy new 5.6 open(my $fh,...)
+
+Version 59, May 2011
+    - tests don't die on a deliberately induced version.pm warning
+
+Version 58, May 2011
+    - new policy Documentation::ProhibitParagraphTwoDots
+
+Version 57, May 2011
+    - ProhibitUnknownBackslash
+        - allow \: etc stopping interpolation
+        - \N only when "use charnames" in scope
+
+Version 56, April 2011
+    - new policy Documentation::ProhibitAdjacentLinks
+    - PerlMinimumVersionAndWhy new 5.6 syswrite() length optional
+
+Version 55, April 2011
+    - PerlMinimumVersionAndWhy add 5.8 pack() "[123]" brackets
+
+Version 54, April 2011
+    - PerlMinimumVersionAndWhy
+        - new check 5.005 for "my (undef,$x)",
+        - fix for "delete $array[0]{'key'}" is hash not array
+        - document 5.8 for "=>" across newline
+        - document 5.004 for "$coderef->()" call and "sysseek()" func
+
+Version 53, April 2011
+    - new policy Documentation::RequireLinkedURLs
+
+Version 52, April 2011
+    - new policy Compatibility::ConstantLeadingUnderscore
+    - Perl::Critic::Pulp::Utils new elem_in_BEGIN()
+
+Version 51, April 2011
+    - depend on Pod::MinimumVersion 50 for fix to =item C<< >> detection
+
+Version 50, March 2011
+    - fix Compatibility::PodMinimumVersion to use its documented
+      "above_version", as reported by Mark Gardner
+    - fix Perl::Critic::Pulp::Utils parameter_parse_version() to store
+      with __set_parameter_value(), so field "_foo" not "foo"
+
+Version 49, March 2011
+    - split Pod::MinimumVersion to its own distribution
+
+Version 48, March 2011
+    - PerlMinimumVersionAndWhy some bits now in Perl::MinimumVersion itself
+
+Version 47, February 2011
+    - fix Makefile.PL for perl 5.6
+    - UnexpandedSpecialLiteral allow fat comma after newline
+    - PerlMinimumVersionAndWhy report pragmas too
+
+Version 46, January 2011
+    - new policy ValuesAndExpressions::RequireNumericVersion
+
+Version 45, December 2010
+    - oops, tests really fix ProhibitVerbatimMarkup.t
+
+Version 44, December 2010
+    - tests fix ProhibitVerbatimMarkup.t some version number checks
+
+Version 43, September 2010
+    - test manifest only as an author test
+    - tests drop backslash of more wide chars which bomb on 5.8.x, maybe
+
+Version 42, September 2010
+    - tests avoid warnings from Pod::Parser 1.37 on empty =encoding
+    - tests and docs Perl::Critic 1.110 for annotations past __END__
+
+Version 41, July 2010
+    - TextDomainPlaceholders allow literal number for __xn() count
+
+Version 40, July 2010
+    - new policy Modules::ProhibitModuleShebang
+
+Version 39, July 2010
+    - PerlMinimumVersionAndWhy add
+	- 0b110011 binary literals new in 5.006
+    - new policy Documentation::ProhibitVerbatimMarkup
+
+Version 38, June 2010
+    - new policy CodeLayout::RequireFinalSemicolon
+
+Version 37, May 2010
+    - tests don't try wide chars in PPI input string, doesn't work in
+      5.8.6 and not sure if it's meant to
+
+Version 36, May 2010
+    - PerlMinimumVersionAndWhy add
+	- "foreach my $foo" lexical loop variable new in 5.004
+	- "$coderef->()" call new in 5.004
+
+Version 35, April 2010
+    - PerlMinimumVersionAndWhy add
+	- special __PACKAGE__ new in 5.004
+	- "use VERSION" or "use MODULE VERSION" new in 5.004
+
+Version 34, April 2010
+    - new policy ValuesAndExpressions::ProhibitBarewordDoubleColon
+    - PerlMinimumVersionAndWhy new option skip_checks
+
+Version 33, April 2010
+    - ProhibitBadAproposMarkup and Pod::MinimumVersion quietly ignore
+      POD parse errors
+
+Version 32, March 2010
+    - PerlMinimumVersionAndWhy add
+        - exists() and delete() subs and arrays new in 5.006
+        - Foo::Bar:: double-colon bareword new in 5.005
+
+Version 31, February 2010
+    - ProhibitUnknownBackslash fix for interpolated "$#array"
+
+Version 30, January 2010
+    - PerlMinimumVersionAndWhy new pack/unpack format string checks
+
+Version 29, January 2010
+    - fix dependency, P::C 1.084 for highest_explicit_perl_version()
+
+Version 28, January 2010
+    - new policy Compatibility::ProhibitUnixDevNull
+
+Version 27, December 2009
+    - ProhibitUnknownBackslash also \c control chars
+
+Version 26, December 2009
+    - new policy ValuesAndExpressions::ProhibitUnknownBackslash
+
+Version 25, December 2009
+    - new policy ValuesAndExpressions::ProhibitFiletest_f
+
+Version 24, December 2009
+    - new policy Documentation::ProhibitBadAproposMarkup
+
+Version 23, November 2009
+    - PodMinimumVersion 5.004 for =for, =begin, =end
+
+Version 22, September 2009
+    - new policy Modules::ProhibitPOSIXimport
+    - TextDomainPlaceholders -- allow non-ascii keys
+
+Version 21, August 2009
+    - PodMinimumVersion -- update the location offset hack
+
+Version 20, August 2009
+    - PerlMinimumVersionAndWhy -- add report qr//m needs 5.10
+    - fix some "use" module version cases
+    - ProhibitNullStatements -- workaround incompatible changes in PPI 1.205
+
+Version 19, June 2009
+    - new policy Compatibility::PerlMinimumVersionAndWhy
+    - new policy Compatibility::PodMinimumVersion
+
+Version 18, June 2009
+    - new policy Compatibility::Gtk2Constants
+    - TextDomainPlaceholders -- check __px() and __npx(), and try to
+      notice a missing count arg in __nx(), __xn() and __npx()
+
+Version 17, May 2009
+    - TextDomainUnused -- recognise __p() etc new in libintl-perl
+      1.17, as advised by Guido Flohr
+
+Version 16, April 2009
+    - new policy Modules::ProhibitUseQuotedVersion
+
+Version 15, March 2009
+    - new policy Miscellanea::TextDomainUnused
+
+Version 14, January 2009
+    - ConstantPragmaHash -- fix for document with no includes at all
+
+Version 13, January 2009
+    - ConstantPragmaHash -- fix location reported
+
+Version 12, January 2009
+    - new policy Compatibility::ConstantPragmaHash
+
+Version 11, December 2008
+    - oops, in the tests PPI 1.203 doesn't like an empty document
+
+Version 10, December 2008
+    - new policy Documentation::RequireEndBeforeLastPod
+
+Version 9, December 2008
+    - new policy ValuesAndExpressions::ProhibitEmptyCommas
+
+Version 8, October 2008
+    - UnexpandedSpecialLiteral -- rename from LiteralSpecialLiteral,
+      for clarity
+
+Version 7, August 2008
+    - new policy LiteralSpecialLiteral
+
+Version 6, August 2008
+    - new policy Miscellanea::TextDomainPlaceholders
+
+Version 5, July 2008
+    - new policy ValuesAndExpressions::NotWithCompare
+
+Version 4, July 2008
+    - another go at the CPAN indexing
+
+Version 3, July 2008
+    - fixes for CPAN indexing
+
+Version 2, July 2008
+    - new toplevel module Perl::Critic::Pulp
+    - ConstantBeforeLt -- depends on prototyping, not perl version
+
+Version 1, June 2008
+    - the first version, with ConstantBeforeLt and ProhibitNullStatements

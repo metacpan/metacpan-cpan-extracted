@@ -1,5 +1,5 @@
 ---
-abstract: 'Perl::Critic policies inspired by #perl on freenode IRC'
+abstract: 'Community-inspired Perl::Critic policies (DEPRECATED)'
 author:
   - 'Dan Book <dbook@cpan.org>'
 build_requires:
@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,118 +26,103 @@ no_index:
 provides:
   Perl::Critic::Freenode:
     file: lib/Perl/Critic/Freenode.pm
-    version: '0.033'
+    version: v1.0.4
   Perl::Critic::Freenode::Utils:
     file: lib/Perl/Critic/Freenode/Utils.pm
-    version: '0.033'
+    version: v1.0.4
   Perl::Critic::Policy::Freenode::AmpersandSubCalls:
     file: lib/Perl/Critic/Policy/Freenode/AmpersandSubCalls.pm
-    version: '0.033'
+    version: v1.0.4
   Perl::Critic::Policy::Freenode::ArrayAssignAref:
     file: lib/Perl/Critic/Policy/Freenode/ArrayAssignAref.pm
-    version: '0.033'
+    version: v1.0.4
   Perl::Critic::Policy::Freenode::BarewordFilehandles:
     file: lib/Perl/Critic/Policy/Freenode/BarewordFilehandles.pm
-    version: '0.033'
+    version: v1.0.4
   Perl::Critic::Policy::Freenode::ConditionalDeclarations:
     file: lib/Perl/Critic/Policy/Freenode/ConditionalDeclarations.pm
-    version: '0.033'
+    version: v1.0.4
   Perl::Critic::Policy::Freenode::ConditionalImplicitReturn:
     file: lib/Perl/Critic/Policy/Freenode/ConditionalImplicitReturn.pm
-    version: '0.033'
+    version: v1.0.4
   Perl::Critic::Policy::Freenode::DeprecatedFeatures:
     file: lib/Perl/Critic/Policy/Freenode/DeprecatedFeatures.pm
-    version: '0.033'
+    version: v1.0.4
   Perl::Critic::Policy::Freenode::DiscouragedModules:
     file: lib/Perl/Critic/Policy/Freenode/DiscouragedModules.pm
-    version: '0.033'
+    version: v1.0.4
   Perl::Critic::Policy::Freenode::DollarAB:
     file: lib/Perl/Critic/Policy/Freenode/DollarAB.pm
-    version: '0.033'
+    version: v1.0.4
   Perl::Critic::Policy::Freenode::Each:
     file: lib/Perl/Critic/Policy/Freenode/Each.pm
-    version: '0.033'
+    version: v1.0.4
   Perl::Critic::Policy::Freenode::EmptyReturn:
     file: lib/Perl/Critic/Policy/Freenode/EmptyReturn.pm
-    version: '0.033'
+    version: v1.0.4
   Perl::Critic::Policy::Freenode::IndirectObjectNotation:
     file: lib/Perl/Critic/Policy/Freenode/IndirectObjectNotation.pm
-    version: '0.033'
+    version: v1.0.4
   Perl::Critic::Policy::Freenode::LexicalForeachIterator:
     file: lib/Perl/Critic/Policy/Freenode/LexicalForeachIterator.pm
-    version: '0.033'
+    version: v1.0.4
   Perl::Critic::Policy::Freenode::LoopOnHash:
     file: lib/Perl/Critic/Policy/Freenode/LoopOnHash.pm
-    version: '0.033'
+    version: v1.0.4
   Perl::Critic::Policy::Freenode::ModPerl:
     file: lib/Perl/Critic/Policy/Freenode/ModPerl.pm
-    version: '0.033'
+    version: v1.0.4
   Perl::Critic::Policy::Freenode::MultidimensionalArrayEmulation:
     file: lib/Perl/Critic/Policy/Freenode/MultidimensionalArrayEmulation.pm
-    version: '0.033'
+    version: v1.0.4
   Perl::Critic::Policy::Freenode::OpenArgs:
     file: lib/Perl/Critic/Policy/Freenode/OpenArgs.pm
-    version: '0.033'
+    version: v1.0.4
   Perl::Critic::Policy::Freenode::OverloadOptions:
     file: lib/Perl/Critic/Policy/Freenode/OverloadOptions.pm
-    version: '0.033'
+    version: v1.0.4
   Perl::Critic::Policy::Freenode::POSIXImports:
     file: lib/Perl/Critic/Policy/Freenode/POSIXImports.pm
-    version: '0.033'
+    version: v1.0.4
   Perl::Critic::Policy::Freenode::PackageMatchesFilename:
     file: lib/Perl/Critic/Policy/Freenode/PackageMatchesFilename.pm
-    version: '0.033'
+    version: v1.0.4
   Perl::Critic::Policy::Freenode::PreferredAlternatives:
     file: lib/Perl/Critic/Policy/Freenode/PreferredAlternatives.pm
-    version: '0.033'
+    version: v1.0.4
   Perl::Critic::Policy::Freenode::Prototypes:
     file: lib/Perl/Critic/Policy/Freenode/Prototypes.pm
-    version: '0.033'
+    version: v1.0.4
   Perl::Critic::Policy::Freenode::StrictWarnings:
     file: lib/Perl/Critic/Policy/Freenode/StrictWarnings.pm
-    version: '0.033'
+    version: v1.0.4
   Perl::Critic::Policy::Freenode::Threads:
     file: lib/Perl/Critic/Policy/Freenode/Threads.pm
-    version: '0.033'
+    version: v1.0.4
   Perl::Critic::Policy::Freenode::Wantarray:
     file: lib/Perl/Critic/Policy/Freenode/Wantarray.pm
-    version: '0.033'
+    version: v1.0.4
   Perl::Critic::Policy::Freenode::WarningsSwitch:
     file: lib/Perl/Critic/Policy/Freenode/WarningsSwitch.pm
-    version: '0.033'
+    version: v1.0.4
   Perl::Critic::Policy::Freenode::WhileDiamondDefaultAssignment:
     file: lib/Perl/Critic/Policy/Freenode/WhileDiamondDefaultAssignment.pm
-    version: '0.033'
+    version: v1.0.4
 requires:
-  Carp: '0'
   Exporter: '0'
-  List::Util: '1.33'
-  PPI: '1.254'
-  Path::Tiny: '0.101'
-  Perl::Critic: '1.126'
-  Perl::Critic::Policy::Objects::ProhibitIndirectSyntax: '1.126'
-  Perl::Critic::Policy::Subroutines::ProhibitAmpersandSigils: '1.126'
-  Perl::Critic::Policy::ValuesAndExpressions::ProhibitArrayAssignAref: '90'
-  Perl::Critic::Policy::Variables::ProhibitConditionalDeclarations: '1.126'
-  Perl::Critic::Policy::Variables::ProhibitLoopOnHash: '0.005'
-  Perl::Critic::Policy::Variables::RequireLexicalLoopIterators: '1.126'
-  Scalar::Util: '0'
+  Perl::Critic::Community: v1.0.0
+  Perl::Critic::Community::Utils: v1.0.0
   parent: '0'
   perl: '5.010001'
-  version: '0'
 resources:
-  IRC: irc://chat.freenode.net/#perl
-  bugtracker: https://github.com/Grinnz/Perl-Critic-Freenode/issues
-  homepage: https://github.com/Grinnz/Perl-Critic-Freenode
-  repository: https://github.com/Grinnz/Perl-Critic-Freenode.git
-version: '0.033'
+  IRC: irc://irc.libera.chat/#perl
+  bugtracker: https://github.com/Grinnz/https://github.com/Grinnz/Perl-Critic-Community/issues
+  homepage: https://github.com/Grinnz/https://github.com/Grinnz/Perl-Critic-Community
+  repository: https://github.com/Grinnz/https://github.com/Grinnz/Perl-Critic-Community.git
+version: v1.0.4
 x_contributors:
-  - 'Dan Book <grinnz@gmail.com>'
   - 'Dan Book <grinnz@grinnz.com>'
-  - 'Graham Knop <haarg@haarg.org>'
-  - 'Ryan Voots <simcop2387@simcop2387.info>'
-  - 'Tomasz Konojacki <me@xenu.pl>'
-  - 'William Taylor <williamt@rebelfactions.com>'
-x_generated_by_perl: v5.32.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+x_deprecated: 1
+x_generated_by_perl: v5.40.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: Artistic-2.0

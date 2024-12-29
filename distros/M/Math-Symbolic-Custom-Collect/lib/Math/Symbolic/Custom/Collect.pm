@@ -15,23 +15,35 @@ Math::Symbolic::Custom::Collect - Collect up Math::Symbolic expressions
 
 =head1 VERSION
 
-Version 0.21
+Version 0.31
 
 =cut
 
-our $VERSION = '0.21';
+require Exporter;
+
+our @ISA = qw(Exporter);
+our @EXPORT = qw/symbolic_complex/;
+
+our $VERSION = '0.31';
 
 use Math::Symbolic qw(:all);
+use Math::Symbolic::Derivative qw//;
 use Math::Symbolic::Custom::Base;
 
 BEGIN {*import = \&Math::Symbolic::Custom::Base::aggregate_import}
-   
-our $Aggregate_Export = [qw/to_collected to_terms/];
+
+our $Aggregate_Export = [qw/to_collected to_terms to_derivative test_complex to_complex_conjugate/];
+Math::Symbolic::Custom::Collect->export_to_level(1, undef, 'symbolic_complex');
 
 use Carp;
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
+Provides some methods for working with Math::Symbolic expressions through the Math::Symbolic module extension class. 
+
+=head1 EXAMPLES
+
+    use strict;
     use Math::Symbolic qw(:all);
     use Math::Symbolic::Custom::Collect;
 
@@ -73,9 +85,23 @@ use Carp;
     print "Output: ", parse_from_string($t9)->to_collected()->to_string(), "\n";
     # Output: 17 - j
 
-=head1 DESCRIPTION
+    my $t10 = "(3*x - 1)^2";
+    print "Output: ", parse_from_string($t10)->to_derivative()->to_string(), "\n";
+    # Output: (18 * x) - 6
 
-Provides "to_collected()" and "to_terms()" through the Math::Symbolic module extension class. "to_collected" performs the following operations on the inputted Math::Symbolic tree:-
+    my $t11 = "u*t + (1/2)*a*t^2";
+    print "Output: ", parse_from_string($t11)->to_derivative('t')->to_string(), "\n";
+    # Output: u + (a * t)
+
+=cut
+
+# this symbol represents the solution to x^2 = -1. If for some reason 'i' is being used as a variable for a different 
+# purpose in the expression, this should be changed (e.g. to 'j'). Otherwise things will get very confusing
+our $COMPLEX_VAR = "i";  
+
+=head2 Method to_collected()
+
+'to_collected' performs the following operations on the inputted Math::Symbolic tree:-
 
 =over
 
@@ -93,38 +119,9 @@ Provides "to_collected()" and "to_terms()" through the Math::Symbolic module ext
 
 =back
 
-The result is often a more concise expression. However, because it does not (yet) factor the expression, the result is not always the simplest representation. Hence it is not offered as a simplify().
-
-"to_terms()" uses "to_collected()" and returns the expression as a list of terms, that is a list of sub-expressions that can be summed to create an expression which is (numerically) equivalent to the original expression.
-
-=head1 COMPLEX NUMBERS
-
-From version 0.2, there is some support for complex numbers. The symbol in $Math::Symbolic::Custom::Collect::COMPLEX_VAR (set to 'i' by default) is considered by the module to be the symbol for the imaginary unit and treated as such when collecting up the expression. It is a Math::Symbolic variable to permit easy conversion to Math::Complex numbers using the value() method, for example:
-
-    use strict;
-    use Math::Symbolic qw(:all);
-    use Math::Symbolic::Custom::Collect;
-    use Math::Complex;
-
-    my $t = "x+sqrt(-100)+y*i";
-    my $M_S = parse_from_string($t)->to_collected();
-    print "$M_S\n"; # ((10 * i) + x) + (i * y)
-
-    # we want some kind of actual number from this expression
-    my $M_C = $M_S->value( 
-                    'x' => 2,
-                    'y' => 3, 
-                    'i' => i,  # glue Math::Symbolic and Math::Complex 
-                    );
-
-    # $M_C is a Math::Complex number
-    print "$M_C\n"; # 2+13i
+The result is often a more concise expression. See EXAMPLES above.
 
 =cut
-
-# this symbol represents the solution to x^2 = -1. If for some reason 'i' is being used as a variable for a different 
-# purpose in the expression, this should be changed (e.g. to 'j'). Otherwise things will get very confusing
-our $COMPLEX_VAR = "i";     
 
 sub to_collected {
     my ($t1) = @_;
@@ -188,10 +185,13 @@ sub to_collected {
     }
 }
 
-#### to_terms()
-# Return an array of Math::Symbolic expressions which can be added to recreate an expression 
-# numerically equivalent to the passed expression.
-# Called in a scalar context, returns the number of terms. 
+=head2 Method to_terms()
+
+'to_terms()' uses 'to_collected()' and returns the expression as a list of terms, that is a list of sub-expressions that can be summed to create an expression which is (numerically) equivalent to the original expression.
+
+Called in a scalar context, returns the number of terms. 
+
+=cut
 
 sub to_terms {
     my ($t1) = @_;
@@ -246,6 +246,257 @@ sub to_terms {
 
     return wantarray ? @terms : scalar(@terms);
 }
+
+=head2 Method to_derivative()
+
+This is a convenience method to differentiate the inputted Math::Symbolic expression. It calls to_collected() before passing the results through to L<Math::Symbolic::Derivative>'s partial_derivative(). 
+
+Takes one parameter, the variable of differentiation. If not provided it will check if the expression and if there is only one variable it will use that.
+
+Using to_collected() on an expression before differentiating it, often yields better results (because to_collected() reformats the expression, and preparing the expression is half the battle in calculus). For example, from L<Bug #55842 - Math-Symbolic: Simplification deficiency affects Algorithm::CurveFit|https://rt.cpan.org/Public/Bug/Display.html?id=55842>:-
+
+    use strict;
+    use Math::Symbolic qw(:all);
+    use Math::Symbolic::Derivative qw(:all);
+    use Math::Symbolic::Custom::Collect;
+
+    # the expression from the bug report
+    my $f = parse_from_string('A*(x - x_0)^2 + y_0');
+
+    # try differentiating it directly, introduces a pole at x-x_0=0
+    my $f_d1 = partial_derivative($f, 'x_0');
+    print "$f_d1\n"; # A * ((2 * ((x - x_0) ^ 2)) * ((1 * (-1)) / (x - x_0)))
+
+    # try with to_derivative()
+    my $f_d2 = $f->to_derivative('x_0');
+    print "$f_d2\n"; # ((2 * A) * x_0) - ((2 * A) * x)
+    # i.e., no pole.
+
+=cut
+
+sub to_derivative {
+    my ($t1, $var) = @_;
+
+    if ( not defined $var ) {
+        my @vars = $t1->explicit_signature();
+        if ( scalar(@vars) == 1 ) {
+            $var = $vars[0];
+        }
+        else {
+            return undef;
+        }
+    }
+    
+    my $t2 = $t1->to_collected();
+    return undef unless defined $t2;
+    
+    $var = Math::Symbolic::Variable->new($var) unless ref($var) =~ /^Math::Symbolic::Variable/;
+    my $diff = Math::Symbolic::Derivative::partial_derivative( $t2, $var );
+    return $diff->to_collected();    
+}
+
+=head1 COMPLEX NUMBERS
+
+From version 0.2, there is some support for complex numbers. The symbol in C<$Math::Symbolic::Custom::Collect::COMPLEX_VAR> (set to 'i' by default) is considered by the module to be the symbol for the imaginary unit and treated as such when collecting up the expression. It is a Math::Symbolic variable to permit easy conversion to Math::Complex numbers using the value() method, for example:
+
+    use strict;
+    use Math::Symbolic qw(:all);
+    use Math::Symbolic::Custom::Collect;
+    use Math::Complex;
+
+    my $t = "x+sqrt(-100)+y*i";
+    my $M_S = parse_from_string($t)->to_collected();
+    print "$M_S\n"; # ((10 * i) + x) + (i * y)
+
+    # we want some kind of actual number from this expression
+    my $M_C = $M_S->value( 
+                    'x' => 2,
+                    'y' => 3, 
+                    'i' => i,  # glue Math::Symbolic and Math::Complex 
+                    );
+
+    # $M_C is a Math::Complex number
+    print "$M_C\n"; # 2+13i
+
+If you are not going to be using complex numbers and want the symbol C<i> available to use as a normal Math::Symbolic variable then you will have to override C<$Math::Symbolic::Custom::Collect::COMPLEX_VAR> to something else at the beginning of your program, e.g.:
+
+    use strict;
+    use Math::Symbolic qw(:all);
+    use Math::Symbolic::Custom::Collect;
+    $Math::Symbolic::Custom::Collect::COMPLEX_VAR = 'blahblahblah'; 
+    # note: remember not to use 'blahblahblah' as a Math::Symbolic variable name
+
+    my $coord = parse_from_string("5*i + 2*j + 6*k");   # 'i' is just a normal variable here
+
+It is not a good idea to change the contents of C<$Math::Symbolic::Custom::Collect::COMPLEX_VAR> mid-program, for example if you define some expressions using 'i' and then want to start using 'j', the module is not going to remember that 'i' was also intended to be the imaginary unit. Best thing is to pick something at the beginning of the program and stick to it.
+
+From version 0.3 there are some helper methods and routines for working with complex (number) expressions:-
+
+=head2 symbolic_complex()
+
+Pass in an expression for the real component and an expression for the imaginary component and symbolic_complex will return a Math::Symbolic expression with the imaginary parameter multiplied by the contents of C<$Math::Symbolic::Custom::Collect::COMPLEX_VAR>, and summed with the real parameter. For example:-
+
+    use strict;
+    use Math::Symbolic qw(:all);
+    use Math::Symbolic::Custom::Collect;
+
+    my $Re = 1;
+    my $Im = 2;
+    my $e = symbolic_complex($Re, $Im);
+    print "$e\n"; # 1 + (2 * i)
+
+    $e = symbolic_complex('exp(2)', 'sin(x)');
+    print "$e\n"; # (e ^ 2) + ((sin(x)) * i)
+    
+=cut
+
+sub symbolic_complex {
+    my ($Re, $Im) = @_;
+    
+    $Re = parse_from_string($Re) unless ref($Re) =~ /^Math::Symbolic/;
+    $Im = parse_from_string($Im) unless ref($Im) =~ /^Math::Symbolic/;    
+    
+    return Math::Symbolic::Operator->new('+', $Re, 
+            Math::Symbolic::Operator->new('*', $Im, Math::Symbolic::Variable->new($COMPLEX_VAR)));
+}
+
+=head2 Method test_complex()
+
+Returns the real and imaginary components of the expression as an array (the imaginary component has C<$Math::Symbolic::Custom::Collect::COMPLEX_VAR> removed). For example:-
+
+    use strict;
+    use Math::Symbolic qw(:all);
+    use Math::Symbolic::Custom::Collect;
+
+    my ($Re, $Im) = parse_from_string('1+i')->test_complex();
+    print "$Re\n";  # 1
+    print "$Im\n";  # 1
+
+    ($Re, $Im) = parse_from_string('x^2 + sin(x) - sqrt(-49)')->test_complex();
+    print "$Re\n";  # (x ^ 2) + (sin(x))
+    print "$Im\n";  # -7
+
+=cut
+
+sub test_complex {
+    my ($t1) = @_;
+    
+    # use to_terms() to get all the terms
+    my @terms = $t1->to_terms();
+    
+    if ( scalar(@terms) == 0 ) {    # ?? TODO: possible error in to_terms()
+        return (Math::Symbolic::Constant->new(0), Math::Symbolic::Constant->new(0));
+    }
+    
+    # check each one using explicit_signature() to see if it contains the imaginary unit
+    # put in the real or imaginary arrays @Re and @Im as appropriate
+    my @Re;
+    my @Im;
+    foreach my $term (@terms) {
+        my @vars = $term->explicit_signature();
+        my @cvar = grep { $_ eq $COMPLEX_VAR } @vars;
+        if ( scalar @cvar ) {
+            push @Im, $term;
+        }
+        else {
+            push @Re, $term;
+        }
+    }
+
+    # create an expression for the real part
+    my $ntr;    
+    if ( scalar(@Re) == 0 ) {   # no real part
+        $ntr = Math::Symbolic::Constant->new(0);
+    }
+    else {
+        # sum the @Re array
+        $ntr = shift @Re;
+        while (@Re) {
+            my $e = shift @Re;
+            $ntr = Math::Symbolic::Operator->new('+', $ntr, $e);
+        }   
+    }
+    
+    if ( scalar(@Im) == 0 ) {   # no imaginary part
+        return ($ntr, Math::Symbolic::Constant->new(0));
+    }    
+    
+    # Remove the imaginary unit from the imaginary part
+    # Sum the imaginary terms
+    my $nti = shift @Im;
+    while (@Im) {
+        my $e = shift @Im;
+        $nti = Math::Symbolic::Operator->new('+', $nti, $e);
+    }       
+
+    # run to_collected() to get useful data structures
+    my ($c, $nhr, $dhr) = $nti->to_collected();
+    
+    foreach my $hr ($nhr, $dhr) {
+        next unless defined $hr;
+    
+        # figure out the variable name in the data structure with the imaginary unit
+        my @vars = grep { $hr->{trees}{$_}{name} eq $COMPLEX_VAR } grep { /^VAR/ } keys %{$hr->{trees}};
+        next if scalar(@vars) == 0; # could not find imaginary unit # TODO: fatal error if none present at all
+        my $k = $vars[0];   # should only be one instance anyway
+    
+        my @t_keys = keys %{$hr->{terms}};
+        foreach my $kss (@t_keys) {
+            my $css = $hr->{terms}{$kss};
+            my @tkss = split(/,/, $kss);
+            my @n_ss = grep { $_ !~ /^$k/ } @tkss;  # remove imaginary unit from this term
+
+            # update the data structure
+            delete $hr->{terms}{$kss};
+            if ( scalar @n_ss ) {
+                $hr->{terms}{ join(",", @n_ss) } += $css;
+            }
+            else {
+                $hr->{terms}{constant_accumulator} += $css;
+            }
+        }
+    }
+
+    # recombine
+    my $new_n = build_summation_tree( $nhr );
+
+    if ( defined $dhr ) {
+        my $new_d = build_summation_tree( $dhr );
+        my $t3 = Math::Symbolic::Operator->new( '/', $new_n, $new_d );
+        
+        return ($ntr, $t3);
+    }
+    else {
+        return ($ntr, $new_n);
+    }
+}
+
+=head2 Method to_complex_conjugate()
+
+Returns the complex conjugate of the expression, essentially by multiplying the imaginary component by -1.
+
+    use strict;
+    use Math::Symbolic qw(:all);
+    use Math::Symbolic::Custom::Collect;
+
+    my $cc = parse_from_string('1+i')->to_complex_conjugate();
+    print "$cc\n"; # 1 - i
+
+    $cc = parse_from_string('5*x+i*sin(y+z)')->to_complex_conjugate();
+    print "$cc\n"; # (5 * x) - ((sin(y + z)) * i)
+
+=cut
+
+sub to_complex_conjugate {
+    my ($t1) = @_;
+    
+    # extract the real and imaginary parts
+    my ($Re, $Im) = $t1->test_complex();
+    # multiple the imaginary part by -1 and use it to create a new complex expression
+    my $ccj = symbolic_complex($Re, Math::Symbolic::Operator->new('*', Math::Symbolic::Constant->new(-1), $Im));
+    return $ccj->to_collected();
+}
+
 
 #### cancel_down. 
 # Checks numerator and denominator expressions for constants and variables which can cancel.
@@ -628,7 +879,7 @@ sub collect_terms {
                     }
                 }
                 if ( not defined $name ) {
-                    $name = 'CONST' . $tree_num;
+                    $name = 'CONST' . "_" . $e->{object}->{special};
                     $trees{$name} = $e->{object};
                     $tree_num++;
                 }
@@ -644,7 +895,7 @@ sub collect_terms {
                 }
             }
             if ( not defined $name ) {
-                $name = 'VAR' . $tree_num;
+                $name = 'VAR' . "_" . $e->{object}->{name};
                 $trees{$name} = $e->{object};
                 $tree_num++;
             }
@@ -691,7 +942,7 @@ sub collect_terms {
                                 }
                             }
                             if ( not defined $name ) {
-                                $name = 'CONST' . $tree_num;
+                                $name = 'CONST' . "_" . $l->{object}->{special};
                                 $trees{$name} = $l->{object};
                                 $tree_num++;
                             }                            
@@ -707,7 +958,7 @@ sub collect_terms {
                             }
                         }
                         if ( not defined $name ) {
-                            $name = 'VAR' . $tree_num;
+                            $name = 'VAR' . "_" . $l->{object}->{name};
                             $trees{$name} = $l->{object};
                             $tree_num++;
                         }
@@ -1382,6 +1633,16 @@ sub prepare {
                 $return_t = Math::Symbolic::Operator->new('^', $op1, $op2);
             }
         }
+        elsif ( ($t->type() == U_P_DERIVATIVE) || ($t->type() == U_T_DERIVATIVE) ) {
+            # pass through derivative operators, but try collect up the internal expression
+            my $op1_col = $op1->to_collected();
+            if ( defined $op1_col ) {
+                $op1 = $op1_col;
+            }
+            my $op_type = 'partial_derivative';
+            $op_type = 'total_derivative' if $t->type() == U_T_DERIVATIVE;
+            $return_t = Math::Symbolic::Operator->new($op_type, $op1, $op2);
+        }
         else {
             my $o = $t->new();
             $o->{operands}[0] = $op1;
@@ -1629,16 +1890,11 @@ sub create_product_tree {
 
 L<Math::Symbolic>
 
+L<Math::Complex>
+
 =head1 AUTHOR
 
 Matt Johnson, C<< <mjohnson at cpan.org> >>
-
-=head1 BUGS
-
-Please report any bugs or feature requests to C<bug-math-symbolic-custom-collect at rt.cpan.org>, or through
-the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Math-Symbolic-Custom-Collect>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
 
 =head1 ACKNOWLEDGEMENTS
 

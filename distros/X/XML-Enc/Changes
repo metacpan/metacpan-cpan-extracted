@@ -1,8 +1,32 @@
 Revision history for Perl extension XML::Enc.
 
+0.15 -- Sat Dec 28 09:10:40 AST 2024
+
+    [ Major change since 0.13 ]
+
+    This release fixes the MFG support for rsa-oaep.  It requires CryptX >= 0.081
+    Release 0.14-TRIAL as a production release
+
+    [Change Log]
+    - b27d8a2 Increment Repo version
+    - b129a01 v0.14
+
+0.14 -- Fri Dec 27 12:14:45 AST 2024
+
+    [ Major change since 0.13 ]
+
+    This release fixes the MFG support for rsa-oaep.  It requires CryptX >= 0.081
+
+    [Change Log]
+    - 1b63d94 Increment repo version
+    - 90d3c51 Fix CryptX version comparison for 0.081
+    - 8f03f0f Add KeyName to XML if specified
+    - 2ad0e14 Fix MGF support
+    - 0d24262 v0.13
+
 0.13 -- Tue Jul 04 18:57:34 ADT 2023
 
-    [ Major change since 0.11 ]
+    [ Major change since 0.12 ]
 
     So... 326d823 fixes an issue introduced in 0.11.  You can ignore my
     comments in the 0.11 Changes...

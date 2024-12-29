@@ -3,12 +3,10 @@ package Perl::Critic::Policy::Freenode::IndirectObjectNotation;
 use strict;
 use warnings;
 
-use Perl::Critic::Utils qw(:severities :classification :ppi);
-use parent 'Perl::Critic::Policy::Objects::ProhibitIndirectSyntax';
+use parent 'Perl::Critic::Policy::Community::IndirectObjectNotation';
 
-our $VERSION = '0.033';
+our $VERSION = 'v1.0.4';
 
-sub default_severity { $SEVERITY_HIGHEST }
 sub default_themes { 'freenode' }
 
 1;
@@ -16,27 +14,15 @@ sub default_themes { 'freenode' }
 =head1 NAME
 
 Perl::Critic::Policy::Freenode::IndirectObjectNotation - Don't call methods
-indirectly
+indirectly (DEPRECATED)
 
 =head1 DESCRIPTION
 
-Perl allows a form of method call where the method name is first, followed by
-the invocant (class or object to call the method on), then the argument list.
-This is an unfortunate legacy syntax that should no longer be used. See
-L<perlobj/"Indirect Object Syntax"> and L<indirect/"REFERENCES"> for more
-information.
+Legacy C<freenode> theme policy alias.
 
- my $obj = new My::Class @args;   # not ok
- my $obj = My::Class->new(@args); # ok
+=head1 POLICY MOVED
 
-It is difficult to detect indirect object notation by static analysis, so this
-policy only forbids the C<new> method call by default, as it is highly unlikely
-to be the name of a standard subroutine call. Consider using the L<indirect>
-pragma to cause the code to warn or die when indirect object notation is used.
-
-This policy is a subclass of the L<Perl::Critic> core policy
-L<Perl::Critic::Policy::Objects::ProhibitIndirectSyntax>, and performs the same
-function but in the C<freenode> theme.
+This policy has been moved to L<Perl::Critic::Community>.
 
 =head1 AFFILIATION
 
@@ -66,4 +52,4 @@ the terms of the Artistic License version 2.0.
 
 =head1 SEE ALSO
 
-L<Perl::Critic>, L<indirect>
+L<Perl::Critic>, L<Perl::Critic::Community>

@@ -1,25 +1,27 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::Cluster;
 
-@EXPORT_OK  = qw( PDL::PP cmean PDL::PP cmedian PDL::PP calculate_weights PDL::PP clusterdistance PDL::PP distancematrix PDL::PP getclustercentroids  getclustermean  getclustermedian PDL::PP getclustermedoids PDL::PP kcluster PDL::PP kmedoids PDL::PP treecluster PDL::PP treeclusterd PDL::PP cuttree PDL::PP somcluster PDL::PP pca PDL::PP rowdistances PDL::PP clusterdistances PDL::PP clustersizes PDL::PP clusterelements PDL::PP clusterelementmask PDL::PP clusterdistancematrix  clusterenc  clusterdec  clusteroffsets PDL::PP clusterdistancematrixenc PDL::PP clusterdistancesenc PDL::PP getclusterwsum PDL::PP attachtonearest  attachtonearestd PDL::PP checkprototypes PDL::PP checkpartitions  randomprototypes  randompartition );
-%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(cmean cmedian calculate_weights clusterdistance distancematrix getclustercentroids getclustermean getclustermedian getclustermedoids kcluster kmedoids treecluster treeclusterd cuttree somcluster pca rowdistances clusterdistances clustersizes clusterelements clusterelementmask clusterdistancematrix clusterenc clusterdec clusteroffsets clusterdistancematrixenc clusterdistancesenc getclusterwsum attachtonearest attachtonearestd checkprototypes checkpartitions randomprototypes randompartition );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
-   $PDL::Cluster::VERSION = '1.54.002';
-   @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our $VERSION = '1.54.003';
+   our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Cluster $VERSION;
 
 
 
+
+
+
+#line 14 "Cluster.pd"
 
 
 #---------------------------------------------------------------------------
@@ -155,7 +157,7 @@ PDL::Cluster - PDL interface to the C Clustering Library
                           $distFlag, $methodFlag);
 
 =cut
-
+#line 161 "Cluster.pm"
 
 
 
@@ -164,12 +166,12 @@ PDL::Cluster - PDL interface to the C Clustering Library
 
 =head1 FUNCTIONS
 
-
-
 =cut
 
 
 
+
+#line 949 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
 
@@ -186,19 +188,22 @@ Computes arithmetic mean of the vector $a().  See also PDL::Primitive::avg().
 =for bad
 
 cmean does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 196 "Cluster.pm"
 
 
 
-
-
+#line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *cmean = \&PDL::cmean;
+#line 203 "Cluster.pm"
 
 
+
+#line 949 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
 
@@ -215,19 +220,22 @@ Computes median of the vector $a().  See also PDL::Primitive::median().
 =for bad
 
 cmedian does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 228 "Cluster.pm"
 
 
 
-
-
+#line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *cmedian = \&PDL::cmedian;
+#line 235 "Cluster.pm"
 
 
+
+#line 949 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
 
@@ -257,19 +265,22 @@ where the cutoff and the exponent are specified by the user.
 =for bad
 
 calculate_weights does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 273 "Cluster.pm"
 
 
 
-
-
+#line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *calculate_weights = \&PDL::calculate_weights;
+#line 280 "Cluster.pm"
 
 
+
+#line 949 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
 
@@ -336,19 +347,22 @@ as for treecluster() "a".
 =for bad
 
 clusterdistance does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 355 "Cluster.pm"
 
 
 
-
-
+#line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *clusterdistance = \&PDL::clusterdistance;
+#line 362 "Cluster.pm"
 
 
+
+#line 949 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
 
@@ -371,19 +385,22 @@ Compute triangular distance matrix over all data points.
 =for bad
 
 distancematrix does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 393 "Cluster.pm"
 
 
 
-
-
+#line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *distancematrix = \&PDL::distancematrix;
+#line 400 "Cluster.pm"
 
 
+
+#line 949 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
 
@@ -407,19 +424,22 @@ Find cluster centroids by arithmetic mean (C<ctrMethodFlag="a">) or median over 
 =for bad
 
 getclustercentroids does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 432 "Cluster.pm"
 
 
 
-
-
+#line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *getclustercentroids = \&PDL::getclustercentroids;
+#line 439 "Cluster.pm"
 
 
+
+#line 589 "Cluster.pd"
 
 
 =pod
@@ -444,8 +464,11 @@ sub getclustermean {
   my ($data,$mask,$cids,$cdata,$cmask) = @_;
   return getclustercentroids($dat,$mask,$cids,$cdata,$cmask,'a');
 }
+#line 468 "Cluster.pm"
 
 
+
+#line 620 "Cluster.pd"
 
 
 =pod
@@ -470,8 +493,11 @@ sub getclustermedian {
   my ($data,$mask,$cids,$cdata,$cmask) = @_;
   return getclustercentroids($dat,$mask,$cids,$cdata,$cmask,'m');
 }
+#line 497 "Cluster.pm"
 
 
+
+#line 949 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
 
@@ -494,19 +520,22 @@ smallest sum of distances to the other elements.
 =for bad
 
 getclustermedoids does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 528 "Cluster.pm"
 
 
 
-
-
+#line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *getclustermedoids = \&PDL::getclustermedoids;
+#line 535 "Cluster.pm"
 
 
+
+#line 949 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
 
@@ -531,25 +560,36 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 K-Means clustering algorithm. The "ctrMethodFlag" determines how
 clusters centroids are to be computed; see getclustercentroids() for details.
 
+Because the C library code reads from the C<clusterids> if and only if
+C<npass> is 0, before writing to it, it would be inconvenient to
+set it to C<[io]>. However for efficiency reasons, as of 2.096, PDL
+will not convert it (force a read-back on the conversion) for you
+if you pass in the wrongly-typed data. This means that you should
+be careful to pass in C<long> data of the right size if you set C<npass>
+to 0.
+
 See also: kmedoids().
 
 
 =for bad
 
 kcluster does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 582 "Cluster.pm"
 
 
 
-
-
+#line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *kcluster = \&PDL::kcluster;
+#line 589 "Cluster.pm"
 
 
+
+#line 949 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
 
@@ -574,19 +614,22 @@ See also: kcluster().
 =for bad
 
 kmedoids does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 622 "Cluster.pm"
 
 
 
-
-
+#line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *kmedoids = \&PDL::kmedoids;
+#line 629 "Cluster.pm"
 
 
+
+#line 949 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
 
@@ -622,19 +665,22 @@ As for $tree(), $lnkdist() uses only (n-1) cells.
 =for bad
 
 treecluster does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 673 "Cluster.pm"
 
 
 
-
-
+#line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *treecluster = \&PDL::treecluster;
+#line 680 "Cluster.pm"
 
 
+
+#line 949 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
 
@@ -663,19 +709,22 @@ See distancematrix() and treecluster(), above.
 =for bad
 
 treeclusterd does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 717 "Cluster.pm"
 
 
 
-
-
+#line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *treeclusterd = \&PDL::treeclusterd;
+#line 724 "Cluster.pm"
 
 
+
+#line 949 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
 
@@ -696,19 +745,22 @@ Cluster selection for hierarchical clustering trees.
 =for bad
 
 cuttree does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 753 "Cluster.pm"
 
 
 
-
-
+#line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *cuttree = \&PDL::cuttree;
+#line 760 "Cluster.pm"
 
 
+
+#line 949 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
 
@@ -735,19 +787,22 @@ Self-Organizing Map clustering, does not return centroid data.
 =for bad
 
 somcluster does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 795 "Cluster.pm"
 
 
 
-
-
+#line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *somcluster = \&PDL::somcluster;
+#line 802 "Cluster.pm"
 
 
+
+#line 949 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
 
@@ -768,19 +823,22 @@ Principal Component Analysis (SVD), operates in-place on $U() and requires ($SIZ
 =for bad
 
 pca does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 831 "Cluster.pm"
 
 
 
-
-
+#line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *pca = \&PDL::pca;
+#line 838 "Cluster.pm"
 
 
+
+#line 949 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
 
@@ -812,19 +870,22 @@ See also clusterdistance(), clusterdistances(), clusterdistancematrixenc(), dist
 =for bad
 
 rowdistances does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 878 "Cluster.pm"
 
 
 
-
-
+#line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *rowdistances = \&PDL::rowdistances;
+#line 885 "Cluster.pm"
 
 
+
+#line 949 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
 
@@ -853,19 +914,22 @@ vector as for clusterdistance().  See also clusterdistancematrixenc().
 =for bad
 
 clusterdistances does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 922 "Cluster.pm"
 
 
 
-
-
+#line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *clusterdistances = \&PDL::clusterdistances;
+#line 929 "Cluster.pm"
 
 
+
+#line 949 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
 
@@ -885,15 +949,18 @@ Useful for allocating less than maximmal space for $clusterelements().
 The output piddle should never be marked BAD.
 
 =cut
+#line 953 "Cluster.pm"
 
 
 
-
-
+#line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *clustersizes = \&PDL::clustersizes;
+#line 960 "Cluster.pm"
 
 
+
+#line 949 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
 
@@ -913,19 +980,22 @@ clusterdistancematrix().
 =for bad
 
 clusterelements does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 988 "Cluster.pm"
 
 
 
-
-
+#line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *clusterelements = \&PDL::clusterelements;
+#line 995 "Cluster.pm"
 
 
+
+#line 949 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
 
@@ -944,19 +1014,22 @@ On completion, $eltmask(k,n) is a true value iff $clusterids(n)=$k.
 =for bad
 
 clusterelementmask does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 1022 "Cluster.pm"
 
 
 
-
-
+#line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *clusterelementmask = \&PDL::clusterelementmask;
+#line 1029 "Cluster.pm"
 
 
+
+#line 949 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
 
@@ -992,19 +1065,22 @@ See also clusterdistance(), clusterdistances(), clustersizes(), clusterelements(
 =for bad
 
 clusterdistancematrix does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 1073 "Cluster.pm"
 
 
 
-
-
+#line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *clusterdistancematrix = \&PDL::clusterdistancematrix;
+#line 1080 "Cluster.pm"
 
 
+
+#line 1196 "Cluster.pd"
 
 
 =pod
@@ -1062,8 +1138,11 @@ sub clusterenc {
 
   return ($clens,$cvals,$crows);
 }
+#line 1142 "Cluster.pm"
 
 
+
+#line 1262 "Cluster.pd"
 
 
 =pod
@@ -1106,8 +1185,11 @@ sub clusterdec {
 
   return $cids2;
 }
+#line 1189 "Cluster.pm"
 
 
+
+#line 1312 "Cluster.pd"
 
 
 =pod
@@ -1141,8 +1223,11 @@ sub clusteroffsets {
 
   return ($coffsets,$cvals,$crows);
 }
+#line 1227 "Cluster.pm"
 
 
+
+#line 949 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
 
@@ -1207,19 +1292,22 @@ See also clusterenc(), clusterdistancematrix().
 =for bad
 
 clusterdistancematrixenc does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 1300 "Cluster.pm"
 
 
 
-
-
+#line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *clusterdistancematrixenc = \&PDL::clusterdistancematrixenc;
+#line 1307 "Cluster.pm"
 
 
+
+#line 949 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
 
@@ -1256,19 +1344,22 @@ See also clusterenc(), clusterdistancematrixenc().
 =for bad
 
 clusterdistancesenc does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 1352 "Cluster.pm"
 
 
 
-
-
+#line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *clusterdistancesenc = \&PDL::clusterdistancesenc;
+#line 1359 "Cluster.pm"
 
 
+
+#line 949 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
 
@@ -1322,19 +1413,22 @@ singleton-row-to-cluster distances as output by clusterdistancematrix().
 =for bad
 
 getclusterwsum does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 1421 "Cluster.pm"
 
 
 
-
-
+#line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *getclusterwsum = \&PDL::getclusterwsum;
+#line 1428 "Cluster.pm"
 
 
+
+#line 949 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
 
@@ -1372,19 +1466,22 @@ See also: clusterdistancematrix(), attachtonearestd().
 =for bad
 
 attachtonearest does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 1474 "Cluster.pm"
 
 
 
-
-
+#line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *attachtonearest = \&PDL::attachtonearest;
+#line 1481 "Cluster.pm"
 
 
+
+#line 1659 "Cluster.pd"
 
 
 =pod
@@ -1422,8 +1519,11 @@ sub attachtonearestd {
 
   return wantarray ? ($cids,$dists) : $cids;
 }
+#line 1523 "Cluster.pm"
 
 
+
+#line 949 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
 
@@ -1452,19 +1552,22 @@ Requires: $n >= $k.
 =for bad
 
 checkprototypes does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 1560 "Cluster.pm"
 
 
 
-
-
+#line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *checkprototypes = \&PDL::checkprototypes;
+#line 1567 "Cluster.pm"
 
 
+
+#line 949 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
 
@@ -1494,19 +1597,22 @@ Requires: $n >= $k.
 =for bad
 
 checkpartitions does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 1605 "Cluster.pm"
 
 
 
-
-
+#line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *checkpartitions = \&PDL::checkpartitions;
+#line 1612 "Cluster.pm"
 
 
+
+#line 1813 "Cluster.pd"
 
 
 =pod
@@ -1531,8 +1637,11 @@ sub randomprototypes {
   checkprototypes($protos->inplace, $n);
   return $protos;
 }
+#line 1641 "Cluster.pm"
 
 
+
+#line 1845 "Cluster.pd"
 
 
 =pod
@@ -1560,8 +1669,11 @@ sub randompartition {
   checkpartitions($part->inplace, $k);
   return $part;
 }
+#line 1673 "Cluster.pm"
 
 
+
+#line 1884 "Cluster.pd"
 
 
 
@@ -1840,15 +1952,13 @@ perl(1), PDL(3perl), Algorithm::Cluster(3perl), cluster(1),
 L<http://bonsai.hgc.jp/~mdehoon/software/cluster/software.htm|http://bonsai.hgc.jp/~mdehoon/software/cluster/software.htm>
 
 =cut
+#line 1956 "Cluster.pm"
 
 
 
-;
 
 
 
 # Exit with OK status
 
 1;
-
-		   

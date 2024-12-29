@@ -4,7 +4,7 @@
 ## Header Administrivia
 ##======================================================================
 
-our $VERSION = '1.54.002';
+our $VERSION = '1.54.003';
 pp_setversion("'$VERSION'");
 
 use PDL::Bad; ##-- for $PDL::Bad::Status
@@ -713,6 +713,14 @@ pp_def
 '),
   Doc => ('K-Means clustering algorithm. The "ctrMethodFlag" determines how
 clusters centroids are to be computed; see getclustercentroids() for details.
+
+Because the C library code reads from the C<clusterids> if and only if
+C<npass> is 0, before writing to it, it would be inconvenient to
+set it to C<[io]>. However for efficiency reasons, as of 2.096, PDL
+will not convert it (force a read-back on the conversion) for you
+if you pass in the wrongly-typed data. This means that you should
+be careful to pass in C<long> data of the right size if you set C<npass>
+to 0.
 
 See also: kmedoids().
 '),

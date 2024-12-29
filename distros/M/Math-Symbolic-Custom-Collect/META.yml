@@ -25,5 +25,5 @@ resources:
   bugtracker: https://github.com/mjohnson108/p5-msc-collect/issues
   homepage: https://github.com/mjohnson108/
   repository: https://github.com/mjohnson108/p5-msc-collect.git
-version: '0.21'
+version: '0.31'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

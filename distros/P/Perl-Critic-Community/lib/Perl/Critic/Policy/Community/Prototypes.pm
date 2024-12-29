@@ -7,7 +7,7 @@ use Perl::Critic::Utils qw(:severities :classification :ppi);
 use parent 'Perl::Critic::Policy';
 use version;
 
-our $VERSION = 'v1.0.3';
+our $VERSION = 'v1.0.4';
 
 use constant DESC => 'Using function prototypes';
 use constant EXPL => 'Function prototypes (sub foo ($@) { ... }) will usually not do what you want. Omit the prototype, or use signatures instead.';

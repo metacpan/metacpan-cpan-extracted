@@ -24,3 +24,20 @@ use JSON;
 use List::MoreUtils;
 use Mouse;
 use Readonly;
+
+## name Allowed BadModules
+## parms { allowed_modules => 'Getopt::Std JSON' };
+## failures 0
+## cut
+
+use Getopt::Std;
+use JSON;
+
+## name Allowed BadModules failing
+## parms { allowed_modules => 'Getopt::Std JSON' };
+## failures 3
+## cut
+
+use List::MoreUtils;
+use Mouse;
+use Readonly;

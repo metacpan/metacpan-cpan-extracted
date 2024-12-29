@@ -90,6 +90,34 @@ sub test_get : Test(5) {
 
 # -----------------------------------------------------------------------------
 
+sub test_getDeep : Test(4) {
+    my $self = shift;
+
+    my $h = Quiq::Hash->new({a=>{b=>{c=>3,d=>[],e=>{}}}});
+
+    # Zugriff auf Skalaren Wert
+
+    my $val = $h->getDeep('a.b.c');
+    $self->is($val,3);
+
+    # Zugriff auf Array
+
+    $val = $h->getDeep('a.b.d');
+    $self->is(ref($val),'ARRAY');
+
+    # Zugriff auf Hash
+
+    $val = $h->getDeep('a.b.e');
+    $self->is(ref($val),'HASH');
+
+    # Zugriff auf nicht-existente Komponente
+
+    $val = eval {$h->getDeep('a.b.x')};
+    $self->like($@,qr/Non-existent access path/);
+}
+
+# -----------------------------------------------------------------------------
+
 sub test_getRef : Test(1) {
     my $self = shift;
 

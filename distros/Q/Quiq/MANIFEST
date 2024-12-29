@@ -13,6 +13,7 @@ lib/Quiq/AxisTick.pm
 lib/Quiq/Cache.pm
 lib/Quiq/Cascm.pm
 lib/Quiq/ChartJs/TimeSeries.pm
+lib/Quiq/Chrome.pm
 lib/Quiq/ClassConfig.pm
 lib/Quiq/ClassLoader.pm
 lib/Quiq/Color.pm
@@ -231,6 +232,7 @@ lib/Quiq/TimeLapse/RangeDef.pm
 lib/Quiq/TimeLapse/Sequence.pm
 lib/Quiq/Timeseries/Synchronizer.pm
 lib/Quiq/Trash.pm
+lib/Quiq/Tree.pm
 lib/Quiq/TreeFormatter.pm
 lib/Quiq/Udl.pm
 lib/Quiq/Unindent.pm
@@ -240,6 +242,12 @@ lib/Quiq/Web/Navigation.pm
 lib/Quiq/Xml.pm
 lib/Quiq/Xml/LibXml.pm
 lib/Quiq/XTerm.pm
+lib/Quiq/Zugferd.pm
+lib/Quiq/Zugferd/Factur-X_1.0.07_BASIC.xsd
+lib/Quiq/Zugferd/Factur-X_1.0.07_BASIC_urn_un_unece_uncefact_data_standard_QualifiedDataType_100.xsd
+lib/Quiq/Zugferd/Factur-X_1.0.07_BASIC_urn_un_unece_uncefact_data_standard_ReusableAggregateBusinessInformationEntity_100.xsd
+lib/Quiq/Zugferd/Factur-X_1.0.07_BASIC_urn_un_unece_uncefact_data_standard_UnqualifiedDataType_100.xsd
+lib/Quiq/Zugferd/zugferd_basic.xml
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
@@ -256,6 +264,7 @@ t/bin/Quiq/AxisTick.t
 t/bin/Quiq/Cache.t
 t/bin/Quiq/Cascm.t
 t/bin/Quiq/ChartJs/TimeSeries.t
+t/bin/Quiq/Chrome.t
 t/bin/Quiq/ClassConfig.t
 t/bin/Quiq/ClassLoader.t
 t/bin/Quiq/Color.t
@@ -474,6 +483,7 @@ t/bin/Quiq/TimeLapse/RangeDef.t
 t/bin/Quiq/TimeLapse/Sequence.t
 t/bin/Quiq/Timeseries/Synchronizer.t
 t/bin/Quiq/Trash.t
+t/bin/Quiq/Tree.t
 t/bin/Quiq/TreeFormatter.t
 t/bin/Quiq/Udl.t
 t/bin/Quiq/Unindent.t
@@ -483,6 +493,7 @@ t/bin/Quiq/Web/Navigation.t
 t/bin/Quiq/Xml.t
 t/bin/Quiq/Xml/LibXml.t
 t/bin/Quiq/XTerm.t
+t/bin/Quiq/Zugferd.t
 t/data/class/MyClass1.pm
 t/data/class/MyClass2.pm
 t/data/class/P1.pm

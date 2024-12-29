@@ -1,5 +1,9 @@
 Revision history for Perl extension Poz
 
+0.08 2024-12-29T00:15:12Z
+
+    - bugfix: an optional string array in an object invokes be crashed
+
 0.07 2024-12-24T08:26:23Z
 
     - bugfix: add enum and union as internal of Poz

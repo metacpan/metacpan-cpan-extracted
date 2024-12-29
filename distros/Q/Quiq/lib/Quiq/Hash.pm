@@ -63,7 +63,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.222';
+our $VERSION = '1.223';
 
 use Scalar::Util ();
 use Quiq::Stacktrace;
@@ -279,6 +279,67 @@ sub get {
     }
 
     return $self->{$_[0]};
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 getDeep() - Werte mit "tiefem Zugriff" abfragen
+
+=head4 Synopsis
+
+  $val = $h->getDeep($key);
+  $val = $h->getDeep($key,$sloppy);
+
+=head4 Arguments
+
+=over 4
+
+=item $key
+
+Zugriffspfad der Form "key1.key2..."
+
+=item $sloppy
+
+Wenn gesetzt, wird keine Exception geworfen, Falls der Zugriffspfad
+nicht existiert.
+
+=back
+
+=head4 Description
+
+Liefere den Wert zum angegebenen Schlüssel. Der Schlüssel ist eine
+mit Punkt (.) getrennte Kette von Einzelschlüsseln, so dass
+sich ein "tiefer Zugriff" kompakt formulieren lässt. Beispiel:
+
+  $val = $h->getDeep('invoice.header.invoiceNumber');
+
+ist dasselbe wie
+
+  $val = $h->{'invoice'}->{'header'}->{'invoiceNumber'};
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub getDeep {
+    my ($self,$key,$sloppy) = @_;
+
+    my $val = $self;
+    for (split /\./,$key) {
+        if (!exists $val->{$_}) {
+            if (!$sloppy) {
+                $self->throw(
+                    'HASH-00099: Non-existent access path',
+                    Path => $key,
+                    Component => $_,
+                );
+            }
+            return undef;
+        }
+        $val = $val->{$_};
+    }
+
+    return $val;
 }
 
 # -----------------------------------------------------------------------------
@@ -1591,7 +1652,7 @@ Das Benchmark-Programm (bench-hash):
 
 =head1 VERSION
 
-1.222
+1.223
 
 =head1 AUTHOR
 

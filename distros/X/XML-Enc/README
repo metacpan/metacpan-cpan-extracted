@@ -2,7 +2,7 @@ NAME
     XML::Enc - XML::Enc Encryption Support
 
 VERSION
-    version 0.13
+    version 0.15
 
 SYNOPSIS
         my $decrypter = XML::Enc->new(
@@ -103,6 +103,41 @@ METHODS
 
         *   mgf1sha512 <http://www.w3.org/2009/xmlenc11#mgf1sha512>
 
+    oaep_params
+        Specify the OAEPparams value to use as part of the mask generation
+        function (MGF). It is optional but can be specified for rsa-oaep and
+        rsa-oaep-mgf1p EncryptionMethods.
+
+        It is base64 encoded and stored in the XML as OAEPparams.
+
+        If specified you MAY specify the oaep_label_hash that should be
+        used. You should note that not all implementations support an
+        oaep_label_hash that differs from that of the MGF specified in the
+        xenc11:MGF element or the default MGF1 with SHA1.
+
+        The oaep_label_hash is stored in the DigestMethod child element of
+        the EncryptionMethod.
+
+    oaep_label_hash
+        Specify the Hash Algorithm to use for the rsa-oaep label as
+        specified by oaep_params.
+
+        The default is sha1. Supported algorithms are:
+
+        *   sha1 <http://www.w3.org/2000/09/xmldsig#sha1>
+
+        *   sha224 <http://www.w3.org/2001/04/xmldsig-more#sha224>
+
+        *   sha256 <http://www.w3.org/2001/04/xmlenc#sha256>
+
+        *   sha384 <http://www.w3.org/2001/04/xmldsig-more#sha384>
+
+        *   sha512 <http://www.w3.org/2001/04/xmlenc#sha512>
+
+    key_name
+        Specify a key name to add to the KeyName element. If it is not
+        specified then no KeyName element is added to the KeyInfo
+
   decrypt( ... )
     Main decryption function.
 
@@ -121,7 +156,7 @@ AUTHOR
     Timothy Legge <timlegge@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023 by TImothy Legge.
+    This software is copyright (c) 2024 by TImothy Legge.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

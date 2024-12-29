@@ -62,4 +62,16 @@ subtest 'safe_parse must handle error' => sub {
     throws_ok(sub { $object->safe_parse({}) }, qr/^Must handle error/, 'Must handle error');
 };
 
+subtest 'object contains undefined value, schema has optional string array' => sub {
+    my $object = z->object({
+        name => z->string,
+        keys => z->array(z->string)->optional,
+    });
+    my ($valid, $errors) = $object->safe_parse({
+        name => "foo",
+    });
+    is_deeply($valid, {name => "foo", keys => undef});
+    is($errors, undef);
+};
+
 done_testing;

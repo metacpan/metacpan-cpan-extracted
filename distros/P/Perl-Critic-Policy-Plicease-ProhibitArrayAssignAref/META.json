@@ -1,0 +1,85 @@
+{
+   "abstract" : "Don't assign an anonymous arrayref to an array",
+   "author" : [
+      "Kevin Ryde",
+      "Graham Ollis <plicease@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Perl-Critic-Policy-Plicease-ProhibitArrayAssignAref",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Zilla::Plugin::Author::Plicease::Core" : "0",
+            "Dist::Zilla::Plugin::Author::Plicease::Thanks" : "0",
+            "Dist::Zilla::Plugin::Author::Plicease::Upload" : "0",
+            "Dist::Zilla::Plugin::PruneFiles" : "0",
+            "Dist::Zilla::PluginBundle::Author::Plicease" : "2.79",
+            "Software::License::GPL_3" : "0"
+         },
+         "requires" : {
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0.07",
+            "Test::More" : "0.98",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0",
+            "Test::Strict" : "0",
+            "YAML" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Perl::Critic::Policy" : "0",
+            "Perl::Critic::Utils" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Perl::Critic" : "0",
+            "Test::More" : "0.98",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/uperl/Perl-Critic-Policy-Plicease-ProhibitArrayAssignAref/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/Perl::Critic::Policy::Plicease::ProhibitArrayAssignAref",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/uperl/Perl-Critic-Policy-Plicease-ProhibitArrayAssignAref.git",
+         "web" : "https://github.com/uperl/Perl-Critic-Policy-Plicease-ProhibitArrayAssignAref"
+      }
+   },
+   "version" : "100.00",
+   "x_contributors" : [
+      "Kevin Ryde",
+      "Graham Ollis <plicease@cpan.org>"
+   ],
+   "x_generated_by_perl" : "v5.40.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_spdx_expression" : "GPL-3.0-only",
+   "x_use_unsafe_inc" : 0
+}
+

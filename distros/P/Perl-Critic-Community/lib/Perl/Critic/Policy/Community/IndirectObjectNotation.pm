@@ -6,7 +6,7 @@ use warnings;
 use Perl::Critic::Utils qw(:severities :classification :ppi);
 use parent 'Perl::Critic::Policy::Objects::ProhibitIndirectSyntax';
 
-our $VERSION = 'v1.0.3';
+our $VERSION = 'v1.0.4';
 
 sub default_severity { $SEVERITY_HIGHEST }
 sub default_themes { 'community' }
@@ -33,6 +33,10 @@ It is difficult to detect indirect object notation by static analysis, so this
 policy only forbids the C<new> method call by default, as it is highly unlikely
 to be the name of a standard subroutine call. Consider using the L<indirect>
 pragma to cause the code to warn or die when indirect object notation is used.
+
+On Perl 5.32 or newer (or automatically with C<use v5.36> or newer),
+L<feature/"The 'indirect' feature"> can be disabled to prevent the parser from
+interpreting syntax as indirect object notation.
 
 This policy is a subclass of the L<Perl::Critic> core policy
 L<Perl::Critic::Policy::Objects::ProhibitIndirectSyntax>, and performs the same

@@ -1,0 +1,28 @@
+---
+abstract: 'Retry requests on failure'
+author:
+  - 'Christian Segundo <ssmn@cpan.org>'
+build_requires:
+  Mojolicious: '9.29'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojo-UserAgent-Role-Retry
+requires:
+  Class::Method::Modifiers: '2.15'
+  HTTP::Date: '6.06'
+  Mojolicious: '9.29'
+  Role::Tiny: '2.002004'
+resources:
+  bugtracker: https://github.com/someone-stole-my-name/perl-mojo-ua-retry/issues
+  repository: git://github.com/someone-stole-my-name/perl-mojo-ua-retry.git
+version: '0.002'
+x_generated_by_perl: v5.40.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

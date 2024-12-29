@@ -21,12 +21,13 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.222';
+our $VERSION = '1.223';
 
 use Quiq::Option;
 use Quiq::FileHandle;
 use Time::HiRes ();
 use Term::ANSIColor ();
+use Quiq::Exit;
 
 # -----------------------------------------------------------------------------
 
@@ -342,9 +343,71 @@ sub ansiEsc {
 
 # -----------------------------------------------------------------------------
 
+=head3 width() - Liefere die Breite des Terminals
+
+=head4 Synopsis
+
+  $width = $this->width;
+
+=head4 Returns
+
+Integer
+
+=head4 Description
+
+Ermittele die Anzahl der Spalten des Terminals und liefere diese zurück.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub width {
+    my $this = shift;
+
+    my $cmd = 'tput cols';
+    my $width = `$cmd`;
+    Quiq::Exit->check($?,$cmd);
+    chomp $width;
+
+    return $width;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 height() - Liefere die Höhe des Terminals
+
+=head4 Synopsis
+
+  $height = $this->height;
+
+=head4 Returns
+
+Integer
+
+=head4 Description
+
+Ermittele die Anzahl der Zeilen des Terminals und liefere diese zurück.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub height {
+    my $this = shift;
+
+    my $cmd = 'tput lines';
+    my $height = `$cmd`;
+    Quiq::Exit->check($?,$cmd);
+    chomp $height;
+
+    return $height;
+}
+
+# -----------------------------------------------------------------------------
+
 =head1 VERSION
 
-1.222
+1.223
 
 =head1 AUTHOR
 

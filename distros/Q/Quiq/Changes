@@ -1,3 +1,32 @@
+1.223 2024-12-28
+================
+
+[Quiq::Chrome]
+* Klasse hinzugefügt
+
+[Quiq::Debug]
+* showDiff(): Methode hinzugefügt
+
+[Quiq::Hash]
+* getDeep(): Methode hinzugefügt
+
+[Quiq::PhotoStorage]
+* add(): Option -removeName hinzugefügt
+* addAllByTime(): Option -removeName hinzugefügt
+
+[Quiq::Template]
+* removePlaceholders(): Methode hinzugefügt
+
+[Quiq::Terminal]
+* width(): Methode hinzugefügt
+* height(): Methode hinzugefügt
+
+[Quiq::Tree]
+* Klasse hinzugefügt
+
+[Quiq::Zugferd]
+* Klasse hinzugefügt
+
 1.222 2024-11-16
 ================
 

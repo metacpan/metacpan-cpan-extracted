@@ -22,7 +22,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.222';
+our $VERSION = '1.223';
 
 use Quiq::Hash;
 use Scalar::Util ();
@@ -513,7 +513,7 @@ sub extractMulti {
 
 =head1 VERSION
 
-1.222
+1.223
 
 =head1 AUTHOR
 

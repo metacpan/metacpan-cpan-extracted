@@ -56,7 +56,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.222';
+our $VERSION = '1.223';
 
 use Quiq::Path;
 use Quiq::Option;
@@ -585,10 +585,45 @@ sub value {
     }
     else {
         # Stringreferenz: Wir liefern den Wert unverändert
-        return $$arg
+        return $$arg;
     }
 
     $self->throw;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 removePlaceholders() - Entferne unaufgelöste Platzhalter
+
+=head4 Synopsis
+
+  $tpl->removePlaceholders;
+
+=head4 Description
+
+Entferne alle Attribute und Tags, die unaufgelöste Platzhalter der
+Form "__...__" enthalten.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub removePlaceholders {
+    my $self = shift;
+
+    # Kopie, auf der wir ersetzen
+    my $str = $self->{'string'};
+
+    # Entferne Attribute mit unaufgelösten Platzhaltern
+    $str =~ s/\s\w+="__.*?__"//g;
+
+    # Entferne Tags mit unaufgelösten Platzhaltern
+    $str =~ s|(^\s*)?<.*?>__.*?__</.*?>(\s*\n)?||gm;
+
+    # Inhalt wieder herstellen
+    $self->{'string'} = $str;
+
+    return;
 }
 
 # -----------------------------------------------------------------------------
@@ -883,7 +918,7 @@ sub asStringNL {
 
 =head1 VERSION
 
-1.222
+1.223
 
 =head1 AUTHOR
 

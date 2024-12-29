@@ -22,7 +22,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.222';
+our $VERSION = '1.223';
 
 use Encode::Guess ();
 use Encode ();
@@ -853,7 +853,7 @@ sub wrap {
 
 =head1 VERSION
 
-1.222
+1.223
 
 =head1 AUTHOR
 

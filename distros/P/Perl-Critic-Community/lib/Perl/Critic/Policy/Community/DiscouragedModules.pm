@@ -6,7 +6,7 @@ use warnings;
 use Perl::Critic::Utils qw(:severities :classification :ppi);
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = 'v1.0.3';
+our $VERSION = 'v1.0.4';
 
 sub supported_parameters {
 	(
@@ -34,7 +34,7 @@ my %modules = (
 	'IO::Socket::INET6' => 'IO::Socket::INET6 is an old attempt at an IPv6 compatible version of IO::Socket::INET, but has numerous issues and is discouraged by the maintainer in favor of IO::Socket::IP, which transparently creates IPv4 and IPv6 sockets.',
 	'IP::World' => 'IP::World is deprecated as its databases are in one case discontinued, in the other no longer updated. Therefore its accuracy is ever-decreasing. Try GeoIP2 instead.',
 	'JSON::Any' => 'JSON::Any is deprecated. Use JSON::MaybeXS instead.',
-	'JSON::XS' => 'JSON::XS\'s author refuses to use public bugtracking and actively breaks interoperability. Cpanel::JSON::XS is a fork with several bugfixes and a more collaborative maintainer. See also JSON::MaybeXS.',
+	'JSON::XS' => 'JSON::XS\'s author refuses to use public bugtracking and actively breaks interoperability. Cpanel::JSON::XS is a fork with several bugfixes and a more collaborative maintainer. See also JSON::MaybeXS. Note that JSON (the distribution) uses JSON::XS by default when installed.',
 	'Net::IRC' => 'Net::IRC is an ancient module implementing the IRC protocol. Use a modern event-loop-based module instead. Choices are POE::Component::IRC (and Bot::BasicBot based on that), Net::Async::IRC, and Mojo::IRC.',
 	'Switch' => 'Switch.pm is a buggy and outdated source filter which can cause any number of strange errors, in addition to the problems with smart-matching shared by its replacement, the \'switch\' feature (given/when). Try Switch::Plain or Syntax::Keyword::Match instead.',
 	'XML::Simple' => 'XML::Simple tries to coerce complex XML documents into perl data structures. This leads to overcomplicated structures and unexpected behavior. Use a proper DOM parser instead like XML::LibXML, XML::TreeBuilder, XML::Twig, or Mojo::DOM.',
@@ -152,7 +152,8 @@ L<JSON::Any> is deprecated. Use L<JSON::MaybeXS> instead.
 
 L<JSON::XS>'s author refuses to use public bugtracking and actively breaks
 interoperability. L<Cpanel::JSON::XS> is a fork with several bugfixes and a
-more collaborative maintainer. See also L<JSON::MaybeXS>.
+more collaborative maintainer. See also L<JSON::MaybeXS>. Note that L<JSON>
+(the distribution) uses L<JSON::XS> by default when installed.
 
 =head2 Net::IRC
 

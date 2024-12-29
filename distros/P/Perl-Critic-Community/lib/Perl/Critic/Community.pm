@@ -3,7 +3,7 @@ package Perl::Critic::Community;
 use strict;
 use warnings;
 
-our $VERSION = 'v1.0.3';
+our $VERSION = 'v1.0.4';
 
 1;
 
@@ -123,6 +123,10 @@ Various modules with preferred alternatives
 =item L<Perl::Critic::Policy::Community::Prototypes>
 
 Don't use function prototypes
+
+=item L<Perl::Critic::Policy::Community::SplitQuotedPattern>
+
+Quote the split() pattern argument with regex slashes
 
 =item L<Perl::Critic::Policy::Community::StrictWarnings>
 

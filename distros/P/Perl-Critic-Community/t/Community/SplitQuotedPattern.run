@@ -1,0 +1,59 @@
+## name SplitStrings
+## failures 4
+## cut
+
+split 'foo', $bar;
+split "foo", $bar;
+split q{foo}, $bar;
+split qq{foo}, $bar;
+
+## name SplitSpace
+## failures 0
+## cut
+
+split ' ', $bar;
+split " ", $bar;
+split q{ }, $bar;
+split qq{ }, $bar;
+
+## name SplitRegex
+## failures 0
+## cut
+
+split /foo/, $bar;
+split m/foo/, $bar;
+split qr/foo/, $bar;
+split /./, $bar;
+split / /, $bar;
+split //, $bar;
+
+## name SplitEmpty
+## failures 0
+## cut
+
+split '', $bar;
+split "", $bar;
+split q{}, $bar;
+split qq{}, $bar;
+split //, $bar;
+split m//, $bar;
+split qr//, $bar;
+
+## name SplitUnquoted
+## failures 4
+## cut
+
+split $foo, $bar;
+split foo, $bar;
+split 42, $bar;
+split @args;
+
+## name SplitUnquotedAllowed
+## parms { allow_unquoted_patterns => '1' }
+## failures 0
+## cut
+
+split $foo, $bar;
+split foo, $bar;
+split 42, $bar;
+split @args;

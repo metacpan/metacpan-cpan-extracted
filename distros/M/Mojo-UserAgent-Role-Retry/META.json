@@ -1,0 +1,53 @@
+{
+   "abstract" : "Retry requests on failure",
+   "author" : [
+      "Christian Segundo <ssmn@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mojo-UserAgent-Role-Retry",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Method::Modifiers" : "2.15",
+            "HTTP::Date" : "6.06",
+            "Mojolicious" : "9.29",
+            "Role::Tiny" : "2.002004"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Mojolicious" : "9.29",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/someone-stole-my-name/perl-mojo-ua-retry/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/someone-stole-my-name/perl-mojo-ua-retry.git",
+         "web" : "http://github.com/someone-stole-my-name/perl-mojo-ua-retry"
+      }
+   },
+   "version" : "0.002",
+   "x_generated_by_perl" : "v5.40.0",
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

@@ -77,6 +77,42 @@ use warnings;
 use 5.10.1;
 use warnings;
 
+## name VersionWarnings1
+## failures 0
+## cut
+
+use 5.036;
+
+## name VersionWarnings2
+## failures 0
+## cut
+
+use v5.36;
+
+## name VersionWarnings3
+## failures 0
+## cut
+
+use 5.36.0;
+
+## name VersionWarnings4
+## failures 1
+## cut
+
+use 5.034001;
+
+## name VersionWarnings5
+## failures 1
+## cut
+
+use v5.34;
+
+## name VersionWarnings6
+## failures 1
+## cut
+
+use 5.34.1;
+
 ## name CustomImporter
 ## failures 0
 ## parms { extra_importers => 'MyApp::Base' }

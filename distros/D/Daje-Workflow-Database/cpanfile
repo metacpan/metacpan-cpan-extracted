@@ -1,4 +1,4 @@
-requires 'perl', '5.40';
+requires 'perl', '5.008001';
 requires 'Mojo::Pg', '0';
 requires 'Mojo::Base', '0';
 

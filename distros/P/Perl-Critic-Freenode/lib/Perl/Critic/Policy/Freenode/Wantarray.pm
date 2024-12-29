@@ -3,52 +3,26 @@ package Perl::Critic::Policy::Freenode::Wantarray;
 use strict;
 use warnings;
 
-use Perl::Critic::Utils qw(:severities :classification :ppi);
-use parent 'Perl::Critic::Policy';
+use parent 'Perl::Critic::Policy::Community::Wantarray';
 
-our $VERSION = '0.033';
+our $VERSION = 'v1.0.4';
 
-use constant DESC => 'wantarray() called';
-use constant EXPL => 'Context-sensitive functions lead to unexpected errors or vulnerabilities. Functions should explicitly return either a list or a scalar value.';
-
-sub supported_parameters { () }
-sub default_severity { $SEVERITY_LOW }
 sub default_themes { 'freenode' }
-sub applies_to { 'PPI::Token::Word' }
-
-sub violates {
-	my ($self, $elem) = @_;
-	return () unless (($elem eq 'wantarray' or $elem->literal eq 'CORE::wantarray') and is_function_call $elem);
-	return $self->violation(DESC, EXPL, $elem);
-}
 
 1;
 
 =head1 NAME
 
 Perl::Critic::Policy::Freenode::Wantarray - Don't write context-sensitive
-functions using wantarray
+functions using wantarray (DEPRECATED)
 
 =head1 DESCRIPTION
 
-Context-sensitive functions, while one way to write functions that DWIM (Do
-What I Mean), tend to instead lead to unexpected behavior when the function is
-accidentally used in a different context, especially if the function's behavior
-changes significantly based on context. This also can lead to vulnerabilities
-when a function is intended to be used as a scalar, but is used in a list, such
-as a hash constructor or function parameter list. Instead, functions should be
-explicitly documented to return either a scalar value or a list, so there is no
-potential for confusion or vulnerability.
+Legacy C<freenode> theme policy alias.
 
-  return wantarray ? ('a','b','c') : 3; # not ok
-  return CORE::wantarray ? ('a', 'b', 'c') : 3; # not ok
-  return ('a','b','c');                 # ok
-  return 3;                             # ok
+=head1 POLICY MOVED
 
-  sub get_stuff {
-    return wantarray ? @things : \@things;
-  }
-  my $stuff = Stuff->new(stuff => get_stuff()); # oops! function will return a list!
+This policy has been moved to L<Perl::Critic::Community>.
 
 =head1 AFFILIATION
 
@@ -71,4 +45,4 @@ the terms of the Artistic License version 2.0.
 
 =head1 SEE ALSO
 
-L<Perl::Critic>
+L<Perl::Critic>, L<Perl::Critic::Community>

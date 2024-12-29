@@ -1,4 +1,5 @@
 Changes
+examples/Newton-Raphson.pl
 ignore.txt
 lib/Math/Symbolic/Custom/Collect.pm
 Makefile.PL
@@ -7,6 +8,7 @@ README
 README.md
 t/00-load.t
 t/01-to_collected-to_terms.t
+t/02-complex.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

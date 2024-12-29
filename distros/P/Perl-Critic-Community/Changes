@@ -1,3 +1,9 @@
+v1.0.4    2024-12-28 17:32:08 EST
+  - Add SplitQuotedPattern policy
+  - Mention 'indirect' and 'multidimensional' features in the appropriate documentation
+  - Replace dependency on Perl::Critic::Pulp with Plicease::ProhibitArrayAssignAref (plicease #55)
+  - Remove Freenode legacy aliases from new versions of the distribution as they will no longer be updated
+
 v1.0.3    2022-07-24 02:27:25 EDT
   - Allow use v5.36+ to satisfy StrictWarnings policy (marlencrabapple #50)
   - Recognize use v5.36+ in the Prototypes policy as an indication that signatures are enabled

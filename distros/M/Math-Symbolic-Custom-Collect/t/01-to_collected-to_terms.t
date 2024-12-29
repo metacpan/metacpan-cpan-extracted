@@ -104,6 +104,8 @@ my %const_expr = (
 	'cos(5/1)' => 0.283662185463226,
 	'-cos(7/4)' => 0.178246055649492,
 	'cos(7/4)' => -0.178246055649492,
+    	'sqrt(4)*sqrt(9)' => 6,
+    	'sqrt(-4)*sqrt(-9)' => -6,
 );
 
 TEST_CONSTANTS: while ( my ($test, $ans) = each %const_expr ) {

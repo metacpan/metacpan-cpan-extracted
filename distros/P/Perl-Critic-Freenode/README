@@ -1,7 +1,7 @@
 NAME
 
-    Perl::Critic::Freenode - Perl::Critic policies inspired by #perl on
-    freenode IRC
+    Perl::Critic::Freenode - Community-inspired Perl::Critic policies
+    (DEPRECATED)
 
 SYNOPSIS
 
@@ -14,11 +14,9 @@ SYNOPSIS
 
 DESCRIPTION
 
-    A set of Perl::Critic policies to enforce the practices generally
-    recommended by the denizens of #perl on Freenode IRC
-    <https://freenode.net/>. Because this policy "theme" is designed to be
-    used with zero configuration on the command line, some duplication will
-    occur if it is used in combination with core Perl::Critic policies.
+    Legacy alias for the Perl::Critic::Community policy set. Contains all
+    of the same policies but under the Freenode:: policy namespace and
+    freenode theme.
 
 AFFILIATION
 
@@ -26,113 +24,6 @@ AFFILIATION
     for this distribution and acts as a means of pulling other modules into
     a bundle. All of the Policy modules contained herein will have an
     "AFFILIATION" section announcing their participation in this grouping.
-
-POLICIES
-
-    Perl::Critic::Policy::Freenode::AmpersandSubCalls
-
-      Don't use & to call subroutines
-
-    Perl::Critic::Policy::Freenode::ArrayAssignAref
-
-      Don't assign an anonymous arrayref to an array
-
-    Perl::Critic::Policy::Freenode::BarewordFilehandles
-
-      Don't use bareword filehandles other than built-ins
-
-    Perl::Critic::Policy::Freenode::ConditionalDeclarations
-
-      Don't declare variables conditionally
-
-    Perl::Critic::Policy::Freenode::ConditionalImplicitReturn
-
-      Don't end a subroutine with a conditional block
-
-    Perl::Critic::Policy::Freenode::DeprecatedFeatures
-
-      Avoid features that have been deprecated or removed from Perl
-
-    Perl::Critic::Policy::Freenode::DiscouragedModules
-
-      Various modules discouraged from use
-
-    Perl::Critic::Policy::Freenode::DollarAB
-
-      Don't use $a or $b as variable names outside sort()
-
-    Perl::Critic::Policy::Freenode::Each
-
-      Don't use each() to iterate through a hash
-
-    Perl::Critic::Policy::Freenode::EmptyReturn
-
-      Don't use return with no arguments
-
-    Perl::Critic::Policy::Freenode::IndirectObjectNotation
-
-      Don't call methods indirectly
-
-    Perl::Critic::Policy::Freenode::LexicalForeachIterator
-
-      Don't use undeclared foreach loop iterators
-
-    Perl::Critic::Policy::Freenode::LoopOnHash
-
-      Don't loop over hashes
-
-    Perl::Critic::Policy::Freenode::ModPerl
-
-      Don't use mod_perl to write web applications
-
-    Perl::Critic::Policy::Freenode::MultidimensionalArrayEmulation
-
-      Don't use multidimensional array emulation
-
-    Perl::Critic::Policy::Freenode::OpenArgs
-
-      Always use the three-argument form of open()
-
-    Perl::Critic::Policy::Freenode::OverloadOptions
-
-      Don't use overload without specifying a bool overload and enabling
-      fallback
-
-    Perl::Critic::Policy::Freenode::PackageMatchesFilename
-
-      Module files should declare a package matching the filename
-
-    Perl::Critic::Policy::Freenode::POSIXImports
-
-      Don't use POSIX without specifying an import list
-
-    Perl::Critic::Policy::Freenode::PreferredAlternatives
-
-      Various modules with preferred alternatives
-
-    Perl::Critic::Policy::Freenode::Prototypes
-
-      Don't use function prototypes
-
-    Perl::Critic::Policy::Freenode::StrictWarnings
-
-      Always use strict and warnings, or a module that imports these
-
-    Perl::Critic::Policy::Freenode::Threads
-
-      Interpreter-based threads are officially discouraged
-
-    Perl::Critic::Policy::Freenode::Wantarray
-
-      Don't write context-sensitive functions using wantarray()
-
-    Perl::Critic::Policy::Freenode::WarningsSwitch
-
-      Scripts should not use the -w switch on the shebang line
-
-    Perl::Critic::Policy::Freenode::WhileDiamondDefaultAssignment
-
-      Don't use while with implicit assignment to $_
 
 CONFIGURATION AND ENVIRONMENT
 
@@ -164,5 +55,5 @@ COPYRIGHT AND LICENSE
 
 SEE ALSO
 
-    Perl::Critic
+    Perl::Critic, Perl::Critic::Community
 

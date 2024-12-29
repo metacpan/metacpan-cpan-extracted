@@ -77,6 +77,24 @@ sub test_ansiEsc : Test(2) {
 
 # -----------------------------------------------------------------------------
 
+sub test_width : Test(1) {
+    my $self = shift;
+
+    my $width = Quiq::Terminal->width;
+    $self->cmpOk($width,'>',0);
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_height : Test(1) {
+    my $self = shift;
+
+    my $height = Quiq::Terminal->height;
+    $self->cmpOk($height,'>',0);
+}
+
+# -----------------------------------------------------------------------------
+
 package main;
 Quiq::Terminal::Test->runTests;
 

@@ -8,7 +8,7 @@ use parent 'Perl::Critic::Policy';
 
 use List::Util 'any';
 
-our $VERSION = 'v1.0.3';
+our $VERSION = 'v1.0.4';
 
 use constant DESC => 'Use of multidimensional array emulation in hash subscript';
 use constant EXPL => 'A list in a hash subscript used with the $ sigil triggers Perl 4 multidimensional array emulation. Nest structures using references instead.';
@@ -80,6 +80,10 @@ L<perldata/"Multi-dimensional array emulation"> and provided a way to emulate
 a multidimensional structure before Perl 5 introduced references. Perl now
 supports true multidimensional structures, so this feature is now unnecessary
 in most cases.
+
+In Perl 5.34 or newer, or automatically under C<use v5.36> or newer,
+L<feature/"The 'multidimensional' feature> can be disabled to remove this
+syntax from the parser.
 
   $foo{$x,$y,$z}   # not ok
   $foo{qw(a b c)}  # not ok

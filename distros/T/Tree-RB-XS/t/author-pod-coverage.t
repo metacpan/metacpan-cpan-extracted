@@ -35,7 +35,7 @@ plan tests => scalar @modules;
 
 my %trustme = (
              'Tree::RB::XS' => [
-                                 qr/^(root|min|max|nth|oldest|newest|KEY_TYPE_CLAIM|LU[^_].*|STORABLE_.*)$/
+                                 qr/^(root|min|max|nth|oldest|newest|CMP_UTF8|KEY_TYPE_CLAIM|LU[^_].*|STORABLE_.*)$/
                                ]
            );
 

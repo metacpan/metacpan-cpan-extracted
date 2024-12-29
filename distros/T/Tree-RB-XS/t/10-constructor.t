@@ -26,6 +26,16 @@ subtest default_tree => sub {
 	is( $tref, undef, 'tree freed' );
 };
 
+subtest single_arg_compare_fn => sub {
+	my $tree= Tree::RB::XS->new(CMP_INT);
+	is( $tree->compare_fn, CMP_INT, 'compare_fn' );
+};
+
+subtest single_arg_hashref => sub {
+	my $tree= Tree::RB::XS->new({ compare_fn => CMP_INT });
+	is( $tree->compare_fn, CMP_INT, 'compare_fn' );
+};
+
 subtest int_tree => sub {
 	my $tree= Tree::RB::XS->new(key_type => KEY_TYPE_INT);
 	weaken(my $tref= $tree);

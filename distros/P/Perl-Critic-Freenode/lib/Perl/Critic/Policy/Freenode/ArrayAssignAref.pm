@@ -3,12 +3,10 @@ package Perl::Critic::Policy::Freenode::ArrayAssignAref;
 use strict;
 use warnings;
 
-use Perl::Critic::Utils qw(:severities :classification :ppi);
-use parent 'Perl::Critic::Policy::ValuesAndExpressions::ProhibitArrayAssignAref';
+use parent 'Perl::Critic::Policy::Community::ArrayAssignAref';
 
-our $VERSION = '0.033';
+our $VERSION = 'v1.0.4';
 
-sub default_severity { $SEVERITY_MEDIUM }
 sub default_themes { 'freenode' }
 
 1;
@@ -16,22 +14,15 @@ sub default_themes { 'freenode' }
 =head1 NAME
 
 Perl::Critic::Policy::Freenode::ArrayAssignAref - Don't assign an anonymous
-arrayref to an array
+arrayref to an array (DEPRECATED)
 
 =head1 DESCRIPTION
 
-A common mistake is to assign values to an array but use arrayref brackets
-C<[]> rather than parentheses C<()>. This results in the array containing one
-element, an arrayref, which is usually unintended. If intended, the arrayref
-brackets can be wrapped in parentheses for clarity.
+Legacy C<freenode> theme policy alias.
 
- @array = [];          # not ok
- @array = [1, 2, 3];   # not ok
- @array = ([1, 2, 3]); # ok
+=head1 POLICY MOVED
 
-This policy is a subclass of the L<Perl::Critic::Pulp> policy
-L<Perl::Critic::Policy::ValuesAndExpressions::ProhibitArrayAssignAref>, and
-performs the same function but in the C<freenode> theme.
+This policy has been moved to L<Perl::Critic::Community>.
 
 =head1 AFFILIATION
 
@@ -54,4 +45,4 @@ the terms of the Artistic License version 2.0.
 
 =head1 SEE ALSO
 
-L<Perl::Critic>, L<Perl::Critic::Pulp>
+L<Perl::Critic>, L<Perl::Critic::Community>

@@ -142,7 +142,7 @@ PDL::Cluster::kcluster(
 		       $mask2,
 		       $weight2,
 		       0,
-		       ($clusters=$initialid->copy),
+		       ($clusters=$initialid->long),
 		       ($error=null),
 		       ($nfound=null),
 		       $params{dist},

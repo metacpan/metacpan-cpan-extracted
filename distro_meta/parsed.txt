@@ -95903,3 +95903,17 @@ M/MI/MITHALDU/PPI-1.281.tar.gz
 N/NE/NERDVANA/Tree-RB-XS-0.15.tar.gz
 E/EX/EXODIST/Term-Table-0.024.tar.gz
 Y/YO/YOREEK/XML-Hash-XS-0.62.tar.gz
+S/ST/STIGTSP/Crypt-URandom-Token-0.003.tar.gz
+J/JA/JANESKIL/Tools/Daje-Workflow-Database-0.06.tar.gz
+J/JA/JANESKIL/Tools/Daje-Workflow-Database-Model-0.02.tar.gz
+M/MJ/MJOHNSON/Math-Symbolic-Custom-Collect-0.31.tar.gz
+S/SS/SSMN/Mojo-UserAgent-Role-Retry-0.002.tar.gz
+M/MO/MOOCOW/PDL-Cluster-1.54.003.tar.gz
+D/DB/DBOOK/Perl-Critic-Community-v1.0.4.tar.gz
+D/DB/DBOOK/Perl-Critic-Freenode-v1.0.4.tar.gz
+P/PL/PLICEASE/Perl-Critic-Policy-Plicease-ProhibitArrayAssignAref-100.00.tar.gz
+Y/YT/YTURTLE/Poz-0.08.tar.gz
+F/FS/FSEITZ/Quiq-1.223.tar.gz
+N/NE/NERDVANA/Tree-RB-XS-0.16.tar.gz
+P/PE/PERLANCAR/Sorter-file_by_size-0.001.tar.gz
+T/TI/TIMLEGGE/XML-Enc-0.15.tar.gz

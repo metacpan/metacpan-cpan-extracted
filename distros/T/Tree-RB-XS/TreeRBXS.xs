@@ -60,7 +60,7 @@ static bool looks_like_integer(SV *sv) {
 static int parse_key_type(SV *type_sv) {
 	const char *str;
 	size_t len;
-	int key_type= -1;
+	IV key_type= -1;
 	if (SvIOK(type_sv)) {
 		key_type= SvIV(type_sv);
 		if (key_type < 1 || key_type > KEY_TYPE_MAX)
@@ -80,7 +80,7 @@ static int parse_key_type(SV *type_sv) {
 		        : (len == 4 && foldEQ(str, "USTR",  4))? KEY_TYPE_USTR
 		        : -1;
 	}
-	return key_type;
+	return (int) key_type;
 }
 
 static const char *get_key_type_name(int key_type) {
@@ -128,9 +128,8 @@ static int parse_cmp_fn(SV *cmp_sv) {
 	if (SvROK(cmp_sv) && SvTYPE(SvRV(cmp_sv)) == SVt_PVCV)
 		cmp_id= CMP_SUB;
 	else if (SvIOK(cmp_sv)) {
-		cmp_id= SvIV(cmp_sv);
-		if (cmp_id < 1 || cmp_id > CMP_MAX || cmp_id == CMP_SUB)
-			cmp_id= -1;
+		IV i= SvIV(cmp_sv);
+		cmp_id= (i < 1 || i > CMP_MAX || i == CMP_SUB)? -1 : (int) i;
 	}
 	else if (SvPOK(cmp_sv)) {
 		str= SvPV(cmp_sv, len);
@@ -182,14 +181,13 @@ static const char * get_cmp_name(int cmp_id) {
 
 static int parse_lookup_mode(SV *mode_sv) {
 	int mode;
-	size_t len;
+	STRLEN len;
 	char *mode_str;
 
 	mode= -1;
 	if (SvIOK(mode_sv)) {
-		mode= SvIV(mode_sv);
-		if (mode < 0 || mode > GET_MAX)
-			mode= -1;
+		IV i= SvIV(mode_sv);
+		mode= (i < 0 || i > GET_MAX)? -1 : (int) i;
 	} else if (SvPOK(mode_sv)) {
 		mode_str= SvPV(mode_sv, len);
 		if (len > 4 && foldEQ(mode_str, "GET_", 4)) {
@@ -717,8 +715,8 @@ static void TreeRBXS_iter_advance(struct TreeRBXS_iter *iter, IV ofs) {
 		if (ofs > 0) {
 			newpos= (UV)ofs < (cnt-pos)? pos + ofs : cnt;
 		} else {
-			ofs= -ofs;
-			newpos= (pos < ofs)? 0 : pos - ofs;
+			size_t o= (size_t) -ofs;
+			newpos= (pos < o)? 0 : pos - o;
 		}
 		// swap back for reverse iterators
 		if (iter->reverse) newpos= cnt - 1 - newpos;
@@ -1130,7 +1128,6 @@ static void TreeRBXS_recent_insert_before(struct TreeRBXS *tree, struct TreeRBXS
  * Users can call this at any time in order to remove certain nodes from consideration.
  */
 static void TreeRBXS_recent_prune(struct TreeRBXS *tree, struct TreeRBXS_item *item) {
-	struct TreeRBXS_iter *iter;
 	if (item->recent.next) {
 		// Move recent-list iterators pointing to this node
 		if (item->iter)
@@ -1251,11 +1248,10 @@ static int cmp_numsplit(
 }
 
 static int TreeRBXS_cmp_numsplit(struct TreeRBXS *tree, struct TreeRBXS_item *a, struct TreeRBXS_item *b) {
-	const char *apos, *alim, *amark;
-	const char *bpos, *blim, *bmark;
+	const char *apos, *alim;
+	const char *bpos, *blim;
 	size_t alen, blen;
 	bool a_utf8= false, b_utf8= false;
-	int cmp;
 
 	switch (tree->key_type) {
 	case KEY_TYPE_USTR:
@@ -1297,7 +1293,7 @@ static int TreeRBXS_cmp_perl(struct TreeRBXS *tree, struct TreeRBXS_item *a, str
 
 // Compare SV items using a user-supplied perl callback
 static int TreeRBXS_cmp_perl_cb(struct TreeRBXS *tree, struct TreeRBXS_item *a, struct TreeRBXS_item *b) {
-	int ret;
+	IV ret;
     dSP;
     ENTER;
 	// There are a max of $tree_depth comparisons to do during an insert or search,
@@ -1314,7 +1310,7 @@ static int TreeRBXS_cmp_perl_cb(struct TreeRBXS *tree, struct TreeRBXS_item *a, 
     PUTBACK;
 	// FREETMPS;
     LEAVE;
-    return ret;
+    return (int)(ret < 0? -1 : ret > 0? 1 : 0);
 }
 
 // Equivalent of "return fc($key)"  (case folding)
@@ -1609,10 +1605,10 @@ static SV * new_enum_dualvar(pTHX_ IV ival, SV *name) {
 /* Return an SV array of an AV.
  * Returns NULL if it wasn't an AV or arrayref.
  */
-static SV** unwrap_array(SV *array, ssize_t *len) {
+static SV** unwrap_array(SV *array, IV *len) {
 	AV *av;
 	SV **vec;
-	ssize_t n;
+	IV n;
 	if (array && SvTYPE(array) == SVt_PVAV)
 		av= (AV*) array;
 	else if (array && SvROK(array) && SvTYPE(SvRV(array)) == SVt_PVAV)
@@ -1627,7 +1623,7 @@ static SV** unwrap_array(SV *array, ssize_t *len) {
 			vec= (SV**) 8;
 		else {
 			/* in case of a tied array, extract the elements into a temporary buffer */
-			ssize_t i;
+			IV i;
 			Newx(vec, n, SV*);
 			SAVEFREEPV(vec);
 			for (i= 0; i < n; i++) {
@@ -1649,22 +1645,21 @@ static SV** unwrap_array(SV *array, ssize_t *len) {
  * This means that attr_list should *NOT* be AvARRAY of an AV.
  * Returns the number of unknown attributes, which have been re-packed in the list.
  */
-ssize_t init_tree_from_attr_list(
+IV init_tree_from_attr_list(
 	struct TreeRBXS *tree,
 	SV **attr_list,
-	ssize_t attr_list_len
+	IV attr_list_len
 ) {
-	ssize_t i, out_i;
+	IV i, out_i;
 	SV *key_type_sv= NULL,
 	   *compare_fn_sv= NULL,
 	   *kv_sv= NULL,
 	   *keys_sv= NULL,
 	   *values_sv= NULL,
 	   *recent_sv= NULL,
-	   *hashiter_sv= NULL,
-	   *tmpsv;
+	   *hashiter_sv= NULL;
 	int key_type;
-	SSize_t nodecount= 0;
+	IV nodecount= 0;
 	struct TreeRBXS_item *item, stack_item;
 	rbtree_node_t *node;
 
@@ -1783,8 +1778,7 @@ ssize_t init_tree_from_attr_list(
 	/* if keys and/or values supplied... */
 	if (kv_sv || keys_sv || values_sv) {
 		SV **key_vec= NULL, **key_lim, **val_vec= NULL;
-		AV *av_tmp;
-		ssize_t i, num_kv, key_step= 0, val_step= 0;
+		IV num_kv, key_step= 0, val_step= 0;
 		bool track_recent= tree->track_recent;
 		
 		if (kv_sv) {
@@ -1804,7 +1798,7 @@ ssize_t init_tree_from_attr_list(
 			key_step= 1;
 		}
 		if (values_sv) {
-			ssize_t nvals;
+			IV nvals;
 			if (!key_vec)
 				croak("'values' can't be specified without 'keys'");
 			if (!(val_vec= unwrap_array(values_sv, &nvals)))
@@ -1827,7 +1821,7 @@ ssize_t init_tree_from_attr_list(
 	}
 	/* user wants to initialize the linked list of track_recent */
 	if (recent_sv) {
-		ssize_t i, idx, n;
+		IV i, idx, n;
 		SV **rvec= unwrap_array(recent_sv, &n);
 		if (!rvec) croak("'recent' must be an arrayref");
 		for (i= 0; i < n; i++) {
@@ -1882,9 +1876,9 @@ new(obj_or_pkg, ...)
 		Tree::RB::XS::_init_tree = 1
 	INIT:
 		struct TreeRBXS *tree= NULL;
-		SV *objref= NULL, *tmpsv, **attr_list;
+		SV *objref= NULL, **attr_list;
 		HV *obj_hv= NULL, *pkg= NULL;
-		SSize_t n_unknown, i;
+		SSize_t n_unknown, i, attr_len;
 	PPCODE:
 		if (sv_isobject(obj_or_pkg) && SvTYPE(SvRV(obj_or_pkg)) == SVt_PVHV) {
 			objref= obj_or_pkg;
@@ -1904,27 +1898,31 @@ new(obj_or_pkg, ...)
 		/* Special cases for 'new': it can be compare_fn, or a hashref */
 		if (items == 2) {
 			SV *first= ST(1);
-			/* non-ref means a compare_fn constant, likewide for coderef */
+			/* non-ref means a compare_fn constant, likewise for coderef */
 			if (!SvROK(first) || SvTYPE(SvRV(first)) == SVt_PVCV) {
 				Newx(attr_list, 2, SV*);
 				SAVEFREEPV(attr_list);
 				attr_list[0]= newSVpvs("compare_fn");
 				attr_list[1]= first;
+				attr_len= 2;
 			}
 			else if (SvTYPE(SvRV(first)) == SVt_PVHV) {
 				HV *attrhv= (HV*) SvRV(first);
-				ssize_t n= hv_iterinit(attrhv), i= 0;
-				HE *ent= hv_iternext(attrhv);
-				Newx(attr_list, n*2, SV*);
+				IV n= hv_iterinit(attrhv);
+				HE *ent;
+				attr_len= n*2;
+				Newx(attr_list, attr_len, SV*);
 				SAVEFREEPV(attr_list);
-				while (ent && i < n) {
-					attr_list[i*2]= hv_iterkeysv(ent);
-					attr_list[i*2+1]= hv_iterval(attrhv, ent);
+				i= 0;
+				while ((ent= hv_iternext(attrhv)) && i < n) {
+					attr_list[i++]= hv_iterkeysv(ent);
+					attr_list[i++]= hv_iterval(attrhv, ent);
 				}
 			}
 			else croak("Expected compare_fn constant, coderef, hashref, or key/value pairs");
 		} else {
 			attr_list= PL_stack_base+ax+1;
+			attr_len= items - 1;
 		}
 
 		/* Upgrade this object to have TreeRBXS struct attached magically */
@@ -1932,7 +1930,7 @@ new(obj_or_pkg, ...)
 		if (tree->owner != (SV*) obj_hv)
 			croak("Tree was already initialized");
 
-		n_unknown= init_tree_from_attr_list(tree, attr_list, items-1);
+		n_unknown= init_tree_from_attr_list(tree, attr_list, attr_len);
 		if (n_unknown) {
 			/* if called by the public constructor, throw an error */
 			if (ix == 0)
@@ -1971,7 +1969,7 @@ STORABLE_freeze(tree, cloning)
 	PPCODE:
 		/* dump out the contents of the hashref, which is empty unless set by subclass */
 		hv_iterinit(treehv);
-		while (pos= hv_iternext(treehv)) {
+		while ((pos= hv_iternext(treehv))) {
 			av_push(attrs, SvREFCNT_inc(hv_iterkeysv(pos)));
 			av_push(attrs, newSVsv(hv_iterval(treehv, pos)));
 		}
@@ -2070,14 +2068,12 @@ STORABLE_freeze(tree, cloning)
 			if (!cloning)
 				croak("Can't serialize a Tree::RB::XS with a custom comparison coderef");
 			else {
-				SV *fullname;
 				CV *cv= (CV*) SvRV(tree->compare_callback);
 				GV *gv= CvGV(cv), *re_gv;
 				HV *stash= GvSTASH(gv);
 				const char *name= GvNAME(gv);
-				size_t namelen, pkglen;
 				
-				if (!stash || !name || !HvNAME(stash) || !(re_gv= gv_fetchmethod(stash, name)) || GvCV(re_gv) != cv)
+				if (!stash || !name || !(re_gv= gv_fetchmethod(stash, name)) || GvCV(re_gv) != cv)
 					croak("Comparison function (%s::%s) for Tree::RB::XS instance cannot be serialized unless it exists as a global package function",
 						stash? HvNAME(stash) : "NULL",
 						name? name : "NULL"
@@ -2109,7 +2105,7 @@ STORABLE_freeze(tree, cloning)
 		sb[9]= (flags >> 8) & 0xFF;
 
 		EXTEND(SP, 2);
-		ST(0)= sv_2mortal(newSVpvn(sb, 10));
+		ST(0)= sv_2mortal(newSVpvn((char*)sb, 10));
 		ST(1)= attrs_ref;
 		XSRETURN(2);
 
@@ -2122,10 +2118,9 @@ STORABLE_thaw(objref, cloning, serialized, attrs)
 	INIT:
 		struct TreeRBXS *tree= NULL;
 		int version, cmp_id, key_type, flags, i;
-		ssize_t attr_len, n_unknown;
+		IV attr_len, n_unknown;
 		const unsigned char *sb;
-		const char *pkg_name, *sub_name;
-		STRLEN sb_len, pkg_len= 0, name_len= 0;
+		STRLEN sb_len;
 		SV **attr_vec= unwrap_array((SV*)attrs, &attr_len), **attr_list, *tmpsv;
 	PPCODE:
 		if (!SvROK(objref) || SvTYPE(SvRV(objref)) != SVt_PVHV)
@@ -2308,7 +2303,6 @@ insert(tree, key, val=&PL_sv_undef)
 	INIT:
 		struct TreeRBXS_item stack_item, *inserted;
 		SV *oldval= NULL;
-		int cmp= 0;
 	PPCODE:
 		//TreeRBXS_assert_structure(tree);
 		if (!SvOK(key))
@@ -2387,6 +2381,7 @@ exists(tree, ...)
 		int i, cmp;
 		size_t count, total= 0;
 	CODE:
+		(void) ix; /* unused */
 		for (i= 1; i < items; i++) {
 			key= ST(i);
 			TreeRBXS_init_tmp_item(&stack_item, tree, key, &PL_sv_undef);
@@ -2421,6 +2416,7 @@ get(tree, key, mode_sv= NULL)
 	ALIAS:
 		Tree::RB::XS::get_node         = 0x00
 		Tree::RB::XS::get_key          = 0x01
+		Tree::RB::XS::key              = 0x01
 		Tree::RB::XS::FETCH            = 0x02
 		Tree::RB::XS::lookup           = 0x03
 		Tree::RB::XS::get              = 0x04
@@ -2642,6 +2638,7 @@ clear(tree)
 	ALIAS:
 		Tree::RB::XS::CLEAR = 1
 	CODE:
+		(void) ix; /* unused */
 		RETVAL= TreeRBXS_get_count(tree);
 		TreeRBXS_clear(tree);
 	OUTPUT:
@@ -3106,6 +3103,7 @@ STORABLE_freeze(item, cloning)
 		struct TreeRBXS *tree= TreeRBXS_item_get_tree(item);
 		AV *av;
 	PPCODE:
+		(void) cloning; /* unused */
 		if (tree) {
 			ST(0)= sv_2mortal(newSViv(rbtree_node_index(&item->rbnode)));
 			ST(1)= sv_2mortal(newRV_inc(tree->owner));
@@ -3129,6 +3127,7 @@ STORABLE_thaw(item_sv, cloning, idx, refs)
 		rbtree_node_t *node;
 		MAGIC *magic;
 	PPCODE:
+		(void) cloning; /* unused */
 		if (idx == -1) {
 			SSize_t n;
 			SV **svec= unwrap_array(refs, &n);
@@ -3394,6 +3393,7 @@ STORABLE_freeze(iter, cloning)
 		char itertype= (iter->reverse? 1 : 0) | (iter->recent? 2 : 0);
 		AV *refs;
 	PPCODE:
+		(void) cloning; /* unused */
 		ST(0)= sv_2mortal(newSVpvn(&itertype, 1));
 		ST(1)= sv_2mortal(newRV_noinc((SV*) (refs= newAV())));
 		av_push(refs, newRV_inc(iter->tree->owner));
@@ -3405,9 +3405,6 @@ STORABLE_freeze(iter, cloning)
 #
 
 BOOT:
-	CV *method_cv;
-	GV *method_gv;
-	int i;
 	HV *stash= gv_stashpvn("Tree::RB::XS::Node", 18, 1);
 	FUNCTION_IS_LVALUE(value);
 	

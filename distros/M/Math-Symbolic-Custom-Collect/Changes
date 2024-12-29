@@ -1,5 +1,15 @@
 Revision history for Math-Symbolic-Custom-Collect
 
+0.31    Sat Dec 28 23:50 2024
+
+        - Bug fix in cancelling down
+
+0.3     Fri Dec 20 11:00 2024
+
+        - Added to_derivative()
+        - Improved complex number support
+        - Added an example (Newton-Raphson.pl)
+
 0.21    Fri Dec 06 20:00 2024
 
         - Updated tests

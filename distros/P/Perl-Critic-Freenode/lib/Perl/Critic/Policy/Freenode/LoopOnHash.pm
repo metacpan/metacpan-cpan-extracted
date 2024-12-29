@@ -3,12 +3,10 @@ package Perl::Critic::Policy::Freenode::LoopOnHash;
 use strict;
 use warnings;
 
-use Perl::Critic::Utils qw(:severities :classification :ppi);
-use parent 'Perl::Critic::Policy::Variables::ProhibitLoopOnHash';
+use parent 'Perl::Critic::Policy::Community::LoopOnHash';
 
-our $VERSION = '0.033';
+our $VERSION = 'v1.0.4';
 
-sub default_severity { $SEVERITY_HIGH }
 sub default_themes { 'freenode' }
 
 1;
@@ -16,27 +14,15 @@ sub default_themes { 'freenode' }
 =head1 NAME
 
 Perl::Critic::Policy::Freenode::LoopOnHash - Don't loop over hashes
+(DEPRECATED)
 
 =head1 DESCRIPTION
 
-It's possible to loop over a hash as if it was a list, which results in
-alternating between the keys and values of the hash. Often, the intent was
-instead to loop over either the keys or the values of the hash.
+Legacy C<freenode> theme policy alias.
 
- foreach my $foo (%hash) { ... }      # not ok
- action() for %hash;                  # not ok
- foreach my $foo (keys %hash) { ... } # ok
- action() for values %hash;           # ok
+=head1 POLICY MOVED
 
-If you intended to loop over alternating keys and values, you can make this
-intent clear by first copying them to an array:
-
- foreach my $key_or_value (@{[%hash]}) { ... }
- foreach my $key_or_value (my @dummy = %hash) { ... }
-
-This policy is a subclass of the policy
-L<Perl::Critic::Policy::Variables::ProhibitLoopOnHash>, and performs the same
-function but in the C<freenode> theme.
+This policy has been moved to L<Perl::Critic::Community>.
 
 =head1 AFFILIATION
 
@@ -59,4 +45,4 @@ the terms of the Artistic License version 2.0.
 
 =head1 SEE ALSO
 
-L<Perl::Critic>
+L<Perl::Critic>, L<Perl::Critic::Community>

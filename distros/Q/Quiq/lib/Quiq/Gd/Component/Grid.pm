@@ -120,7 +120,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.222';
+our $VERSION = '1.223';
 
 use GD ();
 
@@ -228,7 +228,7 @@ siehe L<BASE CLASS|"BASE CLASS">
 
 =head1 VERSION
 
-1.222
+1.223
 
 =head1 AUTHOR
 

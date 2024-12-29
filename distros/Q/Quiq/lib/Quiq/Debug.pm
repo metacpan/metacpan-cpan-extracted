@@ -21,11 +21,13 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.222';
+our $VERSION = '1.223';
 
 use Data::Printer color=>{string=>'black'};
 use Data::Printer ();
 use Quiq::Path;
+use Quiq::Terminal;
+use Quiq::Shell;
 
 # -----------------------------------------------------------------------------
 
@@ -63,7 +65,7 @@ np(). Die Optionen @opt werden an diese Funktion weiter geleitet.
 
 =head4 Example
 
-  Quiq::Debug->dump($obj,colored=>1))
+  Quiq::Debug->dump($obj,colored=>1);
 
 =cut
 
@@ -181,9 +183,46 @@ sub findSubroutine {
 
 # -----------------------------------------------------------------------------
 
+=head2 Textvergleich
+
+=head3 showDiff() - Zeige Differenz zwischen zwei Dateien
+
+=head4 Synopsis
+
+  $str = $this->showDiff($file1,$file2);
+
+=head4 Description
+
+Zeige die Differenz zwischen zwei Dateien. Die Anzeige wird auf die
+Breite des Terminals eingestellt.
+
+=head4 Example
+
+  perl -MQuiq::Debug -E 'print Quiq::Debug->showDiff($file1,$file2)' | less
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub showDiff {
+    my ($this,$file1,$file2) = @_;
+
+    my $width = Quiq::Terminal->width;
+
+    my $sh = Quiq::Shell->new;
+    my $str = $sh->exec("diff -W $width -b -y $file1 $file2",
+        -sloppy => 1,
+        -capture => 'stdout',
+    );
+
+    return $str;
+}
+
+# -----------------------------------------------------------------------------
+
 =head1 VERSION
 
-1.222
+1.223
 
 =head1 AUTHOR
 
