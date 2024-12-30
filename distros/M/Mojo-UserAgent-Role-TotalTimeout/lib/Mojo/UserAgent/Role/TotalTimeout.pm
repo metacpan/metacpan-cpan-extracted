@@ -7,7 +7,7 @@ use Mojo::Base -role;
 use Time::HiRes 'time';
 use Scalar::Util 'weaken';
 
-our $VERSION = "v0.0.1";
+our $VERSION = "v0.0.2";
 
 has 'total_timeout';
 
@@ -69,12 +69,12 @@ Mojo::UserAgent::Role::TotalTimeout - Role for Mojo::UserAgent that enables sett
     use Mojo::UserAgent;
 
     my $class = Mojo::UserAgent->with_roles('+TotalTimeout');
-    my $ua = $class->max_redirects(5)->total_timeout(10);
+    my $ua = $class->new->max_redirects(5)->total_timeout(10);
 
 =head1 DESCRIPTION
 
-Mojo::UserAgent::Role::TotalTimeout is a role for LMojo::UserAgent> that simply allows setting a total timeout to
-the useragent that includes redirects.
+Mojo::UserAgent::Role::TotalTimeout is a role for L<Mojo::UserAgent> that simply allows setting a total timeout to
+the useragent that includes redirects, because L<Mojo::UserAgent/request_timeout>'s timer resets on each redirect.
 
 =head1 ATTRIBUTES
 
@@ -85,11 +85,11 @@ Mojo::UserAgent::Role::Timeout adds the following attribute to the L<Mojo::UserA
     my $ua = $class->new;
     $ua->total_timeout(10);
 
-The number of seconds the whole request (including redirections) will timeout at.
+The number of seconds the whole "request" (including redirections) will timeout at.
+(Defaults to 0, which disables the time limit.)
 
-Defaults to 0, which disables the time limit.
-
-L<Mojo::UserAgent>'s other timeouts (like C<request_timeout>) still apply regardless of this attribute's value.
+L<Mojo::UserAgent>'s other timeouts (such as L<Mojo::UserAgent/request_timeout>)
+still apply regardless of this attribute's value.
 
 =head1 TODO
 

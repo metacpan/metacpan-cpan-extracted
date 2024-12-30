@@ -116,6 +116,7 @@ Creates a new union schema object.
 [Zod](https://zod.dev/)
 [Poz::Builder](https://metacpan.org/pod/Poz%3A%3ABuilder)
 [Poz::Types](https://metacpan.org/pod/Poz%3A%3ATypes)
+[Poz::Types::null](https://metacpan.org/pod/Poz%3A%3ATypes%3A%3Anull)
 [Poz::Types::string](https://metacpan.org/pod/Poz%3A%3ATypes%3A%3Astring)
 [Poz::Types::number](https://metacpan.org/pod/Poz%3A%3ATypes%3A%3Anumber)
 [Poz::Types::object](https://metacpan.org/pod/Poz%3A%3ATypes%3A%3Aobject)

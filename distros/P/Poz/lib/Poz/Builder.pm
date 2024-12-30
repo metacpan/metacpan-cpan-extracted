@@ -2,6 +2,7 @@ package Poz::Builder;
 use 5.032;
 use strict;
 use warnings;
+use Poz::Types::null;
 use Poz::Types::string;
 use Poz::Types::number;
 use Poz::Types::object;
@@ -20,6 +21,15 @@ sub coerce {
     my ($self) = @_;
     $self->{need_coerce} = 1;
     return $self;
+}
+
+sub null {
+    my ($self, $opts) = @_;
+    $opts = $opts || {};
+    return Poz::Types::null->new({
+        %{$opts},
+        need_coerce => $self->{need_coerce},
+    });
 }
 
 sub string {
@@ -106,6 +116,12 @@ Executes the build process for the Poz project.
     $builder->coerce();
 
 Enables coercion for the builder, which affects how types are handled.
+
+=head2 null
+
+    my $null_type = $builder->null(\%opts);
+
+Creates a new null type with the given options.
 
 =head2 string
 

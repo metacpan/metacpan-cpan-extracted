@@ -9,6 +9,7 @@ lib/Poz/Builder.pm
 lib/Poz/Types.pm
 lib/Poz/Types/array.pm
 lib/Poz/Types/enum.pm
+lib/Poz/Types/null.pm
 lib/Poz/Types/number.pm
 lib/Poz/Types/object.pm
 lib/Poz/Types/scalar.pm
@@ -16,6 +17,7 @@ lib/Poz/Types/string.pm
 lib/Poz/Types/union.pm
 minil.toml
 t/00_compile.t
+t/10_null.t
 t/11_string.t
 t/12_number.t
 t/13_object.t

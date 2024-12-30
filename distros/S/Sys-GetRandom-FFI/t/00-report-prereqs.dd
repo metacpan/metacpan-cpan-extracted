@@ -1,4 +1,10 @@
 do { my $x = {
+       'build' => {
+                    'requires' => {
+                                    'ExtUtils::MakeMaker' => '7.22',
+                                    'Module::Metadata' => '1.000015'
+                                  }
+                  },
        'configure' => {
                         'requires' => {
                                         'ExtUtils::MakeMaker' => '0'
@@ -7,6 +13,7 @@ do { my $x = {
        'develop' => {
                       'requires' => {
                                       'Pod::Coverage::TrustPod' => '0',
+                                      'Test::CVE' => '0.08',
                                       'Test::EOF' => '0',
                                       'Test::EOL' => '0',
                                       'Test::Kwalitee' => '1.21',
@@ -37,7 +44,7 @@ do { my $x = {
                                    },
                    'requires' => {
                                    'File::Spec' => '0',
-                                   'Module::Metadata' => '0',
+                                   'Module::Metadata' => '1.000015',
                                    'Test2::V0' => '0',
                                    'Test::More' => '0',
                                    'strict' => '0'

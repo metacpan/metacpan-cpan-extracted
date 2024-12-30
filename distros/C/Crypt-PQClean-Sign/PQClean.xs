@@ -198,7 +198,7 @@ mldsa44_verify(signature, message, pk)
             croak("Invalid public key size");
         }
 
-        if (sig_len > PQCLEAN_MLDSA44_CLEAN_CRYPTO_BYTES) {
+        if (sig_len != PQCLEAN_MLDSA44_CLEAN_CRYPTO_BYTES) {
             croak("Invalid signature size");
         }
 
@@ -262,7 +262,7 @@ mldsa65_verify(signature, message, pk)
             croak("Invalid public key size");
         }
 
-        if (sig_len > PQCLEAN_MLDSA65_CLEAN_CRYPTO_BYTES) {
+        if (sig_len != PQCLEAN_MLDSA65_CLEAN_CRYPTO_BYTES) {
             croak("Invalid signature size");
         }
 
@@ -326,7 +326,7 @@ mldsa87_verify(signature, message, pk)
             croak("Invalid public key size");
         }
 
-        if (sig_len > PQCLEAN_MLDSA87_CLEAN_CRYPTO_BYTES) {
+        if (sig_len != PQCLEAN_MLDSA87_CLEAN_CRYPTO_BYTES) {
             croak("Invalid signature size");
         }
 
@@ -390,7 +390,7 @@ sphincs_shake128f_verify(signature, message, pk)
             croak("Invalid public key size");
         }
 
-        if (sig_len > PQCLEAN_SPHINCSSHAKE128FSIMPLE_CLEAN_CRYPTO_BYTES) {
+        if (sig_len != PQCLEAN_SPHINCSSHAKE128FSIMPLE_CLEAN_CRYPTO_BYTES) {
             croak("Invalid signature size");
         }
 
@@ -454,7 +454,7 @@ sphincs_shake128s_verify(signature, message, pk)
             croak("Invalid public key size");
         }
 
-        if (sig_len > PQCLEAN_SPHINCSSHAKE128SSIMPLE_CLEAN_CRYPTO_BYTES) {
+        if (sig_len != PQCLEAN_SPHINCSSHAKE128SSIMPLE_CLEAN_CRYPTO_BYTES) {
             croak("Invalid signature size");
         }
 
@@ -518,7 +518,7 @@ sphincs_shake192f_verify(signature, message, pk)
             croak("Invalid public key size");
         }
 
-        if (sig_len > PQCLEAN_SPHINCSSHAKE192FSIMPLE_CLEAN_CRYPTO_BYTES) {
+        if (sig_len != PQCLEAN_SPHINCSSHAKE192FSIMPLE_CLEAN_CRYPTO_BYTES) {
             croak("Invalid signature size");
         }
 
@@ -582,7 +582,7 @@ sphincs_shake192s_verify(signature, message, pk)
             croak("Invalid public key size");
         }
 
-        if (sig_len > PQCLEAN_SPHINCSSHAKE192SSIMPLE_CLEAN_CRYPTO_BYTES) {
+        if (sig_len != PQCLEAN_SPHINCSSHAKE192SSIMPLE_CLEAN_CRYPTO_BYTES) {
             croak("Invalid signature size");
         }
 
@@ -646,7 +646,7 @@ sphincs_shake256f_verify(signature, message, pk)
             croak("Invalid public key size");
         }
 
-        if (sig_len > PQCLEAN_SPHINCSSHAKE256FSIMPLE_CLEAN_CRYPTO_BYTES) {
+        if (sig_len != PQCLEAN_SPHINCSSHAKE256FSIMPLE_CLEAN_CRYPTO_BYTES) {
             croak("Invalid signature size");
         }
 
@@ -710,7 +710,7 @@ sphincs_shake256s_verify(signature, message, pk)
             croak("Invalid public key size");
         }
 
-        if (sig_len > PQCLEAN_SPHINCSSHAKE256SSIMPLE_CLEAN_CRYPTO_BYTES) {
+        if (sig_len != PQCLEAN_SPHINCSSHAKE256SSIMPLE_CLEAN_CRYPTO_BYTES) {
             croak("Invalid signature size");
         }
 

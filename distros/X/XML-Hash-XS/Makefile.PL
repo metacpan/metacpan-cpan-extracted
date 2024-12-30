@@ -18,6 +18,7 @@ use File::Spec;
 
 $| = 0;
 
+our $IS_VC = $Config{cc} eq 'cl';
 our %PARAMS = parse_params();
 
 my %WriteMakefileArgs = (
@@ -76,11 +77,12 @@ my %WriteMakefileArgs = (
     },
     MIN_PERL_VERSION => 5.008008,
     LICENSE          => 'perl_5',
-    CCFLAGS          => $Config{ccflags} . ' -o $@',
-    OBJECT           => join(' ', '$(BASEEXT)$(OBJ_EXT)', map { s/\.c$/\$(OBJ_EXT)/; $_ } glob('src/*.c')),
-    C                => [ 'XS.c', glob('src/*.c') ],
+    CCFLAGS          => $Config{ccflags} . ( $IS_VC ? ' /Fosrc/' : ' -o $@' ),
+    OBJECT           => q/$(O_FILES)/,
+    XS               => { 'src/XS.xs' => 'src/XS.c',  },
+    C                => [ 'src/XS.c', glob('src/*.c') ],
     H                => [ glob('src/*.h') ],
-    clean            => { FILES => 'src/*.o' },
+    clean            => { FILES => 'src/*.o* *.o* src/*.pdb *.pdb' },
     extra_config(),
 );
 
@@ -124,8 +126,6 @@ WriteMakefile(%WriteMakefileArgs);
 sub extra_config {
     my $available_libs = get_available_libs();
 
-    return unless scalar %$available_libs;
-
     my (%config, %summary_config);
     my @options = qw(lib libpath incpath);
 
@@ -139,7 +139,6 @@ sub extra_config {
             $config{$option}{$_} = 1 for @$value;
         }
     }
-
     if ( $PARAMS{LIBS} ) {
         $summary_config{LIBS} = [ $PARAMS{LIBS} ];
     }
@@ -148,7 +147,7 @@ sub extra_config {
             # order is important!
             ( map { "-L$_" } keys %{ $config{libpath} || {} } ),
             ( map {
-                $Config{cc} eq 'cl' && $_ !~ /\.lib$/ ? "-l$_.lib" : "-l$_"
+                $IS_VC && $_ !~ /\.lib$/ ? "-l$_.lib" : "-l$_"
               } keys %{ $config{lib} || {} }
             ),
         );
@@ -171,7 +170,7 @@ sub extra_config {
     $summary_config{$_} = join(' ', @{ $summary_config{$_} }) for keys %summary_config;
 
     # CCFLAGS
-    $summary_config{CCFLAGS}  = ( $Config{ccflags} || '' ) . ' -o $@';
+    $summary_config{CCFLAGS}  = ( $Config{ccflags} || '' ) . ( $IS_VC ? ' /Fosrc/' : ' -o $@' );
     $summary_config{CCFLAGS} .= ' -g -Wall -Werror -Wextra -pedantic -Wno-clobbered -std=c99 -DPERL_GCC_PEDANTIC -DWITH_DEBUG -O0'
         if $PARAMS{DEBUG};
     $summary_config{CCFLAGS} .= ' -DWITH_TRACE'

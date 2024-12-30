@@ -1,5 +1,9 @@
 Revision history for Perl extension Mojo-UserAgent-Role-TotalTimeout
 
+v0.0.2 2024-12-30T07:39:03Z
+
+    - fixed broken links and code samples in main POD
+
 v0.0.1 2024-11-06T09:41:03Z
 
     - original version

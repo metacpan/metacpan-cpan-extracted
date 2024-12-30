@@ -1,0 +1,75 @@
+#!perl
+
+use strict;
+use warnings;
+use Getopt::Long qw(GetOptions :config posix_defaults);
+use Pod::Usage;
+use File::Copy::Link qw(copylink);
+
+main() unless caller;
+
+sub main {
+    GetOptions (
+        'h|help'    => \my $help,
+        'm|man'     => \my $manual,
+    ) or 
+    pod2usage();
+
+    pod2usage(1) if $help;
+    pod2usage(-verbose=>2) if $manual;
+    pod2usage("$0: no links") unless @ARGV;
+
+    copylink for @ARGV;
+}
+
+__END__
+
+=head1 NAME
+
+copylink - replace a link with a copy of the linked file
+
+=head1 SYNOPSIS
+
+copylink [link ...]
+
+=head1 DESCRIPTION
+
+Each of the links on the command line is replaced by a copy of the file
+that the link points too, so the copy can be edited without changing
+the original.
+
+The command is intended for modifying perl source files created by
+C<./Configure -Dmksymlinks>.
+ 
+=head2 OPTIONS
+
+=over
+
+=item B<-h>|B<--help>
+
+Show usage and these options
+
+=item B<-m>|B<--man>
+
+Show manual page
+
+=back
+
+=head1 SEE ALSO
+
+File::Copy::Link(3)
+
+=head1 AUTHOR
+
+Robin Barker, <RMBarker@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2003, 2006, 2011, 2024 by Robin Barker
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
+$Id$

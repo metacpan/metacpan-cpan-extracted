@@ -54,11 +54,11 @@
    "provides" : {
       "Mojo::Transaction::HTTP::Role::TotalTimeout" : {
          "file" : "lib/Mojo/Transaction/HTTP/Role/TotalTimeout.pm",
-         "version" : "v0.0.1"
+         "version" : "v0.0.2"
       },
       "Mojo::UserAgent::Role::TotalTimeout" : {
          "file" : "lib/Mojo/UserAgent/Role/TotalTimeout.pm",
-         "version" : "v0.0.1"
+         "version" : "v0.0.2"
       }
    },
    "release_status" : "stable",
@@ -73,7 +73,7 @@
          "web" : "https://gitlab.com/karjala/mojo-useragent-role-total_timeout"
       }
    },
-   "version" : "v0.0.1",
+   "version" : "v0.0.2",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

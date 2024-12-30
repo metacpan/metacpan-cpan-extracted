@@ -1,5 +1,20 @@
 #Revision history for Const-Exporter
 
+v1.3.0    2024-12-29 17:12:00+00:00 Europe/London
+  [Incompatabilities]
+  - The minimum Perl version is now v5.14.
+
+  [Documentation]
+  - Bumped copyright year.
+
+  - Added security policy.
+
+  [Tests]
+  - Added and improved author tests.
+
+  [Other]
+  - Removed generation of MANIFEST.SKIP from builder.
+
 v1.2.3    2023-06-11 11:01:22+01:00 Europe/London
   [Documentation]
   - Document support policy for older Perl versions.

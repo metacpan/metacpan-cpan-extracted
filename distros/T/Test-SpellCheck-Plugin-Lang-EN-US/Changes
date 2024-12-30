@@ -1,0 +1,12 @@
+Revision history for Test-SpellCheck-Plugin-Lang-EN-US
+
+0.03      2024-12-29 08:22:41 -0700
+  - First CPAN version
+
+0.02      2024-12-29 07:01:10 -0700
+  - Restore compatibility back to Perl 5.20
+
+0.01      2021-03-30 11:00:03 -0600
+  - initial version
+
+

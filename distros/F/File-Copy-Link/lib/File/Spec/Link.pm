@@ -3,135 +3,142 @@ package File::Spec::Link;
 use strict;
 use warnings;
 
-use File::Spec ();
-use base q(File::Spec); 
+require File::Spec;
+push our @ISA, qw(File::Spec);
 
-our $VERSION = 0.073;
+our $VERSION = 0.080;
 
 # over-ridden class method - just a debugging wrapper
-# 
-sub canonpath { 
-    my($spec, $path) = @_;
+#
+sub canonpath {
+    my ( $spec, $path ) = @_;
     return $spec->SUPER::canonpath($path) if $path;
     require Carp;
-    Carp::cluck( "canonpath: ", 
-		defined $path ? "empty path" : "path undefined"  
-    );
+    Carp::cluck( "canonpath: ",
+        defined $path ? "empty path" : "path undefined" );
     return $path;
 }
-sub catdir { my $spec = shift; return @_ ? $spec->SUPER::catdir(@_) : $spec->curdir }
+
+sub catdir {
+    my $spec = shift;
+    return @_ ? $spec->SUPER::catdir(@_) : $spec->curdir;
+}
 
 # new class methods - implemented via objects
-# 
-sub linked { 
-    my $self = shift -> new(@_); 
-    return unless $self -> follow; 
-    return $self -> path; 
+#
+sub linked {
+    my $self = shift->new(@_);
+    return unless $self->follow;
+    return $self->path;
 }
-sub resolve { 
-    my $self = shift -> new(@_); 
-    return unless $self -> resolved; 
-    return $self -> path; 
+
+sub resolve {
+    my $self = shift->new(@_);
+    return unless $self->resolved;
+    return $self->path;
 }
-sub resolve_all { 
-    my $self = shift -> new(@_); 
-    return unless $self -> resolvedir; 
-    return $self -> path; 
+
+sub resolve_all {
+    my $self = shift->new(@_);
+    return unless $self->resolvedir;
+    return $self->path;
 }
-sub relative_to_file { 
-    my($spec, $path) = splice @_, 0, 2;
-    my $self = $spec -> new(@_); 
-    return unless $self -> relative($path);
-    return $self -> path;
+
+sub relative_to_file {
+    my ( $spec, $path ) = splice @_, 0, 2;
+    my $self = $spec->new(@_);
+    return unless $self->relative($path);
+    return $self->path;
 }
+
 sub chopfile {
-    my $self = shift -> new(@_);
-    return $self -> path if length($self -> chop); 
-    return
+    my $self = shift->new(@_);
+    return $self->path if length( $self->chop );
+    return;
 }
 
 # other new class methods - implemented via Cwd
-# 
+#
 sub full_resolve {
-    my($spec, $file) = @_;
+    my ( $spec, $file ) = @_;
     my $path = $spec->resolve_path($file);
     return defined $path ? $path : $spec->resolve_all($file);
 }
 
 sub resolve_path {
-    my($spec, $file) = @_;
+    my ( $spec, $file ) = @_;
     my $path = do {
-	local $SIG{__WARN__} = sub { 
-	    if ($_[0] =~ /^opendir\b/			and
-		$_[0] =~ /\bNot\s+a\s+directory\b/	and
-	    	$Cwd::VERSION < 2.18		 	and
-		not -d $file)
-	    {
-		warn <<WARN;
+        local $SIG{__WARN__} = sub {
+            if (    $_[0] =~ /^opendir\b/
+                and $_[0] =~ /\bNot\s+a\s+directory\b/
+                and $Cwd::VERSION < 2.18
+                and not -d $file )
+            {
+                warn <<WARN;
 Cwd::abs_path() only works on directories, not: $file
 Use Cwd v2.18 or later
 WARN
-	    }
-	    else {
-		warn $_[0]
-	    }
-	};
-	eval { require Cwd } && Cwd::abs_path($file) 
+            }
+            else {
+                warn $_[0];
+            }
+        };
+        eval { require Cwd } && Cwd::abs_path($file);
     };
-    return unless $path; 
-    return $spec->file_name_is_absolute($file)
-	    ? $path : $spec->abs2rel($path);
-} 
+    return unless $path;
+    return $spec->file_name_is_absolute($file) ? $path : $spec->abs2rel($path);
+}
 
 # old class method - not needed
-# 
-sub splitlast { 
-    my $self = shift -> new(@_);
-    my $last_path = $self -> chop;
-    return ($self -> path, $last_path);
+#
+sub splitlast {
+    my $self      = shift->new(@_);
+    my $last_path = $self->chop;
+    return ( $self->path, $last_path );
 }
 
-# object methods: 
+# object methods:
 # 	constructor methods	new
-# 	access methods		path, canonical, vol, dir 
+# 	access methods		path, canonical, vol, dir
 # 	updating methods	add, pop, push, split, chop
-# 				relative, follow, resolved, resolvedir  
+# 				relative, follow, resolved, resolvedir
 
-sub new { 
-    my $self = bless { }, shift; 
-    $self -> split(shift) if @_; 
-    return $self; 
+sub new {
+    my $self = bless {}, shift;
+    $self->split(shift) if @_;
+    return $self;
 }
-sub path { 
-    my $self = shift; 
-    return $self -> catpath( $self->vol, $self->dir, q{} ); 
+
+sub path {
+    my $self = shift;
+    return $self->catpath( $self->vol, $self->dir, q{} );
 }
-sub canonical { my $self = shift; return $self -> canonpath( $self -> path ); }
-sub vol { my $vol = shift->{vol}; return defined $vol ? $vol : q{} } 
-sub dir { my $self = shift; return $self -> catdir( $self -> dirs ); }
-sub dirs { my $dirs = shift->{dirs}; return $dirs ? @{$dirs} : () }
-	
+sub canonical { my $self = shift; return $self->canonpath( $self->path ); }
+sub vol       { my $vol  = shift->{vol};  return defined $vol ? $vol : q{} }
+sub dir       { my $self = shift;         return $self->catdir( $self->dirs ); }
+sub dirs      { my $dirs = shift->{dirs}; return $dirs ? @{$dirs} : () }
+
 sub add {
-    my($self, $file) = @_;
-    if( $file eq $self -> curdir ) { }
-    elsif( $file eq $self -> updir ) { $self -> pop }
-    else { $self -> push($file); }
+    my ( $self, $file ) = @_;
+    if    ( $file eq $self->curdir ) { }
+    elsif ( $file eq $self->updir )  { $self->pop }
+    else                             { $self->push($file); }
     return;
 }
+
 sub pop {
     my $self = shift;
-    my @dirs = $self -> dirs;
-    if( not @dirs or $dirs[-1] eq $self -> updir ) {
-	push @{$self->{dirs}}, $self -> updir;
+    my @dirs = $self->dirs;
+    if ( not @dirs or $dirs[-1] eq $self->updir ) {
+        push @{ $self->{dirs} }, $self->updir;
     }
-    elsif( length $dirs[-1] and $dirs[-1] ne $self -> curdir) {
-	CORE::pop @{$self->{dirs}}
-    }	
+    elsif ( length $dirs[-1] and $dirs[-1] ne $self->curdir ) {
+        CORE::pop @{ $self->{dirs} };
+    }
     else {
-	require Carp;
-	Carp::cluck( "Can't go up from ", 
-			length $dirs[-1] ? $dirs[-1]: "empty dir"
-	);
+        require Carp;
+        Carp::cluck( "Can't go up from ",
+            length $dirs[-1] ? $dirs[-1] : "empty dir" );
     }
     return;
 }
@@ -139,50 +146,53 @@ sub pop {
 sub push {
     my $self = shift;
     my $file = shift;
-    CORE::push @{$self->{dirs}}, $file if length $file;
+    CORE::push @{ $self->{dirs} }, $file if length $file;
     return;
 }
+
 sub split {
-    my($self, $path) = @_;
-    my($vol, $dir, $file) = $self->splitpath($path, 1);
-    $self->{vol} = $vol;
+    my ( $self, $path ) = @_;
+    my ( $vol, $dir, $file ) = $self->splitpath( $path, 1 );
+    $self->{vol}  = $vol;
     $self->{dirs} = [ $self->splitdir($dir) ];
     $self->push($file);
     return;
 }
+
 sub chop {
     my $self = shift;
     my $dirs = $self->{dirs};
     my $file = '';
-    while( @$dirs ) {
-	last if @$dirs == 1 and not length $dirs->[0];	# path = '/'
-	last if length($file = CORE::pop @$dirs);
+    while (@$dirs) {
+        last if @$dirs == 1 and not length $dirs->[0];    # path = '/'
+        last if length( $file = CORE::pop @$dirs );
     }
-    return $file;    
-}    
-    
+    return $file;
+}
+
 sub follow {
     my $self = shift;
-    my $path = $self -> path;
+    my $path = $self->path;
     my $link = readlink $self->path;
     return $self->relative($link) if defined $link;
     require Carp;
     Carp::confess(
-	"Can't readlink ", $self->path, 
-    	" : ", 
-	(-l $self->path ? "but it is" : "not"), 
-	" a link"
+        "Can't readlink ",
+        $self->path, " : ", 
+        ( -l $self->path ? "but it is" : "not" ),
+        " a link"
     );
 }
- 
+
 sub relative {
-    my($self, $path) = @_;
-    unless( $self->file_name_is_absolute($path) ) {
-	return unless length($self->chop);
-	$path = $self->catdir($self->path, $path);
+    my ( $self, $path ) = @_;
+    unless ( $self->file_name_is_absolute($path) ) {
+        return unless length( $self->chop );
+        $path = $self->catdir( $self->path, $path );
     }
+
     # what we want to do here is just set $self->{path}
-    # to be read by $self->path; but would need to 
+    # to be read by $self->path; but would need to
     # unset $self->{path} whenever it becomes invalid
     $self->split($path);
     return 1;
@@ -191,9 +201,9 @@ sub relative {
 sub resolved {
     my $self = shift;
     my $seen = @_ ? shift : {};
-    while( -l $self->path ) {
-	return if $seen->{$self->canonical}++;
-	return unless $self->follow;
+    while ( -l $self->path ) {
+        return if $seen->{ $self->canonical }++;
+        return unless $self->follow;
     }
     return 1;
 }
@@ -202,13 +212,13 @@ sub resolvedir {
     my $self = shift;
     my $seen = @_ ? shift : {};
     my @path;
-    while( 1 ) {
-	return unless $self->resolved($seen);
-	my $last = $self->chop;
-	last unless length $last;
-	unshift @path, $last;
+    while (1) {
+        return unless $self->resolved($seen);
+        my $last = $self->chop;
+        last unless length $last;
+        unshift @path, $last;
     }
-    $self->add($_) for @path;    
+    $self->add($_) for @path;
     return 1;
 }
 
@@ -384,11 +394,11 @@ Robin Barker, <RMBarker@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2003, 2005, 2006, 2007, 2011, 2014 by Robin Barker
+Copyright 2003, 2005, 2006, 2007, 2011, 2014, 2024 by Robin Barker
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 
 
 =cut
 
-$Id: Link.pm 342 2014-06-23 18:30:53Z robin $
+$Id$

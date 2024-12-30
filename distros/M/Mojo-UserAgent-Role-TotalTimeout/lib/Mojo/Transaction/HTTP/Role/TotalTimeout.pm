@@ -5,7 +5,7 @@ use warnings;
 
 use Mojo::Base -role;
 
-our $VERSION = "v0.0.1";
+our $VERSION = "v0.0.2";
 
 has __TotalTimeout__absolute_end_time => 0;
 

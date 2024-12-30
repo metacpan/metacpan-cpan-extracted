@@ -9,6 +9,10 @@ use ExtUtils::MakeMaker;
 my %WriteMakefileArgs = (
   "ABSTRACT" => "get random bytes from the system",
   "AUTHOR" => "Robert Rothenberg <rrwo\@cpan.org>",
+  "BUILD_REQUIRES" => {
+    "ExtUtils::MakeMaker" => "7.22",
+    "Module::Metadata" => "1.000015"
+  },
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -25,12 +29,12 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
-    "Module::Metadata" => 0,
+    "Module::Metadata" => "1.000015",
     "Test2::V0" => 0,
     "Test::More" => 0,
     "strict" => 0
   },
-  "VERSION" => "v0.1.0",
+  "VERSION" => "v0.1.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,9 +43,10 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Exporter" => 0,
+  "ExtUtils::MakeMaker" => "7.22",
   "FFI::Platypus" => "2.00",
   "File::Spec" => 0,
-  "Module::Metadata" => 0,
+  "Module::Metadata" => "1.000015",
   "Test2::V0" => 0,
   "Test::More" => 0,
   "constant" => 0,

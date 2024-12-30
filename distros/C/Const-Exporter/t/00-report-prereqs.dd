@@ -1,4 +1,10 @@
 do { my $x = {
+       'build' => {
+                    'requires' => {
+                                    'ExtUtils::MakeMaker' => '7.22',
+                                    'Module::Metadata' => '1.000015'
+                                  }
+                  },
        'configure' => {
                         'requires' => {
                                         'ExtUtils::MakeMaker' => '0'
@@ -7,6 +13,8 @@ do { my $x = {
        'develop' => {
                       'requires' => {
                                       'Pod::Coverage::TrustPod' => '0',
+                                      'Test::CVE' => '0.08',
+                                      'Test::DistManifest' => '0',
                                       'Test::EOF' => '0',
                                       'Test::EOL' => '0',
                                       'Test::Kwalitee' => '1.21',
@@ -26,7 +34,7 @@ do { my $x = {
                                         'List::SomeUtils::XS' => '0',
                                         'Package::Stash::XS' => '0',
                                         'Ref::Util::XS' => '0',
-                                        'Storable' => '0'
+                                        'Storable' => '3.05'
                                       },
                       'requires' => {
                                       'Carp' => '0',
@@ -35,8 +43,7 @@ do { my $x = {
                                       'List::Util' => '1.56',
                                       'Package::Stash' => '0',
                                       'Ref::Util' => '0',
-                                      'perl' => 'v5.10.0',
-                                      'strict' => '0',
+                                      'perl' => 'v5.14.0',
                                       'warnings' => '0'
                                     }
                     },
@@ -47,12 +54,13 @@ do { my $x = {
                    'requires' => {
                                    'File::Spec' => '0',
                                    'Hash::Objectify' => '0',
-                                   'Module::Metadata' => '0',
+                                   'Module::Metadata' => '1.000015',
                                    'Sub::Identify' => '0.06',
                                    'Test::More' => '0',
                                    'Test::Most' => '0',
                                    'if' => '0',
-                                   'lib' => '0'
+                                   'lib' => '0',
+                                   'strict' => '0'
                                  }
                  }
      };

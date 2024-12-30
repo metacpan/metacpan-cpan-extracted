@@ -8,12 +8,12 @@ Mojo::UserAgent::Role::TotalTimeout - Role for Mojo::UserAgent that enables sett
     use Mojo::UserAgent;
 
     my $class = Mojo::UserAgent->with_roles('+TotalTimeout');
-    my $ua = $class->max_redirects(5)->total_timeout(10);
+    my $ua = $class->new->max_redirects(5)->total_timeout(10);
 
 # DESCRIPTION
 
-Mojo::UserAgent::Role::TotalTimeout is a role for LMojo::UserAgent> that simply allows setting a total timeout to
-the useragent that includes redirects.
+Mojo::UserAgent::Role::TotalTimeout is a role for [Mojo::UserAgent](https://metacpan.org/pod/Mojo%3A%3AUserAgent) that simply allows setting a total timeout to
+the useragent that includes redirects, because ["request\_timeout" in Mojo::UserAgent](https://metacpan.org/pod/Mojo%3A%3AUserAgent#request_timeout)'s timer resets on each redirect.
 
 # ATTRIBUTES
 
@@ -24,11 +24,11 @@ Mojo::UserAgent::Role::Timeout adds the following attribute to the [Mojo::UserAg
     my $ua = $class->new;
     $ua->total_timeout(10);
 
-The number of seconds the whole request (including redirections) will timeout at.
+The number of seconds the whole "request" (including redirections) will timeout at.
+(Defaults to 0, which disables the time limit.)
 
-Defaults to 0, which disables the time limit.
-
-[Mojo::UserAgent](https://metacpan.org/pod/Mojo%3A%3AUserAgent)'s other timeouts (like `request_timeout`) still apply regardless of this attribute's value.
+[Mojo::UserAgent](https://metacpan.org/pod/Mojo%3A%3AUserAgent)'s other timeouts (such as ["request\_timeout" in Mojo::UserAgent](https://metacpan.org/pod/Mojo%3A%3AUserAgent#request_timeout))
+still apply regardless of this attribute's value.
 
 # TODO
 

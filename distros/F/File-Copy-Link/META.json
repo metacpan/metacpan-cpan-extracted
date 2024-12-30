@@ -4,25 +4,19 @@
       "Robin Barker <rmbarker@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4205",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "File-Copy-Link",
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "File::Temp" : "0",
-            "Test::More" : "0"
-         }
-      },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.38"
+            "Module::Build" : "0.4"
          }
       },
       "runtime" : {
@@ -34,16 +28,22 @@
             "File::Spec" : "0",
             "perl" : "5.006"
          }
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Test::More" : "0"
+         }
       }
    },
    "provides" : {
       "File::Copy::Link" : {
          "file" : "lib/File/Copy/Link.pm",
-         "version" : "0.06"
+         "version" : "0.200"
       },
       "File::Spec::Link" : {
          "file" : "lib/File/Spec/Link.pm",
-         "version" : "0.073"
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
@@ -52,5 +52,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.140"
+   "version" : "0.200",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

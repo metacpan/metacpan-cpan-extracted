@@ -162,32 +162,7 @@ typedef struct {
 } xh_x2h_ctx_t;
 
 SV *xh_x2h(xh_x2h_ctx_t *ctx);
-
-XH_INLINE void
-xh_x2h_destroy_ctx(xh_x2h_ctx_t *ctx)
-{
-    if (ctx->nodes != NULL) free(ctx->nodes);
-    if (ctx->tmp   != NULL) free(ctx->tmp);
-
-    xh_destroy_opts(&ctx->opts);
-}
-
-XH_INLINE void
-xh_x2h_init_ctx(xh_x2h_ctx_t *ctx, I32 ax, I32 items)
-{
-    xh_opts_t *opts = NULL;
-    xh_int_t   nparam = 0;
-
-    memset(ctx, 0, sizeof(xh_x2h_ctx_t));
-
-    opts = (xh_opts_t *) xh_get_obj_param(&nparam, ax, items, "XML::Hash::XS");
-    ctx->input = xh_get_str_param(&nparam, ax, items);
-    xh_merge_opts(&ctx->opts, opts, nparam, ax, items);
-
-    if ((ctx->nodes = malloc(sizeof(xh_x2h_node_t) * ctx->opts.max_depth)) == NULL) {
-        croak("Memory allocation error");
-    }
-    memset(ctx->nodes, 0, sizeof(xh_x2h_node_t) * ctx->opts.max_depth);
-}
+void xh_x2h_destroy_ctx(xh_x2h_ctx_t *ctx);
+void xh_x2h_init_ctx(xh_x2h_ctx_t *ctx, I32 ax, I32 items);
 
 #endif /* _XH_X2H_H_ */

@@ -1,0 +1,296 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use 5.026;
+use Path::Tiny qw( path );
+use List::Util qw( uniqstr );
+use File::Glob qw( bsd_glob );
+use Text::Hunspell::FFI;
+use Test::SpellCheck::Plugin::Lang::EN::US;
+use List::Util ();
+use Scalar::Util ();
+
+my $hs = Text::Hunspell::FFI->new(
+  Test::SpellCheck::Plugin::Lang::EN::US->new->primary_dictionary,
+);
+
+my @list = grep { !$hs->check($_ =~ s!/.*$!!r ) } (
+  uniqstr
+  @List::Util::EXPORT_OK,
+  @Scalar::Util::EXPORT_OK,
+  qw(
+    interpolator/MS
+    autovivify
+    backreference
+    stringify
+    AnyEvent
+    YAML
+    YAPC
+    vim
+    emacs
+    bash
+    ash
+    sh
+    zsh
+    csh
+    tcsh
+    Unix
+    Unixen
+    VAX
+    VMS
+    OpenVMS
+    uid
+    gid
+    typeglob
+    txt
+    pl
+    subclass
+    subclasses
+    substage/MS
+    metacharacter/MS
+    subplugin/MS
+    TIMTOWTDI
+    stty
+    stdio
+    stdout
+    SMTP
+    SHA
+    MD5
+    setuid
+    RDBM
+    qsort
+    ptr
+    POSIX
+    OpenBSD
+    FreeBSD
+    NetBSD
+    Linux
+    OpenSSH
+    OO
+    OOP
+    numify
+    nosuid
+    noop
+    nmake
+    gmake
+    ndbm
+    nawk
+    gawk
+    awk
+    ftp
+    namespace
+    macOS
+    lwp
+    lookbehind
+    lookahead
+    json
+    IP
+    IPv4
+    IPv6
+    ioctl
+    invocant
+    inode
+    inplace
+    httpd
+    HTTP
+    gzip
+    gz
+    grof
+    goto
+    GNU
+    glob
+    Getopts
+    gcc
+    clang
+    FAQ
+    dzil
+    DWIM
+    DSL
+    DNS
+    diff
+    dereference
+    Debian
+    DBI
+    cygwin
+    css
+    crlf
+    cpantester
+    CPAN
+    CLI
+    CGI
+    catdir
+    catfile
+    byacc
+    yacc
+    bool
+    bleadperl
+    blead
+    bitwise
+    bcrypt
+    basename
+    dirname
+    backtick
+    backslash
+    AMD
+    Intel
+    ActivePerl
+    ActiveState
+    ACL
+    url
+    TODO
+    stopword/MS
+    lang
+    config
+    FFI
+    globbed
+    formatter
+    PODNAME
+    INI
+    ini
+    filesystem/MS
+    makefile/MS
+    Makefile.PL
+    MakeMaker
+    MSYS2
+    msys
+    MSWin32
+    LDFLAGS
+    Env
+    DLL
+    CentOS
+    unstaged
+    m4
+    linux
+    lib/MS
+    lib64
+    ld
+    libffi
+    http
+    https
+    html
+    gtar
+    fs
+    ffi
+    env
+    dmake
+    dist.ini
+    dir
+    diag
+    cwd
+    CWD
+    cpanm
+    cp
+    cmd.exe
+    cmake
+    CMake
+    cd
+    cflags
+    CFLAGS
+    libs
+    bzip2
+    Build.PL
+    bz2
+    bsdtar
+    blib
+    autotools
+    autoconf
+    ar
+    alienfile
+    aclocal
+    Zilla
+    XSLoader
+    WriteMakefile
+    perl/MS
+    perl5
+    config
+    os
+    ok
+    nasm
+    msys
+    noexec
+    UTF
+    utf
+    autogenerate/CAVNGSD
+    xz
+    xs
+    x86
+    x64
+    wget
+    vms
+    vcpkg
+    unix
+    toolchain
+    tmp
+    tmpdir
+    sys
+    subtest
+    stderr
+    stdout
+    ssl
+    SSL
+    ParseXS
+    OpenSSL
+    solaris
+    readme
+    postamble
+    pluggable
+    pkgconfig
+    pkgconf
+    unsetting
+    unsets
+    unescaped
+    toolset/MS
+    tempdir
+    tar.gz
+    tar.xz
+    tar.bz2
+    site.config
+    shellwords
+    realclean
+    distclean
+    rmtree
+    ptar
+    prereq/MS
+    closedir
+    pcfiledir
+    mingw
+    splitter
+    cpu
+    preload
+    plugable
+
+    chomp chop chr crypt fc hex index lc lcfirst length oct ord pack q qq reverse rindex sprintf substr tr uc ucfirst y
+    m pos qr quotemeta s split study
+    abs atan2 cos exp hex int log oct rand sin sqrt srand
+    each keys pop push shift splice unshift values
+    grep join map qw reverse sort unpack
+    delete each exists keys values
+    binmode close closedir dbmclose dbmopen die eof fileno flock format getc print printf read readdir readline rewinddir say seek seekdir select syscall sysread sysseek syswrite tell telldir truncate warn write
+    pack read syscall sysread sysseek syswrite unpack vec
+    chdir chmod chown chroot fcntl glob ioctl link lstat mkdir open opendir readlink rename rmdir select stat symlink sysopen umask unlink utime
+    break caller continue die do dump eval evalbytes exit __FILE__ goto last __LINE__ next __PACKAGE__ redo return sub __SUB__ wantarray
+    caller import local my our package state use
+    defined formline lock prototype reset scalar undef
+    alarm exec fork getpgrp getppid getpriority kill pipe qx readpipe setpgrp setpriority sleep system times wait waitpid
+    do import no package require use
+    bless dbmclose dbmopen package ref tie tied untie use
+    accept bind connect getpeername getsockname getsockopt listen recv send setsockopt shutdown socket socketpair
+    msgctl msgget msgrcv msgsnd semctl semget semop shmctl shmget shmread shmwrite
+    endgrent endhostent endnetent endpwent getgrent getgrgid getgrnam getlogin getpwent getpwnam getpwuid setgrent setpwent
+    endprotoent endservent gethostbyaddr gethostbyname gethostent getnetbyaddr getnetbyname getnetent getprotobyname getprotobynumber getprotoent getservbyname getservbyport getservent sethostent setnetent setprotoent setservent
+    gmtime localtime time times
+    and AUTOLOAD BEGIN CHECK cmp CORE __DATA__ default DESTROY else elseif elsif END __END__ eq for foreach ge given gt if INIT le lt ne not or UNITCHECK unless until when while x xor
+  ),
+);
+
+foreach my $inc (@INC)
+{
+  push @list, grep { !$hs->check($_) } map { path($_)->basename =~ s/\.pod$//r } bsd_glob "$inc/pod/*.pod";
+}
+
+my $path = path(__FILE__)->parent->parent->child('share/perl.dic');
+
+my $fh = $path->openw;
+say $fh "@{[ int @list ]}";
+say $fh $_ for uniqstr sort @list;

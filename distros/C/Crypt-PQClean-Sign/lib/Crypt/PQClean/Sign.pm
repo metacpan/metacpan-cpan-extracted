@@ -3,7 +3,7 @@ package Crypt::PQClean::Sign;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(
@@ -50,11 +50,11 @@ __END__
 
 =head1 NAME
 
-Crypt::PQCrypt::Sign - Post-Quantum Cryptography with keypair
+Crypt::PQClean::Sign - Post-Quantum Cryptography with keypair
 
 =head1 SYNOPSIS
 
-  use Crypt::PQCrypt::Sign qw(falcon512_keypair falcon512_sign falcon512_verify);
+  use Crypt::PQClean::Sign qw(falcon512_keypair falcon512_sign falcon512_verify);
 
   # generate keypair
   ($pk, $sk) = falcon512_keypair();

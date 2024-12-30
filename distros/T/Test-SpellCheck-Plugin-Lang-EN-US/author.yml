@@ -1,0 +1,40 @@
+---
+pod_spelling_system:
+  skip: 0
+  # list of words that are spelled correctly
+  # (regardless of what spell check thinks)
+  # or stuff that I like to spell incorrectly
+  # intentionally
+  stopwords:
+    - Beale
+    - Beresford
+    - Cryptics
+    - Dics
+    - Dicts
+    - Geoff
+    - Kelk
+    - Kuenning
+    - LST
+    - MWords
+    - Moby
+    - UKACD
+    - VarCon
+    - WordNet
+    - aff
+    - brif
+    - dicts
+    - distribtion
+    - english
+    - esl
+    - lst
+    - mainted
+    - mk
+
+pod_coverage:
+  skip: 0
+  # format is "Class#method" or "Class",regex allowed
+  # for either Class or method.
+  private:
+    - Test::SpellCheck::Plugin::Lang::EN::US#new
+    - Test::SpellCheck::Plugin::Lang::EN::US#primary_dictionary
+

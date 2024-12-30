@@ -5,7 +5,7 @@ use warnings;
 use Config;
 
 #use Test::More "no_plan";
- use Test::More tests => 128;
+ use Test::More tests => 127;
 
 BEGIN {
     use_ok "Text::CSV_XS", ("csv");
@@ -311,12 +311,6 @@ $] < 5.008 and unlink glob "SCALAR(*)";
     is ($r, undef, "Cannot add arrays to hashes");
     like ($err, qr{type mismatch}i, "ARRAY != HASH");
     $err = "";
-
-    $r = eval { csv (in => "in.csv", out => "out.csv"); };
-    $err =~ s{\s+at\s+\S+\s+line\s+\d+\.\r?\n?\Z}{};
-    is ($r, undef, "Cannot use strings for both");
-    like ($err, qr{^cannot}i, "Explicitely unsupported");
-    $err = "";
     }
 
 eval {
@@ -346,8 +340,12 @@ eval {
     my $ofn = "_STDOUT.csv";
 
     open STDOUT, ">", $ofn or die "$ofn: $!\n";
-    csv (in => $tfn, quote_always => 1, fragment => "row=1-2",
-	on_in => sub { splice @{$_[1]}, 1; }, eol => "\n");
+    {	my @w;
+	local $SIG{__WARN__} = sub { push @w => @_ };
+	csv (in => $tfn, quote_always => 1, fragment => "row=1-2",
+	    on_in => sub { splice @{$_[1]}, 1; }, eol => "\n");
+	like ($w[0], qr/2016 - EOL/, "EOL mismatch");
+	}
     close STDOUT;
     my $dta = do { local (@ARGV, $/) = $ofn; <> };
     is ($dta, qq{"a"\n"1"\n}, "Chained csv call inherited attributes");

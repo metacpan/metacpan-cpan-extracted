@@ -26,4 +26,4 @@ for my $link (@ARGV) {
         File::Spec::Link->resolve_all($link);
 }
 
-# $Id: filespec 219 2008-06-12 12:31:18Z rmb1 $
+# $Id$

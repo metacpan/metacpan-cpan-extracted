@@ -1,5 +1,5 @@
-#include "src/xh_config.h"
-#include "src/xh_core.h"
+#include "xh_config.h"
+#include "xh_core.h"
 
 MODULE = XML::Hash::XS PACKAGE = XML::Hash::XS
 

@@ -3,6 +3,33 @@
 
 static const char DEF_CONTENT_KEY[] = "content";
 
+void
+xh_x2h_destroy_ctx(xh_x2h_ctx_t *ctx)
+{
+    if (ctx->nodes != NULL) free(ctx->nodes);
+    if (ctx->tmp   != NULL) free(ctx->tmp);
+
+    xh_destroy_opts(&ctx->opts);
+}
+
+void
+xh_x2h_init_ctx(xh_x2h_ctx_t *ctx, I32 ax, I32 items)
+{
+    xh_opts_t *opts = NULL;
+    xh_int_t   nparam = 0;
+
+    memset(ctx, 0, sizeof(xh_x2h_ctx_t));
+
+    opts = (xh_opts_t *) xh_get_obj_param(&nparam, ax, items, "XML::Hash::XS");
+    ctx->input = xh_get_str_param(&nparam, ax, items);
+    xh_merge_opts(&ctx->opts, opts, nparam, ax, items);
+
+    if ((ctx->nodes = malloc(sizeof(xh_x2h_node_t) * ctx->opts.max_depth)) == NULL) {
+        croak("Memory allocation error");
+    }
+    memset(ctx->nodes, 0, sizeof(xh_x2h_node_t) * ctx->opts.max_depth);
+}
+
 XH_INLINE void
 xh_x2h_xpath_update(xh_char_t *xpath, xh_char_t *name, size_t name_len)
 {

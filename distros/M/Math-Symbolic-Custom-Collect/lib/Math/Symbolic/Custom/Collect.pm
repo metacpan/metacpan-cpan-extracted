@@ -15,7 +15,7 @@ Math::Symbolic::Custom::Collect - Collect up Math::Symbolic expressions
 
 =head1 VERSION
 
-Version 0.31
+Version 0.32
 
 =cut
 
@@ -24,7 +24,7 @@ require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw/symbolic_complex/;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Math::Symbolic qw(:all);
 use Math::Symbolic::Derivative qw//;
@@ -598,6 +598,8 @@ sub cancel_down {
             my %n_ct_new;
             my %d_ct_new;
 
+            my $num_d_terms = scalar(keys %d_terms);
+
             $did_some_cancellation = 0;
 
             # cancel from denominator
@@ -607,7 +609,7 @@ sub cancel_down {
                 foreach my $v2 (@v1) {
                     my ($vv, $cc) = split(/:/, $v2);
                     if ($vv eq $v) {
-                        if ( (scalar(%d_terms) == 1) && ($cc == 1) ) {                        
+                        if ( ($num_d_terms == 1) && ($cc == 1) ) {                        
                             # refuse to cancel all instances of a variable from the denominator
                             push @nt, $v2;
                         }

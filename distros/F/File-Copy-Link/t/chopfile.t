@@ -10,18 +10,15 @@ use warnings;
 # change 'tests => 1' to 'tests => last_test_to_print';
 
 use Test::More tests => 3;
-BEGIN { use_ok('File::Spec::Link') };
+BEGIN { use_ok('File::Spec::Link') }
 
 #########################
 
-like( File::Spec::Link->chopfile(
-	    File::Spec->catfile(qw(dir foo.ext))),
-    qr(^dir\W?\z),
-    "chopfile(dir/foo.ext)");
+like( File::Spec::Link->chopfile( File::Spec->catfile(qw(dir foo.ext)) ),
+    qr(^dir\W?\z), "chopfile(dir/foo.ext)" );
 
 my $curr = File::Spec->curdir;
 like( File::Spec::Link->chopfile('file.ext'),
-	qr(^$curr\W?\z),
-	"chopfile(foo.ext)");
+    qr(^$curr\W?\z), "chopfile(foo.ext)" );
 
-# $Id: chopfile.t 82 2006-07-26 08:55:37Z rmb1 $
+# $Id$

@@ -1,5 +1,9 @@
 Revision history for Math-Symbolic-Custom-Collect
 
+0.32    Sun Dec 29 15:20 2024
+
+        - Fixed another bug in cancelling down
+
 0.31    Sat Dec 28 23:50 2024
 
         - Bug fix in cancelling down

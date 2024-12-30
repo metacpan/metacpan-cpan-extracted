@@ -1,5 +1,9 @@
 Revision history for Perl extension Poz
 
+0.09 2024-12-30T01:54:18Z
+
+    - feature: add null feature
+
 0.08 2024-12-29T00:15:12Z
 
     - bugfix: an optional string array in an object invokes be crashed

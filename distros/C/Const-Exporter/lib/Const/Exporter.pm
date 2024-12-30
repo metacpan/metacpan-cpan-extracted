@@ -2,24 +2,22 @@ package Const::Exporter;
 
 # ABSTRACT: Declare constants for export.
 
-use v5.10.0;
-
-use strict;
+use v5.14;
 use warnings;
 
-our $VERSION = 'v1.2.3';
+our $VERSION = 'v1.3.0';
 
 use Carp;
 use Const::Fast;
 use Exporter 5.57 ();
-use List::Util '1.56' => qw/ pairs mesh /;
+use List::Util 1.56 qw/ pairs mesh /;
 use Package::Stash;
 use Ref::Util qw/ is_blessed_ref is_arrayref is_coderef is_hashref is_ref /;
 
 # RECOMMEND PREREQ: List::SomeUtils::XS
 # RECOMMEND PREREQ: Package::Stash::XS
 # RECOMMEND PREREQ: Ref::Util::XS
-# RECOMMEND PREREQ: Storable
+# RECOMMEND PREREQ: Storable 3.05
 
 sub import {
     my $pkg = shift;
@@ -243,7 +241,7 @@ Const::Exporter - Declare constants for export.
 
 =head1 VERSION
 
-version v1.2.3
+version v1.3.0
 
 =head1 SYNOPSIS
 
@@ -458,7 +456,7 @@ The C<:all> tag exports all symbols.
 
 =head2 Support for older Perl versions
 
-This module requires Perl v5.10 or newer.
+This module requires Perl v5.14 or newer.
 
 Pull requests to support older versions of Perl are welcome. See
 L</SOURCE>.
@@ -562,6 +560,11 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head2 Reporting Security Vulnerabilities
+
+Security issues should not be reported on the bugtracker website. Please see F<SECURITY.md> for instructions how to
+report security vulnerabilities
+
 =head1 AUTHOR
 
 Robert Rothenberg <rrwo@cpan.org>
@@ -584,7 +587,7 @@ B. Estrade <estrabd@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014-2023 by Robert Rothenberg.
+This software is Copyright (c) 2014-2024 by Robert Rothenberg.
 
 This is free software, licensed under:
 

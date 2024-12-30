@@ -10,12 +10,14 @@ use warnings;
 # change 'tests => 1' to 'tests => last_test_to_print';
 
 use Test::More;
-BEGIN{ 
-    if( !eval{ (symlink q{}, q{}), 1 } ) { 
-	plan skip_all => q{'symlink' not implemented}; 
+
+BEGIN {
+    require './t/can_symlink.pl';
+    if ( !can_symlink() ) {
+        plan skip_all => skip_symlink_message();
     }
     plan tests => 6;
-    use_ok('File::Copy::Link', qw(copylink) );
+    use_ok( 'File::Copy::Link', qw(copylink) );
 }
 
 #########################
@@ -25,39 +27,39 @@ BEGIN{
 
 use File::Compare;
 use File::Temp qw(tempdir);
-use File::Spec; 
+use File::Spec;
 
 my $dir = tempdir;
 
-my $file = File::Spec->catfile($dir,'file.txt');
-my $link = File::Spec->catfile($dir,'link.lnk');
+my $file = File::Spec->catfile( $dir, 'file.txt' );
+my $link = File::Spec->catfile( $dir, 'link.lnk' );
 
 open my $fh, q{>}, $file or die;
 print {$fh} "text\n" or die;
-close $fh or die;
+close $fh            or die;
 
-    die $! if not(symlink 'file.txt', $link);
-    die if not(-l $link); 
-    die if compare($file,$link);
+die $! if not( symlink 'file.txt', $link );
+die    if not( -l $link );
+die    if compare( $file, $link );
 
-    open $fh, q{>>}, $file or die;
-    print {$fh} "more\n" or die;
-    close $fh or die;
-    not compare($file,$link) or die;
+open $fh, q{>>}, $file or die;
+print {$fh} "more\n"        or die;
+close $fh                   or die;
+not compare( $file, $link ) or die;
 
-    ok( copylink($link), q{copylink});
-    ok( !(-l $link), q{not a link});
-    ok( !compare($file,$link), q{compare file and copy});
+ok( copylink($link),          q{copylink} );
+ok( !( -l $link ),            q{not a link} );
+ok( !compare( $file, $link ), q{compare file and copy} );
 
-    open $fh, q{>>}, $file or die;
-    print {$fh} qq{more\n} or die;
-    close $fh or die;
+open $fh, q{>>}, $file or die;
+print {$fh} qq{more\n} or die;
+close $fh              or die;
 
-    compare($file,$link) or die;
-    unlink $file or die;
+compare( $file, $link ) or die;
+unlink $file            or die;
 
-    ok( -e $link, q{copy not deleted}); 
-    unlink $link or die;
-    ok( !(-e $link), q{copy deleted});
+ok( -e $link, q{copy not deleted} );
+unlink $link or die;
+ok( !( -e $link ), q{copy deleted} );
 
-# $Id: copylink.t 187 2007-12-31 00:29:35Z rmb1 $
+# $Id$

@@ -1,0 +1,5 @@
+#!/bin/bash
+
+cip sudo apt-get update
+cip sudo apt-get install libffi-dev libhunspell-dev
+cip exec cpanm -n https://dist.wdlabs.com/Test-SpellCheck-Plugin-Lang-EN-US-0.02.tar.gz

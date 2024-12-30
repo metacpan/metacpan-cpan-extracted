@@ -15,7 +15,7 @@ use constant GRND_RANDOM   => 0x0002;
 
 our @EXPORT_OK = qw( GRND_RANDOM GRND_NONBLOCK getrandom );
 
-our $VERSION = 'v0.1.0';
+our $VERSION = 'v0.1.1';
 
 
 sub getrandom( $size, $opts = 0 ) {
@@ -47,7 +47,7 @@ Sys::GetRandom::FFI - get random bytes from the system
 
 =head1 VERSION
 
-version v0.1.0
+version v0.1.1
 
 =head1 SYNOPSIS
 
@@ -64,14 +64,6 @@ This is a proof-of-concept module for calling the L<getrandom(2)> system functio
 
 =head1 EXPORTS
 
-=head2 GRND_RANDOM
-
-When this bit is set, it will read from F</dev/random> instead of F</dev/urandom>.
-
-=head2 GRND_NONBLOCK
-
-This will exit with C<undef> when there are no random bytes available.
-
 =head2 getrandom
 
   my $bytes = getrandom( $size, $options );
@@ -83,6 +75,14 @@ entropy pool has not been initialised, or if it was interrupted by a signal when
 
 The C<$options> are optional.
 
+=head2 GRND_RANDOM
+
+When this bit is set, it will read from F</dev/random> instead of F</dev/urandom>.
+
+=head2 GRND_NONBLOCK
+
+This will exit with C<undef> when there are no random bytes available.
+
 =head1 SEE ALSO
 
 =over 4
@@ -93,6 +93,10 @@ The C<$options> are optional.
 
 This is an XS module that calls L<getrandom(2)> directly.  It has a slightly different interface but is faster.
 
+=item L<Sys::GetRandom::PP>
+
+This is a pure-Perl module that makes syscalls to L<getrandom(2)>.
+
 =item L<Rand::URandom>
 
 This is a pure-Perl module that makes syscalls to L<getrandom(2)>, but falls back to reading from F</dev/urandom>.
@@ -101,6 +105,10 @@ This is a pure-Perl module that makes syscalls to L<getrandom(2)>, but falls bac
 
 This is a pure-Perl module that reads data from F</dev/urandom>. It also uses L<Win32::API> to read random bytes on
 Windows.
+
+=item L<Random::Simple>
+
+This is another module that reads data from F</dev/urandom> or calls L<getrandom(2)>.
 
 =back
 

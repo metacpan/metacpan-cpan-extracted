@@ -2,20 +2,20 @@ package File::Copy::Link;
 
 use strict;
 use warnings;
- 
+
 use Carp;
 use File::Copy ();
 
 require Exporter;
-use base qw(Exporter);
+push our @ISA, qw(Exporter);
 
 our @EXPORT_OK = qw(copylink safecopylink);
-our $VERSION = '0.06';
+our $VERSION   = '0.200';
 
 sub copylink {
-    local $_ = @_ ? shift : $_;                 # default to $_ 
+    local $_ = @_ ? shift : $_;    # default to $_
     croak "$_ not a link\n" unless -l;
-    open my $fh, '<', $_ or croak "Can't open link $_: $!\n"; 
+    open my $fh, '<', $_ or croak "Can't open link $_: $!\n";
     unlink or croak "Can't unlink link $_: $!\n";
     my $ok = File::Copy::copy $fh, $_;
     croak "copy($fh $_) failed: $!\n" unless $ok;
@@ -23,7 +23,7 @@ sub copylink {
 }
 
 sub safecopylink {
-    local $_ = @_ ? shift : $_;                 # default to $_ 
+    local $_ = @_ ? shift : $_;    # default to $_
     croak "$_ not a link\n" unless -l;
     require File::Spec::Link;
     my $orig = File::Spec::Link->linked($_);
@@ -87,11 +87,11 @@ Robin Barker, <RMBarker@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2003, 2006, 2007, 2011, 2014 by Robin Barker
+Copyright 2003, 2006, 2007, 2011, 2014, 2024 by Robin Barker
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 
 
 =cut
 
-$Id: Link.pm 342 2014-06-23 18:30:53Z robin $
+$Id$

@@ -3,18 +3,20 @@ abstract: 'Declare constants for export.'
 author:
   - 'Robert Rothenberg <rrwo@cpan.org>'
 build_requires:
+  ExtUtils::MakeMaker: '7.22'
   File::Spec: '0'
   Hash::Objectify: '0'
-  Module::Metadata: '0'
+  Module::Metadata: '1.000015'
   Sub::Identify: '0.06'
   Test::More: '0'
   Test::Most: '0'
   if: '0'
   lib: '0'
+  strict: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 keywords:
   - export
   - Const::Fast
@@ -31,12 +33,12 @@ name: Const-Exporter
 provides:
   Const::Exporter:
     file: lib/Const/Exporter.pm
-    version: v1.2.3
+    version: v1.3.0
 recommends:
   List::SomeUtils::XS: '0'
   Package::Stash::XS: '0'
   Ref::Util::XS: '0'
-  Storable: '0'
+  Storable: '3.05'
 requires:
   Carp: '0'
   Const::Fast: '0'
@@ -44,17 +46,16 @@ requires:
   List::Util: '1.56'
   Package::Stash: '0'
   Ref::Util: '0'
-  perl: v5.10.0
-  strict: '0'
+  perl: v5.14.0
   warnings: '0'
 resources:
   bugtracker: https://github.com/robrwo/Const-Exporter/issues
   repository: git://github.com/robrwo/Const-Exporter.git
-version: v1.2.3
+version: v1.3.0
 x_authority: cpan:RRWO
 x_contributors:
   - 'Slaven Rezić <slaven@rezic.de>'
   - 'B. Estrade <estrabd@cpan.org>'
-x_generated_by_perl: v5.34.0
-x_serialization_backend: 'YAML::Tiny version 1.74'
+x_generated_by_perl: v5.34.3
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: Artistic-2.0

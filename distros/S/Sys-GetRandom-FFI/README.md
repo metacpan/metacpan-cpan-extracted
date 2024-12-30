@@ -4,7 +4,7 @@ Sys::GetRandom::FFI - get random bytes from the system
 
 # VERSION
 
-version v0.1.0
+version v0.1.1
 
 # SYNOPSIS
 
@@ -23,14 +23,6 @@ This is a proof-of-concept module for calling the [getrandom(2)](http://man.he.n
 
 # EXPORTS
 
-## GRND\_RANDOM
-
-When this bit is set, it will read from `/dev/random` instead of `/dev/urandom`.
-
-## GRND\_NONBLOCK
-
-This will exit with `undef` when there are no random bytes available.
-
 ## getrandom
 
 ```perl
@@ -44,12 +36,24 @@ entropy pool has not been initialised, or if it was interrupted by a signal when
 
 The `$options` are optional.
 
+## GRND\_RANDOM
+
+When this bit is set, it will read from `/dev/random` instead of `/dev/urandom`.
+
+## GRND\_NONBLOCK
+
+This will exit with `undef` when there are no random bytes available.
+
 # SEE ALSO
 
 - [getrandom(2)](http://man.he.net/man2/getrandom)
 - [Sys::GetRandom](https://metacpan.org/pod/Sys%3A%3AGetRandom)
 
     This is an XS module that calls [getrandom(2)](http://man.he.net/man2/getrandom) directly.  It has a slightly different interface but is faster.
+
+- [Sys::GetRandom::PP](https://metacpan.org/pod/Sys%3A%3AGetRandom%3A%3APP)
+
+    This is a pure-Perl module that makes syscalls to [getrandom(2)](http://man.he.net/man2/getrandom).
 
 - [Rand::URandom](https://metacpan.org/pod/Rand%3A%3AURandom)
 
@@ -59,6 +63,10 @@ The `$options` are optional.
 
     This is a pure-Perl module that reads data from `/dev/urandom`. It also uses [Win32::API](https://metacpan.org/pod/Win32%3A%3AAPI) to read random bytes on
     Windows.
+
+- [Random::Simple](https://metacpan.org/pod/Random%3A%3ASimple)
+
+    This is another module that reads data from `/dev/urandom` or calls [getrandom(2)](http://man.he.net/man2/getrandom).
 
 # SUPPORT FOR OLDER PERL VERSIONS
 

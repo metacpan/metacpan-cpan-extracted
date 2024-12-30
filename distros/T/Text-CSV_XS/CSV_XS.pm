@@ -23,7 +23,7 @@ use XSLoader;
 use Carp;
 
 use vars qw( $VERSION @ISA @EXPORT_OK %EXPORT_TAGS );
-$VERSION = "1.57";
+$VERSION = "1.58";
 @ISA     = qw( Exporter );
 XSLoader::load ("Text::CSV_XS", $VERSION);
 
@@ -79,6 +79,7 @@ my %def_attr = (
     'auto_diag'			=> 0,
     'diag_verbose'		=> 0,
     'strict'			=> 0,
+    'strict_eol'		=> 0,
     'blank_is_undef'		=> 0,
     'empty_is_undef'		=> 0,
     'allow_whitespace'		=> 0,
@@ -264,35 +265,36 @@ my %_cache_id = ( # Only expose what is accessed from within PM
     'quote_char'		=>  0,
     'escape_char'		=>  1,
     'sep_char'			=>  2,
-    'sep'			=> 39,	# 39 .. 55
-    'binary'			=>  3,
-    'keep_meta_info'		=>  4,
-    'always_quote'		=>  5,
-    'allow_loose_quotes'	=>  6,
-    'allow_loose_escapes'	=>  7,
-    'allow_unquoted_escape'	=>  8,
-    'allow_whitespace'		=>  9,
-    'blank_is_undef'		=> 10,
-    'eol'			=> 11,
-    'quote'			=> 15,
-    'verbatim'			=> 22,
-    'empty_is_undef'		=> 23,
-    'auto_diag'			=> 24,
-    'diag_verbose'		=> 33,
-    'quote_space'		=> 25,
-    'quote_empty'		=> 37,
-    'quote_binary'		=> 32,
-    'escape_null'		=> 31,
-    'decode_utf8'		=> 35,
-    '_has_ahead'		=> 30,
-    '_has_hooks'		=> 36,
-    '_is_bound'			=> 26,	# 26 .. 29
-    'formula'			=> 38,
-    'strict'			=> 42,
-    'skip_empty_rows'		=> 43,
-    'undef_str'			=> 46,
-    'comment_str'		=> 54,
-    'types'			=> 62,
+    'always_quote'		=>  4,
+    'quote_empty'		=>  5,
+    'quote_space'		=>  6,
+    'quote_binary'		=>  7,
+    'allow_loose_quotes'	=>  8,
+    'allow_loose_escapes'	=>  9,
+    'allow_unquoted_escape'	=> 10,
+    'allow_whitespace'		=> 11,
+    'blank_is_undef'		=> 12,
+    'empty_is_undef'		=> 13,
+    'auto_diag'			=> 14,
+    'diag_verbose'		=> 15,
+    'escape_null'		=> 16,
+    'formula'			=> 18,
+    'decode_utf8'		=> 21,
+    'verbatim'			=> 23,
+    'strict_eol'		=> 24,
+    'strict'			=> 28,
+    'skip_empty_rows'		=> 29,
+    'binary'			=> 30,
+    'keep_meta_info'		=> 31,
+    '_has_hooks'		=> 32,
+    '_has_ahead'		=> 33,
+    '_is_bound'			=> 44,
+    'eol'			=> 100,
+    'sep'			=> 116,
+    'quote'			=> 132,
+    'undef_str'			=> 148,
+    'comment_str'		=> 156,
+    'types'			=> 92,
     );
 
 # A `character'
@@ -405,13 +407,18 @@ sub eol {
     my $self = shift;
     if (@_) {
 	my $eol = shift;
-	defined $eol or $eol = "";
+	defined $eol or $eol = "";	# Also reset strict_eol?
 	length ($eol) > 16 and croak ($self->SetDiag (1005));
 	$self->{'eol'} = $eol;
 	$self->_cache_set ($_cache_id{'eol'}, $eol);
 	}
     $self->{'eol'};
     } # eol
+
+sub eol_type {
+    my $self = shift;
+    $self->_cache_get_eolt;
+    } # eol_type
 
 sub always_quote {
     my $self = shift;
@@ -455,6 +462,12 @@ sub strict {
     @_ and $self->_set_attr_X ("strict", shift);
     $self->{'strict'};
     } # strict
+
+sub strict_eol {
+    my $self = shift;
+    @_ and $self->_set_attr_X ("strict_eol", shift);
+    $self->{'strict_eol'};
+    } # strict_eol
 
 sub _supported_skip_empty_rows {
     my ($self, $f) = @_;
@@ -703,7 +716,7 @@ sub callbacks {
 
 sub error_diag {
     my $self = shift;
-    my @diag = (0 + $last_err, $last_err, 0, 0, 0);
+    my @diag = (0 + $last_err, $last_err, 0, 0, 0, 0);
 
     # Docs state to NEVER use UNIVERSAL::isa, because it will *never* call an
     # overridden isa method in any class. Well, that is exacly what I want here
@@ -714,6 +727,7 @@ sub error_diag {
 	$diag[2] = 1 + $self->{'_ERROR_POS'} if exists $self->{'_ERROR_POS'};
 	$diag[3] =     $self->{'_RECNO'};
 	$diag[4] =     $self->{'_ERROR_FLD'} if exists $self->{'_ERROR_FLD'};
+	$diag[5] =     $self->{'_ERROR_SRC'} if exists $self->{'_ERROR_SRC'} && $self->{'diag_verbose'};
 
 	$diag[0] && $self->{'callbacks'} && $self->{'callbacks'}{'error'} and
 	    return $self->{'callbacks'}{'error'}->(@diag);
@@ -724,6 +738,7 @@ sub error_diag {
 	if ($diag[0] && $diag[0] != 2012) {
 	    my $msg = "# CSV_XS ERROR: $diag[0] - $diag[1] \@ rec $diag[3] pos $diag[2]\n";
 	    $diag[4] and $msg =~ s/$/ field $diag[4]/;
+	    $diag[5] and $msg =~ s/$/ (XS#$diag[5])/;
 
 	    unless ($self && ref $self) {	# auto_diag
 		# called without args in void context
@@ -1073,10 +1088,12 @@ sub getline_hr_all {
 sub say {
     my ($self, $io, @f) = @_;
     my $eol = $self->eol ();
-    $eol eq "" and $self->eol ($\ || $/);
     # say ($fh, undef) does not propage actual undef to print ()
     my $state = $self->print ($io, @f == 1 && !defined $f[0] ? undef : @f);
-    $self->eol ($eol);
+    unless (length $eol) {
+	$eol = $self->eol_type () || $\ || $/;
+	print $io $eol;
+	}
     return $state;
     } # say
 
@@ -1193,13 +1210,41 @@ my $csv_usage = q{usage: my $aoa = csv (in => $file);};
 sub _csv_attr {
     my %attr = (@_ == 1 && ref $_[0] eq "HASH" ? %{$_[0]} : @_) or croak ();
 
-    $attr{'binary'} = 1;
+    $attr{'binary'}     = 1;
+    $attr{'strict_eol'} = 1;
 
     my $enc = delete $attr{'enc'} || delete $attr{'encoding'} || "";
     $enc eq "auto" and ($attr{'detect_bom'}, $enc) = (1, "");
     my $stack = $enc =~ s/(:\w.*)// ? $1 : "";
     $enc =~ m/^[-\w.]+$/ and $enc = ":encoding($enc)";
     $enc .= $stack;
+
+    my $hdrs = delete $attr{'headers'};
+    my $frag = delete $attr{'fragment'};
+    my $key  = delete $attr{'key'};
+    my $val  = delete $attr{'value'};
+    my $kh   = delete $attr{'keep_headers'}		||
+	       delete $attr{'keep_column_names'}	||
+	       delete $attr{'kh'};
+
+    my $cbai = delete $attr{'callbacks'}{'after_in'}	||
+	       delete $attr{'after_in'}			||
+	       delete $attr{'callbacks'}{'after_parse'}	||
+	       delete $attr{'after_parse'};
+    my $cbbo = delete $attr{'callbacks'}{'before_out'}	||
+	       delete $attr{'before_out'};
+    my $cboi = delete $attr{'callbacks'}{'on_in'}	||
+	       delete $attr{'on_in'};
+    my $cboe = delete $attr{'callbacks'}{'on_error'}	||
+	       delete $attr{'on_error'};
+
+    my $hd_s = delete $attr{'sep_set'}			||
+	       delete $attr{'seps'};
+    my $hd_b = delete $attr{'detect_bom'}		||
+	       delete $attr{'bom'};
+    my $hd_m = delete $attr{'munge'}			||
+	       delete $attr{'munge_column_names'};
+    my $hd_c = delete $attr{'set_column_names'};
 
     my $fh;
     my $sink = 0;
@@ -1210,9 +1255,40 @@ sub _csv_attr {
 
     ref $in eq "CODE" || ref $in eq "ARRAY" and $out ||= \*STDOUT;
 
-    $in && $out && !ref $in && !ref $out and croak (join "\n" =>
-	qq{Cannot use a string for both in and out. Instead use:},
-	qq{ csv (in => csv (in => "$in"), out => "$out");\n});
+    my ($fho, $fho_cls);
+    if ($in && $out and (!ref $in  || ref $in  eq "GLOB" || ref \$in  eq "GLOB")
+		    and (!ref $out || ref $out eq "GLOB" || ref \$out eq "GLOB")) {
+	if (ref $out or "GLOB" eq ref \$out) {
+	    $fho = $out;
+	    }
+	else {
+	    open $fho, ">", $out or croak "$out: $!\n";
+	    if (my $e = $attr{'encoding'}) {
+		binmode $fho, ":encoding($e)";
+		$hd_b and print $fho "\x{feff}";
+		}
+	    $fho_cls = 1;
+	    }
+	if ($cboi && !$cbai) {
+	    $cbai = $cboi;
+	    $cboi = undef;
+	    }
+	if ($cbai) {
+	    my $cb = $cbai;
+	    $cbai = sub { $cb->(@_); $_[0]->say ($fho, $_[1]); 0 };
+	    }
+	else {
+	    $cbai = sub {            $_[0]->say ($fho, $_[1]); 0 };
+	    }
+
+	# Put all callbacks back in place for streaming behavior
+	$attr{'callbacks'}{'after_parse'} = $cbai; $cbai = undef;
+	$attr{'callbacks'}{'before_out'}  = $cbbo; $cbbo = undef;
+	$attr{'callbacks'}{'on_in'}       = $cboi; $cboi = undef;
+	$attr{'callbacks'}{'on_error'}    = $cboe; $cboe = undef;
+	$out  = undef;
+	$sink = 1;
+	}
 
     if ($out) {
 	if (ref $out and ("ARRAY" eq ref $out or "HASH" eq ref $out)) {
@@ -1235,7 +1311,7 @@ sub _csv_attr {
 		binmode $fh, $enc;
 		my $fn = fileno $fh; # This is a workaround for a bug in PerlIO::via::gzip
 		}
-	    unless (defined $attr{'eol'}) {
+	    unless (defined $attr{'eol'} || defined $fho) {
 		my @layers = eval { PerlIO::get_layers ($fh) };
 		$attr{'eol'} = (grep m/crlf/ => @layers) ? "\n" : "\r\n";
 		}
@@ -1264,33 +1340,6 @@ sub _csv_attr {
 	$cls = 1;
 	}
     $fh || $sink or croak (qq{No valid source passed. "in" is required});
-
-    my $hdrs = delete $attr{'headers'};
-    my $frag = delete $attr{'fragment'};
-    my $key  = delete $attr{'key'};
-    my $val  = delete $attr{'value'};
-    my $kh   = delete $attr{'keep_headers'}		||
-	       delete $attr{'keep_column_names'}	||
-	       delete $attr{'kh'};
-
-    my $cbai = delete $attr{'callbacks'}{'after_in'}	||
-	       delete $attr{'after_in'}			||
-	       delete $attr{'callbacks'}{'after_parse'}	||
-	       delete $attr{'after_parse'};
-    my $cbbo = delete $attr{'callbacks'}{'before_out'}	||
-	       delete $attr{'before_out'};
-    my $cboi = delete $attr{'callbacks'}{'on_in'}	||
-	       delete $attr{'on_in'};
-    my $cboe = delete $attr{'callbacks'}{'on_error'}	||
-	       delete $attr{'on_error'};
-
-    my $hd_s = delete $attr{'sep_set'}			||
-	       delete $attr{'seps'};
-    my $hd_b = delete $attr{'detect_bom'}		||
-	       delete $attr{'bom'};
-    my $hd_m = delete $attr{'munge'}			||
-	       delete $attr{'munge_column_names'};
-    my $hd_c = delete $attr{'set_column_names'};
 
     for ([ 'quo'    => "quote"		],
 	 [ 'esc'    => "escape"		],
@@ -1332,6 +1381,8 @@ sub _csv_attr {
 	'sink' => $sink,
 	'out'  => $out,
 	'enc'  => $enc,
+	'fho'  => $fho,
+	'fhoc' => $fho_cls,
 	'hdrs' => $hdrs,
 	'key'  => $key,
 	'val'  => $val,
@@ -1404,7 +1455,8 @@ sub csv {
 		}
 	    }
 
-	$c->{'cls'} and close $fh;
+	$c->{'cls'}     and close $fh;
+	$c->{'fho_cls'} and close $c->{'fho'};
 	return 1;
 	}
 
@@ -1534,7 +1586,8 @@ sub csv {
     else {
 	Text::CSV_XS->auto_diag ();
 	}
-    $c->{'cls'} and close $fh;
+    $c->{'cls'}     and close $fh;
+    $c->{'fho_cls'} and close $c->{'fho'};
     if ($ref and $c->{'cbai'} || $c->{'cboi'}) {
 	# Default is ARRAYref, but with key =>, you'll get a hashref
 	foreach my $r (ref $ref eq "ARRAY" ? @{$ref} : values %{$ref}) {
@@ -1577,7 +1630,7 @@ sub csv {
 	    %{$c->{'attr'}},
 	    );
 
-    $last_err ||= $csv->{_ERROR_DIAG};
+    $last_err ||= $csv->{'_ERROR_DIAG'};
     return $ref;
     } # csv
 
@@ -1868,6 +1921,14 @@ Return). The L<C<eol>|/eol> attribute cannot exceed 7 (ASCII) characters.
 If both C<$/> and L<C<eol>|/eol> equal C<"\015">, parsing lines that end on
 only a Carriage Return without Line Feed, will be L</parse>d correct.
 
+=head3 eol_type
+X<eol_type>
+
+ my $eol = $csv->eol_type;
+
+This read-only method returns the internal state of  what is considered the
+valid EOL for parsing.
+
 =head3 sep_char
 X<sep_char>
 
@@ -1986,6 +2047,25 @@ of fields than the previous row will cause the parser to throw error 2014.
 
 Empty rows or rows that result in no fields (like comment lines) are exempt
 from these checks.
+
+=head3 strict_eol
+X<strict_eol>
+
+ my $csv = Text::CSV_XS->new ({ strict_eol => 1 });
+         $csv->strict_eol (0);
+ my $f = $csv->strict_eol;
+
+If this attribute is set to C<0>, no EOL consistency checks are done.
+
+If this attribute is set to C<1>, any row that parses with a EOL other than
+the EOL from the first row will cause a warning.  The error will be ignored
+and parsing continues. This warning is only thrown once.  Note that in data
+with various different line endings, C<\r\r> will still throw an error that
+cannot be ignored.
+
+If this attribute is set to C<2> or higher,  any row that parses with a EOL
+other than the EOL from the first row will cause error C<2016> to be thrown.
+The line being parsed to this error might not be stored in the result.
 
 =head3 skip_empty_rows
 X<skip_empty_rows>
@@ -3386,7 +3466,7 @@ X<error_diag>
  $csv->error_diag ();
  $error_code               = 0  + $csv->error_diag ();
  $error_str                = "" . $csv->error_diag ();
- ($cde, $str, $pos, $rec, $fld) = $csv->error_diag ();
+ ($cde, $str, $pos, $rec, $fld, $xs) = $csv->error_diag ();
 
 If (and only if) an error occurred,  this function returns  the diagnostics
 of that error.
@@ -3402,7 +3482,9 @@ the byte at which the parsing failed in the current record. It might change
 to be the index of the current character in a later release. The records is
 the index of the record parsed by the csv instance. The field number is the
 index of the field the parser thinks it is currently  trying to  parse. See
-F<examples/csv-check> for how this can be used.
+F<examples/csv-check> for how this can be used. If C<$xs> is set, it is the
+line number in XS where the error was triggered (for debugging). C<XS> will
+show in void context only when L</diag_verbose> is set.
 
 If called in  scalar context,  it will return  the diagnostics  in a single
 scalar, a-la C<$!>.  It will contain the error code in numeric context, and
@@ -3501,6 +3583,7 @@ If not overridden, the default option used for CSV is
 
  auto_diag   => 1
  escape_null => 0
+ strict_eol  => 1
 
 The option that is always set and cannot be altered is
 
@@ -3562,18 +3645,23 @@ where, in the absence of the C<out> attribute, this is a shortcut to
 =head3 out
 X<out>
 
- csv (in => $aoa, out => "file.csv");
- csv (in => $aoa, out => $fh);
- csv (in => $aoa, out =>   STDOUT);
- csv (in => $aoa, out =>  *STDOUT);
- csv (in => $aoa, out => \*STDOUT);
- csv (in => $aoa, out => \my $data);
- csv (in => $aoa, out =>  undef);
- csv (in => $aoa, out => \"skip");
+ csv (in => $aoa,  out => "file.csv");
+ csv (in => $aoa,  out => $fh);
+ csv (in => $aoa,  out =>   STDOUT);
+ csv (in => $aoa,  out =>  *STDOUT);
+ csv (in => $aoa,  out => \*STDOUT);
+ csv (in => $aoa,  out => \my $data);
+ csv (in => $aoa,  out =>  undef);
+ csv (in => $aoa,  out => \"skip");
 
- csv (in => $fh,  out => \@aoa);
- csv (in => $fh,  out => \@aoh, bom => 1);
- csv (in => $fh,  out => \%hsh, key => "key");
+ csv (in => $fh,   out => \@aoa);
+ csv (in => $fh,   out => \@aoh, bom => 1);
+ csv (in => $fh,   out => \%hsh, key => "key");
+
+ csv (in => $file, out => $file);
+ csv (in => $file, out => $fh);
+ csv (in => $fh,   out => $file);
+ csv (in => $fh,   out => $fh);
 
 In output mode, the default CSV options when producing CSV are
 
@@ -3622,6 +3710,29 @@ collect that into a single data structure:
 
  my @list; # List of hashes
  csv (in => $_, out => \@list, bom => 1)    for sort glob "foo-[0-9]*.csv";
+
+=head4 Streaming
+X<streaming>
+
+If B<both> C<in> and C<out> are files, file handles or globs,  streaming is
+enforced by injecting an C<after_parse> callback  that immediately uses the
+L<C<say ()>|/say> method of the same instance to output the result and then
+rejects the record.
+
+If a C<after_parse> was already passed as attribute,  that will be included
+in the injected call. If C<on_in> was passed and C<after_parse> was not, it
+will be used instead. If both were passed, C<on_in> is ignored.
+
+The EOL of the first record of the C<in> source is consistently used as EOL
+for all records in the C<out> destination.
+
+The C<filter> attribute is not available.
+
+All other attributes are shared for C<in> and C<out>,  so you cannot define
+different encodings for C<in> and C<out>.  You need to pass a C<$fh>, where
+C<binmode> was used to apply the encoding layers.
+
+Note that this is work in progress and things might change.
 
 =head3 encoding
 X<encoding>
@@ -4521,6 +4632,8 @@ Format a data-set (C<@foo>) into a scalar value in memory (C<$data>):
 
 =head2 Rewriting CSV
 
+=head3 Changing separator
+
 Rewrite C<CSV> files with C<;> as separator character to well-formed C<CSV>:
 
  use Text::CSV_XS qw( csv );
@@ -4531,6 +4644,14 @@ file with BOM and TAB-separation to valid UTF-8 CSV could be:
 
  $ perl -C3 -MText::CSV_XS=csv -we\
     'csv(in=>"utf16tab.csv",encoding=>"utf16",sep=>"\t")' >utf8.csv
+
+=head3 Unifying EOL
+
+Rewrite a CSV file with mixed EOL  and/or inconsistent quotation into a new
+CSV file with consistent EOL and quotation. Attributes apply.
+
+ use Text::CSV_XS qw( csv );
+ csv (in => "file.csv", out => "newfile.csv", quote_space => 1);
 
 =head2 Dumping database tables to CSV
 
@@ -5042,6 +5163,12 @@ Inconsistent number of fields under strict parsing.
 X<2015>
 
 An empty row was not allowed.
+
+=item *
+2016 "EOL - Inconsistent EOL"
+X<2016>
+
+Inconsistent End-Of-Line detected under strict_eol parsing.
 
 =item *
 2021 "EIQ - NL char inside quotes, binary off"

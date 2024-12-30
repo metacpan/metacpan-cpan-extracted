@@ -9,4 +9,4 @@ for my $file (@ARGV) {
     copylink $file;
 }
 
-# $Id: copylink 218 2008-06-12 11:09:11Z rmb1 $
+# $Id$

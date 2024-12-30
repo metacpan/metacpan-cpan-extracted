@@ -1,7 +1,13 @@
 Revision history for Perl distribution File-Copy-Link.
-$Id: Changes 354 2014-07-03 19:42:34Z robin $
 
-0.14	2014-07-04
+0.200   2024-12-30
+    Detect when Windows has symlink() - but symlink creation is not allowed
+
+    Remove use of base.pm
+
+    Add usage/options for copylink script - add test for copylink script
+
+0.140   2014-07-04
 	Changed AUTHOR email - no longer @npl.co.uk 
 
 	Fixed C<or> precendence issue with C<return> in File::Copy::Link,

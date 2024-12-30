@@ -4,7 +4,7 @@ Const::Exporter - Declare constants for export.
 
 # VERSION
 
-version v1.2.3
+version v1.3.0
 
 # SYNOPSIS
 
@@ -241,7 +241,7 @@ The `:all` tag exports all symbols.
 
 ## Support for older Perl versions
 
-This module requires Perl v5.10 or newer.
+This module requires Perl v5.14 or newer.
 
 Pull requests to support older versions of Perl are welcome. See
 ["SOURCE"](#source).
@@ -343,6 +343,11 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+## Reporting Security Vulnerabilities
+
+Security issues should not be reported on the bugtracker website. Please see `SECURITY.md` for instructions how to
+report security vulnerabilities
+
 # AUTHOR
 
 Robert Rothenberg <rrwo@cpan.org>
@@ -354,7 +359,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014-2023 by Robert Rothenberg.
+This software is Copyright (c) 2014-2024 by Robert Rothenberg.
 
 This is free software, licensed under:
 

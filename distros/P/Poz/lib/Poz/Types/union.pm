@@ -43,6 +43,8 @@ sub safe_parse {
     if (!defined $data) {
         if ($self->{__optional__}) {
             return (undef, undef);
+        } elsif (grep {ref $_ eq 'Poz::Types::null'} @{$self->{__validators__}}) {
+            return (undef, undef);
         } else {
             push @errors, "Required";
         }
