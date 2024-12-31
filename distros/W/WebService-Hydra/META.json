@@ -1,5 +1,5 @@
 {
-   "abstract" : "...",
+   "abstract" : "Interact with the Hydra service API",
    "author" : [
       "DERIV <DERIV@cpan.org>"
    ],
@@ -86,67 +86,67 @@
    "provides" : {
       "WebService::Hydra" : {
          "file" : "lib/WebService/Hydra.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "WebService::Hydra::Client" : {
          "file" : "lib/WebService/Hydra/Client.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "WebService::Hydra::Exception" : {
          "file" : "lib/WebService/Hydra/Exception.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "WebService::Hydra::Exception::FeatureUnavailable" : {
          "file" : "lib/WebService/Hydra/Exception/FeatureUnavailable.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "WebService::Hydra::Exception::HydraRequestError" : {
          "file" : "lib/WebService/Hydra/Exception/HydraRequestError.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "WebService::Hydra::Exception::HydraServiceUnreachable" : {
          "file" : "lib/WebService/Hydra/Exception/HydraServiceUnreachable.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "WebService::Hydra::Exception::InternalServerError" : {
          "file" : "lib/WebService/Hydra/Exception/InternalServerError.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "WebService::Hydra::Exception::InvalidClaims" : {
          "file" : "lib/WebService/Hydra/Exception/InvalidClaims.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "WebService::Hydra::Exception::InvalidConsentChallenge" : {
          "file" : "lib/WebService/Hydra/Exception/InvalidConsentChallenge.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "WebService::Hydra::Exception::InvalidIdToken" : {
          "file" : "lib/WebService/Hydra/Exception/InvalidIdToken.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "WebService::Hydra::Exception::InvalidLoginChallenge" : {
          "file" : "lib/WebService/Hydra/Exception/InvalidLoginChallenge.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "WebService::Hydra::Exception::InvalidLoginRequest" : {
          "file" : "lib/WebService/Hydra/Exception/InvalidLoginRequest.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "WebService::Hydra::Exception::InvalidLogoutChallenge" : {
          "file" : "lib/WebService/Hydra/Exception/InvalidLogoutChallenge.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "WebService::Hydra::Exception::InvalidToken" : {
          "file" : "lib/WebService/Hydra/Exception/InvalidToken.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "WebService::Hydra::Exception::RevokeLoginSessionsFailed" : {
          "file" : "lib/WebService/Hydra/Exception/RevokeLoginSessionsFailed.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "WebService::Hydra::Exception::TokenExchangeFailed" : {
          "file" : "lib/WebService/Hydra/Exception/TokenExchangeFailed.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -161,15 +161,16 @@
          "web" : "https://github.com/deriv-com/perl-WebService-Hydra"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_authority" : "cpan:DERIV",
    "x_contributors" : [
       "youssef-deriv <youssef@regentmarkets.com>",
       "mukesh-deriv <85932084+mukesh-deriv@users.noreply.github.com>",
       "nihal-deriv <nihal@deriv.com>",
       "chylli-deriv <chylli@deriv.com>",
+      "Hani Kh <hani@deriv.com>",
       "youssef-deriv <79835196+youssef-deriv@users.noreply.github.com>",
-      "hani-deriv <hani@deriv.com>"
+      "Thibault DUPONCHELLE <thibault@deriv.com>"
    ],
    "x_generated_by_perl" : "v5.26.2",
    "x_serialization_backend" : "JSON::XS version 4.03",

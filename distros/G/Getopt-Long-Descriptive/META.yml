@@ -37,7 +37,7 @@ resources:
   bugtracker: https://github.com/rjbs/Getopt-Long-Descriptive/issues
   homepage: https://github.com/rjbs/Getopt-Long-Descriptive
   repository: https://github.com/rjbs/Getopt-Long-Descriptive.git
-version: '0.115'
+version: '0.116'
 x_Dist_Zilla:
   perl:
     version: '5.038000'
@@ -340,7 +340,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.115'
+          tag: '0.116'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -448,7 +448,6 @@ x_contributors:
   - "Arthur Axel 'fREW' Schmidt <frioux@gmail.com>"
   - 'Dave Rolsky <autarch@urth.org>'
   - 'Diab Jerius <djerius@cfa.harvard.edu>'
-  - 'Hans Dieter Pearcey <hdp@pobox.com>'
   - 'Hans Dieter Pearcey <hdp@weftsoar.net>'
   - 'Harley Pig <harleypig@gmail.com>'
   - 'hdp@cpan.org <hdp@cpan.org@fc0e91e4-031c-0410-8307-be39b06d7656>'

@@ -5,7 +5,7 @@ use warnings;
 use 5.010;
 use utf8;
 
-our $VERSION = '3.04';
+our $VERSION = '3.05';
 
 use Carp qw(confess cluck);
 use DateTime;
@@ -572,6 +572,15 @@ sub results_stopfinder {
 	my $json = $self->{response};
 
 	my @results;
+
+	# Edge case: there is just a single result.
+	# Oh EFA, you so silly.
+	if ( ref( $json->{stopFinder}{points} ) eq 'HASH'
+		and exists $json->{stopFinder}{points}{point} )
+	{
+		$json->{stopFinder}{points} = [ $json->{stopFinder}{points}{point} ];
+	}
+
 	for my $stop ( @{ $json->{stopFinder}{points} // [] } ) {
 		push(
 			@results,
@@ -669,7 +678,7 @@ Travel::Status::DE::EFA - unofficial EFA departure monitor
 
 =head1 VERSION
 
-version 3.04
+version 3.05
 
 =head1 DESCRIPTION
 

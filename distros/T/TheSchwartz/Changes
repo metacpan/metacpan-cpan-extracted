@@ -1,3 +1,8 @@
+1.18 2024-12-31T00:55:27Z
+
+    - docs: Fix link in documentation GH#14 (@mikkoi++)
+    - docs: Fix typo and add a link to Data::ObjectDriver GH#13 (@mikkoi++)
+
 1.17 2021-12-30T13:21:45Z
 
     - schwartzmon: 'Not an ARRAY reference' in DBSet::add for at least v5.16.3 GH#12 (@trwww++)

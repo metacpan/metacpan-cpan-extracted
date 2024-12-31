@@ -25,7 +25,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 require XSLoader;
 XSLoader::load('Text::Markdown::Discount', $VERSION);
@@ -49,7 +49,7 @@ sub markdown {
         }
     }
     if (not defined $flags) {
-        $flags = MKD_NOHEADER()|MKD_NOPANTS();
+        $flags = MKD_NOHEADER()|MKD_NOPANTS()|MKD_DLEXTRA()|MKD_FENCEDCODE();
     }
     return _markdown($text, $flags);
 }

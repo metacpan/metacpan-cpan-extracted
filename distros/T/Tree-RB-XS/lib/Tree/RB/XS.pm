@@ -1,5 +1,5 @@
 package Tree::RB::XS;
-$Tree::RB::XS::VERSION = '0.16';
+$Tree::RB::XS::VERSION = '0.17';
 # VERSION
 # ABSTRACT: Red/Black Tree and LRU Cache implemented in C
 
@@ -25,7 +25,8 @@ our %EXPORT_TAGS= (
 );
 
 if ($] < 5.016) {
-   # Before 5.16, perl didn't have 'fc' and also XS can't call CORE::lc
+   # Before 5.16, perl didn't have 'fc' and CORE::lc wasn't a real sub, so need to wrap the op in our own sub.
+   # If anyone cares about the difference between 'fc' and 'lc' they can monkey-patch this.
    eval('sub _fc_impl { lc shift } 1')
       or die $@;
 }
@@ -1134,7 +1135,7 @@ fast and minimal.  Tree::RB::XS can do the same a bit faster with:
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 AUTHOR
 

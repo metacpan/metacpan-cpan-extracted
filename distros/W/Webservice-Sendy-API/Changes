@@ -1,0 +1,13 @@
+0.1	Sun Dec 29 06:59:33 PM UTC 2024
+	- initial release for API starting with
+	  Sendy API, version 6.1.2
+
+0.2	Mon Dec 30 06:59:33 PM UTC 2024
+	- cleaning up docs, making first full
+          release
+        - increased test coverage
+	- please report any issues or questions
+	  due to lack of clarity in POD
+
+0.3	Mon Dec 30 07:00:33 PM UTC 2024
+	- POD tweaks

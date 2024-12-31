@@ -20,11 +20,11 @@ no_index:
     - inc
 requires:
   Math::Symbolic: '0.613'
-  Math::Symbolic::Custom::Collect: '0.21'
+  Math::Symbolic::Custom::CollectSimplify: '0.2'
   perl: '5.006'
 resources:
   bugtracker: https://github.com/mjohnson108/p5-msc-matrix/issues
   homepage: https://github.com/mjohnson108/
   repository: https://github.com/mjohnson108/p5-msc-matrix.git
-version: '0.1'
+version: '0.2'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.5, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,16 +28,18 @@ provides:
     file: lib/Test2/Compare/JSON.pm
   Test2::Tools::JSON:
     file: lib/Test2/Tools/JSON.pm
-    version: '0.05'
+    version: '0.06'
 requires:
   JSON::MaybeXS: '0'
-  Test2: '1.302160'
-  Test2::Suite: '0.000122'
+  Test2: '1.302199'
+  Test2::Suite: '0.000163'
 resources:
   bugtracker: https://github.com/akiym/Test2-Tools-JSON/issues
   homepage: https://github.com/akiym/Test2-Tools-JSON
-  repository: git://github.com/akiym/Test2-Tools-JSON.git
-version: '0.05'
+  repository: https://github.com/akiym/Test2-Tools-JSON.git
+version: '0.06'
 x_authority: cpan:AKIYM
+x_contributors:
+  - 'yoshikazusawa <883514+yoshikazusawa@users.noreply.github.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

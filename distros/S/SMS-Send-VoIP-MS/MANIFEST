@@ -1,7 +1,7 @@
 Changes
 Makefile.PL
 MANIFEST
-README
+README.md
 t/001_load.t
 t/002_live.t
 t/empty.ini

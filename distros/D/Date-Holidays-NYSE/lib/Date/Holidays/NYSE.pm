@@ -6,7 +6,7 @@ use POSIX (); #strftime to calculate wday
 use Date::Calc 5.0 (); #to calculate Easter and thus Good Friday
 
 our @EXPORT_OK = qw(is_holiday holidays is_nyse_holiday nyse_holidays);
-our $VERSION   = '0.02';
+our $VERSION   = '0.04';
 
 =head1 NAME
 
@@ -33,8 +33,6 @@ Per https://www.nyse.com/markets/hours-calendars these are the NYSE holidays.
   Labor Day
   Thanksgiving Day
   Christmas Day
-
-It is unclear if Juneteenth were to fall on a weekend that it would be observed. Juneteenth was not observed on Friday June 18th, 2021 but the Law was enacted on June 17th, 2021.
 
 =head1 METHODS
 
@@ -85,11 +83,11 @@ sub is_holiday {
     return 'Good Friday';
   } elsif ($month == 5 and $day >= 25 and $day <= 31 and $wday == 1) {                   #Last Monday in May
     return 'Memorial Day';
-  } elsif ($year >= 2022 and $month == 6 and $day == 18 and $wday == 5) {                #Juneteenth on a Friday (Assumption)
+  } elsif ($year >= 2022 and $month == 6 and $day == 18 and $wday == 5) {                #Juneteenth on a Friday
     return 'Juneteenth National Independence Day Observed';
   } elsif ($year >= 2022 and $month == 6 and $day == 19 and $wday >= 1 and $wday <= 5) { #Juneteenth on a weekday
     return 'Juneteenth National Independence Day';
-  } elsif ($year >= 2022 and $month == 6 and $day == 20 and $wday == 1) {                #Juneteenth on a Monday (Assumption)
+  } elsif ($year >= 2022 and $month == 6 and $day == 20 and $wday == 1) {                #Juneteenth on a Monday
     return 'Juneteenth National Independence Day Observed';
   } elsif ($month == 7 and $day == 3 and $wday == 5) {                                   #Friday before July 4
     return 'Independence Day Observed';
@@ -107,6 +105,8 @@ sub is_holiday {
     return 'Christmas Day';
   } elsif ($month == 12 and $day == 26 and $wday == 1) {                                 #Monday after December 25
     return 'Christmas Day Observed';
+  } elsif ($year == 2025 and $month == 1 and $day == 9) {                                #Day of Mourning for Jimmy Carter
+    return 'Day of Mourning for President Jimmy Carter';
   } else {
     return undef;
   }
@@ -157,10 +157,6 @@ Wrapper around holidays function per the API specification. See L<Date::Holidays
 =cut
 
 sub nyse_holidays {return holidays(@_)};
-
-=head1 TODO
-
-This package assumes that Juneteenth will be observed when it falls on a weekend. However, in 2021 Juneteenth was not observed on Friday June 18th, 2021. The next weekend Juneteenth will be in June 2027.
 
 =head1 SEE ALSO
 

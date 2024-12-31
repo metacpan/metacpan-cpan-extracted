@@ -6,7 +6,7 @@ use POSIX; #strftime to calculate wday
 
 our @EXPORT_OK = qw(is_holiday holidays is_us_holiday us_holidays);
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =head1 NAME
 
@@ -171,6 +171,9 @@ sub is_holiday {
   } elsif ($year == 2007 and $month == 1 and $day == 2) {
     #38 January 2, 2007 National Day of Mourning for President Gerald R. Ford
     return 'National Day of Mourning for President Gerald R. Ford';
+  } elsif ($year == 2025 and $month == 1 and $day == 9) {
+    #39 January 9, 2025 National Day of Mourning for President Jimmy Carter
+    return 'National Day of Mourning for President James Earl Carter, Jr.';
   } elsif ($year == 2004 and $month == 6 and $day == 11) {
     #40 June 11, 2004, National Day of Mourning for President Ronald W. Reagan
     return 'National Day of Mourning for President Ronald W. Reagan';

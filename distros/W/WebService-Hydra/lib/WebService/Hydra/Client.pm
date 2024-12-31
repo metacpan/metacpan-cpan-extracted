@@ -19,7 +19,7 @@ use constant OK_NO_CONTENT_CODE      => 204;
 use constant BAD_REQUEST_STATUS_CODE => 400;
 use constant HTTP_TIMEOUT_SECONDS    => 10;
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 field $http;
 field $jwks;
@@ -227,6 +227,41 @@ method accept_login_request ($login_challenge, $accept_payload) {
     return $result->{data};
 }
 
+=head2 reject_login_request
+
+Rejects the login request and returns the response from hydra.
+
+Arguments:
+
+=over 1
+
+=item C<$login_challenge>
+
+Authentication challenge string that is used to identify the login request.
+
+=item C<$reject_payload>
+
+Payload to be sent to the Hydra service to reject the login request.
+
+=back
+
+=cut
+
+method reject_login_request ($login_challenge, $reject_payload) {
+    my $method = "PUT";
+    my $path   = "$admin_endpoint/admin/oauth2/auth/requests/login/reject?challenge=$login_challenge";
+
+    my $result = $self->api_call($method, $path, $reject_payload);
+    if ($result->{code} != OK_STATUS_CODE) {
+        WebService::Hydra::Exception::InvalidLoginRequest->new(
+            message  => "Failed to reject login request",
+            category => "client",
+            details  => $result
+        )->throw;
+    }
+    return $result->{data};
+}
+
 =head2 get_logout_request
 
 Get the logout request and return the response from Hydra.
@@ -284,9 +319,9 @@ Exchanges the authorization code with Hydra service for access and ID tokens.
 =cut
 
 method exchange_token ($exchange_payload) {
-    my $method     = "POST";
-    my $path       = "$public_endpoint/oauth2/token";
-    my $payload    = {
+    my $method  = "POST";
+    my $path    = "$public_endpoint/oauth2/token";
+    my $payload = {
         grant_type => 'authorization_code',
         $exchange_payload->%*
     };

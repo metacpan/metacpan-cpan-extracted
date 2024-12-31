@@ -1,5 +1,8 @@
 Revision history for Perl extension kura
 
+0.09 2024-12-31T05:35:40Z
+    - Fixed Can't locate Data/Validator.pm in @INC #9 (Thanks @eserte for report)
+
 0.08 2024-12-16T00:44:13Z
     - Assign name for anon type tiny #8
 

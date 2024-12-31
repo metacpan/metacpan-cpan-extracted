@@ -1,8 +1,9 @@
 use strict;
 use Math::Symbolic qw/:all/;
 use Math::Symbolic::MiscAlgebra qw/:all/;
-use Math::Symbolic::Custom::Collect 0.21;
-use Math::Symbolic::Custom::Matrix;
+use Math::Symbolic::Custom::Matrix 0.2;
+use Math::Symbolic::Custom::CollectSimplify 0.2;
+Math::Symbolic::Custom::CollectSimplify->register();
 
 use Test::Simple 'no_plan';
 
@@ -140,7 +141,7 @@ sub determinant_4B_3a {
 
     my $det = det @mat;
 
-    if ( defined(my $c = $det->to_collected()) ) {
+    if ( defined(my $c = $det->simplify()) ) {
         return $c;
     }
 
@@ -157,7 +158,7 @@ sub determinant_4B_3e {
 
     my $det = det @mat;
 
-    if ( defined(my $c = $det->to_collected()) ) {
+    if ( defined(my $c = $det->simplify()) ) {
         return $c;
     }
 
@@ -174,7 +175,7 @@ sub determinant_4B_3f {
 
     my $det = det @mat;
 
-    if ( defined(my $c = $det->to_collected()) ) {
+    if ( defined(my $c = $det->simplify()) ) {
         return $c;
     }
 
@@ -191,7 +192,7 @@ sub determinant_4B_3g {
 
     my $det = det @mat;
 
-    if ( defined(my $c = $det->to_collected()) ) {
+    if ( defined(my $c = $det->simplify()) ) {
         return $c;
     }
 
@@ -208,7 +209,7 @@ sub determinant_4B_3h {
 
     my $det = det @mat;
 
-    if ( defined(my $c = $det->to_collected()) ) {
+    if ( defined(my $c = $det->simplify()) ) {
         return $c;
     }
 
@@ -226,7 +227,7 @@ sub determinant_16_2c {
 
     my $det = det @mat;
 
-    if ( defined(my $c = $det->to_collected()) ) {
+    if ( defined(my $c = $det->simplify()) ) {
         return $c;
     }
 
@@ -243,7 +244,7 @@ sub determinant_16_3 {
 
     my $det = det @mat;
 
-    if ( defined(my $c = $det->to_collected()) ) {
+    if ( defined(my $c = $det->simplify()) ) {
         return $c;
     }
 
@@ -260,7 +261,7 @@ sub determinant_16_4 {
 
     my $det = det @mat;
 
-    if ( defined(my $c = $det->to_collected()) ) {
+    if ( defined(my $c = $det->simplify()) ) {
         return $c;
     }
 
@@ -278,7 +279,7 @@ sub determinant_LA_p23 {
 
     my $det = det @mat;
 
-    if ( defined(my $c = $det->to_collected()) ) {
+    if ( defined(my $c = $det->simplify()) ) {
         return $c;
     }
 

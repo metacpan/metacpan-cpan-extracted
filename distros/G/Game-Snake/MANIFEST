@@ -4,10 +4,14 @@ lib/Game/Snake.pm
 lib/Game/Snake/Cell.pm
 lib/Game/Snake/Food.pm
 lib/Game/Snake/Head.pm
+lib/Game/Snake/resources/snake-graphics.png
+lib/Game/Snake/Sprite.pm
 lib/Game/Snake/Tail.pm
 lib/Game/Snake/Text.pm
 Makefile.PL
 MANIFEST			This list of files
+META.json			Module JSON meta-data (added by MakeMaker)
+META.yml			Module YAML meta-data (added by MakeMaker)
 README
 snake.pl
 t/00-load.t
@@ -15,5 +19,3 @@ t/manifest.t
 t/pod-coverage.t
 t/pod.t
 xt/boilerplate.t
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

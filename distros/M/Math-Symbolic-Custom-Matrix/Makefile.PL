@@ -17,8 +17,8 @@ my %WriteMakefileArgs = (
         'Test::Simple' => '0',
     },
     PREREQ_PM => {
-        'Math::Symbolic'                  =>  '0.613',
-        'Math::Symbolic::Custom::Collect' =>    '0.21',
+        'Math::Symbolic'                            =>  '0.613',
+        'Math::Symbolic::Custom::CollectSimplify'   =>  '0.2',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Math-Symbolic-Custom-Matrix-*' },

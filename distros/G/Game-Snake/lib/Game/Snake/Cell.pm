@@ -1,6 +1,6 @@
 use 5.38.0;
 use experimental 'class';
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 class Game::Snake::Cell {
 	use Raylib::FFI;
 	use Raylib::Color;

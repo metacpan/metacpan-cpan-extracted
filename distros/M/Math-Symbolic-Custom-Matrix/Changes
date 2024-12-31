@@ -1,5 +1,16 @@
 Revision history for Math-Symbolic-Custom-Matrix
 
+0.2     Mon Dec 30 17:23 2024
+
+        - Updated simplification
+        - Removed reliance on overloaded operators
+        - Added functions:
+            - make_matrix()
+            - scalar_divide_matrix()
+            - implement_matrix()
+            - set_matrix()
+        - Added examples
+
 0.1     Sat Dec 07 15:10 2024
 
         - First version

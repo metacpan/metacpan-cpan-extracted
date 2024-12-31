@@ -3,20 +3,45 @@ use Test2::Tools::JSON;
 
 use Test2::Compare::Custom;
 
-is {
-    foo  => 'bar',
-    json => '{"a":1}',
-}, {
-    foo  => 'bar',
-    json => json({ a => E }),
+subtest 'JSON cmp success' => sub {
+    is {
+        foo  => 'bar',
+        json => '{"a":1}',
+    }, {
+        foo  => 'bar',
+        json => json({ a => E }),
+    };
 };
 
-is {
-    foo  => 'bar',
-    json => '{"a":1}',
-}, hash {
-    field json => json({ a => 1 });
-    etc;
+subtest 'JSON in JSON cmp success (compare by Test2::Tools::Compare subs)' => sub {
+    is {
+        foo  => 'bar',
+        json => '{"a":10,"b":{"b1":20},"c":"[30,\"foo\"]"}',
+    }, {
+        foo  => 'bar',
+        json => json hash {
+            field b => hash {
+                field b1 => number 20;
+                end;
+            };
+            field c => json array {
+                item 0 => number 30;
+                item 1 => string "foo";
+                end;
+            };
+            etc;
+        },
+    };
+};
+
+subtest 'JSON cmp success (exact hash)' => sub {
+    is {
+        foo  => 'bar',
+        json => '{"a":1}',
+    }, hash {
+        field json => json({ a => 1 });
+        etc;
+    };
 };
 
 subtest 'JSON cmp failure (expect raw hash)' => sub {
@@ -33,7 +58,7 @@ subtest 'JSON cmp failure (expect raw hash)' => sub {
                 table => {
                     header => [qw/PATH LNs GOT OP CHECK LNs/],
                     rows   => [
-                        ['{json}', '', '{"a":1}', 'JSON', "$hash", '25'],
+                        ['{json}', '', '{"a":1}', 'JSON', "$hash", E],
                         ['{json} <JSON>->{a}', '', '1', 'eq', '2'],
                     ],
                 },

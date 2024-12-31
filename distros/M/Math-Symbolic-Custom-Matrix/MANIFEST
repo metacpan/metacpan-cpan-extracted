@@ -1,4 +1,6 @@
 Changes
+examples/pod_example.pl
+examples/resistor_circuit.pl
 ignore.txt
 lib/Math/Symbolic/Custom/Matrix.pm
 Makefile.PL

@@ -1,3 +1,8 @@
+Travel::Status::DE::VRR 3.05 - Mon Dec 30 2024
+
+    * efa-m: add --raw-json option
+    * EFA stopFinder: add special handling for #results == 1
+
 Travel::Status::DE::VRR 3.04 - Sun Dec 22 2024
 
     * EFA: Add NWL service definition

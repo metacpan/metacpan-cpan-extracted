@@ -1,0 +1,162 @@
+#!/usr/bin/env perl
+
+package local::bin::sendy;
+
+use v5.10;
+use strict;
+use warnings;
+
+use Dispatch::Fu;
+use Webservice::Sendy::API qw//;
+use Util::H2O::More        qw/ddd Getopt2h2o ini2h2o o2d/;
+
+our $VERSION = 0.3;
+
+use constant {
+  EXIT_SUCCESS => 0,
+  EXIT_ERROR   => 1,
+};
+
+my $HOME = (getpwuid($<))[7];
+my $CONFIG = "$HOME/.sendy.ini";
+
+my $subcommand = shift @ARGV;
+
+sub do_help() {
+  print STDERR <<EOF;
+sendy Utility version $local::bin::sendy::VERSION - for Sendy 6.1.2+, bundled with Webservice::Sendy::API (https://metacpan.org)
+
+This utility is distributed with the Perl library, Webservice::Sendy::API. It uses
+the library to implement the following subcommands. It is a good example of how
+to use the Perl module directly, since this utility and the module are maintained
+together.
+
+Subcommands:
+
+  count        - list count   
+  create       - create campaign; draft, send now, or schedule send
+  brands       - list brands
+  delete       - delete email address from list
+  lists        - list lists in a given brand Id 
+  subscribe    - subscribe email address given a list Id
+  status       - get status of an email address, given a list Id
+  unsubscribe  - unsubscribe email address given a list Id 
+  help         - print this help 
+  "-h"         - print this help
+  "-v"         - print version banner of this utility, then exit
+
+For more details, type:
+
+  perldoc Webservice::Sendy::API
+
+EOF
+}
+
+#>>>
+dispatch { # Dispatch::Fu
+  xdefault shift, q{help};
+} $subcommand,
+  count       => sub { get_active_subscriber_count(\@ARGV) },
+  create      => sub { create_campaign(\@ARGV) },
+  brands      => sub { get_brands(\@ARGV) },
+  delete      => sub { delete_subscriber(\@ARGV) },
+  lists       => sub { get_lists(\@ARGV) },
+  subscribe   => sub { subscribe(\@ARGV) },
+  status      => sub { get_subscription_status(\@ARGV) },
+  unsubscribe => sub { unsubscribe(\@ARGV) },
+  help        => \&do_help,
+  "-h"        => \&do_help,
+  "-v"        => sub { printf "sendy Utility version %s - bundled with Webservice::Sendy::API (https://metacpan.org)\n", $local::bin::sendy::VERSION },
+;
+#<<<
+
+sub create_campaign {
+  my ($argv) = @_;
+  my @opts   = qw/config=s from_name=s from_email=s reply_to=s title=s subject=s plain_text=s html_text=s
+                  list_ids=s segment_ids=s exclude_list_ids=s brand_id=s query_string=s schedule_date_time=s
+                  schedule_timezone=s track_opens track_clicks send_campaign/;
+  my $o      = Getopt2h2o $argv, { config => $CONFIG }, @opts;
+  my $sendy  = Webservice::Sendy::API->new(config => $o->config);
+  my $result = $sendy->create_campaign(%{o2d $o});
+  print $result;
+  exit EXIT_SUCCESS;
+}
+
+sub subscribe {
+  my ($argv) = @_;
+  my @opts   = qw/config=s name=s email=s list_id=s country=s ipaddress=s referrer=s gdpr=s silent hp=s/;
+  my $o      = Getopt2h2o $argv, { config => $CONFIG }, @opts;
+  my $sendy  = Webservice::Sendy::API->new(config => $o->config);
+  my $result = $sendy->subscribe(%{o2d $o});
+  print $result;
+  exit EXIT_SUCCESS;
+}
+
+sub unsubscribe {
+  my ($argv) = @_;
+  my $o      = Getopt2h2o $argv, { config => $CONFIG }, qw/config=s list_id=s email=s/;
+  my $sendy  = Webservice::Sendy::API->new(config => $o->config);
+  my $result = $sendy->unsubscribe(list_id => $o->list_id, email => $o->email);
+  print $result;
+  exit EXIT_SUCCESS;
+}
+
+sub delete_subscriber {
+  my ($argv) = @_;
+  my $o      = Getopt2h2o $argv, { config => $CONFIG }, qw/config=s list_id=s email=s/;
+  my $sendy  = Webservice::Sendy::API->new(config => $o->config);
+  my $result = $sendy->delete_subscriber(list_id => $o->list_id, email => $o->email);
+  print $result;
+  exit EXIT_SUCCESS;
+}
+
+sub get_subscription_status {
+  my ($argv) = @_;
+  my $o      = Getopt2h2o $argv, { config => $CONFIG }, qw/config=s list_id=s email=s/;
+  my $sendy  = Webservice::Sendy::API->new(config => $o->config);
+  my $status = $sendy->get_subscription_status(list_id => $o->list_id, email => $o->email);
+  chomp $status;
+  printf "%s\n", $status;
+  exit EXIT_SUCCESS;
+}
+
+sub get_active_subscriber_count {
+  my ($argv) = @_;
+  my $o      = Getopt2h2o $argv, { config => $CONFIG }, qw/config=s list_id=s/;
+  my $sendy  = Webservice::Sendy::API->new(config => $o->config);
+  my $count   = $sendy->get_active_subscriber_count(list_id => $o->list_id);
+  chomp $count;
+  printf "%s\n", $count;
+  exit EXIT_SUCCESS;
+}
+
+sub get_brands {
+  my ($argv) = @_;
+  my $o      = Getopt2h2o $argv, { config => $CONFIG }, qw/config=s/;
+  my $sendy  = Webservice::Sendy::API->new(config => $o->config);
+  my $brands = $sendy->get_brands;
+  foreach my $key (sort keys %$brands) {
+    my $brand = $brands->$key;
+    printf "%-3d  %s\n", $brand->id, $brand->name;
+  }
+  return EXIT_SUCCESS;
+}
+
+sub get_lists {
+  my ($argv) = @_;
+  my $o      = Getopt2h2o $argv, { config => $CONFIG }, qw/config=s brand_id=i/;
+  my $sendy  = Webservice::Sendy::API->new(config => $o->config);
+  my $lists   = $sendy->get_lists(brand_id => $o->brand_id);
+  my $count = 1;
+  foreach my $key (sort keys %$lists) {
+    my $list = $lists->$key;
+    printf "%-3d  %s  %s\n", $count++, $list->id, $list->name;
+  }
+  return EXIT_SUCCESS;
+}
+
+1
+
+__END__
+This seems like something that my long lost brother, Grant, may see; and
+if he does I hope he knows I love him.

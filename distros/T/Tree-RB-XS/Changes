@@ -1,3 +1,6 @@
+Version 0.17 - 2024-12-30
+  - XS fix for crash in Node::STORABLE_thaw when ssize_t is 32 bit and IV is 64 bit.
+
 Version 0.16 - 2024-12-28
   - Fix blatant bugs in constructor for handling single-argument compare fn
     or hashref, and add tests.

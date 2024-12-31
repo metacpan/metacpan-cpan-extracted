@@ -4,7 +4,7 @@ use warnings;
 use 5.010;
 use utf8;
 
-our $VERSION = '3.04';
+our $VERSION = '3.05';
 
 binmode( STDOUT, ':encoding(utf-8)' );
 
@@ -19,7 +19,7 @@ my $efa_url;
 my $efa_encoding;
 my $use_cache = 1;
 my $cache;
-my $json_output;
+my ( $json_output, $raw_json_output );
 my ( $date,        $time, $input_type, $list_lines, $offset, $relative_times );
 my ( $full_routes, $filter_via, $show_jid );
 my ( $timeout,     $developer_mode );
@@ -60,6 +60,7 @@ GetOptions(
 	'V|track-via=s'                 => \$filter_via,
 	'cache!'                        => \$use_cache,
 	'json'                          => \$json_output,
+	'raw-json'                      => \$raw_json_output,
 	'devmode'                       => \$developer_mode,
 	'version'                       => \&show_version,
 
@@ -340,7 +341,7 @@ sub show_stopseq {
 
 	printf(
 		"Fahrt %s am %s\n",
-		$trip->number || $stopseq,
+		$trip->number || $stopseq->{stateless},
 		( $trip->route )[0]->sched_dep->strftime('%d.%m.%Y'),
 	);
 	say q{};
@@ -575,6 +576,9 @@ if ($json_output) {
 		say JSON->new->convert_blessed->encode( [ $efa->results ] );
 	}
 }
+elsif ($raw_json_output) {
+	say JSON->new->convert_blessed->encode( $efa->{response} );
+}
 elsif ($coord) {
 	show_coord();
 }
@@ -609,7 +613,7 @@ B<efa-m> [B<-s> I<service>] I<tripid>
 
 =head1 VERSION
 
-version 3.04
+version 3.05
 
 =head1 DESCRIPTION
 
@@ -777,6 +781,11 @@ availability, delay reasons, and more.
 
 Only show departures at I<platforms> (comma-separated list, option may be
 repeated).  Note that the C<< Bstg. >> / C<< Gleis >> prefix must be omitted.
+
+=item B<--raw-json>
+
+Print unprocessed EFA response as JSON and exit.
+Useful for debugging and development purposes.
 
 =item B<-r>, B<--relative> (monitor)
 

@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Getopt::Long::Descriptive 0.115;
+package Getopt::Long::Descriptive 0.116;
 # ABSTRACT: Getopt::Long, but simpler and more powerful
 
 use v5.12;
@@ -474,11 +474,13 @@ sub _build_describe_options {
       show_defaults => $arg->{show_defaults},
     });
 
-    Getopt::Long::Configure(@go_conf);
+    my $old_go_conf = Getopt::Long::Configure(@go_conf);
 
     my %return;
     $usage->die unless GetOptions(\%return, grep { length } @getopt_specs);
     my @given_keys = keys %return;
+
+    Getopt::Long::Configure($old_go_conf);
 
     for my $opt (keys %return) {
       my $newopt = _munge($opt);
@@ -734,7 +736,7 @@ Getopt::Long::Descriptive - Getopt::Long, but simpler and more powerful
 
 =head1 VERSION
 
-version 0.115
+version 0.116
 
 =head1 SYNOPSIS
 
@@ -1049,10 +1051,6 @@ Dave Rolsky <autarch@urth.org>
 =item *
 
 Diab Jerius <djerius@cfa.harvard.edu>
-
-=item *
-
-Hans Dieter Pearcey <hdp@pobox.com>
 
 =item *
 

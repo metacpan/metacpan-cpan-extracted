@@ -12,6 +12,7 @@ sub import {
     my $caller = caller;
 
     no strict 'refs';
+    no warnings 'redefine';
     local *{"kura::create_constraint"} = \&create_constraint;
 
     kura->import_into($caller, $name, $args);

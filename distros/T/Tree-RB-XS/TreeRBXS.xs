@@ -59,7 +59,6 @@ static bool looks_like_integer(SV *sv) {
 
 static int parse_key_type(SV *type_sv) {
 	const char *str;
-	size_t len;
 	IV key_type= -1;
 	if (SvIOK(type_sv)) {
 		key_type= SvIV(type_sv);
@@ -67,6 +66,7 @@ static int parse_key_type(SV *type_sv) {
 			key_type= -1;
 	}
 	else if (SvPOK(type_sv)) {
+		STRLEN len;
 		str= SvPV(type_sv, len);
 		if (len > 9 && foldEQ(str, "KEY_TYPE_", 9)) {
 			str += 9;
@@ -122,8 +122,6 @@ static TreeRBXS_xform_fn TreeRBXS_xform_fc;
 #define CMP_MAX         9
 
 static int parse_cmp_fn(SV *cmp_sv) {
-	const char *str;
-	size_t len;
 	int cmp_id= -1;
 	if (SvROK(cmp_sv) && SvTYPE(SvRV(cmp_sv)) == SVt_PVCV)
 		cmp_id= CMP_SUB;
@@ -132,7 +130,8 @@ static int parse_cmp_fn(SV *cmp_sv) {
 		cmp_id= (i < 1 || i > CMP_MAX || i == CMP_SUB)? -1 : (int) i;
 	}
 	else if (SvPOK(cmp_sv)) {
-		str= SvPV(cmp_sv, len);
+		STRLEN len;
+		const char *str= SvPV(cmp_sv, len);
 		if (len > 4 && foldEQ(str, "CMP_", 4)) {
 			str += 4;
 			len -= 4;
@@ -180,16 +179,13 @@ static const char * get_cmp_name(int cmp_id) {
 #define GET_MAX  9
 
 static int parse_lookup_mode(SV *mode_sv) {
-	int mode;
-	STRLEN len;
-	char *mode_str;
-
-	mode= -1;
+	int mode= -1;
 	if (SvIOK(mode_sv)) {
 		IV i= SvIV(mode_sv);
 		mode= (i < 0 || i > GET_MAX)? -1 : (int) i;
 	} else if (SvPOK(mode_sv)) {
-		mode_str= SvPV(mode_sv, len);
+		STRLEN len;
+		char* mode_str= SvPV(mode_sv, len);
 		if (len > 4 && foldEQ(mode_str, "GET_", 4)) {
 			mode_str+= 4;
 			len -= 4;
@@ -441,7 +437,7 @@ struct TreeRBXS_iter * TreeRBXS_get_hashiter(struct TreeRBXS *tree) {
  * (and, the destructor *must not* be called on the stack item)
  */
 static void TreeRBXS_init_tmp_item(struct TreeRBXS_item *item, struct TreeRBXS *tree, SV *key, SV *value) {
-	size_t len= 0;
+	STRLEN len= 0;
 
 	// all fields should start NULL just to be safe
 	memset(item, 0, sizeof(*item));
@@ -470,7 +466,7 @@ static void TreeRBXS_init_tmp_item(struct TreeRBXS_item *item, struct TreeRBXS *
 		if (0)
 	case KEY_TYPE_BSTR:
 			item->keyunion.ckey= SvPVbyte(key, len);
-		// the ckeylen is a bit field, so can't go the full range of size_t
+		// the ckeylen is a bit field, so can't go the full range of int
 		if (len > CKEYLEN_MAX)
 			croak("String length %ld exceeds maximum %ld for optimized key_type", (long)len, CKEYLEN_MAX);
 		item->ckeylen= len;
@@ -487,7 +483,6 @@ static void TreeRBXS_init_tmp_item(struct TreeRBXS_item *item, struct TreeRBXS *
  */
 static struct TreeRBXS_item * TreeRBXS_new_item_from_tmp_item(struct TreeRBXS_item *src) {
 	struct TreeRBXS_item *dst;
-	size_t keyptr_len, strbuf_len;
 	bool is_buffered_key= src->key_type == KEY_TYPE_USTR || src->key_type == KEY_TYPE_BSTR;
 	/* If the item references a string that is not managed by a SV,
 	   copy that into the space at the end of the allocated block.
@@ -497,6 +492,7 @@ static struct TreeRBXS_item * TreeRBXS_new_item_from_tmp_item(struct TreeRBXS_it
 	   The node needs to hold onto the original key, which gets stored
 	   at the end of the buffer area */
 	if (src->orig_key_stored || is_buffered_key) {
+		size_t keyptr_len, strbuf_len;
 		strbuf_len= is_buffered_key? src->ckeylen+1 : 0;
 		keyptr_len= src->orig_key_stored? sizeof(SV*) : 0;
 		Newxc(dst, sizeof(struct TreeRBXS_item) + keyptr_len + strbuf_len, char, struct TreeRBXS_item);
@@ -665,7 +661,6 @@ static void TreeRBXS_iter_advance(struct TreeRBXS_iter *iter, IV ofs) {
 	rbtree_node_t *node;
 	struct TreeRBXS_item *item= iter->item;
 	struct dllist_node *cur, *end;
-	size_t pos, newpos, cnt;
 
 	if (!iter->tree)
 		croak("BUG: iterator lost tree");
@@ -701,6 +696,7 @@ static void TreeRBXS_iter_advance(struct TreeRBXS_iter *iter, IV ofs) {
 		}
 	}
 	else {
+		size_t pos, newpos, cnt;
 		// More advanced case falls back to by-index, since the log(n) of indexes is likely
 		// about the same as a few hops forward or backward, and because reversing from EOF
 		// means there isn't a current node to step from anyway.
@@ -1878,7 +1874,7 @@ new(obj_or_pkg, ...)
 		struct TreeRBXS *tree= NULL;
 		SV *objref= NULL, **attr_list;
 		HV *obj_hv= NULL, *pkg= NULL;
-		SSize_t n_unknown, i, attr_len;
+		IV n_unknown, i, attr_len;
 	PPCODE:
 		if (sv_isobject(obj_or_pkg) && SvTYPE(SvRV(obj_or_pkg)) == SVt_PVHV) {
 			objref= obj_or_pkg;
@@ -3129,7 +3125,7 @@ STORABLE_thaw(item_sv, cloning, idx, refs)
 	PPCODE:
 		(void) cloning; /* unused */
 		if (idx == -1) {
-			SSize_t n;
+			IV n;
 			SV **svec= unwrap_array(refs, &n);
 			if (!svec || n != 2 || !svec[0] || !svec[1])
 				croak("Expected arrayref of (key,value)");

@@ -7,7 +7,7 @@ use 5.006;
 use ExtUtils::MakeMaker 7.64;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "...",
+  "ABSTRACT" => "Interact with the Hydra service API",
   "AUTHOR" => "DERIV <DERIV\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => "7.64"
@@ -41,7 +41,7 @@ my %WriteMakefileArgs = (
     "Test::MockModule" => 0,
     "Test::More" => "0.94"
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t t/unit/*.t"
   }

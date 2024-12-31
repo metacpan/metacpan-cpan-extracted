@@ -26,7 +26,7 @@ no_index:
 provides:
   Text::ANSI::Fold:
     file: lib/Text/ANSI/Fold.pm
-    version: '2.2701'
+    version: '2.2702'
   Text::ANSI::Fold::Japanese::W3C:
     file: lib/Text/ANSI/Fold/Japanese/W3C.pm
   Text::ANSI::Fold::Japanese::Wikipedia:
@@ -39,7 +39,7 @@ resources:
   bugtracker: https://github.com/tecolicom/Text-ANSI-Fold/issues
   homepage: https://github.com/tecolicom/Text-ANSI-Fold
   repository: https://github.com/tecolicom/Text-ANSI-Fold.git
-version: '2.2701'
+version: '2.2702'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

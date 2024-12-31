@@ -7,7 +7,7 @@ use warnings;
 use Plack::Util::Accessor qw(changes generator title);
 use Tags::HTML::CPAN::Changes 0.06;
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 sub _css {
 	my ($self, $env) = @_;
@@ -101,9 +101,9 @@ Default value is undef.
 
 =item * C<css>
 
-Instance of CSS::Struct::Output object.
+Instance of L<CSS::Struct::Output> object.
 
-Default value is CSS::Struct::Output::Raw instance.
+Default value is L<CSS::Struct::Output::Raw> instance.
 
 =item * C<generator>
 
@@ -113,15 +113,15 @@ Default value is 'Plack::App::CPAN::Changes; Version: __VERSION__'
 
 =item * C<tags>
 
-Instance of Tags::Output object.
+Instance of L<Tags::Output> object.
 
-Default value is Tags::Output::Raw->new('xml' => 1) instance.
+Default value is L<Tags::Output::Raw>->new('xml' => 1) instance.
 
 =item * C<title>
 
 Page title.
 
-Default value is 'Login page'.
+Default value is 'Changes'.
 
 =back
 
@@ -302,6 +302,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

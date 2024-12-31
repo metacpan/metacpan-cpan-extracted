@@ -1,5 +1,9 @@
 Revision history for Perl extension Text-ANSI-Fold
 
+2.2702 2024-12-30T23:48:13Z
+
+    - rename "crackwide" to "splitwide"
+
 2.2701 2024-11-20T09:41:03Z
 
     - improve "crackwide" behavior

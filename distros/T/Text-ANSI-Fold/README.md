@@ -5,7 +5,7 @@ Text::ANSI::Fold - Text folding library supporting ANSI terminal sequence and As
 
 # VERSION
 
-Version 2.2701
+Version 2.2702
 
 # SYNOPSIS
 
@@ -295,7 +295,7 @@ function as well as **new** and **configure** method.
     Option **runin** and **runout** is used to set maximum width of moving
     characters.  Default values are both 2.
 
-- **crackwide** => _bool_
+- **splitwide** => _bool_
 - **lefthalf** => _char_
 - **righthalf** => _char_
 

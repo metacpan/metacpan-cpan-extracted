@@ -1,6 +1,6 @@
 use 5.38.0;
 use experimental 'class';
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 class Game::Snake {
 	use Raylib::App;	
 	use Raylib::FFI;
@@ -41,6 +41,13 @@ class Game::Snake {
 		);
 		push @snake, Game::Snake::Tail->new(
 			x => 320,
+			y => 400,
+			width => $cell_size,
+			height => $cell_size,
+			direction => 'left'
+		);
+		push @snake, Game::Snake::Tail->new(
+			x => 340,
 			y => 400,
 			width => $cell_size,
 			height => $cell_size,
@@ -171,24 +178,30 @@ class Game::Snake {
 	method draw_snake {
 		%collide = ();
 		my ($last);
-		for (reverse @snake) {
-			if ($_->direction eq 'left') {
-				$_->x($_->x - $cell_size);
-			} elsif ($_->direction eq 'right') {
-				$_->x($_->x + $cell_size);
-			} elsif ($_->direction eq 'up') {
-				$_->y($_->y - $cell_size);
-			} elsif ($_->direction eq 'down') {
-				$_->y($_->y + $cell_size);
+		for (my $i = scalar @snake - 1; $i >= 0; $i--) {
+			my $sn = $snake[$i];
+			if ($sn->direction eq 'left') {
+				$sn->x($sn->x - $cell_size);
+			} elsif ($sn->direction eq 'right') {
+				$sn->x($sn->x + $cell_size);
+			} elsif ($sn->direction eq 'up') {
+				$sn->y($sn->y - $cell_size);
+			} elsif ($sn->direction eq 'down') {
+				$sn->y($sn->y + $cell_size);
 			}
-			$_->draw();
+
+			if ($i > 0) {
+				$sn->bend( $snake[$i - 1]->direction ne $sn->direction ? $snake[$i - 1]->direction : 0 );
+				$sn->last($i == $#snake ? 1 : 0 );
+			}
+			$sn->draw();
 			if ($last) {
-				$last->direction($_->direction);
+				$last->direction($sn->direction);
 				$collide{$last->x}->{$last->y}++;
 			}
-			$last = $_;
+			$last = $sn;
 		}
-		
+
 		my $head = $snake[0];
 		if (
 			$collide{$head->x}->{$head->y}
@@ -242,7 +255,7 @@ Game::Snake - A clone of the classic snake game using raylib
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 

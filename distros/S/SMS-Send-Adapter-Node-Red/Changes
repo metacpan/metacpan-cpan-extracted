@@ -1,5 +1,12 @@
 Revision history for Perl extension SMS::Send::Adapter::Node::Red.
 
+0.10 2024-12-29
+  - Added driver method to consolidate 3-level driver logic.
+
+0.09 2024-12-29
+  - Added default driver from INI file
+  - Switched from JSON to JSON::XS
+
 0.08 2023-12-20
   - Updated lib/SMS/Send/Adapter/Node/Red.pm to allow default Driver from environment SMS_SEND_ADAPTER_NODE_RED_DRIVER
 

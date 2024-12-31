@@ -33,7 +33,7 @@
       "runtime" : {
          "requires" : {
             "Math::Symbolic" : "0.613",
-            "Math::Symbolic::Custom::Collect" : "0.21",
+            "Math::Symbolic::Custom::CollectSimplify" : "0.2",
             "perl" : "5.006"
          }
       },
@@ -55,6 +55,6 @@
          "web" : "https://github.com/mjohnson108/p5-msc-matrix"
       }
    },
-   "version" : "0.1",
+   "version" : "0.2",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

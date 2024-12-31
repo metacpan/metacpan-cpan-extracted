@@ -4,7 +4,7 @@
       "Takumi Akiyama <t.akiym@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.5",
+   "generated_by" : "Minilla/v3.1.23",
    "license" : [
       "perl_5"
    ],
@@ -43,8 +43,8 @@
       "runtime" : {
          "requires" : {
             "JSON::MaybeXS" : "0",
-            "Test2" : "1.302160",
-            "Test2::Suite" : "0.000122"
+            "Test2" : "1.302199",
+            "Test2::Suite" : "0.000163"
          }
       },
       "test" : {
@@ -59,7 +59,7 @@
       },
       "Test2::Tools::JSON" : {
          "file" : "lib/Test2/Tools/JSON.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -69,12 +69,16 @@
       },
       "homepage" : "https://github.com/akiym/Test2-Tools-JSON",
       "repository" : {
-         "url" : "git://github.com/akiym/Test2-Tools-JSON.git",
+         "type" : "git",
+         "url" : "https://github.com/akiym/Test2-Tools-JSON.git",
          "web" : "https://github.com/akiym/Test2-Tools-JSON"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_authority" : "cpan:AKIYM",
-   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_contributors" : [
+      "yoshikazusawa <883514+yoshikazusawa@users.noreply.github.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

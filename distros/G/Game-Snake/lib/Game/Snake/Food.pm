@@ -1,6 +1,6 @@
 use 5.38.0;
 use experimental 'class';
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 class Game::Snake::Food {
 	use Raylib::App;
 	use Raylib::FFI;
@@ -9,6 +9,14 @@ class Game::Snake::Food {
 	field $y : param;
 	field $height : param;
 	field $width : param;
+
+	field $sprite = Game::Snake::Sprite->new(
+		image => 'resources/snake-graphics.png',
+		x => 0,
+		y => 192,
+		width => 64,
+		height => 64
+	);
 
 	method x (@xx) {
 		$x = $xx[0] if @xx;
@@ -21,13 +29,7 @@ class Game::Snake::Food {
 	}
 
 	method draw () {
-		my $rectangle = Raylib::FFI::Rectangle->new(
-			x => $x,
-			y => $y,
-			width => $width,
-			height => $height
-		);
-		DrawRectangleRec($rectangle, Raylib::Color::YELLOW);
+		$sprite->draw($x, $y, $width, $height);
 	}
 }
 

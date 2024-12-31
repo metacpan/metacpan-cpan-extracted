@@ -1,5 +1,8 @@
 Revision history for Perl extension Date::Holidays::US.
 
+0.07 2024-12-30
+   - Added National Day of Mourning for President Carter (Jan 9, 2025), Impacts 2025
+
 0.06 2024-12-25
   - Added National Day of Mourning holidays, Impacts 1963, 1973, 1994, 2004, 2007, and 2018
 

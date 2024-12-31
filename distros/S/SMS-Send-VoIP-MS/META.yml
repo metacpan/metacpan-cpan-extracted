@@ -3,24 +3,28 @@ abstract: 'SMS::Send driver for VoIP.ms Web Services'
 author:
   - 'Michael R. Davis <mrdvt92>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.120921'
-license: unknown
+generated_by: 'ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150001'
+license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: SMS-Send-VoIP-MS
 no_index:
   directory:
     - t
     - inc
 requires:
-  JSON::XS: 0
-  Path::Class: 0
-  SMS::Send::Driver::WebService: 0
-  Test::Simple: 0
-  URI: 0
-version: 0.03
+  JSON::XS: '0'
+  Path::Class: '0'
+  SMS::Send::Driver::WebService: '0'
+  Test::Simple: '0'
+  URI: '0'
+resources:
+  bugtracker: https://github.com/mrdvt92/perl-SMS-Send-VoIP-MS/issues
+  homepage: https://github.com/mrdvt92/perl-SMS-Send-VoIP-MS
+  repository: https://github.com/mrdvt92/perl-SMS-Send-VoIP-MS.git
+version: '0.04'

@@ -105,6 +105,24 @@ Payload to be sent to the Hydra service to confirm the login challenge.
 
 =back
 
+=head2 reject_login_request
+
+Rejects the login request and returns the response from hydra.
+
+Arguments:
+
+=over 1
+
+=item C<$login_challenge>
+
+Authentication challenge string that is used to identify the login request.
+
+=item C<$reject_payload>
+
+Payload to be sent to the Hydra service to reject the login request.
+
+=back
+
 =head2 get_logout_request
 
 Get the logout request and return the response from Hydra.

@@ -1,7 +1,9 @@
 [![Actions Status](https://github.com/janeskil1525/Daje-Workflow-Load/actions/workflows/test.yml/badge.svg)](https://github.com/janeskil1525/Daje-Workflow-Load/actions)
 # NAME
 
-Daje::Workflow::Loader - It's new $module
+Daje::Workflow::Loader - It's loader for
+
+Daje-Workflow JSON based workflows
 
 # SYNOPSIS
 
@@ -23,7 +25,9 @@ Daje::Workflow::Loader - It's new $module
 
 # DESCRIPTION
 
-Daje::Workflow::Loader is ...
+Daje::Workflow::Loader is a workflow loader for
+
+the Daje-Workflow engine
 
 # REQUIRES
 

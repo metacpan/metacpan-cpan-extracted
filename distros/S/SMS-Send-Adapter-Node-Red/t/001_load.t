@@ -1,7 +1,7 @@
 # --perl--
 use strict;
 use warnings;
-use JSON qw{encode_json};
+use JSON::XS qw{encode_json};
 
 use Test::More tests => 42;
 BEGIN { use_ok('SMS::Send::Adapter::Node::Red') };

@@ -250,7 +250,7 @@ Given a job handle (a scalar string) _$handle_, runs the job, then returns.
 
 ## `$client->grab_and_work_on($handle)`
 
-Similar to [$client->work\_on($handle)](https://metacpan.org/pod/%24client-%3Ework_on%28%24handle%29), except that the job will be grabbed
+Similar to ["$client->work\_on($handle)"](#client-work_on-handle), except that the job will be grabbed
 before being run. It guarantees that only one worker will work on it (at least
 in the `grab_for` interval).
 
@@ -320,7 +320,7 @@ out of scope)
 
 # PASSING IN AN EXISTING DRIVER
 
-You can pass in a existing `Data::Object::Driver::DBI` object which also allows you
+You can pass in a existing [Data::ObjectDriver](https://metacpan.org/pod/Data%3A%3AObjectDriver) object which also allows you
 to reuse exist Database handles like so:
 
         my $dbh = DBI->connect( $dsn, "root", "", {

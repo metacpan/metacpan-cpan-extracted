@@ -7,6 +7,17 @@ Daje::Workflow::Database::Model - is the data models used by Daje-Workflow
 
     use Daje::Workflow::Database::Model;
 
+    my $data = Daje::Workflow::Database::Model->new(
+         db            => $db,
+         workflow_pkey => $workflow_pkey,
+         workflow_name => $workflow_name,
+         context       => $context,
+     )->load();
+
+     my $workflow = $data->workflow();
+
+     my $context = $self->context();
+
 # REQUIRES
 
 Daje::Workflow::Database::Model::Context

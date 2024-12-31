@@ -1,5 +1,5 @@
 package Text::ANSI::Fold::Util;
-our $VERSION = "1.04";
+our $VERSION = "1.05";
 
 use v5.14;
 use utf8;
@@ -32,7 +32,7 @@ Text::ANSI::Fold::Util - Text::ANSI::Fold utilities (width, substr)
 
 =head1 VERSION
 
-Version 1.04
+Version 1.05
 
 =head1 DESCRIPTION
 
@@ -85,9 +85,9 @@ returned.
 
 It does not cut the text in the middle of multi-byte character.  If
 you want to split the text in the middle of a wide character, specify
-the C<crackwide> option.
+the C<splitwide> option.
 
-    Text::ANSI::Fold->configure(crackwide => 1);
+    Text::ANSI::Fold->configure(splitwide => 1);
 
 If an optional I<replacement> parameter is given, replace the
 substring by the replacement and return the entire string.  If 0 is

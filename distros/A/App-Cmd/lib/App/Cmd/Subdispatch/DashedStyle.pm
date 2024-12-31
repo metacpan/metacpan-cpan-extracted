@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-package App::Cmd::Subdispatch::DashedStyle 0.336;
+package App::Cmd::Subdispatch::DashedStyle 0.337;
 
 use App::Cmd::Subdispatch;
 BEGIN { our @ISA = 'App::Cmd::Subdispatch' };
@@ -20,15 +20,15 @@ BEGIN { our @ISA = 'App::Cmd::Subdispatch' };
 #pod =cut
 
 sub get_command {
-	my ($self, @args) = @_;
+  my ($self, @args) = @_;
 
-	my (undef, $opt, @sub_args)
+  my (undef, $opt, @sub_args)
     = $self->App::Cmd::Command::prepare($self->app, @args);
 
-	if (my $cmd = delete $opt->{subcommand}) {
-		delete $opt->{$cmd}; # useless boolean
-		return ($cmd, $opt, @sub_args);
-	} else {
+  if (my $cmd = delete $opt->{subcommand}) {
+    delete $opt->{$cmd}; # useless boolean
+    return ($cmd, $opt, @sub_args);
+  } else {
     return (undef, $opt, @sub_args);
   }
 }
@@ -41,24 +41,24 @@ sub get_command {
 #pod =cut
 
 sub opt_spec {
-	my ($self, $app) = @_;
+  my ($self, $app) = @_;
 
-	my $subcommands = $self->_command;
-	my %plugins = map {
-		$_ => [ $_->command_names ],
-	} values %$subcommands;
+  my $subcommands = $self->_command;
+  my %plugins = map {
+    $_ => [ $_->command_names ],
+  } values %$subcommands;
 
-	foreach my $opt_spec (values %plugins) {
-		$opt_spec = join("|", grep { /^\w/ } @$opt_spec);
-	}
+  foreach my $opt_spec (values %plugins) {
+    $opt_spec = join("|", grep { /^\w/ } @$opt_spec);
+  }
 
-	my @subcommands = map { [ $plugins{$_} =>  $_->abstract ] } keys %plugins;
+  my @subcommands = map { [ $plugins{$_} =>  $_->abstract ] } keys %plugins;
 
-	return (
-		[ subcommand => hidden => { one_of => \@subcommands } ],
-		$self->global_opt_spec($app),
-		{ getopt_conf => [ 'pass_through' ] },
-	);
+  return (
+    [ subcommand => hidden => { one_of => \@subcommands } ],
+    $self->global_opt_spec($app),
+    { getopt_conf => [ 'pass_through' ] },
+  );
 }
 
 1;
@@ -75,7 +75,7 @@ App::Cmd::Subdispatch::DashedStyle - "app cmd --subcmd" style subdispatching
 
 =head1 VERSION
 
-version 0.336
+version 0.337
 
 =head1 PERL VERSION
 
@@ -109,7 +109,7 @@ Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Ricardo Signes.
+This software is copyright (c) 2024 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

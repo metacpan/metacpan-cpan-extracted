@@ -64,14 +64,14 @@ use Daje::Workflow::Database::Model::Context;
 # janeskil1525 E<lt>janeskil1525@gmail.comE<gt>
 #
 
-our $VERSION = "0.05";
+our $VERSION = "0.07";
 
 has 'db';               # Constructor
 has 'workflow_pkey';    # Constructor
 has 'workflow_name';    # Constructor
 has 'context';          # Constructor
 
-has 'workflow';
+has 'workflow_data';
 
 sub load($self) {
     eval {
@@ -90,7 +90,7 @@ sub load_workflow($self) {
         workflow      => $self->workflow_name,
     )->load();
     $self->workflow_pkey($workflow->{workflow_pkey});
-    $self->workflow($workflow);
+    $self->workflow_data($workflow);
     return;
 }
 
@@ -105,8 +105,9 @@ sub save_workflow($self, $workflow) {
 
 sub load_context($self) {
     my $context = Daje::Workflow::Database::Model::Context->new(
-        db => $self->db,
-        workflow_pkey => $self->workflow_pkey
+        db            => $self->db,
+        workflow_pkey => $self->workflow_pkey,
+        context       => $self->context,
     )->load_fk();
 
     $self->context($context);

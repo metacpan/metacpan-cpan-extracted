@@ -11,10 +11,26 @@ WriteMakefile(
                       },
     ABSTRACT_FROM  => 'lib/SMS/Send/VoIP/MS.pm',
     AUTHOR         => 'Michael R. Davis <mrdvt92>',
+    LICENSE        => 'mit',
     EXE_FILES    => [
                     qw{
                        scripts/perl-SMS-Send-VoIP-MS-send_sms.pl
                       }
                     ],
-
+  'META_MERGE' => {
+    'resources' => {
+      'repository' => {
+        'web' => 'https://github.com/mrdvt92/perl-SMS-Send-VoIP-MS.git',
+        'url' => 'git@github.com:mrdvt92/perl-SMS-Send-VoIP-MS.git',
+        'type' => 'git'
+      },
+      'homepage' => 'https://github.com/mrdvt92/perl-SMS-Send-VoIP-MS',
+      'bugtracker' => {
+        'web' => 'https://github.com/mrdvt92/perl-SMS-Send-VoIP-MS/issues'
+      }
+    },
+    'meta-spec' => {
+      'version' => 2
+    }
+  }
 );

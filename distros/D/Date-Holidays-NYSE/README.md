@@ -24,8 +24,6 @@ Per https://www.nyse.com/markets/hours-calendars these are the NYSE holidays.
     Thanksgiving Day
     Christmas Day
 
-It is unclear if Juneteenth were to fall on a weekend that it would be observed. Juneteenth was not observed on Friday June 18th, 2021 but the Law was enacted on June 17th, 2021.
-
 # METHODS
 
 ## is\_holiday
@@ -61,10 +59,6 @@ Returns a hash reference containing all of the holidays in the specified year. T
 ## nyse\_holidays
 
 Wrapper around holidays function per the API specification. See ["holidays1" in Date::Holidays](https://metacpan.org/pod/Date::Holidays#holidays1)
-
-# TODO
-
-This package assumes that Juneteenth will be observed when it falls on a weekend. However, in 2021 Juneteenth was not observed on Friday June 18th, 2021. The next weekend Juneteenth will be in June 2027.
 
 # SEE ALSO
 

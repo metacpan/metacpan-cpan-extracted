@@ -19,7 +19,7 @@ Test2::Tools::JSON - Compare JSON string as data structure with Test2
 # DESCRIPTION
 
 Test2::Tools::JSON provides comparison tools for JSON string.
-This module was inspired by [Test::Deep::JSON](https://metacpan.org/pod/Test::Deep::JSON).
+This module was inspired by [Test::Deep::JSON](https://metacpan.org/pod/Test%3A%3ADeep%3A%3AJSON).
 
 # FUNCTIONS
 
@@ -29,6 +29,8 @@ This module was inspired by [Test::Deep::JSON](https://metacpan.org/pod/Test::De
 
         is '{"a":1}', json({a => 1});
 
+        is '{"a":{"b":1},"c":2}', json hash { field a => {b => 1}; etc; };
+
 - $check = relaxed\_json($expected)
 
     Verify the value in the `$got` relaxed JSON string has the same data structure as `$expected`.
@@ -37,9 +39,9 @@ This module was inspired by [Test::Deep::JSON](https://metacpan.org/pod/Test::De
 
 # SEE ALSO
 
-[Test::Deep::JSON](https://metacpan.org/pod/Test::Deep::JSON)
+[Test::Deep::JSON](https://metacpan.org/pod/Test%3A%3ADeep%3A%3AJSON)
 
-[Test2::Suite](https://metacpan.org/pod/Test2::Suite), [Test2::Tools::Compare](https://metacpan.org/pod/Test2::Tools::Compare)
+[Test2::Suite](https://metacpan.org/pod/Test2%3A%3ASuite), [Test2::Tools::Compare](https://metacpan.org/pod/Test2%3A%3ATools%3A%3ACompare)
 
 # LICENSE
 

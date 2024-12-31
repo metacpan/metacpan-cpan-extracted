@@ -5,7 +5,7 @@ use URI;
 use JSON::XS qw{decode_json};
 use base qw{SMS::Send::Driver::WebService};
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 NAME
 
@@ -18,15 +18,15 @@ SMS::Send::VoIP::MS - SMS::Send driver for VoIP.ms Web Services
   [VoIP::MS]
   username=myuser
   password=mypass
-  did=8005551212
+  did=8005550123
  
   use SMS::Send;
   my $sms     = SMS::Send->new('VoIP::MS');
-  my $success = $sms->send_sms(text=> 'Hello World!', to =>'+17035551212');
+  my $success = $sms->send_sms(text=> 'Hello World!', to =>'+17035550123');
  
   use SMS::Send::VoIP::MS;
   my $sms     = SMS::Send::VoIP::MS->new;
-  my $success = $sms->send_sms(text=> 'Hello World!', to =>'+17035551212');
+  my $success = $sms->send_sms(text=> 'Hello World!', to =>'+17035550123');
   my $json    = $sms->{__content};
   my $href    = $sms->{__data};
 
@@ -38,7 +38,7 @@ SMS::Send driver for VoIP.ms Web Services.
 
 =head2 send_sms
 
-  my $success = $sms->send_sms(text=> 'Hello World!', to =>'+17035551212');
+  my $success = $sms->send_sms(text=> 'Hello World!', to =>'+17035550123');
 
 =cut
 
@@ -132,11 +132,9 @@ Michael R. Davis, mrdvt92
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2020 by Michael R. Davis
+Copyright (C) 2024 by Michael R. Davis
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.16.3 or,
-at your option, any later version of Perl 5 you may have available.
+MIT
 
 =cut
 

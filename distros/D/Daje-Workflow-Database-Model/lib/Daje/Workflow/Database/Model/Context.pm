@@ -41,12 +41,14 @@ use Mojo::JSON qw { to_json from_json };
 has 'db';
 has 'workflow_pkey';
 has 'context_pkey';
+has 'context';
 
 sub load_pk($self) {
     my $context = $self->_load_pk();
     unless(exists $context->{context_pkey} and $context->{context_pkey} > 0) {
         $context->{context_pkey} = 0;
         $context->{workflow_fkey} = $self->workflow_pkey;
+        $context->{context} = $self->context->{context};
         my $context_pkey = $self->save($context);
         $self->context_pkey($context_pkey);
         $context = $self->_load_pk();
@@ -76,6 +78,7 @@ sub load_fk($self) {
     unless(exists $context->{context_pkey} and $context->{context_pkey} > 0) {
         $context->{context_pkey} = 0;
         $context->{workflow_fkey} = $self->workflow_pkey;
+        $context->{context} = $self->context->{context};
         my $context_pkey = $self->save($context);
         $self->context_pkey($context_pkey);
         $context = $self->_load_pk();

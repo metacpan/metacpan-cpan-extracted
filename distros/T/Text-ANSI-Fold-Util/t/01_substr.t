@@ -74,13 +74,13 @@ my $s = Text::ANSI::Fold::Util::substr($_, 3, 6);
 is($s, "\e[31m222\e[m   ", "color: padding");
 
 
-# crackwide
+# splitwide
 
 $_ = "\e[31m赤赤\e[m赤";
-Text::ANSI::Fold->configure(crackwide => 1);
+Text::ANSI::Fold->configure(splitwide => 1);
 my $s = Text::ANSI::Fold::Util::substr($_, 1, 4);
 my $nbp = "\N{NO-BREAK SPACE}";
-is($s, "\e[31m${nbp}赤\e[m${nbp}", "color: crackwide");
+is($s, "\e[31m${nbp}赤\e[m${nbp}", "color: splitwide");
 
 done_testing;
 

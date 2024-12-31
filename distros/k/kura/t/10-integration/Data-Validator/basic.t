@@ -1,5 +1,5 @@
 use Test2::V0;
-use Test2::Require::Module 'Poz', '0.02';
+use Test2::Require::Module 'Data::Validator', '1.07';
 
 use FindBin qw($Bin);
 use lib "$Bin";

@@ -64,7 +64,7 @@
    "provides" : {
       "Poz" : {
          "file" : "lib/Poz.pm",
-         "version" : "0.09"
+         "version" : "0.11"
       },
       "Poz::Builder" : {
          "file" : "lib/Poz/Builder.pm"
@@ -109,7 +109,7 @@
          "web" : "https://github.com/ytnobody/p5-Poz"
       }
    },
-   "version" : "0.09",
+   "version" : "0.11",
    "x_contributors" : [
       "kobaken <kentafly88@gmail.com>"
    ],

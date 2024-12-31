@@ -25,4 +25,4 @@ resources:
   bugtracker: https://github.com/mrdvt92/perl-Date-Holidays-NYSE/issues
   homepage: https://github.com/mrdvt92/perl-Date-Holidays-NYSE
   repository: https://github.com/mrdvt92/perl-Date-Holidays-NYSE.git
-version: '0.02'
+version: '0.04'

@@ -19,8 +19,13 @@ no_index:
     - inc
 requires:
   CGI: '0'
-  JSON: '0'
+  Config::IniFiles: '0'
+  JSON::XS: '0'
   Package::New: '0'
   SMS::Send: '0'
   SMS::Send::VoIP::MS: '0'
-version: '0.08'
+resources:
+  bugtracker: https://github.com/mrdvt92/perl-SMS-Send-Adapter-Node-Red/issues
+  homepage: https://github.com/mrdvt92/perl-SMS-Send-Adapter-Node-Red
+  repository: https://github.com/mrdvt92/perl-SMS-Send-Adapter-Node-Red.git
+version: '0.10'

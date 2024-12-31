@@ -539,6 +539,73 @@ subtest 'oidc_config' => sub {
 
 };
 
+subtest 'reject_login_request' => sub {
+    my $mock_hydra = Test::MockModule->new('WebService::Hydra::Client');
+    my $mock_api_response;
+    my @params;
+    $mock_hydra->redefine(
+        'api_call',
+        sub {
+            (@params) = @_;
+            return $mock_api_response;
+        });
+
+    my $client = WebService::Hydra::Client->new(
+        admin_endpoint  => 'http://dummyhydra.com/admin',
+        public_endpoint => 'http://dummyhydra.com'
+    );
+
+    my $reject_payload = {
+        error             => 'access_denied',
+        error_debug       => 'User authentication failed',
+        error_description => 'Invalid credentials provided',
+        error_hint        => 'Check your username and password',
+        status_code       => 401
+    };
+
+    # Test for 200 OK status code
+    $mock_api_response = {
+        code => 200,
+        data => {redirect_to => 'http://dummyhydra.com/error'}};
+
+    my $got = $client->reject_login_request("VALID_CHALLENGE", $reject_payload);
+    is $params[1], 'PUT', 'PUT request method';
+    is $params[2], 'http://dummyhydra.com/admin/admin/oauth2/auth/requests/login/reject?challenge=VALID_CHALLENGE',
+        'Request URL built with correct parameters';
+    is_deeply $params[3], $reject_payload,            'Request payload is correct';
+    is_deeply $got,       $mock_api_response->{data}, 'api_call response correctly parsed';
+
+    # Test for non-200 status codes
+    $mock_api_response = {
+        code => 400,
+        data => {
+            error             => "string",
+            error_description => "string",
+            status_code       => 400
+        }};
+
+    dies_ok { $client->reject_login_request("INVALID_CHALLENGE", $reject_payload) }
+    'Dies if non-200 status code is received from api_call';
+
+    my $exception          = $@;
+    my $expected_exception = WebService::Hydra::Exception::InvalidLoginRequest->new(
+        message  => 'Failed to reject login request',
+        category => 'client',
+        details  => $mock_api_response
+    );
+    is_deeply $exception, $expected_exception, 'Return api_call response for Non 200 status code';
+
+    # Test network failure
+    $mock_hydra->redefine(
+        'api_call',
+        sub {
+            die "Request to http://dummyhydra.com/admin/oauth2/auth/requests/login/reject?challenge=VALID_CHALLENGE failed - Network issue";
+        });
+
+    dies_ok { $client->reject_login_request("VALID_CHALLENGE", $reject_payload) }
+    'Dies if http request fails for some reason';
+};
+
 subtest 'validate_token' => sub {
     my $mock_hydra       = Test::MockModule->new('WebService::Hydra::Client');
     my $mock_token       = 'mock.jwt.token';

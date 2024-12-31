@@ -4,7 +4,7 @@
       ", Six Apart Ltd, cpan@sixapart.com. All"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.12",
+   "generated_by" : "Minilla/v3.1.23",
    "license" : [
       "perl_5"
    ],
@@ -58,7 +58,7 @@
    "provides" : {
       "TheSchwartz" : {
          "file" : "lib/TheSchwartz.pm",
-         "version" : "1.17"
+         "version" : "1.18"
       },
       "TheSchwartz::Error" : {
          "file" : "lib/TheSchwartz/Error.pm"
@@ -86,11 +86,12 @@
       },
       "homepage" : "https://github.com/akiym/TheSchwartz",
       "repository" : {
-         "url" : "git://github.com/akiym/TheSchwartz.git",
+         "type" : "git",
+         "url" : "https://github.com/akiym/TheSchwartz.git",
          "web" : "https://github.com/akiym/TheSchwartz"
       }
    },
-   "version" : "1.17",
+   "version" : "1.18",
    "x_authority" : "cpan:AKIYM",
    "x_contributors" : [
       "Akira Sawada <akira@peatix.com>",
@@ -99,11 +100,12 @@
       "Jeff Fearn <jfearn@redhat.com>",
       "Keita Jamadam Sugama <sugama@jamadam.com>",
       "Kenichi Ishigaki <ishigaki@cpan.org>",
+      "Mikko Koivunalho <mikkoi@cpan.org>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Six Apart Ltd. <cpan@sixapart.com>",
       "Takumi Akiyama <t.akiym@gmail.com>",
       "Todd Wade <waveright@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

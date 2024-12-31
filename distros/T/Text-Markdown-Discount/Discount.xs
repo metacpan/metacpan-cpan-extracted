@@ -35,6 +35,15 @@ BOOT:
     newCONSTSUB(stash, "MKD_NOALPHALIST", newSViv(MKD_NOALPHALIST));
     newCONSTSUB(stash, "MKD_NODLIST", newSViv(MKD_NODLIST));
     newCONSTSUB(stash, "MKD_EXTRA_FOOTNOTE", newSViv(MKD_EXTRA_FOOTNOTE));
+    newCONSTSUB(stash, "MKD_NOSTYLE", newSViv(MKD_NOSTYLE));
+    newCONSTSUB(stash, "MKD_NODLDISCOUNT", newSViv(MKD_NODLDISCOUNT));
+    newCONSTSUB(stash, "MKD_DLEXTRA", newSViv(MKD_DLEXTRA));
+    newCONSTSUB(stash, "MKD_FENCEDCODE", newSViv(MKD_FENCEDCODE));
+    newCONSTSUB(stash, "MKD_IDANCHOR", newSViv(MKD_IDANCHOR));
+    newCONSTSUB(stash, "MKD_GITHUBTAGS", newSViv(MKD_GITHUBTAGS));
+    newCONSTSUB(stash, "MKD_URLENCODEDANCHOR", newSViv(MKD_URLENCODEDANCHOR));
+    newCONSTSUB(stash, "MKD_LATEX", newSViv(MKD_LATEX));
+    newCONSTSUB(stash, "MKD_EXPLICITLIST", newSViv(MKD_EXPLICITLIST));
 
 SV *
 TextMarkdown__markdown(sv_str, flags)

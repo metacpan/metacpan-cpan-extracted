@@ -33,7 +33,8 @@
       "runtime" : {
          "requires" : {
             "CGI" : "0",
-            "JSON" : "0",
+            "Config::IniFiles" : "0",
+            "JSON::XS" : "0",
             "Package::New" : "0",
             "SMS::Send" : "0",
             "SMS::Send::VoIP::MS" : "0"
@@ -41,5 +42,15 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.08"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mrdvt92/perl-SMS-Send-Adapter-Node-Red/issues"
+      },
+      "homepage" : "https://github.com/mrdvt92/perl-SMS-Send-Adapter-Node-Red",
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/mrdvt92/perl-SMS-Send-Adapter-Node-Red.git"
+      }
+   },
+   "version" : "0.10"
 }

@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package App::Cmd::Tester::CaptureExternal 0.336;
+package App::Cmd::Tester::CaptureExternal 0.337;
 
 use parent 'App::Cmd::Tester';
 use Capture::Tiny 0.13 qw/capture/;
@@ -81,7 +81,7 @@ App::Cmd::Tester::CaptureExternal - Extends App::Cmd::Tester to capture from ext
 
 =head1 VERSION
 
-version 0.336
+version 0.337
 
 =head1 SYNOPSIS
 
@@ -132,7 +132,7 @@ Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Ricardo Signes.
+This software is copyright (c) 2024 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

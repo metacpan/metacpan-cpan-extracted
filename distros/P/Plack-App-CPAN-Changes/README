@@ -53,7 +53,7 @@ METHODS
 
             Page title.
 
-            Default value is 'Login page'.
+            Default value is 'Changes'.
 
     Returns instance of object.
 
@@ -213,5 +213,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.04
+    0.05
 

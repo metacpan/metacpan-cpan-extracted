@@ -5,7 +5,7 @@ use 5.020;
 use warnings;
 use experimental qw(postderef postderef_qq);
 
-package App::Cmd::Subdispatch 0.336;
+package App::Cmd::Subdispatch 0.337;
 
 use App::Cmd;
 use App::Cmd::Command;
@@ -21,13 +21,13 @@ BEGIN { our @ISA = qw(App::Cmd::Command App::Cmd) }
 #pod =cut
 
 sub new {
-	my ($inv, $fields, @args) = @_;
-	if (ref $inv) {
-		@{ $inv }{ keys %$fields } = values %$fields;
-		return $inv;
-	} else {
-		$inv->SUPER::new($fields, @args);
-	}
+  my ($inv, $fields, @args) = @_;
+  if (ref $inv) {
+    @{ $inv }{ keys %$fields } = values %$fields;
+    return $inv;
+  } else {
+    $inv->SUPER::new($fields, @args);
+  }
 }
 
 #pod =method prepare
@@ -40,15 +40,15 @@ sub new {
 #pod =cut
 
 sub prepare {
-	my ($class, $app, @args) = @_;
+  my ($class, $app, @args) = @_;
 
-	my $self = $class->new({ app => $app });
+  my $self = $class->new({ app => $app });
 
-	my ($subcommand, $opt, @sub_args) = $self->get_command(@args);
+  my ($subcommand, $opt, @sub_args) = $self->get_command(@args);
 
   $self->set_global_options($opt);
 
-	if (defined $subcommand) {
+  if (defined $subcommand) {
     return $self->_prepare_command($subcommand, $opt, @sub_args);
   } else {
     if (@args) {
@@ -87,17 +87,17 @@ sub app { $_[0]{app} }
 #pod =cut
 
 sub choose_parent_app {
-	my ( $self, $app, $plugin ) = @_;
+  my ( $self, $app, $plugin ) = @_;
 
-	if (
+  if (
     $plugin->isa("App::Cmd::Command::commands")
     or $plugin->isa("App::Cmd::Command::help")
     or keys $self->global_options->%*
   ) {
-		return $self;
-	} else {
-		return $app;
-	}
+    return $self;
+  } else {
+    return $app;
+  }
 }
 
 1;
@@ -114,7 +114,7 @@ App::Cmd::Subdispatch - an App::Cmd::Command that is also an App::Cmd
 
 =head1 VERSION
 
-version 0.336
+version 0.337
 
 =head1 PERL VERSION
 
@@ -162,7 +162,7 @@ Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Ricardo Signes.
+This software is copyright (c) 2024 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

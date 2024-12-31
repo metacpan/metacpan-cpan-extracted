@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-package App::Cmd::ArgProcessor 0.336;
+package App::Cmd::ArgProcessor 0.337;
 
 # ABSTRACT: App::Cmd-specific wrapper for Getopt::Long::Descriptive
 
@@ -10,7 +10,7 @@ sub _process_args {
   local @ARGV = @$args;
 
   require Getopt::Long::Descriptive;
-  Getopt::Long::Descriptive->VERSION(0.084);
+  Getopt::Long::Descriptive->VERSION(0.116);
 
   my ($opt, $usage) = Getopt::Long::Descriptive::describe_options(@params);
 
@@ -35,7 +35,7 @@ App::Cmd::ArgProcessor - App::Cmd-specific wrapper for Getopt::Long::Descriptive
 
 =head1 VERSION
 
-version 0.336
+version 0.337
 
 =head1 PERL VERSION
 
@@ -53,7 +53,7 @@ Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Ricardo Signes.
+This software is copyright (c) 2024 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

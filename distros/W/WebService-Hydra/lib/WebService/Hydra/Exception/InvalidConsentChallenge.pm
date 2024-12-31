@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Object::Pad;
 
-our $VERSION = '0.004'; ## VERSION
+our $VERSION = '0.005'; ## VERSION
 
 class WebService::Hydra::Exception::InvalidConsentChallenge :isa(WebService::Hydra::Exception) {
     field $redirect_to :param :reader = undef;

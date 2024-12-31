@@ -1,5 +1,5 @@
 Name:           perl-SMS-Send-Adapter-Node-Red
-Version:        0.08
+Version:        0.10
 Release:        1%{?dist}
 Summary:        SMS::Send Adapter to Node-RED JSON HTTP request
 License:        mit
@@ -9,15 +9,17 @@ Source0:        http://www.cpan.org/modules/by-module/SMS/SMS-Send-Adapter-Node-
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:      noarch
 BuildRequires:  perl(CGI)
-BuildRequires:  perl(JSON)
+BuildRequires:  perl(JSON::XS)
 BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl(Package::New)
 BuildRequires:  perl(SMS::Send)
 BuildRequires:  perl(SMS::Send::VoIP::MS)
+BuildRequires:  perl(Config::IniFiles)
 Requires:       perl(CGI)
-Requires:       perl(JSON)
+Requires:       perl(JSON::XS)
 Requires:       perl(Package::New)
 Requires:       perl(SMS::Send)
+Requires:       perl(Config::IniFiles)
 Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 
 %description
@@ -61,7 +63,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,-)
-%doc Changes META.json README
+%doc Changes META.json README.md
 %{perl_vendorlib}/*
 %{_mandir}/man3/*
 %{_datadir}/%{name}/*.psgi

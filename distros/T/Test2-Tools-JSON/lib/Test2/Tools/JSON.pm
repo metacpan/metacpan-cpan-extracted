@@ -2,7 +2,7 @@ package Test2::Tools::JSON;
 use strict;
 use warnings;
 
-our $VERSION = "0.05";
+our $VERSION = "0.06";
 
 use Carp ();
 use JSON::MaybeXS qw/JSON/;
@@ -74,6 +74,8 @@ This module was inspired by L<Test::Deep::JSON>.
 Verify the value in the C<$got> JSON string has the same data structure as C<$expected>.
 
     is '{"a":1}', json({a => 1});
+
+    is '{"a":{"b":1},"c":2}', json hash { field a => {b => 1}; etc; };
 
 =item $check = relaxed_json($expected)
 

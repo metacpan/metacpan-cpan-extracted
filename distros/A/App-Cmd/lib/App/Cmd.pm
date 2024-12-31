@@ -5,7 +5,7 @@ use 5.020;
 use warnings;
 use experimental qw(postderef postderef_qq);
 
-package App::Cmd 0.336;
+package App::Cmd 0.337;
 
 use parent 'App::Cmd::ArgProcessor';
 # ABSTRACT: write command line apps with less suffering
@@ -350,7 +350,7 @@ sub prepare_args {
 
 use constant default_args => [];
 
-#pod =method abstract 
+#pod =method abstract
 #pod
 #pod    sub abstract { "command description" }
 #pod
@@ -540,8 +540,8 @@ sub allow_any_unambiguous_abbrev { return 0 }
 #pod =cut
 
 sub global_options {
-	my $self = shift;
-	return $self->{global_options} //= {} if ref $self;
+  my $self = shift;
+  return $self->{global_options} //= {} if ref $self;
   return {};
 }
 
@@ -657,7 +657,7 @@ sub _global_option_processing_params {
   return (
     $self->usage_desc(@args),
     $self->global_opt_spec(@args),
-    { getopt_conf => $self->_getopt_conf },
+    { getopt_conf => [ $self->_getopt_conf->@*, 'pass_through' ] },
   );
 }
 
@@ -751,7 +751,7 @@ App::Cmd - write command line apps with less suffering
 
 =head1 VERSION
 
-version 0.336
+version 0.337
 
 =head1 SYNOPSIS
 
@@ -886,7 +886,7 @@ If C<L</prepare_args>> is not changed and there are no arguments in C<@ARGV>,
 this method is called and should return an arrayref to be used as the arguments
 to the program.  By default, it returns an empty arrayref.
 
-=head2 abstract 
+=head2 abstract
 
    sub abstract { "command description" }
 
@@ -1117,10 +1117,6 @@ Ingy dot Net <ingy@ingy.net>
 
 =item *
 
-Jakob Voss <jakob@nichtich.de>
-
-=item *
-
 Jakob Voss <voss@gbv.de>
 
 =item *
@@ -1195,7 +1191,7 @@ Yuval Kogman <nuffin@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Ricardo Signes.
+This software is copyright (c) 2024 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

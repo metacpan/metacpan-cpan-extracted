@@ -1,5 +1,13 @@
 Revision history for Perl extension Poz
 
+0.11 2024-12-30T14:30:40Z
+
+    - feature: add "is" feature to object type
+
+0.10 2024-12-30T13:47:49Z
+
+    - bugfix: undefined value warning when undefined value passed to object schema
+
 0.09 2024-12-30T01:54:18Z
 
     - feature: add null feature

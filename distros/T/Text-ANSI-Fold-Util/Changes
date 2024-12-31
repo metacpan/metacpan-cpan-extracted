@@ -1,5 +1,9 @@
 Revision history for Perl extension Text-ANSI-Fold-Util
 
+1.05 2024-12-31T01:36:00Z
+
+    - Text::ANSI::Fold crackwide option was renamed to splitwide
+
 1.04 2024-11-21T08:09:15Z
 
     - substr with replacement fails for unmatched substring

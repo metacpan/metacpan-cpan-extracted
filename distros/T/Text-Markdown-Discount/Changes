@@ -1,5 +1,10 @@
 Revision history for Perl extension Text::Markdown::XS.
 
+0.17 Tue Dec 31 06:24:03 UTC 2024
+	- update discount to v2.2.7d
+	- add latest MKD_* flags
+	- enable fenced code blocks by default again
+
 0.16 Mon Nov 14 21:01:22 UTC 2022
 	- 3f9e817 clean up MANIFEST and dist clean target files
 

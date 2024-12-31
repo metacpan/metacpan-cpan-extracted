@@ -1,7 +1,7 @@
 Changes
 Makefile.PL
 MANIFEST
-README
+README.md
 LICENSE
 t/001_load.t
 t/changes.t

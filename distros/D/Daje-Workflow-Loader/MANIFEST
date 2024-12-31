@@ -1,6 +1,10 @@
 Build.PL
 Changes
+Daje-Workflow-Loader.iml
 LICENSE
+META.json
+MYMETA.json
+MYMETA.yml
 README.md
 conf/database.json
 conf/generate.json
@@ -10,6 +14,5 @@ lib/Daje/Workflow/Loader/Load.pm
 minil.toml
 t/00_compile.t
 t/test_load.t
-META.json
 META.yml
 MANIFEST

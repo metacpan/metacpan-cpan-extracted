@@ -4,7 +4,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 use File::Spec;
 
-my $extdir = 'discount-2.2.7';
+my $extdir = 'discount-2.2.7d';
 my $myextlib = File::Spec->catfile($extdir, 'libmarkdown.a');
 my $clean_files = join (" ",
                   map{ File::Spec->catfile($extdir, $_) }
@@ -73,7 +73,7 @@ sub MY::postamble {
     return sprintf('
 $(MYEXTLIB):
 	%s
-', qq{( cd $extdir; CC='cc -fPIC' sh configure.sh --with-fenced-code --with-dl=both; make )\n});
+', qq{( cd $extdir; CC='cc -fPIC' sh configure.sh; make )\n});
 }
 
 WriteMakefile(

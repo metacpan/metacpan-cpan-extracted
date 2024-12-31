@@ -11,6 +11,7 @@ sub new {
     my $self = bless {
         __struct__ => {},
         __as__     => undef,
+        __is__     => undef,
     }, $class;
     for my $key (keys %$struct) {
         my $v = $struct->{$key};
@@ -24,6 +25,12 @@ sub new {
 sub as {
     my ($self, $typename) = @_;
     $self->{__as__} = $typename;
+    return $self;
+}
+
+sub is {
+    my ($self, $typename) = @_;
+    $self->{__is__} = $typename;
     return $self;
 }
 
@@ -43,12 +50,21 @@ sub safe_parse {
     my ($self, $data) = @_;
     my @errors = ();
     my $valid = {};
-    if (ref($data) ne 'HASH') {
+    if (!_is_hashref_or_object($data)) {
         push @errors, {
-            key   => undef,
+            key   => '(root)',
             error => "Invalid data: is not hashref"
         };
     } else {
+        if ($self->{__is__}) {
+            my $is = $self->{__is__};
+            if (!$data->isa($is)) {
+                push @errors, {
+                    key   => '(root)',
+                    error => "Invalid data: is not $is"
+                };
+            }
+        }
         for my $key (sort keys %{$self->{__struct__}}) {
             my $v = $self->{__struct__}{$key};
             my $val = $data->{$key};
@@ -76,9 +92,14 @@ sub safe_parse {
     if (scalar(@errors) > 0) {
         return (undef, [@errors])
     }
-    my $classname = $self->{__as__};
+    my $classname = $self->{__as__} || $self->{__is__};
     $valid = bless $valid, $classname if $classname;
     return ($valid, undef);
+}
+
+sub _is_hashref_or_object {
+    my $data = shift;
+    return defined $data && (ref($data) eq 'HASH' || $data->isa('HASH'));
 }
 
 sub _errors_to_string {
@@ -100,12 +121,32 @@ Poz::Types::object - A module for handling structured data with type validation
 
     use Poz qw/z/;
 
+    # Schema for a person, cast to Some::Class when valid
     my $object = z->object({
         name => z->string,
         age => z->number,
     })->as('Some::Class');
+    my $data = {
+        name => 'John Doe',
+        age => 30,
+    };
+    my $parsed_data = $object->parse($data); # isa Some::Class
 
-    my $parsed_data = $object->parse($data);
+    # Schema for a person, validate that the data is an instance of Some::Class
+    my $another_object = z->object({
+        name => z->string,
+        age => z->number,
+    })->is('Another::Class');
+    my $other = bless {
+        name => 'John Doe',
+        age => 30,
+    }, 'Another::Class';
+    my $someone = bless {
+        name => 'Jane Doe',
+        age => 25,
+    }, 'Some::Class';
+    my $parsed_data = $another_object->parse($other); # isa Another::Class
+    my $someone_else = $another_object->parse($someone); # throws an exception, because not an instance of Another::Class
 
 =head1 DESCRIPTION
 
@@ -118,6 +159,12 @@ Poz::Types::object is a module for handling structured data with type validation
     $object->as($typename);
 
 Sets the class name to bless the parsed data into. The C<$typename> parameter should be a string representing the class name.
+
+=head2 is
+
+    $object->is($typename);
+
+Validates that the parsed data is an instance of the given class. The C<$typename> parameter should be a string representing the class name.
 
 =head2 parse
 

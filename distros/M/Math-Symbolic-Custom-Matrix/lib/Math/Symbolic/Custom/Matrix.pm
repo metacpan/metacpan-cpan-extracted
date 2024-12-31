@@ -14,7 +14,7 @@ Math::Symbolic::Custom::Matrix - Matrix routines for Math::Symbolic
 
 =head1 VERSION
 
-Version 0.1
+Version 0.2
 
 =cut
 
@@ -22,16 +22,20 @@ require Exporter;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(
+    make_matrix
     make_symbolic_matrix
     identity_matrix
     add_matrix
     sub_matrix    
     multiply_matrix
     scalar_multiply_matrix
+    scalar_divide_matrix
     order_of_matrix
     simplify_matrix
     transpose_matrix
     evaluate_matrix
+    implement_matrix
+    set_matrix
     cofactors_matrix
     adjugate_matrix
     invert_matrix
@@ -41,11 +45,10 @@ our @EXPORT = qw(
     is_skew_symmetric_matrix
 );
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 use Math::Symbolic qw(:all);
 use Math::Symbolic::MiscAlgebra qw/:all/;
-use Math::Symbolic::Custom::Collect 0.21;
 
 use Carp;
 
@@ -60,9 +63,10 @@ converted to Math::Symbolic objects.
     use strict;
     use Math::Symbolic qw/:all/;
     use Math::Symbolic::MiscAlgebra qw/:all/;
-    use Math::Symbolic::Custom::Collect 0.21;
-    use Math::Symbolic::Custom::Matrix;
-    use Math::Symbolic::Custom::Polynomial;
+    use Math::Symbolic::Custom::Matrix 0.2;
+    use Math::Symbolic::Custom::Polynomial 0.11;
+    use Math::Symbolic::Custom::CollectSimplify 0.2;
+    Math::Symbolic::Custom::CollectSimplify->register();
 
     # Say we want the eigenvalues of some matrix with a parameter.
     # 1. A = | 4, 3-k |
@@ -80,7 +84,7 @@ converted to Math::Symbolic objects.
     my $B = sub_matrix($A, $lambda_I);
 
     # 5. form the characteristic polynomial, |A-lambda*I|
-    my $c_poly = det(@{$B})->to_collected();
+    my $c_poly = det(@{$B})->simplify();
     print "Characteristic polynomial is: $c_poly\n";
 
     # 6. analyze the polynomial to get roots
@@ -89,7 +93,7 @@ converted to Math::Symbolic objects.
 
     # 7. Check for some values of parameter k
     foreach my $k (0..3) {
-        print "For k = $k:- lambda_1 = ", 
+        print "For k = $k: lambda_1 = ", 
             $roots->[0]->value('k' => $k), "; lambda_2 = ", 
             $roots->[1]->value('k' => $k), "\n";
     }
@@ -97,6 +101,35 @@ converted to Math::Symbolic objects.
 =head1 EXPORTS
 
 Everything below by default.
+
+=head2 make_matrix
+
+Creates a matrix of specified dimensions with every element set to the specified expression.
+
+    use strict;
+    use Math::Symbolic qw/:all/;
+    use Math::Symbolic::Custom::Matrix;
+
+    my $rows = 1;
+    my $cols = 2;
+    my $M = make_matrix('x', $rows, $cols);
+    
+=cut
+
+sub make_matrix {
+    my ($scalar, $r, $c) = @_;
+    
+    $scalar = Math::Symbolic::parse_from_string($scalar) if ref($scalar) !~ /^Math::Symbolic/;
+    
+    my @m;
+    foreach my $i (0..$r-1) {
+        foreach my $j (0..$c-1) {    
+            $m[$i][$j] = $scalar;
+        }
+    }
+    
+    return \@m;
+}
 
 =head2 make_symbolic_matrix
 
@@ -178,7 +211,7 @@ sub add_matrix {
             $a_val = Math::Symbolic::parse_from_string($a_val) if ref($a_val) !~ /^Math::Symbolic/;
             $b_val = Math::Symbolic::parse_from_string($b_val) if ref($b_val) !~ /^Math::Symbolic/;
 
-            $m_o[$i][$j] = $a_val + $b_val;
+            $m_o[$i][$j] = Math::Symbolic::Operator->new('+', $a_val, $b_val);
         }
     }
 
@@ -212,7 +245,7 @@ sub sub_matrix {
             $a_val = Math::Symbolic::parse_from_string($a_val) if ref($a_val) !~ /^Math::Symbolic/;
             $b_val = Math::Symbolic::parse_from_string($b_val) if ref($b_val) !~ /^Math::Symbolic/;
 
-            $m_o[$i][$j] = $a_val - $b_val;
+            $m_o[$i][$j] = Math::Symbolic::Operator->new('-', $a_val, $b_val);
         }
     }
 
@@ -231,6 +264,9 @@ by the second.
 sub multiply_matrix  {
     my ($m_a, $m_b) = @_;
 
+    $m_a = make_symbolic_matrix($m_a);
+    $m_b = make_symbolic_matrix($m_b);
+
     my ($m_a_rows, $m_a_cols) = order_of_matrix($m_a);
     my ($m_b_rows, $m_b_cols) = order_of_matrix($m_b);
 
@@ -242,10 +278,10 @@ sub multiply_matrix  {
             my $m_o_ij;
             foreach my $k (0..$m_a_cols-1) {
                 if ( defined $m_o_ij ) {
-                    $m_o_ij += $m_a->[$i][$k] * $m_b->[$k][$j];
+                    $m_o_ij = Math::Symbolic::Operator->new('+', $m_o_ij, Math::Symbolic::Operator->new('*', $m_a->[$i][$k], $m_b->[$k][$j]));
                 }
                 else {
-                    $m_o_ij = $m_a->[$i][$k] * $m_b->[$k][$j];
+                    $m_o_ij = Math::Symbolic::Operator->new('*', $m_a->[$i][$k], $m_b->[$k][$j]);
                 }
             }
             $m_o[$i][$j] = $m_o_ij;
@@ -269,16 +305,52 @@ sub scalar_multiply_matrix {
     my ($scalar, $mat) = @_;
   
     $scalar = Math::Symbolic::parse_from_string($scalar) if ref($scalar) !~ /^Math::Symbolic/;
+    $mat = make_symbolic_matrix($mat);
 
     my ($n_r, $n_c) = order_of_matrix($mat);
 
     my @sm;
     foreach my $i (0..$n_r-1) {
         foreach my $j (0..$n_c-1) {
-
             my $m_val = $mat->[$i][$j];
-            $m_val = Math::Symbolic::parse_from_string($m_val) if ref($m_val) !~ /^Math::Symbolic/;          
-            $sm[$i][$j] = $scalar * $m_val;
+            $sm[$i][$j] = Math::Symbolic::Operator->new('*', $scalar, $m_val);
+        }
+    }
+
+    return simplify_matrix(\@sm);
+}
+
+=head2 scalar_divide_matrix
+
+This routine will produce an output matrix where every element is the input 
+expression divided by every corresponding non-zero element of the input matrix. 
+Elements which are zero are left untouched.
+
+Pass in the expression and an array reference to the matrix.
+
+Returns an array reference to the resulting matrix.
+
+=cut
+
+sub scalar_divide_matrix {
+    my ($scalar, $mat) = @_;
+  
+    $scalar = Math::Symbolic::parse_from_string($scalar) if ref($scalar) !~ /^Math::Symbolic/;
+    $mat = make_symbolic_matrix($mat);
+
+    my ($n_r, $n_c) = order_of_matrix($mat);
+
+    my @sm;
+    foreach my $i (0..$n_r-1) {
+        foreach my $j (0..$n_c-1) {
+            my $m_val = $mat->[$i][$j];    
+            my $m_val_v = $m_val->value();
+            if ( defined($m_val_v) && ($m_val_v == 0) ) {
+                $sm[$i][$j] = Math::Symbolic::Constant->new(0);
+            }
+            else {
+                $sm[$i][$j] = Math::Symbolic::Operator->new('/', $scalar, $m_val);
+            }
         }
     }
 
@@ -309,8 +381,8 @@ sub order_of_matrix {
     foreach my $row (@{$mat}) {
         my $c = scalar(@{$row});
         if ( defined $cols ) {
-            if ( $c != $cols ) {
-                warn "order_of_matrix: Matrix is malformed!";
+            if ( $c != $cols ) {                
+                carp "order_of_matrix: Matrix is malformed!";
                 return undef;
             }
         }
@@ -324,7 +396,7 @@ sub order_of_matrix {
 
 =head2 simplify_matrix
 
-This will call "to_collected()" on every element of the matrix,
+This will call "simplify()" on every element of the matrix,
 in an effort to tidy it up.
 
 Pass in an array reference to the matrix.
@@ -346,15 +418,13 @@ sub simplify_matrix {
 
             $m_val = Math::Symbolic::parse_from_string($m_val) if ref($m_val) !~ /^Math::Symbolic/;          
 
-            my $debug = 0;
-
-            if ( defined(my $m_val_s = $m_val->to_collected()) ) {
+            if ( defined(my $m_val_s = $m_val->simplify()) ) {
 
                 $sm[$i][$j] = $m_val_s;
             }            
             else {
 
-                warn "simplify_matrix: Could not simplify!: $m_val";                
+                carp "simplify_matrix: Could not simplify!: $m_val";                
                 $sm[$i][$j] = $m_val;
             }
         }
@@ -362,7 +432,6 @@ sub simplify_matrix {
     
     return \@sm;
 }
-
 
 =head2 transpose_matrix
 
@@ -401,7 +470,6 @@ passed in as the parameters to the "value()" method.
 
 Returns an array reference to the resulting matrix.
 
-
 =cut
 
 sub evaluate_matrix {
@@ -416,6 +484,68 @@ sub evaluate_matrix {
             my $v = $mat->[$i][$j];
             if ( ref($v) =~ /^Math::Symbolic/ ) {
                 $vm[$i][$j] = $v->value(%vals);
+            }
+        }
+    }
+
+    return \@vm;
+}
+
+=head2 implement_matrix
+
+This will call Math::Symbolic's "implement()" method on each element
+of the passed matrix.
+
+Pass in an array reference to a matrix, and a hash ref which will be
+passed in as the parameters to the "implement()" method.
+
+Returns an array reference to the resulting matrix.
+
+=cut
+
+sub implement_matrix {
+    my ($mat, $vals) = @_;
+    my %vals = %{$vals};
+
+    my ($n_r, $n_c) = order_of_matrix($mat);
+
+    my @vm;
+    foreach my $i (0..$n_r-1) {
+        foreach my $j (0..$n_c-1) {
+            my $v = $mat->[$i][$j];
+            if ( ref($v) =~ /^Math::Symbolic/ ) {
+                $vm[$i][$j] = $v->implement(%vals);
+            }
+        }
+    }
+
+    return \@vm;
+}
+
+=head2 set_matrix
+
+This will call Math::Symbolic's "set_value()" method on each element
+of the passed matrix.
+
+Pass in an array reference to a matrix, and a hash ref which will be
+passed in as the parameters to the "set_value()" method.
+
+Returns an array reference to the resulting matrix.
+
+=cut
+
+sub set_matrix {
+    my ($mat, $vals) = @_;
+    my %vals = %{$vals};
+
+    my ($n_r, $n_c) = order_of_matrix($mat);
+
+    my @vm;
+    foreach my $i (0..$n_r-1) {
+        foreach my $j (0..$n_c-1) {
+            my $v = $mat->[$i][$j];
+            if ( ref($v) =~ /^Math::Symbolic/ ) {
+                $vm[$i][$j] = $v->set_value(%vals);
             }
         }
     }
@@ -461,7 +591,7 @@ sub cofactors_matrix {
 
             my $sign = (-1)**($i+$j);
             
-            $cofactors[$i][$j] = $sign * $minor;
+            $cofactors[$i][$j] = Math::Symbolic::Operator->new('*', Math::Symbolic::Constant->new($sign), $minor);
         }
     }
 
@@ -504,12 +634,13 @@ sub invert_matrix {
 
     # the determinant
     my $det = det @{$mat};
-    my $s_det = $det->to_collected();
+    my $s_det = $det->simplify();
 
-    return undef if $s_det->to_string() eq "0";
+    my $s_det_v = $s_det->value();
+    return undef if defined($s_det_v) && ($s_det_v == 0);
 
     my $one = Math::Symbolic::Constant->new(1);
-    my $det_reciprocal = $one / $s_det;
+    my $det_reciprocal = Math::Symbolic::Operator->new('/', $one, $s_det);
 
     # the adjugate
     my $adj = adjugate_matrix($mat);
@@ -604,12 +735,6 @@ L<Math::Symbolic>
 =head1 AUTHOR
 
 Matt Johnson, C<< <mjohnson at cpan.org> >>
-
-=head1 BUGS
-
-Please report any bugs or feature requests to C<bug-math-symbolic-custom-matrix at rt.cpan.org>, or through
-the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Math-Symbolic-Custom-Matrix>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
 
 =head1 ACKNOWLEDGEMENTS
 

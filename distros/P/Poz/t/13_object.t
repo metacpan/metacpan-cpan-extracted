@@ -74,4 +74,44 @@ subtest 'object contains undefined value, schema has optional string array' => s
     is($errors, undef);
 };
 
+subtest 'undefined value passes to standard object schema' => sub {
+    my $object = z->object({
+        name => z->string,
+    });
+    is_deeply($object->parse({name => 'tofu'}), {name => 'tofu'});
+    throws_ok(sub { $object->parse() }, qr/^Invalid data: is not hashref on key `\(root\)`/, 'Invalid data: is not hashref');
+};
+
+subtest 'instance passes to standard object schema' => sub {
+    my $object = z->object({
+        name => z->string,
+    });
+    my $instance = bless {name => 'tofu'}, 'My::Object';
+    is_deeply($object->parse($instance), $instance);
+};
+
+subtest 'instance passes to standard object schema as another class' => sub {
+    my $object = z->object({
+        name => z->string,
+    })->as('My::AnotherObject');
+    my $instance = bless {name => 'tofu'}, 'My::Object';
+    my $parsed = $object->parse($instance);
+    is_deeply($parsed, $instance);
+    isa_ok($parsed, 'My::AnotherObject');
+    isnt(ref($parsed), 'My::Object');
+};
+
+subtest 'instance passes to standard object schema as another class with is' => sub {
+    my $object = z->object({
+        name => z->string,
+    })->is('My::Object');
+    my $instance = bless {name => 'tofu'}, 'My::Object';
+    my $parsed = $object->parse($instance);
+    is_deeply($parsed, $instance);
+    isa_ok($parsed, 'My::Object');
+
+    my $another_instance = bless {name => 'tamago'}, 'My::AnotherObject';
+    throws_ok(sub { $object->parse($another_instance) }, qr/^Invalid data: is not My::Object on key `\(root\)`/, 'Invalid data: is not My::Object');
+};
+
 done_testing;
