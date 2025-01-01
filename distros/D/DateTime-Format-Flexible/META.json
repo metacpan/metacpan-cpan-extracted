@@ -34,8 +34,7 @@
          "requires" : {
             "DateTime" : "0",
             "DateTime::Format::Builder" : "0.74",
-            "DateTime::TimeZone" : "0",
-            "List::MoreUtils" : "0"
+            "DateTime::TimeZone" : "0"
          }
       },
       "test" : {
@@ -48,6 +47,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.36",
+   "version" : "0.37",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

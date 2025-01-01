@@ -44,4 +44,4 @@ resources:
   homepage: https://beyondgrep.com/
   license: https://www.perlfoundation.org/artistic-license-20.html
   repository: git://github.com/beyondgrep/ack3.git
-version: v3.8.0
+version: v3.8.1

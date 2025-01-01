@@ -3,7 +3,7 @@ package DateTime::Format::Flexible::lang;
 use strict;
 use warnings;
 
-use List::MoreUtils 'any';
+#use List::MoreUtils 'any';
 
 sub new
 {
@@ -34,15 +34,16 @@ sub plugins {return @{$_[0]->{_plugins}}}
 sub _cleanup
 {
     my ( $self , $date , $p ) = @_;
-    foreach my $plug ( $self->plugins )
+    PLUGIN: foreach my $plug ( $self->plugins )
     {
         if ( $self->{lang} )
         {
             my ( $lang ) = $plug =~ m{(\w{2}\z)}mx;
-            if ( not any { $_ eq $lang } @{ $self->{lang} } )
-            {
-                printf( "# skipping %s\n", $plug ) if $ENV{DFF_DEBUG};
-                next;
+            foreach my $l (@{ $self->{lang} }) {
+                if ( not $l eq $lang ) {
+                    printf( "# skipping %s\n", $plug ) if $ENV{DFF_DEBUG};
+                    next PLUGIN;
+                }
             }
         }
         printf( "# not skipping %s\n", $plug ) if $ENV{DFF_DEBUG};

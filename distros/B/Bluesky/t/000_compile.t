@@ -151,6 +151,29 @@ subtest auth => sub {
     };
     subtest 'Feeds and content' => sub {
         $login || skip_all "$login";
+        is my $tt = $bsky->getTrendingTopics(), hash {
+            field suggested => bag {
+                all_items hash {
+                    field description => E();
+                    field displayName => E();
+                    field link        => D();
+                    field topic       => D();
+                    end;
+                };
+                end
+            };
+            field topics => bag {
+                all_items hash {
+                    field description => E();
+                    field displayName => E();
+                    field link        => D();
+                    field topic       => D();
+                    end;
+                };
+                end
+            };
+            end
+        }, 'getTrendingTopics( ... )';
         is my $timeline = $bsky->getTimeline(), hash {
             field cursor => D();
             field feed   => D();    # Feed items are subject to change
@@ -166,7 +189,7 @@ subtest auth => sub {
             field threadgate => E();
             end;
         }, 'getPostThread( ... )';
-        is my $post = $bsky->getPost('at://did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.post/3l6oveex3ii2l'), hash {
+        is my $stable_post = $bsky->getPost('at://did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.post/3l6oveex3ii2l'), hash {
             field author      => D();
             field cid         => D();
             field embed       => E();
@@ -202,8 +225,9 @@ subtest auth => sub {
 
         #~ ddx $likes;
         #~ p my $ys   = $bsky->getLikes( uri => 'at://did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.post/3l6oveex3ii2l' );
+        my $post;
         subtest createPost => sub {
-            is my $post = $bsky->createPost( text => 'Post is for #testing only. @atproto.bsky.social https://wikipedia.com/' ), hash {
+            is $post = $bsky->createPost( text => 'Post is for #testing only. @atproto.bsky.social https://wikipedia.com/' ), hash {
                 field cid    => D();
                 field commit => hash {
                     field cid => D();
@@ -257,8 +281,46 @@ END
                 end;
                 }, 'reply with image';
             $image_reply->throw unless $image_reply;
-        }
+        };
+        my $like;
+        subtest like => sub {
+            skip 1 unless $post;
+            is $like = $bsky->like( $post->{uri}, $post->{cid} ), hash {
+                field cid              => E();
+                field commit           => hash { field cid => D(); field rev => D(); etc };
+                field uri              => D();
+                field validationStatus => D();
+                end
+            }, 'like( ... )';
+        };
+        subtest deleteLike => sub {
+            skip 1 unless $like;
+            is my $unlike = $bsky->deleteLike( $like->{uri} ), hash {
+                field commit => hash {
+                    field cid => E();
+                    field rev => D();
+                    end
+                };
+                end
+            }, 'deleteLike( ... )';
+        };
     };
+    subtest 'Social graph' => sub {
+        $login || skip_all "$login";
+        subtest getBlocks => sub {
+            my $blocks = $bsky->getBlocks();
+            skip_all 'failed to gather blocks: ' . $blocks->message unless $blocks;
+            is $blocks, bag {
+                all_items hash {
+                    field createdAt => D();
+                    field did       => E();
+                    field handle    => E();
+                    etc;
+                };
+                end
+            }, 'list of blocks';
+        };
+    }
 };
 if (0) {
 

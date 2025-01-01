@@ -17,7 +17,7 @@ $bsky->createPost( ... );
 You shouldn't need to know the AT protocol in order to get things done so I'm including this sugary wrapper so that
 [At](https://metacpan.org/pod/At) can remain mostly technical.
 
-# Methods
+# Constructor and Session Management
 
 Bluesky.pm is my attempt to make use of Perl's class syntax so this is obviously OO.
 
@@ -37,6 +37,31 @@ Expected parameters include:
 
     This is the app password not the account's password. App passwords are generated at
     [https://bsky.app/settings/app-passwords](https://bsky.app/settings/app-passwords).
+
+# Feed and Content
+
+Methods in this category create, modify, access, and delete content.
+
+## `getTrendingTopics( [...] )`
+
+```
+$bsky->getTrendingTopics( );
+```
+
+Get a list of trending topics.
+
+Expected parameters include:
+
+- `viewer`
+
+    DID of the account making the request (not included for public/unauthenticated queries). Used to boost followed
+    accounts in ranking.
+
+- `limit`
+
+    Integer.
+
+    Default: `10`, Minimum: `1`, Maximum: `25`.
 
 ## `getTimeline( [...] )`
 
@@ -385,6 +410,91 @@ Delete a post or ensures it doesn't exist.
 Expected parameters include:
 
 - `uri` - required
+
+## `like( ... )`
+
+```
+$bsky->like( 'at://did:plc:pwqewimhd3rxc4hg6ztwrcyj/app.bsky.feed.post/3lcdwvquo7y25' );
+
+$bsky->like( 'at://did:plc:totallymadeupgarbagehere/app.bsky.feed.post/randomexample', 'fu82qrfrf829crw89rfpuwcfiosdfcu8239wcrusiofcv2epcuy8r9jkfsl' );
+```
+
+Like a post publically.
+
+Expected parameters include:
+
+- `uri` - required
+
+    The AT-URI of the post.
+
+- `cid`
+
+    If undefined, the post is fetched to gather this for you.
+
+On success, a record is returned.
+
+## `deleteLike( ... )`
+
+```
+$bsky->deleteLike( 'at://did:plc:pwqewimhd3rxc4hg6ztwrcyj/app.bsky.feed.post/3lcdwvquo7y25' );
+
+$bsky->deleteLike( 'at://did:plc:totallymadeupgarbagehere/app.bsky.feed.like/randomexample' );
+```
+
+Remove a like record.
+
+Expected parameters include:
+
+- `uri` - required
+
+    The AT-URI of the post or the like record itself.
+
+On success, commit info is returned.
+
+# Social Graph
+
+Methods documented in this section deal with relationships between the authorized user and other members of the social
+network.
+
+## `block( ... )`
+
+```
+$bsky->block( 'sankor.bsky.social' );
+```
+
+Blocks a user.
+
+Expected parameters include:
+
+- `identifier` - required
+
+    Handle or DID of the person you'd like to block.
+
+## `getBlocks( ... )`
+
+```
+$bsky->getBlocks( );
+```
+
+Enumerates which accounts the requesting account is currently blocking.
+
+Requires auth.
+
+Expected parameters include:
+
+- `uri`
+
+    AT-URI of the subject (eg, a post record).
+
+- `limit`
+
+    Integer.
+
+    Default: 50, Minimum: 1, Maximum: 100.
+
+- `cursor`
+
+Returns a list of actor profile views on success.
 
 # See Also
 

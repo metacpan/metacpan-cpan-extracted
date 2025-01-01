@@ -1,5 +1,12 @@
 Revision history for Perl extension App-Greple-xlate
 
+0.9902 2025-01-01T02:24:46Z
+
+    - execute "docker run" with "--init" option
+    - update xlate options
+      * make -G option as default and remove from usage
+      * add -W option to mount current directory
+
 0.9901 2024-11-23T13:19:05Z
 
     - update "xlate" command options

@@ -1,4 +1,4 @@
-package Bluesky 0.19 {
+package Bluesky 0.20 {
     use v5.40;
     use Carp qw[carp];
     use bytes;
@@ -11,7 +11,7 @@ package Bluesky 0.19 {
     use URI;
 
     class Bluesky {
-        field $at;
+        field $at : reader;
         field $service : param //= 'https://bsky.social';
         #
         ADJUST { $at = At->new( service => $service ); }
@@ -22,17 +22,18 @@ package Bluesky 0.19 {
         method did() { $at->did }
 
         # Feeds and content
-        method getTimeline(%args)   { $at->get( 'app.bsky.feed.getTimeline'   => \%args ); }
-        method getAuthorFeed(%args) { $at->get( 'app.bsky.feed.getAuthorFeed' => \%args ); }
-        method getPostThread(%args) { $at->get( 'app.bsky.feed.getPostThread' => \%args ); }
+        method getTrendingTopics(%args) { $at->get( 'app.bsky.unspecced.getTrendingTopics' => \%args ); }
+        method getTimeline(%args)       { $at->get( 'app.bsky.feed.getTimeline'            => \%args ); }
+        method getAuthorFeed(%args)     { $at->get( 'app.bsky.feed.getAuthorFeed'          => \%args ); }
+        method getPostThread(%args)     { $at->get( 'app.bsky.feed.getPostThread'          => \%args ); }
 
         method getPost($uri) {
-            my $res = $at->get( 'app.bsky.feed.getPosts' => { uris => [$uri] } );
+            my $res = $at->get( 'app.bsky.feed.getPosts' => { uris => [ builtin::blessed $uri ? $uri->as_string : $uri ] } );
             $res ? $res->{posts}[0] // () : $res;
         }
 
         method getPosts(@uris) {
-            my $res = $at->get( 'app.bsky.feed.getPosts' => { uris => \@uris } );
+            my $res = $at->get( 'app.bsky.feed.getPosts' => { uris => [ map { builtin::blessed $_ ? $_->as_string : $_ } @uris ] } );
             $res ? $res->{posts} // () : $res;
         }
         method getLikes(%args) { my $res = $at->get( 'app.bsky.feed.getLikes' => \%args ); }
@@ -97,20 +98,61 @@ package Bluesky 0.19 {
             $at_uri = At::Protocol::URI->new($at_uri) unless builtin::blessed $at_uri;
             $at->post( 'com.atproto.repo.deleteRecord' => { repo => $at_uri->host, collection => 'app.bsky.feed.post', rkey => $at_uri->rkey } );
         }
-        method like( $uri, $cid )         { }
-        method deleteLike($likeUri)       { }
+
+        method like( $uri, $cid //= () ) {
+            if ( !defined $cid ) {
+                my $post = $at->get( 'app.bsky.feed.getPosts' => { uris => [$uri] } );
+                $post || $post->throw;
+                $cid = $post->{posts}[0]{cid};
+            }
+            $at->post(
+                'com.atproto.repo.createRecord' => {
+                    repo       => $at->did,
+                    collection => 'app.bsky.feed.like',
+                    record     => {
+                        '$type' => 'app.bsky.feed.like',
+                        subject => {                       # com.atproto.repo.strongRef
+                            uri => $uri,
+                            cid => $cid
+                        },
+                        createdAt => $at->now
+                    }
+                }
+            );
+        }
+
+        method deleteLike($url) {
+            $url = At::Protocol::URI->new($url) unless builtin::blessed $url;
+            if ( $url->collection eq 'app.bsky.feed.post' ) {
+                my $post = $self->getPost($url);
+                $url = $post->{viewer}{like} // return;
+            }
+            $at->post( 'com.atproto.repo.deleteRecord' => { repo => $at->did, collection => 'app.bsky.feed.like', rkey => $url->rkey } );
+        }
         method repost( $uri, $cid )       { }
         method deleteRepost($repostUri)   { }
         method uploadBlob( $data, %opts ) { }
 
         # Social graph
-        method getFollows()             { }
-        method getFollowers()           { }
+        method block($actor) {
+            my $profile = $self->getProfile($actor);
+            $profile->{did} // return;
+            $at->post( 'com.atproto.repo.createRecord' =>
+                    { repo => $self->did, collection => 'app.bsky.graph.block', record => { createdAt => $at->now, subject => $profile->{did} } } );
+        }
+
+        method getBlocks(%args) {
+            my $res = $at->get( 'app.bsky.graph.getBlocks' => \%args );
+            $res ? $res->{blocks} : $res;
+        }
+        method deleteBlock()            { }
         method follow($did)             { }
         method deleteFollow($followUri) { }
+        method getFollows()             { }
+        method getFollowers()           { }
 
         # Actors
-        method getProfile()             { }
+        method getProfile($actor)       { $at->get( 'app.bsky.actor.getProfile' => { actor => $actor } ) }
         method upsertProfile()          { }
         method getProfiles()            { }
         method getSuggestions()         { }
@@ -410,7 +452,7 @@ Bluesky - Bluesky Client Library in Perl
 You shouldn't need to know the AT protocol in order to get things done so I'm including this sugary wrapper so that
 L<At> can remain mostly technical.
 
-=head1 Methods
+=head1 Constructor and Session Management
 
 Bluesky.pm is my attempt to make use of Perl's class syntax so this is obviously OO.
 
@@ -430,6 +472,33 @@ Handle or other identifier supported by the server for the authenticating user.
 
 This is the app password not the account's password. App passwords are generated at
 L<https://bsky.app/settings/app-passwords>.
+
+=back
+
+=head1 Feed and Content
+
+Methods in this category create, modify, access, and delete content.
+
+=head2 C<getTrendingTopics( [...] )>
+
+    $bsky->getTrendingTopics( );
+
+Get a list of trending topics.
+
+Expected parameters include:
+
+=over
+
+=item C<viewer>
+
+DID of the account making the request (not included for public/unauthenticated queries). Used to boost followed
+accounts in ranking.
+
+=item C<limit>
+
+Integer.
+
+Default: C<10>, Minimum: C<1>, Maximum: C<25>.
 
 =back
 
@@ -796,6 +865,99 @@ Expected parameters include:
 =item C<uri> - required
 
 =back
+
+=head2 C<like( ... )>
+
+    $bsky->like( 'at://did:plc:pwqewimhd3rxc4hg6ztwrcyj/app.bsky.feed.post/3lcdwvquo7y25' );
+
+    $bsky->like( 'at://did:plc:totallymadeupgarbagehere/app.bsky.feed.post/randomexample', 'fu82qrfrf829crw89rfpuwcfiosdfcu8239wcrusiofcv2epcuy8r9jkfsl' );
+
+Like a post publically.
+
+Expected parameters include:
+
+=over
+
+=item C<uri> - required
+
+The AT-URI of the post.
+
+=item C<cid>
+
+If undefined, the post is fetched to gather this for you.
+
+=back
+
+On success, a record is returned.
+
+=head2 C<deleteLike( ... )>
+
+    $bsky->deleteLike( 'at://did:plc:pwqewimhd3rxc4hg6ztwrcyj/app.bsky.feed.post/3lcdwvquo7y25' );
+
+    $bsky->deleteLike( 'at://did:plc:totallymadeupgarbagehere/app.bsky.feed.like/randomexample' );
+
+Remove a like record.
+
+Expected parameters include:
+
+=over
+
+=item C<uri> - required
+
+The AT-URI of the post or the like record itself.
+
+=back
+
+On success, commit info is returned.
+
+=head1 Social Graph
+
+Methods documented in this section deal with relationships between the authorized user and other members of the social
+network.
+
+=head2 C<block( ... )>
+
+    $bsky->block( 'sankor.bsky.social' );
+
+Blocks a user.
+
+Expected parameters include:
+
+=over
+
+=item C<identifier> - required
+
+Handle or DID of the person you'd like to block.
+
+=back
+
+=head2 C<getBlocks( ... )>
+
+    $bsky->getBlocks( );
+
+Enumerates which accounts the requesting account is currently blocking.
+
+Requires auth.
+
+Expected parameters include:
+
+=over
+
+=item C<uri>
+
+AT-URI of the subject (eg, a post record).
+
+=item C<limit>
+
+Integer.
+
+Default: 50, Minimum: 1, Maximum: 100.
+
+=item C<cursor>
+
+=back
+
+Returns a list of actor profile views on success.
 
 =head1 See Also
 

@@ -1,5 +1,12 @@
 Revision history for Perl extension Bluesky.pm
 
+0.20 2024-12-31T16:17:52Z
+
+    - List, create, and delete records to block actors/accounts by name
+    - Allow posts to be liked by their AT-URI
+    - Allow likes to be deleted
+    - Wrapping Bluesky's new *.getTrendingTopics lexicon (beta and still unspecced upstream)
+
 0.19 2024-12-03T02:03:04Z
 
     - Split from At.pm

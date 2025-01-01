@@ -1,5 +1,9 @@
 Revision history for Perl module DateTime::Format::Flexible
 
+0.37 Tue Dec 31 2024
+  - remove List::MoreUtils prereq.
+    - thanks PLICEASE rt #158183
+
 0.36 Wed Oct 16 2024
   - further changes to be backwards compatible with DateTime::TimeZone 2.62 and below.
     - thanks ppisar rt #155996

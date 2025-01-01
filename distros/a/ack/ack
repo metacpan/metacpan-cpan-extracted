@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-our $VERSION = 'v3.8.0'; # Check https://beyondgrep.com/ for updates
+our $VERSION = 'v3.8.1'; # Check https://beyondgrep.com/ for updates
 
 use 5.010001;
 
@@ -2381,6 +2381,8 @@ mailing list.
 How appropriate to have I<ack>nowledgements!
 
 Thanks to everyone who has contributed to ack in any way, including
+Geraint Edwards,
+Loren Howard,
 Yaroslav Halchenko,
 Thiago Perrotta,
 Thomas Gossler,

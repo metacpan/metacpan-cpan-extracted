@@ -47,7 +47,7 @@ define pod <<"=cut"
         -A * attach to the live container
         N.B. These options terminate option handling
 
-        -G   mount git top-level directory
+        -W   mount current working directory
         -H   mount home directory
         -V # specify mount directory
         -U   do not mount
@@ -63,7 +63,7 @@ define pod <<"=cut"
 
 =head1 VERSION
 
-    Version 0.9901
+    Version 0.9902
 
 =cut
 
@@ -73,7 +73,7 @@ git_topdir() {
     [ "$(git rev-parse --is-inside-work-tree 2>/dev/null)" == true ] || return
     local         dir="$(git rev-parse --show-superproject-working-tree)"
     [ "$dir" ] || dir="$(git rev-parse --show-toplevel)"
-    echo -n $dir
+    echo $dir
 }
 
 get_ip() {
@@ -101,6 +101,10 @@ display=
 localtime=/etc/localtime
 givenname=
 detach=
+volume=
+volumes=()
+ports=()
+others=()
 
 ENV=(
     LANG TZ
@@ -131,14 +135,16 @@ container_name() {
 ##
 ## Docker
 ##
-while getopts :dq${DOCKER_OPT:=dURAI:E:HV:GN:KSALCD} OPT
+if [[ ${topdir:=$(git_topdir)} && $topdir != $pwd ]]
+then
+    volume="$topdir"
+fi
+while getopts :dq${DOCKER_OPT:=dURAI:E:WHP:O:V:GN:KSALCD} OPT
 do
     [ "$XLATE_RUNNING_ON_DOCKER" ] && break
     case $OPT in
 	d) debug=yes ; set -x ;;
 	q) quiet=yes ;;
-	U) mount= ;;
-	R) mount_mode=ro ;;
 	I)
 	    if [[ $OPTARG =~ ^:(.+)$ ]]
 	    then
@@ -147,28 +153,24 @@ do
 		image="$OPTARG"
 	    fi
 	    ;;
-	E)
-	    ENV+=("$OPTARG")
-	    ;;
-	H|V|G)
+	E) ENV+=("$OPTARG") ;;
+	P) ports+=("$OPTARG") ;;
+	O) others+=("$OPTARG") ;;
+
+	# mount related options
+	U) mount= ;;
+	R) mount_mode=ro ;;
+	V) volumes+=("$OPTARG") ;;
+	W|H|G)
 	    case $OPT in
-		 H)  volume="$HOME"
-		     ENV+=(HOME=$workdir)
-		     ;;
-		 V)  volume="$OPTARG" ;;
-		 G)
-		     if [[ ${topdir:=$(git_topdir)} && $topdir != $pwd ]]
-		     then
-			 volume="$topdir"
-		     fi
-		     ;;
+		W)  volume="$pwd" ;;
+		H)  volume="$HOME"
+		    ENV+=(HOME=$workdir)
+		    ;;
+		G)  ;;
 	    esac
-	    if [[ $volume && $volume != $pwd ]]
-	    then
-		warn "Mount $volume to $workdir"
-		[[ "${pwd#$volume/}" != $pwd ]] && relative="${pwd#$volume/}"
-	    fi
 	    ;;
+
 	N) givenname="$OPTARG" ;;
 	K|S)
 	    : ${container:=$(container_name)}
@@ -202,6 +204,11 @@ do
 	    remove=
 	    ;&
 	C|D)
+	    if [[ $volume && $volume != $pwd ]]
+	    then
+		warn "Mount $volume to $workdir"
+		[[ ${pwd#$volume/} != $pwd ]] && relative="${pwd#$volume/}"
+	    fi
 	    if [[ $DISPLAY && "${ip:=$(get_ip)}" ]]
 	    then
 		display="$ip:0"
@@ -220,6 +227,7 @@ do
 	    : ${hostname:=$(<<< ${image} sed -e s:.*/:: -e s/:.*//)}
 	    declare -a dockopt=(
 		-e XLATE_RUNNING_ON_DOCKER=1
+		--init
 		--interactive
 	    )
 	    if [ "$remove" ]
@@ -237,6 +245,9 @@ do
 		${read_only:+--read-only}
 		${hostname:+--hostname "${hostname}"}
 		${display:+-e DISPLAY="$display"}
+		${ports[@]:+${ports[@]/#/-p }}
+		${volumes[@]:+${volumes[@]/#/-v }}
+		${others[@]}
 		${ENV[@]/#/-e }
 	    )
 	    exec docker run "${dockopt[@]}" "${image}" "${command[@]}" || exit 1
@@ -495,9 +506,9 @@ process multiple files with specified target languages.
 
 =item B<Flexible Mount Options>
 
-B<xlate> provides options to mount different directories, including
-Git repositories (C<-G>) and read-only mounts (C<-R>).  This allows
-for flexible workflow integration while maintaining data security.
+If you are working in a git environment, the git top directory is
+automatically mounted, which works seamlessly with git commands.
+Otherwise the current directory is mounted.
 
 =item B<Environment Variable Handling>
 
@@ -693,25 +704,30 @@ the container.
 
 =back
 
-When running in a docker environment, the current directory is mounted
-by default.  If another directory is specified to be mounted, such as
-the git top directory or the home directory, it will still be moved to
-the current location within that tree and executed.
+When running in a docker environment, the L<git(1)> top directory is
+mounted if you are in a directory under git, otherwise current
+directory is mounted.  Working directory will still be moved to the
+current location within that tree.
 
 =over 7
 
-=item B<-G>
+=item B<-W>
 
-Mount L<git(1)> top-level directory.
+Mount current working directory.
 
 =item B<-H>
 
 Mount user's home directory.  The environment variable C<HOME> is set
 to the mount point.
 
-=item B<-V> I<directory>
+=begin comment
 
-Specify directory to be mounted.
+=item B<-G>
+
+Mount L<git(1)> top-level directory.  This is the default behavior, so
+it does virtually nothing.
+
+=end comment
 
 =item B<-U>
 
@@ -720,6 +736,11 @@ Do not mount any directory.
 =item B<-R>
 
 Mount directory as read-only.
+
+=item B<-V> I<from>:I<to>
+
+Specify the additional directory to be mounted.
+Repeatable.
 
 =item B<-E> I<name>[=I<value>]
 

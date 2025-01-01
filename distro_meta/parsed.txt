@@ -95958,3 +95958,11 @@ A/AK/AKIYM/TheSchwartz-1.18.tar.gz
 D/DE/DERF/Travel-Status-DE-VRR-3.05.tar.gz
 D/DE/DERIV/WebService-Hydra-0.005.tar.gz
 O/OO/OODLER/Webservice-Sendy-API-0.3.tar.gz
+P/PE/PETDANCE/ack-v3.8.1.tar.gz
+U/UT/UTASHIRO/App-Greple-xlate-0.9902.tar.gz
+O/OL/OLIVER/App-Netdisco-2.081003.tar.gz
+S/SA/SANKO/Bluesky-0.20.tar.gz
+B/BD/BDFOY/CPANSA-DB-20241231.001.tar.gz
+T/TH/THINC/DateTime-Format-Flexible-0.37.tar.gz
+V/VB/VBAR/Regexp-Compare-0.34.tar.gz
+K/KI/KIMOTO/SPVM-0.990034.tar.gz
