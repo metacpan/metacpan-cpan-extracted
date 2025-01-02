@@ -6,7 +6,7 @@ use warnings;
 use Mo qw(build is);
 use Mo::utils qw(check_required);
 
-our $VERSION = 0.34;
+our $VERSION = 0.36;
 
 has value => (
 	is => 'ro',
@@ -179,12 +179,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2020-2024 Michal Josef Špaček
+© 2020-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.34
+0.36
 
 =cut

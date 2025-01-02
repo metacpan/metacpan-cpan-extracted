@@ -53,6 +53,8 @@ examples/fixture_create_and_print_snak_wd_instance_of_human.pl
 examples/fixture_create_and_print_snak_wd_instance_of_version_edition_or_translation.pl
 examples/fixture_create_and_print_snak_wd_instance_of_wikidata_entity.pl
 examples/fixture_create_and_print_snak_wd_item_for_this_sense_dog.pl
+examples/fixture_create_and_print_snak_wd_number_of_limbs_four.pl
+examples/fixture_create_and_print_snak_wd_number_of_limbs_four_tolerance.pl
 examples/fixture_create_and_print_snak_wd_of_poem.pl
 examples/fixture_create_and_print_snak_wd_reference_url_fixture1.pl
 examples/fixture_create_and_print_snak_wd_retrieved_fixture1.pl
@@ -68,6 +70,8 @@ examples/fixture_create_and_print_statement_wd_instance_of_human.pl
 examples/fixture_create_and_print_statement_wd_instance_of_version_edition_or_translation.pl
 examples/fixture_create_and_print_statement_wd_instance_of_wikidata_property.pl
 examples/fixture_create_and_print_statement_wd_item_for_this_sense_dog.pl
+examples/fixture_create_and_print_statement_wd_number_of_hands_four.pl
+examples/fixture_create_and_print_statement_wd_number_of_hands_four_tolerance.pl
 examples/fixture_create_and_print_statement_wd_sex_or_gender_male.pl
 examples/fixture_create_and_print_statement_wd_subject_lexeme_dorota.pl
 examples/fixture_create_and_print_value_item_wd_dog.pl
@@ -114,6 +118,8 @@ lib/Test/Shared/Fixture/Wikibase/Datatype/Snak/Wikidata/InstanceOf/Human.pm
 lib/Test/Shared/Fixture/Wikibase/Datatype/Snak/Wikidata/InstanceOf/VersionEditionOrTranslation.pm
 lib/Test/Shared/Fixture/Wikibase/Datatype/Snak/Wikidata/InstanceOf/WikidataProperty.pm
 lib/Test/Shared/Fixture/Wikibase/Datatype/Snak/Wikidata/ItemForThisSense/Dog.pm
+lib/Test/Shared/Fixture/Wikibase/Datatype/Snak/Wikidata/NumberOfLimbs/Four.pm
+lib/Test/Shared/Fixture/Wikibase/Datatype/Snak/Wikidata/NumberOfLimbs/FourTolerance.pm
 lib/Test/Shared/Fixture/Wikibase/Datatype/Snak/Wikidata/Of/Poem.pm
 lib/Test/Shared/Fixture/Wikibase/Datatype/Snak/Wikidata/ReferenceURL/Fixture1.pm
 lib/Test/Shared/Fixture/Wikibase/Datatype/Snak/Wikidata/Retrieved/Fixture1.pm
@@ -130,6 +136,8 @@ lib/Test/Shared/Fixture/Wikibase/Datatype/Statement/Wikidata/InstanceOf/Human.pm
 lib/Test/Shared/Fixture/Wikibase/Datatype/Statement/Wikidata/InstanceOf/VersionEditionOrTranslation.pm
 lib/Test/Shared/Fixture/Wikibase/Datatype/Statement/Wikidata/InstanceOf/WikidataProperty.pm
 lib/Test/Shared/Fixture/Wikibase/Datatype/Statement/Wikidata/ItemForThisSense/Dog.pm
+lib/Test/Shared/Fixture/Wikibase/Datatype/Statement/Wikidata/NumberOfLimbs/Four.pm
+lib/Test/Shared/Fixture/Wikibase/Datatype/Statement/Wikidata/NumberOfLimbs/FourTolerance.pm
 lib/Test/Shared/Fixture/Wikibase/Datatype/Statement/Wikidata/SexOrGender/Male.pm
 lib/Test/Shared/Fixture/Wikibase/Datatype/Statement/Wikidata/SubjectLexeme/Dorota.pm
 lib/Test/Shared/Fixture/Wikibase/Datatype/Value/Item/Wikidata/Dog.pm
@@ -239,6 +247,12 @@ t/Test-Shared-Fixture-Wikibase-Datatype-Snak-Wikidata-InstanceOf-WikidataPropert
 t/Test-Shared-Fixture-Wikibase-Datatype-Snak-Wikidata-ItemForThisSense-Dog/01-use.t
 t/Test-Shared-Fixture-Wikibase-Datatype-Snak-Wikidata-ItemForThisSense-Dog/02-version.t
 t/Test-Shared-Fixture-Wikibase-Datatype-Snak-Wikidata-ItemForThisSense-Dog/03-new.t
+t/Test-Shared-Fixture-Wikibase-Datatype-Snak-Wikidata-NumberOfLimbs-Four/01-use.t
+t/Test-Shared-Fixture-Wikibase-Datatype-Snak-Wikidata-NumberOfLimbs-Four/02-version.t
+t/Test-Shared-Fixture-Wikibase-Datatype-Snak-Wikidata-NumberOfLimbs-Four/03-new.t
+t/Test-Shared-Fixture-Wikibase-Datatype-Snak-Wikidata-NumberOfLimbs-FourTolerance/01-use.t
+t/Test-Shared-Fixture-Wikibase-Datatype-Snak-Wikidata-NumberOfLimbs-FourTolerance/02-version.t
+t/Test-Shared-Fixture-Wikibase-Datatype-Snak-Wikidata-NumberOfLimbs-FourTolerance/03-new.t
 t/Test-Shared-Fixture-Wikibase-Datatype-Snak-Wikidata-Of-Poem/01-use.t
 t/Test-Shared-Fixture-Wikibase-Datatype-Snak-Wikidata-Of-Poem/02-version.t
 t/Test-Shared-Fixture-Wikibase-Datatype-Snak-Wikidata-Of-Poem/03-new.t
@@ -287,6 +301,12 @@ t/Test-Shared-Fixture-Wikibase-Datatype-Statement-Wikidata-InstanceOf-WikidataPr
 t/Test-Shared-Fixture-Wikibase-Datatype-Statement-Wikidata-ItemForThisSense-Dog/01-use.t
 t/Test-Shared-Fixture-Wikibase-Datatype-Statement-Wikidata-ItemForThisSense-Dog/02-version.t
 t/Test-Shared-Fixture-Wikibase-Datatype-Statement-Wikidata-ItemForThisSense-Dog/03-new.t
+t/Test-Shared-Fixture-Wikibase-Datatype-Statement-Wikidata-NumberOfLimbs-Four/01-use.t
+t/Test-Shared-Fixture-Wikibase-Datatype-Statement-Wikidata-NumberOfLimbs-Four/02-version.t
+t/Test-Shared-Fixture-Wikibase-Datatype-Statement-Wikidata-NumberOfLimbs-Four/03-new.t
+t/Test-Shared-Fixture-Wikibase-Datatype-Statement-Wikidata-NumberOfLimbs-FourTolerance/01-use.t
+t/Test-Shared-Fixture-Wikibase-Datatype-Statement-Wikidata-NumberOfLimbs-FourTolerance/02-version.t
+t/Test-Shared-Fixture-Wikibase-Datatype-Statement-Wikidata-NumberOfLimbs-FourTolerance/03-new.t
 t/Test-Shared-Fixture-Wikibase-Datatype-Statement-Wikidata-SexOrGender-Male/01-use.t
 t/Test-Shared-Fixture-Wikibase-Datatype-Statement-Wikidata-SexOrGender-Male/02-version.t
 t/Test-Shared-Fixture-Wikibase-Datatype-Statement-Wikidata-SexOrGender-Male/03-new.t
@@ -556,6 +576,10 @@ xt/Test-Shared-Fixture-Wikibase-Datatype-Snak-Wikidata-InstanceOf-WikidataProper
 xt/Test-Shared-Fixture-Wikibase-Datatype-Snak-Wikidata-InstanceOf-WikidataProperty/02-pod.t
 xt/Test-Shared-Fixture-Wikibase-Datatype-Snak-Wikidata-ItemForThisSense-Dog/01-pod_coverage.t
 xt/Test-Shared-Fixture-Wikibase-Datatype-Snak-Wikidata-ItemForThisSense-Dog/02-pod.t
+xt/Test-Shared-Fixture-Wikibase-Datatype-Snak-Wikidata-NumberOfLimbs-Four/01-pod_coverage.t
+xt/Test-Shared-Fixture-Wikibase-Datatype-Snak-Wikidata-NumberOfLimbs-Four/02-pod.t
+xt/Test-Shared-Fixture-Wikibase-Datatype-Snak-Wikidata-NumberOfLimbs-FourTolerance/01-pod_coverage.t
+xt/Test-Shared-Fixture-Wikibase-Datatype-Snak-Wikidata-NumberOfLimbs-FourTolerance/02-pod.t
 xt/Test-Shared-Fixture-Wikibase-Datatype-Snak-Wikidata-Of-Poem/01-pod_coverage.t
 xt/Test-Shared-Fixture-Wikibase-Datatype-Snak-Wikidata-Of-Poem/02-pod.t
 xt/Test-Shared-Fixture-Wikibase-Datatype-Snak-Wikidata-ReferenceURL-Fixture1/01-pod_coverage.t
@@ -588,6 +612,10 @@ xt/Test-Shared-Fixture-Wikibase-Datatype-Statement-Wikidata-InstanceOf-WikidataP
 xt/Test-Shared-Fixture-Wikibase-Datatype-Statement-Wikidata-InstanceOf-WikidataProperty/02-pod.t
 xt/Test-Shared-Fixture-Wikibase-Datatype-Statement-Wikidata-ItemForThisSense-Dog/01-pod_coverage.t
 xt/Test-Shared-Fixture-Wikibase-Datatype-Statement-Wikidata-ItemForThisSense-Dog/02-pod.t
+xt/Test-Shared-Fixture-Wikibase-Datatype-Statement-Wikidata-NumberOfLimbs-Four/01-pod_coverage.t
+xt/Test-Shared-Fixture-Wikibase-Datatype-Statement-Wikidata-NumberOfLimbs-Four/02-pod.t
+xt/Test-Shared-Fixture-Wikibase-Datatype-Statement-Wikidata-NumberOfLimbs-FourTolerance/01-pod_coverage.t
+xt/Test-Shared-Fixture-Wikibase-Datatype-Statement-Wikidata-NumberOfLimbs-FourTolerance/02-pod.t
 xt/Test-Shared-Fixture-Wikibase-Datatype-Statement-Wikidata-SexOrGender-Male/01-pod_coverage.t
 xt/Test-Shared-Fixture-Wikibase-Datatype-Statement-Wikidata-SexOrGender-Male/02-pod.t
 xt/Test-Shared-Fixture-Wikibase-Datatype-Statement-Wikidata-SubjectLexeme-Dorota/01-pod_coverage.t

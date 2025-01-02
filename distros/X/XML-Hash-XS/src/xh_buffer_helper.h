@@ -20,30 +20,70 @@
     }
 #define XH_BUFFER_WRITE_CHAR(b, c)                                     \
     *b->cur++ = c;
+#ifdef XH_SPARC_ARCH
+#define XH_BUFFER_WRITE_CHAR2(b, s)                                    \
+    XH_BUFFER_WRITE_LONG_STRING(b, s, 2)
+#else
 #define XH_BUFFER_WRITE_CHAR2(b, s)                                    \
     *((uint16_t *) b->cur) = *((uint16_t *) (s));                      \
     b->cur += 2;
+#endif
+#ifdef XH_SPARC_ARCH
+#define XH_BUFFER_WRITE_CHAR3(b, s)                                    \
+    XH_BUFFER_WRITE_LONG_STRING(b, s, 3)
+#else
 #define XH_BUFFER_WRITE_CHAR3(b, s)                                    \
     XH_BUFFER_WRITE_CHAR2(b, s)                                        \
     XH_BUFFER_WRITE_CHAR(b, s[2])
+#endif
+#ifdef XH_SPARC_ARCH
+#define XH_BUFFER_WRITE_CHAR4(b, s)                                    \
+    XH_BUFFER_WRITE_LONG_STRING(b, s, 4)
+#else
 #define XH_BUFFER_WRITE_CHAR4(b, s)                                    \
     *((uint32_t *) b->cur) = *((uint32_t *) (s));                      \
     b->cur += 4;
+#endif
+#ifdef XH_SPARC_ARCH
+#define XH_BUFFER_WRITE_CHAR5(b, s)                                    \
+    XH_BUFFER_WRITE_LONG_STRING(b, s, 5)
+#else
 #define XH_BUFFER_WRITE_CHAR5(b, s)                                    \
     XH_BUFFER_WRITE_CHAR4(b, s)                                        \
     XH_BUFFER_WRITE_CHAR(b, s[4])
+#endif
+#ifdef XH_SPARC_ARCH
+#define XH_BUFFER_WRITE_CHAR6(b, s)                                    \
+    XH_BUFFER_WRITE_LONG_STRING(b, s, 6)
+#else
 #define XH_BUFFER_WRITE_CHAR6(b, s)                                    \
     XH_BUFFER_WRITE_CHAR4(b, s)                                        \
     XH_BUFFER_WRITE_CHAR2(b, s + 4)
+#endif
+#ifdef XH_SPARC_ARCH
+#define XH_BUFFER_WRITE_CHAR7(b, s)                                    \
+    XH_BUFFER_WRITE_LONG_STRING(b, s, 7)
+#else
 #define XH_BUFFER_WRITE_CHAR7(b, s)                                    \
     XH_BUFFER_WRITE_CHAR6(b, s)                                        \
     XH_BUFFER_WRITE_CHAR(b, s[6])
+#endif
+#ifdef XH_SPARC_ARCH
+#define XH_BUFFER_WRITE_CHAR8(b, s)                                    \
+    XH_BUFFER_WRITE_LONG_STRING(b, s, 8)
+#else
 #define XH_BUFFER_WRITE_CHAR8(b, s)                                    \
     XH_BUFFER_WRITE_CHAR4(b, s)                                        \
     XH_BUFFER_WRITE_CHAR4(b, s + 4)
+#endif
+#ifdef XH_SPARC_ARCH
+#define XH_BUFFER_WRITE_CHAR9(b, s)                                    \
+    XH_BUFFER_WRITE_LONG_STRING(b, s, 9)
+#else
 #define XH_BUFFER_WRITE_CHAR9(b, s)                                    \
     XH_BUFFER_WRITE_CHAR8(b, s)                                        \
     XH_BUFFER_WRITE_CHAR(b, s[8])
+#endif
 #define XH_BUFFER_WRITE_ESCAPE_STRING(b, s, l)                         \
     while (l--) {                                                      \
         switch (*b->cur = *s++) {                                      \

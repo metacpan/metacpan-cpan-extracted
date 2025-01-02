@@ -207,6 +207,11 @@ class Go::Schedule {
     my $coroutine = Go::Coroutine->new($task);
     
     $self->{coroutines}->push($coroutine);
+    
+    if (Go->ENV_DEBUG) {
+      Fn->say_stderr(Fn->sprintf("[Go Debug]Push new goroutine with the callback %p.", [(object)$task]));
+    }
+    
   }
   
 }

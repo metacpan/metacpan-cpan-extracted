@@ -89,6 +89,10 @@ class Go::Channel {
       
       my $current_coroutine = $schedule->{current_coroutine};
       
+      unless ($current_coroutine) {
+        die "There is no currently running goroutine.";
+      }
+      
       $current_coroutine->{disable} = 1;
       
       $read_wait->{coroutine} = $current_coroutine;
@@ -195,6 +199,10 @@ class Go::Channel {
         my $schedule = $self->{schedule};
         
         my $current_coroutine = $schedule->{current_coroutine};
+        
+        unless ($current_coroutine) {
+          die "There is no currently running goroutine.";
+        }
         
         $current_coroutine->{disable} = 1;
         

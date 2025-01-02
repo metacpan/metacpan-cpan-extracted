@@ -1,0 +1,674 @@
+=head1 NAME
+
+PDL::API - making ndarrays from Perl and C/XS code
+
+=head1 SYNOPSIS
+
+  use PDL;
+  sub mkmyndarray {
+   ...
+  }
+
+=head1 DESCRIPTION
+
+A simple cookbook how to create ndarrays manually.
+It covers both the Perl and the C/XS level.
+Additionally, it describes the PDL core routines
+that can be accessed from other modules. These
+routines basically define the PDL API. If you need to
+access ndarrays from C/XS you probably need to know
+about these functions.
+
+Also described is the new (as of PDL 2.058) access to PDL operations
+via C functions, which the XS functions now call.
+
+=head2 Creating an ndarray manually from Perl
+
+Sometimes you want to create an ndarray I<manually>
+from binary data. You can do that at the Perl level.
+Examples in the distribution include some of the
+IO routines. The code snippet below illustrates the
+required steps.
+
+   use Carp;
+   sub mkmyndarray {
+     my $class = shift;
+     my $pdl  = $class->new;
+     $pdl->set_datatype($PDL_B);
+     $pdl->setdims([1,3,4]);
+     my $dref = $pdl->get_dataref();
+     # read data directly from file
+     open my $file, '<data.dat' or die "couldn't open data.dat";
+     my $len = $pdl->nelems*PDL::Core::howbig($pdl->get_datatype);
+     croak "couldn't read enough data" if
+       read( $file, $$dref, $len) != $len;
+     close $file;
+     $pdl->upd_data();
+     return $pdl;
+   }
+
+=head2 Creating an ndarray in C
+
+The following example creates an ndarray at the C level.
+We use the C<Inline> module which is a good way to interface
+Perl and C, using the C<with> capability in L<Inline> 0.68+.
+
+Note that to create a "scalar" ndarray (with no dimensions at all,
+and a single element), just pass a zero-length C<dims> array, with
+C<ndims> as zero.
+
+   use PDL::LiteF;
+
+   $x = myfloatseq(); # exercise our C ndarray constructor
+
+   print $x->info,"\n";
+
+   use Inline with => 'PDL';
+   use Inline C;
+   Inline->init; # useful if you want to be able to 'do'-load this script
+
+   __DATA__
+
+   __C__
+
+   static pdl* new_pdl(int datatype, PDL_Indx dims[], int ndims)
+   {
+     pdl *p = PDL->pdlnew();
+     if (!p) return p;
+     pdl_error err = PDL->setdims(p, dims, ndims);  /* set dims */
+     if (err.error) { PDL->destroy(p); return NULL; }
+     p->datatype = datatype;         /* and data type */
+     err = PDL->allocdata (p);       /* allocate the data chunk */
+     if (err.error) { PDL->destroy(p); return NULL; }
+     return p;
+   }
+
+   pdl* myfloatseq()
+   {
+     PDL_Indx dims[] = {5,5,5};
+     pdl *p = new_pdl(PDL_F,dims,3);
+     if (!p) return p;
+     PDL_Float *dataf = (PDL_Float *) p->data;
+     PDL_Indx i; /* dimensions might be 64bits */
+
+     for (i=0;i<5*5*5;i++)
+       dataf[i] = i; /* the data must be initialized ! */
+     return p;
+   }
+
+=head2 Wrapping your own data into an ndarray
+
+Sometimes you obtain a chunk of data from another
+source, for example an image processing library, etc.
+All you want to do in that case is wrap your data
+into an ndarray struct at the C level. Examples using this approach
+can be found in the IO modules (where FastRaw and FlexRaw
+use it for mmapped access) and the Gimp Perl module (that
+uses it to wrap Gimp pixel regions into ndarrays).
+The following script demonstrates a simple example:
+
+   use PDL::LiteF;
+   use PDL::Core::Dev;
+
+   $y = mkndarray();
+
+   print $y->info,"\n";
+
+   imag1 $y;
+
+   use Inline with => 'PDL';
+   use Inline C;
+   Inline->init;
+
+   __DATA__
+
+   __C__
+
+   /* wrap a user supplied chunk of data into an ndarray
+    * You must specify the dimensions (dims,ndims) and
+    * the datatype (constants for the datatypes are declared
+    * in pdl.h; e.g. PDL_B for byte type, etc)
+    *
+    * when the created ndarray 'p' is destroyed on the
+    * Perl side the function passed as the 'delete_magic'
+    * parameter will be called with the pointer to the pdl structure
+    * and the 'delparam' argument.
+    * This gives you an opportunity to perform any clean up
+    * that is necessary. For example, you might have to
+    * explicitly call a function to free the resources
+    * associated with your data pointer.
+    * At the very least 'delete_magic' should zero the ndarray's data pointer:
+    *
+    *     void delete_mydata(pdl* pdl, int param)
+    *     {
+    *       pdl->data = 0;
+    *     }
+    *     pdl *p = pdl_wrap(mydata, PDL_B, dims, ndims, delete_mydata,0);
+    *
+    * pdl_wrap returns the pointer to the pdl
+    * that was created.
+    */
+   typedef void (*DelMagic)(pdl *, int param);
+   static void default_magic(pdl *p, int pa) { p->data = 0; }
+   static pdl* pdl_wrap(void *data, int datatype, PDL_Indx dims[],
+			int ndims, DelMagic delete_magic, int delparam)
+   {
+     pdl* p = PDL->pdlnew(); /* get the empty container */
+     if (!p) return p;
+     pdl_error err = PDL->setdims(p, dims, ndims);  /* set dims */
+     if (err.error) { PDL->destroy(p); return NULL; }
+     p->datatype = datatype;     /* and data type */
+     p->data = data;             /* point it to your data */
+     /* make sure the core doesn't meddle with your data */
+     p->state |= PDL_DONTTOUCHDATA | PDL_ALLOCATED;
+     if (delete_magic != NULL)
+       PDL->add_deletedata_magic(p, delete_magic, delparam);
+     else
+       PDL->add_deletedata_magic(p, default_magic, 0);
+     return p;
+   }
+
+   #define SZ 256
+   /* a really silly function that makes a ramp image
+    * in reality this could be an opaque function
+    * in some library that you are using
+    */
+   static PDL_Byte* mkramp(void)
+   {
+     PDL_Byte *data;
+     int i; /* should use PDL_Indx to support 64bit pdl indexing */
+
+     if ((data = malloc(SZ*SZ*sizeof(PDL_Byte))) == NULL)
+       croak("mkramp: Couldn't allocate memory");
+     for (i=0;i<SZ*SZ;i++)
+       data[i] = i % SZ;
+
+     return data;
+   }
+
+   /* this function takes care of the required clean-up */
+   static void delete_myramp(pdl* p, int param)
+   {
+     if (p->data)
+       free(p->data);
+     p->data = 0;
+   }
+
+   pdl* mkndarray()
+   {
+     PDL_Indx dims[] = {SZ,SZ};
+     pdl *p;
+
+     p = pdl_wrap((void *) mkramp(), PDL_B, dims, 2,
+		  delete_myramp,0); /* the delparam is abitrarily set to 0 */
+     return p;
+   }
+
+=head1 IMPLEMENTATION DETAILS
+
+=head2 The Core struct -- getting at PDL core routines at runtime
+
+PDL uses a technique similar to that employed by the Tk modules
+to let other modules use its core routines. A pointer to all
+shared core PDL routines is stored in the C<$PDL::SHARE> variable.
+XS code should get hold of this pointer at boot time so that
+the rest of the C/XS code can then use that pointer for access
+at run time. This initial loading of the pointer is most easily
+achieved using the functions C<PDL_AUTO_INCLUDE> and C<PDL_BOOT>
+that are defined and exported by C<PDL::Core::Dev>. Typical usage
+with the Inline module has already been demonstrated:
+
+   use Inline with => 'PDL';
+
+In earlier versions of C<Inline>, this was achieved like this:
+
+   use Inline C => Config =>
+     INC           => &PDL_INCLUDE,
+     TYPEMAPS      => &PDL_TYPEMAP,
+     AUTO_INCLUDE  => &PDL_AUTO_INCLUDE, # declarations
+     BOOT          => &PDL_BOOT;         # code for the XS boot section
+
+The code returned by C<PDL_AUTO_INCLUDE> makes sure that F<pdlcore.h>
+is included and declares the static variables to hold the pointer to
+the C<Core> struct. It looks something like this:
+
+   print PDL_AUTO_INCLUDE;
+
+ #include <pdlcore.h>
+ static Core* PDL; /* Structure holds core C functions */
+
+The code returned by C<PDL_BOOT> retrieves the C<$PDL::SHARE> variable
+and initializes the pointer to the C<Core> struct. For those who know
+their way around the Perl API here is the code:
+
+   perl_require_pv ("PDL/Core.pm"); /* make sure PDL::Core is loaded */
+#ifndef aTHX_
+#define aTHX_
+#endif
+   if (SvTRUE (ERRSV)) Perl_croak(aTHX_ "%s",SvPV_nolen (ERRSV));
+   SV* CoreSV = perl_get_sv("PDL::SHARE",FALSE); /* var with core structure */
+   if (!CoreSV)
+     Perl_croak(aTHX_ "We require the PDL::Core module, which was not found");
+   if (!(PDL = INT2PTR(Core*,SvIV( CoreSV )))) /* Core* value */
+     Perl_croak(aTHX_ "Got NULL pointer for PDL");
+   if (PDL->Version != PDL_CORE_VERSION)
+     Perl_croak(aTHX_ "[PDL->Version: \%d PDL_CORE_VERSION: \%d XS_VERSION: \%s] The code needs to be recompiled against the newly installed PDL", PDL->Version, PDL_CORE_VERSION, XS_VERSION);
+
+The C<Core> struct contains version info to ensure that the structure defined
+in F<pdlcore.h> really corresponds to the one obtained at runtime. The code
+above tests for this
+
+   if (PDL->Version != PDL_CORE_VERSION)
+     ....
+
+For more information on the Core struct see L<PDL::Internals>.
+
+With these preparations your code can now access the
+core routines as already shown in some of the examples above, e.g.
+
+  pdl *p = PDL->pdlnew();
+
+By default the C variable named C<PDL> is used to hold the pointer to the
+C<Core> struct. If that is (for whichever reason) a problem you can
+explicitly specify a name for the variable with the C<PDL_AUTO_INCLUDE>
+and the C<PDL_BOOT> routines:
+
+   use Inline C => Config =>
+     INC           => &PDL_INCLUDE,
+     TYPEMAPS      => &PDL_TYPEMAP,
+     AUTO_INCLUDE  => &PDL_AUTO_INCLUDE 'PDL_Corep',
+     BOOT          => &PDL_BOOT 'PDL_Corep';
+
+Make sure you use the same identifier with C<PDL_AUTO_INCLUDE>
+and C<PDL_BOOT> and use that same identifier in your own code.
+E.g., continuing from the example above:
+
+  pdl *p = PDL_Corep->pdlnew();
+
+=head2 Some selected core routines explained
+
+The full definition of the C<Core> struct can be found in the file
+F<pdlcore.h>. In the following the most frequently used member
+functions of this struct are briefly explained.
+
+=over 5
+
+=item *
+
+C<pdl *SvPDLV(SV *sv)>
+
+=item *
+
+C<pdl *SetSV_PDL(SV *sv, pdl *it)>
+
+=item *
+
+C<pdl *pdlnew()>
+
+C<pdlnew> returns an empty pdl object that is initialised like a "null"
+but with no data. Example:
+
+  pdl *p = PDL->pdlnew();
+  if (!p) return p;
+  pdl_error err = PDL->setdims(p, dims, ndims);  /* set dims */
+  if (err.error) { PDL->destroy(p); return NULL; }
+  p->datatype = PDL_B;
+
+Returns C<NULL> if a problem occurred, so check for that.
+
+=item *
+
+C<pdl *null()>
+
+Returns C<NULL> if a problem occurred, so check for that.
+
+=item *
+
+C<SV *copy(pdl* p, char* )>
+
+=item *
+
+C<void *smalloc(STRLEN nbytes)>
+
+=item *
+
+C<int howbig(int pdl_datatype)>
+
+=item *
+
+C<pdl_error add_deletedata_magic(pdl *p, void (*func)(pdl*, int), int param)>
+
+=item *
+
+C<pdl_error allocdata(pdl *p)>
+
+=item *
+
+C<pdl_error make_physical(pdl *p)>
+
+=item *
+
+C<pdl_error make_physdims(pdl *p)>
+
+=item *
+
+C<pdl_error make_physvaffine(pdl *p)>
+
+=item *
+
+C<void pdl_barf(const char* pat,...)> and
+C<void pdl_warn(const char* pat,...)>
+
+These are C-code equivalents of C<barf> and C<warn>. They include special handling of error or warning
+messages during pthreading (i.e. processor multi-threading) that defer the messages until after pthreading
+is completed. When pthreading is complete, perl's C<barf> or C<warn> is called with the deferred messages. This
+is needed to keep from calling perl's C<barf> or C<warn> during pthreading, which can cause segfaults.
+
+Note that C<barf> and C<warn> have been redefined (using c-preprocessor macros) in pdlcore.h to C<< PDL->barf >>
+and C<< PDL->warn >>. This is to keep any XS or PP code from calling perl's C<barf> or C<warn> directly, which can
+cause segfaults during pthreading.
+
+See L<PDL::ParallelCPU> for more information on pthreading.
+
+B<NB> As of 2.064, it is B<highly recommended> that you do not call
+C<barf> at all in PP code, but instead use C<$CROAK()>. This will return
+a C<pdl_error> which will transparently be used to throw the correct
+exception in Perl code, but can be handled suitably by non-Perl callers.
+
+=item *
+
+  converttype
+
+Used by C<set_datatype> to change an ndarray's type, converting and
+possibly re-allocating the data if a different size. If the ndarray's
+C<badflag> was set, its C<badvalue> will become the default for the
+new type. Bad values will still be bad.
+As of 2.093, will physicalise its ndarray.
+
+=item *
+
+  converttypei_new
+
+Affine transformation used only by C<get_convertedpdl> to convert an
+ndarray's type. Not bad-value aware.
+
+=item *
+
+  get_convertedpdl
+
+Used by L<PDL::Core/convert>.
+
+=item *
+
+  affine_new
+
+Creates a child vaffine ndarray from given parent ndarray, with given offs
+(starting point for that pthread in that ndarray), inclist and dims.
+
+=item *
+
+  make_trans_mutual
+
+Triggers the actual running of a previously-set-up C<pdl_trans>.
+
+=item *
+
+  get
+
+Get data at given coordinates.
+
+=item *
+
+  get_offs
+
+Get data at given offset.
+
+=item *
+
+  put_offs
+
+Put data at given offset.
+
+=item *
+
+  setdims_careful
+
+Despite the name, just calls C<resize_defaultincs> then
+C<reallocbroadcastids> with one.
+
+=item *
+
+  destroy
+
+Destroy ndarray.
+
+=item *
+
+  reallocdims
+
+Cause the ndarray to have given number of dimensions, destroying
+previous ones.
+
+=item *
+
+  reallocbroadcastids
+
+Reallocate n broadcastids. Set the new extra ones to the end.
+
+=item *
+
+  resize_defaultincs
+
+Recalculate default increments from C<dims>, and grow the PDL data.
+
+=back
+
+=head2 Handy macros from pdl.h
+
+Some of the C API functions return C<PDL_Anyval> C type which
+is a structure and therefore requires special handling.
+
+You might want to use for example C<get_pdl_badvalue> function:
+
+ /* THIS DOES NOT WORK! (although it did in older PDL) */
+ if( PDL->get_pdl_badvalue(a) == 0 )  { ... }
+
+ /* THIS IS CORRECT */
+ double bad_a;
+ PDL_Anyval bv = PDL->get_pdl_badvalue(a);
+ if (bv.type < 0) croak("error getting badvalue");
+ ANYVAL_TO_CTYPE(bad_a, double, bv);
+ if( bad_a == 0 ) { ... }
+
+As of PDL 2.014, in F<pdl.h> there are the following macros for handling
+PDL_Anyval from C code:
+
+ ANYVAL_FROM_CTYPE(out_anyval, out_anyval_type, in_variable)
+ ANYVAL_TO_CTYPE(out_variable, out_ctype, in_anyval)
+ ANYVAL_EQ_ANYVAL(x, y) /* returns -1 on type error */
+
+As of PDL 2.039 (returns -1 rather than croaking on failure as of
+2.064) there is:
+
+ ANYVAL_ISNAN(anyval)
+
+As of PDL 2.040 (changed parameter list, also returns -1 rather than
+croaking on failure, in 2.064) - you need to check the badflag first:
+
+ ANYVAL_ISBAD(in_anyval, badval)
+
+e.g.
+
+ int badflag = (x->state & PDL_BADVAL) > 0;
+ PDL_Anyval badval = pdl_get_pdl_badvalue(x);
+ if (badflag) {
+   int isbad = ANYVAL_ISBAD(result, badval);
+   if (isbad == -1) croak("ANYVAL_ISBAD error on types %d, %d", result.type, badval.type);
+   if (isbad)
+     RETVAL = newSVpvn( "BAD", 3 );
+   else
+     ANYVAL_TO_SV(RETVAL, result);
+ } else
+   ANYVAL_TO_SV(RETVAL, result);
+
+As of PDL 2.058, there are:
+
+  ANYVAL_FROM_CTYPE_OFFSET(result, datatype, x, ioff);
+  ANYVAL_TO_CTYPE_OFFSET(x, ioff, datatype, value);
+
+The latter dispatches on both the destination type and the input
+"anyval" type. They are intended for retrieving values from, and setting
+them within, ndarrays.
+
+As of PDL 2.048, in F<pdlperl.h> there are:
+
+ ANYVAL_FROM_SV(out_anyval, in_SV, use_undefval, forced_type, warn_undef)
+ ANYVAL_TO_SV(out_SV, in_anyval)
+
+Because these are used in the PDL F<typemap>, you will need to
+include F<pdlperl.h> in any XS file with functions that take or
+return a C<PDL_Anyval>.
+
+As of 2.083, C<ANYVAL_TO_SV> assigns a value into the passed C<SV*>
+using the Perl API, rather than assigning the given C value to having a
+newly-created C<SV*>, so the caller is responsible for memory-management.
+
+=head3 PDL_GENERICSWITCH et al
+
+As of 2.058, there is a mechanism to use pure C macros (without Perl
+generation) to do PDL type-generic operations, using the
+L<X macro|https://en.wikipedia.org/wiki/X_macro> concept. A simple(ish)
+example, that extracts the right C<struct> member based on an
+ndarray's C<type> variable (from L<PDL::Bad/badvalue>):
+
+  #define X(datatype, ctype, ppsym, ...) \
+      *((ctype *)p->data) = PDL->bvals.ppsym;
+      PDL_GENERICSWITCH(PDL_TYPELIST_ALL, type, X, croak("Not a known data type code=%d", type))
+  #undef X
+
+An example using a mapping from one ndarray type to another, with
+an outer and inner type, from the same function:
+
+  #define X_OUTER(datatype, ctype, ppsym, ...) \
+        ctype cnewval = val.value.ppsym;
+  #define X_INNER(datatype, ctype, ppsym, ...) \
+        PDL->bvals.ppsym = cnewval;
+        PDL_GENERICSWITCH2(
+          PDL_TYPELIST_ALL, val.type, X_OUTER, croak("Not a known data type code=%d", val.type),
+          PDL_TYPELIST_ALL_, type, X_INNER, croak("Not a known data type code=%d", type))
+  #undef X_OUTER
+  #undef X_INNER
+
+You will note the above examples simply hardcode external variable
+names, e.g. C<cnewval>, which they can afford to do as they are
+very local. In lambda calculus terms, those variables are not bound
+by the C macros.
+
+Next is an example that I<does> such lambda binding, adding
+C<outany, inval,> after the mandatory arguments to C<PDL_GENERICSWITCH>.
+The additional comma after C<inval> is absolutely needed, so that
+when the arguments are expanded at the start of arguments to the
+"X macro" (here, C<ANYVAL_FROM_CTYPE_X>), it's syntactically valid:
+
+  #define ANYVAL_FROM_CTYPE_X(outany, inval, datatype, ctype, ppsym, ...) \
+    (outany).type = datatype; (outany).value.ppsym = (inval);
+  #define ANYVAL_FROM_CTYPE(outany,avtype,inval) \
+    PDL_GENERICSWITCH(PDL_TYPELIST_ALL, avtype, ANYVAL_FROM_CTYPE_X, \
+      outany.type = -1; outany.value.B = 0, \
+      outany, inval, \
+    )
+
+A more complex example, implemented for 2.096, does away with the
+last Perl code generation for F<pdlperl.h>, and unpacks the C<switch>
+statement to use several "lister macros":
+
+  #define ANYVAL_UNSIGNED_X(outsv, inany, sym, ctype, ppsym, ...) \
+    sv_setuv(outsv, (UV)(inany.value.ppsym));
+  #define ANYVAL_SIGNED_X(outsv, inany, sym, ctype, ppsym, ...) \
+    sv_setiv(outsv, (IV)(inany.value.ppsym));
+  #define ANYVAL_FLOATREAL_X(outsv, inany, sym, ctype, ppsym, ...) \
+    sv_setnv(outsv, (NV)(inany.value.ppsym));
+  #define ANYVAL_COMPLEX_X(outsv, inany, sym, ctype, ppsym, shortctype, defbval, realctype, convertfunc, floatsuffix, ...) \
+    PDL_MAKE_PERL_COMPLEX(outsv, creal ## floatsuffix(inany.value.ppsym), cimag ## floatsuffix(inany.value.ppsym));
+  #define ANYVAL_TO_SV(outsv,inany) do { switch (inany.type) { \
+    PDL_TYPELIST_UNSIGNED(PDL_GENERICSWITCH_CASE, ANYVAL_UNSIGNED_X, (outsv,inany,),) \
+    PDL_TYPELIST_SIGNED(PDL_GENERICSWITCH_CASE, ANYVAL_SIGNED_X, (outsv,inany,),) \
+    PDL_TYPELIST_FLOATREAL(PDL_GENERICSWITCH_CASE, ANYVAL_FLOATREAL_X, (outsv,inany,),) \
+    PDL_TYPELIST_COMPLEX(PDL_GENERICSWITCH_CASE, ANYVAL_COMPLEX_X, (outsv,inany,),) \
+    default: outsv = &PL_sv_undef; \
+    } \
+   } while (0)
+
+Points this author is noting while he still understands them (these
+macros are somewhat fiendish), having revisited them some months
+after creating this lambda-binding capability:
+
+=over
+
+=item *
+
+as with the last example, the "X macro" gets additional arguments
+at the start;
+
+=item *
+
+the C<PDL_GENERICSWITCH_CASE> macro needs those wrapped in parentheses
+so the C preprocessor will treat them as one thing (the
+C<PDL_GENERICSWITCH> system does this for you);
+
+=item *
+
+passing those on needs the additional C<,> at the end of that
+parenthesised group so that when it is prepended to the expansion
+of arguments in the no-extra-arguments case, chaos does not ensue.
+
+=back
+
+=head2 Access to PDL operations as C functions
+
+As of 2.058, all PDL operations can be accessed from C code in a similar
+way to XS functions, since that is what the XS functions now call. Each
+module defines various C functions and data-structures for each operation,
+as needed to operate as a PDL transformation. The entry point from outside
+(and from XS functions) is a C function called C<pdl_(operationname)_run>,
+with a signature derived from its C<Pars> and C<OtherPars>. E.g.
+
+  # from PDL::Primitive
+  pp_def('wtstat',
+    Pars => 'a(n); wt(n); avg(); [o]b();',
+    OtherPars => 'int deg',
+    # ...
+  );
+
+has the C signature:
+
+  void pdl_run_wtstat(pdl *a, pdl *wt, pdl *avg, pdl *b, int deg);
+
+Not very surprisingly, all C<pdl*> parameters must be initialised (at
+least to C<< PDL->null >> status), and they are changed according to
+the operation's specification. This makes the XS C<_(name)_int>
+non-varargs XS functions very thin layers over this.
+
+=head1 SEE ALSO
+
+L<PDL>
+
+L<Inline>
+
+=head1 BUGS
+
+This manpage is still under development.
+Feedback and corrections are welcome.
+
+
+=head1 COPYRIGHT
+
+Copyright 2013 Chris Marshall (chm@cpan.org).
+
+Copyright 2010 Christian Soeller (c.soeller@auckland.ac.nz).
+You can distribute and/or modify this document under the same
+terms as the current Perl license.
+
+See: http://dev.perl.org/licenses/
+
+=cut

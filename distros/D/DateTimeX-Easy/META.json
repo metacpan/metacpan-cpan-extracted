@@ -4,7 +4,7 @@
       "Robert Krimen <rokr@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -38,7 +38,7 @@
             "DateTime::Format::Flexible" : "0",
             "DateTime::Format::ICal" : "0",
             "DateTime::Format::Natural" : "0",
-            "DateTime::TimeZone" : "0",
+            "DateTime::TimeZone" : "2.63",
             "Exporter" : "0",
             "Scalar::Util" : "0",
             "Time::Zone" : "0",
@@ -69,9 +69,9 @@
          "web" : "https://github.com/jjn1056/datetimex-easy"
       }
    },
-   "version" : "0.091",
-   "x_generated_by_perl" : "v5.34.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "version" : "0.092",
+   "x_generated_by_perl" : "v5.40.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

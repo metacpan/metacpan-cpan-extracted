@@ -18,7 +18,7 @@ name: App-sdview-Output-HTML
 provides:
   App::sdview::Output::HTML:
     file: lib/App/sdview/Output/HTML.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   App::sdview::Output: '0.13'
   Object::Pad: '0.800'
@@ -26,5 +26,5 @@ requires:
   perl: '5.026'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

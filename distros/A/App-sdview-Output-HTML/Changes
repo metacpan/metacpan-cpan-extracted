@@ -1,5 +1,10 @@
 Revision history for App-sdview-Output-HTML
 
+0.03    2025-01-02
+        [BUGFIXES]
+         * Fix to `link` handling as URI now comes in hash key called 'uri',
+           not 'target' (RT156105)
+
 0.02    2023-09-22
         [CHANGES]
          * Updated for `App::sdview` v0.13's new formatting tag names

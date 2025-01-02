@@ -13,9 +13,11 @@ print "\n";
 
 # Output:
 # aa
+# aae
 # ab
 # abs
 # ace
+# acf
 # acm
 # ady
 # ady-cyrl
@@ -24,7 +26,6 @@ print "\n";
 # aeb-latn
 # af
 # agq
-# ak
 # aln
 # als
 # alt
@@ -34,6 +35,7 @@ print "\n";
 # ang
 # ann
 # anp
+# apc
 # ar
 # arc
 # arn
@@ -64,11 +66,14 @@ print "\n";
 # bcc
 # bci
 # bcl
+# bdr
 # be
 # be-tarask
 # be-x-old
+# bew
 # bfd
 # bg
+# bgc
 # bgn
 # bh
 # bho
@@ -94,22 +99,33 @@ print "\n";
 # byv
 # ca
 # cak
+# cal
 # cbk-zam
+# ccp
 # cdo
+# cdo-hant
+# cdo-latn
 # ce
 # ceb
 # ch
+# chn
 # cho
 # chr
 # chy
 # ckb
 # cnh
 # co
+# cop
 # cps
+# cpx
+# cpx-hans
+# cpx-hant
+# cpx-latn
 # cr
 # crh
 # crh-cyrl
 # crh-latn
+# crh-ro
 # cs
 # csb
 # cu
@@ -131,6 +147,7 @@ print "\n";
 # dv
 # dz
 # ee
+# efi
 # egl
 # el
 # eml
@@ -165,6 +182,7 @@ print "\n";
 # frp
 # frr
 # fur
+# fvr
 # fy
 # ga
 # gaa
@@ -172,6 +190,7 @@ print "\n";
 # gan
 # gan-hans
 # gan-hant
+# gcf
 # gcr
 # gd
 # gl
@@ -194,12 +213,16 @@ print "\n";
 # gya
 # ha
 # hak
+# hak-hans
+# hak-hant
+# hak-latn
 # haw
 # he
 # hi
 # hif
 # hif-latn
 # hil
+# hke
 # hno
 # ho
 # hr
@@ -213,6 +236,8 @@ print "\n";
 # hyw
 # hz
 # ia
+# iba
+# ibb
 # id
 # ie
 # ig
@@ -226,6 +251,8 @@ print "\n";
 # io
 # is
 # isu
+# isv-cyrl
+# isv-latn
 # it
 # iu
 # ja
@@ -236,6 +263,7 @@ print "\n";
 # ka
 # kaa
 # kab
+# kai
 # kbd
 # kbd-cyrl
 # kbp
@@ -243,6 +271,7 @@ print "\n";
 # kea
 # ker
 # kg
+# kge
 # khw
 # ki
 # kiu
@@ -259,6 +288,7 @@ print "\n";
 # kl
 # km
 # kn
+# knc
 # ko
 # ko-kp
 # koi
@@ -302,6 +332,7 @@ print "\n";
 # lrc
 # lt
 # ltg
+# lua
 # lus
 # luz
 # lv
@@ -323,6 +354,9 @@ print "\n";
 # mk
 # ml
 # mn
+# mnc
+# mnc-latn
+# mnc-mong
 # mni
 # mnw
 # mo
@@ -334,6 +368,7 @@ print "\n";
 # ms-arab
 # mt
 # mua
+# mui
 # mul
 # mus
 # mwl
@@ -344,6 +379,9 @@ print "\n";
 # nah
 # nan
 # nan-hani
+# nan-hant
+# nan-latn-pehoeji
+# nan-latn-tailo
 # nap
 # nb
 # nds
@@ -353,6 +391,7 @@ print "\n";
 # ng
 # nge
 # nia
+# nit
 # niu
 # nl
 # nl-informal
@@ -367,11 +406,14 @@ print "\n";
 # nog
 # nov
 # nqo
+# nr
 # nrm
 # nso
+# nup
 # nv
 # ny
 # nyn
+# nyo
 # nys
 # oc
 # ojb
@@ -423,6 +465,7 @@ print "\n";
 # ruq
 # ruq-cyrl
 # ruq-latn
+# rut
 # rw
 # rwr
 # ryu
@@ -497,6 +540,7 @@ print "\n";
 # tg-latn
 # th
 # ti
+# tig
 # tk
 # tl
 # tly
@@ -505,6 +549,7 @@ print "\n";
 # to
 # tok
 # tpi
+# tpv
 # tr
 # tru
 # trv
@@ -512,6 +557,7 @@ print "\n";
 # tt
 # tt-cyrl
 # tt-latn
+# ttj
 # tum
 # tvu
 # tw
@@ -546,6 +592,8 @@ print "\n";
 # wls
 # wo
 # wuu
+# wuu-hans
+# wuu-hant
 # wya
 # xal
 # xh
@@ -559,9 +607,12 @@ print "\n";
 # yo
 # yrl
 # yue
+# yue-hans
+# yue-hant
 # za
 # zea
 # zgh
+# zgh-latn
 # zh
 # zh-classical
 # zh-cn

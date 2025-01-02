@@ -14,13 +14,15 @@ sub fapprox {
 sub runtest {
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   my ($in, $method, $expected, $extra) = @_;
+  $_ = $_->copy for $in;
   ($expected, my $expected_cplx) = ref($expected) eq 'ARRAY' ? @$expected : ($expected, $expected);
+  my @extra = map UNIVERSAL::isa($_, 'PDL') ? $_->copy : $_, @{$extra||[]};
   if (defined $expected) {
-    my ($got) = $in->$method(@{$extra||[]});
-    ok fapprox($got, $expected), $method or diag "got(".ref($got)."): $got";
+    my ($got) = $in->$method(@extra);
+    ok fapprox($got, $expected), $method or diag "got(".ref($got)."): $got\nexpected:$expected";
   }
-  $_ = PDL->topdl($_)->r2C for $in;
-  my ($got) = $in->$method(map ref() && ref() ne 'CODE' ? $_->r2C : $_, @{$extra||[]});
+  $_ = $_->r2C for $in;
+  my ($got) = $in->$method(map ref() && ref() ne 'CODE' ? $_->r2C : $_, @extra);
   my @cplx = ref($expected_cplx) eq 'ARRAY' ? @$expected_cplx : $expected_cplx;
   my $ok = grep fapprox($got, PDL->topdl($_)->r2C), @cplx;
   ok $ok, "native complex $method" or diag "got(".ref($got)."): $got\nexpected:@cplx";
@@ -80,5 +82,10 @@ $A = pdl '[[1+i 2+i][3+i 4+i]]';
 $B = identity(2);
 ok fapprox($got = $A x $B, $A), 'complex first' or diag "got: $got";
 ok fapprox($got = $B x $A, $A), 'complex second' or diag "got: $got";
+
+my $d = (identity(2) * 2)->sqrt;
+ok fapprox($got = $d->minv, my $exp = pdl '0.70710678 0; 0 0.70710678'), 'simple minv of double' or diag "got: $got";
+my $ld = (identity(2)->ldouble * 2)->sqrt;
+ok fapprox($got = $ld->minv, $exp->ldouble), 'simple minv of ldouble' or diag "got: $got";
 
 done_testing;

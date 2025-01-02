@@ -71,7 +71,7 @@ pp_add_exported('', ' mexp mexpts mlog msqrt mpow
 			csc acsc csch acsch toreal pi');
 
 pp_def('geexp',
-          Pars => '[io,phys]A(n,n);int deg();scale();[io]trace();int [o]ns();int [o]info(); int [t]ipiv(n); [t]wsp(wspn=CALC(3*$SIZE(n)*$SIZE(n)));',
+          Pars => '[io]A(n,n);int deg();scale();[io]trace();int [o]ns();int [o]info(); int [t]ipiv(n); [t]wsp(wspn=CALC(3*$SIZE(n)*$SIZE(n)));',
        	  GenericTypes => [D],
           Code => '
 /* ----------------------------------------------------------------------| 
@@ -346,7 +346,7 @@ EOT
 
 do '../pp_defc.pl'; die if $@;
 pp_defc('geexp',
-        Pars => '[io,phys]A(2,n,n);int deg();scale();int trace();int [o]ns();int [o]info(); int [t] ipiv(n)',
+        Pars => '[io]A(2,n,n);int deg();scale();int trace();int [o]ns();int [o]info(); int [t] ipiv(n)',
 	Doc => '
 =for ref
 
@@ -601,7 +601,7 @@ ACM - Transactions On Mathematical Software, 24(1):130-156, 1998
 );
 
 pp_defc('trsqrt',
-        Pars => '[io,phys]A(2,n,n);int uplo();[phys,o] B(2,n,n);int [o]info()',
+        Pars => '[io]A(2,n,n);int uplo();[o] B(2,n,n);int [o]info()',
 	Doc => '
 
 =for ref

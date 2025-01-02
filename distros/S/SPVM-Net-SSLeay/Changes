@@ -1,3 +1,6 @@
+0.034001 2025-01-02
+  [Bug Fix]
+    * Fix a potential bug that the argument width on a method call is wrong.
 0.034 2024-12-24
   [New Features]
     * Add Net::SSLeay::SSL_CTX#SSL_CTX_use_certificate method.

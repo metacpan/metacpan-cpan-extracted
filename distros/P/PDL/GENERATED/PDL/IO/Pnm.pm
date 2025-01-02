@@ -1,5 +1,5 @@
 #
-# GENERATED WITH PDL::PP from pnm.pd! Don't modify!
+# GENERATED WITH PDL::PP from lib/PDL/IO/Pnm.pd! Don't modify!
 #
 package PDL::IO::Pnm;
 
@@ -22,7 +22,7 @@ use DynaLoader;
 
 
 
-#line 6 "pnm.pd"
+#line 11 "lib/PDL/IO/Pnm.pd"
 
 use strict;
 use warnings;
@@ -58,7 +58,7 @@ sub dmax {
     $sz-- if !PDL::Type->new($type)->unsigned;
     return ((1 << $sz)-1);
 }
-#line 62 "Pnm.pm"
+#line 62 "lib/PDL/IO/Pnm.pm"
 
 
 =head1 FUNCTIONS
@@ -162,7 +162,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 44 "pnm.pd"
+#line 49 "lib/PDL/IO/Pnm.pd"
 
 =head2 rpnm
 
@@ -388,7 +388,7 @@ the copyright notice should be included in the file.
 =cut
 
 ############################## END PM CODE ################################
-#line 392 "Pnm.pm"
+#line 392 "lib/PDL/IO/Pnm.pm"
 
 # Exit with OK status
 

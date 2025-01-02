@@ -36,6 +36,7 @@ our @EXPORT_OK = qw(
     REPORT_COMMAND
     REPORT_STATUS
     REPORT_DEBUG
+    REPORT_HINT
     REPORT_INFO
     REPORT_NOTICE
     REPORT_WARN
@@ -47,6 +48,7 @@ our @EXPORT_OK = qw(
 our @EXPORT = qw(
     report_options
     debug
+    hint
     info
     notice
     warning
@@ -64,6 +66,7 @@ use Dpkg ();
 use Dpkg::Gettext;
 
 my $quiet_warnings = 0;
+my $show_hints = 1;
 my $debug_level = 0;
 my $info_fh = \*STDOUT;
 
@@ -93,6 +96,7 @@ use constant {
     REPORT_WARN => 6,
     REPORT_ERROR => 7,
     REPORT_DEBUG => 8,
+    REPORT_HINT => 9,
 };
 
 my %report_mode = (
@@ -114,6 +118,10 @@ my %report_mode = (
         # and all debug messages are untranslated anyway.
         name => 'debug',
     },
+    REPORT_HINT() => {
+        color => 'bold blue',
+        name => g_('hint'),
+    },
     REPORT_INFO() => {
         color => 'green',
         name => g_('info'),
@@ -134,16 +142,19 @@ my %report_mode = (
 
 sub report_options
 {
-    my (%options) = @_;
+    my (%opts) = @_;
 
-    if (exists $options{quiet_warnings}) {
-        $quiet_warnings = $options{quiet_warnings};
+    if (exists $opts{quiet_warnings}) {
+        $quiet_warnings = $opts{quiet_warnings};
     }
-    if (exists $options{debug_level}) {
-        $debug_level = $options{debug_level};
+    if (exists $opts{show_hints}) {
+        $show_hints = $opts{show_hints};
     }
-    if (exists $options{info_fh}) {
-        $info_fh = $options{info_fh};
+    if (exists $opts{debug_level}) {
+        $debug_level = $opts{debug_level};
+    }
+    if (exists $opts{info_fh}) {
+        $info_fh = $opts{info_fh};
     }
 }
 
@@ -186,7 +197,7 @@ sub _typename_prefix
     return report_pretty(report_name($type), report_color($type));
 }
 
-sub report(@)
+sub report
 {
     my ($type, $msg, @args) = @_;
 
@@ -205,7 +216,16 @@ sub debug
     print report(REPORT_DEBUG, @args) if $level <= $debug_level;
 }
 
-sub info($;@)
+sub hint
+{
+    my @args = @_;
+
+    return if not $show_hints;
+
+    print report(REPORT_HINT, @args) if not $quiet_warnings;
+}
+
+sub info
 {
     my @args = @_;
 
@@ -219,28 +239,28 @@ sub notice
     warn report(REPORT_NOTICE, @args) if not $quiet_warnings;
 }
 
-sub warning($;@)
+sub warning
 {
     my @args = @_;
 
     warn report(REPORT_WARN, @args) if not $quiet_warnings;
 }
 
-sub syserr($;@)
+sub syserr
 {
     my ($msg, @args) = @_;
 
     die report(REPORT_ERROR, "$msg: $!", @args);
 }
 
-sub error($;@)
+sub error
 {
     my @args = @_;
 
     die report(REPORT_ERROR, @args);
 }
 
-sub errormsg($;@)
+sub errormsg
 {
     my @args = @_;
 
@@ -254,7 +274,7 @@ sub printcmd
     print { *STDERR } report_pretty(" @cmd\n", report_color(REPORT_COMMAND));
 }
 
-sub subprocerr(@)
+sub subprocerr
 {
     my ($p, @args) = @_;
 
@@ -273,7 +293,7 @@ sub subprocerr(@)
     }
 }
 
-sub usageerr(@)
+sub usageerr
 {
     my ($msg, @args) = @_;
 

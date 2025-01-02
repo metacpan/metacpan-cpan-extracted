@@ -6,6 +6,6 @@ use Test::More;
 # use Test::NoWarnings;
 
 # Test.
-is($CommonsLang::VERSION, 0.01, 'Version.');
+is($CommonsLang::VERSION, 0.02, 'Version.');
 
 done_testing();

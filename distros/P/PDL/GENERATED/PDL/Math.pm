@@ -1,5 +1,5 @@
 #
-# GENERATED WITH PDL::PP from math.pd! Don't modify!
+# GENERATED WITH PDL::PP from lib/PDL/Math.pd! Don't modify!
 #
 package PDL::Math;
 
@@ -22,7 +22,7 @@ use DynaLoader;
 
 
 
-#line 13 "math.pd"
+#line 42 "lib/PDL/Math.pd"
 
 use strict;
 use warnings;
@@ -55,7 +55,7 @@ entirely in PDL.
 ### Kludge for backwards compatibility with older scripts
 ### This should be deleted at some point later than 21-Nov-2003.
 BEGIN {use PDL::MatrixOps;}
-#line 59 "Math.pm"
+#line 59 "lib/PDL/Math.pm"
 
 
 =head1 FUNCTIONS
@@ -313,12 +313,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 Round to integer values in floating-point format.
 
-=for method
-
-rint uses the 'round half to even' rounding method (also known as
-banker's rounding).  Half-integers are rounded to the nearest even
-number. This avoids a slight statistical bias inherent in always
-rounding half-integers up or away from zero.
+This is the C99 function; previous to 2.096, the doc referred to a
+bespoke function that did banker's rounding, but this was not used
+as a system version will have been detected and used.
 
 If you are looking to round half-integers up (regardless of sign), try
 C<floor($x+0.5)>.  If you want to round half-integers away from zero,
@@ -814,7 +811,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 348 "math.pd"
+#line 360 "lib/PDL/Math.pd"
 sub PDL::polyroots {
   my @args = map PDL->topdl($_), @_;
   my $natcplx = !$args[0]->type->real;
@@ -824,7 +821,7 @@ sub PDL::polyroots {
   PDL::_polyroots_int(@args);
   $natcplx ? $args[2]->czip($args[3]) : @args[2,3];
 }
-#line 828 "Math.pm"
+#line 825 "lib/PDL/Math.pm"
 
 *polyroots = \&PDL::polyroots;
 
@@ -861,7 +858,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 390 "math.pd"
+#line 402 "lib/PDL/Math.pd"
 sub PDL::polyfromroots {
   my @args = map PDL->topdl($_), @_;
   my $natcplx = !$args[0]->type->real;
@@ -884,7 +881,7 @@ sub PDL::polyfromroots {
   }
   $natcplx ? $outs[0] : @outs;
 }
-#line 888 "Math.pm"
+#line 885 "lib/PDL/Math.pm"
 
 *polyfromroots = \&PDL::polyfromroots;
 
@@ -921,7 +918,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 435 "math.pd"
+#line 447 "lib/PDL/Math.pd"
 sub PDL::polyval {
   my @args = map PDL->topdl($_), @_;
   my $natcplx = !$args[0]->type->real;
@@ -945,7 +942,7 @@ sub PDL::polyval {
   }
   $natcplx ? $outs[0] : @outs;
 }
-#line 949 "Math.pm"
+#line 946 "lib/PDL/Math.pm"
 
 *polyval = \&PDL::polyval;
 
@@ -955,7 +952,7 @@ sub PDL::polyval {
 
 
 
-#line 472 "math.pd"
+#line 484 "lib/PDL/Math.pd"
 
 =head1 BUGS
 
@@ -975,7 +972,7 @@ distribution. If this file is separated from the PDL distribution,
 the PDL copyright notice should be included in the file.
 
 =cut
-#line 979 "Math.pm"
+#line 976 "lib/PDL/Math.pm"
 
 # Exit with OK status
 

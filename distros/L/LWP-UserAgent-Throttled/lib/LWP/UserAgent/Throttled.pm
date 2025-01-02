@@ -14,11 +14,11 @@ LWP::UserAgent::Throttled - Throttle requests to a site
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 =head1 SYNOPSIS
 
@@ -72,8 +72,8 @@ Get/set the number of seconds between each request for sites.
 
     my $ua = LWP::UserAgent::Throttled->new();
     $ua->throttle({ 'search.cpan.org' => 0.1, 'www.example.com' => 1 });
-    print $ua->throttle('search.cpan.org'), "\n";    # prints 0.1
-    print $ua->throttle('perl.org'), "\n";    # prints 0
+    print $ua->throttle('search.cpan.org'), "\n";	# prints 0.1
+    print $ua->throttle('perl.org'), "\n";	# prints 0
 
 When setting a throttle it returns itself,
 so you can daisy chain messages.
@@ -81,21 +81,17 @@ so you can daisy chain messages.
 =cut
 
 sub throttle {
-	my $self = shift;
+	my ($self, $args) = @_;
 
-	return if(!defined($_[0]));
+	return unless(defined($args));
 
-	if(ref($_[0]) eq 'HASH') {
-		my %throttles = %{$_[0]};
-
-		foreach my $host(keys %throttles) {
-			$self->{'throttle'}{$host} = $throttles{$host};
-		}
+	if(ref($args) eq 'HASH') {
+		# Merge the new throttles in with the previous throttles
+		$self->{throttle} = { %{$self->{throttle} || {}}, %{$args} };
 		return $self;
 	}
 
-	my $host = shift;
-	return $self->{'throttle'}{$host} ? $self->{'throttle'}{$host} : 0;
+	return $self->{throttle}{$args} || 0;
 }
 
 =head2 ua
@@ -171,7 +167,7 @@ L<http://deps.cpantesters.org/?module=LWP::UserAgent::Throttled>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2024 Nigel Horne.
+Copyright 2017-2025 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

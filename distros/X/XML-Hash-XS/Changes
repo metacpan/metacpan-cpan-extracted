@@ -1,5 +1,8 @@
 Revision history for perl module XML::Hash::XS
 
+0.64    2025-01-01
+    - Fix for Sparc64.
+
 0.63    2024-12-29
     - Fix for OpenBSD.
     - Fix for MSVC.

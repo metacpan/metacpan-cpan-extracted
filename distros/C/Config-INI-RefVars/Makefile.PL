@@ -13,6 +13,15 @@ my %WriteMakefileArgs = (
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
     },
+    PREREQ_PM => {
+        'strict' => 0,
+        'warnings' => 0,
+        'feature'  => 0,
+        'constant' => 0,
+        'Carp'     => 0,
+        'File::Spec::Functions' => 0,
+        'Config' => 0,
+    },
     TEST_REQUIRES => {
         'strict' => 0,
         'warnings' => 0,
@@ -26,17 +35,7 @@ my %WriteMakefileArgs = (
         'Test::Fatal' => '0.010',
         'Test::Warn' => '0.37',
     },
-    PREREQ_PM => {
-        'strict' => 0,
-        'warnings' => 0,
-        'feature'  => 0,
-        'constant' => 0,
-        'Carp'     => 0,
-        'File::Spec::Functions' => 0,
-        'Config' => 0,
-        #'ABC'              => '1.6',
-        #'Foo::Bar::Module' => '5.0401',
-    },
+    PM_FILTER => 'perl tools/pm_filter_simple.pl',
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Config-INI-RefVars-*' },
 );

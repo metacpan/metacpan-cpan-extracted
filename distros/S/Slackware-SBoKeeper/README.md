@@ -36,7 +36,7 @@ database basically tracks which packages were manually added and what packages
 they depend on. **sbokeeper** tries to give the user a large degree of freedom
 when it comes to manipulating the database, to be compatible with the Slackware
 philosophy of "the user probably knows what he's doing, let him do whatever he
-wants." 
+wants."
 
 ### Getting Started
 
@@ -61,6 +61,7 @@ the default repo location then you do not have to do any sort of configuration,
 * `sbotools`/`sbotools2`
 * `sbpkg`
 * `slpkg`
+* `slackrepo`
 * `sboui`
 
 Now you should be ready to use **sbokeeper**.
@@ -172,7 +173,7 @@ handles the actual package management (building, installation, updating) while
 
 ## Copyright
 
-Copyright (C) 2024 Samuel Young
+Copyright (C) 2024-2025 Samuel Young
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of either: the GNU General Public License as published by the Free

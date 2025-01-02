@@ -5,7 +5,7 @@ package Hash::Match;
 use v5.14;
 use warnings;
 
-our $VERSION = 'v0.8.0';
+our $VERSION = 'v0.8.1';
 
 use Carp qw/ croak /;
 use List::AllUtils qw/ natatime /;
@@ -69,7 +69,7 @@ sub _key2fn {
     # deprecated.
 
     if ($key eq '-not') {
-	$key = $is_hash ? '-notall' : '-notany';
+        $key = $is_hash ? '-notall' : '-notany';
     }
 
     $KEY2FN->{$key} or croak "Unsupported key: '${key}'";
@@ -164,7 +164,7 @@ Hash::Match - match contents of a hash against rules
 
 =head1 VERSION
 
-version v0.8.0
+version v0.8.1
 
 =head1 SYNOPSIS
 
@@ -319,7 +319,7 @@ You can also use functions to match keys. For example,
 
 Since v0.8.0, the this module requires Perl v5.14 or later.
 
-Future releases may only support Perl versions released in the last ten years.
+Future releases may only support Perl versions released in the last ten (10) years.
 
 =head1 SEE ALSO
 
@@ -347,6 +347,11 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head2 Reporting Security Vulnerabilities
+
+Security issues should not be reported on the bugtracker website.  Please see F<SECURITY.md> for instructions how to
+report security vulnerabilities
+
 =head1 AUTHOR
 
 Robert Rothenberg <rrwo@cpan.org>
@@ -362,7 +367,7 @@ Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2023 by Robert Rothenberg.
+This software is Copyright (c) 2018-2025 by Robert Rothenberg.
 
 This is free software, licensed under:
 

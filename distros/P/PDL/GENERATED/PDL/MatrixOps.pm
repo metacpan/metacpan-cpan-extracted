@@ -1,5 +1,5 @@
 #
-# GENERATED WITH PDL::PP from matrixops.pd! Don't modify!
+# GENERATED WITH PDL::PP from lib/PDL/MatrixOps.pd! Don't modify!
 #
 package PDL::MatrixOps;
 
@@ -22,7 +22,7 @@ use DynaLoader;
 
 
 
-#line 9 "matrixops.pd"
+#line 14 "lib/PDL/MatrixOps.pd"
 
 =encoding utf8
 
@@ -132,7 +132,7 @@ document it!
 
 use Carp;
 use strict;
-#line 136 "MatrixOps.pm"
+#line 136 "lib/PDL/MatrixOps.pm"
 
 
 =head1 FUNCTIONS
@@ -143,7 +143,7 @@ use strict;
 
 
 
-#line 126 "matrixops.pd"
+#line 131 "lib/PDL/MatrixOps.pd"
 
 =head2 identity
 
@@ -174,7 +174,7 @@ sub identity {
   $was_pdl ? bless $out, ref($n) : $out;
 }
 
-#line 159 "matrixops.pd"
+#line 164 "lib/PDL/MatrixOps.pd"
 
 =head2 stretcher
 
@@ -188,18 +188,20 @@ sub identity {
 
 =for ref
 
-Return a diagonal matrix with the specified diagonal elements
+Return a diagonal matrix with the specified diagonal elements.
+Preserves higher dimensions.
+As of 2.096, it will also have the same datatype.
 
 =cut
 
 sub stretcher {
   my $in = shift;
-  my $out = zeroes($in->dim(0),$in->dims);
+  my $out = zeroes($in->type, $in->dim(0), $in->dims);
   $out->diagonal(0,1) += $in;
   $out;
 }
 
-#line 189 "matrixops.pd"
+#line 196 "lib/PDL/MatrixOps.pd"
 
 =head2 inv
 
@@ -293,7 +295,7 @@ sub inv {
   $x;
 }
 
-#line 289 "matrixops.pd"
+#line 296 "lib/PDL/MatrixOps.pd"
 
 =head2 det
 
@@ -347,7 +349,7 @@ sub det {
   defined $lu ? $lu->diagonal(0,1)->prodover * $par : PDL->zeroes(sbyte,1);
 }
 
-#line 348 "matrixops.pd"
+#line 355 "lib/PDL/MatrixOps.pd"
 
 =head2 determinant
 
@@ -429,7 +431,7 @@ sub determinant {
 
   return $sum;
 }
-#line 433 "MatrixOps.pm"
+#line 435 "lib/PDL/MatrixOps.pm"
 
 
 =head2 eigens_sym
@@ -462,6 +464,8 @@ runs across their components.
     ($ev,$e) = eigens_sym $x;  # Make eigenvector matrix
     $vector = $ev->slice($n);       # Select nth eigenvector as a column-vector
     $vector = $ev->slice("($n)");     # Select nth eigenvector as a row-vector
+
+As of 2.096, the eigenvalues are returned in ascending order.
 
 To compare with L<PDL::LinearAlgebra>:
 
@@ -687,7 +691,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 685 "matrixops.pd"
+#line 694 "lib/PDL/MatrixOps.pd"
 
 =head2 lu_decomp
 
@@ -860,7 +864,7 @@ sub lu_decomp {
    wantarray ? ($out,$permute,$parity) : $out;
 }
 
-#line 862 "matrixops.pd"
+#line 871 "lib/PDL/MatrixOps.pd"
 
 =head2 lu_decomp2
 
@@ -976,7 +980,7 @@ sub lu_decomp2 {
   wantarray ? ($out,$perm,$par) : $out;
 }
 
-#line 983 "matrixops.pd"
+#line 992 "lib/PDL/MatrixOps.pd"
 
 =head2 lu_backsub
 
@@ -1196,7 +1200,7 @@ BROADCAST_OK:
    }
    $out;
 }
-#line 1200 "MatrixOps.pm"
+#line 1204 "lib/PDL/MatrixOps.pm"
 
 
 =head2 simq
@@ -1420,7 +1424,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1386 "matrixops.pd"
+#line 1395 "lib/PDL/MatrixOps.pd"
 
 =head1 AUTHOR
 
@@ -1432,7 +1436,7 @@ itself.  If this file is separated from the PDL distribution, then the
 PDL copyright notice should be included in this file.
 
 =cut
-#line 1436 "MatrixOps.pm"
+#line 1440 "lib/PDL/MatrixOps.pm"
 
 # Exit with OK status
 

@@ -103,13 +103,13 @@ installed on your system. If you are using one the following:
 
 =item sbopkg
 
-=item sbotools
-
-=item sbotools2
+=item sbotools/sbotools2
 
 =item sbpkg
 
 =item slpkg
+
+=item slackrepo
 
 =item sboui
 
@@ -118,6 +118,15 @@ installed on your system. If you are using one the following:
 then B<sbokeeper> will use the first one found's default repo location. If
 none can be found, B<sbokeeper> is going to croak and just tell you to set it
 manually.
+
+=item B<Tag>
+
+Packge tag used by your SlackBuild repo. The package tag is the string at the
+end of a package name, usually beginning with an underscore.
+
+Can be overrided with the B<-t> option.
+
+The default value is '_SBo'.
 
 =back
 
@@ -227,10 +236,10 @@ database.
 
 This command supports aliases.
 
-=item B<print> I<cat>
+=item B<print> I<cat ...>
 
-Print list of packages that are a part of the specified category. The following
-are valid categories:
+Print unique list of packages that are a part of the specified categories. The
+following are valid categories:
 
 =over 4
 
@@ -263,7 +272,7 @@ database.
 
 =back
 
-If I<cat> is not specified, defaults to 'all'.
+If no I<cat> is specified, defaults to 'all'.
 
 This command supports aliases.
 
@@ -347,6 +356,10 @@ Specify the path to the data file.
 
 Specify the path to the local SlackBuild repository.
 
+=item B<-t> I<tag>, B<--tag>=I<tag>
+
+Specify the tag used by your SlackBuild repo's packages.
+
 =item B<-y>, B<--yes>
 
 Automatically agree to any prompts.
@@ -404,6 +417,12 @@ Marks the end of the current package entry.
 
 Written by Samuel Young E<lt>samyoung12788@gmail.comE<gt>.
 
+=head1 RESTRICTIONS
+
+B<sbokeeper> does not currently support tracking packages from multiple seperate
+repos. A possible workaround would be to maintain seperate configurations for
+each repo.
+
 =head1 BUGS
 
 B<sbokeeper> is (as of right now) incapable of handling circular dependencies.
@@ -415,7 +434,7 @@ Report bugs on my Codeberg, L<https://codeberg.org/1-1sam>.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2024 Samuel Young
+Copyright (C) 2024-2025 Samuel Young
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of either: the GNU General Public License as published by the Free

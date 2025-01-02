@@ -1,5 +1,5 @@
 #
-# GENERATED WITH PDL::PP from compression.pd! Don't modify!
+# GENERATED WITH PDL::PP from lib/PDL/Compression.pd! Don't modify!
 #
 package PDL::Compression;
 
@@ -22,7 +22,7 @@ use DynaLoader;
 
 
 
-#line 1 "compression.pd"
+#line 9 "lib/PDL/Compression.pd"
 
 =head1 NAME
 
@@ -49,7 +49,7 @@ RICE_1 algorithm used in internal FITS-file compression (see PDL::IO::FITS).
 
 use strict;
 use warnings;
-#line 53 "Compression.pm"
+#line 53 "lib/PDL/Compression.pm"
 
 
 =head1 FUNCTIONS
@@ -60,12 +60,12 @@ use warnings;
 
 
 
-#line 70 "compression.pd"
+#line 78 "lib/PDL/Compression.pd"
 
 =head1 METHODS
 
 =cut
-#line 69 "Compression.pm"
+#line 69 "lib/PDL/Compression.pm"
 
 
 =head2 rice_compress
@@ -190,7 +190,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 31 "compression.pd"
+#line 39 "lib/PDL/Compression.pd"
 
 =head1 AUTHORS
 
@@ -226,7 +226,7 @@ terms than PDL itself; that notice is present in the file "ricecomp.c".
 =back
 
 =cut
-#line 230 "Compression.pm"
+#line 230 "lib/PDL/Compression.pm"
 
 # Exit with OK status
 

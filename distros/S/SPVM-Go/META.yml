@@ -24,5 +24,5 @@ requires:
   SPVM::Time::HiRes: '0.004'
 resources:
   repository: https://github.com/yuki-kimoto/SPVM-Go.git
-version: '0.007003'
+version: '0.008001'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

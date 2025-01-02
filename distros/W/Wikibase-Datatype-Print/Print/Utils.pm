@@ -13,7 +13,7 @@ Readonly::Array our @EXPORT_OK => qw(defaults print_aliases print_common print_d
 	print_forms print_glosses print_labels print_references print_senses
 	print_sitelinks print_statements);
 
-our $VERSION = 0.17;
+our $VERSION = 0.18;
 
 sub defaults {
 	my ($obj, $opts_hr) = @_;
@@ -42,11 +42,16 @@ sub defaults {
 sub print_aliases {
 	my ($obj, $opts_hr, $alias_cb) = @_;
 
-	return print_common($obj, $opts_hr, 'aliases', $alias_cb,
-		$opts_hr->{'texts'}->{'aliases'}, sub {
-			grep { $_->language eq $opts_hr->{'lang'} } @_
-		},
-	);
+	if ($opts_hr->{'lang'}) {
+		return print_common($obj, $opts_hr, 'aliases', $alias_cb,
+			$opts_hr->{'texts'}->{'aliases'}, sub {
+				grep { $_->language eq $opts_hr->{'lang'} } @_
+			},
+		);
+	} else {
+		return print_common($obj, $opts_hr, 'aliases', $alias_cb,
+			$opts_hr->{'texts'}->{'aliases'});
+	}
 }
 
 sub print_common {
@@ -89,11 +94,16 @@ sub print_common {
 sub print_descriptions {
 	my ($obj, $opts_hr, $desc_cb) = @_;
 
-	return print_common($obj, $opts_hr, 'descriptions', $desc_cb,
-		$opts_hr->{'texts'}->{'description'}, sub {
-			grep { $_->language eq $opts_hr->{'lang'} } @_
-		}, 1,
-	);
+	if ($opts_hr->{'lang'}) {
+		return print_common($obj, $opts_hr, 'descriptions', $desc_cb,
+			$opts_hr->{'texts'}->{'description'}, sub {
+				grep { $_->language eq $opts_hr->{'lang'} } @_
+			}, 1,
+		);
+	} else {
+		return print_common($obj, $opts_hr, 'descriptions', $desc_cb,
+			$opts_hr->{'texts'}->{'description'});
+	}
 }
 
 sub print_forms {
@@ -113,11 +123,16 @@ sub print_glosses {
 sub print_labels {
 	my ($obj, $opts_hr, $label_cb) = @_;
 
-	return print_common($obj, $opts_hr, 'labels', $label_cb,
-		$opts_hr->{'texts'}->{'label'}, sub {
-			grep { $_->language eq $opts_hr->{'lang'} } @_
-		}, 1,
-	);
+	if ($opts_hr->{'lang'}) {
+		return print_common($obj, $opts_hr, 'labels', $label_cb,
+			$opts_hr->{'texts'}->{'label'}, sub {
+				grep { $_->language eq $opts_hr->{'lang'} } @_
+			}, 1,
+		);
+	} else {
+		return print_common($obj, $opts_hr, 'labels', $label_cb,
+			$opts_hr->{'texts'}->{'label'});
+	}
 }
 
 sub print_references {
@@ -138,7 +153,15 @@ sub print_sitelinks {
 	my ($obj, $opts_hr, $sitelink_cb) = @_;
 
 	return print_common($obj, $opts_hr, 'sitelinks', $sitelink_cb,
-		$opts_hr->{'texts'}->{'sitelinks'});
+		$opts_hr->{'texts'}->{'sitelinks'}, sub {
+			my @sitelinks = @_;
+			my $l = $opts_hr->{'lang'};
+			if (defined $l) {
+				return grep { $_->site =~ m/${l}wiki/ms } @sitelinks;
+			} else {
+				return @sitelinks;
+			}
+		});
 }
 
 sub print_statements {
@@ -312,7 +335,7 @@ Returns array with pretty print strings.
  use Wikibase::Datatype::Print::Value::Monolingual;
 
  my $obj = Test::Shared::Fixture::Wikibase::Datatype::Item::Wikidata::Dog->new;
- my @ret = print_aliases($obj, {'lang' => 'cs'},
+ my @ret = print_aliases($obj, {'lang' => 'cs', 'texts' => {'aliases' => 'Aliases'}},
          \&Wikibase::Datatype::Print::Value::Monolingual::print);
 
  # Print.
@@ -336,7 +359,7 @@ Returns array with pretty print strings.
  use Wikibase::Datatype::Print::Value::Monolingual;
 
  my $obj = Test::Shared::Fixture::Wikibase::Datatype::Item::Wikidata::Dog->new;
- my @ret = print_descriptions($obj, {'lang' => 'cs'},
+ my @ret = print_descriptions($obj, {'lang' => 'cs', 'texts' => {'description' => 'Description'}},
          \&Wikibase::Datatype::Print::Value::Monolingual::print);
 
  # Print.
@@ -356,10 +379,11 @@ Returns array with pretty print strings.
  use Unicode::UTF8 qw(encode_utf8);
  use Test::Shared::Fixture::Wikibase::Datatype::Lexeme::Wikidata::DogCzechNoun;
  use Wikibase::Datatype::Print::Form;
- use Wikibase::Datatype::Print::Utils qw(print_forms);
+ use Wikibase::Datatype::Print::Utils qw(defaults print_forms);
 
  my $obj = Test::Shared::Fixture::Wikibase::Datatype::Lexeme::Wikidata::DogCzechNoun->new;
- my @ret = print_forms($obj, {'lang' => 'cs'},
+ my $opts_hr = defaults({'lang' => 'cs'});
+ my @ret = print_forms($obj, $opts_hr,
          \&Wikibase::Datatype::Print::Form::print);
 
  # Print.
@@ -392,12 +416,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2020-2024 Michal Josef Špaček
+© 2020-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.17
+0.18
 
 =cut

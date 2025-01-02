@@ -1,5 +1,12 @@
 Revision history for LWP-UserAgent-Throttled
 
+0.12	Wed Jan  1 11:09:20 EST 2025
+	Use gtar to create a distribution on Macs
+	Use Test::DescribeMe to simplify tests
+	Use Test::Needs
+	Refactor throttle()
+	Added t/30-basics.t
+
 0.10	Mon Jun 17 09:00:44 EDT 2024
 	Fix http://www.cpantesters.org/cpan/report/55bb4f64-8d7e-11ec-adcf-8cefa471f67a
 

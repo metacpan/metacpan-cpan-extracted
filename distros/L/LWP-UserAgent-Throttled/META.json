@@ -41,6 +41,7 @@
       "test" : {
          "requires" : {
             "LWP::Protocol::https" : "0",
+            "Test::DescribeMe" : "0",
             "Test::Exception" : "0.42",
             "Test::Most" : "0",
             "Test::Needs" : "0",
@@ -62,6 +63,6 @@
          "web" : "https://github.com/nigelhorne/LWP-UserAgent::Throttled"
       }
    },
-   "version" : "0.11",
+   "version" : "0.12",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

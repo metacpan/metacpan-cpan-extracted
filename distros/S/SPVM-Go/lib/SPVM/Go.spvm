@@ -2,7 +2,7 @@
 # MIT License
 
 class Go {
-  version "0.007003";
+  version "0.008001";
   
   use Go::Channel;
   use Go::Schedule;
@@ -81,5 +81,13 @@ class Go {
     my $schedule = $self->{schedule};
     
   }
+  
+  static method ENV_DEBUG : int () {
+    
+    my $debug = (int)Sys->env("SPVM_GO_DEBUG");
+    
+    return $debug;
+  }
+  
 }
 

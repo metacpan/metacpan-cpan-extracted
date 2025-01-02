@@ -76,20 +76,20 @@ class Go::Poll {
           }
         }
         
-        my $io_timeout_occured = 0;
+        my $io_timeout_occur = 0;
         unless ($io_ready) {
           my $deadline_base_io_timeout = $poll_coroutine->{deadline_base_io_timeout};
           
           if ($deadline_base_io_timeout) {
             my $io_timeout = $poll_coroutine->{io_timeout};
             
-            my $io_timeout_occur = &check_io_timeout($deadline_base_io_timeout, $io_timeout);
+            $io_timeout_occur = &check_io_timeout($deadline_base_io_timeout, $io_timeout);
             
             $poll_coroutine->{io_timeout_occur} = (byte)$io_timeout_occur;
           }
         }
         
-        if ($io_ready || $io_timeout_occured) {
+        if ($io_ready || $io_timeout_occur) {
           my $ready_coroutine = (Go::Coroutine)$poll_coroutines_h->delete($address);
           $ready_coroutine->{disable} = 0;
           $ready_coroutine->{fd} = -1;
@@ -107,7 +107,22 @@ class Go::Poll {
     
     my $timeout_occur = $timeout - $interval < 0;
     
+    if (Go->ENV_DEBUG) {
+      Fn->say_stderr(Fn->sprintf("[Go Debug]Check IO timeout(Timeout:%f, ElapsedTime:%f, TimeoutOccur:%d).", [(object)$timeout, $interval, $timeout_occur]));
+    }
+    
     return $timeout_occur;
+  }
+  
+  method DESTROY : void () {
+    
+    my $poll_coroutines_h = $self->{coroutines_h};
+    
+    my $poll_coroutniens_length = $poll_coroutines_h->keys_length;
+    
+    unless ($poll_coroutniens_length == 0) {
+      die "[Unexpected Error]The number of goroutines for IO must be 0 in DESTROY.";
+    }
   }
   
 }

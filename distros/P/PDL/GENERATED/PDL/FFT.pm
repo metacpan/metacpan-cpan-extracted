@@ -1,5 +1,5 @@
 #
-# GENERATED WITH PDL::PP from fft.pd! Don't modify!
+# GENERATED WITH PDL::PP from lib/PDL/FFT.pd! Don't modify!
 #
 package PDL::FFT;
 
@@ -22,7 +22,7 @@ use DynaLoader;
 
 
 
-#line 6 "fft.pd"
+#line 12 "lib/PDL/FFT.pd"
 
 =head1 NAME
 
@@ -99,7 +99,7 @@ However, unlike PDL::FFT, these modules are optional,
 and so may not be installed.
 
 =cut
-#line 103 "FFT.pm"
+#line 103 "lib/PDL/FFT.pm"
 
 
 =head1 FUNCTIONS
@@ -238,7 +238,7 @@ sub PDL::ifft {
 
 
 
-#line 184 "fft.pd"
+#line 190 "lib/PDL/FFT.pd"
 
 use Carp;
 use PDL::Core qw/:Func/;
@@ -441,7 +441,7 @@ sub PDL::fftconvolve {
     @_;
 }
 
-#line 387 "fft.pd"
+#line 393 "lib/PDL/FFT.pd"
 
 =head1 BUGS
 
@@ -460,7 +460,7 @@ COPYING in the PDL distribution. If this file is separated from the
 PDL distribution, the copyright notice should be included in the file.
 
 =cut
-#line 464 "FFT.pm"
+#line 464 "lib/PDL/FFT.pm"
 
 # Exit with OK status
 

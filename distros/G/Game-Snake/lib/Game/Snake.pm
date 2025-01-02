@@ -1,9 +1,10 @@
 use 5.38.0;
 use experimental 'class';
-our $VERSION = 0.03;
+our $VERSION = 0.07;
 class Game::Snake {
 	use Raylib::App;	
 	use Raylib::FFI;
+	use Raylib::Color;
 	use Raylib::Keyboard;
 	use Game::Snake::Cell;
 	use Game::Snake::Text;
@@ -23,6 +24,8 @@ class Game::Snake {
 	field %collide;
 	field $game_over = 0;
 	field $score = 0;
+	field $last_score = 10;
+	field $high_score = 0;
 	field @snake;
 	field $food;
 	field $fps = 2;
@@ -30,6 +33,7 @@ class Game::Snake {
 	method reset_game () {
 		$game_over = 0;
 		$score = 0;
+		$last_score = 10;
 		$fps = 2;
 		@snake = ();
 		push @snake, Game::Snake::Head->new(
@@ -90,7 +94,13 @@ class Game::Snake {
 					if ($game_over) {
 						$self->reset_game();
 					}
+				},
+				KEY_SPACE() => sub { 
+					if ($game_over) {
+						$self->reset_game();
+					}
 				}
+
 			},
 		);
 
@@ -102,7 +112,7 @@ class Game::Snake {
 					$frame++;
 					$app->fps($fps);
 					$app->clear();
-					$score_text->draw("Score: $score");
+					$score_text->draw("Score: $score High Score: $high_score");
 
 					$keyboard->handle_events();
 					if ($game_over) {
@@ -119,15 +129,19 @@ class Game::Snake {
 	}
 
 	method create_grid {
+		my $alt = 1;
 		for (my $y = $cell_size + $top_padding; $y < $height; $y += $cell_size) {
 			for (my $x = 0; $x < $width; $x += $cell_size) {
 				push @grid, Game::Snake::Cell->new(
 					x => $x,
 					y => $y,
 					width => $cell_size,
-					height => $cell_size
+					height => $cell_size,
+					color => $alt ? Raylib::Color::GRAY : Raylib::Color::DARKGRAY
 				);
+				$alt = !$alt;
 			}
+			$alt = !$alt;
 		}
         }
 
@@ -169,8 +183,9 @@ class Game::Snake {
 		);
 
 
-		if ($score % 30 == 0) {
+		if ($score % $last_score == 0) {
 			$fps++;
+			$last_score = $score;
 		}
 
 	}
@@ -234,6 +249,9 @@ class Game::Snake {
 		
 		if ($collide{$food->x}->{$food->y}) {
 			$score += $food_score;
+			if ($score > $high_score) {
+				$high_score = $score;
+			}	
 			$food = undef;
 			$self->extend_snake;
 			return;
@@ -255,7 +273,7 @@ Game::Snake - A clone of the classic snake game using raylib
 
 =head1 VERSION
 
-Version 0.03
+Version 0.07
 
 =cut
 
@@ -270,6 +288,8 @@ Version 0.03
 	my $snake = Game::Snake->new();
 	
 	$snake->run();
+
+=for html <img style="width:500px" src="https://raw.githubusercontent.com/ThisUsedToBeAnEmail/Game-Snake/master/snake.png" title="img-tag, local-dist" alt="Inlineimage" />
 
 =head1 AUTHOR
 

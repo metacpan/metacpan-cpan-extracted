@@ -8,7 +8,7 @@ module.
 Inside the examples, we generally specify a particular OpenAI model we wish to
 use, such as `gpt-3.5-turbo`. Because there are costs associated with calling
 the API, we generally use the least expensive model available for a given
-task. To run `example/chat.pl`, you get `gpt-3.5-turbo` and a shot chat
+task. To run `example/chat.pl`, you get `gpt-3.5-turbo` and a short chat
 session might cost less than a penny.
 
 However, this is the least powerful model available and chat results might be
@@ -49,12 +49,13 @@ Instead, in your business logic, you probably want something like this:
 
     my $text = await { $llm->transcribe( audio => $audio_file ) };
 
-The above assumes that the `transcribe` method returns a promise. If it does
-not, simply omit the `await`
+The above assumes that your version of the `transcribe` method returns a
+promise. If it does not, simply omit the `await`
 
-By abstracting that away, the `transcribe` method, you can more easily change
-it, later. You can pull a cached transcription. You an switch to a local LLM.
-If the OpenAI spec changes and we need to adjust the call, so be it.
+By abstracting away the `transcribe` method's implementation, you can easily
+change it, later. You can pull a cached transcription. You an switch to a
+local LLM.  If the OpenAI spec changes and you need to adjust the call, so be
+it.
 
 As AI grows in capabilities, you will want your high-level code to remain as
 static as possible and only make the smallest changes necessary to make your

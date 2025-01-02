@@ -1,3 +1,11 @@
+0.092 January 1, 2024
+      - Fixed issue with tests failing after tzdata-2024b added some new
+        aliases.  This gets used if you have DateTime-TimeZone-2.63, which
+        came out Sep 07, 2024.  To make sure this passes tests I have bumped
+        the required minimum version of DateTime-TimeZone to v-2.63.   I suppose
+        this could be a breaking change although its hard for me to see the cases;
+        just shout out if you have trouble.
+
 0.091   2022 September 23
     - Fixed issues with broken metadata in previous release and some
       fixes to POD issues and documentation fixes.

@@ -29,5 +29,12 @@ t/99-examples.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
+
+tools/pm_filter_simple.pl
+
 xt/boilerplate.t
+xt/pod.t
+xt/pod-spell.t
+
+
 META.yml                                 Module meta-data (added by MakeMaker)

@@ -23,7 +23,7 @@ Dpkg::OpenPGP::Backend::SOP - OpenPGP backend for SOP
 
 This module provides a class that implements the OpenPGP backend
 for the Stateless OpenPGP Command-Line Interface, as described in
-L<https://datatracker.ietf.org/doc/draft-dkg-openpgp-stateless-cli>.
+L<https://datatracker.ietf.org/doc/draft-dkg-openpgp-stateless-cli/>.
 
 B<Note>: This is a private module, its API can change at any time.
 
@@ -42,10 +42,6 @@ use Dpkg::OpenPGP::ErrorCodes;
 
 use parent qw(Dpkg::OpenPGP::Backend);
 
-# - Once "gosop" implements inline-verify and inline-sign, add as alternative.
-#   Ref: https://github.com/ProtonMail/gosop/issues/6
-# - Once "gosop" can handle big keyrings.
-#   Ref: https://github.com/ProtonMail/gosop/issues/25
 # - Once "hop" implements the new SOP draft, add as alternative.
 #   Ref: https://salsa.debian.org/clint/hopenpgp-tools/-/issues/4
 # - Once the SOP MR !23 is finalized and merged, implement a way to select
@@ -56,7 +52,7 @@ use parent qw(Dpkg::OpenPGP::Backend);
 #   Ref: https://gitlab.com/dkg/openpgp-stateless-cli/-/issues/42
 
 sub DEFAULT_CMD {
-    return [ qw(sqop pgpainless-cli) ];
+    return [ qw(sqop rsop gosop pgpainless-cli) ];
 }
 
 sub _sop_exec
@@ -80,21 +76,13 @@ sub _sop_exec
     }
 }
 
-sub armor
-{
-    my ($self, $type, $in, $out) = @_;
-
-    # We ignore the $type, and let "sop" handle this automatically.
-    return $self->_sop_exec({ in => $in, out => $out }, 'armor');
-}
-
-sub dearmor
-{
-    my ($self, $type, $in, $out) = @_;
-
-    # We ignore the $type, and let "sop" handle this automatically.
-    return $self->_sop_exec({ in => $in, out => $out }, 'dearmor');
-}
+# XXX: We cannot use the SOP armor/dearmor interfaces, because concatenated
+# ASCII Armor is not a well supported construct, and not all SOP
+# implementations support. But we still need to handle this given the
+# data we are managing. Remove these implementations for now and use
+# the generic parent implementations. Once we can guarantee that our
+# data has been sanitized, then we could switch back to use pure SOP
+# interfaces.
 
 sub inline_verify
 {

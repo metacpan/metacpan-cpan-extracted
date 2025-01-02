@@ -1,6 +1,6 @@
 package Slackware::SBoKeeper::Database;
 use 5.016;
-our $VERSION = '2.00';
+our $VERSION = '2.01';
 use strict;
 use warnings;
 
@@ -669,7 +669,7 @@ Report bugs on my Codeberg, L<https://codeberg.org/1-1sam>.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2024 Samuel Young
+Copyright (C) 2024-2025 Samuel Young
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of either: the GNU General Public License as published by the Free

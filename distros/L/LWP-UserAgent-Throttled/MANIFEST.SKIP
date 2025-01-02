@@ -64,4 +64,4 @@
 \.appveyor\.yml
 \.releaserc
 \.lwpcookies
-Geo-.*
+LWP-.*

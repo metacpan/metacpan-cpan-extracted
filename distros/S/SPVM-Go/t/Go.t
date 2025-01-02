@@ -37,7 +37,7 @@ ok(SPVM::TestCase::Go->go_extra);
   
   warn("[Test Output]Proc time:$proc_time");
   
-  ok($proc_time > 1.48 && $proc_time < 1.52);
+  ok($proc_time > 1.46 && $proc_time < 1.52);
 }
 
 ok(SPVM::TestCase::Go->thread_exception);

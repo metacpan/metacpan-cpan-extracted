@@ -1,5 +1,5 @@
 #
-# GENERATED WITH PDL::PP from transform.pd! Don't modify!
+# GENERATED WITH PDL::PP from lib/PDL/Transform.pd! Don't modify!
 #
 package PDL::Transform;
 
@@ -22,7 +22,7 @@ use DynaLoader;
 
 
 
-#line 2 "transform.pd"
+#line 2 "lib/PDL/Transform.pd"
 
 =head1 NAME
 
@@ -261,7 +261,7 @@ are both Transform methods and PDL methods.
 
 use strict;
 use warnings;
-#line 265 "Transform.pm"
+#line 265 "lib/PDL/Transform.pm"
 
 
 =head1 FUNCTIONS
@@ -272,7 +272,7 @@ use warnings;
 
 
 
-#line 315 "transform.pd"
+#line 315 "lib/PDL/Transform.pd"
 
 =head2 apply
 
@@ -327,7 +327,7 @@ sub apply {
   return $result;
 }
 
-#line 373 "transform.pd"
+#line 373 "lib/PDL/Transform.pd"
 
 =head2 invert
 
@@ -363,7 +363,7 @@ sub invert {
   $result->is_inplace(0);  # make sure inplace flag is clear.
   return $result;
 }
-#line 367 "Transform.pm"
+#line 367 "lib/PDL/Transform.pm"
 
 
 =head2 map
@@ -711,13 +711,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1547 "transform.pd"
+#line 1537 "lib/PDL/Transform.pd"
 
 sub PDL::match {
   # Set default for rectification to 0 for simple matching...
   push @_, {} if ref($_[-1]) ne 'HASH';
   my @k = grep(m/^r(e(c(t)?)?)?/,sort keys %{$_[-1]});
-#line 1552 "transform.pd"
+#line 1542 "lib/PDL/Transform.pd"
   unless(@k) {
       $_[-1]->{rectify} = 0;
   }
@@ -941,7 +941,7 @@ sub map {
           ### These are the CROTA<n>, PCi_j, and CDi_j.
           delete @{$out->hdr}{
               grep /(^CROTA\d*$)|(^(CD|PC)\d+_\d+[A-Z]?$)/, keys %{$out->hdr}
-#line 1778 "transform.pd"
+#line 1768 "lib/PDL/Transform.pd"
           };
       } else {
           # Non-rectified output -- generate a CDi_j matrix instead of the simple formalism.
@@ -987,7 +987,7 @@ sub map {
           ## Eliminate competing header pointing tags if they exist
           delete @{$out->hdr}{
               grep /(^CROTA\d*$)|(^(PC)\d+_\d+[A-Z]?$)|(CDELT\d*$)/, keys %{$out->hdr}
-#line 1823 "transform.pd"
+#line 1813 "lib/PDL/Transform.pd"
           };
       }
     }
@@ -1096,7 +1096,7 @@ sub map {
   }
   return $out;
 }
-#line 1100 "Transform.pm"
+#line 1100 "lib/PDL/Transform.pm"
 
 *map = \&PDL::map;
 
@@ -1104,7 +1104,7 @@ sub map {
 
 
 
-#line 1938 "transform.pd"
+#line 1928 "lib/PDL/Transform.pd"
 
 ######################################################################
 
@@ -1144,7 +1144,7 @@ sub unmap {
   return $me->inverse->map($data,@params);
 }
 
-#line 1981 "transform.pd"
+#line 1971 "lib/PDL/Transform.pd"
 
 =head2 t_inverse
 
@@ -1188,7 +1188,7 @@ sub inverse {
   }, ref $me;
 }
 
-#line 2028 "transform.pd"
+#line 2018 "lib/PDL/Transform.pd"
 
 =head2 t_compose
 
@@ -1284,7 +1284,7 @@ sub compose {
   return bless($me,'PDL::Transform::Composition');
 }
 
-#line 2127 "transform.pd"
+#line 2117 "lib/PDL/Transform.pd"
 
 =head2 t_wrap
 
@@ -1351,7 +1351,7 @@ sub _pow_op {
     t_compose(@l);
 }
 
-#line 2200 "transform.pd"
+#line 2190 "lib/PDL/Transform.pd"
 
 =head2 t_identity
 
@@ -1385,7 +1385,7 @@ sub new {
   return bless $me,$class;
 }
 
-#line 2238 "transform.pd"
+#line 2228 "lib/PDL/Transform.pd"
 
 =head2 t_lookup
 
@@ -1483,7 +1483,7 @@ domain.)
 
 NOTES
 
-Inverses are not yet implemented -- the best way to do it might be by
+Inverses are "only weakly supported" -- the best way to do it might be by
 judicious use of map() on the forward transformation.
 
 the type/unit fields are ignored.
@@ -1635,13 +1635,13 @@ sub t_lookup {
   return $me;
 }
 
-#line 2495 "transform.pd"
+#line 2485 "lib/PDL/Transform.pd"
 
 =head2 t_linear
 
 =for usage
 
-$f = t_linear({options});
+  $f = t_linear({options});
 
 =for ref
 
@@ -1960,7 +1960,7 @@ sub stringify {
 }
 }
 
-#line 2823 "transform.pd"
+#line 2813 "lib/PDL/Transform.pd"
 
 =head2 t_scale
 
@@ -1981,12 +1981,12 @@ sub t_scale {
     my($scale) = shift;
     my($y) = shift;
     return t_linear(scale=>$scale,%{$y})
-#line 2844 "transform.pd"
+#line 2834 "lib/PDL/Transform.pd"
         if(ref $y eq 'HASH');
     t_linear(Scale=>$scale,$y,@_);
 }
 
-#line 2851 "transform.pd"
+#line 2841 "lib/PDL/Transform.pd"
 
 =head2 t_offset
 
@@ -2007,13 +2007,13 @@ sub t_offset {
     my($pre) = shift;
     my($y) = shift;
     return t_linear(pre=>$pre,%{$y})
-#line 2872 "transform.pd"
+#line 2862 "lib/PDL/Transform.pd"
         if(ref $y eq 'HASH');
 
     t_linear(pre=>$pre,$y,@_);
 }
 
-#line 2880 "transform.pd"
+#line 2870 "lib/PDL/Transform.pd"
 
 =head2 t_rot
 
@@ -2035,13 +2035,13 @@ sub t_rotate    {
     my $rot = shift;
     my($y) = shift;
     return t_linear(rot=>$rot,%{$y})
-#line 2902 "transform.pd"
+#line 2892 "lib/PDL/Transform.pd"
         if(ref $y eq 'HASH');
 
     t_linear(rot=>$rot,$y,@_);
 }
 
-#line 2912 "transform.pd"
+#line 2902 "lib/PDL/Transform.pd"
 
 =head2 t_fits
 
@@ -2196,7 +2196,7 @@ sub t_fits {
   return $me;
 }
 
-#line 3075 "transform.pd"
+#line 3065 "lib/PDL/Transform.pd"
 
 =head2 t_code
 
@@ -2289,7 +2289,7 @@ sub t_code {
   $me;
 }
 
-#line 3174 "transform.pd"
+#line 3164 "lib/PDL/Transform.pd"
 
 =head2 t_cylindrical
 
@@ -2460,7 +2460,7 @@ sub t_radial {
   $me;
 }
 
-#line 3351 "transform.pd"
+#line 3341 "lib/PDL/Transform.pd"
 
 =head2 t_quadratic
 
@@ -2575,7 +2575,7 @@ sub t_quadratic {
     $me;
 }
 
-#line 3470 "transform.pd"
+#line 3460 "lib/PDL/Transform.pd"
 
 =head2 t_cubic
 
@@ -2715,7 +2715,7 @@ sub t_cubic {
     $me;
 }
 
-#line 3616 "transform.pd"
+#line 3606 "lib/PDL/Transform.pd"
 
 =head2 t_quartic
 
@@ -2834,13 +2834,13 @@ sub t_quartic {
     $me;
 }
 
-#line 3739 "transform.pd"
+#line 3729 "lib/PDL/Transform.pd"
 
 =head2 t_spherical
 
 =for usage
 
-    $t = t_spherical(<options>);
+  $t = t_spherical(<options>);
 
 =for ref
 
@@ -2966,13 +2966,13 @@ sub t_spherical {
     $me;
   }
 
-#line 3875 "transform.pd"
+#line 3865 "lib/PDL/Transform.pd"
 
 =head2 t_projective
 
 =for usage
 
-    $t = t_projective(<options>);
+  $t = t_projective(<options>);
 
 =for ref
 
@@ -3118,7 +3118,7 @@ sub t_projective {
   $me;
 }
 
-#line 245 "transform.pd"
+#line 245 "lib/PDL/Transform.pd"
 
 =head1 AUTHOR
 
@@ -3183,7 +3183,7 @@ sub stringify {
   $out .= "fwd ". ((defined ($me->{func})) ? ( (ref($me->{func}) eq 'CODE') ? "ok" : "non-CODE(!!)" ): "missing")."; ";
   $out .= "inv ". ((defined ($me->{inv})) ?  ( (ref($me->{inv}) eq 'CODE') ? "ok" : "non-CODE(!!)" ):"missing").".\n";
 }
-#line 3187 "Transform.pm"
+#line 3187 "lib/PDL/Transform.pm"
 
 # Exit with OK status
 

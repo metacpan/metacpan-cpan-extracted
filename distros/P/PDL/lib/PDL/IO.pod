@@ -1,0 +1,332 @@
+=head1 NAME
+
+PDL::IO - An overview of some modules in the PDL::IO namespace.
+
+=head1 SYNOPSIS
+
+ # At your system shell, type:
+ perldoc PDL::IO
+
+ # from perldl:
+ pdl> ?? PDL::IO
+
+=head1 DESCRIPTION
+
+PDL contains many modules for displaying, loading, and saving data.
+This list may be incomplete, if others make new ones.
+
+=over
+
+=item * Perlish or Text-Based
+
+A few IO modules provide Perl-inspired capabilities.  These are
+PDL::IO::Dumper and PDL::IO::Storable.  PDL::IO::Misc provides
+simpler routines for dealing with delimited files, though its
+capabilities are limited to tabular or at most 3-d data sets.
+
+=item * Raw Format
+
+PDL has two modules that store their data in a raw binary format; they
+are PDL::IO::FastRaw and PDL::IO::FlexRaw.  They are fast but the files
+they produce will not be readable across different architectures.
+These two modules are so similar that they could probably be combined.
+
+You can also directly access the data from Perl using
+L<PDL::Core/get_dataref>.
+
+=item * Image Handling
+
+PDL has a handful of modules that will load images into ndarrays for you.
+They include PDL::IO::Dicom, PDL::IO::FITS, PDL::IO::GD, PDL::IO::Pic,
+and PDL::IO::Pnm.  However, PDL::IO::FITS should also be considered something
+of a general data format.
+
+=item * Disk Caching
+
+Both PDL::IO::FastRaw and PDL::IO::FlexRaw provide for direct ndarray-to-disk
+mapping, but they use PDL's underlying mmap functionality to do it, and that
+doesn't work for Windows.  However, users of all operating systems can still
+use PDL::DiskCache, which can use any desired IO read/write functionality
+(though you may have to write a small wrapper function).
+
+=item * General Data Storage Formats
+
+PDL has a number of modules that interface general data storage libraries.
+They include L<PDL::IO::HDF> and L<PDL::IO::NDF> (the latter is now a separate
+CPAN module).  There is L<PDL::IO::IDL>.
+L<PDL::IO::FITS> is
+something of a general data format, since ndarray data can be stored to a
+FITS file without loss.  PDL::IO::FlexRaw and PDL::IO::FastRaw read and
+write data identical C's low-level C<write> function and PDL::IO::FlexRaw
+can work with FORTRAN 77 UNFORMATTED files.  FlexRaw and Storable provide
+general data storage capabilities.  Finally, PDL can read Grib (weather-data)
+files using the CPAN module PDL::IO::Grib.
+
+=item * Making Movies
+
+You can make an MPEG animation using PDL::IO::Pic's wmpeg function.
+
+=back
+
+Here's a brief summary of all of the modules, in alphabetical order.
+
+=head2 PDL::DiskCache
+
+The DiskCache module allows you to tie a Perl array to a collection
+of files on your disk, which will be loaded into and out of memory
+as ndarrays.  Although the module defaults to working with FITS files,
+it allows you to specify your own reading and writing functions.
+This allows you to vastly streamline your code by hiding the unnecessary
+details of loading and saving files.
+
+If you find yourself writing scripts to procss many data files,
+especially if that data processing is not necessarily in sequential
+order, you should consider using PDL::DiskCache.  To read more,
+check the L<PDL::DiskCache documentation|PDL::DiskCache>.
+
+=head2 PDL::IO::Dicom
+
+DICOM is an image format, and this module allows you to read image
+files with the DICOM file format.  To read more, check the
+L<PDL::IO::Dicom documentation|PDL::IO::Dicom>.
+
+=head2 PDL::IO::Dumper
+
+Provides functionality similar to L<Data::Dumper> for
+ndarrays.  L<Data::Dumper> stringifies a data structure,
+creating a string that can be C<eval>ed to reproduce the original data
+structure.  It's also usually suitable for printing, to visualize the
+structure.
+
+To read more, check the L<PDL::IO::Dumper documentation|PDL::IO::Dumper>.
+See also PDL::IO::Storable for a more comprehensive structured
+data solution.
+
+=head2 PDL::IO::FastRaw
+
+Very simple module for quickly writing, reading, and memory-mapping
+ndarrays to/from disk.  It is fast to learn and fast to use, though
+you may be frustrated by its lack of options.  To quote from
+the original POD:
+
+"The binary files are in general NOT interchangeable between different
+architectures since the binary file is simply dumped from the memory
+region of the ndarray.  This is what makes the approach efficient."
+
+This creates two files for every ndarray saved - one that stores the
+raw data and another that stores the header file, which indicates
+the dimensions of the data stored in the raw file.  Even
+if you save 1000 different ndarrays with the exact same dimensions,
+you will still need to write out a header file for each one.  You
+cannot store multiple ndarrays in one file.
+
+Note that at the time of writing, memory-mapping is not possible
+on Windows.
+
+For more details, see L<PDL::IO::FastRaw>.  For a more flexible
+raw IO module, see PDL::IO::FlexRaw.
+
+=head2 PDL::IO::FITS
+
+Allows basic reading and writing of FITS files.  You can read more
+about FITS formatted files at L<http://fits.gsfc.nasa.gov/fits_intro.html>
+and L<http://en.wikipedia.org/wiki/FITS>.  It is an image format
+commonly used in Astronomy.
+
+This module may or may not be installed on your machine.  To get more
+information, check online at
+L<http://pdl.perl.org/?docs=IO/FITS&title=PDL::IO::FITS>.  To see if the
+module is installed, look for L<PDL::IO::FITS> on your machine
+by typing at the system prompt:
+
+ perldoc PDL::IO::FITS
+
+=head2 PDL::IO::FlexRaw
+
+Somewhat smarter module (compared to FastRaw) for reading, writing,
+and memory mapping ndarrays to disk.  In addition to everything that
+FastRaw can do, FlexRaw can also store multiple ndarrays in a single
+file, take user-specified headers (so you can use one header file
+for multiple files that have identical structure), and read
+compressed data.  However, FlexRaw cannot memory-map compressed data,
+and just as with FastRaw, the format will not work across multiple
+architectures.
+
+FlexRaw and FastRaw produce identical raw files and have essentially
+identical performance.  Use whichever module seems to be more
+comfortable.  I would generally recommend using FlexRaw over
+FastRaw, but the differences are minor for most uses.
+
+Note that at the time of writing, memory-mapping is not possible
+on Windows.
+
+For more details on FlexRaw, see L<PDL::IO::FlexRaw>.
+
+=head2 PDL::IO::GD
+
+GD is a library for reading, creating, and writing bitmapped images,
+written in C.  You can read more about the C-library here:
+L<http://www.libgd.org/>.
+
+In addition to reading and writing .png and .jpeg files, GD allows
+you to modify the bitmap by drawing rectangles, adding text, and
+probably much more.  The documentation can be
+L<found here|PDL::IO::GD>.  As such, it should probably be not
+only considered an IO module, but a Graphics module as well.
+
+This module provides PDL bindings for the GD library, which ought
+not be confused with the Perl bindings.  The perl bindings were
+developed independently and can be found at L<GD>, if you have
+Perl's GD bindings installed.
+
+=head2 PDL::IO::Grib
+
+A CPAN module last updated in 2000 that allows you to read Grib files.
+GRIB is a data format commonly used in meteorology.  In the off-chance
+that you have it installed, you should L<read PDL::IO::Grib's
+documentation|PDL::IO::Grib>.
+
+=head2 PDL::IO::HDF, PDL::IO::HDF5
+
+Provides an interface to HDF4 and HDF5 file formats, which are kinda like
+cross-platform binary XML files.  HDF stands for B<H>ierarchical B<D>ata
+B<F>ormat.  HDF was originally developed at the NCSA.  To read more about
+HDF, see L<http://www.hdfgroup.org/>.  Note that HDF5 is not presently
+distributed with PDL, and neither HDF4 nor HDF5 will be installed unless
+you have the associated C libraries that these modules interface.  Also
+note that the HDF5 library on CPAN is rather old and somebody from HDF
+contacted the mailing list in the Fall of 2009 to develop new and better
+HDF5 bindings for Perl.
+
+You should look into the L<PDL::IO::HDF (4) documentation|PDL::IO::HDF> or
+L<PDL::IO::HDF5 documentation|PDL::IO::HDF5>, depending upon which module
+you have installed.
+
+=head2 PDL::IO::IDL
+
+PDL has a module for reading IDL data files: L<PDL::IO::IDL>.
+
+=head2 PDL::IO::Misc
+
+Provides mostly text-based IO routines.  Data input and output is
+restricted mostly to tabular (i.e. two-dimensional) data sets,
+though limited support is provided for 3d data sets.
+
+Alternative text-based modules support higher dimensions, such
+as PDL::IO::Dumper and PDL::IO::Storable.  Check the
+L<PDL::IO::Misc documentation|PDL::IO::Misc> for more details.
+
+=head2 PDL::IO::NDF
+
+Starlink developed a file format for N-Dimensional data Files,
+which it cleverly dubbed NDF.  If you work with these files,
+you're in luck!  Check the L<PDL::IO::NDF documentation|PDL::IO::NDF>
+for more details.
+
+=head2 PDL::IO::Pic
+
+Provides reading/writing of images to/from ndarrays, as well as creating
+MPEG animations!  The module uses the netpbm library, so you will
+need that on your machine in order for this to work.  To read more,
+see the L<PDL::IO::Pic documentation|PDL::IO::Pic>.  Also look into
+the next module, as well as PDL::IO::GD.
+
+=head2 PDL::IO::Pnm
+
+Provides methods for reading and writing pnm files (of which pbm is
+but one).  Check the L<PDL::IO::Pnm documentation|PDL::IO::Pnm> for
+more details.  Also check out the previous module and PDL::IO::GD.
+
+=head2 PDL::IO::STL
+
+Read and write STL (STereo Lithography) files, containing 3D
+objects. There are many files available from the "Thingiverse". You can
+then view the data in L<PDL::Graphics::TriD>.
+
+=head2 PDL::IO::Storable
+
+Implements the relevant methods to be able to store and retrieve ndarrays
+via Storable.  True, you can use many methods to save a single ndarray.
+In contrast, this module is particularly useful if you need to save a complex Perl structure
+that contain ndarrays, such as an array of hashes, each of which contains
+ndarrays.
+
+Check the L<PDL::IO::Storable documentation|PDL::IO::Storable> for more
+details.  See also PDL::IO::Dumper for an alternative stringifier.
+
+=head1 Out-of-tree Third-party Modules
+
+=head2 PDL::IO::CSV
+
+Load/save PDL from/to CSV file (optimized for speed and large data).
+
+See the L<PDL::IO::CSV documentation|PDL::IO::CSV>.
+
+=head2 PDL::IO::DBI
+
+Load PDL from a L<DBI> handle. See L<PDL::IO::CSV>.
+
+=head2 PDL::IO::Dcm
+
+Load PDL from a Dicom file. See L<PDL::IO::Dcm>.
+
+=head2 PDL::IO::Touchstone
+
+A simple interface for reading and writing RF Touchstone files (also known as
+".sNp" files). Touchstone files contain complex-valued RF sample data for a
+device or RF component with some number of ports. The data is (typically)
+measured by a vector network analyzer under stringent test conditions.
+
+The resulting files are usually provided by manufacturers so RF design
+engineers can estimate signal behavior at various frequencies in their circuit
+designs. Examples of RF components include capacitors, inductors, resistors,
+filters, power splitters, etc.
+
+See the L<PDL::IO::Touchstone documentation|PDL::IO::Touchstone>.
+
+=head2 PDL::IO::MDIF
+
+A simple interface for reading and writing RF MDIF files (also known as MDF or
+.mdf files). MDIF files contain multiple Touchstone files in a text format for
+use in optimizing circuits. For example, a single MDIF file could contain the
+Touchstone RF data for each available value in a line of capacitors (ie, from
+10pF to 1000pF) provided by a particular manufacturer.
+
+See the L<PDL::IO::MDIF documentation|PDL::IO::MDIF>
+
+=head2 PDL::IO::Image
+
+Load/save PDL from/to image files. See L<PDL::IO::Image>.
+
+=head2 PDL::IO::XLSX
+
+Load/save PDL from/to an Excel spreadsheet. See L<PDL::IO::XLSX>.
+
+=head2 PDL::NetCDF
+
+Load/save PDL from/to NetCDF files. See L<PDL::NetCDF>.
+
+=head2 PDL::IO::Nifti
+
+Load/save PDL from/to Nifti-1 files. See L<PDL::IO::Nifti>.
+
+=head2 PDL::IO::Matlab
+
+Load/save PDL from/to MATLAB files. See L<PDL::IO::Matlab>.
+
+=head2 PDL::IO::Sereal
+
+Load/save PDL from/to L<Sereal> files. See L<PDL::IO::Sereal>.
+
+=head2 PDL::CCS
+
+Has IO modules to load/save PDL from/to sparse data file formats, including
+FITS, LDA-C, MatrixMarket, PETSc. See L<PDL::CCS>.
+
+=head1 COPYRIGHT
+
+Copyright 2010 David Mertens (dcmertens.perl@gmail.com). You can
+distribute and/or modify this document under the same terms as the
+current Perl license.
+
+See: L<http://dev.perl.org/licenses/>

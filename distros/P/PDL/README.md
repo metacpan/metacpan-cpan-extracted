@@ -12,7 +12,7 @@
 
 PDL ("Perl Data Language") gives standard Perl the ability to *compactly* store and *speedily* manipulate the large N-dimensional data arrays which are the bread and butter of scientific computing.
 
-PDL turns Perl into a free, array-oriented, numerical language similar to (but, we believe, better than) such commercial packages as IDL and MatLab. One can write simple perl expressions to manipulate entire numerical arrays all at once. Simple interactive shells, `pdl2` and `perldl`, are provided for use from the command line along with the `PDL` module for use in Perl scripts.
+PDL turns Perl into a free, array-oriented, numerical language similar to (but, we believe, better than) such commercial packages as IDL and MatLab. One can write simple perl expressions to manipulate entire numerical arrays all at once. A simple interactive shell, `perldl`, is provided for use from the command line along with the `PDL` module for use in Perl scripts.
 
 WARNING: There is absolutely no warranty for this software package. See the file COPYING for details.
 
@@ -20,19 +20,15 @@ WARNING: There is absolutely no warranty for this software package. See the file
 
 Before sending us your questions, please see the following files for further information, and check for any [open issues](https://github.com/PDLPorters/pdl/issues).
 
-- `INSTALL`: Basic installation instructions
-- `INTERNATIONALIZATION`: Notes re PDL i18n issue and status
-- `DEPENDENCIES`: Other software that PDL relies on (and where to get it)
+- [`PDL::InstallGuide`](https://metacpan.org/pod/PDL::InstallGuide): Basic installation instructions
 - `Changes`: A list of features or issues with regard to the current version, always worth checking!
-- `Bugs.pod`: How to make a bug report, [`PDL::Bugs`](https://metacpan.org/pod/PDL::Bugs)
-- `perldl.conf`: PDL configuration options
-- `Basic/Pod/FAQ.pod`: The FAQ in pod format. Try `perldoc PDL::FAQ` after installation.
-- `Basic/Pod/QuickStart.pod`: A quick overview of PDL. Try `perldoc PDL::QuickStart` after installation.
-- `Basic/Pod/BadValues.pod`: A discussion of the bad value support in PDL
-- `Basic/Pod/DeveloperGuide.pod`: How to participate in the development of PDL
+- [`PDL::Bugs`](https://metacpan.org/pod/PDL::Bugs): How to make a bug report,
+- [`PDL::FAQ`](https://metacpan.org/pod/PDL::FAQ): The FAQ in pod format. Try `perldoc PDL::FAQ` after installation.
+- [`PDL::QuickStart`](https://metacpan.org/pod/PDL::QuickStart): A quick overview of PDL. Try `perldoc PDL::QuickStart` after installation.
+- [`PDL::BadValues`](https://metacpan.org/pod/PDL::BadValues): A discussion of the bad value support in PDL
+- [`PDL::DeveloperGuide`](https://metacpan.org/pod/PDL::DeveloperGuide): How to participate in the development of PDL
 
-**Note:** Most PDL documentation is available online within the PDL shell, `pdl2` (or `perldl`). Try the `help` command within either shell.
-
+**Note:** Most PDL documentation is available online within the PDL shell, `perldl`. Try the `help` command within either shell.
 
 ## PDL -- the package
 
@@ -45,15 +41,15 @@ Check the [pdl web site](https://pdl.perl.org) for more information.
 
 ## Installation
 
-Please read the file `INSTALL` for information on how to configure and install PDL. The `Changes` file contains important version specific information. Be *sure* to check for any [open issues](https://github.com/PDLPorters/pdl/issues) if you have any `INSTALL` issues.
+Please read the installation guide linked above for information on how to install PDL. The `Changes` file contains important version specific information. Be *sure* to check for any [open issues](https://github.com/PDLPorters/pdl/issues) if you have any installation issues.
 
-Once you have built PDL and either installed it or done `make doctest`, try either
+Once you have built PDL and either installed it or done `make`, try either
 
-    perl -Mblib Perldl2/pdl2
+    perl -Mblib blib/script/perldl
 
 from within the root of the PDL tree or just
 
-    pdl2
+    pdl
 
 if you have installed PDL already (`make install`) to get the interactive PDL shell.  In this shell, `help` gives you access to PDL documentation for each function separately (`help help` for more about this) and `demo` gives you some basic examples of what you can do.
 
@@ -71,53 +67,11 @@ If you need to post a problem report, and after checking with the pdl-general li
 
 ## Notes
 
-Directory structure:
-
-`Basic/`
-: The stuff that PDL would be no use without
-
-`Demos/`
-: Showcase for PDL, type demo at the perldl prompt.
-
-`Doc/`
-: Modules for building/using the PDL documentation database
-
-`Example/`
-: Sample programs using PDL
-
-`Graphics/`
-: The stuff that PDL needs to make pictures
-
-`IO/`
-: The stuff that PDL needs to write and read strange files
-
-`Libtmp/`
-: The stuff that PDL would still be useful without but which makes PDL even more useful
-
-`Perldl2/`
-: The PDL shell version 2 source and development
-
-`cygwin/`
-: Platform specific information
-
-`macosx/`
-: Platform specific information
-
-`t/`
-: PDL tests directory
-
-`utils/`
-: Utilities relating to PDL
-
-`win32/`
-: Platform specific information
-
-
 Comments are welcome - so are volunteers to write code and documentation! Please contact the developers mailing list `pdl-devel@lists.sourceforge.net` ([subscription info](https://pdl.perl.org/?page=mailing-lists)) with ideas and suggestions.
 
 The PDL developers.
 
 
-## Compilation Reports:
+## Installation Reports:
 
 The [CPAN Testers' result page](https://www.cpantesters.org) provides a database showing the results of compiling PDL and many other CPAN packages on multiple platforms.

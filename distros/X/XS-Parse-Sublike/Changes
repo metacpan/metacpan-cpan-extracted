@@ -1,5 +1,10 @@
 Revision history for XS-Parse-Sublike
 
+0.33    2025-01-02
+        [BUGFIXES]
+         * Ensure test .xs files are valid C before C23, by not using unnamed
+           parameters to functions (RT158225)
+
 0.32    2024-12-20
         [BUGFIXES]
          * Ensure that signature start+finish hooks are run if present even on

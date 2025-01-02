@@ -1,0 +1,414 @@
+=head1 NAME
+
+PDL::Modules - A guide to PDL's module reference.
+
+
+=head1 DESCRIPTION
+
+This page serves as a table of contents for PDL's module documentation.
+This page does not list every single PDL module. It only shows the ones
+intended for PDL users, while omitting those which are deemed "for
+internal use only". If you wish to see a comprehensive list of all
+documentation, please see the L<PDL::Index> page.
+
+=head1 LOOKING FOR A FUNCTION?
+
+If you want to search for a function name, you should use the PDL
+shell along with the "help" or "apropos" command (to do a fuzzy search).
+For example:
+
+ pdl> apropos xval
+ xlinvals        X axis values between endpoints (see xvals).
+ xlogvals        X axis values logarithmicly spaced...
+ xvals           Fills an ndarray with X index values...
+ yvals           Fills an ndarray with Y index values. See the CAVEAT for xvals.
+ zvals           Fills an ndarray with Z index values. See the CAVEAT for xvals.
+
+To learn more about the PDL shell, see L<perldl>.
+
+=head1 FOUNDATION
+
+=over 5
+
+=item L<perldl>
+
+Learn about the PDL shell.
+
+=back
+
+=head2 Functions
+
+=over 5
+
+=item L<PDL::Core>
+
+Core module (e.g. creating ndarrays).
+
+=item L<PDL::Basic>
+
+Simplified interface to the more general PDL::Primitive.
+
+=item L<PDL::Ops>
+
+Basic operators (e.g. arithmetic, comparisons, etc.).
+
+=item L<PDL::Ufunc>
+
+Functions that accumulate along a dimension (e.g. sum, max).
+
+=back
+
+=head2 Other Features
+
+=over 5
+
+=item L<PDL::AutoLoader>
+
+MATLAB-style function autoloader.
+
+=item L<PDL::Slices>
+
+Indexing and slices. How to access a subset of an ndarray.
+
+=item L<PDL::NiceSlice>
+
+Nicer syntax for slices.
+
+=back
+
+
+
+=head1 MISCELLANEOUS
+
+=over 5
+
+=item L<PDL::Primitive>
+
+Fundamental operations on ndarrays.
+
+=item L<PDL::Bad>
+
+Bad value support.
+
+=item L<PDL::Reduce>
+
+A 'reduce' function for PDL.
+
+=item L<PDL::Lite>
+
+Minimum PDL module OO loader.
+
+=item L<PDL::LiteF>
+
+Minimum PDL module function loader.
+
+=item L<PDL::Func>
+
+Interpolation-related functions.
+
+=back
+
+
+
+=head1 GRAPHICS
+
+=head2 3D Graphics
+
+=over 5
+
+=item L<PDL::Graphics::TriD>
+
+3D graphics core module.
+
+=item L<PDL::Graphics::TriD::Rout>
+
+Helper routines for 3D graphics.
+
+=back
+
+
+=head1 IMAGE PROCESSING
+
+=over 5
+
+=item L<PDL::Compression>
+
+Compression utilities.
+
+=item L<PDL::Image2D>
+
+2-dimensional image processing.
+
+=item L<PDL::ImageND>
+
+N-dimensional image processing.
+
+=item L<PDL::ImageRGB>
+
+RGB image data handling.
+
+=back
+
+=head1 NUMERICAL METHODS
+
+=over 5
+
+=item L<PDL::FFT>
+
+Fast Fourier Transform (native implementation).
+
+=item L<PDL::Filter::LinPred>
+
+Linear predictive filtering.
+
+=item L<PDL::Filter::Linear>
+
+Linear filtering.
+
+=item L<PDL::Opt::Simplex>
+
+Simplex optimization routines.
+
+=item L<PDL::Slatec>
+
+PDL interface to the Slatec library.
+
+=back
+
+
+
+=head1 COORDINATE TRANSFORMATIONS
+
+=over 5
+
+=item L<PDL::Transform>
+
+Coordinate transforms, image warping, and N-D functions.
+
+=item L<PDL::Transform::Cartography>
+
+Cartographic projections.
+
+=item L<PDL::Transform::Proj4>
+
+PDL interface to the Proj (formerly known as Proj4) projection library.
+
+=back
+
+
+
+=head1 IO FUNCTIONS
+
+=over 5
+
+=item L<PDL::IO>
+
+Overview of IO functions.
+
+=item L<PDL::IO::Dumper>
+
+Data dumper.
+
+=item L<PDL::IO::FastRaw>
+
+Fast storage format (outdated).
+
+=item L<PDL::IO::FlexRaw>
+
+Flexible storage format.
+
+=item L<PDL::IO::Misc>
+
+Misc IO routines.
+
+=item L<PDL::IO::Storable>
+
+Support for Perl's L<Storable> module.
+
+=back
+
+
+=head2 Image Formats
+
+=over 5
+
+=item L<PDL::IO::FITS>
+
+PDL support for FITS images.
+
+=item L<PDL::IO::Pnm>
+
+PDL support for PNM images.
+
+=item L<PDL::IO::GD>
+
+PDL interface to the GD image library.
+
+=item L<PDL::IO::HDF>
+
+PDL interface to the HDF4 image library.
+
+=back
+
+
+
+=head1 2D MATRICES
+
+=over 5
+
+=item L<PDL::Matrix>
+
+Convenience class for 2D matrix work.
+
+=item L<PDL::MatrixOps>
+
+Additional matrix operators.
+
+=back
+
+
+
+=head1 GNU SCIENTIFIC LIBRARY
+
+=over 5
+
+=item L<PDL::GSL::DIFF>
+
+Numerical differentiation.
+
+=item L<PDL::GSL::INTEG>
+
+Numerical integration.
+
+=item L<PDL::GSL::INTERP>
+
+Interpolation.
+
+=item L<PDL::GSL::MROOT>
+
+Multidimensional root-finding.
+
+=item L<PDL::GSL::RNG>
+
+RNG and randist.
+
+=back
+
+
+
+=head2 Special Functions
+
+=over 5
+
+=item L<PDL::GSLSF::AIRY>
+
+=item L<PDL::GSLSF::BESSEL>
+
+=item L<PDL::GSLSF::CLAUSEN>
+
+=item L<PDL::GSLSF::COULOMB>
+
+=item L<PDL::GSLSF::COUPLING>
+
+=item L<PDL::GSLSF::DAWSON>
+
+=item L<PDL::GSLSF::DEBYE>
+
+=item L<PDL::GSLSF::DILOG>
+
+=item L<PDL::GSLSF::ELEMENTARY>
+
+=item L<PDL::GSLSF::ELLINT>
+
+=item L<PDL::GSLSF::ELLJAC>
+
+=item L<PDL::GSLSF::ERF>
+
+=item L<PDL::GSLSF::EXP>
+
+=item L<PDL::GSLSF::EXPINT>
+
+=item L<PDL::GSLSF::FERMI_DIRAC>
+
+=item L<PDL::GSLSF::GAMMA>
+
+=item L<PDL::GSLSF::GEGENBAUER>
+
+=item L<PDL::GSLSF::HYPERG>
+
+=item L<PDL::GSLSF::LAGUERRE>
+
+=item L<PDL::GSLSF::LEGENDRE>
+
+=item L<PDL::GSLSF::LOG>
+
+=item L<PDL::GSLSF::POLY>
+
+=item L<PDL::GSLSF::POW_INT>
+
+=item L<PDL::GSLSF::PSI>
+
+=item L<PDL::GSLSF::SYNCHROTRON>
+
+=item L<PDL::GSLSF::TRANSPORT>
+
+=item L<PDL::GSLSF::TRIG>
+
+=item L<PDL::GSLSF::ZETA>
+
+=back
+
+
+
+=head1 FITTING FUNCTIONS
+
+=over 5
+
+=item L<PDL::Fit::Gaussian>
+
+Fit gaussian curves.
+
+=item L<PDL::Fit::Polynomial>
+
+Fit polynomials.
+
+=item L<PDL::Fit::Linfit>
+
+Fit linear combinations of functions.
+
+=item L<PDL::Fit::LM>
+
+Fit functions using the Levenberg-Marquardt algorithm.
+
+=back
+
+
+
+=head1 ADVANCED
+
+=over 5
+
+=item L<PDL::Dbg>
+
+PDL debugger.
+
+=item L<PDL::DiskCache>
+
+Manage many ndarrays through a disk cache.
+
+=item L<PDL::Objects>
+
+If you want to sub-class from PDL.
+
+=back
+
+
+
+
+=head1 COPYRIGHT
+
+Copyright 2010 Daniel Carrera (dcarrera@gmail.com). You can distribute
+and/or modify this document under the same terms as the current Perl
+license.
+
+See: http://dev.perl.org/licenses/

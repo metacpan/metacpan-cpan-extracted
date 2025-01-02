@@ -1,0 +1,646 @@
+use strict;
+use warnings;
+use PDL::Types qw(types ppdefs ppdefs_all ppdefs_complex);
+require PDL::Core::Dev;
+
+my $A = [ppdefs_all];
+my $C = [ppdefs_complex];
+my $F = [map $_->ppsym, grep $_->real && !$_->integer, types];
+$F = [(grep $_ ne 'D', @$F), 'D']; # so defaults to D if non-float given
+my $AF = [map $_->ppsym, grep !$_->integer, types];
+$AF = [(grep $_ ne 'D', @$AF), 'D']; # so defaults to D if non-float given
+my $T = [map $_->ppsym, grep $_->integer, types];
+my $U = [map $_->ppsym, grep $_->unsigned, types];
+my $S = [map $_->ppsym, grep $_->real && !$_->unsigned, types];
+my %is_real; @is_real{ppdefs()} = ();
+my @Rtypes = grep $_->real, types();
+my @Ctypes = grep !$_->real, types();
+my @Ftypes = grep !$_->integer, types();
+
+pp_addpm({At=>'Top'},<<'EOD');
+
+use strict;
+use warnings;
+
+my %OVERLOADS;
+
+=head1 NAME
+
+PDL::Ops - Fundamental mathematical operators
+
+=head1 DESCRIPTION
+
+This module provides the functions used by PDL to
+overload the basic mathematical operators (C<+ - / *>
+etc.) and functions (C<sin sqrt> etc.)
+
+It also includes the function C<log10>, which should
+be a perl function so that we can overload it!
+
+Matrix multiplication (the operator C<x>) is handled
+by the module L<PDL::Primitive>.
+
+=head1 SYNOPSIS
+
+none
+
+=cut
+
+EOD
+
+pp_addpm({At=>'Bot'},<<'EOPM');
+
+=head1 AUTHOR
+
+Tuomas J. Lukka (lukka@fas.harvard.edu),
+Karl Glazebrook (kgb@aaoepp.aao.gov.au),
+Doug Hunt (dhunt@ucar.edu),
+Christian Soeller (c.soeller@auckland.ac.nz),
+Doug Burke (burke@ifa.hawaii.edu),
+and Craig DeForest (deforest@boulder.swri.edu).
+
+=cut
+
+EOPM
+
+pp_addhdr('
+#include <tgmath.h>
+
+#define MOD(X,N) (((N) == 0)   ?    0   :   (   (X) - (PDL_ABS(N))  *  ((long long)((X)/(PDL_ABS(N))) + (   ( ((N) * ((long long)((X)/(N)))) != (X) )   ?   ( ( ((N)<0) ? 1 : 0 )  +  ( (((X)<0) ? -1 : 0)))  :  0 ))))
+#define BU_MOD(X,N)(((N) == 0)   ?    0   :   ( (X)-(N)*((uint64_t)((X)/(N))) ))
+#define SPACE(A,B)   ( ((A)<(B)) ? -1 : ((A)!=(B)) )
+');
+
+my %char2escape = ('>'=>'E<gt>','<'=>'E<lt>');
+my $chars = '(['.join('', map quotemeta, sort keys %char2escape).'])';
+sub protect_chars {
+  my ($txt) = @_;
+  $txt =~ s/$chars/$char2escape{$1}/g;
+  return $txt;
+}
+
+# simple binary operators
+
+pp_addhdr(pp_line_numbers(__LINE__, <<'EOF'));
+#define PDL_BADVAL_WARN_X(datatype, ctype, ppsym, ...) \
+  bad_anyval.type = datatype; bad_anyval.value.ppsym = PDL->bvals.ppsym;
+#define PDL_BADVAL_WARN(var) \
+  { \
+    PDL_Anyval bad_anyval = { PDL_INVALID, {0} }; \
+    if (!(var->has_badvalue && var->badvalue.type != var->datatype)) { \
+      if (var->has_badvalue) \
+        bad_anyval = var->badvalue; \
+      else { \
+        PDL_GENERICSWITCH(PDL_TYPELIST_ALL, var->datatype, PDL_BADVAL_WARN_X, ) \
+      } \
+    } \
+    if (bad_anyval.type < 0) \
+      barf("Error getting badvalue, type=%d", bad_anyval.type); \
+    complex double bad_c; \
+    ANYVAL_TO_CTYPE(bad_c, complex double, bad_anyval); \
+    if( bad_c == 0 || bad_c == 1 ) \
+      warn(#var " badvalue is set to 0 or 1. This will cause data loss when using badvalues for comparison operators."); \
+  }
+EOF
+sub biop {
+    my ($name,$op,$mutator,$doc,%extra) = @_;
+    my $optxt = protect_chars ref $op eq 'ARRAY' ? $op->[1] : $op;
+    $op = $op->[0] if ref $op eq 'ARRAY';
+    $extra{HdrCode} = << 'EOH';
+  if (swap) {
+    pdl *tmp = a;
+    a = b;
+    b = tmp;
+  }
+EOH
+    # handle exceptions
+    if ( exists $extra{Exception} ) {
+# NOTE This option is unused.
+	#      See also `ufunc()`.
+	delete $extra{Exception};
+    }
+    if ($extra{Comparison}) {
+        my $first_complex = $Ctypes[0]->sym;
+	$extra{HdrCode} .= <<EOF if $extra{Comparison} > 1;
+  if ((a->datatype >= $first_complex) || (b->datatype >= $first_complex))
+    barf("Can't compare complex numbers");
+EOF
+	$extra{HdrCode} .= "  PDL_BADVAL_WARN(a)\n  PDL_BADVAL_WARN(b)\n";
+        delete $extra{Comparison};
+    }
+
+    my $bitwise = delete $extra{Bitwise};
+    pp_addpm(make_overload($op, $name, $mutator, $bitwise));
+    pp_def($name,
+	   Pars => 'a(); b(); [o]c();',
+	   OtherPars => 'int $swap',
+	   OtherParsDefaults => { swap => 0 },
+	   HandleBad => 1,
+	   NoBadifNaN => 1,
+	   Inplace => [ 'a' ],
+	   Code => pp_line_numbers(__LINE__, <<EOF),
+PDL_IF_BAD(char anybad = 0;,)
+broadcastloop %{
+  PDL_IF_BAD(if ( ( \$PDLSTATEISBAD(a) && \$ISBAD(a()) )
+               || ( \$PDLSTATEISBAD(b) && \$ISBAD(b()) )) { \$SETBAD(c()); anybad = 1; } else,)
+     \$c() = \$a() $op \$b();
+%}
+PDL_IF_BAD(if (anybad) \$PDLSTATESETBAD(c);,)
+EOF
+	   %extra,
+	   Doc => << "EOD");
+=for ref
+
+$doc
+
+=for example
+
+   \$c = \$x $op \$y;               # overloaded call
+   \$c = PDL::$name(\$x, \$y);     # explicit call with default swap of 0
+   \$c = PDL::$name(\$x, \$y, 0);  # explicit call with explicit swap of 0
+   \$c = PDL::$name(\$x, \$y, 1);  # explicit call with trailing 1 to swap args
+   PDL::$name(\$x, \$y, \$c, 1);   # all params given
+   \$x->$name(\$y, \$c, 0);        # method call, all params given
+   \$c = \$x->$name(\$y);          # method call
+   \$x->inplace->$name(\$y);      # modify \$x inplace
+
+It can be made to work inplace with the C<< \$x->inplace >> syntax.
+This function is used to overload the binary C<$optxt> operator.
+As of 2.065, when calling this function explicitly you can omit
+the third argument (see second example), or supply it (see third one).
+
+=cut
+
+EOD
+} # sub: biop()
+
+sub make_overload {
+    my ($op, $name, $mutator, $bitwise, $one_arg) = @_;
+    my $ret;
+    my $bitwise_passon = $bitwise ? '$_[2]?@_[1,0]:@_[0,1]' : '@_';
+    if ($one_arg) {
+      $ret = pp_line_numbers(__LINE__, <<EOF);
+BEGIN { \$OVERLOADS{'$op'} = sub { PDL::$name(\$_[0]) } }
+EOF
+    } else {
+      $ret = pp_line_numbers(__LINE__, <<EOF);
+{
+  my (\$foo, \$overload_sub);
+  BEGIN { \$OVERLOADS{'$op'} = \$overload_sub = sub(;\@) {
+      return PDL::$name($bitwise_passon) unless ref \$_[1]
+              && (ref \$_[1] ne 'PDL')
+              && defined(\$foo = overload::Method(\$_[1], '$op'))
+              && \$foo != \$overload_sub; # recursion guard
+      goto &\$foo;
+  }; }
+}
+EOF
+    }
+    $ret .= pp_line_numbers(__LINE__, <<EOF) if $mutator;
+BEGIN {
+# in1, in2, out, swap if true
+\$OVERLOADS{'$op='} = sub { PDL::$name(\$_[0]->inplace, \$_[1]); \$_[0] };
+}
+EOF
+    $ret;
+}
+
+#simple binary functions
+sub bifunc {
+    my ($name,$func,$mutator,$doc,%extra) = @_;
+    my $funcov = ref $func eq 'ARRAY' ? $func->[1] : $func;
+    my $isop = $funcov =~ s/^op//;
+    my $funcovp = protect_chars $funcov;
+    $func = $func->[0] if ref $func eq 'ARRAY';
+    my $got_complex = PDL::Core::Dev::got_complex_version($func, 2);
+    $extra{GenericTypes} = [ grep exists $is_real{$_}, @{$extra{GenericTypes}} ]
+	if !$got_complex and $extra{GenericTypes};
+    $extra{HdrCode} .= << 'EOH';
+  if (swap) {
+    pdl *tmp = a;
+    a = b;
+    b = tmp;
+  }
+EOH
+    # is this one to be used as a function or operator ?
+    my $ovcall = "\$c = ".($isop ? "\$a $funcov" : "$funcov \$a,")." \$b;    # overloaded use";
+
+    my $codestr;
+    if ($extra{unsigned}){
+#a little dance to avoid the MOD macro warnings for byte & ushort datatypes
+      my $t = join '', map $_->ppsym, grep $_->real, types();
+      my $v = join ',', map
+        $_->unsigned ? 'BU_' : '',
+        grep $_->real, types();
+      $codestr = << "ENDCODE";
+\$c() = (\$GENERIC(c))\$T$t($v)$func(\$a(),\$b());
+ENDCODE
+#end dance
+    } else {
+      $codestr = '$c() = ($GENERIC(c))'.$func.'($a(),$b());';
+    }
+    delete $extra{unsigned}; #remove the key so it doesn't get added in pp_def.
+
+    pp_addpm(make_overload($funcov, $name, $mutator));
+    pp_def($name,
+	   HandleBad => 1,
+	   NoBadifNaN => 1,
+	   Pars => 'a(); b(); [o]c();',
+	   OtherPars => 'int $swap',
+	   OtherParsDefaults => { swap => 0 },
+	   Inplace => [ 'a' ],
+	   Code => pp_line_numbers(__LINE__, <<EOF),
+PDL_IF_BAD(char anybad = 0;,)
+broadcastloop %{
+  PDL_IF_BAD(if ( \$ISBAD(a()) || \$ISBAD(b()) ) { anybad = 1; \$SETBAD(c()); } else ,) {
+     $codestr
+  }
+%}
+PDL_IF_BAD(if (anybad) \$PDLSTATESETBAD(c);,)
+EOF
+	   %extra,
+	   Doc => << "EOD");
+=for ref
+
+$doc
+
+=for example
+
+   \$c = \$x->$name(\$y);    # explicit call with default swap of 0
+   \$c = \$x->$name(\$y, 1); # explicit call with trailing 1 to swap args
+   $ovcall
+   \$x->inplace->$name(\$y,0);     # modify \$x inplace
+
+It can be made to work inplace with the C<\$x-E<gt>inplace> syntax.
+This function is used to overload the binary C<$funcovp> function.
+As of 2.065, when calling this function explicitly you can omit
+the third argument (see first example), or supply it (see second one).
+
+=cut
+
+EOD
+} # sub: bifunc()
+
+# simple unary functions and operators
+sub ufunc {
+    my ($name,$func,$overload,$doc,%extra) = @_;
+    my $funcov = ref $func eq 'ARRAY' ? $func->[1] : $func;
+    my $funcovp = protect_chars $funcov;
+    $func = $func->[0] if ref $func eq 'ARRAY';
+    my $got_complex = PDL::Core::Dev::got_complex_version($func, 1);
+    $extra{GenericTypes} = [ grep exists $is_real{$_}, @{$extra{GenericTypes}} ]
+	if !$got_complex and $extra{GenericTypes};
+
+    # handle exceptions
+    if ( exists $extra{Exception} ) {
+#	print "Warning: ignored exception for $name\n";
+# NOTE This option is unused.
+	#      See also `biop()`.
+	delete $extra{Exception};
+    }
+    my $codestr = '$b() = ($GENERIC(b))'.$func.'($a());';
+    if (delete $extra{NoTgmath} and $got_complex) {
+        # don't bother if not got complex version
+        $codestr = join "\n",
+            'types('.join('', map $_->ppsym, @Rtypes).') %{'.$codestr.'%}',
+            (map 'types('.$_->ppsym.') %{$b() = c'.$func.$_->floatsuffix.'($a());%}', @Ctypes),
+            ;
+    }
+    pp_addpm(make_overload($funcov, $name, 0, 0, 1)) if $overload;
+    # do not have to worry about propagation of the badflag when
+    # inplace since only input ndarray is a, hence its badflag
+    # won't change
+    # UNLESS an exception occurs...
+    pp_def($name,
+	   Pars => 'a(); [o]b()',
+	   HandleBad => 1,
+	   NoBadifNaN => 1,
+	   Inplace => 1,
+	   Code => pp_line_numbers(__LINE__, <<EOF),
+PDL_IF_BAD(if ( \$ISBAD(a()) ) \$SETBAD(b()); else {,)
+  $codestr
+PDL_IF_BAD(},)
+EOF
+	   %extra,
+	   Doc => << "EOD");
+=for ref
+
+$doc
+
+=for example
+
+   \$y = $funcov \$x;
+   \$x->inplace->$name;  # modify \$x inplace
+
+It can be made to work inplace with the C<\$x-E<gt>inplace> syntax.
+This function is used to overload the unary C<$funcovp> operator/function.
+
+=cut
+
+EOD
+} # sub: ufunc()
+
+######################################################################
+
+# we trap some illegal operations here -- see the Exception option
+# note, for the ufunc()'s, the checks do not work too well
+#    for unsigned integer types (ie < 0)
+#
+# XXX needs thinking about
+#    - have to integrate into Code section as well (so
+#      12/pdl(2,4,0,3) is trapped and flagged bad)
+#      --> complicated
+#    - perhaps could use type %{ %} ?
+#
+# ==> currently have commented out the exception code, since
+#     want to see if can use NaN/Inf for bad values
+#     (would solve many problems for F,D types)
+#
+# there is an issue over how we handle comparison operators
+# - see Primitive/primitive.pd/zcover() for more discussion
+#
+
+## arithmetic ops
+biop('plus','+',1,'add two ndarrays',GenericTypes => $A);
+biop('mult','*',1,'multiply two ndarrays',GenericTypes => $A);
+biop('minus','-',1,'subtract two ndarrays',GenericTypes => $A);
+biop('divide','/',1,'divide two ndarrays', Exception => '$b() == 0', GenericTypes => $A);
+
+## note: divide should perhaps trap division by zero as well
+
+## comparison ops
+# not defined for complex numbers
+biop('gt','>',0,'the binary E<gt> (greater than) operation', Comparison => 2);
+biop('lt','<',0,'the binary E<lt> (less than) operation', Comparison => 2);
+biop('le','<=',0,'the binary E<lt>= (less equal) operation', Comparison => 2);
+biop('ge','>=',0,'the binary E<gt>= (greater equal) operation', Comparison => 2);
+biop('eq','==',0,'binary I<equal to> operation (C<==>)', Comparison => 1, GenericTypes => $A);
+biop('ne','!=',0,'binary I<not equal to> operation (C<!=>)', Comparison => 1, GenericTypes => $A);
+
+## bit ops
+# those need to be limited to the right types
+biop('shiftleft','<<',1,'leftshift C<$a> by C<$b>',GenericTypes => $T);
+biop('shiftright','>>',1,'rightshift C<$a> by C<$b>',GenericTypes => $T);
+biop('or2','|',1,'binary I<or> of two ndarrays',GenericTypes => $T,
+      Bitwise => 1);
+biop('and2','&',1,'binary I<and> of two ndarrays',GenericTypes => $T,
+      Bitwise => 1);
+biop('xor','^',1,'binary I<exclusive or> of two ndarrays',GenericTypes => $T,
+      Bitwise => 1);
+
+# really an ufunc
+ufunc('bitnot','~',1,'unary bit negation',GenericTypes => $T);
+
+# some standard binary functions
+bifunc('power',['pow','op**'],1,'raise ndarray C<$a> to the power C<$b>',GenericTypes => [@$C, @$F]);
+bifunc('atan2','atan2',0,'elementwise C<atan2> of two ndarrays',GenericTypes => $F);
+bifunc('modulo',['MOD','op%'],1,'elementwise C<modulo> operation',unsigned=>1);
+bifunc('spaceship',['SPACE','op<=>'],0,'elementwise "<=>" operation');
+
+# some standard unary functions
+ufunc('sqrt','sqrt',1,'elementwise square root', GenericTypes => $A); # Exception => '$a() < 0');
+ufunc('sin','sin',1,'the sin function', GenericTypes => $A);
+ufunc('cos','cos',1,'the cos function', GenericTypes => $A);
+ufunc('not','!',1,'the elementwise I<not> operation');
+ufunc('exp','exp',1,'the exponential function',GenericTypes => [@$C, @$F]);
+ufunc('log','log',1,'the natural logarithm',GenericTypes => [@$C, @$F], Exception => '$a() <= 0');
+
+# no export these because clash with Test::Deep (re) or internal (_*abs)
+cfunc('re', 'creal', 1, 'Returns the real part of a complex number.',
+  '$complexv() = $b() + I * cimag($complexv());'
+);
+cfunc('im', 'cimag', 1, 'Returns the imaginary part of a complex number.',
+  '$complexv() = creal($complexv()) + I * $b();'
+);
+cfunc('_cabs', 'fabs', 1, 'Returns the absolute (length) of a complex number.', undef,
+    PMFunc=>'',
+);
+my $rabs_code = '
+  types('.join('', @$U).') %{ $b()=$a(); %}
+  types('.join('', @$S).') %{ $b()=PDL_ABS($a()); %}
+';
+pp_def ( '_rabs',
+	Pars=>'a(); [o]b()',
+	HandleBad => 1,
+	NoBadifNaN => 1,
+	    Inplace => 1,
+	Code => pp_line_numbers(__LINE__-1, qq{
+PDL_IF_BAD(if ( \$ISBAD(a()) ) \$SETBAD(b()); else,)
+  $rabs_code
+	}),
+	Doc=>undef,
+	PMFunc=>'',
+);
+
+pp_export_nothing();
+
+# make log10() work on scalars (returning scalars)
+# as well as ndarrays
+ufunc('log10','log10',0,'the base 10 logarithm', GenericTypes => $A,
+      Exception => '$a() <= 0',
+      NoTgmath => 1, # glibc for at least GCC 8.3.0 won't tgmath log10 though 7.1.0 did
+      PMCode => <<'EOF',
+sub PDL::log10 {
+    my ($x, $y) = @_;
+    return log($x) / log(10) if !UNIVERSAL::isa($x,"PDL");
+    barf "inplace but output given" if $x->is_inplace and defined $y;
+    if ($x->is_inplace) { $x->set_inplace(0); $y = $x; }
+    elsif (!defined $y) { $y = $x->initialize; }
+    &PDL::_log10_int( $x, $y );
+    $y;
+};
+EOF
+);
+
+pp_def(
+       'assgn',
+       HandleBad => 1,
+       GenericTypes => $A,
+       Pars => 'a(); [o]b();',
+       Code => pp_line_numbers(__LINE__-1, q{
+PDL_IF_BAD(char anybad = 0;,)
+broadcastloop %{
+  PDL_IF_BAD(if ( $ISBAD(a()) ) { anybad = 1; $SETBAD(b()); } else,)
+    $b() = $a();
+%}
+PDL_IF_BAD(if (anybad) $PDLSTATESETBAD(b);,)
+       }),
+       Doc =>
+'Plain numerical assignment. This is used to implement the ".=" operator',
+);
+
+# special functions for complex data types that don't work well with
+# the ufunc/bifunc logic
+sub cfunc {
+    my ($name, $func, $make_real, $doc, $backcode, %extra) = @_;
+    my $codestr = pp_line_numbers(__LINE__-1,"\$b() = $func(\$complexv());");
+    pp_def($name,
+	   GenericTypes=>$C,
+	   Pars => 'complexv(); '.($make_real ? 'real' : '').' [o]b()',
+	   HandleBad => 1,
+	   NoBadifNaN => 1,
+	   ($make_real ? () : (Inplace => 1)),
+	   Code => pp_line_numbers(__LINE__-1, qq{
+PDL_IF_BAD(if ( \$ISBAD(complexv()) ) \$SETBAD(b()); else,)
+  $codestr
+	   }),
+	   !$backcode ? () : (
+	     DefaultFlow => 1,
+	     TwoWay => 1,
+	     BackCode => pp_line_numbers(__LINE__-1, qq{
+		PDL_IF_BAD(if ( \$ISBAD(b()) ) \$SETBAD(complexv()); else {,)
+		   $backcode
+		PDL_IF_BAD(},)
+	     }),
+	   ),
+	   %extra,
+	   Doc => $doc . (!$backcode ? '' : ' Flows data back & forth.'),
+    );
+}
+
+cfunc('carg', 'carg', 1, 'Returns the polar angle of a complex number.', undef);
+cfunc('conj', 'conj', 0, 'complex conjugate.', undef);
+
+pp_def('czip',
+  Pars => 'r(); i(); complex [o]c()',
+  Doc => <<'EOF',
+convert real, imaginary to native complex, (sort of) like LISP zip
+function. Will add the C<r> ndarray to "i" times the C<i> ndarray. Only
+takes real ndarrays as input.
+EOF
+  Code => '$c() = $r() + $i() * I;'
+);
+
+pp_def('ipow',
+   Doc => qq{
+=for ref
+
+raise ndarray C<\$a> to integer power C<\$b>
+
+=for example
+
+   \$c = \$x->ipow(\$y);     # as method
+   \$c = ipow \$x, \$y;
+   \$x->inplace->ipow(\$y);  # modify \$x inplace
+
+It can be made to work inplace with the C<\$x-E<gt>inplace> syntax.
+
+Algorithm from L<Wikipedia|http://en.wikipedia.org/wiki/Exponentiation_by_squaring>
+
+=cut
+
+},
+   Pars => 'a(); longlong b(); [o] ans()',
+   GenericTypes => $AF,
+   Code => pp_line_numbers(__LINE__-1, q{
+$GENERIC(b) n = $b();
+if (n == 0) {
+  $ans() = 1;
+  continue;
+}
+$GENERIC() y = 1;
+$GENERIC() x = $a();
+if (n < 0) {
+  x = 1 / x;
+  n = -n;
+}
+while (n > 1) {
+  if (n % 2) {
+    y *= x;
+    n -= 1;
+  }
+  x *= x;
+  n /= 2;
+}
+$ans() = x * y;
+})
+);
+
+pp_addpm(<<'EOPM');
+
+=head2 abs
+
+=for ref
+
+Returns the absolute value of a number.
+
+=cut
+
+sub PDL::abs { $_[0]->type->real ? goto &PDL::_rabs : goto &PDL::_cabs }
+EOPM
+pp_addpm(make_overload(qw(abs abs), 0, 0, 1));
+
+pp_def('abs2',
+  GenericTypes=>$A,
+  HandleBad => 1,
+  Pars => 'a(); real [o]b()',
+  Doc => 'Returns the square of the absolute value of a number.',
+  Code => <<'EOF',
+PDL_IF_BAD(if ($ISBAD(a())) { $SETBAD(b()); continue; },)
+$b() = PDL_IF_GENTYPE_REAL(
+  $a()*$a(),
+  creall($a())*creall($a()) + cimagl($a())*cimagl($a())
+);
+EOF
+);
+
+pp_def('r2C',
+  GenericTypes=>[qw(G C F D)], # last one is default so here = D
+  Pars => 'r(); complex [o]c()',
+  Doc => 'convert real to native complex, with an imaginary part of zero',
+  PMCode => << 'EOF',
+sub PDL::r2C ($) {
+  return $_[0] if UNIVERSAL::isa($_[0], 'PDL') and !$_[0]->type->real;
+  my $r = $_[1] // PDL->nullcreate($_[0]);
+  PDL::_r2C_int($_[0], $r);
+  $r;
+}
+EOF
+  Code => '$c() = $r();'
+);
+
+pp_def('i2C',
+  GenericTypes=>[qw(G C F D)], # last one is default so here = D
+  Pars => 'i(); complex [o]c()',
+  Doc => 'convert imaginary to native complex, with a real part of zero',
+  PMCode => << 'EOF',
+sub PDL::i2C ($) {
+  return $_[0] if UNIVERSAL::isa($_[0], 'PDL') and !$_[0]->type->real;
+  my $r = $_[1] // PDL->nullcreate($_[0]);
+  PDL::_i2C_int($_[0], $r);
+  $r;
+}
+EOF
+  Code => '$c() = $i() * I;'
+);
+
+pp_addpm(<<'EOF');
+# This is to used warn if an operand is non-numeric or non-PDL.
+sub warn_non_numeric_op_wrapper {
+  require Scalar::Util;
+  my ($cb, $op_name) = @_;
+  return sub {
+    my ($op1, $op2) = @_;
+    warn "'$op2' is not numeric nor a PDL in operator $op_name"
+      unless Scalar::Util::looks_like_number($op2)
+            || ( Scalar::Util::blessed($op2) && $op2->isa('PDL') );
+    $cb->(@_);
+  }
+}
+
+{ package # hide from MetaCPAN
+    PDL;
+  use overload %OVERLOADS,
+    "eq"    => PDL::Ops::warn_non_numeric_op_wrapper(\&PDL::eq, 'eq'),
+    ".="    => sub {
+      my @args = !$_[2] ? @_[1,0] : @_[0,1];
+      PDL::Ops::assgn(@args);
+      return $args[1];
+    },
+    '++' => sub { $_[0] += ($PDL::Core::pdl_ones[$_[0]->get_datatype]//barf "Couldn't find 'one' for type ", $_[0]->get_datatype) },
+    '--' => sub { $_[0] -= ($PDL::Core::pdl_ones[$_[0]->get_datatype]//barf "Couldn't find 'one' for type ", $_[0]->get_datatype) },
+    ;
+}
+EOF
+
+pp_done();

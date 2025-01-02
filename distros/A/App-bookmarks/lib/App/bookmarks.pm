@@ -3,11 +3,11 @@ package App::bookmarks;
 use strict;
 use warnings;
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 =head1 NAME
 
-App::bookmarks - Export browser bookmarks as plain text.
+App::bookmarks - Export bookmarks from browsers and files.
 
 =head1 DESCRIPTION
 

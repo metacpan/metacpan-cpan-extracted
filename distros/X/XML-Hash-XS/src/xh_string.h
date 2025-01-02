@@ -62,6 +62,44 @@
 #define xh_strcpy(d, s)         strcpy((char *) (d), (const char *) (s))
 #define xh_strncpy(d, s, n)     strncpy((char *) (d), (const char *) (s), (n))
 
+#ifdef XH_SPARC_ARCH
+#define xh_str_auto_equal2(p, c0, c1, s) (xh_strncmp(p, s, 2) == 0)
+#define xh_str_auto_equal3(p, c0, c1, c2, s) (xh_strncmp(p, s, 3) == 0)
+#define xh_str_auto_equal4(p, c0, c1, c2, c3, s) (xh_strncmp(p, s, 4) == 0)
+#define xh_str_auto_equal5(p, c0, c1, c2, c3, c4, s) (xh_strncmp(p, s, 5) == 0)
+#define xh_str_auto_equal6(p, c0, c1, c2, c3, c4, c5, s) (xh_strncmp(p, s, 6) == 0)
+#define xh_str_auto_equal7(p, c0, c1, c2, c3, c4, c5, c6, s) (xh_strncmp(p, s, 7) == 0)
+#define xh_str_auto_equal8(p, c0, c1, c2, c3, c4, c5, c6, c7, s) (xh_strncmp(p, s, 8) == 0
+#define xh_str_auto_equal9(p, c0, c1, c2, c3, c4, c5, c6, c7, c8, s) (xh_strncmp(p, s, 9) == 0)
+#define xh_str_auto_equal10(p, c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, s) (xh_strncmp(p, s, 10) == 0)
+#define xh_str_auto_equal11(p, c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, s) (xh_strncmp(p, s, 11) == 0)
+#define xh_str_auto_equal12(p, c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, s) (xh_strncmp(p, s, 12) == 0)
+#define xh_str_auto_equal13(p, c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, s) (xh_strncmp(p, s, 13) == 0)
+#define xh_str_auto_equal14(p, c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, s) \
+    (xh_strncmp(p, s, 14) == 0)
+#else
+#define xh_str_auto_equal2(p, c0, c1, s) xh_str_equal2(p, c0, c1)
+#define xh_str_auto_equal3(p, c0, c1, c2, s) xh_str_equal3(p, c0, c1, c2)
+#define xh_str_auto_equal4(p, c0, c1, c2, c3, s) xh_str_equal4(p, c0, c1, c2, c3)
+#define xh_str_auto_equal5(p, c0, c1, c2, c3, c4, s) xh_str_equal5(p, c0, c1, c2, c3, c4)
+#define xh_str_auto_equal6(p, c0, c1, c2, c3, c4, c5, s) xh_str_equal6(p, c0, c1, c2, c3, c4, c5)
+#define xh_str_auto_equal7(p, c0, c1, c2, c3, c4, c5, c6, s) xh_str_equal7(p, c0, c1, c2, c3, c4, c5, c6)
+#define xh_str_auto_equal8(p, c0, c1, c2, c3, c4, c5, c6, c7, s) \
+    xh_str_equal8(p, c0, c1, c2, c3, c4, c5, c6, c7)
+#define xh_str_auto_equal9(p, c0, c1, c2, c3, c4, c5, c6, c7, c8, s) \
+    xh_str_equal9(p, c0, c1, c2, c3, c4, c5, c6, c7, c8)
+#define xh_str_auto_equal10(p, c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, s) \
+    xh_str_equal10(p, c0, c1, c2, c3, c4, c5, c6, c7, c8, c9)
+#define xh_str_auto_equal11(p, c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, s) \
+    xh_str_equal11(p, c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10)
+#define xh_str_auto_equal12(p, c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, s) \
+    xh_str_equal12(p, c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11)
+#define xh_str_auto_equal13(p, c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, s) \
+    xh_str_equal13(p, c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12)
+#define xh_str_auto_equal14(p, c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, s) \
+    xh_str_equal14(p, c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13)
+#endif
+
 XH_INLINE xh_char_t *
 xh_str_trim(xh_char_t *s, size_t *len)
 {

@@ -4,9 +4,81 @@ package CommonsLang;
 
 CommonsLang - Commonly used functions for Perl language
 
+=head1 SYNOPSIS
+use CommonsLang;
+
+print s_pad("a", 5, "0") . "\n";
+# > "a0000"
+
+print s_left("abc", 1) . "\n";
+# > "a"
+
+print s_right("abc", 1) . "\n";
+# > "c"
+
+print s_starts_with("abc", "ab") . "\n";
+# > 1
+
+print s_ends_with("abc", "bc") . "\n";
+# > 1
+
+=head1 DESCRIPTION
+
+  * v_type_of - returns a string indicating the type of the variable.
+  * v_cmp - compare function, usually it is used for sort.
+  * v_max - returns the largest of the element given as input parameters, or undef if there are no parameters.
+  * v_min - returns the smallest of the numbers given as input parameters, or undef if there are no parameters.
+  * s_match_glob - check if a string matches a glob pattern.
+  * s_left - returns a string containing a specified number of characters from the left side of a string.
+  * s_right - returns a string containing a specified number of characters from the right side of a string.
+  * s_starts_with - check whether the string begins with the characters of a specified string, returning 1 or 0 as appropriate.
+  * s_ends_with - check whether the string ends with the characters of a specified string, returning 1 or 0 as appropriate.
+  * s_pad - string padding.
+  * s_trim - a new string representing str stripped of whitespace from both its beginning and end. Whitespace is defined as /\s/.
+  * s_ellipsis - truncate the string to the specified length and add ellipsis "..." at the end of the string to indicate that the string has been truncated.
+  * s_split - takes a pattern and divides this string into an ordered list of substrings by searching for the pattern, puts these substrings into an array, and returns the array.
+  * a_splice - changes the contents of an array by removing or replacing existing elements and/or adding new elements in place.
+  * a_slice - returns a shallow copy of a portion of an array into a new array
+  * a_left - returns an array containing a specified number of elements from the left side of an array.
+  * a_right - returns an array containing a specified number of elements from the right side of an array.
+  * a_push - adds the specified elements to the end of an array and returns the new length of the array.
+  * a_pop - removes the last element from an array and returns that element. This method changes the length of the array.
+  * a_shift - removes the first element from an array and returns that removed element. This method changes the length of the array.
+  * a_unshift - adds the specified elements to the beginning of an array and returns the new length of the array.
+  * a_filter - creates a shallow copy of a portion of a given array, filtered down to just the elements from the given array that pass the test implemented by the provided function.
+  * a_sort - returns a sorted array by callbackFn. The original array will not be modified.
+  * a_concat - merge two or more arrays. This method does not change the existing arrays, but instead returns a new array.
+  * a_find_index - returns the index of the first element in an array that satisfies the provided testing function. If no elements satisfy the testing function, -1 is returned.
+  * a_find_last_index - iterates the array in reverse order and returns the index of the first element that satisfies the provided testing function.  If no elements satisfy the testing function, -1 is returned.
+  * a_find - returns the first element in the provided array that satisfies the provided testing function. If no values satisfy the testing function, undef is returned.
+  * a_find_last - iterates the array in reverse order and returns the index of the first element that satisfies the provided testing function. If no elements satisfy the testing function, -1 is returned.
+  * a_index_of - returns the first index at which a given element can be found in the array, or -1 if it is not present.
+  * a_last_index_of - returns the first index at which a given element can be found in the array, or -1 if it is not present.
+  * a_every - tests whether all elements in the array pass the test implemented by the provided function. It returns 1 or 0. It doesn't modify the array.
+  * a_some - tests whether at least one element in the array passes the test implemented by the provided function. It returns 1 if, in the array, it finds an element for which the provided function returns 1; otherwise it returns 0. It doesn't modify the array.
+  * a_map - creates a new array populated with the results of calling a provided function on every element in the calling array.
+  * a_reduce - executes a user-supplied "reducer" callback function on each element of the array, in order, passing in the return value from the calculation on the preceding element. The final result of running the reducer across all elements of the array is a single value.
+  * a_join - creates and returns a new string by concatenating all of the elements in this array, separated by commas or a specified separator string.
+  * h_keys - returns an array of a given hash's own enumerable names.
+  * h_values - returns an array of a given hash's own enumerable values.
+  * h_find - returns the k-v tuple in the provided hash that satisfies the provided testing function. If no values satisfy the testing function, undef is returned.
+  * h_group_by - groups the elements of a given iterable according to the string values returned by a provided callback function.
+  * h_assign - Copies all key/value from one or more source objects to a target object.
+  * x_now_ts - get formated timestamp(YYYY-mm-ddTHH:MM:SS.SSS).
+  * x_now_ms - get current timestamp.
+  * x_log - print with the line number and subroutine name of caller to STDOUT.
+  * x_debug - print with the line number and subroutine name of caller to STDOUT for debug.
+  * x_error - print with the line number and subroutine name of caller to STDERR.
+  * x_stack - print the call stack to STDERR.
+  * x_fatal - print the error, and exit the perl process with code 1.
+
+=head1 AUTHOR
+
+YUPEN 12/23/24 - new
+
 =cut
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 use Exporter;
 @ISA       = qw(Exporter);
@@ -56,7 +128,7 @@ sub x_now_ms {
 
 ##################
 # Subroutine : x_now_ts
-# Purpose    : get formated timestamp
+# Purpose    : get formated timestamp(YYYY-mm-ddTHH:MM:SS.SSS)
 sub x_now_ts {
     my $t  = localtime();
     my $ms = int(x_now_ms() % 1000);
@@ -103,18 +175,21 @@ sub i_log {
 
 ##################
 # Subroutine : x_log
-# Purpose    : print with the line number and subroutine name of caller
+# Purpose    : print with the line number and subroutine name of caller to STDOUT.
 sub x_log {
     i_log(*STDOUT, "LOG", @_);
 }
 
 ##################
 # Subroutine : x_debug
-# Purpose    : print with the line number and subroutine name of caller for debug
+# Purpose    : print with the line number and subroutine name of caller to STDOUT for debug
 sub x_debug {
     i_log(*STDOUT, "DEBUG", @_);
 }
 
+##################
+# Subroutine : x_error
+# Purpose    : print with the line number and subroutine name of caller to STDERR
 sub x_error {
     i_log(*STDERR, "ERROR", @_);
 }
@@ -149,7 +224,7 @@ sub x_stack {
 
 ##################
 # Subroutine : x_fatal
-# Purpose    : print the error, and exit the perl process.
+# Purpose    : print the error, and exit the perl process with code 1.
 sub x_fatal {
     i_log(*STDERR, "FATAL", @_);
     exit(1);
@@ -326,7 +401,7 @@ sub v_min {
 
 ##################
 # Subroutine : s_pad
-# Purpose    : String padding routines
+# Purpose    : String padding.
 # Input      : 1. text
 #              2. width - can be undef or -1 if you supply multiple texts, in which case the width will be determined from the longest text.
 #              3. which(optional) - is either "r" or "right" for padding on the right (the default if not specified),
@@ -379,7 +454,7 @@ sub s_pad {
         }
     }  # for $text
 
-    ref $text0 eq 'ARRAY' ? $texts : $texts->[0];
+    return ref $text0 eq 'ARRAY' ? $texts : $texts->[0];
 }
 
 ##################
@@ -404,7 +479,7 @@ sub s_left {
 
 ##################
 # Subroutine : s_starts_with
-# Purpose    : The method of String values determines whether this string begins with the characters of a specified string, returning true or false as appropriate.
+# Purpose    : Check whether the string begins with the characters of a specified string, returning 1 or 0 as appropriate.
 # Input      : 1. string
 #              2. string
 # Returns    :
@@ -445,7 +520,7 @@ sub s_right {
 
 ##################
 # Subroutine : s_ends_with
-# Purpose    : The method of String values determines whether a string ends with the characters of this string, returning true or false as appropriate.
+# Purpose    : Check whether the string ends with the characters of a specified string, returning 1 or 0 as appropriate.
 # Input      : 1. string
 #              2. string
 # Returns    :
@@ -479,7 +554,7 @@ sub s_trim {
 
 ##################
 # Subroutine : s_ellipsis
-# Purpose    : This method is to truncate the string to the specified length and add ellipsis "..." at the end of the string to indicate that the string has been truncated.
+# Purpose    : truncate the string to the specified length and add ellipsis "..." at the end of the string to indicate that the string has been truncated.
 # Input      : 1. string
 #              2. width
 #              3. align
@@ -988,7 +1063,7 @@ sub a_reduce {
 
 ##################
 # Subroutine : a_slice
-# Purpose    : The a_slice method returns a shallow copy of a portion of an array into a new array
+# Purpose    : returns a shallow copy of a portion of an array into a new array
 #              The original array will not be modified.
 # Input      : 1. array
 #              2. start index
@@ -1071,7 +1146,7 @@ sub a_sort {
 
 ##################
 # Subroutine : h_keys
-# Purpose    : returns an array of a given hash's own enumerable  names.
+# Purpose    : returns an array of a given hash's own enumerable names.
 # Input      : hash
 # Returns    : An array of strings representing the given hash's own enumerable keys.
 sub h_keys {

@@ -17,6 +17,7 @@ Perl extension to draw Christmas trees with SVG
       layers => 5,
       leaf_colour => 'rgb(0,255,0)',
       pot_colour => 'rgb(0,0,255)',
+      star_color => 'rgb(255,0,0)',
     });
     print $tree->as_xml;
 
@@ -34,7 +35,7 @@ use Math::Trig qw[deg2rad tan];
 
 with 'MooseX::Getopt';
 
-our $VERSION = '0.0.6';
+our $VERSION = '0.0.7';
 
 # Constants that we haven't made into attributes yet
 use constant {
@@ -46,7 +47,6 @@ use constant {
   POT_BOT_WIDTH => 200,       # Width of the bottom of the pot
   TRUNK_WIDTH => 100,         # Width of the trunk
   BAUBLE_RADIUS => 20,        # Radius of a bauble
-  STAR_RADIUS => 40,          # Radius of the star
 };
 
 =head1 Methods
@@ -95,6 +95,16 @@ value is "rgb(191,0,0)".
 
 The height of the pot in "pixels". The default height is 200.
 
+=item star_colour STR
+
+The colour of the star. This must be defined as an SVG RGB value. The default
+value is "rgb(212,175,55)".
+
+=item star_size INT
+
+The size of the star in "pixels". The start will be in a square of the defined
+size.The default size is 80.
+
 =back
 
 =head2 $tree->as_xml
@@ -133,7 +143,7 @@ sub _build_height {
   # ... add all of the last layer ...
   $height += $self->triangle_heights->[-1];
   # ... and (finally) half of the star
-  $height += STAR_RADIUS / 2;
+  $height += $self->star_size / 2;
 
   return int($height + 0.5);
 }
@@ -220,10 +230,22 @@ has pot_colour => (
   default => 'rgb(191,0,0)',
 );
 
+has star_colour => (
+    isa => 'Str',
+    is  => 'ro',
+    default => 'rgb(212,175,55)',
+);
+
 has pot_height => (
   isa => 'Int',
   is  => 'ro',
   default => 200,
+);
+
+has star_size => (
+    isa => 'Int',
+    is  => 'ro',
+    default => 80,
 );
 
 has triangles => (
@@ -263,6 +285,8 @@ sub as_xml {
       $_->{x}, $_->{y}, $self->leaf_colour,
     );
   }
+
+  $self->star;
 
   return $self->svg->xmlify;
 }
@@ -331,6 +355,32 @@ sub bauble {
       fill => $self->bauble_colour,
       stroke => $self->bauble_colour,
     },
+  );
+}
+
+sub star {
+  my $self = shift;
+  my ($x, $y, $delta_x, $delta_y);
+
+  $delta_x = $self->_mid_y;
+  $delta_y = 0;
+
+  # coordinates for a polyline star centered at 0,0
+  $x = [ 0,  0.125, 0.5, 0.25, 0.375,  0, -0.375, -0.25, -0.5, -0.125, 0 ];
+  $y = [ 0, 0.375, 0.375, 0.625, 1, 0.75,  1,  0.625,  0.375, 0.375, 0 ];
+
+  # multiple by size
+  $x = [map { $_ * $self->star_size } @$x];
+  $y = [map { $_ * $self->star_size } @$y];
+
+  # move to the placement we want (centered, on top of tree)
+  $x = [map { $_ + $delta_x } @$x];
+  $y = [map { $_ + $delta_y } @$y];
+
+  $self->_coloured_shape(
+      $x,
+      $y,
+      $self->star_colour,
   );
 }
 

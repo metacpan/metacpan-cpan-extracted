@@ -4,7 +4,7 @@ use warnings;
 use strict;
 
 use constant DEBUG => 0;
-our $VERSION = '0.091';
+our $VERSION = '0.092';
 
 =encoding UTF-8
  
@@ -167,7 +167,7 @@ You can pass the following in:
 
     soft_time_zone_conversion   # Set this flag to 1 if you don't want the time to change when a given timezone is
                                 # different from a parsed timezone. For example, "10:00 UTC" soft converted to
-                                # PST8PDT would be "10:00 PST8PDT".
+                                # America/Los_Angeles would be "10:00 America/Los_Angeles".
 
     time_zone_if_floating       # The value of this option should be a valid timezone. If this option is set, then a DateTime object
                                 # with a floating timezone has it's timezone set to the value.
@@ -211,10 +211,10 @@ Timezone processing can be a little complicated.  Here are some examples:
 
     DateTimeX::Easy->parse($dt, time_zone => "US/Pacific", soft_time_zone_conversion => 1);
                                                             # Will use US/Pacific as the timezone with NO conversion
-                                                            # For example, "22:00 US/Eastern" will become "22:00 PST8PDT"
+                                                            # For example, "22:00 US/Eastern" will become "22:00 America/Los_Angeles"
 
     DateTimeX::Easy->parse($dt)->set_time_zone("US/Pacific"); # Will use US/Pacific as the timezone WITH conversion
-                                                              # For example, "22:00 US/Eastern" will become "19:00 PST8PDT"
+                                                              # For example, "22:00 US/Eastern" will become "19:00 America/Los_Angeles"
 
     DateTimeX::Easy->parse($dt, time_zone => "US/Pacific"); # Will ALSO use US/Pacific as the timezone WITH conversion
 

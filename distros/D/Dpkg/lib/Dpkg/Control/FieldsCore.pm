@@ -28,7 +28,7 @@ CTRL_* constants exported by L<Dpkg::Control>.
 
 =cut
 
-package Dpkg::Control::FieldsCore 1.02;
+package Dpkg::Control::FieldsCore 1.03;
 
 use strict;
 use warnings;
@@ -44,6 +44,7 @@ our @EXPORT = qw(
     field_list_pkg_dep
     field_get_dep_type
     field_get_sep_type
+    field_get_default_value
     field_ordered_list
     field_register
     field_insert_after
@@ -434,6 +435,7 @@ our %FIELDS = (
     'priority' => {
         name => 'Priority',
         allowed => CTRL_TMPL_SRC | CTRL_REPO_SRC | ALL_PKG,
+        default => 'optional',
     },
     'protected' => {
         name => 'Protected',
@@ -473,6 +475,7 @@ our %FIELDS = (
     'section' => {
         name => 'Section',
         allowed => CTRL_TMPL_SRC | CTRL_REPO_SRC | ALL_PKG,
+        default => 'unknown',
     },
     'sha1' => {
         # XXX: Wrong capitalization due to historical reasons.
@@ -1048,7 +1051,7 @@ except the first of each word (words are separated by a hyphen in field names).
 
 =cut
 
-sub field_capitalize($) {
+sub field_capitalize {
     my $field = lc(shift);
 
     # Use known fields first.
@@ -1064,7 +1067,7 @@ Returns true if the field is official and known.
 
 =cut
 
-sub field_is_official($) {
+sub field_is_official {
     my $field = lc shift;
 
     return exists $FIELDS{$field};
@@ -1083,7 +1086,7 @@ Undef is returned for non-official fields.
 
 =cut
 
-sub field_is_allowed_in($@) {
+sub field_is_allowed_in {
     my ($field, @types) = @_;
     $field = lc $field;
 
@@ -1117,7 +1120,7 @@ added to $to otherwise.
 
 =cut
 
-sub field_transfer_single($$;$) {
+sub field_transfer_single {
     my ($from, $to, $field) = @_;
     if (not defined $field) {
         warnings::warnif('deprecated',
@@ -1164,7 +1167,7 @@ Returns the list of fields that have been added to $to.
 
 =cut
 
-sub field_transfer_all($$) {
+sub field_transfer_all {
     my ($from, $to) = @_;
     my (@res, $res);
     foreach my $k (keys %$from) {
@@ -1182,7 +1185,7 @@ The list might be empty for types where the order does not matter much.
 
 =cut
 
-sub field_ordered_list($) {
+sub field_ordered_list {
     my $type = shift;
 
     if (exists $FIELD_ORDER{$type}) {
@@ -1205,7 +1208,7 @@ Dpkg::Package::pkg_name_is_illegal() and Dpkg::Version::version_check().
 
 =cut
 
-sub field_parse_binary_source($) {
+sub field_parse_binary_source {
     my $ctrl = shift;
     my $ctrl_type = $ctrl->get_type();
 
@@ -1244,7 +1247,7 @@ Debian package.
 
 =cut
 
-sub field_list_src_dep() {
+sub field_list_src_dep {
     my @list = map {
         $FIELDS{$_}{name}
     } sort {
@@ -1264,7 +1267,7 @@ the stronger to the weaker.
 
 =cut
 
-sub field_list_pkg_dep() {
+sub field_list_pkg_dep {
     my @list = map {
         $FIELDS{$_}{name}
     } sort {
@@ -1285,7 +1288,7 @@ Breaks, ...). Returns undef for fields which are not dependencies.
 
 =cut
 
-sub field_get_dep_type($) {
+sub field_get_dep_type {
     my $field = lc shift;
 
     return unless exists $FIELDS{$field};
@@ -1300,11 +1303,25 @@ FIELD_SEP_SPACE, FIELD_SEP_COMMA or FIELD_SEP_LINE.
 
 =cut
 
-sub field_get_sep_type($) {
+sub field_get_sep_type {
     my $field = lc shift;
 
     return $FIELDS{$field}{separator} if exists $FIELDS{$field}{separator};
     return FIELD_SEP_UNKNOWN;
+}
+
+=item $value = field_get_default_value($field)
+
+Return the default value (if any) for the field. If there is no default value
+then it returns "undef".
+
+=cut
+
+sub field_get_default_value {
+    my $field = lc shift;
+
+    return $FIELDS{$field}{default} if exists $FIELDS{$field}{default};
+    return;
 }
 
 =item field_register($field, $allowed_types, %opts)
@@ -1314,7 +1331,7 @@ types. %opts is optional.
 
 =cut
 
-sub field_register($$;@) {
+sub field_register {
     my ($field, $types, %opts) = @_;
 
     $field = lc $field;
@@ -1336,7 +1353,7 @@ Return true if the field was inserted, otherwise false.
 
 =cut
 
-sub field_insert_after($$@) {
+sub field_insert_after {
     my ($type, $field, @fields) = @_;
 
     return 0 if not exists $FIELD_ORDER{$type};
@@ -1358,7 +1375,7 @@ Return true if the field was inserted, otherwise false.
 
 =cut
 
-sub field_insert_before($$@) {
+sub field_insert_before {
     my ($type, $field, @fields) = @_;
 
     return 0 if not exists $FIELD_ORDER{$type};
@@ -1374,6 +1391,10 @@ sub field_insert_before($$@) {
 =back
 
 =head1 CHANGES
+
+=head2 Version 1.03 (dpkg 1.22.12)
+
+New function: field_get_default_value().
 
 =head2 Version 1.02 (dpkg 1.22.0)
 

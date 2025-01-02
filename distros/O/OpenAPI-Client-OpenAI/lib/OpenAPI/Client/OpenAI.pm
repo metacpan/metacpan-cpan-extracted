@@ -1,16 +1,12 @@
 package OpenAPI::Client::OpenAI;
 
-use strict;
-use warnings;
-
-use Carp;
-use File::ShareDir ':ALL';
+use Carp ();
+use File::ShareDir 'dist_file';
 use File::Spec::Functions qw(catfile);
 
 use Mojo::Base 'OpenAPI::Client';
-use Mojo::URL;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 sub new {
     my ( $class, $specification ) = ( shift, shift );
@@ -32,7 +28,7 @@ sub new {
     }
     my %headers = ( 'Authorization' => "Bearer $ENV{OPENAI_API_KEY}", );
     if ( delete $attrs->{assistants} ) {
-        $headers{'OpenAI-Beta'} = 'assistants=v1';
+        $headers{'OpenAI-Beta'} = 'assistants=v2';
     }
 
     # 'message' => 'You must provide the \'OpenAI-Beta\' header to access the

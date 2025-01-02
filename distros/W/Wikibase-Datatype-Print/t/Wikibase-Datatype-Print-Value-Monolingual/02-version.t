@@ -6,4 +6,4 @@ use Test::NoWarnings;
 use Wikibase::Datatype::Print::Value::Monolingual;
 
 # Test.
-is($Wikibase::Datatype::Print::Value::Monolingual::VERSION, 0.17, 'Version.');
+is($Wikibase::Datatype::Print::Value::Monolingual::VERSION, 0.18, 'Version.');

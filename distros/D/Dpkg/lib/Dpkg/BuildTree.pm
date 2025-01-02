@@ -43,11 +43,12 @@ use Dpkg::Source::Functions qw(erasedir);
 =item $bt = Dpkg::BuildTree->new(%opts)
 
 Create a new Dpkg::BuildTree object.
-Supported options are:
+
+Options:
 
 =over 8
 
-=item dir
+=item B<dir>
 
 The build tree directory.
 If not specified, it assumes the current working directory.
@@ -100,6 +101,24 @@ sub clean {
     }
 
     return;
+}
+
+=item $bt->needs_root()
+
+Check whether the build tree needs root to build.
+
+=cut
+
+sub needs_root {
+    my $self = shift;
+
+    require Dpkg::Control::Info;
+    require Dpkg::BuildDriver;
+
+    my $ctrl = Dpkg::Control::Info->new();
+    my $bd = Dpkg::BuildDriver->new(ctrl => $ctrl);
+
+    return $bd->need_build_task('build', 'binary');
 }
 
 =back

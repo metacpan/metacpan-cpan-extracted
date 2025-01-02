@@ -1,5 +1,5 @@
 #
-# GENERATED WITH PDL::PP from imagergb.pd! Don't modify!
+# GENERATED WITH PDL::PP from lib/PDL/ImageRGB.pd! Don't modify!
 #
 package PDL::ImageRGB;
 
@@ -22,7 +22,7 @@ use DynaLoader;
 
 
 
-#line 9 "imagergb.pd"
+#line 14 "lib/PDL/ImageRGB.pd"
 
 use strict;
 use warnings;
@@ -252,7 +252,7 @@ distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
 =cut
-#line 256 "ImageRGB.pm"
+#line 256 "lib/PDL/ImageRGB.pm"
 
 *cquant_c = \&PDL::cquant_c;
 

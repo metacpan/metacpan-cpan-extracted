@@ -9,7 +9,7 @@ use Wikibase::Datatype::Print::Utils qw(print_descriptions);
 use Wikibase::Datatype::Print::Value::Monolingual;
 
 my $obj = Test::Shared::Fixture::Wikibase::Datatype::Item::Wikidata::Dog->new;
-my @ret = print_descriptions($obj, {'lang' => 'cs'},
+my @ret = print_descriptions($obj, {'lang' => 'cs', 'texts' => {'description' => 'Description'}},
         \&Wikibase::Datatype::Print::Value::Monolingual::print);
 
 # Print.

@@ -1,6 +1,6 @@
 package SPVM::Go;
 
-our $VERSION = "0.007003";
+our $VERSION = "0.008001";
 
 1;
 
@@ -116,6 +116,12 @@ This method must be called from the main thread. Otherwise an exception is throw
 
 $seconds must be less than or equal to Fn->INT_MAX. Otherwise an exception is thrown.
 
+=head2 ENV_DEBUG
+
+C<static method ENV_DEBUG : int ();>
+
+Casts the value of L</"SPVM_GO_DEBUG> environment variable to int type and returns it.
+
 =head1 Modules
 
 =over 2
@@ -131,6 +137,10 @@ $seconds must be less than or equal to Fn->INT_MAX. Otherwise an exception is th
 =item * L<Go::OS::Signal|SPVM::Go::OS::Signal>
 
 =back
+
+=head1 Enviroment Variables
+
+=head2 SPVM_GO_DEBUG
 
 =head1 Repository
 

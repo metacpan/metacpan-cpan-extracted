@@ -1,35 +1,8 @@
 #!/usr/bin/env perl
 #
-# bookmarks - Export browser bookmarks as plain text.
+# bookmarks - Export bookmarks from browsers and files.
 #
-# bookmarks is a tool to export bookmarks from files supplied as arguments, or
-# from browsers default locations (when called without arguments). If file is a
-# dash "-", STDIN is read and processed as plain text source. The following
-# sources are supported :
-#
-# - Safari (*.plist)
-# - Firefox (*.sqlite)
-# - Chrome and Edge (*Bookmarks)
-# - Internet Explorer (*Favorites)
-# - Netscape (*.html)
-# - Markdown (*.md)
-# - Gemini (*.gmi)
-# - Surfraw (same as plain text)
-# - Plain text (any other extension)
-#
-# Default export format : <title> <url> <description>
-#
-# - <title> is your bookmark's name, alias, or webpage title.
-# - <url> is your bookmark's address, URL or URI.
-# - <description> is empty for Chrome, Edge, Internet Explorer, Netscape or
-#   Gemini. It contains Safari 'Description', Firefox 'Tags' and what the
-#   Markdown spec calls the 'Title' (just the tooltip, actually).
-# 
-# Markdown, Gemini and plain text files are processed line by line (as UTF-8) :
-#
-#   [markdown example](http://example.md/ "with description")
-#   => gemini://example.gmi gemini example
-#   plain text example http://example.txt with description
+# Documentation at bottom of script.
 #
 # Implementation Notes :
 #
@@ -39,8 +12,9 @@
 # - Since Firefox sets an EXCLUSIVE SQLite lock, a tmp DB file copy is used.
 # - sources are read as UTF-8.
 #
-# TODO :
-#
+# 2025.01.01 v0.35 jul : use 5.014
+#                        fixed exit status
+#                        added CSV and HTML output format
 # 2024.03.09 v0.34 jul : added support for netscape
 # 2022.12.22 v0.33 jul : fixed utf8 in stdout and firefox
 #                        fixed bug in POD (wrong repo URL)
@@ -72,7 +46,7 @@
 # 2018.09.21 v0.11 jul : added arg and -a
 # 2018.09.01 v0.10 jul : created
 
-use 5.010;
+use 5.014;
 use strict;
 use warnings;
 use utf8;
@@ -83,7 +57,7 @@ use File::Copy qw(copy);
 use open qw(:std :encoding(UTF-8));
 use Encode qw(decode_utf8);
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 my $program  = basename($0);
 my $usage    = <<EOF;
 
@@ -91,10 +65,10 @@ Usage: $program [-hVdas] [-f format] [file ...]
 
     -h, --help      help
     -V, --version   version
-    -d              debug
-    -a              all files : process arguments and default locations
-    -f format       any combination of letters t,u,d as title/url/description 
-                    (default : tud)
+    -d              debug (sent to STDERR)
+    -a              all : process arguments and default locations
+    -f format       export format : csv, csv-noheader, html, html-raw, or any combination
+                    of characters t,u,d as <title> <url> <description> (default : tud)
     -s              find schemeless URLs in text files (default : no)
 
 See `perldoc $program` for full documentation.
@@ -151,21 +125,25 @@ if (!@ARGV or $all)
 
 # option -f
 my %dispatch = (
-'t'     => sub { my ($t,$u,$d) = @_; say join ' ', grep {defined $_ and length $_} ($t);       },
-'tu'    => sub { my ($t,$u,$d) = @_; say join ' ', grep {defined $_ and length $_} ($t,$u);    },
-'tud'   => sub { my ($t,$u,$d) = @_; say join ' ', grep {defined $_ and length $_} ($t,$u,$d); },
-'tdu'   => sub { my ($t,$u,$d) = @_; say join ' ', grep {defined $_ and length $_} ($t,$d,$u); },
-'td'    => sub { my ($t,$u,$d) = @_; say join ' ', grep {defined $_ and length $_} ($t,$d);    },
-'u'     => sub { my ($t,$u,$d) = @_; say join ' ', grep {defined $_ and length $_} ($u);       },
-'ud'    => sub { my ($t,$u,$d) = @_; say join ' ', grep {defined $_ and length $_} ($u,$d);    },
-'udt'   => sub { my ($t,$u,$d) = @_; say join ' ', grep {defined $_ and length $_} ($u,$d,$t); },
-'utd'   => sub { my ($t,$u,$d) = @_; say join ' ', grep {defined $_ and length $_} ($u,$t,$d); },
-'ut'    => sub { my ($t,$u,$d) = @_; say join ' ', grep {defined $_ and length $_} ($u,$t);    },
-'d'     => sub { my ($t,$u,$d) = @_; say join ' ', grep {defined $_ and length $_} ($d);       },
-'du'    => sub { my ($t,$u,$d) = @_; say join ' ', grep {defined $_ and length $_} ($d,$u);    },
-'dut'   => sub { my ($t,$u,$d) = @_; say join ' ', grep {defined $_ and length $_} ($d,$u,$t); },
-'dtu'   => sub { my ($t,$u,$d) = @_; say join ' ', grep {defined $_ and length $_} ($d,$t,$u); },
-'dt'    => sub { my ($t,$u,$d) = @_; say join ' ', grep {defined $_ and length $_} ($d,$t);    },
+'t'             => sub { my ($t,$u,$d) = @_; say join ' ', grep {defined $_ and length $_} ($t);       },
+'tu'            => sub { my ($t,$u,$d) = @_; say join ' ', grep {defined $_ and length $_} ($t,$u);    },
+'tud'           => sub { my ($t,$u,$d) = @_; say join ' ', grep {defined $_ and length $_} ($t,$u,$d); },
+'tdu'           => sub { my ($t,$u,$d) = @_; say join ' ', grep {defined $_ and length $_} ($t,$d,$u); },
+'td'            => sub { my ($t,$u,$d) = @_; say join ' ', grep {defined $_ and length $_} ($t,$d);    },
+'u'             => sub { my ($t,$u,$d) = @_; say join ' ', grep {defined $_ and length $_} ($u);       },
+'ud'            => sub { my ($t,$u,$d) = @_; say join ' ', grep {defined $_ and length $_} ($u,$d);    },
+'udt'           => sub { my ($t,$u,$d) = @_; say join ' ', grep {defined $_ and length $_} ($u,$d,$t); },
+'utd'           => sub { my ($t,$u,$d) = @_; say join ' ', grep {defined $_ and length $_} ($u,$t,$d); },
+'ut'            => sub { my ($t,$u,$d) = @_; say join ' ', grep {defined $_ and length $_} ($u,$t);    },
+'d'             => sub { my ($t,$u,$d) = @_; say join ' ', grep {defined $_ and length $_} ($d);       },
+'du'            => sub { my ($t,$u,$d) = @_; say join ' ', grep {defined $_ and length $_} ($d,$u);    },
+'dut'           => sub { my ($t,$u,$d) = @_; say join ' ', grep {defined $_ and length $_} ($d,$u,$t); },
+'dtu'           => sub { my ($t,$u,$d) = @_; say join ' ', grep {defined $_ and length $_} ($d,$t,$u); },
+'dt'            => sub { my ($t,$u,$d) = @_; say join ' ', grep {defined $_ and length $_} ($d,$t);    },
+'csv'           => sub { my ($t,$u,$d) = @_; say '"' . join ('","', map { defined $_ and length $_  ? s/"/""/gr : "" } @_) . '"' . "\r"; },
+'csv-noheader'  => sub { my ($t,$u,$d) = @_; say '"' . join ('","', map { defined $_ and length $_  ? s/"/""/gr : "" } @_) . '"' . "\r"; },
+'html'          => sub { my ($t,$u,$d) = @_; say '    <DT><A HREF="' . $u . '">' . $t . '</A>'; },
+'html-raw'      => sub { my ($t,$u,$d) = @_; say '<A HREF="' . $u . '">' . $t . '</A>'; },
 );
 
 # printer function
@@ -544,10 +522,27 @@ sub _netscape {
 }
 
 
-############
-# RUN LOOP #
-############
+########
+# MAIN #
+########
 
+# header
+if ($format eq 'csv')
+{
+    say '"Title","URL","Description"' . "\r";
+}
+elsif ($format eq 'html')
+{
+	say "<!DOCTYPE NETSCAPE-Bookmark-file-1>
+    <!--This is an automatically generated file.
+    It will be read and overwritten.
+    Do Not Edit! -->
+    <Title>Bookmarks</Title>
+    <H1>Bookmarks</H1>
+    <DL>";
+}
+
+# body
 foreach my $file (@ARGV)
 {
     my $name = basename($file);
@@ -558,19 +553,25 @@ foreach my $file (@ARGV)
     elsif (-d $file and $name =~ /Favorites$/) { _iexplorer($file); }
     elsif (-f $file and $name =~ /\.md$/)      { _md($file);        }
     elsif (-f $file and $name =~ /\.gmi$/)     { _gemini($file);    }
-    elsif (-f $file and $name =~ /\.html$/)     { _netscape($file);  }
+    elsif (-f $file and $name =~ /\.html$/)    { _netscape($file);  }
     elsif (-f $file )                          { _txt($file);       } 
     elsif ( $file eq '-' )                     { _txt($file);       }
     else  { die "unable to process file : $file"; }
 }
 
-exit 1;
+# footer
+if ($format eq 'html')
+{
+	print "    </DL>";
+}
+
+exit 0;
 
 __END__
 
 =head1 NAME
 
-bookmarks - Export browser bookmarks as plain text.
+bookmarks - Export bookmarks from browsers and files.
 
 =head1 SYNOPSIS
 
@@ -578,18 +579,19 @@ bookmarks - Export browser bookmarks as plain text.
 
     -h, --help      help
     -V, --version   version
-    -d              debug
-    -a              all files : process arguments and default locations
-    -f format       any combination of letters t,u,d as title/url/description
-                    (default : tud)
+    -d              debug (sent to STDERR)
+    -a              all : process arguments and default locations
+    -f format       export format : csv, csv-noheader, html, html-raw, or any combination
+                    of characters t,u,d as <title> <url> <description> (default : tud)
     -s              find schemeless URLs in text files (default : no)
 
 =head1 DESCRIPTION
 
-bookmarks is a tool to export bookmarks from files supplied as arguments, or
-from browsers default locations (when called without arguments). If file is a
-dash "-", STDIN is read and processed as plain text source. The following
-sources are supported :
+bookmarks is a tool to export bookmarks from files supplied as arguments.
+Without arguments, or with option -a, bookmarks will attempt to read files from browsers default locations.
+If file is a dash "-", STDIN is read and processed as plain text source. 
+
+=head2 Supported sources :
 
 =over
 
@@ -613,25 +615,40 @@ sources are supported :
 
 =back
 
-Default export format : <title> <url> <description>
-
-=over
- 
-=item - <title> is your bookmark's name, alias, or webpage title.
-
-=item - <url> is your bookmark's address, URL or URI.
-
-=item - <description> is empty for Chrome, Edge, Internet Explorer, Netscape
-        or Gemini. It contains Safari 'Description', Firefox 'Tags' and what
-        the Markdown spec calls the 'Title' (just the tooltip, actually).
-
-=back
-
 Markdown, Gemini and plain text files are processed line by line (as UTF-8) :
 
     [markdown example](http://example.md/ "with description")
     => gemini://example.gmi gemini example
     plain text example http://example.txt with description
+
+=head2 Supported fields :
+
+=over
+ 
+=item - <title> is the name, alias or title.
+
+=item - <url> is the address, URL or URI.
+
+=item - <description> is only supported for Safari 'Description', Firefox 'Tags' and Markdown 'Title' (just the tooltip, actually).
+
+=back
+
+=head2 Output format :
+
+By default, fields <title> <url> <description> are exported as plain text. This can be changed by using option -f and specifying any combination of characters t,u,d.
+Other possible values :
+
+=over
+
+=item - csv : Comma-separated values with double-quotes and CR NL (RFC 4180).
+
+=item - csv-noheader : same as above, without header line.
+
+=item - html : Netscape Bookmarks File Format.
+
+=item - html-raw : raw list of HTML <A> elements.
+
+=back
 
 =head1 BUGS
 
@@ -644,7 +661,7 @@ jul, C<kaldor@cpan.org>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2019-2021 by jul.
+This software is Copyright (c) 2019-2025 by jul.
 
 This is free software, licensed under:
 

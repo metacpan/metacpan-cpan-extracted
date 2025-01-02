@@ -1,6 +1,6 @@
 use 5.38.0;
 use experimental 'class';
-our $VERSION = 0.03;
+our $VERSION = 0.07;
 class Game::Snake::Head {
 	use Raylib::FFI;
 	use Game::Snake::Sprite;
@@ -77,16 +77,11 @@ class Game::Snake::Head {
 			$sprite->x(256);
 		}
 		$sprite->draw($x, $y, $width, $height);
-=pod
-		my $rectangle = Raylib::FFI::Rectangle->new(
-			x => $x,
-			y => $y,
-			width => $width,
-			height => $height
-		);
-		DrawRectangleRec($rectangle, Raylib::Color::GRAY);
-=cut
 	}
 }
 
 1;
+
+=pod
+
+=cut

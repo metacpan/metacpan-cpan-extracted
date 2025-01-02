@@ -1,6 +1,6 @@
 package Slackware::SBoKeeper;
 use 5.016;
-our $VERSION = '2.00';
+our $VERSION = '2.01';
 use strict;
 use warnings;
 
@@ -38,7 +38,7 @@ Commands:
   depwant                Show missing dependencies for pkgs.
   depextra               Show extraneous dependencies for pkgs.
   unmanual  <pkgs>       Unset pkg(s) as manually added.
-  print     <cat>        Print all pkgs in specified category.
+  print     <cats>       Print all pkgs in specified categories.
   tree      <pkgs>       Print dependency tree.
   dump                   Dump database.
   help      <cmd>        Print cmd help message.
@@ -47,6 +47,7 @@ Options:
   -c <path>   --config=<path>         Specify config file location.
   -d <path>   --datafile=<path>       Specify data file location.
   -s <path>   --sbodir=<path>         Specify SBo directory.
+  -t <tag>    --tag=<tag>             Specify SlackBuild package tag.
   -y          --yes                   Automatically agree to all prompts.
   -h          --help                  Print help message and exit.
   -v          --version               Print version + copyright info and exit.
@@ -55,7 +56,7 @@ END
 my $VERSION_MSG = <<END;
 $PRGNAM $PRGVER
 
-Copyright (C) 2024 Samuel Young
+Copyright (C) 2024-2025 Samuel Young
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of either: the GNU General Public License as published by the Free
@@ -159,10 +160,10 @@ Unset one or more packages as being manually installed, but do not remove them
 from database.
 END
 	'print' => <<END,
-Usage: print [<cat>]
+Usage: print [<cat> ...]
 
-Print the names of each package in specified category. The following are valid
-categories:
+Prints a unique list of packages in the specified categories. The following are
+valid categories:
 
   all           All added packages
   manual        Packages added manually
@@ -171,7 +172,7 @@ categories:
   unnecessary   Packages not manually added and not depended on by another
   missing       Missing dependencies
 
-If category is not specified, defaults to 'all'.
+If no category is specified, defaults to 'all'.
 END
 	'tree' => <<END,
 Usage: tree [<pkgs>] ...
@@ -349,6 +350,11 @@ my $CONFIG_READERS = {
 		return $val;
 
 	},
+	'Tag' => sub {
+
+		return shift;
+
+	},
 	'PkgtoolLogs' => sub {
 
 		warn "'PkgtoolLogs' is deprecated\n";
@@ -374,10 +380,11 @@ sub get_default_sbopath {
 		'02_sbotools2' => "/usr/sbo/repo",
 		'03_sbpkg'     => "/var/lib/sbpkg/SBo/$SLACKWARE_VERSION",
 		'04_slpkg'     => "/var/lib/slpkg/repos/sbo",
-		# sboui should be last as it is encouraged to be used with other
+		'05_slackrepo' => "/var/lib/slackrepo/SBo/slackbuilds",
+		# sboui should be last as it can be used with other
 		# package management tools, meaning if it is installed along with
 		# another manager it could possibly be using their default repo.
-		'05_sboui'     => "/var/lib/sboui/repo",
+		'06_sboui'     => "/var/lib/sboui/repo",
 	);
 
 	foreach my $m (sort keys %sbopaths) {
@@ -767,7 +774,7 @@ sub pull {
 		$self->{SBoPath}
 	);
 
-	my @installed = Slackware::SBoKeeper::System->packages_by_tag('_SBo');
+	my @installed = Slackware::SBoKeeper::System->packages_by_tag($self->{Tag});
 
 	my @pull;
 
@@ -816,8 +823,12 @@ sub diff {
 		$self->{SBoPath}
 	);
 
-	my %installed = map { $_ => 1 } Slackware::SBoKeeper::System->packages_by_tag('_SBo');
-	my %added     = map { $_ => 1 } $sbokeeper->packages('all');
+	my %installed =
+		map { $_ => 1 }
+		Slackware::SBoKeeper::System->packages_by_tag($self->{Tag})
+	;
+
+	my %added = map { $_ => 1 } $sbokeeper->packages('all');
 
 	my (@idiff, @adiff);
 
@@ -834,15 +845,27 @@ sub diff {
 		return;
 	}
 
+	# Tell the user if the packages that differ are actually in the repo or
+	# not.
+	@idiff =
+		map { $sbokeeper->exists($_) ? $_ : "$_ (does not exist in repo)" }
+		sort @idiff
+	;
+	# This shouldn't happen, but we'll check for consistency's sake.
+	@adiff =
+		map { $sbokeeper->exists($_) ? $_ : "$_ (does not exist in repo)" }
+		sort @adiff
+	;
+
 	if (@idiff) {
 		printf "Packages found installed on system that are not present in database:\n";
-		print_package_list('  ', sort @idiff);
+		print_package_list('  ', @idiff);
 		printf "\n" if @adiff;
 	}
 
 	if (@adiff) {
 		printf "Packages found in database that are not installed on system:\n";
-		print_package_list('  ', sort @adiff);
+		print_package_list('  ', @adiff);
 	}
 
 }
@@ -937,17 +960,21 @@ sub sbokeeper_print {
 
 	my $self = shift;
 
-	my $cat = $self->{Args}->[0] || 'all';
+	my @cat = @{$self->{Args}};
 
-	# Let's accept aliases too
-	$cat = substr $cat, 1 if $cat =~ /^@/;
+	@cat = ('all') unless @cat;
 
 	my $sbokeeper = Slackware::SBoKeeper::Database->new(
 		$self->{DataFile},
 		$self->{SBoPath}
 	);
 
-	my @pkgs = $sbokeeper->packages($cat);
+	my @pkgs =
+		uniq sort
+		map { $sbokeeper->packages($_) }
+		# Get rid of alias '@' if present
+		map { s/^@//r } @cat
+	;
 
 	print_package_list('', @pkgs) if @pkgs;
 
@@ -1027,6 +1054,7 @@ sub init {
 		ConfigFile  => '',
 		DataFile    => '',
 		SBoPath     => '',
+		Tag         => '',
 		YesAll      => 0,
 		Command     => '',
 		Args        => [],
@@ -1037,6 +1065,7 @@ sub init {
 		'config|c=s'       => \$self->{ConfigFile},
 		'datafile|d=s'     => \$self->{DataFile},
 		'sbodir|s=s'       => \$self->{SBoPath},
+		'tag|t=s'          => \$self->{Tag},
 		'yes|y'            => \$self->{YesAll},
 		'help|h'           => sub { print $HELP_MSG;    exit 0 },
 		'version|v'        => sub { print $VERSION_MSG; exit 0 },
@@ -1076,6 +1105,8 @@ sub init {
 		die "SlackBuild repo directory $self->{SBoPath} does not exit or " .
 		    "is not a directory\n";
 	}
+
+	$self->{Tag} ||= '_SBo';
 
 	return bless $self, $class;
 
@@ -1199,7 +1230,7 @@ Report bugs on my Codeberg, E<lt>https://codeberg.org/1-1samE<gt>.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2024 Samuel Young
+Copyright (C) 2024-2025 Samuel Young
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of either: the GNU General Public License as published by the Free

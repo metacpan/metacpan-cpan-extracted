@@ -5,7 +5,7 @@ use English;
 use Error::Pure::Utils qw(clean);
 use Test::More 'tests' => 3;
 use Test::NoWarnings;
-use Test::Shared::Fixture::Wikibase::Datatype::Item::Wikidata::Dog;
+use Test::Shared::Fixture::Wikibase::Datatype::Item::Wikidata::Dog 0.36;
 use Unicode::UTF8 qw(decode_utf8);
 use Wikibase::Datatype::Print::Item;
 
@@ -28,6 +28,7 @@ Statements:
   P31: Q55983715 (normal)
    P642: Q20717272
    P642: Q26972265
+  P123456789: 4 (normal)
 END
 chomp $right_ret;
 is($ret, $right_ret, 'Get printed value.');

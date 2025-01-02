@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More 'tests' => 3;
+use Test::More 'tests' => 4;
 use Test::NoWarnings;
 use Wikibase::Datatype::Value::Quantity;
 
@@ -18,4 +18,12 @@ $obj = Wikibase::Datatype::Value::Quantity->new(
 	'value' => '10',
 );
 $ret = $obj->lower_bound;
-is($ret, 9, 'Get explicit lower_bound().');
+is($ret, 9, 'Get explicit lower_bound() (9).');
+
+# Test.
+$obj = Wikibase::Datatype::Value::Quantity->new(
+	'lower_bound' => 10,
+	'value' => '10',
+);
+$ret = $obj->lower_bound;
+is($ret, 10, 'Get explicit lower_bound() (10).');

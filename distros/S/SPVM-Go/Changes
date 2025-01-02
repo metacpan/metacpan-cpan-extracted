@@ -1,3 +1,22 @@
+0.008001 2025-01-02
+  [Bug Fix]
+    * Fix a potential bug that the argument width on a method call is wrong.
+    
+0.008 2024-10-18
+  [Document Improvemetn]
+    * Add docs for Go::Error::IOTimeout.
+  
+  [Exception Improvement]
+  
+    * Improve an exception message in Go::Channel#read method.
+    * Improve an exception message in Go::Channel#write method.
+  [New Features]
+    * Add Go#ENV_DEBUG method.
+    * Add SPVM_GO_DEBUG environment variable.
+  
+  [Bug Fix]
+    * Fix a bug that poll IO timeout logic was wrong.
+    
 0.007003 2024-06-10
   [Requrement Changes]
     * Require SPVM::Sys 0.523.

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More 'tests' => 2;
+use Test::More 'tests' => 4;
 use Test::NoWarnings;
 use Test::Shared::Fixture::Wikibase::Datatype::Item::Wikidata::Dog;
 use Unicode::UTF8 qw(decode_utf8);
@@ -18,5 +18,33 @@ is_deeply(
 	[
 		'Description: domestic animal (en)',
 	],
-	'Print description test.',
+	'Print description test (one language, lang is en).',
+);
+
+# Test.
+$obj = Test::Shared::Fixture::Wikibase::Datatype::Item::Wikidata::Dog->new;
+@ret = print_descriptions($obj, { 'lang' => '', 'texts' => texts() },
+	\&Wikibase::Datatype::Print::Value::Monolingual::print);
+is_deeply(
+	\@ret,
+	[
+		'Description:',
+		decode_utf8('  domácí zvíře (cs)'),
+		'  domestic animal (en)',
+	],
+	'Print description test (all languages, lang is blank string).',
+);
+
+# Test.
+$obj = Test::Shared::Fixture::Wikibase::Datatype::Item::Wikidata::Dog->new;
+@ret = print_descriptions($obj, { 'texts' => texts() },
+	\&Wikibase::Datatype::Print::Value::Monolingual::print);
+is_deeply(
+	\@ret,
+	[
+		'Description:',
+		decode_utf8('  domácí zvíře (cs)'),
+		'  domestic animal (en)',
+	],
+	'Print description test (all languages, lang is not defined).',
 );

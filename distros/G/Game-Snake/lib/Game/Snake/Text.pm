@@ -1,6 +1,6 @@
 use 5.38.0;
 use experimental 'class';
-our $VERSION = 0.03;
+our $VERSION = 0.07;
 class Game::Snake::Text {
         use Raylib::FFI;
         use Raylib::Color;
@@ -23,3 +23,7 @@ class Game::Snake::Text {
 }
 
 1;
+
+=pod
+
+=cut

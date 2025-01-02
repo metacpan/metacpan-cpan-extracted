@@ -65,7 +65,7 @@ These routines accept either float or double ndarrays.
 
 =for sig
 
-  Signature: (complex [phys]DL(n);complex  [phys]D(n);complex  [phys]DU(n);complex  [io,phys]B(n,nrhs); int [o,phys]info())
+  Signature: (complex [io]DL(n);complex  [io]D(n);complex  [io]DU(n);complex  [io]B(n,nrhs); int [o]info())
 
 =for ref
 
@@ -225,7 +225,7 @@ sub PDL::cggsvd {
 
 =for sig
 
-  Signature: (complex A(n,n); int jobvl(); int jobvr();complex  [o]w(n);complex  [o]vl(m,m);complex  [o]vr(p,p); int [o]info(); [t]rwork(rworkn=CALC(2*$SIZE(n))))
+  Signature: (complex [io]A(n,n); int jobvl(); int jobvr();complex  [o]w(n);complex  [o]vl(m,m);complex  [o]vr(p,p); int [o]info(); [t]rwork(rworkn=CALC(2*$SIZE(n))))
 
 =for ref
 
@@ -277,7 +277,7 @@ sub PDL::cgeevx {
 
 =for sig
 
-  Signature: (complex A(n,n); int [phys]jobvl();int [phys]jobvr();complex B(n,n);complex [o]alpha(n);complex [o]beta(n);complex [o]VL(m,m);complex [o]VR(p,p);int [o]info(); [t]rwork(rworkn=CALC(8*$SIZE(n))))
+  Signature: (complex [io]A(n,n); int jobvl();int jobvr();complex [io]B(n,n);complex [o]alpha(n);complex [o]beta(n);complex [o]VL(m,m);complex [o]VR(p,p);int [o]info(); [t]rwork(rworkn=CALC(8*$SIZE(n))))
 
 =for ref
 
@@ -303,7 +303,7 @@ sub PDL::cggev {
 
 =for sig
 
-  Signature: (complex [io,phys]A(n,n);int balanc();int jobvl();int jobvr();int sense();complex [io,phys]B(n,n);complex [o]alpha(n);complex [o]beta(n);complex [o]VL(m,m);complex [o]VR(p,p);int [o]ilo();int [o]ihi();[o]lscale(n);[o]rscale(n);[o]abnrm();[o]bbnrm();[o]rconde(r);[o]rcondv(s);int [o]info(); [t]rwork(rworkn=CALC(6*$SIZE(n))); int [t]bwork(bworkn); int [t]iwork(iworkn))
+  Signature: (complex [io]A(n,n);int balanc();int jobvl();int jobvr();int sense();complex [io]B(n,n);complex [o]alpha(n);complex [o]beta(n);complex [o]VL(m,m);complex [o]VR(p,p);int [o]ilo();int [o]ihi();[o]lscale(n);[o]rscale(n);[o]abnrm();[o]bbnrm();[o]rconde(r);[o]rcondv(s);int [o]info(); [t]rwork(rworkn=CALC(6*$SIZE(n))); int [t]bwork(bworkn); int [t]iwork(iworkn))
 
 =for ref
 
@@ -507,7 +507,7 @@ sub PDL::cheev {
 
 =for sig
 
-  Signature: (complex [io,phys]A(n,n);  int jobz(); int uplo(); [o,phys]w(n); int [o,phys]info())
+  Signature: (complex [io]A(n,n);  int jobz(); int uplo(); [o]w(n); int [o]info())
 
 =for ref
 
@@ -533,7 +533,7 @@ sub PDL::cheevd {
 
 =for sig
 
-  Signature: (complex A(n,n);  int jobz(); int range(); int uplo(); vl(); vu(); int il(); int iu(); abstol(); int [o]m(); [o]w(n);complex  [o]z(p,p);int [o]ifail(n); int [o]info(); [t]rwork(rworkn=CALC(7*$SIZE(n))); int [t]iwork(iworkn=CALC(5*$SIZE(n))))
+  Signature: (complex [io]A(n,n);  int jobz(); int range(); int uplo(); vl(); vu(); int il(); int iu(); abstol(); int [o]m(); [o]w(n);complex  [o]z(p,p);int [o]ifail(n); int [o]info(); [t]rwork(rworkn=CALC(7*$SIZE(n))); int [t]iwork(iworkn=CALC(5*$SIZE(n))))
 
 =for ref
 
@@ -559,7 +559,7 @@ sub PDL::cheevx {
 
 =for sig
 
-  Signature: (complex [phys]A(n,n);  int jobz(); int range(); int uplo(); [phys]vl(); [phys]vu(); int [phys]il(); int [phys]iu(); [phys]abstol(); int [o,phys]m(); [o,phys]w(n);complex  [o,phys]z(p,q);int [o,phys]isuppz(r); int [o,phys]info())
+  Signature: (complex [io]A(n,n);  int jobz(); int range(); int uplo(); vl(); vu(); int il(); int iu(); abstol(); int [o]m(); [o]w(n);complex  [o]z(p,q);int [o]isuppz(r); int [o]info())
 
 =for ref
 
@@ -611,7 +611,7 @@ sub PDL::chegv {
 
 =for sig
 
-  Signature: (complex [io,phys]A(n,n);int [phys]itype();int jobz(); int uplo();complex [io,phys]B(n,n);[o,phys]w(n); int [o,phys]info())
+  Signature: (complex [io]A(n,n);int itype();int jobz(); int uplo();complex [io]B(n,n);[o]w(n); int [o]info())
 
 =for ref
 
@@ -667,7 +667,7 @@ sub PDL::chegvx {
 
 =for sig
 
-  Signature: (complex [io,phys]A(n,n);complex   [io,phys]B(n,m); int [o,phys]ipiv(n); int [o,phys]info())
+  Signature: (complex [io]A(n,n);complex   [io]B(n,m); int [o]ipiv(n); int [o]info())
 
 =for ref
 
@@ -724,7 +724,7 @@ sub PDL::cgesvx {
 
 =for sig
 
-  Signature: (complex [io,phys]A(n,n);  int uplo();complex  [io,phys]B(n,m); int [o]ipiv(n); int [o]info())
+  Signature: (complex [io]A(n,n);  int uplo();complex  [io]B(n,m); int [o]ipiv(n); int [o]info())
 
 =for ref
 
@@ -750,7 +750,7 @@ sub PDL::csysv {
 
 =for sig
 
-  Signature: (complex [phys]A(n,n); int uplo(); int fact();complex  [phys]B(n,m);complex  [io,phys]af(n,n); int [io,phys]ipiv(n);complex  [o]X(n,m); [o]rcond(); [o]ferr(m); [o]berr(m); int [o]info(); [t]rwork(n))
+  Signature: (complex A(n,n); int uplo(); int fact();complex  B(n,m);complex  [io]af(n,n); int [io]ipiv(n);complex  [o]X(n,m); [o]rcond(); [o]ferr(m); [o]berr(m); int [o]info(); [t]rwork(n))
 
 =for ref
 
@@ -776,7 +776,7 @@ sub PDL::csysvx {
 
 =for sig
 
-  Signature: (complex [io,phys]A(n,n);  int uplo();complex  [io,phys]B(n,m); int [o,phys]ipiv(n); int [o,phys]info())
+  Signature: (complex [io]A(n,n);  int uplo();complex  [io]B(n,m); int [o]ipiv(n); int [o]info())
 
 =for ref
 
@@ -828,7 +828,7 @@ sub PDL::chesvx {
 
 =for sig
 
-  Signature: (complex [io,phys]A(n,n);  int uplo();complex  [io,phys]B(n,m); int [o,phys]info())
+  Signature: (complex [io]A(n,n);  int uplo();complex  [io]B(n,m); int [o]info())
 
 =for ref
 
@@ -880,7 +880,7 @@ sub PDL::cposvx {
 
 =for sig
 
-  Signature: (complex [io,phys]A(m,n); int trans();complex  [io,phys]B(p,q);int [o,phys]info())
+  Signature: (complex [io]A(m,n); int trans();complex  [io]B(p,q);int [o]info())
 
 =for ref
 
@@ -989,7 +989,7 @@ sub PDL::cgelsd {
 
 =for sig
 
-  Signature: (complex [phys]A(m,n);complex  [phys]B(p,n);complex [io,phys]c(m);complex [phys]d(p);complex [o,phys]x(n);int [o,phys]info())
+  Signature: (complex [io]A(m,n);complex  [io]B(p,n);complex [io]c(m);complex [io]d(p);complex [o]x(n);int [o]info())
 
 =for ref
 
@@ -1015,7 +1015,7 @@ sub PDL::cgglse {
 
 =for sig
 
-  Signature: (complex [phys]A(n,m);complex  [phys]B(n,p);complex [phys]d(n);complex [o,phys]x(m);complex [o,phys]y(p);int [o,phys]info())
+  Signature: (complex [io]A(n,m);complex  [io]B(n,p);complex [io]d(n);complex [o]x(m);complex [o]y(p);int [o]info())
 
 =for ref
 
@@ -1093,7 +1093,7 @@ sub PDL::cgetf2 {
 
 =for sig
 
-  Signature: (complex [io,phys]A(n,n); int uplo(); int [o,phys]ipiv(n); int [o,phys]info())
+  Signature: (complex [io]A(n,n); int uplo(); int [o]ipiv(n); int [o]info())
 
 =for ref
 
@@ -1119,7 +1119,7 @@ sub PDL::csytrf {
 
 =for sig
 
-  Signature: (complex [io,phys]A(n,n); int uplo(); int [o,phys]ipiv(n); int [o,phys]info())
+  Signature: (complex [io]A(n,n); int uplo(); int [o]ipiv(n); int [o]info())
 
 =for ref
 
@@ -1197,7 +1197,7 @@ sub PDL::chetf2 {
 
 =for sig
 
-  Signature: (complex [io,phys]A(n,n); int uplo(); int [o,phys]info())
+  Signature: (complex [io]A(n,n); int uplo(); int [o]info())
 
 =for ref
 
@@ -1223,7 +1223,7 @@ sub PDL::cpotrf {
 
 =for sig
 
-  Signature: (complex [io,phys]A(n,n); int uplo(); int [o,phys]info())
+  Signature: (complex [io]A(n,n); int uplo(); int [o]info())
 
 =for ref
 
@@ -1249,7 +1249,7 @@ sub PDL::cpotf2 {
 
 =for sig
 
-  Signature: (complex [io,phys]A(n,n); int [phys]ipiv(n); int [o,phys]info())
+  Signature: (complex [io]A(n,n); int ipiv(n); int [o]info())
 
 =for ref
 
@@ -1327,7 +1327,7 @@ sub PDL::chetri {
 
 =for sig
 
-  Signature: (complex [io,phys]A(n,n); int uplo(); int [o,phys]info())
+  Signature: (complex [io]A(n,n); int uplo(); int [o]info())
 
 =for ref
 
@@ -1353,7 +1353,7 @@ sub PDL::cpotri {
 
 =for sig
 
-  Signature: (complex [io,phys]A(n,n); int uplo(); int diag(); int [o,phys]info())
+  Signature: (complex [io]A(n,n); int uplo(); int diag(); int [o]info())
 
 =for ref
 
@@ -1379,7 +1379,7 @@ sub PDL::ctrtri {
 
 =for sig
 
-  Signature: (complex [io,phys]A(n,n); int uplo(); int diag(); int [o,phys]info())
+  Signature: (complex [io]A(n,n); int uplo(); int diag(); int [o]info())
 
 =for ref
 
@@ -1405,7 +1405,7 @@ sub PDL::ctrti2 {
 
 =for sig
 
-  Signature: (complex [phys]A(n,n); int trans();complex  [io,phys]B(n,m); int [phys]ipiv(n); int [o,phys]info())
+  Signature: (complex A(n,n); int trans();complex  [io]B(n,m); int ipiv(n); int [o]info())
 
 =for ref
 
@@ -1437,7 +1437,7 @@ sub PDL::cgetrs {
 
 =for sig
 
-  Signature: (complex [phys]A(n,n); int uplo();complex [io,phys]B(n,m); int [phys]ipiv(n); int [o,phys]info())
+  Signature: (complex A(n,n); int uplo();complex [io]B(n,m); int ipiv(n); int [o]info())
 
 =for ref
 
@@ -1463,7 +1463,7 @@ sub PDL::csytrs {
 
 =for sig
 
-  Signature: (complex [phys]A(n,n); int uplo();complex [io,phys]B(n,m); int [phys]ipiv(n); int [o,phys]info())
+  Signature: (complex A(n,n); int uplo();complex [io]B(n,m); int ipiv(n); int [o]info())
 
 =for ref
 
@@ -1489,7 +1489,7 @@ sub PDL::chetrs {
 
 =for sig
 
-  Signature: (complex [phys]A(n,n); int uplo();complex  [io,phys]B(n,m); int [o,phys]info())
+  Signature: (complex A(n,n); int uplo();complex  [io]B(n,m); int [o]info())
 
 =for ref
 
@@ -1515,7 +1515,7 @@ sub PDL::cpotrs {
 
 =for sig
 
-  Signature: (complex [phys]A(n,n); int uplo(); int trans(); int diag();complex [io,phys]B(n,m); int [o,phys]info())
+  Signature: (complex A(n,n); int uplo(); int trans(); int diag();complex [io]B(n,m); int [o]info())
 
 =for ref
 
@@ -1547,7 +1547,7 @@ sub PDL::ctrtrs {
 
 =for sig
 
-  Signature: (complex [phys]A(n,n); int uplo(); int trans(); int diag(); int normin();complex [io,phys]x(n); [o,phys]scale();[io,phys]cnorm(n);int [o,phys]info())
+  Signature: (complex A(n,n); int uplo(); int trans(); int diag(); int normin();complex [io]x(n); [o]scale();[io]cnorm(n);int [o]info())
 
 =for ref
 
@@ -1735,7 +1735,7 @@ sub PDL::cgeqp3 {
 
 =for sig
 
-  Signature: (complex [io,phys]A(m,n);complex  [o,phys]tau(k); int [o,phys]info())
+  Signature: (complex [io]A(m,n);complex  [o]tau(k); int [o]info())
 
 =for ref
 
@@ -1761,7 +1761,7 @@ sub PDL::cgeqrf {
 
 =for sig
 
-  Signature: (complex [io,phys]A(m,n);complex  [phys]tau(k); int [o,phys]info())
+  Signature: (complex [io]A(m,n);complex  tau(k); int [o]info())
 
 =for ref
 
@@ -1787,7 +1787,7 @@ sub PDL::cungqr {
 
 =for sig
 
-  Signature: (complex [phys]A(p,k); int side(); int trans();complex  [phys]tau(k);complex  [io,phys]C(m,n);int [o,phys]info())
+  Signature: (complex A(p,k); int side(); int trans();complex  tau(k);complex  [io]C(m,n);int [o]info())
 
 =for ref
 
@@ -1813,7 +1813,7 @@ sub PDL::cunmqr {
 
 =for sig
 
-  Signature: (complex [io,phys]A(m,n);complex  [o,phys]tau(k); int [o,phys]info())
+  Signature: (complex [io]A(m,n);complex  [o]tau(k); int [o]info())
 
 =for ref
 
@@ -1839,7 +1839,7 @@ sub PDL::cgelqf {
 
 =for sig
 
-  Signature: (complex [io,phys]A(m,n);complex  [phys]tau(k); int [o,phys]info())
+  Signature: (complex [io]A(m,n);complex  tau(k); int [o]info())
 
 =for ref
 
@@ -1865,7 +1865,7 @@ sub PDL::cunglq {
 
 =for sig
 
-  Signature: (complex [phys]A(k,p); int side(); int trans();complex  [phys]tau(k);complex  [io,phys]C(m,n);int [o,phys]info())
+  Signature: (complex A(k,p); int side(); int trans();complex  tau(k);complex  [io]C(m,n);int [o]info())
 
 =for ref
 
@@ -1891,7 +1891,7 @@ sub PDL::cunmlq {
 
 =for sig
 
-  Signature: (complex [io,phys]A(m,n);complex  [o,phys]tau(k); int [o,phys]info())
+  Signature: (complex [io]A(m,n);complex  [o]tau(k); int [o]info())
 
 =for ref
 
@@ -1917,7 +1917,7 @@ sub PDL::cgeqlf {
 
 =for sig
 
-  Signature: (complex [io,phys]A(m,n);complex  [phys]tau(k); int [o,phys]info())
+  Signature: (complex [io]A(m,n);complex  tau(k); int [o]info())
 
 =for ref
 Complex version of L<PDL::LinearAlgebra::Real/orgql>.
@@ -1942,7 +1942,7 @@ sub PDL::cungql {
 
 =for sig
 
-  Signature: (complex [phys]A(p,k); int side(); int trans();complex  [phys]tau(k);complex  [io,phys]C(m,n);int [o,phys]info())
+  Signature: (complex A(p,k); int side(); int trans();complex  tau(k);complex  [io]C(m,n);int [o]info())
 
 =for ref
 
@@ -1968,7 +1968,7 @@ sub PDL::cunmql {
 
 =for sig
 
-  Signature: (complex [io,phys]A(m,n);complex  [o,phys]tau(k); int [o,phys]info())
+  Signature: (complex [io]A(m,n);complex  [o]tau(k); int [o]info())
 
 =for ref
 
@@ -1994,7 +1994,7 @@ sub PDL::cgerqf {
 
 =for sig
 
-  Signature: (complex [io,phys]A(m,n);complex  [phys]tau(k); int [o,phys]info())
+  Signature: (complex [io]A(m,n);complex  tau(k); int [o]info())
 
 =for ref
 
@@ -2020,7 +2020,7 @@ sub PDL::cungrq {
 
 =for sig
 
-  Signature: (complex [phys]A(k,p); int side(); int trans();complex  [phys]tau(k);complex  [io,phys]C(m,n);int [o,phys]info())
+  Signature: (complex A(k,p); int side(); int trans();complex  tau(k);complex  [io]C(m,n);int [o]info())
 
 =for ref
 
@@ -2046,7 +2046,7 @@ sub PDL::cunmrq {
 
 =for sig
 
-  Signature: (complex [io,phys]A(m,n);complex  [o,phys]tau(k); int [o,phys]info())
+  Signature: (complex [io]A(m,n);complex  [o]tau(k); int [o]info())
 
 =for ref
 
@@ -2072,7 +2072,7 @@ sub PDL::ctzrzf {
 
 =for sig
 
-  Signature: (complex [phys]A(k,p); int side(); int trans();complex  [phys]tau(k);complex  [io,phys]C(m,n);int [o,phys]info())
+  Signature: (complex A(k,p); int side(); int trans();complex  tau(k);complex  [io]C(m,n);int [o]info())
 
 =for ref
 
@@ -2098,7 +2098,7 @@ sub PDL::cunmrz {
 
 =for sig
 
-  Signature: (complex [io,phys]A(n,n); int [phys]ilo();int [phys]ihi();complex [o,phys]tau(k); int [o,phys]info())
+  Signature: (complex [io]A(n,n); int ilo();int ihi();complex [o]tau(k); int [o]info())
 
 =for ref
 
@@ -2124,7 +2124,7 @@ sub PDL::cgehrd {
 
 =for sig
 
-  Signature: (complex [io,phys]A(n,n); int [phys]ilo();int [phys]ihi();complex [phys]tau(k); int [o,phys]info())
+  Signature: (complex [io]A(n,n); int ilo();int ihi();complex tau(k); int [o]info())
 
 =for ref
 
@@ -2150,7 +2150,7 @@ sub PDL::cunghr {
 
 =for sig
 
-  Signature: (complex [io,phys]H(n,n); int job();int compz();int [phys]ilo();int [phys]ihi();complex [o,phys]w(n);complex  [o,phys]Z(m,m); int [o,phys]info())
+  Signature: (complex [io]H(n,n); int job();int compz();int ilo();int ihi();complex [o]w(n);complex  [o]Z(m,m); int [o]info())
 
 =for ref
 
@@ -2176,7 +2176,7 @@ sub PDL::chseqr {
 
 =for sig
 
-  Signature: (complex [io]T(n,n); int side();int howmny();int select(q);complex [o]VL(m,m);complex  [o]VR(p,p);int [o]m(); int [o]info(); [t]work(workn=CALC(5*$SIZE(n))))
+  Signature: (complex T(n,n); int side();int howmny();int select(q);complex [o]VL(m,m);complex  [o]VR(p,p);int [o]m(); int [o]info(); [t]work(workn=CALC(5*$SIZE(n))))
 
 =for ref
 
@@ -2202,7 +2202,7 @@ sub PDL::ctrevc {
 
 =for sig
 
-  Signature: (complex [io]A(n,n); int side();int howmny();complex  [io]B(n,n);int select(q);complex [o]VL(m,m);complex  [o]VR(p,p);int [o]m(); int [o]info(); [t]work(workn=CALC(6*$SIZE(n))))
+  Signature: (complex A(n,n); int side();int howmny();complex  B(n,n);int select(q);complex [o]VL(m,m);complex  [o]VR(p,p);int [o]m(); int [o]info(); [t]work(workn=CALC(6*$SIZE(n))))
 
 =for ref
 
@@ -2228,7 +2228,7 @@ sub PDL::ctgevc {
 
 =for sig
 
-  Signature: (complex [io,phys]A(n,n); int job(); int [o,phys]ilo();int [o,phys]ihi();[o,phys]scale(n); int [o,phys]info())
+  Signature: (complex [io]A(n,n); int job(); int [o]ilo();int [o]ihi();[o]scale(n); int [o]info())
 
 =for ref
 
@@ -2332,7 +2332,7 @@ sub PDL::clantr {
 
 =for sig
 
-  Signature: (complex [phys]A(m,n); int transa(); int transb();complex  [phys]B(p,q);complex [phys]alpha();complex  [phys]beta();complex  [io,phys]C(r,s))
+  Signature: (complex A(m,n); int transa(); int transb();complex  B(p,q);complex alpha();complex  beta();complex  [io]C(r,s))
 
 =for ref
 
@@ -2368,7 +2368,7 @@ sub PDL::cgemm {
 
 =for sig
 
-  Signature: (complex [phys]A(m,n);complex  [phys]B(p,m);complex  [o,phys]C(p,n))
+  Signature: (complex A(m,n);complex  B(p,m);complex  [o]C(p,n))
 
 =for ref
 
@@ -2394,7 +2394,7 @@ sub PDL::cmmult {
 
 =for sig
 
-  Signature: (complex [phys]A(n,m);complex  [phys]B(p,m);complex  [o,phys]C(p,n))
+  Signature: (complex A(n,m);complex  B(p,m);complex  [o]C(p,n))
 
 =for ref
 
@@ -2420,7 +2420,7 @@ sub PDL::ccrossprod {
 
 =for sig
 
-  Signature: (complex [phys]A(m,n); int uplo(); int trans();complex  [phys]alpha();complex  [phys]beta();complex  [io,phys]C(p,p))
+  Signature: (complex A(m,n); int uplo(); int trans();complex  alpha();complex  beta();complex  [io]C(p,p))
 
 =for ref
 
@@ -2446,7 +2446,7 @@ sub PDL::csyrk {
 
 =for sig
 
-  Signature: (complex [phys]a(n);complex [phys]b(n);complex [o]c())
+  Signature: (complex a(n);complex b(n);complex [o]c())
 
 =for ref
 
@@ -2472,7 +2472,7 @@ sub PDL::cdot {
 
 =for sig
 
-  Signature: (complex [phys]a(n);complex [phys]b(n);complex [o,phys]c())
+  Signature: (complex a(n);complex b(n);complex [o]c())
 
 =for ref
 
@@ -2499,7 +2499,7 @@ sub PDL::cdotc {
 
 =for sig
 
-  Signature: (complex [phys]a(n);complex [phys] alpha();complex [io,phys]b(n))
+  Signature: (complex a(n);complex  alpha();complex [io]b(n))
 
 =for ref
 
@@ -2525,7 +2525,7 @@ sub PDL::caxpy {
 
 =for sig
 
-  Signature: (complex [phys]a(n);[o]b())
+  Signature: (complex a(n);[o]b())
 
 =for ref
 
@@ -2551,7 +2551,7 @@ sub PDL::cnrm2 {
 
 =for sig
 
-  Signature: (complex [phys]a(n);[o]b())
+  Signature: (complex a(n);[o]b())
 
 =for ref
 
@@ -2577,7 +2577,7 @@ sub PDL::casum {
 
 =for sig
 
-  Signature: (complex [io,phys]a(n);complex scale())
+  Signature: (complex [io]a(n);complex scale())
 
 =for ref
 
@@ -2603,7 +2603,7 @@ sub PDL::cscal {
 
 =for sig
 
-  Signature: (complex [io,phys]a(n);scale())
+  Signature: (complex [io]a(n);scale())
 
 =for ref
 
@@ -2629,7 +2629,7 @@ sub PDL::csscal {
 
 =for sig
 
-  Signature: (complex [io,phys]a();complex [phys]b();[o,phys]c();complex  [o,phys]s())
+  Signature: (complex [io]a();complex b();[o]c();complex  [o]s())
 
 =for ref
 
@@ -2655,7 +2655,7 @@ sub PDL::crotg {
 
 =for sig
 
-  Signature: (complex [phys]A(m,n); int uplo();complex  [o,phys]B(p,n))
+  Signature: (complex A(m,n); int uplo();complex  [o]B(p,n))
 
 =for ref
 
@@ -2681,7 +2681,7 @@ sub PDL::clacpy {
 
 =for sig
 
-  Signature: (complex [io,phys]A(m,n); int [phys]k1(); int [phys]k2(); int [phys]ipiv(p))
+  Signature: (complex [io]A(m,n); int k1(); int k2(); int ipiv(p))
 
 =for ref
 

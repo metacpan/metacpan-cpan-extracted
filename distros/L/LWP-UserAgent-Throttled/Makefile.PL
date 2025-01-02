@@ -2,6 +2,15 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker 6.64;	# 6.64 for TEST_REQUIRES
 
+my $dist = {
+	COMPRESS => 'gzip -9f',
+	SUFFIX => 'gz'
+};
+
+if($^O eq 'darwin') {
+	$dist->{'TAR'} = 'gtar';
+}
+
 WriteMakefile(
 	NAME		=> 'LWP::UserAgent::Throttled',
 	AUTHOR		=> q{Nigel Horne <njh@bandsman.co.uk>},
@@ -14,6 +23,7 @@ WriteMakefile(
 	PL_FILES	=> {},
 	TEST_REQUIRES => {
 		'LWP::Protocol::https' => 0,
+		'Test::DescribeMe' => 0,
 		'Test::Exception' => 0.42,	# http://www.cpantesters.org/cpan/report/91a6ac80-6bf9-1014-b7eb-bb2be30b7e63
 		'Test::Most' => 0,
 		'Test::Needs' => 0,
@@ -27,10 +37,8 @@ WriteMakefile(
 	PREREQ_PM => {
 		'LWP' => 0,
 		'LWP::UserAgent' => 0,
-		'Time::HiRes' => 0,
-	},
-	dist		=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-	clean		=> { FILES => 'LWP-UserAgent::Throttled-*' },
+		'Time::HiRes' => 0
+	}, dist => $dist,
 	# META_ADD => {
 		# provides => {}
 	# },

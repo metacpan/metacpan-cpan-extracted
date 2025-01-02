@@ -453,4 +453,31 @@ class TestCase::Go::Channel {
     return 1;
   }
   
+  static method exception : int () {
+    
+    my $read_ok = 0;
+    
+    {
+      my $ch = Go->make;
+      
+      {
+        eval { $ch->read(\$read_ok); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        eval { $ch->write(1); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+    }
+    
+    return 1;
+  }
+  
 }

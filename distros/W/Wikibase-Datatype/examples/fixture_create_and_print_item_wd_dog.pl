@@ -29,3 +29,4 @@ print encode_utf8(scalar Wikibase::Datatype::Print::Item::print($obj));
 #   P31: Q55983715 (normal)
 #    P642: Q20717272
 #    P642: Q26972265
+#   P123456789: 4 (normal)

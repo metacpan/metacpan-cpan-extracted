@@ -1,5 +1,26 @@
 Revision history for Hash::Match
 
+v0.8.1    2025-01-01 12:58:38+00:00 Europe/London
+  [Documentation]
+  - Added a security policy.
+
+  - Updated copyright year.
+
+  [Tests]
+  - Added and improved author tests.
+
+  [Other]
+  - Removed tabs from source code.
+
+  [Toolchain]
+  - Added .mailmap to repo.
+
+  - Declared core prereqs.
+
+  - Added signature to release.
+
+  - Removed MANIFEST.SKIP from build.
+
 v0.8.0    2023-06-11 14:49:27+01:00 Europe/London
   [Incompatible Changes]
   - Perl v5.14 or later is now required.

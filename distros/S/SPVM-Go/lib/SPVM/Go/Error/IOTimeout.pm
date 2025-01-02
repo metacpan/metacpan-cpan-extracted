@@ -6,37 +6,20 @@ package SPVM::Go::Error::IOTimeout;
 
 =head1 Name
 
-SPVM::Go::Error::IOTimeout - Short Description
+SPVM::Go::Error::IOTimeout - Error for Goroutine IO Timeout
 
 =head1 Description
 
-The Go::Error::IOTimeout class in L<SPVM> has methods to do someting.
+Go::Error::IOTimeout class in L<SPVM> represent an error for goroutine IO timeout.
 
 =head1 Usage
-
-  use Go::Error::IOTimeout;
-
-=head1 Fields
-
-
-
-=head1 Class Methods
-
-
-
-=head1 Instance Methods
-
-
-
-
-=head1 Repository
-
-
-
-=head1 Author
-
-Yuki Kimoto C<kimoto.yuki@gmail.com>
-
+  
+  if ($@) {
+    if (eval_error_id isa Go::Error::IOTimeout) {
+      
+    }
+  }
+  
 =head1 Copyright & License
 
 Copyright (c) 2023 Yuki Kimoto

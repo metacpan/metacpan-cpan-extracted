@@ -1,5 +1,5 @@
 #
-# GENERATED WITH PDL::PP from bad.pd! Don't modify!
+# GENERATED WITH PDL::PP from lib/PDL/Bad.pd! Don't modify!
 #
 package PDL::Bad;
 
@@ -22,7 +22,7 @@ use DynaLoader;
 
 
 
-#line 20 "bad.pd"
+#line 20 "lib/PDL/Bad.pd"
 
 =head1 NAME
 
@@ -62,7 +62,7 @@ Set to 1 as of PDL 2.035 as always available.
 =back
 
 =cut
-#line 66 "Bad.pm"
+#line 66 "lib/PDL/Bad.pm"
 
 
 =head1 FUNCTIONS
@@ -73,7 +73,7 @@ Set to 1 as of PDL 2.035 as always available.
 
 
 
-#line 63 "bad.pd"
+#line 63 "lib/PDL/Bad.pd"
 
 $PDL::Bad::Status = 1;
 $PDL::Bad::UseNaN = 0;
@@ -87,7 +87,7 @@ use PDL::Primitive;
 ############################################################
 ############################################################
 
-#line 79 "bad.pd"
+#line 79 "lib/PDL/Bad.pd"
 ############################################################
 ############################################################
 
@@ -263,7 +263,7 @@ sub PDL::check_badflag {
     $pdl->badflag(0) if $pdl->badflag and $pdl->nbad == 0;
     return $pdl->badflag;
 } # sub: check_badflag()
-#line 267 "Bad.pm"
+#line 267 "lib/PDL/Bad.pm"
 
 
 =head2 isbad
@@ -431,7 +431,7 @@ flag set.
 
 
 
-#line 516 "bad.pd"
+#line 516 "lib/PDL/Bad.pd"
 
 *nbad = \&PDL::nbad;
 sub PDL::nbad {
@@ -440,7 +440,7 @@ sub PDL::nbad {
 	return $tmp;
 }
 
-#line 516 "bad.pd"
+#line 516 "lib/PDL/Bad.pd"
 *ngood = \&PDL::ngood;
 sub PDL::ngood {
 	my($x) = @_; my $tmp;
@@ -448,7 +448,7 @@ sub PDL::ngood {
 	return $tmp;
 }
 
-#line 528 "bad.pd"
+#line 528 "lib/PDL/Bad.pd"
 
 =head2 nbad
 
@@ -524,7 +524,7 @@ sub PDL::setbadat {
     $self->badflag(1);
     return $self;
 }
-#line 528 "Bad.pm"
+#line 528 "lib/PDL/Bad.pm"
 
 
 =head2 setbadif
@@ -912,7 +912,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1069 "bad.pd"
+#line 1069 "lib/PDL/Bad.pd"
 
 =head1 AUTHOR
 
@@ -929,7 +929,7 @@ separated from the PDL distribution, the copyright notice should be
 included in the file.
 
 =cut
-#line 933 "Bad.pm"
+#line 933 "lib/PDL/Bad.pm"
 
 # Exit with OK status
 

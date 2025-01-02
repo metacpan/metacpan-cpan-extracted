@@ -90,6 +90,7 @@ my @env_allowed = (
         LDFLAGS_FOR_BUILD
         ARFLAGS
         MAKEFLAGS
+        GNUMAKEFLAGS
     ),
     # Dynamic linker, see ld(1).
     qw(
@@ -140,7 +141,7 @@ my @env_allowed = (
     qw(
         DPKG_GENSYMBOLS_CHECK_LEVEL
     ),
-    # See <https://reproducible-builds.org/specs/source-date-epoch>.
+    # See <https://reproducible-builds.org/specs/source-date-epoch/>.
     qw(
         SOURCE_DATE_EPOCH
     ),

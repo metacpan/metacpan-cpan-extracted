@@ -66,7 +66,7 @@ static bool stage_filter_attr(pTHX_ struct XSParseSublikeContext *ctx, SV *attr,
 }
 
 #ifdef HAVE_SIGNATURES
-static void stage_start_signature(pTHX_ struct XSParseSublikeContext *ctx, void *)
+static void stage_start_signature(pTHX_ struct XSParseSublikeContext *ctx, void *_)
 {
   if(hv_fetchs(GvHV(PL_hintgv), "t::stages/signature-add-$first", 0)) {
     PADOFFSET padix = pad_add_name_pvs("$first", 0, NULL, NULL);
@@ -88,7 +88,7 @@ static void stage_start_signature(pTHX_ struct XSParseSublikeContext *ctx, void 
   }
 }
 
-static void stage_finish_signature(pTHX_ struct XSParseSublikeContext *ctx, void *)
+static void stage_finish_signature(pTHX_ struct XSParseSublikeContext *ctx, void *_)
 {
   if(hv_fetchs(GvHV(PL_hintgv), "t::stages/signature-add-@rest", 0)) {
     PADOFFSET padix = pad_add_name_pvs("@rest", 0, NULL, NULL);

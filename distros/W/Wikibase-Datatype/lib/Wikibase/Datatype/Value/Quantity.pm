@@ -8,7 +8,7 @@ use Mo qw(build is);
 use Mo::utils qw(check_number);
 use Wikibase::Datatype::Utils qw(check_entity);
 
-our $VERSION = 0.34;
+our $VERSION = 0.36;
 
 extends 'Wikibase::Datatype::Value';
 
@@ -39,14 +39,14 @@ sub BUILD {
 
 	if (defined $self->{'lower_bound'}) {
 		check_number($self, 'lower_bound');
-		if ($self->{'lower_bound'} >= $self->{'value'}) {
-			err "Parameter 'lower_bound' must be less than value.";
+		if ($self->{'lower_bound'} > $self->{'value'}) {
+			err "Parameter 'lower_bound' must be less than or equal to value.";
 		}
 	}
 	if (defined $self->{'upper_bound'}) {
 		check_number($self, 'upper_bound');
-		if ($self->{'upper_bound'} <= $self->{'value'}) {
-			err "Parameter 'upper_bound' must be greater than value.";
+		if ($self->{'upper_bound'} < $self->{'value'}) {
+			err "Parameter 'upper_bound' must be greater than or equal to value.";
 		}
 	}
 
@@ -171,8 +171,8 @@ Returns string.
                  Parameter 'unit' must begin with 'Q' and number after it.
          From Wikibase::Datatype::Value::new():
                  Parameter 'value' is required.
-         Parameter 'lower_bound' must be less than value.
-         Parameter 'upper_bound' must be greater than value.
+         Parameter 'lower_bound' must be less than or equal to value.
+         Parameter 'upper_bound' must be greater than or equal to value.
 
 =head1 EXAMPLE1
 
@@ -272,12 +272,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2020-2024 Michal Josef Špaček
+© 2020-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.34
+0.36
 
 =cut

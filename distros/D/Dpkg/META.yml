@@ -93,7 +93,7 @@ provides:
     version: '1.04'
   Dpkg::Control:
     file: lib/Dpkg/Control.pm
-    version: '1.04'
+    version: '1.05'
   Dpkg::Control::Changelog:
     file: lib/Dpkg/Control/Changelog.pm
     version: '1.00'
@@ -102,7 +102,7 @@ provides:
     version: '1.00'
   Dpkg::Control::FieldsCore:
     file: lib/Dpkg/Control/FieldsCore.pm
-    version: '1.02'
+    version: '1.03'
   Dpkg::Control::Hash:
     file: lib/Dpkg/Control/Hash.pm
     version: '1.00'
@@ -267,7 +267,7 @@ provides:
     version: '2.02'
   Dpkg::Vendor:
     file: lib/Dpkg/Vendor.pm
-    version: '1.02'
+    version: '1.03'
   Dpkg::Vendor::Debian:
     file: lib/Dpkg/Vendor/Debian.pm
     version: '0.01'
@@ -296,5 +296,5 @@ resources:
   homepage: https://wiki.debian.org/Teams/Dpkg
   license: http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
   repository: https://git.dpkg.org/git/dpkg/dpkg.git
-version: v1.22.11
+version: v1.22.12
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

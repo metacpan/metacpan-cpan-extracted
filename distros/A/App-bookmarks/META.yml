@@ -1,5 +1,5 @@
 ---
-abstract: 'Export browser bookmarks as plain text.'
+abstract: 'Export bookmarks from browsers and files.'
 author:
   - 'jul <kaldor@cpan.com>'
 build_requires:
@@ -23,10 +23,10 @@ requires:
   File::Copy: '0'
   File::Temp: '0'
   Getopt::Std: '0'
-  perl: '5.010'
+  perl: '5.014'
 resources:
   bugtracker: https://github.com/kal247/App-bookmarks/issues
   homepage: https://github.com/kal247/App-bookmarks
   repository: https://github.com/kal247/App-bookmarks.git
-version: '0.34'
+version: '0.35'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

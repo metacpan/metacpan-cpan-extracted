@@ -4,7 +4,7 @@ LWP::UserAgent::Throttled - Throttle requests to a site
 
 # VERSION
 
-Version 0.11
+Version 0.12
 
 # SYNOPSIS
 
@@ -30,8 +30,8 @@ Get/set the number of seconds between each request for sites.
 
     my $ua = LWP::UserAgent::Throttled->new();
     $ua->throttle({ 'search.cpan.org' => 0.1, 'www.example.com' => 1 });
-    print $ua->throttle('search.cpan.org'), "\n";    # prints 0.1
-    print $ua->throttle('perl.org'), "\n";    # prints 0
+    print $ua->throttle('search.cpan.org'), "\n";       # prints 0.1
+    print $ua->throttle('perl.org'), "\n";      # prints 0
 
 When setting a throttle it returns itself,
 so you can daisy chain messages.
@@ -93,6 +93,6 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2017-2024 Nigel Horne.
+Copyright 2017-2025 Nigel Horne.
 
 This program is released under the following licence: GPL2

@@ -113,7 +113,7 @@ pp_defc("gtsv",
                 integer *ldb, integer *info);
 EOF
 	HandleBad => 0,
-	Pars => '[phys]DL(2,n); [phys]D(2,n); [phys]DU(2,n); [io,phys]B(2,n,nrhs); int [o,phys]info()',
+	Pars => '[io]DL(2,n); [io]D(2,n); [io]DU(2,n); [io]B(2,n,nrhs); int [o]info()',
 	Code => generate_code '
 		FORTRAN($TFD(c,z)gtsv)(
 		&(integer){$SIZE(n)},
@@ -460,7 +460,7 @@ pp_defc("geev",
 		integer *ldvr, $GENERIC() *work, integer *lwork, $GENERIC() *rwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => 'A(2,n,n); int jobvl(); int jobvr(); [o]w(2,n); [o]vl(2,m,m); [o]vr(2,p,p); int [o]info(); [t]rwork(rworkn=CALC(2*$SIZE(n)));',
+	Pars => '[io]A(2,n,n); int jobvl(); int jobvr(); [o]w(2,n); [o]vl(2,m,m); [o]vr(2,p,p); int [o]info(); [t]rwork(rworkn=CALC(2*$SIZE(n)));',
 	RedoDimsCode => '
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvl), tmp, $PDL(vl), $SIZE(m), $SIZE(n))
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvr), tmp, $PDL(vr), $SIZE(p), $SIZE(n))
@@ -624,7 +624,7 @@ pp_defc("ggev",
 		$GENERIC() *rwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => 'A(2,n,n); int [phys]jobvl();int [phys]jobvr();B(2,n,n);[o]alpha(2,n);[o]beta(2,n);[o]VL(2,m,m);[o]VR(2,p,p);int [o]info(); [t]rwork(rworkn=CALC(8*$SIZE(n)));',
+	Pars => '[io]A(2,n,n); int jobvl();int jobvr();[io]B(2,n,n);[o]alpha(2,n);[o]beta(2,n);[o]VL(2,m,m);[o]VR(2,p,p);int [o]info(); [t]rwork(rworkn=CALC(8*$SIZE(n)));',
 	RedoDimsCode => '
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvl), tmp, $PDL(VL), $SIZE(m), $SIZE(n))
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvr), tmp, $PDL(VR), $SIZE(p), $SIZE(n))
@@ -695,7 +695,7 @@ pp_defc("ggevx",
 		bwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io,phys]A(2,n,n);int balanc();int jobvl();int jobvr();int sense();[io,phys]B(2,n,n);[o]alpha(2,n);[o]beta(2,n);[o]VL(2,m,m);[o]VR(2,p,p);int [o]ilo();int [o]ihi();[o]lscale(n);[o]rscale(n);[o]abnrm();[o]bbnrm();[o]rconde(r);[o]rcondv(s);int [o]info(); [t]rwork(rworkn=CALC(6*$SIZE(n))); int [t]bwork(bworkn); int [t]iwork(iworkn);',
+	Pars => '[io]A(2,n,n);int balanc();int jobvl();int jobvr();int sense();[io]B(2,n,n);[o]alpha(2,n);[o]beta(2,n);[o]VL(2,m,m);[o]VR(2,p,p);int [o]ilo();int [o]ihi();[o]lscale(n);[o]rscale(n);[o]abnrm();[o]bbnrm();[o]rconde(r);[o]rcondv(s);int [o]info(); [t]rwork(rworkn=CALC(6*$SIZE(n))); int [t]bwork(bworkn); int [t]iwork(iworkn);',
 	RedoDimsCode => '
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvl), tmp, $PDL(VL), $SIZE(m), $SIZE(n))
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvr), tmp, $PDL(VR), $SIZE(p), $SIZE(n))
@@ -1289,7 +1289,7 @@ pp_defc("heevd",
 		integer *iwork, integer *liwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io,phys]A(2,n,n);  int jobz(); int uplo(); [o,phys]w(n); int [o,phys]info()',
+	Pars => '[io]A(2,n,n);  int jobz(); int uplo(); [o]w(n); int [o]info()',
 	Code => generate_code '
 		char jz = \'N\';
 		char puplo = \'U\';
@@ -1368,7 +1368,7 @@ pp_defc("heevx",
 		$GENERIC() *rwork, integer *iwork, integer *ifail, integer *info);
 EOF
        HandleBad => 0,
-	Pars => 'A(2,n,n);  int jobz(); int range(); int uplo(); vl(); vu(); int il(); int iu(); abstol(); int [o]m(); [o]w(n); [o]z(2,p,p);int [o]ifail(n); int [o]info(); [t]rwork(rworkn=CALC(7*$SIZE(n))); int [t]iwork(iworkn=CALC(5*$SIZE(n)));',
+	Pars => '[io]A(2,n,n);  int jobz(); int range(); int uplo(); vl(); vu(); int il(); int iu(); abstol(); int [o]m(); [o]w(n); [o]z(2,p,p);int [o]ifail(n); int [o]info(); [t]rwork(rworkn=CALC(7*$SIZE(n))); int [t]iwork(iworkn=CALC(5*$SIZE(n)));',
 	RedoDimsCode => '
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobz), tmp, $PDL(z), $SIZE(p), $SIZE(n))
 	',
@@ -1460,7 +1460,7 @@ pp_defc("heevr",
 		integer *iwork, integer *liwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[phys]A(2,n,n);  int jobz(); int range(); int uplo(); [phys]vl(); [phys]vu(); int [phys]il(); int [phys]iu(); [phys]abstol(); int [o,phys]m(); [o,phys]w(n); [o,phys]z(2,p,q);int [o,phys]isuppz(r); int [o,phys]info()',
+	Pars => '[io]A(2,n,n);  int jobz(); int range(); int uplo(); vl(); vu(); int il(); int iu(); abstol(); int [o]m(); [o]w(n); [o]z(2,p,q);int [o]isuppz(r); int [o]info()',
 	Code => generate_code '
 		char jz = \'N\';
 		char puplo = \'U\';
@@ -1625,7 +1625,7 @@ pp_defc("hegvd",
 		integer *iwork,	integer *liwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io,phys]A(2,n,n);int [phys]itype();int jobz(); int uplo();[io,phys]B(2,n,n);[o,phys]w(n); int [o,phys]info()',
+	Pars => '[io]A(2,n,n);int itype();int jobz(); int uplo();[io]B(2,n,n);[o]w(n); int [o]info()',
 	Code => generate_code '
 		char jz = \'N\';
 		char puplo = \'U\';
@@ -1809,7 +1809,7 @@ pp_defc("gesv",
 		*lda, integer *ipiv, $GENERIC() *b, integer *ldb, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io,phys]A(2,n,n);  [io,phys]B(2,n,m); int [o,phys]ipiv(n); int [o,phys]info()',
+	Pars => '[io]A(2,n,n);  [io]B(2,n,m); int [o]ipiv(n); int [o]info()',
 	Code => generate_code '
 		FORTRAN($TFD(c,z)gesv)(
 		&(integer){$SIZE(n)},
@@ -1920,7 +1920,7 @@ pp_defc("sysv",
 		$GENERIC() *work, integer *lwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io,phys]A(2,n,n);  int uplo(); [io,phys]B(2,n,m); int [o]ipiv(n); int [o]info()',
+	Pars => '[io]A(2,n,n);  int uplo(); [io]B(2,n,m); int [o]ipiv(n); int [o]info()',
 	Code => generate_code '
 		char puplo = \'U\';
 		integer lwork = -1;
@@ -1969,7 +1969,7 @@ pp_defc("sysvx",
 		$GENERIC() *work, integer *lwork, $GENERIC() *rwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[phys]A(2,n,n); int uplo(); int fact(); [phys]B(2,n,m); [io,phys]af(2,n,n); int [io,phys]ipiv(n); [o]X(2,n,m); [o]rcond(); [o]ferr(m); [o]berr(m); int [o]info(); [t]rwork(n);',
+	Pars => 'A(2,n,n); int uplo(); int fact(); B(2,n,m); [io]af(2,n,n); int [io]ipiv(n); [o]X(2,n,m); [o]rcond(); [o]ferr(m); [o]berr(m); int [o]info(); [t]rwork(n);',
 	Code => generate_code '
 		char pfact = \'N\';
 		char puplo = \'U\';
@@ -2039,7 +2039,7 @@ pp_defc("hesv",
 		$GENERIC() *work, integer *lwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io,phys]A(2,n,n);  int uplo(); [io,phys]B(2,n,m); int [o,phys]ipiv(n); int [o,phys]info()',
+	Pars => '[io]A(2,n,n);  int uplo(); [io]B(2,n,m); int [o]ipiv(n); int [o]info()',
 	Code => generate_code '
 		char puplo = \'U\';
 		integer lwork = -1;
@@ -2167,7 +2167,7 @@ pp_defc("posv",
 		*a, integer *lda, $GENERIC() *b, integer *ldb, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io,phys]A(2,n,n);  int uplo(); [io,phys]B(2,n,m); int [o,phys]info()',
+	Pars => '[io]A(2,n,n);  int uplo(); [io]B(2,n,m); int [o]info()',
 	Code => generate_code '
              char puplo = \'U\';
 		if ($uplo())
@@ -2262,7 +2262,7 @@ pp_defc("gels",
 		$GENERIC() *work, integer *lwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io,phys]A(2,m,n); int trans(); [io,phys]B(2,p,q);int [o,phys]info()',
+	Pars => '[io]A(2,m,n); int trans(); [io]B(2,p,q);int [o]info()',
 	Code => generate_code '
 		char ptrans = \'N\';
 		integer lwork = -1;
@@ -2479,7 +2479,7 @@ pp_defc("gglse",
 		integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[phys]A(2,m,n); [phys]B(2,p,n);[io,phys]c(2,m);[phys]d(2,p);[o,phys]x(2,n);int [o,phys]info()',
+	Pars => '[io]A(2,m,n); [io]B(2,p,n);[io]c(2,m);[io]d(2,p);[o]x(2,n);int [o]info()',
 	Code => generate_code '
 		integer lwork = -1;
 		$GENERIC() tmp_work[2];
@@ -2529,7 +2529,7 @@ pp_defc("ggglm",
 		integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[phys]A(2,n,m); [phys]B(2,n,p);[phys]d(2,n);[o,phys]x(2,m);[o,phys]y(2,p);int [o,phys]info()',
+	Pars => '[io]A(2,n,m); [io]B(2,n,p);[io]d(2,n);[o]x(2,m);[o]y(2,p);int [o]info()',
 	Code => generate_code '
 		integer lwork = -1;
 		$GENERIC() tmp_work[2];
@@ -2617,7 +2617,7 @@ pp_defc("sytrf",
 		lda, integer *ipiv, $GENERIC() *work, integer *lwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io,phys]A(2,n,n); int uplo(); int [o,phys]ipiv(n); int [o,phys]info()',
+	Pars => '[io]A(2,n,n); int uplo(); int [o]ipiv(n); int [o]info()',
 	Code => generate_code '
              char puplo = \'U\';
 	     integer lwork = -1;
@@ -2657,7 +2657,7 @@ pp_defc("sytf2",
 		lda, integer *ipiv, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io,phys]A(2,n,n); int uplo(); int [o,phys]ipiv(n); int [o,phys]info()',
+	Pars => '[io]A(2,n,n); int uplo(); int [o]ipiv(n); int [o]info()',
 	Code => generate_code '
              char puplo = \'U\';
 		if ($uplo())
@@ -2733,7 +2733,7 @@ pp_defc("potrf",
 		lda, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io,phys]A(2,n,n); int uplo(); int [o,phys]info()',
+	Pars => '[io]A(2,n,n); int uplo(); int [o]info()',
 	Code => generate_code '
              char puplo = \'U\';
 		if ($uplo())
@@ -2760,7 +2760,7 @@ pp_defc("potf2",
 		lda, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io,phys]A(2,n,n); int uplo(); int [o,phys]info()',
+	Pars => '[io]A(2,n,n); int uplo(); int [o]info()',
 	Code => generate_code '
              char puplo = \'U\';
 		if ($uplo())
@@ -2787,7 +2787,7 @@ pp_defc("getri",
 		*ipiv, $GENERIC() *work, integer *lwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io,phys]A(2,n,n); int [phys]ipiv(n); int [o,phys]info()',
+	Pars => '[io]A(2,n,n); int ipiv(n); int [o]info()',
 	Code => generate_code '
 		integer lwork = -1;
 		$GENERIC() tmp_work[2];
@@ -2871,7 +2871,7 @@ pp_defc("potri",
 		lda, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io,phys]A(2,n,n); int uplo(); int [o,phys]info()',
+	Pars => '[io]A(2,n,n); int uplo(); int [o]info()',
 	Code => generate_code '
              char puplo = \'U\';
 		if ($uplo())
@@ -2891,7 +2891,7 @@ pp_defc("trtri",
 		lda, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io,phys]A(2,n,n); int uplo(); int diag(); int [o,phys]info()',
+	Pars => '[io]A(2,n,n); int uplo(); int diag(); int [o]info()',
 	Code => generate_code '
              char puplo = \'U\';
              char pdiag = \'N\';
@@ -2915,7 +2915,7 @@ pp_defc("trti2",
 		lda, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io,phys]A(2,n,n); int uplo(); int diag(); int [o,phys]info()',
+	Pars => '[io]A(2,n,n); int uplo(); int diag(); int [o]info()',
 	Code => generate_code '
              char puplo = \'U\';
              char pdiag = \'N\';
@@ -2940,7 +2940,7 @@ pp_defc("getrs",
 		ldb, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[phys]A(2,n,n); int trans(); [io,phys]B(2,n,m); int [phys]ipiv(n); int [o,phys]info()',
+	Pars => 'A(2,n,n); int trans(); [io]B(2,n,m); int ipiv(n); int [o]info()',
 	Code => generate_code '
              char transp = \'N\';
 		if($trans() == 1)
@@ -2980,7 +2980,7 @@ pp_defc("sytrs",
 		ldb, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[phys]A(2,n,n); int uplo();[io,phys]B(2,n,m); int [phys]ipiv(n); int [o,phys]info()',
+	Pars => 'A(2,n,n); int uplo();[io]B(2,n,m); int ipiv(n); int [o]info()',
 	Code => generate_code '
              char puplo = \'U\';
 		if($uplo())
@@ -3006,7 +3006,7 @@ pp_defc("hetrs",
 		ldb, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[phys]A(2,n,n); int uplo();[io,phys]B(2,n,m); int [phys]ipiv(n); int [o,phys]info()',
+	Pars => 'A(2,n,n); int uplo();[io]B(2,n,m); int ipiv(n); int [o]info()',
 	Code => generate_code '
              char puplo = \'U\';
 		if($uplo())
@@ -3038,7 +3038,7 @@ pp_defc("potrs",
 		info);
 EOF
        HandleBad => 0,
-	Pars => '[phys]A(2,n,n); int uplo(); [io,phys]B(2,n,m); int [o,phys]info()',
+	Pars => 'A(2,n,n); int uplo(); [io]B(2,n,m); int [o]info()',
 	Code => generate_code '
              char puplo = \'U\';
 		if($uplo())
@@ -3071,7 +3071,7 @@ pp_defc("trtrs",
 		ldb, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[phys]A(2,n,n); int uplo(); int trans(); int diag();[io,phys]B(2,n,m); int [o,phys]info()',
+	Pars => 'A(2,n,n); int uplo(); int trans(); int diag();[io]B(2,n,m); int [o]info()',
 	Code => generate_code '
              char puplo = \'U\';
              char ptrans = \'N\';
@@ -3119,7 +3119,7 @@ pp_defc("latrs",
 		$GENERIC() *scale, $GENERIC() *cnorm, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[phys]A(2,n,n); int uplo(); int trans(); int diag(); int normin();[io,phys]x(2,n); [o,phys]scale();[io,phys]cnorm(n);int [o,phys]info()',
+	Pars => 'A(2,n,n); int uplo(); int trans(); int diag(); int normin();[io]x(2,n); [o]scale();[io]cnorm(n);int [o]info()',
 	Code => generate_code '
              char puplo = \'U\';
              char ptrans = \'N\';
@@ -3347,7 +3347,7 @@ pp_defc("geqrf",
 		integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io,phys]A(2,m,n); [o,phys]tau(2,k); int [o,phys]info()',
+	Pars => '[io]A(2,m,n); [o]tau(2,k); int [o]info()',
 	Code => generate_code '
 		integer lwork = -1;
 		$GENERIC() tmp_work[2];
@@ -3385,7 +3385,7 @@ pp_defc("ungqr",
 		integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io,phys]A(2,m,n); [phys]tau(2,k); int [o,phys]info()',
+	Pars => '[io]A(2,m,n); tau(2,k); int [o]info()',
 	Code => generate_code '
 		integer lwork = -1;
 		$GENERIC() tmp_work[2];
@@ -3433,7 +3433,7 @@ pp_defc("unmqr",
 		c__, integer *ldc, $GENERIC() *work, integer *lwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[phys]A(2,p,k); int side(); int trans(); [phys]tau(2,k); [io,phys]C(2,m,n);int [o,phys]info()',
+	Pars => 'A(2,p,k); int side(); int trans(); tau(2,k); [io]C(2,m,n);int [o]info()',
 	Code => generate_code '
 		char ptrans = \'N\', pside = \'L\';
 		integer lwork = -1;
@@ -3490,7 +3490,7 @@ pp_defc("gelqf",
 		lda, $GENERIC() *tau, $GENERIC() *work, integer *lwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io,phys]A(2,m,n); [o,phys]tau(2,k); int [o,phys]info()',
+	Pars => '[io]A(2,m,n); [o]tau(2,k); int [o]info()',
 	Code => generate_code '
 		integer lwork = -1;
 		$GENERIC() tmp_work[2];
@@ -3528,7 +3528,7 @@ pp_defc("unglq",
 		integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io,phys]A(2,m,n); [phys]tau(2,k); int [o,phys]info()',
+	Pars => '[io]A(2,m,n); tau(2,k); int [o]info()',
 	Code => generate_code '
 		integer lwork = -1;
 		$GENERIC() tmp_work[2];
@@ -3572,7 +3572,7 @@ pp_defc("unmlq",
 		c__, integer *ldc, $GENERIC() *work, integer *lwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[phys]A(2,k,p); int side(); int trans(); [phys]tau(2,k); [io,phys]C(2,m,n);int [o,phys]info()',
+	Pars => 'A(2,k,p); int side(); int trans(); tau(2,k); [io]C(2,m,n);int [o]info()',
 	Code => generate_code '
 		char ptrans = \'N\', pside = \'L\';
 		integer lwork = -1;
@@ -3633,7 +3633,7 @@ pp_defc("geqlf",
 		lda, $GENERIC() *tau, $GENERIC() *work, integer *lwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io,phys]A(2,m,n); [o,phys]tau(2,k); int [o,phys]info()',
+	Pars => '[io]A(2,m,n); [o]tau(2,k); int [o]info()',
 	Code => generate_code '
 		integer lwork = -1;
 		$GENERIC() tmp_work[2];
@@ -3670,7 +3670,7 @@ pp_defc("ungql",
 		integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io,phys]A(2,m,n); [phys]tau(2,k); int [o,phys]info()',
+	Pars => '[io]A(2,m,n); tau(2,k); int [o]info()',
 	Code => generate_code '
 		integer lwork = -1;
 		$GENERIC() tmp_work[2];
@@ -3715,7 +3715,7 @@ pp_defc("unmql",
 		c__, integer *ldc, $GENERIC() *work, integer *lwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[phys]A(2,p,k); int side(); int trans(); [phys]tau(2,k); [io,phys]C(2,m,n);int [o,phys]info()',
+	Pars => 'A(2,p,k); int side(); int trans(); tau(2,k); [io]C(2,m,n);int [o]info()',
 	Code => generate_code '
 		char ptrans = \'N\', pside = \'L\';
 		integer lwork = -1;
@@ -3772,7 +3772,7 @@ pp_defc("gerqf",
 		lda, $GENERIC() *tau, $GENERIC() *work, integer *lwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io,phys]A(2,m,n); [o,phys]tau(2,k); int [o,phys]info()',
+	Pars => '[io]A(2,m,n); [o]tau(2,k); int [o]info()',
 	Code => generate_code '
 		integer lwork = -1;
 		$GENERIC() tmp_work[2];
@@ -3810,7 +3810,7 @@ pp_defc("ungrq",
 		integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io,phys]A(2,m,n); [phys]tau(2,k); int [o,phys]info()',
+	Pars => '[io]A(2,m,n); tau(2,k); int [o]info()',
 	Code => generate_code '
 		integer lwork = -1;
 		$GENERIC() tmp_work[2];
@@ -3854,7 +3854,7 @@ pp_defc("unmrq",
 		c__, integer *ldc, $GENERIC() *work, integer *lwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[phys]A(2,k,p); int side(); int trans(); [phys]tau(2,k); [io,phys]C(2,m,n);int [o,phys]info()',
+	Pars => 'A(2,k,p); int side(); int trans(); tau(2,k); [io]C(2,m,n);int [o]info()',
 	Code => generate_code '
 		char ptrans = \'N\', pside = \'L\';
 		integer lwork = -1;
@@ -3914,7 +3914,7 @@ pp_defc("tzrzf",
 		lda, $GENERIC() *tau, $GENERIC() *work, integer *lwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io,phys]A(2,m,n); [o,phys]tau(2,k); int [o,phys]info()',
+	Pars => '[io]A(2,m,n); [o]tau(2,k); int [o]info()',
 	Code => generate_code '
 		integer lwork = -1;
 		$GENERIC() tmp_work[2];
@@ -3951,7 +3951,7 @@ pp_defc("unmrz",
 		c__, integer *ldc, $GENERIC() *work, integer *lwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[phys]A(2,k,p); int side(); int trans(); [phys]tau(2,k); [io,phys]C(2,m,n);int [o,phys]info()',
+	Pars => 'A(2,k,p); int side(); int trans(); tau(2,k); [io]C(2,m,n);int [o]info()',
 	Code => generate_code '
 		char ptrans = \'N\', pside = \'L\';
 		integer lwork = -1;
@@ -4013,7 +4013,7 @@ pp_defc("gehrd",
 		integer *lwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io,phys]A(2,n,n); int [phys]ilo();int [phys]ihi();[o,phys]tau(2,k); int [o,phys]info()',
+	Pars => '[io]A(2,n,n); int ilo();int ihi();[o]tau(2,k); int [o]info()',
 	Code => generate_code '
 		integer lwork = -1;
 		$GENERIC() tmp_work[2];
@@ -4052,7 +4052,7 @@ pp_defc("unghr",
 		integer *lwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io,phys]A(2,n,n); int [phys]ilo();int [phys]ihi();[phys]tau(2,k); int [o,phys]info()',
+	Pars => '[io]A(2,n,n); int ilo();int ihi();tau(2,k); int [o]info()',
 	Code => generate_code '
 		integer lwork = -1;
 		$GENERIC() tmp_work[2];
@@ -4098,7 +4098,7 @@ pp_defc("hseqr",
 		integer *lwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io,phys]H(2,n,n); int job();int compz();int [phys]ilo();int [phys]ihi();[o,phys]w(2,n); [o,phys]Z(2,m,m); int [o,phys]info()',
+	Pars => '[io]H(2,n,n); int job();int compz();int ilo();int ihi();[o]w(2,n); [o]Z(2,m,m); int [o]info()',
 	Code => generate_code '
 		char pcompz;
 		char pjob = \'E\';
@@ -4160,7 +4160,7 @@ pp_defc("trevc",
 		$GENERIC() *work, $GENERIC() *rwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io]T(2,n,n); int side();int howmny();int select(q);[o]VL(2,m,m); [o]VR(2,p,p);int [o]m(); int [o]info(); [t]work(workn=CALC(5*$SIZE(n)));',
+	Pars => 'T(2,n,n); int side();int howmny();int select(q);[o]VL(2,m,m); [o]VR(2,p,p);int [o]m(); int [o]info(); [t]work(workn=CALC(5*$SIZE(n)));',
 	RedoDimsCode => '
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(side), tmp != 1, $PDL(VL), $SIZE(m), $SIZE(n))
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(side), tmp != 2, $PDL(VR), $SIZE(p), $SIZE(n))
@@ -4212,7 +4212,7 @@ pp_defc("tgevc",
 		integer *mm, integer *m, $GENERIC() *work, $GENERIC() *rwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io]A(2,n,n); int side();int howmny(); [io]B(2,n,n);int select(q);[o]VL(2,m,m); [o]VR(2,p,p);int [o]m(); int [o]info(); [t]work(workn=CALC(6*$SIZE(n)));',
+	Pars => 'A(2,n,n); int side();int howmny(); B(2,n,n);int select(q);[o]VL(2,m,m); [o]VR(2,p,p);int [o]m(); int [o]info(); [t]work(workn=CALC(6*$SIZE(n)));',
 	RedoDimsCode => '
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(side), tmp != 1, $PDL(VL), $SIZE(m), $SIZE(n))
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(side), tmp != 2, $PDL(VR), $SIZE(p), $SIZE(n))
@@ -4262,7 +4262,7 @@ pp_defc("gebal",
 		lda, integer *ilo, integer *ihi, $GENERIC() *scale, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io,phys]A(2,n,n); int job(); int [o,phys]ilo();int [o,phys]ihi();[o,phys]scale(n); int [o,phys]info()',
+	Pars => '[io]A(2,n,n); int job(); int [o]ilo();int [o]ihi();[o]scale(n); int [o]info()',
 	Code => generate_code '
 		char pjob;
 	        switch ($job())
@@ -4403,7 +4403,7 @@ pp_defc("gemm",
 			integer *ldc);
 EOF
        HandleBad => 0,
-	Pars => '[phys]A(2,m,n); int transa(); int transb(); [phys]B(2,p,q);[phys]alpha(2); [phys]beta(2); [io,phys]C(2,r,s)',
+	Pars => 'A(2,m,n); int transa(); int transb(); B(2,p,q);alpha(2); beta(2); [io]C(2,r,s)',
 	Code => '
 		char ptransa = \'N\';
 		char ptransb = \'N\';
@@ -4454,7 +4454,7 @@ Complex version of L<PDL::LinearAlgebra::Real/gemm>.
 if ($config{CBLAS}){
 pp_def("rmcgemm",
        HandleBad => 0,
-	Pars => '[phys]A(2,m,n); int transa(); int transb(); [phys]B(2,p,q);[phys]alpha(2); [phys]beta(2); [io,phys]C(2,r,s)',
+	Pars => 'A(2,m,n); int transa(); int transb(); B(2,p,q);alpha(2); beta(2); [io]C(2,r,s)',
 	Code => '
 		int ptransa, ptransb;
 			extern void cblas_$TFD(c,z)gemm(const enum CBLAS_ORDER Order, const enum CBLAS_TRANSPOSE TransA,
@@ -4522,7 +4522,7 @@ pp_defc("mmult",
 		integer *ldc);
 EOF
        HandleBad => 0,
-	Pars => '[phys]A(2,m,n); [phys]B(2,p,m); [o,phys]C(2,p,n)',
+	Pars => 'A(2,m,n); B(2,p,m); [o]C(2,p,n)',
 	Code =>  '
 		char ptrans = \'N\';
 			$GENERIC() alpha[2] = {1,0};
@@ -4552,7 +4552,7 @@ pp_defc("smmult",
 		integer *ldc);
 EOF
        HandleBad => 0,
-	Pars => '[phys]A(2,m,n); [phys]B(2,p,m); [o,phys]C(2,p,n)',
+	Pars => 'A(2,m,n); B(2,p,m); [o]C(2,p,n)',
 	Code =>  '
 		char ptrans = \'N\';
 		$GENERIC() alpha[2] = {1,0};
@@ -4582,7 +4582,7 @@ pp_defc("crossprod",
 		integer *ldc);
 EOF
        HandleBad => 0,
-	Pars => '[phys]A(2,n,m); [phys]B(2,p,m); [o,phys]C(2,p,n)',
+	Pars => 'A(2,n,m); B(2,p,m); [o]C(2,p,n)',
 	Code =>  '
 		char btrans = \'N\';
 		char atrans = \'C\';
@@ -4611,7 +4611,7 @@ pp_defc("syrk",
 			$GENERIC() *c__, integer *ldc);
 EOF
        HandleBad => 0,
-	Pars => '[phys]A(2,m,n); int uplo(); int trans(); [phys]alpha(2); [phys]beta(2); [io,phys]C(2,p,p)',
+	Pars => 'A(2,m,n); int uplo(); int trans(); alpha(2); beta(2); [io]C(2,p,p)',
 	RedoDimsCode => '$SIZE(p) = $trans() ? $SIZE(n) : $SIZE(m);',
 	Code =>  '
 		char puplo = \'U\';
@@ -4641,7 +4641,7 @@ EOF
 if ($config{CBLAS}){
 pp_def("rmcsyrk",
        HandleBad => 0,
-	Pars => '[phys]A(2,m,n); int uplo(); int trans(); [phys]alpha(2); [phys]beta(2); [io,phys]C(2,p,p)',
+	Pars => 'A(2,m,n); int uplo(); int trans(); alpha(2); beta(2); [io]C(2,p,p)',
 	Code =>  '
 		int puplo = CblasUpper;
 		int ptrans;
@@ -4690,7 +4690,7 @@ pp_defc("dot",
 			integer *incy);
 EOF
        HandleBad => 0,
-	Pars => '[phys]a(2,n);[phys]b(2,n);[o]c(2)',
+	Pars => 'a(2,n);b(2,n);[o]c(2)',
 	Code =>  '
 		complex $TFD(float,double) *cptr = (void*)$P(c);
 		*cptr = FORTRAN($TFD(c,z)dotu)(
@@ -4707,7 +4707,7 @@ pp_defc("dotc",
 			integer *incy);
 EOF
        HandleBad => 0,
-	Pars => '[phys]a(2,n);[phys]b(2,n);[o,phys]c(2)',
+	Pars => 'a(2,n);b(2,n);[o]c(2)',
 	Code =>  '
 		complex $TFD(float,double) *cptr = (void*)$P(c);
 		*cptr = FORTRAN($TFD(c,z)dotc)(
@@ -4730,7 +4730,7 @@ pp_defc("axpy",
 		integer *incx, $GENERIC() *dy, integer *incy);
 EOF
        HandleBad => 0,
-	Pars => '[phys]a(2,n);[phys] alpha(2);[io,phys]b(2,n)',
+	Pars => 'a(2,n); alpha(2);[io]b(2,n)',
 	Code =>  '
 		FORTRAN($TFD(c,z)axpy)(
 		&(integer){$SIZE(n)},
@@ -4747,7 +4747,7 @@ pp_defc("nrm2",
 			integer *incx);
 EOF
        HandleBad => 0,
-	Pars => '[phys]a(2,n);[o]b()',
+	Pars => 'a(2,n);[o]b()',
 	Code =>  '
 		$b() = FORTRAN($TFD(sc,dz)nrm2)(
 		&(integer){$SIZE(n)},
@@ -4761,7 +4761,7 @@ pp_defc("asum",
 		integer *incx);
 EOF
        HandleBad => 0,
-	Pars => '[phys]a(2,n);[o]b()',
+	Pars => 'a(2,n);[o]b()',
 	Code =>  '
 		$b() = FORTRAN($TFD(sc,dz)asum)(
 		&(integer){$SIZE(n)},
@@ -4775,7 +4775,7 @@ pp_defc("scal",
 		$GENERIC() *dx, integer *incx);
 EOF
         HandleBad => 0,
-	Pars => '[io,phys]a(2,n);scale(2)',
+	Pars => '[io]a(2,n);scale(2)',
 	Code =>  '
 		FORTRAN($TFD(c,z)scal)(
 		&(integer){$SIZE(n)},
@@ -4790,7 +4790,7 @@ pp_defc("sscal",
 		$GENERIC() *dx, integer *incx);
 EOF
         HandleBad => 0,
-	Pars => '[io,phys]a(2,n);scale()',
+	Pars => '[io]a(2,n);scale()',
 	Code =>  '
 		FORTRAN($TFD(cs,zd)scal)(
 		&(integer){$SIZE(n)},
@@ -4813,7 +4813,7 @@ pp_defc("rotg",
 		$GENERIC() *dy, $GENERIC() *c, $GENERIC() *s);
 EOF
        HandleBad => 0,
-	Pars => '[io,phys]a(2);[phys]b(2);[o,phys]c(); [o,phys]s(2)',
+	Pars => '[io]a(2);b(2);[o]c(); [o]s(2)',
 	Code =>  '
 		FORTRAN($TFD(c,z)rotg)(
 		$P(a),
@@ -4834,7 +4834,7 @@ pp_defc("lacpy",
 		a, integer *lda, $GENERIC() *b, integer *ldb);
 EOF
        HandleBad => 0,
-	Pars => '[phys]A(2,m,n); int uplo(); [o,phys]B(2,p,n)',
+	Pars => 'A(2,m,n); int uplo(); [o]B(2,p,n)',
 	Code => '
 		char puplo;
 		switch ($uplo())
@@ -4862,7 +4862,7 @@ pp_defc("laswp",
 		*k1, integer *k2, integer *ipiv, integer *incx);
 EOF
        HandleBad => 0,
-	Pars => '[io,phys]A(2,m,n); int [phys]k1(); int [phys]k2(); int [phys]ipiv(p)',
+	Pars => '[io]A(2,m,n); int k1(); int k2(); int ipiv(p)',
 	Code => '
 		FORTRAN($TFD(c,z)laswp)(
 		&(integer){$SIZE(n)},

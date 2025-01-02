@@ -1,5 +1,5 @@
 #
-# GENERATED WITH PDL::PP from ops.pd! Don't modify!
+# GENERATED WITH PDL::PP from lib/PDL/Ops.pd! Don't modify!
 #
 package PDL::Ops;
 
@@ -22,7 +22,7 @@ use DynaLoader;
 
 
 
-#line 20 "ops.pd"
+#line 20 "lib/PDL/Ops.pd"
 
 use strict;
 use warnings;
@@ -50,7 +50,7 @@ by the module L<PDL::Primitive>.
 none
 
 =cut
-#line 54 "Ops.pm"
+#line 54 "lib/PDL/Ops.pm"
 
 
 =head1 FUNCTIONS
@@ -61,9 +61,9 @@ none
 
 
 
-#line 134 "ops.pd"
+#line 133 "lib/PDL/Ops.pd"
 
-#line 188 "ops.pd"
+#line 187 "lib/PDL/Ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'+'} = $overload_sub = sub(;@) {
@@ -75,12 +75,12 @@ none
   }; }
 }
 
-#line 201 "ops.pd"
+#line 200 "lib/PDL/Ops.pd"
 BEGIN {
 # in1, in2, out, swap if true
 $OVERLOADS{'+='} = sub { PDL::plus($_[0]->inplace, $_[1]); $_[0] };
 }
-#line 84 "Ops.pm"
+#line 84 "lib/PDL/Ops.pm"
 
 
 =head2 plus
@@ -125,9 +125,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 134 "ops.pd"
+#line 133 "lib/PDL/Ops.pd"
 
-#line 188 "ops.pd"
+#line 187 "lib/PDL/Ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'*'} = $overload_sub = sub(;@) {
@@ -139,12 +139,12 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
   }; }
 }
 
-#line 201 "ops.pd"
+#line 200 "lib/PDL/Ops.pd"
 BEGIN {
 # in1, in2, out, swap if true
 $OVERLOADS{'*='} = sub { PDL::mult($_[0]->inplace, $_[1]); $_[0] };
 }
-#line 148 "Ops.pm"
+#line 148 "lib/PDL/Ops.pm"
 
 
 =head2 mult
@@ -189,9 +189,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 134 "ops.pd"
+#line 133 "lib/PDL/Ops.pd"
 
-#line 188 "ops.pd"
+#line 187 "lib/PDL/Ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'-'} = $overload_sub = sub(;@) {
@@ -203,12 +203,12 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
   }; }
 }
 
-#line 201 "ops.pd"
+#line 200 "lib/PDL/Ops.pd"
 BEGIN {
 # in1, in2, out, swap if true
 $OVERLOADS{'-='} = sub { PDL::minus($_[0]->inplace, $_[1]); $_[0] };
 }
-#line 212 "Ops.pm"
+#line 212 "lib/PDL/Ops.pm"
 
 
 =head2 minus
@@ -253,9 +253,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 134 "ops.pd"
+#line 133 "lib/PDL/Ops.pd"
 
-#line 188 "ops.pd"
+#line 187 "lib/PDL/Ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'/'} = $overload_sub = sub(;@) {
@@ -267,12 +267,12 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
   }; }
 }
 
-#line 201 "ops.pd"
+#line 200 "lib/PDL/Ops.pd"
 BEGIN {
 # in1, in2, out, swap if true
 $OVERLOADS{'/='} = sub { PDL::divide($_[0]->inplace, $_[1]); $_[0] };
 }
-#line 276 "Ops.pm"
+#line 276 "lib/PDL/Ops.pm"
 
 
 =head2 divide
@@ -317,9 +317,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 134 "ops.pd"
+#line 133 "lib/PDL/Ops.pd"
 
-#line 188 "ops.pd"
+#line 187 "lib/PDL/Ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'>'} = $overload_sub = sub(;@) {
@@ -330,7 +330,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
       goto &$foo;
   }; }
 }
-#line 334 "Ops.pm"
+#line 334 "lib/PDL/Ops.pm"
 
 
 =head2 gt
@@ -375,9 +375,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 134 "ops.pd"
+#line 133 "lib/PDL/Ops.pd"
 
-#line 188 "ops.pd"
+#line 187 "lib/PDL/Ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'<'} = $overload_sub = sub(;@) {
@@ -388,7 +388,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
       goto &$foo;
   }; }
 }
-#line 392 "Ops.pm"
+#line 392 "lib/PDL/Ops.pm"
 
 
 =head2 lt
@@ -433,9 +433,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 134 "ops.pd"
+#line 133 "lib/PDL/Ops.pd"
 
-#line 188 "ops.pd"
+#line 187 "lib/PDL/Ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'<='} = $overload_sub = sub(;@) {
@@ -446,7 +446,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
       goto &$foo;
   }; }
 }
-#line 450 "Ops.pm"
+#line 450 "lib/PDL/Ops.pm"
 
 
 =head2 le
@@ -491,9 +491,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 134 "ops.pd"
+#line 133 "lib/PDL/Ops.pd"
 
-#line 188 "ops.pd"
+#line 187 "lib/PDL/Ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'>='} = $overload_sub = sub(;@) {
@@ -504,7 +504,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
       goto &$foo;
   }; }
 }
-#line 508 "Ops.pm"
+#line 508 "lib/PDL/Ops.pm"
 
 
 =head2 ge
@@ -549,9 +549,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 134 "ops.pd"
+#line 133 "lib/PDL/Ops.pd"
 
-#line 188 "ops.pd"
+#line 187 "lib/PDL/Ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'=='} = $overload_sub = sub(;@) {
@@ -562,7 +562,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
       goto &$foo;
   }; }
 }
-#line 566 "Ops.pm"
+#line 566 "lib/PDL/Ops.pm"
 
 
 =head2 eq
@@ -607,9 +607,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 134 "ops.pd"
+#line 133 "lib/PDL/Ops.pd"
 
-#line 188 "ops.pd"
+#line 187 "lib/PDL/Ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'!='} = $overload_sub = sub(;@) {
@@ -620,7 +620,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
       goto &$foo;
   }; }
 }
-#line 624 "Ops.pm"
+#line 624 "lib/PDL/Ops.pm"
 
 
 =head2 ne
@@ -665,9 +665,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 134 "ops.pd"
+#line 133 "lib/PDL/Ops.pd"
 
-#line 188 "ops.pd"
+#line 187 "lib/PDL/Ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'<<'} = $overload_sub = sub(;@) {
@@ -679,12 +679,12 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
   }; }
 }
 
-#line 201 "ops.pd"
+#line 200 "lib/PDL/Ops.pd"
 BEGIN {
 # in1, in2, out, swap if true
 $OVERLOADS{'<<='} = sub { PDL::shiftleft($_[0]->inplace, $_[1]); $_[0] };
 }
-#line 688 "Ops.pm"
+#line 688 "lib/PDL/Ops.pm"
 
 
 =head2 shiftleft
@@ -729,9 +729,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 134 "ops.pd"
+#line 133 "lib/PDL/Ops.pd"
 
-#line 188 "ops.pd"
+#line 187 "lib/PDL/Ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'>>'} = $overload_sub = sub(;@) {
@@ -743,12 +743,12 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
   }; }
 }
 
-#line 201 "ops.pd"
+#line 200 "lib/PDL/Ops.pd"
 BEGIN {
 # in1, in2, out, swap if true
 $OVERLOADS{'>>='} = sub { PDL::shiftright($_[0]->inplace, $_[1]); $_[0] };
 }
-#line 752 "Ops.pm"
+#line 752 "lib/PDL/Ops.pm"
 
 
 =head2 shiftright
@@ -793,9 +793,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 134 "ops.pd"
+#line 133 "lib/PDL/Ops.pd"
 
-#line 188 "ops.pd"
+#line 187 "lib/PDL/Ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'|'} = $overload_sub = sub(;@) {
@@ -807,12 +807,12 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
   }; }
 }
 
-#line 201 "ops.pd"
+#line 200 "lib/PDL/Ops.pd"
 BEGIN {
 # in1, in2, out, swap if true
 $OVERLOADS{'|='} = sub { PDL::or2($_[0]->inplace, $_[1]); $_[0] };
 }
-#line 816 "Ops.pm"
+#line 816 "lib/PDL/Ops.pm"
 
 
 =head2 or2
@@ -857,9 +857,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 134 "ops.pd"
+#line 133 "lib/PDL/Ops.pd"
 
-#line 188 "ops.pd"
+#line 187 "lib/PDL/Ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'&'} = $overload_sub = sub(;@) {
@@ -871,12 +871,12 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
   }; }
 }
 
-#line 201 "ops.pd"
+#line 200 "lib/PDL/Ops.pd"
 BEGIN {
 # in1, in2, out, swap if true
 $OVERLOADS{'&='} = sub { PDL::and2($_[0]->inplace, $_[1]); $_[0] };
 }
-#line 880 "Ops.pm"
+#line 880 "lib/PDL/Ops.pm"
 
 
 =head2 and2
@@ -921,9 +921,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 134 "ops.pd"
+#line 133 "lib/PDL/Ops.pd"
 
-#line 188 "ops.pd"
+#line 187 "lib/PDL/Ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'^'} = $overload_sub = sub(;@) {
@@ -935,12 +935,12 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
   }; }
 }
 
-#line 201 "ops.pd"
+#line 200 "lib/PDL/Ops.pd"
 BEGIN {
 # in1, in2, out, swap if true
 $OVERLOADS{'^='} = sub { PDL::xor($_[0]->inplace, $_[1]); $_[0] };
 }
-#line 944 "Ops.pm"
+#line 944 "lib/PDL/Ops.pm"
 
 
 =head2 xor
@@ -985,11 +985,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 310 "ops.pd"
+#line 309 "lib/PDL/Ops.pd"
 
-#line 184 "ops.pd"
+#line 183 "lib/PDL/Ops.pd"
 BEGIN { $OVERLOADS{'~'} = sub { PDL::bitnot($_[0]) } }
-#line 993 "Ops.pm"
+#line 993 "lib/PDL/Ops.pm"
 
 
 =head2 bitnot
@@ -1026,9 +1026,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 245 "ops.pd"
+#line 244 "lib/PDL/Ops.pd"
 
-#line 188 "ops.pd"
+#line 187 "lib/PDL/Ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'**'} = $overload_sub = sub(;@) {
@@ -1040,12 +1040,12 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
   }; }
 }
 
-#line 201 "ops.pd"
+#line 200 "lib/PDL/Ops.pd"
 BEGIN {
 # in1, in2, out, swap if true
 $OVERLOADS{'**='} = sub { PDL::power($_[0]->inplace, $_[1]); $_[0] };
 }
-#line 1049 "Ops.pm"
+#line 1049 "lib/PDL/Ops.pm"
 
 
 =head2 power
@@ -1086,9 +1086,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 245 "ops.pd"
+#line 244 "lib/PDL/Ops.pd"
 
-#line 188 "ops.pd"
+#line 187 "lib/PDL/Ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'atan2'} = $overload_sub = sub(;@) {
@@ -1099,7 +1099,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
       goto &$foo;
   }; }
 }
-#line 1103 "Ops.pm"
+#line 1103 "lib/PDL/Ops.pm"
 
 
 =head2 atan2
@@ -1140,9 +1140,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 245 "ops.pd"
+#line 244 "lib/PDL/Ops.pd"
 
-#line 188 "ops.pd"
+#line 187 "lib/PDL/Ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'%'} = $overload_sub = sub(;@) {
@@ -1154,12 +1154,12 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
   }; }
 }
 
-#line 201 "ops.pd"
+#line 200 "lib/PDL/Ops.pd"
 BEGIN {
 # in1, in2, out, swap if true
 $OVERLOADS{'%='} = sub { PDL::modulo($_[0]->inplace, $_[1]); $_[0] };
 }
-#line 1163 "Ops.pm"
+#line 1163 "lib/PDL/Ops.pm"
 
 
 =head2 modulo
@@ -1200,9 +1200,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 245 "ops.pd"
+#line 244 "lib/PDL/Ops.pd"
 
-#line 188 "ops.pd"
+#line 187 "lib/PDL/Ops.pd"
 {
   my ($foo, $overload_sub);
   BEGIN { $OVERLOADS{'<=>'} = $overload_sub = sub(;@) {
@@ -1213,7 +1213,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
       goto &$foo;
   }; }
 }
-#line 1217 "Ops.pm"
+#line 1217 "lib/PDL/Ops.pm"
 
 
 =head2 spaceship
@@ -1254,11 +1254,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 310 "ops.pd"
+#line 309 "lib/PDL/Ops.pd"
 
-#line 184 "ops.pd"
+#line 183 "lib/PDL/Ops.pd"
 BEGIN { $OVERLOADS{'sqrt'} = sub { PDL::sqrt($_[0]) } }
-#line 1262 "Ops.pm"
+#line 1262 "lib/PDL/Ops.pm"
 
 
 =head2 sqrt
@@ -1295,11 +1295,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 310 "ops.pd"
+#line 309 "lib/PDL/Ops.pd"
 
-#line 184 "ops.pd"
+#line 183 "lib/PDL/Ops.pd"
 BEGIN { $OVERLOADS{'sin'} = sub { PDL::sin($_[0]) } }
-#line 1303 "Ops.pm"
+#line 1303 "lib/PDL/Ops.pm"
 
 
 =head2 sin
@@ -1336,11 +1336,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 310 "ops.pd"
+#line 309 "lib/PDL/Ops.pd"
 
-#line 184 "ops.pd"
+#line 183 "lib/PDL/Ops.pd"
 BEGIN { $OVERLOADS{'cos'} = sub { PDL::cos($_[0]) } }
-#line 1344 "Ops.pm"
+#line 1344 "lib/PDL/Ops.pm"
 
 
 =head2 cos
@@ -1377,11 +1377,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 310 "ops.pd"
+#line 309 "lib/PDL/Ops.pd"
 
-#line 184 "ops.pd"
+#line 183 "lib/PDL/Ops.pd"
 BEGIN { $OVERLOADS{'!'} = sub { PDL::not($_[0]) } }
-#line 1385 "Ops.pm"
+#line 1385 "lib/PDL/Ops.pm"
 
 
 =head2 not
@@ -1418,11 +1418,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 310 "ops.pd"
+#line 309 "lib/PDL/Ops.pd"
 
-#line 184 "ops.pd"
+#line 183 "lib/PDL/Ops.pd"
 BEGIN { $OVERLOADS{'exp'} = sub { PDL::exp($_[0]) } }
-#line 1426 "Ops.pm"
+#line 1426 "lib/PDL/Ops.pm"
 
 
 =head2 exp
@@ -1459,11 +1459,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 310 "ops.pd"
+#line 309 "lib/PDL/Ops.pd"
 
-#line 184 "ops.pd"
+#line 183 "lib/PDL/Ops.pd"
 BEGIN { $OVERLOADS{'log'} = sub { PDL::log($_[0]) } }
-#line 1467 "Ops.pm"
+#line 1467 "lib/PDL/Ops.pm"
 
 
 =head2 log
@@ -1776,7 +1776,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 560 "ops.pd"
+#line 559 "lib/PDL/Ops.pd"
 
 =head2 abs
 
@@ -1788,9 +1788,9 @@ Returns the absolute value of a number.
 
 sub PDL::abs { $_[0]->type->real ? goto &PDL::_rabs : goto &PDL::_cabs }
 
-#line 184 "ops.pd"
+#line 183 "lib/PDL/Ops.pd"
 BEGIN { $OVERLOADS{'abs'} = sub { PDL::abs($_[0]) } }
-#line 1794 "Ops.pm"
+#line 1794 "lib/PDL/Ops.pm"
 
 
 =head2 abs2
@@ -1891,7 +1891,7 @@ sub PDL::i2C ($) {
 
 
 
-#line 618 "ops.pd"
+#line 617 "lib/PDL/Ops.pd"
 
 # This is to used warn if an operand is non-numeric or non-PDL.
 sub warn_non_numeric_op_wrapper {
@@ -1920,7 +1920,7 @@ sub warn_non_numeric_op_wrapper {
     ;
 }
 
-#line 51 "ops.pd"
+#line 51 "lib/PDL/Ops.pd"
 
 =head1 AUTHOR
 
@@ -1932,7 +1932,7 @@ Doug Burke (burke@ifa.hawaii.edu),
 and Craig DeForest (deforest@boulder.swri.edu).
 
 =cut
-#line 1936 "Ops.pm"
+#line 1936 "lib/PDL/Ops.pm"
 
 # Exit with OK status
 

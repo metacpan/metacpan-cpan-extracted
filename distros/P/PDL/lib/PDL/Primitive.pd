@@ -1,0 +1,6275 @@
+use strict;
+use warnings;
+use PDL::Types qw(ppdefs_all types);
+my $F = [map $_->ppsym, grep $_->real && !$_->integer, types()];
+my $AF = [map $_->ppsym, grep !$_->integer, types];
+$AF = [(grep $_ ne 'D', @$AF), 'D']; # so defaults to D if non-float given
+
+{ no warnings 'once'; # pass info back to Makefile.PL
+$PDL::Core::Dev::EXTRAS{$::PDLMOD}{OBJECT} .= " $::PDLBASE-xoshiro256plus\$(OBJ_EXT)";
+}
+
+pp_addpm({At=>'Top'},<<'EOD');
+use strict;
+use warnings;
+use PDL::Slices;
+use Carp;
+
+{ package # hide from MetaCPAN
+    PDL;
+  use overload (
+    'x' => sub {
+      PDL::Primitive::matmult(@_[0,1], my $foo=$_[0]->null());
+      $foo;
+    },
+  );
+}
+
+=head1 NAME
+
+PDL::Primitive - primitive operations for pdl
+
+=head1 DESCRIPTION
+
+This module provides some primitive and useful functions defined
+using PDL::PP and able to use the new indexing tricks.
+
+See L<PDL::Indexing> for how to use indices creatively.
+For explanation of the signature format, see L<PDL::PP>.
+
+=head1 SYNOPSIS
+
+ # Pulls in PDL::Primitive, among other modules.
+ use PDL;
+
+ # Only pull in PDL::Primitive:
+ use PDL::Primitive;
+
+=cut
+
+EOD
+
+################################################################
+#  a whole bunch of quite basic functions for inner, outer
+#  and matrix products (operations that are not normally
+#  available via operator overloading)
+################################################################
+
+pp_def('inner',
+       HandleBad => 1,
+       Pars => 'a(n); b(n); [o]c();',
+       GenericTypes => [ppdefs_all],
+       Code => <<'EOF',
+complex long double tmp = 0;
+PDL_IF_BAD(int badflag = 0;,)
+loop(n) %{
+  PDL_IF_BAD(if ($ISBAD(a()) || $ISBAD(b())) { badflag = 1; break; }
+  else,)                                     { tmp += $a() * $b(); }
+%}
+PDL_IF_BAD(if (badflag) { $SETBAD(c()); $PDLSTATESETBAD(c); }
+else,)                  { $c() = tmp; }
+EOF
+       Doc => '
+=for ref
+
+Inner product over one dimension
+
+ c = sum_i a_i * b_i
+
+See also L</norm>, L<PDL::Ufunc/magnover>.
+',
+       BadDoc => '
+=for bad
+
+If C<a() * b()> contains only bad data,
+C<c()> is set bad. Otherwise C<c()> will have its bad flag cleared,
+as it will not contain any bad values.
+',
+       ); # pp_def( inner )
+
+pp_def('outer',
+       HandleBad => 1,
+       Pars => 'a(n); b(m); [o]c(n,m);',
+       GenericTypes => [ppdefs_all],
+       Code => <<'EOF',
+loop(n,m) %{
+  PDL_IF_BAD(if ( $ISBAD(a()) || $ISBAD(b()) ) { $SETBAD(c()); continue; },)
+  $c() = $a() * $b();
+%}
+EOF
+       Doc => '
+=for ref
+
+outer product over one dimension
+
+Naturally, it is possible to achieve the effects of outer
+product simply by broadcasting over the "C<*>"
+operator but this function is provided for convenience.
+'); # pp_def( outer )
+
+pp_addpm(<<'EOD');
+=head2 x
+
+=for sig
+
+ Signature: (a(i,z), b(x,i),[o]c(x,z))
+
+=for ref
+
+Matrix multiplication
+
+PDL overloads the C<x> operator (normally the repeat operator) for
+matrix multiplication.  The number of columns (size of the 0
+dimension) in the left-hand argument must normally equal the number of
+rows (size of the 1 dimension) in the right-hand argument.
+
+Row vectors are represented as (N x 1) two-dimensional PDLs, or you
+may be sloppy and use a one-dimensional PDL.  Column vectors are
+represented as (1 x N) two-dimensional PDLs.
+
+Broadcasting occurs in the usual way, but as both the 0 and 1 dimension
+(if present) are included in the operation, you must be sure that
+you don't try to broadcast over either of those dims.
+
+Of note, due to how Perl v5.14.0 and above implement operator overloading of
+the C<x> operator, the use of parentheses for the left operand creates a list
+context, that is
+
+ pdl> ( $x * $y ) x $z
+ ERROR: Argument "..." isn't numeric in repeat (x) ...
+
+treats C<$z> as a numeric count for the list repeat operation and does not call
+the scalar form of the overloaded operator. To use the operator in this case,
+use a scalar context:
+
+ pdl> scalar( $x * $y ) x $z
+
+or by calling L</matmult> directly:
+
+ pdl> ( $x * $y )->matmult( $z )
+
+EXAMPLES
+
+Here are some simple ways to define vectors and matrices:
+
+ pdl> $r = pdl(1,2);                # A row vector
+ pdl> $c = pdl([[3],[4]]);          # A column vector
+ pdl> $c = pdl(3,4)->(*1);          # A column vector, using NiceSlice
+ pdl> $m = pdl([[1,2],[3,4]]);      # A 2x2 matrix
+
+Now that we have a few objects prepared, here is how to
+matrix-multiply them:
+
+ pdl> print $r x $m                 # row x matrix = row
+ [
+  [ 7 10]
+ ]
+
+ pdl> print $m x $r                 # matrix x row = ERROR
+ PDL: Dim mismatch in matmult of [2x2] x [2x1]: 2 != 1
+
+ pdl> print $m x $c                 # matrix x column = column
+ [
+  [ 5]
+  [11]
+ ]
+
+ pdl> print $m x 2                  # Trivial case: scalar mult.
+ [
+  [2 4]
+  [6 8]
+ ]
+
+ pdl> print $r x $c                 # row x column = scalar
+ [
+  [11]
+ ]
+
+ pdl> print $c x $r                 # column x row = matrix
+ [
+  [3 6]
+  [4 8]
+ ]
+
+INTERNALS
+
+The mechanics of the multiplication are carried out by the
+L</matmult> method.
+
+=cut
+
+EOD
+
+pp_def('matmult',
+	HandleBad=>1,
+	Pars => 'a(t,h); b(w,t); [o]c(w,h);',
+	GenericTypes => [ppdefs_all],
+	PMCode => pp_line_numbers(__LINE__, <<'EOPM'),
+sub PDL::matmult {
+    my ($x,$y,$c) = @_;
+    $y = PDL->topdl($y);
+    $c = PDL->null if !UNIVERSAL::isa($c, 'PDL');
+    while($x->getndims < 2) {$x = $x->dummy(-1)}
+    while($y->getndims < 2) {$y = $y->dummy(-1)}
+    return ($c .= $x * $y) if( ($x->dim(0)==1 && $x->dim(1)==1) ||
+                               ($y->dim(0)==1 && $y->dim(1)==1) );
+    barf sprintf 'Dim mismatch in matmult of [%1$dx%2$d] x [%3$dx%4$d]: %1$d != %4$d',$x->dim(0),$x->dim(1),$y->dim(0),$y->dim(1)
+      if $y->dim(1) != $x->dim(0);
+    PDL::_matmult_int($x,$y,$c);
+    $c;
+}
+EOPM
+	Code => <<'EOC',
+PDL_Indx tsiz = 8 * sizeof(double) / sizeof($GENERIC());
+
+// Cache the dimincs to avoid constant lookups
+PDL_Indx atdi = PDL_REPRINCS($PDL(a))[0];
+PDL_Indx btdi = PDL_REPRINCS($PDL(b))[1];
+
+broadcastloop %{
+// Loop over tiles
+loop (h=::tsiz,w=::tsiz) %{
+  PDL_Indx h_outer = h, w_outer = w;
+  // Zero the output for this tile
+  loop (h=h_outer:h_outer+tsiz,w=w_outer:w_outer+tsiz) %{ $c() = 0; %}
+  loop (t=::tsiz,h=h_outer:h_outer+tsiz,w=w_outer:w_outer+tsiz) %{
+    // Cache the accumulated value for the output
+    $GENERIC() cc = $c();
+    PDL_IF_BAD(if ($ISBADVAR(cc,c)) continue;,)
+    // Cache data pointers before 't' run through tile
+    $GENERIC() *ad = &($a());
+    $GENERIC() *bd = &($b());
+    // Hotspot - run the 't' summation
+    PDL_Indx t_outer = t;
+    PDL_IF_BAD(char c_isbad = 0;,)
+    loop (t=t_outer:t_outer+tsiz) %{
+      PDL_IF_BAD(if ($ISBADVAR(*ad,a) || $ISBADVAR(*bd,b)) { c_isbad = 1; break; },)
+      cc += *ad * *bd;
+      ad += atdi;
+      bd += btdi;
+    %}
+    // put the output back to be further accumulated later
+    PDL_IF_BAD(if (c_isbad) { $SETBAD(c()); continue; },)
+    $c() = cc;
+  %}
+%}
+%}
+EOC
+	Doc => <<'EOD'
+=for ref
+
+Matrix multiplication
+
+Notionally, matrix multiplication $x x $y is equivalent to the
+broadcasting expression
+
+    $x->dummy(1)->inner($y->xchg(0,1)->dummy(2),$c);
+
+but for large matrices that breaks CPU cache and is slow.  Instead,
+matmult calculates its result in 32x32x32 tiles, to keep the memory
+footprint within cache as long as possible on most modern CPUs.
+
+For usage, see L</x>, a description of the overloaded 'x' operator
+
+EOD
+);
+
+pp_def('innerwt',
+       HandleBad => 1,
+       Pars => 'a(n); b(n); c(n); [o]d();',
+       GenericTypes => [ppdefs_all],
+       Code => <<'EOF',
+complex long double tmp = 0;
+PDL_IF_BAD(int flag = 0;,)
+loop(n) %{
+  PDL_IF_BAD(if ($ISBAD(a()) || $ISBAD(b()) || $ISBAD(c())) continue;flag = 1;,)
+  tmp += $a() * $b() * $c();
+%}
+PDL_IF_BAD(if (!flag) { $SETBAD(d()); }
+else,)                { $d() = tmp; }
+EOF
+       Doc => '
+
+=for ref
+
+Weighted (i.e. triple) inner product
+
+ d = sum_i a(i) b(i) c(i)
+
+=cut
+
+'
+       );
+
+pp_def('inner2',
+       HandleBad => 1,
+       Pars => 'a(n); b(n,m); c(m); [o]d();',
+       GenericTypes => [ppdefs_all],
+       Code => <<'EOF',
+complex long double tmp = 0;
+PDL_IF_BAD(int flag = 0;,)
+loop(n,m) %{
+  PDL_IF_BAD(if ($ISBAD(a()) || $ISBAD(b()) || $ISBAD(c())) continue;flag = 1;,)
+  tmp += $a() * $b() * $c();
+%}
+PDL_IF_BAD(if (!flag) { $SETBAD(d()); }
+else,)                { $d() = tmp; }
+EOF
+       Doc => '
+=for ref
+
+Inner product of two vectors and a matrix
+
+ d = sum_ij a(i) b(i,j) c(j)
+
+Note that you should probably not broadcast over C<a> and C<c> since that would be
+very wasteful. Instead, you should use a temporary for C<b*c>.
+'
+       );
+
+pp_def('inner2d',
+       HandleBad => 1,
+       Pars => 'a(n,m); b(n,m); [o]c();',
+       GenericTypes => [ppdefs_all],
+       Code => <<'EOF',
+complex long double tmp = 0;
+PDL_IF_BAD(int flag = 0;,)
+loop(n,m) %{
+  PDL_IF_BAD(if ($ISBAD(a()) || $ISBAD(b())) continue;flag = 1;,)
+  tmp += $a() * $b();
+%}
+PDL_IF_BAD(if (!flag) { $SETBAD(c()); }
+else,)                { $c() = tmp; }
+EOF
+       Doc => '
+
+=for ref
+
+Inner product over 2 dimensions.
+
+Equivalent to
+
+ $c = inner($x->clump(2), $y->clump(2))
+
+=cut
+
+'
+       );
+
+pp_def('inner2t',
+       HandleBad => 1,
+       Pars => 'a(j,n); b(n,m); c(m,k); [t]tmp(n,k); [o]d(j,k);',
+       GenericTypes => [ppdefs_all],
+       Code => <<'EOF',
+loop(n,k) %{
+  complex long double tmp0 = 0;
+  PDL_IF_BAD(int flag = 0;,)
+  loop(m) %{
+    PDL_IF_BAD(if ($ISBAD(b()) || $ISBAD(c())) continue;flag = 1;,)
+    tmp0 += $b() * $c();
+   %}
+  PDL_IF_BAD(if (!flag) { $SETBAD(tmp()); }
+  else,)                { $tmp() = tmp0; }
+%}
+loop(j,k) %{
+  complex long double tmp1 = 0;
+  PDL_IF_BAD(int flag = 0;,)
+  loop(n) %{
+    PDL_IF_BAD(if ($ISBAD(a()) || $ISBAD(tmp())) continue;flag = 1;,)
+    tmp1 += $a() * $tmp();
+  %}
+  PDL_IF_BAD(if (!flag) { $SETBAD(d()); }
+  else,)                { $d() = tmp1; }
+%}
+EOF
+       Doc => '
+=for ref
+
+Efficient Triple matrix product C<a*b*c>
+
+Efficiency comes from by using the temporary C<tmp>. This operation only
+scales as C<N**3> whereas broadcasting using L</inner2> would scale
+as C<N**4>.
+
+The reason for having this routine is that you do not need to
+have the same broadcast-dimensions for C<tmp> as for the other arguments,
+which in case of large numbers of matrices makes this much more
+memory-efficient.
+
+It is hoped that things like this could be taken care of as a kind of
+closures at some point.
+
+=cut
+'
+       ); # pp_def inner2t()
+
+# a helper function for the cross product definition
+sub crassgn {
+  "\$c(tri => $_[0]) = \$a(tri => $_[1])*\$b(tri => $_[2]) -
+	\$a(tri => $_[2])*\$b(tri => $_[1]);"
+}
+
+pp_def('crossp',
+       Doc => <<'EOD',
+
+=for ref
+
+Cross product of two 3D vectors
+
+After
+
+=for example
+
+ $c = crossp $x, $y
+
+the inner product C<$c*$x> and C<$c*$y> will be zero, i.e. C<$c> is
+orthogonal to C<$x> and C<$y>
+
+=cut
+
+EOD
+       Pars => 'a(tri=3); b(tri); [o] c(tri)',
+       GenericTypes => [ppdefs_all],
+       Code =>
+       crassgn(0,1,2)."\n".
+       crassgn(1,2,0)."\n".
+       crassgn(2,0,1),
+       );
+
+pp_def('norm',
+       HandleBad => 1,
+       Pars => 'vec(n); [o] norm(n)',
+       GenericTypes => [ppdefs_all],
+       Doc => 'Normalises a vector to unit Euclidean length
+
+See also L</inner>, L<PDL::Ufunc/magnover>.
+',
+       Code => <<'EOF',
+long double sum=0;
+PDL_IF_BAD(int flag = 0;,)
+loop(n) %{
+  PDL_IF_BAD(if ($ISBAD(vec())) continue; flag = 1;,)
+  sum += PDL_IF_GENTYPE_REAL(
+    $vec()*$vec(),
+    creall($vec())*creall($vec()) + cimagl($vec())*cimagl($vec())
+  );
+%}
+PDL_IF_BAD(if ( !flag ) {
+  loop(n) %{ $SETBAD(norm()); %}
+  continue;
+},)
+if (sum > 0) {
+  sum = sqrtl(sum);
+  loop(n) %{
+    PDL_IF_BAD(if ( $ISBAD(vec()) ) { $SETBAD(norm()); }
+               else              ,) { $norm() = $vec()/sum; }
+  %}
+} else {
+  loop(n) %{
+    PDL_IF_BAD(if ( $ISBAD(vec()) ) { $SETBAD(norm()); }
+               else              ,) { $norm() = $vec(); }
+  %}
+}
+EOF
+);
+
+# this one was motivated by the need to compute
+# the circular mean efficiently
+# without it could not be done efficiently or without
+# creating large intermediates (check pdl-porters for
+# discussion)
+# see PDL::ImageND for info about the circ_mean function
+
+pp_def(
+    'indadd',
+    HandleBad => 1,
+    Pars => 'input(n); indx ind(n); [io] sum(m)',
+    GenericTypes => [ppdefs_all],
+    Code => <<'EOF',
+loop(n) %{
+  register PDL_Indx this_ind = $ind();
+  if ( PDL_IF_BAD($ISBADVAR(this_ind,ind) ||,) this_ind<0 || this_ind>=$SIZE(m) )
+    $CROAK("invalid index %"IND_FLAG"; range 0..%"IND_FLAG, this_ind, $SIZE(m));
+  PDL_IF_BAD(
+  if ( $ISBAD(input()) ) { $SETBAD(sum(m => this_ind)); }
+  else,)                 { $sum(m => this_ind) += $input(); }
+%}
+EOF
+    BadDoc => '
+=for bad
+
+The routine barfs on bad indices, and bad inputs set target outputs bad.
+
+=cut
+',
+    Doc=>'
+=for ref
+
+Broadcasting index add: add C<input> to the C<ind> element of C<sum>, i.e:
+
+ sum(ind) += input
+
+=for example
+
+Simple example:
+
+  $x = 2;
+  $ind = 3;
+  $sum = zeroes(10);
+  indadd($x,$ind, $sum);
+  print $sum
+  #Result: ( 2 added to element 3 of $sum)
+  # [0 0 0 2 0 0 0 0 0 0]
+
+Broadcasting example:
+
+  $x = pdl( 1,2,3);
+  $ind = pdl( 1,4,6);
+  $sum = zeroes(10);
+  indadd($x,$ind, $sum);
+  print $sum."\n";
+  #Result: ( 1, 2, and 3 added to elements 1,4,6 $sum)
+  # [0 1 0 0 2 0 3 0 0 0]
+
+=cut
+');
+
+# 1D convolution
+# useful for broadcasted 1D filters
+pp_def('conv1d',
+       Doc => << 'EOD',
+
+=for ref
+
+1D convolution along first dimension
+
+The m-th element of the discrete convolution of an input ndarray
+C<$a> of size C<$M>, and a kernel ndarray C<$kern> of size C<$P>, is
+calculated as
+
+                              n = ($P-1)/2
+                              ====
+                              \
+  ($a conv1d $kern)[m]   =     >      $a_ext[m - n] * $kern[n]
+                              /
+                              ====
+                              n = -($P-1)/2
+
+where C<$a_ext> is either the periodic (or reflected) extension of
+C<$a> so it is equal to C<$a> on C< 0..$M-1 > and equal to the
+corresponding periodic/reflected image of C<$a> outside that range.
+
+
+=for example
+
+  $con = conv1d sequence(10), pdl(-1,0,1);
+
+  $con = conv1d sequence(10), pdl(-1,0,1), {Boundary => 'reflect'};
+
+By default, periodic boundary conditions are assumed (i.e. wrap around).
+Alternatively, you can request reflective boundary conditions using
+the C<Boundary> option:
+
+  {Boundary => 'reflect'} # case in 'reflect' doesn't matter
+
+The convolution is performed along the first dimension. To apply it across
+another dimension use the slicing routines, e.g.
+
+  $y = $x->mv(2,0)->conv1d($kernel)->mv(0,2); # along third dim
+
+This function is useful for broadcasted filtering of 1D signals.
+
+Compare also L<conv2d|PDL::Image2D/conv2d>, L<convolve|PDL::ImageND/convolve>,
+L<fftconvolve|PDL::FFT/fftconvolve()>
+
+=for bad
+
+WARNING: C<conv1d> processes bad values in its inputs as
+the numeric value of C<< $pdl->badvalue >> so it is not
+recommended for processing pdls with bad values in them
+unless special care is taken.
+
+=cut
+
+EOD
+        Pars => 'a(m); kern(p); [o]b(m);',
+        GenericTypes => [ppdefs_all],
+        OtherPars => 'int reflect;',
+        HandleBad => 0,
+        PMCode => pp_line_numbers(__LINE__, <<'EOPM'),
+sub PDL::conv1d {
+   my $opt = pop @_ if ref($_[-1]) eq 'HASH';
+   die 'Usage: conv1d( a(m), kern(p), [o]b(m), {Options} )'
+      if @_<2 || @_>3;
+   my($x,$kern) = @_;
+   my $c = @_ == 3 ? $_[2] : PDL->null;
+   PDL::_conv1d_int($x,$kern,$c,
+		     !(defined $opt && exists $$opt{Boundary}) ? 0 :
+		     lc $$opt{Boundary} eq "reflect");
+   return $c;
+}
+EOPM
+        CHeader => '
+/* Fast Modulus with proper negative behaviour */
+#define REALMOD(a,b) while ((a)>=(b)) (a) -= (b); while ((a)<0) (a) += (b);
+',
+        Code => '
+int reflect = $COMP(reflect);
+PDL_Indx m_size = $SIZE(m), p_size = $SIZE(p);
+PDL_Indx poff = (p_size-1)/2;
+loop(m) %{
+  complex long double tmp = 0;
+  loop(p) %{
+    PDL_Indx pflip = p_size - 1 - p, i2 = m+p - poff;
+    if (reflect && i2<0)
+      i2 = -i2;
+    if (reflect && i2>=m_size)
+      i2 = m_size-(i2-m_size+1);
+    REALMOD(i2,m_size);
+    tmp += $a(m=>i2) * $kern(p=>pflip);
+  %}
+  $b() = tmp;
+%}
+');
+
+
+# this can be achieved by
+#  ($x->dummy(0) == $y)->orover
+# but this one avoids a larger intermediate and potentially shortcuts
+pp_def('in',
+	Pars => 'a(); b(n); [o] c()',
+        GenericTypes => [ppdefs_all],
+	Code => '$c() = 0;
+		 loop(n) %{ if ($a() == $b()) {$c() = 1; break;} %}',
+	Doc => <<'EOD',
+
+=for ref
+
+test if a is in the set of values b
+
+=for example
+
+   $goodmsk = $labels->in($goodlabels);
+   print pdl(3,1,4,6,2)->in(pdl(2,3,3));
+  [1 0 0 0 1]
+
+C<in> is akin to the I<is an element of> of set theory. In principle,
+PDL broadcasting could be used to achieve its functionality by using a
+construct like
+
+   $msk = ($labels->dummy(0) == $goodlabels)->orover;
+
+However, C<in> doesn't create a (potentially large) intermediate
+and is generally faster.
+
+=cut
+
+EOD
+);
+
+pp_add_exported ('', 'uniq');
+pp_addpm (<< 'EOPM');
+=head2 uniq
+
+=for ref
+
+return all unique elements of an ndarray
+
+The unique elements are returned in ascending order.
+
+=for example
+
+  PDL> p pdl(2,2,2,4,0,-1,6,6)->uniq
+  [-1 0 2 4 6]     # 0 is returned 2nd (sorted order)
+
+  PDL> p pdl(2,2,2,4,nan,-1,6,6)->uniq
+  [-1 2 4 6 nan]   # NaN value is returned at end
+
+Note: The returned pdl is 1D; any structure of the input
+ndarray is lost.  C<NaN> values are never compare equal to
+any other values, even themselves.  As a result, they are
+always unique. C<uniq> returns the NaN values at the end
+of the result ndarray.  This follows the Matlab usage.
+
+See L</uniqind> if you need the indices of the unique
+elements rather than the values.
+
+=for bad
+
+Bad values are not considered unique by uniq and are ignored.
+
+ $x=sequence(10);
+ $x=$x->setbadif($x%3);
+ print $x->uniq;
+ [0 3 6 9]
+
+=cut
+
+*uniq = \&PDL::uniq;
+# return unique elements of array
+# find as jumps in the sorted array
+# flattens in the process
+sub PDL::uniq {
+   my ($arr) = @_;
+   return $arr if($arr->nelem == 0); # The null list is unique (CED)
+   return $arr->flat if($arr->nelem == 1); # singleton list is unique
+   my $aflat = $arr->flat;
+   my $srt  = $aflat->where($aflat==$aflat)->qsort; # no NaNs or BADs for qsort
+   my $nans = $aflat->where($aflat!=$aflat);
+   my $uniq = ($srt->nelem > 1) ? $srt->where($srt != $srt->rotate(-1)) : $srt;
+   # make sure we return something if there is only one value
+   (
+      $uniq->nelem > 0 ? $uniq :
+      $srt->nelem == 0 ? $srt :
+      PDL::pdl( ref($srt), [$srt->index(0)] )
+   )->append($nans);
+}
+EOPM
+
+pp_add_exported ('', 'uniqind');
+pp_addpm (<< 'EOPM');
+=head2 uniqind
+
+=for ref
+
+Return the indices of all unique elements of an ndarray
+The order is in the order of the values to be consistent
+with uniq. C<NaN> values never compare equal with any
+other value and so are always unique.  This follows the
+Matlab usage.
+
+=for example
+
+  PDL> p pdl(2,2,2,4,0,-1,6,6)->uniqind
+  [5 4 1 3 6]     # the 0 at index 4 is returned 2nd, but...
+
+  PDL> p pdl(2,2,2,4,nan,-1,6,6)->uniqind
+  [5 1 3 6 4]     # ...the NaN at index 4 is returned at end
+
+
+Note: The returned pdl is 1D; any structure of the input
+ndarray is lost.
+
+See L</uniq> if you want the unique values instead of the
+indices.
+
+=for bad
+
+Bad values are not considered unique by uniqind and are ignored.
+
+=cut
+
+*uniqind = \&PDL::uniqind;
+# return unique elements of array
+# find as jumps in the sorted array
+# flattens in the process
+sub PDL::uniqind {
+  use PDL::Core 'barf';
+  my ($arr) = @_;
+  return $arr if($arr->nelem == 0); # The null list is unique (CED)
+  # Different from uniq we sort and store the result in an intermediary
+  my $aflat = $arr->flat;
+  my $nanind = which($aflat!=$aflat);                        # NaN indexes
+  my $good = PDL->sequence(indx, $aflat->dims)->where($aflat==$aflat);  # good indexes
+  my $i_srt = $aflat->where($aflat==$aflat)->qsorti;         # no BAD or NaN values for qsorti
+  my $srt = $aflat->where($aflat==$aflat)->index($i_srt);
+  my $uniqind;
+  if ($srt->nelem > 0) {
+     $uniqind = which($srt != $srt->rotate(-1));
+     $uniqind = $i_srt->slice('0') if $uniqind->isempty;
+  } else {
+     $uniqind = which($srt);
+  }
+  # Now map back to the original space
+  my $ansind = $nanind;
+  if ( $uniqind->nelem > 0 ) {
+     $ansind = ($good->index($i_srt->index($uniqind)))->append($ansind);
+  } else {
+     $ansind = $uniqind->append($ansind);
+  }
+  return $ansind;
+}
+
+EOPM
+
+pp_add_exported ('', 'uniqvec');
+pp_addpm (<< 'EOPM');
+=head2 uniqvec
+
+=for ref
+
+Return all unique vectors out of a collection
+
+  NOTE: If any vectors in the input ndarray have NaN values
+  they are returned at the end of the non-NaN ones.  This is
+  because, by definition, NaN values never compare equal with
+  any other value.
+
+  NOTE: The current implementation does not sort the vectors
+  containing NaN values.
+
+The unique vectors are returned in lexicographically sorted
+ascending order. The 0th dimension of the input PDL is treated
+as a dimensional index within each vector, and the 1st and any
+higher dimensions are taken to run across vectors. The return
+value is always 2D; any structure of the input PDL (beyond using
+the 0th dimension for vector index) is lost.
+
+See also L</uniq> for a unique list of scalars; and
+L<qsortvec|PDL::Ufunc/qsortvec> for sorting a list of vectors
+lexicographcally.
+
+=for bad
+
+If a vector contains all bad values, it is ignored as in L</uniq>.
+If some of the values are good, it is treated as a normal vector. For
+example, [1 2 BAD] and [BAD 2 3] could be returned, but [BAD BAD BAD]
+could not.  Vectors containing BAD values will be returned after any
+non-NaN and non-BAD containing vectors, followed by the NaN vectors.
+
+=cut
+
+sub PDL::uniqvec {
+   my($pdl) = shift;
+
+   return $pdl if ( $pdl->nelem == 0 || $pdl->ndims < 2 );
+   return $pdl if ( $pdl->slice("(0)")->nelem < 2 );                     # slice isn't cheap but uniqvec isn't either
+
+   my $pdl2d = $pdl->clump(1..$pdl->ndims-1);
+   my $ngood = $pdl2d->ngoodover;
+   $pdl2d = $pdl2d->mv(0,-1)->dice($ngood->which)->mv(-1,0);             # remove all-BAD vectors
+
+   my $numnan = ($pdl2d!=$pdl2d)->sumover;                                  # works since no all-BADs to confuse
+
+   my $presrt = $pdl2d->mv(0,-1)->dice($numnan->not->which)->mv(0,-1);      # remove vectors with any NaN values
+   my $nanvec = $pdl2d->mv(0,-1)->dice($numnan->which)->mv(0,-1);           # the vectors with any NaN values
+
+   my $srt = $presrt->qsortvec->mv(0,-1);                                   # BADs are sorted by qsortvec
+   my $srtdice = $srt;
+   my $somebad = null;
+   if ($srt->badflag) {
+      $srtdice = $srt->dice($srt->mv(0,-1)->nbadover->not->which);
+      $somebad = $srt->dice($srt->mv(0,-1)->nbadover->which);
+   }
+
+   my $uniq = $srtdice->nelem > 0
+     ? ($srtdice != $srtdice->rotate(-1))->mv(0,-1)->orover->which
+     : $srtdice->orover->which;
+
+   my $ans = $uniq->nelem > 0 ? $srtdice->dice($uniq) :
+      ($srtdice->nelem > 0) ? $srtdice->slice("0,:") :
+      $srtdice;
+   return $ans->append($somebad)->append($nanvec->mv(0,-1))->mv(0,-1);
+}
+
+EOPM
+
+#####################################################################
+#  clipping routines
+#####################################################################
+
+# clipping
+
+for my $opt (
+	     ['hclip','PDLMIN'],
+	     ['lclip','PDLMAX']
+	     ) {
+    my $name = $opt->[0];
+    my $op   = $opt->[1];
+    my $code = '$c() = '.$op.'($b(), $a());';
+    pp_def(
+	   $name,
+	   HandleBad => 1,
+	   Pars => 'a(); b(); [o] c()',
+	   Code =>
+	   'PDL_IF_BAD(if ( $ISBAD(a()) || $ISBAD(b()) ) {
+               $SETBAD(c());
+            } else,) { '.$code.' }',
+	   Doc =>  'clip (threshold) C<$a> by C<$b> (C<$b> is '.
+	   ($name eq 'hclip' ? 'upper' : 'lower').' bound)',
+          PMCode=>pp_line_numbers(__LINE__, <<"EOD"),
+sub PDL::$name {
+   my (\$x,\$y) = \@_;
+   my \$c;
+   if (\$x->is_inplace) {
+       \$x->set_inplace(0); \$c = \$x;
+   } elsif (\@_ > 2) {\$c=\$_[2]} else {\$c=PDL->nullcreate(\$x)}
+   PDL::_${name}_int(\$x,\$y,\$c);
+   return \$c;
+}
+EOD
+    ); # pp_def $name
+
+} # for: my $opt
+
+pp_add_exported('', 'clip');
+pp_addpm(<<'EOD');
+=head2 clip
+
+=for ref
+
+Clip (threshold) an ndarray by (optional) upper or lower bounds.
+
+=for usage
+
+ $y = $x->clip(0,3);
+ $c = $x->clip(undef, $x);
+
+=for bad
+
+clip handles bad values since it is just a
+wrapper around L</hclip> and
+L</lclip>.
+
+=cut
+EOD
+
+pp_def(
+	'clip',
+	HandleBad => 1,
+	Pars => 'a(); l(); h(); [o] c()',
+	Code => <<'EOBC',
+         PDL_IF_BAD(
+	 if( $ISBAD(a()) || $ISBAD(l()) || $ISBAD(h()) ) {
+	   $SETBAD(c());
+         } else,) {
+           $c() = PDLMIN($h(), PDLMAX($l(), $a()));
+         }
+EOBC
+       PMCode=>pp_line_numbers(__LINE__, <<'EOPM'),
+*clip = \&PDL::clip;
+sub PDL::clip {
+  my($x, $l, $h) = @_;
+  my $d;
+  unless(defined($l) || defined($h)) {
+      # Deal with pathological case
+      if($x->is_inplace) {
+	  $x->set_inplace(0);
+	  return $x;
+      } else {
+	  return $x->copy;
+      }
+  }
+
+  if($x->is_inplace) {
+      $x->set_inplace(0); $d = $x
+  } elsif (@_ > 3) {
+      $d=$_[3]
+  } else {
+      $d = PDL->nullcreate($x);
+  }
+  if(defined($l) && defined($h)) {
+      PDL::_clip_int($x,$l,$h,$d);
+  } elsif( defined($l) ) {
+      PDL::_lclip_int($x,$l,$d);
+  } elsif( defined($h) ) {
+      PDL::_hclip_int($x,$h,$d);
+  } else {
+      die "This can't happen (clip contingency) - file a bug";
+  }
+
+  return $d;
+}
+EOPM
+    ); # end of clip pp_def call
+
+############################################################
+# elementary statistics and histograms
+############################################################
+
+pp_def('wtstat',
+       HandleBad => 1,
+       Pars => 'a(n); wt(n); avg(); [o]b();',
+       GenericTypes => [ppdefs_all],
+       OtherPars => 'int deg',
+       Code => <<'EOF',
+complex long double wtsum = 0;
+complex long double statsum = 0;
+PDL_IF_BAD(int flag = 0;,)
+loop(n) %{
+  PDL_IF_BAD(if ($ISBAD(wt()) || $ISBAD(a()) || $ISBAD(avg())) continue;flag = 1;,)
+  PDL_Indx i;
+  wtsum += $wt();
+  complex long double tmp=1;
+  for(i=0; i<$COMP(deg); i++)
+    tmp *= $a();
+  statsum += $wt() * (tmp - $avg());
+%}
+PDL_IF_BAD(if (!flag) { $SETBAD(b()); $PDLSTATESETBAD(b); }
+else,)                { $b() = statsum / wtsum; }
+EOF
+       Doc => '
+=for ref
+
+Weighted statistical moment of given degree
+
+This calculates a weighted statistic over the vector C<a>.
+The formula is
+
+ b() = (sum_i wt_i * (a_i ** degree - avg)) / (sum_i wt_i)
+',
+       BadDoc => '
+=for bad
+
+Bad values are ignored in any calculation; C<$b> will only
+have its bad flag set if the output contains any bad data.
+',
+       );
+
+pp_def('statsover',
+	HandleBad => 1,
+	Pars => 'a(n); w(n); float+ [o]avg(); float+ [o]prms(); int+ [o]min(); int+ [o]max(); float+ [o]adev(); float+ [o]rms()',
+	Code => <<'EOF',
+PDL_IF_GENTYPE_REAL(PDL_LDouble,PDL_CLDouble) tmp = 0, tmp1 = 0, diff = 0;
+$GENERIC(min) curmin = 0, curmax = 0;
+$GENERIC(w) norm = 0;
+int flag = 0;
+loop(n) %{             /* Accumulate sum and summed weight. */
+  /* perhaps should check w() for bad values too ? */
+  PDL_IF_BAD(if (!( $ISGOOD(a()) )) continue;,)
+  tmp += $a()*$w();
+  norm += ($GENERIC(avg)) $w();
+  if (!flag) { curmin = $a(); curmax = $a(); flag=1; }
+  if ($a() < curmin) {
+    curmin = $a();
+  } else if ($a() > curmax) {
+    curmax = $a();
+  }
+%}
+/* have at least one valid point if flag true */
+PDL_IF_BAD(if ( !flag ) {
+  $SETBAD(avg());  $PDLSTATESETBAD(avg);
+  $SETBAD(rms());  $PDLSTATESETBAD(rms);
+  $SETBAD(adev()); $PDLSTATESETBAD(adev);
+  $SETBAD(min());  $PDLSTATESETBAD(min);
+  $SETBAD(max());  $PDLSTATESETBAD(max);
+  $SETBAD(prms()); $PDLSTATESETBAD(prms);
+  continue;
+},)
+$avg() = tmp / norm; /* Find mean */
+$min() = curmin;
+$max() = curmax;
+/* Calculate the RMS and standard deviation. */
+tmp = 0;
+loop(n) %{
+  PDL_IF_BAD(if (!$ISGOOD(a())) continue;,)
+  diff = $a()-$avg();
+  tmp += diff * diff * $w();
+  tmp1 += PDL_IF_GENTYPE_REAL(fabsl,cabsl)(diff) * $w();
+%}
+$rms() = sqrtl( tmp/norm );
+if (norm>1)
+  $prms() =  sqrtl( tmp/(norm-1) );
+else
+  PDL_IF_BAD($SETBAD(prms()),$prms() = 0);
+$adev() = tmp1 / norm ;
+EOF
+      PMCode=>pp_line_numbers(__LINE__, <<'EOPM'),
+sub PDL::statsover {
+   barf('Usage: ($mean,[$prms, $median, $min, $max, $adev, $rms]) = statsover($data,[$weights])') if @_>2;
+   my ($data, $weights) = @_;
+   $weights //= $data->ones();
+   my $median = $data->medover;
+   my $mean = PDL->nullcreate($data);
+   my $rms = PDL->nullcreate($data);
+   my $min = PDL->nullcreate($data);
+   my $max = PDL->nullcreate($data);
+   my $adev = PDL->nullcreate($data);
+   my $prms = PDL->nullcreate($data);
+   PDL::_statsover_int($data, $weights, $mean, $prms, $min, $max, $adev, $rms);
+   wantarray ? ($mean, $prms, $median, $min, $max, $adev, $rms) : $mean;
+}
+EOPM
+      Doc => '
+=for ref
+
+Calculate useful statistics over a dimension of an ndarray
+
+=for usage
+
+  ($mean,$prms,$median,$min,$max,$adev,$rms) = statsover($ndarray, $weights);
+
+This utility function calculates various useful
+quantities of an ndarray. These are:
+
+=over 3
+
+=item * the mean:
+
+  MEAN = sum (x)/ N
+
+with C<N> being the number of elements in x
+
+=item * the population RMS deviation from the mean:
+
+  PRMS = sqrt( sum( (x-mean(x))^2 )/(N-1) )
+
+The population deviation is the best-estimate of the deviation
+of the population from which a sample is drawn.
+
+=item * the median
+
+The median is the 50th percentile data value.  Median is found by
+L<medover|PDL::Ufunc/medover>, so WEIGHTING IS IGNORED FOR THE MEDIAN CALCULATION.
+
+=item * the minimum
+
+=item * the maximum
+
+=item * the average absolute deviation:
+
+  AADEV = sum( abs(x-mean(x)) )/N
+
+=item * RMS deviation from the mean:
+
+  RMS = sqrt(sum( (x-mean(x))^2 )/N)
+
+(also known as the root-mean-square deviation, or the square root of the
+variance)
+
+=back
+
+This operator is a projection operator so the calculation
+will take place over the final dimension. Thus if the input
+is N-dimensional each returned value will be N-1 dimensional,
+to calculate the statistics for the entire ndarray either
+use C<clump(-1)> directly on the ndarray or call C<stats>.
+
+=cut
+',
+     BadDoc =>'
+=for bad
+
+Bad values are simply ignored in the calculation, effectively reducing
+the sample size.  If all data are bad then the output data are marked bad.
+
+=cut
+',
+);
+
+pp_add_exported('','stats');
+pp_addpm(<<'EOD');
+=head2 stats
+
+=for ref
+
+Calculates useful statistics on an ndarray
+
+=for usage
+
+ ($mean,$prms,$median,$min,$max,$adev,$rms) = stats($ndarray,[$weights]);
+
+This utility calculates all the most useful quantities in one call.
+It works the same way as L</statsover>, except that the quantities are
+calculated considering the entire input PDL as a single sample, rather
+than as a collection of rows. See L</statsover> for definitions of the
+returned quantities.
+
+=for bad
+
+Bad values are handled; if all input values are bad, then all of the output
+values are flagged bad.
+
+=cut
+
+*stats	  = \&PDL::stats;
+sub PDL::stats {
+    barf('Usage: ($mean,[$rms]) = stats($data,[$weights])') if @_>2;
+    my ($data,$weights) = @_;
+
+    # Ensure that $weights is properly broadcasted over; this could be
+    # done rather more efficiently...
+    if(defined $weights) {
+	$weights = pdl($weights) unless UNIVERSAL::isa($weights,'PDL');
+	if( ($weights->ndims != $data->ndims) or
+	    (pdl($weights->dims) != pdl($data->dims))->or
+	  ) {
+		$weights = $weights + zeroes($data)
+	}
+	$weights = $weights->flat;
+    }
+
+    return PDL::statsover($data->flat,$weights);
+}
+EOD
+
+my $histogram_doc = <<'EOD';
+=for ref
+
+Calculates a histogram for given stepsize and minimum.
+
+=for usage
+
+ $h = histogram($data, $step, $min, $numbins);
+ $hist = zeroes $numbins;  # Put histogram in existing ndarray.
+ histogram($data, $hist, $step, $min, $numbins);
+
+The histogram will contain C<$numbins> bins starting from C<$min>, each
+C<$step> wide. The value in each bin is the number of
+values in C<$data> that lie within the bin limits.
+
+
+Data below the lower limit is put in the first bin, and data above the
+upper limit is put in the last bin.
+
+The output is reset in a different broadcastloop so that you
+can take a histogram of C<$a(10,12)> into C<$b(15)> and get the result
+you want.
+
+For a higher-level interface, see L<hist|PDL::Basic/hist>.
+
+=for example
+
+ pdl> p histogram(pdl(1,1,2),1,0,3)
+ [0 2 1]
+
+=cut
+
+EOD
+
+my $whistogram_doc = <<'EOD';
+=for ref
+
+Calculates a histogram from weighted data for given stepsize and minimum.
+
+=for usage
+
+ $h = whistogram($data, $weights, $step, $min, $numbins);
+ $hist = zeroes $numbins;  # Put histogram in existing ndarray.
+ whistogram($data, $weights, $hist, $step, $min, $numbins);
+
+The histogram will contain C<$numbins> bins starting from C<$min>, each
+C<$step> wide. The value in each bin is the sum of the values in C<$weights>
+that correspond to values in C<$data> that lie within the bin limits.
+
+Data below the lower limit is put in the first bin, and data above the
+upper limit is put in the last bin.
+
+The output is reset in a different broadcastloop so that you
+can take a histogram of C<$a(10,12)> into C<$b(15)> and get the result
+you want.
+
+=for example
+
+ pdl> p whistogram(pdl(1,1,2), pdl(0.1,0.1,0.5), 1, 0, 4)
+ [0 0.2 0.5 0]
+
+=cut
+EOD
+
+for(
+    {Name => 'histogram',
+     WeightPar => '',
+     HistType => 'int+',
+     HistOp => '+= 1',
+     Doc => $histogram_doc,
+     },
+    {Name => 'whistogram',
+     WeightPar => 'float+ wt(n);',
+     HistType => 'float+',
+     HistOp => '+= $wt()',
+     Doc => $whistogram_doc,
+     }
+    )
+{
+pp_def($_->{Name},
+       Pars => 'in(n); '.$_->{WeightPar}.$_->{HistType}.  '[o] hist(m)',
+       GenericTypes => [ppdefs_all],
+       # set outdim by Par!
+       OtherPars => 'double step; double min; IV msize => m',
+       HandleBad => 1,
+       RedoDimsCode => 'if ($SIZE(m) == 0) $CROAK("called with m dim of 0");',
+       Code => pp_line_numbers(__LINE__-1, '
+register double min = $COMP(min), step = $COMP(step);
+broadcastloop %{
+  loop(m) %{ $hist() = 0; %}
+  loop(n) %{
+    PDL_IF_BAD(if ( !$ISGOOD(in()) ) continue;,)
+    PDL_Indx j = round((($in()-min)/step)-0.5);
+    j = PDLMIN(PDLMAX(j, 0), $SIZE(m)-1);
+    ($hist(m => j))'.$_->{HistOp}.';
+  %}
+%}'),
+       Doc=>$_->{Doc});
+}
+
+my $histogram2d_doc = <<'EOD';
+=for ref
+
+Calculates a 2d histogram.
+
+=for usage
+
+ $h = histogram2d($datax, $datay, $stepx, $minx,
+       $nbinx, $stepy, $miny, $nbiny);
+ $hist = zeroes $nbinx, $nbiny;  # Put histogram in existing ndarray.
+ histogram2d($datax, $datay, $hist, $stepx, $minx,
+       $nbinx, $stepy, $miny, $nbiny);
+
+The histogram will contain C<$nbinx> x C<$nbiny> bins, with the lower
+limits of the first one at C<($minx, $miny)>, and with bin size
+C<($stepx, $stepy)>.
+The value in each bin is the number of
+values in C<$datax> and C<$datay> that lie within the bin limits.
+
+Data below the lower limit is put in the first bin, and data above the
+upper limit is put in the last bin.
+
+=for example
+
+ pdl> p histogram2d(pdl(1,1,1,2,2),pdl(2,1,1,1,1),1,0,3,1,0,3)
+ [
+  [0 0 0]
+  [0 2 2]
+  [0 1 0]
+ ]
+
+=cut
+EOD
+
+my $whistogram2d_doc = <<'EOD';
+=for ref
+
+Calculates a 2d histogram from weighted data.
+
+=for usage
+
+ $h = whistogram2d($datax, $datay, $weights,
+       $stepx, $minx, $nbinx, $stepy, $miny, $nbiny);
+ $hist = zeroes $nbinx, $nbiny;  # Put histogram in existing ndarray.
+ whistogram2d($datax, $datay, $weights, $hist,
+       $stepx, $minx, $nbinx, $stepy, $miny, $nbiny);
+
+The histogram will contain C<$nbinx> x C<$nbiny> bins, with the lower
+limits of the first one at C<($minx, $miny)>, and with bin size
+C<($stepx, $stepy)>.
+The value in each bin is the sum of the values in
+C<$weights> that correspond to values in C<$datax> and C<$datay> that lie within the bin limits.
+
+Data below the lower limit is put in the first bin, and data above the
+upper limit is put in the last bin.
+
+=for example
+
+ pdl> p whistogram2d(pdl(1,1,1,2,2),pdl(2,1,1,1,1),pdl(0.1,0.2,0.3,0.4,0.5),1,0,3,1,0,3)
+ [
+  [  0   0   0]
+  [  0 0.5 0.9]
+  [  0 0.1   0]
+ ]
+
+=cut
+EOD
+
+for(
+    {Name => 'histogram2d',
+     WeightPar => '',
+     HistType => 'int+',
+     HistOp => '+= 1',
+     Doc => $histogram2d_doc,
+	},
+    {Name => 'whistogram2d',
+     WeightPar => 'float+ wt(n);',
+     HistType => 'float+',
+     HistOp => '+= $wt()',
+     Doc => $whistogram2d_doc,
+	}
+    )
+{
+pp_def($_->{Name},
+       Pars => 'ina(n); inb(n); '.$_->{WeightPar}.$_->{HistType}.  '[o] hist(ma,mb)',
+       GenericTypes => [ppdefs_all],
+       # set outdim by Par!
+       OtherPars => 'double stepa; double mina; IV masize => ma;
+	             double stepb; double minb; IV mbsize => mb;',
+       HandleBad => 1,
+       RedoDimsCode => '
+        if ($SIZE(ma) == 0) $CROAK("called with ma dim of 0");
+        if ($SIZE(mb) == 0) $CROAK("called with mb dim of 0");
+       ',
+       Code => pp_line_numbers(__LINE__-1, '
+register double mina = $COMP(mina), minb = $COMP(minb), stepa = $COMP(stepa), stepb = $COMP(stepb);
+broadcastloop %{
+  loop(ma,mb) %{ $hist() = 0; %}
+  loop(n) %{
+    PDL_IF_BAD(if (!( $ISGOOD(ina()) && $ISGOOD(inb()) )) continue;,)
+    PDL_Indx ja = round((($ina()-mina)/stepa)-0.5);
+    PDL_Indx jb = round((($inb()-minb)/stepb)-0.5);
+    ja = PDLMIN(PDLMAX(ja, 0), $SIZE(ma)-1);
+    jb = PDLMIN(PDLMAX(jb, 0), $SIZE(mb)-1);
+    ($hist(ma => ja,mb => jb))'.$_->{HistOp}.';
+  %}
+%}'),
+       Doc=> $_->{Doc});
+}
+
+
+###########################################################
+# a number of constructors: fibonacci, append, axisvalues &
+# random numbers
+###########################################################
+
+pp_def('fibonacci',
+        Pars => 'i(n); [o]x(n)',
+        Inplace => 1,
+        GenericTypes => [ppdefs_all],
+	Doc=>'Constructor - a vector with Fibonacci\'s sequence',
+	PMFunc=>'',
+	PMCode=>pp_line_numbers(__LINE__, <<'EOD'),
+sub fibonacci { ref($_[0]) && ref($_[0]) ne 'PDL::Type' ? $_[0]->fibonacci : PDL->fibonacci(@_) }
+sub PDL::fibonacci{
+   my $x = &PDL::Core::_construct;
+   my $is_inplace = $x->is_inplace;
+   my ($in, $out) = $x->flat;
+   $out = $is_inplace ? $in->inplace : PDL->null;
+   PDL::_fibonacci_int($in, $out);
+   $out;
+}
+EOD
+     Code => '
+        PDL_Indx i=0;
+        $GENERIC() x1, x2;
+        x1 = 1; x2 = 0;
+        loop(n) %{
+           $x() = x1 + x2;
+           if (i++>0) {
+              x2 = x1;
+              x1 = $x();
+           }
+        %}
+');
+
+pp_def('append',
+	Pars => 'a(n); b(m); [o] c(mn=CALC($SIZE(n)+$SIZE(m)))',
+        GenericTypes => [ppdefs_all],
+        PMCode => pp_line_numbers(__LINE__-1, '
+sub PDL::append {
+  my ($i1, $i2, $o) = map PDL->topdl($_), @_;
+  $_ = empty() for grep $_->isnull, $i1, $i2;
+  my $nempty = grep $_->isempty, $i1, $i2;
+  if ($nempty == 2) {
+    my @dims = $i1->dims;
+    $dims[0] += $i2->dim(0);
+    return PDL->zeroes($i1->type, @dims);
+  }
+  $o //= PDL->null;
+  $o .= $i1->isempty ? $i2 : $i1, return $o if $nempty == 1;
+  PDL::_append_int($i1, $i2->convert($i1->type), $o);
+  $o;
+}
+        '),
+        Code => 'PDL_Indx ns = $SIZE(n);
+                 broadcastloop %{
+                       loop(n) %{ $c(mn => n) = $a(); %}
+                       loop(mn=ns) %{ $c() = $b(m=>mn-ns); %}
+                 %}',
+	Doc => '
+=for ref
+
+append two ndarrays by concatenating along their first dimensions
+
+=for example
+
+ $x = ones(2,4,7);
+ $y = sequence 5;
+ $c = $x->append($y);  # size of $c is now (7,4,7) (a jumbo-ndarray ;)
+
+C<append> appends two ndarrays along their first dimensions. The rest of the
+dimensions must be compatible in the broadcasting sense. The resulting
+size of the first dimension is the sum of the sizes of the first dimensions
+of the two argument ndarrays - i.e. C<n + m>.
+
+Similar functions include L</glue> (below), which can append more
+than two ndarrays along an arbitrary dimension, and
+L<cat|PDL::Core/cat>, which can append more than two ndarrays that all
+have the same sized dimensions.
+'
+   );
+
+pp_addpm(<<'EOD');
+=head2 glue
+
+=for usage
+
+  $c = $x->glue(<dim>,$y,...)
+
+=for ref
+
+Glue two or more PDLs together along an arbitrary dimension
+(N-D L</append>).
+
+Sticks $x, $y, and all following arguments together along the
+specified dimension.  All other dimensions must be compatible in the
+broadcasting sense.
+
+Glue is permissive, in the sense that every PDL is treated as having an
+infinite number of trivial dimensions of order 1 -- so C<< $x->glue(3,$y) >>
+works, even if $x and $y are only one dimensional.
+
+If one of the PDLs has no elements, it is ignored.  Likewise, if one
+of them is actually the undefined value, it is treated as if it had no
+elements.
+
+If the first parameter is a defined perl scalar rather than a pdl,
+then it is taken as a dimension along which to glue everything else,
+so you can say C<$cube = PDL::glue(3,@image_list);> if you like.
+
+C<glue> is implemented in pdl, using a combination of L<xchg|PDL::Slices/xchg> and
+L</append>.  It should probably be updated (one day) to a pure PP
+function.
+
+Similar functions include L</append> (above), which appends
+only two ndarrays along their first dimension, and
+L<cat|PDL::Core/cat>, which can append more than two ndarrays that all
+have the same sized dimensions.
+
+=cut
+
+sub PDL::glue{
+    my($x) = shift;
+    my($dim) = shift;
+
+    ($dim, $x) = ($x, $dim) if defined $x && !ref $x;
+    confess 'dimension must be Perl scalar' if ref $dim;
+
+    if(!defined $x || $x->nelem==0) {
+	return $x unless(@_);
+	return shift() if(@_<=1);
+	$x=shift;
+	return PDL::glue($x,$dim,@_);
+    }
+
+    if($dim - $x->dim(0) > 100) {
+	print STDERR "warning:: PDL::glue allocating >100 dimensions!\n";
+    }
+    while($dim >= $x->ndims) {
+	$x = $x->dummy(-1,1);
+    }
+    $x = $x->xchg(0,$dim) if 0 != $dim;
+
+    while(scalar(@_)){
+	my $y = shift;
+	next unless(defined $y && $y->nelem);
+
+	while($dim >= $y->ndims) {
+		$y = $y->dummy(-1,1);
+        }
+	$y = $y->xchg(0,$dim) if 0 != $dim;
+	$x = $x->append($y);
+    }
+    0 == $dim ? $x : $x->xchg(0,$dim);
+}
+
+EOD
+
+pp_def( 'axisvalues',
+	Pars => 'i(n); [o]a(n)',
+	Inplace => 1,
+	Code => 'loop(n) %{ $a() = n; %}',
+	GenericTypes => [ppdefs_all],
+	Doc => undef,
+       ); # pp_def: axisvalues
+
+pp_add_macros(
+  CMPVEC => sub {
+    my ($a, $b, $dim, $ret, $anybad) = @_;
+    my $badbit = !defined $anybad ? '' : <<EOF;
+PDL_IF_BAD(if (\$ISBAD($a) || \$ISBAD($b)) { $anybad = 1; break; } else,)
+EOF
+    <<EOF;
+  $ret = 0;
+  loop($dim) %{ $badbit if ($a != $b) { $ret = $a < $b ? -1 : 1; break; } %}
+EOF
+  },
+);
+
+pp_def(
+    'cmpvec',
+    HandleBad => 1,
+    Pars => 'a(n); b(n); sbyte [o]c();',
+    Code => '
+PDL_IF_BAD(char anybad = 0;,)
+broadcastloop %{
+  $CMPVEC($a(), $b(), n, $c(), anybad);
+  PDL_IF_BAD(if (anybad) $SETBAD(c());,)
+%}
+PDL_IF_BAD(if (anybad) $PDLSTATESETBAD(c);,)
+    ',
+    Doc => '
+=for ref
+
+Compare two vectors lexicographically.
+
+Returns -1 if a is less, 1 if greater, 0 if equal.
+',
+    BadDoc => '
+The output is bad if any input values up to the point of inequality are
+bad - any after are ignored.
+',
+);
+
+pp_def(
+    'eqvec',
+    HandleBad => 1,
+    Pars => 'a(n); b(n); sbyte [o]c();',
+    Code => '
+     PDL_IF_BAD(char anybad = 0;,)
+     broadcastloop %{
+       $c() = 1;
+       loop(n) %{
+         PDL_IF_BAD(if ($ISBAD(a()) || $ISBAD(b())) { $SETBAD(c()); anybad = 1; break; }
+         else,) if ($a() != $b()) { $c() = 0; PDL_IF_BAD(,break;) }
+       %}
+     %}
+     PDL_IF_BAD(if (anybad) $PDLSTATESETBAD(c);,)
+    ',
+    Doc => '
+=for ref
+
+Compare two vectors, returning 1 if equal, 0 if not equal.
+',
+    BadDoc => 'The output is bad if any input values are bad.',
+);
+
+pp_def('enumvec',
+       Pars => 'v(M,N); indx [o]k(N)',
+       Code => pp_line_numbers(__LINE__, <<'EOC'),
+loop (N) %{
+  PDL_Indx vn = N; /* preserve value of N into inner N loop */
+  loop (N=vn) %{
+    if (N == vn) { $k() = 0; continue; } /* no need to compare with self */
+    char matches = 1;
+    loop (M) %{
+      if ($v(N=>vn) == $v()) continue;
+      matches = 0;
+      break;
+    %}
+    if (matches) {
+      $k() = N-vn;
+      if (N == $SIZE(N)-1) vn = N; /* last one matched, so stop */
+    } else {
+      vn = N-1;
+      break;
+    }
+  %}
+  N = vn; /* skip forward */
+%}
+EOC
+       Doc =><<'EOD',
+=for ref
+
+Enumerate a list of vectors with locally unique keys.
+
+Given a sorted list of vectors $v, generate a vector $k containing locally unique keys for the elements of $v
+(where an "element" is a vector of length $M occurring in $v).
+
+Note that the keys returned in $k are only unique over a run of a single vector in $v,
+so that each unique vector in $v has at least one 0 (zero) index in $k associated with it.
+If you need global keys, see enumvecg().
+
+Contributed by Bryan Jurish E<lt>moocow@cpan.orgE<gt>.
+EOD
+
+);
+
+##------------------------------------------------------
+## enumvecg()
+pp_def('enumvecg',
+       Pars => 'v(M,N); indx [o]k(N)',
+       Code =><<'EOC',
+if (!$SIZE(N)) return PDL_err;
+PDL_Indx Nprev = 0, ki = $k(N=>0) = 0;
+loop(N=1) %{
+  loop (M) %{
+    if ($v(N=>Nprev) == $v()) continue;
+    ++ki;
+    break;
+  %}
+  $k() = ki;
+  Nprev = N;
+%}
+EOC
+       Doc =><<'EOD',
+=for ref
+
+Enumerate a list of vectors with globally unique keys.
+
+Given a sorted list of vectors $v, generate a vector $k containing globally unique keys for the elements of $v
+(where an "element" is a vector of length $M occurring in $v).
+Basically does the same thing as:
+
+ $k = $v->vsearchvec($v->uniqvec);
+
+... but somewhat more efficiently.
+
+Contributed by Bryan Jurish E<lt>moocow@cpan.orgE<gt>.
+EOD
+);
+
+pp_def('vsearchvec',
+   Pars => 'find(M); which(M,N); indx [o]found();',
+   Code => q(
+ int carp=0;
+broadcastloop %{
+ PDL_Indx n1=$SIZE(N)-1, nlo=-1, nhi=n1, nn;
+ int cmpval, is_asc_sorted;
+ //
+ //-- get sort direction
+ $CMPVEC($which(N=>n1),$which(N=>0),M,cmpval);
+ is_asc_sorted = (cmpval > 0);
+ //
+ //-- binary search
+ while (nhi-nlo > 1) {
+   nn = (nhi+nlo) >> 1;
+   $CMPVEC($find(),$which(N=>nn),M,cmpval);
+   if ((cmpval > 0) == is_asc_sorted)
+     nlo=nn;
+   else
+     nhi=nn;
+ }
+ if (nlo==-1) {
+   nhi=0;
+ } else if (nlo==n1) {
+   $CMPVEC($find(),$which(N=>n1),M,cmpval);
+   if (cmpval != 0) carp = 1;
+   nhi = n1;
+ } else {
+   nhi = nlo+1;
+ }
+ $found() = nhi;
+%}
+ if (carp) warn("some values had to be extrapolated");
+),
+  Doc=><<'EOD'
+=for ref
+
+Routine for searching N-dimensional values - akin to vsearch() for vectors.
+
+=for usage
+
+ $found   = vsearchvec($find, $which);
+ $nearest = $which->dice_axis(1,$found);
+
+Returns for each row-vector in C<$find> the index along dimension N
+of the least row vector of C<$which>
+greater or equal to it.
+C<$which> should be sorted in increasing order.
+If the value of C<$find> is larger
+than any member of C<$which>, the index to the last element of C<$which> is
+returned.
+
+See also: L</vsearch>.
+Contributed by Bryan Jurish E<lt>moocow@cpan.orgE<gt>.
+EOD
+);
+
+pp_def('unionvec',
+   Pars => 'a(M,NA); b(M,NB); [o]c(M,NC=CALC($SIZE(NA) + $SIZE(NB))); indx [o]nc()',
+   PMCode=>pp_line_numbers(__LINE__, <<'EOD'),
+ sub PDL::unionvec {
+   my ($a,$b,$c,$nc) = @_;
+   $c = PDL->null if (!defined($nc));
+   $nc = PDL->null if (!defined($nc));
+   PDL::_unionvec_int($a,$b,$c,$nc);
+   return ($c,$nc) if (wantarray);
+   return $c->slice(",0:".($nc->max-1));
+ }
+EOD
+   Code => q(
+ PDL_Indx nai=0, nbi=0, nci=$SIZE(NC), sizeNA=$SIZE(NA), sizeNB=$SIZE(NB);
+ int cmpval;
+ loop (NC) %{
+   if (nai < sizeNA && nbi < sizeNB) {
+     $CMPVEC($a(NA=>nai),$b(NB=>nbi),M,cmpval);
+   }
+   else if (nai < sizeNA) { cmpval = -1; }
+   else if (nbi < sizeNB) { cmpval =  1; }
+   else                   { nci=NC; break; }
+   //
+   if (cmpval < 0) {
+     //-- CASE: a < b
+     loop (M) %{ $c() = $a(NA=>nai); %}
+     nai++;
+   }
+   else if (cmpval > 0) {
+     //-- CASE: a > b
+     loop (M) %{ $c() = $b(NB=>nbi); %}
+     nbi++;
+   }
+   else {
+     //-- CASE: a == b
+     loop (M) %{ $c() = $a(NA=>nai); %}
+     nai++;
+     nbi++;
+   }
+ %}
+ $nc() = nci;
+ //-- zero unpopulated outputs
+ loop(NC=nci,M) %{ $c() = 0; %}
+),
+   Doc=><<'EOD'
+=for ref
+
+Union of two vector-valued PDLs.
+
+Input PDLs $a() and $b() B<MUST> be sorted in lexicographic order.
+On return, $nc() holds the actual number of vector-values in the union.
+
+In scalar context, slices $c() to the actual number of elements in the union
+and returns the sliced PDL.
+
+Contributed by Bryan Jurish E<lt>moocow@cpan.orgE<gt>.
+EOD
+);
+
+pp_def('intersectvec',
+   Pars => 'a(M,NA); b(M,NB); [o]c(M,NC=CALC(PDLMIN($SIZE(NA),$SIZE(NB)))); indx [o]nc()',
+   PMCode=>pp_line_numbers(__LINE__, <<'EOD'),
+ sub PDL::intersectvec {
+   my ($a,$b,$c,$nc) = @_;
+   $c = PDL->null if (!defined($c));
+   $nc = PDL->null if (!defined($nc));
+   PDL::_intersectvec_int($a,$b,$c,$nc);
+   return ($c,$nc) if (wantarray);
+   my $nc_max = $nc->max;
+   return ($nc_max > 0
+	   ? $c->slice(",0:".($nc_max-1))
+	   : $c->reshape($c->dim(0), 0, ($c->dims)[2..($c->ndims-1)]));
+ }
+EOD
+   Code => q(
+ PDL_Indx nai=0, nbi=0, nci=0, sizeNA=$SIZE(NA), sizeNB=$SIZE(NB), sizeNC=$SIZE(NC);
+ int cmpval;
+ for ( ; nci < sizeNC && nai < sizeNA && nbi < sizeNB; ) {
+   $CMPVEC($a(NA=>nai),$b(NB=>nbi),M,cmpval);
+   //
+   if (cmpval < 0) {
+     //-- CASE: a < b
+     nai++;
+   }
+   else if (cmpval > 0) {
+     //-- CASE: a > b
+     nbi++;
+   }
+   else {
+     //-- CASE: a == b
+     loop (M) %{ $c(NC=>nci) = $a(NA=>nai); %}
+     nai++;
+     nbi++;
+     nci++;
+   }
+ }
+ $nc() = nci;
+ //-- zero unpopulated outputs
+ loop(NC=nci,M) %{ $c() = 0; %}
+),
+   Doc=><<'EOD'
+=for ref
+
+Intersection of two vector-valued PDLs.
+Input PDLs $a() and $b() B<MUST> be sorted in lexicographic order.
+On return, $nc() holds the actual number of vector-values in the intersection.
+
+In scalar context, slices $c() to the actual number of elements in the intersection
+and returns the sliced PDL.
+
+Contributed by Bryan Jurish E<lt>moocow@cpan.orgE<gt>.
+EOD
+);
+
+pp_def('setdiffvec',
+   Pars => 'a(M,NA); b(M,NB); [o]c(M,NC=CALC($SIZE(NA))); indx [o]nc()',
+   PMCode=>pp_line_numbers(__LINE__, <<'EOD'),
+ sub PDL::setdiffvec {
+  my ($a,$b,$c,$nc) = @_;
+  $c = PDL->null if (!defined($c));
+  $nc = PDL->null if (!defined($nc));
+  PDL::_setdiffvec_int($a,$b,$c,$nc);
+  return ($c,$nc) if (wantarray);
+  my $nc_max = $nc->max;
+  return ($nc_max > 0
+	  ? $c->slice(",0:".($nc_max-1))
+	  : $c->reshape($c->dim(0), 0, ($c->dims)[2..($c->ndims-1)]));
+ }
+EOD
+   Code => q(
+ PDL_Indx nai=0, nbi=0, nci=0, sizeNA=$SIZE(NA), sizeNB=$SIZE(NB), sizeNC=$SIZE(NC);
+ int cmpval;
+ for ( ; nci < sizeNC && nai < sizeNA && nbi < sizeNB ; ) {
+   $CMPVEC($a(NA=>nai),$b(NB=>nbi),M,cmpval);
+   //
+   if (cmpval < 0) {
+     //-- CASE: a < b
+     loop (M) %{ $c(NC=>nci) = $a(NA=>nai); %}
+     nai++;
+     nci++;
+   }
+   else if (cmpval > 0) {
+     //-- CASE: a > b
+     nbi++;
+   }
+   else {
+     //-- CASE: a == b
+     nai++;
+     nbi++;
+   }
+ }
+ for ( ; nci < sizeNC && nai < sizeNA ; nai++,nci++ ) {
+   loop (M) %{ $c(NC=>nci) = $a(NA=>nai); %}
+ }
+ $nc() = nci;
+ //-- zero unpopulated outputs
+ loop (NC=nci,M) %{ $c() = 0; %}
+),
+   Doc=><<'EOD'
+=for ref
+
+Set-difference ($a() \ $b()) of two vector-valued PDLs.
+
+Input PDLs $a() and $b() B<MUST> be sorted in lexicographic order.
+On return, $nc() holds the actual number of vector-values in the computed vector set.
+
+In scalar context, slices $c() to the actual number of elements in the output vector set
+and returns the sliced PDL.
+
+Contributed by Bryan Jurish E<lt>moocow@cpan.orgE<gt>.
+EOD
+);
+
+pp_add_macros(
+  CMPVAL => sub {
+    my ($val1, $val2) = @_;
+    "(($val1) < ($val2) ? -1 : ($val1) > ($val2) ? 1 : 0)";
+  },
+);
+
+pp_def('union_sorted',
+   Pars => 'a(NA); b(NB); [o]c(NC=CALC($SIZE(NA) + $SIZE(NB))); indx [o]nc()',
+   PMCode=>pp_line_numbers(__LINE__, <<'EOD'),
+ sub PDL::union_sorted {
+   my ($a,$b,$c,$nc) = @_;
+   $c = PDL->null if (!defined($c));
+   $nc = PDL->null if (!defined($nc));
+   PDL::_union_sorted_int($a,$b,$c,$nc);
+   return ($c,$nc) if (wantarray);
+   return $c->slice("0:".($nc->max-1));
+ }
+EOD
+   Code => q(
+ PDL_Indx nai=0, nbi=0, nci=$SIZE(NC), sizeNA=$SIZE(NA), sizeNB=$SIZE(NB);
+ int cmpval;
+ loop (NC) %{
+   if (nai < sizeNA && nbi < sizeNB) {
+     cmpval = $CMPVAL($a(NA=>nai), $b(NB=>nbi));
+   }
+   else if (nai < sizeNA) { cmpval = -1; }
+   else if (nbi < sizeNB) { cmpval =  1; }
+   else                   { nci = NC; break; }
+   //
+   if (cmpval < 0) {
+     //-- CASE: a < b
+     $c() = $a(NA=>nai);
+     nai++;
+   }
+   else if (cmpval > 0) {
+     //-- CASE: a > b
+     $c() = $b(NB=>nbi);
+     nbi++;
+   }
+   else {
+     //-- CASE: a == b
+     $c() = $a(NA=>nai);
+     nai++;
+     nbi++;
+   }
+ %}
+ $nc() = nci;
+ loop (NC=nci) %{
+  //-- zero unpopulated outputs
+  $c() = 0;
+ %}
+),
+   Doc=><<'EOD'
+=for ref
+
+Union of two flat sorted unique-valued PDLs.
+Input PDLs $a() and $b() B<MUST> be sorted in lexicographic order and contain no duplicates.
+On return, $nc() holds the actual number of values in the union.
+
+In scalar context, reshapes $c() to the actual number of elements in the union and returns it.
+
+Contributed by Bryan Jurish E<lt>moocow@cpan.orgE<gt>.
+EOD
+);
+
+pp_def('intersect_sorted',
+   Pars => 'a(NA); b(NB); [o]c(NC=CALC(PDLMIN($SIZE(NA),$SIZE(NB)))); indx [o]nc()',
+   PMCode=>pp_line_numbers(__LINE__, <<'EOD'),
+ sub PDL::intersect_sorted {
+   my ($a,$b,$c,$nc) = @_;
+   $c = PDL->null if (!defined($c));
+   $nc = PDL->null if (!defined($nc));
+   PDL::_intersect_sorted_int($a,$b,$c,$nc);
+   return ($c,$nc) if (wantarray);
+   my $nc_max = $nc->max;
+   return ($nc_max > 0
+	   ? $c->slice("0:".($nc_max-1))
+	   : $c->reshape(0, ($c->dims)[1..($c->ndims-1)]));
+ }
+EOD
+   Code => q(
+ PDL_Indx nai=0, nbi=0, nci=0, sizeNA=$SIZE(NA), sizeNB=$SIZE(NB), sizeNC=$SIZE(NC);
+ int cmpval;
+ for ( ; nci < sizeNC && nai < sizeNA && nbi < sizeNB; ) {
+   cmpval = $CMPVAL($a(NA=>nai),$b(NB=>nbi));
+   //
+   if (cmpval < 0) {
+     //-- CASE: a < b
+     nai++;
+   }
+   else if (cmpval > 0) {
+     //-- CASE: a > b
+     nbi++;
+   }
+   else {
+     //-- CASE: a == b
+     $c(NC=>nci) = $a(NA=>nai);
+     nai++;
+     nbi++;
+     nci++;
+   }
+ }
+ $nc() = nci;
+ for ( ; nci < sizeNC; nci++) {
+  //-- zero unpopulated outputs
+  $c(NC=>nci) = 0;
+ }
+),
+   Doc=><<'EOD'
+=for ref
+
+Intersection of two flat sorted unique-valued PDLs.
+Input PDLs $a() and $b() B<MUST> be sorted in lexicographic order and contain no duplicates.
+On return, $nc() holds the actual number of values in the intersection.
+
+In scalar context, reshapes $c() to the actual number of elements in the intersection and returns it.
+
+Contributed by Bryan Jurish E<lt>moocow@cpan.orgE<gt>.
+EOD
+);
+
+pp_def('setdiff_sorted',
+   Pars => 'a(NA); b(NB); [o]c(NC=CALC($SIZE(NA))); indx [o]nc()',
+   PMCode=>pp_line_numbers(__LINE__, <<'EOD'),
+ sub PDL::setdiff_sorted {
+   my ($a,$b,$c,$nc) = @_;
+   $c = PDL->null if (!defined($c));
+   $nc = PDL->null if (!defined($nc));
+   PDL::_setdiff_sorted_int($a,$b,$c,$nc);
+   return ($c,$nc) if (wantarray);
+   my $nc_max = $nc->max;
+   return ($nc_max > 0
+	   ? $c->slice("0:".($nc_max-1))
+	   : $c->reshape(0, ($c->dims)[1..($c->ndims-1)]));
+ }
+EOD
+   Code => q(
+ PDL_Indx nai=0, nbi=0, nci=0, sizeNA=$SIZE(NA), sizeNB=$SIZE(NB), sizeNC=$SIZE(NC);
+ int cmpval;
+ for ( ; nci < sizeNC && nai < sizeNA && nbi < sizeNB ; ) {
+   cmpval = $CMPVAL($a(NA=>nai),$b(NB=>nbi));
+   //
+   if (cmpval < 0) {
+     //-- CASE: a < b
+     $c(NC=>nci) = $a(NA=>nai);
+     nai++;
+     nci++;
+   }
+   else if (cmpval > 0) {
+     //-- CASE: a > b
+     nbi++;
+   }
+   else {
+     //-- CASE: a == b
+     nai++;
+     nbi++;
+   }
+ }
+ for ( ; nci < sizeNC && nai < sizeNA ; nai++,nci++ ) {
+   $c(NC=>nci) = $a(NA=>nai);
+ }
+ $nc() = nci;
+ for ( ; nci < sizeNC; nci++) {
+  //-- zero unpopulated outputs
+  $c(NC=>nci) = 0;
+ }
+),
+   Doc=><<'EOD'
+=for ref
+
+Set-difference ($a() \ $b()) of two flat sorted unique-valued PDLs.
+
+Input PDLs $a() and $b() B<MUST> be sorted in lexicographic order and contain no duplicate values.
+On return, $nc() holds the actual number of values in the computed vector set.
+
+In scalar context, reshapes $c() to the actual number of elements in the difference set and returns it.
+
+Contributed by Bryan Jurish E<lt>moocow@cpan.orgE<gt>.
+EOD
+);
+
+pp_def('vcos',
+  Pars => join('',
+    "a(M,N);",            ##-- logical (D,T)
+    "b(M);",              ##-- logical (D,1)
+    "float+ [o]vcos(N);", ##-- logical (T)
+  ),
+  GenericTypes => [ppdefs_all],
+  HandleBad => 1,
+  Code => pp_line_numbers(__LINE__, <<'EOF'),
+$GENERIC(vcos) bnorm = 0;
+loop(M) %{
+  PDL_IF_BAD(if ($ISBAD(b())) continue;,)
+  bnorm += $b() * $b();
+%}
+if (bnorm == 0) {
+  /*-- null-vector b(): set all vcos()=NAN --*/
+  loop (N) %{ $vcos() = NAN; %}
+  continue;
+}
+bnorm = sqrtl(bnorm);
+/*-- usual case: compute values for N-slice of b() --*/
+loop (N) %{
+  $GENERIC(vcos) anorm = 0, vval  = 0;
+  loop (M) %{
+    PDL_IF_BAD(if ($ISBAD(a())) continue;,)
+    $GENERIC(vcos) aval   = $a();
+    anorm += aval * aval;
+    PDL_IF_BAD(if ($ISBAD(b())) continue;,)
+    vval  += aval * $b();
+  %}
+  /*-- normalize --*/
+  anorm = sqrtl(anorm);
+  if (anorm != 0) {
+    /*-- usual case a(), b() non-null --*/
+    $vcos() = vval / (anorm * bnorm);
+  } else {
+    /*-- null-vector a(): set vcos()=NAN --*/
+    $vcos() = NAN;
+  }
+%}
+EOF
+  CopyBadStatusCode => q{
+   if ( $ISPDLSTATEBAD(a) || $ISPDLSTATEBAD(b) ) {
+     $SETPDLSTATEBAD(vcos);
+   }
+},
+  Doc => q{
+Computes the vector cosine similarity of a dense vector $b() with respect
+to each row $a(*,i) of a dense PDL $a().  This is basically the same
+thing as:
+
+ inner($a, $b) / $a->magnover * $b->magnover
+
+... but should be much faster to compute, and avoids allocating
+potentially large temporaries for the vector magnitudes.  Output values
+in $vcos() are cosine similarities in the range [-1,1], except for
+zero-magnitude vectors which will result in NaN values in $vcos().
+
+You can use PDL broadcasting to batch-compute distances for multiple $b()
+vectors simultaneously:
+
+  $bx   = random($M, $NB);   ##-- get $NB random vectors of size $N
+  $vcos = vcos($a,$bx);   ##-- $vcos(i,j) ~ sim($a(,i),$b(,j))
+
+Contributed by Bryan Jurish E<lt>moocow@cpan.orgE<gt>.
+},
+  BadDoc=> q{
+vcos() will set the bad status flag on the output $vcos() if
+it is set on either of the inputs $a() or $b(), but BAD values
+will otherwise be ignored for computing the cosine similarity.
+},
+);
+
+pp_addhdr(<<'EOH');
+extern int pdl_srand_threads;
+extern uint64_t *pdl_rand_state;
+void pdl_srand(uint64_t **s, uint64_t seed, int n);
+double pdl_drand(uint64_t *s);
+#define PDL_MAYBE_SRAND \
+  if (pdl_srand_threads < 0) \
+    pdl_srand(&pdl_rand_state, PDL->pdl_seed(), PDL->online_cpus());
+#define PDL_RAND_SET_OFFSET(v, thr, pdl) \
+  if (v < 0) { \
+    if (thr.mag_nthr >= 0) { \
+      int thr_no = PDL->magic_get_thread(pdl); \
+      if (thr_no < 0) return PDL->make_error_simple(PDL_EFATAL, "Invalid pdl_magic_get_thread!"); \
+      v = thr_no == 0 ? thr_no : thr_no % PDL->online_cpus(); \
+    } else { \
+      v = 0; \
+    } \
+  }
+EOH
+
+pp_def(
+	'srandom',
+	Pars=>'a();',
+	GenericTypes => ['Q'],
+	Code => <<'EOF',
+pdl_srand(&pdl_rand_state, (uint64_t)$a(), PDL->online_cpus());
+EOF
+	NoPthread => 1,
+	HaveBroadcasting => 0,
+	Doc=> <<'EOF',
+=for ref
+
+Seed random-number generator with a 64-bit int. Will generate seed data
+for a number of threads equal to the return-value of
+L<PDL::Core/online_cpus>.
+As of 2.062, the generator changed from Perl's generator to xoshiro256++
+(see L<https://prng.di.unimi.it/>).
+Before PDL 2.090, this was called C<srand>, but was renamed to avoid
+clashing with Perl's built-in.
+
+=for usage
+
+ srandom(); # uses current time
+ srandom(5); # fixed number e.g. for testing
+
+EOF
+	PMCode=>pp_line_numbers(__LINE__, <<'EOD'),
+*srandom = \&PDL::srandom;
+sub PDL::srandom { PDL::_srandom_int($_[0] // PDL::Core::seed()) }
+EOD
+);
+
+pp_def(
+	'random',
+	Pars=>'[o] a();',
+	PMFunc => '',
+	Code => <<'EOF',
+PDL_MAYBE_SRAND
+int rand_offset = -1;
+broadcastloop %{
+  PDL_RAND_SET_OFFSET(rand_offset, $PRIV(broadcast), $PDL(a));
+  $a() = pdl_drand(pdl_rand_state + 4*rand_offset);
+%}
+EOF
+	Doc=> <<'EOF',
+=for ref
+
+Constructor which returns ndarray of random numbers, real data-types only.
+
+=for usage
+
+ $x = random([type], $nx, $ny, $nz,...);
+ $x = random $y;
+
+etc (see L<zeroes|PDL::Core/zeroes>).
+
+This is the uniform distribution between 0 and 1 (assumedly
+excluding 1 itself). The arguments are the same as C<zeroes>
+(q.v.) - i.e. one can specify dimensions, types or give
+a template.
+
+You can use the PDL function L</srandom> to seed the random generator.
+If it has not been called yet, it will be with the current time.
+As of 2.062, the generator changed from Perl's generator to xoshiro256++
+(see L<https://prng.di.unimi.it/>).
+EOF
+	PMCode=>pp_line_numbers(__LINE__, <<'EOD'),
+sub random { ref($_[0]) && ref($_[0]) ne 'PDL::Type' ? $_[0]->random : PDL->random(@_) }
+sub PDL::random {
+   splice @_, 1, 0, double() if !ref($_[0]) and @_<=1;
+   my $x = &PDL::Core::_construct;
+   PDL::_random_int($x);
+   return $x;
+}
+EOD
+);
+
+pp_def(
+	'randsym',
+	Pars=>'[o] a();',
+	PMFunc => '',
+	Code => <<'EOF',
+PDL_MAYBE_SRAND
+int rand_offset = -1;
+broadcastloop %{
+  PDL_RAND_SET_OFFSET(rand_offset, $PRIV(broadcast), $PDL(a));
+  long double tmp;
+  do tmp = pdl_drand(pdl_rand_state + 4*rand_offset); while (tmp == 0.0); /* 0 < tmp < 1 */
+  $a() = tmp;
+%}
+EOF
+	Doc=> <<'EOF',
+=for ref
+
+Constructor which returns ndarray of random numbers, real data-types only.
+
+=for usage
+
+ $x = randsym([type], $nx, $ny, $nz,...);
+ $x = randsym $y;
+
+etc (see L<zeroes|PDL::Core/zeroes>).
+
+This is the uniform distribution between 0 and 1 (excluding both 0 and
+1, cf L</random>). The arguments are the same as C<zeroes> (q.v.) -
+i.e. one can specify dimensions, types or give a template.
+
+You can use the PDL function L</srandom> to seed the random generator.
+If it has not been called yet, it will be with the current time.
+EOF
+	PMCode=>pp_line_numbers(__LINE__, <<'EOD'),
+sub randsym { ref($_[0]) && ref($_[0]) ne 'PDL::Type' ? $_[0]->randsym : PDL->randsym(@_) }
+sub PDL::randsym {
+   splice @_, 1, 0, double() if !ref($_[0]) and @_<=1;
+   my $x = &PDL::Core::_construct;
+   PDL::_randsym_int($x);
+   return $x;
+}
+EOD
+);
+
+pp_add_exported('','grandom');
+pp_addpm(<<'EOD');
+=head2 grandom
+
+=for ref
+
+Constructor which returns ndarray of Gaussian random numbers
+
+=for usage
+
+ $x = grandom([type], $nx, $ny, $nz,...);
+ $x = grandom $y;
+
+etc (see L<zeroes|PDL::Core/zeroes>).
+
+This is generated using the math library routine C<ndtri>.
+
+Mean = 0, Stddev = 1
+
+You can use the PDL function L</srandom> to seed the random generator.
+If it has not been called yet, it will be with the current time.
+
+=cut
+
+sub grandom { ref($_[0]) && ref($_[0]) ne 'PDL::Type' ? $_[0]->grandom : PDL->grandom(@_) }
+sub PDL::grandom {
+   my $x = &PDL::Core::_construct;
+   use PDL::Math 'ndtri';
+   $x .= ndtri(randsym($x));
+   return $x;
+}
+EOD
+
+###############################################################
+# binary searches in an ndarray; various forms
+###############################################################
+
+# generic front end; defaults to vsearch_sample for backwards compatibility
+
+pp_add_exported('','vsearch');
+pp_addpm(<<'EOD');
+=head2 vsearch
+
+=for sig
+
+  Signature: ( vals(); xs(n); [o] indx(); [\%options] )
+
+=for ref
+
+Efficiently search for values in a sorted ndarray, returning indices.
+
+=for usage
+
+  $idx = vsearch( $vals, $x, [\%options] );
+  vsearch( $vals, $x, $idx, [\%options ] );
+
+B<vsearch> performs a binary search in the ordered ndarray C<$x>,
+for the values from C<$vals> ndarray, returning indices into C<$x>.
+What is a "match", and the meaning of the returned indices, are determined
+by the options.
+
+The C<mode> option indicates which method of searching to use, and may
+be one of:
+
+=over
+
+=item C<sample>
+
+invoke L<B<vsearch_sample>|/vsearch_sample>, returning indices appropriate for sampling
+within a distribution.
+
+=item C<insert_leftmost>
+
+invoke L<B<vsearch_insert_leftmost>|/vsearch_insert_leftmost>, returning the left-most possible
+insertion point which still leaves the ndarray sorted.
+
+=item C<insert_rightmost>
+
+invoke L<B<vsearch_insert_rightmost>|/vsearch_insert_rightmost>, returning the right-most possible
+insertion point which still leaves the ndarray sorted.
+
+=item C<match>
+
+invoke L<B<vsearch_match>|/vsearch_match>, returning the index of a matching element,
+else -(insertion point + 1)
+
+=item C<bin_inclusive>
+
+invoke L<B<vsearch_bin_inclusive>|/vsearch_bin_inclusive>, returning an index appropriate for binning
+on a grid where the left bin edges are I<inclusive> of the bin. See
+below for further explanation of the bin.
+
+=item C<bin_exclusive>
+
+invoke L<B<vsearch_bin_exclusive>|/vsearch_bin_exclusive>, returning an index appropriate for binning
+on a grid where the left bin edges are I<exclusive> of the bin. See
+below for further explanation of the bin.
+
+=back
+
+The default value of C<mode> is C<sample>.
+
+=for example
+
+  use PDL;
+
+  my @modes = qw( sample insert_leftmost insert_rightmost match
+                  bin_inclusive bin_exclusive );
+
+  # Generate a sequence of 3 zeros, 3 ones, ..., 3 fours.
+  my $x = zeroes(3,5)->yvals->flat;
+
+  for my $mode ( @modes ) {
+    # if the value is in $x
+    my $contained = 2;
+    my $idx_contained = vsearch( $contained, $x, { mode => $mode } );
+    my $x_contained = $x->copy;
+    $x_contained->slice( $idx_contained ) .= 9;
+
+    # if the value is not in $x
+    my $not_contained = 1.5;
+    my $idx_not_contained = vsearch( $not_contained, $x, { mode => $mode } );
+    my $x_not_contained = $x->copy;
+    $x_not_contained->slice( $idx_not_contained ) .= 9;
+
+    print sprintf("%-23s%30s\n", '$x', $x);
+    print sprintf("%-23s%30s\n",   "$mode ($contained)", $x_contained);
+    print sprintf("%-23s%30s\n\n", "$mode ($not_contained)", $x_not_contained);
+  }
+
+  # $x                     [0 0 0 1 1 1 2 2 2 3 3 3 4 4 4]
+  # sample (2)             [0 0 0 1 1 1 9 2 2 3 3 3 4 4 4]
+  # sample (1.5)           [0 0 0 1 1 1 9 2 2 3 3 3 4 4 4]
+  #
+  # $x                     [0 0 0 1 1 1 2 2 2 3 3 3 4 4 4]
+  # insert_leftmost (2)    [0 0 0 1 1 1 9 2 2 3 3 3 4 4 4]
+  # insert_leftmost (1.5)  [0 0 0 1 1 1 9 2 2 3 3 3 4 4 4]
+  #
+  # $x                     [0 0 0 1 1 1 2 2 2 3 3 3 4 4 4]
+  # insert_rightmost (2)   [0 0 0 1 1 1 2 2 2 9 3 3 4 4 4]
+  # insert_rightmost (1.5) [0 0 0 1 1 1 9 2 2 3 3 3 4 4 4]
+  #
+  # $x                     [0 0 0 1 1 1 2 2 2 3 3 3 4 4 4]
+  # match (2)              [0 0 0 1 1 1 2 9 2 3 3 3 4 4 4]
+  # match (1.5)            [0 0 0 1 1 1 2 2 9 3 3 3 4 4 4]
+  #
+  # $x                     [0 0 0 1 1 1 2 2 2 3 3 3 4 4 4]
+  # bin_inclusive (2)      [0 0 0 1 1 1 2 2 9 3 3 3 4 4 4]
+  # bin_inclusive (1.5)    [0 0 0 1 1 9 2 2 2 3 3 3 4 4 4]
+  #
+  # $x                     [0 0 0 1 1 1 2 2 2 3 3 3 4 4 4]
+  # bin_exclusive (2)      [0 0 0 1 1 9 2 2 2 3 3 3 4 4 4]
+  # bin_exclusive (1.5)    [0 0 0 1 1 9 2 2 2 3 3 3 4 4 4]
+
+
+Also see
+L<B<vsearch_sample>|/vsearch_sample>,
+L<B<vsearch_insert_leftmost>|/vsearch_insert_leftmost>,
+L<B<vsearch_insert_rightmost>|/vsearch_insert_rightmost>,
+L<B<vsearch_match>|/vsearch_match>,
+L<B<vsearch_bin_inclusive>|/vsearch_bin_inclusive>, and
+L<B<vsearch_bin_exclusive>|/vsearch_bin_exclusive>
+
+=cut
+
+sub vsearch {
+    my $opt = 'HASH' eq ref $_[-1]
+            ? pop
+	    : { mode => 'sample' };
+
+    croak( "unknown options to vsearch\n" )
+	if ( ! defined $opt->{mode} && keys %$opt )
+	|| keys %$opt > 1;
+
+    my $mode = $opt->{mode};
+    goto
+        $mode eq 'sample'           ? \&vsearch_sample
+      : $mode eq 'insert_leftmost'  ? \&vsearch_insert_leftmost
+      : $mode eq 'insert_rightmost' ? \&vsearch_insert_rightmost
+      : $mode eq 'match'            ? \&vsearch_match
+      : $mode eq 'bin_inclusive'    ? \&vsearch_bin_inclusive
+      : $mode eq 'bin_exclusive'    ? \&vsearch_bin_exclusive
+      :                               croak( "unknown vsearch mode: $mode\n" );
+}
+
+*PDL::vsearch = \&vsearch;
+
+EOD
+
+use Text::Tabs qw[ expand ];
+sub undent {
+    my $txt = expand( shift );
+
+    $txt =~ s/^([ \t]+)-{4}.*$//m;
+    $txt =~ s/^$1//mg
+      if defined $1;
+    $txt;
+}
+
+for my $func ( [
+        vsearch_sample => {
+            low  => -1,
+            high => '$SIZE(n)',
+	    up   => '($x(n => n1) > $x(n => 0))',
+            code => q[
+                   while ( high - low > 1 ) {
+                       mid = %MID%;
+                       if ( ( value > $x(n => mid ) ) == up ) low = mid;
+                       else                                   high = mid;
+                   }
+                   $idx() = low >= n1 ? n1
+                         : up        ? low + 1
+                         : PDLMAX(low, 0);
+                   ----
+           ],
+            ref =>
+              'Search for values in a sorted array, return index appropriate for sampling from a distribution',
+
+            doc_pre => q[
+			 B<%FUNC%> returns an index I<I> for each value I<V> of C<$vals> appropriate
+                         for sampling C<$vals>
+			 ----
+			 ],
+            doc_incr => q[
+				   V <= x[0]  : I = 0
+			   x[0]  < V <= x[-1] : I s.t. x[I-1] < V <= x[I]
+			   x[-1] < V          : I = $x->nelem -1
+			 ----
+			 ],
+
+            doc_decr => q[
+				    V > x[0]  : I = 0
+			   x[0]  >= V > x[-1] : I s.t. x[I] >= V > x[I+1]
+			   x[-1] >= V         : I = $x->nelem - 1
+			 ----
+			 ],
+
+            doc_post => q[
+			  If all elements of C<$x> are equal, I<< I = $x->nelem - 1 >>.
+
+			  If C<$x> contains duplicated elements, I<I> is the index of the
+			  leftmost (by position in array) duplicate if I<V> matches.
+
+			  =for example
+
+			  This function is useful e.g. when you have a list of probabilities
+			  for events and want to generate indices to events:
+
+			   $x = pdl(.01,.86,.93,1); # Barnsley IFS probabilities cumulatively
+			   $y = random 20;
+			   $c = %FUNC%($y, $x); # Now, $c will have the appropriate distr.
+
+			  It is possible to use the L<cumusumover|PDL::Ufunc/cumusumover>
+			  function to obtain cumulative probabilities from absolute probabilities.
+			  ----
+			  ],
+
+        },
+    ],
+
+    [
+        # return left-most possible insertion point.
+        # lowest index where x[i] >= value
+        vsearch_insert_leftmost => {
+            low  => 0,
+            high => 'n1',
+            code => q[
+		    while (low <= high ) {
+                        mid = %MID%;
+			if ( ( $x(n => mid) >= value ) == up ) high = mid - 1;
+			else                                   low  = mid + 1;
+		    }
+		    $idx() = up ? low : high;
+	    ],
+            ref =>
+              'Determine the insertion point for values in a sorted array, inserting before duplicates.',
+
+            doc_pre => q[
+			 B<%FUNC%> returns an index I<I> for each value I<V> of
+			 C<$vals> equal to the leftmost position (by index in array) within
+			 C<$x> that I<V> may be inserted and still maintain the order in
+			 C<$x>.
+
+			 Insertion at index I<I> involves shifting elements I<I> and higher of
+			 C<$x> to the right by one and setting the now empty element at index
+			 I<I> to I<V>.
+			 ----
+			 ],
+            doc_incr => q[
+				   V <= x[0]  : I = 0
+			   x[0]  < V <= x[-1] : I s.t. x[I-1] < V <= x[I]
+			   x[-1] < V          : I = $x->nelem
+			 ----
+			 ],
+
+            doc_decr => q[
+				    V >  x[0]  : I = -1
+			   x[0]  >= V >= x[-1] : I s.t. x[I] >= V > x[I+1]
+			   x[-1] >= V          : I = $x->nelem -1
+			 ----
+			 ],
+
+            doc_post => q[
+			  If all elements of C<$x> are equal,
+
+			      i = 0
+
+			  If C<$x> contains duplicated elements, I<I> is the index of the
+			  leftmost (by index in array) duplicate if I<V> matches.
+			  ----
+			  ],
+
+        },
+    ],
+
+    [
+        # return right-most possible insertion point.
+        # lowest index where x[i] > value
+        vsearch_insert_rightmost => {
+            low  => 0,
+            high => 'n1',
+            code => q[
+		   while (low <= high ) {
+		       mid = %MID%;
+		       if ( ( $x(n => mid) > value ) == up ) high = mid - 1;
+		       else                                  low  = mid + 1;
+		   }
+		   $idx() = up ? low : high;
+            ],
+            ref =>
+              'Determine the insertion point for values in a sorted array, inserting after duplicates.',
+
+            doc_pre => q[
+			 B<%FUNC%> returns an index I<I> for each value I<V> of
+			 C<$vals> equal to the rightmost position (by index in array) within
+			 C<$x> that I<V> may be inserted and still maintain the order in
+			 C<$x>.
+
+			 Insertion at index I<I> involves shifting elements I<I> and higher of
+			 C<$x> to the right by one and setting the now empty element at index
+			 I<I> to I<V>.
+			 ----
+			 ],
+            doc_incr => q[
+				    V < x[0]  : I = 0
+			   x[0]  <= V < x[-1] : I s.t. x[I-1] <= V < x[I]
+			   x[-1] <= V         : I = $x->nelem
+			 ----
+			 ],
+
+            doc_decr => q[
+				   V >= x[0]  : I = -1
+			   x[0]  > V >= x[-1] : I s.t. x[I] >= V > x[I+1]
+			   x[-1] > V          : I = $x->nelem -1
+			 ----
+			 ],
+
+            doc_post => q[
+			  If all elements of C<$x> are equal,
+
+			      i = $x->nelem - 1
+
+			  If C<$x> contains duplicated elements, I<I> is the index of the
+			  leftmost (by index in array) duplicate if I<V> matches.
+			  ----
+			  ],
+
+        },
+
+    ],
+    [
+        # return index of matching element, else -( insertion point + 1 )
+        # patterned after the Java binarySearch interface; see
+        # http://docs.oracle.com/javase/7/docs/api/java/util/Arrays.html
+        vsearch_match => {
+            low  => 0,
+            high => 'n1',
+            code => q[
+                   int done = 0;
+
+                   while (low <= high ) {
+                       $GENERIC() mid_value;
+
+                       mid = %MID%;
+
+                       mid_value = $x(n=>mid);
+
+                       if ( up ) {
+			   if      ( mid_value > value ) { high = mid - 1; }
+			   else if ( mid_value < value ) { low  = mid + 1; }
+			   else                          { done = 1; break; }
+                       }
+                       else {
+			   if      ( mid_value < value ) { high = mid - 1; }
+			   else if ( mid_value > value ) { low  = mid + 1; }
+			   else                          { done = 1; break; }
+                       }
+                   }
+                   $idx() = done ? mid
+                         :   up ? - ( low  + 1 )
+                         :        - ( high + 1 );
+	       ],
+            ref => 'Match values against a sorted array.',
+
+            doc_pre => q[
+			 B<%FUNC%> returns an index I<I> for each value I<V> of
+			 C<$vals>.  If I<V> matches an element in C<$x>, I<I> is the
+			 index of that element, otherwise it is I<-( insertion_point + 1 )>,
+			 where I<insertion_point> is an index in C<$x> where I<V> may be
+			 inserted while maintaining the order in C<$x>.  If C<$x> has
+			 duplicated values, I<I> may refer to any of them.
+			 ----
+			 ],
+
+        },
+    ],
+    [
+        # x[i] is the INclusive left edge of the bin
+        # return i, s.t. x[i] <= value < x[i+1].
+        # returns -1 if x[0] > value
+        # returns N-1 if x[-1] <= value
+        vsearch_bin_inclusive => {
+            low  => 0,
+            high => 'n1',
+            code => q[
+                   while (low <= high ) {
+                       mid = %MID%;
+                       if ( ( $x(n => mid) <= value ) == up ) low  = mid + 1;
+                       else                                   high = mid - 1;
+                   }
+                   $idx() = up ? high: low;
+            ],
+            ref =>
+              'Determine the index for values in a sorted array of bins, lower bound inclusive.',
+
+            doc_pre => q[
+			 C<$x> represents the edges of contiguous bins, with the first and
+			 last elements representing the outer edges of the outer bins, and the
+			 inner elements the shared bin edges.
+
+			 The lower bound of a bin is inclusive to the bin, its outer bound is exclusive to it.
+                         B<%FUNC%> returns an index I<I> for each value I<V> of C<$vals>
+			 ----
+			 ],
+            doc_incr => q[
+				    V < x[0]  : I = -1
+			   x[0]  <= V < x[-1] : I s.t. x[I] <= V < x[I+1]
+			   x[-1] <= V         : I = $x->nelem - 1
+			 ----
+			 ],
+
+            doc_decr => q[
+				    V >= x[0]  : I = 0
+			   x[0]  >  V >= x[-1] : I s.t. x[I+1] > V >= x[I]
+			   x[-1] >  V          : I = $x->nelem
+			 ----
+			 ],
+
+            doc_post => q[
+			  If all elements of C<$x> are equal,
+
+			      i = $x->nelem - 1
+
+			  If C<$x> contains duplicated elements, I<I> is the index of the
+			  righmost (by index in array) duplicate if I<V> matches.
+			  ----
+			  ],
+
+        },
+    ],
+
+    [
+        # x[i] is the EXclusive left edge of the bin
+        # return i, s.t. x[i] < value <= x[i+1].
+        # returns -1 if x[0] >= value
+        # returns N-1 if x[-1] < value
+        vsearch_bin_exclusive => {
+            low  => 0,
+            high => 'n1',
+            code => q[
+                   while (low <= high ) {
+                       mid = %MID%;
+                       if ( ( $x(n => mid) <  value ) == up ) low  = mid + 1;
+                       else                                   high = mid - 1;
+                   }
+                   $idx() = up ? high: low;
+            ],
+            ref =>
+              'Determine the index for values in a sorted array of bins, lower bound exclusive.',
+
+            doc_pre => q[
+			 C<$x> represents the edges of contiguous bins, with the first and
+			 last elements representing the outer edges of the outer bins, and the
+			 inner elements the shared bin edges.
+
+			 The lower bound of a bin is exclusive to the bin, its upper bound is inclusive to it.
+			 B<%FUNC%> returns an index I<I> for each value I<V> of C<$vals>.
+			 ----
+			 ],
+            doc_incr => q[
+				    V <= x[0]  : I = -1
+			   x[0]  <  V <= x[-1] : I s.t. x[I] < V <= x[I+1]
+			   x[-1] <  V          : I = $x->nelem - 1
+			 ----
+			 ],
+
+            doc_decr => q[
+				    V >  x[0]  : I = 0
+			   x[0]  >= V >  x[-1] : I s.t. x[I-1] >= V > x[I]
+			   x[-1] >= V          : I = $x->nelem
+			 ----
+			 ],
+
+            doc_post => q[
+			  If all elements of C<$x> are equal,
+
+			      i = $x->nelem - 1
+
+			  If C<$x> contains duplicated elements, I<I> is the index of the
+			  righmost (by index in array) duplicate if I<V> matches.
+			  ----
+			  ],
+
+        }
+    ],
+
+  )
+
+{
+    my ( $func, $algo ) = @$func;
+
+    my %replace = (
+        # calculate midpoint of range; ensure we don't overflow
+        # (low+high)>>1 for large values of low + high
+	# see sf.net bug #360
+        '%MID%'  => 'low + (( high - low )>> 1);',
+
+	# determine which way the data are sorted.  vsearch_sample
+	# overrides this.
+        '%UP%' => '$x(n => n1) >= $x(n => 0)',
+
+        '%FUNC%' => $func,
+
+        '%PRE%' => undent(
+            q[
+		    %DOC_PRE%
+                    ----
+		   ]
+        ),
+
+
+
+        '%BODY%' => undent(
+            q[
+		   I<I> has the following properties:
+
+		   =over
+
+		   =item *
+
+		   if C<$x> is sorted in increasing order
+
+		   %DOC_INCR%
+
+		   =item *
+
+		   if C<$x> is sorted in decreasing order
+
+		   %DOC_DECR%
+
+		   =back
+		   ----
+                   ]
+        ),
+
+        '%POST%' => undent(
+            q[
+                   %DOC_POST%
+		   ----
+                   ]
+        ),
+
+        map { ( "%\U$_%" => undent( $algo->{$_} ) ) } keys %$algo,
+    );
+
+    $replace{'%PRE%'} = '' unless defined $replace{'%DOC_PRE%'};
+    $replace{'%BODY%'} = ''
+      unless defined $replace{'%DOC_INCR%'} || defined $replace{'%DOC_DECR%'};
+    $replace{'%POST%'} = '' unless defined $replace{'%DOC_POST%'};
+
+
+    my $code = undent q[
+                 loop(n) %{
+                    if ( $ISGOOD(vals()) ) {
+                      PDL_Indx n1 = $SIZE(n)-1;
+                      PDL_Indx low = %LOW%;
+                      PDL_Indx high = %HIGH%;
+                      PDL_Indx mid;
+
+                      $GENERIC() value = $vals();
+
+                      /* determine sort order of data */
+                      int up = %UP%;
+                      %CODE%
+                    }
+
+                    else {
+                      $SETBAD(idx());
+                    }
+                 %}
+                 ----
+               ];
+
+    my $doc = undent q[
+		   =for ref
+
+		   %REF%
+
+		   =for usage
+
+		     $idx = %FUNC%($vals, $x);
+
+		   C<$x> must be sorted, but may be in decreasing or increasing
+		   order.  if C<$x> is empty, then all values in C<$idx> will be
+                   set to the bad value.
+
+                   %PRE%
+		   %BODY%
+		   %POST%
+                   ----
+		   ];
+
+
+    # redo until nothing changes
+    for my $tref ( \$code, \$doc ) {
+        1 while $$tref =~ s/(%[\w_]+%)/$replace{$1}/ge;
+    }
+
+    pp_def(
+        $func,
+        HandleBad    => 1,
+        BadDoc       => 'bad values in vals() result in bad values in idx()',
+        Pars         => 'vals(); x(n); indx [o]idx()',
+        GenericTypes => $F,    # too restrictive ?
+        Code         => $code,
+	Doc          => $doc,
+    );
+}
+
+###############################################################
+# routines somehow related to interpolation
+###############################################################
+
+pp_def('interpolate',
+  HandleBad => 0,
+  BadDoc => 'needs major (?) work to handles bad values',
+  Pars => '!complex xi(); !complex x(n); y(n); [o] yi(); int [o] err()',
+  GenericTypes => $AF,
+  Code => pp_line_numbers(__LINE__, <<'EOF'),
+PDL_Indx n = $SIZE(n), n1 = n-1;
+broadcastloop %{
+  PDL_Indx jl = -1, jh = n;
+  int carp = 0, up = ($x(n => n1) > $x(n => 0));
+  while (jh-jl > 1) { /* binary search */
+    PDL_Indx m = (jh+jl) >> 1;
+    if (($xi() > $x(n => m)) == up)
+      jl = m;
+    else
+      jh = m;
+  }
+  if (jl == -1) {
+    if ($xi() != $x(n => 0)) carp = 1;
+    jl = 0;
+  } else if (jh == n) {
+    if ($xi() != $x(n => n1)) carp = 1;
+    jl = n1-1;
+  }
+  jh = jl+1;
+  $GENERIC() d = $x(n=>jh) - $x(n=>jl);
+  if (d == 0) $CROAK("identical abscissas");
+  d = ($x(n=>jh) - $xi())/d;
+  $yi() = d*$y(n => jl) + (1-d)*$y(n => jh);
+  $err() = carp;
+%}
+EOF
+  Doc => <<'EOD',
+=for ref
+
+routine for 1D linear interpolation
+
+=for usage
+
+ ( $yi, $err ) = interpolate($xi, $x, $y)
+
+Given a set of points C<($x,$y)>, use linear interpolation
+to find the values C<$yi> at a set of points C<$xi>.
+
+C<interpolate> uses a binary search to find the suspects, er...,
+interpolation indices and therefore abscissas (ie C<$x>)
+have to be I<strictly> ordered (increasing or decreasing).
+For interpolation at lots of
+closely spaced abscissas an approach that uses the last index found as
+a start for the next search can be faster (compare Numerical Recipes
+C<hunt> routine). Feel free to implement that on top of the binary
+search if you like. For out of bounds values it just does a linear
+extrapolation and sets the corresponding element of C<$err> to 1,
+which is otherwise 0.
+
+See also L</interpol>, which uses the same routine,
+differing only in the handling of extrapolation - an error message
+is printed rather than returning an error ndarray.
+
+Note that C<interpolate> can use complex values for C<$y> and C<$yi> but
+C<$x> and C<$xi> must be real.
+
+=cut
+
+EOD
+);
+
+pp_add_exported('', 'interpol');
+pp_addpm(<<'EOD');
+=head2 interpol
+
+=for sig
+
+ Signature: (xi(); x(n); y(n); [o] yi())
+
+=for ref
+
+routine for 1D linear interpolation
+
+=for usage
+
+ $yi = interpol($xi, $x, $y)
+
+C<interpol> uses the same search method as L</interpolate>,
+hence C<$x> must be I<strictly> ordered (either increasing or decreasing).
+The difference occurs in the handling of out-of-bounds values; here
+an error message is printed.
+
+=cut
+
+# kept in for backwards compatibility
+sub interpol ($$$;$) {
+    my $xi = shift;
+    my $x  = shift;
+    my $y  = shift;
+    my $yi = @_ == 1 ? $_[0] : PDL->null;
+    interpolate( $xi, $x, $y, $yi, my $err = PDL->null );
+    print "some values had to be extrapolated\n"
+	if any $err;
+    return $yi if @_ == 0;
+} # sub: interpol()
+*PDL::interpol = \&interpol;
+
+EOD
+
+pp_add_exported('','interpND');
+pp_addpm(<<'EOD');
+=head2 interpND
+
+=for ref
+
+Interpolate values from an N-D ndarray, with switchable method
+
+=for example
+
+  $source = 10*xvals(10,10) + yvals(10,10);
+  $index = pdl([[2.2,3.5],[4.1,5.0]],[[6.0,7.4],[8,9]]);
+  print $source->interpND( $index );
+
+InterpND acts like L<indexND|PDL::Slices/indexND>,
+collapsing C<$index> by lookup
+into C<$source>; but it does interpolation rather than direct sampling.
+The interpolation method and boundary condition are switchable via
+an options hash.
+
+By default, linear or sample interpolation is used, with constant
+value outside the boundaries of the source pdl.  No dataflow occurs,
+because in general the output is computed rather than indexed.
+
+All the interpolation methods treat the pixels as value-centered, so
+the C<sample> method will return C<< $a->(0) >> for coordinate values on
+the set [-0.5,0.5], and all methods will return C<< $a->(1) >> for
+a coordinate value of exactly 1.
+
+Recognized options:
+
+=over 3
+
+=item method
+
+Values can be:
+
+=over 3
+
+=item * 0, s, sample, Sample (default for integer source types)
+
+The nearest value is taken. Pixels are regarded as centered on their
+respective integer coordinates (no offset from the linear case).
+
+=item * 1, l, linear, Linear (default for floating point source types)
+
+The values are N-linearly interpolated from an N-dimensional cube of size 2.
+
+=item * 3, c, cube, cubic, Cubic
+
+The values are interpolated using a local cubic fit to the data.  The
+fit is constrained to match the original data and its derivative at the
+data points.  The second derivative of the fit is not continuous at the
+data points.  Multidimensional datasets are interpolated by the
+successive-collapse method.
+
+(Note that the constraint on the first derivative causes a small amount
+of ringing around sudden features such as step functions).
+
+=item * f, fft, fourier, Fourier
+
+The source is Fourier transformed, and the interpolated values are
+explicitly calculated from the coefficients.  The boundary condition
+option is ignored -- periodic boundaries are imposed.
+
+If you pass in the option "fft", and it is a list (ARRAY) ref, then it
+is a stash for the magnitude and phase of the source FFT.  If the list
+has two elements then they are taken as already computed; otherwise
+they are calculated and put in the stash.
+
+=back
+
+=item b, bound, boundary, Boundary
+
+This option is passed unmodified into L<indexND|PDL::Slices/indexND>,
+which is used as the indexing engine for the interpolation.
+Some current allowed values are 'extend', 'periodic', 'truncate', and 'mirror'
+(default is 'truncate').
+
+=item bad
+
+contains the fill value used for 'truncate' boundary.  (default 0)
+
+=item fft
+
+An array ref whose associated list is used to stash the FFT of the source
+data, for the FFT method.
+
+=back
+
+=cut
+
+*interpND = *PDL::interpND;
+sub PDL::interpND {
+  my $source = shift;
+  my $index = shift;
+  my $options = shift;
+
+  barf 'Usage: interpND($source,$index[,{%options}])'
+    if(defined $options   and    ref $options ne 'HASH');
+
+  my $opt = defined $options ? $options : {};
+
+  my $method = $opt->{m} || $opt->{meth} || $opt->{method} || $opt->{Method};
+  $method //= $source->type->integer ? 'sample' : 'linear';
+
+  my $boundary = $opt->{b} || $opt->{boundary} || $opt->{Boundary} || $opt->{bound} || $opt->{Bound} || 'extend';
+  my $bad = $opt->{bad} || $opt->{Bad} || 0.0;
+
+  return $source->range(PDL::Math::floor($index+0.5),0,$boundary)
+    if $method =~ m/^s(am(p(le)?)?)?/i;
+
+  if (($method eq 1) || $method =~ m/^l(in(ear)?)?/i) {
+    ## key: (ith = index broadcast; cth = cube broadcast; sth = source broadcast)
+    my $d = $index->dim(0);
+    my $di = $index->ndims - 1;
+
+    # Grab a 2-on-a-side n-cube around each desired pixel
+    my $samp = $source->range($index->floor,2,$boundary); # (ith, cth, sth)
+
+    # Reorder to put the cube dimensions in front and convert to a list
+    $samp = $samp->reorder( $di .. $di+$d-1,
+			    0 .. $di-1,
+			    $di+$d .. $samp->ndims-1) # (cth, ith, sth)
+                  ->clump($d); # (clst, ith, sth)
+
+    # Enumerate the corners of an n-cube and convert to a list
+    # (the 'x' is the normal perl repeat operator)
+    my $crnr = PDL::Basic::ndcoords( (2) x $index->dim(0) ) # (index,cth)
+             ->mv(0,-1)->clump($index->dim(0))->mv(-1,0); # (index, clst)
+    # a & b are the weighting coefficients.
+    my($x,$y);
+    $index->where( 0 * $index ) .= -10; # Change NaN to invalid
+    {
+      my $bb = PDL::Math::floor($index);
+      $x = ($index - $bb)     -> dummy(1,$crnr->dim(1)); # index, clst, ith
+      $y = ($bb + 1 - $index) -> dummy(1,$crnr->dim(1)); # index, clst, ith
+    }
+
+    # Use 1/0 corners to select which multiplier happens, multiply
+    # 'em all together to get sample weights, and sum to get the answer.
+    my $out0 =  ( ($x * ($crnr==1) + $y * ($crnr==0)) #index, clst, ith
+		 -> prodover                          #clst, ith
+		 );
+
+    my $out = ($out0 * $samp)->sumover; # ith, sth
+
+    # Work around BAD-not-being-contagious bug in PDL <= 2.6 bad handling code  --CED 3-April-2013
+    if ($source->badflag) {
+	my $baddies = $samp->isbad->orover;
+	$out = $out->setbadif($baddies);
+    }
+
+    $out = $out->convert($source->type->enum) if $out->type != $source->type;
+    return $out;
+
+  } elsif(($method eq 3) || $method =~ m/^c(u(b(e|ic)?)?)?/i) {
+
+      my ($d,@di) = $index->dims;
+      my $di = $index->ndims - 1;
+
+      # Grab a 4-on-a-side n-cube around each desired pixel
+      my $samp = $source->range($index->floor - 1,4,$boundary) #ith, cth, sth
+	  ->reorder( $di .. $di+$d-1, 0..$di-1, $di+$d .. $source->ndims-1 );
+	                   # (cth, ith, sth)
+
+      # Make a cube of the subpixel offsets, and expand its dims to
+      # a 4-on-a-side N-1 cube, to match the slices of $samp (used below).
+      my $y = $index - $index->floor;
+      for my $i(1..$d-1) {
+	  $y = $y->dummy($i,4);
+      }
+
+      # Collapse by interpolation, one dimension at a time...
+      for my $i(0..$d-1) {
+	  my $a0 = $samp->slice("(1)");    # Just-under-sample
+	  my $a1 = $samp->slice("(2)");    # Just-over-sample
+	  my $a1a0 = $a1 - $a0;
+
+	  my $gradient = 0.5 * ($samp->slice("2:3")-$samp->slice("0:1"));
+	  my $s0 = $gradient->slice("(0)");   # Just-under-gradient
+	  my $s1 = $gradient->slice("(1)");   # Just-over-gradient
+
+	  my $bb = $y->slice("($i)");
+
+	  # Collapse the sample...
+	  $samp = ( $a0 +
+		    $bb * (
+			   $s0  +
+			   $bb * ( (3 * $a1a0 - 2*$s0 - $s1) +
+				   $bb * ( $s1 + $s0 - 2*$a1a0 )
+				   )
+			   )
+		    );
+
+	  # "Collapse" the subpixel offset...
+	  $y = $y->slice(":,($i)");
+      }
+
+      $samp = $samp->convert($source->type->enum) if $samp->type != $source->type;
+      return $samp;
+
+  } elsif($method =~ m/^f(ft|ourier)?/i) {
+
+     require PDL::FFT;
+     my $fftref = $opt->{fft};
+     $fftref = [] unless(ref $fftref eq 'ARRAY');
+     if(@$fftref != 2) {
+	 my $x = $source->copy;
+	 my $y = zeroes($source);
+	 PDL::FFT::fftnd($x,$y);
+	 $fftref->[0] = sqrt($x*$x+$y*$y) / $x->nelem;
+	 $fftref->[1] = - atan2($y,$x);
+     }
+
+     my $i;
+     my $c = PDL::Basic::ndcoords($source);               # (dim, source-dims)
+     for $i(1..$index->ndims-1) {
+	 $c = $c->dummy($i,$index->dim($i))
+     }
+     my $id = $index->ndims-1;
+     my $phase = (($c * $index * 3.14159 * 2 / pdl($source->dims))
+		  ->sumover) # (index-dims, source-dims)
+ 	          ->reorder($id..$id+$source->ndims-1,0..$id-1); # (src, index)
+
+     my $phref = $fftref->[1]->copy;        # (source-dims)
+     my $mag = $fftref->[0]->copy;          # (source-dims)
+
+     for $i(1..$index->ndims-1) {
+	 $phref = $phref->dummy(-1,$index->dim($i));
+	 $mag = $mag->dummy(-1,$index->dim($i));
+     }
+     my $out = cos($phase + $phref ) * $mag;
+     $out = $out->clump($source->ndims)->sumover;
+     $out = $out->convert($source->type->enum) if $out->type != $source->type;
+     return $out;
+ }  else {
+     barf("interpND: unknown method '$method'; valid ones are 'linear' and 'sample'.\n");
+ }
+}
+
+EOD
+
+##############################################################
+# things related to indexing: one2nd, which, where
+##############################################################
+
+pp_add_exported("", 'one2nd');
+pp_addpm(<<'EOD');
+=head2 one2nd
+
+=for ref
+
+Converts a one dimensional index ndarray to a set of ND coordinates
+
+=for usage
+
+ @coords=one2nd($x, $indices)
+
+returns an array of ndarrays containing the ND indexes corresponding to
+the one dimensional list indices. The indices are assumed to
+correspond to array C<$x> clumped using C<clump(-1)>. This routine is
+used in the old vector form of L</whichND>, but is useful on
+its own occasionally.
+
+Returned ndarrays have the L<indx|PDL::Core/indx> datatype.  C<$indices> can have
+values larger than C<< $x->nelem >> but negative values in C<$indices>
+will not give the answer you expect.
+
+=for example
+
+ pdl> $x=pdl [[[1,2],[-1,1]], [[0,-3],[3,2]]]; $c=$x->clump(-1)
+ pdl> $maxind=maximum_ind($c); p $maxind;
+ 6
+ pdl> print one2nd($x, maximum_ind($c))
+ 0 1 1
+ pdl> p $x->at(0,1,1)
+ 3
+
+=cut
+
+*one2nd = \&PDL::one2nd;
+sub PDL::one2nd {
+  barf "Usage: one2nd \$array \$indices\n" if @_ != 2;
+  my ($x, $ind)=@_;
+  my @dimension=$x->dims;
+  $ind = indx($ind);
+  my(@index);
+  my $count=0;
+  foreach (@dimension) {
+    $index[$count++]=$ind % $_;
+    $ind /= $_;
+  }
+  return @index;
+}
+
+EOD
+
+my $doc_which = <<'EOD';
+
+=for ref
+
+Returns indices of non-zero values from a 1-D PDL
+
+=for usage
+
+ $i = which($mask);
+
+returns a pdl with indices for all those elements that are nonzero in
+the mask. Note that the returned indices will be 1D. If you feed in a
+multidimensional mask, it will be flattened before the indices are
+calculated.  See also L</whichND> for multidimensional masks.
+
+If you want to index into the original mask or a similar ndarray
+with output from C<which>, remember to flatten it before calling index:
+
+  $data = random 5, 5;
+  $idx = which $data > 0.5; # $idx is now 1D
+  $bigsum = $data->flat->index($idx)->sum;  # flatten before indexing
+
+Compare also L</where> for similar functionality.
+
+SEE ALSO:
+
+L</which_both> returns separately the indices of both nonzero and zero
+values in the mask.
+
+L</where_both> returns separately slices of both nonzero and zero
+values in the mask.
+
+L</where> returns associated values from a data PDL, rather than
+indices into the mask PDL.
+
+L</whichND> returns N-D indices into a multidimensional PDL.
+
+=for example
+
+ pdl> $x = sequence(10); p $x
+ [0 1 2 3 4 5 6 7 8 9]
+ pdl> $indx = which($x>6); p $indx
+ [7 8 9]
+
+=cut
+
+EOD
+
+my $doc_which_both = <<'EOD';
+
+=for ref
+
+Returns indices of nonzero and zero values in a mask PDL
+
+=for usage
+
+ ($i, $c_i) = which_both($mask);
+
+This works just as L</which>, but the complement of C<$i> will be in
+C<$c_i>.
+
+=for example
+
+ pdl> p $x = sequence(10)
+ [0 1 2 3 4 5 6 7 8 9]
+ pdl> ($big, $small) = which_both($x >= 5); p "$big\n$small"
+ [5 6 7 8 9]
+ [0 1 2 3 4]
+
+=cut
+
+EOD
+
+    for (
+	 {Name=>'which',
+	  Pars => 'mask(n); indx [o] inds(n); indx [o]lastout()',
+	  Variables => 'PDL_Indx dm=0;',
+	  Elseclause => "",
+	  Outclause => '$lastout() = dm; loop(n=dm) %{ $inds() = -1; %}',
+	  Doc => $doc_which,
+	  PMCode=>pp_line_numbers(__LINE__, <<'EOD'),
+   sub which { my ($this,$out) = @_;
+		$this = $this->flat;
+		$out //= $this->nullcreate;
+		PDL::_which_int($this,$out,my $lastout = $this->nullcreate);
+		my $lastoutmax = $lastout->max->sclr;
+		$lastoutmax ? $out->slice('0:'.($lastoutmax-1))->sever : empty(indx);
+   }
+   *PDL::which = \&which;
+EOD
+	  },
+	 {Name => 'which_both',
+	  Pars => 'mask(n); indx [o] inds(n); indx [o]notinds(n); indx [o]lastout(); indx [o]lastoutn()',
+	  Variables => 'PDL_Indx dm=0; int dm2=0;',
+	  Elseclause => "else { \n          \$notinds(n => dm2)=n; \n           dm2++;\n     }",
+	  Outclause => '$lastout() = dm; $lastoutn() = dm2; loop(n=dm) %{ $inds() = -1; %} loop(n=dm2) %{ $notinds() = -1; %}',
+	  Doc => $doc_which_both,
+	  PMCode=>pp_line_numbers(__LINE__, <<'EOD'),
+   sub which_both { my ($this,$outi,$outni) = @_;
+		$this = $this->flat;
+		$outi //= $this->nullcreate;
+		$outni //= $this->nullcreate;
+		PDL::_which_both_int($this,$outi,$outni,my $lastout = $this->nullcreate,my $lastoutn = $this->nullcreate);
+		my $lastoutmax = $lastout->max->sclr;
+		$outi = $lastoutmax ? $outi->slice('0:'.($lastoutmax-1))->sever : empty(indx);
+		return $outi if !wantarray;
+		my $lastoutnmax = $lastoutn->max->sclr;
+		($outi, $lastoutnmax ? $outni->slice('0:'.($lastoutnmax-1))->sever : empty(indx));
+   }
+   *PDL::which_both = \&which_both;
+EOD
+	  }
+	 )
+{
+    pp_def($_->{Name},
+	   HandleBad => 1,
+	   Doc => $_->{Doc},
+	   Pars => $_->{Pars},
+	   GenericTypes => [ppdefs_all],
+	   PMCode => $_->{PMCode},
+	   Code => $_->{Variables} .'
+                 loop(n) %{
+			if ( $mask() PDL_IF_BAD(&& $ISGOOD($mask()),) ) {
+				$inds(n => dm) = n;
+				dm++;
+			}'.$_->{Elseclause}.'
+		 %}'.$_->{Outclause},
+    );
+}
+
+pp_def('whichover',
+  HandleBad => 1,
+  Inplace => 1,
+  Pars => 'a(n); [o]o(n)',
+  GenericTypes => [ppdefs_all],
+  Code => <<'EOF',
+PDL_Indx last = 0;
+loop(n) %{
+  if ($a() PDL_IF_BAD(&& $ISGOOD($a()),)) $o(n=>last++) = n;
+%}
+loop(n=last) %{ $o() = -1; %}
+EOF
+  Doc => <<'EOF',
+=for ref
+
+Collects the coordinates of non-zero, non-bad values in each 1D mask in
+ndarray at the start of the output, and fills the rest with -1. Works
+inplace.
+
+By using L<PDL::Slices/xchg> etc. it is possible to use I<any> dimension.
+
+=for usage
+
+  my $a = pdl q[3 4 2 3 2 3 1];
+  my $b = $a->uniq;
+  my $c = +($a->dummy(0) == $b)->transpose;
+  print $c, $c->whichover;
+  # [
+  #  [0 0 0 0 0 0 1]
+  #  [0 0 1 0 1 0 0]
+  #  [1 0 0 1 0 1 0]
+  #  [0 1 0 0 0 0 0]
+  # ]
+  # [
+  #  [ 6 -1 -1 -1 -1 -1 -1]
+  #  [ 2  4 -1 -1 -1 -1 -1]
+  #  [ 0  3  5 -1 -1 -1 -1]
+  #  [ 1 -1 -1 -1 -1 -1 -1]
+  # ]
+
+EOF
+);
+
+pp_def('approx_artol',
+  Pars => 'got(); expected(); sbyte [o] result()',
+  OtherPars => 'double atol; double rtol',
+  OtherParsDefaults => { atol => 1e-6, rtol => 0 },
+  GenericTypes => [ppdefs_all],
+  ArgOrder => 1,
+  HandleBad => 1,
+  Code => pp_line_numbers(__LINE__, <<'EOF'),
+double atol2 = $COMP(atol)*$COMP(atol), rtol2 = $COMP(rtol)*$COMP(rtol);
+PDL_IF_BAD(char got_badflag = !!$PDLSTATEISBAD(got); char exp_badflag = !!$PDLSTATEISBAD(expected);,)
+broadcastloop %{
+$GENERIC() expctd = $expected();
+if (PDL_ISNAN_$PPSYM()($got()) && PDL_ISNAN_$PPSYM()(expctd)) { $result() = 1; continue; }
+if (PDL_ISNAN_$PPSYM()($got()) || PDL_ISNAN_$PPSYM()(expctd)) { $result() = 0; continue; }
+PDL_IF_BAD(
+  if ((got_badflag && $ISBAD(got())) && (exp_badflag && $ISBADVAR(expctd,expected))) { $result() = 1; continue; }
+  if ((got_badflag && $ISBAD(got())) || (exp_badflag && $ISBADVAR(expctd,expected))) { $result() = 0; continue; }
+,)
+if ($got() == expctd) { $result() = 1; continue; }
+$GENERIC() diff = $got() - expctd;
+double abs_diff2 = PDL_IF_GENTYPE_REAL(
+  diff * diff,
+  (creall(diff) * creall(diff)) + (cimagl(diff) * cimagl(diff))
+);
+if (abs_diff2 <= atol2)                 { $result() = 1; continue; }
+double rel_diff2 = rtol2 * PDL_IF_GENTYPE_REAL(
+  expctd * expctd,
+  ((creall(expctd) * creall(expctd)) + (cimagl(expctd) * cimagl(expctd)))
+);
+if (abs_diff2 <= rel_diff2)             { $result() = 1; continue; }
+$result() = 0;
+%}
+EOF
+  Doc => <<'EOF',
+=for ref
+
+Returns C<sbyte> mask whether C<< abs($got()-$expected())> <= >> either
+absolute or relative (C<rtol> * C<$expected()>) tolerances.
+
+Relative tolerance defaults to zero, and absolute tolerance defaults to
+C<1e-6>, for compatibility with L<PDL::Core/approx>.
+
+Works with complex numbers, and to avoid expensive C<sqrt>ing uses the
+squares of the input quantities and differences. Bear this in mind for
+numbers outside the range (for C<double>) of about C<1e-154..1e154>.
+
+Handles C<NaN>s by showing them approximately equal (i.e. true in the
+output) if both values are C<NaN>, and not otherwise.
+
+Adapted from code by Edward Baudrez, test changed from C<< < >> to C<< <= >>.
+EOF
+  BadDoc => <<'EOF',
+Handles bad values similarly to C<NaN>s, above. This includes if only
+one of the two input ndarrays has their badflag true.
+EOF
+);
+
+pp_add_exported("", 'where');
+pp_addpm(<<'EOD');
+=head2 where
+
+=for ref
+
+Use a mask to select values from one or more data PDLs
+
+C<where> accepts one or more data ndarrays and a mask ndarray.  It
+returns a list of output ndarrays, corresponding to the input data
+ndarrays.  Each output ndarray is a 1-dimensional list of values in its
+corresponding data ndarray. The values are drawn from locations where
+the mask is nonzero.
+
+The output PDLs are still connected to the original data PDLs, for the
+purpose of dataflow.
+
+C<where> combines the functionality of L</which> and L<index|PDL::Slices/index>
+into a single operation.
+
+BUGS:
+
+While C<where> works OK for most N-dimensional cases, it does not
+broadcast properly over (for example) the (N+1)th dimension in data
+that is compared to an N-dimensional mask.  Use C<whereND> for that.
+
+=for usage
+
+ $i = $x->where($x+5 > 0); # $i contains those elements of $x
+                           # where mask ($x+5 > 0) is 1
+ $i .= -5;  # Set those elements (of $x) to -5. Together, these
+            # commands clamp $x to a maximum of -5.
+
+It is also possible to use the same mask for several ndarrays with
+the same call:
+
+ ($i,$j,$k) = where($x,$y,$z, $x+5>0);
+
+Note: C<$i> is always 1-D, even if C<$x> is E<gt>1-D.
+
+WARNING: The first argument
+(the values) and the second argument (the mask) currently have to have
+the exact same dimensions (or horrible things happen). You *cannot*
+broadcast over a smaller mask, for example.
+
+=cut
+
+sub PDL::where :lvalue {
+  barf "Usage: where( \$pdl1, ..., \$pdlN, \$mask )\n" if @_ == 1;
+  my $mask = pop->flat->which;
+  @_ == 1 ? $_[0]->flat->index($mask) : map $_->flat->index($mask), @_;
+}
+*where = \&PDL::where;
+
+EOD
+
+pp_add_exported("", 'where_both');
+pp_addpm(<<'EOD');
+=head2 where_both
+
+=for ref
+
+Returns slices (non-zero in mask, zero) of an ndarray according to a mask
+
+=for usage
+
+ ($match_vals, $non_match_vals) = where_both($pdl, $mask);
+
+This works like L</which_both>, but (flattened) data-flowing slices
+rather than index-sets are returned.
+
+=for example
+
+ pdl> p $x = sequence(10) + 2
+ [2 3 4 5 6 7 8 9 10 11]
+ pdl> ($big, $small) = where_both($x, $x > 5); p "$big\n$small"
+ [6 7 8 9 10 11]
+ [2 3 4 5]
+ pdl> p $big += 2, $small -= 1
+ [8 9 10 11 12 13] [1 2 3 4]
+ pdl> p $x
+ [1 2 3 4 8 9 10 11 12 13]
+
+=cut
+
+sub PDL::where_both {
+  barf "Usage: where_both(\$pdl, \$mask)\n" if @_ != 2;
+  my ($arr, $mask) = @_;  # $mask has 0==false, 1==true
+  my $arr_flat = $arr->flat;
+  map $arr_flat->index1d($_), PDL::which_both($mask);
+}
+*where_both = \&PDL::where_both;
+EOD
+
+pp_add_exported("", 'whereND');
+pp_addpm(<<'EOD');
+=head2 whereND
+
+=for ref
+
+C<where> with support for ND masks and broadcasting
+
+C<whereND> accepts one or more data ndarrays and a
+mask ndarray.  It returns a list of output ndarrays,
+corresponding to the input data ndarrays.  The values
+are drawn from locations where the mask is nonzero.
+
+C<whereND> differs from C<where> in that the mask
+dimensionality is preserved which allows for
+proper broadcasting of the selection operation over
+higher dimensions.
+
+As with C<where> the output PDLs are still connected
+to the original data PDLs, for the purpose of dataflow.
+
+=for usage
+
+  $sdata = whereND $data, $mask
+  ($s1, $s2, ..., $sn) = whereND $d1, $d2, ..., $dn, $mask
+
+  where
+
+    $data is M dimensional
+    $mask is N < M dimensional
+    dims($data) 1..N == dims($mask) 1..N
+    with broadcasting over N+1 to M dimensions
+
+=for example
+
+  $data   = sequence(4,3,2);   # example data array
+  $mask4  = (random(4)>0.5);   # example 1-D mask array, has $n4 true values
+  $mask43 = (random(4,3)>0.5); # example 2-D mask array, has $n43 true values
+  $sdat4  = whereND $data, $mask4;   # $sdat4 is a [$n4,3,2] pdl
+  $sdat43 = whereND $data, $mask43;  # $sdat43 is a [$n43,2] pdl
+
+Just as with C<where>, you can use the returned value in an
+assignment. That means that both of these examples are valid:
+
+  # Used to create a new slice stored in $sdat4:
+  $sdat4 = $data->whereND($mask4);
+  $sdat4 .= 0;
+  # Used in lvalue context:
+  $data->whereND($mask4) .= 0;
+
+SEE ALSO:
+
+L</whichND> returns N-D indices into a multidimensional PDL, from a mask.
+
+=cut
+
+sub PDL::whereND :lvalue {
+   barf "Usage: whereND( \$pdl1, ..., \$pdlN, \$mask )\n" if @_ == 1;
+   my $mask = pop @_;  # $mask has 0==false, 1==true
+   my @to_return;
+   my $n = PDL::sum($mask);
+   my $maskndims = $mask->ndims;
+   foreach my $arr (@_) {
+      # count the number of dims in $mask and $arr
+      # $mask = a b c d e f.....
+      my @idims = dims($arr);
+      splice @idims, 0, $maskndims; # pop off the number of dims in $mask
+      if (!$n or $arr->isempty) {
+        push @to_return, PDL->zeroes($arr->type, $n, @idims);
+        next;
+      }
+      my $sub_i = $mask * ones($arr);
+      my $where_sub_i = PDL::where($arr, $sub_i);
+      my $ndim = 0;
+      foreach my $id ($n, @idims[0..($#idims-1)]) {
+         $where_sub_i = $where_sub_i->splitdim($ndim++,$id) if $n>0;
+      }
+      push @to_return, $where_sub_i;
+   }
+   return (@to_return == 1) ? $to_return[0] : @to_return;
+}
+*whereND = \&PDL::whereND;
+
+EOD
+
+pp_add_exported("", 'whichND');
+pp_addpm(<<'EOD');
+=head2 whichND
+
+=for ref
+
+Return the coordinates of non-zero values in a mask.
+
+=for usage
+
+WhichND returns the N-dimensional coordinates of each nonzero value in
+a mask PDL with any number of dimensions.  The returned values arrive
+as an array-of-vectors suitable for use in
+L<indexND|PDL::Slices/indexND> or L<range|PDL::Slices/range>.
+
+ $coords = whichND($mask);
+
+returns a PDL containing the coordinates of the elements that are non-zero
+in C<$mask>, suitable for use in L<PDL::Slices/indexND>. The 0th dimension contains the
+full coordinate listing of each point; the 1st dimension lists all the points.
+For example, if $mask has rank 4 and 100 matching elements, then $coords has
+dimension 4x100.
+
+If no such elements exist, then whichND returns a structured empty PDL:
+an Nx0 PDL that contains no values (but matches, broadcasting-wise, with
+the vectors that would be produced if such elements existed).
+
+DEPRECATED BEHAVIOR IN LIST CONTEXT:
+
+whichND once delivered different values in list context than in scalar
+context, for historical reasons.  In list context, it returned the
+coordinates transposed, as a collection of 1-PDLs (one per dimension)
+in a list.  This usage is deprecated in PDL 2.4.10, and will cause a
+warning to be issued every time it is encountered.  To avoid the
+warning, you can set the global variable "$PDL::whichND" to 's' to
+get scalar behavior in all contexts, or to 'l' to get list behavior in
+list context.
+
+In later versions of PDL, the deprecated behavior will disappear.  Deprecated
+list context whichND expressions can be replaced with:
+
+    @list = $x->whichND->mv(0,-1)->dog;
+
+SEE ALSO:
+
+L</which> finds coordinates of nonzero values in a 1-D mask.
+
+L</where> extracts values from a data PDL that are associated
+with nonzero values in a mask PDL.
+
+L<PDL::Slices/indexND> can be fed the coordinates to return the values.
+
+=for example
+
+ pdl> $s=sequence(10,10,3,4)
+ pdl> ($x, $y, $z, $w)=whichND($s == 203); p $x, $y, $z, $w
+ [3] [0] [2] [0]
+ pdl> print $s->at(list(cat($x,$y,$z,$w)))
+ 203
+
+=cut
+
+*whichND = \&PDL::whichND;
+sub PDL::whichND {
+  my $mask = PDL->topdl(shift);
+
+  # List context: generate a perl list by dimension
+  if(wantarray) {
+      if(!defined($PDL::whichND)) {
+	  printf STDERR "whichND: WARNING - list context deprecated. Set \$PDL::whichND. Details in pod.";
+      } elsif($PDL::whichND =~ m/l/i) {
+	  # old list context enabled by setting $PDL::whichND to 'l'
+	  return $mask->one2nd($mask->flat->which);
+      }
+      # if $PDL::whichND does not contain 'l' or 'L', fall through to scalar context
+  }
+
+  # Scalar context: generate an N-D index ndarray
+  return PDL->new_from_specification(indx,$mask->ndims,0) if !$mask->nelem;
+  return $mask ? pdl(indx,0) : PDL->new_from_specification(indx,0)
+    if !$mask->getndims;
+
+  my $ind = $mask->flat->which->dummy(0,$mask->getndims)->make_physical;
+  # In the empty case, explicitly return the correct type of structured empty
+  return PDL->new_from_specification(indx,$mask->ndims, 0) if !$ind->nelem;
+
+  my $mult = ones(indx, $mask->getndims);
+  my @mdims = $mask->dims;
+
+  for my $i (0..$#mdims-1) {
+   # use $tmp for 5.005_03 compatibility
+   (my $tmp = $mult->index($i+1)) .= $mult->index($i)*$mdims[$i];
+  }
+
+  for my $i (0..$#mdims) {
+   my($s) = $ind->index($i);
+   $s /= $mult->index($i);
+   $s %= $mdims[$i];
+  }
+
+  return $ind;
+}
+EOD
+
+#
+# Set operations suited for manipulation of the operations above.
+#
+
+pp_add_exported("", 'setops');
+pp_addpm(<<'EOD');
+=head2 setops
+
+=for ref
+
+Implements simple set operations like union and intersection
+
+=for usage
+
+   Usage: $set = setops($x, <OPERATOR>, $y);
+
+The operator can be C<OR>, C<XOR> or C<AND>. This is then applied
+to C<$x> viewed as a set and C<$y> viewed as a set. Set theory says
+that a set may not have two or more identical elements, but setops
+takes care of this for you, so C<$x=pdl(1,1,2)> is OK. The functioning
+is as follows:
+
+=over
+
+=item C<OR>
+
+The resulting vector will contain the elements that are either in C<$x>
+I<or> in C<$y> or both. This is the union in set operation terms
+
+=item C<XOR>
+
+The resulting vector will contain the elements that are either in C<$x>
+or C<$y>, but not in both. This is
+
+     Union($x, $y) - Intersection($x, $y)
+
+in set operation terms.
+
+=item C<AND>
+
+The resulting vector will contain the intersection of C<$x> and C<$y>, so
+the elements that are in both C<$x> and C<$y>. Note that for convenience
+this operation is also aliased to L</intersect>.
+
+=back
+
+It should be emphasized that these routines are used when one or both of
+the sets C<$x>, C<$y> are hard to calculate or that you get from a separate
+subroutine.
+
+Finally IDL users might be familiar with Craig Markwardt's C<cmset_op.pro>
+routine which has inspired this routine although it was written independently
+However the present routine has a few less options (but see the examples)
+
+=for example
+
+You will very often use these functions on an index vector, so that is
+what we will show here. We will in fact something slightly silly. First
+we will find all squares that are also cubes below 10000.
+
+Create a sequence vector:
+
+  pdl> $x = sequence(10000)
+
+Find all odd and even elements:
+
+  pdl> ($even, $odd) = which_both( ($x % 2) == 0)
+
+Find all squares
+
+  pdl> $squares= which(ceil(sqrt($x)) == floor(sqrt($x)))
+
+Find all cubes (being careful with roundoff error!)
+
+  pdl> $cubes= which(ceil($x**(1.0/3.0)) == floor($x**(1.0/3.0)+1e-6))
+
+Then find all squares that are cubes:
+
+  pdl> $both = setops($squares, 'AND', $cubes)
+
+And print these (assumes that C<PDL::NiceSlice> is loaded!)
+
+  pdl> p $x($both)
+   [0 1 64 729 4096]
+
+Then find all numbers that are either cubes or squares, but not both:
+
+  pdl> $cube_xor_square = setops($squares, 'XOR', $cubes)
+
+  pdl> p $cube_xor_square->nelem()
+   112
+
+So there are a total of 112 of these!
+
+Finally find all odd squares:
+
+  pdl> $odd_squares = setops($squares, 'AND', $odd)
+
+
+Another common occurrence is to want to get all objects that are
+in C<$x> and in the complement of C<$y>. But it is almost always best
+to create the complement explicitly since the universe that both are
+taken from is not known. Thus use L</which_both> if possible
+to keep track of complements.
+
+If this is impossible the best approach is to make a temporary:
+
+This creates an index vector the size of the universe of the sets and
+set all elements in C<$y> to 0
+
+  pdl> $tmp = ones($n_universe); $tmp($y) .= 0;
+
+This then finds the complement of C<$y>
+
+  pdl> $C_b = which($tmp == 1);
+
+and this does the final selection:
+
+  pdl> $set = setops($x, 'AND', $C_b)
+
+=cut
+
+*setops = \&PDL::setops;
+
+sub PDL::setops {
+
+  my ($x, $op, $y)=@_;
+
+  # Check that $x and $y are 1D.
+  if ($x->ndims() > 1 || $y->ndims() > 1) {
+     warn 'setops: $x and $y must be 1D - flattening them!'."\n";
+     $x = $x->flat;
+     $y = $y->flat;
+  }
+
+  #Make sure there are no duplicate elements.
+  $x=$x->uniq;
+  $y=$y->uniq;
+
+  my $result;
+
+  if ($op eq 'OR') {
+    # Easy...
+    $result = uniq(append($x, $y));
+  } elsif ($op eq 'XOR') {
+    # Make ordered list of set union.
+    my $union = append($x, $y)->qsort;
+    # Index lists.
+    my $s1=zeroes(byte, $union->nelem());
+    my $s2=zeroes(byte, $union->nelem());
+
+    # Find indices which are duplicated - these are to be excluded
+    #
+    # We do this by comparing x with x shifted each way.
+    my $i1 = which($union != rotate($union, 1));
+    my $i2 = which($union != rotate($union, -1));
+    #
+    # We then mark/mask these in the s1 and s2 arrays to indicate which ones
+    # are not equal to their neighbours.
+    #
+    my $ts;
+    ($ts = $s1->index($i1)) .= byte(1) if $i1->nelem() > 0;
+    ($ts = $s2->index($i2)) .= byte(1) if $i2->nelem() > 0;
+
+    my $inds=which($s1 == $s2);
+
+    if ($inds->nelem() > 0) {
+      return $union->index($inds);
+    } else {
+      return $inds;
+    }
+
+  } elsif ($op eq 'AND') {
+    # The intersection of the arrays.
+    return $x if $x->isempty;
+    return $y if $y->isempty;
+    # Make ordered list of set union.
+    my $union = append($x, $y)->qsort;
+    return $union->where($union == rotate($union, -1))->uniq;
+  } else {
+    print "The operation $op is not known!";
+    return -1;
+  }
+
+}
+EOD
+
+pp_add_exported("", 'intersect');
+pp_addpm(<<'EOD');
+=head2 intersect
+
+=for ref
+
+Calculate the intersection of two ndarrays
+
+=for usage
+
+   Usage: $set = intersect($x, $y);
+
+This routine is merely a simple interface to L</setops>. See
+that for more information
+
+=for example
+
+Find all numbers less that 100 that are of the form 2*y and 3*x
+
+ pdl> $x=sequence(100)
+ pdl> $factor2 = which( ($x % 2) == 0)
+ pdl> $factor3 = which( ($x % 3) == 0)
+ pdl> $ii=intersect($factor2, $factor3)
+ pdl> p $x($ii)
+ [0 6 12 18 24 30 36 42 48 54 60 66 72 78 84 90 96]
+
+=cut
+
+*intersect = \&PDL::intersect;
+
+sub PDL::intersect { setops($_[0], 'AND', $_[1]) }
+EOD
+
+pp_add_macros(
+PCHDF => sub {my ($k, $x, $s, $out) = @_; '
+/* PDL version: K, X, S are var names, 4th param output */
+/* ***PURPOSE  Computes divided differences for DPCHCE and DPCHSP */
+/*      DPCHDF:   DPCHIP Finite Difference Formula */
+/*   Uses a divided difference formulation to compute a K-point approx- */
+/*   imation to the derivative at X(K) based on the data in X and S. */
+/*   Called by  DPCHCE  and  DPCHSP  to compute 3- and 4-point boundary */
+/*   derivative approximations. */
+/* ---------------------------------------------------------------------- */
+/*   On input: */
+/*    K    is the order of the desired derivative approximation. */
+/*         K must be at least 3 (error return if not). */
+/*    X    contains the K values of the independent variable. */
+/*         X need not be ordered, but the values **MUST** be */
+/*         distinct.  (Not checked here.) */
+/*    S    contains the associated slope values: */
+/*          S(I) = (F(I+1)-F(I))/(X(I+1)-X(I)), I=1(1)K-1. */
+/*         (Note that S need only be of length K-1.) */
+/*   On return: */
+/*    S    will be destroyed. */
+/*    IERR   will be set to -1 if K.LT.2 . */
+/*    DPCHDF  will be set to the desired derivative approximation if */
+/*         IERR=0 or to zero if IERR=-1. */
+/* ---------------------------------------------------------------------- */
+/* ***SEE ALSO  DPCHCE, DPCHSP */
+/* ***REFERENCES  Carl de Boor, A Practical Guide to Splines, Springer- */
+/*         Verlag, New York, 1978, pp. 10-16. */
+/*  CHECK FOR LEGAL VALUE OF K. */
+{
+/* Local variables */
+  PDL_Indx i, j, k_cached = '.$k.';
+  $GENERIC() *x = '.$x.', *s = '.$s.';
+  if (k_cached < 3) $CROAK("K LESS THAN THREE");
+/*  COMPUTE COEFFICIENTS OF INTERPOLATING POLYNOMIAL. */
+  for (j = 2; j < k_cached; ++j) {
+    PDL_Indx itmp = k_cached - j;
+    for (i = 0; i < itmp; ++i)
+      s[i] = (s[i+1] - s[i]) / (x[i + j] - x[i]);
+  }
+/*  EVALUATE DERIVATIVE AT X(K). */
+  $GENERIC() value = s[0];
+  for (i = 1; i < k_cached-1; ++i)
+    value = s[i] + value * (x[k_cached-1] - x[i]);
+  '.$out.' = value;
+}
+'},
+SIGN => sub {my ($a, $b) = @_; "(($b) >= 0 ? PDL_ABS($a) : -PDL_ABS($a))"},
+PCHST => sub {my ($a, $b) = @_;
+  "((($a) == 0. || ($b) == 0.) ? 0. : \$SIGN(1, ($a)) * \$SIGN(1, ($b)))"
+},
+CHFIE => sub {my ($x1, $x2, $f1, $f2, $d1, $d2, $a, $b, $out) = @_; '
+/* ***PURPOSE  Evaluates integral of a single cubic for DPCHIA */
+/*      DCHFIE:  Cubic Hermite Function Integral Evaluator. */
+/*   Called by  DPCHIA  to evaluate the integral of a single cubic (in */
+/*   Hermite form) over an arbitrary interval (A,B). */
+/* ---------------------------------------------------------------------- */
+/*   Parameters: */
+/*   VALUE -- (output) value of the requested integral. */
+/*   X1,X2 -- (input) endpoints if interval of definition of cubic. */
+/*   F1,F2 -- (input) function values at the ends of the interval. */
+/*   D1,D2 -- (input) derivative values at the ends of the interval. */
+/*   A,B -- (input) endpoints of interval of integration. */
+/* ***SEE ALSO  DPCHIA */
+/*  Programming notes: */
+/*  1. There is no error return from this routine because zero is */
+/*   indeed the mathematically correct answer when X1.EQ.X2 . */
+do {
+  if ('.$x1.' == '.$x2.') {
+    '.$out.' = 0.; break;
+  }
+  $GENERIC() h = '.$x2.' - '.$x1.';
+  $GENERIC() ta1 = ('.$a.' - '.$x1.') / h;
+  $GENERIC() ta2 = ('.$x2.' - '.$a.') / h;
+  $GENERIC() tb1 = ('.$b.' - '.$x1.') / h;
+  $GENERIC() tb2 = ('.$x2.' - '.$b.') / h;
+/* Computing 3rd power */
+  $GENERIC() ua1 = ta1 * (ta1 * ta1);
+  $GENERIC() phia1 = ua1 * (2. - ta1);
+  $GENERIC() psia1 = ua1 * (3. * ta1 - 4.);
+/* Computing 3rd power */
+  $GENERIC() ua2 = ta2 * (ta2 * ta2);
+  $GENERIC() phia2 = ua2 * (2. - ta2);
+  $GENERIC() psia2 = -ua2 * (3. * ta2 - 4.);
+/* Computing 3rd power */
+  $GENERIC() ub1 = tb1 * (tb1 * tb1);
+  $GENERIC() phib1 = ub1 * (2. - tb1);
+  $GENERIC() psib1 = ub1 * (3. * tb1 - 4.);
+/* Computing 3rd power */
+  $GENERIC() ub2 = tb2 * (tb2 * tb2);
+  $GENERIC() phib2 = ub2 * (2. - tb2);
+  $GENERIC() psib2 = -ub2 * (3. * tb2 - 4.);
+  $GENERIC() fterm = '.$f1.' * (phia2 - phib2) + '.$f2.' * (phib1 - phia1);
+  $GENERIC() dterm = ('.$d1.' * (psia2 - psib2) + '.$d2.' * (psib1 - psia1)) * (h / 6.);
+  '.$out.' = 0.5 * h * (fterm + dterm);
+} while(0)
+'},
+PCHID => sub {my ($ia, $ib, $out) = @_; '
+/*  Programming notes: */
+/*  1. This routine uses a special formula that is valid only for */
+/*   integrals whose limits coincide with data values.  This is */
+/*   mathematically equivalent to, but much more efficient than, */
+/*   calls to DCHFIE. */
+/*  VALIDITY-CHECK ARGUMENTS. */
+do {
+  /*  FUNCTION DEFINITION IS OK, GO ON. */
+  $skip() = 1;
+  if ('.$ia.' < 0 || '.$ia.' > $SIZE(n)-1 || '.$ib.' < 0 || '.$ib.' > $SIZE(n)-1) {
+    $ierr() = -4;
+    $CROAK("IA OR IB OUT OF RANGE");
+  }
+  $ierr() = 0;
+  /*  COMPUTE INTEGRAL VALUE. */
+  if ('.$ia.' == '.$ib.') { '.$out.' = 0; continue; }
+  PDL_Indx low = PDLMIN('.$ia.','.$ib.'), iup = PDLMAX('.$ia.','.$ib.');
+  $GENERIC() sum = 0.;
+  loop (n=low:iup) %{
+    $GENERIC() h = $x(n=>n+1) - $x();
+    sum += h * ($f() + $f(n=>n+1) + ($d() - $d(n=>n+1)) * (h / 6.));
+  %}
+  '.$out.' = 0.5 * ('.$ia.' > '.$ib.' ? -sum : sum);
+} while(0)
+'},
+CHFD => sub {my ($do_deriv) = @_; '
+/*  Programming notes: */
+/*   2. Most of the coding between the call to DCHFDV and the end of */
+/*    the IR-loop could be eliminated if it were permissible to */
+/*    assume that XE is ordered relative to X. */
+/*   3. DCHFDV does not assume that X1 is less than X2.  thus, it would */
+/*    be possible to write a version of DPCHFD that assumes a strict- */
+/*    ly decreasing X-array by simply running the IR-loop backwards */
+/*    (and reversing the order of appropriate tests). */
+/*   4. The present code has a minor bug, which I have decided is not */
+/*    worth the effort that would be required to fix it. */
+/*    If XE contains points in [X(N-1),X(N)], followed by points .LT. */
+/*    X(N-1), followed by points .GT.X(N), the extrapolation points */
+/*    will be counted (at least) twice in the total returned in IERR. */
+/*  VALIDITY-CHECK ARGUMENTS. */
+if (!$skip()) {
+  loop (n=1) %{
+    if ($x() > $x(n=>n-1)) continue;
+    $ierr() = -3;
+    $CROAK("X-ARRAY NOT STRICTLY INCREASING");
+  %}
+}
+/*  FUNCTION DEFINITION IS OK, GO ON. */
+$ierr() = 0;
+$skip() = 1;
+/*  LOOP OVER INTERVALS.    (   INTERVAL INDEX IS  IL = IR-1  . ) */
+/*                ( INTERVAL IS X(IL).LE.X.LT.X(IR) . ) */
+PDL_Indx n = $SIZE(n), ne = $SIZE(ne);
+PDL_Indx jfirst = 0, ir;
+for (ir = 1; ir < n && jfirst < ne; ++ir) {
+/*   SKIP OUT OF LOOP IF HAVE PROCESSED ALL EVALUATION POINTS. */
+/*   LOCATE ALL POINTS IN INTERVAL. */
+  char located = 0;
+  PDL_Indx j = jfirst;
+  loop (ne=jfirst) %{
+    j = ne;
+    if ($xe() >= $x(n=>ir)) {
+      located = 1;
+      break;
+    }
+  %}
+  if (!located || ir == n-1)
+    j = ne;
+/*   HAVE LOCATED FIRST POINT BEYOND INTERVAL. */
+  PDL_Indx nj = j - jfirst;
+/*   SKIP EVALUATION IF NO POINTS IN INTERVAL. */
+  if (nj == 0)
+    continue;
+/*   EVALUATE CUBIC AT XE(I),  I = JFIRST (1) J-1 . */
+/*     ---------------------------------------------------------------- */
+  PDL_Indx next[] = {0,0};
+  do { /* inline dchfdv */
+/* Local variables */
+    $GENERIC() x1 = $x(n=>ir-1), x2 = $x(n=>ir);
+    $GENERIC() f1 = $f(n=>ir-1), f2 = $f(n=>ir);
+    $GENERIC() d1 = $d(n=>ir-1), d2 = $d(n=>ir);
+    $GENERIC() h = x2 - x1;
+    if (h == 0.)
+      $CROAK("INTERVAL ENDPOINTS EQUAL");
+/*  INITIALIZE. */
+    $GENERIC() xmi = PDLMIN(0.,h);
+    $GENERIC() xma = PDLMAX(0.,h);
+/*  COMPUTE CUBIC COEFFICIENTS (EXPANDED ABOUT X1). */
+    $GENERIC() delta = (f2 - f1) / h;
+    $GENERIC() del1 = (d1 - delta) / h;
+    $GENERIC() del2 = (d2 - delta) / h;
+/*                       (DELTA IS NO LONGER NEEDED.) */
+    $GENERIC() c2 = -(del1 + del1 + del2);
+    '.($do_deriv ? '$GENERIC() c2t2 = c2 + c2;' : '').'
+    $GENERIC() c3 = (del1 + del2) / h;
+/*                 (H, DEL1 AND DEL2 ARE NO LONGER NEEDED.) */
+    '.($do_deriv ? '$GENERIC() c3t3 = c3 + c3 + c3;' : '').'
+/*  EVALUATION LOOP. */
+    loop (ne=:nj) %{
+      $GENERIC() x = $xe(ne=>ne+jfirst) - x1;
+      $fe(ne=>ne+jfirst) = f1 + x * (d1 + x * (c2 + x * c3));
+      '.($do_deriv ? '$de(ne=>ne+jfirst) = d1 + x * (c2t2 + x * c3t3);' : '').'
+/*      COUNT EXTRAPOLATION POINTS. */
+      if (x < xmi)
+        ++next[0];
+      if (x > xma)
+        ++next[1];
+/*    (NOTE REDUNDANCY--IF EITHER CONDITION IS TRUE, OTHER IS FALSE.) */
+    %}
+  } while (0); /* end inline dchfdv */
+/*     ---------------------------------------------------------------- */
+  if (next[1] != 0) {
+/*       IN THE CURRENT SET OF XE-POINTS, THERE ARE NEXT(2) TO THE */
+/*       RIGHT OF X(IR). */
+/*        THESE ARE ACTUALLY EXTRAPOLATION POINTS. */
+    $ierr() += next[1];
+  }
+  if (next[0] != 0) {
+/*       IN THE CURRENT SET OF XE-POINTS, THERE ARE NEXT(1) TO THE */
+/*       LEFT OF X(IR-1). */
+    if (ir < 2) {
+/*        THESE ARE ACTUALLY EXTRAPOLATION POINTS. */
+      $ierr() += next[0];
+      jfirst = j;
+      continue;
+    }
+/*        XE IS NOT ORDERED RELATIVE TO X, SO MUST ADJUST */
+/*        EVALUATION INTERVAL. */
+/*        FIRST, LOCATE FIRST POINT TO LEFT OF X(IR-1). */
+    located = 0;
+    PDL_Indx i = jfirst;
+    loop (ne=jfirst:j) %{
+      i = ne;
+      if ($xe() < $x(n=>ir-1)) {
+        located = 1;
+        break;
+      }
+    %}
+    if (!located) {
+/*        NOTE-- CANNOT DROP THROUGH HERE UNLESS THERE IS AN ERROR */
+/*           IN DCHFDV. */
+      $ierr() = -5;
+      $CROAK("ERROR RETURN FROM DCHFDV -- FATAL");
+    }
+/*        RESET J.  (THIS WILL BE THE NEW JFIRST.) */
+    j = i;
+/*        NOW FIND OUT HOW FAR TO BACK UP IN THE X-ARRAY. */
+    loop (n=:ir) %{
+      i = n;
+      if ($xe(ne=>j) < $x())
+        break;
+    %}
+/*        NB-- CAN NEVER DROP THROUGH HERE, SINCE XE(J).LT.X(IR-1). */
+/*        AT THIS POINT, EITHER  XE(J) .LT. X(1) */
+/*         OR    X(I-1) .LE. XE(J) .LT. X(I) . */
+/*        RESET IR, RECOGNIZING THAT IT WILL BE INCREMENTED BEFORE */
+/*        CYCLING. */
+/* Computing MAX */
+    ir = PDLMAX(0,i-1);
+  }
+  jfirst = j;
+/*   END OF IR-LOOP. */
+}
+'},
+);
+
+pp_def('pchip_chim',
+  Pars => 'x(n); f(n); [o]d(n); indx [o]ierr();',
+  RedoDimsCode => <<'EOF',
+if ($SIZE(n) < 2) $CROAK("NUMBER OF DATA POINTS LESS THAN TWO");
+EOF
+  Code => pp_line_numbers(__LINE__, <<'EOF'),
+/* Local variables */
+$GENERIC() dmax, hsumt3;
+PDL_Indx n = $SIZE(n);
+/*  VALIDITY-CHECK ARGUMENTS. */
+loop (n=1) %{
+  if ($x() > $x(n=>n-1)) continue;
+  $ierr() = -1;
+  $CROAK("X-ARRAY NOT STRICTLY INCREASING");
+%}
+/*  FUNCTION DEFINITION IS OK, GO ON. */
+$ierr() = 0;
+$GENERIC() h1 = $x(n=>1) - $x(n=>0);
+$GENERIC() del1 = ($f(n=>1) - $f(n=>0)) / h1;
+$GENERIC() dsave = del1;
+/*  SPECIAL CASE N=2 -- USE LINEAR INTERPOLATION. */
+if (n <= 2) {
+  $d(n=>0) = $d(n=>1) = del1;
+  continue;
+}
+/*  NORMAL CASE  (N .GE. 3). */
+$GENERIC() h2 = $x(n=>2) - $x(n=>1);
+$GENERIC() del2 = ($f(n=>2) - $f(n=>1)) / h2;
+/*  SET D(1) VIA NON-CENTERED THREE-POINT FORMULA, ADJUSTED TO BE */
+/*   SHAPE-PRESERVING. */
+$GENERIC() hsum = h1 + h2;
+$GENERIC() w1 = (h1 + hsum) / hsum;
+$GENERIC() w2 = -h1 / hsum;
+$d(n=>0) = w1 * del1 + w2 * del2;
+if ($PCHST($d(n=>0), del1) <= 0.) {
+  $d(n=>0) = 0.;
+} else if ($PCHST(del1, del2) < 0.) {
+/*    NEED DO THIS CHECK ONLY IF MONOTONICITY SWITCHES. */
+  dmax = 3. * del1;
+  if (PDL_ABS($d(n=>0)) > PDL_ABS(dmax)) {
+    $d(n=>0) = dmax;
+  }
+}
+/*  LOOP THROUGH INTERIOR POINTS. */
+loop (n=1:-1) %{
+  if (n != 1) {
+    h1 = h2;
+    h2 = $x(n=>n+1) - $x();
+    hsum = h1 + h2;
+    del1 = del2;
+    del2 = ($f(n=>n+1) - $f()) / h2;
+  }
+/*    SET D(I)=0 UNLESS DATA ARE STRICTLY MONOTONIC. */
+  $d() = 0.;
+  $GENERIC() dtmp = $PCHST(del1, del2);
+  if (dtmp <= 0) {
+    if (dtmp == 0.) {
+/*    COUNT NUMBER OF CHANGES IN DIRECTION OF MONOTONICITY. */
+      if (del2 == 0.) {
+        continue;
+      }
+      if ($PCHST(dsave, del2) < 0.) {
+        ++($ierr());
+      }
+      dsave = del2;
+      continue;
+    }
+    ++($ierr());
+    dsave = del2;
+    continue;
+  }
+/*    USE BRODLIE MODIFICATION OF BUTLAND FORMULA. */
+  hsumt3 = hsum + hsum + hsum;
+  w1 = (hsum + h1) / hsumt3;
+  w2 = (hsum + h2) / hsumt3;
+/* Computing MAX */
+  dmax = PDLMAX(PDL_ABS(del1),PDL_ABS(del2));
+/* Computing MIN */
+  $GENERIC() dmin = PDLMIN(PDL_ABS(del1),PDL_ABS(del2));
+  $GENERIC() drat1 = del1 / dmax;
+  $GENERIC() drat2 = del2 / dmax;
+  $d() = dmin / (w1 * drat1 + w2 * drat2);
+%}
+/*  SET D(N) VIA NON-CENTERED THREE-POINT FORMULA, ADJUSTED TO BE */
+/*   SHAPE-PRESERVING. */
+w1 = -h2 / hsum;
+w2 = (h2 + hsum) / hsum;
+$d(n=>n-1) = w1 * del1 + w2 * del2;
+if ($PCHST($d(n=>n-1), del2) <= 0.) {
+  $d(n=>n-1) = 0.;
+} else if ($PCHST(del1, del2) < 0.) {
+/*    NEED DO THIS CHECK ONLY IF MONOTONICITY SWITCHES. */
+  dmax = 3. * del2;
+  if (PDL_ABS($d(n=>n-1)) > PDL_ABS(dmax)) {
+    $d(n=>n-1) = dmax;
+  }
+}
+EOF
+  Doc => <<'EOF',
+=for ref
+
+Calculate the derivatives of (x,f(x)) using cubic Hermite interpolation.
+
+Calculate the derivatives needed to determine a monotone piecewise
+cubic Hermite interpolant to the given set of points (C<$x,$f>,
+where C<$x> is strictly increasing).
+The resulting set of points - C<$x,$f,$d>, referred to
+as the cubic Hermite representation - can then be used in
+other functions, such as L</pchip_chfe>, L</pchip_chfd>,
+and L</pchip_chia>.
+
+The boundary conditions are compatible with monotonicity,
+and if the data are only piecewise monotonic, the interpolant
+will have an extremum at the switch points; for more control
+over these issues use L</pchip_chic>.
+
+F -- (input) array of dependent variable values to be
+interpolated. F(I) is value corresponding to
+X(I). C<pchip_chim> is designed for monotonic data, but it will
+work for any F-array.  It will force extrema at points where
+monotonicity switches direction. If some other treatment of
+switch points is desired, DPCHIC should be used instead.
+
+D -- (output) array of derivative values at the data
+points.  If the data are monotonic, these values will
+determine a monotone cubic Hermite function.
+
+Error status returned by C<$ierr>:
+
+=over 4
+
+=item *
+
+0 if successful.
+
+=item *
+
+E<gt> 0 if there were C<ierr> switches in the direction of
+monotonicity (data still valid).
+
+=item *
+
+-1 if C<dim($x, 0) E<lt> 2>.
+
+=item *
+
+-3 if C<$x> is not strictly increasing.
+
+=back
+
+(The D-array has not been changed in any of these cases.)
+NOTE: The above errors are checked in the order listed,
+and following arguments have B<NOT> been validated.
+
+References:
+
+1. F. N. Fritsch and J. Butland, A method for constructing
+local monotone piecewise cubic interpolants, SIAM
+Journal on Scientific and Statistical Computing 5, 2
+(June 1984), pp. 300-304.
+
+F. N. Fritsch and R. E. Carlson, Monotone piecewise
+cubic interpolation, SIAM Journal on Numerical Analysis
+17, 2 (April 1980), pp. 238-246.
+EOF
+);
+
+pp_def('pchip_chic',
+  Pars => 'sbyte ic(two=2); vc(two=2); mflag(); x(n); f(n);
+    [o]d(n); indx [o]ierr();
+    [t]h(nless1=CALC($SIZE(n)-1)); [t]slope(nless1);',
+  GenericTypes => $F,
+  RedoDimsCode => <<'EOF',
+if ($SIZE(n) < 2) $CROAK("NUMBER OF DATA POINTS LESS THAN TWO");
+EOF
+  Code => pp_line_numbers(__LINE__, <<'EOF'),
+const $GENERIC() d1mach = $TFDE(FLT_EPSILON,DBL_EPSILON,LDBL_EPSILON);
+/*  VALIDITY-CHECK ARGUMENTS. */
+loop (n=1) %{
+  if ($x() > $x(n=>n-1)) continue;
+  $ierr() = -1;
+  $CROAK("X-ARRAY NOT STRICTLY INCREASING");
+%}
+PDL_Indx ibeg = $ic(two=>0), iend = $ic(two=>1), n = $SIZE(n);
+$ierr() = 0;
+if (PDL_ABS(ibeg) > 5)
+  --($ierr());
+if (PDL_ABS(iend) > 5)
+  $ierr() += -2;
+if ($ierr() < 0) {
+  $ierr() += -3;
+  $CROAK("IC OUT OF RANGE");
+}
+/*  FUNCTION DEFINITION IS OK -- GO ON. */
+/*  SET UP H AND SLOPE ARRAYS. */
+loop (nless1) %{
+  $h() = $x(n=>nless1+1) - $x(n=>nless1);
+  $slope() = $f(n=>nless1+1) - $f(n=>nless1);
+%}
+/*  SPECIAL CASE N=2 -- USE LINEAR INTERPOLATION. */
+if ($SIZE(nless1) <= 1) {
+  $d(n=>0) = $d(n=>1) = $slope(nless1=>0);
+} else {
+/*  NORMAL CASE  (N .GE. 3) . */
+/*  SET INTERIOR DERIVATIVES AND DEFAULT END CONDITIONS. */
+  do { /* inline dpchci */
+/* Local variables */
+    $GENERIC() del1 = $slope(nless1=>0);
+/*  SPECIAL CASE N=2 is dealt with in separate branch above */
+/*  NORMAL CASE  (N .GE. 3). */
+    $GENERIC() del2 = $slope(nless1=>1);
+/*  SET D(1) VIA NON-CENTERED THREE-POINT FORMULA, ADJUSTED TO BE */
+/*   SHAPE-PRESERVING. */
+    $GENERIC() hsum = $h(nless1=>0) + $h(nless1=>1);
+    $GENERIC() w1 = ($h(nless1=>0) + hsum) / hsum;
+    $GENERIC() w2 = -$h(nless1=>0) / hsum;
+    $d(n=>0) = w1 * del1 + w2 * del2;
+    if ($PCHST($d(n=>0), del1) <= 0.) {
+      $d(n=>0) = 0.;
+    } else if ($PCHST(del1, del2) < 0.) {
+/*    NEED DO THIS CHECK ONLY IF MONOTONICITY SWITCHES. */
+      $GENERIC() dmax = 3. * del1;
+      if (PDL_ABS($d(n=>0)) > PDL_ABS(dmax))
+        $d(n=>0) = dmax;
+    }
+/*  LOOP THROUGH INTERIOR POINTS. */
+    loop (nless1=1) %{
+      if (nless1 != 1) {
+        hsum = $h(nless1=>nless1-1) + $h();
+        del1 = del2;
+        del2 = $slope();
+      }
+/*    SET D(I)=0 UNLESS DATA ARE STRICTLY MONOTONIC. */
+      $d(n=>nless1) = 0.;
+      if ($PCHST(del1, del2) <= 0.)
+        continue;
+/*    USE BRODLIE MODIFICATION OF BUTLAND FORMULA. */
+      $GENERIC() hsumt3 = hsum + hsum + hsum;
+      w1 = (hsum + $h(nless1=>nless1-1)) / hsumt3;
+      w2 = (hsum + $h()) / hsumt3;
+/* Computing MAX */
+      $GENERIC() dmax = PDLMAX(PDL_ABS(del1),PDL_ABS(del2));
+/* Computing MIN */
+      $GENERIC() dmin = PDLMIN(PDL_ABS(del1),PDL_ABS(del2));
+      $GENERIC() drat1 = del1 / dmax, drat2 = del2 / dmax;
+      $d(n=>nless1) = dmin / (w1 * drat1 + w2 * drat2);
+    %}
+/*  SET D(N) VIA NON-CENTERED THREE-POINT FORMULA, ADJUSTED TO BE */
+/*   SHAPE-PRESERVING. */
+    w1 = -$h(nless1=>n-2) / hsum;
+    w2 = ($h(nless1=>n-2) + hsum) / hsum;
+    $d(n=>n-1) = w1 * del1 + w2 * del2;
+    if ($PCHST($d(n=>n-1), del2) <= 0.) {
+      $d(n=>n-1) = 0.;
+    } else if ($PCHST(del1, del2) < 0.) {
+/*    NEED DO THIS CHECK ONLY IF MONOTONICITY SWITCHES. */
+      $GENERIC() dmax = 3. * del2;
+      if (PDL_ABS($d(n=>n-1)) > PDL_ABS(dmax))
+        $d(n=>n-1) = dmax;
+    }
+  } while (0); /* end inline dpchci */
+/*  SET DERIVATIVES AT POINTS WHERE MONOTONICITY SWITCHES DIRECTION. */
+  if ($mflag() != 0.) {
+    do { /* inline dpchcs */
+/* ***PURPOSE  Adjusts derivative values for DPCHIC */
+/*     DPCHCS:  DPCHIC Monotonicity Switch Derivative Setter. */
+/*   Called by  DPCHIC  to adjust the values of D in the vicinity of a */
+/*   switch in direction of monotonicity, to produce a more "visually */
+/*   pleasing" curve than that given by  DPCHIM . */
+      static const $GENERIC() fudge = 4.;
+/* Local variables */
+      PDL_Indx k;
+      $GENERIC() del[3], fact, dfmx;
+      $GENERIC() dext, dfloc, slmax, wtave[2];
+/*  INITIALIZE. */
+/*  LOOP OVER SEGMENTS. */
+      loop (nless1=1) %{
+        $GENERIC() dtmp = $PCHST($slope(nless1=>nless1-1), $slope());
+        if (dtmp > 0.) {
+          continue;
+        }
+        if (dtmp != 0.) {
+/* ....... SLOPE SWITCHES MONOTONICITY AT I-TH POINT ..................... */
+/*       DO NOT CHANGE D IF 'UP-DOWN-UP'. */
+          if (nless1 > 1) {
+            if ($PCHST($slope(nless1=>nless1-2), $slope()) > 0.)
+              continue;
+/*           -------------------------- */
+          }
+          if (nless1 < $SIZE(nless1)-1 && $PCHST($slope(nless1=>nless1+1), $slope(nless1=>nless1-1)) > 0.)
+            continue;
+/*           ---------------------------- */
+/*   ....... COMPUTE PROVISIONAL VALUE FOR D(1,I). */
+          dext = $h() / ($h(nless1=>nless1-1) + $h()) * $slope(nless1=>nless1-1) +
+              $h(nless1=>nless1-1) / ($h(nless1=>nless1-1) + $h()) * $slope();
+/*   ....... DETERMINE WHICH INTERVAL CONTAINS THE EXTREMUM. */
+          dtmp = $PCHST(dext, $slope(nless1=>nless1-1));
+          if (dtmp == 0) {
+            continue;
+          }
+          if (dtmp < 0.) {
+/*        DEXT AND SLOPE(I-1) HAVE OPPOSITE SIGNS -- */
+/*            EXTREMUM IS IN (X(I-1),X(I)). */
+            k = nless1;
+/*        SET UP TO COMPUTE NEW VALUES FOR D(1,I-1) AND D(1,I). */
+            wtave[1] = dext;
+            if (k > 1) {
+              wtave[0] = $h(nless1=>k-1) / ($h(nless1=>k-2) + $h(nless1=>k-1)) * $slope(nless1=>k-2) +
+                  $h(nless1=>k-2) / ($h(nless1=>k-2) + $h(nless1=>k)) * $slope(nless1=>k-1);
+            }
+          } else {
+/*        DEXT AND SLOPE(I) HAVE OPPOSITE SIGNS -- */
+/*            EXTREMUM IS IN (X(I),X(I+1)). */
+            k = nless1 + 1;
+/*        SET UP TO COMPUTE NEW VALUES FOR D(1,I) AND D(1,I+1). */
+            wtave[0] = dext;
+            if (k < nless1) {
+              wtave[1] = $h(nless1=>k) / ($h(nless1=>k-1) + $h(nless1=>k)) * $slope(nless1=>k-1) + $h(nless1=>k-1)
+                  / ($h(nless1=>k-1) + $h(nless1=>k)) * $slope(nless1=>k);
+            }
+          }
+        } else {
+/* ....... AT LEAST ONE OF SLOPE(I-1) AND SLOPE(I) IS ZERO -- */
+/*           CHECK FOR FLAT-TOPPED PEAK ....................... */
+          if (nless1 == $SIZE(nless1)-1 || $PCHST($slope(nless1=>nless1-1), $slope(nless1=>nless1+1)) >= 0.)
+            continue;
+/*        ----------------------------- */
+/*       WE HAVE FLAT-TOPPED PEAK ON (X(I),X(I+1)). */
+          k = nless1+1;
+/*       SET UP TO COMPUTE NEW VALUES FOR D(1,I) AND D(1,I+1). */
+          wtave[0] = $h(nless1=>k-1) / ($h(nless1=>k-2) + $h(nless1=>k-1)) * $slope(nless1=>k-2) + $h(nless1=>k-2)
+              / ($h(nless1=>k-2) + $h(nless1=>k-1)) * $slope(nless1=>k-1);
+          wtave[1] = $h(nless1=>k) / ($h(nless1=>k-1) + $h(nless1=>k)) * $slope(nless1=>k-1) + $h(nless1=>k-1) / (
+              $h(nless1=>k-1) + $h(nless1=>k)) * $slope(nless1=>k);
+        }
+/* ....... AT THIS POINT WE HAVE DETERMINED THAT THERE WILL BE AN EXTREMUM */
+/*    ON (X(K),X(K+1)), WHERE K=I OR I-1, AND HAVE SET ARRAY WTAVE-- */
+/*       WTAVE(1) IS A WEIGHTED AVERAGE OF SLOPE(K-1) AND SLOPE(K), */
+/*          IF K.GT.1 */
+/*       WTAVE(2) IS A WEIGHTED AVERAGE OF SLOPE(K) AND SLOPE(K+1), */
+/*          IF K.LT.N-1 */
+        slmax = PDL_ABS($slope(nless1=>k-1));
+        if (k > 1) {
+/* Computing MAX */
+          slmax = PDLMAX(slmax,PDL_ABS($slope(nless1=>k-2)));
+        }
+        if (k < nless1) {
+/* Computing MAX */
+          slmax = PDLMAX(slmax,PDL_ABS($slope(nless1=>k)));
+        }
+        if (k > 1) {
+          del[0] = $slope(nless1=>k-2) / slmax;
+        }
+        del[1] = $slope(nless1=>k-1) / slmax;
+        if (k < nless1) {
+          del[2] = $slope(nless1=>k) / slmax;
+        }
+        if (k > 1 && k < nless1) {
+/*       NORMAL CASE -- EXTREMUM IS NOT IN A BOUNDARY INTERVAL. */
+          fact = fudge * PDL_ABS(del[2] * (del[0] - del[1]) * (wtave[1] / slmax));
+          $d(n=>k-1) += PDLMIN(fact,1.) * (wtave[0] - $d(n=>k-1));
+          fact = fudge * PDL_ABS(del[0] * (del[2] - del[1]) * (wtave[0] / slmax));
+          $d(n=>k) += PDLMIN(fact,1.) * (wtave[1] - $d(n=>k));
+        } else {
+/*       SPECIAL CASE K=1 (WHICH CAN OCCUR ONLY IF I=2) OR */
+/*            K=NLESS1 (WHICH CAN OCCUR ONLY IF I=NLESS1). */
+          fact = fudge * PDL_ABS(del[1]);
+          $d(n=>nless1) = PDLMIN(fact,1.) * wtave[nless1+1 - k];
+/*        NOTE THAT I-K+1 = 1 IF K=I  (=NLESS1), */
+/*            I-K+1 = 2 IF K=I-1(=1). */
+        }
+/* ....... ADJUST IF NECESSARY TO LIMIT EXCURSIONS FROM DATA. */
+        if ($mflag() <= 0.) {
+          continue;
+        }
+        dfloc = $h(nless1=>k-1) * PDL_ABS($slope(nless1=>k-1));
+        if (k > 1) {
+/* Computing MAX */
+          dfloc = PDLMAX(dfloc,$h(nless1=>k-2) * PDL_ABS($slope(nless1=>k-2)));
+        }
+        if (k < nless1) {
+/* Computing MAX */
+          dfloc = PDLMAX(dfloc,$h(nless1=>k) * PDL_ABS($slope(nless1=>k)));
+        }
+        dfmx = $mflag() * dfloc;
+        PDL_Indx indx = nless1 - k;
+/*    INDX = 1 IF K=I, 2 IF K=I-1. */
+/*    --------------------------------------------------------------- */
+        do { /* inline dpchsw */
+/*  NOTATION AND GENERAL REMARKS. */
+/*   RHO IS THE RATIO OF THE DATA SLOPE TO THE DERIVATIVE BEING TESTED. */
+/*   LAMBDA IS THE RATIO OF D2 TO D1. */
+/*   THAT = T-HAT(RHO) IS THE NORMALIZED LOCATION OF THE EXTREMUM. */
+/*   PHI IS THE NORMALIZED VALUE OF P(X)-F1 AT X = XHAT = X-HAT(RHO), */
+/*       WHERE  THAT = (XHAT - X1)/H . */
+/*    THAT IS, P(XHAT)-F1 = D*H*PHI,  WHERE D=D1 OR D2. */
+/*   SIMILARLY,  P(XHAT)-F2 = D*H*(PHI-RHO) . */
+/* Local variables */
+          $GENERIC() cp, nu, phi, rho, hphi, that, sigma, small;
+          $GENERIC() lambda, radcal;
+          $GENERIC() d1 = $d(n=>k-1), d2 = $d(n=>k), h2 = $h(nless1=>k-1), slope2 = $slope(nless1=>k-1);
+/* Initialized data */
+          static const $GENERIC() fact = 100.;
+/*    THIRD SHOULD BE SLIGHTLY LESS THAN 1/3. */
+          static const $GENERIC() third = .33333;
+/*    SMALL SHOULD BE A FEW ORDERS OF MAGNITUDE GREATER THAN MACHEPS. */
+          small = fact * d1mach;
+/*  DO MAIN CALCULATION. */
+          if (d1 == 0.) {
+/*    SPECIAL CASE -- D1.EQ.ZERO . */
+/*      IF D2 IS ALSO ZERO, THIS ROUTINE SHOULD NOT HAVE BEEN CALLED. */
+            if (d2 == 0.) {
+              $ierr() = -1;
+              $CROAK("D1 AND/OR D2 INVALID");
+            }
+            rho = slope2 / d2;
+/*      EXTREMUM IS OUTSIDE INTERVAL WHEN RHO .GE. 1/3 . */
+            if (rho >= third) {
+              $ierr() = 0; break;
+            }
+            that = 2. * (3. * rho - 1.) / (3. * (2. * rho - 1.));
+/* Computing 2nd power */
+            phi = that * that * ((3. * rho - 1.) / 3.);
+/*      CONVERT TO DISTANCE FROM F2 IF IEXTRM.NE.1 . */
+            if (indx != 3) {
+              phi -= rho;
+            }
+/*      TEST FOR EXCEEDING LIMIT, AND ADJUST ACCORDINGLY. */
+            hphi = h2 * PDL_ABS(phi);
+            if (hphi * PDL_ABS(d2) > dfmx) {
+/*       AT THIS POINT, HPHI.GT.0, SO DIVIDE IS OK. */
+              d2 = $SIGN(dfmx / hphi, d2);
+            }
+          } else {
+            rho = slope2 / d1;
+            lambda = -(d2) / d1;
+            if (d2 == 0.) {
+/*       SPECIAL CASE -- D2.EQ.ZERO . */
+/*       EXTREMUM IS OUTSIDE INTERVAL WHEN RHO .GE. 1/3 . */
+              if (rho >= third) {
+                $ierr() = 0; break;
+              }
+              cp = 2. - 3. * rho;
+              nu = 1. - 2. * rho;
+              that = 1. / (3. * nu);
+            } else {
+              if (lambda <= 0.) {
+                $ierr() = -1;
+                $CROAK("D1 AND/OR D2 INVALID");
+              }
+/*       NORMAL CASE -- D1 AND D2 BOTH NONZERO, OPPOSITE SIGNS. */
+              nu = 1. - lambda - 2. * rho;
+              sigma = 1. - rho;
+              cp = nu + sigma;
+              if (PDL_ABS(nu) > small) {
+/* Computing 2nd power */
+                radcal = (nu - (2. * rho + 1.)) * nu + sigma * sigma;
+                if (radcal < 0.) {
+                  $ierr() = -2;
+                  $CROAK("NEGATIVE RADICAL");
+                }
+                that = (cp - sqrt(radcal)) / (3. * nu);
+              } else {
+                that = 1. / (2. * sigma);
+              }
+            }
+            phi = that * ((nu * that - cp) * that + 1.);
+/*      CONVERT TO DISTANCE FROM F2 IF IEXTRM.NE.1 . */
+            if (indx != 3) {
+              phi -= rho;
+            }
+/*      TEST FOR EXCEEDING LIMIT, AND ADJUST ACCORDINGLY. */
+            hphi = h2 * PDL_ABS(phi);
+            if (hphi * PDL_ABS(d1) > dfmx) {
+/*       AT THIS POINT, HPHI.GT.0, SO DIVIDE IS OK. */
+              d1 = $SIGN(dfmx / hphi, d1);
+              d2 = -lambda * d1;
+            }
+          }
+          $ierr() = 0;
+        } while (0); /* end inline dpchsw */
+/*    --------------------------------------------------------------- */
+        if ($ierr() != 0) {
+          break;
+        }
+      %} /* ....... END OF SEGMENT LOOP. */
+    } while (0); /* end inline dpchcs */
+  }
+}
+/*  SET END CONDITIONS. */
+if (ibeg == 0 && iend == 0)
+  continue;
+/*   ------------------------------------------------------- */
+do { /* inline dpchce */
+/* Local variables */
+  PDL_Indx j, k, ibeg = $ic(two=>0), iend = $ic(two=>1);
+  $GENERIC() stemp[3], xtemp[4];
+/*  SET TO DEFAULT BOUNDARY CONDITIONS IF N IS TOO SMALL. */
+  if (PDL_ABS(ibeg) > n)
+    ibeg = 0;
+  if (PDL_ABS(iend) > n)
+    iend = 0;
+/*  TREAT BEGINNING BOUNDARY CONDITION. */
+  if (ibeg != 0) {
+    k = PDL_ABS(ibeg);
+    if (k == 1) {
+/*    BOUNDARY VALUE PROVIDED. */
+      $d(n=>0) = $vc(two=>0);
+    } else if (k == 2) {
+/*    BOUNDARY SECOND DERIVATIVE PROVIDED. */
+      $d(n=>0) = 0.5 * (3. * $slope(nless1=>0) - $d(n=>1) - 0.5 * $vc(two=>0) * $h(nless1=>0));
+    } else if (k < 5) {
+/*    USE K-POINT DERIVATIVE FORMULA. */
+/*    PICK UP FIRST K POINTS, IN REVERSE ORDER. */
+      for (j = 0; j < k; ++j) {
+        PDL_Indx index = k - j;
+/*       INDEX RUNS FROM K DOWN TO 1. */
+        xtemp[j] = $x(n=>index+1);
+        if (j < k-1) {
+          stemp[j] = $slope(nless1=>index);
+        }
+      }
+/*         ----------------------------- */
+      $PCHDF(k, xtemp, stemp, $d(n=>0));
+/*         ----------------------------- */
+    } else {
+/*    USE 'NOT A KNOT' CONDITION. */
+      $d(n=>0) = (3. * ($h(nless1=>0) * $slope(nless1=>1) + $h(nless1=>1) * $slope(nless1=>0)) -
+          2. * ($h(nless1=>0) + $h(nless1=>1)) * $d(n=>1) - $h(nless1=>0) * $d(n=>2)) / $h(nless1=>1);
+    }
+/*  CHECK D(1,1) FOR COMPATIBILITY WITH MONOTONICITY. */
+    if (ibeg <= 0) {
+      if ($slope(nless1=>0) == 0.) {
+        if ($d(n=>0) != 0.) {
+          $d(n=>0) = 0.;
+          ++($ierr());
+        }
+      } else if ($PCHST($d(n=>0), $slope(nless1=>0)) < 0.) {
+        $d(n=>0) = 0.;
+        ++($ierr());
+      } else if (PDL_ABS($d(n=>0)) > 3. * PDL_ABS($slope(nless1=>0))) {
+        $d(n=>0) = 3. * $slope(nless1=>0);
+        ++($ierr());
+      }
+    }
+  }
+/*  TREAT END BOUNDARY CONDITION. */
+  if (iend == 0)
+    break;
+  k = PDL_ABS(iend);
+  if (k == 1) {
+/*    BOUNDARY VALUE PROVIDED. */
+    $d(n=>n-1) = $vc(two=>1);
+  } else if (k == 2) {
+/*    BOUNDARY SECOND DERIVATIVE PROVIDED. */
+    $d(n=>n-1) = 0.5 * (3. * $slope(nless1=>n-2) - $d(n=>n-2)
+        + 0.5 * $vc(two=>1) * $h(nless1=>n-2));
+  } else if (k < 5) {
+/*    USE K-POINT DERIVATIVE FORMULA. */
+/*    PICK UP LAST K POINTS. */
+    for (j = 0; j < k; ++j) {
+      PDL_Indx index = n - k + j;
+/*       INDEX RUNS FROM N+1-K UP TO N. */
+      xtemp[j] = $x(n=>index);
+      if (j < k-1) {
+        stemp[j] = $slope(nless1=>index);
+      }
+    }
+/*         ----------------------------- */
+    $PCHDF(k, xtemp, stemp, $d(n=>n-1));
+/*         ----------------------------- */
+  } else {
+/*    USE 'NOT A KNOT' CONDITION. */
+    $d(n=>n-1) = (3. * ($h(nless1=>n-2) * $slope(nless1=>n-3) +
+        $h(nless1=>n-3) * $slope(nless1=>n-2)) - 2. * ($h(nless1=>n-2) + $h(nless1=>n-3)) *
+        $d(n=>n-2) - $h(nless1=>n-2) * $d(n=>n-3)) / $h(nless1=>n-3);
+  }
+  if (iend > 0)
+    break;
+/*  CHECK D(1,N) FOR COMPATIBILITY WITH MONOTONICITY. */
+  if ($slope(nless1=>n-2) == 0.) {
+    if ($d(n=>n-1) != 0.) {
+      $d(n=>n-1) = 0.;
+      $ierr() += 2;
+    }
+  } else if ($PCHST($d(n=>n-1), $slope(nless1=>n-2)) < 0.) {
+    $d(n=>n-1) = 0.;
+    $ierr() += 2;
+  } else if (PDL_ABS($d(n=>n-1)) > 3. * PDL_ABS($slope(nless1=>n-2))) {
+    $d(n=>n-1) = 3. * $slope(nless1=>n-2);
+    $ierr() += 2;
+  }
+} while (0); /* end inlined dpchce */
+/*   ------------------------------------------------------- */
+EOF
+  Doc => <<'EOF',
+=for ref
+
+Set derivatives needed to determine a piecewise monotone piecewise
+cubic Hermite interpolant to given data. User control is available
+over boundary conditions and/or treatment of points where monotonicity
+switches direction.
+
+Calculate the derivatives needed to determine a piecewise monotone piecewise
+cubic interpolant to the data given in (C<$x,$f>,
+where C<$x> is strictly increasing).
+Control over the boundary conditions is given by the
+C<$ic> and C<$vc> ndarrays, and the value of C<$mflag> determines
+the treatment of points where monotonicity switches
+direction. A simpler, more restricted, interface is available
+using L</pchip_chim>.
+The resulting piecewise cubic Hermite function may be evaluated
+by L</pchip_chfe> or L</pchip_chfd>.
+
+The first and second elements of C<$ic> determine the boundary
+conditions at the start and end of the data respectively.
+If the value is 0, then the default condition, as used by
+L</pchip_chim>, is adopted.
+If greater than zero, no adjustment for monotonicity is made,
+otherwise if less than zero the derivative will be adjusted.
+The allowed magnitudes for C<ic(0)> are:
+
+=over 4
+
+=item *
+
+1 if first derivative at C<x(0)> is given in C<vc(0)>.
+
+=item *
+
+2 if second derivative at C<x(0)> is given in C<vc(0)>.
+
+=item *
+
+3 to use the 3-point difference formula for C<d(0)>.
+(Reverts to the default b.c. if C<n E<lt> 3>)
+
+=item *
+
+4 to use the 4-point difference formula for C<d(0)>.
+(Reverts to the default b.c. if C<n E<lt> 4>)
+
+=item *
+
+5 to set C<d(0)> so that the second derivative is
+continuous at C<x(1)>.
+(Reverts to the default b.c. if C<n E<lt> 4>)
+This option is somewhat analogous to the "not a knot"
+boundary condition provided by DPCHSP.
+
+=back
+
+The values for C<ic(1)> are the same as above, except that
+the first-derivative value is stored in C<vc(1)> for cases 1 and 2.
+The values of C<$vc> need only be set if options 1 or 2 are chosen
+for C<$ic>. NOTES:
+
+=over
+
+=item *
+
+Only in case C<$ic(n)> E<lt> 0 is it guaranteed that the interpolant
+will be monotonic in the first interval. If the returned value of
+D(start_or_end) lies between zero and 3*SLOPE(start_or_end), the
+interpolant will be monotonic. This is B<NOT> checked if C<$ic(n)>
+E<gt> 0.
+
+=item *
+
+If C<$ic(n)> E<lt> 0 and D(0) had to be changed to achieve monotonicity,
+a warning error is returned.
+
+=back
+
+Set C<$mflag = 0> if interpolant is required to be monotonic in
+each interval, regardless of monotonicity of data. This causes C<$d> to be
+set to 0 at all switch points. NOTES:
+
+=over
+
+item *
+
+This will cause D to be set to zero at all switch points, thus
+forcing extrema there.
+
+item *
+
+The result of using this option with the default boundary conditions
+will be identical to using DPCHIM, but will generally cost more
+compute time. This option is provided only to facilitate comparison
+of different switch and/or boundary conditions.
+
+=back
+
+Set C<$mflag> to be non-zero to
+use a formula based on the 3-point difference formula at switch
+points. If C<$mflag E<gt> 0>, then the interpolant at switch points
+is forced to not deviate from the data by more than C<$mflag*dfloc>,
+where C<dfloc> is the maximum of the change of C<$f> on this interval
+and its two immediate neighbours.
+If C<$mflag E<lt> 0>, no such control is to be imposed.
+
+X -- (input) array of independent variable values.  The
+elements of X must be strictly increasing:
+
+           X(I-1) .LT. X(I),  I = 2(1)N.
+
+(Error return if not.)
+
+F -- (input) array of dependent variable values to be
+interpolated. F(I) is value corresponding to X(I).
+
+D -- (output) array of derivative values at the data
+points. These values will determine a monotone cubic
+Hermite function on each subinterval on which the data
+are monotonic, except possibly adjacent to switches in
+monotonicity. The value corresponding to X(I) is stored in D(I).
+No other entries in D are changed.
+
+Error status returned by C<$ierr>:
+
+=over 4
+
+=item *
+
+0 if successful.
+
+=item *
+
+1 if C<ic(0) E<lt> 0> and C<d(0)> had to be adjusted for
+monotonicity.
+
+=item *
+
+2 if C<ic(1) E<lt> 0> and C<d(n-1)> had to be adjusted
+for monotonicity.
+
+=item *
+
+3 if both 1 and 2 are true.
+
+=item *
+
+-1 if C<n E<lt> 2>.
+
+=item *
+
+-3 if C<$x> is not strictly increasing.
+
+=item *
+
+-4 if C<abs(ic(0)) E<gt> 5>.
+
+=item *
+
+-5 if C<abs(ic(1)) E<gt> 5>.
+
+=item *
+
+-6 if both -4 and -5  are true.
+
+=item *
+
+-7 if C<nwk E<lt> 2*(n-1)>.
+
+=back
+
+(The D-array has not been changed in any of these cases.)
+NOTE:  The above errors are checked in the order listed,
+and following arguments have B<NOT> been validated.
+
+References:
+
+1. F. N. Fritsch, Piecewise Cubic Hermite Interpolation
+Package, Report UCRL-87285, Lawrence Livermore National
+Laboratory, July 1982.  [Poster presented at the
+SIAM 30th Anniversary Meeting, 19-23 July 1982.]
+
+2. F. N. Fritsch and J. Butland, A method for constructing
+local monotone piecewise cubic interpolants, SIAM
+Journal on Scientific and Statistical Computing 5, 2
+(June 1984), pp. 300-304.
+
+3. F. N. Fritsch and R. E. Carlson, Monotone piecewise
+cubic interpolation, SIAM Journal on Numerical
+Analysis 17, 2 (April 1980), pp. 238-246.
+EOF
+);
+
+pp_def('pchip_chsp',
+  Pars => 'sbyte ic(two=2); vc(two=2); x(n); f(n);
+    [o]d(n); indx [o]ierr();
+    [t]dx(n); [t]dy_dx(n);
+  ',
+  GenericTypes => $F,
+  RedoDimsCode => <<'EOF',
+if ($SIZE(n) < 2) $CROAK("NUMBER OF DATA POINTS LESS THAN TWO");
+EOF
+  Code => pp_line_numbers(__LINE__, <<'EOF'),
+/*   SINGULAR SYSTEM. */
+/*   *** THEORETICALLY, THIS CAN ONLY OCCUR IF SUCCESSIVE X-VALUES   *** */
+/*   *** ARE EQUAL, WHICH SHOULD ALREADY HAVE BEEN CAUGHT (IERR=-3). *** */
+#define dpchsp_singular(x, ind) \
+  $ierr() = -8; $CROAK("SINGULAR LINEAR SYSTEM(" #x ") at %td", ind);
+/* Local variables */
+$GENERIC() stemp[3], xtemp[4];
+PDL_Indx n = $SIZE(n), nm1 = n - 1;
+/*  VALIDITY-CHECK ARGUMENTS. */
+loop (n=1) %{
+  if ($x() > $x(n=>n-1)) continue;
+  $ierr() = -1;
+  $CROAK("X-ARRAY NOT STRICTLY INCREASING");
+%}
+PDL_Indx ibeg = $ic(two=>0), iend = $ic(two=>1), j;
+$ierr() = 0;
+if (PDL_ABS(ibeg) > 5)
+  --($ierr());
+if (PDL_ABS(iend) > 5)
+  $ierr() += -2;
+if ($ierr() < 0) {
+  $ierr() += -3;
+  $CROAK("IC OUT OF RANGE");
+}
+/*  FUNCTION DEFINITION IS OK -- GO ON. */
+/*  COMPUTE FIRST DIFFERENCES OF X SEQUENCE AND STORE IN WK(1,.). ALSO, */
+/*  COMPUTE FIRST DIVIDED DIFFERENCE OF DATA AND STORE IN WK(2,.). */
+loop (n=1) %{
+  $dx() = $x() - $x(n=>n-1);
+  $dy_dx() = ($f() - $f(n=>n-1)) / $dx();
+%}
+/*  SET TO DEFAULT BOUNDARY CONDITIONS IF N IS TOO SMALL. */
+if (ibeg > n) {
+  ibeg = 0;
+}
+if (iend > n) {
+  iend = 0;
+}
+/*  SET UP FOR BOUNDARY CONDITIONS. */
+if (ibeg == 1 || ibeg == 2) {
+  $d(n=>0) = $vc(two=>0);
+} else if (ibeg > 2) {
+/*    PICK UP FIRST IBEG POINTS, IN REVERSE ORDER. */
+  for (j = 0; j < ibeg; ++j) {
+    PDL_Indx index = ibeg - j + 1;
+/*       INDEX RUNS FROM IBEG DOWN TO 1. */
+    xtemp[j] = $x(n=>index);
+    if (j < ibeg-1)
+      stemp[j] = $dy_dx(n=>index);
+  }
+/*         -------------------------------- */
+  $PCHDF(ibeg, xtemp, stemp, $d(n=>0));
+/*         -------------------------------- */
+  ibeg = 1;
+}
+if (iend == 1 || iend == 2) {
+  $d(n=>n-1) = $vc(two=>1);
+} else if (iend > 2) {
+/*    PICK UP LAST IEND POINTS. */
+  for (j = 0; j < iend; ++j) {
+    PDL_Indx index = n - iend + j;
+/*       INDEX RUNS FROM N+1-IEND UP TO N. */
+    xtemp[j] = $x(n=>index);
+    if (j < iend-1)
+      stemp[j] = $dy_dx(n=>index+1);
+  }
+/*         -------------------------------- */
+  $PCHDF(iend, xtemp, stemp, $d(n=>n-1));
+/*         -------------------------------- */
+  iend = 1;
+}
+/* --------------------( BEGIN CODING FROM CUBSPL )-------------------- */
+/*  **** A TRIDIAGONAL LINEAR SYSTEM FOR THE UNKNOWN SLOPES S(J) OF */
+/*  F  AT X(J), J=1,...,N, IS GENERATED AND THEN SOLVED BY GAUSS ELIM- */
+/*  INATION, WITH S(J) ENDING UP IN D(1,J), ALL J. */
+/*   WK(1,.) AND WK(2,.) ARE USED FOR TEMPORARY STORAGE. */
+/*  CONSTRUCT FIRST EQUATION FROM FIRST BOUNDARY CONDITION, OF THE FORM */
+/*       WK(2,1)*S(1) + WK(1,1)*S(2) = D(1,1) */
+if (ibeg == 0) {
+  if (n == 2) {
+/*       NO CONDITION AT LEFT END AND N = 2. */
+    $dy_dx(n=>0) = 1.;
+    $dx(n=>0) = 1.;
+    $d(n=>0) = 2. * $dy_dx(n=>1);
+  } else {
+/*       NOT-A-KNOT CONDITION AT LEFT END AND N .GT. 2. */
+    $dy_dx(n=>0) = $dx(n=>2);
+    $dx(n=>0) = $dx(n=>1) + $dx(n=>2);
+/* Computing 2nd power */
+    $d(n=>0) = (($dx(n=>1) + 2. * $dx(n=>0)) * $dy_dx(n=>1) * $dx(n=>2) + $dx(n=>1) *
+        $dx(n=>1) * $dy_dx(n=>2)) / $dx(n=>0);
+  }
+} else if (ibeg == 1) {
+/*    SLOPE PRESCRIBED AT LEFT END. */
+  $dy_dx(n=>0) = 1.;
+  $dx(n=>0) = 0.;
+} else {
+/*    SECOND DERIVATIVE PRESCRIBED AT LEFT END. */
+  $dy_dx(n=>0) = 2.;
+  $dx(n=>0) = 1.;
+  $d(n=>0) = 3. * $dy_dx(n=>1) - 0.5 * $dx(n=>1) * $d(n=>0);
+}
+/*  IF THERE ARE INTERIOR KNOTS, GENERATE THE CORRESPONDING EQUATIONS AND */
+/*  CARRY OUT THE FORWARD PASS OF GAUSS ELIMINATION, AFTER WHICH THE J-TH */
+/*  EQUATION READS  WK(2,J)*S(J) + WK(1,J)*S(J+1) = D(1,J). */
+if (n > 2) {
+  loop (n=1:-1) %{
+    if ($dy_dx(n=>n-1) == 0.) {
+      dpchsp_singular(1, n-1);
+    }
+    $GENERIC() g = -$dx(n=>n+1) / $dy_dx(n=>n-1);
+    $d() = g * $d(n=>n-1) + 3. * ($dx() * $dy_dx(n=>n+1) +
+        $dx(n=>n+1) * $dy_dx());
+    $dy_dx() = g * $dx(n=>n-1) + 2. * ($dx() + $dx(n=>n+1));
+  %}
+}
+/*  CONSTRUCT LAST EQUATION FROM SECOND BOUNDARY CONDITION, OF THE FORM */
+/*       (-G*WK(2,N-1))*S(N-1) + WK(2,N)*S(N) = D(1,N) */
+/*   IF SLOPE IS PRESCRIBED AT RIGHT END, ONE CAN GO DIRECTLY TO BACK- */
+/*   SUBSTITUTION, SINCE ARRAYS HAPPEN TO BE SET UP JUST RIGHT FOR IT */
+/*   AT THIS POINT. */
+if (iend != 1) {
+  if (iend == 0 && n == 2 && ibeg == 0) {
+/*       NOT-A-KNOT AT RIGHT ENDPOINT AND AT LEFT ENDPOINT AND N = 2. */
+    $d(n=>1) = $dy_dx(n=>1);
+  } else {
+    $GENERIC() g;
+    if (iend == 0) {
+      if (n == 2 || (n == 3 && ibeg == 0)) {
+/*       EITHER (N=3 AND NOT-A-KNOT ALSO AT LEFT) OR (N=2 AND *NOT* */
+/*       NOT-A-KNOT AT LEFT END POINT). */
+        $d(n=>n-1) = 2. * $dy_dx(n=>n-1);
+        $dy_dx(n=>n-1) = 1.;
+        if ($dy_dx(n=>n-2) == 0.) {
+          dpchsp_singular(2, n-2);
+        }
+        g = -1. / $dy_dx(n=>n-2);
+      } else {
+/*       NOT-A-KNOT AND N .GE. 3, AND EITHER N.GT.3 OR  ALSO NOT-A- */
+/*       KNOT AT LEFT END POINT. */
+        g = $dx(n=>n-2) + $dx(n=>n-1);
+/*       DO NOT NEED TO CHECK FOLLOWING DENOMINATORS (X-DIFFERENCES). */
+/* Computing 2nd power */
+        $GENERIC() dtmp = $dx(n=>n-1);
+        $d(n=>n-1) = (($dx(n=>n-1) + 2. * g) * $dy_dx(n=>n-1) * $dx(n=>n-2) + dtmp * dtmp * ($f(n=>n-2) - $f(n=>n-3)) / $dx(n=>n-2)) / g;
+        if ($dy_dx(n=>n-2) == 0.) {
+          dpchsp_singular(3, n-2);
+        }
+        g /= -$dy_dx(n=>n-2);
+        $dy_dx(n=>n-1) = $dx(n=>n-2);
+      }
+    } else {
+/*    SECOND DERIVATIVE PRESCRIBED AT RIGHT ENDPOINT. */
+      $d(n=>n-1) = 3. * $dy_dx(n=>n-1) + 0.5 * $dx(n=>n-1) * $d(n=>n-1);
+      $dy_dx(n=>n-1) = 2.;
+      if ($dy_dx(n=>n-2) == 0.) {
+        dpchsp_singular(4, n-2);
+      }
+      g = -1. / $dy_dx(n=>n-2);
+    }
+/*  COMPLETE FORWARD PASS OF GAUSS ELIMINATION. */
+    $dy_dx(n=>n-1) = g * $dx(n=>n-2) + $dy_dx(n=>n-1);
+    if ($dy_dx(n=>n-1) == 0.) {
+      dpchsp_singular(5, n-1);
+    }
+    $d(n=>n-1) = (g * $d(n=>n-2) + $d(n=>n-1)) / $dy_dx(n=>n-1);
+  }
+}
+/*  CARRY OUT BACK SUBSTITUTION */
+loop (n=nm1-1::-1) %{
+  if ($dy_dx() == 0.) {
+    dpchsp_singular(6, n);
+  }
+  $d() = ($d() - $dx() * $d(n=>n+1)) / $dy_dx();
+%}
+/* --------------------(  END  CODING FROM CUBSPL )-------------------- */
+#undef dpchsp_singular
+EOF
+  Doc => <<'EOF',
+=for ref
+
+Calculate the derivatives of (x,f(x)) using cubic spline interpolation.
+
+Computes the Hermite representation of the cubic spline interpolant
+to the data given in (C<$x,$f>), with the specified boundary conditions.
+Control over the boundary conditions is given by the
+C<$ic> and C<$vc> ndarrays.
+The resulting values - C<$x,$f,$d> - can
+be used in all the functions which expect a cubic
+Hermite function, including L</pchip_bvalu>.
+
+The first and second elements of C<$ic> determine the boundary
+conditions at the start and end of the data respectively.
+The allowed values for C<ic(0)> are:
+
+=over 4
+
+=item *
+
+0 to set C<d(0)> so that the third derivative is
+continuous at C<x(1)>.
+
+=item *
+
+1 if first derivative at C<x(0)> is given in C<vc(0>).
+
+=item *
+
+2 if second derivative at C<x(0>) is given in C<vc(0)>.
+
+=item *
+
+3 to use the 3-point difference formula for C<d(0)>.
+(Reverts to the default b.c. if C<n E<lt> 3>.)
+
+=item *
+
+4 to use the 4-point difference formula for C<d(0)>.
+(Reverts to the default b.c. if C<n E<lt> 4>.)
+
+=back
+
+The values for C<ic(1)> are the same as above, except that
+the first-derivative value is stored in C<vc(1)> for cases 1 and 2.
+The values of C<$vc> need only be set if options 1 or 2 are chosen
+for C<$ic>.
+
+NOTES: For the "natural" boundary condition, use IC(n)=2 and VC(n)=0.
+
+Error status returned by C<$ierr>:
+
+=over 4
+
+=item *
+
+0 if successful.
+
+=item *
+
+-1  if C<dim($x, 0) E<lt> 2>.
+
+=item *
+
+-3  if C<$x> is not strictly increasing.
+
+=item *
+
+-4  if C<ic(0) E<lt> 0> or C<ic(0) E<gt> 4>.
+
+=item *
+
+-5  if C<ic(1) E<lt> 0> or C<ic(1) E<gt> 4>.
+
+=item *
+
+-6  if both of the above are true.
+
+=item *
+
+-7  if C<nwk E<lt> 2*n>.
+
+NOTE:  The above errors are checked in the order listed,
+and following arguments have B<NOT> been validated.
+(The D-array has not been changed in any of these cases.)
+
+=item *
+
+-8  in case of trouble solving the linear system
+for the interior derivative values.
+(The D-array may have been changed in this case. Do B<NOT> use it!)
+
+=back
+
+References: Carl de Boor, A Practical Guide to Splines, Springer-Verlag,
+New York, 1978, pp. 53-59.
+EOF
+);
+
+pp_def('pchip_chfd',
+  Pars => 'x(n); f(n); d(n); xe(ne);
+    [o] fe(ne); [o] de(ne); indx [o] ierr(); int [o] skip()',
+  RedoDimsCode => <<'EOF',
+if ($SIZE(n) < 2)  $CROAK("NUMBER OF DATA POINTS LESS THAN TWO");
+if ($SIZE(ne) < 1) $CROAK("NUMBER OF EVALUATION POINTS LESS THAN ONE");
+EOF
+  Code => pp_line_numbers(__LINE__, <<'EOF'),
+$CHFD(1);
+EOF
+  GenericTypes => $F,
+  Doc => <<'EOF',
+=for ref
+
+Evaluate a piecewise cubic Hermite function and its first derivative
+at an array of points. May be used by itself for Hermite interpolation,
+or as an evaluator for DPCHIM or DPCHIC.
+
+Given a piecewise cubic Hermite function - such as from
+L</pchip_chim> - evaluate the function (C<$fe>) and
+derivative (C<$de>) at a set of points (C<$xe>).
+If function values alone are required, use L</pchip_chfe>.
+
+Set C<skip> to 1 to skip checks on the input data.
+This will save time in case these checks have already
+been performed (say, in L</pchip_chim> or L</pchip_chic>).
+Will be set to TRUE on normal return.
+
+XE -- (input) array of points at which the functions are to
+be evaluated. NOTES:
+
+  1. The evaluation will be most efficient if the elements
+     of XE are increasing relative to X;
+     that is,   XE(J) .GE. X(I)
+     implies    XE(K) .GE. X(I),  all K.GE.J .
+  2. If any of the XE are outside the interval [X(1),X(N)],
+     values are extrapolated from the nearest extreme cubic,
+     and a warning error is returned.
+
+FE -- (output) array of values of the cubic Hermite
+function defined by  N, X, F, D  at the points  XE.
+
+DE -- (output) array of values of the first derivative of
+the same function at the points  XE.
+
+Error status returned by C<$ierr>:
+
+=over 4
+
+=item *
+
+0 if successful.
+
+=item *
+
+E<gt>0 if extrapolation was performed at C<ierr> points
+(data still valid).
+
+=item *
+
+-1 if C<dim($x, 0) E<lt> 2>
+
+=item *
+
+-3 if C<$x> is not strictly increasing.
+
+=item *
+
+-4 if C<dim($xe, 0) E<lt> 1>.
+
+=item *
+
+-5 if an error has occurred in a lower-level routine,
+which should never happen.
+
+=back
+EOF
+);
+
+pp_def('pchip_chfe',
+  Pars => 'x(n); f(n); d(n); xe(ne);
+    [o] fe(ne); indx [o] ierr(); int [o] skip()',
+  RedoDimsCode => <<'EOF',
+if ($SIZE(n) < 2)  $CROAK("NUMBER OF DATA POINTS LESS THAN TWO");
+if ($SIZE(ne) < 1) $CROAK("NUMBER OF EVALUATION POINTS LESS THAN ONE");
+EOF
+  Code => pp_line_numbers(__LINE__, <<'EOF'),
+$CHFD(0);
+EOF
+  GenericTypes => $F,
+  Doc => <<'EOF',
+=for ref
+
+Evaluate a piecewise cubic Hermite function at an array of points.
+May be used by itself for Hermite interpolation, or as an evaluator
+for L</pchip_chim> or L</pchip_chic>.
+
+Given a piecewise cubic Hermite function - such as from
+L</pchip_chim> - evaluate the function (C<$fe>) at
+a set of points (C<$xe>).
+If derivative values are also required, use L</pchip_chfd>.
+
+X -- (input) array of independent variable values.  The
+elements of X must be strictly increasing:
+
+           X(I-1) .LT. X(I),  I = 2(1)N.
+
+(Error return if not.)
+
+F -- (input) array of function values.  F(I) is
+the value corresponding to X(I).
+
+D -- (input) array of derivative values.  D(I)
+is the value corresponding to X(I).
+
+Set C<skip> to 1 to skip checks on the input data.
+This will save time in case these checks have already
+been performed (say, in L</pchip_chim> or L</pchip_chic>).
+Will be set to TRUE on normal return.
+
+XE -- (input) array of points at which the function is to
+      be evaluated.
+
+ NOTES:
+  1. The evaluation will be most efficient if the elements
+     of XE are increasing relative to X;
+     that is,   XE(J) .GE. X(I)
+     implies    XE(K) .GE. X(I),  all K.GE.J .
+  2. If any of the XE are outside the interval [X(1),X(N)],
+     values are extrapolated from the nearest extreme cubic,
+     and a warning error is returned.
+
+FE -- (output) array of values of the cubic Hermite
+function defined by  N, X, F, D  at the points  XE.
+
+Error status returned by C<$ierr>:
+
+=over 4
+
+=item *
+
+0 if successful.
+
+=item *
+
+E<gt>0 if extrapolation was performed at C<ierr> points
+(data still valid).
+
+=item *
+
+-1 if C<dim($x, 0) E<lt> 2>
+
+=item *
+
+-3 if C<$x> is not strictly increasing.
+
+=item *
+
+-4 if C<dim($xe, 0) E<lt> 1>.
+
+=back
+
+(The FE-array has not been changed in any of these cases.)
+NOTE:  The above errors are checked in the order listed,
+and following arguments have B<NOT> been validated.
+EOF
+);
+
+pp_def('pchip_chia',
+  Pars => 'x(n); f(n); d(n); la(); lb();
+    [o]ans(); indx [o]ierr(); int [o]skip()',
+  GenericTypes => $F,
+  RedoDimsCode => <<'EOF',
+if ($SIZE(n) < 2) $CROAK("NUMBER OF DATA POINTS LESS THAN TWO");
+EOF
+  Code => pp_line_numbers(__LINE__, <<'EOF'),
+PDL_Indx ia, ib, il;
+$GENERIC() a = $la(), b = $lb(), xa, xb;
+PDL_Indx ir, n = $SIZE(n);
+$GENERIC() value = 0.;
+if (!$skip()) {
+  loop (n=1) %{
+    if ($x() > $x(n=>n-1)) continue;
+    $ierr() = -1;
+    $CROAK("X-ARRAY NOT STRICTLY INCREASING");
+  %}
+}
+/*  FUNCTION DEFINITION IS OK, GO ON. */
+$skip() = 1;
+$ierr() = 0;
+if (a < $x(n=>0) || a > $x(n=>n-1)) {
+  ++($ierr());
+}
+if (b < $x(n=>0) || b > $x(n=>n-1)) {
+  $ierr() += 2;
+}
+/*  COMPUTE INTEGRAL VALUE. */
+if (a != b) {
+  xa = PDLMIN(a,b);
+  xb = PDLMAX(a,b);
+  if (xb <= $x(n=>1)) {
+/*       INTERVAL IS TO LEFT OF X(2), SO USE FIRST CUBIC. */
+/*           --------------------------------------- */
+    $CHFIE($x(n=>0), $x(n=>1), $f(n=>0), $f(n=>1),
+        $d(n=>0), $d(n=>1), a, b, value);
+/*           --------------------------------------- */
+  } else if (xa >= $x(n=>n-2)) {
+/*       INTERVAL IS TO RIGHT OF X(N-1), SO USE LAST CUBIC. */
+/*           ------------------------------------------ */
+    $CHFIE($x(n=>n-2), $x(n=>n-1), $f(n=>n-2), $f(n=>n-1), $d(n=>n-2), $d(n=>n-1), a, b, value);
+/*           ------------------------------------------ */
+  } else {
+/*       'NORMAL' CASE -- XA.LT.XB, XA.LT.X(N-1), XB.GT.X(2). */
+/*    ......LOCATE IA AND IB SUCH THAT */
+/*         X(IA-1).LT.XA.LE.X(IA).LE.X(IB).LE.XB.LE.X(IB+1) */
+    ia = 0;
+    loop (n=:-1) %{
+      if (xa > $x())
+        ia = n + 1;
+    %}
+/*       IA = 1 IMPLIES XA.LT.X(1) .  OTHERWISE, */
+/*       IA IS LARGEST INDEX SUCH THAT X(IA-1).LT.XA,. */
+    ib = n - 1;
+    loop (n=:ia:-1) %{
+      if (xb < $x())
+        ib = n - 1;
+    %}
+/*       IB = N IMPLIES XB.GT.X(N) .  OTHERWISE, */
+/*       IB IS SMALLEST INDEX SUCH THAT XB.LT.X(IB+1) . */
+/*   ......COMPUTE THE INTEGRAL. */
+    if (ib <= ia) {
+/*        THIS MEANS IB = IA-1 AND */
+/*         (A,B) IS A SUBSET OF (X(IB),X(IA)). */
+/*            ------------------------------------------- */
+      $CHFIE($x(n=>ib), $x(n=>ia), $f(n=>ib),
+          $f(n=>ia), $d(n=>ib), $d(n=>ia), a, b, value);
+/*            ------------------------------------------- */
+    } else {
+/*        FIRST COMPUTE INTEGRAL OVER (X(IA),X(IB)). */
+/*        (Case (IB .EQ. IA) is taken care of by initialization */
+/*         of VALUE to ZERO.) */
+      if (ib > ia-1) {
+/*             --------------------------------------------- */
+        $PCHID(ia, ib, value);
+/*             --------------------------------------------- */
+      }
+/*        THEN ADD ON INTEGRAL OVER (XA,X(IA)). */
+      if (xa < $x(n=>ia)) {
+/* Computing MAX */
+        il = PDLMAX(0,ia - 1);
+        ir = il + 1;
+/*                 ------------------------------------- */
+        $GENERIC() chfie_ans = 0;
+        $CHFIE($x(n=>il), $x(n=>ir), $f(n=>il), $f(n=>ir), $d(n=>il), $d(n=>ir), xa, $x(n=>ia), chfie_ans);
+        value += chfie_ans;
+/*                 ------------------------------------- */
+      }
+/*        THEN ADD ON INTEGRAL OVER (X(IB),XB). */
+      if (xb > $x(n=>ib)) {
+/* Computing MIN */
+        ir = PDLMIN(ib + 1,n-1);
+        il = ir - 1;
+/*                 ------------------------------------- */
+        $GENERIC() chfie_ans = 0;
+        $CHFIE($x(n=>il), $x(n=>ir), $f(n=>il), $f(n=>ir), $d(n=>il), $d(n=>ir), $x(n=>ib), xb, chfie_ans);
+        value += chfie_ans;
+/*                 ------------------------------------- */
+      }
+/*        FINALLY, ADJUST SIGN IF NECESSARY. */
+      if (a > b) {
+        value = -value;
+      }
+    }
+  }
+}
+$ans() = value;
+EOF
+  Doc => <<'EOF',
+=for ref
+
+Integrate (x,f(x)) over arbitrary limits.
+
+Evaluate the definite integral of a piecewise
+cubic Hermite function over an arbitrary interval,
+given by C<[$la,$lb]>.
+
+X -- (input) array of independent variable values.  The elements
+of X must be strictly increasing (error return if not):
+
+           X(I-1) .LT. X(I),  I = 2(1)N.
+
+F -- (input) array of function values. F(I) is the value
+corresponding to X(I).
+
+C<$d> should contain the derivative values,
+computed by L</pchip_chim>.
+See L</pchip_chid> if the integration limits are
+data points.
+
+Set C<skip> to 1 to skip checks on the input data.
+This will save time in case these checks have already
+been performed (say, in L</pchip_chim> or L</pchip_chic>).
+Will be set to TRUE on return with IERR E<gt>= 0.
+
+The values of C<$la> and C<$lb> do not have
+to lie within C<$x>, although the resulting integral
+value will be highly suspect if they are not.
+
+Error status returned by C<$ierr>:
+
+=over 4
+
+=item *
+
+0 if successful.
+
+=item *
+
+1 if C<$la> lies outside C<$x>.
+
+=item *
+
+2 if C<$lb> lies outside C<$x>.
+
+=item *
+
+3 if both 1 and 2 are true. (Note that this means that either [A,B]
+contains data interval or the intervals do not intersect at all.)
+
+=item *
+
+-1 if C<dim($x, 0) E<lt> 2>
+
+=item *
+
+-3 if C<$x> is not strictly increasing.
+
+=item *
+
+-4 if an error has occurred in a lower-level routine,
+which should never happen.
+
+=back
+EOF
+);
+
+pp_def('pchip_chid',
+  Pars => 'x(n); f(n); d(n);
+    indx ia(); indx ib();
+    [o]ans(); indx [o]ierr(); int [o]skip()',
+  RedoDimsCode => <<'EOF',
+if ($SIZE(n) < 2) $CROAK("NUMBER OF DATA POINTS LESS THAN TWO");
+EOF
+  Code => <<'EOF',
+if (!$skip()) {
+  loop (n=1) %{
+    if ($x() > $x(n=>n-1)) continue;
+    $ierr() = -1;
+    $CROAK("X-ARRAY NOT STRICTLY INCREASING");
+  %}
+}
+$PCHID($ia(), $ib(), $ans());
+EOF
+  GenericTypes => $F,
+  Doc => <<'EOF',
+=for ref
+
+Evaluate the definite integral of a piecewise cubic Hermite function
+over an interval whose endpoints are data points.
+
+=for usage
+
+Evaluate the definite integral of a a piecewise cubic Hermite
+function between C<x($ia)> and C<x($ib)>.
+
+See L</pchip_chia> for integration between arbitrary
+limits.
+
+X -- (input) array of independent variable values.  The
+elements of X must be strictly increasing:
+
+           X(I-1) .LT. X(I),  I = 2(1)N.
+
+(Error return if not.)
+
+IA,IB -- (input) indices in X-array for the limits of integration.
+both must be in the range [0,N-1] (this is different from the Fortran
+version) - error return if not. No restrictions on their relative
+values.
+
+F -- (input) array of function values.  F(I) is
+the value corresponding to X(I).
+
+C<$d> should contain the derivative values, computed by L</pchip_chim>.
+
+Set C<skip> to 1 to skip checks on the input data.
+This will save time in case these checks have already
+been performed (say, in L</pchip_chim> or L</pchip_chic>).
+Will be set to TRUE on return with IERR of 0 or -4.
+
+It is a fatal error to pass in data with C<N> E<lt> 2.
+
+Error status returned by C<$ierr> - this will be set, but an exception
+will also be thrown:
+
+=over 4
+
+=item *
+
+0 if successful.
+
+=item *
+
+-3 if C<$x> is not strictly increasing.
+
+=item *
+
+-4 if C<$ia> or C<$ib> is out of range.
+
+=back
+
+(VALUE will be zero in any of these cases.)
+NOTE: The above errors are checked in the order listed, and following
+arguments have B<NOT> been validated.
+EOF
+);
+
+pp_def('pchip_chbs',
+  Pars => 'x(n); f(n); d(n); sbyte knotyp();
+    [o]t(nknots=CALC(2*$SIZE(n)+4));
+    [o]bcoef(ndim=CALC(2*$SIZE(n))); indx [o]ierr()',
+  GenericTypes => $F,
+  Code => pp_line_numbers(__LINE__, <<'EOF'),
+/* Local variables */
+PDL_Indx n = $SIZE(n), ndim = $SIZE(ndim);
+$ierr() = 0;
+/*  Check argument validity.  Set up knot sequence if OK. */
+if ($knotyp() > 2) {
+  $ierr() = -1;
+  $CROAK("KNOTYP GREATER THAN 2");
+}
+if ($knotyp() >= 0) {
+/*      Set up knot sequence. */
+  do { /* inline dpchkt */
+/*  Set interior knots. */
+    PDL_Indx j = 0;
+    loop (n) %{
+      j += 2;
+      $t(nknots=>j+1) = $t(nknots=>j) = $x();
+    %}
+/*   Assertion:  At this point T(3),...,T(NDIM+2) have been set and */
+/*         J=NDIM+1. */
+/*  Set end knots according to KNOTYP. */
+    $GENERIC() hbeg = $x(n=>1) - $x(n=>0);
+    $GENERIC() hend = $x(n=>n-1) - $x(n=>n-2);
+    if ($knotyp() == 1) {
+/*      Extrapolate. */
+      $t(nknots=>1) = $x(n=>0) - hbeg;
+      $t(nknots=>ndim+2) = $x(n=>n-1) + hend;
+    } else if ($knotyp() == 2) {
+/*      Periodic. */
+      $t(nknots=>1) = $x(n=>0) - hend;
+      $t(nknots=>ndim+2) = $x(n=>n-1) + hbeg;
+    } else {
+/*      Quadruple end knots. */
+      $t(nknots=>1) = $x(n=>0);
+      $t(nknots=>ndim+2) = $x(n=>n-1);
+    }
+    $t(nknots=>0) = $t(nknots=>1);
+    $t(nknots=>ndim+3) = $t(nknots=>ndim+2);
+  } while (0); /* end inline dpchkt */
+}
+/*  Compute B-spline coefficients. */
+$GENERIC() hnew = $t(nknots=>2) - $t(nknots=>0);
+loop (n) %{
+  $GENERIC() hold = hnew;
+/*      The following requires mixed mode arithmetic. */
+  $GENERIC() dov3 = $d() / 3;
+  $bcoef(ndim=>2*n) = $f() - hold * dov3;
+/*      The following assumes T(2*K+1) = X(K). */
+  hnew = $t(nknots=>2*n+4) - $t(nknots=>2*n+2);
+  $bcoef(ndim=>2*n+1) = $f() + hnew * dov3;
+%}
+EOF
+  Doc => <<'EOF',
+=for ref
+
+Piecewise Cubic Hermite function to B-Spline converter.
+
+Computes the B-spline representation of the PCH function
+determined by N,X,F,D. The output is the B-representation for the
+function:  NKNOTS, T, BCOEF, NDIM, KORD.
+
+L</pchip_chic>, L</pchip_chim>, or L</pchip_chsp> can be used to
+determine an interpolating PCH function from a set of data. The
+B-spline routine L</pchip_bvalu> can be used to evaluate the
+resulting B-spline representation of the data
+(i.e. C<nknots>, C<t>, C<bcoeff>, C<ndim>, and
+C<kord>).
+
+Caution: Since it is assumed that the input PCH function has been
+computed by one of the other routines in the package PCHIP,
+input arguments N, X are B<not> checked for validity.
+
+Restrictions/assumptions:
+
+   1. N.GE.2 .  (not checked)
+   2. X(i).LT.X(i+1), i=1,...,N .  (not checked)
+   4. KNOTYP.LE.2 .  (error return if not)
+  *6. T(2*k+1) = T(2*k) = X(k), k=1,...,N .  (not checked)
+     * Indicates this applies only if KNOTYP.LT.0 .
+
+C<f> is the array of dependent variable values.
+C<f(I)> is the value corresponding to C<x(I)>.
+
+C<d> is the array of derivative values at the data points.
+C<d(I)> is the value corresponding to C<x(I)>.
+
+C<knotyp> is a flag which controls the knot sequence.
+The knot sequence C<t> is normally computed from C<$x>
+by putting a double knot at each C<x> and setting the end knot pairs
+according to the value of C<knotyp> (where C<m = ndim = 2*n>):
+
+=over
+
+=item *
+
+0 -   Quadruple knots at the first and last points.
+
+=item *
+
+1 -   Replicate lengths of extreme subintervals:
+C<t( 0 ) = t( 1 ) = x(0) - (x(1)-x(0))> and
+C<t(m+3) = t(m+2) = x(n-1) + (x(n-1)-x(n-2))>
+
+=item *
+
+2 -   Periodic placement of boundary knots:
+C<t( 0 ) = t( 1 ) = x(0) - (x(n-1)-x(n-2))> and
+C<t(m+3) = t(m+2) = x(n) + (x(1)-x(0))>
+
+=item *
+
+E<lt>0 - Assume the C<nknots> and C<t> were set in a previous call.
+This option is provided for improved efficiency when used
+in a parametric setting.
+
+=back
+
+C<nknots> is the number of knots and may be changed by the routine.
+If C<knotyp E<gt>= 0>, C<nknots> will be set to C<ndim+4>,
+otherwise it is an input variable, and an error will occur if its
+value is not equal to C<ndim+4>.
+
+C<t> is the array of C<2*n+4> knots for the B-representation
+and may be changed by the routine.
+If C<knotyp E<gt>= 0>, C<t> will be changed so that the
+interior double knots are equal to the x-values and the
+boundary knots set as indicated above,
+otherwise it is assumed that C<t> was set by a
+previous call (no check is made to verify that the data
+forms a legitimate knot sequence).
+
+C<BCOEF:OUT> is the array of 2*N B-spline coefficients.
+C<NDIM:OUT> is the dimension of the B-spline space.  (Set to 2*N.)
+C<KORD:OUT> is the order of the B-spline.  (Set to 4.)
+
+Error status returned by C<$ierr>:
+
+=over 4
+
+=item *
+
+0 if successful.
+
+=item *
+
+-4 if C<knotyp E<gt> 2>. (recoverable)
+
+=item *
+
+-5 if C<knotyp E<lt> 0> and C<nknots != 2*n + 4>. (recoverable)
+
+=back
+
+References: F. N. Fritsch, "Representations for parametric cubic
+splines," Computer Aided Geometric Design 6 (1989), pp.79-82.
+EOF
+);
+
+pp_def('pchip_bvalu',
+  Pars => 't(nplusk); a(n); indx ideriv(); x();
+    [o]ans(); indx [o] inbv();
+    [t] work(k3=CALC(3*($SIZE(nplusk)-$SIZE(n))));',
+  GenericTypes => $F,
+  RedoDimsCode => <<'EOF',
+PDL_Indx k = $SIZE(nplusk) - $SIZE(n);
+if (k < 1)        $CROAK("K DOES NOT SATISFY K.GE.1");
+if ($SIZE(n) < k) $CROAK("N DOES NOT SATISFY N.GE.K");
+EOF
+  Code => pp_line_numbers(__LINE__, <<'EOF'),
+PDL_Indx k = $SIZE(nplusk) - $SIZE(n);
+if ($ideriv() < 0 || $ideriv() >= k)
+  $CROAK("IDERIV DOES NOT SATISFY 0.LE.IDERIV.LT.K");
+PDL_Indx i;
+int mflag;
+/* *** FIND *I* IN (K,N) SUCH THAT T(I) .LE. X .LT. T(I+1) */
+/*   (OR, .LE. T(I+1) IF T(I) .LT. T(I+1) = T(N+1)). */
+do { /* inlined dintrv */
+  PDL_Indx ihi = $inbv() + 1, lxt = $SIZE(n);
+  if (ihi >= lxt) {
+    if ($x() >= $t(nplusk=>lxt)) {
+      mflag = 1; i = lxt; break;
+    }
+    if (lxt <= 0) {
+      mflag = -1; i = 0; break;
+    }
+    ihi = $inbv() = lxt;
+  }
+  char skipflag = 0;
+  if ($x() < $t(nplusk=>ihi)) {
+    PDL_Indx inbv = $inbv();
+    if ($x() >= $t(nplusk=>inbv)) {
+      mflag = 0; i = $inbv(); break;
+    }
+/* *** NOW X .LT. XT(IHI) . FIND LOWER BOUND */
+    PDL_Indx istep = 1;
+    while (1) {
+      ihi = $inbv();
+      $inbv() = ihi - istep;
+      if ($inbv() <= 0) {
+        break;
+      }
+      PDL_Indx inbv = $inbv();
+      if ($x() >= $t(nplusk=>inbv)) {
+        skipflag = 1;
+        break;
+      }
+      istep <<= 1;
+    }
+    if (!skipflag) {
+      $inbv() = 0;
+      if ($x() < $t(nplusk=>0)) {
+        mflag = -1; i = 0; break;
+      }
+    }
+    skipflag = 1;
+/* *** NOW X .GE. XT(ILO) . FIND UPPER BOUND */
+  }
+  if (!skipflag) {
+    PDL_Indx istep = 1;
+    while (1) {
+      $inbv() = ihi;
+      ihi = $inbv() + istep;
+      if (ihi >= lxt) break;
+      if ($x() < $t(nplusk=>ihi)) {
+        skipflag = 1;
+        break;
+      }
+      istep <<= 1;
+    }
+    if (!skipflag) {
+      if ($x() >= $t(nplusk=>lxt)) {
+        mflag = 1; i = lxt; break;
+      }
+      ihi = lxt;
+    }
+  }
+/* *** NOW XT(ILO) .LE. X .LT. XT(IHI) . NARROW THE INTERVAL */
+  while (1) {
+    PDL_Indx middle = ($inbv() + ihi) / 2;
+    if (middle == $inbv()) {
+      mflag = 0; i = $inbv(); break;
+    }
+/*   NOTE. IT IS ASSUMED THAT MIDDLE = ILO IN CASE IHI = ILO+1 */
+    if ($x() < $t(nplusk=>middle))
+      ihi = middle;
+    else
+      $inbv() = middle;
+  }
+} while (0); /* end dintrv inlined */
+if ($x() < $t(nplusk=>k-1)) {
+  $CROAK("X IS N0T GREATER THAN OR EQUAL TO T(K)");
+}
+if (mflag != 0) {
+  if ($x() > $t(nplusk=>i)) {
+    $CROAK("X IS NOT LESS THAN OR EQUAL TO T(N+1)");
+  }
+  while (1) {
+    if (i == k-1) {
+      $CROAK("A LEFT LIMITING VALUE CANNOT BE OBTAINED AT T(K)");
+    }
+    --i;
+    if ($x() != $t(nplusk=>i)) {
+      break;
+    }
+  }
+/* *** DIFFERENCE THE COEFFICIENTS *IDERIV* TIMES */
+/*   WORK(I) = AJ(I), WORK(K+I) = DP(I), WORK(K+K+I) = DM(I), I=1.K */
+}
+PDL_Indx imk = i+1 - k, j;
+loop (k3=:k) %{
+  $work() = $a(n=>imk+k3);
+%}
+if ($ideriv() != 0) {
+  for (j = 0; j < $ideriv(); ++j) {
+    PDL_Indx kmj = k - j - 1;
+    $GENERIC() fkmj = kmj;
+    loop (k3=0:kmj) %{
+      PDL_Indx ihi = i+1 + k3;
+      $work() = ($work(k3=>k3+1) - $work()) / ($t(nplusk=>ihi) - $t(nplusk=>ihi-kmj)) * fkmj;
+    %}
+  }
+/* *** COMPUTE VALUE AT *X* IN (T(I),T(I+1)) OF IDERIV-TH DERIVATIVE, */
+/*   GIVEN ITS RELEVANT B-SPLINE COEFF. IN AJ(1),...,AJ(K-IDERIV). */
+}
+PDL_Indx km1 = k - 1;
+if ($ideriv() != km1) {
+  PDL_Indx j, j1 = k, kpk = k + k, j2 = kpk, kmider = k - $ideriv();
+  for (j = 0; j < kmider; ++j) {
+    PDL_Indx ipj = i + j + 1;
+    $work(k3=>j1) = $t(nplusk=>ipj) - $x();
+    $work(k3=>j2) = $x() - $t(nplusk=>i-j);
+    ++j1;
+    ++j2;
+  }
+  for (j = $ideriv(); j < km1; ++j) {
+    PDL_Indx kmj = k - j - 1, ilo = kpk + kmj - 1;
+    loop (k3=0:kmj) %{
+      $work() = ($work(k3=>k3+1) * $work(k3=>ilo) + $work() *
+          $work(k3=>k+k3)) / ($work(k3=>ilo) + $work(k3=>k+k3));
+      --ilo;
+    %}
+  }
+}
+$ans() = $work(k3=>0);
+EOF
+  Doc => <<'EOF',
+=for ref
+
+Evaluate the B-representation of a B-spline at X for the
+function value or any of its derivatives.
+
+=for usage
+
+Evaluates the B-representation C<(T,A,N,K)> of a B-spline
+at C<X> for the function value on C<IDERIV = 0> or any of its
+derivatives on C<IDERIV = 1,2,...,K-1>.  Right limiting values
+(right derivatives) are returned except at the right end
+point C<X=T(N+1)> where left limiting values are computed.  The
+spline is defined on C<T(K) .LE. X .LE. T(N+1)>.  BVALU returns
+a fatal error message when C<X> is outside of this interval.
+
+To compute left derivatives or left limiting values at a
+knot C<T(I)>, replace C<N> by C<I-1> and set C<X=T(I)>, C<I=K+1,N+1>.
+
+=head3 Description of Arguments
+
+=head4 Input
+
+     T       - knot vector of length N+K
+     A       - B-spline coefficient vector of length N
+     N       - number of B-spline coefficients
+               N = sum of knot multiplicities-K
+     K       - order of the B-spline, K .GE. 1
+     IDERIV  - order of the derivative, 0 .LE. IDERIV .LE. K-1
+               IDERIV=0 returns the B-spline value
+     X       - argument, T(K) .LE. X .LE. T(N+1)
+     INBV    - an initialization parameter which must be set
+               to 0 (different from Fortran) the first time BVALU is called.
+               (PDL sets to 0 for you)
+
+=head4 Output
+
+     INBV    - INBV contains information for efficient process-
+               ing after the initial call and INBV must not
+               be changed by the user.  Distinct splines require
+               distinct INBV parameters.
+     WORK    - work vector of length 3*K.
+     BVALU   - value of the IDERIV-th derivative at X
+
+=head4 Error Conditions
+
+An improper input is a fatal error
+
+References: Carl de Boor, Package for calculating with B-splines,
+SIAM Journal on Numerical Analysis 14, 3 (June 1977), pp. 441-472.
+EOF
+);
+
+pp_addpm({At=>'Bot'},<<'EOD');
+
+=head1 AUTHOR
+
+Copyright (C) Tuomas J. Lukka 1997 (lukka@husc.harvard.edu). Contributions
+by Christian Soeller (c.soeller@auckland.ac.nz), Karl Glazebrook
+(kgb@aaoepp.aao.gov.au), Craig DeForest (deforest@boulder.swri.edu)
+and Jarle Brinchmann (jarle@astro.up.pt)
+All rights reserved. There is no warranty. You are allowed
+to redistribute this software / documentation under certain
+conditions. For details, see the file COPYING in the PDL
+distribution. If this file is separated from the PDL distribution,
+the copyright notice should be included in the file.
+
+Updated for CPAN viewing compatibility by David Mertens.
+
+=cut
+
+EOD
+
+pp_done();

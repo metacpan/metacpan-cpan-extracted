@@ -1,4 +1,4 @@
-LWP-UserAgent-Throttled 0.11
+LWP-UserAgent-Throttled 0.12
 
 INSTALLATION
 
@@ -24,15 +24,12 @@ You can also look for information at:
     AnnoCPAN, Annotated CPAN documentation
         http://annocpan.org/dist/LWP-UserAgent-Throttled
 
-    CPAN Ratings
-        http://cpanratings.perl.org/d/LWP-UserAgent-Throttled
-
     Search CPAN
         http://search.cpan.org/dist/LWP-UserAgent-Throttled/
 
 
 LICENSE AND COPYRIGHT
 
-Copyright (C) 2017-2024 Nigel Horne
+Copyright (C) 2017-2025 Nigel Horne
 
 This program is released under the following licence: GPL2

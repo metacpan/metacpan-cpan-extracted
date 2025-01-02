@@ -3,7 +3,7 @@ package Valiant;
 use warnings;
 use strict;
 
-our $VERSION = '0.002012';
+our $VERSION = '0.002013';
 $VERSION = eval $VERSION;
 
 1;

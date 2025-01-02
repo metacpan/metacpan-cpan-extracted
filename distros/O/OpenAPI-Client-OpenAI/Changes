@@ -1,5 +1,11 @@
 Revision history for OpenAPI-Client-OpenAI
 
+0.13    2025-01-02
+        - Happy New Year!
+        - Update assistance header to v2 https://platform.openai.com/docs/assistants/migration
+        - Update to latest version of OpenAI API spec
+        - Cleaned up main class imports
+
 0.12    2024-11-18
         - Added examples/get-embeddings.pl to the MANIFEST
 

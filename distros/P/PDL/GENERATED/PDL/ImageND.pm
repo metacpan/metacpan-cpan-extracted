@@ -1,9 +1,9 @@
 #
-# GENERATED WITH PDL::PP from imagend.pd! Don't modify!
+# GENERATED WITH PDL::PP from lib/PDL/ImageND.pd! Don't modify!
 #
 package PDL::ImageND;
 
-our @EXPORT_OK = qw(kernctr convolve ninterpol rebin circ_mean circ_mean_p convolveND contour_segments contour_polylines path_join path_segs );
+our @EXPORT_OK = qw(kernctr convolve ninterpol rebin circ_mean circ_mean_p convolveND contour_segments contour_polylines path_join path_segs combcoords repulse attract );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
@@ -22,7 +22,7 @@ use DynaLoader;
 
 
 
-#line 4 "imagend.pd"
+#line 4 "lib/PDL/ImageND.pd"
 
 =head1 NAME
 
@@ -49,7 +49,7 @@ loaded.
 
 use strict;
 use warnings;
-#line 53 "ImageND.pm"
+#line 53 "lib/PDL/ImageND.pm"
 
 
 =head1 FUNCTIONS
@@ -60,10 +60,10 @@ use warnings;
 
 
 
-#line 95 "imagend.pd"
+#line 50 "lib/PDL/ImageND.pd"
 
 use Carp;
-#line 67 "ImageND.pm"
+#line 67 "lib/PDL/ImageND.pm"
 
 
 =head2 convolve
@@ -126,7 +126,7 @@ sub PDL::convolve {
 
 
 
-#line 220 "imagend.pd"
+#line 209 "lib/PDL/ImageND.pd"
 
 =head2 ninterpol()
 
@@ -167,7 +167,7 @@ sub PDL::ninterpol {
     for (list ($p-$ip)) { $y = interpol($_,$y->xvals,$y); }
     $y;
 }
-#line 171 "ImageND.pm"
+#line 171 "lib/PDL/ImageND.pm"
 
 
 =head2 rebin
@@ -211,7 +211,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 297 "imagend.pd"
+#line 286 "lib/PDL/ImageND.pd"
 sub PDL::rebin {
     my($x) = shift;
     my($opts) = ref $_[-1] eq "HASH" ? pop : {};
@@ -259,7 +259,7 @@ sub PDL::rebin {
       return $x -> copy;
     }
 }
-#line 263 "ImageND.pm"
+#line 263 "lib/PDL/ImageND.pm"
 
 *rebin = \&PDL::rebin;
 
@@ -267,7 +267,7 @@ sub PDL::rebin {
 
 
 
-#line 370 "imagend.pd"
+#line 359 "lib/PDL/ImageND.pd"
 
 =head2 circ_mean_p
 
@@ -338,7 +338,7 @@ sub circ_mean {
  return $x;
 }
 
-#line 448 "imagend.pd"
+#line 437 "lib/PDL/ImageND.pd"
 
 =head2 kernctr
 
@@ -394,7 +394,7 @@ sub PDL::kernctr {
     }
     $newk;
 }
-#line 398 "ImageND.pm"
+#line 398 "lib/PDL/ImageND.pm"
 
 
 =head2 convolveND
@@ -798,7 +798,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1137 "imagend.pd"
+#line 1126 "lib/PDL/ImageND.pd"
 
 =head2 path_segs
 
@@ -854,8 +854,124 @@ sub PDL::path_segs {
   }
   @out;
 }
+#line 858 "lib/PDL/ImageND.pm"
 
-#line 34 "imagend.pd"
+
+=head2 combcoords
+
+=for sig
+
+  Signature: (x(); y(); z();
+		float [o]coords(tri=3);)
+
+=for ref
+
+Combine three coordinates into a single ndarray.
+
+Combine x, y and z to a single ndarray the first dimension
+of which is 3. This routine does dataflow automatically.
+
+=for bad
+
+combcoords does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+*combcoords = \&PDL::combcoords;
+
+
+
+
+
+
+=head2 repulse
+
+=for sig
+
+  Signature: (coords(nc,np); [o]vecs(nc,np); int [t]links(np); 
+    double boxsize;
+    int dmult;
+    double a;
+    double b;
+    double c;
+    double d;
+  )
+
+=for ref
+
+Repulsive potential for molecule-like constructs.
+
+C<repulse> uses a hash table of cubes to quickly calculate
+a repulsive force that vanishes at infinity for many
+objects. For use by the module L<PDL::Graphics::TriD::MathGraph>.
+Checks all neighbouring boxes. The formula is:
+
+  (r = |dist|+d) a*r^-2 + b*r^-1 + c*r^-0.5
+
+=for bad
+
+repulse does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+*repulse = \&PDL::repulse;
+
+
+
+
+
+
+=head2 attract
+
+=for sig
+
+  Signature: (coords(nc,np);
+          int from(nl);
+          int to(nl);
+          strength(nl);
+          [o]vecs(nc,np);; 
+          double m;
+          double ms;
+  )
+
+=for ref
+
+Attractive potential for molecule-like constructs.
+
+C<attract> is used to calculate
+an attractive force for many
+objects, of which some attract each other (in a way
+like molecular bonds).
+For use by the module L<PDL::Graphics::TriD::MathGraph>.
+For definition of the potential, see the actual function.
+
+=for bad
+
+attract does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+*attract = \&PDL::attract;
+
+
+
+
+
+
+
+#line 34 "lib/PDL/ImageND.pd"
 
 =head1 AUTHORS
 
@@ -867,7 +983,7 @@ distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
 =cut
-#line 871 "ImageND.pm"
+#line 987 "lib/PDL/ImageND.pm"
 
 # Exit with OK status
 

@@ -1,3 +1,53 @@
+2.096 2025-01-02
+- CallExt removed - use `Inline with => "PDL"; use Inline C => "..."`
+- Inline::MakePdlppInstallable removed - use Inline::Module
+- PDL::PP::Dump removed - set $::PP_VERBOSE in .pd instead
+- add IO::Misc::bswap{16,32}
+- IO::Misc::bswap* now give error if try to swap more bytes than type-size
+- the distro VERSION now comes from PDL::Core
+- PDL::GSL now requires GSL >= 2.0
+- PDL::GSLSF::* now merged into PDL::GSL::SF
+- incorporate PDL::Stats::Distr into PDL::GSL since needs GSL
+- Ufunc::{csumover,cprodover,ccumusumover,ccumuprodover} removed
+- minimum Perl 5.16 due to lvalue problems
+- add PP key "Lvalue" to make the operation's XS func lvalue
+- replace PDL::Lvalue with decorating the subs with ":lvalue", or Lvalue key
+- pptemplate updated to new lib/*.pd scheme, adds trivial pp_def and test
+- PDL::Graphics2D removed - use PDL::Graphics::Simple or PDL::Graphics::TriD
+- move PDL::Graphics::State to PGPLOT distro
+- split PDL::Graphics::Limits out to separate distro
+- split PDL::IO::Browser out to separate distro
+- split PDL::Perldl2 out to separate distro
+- fixed overly-rigid parsing of ASCII STL files (#504) - thanks Shugo for report
+- split PDL::Complex out to separate distro
+- move combcoords attract repulse from Graphics::TriD::Rout to ImageND
+- split PDL::IO::HDF out to separate distro
+- split PDL::IO::GD out to separate distro
+- split PDL::Transform::Proj4 out to separate distro
+- split PDL::IO::IDL out to separate distro
+- split PDL::IO::Dicom out to separate distro
+- finish, then split PDL::IO::ENVI out to separate distro
+- split PDL::Graphics::TriD out to separate distro
+- fix approx_artol for complex values (#507) - thanks @wlmb
+- split PDL::GSL out to separate distro
+- split PDL::Slatec out to separate distro
+- split PDL::Fit out to separate distro
+- split PDL::Opt::Simplex out to separate distro
+- add Primitive::pchip_{chsp,chic,chim,chfe,chfd,chia,chid,chbs,bvalu}
+- repository directory structure now like a normal Perl distro with lib/ (#119)
+- IO::Dumper fixed to deal with multiple refs to same ndarray (#508,#509) - thanks @d-lamb for report, thanks @shawnlaffan for fix
+- stop pdl([-6,18446744073709551615,-4]) being pdl([-6,-1,-4]) (#511)
+- bswap{12,24} added as long double can be 12 bytes
+- Core::trans_children in scalar context now returns how many
+- add Pars type-spec "!complex" which makes it an error to supply complex values (#511)
+- fix xform datatype selection when "real" or "complex" (#511)
+- xforms now select datatype from outputs only if can (#511)
+- xforms now give error if supply output with trans_parent needing converting (#511)
+- eigens_sym now sorts output like EISPACK
+- Math::isfinite no longer works inplace due to mismatch between Pars (#511)
+- now an error to specify Inplace between differently-typed Pars (#511)
+- now an error to give a null to an [io] Par (#511)
+
 2.095 2024-11-03
 - add PDL_GENTYPE_IS_{REAL,FLOATREAL,COMPLEX,SIGNED,UNSIGNED}_##ppsym (#502)
 - fix some architectures convert()ing -5 to ushort as 0 (#502) - thanks @sebastic for report
@@ -27,6 +77,7 @@
 - incorporate PDL::Parallel::threads
 - Ufunc::firstnonzeroover added - thanks @guillepo for inspiration
 - incorporate Test::PDL
+- minimum Perl 5.14
 
 2.093 2024-09-29
 - PDL.set_datatype now doesn't physicalise input, PDL.convert_type does

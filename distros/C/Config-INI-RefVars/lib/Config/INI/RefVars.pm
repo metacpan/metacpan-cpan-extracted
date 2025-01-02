@@ -9,7 +9,7 @@ use feature ":5.10";
 use Config;
 use File::Spec::Functions qw(catdir rel2abs splitpath);
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 use constant DFLT_TOCOPY_SECTION  => "__TOCOPY__";
 
@@ -522,7 +522,7 @@ Config::INI::RefVars - INI file reader that supports make-style variable referen
 
 =head1 VERSION
 
-Version 0.17
+Version #VERSION#
 
 =head1 SYNOPSIS
 
@@ -858,7 +858,23 @@ A more complex example:
    [C]
    c var = A
 
-Variable C<nested> in section C<B> has the value C<1234567>.
+Variable C<nested> in section C<B> has the value C<1234567>:
+
+=over
+
+=item
+
+C<$([C]c var)> expands to C<A>,
+
+=item
+
+C<$(b var)> expands to C<a var>,
+
+=item
+
+We therefore have C<$([A]a var)> which leads to C<1234567>.
+
+=back
 
 
 =head2 PREDEFINED VARIABLES
@@ -1302,7 +1318,7 @@ Default is I<false> (C<undef>).
 
 =item C<global_mode>
 
-Optional, a boolean. Cheanges handling of the I<tocopy> section, see section
+Optional, a boolean. Changes handling of the I<tocopy> section, see section
 L</"Global Mode">. See also the accessor method of the same name.
 
 =item C<not_tocopy>
@@ -1440,7 +1456,7 @@ See constructor argument of the same name.
 Optional, overwrites the corresponding setting saved in the object for this
 run only. The previous setting is restored before the method returns.
 
-See constructor argument of the same name, see also the accessor os the same
+See constructor argument of the same name, see also the accessor of the same
 name.
 
 =back
@@ -1483,7 +1499,7 @@ See also method C<current_tocopy_section>.
 =head3 variables
 
 Returns a reference to a hash of hashes. The keys are the section names, each
-value is the corresponding hash of varibales (key: variable name, value:
+value is the corresponding hash of variables (key: variable name, value:
 variable value). By default, variables with a C<=> in their name are not
 included; this can be changed with the C<cleanup> argument.
 
@@ -1540,7 +1556,7 @@ L<Config::IniFiles>, and many more.
 
 =head1 AUTHOR
 
-Abdul al Hazred, C<< <451 at gmx.eu> >>
+#AUTHOR#, C<< <451 at gmx.eu> >>
 
 
 
@@ -1581,7 +1597,7 @@ L<https://github.com/AAHAZRED/perl-Config-INI-RefVars>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2023 by Abdul al Hazred.
+This software is copyright (c) 2023 by #AUTHOR#.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

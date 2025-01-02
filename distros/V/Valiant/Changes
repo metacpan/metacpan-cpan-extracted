@@ -1,5 +1,8 @@
 The following logs changes for the CPAN distribution Valiant
 
+0.002013 2025 January 01
+          - fixed 'TO_JSON' method in Valiant::Errors to properly return a hashref.
+
 0.002012 2024 December 12
           - Updated github workflow to fix broken badges
 

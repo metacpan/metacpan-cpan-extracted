@@ -37,7 +37,6 @@ use POSIX qw(:sys_wait_h);
 use File::Basename;
 use File::Temp;
 use File::Copy;
-use MIME::Base64;
 
 use Dpkg::ErrorHandling;
 use Dpkg::IPC;
@@ -106,101 +105,6 @@ sub get_trusted_keyrings {
     return @keyrings;
 }
 
-# _pgp_* functions are strictly for applying or removing ASCII armor.
-# See <https://www.rfc-editor.org/rfc/rfc9580.html#section-6> for more
-# details.
-#
-# Note that these _pgp_* functions are only necessary while relying on
-# gpgv, and gpgv itself does not verify multiple signatures correctly
-# (see https://bugs.debian.org/1010955).
-
-sub _pgp_dearmor_data {
-    my ($type, $data) = @_;
-
-    # Note that we ignore an incorrect or absent checksum, following the
-    # guidance of <https://www.rfc-editor.org/rfc/rfc9580.html>.
-    my $armor_regex = qr{
-        -----BEGIN\ PGP\ \Q$type\E-----[\r\t ]*\n
-        (?:[^:]+:\ [^\n]*[\r\t ]*\n)*
-        [\r\t ]*\n
-        ([a-zA-Z0-9/+\n]+={0,2})[\r\t ]*\n
-        (?:=[a-zA-Z0-9/+]{4}[\r\t ]*\n)?
-        -----END\ PGP\ \Q$type\E-----
-    }xm;
-
-    if ($data =~ m/$armor_regex/) {
-        return decode_base64($1);
-    }
-    return;
-}
-
-sub _pgp_armor_checksum {
-    my ($data) = @_;
-
-    # From RFC9580 <https://www.rfc-editor.org/rfc/rfc9580.html>.
-    #
-    # The resulting three-octet-wide value then gets base64-encoded into
-    # four base64 ASCII characters.
-
-    my $CRC24_INIT = 0xB704CE;
-    my $CRC24_GENERATOR = 0x864CFB;
-
-    my @bytes = unpack 'C*', $data;
-    my $crc = $CRC24_INIT;
-    for my $b (@bytes) {
-        $crc ^= ($b << 16);
-        for (1 .. 8) {
-            $crc <<= 1;
-            if ($crc & 0x1000000) {
-                # Clear bit 25 to avoid overflow.
-                $crc &= 0xffffff;
-                $crc ^= $CRC24_GENERATOR;
-            }
-        }
-    }
-    my $sum = pack 'CCC', ($crc >> 16) & 0xff, ($crc >> 8) & 0xff, $crc & 0xff;
-    return encode_base64($sum, q{});
-}
-
-sub _pgp_armor_data {
-    my ($type, $data) = @_;
-
-    my $out = encode_base64($data, q{}) =~ s/(.{1,64})/$1\n/gr;
-    chomp $out;
-    my $crc = _pgp_armor_checksum($data);
-    my $armor = <<~"ARMOR";
-        -----BEGIN PGP $type-----
-
-        $out
-        =$crc
-        -----END PGP $type-----
-        ARMOR
-    return $armor;
-}
-
-sub armor {
-    my ($self, $type, $in, $out) = @_;
-
-    my $raw_data = file_slurp($in);
-    my $data = _pgp_dearmor_data($type, $raw_data) // $raw_data;
-    my $armor = _pgp_armor_data($type, $data);
-    return OPENPGP_BAD_DATA unless defined $armor;
-    file_dump($out, $armor);
-
-    return OPENPGP_OK;
-}
-
-sub dearmor {
-    my ($self, $type, $in, $out) = @_;
-
-    my $armor = file_slurp($in);
-    my $data = _pgp_dearmor_data($type, $armor);
-    return OPENPGP_BAD_DATA unless defined $data;
-    file_dump($out, $data);
-
-    return OPENPGP_OK;
-}
-
 sub _gpg_exec
 {
     my ($self, @exec) = @_;
@@ -231,37 +135,29 @@ sub _gpg_verify {
     return OPENPGP_MISSING_CMD if ! $self->has_verify_cmd();
 
     my $gpg_home = File::Temp->newdir('dpkg-gpg-verify.XXXXXXXX', TMPDIR => 1);
-    my @cmd_opts = qw(--no-options --no-default-keyring --batch --quiet);
-    my @gpg_opts;
-    push @gpg_opts, _gpg_options_weak_digests();
-    push @gpg_opts, '--homedir', $gpg_home;
-    push @cmd_opts, @gpg_opts;
 
     my @exec;
     if ($self->{cmdv}) {
         push @exec, $self->{cmdv};
-        push @exec, @gpg_opts;
         # We need to touch the trustedkeys.gpg keyring, otherwise gpgv will
         # emit an error about the trustedkeys.kbx file being of unknown type.
         file_touch("$gpg_home/trustedkeys.gpg");
     } else {
         push @exec, $self->{cmd};
-        push @exec, @cmd_opts;
+        push @exec, qw(--no-options --no-default-keyring --batch --quiet);
     }
+    push @exec, _gpg_options_weak_digests();
+    push @exec, '--homedir', $gpg_home;
     foreach my $cert (@certs) {
         my $certring = File::Temp->new(UNLINK => 1, SUFFIX => '.pgp');
         my $rc;
-        # XXX: The internal dearmor() does not handle concatenated ASCII Armor,
-        # but the old implementation handled such certificate keyrings, so to
-        # avoid regressing for now, we fallback to use the GnuPG dearmor.
         if ($cert =~ m{\.kbx$}) {
             # Accept GnuPG apparent keybox-format keyrings as-is.
             $rc = 1;
-        } elsif (defined $self->{cmd}) {
-            $rc = $self->_gpg_exec($self->{cmd}, @cmd_opts, '--yes',
-                                          '--output', $certring,
-                                          '--dearmor', $cert);
         } else {
+            # Note that these _pgp_* functions are only necessary while relying on
+            # gpgv, and gpgv itself does not verify multiple signatures correctly
+            # (see https://bugs.debian.org/1010955).
             $rc = $self->dearmor('PUBLIC KEY BLOCK', $cert, $certring);
         }
         $certring = $cert if $rc;

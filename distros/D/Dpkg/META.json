@@ -156,7 +156,7 @@
       },
       "Dpkg::Control" : {
          "file" : "lib/Dpkg/Control.pm",
-         "version" : "1.04"
+         "version" : "1.05"
       },
       "Dpkg::Control::Changelog" : {
          "file" : "lib/Dpkg/Control/Changelog.pm",
@@ -168,7 +168,7 @@
       },
       "Dpkg::Control::FieldsCore" : {
          "file" : "lib/Dpkg/Control/FieldsCore.pm",
-         "version" : "1.02"
+         "version" : "1.03"
       },
       "Dpkg::Control::Hash" : {
          "file" : "lib/Dpkg/Control/Hash.pm",
@@ -388,7 +388,7 @@
       },
       "Dpkg::Vendor" : {
          "file" : "lib/Dpkg/Vendor.pm",
-         "version" : "1.02"
+         "version" : "1.03"
       },
       "Dpkg::Vendor::Debian" : {
          "file" : "lib/Dpkg/Vendor/Debian.pm",
@@ -429,6 +429,6 @@
          "web" : "https://git.dpkg.org/cgit/dpkg/dpkg.git"
       }
    },
-   "version" : "v1.22.11",
+   "version" : "v1.22.12",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

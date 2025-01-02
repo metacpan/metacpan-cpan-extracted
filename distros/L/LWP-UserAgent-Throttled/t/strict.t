@@ -2,16 +2,11 @@
 
 use strict;
 use warnings;
-use Test::Most;
 
-if($ENV{AUTHOR_TESTING}) {
-	eval 'use Test::Strict';
-	if($@) {
-		plan(skip_all => 'Test::Strict required for testing use strict');
-	} else {
-		all_perl_files_ok();
-		warnings_ok('lib/LWP/UserAgent/Throttled.pm');
-	}
-} else {
-	plan(skip_all => 'Author tests not required for installation');
-}
+use Test::DescribeMe qw(author);
+use Test::Most;
+use Test::Needs 'Test::Strict';
+
+Test::Strict->import();
+all_perl_files_ok();
+warnings_ok('lib/LWP/UserAgent/Throttled.pm');

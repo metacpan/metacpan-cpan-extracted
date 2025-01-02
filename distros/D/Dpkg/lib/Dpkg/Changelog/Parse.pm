@@ -72,19 +72,14 @@ sub _changelog_detect_format {
 
 =over 4
 
-=item $fields = changelog_parse(%opt)
+=item $fields = changelog_parse(%opts)
 
 This function will parse a changelog. In list context, it returns as many
 L<Dpkg::Control> objects as the parser did create. In scalar context, it will
 return only the first one. If the parser did not return any data, it will
 return an empty list in list context or undef on scalar context. If the
 parser failed, it will die. Any parse errors will be printed as warnings
-on standard error, but this can be disabled by passing $opt{verbose} to 0.
-
-The changelog file that is parsed is F<debian/changelog> by default but it
-can be overridden with $opt{file}. The changelog name used in output messages
-can be specified with $opt{label}, otherwise it will default to $opt{file}.
-The default output format is "dpkg" but it can be overridden with $opt{format}.
+on standard error, but this can be disabled by passing $opts{verbose} to 0.
 
 The parsing itself is done by a parser module (searched in the standard
 perl library directories. That module is named according to the format that
@@ -92,62 +87,95 @@ it is able to parse, with the name capitalized. By default it is either
 L<Dpkg::Changelog::Debian> (from the "debian" format) or the format name looked
 up in the 40 last lines of the changelog itself (extracted with this perl
 regular expression "\schangelog-format:\s+([0-9a-z]+)\W"). But it can be
-overridden with $opt{changelogformat}.
+overridden with $opts{changelogformat}.
 
-If $opt{compression} is false, the file will be loaded without compression
-support, otherwise by default compression support is disabled if the file
-is the default.
+All the other keys in %opts are forwarded to the parser module constructor.
 
-All the other keys in %opt are forwarded to the parser module constructor.
+Options:
+
+=over
+
+=item B<file>
+
+Set the changelog file to parse.
+Defaults to F<debian/changelog>.
+
+=item B<label>
+
+Set the changelog name used in output messages.
+Defaults to $opts{file}.
+
+=item B<compression>
+
+Set a boolean on whether to load the file without compression support.
+If the file is the default compression is disabled,
+otherwise the default is to enable compression.
+
+=item B<changelogformat>
+
+Set the changelog input format to use.
+
+=item B<format>
+
+Set the output format to use.
+Defaults to "dpkg".
+
+=item B<verbose>
+
+Set whether to print any parse errors as warnings to standard error.
+Defaults to true.
+
+=back
 
 =cut
 
 sub changelog_parse {
-    my (%options) = @_;
+    my (%opts) = @_;
 
-    $options{verbose} //= 1;
-    $options{file} //= 'debian/changelog';
-    $options{label} //= $options{file};
-    $options{changelogformat} //= _changelog_detect_format($options{file});
-    $options{format} //= 'dpkg';
-    $options{compression} //= $options{file} ne 'debian/changelog';
+    $opts{verbose} //= 1;
+    $opts{file} //= 'debian/changelog';
+    $opts{label} //= $opts{file};
+    $opts{changelogformat} //= _changelog_detect_format($opts{file});
+    $opts{format} //= 'dpkg';
+    $opts{compression} //= $opts{file} ne 'debian/changelog';
 
     my @range_opts = qw(since until from to offset count reverse all);
-    $options{all} = 1 if exists $options{all};
-    if (none { defined $options{$_} } @range_opts) {
-        $options{count} = 1;
+    $opts{all} = 1 if exists $opts{all};
+    if (none { defined $opts{$_} } @range_opts) {
+        $opts{count} = 1;
     }
     my $range;
     foreach my $opt (@range_opts) {
-        $range->{$opt} = $options{$opt} if exists $options{$opt};
+        $range->{$opt} = $opts{$opt} if exists $opts{$opt};
     }
 
     # Find the right changelog parser.
-    my $format = ucfirst lc $options{changelogformat};
+    my $format = ucfirst lc $opts{changelogformat};
     my $changes;
+    my $module = "Dpkg::Changelog::$format";
     eval qq{
-        require Dpkg::Changelog::$format;
-        \$changes = Dpkg::Changelog::$format->new();
+        require $module;
     };
     error(g_('changelog format %s is unknown: %s'), $format, $@) if $@;
+    $changes = $module->new();
     error(g_('changelog format %s is not a Dpkg::Changelog class'), $format)
         unless $changes->isa('Dpkg::Changelog');
-    $changes->set_options(reportfile => $options{label},
-                          verbose => $options{verbose},
+    $changes->set_options(reportfile => $opts{label},
+                          verbose => $opts{verbose},
                           range => $range);
 
     # Load and parse the changelog.
-    $changes->load($options{file}, compression => $options{compression})
-        or error(g_('fatal error occurred while parsing %s'), $options{file});
+    $changes->load($opts{file}, compression => $opts{compression})
+        or error(g_('fatal error occurred while parsing %s'), $opts{file});
 
     # Get the output into several Dpkg::Control objects.
     my @res;
-    if ($options{format} eq 'dpkg') {
+    if ($opts{format} eq 'dpkg') {
         push @res, $changes->format_range('dpkg', $range);
-    } elsif ($options{format} eq 'rfc822') {
+    } elsif ($opts{format} eq 'rfc822') {
         push @res, $changes->format_range('rfc822', $range);
     } else {
-        error(g_('unknown output format %s'), $options{format});
+        error(g_('unknown output format %s'), $opts{format});
     }
 
     if (wantarray) {

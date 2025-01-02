@@ -82,13 +82,23 @@ use overload
 =item $v = Dpkg::Version->new($version, %opts)
 
 Create a new Dpkg::Version object corresponding to the version indicated in
-the string (scalar) $version. By default it will accepts any string
-and consider it as a valid version. If you pass the option "check => 1",
-it will return undef if the version is invalid (see version_check for
-details).
+the string (scalar) $version. By default it will accept any string
+and consider it as a valid version, but this can be controlled with the
+"check" option.
 
 You can always call $v->is_valid() later on to verify that the version is
 valid.
+
+Options:
+
+=over
+
+=item B<check>
+
+Setting this option to true will return undef if the version is invalid
+(see $v->version_check() for details).
+
+=back
 
 =cut
 
@@ -204,7 +214,7 @@ sub _comparison {
     return version_compare_part($a->revision(), $b->revision());
 }
 
-=item "$v", $v->as_string(), $v->as_string(%options)
+=item "$v", $v->as_string(), $v->as_string(%opts)
 
 Accepts an optional option hash reference, affecting the string conversion.
 
@@ -255,7 +265,7 @@ If $a or $b are not valid version numbers, it dies with an error.
 
 =cut
 
-sub version_compare($$) {
+sub version_compare {
     my ($a, $b) = @_;
     my $va = Dpkg::Version->new($a, check => 1);
     defined($va) || error(g_('%s is not a valid version'), "$a");
@@ -275,7 +285,7 @@ have an input string containing the operator.
 
 =cut
 
-sub version_compare_relation($$$) {
+sub version_compare_relation {
     my ($a, $op, $b) = @_;
     my $res = version_compare($a, $b);
 
@@ -304,7 +314,7 @@ they are obsolete aliases of ">=" and "<=".
 
 =cut
 
-sub version_normalize_relation($) {
+sub version_normalize_relation {
     my $op = shift;
 
     warning('relation %s is deprecated: use %s or %s',
@@ -352,7 +362,7 @@ sub _version_order {
     }
 }
 
-sub version_compare_string($$) {
+sub version_compare_string {
     my @a = map { _version_order($_) } split(//, shift);
     my @b = map { _version_order($_) } split(//, shift);
     while (1) {
@@ -376,7 +386,7 @@ $a is earlier than $b, 0 if they are equal and 1 if $a is later than $b.
 
 =cut
 
-sub version_compare_part($$) {
+sub version_compare_part {
     my @a = version_split_digits(shift);
     my @b = version_split_digits(shift);
     while (1) {
@@ -404,7 +414,7 @@ return ("1", ".", "024", "~beta", "1", "+svn", "234").
 
 =cut
 
-sub version_split_digits($) {
+sub version_split_digits {
     my $version = shift;
 
     return split /(?<=\d)(?=\D)|(?<=\D)(?=\d)/, $version;
@@ -420,7 +430,7 @@ contains a description of the problem with the $version scalar.
 
 =cut
 
-sub version_check($) {
+sub version_check {
     my $version = shift;
     my $str;
     if (defined $version) {

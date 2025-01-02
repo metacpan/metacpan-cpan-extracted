@@ -1,5 +1,5 @@
 #
-# GENERATED WITH PDL::PP from image2d.pd! Don't modify!
+# GENERATED WITH PDL::PP from lib/PDL/Image2D.pd! Don't modify!
 #
 package PDL::Image2D;
 
@@ -22,7 +22,7 @@ use DynaLoader;
 
 
 
-#line 5 "image2d.pd"
+#line 11 "lib/PDL/Image2D.pd"
 
 use strict;
 use warnings;
@@ -47,7 +47,7 @@ use PDL::Math;
 use Carp;
 
 my %boundary2value = (Reflect=>1, Truncate=>2, Replicate=>3);
-#line 51 "Image2D.pm"
+#line 51 "lib/PDL/Image2D.pm"
 
 
 =head1 FUNCTIONS
@@ -175,6 +175,8 @@ kernel are bad, the output is set bad.
 
 
 
+
+#line 311 "lib/PDL/Image2D.pd"
 sub PDL::med2d {
    my $opt; $opt = pop @_ if ref($_[$#_]) eq 'HASH';
    die 'Usage: med2d( a(m,n), kern(p,q), [o]b(m,n), {Options} )'
@@ -188,8 +190,7 @@ sub PDL::med2d {
    );
    return $c;
 }
-
-
+#line 194 "lib/PDL/Image2D.pm"
 
 *med2d = \&PDL::med2d;
 
@@ -434,7 +435,7 @@ something with negatives in...) then the output values are set bad.
 
 
 
-#line 723 "image2d.pd"
+#line 716 "lib/PDL/Image2D.pd"
 
 =head2 crop
 
@@ -463,7 +464,7 @@ sub PDL::crop {
   $x1->cat($x2, $y1, $y2)->mv(-1,0);
 }
 
-#line 753 "image2d.pd"
+#line 746 "lib/PDL/Image2D.pd"
 
 =head2 cc8compt
 
@@ -506,7 +507,7 @@ sub PDL::cc4compt{
 return ccNcompt(shift,4);
 }
 *cc4compt = \&PDL::cc4compt;
-#line 510 "Image2D.pm"
+#line 511 "lib/PDL/Image2D.pm"
 
 
 =head2 ccNcompt
@@ -549,7 +550,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 920 "image2d.pd"
+#line 913 "lib/PDL/Image2D.pd"
 
 =head2 polyfill
 
@@ -604,7 +605,7 @@ sub PDL::polyfill {
 
 *polyfill = \&PDL::polyfill;
 
-#line 977 "image2d.pd"
+#line 970 "lib/PDL/Image2D.pd"
 
 =head2 pnpoly
 
@@ -684,7 +685,7 @@ sub PDL::pnpoly {
 
 *pnpoly = \&PDL::pnpoly;
 
-#line 1060 "image2d.pd"
+#line 1053 "lib/PDL/Image2D.pd"
 
 =head2 polyfillv
 
@@ -735,7 +736,7 @@ sub PDL::polyfillv :lvalue {
 	return $im->where($msk);
 }
 *polyfillv = \&PDL::polyfillv;
-#line 739 "Image2D.pm"
+#line 740 "lib/PDL/Image2D.pm"
 
 
 =head2 rot2d
@@ -849,7 +850,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1346 "image2d.pd"
+#line 1339 "lib/PDL/Image2D.pd"
 
 =head2 fitwarp2d
 
@@ -1262,7 +1263,7 @@ sub PDL::applywarp2d {
 } # sub: applywarp2d
 
 *applywarp2d = \&PDL::applywarp2d;
-#line 1266 "Image2D.pm"
+#line 1267 "lib/PDL/Image2D.pm"
 
 
 =head2 warp2d
@@ -1476,7 +1477,7 @@ sub PDL::warp2d_kernel ($) {
 
 
 
-#line 31 "image2d.pd"
+#line 37 "lib/PDL/Image2D.pd"
 
 =head1 AUTHORS
 
@@ -1491,7 +1492,7 @@ distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
 =cut
-#line 1495 "Image2D.pm"
+#line 1496 "lib/PDL/Image2D.pm"
 
 # Exit with OK status
 

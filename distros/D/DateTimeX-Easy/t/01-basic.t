@@ -176,16 +176,16 @@ TODO: {
     is("$eg", "2007-07-01T22:32:10");
 
     # FIXED
-    $eg = DateTimeX::Easy->parse($dt, time_zone => "PST8PDT", soft_time_zone_conversion => 1); # Will use "US/Pacific" as the timezone with *no* conversion
-    is($eg->time_zone->name, "PST8PDT");
+    $eg = DateTimeX::Easy->parse($dt, time_zone => "America/Los_Angeles", soft_time_zone_conversion => 1); # Will use "US/Pacific" as the timezone with *no* conversion
+    is($eg->time_zone->name, "America/Los_Angeles");
     is("$eg", "2007-07-01T22:32:10");
 
-    $eg = DateTimeX::Easy->parse($dt)->set_time_zone("PST8PDT"); # Will use "US/Pacific" as the timezone WITH conversion
-    is($eg->time_zone->name, "PST8PDT");
+    $eg = DateTimeX::Easy->parse($dt)->set_time_zone("America/Los_Angeles"); # Will use "US/Pacific" as the timezone WITH conversion
+    is($eg->time_zone->name, "America/Los_Angeles");
     is("$eg", "2007-07-01T19:32:10");
 
-    $eg = DateTimeX::Easy->parse($dt, time_zone => "PST8PDT"); # Will ALSO use "US/Pacific" as the timezone WITH conversion
-    is($eg->time_zone->name, "PST8PDT");
+    $eg = DateTimeX::Easy->parse($dt, time_zone => "America/Los_Angeles"); # Will ALSO use "US/Pacific" as the timezone WITH conversion
+    is($eg->time_zone->name, "America/Los_Angeles");
     is("$eg", "2007-07-01T19:32:10");
 
     $eg = DateTimeX::Easy->parse($dt, time_zone => "floating");

@@ -22,8 +22,6 @@ my @test_cases = (
     },
 );
 
-my $openai = OpenAPI::Client::OpenAI->new( undef, assistants => 1 );
-
 for my $test (@test_cases) {
     my ( $method, $params, $error ) = @{$test}{qw/method params error/};
     my $openai = OpenAPI::Client::OpenAI->new( undef, assistants => !$error );

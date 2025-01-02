@@ -9,7 +9,7 @@ use Wikibase::Datatype::Print::Utils qw(print_aliases);
 use Wikibase::Datatype::Print::Value::Monolingual;
 
 my $obj = Test::Shared::Fixture::Wikibase::Datatype::Item::Wikidata::Dog->new;
-my @ret = print_aliases($obj, {'lang' => 'cs'},
+my @ret = print_aliases($obj, {'lang' => 'cs', 'texts' => {'aliases' => 'Aliases'}},
         \&Wikibase::Datatype::Print::Value::Monolingual::print);
 
 # Print.

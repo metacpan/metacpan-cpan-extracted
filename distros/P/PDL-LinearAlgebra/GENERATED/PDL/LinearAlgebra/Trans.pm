@@ -78,7 +78,7 @@ PDL routine sec. If you need to call it specify its origin module : PDL::Basic::
 
 =for sig
 
-  Signature: ([io,phys]A(n,n);int deg();scale();[io]trace();int [o]ns();int [o]info(); int [t]ipiv(n); [t]wsp(wspn=CALC(3*$SIZE(n)*$SIZE(n))))
+  Signature: ([io]A(n,n);int deg();scale();[io]trace();int [o]ns();int [o]info(); int [t]ipiv(n); [t]wsp(wspn=CALC(3*$SIZE(n)*$SIZE(n))))
 
 =for ref
 
@@ -141,7 +141,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io,phys]A(n,n);int deg();scale();int trace();int [o]ns();int [o]info(); int [t] ipiv(n))
+  Signature: (complex [io]A(n,n);int deg();scale();int trace();int [o]ns();int [o]info(); int [t] ipiv(n))
 
 =for ref
 
@@ -170,7 +170,7 @@ sub PDL::cgeexp {
 
 =for sig
 
-  Signature: (complex [io,phys]A(n,n);int uplo();complex [phys,o] B(n,n);int [o]info())
+  Signature: (complex [io]A(n,n);int uplo();complex [o] B(n,n);int [o]info())
 
 =for ref
 

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# vim: ft=sh
+
 function show_help() {
     less <<END
 $(basename "$0") [-?|-h|--help] [-f|--force] [-u|--update]

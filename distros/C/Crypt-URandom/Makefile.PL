@@ -2,10 +2,33 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
+
+my %optional;
+if ($^O eq 'MSWin32') {
+	$optional{OBJECT} = q[];
+	$optional{C} = [];
+	$optional{MYEXTLIB} = q[];
+} else {
+	eval `cat ./check_random.pl`;
+	if (($optional{DEFINE}) && ($optional{DEFINE} eq '-DNO_COMPILER_FOUND')) {
+		# figured this out from ExtUtils/MM_Unix.pm in has_link_code
+		$optional{OBJECT} = q[];
+		$optional{C} = [];
+		$optional{MYEXTLIB} = q[];
+		delete $optional{DEFINE};
+	} elsif (($optional{DEFINE}) && ($optional{DEFINE} eq '-DUNKNOWN_ENVIRONMENT')) {
+		$optional{OBJECT} = q[];
+		$optional{C} = [];
+		$optional{MYEXTLIB} = q[];
+		delete $optional{DEFINE};
+	}
+}
+
 WriteMakefile(
     NAME                => 'Crypt::URandom',
     AUTHOR              => 'David Dick <ddick@cpan.org>',
     VERSION_FROM        => 'lib/Crypt/URandom.pm',
+    %optional,
     ABSTRACT_FROM       => 'lib/Crypt/URandom.pm',
     ( $ExtUtils::MakeMaker::VERSION >= 6.3002
         ? ( 'LICENSE' => 'perl' )

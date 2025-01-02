@@ -1,5 +1,5 @@
 package Slackware::SBoKeeper::Config;
-our $VERSION = '2.00';
+our $VERSION = '2.01';
 use 5.016;
 use strict;
 use warnings;
@@ -33,7 +33,7 @@ sub read_config {
 		$field =~ s/^\s+|\s+$//g;
 		$val   =~ s/^\s+|\s+$//g;
 
-		unless ($val) {
+		if ($val eq '') {
 			die "$file line $ln: Value cannot be empty\n";
 		}
 
@@ -43,6 +43,7 @@ sub read_config {
 
 		eval {
 			$config->{$field} = $callback->{$field}($val);
+			1; # so that $config->{$field} being 0 won't cause problems.
 		} or do {
 			my $e = $@ || 'Something went wrong';
 			chomp $e;
@@ -104,7 +105,7 @@ Report bugs on my Codeberg, L<https://codeberg.org/1-1sam>.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2024 Samuel Young
+Copyright (C) 2024-2025 Samuel Young
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of either: the GNU General Public License as published by the Free

@@ -836,33 +836,33 @@ PPCAT(loop, _SEARCH_ATTRIBUTE_VALUE):                                   \
             END(PPCAT(loop, _CHAR_REFERENCE))                           \
             goto INVALID_REF;                                           \
         EXPECT_CHAR("amp or apos", 'a')                                 \
-            if (xh_str_equal3(cur, 'm', 'p', ';')) {                    \
+            if (xh_str_auto_equal3(cur, 'm', 'p', ';', "mp;")) {        \
                 code = '&';                                             \
                 cur += 3;                                               \
                 goto PPCAT(loop, _REFEFENCE_VALUE);                     \
             }                                                           \
-            if (xh_str_equal4(cur, 'p', 'o', 's', ';')) {               \
+            if (xh_str_auto_equal4(cur, 'p', 'o', 's', ';', "pos;")) {  \
                 code = '\'';                                            \
                 cur += 4;                                               \
                 goto PPCAT(loop, _REFEFENCE_VALUE);                     \
             }                                                           \
             goto INVALID_REF;                                           \
         EXPECT_CHAR("lt", 'l')                                          \
-            if (xh_str_equal2(cur, 't', ';')) {                         \
+            if (xh_str_auto_equal2(cur, 't', ';', "t;")) {              \
                 code = '<';                                             \
                 cur += 2;                                               \
                 goto PPCAT(loop, _REFEFENCE_VALUE);                     \
             }                                                           \
             goto INVALID_REF;                                           \
         EXPECT_CHAR("gt", 'g')                                          \
-            if (xh_str_equal2(cur, 't', ';')) {                         \
+            if (xh_str_auto_equal2(cur, 't', ';', "t;")) {              \
                 code = '>';                                             \
                 cur += 2;                                               \
                 goto PPCAT(loop, _REFEFENCE_VALUE);                     \
             }                                                           \
             goto INVALID_REF;                                           \
         EXPECT_CHAR("quot", 'q')                                        \
-            if (xh_str_equal4(cur, 'u', 'o', 't', ';')) {               \
+            if (xh_str_auto_equal4(cur, 'u', 'o', 't', ';', "uot;")) {  \
                 code = '"';                                             \
                 cur += 4;                                               \
                 goto PPCAT(loop, _REFEFENCE_VALUE);                     \

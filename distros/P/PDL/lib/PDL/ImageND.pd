@@ -1,0 +1,1344 @@
+use strict;
+use warnings;
+
+pp_addpm({At=>'Top'},<<'EOD');
+
+=head1 NAME
+
+PDL::ImageND - useful image processing in N dimensions
+
+=head1 DESCRIPTION
+
+These routines act on PDLs as N-dimensional objects, not as broadcasted
+sets of 0-D or 1-D objects.  The file is sort of a catch-all for
+broadly functional routines, most of which could legitimately
+be filed elsewhere (and probably will, one day).
+
+ImageND is not a part of the PDL core (v2.4) and hence must be explicitly
+loaded.
+
+=head1 SYNOPSIS
+
+ use PDL::ImageND;
+
+ $y = $x->convolveND($kernel,{bound=>'periodic'});
+ $y = $x->rebin(50,30,10);
+
+=cut
+
+use strict;
+use warnings;
+
+EOD
+
+pp_addpm({At=>'Bot'},<<'EOD');
+
+=head1 AUTHORS
+
+Copyright (C) Karl Glazebrook and Craig DeForest, 1997, 2003
+All rights reserved. There is no warranty. You are allowed
+to redistribute this software / documentation under certain
+conditions. For details, see the file COPYING in the PDL
+distribution. If this file is separated from the PDL distribution,
+the copyright notice should be included in the file.
+
+=cut
+EOD
+
+# N-dim utilities
+
+pp_addpm(<<'EOD');
+
+use Carp;
+
+EOD
+
+pp_add_exported('','kernctr');
+
+
+pp_def('convolve',Doc=><<'EOD',
+=for ref
+
+N-dimensional convolution (Deprecated; use convolveND)
+
+=for usage
+
+  $new = convolve $x, $kernel
+
+Convolve an array with a kernel, both of which are N-dimensional.  This
+routine does direct convolution (by copying) but uses quasi-periodic
+boundary conditions: each dim "wraps around" to the next higher row in
+the next dim.
+
+This routine is kept for backwards compatibility with earlier scripts;
+for most purposes you want L<convolveND|PDL::ImageND/convolveND> instead:
+it runs faster and handles a variety of boundary conditions.
+
+=cut
+
+
+EOD
+        Pars => 'a(m); b(n); indx adims(p); indx bdims(q); [o]c(m);',
+        PMCode => '
+sub PDL::convolve {
+    my($x,$y,$c) = @_;
+    barf("Usage: convolve(a(*), b(*), [o]c(*)") if $#_<1 || $#_>2;
+    $c = PDL->null if $#_<2;
+    PDL::_convolve_int( $x->flat, $y->flat,
+       $x->shape, $y->shape,
+       $c->isnull ? $c : $c->flat,
+    );
+    $c->setdims([$x->dims]);
+
+    if($x->is_inplace) {
+      $x .= $c;
+      $x->set_inplace(0);
+      return $x;
+    }
+    return $c;
+}
+',
+        RedoDimsCode => '
+   if ($SIZE(p) != $SIZE(q))
+     $CROAK("Arguments do not have the same dimensionality");
+   PDL_Indx i, *dimsa = $P(adims), *dimsb = $P(bdims);
+   for(i=0; i<$SIZE(p); i++)
+     if (dimsb[i]>=dimsa[i])
+       $CROAK("Second argument must be smaller in all dimensions that first");
+        ',
+        CHeader => <<'EOF',
+/* Compute offset of (x,y,z,...) position in row-major list */
+static inline PDL_Indx ndim_get_offset(PDL_Indx* pos, PDL_Indx* dims, PDL_Long ndims) {
+   PDL_Long i;
+   PDL_Indx result,size;
+   size = 1;
+   result = 0;
+   for (i=0; i<ndims; i++) {
+       if (i>0)
+          size = size*dims[i-1];
+       result = result + pos[i]*size;
+   }
+   return result;
+}
+/* Increment a position pointer array by one row */
+static inline void ndim_row_plusplus ( PDL_Indx* pos, PDL_Indx* dims, PDL_Long ndims ) {
+    PDL_Long  noescape;
+    PDL_Indx i;
+    i=1; noescape=1;
+    while(noescape) {
+       (pos[i])++;
+       if (pos[i]==dims[i]) { /* Carry */
+          if (i>=(ndims)-1)  {
+             noescape = 0; /* Exit */
+          }else{
+             pos[i]=0;
+             i++;
+          }
+       }else{
+          noescape = 0;    /* Exit */
+       }
+    }
+}
+EOF
+        Code => '
+   PDL_Indx *dimsa = $P(adims);
+   PDL_Indx *dimsb = $P(bdims);
+   PDL_Indx andims = $SIZE(p);
+   PDL_Indx bndims = $SIZE(q);
+   PDL_Indx anvals = $SIZE(m);
+   PDL_Indx bnvals = $SIZE(n);
+   double cc;
+
+   PDL_Indx i,i2,j,k,n,offcen=0,ncen=0,nrow;
+
+   PDL_Indx pos[andims];
+   for (i=0; i<andims; i++) /* Zero */
+       pos[i]=0;
+
+   /* Find middle pixel in b */
+   i=0; nrow = dimsb[0];
+   while (i<bnvals) {
+      for (j=0; j<nrow; j++) { /* For each row */
+         pos[0]=j;
+         for (k=0; k < bndims; k++) {       /* Is centre? */
+            if (pos[k] != dimsb[k]/2) goto getout_$GENERIC();
+         }
+         ncen = i;
+getout_$GENERIC():    i++;
+      }
+      pos[0]=0;
+      ndim_row_plusplus( pos, dimsb, bndims );
+   }
+
+   for (i=0; i<andims; i++) /* Zero */
+       pos[i]=0;
+
+   /* Initialise offset array to handle the relative coords efficiently */
+   PDL_Indx off[bnvals]; /* Offset array */
+
+   i=0;
+   while(i<bnvals) {
+      n = ndim_get_offset(pos, dimsa, andims); /* Start of row in A */
+      for (j=0; j<nrow; j++) { /* Fill row */
+           off[i] = n+j;
+           if (i==ncen)
+              offcen = off[i]; /* Offset to middle */
+           i++;
+      }
+      ndim_row_plusplus( pos, dimsa, andims );
+   }
+
+   for(i=0;i<bnvals;i++)    /* Subtract center offset */
+       off[i]=offcen-off[i];
+
+   /* Now convolve the data */
+
+    for(i=0; i<anvals; i++) {
+        cc = 0;
+        for(j=0; j<bnvals; j++) {
+            i2 = (i+off[j]+anvals) % anvals ;
+            cc += $a( m=> i2 ) * $b(n=>j) ;
+        }
+        $c(m=>i) = cc;
+    }
+');
+
+
+pp_add_exported('',"ninterpol");
+
+pp_addpm(<<'EOD');
+
+=head2 ninterpol()
+
+=for ref
+
+N-dimensional interpolation routine
+
+=for sig
+
+ Signature: ninterpol(point(),data(n),[o]value())
+
+=for usage
+
+      $value = ninterpol($point, $data);
+
+C<ninterpol> uses C<interpol> to find a linearly interpolated value in
+N dimensions, assuming the data is spread on a uniform grid.  To use
+an arbitrary grid distribution, need to find the grid-space point from
+the indexing scheme, then call C<ninterpol> -- this is far from
+trivial (and ill-defined in general).
+
+See also L<interpND|PDL::Primitive/interpND>, which includes boundary
+conditions and allows you to switch the method of interpolation, but
+which runs somewhat slower.
+
+=cut
+
+
+*ninterpol = \&PDL::ninterpol;
+
+sub PDL::ninterpol {
+    use PDL::Math 'floor';
+    use PDL::Primitive 'interpol';
+    print 'Usage: $x = ninterpolate($point(s), $data);' if $#_ != 1;
+    my ($p, $y) = @_;
+    my ($ip) = floor($p);
+    # isolate relevant N-cube
+    $y = $y->slice(join (',',map($_.':'.($_+1),list $ip)));
+    for (list ($p-$ip)) { $y = interpol($_,$y->xvals,$y); }
+    $y;
+}
+
+EOD
+
+pp_def('rebin',Doc=><<'EOD',
+=for ref
+
+N-dimensional rebinning algorithm
+
+=for usage
+
+  $new = rebin $x, $dim1, $dim2,..;.
+  $new = rebin $x, $template;
+  $new = rebin $x, $template, {Norm => 1};
+
+Rebin an N-dimensional array to newly specified dimensions.
+Specifying `Norm' keeps the sum constant, otherwise the intensities
+are kept constant.  If more template dimensions are given than for the
+input pdl, these dimensions are created; if less, the final dimensions
+are maintained as they were.
+
+So if C<$x> is a 10 x 10 pdl, then C<rebin($x,15)> is a 15 x 10 pdl,
+while C<rebin($x,15,16,17)> is a 15 x 16 x 17 pdl (where the values
+along the final dimension are all identical).
+
+Expansion is performed by sampling; reduction is performed by averaging.
+If you want different behavior, use L<PDL::Transform::map|PDL::Transform/map>
+instead.  PDL::Transform::map runs slower but is more flexible.
+
+=cut
+
+
+EOD
+        Pars => 'a(m); [o]b(n);',
+        OtherPars => 'int ns => n',
+        PMCode => pp_line_numbers(__LINE__, <<'EOF'),
+sub PDL::rebin {
+    my($x) = shift;
+    my($opts) = ref $_[-1] eq "HASH" ? pop : {};
+    my(@idims) = $x->dims;
+    my(@odims) = ref $_[0] ? $_[0]->dims : @_;
+    my($i,$y);
+    foreach $i (0..$#odims) {
+      if ($i > $#idims) {  # Just dummy extra dimensions
+          $x = $x->dummy($i,$odims[$i]);
+          next;
+      # rebin_int can cope with all cases, but code
+      # 1->n and n->1 separately for speed
+      } elsif ($odims[$i] != $idims[$i]) {       # If something changes
+         if (!($odims[$i] % $idims[$i])) {      # Cells map 1 -> n
+               my ($r) = $odims[$i]/$idims[$i];
+               $y = ($i==0 ? $x : $x->mv($i,0))->dupN($r);
+         } elsif (!($idims[$i] % $odims[$i])) { # Cells map n -> 1
+               my ($r) = $idims[$i]/$odims[$i];
+               $x = $x->mv($i,0) if $i != 0;
+               # -> copy so won\'t corrupt input PDL
+               $y = $x->slice("0:-1:$r")->copy;
+               foreach (1..$r-1) {
+                  $y += $x->slice("$_:-1:$r");
+               }
+               $y /= $r;
+         } else {                               # Cells map n -> m
+             &PDL::_rebin_int(($i==0 ? $x : $x->mv($i,0)), $y = null, $odims[$i]);
+         }
+         $x = $y->mv(0,$i);
+      }
+    }
+    if (exists $opts->{Norm} and $opts->{Norm}) {
+      my ($norm) = 1;
+      for $i (0..$#odims) {
+         if ($i > $#idims) {
+              $norm /= $odims[$i];
+         } else {
+              $norm *= $idims[$i]/$odims[$i];
+         }
+      }
+      return $x * $norm;
+    } else {
+      # Explicit copy so i) can\'t corrupt input PDL through this link
+      #                 ii) don\'t waste space on invisible elements
+      return $x -> copy;
+    }
+}
+EOF
+        Code => '
+        int ms = $SIZE(m);
+        int nv = $COMP(ns);
+      int i;
+      double u, d;
+      $GENERIC(a) av;
+         broadcastloop %{
+          i = 0;
+          d = -1;
+          loop (n) %{ $b() = 0; %}
+          loop (m) %{
+              av = $a();
+              u = nv*((m+1.)/ms)-1;
+              while (i <= u) {
+                 $b(n => i) +=  (i-d)*av;
+                 d = i;
+                 i++;
+              }
+              if (i < nv) $b(n => i) +=  (u-d)*av;
+              d = u;
+          %}
+      %}
+');
+
+
+pp_addpm(<<'EOD');
+
+=head2 circ_mean_p
+
+=for ref
+
+Calculates the circular mean of an n-dim image and returns
+the projection. Optionally takes the center to be used.
+
+=for usage
+
+   $cmean=circ_mean_p($im);
+   $cmean=circ_mean_p($im,{Center => [10,10]});
+
+=cut
+
+
+sub circ_mean_p {
+ my ($x,$opt) = @_;
+ my ($rad,$sum,$norm);
+
+ if (defined $opt) {
+   $rad = indx PDL::rvals($x,$opt);
+ }
+ else {
+   $rad = indx rvals $x;
+ }
+ my $max1 = $rad->max->sclr+1;
+ $sum = zeroes($max1);
+ PDL::indadd $x->flat, $rad->flat, $sum; # this does the real work
+ $norm = zeroes($max1);
+ PDL::indadd pdl(1), $rad->flat, $norm;       # equivalent to get norm
+ $sum /= $norm;
+ return $sum;
+}
+
+=head2 circ_mean
+
+=for ref
+
+Smooths an image by applying circular mean.
+Optionally takes the center to be used.
+
+=for usage
+
+   circ_mean($im);
+   circ_mean($im,{Center => [10,10]});
+
+=cut
+
+
+sub circ_mean {
+ my ($x,$opt) = @_;
+ my ($rad,$sum,$norm,$a1);
+
+ if (defined $opt) {
+   $rad = indx PDL::rvals($x,$opt);
+ }
+ else {
+   $rad = indx rvals $x;
+ }
+ my $max1 = $rad->max->sclr+1;
+ $sum = zeroes($max1);
+ PDL::indadd $x->flat, $rad->flat, $sum; # this does the real work
+ $norm = zeroes($max1);
+ PDL::indadd pdl(1), $rad->flat, $norm;       # equivalent to get norm
+ $sum /= $norm;
+ $a1 = $x->flat;
+ $a1 .= $sum->index($rad->flat);
+
+ return $x;
+}
+
+EOD
+
+pp_add_exported('','circ_mean circ_mean_p');
+
+
+pp_addpm(<<'EOPM');
+=head2 kernctr
+
+=for ref
+
+`centre' a kernel (auxiliary routine to fftconvolve)
+
+=for usage
+
+	$kernel = kernctr($image,$smallk);
+	fftconvolve($image,$kernel);
+
+kernctr centres a small kernel to emulate the behaviour of the direct
+convolution routines.
+
+=cut
+
+
+*kernctr = \&PDL::kernctr;
+
+sub PDL::kernctr {
+    # `centre' the kernel, to match kernel & image sizes and
+    # emulate convolve/conv2d.  FIX: implement with phase shifts
+    # in fftconvolve, with option tag
+    barf "Must have image & kernel for kernctr" if $#_ != 1;
+    my ($imag, $kern) = @_;
+    my (@ni) = $imag->dims;
+    my (@nk) = $kern->dims;
+    barf "Kernel and image must have same number of dims" if $#ni != $#nk;
+    my ($newk) = zeroes(double,@ni);
+    my ($k,$n,$y,$d,$i,@stri,@strk,@b);
+    for ($i=0; $i <= $#ni; $i++) {
+	$k = $nk[$i];
+	$n = $ni[$i];
+	barf "Kernel must be smaller than image in all dims" if ($n < $k);
+	$d = int(($k-1)/2);
+        $stri[$i][0] = "0:$d,";
+        $strk[$i][0] = (-$d-1).":-1,";
+        $stri[$i][1] = $d == 0 ? '' : ($d-$k+1).':-1,';
+        $strk[$i][1] = $d == 0 ? '' : '0:'.($k-$d-2).',';
+    }
+    # kernel is split between the 2^n corners of the cube
+    my ($nchunk) = 2 << $#ni;
+    CHUNK:
+      for ($i=0; $i < $nchunk; $i++) {
+	my ($stri,$strk);
+	for ($n=0, $y=$i; $n <= $#ni; $n++, $y >>= 1) {
+        next CHUNK if $stri[$n][$y & 1] eq '';
+	  $stri .= $stri[$n][$y & 1];
+	  $strk .= $strk[$n][$y & 1];
+	}
+	chop ($stri); chop ($strk);
+	(my $t = $newk->slice($stri)) .= $kern->slice($strk);
+    }
+    $newk;
+}
+
+EOPM
+
+pp_def(
+       'convolveND',
+       Doc=><<'EOD',
+
+=for ref
+
+Speed-optimized convolution with selectable boundary conditions
+
+=for usage
+
+  $new = convolveND($x, $kernel, [ {options} ]);
+
+Convolve an array with a kernel, both of which are N-dimensional.
+
+If the kernel has fewer dimensions than the array, then the extra array
+dimensions are broadcasted over.  There are options that control the boundary
+conditions and method used.
+
+The kernel's origin is taken to be at the kernel's center.  If your
+kernel has a dimension of even order then the origin's coordinates get
+rounded up to the next higher pixel (e.g. (1,2) for a 3x4 kernel).
+This mimics the behavior of the earlier L</convolve> and
+L<fftconvolve|PDL::FFT/fftconvolve()> routines, so convolveND is a drop-in
+replacement for them.
+
+
+The kernel may be any size compared to the image, in any dimension.
+
+The kernel and the array are not quite interchangeable (as in mathematical
+convolution): the code is inplace-aware only for the array itself, and
+the only allowed boundary condition on the kernel is truncation.
+
+convolveND is inplace-aware: say C<convolveND(inplace $x ,$k)> to modify
+a variable in-place.  You don't reduce the working memory that way -- only
+the final memory.
+
+OPTIONS
+
+Options are parsed by PDL::Options, so unique abbreviations are accepted.
+
+=over 3
+
+=item boundary (default: 'truncate')
+
+The boundary condition on the array, which affects any pixel closer
+to the edge than the half-width of the kernel.
+
+The boundary conditions are the same as those accepted by
+L<range|PDL::Slices/range>, because this option is passed directly
+into L<range|PDL::Slices/range>.  Useful options are 'truncate' (the
+default), 'extend', and 'periodic'.  You can select different boundary
+conditions for different axes -- see L<range|PDL::Slices/range> for more
+detail.
+
+The (default) truncate option marks all the near-boundary pixels as BAD if
+you have bad values compiled into your PDL and the array's badflag is set.
+
+=item method (default: 'auto')
+
+The method to use for the convolution.  Acceptable alternatives are
+'direct', 'fft', or 'auto'.  The direct method is an explicit
+copy-and-multiply operation; the fft method takes the Fourier
+transform of the input and output kernels.  The two methods give the
+same answer to within double-precision numerical roundoff.  The fft
+method is much faster for large kernels; the direct method is faster
+for tiny kernels.  The tradeoff occurs when the array has about 400x
+more pixels than the kernel.
+
+The default method is 'auto', which chooses direct or fft convolution
+based on the size of the input arrays.
+
+=back
+
+NOTES
+
+At the moment there's no way to broadcast over kernels.  That could/should
+be fixed.
+
+The broadcasting over input is cheesy and should probably be fixed:
+currently the kernel just gets dummy dimensions added to it to match
+the input dims.  That does the right thing tersely but probably runs slower
+than a dedicated broadcastloop.
+
+The direct copying code uses PP primarily for the generic typing: it includes
+its own broadcastloops.
+
+=cut
+
+
+EOD
+       PMCode => <<'EOD',
+
+use PDL::Options;
+
+# Perl wrapper conditions the data to make life easier for the PP sub.
+
+sub PDL::convolveND {
+  my($a0,$k,$opt0) = @_;
+  my $inplace = $a0->is_inplace;
+  my $x = $a0->new_or_inplace;
+
+  barf("convolveND: kernel (".join("x",$k->dims).") has more dims than source (".join("x",$x->dims).")\n")
+    if($x->ndims < $k->ndims);
+
+  # Coerce stuff all into the same type.  Try to make sense.
+  # The trivial conversion leaves dataflow intact (nontrivial conversions
+  # don't), so the inplace code is OK.  Non-inplace code: let the existing
+  # PDL code choose what type is best.
+  my $type;
+  if($inplace) {
+	$type = $a0->get_datatype;
+  } else {
+	my $z = $x->flat->index(0) + $k->flat->index(0);
+	$type = $z->get_datatype;
+  }
+  $x = $x->convert($type);
+  $k = $k->convert($type);
+
+  ## Handle options -- $def is a static variable so it only gets set up once.
+  our $def;
+  unless(defined($def)) {
+    $def = PDL::Options->new( {
+                              Method=>'a',
+                              Boundary=>'t'
+                             }
+			     );
+    $def->minmatch(1);
+    $def->casesens(0);
+  }
+
+  my $opt = $def->options(PDL::Options::ifhref($opt0));
+
+  ###
+  # If the kernel has too few dimensions, we broadcast over the other
+  # dims -- this is the same as supplying the kernel with dummy dims of
+  # order 1, so, er, we do that.
+  $k = $k->dummy($x->dims - 1, 1)
+    if($x->ndims > $k->ndims);
+  my $kdims = pdl($k->dims);
+
+  ###
+  # Decide whether to FFT or directly convolve: if we're in auto mode,
+  # choose based on the relative size of the image and kernel arrays.
+  my $fft = ( ($opt->{Method} =~ m/^a/i) ?
+	       ( $x->nelem > 2500 and ($x->nelem) <= ($k->nelem * 500) ) :
+  	       ( $opt->{Method} !~ m/^[ds]/i )
+	      );
+
+  ###
+  # Pad the array to include boundary conditions
+  my $adims = $x->shape;
+  my $koff = ($kdims/2)->ceil - 1;
+
+  my $aa = $x->range( -$koff, $adims + $kdims, $opt->{Boundary} )
+               ->sever;
+
+  if ($fft) {
+    require PDL::FFT;
+
+    print "convolveND: using FFT method\n" if($PDL::debug);
+
+    # FFT works best on doubles; do our work there then cast back
+    # at the end.
+    $aa = double($aa);
+    $_ = $aa->zeroes for my ($aai, $kk, $kki);
+    $kk->range( - ($kdims/2)->floor, $kdims, 'p') .= $k;
+    PDL::fftnd($kk, $kki);
+    PDL::fftnd($aa, $aai);
+
+    {
+      my($ii) = $kk * $aai   +    $aa * $kki;
+      $aa =     $aa * $kk    -   $kki * $aai;
+      $aai .= $ii;
+    }
+
+    PDL::ifftnd($aa,$aai);
+    $x .= $aa->range( $koff, $adims);
+
+  } else {
+    print "convolveND: using direct method\n" if($PDL::debug);
+
+    ### The first argument is a dummy to set $GENERIC.
+    &PDL::_convolveND_int( $k->flat->index(0), $k, $aa, $x );
+
+  }
+
+
+  $x;
+}
+
+EOD
+  Pars=>'k0()',
+  OtherPars=>'pdl *k; pdl *aa; pdl *a;',
+
+Code => <<'EOD'
+/*
+ * Direct convolution
+ *
+ * Because the kernel is usually the smaller of the two arrays to be convolved,
+ * we broadcast kernel-first to keep it in the processor's cache.  The strategy:
+ * work on a padded copy of the original image, so that (even with boundary
+ * conditions) the geometry of the kernel is linearly related to the input
+ * array.  Otherwise, follow the path blazed by Karl in convolve(): keep track
+ * of the offsets for each kernel element in a flattened original PDL.
+ *
+ * The first (PP) argument is a dummy that's only used to set the GENERIC()
+ * macro.  The other three arguments should all have the same type as the
+ * first arguments, and are all passed in as SVs.  They are: the kernel,
+ * the padded copy of the input PDL, and a pre-allocated output PDL.  The
+ * input PDL should be padded by the dimensionality of the kernel.
+ *
+ */
+
+  PDL_Indx i;
+  pdl *k = $COMP(k), *a = $COMP(a), *aa = $COMP(aa);
+  PDL_RETERROR(PDL_err, PDL->make_physical(aa));
+  PDL_RETERROR(PDL_err, PDL->make_physical(a));
+  PDL_RETERROR(PDL_err, PDL->make_physical(k));
+
+  PDL_Indx ndims = aa->ndims;
+  if(ndims != k->ndims || ndims != aa->ndims)
+     $CROAK("convolveND: dims don't agree - should never happen\n");
+
+  PDL_Indx koffs[k->nvals];
+  $GENERIC() kvals[k->nvals];
+  PDL_Indx ivec[ndims];
+
+  /************************************/
+  /* Fill up the koffs & kvals arrays */
+  /* koffs gets relative offsets into aa for each kernel value; */
+  /* kvals gets the kernel values in the same order (flattened) */
+  PDL_Indx *koff = koffs;
+  $GENERIC() *kval = kvals;
+  $GENERIC() *aptr = ($GENERIC() *)k->data + k->nvals - 1;
+
+  for (i=0; i < ndims; i++) ivec[i] = 0;
+  PDL_Indx npdls = 2, incs[npdls*ndims], offs[npdls];
+  for (i=0; i < npdls; i++) offs[i] = 0;
+  for (i=0; i < ndims; i++) {
+    incs[i*npdls + 0] = k->dimincs[i];
+    incs[i*npdls + 1] = aa->dimincs[i];
+  }
+  do {
+    *kval++ = aptr[-offs[0]]; /* Copy kernel value into kernel list */
+    *koff++ = offs[1];	  /* Copy current aa offset into koffs list */
+    if (!pdl_broadcast_nd_step(npdls, offs, 0, ndims, incs, k->dims, ivec)) break;
+  } while (1);
+
+  /******************************/
+  /* Now do the actual convolution: for each vector in a,   */
+  /* accumulate the appropriate aa-sum and stick it into a. */
+  for (i=0; i < ndims; i++) ivec[i] = 0;
+  aptr  = a->data;
+  $GENERIC() *aaptr = aa->data;
+  for (i=0; i < npdls; i++) offs[i] = 0;
+  for (i=0; i < ndims; i++) incs[i*npdls + 0] = a->dimincs[i]; /* got aa already */
+  do {
+    $GENERIC() acc = 0;
+    koff = koffs;
+    kval = kvals;
+    for (i=0;i<k->nvals;i++)
+      acc += aaptr[offs[1] + *koff++] * (*kval++);
+    aptr[offs[0]] = acc;
+    if (!pdl_broadcast_nd_step(npdls, offs, 0, ndims, incs, a->dims, ivec)) break;
+  } while (1);
+  PDL->changed(a, PDL_PARENTDATACHANGED, 0);
+EOD
+);
+
+pp_def('contour_segments',
+  Pars => 'c(); data(m,n); points(d,m,n);
+    [o] segs(d,q=CALC(($SIZE(m)-1)*($SIZE(n)-1)*4)); indx [o] cnt();',
+  GenericTypes => ['F'],
+  Code => <<'EOF',
+PDL_Indx p=0;
+#define PDL_DCALC(vname,c,x1,y1,x2,y2) \
+  $GENERIC(points) vname = (c-$data(m=>x1,n=>y1))/($data(m=>x2,n=>y2)-$data(m=>x1,n=>y1))
+#define PDL_PCALC(dname,d,x1,y1,x2,y2) \
+  ($points(d=>d,m=>x1,n=>y1)+dname*($points(d=>d,m=>x2,n=>y2)-$points(d=>d,m=>x1,n=>y1)))
+#define PDL_LINESEG(x01,y01,x02,y02,x11,y11,x12,y12,c,p) do { \
+  PDL_DCALC(dist1,c,x01,y01,x02,y02); \
+  PDL_DCALC(dist2,c,x11,y11,x12,y12); \
+  loop (d) %{ \
+    $segs(q=>p)   = PDL_PCALC(dist1,d,x01,y01,x02,y02); \
+    $segs(q=>p+1) = PDL_PCALC(dist2,d,x11,y11,x12,y12); \
+  %} \
+  p+=2; \
+  } while (0)
+#define PDL_CONTOUR_BREAK(x1,y1,x2,y2,c) \
+  (($data(m=>x1,n=>y1) < c) != ($data(m=>x2,n=>y2) < c))
+loop (n=:-1,m=:-1) %{
+  PDL_Indx m1=m+1, n1=n+1;
+  char brk_0010 = PDL_CONTOUR_BREAK(m,n,m1,n,$c()),
+       brk_0001 = PDL_CONTOUR_BREAK(m,n,m,n1,$c()),
+       brk_1011 = PDL_CONTOUR_BREAK(m1,n,m1,n1,$c()),
+       brk_0111 = PDL_CONTOUR_BREAK(m,n1,m1,n1,$c());
+  if (brk_0010 && brk_1011)
+    PDL_LINESEG(m,n,m1,n,m1,n,m1,n1,$c(),p); /* from m,n right, stretched right/down */
+  if (brk_0001 && brk_0010 && !brk_1011)
+    PDL_LINESEG(m,n,m1,n,m,n,m,n1,$c(),p); /* loop m,n, stretched right/down */
+  if (brk_0010 && brk_0111 && !brk_0001 && !brk_1011)
+    PDL_LINESEG(m,n,m1,n,m,n1,m1,n1,$c(),p); /* from m,n down, both stretched right */
+  if (brk_0001 && brk_0111 && !(brk_0010 && !brk_1011))
+    PDL_LINESEG(m,n,m,n1,m,n1,m1,n1,$c(),p); /* from m,n downward, stretched down/right */
+  if (brk_0001 && brk_1011 && !brk_0010 && !brk_0111)
+    PDL_LINESEG(m,n,m,n1,m1,n,m1,n1,$c(),p); /* from m,n rightward, both stretched downward */
+  if (brk_0111 && brk_1011 && !brk_0010)
+    PDL_LINESEG(m1,n,m1,n1,m,n1,m1,n1,$c(),p); /* from m1,n down/left, stretched down/left */
+%}
+#undef PDL_DCALC
+#undef PDL_PCALC
+#undef PDL_LINESEG
+#undef PDL_CONTOUR_BREAK
+$cnt()=p-1;
+EOF
+  Doc => <<'EOF',
+=for ref
+
+Finds a contour in given data. Takes 3 ndarrays as input:
+
+C<$c> is the contour value (broadcast with this)
+
+C<$data> is an [m,n] array of values at each point
+
+C<$points> is a list of [d,m,n] points. It should be a grid monotonically
+increasing with m and n.
+
+Returns C<$segs>, and C<$cnt> which is the highest 2nd-dim index in
+C<$segs> that's defined. The contours are a collection of disconnected
+line segments rather than a set of closed polygons.
+
+The data array represents samples of some field observed on the surface
+described by points. This uses a variant of the Marching Squares
+algorithm, though without being data-driven.
+EOF
+);
+
+pp_def('contour_polylines',
+  Pars => 'c(); data(m,n); points(d,m,n);
+    indx [o] pathendindex(q=CALC(($SIZE(m)-1)*($SIZE(n)-1)*5)); [o] paths(d,q);
+    byte [t] seenmap(m,n)',
+  GenericTypes => ['F'],
+  Code => <<'EOF',
+int dir2xy[4][2] = { /* 0 = east, 1 = south, 2 = west, 3 = north */
+  {1,0}, {0,1}, {-1,0}, {0,-1}
+};
+broadcastloop %{
+PDL_Indx polyind = 0, p = 0;
+loop (n,m) %{ $seenmap() = 0; %} /* & 1 = east, & 2 = south */
+loop (q) %{ $pathendindex() = -1; %}
+#define PDL_DCALC(vname,c,x1,y1,x2,y2) \
+  $GENERIC(points) vname = (c-$data(m=>x1,n=>y1))/($data(m=>x2,n=>y2)-$data(m=>x1,n=>y1))
+#define PDL_PCALC(dname,d,x1,y1,x2,y2) \
+  ($points(d=>d,m=>x1,n=>y1)+dname*($points(d=>d,m=>x2,n=>y2)-$points(d=>d,m=>x1,n=>y1)))
+#define PDL_LINEPOINT(x,y,dir,c,p) do { \
+  PDL_Indx x2 = x+dir2xy[dir][0], y2 = y+dir2xy[dir][1]; \
+  PDL_DCALC(dist,c,x,y,x2,y2); \
+  loop (d) %{ $paths(q=>p) = PDL_PCALC(dist,d,x,y,x2,y2); %} \
+  p++; \
+  } while (0)
+#define PDL_CONTOUR_BREAK(x,y,dir,c) \
+  (x >= 0 && x < $SIZE(m) && y >= 0 && y < $SIZE(n) && \
+   (x+dir2xy[dir][0]) >= 0 && (x+dir2xy[dir][0]) < $SIZE(m) && \
+   (y+dir2xy[dir][1]) >= 0 && (y+dir2xy[dir][1]) < $SIZE(n) && \
+   !((dir == 0 && ($seenmap(m=>x,n=>y) & (1<<dir))) || \
+     (dir == 1 && ($seenmap(m=>x,n=>y) & (1<<dir))) || \
+     (dir == 2 && ($seenmap(m=>x-1,n=>y) & (1<<(dir % 2)))) || \
+     (dir == 3 && ($seenmap(m=>x,n=>y-1) & (1<<(dir % 2)))) \
+   ) && \
+   (($data(m=>x,n=>y) < c) != ($data(m=>x+dir2xy[dir][0],n=>y+dir2xy[dir][1]) < c)))
+loop (n,m) %{
+  PDL_Indx m1=m+1, n1=n+1, linex=-1, liney=-1, linedir=-1;
+  /* linedir is same as dir, but outside linex/y and facing clockwise */
+  char brk_ab = PDL_CONTOUR_BREAK(m,n,0,$c()),
+       brk_ad = PDL_CONTOUR_BREAK(m,n,1,$c()),
+       brk_be = PDL_CONTOUR_BREAK(m1,n,1,$c()),
+       brk_cd = PDL_CONTOUR_BREAK(m,n1,2,$c()), /* actually dc */
+       brk_de = PDL_CONTOUR_BREAK(m,n1,0,$c());
+  if (brk_ab && (brk_ad || brk_de || brk_be))
+    linex = m, liney = n, linedir = 1;
+  else
+    $seenmap() |= 1;
+  if (linedir < 0 && brk_ad && brk_cd)
+    linex = m, liney = n, linedir = 2;
+  if (linedir < 0 && brk_ad && (brk_de || brk_be))
+    linex = m, liney = n1, linedir = 0;
+  if (linedir < 0) { $seenmap() |= 2; continue; }
+  PDL_Indx startlinex=linex, startliney=liney, startlinedir=linedir;
+  PDL_Float startmidx=linex+0.5*dir2xy[(linedir+3)%4][0], startmidy=liney+0.5*dir2xy[(linedir+3)%4][1]; /* of the line-segment */
+  PDL_Float startbackx=startmidx+0.5*dir2xy[(linedir+2)%4][0], startbacky=startmidy+0.5*dir2xy[(linedir+2)%4][1];
+  /* walk the line */
+  while (1) {
+    PDL_LINEPOINT(linex,liney,(linedir+3)%4,$c(),p);
+    switch (linedir) {
+      case 0: $seenmap(m=>linex,n=>liney-1) |= (1<<((linedir+1)%2)); break;
+      case 1: $seenmap(m=>linex,n=>liney)   |= (1<<((linedir+1)%2)); break;
+      case 2: $seenmap(m=>linex,n=>liney)   |= (1<<((linedir+1)%2)); break;
+      case 3: $seenmap(m=>linex-1,n=>liney) |= (1<<((linedir+1)%2)); break;
+      default: $CROAK("linedir had invalid value %"IND_FLAG, linedir);
+    }
+    char brk_right = PDL_CONTOUR_BREAK(linex,liney,linedir,$c()),
+         brk_straight = PDL_CONTOUR_BREAK(linex+dir2xy[linedir][0],liney+dir2xy[linedir][1],(linedir+3)%4,$c()),
+         brk_left = PDL_CONTOUR_BREAK(linex+dir2xy[(linedir+3)%4][0],liney+dir2xy[(linedir+3)%4][1],linedir,$c());
+    if (brk_right) {
+      linedir = (linedir+1)%4;
+      continue;
+    }
+    if (brk_straight) {
+      linex += dir2xy[linedir][0], liney += dir2xy[linedir][1];
+      continue;
+    }
+    if (brk_left) {
+      linex += dir2xy[linedir][0], liney += dir2xy[linedir][1]; /* step with */
+      linedir = (linedir+3)%4;
+      linex += dir2xy[linedir][0], liney += dir2xy[linedir][1]; /* and left */
+      continue;
+    }
+    break;
+  }
+  PDL_Float endmidx=linex+0.5*dir2xy[(linedir+3)%4][0], endmidy=liney+0.5*dir2xy[(linedir+3)%4][1];
+  PDL_Float endfrontx=endmidx+0.5*dir2xy[linedir][0], endfronty=endmidy+0.5*dir2xy[linedir][1];
+  if (endfrontx == startbackx && endfronty == startbacky) /* close polygon */
+    PDL_LINEPOINT(startlinex,startliney,(startlinedir+3)%4,$c(),p);
+  $pathendindex(q=>polyind++) = p - 1;
+%}
+%}
+#undef PDL_DCALC
+#undef PDL_PCALC
+#undef PDL_LINEPOINT
+#undef PDL_CONTOUR_BREAK
+EOF
+  Doc => <<'EOF',
+=for ref
+
+Finds polylines describing contours in given data. Takes 3 ndarrays as input:
+
+C<$c> is the contour value (broadcast with this)
+
+C<$data> is an [m,n] array of values at each point
+
+C<$points> is a list of [d,m,n] points. It should be a grid monotonically
+increasing with m and n.
+
+Returns C<$pathendindex>, and C<$paths>. Any C<$pathendindex> entries
+after the pointers to the ends of polylines are negative.
+
+=head3 Algorithm
+
+Has two modes: scanning, and line-walking. Scanning is done from the
+top left, along each row. Each point can be considered as, at C<a>:
+
+    a|b
+   +-+-
+  c|d|e
+
+Every potential boundary above, or to the left of (including the bottom
+boundaries), C<a> has been cleared (marked with a space above).
+
+=head4 Boundary detection
+
+This is done by first checking both points' coordinates are within
+bounds, then checking if the boundary is marked seen, then detecting
+whether the two cells' values cross the contour threshold.
+
+=head4 Scanning
+
+If detect boundary between C<a>-C<b>, and also C<a>-C<d>, C<d>-C<e>,
+or C<b>-C<e>, line-walking starts C<a>-C<b> facing south.
+
+If not, mark C<a>-C<b> seen.
+
+If detect boundary C<a>-C<d> and C<c>-C<d>, line-walking starts C<a>-C<d>
+facing west.
+
+If detect boundary C<a>-C<d> and also C<d>-C<e> or C<b>-C<e>, line-walking
+starts C<a>-C<d> facing east.
+
+If not, mark C<a>-C<d> seen, and continue scanning.
+
+=head4 Line-walking
+
+The conditions above guarantee that any line started will have at least
+two points, since two connected "points" (boundaries between two cells)
+have been detected. The coordinates of the back end of the starting
+"point" (boundary with direction) are recorded.
+
+At each, a line-point is emitted and that "point" is marked seen. The
+coordinates emitted are linearly interpolated between the coordinates
+of the two cells similarly to the Marching Squares algorithm.
+
+The next "point" is sought, looking in order right, straight ahead, then
+left. Each one not detected is marked seen. That order means the walked
+boundary will always turn as much right (go clockwise) as available,
+thereby guaranteeing enclosing the area, which deals with saddle points.
+
+If a next "point" is found, move to that and repeat.
+
+If not, then if the front of the ending "point" (boundary plus direction)
+is identical to the back of the starting point, a final point is emitted
+to close the shape. Then the polyline is closed by emitting the current
+point-counter into C<polyendindex>.
+
+=for usage
+
+  use PDL;
+  use PDL::ImageND;
+  use PDL::Graphics::Simple;
+  $SIZE = 500;
+  $vals = rvals($SIZE,$SIZE)->divide($SIZE/12.5)->sin;
+  @cntr_threshes = zeroes(9)->xlinvals($vals->minmax)->list;
+  $win = pgswin();
+  $xrange = [0,$vals->dim(0)-1]; $yrange = [0,$vals->dim(1)-1];
+  $win->plot(with=>'image', $vals, {xrange=>$xrange,yrange=>$yrange,j=>1},);
+  for $thresh (@cntr_threshes) {
+    ($pi, $p) = contour_polylines($thresh, $vals, $vals->ndcoords);
+    $pi_max = $pi->max;
+    next if $pi_max < 0;
+    $pi = $pi->where($pi > -1);
+    $p = $p->slice(',0:'.$pi_max);
+    @paths = path_segs($pi, $p->mv(0,-1));
+    $win->oplot(
+      (map +(with=>'lines', $_->dog), @paths),
+      {xrange=>$xrange,yrange=>$yrange,j=>1},
+    );
+  }
+  print "ret> "; <>;
+EOF
+);
+
+pp_def('path_join',
+  Pars => 'e(v=2,n);
+    indx [o] pathendindex(n); indx [o] paths(nout=CALC($SIZE(n)*2));
+    indx [t] highestoutedge(d); indx [t] outedges(d,d); byte [t] hasinward(d);
+    indx [t] sourceids(d);
+  ',
+  OtherPars => 'PDL_Indx d => d; int directed;',
+  OtherParsDefaults => { directed => 1 },
+  Code => <<'EOF',
+loop (d) %{ $highestoutedge() = -1; $hasinward() = 0; %}
+loop (n) %{ $pathendindex() = -1; %}
+loop (nout) %{ $paths() = -1; %}
+#define PDL_ADJ_ADD(idfrom,idto) \
+  do { \
+    if (idfrom >= $SIZE(d) || idfrom < 0) \
+      $CROAK("from index %"IND_FLAG"=%"IND_FLAG" out of bounds", n, idfrom); \
+    if (idto >= $SIZE(d) || idto < 0) \
+      $CROAK("to index %"IND_FLAG"=%"IND_FLAG" out of bounds", n, idto); \
+    PDL_Indx setind = ++$highestoutedge(d=>idfrom); \
+    if (setind >= $SIZE(d)) \
+      $CROAK("setind=%"IND_FLAG" exceeded d=%"IND_FLAG, setind, $SIZE(d)); \
+    $outedges(d0=>setind,d1=>idfrom) = idto; \
+    $hasinward(d=>idto) = 1; \
+  } while (0)
+loop (n) %{
+  PDL_Indx from = $e(v=>0), to = $e(v=>1);
+  PDL_ADJ_ADD(from,to);
+  if (!$COMP(directed)) PDL_ADJ_ADD(to,from);
+%}
+#undef PDL_ADJ_ADD
+PDL_Indx highest_no_inward = -1;
+loop (d) %{
+  if ($hasinward() || $highestoutedge() == -1) continue;
+  $sourceids(d=>++highest_no_inward) = d;
+%}
+PDL_Indx pind = 0, pcount = 0;
+while (1) {
+  PDL_Indx idthis = -1, idnext = -1;
+  if (highest_no_inward >= 0) {
+    idthis = $sourceids(d=>highest_no_inward);
+    if ($highestoutedge(d=>idthis) == 0) highest_no_inward--;
+  }
+  if (idthis == -1)
+    loop (d) %{
+      if ($highestoutedge() == -1) continue;
+      idthis = d; break;
+    %}
+  if (idthis == -1) break;
+  while (1) {
+    if (idthis == -1) break;
+    if (pind >= $SIZE(nout)) $CROAK("pind exceeded nout");
+    $paths(nout=>pind++) = idthis;
+    PDL_Indx edgehighest = $highestoutedge(d=>idthis), edgeidnext = -1;
+    if (edgehighest < 0) break;
+    idnext = -1;
+    loop (d0=edgehighest:0:-1) %{ /* look for non-sink */
+      PDL_Indx maybe_next = $outedges(d1=>idthis);
+      if ($highestoutedge(d=>maybe_next) <= 0) continue;
+      edgeidnext = d0;
+    %}
+    if (edgeidnext == -1) edgeidnext = edgehighest;
+    idnext = $outedges(d0=>edgeidnext,d1=>idthis);
+    if (edgeidnext != edgehighest)
+      loop (d0=edgeidnext:edgehighest) %{
+        $outedges(d1=>idthis) = $outedges(d0=>d0+1,d1=>idthis);
+      %}
+    $highestoutedge(d=>idthis) = edgehighest - 1;
+    if (!$COMP(directed)) { /* remove the edge in the other direction */
+      edgehighest = $highestoutedge(d=>idnext);
+      edgeidnext = -1;
+      loop (d0=edgehighest:0:-1) %{
+        PDL_Indx maybe_other = $outedges(d1=>idnext);
+        if (maybe_other != idthis) continue;
+        edgeidnext = d0;
+        break;
+      %}
+      if (edgeidnext == -1)
+        $CROAK("no other edge %"IND_FLAG"-%"IND_FLAG, idthis, idnext);
+      if (edgeidnext != edgehighest)
+        loop (d0=edgeidnext:edgehighest) %{
+          $outedges(d1=>idnext) = $outedges(d0=>d0+1,d1=>idnext);
+        %}
+      $highestoutedge(d=>idnext) = edgehighest - 1;
+    }
+    idthis = idnext;
+  }
+  if (pcount >= $SIZE(n)) $CROAK("pcount exceeded n");
+  $pathendindex(n=>pcount++) = pind - 1;
+  if (idthis == -1) break;
+}
+EOF
+  Doc => <<'EOF',
+=for ref
+
+Links a (by default directed) graph's edges into paths.
+
+The outputs are the indices into C<paths> ending each path. Past the last
+path, the indices are set to -1.
+EOF
+);
+
+pp_addpm(<<'EOPM');
+=head2 path_segs
+
+=for ref
+
+Divide a path into segments.
+
+=for usage
+
+  @segments = path_segs($pathindices, $paths);
+
+Returns a series of slices of the C<paths>, such as those created by
+L</path_join>, stopping at the first negative index. Currently does not
+broadcast.
+
+=for example
+
+  use PDL;
+  use PDL::ImageND;
+  use PDL::Graphics::Simple;
+  $SIZE = 500;
+  $vals = rvals($SIZE,$SIZE)->divide($SIZE/12.5)->sin;
+  @cntr_threshes = zeroes(9)->xlinvals($vals->minmax)->list;
+  $win = pgswin();
+  $xrange = [0,$vals->dim(0)-1]; $yrange = [0,$vals->dim(1)-1];
+  $win->plot(with=>'image', $vals, {xrange=>$xrange,yrange=>$yrange,j=>1},);
+  for $thresh (@cntr_threshes) {
+    my ($segs, $cnt) = contour_segments($thresh, $vals, $vals->ndcoords);
+    my $segscoords = $segs->slice(',0:'.$cnt->max)->clump(-1)->splitdim(0,4);
+    $linesegs = $segscoords->splitdim(0,2);
+    $uniqcoords = $linesegs->uniqvec;
+    next if $uniqcoords->dim(1) < 2;
+    $indexed = vsearchvec($linesegs, $uniqcoords)->uniqvec;
+    @paths = path_segs(path_join($indexed, $uniqcoords->dim(1), 0));
+    @paths = map $uniqcoords->dice_axis(1, $_)->mv(0,-1), @paths;
+    $win->oplot(
+      (map +(with=>'lines', $_->dog), @paths),
+      {xrange=>$xrange,yrange=>$yrange,j=>1},
+    );
+  }
+  print "ret> "; <>;
+
+=cut
+
+*path_segs = \&PDL::path_segs;
+sub PDL::path_segs {
+  my ($pi, $p) = @_;
+  my ($startind, @out) = 0;
+  for ($pi->list) {
+    last if $_ < 0;
+    push @out, $p->slice("$startind:$_");
+    $startind = $_ + 1;
+  }
+  @out;
+}
+EOPM
+pp_add_exported('','path_segs');
+
+pp_def('combcoords',
+	GenericTypes => ['F','D'],
+	DefaultFlow => 1,
+	Pars => 'x(); y(); z();
+		float [o]coords(tri=3);',
+	Code => '
+		$coords(tri => 0) = $x();
+		$coords(tri => 1) = $y();
+		$coords(tri => 2) = $z();
+	',
+	Doc => <<EOT
+=for ref
+
+Combine three coordinates into a single ndarray.
+
+Combine x, y and z to a single ndarray the first dimension
+of which is 3. This routine does dataflow automatically.
+EOT
+);
+
+pp_def('repulse',
+  GenericTypes => ['F','D'],
+  Pars => 'coords(nc,np); [o]vecs(nc,np); int [t]links(np);',
+  OtherPars => '
+    double boxsize;
+    int dmult;
+    double a;
+    double b;
+    double c;
+    double d;
+  ',
+  Code => <<'EOF',
+double a = $COMP(a);
+double b = $COMP(b);
+double c = $COMP(c);
+double d = $COMP(d);
+int ind; int x,y,z;
+HV *hv = newHV();
+double boxsize = $COMP(boxsize);
+int dmult = $COMP(dmult);
+loop(np) %{
+  int index = 0;
+  $links() = -1;
+  loop(nc) %{
+    $vecs() = 0;
+    index *= dmult;
+    index += (int)($coords()/boxsize);
+  %}
+  /* Repulse old (shame to use x,y,z...) */
+  for (x=-1; x<=1; x++) {
+    for (y=-1; y<=1; y++) {
+      for (z=-1; z<=1; z++) {
+        int ni = index + x + dmult * y + dmult * dmult * z;
+        SV **svp = hv_fetch(hv, (char *)&ni, sizeof(int), 0);
+        if (svp && *svp) {
+          ind = SvIV(*svp) - 1;
+          while (ind>=0) {
+            double dist = 0;
+            double dist2;
+            double tmp;
+            double func;
+            loop(nc) %{
+              tmp = ($coords() - $coords(np => ind));
+              dist += tmp * tmp;
+            %}
+            dist = sqrt(1/(sqrt(dist)+d));
+            func = c * dist;
+            dist2 = dist * dist;
+            func += b * dist2;
+            dist2 *= dist2;
+            func += a * dist2;
+            loop(nc) %{
+              tmp = ($coords() - $coords(np => ind));
+              $vecs() -= func * tmp;
+              $vecs(np => ind) += func * tmp;
+            %}
+            ind = $links(np => ind);
+          }
+        }
+      }
+    }
+  }
+  /* Store new */
+  SV **svp = hv_fetch(hv, (char *)&index, sizeof(index), 1);
+  if(!svp || !*svp)
+          $CROAK("Invalid sv from hvfetch");
+  SV *sv = *svp;
+  int npv;
+  if(SvOK(sv) && (npv = SvIV(sv))) {
+          npv --;
+          $links() = $links(np => npv);
+          $links(np => npv) = np;
+  } else {
+          sv_setiv(sv,np+1);
+          $links() = -1;
+  }
+%}
+hv_undef(hv);
+EOF
+  Doc => <<'EOF',
+=for ref
+
+Repulsive potential for molecule-like constructs.
+
+C<repulse> uses a hash table of cubes to quickly calculate
+a repulsive force that vanishes at infinity for many
+objects. For use by the module L<PDL::Graphics::TriD::MathGraph>.
+Checks all neighbouring boxes. The formula is:
+
+  (r = |dist|+d) a*r^-2 + b*r^-1 + c*r^-0.5
+EOF
+);
+
+pp_def('attract',
+  GenericTypes => ['F','D'],
+  Pars => 'coords(nc,np);
+          int from(nl);
+          int to(nl);
+          strength(nl);
+          [o]vecs(nc,np);',
+  OtherPars => '
+          double m;
+          double ms;
+  ',
+  Code => <<'EOF',
+double m = $COMP(m);
+double ms = $COMP(ms);
+loop(nc,np) %{ $vecs() = 0; %}
+loop(nl) %{
+  int f = $from();
+  int t = $to();
+  double s = $strength();
+  double dist = 0;
+  double tmp;
+  loop(nc) %{
+    tmp = $coords(np => f) - $coords(np => t);
+    dist += tmp * tmp;
+  %}
+  s *= ms * dist + m * sqrt(dist);
+  loop(nc) %{
+    tmp = $coords(np => f) - $coords(np => t);
+    $vecs(np => f) -= tmp * s;
+    $vecs(np => t) += tmp * s;
+  %}
+%}
+EOF
+  Doc => '
+=for ref
+
+Attractive potential for molecule-like constructs.
+
+C<attract> is used to calculate
+an attractive force for many
+objects, of which some attract each other (in a way
+like molecular bonds).
+For use by the module L<PDL::Graphics::TriD::MathGraph>.
+For definition of the potential, see the actual function.
+'
+);
+
+pp_done();

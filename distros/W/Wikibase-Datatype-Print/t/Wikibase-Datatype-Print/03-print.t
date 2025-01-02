@@ -6,7 +6,7 @@ use Error::Pure::Utils qw(clean);
 use Readonly;
 use Test::More 'tests' => 11;
 use Test::NoWarnings;
-use Test::Shared::Fixture::Wikibase::Datatype::Item::Wikidata::Dog;
+use Test::Shared::Fixture::Wikibase::Datatype::Item::Wikidata::Dog 0.36;
 use Test::Shared::Fixture::Wikibase::Datatype::Lexeme::Wikidata::DogCzechNoun;
 use Test::Shared::Fixture::Wikibase::Datatype::Mediainfo::Commons::ImageOfHuman;
 use Test::Shared::Fixture::Wikibase::Datatype::Property::Wikidata::InstanceOf;
@@ -61,6 +61,7 @@ Statements:
   P31: Q55983715 (normal)
    P642: Q20717272
    P642: Q26972265
+  P123456789: 4 (normal)
 END
 chomp $right_ret;
 is($ret, $right_ret, 'Get printed value (item).');
@@ -86,6 +87,7 @@ S t a t e m e n t s:
   P31: Q55983715 (n o r m a l)
    P642: Q20717272
    P642: Q26972265
+  P123456789: 4 (n o r m a l)
 END
 chomp $right_ret;
 is($ret, $right_ret, 'Get printed value (item with explicit texts).');

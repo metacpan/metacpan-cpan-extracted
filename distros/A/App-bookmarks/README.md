@@ -1,5 +1,5 @@
-bookmarks - Export browser bookmarks as plain text.
-===================================================
+bookmarks - Export bookmarks from browsers and files.
+=====================================================
 
 SYNOPSIS
 --------
@@ -8,16 +8,21 @@ SYNOPSIS
 
     -h, --help      help
     -V, --version   version
-    -d              debug
-    -a              all files : process arguments and default locations
-    -f format       any combination of letters t,u,d as title/url/description (default : tud)
+    -d              debug (sent to STDERR)
+    -a              all : process arguments and default locations
+    -f format       export format : csv, csv-noheader, html, html-raw, or any combination
+                    of characters t,u,d as <title> <url> <description> (default : tud)
     -s              find schemeless URLs in text files (default : no)
 
 
 DESCRIPTION
 -----------
 
-`bookmarks` is a tool to export bookmarks from files supplied as arguments, or from browsers default locations (when called without arguments). If file is a dash "-", STDIN is read and processed as plain text source. The following sources are supported :
+`bookmarks` is a tool to export bookmarks from files supplied as arguments.
+Without arguments, or with option -a, `bookmarks` will attempt to read files from browsers default locations.
+If file is a dash "-", STDIN is read and processed as plain text source. 
+
+Supported sources :
 
 - Safari (_*.plist_)
 - Firefox (_*.sqlite_)
@@ -29,13 +34,11 @@ DESCRIPTION
 - Surfraw (same as plain text)
 - Plain text (any other extension)
 
-Default export format : `<title> <url> <description>`
+Supported fields :
 
-- `<title>` is your bookmark's name, alias, or webpage title.
-- `<url>` is your bookmark's address, URL or URI.
-- `<description>` is empty for Chrome, Edge, Internet Explorer, Netscape or Gemini.
-  It contains Safari 'Description', Firefox 'Tags' and what the Markdown spec
-  calls the 'Title' (just the tooltip, actually).
+- `<title>` is the name, alias or title.
+- `<url>` is the address, URL or URI.
+- `<description>` is only supported for Safari 'Description', Firefox 'Tags' and Markdown 'Title' (just the tooltip, actually).
 
 Markdown, Gemini and plain text files are processed line by line (as UTF-8) :
 ```
@@ -43,6 +46,16 @@ Markdown, Gemini and plain text files are processed line by line (as UTF-8) :
   => gemini://example.gmi gemini example
   plain text example http://example.txt with description
 ```
+
+Output format :
+
+By default, fields <title> <url> <description> are exported as plain text. This can be changed by using option -f and specifying any combination of characters t,u,d.
+Other possible values :
+
+- `csv` : Comma-separated values with double-quotes and CR NL (RFC 4180).
+- `csv-noheader` : same as above, without header line.
+- `html` : Netscape Bookmarks File Format.
+- `html-raw` : raw list of HTML <A> elements.
 
 
 SEARCH BOOKMARKS INTERACTIVELY FROM CLI
@@ -124,7 +137,6 @@ All are optional.
 - Internet Explorer : Config::Any, Config::Tiny, Win32
 - Netscape : Netscape::Bookmarks
 - Plain text : URI::Find
-- Markdown : none
 
 
 SUPPORT AND DOCUMENTATION
@@ -149,7 +161,7 @@ You can also look for information at :
 LICENSE AND COPYRIGHT
 ---------------------
 
-This software is Copyright (c) 2019-2021 by jul.
+This software is Copyright (c) 2019-2025 by jul.
 
 This is free software, licensed under:
 

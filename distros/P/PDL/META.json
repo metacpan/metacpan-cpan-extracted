@@ -17,9 +17,6 @@
       "directory" : [
          "t",
          "inc"
-      ],
-      "file" : [
-         "Basic/Doc/scantree.pl"
       ]
    },
    "prereqs" : {
@@ -32,13 +29,8 @@
          }
       },
       "configure" : {
-         "recommends" : {
-            "ExtUtils::F77" : "1.10"
-         },
          "requires" : {
-            "Carp" : "1.2",
             "Devel::CheckLib" : "1.01",
-            "ExtUtils::Depends" : "0.402",
             "ExtUtils::MakeMaker" : "7.12",
             "File::Path" : "0",
             "File::Which" : "0"
@@ -46,17 +38,12 @@
       },
       "runtime" : {
          "recommends" : {
-            "Alien::proj" : "1.29",
-            "ExtUtils::F77" : "1.26",
+            "Astro::FITS::Header" : "2.1",
             "Inline" : "0.83",
             "Inline::C" : "0.62",
-            "OpenGL" : "0.70",
-            "OpenGL::GLUT" : "0.72",
-            "PGPLOT" : "2.29",
             "Term::ReadKey" : "2.34"
          },
          "requires" : {
-            "Alien::proj" : "1.29",
             "Data::Dumper" : "2.121",
             "File::Map" : "0.57",
             "File::Which" : "0",
@@ -68,17 +55,15 @@
             "Scalar::Util" : "0",
             "Storable" : "1.03",
             "Text::Balanced" : "2.05",
-            "perl" : "5.014"
+            "perl" : "5.016"
          },
          "suggests" : {
-            "Astro::FITS::Header" : "0",
             "Sys::SigAction" : "0"
          }
       },
       "test" : {
          "requires" : {
             "CPAN::Meta" : "2.120900",
-            "IPC::Cmd" : "0.72",
             "Test::Deep" : "0",
             "Test::Exception" : "0",
             "Test::Warn" : "0"
@@ -98,6 +83,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#pdl"
    },
-   "version" : "2.095",
+   "version" : "2.096",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -13,7 +13,7 @@ use Wikibase::Datatype::Print::Value::Monolingual;
 
 Readonly::Array our @EXPORT_OK => qw(print);
 
-our $VERSION = 0.17;
+our $VERSION = 0.18;
 
 sub print {
 	my ($obj, $opts_hr) = @_;
@@ -447,12 +447,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2020-2024 Michal Josef Špaček
+© 2020-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.17
+0.18
 
 =cut

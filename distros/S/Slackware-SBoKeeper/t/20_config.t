@@ -14,6 +14,7 @@ my $config = read_config($TEST_FILE, {
 	LowerCase       => sub { lc shift },
 	ExtraEquals     => sub { shift =~ s/=//gr },
 	ExtraWhitespace => sub { shift =~ s/\s+//gr },
+	Zero            => sub { shift },
 });
 
 is_deeply(
@@ -21,7 +22,8 @@ is_deeply(
 	{
 		LowerCase       => 'value',
 		ExtraEquals     => ' None  Of  These',
-		ExtraWhitespace => 'Weirdwhitespace'
+		ExtraWhitespace => 'Weirdwhitespace',
+		Zero            => '0',
 	},
 	'read_config() read file correctly'
 );

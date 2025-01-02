@@ -86,7 +86,7 @@ These routines accept either float or double ndarrays.
 
 =for sig
 
-  Signature: ([phys]DL(n); [phys]D(n); [phys]DU(n); [io,phys]B(n,nrhs); int [o,phys]info())
+  Signature: ([io]DL(n); [io]D(n); [io]DU(n); [io]B(n,nrhs); int [o]info())
 
 =for ref
 
@@ -541,7 +541,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (A(n,n); int jobvl(); int jobvr(); [o]wr(n); [o]wi(n); [o]vl(m,m); [o]vr(p,p); int [o]info())
+  Signature: ([io]A(n,n); int jobvl(); int jobvr(); [o]wr(n); [o]wi(n); [o]vl(m,m); [o]vr(p,p); int [o]info())
 
 =for ref
 
@@ -808,7 +808,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (A(n,n); int [phys]jobvl();int [phys]jobvr();B(n,n);[o]alphar(n);[o]alphai(n);[o]beta(n);[o]VL(m,m);[o]VR(p,p);int [o]info())
+  Signature: ([io]A(n,n); int jobvl();int jobvr();[io]B(n,n);[o]alphar(n);[o]alphai(n);[o]beta(n);[o]VL(m,m);[o]VR(p,p);int [o]info())
 
 =for ref
 
@@ -925,7 +925,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(n,n);int balanc();int jobvl();int jobvr();int sense();[io,phys]B(n,n);[o]alphar(n);[o]alphai(n);[o]beta(n);[o]VL(m,m);[o]VR(p,p);int [o]ilo();int [o]ihi();[o]lscale(n);[o]rscale(n);[o]abnrm();[o]bbnrm();[o]rconde(r);[o]rcondv(s);int [o]info(); int [t]bwork(bworkn); int [t]iwork(iworkn))
+  Signature: ([io]A(n,n);int balanc();int jobvl();int jobvr();int sense();[io]B(n,n);[o]alphar(n);[o]alphai(n);[o]beta(n);[o]VL(m,m);[o]VR(p,p);int [o]ilo();int [o]ihi();[o]lscale(n);[o]rscale(n);[o]abnrm();[o]bbnrm();[o]rconde(r);[o]rcondv(s);int [o]info(); int [t]bwork(bworkn); int [t]iwork(iworkn))
 
 =for ref
 
@@ -1760,7 +1760,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(n,n);  int jobz(); int uplo(); [o,phys]w(n); int [o,phys]info())
+  Signature: ([io]A(n,n);  int jobz(); int uplo(); [o]w(n); int [o]info())
 
 =for ref
 
@@ -1822,7 +1822,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(n,n);  int jobz(); int uplo(); [o,phys]w(n); int [o,phys]info())
+  Signature: ([io]A(n,n);  int jobz(); int uplo(); [o]w(n); int [o]info())
 
 =for ref
 
@@ -1895,7 +1895,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (A(n,n);  int jobz(); int range(); int uplo(); vl(); vu(); int il(); int iu(); abstol(); int [o]m(); [o]w(n); [o]z(p,p);int [o]ifail(n); int [o]info(); int [t]iwork(iworkn=CALC(5*$SIZE(n))))
+  Signature: ([io]A(n,n);  int jobz(); int range(); int uplo(); vl(); vu(); int il(); int iu(); abstol(); int [o]m(); [o]w(n); [o]z(p,p);int [o]ifail(n); int [o]info(); int [t]iwork(iworkn=CALC(5*$SIZE(n))))
 
 =for ref
 
@@ -2024,7 +2024,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]A(n,n);  int jobz(); int range(); int uplo(); [phys]vl(); [phys]vu(); int [phys]il(); int [phys]iu();[phys]abstol();int [o,phys]m();[o,phys]w(n); [o,phys]z(p,q);int [o,phys]isuppz(r); int [o,phys]info())
+  Signature: ([io]A(n,n);  int jobz(); int range(); int uplo(); vl(); vu(); int il(); int iu();abstol();int [o]m();[o]w(n); [o]z(p,q);int [o]isuppz(r); int [o]info())
 
 =for ref
 
@@ -2195,7 +2195,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(n,n);int [phys]itype();int jobz(); int uplo();[io,phys]B(n,n);[o,phys]w(n); int [o,phys]info())
+  Signature: ([io]A(n,n);int itype();int jobz(); int uplo();[io]B(n,n);[o]w(n); int [o]info())
 
 =for ref
 
@@ -2286,7 +2286,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(n,n);int [phys]itype();int jobz(); int uplo();[io,phys]B(n,n);[o,phys]w(n); int [o,phys]info())
+  Signature: ([io]A(n,n);int itype();int jobz(); int uplo();[io]B(n,n);[o]w(n); int [o]info())
 
 =for ref
 
@@ -2542,7 +2542,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(n,n);  [io,phys]B(n,m); int [o,phys]ipiv(n); int [o,phys]info())
+  Signature: ([io]A(n,n);  [io]B(n,m); int [o]ipiv(n); int [o]info())
 
 =for ref
 
@@ -2858,7 +2858,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(n,n);  int uplo(); [io,phys]B(n,m); int [o]ipiv(n); int [o]info())
+  Signature: ([io]A(n,n);  int uplo(); [io]B(n,m); int [o]ipiv(n); int [o]info())
 
 =for ref
 
@@ -2948,7 +2948,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]A(n,n); int uplo(); int fact(); [phys]B(n,m); [io,phys]af(n,n); int [io,phys]ipiv(n); [o]X(n,m); [o]rcond(); [o]ferr(m); [o]berr(m); int [o]info(); int [t]iwork(n))
+  Signature: (A(n,n); int uplo(); int fact(); B(n,m); [io]af(n,n); int [io]ipiv(n); [o]X(n,m); [o]rcond(); [o]ferr(m); [o]berr(m); int [o]info(); int [t]iwork(n))
 
 =for ref
 
@@ -3118,7 +3118,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(n,n);  int uplo(); [io,phys]B(n,m); int [o,phys]info())
+  Signature: ([io]A(n,n);  int uplo(); [io]B(n,m); int [o]info())
 
 =for ref
 
@@ -3195,7 +3195,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(n,n); int uplo(); int fact(); [io,phys]B(n,m); [io,phys]af(n,n); int [io]equed(); [o]s(p); [o,phys]X(n,m); [o,phys]rcond(); [o,phys]ferr(m); [o,phys]berr(m); int [o,phys]info(); int [t]iwork(n); [t]work(workn=CALC(3*$SIZE(n))))
+  Signature: ([io]A(n,n); int uplo(); int fact(); [io]B(n,m); [io]af(n,n); int [io]equed(); [o]s(p); [o]X(n,m); [o]rcond(); [o]ferr(m); [o]berr(m); int [o]info(); int [t]iwork(n); [t]work(workn=CALC(3*$SIZE(n))))
 
 =for ref
 
@@ -3405,7 +3405,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(m,n); int trans(); [io,phys]B(p,q);int [o,phys]info())
+  Signature: ([io]A(m,n); int trans(); [io]B(p,q);int [o]info())
 
 =for ref
 
@@ -3510,7 +3510,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(m,n); [io,phys]B(p,q); [phys]rcond(); int [io,phys]jpvt(n); int [o,phys]rank();int [o,phys]info())
+  Signature: ([io]A(m,n); [io]B(p,q); rcond(); int [io]jpvt(n); int [o]rank();int [o]info())
 
 =for ref
 
@@ -3611,7 +3611,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(m,n); [io,phys]B(p,q); [phys]rcond(); [o,phys]s(r); int [o,phys]rank();int [o,phys]info())
+  Signature: ([io]A(m,n); [io]B(p,q); rcond(); [o]s(r); int [o]rank();int [o]info())
 
 =for ref
 
@@ -3806,7 +3806,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]A(m,n); [phys]B(p,n);[io,phys]c(m);[phys]d(p);[o,phys]x(n);int [o,phys]info())
+  Signature: ([io]A(m,n); [io]B(p,n);[io]c(m);[io]d(p);[o]x(n);int [o]info())
 
 =for ref
 
@@ -3879,7 +3879,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]A(n,m); [phys]B(n,p);[phys]d(n);[o,phys]x(m);[o,phys]y(p);int [o,phys]info())
+  Signature: ([io]A(n,m); [io]B(n,p);[io]d(n);[o]x(m);[o]y(p);int [o]info())
 
 =for ref
 
@@ -4079,7 +4079,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(n,n); int uplo(); int [o,phys]ipiv(n); int [o,phys]info())
+  Signature: ([io]A(n,n); int uplo(); int [o]ipiv(n); int [o]info())
 
 =for ref
 
@@ -4193,7 +4193,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(n,n); int uplo(); int [o,phys]ipiv(n); int [o,phys]info())
+  Signature: ([io]A(n,n); int uplo(); int [o]ipiv(n); int [o]info())
 
 =for ref
 
@@ -4272,7 +4272,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(n,n); int uplo(); int [o,phys]info())
+  Signature: ([io]A(n,n); int uplo(); int [o]info())
 
 =for ref
 
@@ -4337,7 +4337,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(n,n); int uplo(); int [o,phys]info())
+  Signature: ([io]A(n,n); int uplo(); int [o]info())
 
 =for ref
 
@@ -4402,7 +4402,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(n,n); int [phys]ipiv(n); int [o,phys]info())
+  Signature: ([io]A(n,n); int ipiv(n); int [o]info())
 
 =for ref
 
@@ -4526,7 +4526,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(n,n); int uplo(); int [o,phys]info())
+  Signature: ([io]A(n,n); int uplo(); int [o]info())
 
 =for ref
 
@@ -4582,7 +4582,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(n,n); int uplo(); int diag(); int [o,phys]info())
+  Signature: ([io]A(n,n); int uplo(); int diag(); int [o]info())
 
 =for ref
 
@@ -4645,7 +4645,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(n,n); int uplo(); int diag(); int [o,phys]info())
+  Signature: ([io]A(n,n); int uplo(); int diag(); int [o]info())
 
 =for ref
 
@@ -4706,7 +4706,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]A(n,n); int trans(); [io,phys]B(n,m); int [phys]ipiv(n); int [o,phys]info())
+  Signature: (A(n,n); int trans(); [io]B(n,m); int ipiv(n); int [o]info())
 
 =for ref
 
@@ -4768,7 +4768,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]A(n,n); int uplo();[io,phys]B(n,m); int [phys]ipiv(n); int [o,phys]info())
+  Signature: (A(n,n); int uplo();[io]B(n,m); int ipiv(n); int [o]info())
 
 =for ref
 
@@ -4830,7 +4830,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]A(n,n); int uplo(); [io,phys]B(n,m); int [o,phys]info())
+  Signature: (A(n,n); int uplo(); [io]B(n,m); int [o]info())
 
 =for ref
 
@@ -4887,7 +4887,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]A(n,n); int uplo(); int trans(); int diag();[io,phys]B(n,m); int [o,phys]info())
+  Signature: (A(n,n); int uplo(); int trans(); int diag();[io]B(n,m); int [o]info())
 
 =for ref
 
@@ -4963,7 +4963,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]A(n,n); int uplo(); int trans(); int diag(); int normin();[io,phys]x(n); [o,phys]scale();[io,phys]cnorm(n);int [o,phys]info())
+  Signature: (A(n,n); int uplo(); int trans(); int diag(); int normin();[io]x(n); [o]scale();[io]cnorm(n);int [o]info())
 
 =for ref
 
@@ -5198,7 +5198,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]A(n,n); int uplo(); int ipiv(n); [phys]anorm(); [o,phys]rcond();int [o,phys]info(); int [t]iwork(n); [t]work(workn=CALC(2*$SIZE(n))))
+  Signature: (A(n,n); int uplo(); int ipiv(n); anorm(); [o]rcond();int [o]info(); int [t]iwork(n); [t]work(workn=CALC(2*$SIZE(n))))
 
 =for ref
 
@@ -5392,7 +5392,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(m,n); int [io,phys]jpvt(n); [o,phys]tau(k); int [o,phys]info())
+  Signature: ([io]A(m,n); int [io]jpvt(n); [o]tau(k); int [o]info())
 
 =for ref
 
@@ -5463,7 +5463,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(m,n); [o,phys]tau(k); int [o,phys]info())
+  Signature: ([io]A(m,n); [o]tau(k); int [o]info())
 
 =for ref
 
@@ -5526,7 +5526,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(m,n); [phys]tau(k); int [o,phys]info())
+  Signature: ([io]A(m,n); tau(k); int [o]info())
 
 =for ref
 
@@ -5582,7 +5582,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]A(p,k); int side(); int trans(); [phys]tau(k); [io,phys]C(m,n);int [o,phys]info())
+  Signature: (A(p,k); int side(); int trans(); tau(k); [io]C(m,n);int [o]info())
 
 =for ref
 
@@ -5659,7 +5659,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(m,n); [o,phys]tau(k); int [o,phys]info())
+  Signature: ([io]A(m,n); [o]tau(k); int [o]info())
 
 =for ref
 
@@ -5722,7 +5722,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(m,n); [phys]tau(k); int [o,phys]info())
+  Signature: ([io]A(m,n); tau(k); int [o]info())
 
 =for ref
 
@@ -5777,7 +5777,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]A(k,p); int side(); int trans(); [phys]tau(k); [io,phys]C(m,n);int [o,phys]info())
+  Signature: (A(k,p); int side(); int trans(); tau(k); [io]C(m,n);int [o]info())
 
 =for ref
 
@@ -5854,7 +5854,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(m,n); [o,phys]tau(k); int [o,phys]info())
+  Signature: ([io]A(m,n); [o]tau(k); int [o]info())
 
 =for ref
 
@@ -5919,7 +5919,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(m,n); [phys]tau(k); int [o,phys]info())
+  Signature: ([io]A(m,n); tau(k); int [o]info())
 
 =for ref
 
@@ -5975,7 +5975,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]A(p,k); int side(); int trans(); [phys]tau(k); [io,phys]C(m,n);int [o,phys]info())
+  Signature: (A(p,k); int side(); int trans(); tau(k); [io]C(m,n);int [o]info())
 
 =for ref
 
@@ -6052,7 +6052,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(m,n); [o,phys]tau(k); int [o,phys]info())
+  Signature: ([io]A(m,n); [o]tau(k); int [o]info())
 
 =for ref
 
@@ -6118,7 +6118,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(m,n); [phys]tau(k); int [o,phys]info())
+  Signature: ([io]A(m,n); tau(k); int [o]info())
 
 =for ref
 
@@ -6174,7 +6174,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]A(k,p); int side(); int trans(); [phys]tau(k); [io,phys]C(m,n);int [o,phys]info())
+  Signature: (A(k,p); int side(); int trans(); tau(k); [io]C(m,n);int [o]info())
 
 =for ref
 
@@ -6251,7 +6251,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(m,n); [o,phys]tau(k); int [o,phys]info())
+  Signature: ([io]A(m,n); [o]tau(k); int [o]info())
 
 =for ref
 
@@ -6334,7 +6334,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]A(k,p); int side(); int trans(); [phys]tau(k); [io,phys]C(m,n);int [o,phys]info())
+  Signature: (A(k,p); int side(); int trans(); tau(k); [io]C(m,n);int [o]info())
 
 =for ref
 
@@ -6411,7 +6411,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(n,n); int [phys]ilo();int [phys]ihi();[o,phys]tau(k); int [o,phys]info())
+  Signature: ([io]A(n,n); int ilo();int ihi();[o]tau(k); int [o]info())
 
 =for ref
 
@@ -6502,7 +6502,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(n,n); int [phys]ilo();int [phys]ihi();[phys]tau(k); int [o,phys]info())
+  Signature: ([io]A(n,n); int ilo();int ihi();tau(k); int [o]info())
 
 =for ref
 
@@ -6560,7 +6560,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]H(n,n); int job();int compz();int [phys]ilo();int [phys]ihi();[o,phys]wr(n); [o,phys]wi(n);[o,phys]Z(m,m); int [o,phys]info())
+  Signature: ([io]H(n,n); int job();int compz();int ilo();int ihi();[o]wr(n); [o]wi(n);[o]Z(m,m); int [o]info())
 
 =for ref
 
@@ -6660,7 +6660,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]T(n,n); int side();int howmny();int select(q);[o]VL(m,m); [o]VR(p,p);int [o]m(); int [o]info(); [t]work(workn=CALC(3*$SIZE(n))))
+  Signature: (T(n,n); int side();int howmny();int select(q);[o]VL(m,m); [o]VR(p,p);int [o]m(); int [o]info(); [t]work(workn=CALC(3*$SIZE(n))))
 
 =for ref
 
@@ -6812,7 +6812,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(n,n); int side();int howmny();[io]B(n,n);int select(q);[o]VL(m,m); [o]VR(p,p);int [o]m(); int [o]info(); [t]work(workn=CALC(6*$SIZE(n))))
+  Signature: (A(n,n); int side();int howmny();B(n,n);int select(q);[o]VL(m,m); [o]VR(p,p);int [o]m(); int [o]info(); [t]work(workn=CALC(6*$SIZE(n))))
 
 =for ref
 
@@ -6945,7 +6945,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(n,n); int job(); int [o,phys]ilo();int [o,phys]ihi();[o,phys]scale(n); int [o,phys]info())
+  Signature: ([io]A(n,n); int job(); int [o]ilo();int [o]ihi();[o]scale(n); int [o]info())
 
 =for ref
 
@@ -7047,7 +7047,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(n,m); int job(); int side();int [phys]ilo();int [phys]ihi();[phys]scale(n); int [o,phys]info())
+  Signature: ([io]A(n,m); int job(); int side();int ilo();int ihi();scale(n); int [o]info())
 
 =for ref
 
@@ -7116,7 +7116,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]A(n,m); int norm(); [o]b(); [t]work(workn))
+  Signature: (A(n,m); int norm(); [o]b(); [t]work(workn))
 
 =for ref
 
@@ -7320,7 +7320,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]A(m,n); int transa(); int transb(); [phys]B(p,q);[phys]alpha(); [phys]beta(); [io,phys]C(r,s))
+  Signature: (A(m,n); int transa(); int transb(); B(p,q);alpha(); beta(); [io]C(r,s))
 
 =for ref
 
@@ -7394,7 +7394,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]A(m,n); [phys]B(p,m); [o,phys]C(p,n))
+  Signature: (A(m,n); B(p,m); [o]C(p,n))
 
 =for ref
 
@@ -7421,7 +7421,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]A(n,m); [phys]B(p,m); [o,phys]C(p,n))
+  Signature: (A(n,m); B(p,m); [o]C(p,n))
 
 =for ref
 
@@ -7448,7 +7448,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]A(m,n); int uplo(); int trans(); [phys]alpha(); [phys]beta(); [io,phys]C(p,p))
+  Signature: (A(m,n); int uplo(); int trans(); alpha(); beta(); [io]C(p,p))
 
 =for ref
 
@@ -7532,7 +7532,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]a(n);[phys]b(n);[o,phys]c())
+  Signature: (a(n);b(n);[o]c())
 
 =for ref
 
@@ -7565,7 +7565,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]a(n);[phys] alpha();[io,phys]b(m))
+  Signature: (a(n); alpha();[io]b(m))
 
 =for ref
 
@@ -7599,7 +7599,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]a(n);[o]b())
+  Signature: (a(n);[o]b())
 
 =for ref
 
@@ -7608,7 +7608,7 @@ Euclidean norm of a vector using Blas.
 =for example
 
  $a = random(5);
- $norm2 = norm2($a)
+ $norm2 = nrm2($a)
 
 =for bad
 
@@ -7631,7 +7631,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]a(n);[o]b())
+  Signature: (a(n);[o]b())
 
 =for ref
 
@@ -7663,7 +7663,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]a(n);scale())
+  Signature: ([io]a(n);scale())
 
 =for ref
 
@@ -7695,7 +7695,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]a(n);[phys]c(); [phys]s();[io,phys]b(n))
+  Signature: ([io]a(n);c(); s();[io]b(n))
 
 =for ref
 
@@ -7728,7 +7728,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]a();[io,phys]b();[o,phys]c(); [o,phys]s())
+  Signature: ([io]a();[io]b();[o]c(); [o]s())
 
 =for ref
 
@@ -7760,7 +7760,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]d(n); int id();int [o,phys]info())
+  Signature: ([io]d(n); int id();int [o]info())
 
 =for ref
 
@@ -7810,7 +7810,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]A(m,n); int uplo(); [o,phys]B(p,n))
+  Signature: (A(m,n); int uplo(); [o]B(p,n))
 
 =for ref
 
@@ -7858,7 +7858,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(m,n);int [phys]k1();int [phys] k2(); int [phys]ipiv(p);int [phys]inc())
+  Signature: ([io]A(m,n);int k1();int  k2(); int ipiv(p);int inc())
 
 =for ref
 
@@ -7975,7 +7975,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]small(); [io,phys]large())
+  Signature: ([io]small(); [io]large())
 
 =for ref
 

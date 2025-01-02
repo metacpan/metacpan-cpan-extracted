@@ -42,13 +42,21 @@ use Dpkg::Vendor qw(run_vendor_hook);
 
 =over 4
 
-=item $bf = Dpkg::BuildFlags->new()
+=item $bf = Dpkg::BuildFlags->new(%opts)
 
 Create a new Dpkg::BuildFlags object. It will be initialized based
 on the value of several configuration files and environment variables.
 
-If the option B<vendor_defaults> is set to false, then no vendor defaults are
-initialized (it defaults to true).
+Options:
+
+=over
+
+=item B<vendor_defaults>
+
+If set to false, then no vendor defaults are initialized
+(it defaults to true).
+
+=back
 
 =cut
 

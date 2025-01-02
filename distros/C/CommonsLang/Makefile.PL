@@ -21,8 +21,8 @@ WriteMakefile(
                 resources   => {
                     repository => {
                         type => 'git',
-                        url  => 'https://github.com/dnmfarrell/foo.git',
-                        web  => 'https://github.com/dnmfarrell/foo'
+                        url  => 'https://github.com/yupen-q/CommonsLang.git',
+                        web  => 'https://github.com/yupen-q/CommonsLang'
                     }
                 }
             }

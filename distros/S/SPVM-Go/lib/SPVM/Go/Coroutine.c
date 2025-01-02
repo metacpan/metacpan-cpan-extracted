@@ -24,7 +24,7 @@ static void coroutine_handler (void* obj_self) {
   void* method = env->get_instance_method(env, stack, obj_task, "");
   
   stack[0].oval = obj_task;
-  error_id = env->call_method(env, stack, method, 0);
+  error_id = env->call_method(env, stack, method, 1);
   
   if (error_id) {
     void* obj_exception = env->get_exception(env, stack);

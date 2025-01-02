@@ -5,13 +5,14 @@ use strict;
 use warnings;
 
 use Test::Shared::Fixture::Wikibase::Datatype::Statement::Wikidata::InstanceOf::CommonLivingOrganism;
+use Test::Shared::Fixture::Wikibase::Datatype::Statement::Wikidata::NumberOfLimbs::Four;
 use Unicode::UTF8 qw(decode_utf8);
 use Wikibase::Datatype::Sitelink;
 use Wikibase::Datatype::Statement;
 use Wikibase::Datatype::Value::Item;
 use Wikibase::Datatype::Value::Monolingual;
 
-our $VERSION = 0.34;
+our $VERSION = 0.36;
 
 sub new {
 	my $class = shift;
@@ -80,6 +81,7 @@ sub new {
 		],
 		'statements' => [
 			Test::Shared::Fixture::Wikibase::Datatype::Statement::Wikidata::InstanceOf::CommonLivingOrganism->new,
+			Test::Shared::Fixture::Wikibase::Datatype::Statement::Wikidata::NumberOfLimbs::Four->new,
 		],
 		'title' => 'Q144',
 	);
@@ -249,6 +251,7 @@ Returns string.
  #   P31: Q55983715 (normal)
  #    P642: Q20717272
  #    P642: Q26972265
+ #   P123456789: 4 (normal)
 
 =head1 DEPENDENCIES
 
@@ -286,12 +289,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2020-2024 Michal Josef Špaček
+© 2020-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.34
+0.36
 
 =cut

@@ -8,7 +8,7 @@ use warnings;
 
 use Object::Pad 0.800;
 
-package App::sdview::Output::HTML 0.02;
+package App::sdview::Output::HTML 0.03;
 class App::sdview::Output::HTML
    :does(App::sdview::Output 0.13)
    :strict(params);
@@ -122,7 +122,8 @@ method _convert_str ( $s, $tag = undef )
          underline => "u",
          strikethrough => "s",
          # TODO: F
-         link => sub ($t, $v) { a => { href => $v->{target} };
+         link => sub ($t, $v) {
+            ( defined $v->{uri} ) ? ( a => { href => $v->{uri} } ) : ()
          },
       },
    )->as_html( $tag );

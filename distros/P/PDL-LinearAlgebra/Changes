@@ -1,3 +1,8 @@
+0.43 2025-01-02
+- fix Pars so their [io] or [o] matches docs enough - THIS CHANGES RETURN SIGNATURES (#28) - thanks @wlmb for report
+- added [o] or [io] to Pars for real and complex: gtsv geev ggev gglse ggglm syevx/cheevx syevr/cheevr
+- removed [io] from Pars in real and complex: trevc tgevc
+
 0.42 2024-12-07
 - fix t/cgtsv.t (#27) - thanks @wlmb
 

@@ -23,6 +23,10 @@
 #include <sys/mman.h>
 #endif
 
+#if defined(__sparc__) || defined(__sparc)
+# define XH_SPARC_ARCH
+#endif
+
 #if defined(sun) || defined(__sun)
 #  include <sys/isa_defs.h>
 #  if defined(_LITTLE_ENDIAN)

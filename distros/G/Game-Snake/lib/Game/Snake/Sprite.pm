@@ -1,6 +1,6 @@
 use 5.38.0;
 use experimental 'class';
-our $VERSION = 0.03;
+our $VERSION = 0.07;
 
 class Game::Snake::Sprite {
 	use Raylib::FFI;
@@ -61,3 +61,7 @@ class Game::Snake::Sprite {
 		DrawTexturePro($loaded, $image, $viewport, $vector, 0, Raylib::Color::WHITE);
 	}
 }
+
+=pod
+
+=cut

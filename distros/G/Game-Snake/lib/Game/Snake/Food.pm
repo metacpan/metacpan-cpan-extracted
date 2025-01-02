@@ -1,6 +1,6 @@
 use 5.38.0;
 use experimental 'class';
-our $VERSION = 0.03;
+our $VERSION = 0.07;
 class Game::Snake::Food {
 	use Raylib::App;
 	use Raylib::FFI;
@@ -34,3 +34,7 @@ class Game::Snake::Food {
 }
 
 1;
+
+=pod
+
+=cut

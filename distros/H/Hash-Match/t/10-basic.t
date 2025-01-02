@@ -333,20 +333,18 @@ subtest "regex key match (-all)" => sub {
 subtest "exceptions" => sub {
 
     throws_ok sub {
-	my $m = Hash::Match->new( rules => { badkey => { k => '1' } } );
+        my $m = Hash::Match->new( rules => { badkey => { k => '1' } } );
     }, qr/Unsupported key: 'badkey'/, "unrecognized key";
 
     my $foo = bless {}, 'Foo';
 
     throws_ok sub {
-	my $m = Hash::Match->new( rules => { k => $foo } );
+        my $m = Hash::Match->new( rules => { k => $foo } );
     }, qr/Unsupported type: 'Foo'/, "unrecognized key";
-
 
     throws_ok sub {
-	my $m = Hash::Match->new( rules => [ qr/k/ => $foo ] );
+        my $m = Hash::Match->new( rules => [ qr/k/ => $foo ] );
     }, qr/Unsupported type: 'Foo'/, "unrecognized key";
-
 
 };
 

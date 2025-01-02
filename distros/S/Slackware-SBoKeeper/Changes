@@ -1,5 +1,18 @@
 Revision history for sbokeeper.
 
+2.01 (1/1/2025):
+  Added:
+    * -t/--tag option: Specify a SlackBuild package tag. Corresponding 'Tag'
+      option for config files.
+    * 'print' command can now accept multiple categories as argument.
+    * RESTRICTIONS section to manual.
+    * Recognize slackrepo's default repo path.
+  Improvements:
+    * 'diff' now warns the user if a differing package does not exist in the
+      repo.
+  Fixes:
+    * Config file options can now be set to the string '0'.
+
 2.00 (12/18/2024):
   This release I intended to refactor sbokeeper so that it would be less
   monolithic and easier to use some of its components in other projects. This

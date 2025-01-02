@@ -32,6 +32,7 @@ SKIP: {
 		use warnings;
 		require POSIX;
 		my $required_error_message = q[(?:] . (quotemeta POSIX::strerror(POSIX::EACCES())) . q[|Permission[ ]denied)];
+		@INC = grep !/arch/, @INC; # making sure we're testing pure perl version
 		require Crypt::URandom;
 		my $generated = 0;
 		eval {

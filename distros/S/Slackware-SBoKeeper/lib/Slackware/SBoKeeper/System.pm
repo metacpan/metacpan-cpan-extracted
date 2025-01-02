@@ -1,5 +1,5 @@
 package Slackware::SBoKeeper::System;
-our $VERSION = '2.00';
+our $VERSION = '2.01';
 use 5.016;
 use strict;
 use warnings;
@@ -36,7 +36,7 @@ sub _slackware_version {
 }
 
 my $SLACKWARE_VERSION = _slackware_version();
-my $IS_SLACKWARE = defined $SLACKWARE_VERSION ? 1 : 0;
+my $IS_SLACKWARE = defined $SLACKWARE_VERSION;
 
 my $PKGTOOL_LOGS = undef;
 my %PACKAGES;
@@ -161,7 +161,7 @@ Written by Samuel Young, E<lt>samyoung12788@gmail.comE<gt>.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2024, Samuel Young
+Copyright (C) 2024-2025, Samuel Young
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of either: the GNU General Public License as published by the Free

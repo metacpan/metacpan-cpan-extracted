@@ -3,7 +3,7 @@ use warnings;
 
 use English;
 use Error::Pure::Utils qw(clean);
-use Test::More 'tests' => 9;
+use Test::More 'tests' => 7;
 use Test::NoWarnings;
 use Wikibase::Datatype::Value::Quantity;
 
@@ -46,19 +46,8 @@ eval {
 		'value' => 10,
 	);
 };
-is($EVAL_ERROR, "Parameter 'lower_bound' must be less than value.\n",
-	"Parameter 'lower_bound' must be less than value.");
-clean();
-
-# Test.
-eval {
-	Wikibase::Datatype::Value::Quantity->new(
-		'lower_bound' => 10,
-		'value' => 10,
-	);
-};
-is($EVAL_ERROR, "Parameter 'lower_bound' must be less than value.\n",
-	"Parameter 'lower_bound' must be less than value. Same value.");
+is($EVAL_ERROR, "Parameter 'lower_bound' must be less than or equal to value.\n",
+	"Parameter 'lower_bound' must be less than or equal to value.");
 clean();
 
 # Test.
@@ -68,17 +57,6 @@ eval {
 		'value' => 10,
 	);
 };
-is($EVAL_ERROR, "Parameter 'upper_bound' must be greater than value.\n",
-	"Parameter 'upper_bound' must be greater than value.");
-clean();
-
-# Test.
-eval {
-	Wikibase::Datatype::Value::Quantity->new(
-		'upper_bound' => 10,
-		'value' => 10,
-	);
-};
-is($EVAL_ERROR, "Parameter 'upper_bound' must be greater than value.\n",
-	"Parameter 'upper_bound' must be greater than value. Same value.");
+is($EVAL_ERROR, "Parameter 'upper_bound' must be greater than or equal to value.\n",
+	"Parameter 'upper_bound' must be greater than or equal to value.");
 clean();

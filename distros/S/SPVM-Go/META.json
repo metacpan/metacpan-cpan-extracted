@@ -50,6 +50,6 @@
          "web" : "https://github.com/yuki-kimoto/SPVM-Go"
       }
    },
-   "version" : "0.007003",
+   "version" : "0.008001",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

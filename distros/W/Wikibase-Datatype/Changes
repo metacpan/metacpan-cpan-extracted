@@ -1,3 +1,14 @@
+0.36 2025-01-01T22:02:29+01:00
+ - Error message change: Fix check of quantity upperBound and lowerBound.
+   They could be same as amount. Fix errors.
+ - Fixture API change: Add statement to Dog item.
+ - Add new fixtures with quantity.
+
+0.35 2025-01-01T15:09:35+01:00
+ - Update Wikibase content language codes.
+ - Update copyright years.
+ - Update mediawiki language codes.
+
 0.34 2024-11-10T17:03:15+01:00
  - Add tests.
  - Update copyright years.

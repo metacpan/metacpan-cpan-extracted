@@ -1,6 +1,12 @@
 # Change Log
 
-## [0.0.5] - 2024-10-05
+## [0.0.7] - 2025-01-01
+
+### Added
+
+- Added star on the top of the tree
+
+## [0.0.6] - 2024-10-05
 
 ### Fixed
 

@@ -53,15 +53,15 @@ my $AR_HDR_LEN = 60;
 
 Create a new object to handle Unix ar archives.
 
-Supported options are:
+Options:
 
 =over 8
 
-=item filename
+=item B<filename>
 
 The filename for the archive to open or create.
 
-=item create
+=item B<create>
 
 A boolean denoting whether the archive should be created,
 otherwise if it does not exist the constructor will not open, create or
@@ -303,10 +303,10 @@ sub _copy_fh_fh {
         my $n = $if->{fh}->read($buf, $buflen)
             or syserr(g_('cannot read file %s'), $if->{name});
 
-        $of->{fh}->write($buf, $buflen)
+        $of->{fh}->write($buf, $n)
             or syserr(g_('cannot write file %s'), $of->{name});
 
-        $size -= $buflen;
+        $size -= $n;
     }
 
     return;

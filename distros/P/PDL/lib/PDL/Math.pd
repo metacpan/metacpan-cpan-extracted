@@ -1,0 +1,506 @@
+use strict;
+use warnings;
+use Config;
+use PDL::Types qw(ppdefs ppdefs_complex types);
+require PDL::Core::Dev;
+
+{ # pass info back to Makefile.PL
+# Files for each routine (.c assumed)
+my %source = qw(
+  j0 j0
+  j1 j1
+  jn jn
+  y0 j0
+  y1 j1
+  yn yn
+);
+my @keys = sort keys %source;
+my $libs = PDL::Core::Dev::get_maths_libs();
+# Test for presence of besfuncs
+require File::Spec::Functions;
+my $include = qq{#include "}.File::Spec::Functions::rel2abs("$::PDLBASE/mconf.h").qq{"};
+$source{$_} = 'system' for grep PDL::Core::Dev::trylink('', $include, "$_(1.);", $libs), qw(j0 j1 y0 y1);
+$source{$_} = 'system' for grep PDL::Core::Dev::trylink('', $include, "$_(1,1.);", $libs), qw(jn yn);
+my %seen; # Build object file list
+foreach my $func (@keys) {
+   my $file = $source{$func};
+   next if $file eq 'system';
+   die "File for function $func not found\n" if $file eq '';
+   $PDL::Core::Dev::EXTRAS{$::PDLMOD}{OBJECT} .= " $::PDLBASE/$file\$(OBJ_EXT)" unless $seen{$file}++;
+}
+# Add support routines
+$PDL::Core::Dev::EXTRAS{$::PDLMOD}{OBJECT} .= join '', map " $::PDLBASE/$_\$(OBJ_EXT)", qw(const mtherr polevl cpoly ndtri);
+$PDL::Core::Dev::EXTRAS{$::PDLMOD}{INC} .= qq{ "-I$::PDLBASE"};
+}
+
+my $R = [ppdefs()];
+my $F = [map $_->ppsym, grep $_->real && !$_->integer, types()];
+my $C = [ppdefs_complex()];
+my @Rtypes = grep $_->real, types();
+my @Ctypes = grep !$_->real, types();
+
+pp_addpm({At=>'Top'},<<'EOD');
+use strict;
+use warnings;
+
+=head1 NAME
+
+PDL::Math - extended mathematical operations and special functions
+
+=head1 SYNOPSIS
+
+ use PDL::Math;
+
+ use PDL::Graphics::TriD;
+ imag3d [SURF2D,bessj0(rvals(zeroes(50,50))/2)];
+
+=head1 DESCRIPTION
+
+This module extends PDL with more advanced mathematical functions than
+provided by standard Perl.
+
+All the functions have one input pdl, and one output, unless otherwise
+stated.
+
+Many of the functions are linked from the system maths library or the
+Cephes maths library (determined when PDL is compiled); a few are implemented
+entirely in PDL.
+
+=cut
+
+### Kludge for backwards compatibility with older scripts
+### This should be deleted at some point later than 21-Nov-2003.
+BEGIN {use PDL::MatrixOps;}
+
+EOD
+
+# Internal doc util
+
+my %doco;
+sub doco {
+  my @funcs = @_;
+  my $doc = pop @funcs;
+  for (@funcs) { $doco{$_} = $doc }
+}
+
+doco (qw/acos asin atan tan/, <<'EOF');
+The usual trigonometric function.
+EOF
+
+doco (qw/cosh sinh tanh acosh asinh atanh/, <<'EOF');
+The standard hyperbolic function.
+EOF
+
+doco (qw/ceil floor/,
+'Round to integer values in floating-point format.');
+
+doco ('rint',
+q/=for ref
+
+Round to integer values in floating-point format.
+
+This is the C99 function; previous to 2.096, the doc referred to a
+bespoke function that did banker's rounding, but this was not used
+as a system version will have been detected and used.
+
+If you are looking to round half-integers up (regardless of sign), try
+C<floor($x+0.5)>.  If you want to round half-integers away from zero,
+try C<< ceil(abs($x)+0.5)*($x<=>0) >>./);
+
+doco( 'pow',"Synonym for `**'.");
+
+doco ('erf',"The error function.");
+doco ('erfc',"The complement of the error function.");
+doco ('erfi',"The inverse of the error function.");
+doco ('ndtri',
+"=for ref
+
+The value for which the area under the
+Gaussian probability density function (integrated from
+minus infinity) is equal to the argument (cf L</erfi>).");
+
+doco(qw/bessj0 bessj1/,
+     "The regular Bessel function of the first kind, J_n" );
+
+doco(qw/bessy0 bessy1/,
+     "The regular Bessel function of the second kind, Y_n." );
+
+doco( qw/bessjn/,
+'=for ref
+
+The regular Bessel function of the first kind, J_n
+.
+This takes a second int argument which gives the order
+of the function required.
+');
+
+doco( qw/bessyn/,
+'=for ref
+
+The regular Bessel function of the first kind, Y_n
+.
+This takes a second int argument which gives the order
+of the function required.
+');
+
+if ($^O !~ /win32/i || $Config{cc} =~ /\bgcc/i) {  # doesn't seem to be in the MS VC lib
+doco( 'lgamma' ,<<'EOD');
+=for ref
+
+log gamma function
+
+This returns 2 ndarrays -- the first set gives the log(gamma) values,
+while the second set, of integer values, gives the sign of the gamma
+function.  This is useful for determining factorials, amongst other
+things.
+
+EOD
+
+} # if: $^O !~ win32
+
+pp_addhdr('
+#include <tgmath.h>
+#include "protos.h"
+#include "cpoly.h"
+');
+
+# Standard `-lm'
+my (@ufuncs1) = qw(acos asin atan cosh sinh tan tanh); # F,D only
+my (@ufuncs1g) = qw(ceil floor rint); # Any real type
+
+# Note:
+#  ops.pd has a power() function that does the same thing
+#  (although it has OtherPars => 'int swap;' as well)
+#  - left this in for now.
+#
+my (@bifuncs1) = qw(pow); # Any type
+
+# Extended `-lm'
+my (@ufuncs2) = qw(acosh asinh atanh erf erfc);  # F,D only
+my (@besufuncs) = qw(j0 j1 y0 y1); # "
+my (@besbifuncs) = qw(jn yn); # "
+# Need igamma, ibeta, and a fall-back implementation of the above
+
+sub code_ufunc {
+<<EOF
+PDL_IF_BAD(if ( \$ISBAD(a()) ) { \$SETBAD(b()); } else,)
+  \$b() = $_[0](\$a());
+EOF
+}
+
+sub code_bifunc {
+    my $name = $_[0];
+    my $x = $_[1] || 'a'; my $y = $_[2] || 'b'; my $c = $_[3] || 'c';
+<<EOF
+PDL_IF_BAD(if ( \$ISBAD($x()) || \$ISBAD($y()) ) { \$SETBAD($c()); } else,)
+  \$$c() = $name(\$$x(),\$$y());
+EOF
+}
+
+sub inplace_doc {
+    my $func = shift;
+    return "$doco{$func} Works inplace.";
+}
+
+foreach my $func (@ufuncs1) {
+    my $got_complex = PDL::Core::Dev::got_complex_version($func, 1);
+    pp_def($func,
+	   HandleBad => 1,
+	   NoBadifNaN => 1,
+	   GenericTypes => [($got_complex ? @$C : ()), @$F],
+	   Pars => 'a(); [o]b();',
+	   Inplace => 1,
+	   Doc => inplace_doc( $func ),
+	   Code => code_ufunc($func),
+	   );
+}
+# real types
+foreach my $func (@ufuncs1g) {
+    pp_def($func,
+	   HandleBad => 1,
+	   NoBadifNaN => 1,
+	   Pars => 'a(); [o]b();',
+	   Inplace => 1,
+	   Doc => inplace_doc( $func ),
+	   Code => code_ufunc($func),
+	   );
+}
+
+foreach my $func (@bifuncs1) {
+    my $got_complex = PDL::Core::Dev::got_complex_version($func, 2);
+    pp_def($func,
+	   HandleBad => 1,
+	   NoBadifNaN => 1,
+	   Pars => 'a(); b(); [o]c();',
+	   Inplace => [ 'a' ],
+	   GenericTypes => [($got_complex ? @$C : ()), @$R],
+	   Doc => inplace_doc( $func ),
+	   Code => code_bifunc($func),
+	   );
+}
+
+# Functions provided by extended -lm
+foreach my $func (@ufuncs2) {
+    pp_def($func,
+	   HandleBad => 1,
+	   NoBadifNaN => 1,
+	   GenericTypes => $F,
+	   Pars => 'a(); [o]b();',
+	   Inplace => 1,
+	   Doc => inplace_doc( $func ),
+	   Code => code_ufunc($func),
+	   );
+}
+
+foreach my $func (@besufuncs) {
+    my $fname = "bess$func";
+    pp_def($fname,
+	   HandleBad => 1,
+	   NoBadifNaN => 1,
+	   GenericTypes => $F,
+	   Pars => 'a(); [o]b();',
+	   Inplace => 1,
+	   Doc => inplace_doc( $fname ),
+	   Code => code_ufunc($func),
+	   );
+}
+
+foreach my $func (@besbifuncs) {
+    my $fname = "bess$func";
+    pp_def($fname,
+	   HandleBad => 1,
+	   NoBadifNaN => 1,
+	   GenericTypes => $F,
+	   Pars => 'a(); int n(); [o]b();',
+	   Inplace => [ 'a' ],
+	   Doc => inplace_doc( $fname ),
+	   Code => code_bifunc($func,'n','a','b'),
+	   );
+}
+
+if ($^O !~ /win32/i) {
+    pp_def("lgamma",
+	   HandleBad => 1,
+	   Pars => 'a(); [o]b(); int[o]s()',
+	   Doc => $doco{"lgamma"},
+	   Code => '
+	    extern int signgam;
+	    PDL_IF_BAD(if ( $ISBAD(a()) ) { $SETBAD(b()); $SETBAD(s()); } else,) {
+	      $b() = lgamma($a());
+	      $s() = signgam;
+	    }
+	   ',     # what happens to signgam if $a() is bad?
+	   );
+} # if: os !~ win32
+
+elsif ($Config{cc} =~ /\bgcc/i) {
+    pp_def("lgamma",
+	   HandleBad => 1,
+	   Pars => 'a(); [o]b(); int[o]s()',
+	   Doc => $doco{"lgamma"},
+	   Code => '
+	    PDL_IF_BAD(if ( $ISBAD(a()) ) { $SETBAD(b()); $SETBAD(s()); } else,) {
+	    $b() = lgamma($a());
+	    $s() = tgamma($a()) < 0 ? -1 : 1;
+	    }
+	    ',     # what happens to signgam if $a() is bad?
+	   );
+} # elsif: cc =~ /\bgcc/i
+
+pp_def('isfinite',
+  Pars => 'a(); int [o]mask();',
+  HandleBad => 1,
+  Code => <<'EOF',
+broadcastloop %{
+  $mask() = isfinite((double) $a()) != 0 PDL_IF_BAD(&& $ISGOOD($a()),);
+%}
+$PDLSTATESETGOOD(mask);
+EOF
+  Doc =>
+'Sets C<$mask> true if C<$a> is not a C<NaN> or C<inf> (either positive or negative). Works inplace.',
+  BadDoc =>
+'Bad values are treated as C<NaN> or C<inf>.',
+);
+
+# Extra functions from cephes
+pp_def("erfi",
+       HandleBad => 1,
+       NoBadifNaN => 1,
+       GenericTypes => $F,
+       Pars => 'a(); [o]b()',
+       Inplace => 1,
+       Doc => inplace_doc( "erfi" ),
+       Code =>
+       'extern double SQRTH;
+        PDL_IF_BAD(if ( $ISBAD(a()) ) { $SETBAD(b()); }
+        else,) { $b() = SQRTH*ndtri((1+(double)$a())/2); }',
+       );
+
+pp_def("ndtri",
+       HandleBad => 1,
+       NoBadifNaN => 1,
+       GenericTypes => $F,
+       Pars => 'a(); [o]b()',
+       Inplace => 1,
+       Doc => inplace_doc( "ndtri" ),
+       Code =>
+       'PDL_IF_BAD(if ( $ISBAD(a()) ) { $SETBAD(b()); }
+	else,) { $b() = ndtri((double)$a()); }',
+       );
+
+pp_def("polyroots",
+      Pars => 'cr(n); ci(n); [o]rr(m=CALC($SIZE(n)-1)); [o]ri(m);',
+      GenericTypes => ['D'],
+      Code => <<'EOF',
+  char *fail = cpoly($P(cr), $P(ci), $SIZE(m), $P(rr), $P(ri));
+  if (fail)
+     $CROAK("cpoly: %s", fail);
+EOF
+      PMCode => pp_line_numbers(__LINE__, <<'EOF'),
+sub PDL::polyroots {
+  my @args = map PDL->topdl($_), @_;
+  my $natcplx = !$args[0]->type->real;
+  barf "need array context" if !$natcplx and !(wantarray//1);
+  splice @args, 0, 1, map $args[0]->$_, qw(re im) if $natcplx;
+  $_ //= PDL->null for @args[2,3];
+  PDL::_polyroots_int(@args);
+  $natcplx ? $args[2]->czip($args[3]) : @args[2,3];
+}
+EOF
+      Doc => '
+=for ref
+
+Complex roots of a complex polynomial, given coefficients in order
+of decreasing powers. Only works for degree >= 1.
+Uses the Jenkins-Traub algorithm (see
+L<https://en.wikipedia.org/wiki/Jenkins%E2%80%93Traub_algorithm>).
+As of 2.086, works with native-complex data.
+
+=for usage
+
+ $roots = polyroots($coeffs); # native complex
+ ($rr, $ri) = polyroots($cr, $ci);
+',);
+
+pp_def("polyfromroots",
+      Pars => 'r(m); [o]c(n=CALC($SIZE(m)+1));',
+      GenericTypes => ['CD'],
+      Code => <<'EOF',
+/*
+algorithm from octave poly.m, O(n^2)
+per https://cs.stackexchange.com/questions/116643/what-is-the-most-efficient-algorithm-to-compute-polynomial-coefficients-from-its, FFT allows O(n*log(n)^2)
+*/
+$c(n=>0) = 1.0;
+loop(m) %{ $c(n=>m+1) = 0.0; %}
+PDL_Indx k;
+loop(m) %{
+  for (k = m; k >= 0; k--) /* count down to use data before we mutate */
+    $c(n=>k+1) -= $r() * $c(n=>k);
+%}
+EOF
+      PMCode => pp_line_numbers(__LINE__, <<'EOF'),
+sub PDL::polyfromroots {
+  my @args = map PDL->topdl($_), @_;
+  my $natcplx = !$args[0]->type->real;
+  barf "need array context" if !$natcplx and !(wantarray//1);
+  if (!$natcplx) {
+    splice @args, 0, 2, $args[0]->czip($args[1]); # r
+  }
+  my @ins = splice @args, 0, 1;
+  my $explicit_out = my @outs = @args;
+  if ($natcplx) {
+    $_ //= PDL->null for $outs[0];
+  } else {
+    $_ //= PDL->null for @outs[0,1];
+  }
+  my @args_out = $natcplx ? @outs : PDL->null;
+  PDL::_polyfromroots_int(@ins, @args_out);
+  if (!$natcplx) {
+    $outs[0] .= $args_out[0]->re;
+    $outs[1] .= $args_out[0]->im;
+  }
+  $natcplx ? $outs[0] : @outs;
+}
+EOF
+      Doc => '
+=for ref
+
+Calculates the complex coefficients of a polynomial from its complex
+roots, in order of decreasing powers. Added in 2.086, works with
+native-complex data. Currently C<O(n^2)>.
+
+=for usage
+
+ $coeffs = polyfromroots($roots); # native complex
+ ($cr, $ci) = polyfromroots($rr, $ri);
+',);
+
+pp_def("polyval",
+      Pars => 'c(n); x(); [o]y();',
+      GenericTypes => ['CD'],
+      Code => <<'EOF',
+$GENERIC(y) vc = $c(n=>0), sc = $x();
+loop(n=1) %{ vc = vc*sc + $c(); %}
+$y() = vc;
+EOF
+      PMCode => pp_line_numbers(__LINE__, <<'EOF'),
+sub PDL::polyval {
+  my @args = map PDL->topdl($_), @_;
+  my $natcplx = !$args[0]->type->real;
+  barf "need array context" if !$natcplx and !(wantarray//1);
+  if (!$natcplx) {
+    splice @args, 0, 2, $args[0]->czip($args[1]); # c
+    splice @args, 1, 2, $args[1]->czip($args[2]); # x
+  }
+  my @ins = splice @args, 0, 2;
+  my $explicit_out = my @outs = @args;
+  if ($natcplx) {
+    $_ //= PDL->null for $outs[0];
+  } else {
+    $_ //= PDL->null for @outs[0,1];
+  }
+  my @args_out = $natcplx ? @outs : PDL->null;
+  PDL::_polyval_int(@ins, @args_out);
+  if (!$natcplx) {
+    $outs[0] .= $args_out[0]->re;
+    $outs[1] .= $args_out[0]->im;
+  }
+  $natcplx ? $outs[0] : @outs;
+}
+EOF
+      Doc => '
+=for ref
+
+Complex value of a complex polynomial at given point, given coefficients
+in order of decreasing powers. Uses Horner recurrence. Added in 2.086,
+works with native-complex data.
+
+=for usage
+
+ $y = polyval($coeffs, $x); # native complex
+ ($yr, $yi) = polyval($cr, $ci, $xr, $xi);
+',);
+
+pp_addpm({At=>'Bot'},<<'EOD');
+
+=head1 BUGS
+
+Hasn't been tested on all platforms to ensure Cephes
+versions are picked up automatically and used correctly.
+
+=head1 AUTHOR
+
+Copyright (C) R.J.R. Williams 1997 (rjrw@ast.leeds.ac.uk), Karl Glazebrook
+(kgb@aaoepp.aao.gov.au) and Tuomas J. Lukka (Tuomas.Lukka@helsinki.fi).
+Portions (C) Craig DeForest 2002 (deforest@boulder.swri.edu).
+
+All rights reserved. There is no warranty. You are allowed
+to redistribute this software / documentation under certain
+conditions. For details, see the file COPYING in the PDL
+distribution. If this file is separated from the PDL distribution,
+the PDL copyright notice should be included in the file.
+
+=cut
+
+EOD
+pp_done();

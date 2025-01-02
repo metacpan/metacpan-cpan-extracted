@@ -128,7 +128,7 @@ EOD
 
 pp_def("gtsv",
 	HandleBad => 0,
-	Pars => '[phys]DL(n); [phys]D(n); [phys]DU(n); [io,phys]B(n,nrhs); int [o,phys]info()',
+	Pars => '[io]DL(n); [io]D(n); [io]DU(n); [io]B(n,nrhs); int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
 		extern int FORTRAN($TFD(s,d)gtsv)(integer *n, integer *nrhs,
@@ -773,7 +773,7 @@ form by taking the nonsingular matrix X as
 
 pp_def("geev",
        HandleBad => 0,
-	Pars => 'A(n,n); int jobvl(); int jobvr(); [o]wr(n); [o]wi(n); [o]vl(m,m); [o]vr(p,p); int [o]info()',
+	Pars => '[io]A(n,n); int jobvl(); int jobvr(); [o]wr(n); [o]wi(n); [o]vl(m,m); [o]vr(p,p); int [o]info()',
 	RedoDimsCode => '
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvl), tmp, $PDL(vl), $SIZE(m), $SIZE(n))
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvr), tmp, $PDL(vr), $SIZE(p), $SIZE(n))
@@ -1170,7 +1170,7 @@ Users\' Guide.
 
 pp_def("ggev",
        HandleBad => 0,
-	Pars => 'A(n,n); int [phys]jobvl();int [phys]jobvr();B(n,n);[o]alphar(n);[o]alphai(n);[o]beta(n);[o]VL(m,m);[o]VR(p,p);int [o]info()',
+	Pars => '[io]A(n,n); int jobvl();int jobvr();[io]B(n,n);[o]alphar(n);[o]alphai(n);[o]beta(n);[o]VL(m,m);[o]VR(p,p);int [o]info()',
 	GenericTypes => [F,D],
 	RedoDimsCode => '
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvl), tmp, $PDL(VL), $SIZE(m), $SIZE(n))
@@ -1336,7 +1336,7 @@ of (A,B) satisfies
 
 pp_def("ggevx",
        HandleBad => 0,
-	Pars => '[io,phys]A(n,n);int balanc();int jobvl();int jobvr();int sense();[io,phys]B(n,n);[o]alphar(n);[o]alphai(n);[o]beta(n);[o]VL(m,m);[o]VR(p,p);int [o]ilo();int [o]ihi();[o]lscale(n);[o]rscale(n);[o]abnrm();[o]bbnrm();[o]rconde(r);[o]rcondv(s);int [o]info(); int [t]bwork(bworkn); int [t]iwork(iworkn);',
+	Pars => '[io]A(n,n);int balanc();int jobvl();int jobvr();int sense();[io]B(n,n);[o]alphar(n);[o]alphai(n);[o]beta(n);[o]VL(m,m);[o]VR(p,p);int [o]ilo();int [o]ihi();[o]lscale(n);[o]rscale(n);[o]abnrm();[o]bbnrm();[o]rconde(r);[o]rcondv(s);int [o]info(); int [t]bwork(bworkn); int [t]iwork(iworkn);',
 	RedoDimsCode => '
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvl), tmp, $PDL(VL), $SIZE(m), $SIZE(n))
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvr), tmp, $PDL(VR), $SIZE(p), $SIZE(n))
@@ -2540,7 +2540,7 @@ See LAPACK User\'s Guide, section 4.11 for more information.
 
 pp_def("syev",
        HandleBad => 0,
-	Pars => '[io,phys]A(n,n);  int jobz(); int uplo(); [o,phys]w(n); int [o,phys]info()',
+	Pars => '[io]A(n,n);  int jobz(); int uplo(); [o]w(n); int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
 		char jz = \'N\';
@@ -2631,7 +2631,7 @@ real symmetric matrix A.
 
 pp_def("syevd",
        HandleBad => 0,
-	Pars => '[io,phys]A(n,n);  int jobz(); int uplo(); [o,phys]w(n); int [o,phys]info()',
+	Pars => '[io]A(n,n);  int jobz(); int uplo(); [o]w(n); int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
 		char jz = \'N\';
@@ -2743,7 +2743,7 @@ workspace than syevx.
 
 pp_def("syevx",
        HandleBad => 0,
-	Pars => 'A(n,n);  int jobz(); int range(); int uplo(); vl(); vu(); int il(); int iu(); abstol(); int [o]m(); [o]w(n); [o]z(p,p);int [o]ifail(n); int [o]info(); int [t]iwork(iworkn=CALC(5*$SIZE(n)));',
+	Pars => '[io]A(n,n);  int jobz(); int range(); int uplo(); vl(); vu(); int il(); int iu(); abstol(); int [o]m(); [o]w(n); [o]z(p,p);int [o]ifail(n); int [o]info(); int [t]iwork(iworkn=CALC(5*$SIZE(n)));',
 	RedoDimsCode => '
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobz), tmp, $PDL(z), $SIZE(p), $SIZE(n))
 	',
@@ -2938,7 +2938,7 @@ for the desired eigenvalues.
 
 pp_def("syevr",
        HandleBad => 0,
-	Pars => '[phys]A(n,n);  int jobz(); int range(); int uplo(); [phys]vl(); [phys]vu(); int [phys]il(); int [phys]iu();[phys]abstol();int [o,phys]m();[o,phys]w(n); [o,phys]z(p,q);int [o,phys]isuppz(r); int [o,phys]info()',
+	Pars => '[io]A(n,n);  int jobz(); int range(); int uplo(); vl(); vu(); int il(); int iu();abstol();int [o]m();[o]w(n); [o]z(p,q);int [o]isuppz(r); int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
 		char jz = \'N\';
@@ -3183,7 +3183,7 @@ manner.
 
 pp_def("sygv",
        HandleBad => 0,
-	Pars => '[io,phys]A(n,n);int [phys]itype();int jobz(); int uplo();[io,phys]B(n,n);[o,phys]w(n); int [o,phys]info()',
+	Pars => '[io]A(n,n);int itype();int jobz(); int uplo();[io]B(n,n);[o]w(n); int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
 		char jz = \'N\';
@@ -3308,7 +3308,7 @@ positive definite.
 
 pp_def("sygvd",
        HandleBad => 0,
-	Pars => '[io,phys]A(n,n);int [phys]itype();int jobz(); int uplo();[io,phys]B(n,n);[o,phys]w(n); int [o,phys]info()',
+	Pars => '[io]A(n,n);int itype();int jobz(); int uplo();[io]B(n,n);[o]w(n); int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
 		char jz = \'N\';
@@ -3683,7 +3683,7 @@ range of values or a range of indices for the desired eigenvalues.
 
 pp_def("gesv",
        HandleBad => 0,
-	Pars => '[io,phys]A(n,n);  [io,phys]B(n,m); int [o,phys]ipiv(n); int [o,phys]info()',
+	Pars => '[io]A(n,n);  [io]B(n,m); int [o]ipiv(n); int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
 		extern int FORTRAN($TFD(s,d)gesv)(integer *n, integer *nrhs, $GENERIC() *a, integer
@@ -4060,7 +4060,7 @@ that it solves the original system before equilibration.
 
 pp_def("sysv",
        HandleBad => 0,
-	Pars => '[io,phys]A(n,n);  int uplo(); [io,phys]B(n,m); int [o]ipiv(n); int [o]info()',
+	Pars => '[io]A(n,n);  int uplo(); [io]B(n,m); int [o]ipiv(n); int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
 		char puplo = \'U\';
@@ -4177,7 +4177,7 @@ used to solve the system of equations A * X = B.
 
 pp_def("sysvx",
        HandleBad => 0,
-	Pars => '[phys]A(n,n); int uplo(); int fact(); [phys]B(n,m); [io,phys]af(n,n); int [io,phys]ipiv(n); [o]X(n,m); [o]rcond(); [o]ferr(m); [o]berr(m); int [o]info(); int [t]iwork(n);',
+	Pars => 'A(n,n); int uplo(); int fact(); B(n,m); [io]af(n,n); int [io]ipiv(n); [o]X(n,m); [o]rcond(); [o]ferr(m); [o]berr(m); int [o]info(); int [t]iwork(n);',
 	GenericTypes => [F,D],
 	Code => generate_code '
 		char pfact = \'N\';
@@ -4401,7 +4401,7 @@ for it.
 
 pp_def("posv",
        HandleBad => 0,
-	Pars => '[io,phys]A(n,n);  int uplo(); [io,phys]B(n,m); int [o,phys]info()',
+	Pars => '[io]A(n,n);  int uplo(); [io]B(n,m); int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
              char puplo = \'U\';
@@ -4482,7 +4482,7 @@ equations A * X = B.
 
 pp_def("posvx",
        HandleBad => 0,
-	Pars => '[io,phys]A(n,n); int uplo(); int fact(); [io,phys]B(n,m); [io,phys]af(n,n); int [io]equed(); [o]s(p); [o,phys]X(n,m); [o,phys]rcond(); [o,phys]ferr(m); [o,phys]berr(m); int [o,phys]info(); int [t]iwork(n); [t]work(workn=CALC(3*$SIZE(n)));',
+	Pars => '[io]A(n,n); int uplo(); int fact(); [io]B(n,m); [io]af(n,n); int [io]equed(); [o]s(p); [o]X(n,m); [o]rcond(); [o]ferr(m); [o]berr(m); int [o]info(); int [t]iwork(n); [t]work(workn=CALC(3*$SIZE(n)));',
 	RedoDimsCode => '
 	  $SIZE(p) = $SIZE(n); /* Ubuntu LAPACK 3 writes to s anyway */
 	',
@@ -4733,7 +4733,7 @@ equilibration.
 
 pp_def("gels",
        HandleBad => 0,
-	Pars => '[io,phys]A(m,n); int trans(); [io,phys]B(p,q);int [o,phys]info()',
+	Pars => '[io]A(m,n); int trans(); [io]B(p,q);int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
 		char ptrans = \'N\';
@@ -4869,7 +4869,7 @@ matrix X.
 
 pp_def("gelsy",
        HandleBad => 0,
-	Pars => '[io,phys]A(m,n); [io,phys]B(p,q); [phys]rcond(); int [io,phys]jpvt(n); int [o,phys]rank();int [o,phys]info()',
+	Pars => '[io]A(m,n); [io]B(p,q); rcond(); int [io]jpvt(n); int [o]rank();int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
 		integer lwork = -1;
@@ -5004,7 +5004,7 @@ The minimum-norm solution is then
 
 pp_def("gelss",
        HandleBad => 0,
-	Pars => '[io,phys]A(m,n); [io,phys]B(p,q); [phys]rcond(); [o,phys]s(r); int [o,phys]rank();int [o,phys]info()',
+	Pars => '[io]A(m,n); [io]B(p,q); rcond(); [o]s(r); int [o]rank();int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
 		integer lwork = -1;
@@ -5271,7 +5271,7 @@ without guard digits, but we know of none.
 
 pp_def("gglse",
        HandleBad => 0,
-	Pars => '[phys]A(m,n); [phys]B(p,n);[io,phys]c(m);[phys]d(p);[o,phys]x(n);int [o,phys]info()',
+	Pars => '[io]A(m,n); [io]B(p,n);[io]c(m);[io]d(p);[o]x(n);int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
 		integer lwork = -1;
@@ -5377,7 +5377,7 @@ which is obtained using a GRQ factorization of the matrices B and A.
 
 pp_def("ggglm",
        HandleBad => 0,
-	Pars => '[phys]A(n,m); [phys]B(n,p);[phys]d(n);[o,phys]x(m);[o,phys]y(p);int [o,phys]info()',
+	Pars => '[io]A(n,m); [io]B(n,p);[io]d(n);[o]x(m);[o]y(p);int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
 		integer lwork = -1;
@@ -5607,7 +5607,7 @@ This is the right-looking Level 2 BLAS version of the algorithm.
 
 pp_def("sytrf",
        HandleBad => 0,
-	Pars => '[io,phys]A(n,n); int uplo(); int [o,phys]ipiv(n); int [o,phys]info()',
+	Pars => '[io]A(n,n); int uplo(); int [o]ipiv(n); int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
              char puplo = \'U\';
@@ -5742,7 +5742,7 @@ This is the blocked version of the algorithm, calling Level 3 BLAS.
 
 pp_def("sytf2",
        HandleBad => 0,
-	Pars => '[io,phys]A(n,n); int uplo(); int [o,phys]ipiv(n); int [o,phys]info()',
+	Pars => '[io]A(n,n); int uplo(); int [o]ipiv(n); int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
              char puplo = \'U\';
@@ -5822,7 +5822,7 @@ This is the unblocked version of the algorithm, calling Level 2 BLAS.
 
 pp_def("potrf",
        HandleBad => 0,
-	Pars => '[io,phys]A(n,n); int uplo(); int [o,phys]info()',
+	Pars => '[io]A(n,n); int uplo(); int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
 
@@ -5888,7 +5888,7 @@ This is the block version of the algorithm, calling Level 3 BLAS.
 
 pp_def("potf2",
        HandleBad => 0,
-	Pars => '[io,phys]A(n,n); int uplo(); int [o,phys]info()',
+	Pars => '[io]A(n,n); int uplo(); int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
              char puplo = \'U\';
@@ -5953,7 +5953,7 @@ This is the unblocked version of the algorithm, calling Level 2 BLAS.
 
 pp_def("getri",
        HandleBad => 0,
-	Pars => '[io,phys]A(n,n); int [phys]ipiv(n); int [o,phys]info()',
+	Pars => '[io]A(n,n); int ipiv(n); int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
 		integer lwork = -1;
@@ -6093,7 +6093,7 @@ C<sytrf>.
 
 pp_def("potri",
        HandleBad => 0,
-	Pars => '[io,phys]A(n,n); int uplo(); int [o,phys]info()',
+	Pars => '[io]A(n,n); int uplo(); int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
              char puplo = \'U\';
@@ -6150,7 +6150,7 @@ computed by C<potrf>.
 
 pp_def("trtri",
        HandleBad => 0,
-	Pars => '[io,phys]A(n,n); int uplo(); int diag(); int [o,phys]info()',
+	Pars => '[io]A(n,n); int uplo(); int diag(); int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
              char puplo = \'U\';
@@ -6218,7 +6218,7 @@ This is the Level 3 BLAS version of the algorithm.
 
 pp_def("trti2",
        HandleBad => 0,
-	Pars => '[io,phys]A(n,n); int uplo(); int diag(); int [o,phys]info()',
+	Pars => '[io]A(n,n); int uplo(); int diag(); int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
              char puplo = \'U\';
@@ -6282,7 +6282,7 @@ This is the Level 2 BLAS version of the algorithm.
 
 pp_def("getrs",
        HandleBad => 0,
-	Pars => '[phys]A(n,n); int trans(); [io,phys]B(n,m); int [phys]ipiv(n); int [o,phys]info()',
+	Pars => 'A(n,n); int trans(); [io]B(n,m); int ipiv(n); int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
              char transp = \'N\';
@@ -6348,7 +6348,7 @@ by getrf.
 
 pp_def("sytrs",
        HandleBad => 0,
-	Pars => '[phys]A(n,n); int uplo();[io,phys]B(n,m); int [phys]ipiv(n); int [o,phys]info()',
+	Pars => 'A(n,n); int uplo();[io]B(n,m); int ipiv(n); int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
              char puplo = \'U\';
@@ -6415,7 +6415,7 @@ A = L*D*L\' computed by C<sytrf>.
 
 pp_def("potrs",
        HandleBad => 0,
-	Pars => '[phys]A(n,n); int uplo(); [io,phys]B(n,m); int [o,phys]info()',
+	Pars => 'A(n,n); int uplo(); [io]B(n,m); int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
              char puplo = \'U\';
@@ -6475,7 +6475,7 @@ A = U\'*U or A = L*L\' computed by C<potrf>.
 
 pp_def("trtrs",
        HandleBad => 0,
-	Pars => '[phys]A(n,n); int uplo(); int trans(); int diag();[io,phys]B(n,m); int [o,phys]info()',
+	Pars => 'A(n,n); int uplo(); int trans(); int diag();[io]B(n,m); int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
              char puplo = \'U\';
@@ -6564,7 +6564,7 @@ A check is made to verify that A is nonsingular.
 
 pp_def("latrs",
        HandleBad => 0,
-	Pars => '[phys]A(n,n); int uplo(); int trans(); int diag(); int normin();[io,phys]x(n); [o,phys]scale();[io,phys]cnorm(n);int [o,phys]info()',
+	Pars => 'A(n,n); int uplo(); int trans(); int diag(); int normin();[io]x(n); [o]scale();[io]cnorm(n);int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
              char puplo = \'U\';
@@ -6825,7 +6825,7 @@ condition number is computed as
 
 pp_def("sycon",
        HandleBad => 0,
-	Pars => '[phys]A(n,n); int uplo(); int ipiv(n); [phys]anorm(); [o,phys]rcond();int [o,phys]info(); int [t]iwork(n); [t]work(workn=CALC(2*$SIZE(n)));',
+	Pars => 'A(n,n); int uplo(); int ipiv(n); anorm(); [o]rcond();int [o]info(); int [t]iwork(n); [t]work(workn=CALC(2*$SIZE(n)));',
 	GenericTypes => [F,D],
 	Code => generate_code '
              char puplo = \'U\';
@@ -7035,7 +7035,7 @@ computed as
 
 pp_def("geqp3",
        HandleBad => 0,
-	Pars => '[io,phys]A(m,n); int [io,phys]jpvt(n); [o,phys]tau(k); int [o,phys]info()',
+	Pars => '[io]A(m,n); int [io]jpvt(n); [o]tau(k); int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
 		integer lwork = -1;
@@ -7126,7 +7126,7 @@ Each H(i) has the form
 
 pp_def("geqrf",
        HandleBad => 0,
-	Pars => '[io,phys]A(m,n); [o,phys]tau(k); int [o,phys]info()',
+	Pars => '[io]A(m,n); [o]tau(k); int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
 		integer lwork = -1;
@@ -7208,7 +7208,7 @@ Each H(i) has the form
 
 pp_def("orgqr",
        HandleBad => 0,
-	Pars => '[io,phys]A(m,n); [phys]tau(k); int [o,phys]info()',
+	Pars => '[io]A(m,n); tau(k); int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
 		integer lwork = -1;
@@ -7286,7 +7286,7 @@ reflectors of order M
 
 pp_def("ormqr",
        HandleBad => 0,
-	Pars => '[phys]A(p,k); int side(); int trans(); [phys]tau(k); [io,phys]C(m,n);int [o,phys]info()',
+	Pars => 'A(p,k); int side(); int trans(); tau(k); [io]C(m,n);int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
 		char ptrans = \'N\', pside = \'L\';
@@ -7397,7 +7397,7 @@ if C<side> = 1.
 
 pp_def("gelqf",
        HandleBad => 0,
-	Pars => '[io,phys]A(m,n); [o,phys]tau(k); int [o,phys]info()',
+	Pars => '[io]A(m,n); [o]tau(k); int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
 		integer lwork = -1;
@@ -7477,7 +7477,7 @@ Each H(i) has the form
 
 pp_def("orglq",
        HandleBad => 0,
-	Pars => '[io,phys]A(m,n); [phys]tau(k); int [o,phys]info()',
+	Pars => '[io]A(m,n); tau(k); int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
 		integer lwork = -1;
@@ -7553,7 +7553,7 @@ reflectors of order N
 
 pp_def("ormlq",
        HandleBad => 0,
-	Pars => '[phys]A(k,p); int side(); int trans(); [phys]tau(k); [io,phys]C(m,n);int [o,phys]info()',
+	Pars => 'A(k,p); int side(); int trans(); tau(k); [io]C(m,n);int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
 		char ptrans = \'N\', pside = \'L\';
@@ -7664,7 +7664,7 @@ if C<side> = 1.
 
 pp_def("geqlf",
        HandleBad => 0,
-	Pars => '[io,phys]A(m,n); [o,phys]tau(k); int [o,phys]info()',
+	Pars => '[io]A(m,n); [o]tau(k); int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
 		integer lwork = -1;
@@ -7746,7 +7746,7 @@ Each H(i) has the form
 
 pp_def("orgql",
        HandleBad => 0,
-	Pars => '[io,phys]A(m,n); [phys]tau(k); int [o,phys]info()',
+	Pars => '[io]A(m,n); tau(k); int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
 		integer lwork = -1;
@@ -7823,7 +7823,7 @@ reflectors of order M
 
 pp_def("ormql",
        HandleBad => 0,
-	Pars => '[phys]A(p,k); int side(); int trans(); [phys]tau(k); [io,phys]C(m,n);int [o,phys]info()',
+	Pars => 'A(p,k); int side(); int trans(); tau(k); [io]C(m,n);int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
 		char ptrans = \'N\', pside = \'L\';
@@ -7934,7 +7934,7 @@ if C<side> = 1.
 
 pp_def("gerqf",
        HandleBad => 0,
-	Pars => '[io,phys]A(m,n); [o,phys]tau(k); int [o,phys]info()',
+	Pars => '[io]A(m,n); [o]tau(k); int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
 		integer lwork = -1;
@@ -8017,7 +8017,7 @@ Each H(i) has the form
 
 pp_def("orgrq",
        HandleBad => 0,
-	Pars => '[io,phys]A(m,n); [phys]tau(k); int [o,phys]info()',
+	Pars => '[io]A(m,n); tau(k); int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
 		integer lwork = -1;
@@ -8094,7 +8094,7 @@ reflectors of order N
 
 pp_def("ormrq",
        HandleBad => 0,
-	Pars => '[phys]A(k,p); int side(); int trans(); [phys]tau(k); [io,phys]C(m,n);int [o,phys]info()',
+	Pars => 'A(k,p); int side(); int trans(); tau(k); [io]C(m,n);int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
 		char ptrans = \'N\', pside = \'L\';
@@ -8205,7 +8205,7 @@ if C<side> = 1.
 
 pp_def("tzrzf",
        HandleBad => 0,
-	Pars => '[io,phys]A(m,n); [o,phys]tau(k); int [o,phys]info()',
+	Pars => '[io]A(m,n); [o]tau(k); int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
 		integer lwork = -1;
@@ -8306,7 +8306,7 @@ Z is given by
 
 pp_def("ormrz",
        HandleBad => 0,
-	Pars => '[phys]A(k,p); int side(); int trans(); [phys]tau(k); [io,phys]C(m,n);int [o,phys]info()',
+	Pars => 'A(k,p); int side(); int trans(); tau(k); [io]C(m,n);int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
 		char ptrans = \'N\', pside = \'L\';
@@ -8421,7 +8421,7 @@ if C<side> = 1.
 
 pp_def("gehrd",
        HandleBad => 0,
-	Pars => '[io,phys]A(n,n); int [phys]ilo();int [phys]ihi();[o,phys]tau(k); int [o,phys]info()',
+	Pars => '[io]A(n,n); int ilo();int ihi();[o]tau(k); int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
 		integer lwork = -1;
@@ -8534,7 +8534,7 @@ n = 7, ilo = 2 and ihi = 6:
 
 pp_def("orghr",
        HandleBad => 0,
-	Pars => '[io,phys]A(n,n); int [phys]ilo();int [phys]ihi();[phys]tau(k); int [o,phys]info()',
+	Pars => '[io]A(n,n); int ilo();int ihi();tau(k); int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
 		integer lwork = -1;
@@ -8615,7 +8615,7 @@ C<gehrd>:
 
 pp_def("hseqr",
        HandleBad => 0,
-	Pars => '[io,phys]H(n,n); int job();int compz();int [phys]ilo();int [phys]ihi();[o,phys]wr(n); [o,phys]wi(n);[o,phys]Z(m,m); int [o,phys]info()',
+	Pars => '[io]H(n,n); int job();int compz();int ilo();int ihi();[o]wr(n); [o]wi(n);[o]Z(m,m); int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
 		char pcompz;
@@ -8762,7 +8762,7 @@ matrix Q:  A = Q*H*Q**T = (QZ)*T*(QZ)**T.
 
 pp_def("trevc",
        HandleBad => 0,
-	Pars => '[io]T(n,n); int side();int howmny();int select(q);[o]VL(m,m); [o]VR(p,p);int [o]m(); int [o]info(); [t]work(workn=CALC(3*$SIZE(n)));',
+	Pars => 'T(n,n); int side();int howmny();int select(q);[o]VL(m,m); [o]VR(p,p);int [o]m(); int [o]info(); [t]work(workn=CALC(3*$SIZE(n)));',
 	RedoDimsCode => '
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(side), tmp != 1, $PDL(VL), $SIZE(m), $SIZE(n))
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(side), tmp != 2, $PDL(VR), $SIZE(p), $SIZE(n))
@@ -8950,7 +8950,7 @@ magnitude has magnitude 1; here the magnitude of a complex number
 
 pp_def("tgevc",
        HandleBad => 0,
-	Pars => '[io]A(n,n); int side();int howmny();[io]B(n,n);int select(q);[o]VL(m,m); [o]VR(p,p);int [o]m(); int [o]info(); [t]work(workn=CALC(6*$SIZE(n)));',
+	Pars => 'A(n,n); int side();int howmny();B(n,n);int select(q);[o]VL(m,m); [o]VR(p,p);int [o]m(); int [o]info(); [t]work(workn=CALC(6*$SIZE(n)));',
 	RedoDimsCode => '
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(side), tmp != 1, $PDL(VL), $SIZE(m), $SIZE(n))
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(side), tmp != 2, $PDL(VR), $SIZE(p), $SIZE(n))
@@ -9119,7 +9119,7 @@ to the eigenvalue with positive imaginary part.
 
 pp_def("gebal",
 	HandleBad => 0,
-	Pars => '[io,phys]A(n,n); int job(); int [o,phys]ilo();int [o,phys]ihi();[o,phys]scale(n); int [o,phys]info()',
+	Pars => '[io]A(n,n); int job(); int [o]ilo();int [o]ihi();[o]scale(n); int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
 		char pjob;
@@ -9240,7 +9240,7 @@ returned in the vector C<scale>.
 
 pp_def("gebak",
        HandleBad => 0,
-	Pars => '[io,phys]A(n,m); int job(); int side();int [phys]ilo();int [phys]ihi();[phys]scale(n); int [o,phys]info()',
+	Pars => '[io]A(n,m); int job(); int side();int ilo();int ihi();scale(n); int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
 		char pjob;
@@ -9331,7 +9331,7 @@ balanced matrix output by gebal.
 
 pp_def("lange",
        HandleBad => 0,
-	Pars => '[phys]A(n,m); int norm(); [o]b(); [t]work(workn);',
+	Pars => 'A(n,m); int norm(); [o]b(); [t]work(workn);',
 	RedoDimsCode => '
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(norm), tmp == 2, $PDL(work), $SIZE(workn), $SIZE(n))
 	',
@@ -9574,7 +9574,7 @@ trapezoidal or triangular matrix A.
 ################################################################################
 pp_def("gemm",
        HandleBad => 0,
-	Pars => '[phys]A(m,n); int transa(); int transb(); [phys]B(p,q);[phys]alpha(); [phys]beta(); [io,phys]C(r,s)',
+	Pars => 'A(m,n); int transa(); int transb(); B(p,q);alpha(); beta(); [io]C(r,s)',
 	GenericTypes => [F,D],
 	Code => '
 		char ptransa = \'N\';
@@ -9663,7 +9663,7 @@ if ($config{CBLAS}){
 
 pp_def("rmgemm",
        HandleBad => 0,
-	Pars => '[phys]A(m,n); int transa(); int transb(); [phys]B(p,q);[phys]alpha(); [phys]beta(); [io,phys]C(r,s)',
+	Pars => 'A(m,n); int transa(); int transb(); B(p,q);alpha(); beta(); [io]C(r,s)',
 	GenericTypes => [F,D],
 	Code => '
 		int ptransa = CblasNoTrans;
@@ -9718,7 +9718,7 @@ Row major version of gemm
 
 pp_def("mmult",
        HandleBad => 0,
-	Pars => '[phys]A(m,n); [phys]B(p,m); [o,phys]C(p,n)',
+	Pars => 'A(m,n); B(p,m); [o]C(p,n)',
 	GenericTypes => [F,D],
 	Code => '
 		char ptrans = \'N\';
@@ -9754,7 +9754,7 @@ Blas matrix multiplication based on gemm
 if ($config{STRASSEN}){
 pp_def("smmult",
        HandleBad => 0,
-	Pars => '[phys]A(m,n); [phys]B(p,m); [o,phys]C(p,n)',
+	Pars => 'A(m,n); B(p,m); [o]C(p,n)',
 	GenericTypes => [F,D],
 	Code => '
 		char ptrans = \'N\';
@@ -9791,7 +9791,7 @@ Blas matrix multiplication based on Strassen Algorithm.
 
 pp_def("crossprod",
        HandleBad => 0,
-	Pars => '[phys]A(n,m); [phys]B(p,m); [o,phys]C(p,n)',
+	Pars => 'A(n,m); B(p,m); [o]C(p,n)',
 	GenericTypes => [F,D],
 	Code => '
 
@@ -9829,7 +9829,7 @@ Blas matrix cross product based on gemm
 
 pp_def("syrk",
        HandleBad => 0,
-	Pars => '[phys]A(m,n); int uplo(); int trans(); [phys]alpha(); [phys]beta(); [io,phys]C(p,p)',
+	Pars => 'A(m,n); int uplo(); int trans(); alpha(); beta(); [io]C(p,p)',
 	GenericTypes => [F,D],
 	Code => '
 		char puplo = \'U\';
@@ -9927,7 +9927,7 @@ or
 if ($config{CBLAS}){
 pp_def("rmsyrk",
        HandleBad => 0,
-	Pars => '[phys]A(m,n); int uplo(); int trans(); [phys]alpha(); [phys]beta(); [io,phys]C(p,p)',
+	Pars => 'A(m,n); int uplo(); int trans(); alpha(); beta(); [io]C(p,p)',
 	GenericTypes => [F,D],
 	Code => '
 
@@ -9980,7 +9980,7 @@ Row major version of syrk
 
 pp_def("dot",
        HandleBad => 0,
-	Pars => '[phys]a(n);[phys]b(n);[o,phys]c()',
+	Pars => 'a(n);b(n);[o]c()',
 	GenericTypes => [F,D],
 	Code => '
 			extern $GENERIC() FORTRAN($TFD(s,d)dot)(integer *n, $GENERIC() *dx, integer *incx, $GENERIC() *dy,
@@ -10009,7 +10009,7 @@ Dot product of two vectors using Blas.
 
 pp_def("axpy",
        HandleBad => 0,
-	Pars => '[phys]a(n);[phys] alpha();[io,phys]b(m)',
+	Pars => 'a(n); alpha();[io]b(m)',
 	GenericTypes => [F,D],
 	Code => '
 			extern int FORTRAN($TFD(s,d)axpy)(integer *n, $GENERIC() *da, $GENERIC() *dx,
@@ -10040,7 +10040,7 @@ Returns result in b.
 
 pp_def("nrm2",
        HandleBad => 0,
-	Pars => '[phys]a(n);[o]b()',
+	Pars => 'a(n);[o]b()',
 	GenericTypes => [F,D],
 	Code => '
 			extern $GENERIC() FORTRAN($TFD(s,d)nrm2)(integer *n, $GENERIC() *dx,
@@ -10059,13 +10059,13 @@ Euclidean norm of a vector using Blas.
 =for example
 
  $a = random(5);
- $norm2 = norm2($a)
+ $norm2 = nrm2($a)
 
 ');
 
 pp_def("asum",
        HandleBad => 0,
-	Pars => '[phys]a(n);[o]b()',
+	Pars => 'a(n);[o]b()',
 	GenericTypes => [F,D],
 	Code => '
 			extern $GENERIC() FORTRAN($TFD(s,d)asum)(integer *n, $GENERIC() *dx,
@@ -10090,7 +10090,7 @@ Sum of absolute values of a vector using Blas.
 
 pp_def("scal",
        HandleBad => 0,
-	Pars => '[io,phys]a(n);scale()',
+	Pars => '[io]a(n);scale()',
 	GenericTypes => [F,D],
 	Code => '
 			extern int FORTRAN($TFD(s,d)scal)(integer *n, $GENERIC() *sa,
@@ -10116,7 +10116,7 @@ Scale a vector by a constant using Blas.
 
 pp_def("rot",
        HandleBad => 0,
-	Pars => '[io,phys]a(n);[phys]c(); [phys]s();[io,phys]b(n)',
+	Pars => '[io]a(n);c(); s();[io]b(n)',
 	GenericTypes => [F,D],
 	Code => '
 			extern int FORTRAN($TFD(s,d)rot)(integer *n, $GENERIC() *dx,
@@ -10147,7 +10147,7 @@ Applies plane rotation using Blas.
 
 pp_def("rotg",
        HandleBad => 0,
-	Pars => '[io,phys]a();[io,phys]b();[o,phys]c(); [o,phys]s()',
+	Pars => '[io]a();[io]b();[o]c(); [o]s()',
 	GenericTypes => [F,D],
 	Code => '
 			extern int FORTRAN($TFD(s,d)rotg)($GENERIC() *dx,
@@ -10180,7 +10180,7 @@ Generates plane rotation using Blas.
 ################################################################################
 pp_def("lasrt",
        HandleBad => 0,
-	Pars => '[io,phys]d(n); int id();int [o,phys]info()',
+	Pars => '[io]d(n); int id();int [o]info()',
 	GenericTypes => [F,D],
 	Code => '
 		char pwork  = \'I\';
@@ -10229,7 +10229,7 @@ size <= 20. Dimension of stack limits N to about 2**32.
 
 pp_def("lacpy",
        HandleBad => 0,
-	Pars => '[phys]A(m,n); int uplo(); [o,phys]B(p,n)',
+	Pars => 'A(m,n); int uplo(); [o]B(p,n)',
 	GenericTypes => [F,D],
 	Code => '
 		char puplo;
@@ -10284,7 +10284,7 @@ matrix B.
 
 pp_def("laswp",
        HandleBad => 0,
-	Pars => '[io,phys]A(m,n);int [phys]k1();int [phys] k2(); int [phys]ipiv(p);int [phys]inc()',
+	Pars => '[io]A(m,n);int k1();int  k2(); int ipiv(p);int inc()',
 	GenericTypes => [F,D],
 	Code => '
 			extern int FORTRAN($TFD(s,d)laswp)(integer *n, $GENERIC() *a, integer *lda, integer
@@ -10413,7 +10413,7 @@ Works inplace.
 
 pp_def("labad",
        HandleBad => 0,
-	Pars => '[io,phys]small(); [io,phys]large()',
+	Pars => '[io]small(); [io]large()',
 	GenericTypes => [F,D],
 	Code => '
 

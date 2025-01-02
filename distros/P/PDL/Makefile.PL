@@ -1,16 +1,12 @@
 use strict;
 use warnings;
+use lib qw(lib);
+use PDL::Core::Dev;
 
 eval { require Devel::CheckLib; Devel::CheckLib->import; };
-use 5.010_000;
 use ExtUtils::MakeMaker;
 use ExtUtils::MakeMaker::Config;
-use File::Spec;
-
-# this will make PDL::Core::Dev's functions available
-# in Makefile.PL files in all subdirectories
-require "./Basic/Core/Dev.pm"; PDL::Core::Dev->import();
-$INC{'PDL/Core/Dev.pm'} = 1; # so require P:C:Dev will report success after
+use File::Spec::Functions qw(catdir catfile);
 
 my @cpan_deps = my @prereq = (
   'Data::Dumper'        => 2.121,     # for PDL::IO::Dumper
@@ -26,14 +22,10 @@ my @cpan_deps = my @prereq = (
   'Math::Complex'       => 0,
 );
 my %min_version = (
-  'OpenGL' => '0.70', # see also Graphics/TriD/Makefile.PL
-  'OpenGL::GLUT' => '0.72', # see also Graphics/TriD/Makefile.PL
-  'ExtUtils::F77' => '1.26', # eg 1.20 can leave off -lgfortran
   'Inline' => '0.83', # fixed ILSM-finding
   'Inline::C' => '0.62',
   'Term::ReadKey' => '2.34', #for perldl shell
-  'PGPLOT' => '2.29',
-  'Alien::proj' => '1.29', # min PROJ 7.1 as T:Proj4 needs degree_output
+  'Astro::FITS::Header' => '2.1', # apparently before that, IO::FITS no work
 );
 for my $opt_dep (sort keys %min_version) {
   (my $file = $opt_dep) =~ s#::#/#g;
@@ -41,6 +33,11 @@ for my $opt_dep (sort keys %min_version) {
   next if eval { $opt_dep->VERSION($min_version{$opt_dep}); 1 };
   push @prereq, $opt_dep => $min_version{$opt_dep};
 }
+
+my $pdlroot = catfile qw(script pdl);
+my @exe_files = map catfile('script', $_), qw(perldl pdldoc pptemplate);
+push @exe_files, "$pdlroot$Config{exe_ext}" if $^O !~ /MSWin/;
+my @cleanup = ("$pdlroot$Config{exe_ext}");
 
 ##############################
 # Hack to include fPIC on x86_64 systems -
@@ -51,6 +48,34 @@ if($Config{archname}=~m/amd64|i686|x86_64/) {
     $ccflags .= " -fPIC";
 }
 
+my $pthread_include = $ENV{POSIX_THREADS_INC} // '';
+my $pthread_library = $ENV{POSIX_THREADS_LIBS} // '-lpthread';
+if ($pthread_library) {
+    (my $libname = $pthread_library) =~ s/^-l//;
+    if (!eval { check_lib(lib=>$libname,header=>'pthread.h',incpath=>$pthread_include) }) {
+        print "\tDevel::CheckLib with '$libname' failed\n";
+        $pthread_library = '';
+    }
+}
+if (!$pthread_library) {
+    print "PDL will be built without POSIX thread support.\n";
+    print "\t==> *NOTE*: PDL threads are unrelated to perl threads (usethreads=y)!\n";
+    print "\t==> Enabling perl threads will not help!\n";
+}
+my $pthread_define  = $pthread_library ? ' -DPDL_PTHREAD ' : '';
+my $libs_string = "$pthread_library ".get_maths_libs();
+
+my $hdeps = join ' ', map catfile(qw(lib PDL Core), $_), qw(pdl.h pdlperl.h pdlcore.h pdlbroadcast.h pdlmagic.h);
+my @cfiles = qw(pdlcore pdlapi pdlbroadcast pdlconv pdlmagic pdlaffine pdlutil);
+my $cobj = join ' ', map catfile(qw(lib PDL Core), qq{$_\$(OBJ_EXT)}), @cfiles;
+push @cleanup, $cobj;
+my $core_obj = catfile(qw(lib PDL), 'Core$(OBJ_EXT)');
+
+# the modules in PDL::LiteF, used in t/core.t
+my @BUILD_CORE = qw(Bad Core Math MatrixOps Ops Primitive Slices Ufunc);
+# the modules needed in "use PDL"
+my @BUILD_BASIC = qw(Compression FFT IO/Misc IO/Pnm ImageND ImageRGB);
+
 # create GENERATED subdir with *.pm files during 'make dist' (to make metacpan.org happy)
 my $preop = '$(PERLRUNINST) -MPDL::Core::Dev -e pdlpp_mkgen $(DISTVNAME)';
 
@@ -60,14 +85,11 @@ my %makefile_hash = (
   CONFIGURE_REQUIRES => {
     'Devel::CheckLib' => '1.01',
     'File::Which'     => 0,
-    'Carp'            => 1.20,    # EU::MM seems to need this not to crash
     'ExtUtils::MakeMaker' => '7.12', # working .g.c
     'File::Path'          => 0,
-    'ExtUtils::Depends' => '0.402',
   },
   TEST_REQUIRES => {
     'CPAN::Meta' => '2.120900',
-    'IPC::Cmd' => '0.72',
     'Test::Exception' => 0,
     'Test::Warn' => 0,  # for t/pptest.t
     "Test::Deep" => 0, # for Test::Deep::PDL tests
@@ -78,9 +100,10 @@ my %makefile_hash = (
     'Pod::Select'         => 0,
     'ExtUtils::ParseXS'   => '3.21', # ExtUtils::Typemaps::tidy_type
   },
-  MIN_PERL_VERSION => '5.014',
+  MIN_PERL_VERSION => '5.016',
   NAME => 'PDL',
-  VERSION_FROM => 'Basic/PDL.pm',
+  VERSION_FROM => 'lib/PDL/Core.pm',
+  EXE_FILES => \@exe_files,
   META_MERGE => {
      "meta-spec" => { version => 2 },
      resources => {
@@ -93,16 +116,9 @@ my %makefile_hash = (
         },
         x_IRC => 'irc://irc.perl.org/#pdl',
      },
-     no_index => { file => ['Basic/Doc/scantree.pl'] },
      prereqs => {
-        configure => {
-           recommends => {
-              'ExtUtils::F77' => '1.10',
-           },
-        },
         runtime => {
            suggests => {
-              'Astro::FITS::Header' => 0,
               'Sys::SigAction' => 0, # Ctrl-C handling in shells
            },
            recommends => \%min_version,
@@ -111,12 +127,32 @@ my %makefile_hash = (
      },
   },
   CCFLAGS => $ccflags,
+  XSMULTI => 1,
+  XSBUILD => {
+    xs => {
+      'lib/PDL/Core' => {
+        INC => join(' ',
+          PDL::Core::Dev::PDL_INCLUDE(),
+          map {length($_) ? qq{"$_"} : ()} $pthread_include
+        ),
+        OBJECT => "$core_obj $cobj",
+      },
+    },
+  },
+  DEFINE => $pthread_define,
+  LIBS => [$libs_string],
+  depend => {
+    $core_obj => $hdeps,
+    $cobj => $hdeps,
+    (map +(
+      "build_dynamic_PDL_".(s#/#_#gr) => "\$(INST_ARCHLIB)/auto/PDL/$_/".(s#.*/##gr).".\$(DLEXT)",
+      "build_static_PDL_".(s#/#_#gr) => "\$(INST_ARCHLIB)/auto/PDL/$_/".(s#.*/##gr)."\$(LIB_EXT)",
+    ), @BUILD_CORE, @BUILD_BASIC),
+  },
   dist => { COMPRESS => 'gzip', SUFFIX => 'gz', PREOP => $preop },
-  clean => {
-    FILES => join ' ', qw(
-      MANIFEST.bak tmp1* tmpraw* t/tmpraw* t/tmp1*
-      _Inline/ .inlinepdlpp/ .inline-ct/ .inlinewith/ .pptest/ *.xfig
-    ),
+  clean => { FILES => join ' ',
+    qw(MANIFEST.bak _Inline/ .inlinepdlpp/ .inlinewith/ .pptest/), @cleanup,
+    catfile(qw(lib PDL Core pdl.h)),
   },
   AUTHOR => 'PerlDL Developers <pdl-general@lists.sourceforge.net>',
   ABSTRACT => 'Perl Data Language',
@@ -125,69 +161,77 @@ my %makefile_hash = (
 
 WriteMakefile(%makefile_hash);
 
-# Extra build target to build the doc database
-sub MY::postamble {
+{
+package MY; # so that "SUPER" works right
+my @pd_srcs;
+sub postamble {
   my ($self) = @_;
-  package MY;
-  my  $text =
-'
-doctest ::
-	cd Basic$(DFSEP)Doc && make test
+  my $text = '';
+  $text .= <<'EOF';
+doctest :: pm_to_blib
 	$(NOECHO) $(ECHO) "doctest: Building PDL documentation database in blib ..."
-	$(NOECHO) $(PERLRUNINST) Basic$(DFSEP)Doc$(DFSEP)scantree.pl
+	$(NOECHO) $(PERLRUNINST) utils$(DFSEP)scantree.pl
 
 doc_site_install :: doc_pdldoc_install
 
 doc_pdldoc_install :: pure_install # needs installed .../PDL dir to exist
 	$(NOECHO) $(ECHO) "doc_site_install: Building PDL documentation database ..."
-	$(NOECHO) $(PERLRUNINST) Basic$(DFSEP)Doc$(DFSEP)scantree.pl "$(DESTDIR)$(INSTALLSITEARCH)"
+	$(NOECHO) $(PERLRUNINST) utils$(DFSEP)scantree.pl "$(DESTDIR)$(INSTALLSITEARCH)"
 
 doc_vendor_install ::
 	$(NOECHO) $(ECHO) "doc_vendor_install: Building PDL documentation database ..."
-	$(NOECHO) $(PERLRUNINST) Basic$(DFSEP)Doc$(DFSEP)scantree.pl "$(DESTDIR)$(INSTALLVENDORARCH)"
+	$(NOECHO) $(PERLRUNINST) utils$(DFSEP)scantree.pl "$(DESTDIR)$(INSTALLVENDORARCH)"
 
 doc_perl_install ::
 	$(NOECHO) $(ECHO) "doc_perl_install: Building PDL documentation database ..."
-	$(NOECHO) $(PERLRUNINST) Basic$(DFSEP)Doc$(DFSEP)scantree.pl "$(DESTDIR)$(INSTALLARCHLIB)"
-';
-
-$text .= "\n" . ::coretarget($self);
-my $coretest = join ' ', map File::Spec->catfile('t', $_.'.t'), qw(
-  01-pptest autoload bad basic bool clump constructor core croak lvalue
-  math matrix matrixops nat_complex ops-bitwise ops pdl_from_string
-  pdlchar pp_croaking pp_line_numbers primitive-* ppt-* pthread reduce
-  slice subclass thread thread_def ufunc
-);
-$text .= <<EOF;
-
-coretest : core
-	cd Basic && \$(FULLPERLRUN) "$::Config{bin}/prove" -I ../blib/lib -I ../blib/arch $coretest
+	$(NOECHO) $(PERLRUNINST) utils$(DFSEP)scantree.pl "$(DESTDIR)$(INSTALLARCHLIB)"
 EOF
-
-$text .= <<EOF;
-
+  $text .= <<EOT if $^O !~ /MSWin/;
+${pdlroot}$::Config{exe_ext} : ${pdlroot}.c
+\t\$(CC) \$(CFLAGS) \$(LDFLAGS) \$(CCCDLFLAGS) ${pdlroot}.c -o \$\@
+EOT
+  my $typespm = ::catfile(qw(lib PDL Types.pm));
+  for (qw(pdl.h)) {
+    my $base = "lib/PDL/Core/$_"; # no catfile as init_PM uses File::Find which normalises to /
+    $text .= "$base :: $base.PL $typespm\n\t\$(PERLRUN) $base.PL $base\n";
+  }
+  $text .= "\n" . ::coretarget($self);
+  my $coretest = join ' ', map ::catfile('t', $_.'.t'), qw(
+    01-pptest autoload bad basic bool clump constructor core croak lvalue
+    math matrix matrixops nat_complex ops-bitwise ops pdl_from_string
+    pdlchar pp_croaking pp_line_numbers primitive-* ppt-* pthread reduce
+    slice subclass thread thread_def ufunc
+  );
+  my $basictest = join ' ', map ::catfile('t', $_.'.t'), qw(
+    compression fft imagergb picnorgb picrgb pic_16bit io-pnm pic-rim
+    io-misc
+  );
+  $text .= <<EOF;
+basictest : basic pm_to_blib core
+	\$(FULLPERLRUN) "$::Config{bin}/prove" -b $basictest
+coretest : core pm_to_blib
+	\$(FULLPERLRUN) "$::Config{bin}/prove" -b $coretest
 update-ppport:
-	cd Basic/Core && \$(PERLRUN) -MDevel::PPPort -e'Devel::PPPort::WriteFile' && \$(PERLRUN) ppport.h --strip
-
+	\$(PERLRUN) -MDevel::PPPort -e'Devel::PPPort::WriteFile' && \$(PERLRUN) lib/PDL/Core/ppport.h --strip
 EOF
-
-return $text
-
+  $text .= ::pdlpp_postamble_int(@pd_srcs);
+  $text;
+}
+sub _nopl { $_[0] =~ s/[.]PL$//r }
+sub init_PM {
+  my ($self) = @_;
+  $self->SUPER::init_PM;
+  my ($pm, $plf) = @$self{qw(PM PL_FILES)};
+  for my $f (grep /pdl\.h\.PL$/, keys %$pm) {
+    $pm->{ _nopl($f) } = _nopl(delete $pm->{$f}); # dealing in postamble but still install
+  }
+  for my $f (grep /\.PL$/, keys %$pm) {
+    $pm->{ $plf->{$f} = _nopl($f) } = _nopl(delete $pm->{$f});
+  }
+  @pd_srcs = ::pdlpp_eumm_update_deep($self);
+}
 }
 
-# the modules to test the ones in full PDL
-my @basics; BEGIN { @basics = (
-  [qw(Basic Demos)],
-  [qw(Basic Doc)],
-  [qw(Basic IO-FITS)],
-  [qw(Basic IO-Misc)],
-  [qw(Basic IO-Pnm)],
-  [qw(Basic IO-Storable)],
-  [qw(Basic Lib-Compression)],
-  [qw(Basic Lib-FFT)],
-  [qw(Basic Lib-ImageND)],
-  [qw(Basic Lib-ImageRGB)],
-) }
 sub coretarget {
     my ($self) = @_;
     # remember the fundamental ones end up far to right as much deps on them
@@ -198,42 +242,8 @@ sub coretarget {
     # @prereqs are named targets - undef=[]
     # all a left's rights are made concurrently, no sequence - list ALL prereqs
     my @left2rights = (
-        [
-            coregen => [
-                [ [ qw(Basic) ], [ qw(pm_to_blib) ], ],
-                [ [ qw(Basic Core) ], [ qw(pm_to_blib) ], ],
-                [ [ qw(Basic Gen) ], [ qw(all) ], ],
-            ]
-        ],
-        [
-            core => [
-                [ [ qw(Basic SourceFilter) ], [ qw(pm_to_blib) ], ],
-                map [
-                    [ 'Basic', $_ ],
-                    [ qw(pure_all) ],
-                    [ 'coregen' ],
-                # the modules in PDL::LiteF, used in t/core.t
-                ], qw(Core Ops Primitive Ufunc Slices Bad Math MatrixOps IO-FastRaw),
-            ]
-        ],
-        [
-            basic => [
-                map [
-                    $_,
-                    [ qw(pm_to_blib dynamic) ],
-                    [ 'core' ],
-                ], @basics,
-            ]
-        ],
-        [
-            basictest => [
-                map [
-                    $_,
-                    [ 'test' ],
-                    [ 'basic' ],
-                ], @basics,
-            ]
-        ],
+      [core => [ map qq{build_\$(LINKTYPE)_PDL_}.(s#/#_#gr), @BUILD_CORE ]],
+      [basic => [(map qq{build_\$(LINKTYPE)_PDL_}.(s#/#_#gr), @BUILD_BASIC)]],
     );
     join "\n", map flatten_parallel_target($self, $_), @left2rights;
 }
@@ -241,9 +251,9 @@ sub coretarget {
 sub format_chunk {
     my ($self, $left, $deps, $dir, $targets) = @_;
     my @m = join ' ', $left, ':', @{$deps||[]};
-    my $fsdir = File::Spec->catdir(@$dir);
     push @m, "\t" . $self->oneliner(
-        "die \$! unless chdir q($fsdir); exec q(\$(MAKE) @$targets)"
+        (@$dir ? "die \$! unless chdir q(".catdir(@$dir)."); " : '').
+        "exec q(\$(MAKE) @$targets)"
     );
     join '', map "$_\n", @m;
 }
@@ -278,6 +288,6 @@ sub flatten_parallel_target {
 sub parallel_target_mangle {
     my ($self, $dir, $targets) = @_;
     my $target = join '_', @$dir, @$targets;
-    $target =~ s#[/\\]#_#g; # avoid ambiguity with filenames
+    $target =~ s#[\$\(\)/\\_\.]+#_#g; # avoid ambiguity with filenames
     $target;
 }

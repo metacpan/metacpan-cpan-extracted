@@ -1,5 +1,8 @@
 Revision history for Crypt-URandom
 
+0.41 - Thu Jan 02 09:51:36 2025
+       Adding getrandom(2) support including a dedicated method. Thanks to Robert Rothenberg and H.Merijn Brand for GH#5
+
 0.40 - Sat Feb 17 06:34:33 2024
        Moving $OSNAME checks to compile time with GH#4.  Thanks to Aristotle.
        Test and documentation fixes in GH#1, GH#2, GH#3.  Thanks to guest20.

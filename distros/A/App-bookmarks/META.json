@@ -1,5 +1,5 @@
 {
-   "abstract" : "Export browser bookmarks as plain text.",
+   "abstract" : "Export bookmarks from browsers and files.",
    "author" : [
       "jul <kaldor@cpan.com>"
    ],
@@ -36,7 +36,7 @@
             "File::Copy" : "0",
             "File::Temp" : "0",
             "Getopt::Std" : "0",
-            "perl" : "5.010"
+            "perl" : "5.014"
          }
       },
       "test" : {
@@ -57,6 +57,6 @@
          "web" : "https://github.com/kal247/App-bookmarks"
       }
    },
-   "version" : "0.34",
+   "version" : "0.35",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

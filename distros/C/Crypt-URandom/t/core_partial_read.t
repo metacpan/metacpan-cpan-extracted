@@ -14,6 +14,7 @@ SKIP: {
 		use warnings;
 		require POSIX;
 		my $required_error_message = quotemeta "Only read 0 bytes from";
+		@INC = grep !/arch/, @INC; # making sure we're testing pure perl version
 		require Crypt::URandom;
 		my $generated = 0;
 		eval {
