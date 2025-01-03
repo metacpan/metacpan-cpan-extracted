@@ -1,0 +1,57 @@
+{
+   "abstract" : "SMS::Send driver base class for web services",
+   "author" : [
+      "Michael R. Davis (mrdvt)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "SMS-Send-Driver-WebService",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::IniFiles" : "0",
+            "HTTP::Tiny" : "0",
+            "LWP::UserAgent" : "0",
+            "Path::Class" : "0",
+            "SMS::Send" : "0",
+            "Test::Simple" : "0.44",
+            "URI" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mrdvt92/perl-SMS-Send-Driver-WebService/issues"
+      },
+      "homepage" : "https://github.com/mrdvt92/perl-SMS-Send-Driver-WebService",
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/mrdvt92/perl-SMS-Send-Driver-WebService.git"
+      }
+   },
+   "version" : "0.08"
+}

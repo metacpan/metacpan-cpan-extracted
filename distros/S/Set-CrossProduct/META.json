@@ -31,6 +31,8 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
+            "List::Util" : "0",
             "perl" : "5.008"
          }
       },
@@ -52,6 +54,6 @@
          "web" : "https://github.com/briandfoy/set-crossproduct"
       }
    },
-   "version" : "2.009",
+   "version" : "3.001",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

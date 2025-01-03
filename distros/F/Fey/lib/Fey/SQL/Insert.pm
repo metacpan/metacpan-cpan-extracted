@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.43';
+our $VERSION = '0.44';
 
 use Fey::Types
     qw( ArrayRef HashRef CanQuote IntoElement NonNullableInsertValue
@@ -186,13 +186,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Fey::SQL::Insert - Represents a INSERT query
 
 =head1 VERSION
 
-version 0.43
+version 0.44
 
 =head1 SYNOPSIS
 
@@ -301,16 +303,25 @@ Returns the C<VALUES> clause portion of the SQL statement as a string.
 
 See L<Fey> for details on how to report bugs.
 
+Bugs may be submitted at L<https://github.com/ap/Fey/issues>.
+
+=head1 SOURCE
+
+The source code repository for Fey can be found at L<https://github.com/ap/Fey>.
+
 =head1 AUTHOR
 
 Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2011 - 2015 by Dave Rolsky.
+This software is Copyright (c) 2011 - 2025 by Dave Rolsky.
 
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
+
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
 
 =cut

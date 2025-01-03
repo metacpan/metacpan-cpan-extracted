@@ -62,11 +62,11 @@ sub test_binop {
   isok("$lab:${op_name}:func:b=sparse:missing=$missing_val:swap=$swap:type",
        $ccs_bs->type, $dense_rc->type);
   pdlok("$lab:${op_name}:func:b=sparse:missing=$missing_val:swap=$swap:nzvals",
-	$ccs_bs->_nzvals, $dense_rc->indexND($ccs_bs->_whichND));
+        $ccs_bs->_nzvals, $dense_rc->indexND($ccs_bs->_whichND));
   isok("$lab:${op_name}:func:b=dense:missing=$missing_val:swap=$swap:type",
        $ccs_b->type, $dense_rc->type);
   pdlok("$lab:${op_name}:func:b=dense:missing=$missing_val:swap=$swap:nzvals",
-	$ccs_b->_nzvals, $dense_rc->indexND($ccs_b->_whichND));
+        $ccs_b->_nzvals, $dense_rc->indexND($ccs_b->_whichND));
 
   if (defined($op_op)) {
     if (!$swap) {
@@ -79,13 +79,13 @@ sub test_binop {
       eval "\$ccs_b    = (\$bs $op_op \$a);";
     }
     isok("$lab:${op_name}:op=$op_op:b=sparse:missing=$missing_val:swap=$swap:type",
-	 $ccs_bs->type, $dense_rc->type);
+         $ccs_bs->type, $dense_rc->type);
     pdlok("$lab:${op_name}:op=$op_op:b=sparse:missing=$missing_val:swap=$swap:nzvals",
-	  $ccs_bs->_nzvals, $dense_rc->indexND(scalar $ccs_bs->_whichND));
+          $ccs_bs->_nzvals, $dense_rc->indexND(scalar $ccs_bs->_whichND));
     isok("$lab:${op_name}:op=$op_op:b=dense:missing=$missing_val:swap=$swap:type",
-	 $ccs_b->type, $dense_rc->type);
+         $ccs_b->type, $dense_rc->type);
     pdlok("$lab:${op_name}:op=$op_op:b=dense:missing=$missing_val:swap=$swap:nzvals",
-	  $ccs_b->_nzvals, $dense_rc->indexND(scalar $ccs_b->_whichND));
+          $ccs_b->_nzvals, $dense_rc->indexND(scalar $ccs_b->_whichND));
   } else {
     isok("$lab:${op_name}:op=NONE:b=sparse:missing=$missing_val:swap=$swap:type (dummy)", 1);
     isok("$lab:${op_name}:op=NONE:b=sparse:missing=$missing_val:swap=$swap:vals (dummy)", 1);
@@ -94,31 +94,31 @@ sub test_binop {
   }
 }
 
-my @binops = (			##-- *20
-	      ##-- Arithmetic
-	      ['plus','+'],
-	      ['minus','-'],
-	      ['mult','*'],
-	      ['divide','/'],
-	      ['modulo','%'],
-	      ['power','**'],
+my @binops = (                  ##-- *20
+              ##-- Arithmetic
+              ['plus','+'],
+              ['minus','-'],
+              ['mult','*'],
+              ['divide','/'],
+              ['modulo','%'],
+              ['power','**'],
 
-	      ##-- Comparisons
-	      [qw(gt >)],
-	      [qw(lt <)],
-	      [qw(ge >=)],
-	      [qw(le <=)],
-	      [qw(eq ==)],
-	      [qw(ne !=)],
-	      [qw(spaceship <=>)],
+              ##-- Comparisons
+              [qw(gt >)],
+              [qw(lt <)],
+              [qw(ge >=)],
+              [qw(le <=)],
+              [qw(eq ==)],
+              [qw(ne !=)],
+              [qw(spaceship <=>)],
 
-	      ##-- Logical & bitwise
-	      [qw(and2 &)],
-	      [qw(or2 |)],
-	      [qw(xor ^)],
-	      [qw(shiftleft <<)],
-	      [qw(shiftright >>)],
-	     );
+              ##-- Logical & bitwise
+              [qw(and2 &)],
+              [qw(or2 |)],
+              [qw(xor ^)],
+              [qw(shiftleft <<)],
+              [qw(shiftright >>)],
+             );
 
 my ($b);
 

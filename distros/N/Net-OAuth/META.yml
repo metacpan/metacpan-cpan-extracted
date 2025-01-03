@@ -2,21 +2,24 @@
 abstract: 'An implementation of the OAuth protocol'
 author:
   - 'Keith Grennan <kgrennan@cpan.org>'
+  - 'Robert Rothenberg <rrwo@cpan.org>'
 build_requires:
-  Test::More: 0.66
-  Test::Warn: 0.21
+  Test::More: '0.66'
+  Test::Warn: '0.21'
 configure_requires:
-  Module::Build: 0.36
-generated_by: 'Module::Build version 0.3603'
+  Module::Build: '0.4234'
+  Module::Build::Compat: '0.4234'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Net-OAuth
 provides:
   Net::OAuth:
     file: lib/Net/OAuth.pm
-    version: 0.28
+    version: '0.30'
   Net::OAuth::AccessToken:
     file: lib/Net/OAuth/AccessToken.pm
   Net::OAuth::AccessTokenRequest:
@@ -25,6 +28,7 @@ provides:
     file: lib/Net/OAuth/AccessTokenResponse.pm
   Net::OAuth::Client:
     file: lib/Net/OAuth/Client.pm
+    version: '0.30'
   Net::OAuth::ConsumerRequest:
     file: lib/Net/OAuth/ConsumerRequest.pm
   Net::OAuth::Message:
@@ -33,7 +37,7 @@ provides:
     file: lib/Net/OAuth/ProtectedResourceRequest.pm
   Net::OAuth::Request:
     file: lib/Net/OAuth/Request.pm
-    version: 0.28
+    version: '0.30'
   Net::OAuth::RequestTokenRequest:
     file: lib/Net/OAuth/RequestTokenRequest.pm
   Net::OAuth::RequestTokenResponse:
@@ -65,14 +69,17 @@ provides:
   Net::OAuth::YahooAccessTokenRefreshRequest:
     file: lib/Net/OAuth/YahooAccessTokenRefreshRequest.pm
 requires:
-  Class::Accessor: 0.31
-  Class::Data::Inheritable: 0.06
-  Digest::HMAC_SHA1: 1.01
-  Digest::SHA: 5.47
-  Digest::SHA1: 2.12
-  Encode: 2.35
-  LWP::UserAgent: 1
-  URI::Escape: 3.28
+  Class::Accessor: '0.31'
+  Class::Data::Inheritable: '0.06'
+  Crypt::URandom: '0.37'
+  Digest::HMAC_SHA1: '1.01'
+  Digest::SHA: '5.47'
+  Encode: '2.35'
+  LWP::UserAgent: '1'
+  URI: '5.15'
 resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Net-OAuth
   license: http://dev.perl.org/licenses/
-version: 0.28
+  repository: https://github.com/keeth/Net-OAuth.git
+version: '0.30'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -80,7 +80,7 @@
    "provides" : {
       "Hash::Match" : {
          "file" : "lib/Hash/Match.pm",
-         "version" : "v0.8.1"
+         "version" : "v0.8.2"
       }
    },
    "release_status" : "stable",
@@ -94,7 +94,7 @@
          "web" : "https://github.com/robrwo/Hash-Match"
       }
    },
-   "version" : "v0.8.1",
+   "version" : "v0.8.2",
    "x_authority" : "cpan:RRWO",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"

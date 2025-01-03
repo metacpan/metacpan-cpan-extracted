@@ -30,6 +30,7 @@ perf/brick_hash.t
 perf/bucket_memory.t
 perf/get_brick_by_name.t
 README.pod
+SECURITY.md
 t/apply.t
 t/bucket/add_to_bucket.t
 t/bucket/get_brick_by_name.t

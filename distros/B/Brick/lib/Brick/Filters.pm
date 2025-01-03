@@ -3,7 +3,7 @@ package Brick::Filters;
 use base qw(Exporter);
 use vars qw($VERSION);
 
-$VERSION = '0.902';
+$VERSION = '0.903';
 
 package Brick::Bucket;
 use strict;
@@ -35,8 +35,7 @@ error.
 
 =cut
 
-sub _uppercase
-	{
+sub _uppercase {
 	my( $bucket, $setup ) = @_;
 
 	my @caller = $bucket->__caller_chain_as_list();
@@ -68,8 +67,7 @@ error.
 
 =cut
 
-sub _lowercase
-	{
+sub _lowercase {
 	my( $bucket, $setup ) = @_;
 
 	my @caller = $bucket->__caller_chain_as_list();
@@ -101,8 +99,7 @@ error.
 
 =cut
 
-sub _remove_non_digits
-	{
+sub _remove_non_digits {
 	my( $bucket, $setup ) = @_;
 
 	my @caller = $bucket->__caller_chain_as_list();
@@ -139,8 +136,7 @@ This filter always succeeds, so it will not generate an error.
 
 =cut
 
-sub _remove_whitespace
-	{
+sub _remove_whitespace {
 	my( $bucket, $setup ) = @_;
 
 	my @caller = $bucket->__caller_chain_as_list();
@@ -169,8 +165,7 @@ This filter always succeeds, so it will not generate an error.
 
 =cut
 
-sub _remove_extra_fields
-	{
+sub _remove_extra_fields {
 	my( $bucket, $setup ) = @_;
 
 	my @caller = $bucket->__caller_chain_as_list();
@@ -207,11 +202,11 @@ This source is in Github:
 
 =head1 AUTHOR
 
-brian d foy, C<< <bdfoy@cpan.org> >>
+brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT
 
-Copyright © 2007-2022, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2007-2025, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

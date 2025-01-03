@@ -1,5 +1,8 @@
 Revision history for Perl module Mac::Errors
 
+1.193 2025-01-03T05:32:09Z
+	* refresh distro and move to BRIANDFOY
+
 1.192 2018-06-20T17:49:32Z
 	* Clarify that it's the Artistic License 2.0
 

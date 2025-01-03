@@ -1,6 +1,9 @@
 Revision history for App-bookmarks
 
 0.35    2025-01-01
+        - fixed documentation
+
+0.35    2025-01-01
         - use 5.014
         - fixed exit status
         - added CSV and HTML output format

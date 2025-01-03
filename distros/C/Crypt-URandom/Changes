@@ -1,5 +1,11 @@
 Revision history for Crypt-URandom
 
+0.43 - Fri Jan 03 19:58:22 2025
+       More fixes to test suite.  Thanks to Slaven Rezić for GH#6
+
+0.42 - Fri Jan 03 10:49:20 2025
+       Fixes to test suite.  Thanks to Slaven Rezić for GH#6
+
 0.41 - Thu Jan 02 09:51:36 2025
        Adding getrandom(2) support including a dedicated method. Thanks to Robert Rothenberg and H.Merijn Brand for GH#5
 

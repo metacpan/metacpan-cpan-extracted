@@ -1,24 +1,27 @@
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec
-odio. Praesent libero. Sed cursus ante dapibus diam. Sed nisi. Nulla quis
-sem at nibh elementum imperdiet. Duis sagittis ipsum. Praesent mauris. Fusce
-nec tellus sed augue semper porta. Mauris massa. Vestibulum lacinia arcu eget
-nulla. Nulla vitae massa at libero auctor interdum. Integer vitae libero ac
-risus egestas placerat. Duis ac turpis. Integer aliquet, massa id gravida
-bibendum, nisl turpis ultrices sapien, a tincidunt risus odio a enim.
+Greetings Good People!
 
-Fusce vel dui. Nullam sit amet nisi condimentum erat iaculis auctor. Vivamus
-magna justo, lacinia eget consectetur sed, convallis at tellus. Mauris
-blandit aliquet elit, eget tincidunt nibh pulvinar a. Sed porttitor lectus
-nibh. Cras ultricies ligula sed magna dictum porta. Nulla porttitor accumsan
-tincidunt. Cras ultricies ligula sed magna dictum porta. Vestibulum ac diam
-sit amet quam vehicula elementum sed sit amet dui. Nulla quis lorem ut libero
-malesuada feugiat.
+Best viewed in HTML or on the web.
 
-Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere
-cubilia curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper
-sit amet ligula. Proin eget tortor risus. Curabitur arcu erat, accumsan
-id imperdiet et, porttitor at sem. Praesent sapien massa, convallis a
-pellentesque nec, egestas non nisi. Vivamus suscipit tortor eget felis
-porttitor volutpat. Donec sollicitudin molestie malesuada. Pellentesque in
-ipsum id orci porta dapibus. Sed porttitor lectus nibh.
+[webversion]
 
+Additional links:
+
+    https://boyscoutpatch.com/ - main portal for all the links below
+    https://boyscoutpatchvalues.com/ - Main site for an archive of FREE patch values is here,  I am working on getting a daily dump of all sold items.
+    https://boyscoutpatchdeals.com/ - Updated every 10 minutes, find great bargains on auctions closing in the next 3 hours (great to check at odd hours)
+    https://boyscoutpatch.info/ - Member supported site with search tools and access to auction images ($29.95/yr now)
+
+Ways to Support Me
+
+    share this email with fellow collectors of the cloth
+    visit the links, especially the links to eBay
+    purchase a membership if you're an active buyer or seller
+
+YiS && WWW,
+
+Brett Estrade
+boyscoutpatch.com
+
+Mailing address for marketing compliance: 9711 125-329 S. Mason Rd, Richmond, Tx 77407
+
+[unsubscribe]

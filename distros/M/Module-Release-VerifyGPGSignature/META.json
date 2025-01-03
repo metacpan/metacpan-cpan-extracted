@@ -1,0 +1,58 @@
+{
+   "abstract" : "Verify GPG signatures in the distro",
+   "author" : [
+      "brian d foy <briandfoy@pobox.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Module-Release-VerifyGPGSignature",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::Spec::Functions" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "perl" : "5.026"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/briandfoy/module-release-verifygpgsignature/issues"
+      },
+      "homepage" : "https://github.com/briandfoy/module-release-verifygpgsignature",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/briandfoy/module-release-verifygpgsignature",
+         "web" : "https://github.com/briandfoy/module-release-verifygpgsignature"
+      }
+   },
+   "version" : "0.002",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

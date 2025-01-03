@@ -11,7 +11,7 @@ use PDL::Exporter;
 use DynaLoader;
 
 
-   our $VERSION = '1.23.29';
+   our $VERSION = '1.24.0';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::CCS::Ops $VERSION;
@@ -58,7 +58,7 @@ PDL::CCS::Ops - Low-level binary operations for compressed storage sparse PDLs
 
 #line 51 "ccsops.pd"
 
-*ccs_indx = \&PDL::indx; ##-- typecasting for CCS indices
+*ccs_indx = \&PDL::indx; ##-- typecasting for CCS indices (deprecated)
 #line 63 "Ops.pm"
 
 

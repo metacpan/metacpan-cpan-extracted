@@ -1,17 +1,22 @@
 use strict;
 use warnings;
 
-use Test::More 0.95;
+use Test::More 1;
+my $class = 'Set::CrossProduct';
 
-my $Class = 'Set::CrossProduct';
-use_ok( $Class );
+subtest 'sanity' => sub {
+	use_ok $class or BAIL_OUT( "$class did not compile" );
+	can_ok $class, 'nth';
+	};
 
-my $cross = Set::CrossProduct->new( [ [1,2,3], [] ] );
-isa_ok( $cross, $Class );
+subtest 'empty set' => sub {
+	my $cross = $class->new( [ [1,2,3], [] ] );
+	isa_ok $cross, $class;
 
-is( $cross->cardinality, 0, "Cardinality is zero" );
-is( $cross->done, 1, "Done is already true (good)" );
-isa_ok( $cross->combinations, ref [], "Combinations is array ref" );
-is( scalar @{$cross->combinations}, 0, "Combinations has zero elements" );
+	is $cross->cardinality, 0, "Cardinality is zero";
+	is $cross->done, 1, "Done is already true (good)";
+	isa_ok $cross->combinations, ref [], "Combinations is array ref";
+	is scalar @{$cross->combinations}, 0, "Combinations has zero elements";
+	};
 
 done_testing();

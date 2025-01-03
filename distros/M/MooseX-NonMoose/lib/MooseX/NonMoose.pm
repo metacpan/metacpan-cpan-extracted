@@ -1,13 +1,10 @@
 package MooseX::NonMoose;
-BEGIN {
-  $MooseX::NonMoose::AUTHORITY = 'cpan:DOY';
-}
-{
-  $MooseX::NonMoose::VERSION = '0.26';
-}
+
 use Moose::Exporter;
 use Moose::Util;
+
 # ABSTRACT: easy subclassing of non-Moose classes
+our $VERSION = '0.27'; # VERSION
 
 
 my ($import, $unimport, $init_meta) = Moose::Exporter->build_import_methods(
@@ -34,13 +31,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 MooseX::NonMoose - easy subclassing of non-Moose classes
 
 =head1 VERSION
 
-version 0.26
+version 0.27
 
 =head1 SYNOPSIS
 
@@ -136,7 +135,7 @@ normal Moose classes.
 =back
 
 Please report any bugs to GitHub Issues at
-L<https://github.com/doy/moosex-nonmoose/issues>.
+L<https://github.com/uperl/moosex-nonmoose/issues>.
 
 =head1 SEE ALSO
 
@@ -167,15 +166,11 @@ L<https://metacpan.org/release/MooseX-NonMoose>
 
 =item * Github
 
-L<https://github.com/doy/moosex-nonmoose>
+L<https://github.com/uperl/moosex-nonmoose>
 
 =item * RT: CPAN's request tracker
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=MooseX-NonMoose>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/MooseX-NonMoose>
 
 =back
 
@@ -183,11 +178,13 @@ L<http://cpanratings.perl.org/d/MooseX-NonMoose>
 
 =head1 AUTHOR
 
-Jesse Luehrs <doy@tozt.net>
+Original author: Jesse Luehrs E<lt>doy@tozt.netE<gt>
+
+Current maintainer: Graham Ollis E<lt>plicease@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Jesse Luehrs.
+This software is copyright (c) 2009-2025 by Jesse Luehrs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

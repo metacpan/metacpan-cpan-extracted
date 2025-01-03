@@ -17,7 +17,7 @@ our %EXPORT_TAGS = ( 'all' => \@EXPORT_OK, );
 our @CARP_NOT = ('Crypt::URandom');
 
 BEGIN {
-    our $VERSION = '0.41';
+    our $VERSION = '0.43';
     eval {
         require XSLoader;
 
@@ -127,7 +127,7 @@ _RTLGENRANDOM_PROTO_
         require FileHandle;
         $_urandom_handle = FileHandle->new( PATH(), Fcntl::O_RDONLY() )
           or Carp::croak(
-            q[Failed to open '] . PATH() . qq['. " for reading:$OS_ERROR] );
+            q[Failed to open ] . PATH() . qq[ for reading:$OS_ERROR] );
         binmode $_urandom_handle;
     }
     return;
@@ -192,17 +192,18 @@ sub _urandom {
                 return $buffer;
             }
             else {
+                my $error = $EXTENDED_OS_ERROR;
                 $_urandom_handle = undef;
                 $_initialised    = undef;
                 Carp::croak(
-                    qq[Only read $result bytes from '] . PATH() . q['] );
+                    qq[Only read $result bytes from ] . PATH() . qq[:$error] );
             }
         }
         else {
-            my $error = $OS_ERROR;
+            my $error = $EXTENDED_OS_ERROR;
             $_urandom_handle = undef;
             $_initialised    = undef;
-            Carp::croak( q[Failed to read from '] . PATH() . qq[':$error] );
+            Carp::croak( q[Failed to read from ] . PATH() . qq[:$error] );
         }
     }
 }
@@ -217,7 +218,7 @@ Crypt::URandom - Provide non blocking randomness
 
 =head1 VERSION
 
-This document describes Crypt::URandom version 0.41
+This document describes Crypt::URandom version 0.43
 
 
 =head1 SYNOPSIS

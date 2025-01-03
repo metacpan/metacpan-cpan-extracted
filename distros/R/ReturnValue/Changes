@@ -1,5 +1,8 @@
 Revision history for Perl module ReturnValue
 
+0.904 2025-01-03T06:15:00Z
+	* refresh distro and move to BRIANDFOY
+
 0.903 2022-01-26T06:46:08Z
 	* This is a release mostly to test adding releases to GitHub, and
 	getting DOI's for all those: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-citation-files

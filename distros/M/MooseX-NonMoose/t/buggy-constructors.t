@@ -30,7 +30,7 @@ with_immutable {
 {
     package BadFoo;
 
-    sub new { bless {} }
+    sub new { bless {} }  ## no critic (ClassHierarchies::ProhibitOneArgBless)
 }
 
 {

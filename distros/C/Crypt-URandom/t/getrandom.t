@@ -4,10 +4,17 @@ use Config;
 use strict;
 use warnings;
 
+my %optional;
+if ($^O eq 'MSWin32') {
+} else {
+	eval `cat ./check_random.pl`;
+	if ($optional{DEFINE}) {
+		diag("check_random.pl produced the flag of $optional{DEFINE}");
+	}
+}
+
 SKIP: {
 	if ($^O eq 'linux') { # LD_PRELOAD trick works here
-		my %optional;
-		eval `cat ./check_random.pl`;
 		if (($optional{DEFINE}) && ($optional{DEFINE} eq '-DHAVE_CRYPT_URANDOM_NATIVE_GETRANDOM')) {
 
 			my $failed_number_of_bytes = 13;

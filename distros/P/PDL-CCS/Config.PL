@@ -28,8 +28,8 @@ require PDL;
 $cconfig{INDX_CTYPE} = "PDL_Indx";
 $cconfig{INDX_SIG}   = "indx";
 $cconfig{INDX_FUNC}  = "indx";
-$cconfig{INDX_TYPEDEF} = "typedef $cconfig{INDX_CTYPE} CCS_Indx;  /**< typedef for CCS indices */\n";
-$cconfig{INDX_FUNCDEF} = "*ccs_indx = \\&PDL::$cconfig{INDX_FUNC}; ##-- typecasting for CCS indices\n";
+$cconfig{INDX_TYPEDEF} = "typedef $cconfig{INDX_CTYPE} CCS_Indx;  /**< typedef for CCS indices (deprecated) */\n";
+$cconfig{INDX_FUNCDEF} = "*ccs_indx = \\&PDL::$cconfig{INDX_FUNC}; ##-- typecasting for CCS indices (deprecated)\n";
 
 ##-- figure out what integer types we have available
 require PDL::Types;
@@ -42,10 +42,10 @@ if (version->parse($PDL::VERSION) >= version->parse("2.037")) {
 } else {
   ##-- integer types for b*over &c, PDL < v2.037: functional (and mostly equivalent)
   $cconfig{INT_TYPE_KEYS} = [map {$_->{sym}}
-			     sort {$a->{numval} <=> $b->{numval}}
-			     grep {$_->{ppsym} =~ /^(?:[BSULQN]|LL|US)$/}
-			     values %PDL::Types::typehash
-			    ];
+                             sort {$a->{numval} <=> $b->{numval}}
+                             grep {$_->{ppsym} =~ /^(?:[BSULQN]|LL|US)$/}
+                             values %PDL::Types::typehash
+                            ];
   $cconfig{INT_TYPE_CHRS} = [map {$_->{ppsym}} @PDL::Types::typehash{ @{$cconfig{INT_TYPE_KEYS}} }];
 
   ##-- PDL < v2.037 downcasts to 'indx' if available (but probably should use 'longlong' if it could)
@@ -61,12 +61,13 @@ print CONFIGPM <<'EOF';
 ## Automatically generated, remove to re-configure!
 
 package PDL::CCS::Config;
+use strict;
 use PDL qw();
 our @ISA = qw(Exporter);
 our (%ccsConfig);
 our @EXPORT      = qw(ccs_indx);
 our @EXPORT_OK   = ('%ccsConfig', 'ccs_indx');
-our %EXPORT_TAGS = (config=>['%ccsConfig'], Func=>\@Export, default=>\@EXPORT, all=>\@EXPORT_OK);
+our %EXPORT_TAGS = (config=>['%ccsConfig'], Func=>\@EXPORT, default=>\@EXPORT, all=>\@EXPORT_OK);
 
 EOF
 

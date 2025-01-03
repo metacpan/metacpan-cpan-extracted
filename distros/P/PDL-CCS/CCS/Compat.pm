@@ -12,12 +12,12 @@ use PDL::CCS::Ufunc;
 use PDL::CCS::Ops;
 use strict;
 
-our $VERSION = '1.23.29'; ##-- update with perl-reversion from Perl::Version module
+our $VERSION = '1.24.0'; ##-- update with perl-reversion from Perl::Version module
 our @ISA = ('PDL::Exporter');
 our @ccs_binops = (qw(plus minus mult divide modulo power),
-		   qw(gt ge lt le eq ne spaceship),
-		   qw(and2 or2 xor shiftleft shiftright),
-		  );
+                   qw(gt ge lt le eq ne spaceship),
+                   qw(and2 or2 xor shiftleft shiftright),
+                  );
 our @EXPORT_OK =
   (
    ##
@@ -619,9 +619,9 @@ sub ccswhichND {
   my ($ptr,$rowids,$nzvals, $which_cols,$which_rows) = @_;
   my ($ptrnzi);
   ($which_cols,$ptrnzi) = ccs_decode_pointer($ptr->append($rowids->nelem),
-					     sequence(ccs_indx, $ptr->nelem),
-					     $which_cols
-					    );
+                                             sequence(ccs_indx, $ptr->nelem),
+                                             $which_cols
+                                            );
   $which_rows  = zeroes(ccs_indx, $rowids->nelem) if (!defined($which_rows));
   $which_rows .= $rowids->index($ptrnzi);
   return wantarray ? ($which_cols,$which_rows) : $which_cols->cat($which_rows)->xchg(0,1);
@@ -925,13 +925,13 @@ sub ccs_ufunc_compat_t {
 =head2 Compressed Column Format Example
 
  $a = pdl([
-	   [10, 0, 0, 0,-2,  0],
-	   [3,  9, 0, 0, 0,  3],
-	   [0,  7, 8, 7, 0,  0],
-	   [3,  0, 8, 7, 5,  0],
-	   [0,  8, 0, 9, 9, 13],
-	   [0,  4, 0, 0, 2, -1]
-	  ]);
+           [10, 0, 0, 0,-2,  0],
+           [3,  9, 0, 0, 0,  3],
+           [0,  7, 8, 7, 0,  0],
+           [3,  0, 8, 7, 5,  0],
+           [0,  8, 0, 9, 9, 13],
+           [0,  4, 0, 0, 2, -1]
+          ]);
 
  ($ptr,$rowids,$nzvals) = ccsencode($a);
 

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.43';
+our $VERSION = '0.44';
 
 use Fey::Exceptions qw( param_error );
 use Fey::NamedObjectSet;
@@ -126,7 +126,7 @@ sub foreign_keys_for_table {
 
     my %fks = (
         map { $_->id() => $_ }
-            map { values %{ $self->_fks()->{$name}{$_} } }
+        map { values %{ $self->_fks()->{$name}{$_} } }
             keys %{ $self->_fks()->{$name} || {} }
     );
 
@@ -152,9 +152,9 @@ sub foreign_keys_between_tables {
         :                              $table2->table()->name();
 
     my %fks = (
-        map { $_->id() => $_ }
-            grep { $_->has_tables( $name1, $name2 ) }
-            map { values %{ $self->_fks()->{$name1}{$_} } }
+        map  { $_->id() => $_ }
+        grep { $_->has_tables( $name1, $name2 ) }
+        map  { values %{ $self->_fks()->{$name1}{$_} } }
             keys %{ $self->_fks()->{$name1} || {} }
     );
 
@@ -170,8 +170,7 @@ sub foreign_keys_between_tables {
     my @fks;
 
     for my $fk ( values %fks ) {
-        my %p
-            = $table1->name() eq $fk->source_table()->name()
+        my %p = $table1->name() eq $fk->source_table()->name()
             ? (
             source_columns => [
                 $table1->columns(
@@ -213,13 +212,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Fey::Schema - Represents a schema and contains tables and foreign keys
 
 =head1 VERSION
 
-version 0.43
+version 0.44
 
 =head1 SYNOPSIS
 
@@ -322,16 +323,25 @@ tables. This provides support for joining an alias in a SQL statement.
 
 See L<Fey> for details on how to report bugs.
 
+Bugs may be submitted at L<https://github.com/ap/Fey/issues>.
+
+=head1 SOURCE
+
+The source code repository for Fey can be found at L<https://github.com/ap/Fey>.
+
 =head1 AUTHOR
 
 Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2011 - 2015 by Dave Rolsky.
+This software is Copyright (c) 2011 - 2025 by Dave Rolsky.
 
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
+
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
 
 =cut

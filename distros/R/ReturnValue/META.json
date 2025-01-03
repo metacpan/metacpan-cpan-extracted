@@ -1,10 +1,10 @@
 {
    "abstract" : "A structured return value for failure or success",
    "author" : [
-      "brian d foy <bdfoy@cpan.org>"
+      "brian d foy <briandfoy@pobox.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -45,7 +45,7 @@
    "resources" : {
       "X_authors" : [
          {
-            "email" : "bdfoy@cpan.org",
+            "email" : "briandfoy@pobox.com",
             "github" : "https://github.com/briandfoy",
             "linkedin" : "https://www.linkedin.com/in/briandfoy/",
             "name" : "brian d foy",
@@ -55,15 +55,15 @@
       ],
       "X_doi" : "10.5281/zenodo.5904392",
       "bugtracker" : {
-         "web" : "https://github.com/perlreview/returnvalue/issues"
+         "web" : "https://github.com/briandfoy/returnvalue/issues"
       },
-      "homepage" : "https://github.com/perlreview/returnvalue",
+      "homepage" : "https://github.com/briandfoy/returnvalue",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/perlreview/returnvalue.git",
-         "web" : "https://github.com/perlreview/returnvalue"
+         "url" : "https://github.com/briandfoy/returnvalue",
+         "web" : "https://github.com/briandfoy/returnvalue"
       }
    },
-   "version" : "0.903",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.904",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -155,6 +155,7 @@ EOF
 
   ##----------------------------
   ## PDL v2.058 package parameters $callpack,$multi_c
+  require PDL;
   $package = [@$package, undef, 1]
     if (@{$package||[]} == 3 && version->parse($PDL::VERSION) >= version->parse('2.058'));
 
@@ -173,7 +174,11 @@ EOF
 
   ##---------------------------
   ## returning list context? --> call pdlpp_stdargs()
-  return ::pdlpp_stdargs($package,@_) if ($package && wantarray && UNIVERSAL::can('main','pdlpp_stdargs'));
+  if ($package && wantarray && UNIVERSAL::can('main','pdlpp_stdargs')) {
+    ##  + TODO: dodge 'redefined' warnings here for Basic/Core/Types.pm.PL symbols on 1st nested submodule (currently PDL::CCS::Utils)
+    ##    > Subroutine typesrtkeys redefined at Basic/Core/Types.pm.PL line 484.
+    return ::pdlpp_stdargs($package,@_);
+  }
 }
 
 ##----------------------------------------------------------------------

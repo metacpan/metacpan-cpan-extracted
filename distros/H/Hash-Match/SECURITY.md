@@ -1,10 +1,10 @@
 This is the Security Policy for the Perl distribution Hash-Match.
 
-The latest version of this Security Policy can be found at
-https://metacpan.org/dist/Hash-Match.
+The latest version of this Security Policy can be found in the git repository at
+[https://github.com/robrwo/Hash-Match](https://github.com/robrwo/Hash-Match).
 
 This text is based on the CPAN Security Group's Guidelines for Adding
-a Security Policy to Perl Distributions (version 0.1.8).
+a Security Policy to Perl Distributions (version 0.1.9).
 https://security.metacpan.org/docs/guides/security-policy-for-authors.html
 
 # How to Report a Security Vulnerability

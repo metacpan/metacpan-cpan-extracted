@@ -8,11 +8,11 @@ use PDL::CCS::Config qw(ccs_indx);
 use PDL::CCS::Nd;
 use PDL::CCS::IO::Common qw(:intern); ##-- for e.g. _ccsio_open(), _ccsio_close()
 use PDL;
-use Fcntl qw(:seek);	   ##-- for rewinding
+use Fcntl qw(:seek);       ##-- for rewinding
 use Carp qw(confess);
 use strict;
 
-our $VERSION = '1.23.29';
+our $VERSION = '1.24.0';
 our @ISA = ('PDL::Exporter');
 our @EXPORT_OK =
   (
@@ -248,11 +248,11 @@ sub ccs_rpetsc {
 
   ##-- construct and return
   return PDL::CCS::Nd->newFromWhich($ix,$nz,
-				    pdims=>[$m,$n],
-				    flags=>$opts{flags},
-				    sorted=>$opts{sorted},
-				    steal=>1,
-				   );
+                                    pdims=>[$m,$n],
+                                    flags=>$opts{flags},
+                                    sorted=>$opts{sorted},
+                                    steal=>1,
+                                   );
 }
 
 

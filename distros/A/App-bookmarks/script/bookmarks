@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 #
-# bookmarks - Export bookmarks from browsers and files.
+# bookmarks - Export bookmarks from browsers and files
 #
 # Documentation at bottom of script.
 #
@@ -67,8 +67,9 @@ Usage: $program [-hVdas] [-f format] [file ...]
     -V, --version   version
     -d              debug (sent to STDERR)
     -a              all : process arguments and default locations
-    -f format       export format : csv, csv-noheader, html, html-raw, or any combination
-                    of characters t,u,d as <title> <url> <description> (default : tud)
+    -f format       export format : csv, csv-noheader, html, html-raw,
+                    or any combination of characters t,u,d as
+                    <title> <url> <description> (default : tud)
     -s              find schemeless URLs in text files (default : no)
 
 See `perldoc $program` for full documentation.
@@ -569,9 +570,13 @@ exit 0;
 
 __END__
 
+=pod
+
+=encoding utf8
+
 =head1 NAME
 
-bookmarks - Export bookmarks from browsers and files.
+bookmarks - Export bookmarks from browsers and files
 
 =head1 SYNOPSIS
 
@@ -581,37 +586,36 @@ bookmarks - Export bookmarks from browsers and files.
     -V, --version   version
     -d              debug (sent to STDERR)
     -a              all : process arguments and default locations
-    -f format       export format : csv, csv-noheader, html, html-raw, or any combination
-                    of characters t,u,d as <title> <url> <description> (default : tud)
+    -f format       export format : csv, csv-noheader, html, html-raw,
+                    or any combination of characters t,u,d as
+                    <title> <url> <description> (default : tud)
     -s              find schemeless URLs in text files (default : no)
 
 =head1 DESCRIPTION
 
-bookmarks is a tool to export bookmarks from files supplied as arguments.
-Without arguments, or with option -a, bookmarks will attempt to read files from browsers default locations.
-If file is a dash "-", STDIN is read and processed as plain text source. 
+B<bookmarks> is a tool to export bookmarks from files supplied as arguments. Without arguments, or with option B<-a>, B<bookmarks> will attempt to read files from browsers default locations. If I<file> is a dash "-", STDIN is read and processed as plain text source. 
 
 =head2 Supported sources :
 
 =over
 
-=item - Safari (*.plist)
+=item * Safari (*.plist)
 
-=item - Firefox (*.sqlite)
+=item * Firefox (*.sqlite)
 
-=item - Chrome and Edge (*Bookmarks)
+=item * Chrome and Edge (*Bookmarks)
 
-=item - Internet Explorer (*Favorites)
+=item * Internet Explorer (*Favorites)
 
-=item - Netscape (*.html)
+=item * Netscape Bookmarks File Format (*.html)
 
-=item - Markdown (*.md)
+=item * Markdown (*.md)
 
-=item - Gemini (*.gmi)
+=item * Gemini (*.gmi)
 
-=item - Surfraw (same as plain text)
+=item * Surfraw (same as plain text)
 
-=item - Plain text (any other extension)
+=item * Plain text (any other extension)
 
 =back
 
@@ -624,36 +628,34 @@ Markdown, Gemini and plain text files are processed line by line (as UTF-8) :
 =head2 Supported fields :
 
 =over
- 
-=item - <title> is the name, alias or title.
 
-=item - <url> is the address, URL or URI.
+=item * <title> is the name, alias or title.
 
-=item - <description> is only supported for Safari 'Description', Firefox 'Tags' and Markdown 'Title' (just the tooltip, actually).
+=item * <url> is the address, URL or URI.
+
+=item * <description> is only supported for Safari 'Description', Firefox 'Tags' and Markdown 'Title' (just the tooltip, actually).
 
 =back
 
 =head2 Output format :
 
-By default, fields <title> <url> <description> are exported as plain text. This can be changed by using option -f and specifying any combination of characters t,u,d.
-Other possible values :
+By default, fields <title> <url> <description> are exported as plain text. This can be changed by using option B<-f> and specifying any combination of characters t,u,d. Other possible values :
 
 =over
 
-=item - csv : Comma-separated values with double-quotes and CR NL (RFC 4180).
+=item * C<csv> : Comma-separated values with double-quotes and CR NL (RFC 4180).
 
-=item - csv-noheader : same as above, without header line.
+=item * C<csv-noheader> : same as above, without header line.
 
-=item - html : Netscape Bookmarks File Format.
+=item * C<html> : Netscape Bookmarks File Format.
 
-=item - html-raw : raw list of HTML <A> elements.
+=item * C<html-raw> : raw list of HTML <A> elements.
 
 =back
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<kaldor@cpan.org>, or through
-the web interface at L<https://github.com/kal247/App-bookmarks	/issues>.
+Please report any bugs or feature requests to C<kaldor@cpan.org>, or through the web interface at L<https://github.com/kal247/App-bookmarks/issues>.
 
 =head1 AUTHOR
 

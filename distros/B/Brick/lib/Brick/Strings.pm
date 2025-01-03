@@ -4,7 +4,7 @@ use strict;
 use base qw(Exporter);
 use vars qw($VERSION);
 
-$VERSION = '0.902';
+$VERSION = '0.903';
 
 package Brick::Bucket;
 use strict;
@@ -29,8 +29,7 @@ Brick::General - constraints for domain-nonspecific stuff
 
 =cut
 
-sub _value_length_is_exactly
-	{
+sub _value_length_is_exactly {
 	my( $bucket, $setup ) = @_;
 
 	$setup->{minimum_length} = $setup->{exact_length};
@@ -45,8 +44,7 @@ sub _value_length_is_exactly
 
 =cut
 
-sub _value_length_is_equal_to_greater_than
-	{
+sub _value_length_is_equal_to_greater_than {
 	my( $bucket, $setup ) = @_;
 
 	my @caller = $bucket->__caller_chain_as_list();
@@ -72,8 +70,7 @@ sub _value_length_is_equal_to_greater_than
 
 =cut
 
-sub _value_length_is_equal_to_less_than
-	{
+sub _value_length_is_equal_to_less_than {
 	my( $bucket, $setup ) = @_;
 
 	my @caller = $bucket->__caller_chain_as_list();
@@ -99,8 +96,7 @@ sub _value_length_is_equal_to_less_than
 
 =cut
 
-sub _value_length_is_between
-	{
+sub _value_length_is_between {
 	my( $bucket, $setup ) = @_;
 
 	local $setup->{name} = '';
@@ -130,11 +126,11 @@ This source is in Github:
 
 =head1 AUTHOR
 
-brian d foy, C<< <bdfoy@cpan.org> >>
+brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT
 
-Copyright © 2007-2022, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2007-2025, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

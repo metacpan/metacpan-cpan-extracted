@@ -11,7 +11,9 @@ Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 META.json
+Mojolicious-Plugin-DirectoryServer-1.004.tar.gz
 README.pod
+SECURITY.md
 t/00_compile.t
 t/auto_index.t
 t/default.t

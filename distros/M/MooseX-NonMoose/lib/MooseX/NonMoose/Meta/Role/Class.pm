@@ -1,16 +1,14 @@
 package MooseX::NonMoose::Meta::Role::Class;
-BEGIN {
-  $MooseX::NonMoose::Meta::Role::Class::AUTHORITY = 'cpan:DOY';
-}
-{
-  $MooseX::NonMoose::Meta::Role::Class::VERSION = '0.26';
-}
-use Moose::Role;
-# ABSTRACT: metaclass trait for L<MooseX::NonMoose>
 
-use List::MoreUtils qw(any);
+use Moose::Role;
+use List::Util 1.33 qw(any);
 use Module::Runtime qw(use_package_optimistically);
 use Try::Tiny;
+use List::Util qw( any );
+use Scalar::Util 'blessed';
+
+# ABSTRACT: metaclass trait for L<MooseX::NonMoose>
+our $VERSION = '0.27'; # VERSION
 
 
 has has_nonmoose_constructor => (
@@ -213,7 +211,7 @@ sub _check_superclass_destructor {
         local $?;
 
         Try::Tiny::try {
-            $super_DESTROY->execute($self);
+            $super_DESTROY->execute($self) if defined $super_DESTROY;
             $self->DEMOLISHALL(Devel::GlobalDestruction::in_global_destruction);
         }
         Try::Tiny::catch {
@@ -281,7 +279,7 @@ around superclasses => sub {
 
     my @superclasses = @_;
     push @superclasses, 'Moose::Object'
-        unless grep { !ref($_) && $_->isa('Moose::Object') } @superclasses;
+        unless any { !ref($_) && $_->isa('Moose::Object') } @superclasses;
 
     my @ret = $self->$orig(@superclasses);
 
@@ -365,13 +363,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 MooseX::NonMoose::Meta::Role::Class - metaclass trait for L<MooseX::NonMoose>
 
 =head1 VERSION
 
-version 0.26
+version 0.27
 
 =head1 SYNOPSIS
 
@@ -404,11 +404,13 @@ L<MooseX::NonMoose> for more details.
 
 =head1 AUTHOR
 
-Jesse Luehrs <doy@tozt.net>
+Original author: Jesse Luehrs E<lt>doy@tozt.netE<gt>
+
+Current maintainer: Graham Ollis E<lt>plicease@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Jesse Luehrs.
+This software is copyright (c) 2009-2025 by Jesse Luehrs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

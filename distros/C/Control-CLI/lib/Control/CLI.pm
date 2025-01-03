@@ -11,7 +11,7 @@ use IO::Socket::INET;
 use Errno qw( EINPROGRESS EWOULDBLOCK );
 
 my $Package = __PACKAGE__;
-our $VERSION = '2.11';
+our $VERSION = '2.12';
 our %EXPORT_TAGS = (
 		use	=> [qw(useTelnet useSsh useSerial useIPv6)],
 		prompt	=> [qw(promptClear promptHide promptCredential)],
@@ -57,6 +57,7 @@ my %Default = ( # Hash of default object settings which can be modified on a per
 	databits		=> 8,			# Default data bits used when connecting via Serial port
 	stopbits		=> 1,			# Default stop bits used when connecting via Serial port
 	ors			=> "\n",		# Default Output Record Separator used by print() & cmd()
+	binmode			=> 0,			# Default binmode; if disabled newline translation will be done
 	errmode			=> 'croak',		# Default error mode; can be: die/croak/return/coderef/arrayref
 	errmsg_format		=> 'default',		# Default error message format; can be: terse/default/verbose
 	poll_obj_complete	=> 'all',		# Default mode for poll() method
@@ -73,7 +74,7 @@ my %Default = ( # Hash of default object settings which can be modified on a per
 our @ConstructorArgs = ( 'use', 'timeout', 'errmode', 'return_reference', 'prompt', 'username_prompt', 'password_prompt',
 			'input_log', 'output_log', 'dump_log', 'blocking', 'debug', 'prompt_credentials', 'read_attempts',
 			'readwait_timer', 'read_block_size', 'output_record_separator', 'connection_timeout', 'data_with_error',
-			'terminal_type', 'window_size', 'errmsg_format', 'report_query_status',
+			'terminal_type', 'window_size', 'errmsg_format', 'report_query_status', 'binmode',
 			);
 
 # Debug levels can be set using the debug() method or via debug argument to new() constructor
@@ -275,7 +276,7 @@ sub new {
 	if    ($connectionType =~ /^TELNET$/i) {
 		croak "$pkgsub: Module 'Net::Telnet' required for telnet access" unless $UseTelnet;
 		@CLI::ISA = qw(Net::Telnet);
-		$parent = Net::Telnet->new();
+		$parent = Net::Telnet->new(Binmode => 1);
 		# Set up callbacks for telnet options
 		$parent->option_callback(\&_telnet_opt_callback);
 		$parent->suboption_callback(\&_telnet_subopt_callback);
@@ -334,6 +335,7 @@ sub new {
 		LASTPROMPT		=>	undef,
 		SERIALEOF		=>	1,
 		TELNETMODE		=>	1,
+		PUSHBACKCR		=>	'', # Always defined; used to push back CR in newline translation with binmode disabled
 		POLL			=>	undef,	# Storage hash for poll-capable methods
 		POLLING			=>	0,	# Flag to track if in polling-capable method or not
 		POLLREPORTED		=>	0,	# Flag used by poll() to track already reported objects
@@ -348,6 +350,7 @@ sub new {
 		data_with_error		=>	$Default{data_with_error},
 		read_block_size		=>	$Default{read_block_size}{$connectionType},
 		ors			=>	$Default{ors},
+		binmode			=>	$Default{binmode},
 		errmode			=>	$Default{errmode},
 		errmsg			=>	'',
 		errmsg_format		=>	$Default{errmsg_format},
@@ -385,6 +388,7 @@ sub new {
 		elsif ($arg eq 'data_with_error')		{ $self->data_with_error($args{$arg}) }
 		elsif ($arg eq 'return_reference')		{ $self->return_reference($args{$arg}) }
 		elsif ($arg eq 'output_record_separator')	{ $self->output_record_separator($args{$arg}) }
+		elsif ($arg eq 'binmode')			{ $self->binmode($args{$arg}) }
 		elsif ($arg eq 'prompt_credentials')		{ $self->prompt_credentials($args{$arg}) }
 		elsif ($arg eq 'prompt')			{ $self->prompt($args{$arg}) }
 		elsif ($arg eq 'username_prompt')		{ $self->username_prompt($args{$arg}) }
@@ -494,12 +498,14 @@ sub connect_poll { # Poll status of connection (non-blocking mode)
 sub read { # Read in data from connection
 	my $pkgsub = "${Package}::read";
 	my $self = shift;
-	my @validArgs = ('blocking', 'timeout', 'errmode', 'return_reference');
+	my @validArgs = ('blocking', 'timeout', 'binmode', 'errmode', 'return_reference');
 	my %args = parseMethodArgs($pkgsub, \@_, \@validArgs);
 	my $timeout = defined $args{timeout} ? $args{timeout} : $self->{timeout};
 	my $blocking = defined $args{blocking} ? $args{blocking} : $self->{blocking};
 	my $returnRef = defined $args{return_reference} ? $args{return_reference} : $self->{return_reference};
+	my $binmode = defined $args{binmode} ? $args{binmode} : $self->{binmode};
 	my $errmode = defined $args{errmode} ? parse_errmode($pkgsub, $args{errmode}) : undef;
+	local $self->{binmode} = $binmode if defined $binmode;
 	local $self->{errmode} = $errmode if defined $errmode;
 
 	return $self->_read_blocking($pkgsub, $timeout, $returnRef) if $blocking && !length $self->{BUFFER};
@@ -512,7 +518,7 @@ sub readwait { # Read in data initially in blocking mode, then perform subsequen
 	my $self = shift;
 	my ($outref, $bufref);
 	my $ticks = 0;
-	my @validArgs = ('read_attempts', 'readwait_timer', 'blocking', 'timeout', 'errmode', 'return_reference', 'data_with_error');
+	my @validArgs = ('read_attempts', 'readwait_timer', 'blocking', 'timeout', 'binmode', 'errmode', 'return_reference', 'data_with_error');
 	my %args = parseMethodArgs($pkgsub, \@_, \@validArgs);
 	my $readAttempts = defined $args{read_attempts} ? $args{read_attempts} : $self->{read_attempts};
 	my $readwaitTimer = defined $args{readwait_timer} ? $args{readwait_timer} : $self->{readwait_timer};
@@ -520,7 +526,9 @@ sub readwait { # Read in data initially in blocking mode, then perform subsequen
 	my $timeout = defined $args{timeout} ? $args{timeout} : $self->{timeout};
 	my $blocking = defined $args{blocking} ? $args{blocking} : $self->{blocking};
 	my $returnRef = defined $args{return_reference} ? $args{return_reference} : $self->{return_reference};
+	my $binmode = defined $args{binmode} ? $args{binmode} : $self->{binmode};
 	my $errmode = defined $args{errmode} ? parse_errmode($pkgsub, $args{errmode}) : undef;
+	local $self->{binmode} = $binmode if defined $binmode;
 	local $self->{errmode} = $errmode if defined $errmode;
 
 	# Wait until some data is read in
@@ -635,11 +643,13 @@ sub put { # Send character strings to host (no \n appended)
 		$args{string} = shift;
 	}
 	else {
-		my @validArgs = ('string', 'errmode');
+		my @validArgs = ('string', 'binmode', 'errmode');
 		%args = parseMethodArgs($pkgsub, \@_, \@validArgs);
 	}
 	return 1 unless defined $args{string};
+	my $binmode = defined $args{binmode} ? $args{binmode} : $self->{binmode};
 	my $errmode = defined $args{errmode} ? parse_errmode($pkgsub, $args{errmode}) : undef;
+	local $self->{binmode} = $binmode if defined $binmode;
 	local $self->{errmode} = $errmode if defined $errmode;
 
 	return $self->_put($pkgsub, \$args{string});
@@ -654,10 +664,12 @@ sub print { # Send CLI commands to host (\n appended)
 		$args{line} = shift;
 	}
 	else {
-		my @validArgs = ('line', 'errmode');
+		my @validArgs = ('line', 'binmode', 'errmode');
 		%args = parseMethodArgs($pkgsub, \@_, \@validArgs);
 	}
+	my $binmode = defined $args{binmode} ? $args{binmode} : $self->{binmode};
 	my $errmode = defined $args{errmode} ? parse_errmode($pkgsub, $args{errmode}) : undef;
+	local $self->{binmode} = $binmode if defined $binmode;
 	local $self->{errmode} = $errmode if defined $errmode;
 	$args{line} .= $self->{ors};
 
@@ -866,24 +878,16 @@ sub input_log { # Log to file all input sent to host
 	unless (defined $fh) { # No input = return current filehandle
 		return $self->{INPUTLOGFH};
 	}
-	if ($self->{TYPE} eq 'TELNET') { # For Telnet use methods provided by Net::Telnet
-		$fh = $self->{PARENT}->input_log($fh);
-		if (defined $fh && $self->{PARENT}->errmsg =~ /problem creating $fh: (.*)/) {
-			return $self->error("$pkgsub: Unable to open input log file: $1");
-		}
+	unless (ref $fh or length $fh) { # Empty input = stop logging
+		$self->{INPUTLOGFH} = undef;
+		return;
 	}
-	else { # SSH & SERIAL We implement logging ourselves
-		unless (ref $fh or length $fh) { # Empty input = stop logging
-			$self->{INPUTLOGFH} = undef;
-			return;
-		}
-		if (!ref($fh) && !defined(fileno $fh)) { # Open a new filehandle if input is a filename
-			my $logfile = $fh;
-			$fh = IO::Handle->new;
-			open($fh, '>', "$logfile") or return $self->error("$pkgsub: Unable to open input log file: $!");
-		}
-		$fh->autoflush();
+	if (!ref($fh) && !defined(fileno $fh)) { # Open a new filehandle if input is a filename
+		my $logfile = $fh;
+		$fh = IO::Handle->new;
+		open($fh, '>', "$logfile") or return $self->error("$pkgsub: Unable to open input log file: $!");
 	}
+	$fh->autoflush();
 	$self->{INPUTLOGFH} = $fh;
 	return $fh;
 }
@@ -896,24 +900,16 @@ sub output_log { # Log to file all output received from host
 	unless (defined $fh) { # No input = return current filehandle
 		return $self->{OUTPUTLOGFH};
 	}
-	if ($self->{TYPE} eq 'TELNET') { # For Telnet use methods provided by Net::Telnet
-		$fh = $self->{PARENT}->output_log($fh);
-		if (defined $fh && $self->{PARENT}->errmsg =~ /problem creating $fh: (.*)/) {
-			return $self->error("$pkgsub: Unable to open output log file: $1");
-		}
+	unless (ref $fh or length $fh) { # Empty input = stop logging
+		$self->{OUTPUTLOGFH} = undef;
+		return;
 	}
-	else { # SSH & SERIAL We implement logging ourselves
-		unless (ref $fh or length $fh) { # Empty input = stop logging
-			$self->{OUTPUTLOGFH} = undef;
-			return;
-		}
-		if (!ref($fh) && !defined(fileno $fh)) { # Open a new filehandle if input is a filename
-			my $logfile = $fh;
-			$fh = IO::Handle->new;
-			open($fh, '>', "$logfile") or return $self->error("$pkgsub: Unable to open output log file: $!");
-		}
-		$fh->autoflush();
+	if (!ref($fh) && !defined(fileno $fh)) { # Open a new filehandle if input is a filename
+		my $logfile = $fh;
+		$fh = IO::Handle->new;
+		open($fh, '>', "$logfile") or return $self->error("$pkgsub: Unable to open output log file: $!");
 	}
+	$fh->autoflush();
 	$self->{OUTPUTLOGFH} = $fh;
 	return $fh;
 }
@@ -926,24 +922,16 @@ sub dump_log { # Log hex and ascii for both input & output
 	unless (defined $fh) { # No input = return current filehandle
 		return $self->{DUMPLOGFH};
 	}
-	if ($self->{TYPE} eq 'TELNET') { # For Telnet use methods provided by Net::Telnet
-		$fh = $self->{PARENT}->dump_log($fh);
-		if (defined $fh && $self->{PARENT}->errmsg =~ /problem creating $fh: (.*)/) {
-			return $self->error("$pkgsub: Unable to open dump log file: $1");
-		}
+	unless (ref $fh or length $fh) { # Empty input = stop logging
+		$self->{DUMPLOGFH} = undef;
+		return;
 	}
-	else { # SSH & SERIAL We implement logging ourselves
-		unless (ref $fh or length $fh) { # Empty input = stop logging
-			$self->{DUMPLOGFH} = undef;
-			return;
-		}
-		if (!ref($fh) && !defined(fileno $fh)) { # Open a new filehandle if input is a filename
-			my $logfile = $fh;
-			$fh = IO::Handle->new;
-			open($fh, '>', "$logfile") or return $self->error("$pkgsub: Unable to open dump log file: $!");
-		}
-		$fh->autoflush();
+	if (!ref($fh) && !defined(fileno $fh)) { # Open a new filehandle if input is a filename
+		my $logfile = $fh;
+		$fh = IO::Handle->new;
+		open($fh, '>', "$logfile") or return $self->error("$pkgsub: Unable to open dump log file: $!");
 	}
+	$fh->autoflush();
 	$self->{DUMPLOGFH} = $fh;
 	return $fh;
 }
@@ -964,7 +952,9 @@ sub eof { # End-Of-File indicator
 		return 1 if $self->{SSHCHANNEL}->eof;
 		# So we fudge it by checking Net::SSH2's last error code.. 
 		my $sshError = $self->{PARENT}->error; # Minimize calls to Net::SSH2 error method, as it leaks in version 0.58
+		# Libssh2 error codes: https://github.com/libssh2/libssh2/blob/master/include/libssh2.h
 		return 1 if $sshError == -1;  # LIBSSH2_ERROR_SOCKET_NONE
+		return 1 if $sshError == -13; # LIBSSH2_ERROR_SOCKET_DISCONNECT
 		return 1 if $sshError == -43; # LIBSSH2_ERROR_SOCKET_RECV
 		return 0; # If we get here, return 0
 	}
@@ -1326,6 +1316,14 @@ sub output_record_separator { # Set/read the Output Record Separator automatical
 		$self->{ors} = $newSetting;
 		$self->{TELNETMODE} = $newSetting eq "\r" ? 0 : 1;
 	}
+	return $currentSetting;
+}
+
+
+sub binmode { # Set/read bimode
+	my ($self, $newSetting) = @_;
+	my $currentSetting = $self->{binmode};
+	$self->{binmode} = $newSetting if defined $newSetting;
 	return $currentSetting;
 }
 
@@ -2676,6 +2674,30 @@ sub _check_query { # Internal method to process Query Device Status escape seque
 }
 
 
+sub _newlineTranslation { # Modified _interpret_cr() method from Net::Telnet; converts CR LF back into newlines upon reading data stream
+	my ($self, $bufRef) = @_;
+	my $pos = 0;
+	my $nextchar;
+
+	if (length $self->{PUSHBACKCR}) { # If an ending CR character was cashed
+		$$bufRef = join('', $self->{PUSHBACKCR}, $$bufRef); # prepend it to new output
+		$self->{PUSHBACKCR} = '';
+	}
+	while (($pos = index($$bufRef, "\015", $pos)) > -1) {
+		$nextchar = substr($$bufRef, $pos + 1, 1);
+		if ($nextchar eq "\012") { # Convert CR LF to newline
+			substr($$bufRef, $pos, 2) = "\n";
+		}
+		elsif (!length($nextchar)) { # Save CR in alt buffer for possible CR LF on next read
+			$self->{PUSHBACKCR} .= "\015";
+			chop $$bufRef;
+		}
+		$pos++;
+	}
+	return;
+}
+
+
 sub _read_buffer { # Internal method to read (and clear) any data cached in object buffer
 	my ($self, $returnRef) = @_;
 	my $buffer = $self->{BUFFER};
@@ -2708,8 +2730,6 @@ sub _read_blocking { # Internal read method; data must be read or we timeout
 				my $inBytes = $self->{SSHCHANNEL}->read($buffer, $self->{read_block_size});
 				return $self->error("$pkgsub: SSH channel read error") unless defined $inBytes;
 			}
-			_log_print($self->{INPUTLOGFH}, \$buffer) if defined $self->{INPUTLOGFH};
-			_log_dump('<', $self->{DUMPLOGFH}, \$buffer) if defined $self->{DUMPLOGFH};
 		}
 		elsif ($self->{TYPE} eq 'SERIAL') {
 			return $self->error("$pkgsub: Received eof from connection") if $self->{SERIALEOF};
@@ -2742,8 +2762,6 @@ sub _read_blocking { # Internal read method; data must be read or we timeout
 					($inBytes, $buffer) = $self->{PARENT}->read($self->{read_block_size});
 				} until $inBytes > 0;
 			}
-			_log_print($self->{INPUTLOGFH}, \$buffer) if defined $self->{INPUTLOGFH};
-			_log_dump('<', $self->{DUMPLOGFH}, \$buffer) if defined $self->{DUMPLOGFH};
 		}
 		else {
 			return $self->error("$pkgsub: Invalid connection mode");
@@ -2757,6 +2775,13 @@ sub _read_blocking { # Internal read method; data must be read or we timeout
 			}
 		}
 	}
+	# Perform newline translation if binmode is not enabled
+	$self->_newlineTranslation(\$buffer) unless $self->{binmode};
+
+	# Input logging
+	_log_print($self->{INPUTLOGFH}, \$buffer) if defined $self->{INPUTLOGFH};
+	_log_dump('<', $self->{DUMPLOGFH}, \$buffer) if defined $self->{DUMPLOGFH};
+
 	# $buffer should always be a defined, non-empty string
 	return $returnRef ? \$buffer : $buffer;
 }
@@ -2777,10 +2802,6 @@ sub _read_nonblocking { # Internal read method; if no data available return imme
 		# With Net::SSH2 0.58 & libssh2 1.5.0 line below was not necessary, as an emty read would leave $buffer defined and empty
 		# But with Net::SSH2 0.63 & libssh2 1.7.0 this is no longer the case; now an empty read returns undef as both method return value and $buffer 
 		$buffer = '' unless defined $buffer;
-		if (length $buffer) {
-			_log_print($self->{INPUTLOGFH}, \$buffer) if defined $self->{INPUTLOGFH};
-			_log_dump('<', $self->{DUMPLOGFH}, \$buffer) if defined $self->{DUMPLOGFH};
-		}
 	}
 	elsif ($self->{TYPE} eq 'SERIAL') {
 		return $self->error("$pkgsub: Received eof from connection") if $self->{SERIALEOF};
@@ -2794,16 +2815,22 @@ sub _read_nonblocking { # Internal read method; if no data available return imme
 		};
 		($inBytes, $buffer) = $self->{PARENT}->read($self->{read_block_size});
 		return $self->error("$pkgsub: Serial port read error") unless defined $buffer;
-		if (length $buffer) {
-			_log_print($self->{INPUTLOGFH}, \$buffer) if defined $self->{INPUTLOGFH};
-			_log_dump('<', $self->{DUMPLOGFH}, \$buffer) if defined $self->{DUMPLOGFH};
-		}
 	}
 	else {
 		return $self->error("$pkgsub: Invalid connection mode");
 	}
-	# Check for Query Device Status escape sequences and process a reply if necessary
-	$self->_check_query($pkgsub, \$buffer) if length $buffer && $self->{report_query_status};
+
+	if (length $buffer) {
+		# Check for Query Device Status escape sequences and process a reply if necessary
+		$self->_check_query($pkgsub, \$buffer) if $self->{report_query_status};
+
+		# Perform newline translation if binmode is not enabled
+		$self->_newlineTranslation(\$buffer) unless $self->{binmode};
+
+		# Input logging
+		_log_print($self->{INPUTLOGFH}, \$buffer) if defined $self->{INPUTLOGFH};
+		_log_dump('<', $self->{DUMPLOGFH}, \$buffer) if defined $self->{DUMPLOGFH};
+	}
 
 	# Pre-pend local buffer if not empty
 	$buffer = join('', $self->_read_buffer(0), $buffer) if length $self->{BUFFER};
@@ -2815,8 +2842,17 @@ sub _read_nonblocking { # Internal read method; if no data available return imme
 
 sub _put { # Internal write method
 	my ($self, $pkgsub, $outref) = @_;
+	my $outlog;
 
 	return $self->error("$pkgsub: No connection to write to") if $self->eof;
+
+	# Output logging to occur before newline conversion
+	if (defined $self->{OUTPUTLOGFH} || defined $self->{DUMPLOGFH}) {
+		$outlog = $$outref; # So we hold a copy of the buffer, and actually log it after successful transmission
+	}
+
+	# Convert native newlines to CR LF if not in binmode
+	$$outref =~ s/\n/\015\012/g unless $self->{binmode};
 
 	if ($self->{TYPE} eq 'TELNET') {
 		$self->{PARENT}->put(
@@ -2827,18 +2863,20 @@ sub _put { # Internal write method
 	elsif ($self->{TYPE} eq 'SSH') {
 		return $self->error("$pkgsub: No SSH channel to write to") unless defined $self->{SSHCHANNEL};
 		print {$self->{SSHCHANNEL}} $$outref;
-		_log_print($self->{OUTPUTLOGFH}, $outref) if defined $self->{OUTPUTLOGFH};
-		_log_dump('>', $self->{DUMPLOGFH}, $outref) if defined $self->{DUMPLOGFH};
 	}
 	elsif ($self->{TYPE} eq 'SERIAL') {
 		my $countOut = $self->{PARENT}->write($$outref);
 		return $self->error("$pkgsub: Serial port write failed") unless $countOut;
 		return $self->error("$pkgsub: Serial port write incomplete") if $countOut != length($$outref);
-		_log_print($self->{OUTPUTLOGFH}, $outref) if defined $self->{OUTPUTLOGFH};
-		_log_dump('>', $self->{DUMPLOGFH}, $outref) if defined $self->{DUMPLOGFH};
 	}
 	else {
 		return $self->error("$pkgsub: Invalid connection mode");
+	}
+
+	# Output logging
+	if (defined $outlog) {
+		_log_print($self->{OUTPUTLOGFH}, \$outlog) if defined $self->{OUTPUTLOGFH};
+		_log_dump('>', $self->{DUMPLOGFH}, \$outlog) if defined $self->{DUMPLOGFH};
 	}
 	$self->{WRITEFLAG} = 1;
 	return 1;
@@ -3222,6 +3260,7 @@ Used to create an object instance of Control::CLI
   	Use			 => 'TELNET'|'SSH'|'<COM_port_name>',
   	[Timeout		 => $secs,]
   	[Connection_timeout	 => $secs,]
+  	[Binmode		 => $binmode,]
   	[Errmode		 => $errmode,]
   	[Errmsg_format		 => $msgFormat,]
   	[Return_reference	 => $flag,]
@@ -3488,6 +3527,7 @@ For SSH connections, only the TCP socket connection is treated in a true non-blo
   	[Blocking		=> $flag,]
   	[Timeout		=> $secs,]
   	[Return_reference	=> $flag,]
+  	[Binmode		=> $binmode,]
   	[Errmode		=> $errmode,]
   );
 
@@ -3512,6 +3552,7 @@ Returns either a hard reference to any data read or the data itself, depending o
   	[Blocking		=> $flag,]
   	[Timeout		=> $secs,]
   	[Return_reference	=> $flag,]
+  	[Binmode		=> $binmode,]
   	[Errmode		=> $errmode,]
   );
 
@@ -3536,7 +3577,7 @@ The optional arguments are provided to override the global setting of the parame
 
 =item B<waitfor() & waitfor_poll()> - wait for pattern in the input stream
 
-Backward compatble syntax:
+Backward compatible syntax:
 
   $data || $dataref = $obj->waitfor($matchpat);
 
@@ -3629,6 +3670,7 @@ In non-blocking mode (blocking disabled) the waitfor() method will most likely i
 
   $ok = $obj->put(
   	String			=> $string,
+  	[Binmode		=> $binmode,]
   	[Errmode		=> $errmode,]
   );
 
@@ -3643,6 +3685,7 @@ This method is like print($string) except that no trailing character (usually a 
 
   $ok = $obj->print(
   	[Line			=> $line,]
+  	[Binmode		=> $binmode,]
   	[Errmode		=> $errmode,]
   );
 
@@ -3935,6 +3978,7 @@ Note that you have to change the baudrate on the far end device before calling t
 
 This method starts or stops logging of all input received from host (e.g. via any of read(), readwait(), waitfor(), cmd(), login() methods).
 This is useful when debugging. Because most command interpreters echo back commands received, it's likely all output sent to the host will also appear in the input log. See also output_log().
+Note that input logging occurs after newline translation. See binmode() for details on newline translation.
 If no argument is given, the log filehandle is returned. An empty string indicates logging is off. If an open filehandle is given, it is used for logging and returned. Otherwise, the argument is assumed to be the name of a file, the file is opened for logging and a filehandle to it is returned. If the file can't be opened for writing, the error mode action is performed.
 To stop logging, use an empty string as the argument.
 
@@ -3949,6 +3993,7 @@ To stop logging, use an empty string as the argument.
 
 This method starts or stops logging of output sent to host (e.g. via any of put(), print(), printlist(), cmd(), login() methods).
 This is useful when debugging.
+Note that output logging occurs before newline translation. See binmode() for details on newline translation.
 If no argument is given, the log filehandle is returned. An empty string indicates logging is off. If an open filehandle is given, it is used for logging and returned. Otherwise, the argument is assumed to be the name of a file, the file is opened for logging and a filehandle to it is returned. If the file can't be opened for writing, the error mode action is performed.
 To stop logging, use an empty string as the argument.
 
@@ -3962,6 +4007,7 @@ To stop logging, use an empty string as the argument.
   $fh = $obj->dump_log($filename);
 
 This method starts or stops logging of both input and output. The information is displayed both as a hex dump as well as in printable ascii. This is useful when debugging.
+Note that input/output logging occurs after newline translation on the input stream and before newline translation on the output stream. See binmode() for details on newline translation.
 If no argument is given, the log filehandle is returned. An empty string indicates logging is off. If an open filehandle is given, it is used for logging and returned. Otherwise, the argument is assumed to be the name of a file, the file is opened for logging and a filehandle to it is returned. If the file can't be opened for writing, the error mode action is performed.
 To stop logging, use an empty string as the argument.
 
@@ -3972,7 +4018,7 @@ To stop logging, use an empty string as the argument.
 
 This method returns a true (1) value if the end of file has been read. When this is true, the general idea is that you can still read but you won't be able to write.
 This method simply exposes the method by the same name provided by Net::Telnet.
-Net::SSH2::Channel also has an eof method but this was not working properly (always returns 0) at the time of implementing the Control::CLI::eof method; so this method adds some logic to eof for SSH connections: if the SSH eof method returns 1, then that value is returned, otherwise a check is performed on Net::SSH::error and if this returns either LIBSSH2_ERROR_SOCKET_NONE or LIBSSH2_ERROR_SOCKET_RECV then we return an eof of 1; otherwise we return an eof of 0.
+Net::SSH2::Channel also has an eof method but this was not working properly (always returns 0) at the time of implementing the Control::CLI::eof method; so this method adds some logic to eof for SSH connections: if the SSH eof method returns 1, then that value is returned, otherwise a check is performed on Net::SSH::error and if this returns either LIBSSH2_ERROR_SOCKET_NONE or LIBSSH2_ERROR_SOCKET_DISCONNECT or LIBSSH2_ERROR_SOCKET_RECV then we return an eof of 1; otherwise we return an eof of 0.
 In the case of a serial connection this module simply returns eof true before a connection is established and after the connection is closed or breaks.
 
 
@@ -4273,6 +4319,15 @@ This applies to the read(), readwait(), waitfor(), cmd() and login() methods and
 However, if reading large amounts of data via the above mentioned read methods, using references will result in faster and more efficient code.
 
 
+=item B<binmode()> - enable/disable newline translation
+
+  $flag = $obj->binmode;
+
+  $prev = $obj->output_record_separator($flag);
+
+This method gets or sets the setting for binmode for the object. By default binmode is disabled (0) which means that newlines "\n" are translated into CR+LF by print() and put() and in reverse CR+LF are translated back into newline "\n" by read() and readwait(). TCP protocols typically use the ASCII sequence, carriage return and line feed to designate a newline. To disable newline translation enable binmode (1).
+
+
 =item B<output_record_separator()> - set the Output Record Separator automatically appended by print & cmd methods
 
   $ors = $obj->output_record_separator;
@@ -4281,6 +4336,7 @@ However, if reading large amounts of data via the above mentioned read methods, 
 
 This method gets or sets the Output Record Separator character (or string) automatically appended by print(), printlist() and cmd() methods when sending a command string to the host.
 By default the Output Record Separator is a new line character "\n".
+Note that by default this modules does newline translation, see binmode(), so the default new line character "\n" will always be translated to CR + LF unless binmode is enabled.
 If you do not want a new line character automatically appended consider using put() instead of print().
 Alternatively (or if a different character than newline is required) modify the Output Record Separator for the object via this method.
 
@@ -4713,7 +4769,7 @@ Follows an example on how to use this method:
 
 		< process data in $self->{POLL}{read_buffer}>
 
-	} until <loop stisfied condition>;
+	} until <loop satisfied condition>;
 
 
 =item B<poll_readwait()> - performs a non-blocking poll readwait and handles timeout in non-blocking polling mode
@@ -4739,7 +4795,7 @@ Follows an example on how to use this method:
 
 		< process data in $self->{POLL}{read_buffer}>
 
-	} until <loop stisfied condition>;
+	} until <loop satisfied condition>;
 
 
 =item B<poll_waitfor()> - performs a non-blocking poll for waitfor()
@@ -5079,8 +5135,7 @@ Ludovico Stevens <lstevens@cpan.org>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-control-cli at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Control-CLI>.  I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests at L<https://github.com/lgastevens/Control-CLI/issues> or alternatively via CPAN sending an email at C<bug-control-cli@rt.cpan.org> or at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Control-CLI>.  I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
 
 
 
@@ -5095,6 +5150,10 @@ You can find documentation for this module with the perldoc command.
 You can also look for information at:
 
 =over 4
+
+=item * Github repository
+
+L<https://github.com/lgastevens/Control-CLI>
 
 =item * RT: CPAN's request tracker
 
@@ -5122,7 +5181,7 @@ A lot of the methods and functionality of this class, as well as some code, is d
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2022 Ludovico Stevens.
+Copyright 2025 Ludovico Stevens.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

@@ -12,7 +12,7 @@ use PDL::IO::FastRaw;
 use Carp qw(confess);
 use strict;
 
-our $VERSION = '1.23.29';
+our $VERSION = '1.24.0';
 our @ISA = ('PDL::Exporter');
 our @EXPORT_OK = qw(ccs_writefraw ccs_readfraw ccs_mapfraw);
 our %EXPORT_TAGS =
@@ -38,7 +38,7 @@ PDL::CCS::IO::FastRaw - PDL::IO::FastRaw wrappers for PDL::CCS::Nd
 
  $ccs = PDL::CCS::Nd->newFromWhich($which,$nzvals);
 
- ccs_writefraw($ccs,$fname);	 # write a pair of raw files
+ ccs_writefraw($ccs,$fname);     # write a pair of raw files
  $ccs2 = ccs_readfraw($fname);   # read a pair of raw files
 
  $ccs3 = ccs_mapfraw($fname,{ReadOnly=>1}); # mmap a pair of files, don't read yet
@@ -141,11 +141,11 @@ sub ccs_readfraw {
 
   ##-- construct and return
   return PDL::CCS::Nd->newFromWhich($ix,$nz,
-				    pdims=>$header->{pdims},
-				    vdims=>$header->{vdims},
-				    flags=>$header->{flags},
-				    sorted=>($opts->{sorted}//1),
-				    steal=>1);
+                                    pdims=>$header->{pdims},
+                                    vdims=>$header->{vdims},
+                                    flags=>$header->{flags},
+                                    sorted=>($opts->{sorted}//1),
+                                    steal=>1);
 }
 
 
@@ -197,10 +197,10 @@ sub ccs_mapfraw {
 
   ##-- get ccs header
   my $header = {
-		pdims => ($opts->{pdims} // $opts->{Dims}),
-		vdims => $opts->{vdims},
-		flags => ($opts->{flags} // $PDL::CCS::Nd::CCSND_FLAGS_DEFAULT),
-	       };
+                pdims => ($opts->{pdims} // $opts->{Dims}),
+                vdims => $opts->{vdims},
+                flags => ($opts->{flags} // $PDL::CCS::Nd::CCSND_FLAGS_DEFAULT),
+               };
   if (!defined($header->{pdims})) {
     my $hdr = _ccsio_read_header($hFile)
       or confess("ccs_mapfraw(): failed to read header-file $hFile: $!");
@@ -224,11 +224,11 @@ sub ccs_mapfraw {
 
   ##-- construct and return
   return PDL::CCS::Nd->newFromWhich($ix,$nz,
-				    pdims=>$header->{pdims},
-				    vdims=>$header->{vdims},
-				    flags=>$header->{flags},
-				    sorted=>($opts->{sorted}//1),
-				    steal=>1);
+                                    pdims=>$header->{pdims},
+                                    vdims=>$header->{vdims},
+                                    flags=>$header->{flags},
+                                    sorted=>($opts->{sorted}//1),
+                                    steal=>1);
 }
 
 1; ##-- be happy

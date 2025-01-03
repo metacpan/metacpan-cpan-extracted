@@ -187,11 +187,11 @@ sub test_matop {
   isok("$lab:${op_name}:func:b=sparse:missing=$missing_val:swap=$swap:type",
        $css->type, $c->type);
   pdlok("$lab:${op_name}:func:b=sparse:missing=$missing_val:swap=$swap:vals",
-	$css->decode, $c);
+        $css->decode, $c);
   isok("$lab:${op_name}:func:b=dense:missing=$missing_val:swap=$swap:type",
        $c->type, $csb->type);
   pdlok("$lab:${op_name}:func:b=dense:missing=$missing_val:swap=$swap:vals",
-	$csb->decode, $c);
+        $csb->decode, $c);
 
   if (defined($op_op)) {
     if (!$swap) {
@@ -204,21 +204,21 @@ sub test_matop {
       eval "\$csb    = (\$bs $op_op \$a);";
     }
     isok("$lab:${op_name}:op=$op_op:b=sparse:missing=$missing_val:swap=$swap:type",
-	 $css->type, $c->type);
+         $css->type, $c->type);
     pdlok("$lab:${op_name}:op=$op_op:b=sparse:missing=$missing_val:swap=$swap:vals",
-	  $css->decode, $c);
+          $css->decode, $c);
     isok("$lab:${op_name}:op=$op_op:b=dense:missing=$missing_val:swap=$swap:type",
-	 $csb->type, $c->type);
+         $csb->type, $c->type);
     pdlok("$lab:${op_name}:op=$op_op:b=dense:missing=$missing_val:swap=$swap:vals",
-	  $csb->decode, $c);
+          $csb->decode, $c);
   }
 }
 
 my @matops = (
-	      ##-- Matrix operations
-	      'inner',
-	      [qw(matmult x)],
-	     );
+              ##-- Matrix operations
+              'inner',
+              [qw(matmult x)],
+             );
 #my @missing = (0,127,'BAD');
 my @missing = (0);
 my $b;
@@ -232,7 +232,7 @@ my @tuples = (
 
 for my $tuple (@tuples) {
   my ($lab, $a, $abad, $b, $bs, $swap_override) = @$tuple;
-  for my $missing (@missing) {  	  ##-- *NMISSING
+  for my $missing (@missing) {            ##-- *NMISSING
     for my $swap (0,1) {           ##-- *NSWAP=2
       for my $op (@matops) {       ##-- *1
         test_matop(

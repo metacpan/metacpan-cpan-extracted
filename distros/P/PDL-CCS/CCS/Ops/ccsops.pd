@@ -5,7 +5,7 @@
 ##======================================================================
 
 use PDL::VectorValued::Dev;
-my $VERSION = '1.23.29'; ##-- update with perl-reversion from Perl::Version module
+my $VERSION = '1.24.0'; ##-- update with perl-reversion from Perl::Version module
 pp_setversion($VERSION);
 
 ##------------------------------------------------------
@@ -69,10 +69,10 @@ pp_addhdr( $PDL::CCS::Config::ccsConfig{INDX_TYPEDEF} );
 vvpp_def
   ('ccs_binop_align_block_mia',
    Pars => ("\n    "
-	    .join("\n    ",
-		  "$INDX\ ixa(Ndims,NnzA); $INDX\ ixb(Ndims,NnzB); $INDX\    istate(State);",
-		  "$INDX\ [o]nzai(NnzC);   $INDX\ [o]nzbi(NnzC);   $INDX\ [o]ostate(State);",
-		  '')),
+            .join("\n    ",
+                  "$INDX\ ixa(Ndims,NnzA); $INDX\ ixb(Ndims,NnzB); $INDX\    istate(State);",
+                  "$INDX\ [o]nzai(NnzC);   $INDX\ [o]nzbi(NnzC);   $INDX\ [o]ostate(State);",
+                  '')),
    Code =>
 (q(
  CCS_Indx sizeNnzA=$SIZE(NnzA), sizeNnzB=$SIZE(NnzB), sizeNnzC=$SIZE(NnzC);
@@ -115,8 +115,8 @@ vvpp_def
      //-- CASE ixa(,ai) == ixb(,bi) : INSERT ( ixa(,ai) => (ixa(,ai) . ixb(,bi)) ); INCR(ai); INCR(bi);
      for (nnzbi0=nnzbi; nnzai<nnzai_nxt; nnzai++) {
        for (nnzbi=nnzbi0; nnzbi<nnzbi_nxt; nnzbi++, nnzci++) {
-	 $nzai(NnzC=>nnzci) = nnzai;
-	 $nzbi(NnzC=>nnzci) = nnzbi;
+         $nzai(NnzC=>nnzci) = nnzai;
+         $nzbi(NnzC=>nnzci) = nnzbi;
        }
      }
      //-- increment ai,bi: detect next run-lengths

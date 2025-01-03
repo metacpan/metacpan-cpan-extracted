@@ -171,3 +171,59 @@ Revision history for Control-CLI
 2.11	2022-08-28
 	* Added an internal WRITEFLAG object key to keep track of direct writes to the connected device. This can
 	  be used by modules sub-classing Control::CLI to help keep in synch with the connected device
+
+2.12	2025-01-02
+	* Added error code 13 = LIBSSH2_ERROR_SOCKET_DISCONNECT to return a true eof() for SSH
+	* Implemented binmode to control newline translation. Previous versions were inconsistent in that the underlying
+	  Net::Telnet did not have binmode enabled and so would always do newline translation, whereas over Serial and SSH this
+	  module was not doing any newline translation and thus effectively behaving as if binmode was enabled. From this version
+	  onwards Net::Telnet is always used with binmode enabled, and now this class implements newline translation across all
+	  of Telnet, SSH, Serial. Newline translation is by default enabled and can be disabled via the new binmode() method or 
+	  parameter to the object constructor. A binmode parameter is also added to methods: read(), readwait(), put(), print().
+	  The following tables summarize how and where newline translation was and is now performed.
+	  In previous module versions up to and including version 2.11:
+	  
+		Connection	Translation	OS	Newline	is			Newline sent as
+		=======================================================================================
+		Telnet		yes		Unix	"\n" = LF "\012"	<=>	CRLF "\015\012"
+				yes		MAC	"\n" = CR "\015"	<=>	CRLF "\015\012"
+				yes		Windows	"\n" = CRLF "\015\012"	<=>	CRLF "\015\012"
+		SSH		no		Unix	"\n" = LF "\012"	<=>	LF "\012"
+				no		MAC	"\n" = CR "\015"	<=>	CR "\015"
+				no		Windows	"\n" = CRLF "\015\012"	<=>	CRLF "\015\012"
+		Serial		no		Unix	"\n" = LF "\012"	<=>	LF "\012"
+				no		MAC	"\n" = CR "\015"	<=>	CR "\015"
+				no		Windows	"\n" = CRLF "\015\012"	<=>	CRLF "\015\012"
+	  
+	  From version 2.12 with binmode disabled (default):
+	  
+		Connection	Translation	OS	Newline	is			Newline sent as
+		=======================================================================================
+		Telnet		yes		Unix	"\n" = LF "\012"	<=>	CRLF "\015\012"
+				yes		MAC	"\n" = CR "\015"	<=>	CRLF "\015\012"
+				yes		Windows	"\n" = CRLF "\015\012"	<=>	CRLF "\015\012"
+		SSH		yes		Unix	"\n" = LF "\012"	<=>	CRLF "\015\012"
+				yes		MAC	"\n" = CR "\015"	<=>	CRLF "\015\012"
+				yes		Windows	"\n" = CRLF "\015\012"	<=>	CRLF "\015\012"
+		Serial		yes		Unix	"\n" = LF "\012"	<=>	CRLF "\015\012"
+				yes		MAC	"\n" = CR "\015"	<=>	CRLF "\015\012"
+				yes		Windows	"\n" = CRLF "\015\012"	<=>	CRLF "\015\012"
+	  
+	  From version 2.12 with binmode enabled:
+	  
+		Connection	Translation	OS	Newline	is			Newline sent as
+		=======================================================================================
+		Telnet		no		Unix	"\n" = LF "\012"	<=>	LF "\012"
+				no		MAC	"\n" = CR "\015"	<=>	CR "\015"
+				no		Windows	"\n" = CRLF "\015\012"	<=>	CRLF "\015\012"
+		SSH		no		Unix	"\n" = LF "\012"	<=>	LF "\012"
+				no		MAC	"\n" = CR "\015"	<=>	CR "\015"
+				no		Windows	"\n" = CRLF "\015\012"	<=>	CRLF "\015\012"
+		Serial		no		Unix	"\n" = LF "\012"	<=>	LF "\012"
+				no		MAC	"\n" = CR "\015"	<=>	CR "\015"
+				no		Windows	"\n" = CRLF "\015\012"	<=>	CRLF "\015\012"
+
+	* Methods input_log, output_log and dump_log were re-implemented for Serial and SSH access, while they would simply reuse
+	  the same methods for Telnet access as Net::Telnet provides them. Now that newline translation is handled in this module,
+	  all of input_log, output_log and dump_log methods are also re-implemented for Telnet, thus providing consistency across
+	  all access types

@@ -84,14 +84,14 @@ sub test_ufunc {
 ## generic tests
 for my $missing (0,1,255,$BAD) { ##-- *4
   for my $ufunc (
-		  qw(sumover prodover dsumover dprodover),  ## *17
-		  qw(andover orover bandover borover),
-		  qw(maximum minimum),
-		  qw(maximum_ind minimum_ind),
-		  qw(nbadover ngoodover), #nnz
-		  qw(average),
-		  qw(qsort qsorti)
-		 )
+                  qw(sumover prodover dsumover dprodover),  ## *17
+                  qw(andover orover bandover borover),
+                  qw(maximum minimum),
+                  qw(maximum_ind minimum_ind),
+                  qw(nbadover ngoodover), #nnz
+                  qw(average),
+                  qw(qsort qsorti)
+                 )
     {
       test_ufunc($ufunc,$missing);
     }
@@ -103,6 +103,5 @@ for my $missing (0,1,255,$BAD) { ##-- *4
 ##-- sumover empty nzValsIn: https://github.com/moocow-the-bovine/PDL-CCS/issues/14
 my $pdl = zeroes(3,1,3);
 pdlok("sumover(empty)", $pdl->toccs->sumover->decode, $pdl->sumover);
-
 
 done_testing;

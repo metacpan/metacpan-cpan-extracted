@@ -1,3 +1,11 @@
+0.44    2025-01-02
+
+- The 0.41 release included a change to the SQL rendering when selecting all
+  table(ish) columns. Instead of inidvidually listing out every table column,
+  it would be selected as just table.* for readability. This has been reverted
+  because it broke Fey::Object::Iterator::FromSelect.
+
+
 0.43    2015-06-15
 
 - I meant to require MooseX::Params::Validate 0.21 or greater in the 0.41

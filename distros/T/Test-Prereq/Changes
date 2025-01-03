@@ -1,5 +1,14 @@
 Revision history for Perl module Test::Prereq
 
+2.005 2025-01-03T05:20:21Z
+	* refresh distro
+	* move to BRIANDFOY
+
+2.004 2025-01-03T03:41:05Z
+	* refresh distro
+	* move to BRIANDFOY user
+	* Add SECURITY.md policy
+
 2.003 2019-12-20T06:43:31Z
 	* Uniq the list of modules this extracts. Module::Extract::Use 1.045
 	changed slightly to return a bit more than it used to.

@@ -8,12 +8,12 @@ use PDL::CCS::Config qw(ccs_indx);
 use PDL::CCS::Nd;
 use PDL::CCS::IO::Common qw(:intern); ##-- for e.g. _ccsio_header_lines(), _ccsio_parse_header()
 use PDL;
-use PDL::IO::Misc;	   ##-- for rcols(), wcols(), $PDL::IO::Misc::deftype
-use Fcntl qw(:seek);	   ##-- for rewinding
+use PDL::IO::Misc;         ##-- for rcols(), wcols(), $PDL::IO::Misc::deftype
+use Fcntl qw(:seek);       ##-- for rewinding
 use Carp qw(confess);
 use strict;
 
-our $VERSION = '1.23.29';
+our $VERSION = '1.24.0';
 our @ISA = ('PDL::Exporter');
 our @EXPORT_OK =
   (
@@ -176,9 +176,9 @@ sub ccs_readldac {
     while (defined($_=<$fh>)) {
       chomp;
       if (/^[%\#](\S+) (.*)$/) {
-	push(@hlines,$2) if (substr($_,1,length(__PACKAGE__)) eq __PACKAGE__);
+        push(@hlines,$2) if (substr($_,1,length(__PACKAGE__)) eq __PACKAGE__);
       } elsif (!/^[%\#]/) {
-	last;
+        last;
       }
     }
     $header = _ccsio_parse_header(\@hlines);
@@ -235,12 +235,12 @@ sub ccs_readldac {
 
   ##-- construct and return
   return PDL::CCS::Nd->newFromWhich($ix,$nz,
-				    pdims=>$header->{pdims},
-				    vdims=>$header->{vdims},
-				    flags=>$header->{flags},
-				    sorted=>($opts{sorted} && !$opts{transpose}),
-				    steal=>1,
-				   );
+                                    pdims=>$header->{pdims},
+                                    vdims=>$header->{vdims},
+                                    flags=>$header->{flags},
+                                    sorted=>($opts{sorted} && !$opts{transpose}),
+                                    steal=>1,
+                                   );
 }
 
 

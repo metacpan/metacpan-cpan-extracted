@@ -1,10 +1,10 @@
 {
    "abstract" : "get info about a character",
    "author" : [
-      "brian d foy <bdfoy@cpan.org>"
+      "brian d foy <briandfoy@pobox.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -44,15 +44,15 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/briandfoy/unichar/issues"
+         "web" : "https://github.com/briandfoy/app-unichar/issues"
       },
-      "homepage" : "https://github.com/briandfoy/unichar",
+      "homepage" : "https://github.com/briandfoy/app-unichar",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/briandfoy/unichar.git",
-         "web" : "https://github.com/briandfoy/unichar"
+         "url" : "https://github.com/briandfoy/app-unichar",
+         "web" : "https://github.com/briandfoy/app-unichar"
       }
    },
-   "version" : "0.013",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "0.014",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

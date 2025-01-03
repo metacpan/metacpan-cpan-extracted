@@ -29,13 +29,13 @@ BEGIN {
 
 ##-- basic data
 my $a = pdl(double, [
-		      [10,0,0,0,-2],
-		      [3,9,0,0,0],
-		      [0,7,8,7,0],
-		      [3,0,8,7,5],
-		      [0,8,0,9,9],
-		      [0,4,0,0,2],
-		     ]);
+                      [10,0,0,0,-2],
+                      [3,9,0,0,0],
+                      [0,7,8,7,0],
+                      [3,0,8,7,5],
+                      [0,8,0,9,9],
+                      [0,4,0,0,2],
+                     ]);
 my $ccs = $a->toccs();
 
 ##-- pdl equality
@@ -76,29 +76,29 @@ iotest($ccs, 'ccs.fits', qw(rfits wfits));
 
 ##-- x3-x8 : mm
 do {
-  iotest($ccs, 'ccs.mm', qw(readmm writemm));			##-- mm: sparse
-  iotest($ccs, 'ccs.mm0', qw(readmm writemm), {header=>0});	##-- mm: sparse, no header
-  iotest($a, 'dense.mm', qw(readmm writemm));			##-- mm: dense
+  iotest($ccs, 'ccs.mm', qw(readmm writemm));                   ##-- mm: sparse
+  iotest($ccs, 'ccs.mm0', qw(readmm writemm), {header=>0});     ##-- mm: sparse, no header
+  iotest($a, 'dense.mm', qw(readmm writemm));                   ##-- mm: dense
 
   my $a3 = $a->cat($a->rotate(1));
   my $ccs3 = $a3->toccs;
-  iotest($ccs3, 'ccs3.mm', qw(readmm writemm));			##-- mm3: sparse
-  iotest($ccs3, 'ccs3.mm0', qw(readmm writemm), {header=>0});	##-- mm3: sparse, no header
-  iotest($a3, 'dense3.mm', qw(readmm writemm));			##-- mm3: dense
+  iotest($ccs3, 'ccs3.mm', qw(readmm writemm));                 ##-- mm3: sparse
+  iotest($ccs3, 'ccs3.mm0', qw(readmm writemm), {header=>0});   ##-- mm3: sparse, no header
+  iotest($a3, 'dense3.mm', qw(readmm writemm));                 ##-- mm3: dense
 };
 
 ##-- x9-x12 : ldac
 do {
-  iotest($ccs, 'ccs.ldac', qw(readldac writeldac));				##-- ldac: natural
-  iotest($ccs, 'ccs.ldac0', qw(readldac writeldac), {header=>0});		##-- ldac: natural, no-header
-  iotest($ccs, 'ccs.ldact', qw(readldac writeldac), {transpose=>1});		##-- ldac: transposed
-  iotest($ccs, 'ccs.ldact0', qw(readldac writeldac), {header=>0,transpose=>1});	##-- ldac: transposed, no-header
+  iotest($ccs, 'ccs.ldac', qw(readldac writeldac));                             ##-- ldac: natural
+  iotest($ccs, 'ccs.ldac0', qw(readldac writeldac), {header=>0});               ##-- ldac: natural, no-header
+  iotest($ccs, 'ccs.ldact', qw(readldac writeldac), {transpose=>1});            ##-- ldac: transposed
+  iotest($ccs, 'ccs.ldact0', qw(readldac writeldac), {header=>0,transpose=>1}); ##-- ldac: transposed, no-header
 };
 
 ##-- x13-x14: petsc
 do {
-  iotest($ccs, 'ccs.petsc',  qw(rpetsc wpetsc));		##-- petsc: bin
-  iotest($ccs, 'ccs.petscb', qw(rpetsc wpetsc), {ioblock=>2});	##-- petsc: bin, with block i/o
+  iotest($ccs, 'ccs.petsc',  qw(rpetsc wpetsc));                ##-- petsc: bin
+  iotest($ccs, 'ccs.petscb', qw(rpetsc wpetsc), {ioblock=>2});  ##-- petsc: bin, with block i/o
 };
 
 done_testing;

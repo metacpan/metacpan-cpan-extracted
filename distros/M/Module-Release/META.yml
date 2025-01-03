@@ -41,5 +41,5 @@ requires:
 resources:
   bugtracker: https://github.com/briandfoy/module-release/issues
   repository: https://github.com/briandfoy/module-release
-version: '2.135'
+version: '2.136'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

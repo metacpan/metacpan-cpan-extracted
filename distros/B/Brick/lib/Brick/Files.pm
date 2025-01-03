@@ -4,7 +4,7 @@ use strict;
 use base qw(Exporter);
 use vars qw($VERSION);
 
-$VERSION = '0.902';
+$VERSION = '0.903';
 
 package Brick::Bucket;
 use strict;
@@ -33,8 +33,7 @@ creation.
 =cut
 
 # returns MIME type from File::MMagic on success, undef otherwise
-sub _file_magic_type
-	{
+sub _file_magic_type {
 	my( $bucket, $file ) = @_;
 
 	require File::MMagic;
@@ -50,8 +49,7 @@ sub _file_magic_type
 
 	my( $uploaded_ext ) = $file =~ m/\.(\w*)?$/g;
 
-	if( $format eq "application/msword" )
-		{
+	if( $format eq "application/msword" ) {
 		no warnings 'uninitialized';
 
 		$format = ($uploaded_ext =~ /^xl[st]$/)
@@ -60,16 +58,14 @@ sub _file_magic_type
 				:
 			"application/x-msword";
 		}
-	elsif( $format =~ m|x-system/x-error| )
-		{
+	elsif( $format =~ m|x-system/x-error| ) {
 		$format = undef;
 		}
 
 	return $format;
 	}
 
-sub _get_file_extensions_by_mime_type
-	{
+sub _get_file_extensions_by_mime_type {
 	my( $bucket, $type ) = @_;
 
 	require MIME::Types;
@@ -93,8 +89,7 @@ sub is_mime_type {
 
 	my @caller = $bucket->__caller_chain_as_list;
 
-	unless( UNIVERSAL::isa( $setup->{mime_types}, ref [] ) )
-		{
+	unless( UNIVERSAL::isa( $setup->{mime_types}, ref [] ) ) {
     	croak( "The mime_types key must be an array reference!" );
 		}
 
@@ -151,13 +146,11 @@ which are the elements of ARRAY_REF.
 
 =cut
 
-sub Brick::_get_file_extension # just a sub, not a method
-	{
+sub Brick::_get_file_extension { # just a sub, not a method
 	lc +( split /\./, $_[0] )[-1];
 	}
 
-sub has_file_extension
-	{
+sub has_file_extension {
 	my( $bucket, $setup ) = @_;
 
 	my @caller = $bucket->__caller_chain_as_list;
@@ -331,11 +324,11 @@ This source is in Github:
 
 =head1 AUTHOR
 
-brian d foy, C<< <bdfoy@cpan.org> >>
+brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT
 
-Copyright © 2007-2022, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2007-2025, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

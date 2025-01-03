@@ -71,6 +71,37 @@ use Test::DBIx::Class
     ],
   }, 'Got expected errors';
 
+  is_deeply $top->errors->as_rfc_7807, +{
+    fields => {
+      middle => [
+        "Middle Is Invalid",
+      ],
+      "middle.bottom" => [
+        "Middle Bottom Is Invalid",
+      ],
+      "middle.bottom.*" => [
+        "Middle Bottom * No CCC",
+      ],
+      "middle.bottom.bottom_value" => [
+        "Middle Bottom Bottom Value is too short (minimum is 4 characters)",
+      ],
+      "middle.bottom.children" => [
+        "Middle Bottom Children has too few rows (minimum is 3)",
+        "Middle Bottom Children Are Invalid",
+      ],
+      "middle.bottom.children[0].child_value" => [
+        "Middle Bottom Children Child Value is too short (minimum is 5 characters)",
+      ],
+      "middle.middle_value" => [
+        "Middle Middle Value is too short (minimum is 4 characters)",
+      ],
+      top_value => [
+        "Top Value is too short (minimum is 4 characters)",
+      ],
+    },
+    general => [],
+  };
+
   is_deeply +{$top->middle->bottom->errors->to_hash(full_messages=>1)}, +{
     "*" => [
       "No CCC",

@@ -1,5 +1,17 @@
 Revision history for Perl extension Poz
 
+0.14 2025-01-02T23:46:30Z
+
+    - bugfix: z->is(...) not resolve the parent class
+
+0.13 2025-01-02T16:13:50Z
+
+    - feature: implement Poz::Types::is
+
+0.12 2025-01-02T14:43:58Z
+
+    - bugfix: nested instances is not blessed
+
 0.11 2024-12-30T14:30:40Z
 
     - feature: add "is" feature to object type

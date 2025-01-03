@@ -6,7 +6,7 @@ use Poz::Builder;
 use Exporter 'import';
 use Carp;
 
-our $VERSION = "0.11";
+our $VERSION = "0.14";
 
 our @EXPORT_OK = qw/z/;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
@@ -22,6 +22,7 @@ $Carp::Internal{'Poz::Types::object'}++;
 $Carp::Internal{'Poz::Types::array'}++;
 $Carp::Internal{'Poz::Types::enum'}++;
 $Carp::Internal{'Poz::Types::union'}++;
+$Carp::Internal{'Poz::Types::is'}++;
 
 sub z {
     return Poz::Builder->new;
@@ -72,6 +73,12 @@ Poz - A simple, composable, and extensible data validation library for Perl.
         date => "2005-07-01",
         author => "Damian Conway",
     }); 
+
+    my $bookArraySchema = z->array($z->is("My::Book"));
+    my $book1 = $bookSchema->parse({title => "Perl Best Practices", author => "Damian Conway", published => "2005-07-01"});
+    my $book2 = $bookSchema->parse({title => "Spidering Hacks", author => "Kevin Hemenway", published => "2003-10-01"});
+    my $bookArray = $bookArraySchema->parse([$book1, $book2]);
+    
     
 =head1 DESCRIPTION
 
@@ -145,16 +152,31 @@ Creates a new union schema object.
 
 =head1 SEE ALSO
 
-L<Zod|https://zod.dev/>
-L<Poz::Builder>
-L<Poz::Types>
-L<Poz::Types::null>
-L<Poz::Types::string>
-L<Poz::Types::number>
-L<Poz::Types::object>
-L<Poz::Types::array>
-L<Poz::Types::enum>
-L<Poz::Types::union>
+=over 4
+
+=item L<Zod|https://zod.dev/>
+
+=item L<Poz::Builder>
+
+=item L<Poz::Types>
+
+=item L<Poz::Types::null>
+
+=item L<Poz::Types::string>
+
+=item L<Poz::Types::number>
+
+=item L<Poz::Types::object>
+
+=item L<Poz::Types::array>
+
+=item L<Poz::Types::enum>
+
+=item L<Poz::Types::union>
+
+=item L<Poz::Types::is>
+
+=back
 
 =head1 HOW TO CONTRIBUTE
 

@@ -3,10 +3,9 @@ use strict;
 use warnings;
 use Test::More;
 use Test::Moose;
-BEGIN {
-    eval "use MooseX::GlobRef ()";
-    plan skip_all => "MooseX::GlobRef is required for this test" if $@;
-}
+use Test2::Require::Module 'MooseX::GlobRef';
+use MooseX::GlobRef;
+
 # XXX: the way the IO modules are loaded means we can't just rely on cmop to
 # load these properly/:
 use IO::Handle;

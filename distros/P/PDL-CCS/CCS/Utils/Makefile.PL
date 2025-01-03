@@ -13,13 +13,7 @@ $hash{LICENSE} = 'perl';
 $hash{PREREQ_PM}{PDL} = $hash{CONFIGURE_REQUIRES}{PDL} = 0;
 push(@{$hash{LIBS}}, '-lm');
 $hash{DIR} = [];
-#$hash{INC} .= '';
-#$hash{OBJECT} .= '';
 $hash{realclean}{FILES} .= '*~ *.tmp README.txt';
-
-#my $pmfile = $package[0];
-#$pmfile =~ s/\.pd$/\.pm/;
-#$hash{PM}{$pmfile} = "\$(INST_LIBDIR)/CCS/$pmfile";
 
 WriteMakefile(%hash);
 

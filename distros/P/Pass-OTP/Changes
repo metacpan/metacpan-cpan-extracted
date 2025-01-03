@@ -1,3 +1,6 @@
+1.800   2025/01/02
+- switch to MIME::Base32
+
 1.702   2024/03/11
 - fix type in Makefile.PL
 

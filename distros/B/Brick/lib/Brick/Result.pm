@@ -5,7 +5,7 @@ use vars qw($VERSION);
 
 use Carp qw(carp croak);
 
-$VERSION = '0.902';
+$VERSION = '0.903';
 
 =encoding utf8
 
@@ -58,14 +58,12 @@ use constant LEVEL   => 0;
 use constant MESSAGE => 1;
 
 
-sub explain
-	{
+sub explain {
 	my( $result_set ) = @_;
 
 	my $str   = '';
 
-	foreach my $element ( @$result_set )
-		{
+	foreach my $element ( @$result_set ) {
 		my $level = 0;
 
 		$str .= "$$element[0]: " . do {
@@ -76,8 +74,7 @@ sub explain
 
 		$str .= $element->get_method() . "\n";
 
-		if( $element->passed )
-			{
+		if( $element->passed ) {
 			$str .= "\n";
 			next;
 			}
@@ -85,26 +82,21 @@ sub explain
 		# this descends into the error tree (without using recursion
 		my @uses = ( [ $level, $element->get_messages ] );
 
-		while( my $pair = shift @uses )
-			{
+		while( my $pair = shift @uses ) {
 			# is it a single error or a composition?
-			if( ! ref $pair->[ MESSAGE ] )
-				{
+			if( ! ref $pair->[ MESSAGE ] ) {
 				$str .= $pair->[ MESSAGE ] . "foo";
 				}
-			elsif( ! ref $pair->[ MESSAGE ] eq ref {} )
-				{
+			elsif( ! ref $pair->[ MESSAGE ] eq ref {} ) {
 				next;
 				}
-			elsif( exists $pair->[ MESSAGE ]->{errors} )
-				{
+			elsif( exists $pair->[ MESSAGE ]->{errors} ) {
 				# something else to process, but put it back into @uses
 				unshift @uses, map {
 					[ $pair->[ LEVEL ] + 1, $_ ]
 					} @{ $pair->[ MESSAGE ]->{errors} };
 				}
-			else
-				{
+			else {
 				# this could come back as an array ref instead of a string
 				no warnings 'uninitialized';
 				$str .=  "\t" . #x $pair->[ LEVEL ] .
@@ -126,46 +118,37 @@ Collapse the result structure to an array of flat hashes.
 
 =cut
 
-sub flatten
-	{
+sub flatten {
 	my( $result_set ) = @_;
 
 	my $str   = '';
 
 	my @flatten;
 
-	foreach my $element ( @$result_set ) # one element per profile element
-		{
+	foreach my $element ( @$result_set ) { # one element per profile element
 		bless $element, $result_set->result_item_class;
 		next if $element->passed;
 		my $constraint = $element->get_method;
 
 		my @uses = ( $element->get_messages );
 
-		while( my $hash = shift @uses )
-			{
-			if( ! ref $hash eq ref {} )
-				{
+		while( my $hash = shift @uses ) {
+			if( ! ref $hash eq ref {} ) {
 				carp "Non-hash reference in messages result key! Skipping";
 				next;
 				}
 
 			# is it a single error or a composition?
-			unless( ref $hash  )
-				{
+			unless( ref $hash  ) {
 				next;
 				}
-			elsif( exists $hash->{errors} )
-				{
+			elsif( exists $hash->{errors} ) {
 				unshift @uses, @{ $hash->{errors} };
 				}
-			else
-				{
+			else {
 				push @flatten, { %$hash, constraint => $constraint };
 				}
-
 			}
-
 		}
 
 	\@flatten;
@@ -177,8 +160,7 @@ Similar to flatten, but keyed by the field that failed the constraint.
 
 =cut
 
-sub flatten_by_field
-	{
+sub flatten_by_field {
 	my( $result_set ) = @_;
 
 	my $str   = '';
@@ -186,26 +168,21 @@ sub flatten_by_field
 	my %flatten;
 	my %Seen;
 
-	foreach my $element ( @$result_set ) # one element per profile element
-		{
+	foreach my $element ( @$result_set ) { # one element per profile element
 		next if $element->passed;
 		my $constraint = $element->get_method;
 
 		my @uses = ( $element->get_messages );
 
-		while( my $hash = shift @uses )
-			{
+		while( my $hash = shift @uses ) {
 			# is it a single error or a composition?
-			unless( ref $hash  )
-				{
+			unless( ref $hash  ) {
 				next;
 				}
-			elsif( exists $hash->{errors} )
-				{
+			elsif( exists $hash->{errors} ) {
 				unshift @uses, @{ $hash->{errors} };
 				}
-			else
-				{
+			else {
 				my $field = $hash->{failed_field};
 				next if $hash->{handler} and $Seen{$field}{$hash->{handler}}++;
 				$flatten{ $field } = [] unless exists $flatten{ $field };
@@ -213,9 +190,7 @@ sub flatten_by_field
 					{ %$hash, constraint => $constraint };
 				$Seen{$field}{$hash->{handler}}++;
 				}
-
 			}
-
 		}
 
 	\%flatten;
@@ -227,8 +202,7 @@ Similar to flatten, but keyed by the hash key named in the argument list.
 
 =cut
 
-sub flatten_by
-	{
+sub flatten_by {
 	my( $result_set, $key ) = @_;
 
 	my $str   = '';
@@ -236,26 +210,21 @@ sub flatten_by
 	my %flatten;
 	my %Seen;
 
-	foreach my $element ( @$result_set ) # one element per profile element
-		{
+	foreach my $element ( @$result_set ) { # one element per profile element
 		next if $element->passed;
 		my $constraint = $element->get_method;
 
 		my @uses = ( $element->get_messages );
 
-		while( my $hash = shift @uses )
-			{
+		while( my $hash = shift @uses ) {
 			# is it a single error or a composition?
-			unless( ref $hash  )
-				{
+			unless( ref $hash  ) {
 				next;
 				}
-			elsif( exists $hash->{errors} )
-				{
+			elsif( exists $hash->{errors} ) {
 				unshift @uses, @{ $hash->{errors} };
 				}
-			else
-				{
+			else {
 				my $field = $hash->{$key};
 				next if $hash->{handler} and $Seen{$field}{$hash->{handler}}++;
 				$flatten{ $field } = [] unless exists $flatten{ $field };
@@ -263,9 +232,7 @@ sub flatten_by
 					{ %$hash, constraint => $constraint };
 				$Seen{$field}{$hash->{handler}}++;
 				}
-
 			}
-
 		}
 
 	\%flatten;
@@ -297,11 +264,11 @@ This source is in Github:
 
 =head1 AUTHOR
 
-brian d foy, C<< <bdfoy@cpan.org> >>
+brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT
 
-Copyright © 2007-2022, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2007-2025, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

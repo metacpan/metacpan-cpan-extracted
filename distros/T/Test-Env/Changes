@@ -1,5 +1,9 @@
 Revision history for Perl module Test::Env
 
+1.087 2025-01-03T05:03:56Z
+	* refresh distro
+	* move to BRIANDFOY user
+
 1.086 2022-01-08T22:38:34Z
 	* No code changes. Fix a link in README.pod.
 

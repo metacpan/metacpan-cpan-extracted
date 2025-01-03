@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use Data::Dumper qw{Dumper};
-use Test::More tests => 16;
+use Test::More tests => 18;
 
 {
   package #hide from CPAN
@@ -15,6 +15,8 @@ use Test::More tests => 16;
   sub _protocol_default {"protocol_class"};
   sub _port_default {"port_class"};
   sub _script_name_default {"script_name_class"};
+  sub _warnings_default {"warnings_class"};
+  sub _debug_default {"debug_class"};
 }
 
 my $service = SMS::Send::My::ClassWithOverrides->new;
@@ -49,3 +51,5 @@ is($service->protocol,    'protocol_class_cfg',    'protocol');
 is($service->port,        'port_class_cfg',        'port');
 is($service->script_name, 'script_name_class_cfg', 'script_name');
 is($service->script_name, 'script_name_class_cfg', 'script_name');
+is($service->warnings,    'warnings_class_cfg',    'warnings');
+is($service->debug,       'debug_class_cfg',       'debug');

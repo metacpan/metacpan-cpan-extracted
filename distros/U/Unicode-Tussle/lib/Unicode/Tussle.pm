@@ -3,7 +3,7 @@ use v5.14;
 package Unicode::Tussle;
 use vars qw( $VERSION );
 
-$VERSION = '1.115';
+$VERSION = '1.118';
 
 =encoding utf8
 
@@ -13,8 +13,8 @@ Unicode::Tussle - Tom's Unicode Scripts So Life is Easier
 
 =head1 SYNOPSIS
 
-This is a collection of separate program. See the documentation for each
-program.
+This is a collection of separate programs from Tom Christiansen. See
+the documentation for each program.
 
 =head1 DESCRIPTION
 
@@ -1862,12 +1862,12 @@ and useful program, so here are 861 of them, ucsorted, of course.
 
 Tom Christiansen C<< <tchrist@perl.org> >> wrote all the code.
 
-brian d foy C<< <brian.d.foy@gmail.com> >> wrapped the distribution around
+brian d foy C<< <briandfoy@pobox.com> >> wrapped the distribution around
 it.
 
 =head1 COPYRIGHT
 
-Copyright 2011-2021, Tom Christiansen.
+Copyright 2011-2025, Tom Christiansen.
 
 =head1 LICENSE
 

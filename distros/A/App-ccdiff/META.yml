@@ -16,7 +16,7 @@ name: App-ccdiff
 provides: 
   App::ccdiff: 
     file: lib/App/ccdiff.pm
-    version: '0.33'
+    version: '0.34'
 recommends: 
   Algorithm::Diff: '1.201'
   Algorithm::Diff::XS: '0.04'
@@ -36,4 +36,4 @@ resources:
   homepage: https://metacpan.org/pod/App::ccdiff
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/App-ccdiff
-version: '0.33'
+version: '0.34'

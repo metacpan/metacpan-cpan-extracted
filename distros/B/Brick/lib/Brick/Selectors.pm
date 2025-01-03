@@ -4,7 +4,7 @@ use strict;
 use base qw(Exporter);
 use vars qw($VERSION);
 
-$VERSION = '0.902';
+$VERSION = '0.903';
 
 package Brick::Bucket;
 use strict;
@@ -91,8 +91,7 @@ tests the value with the key C<field>.
 
 =cut
 
-sub _is_even_number
-	{
+sub _is_even_number {
 	sub{ $_[0]->{field} % 2 ? 0 : 1 };
 	}
 
@@ -106,8 +105,7 @@ tests the value with the key C<field>.
 
 =cut
 
-sub _is_odd_number
-	{
+sub _is_odd_number {
 	sub{ $_[0]->{field} % 2 ? 1 : 0 };
 	}
 
@@ -118,8 +116,7 @@ indicates it's Tuesday, and return the empty list otherwise.
 
 =cut
 
-sub _is_tuesday
-	{
+sub _is_tuesday {
 	sub { (localtime)[6] == 2 ? 1 : 0 };
 	}
 
@@ -228,11 +225,11 @@ This source is in Github:
 
 =head1 AUTHOR
 
-brian d foy, C<< <bdfoy@cpan.org> >>
+brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT
 
-Copyright © 2007-2022, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2007-2025, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

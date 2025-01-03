@@ -24,6 +24,7 @@ Control::CLI::Extreme currently supports:
       BPS 2000, ES 460, ES 470
       Baystack models 325, 425
       Accelar/Passport models 1000, 1100, 1200
+      EnterasysOS Chassis (only tested with S4)
 
 The devices supported by this module can have an inconsistent CLI (in terms of syntax, login sequences, terminal width-length-paging, prompts) and in some cases two separate CLI syntaxes are available on the same product.
 This class is written so that all the above products can be CLI scripted in a consistent way regardless of their underlying CLI variants. The CLI commands themselves might still vary across the different products though, even here, for certain common functions (like entering privExec mode or disabling terminal more paging) a generic method is provided by this class.
@@ -106,6 +107,9 @@ perldoc command.
 
 You can also look for information at:
 
+    Github repository
+        https://github.com/lgastevens/Control-CLI-Extreme
+
     RT, CPAN's request tracker
         http://rt.cpan.org/NoAuth/Bugs.html?Dist=Control-CLI-Extreme
 
@@ -121,7 +125,7 @@ You can also look for information at:
 
 LICENSE AND COPYRIGHT
 
-Copyright (C) 2024 Ludovico Stevens
+Copyright (C) 2025 Ludovico Stevens
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

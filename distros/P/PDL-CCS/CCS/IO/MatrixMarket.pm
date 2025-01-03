@@ -8,12 +8,12 @@ use PDL::CCS::Config qw(ccs_indx);
 use PDL::CCS::Nd;
 use PDL::CCS::IO::Common qw(:intern); ##-- for e.g. _ccsio_header_lines(), _ccsio_parse_header()
 use PDL;
-use PDL::IO::Misc;	   ##-- for rcols(), wcols(), $PDL::IO::Misc::deftype
-use Fcntl qw(:seek);	   ##-- for rewinding
+use PDL::IO::Misc;         ##-- for rcols(), wcols(), $PDL::IO::Misc::deftype
+use Fcntl qw(:seek);       ##-- for rewinding
 use Carp qw(confess);
 use strict;
 
-our $VERSION = '1.23.29';
+our $VERSION = '1.24.0';
 our @ISA = ('PDL::Exporter');
 our @EXPORT_OK =
   (
@@ -46,12 +46,12 @@ PDL::CCS::IO::MatrixMarket - Matrix Market Exchange Format text I/O for PDL::CCS
 
  $ccs = PDL::CCS::Nd->newFromWhich($which,$nzvals);
 
- ccs_writemm($ccs,"ccs.mm");	 # write a sparse matrix market text file
+ ccs_writemm($ccs,"ccs.mm");     # write a sparse matrix market text file
  $ccs2 = ccs_readmm("ccs.mm");   # read a sparse matrix market text file
 
- $dense = random(10,10);	 # ... also supported for dense piddles
- writemm($dense, "file.mm");	 # write a dense matrix market text file
- $dense2 = readmm("file.mm");	 # read a dense matrix market text file
+ $dense = random(10,10);         # ... also supported for dense piddles
+ writemm($dense, "file.mm");     # write a dense matrix market text file
+ $dense2 = readmm("file.mm");    # read a dense matrix market text file
 
 =cut
 
@@ -260,11 +260,11 @@ sub ccs_readmm {
 
   ##-- construct and return
   return PDL::CCS::Nd->newFromWhich($ix,$nz,
-				    pdims=>$header->{pdims},
-				    vdims=>$header->{vdims},
-				    flags=>$header->{flags},
-				    sorted=>$opts{sorted},
-				    steal=>1);
+                                    pdims=>$header->{pdims},
+                                    vdims=>$header->{vdims},
+                                    flags=>$header->{flags},
+                                    sorted=>$opts{sorted},
+                                    steal=>1);
 }
 
 
@@ -313,7 +313,7 @@ sub readmm {
   while (defined($_=<$fh>)) {
     if (!/^%/) {
       if (/^%(\S+) type (\S+)/ && $1 eq __PACKAGE__) {
-	$iotype = PDL->can($_)->() if (PDL->can($_));
+        $iotype = PDL->can($_)->() if (PDL->can($_));
       }
     } elsif (!/^\s*$/) {
       next;

@@ -28,6 +28,7 @@ CCS/Ufunc/ccsufunc.pd		# CCS/Ufunc/Ufunc.pm
 CCS/Ufunc/Ufunc.pm
 CCS/Utils/Makefile.PL
 CCS/Utils/ccsutils.pd		# CCS/Utils/Utils.pm
+CCS/Utils/ccsutils.h
 CCS/Utils/Utils.pm
 CCS/MatrixOps/Makefile.PL
 CCS/MatrixOps/ccsmatops.pd	# CCS/MatrixOps/MatrixOps.pm

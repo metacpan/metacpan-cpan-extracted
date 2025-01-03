@@ -21,13 +21,13 @@ use PDL::CCS;
 
 ##-- setup
 my $a = pdl(double, [
-		     [10,0,0,0,-2,0],
-		     [3,9,0,0,0,3],
-		     [0,7,8,7,0,0],
-		     [3,0,8,7,5,0],
-		     [0,8,0,9,9,13],
-		     [0,4,0,0,2,-1],
-		    ]);
+                     [10,0,0,0,-2,0],
+                     [3,9,0,0,0,3],
+                     [0,7,8,7,0,0],
+                     [3,0,8,7,5,0],
+                     [0,8,0,9,9,13],
+                     [0,4,0,0,2,-1],
+                    ]);
 my ($ptr,$rowids,$nzvals) = ccsencode($a);
 
 ##-- 1: transpose()
@@ -57,11 +57,11 @@ my $unless_bad = $PDL::Bad::Status ? '' : "your PDL doesn't support bad values";
 skipok("get():some_missing:bad",
        $unless_bad,
        sub {
-	 my $badval    = pdl(0)->setvaltobad(0);
-	 my $allbcvals = ccsget($ptr,$rowids,$nzvals, $allai,$badval);
-	 return (all($allbcvals->where($allbcvals->isgood) == $allavals->where($allbcvals->isgood))
-		 &&
-		 all($allavals->where($allbcvals->isbad) == 0));
+         my $badval    = pdl(0)->setvaltobad(0);
+         my $allbcvals = ccsget($ptr,$rowids,$nzvals, $allai,$badval);
+         return (all($allbcvals->where($allbcvals->isgood) == $allavals->where($allbcvals->isgood))
+                 &&
+                 all($allavals->where($allbcvals->isbad) == 0));
        });
 
 ##-- 7: get2d(): some missing (zero)
@@ -74,11 +74,11 @@ pdlok("index2d():some_missing:zero", $allavals, $allcvals);
 skipok("get():some_missing:bad",
        $unless_bad,
        sub {
-	 my $badval    = pdl(0)->setvaltobad(0);
-	 my $allbcvals = ccsget2d($ptr,$rowids,$nzvals, $acoli,$arowi,$badval);
-	 return (all($allbcvals->where($allbcvals->isgood) == $allavals->where($allbcvals->isgood))
-		 &&
-		 all($allavals->where($allbcvals->isbad) == 0));
+         my $badval    = pdl(0)->setvaltobad(0);
+         my $allbcvals = ccsget2d($ptr,$rowids,$nzvals, $acoli,$arowi,$badval);
+         return (all($allbcvals->where($allbcvals->isgood) == $allavals->where($allbcvals->isgood))
+                 &&
+                 all($allavals->where($allbcvals->isbad) == 0));
        });
 
 

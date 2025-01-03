@@ -1,32 +1,44 @@
-use Test::More 0.95;
+use strict;
+use warnings;
 
-my $class = 'Set::CrossProduct';
-use_ok( $class );
+use Test::More 1;
+
+my $class  = 'Set::CrossProduct';
+my $method = 'next';
+
+subtest 'sanity' => sub {
+	use_ok $class or BAIL_OUT( "$class did not compile" );
+	can_ok $class, $method;
+	};
 
 my @apples  = ('Granny Smith', 'Washington', 'Red Delicious');
 my @oranges = ('Navel', 'Florida');
 
-my $i = Set::CrossProduct->new( [ \@apples, \@oranges ] );
-isa_ok( $i, $class );
+my $cross;
+subtest 'construct' => sub {
+	$cross = $class->new( [ \@apples, \@oranges ] );
+	isa_ok $cross, $class;
 
-my $count = $i->cardinality;
-is( $count, 6, 'Get back the right number of elements' );
+	is $cross->cardinality, 6, 'get back the right number of elements';
+	};
 
-ok( defined $i->next, 'Next element is defined' );	
+subtest "$method at end" => sub {
+	ok defined $cross->next, 'next element is defined';
+	$cross->combinations; #exhaust iterator
+	ok $cross->done, 'cross is done';
+	ok !defined $cross->next, 'next element is undefined';
+	};
 
-# after the last fetch, next() should return undef
-for( ; $count > 0; $count-- ) {
-	my @a = $i->get;
-	}
-ok( !(defined $i->next), 'Next element is undefined' );	
+subtest "$method after unget" => sub {
+	ok $cross->unget;
+	ok ! $cross->done, 'cross is not done';
+	ok defined $cross->next, 'next element is defined';
+	};
 
-# but if i unget the last element, next should return
-# the last one.
-$i->unget;
-ok( defined $i->next, 'Next element is defined after unget' );	
-
-# now we should be done
-my @a = $i->get;
-ok( !( defined $i->next ), 'Next element is undefined after get' );	
+subtest "exhaust again" => sub {
+	ok $cross->get, 'get last element again';
+	ok $cross->done, 'cross is done';
+	ok ! defined $cross->next, 'next element is undefined';
+	};
 
 done_testing();

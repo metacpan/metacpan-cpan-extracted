@@ -7,7 +7,7 @@ shift(@ARGV) if defined $ARGV[0] and $ARGV[0] eq 'Build'; # accomodate with CPAN
 my $builder = Module::Build->new(
     module_name         => 'Net::OAuth',
     license             => 'perl',
-    dist_author         => 'Keith Grennan <kgrennan@cpan.org>',
+    dist_author         => [ 'Keith Grennan <kgrennan@cpan.org>', 'Robert Rothenberg <rrwo@cpan.org>' ],
     dist_version_from   => 'lib/Net/OAuth.pm',
     dist_abstract       => 'An implementation of the OAuth protocol',
     build_requires => {
@@ -17,15 +17,25 @@ my $builder = Module::Build->new(
     requires => {
         'Digest::SHA' => '5.47',
         'Digest::HMAC_SHA1' => '1.01',
-        'URI::Escape' => '3.28',
+        'URI' => '5.15',
         'Class::Accessor' => '0.31',
         'Class::Data::Inheritable' => '0.06',
-        'Digest::SHA1' => '2.12',
         'Encode' => '2.35',
         'LWP::UserAgent' => '1',
-    },    
+        'Crypt::URandom' => '0.37',
+    },
+    configure_requires => {
+        'Module::Build'         => '0.4234',
+        'Module::Build::Compat' => '0.4234',
+    },
     add_to_cleanup      => [ 'Net-OAuth-*' ],
-    create_makefile_pl => 'passthrough',
+    create_makefile_pl  => 'small',
+    meta_merge          => {
+        resources => {
+            bugtracker => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Net-OAuth',
+            repository => 'https://github.com/keeth/Net-OAuth.git',
+        },
+    },
 );
 
 $builder->create_build_script();

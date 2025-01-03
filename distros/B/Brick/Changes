@@ -1,5 +1,8 @@
 Revision history for Perl module Brick
 
+0.903 2025-01-03T06:57:50Z
+	* refresh distro and move to BRIANDFOY
+
 0.902 2022-01-09T01:10:56Z
 	* No code changes. Fix a link in README.pod.
 

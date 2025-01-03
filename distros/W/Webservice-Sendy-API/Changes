@@ -11,3 +11,20 @@
 
 0.3	Mon Dec 30 07:00:33 PM UTC 2024
 	- POD tweaks
+
+0.4	Thu Jan 2 07:00:33 PM UTC 2024
+	- completed "create" support, which was
+	  lacking a final message on success
+	- POD tweaks
+
+0.5	Thu Jan 2 08:00:33 PM UTC 2024
+	- made "track_opens" and "track_clicks"
+	  enabled by default; added option params
+	  "no_track_opens" and "no_track_clicks"
+	  turn turn them off, respectively.
+	- updated POD; also noted that by default
+	  campaigns are created as drafts; there
+	  currently no support for scheduling a
+	  send, only sending immediately via the
+	  "send_campaign" parameter (and cli flag,
+	  "--send_campaign".

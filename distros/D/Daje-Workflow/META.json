@@ -1,0 +1,102 @@
+{
+   "abstract" : "It's new $module",
+   "author" : [
+      "janeskil1525 <janeskil1525@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.25",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Daje-Workflow",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Daje::Workflow::Database" : "0.05",
+            "Daje::Workflow::Database::Model" : "0",
+            "Daje::Workflow::Loader" : "0",
+            "Mojo::Loader" : "0",
+            "Mojo::Pg" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Daje::Workflow" : {
+         "file" : "lib/Daje/Workflow.pm",
+         "version" : "0.02"
+      },
+      "Daje::Workflow::Activities" : {
+         "file" : "lib/Daje/Workflow/Activities.pm"
+      },
+      "Daje::Workflow::Activities::Activity::Base::Common" : {
+         "file" : "lib/Daje/Workflow/Activities/Activity/Base/Common.pm"
+      },
+      "Daje::Workflow::Checks" : {
+         "file" : "lib/Daje/Workflow/Checks.pm"
+      },
+      "Daje::Workflow::Checks::Base::Common" : {
+         "file" : "lib/Daje/Workflow/Checks/Base/Common.pm"
+      },
+      "Daje::Workflow::Checks::Mandatory" : {
+         "file" : "lib/Daje/Workflow/Checks/Mandatory.pm"
+      },
+      "Daje::Workflow::Create::State" : {
+         "file" : "lib/Daje/Workflow/Create/State.pm",
+         "version" : "0.01"
+      },
+      "Daje::Workflow::Errors::Error" : {
+         "file" : "lib/Daje/Workflow/Errors/Error.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/janeskil1525/Daje-Workflow/issues"
+      },
+      "homepage" : "https://github.com/janeskil1525/Daje-Workflow",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/janeskil1525/Daje-Workflow.git",
+         "web" : "https://github.com/janeskil1525/Daje-Workflow"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_static_install" : 1
+}

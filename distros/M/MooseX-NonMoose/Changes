@@ -1,7 +1,11 @@
 Revision history for MooseX-NonMoose
 
+0.27      2025-01-02 20:30:46 -0700
+  - Drop dependency on List::MoreUtils
+  - New maintainer and repository: https://github.com/uperl/MooseX-NonMoose
+
 0.26  2014-02-25
-      - fix dependency specification for Try::Tiny (Gareth Harper, #9)
+      - fix dependency specification for Try::Tiny (Gareth Harper, https://github.com/doy/moosex-nonmoose/pull/9)
 
 0.25  2014-02-06
       - fix for Module::Runtime 0.014

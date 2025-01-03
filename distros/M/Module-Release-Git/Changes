@@ -1,5 +1,8 @@
 Revision history for Perl module Module::Release::Git
 
+1.019 2025-01-03T07:06:25Z
+	* refresh distro and move to BRIANDFOY
+
 1.018 2024-01-14T18:10:19Z
 	* refresh distro, update email addresses
 

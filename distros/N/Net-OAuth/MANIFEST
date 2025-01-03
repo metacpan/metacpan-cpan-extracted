@@ -46,3 +46,4 @@ t/13-hmac-sha256.t
 t/rsakey
 t/rsakey.pub
 META.yml
+META.json

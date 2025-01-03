@@ -57,10 +57,10 @@ sub test_unop {
 
 for my $missing (0,1,255,$BAD) { ##-- *4
   for my $op (
-	       [qw(bitnot ~)],
-	       [qw(not !)],
-	       qw(sqrt abs sin cos log log10), 'exp' ##-- *9
-	      )
+               [qw(bitnot ~)],
+               [qw(not !)],
+               qw(sqrt abs sin cos log log10), 'exp' ##-- *9
+              )
     {
       if (ref($op)) { test_unop(@$op, $missing); }
       else          { test_unop($op, undef, $missing); }

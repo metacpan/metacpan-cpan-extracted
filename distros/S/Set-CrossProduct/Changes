@@ -1,5 +1,9 @@
 Revision history for Perl module Set::CrossProduct
 
+3.001 2025-01-02T19:47:26Z
+	* Add random access funtions to move the cursor and jump to any
+	particular element. This includes jump_to, nth, and random().
+
 2.009 2024-02-11T07:12:34Z
 	* refresh distro, update email address, move to BRIANDFOY
 

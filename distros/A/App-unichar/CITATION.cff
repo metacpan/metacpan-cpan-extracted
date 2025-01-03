@@ -1,0 +1,21 @@
+# This CITATION.cff file was generated with /Users/brian/bin/bmt
+# Fri Feb 18 18:04:11 2022
+
+abstract: App::unichar - get info about a character
+authors:
+- alias: briandfoy
+  family-names: foy
+  given-names: brian d
+  orcid: 0000-0002-0283-8283
+  email: briandfoy@pobox.com
+cff-version: 1.2.0
+date-released: 2021-01-13
+doi: 10.5281/zenodo.6150223
+license: artistic_2
+license-url: https://github.com/briandfoy/unichar/LICENSE
+message: The GitHub page for this module provides formatted citations
+repository-code: https://github.com/briandfoy/unichar
+title: The App::unichar Perl module
+type: software
+version: '0.013'
+

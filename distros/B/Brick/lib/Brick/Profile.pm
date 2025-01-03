@@ -8,7 +8,7 @@ use Carp qw(carp);
 
 use Brick;
 
-$VERSION = '0.902';
+$VERSION = '0.903';
 
 =encoding utf8
 
@@ -66,12 +66,10 @@ Create a new profile object tied to the Brick object.
 
 =cut
 
-sub new
-	{
+sub new {
 	my( $class, $brick, $array_ref ) = @_;
 
-	unless( $brick->isa( $class->brick_class ) )
-		{
+	unless( $brick->isa( $class->brick_class ) ) {
 		carp "First argument to \$class->new() must be a brick object. " .
 			"Got [$brick]\n";
 		return;
@@ -81,8 +79,7 @@ sub new
 
 	my $lint_errors = $class->lint( $array_ref );
 
-	if( ! defined $lint_errors or $lint_errors )
-		{
+	if( ! defined $lint_errors or $lint_errors ) {
 		carp "Profile did not validate!";
 		return;
 		}
@@ -164,8 +161,7 @@ Errors for duplicate names?
 
 =cut
 
-sub lint
-	{
+sub lint {
 	my( $class, $array ) = @_;
 
 	return unless(
@@ -175,14 +171,12 @@ sub lint
 
 	my $lint = {};
 
-	foreach my $index ( 0 .. $#$array )
-		{
+	foreach my $index ( 0 .. $#$array ) {
 		my $h = $lint->{$index} = {};
 
 		unless( eval { $array->[$index]->isa( ref [] ) } or
 			UNIVERSAL::isa(  $array->[$index], ref [] )
-			)
-			{
+			) {
 			$h->{format} = "Not an array reference!";
 			last;
 			}
@@ -229,8 +223,7 @@ it in different ways (text output, hash output).
 
 =cut
 
-sub explain
-	{
+sub explain {
 	my( $profile ) = @_;
 
 	my $bucket   = $profile->get_bucket;
@@ -246,16 +239,14 @@ sub explain
 
 	my $level = 0;
 	my $str   = '';
-	foreach my $index ( 0 .. $#entries )
-		{
+	foreach my $index ( 0 .. $#entries ) {
 		my $tuple = $entries[$index];
 
 		my @uses = ( [ $level, $tuple->[0] ] );
 
 		#print STDERR Data::Dumper->Dump( [ \@uses ], [qw(uses)] );
 
-		while( my $pair = shift @uses )
-			{
+		while( my $pair = shift @uses ) {
 			my $entry = $bucket->get_from_bucket( $pair->[1] );
 			#print Data::Dumper->Dump( [ $entry ], [qw(entry)] );
 			next unless $entry;
@@ -278,8 +269,7 @@ sub explain
 
 =cut
 
-sub get_bucket
-	{
+sub get_bucket {
 	$_[0]->{bucket}
 	}
 
@@ -287,8 +277,7 @@ sub get_bucket
 
 =cut
 
-sub set_bucket
-	{
+sub set_bucket {
 	$_[0]->{bucket} = $_[1];
 	}
 
@@ -296,8 +285,7 @@ sub set_bucket
 
 =cut
 
-sub get_coderefs
-	{
+sub get_coderefs {
 	$_[0]->{coderefs};
 	}
 
@@ -305,8 +293,7 @@ sub get_coderefs
 
 =cut
 
-sub set_coderefs
-	{
+sub set_coderefs {
 	$_[0]->{coderefs} = $_[1];
 	}
 
@@ -314,8 +301,7 @@ sub set_coderefs
 
 =cut
 
-sub get_array
-	{
+sub get_array {
 	$_[0]->{array};
 	}
 
@@ -323,8 +309,7 @@ sub get_array
 
 =cut
 
-sub set_array
-	{
+sub set_array {
 	$_[0]->{array} = $_[1];
 	}
 
@@ -354,11 +339,11 @@ This source is in Github:
 
 =head1 AUTHOR
 
-brian d foy, C<< <bdfoy@cpan.org> >>
+brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT
 
-Copyright © 2007-2022, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2007-2025, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

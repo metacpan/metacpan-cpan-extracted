@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.43';
+our $VERSION = '0.44';
 
 use Fey::Exceptions qw( param_error );
 use Fey::Literal;
@@ -116,9 +116,15 @@ sub select {
         MX_PARAMS_VALIDATE_NO_CACHE => 1,
     );
 
-    for my $elt (@select) {
-        $self->_add_select_element(
-            blessed $elt ? $elt : Fey::Literal->new_from_scalar($elt) );
+    for my $elt (
+        map {
+            $_->can('columns')
+                ? sort { $a->name() cmp $b->name() } $_->columns()
+                : $_
+        }
+        map { blessed $_ ? $_ : Fey::Literal->new_from_scalar($_) } @select
+        ) {
+        $self->_add_select_element($elt);
     }
 
     return $self;
@@ -399,11 +405,7 @@ sub select_clause {
 
     $sql .= (
         join ', ',
-        map {
-                  $_->can('sql_for_select_clause')
-                ? $_->sql_for_select_clause($dbh)
-                : $_->sql_with_alias($dbh)
-        } $self->select_clause_elements()
+        map { $_->sql_with_alias($dbh) } $self->select_clause_elements()
     );
 
     return $sql;
@@ -519,13 +521,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Fey::SQL::Select - Represents a SELECT query
 
 =head1 VERSION
 
-version 0.43
+version 0.44
 
 =head1 SYNOPSIS
 
@@ -574,7 +578,7 @@ These will be passed to C<< Fey::Literal->new_from_scalar() >>.
 =item * C<Fey::Table> objects
 
 If a table is passed, then all of its columns will be included in the
-C<SELECT> clause.
+C<SELECT> clause, sorted alphanumerically.
 
 =item * C<Fey::Column> objects, and aliases
 
@@ -825,16 +829,25 @@ subselect in C<WHERE> clauses.
 
 See L<Fey> for details on how to report bugs.
 
+Bugs may be submitted at L<https://github.com/ap/Fey/issues>.
+
+=head1 SOURCE
+
+The source code repository for Fey can be found at L<https://github.com/ap/Fey>.
+
 =head1 AUTHOR
 
 Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2011 - 2015 by Dave Rolsky.
+This software is Copyright (c) 2011 - 2025 by Dave Rolsky.
 
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
+
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
 
 =cut

@@ -1,5 +1,14 @@
 Revision history for Hash::Match
 
+v0.8.2    2025-01-02 21:25:39+00:00 Europe/London
+  [Documentation]
+  - Updated link to the security policy to refer to the git repo.
+
+  - Fixed copyright year.
+
+  [Tests]
+  - Fixed an error with t/author-leaks.t GH#8.
+
 v0.8.1    2025-01-01 12:58:38+00:00 Europe/London
   [Documentation]
   - Added a security policy.

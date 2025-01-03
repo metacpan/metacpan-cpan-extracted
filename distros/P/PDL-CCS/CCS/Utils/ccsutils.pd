@@ -5,7 +5,7 @@
 ##======================================================================
 
 use PDL::VectorValued::Dev;
-my $VERSION = '1.23.29'; ##-- update with perl-reversion from Perl::Version module
+my $VERSION = '1.24.0'; ##-- update with perl-reversion from Perl::Version module
 pp_setversion($VERSION);
 
 ##------------------------------------------------------
@@ -42,6 +42,7 @@ EOPM
 ##------------------------------------------------------
 ## Includes / defines
 pp_addhdr(<<'EOH');
+#include "ccsutils.h"
 EOH
 
 ##------------------------------------------------------
@@ -78,17 +79,22 @@ EOPM
 
 ##------------------------------------------------------
 ## nnz() : get number of nonzero values
-pp_def('nnz',
-       Pars => 'a(N); int+ [o]nnz()',
-       Code =>
-('
-  $nnz()=0;
-  loop (N) %{
-    if ($a()!=0) ++$nnz();
-  %}
-'),
-       Doc =>
-q(Get number of non-zero values in a PDL $a();
+pp_def(
+  'nnz',
+  Pars => "a(N); $INDX\ [o]nnz()",
+  HandleBad => 1,
+  Code => q{
+    broadcastloop %{
+      $nnz()=0;
+      loop (N) %{
+        if ($a()!=0) ++$nnz();
+      %}
+    %}
+    $PDLSTATESETGOOD(nnz); /*-- output is always good --*/
+  },
+
+  Doc => <<'EOD',
+Get number of non-zero values in a PDL $a();
 For 1d PDLs, should be equivalent to:
 
  $nnz = nelem(which($a!=0));
@@ -96,72 +102,51 @@ For 1d PDLs, should be equivalent to:
 For k>1 dimensional PDLs, projects via number of nonzero elements
 to N-1 dimensions by computing the number of nonzero elements
 along the the 1st dimension.
-),
-      );
+
+EOD
+
+    BadDoc=> 'The output PDL $nnz() never contains BAD values.',
+);
+
 
 ##------------------------------------------------------
 ## nnza() : get number of non-approximate zero values
 use PDL;
 my %absfunc = (
-	       map {
-		 my $typ = PDL->can($_);
-		 ($typ
-		  ? ($typ->()->ppsym => ($typ->()->ctype eq 'long' ? "labs" : "llabs"))
-		  : qw())
-	       } qw (longlong indx)
-	      );
-pp_def('nnza',
-       Pars => 'a(N); eps(); int+ [o]nnz();',
-       Code => ('
-$nnz()=0;
-loop (N) %{
-  types(BSUL) %{ if ( abs($a()) > $eps()) ++$nnz(); %}
- '.join("\n ", map {"types($_) %{ if ($absfunc{$_}(\$a()) > \$eps()) ++\$nnz(); %}"} sort keys(%absfunc)).'
-  types(F)    %{ if (fabsf($a()) > $eps()) ++$nnz(); %}
-  types(D)    %{ if (fabs ($a()) > $eps()) ++$nnz(); %}
-%}
-'),
-       Doc =>
-q(Like nnz() using tolerance constant $eps().
+               map {
+                 my $typ = PDL->can($_);
+                 ($typ
+                  ? ($typ->()->ppsym => ($typ->()->ctype eq 'long' ? "labs" : "llabs"))
+                  : qw())
+               } qw (longlong indx)
+              );
+pp_def(
+  'nnza',
+  Pars => "a(N); eps(); $INDX\ [o]nnz();",
+  HandleBad => 1,
+  Code => '
+    broadcastloop %{
+      $nnz()=0;
+      loop (N) %{
+        types(BSUL) %{ if ( abs($a()) > $eps()) ++$nnz(); %}
+       '.join("\n ", map {"types($_) %{ if ($absfunc{$_}(\$a()) > \$eps()) ++\$nnz(); %}"} sort keys(%absfunc)).'
+        types(F)    %{ if (fabsf($a()) > $eps()) ++$nnz(); %}
+        types(D)    %{ if (fabs ($a()) > $eps()) ++$nnz(); %}
+      %}
+    %}
+    $PDLSTATESETGOOD(nnz); /*-- output is always good --*/
+  ',
+
+  Doc => <<'EOD',
+Like nnz() using tolerance constant $eps().
 For 1d PDLs, should be equivalent to:
 
  $nnz = nelem(which(!$a->approx(0,$eps)));
-),
-      );
 
+EOD
 
-##------------------------------------------------------
-## ngoodover() : get number of good values: BUILTIN in PDL::Bad
-#pp_def('ngoodover',
-#       Pars => 'a(N); int+ [o]ngood()',
-#       Code => '$ngood() = $SIZE(N);',
-#       HandleBad=>1,
-#       BadCode=>
-#('
-#  $GENERIC(a) a_val;
-#  threadloop %{
-#   $GENERIC(ngood) ngoodi = 0;
-#   loop(N) %{
-#    a_val = $a();
-#    if ( $ISGOODVAR(a_val,a) ) { ++ngoodi; }
-#   %}
-#   $ngood() = ngoodi;
-#  %}
-#'),
-#       CopyBadStatusCode => '$SETPDLSTATEGOOD(ngood); /* always make sure the output is "good" */',
-#       BadDoc=>'The output PDL $ngood() always has its bad flag cleared.',
-#       Doc =>
-#q(Get number of good elements in a PDL $a();
-#For 1d PDLs, should be equivalent to:
-#
-# $ngood = nelem(which($a->isgood()));
-#
-#For k>1 dimensional PDLs, projects via number of good elements
-#to N-1 dimensions by computing the number of good elements
-#along the the 1st dimension.
-#),
-#      );
-
+  BadDoc=> 'The output PDL $nnz() never contains BAD values.',
+);
 
 
 ##======================================================================
@@ -180,48 +165,54 @@ EOPM
 
 ##------------------------------------------------------
 ## ccs_encode_pointers() : get encoded pointer & index translation PDL
-pp_def
-  ('ccs_encode_pointers',
-   Pars => "$INDX\ ix(Nnz); $INDX\ N(); $INDX\ [o]ptr(Nplus1); $INDX\ [o]ixix(Nnz);",
-   PMCode=>
-(q{
- sub PDL::ccs_encode_pointers {
-   my ($ix,$N,$ptr,$ixix) = @_;
-   barf("Usage: ccs_encode_pointers(ix(Nnz), N(), [o]ptr(N+1), [o]ixix(Nnz)") if (!defined($ix));
-   $N    = $ix->max()+1                               if (!defined($N));
-   $ptr = PDL->zeroes(ccs_indx(), $N+1)              if (!defined($ptr));
-   $ixix = PDL->zeroes(ccs_indx(), $ix->dim(0))      if (!defined($ixix));
-   &PDL::_ccs_encode_pointers_int($ix,$N,$ptr,$ixix);
-   return ($ptr,$ixix);
- }
-}),
-   Code =>
-(q(
- /*-- Local variables --*/
- CCS_Indx ixval, ixval_next, ixval_prev, nzi, nzj, sizeN=$SIZE(Nplus1)-1, sizeNnz=$SIZE(Nnz);
- //
- /*-- Count number of NZs in each column; store in ptr[N=>ixval] --*/
- loop (Nplus1) %{ $ptr()=0; %}
- loop (Nnz)    %{ ixval=$ix(); ++$ptr(Nplus1=>ixval); %}
- //
- /*-- tweak ptr(): fill each cell with the starting point of the previous row --*/
- ixval_prev = sizeN-1;
- $ptr(Nplus1=>sizeN) = sizeNnz - $ptr(Nplus1=>ixval_prev);
- for (ixval_next=sizeN, ixval=ixval_prev; ixval > 0; ixval_next=ixval--) {
-   ixval_prev = ixval-1;
-   $ptr(Nplus1=>ixval) = $ptr(Nplus1=>ixval_next) - $ptr(Nplus1=>ixval_prev);
- }
- $ptr(Nplus1=>0) = 0;
- //
- /*-- Assign columns and values --*/
- for (nzi=0; nzi < sizeNnz; nzi++) {
-   ixval      = $ix(Nnz=>nzi);
-   ixval_next = ixval+1;
-   nzj        = $ptr(Nplus1=>ixval_next)++;
-   $ixix(Nnz=>nzj) = nzi;
- }
-)),
-  Doc=><<'EOD'
+pp_def(
+  'ccs_encode_pointers',
+  Pars => "$INDX\ ix(Nnz); $INDX\ N(); $INDX\ [o]ptr(Nplus1); $INDX\ [o]ixix(Nnz);",
+  PMCode=> q{
+    sub PDL::ccs_encode_pointers {
+      my ($ix,$N,$ptr,$ixix) = @_;
+      barf("Usage: ccs_encode_pointers(ix(Nnz), N(), [o]ptr(N+1), [o]ixix(Nnz)") if (!defined($ix));
+      &PDL::_ccs_encode_pointers_int($ix, ($N // $ix->max+1), ($ptr //= null), ($ixix //= null));
+      return ($ptr,$ixix);
+    }
+  },
+
+  RedoDimsCode => q{
+    if ($SIZE(Nplus1) < 0) {
+      $SIZE(Nplus1) = $N() + 1;
+    }
+    else if ($SIZE(Nplus1) <= $N()) {
+      $CROAK("dimension Nplus1 (=%td) must be greater than N (=%td)", $SIZE(Nplus1), $N());
+    }
+  },
+
+  Code => q{
+    /*-- Local variables --*/
+    CCS_Indx ixval, ixval_next, ixval_prev, nzi, nzj, sizeN=$SIZE(Nplus1)-1, sizeNnz=$SIZE(Nnz);
+    //
+    /*-- Count number of NZs in each column; store in ptr[N=>ixval] --*/
+    loop (Nplus1) %{ $ptr()=0; %}
+    loop (Nnz)    %{ ixval=$ix(); ++$ptr(Nplus1=>ixval); %}
+    //
+    /*-- tweak ptr(): fill each cell with the starting point of the previous row --*/
+    ixval_prev = sizeN-1;
+    $ptr(Nplus1=>sizeN) = sizeNnz - $ptr(Nplus1=>ixval_prev);
+    for (ixval_next=sizeN, ixval=ixval_prev; ixval > 0; ixval_next=ixval--) {
+      ixval_prev = ixval-1;
+      $ptr(Nplus1=>ixval) = $ptr(Nplus1=>ixval_next) - $ptr(Nplus1=>ixval_prev);
+    }
+    $ptr(Nplus1=>0) = 0;
+    //
+    /*-- Assign columns and values --*/
+    for (nzi=0; nzi < sizeNnz; nzi++) {
+      ixval      = $ix(Nnz=>nzi);
+      ixval_next = ixval+1;
+      nzj        = $ptr(Nplus1=>ixval_next)++;
+      $ixix(Nnz=>nzj) = nzi;
+    }
+  },
+
+  Doc => <<'EOD'
 General CCS encoding utility.
 
 Get a compressed storage "pointer" vector $ptr
@@ -257,55 +248,62 @@ EOPM
 
 ##------------------------------------------------------
 ## ccs_decode_pointer() : decode a CCS-encoded pointer
-pp_def
-  ('ccs_decode_pointer',
-   Pars => "$INDX ptr(Nplus1); $INDX proj(Nproj); $INDX\ [o]projix(NnzProj); $INDX\ [o]nzix(NnzProj)",
-   PMCode=>
-(q{
- sub PDL::ccs_decode_pointer {
-   my ($ptr,$proj,$projix,$nzix) = @_;
-   barf("Usage: ccs_decode_pointer(ptr(N+1), proj(Nproj), [o]projix(NnzProj), [o]nzix(NnzProj)")
-     if (!defined($ptr));
-   my ($nnzproj);
-   if (!defined($proj)) {
-     $proj    = PDL->sequence(ccs_indx(), $ptr->dim(0)-1);
-     $nnzproj = $ptr->at(-1);
-   }
-   if (!defined($projix) || !defined($nzix)) {
-     $nnzproj = ($ptr->index($proj+1)-$ptr->index($proj))->sum if (!defined($nnzproj));
-     return (null,null) if (!$nnzproj);
-     $projix  = PDL->zeroes(ccs_indx(), $nnzproj) if (!defined($projix));
-     $nzix    = PDL->zeroes(ccs_indx(), $nnzproj) if (!defined($nzix));
-   }
-   &PDL::_ccs_decode_pointer_int($ptr,$proj,$projix,$nzix);
-   return ($projix,$nzix);
- }
-}),
-   Code =>
-(q(
- /*-- Local variables --*/
- CCS_Indx ni,ni_next, nzi,nzi_next, ixi=0, sizeNproj=$SIZE(Nproj), sizeNnzProj=$SIZE(NnzProj);
- loop (Nproj) %{
-   ni         = $proj();
-   ni_next    = ni+1;
-   nzi        = $ptr(Nplus1=>ni);
-   nzi_next   = $ptr(Nplus1=>ni_next);
-   for ( ; nzi < nzi_next && ixi < sizeNnzProj; nzi++, ixi++) {
-     $projix(NnzProj=>ixi) = Nproj;
-     $nzix(NnzProj=>ixi)   = nzi;
-   }
- %}
-)),
+pp_def(
+  'ccs_decode_pointer',
+  Pars => "$INDX ptr(Nplus1); $INDX proj(Nproj); $INDX\ [o]projix(NnzProj); $INDX\ [o]nzix(NnzProj)",
+  OtherPars => 'PDL_Indx nnzProj;',
+  PMCode=> q{
+    sub PDL::ccs_decode_pointer {
+      my ($ptr,$proj,$projix,$nzix,$nnzproj) = @_;
+      barf("Usage: ccs_decode_pointer(ptr(N+1), proj(Nproj), [o]projix(NnzProj), [o]nzix(NnzProj), NnzProj?")
+        if (!defined($ptr));
+      if (!defined($proj)) {
+        $proj    = PDL->sequence(ccs_indx(), $ptr->dim(0)-1);
+        $nnzproj //= $ptr->at(-1);
+      }
+      $projix //= null;
+      $nzix //= null;
+      $nnzproj //= ($projix->isnull && $nzix->isnull
+                    ? ($ptr->index($proj+1)-$ptr->index($proj))->sum
+                    : -1);
+      return (null,null) if (!$nnzproj);
+      &PDL::_ccs_decode_pointer_int($ptr,$proj, $projix,$nzix, $nnzproj);
+      return ($projix,$nzix);
+    }
+  },
+
+  RedoDimsCode => q{
+    if ($SIZE(NnzProj) < 0) {
+      $SIZE(NnzProj) = $COMP(nnzProj);
+    }
+  },
+
+  Code => q{
+    /*-- Local variables --*/
+    CCS_Indx ni,ni_next, nzi,nzi_next, ixi=0, sizeNproj=$SIZE(Nproj), sizeNnzProj=$SIZE(NnzProj);
+    loop (Nproj) %{
+      ni         = $proj();
+      ni_next    = ni+1;
+      nzi        = $ptr(Nplus1=>ni);
+      nzi_next   = $ptr(Nplus1=>ni_next);
+      for ( ; nzi < nzi_next && ixi < sizeNnzProj; nzi++, ixi++) {
+        $projix(NnzProj=>ixi) = Nproj;
+        $nzix(NnzProj=>ixi)   = nzi;
+      }
+    %}
+  },
+
   Doc=><<'EOD'
 General CCS decoding utility.
 
-Project indices $proj() from a compressed storage "pointer" vector $proj().
+Project indices $proj() from a compressed storage "pointer" vector $ptr().
 If unspecified, $proj() defaults to:
 
- sequence($ptr->dim(0))
+ sequence($ptr->dim(0) - 1)
 
 EOD
 );
+
 
 ##======================================================================
 ## Indexing
@@ -323,56 +321,62 @@ EOPM
 ##------------------------------------------------------
 ## ccs_xindex1d()
 ##  + optimized dice_axis on 0th dimension, no pointer required
-vvpp_def('ccs_xindex1d',
-	 Pars => "which(Ndims,Nnz); a(Na); [o]nzia(NnzA); [o]nnza()",
-   PMCode=>
-(q{
- sub PDL::ccs_xindex1d {
-   my ($which,$a,$nzia,$nnza) = @_;
-   barf("Usage: ccs_xindex2d(which(Ndims,Nnz), a(Na), [o]nzia(NnzA), [o]nnza()")
-     if ((grep {!defined($_)} @_[0..1]) || $which->ndims < 2 || $which->dim(0) < 1);
-   $nnza = $nzia->dim(0) if (defined($nzia) && !defined($nnza));
-   $nnza = $which->dim(1) if (!defined($nnza));
-   $nnza = pdl($which->type, $nnza) if (!ref($nnza));
-   $nzia  = PDL->zeroes($which->type, $nnza->sclr) if (!defined($nzia));
-   &PDL::_ccs_xindex1d_int($which,$a,$nzia,$nnza);
-   return ($nzia,$nnza) if (wantarray);
-   return $nzia->reshape($nnza->sclr);
- }
-}),
-	 Code =>
-(q(
-long a_min=0, a_max=$SIZE(Nnz);
-long a_lb, a_ub, a_ubmax=a_max;
-CCS_Indx nnzai = 0;
-/*-- DEBUG
- long size_nnz = $SIZE(Nnz);
- long size_na  = $SIZE(Na);
- long size_nnza = $SIZE(NnzA);
- printf("Nnz=%d, Na=%d [%d:%d], NnzA=%d\n", size_nnz, size_na,$a(Na=>0),$a(Na=>size_na-1), size_nnza);
-*/
-loop (Na) %{
-  a_ubmax = a_max;
-  $LB('$a()',   '$which(Ndims=>0,Nnz=>$_)', 'a_min','a_max',   'a_lb',ubmaxvar=>'a_ubmax');
-  if ($which(Ndims=>0,Nnz=>a_lb) != $a()) { a_min=a_lb; continue; }
+vvpp_def(
+  'ccs_xindex1d',
+  Pars => "$INDX which(Ndims,Nnz); $INDX a(Na); $INDX\ [o]nzia(NnzA); $INDX\ [o]nnza()",
+  OtherPars => 'PDL_Indx sizeNnzA;',
 
-  $LB('$a()+1', '$which(Ndims=>0,Nnz=>$_)', 'a_lb' ,'a_ubmax', 'a_ub');
-  if ($which(Ndims=>0,Nnz=>a_ub) <= $a()) ++a_ub;
+  PMCode=> q{
+    sub PDL::ccs_xindex1d {
+      my ($which,$a,$nzia,$nnza) = @_;
+      barf("Usage: ccs_xindex2d(which(Ndims,Nnz), a(Na), [o]nzia(NnzA), [o]nnza()")
+        if ((grep {!defined($_)} @_[0..1]) || $which->ndims < 2 || $which->dim(0) < 1);
+      $nzia //= null;
+      $nnza //= null;
+      &PDL::_ccs_xindex1d_int($which,$a,$nzia,$nnza, ($nnza ? $nnza->sclr : -1));
+      return wantarray ? ($nzia,$nnza) : $nzia->reshape($nnza->sclr);
+    }
+  },
 
-  for ( ; a_lb < a_ub && nnzai < $SIZE(NnzA); ++a_lb, ++nnzai ) {
-    $nzia(NnzA=>nnzai) = a_lb;
-  }
-  if (nnzai >= $SIZE(NnzA)) break;
-  if (a_ub < a_max) a_min = a_ub;
-%}
-$nnza() = nnzai;
-for ( ; nnzai < $SIZE(NnzA); ++nnzai) {
-  $nzia(NnzA=>nnzai) = -1;
-}
-)),
+  RedoDimsCode => q(
+    if ($SIZE(NnzA) < 0) {
+      $SIZE(NnzA) = $COMP(sizeNnzA) >= 0 ? $COMP(sizeNnzA) : $SIZE(Nnz);
+    }
+  ),
+
+  Code => q{
+    CCS_Indx a_min=0, a_max=$SIZE(Nnz);
+    CCS_Indx a_lb, a_ub, a_ubmax=a_max;
+    CCS_Indx nnzai = 0;
+    #if 0
+     /*-- DEBUG --*/
+     CCS_Indx size_nnz = $SIZE(Nnz);
+     CCS_Indx size_na  = $SIZE(Na);
+     CCS_Indx size_nnza = $SIZE(NnzA);
+     printf("Nnz=%td, Na=%td [%td:%td], NnzA=%td\n", size_nnz, size_na,$a(Na=>0),$a(Na=>size_na-1), size_nnza);
+    #endif
+    loop (Na) %{
+      a_ubmax = a_max;
+      $LB('$a()',   '$which(Ndims=>0,Nnz=>$_)', 'a_min','a_max',   'a_lb',ubmaxvar=>'a_ubmax');
+      if ($which(Ndims=>0,Nnz=>a_lb) != $a()) { a_min=a_lb; continue; }
+
+      $LB('$a()+1', '$which(Ndims=>0,Nnz=>$_)', 'a_lb' ,'a_ubmax', 'a_ub');
+      if ($which(Ndims=>0,Nnz=>a_ub) <= $a()) ++a_ub;
+
+      for ( ; a_lb < a_ub && nnzai < $SIZE(NnzA); ++a_lb, ++nnzai ) {
+        $nzia(NnzA=>nnzai) = a_lb;
+      }
+      if (nnzai >= $SIZE(NnzA)) break;
+      if (a_ub < a_max) a_min = a_ub;
+    %}
+    $nnza() = nnzai;
+    for ( ; nnzai < $SIZE(NnzA); ++nnzai) {
+      $nzia(NnzA=>nnzai) = -1;
+    }
+  },
+
   Doc=><<'EOD'
-
-Compute indices $nzai() along dimension C<NNz> of $which() whose initial values $which(0,$nzai)
+Compute indices $nzai() along dimension C<Nnz> of $which() whose initial values $which(0,$nzai)
 match some element of $a().  Appropriate for indexing a sparse encoded PDL
 with non-missing entries at $which()
 along the 0th dimension, a la L<dice_axis(0,$a)|PDL::Slices/dice_axis>.
@@ -385,79 +389,84 @@ elements.
 EOD
   );
 
+
 ##------------------------------------------------------
 ## ccs_xindex2d()
 ##  + Cartesian-product index
-vvpp_def('ccs_xindex2d',
-	 Pars => "which(Ndims,Nnz); a(Na); b(Nb); [o]ab(Nab); [o]nab()",
-   PMCode=>
-(q{
- sub PDL::ccs_xindex2d {
-   my ($which,$a,$b,$ab,$nab) = @_;
-   barf("Usage: ccs_xindex2d(which(2,Nnz), a(Na), b(Nb), [o]nab(), [o]ab(Nab)")
-     if ((grep {!defined($_)} @_[0..2]) || $which->ndims != 2 || $which->dim(0) < 2);
-   $nab = $ab->dim(0) if (defined($ab) && !defined($nab));
-   if (!defined($nab)) {
-     $nab = $a->nelem*$b->nelem;
-     $nab = $which->dim(1) if ($which->dim(1)) < $nab;
-   }
-   $nab = pdl($which->type, $nab) if (!ref($nab));
-   $ab = PDL->zeroes($which->type, $nab->sclr) if (!defined($ab));
-   &PDL::_ccs_xindex2d_int($which,$a,$b,$ab,$nab);
-   return ($ab,$nab) if (wantarray);
-   return $ab->reshape($nab->sclr);
- }
-}),
-	 Code =>
-(q(
-long a_min=0, a_max=$SIZE(Nnz);
-long a_lb, a_ub, a_ubmax=a_max;
-long b_min, b_max, b_lb;
-CCS_Indx abi = 0;
-/*-- DEBUG
- long size_nnz = $SIZE(Nnz);
- long size_na  = $SIZE(Na);
- long size_nb  = $SIZE(Nb);
- long size_nab = $SIZE(Nab);
- printf("Nnz=%d, Na=%d [%d:%d], Nb=%d [%d:%d], Nab=%d\n", size_nnz, size_na,$a(Na=>0),$a(Na=>size_na-1), size_nb,$b(Nb=>0),$b(Nb=>size_nb-1), size_nab);
-*/
-loop (Na) %{
-  a_ubmax = a_max;
-  $LB('$a()',   '$which(Ndims=>0,Nnz=>$_)', 'a_min','a_max',   'a_lb',ubmaxvar=>'a_ubmax');
-  //printf("a:LB(a=%d,min=%d,max=%d)=%d --> %d (ubmax=%d)\n", $a(),a_min,a_max,a_lb, $which(Ndims=>0,Nnz=>a_lb), a_ubmax); fflush(stdout);
-  if ($which(Ndims=>0,Nnz=>a_lb) != $a()) { a_min=a_lb; continue; }
-  //
-  $LB('$a()+1', '$which(Ndims=>0,Nnz=>$_)', 'a_lb' ,'a_ubmax', 'a_ub');
-  if ($which(Ndims=>0,Nnz=>a_ub) <= $a()) ++a_ub;
-  //printf("a:UB(a=%d,min=%d,max=%d)=%d --> %d\n", $a(),a_lb,a_ubmax,a_ub, $which(Ndims=>0,Nnz=>a_ub)); fflush(stdout);
-  //
-  b_min = a_lb;
-  b_max = a_ub;
-  loop (Nb) %{
-    if (b_min >= b_max) break;
-    //printf("+ b:LB(a=%d,b=%d,min=%d,max=%d)=", $a(),$b(),b_min,b_max); fflush(stdout);
-    $LB('$b()', '$which(Ndims=>1,Nnz=>$_)', 'b_min','b_max', 'b_lb');
-    //printf("%d --> %d", b_lb, $which(Ndims=>1,Nnz=>b_lb));
-    if ($which(Ndims=>1,Nnz=>b_lb) == $b()) {
-      //printf(" *[%d]", abi); fflush(stdout);
-      $ab(Nab=>abi) = b_lb;
-      ++abi;
-      ++b_lb;
-      if (abi >= $SIZE(Nab)) break;
-    }
-    b_min = b_lb;
-    //printf("\n"); fflush(stdout);
-  %}
-  if (abi >= $SIZE(Nab)) break;
-  if (a_ub < a_max) a_min = a_ub;
-%}
-$nab() = abi;
-for ( ; abi < $SIZE(Nab); ++abi) {
-  $ab(Nab=>abi) = -1;
-}
-)),
-  Doc=><<'EOD'
+vvpp_def(
+  'ccs_xindex2d',
+  Pars => "$INDX which(Ndims,Nnz); $INDX a(Na); $INDX b(Nb); $INDX\ [o]ab(Nab); $INDX\ [o]nab()",
 
+  PMCode=> q{
+    sub PDL::ccs_xindex2d {
+      my ($which,$a,$b,$ab,$nab) = @_;
+      barf("Usage: ccs_xindex2d(which(2,Nnz), a(Na), b(Nb), [o]nab(), [o]ab(Nab)")
+        if ((grep {!defined($_)} @_[0..2]) || $which->ndims != 2 || $which->dim(0) < 2);
+      &PDL::_ccs_xindex2d_int($which,$a,$b, ($ab//=null), ($nab//=null));
+      return wantarray ? ($ab,$nab) : $ab->reshape($nab->sclr);
+    }
+  },
+
+  RedoDimsCode => q{
+    if ($SIZE(Nab) < 0) {
+      if ($PDL(nab)->nvals > 0) {
+        $SIZE(Nab) = $nab();
+      } else {
+        $SIZE(Nab) = ($SIZE(Na)*$SIZE(Nb)) < $SIZE(Nnz) ? ($SIZE(Na)*$SIZE(Nb)) : $SIZE(Nnz);
+      }
+    }
+  },
+
+  Code => q{
+    CCS_Indx a_min=0, a_max=$SIZE(Nnz);
+    CCS_Indx a_lb, a_ub, a_ubmax=a_max;
+    CCS_Indx b_min, b_max, b_lb;
+    CCS_Indx abi = 0;
+   #if 0
+    /*-- DEBUG --*/
+     CCS_Indx size_nnz = $SIZE(Nnz);
+     CCS_Indx size_na  = $SIZE(Na);
+     CCS_Indx size_nb  = $SIZE(Nb);
+     CCS_Indx size_nab = $SIZE(Nab);
+     printf("Nnz=%td, Na=%td [%td:%td], Nb=%td [%td:%td], Nab=%td\n", size_nnz, size_na,$a(Na=>0),$a(Na=>size_na-1), size_nb,$b(Nb=>0),$b(Nb=>size_nb-1), size_nab);
+   #endif
+    loop (Na) %{
+      a_ubmax = a_max;
+      $LB('$a()',   '$which(Ndims=>0,Nnz=>$_)', 'a_min','a_max',   'a_lb',ubmaxvar=>'a_ubmax');
+      //printf("a:LB(a=%td,min=%td,max=%td)=%td --> %td (ubmax=%td)\n", $a(),a_min,a_max,a_lb, $which(Ndims=>0,Nnz=>a_lb), a_ubmax); fflush(stdout);
+      if ($which(Ndims=>0,Nnz=>a_lb) != $a()) { a_min=a_lb; continue; }
+      //
+      $LB('$a()+1', '$which(Ndims=>0,Nnz=>$_)', 'a_lb' ,'a_ubmax', 'a_ub');
+      if ($which(Ndims=>0,Nnz=>a_ub) <= $a()) ++a_ub;
+      //printf("a:UB(a=%td,min=%td,max=%td)=%td --> %td\n", $a(),a_lb,a_ubmax,a_ub, $which(Ndims=>0,Nnz=>a_ub)); fflush(stdout);
+      //
+      b_min = a_lb;
+      b_max = a_ub;
+      loop (Nb) %{
+        if (b_min >= b_max) break;
+        //printf("+ b:LB(a=%td,b=%td,min=%td,max=%td)=", $a(),$b(),b_min,b_max); fflush(stdout);
+        $LB('$b()', '$which(Ndims=>1,Nnz=>$_)', 'b_min','b_max', 'b_lb');
+        //printf("%td --> %td", b_lb, $which(Ndims=>1,Nnz=>b_lb));
+        if ($which(Ndims=>1,Nnz=>b_lb) == $b()) {
+          //printf(" *[%td]", abi); fflush(stdout);
+          $ab(Nab=>abi) = b_lb;
+          ++abi;
+          ++b_lb;
+          if (abi >= $SIZE(Nab)) break;
+        }
+        b_min = b_lb;
+        //printf("\n"); fflush(stdout);
+      %}
+      if (abi >= $SIZE(Nab)) break;
+      if (a_ub < a_max) a_min = a_ub;
+    %}
+    $nab() = abi;
+    for ( ; abi < $SIZE(Nab); ++abi) {
+      $ab(Nab=>abi) = -1;
+    }
+  },
+
+  Doc=><<'EOD'
 Compute indices along dimension C<NNz> of $which() corresponding to any combination
 of values in the Cartesian product of $a() and $b().  Appropriate for indexing a
 2d sparse encoded PDL with non-missing entries at $which() via the ND-index piddle
@@ -488,48 +497,49 @@ EOPM
 ##------------------------------------------------------
 ## ccs_dump_which()
 ##  + prints a text dump of an index
-pp_def('ccs_dump_which',
-       Pars => "$INDX which(Ndims,Nnz)",
-       OtherPars => 'SV *HANDLE; char *fmt; char *fsep; char *rsep',
-       PMCode=>
-(q{
- sub PDL::ccs_dump_which {
-   my ($which,$fh,$fmt,$fsep,$rsep) = @_;
-   $fmt  = '%d'  if (!defined($fmt)  || $fmt eq '');
-   $fsep = " "   if (!defined($fsep) || $fsep eq '');
-   $rsep = "$/"  if (!defined($rsep) || $rsep eq '');
-   $fh = \*STDOUT if (!defined($fh));
-   &PDL::_ccs_dump_which_int($which,$fh,$fmt,$fsep,$rsep);
- }
-}),
-   Code =>
-(q(
- CCS_Indx dimi, sizeNdims=$SIZE(Ndims);
- char *fmt_str  = $COMP(fmt);
- char *fsep_str = $COMP(fsep);
- char *rsep_str = $COMP(rsep);
- PerlIO *pio;
- IO     *io;
+pp_def(
+  'ccs_dump_which',
+  Pars => "$INDX which(Ndims,Nnz)",
+  OtherPars => 'SV *HANDLE; char *fmt; char *fsep; char *rsep',
 
- /*-- get PerlIO from SV (lifted from _rasc() n PDL_SRC_ROOT/IO/Misc/misc.pd) --*/
- io = sv_2io($COMP(HANDLE));
- if (!io || !(pio = IoIFP(io))) {
-   croak("can\'t get PerlIO pointer from HANDLE");
- }
+  PMCode=> q{
+    sub PDL::ccs_dump_which {
+      my ($which,$fh,$fmt,$fsep,$rsep) = @_;
+      $fmt  = '%td'  if (!defined($fmt)  || $fmt eq '');
+      $fsep = " "   if (!defined($fsep) || $fsep eq '');
+      $rsep = "$/"  if (!defined($rsep) || $rsep eq '');
+      $fh = \*STDOUT if (!defined($fh));
+      &PDL::_ccs_dump_which_int($which,$fh,$fmt,$fsep,$rsep);
+    }
+  },
 
- loop (Nnz) %{
-   PerlIO_printf(pio, fmt_str, $which(Ndims=>0));
-   for (dimi=1; dimi<sizeNdims; dimi++) {
-     PerlIO_puts(pio,fsep_str);
-     PerlIO_printf(pio, fmt_str, $which(Ndims=>dimi));
-   }
-   PerlIO_puts(pio,rsep_str);
- %}
-)),
+   Code => q{
+    CCS_Indx dimi, sizeNdims=$SIZE(Ndims);
+    char *fmt_str  = $COMP(fmt);
+    char *fsep_str = $COMP(fsep);
+    char *rsep_str = $COMP(rsep);
+    PerlIO *pio;
+    IO     *io;
+
+    /*-- get PerlIO from SV (lifted from _rasc() n PDL_SRC_ROOT/IO/Misc/misc.pd) --*/
+    io = sv_2io($COMP(HANDLE));
+    if (!io || !(pio = IoIFP(io))) {
+      croak("can\'t get PerlIO pointer from HANDLE");
+    }
+
+    loop (Nnz) %{
+      PerlIO_printf(pio, fmt_str, $which(Ndims=>0));
+      for (dimi=1; dimi<sizeNdims; dimi++) {
+        PerlIO_puts(pio,fsep_str);
+        PerlIO_printf(pio, fmt_str, $which(Ndims=>dimi));
+      }
+      PerlIO_puts(pio,rsep_str);
+    %}
+  },
+
   Doc=><<'EOD'
-
 Print a text dump of an index PDL to the filehandle C<HANDLE>, which default to C<STDUT>.
-C<$fmt> is a printf() format to use for output, which defaults to "%d".
+C<$fmt> is a printf() format to use for output, which defaults to "%td".
 C<$fsep> and C<$rsep> are field-and record separators, which default to
 a single space and C<$/>, respectively.
 

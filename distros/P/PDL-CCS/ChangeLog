@@ -1,3 +1,15 @@
+v1.24.0 Fri, 03 Jan 2025 08:59:42 +0100
+	+ github issue #16: overhaul PP output dimension initialization (use RedoDimsCode)
+	+ add and use CCS_PDL_IS_NULL macro
+	+ double-check ccsutils type signatures (remove int+)
+	+ moderinize bad-handling
+	+ workaround for failing bandover,borover tests under PDL-2.096
+	+ expand TABs to spaces in *.{pm,pd,t,PL,perl} files
+	+ fix indentation, opt-in to $multi_c from local submodule builds
+	+ add deprecation comment for ccs_indx() etc. to auto-generated Config.pm
+	+ require perl >= v5.10 for //= operator
+	+ fix typo for 'Func' export tag in Config.PL
+
 v1.23.29 Fri, 27 Dec 2024 17:59:08 +0100
 	+ support BAD non-missing values in ccs_matmult2d_zdd
 	  - TODO: support BAD values (including missing) in ccs_matmult2d_sdd

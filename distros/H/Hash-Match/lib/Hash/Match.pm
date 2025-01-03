@@ -5,7 +5,7 @@ package Hash::Match;
 use v5.14;
 use warnings;
 
-our $VERSION = 'v0.8.1';
+our $VERSION = 'v0.8.2';
 
 use Carp qw/ croak /;
 use List::AllUtils qw/ natatime /;
@@ -164,7 +164,7 @@ Hash::Match - match contents of a hash against rules
 
 =head1 VERSION
 
-version v0.8.1
+version v0.8.2
 
 =head1 SYNOPSIS
 
@@ -367,7 +367,7 @@ Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2025 by Robert Rothenberg.
+This software is Copyright (c) 2014-2015, 2018-2025 by Robert Rothenberg.
 
 This is free software, licensed under:
 

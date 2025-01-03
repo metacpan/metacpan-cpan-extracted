@@ -2,7 +2,7 @@ package Brick::Dates;
 use base qw(Exporter);
 use vars qw($VERSION);
 
-$VERSION = '0.902';
+$VERSION = '0.903';
 
 package Brick::Bucket;
 use strict;
@@ -31,8 +31,7 @@ Brick - This is the description
 
 =cut
 
-sub _is_YYYYMMDD_date_format
-	{
+sub _is_YYYYMMDD_date_format {
 	my( $bucket, $setup ) = @_;
 
 	my @caller = $bucket->__caller_chain_as_list();
@@ -54,8 +53,7 @@ sub _is_YYYYMMDD_date_format
 		} );
 	}
 
-sub _is_valid_date
-	{
+sub _is_valid_date {
 	my( $bucket, $setup ) = @_;
 
 	my @caller = $bucket->__caller_chain_as_list();
@@ -65,8 +63,7 @@ sub _is_valid_date
 		code => sub {
 			my $eval_error = 'Could not parse YYYYMMMDD date';
 			if( my( $year, $month, $day ) =
-				$_[0]->{$setup->{field}} =~ m/(\d\d\d\d)(\d\d)(\d\d)/g )
-				{
+				$_[0]->{$setup->{field}} =~ m/(\d\d\d\d)(\d\d)(\d\d)/g ) {
 				$eval_error = '';
 				my $tm = eval {
 					Time::Moment->new(
@@ -138,8 +135,7 @@ sub _is_in_the_past
 
 =cut
 
-sub _date_is_after
-	{
+sub _date_is_after {
 	my( $bucket, $setup ) = @_;
 
 	my @caller = $bucket->__caller_chain_as_list();
@@ -162,8 +158,7 @@ sub _date_is_after
 		} );
 	}
 
-sub _date_is_before
-	{
+sub _date_is_before {
 	my( $bucket, $setup ) = @_;
 
 	my @caller = $bucket->__caller_chain_as_list();
@@ -192,8 +187,7 @@ sub _date_is_before
 
 =cut
 
-sub date_within_range  # inclusive, negative numbers indicate past
-	{
+sub date_within_range {  # inclusive, negative numbers indicate past
 	my( $bucket, $setup ) = @_;
 
 	my $before_sub = $bucket->_date_is_before( $setup );
@@ -229,8 +223,7 @@ in the comparisons
 
 =cut
 
-sub days_between_dates_within_range  # inclusive, negative numbers indicate past
-	{
+sub days_between_dates_within_range  { # inclusive, negative numbers indicate past
 	my( $bucket, $setup ) = @_;
 
 	my @caller = $bucket->__caller_chain_as_list();
@@ -279,8 +272,7 @@ in the comparisons
 
 =cut
 
-sub days_between_dates_outside_range
-	{
+sub days_between_dates_outside_range {
 	my( $bucket, $setup ) = @_;
 
 	my @caller = $bucket->__caller_chain_as_list();
@@ -308,8 +300,7 @@ sub days_between_dates_outside_range
 
 =cut
 
-sub at_least_N_days_between
-	{
+sub at_least_N_days_between {
 	my( $bucket, $setup ) = @_;
 
 	my @caller = $bucket->__caller_chain_as_list();
@@ -350,8 +341,7 @@ if I should require the end date to be after the start date.
 
 =cut
 
-sub at_most_N_days_between
-	{
+sub at_most_N_days_between {
 	my( $bucket, $setup ) = @_;
 
 	my @caller = $bucket->__caller_chain_as_list();
@@ -425,8 +415,7 @@ is in the past.
 
 =cut
 
-sub _get_days_between
-	{
+sub _get_days_between {
 	my( $bucket, $start, $stop ) = @_;
 
 	my @dates =
@@ -447,8 +436,7 @@ keys:
 
 =cut
 
-sub __get_ymd_as_hashref
-	{
+sub __get_ymd_as_hashref {
 	my( $bucket, $date ) = @_;
 
 	my %hash = eval {
@@ -469,8 +457,7 @@ sub __get_ymd_as_hashref
 		);
 		};
 
-	if( $@ )
-		{
+	if( $@ ) {
 		$@ =~ s/\s+at\s+$0.*//s;
 		croak( "$@: I got [$date] but was expecting something in YYYYMMDD format!" );
 		}
@@ -497,11 +484,11 @@ This source is in Github:
 
 =head1 AUTHOR
 
-brian d foy, C<< <bdfoy@cpan.org> >>
+brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT
 
-Copyright © 2007-2022, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2007-2025, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

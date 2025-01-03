@@ -9,4 +9,5 @@ subtest all_pod_coverage_ok => sub {
     all_pod_coverage_ok({ coverage_class => 'Pod::Coverage::TrustPod' });
 };
 
+Test::Warnings->import(':no_end_test');
 done_testing;

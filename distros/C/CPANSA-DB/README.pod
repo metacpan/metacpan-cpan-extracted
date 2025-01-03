@@ -2,7 +2,25 @@
 
 =encoding utf8
 
+=for HTML <a href="https://www.github.com/briandfoy/cpan-security-advisory/actions?query=workflow%3Amacos"><img src="https://www.github.com/briandfoy/cpan-security-advisory/workflows/macos/badge.svg"></a>
+
+=for HTML <a href="https://www.github.com/briandfoy/cpan-security-advisory/actions?query=workflow%3Aubuntu"><img src="https://www.github.com/briandfoy/cpan-security-advisory/workflows/ubuntu/badge.svg"></a>
+
+=for HTML <a href="https://www.github.com/briandfoy/cpan-security-advisory/actions?query=workflow%3Awindows"><img src="https://www.github.com/briandfoy/cpan-security-advisory/workflows/windows/badge.svg"></a>
+
+=for HTML <a href='https://ci.appveyor.com/project/briandfoy/cpan-security-advisory'><img src='https://ci.appveyor.com/api/projects/status/bmve9x6oe8npv9q6?svg=true'></a>
+
+=for HTML <a href='https://coveralls.io/github/briandfoy/cpan-security-advisory?branch=master'><img src='https://coveralls.io/repos/github/briandfoy/cpan-security-advisory/badge.svg?branch=master' alt='Coverage Status' /></a>
+
+=for HTML <a href="https://github.com/briandfoy/cpan-security-advisory/blob/master/LICENSE"><img src="https://img.shields.io/cpan/l/CPANSA-DB.svg" /></a>
+
+=for HTML <a href="https://metacpan.org/pod/CPANSA::DB"><img src="https://img.shields.io/cpan/v/CPANSA-DB.svg" /></A>
+
 =head1 The CPANSA::DB module
+
+**Report Perl security problems to [CPAN Security
+Group](https://security.metacpan.org), not here**. This is not a
+primary source of security information.
 
 This is the I<README> for the L<CPANSA::DB> Perl module. This is the
 database that L<CPAN::Audit> uses to do its work. The module was
@@ -67,16 +85,25 @@ module and only want to run the tests without installing anything.
 The meta data, such as the source repository and bug tracker, is in
 I<Makefile.PL> or the I<META.*> files it creates. You can find that on
 those CPAN web interfaces, but you can also look at files directly in
-the source repository:
-
-=over 4
-
-=item *	L<https://github.com/briandfoy/cpan-security-advisory>
-
-=back
+the source repository: L<https://github.com/briandfoy/cpan-security-advisory>
 
 If you find a problem, file a ticket in the L<issue
 tracker|https://github.com/briandfoy/cpan-security-advisory/issues>.
+
+There are also backup repositories hosted on other services. These
+reflect the state of the main repo and exist only for redundancy:
+
+=over 4
+
+=item * L<https://bitbucket.com/briandfoy/cpan-security-advisory>
+
+=item * L<https://gitlab.com/briandfoy/cpan-security-advisory>
+
+=item * L<https://codeberg.org/briandfoy/cpan-security-advisory>
+
+=back
+
+=head2 GitHub Attestations
 
 This distribution now uses
 L<GitHub Attestations|https://github.blog/2024-05-02-introducing-artifact-attestations-now-in-public-beta/>,
@@ -124,6 +151,6 @@ you wrote code that you didn't.
 
 Enjoy,
 
-brian d foy, bdfoy@cpan.org
+brian d foy, briandfoy@pobox.com
 
 =cut

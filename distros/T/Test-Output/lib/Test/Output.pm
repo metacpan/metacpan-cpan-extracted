@@ -75,7 +75,7 @@ Test::Output - Utilities to test STDOUT and STDERR messages.
 
 =cut
 
-our $VERSION = '1.034';
+our $VERSION = '1.035';
 
 =head1 SYNOPSIS
 
@@ -893,7 +893,7 @@ sub _chkregex {
 
 =head1 AUTHOR
 
-Currently maintained by brian d foy, C<bdfoy@cpan.org>.
+Currently maintained by brian d foy, C<briandfoy@pobox.com>.
 
 Shawn Sorichetti, C<< <ssoriche@cpan.org> >>
 

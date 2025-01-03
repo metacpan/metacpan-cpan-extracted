@@ -4,7 +4,7 @@ use strict;
 use base qw(Exporter);
 use vars qw($VERSION);
 
-$VERSION = '0.902';
+$VERSION = '0.903';
 
 package Brick::Bucket;
 use strict;
@@ -39,14 +39,12 @@ Create a code ref to apply a regular expression to the named field.
 
 =cut
 
-sub _matches_regex
-	{
+sub _matches_regex {
 	my( $bucket, $setup ) = @_;
 
 	my @caller = $bucket->__caller_chain_as_list();
 
-	unless( eval { $setup->{regex}->isa( ref qr// ) } )
-		{
+	unless( eval { $setup->{regex}->isa( ref qr// ) } ) {
     	croak( "Argument to $caller[0]{'sub'} must be a regular expression object" );
 		}
 
@@ -84,11 +82,11 @@ This source is in Github:
 
 =head1 AUTHOR
 
-brian d foy, C<< <bdfoy@cpan.org> >>
+brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT
 
-Copyright © 2007-2022, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2007-2025, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

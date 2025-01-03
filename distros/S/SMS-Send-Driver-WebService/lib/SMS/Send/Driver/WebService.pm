@@ -7,7 +7,7 @@ use Path::Class qw{};
 use Config::IniFiles qw{};
 use HTTP::Tiny qw{};
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 our $PACKAGE = __PACKAGE__;
 
 =head1 NAME
@@ -502,27 +502,76 @@ sub cfg_property {
   }
 }
 
-=head1 BUGS
+=head2 warnings
 
-Please log on RT and send an email to the author.
+Enable warnings to STDERR for issues such as failed resource and web calls
 
-=head1 SUPPORT
+  $ws->warnings(1);
 
-DavisNetworks.com supports all Perl applications including this package.
+Default: 0
+
+Override in sub class
+
+  sub _warnings_default {1};
+
+Override in configuration
+
+  [My::Driver]
+  warnings=1
+
+=cut
+
+sub warnings {
+  my $self=shift;
+  $self->{'warnings'}=shift if @_;
+  $self->{'warnings'}=$self->cfg_property('warnings', $self->_warnings_default) unless defined $self->{'warnings'};
+  return $self->{'warnings'};
+}
+
+sub _warnings_default {0};
+
+=head2 debug
+
+Enable debug level to STDOUT for logging information such as steps, urls, and parameters
+
+  $ws->debug(5);
+
+Default: 0
+
+Override in sub class
+
+  sub _debug_default {5};
+
+Override in configuration
+
+  [My::Driver]
+  debug=5
+
+
+=cut
+
+sub debug {
+  my $self=shift;
+  $self->{'debug'}=shift if @_;
+  $self->{'debug'}=$self->cfg_property('debug', $self->_debug_default) unless defined $self->{'debug'};
+  return $self->{'debug'};
+}
+
+sub _debug_default {0};
+
+=head1 ISSUES
+
+Please open issue on GitHub
 
 =head1 AUTHOR
 
   Michael R. Davis
-  CPAN ID: MRDVT
-  Satellite Tracking of People, LLC
-  mdavis@stopllc.com
-  http://www.stopllc.com/
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+Copyright (c) 2025 Michael R. Davis
 
-The full text of the license can be found in the LICENSE file included with this module.
+MIT License
 
 =head1 SEE ALSO
 

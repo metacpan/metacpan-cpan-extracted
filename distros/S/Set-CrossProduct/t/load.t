@@ -1,9 +1,12 @@
-use Test::More 0.95;
+use strict;
+use warnings;
 
-my @classes = qw(Set::CrossProduct);
+use Test::More 1;
 
-foreach my $class ( @classes ) {
-	use_ok( $class ) or BIALOUT();
-	}
-	
+my $class  = 'Set::CrossProduct';
+
+subtest 'sanity' => sub {
+	use_ok $class or BAIL_OUT( "$class did not compile" );
+	};
+
 done_testing();

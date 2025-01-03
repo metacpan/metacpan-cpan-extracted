@@ -9,7 +9,7 @@ use Data::Dumper;
 
 use Brick::Profile;
 
-$VERSION = '0.902';
+$VERSION = '0.903';
 
 =encoding utf8
 
@@ -57,8 +57,7 @@ Future ideas? Maybe store several buckets or profiles?
 
 =cut
 
-sub new
-	{
+sub new {
 	my( $class, $args ) = @_;
 
 	my $self = bless {}, $class;
@@ -70,14 +69,12 @@ sub new
 	$self;
 	}
 
-sub _load_external_packages
-	{
+sub _load_external_packages {
 	my( $self, @packages ) = @_;
 
 	my $bucket_class = $self->bucket_class;
 
-	foreach my $package ( @packages )
-		{
+	foreach my $package ( @packages ) {
 		eval "package $bucket_class; require $package; $package->import";
 		croak "Could not load $package: $@" if $@;
 		}
@@ -162,32 +159,27 @@ argument most of the time.
 
 sub create_pool { croak "create_pool is now create_bucket!" }
 
-sub create_bucket
-	{
+sub create_bucket {
 	my( $brick, $profile ) = @_;
 
-	unless( 0 == $brick->profile_class->lint( $profile || [] ) ) # zero but true!
-		{
+	unless( 0 == $brick->profile_class->lint( $profile || [] ) ) { # zero but true!
 		croak "Bad profile for create_bucket! Perhaps you need to check it with lint"
 		};
 
 	my $bucket = $brick->bucket_class->new;
 
 	my @coderefs = ();
-	foreach my $entry ( @$profile )
-		{
+	foreach my $entry ( @$profile ) {
 		my( $name, $method, $args ) = @$entry;
 
 		$args->{profile_name} = $name;
 
 		$args->{code} = do {
 			if( eval { $method->isa( ref {} ) } or
-				ref $method eq ref sub {} )
-				{
+				ref $method eq ref sub {} ) {
 				$method;
 				}
-			elsif( my $code = eval{ $bucket->$method( $args ) } )
-				{
+			elsif( my $code = eval{ $bucket->$method( $args ) } ) {
 				$code;
 				}
 			elsif( $@ ) { croak $@ }
@@ -207,8 +199,7 @@ subclass this you might want to override it.
 
 =cut
 
-sub init
-	{
+sub init {
 	my( $self, $args ) = @_;
 
 	my $bucket_class = $self->bucket_class;
@@ -217,18 +208,15 @@ sub init
 
 	$self->{buckets} = [];
 
-	if( defined $args->{external_packages} && ref $args->{external_packages} eq ref [] )
-		{ # defined and array ref
+	if( defined $args->{external_packages} && ref $args->{external_packages} eq ref [] ) { # defined and array ref
 		$self->{external_packages} = $args->{external_packages};
 		}
 	elsif( defined $args->{external_packages} &&
-		! ($args->{external_packages} eq ref []) )
-		{ # defined but not array ref
+		! ($args->{external_packages} eq ref []) ) { # defined but not array ref
 		carp "'external_packages' value must be an anonymous array";
 		$self->{external_packages} = [];
 		}
-	else
-		{ # not defined
+	else { # not defined
 		$self->{external_packages} = [];
 		}
 	}
@@ -261,15 +249,13 @@ not using a copy breaks, I'll fix that.
 
 =cut
 
-sub clone
-	{
+sub clone {
 	my( $brick ) = shift;
 
 	$brick;
 	}
 
-sub explain
-	{
+sub explain {
 	croak "Who's calling Brick::explain? That's in Brick::Profile now!";
 	}
 
@@ -285,8 +271,7 @@ that, you can override it in your own subclass.
 
 =cut
 
-sub apply
-	{
+sub apply {
 	my( $brick, $profile, $input ) = @_;
 
 	croak "Did not get a profile object in Brick::apply()!\n"
@@ -303,8 +288,7 @@ sub apply
 
 	my @results = ();
 
-	foreach my $index ( 0 .. $#entries )
-		{
+	foreach my $index ( 0 .. $#entries ) {
 		my $e    = $entries[$index];
 		my $name = $array->[$index][0];
 
@@ -317,8 +301,7 @@ sub apply
 		carp "Brick: $sub_name: eval error \$\@ is not a string or hash reference"
 			unless( ! ref $eval_error or ref $eval_error eq ref {} );
 
-		if( defined $eval_error and ref $eval_error eq ref {} )
-			{
+		if( defined $eval_error and ref $eval_error eq ref {} ) {
 			$result = 0;
 			carp "Brick: $sub_name died with reference, but didn't define 'handler' key"
 				unless exists $eval_error->{handler};
@@ -326,8 +309,7 @@ sub apply
 			carp "Brick: $sub_name died with reference, but didn't define 'message' key"
 				unless exists $eval_error->{message};
 			}
-		elsif( defined $eval_error ) # but not a reference
-			{
+		elsif( defined $eval_error ) { # but not a reference
 			$eval_error = {
 				handler       => 'program_error',
 				message       => $eval_error,
@@ -412,11 +394,11 @@ This source is in Github:
 
 =head1 AUTHOR
 
-brian d foy, C<< <bdfoy@cpan.org> >>
+brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT
 
-Copyright © 2007-2022, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2007-2025, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

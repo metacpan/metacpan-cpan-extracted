@@ -28,7 +28,7 @@ no_index:
 provides:
   Poz:
     file: lib/Poz.pm
-    version: '0.11'
+    version: '0.14'
   Poz::Builder:
     file: lib/Poz/Builder.pm
   Poz::Types:
@@ -37,6 +37,8 @@ provides:
     file: lib/Poz/Types/array.pm
   Poz::Types::enum:
     file: lib/Poz/Types/enum.pm
+  Poz::Types::is:
+    file: lib/Poz/Types/is.pm
   Poz::Types::null:
     file: lib/Poz/Types/null.pm
   Poz::Types::number:
@@ -62,7 +64,7 @@ resources:
   bugtracker: https://github.com/ytnobody/p5-Poz/issues
   homepage: https://github.com/ytnobody/p5-Poz
   repository: https://github.com/ytnobody/p5-Poz.git
-version: '0.11'
+version: '0.14'
 x_contributors:
   - 'kobaken <kentafly88@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

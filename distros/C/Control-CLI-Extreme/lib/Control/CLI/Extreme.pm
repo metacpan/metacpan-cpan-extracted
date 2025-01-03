@@ -7,7 +7,7 @@ use Carp;
 use Control::CLI qw( :all );
 
 my $Package = __PACKAGE__;
-our $VERSION = '1.12';
+our $VERSION = '1.13';
 our @ISA = qw(Control::CLI);
 our %EXPORT_TAGS = (
 		use	=> [qw(useTelnet useSsh useSerial useIPv6)],
@@ -58,7 +58,8 @@ my %LoginPatterns = ( # Patterns to check for during device login (Telnet/Serial
 	isw		=>	'Product: ISW ',
 	isw2		=>	'Product: ISW-4W-4WS-4X',
 	iswMarvell	=>	'Product: ISW-24W-4X',
-	slx		=>	'Welcome to the Extreme SLX-OS Software'
+	slx		=>	'Welcome to the Extreme SLX-OS Software',
+	eosChassis	=>	'   C H A S S I S',
 );
 my %Prm = ( # Hash containing list of named parameters returned by attributes
 	bstk	=>	'BaystackERS',
@@ -75,6 +76,7 @@ my %Prm = ( # Hash containing list of named parameters returned by attributes
 	slx	=>	'SLX',
 	hive	=>	'HiveOS',
 	ipanema	=>	'Ipanema',
+	eos	=>	'EnterasysOS',
 	generic	=>	'generic',
 );
 
@@ -184,6 +186,11 @@ my %Attribute = (
 			'is_sdwan',
 			],
 
+	$Prm{eos}	=> [
+			'is_eos',
+			'stp_mode',
+			],
+
 	$Prm{xlr}	=> [
 			'is_master_cpu',
 			'is_dual_cpu',
@@ -209,6 +216,7 @@ my %InitPrompt = ( # Initial prompt pattern expected at login
 	$Prm{slx}		=>	'([^\n\x0d\x0a\)]+)()(?:\((.+?)\))?# $',
 	$Prm{hive}		=>	'([^\n\x0d\x0a\)]+)()#$',
 	$Prm{ipanema}		=>	'\[([^\n\x0d\x0a\\[\])]+?)(?:\.rt\d)?\]()\$ $',
+	$Prm{eos}		=>	'([^\n\x0d\x0a\)]+)()\((.+?)\)->$',
 	$Prm{generic}		=>	'[^\n\x0d\x0a]*' . $GenericPromptRegex,
 );
 
@@ -228,6 +236,7 @@ my %Prompt = ( # Prompt pattern templates; SWITCHNAME gets replaced with actual 
 	$Prm{slx}		=>	'SWITCHNAME(?:\((.+?)\))?# $',
 	$Prm{hive}		=>	'SWITCHNAME#$',
 	$Prm{ipanema}		=>	'(?:\[SWITCHNAME(?:\.rt\d)?\]\$|bash-[\d\.]+\$|SWITCHNAME\.?(?:rt\d)?:[~\/\w\.-]+#) $',
+	$Prm{eos}		=>	'SWITCHNAME\((.+?)\)->$',
 	$Prm{generic}		=>	'[^\n\x0d\x0a]*' . $GenericPromptRegex,
 );
 
@@ -254,6 +263,7 @@ my %MorePrompt = ( # Regular expression character like ()[]. need to be backslas
 	$Prm{slx}		=>	'(?:\e\[7m)?(?:--More--|\(END\))(?:\e\[27m)?',
 	$Prm{hive}		=>	' --More-- ',
 	$Prm{ipanema}		=>	'', # N/A on Linux..
+	$Prm{eos}		=>	'--More-- <space> next page, <cr> one line, <q> quit',
 	$Prm{generic}		=>	'----More \(q=Quit, space/return=Continue\)----'
 					. '|--More-- \(q = quit\) '
 					. '|Press any key to continue \(q : quit\) :\x00'
@@ -337,6 +347,7 @@ our %ErrorPatterns = ( # Patterns which indicated the last command sent generate
 					. '|Invalid ipv4 address\.'					# filter acl ace action 11 6 permit redirect-next-hop 2000:100::201 (on a non-ipv6 acl)
 					. '|\x07?error in getting .+'					# mlt 1 member 1/1 (where mlt does not exist)
 					. '|\x07?Error In \w+ ?:'					# ip name-server primary <ip> (where <ip> is already set)
+					. '|Invalid ip address format\.'				# ip bgp neighbor ''
 				. ')',
 	$Prm{xlr}		=>	'^('
 					. '.+? not found'
@@ -390,13 +401,16 @@ our %ErrorPatterns = ( # Patterns which indicated the last command sent generate
 					. '|: No such file or directory'
 					. '|: incorrect password'
 				. ')',
+	$Prm{eos}		=>	'^('
+					. 'Error: '
+				. ')',
 );
 our $CmdConfirmPrompt = '(?:' # Y/N prompt
-				. '[\(\[] *(?:'
+				. '[\(\[<] *(?:'
 						. '[yY](?:es)? *(?:[\\\/]|or) *[nN]o?'
 						. '|[nN]o? *(?:[\\\/]|or) *[yY](?:es)?'
-						. '|y - .+?, n - .+?, <cr> - .+'
-					. '?) *[\)\]](?: *(?:[?:]|\? ?:) *| )'
+						. '|y - .+?, n - .+?, <cr> - .+?'
+					. ') *[\)\]>](?: *(?:\[[yYnN]\])? *(?:[?:]|\? ?:) *| )'
 				. '|Y - Yes, N - No: ' # ISWmarvell
 			. ')$';
 our %CmdConfirmSendY = ( # How to feed "y" to above confirmation prompt: 1 = print("y"); 0 = put("y")
@@ -414,6 +428,7 @@ our %CmdConfirmSendY = ( # How to feed "y" to above confirmation prompt: 1 = pri
 	$Prm{slx}		=>	1,
 	$Prm{hive}		=>	1,
 	$Prm{ipanema}		=>	1,
+	$Prm{eos}		=>	1,
 	$Prm{generic}		=>	1,
 );
 our $CmdInitiatedPrompt = '[?:=]\h*(?:\(.+?\)\h*)?$'; # Prompt for additional user info
@@ -730,6 +745,8 @@ sub cmd { # Sends a CLI command to host and returns result or output data
 		lastPromptEchoedCmd	=>	undef,
 		cache_timeout		=>	$self->{POLL}{timeout},
 		noRefreshCmdDone	=>	undef,
+		morePromptDelayed	=>	undef,
+		morePromptRemoved	=>	undef,
 	};
 	$self->{POLL}{output_requested} = !$args{poll_syntax} || wantarray; # Always true in legacy syntax and in poll_syntax if wantarray
 	local $self->{POLLING} = 1; # True until we come out of this polling-capable method
@@ -825,6 +842,8 @@ sub cmd_prompted { # Sends a CLI command to host, feed additional data and retur
 		lastPromptEchoedCmd	=>	undef,
 		cache_timeout		=>	$self->{POLL}{timeout},
 		noRefreshCmdDone	=>	undef,
+		morePromptDelayed	=>	undef,
+		morePromptRemoved	=>	undef,
 	};
 	$self->{POLL}{output_requested} = !$pollSyntax || wantarray; # Always true in legacy syntax and in poll_syntax if wantarray
 	local $self->{POLLING} = 1; # True until we come out of this polling-capable method
@@ -1616,6 +1635,11 @@ sub poll_login { # Method to handle login for poll methods (used for both blocki
 							$self->debugMsg(8,"login() Detected family_type = $login->{family_type}\n");
 							$self->_setFamilyTypeAttrib($login->{family_type}, is_nncli => 1, is_slx => 1);
 						}
+						elsif ($key eq 'eosChassis') {
+							$login->{family_type} = $Prm{eos};
+							$self->debugMsg(8,"login() Detected family_type = $login->{family_type}\n");
+							$self->_setFamilyTypeAttrib($login->{family_type}, is_nncli => 0, is_eos => 1);
+						}
 					}
 					if ($patdepth > $deepest) { # We have a deeper match, we keep it
 						($pattern, $deepest) = ($key, $patdepth);
@@ -1860,6 +1884,8 @@ sub poll_cmd { # Method to handle cmd for poll methods (used for both blocking &
 			lastPromptEchoedCmd	=>	undef,
 			cache_timeout		=>	defined $args{timeout} ? $args{timeout} : $self->{POLL}{timeout},
 			noRefreshCmdDone	=>	undef,
+			morePromptDelayed	=>	undef,
+			morePromptRemoved	=>	undef,
 			# Declare keys to be set if method called from another polled method
 			errmode			=>	$args{errmode},
 		};
@@ -1982,6 +2008,10 @@ sub poll_cmd { # Method to handle cmd for poll methods (used for both blocking &
 		}
 
 		if (length $output) { # Clean up patterns
+			if ($cmd->{morePromptRemoved}) {
+				$cmd->{morePromptRemoved} = 0;	# Reset this flag
+				$output =~ s/^\n//	if $familyType eq $Prm{eos};	  # Remove newline following a more prompt
+			}
 			$output =~ s/^(?:\x08 \x08)+//;					  # Remove backspace chars following a more prompt, if any
 			$output =~ s/^\x08+ +\x08+//;     				  # Remove backspace chars following a more prompt, if any (Wing and SLX)
 			$output =~ s/\x08+ +\x08+//	 if $familyType eq $Prm{hive};	  # On HiveOS, these are not necessarily at the beginning of the line
@@ -2051,6 +2081,7 @@ sub poll_cmd { # Method to handle cmd for poll methods (used for both blocking &
 			next CMDLOOP;
 		}
 		if ($cmd->{more_prompt} && $cmd->{lastLine} =~ s/(?:$cmd->{more_prompt})$//) { # We have a more prompt
+			$cmd->{morePromptRemoved} = 1;
 			$cmd->{morePromptDelayed} = 0;	# Reset this flag
 			if ($cmd->{lastLine} =~ s/^\n//) { # If we did not gobble the \n remove it and re-add it (residual lastLine can still be rolled over)
 				$self->{POLL}{local_buffer} .= "\n";
@@ -3181,6 +3212,67 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 			return $self->poll_return(1);
 		};
 	}
+	elsif ($familyType eq $Prm{eos}) {
+		$attrib->{attribute} eq 'sysname' && do {
+			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, ['show system']);
+			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
+			$$outref =~ /System name:     (.+)/g && $self->_setAttrib('sysname', $1);
+			$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
+			return $self->poll_return(1);
+		};
+		($attrib->{attribute} eq 'model' || $attrib->{attribute} eq 'base_mac') && do {
+			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, ['show system hardware']);
+			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
+			$$outref =~ /Chassis Type:               (.+?)(?:\s?\(0x\d+\)?)/g && $self->_setModelAttrib($1);
+			$$outref =~ /Base MAC Address:        (.+)/g && $self->_setBaseMacAttrib($1);
+			$$outref =~ /Firmware Version:        (\S+)/g && $self->_setAttrib('sw_version', $1);
+			$$outref =~ /BootCode Version:        (\S+)/g && $self->_setAttrib('fw_version', $1);
+			$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
+			return $self->poll_return(1);
+		};
+		($attrib->{attribute} eq 'sw_version' || $attrib->{attribute} eq 'fw_version') && do {
+			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, ['show version']);
+			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
+			$$outref =~ /Fw: (\S+)/g && $self->_setAttrib('sw_version', $1);
+			$$outref =~ /Bp: (.+)/g && $self->_setAttrib('fw_version', $1);
+			$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
+			return $self->poll_return(1);
+		};
+		($attrib->{attribute} eq 'slots' || $attrib->{attribute} eq 'ports') && do {
+			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, ['show port speed']);
+			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
+			$self->_setSlotPortHashAttrib($outref);
+			$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
+			return $self->poll_return(1);
+		};
+		($attrib->{attribute} eq 'stp_mode') && do {
+			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, ['show spantree stpmode']);
+			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
+			if ($$outref =~ /Bridge Stp Mode is set to (.+)/g) {
+				$self->_setAttrib('stp_mode', 'stpg') if $1 == 'ieee8021';
+				$self->_setAttrib('stp_mode', 'none') if $1 == 'none';
+			}
+			else {
+				$self->_setAttrib('stp_mode', undef);
+			}
+			$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
+			return $self->poll_return(1);
+		};
+		$attrib->{attribute} eq 'baudrate' && do {
+			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, ['show console baud']);
+			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
+			$$outref =~ /com.\d.\d +(\d+)/ && $self->_setAttrib('baudrate', $1);
+			$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
+			return $self->poll_return(1);
+		};
+		$attrib->{attribute} eq 'max_baud' && do {
+			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, ["set console baud ?$CTRL_U"]);
+			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
+			$$outref =~ /,(\d+)\)$/m && $self->_setAttrib('max_baud', $1);
+			$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
+			return $self->poll_return(1);
+		};
+	}
 
 	return $self->poll_return(1); # Undefined output_result for unrecognized attributes
 }
@@ -3713,6 +3805,12 @@ sub poll_device_more_paging { # Method to handle device_more_paging for poll met
 		return $self->poll_return($ok) unless $ok;
 		return $self->poll_return($self->error("$pkgsub: Failed to set more-paging mode")) unless $$resref;
 	}
+	elsif ($familyType eq $Prm{eos}) {
+		$devMorePage->{cmdString} = $devMorePage->{enable} ? '23' : '0' unless defined $devMorePage->{cmdString};
+		my ($ok, undef, $resref) = $self->poll_cmd($pkgsub, "set length $devMorePage->{cmdString}");
+		return $self->poll_return($ok) unless $ok;
+		return $self->poll_return($self->error("$pkgsub: Failed to set more-paging mode")) unless $$resref;
+	}
 	else {
 		return $self->poll_return($self->error("$pkgsub: Cannot configure more paging on family type $familyType"));
 	}
@@ -4190,17 +4288,23 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 		}
 	}
 	if ($discDevice->{stage} < 10) { # Next stage
-		# HiveOS detection command
+		# HiveOS & EnterasysOS detection command
 		my ($ok, $outref) = $self->poll_cmd($pkgsub, 'show version');
 		return $ok unless $ok;
 		$discDevice->{stage}++; # Move to next stage on next cycle
-		if ($$outref =~ /^Version:            HiveOS (\S+) build-/m) {
+		if ($$outref =~ /^Version:            HiveOS (\S+) build-/m) { # HiveOS
 			$self->_setFamilyTypeAttrib($Prm{hive}, is_nncli => 0, is_hiveos => 1, baudrate => 9600, sw_version => $1);
 			$self->_setModelAttrib($1) if $$outref =~ /^Platform:\s+(\S+)/m;
 			$self->_setAttrib('fw_version', $1) if $$outref =~ /^Bootloader ver:     v(\S+)/m;
 			$self->{LASTPROMPT} =~ /$InitPrompt{$Prm{hive}}/;
 			$self->_setDevicePrompts($Prm{hive}, $1);
 			return (1, $Prm{hive});
+		}
+		if ($$outref =~ /^Copyright \(c\) \d{4} by (?:Extreme|Enterasys) Networks, Inc\./m) { # EnterasysOS
+			$self->_setFamilyTypeAttrib($Prm{eos}, is_nncli => 0, is_eos => 1);
+			$self->{LASTPROMPT} =~ /$InitPrompt{$Prm{eos}}/;
+			$self->_setDevicePrompts($Prm{eos}, $1);
+			return (1, $Prm{eos});
 		}
 	}
 	if ($discDevice->{stage} < 11) { # Next stage
@@ -4445,7 +4549,8 @@ sub _setSlotPortHashAttrib { # Set the Slot & Port attributes where the port att
 	# Get current attribute if partly stored
 	@slots = @{$self->{$Package}{ATTRIB}{'slots'}} if $self->{$Package}{ATTRIBFLAG}{'slots'};
 	%ports = %{$self->{$Package}{ATTRIB}{'ports'}} if $self->{$Package}{ATTRIBFLAG}{'ports'};
-	while ($$outref =~ /^ ?(FastEthernet|(?:\d+)?GigabitEthernet) ((?:\d\/)?\d{1,2})/mg) {
+	while (	$$outref =~ /(?|^ ?(FastEthernet|(?:\d+)?GigabitEthernet) ((?:\d\/)?\d{1,2})|((?:ge|tg)\.\d{1,2})\.(\d{1,3})\.)/mg ) {
+		#            <-----------------------ISW&ISWmarvell------------------------>|<----------EnterasysOS----------->
 		if (!defined $currentHash || $1 ne $currentHash) { # New hash
 			$currentHash = $1;
 			push(@slots, $currentHash) unless grep {$_ eq $currentHash} @slots;
@@ -4494,12 +4599,15 @@ sub _setModelAttrib { # Set & re-format the Model attribute
 		# Try and reformat the model number into something like ISW_8-10/100P_4-SFP
 		$model =~ s/, (?:PoE )?Switch$//;
 		$model =~ s/ /_/g;		# From: ISW 8-10/100P, 4-SFP
-		$model =~ s/,//g;		# From: ISW_8-10/100P_4-SFP
+		$model =~ s/,//g;		# To:   ISW_8-10/100P_4-SFP
 	}
 	elsif ($self->{$Package}{ATTRIB}{'is_apls'}) {
 		# Try and reformat from DSG6248CFP to DSG-6248-CFP
 		$model =~ s/^([A-Z]{3})(\d{3,})/$1-$2/;
 		$model =~ s/(-\d{3,})([A-Z])/$1-$2/;
+	}
+	elsif ($self->{$Package}{ATTRIB}{'is_eos'}) {
+		$model =~ s/ /-/g;
 	}
 	$self->_setAttrib('model', $model);
 
@@ -4919,6 +5027,7 @@ Used to create an object instance of Control::CLI::Extreme
   	Use			 => 'TELNET'|'SSH'|'<COM_port_name>',
   	[Timeout		 => $secs,]
   	[Connection_timeout	 => $secs,]
+  	[Binmode		 => $binmode,]
   	[Errmode		 => $errmode,]
   	[Errmsg_format		 => $msgFormat,]
   	[Return_reference	 => $flag,]
@@ -5706,6 +5815,10 @@ B<Accelar> : Any of the old Accelar 1000, 1100, 1200
 
 =item *
 
+B<EnterasysOS> : Enterasys Chassis (only tested with S4)
+
+=item *
+
 B<generic> : Not an Extreme Networking product; equivalent functionality to Control::CLI
 
 =back
@@ -6113,6 +6226,18 @@ I<is_master_cpu>: Flag; true(1) if connected to a Master CPU; false(0) otherwise
 =item *
 
 I<is_dual_cpu>: Flag; true(1) if 2 CPUs are present in the chassis; false(0) otherwise
+
+=back
+
+
+
+Attributes which only apply to B<EnterasysOS> family type:
+
+=over 4
+
+=item *
+
+I<is_eos>: Flag; true(1) if the device is EnterasysOS; false(0) otherwise.
 
 =back
 
@@ -6699,6 +6824,8 @@ Of the supported family types only the WLAN2300 requires a password to access pr
 
 =item B<return_reference()> - set whether read methods should return a hard reference or not 
 
+=item B<binmode()> - enable/disable newline translation
+
 =item B<output_record_separator()> - set the Output Record Separator automatically appended by print & cmd methods (Note that unlike Control::CLI this class will default to "\r")
 
 =item B<prompt_credentials()> - set whether connect() and login() methods should be able to prompt for credentials 
@@ -7136,8 +7263,7 @@ Ludovico Stevens <lstevens@cpan.org>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-control-cli-extreme at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Control-CLI-Extreme>.  I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests at L<https://github.com/lgastevens/Control-CLI-Extreme/issues> or alternatively via CPAN sending an email at C<bug-control-cli-extreme@rt.cpan.org> or at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Control-CLI-Extreme>.  I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
 
 
 
@@ -7156,6 +7282,10 @@ You can find documentation for this module with the perldoc command.
 You can also look for information at:
 
 =over 4
+
+=item * Github repository
+
+L<https://github.com/lgastevens/Control-CLI-Extreme>
 
 =item * RT: CPAN's request tracker
 
@@ -7179,7 +7309,7 @@ L<http://search.cpan.org/dist/Control-CLI-Extreme/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2024 Ludovico Stevens.
+Copyright 2025 Ludovico Stevens.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

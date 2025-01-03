@@ -4,7 +4,7 @@
       "Tom Christiansen <tchrist@perl.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -36,7 +36,7 @@
             "Lingua::KO::Romanize::Hangul" : "0",
             "Lingua::ZH::Romanize::Pinyin" : "0",
             "Unicode::GCString" : "0",
-            "Unicode::Unihan" : "0",
+            "Unicode::Unihan" : "0.043",
             "perl" : "5.014001"
          }
       },
@@ -54,10 +54,10 @@
       "homepage" : "https://github.com/briandfoy/unicode-tussle",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/briandfoy/unicode-tussle.git",
+         "url" : "https://github.com/briandfoy/unicode-tussle",
          "web" : "https://github.com/briandfoy/unicode-tussle"
       }
    },
-   "version" : "1.115",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "1.118",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

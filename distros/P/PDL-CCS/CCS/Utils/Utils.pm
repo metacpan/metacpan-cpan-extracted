@@ -11,7 +11,7 @@ use PDL::Exporter;
 use DynaLoader;
 
 
-   our $VERSION = '1.23.29';
+   our $VERSION = '1.24.0';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::CCS::Utils $VERSION;
@@ -56,14 +56,14 @@ PDL::CCS::Utils - Low-level utilities for compressed storage sparse PDLs
 
 
 
-#line 51 "ccsutils.pd"
+#line 52 "ccsutils.pd"
 
-*ccs_indx = \&PDL::indx; ##-- typecasting for CCS indices
+*ccs_indx = \&PDL::indx; ##-- typecasting for CCS indices (deprecated)
 #line 63 "Utils.pm"
 
 
 
-#line 69 "ccsutils.pd"
+#line 70 "ccsutils.pd"
 
 
 =pod
@@ -83,7 +83,7 @@ PDL::CCS::Utils - Low-level utilities for compressed storage sparse PDLs
 
 =for sig
 
-  Signature: (a(N); int+ [o]nnz())
+  Signature: (a(N); indx [o]nnz())
 
 Get number of non-zero values in a PDL $a();
 For 1d PDLs, should be equivalent to:
@@ -95,21 +95,20 @@ to N-1 dimensions by computing the number of nonzero elements
 along the the 1st dimension.
 
 
+
 =for bad
 
-nnz does not process bad values.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
-
+The output PDL $nnz() never contains BAD values.
 
 =cut
-#line 106 "Utils.pm"
+#line 105 "Utils.pm"
 
 
 
 #line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *nnz = \&PDL::nnz;
-#line 113 "Utils.pm"
+#line 112 "Utils.pm"
 
 
 
@@ -121,7 +120,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(N); eps(); int+ [o]nnz())
+  Signature: (a(N); eps(); indx [o]nnz())
 
 Like nnz() using tolerance constant $eps().
 For 1d PDLs, should be equivalent to:
@@ -129,25 +128,24 @@ For 1d PDLs, should be equivalent to:
  $nnz = nelem(which(!$a->approx(0,$eps)));
 
 
+
 =for bad
 
-nnza does not process bad values.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
-
+The output PDL $nnz() never contains BAD values.
 
 =cut
-#line 140 "Utils.pm"
+#line 138 "Utils.pm"
 
 
 
 #line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *nnza = \&PDL::nnza;
-#line 147 "Utils.pm"
+#line 145 "Utils.pm"
 
 
 
-#line 171 "ccsutils.pd"
+#line 156 "ccsutils.pd"
 
 
 =pod
@@ -155,7 +153,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =head1 Encoding Utilities
 
 =cut
-#line 159 "Utils.pm"
+#line 157 "Utils.pm"
 
 
 
@@ -194,34 +192,32 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 198 "Utils.pm"
+#line 196 "Utils.pm"
 
 
 
 #line 950 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
- sub PDL::ccs_encode_pointers {
-   my ($ix,$N,$ptr,$ixix) = @_;
-   barf("Usage: ccs_encode_pointers(ix(Nnz), N(), [o]ptr(N+1), [o]ixix(Nnz)") if (!defined($ix));
-   $N    = $ix->max()+1                               if (!defined($N));
-   $ptr = PDL->zeroes(ccs_indx(), $N+1)              if (!defined($ptr));
-   $ixix = PDL->zeroes(ccs_indx(), $ix->dim(0))      if (!defined($ixix));
-   &PDL::_ccs_encode_pointers_int($ix,$N,$ptr,$ixix);
-   return ($ptr,$ixix);
- }
-#line 214 "Utils.pm"
+    sub PDL::ccs_encode_pointers {
+      my ($ix,$N,$ptr,$ixix) = @_;
+      barf("Usage: ccs_encode_pointers(ix(Nnz), N(), [o]ptr(N+1), [o]ixix(Nnz)") if (!defined($ix));
+      &PDL::_ccs_encode_pointers_int($ix, ($N // $ix->max+1), ($ptr //= null), ($ixix //= null));
+      return ($ptr,$ixix);
+    }
+  
+#line 210 "Utils.pm"
 
 
 
 #line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *ccs_encode_pointers = \&PDL::ccs_encode_pointers;
-#line 221 "Utils.pm"
+#line 217 "Utils.pm"
 
 
 
-#line 248 "ccsutils.pd"
+#line 239 "ccsutils.pd"
 
 
 =pod
@@ -229,7 +225,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =head1 Decoding Utilities
 
 =cut
-#line 233 "Utils.pm"
+#line 229 "Utils.pm"
 
 
 
@@ -241,14 +237,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (indx ptr(Nplus1); indx proj(Nproj); indx [o]projix(NnzProj); indx [o]nzix(NnzProj))
+  Signature: (indx ptr(Nplus1); indx proj(Nproj); indx [o]projix(NnzProj); indx [o]nzix(NnzProj); PDL_Indx nnzProj)
 
 General CCS decoding utility.
 
-Project indices $proj() from a compressed storage "pointer" vector $proj().
+Project indices $proj() from a compressed storage "pointer" vector $ptr().
 If unspecified, $proj() defaults to:
 
- sequence($ptr->dim(0))
+ sequence($ptr->dim(0) - 1)
 
 
 
@@ -259,43 +255,43 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 263 "Utils.pm"
+#line 259 "Utils.pm"
 
 
 
 #line 950 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
- sub PDL::ccs_decode_pointer {
-   my ($ptr,$proj,$projix,$nzix) = @_;
-   barf("Usage: ccs_decode_pointer(ptr(N+1), proj(Nproj), [o]projix(NnzProj), [o]nzix(NnzProj)")
-     if (!defined($ptr));
-   my ($nnzproj);
-   if (!defined($proj)) {
-     $proj    = PDL->sequence(ccs_indx(), $ptr->dim(0)-1);
-     $nnzproj = $ptr->at(-1);
-   }
-   if (!defined($projix) || !defined($nzix)) {
-     $nnzproj = ($ptr->index($proj+1)-$ptr->index($proj))->sum if (!defined($nnzproj));
-     return (null,null) if (!$nnzproj);
-     $projix  = PDL->zeroes(ccs_indx(), $nnzproj) if (!defined($projix));
-     $nzix    = PDL->zeroes(ccs_indx(), $nnzproj) if (!defined($nzix));
-   }
-   &PDL::_ccs_decode_pointer_int($ptr,$proj,$projix,$nzix);
-   return ($projix,$nzix);
- }
-#line 288 "Utils.pm"
+    sub PDL::ccs_decode_pointer {
+      my ($ptr,$proj,$projix,$nzix,$nnzproj) = @_;
+      barf("Usage: ccs_decode_pointer(ptr(N+1), proj(Nproj), [o]projix(NnzProj), [o]nzix(NnzProj), NnzProj?")
+        if (!defined($ptr));
+      if (!defined($proj)) {
+        $proj    = PDL->sequence(ccs_indx(), $ptr->dim(0)-1);
+        $nnzproj //= $ptr->at(-1);
+      }
+      $projix //= null;
+      $nzix //= null;
+      $nnzproj //= ($projix->isnull && $nzix->isnull
+                    ? ($ptr->index($proj+1)-$ptr->index($proj))->sum
+                    : -1);
+      return (null,null) if (!$nnzproj);
+      &PDL::_ccs_decode_pointer_int($ptr,$proj, $projix,$nzix, $nnzproj);
+      return ($projix,$nzix);
+    }
+  
+#line 284 "Utils.pm"
 
 
 
 #line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *ccs_decode_pointer = \&PDL::ccs_decode_pointer;
-#line 295 "Utils.pm"
+#line 291 "Utils.pm"
 
 
 
-#line 313 "ccsutils.pd"
+#line 311 "ccsutils.pd"
 
 
 =pod
@@ -303,7 +299,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =head1 Indexing Utilities
 
 =cut
-#line 307 "Utils.pm"
+#line 303 "Utils.pm"
 
 
 
@@ -315,10 +311,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (which(Ndims,Nnz); a(Na); [o]nzia(NnzA); [o]nnza())
+  Signature: (indx which(Ndims,Nnz); indx a(Na); indx [o]nzia(NnzA); indx [o]nnza(); PDL_Indx sizeNnzA)
 
-
-Compute indices $nzai() along dimension C<NNz> of $which() whose initial values $which(0,$nzai)
+Compute indices $nzai() along dimension C<Nnz> of $which() whose initial values $which(0,$nzai)
 match some element of $a().  Appropriate for indexing a sparse encoded PDL
 with non-missing entries at $which()
 along the 0th dimension, a la L<dice_axis(0,$a)|PDL::Slices/dice_axis>.
@@ -337,33 +332,31 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 341 "Utils.pm"
+#line 336 "Utils.pm"
 
 
 
 #line 950 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
- sub PDL::ccs_xindex1d {
-   my ($which,$a,$nzia,$nnza) = @_;
-   barf("Usage: ccs_xindex2d(which(Ndims,Nnz), a(Na), [o]nzia(NnzA), [o]nnza()")
-     if ((grep {!defined($_)} @_[0..1]) || $which->ndims < 2 || $which->dim(0) < 1);
-   $nnza = $nzia->dim(0) if (defined($nzia) && !defined($nnza));
-   $nnza = $which->dim(1) if (!defined($nnza));
-   $nnza = pdl($which->type, $nnza) if (!ref($nnza));
-   $nzia  = PDL->zeroes($which->type, $nnza->sclr) if (!defined($nzia));
-   &PDL::_ccs_xindex1d_int($which,$a,$nzia,$nnza);
-   return ($nzia,$nnza) if (wantarray);
-   return $nzia->reshape($nnza->sclr);
- }
-#line 360 "Utils.pm"
+    sub PDL::ccs_xindex1d {
+      my ($which,$a,$nzia,$nnza) = @_;
+      barf("Usage: ccs_xindex2d(which(Ndims,Nnz), a(Na), [o]nzia(NnzA), [o]nnza()")
+        if ((grep {!defined($_)} @_[0..1]) || $which->ndims < 2 || $which->dim(0) < 1);
+      $nzia //= null;
+      $nnza //= null;
+      &PDL::_ccs_xindex1d_int($which,$a,$nzia,$nnza, ($nnza ? $nnza->sclr : -1));
+      return wantarray ? ($nzia,$nnza) : $nzia->reshape($nnza->sclr);
+    }
+  
+#line 353 "Utils.pm"
 
 
 
 #line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *ccs_xindex1d = \&PDL::ccs_xindex1d;
-#line 367 "Utils.pm"
+#line 360 "Utils.pm"
 
 
 
@@ -375,8 +368,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (which(Ndims,Nnz); a(Na); b(Nb); [o]ab(Nab); [o]nab())
-
+  Signature: (indx which(Ndims,Nnz); indx a(Na); indx b(Nb); indx [o]ab(Nab); indx [o]nab())
 
 Compute indices along dimension C<NNz> of $which() corresponding to any combination
 of values in the Cartesian product of $a() and $b().  Appropriate for indexing a
@@ -397,40 +389,33 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 401 "Utils.pm"
+#line 393 "Utils.pm"
 
 
 
 #line 950 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
- sub PDL::ccs_xindex2d {
-   my ($which,$a,$b,$ab,$nab) = @_;
-   barf("Usage: ccs_xindex2d(which(2,Nnz), a(Na), b(Nb), [o]nab(), [o]ab(Nab)")
-     if ((grep {!defined($_)} @_[0..2]) || $which->ndims != 2 || $which->dim(0) < 2);
-   $nab = $ab->dim(0) if (defined($ab) && !defined($nab));
-   if (!defined($nab)) {
-     $nab = $a->nelem*$b->nelem;
-     $nab = $which->dim(1) if ($which->dim(1)) < $nab;
-   }
-   $nab = pdl($which->type, $nab) if (!ref($nab));
-   $ab = PDL->zeroes($which->type, $nab->sclr) if (!defined($ab));
-   &PDL::_ccs_xindex2d_int($which,$a,$b,$ab,$nab);
-   return ($ab,$nab) if (wantarray);
-   return $ab->reshape($nab->sclr);
- }
-#line 423 "Utils.pm"
+    sub PDL::ccs_xindex2d {
+      my ($which,$a,$b,$ab,$nab) = @_;
+      barf("Usage: ccs_xindex2d(which(2,Nnz), a(Na), b(Nb), [o]nab(), [o]ab(Nab)")
+        if ((grep {!defined($_)} @_[0..2]) || $which->ndims != 2 || $which->dim(0) < 2);
+      &PDL::_ccs_xindex2d_int($which,$a,$b, ($ab//=null), ($nab//=null));
+      return wantarray ? ($ab,$nab) : $ab->reshape($nab->sclr);
+    }
+  
+#line 408 "Utils.pm"
 
 
 
 #line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *ccs_xindex2d = \&PDL::ccs_xindex2d;
-#line 430 "Utils.pm"
+#line 415 "Utils.pm"
 
 
 
-#line 478 "ccsutils.pd"
+#line 487 "ccsutils.pd"
 
 
 =pod
@@ -438,7 +423,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =head1 Debugging Utilities
 
 =cut
-#line 442 "Utils.pm"
+#line 427 "Utils.pm"
 
 
 
@@ -452,9 +437,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (indx which(Ndims,Nnz); SV *HANDLE; char *fmt; char *fsep; char *rsep)
 
-
 Print a text dump of an index PDL to the filehandle C<HANDLE>, which default to C<STDUT>.
-C<$fmt> is a printf() format to use for output, which defaults to "%d".
+C<$fmt> is a printf() format to use for output, which defaults to "%td".
 C<$fsep> and C<$rsep> are field-and record separators, which default to
 a single space and C<$/>, respectively.
 
@@ -467,33 +451,34 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 471 "Utils.pm"
+#line 455 "Utils.pm"
 
 
 
 #line 950 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
- sub PDL::ccs_dump_which {
-   my ($which,$fh,$fmt,$fsep,$rsep) = @_;
-   $fmt  = '%d'  if (!defined($fmt)  || $fmt eq '');
-   $fsep = " "   if (!defined($fsep) || $fsep eq '');
-   $rsep = "$/"  if (!defined($rsep) || $rsep eq '');
-   $fh = \*STDOUT if (!defined($fh));
-   &PDL::_ccs_dump_which_int($which,$fh,$fmt,$fsep,$rsep);
- }
-#line 486 "Utils.pm"
+    sub PDL::ccs_dump_which {
+      my ($which,$fh,$fmt,$fsep,$rsep) = @_;
+      $fmt  = '%td'  if (!defined($fmt)  || $fmt eq '');
+      $fsep = " "   if (!defined($fsep) || $fsep eq '');
+      $rsep = "$/"  if (!defined($rsep) || $rsep eq '');
+      $fh = \*STDOUT if (!defined($fh));
+      &PDL::_ccs_dump_which_int($which,$fh,$fmt,$fsep,$rsep);
+    }
+  
+#line 471 "Utils.pm"
 
 
 
 #line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *ccs_dump_which = \&PDL::ccs_dump_which;
-#line 493 "Utils.pm"
+#line 478 "Utils.pm"
 
 
 
-#line 548 "ccsutils.pd"
+#line 558 "ccsutils.pd"
 
 
 ##---------------------------------------------------------------------
@@ -537,7 +522,7 @@ as Perl itself.
 perl(1), PDL(3perl)
 
 =cut
-#line 541 "Utils.pm"
+#line 526 "Utils.pm"
 
 
 

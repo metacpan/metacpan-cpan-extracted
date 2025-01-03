@@ -2,6 +2,9 @@
 #
 # remotediff - remote diff over rsync
 #
+# Documentation at bottom of script.
+#
+# 2024.06.03 v1.16 jul : fixed documentation
 # 2024.06.03 v1.15 jul : replace "." with absolute path
 # 2024.05.28 v1.14 jul : fixed cleanup bug when basename contained dot
 # 2022.11.14 v1.13 jul : bypass test for solaris
@@ -20,7 +23,7 @@ use File::Temp qw(tempdir);
 use File::Path qw(make_path remove_tree);
 use Cwd qw(abs_path cwd);
 
-our $VERSION = '1.15';
+our $VERSION = '1.16';
 my $program  = basename($0);
 my $usage    = <<EOF;
 
@@ -153,6 +156,10 @@ exec ("$diff $opts $ARGV[0] $ARGV[1]");
 
 __END__
 
+=pod
+
+=encoding utf8
+
 =head1 NAME
 
 remotediff - remote diff over rsync
@@ -173,17 +180,15 @@ remotediff - remote diff over rsync
 
 =head1 DESCRIPTION
 
-`remotediff` uses `rsync` to copy remote files to a tmp directory, before
-executing `diff` on them locally.
+B<remotediff> uses B<rsync> to copy remote files to a tmp directory, before executing B<diff> on them locally.
 
 The remote files are cached between program executions.
 
-`colordiff` is used if installed and STDOUT is a TTY.
+B<colordiff> is used if installed and STDOUT is a TTY.
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<kaldor@cpan.org>, or through
-the web interface at L<https://github.com/kal247/App-remotediff/issues>.
+Please report any bugs or feature requests to C<kaldor@cpan.org>, or through the web interface at L<https://github.com/kal247/App-remotediff/issues>.
 
 =head1 AUTHOR
 
@@ -191,7 +196,7 @@ jul, C<kaldor@cpan.org>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2022 by jul.
+This software is Copyright (c) 2022-2025 by jul.
 
 This is free software, licensed under:
 

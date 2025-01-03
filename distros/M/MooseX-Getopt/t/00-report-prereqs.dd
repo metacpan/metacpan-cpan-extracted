@@ -1,7 +1,6 @@
 do { my $x = {
        'configure' => {
                         'requires' => {
-                                        'ExtUtils::MakeMaker' => '0',
                                         'Module::Build::Tiny' => '0.034',
                                         'perl' => '5.006'
                                       },
@@ -11,7 +10,7 @@ do { my $x = {
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.163',
+                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.164',
                                         'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
@@ -38,8 +37,9 @@ do { my $x = {
                                       'Test::Pod::Coverage' => '1.08',
                                       'Test::Pod::No404s' => '0',
                                       'Test::Portability::Files' => '0',
-                                      'Test::Spelling' => '0.12',
+                                      'Test::Spelling' => '0.17',
                                       'Test::Warnings' => '0',
+                                      'YAML' => '0',
                                       'perl' => '5.006'
                                     }
                     },
@@ -74,6 +74,7 @@ do { my $x = {
                                    'Moose::Meta::Class' => '0',
                                    'Moose::Util' => '0',
                                    'Path::Tiny' => '0.009',
+                                   'Test2::V0' => '0',
                                    'Test::Deep' => '0',
                                    'Test::Fatal' => '0.003',
                                    'Test::Moose' => '0',
@@ -120,7 +121,6 @@ do { my $x = {
                                            'Dist::Zilla::Plugin::InstallGuide' => '1.200005',
                                            'Dist::Zilla::Plugin::Keywords' => '0.004',
                                            'Dist::Zilla::Plugin::License' => '5.038',
-                                           'Dist::Zilla::Plugin::MakeMaker::Fallback' => '0.029',
                                            'Dist::Zilla::Plugin::Manifest' => '0',
                                            'Dist::Zilla::Plugin::MetaConfig' => '0',
                                            'Dist::Zilla::Plugin::MetaJSON' => '0',
@@ -130,7 +130,7 @@ do { my $x = {
                                            'Dist::Zilla::Plugin::MetaTests' => '0',
                                            'Dist::Zilla::Plugin::MetaYAML' => '0',
                                            'Dist::Zilla::Plugin::MinimumPerl' => '1.006',
-                                           'Dist::Zilla::Plugin::ModuleBuildTiny::Fallback' => '0.018',
+                                           'Dist::Zilla::Plugin::ModuleBuildTiny' => '0.012',
                                            'Dist::Zilla::Plugin::MojibakeTests' => '0.8',
                                            'Dist::Zilla::Plugin::NextRelease' => '5.033',
                                            'Dist::Zilla::Plugin::PodCoverageTests' => '5.040',

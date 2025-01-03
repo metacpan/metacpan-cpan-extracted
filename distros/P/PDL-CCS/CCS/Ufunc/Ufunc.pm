@@ -11,7 +11,7 @@ use PDL::Exporter;
 use DynaLoader;
 
 
-   our $VERSION = '1.23.29';
+   our $VERSION = '1.24.0';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::CCS::Ufunc $VERSION;
@@ -24,8 +24,7 @@ use DynaLoader;
 #line 13 "ccsufunc.pd"
 
 
-#use PDL::CCS::Version;
-use strict;
+#use PDL::CCS::Version; use strict;
 
 =pod
 
@@ -35,14 +34,13 @@ PDL::CCS::Ufunc - Ufuncs for compressed storage sparse PDLs
 
 =head1 SYNOPSIS
 
- use PDL;
- use PDL::CCS::Ufunc;
+ use PDL; use PDL::CCS::Ufunc;
 
  ##---------------------------------------------------------------------
  ## ... stuff happens
 
 =cut
-#line 46 "Ufunc.pm"
+#line 44 "Ufunc.pm"
 
 
 
@@ -56,13 +54,6 @@ PDL::CCS::Ufunc - Ufuncs for compressed storage sparse PDLs
 
 
 
-#line 58 "ccsufunc.pd"
-
-*ccs_indx = \&PDL::indx; ##-- typecasting for CCS indices
-#line 63 "Ufunc.pm"
-
-
-
 #line 949 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
@@ -73,8 +64,8 @@ PDL::CCS::Ufunc - Ufuncs for compressed storage sparse PDLs
 
   Signature: (
     indx ixIn(Ndims,NnzIn);
-    nzvalsIn(NnzIn);
-    missing();
+         nzvalsIn(NnzIn);
+         missing();
     indx N();
     indx [o]ixOut(Ndims,NnzOut);
        [o]nzvalsOut(NnzOut);
@@ -82,7 +73,7 @@ PDL::CCS::Ufunc - Ufuncs for compressed storage sparse PDLs
     )
 
 
-Accumulated product over values $nzvalsIn() associated with vector-valued keys $ixIn().
+Accumulated product over values $nzvalsIn() associated with non-missing vector-valued keys $ixIn().
 On return,
 $ixOut() holds the unique non-"missing" values of $ixIn(),
 $nzvalsOut() holds the associated values,
@@ -108,54 +99,41 @@ In scalar context, returns only $nzvalsOut().
 =for bad
 
 ccs_accum_prod processes bad values.
-The state of the bad-value flag of the output ndarrays is unknown.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
-#line 116 "Ufunc.pm"
+#line 107 "Ufunc.pm"
 
 
 
 #line 950 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
- sub PDL::ccs_accum_prod {
-   my ($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut) = @_;
-   my ($ndims,@nnzIn) = $ixIn->dims;
-   my (@nnzOut);
-   if (defined($ixOut)) {
-     @nnzOut = $ixOut->dims;
-     shift(@nnzOut);
-   }
-
-   @nnzOut = $nzvalsOut->dims if (!@nnzOut && defined($nzvalsOut) && !$nzvalsOut->isempty);
-   @nnzOut = @nnzIn           if (!@nnzOut);
-   $ixOut  = PDL->zeroes(ccs_indx(), $ndims,@nnzOut)
-     if (!defined($ixOut)      || $ixOut->isempty);
-
-   $nzvalsOut = PDL->zeroes(($nzvalsIn->type), @nnzOut)
-     if (!defined($nzvalsOut) || $nzvalsOut->isempty);
-
-   $nOut = PDL->pdl(ccs_indx(),0)                  if (!defined($nOut) || $nOut->isempty);
-   ##
-   ##-- guts
-   &PDL::_ccs_accum_prod_int($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut);
-   ##
-   ##-- auto-trim
-   $ixOut      = $ixOut->slice(",0:".($nOut->max-1));
-   $nzvalsOut  = $nzvalsOut->slice("0:".($nOut->max-1));
-   ##
-   ##-- return
-   return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
- }
-#line 152 "Ufunc.pm"
+        sub PDL::ccs_accum_prod {
+          my ($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut) = @_;
+          $nOut //= PDL->null;
+          $ixOut //= PDL->null;
+          $nzvalsOut //= PDL->null;
+          &PDL::_ccs_accum_prod_int($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut);
+          ##
+          ##-- auto-trim
+          my $trim_slice = "0:".($nOut->max-1);
+          $ixOut     = $ixOut->slice(",$trim_slice");
+          $nzvalsOut = $nzvalsOut->slice($trim_slice);
+          ##
+          ##-- return
+          return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
+        }
+    
+#line 130 "Ufunc.pm"
 
 
 
 #line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *ccs_accum_prod = \&PDL::ccs_accum_prod;
-#line 159 "Ufunc.pm"
+#line 137 "Ufunc.pm"
 
 
 
@@ -169,8 +147,8 @@ The state of the bad-value flag of the output ndarrays is unknown.
 
   Signature: (
     indx ixIn(Ndims,NnzIn);
-    nzvalsIn(NnzIn);
-    missing();
+         nzvalsIn(NnzIn);
+         missing();
     indx N();
     indx [o]ixOut(Ndims,NnzOut);
     double [o]nzvalsOut(NnzOut);
@@ -178,7 +156,7 @@ The state of the bad-value flag of the output ndarrays is unknown.
     )
 
 
-Accumulated double-precision product over values $nzvalsIn() associated with vector-valued keys $ixIn().
+Accumulated double-precision product over values $nzvalsIn() associated with non-missing vector-valued keys $ixIn().
 On return,
 $ixOut() holds the unique non-"missing" values of $ixIn(),
 $nzvalsOut() holds the associated values,
@@ -204,54 +182,41 @@ In scalar context, returns only $nzvalsOut().
 =for bad
 
 ccs_accum_dprod processes bad values.
-The state of the bad-value flag of the output ndarrays is unknown.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
-#line 212 "Ufunc.pm"
+#line 190 "Ufunc.pm"
 
 
 
 #line 950 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
- sub PDL::ccs_accum_dprod {
-   my ($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut) = @_;
-   my ($ndims,@nnzIn) = $ixIn->dims;
-   my (@nnzOut);
-   if (defined($ixOut)) {
-     @nnzOut = $ixOut->dims;
-     shift(@nnzOut);
-   }
-
-   @nnzOut = $nzvalsOut->dims if (!@nnzOut && defined($nzvalsOut) && !$nzvalsOut->isempty);
-   @nnzOut = @nnzIn           if (!@nnzOut);
-   $ixOut  = PDL->zeroes(ccs_indx(), $ndims,@nnzOut)
-     if (!defined($ixOut)      || $ixOut->isempty);
-
-   $nzvalsOut = PDL->zeroes((PDL::double()), @nnzOut)
-     if (!defined($nzvalsOut) || $nzvalsOut->isempty);
-
-   $nOut = PDL->pdl(ccs_indx(),0)                  if (!defined($nOut) || $nOut->isempty);
-   ##
-   ##-- guts
-   &PDL::_ccs_accum_dprod_int($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut);
-   ##
-   ##-- auto-trim
-   $ixOut      = $ixOut->slice(",0:".($nOut->max-1));
-   $nzvalsOut  = $nzvalsOut->slice("0:".($nOut->max-1));
-   ##
-   ##-- return
-   return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
- }
-#line 248 "Ufunc.pm"
+        sub PDL::ccs_accum_dprod {
+          my ($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut) = @_;
+          $nOut //= PDL->null;
+          $ixOut //= PDL->null;
+          $nzvalsOut //= PDL->null;
+          &PDL::_ccs_accum_dprod_int($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut);
+          ##
+          ##-- auto-trim
+          my $trim_slice = "0:".($nOut->max-1);
+          $ixOut     = $ixOut->slice(",$trim_slice");
+          $nzvalsOut = $nzvalsOut->slice($trim_slice);
+          ##
+          ##-- return
+          return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
+        }
+    
+#line 213 "Ufunc.pm"
 
 
 
 #line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *ccs_accum_dprod = \&PDL::ccs_accum_dprod;
-#line 255 "Ufunc.pm"
+#line 220 "Ufunc.pm"
 
 
 
@@ -265,8 +230,8 @@ The state of the bad-value flag of the output ndarrays is unknown.
 
   Signature: (
     indx ixIn(Ndims,NnzIn);
-    nzvalsIn(NnzIn);
-    missing();
+         nzvalsIn(NnzIn);
+         missing();
     indx N();
     indx [o]ixOut(Ndims,NnzOut);
        [o]nzvalsOut(NnzOut);
@@ -274,7 +239,7 @@ The state of the bad-value flag of the output ndarrays is unknown.
     )
 
 
-Accumulated sum over values $nzvalsIn() associated with vector-valued keys $ixIn().
+Accumulated sum over values $nzvalsIn() associated with non-missing vector-valued keys $ixIn().
 On return,
 $ixOut() holds the unique non-"missing" values of $ixIn(),
 $nzvalsOut() holds the associated values,
@@ -300,54 +265,41 @@ In scalar context, returns only $nzvalsOut().
 =for bad
 
 ccs_accum_sum processes bad values.
-The state of the bad-value flag of the output ndarrays is unknown.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
-#line 308 "Ufunc.pm"
+#line 273 "Ufunc.pm"
 
 
 
 #line 950 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
- sub PDL::ccs_accum_sum {
-   my ($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut) = @_;
-   my ($ndims,@nnzIn) = $ixIn->dims;
-   my (@nnzOut);
-   if (defined($ixOut)) {
-     @nnzOut = $ixOut->dims;
-     shift(@nnzOut);
-   }
-
-   @nnzOut = $nzvalsOut->dims if (!@nnzOut && defined($nzvalsOut) && !$nzvalsOut->isempty);
-   @nnzOut = @nnzIn           if (!@nnzOut);
-   $ixOut  = PDL->zeroes(ccs_indx(), $ndims,@nnzOut)
-     if (!defined($ixOut)      || $ixOut->isempty);
-
-   $nzvalsOut = PDL->zeroes(($nzvalsIn->type), @nnzOut)
-     if (!defined($nzvalsOut) || $nzvalsOut->isempty);
-
-   $nOut = PDL->pdl(ccs_indx(),0)                  if (!defined($nOut) || $nOut->isempty);
-   ##
-   ##-- guts
-   &PDL::_ccs_accum_sum_int($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut);
-   ##
-   ##-- auto-trim
-   $ixOut      = $ixOut->slice(",0:".($nOut->max-1));
-   $nzvalsOut  = $nzvalsOut->slice("0:".($nOut->max-1));
-   ##
-   ##-- return
-   return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
- }
-#line 344 "Ufunc.pm"
+        sub PDL::ccs_accum_sum {
+          my ($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut) = @_;
+          $nOut //= PDL->null;
+          $ixOut //= PDL->null;
+          $nzvalsOut //= PDL->null;
+          &PDL::_ccs_accum_sum_int($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut);
+          ##
+          ##-- auto-trim
+          my $trim_slice = "0:".($nOut->max-1);
+          $ixOut     = $ixOut->slice(",$trim_slice");
+          $nzvalsOut = $nzvalsOut->slice($trim_slice);
+          ##
+          ##-- return
+          return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
+        }
+    
+#line 296 "Ufunc.pm"
 
 
 
 #line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *ccs_accum_sum = \&PDL::ccs_accum_sum;
-#line 351 "Ufunc.pm"
+#line 303 "Ufunc.pm"
 
 
 
@@ -361,8 +313,8 @@ The state of the bad-value flag of the output ndarrays is unknown.
 
   Signature: (
     indx ixIn(Ndims,NnzIn);
-    nzvalsIn(NnzIn);
-    missing();
+         nzvalsIn(NnzIn);
+         missing();
     indx N();
     indx [o]ixOut(Ndims,NnzOut);
     double [o]nzvalsOut(NnzOut);
@@ -370,7 +322,7 @@ The state of the bad-value flag of the output ndarrays is unknown.
     )
 
 
-Accumulated double-precision sum over values $nzvalsIn() associated with vector-valued keys $ixIn().
+Accumulated double-precision sum over values $nzvalsIn() associated with non-missing vector-valued keys $ixIn().
 On return,
 $ixOut() holds the unique non-"missing" values of $ixIn(),
 $nzvalsOut() holds the associated values,
@@ -396,54 +348,41 @@ In scalar context, returns only $nzvalsOut().
 =for bad
 
 ccs_accum_dsum processes bad values.
-The state of the bad-value flag of the output ndarrays is unknown.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
-#line 404 "Ufunc.pm"
+#line 356 "Ufunc.pm"
 
 
 
 #line 950 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
- sub PDL::ccs_accum_dsum {
-   my ($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut) = @_;
-   my ($ndims,@nnzIn) = $ixIn->dims;
-   my (@nnzOut);
-   if (defined($ixOut)) {
-     @nnzOut = $ixOut->dims;
-     shift(@nnzOut);
-   }
-
-   @nnzOut = $nzvalsOut->dims if (!@nnzOut && defined($nzvalsOut) && !$nzvalsOut->isempty);
-   @nnzOut = @nnzIn           if (!@nnzOut);
-   $ixOut  = PDL->zeroes(ccs_indx(), $ndims,@nnzOut)
-     if (!defined($ixOut)      || $ixOut->isempty);
-
-   $nzvalsOut = PDL->zeroes((PDL::double()), @nnzOut)
-     if (!defined($nzvalsOut) || $nzvalsOut->isempty);
-
-   $nOut = PDL->pdl(ccs_indx(),0)                  if (!defined($nOut) || $nOut->isempty);
-   ##
-   ##-- guts
-   &PDL::_ccs_accum_dsum_int($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut);
-   ##
-   ##-- auto-trim
-   $ixOut      = $ixOut->slice(",0:".($nOut->max-1));
-   $nzvalsOut  = $nzvalsOut->slice("0:".($nOut->max-1));
-   ##
-   ##-- return
-   return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
- }
-#line 440 "Ufunc.pm"
+        sub PDL::ccs_accum_dsum {
+          my ($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut) = @_;
+          $nOut //= PDL->null;
+          $ixOut //= PDL->null;
+          $nzvalsOut //= PDL->null;
+          &PDL::_ccs_accum_dsum_int($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut);
+          ##
+          ##-- auto-trim
+          my $trim_slice = "0:".($nOut->max-1);
+          $ixOut     = $ixOut->slice(",$trim_slice");
+          $nzvalsOut = $nzvalsOut->slice($trim_slice);
+          ##
+          ##-- return
+          return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
+        }
+    
+#line 379 "Ufunc.pm"
 
 
 
 #line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *ccs_accum_dsum = \&PDL::ccs_accum_dsum;
-#line 447 "Ufunc.pm"
+#line 386 "Ufunc.pm"
 
 
 
@@ -457,8 +396,8 @@ The state of the bad-value flag of the output ndarrays is unknown.
 
   Signature: (
     indx ixIn(Ndims,NnzIn);
-    nzvalsIn(NnzIn);
-    missing();
+         nzvalsIn(NnzIn);
+         missing();
     indx N();
     indx [o]ixOut(Ndims,NnzOut);
        [o]nzvalsOut(NnzOut);
@@ -466,7 +405,7 @@ The state of the bad-value flag of the output ndarrays is unknown.
     )
 
 
-Accumulated logical "or" over values $nzvalsIn() associated with vector-valued keys $ixIn().
+Accumulated logical "or" over values $nzvalsIn() associated with non-missing vector-valued keys $ixIn().
 On return,
 $ixOut() holds the unique non-"missing" values of $ixIn(),
 $nzvalsOut() holds the associated values,
@@ -489,54 +428,41 @@ In scalar context, returns only $nzvalsOut().
 =for bad
 
 ccs_accum_or processes bad values.
-The state of the bad-value flag of the output ndarrays is unknown.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
-#line 497 "Ufunc.pm"
+#line 436 "Ufunc.pm"
 
 
 
 #line 950 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
- sub PDL::ccs_accum_or {
-   my ($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut) = @_;
-   my ($ndims,@nnzIn) = $ixIn->dims;
-   my (@nnzOut);
-   if (defined($ixOut)) {
-     @nnzOut = $ixOut->dims;
-     shift(@nnzOut);
-   }
-
-   @nnzOut = $nzvalsOut->dims if (!@nnzOut && defined($nzvalsOut) && !$nzvalsOut->isempty);
-   @nnzOut = @nnzIn           if (!@nnzOut);
-   $ixOut  = PDL->zeroes(ccs_indx(), $ndims,@nnzOut)
-     if (!defined($ixOut)      || $ixOut->isempty);
-
-   $nzvalsOut = PDL->zeroes(($nzvalsIn->type), @nnzOut)
-     if (!defined($nzvalsOut) || $nzvalsOut->isempty);
-
-   $nOut = PDL->pdl(ccs_indx(),0)                  if (!defined($nOut) || $nOut->isempty);
-   ##
-   ##-- guts
-   &PDL::_ccs_accum_or_int($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut);
-   ##
-   ##-- auto-trim
-   $ixOut      = $ixOut->slice(",0:".($nOut->max-1));
-   $nzvalsOut  = $nzvalsOut->slice("0:".($nOut->max-1));
-   ##
-   ##-- return
-   return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
- }
-#line 533 "Ufunc.pm"
+        sub PDL::ccs_accum_or {
+          my ($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut) = @_;
+          $nOut //= PDL->null;
+          $ixOut //= PDL->null;
+          $nzvalsOut //= PDL->null;
+          &PDL::_ccs_accum_or_int($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut);
+          ##
+          ##-- auto-trim
+          my $trim_slice = "0:".($nOut->max-1);
+          $ixOut     = $ixOut->slice(",$trim_slice");
+          $nzvalsOut = $nzvalsOut->slice($trim_slice);
+          ##
+          ##-- return
+          return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
+        }
+    
+#line 459 "Ufunc.pm"
 
 
 
 #line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *ccs_accum_or = \&PDL::ccs_accum_or;
-#line 540 "Ufunc.pm"
+#line 466 "Ufunc.pm"
 
 
 
@@ -550,8 +476,8 @@ The state of the bad-value flag of the output ndarrays is unknown.
 
   Signature: (
     indx ixIn(Ndims,NnzIn);
-    nzvalsIn(NnzIn);
-    missing();
+         nzvalsIn(NnzIn);
+         missing();
     indx N();
     indx [o]ixOut(Ndims,NnzOut);
        [o]nzvalsOut(NnzOut);
@@ -559,7 +485,7 @@ The state of the bad-value flag of the output ndarrays is unknown.
     )
 
 
-Accumulated logical "and" over values $nzvalsIn() associated with vector-valued keys $ixIn().
+Accumulated logical "and" over values $nzvalsIn() associated with non-missing vector-valued keys $ixIn().
 On return,
 $ixOut() holds the unique non-"missing" values of $ixIn(),
 $nzvalsOut() holds the associated values,
@@ -582,54 +508,41 @@ In scalar context, returns only $nzvalsOut().
 =for bad
 
 ccs_accum_and processes bad values.
-The state of the bad-value flag of the output ndarrays is unknown.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
-#line 590 "Ufunc.pm"
+#line 516 "Ufunc.pm"
 
 
 
 #line 950 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
- sub PDL::ccs_accum_and {
-   my ($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut) = @_;
-   my ($ndims,@nnzIn) = $ixIn->dims;
-   my (@nnzOut);
-   if (defined($ixOut)) {
-     @nnzOut = $ixOut->dims;
-     shift(@nnzOut);
-   }
-
-   @nnzOut = $nzvalsOut->dims if (!@nnzOut && defined($nzvalsOut) && !$nzvalsOut->isempty);
-   @nnzOut = @nnzIn           if (!@nnzOut);
-   $ixOut  = PDL->zeroes(ccs_indx(), $ndims,@nnzOut)
-     if (!defined($ixOut)      || $ixOut->isempty);
-
-   $nzvalsOut = PDL->zeroes(($nzvalsIn->type), @nnzOut)
-     if (!defined($nzvalsOut) || $nzvalsOut->isempty);
-
-   $nOut = PDL->pdl(ccs_indx(),0)                  if (!defined($nOut) || $nOut->isempty);
-   ##
-   ##-- guts
-   &PDL::_ccs_accum_and_int($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut);
-   ##
-   ##-- auto-trim
-   $ixOut      = $ixOut->slice(",0:".($nOut->max-1));
-   $nzvalsOut  = $nzvalsOut->slice("0:".($nOut->max-1));
-   ##
-   ##-- return
-   return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
- }
-#line 626 "Ufunc.pm"
+        sub PDL::ccs_accum_and {
+          my ($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut) = @_;
+          $nOut //= PDL->null;
+          $ixOut //= PDL->null;
+          $nzvalsOut //= PDL->null;
+          &PDL::_ccs_accum_and_int($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut);
+          ##
+          ##-- auto-trim
+          my $trim_slice = "0:".($nOut->max-1);
+          $ixOut     = $ixOut->slice(",$trim_slice");
+          $nzvalsOut = $nzvalsOut->slice($trim_slice);
+          ##
+          ##-- return
+          return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
+        }
+    
+#line 539 "Ufunc.pm"
 
 
 
 #line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *ccs_accum_and = \&PDL::ccs_accum_and;
-#line 633 "Ufunc.pm"
+#line 546 "Ufunc.pm"
 
 
 
@@ -643,8 +556,8 @@ The state of the bad-value flag of the output ndarrays is unknown.
 
   Signature: (
     indx ixIn(Ndims,NnzIn);
-    nzvalsIn(NnzIn);
-    missing();
+         nzvalsIn(NnzIn);
+         missing();
     indx N();
     indx [o]ixOut(Ndims,NnzOut);
        [o]nzvalsOut(NnzOut);
@@ -652,7 +565,7 @@ The state of the bad-value flag of the output ndarrays is unknown.
     )
 
 
-Accumulated bitwise "or" over values $nzvalsIn() associated with vector-valued keys $ixIn().
+Accumulated bitwise "or" over values $nzvalsIn() associated with non-missing vector-valued keys $ixIn().
 On return,
 $ixOut() holds the unique non-"missing" values of $ixIn(),
 $nzvalsOut() holds the associated values,
@@ -675,55 +588,41 @@ In scalar context, returns only $nzvalsOut().
 =for bad
 
 ccs_accum_bor processes bad values.
-The state of the bad-value flag of the output ndarrays is unknown.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
-#line 683 "Ufunc.pm"
+#line 596 "Ufunc.pm"
 
 
 
 #line 950 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
- sub PDL::ccs_accum_bor {
-   my ($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut) = @_;
-   my ($ndims,@nnzIn) = $ixIn->dims;
-   my (@nnzOut);
-   if (defined($ixOut)) {
-     @nnzOut = $ixOut->dims;
-     shift(@nnzOut);
-   }
-
-   $nzvalsIn = longlong($nzvalsIn) if ($nzvalsIn->type > longlong()); ##-- max_type_perl=longlong
-   @nnzOut = $nzvalsOut->dims if (!@nnzOut && defined($nzvalsOut) && !$nzvalsOut->isempty);
-   @nnzOut = @nnzIn           if (!@nnzOut);
-   $ixOut  = PDL->zeroes(ccs_indx(), $ndims,@nnzOut)
-     if (!defined($ixOut)      || $ixOut->isempty);
-
-   $nzvalsOut = PDL->zeroes(($nzvalsIn->type), @nnzOut)
-     if (!defined($nzvalsOut) || $nzvalsOut->isempty);
-
-   $nOut = PDL->pdl(ccs_indx(),0)                  if (!defined($nOut) || $nOut->isempty);
-   ##
-   ##-- guts
-   &PDL::_ccs_accum_bor_int($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut);
-   ##
-   ##-- auto-trim
-   $ixOut      = $ixOut->slice(",0:".($nOut->max-1));
-   $nzvalsOut  = $nzvalsOut->slice("0:".($nOut->max-1));
-   ##
-   ##-- return
-   return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
- }
-#line 720 "Ufunc.pm"
+        sub PDL::ccs_accum_bor {
+          my ($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut) = @_;
+          $nOut //= PDL->null;
+          $ixOut //= PDL->null;
+          $nzvalsOut //= PDL->null;
+          &PDL::_ccs_accum_bor_int($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut);
+          ##
+          ##-- auto-trim
+          my $trim_slice = "0:".($nOut->max-1);
+          $ixOut     = $ixOut->slice(",$trim_slice");
+          $nzvalsOut = $nzvalsOut->slice($trim_slice);
+          ##
+          ##-- return
+          return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
+        }
+    
+#line 619 "Ufunc.pm"
 
 
 
 #line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *ccs_accum_bor = \&PDL::ccs_accum_bor;
-#line 727 "Ufunc.pm"
+#line 626 "Ufunc.pm"
 
 
 
@@ -737,8 +636,8 @@ The state of the bad-value flag of the output ndarrays is unknown.
 
   Signature: (
     indx ixIn(Ndims,NnzIn);
-    nzvalsIn(NnzIn);
-    missing();
+         nzvalsIn(NnzIn);
+         missing();
     indx N();
     indx [o]ixOut(Ndims,NnzOut);
        [o]nzvalsOut(NnzOut);
@@ -746,7 +645,7 @@ The state of the bad-value flag of the output ndarrays is unknown.
     )
 
 
-Accumulated bitwise "and" over values $nzvalsIn() associated with vector-valued keys $ixIn().
+Accumulated bitwise "and" over values $nzvalsIn() associated with non-missing vector-valued keys $ixIn().
 On return,
 $ixOut() holds the unique non-"missing" values of $ixIn(),
 $nzvalsOut() holds the associated values,
@@ -769,55 +668,41 @@ In scalar context, returns only $nzvalsOut().
 =for bad
 
 ccs_accum_band processes bad values.
-The state of the bad-value flag of the output ndarrays is unknown.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
-#line 777 "Ufunc.pm"
+#line 676 "Ufunc.pm"
 
 
 
 #line 950 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
- sub PDL::ccs_accum_band {
-   my ($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut) = @_;
-   my ($ndims,@nnzIn) = $ixIn->dims;
-   my (@nnzOut);
-   if (defined($ixOut)) {
-     @nnzOut = $ixOut->dims;
-     shift(@nnzOut);
-   }
-
-   $nzvalsIn = longlong($nzvalsIn) if ($nzvalsIn->type > longlong()); ##-- max_type_perl=longlong
-   @nnzOut = $nzvalsOut->dims if (!@nnzOut && defined($nzvalsOut) && !$nzvalsOut->isempty);
-   @nnzOut = @nnzIn           if (!@nnzOut);
-   $ixOut  = PDL->zeroes(ccs_indx(), $ndims,@nnzOut)
-     if (!defined($ixOut)      || $ixOut->isempty);
-
-   $nzvalsOut = PDL->zeroes(($nzvalsIn->type), @nnzOut)
-     if (!defined($nzvalsOut) || $nzvalsOut->isempty);
-
-   $nOut = PDL->pdl(ccs_indx(),0)                  if (!defined($nOut) || $nOut->isempty);
-   ##
-   ##-- guts
-   &PDL::_ccs_accum_band_int($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut);
-   ##
-   ##-- auto-trim
-   $ixOut      = $ixOut->slice(",0:".($nOut->max-1));
-   $nzvalsOut  = $nzvalsOut->slice("0:".($nOut->max-1));
-   ##
-   ##-- return
-   return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
- }
-#line 814 "Ufunc.pm"
+        sub PDL::ccs_accum_band {
+          my ($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut) = @_;
+          $nOut //= PDL->null;
+          $ixOut //= PDL->null;
+          $nzvalsOut //= PDL->null;
+          &PDL::_ccs_accum_band_int($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut);
+          ##
+          ##-- auto-trim
+          my $trim_slice = "0:".($nOut->max-1);
+          $ixOut     = $ixOut->slice(",$trim_slice");
+          $nzvalsOut = $nzvalsOut->slice($trim_slice);
+          ##
+          ##-- return
+          return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
+        }
+    
+#line 699 "Ufunc.pm"
 
 
 
 #line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *ccs_accum_band = \&PDL::ccs_accum_band;
-#line 821 "Ufunc.pm"
+#line 706 "Ufunc.pm"
 
 
 
@@ -831,8 +716,8 @@ The state of the bad-value flag of the output ndarrays is unknown.
 
   Signature: (
     indx ixIn(Ndims,NnzIn);
-    nzvalsIn(NnzIn);
-    missing();
+         nzvalsIn(NnzIn);
+         missing();
     indx N();
     indx [o]ixOut(Ndims,NnzOut);
        [o]nzvalsOut(NnzOut);
@@ -840,7 +725,7 @@ The state of the bad-value flag of the output ndarrays is unknown.
     )
 
 
-Accumulated maximum over values $nzvalsIn() associated with vector-valued keys $ixIn().
+Accumulated maximum over values $nzvalsIn() associated with non-missing vector-valued keys $ixIn().
 On return,
 $ixOut() holds the unique non-"missing" values of $ixIn(),
 $nzvalsOut() holds the associated values,
@@ -864,54 +749,41 @@ In scalar context, returns only $nzvalsOut().
 =for bad
 
 ccs_accum_maximum processes bad values.
-The state of the bad-value flag of the output ndarrays is unknown.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
-#line 872 "Ufunc.pm"
+#line 757 "Ufunc.pm"
 
 
 
 #line 950 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
- sub PDL::ccs_accum_maximum {
-   my ($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut) = @_;
-   my ($ndims,@nnzIn) = $ixIn->dims;
-   my (@nnzOut);
-   if (defined($ixOut)) {
-     @nnzOut = $ixOut->dims;
-     shift(@nnzOut);
-   }
-
-   @nnzOut = $nzvalsOut->dims if (!@nnzOut && defined($nzvalsOut) && !$nzvalsOut->isempty);
-   @nnzOut = @nnzIn           if (!@nnzOut);
-   $ixOut  = PDL->zeroes(ccs_indx(), $ndims,@nnzOut)
-     if (!defined($ixOut)      || $ixOut->isempty);
-
-   $nzvalsOut = PDL->zeroes(($nzvalsIn->type), @nnzOut)
-     if (!defined($nzvalsOut) || $nzvalsOut->isempty);
-
-   $nOut = PDL->pdl(ccs_indx(),0)                  if (!defined($nOut) || $nOut->isempty);
-   ##
-   ##-- guts
-   &PDL::_ccs_accum_maximum_int($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut);
-   ##
-   ##-- auto-trim
-   $ixOut      = $ixOut->slice(",0:".($nOut->max-1));
-   $nzvalsOut  = $nzvalsOut->slice("0:".($nOut->max-1));
-   ##
-   ##-- return
-   return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
- }
-#line 908 "Ufunc.pm"
+        sub PDL::ccs_accum_maximum {
+          my ($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut) = @_;
+          $nOut //= PDL->null;
+          $ixOut //= PDL->null;
+          $nzvalsOut //= PDL->null;
+          &PDL::_ccs_accum_maximum_int($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut);
+          ##
+          ##-- auto-trim
+          my $trim_slice = "0:".($nOut->max-1);
+          $ixOut     = $ixOut->slice(",$trim_slice");
+          $nzvalsOut = $nzvalsOut->slice($trim_slice);
+          ##
+          ##-- return
+          return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
+        }
+    
+#line 780 "Ufunc.pm"
 
 
 
 #line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *ccs_accum_maximum = \&PDL::ccs_accum_maximum;
-#line 915 "Ufunc.pm"
+#line 787 "Ufunc.pm"
 
 
 
@@ -925,8 +797,8 @@ The state of the bad-value flag of the output ndarrays is unknown.
 
   Signature: (
     indx ixIn(Ndims,NnzIn);
-    nzvalsIn(NnzIn);
-    missing();
+         nzvalsIn(NnzIn);
+         missing();
     indx N();
     indx [o]ixOut(Ndims,NnzOut);
        [o]nzvalsOut(NnzOut);
@@ -934,7 +806,7 @@ The state of the bad-value flag of the output ndarrays is unknown.
     )
 
 
-Accumulated minimum over values $nzvalsIn() associated with vector-valued keys $ixIn().
+Accumulated minimum over values $nzvalsIn() associated with non-missing vector-valued keys $ixIn().
 On return,
 $ixOut() holds the unique non-"missing" values of $ixIn(),
 $nzvalsOut() holds the associated values,
@@ -958,54 +830,41 @@ In scalar context, returns only $nzvalsOut().
 =for bad
 
 ccs_accum_minimum processes bad values.
-The state of the bad-value flag of the output ndarrays is unknown.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
-#line 966 "Ufunc.pm"
+#line 838 "Ufunc.pm"
 
 
 
 #line 950 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
- sub PDL::ccs_accum_minimum {
-   my ($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut) = @_;
-   my ($ndims,@nnzIn) = $ixIn->dims;
-   my (@nnzOut);
-   if (defined($ixOut)) {
-     @nnzOut = $ixOut->dims;
-     shift(@nnzOut);
-   }
-
-   @nnzOut = $nzvalsOut->dims if (!@nnzOut && defined($nzvalsOut) && !$nzvalsOut->isempty);
-   @nnzOut = @nnzIn           if (!@nnzOut);
-   $ixOut  = PDL->zeroes(ccs_indx(), $ndims,@nnzOut)
-     if (!defined($ixOut)      || $ixOut->isempty);
-
-   $nzvalsOut = PDL->zeroes(($nzvalsIn->type), @nnzOut)
-     if (!defined($nzvalsOut) || $nzvalsOut->isempty);
-
-   $nOut = PDL->pdl(ccs_indx(),0)                  if (!defined($nOut) || $nOut->isempty);
-   ##
-   ##-- guts
-   &PDL::_ccs_accum_minimum_int($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut);
-   ##
-   ##-- auto-trim
-   $ixOut      = $ixOut->slice(",0:".($nOut->max-1));
-   $nzvalsOut  = $nzvalsOut->slice("0:".($nOut->max-1));
-   ##
-   ##-- return
-   return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
- }
-#line 1002 "Ufunc.pm"
+        sub PDL::ccs_accum_minimum {
+          my ($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut) = @_;
+          $nOut //= PDL->null;
+          $ixOut //= PDL->null;
+          $nzvalsOut //= PDL->null;
+          &PDL::_ccs_accum_minimum_int($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut);
+          ##
+          ##-- auto-trim
+          my $trim_slice = "0:".($nOut->max-1);
+          $ixOut     = $ixOut->slice(",$trim_slice");
+          $nzvalsOut = $nzvalsOut->slice($trim_slice);
+          ##
+          ##-- return
+          return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
+        }
+    
+#line 861 "Ufunc.pm"
 
 
 
 #line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *ccs_accum_minimum = \&PDL::ccs_accum_minimum;
-#line 1009 "Ufunc.pm"
+#line 868 "Ufunc.pm"
 
 
 
@@ -1019,8 +878,8 @@ The state of the bad-value flag of the output ndarrays is unknown.
 
   Signature: (
     indx ixIn(Ndims,NnzIn);
-    nzvalsIn(NnzIn);
-    missing();
+         nzvalsIn(NnzIn);
+         missing();
     indx N();
     indx [o]ixOut(Ndims,NnzOut);
     indx [o]nzvalsOut(NnzOut);
@@ -1028,7 +887,7 @@ The state of the bad-value flag of the output ndarrays is unknown.
     )
 
 
-Accumulated maximum_nz_ind over values $nzvalsIn() associated with vector-valued keys $ixIn().
+Accumulated maximum_nz_ind over values $nzvalsIn() associated with non-missing vector-valued keys $ixIn().
 On return,
 $ixOut() holds the unique non-"missing" values of $ixIn(),
 $nzvalsOut() holds the associated values,
@@ -1049,54 +908,41 @@ In scalar context, returns only $nzvalsOut().
 =for bad
 
 ccs_accum_maximum_nz_ind processes bad values.
-The state of the bad-value flag of the output ndarrays is unknown.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
-#line 1057 "Ufunc.pm"
+#line 916 "Ufunc.pm"
 
 
 
 #line 950 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
- sub PDL::ccs_accum_maximum_nz_ind {
-   my ($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut) = @_;
-   my ($ndims,@nnzIn) = $ixIn->dims;
-   my (@nnzOut);
-   if (defined($ixOut)) {
-     @nnzOut = $ixOut->dims;
-     shift(@nnzOut);
-   }
-
-   @nnzOut = $nzvalsOut->dims if (!@nnzOut && defined($nzvalsOut) && !$nzvalsOut->isempty);
-   @nnzOut = @nnzIn           if (!@nnzOut);
-   $ixOut  = PDL->zeroes(ccs_indx(), $ndims,@nnzOut)
-     if (!defined($ixOut)      || $ixOut->isempty);
-
-   $nzvalsOut = PDL->zeroes((ccs_indx()), @nnzOut)
-     if (!defined($nzvalsOut) || $nzvalsOut->isempty);
-
-   $nOut = PDL->pdl(ccs_indx(),0)                  if (!defined($nOut) || $nOut->isempty);
-   ##
-   ##-- guts
-   &PDL::_ccs_accum_maximum_nz_ind_int($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut);
-   ##
-   ##-- auto-trim
-   $ixOut      = $ixOut->slice(",0:".($nOut->max-1));
-   $nzvalsOut  = $nzvalsOut->slice("0:".($nOut->max-1));
-   ##
-   ##-- return
-   return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
- }
-#line 1093 "Ufunc.pm"
+        sub PDL::ccs_accum_maximum_nz_ind {
+          my ($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut) = @_;
+          $nOut //= PDL->null;
+          $ixOut //= PDL->null;
+          $nzvalsOut //= PDL->null;
+          &PDL::_ccs_accum_maximum_nz_ind_int($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut);
+          ##
+          ##-- auto-trim
+          my $trim_slice = "0:".($nOut->max-1);
+          $ixOut     = $ixOut->slice(",$trim_slice");
+          $nzvalsOut = $nzvalsOut->slice($trim_slice);
+          ##
+          ##-- return
+          return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
+        }
+    
+#line 939 "Ufunc.pm"
 
 
 
 #line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *ccs_accum_maximum_nz_ind = \&PDL::ccs_accum_maximum_nz_ind;
-#line 1100 "Ufunc.pm"
+#line 946 "Ufunc.pm"
 
 
 
@@ -1110,8 +956,8 @@ The state of the bad-value flag of the output ndarrays is unknown.
 
   Signature: (
     indx ixIn(Ndims,NnzIn);
-    nzvalsIn(NnzIn);
-    missing();
+         nzvalsIn(NnzIn);
+         missing();
     indx N();
     indx [o]ixOut(Ndims,NnzOut);
     indx [o]nzvalsOut(NnzOut);
@@ -1119,7 +965,7 @@ The state of the bad-value flag of the output ndarrays is unknown.
     )
 
 
-Accumulated minimum_nz_ind over values $nzvalsIn() associated with vector-valued keys $ixIn().
+Accumulated minimum_nz_ind over values $nzvalsIn() associated with non-missing vector-valued keys $ixIn().
 On return,
 $ixOut() holds the unique non-"missing" values of $ixIn(),
 $nzvalsOut() holds the associated values,
@@ -1140,54 +986,41 @@ In scalar context, returns only $nzvalsOut().
 =for bad
 
 ccs_accum_minimum_nz_ind processes bad values.
-The state of the bad-value flag of the output ndarrays is unknown.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
-#line 1148 "Ufunc.pm"
+#line 994 "Ufunc.pm"
 
 
 
 #line 950 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
- sub PDL::ccs_accum_minimum_nz_ind {
-   my ($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut) = @_;
-   my ($ndims,@nnzIn) = $ixIn->dims;
-   my (@nnzOut);
-   if (defined($ixOut)) {
-     @nnzOut = $ixOut->dims;
-     shift(@nnzOut);
-   }
-
-   @nnzOut = $nzvalsOut->dims if (!@nnzOut && defined($nzvalsOut) && !$nzvalsOut->isempty);
-   @nnzOut = @nnzIn           if (!@nnzOut);
-   $ixOut  = PDL->zeroes(ccs_indx(), $ndims,@nnzOut)
-     if (!defined($ixOut)      || $ixOut->isempty);
-
-   $nzvalsOut = PDL->zeroes((ccs_indx()), @nnzOut)
-     if (!defined($nzvalsOut) || $nzvalsOut->isempty);
-
-   $nOut = PDL->pdl(ccs_indx(),0)                  if (!defined($nOut) || $nOut->isempty);
-   ##
-   ##-- guts
-   &PDL::_ccs_accum_minimum_nz_ind_int($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut);
-   ##
-   ##-- auto-trim
-   $ixOut      = $ixOut->slice(",0:".($nOut->max-1));
-   $nzvalsOut  = $nzvalsOut->slice("0:".($nOut->max-1));
-   ##
-   ##-- return
-   return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
- }
-#line 1184 "Ufunc.pm"
+        sub PDL::ccs_accum_minimum_nz_ind {
+          my ($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut) = @_;
+          $nOut //= PDL->null;
+          $ixOut //= PDL->null;
+          $nzvalsOut //= PDL->null;
+          &PDL::_ccs_accum_minimum_nz_ind_int($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut);
+          ##
+          ##-- auto-trim
+          my $trim_slice = "0:".($nOut->max-1);
+          $ixOut     = $ixOut->slice(",$trim_slice");
+          $nzvalsOut = $nzvalsOut->slice($trim_slice);
+          ##
+          ##-- return
+          return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
+        }
+    
+#line 1017 "Ufunc.pm"
 
 
 
 #line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *ccs_accum_minimum_nz_ind = \&PDL::ccs_accum_minimum_nz_ind;
-#line 1191 "Ufunc.pm"
+#line 1024 "Ufunc.pm"
 
 
 
@@ -1201,8 +1034,8 @@ The state of the bad-value flag of the output ndarrays is unknown.
 
   Signature: (
     indx ixIn(Ndims,NnzIn);
-    nzvalsIn(NnzIn);
-    missing();
+         nzvalsIn(NnzIn);
+         missing();
     indx N();
     indx [o]ixOut(Ndims,NnzOut);
     indx [o]nzvalsOut(NnzOut);
@@ -1210,7 +1043,7 @@ The state of the bad-value flag of the output ndarrays is unknown.
     )
 
 
-Accumulated number of bad values over values $nzvalsIn() associated with vector-valued keys $ixIn().
+Accumulated number of bad values over values $nzvalsIn() associated with non-missing vector-valued keys $ixIn().
 On return,
 $ixOut() holds the unique non-"missing" values of $ixIn(),
 $nzvalsOut() holds the associated values,
@@ -1231,55 +1064,41 @@ In scalar context, returns only $nzvalsOut().
 =for bad
 
 ccs_accum_nbad processes bad values.
-The state of the bad-value flag of the output ndarrays is unknown.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
-#line 1239 "Ufunc.pm"
+#line 1072 "Ufunc.pm"
 
 
 
 #line 950 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
- sub PDL::ccs_accum_nbad {
-   my ($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut) = @_;
-   my ($ndims,@nnzIn) = $ixIn->dims;
-   my (@nnzOut);
-   if (defined($ixOut)) {
-     @nnzOut = $ixOut->dims;
-     shift(@nnzOut);
-   }
-
-   $nzvalsIn = ccs_indx($nzvalsIn) if ($nzvalsIn->type > ccs_indx()); ##-- max_type_perl=ccs_indx
-   @nnzOut = $nzvalsOut->dims if (!@nnzOut && defined($nzvalsOut) && !$nzvalsOut->isempty);
-   @nnzOut = @nnzIn           if (!@nnzOut);
-   $ixOut  = PDL->zeroes(ccs_indx(), $ndims,@nnzOut)
-     if (!defined($ixOut)      || $ixOut->isempty);
-
-   $nzvalsOut = PDL->zeroes(($nzvalsIn->type), @nnzOut)
-     if (!defined($nzvalsOut) || $nzvalsOut->isempty);
-
-   $nOut = PDL->pdl(ccs_indx(),0)                  if (!defined($nOut) || $nOut->isempty);
-   ##
-   ##-- guts
-   &PDL::_ccs_accum_nbad_int($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut);
-   ##
-   ##-- auto-trim
-   $ixOut      = $ixOut->slice(",0:".($nOut->max-1));
-   $nzvalsOut  = $nzvalsOut->slice("0:".($nOut->max-1));
-   ##
-   ##-- return
-   return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
- }
-#line 1276 "Ufunc.pm"
+        sub PDL::ccs_accum_nbad {
+          my ($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut) = @_;
+          $nOut //= PDL->null;
+          $ixOut //= PDL->null;
+          $nzvalsOut //= PDL->null;
+          &PDL::_ccs_accum_nbad_int($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut);
+          ##
+          ##-- auto-trim
+          my $trim_slice = "0:".($nOut->max-1);
+          $ixOut     = $ixOut->slice(",$trim_slice");
+          $nzvalsOut = $nzvalsOut->slice($trim_slice);
+          ##
+          ##-- return
+          return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
+        }
+    
+#line 1095 "Ufunc.pm"
 
 
 
 #line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *ccs_accum_nbad = \&PDL::ccs_accum_nbad;
-#line 1283 "Ufunc.pm"
+#line 1102 "Ufunc.pm"
 
 
 
@@ -1293,8 +1112,8 @@ The state of the bad-value flag of the output ndarrays is unknown.
 
   Signature: (
     indx ixIn(Ndims,NnzIn);
-    nzvalsIn(NnzIn);
-    missing();
+         nzvalsIn(NnzIn);
+         missing();
     indx N();
     indx [o]ixOut(Ndims,NnzOut);
     indx [o]nzvalsOut(NnzOut);
@@ -1302,7 +1121,7 @@ The state of the bad-value flag of the output ndarrays is unknown.
     )
 
 
-Accumulated number of good values over values $nzvalsIn() associated with vector-valued keys $ixIn().
+Accumulated number of good values over values $nzvalsIn() associated with non-missing vector-valued keys $ixIn().
 On return,
 $ixOut() holds the unique non-"missing" values of $ixIn(),
 $nzvalsOut() holds the associated values,
@@ -1323,55 +1142,41 @@ In scalar context, returns only $nzvalsOut().
 =for bad
 
 ccs_accum_ngood processes bad values.
-The state of the bad-value flag of the output ndarrays is unknown.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
-#line 1331 "Ufunc.pm"
+#line 1150 "Ufunc.pm"
 
 
 
 #line 950 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
- sub PDL::ccs_accum_ngood {
-   my ($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut) = @_;
-   my ($ndims,@nnzIn) = $ixIn->dims;
-   my (@nnzOut);
-   if (defined($ixOut)) {
-     @nnzOut = $ixOut->dims;
-     shift(@nnzOut);
-   }
-
-   $nzvalsIn = ccs_indx($nzvalsIn) if ($nzvalsIn->type > ccs_indx()); ##-- max_type_perl=ccs_indx
-   @nnzOut = $nzvalsOut->dims if (!@nnzOut && defined($nzvalsOut) && !$nzvalsOut->isempty);
-   @nnzOut = @nnzIn           if (!@nnzOut);
-   $ixOut  = PDL->zeroes(ccs_indx(), $ndims,@nnzOut)
-     if (!defined($ixOut)      || $ixOut->isempty);
-
-   $nzvalsOut = PDL->zeroes(($nzvalsIn->type), @nnzOut)
-     if (!defined($nzvalsOut) || $nzvalsOut->isempty);
-
-   $nOut = PDL->pdl(ccs_indx(),0)                  if (!defined($nOut) || $nOut->isempty);
-   ##
-   ##-- guts
-   &PDL::_ccs_accum_ngood_int($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut);
-   ##
-   ##-- auto-trim
-   $ixOut      = $ixOut->slice(",0:".($nOut->max-1));
-   $nzvalsOut  = $nzvalsOut->slice("0:".($nOut->max-1));
-   ##
-   ##-- return
-   return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
- }
-#line 1368 "Ufunc.pm"
+        sub PDL::ccs_accum_ngood {
+          my ($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut) = @_;
+          $nOut //= PDL->null;
+          $ixOut //= PDL->null;
+          $nzvalsOut //= PDL->null;
+          &PDL::_ccs_accum_ngood_int($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut);
+          ##
+          ##-- auto-trim
+          my $trim_slice = "0:".($nOut->max-1);
+          $ixOut     = $ixOut->slice(",$trim_slice");
+          $nzvalsOut = $nzvalsOut->slice($trim_slice);
+          ##
+          ##-- return
+          return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
+        }
+    
+#line 1173 "Ufunc.pm"
 
 
 
 #line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *ccs_accum_ngood = \&PDL::ccs_accum_ngood;
-#line 1375 "Ufunc.pm"
+#line 1180 "Ufunc.pm"
 
 
 
@@ -1385,8 +1190,8 @@ The state of the bad-value flag of the output ndarrays is unknown.
 
   Signature: (
     indx ixIn(Ndims,NnzIn);
-    nzvalsIn(NnzIn);
-    missing();
+         nzvalsIn(NnzIn);
+         missing();
     indx N();
     indx [o]ixOut(Ndims,NnzOut);
     indx [o]nzvalsOut(NnzOut);
@@ -1394,7 +1199,7 @@ The state of the bad-value flag of the output ndarrays is unknown.
     )
 
 
-Accumulated number of non-zero values over values $nzvalsIn() associated with vector-valued keys $ixIn().
+Accumulated number of non-zero values over values $nzvalsIn() associated with non-missing vector-valued keys $ixIn().
 On return,
 $ixOut() holds the unique non-"missing" values of $ixIn(),
 $nzvalsOut() holds the associated values,
@@ -1415,55 +1220,41 @@ In scalar context, returns only $nzvalsOut().
 =for bad
 
 ccs_accum_nnz processes bad values.
-The state of the bad-value flag of the output ndarrays is unknown.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
-#line 1423 "Ufunc.pm"
+#line 1228 "Ufunc.pm"
 
 
 
 #line 950 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
- sub PDL::ccs_accum_nnz {
-   my ($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut) = @_;
-   my ($ndims,@nnzIn) = $ixIn->dims;
-   my (@nnzOut);
-   if (defined($ixOut)) {
-     @nnzOut = $ixOut->dims;
-     shift(@nnzOut);
-   }
-
-   $nzvalsIn = longlong($nzvalsIn) if ($nzvalsIn->type > longlong()); ##-- max_type_perl=longlong
-   @nnzOut = $nzvalsOut->dims if (!@nnzOut && defined($nzvalsOut) && !$nzvalsOut->isempty);
-   @nnzOut = @nnzIn           if (!@nnzOut);
-   $ixOut  = PDL->zeroes(ccs_indx(), $ndims,@nnzOut)
-     if (!defined($ixOut)      || $ixOut->isempty);
-
-   $nzvalsOut = PDL->zeroes(($nzvalsIn->type), @nnzOut)
-     if (!defined($nzvalsOut) || $nzvalsOut->isempty);
-
-   $nOut = PDL->pdl(ccs_indx(),0)                  if (!defined($nOut) || $nOut->isempty);
-   ##
-   ##-- guts
-   &PDL::_ccs_accum_nnz_int($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut);
-   ##
-   ##-- auto-trim
-   $ixOut      = $ixOut->slice(",0:".($nOut->max-1));
-   $nzvalsOut  = $nzvalsOut->slice("0:".($nOut->max-1));
-   ##
-   ##-- return
-   return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
- }
-#line 1460 "Ufunc.pm"
+        sub PDL::ccs_accum_nnz {
+          my ($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut) = @_;
+          $nOut //= PDL->null;
+          $ixOut //= PDL->null;
+          $nzvalsOut //= PDL->null;
+          &PDL::_ccs_accum_nnz_int($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut);
+          ##
+          ##-- auto-trim
+          my $trim_slice = "0:".($nOut->max-1);
+          $ixOut     = $ixOut->slice(",$trim_slice");
+          $nzvalsOut = $nzvalsOut->slice($trim_slice);
+          ##
+          ##-- return
+          return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
+        }
+    
+#line 1251 "Ufunc.pm"
 
 
 
 #line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *ccs_accum_nnz = \&PDL::ccs_accum_nnz;
-#line 1467 "Ufunc.pm"
+#line 1258 "Ufunc.pm"
 
 
 
@@ -1477,8 +1268,8 @@ The state of the bad-value flag of the output ndarrays is unknown.
 
   Signature: (
     indx ixIn(Ndims,NnzIn);
-    nzvalsIn(NnzIn);
-    missing();
+         nzvalsIn(NnzIn);
+         missing();
     indx N();
     indx [o]ixOut(Ndims,NnzOut);
     float+ [o]nzvalsOut(NnzOut);
@@ -1486,7 +1277,7 @@ The state of the bad-value flag of the output ndarrays is unknown.
     )
 
 
-Accumulated average over values $nzvalsIn() associated with vector-valued keys $ixIn().
+Accumulated average over values $nzvalsIn() associated with non-missing vector-valued keys $ixIn().
 On return,
 $ixOut() holds the unique non-"missing" values of $ixIn(),
 $nzvalsOut() holds the associated values,
@@ -1512,58 +1303,45 @@ In scalar context, returns only $nzvalsOut().
 =for bad
 
 ccs_accum_average processes bad values.
-The state of the bad-value flag of the output ndarrays is unknown.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
-#line 1520 "Ufunc.pm"
+#line 1311 "Ufunc.pm"
 
 
 
 #line 950 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
- sub PDL::ccs_accum_average {
-   my ($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut) = @_;
-   my ($ndims,@nnzIn) = $ixIn->dims;
-   my (@nnzOut);
-   if (defined($ixOut)) {
-     @nnzOut = $ixOut->dims;
-     shift(@nnzOut);
-   }
-
-   @nnzOut = $nzvalsOut->dims if (!@nnzOut && defined($nzvalsOut) && !$nzvalsOut->isempty);
-   @nnzOut = @nnzIn           if (!@nnzOut);
-   $ixOut  = PDL->zeroes(ccs_indx(), $ndims,@nnzOut)
-     if (!defined($ixOut)      || $ixOut->isempty);
-
-   $nzvalsOut = PDL->zeroes(($nzvalsIn->type), @nnzOut)
-     if (!defined($nzvalsOut) || $nzvalsOut->isempty);
-
-   $nOut = PDL->pdl(ccs_indx(),0)                  if (!defined($nOut) || $nOut->isempty);
-   ##
-   ##-- guts
-   &PDL::_ccs_accum_average_int($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut);
-   ##
-   ##-- auto-trim
-   $ixOut      = $ixOut->slice(",0:".($nOut->max-1));
-   $nzvalsOut  = $nzvalsOut->slice("0:".($nOut->max-1));
-   ##
-   ##-- return
-   return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
- }
-#line 1556 "Ufunc.pm"
+        sub PDL::ccs_accum_average {
+          my ($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut) = @_;
+          $nOut //= PDL->null;
+          $ixOut //= PDL->null;
+          $nzvalsOut //= PDL->null;
+          &PDL::_ccs_accum_average_int($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut);
+          ##
+          ##-- auto-trim
+          my $trim_slice = "0:".($nOut->max-1);
+          $ixOut     = $ixOut->slice(",$trim_slice");
+          $nzvalsOut = $nzvalsOut->slice($trim_slice);
+          ##
+          ##-- return
+          return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
+        }
+    
+#line 1334 "Ufunc.pm"
 
 
 
 #line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *ccs_accum_average = \&PDL::ccs_accum_average;
-#line 1563 "Ufunc.pm"
+#line 1341 "Ufunc.pm"
 
 
 
-#line 623 "ccsufunc.pd"
+#line 559 "ccsufunc.pd"
 
 
 =pod
@@ -1591,11 +1369,11 @@ zcover, intover, minmaximum
 =back
 
 =cut
-#line 1595 "Ufunc.pm"
+#line 1373 "Ufunc.pm"
 
 
 
-#line 659 "ccsufunc.pd"
+#line 595 "ccsufunc.pd"
 
 
 ##---------------------------------------------------------------------
@@ -1639,7 +1417,7 @@ as Perl itself.
 perl(1), PDL(3perl)
 
 =cut
-#line 1643 "Ufunc.pm"
+#line 1421 "Ufunc.pm"
 
 
 

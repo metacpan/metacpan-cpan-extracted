@@ -39,6 +39,12 @@ Poz - A simple, composable, and extensible data validation library for Perl.
         date => "2005-07-01",
         author => "Damian Conway",
     }); 
+
+    my $bookArraySchema = z->array($z->is("My::Book"));
+    my $book1 = $bookSchema->parse({title => "Perl Best Practices", author => "Damian Conway", published => "2005-07-01"});
+    my $book2 = $bookSchema->parse({title => "Spidering Hacks", author => "Kevin Hemenway", published => "2003-10-01"});
+    my $bookArray = $bookArraySchema->parse([$book1, $book2]);
+    
     
 
 # DESCRIPTION
@@ -113,16 +119,17 @@ Creates a new union schema object.
 
 # SEE ALSO
 
-[Zod](https://zod.dev/)
-[Poz::Builder](https://metacpan.org/pod/Poz%3A%3ABuilder)
-[Poz::Types](https://metacpan.org/pod/Poz%3A%3ATypes)
-[Poz::Types::null](https://metacpan.org/pod/Poz%3A%3ATypes%3A%3Anull)
-[Poz::Types::string](https://metacpan.org/pod/Poz%3A%3ATypes%3A%3Astring)
-[Poz::Types::number](https://metacpan.org/pod/Poz%3A%3ATypes%3A%3Anumber)
-[Poz::Types::object](https://metacpan.org/pod/Poz%3A%3ATypes%3A%3Aobject)
-[Poz::Types::array](https://metacpan.org/pod/Poz%3A%3ATypes%3A%3Aarray)
-[Poz::Types::enum](https://metacpan.org/pod/Poz%3A%3ATypes%3A%3Aenum)
-[Poz::Types::union](https://metacpan.org/pod/Poz%3A%3ATypes%3A%3Aunion)
+- [Zod](https://zod.dev/)
+- [Poz::Builder](https://metacpan.org/pod/Poz%3A%3ABuilder)
+- [Poz::Types](https://metacpan.org/pod/Poz%3A%3ATypes)
+- [Poz::Types::null](https://metacpan.org/pod/Poz%3A%3ATypes%3A%3Anull)
+- [Poz::Types::string](https://metacpan.org/pod/Poz%3A%3ATypes%3A%3Astring)
+- [Poz::Types::number](https://metacpan.org/pod/Poz%3A%3ATypes%3A%3Anumber)
+- [Poz::Types::object](https://metacpan.org/pod/Poz%3A%3ATypes%3A%3Aobject)
+- [Poz::Types::array](https://metacpan.org/pod/Poz%3A%3ATypes%3A%3Aarray)
+- [Poz::Types::enum](https://metacpan.org/pod/Poz%3A%3ATypes%3A%3Aenum)
+- [Poz::Types::union](https://metacpan.org/pod/Poz%3A%3ATypes%3A%3Aunion)
+- [Poz::Types::is](https://metacpan.org/pod/Poz%3A%3ATypes%3A%3Ais)
 
 # HOW TO CONTRIBUTE
 

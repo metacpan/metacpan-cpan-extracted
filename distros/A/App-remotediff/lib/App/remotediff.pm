@@ -3,7 +3,7 @@ package App::remotediff;
 use strict;
 use warnings;
 
-our $VERSION = '1.15';
+our $VERSION = '1.16';
 
 =head1 NAME
 

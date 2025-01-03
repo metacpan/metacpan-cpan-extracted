@@ -63,6 +63,6 @@
          "web" : "https://github.com/briandfoy/module-release-git"
       }
    },
-   "version" : "1.018",
+   "version" : "1.019",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

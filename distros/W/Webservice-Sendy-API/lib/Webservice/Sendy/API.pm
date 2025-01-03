@@ -4,7 +4,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = 0.3;
+our $VERSION = 0.5;
 
 use HTTP::Tiny;
 use JSON            qw/decode_json/;
@@ -34,7 +34,6 @@ sub form_data {
   };
 }
 
-# .. modify for create_campaign
 sub create_campaign {
   my $self     = shift;
   my $params   = {@_};
@@ -59,8 +58,8 @@ sub create_campaign {
     reply_to      => $self->config->campaign->reply_to,
     brand_id      => $self->config->defaults->brand_id,
     list_ids      => $self->config->defaults->list_id,
-    track_opens   => 0,
-    track_clicks  => 0,
+    track_clicks  => ($params->no_track_clicks) ? 0 : 1, # --no_track_clicks
+    track_opens   => ($params->no_track_opens)  ? 0 : 1, # --no_track_opens
     send_campaign => 0,
   };
 
@@ -72,7 +71,7 @@ sub create_campaign {
     }
     # FATAL for anything in $required_defaults set to 'undef'
     elsif (not defined $params->$param and not defined $required_defaults->$param) {
-      die sprintf "[campaign] creation requires: %s; died on '%s'\n", join(",", keys %$required_defaults), $param;
+      die sprintf "[campaign] Missing '%s' flag; creation requires: %s'\n", $param, join(",", keys %$required_defaults);
     }
     $required_options->{$param} = $params->$param;
   }
@@ -93,7 +92,7 @@ sub create_campaign {
   if ($resp->content and $resp->content =~ m/Already|missing|not|valid|Unable/i) {
     my $msg = $resp->content;
     $msg =~ s/\.$//g;
-    die sprintf "[create] Server replied: %s!\n", $msg;
+    die sprintf "[campaign] Server replied: %s!\n", $msg;
   }
 
   # report general failure (it is not clear anything other than HTTP Status of "200 OK" is returned)
@@ -101,33 +100,7 @@ sub create_campaign {
     die sprintf("Server Replied: HTTP Status %s %s\n", $resp->status, $resp->reason);
   }
 
-ddd $resp;
-
-  #return sprintf "%s %s %s\n", ($resp->content eq "1")?"Subscribed":$resp->content, $params->list_id, $params->email;
-}
-
-
-sub _country_codes {
-  return qw(
-    AD AE AF AG AI AL AM AO AR AS AT AU AW AX AZ
-    BA BB BD BE BF BG BH BI BJ BL BM BN BO BQ BR BS
-    BT BU BV BW BY BZ CA CC CD CF CG CH CI CK CL CM
-    CN CO CR CU CV CW CX CY CZ DE DJ DK DM DO DZ
-    EC EE EG EH ER ES ET FI FJ FM FO FR GA GB GD
-    GE GF GG GH GI GL GM GN GP GQ GR GT GU GW GY
-    HK HM HN HR HT HU ID IE IL IM IN IO IQ IR IS
-    IT JE JM JO JP KE KG KH KI KM KN KP KR KW
-    KY KZ LA LB LC LI LK LR LS LT LU LV LY
-    MA MB MC MD ME MF MG MH MK ML MM MN MO MP
-    MQ MR MS MT MU MV MW MX MY MZ NA NC NE NF
-    NG NI NL NO NP NR NU NZ OM PA PE PF PG PH
-    PK PL PM PN PR PT PW PY QA RE RO RS RU RW
-    SA SB SC SD SE SG SH SI SJ SK SL SM SN
-    SO SR SS ST SV SX SY SZ TC TD TF TG TH TJ
-    TK TL TM TN TO TR TT TV TZ UA UG US UY
-    UZ VA VC VE VG VI VN VU WF WG WS YE YT ZA
-    ZM ZW
-  );
+  return $resp->content;
 }
 
 sub subscribe {
@@ -373,11 +346,12 @@ utility
 
 =head1 SYNOPSIS
 
-  use v5.10;   # enables "say" and turns on "use warnings;"
+  use v5.10;
   use strict;
   use Webservice::Sendy::API qw//;
   
-  my $sendy  = Webservice::Sendy::API->new; # looks for default config file 
+  # constructor looks for default config file if not provided ..
+  my $sendy  = Webservice::Sendy::API->new;
   my $brands = $sendy->get_brands;
   
   foreach my $key (sort keys %$brands) {
@@ -385,8 +359,24 @@ utility
     printf "%-3d  %s\n", $brand->id, $brand->name;
   }
 
-B<NOTE:> This module requires a configuration file to be set up. See the ENVIRONMENT
-section below to learn more.
+B<NOTE:> This module requires a configuration file  (defaults to C<$HOME/.sendy.ini>)
+to be set up. See the ENVIRONMENT section below to learn more.
+
+  ; defaults used for specified options
+  [defaults]
+  api_key=sOmekeyFromYourSendy
+  base_url=https://my.domain.tld/sendy
+  brand_id=1
+  list_id=mumdsQnpwnazscoOzKJ763Ow
+  
+  ; campaign information used for default brand_id 
+  [campaign]
+  from_name=List Sender Name
+  from_email=your-email-list@domain.tld
+  reply_to=some-other-reply-to@domain.tld
+
+Save this file as C<$HOM/.sendy.ini>, and you may start to use the
+C<sendy> commandline utility.
 
 =head1 DESCRIPTION
 
@@ -430,12 +420,19 @@ other fields required by the API can use defaults in the configuration file,
 listed after the check:
 
 B<Required fields:> from_name*, from_email*, reply_to*, title, subject,
-html_text, list_ids*, brand_id*, track_opens, track_clicks, send_campaign
+html_text, list_ids*, brand_id*, no_track_opens, no_track_clicks, send_campaign
 (* = uses defaults in C<.sendy.ini>)
 
 B<Optional fields:> plain_text, segment_ids, exclude_list_ids, query_string,
 schedule_date_time, schedule_timezone
 
+NOTE: Unless C<no_track_opens> and C<no_track_clicks> are set to I<1>
+value, the campaign created will have them I<ON>, respectively. In the C<sendy>
+tool, this means that to turn off tracking, you'd need to supply the flags,
+C<--no_track_opens --no_track_clicks>; in a similar way, the default behavior
+will always be to just create a draft. Therefore, to send the actual email
+campaign via this command, the C<send_campaign> flag must be set to I<1>.
+ 
 See more information about the call on Sendy's specification,
 L<https://sendy.co/api#create-send-campaigns>.
 
@@ -570,6 +567,14 @@ Usage
 Creates an email campaign based on specified options. Status is returned
 via C<STDOUT>.
 
+By default full tracking is enabled. To turn off tracking, use the flags,
+C<--no_track_opens> and C<--no_track_clicks>.
+
+To send right away, rather than just creating a draft; use the
+C<--send_campaign> flag. There is currently no support to schedule the
+sending of a campaign at a later time. Please let me know if you need this
+ability. Otherwise it'll get implemented if and when I needed it.
+
 Usage,
 
   sendy create [--config alt-config.ini] --list_ids A,B,C,...
@@ -652,7 +657,7 @@ mode or automatically change permissions on the file.
 
 Brett Estrade L<< <oodler@cpan.org> >>
 
-Find out about more Perl API clients at L<https://perlclientdirectory.com>.
+Find out about this client and more Perl API clients at L<https://PerlClientDirectory.com>.
 
 =head1 BUGS
 

@@ -1,5 +1,8 @@
 Revision history for Perl module Test::Output
 
+1.035 2025-01-03T06:45:21Z
+	* distro refresh and move to BRIANDFOY
+
 1.034 2023-07-05T14:46:18Z
 	* Remove unnecessary -T from pod tests. Now that v5.38 allows you
 	to compile without taint support and those perls won't run if

@@ -11,7 +11,7 @@ use PDL::Exporter;
 use DynaLoader;
 
 
-   our $VERSION = '1.23.29';
+   our $VERSION = '1.24.0';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::CCS::MatrixOps $VERSION;
@@ -56,9 +56,9 @@ PDL::CCS::MatrixOps - Low-level matrix operations for compressed storage sparse 
 
 
 
-#line 59 "ccsmatops.pd"
+#line 60 "ccsmatops.pd"
 
-*ccs_indx = \&PDL::indx; ##-- typecasting for CCS indices
+*ccs_indx = \&PDL::indx; ##-- typecasting for CCS indices (deprecated)
 #line 63 "MatrixOps.pm"
 
 
@@ -72,11 +72,11 @@ PDL::CCS::MatrixOps - Low-level matrix operations for compressed storage sparse 
 =for sig
 
   Signature: (
-    indx ixa(NdimsA,NnzA); nza(NnzA); missinga();
+    indx ixa(Two,NnzA); nza(NnzA); missinga();
     b(O,M);
     zc(O);
     [o]c(O,N)
-    )
+    ; PDL_Indx sizeN)
 
 
 Two-dimensional matrix multiplication of a sparse index-encoded PDL
@@ -93,12 +93,12 @@ a $missinga()-row ("M") to an output column ("O"), i.e.
 
  $zc = ((zeroes($M,1)+$missinga) x $b)->flat;
 
-$SIZE(Ndimsa) is assumed to be 2.
+$SIZE(Two) must be 2.
 
 
 =for bad
 
-ccs_matmult2d_sdd does not process bad values.
+ccs_matmult2d_sdd processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
@@ -123,10 +123,10 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (
-    indx ixa(Ndimsa,NnzA); nza(NnzA);
+    indx ixa(Two,NnzA); nza(NnzA);
     b(O,M);
     [o]c(O,N)
-    )
+    ; PDL_Indx sizeN)
 
 
 Two-dimensional matrix multiplication of a sparse index-encoded PDL
@@ -137,13 +137,13 @@ dimension "M" and 1st dimension "N", just as for the
 built-in PDL::Primitive::matmult().
 
 "Missing" values in $a() are treated as zero.
-$SIZE(Ndimsa) is assumed to be 2.
+$SIZE(Two) must be 2.
 
 
 =for bad
 
 ccs_matmult2d_zdd processes bad values.
-The state of the bad-value flag of the output ndarrays is unknown.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -169,7 +169,7 @@ The state of the bad-value flag of the output ndarrays is unknown.
   Signature: (
     indx acols(NnzA); avals(NnzA);
     float+ [o]vnorm(M);
-    ; int sizeM=>M)
+    ; PDL_Indx sizeM=>M)
 
 
 Computes the Euclidean lengths of each column-vector $a(i,*) of a sparse index-encoded pdl $a()
@@ -184,24 +184,23 @@ This is basically the same thing as:
 ... but should be must faster to compute for sparse index-encoded piddles.
 
 
-
 =for bad
 
 ccs_vnorm() always clears the bad-status flag on $vnorm().
 
 =cut
-#line 194 "MatrixOps.pm"
+#line 193 "MatrixOps.pm"
 
 
 
 #line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *ccs_vnorm = \&PDL::ccs_vnorm;
-#line 201 "MatrixOps.pm"
+#line 200 "MatrixOps.pm"
 
 
 
-#line 252 "ccsmatops.pd"
+#line 275 "ccsmatops.pd"
 
 
 =pod
@@ -215,7 +214,7 @@ ccs_vnorm() always clears the bad-status flag on $vnorm().
     b(N);
     float+ [o]vcos(M);
     float+ [t]anorm(M);
-    int sizeM=>M;
+    PDL_Indx sizeM=>M;
   )
 
 
@@ -268,17 +267,16 @@ sub ccs_vcos_zdd {
   $M = $anorm->dim(0) if (!defined($M) && defined($anorm) && !$anorm->isempty);
   $M = $ixa->slice("(0),")->max+1 if (!defined($M));
 
-  ##-- compat: create output piddles, implicitly computing anorm() if required
+  ##-- compat: implicitly compute anorm() if required
   $anorm = $ixa->slice("(0),")->ccs_vnorm($nza, $M) if (!defined($anorm) || $anorm->isempty);
-  $vcos  = PDL->zeroes($anorm->type, $M, ($b->dims)[1..$b->ndims-1]) if (!defined($vcos) || $vcos->isempty);
 
   ##-- guts
-  $ixa->_ccs_vcos_zdd($nza,$b, $anorm, $vcos);
+  $ixa->_ccs_vcos_zdd($nza,$b, $anorm, ($vcos//=PDL->null));
   return $vcos;
 }
 
 *PDL::ccs_vcos_zdd = \&ccs_vcos_zdd;
-#line 282 "MatrixOps.pm"
+#line 280 "MatrixOps.pm"
 
 
 
@@ -305,14 +303,14 @@ Guts for L<ccs_vcos_zdd()|/ccs_vcos_zdd>, with slightly different calling conven
 Always clears the bad status flag on the output piddle $vcos.
 
 =cut
-#line 309 "MatrixOps.pm"
+#line 307 "MatrixOps.pm"
 
 
 
 #line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *_ccs_vcos_zdd = \&PDL::_ccs_vcos_zdd;
-#line 316 "MatrixOps.pm"
+#line 314 "MatrixOps.pm"
 
 
 
@@ -345,18 +343,18 @@ for $a().
 ccs_vcos_pzd() always clears the bad status flag on the output piddle $vcos.
 
 =cut
-#line 349 "MatrixOps.pm"
+#line 347 "MatrixOps.pm"
 
 
 
 #line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *ccs_vcos_pzd = \&PDL::ccs_vcos_pzd;
-#line 356 "MatrixOps.pm"
+#line 354 "MatrixOps.pm"
 
 
 
-#line 497 "ccsmatops.pd"
+#line 496 "ccsmatops.pd"
 
 
 ##---------------------------------------------------------------------
@@ -402,7 +400,7 @@ as Perl itself.
 perl(1), PDL(3perl)
 
 =cut
-#line 406 "MatrixOps.pm"
+#line 404 "MatrixOps.pm"
 
 
 

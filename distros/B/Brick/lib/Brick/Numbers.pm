@@ -4,7 +4,7 @@ use strict;
 use base qw(Exporter);
 use vars qw($VERSION);
 
-$VERSION = '0.902';
+$VERSION = '0.903';
 
 package Brick::Bucket;
 use strict;
@@ -36,14 +36,12 @@ Hash fields:
 
 =cut
 
-sub number_within_range
-	{
+sub number_within_range {
 	my( $bucket, $setup ) = @_;
 
 	my @missing = sort grep { ! defined $setup->{$_} } qw( minimum maximum );
 
-  	if( @missing )
-    	{
+  	if( @missing ) {
     	no warnings 'uninitialized';
     	croak( sprintf "number_within_range missing %s%s attibute%s",
     		$missing[0],
@@ -64,8 +62,7 @@ sub number_within_range
 	$bucket->__make_constraint( $composed_sub, $setup );
 	}
 
-sub _is_only_decimal_digits
-	{
+sub _is_only_decimal_digits {
 	my( $bucket, $setup ) = @_;
 
 	my @caller = $bucket->__caller_chain_as_list();
@@ -89,8 +86,7 @@ sub _is_only_decimal_digits
 		} );
 	}
 
-sub _is_decimal_integer
-	{
+sub _is_decimal_integer {
 	my( $bucket, $setup ) = @_;
 
 	my @caller = $bucket->__caller_chain_as_list();
@@ -116,8 +112,7 @@ sub _is_decimal_integer
 		} );
 	}
 
-sub _inclusive_within_numeric_range
-	{
+sub _inclusive_within_numeric_range {
 	my( $bucket, $setup ) = @_;
 
 	my @caller = $bucket->__caller_chain_as_list();
@@ -133,8 +128,7 @@ sub _inclusive_within_numeric_range
 		} );
 	}
 
-sub _exclusive_within_numeric_range
-	{
+sub _exclusive_within_numeric_range {
 	my( $bucket, $setup ) = @_;
 
 	my @caller = $bucket->__caller_chain_as_list();
@@ -151,8 +145,7 @@ sub _exclusive_within_numeric_range
 
 	}
 
-sub _numeric_equal_or_greater_than
-	{
+sub _numeric_equal_or_greater_than {
 	my( $bucket, $setup ) = @_;
 
 	my @caller = $bucket->__caller_chain_as_list();
@@ -171,8 +164,7 @@ sub _numeric_equal_or_greater_than
 		} );
 	}
 
-sub _numeric_strictly_greater_than
-	{
+sub _numeric_strictly_greater_than {
 	my( $bucket, $setup ) = @_;
 
 	my @caller = $bucket->__caller_chain_as_list();
@@ -191,8 +183,7 @@ sub _numeric_strictly_greater_than
 		} );
 	}
 
-sub _numeric_equal_or_less_than
-	{
+sub _numeric_equal_or_less_than {
 	my( $bucket, $setup ) = @_;
 
 	my @caller = $bucket->__caller_chain_as_list();
@@ -211,8 +202,7 @@ sub _numeric_equal_or_less_than
 		} );
 	}
 
-sub _numeric_strictly_less_than
-	{
+sub _numeric_strictly_less_than {
 	my( $bucket, $setup ) = @_;
 
 	my @caller = $bucket->__caller_chain_as_list();
@@ -249,11 +239,11 @@ This source is in Github:
 
 =head1 AUTHOR
 
-brian d foy, C<< <bdfoy@cpan.org> >>
+brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT
 
-Copyright © 2007-2022, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2007-2025, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

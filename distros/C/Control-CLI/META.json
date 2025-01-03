@@ -39,18 +39,21 @@
    "provides" : {
       "Control::CLI" : {
          "file" : "lib/Control/CLI.pm",
-         "version" : "2.11"
+         "version" : "2.12"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Control-CLI"
+         "web" : "https://github.com/lgastevens/Control-CLI/issues"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
-      ]
+      ],
+      "repository" : {
+         "url" : "https://github.com/lgastevens/Control-CLI"
+      }
    },
-   "version" : "2.11",
+   "version" : "2.12",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

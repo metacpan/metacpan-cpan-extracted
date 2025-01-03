@@ -214,10 +214,28 @@ sub to_hash {
 
 sub as_json {
   my ($self, @args) = @_;
-  return $self->to_hash(@args);
+  return $self->object->errors_as_json($self) if $self->object->can('errors_as_json');
+  return $self->as_rfc_7807;
 }
 
-sub TO_JSON { +{ shift->as_json(1) } }
+sub as_rfc_7807 {
+  my $self = shift;
+  my %hash = $self->to_hash(1);
+
+  my %rfc = (fields => {}, general => []);
+  foreach my $field (keys %hash) {
+    if ($field eq '*') {
+        # General errors
+        push @{ $rfc{general} }, @{ $hash{$field} };
+    } else {
+        # Field-specific errors
+        $rfc{fields}->{$field} = $hash{$field};
+    }
+  }
+  return \%rfc;
+}
+
+sub TO_JSON { shift->as_json }
 
 # Adds +message+ to the error messages and used validator type to +details+ on +attribute+.
 # More than one error can be added to the same +attribute+.
@@ -552,11 +570,66 @@ An array of all the messages for the given attribute (localized if needed).
 
 An array of all the full messages for the given attribute (localized if needed).
 
+=head2 as_rfc_7807
+
+Returns a hashref suitable for contstructing an error response compatible with
+RFC-7807, an open standard for returning errors formated in JSON from web APIs.
+
+Example response:
+
+   {
+      fields => {
+        attendees => [
+          "Attendees Are Invalid",
+        ],
+        "attendees[0].role" => [
+          "Attendees Role is too short (minimum is 2 characters)",
+        ],
+        "attendees[1].role" => [
+          "Attendees Role is too short (minimum is 2 characters)",
+        ],
+      },
+      general => [
+        "A model error",
+      ],
+    }
+
+You can use this to construct the C<errors> field of a compliant response.  Here's how
+A full response might look like encoded in JSON.
+
+    {
+      "type": "https://example.com/probs/validation-error",
+      "title": "Validation Error",
+      "status": 400,
+      "detail": "There are validation errors in your request.",
+      "errors": {
+        "fields": {
+          "attendees": [
+            "Attendees Are Invalid"
+          ],
+          "attendees[0].role": [
+            "Attendees Role is too short (minimum is 2 characters)"
+          ],
+          "attendees[1].role": [
+            "Attendees Role is too short (minimum is 2 characters)"
+          ]
+        },
+        "general": [
+          "A model error"
+        ]
+      }
+    }
+
 =head1 JSONification
 
 This class provides a C<TO_JSON> method suitable for use in some of the common
 JSON serializers.  When supported it will delegate the job of turning the object
-into a hash that can be serialized to JSON to the C<to_hash> method.
+into a hash that can be serialized to JSON to the C<as_rfc_7807> method.
+
+If you wish to overide this, you can have your model object provide a method
+C<errors_as_json> which will recieve the errors object as an argument and then
+you can format it as you wish.  This method should return a hash or array reference
+that can be passed to one of the standard C<JSON> encoders.
 
 =head1 SEE ALSO
  

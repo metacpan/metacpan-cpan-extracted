@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use Data::Dumper qw{Dumper};
-use Test::More tests => 16;
+use Test::More tests => 18;
 
 BEGIN { use_ok( 'SMS::Send::Driver::WebService' ); }
 
@@ -38,3 +38,5 @@ is($service->protocol,    'protocol_cfg',    'protocol');
 is($service->port,        'port_cfg',        'port');
 is($service->script_name, 'script_name_cfg', 'script_name');
 is($service->url,         'url_cfg',         'url');
+is($service->warnings,    'warnings_cfg',    'warnings');
+is($service->debug,       'debug_cfg',       'debug');

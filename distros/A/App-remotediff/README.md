@@ -20,8 +20,7 @@ SYNOPSIS
 DESCRIPTION
 -----------
 
-`remotediff` uses `rsync` to copy remote files to a tmp directory, before
-executing `diff` on them locally.
+`remotediff` uses `rsync` to copy remote files to a tmp directory, before executing `diff` on them locally.
 
 The remote files are cached between program executions.
 
@@ -50,12 +49,15 @@ To install this module manually, run the following commands :
 SUPPORT AND DOCUMENTATION
 -------------------------
 
-After installing, you can find documentation for this module with the
-perldoc command :
+After installing, you can find documentation for this module with the `perldoc` command :
 
     perldoc remotediff
 
 You can also look for information at :
+
+- CPAN
+
+    [https://metacpan.org/release/App-remotediff](https://metacpan.org/release/App-remotediff)
 
 - GITHUB
 
@@ -65,7 +67,7 @@ You can also look for information at :
 LICENSE AND COPYRIGHT
 ---------------------
 
-This software is Copyright (c) 2022 by jul.
+This software is Copyright (c) 2022-2025 by jul.
 
 This is free software, licensed under:
 

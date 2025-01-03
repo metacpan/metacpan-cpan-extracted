@@ -32,7 +32,7 @@ use Fey::NamedObjectSet;
 
     $set->add($bob);
     @objects = $set->objects('bob');
-    is( scalar @objects, 1, 'objects() returns one object named bob' );
+    is( scalar @objects,     1, 'objects() returns one object named bob' );
     is( $objects[0]->name(), 'bob', 'that one object is bob' );
 
     is(

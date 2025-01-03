@@ -1,5 +1,5 @@
-uricolor - Colorize URIs with ANSI colors.
-==========================================
+uricolor - Colorize URIs with ANSI colors
+=========================================
 
 SYNOPSIS
 --------
@@ -12,13 +12,12 @@ SYNOPSIS
     -s              schemeless
     -c              color (default : underline blue)
 
+
 DESCRIPTION
 -----------
 
-uricolor is a Perl script to colorize URIs with ANSI colors.
-It reads files sequentially, and writes them to STDOUT,
-with all URIs colored. If file is a dash "-" or if no file
-is given as argument, uricolor reads from STDIN.
+`uricolor` is a tool to colorize URIs with ANSI colors. It reads files sequentially, and writes them to STDOUT, with all URIs colored. If file is a dash "-" or if no file is given as argument, `uricolor` reads from STDIN.
+
 
 INSTALLATION
 ------------
@@ -38,16 +37,17 @@ To install this module manually, run the following commands :
     make test
     make install
 
+
 PREREQUISITES
 -------------
 
 URI::Find, URI::Find::Schemeless, Term::ANSIColor
 
+
 SUPPORT AND DOCUMENTATION
 -------------------------
 
-After installing, you can find documentation for this module with the
-perldoc command :
+After installing, you can find documentation for this module with the `perldoc` command :
 
     perldoc uricolor
 
@@ -61,10 +61,11 @@ You can also look for information at :
 
     [https://github.com/kal247/App-uricolor](https://github.com/kal247/App-uricolor)
 
+
 LICENSE AND COPYRIGHT
 ---------------------
 
-This software is Copyright (c) 2019 by jul.
+This software is Copyright (c) 2019-2025 by jul.
 
 This is free software, licensed under:
 

@@ -13,6 +13,7 @@ my $SeriaPort		= '';		# To manually set the a Serial port to test with; e.g 'COM
 my $TestMultiple	= 1;		# Set to 0 if you only want to test against one device
 my $ConnectionType	;
 my $Blocking		;		# blocking mode
+my $Binmode		= 0;		# binmode = 0 (default) does newline translation; binmode = 1 does not
 my $Timeout		= 10;		# seconds
 my $ConnectionTimeout	= 15;		# seconds
 my $ErrorMode		= 'return';	# always return, so we check outcome in this test script
@@ -267,6 +268,7 @@ do {{ # Test loop, we keep testing until user satisfied
 		  	Timeout 		=> $Timeout,		# optional; default timeout = 10 secs
 		  	Connection_timeout	=> $ConnectionTimeout,	# optional; default is not set
 			Errmode 		=> $ErrorMode,		# optional; default = 'croak'
+			Binmode			=> $Binmode,		# optional; defalut = 0
 			Errmsg_format		=> $ErrMsgFormat,
 			Input_log		=> $InputLog,
 			Output_log		=> $OutputLog,
@@ -365,7 +367,15 @@ do {{ # Test loop, we keep testing until user satisfied
 	ok( !$eof, "Testing eof is false after connecting" );
 
 	# Test login (we do this also for SSH, needed if device accepts SSH connection without authentication; no harm otherwise)
-	$cli->print if $connectionType eq 'SERIAL';
+	if ($connectionType eq 'SERIAL') {
+		$ok = $cli->print;
+		ok( $ok, "Testing print() method to prime SERIAL login");
+		unless ($ok) {
+			diag $cli->errmsg;
+			$cli->disconnect;
+			last;
+		}
+	}
 	($ok, $output) = $cli->login(
 			Username		=>	$username,		# optional (with PromptCredentials=1 will be prompted for, if required)
 			Password		=>	$password,		# optional (with PromptCredentials=1 will be prompted for, if required)

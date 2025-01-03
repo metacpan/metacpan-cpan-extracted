@@ -10,7 +10,7 @@ use PDL::CCS::IO::Common qw(:intern); ##-- for e.g. _ccsio_write_header, _ccsio_
 use Carp qw(confess);
 use strict;
 
-our $VERSION = '1.23.29';
+our $VERSION = '1.24.0';
 our @ISA = ('PDL::Exporter');
 our @EXPORT_OK =
   (
@@ -39,7 +39,7 @@ PDL::CCS::IO::FITS - PDL::IO::FITS wrappers for PDL::CCS::Nd
 
  $ccs = PDL::CCS::Nd->newFromWhich($which,$nzvals);
 
- ccs_wfits($ccs,$fname);	 # write a pair of FITS files
+ ccs_wfits($ccs,$fname);         # write a pair of FITS files
  $ccs2 = ccs_readfits($fname);   # read a pair of FITS files
 
 =cut
@@ -142,11 +142,11 @@ sub ccs_rfits {
 
   ##-- construct and return
   return PDL::CCS::Nd->newFromWhich($ix,$nz,
-				    pdims=>$header->{pdims},
-				    vdims=>$header->{vdims},
-				    flags=>$header->{flags},
-				    sorted=>($opts->{sorted}//1),
-				    steal=>1);
+                                    pdims=>$header->{pdims},
+                                    vdims=>$header->{vdims},
+                                    flags=>$header->{flags},
+                                    sorted=>($opts->{sorted}//1),
+                                    steal=>1);
 }
 
 

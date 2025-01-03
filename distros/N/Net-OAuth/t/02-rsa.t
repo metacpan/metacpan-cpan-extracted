@@ -26,6 +26,10 @@ SKIP: {
     $publickey = Crypt::OpenSSL::RSA->new_public_key(slurp("t/rsakey.pub"));
     } or die "unable to read public key";
 
+    # Crypt::OpenSSL::RSA changed its default to sha256 in 0.29_01
+    $privkey->use_sha1_hash;
+    $publickey->use_sha1_hash;
+
     my $request = Net::OAuth::ProtectedResourceRequest->new(
             consumer_key => 'dpf43f3p2l4k3l03',
             consumer_secret => 'kd94hf93k423kf44',

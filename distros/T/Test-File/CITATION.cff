@@ -6,6 +6,7 @@ authors:
 - family-names: foy
   given-names: brian d
   orcid: 0000-0002-0283-8283
+  email: briandfoy@pobox.com
 cff-version: 1.2.0
 date-released: refs/tags/v1.36
 doi: 10.5281/zenodo.6093297

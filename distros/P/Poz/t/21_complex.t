@@ -76,6 +76,10 @@ my ($result, $error) = $receipt_schema->safe_parse($test_data);
 # Test results
 is($error, undef, 'expected no error');
 is($result->{table_number}, 10, 'table_number is 10');
+
+for my $order (@{$result->{orders}}) {
+  isa_ok($order, 'BurgerShop::Order', 'order is BurgerShop::Order: got '. ref($order));
+}
 is_deeply($result->{orders}, [
   bless({
     item => {
@@ -92,10 +96,14 @@ is_deeply($result->{orders}, [
     amounts => 1,
   }, 'BurgerShop::Order'),
 ], 'orders is correct');
+isa_ok($result->{staff}, 'BurgerShop::Staff', 'staff is BurgerShop::Staff: got '. ref($result->{staff}));
 is_deeply($result->{staff}, bless({
   id => 1,
   name => 'Taro Yamada',
 }, 'BurgerShop::Staff'), 'staff is correct');
 like($result->{ordered_at}, qr/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/, 'ordered_at is correct');
+
+my $is_burger_shop_receipt_schema = z->is('BurgerShop::Receipt');
+is($is_burger_shop_receipt_schema->parse($result), $result, 'BurgerShop::Receipt');
 
 done_testing;

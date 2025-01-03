@@ -73,7 +73,7 @@ my %WriteMakefile = (
 	'PREREQ_PM'     => {
 		'Lingua::EN::Syllable'           => '0',
 		'Unicode::GCString'              => '0',
-		'Unicode::Unihan'                => '0',
+		'Unicode::Unihan'                => '0.043',
 		'Lingua::KO::Hangul::Util'       => '0',
 # This is broken on CPAN because the source files have disappeared
 # I have a patch https://github.com/briandfoy/lingua-ja-romanize-japanese
@@ -88,7 +88,7 @@ my %WriteMakefile = (
 		resources => {
 			repository => {
 				type => 'git',
-				url  => "$github.git",
+				url  => $github,
 				web  => $github,
 				},
 			bugtracker => {

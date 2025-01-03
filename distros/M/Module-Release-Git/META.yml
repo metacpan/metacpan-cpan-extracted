@@ -34,5 +34,5 @@ resources:
   bugtracker: https://github.com/briandfoy/module-release-git/issues
   homepage: https://github.com/briandfoy/module-release-git
   repository: https://github.com/briandfoy/module-release-git
-version: '1.018'
+version: '1.019'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

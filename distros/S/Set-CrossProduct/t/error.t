@@ -1,14 +1,22 @@
-use Test::More 0.95;
+use strict;
+use warnings;
 
+use Test::More 1;
 my $class = 'Set::CrossProduct';
-use_ok( $class );
 
-my @apples  = ('Granny Smith', 'Washington', 'Red Delicious');
-my @oranges = ('Navel', 'Florida');
+subtest 'sanity' => sub {
+	use_ok $class or BAIL_OUT( "$class did not compile" );
+	can_ok $class, 'nth';
+	};
 
-no warnings;
+subtest 'warnings' => sub {
+	my @apples  = ('Granny Smith', 'Washington', 'Red Delicious');
+	my @oranges = ('Navel', 'Florida');
 
-my $cross = Set::CrossProduct->new( [ \@apples ] );
-ok( !( defined $cross ), 'Single array returns undef' );
+	no warnings;
+
+	my $cross = $class->new( [ \@apples ] );
+	ok ! defined $cross, 'Single array returns undef';
+	};
 
 done_testing();

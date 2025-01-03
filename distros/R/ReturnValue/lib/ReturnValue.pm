@@ -9,7 +9,7 @@ use parent qw(Hash::AsObject);
 
 use Carp;
 
-our $VERSION = '0.903';
+our $VERSION = '0.904';
 
 =encoding utf8
 
@@ -178,15 +178,15 @@ package ReturnValue::Error {
 
 This source is in Github:
 
-	http://github.com/perlreview/returnvalue/
+	http://github.com/briandfoy/returnvalue/
 
 =head1 AUTHOR
 
-brian d foy, <bdfoy@cpan.org>
+brian d foy, <briandfoy@pobox.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2013-2022, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2013-2025, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

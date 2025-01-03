@@ -1,5 +1,5 @@
-bookmarks - Export bookmarks from browsers and files.
-=====================================================
+bookmarks - Export bookmarks from browsers and files
+====================================================
 
 SYNOPSIS
 --------
@@ -10,17 +10,16 @@ SYNOPSIS
     -V, --version   version
     -d              debug (sent to STDERR)
     -a              all : process arguments and default locations
-    -f format       export format : csv, csv-noheader, html, html-raw, or any combination
-                    of characters t,u,d as <title> <url> <description> (default : tud)
+    -f format       export format : csv, csv-noheader, html, html-raw,
+                    or any combination of characters t,u,d as
+                    <title> <url> <description> (default : tud)
     -s              find schemeless URLs in text files (default : no)
 
 
 DESCRIPTION
 -----------
 
-`bookmarks` is a tool to export bookmarks from files supplied as arguments.
-Without arguments, or with option -a, `bookmarks` will attempt to read files from browsers default locations.
-If file is a dash "-", STDIN is read and processed as plain text source. 
+`bookmarks` is a tool to export bookmarks from files supplied as arguments. Without arguments, or with option `-a`, `bookmarks` will attempt to read files from browsers default locations. If file is a dash "-", STDIN is read and processed as plain text source. 
 
 Supported sources :
 
@@ -28,7 +27,7 @@ Supported sources :
 - Firefox (_*.sqlite_)
 - Chrome and Edge (_*Bookmarks_)
 - Internet Explorer (_*Favorites_)
-- Netscape (_*.html_)
+- Netscape Bookmarks File Format (_*.html_)
 - Markdown (_*.md_)
 - Gemini (_*.gmi_)
 - Surfraw (same as plain text)
@@ -49,7 +48,7 @@ Markdown, Gemini and plain text files are processed line by line (as UTF-8) :
 
 Output format :
 
-By default, fields <title> <url> <description> are exported as plain text. This can be changed by using option -f and specifying any combination of characters t,u,d.
+By default, fields `<title>` `<url>` `<description>` are exported as plain text. This can be changed by using option `-f` and specifying any combination of characters t,u,d.
 Other possible values :
 
 - `csv` : Comma-separated values with double-quotes and CR NL (RFC 4180).
@@ -142,8 +141,7 @@ All are optional.
 SUPPORT AND DOCUMENTATION
 -------------------------
 
-After installing, you can find documentation for this module with the
-perldoc command :
+After installing, you can find documentation for this module with the `perldoc` command :
 
     perldoc bookmarks
 

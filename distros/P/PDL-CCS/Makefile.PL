@@ -1,13 +1,14 @@
 use ExtUtils::MakeMaker;
+require 5.10.0;  ##-- for the `//=` operator
 require "./pdlmaker.plm";
 pdlmaker_init();
 
 ##-- prerequisites (for PREREQ_PM)
 my %prereq = (
-	      'PDL' => '2.082',
-	      'PDL::VectorValued' => '1.0.4',
-	      'File::Basename' => 0,
-	     );
+  'PDL' => '2.081',
+  'PDL::VectorValued' => '1.0.4',
+  'File::Basename' => 0,
+);
 
 ##-- read in user variables
 do "./Config.PL";
@@ -17,44 +18,44 @@ die "$0: reading './Config.PL' failed: $@" if ($@);
 ##     ERROR from evaluation of .../ccsutils/Makefile.PL:
 ##     Modification of a read-only value attempted at /usr/share/perl/5.8/Carp/Heavy.pm line 45.
 my $realclean_files = join(' ',
-			   qw(*~ *.tmp),
-			   (-e 'README.rpod' ? qw(README.txt README.html) : qw()),
-			   (-e 'Config.PL' ? qw(CCS/Config.pm) : qw()),
-			  );
+                           qw(*~ *.tmp),
+                           (-e 'README.rpod' ? qw(README.txt README.html) : qw()),
+                           (-e 'Config.PL' ? qw(CCS/Config.pm) : qw()),
+                          );
 WriteMakefile(
-	      NAME   =>'PDL::CCS',
-	      AUTHOR => 'Bryan Jurish',
-	      ABSTRACT =>'Sparse N-dimensional PDLs with compressed column storage',
-	      ##
-	      VERSION_FROM => 'CCS.pm',
-	      LICENSE => 'perl',
-	      ##
-	      #PM => { (map {$_=>"\$(INST_LIBDIR)/CCS/$_"} <*.pm>), },
-	      DIR =>[
-		     'CCS',
-		    ],
-	      realclean=>{ FILES=>$realclean_files, },
-	      PREREQ_PM => {%prereq},
-	      TEST_REQUIRES => {
-		'Test::More' => '0.88',
-	      },
-	      CONFIGURE_REQUIRES => {
-				     %prereq,
-				     'ExtUtils::MakeMaker'=>0,
-				     'Data::Dumper' => 0,
-				    },
-	      ##
-	      META_MERGE => {
-			     "meta-spec" => { version => 2 },
-			     resources => {
-					   repository => {
-							  url => 'git://github.com/moocow-the-bovine/PDL-CCS.git',
-							  type => 'git',
-							  web => 'https://github.com/moocow-the-bovine/PDL-CCS',
-							 },
-					  },
-			    },
-	     );
+  NAME   =>'PDL::CCS',
+  AUTHOR => 'Bryan Jurish',
+  ABSTRACT =>'Sparse N-dimensional PDLs with compressed column storage',
+  ##
+  VERSION_FROM => 'CCS.pm',
+  LICENSE => 'perl',
+  ##
+  #PM => { (map {$_=>"\$(INST_LIBDIR)/CCS/$_"} <*.pm>), },
+  DIR =>[
+    'CCS',
+  ],
+  realclean=>{ FILES=>$realclean_files, },
+  PREREQ_PM => {%prereq},
+  TEST_REQUIRES => {
+    'Test::More' => '0.88',
+  },
+  CONFIGURE_REQUIRES => {
+    %prereq,
+    'ExtUtils::MakeMaker'=>0,
+    'Data::Dumper' => 0,
+  },
+  ##
+  META_MERGE => {
+    "meta-spec" => { version => 2 },
+    resources => {
+      repository => {
+        url => 'git://github.com/moocow-the-bovine/PDL-CCS.git',
+        type => 'git',
+        web => 'https://github.com/moocow-the-bovine/PDL-CCS',
+      },
+    },
+  },
+);
 
 ##-- avoid applying 'processPL' rules to 'Config.PL'
 sub MY::processPL { return ''; }

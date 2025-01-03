@@ -1,10 +1,10 @@
 {
    "abstract" : "test file attributes",
    "author" : [
-      "brian d foy <bdfoy@cpan.org>"
+      "brian d foy <briandfoy@pobox.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "testing",
       "file"
@@ -70,6 +70,6 @@
          "web" : "https://github.com/briandfoy/test-file"
       }
    },
-   "version" : "1.993",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "1.994",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -102,6 +102,24 @@ ok $new_meeting->valid;
       "Attendees Role is too short (minimum is 2 characters)",
     ],
   };
+
+  $new_meeting->errors->add(undef, 'testerror');
+  is_deeply $new_meeting->errors->as_rfc_7807, {
+    fields => {
+      attendees => [
+        "Attendees Are Invalid",
+      ],
+      "attendees[0].role" => [
+        "Attendees Role is too short (minimum is 2 characters)",
+      ],
+      "attendees[1].role" => [
+        "Attendees Role is too short (minimum is 2 characters)",
+      ],
+    },
+    general => [
+      "testerror",
+    ],
+  }
 }
 
 done_testing;

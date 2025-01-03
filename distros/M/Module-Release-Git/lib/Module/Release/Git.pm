@@ -19,7 +19,7 @@ our @EXPORT = qw(
 	vcs_tag
 	);
 
-our $VERSION = '1.018';
+our $VERSION = '1.019';
 
 =encoding utf8
 
@@ -306,7 +306,7 @@ brian d foy, <briandfoy@pobox.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2007-2024, brian d foy <briandfoy@pobox.com>. All rights reserved.
+Copyright © 2007-2025, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 You may redistribute this under the same terms as the Artistic License 2.0.
 

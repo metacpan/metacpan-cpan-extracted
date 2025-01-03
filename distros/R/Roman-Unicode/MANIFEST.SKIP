@@ -67,3 +67,4 @@ Roman−.*
 \.icloud$
 \A\.github\b
 
+\.gitattributes\b

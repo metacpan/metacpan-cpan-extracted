@@ -4,7 +4,10 @@ use strict;
 use warnings;
 use warnings::register;
 
-our $VERSION = '2.009';
+use Carp qw(carp);
+use List::Util qw( reduce );
+
+our $VERSION = '3.001';
 
 =encoding utf8
 
@@ -15,36 +18,40 @@ Set::CrossProduct - work with the cross product of two or more sets
 =head1 SYNOPSIS
 
 	# unlabeled sets
-	my $iterator = Set::CrossProduct->new( ARRAY_OF_ARRAYS );
+	my $cross = Set::CrossProduct->new( ARRAY_OF_ARRAYS );
 
 	# or labeled sets where hash keys are the set names
-	my $iterator = Set::CrossProduct->new( HASH_OF_ARRAYS );
+	my $cross = Set::CrossProduct->new( HASH_OF_ARRAYS );
 
 	# get the number of tuples
-	my $number_of_tuples = $iterator->cardinality;
+	my $number_of_tuples = $cross->cardinality;
 
 	# get the next tuple
-	my $tuple            = $iterator->get;
+	my $tuple            = $cross->get;
 
 	# move back one position
-	my $tuple            = $iterator->unget;
+	my $tuple            = $cross->unget;
 
 	# get the next tuple without resetting
 	# the cursor (peek at it)
-	my $next_tuple       = $iterator->next;
+	my $next_tuple       = $cross->next;
 
 	# get the previous tuple without resetting
 	# the cursor
-	my $last_tuple       = $iterator->previous;
+	my $last_tuple       = $cross->previous;
+
+	# get a particular tuple with affecting the cursor
+	# this is zero based
+	my $nth_tuple        = $cross->nth($n);
 
 	# get a random tuple
-	my $tuple            = $iterator->random;
+	my $random_tuple     = $cross->random;
 
 	# in list context returns a list of all tuples
-	my @tuples           = $iterator->combinations;
+	my @tuples           = $cross->combinations;
 
 	# in scalar context returns an array reference to all tuples
-	my $tuples           = $iterator->combinations;
+	my $tuples           = $cross->combinations;
 
 
 =head1 DESCRIPTION
@@ -112,7 +119,7 @@ too.
 
 In this case, A x B is the empty set, so you'll get no tuples.
 
-This module combines the arrays that give to it to create this
+This module combines the arrays that you give to it to create this
 cross product, then allows you to access the elements of the
 cross product in sequence, or to get all of the elements at
 once. Be warned! The cardinality of the cross product, that is,
@@ -194,7 +201,7 @@ sub new {
 
 	my $ref_type = ref $constructor_ref;
 
-	my $self = {};
+	my $self = bless {}, $class;
 
 	if( $ref_type eq ref {} ) {
 		$self->{labeled} = 1;
@@ -223,15 +230,14 @@ sub new {
 			}
 		}
 
-	$self->{counters} = [ map { 0 }      @$array_ref ];
-	$self->{lengths}  = [ map { $#{$_} } @$array_ref ];
-	$self->{previous} = [];
-	$self->{ungot}    = 1;
+	$self->_init;
 
-	$self->{done}     = grep( $_ == -1, @{ $self->{lengths} } )
-		? 1 : 0;
-
-	bless $self, $class;
+	my $len_last = $#{ $self->{lengths} };
+	for( my $i  = 0; $i < $#{ $self->{counters} }; $i++ ) {
+		my @lengths = map { $_+1 } @{ $self->{lengths} }[$i+1 .. $len_last];
+		$self->{factors}[$i] += reduce { $a * $b } @lengths;
+		}
+	push @{ $self->{factors} }, 1;
 
 	return $self;
 	}
@@ -245,41 +251,15 @@ sub new {
 =cut
 
 
-sub _decrement {
-	my $self = shift;
-
-	my $tail = $#{ $self->{counters} };
-
-	$self->{counters} = $self->_previous( $self->{counters} );
-	$self->{previous} = $self->_previous( $self->{counters} );
-
-	return 1;
-	}
-
-sub _find_ref {
-	my ($self, $which) = @_;
-
-	my $place_func =
-		  ($which eq 'next') ? sub { $self->{counters}[shift] }
-		: ($which eq 'prev') ? sub { $self->{previous}[shift] }
-		: ($which eq 'rand') ? sub { rand(1 + $self->{lengths}[shift]) }
-		:                      undef;
-
-	return unless $place_func;
-
-	my @indices = (0 .. $#{ $self->{arrays} });
-
-	if ($self->{labels}) {
-		 return +{ map {  $self->{labels}[$_] => ${ $self->{arrays}[$_] }[ $place_func->($_) ]  } @indices } }
-	else {
-		return [ map {  ${ $self->{arrays}[$_] }[ $place_func->($_) ]  } @indices ]
-		}
-	}
+sub _factors { @{ $_[0]{factors} } }
 
 sub _increment {
 	my $self = shift;
 
+	# print STDERR "_increment: counters at start: @{$self->{counters}}\n";
+	# print STDERR "_increment: previous at start: @{$self->{previous}}\n";
 	$self->{previous} = [ @{$self->{counters}} ]; # need a deep copy
+	# print STDERR "_increment: previous after: @{$self->{previous}}\n";
 
 	my $tail = $#{ $self->{counters} };
 
@@ -303,32 +283,36 @@ sub _increment {
 	return 1;
 	}
 
-sub _previous {
-	my $self = shift;
+sub _init {
+	my( $self ) = @_;
 
-	my $counters = $self->{counters};
+	$self->{counters} = [ map { 0 } @{ $self->{arrays} } ];
+    $self->{lengths}  = [ map { $#{$_} } @{ $self->{arrays} } ];
+	$self->{ungot}    = 1;
+	$self->{done}     = grep( $_ == -1, @{ $self->{lengths} } );
 
-	my $tail = $#{ $counters };
+	# stolen from Set::CartesianProduct::Lazy by Stephen R. Scaffidi
+	# https://github.com/hercynium/Set-CartesianProduct-Lazy
+	$self->{info} = [
+		map {
+			[ $_, (scalar @{${ $self->{arrays} }[$_]}), reduce { $a * @$b } 1, @{ $self->{arrays} }[$_ + 1 .. $#{ $self->{arrays} }] ];
+			} 0 .. $#{ $self->{arrays} }
+		];
 
-	return [] unless grep { $_ } @$counters;
+	return $self;
+	}
 
-	COUNTERS: {
-		if( $counters->[$tail] == 0 ) {
-			$counters->[$tail] = $self->{lengths}[$tail];
-			$tail--;
+sub _label_tuple {
+	my( $self, $tuple ) = @_;
 
-			if( $tail == 0 and $counters->[$tail] == 0) {
-				$counters = [ map { 0 } 0 .. $tail ];
-				last COUNTERS;
-				}
-
-			redo COUNTERS;
-			}
-
-		$counters->[$tail]--;
+	unless( $self->{labeled} ) {
+		return wantarray ? @$tuple : $tuple;
 		}
 
-	return $counters;
+	my %hash;
+	@hash{ @{ $self->{labels} } } = @$tuple;
+
+	return wantarray ? %hash : \%hash;
 	}
 
 =item * cardinality()
@@ -364,6 +348,9 @@ context except for very low cardinalities to avoid huge return values.
 
 This can be quite large, so you might want to check the cardinality
 first. The array elements are the return values for C<get>.
+
+This works by exhausting the iterator. After calling this, there will
+be no more tuples to C<get>. You can use C<reset_cursor> to start over.
 
 =cut
 
@@ -411,23 +398,87 @@ list of key-value pairs in list context.
 
 sub get {
 	my $self = shift;
-
 	return if $self->done;
 
-	my $next_ref = $self->_find_ref('next');
-
+	my $next_ref = $self->next;
 	$self->_increment;
 	$self->{ungot} = 0;
 
-	if( wantarray ) { return (ref $next_ref eq ref []) ? @$next_ref : %$next_ref }
-	else            { return $next_ref }
+	$next_ref;
+	}
+
+=item * jump_to(N)
+
+(new in 3.0)
+
+Moves the cursor such that the next call to C<get> will fetch tuple
+C<N>, which should be a positive whole number less than the cardinality.
+Remember that everything is zero-based.
+
+Invalid arguments return the empty list and warn.
+
+This works by doing the math to reset the cursor rather than iterating
+through the cursor to get to the right position. You can jump to any
+position, including ones before the current cursor. After calling
+C<jump_to($n)>, C<$position> should return the value of C<$n>.
+
+This returns the object itself to allow you to chain methods. In previous
+versions this returned C<1> (true). It still returns true, but just
+a different value for it.
+
+=cut
+
+sub jump_to {
+	my($self, $n) = @_;
+
+	my $message = do {
+		my $guidance = 'It should be a positive whole number up to one less than the cardinality.';
+		if( @_ > 2 ) {
+			"too many arguments for jump_to(). $guidance";
+			}
+		elsif( ! defined $n ) {
+			"no or undefined argument for jump_to(). $guidance";
+			}
+		elsif( $n >= $self->cardinality ) {
+			sprintf "argument ($n) for jump_to() is too large for cardinality (%d). $guidance",
+				$self->cardinality;
+			}
+		elsif( $n =~ m/\D/ ) {
+			"argument ($n) for jump_to() is inappropriate. $guidance";
+			}
+		};
+	if( $message ) {
+		carp $message;
+		return;
+		}
+
+	my $max = $self->cardinality;
+	my @positions = ();
+	my $working_n = $n;
+	foreach my $factor ( $self->_factors ) {
+		if( $factor > $working_n ) {
+			push @positions, 0;
+			next;
+			}
+
+		my $int = int( $working_n / $factor );
+		$working_n -= $int * $factor;
+		push @positions, $int;
+		}
+
+	$self->{counters} = [@positions];
+
+	$self;
 	}
 
 =item * labeled()
 
-Return true if the sets are labeled (i.e. you made the object from
-a hash ref). Returns false otherwise. You might use this to figure out
-what sort of value C<get> will return.
+Return true if the sets are labeled (i.e. you made the object from a
+hash ref). Returns false otherwise.
+
+You might use this to figure out what sort of value C<get> will
+return. When the tuple is labeled, you get hash refs. Otherwise, you
+get array refs.
 
 =cut
 
@@ -435,25 +486,100 @@ sub labeled { !! $_[0]->{labeled} }
 
 =item * next()
 
-Like C<get>, but does not move the pointer.  This way you can look at
+Like C<get>, but does not move the cursor. This way you can look at
 the next tuple without affecting your position in the cross product.
+
+Since this does not move the cursor, repeated calls to C<next> will
+return the same tuple.
 
 =cut
 
 sub next {
 	my $self = shift;
 
-	return if $self->done;
+	# At end position returns undef
+	return unless defined $self->position;
 
-	my $next_ref = $self->_find_ref('next');
+	$self->nth( $self->position );
+	}
 
-	if( wantarray ) { return (ref $next_ref eq ref []) ? @$next_ref : %$next_ref }
-	else            { return $next_ref }
+=item * nth(n)
+
+(new in 3.0)
+
+Get the tuple at position C<n> in the set (zero based). This does not
+advance or affect the cursor. C<n> must be a positive whole number
+less than the cardinality. Anything else warns and returns undef.
+
+This was largely stolen from L<Set::CartesianProduct::Lazy> by
+Stephen R. Scaffidi.
+
+=cut
+
+# stolen from Set::CartesianProduct::Lazy by Stephen R. Scaffidi
+# https://github.com/hercynium/Set-CartesianProduct-Lazy
+sub nth {
+	my($self, $n) = @_;
+
+	my $message = do {
+		my $guidance = 'It should be a positive whole number up to one less than the cardinality.';
+		if( @_ > 2 ) {
+			"too many arguments for nth(). $guidance";
+			}
+		elsif( ! defined $n ) {
+			"no or undefined argument for nth(). $guidance";
+			}
+		elsif( $n >= $self->cardinality ) {
+			sprintf "argument ($n) for nth() is too large for cardinality (%d). $guidance",
+				$self->cardinality;
+			}
+		elsif( $n =~ m/\D/ ) {
+			"argument ($n) for nth() is inappropriate. $guidance";
+			}
+		};
+	if( $message ) {
+		carp $message;
+		return;
+		}
+
+	my @tuple = map {
+		my ($set_num, $set_size, $factor) = @$_;
+		${ $self->{arrays} }[ $set_num ][ int( $n / $factor ) % $set_size ];
+		} @{ $self->{info} };
+
+	my $tuple = $self->_label_tuple(\@tuple);
+
+	return wantarray ? @$tuple : $tuple;
+	}
+
+=item * position()
+
+(new in 3.0)
+
+Returns the zero-based position of the cursor. This is the same as the
+position for the next tuple that C<get> will fetch. Before you fetch
+any tuple, the position is 0. After you have fetched all the tuples,
+C<position> returns undef.
+
+=cut
+
+sub position {
+	my( $self ) = $_[0];
+	return if $self->{done};
+
+	my $len_last = $#{ $self->{lengths} };
+
+	my $sum = 0;
+	for( my $i  = 0; $i <= $#{ $self->{counters} }; $i++ ) {
+		$sum += $self->{counters}[$i] * $self->{factors}[$i];
+		}
+
+	return $sum;
 	}
 
 =item * previous()
 
-Like C<get>, but does not move the pointer.  This way you can look at
+Like C<get>, but does not move the cursor.  This way you can look at
 the previous tuple without affecting your position in the cross product.
 
 =cut
@@ -461,10 +587,12 @@ the previous tuple without affecting your position in the cross product.
 sub previous {
 	my $self = shift;
 
-	my $prev_ref = $self->_find_ref('prev');
+	if( $self->position == 0 ) {
+		carp "Can't call previous at the first tuple of the cross product";
+		return;
+		}
 
-	if( wantarray ) { return (ref $prev_ref eq ref []) ? @$prev_ref : %$prev_ref }
-	else            { return $prev_ref }
+	$self->nth( $self->done ? $self->cardinality - 1 : $self->position - 1 );
 	}
 
 =item * random()
@@ -485,19 +613,22 @@ sub random {
 
 =item * reset_cursor()
 
-Return the pointer to the first element of the cross product.
+Return the cursor to the first element of the cross product. The next
+call to C<get> will fetch the first tuple.
+
+This returns the object itself to allow you to chain methods. In previous
+versions this returned C<1> (true). It still returns true, but just
+a different value for it.
 
 =cut
 
 sub reset_cursor {
-	my $self = shift;
+	my( $self, $position ) = @_;
+	$position = 0 unless defined $position;
 
-	$self->{counters} = [ map { 0 } @{ $self->{counters} } ];
-	$self->{previous} = [];
-	$self->{ungot}    = 1;
-	$self->{done}     = 0;
+	$self->_init;
 
-	return 1;
+	return $self;
 	}
 
 =item * unget()
@@ -508,6 +639,10 @@ next value and put it back if you do not like it.
 
 You can only do this for the previous tuple.  C<unget> does not do
 multiple levels of unget.
+
+This returns the object itself to allow you to chain methods. In previous
+versions this returned C<1> (true). It still returns true, but just
+a different value for it.
 
 =cut
 
@@ -524,7 +659,7 @@ sub unget {
 	# so unset it.
 	$self->{done}  = 0;
 
-	return 1;
+	return $self;
 	}
 
 =back
@@ -554,9 +689,9 @@ of possibly non-unique tuples.
 	# the coderef.
 	$set->apply( CODEREF );
 
-=head1 BUGS
+=head1 ISSUES
 
-* none that I know about (yet)
+Report an problems to L<http://github.com/briandfoy/set-crossproduct/issues>.
 
 =head1 SOURCE AVAILABILITY
 
@@ -570,9 +705,12 @@ brian d foy, C<< <briandfoy@pobox.com> >>
 
 Matt Miller implemented the named sets feature.
 
+Stephen R. Scaffidi implemented the code for C<nth> in his
+L<Set::CartesianProduct::Lazy>, and I adapted it for this module.
+
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2001-2024, brian d foy <briandfoy@pobox.com>. All rights reserved.
+Copyright © 2001-2025, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License 2.0.

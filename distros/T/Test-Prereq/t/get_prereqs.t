@@ -23,7 +23,7 @@ subtest 'get_prereqs' => sub {
 			],
 		'Right modules for Build.PL'
 		);
-	chdir $cwd or warn "Could not reset dirctory! $!";
+	chdir $cwd or warn "Could not reset directory! $!";
 	};
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
@@ -44,7 +44,7 @@ subtest 'good_makefile' => sub {
 			'Right modules for Makefile.PL'
 			);
 
-	chdir $cwd or warn "Could not reset dirctory! $!";
+	chdir $cwd or warn "Could not reset directory! $!";
 	};
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
@@ -57,7 +57,7 @@ subtest 'bad_makefile' => sub {
 	my $okay = defined $modules ? 0 : 1;
 
 	ok( $okay, 'Bad Makefile.PL fails in right way' );
-	chdir $cwd or warn "Could not reset dirctory! $!";
+	chdir $cwd or warn "Could not reset directory! $!";
 	};
 
 done_testing();

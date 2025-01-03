@@ -15,7 +15,7 @@ WriteMakefile(
         'Test::More' => '0',
     },
     PREREQ_PM => {
-        'Convert::Base32' => '0',
+        'MIME::Base32' => '0',
         'Digest::HMAC' => '0',
         'Digest::SHA' => '0',
         'Math::BigInt' => '1.999806',
@@ -31,10 +31,10 @@ WriteMakefile(
         },
         provides => {
             'Pass::OTP' => {
-                file => 'lib/Pass/OTP.pm', version => '1.702',
+                file => 'lib/Pass/OTP.pm', version => '1.800',
             },
             'Pass::OTP::URI' => {
-                file => 'lib/Pass/OTP/URI.pm', version => '1.702',
+                file => 'lib/Pass/OTP/URI.pm', version => '1.800',
             },
         }
     },

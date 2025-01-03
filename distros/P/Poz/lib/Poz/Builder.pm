@@ -9,6 +9,7 @@ use Poz::Types::object;
 use Poz::Types::array;
 use Poz::Types::enum;
 use Poz::Types::union;
+use Poz::Types::is;
 
 sub new {
     my ($class) = @_;
@@ -80,6 +81,11 @@ sub enum {
 sub union {
     my ($self, @validators) = @_;
     return Poz::Types::union->new(@validators);
+}
+
+sub is {
+    my ($self, $isa) = @_;
+    return Poz::Types::is->new($isa);
 }
 
 1;
@@ -164,6 +170,12 @@ Creates a new enum type with the given options.
     my $union_type = $builder->union(@validators);
 
 Creates a new union type with the given validators.
+
+=head2 is
+
+    my $is_type = $builder->is($isa);
+
+Creates a new is type with the given class.
 
 =head1 LICENSE
 

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use Data::Dumper qw{Dumper};
-use Test::More tests => 16;
+use Test::More tests => 18;
 
 {
   package #hide from CPAN
@@ -43,3 +43,5 @@ is($service->protocol,    'protocol_cfg_sub',    'protocol');
 is($service->port,        'port_cfg_sub',        'port');
 is($service->script_name, 'script_name_cfg_sub', 'script_name');
 is($service->url,         'url_cfg_sub',         'url');
+is($service->warnings,    'warnings_cfg_sub',    'warnings');
+is($service->debug,       'debug_cfg_sub',       'debug');

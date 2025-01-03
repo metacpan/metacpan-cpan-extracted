@@ -1,8 +1,8 @@
-package MooseX::Getopt; # git description: v0.75-2-gdb80a15
+package MooseX::Getopt; # git description: v0.76-5-gd73e174
 # ABSTRACT: A Moose role for processing command line options
 # KEYWORDS: moose extension command line options attributes executable flags switches arguments
 
-our $VERSION = '0.76';
+our $VERSION = '0.77';
 
 use Moose::Role 0.56;
 use namespace::autoclean;
@@ -23,7 +23,7 @@ MooseX::Getopt - A Moose role for processing command line options
 
 =head1 VERSION
 
-version 0.76
+version 0.77
 
 =head1 SYNOPSIS
 
@@ -328,7 +328,7 @@ Stevan Little <stevan@iinteractive.com>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Tomas Doran Stevan Little Yuval Kogman Florian Ragwitz Brandon L Black Shlomi Fish Hans Dieter Pearcey Olaf Alders Dave Rolsky Nelo Onyiah Ryan D Johnson Ricardo SIGNES Ævar Arnfjörð Bjarmason Damien Krotkine Hinrik Örn Sigurðsson Chris Prather Devin Austin Gregory Oschwald Jose Luis Martinez Todd Hepler Andreas Koenig König Dagfinn Ilmari Mannsåker Damyan Ivanov Drew Taylor Gordon Irving Jesse Luehrs John Goulah Jonathan Swartz Justin Hunter Michael Schout Stuart A Johnston
+=for stopwords Karen Etheridge Tomas Doran Stevan Little Yuval Kogman Florian Ragwitz Brandon L Black Shlomi Fish Hans Dieter Pearcey Olaf Alders Dave Rolsky Nelo Onyiah Ryan D Johnson Ricardo SIGNES Ævar Arnfjörð Bjarmason Damien Krotkine Hinrik Örn Sigurðsson Andreas Koenig Chris Prather Devin Austin Gregory Oschwald Jose Luis Martinez Todd Hepler Dagfinn Ilmari Mannsåker Damyan Ivanov Drew Taylor Gordon Irving Jesse Luehrs John Goulah Jonathan Swartz Justin Hunter Michael Schout Stuart A Johnston
 
 =over 4
 
@@ -398,6 +398,10 @@ Hinrik Örn Sigurðsson <hinrik.sig@gmail.com>
 
 =item *
 
+Andreas Koenig <andk@cpan.org>
+
+=item *
+
 Chris Prather <chris@prather.org>
 
 =item *
@@ -415,14 +419,6 @@ Jose Luis Martinez <jlmartinez@capside.com>
 =item *
 
 Todd Hepler <thepler@employees.org>
-
-=item *
-
-Andreas Koenig <andk@cpan.org>
-
-=item *
-
-Andreas König <Andreas.Koenig.extern@telecolumbus.de>
 
 =item *
 
@@ -459,14 +455,6 @@ Justin Hunter <justin.d.hunter@gmail.com>
 =item *
 
 Michael Schout <mschout@gkg.net>
-
-=item *
-
-Shlomi Fish <shlomif@shlomifish.org>
-
-=item *
-
-Stevan Little <stevan.little@gmail.com>
 
 =item *
 

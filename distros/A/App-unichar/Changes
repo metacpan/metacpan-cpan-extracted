@@ -5,3 +5,7 @@ Revision history for Perl module unichar
 	* Add a simple test 
 	* update to the Artistic License 2.0
 
+0.013 2021-01-13T11:51:00Z
+	* freshen distro, remove Travis CI, add Github Actions
+	* add the unichar program (but it's just a modulino)
+

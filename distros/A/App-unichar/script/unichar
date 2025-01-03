@@ -5,7 +5,7 @@ use utf8;
 use warnings;
 use open qw(:std :utf8);
 
-our $VERSION = '0.013';
+our $VERSION = '0.014';
 
 use App::unichar;
 
@@ -33,7 +33,7 @@ Call it as a program with a name, character, or hex code number:
 		character   ✓
 
 	% unichar ✓
-	Processing CHECK MARK
+	Processing ✓
 		match type  grapheme
 		code point  U+2713
 		decimal     10003
@@ -55,17 +55,17 @@ values of characters.
 
 =head1 AUTHOR
 
-brian d foy, C<bdfoy@cpan.org>.
+brian d foy, C<briandfoy@pobox.com>.
 
 =head1 SOURCE AVAILABILITY
 
 This module is in Github:
 
-	https://github.com/briandfoy/unichar
+	https://github.com/briandfoy/app-unichar
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2011-2021 brian d foy
+Copyright 2011-2024 brian d foy
 
 This module is licensed under the Artistic License 2.0.
 

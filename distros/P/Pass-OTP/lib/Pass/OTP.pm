@@ -20,7 +20,7 @@ use utf8;
 use strict;
 use warnings;
 
-use Convert::Base32 qw(decode_base32);
+use MIME::Base32 qw(decode_base32);
 use Digest::HMAC;
 use Digest::SHA;
 use Math::BigInt;
@@ -29,7 +29,7 @@ require Exporter;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(otp hotp totp);
 
-our $VERSION = '1.702';
+our $VERSION = '1.800';
 
 =head1 DESCRIPTION
 

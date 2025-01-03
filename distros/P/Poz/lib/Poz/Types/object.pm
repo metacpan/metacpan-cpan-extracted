@@ -77,7 +77,8 @@ sub safe_parse {
             }
 
             try {
-                $v->parse($val);
+                my $_parsed = $v->parse($val);
+                $valid->{$key} = $_parsed;
             } catch {
                 my $error_message = $_;
                 $error_message =~ s/ at .+ line [0-9]+\.\n//;
@@ -86,7 +87,6 @@ sub safe_parse {
                     error => $error_message,
                 };
             };
-            $valid->{$key} = $val;
         }
     }
     if (scalar(@errors) > 0) {

@@ -2,19 +2,21 @@
 
 =encoding utf8
 
-=for HTML <a href="../../actions?query=workflow%3Amacos"><img src="../../workflows/macos/badge.svg"></a>
+=for HTML <a href="https://www.github.com/briandfoy/app-unichar/actions?query=workflow%3Amacos"><img src="https://www.github.com/briandfoy/app-unichar/workflows/macos/badge.svg"></a>
 
-=for HTML <a href="../../actions?query=workflow%3Aubuntu"><img src="../../workflows/ubuntu/badge.svg"></a>
+=for HTML <a href="https://www.github.com/briandfoy/app-unichar/actions?query=workflow%3Aubuntu"><img src="https://www.github.com/briandfoy/app-unichar/workflows/ubuntu/badge.svg"></a>
 
-=for HTML <a href="../../actions?query=workflow%3Awindows"><img src="../../workflows/windows/badge.svg"></a>
+=for HTML <a href="https://www.github.com/briandfoy/app-unichar/actions?query=workflow%3Awindows"><img src="https://www.github.com/briandfoy/app-unichar/workflows/windows/badge.svg"></a>
 
-=for HTML <a href='https://ci.appveyor.com/project/briandfoy/unichar'><img src='https://ci.appveyor.com/api/projects/status/vsbacgelq7osu5hf' /></a>
+=for HTML <a href='https://ci.appveyor.com/project/briandfoy/app-unichar'><img src='https://ci.appveyor.com/api/projects/status/vsbacgelq7osu5hf' /></a>
 
-=for HTML <a href='https://coveralls.io/github/briandfoy/unichar?branch=master'><img src='https://coveralls.io/repos/github/briandfoy/unichar/badge.svg?branch=master' alt='Coverage Status' /></a>
+=for HTML <a href='https://coveralls.io/github/briandfoy/app-unichar?branch=master'><img src='https://coveralls.io/repos/github/briandfoy/uniapp-unicharchar/badge.svg?branch=master' alt='Coverage Status' /></a>
 
 =for HTML <a href="https://github.com/briandfoy/unichar/blob/master/LICENSE"><img src="https://img.shields.io/cpan/l/App-unichar.svg" /></a>
 
 =for HTML <a href="https://metacpan.org/pod/App::unichar"><img src="https://img.shields.io/cpan/v/App-unichar.svg" /></A>
+
+=for HTML <a href="https://zenodo.org/badge/latestdoi/1256539"><img src="https://zenodo.org/badge/1256539.svg" alt="DOI"></a>
 
 =head1 The App::unichar module
 
@@ -27,7 +29,7 @@ for any Perl module.
 
 To read about L<App::unichar>, look at the embedded documentation
 in the module itself. Inside the distribution, you can format it
-with L<perldoc|https://perldoc.perl.orgperldoc.html>:
+with L<perldoc|https://perldoc.perl.org/perldoc.html>:
 
 	% perldoc lib/App/unichar.pm
 
@@ -72,22 +74,37 @@ module and only want to run the tests without installing anything.
 The meta data, such as the source repository and bug tracker, is in
 I<Makefile.PL> or the I<META.*> files it creates. You can find that on
 those CPAN web interfaces, but you can also look at files directly in
-the source repository:
-
-=over 4
-
-=item *	L<https://github.com/briandfoy/unichar>
-
-=back
+the source repository: L<https://github.com/briandfoy/app-unichar>
 
 If you find a problem, file a ticket in the L<issue
-tracker|https://github.com/briandfoy/unichar/issues>:
+tracker|https://github.com/briandfoy/app-unichar/issues>.
+
+There are also backup repositories hosted on other services. These
+reflect the state of the main repo and exist only for redundancy:
 
 =over 4
 
-=item *	L<https://github.com/briandfoy/unichar/issues>
+=item * L<https://bitbucket.com/briandfoy/app-unichar>
+
+=item * L<https://codeberg.org/briandfoy/app-unichar>
+
+=item * L<https://gitlab.com/briandfoy/app-unichar>
 
 =back
+
+=head2 GitHub Attestations
+
+This distribution now uses
+L<GitHub Attestations|https://github.blog/2024-05-02-introducing-artifact-attestations-now-in-public-beta/>,
+which allow you to verify that the archive file you have was made from
+the official repo.
+
+You need a GitHub account and the L<gh tool|https://github.com/larsks/ghcli>.
+
+	# download the distro file from GitHub, MetaCPAN, or a CPAN mirror
+	$ gh auth login
+	...follow instructions...
+	$ gh attestation verify App-unichar-1.23.tar.gz --owner briandfoy
 
 =head2 Getting help
 
@@ -114,6 +131,6 @@ you wrote code that you didn't.
 
 Enjoy,
 
-brian d foy, bdfoy@cpan.org
+brian d foy, briandfoy@pobox.com
 
 =cut

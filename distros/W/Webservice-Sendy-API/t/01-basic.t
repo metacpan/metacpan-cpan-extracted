@@ -30,7 +30,7 @@ close $fh;
 # create client instance using temp config file
 my $sendy = Webservice::Sendy::API->new(config => $configfile);
 
-my @can = qw/new form_data create_campaign _country_codes subscribe unsubscribe delete_subscriber get_subscription_status get_active_subscriber_count get_brands get_lists/;
+my @can = qw/new form_data create_campaign subscribe unsubscribe delete_subscriber get_subscription_status get_active_subscriber_count get_brands get_lists/;
 
 can_ok $sendy, @can;
 

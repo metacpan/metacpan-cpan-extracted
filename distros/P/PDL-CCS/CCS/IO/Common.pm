@@ -9,7 +9,7 @@ use PDL;
 use Carp qw(confess);
 use strict;
 
-our $VERSION = '1.23.29';
+our $VERSION = '1.24.0';
 our @ISA = ('PDL::Exporter');
 our @EXPORT_OK =
   (
@@ -98,12 +98,12 @@ sub _ccsio_parse_header {
   my $hlines = shift;
   my ($magic,$pdims,$vdims,$flags,$iotype) = map {chomp;$_} @$hlines;
   return {
-	  magic=>$magic,
-	  (defined($pdims) && $pdims ne '' ? (pdims=>pdl(ccs_indx(),[split(' ',$pdims)])) : qw()),
-	  (defined($vdims) && $vdims ne '' ? (vdims=>pdl(ccs_indx(),[split(' ',$vdims)])) : qw()),
-	  (defined($flags) && $flags ne '' ? (flags=>$flags) : qw()),
-	  (defined($iotype) && $iotype ne ''  ? (iotype=>$iotype) : qw()), ##-- added in v1.22.6
-	 };
+          magic=>$magic,
+          (defined($pdims) && $pdims ne '' ? (pdims=>pdl(ccs_indx(),[split(' ',$pdims)])) : qw()),
+          (defined($vdims) && $vdims ne '' ? (vdims=>pdl(ccs_indx(),[split(' ',$vdims)])) : qw()),
+          (defined($flags) && $flags ne '' ? (flags=>$flags) : qw()),
+          (defined($iotype) && $iotype ne ''  ? (iotype=>$iotype) : qw()), ##-- added in v1.22.6
+         };
 }
 
 ## $bool = _ccsio_write_header(\%header, $hfile)
@@ -126,13 +126,13 @@ sub _ccsio_header_lines {
   my $header = shift;
   $header = _ccsio_header($header) if (UNIVERSAL::isa($header,'PDL::CCS::Nd'));
   return [
-	  map {"$_\n"}
-	  (defined($header->{magic}) ? $header->{magic} : ''),
-	  (defined($header->{pdims}) ? (join(' ', $header->{pdims}->list)) : ''),
-	  (defined($header->{vdims}) ? (join(' ', $header->{vdims}->list)) : ''),
-	  (defined($header->{flags}) ? $header->{flags} : $PDL::CCS::Nd::CCSND_FLAGS_DEFAULT),
-	  (defined($header->{iotype}) ? $header->{iotype} : $PDL::IO::Misc::deftype),
-	 ];
+          map {"$_\n"}
+          (defined($header->{magic}) ? $header->{magic} : ''),
+          (defined($header->{pdims}) ? (join(' ', $header->{pdims}->list)) : ''),
+          (defined($header->{vdims}) ? (join(' ', $header->{vdims}->list)) : ''),
+          (defined($header->{flags}) ? $header->{flags} : $PDL::CCS::Nd::CCSND_FLAGS_DEFAULT),
+          (defined($header->{iotype}) ? $header->{iotype} : $PDL::IO::Misc::deftype),
+         ];
 }
 
 ## \%header = _ccsio_header( $ccs)
@@ -141,12 +141,12 @@ sub _ccsio_header {
   my $ccs = shift;
   return $ccs if (!UNIVERSAL::isa($ccs,'PDL::CCS::Nd'));
   return {
-	  magic=>(ref($ccs)." $VERSION"),
-	  pdims=>$ccs->pdims,
-	  vdims=>$ccs->vdims,
-	  flags=>$ccs->flags,
-	  iotype=>$ccs->type,
-	 };
+          magic=>(ref($ccs)." $VERSION"),
+          pdims=>$ccs->pdims,
+          vdims=>$ccs->vdims,
+          flags=>$ccs->flags,
+          iotype=>$ccs->type,
+         };
 }
 
 

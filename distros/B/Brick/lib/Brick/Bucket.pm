@@ -10,14 +10,13 @@ use Carp;
 use Brick::Constraints;
 
 foreach my $package ( qw(Numbers Regexes Strings Dates General
-	Composers Filters Selectors Files) )
-	{
+	Composers Filters Selectors Files) ) {
 	# print STDERR "Requiring $package\n";
 	eval "require Brick::$package";
 	print STDERR $@ if $@;
 	}
 
-$VERSION = '0.902';
+$VERSION = '0.903';
 
 =encoding utf8
 
@@ -43,8 +42,7 @@ Creates a new bucket to store Brick constraints
 
 =cut
 
-sub new
-	{
+sub new {
 	my( $class ) = @_;
 
 	my $self = bless {}, $class;
@@ -54,8 +52,7 @@ sub new
 	$self;
 	}
 
-sub _init
-	{
+sub _init {
 	my $self = shift;
 
 	$self->{_names}        = {};
@@ -113,8 +110,7 @@ It returns the subroutine reference.
 
 sub add_to_pool { croak "add_to_pool is now add_to_bucket" }
 
-sub add_to_bucket
-	{
+sub add_to_bucket {
 	require B;
 	my @caller = __caller_chain_as_list();
 	# print STDERR Data::Dumper->Dump( [\@caller],[qw(caller)] );
@@ -125,32 +121,27 @@ sub add_to_bucket
 
 	$unique ||= 0;
 
-	unless( defined $name )
-		{
+	unless( defined $name ) {
 		my $default = '(anonymous)';
 		#carp "Setup does not specify a 'name' key! Using $default";
 		$name   ||= $default;
 		}
 
 	# ensure we have a sub first
-	unless( ref $sub eq ref sub {} )
-		{
+	unless( ref $sub eq ref sub {} ) {
 		#print STDERR Data::Dumper->Dump( [$setup],[qw(setup)] );
 		croak "Code ref [$sub] is not a reference! $caller[1]{sub}";
 		}
 	# and that the name doesn't exist already if it's to be unique
-	elsif( $unique and exists $bucket->{ _names }{ $name } )
-		{
+	elsif( $unique and exists $bucket->{ _names }{ $name } ) {
 		croak "A brick named [$name] already exists";
 		}
 	# or the name isn't unique already
-	elsif( exists $bucket->{ _names }{ $name } and $bucket->{ _names }{ $name } )
-		{
+	elsif( exists $bucket->{ _names }{ $name } and $bucket->{ _names }{ $name } ) {
 		croak "A brick named [$name] already exists";
 		}
 	# and that the code ref isn't already in there
-	elsif( exists $bucket->{ $sub } )
-		{
+	elsif( exists $bucket->{ $sub } ) {
 		no warnings;
 		my $old_name = $bucket->{ $sub }{name};
 		}
@@ -199,8 +190,7 @@ The return value is an entry instance.
 
 =cut
 
-sub get_from_bucket
-	{
+sub get_from_bucket {
 	my( $bucket, $sub ) = @_;
 
 	return exists $bucket->{$sub} ? $bucket->{$sub} : ();
@@ -217,14 +207,12 @@ returns the number of bricks it found.
 
 =cut
 
-sub get_brick_by_name
-	{
+sub get_brick_by_name {
 	my( $bucket, $name ) = @_;
 
 	my @found;
 
-	foreach my $key ( $bucket->get_all_keys )
-		{
+	foreach my $key ( $bucket->get_all_keys ) {
 		#print STDERR "Got key $key\n";
 		my $brick = $bucket->get_from_bucket( $key );
 		#print STDERR Data::Dumper->Dump( [$brick], [qw(brick)] );
@@ -255,8 +243,7 @@ Tell the bucket that the COMPOSED_CODEREF is made up of THE_OTHER_CODEREFS.
 
 =cut
 
-sub comprise
-	{
+sub comprise {
 	my( $bucket, $compriser, @used ) = @_;
 
 	$bucket->get_from_bucket( $compriser )->add_bit( @used );
@@ -270,12 +257,10 @@ mostly a debugging tool.
 
 =cut
 
-sub dump_bucket
-	{
+sub dump_bucket {
 	my $bucket = shift;
 
-	foreach my $key ( $bucket->get_all_keys )
-		{
+	foreach my $key ( $bucket->get_all_keys ) {
 		my $brick = $bucket->get_from_bucket( $key );
 
 		print $brick->get_name, " --> $key\n";
@@ -306,8 +291,7 @@ This method croaks if its argument isn't a hash reference.
 
 =cut
 
-sub use_field_labels
-	{
+sub use_field_labels {
 	croak "Not a hash reference!" unless UNIVERSAL::isa( $_[1], ref {} );
 	$_[0]->{_field_labels} = { %{$_[1]} };
 	}
@@ -318,8 +302,7 @@ Retrieve the label for FIELD.
 
 =cut
 
-sub get_field_label
-	{
+sub get_field_label {
 	no warnings 'uninitialized';
 	$_[0]->{_field_labels}{ $_[1] };
 	}
@@ -330,18 +313,15 @@ Set the label for FIELD to VALUE. It returns VALUE.
 
 =cut
 
-sub set_field_label
-	{
+sub set_field_label {
 	$_[0]->{_field_labels}{ $_[1] } = $_[2];
 	}
 
-sub __caller_chain_as_list
-	{
+sub __caller_chain_as_list {
 	my $level = 0;
 	my @Callers = ();
 
-	while( 1 )
-		{
+	while( 1 ) {
 		my @caller = caller( ++$level );
 		last unless @caller;
 
@@ -372,8 +352,7 @@ use Carp qw(carp);
 
 =cut
 
-sub new
-	{
+sub new {
 	my $class = shift;
 
 	my $self = bless {}, $class;
@@ -494,8 +473,7 @@ entry that composes it.
 
 =cut
 
-sub add_bit
-	{
+sub add_bit {
 	my $entry = shift;
 	no warnings;
 
@@ -509,8 +487,7 @@ Print a text version of the entry.
 
 =cut
 
-sub dump
-	{
+sub dump {
 	require Data::Dumper;
 
 	Data::Dumper->Dump( [ $_[0]->entry( $_[1] ) ], [ "$_[1]" ] )
@@ -526,12 +503,10 @@ bucket tracks.
 
 =cut
 
-sub applies_to_fields
-	{
+sub applies_to_fields {
 	my( $class, $sub, @fields ) = @_;
 
-	foreach my $field ( @fields )
-		{
+	foreach my $field ( @fields ) {
 		$class->registry->{$sub}{fields}{$field}++;
 		$class->registry->{_fields}{$field}{$sub}++;
 		}
@@ -556,11 +531,11 @@ This source is in Github:
 
 =head1 AUTHOR
 
-brian d foy, C<< <bdfoy@cpan.org> >>
+brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT
 
-Copyright © 2007-2022, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2007-2025, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

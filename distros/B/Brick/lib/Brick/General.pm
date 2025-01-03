@@ -4,7 +4,7 @@ use strict;
 use base qw(Exporter);
 use vars qw($VERSION);
 
-$VERSION = '0.902';
+$VERSION = '0.903';
 
 package Brick::Bucket;
 use strict;
@@ -32,8 +32,7 @@ Brick::General - constraints for domain-nonspecific stuff
 
 =cut
 
-sub _is_blank
-	{
+sub _is_blank {
 	my( $bucket, $setup ) = @_;
 
 	$setup->{fields} = [ $setup->{field} ];
@@ -46,8 +45,7 @@ sub _is_blank
 
 =cut
 
-sub _is_true
-	{
+sub _is_true {
 	my( $bucket, $setup ) = @_;
 
 	$setup->{fields} = [ $setup->{field} ];
@@ -61,8 +59,7 @@ sub _is_true
 
 =cut
 
-sub _is_defined
-	{
+sub _is_defined {
 	my( $bucket, $setup ) = @_;
 
 	$setup->{fields} = [ $setup->{field} ];
@@ -84,8 +81,7 @@ to verify that each field for definedness. It takes the same input.
 =cut
 
 
-sub defined_fields
-	{
+sub defined_fields {
 	my( $bucket, $setup ) = @_;
 
 	my $sub = $bucket->_fields_are_defined( $setup );
@@ -99,8 +95,7 @@ to verify that each field for true values. It takes the same input.
 
 =cut
 
-sub true_fields
-	{
+sub true_fields {
 	my( $bucket, $setup ) = @_;
 
 	my $sub = $bucket->_fields_are_true( $setup );
@@ -114,8 +109,7 @@ to verify that each field for false values. It takes the same input.
 
 =cut
 
-sub false_fields
-	{
+sub false_fields {
 	my( $bucket, $setup ) = @_;
 
 	my $sub = $bucket->_fields_are_false( $setup );
@@ -129,8 +123,7 @@ to verify that each field has blank values. It takes the same input.
 
 =cut
 
-sub blank_fields
-	{
+sub blank_fields {
 	my( $bucket, $setup ) = @_;
 
 	my $sub = $bucket->_fields_are_blank( $setup );
@@ -144,8 +137,7 @@ to verify that each field has blank values. It takes the same input.
 
 =cut
 
-sub exist_fields
-	{
+sub exist_fields {
 	my( $bucket, $setup ) = @_;
 
 	my $sub = $bucket->_fields_exist( $setup );
@@ -163,8 +155,7 @@ should be there are. Use required fields for that.
 
 =cut
 
-sub allowed_fields
-	{
+sub allowed_fields {
 	my( $bucket, $setup ) = @_;
 
 	my $filter_sub = $bucket->_remove_extra_fields(
@@ -185,8 +176,7 @@ the input hash and have a defined value that is not the null string.
 
 =cut
 
-sub required_fields
-	{
+sub required_fields {
 	my( $bucket, $setup ) = @_;
 
 	my $sub = $bucket->_fields_are_defined_and_not_null_string(
@@ -215,8 +205,7 @@ If a code error occurs, it dies with a simple scalar.
 
 =cut
 
-sub _fields_exist
-	{
+sub _fields_exist {
 	my( $bucket, $setup, $sub ) = @_;
 
 	my @caller = $bucket->__caller_chain_as_list();
@@ -224,8 +213,7 @@ sub _fields_exist
 	#print STDERR Data::Dumper->Dump( [\@caller], [qw(caller)] );
 
 	unless( eval { $setup->{fields}->isa( ref [] ) } or
-		UNIVERSAL::isa( $setup->{fields}, ref [] ) )
-		{
+		UNIVERSAL::isa( $setup->{fields}, ref [] ) ) {
 		croak( "Argument to $caller[0]{'sub'} must be an anonymous array of field names!" );
 		}
 
@@ -236,8 +224,7 @@ sub _fields_exist
 		code        => sub {
 			my @errors;
 			my @missing;
-			foreach my $f ( @{ $setup->{fields} } )
-				{
+			foreach my $f ( @{ $setup->{fields} } ) {
 				next if exists $_[0]->{ $f };
 
 				push @errors, {
@@ -281,15 +268,13 @@ If a code error occurs, it dies with a simple scalar.
 
 =cut
 
-sub __fields_are_something
-	{
+sub __fields_are_something {
 	my( $bucket, $setup, $sub ) = @_;
 
 	my @caller = $bucket->__caller_chain_as_list();
 
 	unless( eval { $setup->{fields}->isa( ref [] ) } or
-		UNIVERSAL::isa( $setup->{fields}, ref [] ) )
-		{
+		UNIVERSAL::isa( $setup->{fields}, ref [] ) ) {
 		croak( "Argument to $caller[0]{'sub'} must be an anonymous array of field names!" );
 		}
 
@@ -340,8 +325,7 @@ have a true value. See __fields_are_something for details.
 
 =cut
 
-sub _fields_are_defined_and_not_null_string
-	{
+sub _fields_are_defined_and_not_null_string {
 	my( $bucket, $setup ) = @_;
 
 	#print STDERR "_fields_are_defined_and_not_null_string: ", Data::Dumper->Dump( [$setup], [qw(setup)] );
@@ -359,8 +343,7 @@ __fields_are_something for details.
 
 =cut
 
-sub _fields_are_defined
-	{
+sub _fields_are_defined {
 	my( $bucket, $setup ) = @_;
 
 	$setup->{test_name} = 'defined';
@@ -375,8 +358,7 @@ undefined or the empty string). See __fields_are_something for details.
 
 =cut
 
-sub _fields_are_blank
-	{
+sub _fields_are_blank {
 	my( $bucket, $setup ) = @_;
 
 	$setup->{test_name} = 'blank';
@@ -391,8 +373,7 @@ sense). See __fields_are_something for details.
 
 =cut
 
-sub _fields_are_false
-	{
+sub _fields_are_false {
 	my( $bucket, $setup ) = @_;
 
 	$setup->{test_name} = 'false';
@@ -407,8 +388,7 @@ sense). See __fields_are_something for details.
 
 =cut
 
-sub _fields_are_true
-	{
+sub _fields_are_true {
 	my( $bucket, $setup ) = @_;
 
 	$setup->{test_name} = 'true';
@@ -434,11 +414,11 @@ This source is in Github:
 
 =head1 AUTHOR
 
-brian d foy, C<< <bdfoy@cpan.org> >>
+brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT
 
-Copyright © 2007-2022, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2007-2025, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

@@ -6,10 +6,11 @@ use warnings;
 
 use Test::More 0.94;
 
-plan tests => 11;
+plan tests => 12;
 
 my @module_files = (
-    'Test/Warnings.pm'
+    'Test/Warnings.pm',
+    'Test2/Warnings.pm'
 );
 
 my @scripts = (

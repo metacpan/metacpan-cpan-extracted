@@ -1,10 +1,10 @@
 {
    "abstract" : "constants for Mac error codes",
    "author" : [
-      "brian d foy <bdfoy@cpan.org>"
+      "brian d foy <briandfoy@pobox.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "mac",
       "errors"
@@ -14,7 +14,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Mac-Errors",
    "no_index" : {
@@ -40,7 +40,7 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.94"
+            "Test::More" : "1"
          }
       }
    },
@@ -52,10 +52,10 @@
       "homepage" : "https://github.com/briandfoy/Mac-Errors",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/briandfoy/Mac-Errors.git",
+         "url" : "https://github.com/briandfoy/Mac-Errors",
          "web" : "https://github.com/briandfoy/Mac-Errors"
       }
    },
-   "version" : "1.192",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "1.193",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

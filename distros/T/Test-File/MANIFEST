@@ -9,6 +9,7 @@ Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 README.pod
+SECURITY.md
 t/dm_skeleton.t
 t/file_contains.t
 t/file_contains_encoded.t

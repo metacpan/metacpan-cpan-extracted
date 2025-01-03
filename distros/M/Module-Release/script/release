@@ -100,7 +100,7 @@ Now it uploads through the web form.
 =item Tag the repository
 
 Use the version number (in the distribution name) to tag the
-repository.  You should be able to checkout the code from any release.
+repository. You should be able to checkout the code from any release.
 
 =back
 
@@ -342,6 +342,13 @@ release reads the C<CPAN_PASS> environment variable to set the
 password for PAUSE.  Of course, you don't need to set the password for
 a system you're not uploading to.
 
+=item * CPAN_PASS_<USER>
+
+Append the CPAN user ID to C<CPAN_PASS> and use that value to interact
+with PAUSE. This allows people to deal with more than one CPAN account
+(for example, work and personal). If this has no value, it is used
+preferentially to C<CPAN_PASS>
+
 =item * RELEASE_DEBUG
 
 The C<RELEASE_DEBUG> environment variable sets the debugging value,
@@ -381,7 +388,7 @@ brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2002-2024, brian d foy <briandfoy@pobox.com>. All rights reserved.
+Copyright © 2002-2025, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 You may use this software under the same terms as Perl itself.
 
@@ -398,7 +405,7 @@ the automated_testing and required features and parallel testing.
 
 use Getopt::Long qw(:config noignorecase bundling);
 use Module::Release 2.131;
-my $script_version = '2.132';
+my $script_version = '2.133';
 
 my $class = "Module::Release";
 
@@ -448,7 +455,7 @@ both) if not supplied.
 	-jN  Enable parallel tests
 	-k   Skip kwalitee check
 	-m   Skip the MANIFEST check
-	-p   Skip the orereqs check
+	-p   Skip the prereqs check
 	-t   Just make and test distribution, don't tag/upload
 	-T   Skip tests
 	-v   Print the script version number and exit

@@ -8,7 +8,7 @@ use Test::More 0.88;
 
 use Fey::Table::Alias;
 
-my $t = Fey::Table->new( name => 'Test' );
+my $t  = Fey::Table->new( name => 'Test' );
 my $c1 = Fey::Column->new(
     name => 'test_id',
     type => 'text',

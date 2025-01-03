@@ -1,14 +1,14 @@
 ---
 abstract: 'constants for Mac error codes'
 author:
-  - 'brian d foy <bdfoy@cpan.org>'
+  - 'brian d foy <briandfoy@pobox.com>'
 build_requires:
-  Test::More: '0.94'
+  Test::More: '1'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::Spec::Functions: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 keywords:
   - mac
   - errors
@@ -26,6 +26,6 @@ requires:
 resources:
   bugtracker: https://github.com/briandfoy/Mac-Errors/issues
   homepage: https://github.com/briandfoy/Mac-Errors
-  repository: https://github.com/briandfoy/Mac-Errors.git
-version: '1.192'
+  repository: https://github.com/briandfoy/Mac-Errors
+version: '1.193'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

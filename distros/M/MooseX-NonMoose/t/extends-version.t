@@ -5,6 +5,7 @@ use Test::More;
 use Test::Fatal;
 
 {
+    $INC{'Foo.pm'} = __FILE__;
     package Foo;
     our $VERSION = '0.02';
     sub new { bless {}, shift }

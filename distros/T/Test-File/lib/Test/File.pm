@@ -1,15 +1,13 @@
 package Test::File;
 use strict;
 
-use vars qw(@EXPORT $VERSION);
-
 use Carp            qw(carp);
 use Exporter        qw(import);
 use File::Spec;
 use Test::Builder;
 use XSLoader;
 
-@EXPORT = qw(
+our @EXPORT = qw(
 	file_exists_ok file_not_exists_ok
 	file_empty_ok file_not_empty_ok file_size_ok file_max_size_ok
 	file_min_size_ok file_readable_ok file_not_readable_ok
@@ -31,7 +29,7 @@ use XSLoader;
 	file_mtime_gt_ok file_mtime_lt_ok file_mtime_age_ok
 	);
 
-$VERSION = '1.993';
+our $VERSION = '1.994';
 XSLoader::load(__PACKAGE__, $VERSION) if $^O eq 'MSWin32';
 
 my $Test = Test::Builder->new();
@@ -1805,7 +1803,7 @@ This module is in Github:
 
 =head1 AUTHOR
 
-brian d foy, C<< <bdfoy@cpan.org> >>
+brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 CREDITS
 
@@ -1833,7 +1831,7 @@ new since Win32 0.55.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2002-2023, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2002-2025, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License 2.0

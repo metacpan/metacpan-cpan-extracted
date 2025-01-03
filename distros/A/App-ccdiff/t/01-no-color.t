@@ -20,7 +20,7 @@ while (<DATA>) {
     $exp =~ s/STAMP:1/$stamp{$f1}/g;
     $exp =~ s/STAMP:2/$stamp{$f2}/g;
     #diag "Description: $dsc";
-    # diag "Options:     $opt";
+    #diag "Options:     $opt";
     my @cmd = ($^X, "ccdiff", "--utf-8", "--no-color", "Files/$f1", "Files/$f2");
     $opt and push @cmd, split m/ / => $opt;
     #diag "@cmd";

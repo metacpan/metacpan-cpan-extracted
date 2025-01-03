@@ -3,10 +3,8 @@ use strict;
 use warnings;
 use Test::More;
 use Test::Moose;
-BEGIN {
-    eval "use MooseX::InsideOut 0.100 ()";
-    plan skip_all => "MooseX::InsideOut is required for this test" if $@;
-}
+use Test2::Require::Module 'MooseX::InsideOut', '0.100';
+use MooseX::InsideOut;
 
 BEGIN {
     require Moose;

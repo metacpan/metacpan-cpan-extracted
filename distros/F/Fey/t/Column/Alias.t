@@ -35,8 +35,8 @@ $t->add_column($c);
         'table for column alias is same as original column'
     );
 
-    is( $alias->name(), 'test_id', 'column alias name is test_id' );
-    is( $alias->type(), 'text',    'column alias type is text' );
+    is( $alias->name(),         'test_id', 'column alias name is test_id' );
+    is( $alias->type(),         'text',    'column alias type is text' );
     is( $alias->generic_type(), 'text', 'column alias generic type is text' );
     ok( !defined $alias->length(),    'column alias has no length' );
     ok( !defined $alias->precision(), 'column alias has no precision' );

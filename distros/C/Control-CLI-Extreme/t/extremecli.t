@@ -12,6 +12,7 @@ use IO::Interactive qw(is_interactive);
 my $TestMultiple	= 1;		# Set to 0 if you only want to test against only one switch
 my $ConnectionType	;
 my $Blocking		;		# blocking mode
+my $Binmode		= 0;		# binmode = 0 (default) does newline translation; binmode = 1 does not
 my $Timeout		= 30;		# seconds
 my $ConnectionTimeout	= 15;		# seconds
 my $ErrorMode		= 'return';	# always return, so we check outcome in this test script
@@ -50,6 +51,7 @@ my %Cmd = (		# CLI commands to test with (output should be long enough to be mor
 			SLX			=> 'show interface stats brief', # Better test, on serial port, SLX really fills the output of this command with garbage..
 			HiveOS			=> 'show running-config | exclude "console page"',
 			Ipanema			=> 'ifconfig',
+			EnterasysOS		=> 'show running-config all',
 );
 my %CmdRefreshed = (	# CLI commands whose output is refreshed; to test that we can exit the refresh
 			PassportERS_cli		=> 'monitor ports stats interface utilization',
@@ -275,6 +277,7 @@ do {{ # Test loop, we keep testing until user satisfied
 			Blocking		=> $blocking,		# optional, blocking mode
 		  	Connection_timeout	=> $ConnectionTimeout,	# optional; default is not set
 			Errmode 		=> $ErrorMode,		# optional; default = 'croak'
+			Binmode			=> $Binmode,		# optional; defalut = 0
 			Errmsg_format		=> $ErrMsgFormat,
 			Data_with_error		=> $DataWithError,	# optional; used by my acli.pl
 			Console			=> $SendWakeConsole,	# optional; needed with Telnet if XOS has banner before-login with acknowledge
@@ -444,6 +447,9 @@ do {{ # Test loop, we keep testing until user satisfied
 	attribute($cli, 'is_xos',1); # will be undefined on non-ExtremeXOS products
 	attribute($cli, 'is_isw',1); # will be undefined on non-ISW products
 	attribute($cli, 'is_wing',1); # will be undefined on non-Wing products
+	attribute($cli, 'is_hiveos',1); # will be undefined on non-HiveOS products
+	attribute($cli, 'is_sdwan',1); # will be undefined on non-Ipanema products
+	attribute($cli, 'is_eos',1); # will be undefined on non-EnterasysOS products
 	$slx = attribute($cli, 'is_slx',1); # will be undefined on non-SLX products
 	if ($slx) {
 		attribute($cli, 'is_slx_r',1); # will be undefined on non-SLX products
@@ -579,7 +585,7 @@ do {{ # Test loop, we keep testing until user satisfied
 					Return_result		=>	1,
 				);
 		}
-		elsif ($familyType eq 'ISWmarvell') {
+		elsif ($familyType eq 'ISWmarvell' || $familyType eq 'EnterasysOS') {
 			($ok, $result) = $cli->cmd(
 					Command			=>	'configure',
 					Return_result		=>	1,
@@ -623,7 +629,7 @@ do {{ # Test loop, we keep testing until user satisfied
 						Return_result		=>	1,
 					);
 			}
-			elsif ( $familyType eq 'ISWmarvell') {
+			elsif ( $familyType eq 'ISWmarvell' || $familyType eq 'EnterasysOS' ) {
 				($ok, $result) = $cli->cmd(
 						Command			=>	'exit',
 						Return_result		=>	1,

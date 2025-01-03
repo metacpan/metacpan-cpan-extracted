@@ -1,12 +1,11 @@
 #!/usr/bin/env perl
 #
-# uricolor - Colorize URIs with ANSI colors.
+# uricolor - Colorize URIs with ANSI colors
 #
-# uricolor is a Perl script to colorize URIs with ANSI colors.
-# It reads files sequentially, and writes them to STDOUT,
-# with all URIs colored. If file is a dash "-" or if no file
-# is given as argument, uricolor reads from STDIN.
+# Documentation at bottom of script.
 #
+# 2025.01.02 v0.16 jul : fixed exit status
+#                        fixed documentation
 # 2019.10.10 v0.15 jul : fixed META data
 # 2019.08.05 v0.14 jul : added -c (color)
 # 2019.07.09 v0.13 jul : added -s (schemeless), use 5.010, better doc
@@ -24,7 +23,7 @@ use URI::Find;
 use URI::Find::Schemeless;
 use Term::ANSIColor qw(colored colorvalid);
 
-our $VERSION    = '0.15';
+our $VERSION    = '0.16';
 my $program     = basename($0);
 my $usage       = <<EOF;
 
@@ -35,6 +34,8 @@ Usage: $program [-hVds] [-c color] [file ...]
     -d              debug
     -s              schemeless
     -c              color (default : underline blue)
+
+See `perldoc $program` for full documentation.
 EOF
 
 # options
@@ -78,13 +79,17 @@ while (<>)
 
 warn "$n URIs colorized\n" if $debug;
 
-exit 1;
+exit 0;
 
 __END__
 
+=pod
+
+=encoding utf8
+
 =head1 NAME
 
-uricolor - Colorize URIs with ANSI colors.
+uricolor - Colorize URIs with ANSI colors
 
 =head1 SYNOPSIS
 
@@ -98,15 +103,11 @@ uricolor - Colorize URIs with ANSI colors.
 
 =head1 DESCRIPTION
 
-uricolor is a Perl script to colorize URIs with ANSI colors.
-It reads files sequentially, and writes them to STDOUT,
-with all URIs colored. If file is a dash "-" or if no file
-is given as argument, uricolor reads from STDIN.
+B<uricolor> is a tool to colorize URIs with ANSI colors. It reads files sequentially, and writes them to STDOUT, with all URIs colored. If I<file> is a dash "-" or if no file is given as argument, B<uricolor> reads from STDIN.
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<kaldor@cpan.org>, or through
-the web interface at L<https://github.com/kal247/App-uricolor/issues>.
+Please report any bugs or feature requests to C<kaldor@cpan.org>, or through the web interface at L<https://github.com/kal247/App-uricolor/issues>.
 
 =head1 AUTHOR
 
@@ -114,7 +115,7 @@ jul, C<kaldor@cpan.org>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2019 by jul.
+This software is Copyright (c) 2019-2025 by jul.
 
 This is free software, licensed under:
 

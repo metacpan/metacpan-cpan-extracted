@@ -1,14 +1,14 @@
 ---
 abstract: 'A structured return value for failure or success'
 author:
-  - 'brian d foy <bdfoy@cpan.org>'
+  - 'brian d foy <briandfoy@pobox.com>'
 build_requires:
   Test::More: '1'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::Spec::Functions: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,15 +24,15 @@ requires:
 resources:
   X_authors:
     -
-      email: bdfoy@cpan.org
+      email: briandfoy@pobox.com
       github: https://github.com/briandfoy
       linkedin: https://www.linkedin.com/in/briandfoy/
       name: 'brian d foy'
       orc_id: 0000-0002-0283-8283
       twitter: https://twitter.com/briandfoy_perl
   X_doi: 10.5281/zenodo.5904392
-  bugtracker: https://github.com/perlreview/returnvalue/issues
-  homepage: https://github.com/perlreview/returnvalue
-  repository: https://github.com/perlreview/returnvalue.git
-version: '0.903'
+  bugtracker: https://github.com/briandfoy/returnvalue/issues
+  homepage: https://github.com/briandfoy/returnvalue
+  repository: https://github.com/briandfoy/returnvalue
+version: '0.904'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

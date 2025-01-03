@@ -2,7 +2,7 @@ package Brick::Constraints;
 use base qw(Exporter);
 use vars qw($VERSION);
 
-$VERSION = '0.902';
+$VERSION = '0.903';
 
 package Brick::Bucket;
 use strict;
@@ -35,8 +35,7 @@ pieces you want.
 
 =cut
 
-sub __make_constraint # may need to change name to make generic
-	{
+sub __make_constraint { # may need to change name to make generic
 	my( $bucket, $validator, $setup ) = @_;
 
 	$setup ||= {};
@@ -45,8 +44,7 @@ sub __make_constraint # may need to change name to make generic
 
 	#print STDERR Data::Dumper->Dump( [\@callers], [qw(callers)] ); use Data::Dumper;
 
-	if( $#callers >= 1 and exists $callers[1]{'sub'} and  $callers[1]{'sub'} =~ m/^_/ )
-		{
+	if( $#callers >= 1 and exists $callers[1]{'sub'} and  $callers[1]{'sub'} =~ m/^_/ ) {
 		carp "$callers[1]{'sub'} called from sub with leading underscore. Are you sure you want that?";
 		}
 
@@ -56,8 +54,7 @@ sub __make_constraint # may need to change name to make generic
 	unless(
 		eval { $validator->isa( ref sub {} ) }    ||
 		UNIVERSAL::isa( $validator, ref sub {} )
-		)
-		{
+		) {
 		croak( "Argument to $callers[1]{'sub'} must be a code reference [$validator]: $@" );
 		}
 
@@ -153,11 +150,11 @@ This source is in Github:
 
 =head1 AUTHOR
 
-brian d foy, C<< <bdfoy@cpan.org> >>
+brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT
 
-Copyright © 2007-2022, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2007-2025, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

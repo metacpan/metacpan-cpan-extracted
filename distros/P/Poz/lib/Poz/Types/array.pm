@@ -42,6 +42,7 @@ sub safe_parse {
     Carp::croak "Must handle error" unless wantarray;
 
     my ($self, $data) = @_;
+    my @parsed = ();
     my @errors = ();
     if (defined $self->{__default__} && !defined $data) {
         $data = $self->{__default__};
@@ -74,7 +75,8 @@ sub safe_parse {
             my $v = $self->{__validator__};
             my $val = $data->[$i];
             try {
-                $v->parse($val);
+                my $_parsed = $v->parse($val);
+                push @parsed, $_parsed;
             } catch {
                 my $error_message = $_;
                 $error_message =~ s/ at .+ line [0-9]+\.\n//;
@@ -89,7 +91,7 @@ sub safe_parse {
         return (undef, [@errors])
     }
     my $classname = $self->{__as__};
-    my $valid = $classname ? bless [@$data], $classname : [@$data];
+    my $valid = $classname ? bless [@parsed], $classname : [@parsed];
     return ($valid, undef);
 }
 

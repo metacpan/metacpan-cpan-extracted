@@ -66,8 +66,16 @@ WriteMakefile(
 	MIN_PERL_VERSION => '5.6.0',
 	META_MERGE => {
 		'meta-spec' => { version => 2 },
-		bugtracker => {
-			web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Control-CLI'
+		resources => {
+			repository => {
+				type => 'git',
+				url  => 'https://github.com/lgastevens/Control-CLI.git',
+				web  => 'https://github.com/lgastevens/Control-CLI',
+			},
+			bugtracker => {
+				web => 'https://github.com/lgastevens/Control-CLI/issues',
+#				web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Control-CLI',
+			},
 		},
 	},
 );

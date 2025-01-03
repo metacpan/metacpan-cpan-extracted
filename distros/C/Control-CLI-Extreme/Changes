@@ -128,3 +128,9 @@ Revision history for Control-CLI-Extreme
 1.12	2024-03-17
 	* New Universal Hardware series 4120 and 4220 restricted CLI prompt ending in "=" was not being caught
 	  by the generic prompt and would fail extended discovery
+
+1.13	2025-01-02
+	* Added tentative support for EnterasysOS; only tested with an S4 Chassis
+	* Adjusted patterns for Y/N confirmation prompt
+	* Update to PassportERS VOSS error patterns
+	* Documentation updates for Control::CLI version 2.12 changes

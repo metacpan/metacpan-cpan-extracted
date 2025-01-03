@@ -1,5 +1,8 @@
 Revision history for App-remotediff
 
+1.16    2025-01-02
+        - fixed documentation
+
 1.15    2024-06-03
         - replace "." with absolute path
 

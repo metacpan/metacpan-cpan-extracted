@@ -1,14 +1,14 @@
 ---
 abstract: 'get info about a character'
 author:
-  - 'brian d foy <bdfoy@cpan.org>'
+  - 'brian d foy <briandfoy@pobox.com>'
 build_requires:
   Test::More: '1'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::Spec::Functions: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,8 +22,8 @@ requires:
   I18N::Langinfo: '0'
   perl: '5.026'
 resources:
-  bugtracker: https://github.com/briandfoy/unichar/issues
-  homepage: https://github.com/briandfoy/unichar
-  repository: https://github.com/briandfoy/unichar.git
-version: '0.013'
+  bugtracker: https://github.com/briandfoy/app-unichar/issues
+  homepage: https://github.com/briandfoy/app-unichar
+  repository: https://github.com/briandfoy/app-unichar
+version: '0.014'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

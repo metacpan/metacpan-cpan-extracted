@@ -57,7 +57,9 @@ my $build = Module::Build->new(
 		configure_requires => { 'Module::Build' => 0.36 },
 		meta_merge => {
 			resources => {
-				bugtracker => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Control-CLI'
+				repository => 'https://github.com/lgastevens/Control-CLI',
+				bugtracker => 'https://github.com/lgastevens/Control-CLI/issues',
+#				bugtracker => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Control-CLI',
 			}
 		},
 	);

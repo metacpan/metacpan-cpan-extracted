@@ -10,7 +10,7 @@ use Dispatch::Fu;
 use Webservice::Sendy::API qw//;
 use Util::H2O::More        qw/ddd Getopt2h2o ini2h2o o2d/;
 
-our $VERSION = 0.3;
+our $VERSION = 0.5;
 
 use constant {
   EXIT_SUCCESS => 0,
@@ -74,11 +74,14 @@ sub create_campaign {
   my ($argv) = @_;
   my @opts   = qw/config=s from_name=s from_email=s reply_to=s title=s subject=s plain_text=s html_text=s
                   list_ids=s segment_ids=s exclude_list_ids=s brand_id=s query_string=s schedule_date_time=s
-                  schedule_timezone=s track_opens track_clicks send_campaign/;
-  my $o      = Getopt2h2o $argv, { config => $CONFIG }, @opts;
+                  schedule_timezone=s no_track_opens no_track_clicks send_campaign/;
+
+  # NOTE: As much as I despise "reverse options," until Getopt2h2o supports "flag!" syntax, I will have
+  # to use it here; default values in initial HASH ref are also necessary here
+  my $o      = Getopt2h2o $argv, { config => $CONFIG, no_track_clicks => 0, no_track_opens => 0 }, @opts;
   my $sendy  = Webservice::Sendy::API->new(config => $o->config);
   my $result = $sendy->create_campaign(%{o2d $o});
-  print $result;
+  say $result;
   exit EXIT_SUCCESS;
 }
 

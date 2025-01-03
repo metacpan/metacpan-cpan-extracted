@@ -22,13 +22,13 @@ use PDL::VectorValued;
 
 ##-- setup
 my $a = pdl(double, [
-		     [10,0,0,0,-2],
-		     [3,9,0,0,0],
-		     [0,7,8,7,0],
-		     [3,0,8,7,5],
-		     [0,8,0,9,9],
-		     [0,4,0,0,2],
-		    ]);
+                     [10,0,0,0,-2],
+                     [3,9,0,0,0],
+                     [0,7,8,7,0],
+                     [3,0,8,7,5],
+                     [0,8,0,9,9],
+                     [0,4,0,0,2],
+                    ]);
 
 ##-- test: decode_pointer
 my $awhich = $a->whichND;
@@ -73,5 +73,22 @@ $vals_proj  = $avals->index($apnzi);
 
 pdlok("ccs_decode_pointer:partial:dim=1:which", $which_proj->vv_qsortvec, $aslice1->whichND->vv_qsortvec);
 pdlok("ccs_decode_pointer:partial:dim=1:vals",  $vals_proj, $aslice1->indexND($which_proj));
+
+##-- test Compat::ccswhichND-style usage with pre-allocated outputs
+sub test_decode_args {
+  my ($label, @args) = @_;
+  print "# test_decode_args:$label\n";
+  my $aptr = pdl(indx, [0,3,7,9,12,16, 19]); # == $ptr0->append(19)
+  my $aproj = sequence(indx, $aptr->nelem - 1);
+
+  my ($projix, $nzix) = ccs_decode_pointer($aptr, $aproj, @args);
+  pdlok("test_decode_args:$label:projix", $projix, pdl(indx, [0,0,0,1,1,1,1,2,2,3,3,3,4,4,4,4,5,5,5]));
+  pdlok("test_decode_args:$label:nzix", $nzix, sequence(indx, 19));
+}
+test_decode_args('no-outputs');
+test_decode_args('null-outputs', null, null);
+test_decode_args('prealloc-projix', zeroes(indx, 19), null);
+test_decode_args('prealloc-nzix', null, zeroes(indx, 19));
+test_decode_args('prealloc-all', zeroes(indx, 19), zeroes(indx, 19));
 
 done_testing;

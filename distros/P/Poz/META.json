@@ -64,7 +64,7 @@
    "provides" : {
       "Poz" : {
          "file" : "lib/Poz.pm",
-         "version" : "0.11"
+         "version" : "0.14"
       },
       "Poz::Builder" : {
          "file" : "lib/Poz/Builder.pm"
@@ -77,6 +77,9 @@
       },
       "Poz::Types::enum" : {
          "file" : "lib/Poz/Types/enum.pm"
+      },
+      "Poz::Types::is" : {
+         "file" : "lib/Poz/Types/is.pm"
       },
       "Poz::Types::null" : {
          "file" : "lib/Poz/Types/null.pm"
@@ -109,7 +112,7 @@
          "web" : "https://github.com/ytnobody/p5-Poz"
       }
    },
-   "version" : "0.11",
+   "version" : "0.14",
    "x_contributors" : [
       "kobaken <kentafly88@gmail.com>"
    ],

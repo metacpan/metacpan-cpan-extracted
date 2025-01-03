@@ -1,5 +1,11 @@
 The following logs changes for the CPAN distribution Valiant
 
+0.002015 2025 January 02
+          - Fixed goof in previous release
+
+0.002014 2025 January 02
+          - Further improvements to JSONification
+
 0.002013 2025 January 01
           - fixed 'TO_JSON' method in Valiant::Errors to properly return a hashref.
 

@@ -1,7 +1,7 @@
 ---
 abstract: 'Utilities to test STDOUT and STDERR messages.'
 author:
-  - 'brian d foy <bdfoy@cpan.org>'
+  - 'brian d foy <briandfoy@pobox.com>'
 build_requires:
   Test::More: '1'
   Test::Tester: '0.107'
@@ -9,7 +9,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::Spec::Functions: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 keywords:
   - testing
   - STDOUT
@@ -31,5 +31,5 @@ resources:
   bugtracker: https://github.com/briandfoy/test-output/issues
   homepage: https://github.com/briandfoy/test-output
   repository: https://github.com/briandfoy/test-output
-version: '1.034'
+version: '1.035'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
