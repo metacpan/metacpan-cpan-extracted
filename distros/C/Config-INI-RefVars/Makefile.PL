@@ -3,6 +3,8 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
+
+
 my %WriteMakefileArgs = (
     NAME             => 'Config::INI::RefVars',
     AUTHOR           => q{Abdul al Hazred <451@gmx.eu>},
@@ -35,10 +37,15 @@ my %WriteMakefileArgs = (
         'Test::Fatal' => '0.010',
         'Test::Warn' => '0.37',
     },
-    PM_FILTER => 'perl tools/pm_filter_simple.pl',
-    dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+    dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', DIST_CP => 'cp',
+               PREOP => 'perl tools/pm_filter_simple.pl $(DISTVNAME)'
+    },
     clean => { FILES => 'Config-INI-RefVars-*' },
 );
+
+if ($ENV{AAHAZRED_PERL_DEVEL}) {
+  $WriteMakefileArgs{PM_FILTER} = 'perl tools/pm_filter_simple.pl';
+}
 
 # Compatibility with old versions of ExtUtils::MakeMaker
 unless (eval { ExtUtils::MakeMaker->VERSION('6.64'); 1 }) {

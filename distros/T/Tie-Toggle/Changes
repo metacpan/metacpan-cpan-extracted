@@ -1,5 +1,8 @@
 Revision history for Perl module Tie::Toggle
 
+1.086 2025-01-04T05:08:54Z
+	* refresh distro and move to BRIANDFOY
+
 1.085 2024-02-05T20:08:46Z
 	* Fix Makefile to get rid of MY. Don't remember what I was doing there.
 	* refresh distro, update email addresses

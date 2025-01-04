@@ -17,7 +17,7 @@ our %EXPORT_TAGS = ( 'all' => \@EXPORT_OK, );
 our @CARP_NOT = ('Crypt::URandom');
 
 BEGIN {
-    our $VERSION = '0.43';
+    our $VERSION = '0.46';
     eval {
         require XSLoader;
 
@@ -29,14 +29,14 @@ BEGIN {
 ## no critic (ProhibitConstantPragma)
 # using constant for the speed benefit of constant-folding of values
 
-use constant CRYPT_SILENT      => 64;               # hex 40
+use constant CRYPT_SILENT      => 64;                     # hex 40
 use constant PROV_RSA_FULL     => 1;
-use constant VERIFY_CONTEXT    => 4_026_531_840;    # hex 'F0000000'
+use constant VERIFY_CONTEXT    => 4_026_531_840;          # hex 'F0000000'
 use constant W2K_MAJOR_VERSION => 5;
 use constant W2K_MINOR_VERSION => 0;
-use constant OS_FREEBSD => $OSNAME eq 'freebsd';
-use constant OS_WIN32 => $OSNAME eq 'MSWin32';
-use constant PATH     => do {
+use constant OS_FREEBSD        => $OSNAME eq 'freebsd';
+use constant OS_WIN32          => $OSNAME eq 'MSWin32';
+use constant PATH              => do {
     my $path = '/dev/urandom';
     if ( OS_FREEBSD() ) {
         $path = '/dev/random';    # FreeBSD's /dev/random is non-blocking
@@ -218,7 +218,7 @@ Crypt::URandom - Provide non blocking randomness
 
 =head1 VERSION
 
-This document describes Crypt::URandom version 0.43
+This document describes Crypt::URandom version 0.46
 
 
 =head1 SYNOPSIS
@@ -385,7 +385,7 @@ gratitude from Crypt::Random::Source::Strong::Win32 by Max Kanat-Alexander
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2023, David Dick C<< <ddick@cpan.org> >>. All rights reserved.
+Copyright (c) 2025, David Dick C<< <ddick@cpan.org> >>. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

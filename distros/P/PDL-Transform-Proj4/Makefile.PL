@@ -4,31 +4,34 @@ use ExtUtils::MakeMaker;
 use PDL::Core::Dev;
 use Alien::proj;
 
-my $package_name = "PDL::Transform::Proj4";
-my $lib_name = "Proj4";
+my @pd_srcs;
+undef &MY::init_PM; # suppress warning
+*MY::init_PM = sub {
+  package MY; # so that "SUPER" works right
+  my ($self) = @_;
+  $self->SUPER::init_PM;
+  @pd_srcs = ::pdlpp_eumm_update_deep($self);
+};
+sub MY::postamble { pdlpp_postamble(@pd_srcs) }
 
-my $ppfile = "proj4.pd";
-my $package = [$ppfile, 'Proj4', $package_name];
-my %hash = pdlpp_stdargs($package);
-$hash{VERSION_FROM} = $ppfile;
-$hash{LIBS}[0] .= ' ' . Alien::proj->libs;
-$hash{INC}     .= ' ' . Alien::proj->cflags;
-$hash{realclean} ||= { FILES => 'Proj4.xs' };
-$hash{realclean}{FILES} .= ' _Inline';
-$hash{PM}{'Demo.pm'} = '$(INST_LIB)/PDL/Demos/Proj4_demo.pm';
-$hash{CONFIGURE_REQUIRES} = {
-  'ExtUtils::MakeMaker' => 0,
-  'PDL' => '2.094',
-  'Alien::proj' => '1.29', # guarantee minimum PROJ 7.1 as need degree_output
-};
-$hash{PREREQ_PM} = {
-  'PDL' => '2.094',
-};
-$hash{TEST_REQUIRES} = {
-  'Test::More' => '0.88',
-};
-$hash{AUTHOR} = 'PerlDL Developers <pdl-general@lists.sourceforge.net>';
-
-undef &MY::postamble; # suppress warning
-*MY::postamble = sub { pdlpp_postamble( $package ); };
-WriteMakefile(%hash);
+WriteMakefile(
+  NAME  => 'PDL::Transform::Proj4',
+  VERSION_FROM => 'lib/PDL/Transform/Proj4.pd',
+  MIN_PERL_VERSION => '5.016',
+  AUTHOR => 'PerlDL Developers <pdl-general@lists.sourceforge.net>',
+  CONFIGURE_REQUIRES => {
+    'ExtUtils::MakeMaker' => 0,
+    'PDL' => '2.096',
+    'Alien::proj' => '1.29', # guarantee minimum PROJ 7.1 as need degree_output
+  },
+  PREREQ_PM => {
+    'PDL' => '2.096',
+  },
+  TEST_REQUIRES => {
+    'Test::More' => '0.88',
+  },
+  INC => Alien::proj->cflags,
+  LIBS => [Alien::proj->libs],
+  clean => { FILES => join ' ', qw(MANIFEST.bak) },
+  NO_MYMETA => 1,
+);

@@ -9,6 +9,7 @@ MANIFEST.SKIP
 META.json
 META.yml
 README.pod
+SECURITY.md
 t/expire.t
 t/load.t
 t/pod.t

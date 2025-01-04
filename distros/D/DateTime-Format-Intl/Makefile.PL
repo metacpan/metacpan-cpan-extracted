@@ -31,8 +31,7 @@ my %WriteMakefileArgs = (
         'DateTime::Locale::FromCLDR'    => 'v0.6.0',
         'DateTime::Format::Unicode'     => 'v0.1.5',
         'Locale::Intl'                  => 'v0.1.2',
-        'Locale::Unicode::Data'         => 'v1.0.4',
-        'POSIX'                         => 0,
+        'Locale::Unicode::Data'         => 'v1.3.0',
         'Scalar::Util'                  => 0,
         # Version compatible with perl v5.10.1
         'Want'                          => '0.17',

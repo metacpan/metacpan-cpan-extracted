@@ -1,3 +1,4 @@
+.downstream.json
 Changes
 CONTRIBUTING.md
 examples/README
@@ -8,6 +9,7 @@ Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 README.pod
+SECURITY.md
 t/cycle.t
 t/load.t
 t/one.t

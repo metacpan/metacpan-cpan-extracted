@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Unicode Locale Identifier - ~/lib/Locale/Unicode.pm
-## Version v0.3.9
+## Version v0.3.10
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/05/11
-## Modified 2024/10/07
+## Modified 2025/01/04
 ## All rights reserved
 ## 
 ## 
@@ -407,7 +407,7 @@ BEGIN
     our $PROP_TO_SUB = {};
     # False, by default
     our $EXPLICIT_BOOLEAN = 0;
-    our $VERSION = 'v0.3.9';
+    our $VERSION = 'v0.3.10';
 };
 
 use strict;
@@ -572,7 +572,7 @@ sub apply
 sub as_string
 {
     my $self = shift( @_ );
-    return( $self->{_cache_value} ) if( $self->{_cache_value} && !CORE::length( $self->{_reset} ) );
+    return( $self->{_cache_value} ) if( $self->{_cache_value} && !CORE::length( $self->{_reset} // '' ) );
     my $unicodes =
     {
     ca  => 'calendar',
@@ -1551,7 +1551,7 @@ sub rg { return( shift->region_override( @_ ) ); }
 sub reset
 {
     my $self = shift( @_ );
-    if( !CORE::length( $self->{_reset} ) && scalar( @_ ) )
+    if( !CORE::length( $self->{_reset} // '' ) && scalar( @_ ) )
     {
         $self->{_reset} = scalar( @_ );
     }
@@ -1709,7 +1709,7 @@ sub tz_name2id
     my $name = shift( @_ ) || return( $self->error( "No CLDR timezone ID was provided." ) );
     if( !exists( $TZ_NAME2ID->{ $name } ) ||
         !defined( $TZ_NAME2ID->{ $name } ) ||
-        !length( $TZ_NAME2ID->{ $name } ) )
+        !length( $TZ_NAME2ID->{ $name } // '' ) )
     {
         return( '' );
     }
@@ -3705,7 +3705,7 @@ sub as_string
 {
     no overloading;
     my $self = shift( @_ );
-    return( $self->{_cache_value} ) if( $self->{_cache_value} && !CORE::length( $self->{_reset} ) );
+    return( $self->{_cache_value} ) if( $self->{_cache_value} && !CORE::length( $self->{_reset} // '' ) );
     my $str = $self->message;
     $str = "$str";
     $str =~ s/\r?\n$//g;
@@ -3747,7 +3747,7 @@ sub PROPAGATE
 sub reset
 {
     my $self = shift( @_ );
-    if( !CORE::length( $self->{_reset} ) && scalar( @_ ) )
+    if( !CORE::length( $self->{_reset} // '' ) && scalar( @_ ) )
     {
         $self->{_reset} = scalar( @_ );
     }
@@ -3938,7 +3938,7 @@ In Scalar or in list context, the value returned is the last value set.
 
 =head1 VERSION
 
-    v0.3.9
+    v0.3.10
 
 =head1 DESCRIPTION
 
@@ -3950,7 +3950,7 @@ The only requirement is to provide a proper L<language|https://unicode.org/repor
 
 For your convenience, summary of key elements of the standard can be found in this documentation.
 
-It is lightweight and fast with no dependency outside of L<Scalar::Util> and L<Want>. It requires perl C<v5.10> minimum to operate.
+It is lightweight and fast with no dependency outside of L<Scalar::Util> and L<Want>. It requires perl C<v5.10.1> minimum to operate.
 
 The object stringifies, and once its string value is computed, it is cached and re-used until it is changed. Thus repetitive call to L<as_string|/as_string> or to stringification does not incur any speed penalty by recomputing what has not changed.
 

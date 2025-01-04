@@ -31,9 +31,8 @@ Makefile\.old
 \.patch$
 \.so$
 \.tar\.gz$
-/core$
 \b_eumm/
-^Proj\.(pm|xs|c)$
+^lib/PDL/Transform/Proj4(\.(pm|xs|c)$|-pp-)
 ^\.\#.*
 ^\.exists
 ^\.git
@@ -46,7 +45,7 @@ Makefile\.old
 ^\.github/
 ^\.cirrus\.yml
 
-^cover_db/
+cover_db/
 ^nytprof(/|\.out)
 \.gc(ov|no|da)$
 pp-\w*\.c$

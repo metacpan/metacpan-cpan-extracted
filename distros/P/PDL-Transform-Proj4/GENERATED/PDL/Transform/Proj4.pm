@@ -1,5 +1,5 @@
 #
-# GENERATED WITH PDL::PP from proj4.pd! Don't modify!
+# GENERATED WITH PDL::PP from lib/PDL/Transform/Proj4.pd! Don't modify!
 #
 package PDL::Transform::Proj4;
 
@@ -11,7 +11,7 @@ use PDL::Exporter;
 use DynaLoader;
 
 
-   our $VERSION = '2.096';
+   our $VERSION = '2.097';
    our @ISA = ( 'PDL::Exporter','DynaLoader','PDL::Transform' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Transform::Proj4 $VERSION;
@@ -22,7 +22,7 @@ use DynaLoader;
 
 
 
-#line 168 "proj4.pd"
+#line 168 "lib/PDL/Transform/Proj4.pd"
 
 # PDL::Transform::Proj4
 #
@@ -281,7 +281,7 @@ sub update_proj_string {
     # (Re)Generate the proj_params string from the options passed:
     my @params = map "+$_".($self->{params}{$_} eq 'ON' ? '' : "=$self->{params}{$_}"),
       sort grep $_ ne 'proj_params' && defined $self->{params}{$_}, keys %{$self->{params}};
-#line 426 "proj4.pd"
+#line 426 "lib/PDL/Transform/Proj4.pd"
     $self->{params}{proj_params} = "@params";
   my ($iunit, $ounit) = PDL::Transform::Proj4::units($self->{params}{proj_params});
   @$self{qw(iunit ounit)} = ([($iunit)x2], [($ounit)x2]);
@@ -318,7 +318,7 @@ sub new {
 }
 EOF
 }
-#line 322 "Proj4.pm"
+#line 322 "lib/PDL/Transform/Proj4.pm"
 
 *fwd_transform = \&PDL::fwd_transform;
 
@@ -331,7 +331,7 @@ EOF
 
 
 
-#line 150 "proj4.pd"
+#line 150 "lib/PDL/Transform/Proj4.pd"
 
 =head2 proj_version
 
@@ -340,7 +340,7 @@ Not exported.
 
 =cut
 
-#line 159 "proj4.pd"
+#line 159 "lib/PDL/Transform/Proj4.pd"
 sub load_projection_information {+{
   'adams_hemi' => {
     'CATEGORIES' => [
@@ -2612,7 +2612,7 @@ sub load_projection_information {+{
 }
 }
 
-#line 467 "proj4.pd"
+#line 467 "lib/PDL/Transform/Proj4.pd"
 
 =head1 FUNCTIONS
 
@@ -2622,7 +2622,7 @@ This is the main entry point for the generalized interface. See above on its usa
 
 =cut
 
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 =head2 t_proj_adams_hemi
 
 Proj4 projection code C<adams_hemi>, full name "Adams Hemisphere in a Square".
@@ -2632,7 +2632,7 @@ Categories: B<no inverse> Misc Sph.
 =cut
 
 sub t_proj_adams_hemi {'PDL::Transform::Proj4::adams_hemi'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_adams_ws1
 
@@ -2643,7 +2643,7 @@ Categories: B<no inverse> Misc Sph.
 =cut
 
 sub t_proj_adams_ws1 {'PDL::Transform::Proj4::adams_ws1'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_adams_ws2
 
@@ -2654,7 +2654,7 @@ Categories: B<no inverse> Misc Sph.
 =cut
 
 sub t_proj_adams_ws2 {'PDL::Transform::Proj4::adams_ws2'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_aea
 
@@ -2677,7 +2677,7 @@ Projection Parameters
 =cut
 
 sub t_proj_aea {'PDL::Transform::Proj4::aea'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_aeqd
 
@@ -2700,7 +2700,7 @@ Projection Parameters
 =cut
 
 sub t_proj_aeqd {'PDL::Transform::Proj4::aeqd'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_affine
 
@@ -2709,7 +2709,7 @@ Proj4 projection code C<affine>, full name "Affine transformation".
 =cut
 
 sub t_proj_affine {'PDL::Transform::Proj4::affine'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_airy
 
@@ -2732,7 +2732,7 @@ Projection Parameters
 =cut
 
 sub t_proj_airy {'PDL::Transform::Proj4::airy'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_aitoff
 
@@ -2743,7 +2743,7 @@ Categories: Misc Sph.
 =cut
 
 sub t_proj_aitoff {'PDL::Transform::Proj4::aitoff'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_alsk
 
@@ -2754,7 +2754,7 @@ Categories: Azi(mod).
 =cut
 
 sub t_proj_alsk {'PDL::Transform::Proj4::alsk'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_apian
 
@@ -2765,7 +2765,7 @@ Categories: B<no inverse> Misc Sph.
 =cut
 
 sub t_proj_apian {'PDL::Transform::Proj4::apian'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_august
 
@@ -2776,7 +2776,7 @@ Categories: B<no inverse> Misc Sph.
 =cut
 
 sub t_proj_august {'PDL::Transform::Proj4::august'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_axisswap
 
@@ -2785,7 +2785,7 @@ Proj4 projection code C<axisswap>, full name "Axis ordering".
 =cut
 
 sub t_proj_axisswap {'PDL::Transform::Proj4::axisswap'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_bacon
 
@@ -2796,7 +2796,7 @@ Categories: B<no inverse> Misc Sph.
 =cut
 
 sub t_proj_bacon {'PDL::Transform::Proj4::bacon'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_bertin1953
 
@@ -2807,7 +2807,7 @@ Categories: B<no inverse> Misc Sph.
 =cut
 
 sub t_proj_bertin1953 {'PDL::Transform::Proj4::bertin1953'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_bipc
 
@@ -2818,7 +2818,7 @@ Categories: Conic Sph.
 =cut
 
 sub t_proj_bipc {'PDL::Transform::Proj4::bipc'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_boggs
 
@@ -2829,7 +2829,7 @@ Categories: B<no inverse> PCyl Sph.
 =cut
 
 sub t_proj_boggs {'PDL::Transform::Proj4::boggs'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_bonne
 
@@ -2850,7 +2850,7 @@ Projection Parameters
 =cut
 
 sub t_proj_bonne {'PDL::Transform::Proj4::bonne'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_calcofi
 
@@ -2861,7 +2861,7 @@ Categories: Cyl Sph Ell.
 =cut
 
 sub t_proj_calcofi {'PDL::Transform::Proj4::calcofi'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_cart
 
@@ -2870,7 +2870,7 @@ Proj4 projection code C<cart>, full name "Geodetic/cartesian conversions".
 =cut
 
 sub t_proj_cart {'PDL::Transform::Proj4::cart'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_cass
 
@@ -2881,7 +2881,7 @@ Categories: Cyl Sph Ell.
 =cut
 
 sub t_proj_cass {'PDL::Transform::Proj4::cass'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_cc
 
@@ -2892,7 +2892,7 @@ Categories: Cyl Sph.
 =cut
 
 sub t_proj_cc {'PDL::Transform::Proj4::cc'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_ccon
 
@@ -2913,7 +2913,7 @@ Projection Parameters
 =cut
 
 sub t_proj_ccon {'PDL::Transform::Proj4::ccon'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_cea
 
@@ -2934,7 +2934,7 @@ Projection Parameters
 =cut
 
 sub t_proj_cea {'PDL::Transform::Proj4::cea'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_chamb
 
@@ -2965,7 +2965,7 @@ Projection Parameters
 =cut
 
 sub t_proj_chamb {'PDL::Transform::Proj4::chamb'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_col_urban
 
@@ -2986,7 +2986,7 @@ Projection Parameters
 =cut
 
 sub t_proj_col_urban {'PDL::Transform::Proj4::col_urban'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_collg
 
@@ -2997,7 +2997,7 @@ Categories: PCyl Sph.
 =cut
 
 sub t_proj_collg {'PDL::Transform::Proj4::collg'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_comill
 
@@ -3008,7 +3008,7 @@ Categories: Cyl Sph.
 =cut
 
 sub t_proj_comill {'PDL::Transform::Proj4::comill'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_crast
 
@@ -3019,7 +3019,7 @@ Categories: PCyl Sph.
 =cut
 
 sub t_proj_crast {'PDL::Transform::Proj4::crast'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_defmodel
 
@@ -3028,7 +3028,7 @@ Proj4 projection code C<defmodel>, full name "Deformation model".
 =cut
 
 sub t_proj_defmodel {'PDL::Transform::Proj4::defmodel'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_deformation
 
@@ -3037,7 +3037,7 @@ Proj4 projection code C<deformation>, full name "Kinematic grid shift".
 =cut
 
 sub t_proj_deformation {'PDL::Transform::Proj4::deformation'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_denoy
 
@@ -3048,7 +3048,7 @@ Categories: B<no inverse> PCyl Sph.
 =cut
 
 sub t_proj_denoy {'PDL::Transform::Proj4::denoy'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_eck1
 
@@ -3059,7 +3059,7 @@ Categories: PCyl Sph.
 =cut
 
 sub t_proj_eck1 {'PDL::Transform::Proj4::eck1'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_eck2
 
@@ -3070,7 +3070,7 @@ Categories: PCyl Sph.
 =cut
 
 sub t_proj_eck2 {'PDL::Transform::Proj4::eck2'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_eck3
 
@@ -3081,7 +3081,7 @@ Categories: PCyl Sph.
 =cut
 
 sub t_proj_eck3 {'PDL::Transform::Proj4::eck3'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_eck4
 
@@ -3092,7 +3092,7 @@ Categories: PCyl Sph.
 =cut
 
 sub t_proj_eck4 {'PDL::Transform::Proj4::eck4'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_eck5
 
@@ -3103,7 +3103,7 @@ Categories: PCyl Sph.
 =cut
 
 sub t_proj_eck5 {'PDL::Transform::Proj4::eck5'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_eck6
 
@@ -3114,7 +3114,7 @@ Categories: PCyl Sph.
 =cut
 
 sub t_proj_eck6 {'PDL::Transform::Proj4::eck6'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_eqc
 
@@ -3137,7 +3137,7 @@ Projection Parameters
 =cut
 
 sub t_proj_eqc {'PDL::Transform::Proj4::eqc'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_eqdc
 
@@ -3160,7 +3160,7 @@ Projection Parameters
 =cut
 
 sub t_proj_eqdc {'PDL::Transform::Proj4::eqdc'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_eqearth
 
@@ -3171,7 +3171,7 @@ Categories: PCyl Sph Ell.
 =cut
 
 sub t_proj_eqearth {'PDL::Transform::Proj4::eqearth'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_etmerc
 
@@ -3182,7 +3182,7 @@ Categories: Cyl Sph.
 =cut
 
 sub t_proj_etmerc {'PDL::Transform::Proj4::etmerc'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_euler
 
@@ -3205,7 +3205,7 @@ Projection Parameters
 =cut
 
 sub t_proj_euler {'PDL::Transform::Proj4::euler'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_fahey
 
@@ -3216,7 +3216,7 @@ Categories: Pcyl Sph.
 =cut
 
 sub t_proj_fahey {'PDL::Transform::Proj4::fahey'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_fouc
 
@@ -3227,7 +3227,7 @@ Categories: PCyl Sph.
 =cut
 
 sub t_proj_fouc {'PDL::Transform::Proj4::fouc'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_fouc_s
 
@@ -3238,7 +3238,7 @@ Categories: PCyl Sph.
 =cut
 
 sub t_proj_fouc_s {'PDL::Transform::Proj4::fouc_s'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_gall
 
@@ -3249,7 +3249,7 @@ Categories: Cyl Sph.
 =cut
 
 sub t_proj_gall {'PDL::Transform::Proj4::gall'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_geoc
 
@@ -3258,7 +3258,7 @@ Proj4 projection code C<geoc>, full name "Geocentric Latitude".
 =cut
 
 sub t_proj_geoc {'PDL::Transform::Proj4::geoc'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_geogoffset
 
@@ -3267,7 +3267,7 @@ Proj4 projection code C<geogoffset>, full name "Geographic Offset".
 =cut
 
 sub t_proj_geogoffset {'PDL::Transform::Proj4::geogoffset'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_geos
 
@@ -3288,7 +3288,7 @@ Projection Parameters
 =cut
 
 sub t_proj_geos {'PDL::Transform::Proj4::geos'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_gins8
 
@@ -3299,7 +3299,7 @@ Categories: B<no inverse> PCyl Sph.
 =cut
 
 sub t_proj_gins8 {'PDL::Transform::Proj4::gins8'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_gn_sinu
 
@@ -3322,7 +3322,7 @@ Projection Parameters
 =cut
 
 sub t_proj_gn_sinu {'PDL::Transform::Proj4::gn_sinu'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_gnom
 
@@ -3333,7 +3333,7 @@ Categories: Azi Sph.
 =cut
 
 sub t_proj_gnom {'PDL::Transform::Proj4::gnom'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_goode
 
@@ -3344,7 +3344,7 @@ Categories: PCyl Sph.
 =cut
 
 sub t_proj_goode {'PDL::Transform::Proj4::goode'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_gridshift
 
@@ -3353,7 +3353,7 @@ Proj4 projection code C<gridshift>, full name "Generic grid shift".
 =cut
 
 sub t_proj_gridshift {'PDL::Transform::Proj4::gridshift'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_gs48
 
@@ -3364,7 +3364,7 @@ Categories: Azi(mod).
 =cut
 
 sub t_proj_gs48 {'PDL::Transform::Proj4::gs48'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_gs50
 
@@ -3375,7 +3375,7 @@ Categories: Azi(mod).
 =cut
 
 sub t_proj_gs50 {'PDL::Transform::Proj4::gs50'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_gstmerc
 
@@ -3400,7 +3400,7 @@ Projection Parameters
 =cut
 
 sub t_proj_gstmerc {'PDL::Transform::Proj4::gstmerc'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_guyou
 
@@ -3411,7 +3411,7 @@ Categories: B<no inverse> Misc Sph.
 =cut
 
 sub t_proj_guyou {'PDL::Transform::Proj4::guyou'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_hammer
 
@@ -3434,7 +3434,7 @@ Projection Parameters
 =cut
 
 sub t_proj_hammer {'PDL::Transform::Proj4::hammer'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_hatano
 
@@ -3445,7 +3445,7 @@ Categories: PCyl Sph.
 =cut
 
 sub t_proj_hatano {'PDL::Transform::Proj4::hatano'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_healpix
 
@@ -3466,7 +3466,7 @@ Projection Parameters
 =cut
 
 sub t_proj_healpix {'PDL::Transform::Proj4::healpix'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_helmert
 
@@ -3475,7 +3475,7 @@ Proj4 projection code C<helmert>, full name "3(6)-, 4(8)- and 7(14)-parameter He
 =cut
 
 sub t_proj_helmert {'PDL::Transform::Proj4::helmert'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_hgridshift
 
@@ -3484,7 +3484,7 @@ Proj4 projection code C<hgridshift>, full name "Horizontal grid shift".
 =cut
 
 sub t_proj_hgridshift {'PDL::Transform::Proj4::hgridshift'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_horner
 
@@ -3493,7 +3493,7 @@ Proj4 projection code C<horner>, full name "Horner polynomial evaluation".
 =cut
 
 sub t_proj_horner {'PDL::Transform::Proj4::horner'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_igh
 
@@ -3504,7 +3504,7 @@ Categories: PCyl Sph.
 =cut
 
 sub t_proj_igh {'PDL::Transform::Proj4::igh'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_igh_o
 
@@ -3515,7 +3515,7 @@ Categories: PCyl Sph.
 =cut
 
 sub t_proj_igh_o {'PDL::Transform::Proj4::igh_o'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_imoll
 
@@ -3526,7 +3526,7 @@ Categories: PCyl Sph.
 =cut
 
 sub t_proj_imoll {'PDL::Transform::Proj4::imoll'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_imoll_o
 
@@ -3537,7 +3537,7 @@ Categories: PCyl Sph.
 =cut
 
 sub t_proj_imoll_o {'PDL::Transform::Proj4::imoll_o'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_imw_p
 
@@ -3562,7 +3562,7 @@ Projection Parameters
 =cut
 
 sub t_proj_imw_p {'PDL::Transform::Proj4::imw_p'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_isea
 
@@ -3573,7 +3573,7 @@ Categories: Sph.
 =cut
 
 sub t_proj_isea {'PDL::Transform::Proj4::isea'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_kav5
 
@@ -3584,7 +3584,7 @@ Categories: PCyl Sph.
 =cut
 
 sub t_proj_kav5 {'PDL::Transform::Proj4::kav5'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_kav7
 
@@ -3595,7 +3595,7 @@ Categories: PCyl Sph.
 =cut
 
 sub t_proj_kav7 {'PDL::Transform::Proj4::kav7'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_krovak
 
@@ -3606,7 +3606,7 @@ Categories: PCyl Ell.
 =cut
 
 sub t_proj_krovak {'PDL::Transform::Proj4::krovak'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_labrd
 
@@ -3627,7 +3627,7 @@ Projection Parameters
 =cut
 
 sub t_proj_labrd {'PDL::Transform::Proj4::labrd'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_laea
 
@@ -3638,7 +3638,7 @@ Categories: Azi Sph Ell.
 =cut
 
 sub t_proj_laea {'PDL::Transform::Proj4::laea'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_lagrng
 
@@ -3659,7 +3659,7 @@ Projection Parameters
 =cut
 
 sub t_proj_lagrng {'PDL::Transform::Proj4::lagrng'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_larr
 
@@ -3670,7 +3670,7 @@ Categories: B<no inverse> Misc Sph.
 =cut
 
 sub t_proj_larr {'PDL::Transform::Proj4::larr'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_lask
 
@@ -3681,7 +3681,7 @@ Categories: B<no inverse> Misc Sph.
 =cut
 
 sub t_proj_lask {'PDL::Transform::Proj4::lask'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_latlon
 
@@ -3690,7 +3690,7 @@ Proj4 projection code C<latlon>, full name "Lat/long (Geodetic alias)".
 =cut
 
 sub t_proj_latlon {'PDL::Transform::Proj4::latlon'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_lcc
 
@@ -3717,7 +3717,7 @@ Projection Parameters
 =cut
 
 sub t_proj_lcc {'PDL::Transform::Proj4::lcc'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_lcca
 
@@ -3738,7 +3738,7 @@ Projection Parameters
 =cut
 
 sub t_proj_lcca {'PDL::Transform::Proj4::lcca'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_leac
 
@@ -3761,7 +3761,7 @@ Projection Parameters
 =cut
 
 sub t_proj_leac {'PDL::Transform::Proj4::leac'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_lee_os
 
@@ -3772,7 +3772,7 @@ Categories: Azi(mod).
 =cut
 
 sub t_proj_lee_os {'PDL::Transform::Proj4::lee_os'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_lonlat
 
@@ -3781,7 +3781,7 @@ Proj4 projection code C<lonlat>, full name "Lat/long (Geodetic)".
 =cut
 
 sub t_proj_lonlat {'PDL::Transform::Proj4::lonlat'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_loxim
 
@@ -3792,7 +3792,7 @@ Categories: PCyl Sph.
 =cut
 
 sub t_proj_loxim {'PDL::Transform::Proj4::loxim'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_lsat
 
@@ -3815,7 +3815,7 @@ Projection Parameters
 =cut
 
 sub t_proj_lsat {'PDL::Transform::Proj4::lsat'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_mbt_fps
 
@@ -3826,7 +3826,7 @@ Categories: Cyl Sph.
 =cut
 
 sub t_proj_mbt_fps {'PDL::Transform::Proj4::mbt_fps'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_mbt_s
 
@@ -3837,7 +3837,7 @@ Categories: PCyl Sph.
 =cut
 
 sub t_proj_mbt_s {'PDL::Transform::Proj4::mbt_s'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_mbtfpp
 
@@ -3848,7 +3848,7 @@ Categories: Cyl Sph.
 =cut
 
 sub t_proj_mbtfpp {'PDL::Transform::Proj4::mbtfpp'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_mbtfpq
 
@@ -3859,7 +3859,7 @@ Categories: Cyl Sph.
 =cut
 
 sub t_proj_mbtfpq {'PDL::Transform::Proj4::mbtfpq'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_mbtfps
 
@@ -3870,7 +3870,7 @@ Categories: PCyl Sph.
 =cut
 
 sub t_proj_mbtfps {'PDL::Transform::Proj4::mbtfps'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_merc
 
@@ -3891,7 +3891,7 @@ Projection Parameters
 =cut
 
 sub t_proj_merc {'PDL::Transform::Proj4::merc'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_mil_os
 
@@ -3902,7 +3902,7 @@ Categories: Azi(mod).
 =cut
 
 sub t_proj_mil_os {'PDL::Transform::Proj4::mil_os'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_mill
 
@@ -3913,7 +3913,7 @@ Categories: Cyl Sph.
 =cut
 
 sub t_proj_mill {'PDL::Transform::Proj4::mill'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_misrsom
 
@@ -3934,7 +3934,7 @@ Projection Parameters
 =cut
 
 sub t_proj_misrsom {'PDL::Transform::Proj4::misrsom'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_mod_krovak
 
@@ -3945,7 +3945,7 @@ Categories: PCyl Ell.
 =cut
 
 sub t_proj_mod_krovak {'PDL::Transform::Proj4::mod_krovak'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_moll
 
@@ -3956,7 +3956,7 @@ Categories: PCyl Sph.
 =cut
 
 sub t_proj_moll {'PDL::Transform::Proj4::moll'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_molobadekas
 
@@ -3965,7 +3965,7 @@ Proj4 projection code C<molobadekas>, full name "Molodensky-Badekas transformati
 =cut
 
 sub t_proj_molobadekas {'PDL::Transform::Proj4::molobadekas'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_molodensky
 
@@ -3974,7 +3974,7 @@ Proj4 projection code C<molodensky>, full name "Molodensky transform".
 =cut
 
 sub t_proj_molodensky {'PDL::Transform::Proj4::molodensky'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_murd1
 
@@ -3997,7 +3997,7 @@ Projection Parameters
 =cut
 
 sub t_proj_murd1 {'PDL::Transform::Proj4::murd1'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_murd2
 
@@ -4020,7 +4020,7 @@ Projection Parameters
 =cut
 
 sub t_proj_murd2 {'PDL::Transform::Proj4::murd2'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_murd3
 
@@ -4043,7 +4043,7 @@ Projection Parameters
 =cut
 
 sub t_proj_murd3 {'PDL::Transform::Proj4::murd3'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_natearth
 
@@ -4054,7 +4054,7 @@ Categories: PCyl Sph.
 =cut
 
 sub t_proj_natearth {'PDL::Transform::Proj4::natearth'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_natearth2
 
@@ -4065,7 +4065,7 @@ Categories: PCyl Sph.
 =cut
 
 sub t_proj_natearth2 {'PDL::Transform::Proj4::natearth2'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_nell
 
@@ -4076,7 +4076,7 @@ Categories: PCyl Sph.
 =cut
 
 sub t_proj_nell {'PDL::Transform::Proj4::nell'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_nell_h
 
@@ -4087,7 +4087,7 @@ Categories: PCyl Sph.
 =cut
 
 sub t_proj_nell_h {'PDL::Transform::Proj4::nell_h'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_nicol
 
@@ -4098,7 +4098,7 @@ Categories: B<no inverse> Misc Sph.
 =cut
 
 sub t_proj_nicol {'PDL::Transform::Proj4::nicol'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_noop
 
@@ -4107,7 +4107,7 @@ Proj4 projection code C<noop>, full name "No operation".
 =cut
 
 sub t_proj_noop {'PDL::Transform::Proj4::noop'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_nsper
 
@@ -4128,7 +4128,7 @@ Projection Parameters
 =cut
 
 sub t_proj_nsper {'PDL::Transform::Proj4::nsper'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_nzmg
 
@@ -4139,7 +4139,7 @@ Categories: fixed Earth.
 =cut
 
 sub t_proj_nzmg {'PDL::Transform::Proj4::nzmg'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_ob_tran
 
@@ -4178,7 +4178,7 @@ Projection Parameters
 =cut
 
 sub t_proj_ob_tran {'PDL::Transform::Proj4::ob_tran'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_ocea
 
@@ -4205,7 +4205,7 @@ Projection Parameters
 =cut
 
 sub t_proj_ocea {'PDL::Transform::Proj4::ocea'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_oea
 
@@ -4230,7 +4230,7 @@ Projection Parameters
 =cut
 
 sub t_proj_oea {'PDL::Transform::Proj4::oea'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_omerc
 
@@ -4265,7 +4265,7 @@ Projection Parameters
 =cut
 
 sub t_proj_omerc {'PDL::Transform::Proj4::omerc'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_ortel
 
@@ -4276,7 +4276,7 @@ Categories: B<no inverse> Misc Sph.
 =cut
 
 sub t_proj_ortel {'PDL::Transform::Proj4::ortel'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_ortho
 
@@ -4287,7 +4287,7 @@ Categories: Azi Sph Ell.
 =cut
 
 sub t_proj_ortho {'PDL::Transform::Proj4::ortho'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_patterson
 
@@ -4298,7 +4298,7 @@ Categories: Cyl.
 =cut
 
 sub t_proj_patterson {'PDL::Transform::Proj4::patterson'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_pconic
 
@@ -4321,7 +4321,7 @@ Projection Parameters
 =cut
 
 sub t_proj_pconic {'PDL::Transform::Proj4::pconic'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_peirce_q
 
@@ -4332,7 +4332,7 @@ Categories: B<no inverse> Misc Sph.
 =cut
 
 sub t_proj_peirce_q {'PDL::Transform::Proj4::peirce_q'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_pipeline
 
@@ -4341,7 +4341,7 @@ Proj4 projection code C<pipeline>, full name "Transformation pipeline manager".
 =cut
 
 sub t_proj_pipeline {'PDL::Transform::Proj4::pipeline'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_poly
 
@@ -4352,7 +4352,7 @@ Categories: Conic Sph Ell.
 =cut
 
 sub t_proj_poly {'PDL::Transform::Proj4::poly'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_pop
 
@@ -4361,7 +4361,7 @@ Proj4 projection code C<pop>, full name "Retrieve coordinate value from pipeline
 =cut
 
 sub t_proj_pop {'PDL::Transform::Proj4::pop'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_push
 
@@ -4370,7 +4370,7 @@ Proj4 projection code C<push>, full name "Save coordinate value on pipeline stac
 =cut
 
 sub t_proj_push {'PDL::Transform::Proj4::push'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_putp1
 
@@ -4381,7 +4381,7 @@ Categories: PCyl Sph.
 =cut
 
 sub t_proj_putp1 {'PDL::Transform::Proj4::putp1'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_putp2
 
@@ -4392,7 +4392,7 @@ Categories: PCyl Sph.
 =cut
 
 sub t_proj_putp2 {'PDL::Transform::Proj4::putp2'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_putp3
 
@@ -4403,7 +4403,7 @@ Categories: PCyl Sph.
 =cut
 
 sub t_proj_putp3 {'PDL::Transform::Proj4::putp3'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_putp3p
 
@@ -4414,7 +4414,7 @@ Categories: PCyl Sph.
 =cut
 
 sub t_proj_putp3p {'PDL::Transform::Proj4::putp3p'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_putp4p
 
@@ -4425,7 +4425,7 @@ Categories: PCyl Sph.
 =cut
 
 sub t_proj_putp4p {'PDL::Transform::Proj4::putp4p'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_putp5
 
@@ -4436,7 +4436,7 @@ Categories: PCyl Sph.
 =cut
 
 sub t_proj_putp5 {'PDL::Transform::Proj4::putp5'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_putp5p
 
@@ -4447,7 +4447,7 @@ Categories: PCyl Sph.
 =cut
 
 sub t_proj_putp5p {'PDL::Transform::Proj4::putp5p'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_putp6
 
@@ -4458,7 +4458,7 @@ Categories: PCyl Sph.
 =cut
 
 sub t_proj_putp6 {'PDL::Transform::Proj4::putp6'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_putp6p
 
@@ -4469,7 +4469,7 @@ Categories: PCyl Sph.
 =cut
 
 sub t_proj_putp6p {'PDL::Transform::Proj4::putp6p'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_qsc
 
@@ -4480,7 +4480,7 @@ Categories: Azi Sph.
 =cut
 
 sub t_proj_qsc {'PDL::Transform::Proj4::qsc'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_qua_aut
 
@@ -4491,7 +4491,7 @@ Categories: PCyl Sph.
 =cut
 
 sub t_proj_qua_aut {'PDL::Transform::Proj4::qua_aut'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_rhealpix
 
@@ -4514,7 +4514,7 @@ Projection Parameters
 =cut
 
 sub t_proj_rhealpix {'PDL::Transform::Proj4::rhealpix'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_robin
 
@@ -4525,7 +4525,7 @@ Categories: PCyl Sph.
 =cut
 
 sub t_proj_robin {'PDL::Transform::Proj4::robin'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_rouss
 
@@ -4536,7 +4536,7 @@ Categories: Azi Ell.
 =cut
 
 sub t_proj_rouss {'PDL::Transform::Proj4::rouss'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_rpoly
 
@@ -4557,7 +4557,7 @@ Projection Parameters
 =cut
 
 sub t_proj_rpoly {'PDL::Transform::Proj4::rpoly'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_s2
 
@@ -4568,7 +4568,7 @@ Categories: Misc Sph Ell.
 =cut
 
 sub t_proj_s2 {'PDL::Transform::Proj4::s2'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_sch
 
@@ -4595,7 +4595,7 @@ Projection Parameters
 =cut
 
 sub t_proj_sch {'PDL::Transform::Proj4::sch'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_set
 
@@ -4604,7 +4604,7 @@ Proj4 projection code C<set>, full name "Set coordinate value".
 =cut
 
 sub t_proj_set {'PDL::Transform::Proj4::set'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_sinu
 
@@ -4615,7 +4615,7 @@ Categories: PCyl Sph Ell.
 =cut
 
 sub t_proj_sinu {'PDL::Transform::Proj4::sinu'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_som
 
@@ -4640,7 +4640,7 @@ Projection Parameters
 =cut
 
 sub t_proj_som {'PDL::Transform::Proj4::som'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_somerc
 
@@ -4651,7 +4651,7 @@ Categories: Cyl Ell.
 =cut
 
 sub t_proj_somerc {'PDL::Transform::Proj4::somerc'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_stere
 
@@ -4672,7 +4672,7 @@ Projection Parameters
 =cut
 
 sub t_proj_stere {'PDL::Transform::Proj4::stere'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_sterea
 
@@ -4683,7 +4683,7 @@ Categories: Azimuthal Sph Ell.
 =cut
 
 sub t_proj_sterea {'PDL::Transform::Proj4::sterea'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_tcc
 
@@ -4694,7 +4694,7 @@ Categories: B<no inverse> Cyl Sph.
 =cut
 
 sub t_proj_tcc {'PDL::Transform::Proj4::tcc'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_tcea
 
@@ -4705,7 +4705,7 @@ Categories: Cyl Sph.
 =cut
 
 sub t_proj_tcea {'PDL::Transform::Proj4::tcea'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_times
 
@@ -4716,7 +4716,7 @@ Categories: Cyl Sph.
 =cut
 
 sub t_proj_times {'PDL::Transform::Proj4::times'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_tinshift
 
@@ -4725,7 +4725,7 @@ Proj4 projection code C<tinshift>, full name "Triangulation based transformation
 =cut
 
 sub t_proj_tinshift {'PDL::Transform::Proj4::tinshift'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_tissot
 
@@ -4748,7 +4748,7 @@ Projection Parameters
 =cut
 
 sub t_proj_tissot {'PDL::Transform::Proj4::tissot'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_tmerc
 
@@ -4769,7 +4769,7 @@ Projection Parameters
 =cut
 
 sub t_proj_tmerc {'PDL::Transform::Proj4::tmerc'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_tobmerc
 
@@ -4780,7 +4780,7 @@ Categories: Cyl Sph.
 =cut
 
 sub t_proj_tobmerc {'PDL::Transform::Proj4::tobmerc'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_topocentric
 
@@ -4789,7 +4789,7 @@ Proj4 projection code C<topocentric>, full name "Geocentric/Topocentric conversi
 =cut
 
 sub t_proj_topocentric {'PDL::Transform::Proj4::topocentric'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_tpeqd
 
@@ -4816,7 +4816,7 @@ Projection Parameters
 =cut
 
 sub t_proj_tpeqd {'PDL::Transform::Proj4::tpeqd'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_tpers
 
@@ -4841,7 +4841,7 @@ Projection Parameters
 =cut
 
 sub t_proj_tpers {'PDL::Transform::Proj4::tpers'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_unitconvert
 
@@ -4850,7 +4850,7 @@ Proj4 projection code C<unitconvert>, full name "Unit conversion".
 =cut
 
 sub t_proj_unitconvert {'PDL::Transform::Proj4::unitconvert'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_ups
 
@@ -4871,7 +4871,7 @@ Projection Parameters
 =cut
 
 sub t_proj_ups {'PDL::Transform::Proj4::ups'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_urm5
 
@@ -4896,7 +4896,7 @@ Projection Parameters
 =cut
 
 sub t_proj_urm5 {'PDL::Transform::Proj4::urm5'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_urmfps
 
@@ -4917,7 +4917,7 @@ Projection Parameters
 =cut
 
 sub t_proj_urmfps {'PDL::Transform::Proj4::urmfps'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_utm
 
@@ -4942,7 +4942,7 @@ Projection Parameters
 =cut
 
 sub t_proj_utm {'PDL::Transform::Proj4::utm'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_vandg
 
@@ -4953,7 +4953,7 @@ Categories: Misc Sph.
 =cut
 
 sub t_proj_vandg {'PDL::Transform::Proj4::vandg'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_vandg2
 
@@ -4964,7 +4964,7 @@ Categories: B<no inverse> Misc Sph.
 =cut
 
 sub t_proj_vandg2 {'PDL::Transform::Proj4::vandg2'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_vandg3
 
@@ -4975,7 +4975,7 @@ Categories: B<no inverse> Misc Sph.
 =cut
 
 sub t_proj_vandg3 {'PDL::Transform::Proj4::vandg3'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_vandg4
 
@@ -4986,7 +4986,7 @@ Categories: B<no inverse> Misc Sph.
 =cut
 
 sub t_proj_vandg4 {'PDL::Transform::Proj4::vandg4'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_vertoffset
 
@@ -5015,7 +5015,7 @@ Projection Parameters
 =cut
 
 sub t_proj_vertoffset {'PDL::Transform::Proj4::vertoffset'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_vgridshift
 
@@ -5024,7 +5024,7 @@ Proj4 projection code C<vgridshift>, full name "Vertical grid shift".
 =cut
 
 sub t_proj_vgridshift {'PDL::Transform::Proj4::vgridshift'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_vitk1
 
@@ -5047,7 +5047,7 @@ Projection Parameters
 =cut
 
 sub t_proj_vitk1 {'PDL::Transform::Proj4::vitk1'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_wag1
 
@@ -5058,7 +5058,7 @@ Categories: PCyl Sph.
 =cut
 
 sub t_proj_wag1 {'PDL::Transform::Proj4::wag1'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_wag2
 
@@ -5069,7 +5069,7 @@ Categories: PCyl Sph.
 =cut
 
 sub t_proj_wag2 {'PDL::Transform::Proj4::wag2'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_wag3
 
@@ -5090,7 +5090,7 @@ Projection Parameters
 =cut
 
 sub t_proj_wag3 {'PDL::Transform::Proj4::wag3'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_wag4
 
@@ -5101,7 +5101,7 @@ Categories: PCyl Sph.
 =cut
 
 sub t_proj_wag4 {'PDL::Transform::Proj4::wag4'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_wag5
 
@@ -5112,7 +5112,7 @@ Categories: PCyl Sph.
 =cut
 
 sub t_proj_wag5 {'PDL::Transform::Proj4::wag5'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_wag6
 
@@ -5123,7 +5123,7 @@ Categories: PCyl Sph.
 =cut
 
 sub t_proj_wag6 {'PDL::Transform::Proj4::wag6'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_wag7
 
@@ -5134,7 +5134,7 @@ Categories: B<no inverse> Misc Sph.
 =cut
 
 sub t_proj_wag7 {'PDL::Transform::Proj4::wag7'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_webmerc
 
@@ -5145,7 +5145,7 @@ Categories: Cyl Ell.
 =cut
 
 sub t_proj_webmerc {'PDL::Transform::Proj4::webmerc'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_weren
 
@@ -5156,7 +5156,7 @@ Categories: PCyl Sph.
 =cut
 
 sub t_proj_weren {'PDL::Transform::Proj4::weren'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_wink1
 
@@ -5177,7 +5177,7 @@ Projection Parameters
 =cut
 
 sub t_proj_wink1 {'PDL::Transform::Proj4::wink1'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_wink2
 
@@ -5198,7 +5198,7 @@ Projection Parameters
 =cut
 
 sub t_proj_wink2 {'PDL::Transform::Proj4::wink2'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_wintri
 
@@ -5219,7 +5219,7 @@ Projection Parameters
 =cut
 
 sub t_proj_wintri {'PDL::Transform::Proj4::wintri'->new(@_)}
-#line 484 "proj4.pd"
+#line 484 "lib/PDL/Transform/Proj4.pd"
 
 =head2 t_proj_xyzgridshift
 
@@ -5228,551 +5228,551 @@ Proj4 projection code C<xyzgridshift>, full name "Geocentric grid shift".
 =cut
 
 sub t_proj_xyzgridshift {'PDL::Transform::Proj4::xyzgridshift'->new(@_)}
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 
 _make_class(q{adams_hemi}, q{Adams Hemisphere in a Square}, 0, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{adams_ws1}, q{Adams World in a Square I}, 0, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{adams_ws2}, q{Adams World in a Square II}, 0, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{aea}, q{Albers Equal Area}, 1, q{qw(lat_1 lat_2)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{aeqd}, q{Azimuthal Equidistant}, 1, q{qw(lat_0 guam)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{affine}, q{Affine transformation}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{airy}, q{Airy}, 0, q{qw(no_cut lat_b)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{aitoff}, q{Aitoff}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{alsk}, q{Modified Stereographic of Alaska}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{apian}, q{Apian Globular I}, 0, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{august}, q{August Epicycloidal}, 0, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{axisswap}, q{Axis ordering}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{bacon}, q{Bacon Globular}, 0, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{bertin1953}, q{Bertin 1953}, 0, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{bipc}, q{Bipolar conic of western hemisphere}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{boggs}, q{Boggs Eumorphic}, 0, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{bonne}, q{Bonne (Werner lat_1=90)}, 1, q{qw(lat_1)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{calcofi}, q{Cal Coop Ocean Fish Invest Lines/Stations}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{cart}, q{Geodetic/cartesian conversions}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{cass}, q{Cassini}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{cc}, q{Central Cylindrical}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{ccon}, q{Central Conic}, 1, q{qw(lat_1)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{cea}, q{Equal Area Cylindrical}, 1, q{qw(lat_ts)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{chamb}, q{Chamberlin Trimetric}, 0, q{qw(lat_1 lon_1 lat_2 lon_2 lat_3 lon_3)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{col_urban}, q{Colombia Urban}, 1, q{qw(h_0)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{collg}, q{Collignon}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{comill}, q{Compact Miller}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{crast}, q{Craster Parabolic (Putnins P4)}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{defmodel}, q{Deformation model}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{deformation}, q{Kinematic grid shift}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{denoy}, q{Denoyer Semi-Elliptical}, 0, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{eck1}, q{Eckert I}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{eck2}, q{Eckert II}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{eck3}, q{Eckert III}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{eck4}, q{Eckert IV}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{eck5}, q{Eckert V}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{eck6}, q{Eckert VI}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{eqc}, q{Equidistant Cylindrical (Plate Carree)}, 1, q{qw(lat_ts lat_00)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{eqdc}, q{Equidistant Conic}, 1, q{qw(lat_1 lat_2)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{eqearth}, q{Equal Earth}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{etmerc}, q{Extended Transverse Mercator}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{euler}, q{Euler}, 1, q{qw(lat_1 lat_2)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{fahey}, q{Fahey}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{fouc}, q{Foucaut}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{fouc_s}, q{Foucaut Sinusoidal}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{gall}, q{Gall (Gall Stereographic)}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{geoc}, q{Geocentric Latitude}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{geogoffset}, q{Geographic Offset}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{geos}, q{Geostationary Satellite View}, 1, q{qw(h)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{gins8}, q{Ginsburg VIII (TsNIIGAiK)}, 0, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{gn_sinu}, q{General Sinusoidal Series}, 1, q{qw(m n)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{gnom}, q{Gnomonic}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{goode}, q{Goode Homolosine}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{gridshift}, q{Generic grid shift}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{gs48}, q{Modified Stereographic of 48 U.S.}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{gs50}, q{Modified Stereographic of 50 U.S.}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{gstmerc}, q{Gauss-Schreiber Transverse Mercator (aka Gauss-Laborde Reunion)}, 1, q{qw(lat_0 lon_0 k_0)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{guyou}, q{Guyou}, 0, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{hammer}, q{Hammer & Eckert-Greifendorff}, 1, q{qw(W M)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{hatano}, q{Hatano Asymmetrical Equal Area}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{healpix}, q{HEALPix}, 1, q{qw(rot_xy)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{helmert}, q{3(6)-, 4(8)- and 7(14)-parameter Helmert shift}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{hgridshift}, q{Horizontal grid shift}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{horner}, q{Horner polynomial evaluation}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{igh}, q{Interrupted Goode Homolosine}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{igh_o}, q{Interrupted Goode Homolosine Oceanic View}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{imoll}, q{Interrupted Mollweide}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{imoll_o}, q{Interrupted Mollweide Oceanic View}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{imw_p}, q{International Map of the World Polyconic}, 1, q{qw(lat_1 lat_2 lon_1)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{isea}, q{Icosahedral Snyder Equal Area}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{kav5}, q{Kavrayskiy V}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{kav7}, q{Kavrayskiy VII}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{krovak}, q{Krovak}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{labrd}, q{Laborde}, 1, q{qw(lat_0)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{laea}, q{Lambert Azimuthal Equal Area}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{lagrng}, q{Lagrange}, 1, q{qw(W)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{larr}, q{Larrivee}, 0, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{lask}, q{Laskowski}, 0, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{latlon}, q{Lat/long (Geodetic alias)}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{lcc}, q{Lambert Conformal Conic}, 1, q{qw(lat_1 lat_2 lat_0 k_0)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{lcca}, q{Lambert Conformal Conic Alternative}, 1, q{qw(lat_0)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{leac}, q{Lambert Equal Area Conic}, 1, q{qw(lat_1 south)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{lee_os}, q{Lee Oblated Stereographic}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{lonlat}, q{Lat/long (Geodetic)}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{loxim}, q{Loximuthal}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{lsat}, q{Space oblique for LANDSAT}, 1, q{qw(lsat path)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{mbt_fps}, q{McBryde-Thomas Flat-Pole Sine (No. 2)}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{mbt_s}, q{McBryde-Thomas Flat-Polar Sine (No. 1)}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{mbtfpp}, q{McBride-Thomas Flat-Polar Parabolic}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{mbtfpq}, q{McBryde-Thomas Flat-Polar Quartic}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{mbtfps}, q{McBryde-Thomas Flat-Polar Sinusoidal}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{merc}, q{Mercator}, 1, q{qw(lat_ts)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{mil_os}, q{Miller Oblated Stereographic}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{mill}, q{Miller Cylindrical}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{misrsom}, q{Space oblique for MISR}, 1, q{qw(path)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{mod_krovak}, q{Modified Krovak}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{moll}, q{Mollweide}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{molobadekas}, q{Molodensky-Badekas transformation}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{molodensky}, q{Molodensky transform}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{murd1}, q{Murdoch I}, 1, q{qw(lat_1 lat_2)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{murd2}, q{Murdoch II}, 1, q{qw(lat_1 lat_2)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{murd3}, q{Murdoch III}, 1, q{qw(lat_1 lat_2)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{natearth}, q{Natural Earth}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{natearth2}, q{Natural Earth 2}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{nell}, q{Nell}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{nell_h}, q{Nell-Hammer}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{nicol}, q{Nicolosi Globular}, 0, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{noop}, q{No operation}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{nsper}, q{Near-sided perspective}, 1, q{qw(h)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{nzmg}, q{New Zealand Map Grid}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{ob_tran}, q{General Oblique Transformation}, 1, q{qw(o_proj o_lat_p o_lon_p o_alpha o_lon_c o_lat_c o_lon_1 o_lat_1 o_lon_2 o_lat_2)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{ocea}, q{Oblique Cylindrical Equal Area}, 1, q{qw(lat_1 lat_2 lon_1 lon_2)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{oea}, q{Oblated Equal Area}, 1, q{qw(n m theta)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{omerc}, q{Oblique Mercator}, 1, q{qw(alpha gamma no_off lonc lon_1 lat_1 lon_2 lat_2)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{ortel}, q{Ortelius Oval}, 0, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{ortho}, q{Orthographic}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{patterson}, q{Patterson Cylindrical}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{pconic}, q{Perspective Conic}, 1, q{qw(lat_1 lat_2)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{peirce_q}, q{Peirce Quincuncial}, 0, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{pipeline}, q{Transformation pipeline manager}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{poly}, q{Polyconic (American)}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{pop}, q{Retrieve coordinate value from pipeline stack}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{push}, q{Save coordinate value on pipeline stack}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{putp1}, q{Putnins P1}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{putp2}, q{Putnins P2}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{putp3}, q{Putnins P3}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{putp3p}, q{Putnins P3'}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{putp4p}, q{Putnins P4'}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{putp5}, q{Putnins P5}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{putp5p}, q{Putnins P5'}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{putp6}, q{Putnins P6}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{putp6p}, q{Putnins P6'}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{qsc}, q{Quadrilateralized Spherical Cube}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{qua_aut}, q{Quartic Authalic}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{rhealpix}, q{rHEALPix}, 1, q{qw(north_square south_square)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{robin}, q{Robinson}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{rouss}, q{Roussilhe Stereographic}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{rpoly}, q{Rectangular Polyconic}, 0, q{qw(lat_ts)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{s2}, q{S2}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{sch}, q{Spherical Cross-track Height}, 1, q{qw(plat_0 plon_0 phdg_0 h_0)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{set}, q{Set coordinate value}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{sinu}, q{Sinusoidal (Sanson-Flamsteed)}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{som}, q{Space Oblique Mercator}, 1, q{qw(inc_angle ps_rev asc_lon)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{somerc}, q{Swiss. Obl. Mercator}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{stere}, q{Stereographic}, 1, q{qw(lat_ts)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{sterea}, q{Oblique Stereographic Alternative}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{tcc}, q{Transverse Central Cylindrical}, 0, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{tcea}, q{Transverse Cylindrical Equal Area}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{times}, q{Times}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{tinshift}, q{Triangulation based transformation}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{tissot}, q{Tissot}, 1, q{qw(lat_1 lat_2)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{tmerc}, q{Transverse Mercator}, 1, q{qw(approx)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{tobmerc}, q{Tobler-Mercator}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{topocentric}, q{Geocentric/Topocentric conversion}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{tpeqd}, q{Two Point Equidistant}, 1, q{qw(lat_1 lon_1 lat_2 lon_2)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{tpers}, q{Tilted perspective}, 1, q{qw(tilt azi h)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{unitconvert}, q{Unit conversion}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{ups}, q{Universal Polar Stereographic}, 1, q{qw(south)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{urm5}, q{Urmaev V}, 0, q{qw(n q alpha)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{urmfps}, q{Urmaev Flat-Polar Sinusoidal}, 1, q{qw(n)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{utm}, q{Universal Transverse Mercator (UTM)}, 1, q{qw(zone south approx)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{vandg}, q{van der Grinten (I)}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{vandg2}, q{van der Grinten II}, 0, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{vandg3}, q{van der Grinten III}, 0, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{vandg4}, q{van der Grinten IV}, 0, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{vertoffset}, q{Vertical Offset and Slope}, 1, q{qw(lat_0 lon_0 dh slope_lat slope_lon)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{vgridshift}, q{Vertical grid shift}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{vitk1}, q{Vitkovsky I}, 1, q{qw(lat_1 lat_2)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{wag1}, q{Wagner I (Kavrayskiy VI)}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{wag2}, q{Wagner II}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{wag3}, q{Wagner III}, 1, q{qw(lat_ts)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{wag4}, q{Wagner IV}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{wag5}, q{Wagner V}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{wag6}, q{Wagner VI}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{wag7}, q{Wagner VII}, 0, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{webmerc}, q{Web Mercator / Pseudo Mercator}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{weren}, q{Werenskiold I}, 1, q{qw()});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{wink1}, q{Winkel I}, 1, q{qw(lat_ts)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{wink2}, q{Winkel II}, 1, q{qw(lat_1)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{wintri}, q{Winkel Tripel}, 1, q{qw(lat_1)});
 
-#line 499 "proj4.pd"
+#line 499 "lib/PDL/Transform/Proj4.pd"
 _make_class(q{xyzgridshift}, q{Geocentric grid shift}, 1, q{qw()});
 
-#line 526 "proj4.pd"
+#line 526 "lib/PDL/Transform/Proj4.pd"
 
 =head1 AUTHOR
 
@@ -5780,7 +5780,7 @@ Judd Taylor, Orbital Systems, Ltd.
 judd dot t at orbitalsystems dot com
 
 =cut
-#line 5784 "Proj4.pm"
+#line 5784 "lib/PDL/Transform/Proj4.pm"
 
 # Exit with OK status
 

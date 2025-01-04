@@ -23,6 +23,12 @@
 
 Version - YYYY/MM/DD
 ---------------------
+2.10 2025-01-01 08:30:00
+   - Fixed copyright to 2025.
+   - Test.pm - Fixed dbug_BAIL_OUT() to do done_testing() only when needed.
+   - Test.pm - fixed most funcs to get the right caller on failure.
+   - ON.pm & OFF.pm - added dbug_get_frame_value() for Test.pm to use.
+
 2.09 2024-12-06 08:30:00
   - Success!  It now passes all CPAN Testers tests for all versions of perl.
   - Fixed some POD typos.

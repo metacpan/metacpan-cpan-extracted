@@ -1,5 +1,5 @@
 ###
-###  Copyright (c) 2019 - 2024 Curtis Leach.  All rights reserved.
+###  Copyright (c) 2019 - 2025 Curtis Leach.  All rights reserved.
 ###
 ###  A crazy extension module for Fred::Fish::DBUG.
 ###
@@ -66,9 +66,9 @@ use Exporter;
 
 # The module whose behaviour we want to modify
 # so that we can sabotage everything else!
-use Fred::Fish::DBUG::Signal 2.09;
+use Fred::Fish::DBUG::Signal 2.10;
 
-$VERSION = "2.09";
+$VERSION = "2.10";
 @ISA = qw( Exporter );
 @EXPORT = qw( );
 @EXPORT_OK = qw( );
@@ -156,7 +156,7 @@ module.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2019 - 2024 Curtis Leach.  All rights reserved.
+Copyright (c) 2019 - 2025 Curtis Leach.  All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

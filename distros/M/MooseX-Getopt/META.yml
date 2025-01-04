@@ -47,37 +47,37 @@ no_index:
 provides:
   MooseX::Getopt:
     file: lib/MooseX/Getopt.pm
-    version: '0.77'
+    version: '0.78'
   MooseX::Getopt::Basic:
     file: lib/MooseX/Getopt/Basic.pm
-    version: '0.77'
+    version: '0.78'
   MooseX::Getopt::Dashes:
     file: lib/MooseX/Getopt/Dashes.pm
-    version: '0.77'
+    version: '0.78'
   MooseX::Getopt::GLD:
     file: lib/MooseX/Getopt/GLD.pm
-    version: '0.77'
+    version: '0.78'
   MooseX::Getopt::Meta::Attribute:
     file: lib/MooseX/Getopt/Meta/Attribute.pm
-    version: '0.77'
+    version: '0.78'
   MooseX::Getopt::Meta::Attribute::NoGetopt:
     file: lib/MooseX/Getopt/Meta/Attribute/NoGetopt.pm
-    version: '0.77'
+    version: '0.78'
   MooseX::Getopt::Meta::Attribute::Trait:
     file: lib/MooseX/Getopt/Meta/Attribute/Trait.pm
-    version: '0.77'
+    version: '0.78'
   MooseX::Getopt::Meta::Attribute::Trait::NoGetopt:
     file: lib/MooseX/Getopt/Meta/Attribute/Trait/NoGetopt.pm
-    version: '0.77'
+    version: '0.78'
   MooseX::Getopt::OptionTypeMap:
     file: lib/MooseX/Getopt/OptionTypeMap.pm
-    version: '0.77'
+    version: '0.78'
   MooseX::Getopt::ProcessedArgv:
     file: lib/MooseX/Getopt/ProcessedArgv.pm
-    version: '0.77'
+    version: '0.78'
   MooseX::Getopt::Strict:
     file: lib/MooseX/Getopt/Strict.pm
-    version: '0.77'
+    version: '0.78'
 requires:
   Carp: '0'
   Getopt::Long: '2.37'
@@ -99,7 +99,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=MooseX-Getopt
   homepage: https://github.com/moose/MooseX-Getopt
   repository: https://github.com/moose/MooseX-Getopt.git
-version: '0.77'
+version: '0.78'
 x_Dist_Zilla:
   perl:
     version: '5.041007'
@@ -752,7 +752,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.77
+          tag: v0.78
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:

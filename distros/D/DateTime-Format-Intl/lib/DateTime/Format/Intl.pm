@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## DateTime Format Intl - ~/lib/DateTime/Format/Intl.pm
-## Version v0.1.5
+## Version v0.1.6
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/09/16
-## Modified 2024/10/12
+## Modified 2024/12/31
 ## All rights reserved
 ## 
 ## 
@@ -29,7 +29,7 @@ BEGIN
     use Locale::Unicode::Data;
     use Scalar::Util ();
     use Want;
-    our $VERSION = 'v0.1.5';
+    our $VERSION = 'v0.1.6';
     our $CACHE = {};
     our $LAST_CACHE_CLEAR = time();
     our $MAX_CACHE_SIZE = 30;
@@ -315,28 +315,39 @@ sub new
 
     my $systems = $unicode->number_systems;
     my $ns_default = $unicode->number_system;
+    my $ns_default_def = $cldr->number_system( number_system => $ns_default ) ||
+        return( $self->pass_error( $cldr->error ) );
+    undef( $ns_default ) unless( $ns_default_def->{type} eq 'numeric' );
     # NOTE: number system check
     if( $num_sys )
     {
-        # 'latn' is always supported by all locale as per the LDML specifications
-        if( !( $num_sys eq 'latn' || scalar( grep( ( $systems->{ $_ } // '' ) eq $num_sys, qw( number_system native ) ) ) ) )
-        {
-            warn( "Warning only: unsupported numbering system provided \"${num_sys}\" for locale \"${locale}\"." ) if( warnings::enabled() );
-            undef( $num_sys );
-        }
-
-        my $ref = $cldr->number_system( number_system => $num_sys );
-        return( $self->pass_error( $cldr->error ) ) if( !defined( $ref ) && $cldr->error );
+        my $num_sys_def = $cldr->number_system( number_system => $num_sys );
+        return( $self->pass_error( $cldr->error ) ) if( !defined( $num_sys_def ) && $cldr->error );
         # The proper behaviour is to ignore bad value and fall back to 'latn'
-        if( !$ref )
+        if( !$num_sys_def )
         {
             warn( "Warning only: invalid numbering system provided \"${num_sys}\"." ) if( warnings::enabled() );
+            undef( $num_sys );
+            $num_sys_def = {};
+        }
+        # 'latn' is always supported by all locale as per the LDML specifications
+        # We reject the specified if it is not among the locale's default, and if it is not 'numeric' (e.g. if it is algorithmic)
+        if( !( $num_sys eq 'latn' || scalar( grep( ( $systems->{ $_ } // '' ) eq $num_sys, qw( number_system native ) ) ) ) && $num_sys_def->{type} ne 'numeric' )
+        {
+            warn( "Warning only: unsupported numbering system provided \"${num_sys}\" for locale \"${locale}\"." ) if( warnings::enabled() );
             undef( $num_sys );
         }
     }
     if( !defined( $num_sys ) && ( my $locale_num_sys = $locale->number ) )
     {
-        if( $locale_num_sys eq 'latn' || scalar( grep( ( $systems->{ $_ } // '' ) eq $locale_num_sys, qw( number_system native ) ) ) )
+        my $num_sys_def = $cldr->number_system( number_system => $locale_num_sys );
+        return( $self->pass_error( $cldr->error ) ) if( !defined( $num_sys_def ) && $cldr->error );
+        $num_sys_def ||= {};
+        if( $locale_num_sys eq 'latn' || 
+            (
+                scalar( grep( ( $systems->{ $_ } // '' ) eq $locale_num_sys, qw( number_system native ) ) ) && 
+                $num_sys_def->{type} ne 'numeric'
+            ) )
         {
             $num_sys = $locale_num_sys;
         }
@@ -5165,7 +5176,7 @@ Or, you could set the global variable C<$FATAL_EXCEPTIONS> instead:
 
 =head1 VERSION
 
-    v0.1.5
+    v0.1.6
 
 =head1 DESCRIPTION
 
@@ -5221,14 +5232,14 @@ For example, a Japanese locale with the C<latn> number system extension set and 
 
     my $fmt = DateTime::Format::Intl->new( 'ja-u-nu-latn-tz-jptyo' );
 
-However, note that you can only provide a number system that is supported by the C<locale>. For instance, you cannot specify a C<locale> C<ar-SA> (arab as spoken in Saudi Arabia) with a number system of Japan:
+However, note that you can only provide a number system that is supported by the C<locale>, and whose type is C<numeric>, i.e. not C<algorithmic>. For instance, you cannot specify a C<locale> C<ar-SA> (arab as spoken in Saudi Arabia) with a number system of Japan:
 
     my $fmt = DateTime::Format::Intl->new( 'ar-SA', { numberingSystem => 'japn' } );
     say $fmt->resolvedOptions->{numberingSystem}; # arab
 
 It would reject it, and issue a warning, if warnings are enabled, and fallback to the C<locale>'s default number system, which is, in this case, C<arab>
 
-Additionally, even though the number system C<jpanfin> is supported by the locale C<ja>, it would not be acceptable, because it is not suitable for datetime formatting, or at least this is how it is treated by web browsers. This API could easily make it acceptable, but it was designed to closely mimic the web browser implementation of the JavaScript API C<Intl.DateTimeFormat>. Thus:
+Additionally, even though the number system C<jpanfin> is supported by the locale C<ja>, it would not be acceptable, because it is not suitable for datetime formatting, since it is not of type C<numeric>, or at least this is how it is treated by web browsers (see L<here the web browser engine implementation|https://github.com/v8/v8/blob/main/src/objects/intl-objects.cc> and L<here for the Unicode ICU implementation|https://github.com/unicode-org/icu/blob/main/icu4c/source/i18n/numsys.cpp>). This API could easily make it acceptable, but it was designed to closely mimic the web browser implementation of the JavaScript API C<Intl.DateTimeFormat>. Thus:
 
     my $fmt = DateTime::Format::Intl->new( 'ja-u-nu-jpanfin-tz-jptyo' );
     say $fmt->resolvedOptions->{numberingSystem}; # latn

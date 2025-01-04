@@ -26,7 +26,7 @@ no_index:
 provides:
   Daje::Workflow::Database::Model:
     file: lib/Daje/Workflow/Database/Model.pm
-    version: '0.07'
+    version: '0.08'
   Daje::Workflow::Database::Model::Context:
     file: lib/Daje/Workflow/Database/Model/Context.pm
   Daje::Workflow::Database::Model::History:
@@ -34,11 +34,14 @@ provides:
   Daje::Workflow::Database::Model::Workflow:
     file: lib/Daje/Workflow/Database/Model/Workflow.pm
 requires:
+  DBD::Pg: '0'
+  Mojo::Base: '0'
+  Mojo::JSON: '0'
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/janeskil1525/Daje-Workflow-Database-Model/issues
   homepage: https://github.com/janeskil1525/Daje-Workflow-Database-Model
   repository: https://github.com/janeskil1525/Daje-Workflow-Database-Model.git
-version: '0.07'
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

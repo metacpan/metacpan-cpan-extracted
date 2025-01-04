@@ -1,7 +1,7 @@
 ---
 abstract: 'Print version of the specified module(s).'
 author:
-  - 'Abe Timmerman <abeltje@cpan.org>'
+  - 'H.Merijn Brand <hmbrand@cpan.org>'
 build_requires:
   Test::Fatal: '0'
   Test::Simple: '0.88'
@@ -23,8 +23,9 @@ requires:
   perl: '5.010001'
   version: '0.77'
 resources:
-  bugtracker: https://github.com/abeltje/V/issues
-  homepage: https://github.com/abeltje/V
-  repository: https://github.com/abeltje/V.git
-version: '0.19'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+  IRC: irc://irc.perl.org/#csv
+  bugtracker: https://github.com/Tux/V/issues
+  homepage: https://github.com/Tux/V
+  repository: https://github.com/Tux/V.git
+version: '0.20'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

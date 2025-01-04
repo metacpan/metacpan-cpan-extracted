@@ -6,7 +6,7 @@ use strict;
 use Util::H2O::More qw/baptise ddd HTTPTiny2h2o h2o o2d/;
 use HTTP::Tiny qw//;
 
-our $VERSION = "0.1.3";
+our $VERSION = "0.1.4";
 
 use constant {
   BASEURL  => "https://the-rosary-api.vercel.app/v1",
@@ -27,7 +27,6 @@ sub _make_call {
   return $resp->content;
 }
 
-#TODO - add "list", date/MMDDYY, and novena/MMDDYY
 sub mp3Link {
   my ($self, $when) = @_;
   my @mp3 = qw/today yesterday tomorrow random/;
@@ -35,16 +34,15 @@ sub mp3Link {
   return "" if (not grep { m/^$when$/i } @mp3);
   # valid
   my $resp = $self->_make_call($when);
-  # NOTE: this endpoint has proven somewhat unstable, which really means that
-  # another place Util::H2O::More::HTTPTiny2h2o would behefit from an "autoundef"
-  # option (these endpoints are also kind of a mess, returning 3 different structures
-  # in different cases
-  my $_resp = o2d $resp;
-  if (ref $_resp eq "HASH" and defined $resp->{mp3Link}) {
-    return sprintf "%s/%s", DAILYURL, $resp->mp3Link;
+  my $ref = $resp->shift;
+  # the problem here is that this API call in the past has returned
+  # a JSON hash rather than an array in some cases; in other cases
+  # it has returned an empty JSON array
+  if (my $ref = $resp->shift) {
+    return sprintf "%s/%s", DAILYURL, $ref->mp3Link;
   }
-  elsif ($resp->get(0)) {
-    return sprintf "%s/%s", DAILYURL, $resp->get(0)->mp3Link;
+  elsif (ref o2d $resp ne "ARRAY" and my $file = $resp->mp3Link) {
+    return sprintf "%s/%s", DAILYURL, $file;
   }
   else {
     warn "\nNo content in response from https://therosaryapi.cf ... try the following links:\n";
@@ -122,13 +120,13 @@ The Rosary API is profiled at L<https://www.freepublicapis.com/the-rosary-api>.
 Contributed as part of the B<FreePublicPerlAPIs> Project described at,
 L<https://github.com/oodler577/FreePublicPerlAPIs>.
 
-* - the module author is not affiliated with the site
+* - the module author is not affiliated with these sites
 
 =head1 METHODS
 
 =over 4
 
-=item C<new(param1 = $val1, ...)>
+=item C<new(param1 => $val1, ...)>
 
 Constructor, accepts any number of parameters and makes them available
 during execution time; but doesn't do anything internally with them. Instance
@@ -366,14 +364,14 @@ Douay-Rheims translation:
   And the angel being come in, said unto her: Hail, full of grace, the Lord
   is with thee: blessed art thou among women.
 
-  L<https://drbo.org/cgi-bin/d?b=drb&bk=49&ch=1&l=28-#x>
+L<https://drbo.org/cgi-bin/d?b=drb&bk=49&ch=1&l=28-#x>
 
 =item * Luke 1:42
 
   And she cried out with a loud voice, and said: Blessed art thou among women,
   and blessed is the fruit of thy womb.
 
-  L<https://drbo.org/cgi-bin/d?b=drb&bk=49&ch=1&l=42-#x>
+L<https://drbo.org/cgi-bin/d?b=drb&bk=49&ch=1&l=42-#x>
 
 =back
 
@@ -415,7 +413,7 @@ The Our Father comes directly from Jesus' teaching in the Gospel of Matthew
   those who trespass against us. And lead us not into temptation, but deliver
   us from evil.
 
-  L<https://drbo.org/cgi-bin/d?b=drb&bk=47&ch=6&l=9-13#x>
+L<https://drbo.org/cgi-bin/d?b=drb&bk=47&ch=6&l=9-13#x>
 
 =back
 

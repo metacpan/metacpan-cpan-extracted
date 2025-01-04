@@ -1,5 +1,5 @@
 ###
-###  Copyright (c) 2019 - 2024 Curtis Leach.  All rights reserved.
+###  Copyright (c) 2019 - 2025 Curtis Leach.  All rights reserved.
 ###
 ###  Module: Fred::Fish::DBUG::DEBUG
 
@@ -11,7 +11,7 @@ use warnings;
 use vars qw ( @ISA @EXPORT @EXPORT_OK $VERSION );
 use Exporter;
 
-$VERSION   = "2.09";
+$VERSION   = "2.10";
 @ISA       = qw ( Exporter );
 @EXPORT    = qw ();
 @EXPORT_OK = qw ();

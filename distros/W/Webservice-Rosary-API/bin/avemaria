@@ -16,7 +16,7 @@ $|++; #autoflush
 
 my $Rosary = Webservice::Rosary::API->new;
 
-our $VERSION = "0.1.3";
+our $VERSION = $Webservice::Rosary::API::VERSION;
 
 use constant {
   EXIT_SUCCESS => 0,
@@ -171,6 +171,8 @@ sub do_help() {
   return print <<EOF;
 avemaria - commandline Rosary client for DailyRosary.cf and TheRosaryAPI.cf  
 
+VERSION $Webservice::Rosary::API::VERSION
+
 Note: Commandline options may change to accomodate feedback. This note will
 be removed once the cli UX settles.
 
@@ -278,6 +280,10 @@ tends to be highly personal; so please let me know what kind of "--pray" control
 would be helpful.
 
 +Deo Gratias+
+
+VERSION $Webservice::Rosary::API::VERSION
+
+avemaria - commandline Rosary client for DailyRosary.cf and TheRosaryAPI.cf  
   
 EOF
 

@@ -1,5 +1,5 @@
 #
-# GENERATED WITH PDL::PP from gsl_random.pd! Don't modify!
+# GENERATED WITH PDL::PP from lib/PDL/GSL/RNG.pd! Don't modify!
 #
 package PDL::GSL::RNG;
 
@@ -22,7 +22,7 @@ use DynaLoader;
 
 
 
-#line 9 "gsl_random.pd"
+#line 9 "lib/PDL/GSL/RNG.pd"
 
 use strict;
 use warnings;
@@ -62,7 +62,7 @@ as C<$pa> and C<$pb>, respectively, and Limits (of domain or
 integration) as C<$la> and C<$lb>.
 
 =cut
-#line 66 "RNG.pm"
+#line 66 "lib/PDL/GSL/RNG.pm"
 
 
 =head1 FUNCTIONS
@@ -73,7 +73,7 @@ integration) as C<$la> and C<$lb>.
 
 
 
-#line 50 "gsl_random.pd"
+#line 50 "lib/PDL/GSL/RNG.pd"
 
 =head2 new
 
@@ -391,7 +391,7 @@ Example:
    $o = $rng->ran_discrete($discrete_dist_handle,100);
 
 =cut
-#line 395 "RNG.pm"
+#line 395 "lib/PDL/GSL/RNG.pm"
 
 
 =head2 ran_bernoulli_pdf
@@ -4727,7 +4727,7 @@ sub ran_bivariate_gaussian {
 
 
 
-#line 968 "gsl_random.pd"
+#line 968 "lib/PDL/GSL/RNG.pd"
 
        sub ran_dir {
 	 my ($obj,$ndim,$n) = @_;
@@ -4740,7 +4740,7 @@ sub ran_bivariate_gaussian {
 	 return $p;
        }
        
-#line 4744 "RNG.pm"
+#line 4744 "lib/PDL/GSL/RNG.pm"
 
 
 =head2 ran_discrete
@@ -4801,7 +4801,7 @@ else {
 
 
 
-#line 1024 "gsl_random.pd"
+#line 1024 "lib/PDL/GSL/RNG.pd"
 
 sub ran_shuffle_vec {
 my ($obj,@in) = @_;
@@ -4809,13 +4809,13 @@ $obj->ran_shuffle(my $p = PDL->sequence(PDL::indx(), 0+@in));
 @in[$p->list];
 }
 
-#line 1032 "gsl_random.pd"
+#line 1032 "lib/PDL/GSL/RNG.pd"
 sub ran_choose_vec {
 my ($obj,$nout,@in) = @_;
 $obj->ran_choose(PDL->sequence(PDL::indx(), 0+@in),my $pout = PDL->zeroes(PDL::indx(), $nout));
 @in[$pout->list];
 }
-#line 4819 "RNG.pm"
+#line 4819 "lib/PDL/GSL/RNG.pm"
 
 
 =head2 ran_ver
@@ -4909,7 +4909,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 369 "gsl_random.pd"
+#line 369 "lib/PDL/GSL/RNG.pd"
 
 =head1 BUGS
 
@@ -4935,7 +4935,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL RNG and randist modules were written by James Theiler.
 
 =cut
-#line 4939 "RNG.pm"
+#line 4939 "lib/PDL/GSL/RNG.pm"
 
 # Exit with OK status
 

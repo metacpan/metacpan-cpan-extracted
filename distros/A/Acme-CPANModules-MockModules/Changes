@@ -1,3 +1,10 @@
+0.004   2025-01-01  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Mention other lists.
+
+
 0.003   2025-01-01  Released-By: PERLANCAR; Urgency: medium
 
         - Remove entry: Log::Any::IfLOG (removing the module from CPAN).

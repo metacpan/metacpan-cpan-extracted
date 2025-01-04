@@ -9,7 +9,7 @@ use feature ":5.10";
 use Config;
 use File::Spec::Functions qw(catdir rel2abs splitpath);
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use constant DFLT_TOCOPY_SECTION  => "__TOCOPY__";
 
@@ -522,7 +522,7 @@ Config::INI::RefVars - INI file reader that supports make-style variable referen
 
 =head1 VERSION
 
-Version #VERSION#
+Version 0.19
 
 =head1 SYNOPSIS
 
@@ -1556,7 +1556,7 @@ L<Config::IniFiles>, and many more.
 
 =head1 AUTHOR
 
-#AUTHOR#, C<< <451 at gmx.eu> >>
+Abdul al Hazred, C<< <451 at gmx.eu> >>
 
 
 
@@ -1597,7 +1597,7 @@ L<https://github.com/AAHAZRED/perl-Config-INI-RefVars>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2023 by #AUTHOR#.
+This software is copyright (c) 2023 by Abdul al Hazred.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

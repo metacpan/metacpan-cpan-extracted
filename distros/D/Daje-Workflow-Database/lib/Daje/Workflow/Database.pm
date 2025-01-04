@@ -35,7 +35,7 @@ use Mojo::Pg;
 # janeskil1525 E<lt>janeskil1525@gmail.comE<gt>
 #
 
-our $VERSION = "0.06";
+our $VERSION = "0.07";
 
 has 'pg';
 
@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS context
     modby varchar NOT NULL DEFAULT 'System',
     moddatetime timestamp without time zone NOT NULL DEFAULT NOW(),
     workflow_fkey bigint not null,
-    context JSON,
+    context bytea,
     CONSTRAINT context_workflow_fkey FOREIGN KEY (workflow_fkey)
         REFERENCES workflow (workflow_pkey)
 );

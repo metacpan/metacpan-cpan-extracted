@@ -4,7 +4,7 @@ use warnings;
 use IO::Scalar qw{};
 use Spreadsheet::WriteExcel qw{};
 
-our $VERSION='0.10';
+our $VERSION='0.11';
 our $PACKAGE=__PACKAGE__;
 
 =head1 NAME
@@ -25,9 +25,7 @@ Spreadsheet::WriteExcel::Simple::Tabs - Simple Interface to the Spreadsheet::Wri
 
 =head1 DESCRIPTION
 
-This is a simple wrapper around Spreadsheet::WriteExcel that creates tabs for data.  It is ment to be simple not full featured.  I use this package to export data from the L<DBIx::Array> sqlarrayarrayname method which is an array of array references where the first array is the column headings.
-
-=head1 USAGE
+This is a simple wrapper around Spreadsheet::WriteExcel that creates tabs for data.  It is meant to be simple not full featured.  I use this package to export data from the L<DBIx::Array> sqlarrayarrayname method which is an array of array references where the first array is the column headings.
 
 =head1 CONSTRUCTOR
 
@@ -213,21 +211,9 @@ sub default {
   return wantarray ? %{$self->{"default"}} : $self->{"default"};
 }
 
-=head1 BUGS
-
-Log on RT and contact the author.
-
-=head1 SUPPORT
-
-DavisNetworks.com provides support services for all Perl applications including this package.
-
 =head1 AUTHOR
 
   Michael R. Davis
-  CPAN ID: MRDVT
-  STOP, LLC
-  domain=>michaelrdavis,tld=>com,account=>perl
-  http://www.stopllc.com/
 
 =head1 COPYRIGHT
 

@@ -1,6 +1,6 @@
 use 5.38.0;
 use experimental 'class';
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 class Game::Floppy {
 	use Raylib::App;
@@ -51,8 +51,7 @@ class Game::Floppy {
 						$floppy->y( $height / 2 - $floppy_radius );
 						$game_over = 0;
  					} else {
-						$floppy->y($floppy->y - 30);
-						$floppy->sprite->rotate(-45);
+						$self->handle_click();
 					}
 				},
                         },
@@ -65,8 +64,11 @@ class Game::Floppy {
 					$app->clear();
 					$background->draw(0, 0, $width, $height);
 
-
+					if (IsMouseButtonReleased(0)) {
+						$self->handle_click();
+					}
 					$keyboard->handle_events();
+					
 					if ($game_over) {
 
 						DrawText( "Current Score: $score High Score: $hi_score", 10, 10, 22, Raylib::Color::WHITE );
@@ -82,6 +84,11 @@ class Game::Floppy {
 				}
 			);
 		}
+	}
+
+	method handle_click () {
+		$floppy->y($floppy->y - 30);
+		$floppy->sprite->rotate(-45);
 	}
 
 	method handle_flappy () {
@@ -136,7 +143,7 @@ Game::Floppy - Floppy bird using raylib
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 

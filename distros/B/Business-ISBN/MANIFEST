@@ -15,6 +15,7 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README.pod
 scripts/get_isbn_data.pl
+SECURITY.md
 t/albania.t
 t/constants.t
 t/errors.t

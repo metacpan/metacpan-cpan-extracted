@@ -50,6 +50,6 @@
          "web" : "https://github.com/briandfoy/tie-toggle"
       }
    },
-   "version" : "1.085",
+   "version" : "1.086",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

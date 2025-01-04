@@ -5,14 +5,12 @@
 ##======================================================================
 
 use PDL::VectorValued::Dev;
-my $VERSION = '1.24.0'; ##-- update with perl-reversion from Perl::Version module
+my $VERSION = '1.24.1'; ##-- update with perl-reversion from Perl::Version module
 pp_setversion($VERSION);
 
 ##------------------------------------------------------
 ## pm headers
 pp_addpm({At=>'Top'},<<'EOPM');
-
-#use PDL::CCS::Version; use strict;
 
 =pod
 
@@ -22,7 +20,8 @@ PDL::CCS::Ufunc - Ufuncs for compressed storage sparse PDLs
 
 =head1 SYNOPSIS
 
- use PDL; use PDL::CCS::Ufunc;
+ use PDL;
+ use PDL::CCS::Ufunc;
 
  ##---------------------------------------------------------------------
  ## ... stuff happens
@@ -319,7 +318,7 @@ EOMD
 ##--------------------------------------------------------------
 ## Operations: Accumulators (Ufuncs): or
 ccs_accum_def('or', 'logical "or"',
-              tmp_type       => 'char',
+              tmp_type       => 'signed char',
               init_missingOut=>'missingOut = missingVal;',
               tmp_addmissing =>'if (nMissing > 0) { tmp = tmp || missingVal; }   tmp = !!tmp; /* canonicalize */',
               tmp_addval     =>'tmp = tmp || $nzvalsIn(NnzIn=>nnzii);',
@@ -336,7 +335,7 @@ EOMD
 ##--------------------------------------------------------------
 ## Operations: Accumulators (Ufuncs): and
 ccs_accum_def('and', 'logical "and"',
-              tmp_type       => 'char',
+              tmp_type       => 'signed char',
               init_missingOut=>'missingOut = missingVal;',
               tmp_addmissing =>'if (nMissing > 0) { tmp = tmp && missingVal; }   tmp = !!tmp; /* canonicalize */',
               tmp_addval     =>'tmp = tmp && $nzvalsIn(NnzIn=>nnzii);',

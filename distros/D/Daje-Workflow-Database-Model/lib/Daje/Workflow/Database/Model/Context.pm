@@ -2,16 +2,39 @@ package Daje::Workflow::Database::Model::Context;
 use Mojo::Base -base, -signatures;
 
 use Mojo::JSON qw { to_json from_json };
+use DBD::Pg ':pg_types';
+
 # NAME
 # ====
 #
 # Daje::Workflow::Database::Model::Context
+#
+# SYNOPSIS
+# ========
+#
+#    use Daje::Workflow::Database::Model::Context;
+#
+#    my $context_obj = Daje::Workflow::Database::Model::Context->new(
+#           db              => $db,
+#           workflow_pkey   => $workflow_pkey
+#           context_pkey    => $context_pkey,
+#           context         => $context,
+#       );
+#
+#       my $context = $context_obj->load_fk($self)
+#
+#       my $context = $context_obj->load_pk($self)
+#
+#       my $context_pkey = $context_obj->save($self, $context)
 #
 #
 # REQUIRES
 # ========
 #
 # Mojo::Base>
+#
+#  DBD::Pg
+#
 #
 # METHODS
 # =======
@@ -105,36 +128,24 @@ sub _load_fk($self) {
 
 sub save($self, $context) {
 
-    if (defined $context->{context}) {
-        $context->{context} = to_json $context->{context};
-    }
     if ($context->{context_pkey} > 0) {
-        $self->db->update(
-            'context',
-            {
-                %$context
-            },
-            {
-                context_pkey => $context->{context_pkey}
-            }
-        )
+        $self->db->query("UPDATE context SET context = ? WHERE context_pkey = ?",
+            [{type => PG_BYTEA, value => $context->{context}}, $context->{context_pkey}]
+        );
+
     } else {
         delete %$context{context_pkey};
-        $context->{context_pkey} = $self->db->insert(
-            'context',
-            {
-                %$context
-            },
-            {
-                returning => 'context_pkey'
-            }
-        )->hash->{context_pkey}
+        $context->{context_pkey} = $self->db->query(
+            "INSERT context (context, workflow_fkey) VALUES (?,?) RETURNING context_pkey",
+                [{type => PG_BYTEA, value => $context->{context}}, $context->{workflow_fkey}]
+        )->hash->{context_pkey};
     }
 
     return $context->{context_pkey};
 }
 
 1;
+
 
 
 
@@ -155,11 +166,34 @@ Daje::Workflow::Database::Model::Context
 
 
 
+=head1 SYNOPSIS
+
+
+   use Daje::Workflow::Database::Model::Context;
+
+   my $context_obj = Daje::Workflow::Database::Model::Context->new(
+          db              => $db,
+          workflow_pkey   => $workflow_pkey
+          context_pkey    => $context_pkey,
+          context         => $context,
+      );
+
+      my $context = $context_obj->load_fk($self)
+
+      my $context = $context_obj->load_pk($self)
+
+      my $context_pkey = $context_obj->save($self, $context)
+
+
+
 
 =head1 REQUIRES
 
 
 Mojo::Base>
+
+ DBD::Pg
+
 
 
 

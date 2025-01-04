@@ -28,7 +28,7 @@
       "configure" : {
          "requires" : {
             "IPC::Run" : "0",
-            "PDL" : "2.091"
+            "PDL" : "2.097"
          }
       },
       "develop" : {
@@ -38,7 +38,7 @@
       },
       "runtime" : {
          "requires" : {
-            "PDL" : "2.091",
+            "PDL" : "2.097",
             "perl" : "5.016"
          }
       },
@@ -60,6 +60,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#pdl"
    },
-   "version" : "0.20",
+   "version" : "0.201",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

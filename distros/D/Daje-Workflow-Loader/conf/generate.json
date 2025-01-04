@@ -14,7 +14,8 @@
         "activities": [
           {
             "name": "sql",
-            "activity": "Daje::Plugin::GenerateSQL"
+            "activity": "Daje::Plugin::GenerateSQL",
+            "method": "genereate"
           }
         ],
         "post_checks": [

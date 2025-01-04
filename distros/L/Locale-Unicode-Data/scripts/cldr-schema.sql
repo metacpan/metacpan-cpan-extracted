@@ -920,8 +920,9 @@ CREATE TABLE date_fields_l10n (
     ,field_type         VARCHAR(10) NOT NULL COLLATE NOCASE
     -- standard (if none defined), short, narrow
     ,field_length       VARCHAR(10) NOT NULL
-    -- The localised value for the field type
+    -- -1 for yesterday, 0 for today, and 1 for tomorrow
     ,relative           INTEGER NOT NULL
+    -- The localised value for the field type
     ,locale_name        TEXT NOT NULL
     ,PRIMARY KEY(date_field_id)
     ,CHECK( field_type REGEXP '^[a-zA-Z][a-zA-Z0-9]+(?:\-[a-zA-Z][a-zA-Z0-9]+)*$' )
@@ -946,6 +947,29 @@ CREATE TABLE date_terms (
     ,FOREIGN KEY(locale) REFERENCES locales(locale) ON UPDATE CASCADE ON DELETE RESTRICT
 );
 CREATE UNIQUE INDEX idx_date_terms_unique ON date_terms(locale, term_type, term_length);
+
+-- Source: main/*.xml/ldml/dates/fields/field[@type]/relativeTime[@type]/relativeTimePattern
+CREATE TABLE time_relative_l10n (
+     time_relative_id   INTEGER
+    ,locale             VARCHAR(20) NOT NULL COLLATE NOCASE
+    -- Example: era, year, quarter, month, week, weekOfMonth, day, dayOfYear, weekday, weekdayOfMonth, mon..sun, dayperiod, hour, minute, second, zone and for each *-short. *-narrow
+    ,field_type         VARCHAR(10) NOT NULL COLLATE NOCASE
+    -- standard (if none defined), short, narrow
+    ,field_length       VARCHAR(10) NOT NULL
+    -- -1 for past, and 1 for future
+    ,relative           INTEGER NOT NULL
+    -- The localised pattern for the relative time
+    ,format_pattern     TEXT NOT NULL
+    -- This is used to spell singular or plural: zero, one, two, few, many, other
+    ,count              VARCHAR(10) COLLATE NOCASE
+    ,PRIMARY KEY(time_relative_id)
+    ,CHECK( field_type REGEXP '^[a-zA-Z][a-zA-Z0-9]+(?:\-[a-zA-Z][a-zA-Z0-9]+)*$' )
+    ,CHECK( field_length REGEXP '^[a-zA-Z][a-zA-Z0-9]+$' )
+    ,CHECK( relative REGEXP '^(?:1|-1)$' )
+    ,CHECK( count REGEXP '^[a-zA-Z][a-zA-Z0-9]+$' )
+    ,FOREIGN KEY(locale) REFERENCES locales(locale) ON UPDATE CASCADE ON DELETE RESTRICT
+);
+CREATE UNIQUE INDEX idx_time_relative_l10n_unique ON time_relative_l10n(locale, field_type, field_length, relative, IFNULL(count, ''));
 
 -- Source: main/*.xml->//layout/orientation/characterOrder
 -- left-to-right or right-to-left
@@ -1241,3 +1265,34 @@ CREATE TABLE collations_l10n (
     -- ,FOREIGN KEY(collation) REFERENCES collations(collation) ON UPDATE CASCADE ON DELETE RESTRICT
 );
 CREATE UNIQUE INDEX idx_collations_l10n_unique ON collations_l10n(locale, collation);
+
+-- NOTE: Source: supplemental/plurals.xml/supplementalData/plurals/pluralRules[@locales]/pluralRule[@count]
+CREATE TABLE plural_rules (
+     plural_rule_id     INTEGER
+    ,locale             VARCHAR(20) NOT NULL COLLATE NOCASE
+    ,aliases            TEXT[]
+    ,count              VARCHAR(10) COLLATE NOCASE
+    ,rule               TEXT NOT NULL
+    ,PRIMARY KEY(plural_rule_id)
+    ,CHECK( count REGEXP '^[a-zA-Z][a-zA-Z0-9]+$' )
+    ,FOREIGN KEY(locale) REFERENCES locales(locale) ON UPDATE CASCADE ON DELETE RESTRICT
+);
+CREATE UNIQUE INDEX idx_plural_rules_unique ON plural_rules(locale,count);
+
+-- NOTE: Source: supplemental/pluralRanges.xml/supplementalData/plurals/pluralRanges[@locales]/pluralRange[local-name()="start" or local-name()="end" or local-name()="result"]
+CREATE TABLE plural_ranges (
+     plural_range_id    INTEGER
+    ,locale             VARCHAR(20) NOT NULL COLLATE NOCASE
+    ,aliases            TEXT[]
+    ,start              VARCHAR(10) COLLATE NOCASE
+    -- 'end' is a SQLite reserved keyword, so I could not use it.
+    -- Admittedly, 'stop' is more appropriate than 'end' for 'start' ;)
+    ,stop               VARCHAR(10) COLLATE NOCASE
+    ,result             VARCHAR(10) COLLATE NOCASE
+    ,PRIMARY KEY(plural_range_id)
+    ,CHECK( start REGEXP '^[a-zA-Z][a-zA-Z0-9]+$' )
+    ,CHECK( stop REGEXP '^[a-zA-Z][a-zA-Z0-9]+$' )
+    ,CHECK( result REGEXP '^[a-zA-Z][a-zA-Z0-9]+$' )
+    ,FOREIGN KEY(locale) REFERENCES locales(locale) ON UPDATE CASCADE ON DELETE RESTRICT
+);
+CREATE UNIQUE INDEX idx_plural_ranges_unique ON plural_ranges(locale, start, stop);

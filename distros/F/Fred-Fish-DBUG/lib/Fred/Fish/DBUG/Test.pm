@@ -1,5 +1,5 @@
 ###
-###  Copyright (c) 2024 - 2024 Curtis Leach.  All rights reserved.
+###  Copyright (c) 2024 - 2025 Curtis Leach.  All rights reserved.
 ###
 ###  Based on the Fred Fish DBUG macros in C/C++.
 ###  This Algorithm is in the public domain!
@@ -31,6 +31,8 @@ after it to avoid problems.
     use threads;
     use Fred::Fish::DBUG::Test;
 
+All functions return what the corresponding Test::More call does.
+
 =head1 FUNCTIONS
 
 =over 4
@@ -50,17 +52,18 @@ use Fred::Fish::DBUG::ON;
 
 use Test::More 0.88;
 
-$VERSION = "2.09";
+$VERSION = "2.10";
 @ISA = qw( Exporter );
 
 @EXPORT = qw( 
               dbug_ok       dbug_is       dbug_isnt
               dbug_like     dbug_unlike   dbug_cmp_ok
-	      dbug_can_ok   dbug_isa_ok   dbug_new_ok
-	      dbug_BAIL_OUT
+              dbug_can_ok   dbug_isa_ok   dbug_new_ok
+              dbug_BAIL_OUT
 	  );
 
 
+# --------------------------------------------------------------------------
 
 sub _write_to_fish
 {
@@ -69,6 +72,7 @@ sub _write_to_fish
    my $oper      = shift;
    my $expected  = shift;
    my $test_name = shift;
+   my $diag_flag = shift || 0;
 
    my $subName = (caller(1))[3];   # which func called me.
    my $lbl = ($subName =~ m/:dbug_(.*)$/) ? $1 : 0;
@@ -80,7 +84,7 @@ sub _write_to_fish
    } else {
       my @c = (caller(1))[1,2];    # Filename & line # of who called my caller.
       my $line = "  at $c[0] line $c[1].";
-      diag ( $line );
+      diag ( $line )  if ( $diag_flag );
 
       $got = (defined $got) ? "'${got}'" : "undef";
       $oper = (defined $oper) ? "'${oper}'" : "undef";
@@ -103,7 +107,13 @@ sub _write_to_fish
       }
       # else - ok, can_ok, isa_ok, new_ok.
 
-      DBUG_PRINT ("NOT OK", "%d - %s() - [%s]\n#%s\n%s%s%s",
+      if ( Fred::Fish::DBUG::ON::dbug_get_frame_value ("who_called") ) {
+         $line = "";      # Fish will automatically get the caller info itself.
+      } else {
+         $line = '#' . $line . "\n";
+      }
+
+      DBUG_PRINT ("NOT OK", "%d - %s() - [%s]\n%s%s%s%s",
                    $test, $lbl, $test_name, $line, $msg1, $msg2, $msg3);
    }
 
@@ -112,7 +122,7 @@ sub _write_to_fish
 
 # =============================================================================
 
-=item my $bool = dbug_ok ( $status, $test_name )
+=item dbug_ok ( $status, $test_name )
 
 Writes the message to B<fish> and then calls Test::More::ok().
 
@@ -123,17 +133,17 @@ sub dbug_ok
    my $status    = shift;
    my $test_name = shift;
 
-   my $res = ok ( $status, $test_name );
+   # my $res = ok ( $status, $test_name );
+   my $res = Test::Builder->new()->ok ( $status, $test_name );
 
-   _write_to_fish ($res, undef, undef, undef, $test_name);
+   _write_to_fish ($res, undef, undef, undef, $test_name, 0);
 
    return ( $res );
 }
 
-
 # =============================================================================
 
-=item my $bool = dbug_is ( $got, $expected. $test_name )
+=item dbug_is ( $got, $expected. $test_name )
 
 Writes the message to B<fish> and then calls Test::More::is().
 
@@ -145,15 +155,16 @@ sub dbug_is
    my $expected  = shift;
    my $test_name = shift;
 
-   my $res = is ( $got, $expected, $test_name );
+   # my $res = is ( $got, $expected, $test_name );
+   my $res = Test::Builder->new()->is_eq ( $got, $expected, $test_name );
 
-   _write_to_fish ($res, $got, undef, $expected, $test_name);
+   _write_to_fish ($res, $got, undef, $expected, $test_name, 0);
 
    return ( $res );
 }
 # =============================================================================
 
-=item my $bool = dbug_isnt ( $got, $expected. $test_name )
+=item dbug_isnt ( $got, $expected. $test_name )
 
 Writes the message to B<fish> and then calls Test::More::isnt().
 
@@ -165,16 +176,17 @@ sub dbug_isnt
    my $expected  = shift;
    my $test_name = shift;
 
-   my $res = isnt ( $got, $expected, $test_name );
+   # my $res = isnt ( $got, $expected, $test_name );
+   my $res = Test::Builder->new()->isnt_eq ( $got, $expected, $test_name );
 
-   _write_to_fish ($res, $got, undef, $expected, $test_name);
+   _write_to_fish ($res, $got, undef, $expected, $test_name, 0);
 
    return ( $res );
 }
 
 # =============================================================================
 
-=item my $bool = dbug_like ( $got, $regexpr. $test_name )
+=item dbug_like ( $got, $regexpr. $test_name )
 
 Writes the message to B<fish> and then calls Test::More::like().
 
@@ -186,16 +198,17 @@ sub dbug_like
    my $regexpr   = shift;
    my $test_name = shift;
 
-   my $res = like ( $got, $regexpr, $test_name );
+   # my $res = like ( $got, $regexpr, $test_name );
+   my $res = Test::Builder->new()->like ( $got, $regexpr, $test_name );
 
-   _write_to_fish ($res, $got, $regexpr, undef, $test_name);
+   _write_to_fish ($res, $got, $regexpr, undef, $test_name, 0);
 
    return ( $res );
 }
 
 # =============================================================================
 
-=item my $bool = dbug_unlike ( $got, $regexpr. $test_name )
+=item dbug_unlike ( $got, $regexpr. $test_name )
 
 Writes the message to B<fish> and then calls Test::More::unlike().
 
@@ -207,16 +220,17 @@ sub dbug_unlike
    my $regexpr   = shift;
    my $test_name = shift;
 
-   my $res = unlike ( $got, $regexpr, $test_name );
+   # my $res = unlike ( $got, $regexpr, $test_name );
+   my $res = Test::Builder->new()->unlike ( $got, $regexpr, $test_name );
 
-   _write_to_fish ($res, $got, $regexpr, undef, $test_name);
+   _write_to_fish ($res, $got, $regexpr, undef, $test_name, 0);
 
    return ( $res );
 }
 
 # =============================================================================
 
-=item my $bool = dbug_cmp_ok ( $got, $op, $expected. $test_name )
+=item dbug_cmp_ok ( $got, $op, $expected. $test_name )
 
 Writes the message to B<fish> and then calls Test::More::cmp_ok().
 
@@ -229,16 +243,17 @@ sub dbug_cmp_ok
    my $expected  = shift;
    my $test_name = shift;
 
-   my $res = cmp_ok ( $got, $op, $expected, $test_name );
+   # my $res = cmp_ok ( $got, $op, $expected, $test_name );
+   my $res = Test::Builder->new()->cmp_ok ( $got, $op, $expected, $test_name );
 
-   _write_to_fish ($res, $got, $op, $expected, $test_name);
+   _write_to_fish ($res, $got, $op, $expected, $test_name, 0);
 
    return ( $res );
 }
 
 # =============================================================================
 
-=item my $bool = dbug_can_ok ( $module_or_object, @methods )
+=item dbug_can_ok ( $module_or_object, @methods )
 
 Writes the message to B<fish> and then calls Test::More::can_ok().
 
@@ -252,16 +267,17 @@ sub dbug_can_ok
    my $cnt = @methods;
    my $test_name = "Testing existance of $cnt method(s).";
 
+   # To complex to write my own version, so have to write additional "at" diag.
    my $res = can_ok ( $module, @methods );
 
-   _write_to_fish ($res, undef, undef, undef, $test_name);
+   _write_to_fish ($res, undef, undef, undef, $test_name, 1);
 
    return ( $res );
 }
 
 # =============================================================================
 
-=item my $bool = dbug_isa_ok ( $object, $class, $object_name )
+=item dbug_isa_ok ( $object, $class, $object_name )
 
 Writes the message to B<fish> and then calls Test::More::isa_ok().
 
@@ -273,9 +289,10 @@ sub dbug_isa_ok
 
    my $test_name = join (", ", @opts);
 
+   # To complex to write my own version, so have to write additional "at" diag.
    my $res = isa_ok ( $opts[0], $opts[1], $opts[2] );
 
-   _write_to_fish ($res, undef, undef, undef, $test_name);
+   _write_to_fish ($res, undef, undef, undef, $test_name, 1);
 
    return ( $res );
 }
@@ -296,7 +313,8 @@ sub dbug_new_ok
 
    my $obj = new_ok ( @opts );
 
-   _write_to_fish (defined $obj, undef, undef, undef, $test_name);
+   # To complex to write my own version, so have to write additional "at" diag.
+   _write_to_fish (defined $obj, undef, undef, undef, $test_name, 1);
 
    return ( $obj );
 }
@@ -305,8 +323,9 @@ sub dbug_new_ok
 
 =item dbug_BAIL_OUT ( $message )
 
-Writes the message to B<fish> and then calls Test::More::done_testing() and
-then Test::More::BAIL_OUT($message) before terminating your test script.
+Writes the message to B<fish> and then calls Test::More::done_testing() if
+needed and then Test::More::BAIL_OUT($message) before terminating your test
+script.
 
 =cut
 
@@ -314,9 +333,15 @@ sub dbug_BAIL_OUT
 {
    my $msg = shift || "Unknown reason for bailing.";
 
+   my $tb = Test::Builder->new ();
+   my $test = $tb->current_test ();
+   my $plan = $tb->expected_tests ();
+   # diag ( DBUG_PRINT ("test", "Current: %d,  Planed: %s", $test, $plan) );
+
    DBUG_PRINT ("BAIL_OUT", "%s", $msg);
-   done_testing ();
-   BAIL_OUT ( $msg );
+   done_testing ()  if ($plan == 0);
+   # BAIL_OUT ( $msg );
+   Test::Builder->new()->BAIL_OUT ( $msg );
    exit (255);           # Should never get here.
 }
 
@@ -354,7 +379,7 @@ L<Fred::Fish::DBUG::Tutorial> - Sample code demonstrating using DBUG module.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2024 - 2024 Curtis Leach.  All rights reserved.
+Copyright (c) 2024 - 2025 Curtis Leach.  All rights reserved.
 
 This program is free software.  You can redistribute it and/or modify it
 under the same terms as Perl itself.

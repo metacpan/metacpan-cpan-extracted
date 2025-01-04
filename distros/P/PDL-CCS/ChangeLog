@@ -1,3 +1,10 @@
+v1.24.1 Sat, 04 Jan 2025 09:02:21 +0100 mohawk2
+	- use `signed char` to accumulate logical values - #19
+	  + same problem as https://github.com/PDLPorters/pdl/issues/502
+	+ PR #20 - fixups
+	  - set dimsize in Pars
+	  - CI min 5.16
+
 v1.24.0 Fri, 03 Jan 2025 08:59:42 +0100
 	+ github issue #16: overhaul PP output dimension initialization (use RedoDimsCode)
 	+ add and use CCS_PDL_IS_NULL macro

@@ -1,18 +1,22 @@
-#! perl -I. -w
+#!/usr/bin/perl -I.
+
+use strict;
+use warnings;
+
 use t::Test::abeltje;
 
-require_ok( 'V' );
+require_ok ("V");
 
 my @modules = map {
-    s{/}{::}g; s{\.pm$}{};
-    $_
-} grep { /\.pm$/ && ! /^Config\.pm$/ } keys %INC;
-
+    s{/}{::}g;
+    s{\.pm$}{};
+    $_;
+    } grep { m/\.pm$/ && !m/^Config\.pm$/ } keys %INC;
 
 my $versions = eval {
-    join ", ", map { "$_: " . V::get_version( $_ ) } qw/ Cwd /;
-};
+    join ", " => map { "$_: " . V::get_version ($_) } qw( Cwd );
+    };
 
-is( $@, "", "readonly bug" );
+is ($@, "", "readonly bug");
 
-abeltje_done_testing();
+abeltje_done_testing ();

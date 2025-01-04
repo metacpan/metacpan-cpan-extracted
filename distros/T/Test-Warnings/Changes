@@ -1,5 +1,15 @@
 Revision history for Test-Warnings
 
+0.036     2025-01-03 18:30:28Z
+          - avoid redefinition warnings when $^W is enabled in tests
+            (RT#158297)
+
+0.035     2025-01-03 17:47:24Z
+          - allow tests to pass even when Import::Into is not installed
+            (RT#158296)
+          - add backcompat shim for cases where Test::More is loaded in tests
+            after Test::Warnings
+
 0.034     2025-01-03 02:46:29Z
           - fix Test2 compability for done_testing()
           - Test2::Warnings added as a simple wrapper (for now)

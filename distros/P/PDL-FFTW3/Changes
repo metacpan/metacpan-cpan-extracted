@@ -1,3 +1,6 @@
+0.201 2025-01-03
+- remove workaround for type-selection fixed in PDL 2.097
+
 0.20 2024-12-02
 - remove support for PDL::Complex entirely - rfft* now same as rNfft*
 

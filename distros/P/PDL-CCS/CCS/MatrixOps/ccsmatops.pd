@@ -5,7 +5,7 @@
 ##======================================================================
 
 use PDL::VectorValued::Dev;
-my $VERSION = '1.24.0'; ##-- update with perl-reversion from Perl::Version module
+my $VERSION = '1.24.1'; ##-- update with perl-reversion from Perl::Version module
 pp_setversion($VERSION);
 
 ##-- for integer-type keys
@@ -88,7 +88,7 @@ pp_def
   ('ccs_matmult2d_sdd',
    Pars => ("\n    "
             .join("\n    ",
-                  "$INDX ixa(Two,NnzA); nza(NnzA); missinga();",  ## a(M,N) (M~i, N~x): formerly here as a(N,M)
+                  "$INDX ixa(Two=2,NnzA); nza(NnzA); missinga();",  ## a(M,N) (M~i, N~x): formerly here as a(N,M)
                   'b(O,M);',                                      ## b(O,M) (O~z, M~i)
                   'zc(O);',                                       ## zc(O)
                   '[o]c(O,N)',                                    ## c(O,N) (O~z, N~x)
@@ -97,9 +97,6 @@ pp_def
 
    OtherPars => "PDL_Indx sizeN;",
    RedoDimsCode => q{
-     if ($SIZE(Two) != 2)
-       $CROAK("bogus input dimension Two=%ld for index PDL ixa(Two,NnzA) must be 2", $SIZE(Two));
-
      /*--  we're getting SIZE(N)==1 if c() is passed in as null here too --*/
      if ( CCS_PDL_IS_NULL($PDL(c)) )
        $SIZE(N) = $COMP(sizeN);
@@ -159,16 +156,13 @@ pp_def
   ('ccs_matmult2d_zdd',
    Pars => ("\n    "
             .join("\n    ",
-                  "$INDX ixa(Two,NnzA); nza(NnzA);", ## a(M,N) (M~i, N~x)
+                  "$INDX ixa(Two=2,NnzA); nza(NnzA);", ## a(M,N) (M~i, N~x)
                   'b(O,M);',                          ## b(O,M) (O~z, M~i)
                   '[o]c(O,N)',                        ## c(O,N) (O~z, N~x)
                   '')),
 
    OtherPars => "PDL_Indx sizeN;",
    RedoDimsCode => q{
-     if ($SIZE(Two) != 2)
-       $CROAK("bogus input dimension Two=%ld for index PDL ixa(Two,NnzA) must be 2", $SIZE(Two));
-
      /*--  we're getting SIZE(N)==1 if c() is passed in as null here too --*/
      if ( CCS_PDL_IS_NULL($PDL(c)) )
        $SIZE(N) = $COMP(sizeN);
@@ -356,7 +350,7 @@ pp_def
   ('_ccs_vcos_zdd',
    Pars => ("\n    "
             .join("\n    ",
-                  "$INDX ixa(Two,NnzA); nza(NnzA);",   ##-- logical (M,N)
+                  "$INDX ixa(Two=2,NnzA); nza(NnzA);",   ##-- logical (M,N)
                   "b(N);",                             ##-- logical (1,N)
                   "float+ anorm(M);",                  ##-- dense (required)
                   "float+ [o]vcos(M);",
@@ -366,10 +360,6 @@ pp_def
      CCS_Indx an,am, bm;
      $GENERIC(anorm) bnorm;
      $GENERIC(nza)   av;
-
-     /*-- sanity check: dimension "Two" --*/
-     if ($SIZE(Two) != 2)
-        $CROAK("bogus input dimension Two=%ld for index PDL ixa(Two,NnzA) must be 2", $SIZE(Two));
 
      broadcastloop %{
        /*-- cache bnorm as \sum_{i=1}^N b[i]**2 --*/

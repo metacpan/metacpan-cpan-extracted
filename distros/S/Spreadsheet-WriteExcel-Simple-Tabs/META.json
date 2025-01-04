@@ -1,0 +1,53 @@
+{
+   "abstract" : "Simple Interface to the Spreadsheet::WriteExcel Package",
+   "author" : [
+      "Michael R. Davis"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Spreadsheet-WriteExcel-Simple-Tabs",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Scalar" : "0",
+            "Spreadsheet::WriteExcel" : "0",
+            "Test::Simple" : "0.44"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mrdvt92/perl-Spreadsheet-WriteExcel-Simple-Tabs/issues"
+      },
+      "homepage" : "https://github.com/mrdvt92/perl-Spreadsheet-WriteExcel-Simple-Tabs",
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/mrdvt92/perl-Spreadsheet-WriteExcel-Simple-Tabs.git"
+      }
+   },
+   "version" : "0.11"
+}

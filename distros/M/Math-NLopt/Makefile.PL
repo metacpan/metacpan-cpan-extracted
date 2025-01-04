@@ -28,6 +28,8 @@ my %WriteMakefileArgs = (
     "Carp" => 0,
     "Exporter" => 0,
     "XSLoader" => 0,
+    "overload" => 0,
+    "parent" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -43,7 +45,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "constant" => 0
   },
-  "VERSION" => "0.05",
+  "VERSION" => "0.09",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -70,6 +72,8 @@ my %FallbackPrereqs = (
   "Test::More" => 0,
   "XSLoader" => 0,
   "constant" => 0,
+  "overload" => 0,
+  "parent" => 0,
   "strict" => 0,
   "warnings" => 0
 );

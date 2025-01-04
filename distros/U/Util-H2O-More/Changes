@@ -15,7 +15,7 @@
       due to "-isa" not being supported
       before v0.14
 
-0.0.5 Thu Feb 24 12:05:08 2022 
+0.0.5 Thu Feb 24 12:05:08 2022
     - deprecating baptise_deeply in favor of
       supporting -recurse in the baptise command
     - add opt2h2o for efficiently using h2o with
@@ -23,7 +23,7 @@
     - added o2h, to be the "inverse" operation of
       h2o; it supports the -recurse option.
 
-0.0.6 Thu Feb 24 12:07:08 2022 
+0.0.6 Thu Feb 24 12:07:08 2022
     - POD fixes
 
 0.0.7 Thu Jun 23 12:07:08 2022
@@ -121,14 +121,14 @@
 0.3.1 Wed Aug 30 00:05:00 2023
     - added yaml2o and POD for it
     - yaml2o is like ini2o, but used with YAML files and YAML saved directly
-      as a string to a SCALAR variable 
-      
+      as a string to a SCALAR variable
+
 0.3.2 Wed Aug 30 01:05:00 2023
-    - POD update 
+    - POD update
 
 0.3.3 Wed Nov 01 01:05:00 2023
     - made yaml2o an alias for yaml2h2o to be consistent with ini2h2o/ini2o
-    - POD update 
+    - POD update
 
 0.3.4 Wed Dec 12 01:04:00 2023
     - pinned module to Util::H2O after critical upstream bug affecting o2d
@@ -150,7 +150,7 @@
         my @mightexist = qw/foo bar baz/;
         foreach my $k (@mightexist) {
           say $hash_ref->$k if (exists $hash_ref->{$k}); #...before
-        } 
+        }
 
         After, missing methods return undef:
 
@@ -158,8 +158,8 @@
         d2o -autoundef, $hash_ref;
         my @mightexist = qw/foo bar baz/;
         foreach my $k (@mightexist) {
-          say $hash_ref->$k if ($hash_ref->$k); #............after 
-        } 
+          say $hash_ref->$k if ($hash_ref->$k); #............after
+        }
 
 0.3.6 Sun Aug 26 00:55:00 2024
         - cleaned up some POD
@@ -187,3 +187,24 @@
         - HTTPTiny2h2o doesn't attempt to trap any exceptions or verify before
           the "decode_json" that it is actually JSON
         - see updated POD for HTTPTiny2h2o for more details
+
+0.4.1 Tue Jan 03 02:27:00 2025
+        - new minor version
+	- Getopt2h2o now supports "-autoundef" option, but is not
+	  on by default - tests added
+	- HTTPTiny2h2o will applies "d2o -autoundef" if the 'content'
+	  in the HTTP::Tiny response is undef'd - tests added
+	- added tests to confirm HTTPTiny2h2o does the right thing
+	  if the content of the response is a JSON array
+	- HTTPTiny2h2o supports a "-autothrow" option, which when used
+	  allows JSON decode exceptions to propagate up; otherwise
+	  the default behavior is to ignore it and leave the contents
+	  untouched (but accessor "->content" is still created)
+        - see updated POD for HTTPTiny2h2o for more details
+	- HTTPTiny2h2o this method is still evolving, feedback is
+	  welcomed for different scenario
+
+0.4.2 Tue Jan 03 03:27:00 2025
+	- added POD about opt2h2o's support for Getopt::Long's ability
+	  to define negative options; e.g., "option6!" is able to
+	  accept "--option6" and "--no-option6".

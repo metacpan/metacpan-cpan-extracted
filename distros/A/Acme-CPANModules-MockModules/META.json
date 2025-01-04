@@ -59,7 +59,7 @@
    "provides" : {
       "Acme::CPANModules::MockModules" : {
          "file" : "lib/Acme/CPANModules/MockModules.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
@@ -74,7 +74,7 @@
          "web" : "https://github.com/perlancar/perl-Acme-CPANModules-MockModules"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040000"

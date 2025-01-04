@@ -1,5 +1,5 @@
 #
-# GENERATED WITH PDL::PP from gsl_mroot.pd! Don't modify!
+# GENERATED WITH PDL::PP from lib/PDL/GSL/MROOT.pd! Don't modify!
 #
 package PDL::GSL::MROOT;
 
@@ -22,7 +22,7 @@ use DynaLoader;
 
 
 
-#line 68 "gsl_mroot.pd"
+#line 72 "lib/PDL/GSL/MROOT.pd"
 
 use strict;
 use warnings;
@@ -64,7 +64,7 @@ to the algorithms in the GSL library that do not use derivatives.
 
      return $y;
   }
-#line 68 "MROOT.pm"
+#line 68 "lib/PDL/GSL/MROOT.pm"
 
 
 =head1 FUNCTIONS
@@ -137,7 +137,7 @@ sub gslmroot_fsolver {
 
 
 
-#line 114 "gsl_mroot.pd"
+#line 118 "lib/PDL/GSL/MROOT.pd"
 
 =head1 SEE ALSO
 
@@ -157,7 +157,7 @@ COPYING in the PDL distribution. If this file is separated from the
 PDL distribution, the copyright notice should be included in the file.
 
 =cut
-#line 161 "MROOT.pm"
+#line 161 "lib/PDL/GSL/MROOT.pm"
 
 # Exit with OK status
 

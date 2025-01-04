@@ -8,12 +8,14 @@ use warnings;
 
 #<<<
 
-our $VERSION = '0.05';
+our $VERSION = '0.09';
 
 #>>>
 
 # don't inherit.  We're a class by-golly, and don't want Exporter's methods.
 use Exporter 'import';
+
+use Math::NLopt::Exception;
 
 # Items to export into callers namespace by default. Note: do not export
 # names by default without a very good reason. Use EXPORT_OK instead.
@@ -119,9 +121,13 @@ sub AUTOLOAD {    ## no critic (ClassHierarchies::ProhibitAutoload)
     my $constname;
     our $AUTOLOAD;
     ( $constname = $AUTOLOAD ) =~ s/.*:://;
-    _croak '&Math::NLopt::constant not defined' if $constname eq 'constant';
+    _croak Math::NLopt::Exception->new( 'Math::NLopt::constant not defined' )
+      if $constname eq 'constant';
     my ( $error, $val ) = constant( $constname );
-    if ( $error ) { croak $error; }
+    if ( $error ) {
+        _croak Math::NLopt::Exception->new( $error );
+    }
+
     {
         no strict 'refs';    ## no critic (TestingAndDebugging::ProhibitNoStrict)
 
@@ -160,7 +166,7 @@ Math::NLopt - Math::NLopt - Perl interface to the NLopt optimization library
 
 =head1 VERSION
 
-version 0.05
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -170,7 +176,7 @@ version 0.05
   $opt->set_lower_bounds( [ -HUGE_VAL(), 0 ] );
   $opt->set_min_objective( sub ( $x, $grad, $data ) { ... } );
   $opt->set_xtol_rel( ... );
-  my $output_pars = $opt->optimize( \@input_pars );
+  \@optimized_pars = $opt->optimize( \@initial_pars );
 
 =head1 DESCRIPTION
 
@@ -185,30 +191,34 @@ B<Math::NLopt> is a Perl binding to B<NLopt>.  It uses the
 L<Alien::NLopt> module to find or install a Perl local instance of the
 B<NLopt> library.
 
-This version interfaces to Perl using native Perl arrays.  A version
-which uses PDL ndarrays will be forthcoming.
+This module provides an interface using native Perl arrays.
 
-The main documentation for B<NLopt> may be found at
-L<< https://nlopt.readthedocs.io/ >>; this documentation focuses on the
+The main documentation for B<NLopt> may be found at L<<
+https://nlopt.readthedocs.io/ >>; this document focuses on the
 Perl specific implementation, which is more Perlish than the C API
 (and is very similar to the Python one).
 
-=head2 Perl Interface
+=head2 API
 
-The Perl interface closely tracks the object oriented interface of B<NLopt>,
-but uses methods rather than subroutine calls, e.g. translate the C
+The Perl API uses an object, constructed by the L</new> class method,
+to maintain state. The optimization process is controlled by
+invoking methods on the object.
 
-   result = nlopt_<method>( opt, ... );
+I<In general> results are returned directly from the methods; method
+parameters are used primarily as input data for the methods (the
+objective and constraint callbacks more closely follow the C API).
 
-into
+The Perl methods are named similarly to the C functions, e.g.
 
-  $result = $opt->method( ... );
+   nlopt_<method>( opt, ... );
 
-However, the Perl API I<in general> returns results directly, whereas
-the C interface returns a success/failure code and transfers data to
-and from a routine via its parameters.  The Perl API, apart from that
-for the objective and constraint methods, uses parameters solely as
-input data for the methods.  For example, the C API for starting
+becomes
+
+  $opt->method( ... );
+
+Where C<$opt> is provided by the L</new> class method.
+
+As an example,  the C API for starting
 the optimization process is
 
    nlopt_result nlopt_optimize(nlopt_opt opt, double *x, double *opt_f);
@@ -224,9 +234,18 @@ The Perl interface (similar to the Python and C++ versions) is
    $opt_f = $opt->last_optimum_value;
    $result_code = $opt->last_optimize_result;
 
-The Perl API will throw exceptions on failures, similar to the
-behavior of the C++ and Python API's.  That behavior will be tunable
-in future releases.
+The Perl API throws exceptions on failures, similar to the behavior of
+the C++ and Python API's.  Where the C API returns error codes,
+C<Math::NLopt> throws objects in similarly named exception classes:
+
+  Math::NLopt::Exception::Failure
+  Math::NLopt::Exception::OutOfMemory
+  Math::NLopt::Exception::InvalidArgs
+  Math::NLopt::Exception::RoundoffLimited>
+  Math::NLopt::Exception::ForcedStop
+
+These all extend the L<Math::NLopt::Exception> class; see it for more
+information on retrieving messages from the objects.
 
 =head2 Constants
 
@@ -252,13 +271,13 @@ As are the utility subroutines:
 
 =head2 Callbacks
 
-B<NLopt> handles the optimization of the objective function. The
-user must provide subroutines which return the value of the objective
-function or non-linear constraints.  Such callback subroutines
-have a required calling signature, documented below.  The user can
-provide their own data structure containing additional information
-which will be passed to the callbacks, or they can access that
-information from closures.
+B<NLopt> handles the optimization of the objective function, relying
+upon user provided subroutines to calculate the objective function and
+non-linear constraints (see below for the required calling signature).
+
+The callback subroutines are called with a user-provided structure
+which can be used to pass additional information to the callback
+(or the subroutines can use closures).
 
 =head3 Objective Functions
 
@@ -460,7 +479,7 @@ Return the result code after an optimization.
 
   $min_f = $opt->last_optimum_value;
 
-Return the minimum objective value obtained after an optimization.
+Return the objective value obtained after an optimization.
 
 =head3 num_params
 
@@ -471,6 +490,11 @@ Return the number of algorithm specific parameters.
 =head3 optimize
 
   \@optimized_pars = $opt->optimize( \@input_pars );
+
+Returns the parameter values determined from the optimization.  The
+status of the optimization (e.g. NLopt's result code) can be retrieved
+via the L</last_optimize_result> method. The final value of the
+objective function is available via the L</last_aptimum_value> method.
 
 =head3 remove_equality_constraints
 
@@ -619,8 +643,6 @@ B<$algorithm> is one of the algorithm constants, e.g.
 
   use Math::NLopt 'NLOPT_LD_MMA';
   my $opt = Math::NLopt->new( NLOPT_LD_MMA, 3 );
-
-=head1 INTERNALS
 
 =for Pod::Coverage constant
 create

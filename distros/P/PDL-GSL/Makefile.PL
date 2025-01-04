@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 use PDL::Core::Dev;
+use File::Spec::Functions;
 
 sub get_gsl_config {
   my ($flags) = @_;
@@ -31,11 +32,11 @@ sub get_gsl_libs {
 	  get_gsl_config('--cflags') ||
 	  warn "\tno GSL include info (libgsl probably not available)\n\n");
   chomp $lib; chomp $inc;
-  return ($inc,$lib);
+  ($inc,$lib);
 }
 
 # these will be used in the subdirs
-our ($GSL_includes, $GSL_libs) = get_gsl_libs();
+my ($GSL_includes, $GSL_libs) = get_gsl_libs();
 
 # create GENERATED subdir with *.pm files during 'make dist' (to make metacpan.org happy)
 my $preop = '$(PERLRUNINST) -MPDL::Core::Dev -e pdlpp_mkgen $(DISTVNAME)';
@@ -45,15 +46,18 @@ my $package_name = "PDL::GSL";
 $repo = "PDLPorters/$repo";
 WriteMakefile(
   NAME => $package_name,
-  VERSION_FROM => 'GSL.pm',
+  VERSION_FROM => 'lib/PDL/GSL.pm',
   AUTHOR => 'PerlDL Developers <pdl-general@lists.sourceforge.net>',
+  MIN_PERL_VERSION => '5.016',
   CONFIGURE_REQUIRES => {
     'ExtUtils::MakeMaker' => 0,
-    'PDL' => '2.094',
+    'PDL' => '2.096',
   },
   PREREQ_PM => {
-    'PDL' => '2.094',
+    'PDL' => '2.096',
   },
+  INC => join(' ', "-I".curdir(), $GSL_includes),
+  LIBS => [$GSL_libs],
   dist => { COMPRESS => 'gzip', SUFFIX => 'gz', PREOP => $preop },
   META_MERGE => {
     "meta-spec" => { version => 2 },
@@ -68,9 +72,18 @@ WriteMakefile(
       x_IRC => 'irc://irc.perl.org/#pdl',
     },
   },
+  clean => { FILES => join ' ', qw(MANIFEST.bak) },
 );
 
+my @pd_srcs;
+sub MY::init_PM {
+  package MY; # so that "SUPER" works right
+  my ($self) = @_;
+  $self->SUPER::init_PM;
+  @pd_srcs = ::pdlpp_eumm_update_deep($self);
+}
 sub MY::postamble {
   my $oneliner = PDL::Core::Dev::_oneliner(qq{exit if \$ENV{DESTDIR}; use PDL::Doc; eval { PDL::Doc::add_module(shift); }});
-  qq|\ninstall :: pure_install\n\t$oneliner \$(NAME)\n|;
+  pdlpp_postamble_int(@pd_srcs) .
+    qq|\ninstall :: pure_install\n\t$oneliner \$(NAME)\n|;
 }

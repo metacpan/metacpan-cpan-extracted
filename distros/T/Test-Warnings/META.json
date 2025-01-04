@@ -186,11 +186,11 @@
    "provides" : {
       "Test2::Warnings" : {
          "file" : "lib/Test2/Warnings.pm",
-         "version" : "0.034"
+         "version" : "0.036"
       },
       "Test::Warnings" : {
          "file" : "lib/Test/Warnings.pm",
-         "version" : "0.034"
+         "version" : "0.036"
       }
    },
    "release_status" : "stable",
@@ -208,7 +208,7 @@
       "x_IRC" : "irc://irc.perl.org/#perl-qa",
       "x_MailingList" : "http://lists.perl.org/list/perl-qa.html"
    },
-   "version" : "0.034",
+   "version" : "0.036",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.041007"
@@ -1045,7 +1045,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.034",
+                  "tag" : "v0.036",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },

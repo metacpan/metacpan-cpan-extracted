@@ -12,3 +12,10 @@
 	- added the "about" subcommand
 	- commandline interface is not yet settled, and will
 	  likely change somewhat based on feedback
+
+0.1.4	Thu Jan 3 09:02:57 PM UTC 2025
+	- cleaned up some internal API error handling
+	- updated require version of Util::H2O::More so that
+	  API error handling is more clean (>= 0.4.1)
+	- pinned "avemaria" client version to version of the
+	  main Perl module $VERSION

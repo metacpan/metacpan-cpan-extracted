@@ -5,7 +5,18 @@ use Carp();
 use English qw( -no_match_vars );
 use Exporter();
 use XSLoader();
-@INC = grep !/blib\/arch/, @INC; # making sure we're testing pure perl version
+use constant;
+use overload;
+BEGIN {
+	if ($^O eq 'MSWin32') {
+		require Win32;
+		require Win32::API;
+		require Win32::API::Type;
+	} else {
+		require FileHandle;
+	}
+}
+@INC = qw(blib/lib); # making sure we're testing pure perl version
 require Crypt::URandom;
 
 foreach my $correct (qw(500000 500 50)) {

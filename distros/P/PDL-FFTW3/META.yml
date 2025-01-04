@@ -7,7 +7,7 @@ build_requires:
   Test::More: '0.98'
 configure_requires:
   IPC::Run: '0'
-  PDL: '2.091'
+  PDL: '2.097'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: gpl
@@ -20,11 +20,11 @@ no_index:
     - t
     - inc
 requires:
-  PDL: '2.091'
+  PDL: '2.097'
   perl: '5.016'
 resources:
   IRC: irc://irc.perl.org/#pdl
   bugtracker: https://github.com/PDLPorters/pdl-fftw3/issues
   repository: git://github.com/PDLPorters/pdl-fftw3.git
-version: '0.20'
+version: '0.201'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

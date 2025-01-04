@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Test::Warnings; # git description: v0.033-4-gb16c52b
+package Test::Warnings; # git description: v0.035-3-g0d65702
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Test for warnings and the lack of them
 # KEYWORDS: testing tests warnings
 
-our $VERSION = '0.034';
+our $VERSION = '0.036';
 
 use parent 'Exporter';
 use Test::Builder;
@@ -41,6 +41,14 @@ sub import {
     $report_warnings = exists $names{':report_warnings'};
 
     delete @names{qw(:no_end_test :fail_on_warning :report_warnings)};
+
+    {
+        my $callpkg = caller(1);
+        no strict 'refs';
+        no warnings 'once';
+        undef *{$callpkg.'::done_testing'} if *{$callpkg.'::done_testing'}{CODE};
+    }
+
     __PACKAGE__->export_to_level(1, $class, keys %names);
 }
 
@@ -106,7 +114,7 @@ sub warning(&) {
 # so we do not check again via END
 sub done_testing {
     if (Test2::Tools::Basic->can('done_testing')) {
-        if (not $no_end_test) {
+        if (not $no_end_test and not $done_testing_called) {
             # we could use $ctx to create the test, which means not having to adjust Level,
             # but then we need to make _builder Test2-compatible, which seems like a PITA.
             local $Test::Builder::Level = $Test::Builder::Level + 3;
@@ -120,7 +128,7 @@ sub done_testing {
         # only do this at the end of all tests, not at the end of a subtest
         my $builder = _builder;
         my $in_subtest_sub = $builder->can('in_subtest');
-        if (not $no_end_test
+        if (not $no_end_test and not $done_testing_called
             and not ($in_subtest_sub ? $builder->$in_subtest_sub : $builder->parent)) {
             local $Test::Builder::Level = $Test::Builder::Level + 3;
             had_no_warnings('no (unexpected) warnings (via done_testing)');
@@ -132,6 +140,28 @@ sub done_testing {
     else {
         die 'no done_testing available via a Test module';
     }
+}
+
+# we also monkey-patch Test::Builder::done_testing (which is called by Test::More::done_testing),
+# in case Test::More was loaded after Test::Warnings and therefore its version of done_testing was
+# imported into the test rather than ours.
+if (Test::Builder->can('done_testing')) {
+    no strict 'refs';
+    my $orig = *{'Test::Builder::done_testing'}{CODE};
+    no warnings 'redefine';
+    *{'Test::Builder::done_testing'} = sub {
+        # only do this at the end of all tests, not at the end of a subtest
+        my $builder = _builder;
+        my $in_subtest_sub = $builder->can('in_subtest');
+        if (not $no_end_test and not $done_testing_called
+            and not ($in_subtest_sub ? $builder->$in_subtest_sub : $builder->parent)) {
+            local $Test::Builder::Level = $Test::Builder::Level + 3;
+            had_no_warnings('no (unexpected) warnings (via done_testing)');
+            $done_testing_called = 1;
+        }
+
+        $orig->(@_);
+    };
 }
 
 END {
@@ -214,7 +244,7 @@ Test::Warnings - Test for warnings and the lack of them
 
 =head1 VERSION
 
-version 0.034
+version 0.036
 
 =head1 SYNOPSIS
 

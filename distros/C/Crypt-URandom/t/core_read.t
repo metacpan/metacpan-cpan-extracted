@@ -8,6 +8,8 @@ use Carp();
 use English qw( -no_match_vars );
 use Exporter();
 use XSLoader();
+use constant;
+use overload;
 BEGIN {
 	if ($^O eq 'MSWin32') {
 		require Win32;
@@ -37,7 +39,8 @@ SKIP: {
 		use warnings;
 		require POSIX;
 		my $required_error_message = q[(?:] . (quotemeta POSIX::strerror(POSIX::EACCES())) . q[|Permission[ ]denied)];
-		@INC = grep !/blib\/arch/, @INC; # making sure we're testing pure perl version
+		require FileHandle;
+		@INC = qw(blib/lib); # making sure we're testing pure perl version
 		require Crypt::URandom;
 		my $generated = 0;
 		eval {

@@ -29,12 +29,13 @@
          "requires" : {
             "Alien::proj" : "1.29",
             "ExtUtils::MakeMaker" : "0",
-            "PDL" : "2.094"
+            "PDL" : "2.096"
          }
       },
       "runtime" : {
          "requires" : {
-            "PDL" : "2.094"
+            "PDL" : "2.096",
+            "perl" : "5.016"
          }
       },
       "test" : {
@@ -44,6 +45,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "2.096",
+   "version" : "2.097",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

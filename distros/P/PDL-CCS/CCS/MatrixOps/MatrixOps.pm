@@ -11,7 +11,7 @@ use PDL::Exporter;
 use DynaLoader;
 
 
-   our $VERSION = '1.24.0';
+   our $VERSION = '1.24.1';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::CCS::MatrixOps $VERSION;
@@ -72,7 +72,7 @@ PDL::CCS::MatrixOps - Low-level matrix operations for compressed storage sparse 
 =for sig
 
   Signature: (
-    indx ixa(Two,NnzA); nza(NnzA); missinga();
+    indx ixa(Two=2,NnzA); nza(NnzA); missinga();
     b(O,M);
     zc(O);
     [o]c(O,N)
@@ -123,7 +123,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (
-    indx ixa(Two,NnzA); nza(NnzA);
+    indx ixa(Two=2,NnzA); nza(NnzA);
     b(O,M);
     [o]c(O,N)
     ; PDL_Indx sizeN)
@@ -200,7 +200,7 @@ ccs_vnorm() always clears the bad-status flag on $vnorm().
 
 
 
-#line 275 "ccsmatops.pd"
+#line 269 "ccsmatops.pd"
 
 
 =pod
@@ -289,7 +289,7 @@ sub ccs_vcos_zdd {
 =for sig
 
   Signature: (
-    indx ixa(Two,NnzA); nza(NnzA);
+    indx ixa(Two=2,NnzA); nza(NnzA);
     b(N);
     float+ anorm(M);
     float+ [o]vcos(M);)
@@ -354,7 +354,7 @@ ccs_vcos_pzd() always clears the bad status flag on the output piddle $vcos.
 
 
 
-#line 496 "ccsmatops.pd"
+#line 486 "ccsmatops.pd"
 
 
 ##---------------------------------------------------------------------

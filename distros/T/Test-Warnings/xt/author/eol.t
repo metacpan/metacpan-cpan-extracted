@@ -46,6 +46,8 @@ my @files = (
     't/24-only-report-warnings.t',
     't/25-allowed_patterns.t',
     't/lib/SilenceStderr.pm',
+    't/module-ordering.t',
+    't/redefine-done_testing.t',
     't/test2-compat.t',
     't/zzz-check-breaks.t',
     'xt/author/00-compile.t',

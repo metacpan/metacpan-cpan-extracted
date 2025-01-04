@@ -64,7 +64,7 @@ use Daje::Workflow::Database::Model::Context;
 # janeskil1525 E<lt>janeskil1525@gmail.comE<gt>
 #
 
-our $VERSION = "0.07";
+our $VERSION = "0.08";
 
 has 'db';               # Constructor
 has 'workflow_pkey';    # Constructor
@@ -133,6 +133,7 @@ sub insert_history($self, $history) {
 
 1;
 __END__
+
 
 
 

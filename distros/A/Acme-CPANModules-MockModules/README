@@ -2,9 +2,9 @@ NAME
     Acme::CPANModules::MockModules - List of modules that mock other modules
 
 VERSION
-    This document describes version 0.003 of Acme::CPANModules::MockModules
+    This document describes version 0.004 of Acme::CPANModules::MockModules
     (from Perl distribution Acme-CPANModules-MockModules), released on
-    2025-01-01.
+    2025-01-02.
 
 DESCRIPTION
     Not to be confused with modules which you can use to do mock testing.
@@ -58,6 +58,8 @@ SOURCE
     <https://github.com/perlancar/perl-Acme-CPANModules-MockModules>.
 
 SEE ALSO
+    Acme::CPANModules::Mock, "Acme::CPANModules::Mock::*"
+
     Acme::CPANModules - about the Acme::CPANModules namespace
 
     cpanmodules - CLI tool to let you browse/view the lists

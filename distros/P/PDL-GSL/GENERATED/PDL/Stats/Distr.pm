@@ -1,5 +1,5 @@
 #
-# GENERATED WITH PDL::PP from distr.pd! Don't modify!
+# GENERATED WITH PDL::PP from lib/PDL/Stats/Distr.pd! Don't modify!
 #
 package PDL::Stats::Distr;
 
@@ -22,7 +22,7 @@ use DynaLoader;
 
 
 
-#line 7 "distr.pd"
+#line 7 "lib/PDL/Stats/Distr.pd"
 
 use strict;
 use warnings;
@@ -72,7 +72,7 @@ Or, play with different distributions with B<plot_distr> :)
     $data->plot_distr( 'gaussian', 'lognormal' );
 
 =cut
-#line 76 "Distr.pm"
+#line 76 "lib/PDL/Stats/Distr.pm"
 
 
 =head1 FUNCTIONS
@@ -793,7 +793,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 652 "distr.pd"
+#line 652 "lib/PDL/Stats/Distr.pd"
 sub PDL::pmf_poisson_factorial {
   my ($x, $l) = @_;
   my $pdlx = PDL->topdl($x);
@@ -802,7 +802,7 @@ sub PDL::pmf_poisson_factorial {
   PDL::_pmf_poisson_factorial_int($pdlx, $l, my $p = PDL->null);
   $p;
 }
-#line 806 "Distr.pm"
+#line 806 "lib/PDL/Stats/Distr.pm"
 
 *pmf_poisson_factorial = \&PDL::pmf_poisson_factorial;
 
@@ -812,9 +812,9 @@ sub PDL::pmf_poisson_factorial {
 
 
 
-#line 668 "distr.pd"
+#line 668 "lib/PDL/Stats/Distr.pd"
 
-#line 669 "distr.pd"
+#line 669 "lib/PDL/Stats/Distr.pd"
 
 =head2 plot_distr
 
@@ -958,7 +958,7 @@ Copyright (C) 2009 Maggie J. Xiong <maggiexyz users.sourceforge.net>, David Mert
 All rights reserved. There is no warranty. You are allowed to redistribute this software / documentation as described in the file COPYING in the PDL distribution.
 
 =cut
-#line 962 "Distr.pm"
+#line 962 "lib/PDL/Stats/Distr.pm"
 
 # Exit with OK status
 

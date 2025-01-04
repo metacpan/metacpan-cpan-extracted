@@ -34,8 +34,8 @@ Makefile\.old
 \.so$
 \.tar\.gz$
 \b_eumm/
-^Libtmp/Slatec/Slatec..*
-^Libtmp/Slatec/slatec/.*\.c$
+^Slatec..*
+^slatec/.*\.c$
 ^\.\#.*
 ^\.exists
 ^\.git

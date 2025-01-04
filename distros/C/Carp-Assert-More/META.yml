@@ -27,4 +27,4 @@ resources:
   bugtracker: https://github.com/petdance/carp-assert-more/issues
   homepage: https://github.com/petdance/carp-assert-more
   license: https://opensource.org/licenses/artistic-license-2.0.php
-version: v2.7.0
+version: v2.8.0

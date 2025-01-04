@@ -19,7 +19,7 @@ use warnings;
 # I generate code for up to 10-dimensional FFTs
 my $maxrank = 10;
 
-our $VERSION = '0.20';
+our $VERSION = '0.201';
 pp_setversion($VERSION);
 
 pp_addpm( {At => 'Top'}, slurp('README.pod') . <<'EOF' );
@@ -693,13 +693,6 @@ EOF
   pp_def("__rNfft$rank",
     %pp_def,
     Code => $TEMPLATE_REAL_R2C,
-    NewXSTypeCoerceNS => <<'EOF',
-  $PRIV(__datatype) = $PDL(real)->datatype;
-  pdl_transvtable *vtable = $PRIV(vtable);
-  PDL_Indx i, nchildren = vtable->npdls - vtable->nparents;
-  pdl **pdls = $PRIV(pdls);
-  for (i=vtable->nparents; i<vtable->npdls; i++) pdls[i+nchildren] = pdls[i];
-EOF
   );
 }
 

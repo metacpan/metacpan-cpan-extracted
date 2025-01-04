@@ -38,7 +38,7 @@ do { my $x = {
                                       'Test::Pod::No404s' => '0',
                                       'Test::Portability::Files' => '0',
                                       'Test::Spelling' => '0.17',
-                                      'Test::Warnings' => '0',
+                                      'Test::Warnings' => '0.034',
                                       'YAML' => '0',
                                       'perl' => '5.006'
                                     }

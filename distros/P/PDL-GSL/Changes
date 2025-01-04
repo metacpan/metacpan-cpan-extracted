@@ -1,3 +1,6 @@
+2.100 2025-01-03
+- uses PDL 2.096+ lib/*.pd format for quicker builds
+
 2.099 2024-12-09
 - separate file for package declaration so PAUSE deigns to index
 

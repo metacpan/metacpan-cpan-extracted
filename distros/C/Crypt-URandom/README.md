@@ -4,7 +4,7 @@ Crypt::URandom - Provide non blocking randomness
 
 # VERSION
 
-This document describes Crypt::URandom version 0.43\_03
+This document describes Crypt::URandom version 0.46\_03
 
 # SYNOPSIS
 
@@ -136,7 +136,7 @@ gratitude from Crypt::Random::Source::Strong::Win32 by Max Kanat-Alexander
 
 # LICENSE AND COPYRIGHT
 
-Copyright (c) 2023, David Dick `<ddick@cpan.org>`. All rights reserved.
+Copyright (c) 2025, David Dick `<ddick@cpan.org>`. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

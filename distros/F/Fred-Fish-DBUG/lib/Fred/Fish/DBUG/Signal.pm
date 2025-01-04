@@ -1,5 +1,5 @@
 ###
-###  Copyright (c) 2007 - 2024 Curtis Leach.  All rights reserved.
+###  Copyright (c) 2007 - 2025 Curtis Leach.  All rights reserved.
 ###
 ###  Signal processinng enhancememnt to the Fred Fish Dbug module.
 ###
@@ -46,7 +46,7 @@ use warnings;
 use vars qw( @ISA @EXPORT @EXPORT_OK $VERSION );
 use Exporter;
 
-use Fred::Fish::DBUG::ON 2.09;
+use Fred::Fish::DBUG::ON 2.10;
 
 use Perl::AtEndOfScope;
 use Config qw( %Config );
@@ -57,7 +57,7 @@ use File::Basename;
 use Cwd 'abs_path';
 use Sub::Identify 'sub_fullname';
 
-$VERSION = "2.09";
+$VERSION = "2.10";
 @ISA = qw( Exporter );
 
 @EXPORT = qw( DBUG_TRAP_SIGNAL  DBUG_FIND_CURRENT_TRAPS  DBUG_DIE_CONTEXT
@@ -1059,7 +1059,7 @@ L<Fred::Fish::DBUG::Tutorial> - Sample code demonstrating using DBUG module.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2007 - 2024 Curtis Leach.  All rights reserved.
+Copyright (c) 2007 - 2025 Curtis Leach.  All rights reserved.
 
 This program is free software.  You can redistribute it and/or modify it
 under the same terms as Perl itself.

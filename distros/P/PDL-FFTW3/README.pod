@@ -145,9 +145,9 @@ true for the complex <-> complex transforms: the output will have the same size
 and the input, and an error will result if this isn't possible for some reason.
 
 This is a little bit more involved for the real <-> complex transforms. If I'm
-transforming a real 3D vector of dimensions C<K,L,M>, I will get an output of
-dimensions C<2,int(K/2)+1,L,M>. The leading 2 is there because the output is
-complex; the C<K/2> is there because the input was real. The first dimension is
+transforming a real 3D vector of dimensions C<K,L,M>, I will get a complex output of
+dimensions C<int(K/2)+1,L,M>.
+The C<K/2> is there because the input was real. The first dimension is
 always the one that gets the C<K/2>. This is described in detail in section 2.4
 of the FFTW manual.
 
@@ -159,9 +159,9 @@ and C<int(19/2)+1 == 10>).
 
 I<Without any extra information this module assumes the even-sized input>.
 
-Thus C<irfft1( sequence(2,10) )-E<gt>dim(0) == 18> is true. If we want the odd-sized output, we have to explicitly pass this into the function like this:
+Thus C<irfft1( sequence(cdouble,10) )-E<gt>dim(0) == 18> is true. If we want the odd-sized output, we have to explicitly pass this into the function like this:
 
- irfft1( sequence(2,10), zeros(19) )
+ irfft1( sequence(cdouble,10), zeros(19) )
 
 Here I create a new output ndarray with the C<zeros> function; C<irfft1> then
 fills in this ndarray with the result of the computation. This module validates

@@ -127,7 +127,7 @@ BEGIN {
 		);
 	};
 
-our $VERSION   = '3.009';
+our $VERSION   = '3.011';
 
 sub ARTICLE_CODE_OUT_OF_RANGE () { -5 }
 sub INVALID_PREFIX            () { -4 };
@@ -898,7 +898,7 @@ brian d foy C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2001-2024, brian d foy <briandfoy@pobox.com>. All rights reserved.
+Copyright © 2001-2025, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 This module is licensed under the Artistic License 2.0. See the LICENSE
 file in the distribution, or https://opensource.org/licenses/Artistic-2.0

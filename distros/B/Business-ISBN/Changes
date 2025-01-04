@@ -1,5 +1,8 @@
 Revision history for Perl module Business::ISBN
 
+3.011 2025-01-04T03:01:58Z
+	* add SECURITY.md; no code changes
+
 3.009 2024-02-10T21:46:10Z
 	* refresh distro, update email addresses, move to BRIANDFOY
 

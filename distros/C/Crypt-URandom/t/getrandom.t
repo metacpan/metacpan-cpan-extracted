@@ -7,9 +7,9 @@ use warnings;
 my %optional;
 if ($^O eq 'MSWin32') {
 } else {
-	eval `cat ./check_random.pl`;
+	eval `cat ./check_random.inc`;
 	if ($optional{DEFINE}) {
-		diag("check_random.pl produced the flag of $optional{DEFINE}");
+		diag("check_random.inc produced the flag of $optional{DEFINE}");
 	}
 }
 

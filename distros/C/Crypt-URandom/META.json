@@ -32,7 +32,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Carp" : "0",
+            "Carp" : "1.26",
             "English" : "0",
             "Exporter" : "0",
             "FileHandle" : "0",
@@ -58,6 +58,6 @@
          "web" : "https://github.com/david-dick/crypt-urandom"
       }
    },
-   "version" : "0.43",
+   "version" : "0.46",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

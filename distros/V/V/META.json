@@ -1,7 +1,7 @@
 {
    "abstract" : "Print version of the specified module(s).",
    "author" : [
-      "Abe Timmerman <abeltje@cpan.org>"
+      "H.Merijn Brand <hmbrand@cpan.org>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
@@ -42,14 +42,15 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/abeltje/V/issues"
+         "web" : "https://github.com/Tux/V/issues"
       },
-      "homepage" : "https://github.com/abeltje/V",
+      "homepage" : "https://github.com/Tux/V",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/abeltje/V.git"
-      }
+         "url" : "https://github.com/Tux/V.git"
+      },
+      "x_IRC" : "irc://irc.perl.org/#csv"
    },
-   "version" : "0.19",
+   "version" : "0.20",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

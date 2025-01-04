@@ -1,5 +1,5 @@
 ---
-abstract: "It's loader for Daje-Workflow JSON based workflows"
+abstract: 'Just loads Daje-Workflow JSON based workflows'
 author:
   - 'janeskil1525 <janeskil1525@gmail.com>'
 build_requires:
@@ -26,7 +26,7 @@ no_index:
 provides:
   Daje::Workflow::Loader:
     file: lib/Daje/Workflow/Loader.pm
-    version: '0.03'
+    version: '0.04'
   Daje::Workflow::Loader::Load:
     file: lib/Daje/Workflow/Loader/Load.pm
 requires:
@@ -38,6 +38,6 @@ resources:
   bugtracker: https://github.com/janeskil1525/Daje-Workflow-Load/issues
   homepage: https://github.com/janeskil1525/Daje-Workflow-Load
   repository: https://github.com/janeskil1525/Daje-Workflow-Load.git
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

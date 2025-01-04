@@ -3,9 +3,9 @@ package Acme::CPANModules::MockModules;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-01-01'; # DATE
+our $DATE = '2025-01-02'; # DATE
 our $DIST = 'Acme-CPANModules-MockModules'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 our $LIST = {
     summary => 'List of modules that mock other modules',
@@ -41,7 +41,7 @@ Acme::CPANModules::MockModules - List of modules that mock other modules
 
 =head1 VERSION
 
-This document describes version 0.003 of Acme::CPANModules::MockModules (from Perl distribution Acme-CPANModules-MockModules), released on 2025-01-01.
+This document describes version 0.004 of Acme::CPANModules::MockModules (from Perl distribution Acme-CPANModules-MockModules), released on 2025-01-02.
 
 =head1 DESCRIPTION
 
@@ -105,6 +105,8 @@ Please visit the project's homepage at L<https://metacpan.org/release/Acme-CPANM
 Source repository is at L<https://github.com/perlancar/perl-Acme-CPANModules-MockModules>.
 
 =head1 SEE ALSO
+
+L<Acme::CPANModules::Mock>, C<Acme::CPANModules::Mock::*>
 
 L<Acme::CPANModules> - about the Acme::CPANModules namespace
 

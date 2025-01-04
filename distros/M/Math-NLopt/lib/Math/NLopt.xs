@@ -9,6 +9,8 @@
 
 #include "const-c.inc"
 
+#define EXCEPTION "Math::NLopt::Exception"
+
 /* copy a C double array (in) into an AV (out).
 
    'out' may be NULL, an AV* or an RV pointing to an AV
@@ -77,13 +79,12 @@ AV_to_double( pTHX_ unsigned n, SV* in, double *out ) {
         arr = (AV*) in;
     }
     else {
-        croak( "internal error: unknown SV passed to AV_tod_-double" );
+        croak( "internal error: unknown SV passed to AV_to_double" );
     }
-
 
     SSize_t len = av_count( arr );
     if ( len != n )
-        croak( "AV_to_double: arrconsistent arrput Perl array length: expected %d, got %d", n, len );
+        croak( "AV_to_double: inconsistent input Perl array length: expected %d, got %d", n, len );
 
     if ( NULL == out )
         out = (double*) SvPVX( sv_2mortal(newSV(n * sizeof(double))) );
@@ -160,6 +161,86 @@ SV* new_ProxyNLopt( pTHX_ nlopt_opt self ) {
     return sv_proxy;
 }
 
+static void
+my_throw( pTHX_ const char * pclass, const char* message ) {
+
+    SV* object;
+    int count;
+
+    dSP;
+    ENTER;
+    SAVETMPS;
+    PUSHMARK(SP);
+    EXTEND(SP,2);
+    mPUSHs(newSVpv(pclass, 0 ));
+    mPUSHs(newSVpv(message, 0 ));
+    PUTBACK;
+
+    count = call_method( "new", G_SCALAR );
+
+    SPAGAIN;
+
+    if (count != 1)
+        croak("Big Trouble\n" );
+
+    object = POPs;
+
+    /* increment ref count otherwise the LEAVE below destroys it */
+    SvREFCNT_inc_simple_void_NN(object);
+
+    PUTBACK;
+    FREETMPS;
+    LEAVE;
+
+    croak_sv( object );
+}
+
+static void
+throw_nlopt( pTHX_ int iclass, const char* message ) {
+
+    SV* object;
+    const char * pclass;
+    int count;
+
+    switch( iclass ) {
+    case NLOPT_FAILURE:
+        pclass = "Math::NLopt::Exception::Failure";
+        if ( NULL == message )
+            message = "failure";
+        break;
+
+    case NLOPT_OUT_OF_MEMORY:
+        pclass = "Math::NLopt::Exception::OutOfMemory";
+        if ( NULL == message )
+            message = "out of memory";
+        break;
+
+    case NLOPT_INVALID_ARGS:
+        pclass = "Math::NLopt::Exception::InvalidArgs";
+        if ( NULL == message )
+            message = "invalid argument";
+        break;
+
+    case NLOPT_ROUNDOFF_LIMITED:
+        pclass = "Math::NLopt::Exception::RoundOffLimited";
+        if ( NULL == message )
+            message = "roundoff limited";
+        break;
+
+    case NLOPT_FORCED_STOP:
+        pclass = "Math::NLopt::Exception::ForcedStop";
+        if ( NULL == message )
+            message = "forced stop";
+        break;
+
+    default:
+        pclass = "Math::NLopt::Exception";
+        break;
+    }
+
+    my_throw( aTHX_ pclass, message );
+}
+
 nlopt_result validate_result ( pTHX_ NLopt opt, nlopt_result result ) {
 
     opt->result = result;
@@ -167,13 +248,7 @@ nlopt_result validate_result ( pTHX_ NLopt opt, nlopt_result result ) {
         return result;
 
     const char *errmsg = nlopt_get_errmsg( opt->self );
-    switch( result ) {
-      case NLOPT_FAILURE: croak( errmsg ? errmsg : "nlopt failure");
-      case NLOPT_OUT_OF_MEMORY: croak( "out of memory" );
-      case NLOPT_INVALID_ARGS: croak( errmsg ? errmsg : "nlopt invalid argument");
-      case NLOPT_ROUNDOFF_LIMITED: croak( "nlopt roundoff limited" );
-      case NLOPT_FORCED_STOP: croak( "nlopt forced stop" );
-    }
+    throw_nlopt( aTHX_ result, errmsg );
 
     /* shouldn't get here */
     return result;
@@ -264,7 +339,6 @@ proxy_func ( unsigned n, const double *x, double *gradient, void *data ) {
     PUSHs(proxy->data);
     PUTBACK;
 
-    /* sv_dump(proxy->x); */
     count = call_sv( proxy->perl_sub, G_SCALAR);
 
     SPAGAIN;
@@ -281,7 +355,6 @@ proxy_func ( unsigned n, const double *x, double *gradient, void *data ) {
     FREETMPS;
     LEAVE;
 
-    /* sv_dump(proxy->x); */
     return retval;
 }
 
@@ -560,7 +633,7 @@ nlopt_add_equality_constraint(opt, h, ... )
         double	tol;
     CODE:
         if (items > 4)
-            croak( "too many arguments" );
+            croak_xs_usage(cv, "too many arguments" );
         h_data = items > 2 ? ST(2) : &PL_sv_undef;
         tol = items > 3 ? (double) SvNV(ST(3)) : 0;
         func = new_ProxyFunc( aTHX_ opt, h, opt->dimension, h_data );
@@ -578,7 +651,7 @@ nlopt_add_inequality_constraint(opt, fc, ... )
         double	tol;
     CODE:
         if (items > 4)
-            croak( "too many arguments" );
+            croak_xs_usage(cv, "too many arguments" );
         fc_data = items > 2 ? ST(2) : &PL_sv_undef;
         tol = items > 3 ? (double) SvNV(ST(3)) : 0;
         func = new_ProxyFunc( aTHX_ opt, fc, opt->dimension, fc_data );
@@ -598,7 +671,7 @@ nlopt_add_equality_mconstraint(opt, m, h, ... )
         double *c_tol = NULL;
     CODE:
         if (items > 5)
-            croak( "too many arguments" );
+            croak_xs_usage(cv, "too many arguments" );
         h_data = items > 3 ? ST(3) : &PL_sv_undef;
         tol = items > 4 ? ST(4) : &PL_sv_undef;
         func = new_ProxyMFunc( aTHX_ opt,  h, opt->dimension, m, h_data );
@@ -620,7 +693,7 @@ nlopt_add_inequality_mconstraint(opt, m, fc, ... )
         double *c_tol = NULL;
     CODE:
         if (items > 5)
-            croak( "too many arguments" );
+            croak_xs_usage(cv, "too many arguments" );
         fc_data = items > 3 ? ST(3) : &PL_sv_undef;
         tol = items > 4 ? ST(4) : &PL_sv_undef;
         func = new_ProxyMFunc( aTHX_ opt,  fc, opt->dimension, m, fc_data );
@@ -960,7 +1033,7 @@ nlopt_set_max_objective(opt, f, ...)
         SV *	f_data;
       CODE:
         if (items > 4)
-            croak( "too many arguments" );
+            croak_xs_usage(cv, "too many arguments" );
         f_data = items > 3 ? ST(3) : &PL_sv_undef;
         func = new_ProxyFunc( aTHX_ opt, f, opt->dimension, f_data );
         RETVAL = nlopt_set_max_objective( opt->self, &proxy_func, (void*) func );
@@ -986,7 +1059,7 @@ nlopt_set_min_objective(opt, f, ... )
         SV * f_data;
       CODE:
         if (items > 3)
-            croak( "too many arguments" );
+            croak_xs_usage(cv, "too many arguments" );
         f_data = items > 2 ? ST(2) : &PL_sv_undef;
         func = new_ProxyFunc( aTHX_ opt, f, opt->dimension, f_data );
         RETVAL = nlopt_set_min_objective( opt->self, &proxy_func, (void*) func );
@@ -1016,7 +1089,7 @@ nlopt_set_precond_max_objective(opt, f, pre, ...)
         SV * f_data;
       CODE:
         if (items > 4)
-            croak( "too many arguments" );
+            croak_xs_usage(cv, "too many arguments" );
         f_data = items > 3 ? ST(3) : &PL_sv_undef;
         n = opt->dimension;
         prefunc = new_ProxyPreCondFunc( aTHX_ opt, f, n, f_data );
@@ -1038,7 +1111,7 @@ nlopt_set_precond_min_objective(opt, f, pre, ...)
         SV *	f_data;
       CODE:
         if (items > 4)
-            croak( "too many arguments" );
+            croak_xs_usage(cv, "too many arguments" );
         f_data = items > 3 ? ST(3) : &PL_sv_undef;
         n = opt->dimension;
         prefunc = new_ProxyPreCondFunc( aTHX_ opt, f, n, f_data );

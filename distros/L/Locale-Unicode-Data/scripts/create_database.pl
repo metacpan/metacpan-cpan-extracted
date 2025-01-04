@@ -1,17 +1,19 @@
 #!/usr/bin/env perl
 ##----------------------------------------------------------------------------
-## Unicode CLDR SQL Data - ~/scripts/create_database.pl
-## Version v0.1.1
+## Unicode Locale Identifier - ~/scripts/create_database.pl
+## Version v0.2.0
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/06/15
-## Modified 2024/07/20
+## Modified 2025/01/01
 ## All rights reserved
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
+# If you want to know more about this script, and how to use it, do: perldoc create_database.pl
+# or, if you prefer, ./create_database.pl --man or ./create_database.pl --help for a short help
 use strict;
 use warnings;
 use open ':std' => ':utf8';
@@ -35,7 +37,7 @@ use Module::Generic::Array;
 use Pod::Usage;
 use Scalar::Util qw( looks_like_number );
 use XML::LibXML;
-our $VERSION = 'v0.1.1';
+our $VERSION = 'v0.2.0';
 our $DEBUG = 0;
 our $VERBOSE = 0;
 our $LOG_LEVEL = 0;
@@ -316,6 +318,8 @@ sub process
         number_systems => "INSERT INTO number_systems (number_system, digits, type) VALUES(?, ?, ?)",
         number_systems_l10n => "INSERT INTO number_systems_l10n (locale, number_system, locale_name, alt) VALUES(?, ?, ?, ?)",
         person_name_defaults => "INSERT INTO person_name_defaults (locale, value) VALUES(?, ?)",
+        plural_ranges => "INSERT INTO plural_ranges (locale, aliases, start, stop, result) VALUES(?, ?, ?, ?, ?)",
+        plural_rules => "INSERT INTO plural_rules (locale, aliases, count, rule) VALUES(?, ?, ?, ?)",
         rbnf => "INSERT INTO rbnf (locale, grouping, ruleset, rule_id, rule_value) VALUES(?, ?, ?, ?, ?)",
         refs => "INSERT INTO refs (code, uri, description) VALUES(?, ?, ?)",
         regions => "INSERT OR IGNORE INTO territories (territory, contains, status) VALUES(?, ?, ?)",
@@ -326,6 +330,7 @@ sub process
         territories => "INSERT INTO territories (territory, parent, gdp, literacy_percent, population, languages, contains, currency, calendars, min_days, first_day, weekend, status) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         territories_l10n => "INSERT INTO territories_l10n (locale, territory, locale_name, alt) VALUES(?, ?, ?, ?)",
         time_formats => "INSERT INTO time_formats (region, territory, locale, time_format, time_allowed) VALUES(?, ?, ?, ?, ?)",
+        time_relative_l10n => "INSERT INTO time_relative_l10n (locale, field_type, field_length, relative, format_pattern, count) VALUES(?, ?, ?, ?, ?, ?)",
         timezones => "INSERT INTO timezones (timezone, territory, region, tzid, metazone, tz_bcpid, is_golden, is_primary, is_preferred, is_canonical,  alias) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         timezones_cities => "INSERT INTO timezones_cities (locale, timezone, city, alt) VALUES(?, ?, ?, ?)",
         # This is defined in the extend_timezones_cities() function
@@ -3779,7 +3784,7 @@ sub process
                 $before = $el_rule->getAttribute( 'before' ) ||
                     die( "Unable to get attribute 'before' for this day period element: ", $el_rule->toString() );
             }
-    
+
             foreach my $locale ( @$locales )
             {
                 # Should not be needed, but better safe than sorry
@@ -3807,9 +3812,9 @@ sub process
             $total_locales += scalar( @$locales );
         }
     }
-    
+
     &log( "${n} day periods added for ${total_locales} locales." );
-    
+
     # NOTE: Loading localised data
     &log( "Loading localised data." );
     $n = 0;
@@ -3828,6 +3833,7 @@ sub process
     my $sth_inter_fmt = $sths->{calendar_interval_formats} || die( "No SQL statement object for calendar_interval_formats" );
     my $sth_cyclic = $sths->{calendar_cyclics_l10n} || die( "No SQL statement object for calendar_cyclics_l10n" );
     my $sth_field = $sths->{date_fields_l10n} || die( "No SQL statement object for date_fields_l10n" );
+    my $sth_time_rel = $sths->{time_relative_l10n} || die( "No SQL statement object for time_relative_l10n" );
     my $sth_date_term = $sths->{date_terms} || die( "No SQL statement object for date_terms" );
     my $sth_locale_info = $sths->{locales_info} || die( "No SQL statement object for locales_info" );
     my $sth_locale_num_sys = $sths->{locale_number_systems} || die( "No SQL statement object for locale_number_systems" );
@@ -4913,6 +4919,49 @@ sub process
                             $sth_field->execute( @$def{qw( locale field_type field_length relative locale_name )} );
                         } || die( "Error executing query to add date field for locale ${locale} and field type ${field_type} and field length ${field_length} from file ${f}: ", ( $@ || $sth_field->errstr ), "\nwith query: ", $sth_field->{Statement}, "\n", dump( $def ) );
                         $added->{cal_field}++;
+                    }
+                    # And now, we process the 'relativeTime' elements, such as:
+                    # <relativeTime type="future">
+                    #     <relativeTimePattern count="one">in {0} year</relativeTimePattern>
+                    #     <relativeTimePattern count="other">in {0} years</relativeTimePattern>
+                    # </relativeTime>
+                    # <relativeTime type="past">
+                    #     <relativeTimePattern count="one">{0} year ago</relativeTimePattern>
+                    #     <relativeTimePattern count="other">{0} years ago</relativeTimePattern>
+                    # </relativeTime>
+                    my $calDateTimeRelItemsRes = $el_field->findnodes( './relativeTime[@type]' );
+                    while( my $el_time_rel = $calDateTimeRelItemsRes->shift )
+                    {
+                        # This can either be 'future' or 'past', which we translate to 1 or -1
+                        my $time_relative_position = $el_time_rel->getAttribute( 'type' ) // '';
+                        my $calDateTimeRelHasAliasRes = $el_time_rel->findnodes( './alias[@path]' );
+                        if( $calDateTimeRelHasAliasRes->size )
+                        {
+                            $el_time_rel = resolve_alias( $calDateTimeRelHasAliasRes ) ||
+                                die( "This date time relative of type ${type} is aliased, but I could not resolve it for locale ${locale} in file ${f}." );
+                        }
+                        my $calDateTimeRelPatternItemsRes = $el_time_rel->findnodes( './relativeTimePattern' );
+                        while( my $el_time_rel_pat = $calDateTimeRelPatternItemsRes->shift )
+                        {
+                            my $def =
+                            {
+                                locale          => $locale,
+                                field_type      => $field_type,
+                                field_length    => $field_length,
+                                relative        => ( $time_relative_position eq 'future' ? 1 : $time_relative_position eq 'past' ? -1 : undef ),
+                                pattern         => $el_time_rel_pat->textContent,
+                            };
+                            if( $el_time_rel_pat->hasAttribute( 'count' ) )
+                            {
+                                $def->{count} = $el_time_rel_pat->getAttribute( 'count' );
+                            }
+
+                            eval
+                            {
+                                $sth_time_rel->execute( @$def{qw( locale field_type field_length relative pattern count )} );
+                            } || die( "Error executing query to add date field for locale ${locale} and field type ${field_type} and field length ${field_length} from file ${f}: ", ( $@ || $sth_time_rel->errstr ), "\nwith query: ", $sth_time_rel->{Statement}, "\n", dump( $def ) );
+                            $added->{cal_time_rel}++;
+                        }
                     }
                 }
             }
@@ -6524,6 +6573,177 @@ sub process
     &log( "${j} unit conversions added." );
     
     &log( "${n} units data added." );
+
+    # NOTE: Loading plural rules
+    &log( "Loading plural rules." );
+    $n = 0;
+    $total_locales = 0;
+    my $plural_rules_file = $basedir->child( 'supplemental/plurals.xml' );
+    my $pluralRulesDoc = load_xml( $plural_rules_file );
+    $sth = $sths->{plural_rules} || die( "No SQL statement object for plural_rules" );
+    $rules = $pluralRulesDoc->findnodes( '/supplementalData/plurals/pluralRules[@locales]' ) ||
+        die( "Unable to find plural ruleset in file $plural_rules_file" );
+    if( !$rules->size )
+    {
+        die( "No rules found in plural rules XML file $plural_rules_file" );
+    }
+    # Example: <pluralRules locales="am as bn doi fa gu hi kn pcm zu">
+    while( my $el = $rules->shift )
+    {
+        my $locales = $el->getAttribute( 'locales' ) || die( "No attribute 'locales' found for this plural rule: ", $el->toString() );
+        &log( "\tChecking plural rules for locales ${locales}" );
+        my $pluralRulesHasAliasRes = $el->findnodes( './alias[@path]' );
+        if( $pluralRulesHasAliasRes->size )
+        {
+            $out->print( "\tPlural rules for locales ${locales} is aliased. Resolving it... " ) if( $DEBUG );
+            $el = resolve_alias( $pluralRulesHasAliasRes ) ||
+                die( "Plural rules for locales ${locales} is aliased, but the resolved element contains nothing in file ${plural_rules_file}" );
+            $out->print( "ok\n" ) if( $DEBUG );
+        }
+
+        $locales = [split( /[[:blank:]\h\v]+/, $locales )];
+        for( my $i = 0; $i < scalar( @$locales ); $i++ )
+        {
+            my $locale = $locales->[$i];
+            # Should not be needed, but better safe than sorry
+            $locale =~ tr/_/-/;
+            if( index( $locale, 'root' ) != -1 )
+            {
+                if( length( $locale ) > 4 )
+                {
+                    my $loc = Locale::Unicode->new( $locale );
+                    $loc->language( 'und' );
+                    $locale = $loc->as_string;
+                }
+                else
+                {
+                    $locale = 'und';
+                }
+            }
+            $locales->[$i] = $locale;
+        }
+
+        # Example: <pluralRule count="one">i = 0 or n = 1 @integer 0, 1 @decimal 0.0~1.0, 0.00~0.04</pluralRule>
+        my $pluralRules = $el->findnodes( './pluralRule' );
+        if( !$pluralRules->size )
+        {
+            warn( "Warning only: unable to find child elements 'pluralRules' for locale '", join( ', ', @$locales ), "' for this plural rule set in file ${plural_rules_file}: ", $el->toString() );
+        }
+        while( my $el_rule = $pluralRules->shift )
+        {
+            my $def = {};
+            $def->{count} = $el_rule->getAttribute( 'count' ) ||
+                die( "No attribute 'count' for this plural rule: ", $el_rule->toString() );
+            $def->{rule} = $el_rule->textContent ||
+                die( "No value found for this plural rule '$def->{count}' for locales @$locales: ", $el_rule->toString() );
+            
+            foreach my $locale ( @$locales )
+            {
+                $def->{locale} = $locale;
+                $def->{aliases} = to_array( [grep{ $_ ne $locale } @$locales] );
+                # 3728
+
+                eval
+                {
+                    $sth->execute( @$def{ qw( locale aliases count rule ) } );
+                } || die( "Error adding plural rule '$def->{count}' with rule '$def->{rule}' for locales @$locales: ", ( $@ || $sth->errstr ), "\nwith SQL query: ", $sth->{Statement}, "\n", dump( $def ) );
+                $n++;
+            }
+            $total_locales += scalar( @$locales );
+        }
+    }
+    &log( "${n} plural rules added for ${total_locales} locales." );
+
+    # NOTE: Loading plural ranges
+    &log( "Loading plural ranges." );
+    $n = 0;
+    $total_locales = 0;
+    my $plural_ranges_file = $basedir->child( 'supplemental/pluralRanges.xml' );
+    my $pluralRangesDoc = load_xml( $plural_ranges_file );
+    $sth = $sths->{plural_ranges} || die( "No SQL statement object for plural_ranges" );
+    # Example:
+    # <pluralRanges locales="id ja km ko lo ms my th vi yue zh">
+    #     <pluralRange start="other" end="other" result="other"/>
+    # </pluralRanges>
+    $rules = $pluralRangesDoc->findnodes( '/supplementalData/plurals/pluralRanges[@locales]' ) ||
+        die( "Unable to find plural range ruleset in file $plural_ranges_file" );
+    if( !$rules->size )
+    {
+        die( "No rules found in plural range rules XML file $plural_ranges_file" );
+    }
+    while( my $el = $rules->shift )
+    {
+        my $locales = $el->getAttribute( 'locales' ) || die( "No attribute 'locales' found for this plural range rule: ", $el->toString() );
+        &log( "\tChecking plural range rules for locales ${locales}" );
+        my $pluralRangeRulesHasAliasRes = $el->findnodes( './alias[@path]' );
+        if( $pluralRangeRulesHasAliasRes->size )
+        {
+            $out->print( "\tPlural rules for locales ${locales} is aliased. Resolving it... " ) if( $DEBUG );
+            $el = resolve_alias( $pluralRangeRulesHasAliasRes ) ||
+                die( "Plural rules for locales ${locales} is aliased, but the resolved element contains nothing in file ${plural_ranges_file}" );
+            $out->print( "ok\n" ) if( $DEBUG );
+        }
+
+        $locales = [split( /[[:blank:]\h\v]+/, $locales )];
+        for( my $i = 0; $i < scalar( @$locales ); $i++ )
+        {
+            my $locale = $locales->[$i];
+            # Should not be needed, but better safe than sorry
+            $locale =~ tr/_/-/;
+            if( index( $locale, 'root' ) != -1 )
+            {
+                if( length( $locale ) > 4 )
+                {
+                    my $loc = Locale::Unicode->new( $locale );
+                    $loc->language( 'und' );
+                    $locale = $loc->as_string;
+                }
+                else
+                {
+                    $locale = 'und';
+                }
+            }
+            $locales->[$i] = $locale;
+        }
+
+        # Example: <pluralRange start="other" end="other" result="other"/>
+        my $pluralRanges = $el->findnodes( './pluralRange' );
+        if( !$pluralRanges->size )
+        {
+            warn( "Warning only: unable to find child elements 'pluralRange' for locale '", join( ', ', @$locales ), "' for this plural range rule set in file ${plural_ranges_file}: ", $el->toString() );
+        }
+        my $map =
+        {
+            start => 'start',
+            end => 'stop',
+            result => 'result',
+        };
+        while( my $el_range = $pluralRanges->shift )
+        {
+            my $def = {};
+            foreach my $t ( sort( keys( %$map ) ) )
+            {
+                $def->{ $map->{ $t } } = $el_range->getAttribute( $t ) ||
+                    die( "No attribute '${t}' for this plural range: ", $el_range->toString() );
+            }
+            
+            foreach my $locale ( @$locales )
+            {
+                $def->{locale} = $locale;
+                $def->{aliases} = to_array( [grep{ $_ ne $locale } @$locales] );
+                # 3728
+
+                eval
+                {
+                    $sth->execute( @$def{ qw( locale aliases start stop result ) } );
+                } || die( "Error adding plural range from '$def->{start}' to end '$def->{stop}' for locales @$locales: ", ( $@ || $sth->errstr ), "\nwith SQL query: ", $sth->{Statement}, "\n", dump( $def ) );
+                $n++;
+            }
+            $total_locales += scalar( @$locales );
+        }
+    }
+    &log( "${n} plural ranges added for ${total_locales} locales." );
+
     
     # NOTE: Apply fixes on missing languages in territories and vice versa
     if( $opts->{apply_patch} )

@@ -9,7 +9,7 @@ Tk::FileBrowser - Multi column file system explorer
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = 0.07;
+$VERSION = 0.08;
 
 use base qw(Tk::Derived Tk::Frame);
 Construct Tk::Widget 'FileBrowser';
@@ -29,9 +29,10 @@ require Tk::FileBrowser::Header;
 use Tk::FileBrowser::Images;
 use Tk::FileBrowser::Item;
 require Tk::ITree;
+require Tk::LabFrame;
 require Tk::ListEntry;
 require Tk::YADialog;
-require Tk::Message;
+#require Tk::YAMessage;
 
 my $file_icon = Tk->findINC('file.xpm');
 my $dir_icon = Tk->findINC('folder.xpm');
@@ -262,9 +263,17 @@ Class Tk::Entry.
 
 =over 4
 
+=item B<CTRL+A>
+
+Selects all entries in the root of the list.
+
 =item B<CTRL+F>
 
 Shows the filter bar.
+
+=item B<CTRL+P>
+
+Pops a properties window with details about the current selection. A selection must be present.
 
 =item B<F5>
 
@@ -389,9 +398,10 @@ sub Populate {
 	);
 
 	$self->Advertise('Tree' => $tree);
-	$tree->bind('<Control-f>', [$self, 'filterShow']);
+	$tree->bind('<Control-a>', [$self, 'selectAll']);
+	$tree->bind('<Control-f>', [$self, 'filterFlip']);
+	$tree->bind('<Control-p>', [$self, 'propertiesPop']);
 	$tree->bind('<F5>', [$self, 'reload']);
-	$tree->bind('<Escape>', [$self, 'filterHide']);
 	$tree->bind('<Button-3>' => [$self, 'lmPost', Ev('X'), Ev('Y')]);
 
 	###################################################################
@@ -439,7 +449,7 @@ sub Populate {
 		-textvariable => \$filter,
 	)->pack(@pack, -expand => 1, -fill => 'x');
 	$self->Advertise('FilterEntry', $fentry);
-	$fentry->bind('<Control-f>', [$self, 'filterHide']);
+	$fentry->bind('<Control-f>', [$self, 'filterFlip']);
 
 	my $case = 0;
 	$self->Advertise('Case', \$case);
@@ -584,6 +594,7 @@ sub Populate {
 		load => $self,
 		refresh => $self,
 		reload => $self,
+		selectAll => $self,
 		DEFAULT => $tree,
 	);
 }
@@ -601,7 +612,7 @@ sub Add {
 		push @op, -image => $self->GetLinkIcon($item);
 	} else {
 		push @op, -image => $self->GetFileIcon($item);
-	} 
+	}
 	my @entrypos = $self->Position($item, $data);
 	$self->add($item, -data => $data, @entrypos);
 	my $c = $self->cget('-columns');
@@ -672,7 +683,7 @@ sub bgCycle {
 			if ($folder eq $root) {
 				$fullname = "$root$item";
 			} else {
-				$fullname = "$folder$sep$item";`																																	`																																																																																																																	
+				$fullname = "$folder$sep$item";
 			}
 			next if ((-d $fullname) and (not $self->cget('-showfolders')));
 			next if ((-f $fullname) and (not $self->cget('-showfiles')));
@@ -895,6 +906,8 @@ sub EditSelect {
 	my $self = shift;
 	my $e = $self->Subwidget('Entry');
 	my $folder = $e->get;
+	my $home = $ENV{HOME};
+	$folder =~ s/^~/$home/;
 	$e->Subwidget('List')->popDown;
 	$self->load($folder) if (-e $folder) and (-d $folder);
 }
@@ -922,17 +935,29 @@ sub filterActivate {
 	$self->{'filter_id'} = $filter_id;
 }
 
-=item B<filterHide>
+=item B<filterFlip>
 
-Removes the filter bar.
+Hides the filter bar if it is shown. Shows it if it is hidden.
 
 =cut
 
-sub filterHide {
+sub filterFlip {
 	my $self = shift;
-	$self->Subwidget('FilterFrame')->packForget;
-	$self->Subwidget('FilterEntry')->delete(0, 'end');
-	$self->Subwidget('Tree')->focus;
+	my $f = $self->Subwidget('FilterFrame');
+	if ($f->ismapped) {
+		$f->packForget;
+		$self->Subwidget('FilterEntry')->delete(0, 'end');
+		$self->Subwidget('Tree')->focus;
+	} else {
+		$self->noRefresh(1);
+		my $case = $self->Subwidget('Case');
+		$$case = $self->cget('-filtercase');
+		my $folders = $self->Subwidget('Folders');
+		$$folders = $self->cget('-refreshfilterfolders');
+		$self->noRefresh(0);
+		$self->Subwidget('FilterFrame')->pack(-fill => 'x');
+		$self->Subwidget('FilterEntry')->focus;
+	}
 }
 
 sub filterRefresh {
@@ -941,24 +966,6 @@ sub filterRefresh {
 	$self->configure('-refreshfilter', $filter);
 	delete $self->{'filter_id'};
 	$self->refresh;
-}
-
-=item B<filterShow>
-
-Shows the filter bar.
-
-=cut
-
-sub filterShow {
-	my $self = shift;
-	$self->noRefresh(1);
-	my $case = $self->Subwidget('Case');
-	$$case = $self->cget('-filtercase');
-	my $folders = $self->Subwidget('Folders');
-	$$folders = $self->cget('-refreshfilterfolders');
-	$self->noRefresh(0);
-	$self->Subwidget('FilterFrame')->pack(-fill => 'x');
-	$self->Subwidget('FilterEntry')->focus;
 }
 
 =item B<folder>
@@ -1138,6 +1145,8 @@ sub load {
 	$focus = 1 unless defined $focus;
 	$folder = getcwd unless defined $folder;
 	return if $folder eq '';
+	my $home = $ENV{HOME};
+	$folder =~ s/^~/$home/;
 	unless (-e $folder) {
 		warn "'$folder' does not exist";
 		return
@@ -1259,7 +1268,7 @@ sub Position {
 		for (@peers) {
 			my $peer = $_;
 			my $pdat = $self->infoData($peer);
-			if (($pdat->isDir) and $self->cget('-directoriesfirst')) { 
+			if (($pdat->isDir) and $self->cget('-directoriesfirst')) {
 			#we are still in directory section, ignoring
 			} elsif ($self->OrderTest($itemdata, $pdat)) {
 				push @op, -before => $peer;
@@ -1268,6 +1277,202 @@ sub Position {
 		}
 	}
 	return @op;
+}
+
+sub propertiesCollect {
+	my ($self, $folder) = @_;
+	my $totaldirs = 0;
+	my $totalfiles = 0;
+	my $totallinks = 0;
+	my $totalsize = 0;
+	if (opendir(my $dh, $folder)) {
+		while (my $entry = readdir($dh)) {
+			next if $entry eq '.';
+			next if $entry eq '..';
+			my $full = $folder . $self->cget('-separator') . $entry;
+			if (-d $full) {
+				$totaldirs ++;
+				my ($d, $f, $l, $size) = $self->propertiesCollect($full);
+				$totaldirs = $totaldirs + $d;
+				$totalfiles = $totalfiles + $f;
+				$totallinks = $totallinks + $l;
+				$totalsize = $totalsize + $size;
+				$self->update;
+			} elsif (-f $full) {
+				$totalfiles ++;
+				$totalsize = $totalsize + -s $full;
+			} elsif (-l $full) {
+				$totallinks ++;
+#				$totalsize = $totalsize + -s $full;
+			}
+		}
+	}
+	return ($totaldirs, $totalfiles, $totallinks, $totalsize)
+}
+
+sub propertiesPop {
+	my $self = shift;
+	my @sel = $self->collect;
+	return unless @sel;
+	my @dirs = ();
+	my @files = ();
+	my @links = ();
+
+	for (@sel) {
+		push @dirs, $_ if -d $_;
+		push @files, $_ if -f $_;
+		push @links, $_ if -l $_;
+	}
+	my $ndirs = @dirs;
+	my $nfiles = @files;
+	my $nlinks = @links;
+
+	my $totalsize = 0;
+	my $totaldirs = $ndirs;
+	my $totalfiles = $nfiles;
+	my $totallinks = $nlinks;
+
+	my $summary = 'Calculating';
+
+	my ($diskdev, $dummy, $diskused, $diskfree, $diskpused, $diskmount);
+	my $folder = $self->folder;
+	if ($mswin) {
+		my $drive = substr($folder, 0, 2);
+#		print "drive $drive\n";
+		$diskdev = 'not supported';
+		my $dfstring = `wmic logicaldisk get size, freespace, caption`;
+		while ($dfstring =~ s/(^[^\n]+)\n//) {
+			my ($tdrive, $free, $size) = split(' ', $1);
+			next unless defined $tdrive;
+			if (substr($tdrive, 0, 2) eq $drive) {
+				my $used = $size - $free;
+				$diskmount = $drive;
+				$diskfree = $self->size2String($free);
+				$diskused = $self->size2String($used);
+				my $pused = int($used / $size) * 100;
+				$diskpused = "$pused%";
+			}
+#			print "$tdrive, $free, $size\n";
+		}
+	} else {
+		my $dfstring = `df $folder`;
+		$dfstring =~ s/^[^\n]+\n//; #remove first line from df result
+		($diskdev, $dummy, $diskused, $diskfree, $diskpused, $diskmount) = split(' ', $dfstring);
+		$diskused = $self->size2String($diskused);
+		$diskfree = $self->size2String($diskfree);
+	}
+
+	my $srow = 0;
+	my $labwidth = 36;
+	my $namwidth = 12;
+
+	for (@files, @links) {
+		$totalsize = $totalsize + -s $_
+	}
+	my $stop = 0;
+
+	#setup dialog box
+	my $db = $self->YADialog(
+		-title => 'Properties',
+		-buttons => [],
+	);
+	my $button = $db->Subwidget('buttonframe')->Button(
+		-command => sub {
+			$stop = 1;
+			$db->Pressed('Close');
+		},
+		-text => 'Close',
+	);
+	$db->ButtonPack($button);
+
+	my $sf = $db->LabFrame(
+		-label => 'Selected',
+	)->pack(-expand => 1, -fill => 'both');
+	for ([\$ndirs, 'Directories'], [\$nfiles, 'Files'], [\$nlinks, 'Links']) {
+		my ($num, $lab) = @$_;
+		if ($$num > 0) {
+			$sf->Label(
+				-width => $namwidth,
+				-text => "$lab:",
+				-anchor => 'e',
+			)->grid(-row => $srow, -column => 0, -sticky => 'ew');
+			$sf->Label(
+				-width => $labwidth,
+				-textvariable => $num,
+				-anchor => 'w',
+			)->grid(-row => $srow, -column => 1, -sticky => 'ew');
+			$srow++
+		};
+	}
+
+	my $df = $db->LabFrame(
+		-label => 'Details',
+	)->pack(-expand => 1, -fill => 'both');
+	$srow = 0;
+	for (
+		[\$summary, 'Summary'],
+		[\$totalsize, 'Total Size'],
+	) {
+		my ($num, $lab) = @$_;
+		$df->Label(
+			-width => $namwidth,
+			-text => "$lab:",
+			-anchor => 'e',
+		)->grid(-row => $srow, -column => 0, -sticky => 'ew');
+		$df->Label(
+			-width => $labwidth,
+			-textvariable => $num,
+			-anchor => 'w',
+		)->grid(-row => $srow, -column => 1, -sticky => 'ew');
+		$srow++
+	}
+
+	my $dvf = $db->LabFrame(
+		-label => 'Disk',
+	)->pack(-expand => 1, -fill => 'both');
+	$srow = 0;
+	for (
+		[\$diskfree, 'Free space'],
+		[\$diskused, 'Used space'],
+		[\$diskpused, 'Percentage'],
+		[\$diskmount, 'Mount'],
+		[\$diskdev, 'Device'],
+	) {
+		my ($num, $lab) = @$_;
+		$dvf->Label(
+			-width => $namwidth,
+			-text => "$lab:",
+			-anchor => 'e',
+		)->grid(-row => $srow, -column => 0, -sticky => 'ew');
+		$dvf->Label(
+			-width => $labwidth,
+			-textvariable => $num,
+			-anchor => 'w',
+		)->grid(-row => $srow, -column => 1, -sticky => 'ew');
+		$srow++
+	}
+
+
+
+	$self->after(200, sub {
+		for (@dirs){
+			my ($d, $f, $l, $size) = $self->propertiesCollect($_);
+			return if $stop;
+			$totaldirs = $totaldirs + $d;
+			$totalfiles = $totalfiles + $f;
+			$totallinks = $totallinks + $l;
+			$totalsize = $totalsize + $size;
+			$summary = "Folders: $totaldirs, Files: $totalfiles, Links: $totallinks";
+			$db->update;
+		}
+		$totalsize = $self->size2String($totalsize);
+	});
+
+	#pop dialog here
+	$button->focus;
+	$db->show(-popover=> $self);
+	$db->destroy;
+	
 }
 
 =item B<refresh>
@@ -1287,7 +1492,7 @@ sub refresh {
 	for (sort @children) {
 		$self->refreshRecursive('', $_, $root->child($_));
 	}
-	$self->bgStart if $bg; 
+	$self->bgStart if $bg;
 }
 
 sub refreshRecursive {
@@ -1438,6 +1643,41 @@ sub nameString {
 	return basename($data->name);
 }
 
+sub selectAll {
+	my $self = shift;
+	my $tree = $self->Subwidget('Tree');
+	$tree->selectionClear;
+	my @children = $tree->infoChildren('');
+#	my $first = shift @children;
+#	my $last = pop @children;
+	for (@children) {
+		$tree->selectionSet($_);
+	}
+}
+
+
+sub size2String {
+	my ($self, $size) = @_;
+	my @magnifiers = ('', 'K', 'M', 'G', 'T', 'P');
+	my $count = 0;
+	while ($size >= 1024) {
+		$size = $size / 1024;
+		$count ++;
+	}
+	my $mag = $magnifiers[$count];
+	if ($count eq 0) {
+		$size = int($size);
+	} elsif ($size < 10) {
+		$size = sprintf("%.2f", $size)
+	} elsif ($size < 100) {
+		$size = sprintf("%.1f", $size)
+	} else {
+		$size = int($size);
+	}
+	$size = $size . " $mag" . 'B';
+	return $size
+}
+
 =item B<sizeString>I<($data)>
 
 Returns the formatted size string to be displayed for I<$data>.
@@ -1452,21 +1692,7 @@ sub sizeString {
 		$size = "$size items" if $size ne 1;
 		$size = "$size item" if $size eq 1;
 	} else {
-		my @magnifiers = ('', 'K', 'M', 'G', 'T', 'P');
-		my $count = 0;
-		while ($size >= 1024) {
-			$size = $size / 1024;
-			$count ++;
-		}
-		my $mag = $magnifiers[$count];
-		if ($count eq 0) {
-			$size = int($size);
-		} elsif ($size < 100) {
-			$size = sprintf("%.1f", $size)
-		} else {
-			$size = int($size);
-		}
-		$size = $size . " $mag" . 'B';
+		$size = $self->size2String($size);
 	}
 	return $size
 }
@@ -1488,7 +1714,7 @@ sub testDate {
 	my $pdat = $data2->$key;
 	return 1 unless defined $idat;
 	return 1 unless defined $pdat;
-	if ($sort eq 'ascending') { 
+	if ($sort eq 'ascending') {
 		return $idat <= $pdat
 	} else {
 		return $idat >= $pdat
@@ -1506,7 +1732,7 @@ sub testLink {
 	my $sort = $self->sortorder;
 	my $itarget = $self->linkString($data1);
 	my $ptarget = $self->linkString($data2);
-	if ($sort eq 'ascending') { 
+	if ($sort eq 'ascending') {
 		return 1 if $itarget eq '';
 		return 0 if $ptarget eq '';
 		return $itarget le $ptarget
@@ -1532,7 +1758,7 @@ sub testName {
 		$name = lc($name);
 		$peer = lc($peer);
 	}
-	if ($sort eq 'ascending') { 
+	if ($sort eq 'ascending') {
 		return $name lt $peer
 	} else {
 		return $name gt $peer
@@ -1552,7 +1778,7 @@ sub testSize {
 	my $psize = $data2->size;
 	return 1 unless defined $isize;
 	return 1 unless defined $psize;
-	if ($sort eq 'ascending') { 
+	if ($sort eq 'ascending') {
 		return $isize <= $psize
 	} else {
 		return $isize >= $psize

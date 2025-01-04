@@ -15,11 +15,11 @@ Carp::Assert::More - Convenience assertions for common situations
 
 =head1 VERSION
 
-Version 2.7.0
+Version 2.8.0
 
 =cut
 
-our $VERSION = '2.7.0';
+our $VERSION = '2.8.0';
 our @EXPORT = qw(
     assert
     assert_all_keys_in
@@ -67,6 +67,7 @@ our @EXPORT = qw(
     assert_or
     assert_positive
     assert_positive_integer
+    assert_regex
     assert_undefined
     assert_unlike
     assert_xor
@@ -1165,6 +1166,27 @@ sub assert_coderef($;$) {
 }
 
 
+=head2 assert_regex( $ref [,$name] )
+
+Asserts that I<$ref> is defined, and is a reference to a regex.
+
+It is functionally the same as C<assert_isa( $ref, 'Regexp' )>.
+
+=cut
+
+sub assert_regex($;$) {
+    my $ref = shift;
+    my $name = shift;
+
+    if ( ref($ref) eq 'Regexp' ) {
+        return;
+    }
+
+    require Carp;
+    &Carp::confess( _failure_msg($name) );
+}
+
+
 =head1 TYPE-SPECIFIC ASSERTIONS
 
 =head2 assert_datetime( $date )
@@ -1639,7 +1661,7 @@ sub _failure_msg {
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2005-2024 Andy Lester
+Copyright 2005-2025 Andy Lester
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License version 2.0.

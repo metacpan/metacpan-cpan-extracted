@@ -52,6 +52,7 @@ t/assert_numeric_between.t
 t/assert_or.t
 t/assert_positive_integer.t
 t/assert_positive.t
+t/assert_regex.t
 t/assert_undefined.t
 t/assert_unlike.t
 t/assert_xor.t

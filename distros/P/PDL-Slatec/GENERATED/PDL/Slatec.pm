@@ -3,7 +3,7 @@
 #
 package PDL::Slatec;
 
-our @EXPORT_OK = qw(eigsys matinv polyfit polycoef svdc poco geco gefa podi gedi gesl rs ezffti ezfftf ezfftb pcoef polyvalue chim chic chsp chfd chfe chia chid chcm chbs bvalu polfit );
+our @EXPORT_OK = qw(eigsys matinv polyfit polycoef svdc poco geco gefa podi gedi gesl rs ezffti ezfftf ezfftb pcoef polyvalue polfit );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
@@ -11,7 +11,7 @@ use PDL::Exporter;
 use DynaLoader;
 
 
-   our $VERSION = '2.096';
+   our $VERSION = '2.097';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Slatec $VERSION;
@@ -29,7 +29,7 @@ use warnings;
 
 =head1 NAME
 
-PDL::Slatec - PDL interface to the slatec numerical programming library
+PDL::Slatec - PDL interface to some LINPACK and EISPACK routines - DEPRECATED
 
 =head1 SYNOPSIS
 
@@ -39,64 +39,24 @@ PDL::Slatec - PDL interface to the slatec numerical programming library
 
 =head1 DESCRIPTION
 
+This module is now deprecated in favour of L<PDL::LinearAlgebra>.
+
 This module serves the dual purpose of providing an interface to
 parts of the slatec library and showing how to interface PDL
 to an external library.
-Using this library requires a fortran compiler; the source for the routines
+Using this library requires a Fortran compiler; the source for the routines
 is provided for convenience.
 
 Currently available are routines to:
 manipulate matrices; calculate FFT's; 
-fit data using polynomials; 
-and interpolate/integrate data using piecewise cubic Hermite interpolation.
+and fit data using polynomials.
 
 =head2 Piecewise cubic Hermite interpolation (PCHIP)
 
-PCHIP is the slatec package of routines to perform piecewise cubic
-Hermite interpolation of data.
-It features software to produce a monotone and "visually pleasing"
-interpolant to monotone data.  
-According to Fritsch & Carlson ("Monotone piecewise
-cubic interpolation", SIAM Journal on Numerical Analysis 
-17, 2 (April 1980), pp. 238-246),
-such an interpolant may be more reasonable than a cubic spline if
-the data contains both "steep" and "flat" sections.  
-Interpolation of cumulative probability distribution functions is 
-another application.
-These routines are cryptically named (blame FORTRAN), 
-beginning with 'ch', and accept either float or double ndarrays. 
+These routines are now in L<PDL::Primitive> as of PDL 2.096.
 
-Most of the routines require an integer parameter called C<skip>;
-if set to 1, then no checks on the validity of the input data are
-made, otherwise these checks are made.
-The value of C<skip> can be set to 1 if a routine
-such as L</chim> has already been successfully called.
-
-=over 4
-
-=item * 
-
-If not known, estimate derivative values for the points
-using the L</chim>, L</chic>, or L</chsp> routines
-(the following routines require both the function (C<f>)
-and derivative (C<d>) values at a set of points (C<x>)). 
-
-=item * 
-
-Evaluate, integrate, or differentiate the resulting PCH
-function using the routines:
-L</chfd>; L</chfe>; L</chia>; L</chid>.
-
-=item * 
-
-If desired, you can check the monotonicity of your
-data using L</chcm>, or use L</chbs> to convert a PCH function into
-B-representation for use with the B-spline routines of SLATEC.
-
-=back
- 
 =cut
-#line 100 "Slatec.pm"
+#line 60 "Slatec.pm"
 
 
 =head1 FUNCTIONS
@@ -107,7 +67,7 @@ B-representation for use with the B-spline routines of SLATEC.
 
 
 
-#line 88 "slatec.pd"
+#line 47 "slatec.pd"
 
 =head2 eigsys
 
@@ -121,6 +81,8 @@ Eigenvalues and eigenvectors of a real positive definite symmetric matrix.
 
 Note: this function should be extended to calculate only eigenvalues if called 
 in scalar context!
+
+This is the EISPACK routine C<rs>.
 
 =head2 matinv
 
@@ -173,7 +135,7 @@ In scalar context, only $coeffs is returned.
 Historically, C<$eps> was modified in-place to be a return value of the
 rms error.  This usage is deprecated, and C<$eps> is an optional parameter now.
 It is still modified if present.
- 
+
 C<$c> is a working array accessible to Slatec - you can feed it to several
 other Slatec routines to get nice things out.  It does not broadcast
 correctly and should probably be fixed by someone.  If you are 
@@ -261,14 +223,12 @@ L</PDL::Slatec::fft>.
 
 =cut
 
-#line 412 "slatec.pd"
+#line 362 "slatec.pd"
 use PDL::Core;
 use PDL::Basic;
 use PDL::Primitive;
 use PDL::Ufunc;
 use strict;
-
-# Note: handles only real symmetric positive-definite.
 
 *eigsys = \&PDL::eigsys;
 
@@ -380,14 +340,14 @@ sub PDL::polycoef {
   return $tc;
 
 }
-#line 384 "Slatec.pm"
+#line 344 "Slatec.pm"
 
 
 =head2 svdc
 
 =for sig
 
-  Signature: (x(n,p);[o]s(p);[o]e(p);[o]u(n,p);[o]v(p,p);[t]work(n);longlong job();longlong [o]info())
+  Signature: (x(n,p); [o] s(p); [o] e(p); [o] u(n,p); [o] v(p,p); [t] work(n); longlong job(); longlong [o] info())
 
 =for ref
 
@@ -414,7 +374,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]a(n,n);[o]rcond();[o]z(n);longlong [o]info())
+  Signature: ([io] a(n,n); [o] rcond(); [o] z(n); longlong [o] info())
 
 Factor a real symmetric positive definite matrix
 and estimate the condition number of the matrix.
@@ -440,7 +400,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n,n);longlong [o]ipvt(n);[o]rcond();[o]z(n))
+  Signature: (a(n,n); longlong [o] ipvt(n); [o] rcond(); [o] z(n))
 
 Factor a matrix using Gaussian elimination and estimate
 the condition number of the matrix.
@@ -466,7 +426,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]a(n,n);longlong [o]ipvt(n);longlong [o]info())
+  Signature: ([io] a(n,n); longlong [o] ipvt(n); longlong [o] info())
 
 =for ref
 
@@ -493,7 +453,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]a(n,n);[o]det(two=2);longlong job())
+  Signature: ([io] a(n,n); [o] det(two=2); longlong job())
 
 Compute the determinant and inverse of a certain real
 symmetric positive definite matrix using the factors
@@ -520,7 +480,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]a(n,n);longlong ipvt(n);[o]det(two=2);[t]work(n);longlong job())
+  Signature: ([io] a(n,n); longlong ipvt(n); [o] det(two=2); [t] work(n); longlong job())
 
 Compute the determinant and inverse of a matrix using the
 factors computed by L</geco> or L</gefa>.
@@ -546,7 +506,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(lda,n);longlong ipvt(n);[io]b(n);longlong job())
+  Signature: (a(lda,n); longlong ipvt(n); [io] b(n); longlong job())
 
 Solve the real system C<A*X=B> or C<TRANS(A)*X=B> using the
 factors computed by L</geco> or L</gefa>.
@@ -572,7 +532,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n,n);[o]w(n);longlong matz();[o]z(n,n);[t]fvone(n);[t]fvtwo(n);longlong [o]ierr())
+  Signature: (a(n,n); [o] w(n); longlong matz(); [o] z(n,n); [t] fvone(n); [t] fvtwo(n); longlong [o] ierr())
 
 This subroutine calls the recommended sequence of
 subroutines from the eigensystem subroutine package (EISPACK)
@@ -600,7 +560,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (longlong n();[io]wsave(foo);longlong [o]ifac(ni=15))
+  Signature: (longlong n(); [io] wsave(foo); longlong [o] ifac(ni=15))
 
 Subroutine ezffti initializes the work array C<wsave(3n or more)>
 and C<ifac()>
@@ -630,7 +590,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (r(n);[o]azero();[o]a(n);[o]b(n);wsave(foo);longlong ifac(ni=15))
+  Signature: (r(n); [o] azero(); [o] a(n); [o] b(n); wsave(foo); longlong ifac(ni=15))
 
 =for ref
 
@@ -655,7 +615,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([o]r(n);azero();a(n);b(n);wsave(foo);longlong ifac(ni=15))
+  Signature: ([o] r(n); azero(); a(n); b(n); wsave(foo); longlong ifac(ni=15))
 
 =for ref
 
@@ -680,7 +640,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (longlong l();c();[o]tc(bar);a(foo))
+  Signature: (longlong l(); c(); [o] tc(bar); a(foo))
 
 Convert the C<polfit> coefficients to Taylor series form.
 C<c> and C<a()> must be of the same type.
@@ -706,7 +666,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (longlong l();x();[o]yfit();[o]yp(nder);a(foo); PDL_LongLong nder => nder)
+  Signature: (longlong l(); x(); [o] yfit(); [o] yp(nder); a(foo); PDL_LongLong nder => nder)
 
 =for ref
 
@@ -730,823 +690,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 *polyvalue = \&PDL::polyvalue;
-
-
-
-
-
-
-=head2 chim
-
-=for sig
-
-  Signature: (x(n);f(n);[o]d(n);longlong [o]ierr())
-
-=for ref
-
-Calculate the derivatives of (x,f(x)) using cubic Hermite interpolation.
-
-Calculate the derivatives at the given set of points (C<$x,$f>,
-where C<$x> is strictly increasing).
-The resulting set of points - C<$x,$f,$d>, referred to
-as the cubic Hermite representation - can then be used in
-other functions, such as L</chfe>, L</chfd>,
-and L</chia>.
-
-The boundary conditions are compatible with monotonicity,
-and if the data are only piecewise monotonic, the interpolant
-will have an extremum at the switch points; for more control
-over these issues use L</chic>. 
-
-Error status returned by C<$ierr>:
-
-=over 4
-
-=item *
-
-0 if successful.
-
-=item *
-
-E<gt> 0 if there were C<ierr> switches in the direction of 
-monotonicity (data still valid).
-
-=item *
-
--1 if C<nelem($x) E<lt> 2>.
-
-=item *
-
--3 if C<$x> is not strictly increasing.
-
-=back
-
-=for bad
-
-chim does not process bad values.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
-
-=cut
-
-
-
-
-*chim = \&PDL::chim;
-
-
-
-
-
-
-=head2 chic
-
-=for sig
-
-  Signature: (longlong ic(two=2);vc(two=2);mflag();x(n);f(n);[o]d(n);[t]wk(nwk=CALC(2*$SIZE(n)));longlong [o]ierr())
-
-=for ref
-
-Calculate the derivatives of (x,f(x)) using cubic Hermite interpolation.
-
-Calculate the derivatives at the given points (C<$x,$f>,
-where C<$x> is strictly increasing).
-Control over the boundary conditions is given by the 
-C<$ic> and C<$vc> ndarrays, and the value of C<$mflag> determines
-the treatment of points where monotoncity switches
-direction. A simpler, more restricted, interface is available 
-using L</chim>.
-
-The first and second elements of C<$ic> determine the boundary
-conditions at the start and end of the data respectively.
-If the value is 0, then the default condition, as used by
-L</chim>, is adopted.
-If greater than zero, no adjustment for monotonicity is made,
-otherwise if less than zero the derivative will be adjusted.
-The allowed magnitudes for C<ic(0)> are:
-
-=over 4
-
-=item *  
-
-1 if first derivative at C<x(0)> is given in C<vc(0)>.
-
-=item *
-
-2 if second derivative at C<x(0)> is given in C<vc(0)>.
-
-=item *
-
-3 to use the 3-point difference formula for C<d(0)>.
-(Reverts to the default b.c. if C<n E<lt> 3>)
-
-=item *
-
-4 to use the 4-point difference formula for C<d(0)>.
-(Reverts to the default b.c. if C<n E<lt> 4>)
-
-=item *
-
-5 to set C<d(0)> so that the second derivative is 
-continuous at C<x(1)>.
-(Reverts to the default b.c. if C<n E<lt> 4>) 
-
-=back
-
-The values for C<ic(1)> are the same as above, except that
-the first-derivative value is stored in C<vc(1)> for cases 1 and 2.
-The values of C<$vc> need only be set if options 1 or 2 are chosen
-for C<$ic>.
-
-Set C<$mflag = 0> if interpolant is required to be monotonic in
-each interval, regardless of the data. This causes C<$d> to be
-set to 0 at all switch points. Set C<$mflag> to be non-zero to
-use a formula based on the 3-point difference formula at switch
-points. If C<$mflag E<gt> 0>, then the interpolant at swich points
-is forced to not deviate from the data by more than C<$mflag*dfloc>, 
-where C<dfloc> is the maximum of the change of C<$f> on this interval
-and its two immediate neighbours.
-If C<$mflag E<lt> 0>, no such control is to be imposed.            
-
-Error status returned by C<$ierr>:
-
-=over 4
-
-=item *
-
-0 if successful.
-
-=item *
-
-1 if C<ic(0) E<lt> 0> and C<d(0)> had to be adjusted for
-monotonicity.
-
-=item *
-
-2 if C<ic(1) E<lt> 0> and C<d(n-1)> had to be adjusted
-for monotonicity.
-
-=item * 
-
-3 if both 1 and 2 are true.
-
-=item *
-
--1 if C<n E<lt> 2>.
-
-=item *
-
--3 if C<$x> is not strictly increasing.
-
-=item *
-
--4 if C<abs(ic(0)) E<gt> 5>.
-
-=item *
-
--5 if C<abs(ic(1)) E<gt> 5>.
-
-=item *
-
--6 if both -4 and -5  are true.
-
-=item *
-
--7 if C<nwk E<lt> 2*(n-1)>.
-
-=back
-
-=for bad
-
-chic does not process bad values.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
-
-=cut
-
-
-
-
-*chic = \&PDL::chic;
-
-
-
-
-
-
-=head2 chsp
-
-=for sig
-
-  Signature: (longlong ic(two=2);vc(two=2);x(n);f(n);[o]d(n);[t]wk(nwk=CALC(2*$SIZE(n)));longlong [o]ierr())
-
-=for ref
-
-Calculate the derivatives of (x,f(x)) using cubic spline interpolation.
-
-Calculate the derivatives, using cubic spline interpolation,
-at the given points (C<$x,$f>), with the specified
-boundary conditions. 
-Control over the boundary conditions is given by the 
-C<$ic> and C<$vc> ndarrays.
-The resulting values - C<$x,$f,$d> - can
-be used in all the functions which expect a cubic
-Hermite function.
-
-The first and second elements of C<$ic> determine the boundary
-conditions at the start and end of the data respectively.
-The allowed values for C<ic(0)> are:
-
-=over 4
-
-=item *
-
-0 to set C<d(0)> so that the third derivative is 
-continuous at C<x(1)>.
-
-=item *
-
-1 if first derivative at C<x(0)> is given in C<vc(0>).
-
-=item *
-
-2 if second derivative at C<x(0>) is given in C<vc(0)>.
-
-=item *
-
-3 to use the 3-point difference formula for C<d(0)>.
-(Reverts to the default b.c. if C<n E<lt> 3>.)
-
-=item *
-
-4 to use the 4-point difference formula for C<d(0)>.
-(Reverts to the default b.c. if C<n E<lt> 4>.)                 
-
-=back
-
-The values for C<ic(1)> are the same as above, except that
-the first-derivative value is stored in C<vc(1)> for cases 1 and 2.
-The values of C<$vc> need only be set if options 1 or 2 are chosen
-for C<$ic>.
-
-Error status returned by C<$ierr>:
-
-=over 4
-
-=item *
-
-0 if successful.
-
-=item *
-
--1  if C<nelem($x) E<lt> 2>.
-
-=item *
-
--3  if C<$x> is not strictly increasing.
-
-=item *
-
--4  if C<ic(0) E<lt> 0> or C<ic(0) E<gt> 4>.
-
-=item *
-
--5  if C<ic(1) E<lt> 0> or C<ic(1) E<gt> 4>.
-
-=item *
-
--6  if both of the above are true.
-
-=item *
-
--7  if C<nwk E<lt> 2*n>.
-
-=item *
-
--8  in case of trouble solving the linear system
-for the interior derivative values.
-
-=back
-
-=for bad
-
-chsp does not process bad values.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
-
-=cut
-
-
-
-
-*chsp = \&PDL::chsp;
-
-
-
-
-
-
-=head2 chfd
-
-=for sig
-
-  Signature: (x(n);f(n);d(n);int [io]skip();xe(ne);[o]fe(ne);[o]de(ne);longlong [o]ierr())
-
-=for ref
-
-Interpolate function and derivative values.
-
-Given a piecewise cubic Hermite function - such as from
-L</chim> - evaluate the function (C<$fe>) and 
-derivative (C<$de>) at a set of points (C<$xe>).
-If function values alone are required, use L</chfe>.
-Set C<skip> to 0 to skip checks on the input data.
-
-Error status returned by C<$ierr>:
-
-=over 4
-
-=item *
-
-0 if successful.
-
-=item *
-
-E<gt>0 if extrapolation was performed at C<ierr> points
-(data still valid).
-
-=item *
-
--1 if C<nelem($x) E<lt> 2>
-
-=item *
-
--3 if C<$x> is not strictly increasing.
-
-=item *
-
--4 if C<nelem($xe) E<lt> 1>.
-
-=item *
-
--5 if an error has occurred in a lower-level routine,
-which should never happen.
-
-=back
-
-=for bad
-
-chfd does not process bad values.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
-
-=cut
-
-
-
-
-*chfd = \&PDL::chfd;
-
-
-
-
-
-
-=head2 chfe
-
-=for sig
-
-  Signature: (x(n);f(n);d(n);int [io]skip();xe(ne);[o]fe(ne);longlong [o]ierr())
-
-=for ref
-
-Interpolate function values.
-
-Given a piecewise cubic Hermite function - such as from
-L</chim> - evaluate the function (C<$fe>) at
-a set of points (C<$xe>).
-If derivative values are also required, use L</chfd>.
-Set C<skip> to 0 to skip checks on the input data.
-
-Error status returned by C<$ierr>:
-
-=over 4
-
-=item *
-
-0 if successful.
-
-=item *
-
-E<gt>0 if extrapolation was performed at C<ierr> points
-(data still valid).
-
-=item *
-
--1 if C<nelem($x) E<lt> 2>
-
-=item *
-
--3 if C<$x> is not strictly increasing.
-
-=item *
-
--4 if C<nelem($xe) E<lt> 1>.
-
-=back
-
-=for bad
-
-chfe does not process bad values.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
-
-=cut
-
-
-
-
-*chfe = \&PDL::chfe;
-
-
-
-
-
-
-=head2 chia
-
-=for sig
-
-  Signature: (x(n);f(n);d(n);int [io]skip();la();lb();[o]ans();longlong [o]ierr())
-
-=for ref
-
-Integrate (x,f(x)) over arbitrary limits.
-
-Evaluate the definite integral of a piecewise
-cubic Hermite function over an arbitrary interval,
-given by C<[$la,$lb]>. C<$d> should contain the derivative values, computed by L</chim>.
-See L</chid> if the integration limits are
-data points.
-Set C<skip> to 0 to skip checks on the input data.
-
-The values of C<$la> and C<$lb> do not have
-to lie within C<$x>, although the resulting integral
-value will be highly suspect if they are not.
-
-Error status returned by C<$ierr>:
-
-=over 4
-
-=item *
-
-0 if successful.
-
-=item *
-
-1 if C<$la> lies outside C<$x>.
-
-=item *
-
-2 if C<$lb> lies outside C<$x>.
-
-=item *
-
-3 if both 1 and 2 are true.
-
-=item *
-
--1 if C<nelem($x) E<lt> 2>
-
-=item *
-
--3 if C<$x> is not strictly increasing.
-
-=item *
-
--4 if an error has occurred in a lower-level routine,
-which should never happen.
-
-=back
-
-=for bad
-
-chia does not process bad values.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
-
-=cut
-
-
-
-
-*chia = \&PDL::chia;
-
-
-
-
-
-
-=head2 chid
-
-=for sig
-
-  Signature: (x(n);f(n);d(n);int [io]skip();longlong ia();longlong ib();[o]ans();longlong [o]ierr())
-
-=for ref
-
-Integrate (x,f(x)) between data points.
-
-Evaluate the definite integral of a a piecewise
-cubic Hermite function between C<x($ia)> and
-C<x($ib)>. 
-
-See L</chia> for integration between arbitrary
-limits.
-
-Although using a fortran routine, the values of
-C<$ia> and C<$ib> are zero offset.
-C<$d> should contain the derivative values, computed by L</chim>.
-Set C<skip> to 0 to skip checks on the input data.
-
-Error status returned by C<$ierr>:
-
-=over 4
-
-=item *
-
-0 if successful.
-
-=item *
-
--1 if C<nelem($x) E<lt> 2>.
-
-=item *
-
--3 if C<$x> is not strictly increasing.
-
-=item *
-
--4 if C<$ia> or C<$ib> is out of range.
-
-=back
-
-=for bad
-
-chid does not process bad values.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
-
-=cut
-
-
-
-
-*chid = \&PDL::chid;
-
-
-
-
-
-
-=head2 chcm
-
-=for sig
-
-  Signature: (x(n);f(n);d(n);int [io]skip();longlong [o]ismon(n);longlong [o]ierr())
-
-=for ref
-
-Check the given piecewise cubic Hermite function for monotonicity.
-
-The outout ndarray C<$ismon> indicates over
-which intervals the function is monotonic.
-Set C<skip> to 0 to skip checks on the input data.
-
-For the data interval C<[x(i),x(i+1)]>, the
-values of C<ismon(i)> can be:
-
-=over 4
-
-=item *
-
--3 if function is probably decreasing
-
-=item *
-
--1 if function is strictly decreasing
-
-=item *
-
-0  if function is constant
-
-=item *
-
-1  if function is strictly increasing
-
-=item *
-
-2  if function is non-monotonic
-
-=item *
-
-3  if function is probably increasing
-
-=back
-
-If C<abs(ismon(i)) == 3>, the derivative values are
-near the boundary of the monotonicity region. A small
-increase produces non-monotonicity, whereas a decrease
-produces strict monotonicity.
-
-The above applies to C<i = 0 .. nelem($x)-1>. The last element of
-C<$ismon> indicates whether
-the entire function is monotonic over $x.
-
-Error status returned by C<$ierr>:
-
-=over 4
-
-=item *
-
-0 if successful.
-
-=item *
-
--1 if C<n E<lt> 2>.
-
-=item *
-
--3 if C<$x> is not strictly increasing.
-
-=back
-
-=for bad
-
-chcm does not process bad values.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
-
-=cut
-
-
-
-
-*chcm = \&PDL::chcm;
-
-
-
-
-
-
-=head2 chbs
-
-=for sig
-
-  Signature: (x(n);f(n);d(n);longlong knotyp();longlong [io]nknots();[io]t(tsize=CALC(2*$SIZE(n)+4));[o]bcoef(bsize=CALC(2*$SIZE(n)));longlong [o]ndim();longlong [o]kord();longlong [o]ierr())
-
-=for ref
-
-Piecewise Cubic Hermite function to B-Spline converter.
-
-The resulting B-spline representation of the data
-(i.e. C<nknots>, C<t>, C<bcoeff>, C<ndim>, and
-C<kord>) can be evaluated by L</bvalu>.
-
-Array sizes: C<tsize = 2*n + 4>, C<bsize = 2*n>,
-and C<ndim = 2*n>.
-
-C<knotyp> is a flag which controls the knot sequence.
-The knot sequence C<t> is normally computed from C<$x> 
-by putting a double knot at each C<x> and setting the end knot pairs
-according to the value of C<knotyp> (where C<m = ndim = 2*n>):
-
-=over
-
-=item *
-
-0 -   Quadruple knots at the first and last points.
-
-=item *
-
-1 -   Replicate lengths of extreme subintervals:
-C<t( 0 ) = t( 1 ) = x(0) - (x(1)-x(0))> and
-C<t(m+3) = t(m+2) = x(n-1) + (x(n-1)-x(n-2))>
-
-=item *
-
-2 -   Periodic placement of boundary knots:
-C<t( 0 ) = t( 1 ) = x(0) - (x(n-1)-x(n-2))> and
-C<t(m+3) = t(m+2) = x(n) + (x(1)-x(0))>
-
-=item *
-
-E<lt>0 - Assume the C<nknots> and C<t> were set in a previous call.
-
-=back
-
-C<nknots> is the number of knots and may be changed by the routine. 
-If C<knotyp E<gt>= 0>, C<nknots> will be set to C<ndim+4>,
-otherwise it is an input variable, and an error will occur if its
-value is not equal to C<ndim+4>.
-
-C<t> is the array of C<2*n+4> knots for the B-representation
-and may be changed by the routine.
-If C<knotyp E<gt>= 0>, C<t> will be changed so that the
-interior double knots are equal to the x-values and the
-boundary knots set as indicated above,
-otherwise it is assumed that C<t> was set by a
-previous call (no check is made to verify that the data
-forms a legitimate knot sequence). 
-
-Error status returned by C<$ierr>:
-
-=over 4
-
-=item *
-
-0 if successful.
-
-=item *
-
--4 if C<knotyp E<gt> 2>.
-
-=item *
-
--5 if C<knotyp E<lt> 0> and C<nknots != 2*n + 4>.
-
-=back
-
-=for bad
-
-chbs does not process bad values.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
-
-=cut
-
-
-
-
-*chbs = \&PDL::chbs;
-
-
-
-
-
-
-=head2 bvalu
-
-=for sig
-
-  Signature: (t(nplusk);a(n);longlong ideriv();x();[t]work(k3=CALC(3*($SIZE(nplusk)-$SIZE(n))));[o]ans())
-
-=for ref
-
-Evaluate the B-representation of a B-spline at X for the
-function value or any of its derivatives.
-
-Evaluates the B-representation C<(T,A,N,K)> of a B-spline
-at C<X> for the function value on C<IDERIV = 0> or any of its
-derivatives on C<IDERIV = 1,2,...,K-1>.  Right limiting values
-(right derivatives) are returned except at the right end
-point C<X=T(N+1)> where left limiting values are computed.  The
-spline is defined on C<T(K) .LE. X .LE. T(N+1)>.  BVALU returns
-a fatal error message when C<X> is outside of this interval.
-
-To compute left derivatives or left limiting values at a
-knot C<T(I)>, replace C<N> by C<I-1> and set C<X=T(I)>, C<I=K+1,N+1>.
-
-=head3 Description of Arguments
-
-=head4 Input
-
-     T       - knot vector of length N+K
-     A       - B-spline coefficient vector of length N
-     N       - number of B-spline coefficients
-               N = sum of knot multiplicities-K
-     K       - order of the B-spline, K .GE. 1
-     IDERIV  - order of the derivative, 0 .LE. IDERIV .LE. K-1
-               IDERIV=0 returns the B-spline value
-     X       - argument, T(K) .LE. X .LE. T(N+1)
-     INBV    - an initialization parameter which must be set
-               to 1 the first time BVALU is called. (PDL sets to 1 for you)
-
-=head4 Output
-
-     INBV    - INBV contains information for efficient process-
-               ing after the initial call and INBV must not
-               be changed by the user.  Distinct splines require
-               distinct INBV parameters. (unavailable in PDL)
-     WORK    - work vector of length 3*K.
-     BVALU   - value of the IDERIV-th derivative at X
-
-=head4 Error Conditions
-
-An improper input is a fatal error
-
-=for bad
-
-bvalu does not process bad values.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
-
-=cut
-
-
-
-
-*bvalu = \&PDL::bvalu;
 
 
 
@@ -1579,7 +722,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1555 "slatec.pd"
+#line 766 "slatec.pd"
 
 =head1 AUTHOR
 
@@ -1592,7 +735,7 @@ distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
 =cut
-#line 1596 "Slatec.pm"
+#line 739 "Slatec.pm"
 
 # Exit with OK status
 

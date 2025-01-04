@@ -19,14 +19,14 @@ name: Acme-CPANModules-MockModules
 provides:
   Acme::CPANModules::MockModules:
     file: lib/Acme/CPANModules/MockModules.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   strict: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-MockModules
   homepage: https://metacpan.org/release/Acme-CPANModules-MockModules
   repository: git://github.com/perlancar/perl-Acme-CPANModules-MockModules.git
-version: '0.003'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.040000'

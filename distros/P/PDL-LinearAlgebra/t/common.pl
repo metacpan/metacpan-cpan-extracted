@@ -7,6 +7,7 @@ my $x = pdl([0.43,0.03],[0.75,0.72]);
 my $wide = pdl([0.43,0.03,0.7],[0.75,0.72,0.2]);
 my $rank2 = pdl([1,0,1],[-2,-3,1],[3,3,0]);
 my $schur_soln = pdl([0.36637354,-0.72],[0,0.78362646]);
+$schur_soln = [$schur_soln,[pdl([0.36637354,0.72],[0,0.78362646]),$schur_soln]];
 runtest($x, 'mschur', $schur_soln);
 runtest($x, 'mschur', $schur_soln, [1,1,1,sub {1}]);
 runtest($x, 'mschur', $schur_soln, [1,1,1,undef]);

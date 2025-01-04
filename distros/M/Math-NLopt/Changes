@@ -1,12 +1,45 @@
 Revision history for Math-NLopt
 
+0.09      2025-01-03 22:23:40-05:00 America/New_York
+
+  [ PACKAGING ]
+
+    * production release; no changes from 0.08-TRIAL
+
+
+0.08      2024-12-25 13:32:31-05:00 America/New_York (TRIAL RELEASE)
+
+  [BUGFIX]
+
+    * fix for threaded Perls
+
+0.07      2024-12-25 08:46:23-05:00 America/New_York (TRIAL RELEASE)
+
+  [TESTS]
+
+    * adjust numerical precision to get tests to pass with Perl
+      compiled with -Duselongdouble. ++bingos, cpan tester
+
+0.06      2024-12-24 23:37:08-05:00 America/New_York (TRIAL RELEASE)
+
+  [ENHANCEMENT]
+
+    * throw exception objects instead of strings where
+      practical. Fixes RT#158039, ++srezic.
+
+  [TESTS]
+
+    * adjust numerical precision to get tests to pass with Perl
+      compiled with -Duselongdouble. RT#158038. ++srezic.
+
+
 0.05      2024-12-20 11:19:10-05:00 America/New_York
 
   [DOCUMENTATION]
 
-     * fix incorrect build from repo instructions in CONTRIBUTING
+    * fix incorrect build from repo instructions in CONTRIBUTING
 
-     * fix typos in documentation
+    * fix typos in documentation
 
 0.04      2024-12-19 22:20:41-05:00 America/New_York
 

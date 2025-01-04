@@ -10,32 +10,34 @@ NLopt <https://github.com/stevengj/nlopt> is a
 Math::NLopt is a Perl binding to NLopt. It uses the Alien::NLopt module
 to find or install a Perl local instance of the NLopt library.
 
-This version interfaces to Perl using native Perl arrays. A version
-which uses PDL ndarrays will be forthcoming.
+This module provides an interface using native Perl arrays.
 
 The main documentation for NLopt may be found at
-<https://nlopt.readthedocs.io/>; this documentation focuses on the Perl
+<https://nlopt.readthedocs.io/>; this document focuses on the Perl
 specific implementation, which is more Perlish than the C API (and is
 very similar to the Python one).
 
-  Perl Interface
+  API
 
-The Perl interface closely tracks the object oriented interface of
-NLopt, but uses methods rather than subroutine calls, e.g. translate the
-C
+The Perl API uses an object, constructed by the "new" class method, to
+maintain state. The optimization process is controlled by invoking
+methods on the object.
 
-   result = nlopt_<method>( opt, ... );
+*In general* results are returned directly from the methods; method
+parameters are used primarily as input data for the methods (the
+objective and constraint callbacks more closely follow the C API).
 
-into
+The Perl methods are named similarly to the C functions, e.g.
 
-  $result = $opt->method( ... );
+   nlopt_<method>( opt, ... );
 
-However, the Perl API *in general* returns results directly, whereas the
-C interface returns a success/failure code and transfers data to and
-from a routine via its parameters. The Perl API, apart from that for the
-objective and constraint methods, uses parameters solely as input data
-for the methods. For example, the C API for starting the optimization
-process is
+becomes
+
+  $opt->method( ... );
+
+Where $opt is provided by the "new" class method.
+
+As an example, the C API for starting the optimization process is
 
    nlopt_result nlopt_optimize(nlopt_opt opt, double *x, double *opt_f);
 
@@ -50,9 +52,18 @@ The Perl interface (similar to the Python and C++ versions) is
    $opt_f = $opt->last_optimum_value;
    $result_code = $opt->last_optimize_result;
 
-The Perl API will throw exceptions on failures, similar to the behavior
-of the C++ and Python API's. That behavior will be tunable in future
-releases.
+The Perl API throws exceptions on failures, similar to the behavior of
+the C++ and Python API's. Where the C API returns error codes,
+"Math::NLopt" throws objects in similarly named exception classes:
+
+  Math::NLopt::Exception::Failure
+  Math::NLopt::Exception::OutOfMemory
+  Math::NLopt::Exception::InvalidArgs
+  Math::NLopt::Exception::RoundoffLimited>
+  Math::NLopt::Exception::ForcedStop
+
+These all extend the Math::NLopt::Exception class; see it for more
+information on retrieving messages from the objects.
 
   Constants
 
@@ -78,12 +89,13 @@ As are the utility subroutines:
 
   Callbacks
 
-NLopt handles the optimization of the objective function. The user must
-provide subroutines which return the value of the objective function or
-non-linear constraints. Such callback subroutines have a required
-calling signature, documented below. The user can provide their own data
-structure containing additional information which will be passed to the
-callbacks, or they can access that information from closures.
+NLopt handles the optimization of the objective function, relying upon
+user provided subroutines to calculate the objective function and
+non-linear constraints (see below for the required calling signature).
+
+The callback subroutines are called with a user-provided structure which
+can be used to pass additional information to the callback (or the
+subroutines can use closures).
 
    Objective Functions
 

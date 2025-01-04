@@ -13,6 +13,9 @@ exclude = Freenode
 [-Documentation::RequirePodSections]
 [-ErrorHandling::RequireCarping]
 [-InputOutput::RequireBriefOpen]
+
+[-Modules::ProhibitMultiplePackages]
+
 [-NamingConventions::Capitalization]
 [-References::ProhibitDoubleSigils]
 [-RegularExpressions::RequireDotMatchAnything]

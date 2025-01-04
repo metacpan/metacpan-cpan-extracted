@@ -1,5 +1,5 @@
 {
-   "abstract" : "It's loader for Daje-Workflow JSON based workflows",
+   "abstract" : "Just loads Daje-Workflow JSON based workflows",
    "author" : [
       "janeskil1525 <janeskil1525@gmail.com>"
    ],
@@ -57,7 +57,7 @@
    "provides" : {
       "Daje::Workflow::Loader" : {
          "file" : "lib/Daje/Workflow/Loader.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Daje::Workflow::Loader::Load" : {
          "file" : "lib/Daje/Workflow/Loader/Load.pm"
@@ -75,7 +75,7 @@
          "web" : "https://github.com/janeskil1525/Daje-Workflow-Load"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

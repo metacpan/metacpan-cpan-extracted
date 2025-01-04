@@ -1,0 +1,43 @@
+---
+abstract: 'A Web Intl.RelativeTimeFormat Class Implementation'
+author:
+  - 'Jacques Deguest (jack@deguest.jp)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '1.302120'
+  Test::Pod: '1.52'
+  Test::Time: '0'
+  lib: '0.63'
+  open: '0'
+  utf8: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DateTime-Format-RelativeTime
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DateTime: '0.42'
+  DateTime::Locale::FromCLDR: v0.6.0
+  Locale::Intl: v0.1.2
+  Locale::Unicode::Data: v1.3.0
+  Scalar::Util: '0'
+  Want: '0.17'
+  parent: '0'
+  perl: '5.010001'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+  warnings::register: '0'
+resources:
+  bugtracker: https://gitlab.com/jackdeguest/DateTime-Format-RelativeTime/issues
+  repository: https://gitlab.com/jackdeguest/DateTime-Format-RelativeTime
+version: v0.1.3
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

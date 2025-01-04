@@ -1,5 +1,5 @@
 #
-# GENERATED WITH PDL::PP from gsl_sf.pd! Don't modify!
+# GENERATED WITH PDL::PP from lib/PDL/GSL/SF.pd! Don't modify!
 #
 package PDL::GSL::SF;
 
@@ -22,7 +22,7 @@ use DynaLoader;
 
 
 
-#line 4 "gsl_sf.pd"
+#line 4 "lib/PDL/GSL/SF.pd"
 
 use strict;
 use warnings;
@@ -36,7 +36,7 @@ PDL::GSL::SF - PDL interface to GSL Special Functions
 This is an interface to the Special Function package present in the GNU Scientific Library.
 
 =cut
-#line 40 "SF.pm"
+#line 40 "lib/PDL/GSL/SF.pm"
 
 
 =head1 FUNCTIONS
@@ -4401,7 +4401,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 64 "gsl_sf.pd"
+#line 64 "lib/PDL/GSL/SF.pd"
 
 =head1 AUTHOR
 
@@ -4415,7 +4415,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL SF modules were written by G. Jungman.
 
 =cut
-#line 4419 "SF.pm"
+#line 4419 "lib/PDL/GSL/SF.pm"
 
 # Exit with OK status
 

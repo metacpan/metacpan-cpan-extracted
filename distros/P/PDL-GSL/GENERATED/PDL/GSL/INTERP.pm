@@ -1,5 +1,5 @@
 #
-# GENERATED WITH PDL::PP from gsl_interp.pd! Don't modify!
+# GENERATED WITH PDL::PP from lib/PDL/GSL/INTERP.pd! Don't modify!
 #
 package PDL::GSL::INTERP;
 
@@ -22,7 +22,7 @@ use DynaLoader;
 
 
 
-#line 6 "gsl_interp.pd"
+#line 6 "lib/PDL/GSL/INTERP.pd"
 
 use strict;
 use warnings;
@@ -60,7 +60,7 @@ C<b>. Since good Perl coding practices discourage the use of Perl
 variables C<$a> and C<$b>, here we refer to Parameters C<a> and C<b>
 as C<$pa> and C<$pb>, respectively, and Limits (of domain or
 integration) as C<$la> and C<$lb>.
-#line 64 "INTERP.pm"
+#line 64 "lib/PDL/GSL/INTERP.pm"
 
 
 =head1 FUNCTIONS
@@ -371,7 +371,7 @@ sub integ {
 
 
 
-#line 45 "gsl_interp.pd"
+#line 45 "lib/PDL/GSL/INTERP.pd"
 
 =head1 BUGS
 
@@ -395,7 +395,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL interpolation module was written by Gerard Jungman.
 
 =cut
-#line 399 "INTERP.pm"
+#line 399 "lib/PDL/GSL/INTERP.pm"
 
 # Exit with OK status
 

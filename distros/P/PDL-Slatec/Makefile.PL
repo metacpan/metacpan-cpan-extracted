@@ -49,7 +49,7 @@ sub MY::postamble {
         my $mycompiler     = $f77->compiler();
         my $mycflags       = $f77->cflags();
 	my $orig = pdlpp_postamble(@pack);
-	my $hack_64bit = $Config{archname}=~m/amd64|i686|x86_64/ ?" -fPIC " : "";
+	my $hack_64bit = $Config{archname}=~m/amd64|i686|x86_64|hppa|hppa64/ ?" -fPIC " : "";
 	$orig =~ s/:\s*slatec\.pd/: slatec.pd/;
 	$orig .= "FFLAGS = $hack_64bit $mycflags \$(OPTIMIZE)\n";
 	join "\n", $orig, map "$_\$(OBJ_EXT): $_.f

@@ -75,8 +75,15 @@ my @x0 = ( 1.234, 5.678 );
 
 is( $opt->optimize( \@x0 ),   [ float( 0.33333333 ), float( 0.29629629 ) ], 'optimum parameters', );
 is( $opt->last_optimum_value, float( 0.5443310476200902 ),                  'minimum vlaue', );
-is( $opt->last_optimize_result,     4,                                      'result code' );
-is( $opt->get_numevals,             11,                                     'nevals' );
-is( $opt->get_initial_step( \@x0 ), [ 1.234, 4.2585 ],                      'initial step' );
+is( $opt->last_optimize_result, 4,                                          'result code' );
+is( $opt->get_numevals,         11,                                         'nevals' );
+is(
+    $opt->get_initial_step( \@x0 ),
+    array {
+        item float( 1.234,  precision => 3 );
+        item float( 4.2585, precision => 4 );
+    },
+    'initial step'
+);
 
 done_testing;

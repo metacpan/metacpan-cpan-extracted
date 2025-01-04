@@ -1,0 +1,13 @@
+Revision history for Perl module DateTime::Format::RelativeTime
+
+v0.1.3 2025-01-04T08:05:17+0900
+    - Correcting minor oversight about debugging tool remaining in the distribution code
+
+v0.1.2 2025-01-04T00:48:19+0900
+    - Another minor correction in method format_to_parts
+
+v0.1.1 2025-01-04T00:20:46+0900
+    - Minor correction in method format_to_parts
+
+v0.1.0 2024-12-30T17:41:57+0900
+	- Initial version

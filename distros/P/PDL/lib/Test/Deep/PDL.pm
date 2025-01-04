@@ -3,15 +3,15 @@ use warnings;
 
 package Test::Deep::PDL;
 
-=head1 NAME 
+=head1 NAME
 
 Test::Deep::PDL - Test ndarrays inside data structures with Test::Deep
-
-our $VERSION = '0.22';
 
 =for Pod::Coverage init descend diag_message renderExp renderGot
 
 =cut
+
+our $VERSION = '0.22';
 
 use Test::Deep::Cmp;
 require Test::PDL;

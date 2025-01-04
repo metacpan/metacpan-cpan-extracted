@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 22;
+use Test::More tests => 23;
 use Test::Tk;
 use Tk;
 
@@ -194,13 +194,22 @@ push @tests, (
 	}, \@filterfolderscase, 'Load filter folders fi' ],
 
 	[ sub { 
+		return 1 if $mswin; #skip Windows
 		$fb->configure(-filtercase => 0);
 		$fb->configure(-casedependantsort => 0);
 		$fb->configure(-directoriesfirst => 1);
 		$fb->configure(-loadfilter => '');
 		$fb->configure(-loadfilterfolders => 0);
 		$fb->configure(-sortorder => 'ascending');
-		$fb->after(1, ['load', $fb]);;
+		pause(10);
+		$fb->load('~');
+		pause($pause);
+		my $home = $ENV{HOME};
+		return $fb->folder eq $home 
+	}, 1, 'Loaded home folder' ],
+
+	[ sub { 
+		$fb->after(1, ['load', $fb]);
 		return 1 
 	}, 1, 'Loaded current folder' ],
 );

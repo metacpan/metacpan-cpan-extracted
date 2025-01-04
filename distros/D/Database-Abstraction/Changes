@@ -1,5 +1,8 @@
 Revision history for Database-Abstraction
 
+0.14	Fri Jan  3 11:17:11 EST 2025
+	Added the dbname argument
+
 0.13	Sun Dec 22 13:30:13 EST 2024
 	Refactor logger helper routines
 	Fix "Bad table or column name: 'entryIS NOT NULL' has chars not alphanumeric or underscore"

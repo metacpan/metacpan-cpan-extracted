@@ -1,5 +1,8 @@
 Revision history for Perl module Tie::Cycle
 
+1.229 2025-01-04T05:10:10Z
+	* refresh distro and move to BRIANDFOY
+
 1.228 2024-02-04T06:40:57Z
 	* refresh distro, update email address
 

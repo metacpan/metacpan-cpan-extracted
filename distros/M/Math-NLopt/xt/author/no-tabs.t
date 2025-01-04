@@ -8,6 +8,7 @@ use Test::NoTabs;
 
 my @files = (
     'lib/Math/NLopt.pm',
+    'lib/Math/NLopt/Exception.pm',
     't/00-compile.t',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',

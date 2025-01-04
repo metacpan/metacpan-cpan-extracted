@@ -1,5 +1,8 @@
 Revision history for Perl module Tie::StringArray
 
+1.105 2025-01-04T05:17:28Z
+	* refresh distro and move to BRIANDFOY
+
 1.104 2024-02-05T08:28:20Z
 	* refresh distro, update email addresses
 

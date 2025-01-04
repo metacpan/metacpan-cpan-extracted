@@ -1,6 +1,6 @@
 Revision history for Perl extension Daje-Workflow-Database
 
-0.06 2024-12-28T12:32:30Z
+0.07 2025-01-03T14:46:23Z
 
-    - 2nd migration
+    - context changed to bytea
 

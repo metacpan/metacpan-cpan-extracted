@@ -4,7 +4,7 @@ Database::Abstraction - read-only database abstraction layer
 
 # VERSION
 
-Version 0.13
+Version 0.14
 
 # SYNOPSIS
 
@@ -13,10 +13,22 @@ using caching for performance optimization.
 It offers functionalities like opening the database and fetching data based on various criteria,
 
 Look for databases in $directory in this order:
-1) SQLite (file ends with .sql)
-2) PSV (pipe separated file, file ends with .psv)
-3) CSV (file ends with .csv or .db, can be gzipped) (note the default sep\_char is '!' not ',')
-4) XML (file ends with .xml)
+
+- 1 `SQLite`
+
+    File ends with .sql
+
+- 2 `PSV`
+
+    Pipe separated file, file ends with .psv
+
+- 3 `CSV`
+
+    File ends with .csv or .db, can be gzipped. Note the default sep\_char is '!' not ','
+
+- 4 `XML`
+
+    File ends with .xml
 
 The AUTOLOAD feature allows for convenient access to database columns using method calls.
 
@@ -78,10 +90,28 @@ Arguments:
 
 Takes different argument formats (hash or positional)
 
-cache => place to store results;
-cache\_duration => how long to store results in the cache (default is 1 hour);
-directory => where the database file is held
-max\_slurp\_size => CSV/PSV/XML files smaller than this are held in RAM (default is 16K)
+- `cache`
+
+    Place to store results
+
+- `cache_duration`
+
+    How long to store results in the cache (default is 1 hour)
+
+- `dbname`
+
+    The prefix of name of the database file (default is name of the table).
+    The database will be held in a file such as $dbname.csv.
+
+- `directory`
+
+    Where the database file is held
+
+- `max_slurp_size`
+
+    CSV/PSV/XML files smaller than this are held in RAM (default is 16K).
+    Setting this value to 0 will turn this feature off,
+    thus forcing SQL to be used to access the database
 
 If the arguments are not set, tries to take from class level defaults.
 
@@ -175,12 +205,12 @@ so if XML fails for you on a small file force non-slurping mode with
 
     $foo = MyPackageName::Database::Foo->new({
         directory => '/var/db',
-        max_slurp_size => 1     # force to not use slurp and therefore to use SQL
+        max_slurp_size => 0     # force to not use slurp and therefore to use SQL
     });
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2015-2024 Nigel Horne.
+Copyright 2015-2025 Nigel Horne.
 
 This program is released under the following licence: GPL2.
 Usage is subject to licence terms.

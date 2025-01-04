@@ -1,5 +1,16 @@
 Revision history for Perl module Locale::Unicode::Data
 
+v1.3.1 2025-01-04T08:15:48+0900
+    - Removing allow_tags from JSON instantiation and some debugging tool in unit tests. Gitlab issue #2 and #3 reported by Slaven Rezić
+
+v1.3.0 2025-01-03T22:52:22+0900
+    - Added table time_relative_l10n to handle relative time
+    - Added methods time_relative_l10n and time_relatives_l10n
+    - Small correction to the method make_inheritance_tree() to ensure it build the inheritance tree using the locale 'base' information only.
+    - Added tables plural_rules and plural_ranges
+    - Added methods plural_rule, plural_rules, plural_range, plural_ranges, and plural_count
+    - Correcting the method make_inheritance_tree to ensure language ID and territory combination is part of the tree.
+
 v1.2.0 2024-12-20T06:27:46+0900
     - Release for updated Unicode data release version 46.1
       See CLDR release notes for details: <https://cldr.unicode.org/downloads/cldr-46>

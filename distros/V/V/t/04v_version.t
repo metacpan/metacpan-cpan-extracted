@@ -1,10 +1,14 @@
-#! perl -I. -w
+#!/usr/bin/perl -I.
+
+use strict;
+use warnings;
+
 use t::Test::abeltje;
 
-require_ok( 'V' );
+require_ok ("V");
 
-my $version = V::get_version('V_Version');
+my $version = V::get_version ("V_Version");
 
-is($version, "v1.2.3", "Got version: $version");
+is ($version, "v1.2.3", "Got version: $version");
 
-abeltje_done_testing();
+abeltje_done_testing ();

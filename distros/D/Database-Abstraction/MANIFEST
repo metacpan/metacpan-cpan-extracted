@@ -16,13 +16,13 @@ t/00-load.t
 t/10-compile.t
 t/20-new.t
 t/30-basics.t
+t/carp.t
 t/chi.t
 t/comment-spelling.t
 t/csv.t
 t/csv_id.t
 t/eof.t
 t/eol.t
-t/error.t
 t/init.t
 t/lib/Database/test1.pm
 t/lib/Database/test2.pm

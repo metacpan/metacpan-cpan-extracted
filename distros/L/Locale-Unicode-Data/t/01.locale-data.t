@@ -133,6 +133,11 @@ can_ok( $cldr, 'number_systems_l10n' );
 can_ok( $cldr, 'pass_error' );
 can_ok( $cldr, 'person_name_default' );
 can_ok( $cldr, 'person_name_defaults' );
+can_ok( $cldr, 'plural_count' );
+can_ok( $cldr, 'plural_range' );
+can_ok( $cldr, 'plural_ranges' );
+can_ok( $cldr, 'plural_rule' );
+can_ok( $cldr, 'plural_rules' );
 can_ok( $cldr, 'rbnf' );
 can_ok( $cldr, 'rbnfs' );
 can_ok( $cldr, 'reference' );
@@ -152,6 +157,8 @@ can_ok( $cldr, 'territory_l10n' );
 can_ok( $cldr, 'territories_l10n' );
 can_ok( $cldr, 'time_format' );
 can_ok( $cldr, 'time_formats' );
+can_ok( $cldr, 'time_relative_l10n' );
+can_ok( $cldr, 'time_relatives_l10n' );
 can_ok( $cldr, 'timezone' );
 can_ok( $cldr, 'timezones' );
 can_ok( $cldr, 'timezone_canonical' );
@@ -223,9 +230,10 @@ SKIP:
         locales_info locales_l10n metainfos metazones
         metazones_names number_formats_l10n number_symbols_l10n
         number_systems number_systems_l10n person_name_defaults
+        plural_ranges plural_rules
         rbnf refs scripts scripts_l10n subdivisions
         subdivisions_l10n territories territories_l10n
-        time_formats timezones timezones_cities
+        time_formats time_relative_l10n timezones timezones_cities
         timezones_cities_extended timezones_cities_supplemental
         timezones_formats timezones_info timezones_names
         unit_aliases unit_constants unit_conversions

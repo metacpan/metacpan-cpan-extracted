@@ -11,7 +11,7 @@ use PDL::Exporter;
 use DynaLoader;
 
 
-   our $VERSION = '1.24.0';
+   our $VERSION = '1.24.1';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::CCS::Ufunc $VERSION;
@@ -24,8 +24,6 @@ use DynaLoader;
 #line 13 "ccsufunc.pd"
 
 
-#use PDL::CCS::Version; use strict;
-
 =pod
 
 =head1 NAME
@@ -34,13 +32,14 @@ PDL::CCS::Ufunc - Ufuncs for compressed storage sparse PDLs
 
 =head1 SYNOPSIS
 
- use PDL; use PDL::CCS::Ufunc;
+ use PDL;
+ use PDL::CCS::Ufunc;
 
  ##---------------------------------------------------------------------
  ## ... stuff happens
 
 =cut
-#line 44 "Ufunc.pm"
+#line 43 "Ufunc.pm"
 
 
 
@@ -103,7 +102,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 107 "Ufunc.pm"
+#line 106 "Ufunc.pm"
 
 
 
@@ -126,14 +125,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
           return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
         }
     
-#line 130 "Ufunc.pm"
+#line 129 "Ufunc.pm"
 
 
 
 #line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *ccs_accum_prod = \&PDL::ccs_accum_prod;
-#line 137 "Ufunc.pm"
+#line 136 "Ufunc.pm"
 
 
 
@@ -186,7 +185,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 190 "Ufunc.pm"
+#line 189 "Ufunc.pm"
 
 
 
@@ -209,14 +208,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
           return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
         }
     
-#line 213 "Ufunc.pm"
+#line 212 "Ufunc.pm"
 
 
 
 #line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *ccs_accum_dprod = \&PDL::ccs_accum_dprod;
-#line 220 "Ufunc.pm"
+#line 219 "Ufunc.pm"
 
 
 
@@ -269,7 +268,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 273 "Ufunc.pm"
+#line 272 "Ufunc.pm"
 
 
 
@@ -292,14 +291,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
           return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
         }
     
-#line 296 "Ufunc.pm"
+#line 295 "Ufunc.pm"
 
 
 
 #line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *ccs_accum_sum = \&PDL::ccs_accum_sum;
-#line 303 "Ufunc.pm"
+#line 302 "Ufunc.pm"
 
 
 
@@ -352,7 +351,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 356 "Ufunc.pm"
+#line 355 "Ufunc.pm"
 
 
 
@@ -375,14 +374,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
           return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
         }
     
-#line 379 "Ufunc.pm"
+#line 378 "Ufunc.pm"
 
 
 
 #line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *ccs_accum_dsum = \&PDL::ccs_accum_dsum;
-#line 386 "Ufunc.pm"
+#line 385 "Ufunc.pm"
 
 
 
@@ -432,7 +431,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 436 "Ufunc.pm"
+#line 435 "Ufunc.pm"
 
 
 
@@ -455,14 +454,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
           return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
         }
     
-#line 459 "Ufunc.pm"
+#line 458 "Ufunc.pm"
 
 
 
 #line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *ccs_accum_or = \&PDL::ccs_accum_or;
-#line 466 "Ufunc.pm"
+#line 465 "Ufunc.pm"
 
 
 
@@ -512,7 +511,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 516 "Ufunc.pm"
+#line 515 "Ufunc.pm"
 
 
 
@@ -535,14 +534,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
           return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
         }
     
-#line 539 "Ufunc.pm"
+#line 538 "Ufunc.pm"
 
 
 
 #line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *ccs_accum_and = \&PDL::ccs_accum_and;
-#line 546 "Ufunc.pm"
+#line 545 "Ufunc.pm"
 
 
 
@@ -592,7 +591,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 596 "Ufunc.pm"
+#line 595 "Ufunc.pm"
 
 
 
@@ -615,14 +614,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
           return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
         }
     
-#line 619 "Ufunc.pm"
+#line 618 "Ufunc.pm"
 
 
 
 #line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *ccs_accum_bor = \&PDL::ccs_accum_bor;
-#line 626 "Ufunc.pm"
+#line 625 "Ufunc.pm"
 
 
 
@@ -672,7 +671,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 676 "Ufunc.pm"
+#line 675 "Ufunc.pm"
 
 
 
@@ -695,14 +694,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
           return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
         }
     
-#line 699 "Ufunc.pm"
+#line 698 "Ufunc.pm"
 
 
 
 #line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *ccs_accum_band = \&PDL::ccs_accum_band;
-#line 706 "Ufunc.pm"
+#line 705 "Ufunc.pm"
 
 
 
@@ -753,7 +752,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 757 "Ufunc.pm"
+#line 756 "Ufunc.pm"
 
 
 
@@ -776,14 +775,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
           return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
         }
     
-#line 780 "Ufunc.pm"
+#line 779 "Ufunc.pm"
 
 
 
 #line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *ccs_accum_maximum = \&PDL::ccs_accum_maximum;
-#line 787 "Ufunc.pm"
+#line 786 "Ufunc.pm"
 
 
 
@@ -834,7 +833,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 838 "Ufunc.pm"
+#line 837 "Ufunc.pm"
 
 
 
@@ -857,14 +856,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
           return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
         }
     
-#line 861 "Ufunc.pm"
+#line 860 "Ufunc.pm"
 
 
 
 #line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *ccs_accum_minimum = \&PDL::ccs_accum_minimum;
-#line 868 "Ufunc.pm"
+#line 867 "Ufunc.pm"
 
 
 
@@ -912,7 +911,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 916 "Ufunc.pm"
+#line 915 "Ufunc.pm"
 
 
 
@@ -935,14 +934,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
           return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
         }
     
-#line 939 "Ufunc.pm"
+#line 938 "Ufunc.pm"
 
 
 
 #line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *ccs_accum_maximum_nz_ind = \&PDL::ccs_accum_maximum_nz_ind;
-#line 946 "Ufunc.pm"
+#line 945 "Ufunc.pm"
 
 
 
@@ -990,7 +989,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 994 "Ufunc.pm"
+#line 993 "Ufunc.pm"
 
 
 
@@ -1013,14 +1012,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
           return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
         }
     
-#line 1017 "Ufunc.pm"
+#line 1016 "Ufunc.pm"
 
 
 
 #line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *ccs_accum_minimum_nz_ind = \&PDL::ccs_accum_minimum_nz_ind;
-#line 1024 "Ufunc.pm"
+#line 1023 "Ufunc.pm"
 
 
 
@@ -1068,7 +1067,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1072 "Ufunc.pm"
+#line 1071 "Ufunc.pm"
 
 
 
@@ -1091,14 +1090,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
           return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
         }
     
-#line 1095 "Ufunc.pm"
+#line 1094 "Ufunc.pm"
 
 
 
 #line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *ccs_accum_nbad = \&PDL::ccs_accum_nbad;
-#line 1102 "Ufunc.pm"
+#line 1101 "Ufunc.pm"
 
 
 
@@ -1146,7 +1145,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1150 "Ufunc.pm"
+#line 1149 "Ufunc.pm"
 
 
 
@@ -1169,14 +1168,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
           return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
         }
     
-#line 1173 "Ufunc.pm"
+#line 1172 "Ufunc.pm"
 
 
 
 #line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *ccs_accum_ngood = \&PDL::ccs_accum_ngood;
-#line 1180 "Ufunc.pm"
+#line 1179 "Ufunc.pm"
 
 
 
@@ -1224,7 +1223,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1228 "Ufunc.pm"
+#line 1227 "Ufunc.pm"
 
 
 
@@ -1247,14 +1246,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
           return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
         }
     
-#line 1251 "Ufunc.pm"
+#line 1250 "Ufunc.pm"
 
 
 
 #line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *ccs_accum_nnz = \&PDL::ccs_accum_nnz;
-#line 1258 "Ufunc.pm"
+#line 1257 "Ufunc.pm"
 
 
 
@@ -1307,7 +1306,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1311 "Ufunc.pm"
+#line 1310 "Ufunc.pm"
 
 
 
@@ -1330,18 +1329,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
           return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
         }
     
-#line 1334 "Ufunc.pm"
+#line 1333 "Ufunc.pm"
 
 
 
 #line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *ccs_accum_average = \&PDL::ccs_accum_average;
-#line 1341 "Ufunc.pm"
+#line 1340 "Ufunc.pm"
 
 
 
-#line 559 "ccsufunc.pd"
+#line 558 "ccsufunc.pd"
 
 
 =pod
@@ -1369,11 +1368,11 @@ zcover, intover, minmaximum
 =back
 
 =cut
-#line 1373 "Ufunc.pm"
+#line 1372 "Ufunc.pm"
 
 
 
-#line 595 "ccsufunc.pd"
+#line 594 "ccsufunc.pd"
 
 
 ##---------------------------------------------------------------------
@@ -1417,7 +1416,7 @@ as Perl itself.
 perl(1), PDL(3perl)
 
 =cut
-#line 1421 "Ufunc.pm"
+#line 1420 "Ufunc.pm"
 
 
 

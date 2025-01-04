@@ -54,10 +54,10 @@ $descriptor{INC} = '' unless defined $descriptor{INC};
 $descriptor{INC} .= " $cflags";
 
 $descriptor{PREREQ_PM} = {
-  'PDL' => '2.091', # t method
+  'PDL' => '2.097', # fixed type-selecting
 };
 $descriptor{CONFIGURE_REQUIRES} = {
-  'PDL' => '2.091',
+  'PDL' => '2.097',
   'IPC::Run'       =>0,
 #  'Alien::FFTW3'   =>0,
 };

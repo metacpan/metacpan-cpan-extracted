@@ -1,5 +1,5 @@
 #
-# GENERATED WITH PDL::PP from gsl_integ.pd! Don't modify!
+# GENERATED WITH PDL::PP from lib/PDL/GSL/INTEG.pd! Don't modify!
 #
 package PDL::GSL::INTEG;
 
@@ -22,7 +22,7 @@ use DynaLoader;
 
 
 
-#line 6 "gsl_integ.pd"
+#line 10 "lib/PDL/GSL/INTEG.pd"
 
 use strict;
 use warnings;
@@ -123,7 +123,7 @@ integration) as C<$la> and C<$lb>.
      my ($x) = @_;
      return exp(-$x**2);
    }
-#line 127 "INTEG.pm"
+#line 127 "lib/PDL/GSL/INTEG.pm"
 
 
 =head1 FUNCTIONS
@@ -934,7 +934,7 @@ sub gslinteg_qawf{
 
 
 
-#line 110 "gsl_integ.pd"
+#line 114 "lib/PDL/GSL/INTEG.pd"
 
 =head1 BUGS
 
@@ -960,7 +960,7 @@ The GSL integration routines were written by Brian Gough. QUADPACK
 was written by Piessens, Doncker-Kapenga, Uberhuber and Kahaner.
 
 =cut
-#line 964 "INTEG.pm"
+#line 964 "lib/PDL/GSL/INTEG.pm"
 
 # Exit with OK status
 

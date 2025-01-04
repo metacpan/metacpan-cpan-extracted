@@ -33,17 +33,15 @@ Makefile\.old
 \.tar\.gz$
 \b_eumm/
 
-^.*/[A-Z_]*\.pm$
-^.*\.xs$
-^CDF/CDF\..*
-^DIFF/DIFF\..*
-^Distr/Distr\..*
-^INTEG/INTEG\..*
-^INTERP/INTERP\..*
-^LINALG/LINALG\..*
-^MROOT/MROOT\..*
-^RNG/RNG\..*
-^SF/SF\..*
+^lib/PDL/GSL/CDF(\.(pm|xs|c)$|-pp-)
+^lib/PDL/GSL/DIFF(\.(pm|xs|c)$|-pp-)
+^lib/PDL/GSL/INTEG(\.(pm|xs|c)$|-pp-)
+^lib/PDL/GSL/INTERP(\.(pm|xs|c)$|-pp-)
+^lib/PDL/GSL/LINALG(\.(pm|xs|c)$|-pp-)
+^lib/PDL/GSL/MROOT(\.(pm|xs|c)$|-pp-)
+^lib/PDL/GSL/RNG(\.(pm|xs|c)$|-pp-)
+^lib/PDL/GSL/SF(\.(pm|xs|c)$|-pp-)
+^lib/PDL/Stats/Distr(\.(pm|xs|c)$|-pp-)
 
 ^\.\#.*
 ^\.exists

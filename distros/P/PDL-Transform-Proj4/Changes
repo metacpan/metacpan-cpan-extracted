@@ -1,2 +1,5 @@
+2.097 2025-01-03
+- uses PDL 2.096+ lib/*.pd format for quicker builds
+
 2.096 2024-12-03
 - split out from PDL 2.095

@@ -1,5 +1,5 @@
 #
-# GENERATED WITH PDL::PP from gsl_linalg.pd! Don't modify!
+# GENERATED WITH PDL::PP from lib/PDL/GSL/LINALG.pd! Don't modify!
 #
 package PDL::GSL::LINALG;
 
@@ -22,7 +22,7 @@ use DynaLoader;
 
 
 
-#line 4 "gsl_linalg.pd"
+#line 4 "lib/PDL/GSL/LINALG.pd"
 
 use strict;
 use warnings;
@@ -56,7 +56,7 @@ initial C<gsl_linalg_> removed. They are provided in both real and
 complex double precision.
 
 Currently only LU decomposition interfaces here. Pull requests welcome!
-#line 60 "LINALG.pm"
+#line 60 "lib/PDL/GSL/LINALG.pm"
 
 
 =head1 FUNCTIONS
@@ -179,7 +179,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 40 "gsl_linalg.pd"
+#line 40 "lib/PDL/GSL/LINALG.pd"
 
 =head1 SEE ALSO
 
@@ -189,7 +189,7 @@ The GSL documentation for linear algebra is online at
 L<https://www.gnu.org/software/gsl/doc/html/linalg.html>
 
 =cut
-#line 193 "LINALG.pm"
+#line 193 "lib/PDL/GSL/LINALG.pm"
 
 # Exit with OK status
 

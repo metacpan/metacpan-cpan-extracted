@@ -1,5 +1,8 @@
 Revision history for Perl module Time::Timely
 
+1.026 2025-01-04T05:19:55Z
+	* refresh distro and move to BRIANDFOY
+
 1.025 2024-02-06T05:18:49Z
 	* refresh distro, update email addresses
 

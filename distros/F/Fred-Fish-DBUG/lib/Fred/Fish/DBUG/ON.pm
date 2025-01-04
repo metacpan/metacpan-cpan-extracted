@@ -1,5 +1,5 @@
 ###
-###  Copyright (c) 2007 - 2024 Curtis Leach.  All rights reserved.
+###  Copyright (c) 2007 - 2025 Curtis Leach.  All rights reserved.
 ###
 ###  Based on the Fred Fish DBUG macros in C/C++.
 ###  This Algorithm is in the public domain!
@@ -57,7 +57,7 @@ use Cwd 'abs_path';
 use Config qw( %Config );
 use Sub::Identify 'sub_fullname';
 
-$VERSION = "2.09";
+$VERSION = "2.10";
 @ISA = qw( Exporter );
 
 # ------------------------------------------------------------------------------
@@ -2947,7 +2947,7 @@ sub dbug_mask_argument_counts
    return ( $cnt );
 }
 
-# These 3 actually work in Fred::Fish::DBUG::OFF as well!
+# These 4 actually work in Fred::Fish::DBUG::OFF as well!
 sub dbug_threads_supported
 {
    return ( $threads_possible );
@@ -2963,6 +2963,18 @@ sub dbug_time_hires_supported
    return ( $time_hires_flag );
 }
 
+sub dbug_get_frame_value
+{
+   my $key = shift;
+
+   my $value;
+
+   if ( $dbug_global_vars{on} && exists $dbug_global_vars{$key} ) {
+      $value = $dbug_global_vars{$key}; 
+   }
+
+   return ( $value );
+}
 
 =back
 
@@ -2993,7 +3005,7 @@ L<Fred::Fish::DBUG::Tutorial> - Sample code demonstrating using DBUG module.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2007 - 2024 Curtis Leach.  All rights reserved.
+Copyright (c) 2007 - 2025 Curtis Leach.  All rights reserved.
 
 This program is free software.  You can redistribute it and/or modify it
 under the same terms as Perl itself.

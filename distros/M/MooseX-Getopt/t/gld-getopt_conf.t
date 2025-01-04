@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use Test2::V0;
-use if $ENV{AUTHOR_TESTING}, 'Test::Warnings' => ':no_end_test', 'had_no_warnings';
+use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 use Moose ();
 use Moose::Meta::Class;
 use MooseX::Getopt::GLD ();
@@ -61,5 +61,4 @@ subtest 'require_order is set in argv' => sub {
   is($obj->extra_argv, [ 'bloop', '-y' ], 'require_order is set: got misordered flag and extras in extra_argv');
 };
 
-had_no_warnings if $ENV{AUTHOR_TESTING};
 done_testing;

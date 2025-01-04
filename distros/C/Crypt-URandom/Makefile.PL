@@ -9,7 +9,7 @@ if ($^O eq 'MSWin32') {
 	$optional{C} = [];
 	$optional{MYEXTLIB} = q[];
 } else {
-	eval `cat ./check_random.pl`;
+	eval `cat ./check_random.inc`;
 	if (($optional{DEFINE}) && ($optional{DEFINE} eq '-DNO_COMPILER_FOUND')) {
 		# figured this out from ExtUtils/MM_Unix.pm in has_link_code
 		$optional{OBJECT} = q[];
@@ -61,7 +61,7 @@ WriteMakefile(
     },
     PREREQ_PM => {
 	'Exporter'   => 0,
-	'Carp'       => 0,
+	'Carp'       => 1.26, # used on RHEL7
 	'constant'   => 0,
 	'English'    => 0,
 	($^O eq 'MSWin32') ? ( 'Win32::API' => 0 ) : ( 'FileHandle' => 0 ),

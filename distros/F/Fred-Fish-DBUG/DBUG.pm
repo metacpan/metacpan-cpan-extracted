@@ -1,5 +1,5 @@
 ###
-###  Copyright (c) 2007 - 2024 Curtis Leach.  All rights reserved.
+###  Copyright (c) 2007 - 2025 Curtis Leach.  All rights reserved.
 ###
 ###  Based on the Fred Fish DBUG macros in C/C++.
 ###  This Algorithm is in the public domain!
@@ -190,7 +190,7 @@ use warnings;
 use vars qw( @ISA @EXPORT @EXPORT_OK $VERSION );
 use Exporter;
 
-$VERSION = "2.09";
+$VERSION = "2.10";
 @ISA = qw( Exporter );
 
 # ------------------------------------------------------------------------------
@@ -268,7 +268,7 @@ sub import
    my @imports;
    my $fish_module = __PACKAGE__ . "::";
 
-   my $minVer = 2.09;
+   my $minVer = 2.10;
    if ( $on_flag ) {
       $fish_module .= "ON";
       require Fred::Fish::DBUG::ON;
@@ -1138,7 +1138,7 @@ L<Fred::Fish::DBUG::Tutorial> - Sample code demonstrating using the DBUG module.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2007 - 2024 Curtis Leach.  All rights reserved.
+Copyright (c) 2007 - 2025 Curtis Leach.  All rights reserved.
 
 This program is free software.  You can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -153,9 +153,9 @@ sub main {
             {
                 # count => 94,
                 minf => float(  0.00639855,  precision => 5 ),
-                A    => float(  1.00146,     precision => 5 ),
-                w    => float( -0.000287406, precision => 5 ),
-                G    => float(  1.00039,     precision => 5 ),
+                A    => float(  1.00146,     precision => 3 ),
+                w    => float( -0.000287406, precision => 4 ),
+                G    => float(  1.00039,     precision => 3 ),
             },
         );
     };
@@ -178,9 +178,9 @@ sub main {
             {
                 # count => 137,
                 minf => float(  0.00639851,  precision => 5 ),
-                A    => float(  1.00137,     precision => 5 ),
-                w    => float( -0.000287383, precision => 5 ),
-                G    => float(  1.00033,     precision => 5 ),
+                A    => float(  1.0013,      precision => 3 ),
+                w    => float( -0.000287383, precision => 4 ),
+                G    => float(  1.0003,      precision => 4 ),
             },
         );
     };

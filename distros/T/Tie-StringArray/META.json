@@ -52,6 +52,6 @@
          "web" : "https://github.com/briandfoy/tie-stringarray"
       }
    },
-   "version" : "1.104",
+   "version" : "1.105",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

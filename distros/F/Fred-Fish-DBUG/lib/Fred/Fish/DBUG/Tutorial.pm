@@ -1,5 +1,5 @@
 ###
-###  Copyright (c) 2019 - 2024 Curtis Leach.  All rights reserved.
+###  Copyright (c) 2019 - 2025 Curtis Leach.  All rights reserved.
 ###
 ###  Module: Fred::Fish::DBUG::Tutorial
 
@@ -11,7 +11,7 @@ use warnings;
 use vars qw ( @ISA @EXPORT @EXPORT_OK $VERSION );
 use Exporter;
 
-$VERSION   = "2.09";
+$VERSION   = "2.10";
 @ISA       = qw ( Exporter );
 @EXPORT    = qw ();
 @EXPORT_OK = qw ();
@@ -675,7 +675,7 @@ This is only the beginning!  :)
 
 =head1 COPYRIGHT
 
-Copyright (c) 2019 - 2024 Curtis Leach.  All rights reserved.
+Copyright (c) 2019 - 2025 Curtis Leach.  All rights reserved.
 
 This program is free software.  You can redistribute it and/or modify it under
 the same terms as Perl itself.

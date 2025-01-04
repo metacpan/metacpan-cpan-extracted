@@ -1,5 +1,5 @@
 #
-# GENERATED WITH PDL::PP from gsl_diff.pd! Don't modify!
+# GENERATED WITH PDL::PP from lib/PDL/GSL/DIFF.pd! Don't modify!
 #
 package PDL::GSL::DIFF;
 
@@ -22,7 +22,7 @@ use DynaLoader;
 
 
 
-#line 4 "gsl_diff.pd"
+#line 8 "lib/PDL/GSL/DIFF.pd"
 
 use strict;
 use warnings;
@@ -60,7 +60,7 @@ GNU Scientific Library.
 
 =cut
 
-#line 121 "gsl_diff.pd"
+#line 125 "lib/PDL/GSL/DIFF.pd"
 sub gsldiff{
   my $opt;
   if (ref($_[$#_]) eq 'HASH'){ $opt = pop @_; }
@@ -83,7 +83,7 @@ sub gsldiff{
   }
   return ($res,$abserr);
 }
-#line 87 "DIFF.pm"
+#line 87 "lib/PDL/GSL/DIFF.pm"
 
 *diff_central = \&PDL::diff_central;
 
@@ -103,7 +103,7 @@ sub gsldiff{
 
 
 
-#line 43 "gsl_diff.pd"
+#line 47 "lib/PDL/GSL/DIFF.pd"
 
 =head2 gsldiff
 
@@ -169,7 +169,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL differentiation routines were written by David Morrison.
 
 =cut
-#line 173 "DIFF.pm"
+#line 173 "lib/PDL/GSL/DIFF.pm"
 
 # Exit with OK status
 

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Unicode Locale Identifier - ~/lib/Locale/Unicode/Data.pm
-## Version v1.2.0
+## Version v1.3.1
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/06/15
-## Modified 2024/12/20
+## Modified 2025/01/04
 ## All rights reserved
 ## 
 ## 
@@ -39,7 +39,7 @@ BEGIN
     our $CLDR_VERSION = '45.0';
     our $DBH = {};
     our $STHS = {};
-    our $VERSION = 'v1.2.0';
+    our $VERSION = 'v1.3.1';
 };
 
 sub INIT
@@ -903,7 +903,8 @@ sub make_inheritance_tree
     my $self = shift( @_ );
     my $locale = $self->_locale_object( shift( @_ ) ) ||
         return( $self->pass_error );
-    $locale = $locale->clone;
+    $locale = $self->_locale_object( $locale->clone->base ) ||
+        return( $self->pass_error );
     my $tree = ["$locale"];
     my $ref;
     if( ( $ref = $self->locale( locale => $locale ) ) &&
@@ -912,6 +913,22 @@ sub make_inheritance_tree
         my $tree2 = $self->make_inheritance_tree( $ref->{parent} ) || return( $self->pass_error );
         push( @$tree, @$tree2 );
         return( $tree );
+    }
+
+    # The locale has something like en-Latn-US, we need to save in the tree en-US
+    if( $locale->territory && ( $locale->script || $locale->variant ) )
+    {
+        my $clone = $locale->clone;
+        $clone->script( undef );
+        $clone->variant( undef );
+        push( @$tree, "$clone" );
+        if( ( $ref = $self->locale( locale => $clone ) ) &&
+            $ref->{parent} )
+        {
+            my $tree2 = $self->make_inheritance_tree( $ref->{parent} ) || return( $self->pass_error );
+            push( @$tree, @$tree2 );
+            return( $tree );
+        }
     }
 
     # "The default search chain is slighly different for multiple variants. In that case, the inheritance chain covers all combinations of variants, with longest number of variants first, and otherwise in alphabetical order."
@@ -1371,6 +1388,1079 @@ sub person_name_defaults { return( shift->_fetch_all({
     table       => 'person_name_defaults',
 }, @_ ) ); }
 
+# NOTE: plural rules for 222 locales based on the Unicode CDR rules set out in supplemental/plurals.xml
+# This is for the method plural_count()
+my $plural_rules = 
+{
+    # 1: other
+    # bm bo dz hnj id ig ii in ja jbo jv jw kde kea km ko lkt lo ms my nqo osa root sah ses sg su th to tpi vi wo yo yue zh
+    bm => { other => sub { 1 } },
+    # The other locales in this group are aliased
+
+    # 2: one, other
+    # am as bn doi fa gu hi kn pcm zu
+    am => 
+    {
+        one   => sub { $_[0] == 0 || $_[0] == 1 },
+        other => sub { 1 },
+    },
+    # The other locales in this group are aliased
+
+    # ff hy kab
+    ff => 
+    {
+        one   => sub { $_[0] == 0 || $_[0] == 1 },
+        other => sub { 1 },
+    },
+    # The other locales in this group are aliased
+
+    # ast de en et fi fy gl ia io ji lij nl sc sv sw ur yi
+    ast => 
+    {
+        one   => sub { $_[0] == 1 && int( $_[0] ) == $_[0] },
+        other => sub { 1 },
+    },
+    # The other locales in this group are aliased
+
+    # si (Sinhala):
+    si => 
+    {
+        one   => sub 
+        { 
+            $_[0] == 0 || 
+            $_[0] == 1 || 
+            # For decimals where the integer part is 0
+            ( int( $_[0] ) == 0 && $_[0] != 0 )
+        },
+        other => sub { 1 },
+    },
+    # ak bho csw guw ln mg nso pa ti wa
+    ak => 
+    {
+        one   => sub { $_[0] == 0 || $_[0] == 1 },
+        other => sub { 1 },
+    },
+    # The other locales in this group are aliased
+
+    # tzm
+    tzm => 
+    {
+        one   => sub 
+        {
+            $_[0] == 0 ||
+            $_[0] == 1 ||
+            (
+                $_[0] >= 11 &&
+                $_[0] <= 99 &&
+                int( $_[0] ) == $_[0]
+            )
+        },
+        other => sub { 1 },
+    },
+    # af an asa az bal bem bez bg brx ce cgg chr ckb dv ee el eo eu fo fur gsw ha haw hu jgo jmc ka kaj kcg kk kkj kl ks ksb ku ky lb lg mas mgo ml mn mr nah nb nd ne nn nnh no nr ny nyn om or os pap ps rm rof rwk saq sd sdh seh sn so sq ss ssy st syr ta te teo tig tk tn tr ts ug uz ve vo vun wae xh xog
+    af => 
+    {
+        one   => sub { $_[0] == 1 && int( $_[0] ) == $_[0] },
+        other => sub { 1 },
+    },
+    # The other locales in this group are aliased
+
+    # da
+    da => 
+    {
+        one   => sub 
+        {
+            $_[0] == 1 ||
+            (
+                int( $_[0] ) != $_[0] &&
+                int( $_[0] ) == 0
+            )
+        },
+        other => sub { 1 },
+    },
+    # is: Icelandic
+    is => 
+    {
+        one   => sub 
+        {
+            int( $_[0] ) == $_[0] && 
+            (
+                (
+                    $_[0] % 10 == 1 &&
+                    $_[0] % 100 != 11
+                )
+                || 
+                (
+                    int( $_[0] * 10 ) % 10 == 1 &&
+                    int( $_[0] * 100 ) % 100 != 11
+                )
+            )
+            || 
+            # Handling decimals
+            (
+                int( $_[0] ) != $_[0] &&
+                $_[0] < 1.1
+            )
+        },
+        other => sub { 1 },
+    },
+    # mk: Macedonian
+    mk => 
+    {
+        one   => sub 
+        {
+            int( $_[0] ) == $_[0] && 
+            (
+                (
+                    $_[0] % 10 == 1 &&
+                    $_[0] % 100 != 11
+                )
+                ||
+                (
+                    int( $_[0] * 10 ) % 10 == 1 &&
+                    int( $_[0] * 100 ) % 100 != 11
+                )
+            )
+            || 
+            # Handling decimals
+            (
+                int( $_[0] ) != $_[0] &&
+                $_[0] < 1.1
+            )
+        },
+        other => sub { 1 },
+    },
+    # ceb fil tl
+    ceb => 
+    {
+        one   => sub 
+        {
+            int( $_[0] ) == $_[0] &&
+            (
+                (
+                    $_[0] == 1 ||
+                    $_[0] == 2 ||
+                    $_[0] == 3
+                )
+                ||
+                (
+                    $_[0] % 10 != 4 &&
+                    $_[0] % 10 != 6 &&
+                    $_[0] % 10 != 9
+                )
+            )
+            ||
+            (
+                int( $_[0] ) != $_[0] &&
+                int( $_[0] * 10 ) % 10 != 4 &&
+                int( $_[0] * 10 ) % 10 != 6 &&
+                int( $_[0] * 10 ) % 10 != 9
+            )
+        },
+        other => sub { 1 },
+    },
+    # The other locales in this group are aliased
+
+    # 3: zero, one, other
+    # lv (Latvian) prg
+    lv => 
+    {
+        zero  => sub
+        {
+            # Check for very small numbers, including 0 and close to zero
+            abs( $_[0] ) < 0.011  # Slightly larger threshold to catch 0.01 and 0.001
+            ||
+            # Include integers
+            (
+                int( $_[0] ) == $_[0] &&
+                (
+                    $_[0] % 10 == 0 || 
+                    (
+                        $_[0] % 100 >= 11 &&
+                        $_[0] % 100 <= 19
+                    )
+                )
+            )
+        },
+        one   => sub
+        { 
+            (
+                $_[0] % 10 == 1 &&
+                $_[0] % 100 != 11
+            )
+            ||
+            # Handle decimals for 'one', excluding numbers very close to zero
+            (
+                int( $_[0] ) != $_[0] &&
+                $_[0] > 0.01 &&  # Exclude 0.01 explicitly
+                $_[0] < 1.1
+            )
+        },
+        other => sub { 1 },
+    },
+    # The other locales in this group are aliased
+
+    # lag
+    lag => 
+    {
+        zero  => sub { $_[0] == 0 },
+        one   => sub 
+        {
+            $_[0] == 1 ||
+            (
+                int( $_[0] ) == 0 &&
+                int( $_[0] ) != $_[0]
+            )
+        },
+        other => sub { 1 },
+    },
+    # blo
+    blo => 
+    {
+        zero  => sub { $_[0] == 0 },
+        one   => sub { $_[0] == 1 },
+        other => sub { 1 },
+    },
+    # ksh
+    ksh => 
+    {
+        zero  => sub { $_[0] == 0 },
+        one   => sub { $_[0] == 1 },
+        other => sub { 1 },
+    },
+
+    # 3: one, two, other
+    # he iw
+    he => 
+    {
+        one   => sub 
+        {
+            (
+                $_[0] == 1 &&
+                int( $_[0] ) == $_[0]
+            )
+            ||
+            (
+                int( $_[0] ) != $_[0] &&
+                $_[0] > 0 &&
+                $_[0] < 2  # Include all non-integers between 0 and 2 for 'one'
+            )
+        },
+        two   => sub { $_[0] == 2 && int( $_[0] ) == $_[0] },
+        other => sub { 1 },
+    },
+    # The other locales in this group are aliased
+
+    # iu naq sat se sma smi smj smn sms
+    iu => 
+    {
+        one   => sub { $_[0] == 1 && int( $_[0] ) == $_[0] },
+        two   => sub { $_[0] == 2 && int( $_[0] ) == $_[0] },
+        other => sub { 1 },
+    },
+    # The other locales in this group are aliased
+
+    # 3: one, few, other
+    # shi
+    shi => 
+    {
+        one   => sub { $_[0] == 0 || $_[0] == 1 },
+        few   => sub 
+        {
+            $_[0] >= 2 &&
+            $_[0] <= 10 &&
+            int( $_[0] ) == $_[0]
+        },
+        other => sub { 1 },
+    },
+    # mo ro
+    mo => 
+    {
+        one   => sub { $_[0] == 1 && int( $_[0] ) == $_[0] },
+        few   => sub 
+        {
+            int( $_[0] ) != $_[0] ||
+            $_[0] == 0 ||
+            (
+                $_[0] % 100 >= 1 &&
+                $_[0] % 100 <= 19 &&
+                $_[0] != 1
+            )
+        },
+        other => sub { 1 },
+    },
+    # The other locales in this group are aliased
+
+    # bs (Bosnian) hr sh sr
+    bs => 
+    {
+        one   => sub
+        {
+            (
+                int( $_[0] ) == $_[0] && 
+                (
+                    (
+                        $_[0] % 10 == 1 &&
+                        $_[0] % 100 != 11
+                    )
+                    ||
+                    (
+                        int( $_[0] * 10 ) % 10 == 1 &&
+                        int( $_[0] * 100 ) % 100 != 11
+                    )
+                )
+            )
+            || 
+            # Handle decimals for 'one'
+            (
+                int( $_[0] ) != $_[0] &&
+                $_[0] < 1.1 &&
+                $_[0] > 0 &&
+                # Exclude numbers like 0.2 from being 'one'
+                $_[0] < 0.2
+            )
+        },
+        few   => sub
+        {
+            (
+                int( $_[0] ) == $_[0] && 
+                (
+                    (
+                        $_[0] % 10 >= 2 &&
+                        $_[0] % 10 <= 4 &&
+                        $_[0] % 100 < 10
+                    )
+                    ||
+                    (
+                        $_[0] % 10 >= 2 &&
+                        $_[0] % 10 <= 4 &&
+                        $_[0] % 100 >= 20
+                    )
+                    ||
+                    (
+                        int( $_[0] * 10 ) % 10 >= 2 &&
+                        int( $_[0] * 10 ) % 10 <= 4 &&
+                        int( $_[0] * 100 ) % 100 < 10
+                    )
+                    ||
+                    (
+                        int( $_[0] * 10 ) % 10 >= 2 &&
+                        int( $_[0] * 10 ) % 10 <= 4 &&
+                        int( $_[0] * 100 ) % 100 >= 20
+                    )
+                )
+            )
+            ||
+            # Handle decimals for 'few' including numbers like 0.2 but not 1.1
+            (
+                int( $_[0] ) != $_[0] &&
+                (
+                    $_[0] >= 0.2 && 
+                    $_[0] < 1.2 &&
+                    # Exclude 1.1 specifically
+                    $_[0] != 1.1
+                )
+            )
+        },
+        many  => sub
+        {
+            int( $_[0] ) == $_[0] && 
+            (
+                (
+                    $_[0] % 10 == 0 ||
+                    (
+                        $_[0] % 10 >= 5 &&
+                        $_[0] % 10 <= 9
+                    )
+                    ||
+                    (
+                        $_[0] % 100 >= 11 &&
+                        $_[0] % 100 <= 14
+                    )
+                )
+                ||
+                (
+                    int( $_[0] * 10 ) % 10 == 0 ||
+                    (
+                        int( $_[0] * 10 ) % 10 >= 5 &&
+                        int( $_[0] * 10 ) % 10 <= 9
+                    )
+                    ||
+                    (
+                        int( $_[0] * 100 ) % 100 >= 11 &&
+                        int( $_[0] * 100 ) % 100 <= 14
+                    )
+                )
+            )
+            &&
+            # Exclude specific cases that should be 'other'
+            !( $_[0] == 11 || $_[0] == 5 )
+            &&
+            # Exclude decimals that should be 'few'
+            !( $_[0] >= 1.1 && $_[0] < 1.5 )
+        },
+        other => sub { 1 },
+    },
+    # The other locales in this group are aliased
+
+    # 3: one, many, other
+    # fr
+    fr => 
+    {
+        one   => sub { $_[0] == 0 || $_[0] == 1 },
+        many  => sub 
+        {
+            (
+                int( $_[0] ) != $_[0] && 
+                (
+                    # Check if there's a fractional part but exclude exact half-integers like 1.5
+                    int( $_[0] * 1000000 ) != int( $_[0] ) * 1000000 &&
+                    # Explicitly exclude numbers like 1.5 but allow numbers like 1000000.5
+                    !($_[0] - int( $_[0]) == 0.5 && int( $_[0] ) % 1000000 != 0)
+                )
+            )
+            ||
+            (
+                int( $_[0] ) != 0 &&
+                (
+                    $_[0] % 1000000 == 0 ||
+                    # Handle cases like 1000000.5 where the integer part is divisible by 1,000,000
+                    (int( $_[0] ) % 1000000 == 0 && $_[0] != int( $_[0] ))
+                ) &&
+                int( $_[0] ) == $_[0] &&
+                $_[0] > 1
+            )
+        },
+        other => sub { 1 },
+    },
+    # pt
+    pt => 
+    {
+        one   => sub { $_[0] == 0 || $_[0] == 1 },
+        many  => sub 
+        {
+            int( $_[0] ) != $_[0] ||
+            (
+                int( $_[0] ) != 0 &&
+                $_[0] % 1000000 == 0 &&
+                int( $_[0] ) == $_[0]
+            )
+        },
+        other => sub { 1 },
+    },
+    # ca it lld pt_PT scn vec
+    ca => 
+    {
+        one   => sub { $_[0] == 1 && int( $_[0] ) == $_[0] },
+        many  => sub 
+        {
+            int( $_[0] ) != $_[0] ||
+            (
+                int( $_[0] ) != 0 &&
+                $_[0] % 1000000 == 0 &&
+                int( $_[0] ) == $_[0]
+            )
+        },
+        other => sub { 1 },
+    },
+    # The other locales in this group are aliased
+
+    # es
+    es => 
+    {
+        one   => sub { $_[0] == 1 && int( $_[0] ) == $_[0] },
+        many  => sub 
+        {
+            int( $_[0]) != $_[0] ||
+            (
+                int( $_[0] ) != 0 &&
+                $_[0] % 1000000 == 0 &&
+                int( $_[0] ) == $_[0]
+            )
+        },
+        other => sub { 1 },
+    },
+
+    # 4: one, two, few, other
+    # gd
+    gd => 
+    {
+        one   => sub { $_[0] == 1 || $_[0] == 11 },
+        two   => sub { $_[0] == 2 || $_[0] == 12 },
+        few   => sub 
+        {
+            $_[0] >= 3 &&
+            (
+                $_[0] <= 10 ||
+                $_[0] >= 13
+            )
+            && $_[0] <= 19
+        },
+        other => sub { 1 },
+    },
+    # sl
+    sl => 
+    {
+        one   => sub { int( $_[0]) == $_[0] && $_[0] % 100 == 1 },
+        two   => sub { int( $_[0]) == $_[0] && $_[0] % 100 == 2 },
+        few   => sub 
+        {
+            int( $_[0] ) == $_[0] &&
+            (
+                $_[0] % 100 == 3 ||
+                $_[0] % 100 == 4
+            )
+            ||
+            int( $_[0] ) != $_[0]
+        },
+        other => sub { 1 },
+    },
+    # dsb (Lower Sorbian) hsb
+    dsb => 
+    {
+        one   => sub 
+        {
+            (
+                int( $_[0] ) == $_[0] &&
+                (
+                    ( $_[0] % 100 == 1 )
+                    ||
+                    ( int( $_[0] * 10 ) % 100 == 1 )
+                )
+            )
+            ||
+            # Handle decimals for 'one'
+            (
+                int( $_[0] ) != $_[0] &&
+                $_[0] > 0 &&
+                $_[0] < 1.1
+            )
+        },
+        two   => sub 
+        {
+            int( $_[0] ) == $_[0] &&
+            (
+                ( $_[0] % 100 == 2 )
+                ||
+                ( int( $_[0] * 10 ) % 100 == 2 )
+            )
+        },
+        few   => sub 
+        {
+            int( $_[0] ) == $_[0] &&
+            (
+                ( $_[0] % 100 >= 3 && $_[0] % 100 <= 4 )
+                ||
+                (
+                    int( $_[0] * 10 ) % 100 >= 3 &&
+                    int( $_[0] * 10 ) % 100 <= 4
+                )
+            )
+        },
+        other => sub { 1 },
+    },
+    # The other locales in this group are aliased
+
+    # 4: one, few, many, other
+    # cs sk
+    cs => 
+    {
+        one   => sub { $_[0] == 1 && int( $_[0] ) == $_[0] },
+        few   => sub 
+        {
+            $_[0] >= 2 && 
+            $_[0] <= 4 && 
+            int( $_[0] ) == $_[0]
+        },
+        many  => sub { int( $_[0] ) != $_[0] },
+        other => sub { 1 },
+    },
+    # The other locales in this group are aliased
+
+    # pl (Polish)
+    pl => 
+    {
+        one   => sub { $_[0] == 1 && int( $_[0] ) == $_[0] },
+        few   => sub 
+        {
+            int( $_[0] ) == $_[0] &&
+            $_[0] % 10 >= 2 &&
+            $_[0] % 10 <= 4 &&
+            (
+                $_[0] % 100 < 10 ||
+                $_[0] % 100 >= 20
+            )
+        },
+        many  => sub 
+        {
+            int( $_[0] ) == $_[0] &&
+            (
+                $_[0] % 10 == 0 ||
+                (
+                    $_[0] % 10 >= 5 &&
+                    $_[0] % 10 <= 9
+                )
+                ||
+                (
+                    $_[0] % 100 >= 11 &&
+                    $_[0] % 100 <= 14
+                )
+            )
+            ||
+            int( $_[0] ) != $_[0]
+        },
+        other => sub { 1 },
+    },
+    # be (Belarusian)
+    be => 
+    {
+        one   => sub 
+        {
+            int( $_[0] ) == $_[0] &&
+            $_[0] % 10 == 1 &&
+            $_[0] % 100 != 11
+        },
+        few   => sub 
+        {
+            int( $_[0] ) == $_[0] &&
+            $_[0] % 10 >= 2 &&
+            $_[0] % 10 <= 4 &&
+            (
+                $_[0] % 100 < 10 ||
+                $_[0] % 100 >= 20
+            )
+        },
+        many  => sub 
+        {
+            int( $_[0] ) == $_[0] &&
+            (
+                (
+                    $_[0] % 10 == 0 ||
+                    $_[0] % 10 >= 5
+                )
+                ||
+                (
+                    $_[0] % 100 >= 11 &&
+                    $_[0] % 100 <= 14
+                )
+            )
+        },
+        other => sub { int( $_[0] ) != $_[0] },
+    },
+    # lt (Lithuanian)
+    lt => 
+    {
+        one   => sub 
+        {
+            int( $_[0] ) == $_[0] &&
+            $_[0] % 10 == 1 &&
+            !(
+                $_[0] % 100 >= 11 &&
+                $_[0] % 100 <= 19
+            )
+        },
+        few   => sub 
+        {
+            int( $_[0] ) == $_[0] &&
+            $_[0] % 10 >= 2 &&
+            $_[0] % 10 <= 9 &&
+            (
+                $_[0] % 100 < 10 ||
+                $_[0] % 100 >= 20
+            )
+        },
+        many  => sub { int( $_[0] ) != $_[0] },
+        other => sub 
+        {
+            int( $_[0] ) == $_[0] &&
+            (
+                $_[0] % 100 >= 11 &&
+                (
+                    $_[0] % 100 <= 19 ||
+                    $_[0] % 10 == 0
+                )
+            )
+        },
+    },
+    # ru (Russian) uk (Ukrainian)
+    ru => 
+    {
+        one   => sub 
+        {
+            int( $_[0] ) == $_[0] &&
+            $_[0] % 10 == 1 &&
+            $_[0] % 100 != 11
+        },
+        few   => sub 
+        {
+            int( $_[0] ) == $_[0] &&
+            $_[0] % 10 >= 2 &&
+            $_[0] % 10 <= 4 &&
+            (
+                $_[0] % 100 < 10 ||
+                $_[0] % 100 >= 20
+            )
+        },
+        many  => sub 
+        {
+            int( $_[0] ) == $_[0] &&
+            (
+                (
+                    $_[0] % 10 == 0 ||
+                    $_[0] % 10 >= 5
+                )
+                ||
+                (
+                    $_[0] % 100 >= 11 &&
+                    $_[0] % 100 <= 14
+                )
+            )
+        },
+        other => sub { int( $_[0] ) != $_[0] },
+    },
+    # The other locales in this group are aliased
+
+    # 5: one, two, few, many, other
+    # br
+    br => 
+    {
+        one   => sub 
+        {
+            int( $_[0] ) == $_[0] &&
+            $_[0] % 10 == 1 &&
+            $_[0] % 100 != 11 &&
+            $_[0] % 100 != 71 &&
+            $_[0] % 100 != 91
+        },
+        two   => sub 
+        {
+            int( $_[0] ) == $_[0] &&
+            $_[0] % 10 == 2 &&
+            $_[0] % 100 != 12 &&
+            $_[0] % 100 != 72 &&
+            $_[0] % 100 != 92
+        },
+        few   => sub 
+        {
+            int( $_[0] ) == $_[0] && 
+            (
+                (
+                    $_[0] % 10 >= 3 &&
+                    (
+                        $_[0] % 10 <= 4 ||
+                        $_[0] % 10 == 9
+                    )
+                )
+                &&
+                (
+                    $_[0] % 100 < 10 ||
+                    $_[0] % 100 > 19
+                )
+                &&
+                (
+                    $_[0] % 100 < 70 ||
+                    $_[0] % 100 > 79
+                )
+                &&
+                (
+                    $_[0] % 100 < 90 ||
+                    $_[0] % 100 > 99
+                )
+            )
+        },
+        many  => sub 
+        {
+            int( $_[0] ) == $_[0] &&
+            $_[0] != 0 &&
+            $_[0] % 1000000 == 0
+        },
+        other => sub { 1 },
+    },
+    # mt
+    mt => 
+    {
+        one   => sub { $_[0] == 1 && int( $_[0] ) == $_[0] },
+        two   => sub { $_[0] == 2 && int( $_[0] ) == $_[0] },
+        few   => sub 
+        {
+            $_[0] == 0 ||
+            (
+                int( $_[0] ) == $_[0] &&
+                $_[0] % 100 >= 3 &&
+                $_[0] % 100 <= 10
+            )
+        },
+        many  => sub 
+        {
+            int( $_[0] ) == $_[0] &&
+            $_[0] % 100 >= 11 &&
+            $_[0] % 100 <= 19
+        },
+        other => sub { 1 },
+    },
+    # ga
+    ga => 
+    {
+        one   => sub { $_[0] == 1 && int( $_[0] ) == $_[0] },
+        two   => sub { $_[0] == 2 && int( $_[0] ) == $_[0] },
+        few   => sub 
+        {
+            $_[0] >= 3 &&
+            $_[0] <= 6 &&
+            int( $_[0] ) == $_[0]
+        },
+        many  => sub 
+        {
+            $_[0] >= 7 &&
+            $_[0] <= 10 &&
+            int( $_[0] ) == $_[0]
+        },
+        other => sub { 1 },
+    },
+    # gv
+    gv => 
+    {
+        one   => sub { int( $_[0] ) == $_[0] && $_[0] % 10 == 1 },
+        two   => sub { int( $_[0] ) == $_[0] && $_[0] % 10 == 2 },
+        few   => sub 
+        {
+            int( $_[0] ) == $_[0] &&
+            (
+                $_[0] % 100 == 0 ||
+                $_[0] % 100 == 20 ||
+                $_[0] % 100 == 40 ||
+                $_[0] % 100 == 60 ||
+                $_[0] % 100 == 80
+            )
+        },
+        many  => sub { int( $_[0] ) != $_[0] },
+        other => sub { 1 },
+    },
+
+    # 6: zero, one, two, few, many, other
+    # kw (Cornish)
+    kw => 
+    {
+        zero  => sub { $_[0] == 0 },
+        one   => sub { $_[0] == 1 },
+        two   => sub 
+        {
+            int( $_[0] ) == $_[0] &&
+            (
+                # Directly include 2
+                $_[0] == 2
+                ||
+                # Existing conditions for other cases
+                (
+                    (
+                        $_[0] % 100 == 22 ||
+                        $_[0] % 100 == 42 ||
+                        $_[0] % 100 == 62 ||
+                        $_[0] % 100 == 82
+                    )
+                    ||
+                    (
+                        $_[0] % 1000 == 0 &&
+                        (
+                            $_[0] % 100000 >= 1000 &&
+                            $_[0] % 100000 <= 20000
+                        )
+                    )
+                    ||
+                    (
+                        $_[0] % 100000 == 40000 ||
+                        $_[0] % 100000 == 60000 ||
+                        $_[0] % 100000 == 80000
+                    )
+                    ||
+                    (
+                        $_[0] % 1000000 == 100000 &&
+                        $_[0] != 0
+                    )
+                )
+            )
+        },
+        few   => sub 
+        {
+            int( $_[0] ) == $_[0] &&
+            (
+                $_[0] % 100 == 3 ||
+                $_[0] % 100 == 23 ||
+                $_[0] % 100 == 43 ||
+                $_[0] % 100 == 63 ||
+                $_[0] % 100 == 83
+            )
+        },
+        many  => sub 
+        {
+            int( $_[0] ) == $_[0] &&
+            $_[0] != 1 &&
+            (
+                $_[0] % 100 == 1 ||
+                $_[0] % 100 == 21 ||
+                $_[0] % 100 == 41 ||
+                $_[0] % 100 == 61 ||
+                $_[0] % 100 == 81
+            )
+        },
+        other => sub { 1 },
+    },
+    # ar ars
+    ar => 
+    {
+        zero  => sub { $_[0] == 0 },
+        one   => sub { $_[0] == 1 },
+        two   => sub { $_[0] == 2 },
+        few   => sub 
+        {
+            int( $_[0] ) == $_[0] &&
+            $_[0] % 100 >= 3 &&
+            $_[0] % 100 <= 10
+        },
+        many  => sub 
+        {
+            int( $_[0] ) == $_[0] &&
+            $_[0] % 100 >= 11 &&
+            $_[0] % 100 <= 99
+        },
+        other => sub { 1 },
+    },
+    # The other locales in this group are aliased
+
+    # cy
+    cy => 
+    {
+        zero  => sub { $_[0] == 0 },
+        one   => sub { $_[0] == 1 },
+        two   => sub { $_[0] == 2 },
+        few   => sub { $_[0] == 3 },
+        many  => sub { $_[0] == 6 },
+        other => sub { 1 },
+    },
+};
+
+# Aliasing
+my $aliases =
+{
+    # 1: other
+    bm => [qw( bo dz hnj id ig ii in ja jbo jv jw kde kea km ko lkt lo ms my nqo osa root sah ses sg su th to tpi vi wo yo yue zh )],
+    # 2: one, other
+    am => [qw( as bn doi fa gu hi kn pcm zu )],
+    ff => [qw( hy kab )],
+    ast => [qw( de en et fi fy gl ia io ji lij nl sc sv sw ur yi )],
+    ak => [qw( bho csw guw ln mg nso pa ti wa )],
+    af => [qw( an asa az bal bem bez bg brx ce cgg chr ckb dv ee el eo eu fo fur gsw ha haw hu jgo jmc ka kaj kcg kk kkj kl ks ksb ku ky lb lg mas mgo ml mn mr nah nb nd ne nn nnh no nr ny nyn om or os pap ps rm rof rwk saq sd sdh seh sn so sq ss ssy st syr
+ta te teo tig tk tn tr ts ug uz ve vo vun wae xh xog )],
+    ceb => [qw( fil tl )],
+
+    # 3: zero,one,other
+    lv => [qw( prg )],
+
+    # 3: one,two,other
+    he => [qw( iw )],
+    iu => [qw( naq sat se sma smi smj smn sms )],
+
+    # 3: one,few,other
+    mo => [qw( ro )],
+    bs => [qw( hr sh sr )],
+
+    # 3: one,many,other
+    ca => [qw( it lld pt-PT scn vec )],
+
+    # 4: one,two,few,other
+    dsb => [qw( hsb )],
+
+    # 4: one,few,many,other
+    cs => [qw( sk )],
+    ru => [qw( uk )],
+
+    # 5: one,two,few,many,other
+    # No aliases in this group
+
+    # 6: zero,one,two,few,many,other
+    ar => [qw( ars )],
+};
+
+foreach my $locale ( keys( %$aliases ) )
+{
+    $plural_rules->{ $_ } = $plural_rules->{ $locale } for( @{$aliases->{ $locale }} );
+}
+
+# https://unicode.org/reports/tr35/tr35-numbers.html#Language_Plural_Rules
+# https://cldr.unicode.org/index/cldr-spec/plural-rules
+# https://unicode.org/reports/tr35/tr35-dates.html#Contents
+sub plural_count
+{
+    my $self = shift( @_ );
+    my $number = shift( @_ );
+    my $locale = shift( @_ );
+    if( !length( $number // '' ) )
+    {
+        return( $self->error( "No number was provided to get its plural count." ) );
+    }
+    elsif( !length( $locale ) )
+    {
+        return( $self->error( "No locale was provided to get its plural count." ) );
+    }
+    $locale = $self->_locale_object( $locale ) ||
+        return( $self->pass_error );
+
+    my $rules;
+    my $tree = $self->make_inheritance_tree( $locale->base ) ||
+        return( $self->pass_error );
+    foreach my $loc ( @$tree )
+    {
+        if( exists( $plural_rules->{ $loc } ) )
+        {
+            $rules = $plural_rules->{ $loc };
+            last;
+        }
+    }
+    # I could also write it as $rules //= { one => sub { $_[0] == 1 }, other => sub { 1 } };
+    # but I would lose point for readability
+    if( !defined( $rules ) )
+    {
+        $rules = { one => sub { $_[0] == 1 }, other => sub { 1 } };
+    }
+    foreach my $category ( qw( zero one two few many other ) )
+    {
+        if( exists( $rules->{ $category } ) && 
+            $rules->{ $category }->( $number ) )
+        {
+            return( $category );
+        }
+    }
+    # It should never reach here
+    return( 'other' );
+}
+
+sub plural_range { return( shift->_fetch_one({
+    id          => 'get_plural_range',
+    field       => 'result',
+    table       => 'plural_ranges',
+    requires    => [qw( locale start stop )],
+    default     => { alt => undef },
+}, @_ ) ); }
+
+sub plural_ranges { return( shift->_fetch_all({
+    id          => 'plural_ranges',
+    table       => 'plural_ranges',
+    by          => [qw( locale aliases start stop result )],
+}, @_ ) ); }
+
+sub plural_rule { return( shift->_fetch_one({
+    id          => 'get_plural_rule',
+    field       => 'rule',
+    table       => 'plural_rules',
+    requires    => [qw( locale count )],
+}, @_ ) ); }
+
+sub plural_rules { return( shift->_fetch_all({
+    id          => 'plural_rules',
+    table       => 'plural_rules',
+    by          => [qw( locale aliases count rule )],
+}, @_ ) ); }
+
 sub rbnf { return( shift->_fetch_one({
     id      => 'get_rbnf',
     field   => 'rule_id',
@@ -1623,6 +2713,20 @@ sub time_formats { return( shift->_fetch_all({
     table       => 'time_formats',
     by          => [qw( region territory locale )],
     has_array   => [qw( time_allowed )],
+}, @_ ) ); }
+
+sub time_relative_l10n { return( shift->_fetch_one({
+    id          => 'get_time_relative_l10n',
+    field       => 'relative',
+    table       => 'time_relative_l10n',
+    requires    => [qw( locale field_type field_length count )],
+    default     => { count => 'one' },
+}, @_ ) ); }
+
+sub time_relatives_l10n { return( shift->_fetch_all({
+    id          => 'time_relative_l10n',
+    table       => 'time_relative_l10n',
+    by          => [qw( locale field_type field_length count )],
 }, @_ ) ); }
 
 sub timezone { return( shift->_fetch_one({
@@ -1964,7 +3068,7 @@ sub _decode_sql_arrays
         die( "\$cldr->_decode_sql_arrays( \$array_ref_of_array_fields, \$data )" );
     }
 
-    my $j = JSON->new->relaxed->allow_tags;
+    my $j = JSON->new->relaxed;
     local $@;
     if( ref( $ref ) eq 'HASH' )
     {
@@ -3736,7 +4840,7 @@ Or, you could set the global variable C<$FATAL_EXCEPTIONS> instead:
 
 =head1 VERSION
 
-    v1.2.0
+    v1.3.1
 
 =head1 DESCRIPTION
 
@@ -8038,6 +9142,193 @@ This is the way the Unicode CLDR data is structured.
 
 Returns all person name defaults information from L<table person_name_defaults|/"Table person_name_defaults"> as an array reference of hash reference.
 
+=head2 plural_count
+
+    my $str = $cldr->plural_count( 3, 'ja-t-de-t0-und-x0-medical' );
+    # "other"
+    my $str = $cldr->plural_count( -2, 'he-IL-u-ca-hebrew-tz-jeruslm' );
+    # "two"
+    my $str = $cldr->plural_count( 3.5, 'ru' );
+    # "other"
+
+Provided with a number, and a C<locale>, and this will return a string representing the type of C<count> for the plural value, which may be one of C<zero>, C<one>, C<two>, C<few>, C<many> or C<other>
+
+This is used for example by L<DateTime::Format::RelativeTime> to query L<time_relative_l10n|/time_relative_l10n> to get the localised relative time value.
+
+If an error has occurred, this will set an L<error object|Locale::Unicode::Data::Exception>, and return C<undef> in scalar context, or an empty list in list context.
+
+See also L<plural_range|/plural_range> and L<plural_rule|/plural_rule>
+
+=head2 plural_range
+
+    my $ref = $cldr->plural_range(
+        locale => 'am',
+        start  => 'one',
+        stop   => 'other',
+    );
+    # Returns an hash reference like this:
+    {
+        plural_range_id => 1335,
+        locale          => 'am',
+        aliases         => [qw(as bn gu hi hy kn mr ps zu)],
+        start           => 'one',
+        stop            => 'other',
+        result          => 'other',
+    }
+
+Returns an hash reference of a C<plural_range> information from the table L<plural_ranges|/"Table plural_ranges"> for a given C<start> count, a C<stop> count and a C<locale> ID.
+
+For example:
+
+    my $num   = '2-7';
+    my $range = [split( /-/, $num, 2 )];
+    # Will get a string like: zero, one, two, few, many, or other
+    my $start = $cldr->plural_count( $range->[0], $locale );
+    my $end   = $cldr->plural_count( $range->[1], $locale );
+    my $ref   = $cldr->plural_range( locale => $locale, start => $start, stop => $end );
+    # zero, one, two, few, many, or other
+    my $count = $ref->{result};
+    my $def   = $cldr->time_relative_l10n(
+        locale => $locale,
+        # For example: second, minute, hour, day, week, month, quarter, or year
+        field_type => $unit,
+        # long, short or narrow
+        field_length => $this_style,
+        # -1 for past, or 1 for present or future
+        relative => substr( $num, 0, 1 ) eq '-' ? -1 : 1,
+        count => $count,
+    );
+    # Resulting in a pattern containing {0} that needs to be replaced with the range
+    $def->{pattern} =~ s/\{0\}/$num/;
+    say $def->{pattern};
+
+The meaning of the fields are as follows:
+
+=over 4
+
+=item * C<plural_range_id>
+
+A unique incremental value automatically generated by SQLite.
+
+=item * C<aliases>
+
+An array reference of C<locale> values.
+
+=item * C<start>
+
+A string representing the starting count value.
+
+=item * C<stop>
+
+A string representing the ending count value.
+
+=item * C<result>
+
+A string representing the resulting count value.
+
+=back
+
+=head2 plural_ranges
+
+    my $all = $cldr->plural_ranges;
+    my $all = $cldr->plural_ranges( locale => 'he' );
+    my $all = $cldr->plural_ranges( start => 'one' );
+    my $all = $cldr->plural_ranges( start => 'one', stop => 'many' );
+    my $all = $cldr->plural_ranges( result => 'other' );
+
+Returns all plural ranges information from L<table plural_ranges|/"Table plural_ranges"> as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+=over 4
+
+=item * C<locale>
+
+A C<locale> such as C<en> or C<ja-JP> as can be found in table L<locales|/"Table locales">
+
+=item * C<start>
+
+A string representing the starting count value.
+
+=item * C<stop>
+
+A string representing the ending count value.
+
+=item * C<result>
+
+A string representing the resulting count value.
+
+=back
+
+=head2 plural_rule
+
+    my $ref = $cldr->plural_rule(
+        locale => 'am',
+        count  => 'one',
+    );
+    # Returns an hash reference like this:
+    {
+        plural_rule_id => 1335,
+        locale          => 'am',
+        aliases         => [qw(as bn doi fa gu hi kn pcm zu)],
+        count           => 'one',
+        rule            => 'i = 0 or n = 1 @integer 0, 1 @decimal 0.0~1.0, 0.00~0.04',
+    }
+
+Returns an hash reference of a C<plural_rule> information from the table L<plural_rules|/"Table plural_rules"> for a given C<start> count, a C<stop> count and a C<locale> ID.
+
+The meaning of the fields are as follows:
+
+=over 4
+
+=item * C<plural_rule_id>
+
+A unique incremental value automatically generated by SQLite.
+
+=item * C<aliases>
+
+An array reference of C<locale> values.
+
+=item * C<count>
+
+A string representing the count value.
+
+=item * C<rule>
+
+A string representing the plural rule.
+
+=back
+
+See also the L<Unicode documentation|https://unicode.org/reports/tr35/tr35-numbers.html#Language_Plural_Rules>, and L<also here|https://cldr.unicode.org/index/cldr-spec/plural-rules>, and L<here|https://unicode.org/reports/tr35/tr35-dates.html#Contents>.
+
+=head2 plural_rules
+
+    my $all = $cldr->plural_rules;
+    my $all = $cldr->plural_rules( locale => 'he' );
+    my $all = $cldr->plural_rules( count => 'one' );
+
+Returns all plural ranges information from L<table plural_rules|/"Table plural_rules"> as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+=over 4
+
+=item * C<locale>
+
+A C<locale> such as C<en> or C<ja-JP> as can be found in table L<locales|/"Table locales">
+
+=item * C<aliases>
+
+An array reference of C<locale> values.
+
+=item * C<count>
+
+A string representing the count value.
+
+=back
+
+See also the L<Unicode documentation|https://unicode.org/reports/tr35/tr35-numbers.html#Language_Plural_Rules>, and L<also here|https://cldr.unicode.org/index/cldr-spec/plural-rules>, and L<here|https://unicode.org/reports/tr35/tr35-dates.html#Contents>.
+
 =head2 rbnf
 
     my $ref = $cldr->rbnf(
@@ -8760,6 +10051,113 @@ A C<territory> code as can be found in table L<territories|/"Table territories">
 =item * C<territory>
 
 A C<territory> code as can be found in table L<territories|/"Table territories">
+
+=back
+
+=head2 time_relative_l10n
+
+    my $ref = $cldr->time_relative_l10n(
+        locale          => 'en',
+        field_type      => 'day',
+        field_length    => 'short',
+        relative        => -1,
+        # optionally a 'count' value; defaults to 'one'
+        # count         => 'one'
+    );
+    # Returns an hash reference like this:
+    {
+        time_relative_id    => 2087,
+        locale              => 'en',
+        field_type          => 'day',
+        field_length        => 'short',
+        relative            => -1,
+        format_pattern      => '{0} day ago',
+        count               => 'one',
+    }
+
+Returns an hash reference of a field localised information from the table L<time_relative_l10n|/"Table time_relative_l10n"> for a given C<locale> ID, C<field_type>, C<field_length> and C<relative> value.
+
+The meaning of the fields are as follows:
+
+=over 4
+
+=item * C<time_relative_id>
+
+A unique incremental value automatically generated by SQLite.
+
+=item * C<locale>
+
+A C<locale>, such as C<en> or C<ja-JP> as can be found in table L<locales|/"Table locales">
+
+=item * C<field_type>
+
+A string representing a field type.
+
+Known values are: C<day>, C<fri>, C<hour>, C<minute>, C<mon>, C<month>, C<quarter>, C<sat>, C<second>, C<sun>, C<thu>, C<tue>, C<wed>, C<week>, C<year>
+
+=item * C<field_length>
+
+A string representing a field length.
+
+Known values are: C<narrow>, C<short>, C<standard>
+
+=item * C<relative>
+
+An integer representing the relative value of the field. For example, C<-1> being the past, and C<1> being the future.
+
+Posible values are: C<-1>, C<1>
+
+=item * C<format_pattern>
+
+A string containing the localised pattern based on the C<locale>
+
+=item * C<count>
+
+A string representing the count for the pattern. If none is provided, it defaults to C<one>
+
+Possible values may be: C<zero>, C<one>, C<two>, C<few>, C<many>, C<other>
+
+=back
+
+See the L<LDML specifications|https://unicode.org/reports/tr35/tr35-dates.html#Calendar_Fields> for more information.
+
+=head2 time_relatives_l10n
+
+    my $all = $cldr->time_relatives_l10n;
+    my $all = $cldr->time_relatives_l10n( locale => 'en' );
+    my $all = $cldr->time_relatives_l10n(
+        locale          => 'en',
+        field_type      => 'day',
+        field_length    => 'short',
+    );
+
+Returns all time relative localised information from L<table time_relative_l10n|/"Table time_relative_l10n"> as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+=over 4
+
+=item * C<locale>
+
+A C<locale>, such as C<en> or C<ja-JP> as can be found in table L<locales|/"Table locales">
+
+=item * C<field_type>
+
+A string representing a field type.
+
+Known values are: C<day>, C<fri>, C<hour>, C<minute>, C<mon>, C<month>, C<quarter>, C<sat>, C<second>, C<sun>, C<thu>, C<tue>, C<wed>, C<week>, C<year>
+
+=item * C<field_length>
+
+A string representing a field length.
+
+Known values are: C<narrow>, C<short>, C<standard>
+
+=item * C<count>
+
+A string representing the count for the pattern.
+
+Possible values may be: C<zero>, C<one>, C<two>, C<few>, C<many>, C<other>
 
 =back
 
@@ -13035,6 +14433,40 @@ A string field.
 =item * C<time_allowed>
 
 A string array field.
+
+=back
+
+=head2 Table time_relative_l10n
+
+=over 4
+
+=item * C<time_relative_id>
+
+An integer field.
+
+=item * C<locale>
+
+A string field.
+
+=item * C<field_type>
+
+A string field.
+
+=item * C<field_length>
+
+A string field.
+
+=item * C<relative>
+
+An integer field.
+
+=item * C<format_pattern>
+
+A string field.
+
+=item * C<count>
+
+A string field.
 
 =back
 

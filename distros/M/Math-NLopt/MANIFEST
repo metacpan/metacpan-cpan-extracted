@@ -12,6 +12,7 @@ dist.ini
 hgrc
 lib/Math/NLopt.pm
 lib/Math/NLopt.xs
+lib/Math/NLopt/Exception.pm
 lib/Math/const-c.inc
 lib/Math/const-xs.inc
 lib/Math/ppport.h
