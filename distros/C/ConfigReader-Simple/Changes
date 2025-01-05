@@ -1,5 +1,8 @@
 Revision history for Perl module ConfigReader::Simple
 
+1.297 2025-01-04T16:09:56Z
+	* refresh distro and move to BRIANDFOY
+
 1.296 2024-01-23T14:28:43Z
 	* refresh distro, update email address, update repo URL
 
@@ -63,7 +66,6 @@ Revision history for Perl module ConfigReader::Simple
 	* some fix ups for the POD docs
 	* fixed a problem in t/pod.t so the test finds the files
 	* if you already have this installed, you don't need this update
-
 
 1.15 - 2002-10-22
 	* new_multiple can keep going if it cannot read a file

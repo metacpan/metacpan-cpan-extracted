@@ -26,6 +26,7 @@ print "\n";
 # aeb-latn
 # af
 # agq
+# ak
 # aln
 # als
 # alt

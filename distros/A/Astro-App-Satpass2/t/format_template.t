@@ -207,14 +207,14 @@ EOD
 EOD
 
     is $ft->format(
-	template	=> 't/list.tt',
+	template	=> 't/list.tt2',
 	data		=> [ $sat ],
     ), <<'EOD', 'List (format from relative path)';
                     Name OID
                     None  88888
 EOD
 
-    my $abs = Cwd::abs_path( 't/list.tt' );
+    my $abs = Cwd::abs_path( 't/list.tt2' );
 
     my $rslt;
     eval {

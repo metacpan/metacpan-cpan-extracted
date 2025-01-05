@@ -28,10 +28,10 @@ my %WriteMakefileArgs = (
         'warnings::register'            => 0,
         # 2008-02-29
         'DateTime'                      => '0.42',
-        'DateTime::Locale::FromCLDR'    => 'v0.6.0',
-        'DateTime::Format::Unicode'     => 'v0.1.5',
-        'Locale::Intl'                  => 'v0.1.2',
-        'Locale::Unicode::Data'         => 'v1.3.0',
+        'DateTime::Locale::FromCLDR'    => 'v0.6.1',
+        'DateTime::Format::Unicode'     => 'v0.1.6',
+        'Locale::Intl'                  => 'v0.1.3',
+        'Locale::Unicode::Data'         => 'v1.3.2',
         'Scalar::Util'                  => 0,
         # Version compatible with perl v5.10.1
         'Want'                          => '0.17',

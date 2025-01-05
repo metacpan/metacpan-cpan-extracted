@@ -14,3 +14,7 @@ Revision history for VAPID
         - Update POD - create a Perl example for STEP 6 - Jan Kasprzak <YENYA>
 	- Update POD - state the purpose of manifest.json in STEP 4 - Jan Kasprzak <YENYA>
 	- rename the $header hash to $authorization_headers to be more descriptive - Jan Kasprzak <YENYA>
+
+1.02    2025/01/04
+	- Fix typo in pod
+

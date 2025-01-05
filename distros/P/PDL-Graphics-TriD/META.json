@@ -30,14 +30,14 @@
             "ExtUtils::MakeMaker" : "0",
             "OpenGL" : "0.70",
             "OpenGL::GLUT" : "0.72",
-            "PDL" : "2.094"
+            "PDL" : "2.096"
          }
       },
       "runtime" : {
          "requires" : {
             "OpenGL" : "0.70",
             "OpenGL::GLUT" : "0.72",
-            "PDL" : "2.094"
+            "PDL" : "2.096"
          }
       },
       "test" : {
@@ -59,6 +59,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#pdl"
    },
-   "version" : "2.097",
+   "version" : "2.098",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

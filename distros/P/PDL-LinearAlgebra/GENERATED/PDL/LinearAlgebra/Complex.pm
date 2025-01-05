@@ -1,9 +1,9 @@
 #
-# GENERATED WITH PDL::PP from complex.pd! Don't modify!
+# GENERATED WITH PDL::PP from lib/PDL/LinearAlgebra/Complex.pd! Don't modify!
 #
 package PDL::LinearAlgebra::Complex;
 
-our @EXPORT_OK = qw(__Ncgtsv cgtsv __Ncgesvd cgesvd __Ncgesdd cgesdd __Ncggsvd cggsvd __Ncgeev cgeev __Ncgeevx cgeevx __Ncggev cggev __Ncggevx cggevx __Ncgees cgees __Ncgeesx cgeesx __Ncgges cgges __Ncggesx cggesx __Ncheev cheev __Ncheevd cheevd __Ncheevx cheevx __Ncheevr cheevr __Nchegv chegv __Nchegvd chegvd __Nchegvx chegvx __Ncgesv cgesv __Ncgesvx cgesvx __Ncsysv csysv __Ncsysvx csysvx __Nchesv chesv __Nchesvx chesvx __Ncposv cposv __Ncposvx cposvx __Ncgels cgels __Ncgelsy cgelsy __Ncgelss cgelss __Ncgelsd cgelsd __Ncgglse cgglse __Ncggglm cggglm __Ncgetrf cgetrf __Ncgetf2 cgetf2 __Ncsytrf csytrf __Ncsytf2 csytf2 __Ncchetrf cchetrf __Nchetf2 chetf2 __Ncpotrf cpotrf __Ncpotf2 cpotf2 __Ncgetri cgetri __Ncsytri csytri __Nchetri chetri __Ncpotri cpotri __Nctrtri ctrtri __Nctrti2 ctrti2 __Ncgetrs cgetrs __Ncsytrs csytrs __Nchetrs chetrs __Ncpotrs cpotrs __Nctrtrs ctrtrs __Nclatrs clatrs __Ncgecon cgecon __Ncsycon csycon __Nchecon checon __Ncpocon cpocon __Nctrcon ctrcon __Ncgeqp3 cgeqp3 __Ncgeqrf cgeqrf __Ncungqr cungqr __Ncunmqr cunmqr __Ncgelqf cgelqf __Ncunglq cunglq __Ncunmlq cunmlq __Ncgeqlf cgeqlf __Ncungql cungql __Ncunmql cunmql __Ncgerqf cgerqf __Ncungrq cungrq __Ncunmrq cunmrq __Nctzrzf ctzrzf __Ncunmrz cunmrz __Ncgehrd cgehrd __Ncunghr cunghr __Nchseqr chseqr __Nctrevc ctrevc __Nctgevc ctgevc __Ncgebal cgebal __Nclange clange __Nclansy clansy __Nclantr clantr __Ncgemm cgemm __Ncmmult cmmult __Nccrossprod ccrossprod __Ncsyrk csyrk __Ncdot cdot __Ncdotc cdotc __Ncaxpy caxpy __Ncnrm2 cnrm2 __Ncasum casum __Ncscal cscal __Ncsscal csscal __Ncrotg crotg __Nclacpy clacpy __Nclaswp claswp __Nccharpol ccharpol );
+our @EXPORT_OK = qw(cgtsv cgesvd cgesdd cggsvd cgeev cgeevx cggev cggevx cgees cgeesx cgges cggesx cheev cheevd cheevx cheevr chegv chegvd chegvx cgesv cgesvx csysv csysvx chesv chesvx cposv cposvx cgels cgelsy cgelss cgelsd cgglse cggglm cgetrf cgetf2 csytrf csytf2 cchetrf chetf2 cpotrf cpotf2 cgetri csytri chetri cpotri ctrtri ctrti2 cgetrs csytrs chetrs cpotrs ctrtrs clatrs cgecon csycon checon cpocon ctrcon cgeqp3 cgeqrf cungqr cunmqr cgelqf cunglq cunmlq cgeqlf cungql cunmql cgerqf cungrq cunmrq ctzrzf cunmrz cgehrd cunghr chseqr ctrevc ctgevc cgebal clange clansy clantr cgemm cmmult ccrossprod csyrk cdot cdotc caxpy cnrm2 casum cscal csscal crotg clacpy claswp ccharpol );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
@@ -11,7 +11,7 @@ use PDL::Exporter;
 use DynaLoader;
 
 
-   our $VERSION = '0.14';
+   our $VERSION = '0.432';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::LinearAlgebra::Complex $VERSION;
@@ -22,7 +22,7 @@ use DynaLoader;
 
 
 
-#line 79 "complex.pd"
+#line 85 "lib/PDL/LinearAlgebra/Complex.pd"
 
 use strict;
 use PDL::LinearAlgebra::Real;
@@ -51,15 +51,17 @@ This module provides an interface to parts of the lapack library (complex number
 These routines accept either float or double ndarrays.
 
 =cut
-#line 55 "Complex.pm"
-
-*__Ncgtsv = \&PDL::__Ncgtsv;
+#line 55 "lib/PDL/LinearAlgebra/Complex.pm"
 
 
+=head1 FUNCTIONS
+
+=cut
 
 
 
-#line 22 "../pp_defc.pl"
+
+
 
 =head2 cgtsv
 
@@ -119,21 +121,22 @@ its second element.
  cgtsv($dl, $d, $du, $b, ($info=null));
  print "X is:\n$b" unless $info;
 
+=for bad
+
+cgtsv ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cgtsv {
-  goto &PDL::__Ncgtsv;
-}
+
+
+
 *cgtsv = \&PDL::cgtsv;
-#line 129 "Complex.pm"
-
-*__Ncgesvd = \&PDL::__Ncgesvd;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cgesvd
 
@@ -149,21 +152,22 @@ The SVD is written
 
  A = U * SIGMA * ConjugateTranspose(V)
 
+=for bad
+
+cgesvd ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cgesvd {
-  goto &PDL::__Ncgesvd;
-}
+
+
+
 *cgesvd = \&PDL::cgesvd;
-#line 159 "Complex.pm"
-
-*__Ncgesdd = \&PDL::__Ncgesdd;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cgesdd
 
@@ -179,21 +183,22 @@ The SVD is written
 
  A = U * SIGMA * ConjugateTranspose(V)
 
+=for bad
+
+cgesdd ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cgesdd {
-  goto &PDL::__Ncgesdd;
-}
+
+
+
 *cgesdd = \&PDL::cgesdd;
-#line 189 "Complex.pm"
-
-*__Ncggsvd = \&PDL::__Ncggsvd;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cggsvd
 
@@ -205,21 +210,22 @@ sub PDL::cgesdd {
 
 Complex version of L<PDL::LinearAlgebra::Real/ggsvd>
 
+=for bad
+
+cggsvd ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cggsvd {
-  goto &PDL::__Ncggsvd;
-}
+
+
+
 *cggsvd = \&PDL::cggsvd;
-#line 215 "Complex.pm"
-
-*__Ncgeev = \&PDL::__Ncgeev;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cgeev
 
@@ -231,21 +237,22 @@ sub PDL::cggsvd {
 
 Complex version of L<PDL::LinearAlgebra::Real/geev>
 
+=for bad
+
+cgeev ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cgeev {
-  goto &PDL::__Ncgeev;
-}
+
+
+
 *cgeev = \&PDL::cgeev;
-#line 241 "Complex.pm"
-
-*__Ncgeevx = \&PDL::__Ncgeevx;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cgeevx
 
@@ -257,21 +264,22 @@ sub PDL::cgeev {
 
 Complex version of L<PDL::LinearAlgebra::Real/geevx>
 
+=for bad
+
+cgeevx ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cgeevx {
-  goto &PDL::__Ncgeevx;
-}
+
+
+
 *cgeevx = \&PDL::cgeevx;
-#line 267 "Complex.pm"
-
-*__Ncggev = \&PDL::__Ncggev;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cggev
 
@@ -283,21 +291,22 @@ sub PDL::cgeevx {
 
 Complex version of L<PDL::LinearAlgebra::Real/ggev>
 
+=for bad
+
+cggev ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cggev {
-  goto &PDL::__Ncggev;
-}
+
+
+
 *cggev = \&PDL::cggev;
-#line 293 "Complex.pm"
-
-*__Ncggevx = \&PDL::__Ncggevx;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cggevx
 
@@ -309,27 +318,28 @@ sub PDL::cggev {
 
 Complex version of L<PDL::LinearAlgebra::Real/ggevx>
 
+=for bad
+
+cggevx ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cggevx {
-  goto &PDL::__Ncggevx;
-}
+
+
+
 *cggevx = \&PDL::cggevx;
-#line 319 "Complex.pm"
-
-*__Ncgees = \&PDL::__Ncgees;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cgees
 
 =for sig
 
-  Signature: (complex [io]A(n,n);  int jobvs(); int sort();complex  [o]w(n);complex  [o]vs(p,p); int [o]sdim(); int [o]info(); [t]rwork(n); int [t]bwork(bworkn);SV* select_func)
+  Signature: (complex [io]A(n,n);  int jobvs(); int sort();complex  [o]w(n);complex  [o]vs(p,p); int [o]sdim(); int [o]info(); [t]rwork(n); int [t]bwork(bworkn); SV* select_func)
 
 =for ref
 
@@ -347,27 +357,28 @@ Complex version of L<PDL::LinearAlgebra::Real/gees>
             (especially if the eigenvalue is ill-conditioned); in this
             case info is set to N+2.
 
+=for bad
+
+cgees ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cgees {
-  goto &PDL::__Ncgees;
-}
+
+
+
 *cgees = \&PDL::cgees;
-#line 357 "Complex.pm"
-
-*__Ncgeesx = \&PDL::__Ncgeesx;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cgeesx
 
 =for sig
 
-  Signature: (complex [io]A(n,n);  int jobvs(); int sort(); int sense();complex  [o]w(n);complex [o]vs(p,p); int [o]sdim(); [o]rconde();[o]rcondv(); int [o]info(); [t]rwork(n); int [t]bwork(bworkn);SV* select_func)
+  Signature: (complex [io]A(n,n);  int jobvs(); int sort(); int sense();complex  [o]w(n);complex [o]vs(p,p); int [o]sdim(); [o]rconde();[o]rcondv(); int [o]info(); [t]rwork(n); int [t]bwork(bworkn); SV* select_func)
 
 =for ref
 
@@ -385,27 +396,28 @@ Complex version of L<PDL::LinearAlgebra::Real/geesx>
             (especially if the eigenvalue is ill-conditioned); in this
             case info is set to N+2.
 
+=for bad
+
+cgeesx ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cgeesx {
-  goto &PDL::__Ncgeesx;
-}
+
+
+
 *cgeesx = \&PDL::cgeesx;
-#line 395 "Complex.pm"
-
-*__Ncgges = \&PDL::__Ncgges;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cgges
 
 =for sig
 
-  Signature: (complex [io]A(n,n); int jobvsl();int jobvsr();int sort();complex [io]B(n,n);complex [o]alpha(n);complex [o]beta(n);complex [o]VSL(m,m);complex [o]VSR(p,p);int [o]sdim();int [o]info(); [t]rwork(rworkn=CALC(8*$SIZE(n))); int [t]bwork(bworkn);SV* select_func)
+  Signature: (complex [io]A(n,n); int jobvsl();int jobvsr();int sort();complex [io]B(n,n);complex [o]alpha(n);complex [o]beta(n);complex [o]VSL(m,m);complex [o]VSR(p,p);int [o]sdim();int [o]info(); [t]rwork(rworkn=CALC(8*$SIZE(n))); int [t]bwork(bworkn); SV* select_func)
 
 =for ref
 
@@ -423,27 +435,28 @@ Complex version of L<PDL::LinearAlgebra::Real/ggees>
             (especially if the eigenvalue is ill-conditioned); in this
             case info is set to N+2.
 
+=for bad
+
+cgges ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cgges {
-  goto &PDL::__Ncgges;
-}
+
+
+
 *cgges = \&PDL::cgges;
-#line 433 "Complex.pm"
-
-*__Ncggesx = \&PDL::__Ncggesx;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cggesx
 
 =for sig
 
-  Signature: (complex [io]A(n,n); int jobvsl();int jobvsr();int sort();int sense();complex [io]B(n,n);complex [o]alpha(n);complex [o]beta(n);complex [o]VSL(m,m);complex [o]VSR(p,p);int [o]sdim();[o]rconde(q=2);[o]rcondv(q=2);int [o]info(); [t]rwork(rworkn=CALC(8*$SIZE(n))); int [t]bwork(bworkn); int [t]iwork(iworkn=CALC($SIZE(n)+2));SV* select_func)
+  Signature: (complex [io]A(n,n); int jobvsl();int jobvsr();int sort();int sense();complex [io]B(n,n);complex [o]alpha(n);complex [o]beta(n);complex [o]VSL(m,m);complex [o]VSR(p,p);int [o]sdim();[o]rconde(q=2);[o]rcondv(q=2);int [o]info(); [t]rwork(rworkn=CALC(8*$SIZE(n))); int [t]bwork(bworkn); int [t]iwork(iworkn=CALC($SIZE(n)+2)); SV* select_func)
 
 =for ref
 
@@ -461,21 +474,22 @@ Complex version of L<PDL::LinearAlgebra::Real/ggeesx>
             (especially if the eigenvalue is ill-conditioned); in this
             case info is set to N+3.
 
+=for bad
+
+cggesx ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cggesx {
-  goto &PDL::__Ncggesx;
-}
+
+
+
 *cggesx = \&PDL::cggesx;
-#line 471 "Complex.pm"
-
-*__Ncheev = \&PDL::__Ncheev;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cheev
 
@@ -487,21 +501,22 @@ sub PDL::cggesx {
 
 Complex version of L<PDL::LinearAlgebra::Real/syev> for Hermitian matrix
 
+=for bad
+
+cheev ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cheev {
-  goto &PDL::__Ncheev;
-}
+
+
+
 *cheev = \&PDL::cheev;
-#line 497 "Complex.pm"
-
-*__Ncheevd = \&PDL::__Ncheevd;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cheevd
 
@@ -513,21 +528,22 @@ sub PDL::cheev {
 
 Complex version of L<PDL::LinearAlgebra::Real/syevd> for Hermitian matrix
 
+=for bad
+
+cheevd ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cheevd {
-  goto &PDL::__Ncheevd;
-}
+
+
+
 *cheevd = \&PDL::cheevd;
-#line 523 "Complex.pm"
-
-*__Ncheevx = \&PDL::__Ncheevx;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cheevx
 
@@ -539,21 +555,22 @@ sub PDL::cheevd {
 
 Complex version of L<PDL::LinearAlgebra::Real/syevx> for Hermitian matrix
 
+=for bad
+
+cheevx ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cheevx {
-  goto &PDL::__Ncheevx;
-}
+
+
+
 *cheevx = \&PDL::cheevx;
-#line 549 "Complex.pm"
-
-*__Ncheevr = \&PDL::__Ncheevr;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cheevr
 
@@ -565,21 +582,22 @@ sub PDL::cheevx {
 
 Complex version of L<PDL::LinearAlgebra::Real/syevr> for Hermitian matrix
 
+=for bad
+
+cheevr ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cheevr {
-  goto &PDL::__Ncheevr;
-}
+
+
+
 *cheevr = \&PDL::cheevr;
-#line 575 "Complex.pm"
-
-*__Nchegv = \&PDL::__Nchegv;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 chegv
 
@@ -591,21 +609,22 @@ sub PDL::cheevr {
 
 Complex version of L<PDL::LinearAlgebra::Real/sygv> for Hermitian matrix
 
+=for bad
+
+chegv ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::chegv {
-  goto &PDL::__Nchegv;
-}
+
+
+
 *chegv = \&PDL::chegv;
-#line 601 "Complex.pm"
-
-*__Nchegvd = \&PDL::__Nchegvd;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 chegvd
 
@@ -617,21 +636,22 @@ sub PDL::chegv {
 
 Complex version of L<PDL::LinearAlgebra::Real/sygvd> for Hermitian matrix
 
+=for bad
+
+chegvd ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::chegvd {
-  goto &PDL::__Nchegvd;
-}
+
+
+
 *chegvd = \&PDL::chegvd;
-#line 627 "Complex.pm"
-
-*__Nchegvx = \&PDL::__Nchegvx;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 chegvx
 
@@ -647,21 +667,22 @@ sub PDL::chegvd {
 
 Complex version of L<PDL::LinearAlgebra::Real/sygvx> for Hermitian matrix
 
+=for bad
+
+chegvx ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::chegvx {
-  goto &PDL::__Nchegvx;
-}
+
+
+
 *chegvx = \&PDL::chegvx;
-#line 657 "Complex.pm"
-
-*__Ncgesv = \&PDL::__Ncgesv;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cgesv
 
@@ -673,21 +694,22 @@ sub PDL::chegvx {
 
 Complex version of L<PDL::LinearAlgebra::Real/gesv>
 
+=for bad
+
+cgesv ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cgesv {
-  goto &PDL::__Ncgesv;
-}
+
+
+
 *cgesv = \&PDL::cgesv;
-#line 683 "Complex.pm"
-
-*__Ncgesvx = \&PDL::__Ncgesvx;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cgesvx
 
@@ -704,21 +726,22 @@ Complex version of L<PDL::LinearAlgebra::Real/gesvx>.
             = 1:  A' * X = B  (Transpose)
             = 2:  A**H * X = B  (Conjugate transpose)
 
+=for bad
+
+cgesvx ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cgesvx {
-  goto &PDL::__Ncgesvx;
-}
+
+
+
 *cgesvx = \&PDL::cgesvx;
-#line 714 "Complex.pm"
-
-*__Ncsysv = \&PDL::__Ncsysv;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 csysv
 
@@ -730,21 +753,22 @@ sub PDL::cgesvx {
 
 Complex version of L<PDL::LinearAlgebra::Real/sysv>
 
+=for bad
+
+csysv ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::csysv {
-  goto &PDL::__Ncsysv;
-}
+
+
+
 *csysv = \&PDL::csysv;
-#line 740 "Complex.pm"
-
-*__Ncsysvx = \&PDL::__Ncsysvx;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 csysvx
 
@@ -756,21 +780,22 @@ sub PDL::csysv {
 
 Complex version of L<PDL::LinearAlgebra::Real/sysvx>
 
+=for bad
+
+csysvx ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::csysvx {
-  goto &PDL::__Ncsysvx;
-}
+
+
+
 *csysvx = \&PDL::csysvx;
-#line 766 "Complex.pm"
-
-*__Nchesv = \&PDL::__Nchesv;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 chesv
 
@@ -782,21 +807,22 @@ sub PDL::csysvx {
 
 Complex version of L<PDL::LinearAlgebra::Real/sysv> for Hermitian matrix
 
+=for bad
+
+chesv ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::chesv {
-  goto &PDL::__Nchesv;
-}
+
+
+
 *chesv = \&PDL::chesv;
-#line 792 "Complex.pm"
-
-*__Nchesvx = \&PDL::__Nchesvx;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 chesvx
 
@@ -808,21 +834,22 @@ sub PDL::chesv {
 
 Complex version of L<PDL::LinearAlgebra::Real/sysvx> for Hermitian matrix
 
+=for bad
+
+chesvx ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::chesvx {
-  goto &PDL::__Nchesvx;
-}
+
+
+
 *chesvx = \&PDL::chesvx;
-#line 818 "Complex.pm"
-
-*__Ncposv = \&PDL::__Ncposv;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cposv
 
@@ -834,21 +861,22 @@ sub PDL::chesvx {
 
 Complex version of L<PDL::LinearAlgebra::Real/posv> for Hermitian positive definite matrix
 
+=for bad
+
+cposv ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cposv {
-  goto &PDL::__Ncposv;
-}
+
+
+
 *cposv = \&PDL::cposv;
-#line 844 "Complex.pm"
-
-*__Ncposvx = \&PDL::__Ncposvx;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cposvx
 
@@ -860,21 +888,22 @@ sub PDL::cposv {
 
 Complex version of L<PDL::LinearAlgebra::Real/posvx> for Hermitian positive definite matrix
 
+=for bad
+
+cposvx ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cposvx {
-  goto &PDL::__Ncposvx;
-}
+
+
+
 *cposvx = \&PDL::cposvx;
-#line 870 "Complex.pm"
-
-*__Ncgels = \&PDL::__Ncgels;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cgels
 
@@ -891,21 +920,22 @@ Complex version of L<PDL::LinearAlgebra::Real/gels>.
     trans:  = 0: the linear system involves A;
             = 1: the linear system involves A**H.
 
+=for bad
+
+cgels ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cgels {
-  goto &PDL::__Ncgels;
-}
+
+
+
 *cgels = \&PDL::cgels;
-#line 901 "Complex.pm"
-
-*__Ncgelsy = \&PDL::__Ncgelsy;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cgelsy
 
@@ -917,21 +947,22 @@ sub PDL::cgels {
 
 Complex version of L<PDL::LinearAlgebra::Real/gelsy>
 
+=for bad
+
+cgelsy ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cgelsy {
-  goto &PDL::__Ncgelsy;
-}
+
+
+
 *cgelsy = \&PDL::cgelsy;
-#line 927 "Complex.pm"
-
-*__Ncgelss = \&PDL::__Ncgelss;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cgelss
 
@@ -943,21 +974,22 @@ sub PDL::cgelsy {
 
 Complex version of L<PDL::LinearAlgebra::Real/gelss>
 
+=for bad
+
+cgelss ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cgelss {
-  goto &PDL::__Ncgelss;
-}
+
+
+
 *cgelss = \&PDL::cgelss;
-#line 953 "Complex.pm"
-
-*__Ncgelsd = \&PDL::__Ncgelsd;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cgelsd
 
@@ -969,21 +1001,22 @@ sub PDL::cgelss {
 
 Complex version of L<PDL::LinearAlgebra::Real/gelsd>
 
+=for bad
+
+cgelsd ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cgelsd {
-  goto &PDL::__Ncgelsd;
-}
+
+
+
 *cgelsd = \&PDL::cgelsd;
-#line 979 "Complex.pm"
-
-*__Ncgglse = \&PDL::__Ncgglse;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cgglse
 
@@ -995,21 +1028,22 @@ sub PDL::cgelsd {
 
 Complex version of L<PDL::LinearAlgebra::Real/gglse>
 
+=for bad
+
+cgglse ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cgglse {
-  goto &PDL::__Ncgglse;
-}
+
+
+
 *cgglse = \&PDL::cgglse;
-#line 1005 "Complex.pm"
-
-*__Ncggglm = \&PDL::__Ncggglm;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cggglm
 
@@ -1021,21 +1055,22 @@ sub PDL::cgglse {
 
 Complex version of L<PDL::LinearAlgebra::Real/ggglm>
 
+=for bad
+
+cggglm ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cggglm {
-  goto &PDL::__Ncggglm;
-}
+
+
+
 *cggglm = \&PDL::cggglm;
-#line 1031 "Complex.pm"
-
-*__Ncgetrf = \&PDL::__Ncgetrf;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cgetrf
 
@@ -1047,21 +1082,22 @@ sub PDL::cggglm {
 
 Complex version of L<PDL::LinearAlgebra::Real/getrf>
 
+=for bad
+
+cgetrf ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cgetrf {
-  goto &PDL::__Ncgetrf;
-}
+
+
+
 *cgetrf = \&PDL::cgetrf;
-#line 1057 "Complex.pm"
-
-*__Ncgetf2 = \&PDL::__Ncgetf2;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cgetf2
 
@@ -1073,21 +1109,22 @@ sub PDL::cgetrf {
 
 Complex version of L<PDL::LinearAlgebra::Real/getf2>
 
+=for bad
+
+cgetf2 ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cgetf2 {
-  goto &PDL::__Ncgetf2;
-}
+
+
+
 *cgetf2 = \&PDL::cgetf2;
-#line 1083 "Complex.pm"
-
-*__Ncsytrf = \&PDL::__Ncsytrf;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 csytrf
 
@@ -1099,21 +1136,22 @@ sub PDL::cgetf2 {
 
 Complex version of L<PDL::LinearAlgebra::Real/sytrf>
 
+=for bad
+
+csytrf ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::csytrf {
-  goto &PDL::__Ncsytrf;
-}
+
+
+
 *csytrf = \&PDL::csytrf;
-#line 1109 "Complex.pm"
-
-*__Ncsytf2 = \&PDL::__Ncsytf2;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 csytf2
 
@@ -1125,21 +1163,22 @@ sub PDL::csytrf {
 
 Complex version of L<PDL::LinearAlgebra::Real/sytf2>
 
+=for bad
+
+csytf2 ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::csytf2 {
-  goto &PDL::__Ncsytf2;
-}
+
+
+
 *csytf2 = \&PDL::csytf2;
-#line 1135 "Complex.pm"
-
-*__Ncchetrf = \&PDL::__Ncchetrf;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cchetrf
 
@@ -1151,21 +1190,22 @@ sub PDL::csytf2 {
 
 Complex version of L<PDL::LinearAlgebra::Real/sytrf> for Hermitian matrix
 
+=for bad
+
+cchetrf ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cchetrf {
-  goto &PDL::__Ncchetrf;
-}
+
+
+
 *cchetrf = \&PDL::cchetrf;
-#line 1161 "Complex.pm"
-
-*__Nchetf2 = \&PDL::__Nchetf2;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 chetf2
 
@@ -1177,21 +1217,22 @@ sub PDL::cchetrf {
 
 Complex version of L<PDL::LinearAlgebra::Real/sytf2> for Hermitian matrix
 
+=for bad
+
+chetf2 ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::chetf2 {
-  goto &PDL::__Nchetf2;
-}
+
+
+
 *chetf2 = \&PDL::chetf2;
-#line 1187 "Complex.pm"
-
-*__Ncpotrf = \&PDL::__Ncpotrf;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cpotrf
 
@@ -1203,21 +1244,22 @@ sub PDL::chetf2 {
 
 Complex version of L<PDL::LinearAlgebra::Real/potrf> for Hermitian positive definite matrix
 
+=for bad
+
+cpotrf ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cpotrf {
-  goto &PDL::__Ncpotrf;
-}
+
+
+
 *cpotrf = \&PDL::cpotrf;
-#line 1213 "Complex.pm"
-
-*__Ncpotf2 = \&PDL::__Ncpotf2;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cpotf2
 
@@ -1229,21 +1271,22 @@ sub PDL::cpotrf {
 
 Complex version of L<PDL::LinearAlgebra::Real/potf2> for Hermitian positive definite matrix
 
+=for bad
+
+cpotf2 ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cpotf2 {
-  goto &PDL::__Ncpotf2;
-}
+
+
+
 *cpotf2 = \&PDL::cpotf2;
-#line 1239 "Complex.pm"
-
-*__Ncgetri = \&PDL::__Ncgetri;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cgetri
 
@@ -1255,21 +1298,22 @@ sub PDL::cpotf2 {
 
 Complex version of L<PDL::LinearAlgebra::Real/getri>
 
+=for bad
+
+cgetri ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cgetri {
-  goto &PDL::__Ncgetri;
-}
+
+
+
 *cgetri = \&PDL::cgetri;
-#line 1265 "Complex.pm"
-
-*__Ncsytri = \&PDL::__Ncsytri;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 csytri
 
@@ -1281,21 +1325,22 @@ sub PDL::cgetri {
 
 Complex version of L<PDL::LinearAlgebra::Real/sytri>
 
+=for bad
+
+csytri ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::csytri {
-  goto &PDL::__Ncsytri;
-}
+
+
+
 *csytri = \&PDL::csytri;
-#line 1291 "Complex.pm"
-
-*__Nchetri = \&PDL::__Nchetri;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 chetri
 
@@ -1307,21 +1352,22 @@ sub PDL::csytri {
 
 Complex version of L<PDL::LinearAlgebra::Real/sytri> for Hermitian matrix
 
+=for bad
+
+chetri ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::chetri {
-  goto &PDL::__Nchetri;
-}
+
+
+
 *chetri = \&PDL::chetri;
-#line 1317 "Complex.pm"
-
-*__Ncpotri = \&PDL::__Ncpotri;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cpotri
 
@@ -1333,21 +1379,22 @@ sub PDL::chetri {
 
 Complex version of L<PDL::LinearAlgebra::Real/potri>
 
+=for bad
+
+cpotri ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cpotri {
-  goto &PDL::__Ncpotri;
-}
+
+
+
 *cpotri = \&PDL::cpotri;
-#line 1343 "Complex.pm"
-
-*__Nctrtri = \&PDL::__Nctrtri;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 ctrtri
 
@@ -1359,21 +1406,22 @@ sub PDL::cpotri {
 
 Complex version of L<PDL::LinearAlgebra::Real/trtri>
 
+=for bad
+
+ctrtri ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::ctrtri {
-  goto &PDL::__Nctrtri;
-}
+
+
+
 *ctrtri = \&PDL::ctrtri;
-#line 1369 "Complex.pm"
-
-*__Nctrti2 = \&PDL::__Nctrti2;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 ctrti2
 
@@ -1385,21 +1433,22 @@ sub PDL::ctrtri {
 
 Complex version of L<PDL::LinearAlgebra::Real/trti2>
 
+=for bad
+
+ctrti2 ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::ctrti2 {
-  goto &PDL::__Nctrti2;
-}
+
+
+
 *ctrti2 = \&PDL::ctrti2;
-#line 1395 "Complex.pm"
-
-*__Ncgetrs = \&PDL::__Ncgetrs;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cgetrs
 
@@ -1417,21 +1466,22 @@ Complex version of L<PDL::LinearAlgebra::Real/getrs>
 		 = 1:  Transpose;
 		 = 2:  Conjugate transpose;
 
+=for bad
+
+cgetrs ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cgetrs {
-  goto &PDL::__Ncgetrs;
-}
+
+
+
 *cgetrs = \&PDL::cgetrs;
-#line 1427 "Complex.pm"
-
-*__Ncsytrs = \&PDL::__Ncsytrs;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 csytrs
 
@@ -1443,21 +1493,22 @@ sub PDL::cgetrs {
 
 Complex version of L<PDL::LinearAlgebra::Real/sytrs>
 
+=for bad
+
+csytrs ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::csytrs {
-  goto &PDL::__Ncsytrs;
-}
+
+
+
 *csytrs = \&PDL::csytrs;
-#line 1453 "Complex.pm"
-
-*__Nchetrs = \&PDL::__Nchetrs;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 chetrs
 
@@ -1469,21 +1520,22 @@ sub PDL::csytrs {
 
 Complex version of L<PDL::LinearAlgebra::Real/sytrs> for Hermitian matrix
 
+=for bad
+
+chetrs ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::chetrs {
-  goto &PDL::__Nchetrs;
-}
+
+
+
 *chetrs = \&PDL::chetrs;
-#line 1479 "Complex.pm"
-
-*__Ncpotrs = \&PDL::__Ncpotrs;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cpotrs
 
@@ -1495,21 +1547,22 @@ sub PDL::chetrs {
 
 Complex version of L<PDL::LinearAlgebra::Real/potrs> for Hermitian positive definite matrix
 
+=for bad
+
+cpotrs ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cpotrs {
-  goto &PDL::__Ncpotrs;
-}
+
+
+
 *cpotrs = \&PDL::cpotrs;
-#line 1505 "Complex.pm"
-
-*__Nctrtrs = \&PDL::__Nctrtrs;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 ctrtrs
 
@@ -1527,21 +1580,22 @@ Complex version of L<PDL::LinearAlgebra::Real/trtrs>
 		 = 1:  Transpose;
 		 = 2:  Conjugate transpose;
 
+=for bad
+
+ctrtrs ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::ctrtrs {
-  goto &PDL::__Nctrtrs;
-}
+
+
+
 *ctrtrs = \&PDL::ctrtrs;
-#line 1537 "Complex.pm"
-
-*__Nclatrs = \&PDL::__Nclatrs;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 clatrs
 
@@ -1559,21 +1613,22 @@ Complex version of L<PDL::LinearAlgebra::Real/latrs>
 		 = 1:  Transpose;
 		 = 2:  Conjugate transpose;
 
+=for bad
+
+clatrs ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::clatrs {
-  goto &PDL::__Nclatrs;
-}
+
+
+
 *clatrs = \&PDL::clatrs;
-#line 1569 "Complex.pm"
-
-*__Ncgecon = \&PDL::__Ncgecon;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cgecon
 
@@ -1585,21 +1640,22 @@ sub PDL::clatrs {
 
 Complex version of L<PDL::LinearAlgebra::Real/gecon>
 
+=for bad
+
+cgecon ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cgecon {
-  goto &PDL::__Ncgecon;
-}
+
+
+
 *cgecon = \&PDL::cgecon;
-#line 1595 "Complex.pm"
-
-*__Ncsycon = \&PDL::__Ncsycon;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 csycon
 
@@ -1611,21 +1667,22 @@ sub PDL::cgecon {
 
 Complex version of L<PDL::LinearAlgebra::Real/sycon>
 
+=for bad
+
+csycon ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::csycon {
-  goto &PDL::__Ncsycon;
-}
+
+
+
 *csycon = \&PDL::csycon;
-#line 1621 "Complex.pm"
-
-*__Nchecon = \&PDL::__Nchecon;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 checon
 
@@ -1637,21 +1694,22 @@ sub PDL::csycon {
 
 Complex version of L<PDL::LinearAlgebra::Real/sycon> for Hermitian matrix
 
+=for bad
+
+checon ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::checon {
-  goto &PDL::__Nchecon;
-}
+
+
+
 *checon = \&PDL::checon;
-#line 1647 "Complex.pm"
-
-*__Ncpocon = \&PDL::__Ncpocon;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cpocon
 
@@ -1663,21 +1721,22 @@ sub PDL::checon {
 
 Complex version of L<PDL::LinearAlgebra::Real/pocon> for Hermitian positive definite matrix
 
+=for bad
+
+cpocon ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cpocon {
-  goto &PDL::__Ncpocon;
-}
+
+
+
 *cpocon = \&PDL::cpocon;
-#line 1673 "Complex.pm"
-
-*__Nctrcon = \&PDL::__Nctrcon;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 ctrcon
 
@@ -1689,21 +1748,22 @@ sub PDL::cpocon {
 
 Complex version of L<PDL::LinearAlgebra::Real/trcon>
 
+=for bad
+
+ctrcon ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::ctrcon {
-  goto &PDL::__Nctrcon;
-}
+
+
+
 *ctrcon = \&PDL::ctrcon;
-#line 1699 "Complex.pm"
-
-*__Ncgeqp3 = \&PDL::__Ncgeqp3;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cgeqp3
 
@@ -1715,21 +1775,22 @@ sub PDL::ctrcon {
 
 Complex version of L<PDL::LinearAlgebra::Real/geqp3>
 
+=for bad
+
+cgeqp3 ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cgeqp3 {
-  goto &PDL::__Ncgeqp3;
-}
+
+
+
 *cgeqp3 = \&PDL::cgeqp3;
-#line 1725 "Complex.pm"
-
-*__Ncgeqrf = \&PDL::__Ncgeqrf;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cgeqrf
 
@@ -1741,21 +1802,22 @@ sub PDL::cgeqp3 {
 
 Complex version of L<PDL::LinearAlgebra::Real/geqrf>
 
+=for bad
+
+cgeqrf ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cgeqrf {
-  goto &PDL::__Ncgeqrf;
-}
+
+
+
 *cgeqrf = \&PDL::cgeqrf;
-#line 1751 "Complex.pm"
-
-*__Ncungqr = \&PDL::__Ncungqr;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cungqr
 
@@ -1767,21 +1829,22 @@ sub PDL::cgeqrf {
 
 Complex version of L<PDL::LinearAlgebra::Real/orgqr>
 
+=for bad
+
+cungqr ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cungqr {
-  goto &PDL::__Ncungqr;
-}
+
+
+
 *cungqr = \&PDL::cungqr;
-#line 1777 "Complex.pm"
-
-*__Ncunmqr = \&PDL::__Ncunmqr;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cunmqr
 
@@ -1793,21 +1856,22 @@ sub PDL::cungqr {
 
 Complex version of L<PDL::LinearAlgebra::Real/ormqr>. Here trans = 1 means conjugate transpose.
 
+=for bad
+
+cunmqr ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cunmqr {
-  goto &PDL::__Ncunmqr;
-}
+
+
+
 *cunmqr = \&PDL::cunmqr;
-#line 1803 "Complex.pm"
-
-*__Ncgelqf = \&PDL::__Ncgelqf;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cgelqf
 
@@ -1819,21 +1883,22 @@ sub PDL::cunmqr {
 
 Complex version of L<PDL::LinearAlgebra::Real/gelqf>
 
+=for bad
+
+cgelqf ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cgelqf {
-  goto &PDL::__Ncgelqf;
-}
+
+
+
 *cgelqf = \&PDL::cgelqf;
-#line 1829 "Complex.pm"
-
-*__Ncunglq = \&PDL::__Ncunglq;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cunglq
 
@@ -1845,21 +1910,22 @@ sub PDL::cgelqf {
 
 Complex version of L<PDL::LinearAlgebra::Real/orglq>
 
+=for bad
+
+cunglq ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cunglq {
-  goto &PDL::__Ncunglq;
-}
+
+
+
 *cunglq = \&PDL::cunglq;
-#line 1855 "Complex.pm"
-
-*__Ncunmlq = \&PDL::__Ncunmlq;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cunmlq
 
@@ -1871,21 +1937,22 @@ sub PDL::cunglq {
 
 Complex version of L<PDL::LinearAlgebra::Real/ormlq>. Here trans = 1 means conjugate transpose.
 
+=for bad
+
+cunmlq ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cunmlq {
-  goto &PDL::__Ncunmlq;
-}
+
+
+
 *cunmlq = \&PDL::cunmlq;
-#line 1881 "Complex.pm"
-
-*__Ncgeqlf = \&PDL::__Ncgeqlf;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cgeqlf
 
@@ -1897,21 +1964,22 @@ sub PDL::cunmlq {
 
 Complex version of L<PDL::LinearAlgebra::Real/geqlf>
 
+=for bad
+
+cgeqlf ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cgeqlf {
-  goto &PDL::__Ncgeqlf;
-}
+
+
+
 *cgeqlf = \&PDL::cgeqlf;
-#line 1907 "Complex.pm"
-
-*__Ncungql = \&PDL::__Ncungql;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cungql
 
@@ -1922,21 +1990,22 @@ sub PDL::cgeqlf {
 =for ref
 Complex version of L<PDL::LinearAlgebra::Real/orgql>.
 
+=for bad
+
+cungql ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cungql {
-  goto &PDL::__Ncungql;
-}
+
+
+
 *cungql = \&PDL::cungql;
-#line 1932 "Complex.pm"
-
-*__Ncunmql = \&PDL::__Ncunmql;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cunmql
 
@@ -1948,21 +2017,22 @@ sub PDL::cungql {
 
 Complex version of L<PDL::LinearAlgebra::Real/ormql>. Here trans = 1 means conjugate transpose.
 
+=for bad
+
+cunmql ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cunmql {
-  goto &PDL::__Ncunmql;
-}
+
+
+
 *cunmql = \&PDL::cunmql;
-#line 1958 "Complex.pm"
-
-*__Ncgerqf = \&PDL::__Ncgerqf;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cgerqf
 
@@ -1974,21 +2044,22 @@ sub PDL::cunmql {
 
 Complex version of L<PDL::LinearAlgebra::Real/gerqf>
 
+=for bad
+
+cgerqf ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cgerqf {
-  goto &PDL::__Ncgerqf;
-}
+
+
+
 *cgerqf = \&PDL::cgerqf;
-#line 1984 "Complex.pm"
-
-*__Ncungrq = \&PDL::__Ncungrq;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cungrq
 
@@ -2000,21 +2071,22 @@ sub PDL::cgerqf {
 
 Complex version of L<PDL::LinearAlgebra::Real/orgrq>.
 
+=for bad
+
+cungrq ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cungrq {
-  goto &PDL::__Ncungrq;
-}
+
+
+
 *cungrq = \&PDL::cungrq;
-#line 2010 "Complex.pm"
-
-*__Ncunmrq = \&PDL::__Ncunmrq;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cunmrq
 
@@ -2026,21 +2098,22 @@ sub PDL::cungrq {
 
 Complex version of L<PDL::LinearAlgebra::Real/ormrq>. Here trans = 1 means conjugate transpose.
 
+=for bad
+
+cunmrq ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cunmrq {
-  goto &PDL::__Ncunmrq;
-}
+
+
+
 *cunmrq = \&PDL::cunmrq;
-#line 2036 "Complex.pm"
-
-*__Nctzrzf = \&PDL::__Nctzrzf;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 ctzrzf
 
@@ -2052,21 +2125,22 @@ sub PDL::cunmrq {
 
 Complex version of L<PDL::LinearAlgebra::Real/tzrzf>
 
+=for bad
+
+ctzrzf ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::ctzrzf {
-  goto &PDL::__Nctzrzf;
-}
+
+
+
 *ctzrzf = \&PDL::ctzrzf;
-#line 2062 "Complex.pm"
-
-*__Ncunmrz = \&PDL::__Ncunmrz;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cunmrz
 
@@ -2078,21 +2152,22 @@ sub PDL::ctzrzf {
 
 Complex version of L<PDL::LinearAlgebra::Real/ormrz>. Here trans = 1 means conjugate transpose.
 
+=for bad
+
+cunmrz ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cunmrz {
-  goto &PDL::__Ncunmrz;
-}
+
+
+
 *cunmrz = \&PDL::cunmrz;
-#line 2088 "Complex.pm"
-
-*__Ncgehrd = \&PDL::__Ncgehrd;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cgehrd
 
@@ -2104,21 +2179,22 @@ sub PDL::cunmrz {
 
 Complex version of L<PDL::LinearAlgebra::Real/gehrd>
 
+=for bad
+
+cgehrd ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cgehrd {
-  goto &PDL::__Ncgehrd;
-}
+
+
+
 *cgehrd = \&PDL::cgehrd;
-#line 2114 "Complex.pm"
-
-*__Ncunghr = \&PDL::__Ncunghr;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cunghr
 
@@ -2130,21 +2206,22 @@ sub PDL::cgehrd {
 
 Complex version of L<PDL::LinearAlgebra::Real/orghr>
 
+=for bad
+
+cunghr ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cunghr {
-  goto &PDL::__Ncunghr;
-}
+
+
+
 *cunghr = \&PDL::cunghr;
-#line 2140 "Complex.pm"
-
-*__Nchseqr = \&PDL::__Nchseqr;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 chseqr
 
@@ -2156,21 +2233,22 @@ sub PDL::cunghr {
 
 Complex version of L<PDL::LinearAlgebra::Real/hseqr>
 
+=for bad
+
+chseqr ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::chseqr {
-  goto &PDL::__Nchseqr;
-}
+
+
+
 *chseqr = \&PDL::chseqr;
-#line 2166 "Complex.pm"
-
-*__Nctrevc = \&PDL::__Nctrevc;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 ctrevc
 
@@ -2182,21 +2260,22 @@ sub PDL::chseqr {
 
 Complex version of L<PDL::LinearAlgebra::Real/trevc>
 
+=for bad
+
+ctrevc ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::ctrevc {
-  goto &PDL::__Nctrevc;
-}
+
+
+
 *ctrevc = \&PDL::ctrevc;
-#line 2192 "Complex.pm"
-
-*__Nctgevc = \&PDL::__Nctgevc;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 ctgevc
 
@@ -2208,21 +2287,22 @@ sub PDL::ctrevc {
 
 Complex version of L<PDL::LinearAlgebra::Real/tgevc>
 
+=for bad
+
+ctgevc ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::ctgevc {
-  goto &PDL::__Nctgevc;
-}
+
+
+
 *ctgevc = \&PDL::ctgevc;
-#line 2218 "Complex.pm"
-
-*__Ncgebal = \&PDL::__Ncgebal;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cgebal
 
@@ -2234,21 +2314,22 @@ sub PDL::ctgevc {
 
 Complex version of L<PDL::LinearAlgebra::Real/gebal>
 
+=for bad
+
+cgebal ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cgebal {
-  goto &PDL::__Ncgebal;
-}
+
+
+
 *cgebal = \&PDL::cgebal;
-#line 2244 "Complex.pm"
-
-*__Nclange = \&PDL::__Nclange;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 clange
 
@@ -2260,21 +2341,22 @@ sub PDL::cgebal {
 
 Complex version of L<PDL::LinearAlgebra::Real/lange>
 
+=for bad
+
+clange ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::clange {
-  goto &PDL::__Nclange;
-}
+
+
+
 *clange = \&PDL::clange;
-#line 2270 "Complex.pm"
-
-*__Nclansy = \&PDL::__Nclansy;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 clansy
 
@@ -2286,21 +2368,22 @@ sub PDL::clange {
 
 Complex version of L<PDL::LinearAlgebra::Real/lansy>
 
+=for bad
+
+clansy ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::clansy {
-  goto &PDL::__Nclansy;
-}
+
+
+
 *clansy = \&PDL::clansy;
-#line 2296 "Complex.pm"
-
-*__Nclantr = \&PDL::__Nclantr;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 clantr
 
@@ -2312,21 +2395,22 @@ sub PDL::clansy {
 
 Complex version of L<PDL::LinearAlgebra::Real/lantr>
 
+=for bad
+
+clantr ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::clantr {
-  goto &PDL::__Nclantr;
-}
+
+
+
 *clantr = \&PDL::clantr;
-#line 2322 "Complex.pm"
-
-*__Ncgemm = \&PDL::__Ncgemm;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cgemm
 
@@ -2348,21 +2432,22 @@ Complex version of L<PDL::LinearAlgebra::Real/gemm>.
 		 = 1:  Transpose;
 		 = 2:  Conjugate transpose;
 
+=for bad
+
+cgemm ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cgemm {
-  goto &PDL::__Ncgemm;
-}
+
+
+
 *cgemm = \&PDL::cgemm;
-#line 2358 "Complex.pm"
-
-*__Ncmmult = \&PDL::__Ncmmult;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cmmult
 
@@ -2374,21 +2459,22 @@ sub PDL::cgemm {
 
 Complex version of L<PDL::LinearAlgebra::Real/mmult>
 
+=for bad
+
+cmmult ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cmmult {
-  goto &PDL::__Ncmmult;
-}
+
+
+
 *cmmult = \&PDL::cmmult;
-#line 2384 "Complex.pm"
-
-*__Nccrossprod = \&PDL::__Nccrossprod;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 ccrossprod
 
@@ -2400,21 +2486,22 @@ sub PDL::cmmult {
 
 Complex version of L<PDL::LinearAlgebra::Real/crossprod>
 
+=for bad
+
+ccrossprod ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::ccrossprod {
-  goto &PDL::__Nccrossprod;
-}
+
+
+
 *ccrossprod = \&PDL::ccrossprod;
-#line 2410 "Complex.pm"
-
-*__Ncsyrk = \&PDL::__Ncsyrk;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 csyrk
 
@@ -2426,21 +2513,22 @@ sub PDL::ccrossprod {
 
 Complex version of L<PDL::LinearAlgebra::Real/syrk>
 
+=for bad
+
+csyrk ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::csyrk {
-  goto &PDL::__Ncsyrk;
-}
+
+
+
 *csyrk = \&PDL::csyrk;
-#line 2436 "Complex.pm"
-
-*__Ncdot = \&PDL::__Ncdot;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cdot
 
@@ -2452,21 +2540,22 @@ sub PDL::csyrk {
 
 Complex version of L<PDL::LinearAlgebra::Real/dot>
 
+=for bad
+
+cdot ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cdot {
-  goto &PDL::__Ncdot;
-}
+
+
+
 *cdot = \&PDL::cdot;
-#line 2462 "Complex.pm"
-
-*__Ncdotc = \&PDL::__Ncdotc;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cdotc
 
@@ -2479,21 +2568,22 @@ sub PDL::cdot {
 Forms the dot product of two vectors, conjugating the first
 vector.
 
+=for bad
+
+cdotc ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cdotc {
-  goto &PDL::__Ncdotc;
-}
+
+
+
 *cdotc = \&PDL::cdotc;
-#line 2489 "Complex.pm"
-
-*__Ncaxpy = \&PDL::__Ncaxpy;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 caxpy
 
@@ -2505,21 +2595,22 @@ sub PDL::cdotc {
 
 Complex version of L<PDL::LinearAlgebra::Real/axpy>
 
+=for bad
+
+caxpy ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::caxpy {
-  goto &PDL::__Ncaxpy;
-}
+
+
+
 *caxpy = \&PDL::caxpy;
-#line 2515 "Complex.pm"
-
-*__Ncnrm2 = \&PDL::__Ncnrm2;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cnrm2
 
@@ -2531,21 +2622,22 @@ sub PDL::caxpy {
 
 Complex version of L<PDL::LinearAlgebra::Real/nrm2>
 
+=for bad
+
+cnrm2 ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cnrm2 {
-  goto &PDL::__Ncnrm2;
-}
+
+
+
 *cnrm2 = \&PDL::cnrm2;
-#line 2541 "Complex.pm"
-
-*__Ncasum = \&PDL::__Ncasum;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 casum
 
@@ -2557,21 +2649,22 @@ sub PDL::cnrm2 {
 
 Complex version of L<PDL::LinearAlgebra::Real/asum>
 
+=for bad
+
+casum ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::casum {
-  goto &PDL::__Ncasum;
-}
+
+
+
 *casum = \&PDL::casum;
-#line 2567 "Complex.pm"
-
-*__Ncscal = \&PDL::__Ncscal;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 cscal
 
@@ -2583,21 +2676,22 @@ sub PDL::casum {
 
 Complex version of L<PDL::LinearAlgebra::Real/scal>
 
+=for bad
+
+cscal ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cscal {
-  goto &PDL::__Ncscal;
-}
+
+
+
 *cscal = \&PDL::cscal;
-#line 2593 "Complex.pm"
-
-*__Ncsscal = \&PDL::__Ncsscal;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 csscal
 
@@ -2609,21 +2703,22 @@ sub PDL::cscal {
 
 Scales a complex vector by a real constant.
 
+=for bad
+
+csscal ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::csscal {
-  goto &PDL::__Ncsscal;
-}
+
+
+
 *csscal = \&PDL::csscal;
-#line 2619 "Complex.pm"
-
-*__Ncrotg = \&PDL::__Ncrotg;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 crotg
 
@@ -2635,21 +2730,22 @@ sub PDL::csscal {
 
 Complex version of L<PDL::LinearAlgebra::Real/rotg>
 
+=for bad
+
+crotg ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::crotg {
-  goto &PDL::__Ncrotg;
-}
+
+
+
 *crotg = \&PDL::crotg;
-#line 2645 "Complex.pm"
-
-*__Nclacpy = \&PDL::__Nclacpy;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 clacpy
 
@@ -2661,21 +2757,22 @@ sub PDL::crotg {
 
 Complex version of L<PDL::LinearAlgebra::Real/lacpy>
 
+=for bad
+
+clacpy ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::clacpy {
-  goto &PDL::__Nclacpy;
-}
+
+
+
 *clacpy = \&PDL::clacpy;
-#line 2671 "Complex.pm"
-
-*__Nclaswp = \&PDL::__Nclaswp;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 claswp
 
@@ -2687,21 +2784,22 @@ sub PDL::clacpy {
 
 Complex version of L<PDL::LinearAlgebra::Real/laswp>
 
+=for bad
+
+claswp ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::claswp {
-  goto &PDL::__Nclaswp;
-}
+
+
+
 *claswp = \&PDL::claswp;
-#line 2697 "Complex.pm"
-
-*__Nccharpol = \&PDL::__Nccharpol;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 ccharpol
 
@@ -2713,14 +2811,25 @@ sub PDL::claswp {
 
 Complex version of L<PDL::LinearAlgebra::Real/charpol>
 
+=for bad
+
+ccharpol does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::ccharpol {
-  goto &PDL::__Nccharpol;
-}
+
+
+
 *ccharpol = \&PDL::ccharpol;
 
-#line 4945 "complex.pd"
+
+
+
+
+
+
+#line 4951 "lib/PDL/LinearAlgebra/Complex.pd"
 
 =head1 AUTHOR
 
@@ -2731,7 +2840,7 @@ it under the terms of the Perl Artistic License as in the file Artistic_2
 in this distribution.
 
 =cut
-#line 2735 "Complex.pm"
+#line 2844 "lib/PDL/LinearAlgebra/Complex.pm"
 
 # Exit with OK status
 

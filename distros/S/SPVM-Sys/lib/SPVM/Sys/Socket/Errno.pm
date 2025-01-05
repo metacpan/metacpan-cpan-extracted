@@ -37,6 +37,30 @@ Returns C<strerror> related to sockets in a portable way given enough length $ma
 
 If $length is 0, an appropriate default value is set.
 
+=head2 is_read_again
+
+C<static method is_read_again : int ($errno : int);>
+
+If the error number $errno returned by L</"errno"> method is the return value of L</"EWOULDBLOCK"> or L</"EINTR">, returns 1, otherwise returns 0.
+
+=head2 is_write_again
+
+C<static method is_write_again : int ($errno : int);>
+
+If the error number $errno returned by L</"errno"> method is the return value of L</"EWOULDBLOCK"> or L</"EINTR">, returns 1, otherwise returns 0.
+
+=head2 is_connect_again
+
+C<static method is_connect_again : int ($errno : int);>
+    
+If the error number $errno returned by L</"errno"> method is the return value of L</"EWOULDBLOCK">, L</"EINPROGRESS"> or L</"EINTR">, returns 1, otherwise returns 0.
+
+=head2 is_accept_again
+
+C<static method is_accept_again : int ($errno : int);>
+    
+If the error number $errno returned by L</"errno"> method is the return value of L</"EWOULDBLOCK"> or L</"EINTR">, returns 1, otherwise returns 0.
+
 =head2 EINTR
 
 C<static method EINTR : int ();>

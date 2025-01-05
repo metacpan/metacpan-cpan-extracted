@@ -7,6 +7,7 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README.pod
 script/url
+SECURITY.md
 t/compile.t
 t/formatter.t
 t/load.t

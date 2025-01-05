@@ -12,7 +12,7 @@ my $Test = Test::Builder->new();
 @EXPORT = qw(uri_scheme_ok uri_host_ok uri_port_ok uri_fragment_ok
 	uri_path_ok);
 
-$VERSION = '1.085';
+$VERSION = '1.086';
 
 =encoding utf8
 
@@ -206,7 +206,7 @@ brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2004-2024, brian d foy <briandfoy@pobox.com>. All rights reserved.
+Copyright © 2004-2025, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License 2.0.

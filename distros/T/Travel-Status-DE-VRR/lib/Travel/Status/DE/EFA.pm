@@ -5,7 +5,7 @@ use warnings;
 use 5.010;
 use utf8;
 
-our $VERSION = '3.05';
+our $VERSION = '3.06';
 
 use Carp qw(confess cluck);
 use DateTime;
@@ -441,7 +441,8 @@ sub stop {
 		place     => $place,
 		full_name => $point->{name},
 		name      => $point->{name} =~ s{\Q$place\E,? ?}{}r,
-		id        => $point->{stateless},
+		id_num    => $point->{ref}{id},
+		id_code   => $point->{ref}{gid},
 	);
 
 	return $self->{stop};
@@ -468,7 +469,8 @@ sub stops {
 				place     => $stop->{place},
 				name      => $stop->{name},
 				full_name => $stop->{nameWithPlace},
-				id        => $stop->{stopID},
+				id_num    => $stop->{stopID},
+				id_code   => $stop->{gid},
 			)
 		);
 	}
@@ -557,7 +559,7 @@ sub results_coord {
 				full_name  => $stop->{properties}{STOP_NAME_WITH_PLACE},
 				distance_m => $stop->{properties}{distance},
 				name       => $stop->{name},
-				id         => $stop->{id},
+				id_code    => $stop->{id},
 			)
 		);
 	}
@@ -588,8 +590,8 @@ sub results_stopfinder {
 				place     => $stop->{ref}{place},
 				full_name => $stop->{name},
 				name      => $stop->{object},
-				id        => $stop->{stateless},
-				stop_id   => $stop->{ref}{gid},
+				id_num    => $stop->{ref}{id},
+				id_code   => $stop->{ref}{gid},
 			)
 		);
 	}
@@ -678,7 +680,7 @@ Travel::Status::DE::EFA - unofficial EFA departure monitor
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 
@@ -902,7 +904,7 @@ efa-m(1), Travel::Status::DE::EFA::Departure(3pm).
 
 =head1 AUTHOR
 
-Copyright (C) 2011-2024 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2011-2025 Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

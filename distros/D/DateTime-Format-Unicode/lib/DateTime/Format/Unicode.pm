@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## DateTime::Format::Unicode - ~/lib/DateTime/Format/Unicode.pm
-## Version v0.1.5
+## Version v0.1.6
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/07/21
-## Modified 2024/10/10
+## Modified 2025/01/05
 ## All rights reserved
 ## 
 ## 
@@ -26,7 +26,7 @@ BEGIN
     use POSIX ();
     use Scalar::Util;
     use Want;
-    our $VERSION = 'v0.1.5';
+    our $VERSION = 'v0.1.6';
 };
 
 use strict;
@@ -356,6 +356,69 @@ sub on_error
 sub pass_error
 {
     my $self = shift( @_ );
+    my $pack = ref( $self ) || $self;
+    my $opts = {};
+    my( $err, $class, $code );
+    no strict 'refs';
+    if( scalar( @_ ) )
+    {
+        # Either an hash defining a new error and this will be passed along to error(); or
+        # an hash with a single property: { class => 'Some::ExceptionClass' }
+        if( scalar( @_ ) == 1 && ref( $_[0] ) eq 'HASH' )
+        {
+            $opts = $_[0];
+        }
+        else
+        {
+            if( scalar( @_ ) > 1 && ref( $_[-1] ) eq 'HASH' )
+            {
+                $opts = pop( @_ );
+            }
+            $err = $_[0];
+        }
+    }
+    $err = $opts->{error} if( !defined( $err ) && CORE::exists( $opts->{error} ) && defined( $opts->{error} ) && CORE::length( $opts->{error} ) );
+    # We set $class only if the hash provided is a one-element hash and not an error-defining hash
+    $class = $opts->{class} if( CORE::exists( $opts->{class} ) && defined( $opts->{class} ) && CORE::length( $opts->{class} ) );
+    $code  = $opts->{code} if( CORE::exists( $opts->{code} ) && defined( $opts->{code} ) && CORE::length( $opts->{code} ) );
+    
+    # called with no argument, most likely from the same class to pass on an error 
+    # set up earlier by another method; or
+    # with an hash containing just one argument class => 'Some::ExceptionClass'
+    if( !defined( $err ) && ( !scalar( @_ ) || defined( $class ) ) )
+    {
+        # $error is a previous erro robject
+        my $error = ref( $self ) ? $self->{error} : length( ${ $pack . '::ERROR' } ) ? ${ $pack . '::ERROR' } : undef;
+        if( !defined( $error ) )
+        {
+            warn( "No error object provided and no previous error set either! It seems the previous method call returned a simple undef" );
+        }
+        else
+        {
+            $err = ( defined( $class ) ? bless( $error => $class ) : $error );
+            $err->code( $code ) if( defined( $code ) );
+        }
+    }
+    elsif( defined( $err ) && 
+           Scalar::Util::blessed( $err ) && 
+           ( scalar( @_ ) == 1 || 
+             ( scalar( @_ ) == 2 && defined( $class ) ) 
+           ) )
+    {
+        $self->{error} = ${ $pack . '::ERROR' } = ( defined( $class ) ? bless( $err => $class ) : $err );
+        $self->{error}->code( $code ) if( defined( $code ) && $self->{error}->can( 'code' ) );
+        
+        if( $self->{fatal} || ( defined( ${"${class}\::FATAL_EXCEPTIONS"} ) && ${"${class}\::FATAL_EXCEPTIONS"} ) )
+        {
+            die( $self->{error} );
+        }
+    }
+    # If the error provided is not an object, we call error to create one
+    else
+    {
+        return( $self->error( @_ ) );
+    }
+    
     if( Want::want( 'OBJECT' ) )
     {
         rreturn( DateTime::Format::Unicode::NullObject->new );
@@ -1976,7 +2039,7 @@ You can also override the C<locale>'s default number system, by another one, as 
 
 =head1 VERSION
 
-    v0.1.5
+    v0.1.6
 
 =head1 DESCRIPTION
 

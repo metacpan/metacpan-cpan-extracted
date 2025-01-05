@@ -722,7 +722,7 @@ Ascii::Text::Font::Small - Small Font
 
 =head1 VERSION
 
-Version 0.18
+Version 0.19
 
 =cut
 

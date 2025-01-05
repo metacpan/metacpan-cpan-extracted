@@ -17,6 +17,9 @@
 #14 git159.git159
 #15 git162.def
 #16 git162.git162
+#17 qwaf.def
+#18 qwaf.qwaf
+#19 btct.btct1
 
 # To locate test #13 you can search for its name or the string '#13'
 
@@ -34,8 +37,9 @@ BEGIN {
     # BEGIN SECTION 1: Parameter combinations #
     ###########################################
     $rparams = {
-        'altc1'  => "-atc -wtc=m",
+        'altc1'  => "-naltc -atc -wtc=m",
         'altc2'  => "-altc -atc -wtc=m",
+        'btct1'  => "-btct=1",
         'csc3'   => "-csc -csci=2 -ncscb",
         'def'    => "",
         'dltc1'  => "-dtc -wtc=0",
@@ -49,6 +53,11 @@ BEGIN {
 ----------
         'git159' => "-bl -nsbl",
         'git162' => "-nwrs=A",
+        'qwaf'   => <<'----------',
+# git164
+-qwaf
+-sfp
+----------
     };
 
     ############################
@@ -64,6 +73,22 @@ $self->make_grammar(
         version  => $self->version
     }
 );
+----------
+
+        'btct' => <<'----------',
+$w->bind(
+    '<Page_Down>' => xx,
+);
+
+$w->bind( '<Page_Down>' => xx,);
+
+$w->bind(
+    '<Page_Down>' => xx
+);
+
+$w->bind( '<Page_Down>' => xx);
+
+$lut = byte [ [ 0, 0, 0 ], [ 10, 1, 10 ], [ 2, 20, 20 ], [ 30, 30, 3 ], ];
 ----------
 
         'csc' => <<'----------',
@@ -142,6 +167,37 @@ match( $n : == ) {
 
         'logical_xor' => <<'----------',
 $x^^$y and say "One of x or y is true, but not both";
+----------
+
+        'qwaf' => <<'----------',
+use Digest::MD5 qw( md5_hex );
+
+@fields = qw( $st_dev	   $st_ino    $st_mode
+      $st_nlink   $st_uid    $st_gid
+      $st_rdev    $st_size
+      $st_atime   $st_mtime  $st_ctime
+      $st_blksize $st_blocks
+);
+
+@hdr_colors = qw(
+        CadetBlue1
+        MediumPurple1
+        turquoise1
+        PaleTurquoise1
+        SlateBlue1
+    );
+
+# has blank line, so keep line breaks
+@hdr_colors = qw(
+
+        CadetBlue1
+        MediumPurple1
+        turquoise1
+        PaleTurquoise1
+        SlateBlue1
+    );
+
+@list = qw( \ );
 ----------
     };
 
@@ -383,6 +439,92 @@ match( $n :== ) {
     default             { say "It's something else" }
 }
 #16...........
+        },
+
+        'qwaf.def' => {
+            source => "qwaf",
+            params => "def",
+            expect => <<'#17...........',
+use Digest::MD5 qw( md5_hex );
+
+@fields = qw( $st_dev	   $st_ino    $st_mode
+  $st_nlink   $st_uid    $st_gid
+  $st_rdev    $st_size
+  $st_atime   $st_mtime  $st_ctime
+  $st_blksize $st_blocks
+);
+
+@hdr_colors = qw(
+  CadetBlue1
+  MediumPurple1
+  turquoise1
+  PaleTurquoise1
+  SlateBlue1
+);
+
+# has blank line, so keep line breaks
+@hdr_colors = qw(
+
+  CadetBlue1
+  MediumPurple1
+  turquoise1
+  PaleTurquoise1
+  SlateBlue1
+);
+
+@list = qw( \ );
+#17...........
+        },
+
+        'qwaf.qwaf' => {
+            source => "qwaf",
+            params => "qwaf",
+            expect => <<'#18...........',
+use Digest::MD5 qw(md5_hex);
+
+@fields = qw(
+    $st_dev  $st_ino  $st_mode  $st_nlink $st_uid   $st_gid
+    $st_rdev $st_size $st_atime $st_mtime $st_ctime $st_blksize
+    $st_blocks
+);
+
+@hdr_colors =
+  qw( CadetBlue1 MediumPurple1 turquoise1 PaleTurquoise1 SlateBlue1 );
+
+# has blank line, so keep line breaks
+@hdr_colors = qw(
+
+    CadetBlue1
+    MediumPurple1
+    turquoise1
+    PaleTurquoise1
+    SlateBlue1
+);
+
+@list = qw( \ );
+#18...........
+        },
+
+        'btct.btct1' => {
+            source => "btct",
+            params => "btct1",
+            expect => <<'#19...........',
+$w->bind(
+    '<Page_Down>' => xx,
+);
+
+$w->bind(
+    '<Page_Down>' => xx,
+);
+
+$w->bind( '<Page_Down>' => xx );
+
+$w->bind( '<Page_Down>' => xx );
+
+$lut = byte [
+    [ 0, 0, 0 ], [ 10, 1, 10 ], [ 2, 20, 20 ], [ 30, 30, 3 ],
+];
+#19...........
         },
     };
 

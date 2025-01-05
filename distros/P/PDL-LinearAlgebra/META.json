@@ -29,12 +29,12 @@
          "requires" : {
             "Devel::CheckLib" : "0",
             "ExtUtils::F77" : "1.26",
-            "PDL" : "2.091"
+            "PDL" : "2.096"
          }
       },
       "runtime" : {
          "requires" : {
-            "PDL" : "2.091"
+            "PDL" : "2.096"
          }
       },
       "test" : {
@@ -46,16 +46,16 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/PDLPorters/pdl-linearalgebra/issues"
+         "web" : "https://github.com/PDLPorters/PDL-LinearAlgebra/issues"
       },
       "homepage" : "http://pdl.perl.org/",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/PDLPorters/pdl-linearalgebra.git",
-         "web" : "https://github.com/PDLPorters/pdl-linearalgebra"
-      }
+         "url" : "git://github.com/PDLPorters/PDL-LinearAlgebra.git",
+         "web" : "https://github.com/PDLPorters/PDL-LinearAlgebra"
+      },
+      "x_IRC" : "irc://irc.perl.org/#pdl"
    },
-   "version" : "0.431",
-   "x_IRC" : "irc://irc.perl.org/#pdl",
+   "version" : "0.432",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -6,7 +6,7 @@ use warnings;
 use Mo qw(build default is);
 use Mo::utils qw(check_array_object);
 
-our $VERSION = 0.36;
+our $VERSION = 0.37;
 
 has grammatical_features => (
 	default => [],
@@ -247,6 +247,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.36
+0.37
 
 =cut

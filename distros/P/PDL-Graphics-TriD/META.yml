@@ -9,7 +9,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   OpenGL: '0.70'
   OpenGL::GLUT: '0.72'
-  PDL: '2.094'
+  PDL: '2.096'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: unknown
@@ -24,11 +24,11 @@ no_index:
 requires:
   OpenGL: '0.70'
   OpenGL::GLUT: '0.72'
-  PDL: '2.094'
+  PDL: '2.096'
 resources:
   IRC: irc://irc.perl.org/#pdl
   bugtracker: https://github.com/PDLPorters/PDL-Graphics-TriD/issues
   homepage: http://pdl.perl.org/
   repository: git://github.com/PDLPorters/PDL-Graphics-TriD.git
-version: '2.097'
+version: '2.098'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

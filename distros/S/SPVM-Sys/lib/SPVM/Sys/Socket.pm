@@ -155,6 +155,8 @@ C<static method accept : int ($sockfd : int, $addr : L<Sys::Socket::Sockaddr|SPV
 
 Calls the L<accept|https://linux.die.net/man/2/accept> function and returns its return value.
 
+Exceptions:
+
 $addr must be defined. Otherwise an excetpion is thrown.
 
 If the accept function failed, an excetpion is thrownn with C<eval_error_id> set to the basic type ID of the L<Error::System|SPVM::Error::System> class.

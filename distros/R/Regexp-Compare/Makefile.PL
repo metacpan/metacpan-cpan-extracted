@@ -1,4 +1,4 @@
-require 5.034_000;
+require 5.036_000;
 
 use ExtUtils::MakeMaker;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
@@ -15,6 +15,6 @@ WriteMakefile(
     INC               => '-I.', # e.g., '-I. -I/usr/include/other'
     OBJECT            => 'Compare.o engine.o',
     'depend'	      => {
-			  'engine.o' => 'engine.c engine.h XPerlSpace.30 XPerlSpace.30a XPosixAlnum.32 XPosixAlnum.36 XPosixAlpha.28 XPosixDigit.22 XPosixWord.22',
+			  'engine.o' => 'engine.c engine.h XPerlSpace.30 XPerlSpace.30a XPosixAlnum.36 XPosixAlpha.28 XPosixDigit.22 XPosixWord.22',
 			 },
 );

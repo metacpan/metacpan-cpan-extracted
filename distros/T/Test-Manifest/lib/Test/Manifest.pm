@@ -12,7 +12,7 @@ use File::Spec::Functions qw(catfile);
 our @EXPORT    = qw(run_t_manifest);
 our @EXPORT_OK = qw(get_t_files make_test_manifest manifest_name);
 
-our $VERSION = '2.024';
+our $VERSION = '2.025';
 
 my %SeenInclude = ();
 my %SeenTest = ();
@@ -223,7 +223,7 @@ sub run_t_manifest {
 		if $Test::Harness::verbose;
 
 	my @files = get_t_files( $level );
-	print STDERR "Test::Manifest::test_harness found [@files]\n"
+	print STDERR "Test::Manifest: test harness found [@files]\n"
 		if $Test::Harness::verbose;
 
 	Test::Harness::runtests( @files );
@@ -445,7 +445,7 @@ brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2002-2024, brian d foy <briandfoy@pobox.com>. All rights reserved.
+Copyright © 2002-2025, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License 2.0.

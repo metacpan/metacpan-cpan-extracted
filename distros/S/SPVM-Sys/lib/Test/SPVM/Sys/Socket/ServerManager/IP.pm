@@ -54,10 +54,10 @@ sub start {
   }
 }
 
-my $localhost = "127.0.0.1";
-
 sub _wait_server_start {
   my ($self) = @_;
+  
+  my $host = $self->{host};
   
   my $port = $self->{port};
   
@@ -76,7 +76,7 @@ sub _wait_server_start {
     
     my $sock = IO::Socket::IP->new(
       Proto    => 'tcp',
-      PeerAddr => $localhost,
+      PeerAddr => $host,
       PeerPort => $port,
     );
     

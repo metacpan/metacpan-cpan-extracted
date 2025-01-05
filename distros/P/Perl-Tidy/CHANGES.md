@@ -1,5 +1,126 @@
 # Perltidy Change Log
 
+## 2025 01 05
+
+    - If a file consists only of comments, then the starting indentation will
+      be guessed from the indentation of the first comment. Previously it would
+      be guessed to be zero. Parameter --starting-indentation-level=n can be
+      used to specify an indentation and avoid a guess. This issue can
+      arise when formatting a block of comments from within an editor.
+
+    - Added missing 'use File::Temp' for -html option. This was causing the
+      message: "Undefined subroutine &File::Temp::tempfile called at ..."
+      See git #176.
+
+    - A new parameter --dump-unique-keys, or -duk, dumps a list of hash keys
+      which appear to be used just once, and do not appear among the quoted
+      strings in a file. For example:
+
+         perltidy -duk File.pm >output.txt
+
+      This can help locate misspelled hash keys.
+
+    - Line breaks at long chains of method calls now break at all calls
+      with args in parens, as in this example from git #171
+
+        # Old default
+        sub bla_p( $value = 42 ) {
+            return Mojo::Promise->resolve($value)->then( sub { shift() / 2 } )
+              ->then( sub { shift() + 6 } )->then( sub { shift() / 2 } )
+              ->catch( sub { warn shift } );
+        }
+
+        # New default
+        sub bla_p( $value = 42 ) {
+            return Mojo::Promise->resolve($value)
+              ->then( sub { shift() / 2 } )
+              ->then( sub { shift() + 6 } )
+              ->then( sub { shift() / 2 } )
+              ->catch( sub { warn shift } );
+        }
+
+    - Parameter --break-at-old-method-breakpoints, or -bom, has been
+    updated to insure that it only applies to lines beginning with
+    method calls, as intended.  Line breaks for all lines beginning with
+    '->', even non-method calls, can be retained by using
+    --keep-old-breakpoints_before='->'.
+
+    - Added parameter --multiple-token-tightness=s, or -mutt=s.
+    The default value --paren-tightness=1 adds space within the parens
+    if, and only if, the container holds multiple tokens.  Some perltidy
+    tokens may be rather long, and it can be preferable to also space some of
+    them as if they were multiple tokens.  This can be done with this parameter,
+    and it applies to parens as well as square brackets and curly braces.
+    For example, the default below has no space within the square brackets:
+
+        # perltidy
+        my $rlist = [qw( alpha beta gamma )];
+
+    Spaces can be obtained with:
+
+        # perltidy -mutt='q*'
+        my $rlist = [ qw( alpha beta gamma ) ];
+
+    The parameter -mutt='q*' means treat qw and similar quote operators as
+    multiple tokens.  The manual has details; git #120 has another example.
+
+    - Added parameter --indent-leading-semicolon, -ils; see git #171. When
+    this is negated, a line with a leading semicolon does not get the extra
+    leading continuation indentation spaces (defined with -ci=n).
+
+    - Space around here doc delimiters follow spacing controls better. For
+    example, a space is now added before the closing paren here:
+
+       OLD: (without the here doc):
+       push( @script, <<'EOT');
+
+       NEW:
+       push( @script, <<'EOT' );
+
+    Also, any spaces between the '<<' and here target are removed (git #174):
+
+       OLD:
+       push( @script, <<  'EOT');
+
+       NEW:
+       push( @script, <<'EOT' );
+
+    - Added parameter --break-at-trailing-comma-types=s, or -btct=s, where
+    s is a string which selects trailing commas.  For example, -btct='f(b'
+    places a line break after all bare trailing commas in function calls.
+    The manual has details.
+
+    - Fix git #165, strings beginning with v before => gave an incorrect error
+    message.
+
+    - The parameter --add-lone-trailing-commas, -altc, is now on by default.
+    This will simplify input for trailing comma operations. Use
+    --noadd-lone-trailing-commas, or -naltc to turn it off.
+
+    - More edge cases for adding and deleting trailing commas are now handled
+    (git #156).
+
+    - A problem has been fixed in which the addition or deletion of trailing
+    commas with the -atc or -dtc flags did not occur due to early convergence
+    when the -conv flag was set (git #143).
+
+    - Added parameter --qw-as-function, or -qwaf, discussed in git #164.
+    When this parameter is set, a qw list which begins with 'qw(' is
+    formatted as if it were a function call with call args being a list
+    of comma-separated quoted items. For example, given this input:
+
+    @fields = qw( $st_dev	   $st_ino    $st_mode $st_nlink   $st_uid
+      $st_gid $st_rdev    $st_size $st_atime   $st_mtime  $st_ctime
+      $st_blksize $st_blocks);
+
+    # perltidy -qwaf
+    @fields = qw(
+        $st_dev   $st_ino   $st_mode  $st_nlink
+        $st_uid   $st_gid   $st_rdev  $st_size
+        $st_atime $st_mtime $st_ctime $st_blksize
+        $st_blocks
+    );
+
 ## 2024 09 03
 
     - Add partial support for Syntax::Operator::In and Syntax::Keyword::Match
@@ -524,11 +645,11 @@
     - Some minor issues with continuation indentation have been fixed.
       Most scripts will remain unchanged.  The main change is that block
       comments which occur just before a closing brace, bracket or paren
-      now have an indentation which is independent of the existance of
+      now have an indentation which is independent of the existence of
       an optional comma or semicolon.  Previously, adding or deleting
       an optional trailing comma could cause their indentation to jump.
       Also, indentation of comments within ternary statements has been
-      improved. For additonal details see:
+      improved. For additional details see:
 
       https://github.com/perltidy/perltidy/blob/master/docs/ci_update.md
 
@@ -1088,7 +1209,7 @@
 
     - Added a new option '--code-skipping', requested in git #65, in which code
       between comment lines '#<<V' and '#>>V' is passed verbatim to the output
-      stream without error checking.  It is simmilar to --format-skipping
+      stream without error checking.  It is similar to --format-skipping
       but there is no error checking of the skipped code. This can be useful for
       skipping past code which employs an extended syntax.
 
@@ -1582,7 +1703,7 @@
       will exit with a non-zero exit flag if the assertion fails.
 
     - fixed issue RT#130297; the perltidy script now exits with a nonzero exit
-      status if it wrote to the standard error output. Prevously only fatal
+      status if it wrote to the standard error output. Previously only fatal
       run errors produced a non-zero exit flag. Now, even non-fatal messages
       requested with the -w flag will cause a non-zero exit flag.  The exit
       flag now has these values:
@@ -1616,7 +1737,7 @@
 
 ## 2019 06 01
 
-    - rt #128477: Prevent inconsistent owner/group and setuid/setgid bits. 
+    - rt #128477: Prevent inconsistent owner/group and setuid/setgid bits.
       In the -b (--backup-and-modify-in-place) mode, an attempt is made to set ownership
       of the output file equal to the input file, if they differ.
       In all cases, if the final output file ownership differs from input file, any setuid/setgid bits are cleared.
@@ -1911,7 +2032,7 @@
     - RT #123749, partial fix.  "Continuation indentation" is removed from lines 
       with leading closing parens which are part of a call chain. 
       For example, the call to pack() is is now outdented to the starting 
-      indentation in the following experession:  
+      indentation in the following expression:
 
           # OLD
           $mw->Button(
@@ -2636,7 +2757,7 @@
       -it>1.
 
     - Fixed bug where a line occasionally ended with an extra space. This reduces
-      rhe number of instances where a second iteration gives a result different
+      the number of instances where a second iteration gives a result different
       from the first. 
 
     - Updated documentation to note that the Tidy.pm module <stderr> parameter may
@@ -2710,7 +2831,7 @@
 
     - Allow configuration file to be 'perltidy.ini' for Windows systems.
       i.e. C:\Documents and Settings\User\perltidy.ini
-      and added documentation for setting configuation file under Windows in man
+      and added documentation for setting configuration file under Windows in man
       page.  Thanks to Stuart Clark.
 
     - Corrected problem of unwanted semicolons in hash ref within given/when code.
@@ -3353,7 +3474,7 @@
 
      Thanks to Mark Olesen for suggesting this.
 
-    -Improved alignement of '='s in certain cases.
+    -Improved alignment of '='s in certain cases.
      Thanks to Norbert Gruener for sending an example.
 
     -Outdent-long-comments (-olc) has been re-instated as a default, since
@@ -3621,7 +3742,7 @@
        );
 
     -Lists which do not format well in uniform columns are now better
-     identified and formated.
+     identified and formatted.
 
        OLD:
        return $c->create( 'polygon', $x, $y, $x + $ruler_info{'size'},
@@ -3673,7 +3794,7 @@
      to control what text is appended to 'else' and 'elsif' blocks.
      Default is to just add leading 'if' text to an 'else'.  See manual.
 
-    -The -csc option now labels 'else' blocks with additinal information
+    -The -csc option now labels 'else' blocks with additional information
      from the opening if statement and elsif statements, if space.
      Thanks to Wolfgang Weisselberg for suggesting this.
 
@@ -3782,7 +3903,7 @@
                      '92', '94', '96', '98', '100', '102', '104'
                      );
 
-    -Lists of complex items, such as matricies, are now detected
+    -Lists of complex items, such as matrices, are now detected
      and displayed with just one item per row:
 
        OLD:
@@ -3891,7 +4012,7 @@
        if ( ( $tmp >= 0x80_00_00 ) || ( $tmp < -0x80_00_00 ) ) { }
 
     -'**=' was incorrectly tokenized as '**' and '='.  This only
-        caused a problem with the -extrude opton.
+        caused a problem with the -extrude option.
 
     -Corrected a divide by zero when -extrude option is used
 

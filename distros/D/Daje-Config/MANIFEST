@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+README.md
+cpanfile
+lib/Daje/Config.pm
+minil.toml
+t/00_compile.t
+t/test_load.t
+META.json
+META.yml
+MANIFEST

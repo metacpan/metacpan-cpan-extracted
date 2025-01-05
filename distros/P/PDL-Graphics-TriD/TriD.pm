@@ -720,7 +720,7 @@ our @EXPORT_OK = qw/imag3d_ns imag3d line3d mesh3d lattice3d points3d
   twiddle3d grabpic3d tridsettings/;
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 our $verbose;
-our $VERSION = '2.097';
+our $VERSION = '2.098';
 
 use PDL::Graphics::TriD::Object;
 use PDL::Graphics::TriD::Window;
@@ -728,7 +728,7 @@ use PDL::Graphics::TriD::ViewPort;
 use PDL::Graphics::TriD::Graph;
 use PDL::Graphics::TriD::Quaternion;
 use PDL::Graphics::TriD::Objects;
-use PDL::Graphics::TriD::Rout;
+use PDL::ImageND;
 
 # Then, see which display method are we using:
 
@@ -805,7 +805,7 @@ sub realcoords {
 	    $c[$_] = $c[$_]*(PDL->ones($c[($_+1)%3]->dims));
 	  }
 	}
-	my $g = PDL::Graphics::TriD::Rout::combcoords(@c);
+	my $g = PDL::ImageND::combcoords(@c);
 	$g->dump if $PDL::Graphics::TriD::verbose;
 	return $g;
 }

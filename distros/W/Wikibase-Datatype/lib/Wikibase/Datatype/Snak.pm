@@ -35,7 +35,7 @@ Readonly::Array our @SNAK_TYPES => qw(
 	value
 );
 
-our $VERSION = 0.36;
+our $VERSION = 0.37;
 
 has datatype => (
 	is => 'ro',
@@ -298,6 +298,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.36
+0.37
 
 =cut

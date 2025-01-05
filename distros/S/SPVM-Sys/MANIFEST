@@ -274,8 +274,9 @@ t/Sys-Select.t
 t/Sys-Signal.t
 t/Sys-Signal_alarm.t
 t/Sys-Signal_ualarm.t
+t/Sys-Socket-Errno.t
+t/Sys-Socket-ipv6.t
 t/Sys-Socket.t
-t/Sys-Socket_Errno.t
 t/Sys-Time-Util.t
 t/Sys-Time.t
 t/Sys-User.t

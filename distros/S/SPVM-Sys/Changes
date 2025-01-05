@@ -1,3 +1,33 @@
+0.529001 2025-01-05
+  [Changes]
+    * Sys#rand method calls Fn#rand method.
+0.529 2025-01-05
+  [Requirement Changes]
+    * Require SPVM 0.990035.
+  [New Features]
+    * Add Sys#rand method.
+    * Add Sys#srand method.
+  [Changes]
+    * $mode argument of Sys#mkdir method is optional.
+    
+0.528 2024-10-17
+  [New Features]
+    * Add Sys::Socket::Errno#is_read_again method.
+    * Add Sys::Socket::Errno#is_write_again method.
+    * Add Sys::Socket::Errno#is_connect_again method.
+    * Add Sys::Socket::Errno#is_accept_again method.
+    
+  [Cleanup]
+    * Improve docs, argument names, variable names of Sys#accept method and Sys::Socket#accept method.
+    
+
+0.527 2024-10-11
+  [New Features]
+    * Add host option to Test::SPVM::Sys::Socket::ServerManager class.
+    * Add can_bind function to Test::SPVM::Sys::Socket::Util module.
+  [Test Improvement]
+    * Add IPv6 tests.
+  
 0.526001 2024-10-09
   [Changes]
     * Remove unused Sys.config

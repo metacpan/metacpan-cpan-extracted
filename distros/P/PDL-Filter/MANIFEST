@@ -1,0 +1,9 @@
+Changes
+Filter.pm
+Linear.pm
+LinPred.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

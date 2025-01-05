@@ -1,7 +1,7 @@
 [![Actions Status](https://github.com/janeskil1525/Daje-Workflow-Load/actions/workflows/test.yml/badge.svg)](https://github.com/janeskil1525/Daje-Workflow-Load/actions)
 # NAME
 
-Daje::Workflow::Loader - It's loader for Daje-Workflow JSON based workflows
+Daje::Workflow::Loader - Just loads Daje-Workflow JSON based workflows
 
 # SYNOPSIS
 
@@ -29,7 +29,7 @@ the Daje-Workflow engine
 
 # REQUIRES
 
-[Daje::Workflow::Loader::Load](https://metacpan.org/pod/Daje%3A%3AWorkflow%3A%3ALoader%3A%3ALoad) 
+[Daje::Config](https://metacpan.org/pod/Daje%3A%3AConfig) 
 
 [Mojo::Base](https://metacpan.org/pod/Mojo%3A%3ABase) 
 

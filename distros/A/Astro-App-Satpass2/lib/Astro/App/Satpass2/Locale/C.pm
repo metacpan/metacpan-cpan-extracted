@@ -11,7 +11,7 @@ use Astro::Coord::ECI::TLE 0.059 qw{ :constants };
 use Astro::App::Satpass2::Utils qw{ @CARP_NOT };
 use Scalar::Util ();
 
-our $VERSION = '0.054';
+our $VERSION = '0.055';
 
 my @event_names;
 $event_names[PASS_EVENT_NONE]		= '';
@@ -257,7 +257,7 @@ BEGIN:VALARM
 TRIGGER:PT0M
 ACTION:DISPLAY
 END:VALARM
-SUMMARY:[% first.name %]
+SUMMARY:[% first.name( width = '' ) %]
 DESCRIPTION:
     [%- FOREACH evt IN events %][% punct %]
 	[%- format_detail( 'event', evt ) %]
@@ -741,7 +741,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014-2024 by Thomas R. Wyant, III
+Copyright (C) 2014-2025 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

@@ -26,5 +26,5 @@ resources:
   bugtracker: https://github.com/briandfoy/test-uri/issues
   homepage: https://github.com/briandfoy/test-uri
   repository: https://github.com/briandfoy/test-uri
-version: '1.085'
+version: '1.086'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

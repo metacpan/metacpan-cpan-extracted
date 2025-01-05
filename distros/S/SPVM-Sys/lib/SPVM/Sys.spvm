@@ -2,7 +2,7 @@
 # MIT License
 
 class Sys {
-  version "0.526001";
+  version "0.529001";
   
   use Format;
   use Sys::IO;
@@ -315,7 +315,12 @@ class Sys {
     Sys::IO->flock($fd, $operation);
   }
   
-  static method mkdir : void ($dir : string, $mode : int) {
+  static method mkdir : void ($dir : string, $mode : int = -1) {
+    
+    if ($mode < 0) {
+      $mode = 0777;
+    }
+    
     Sys::IO->mkdir($dir, $mode);
   }
   
@@ -975,16 +980,16 @@ class Sys {
     Sys::Socket->listen($socket_fd, $backlog);
   }
   
-  static method accept : Sys::Socket::Sockaddr ($new_socket_fd_ref : int*, $socket_fd : int) {
+  static method accept : Sys::Socket::Sockaddr ($client_fd_ref : int*, $server_fd : int) {
     
     my $sockaddr = Sys::Socket::Sockaddr->new;
     
     my $sockaddr_size = Sys::Socket::Sockaddr::Storage->new->size;
     
-    $$new_socket_fd_ref = Sys::Socket->accept($socket_fd, $sockaddr, \$sockaddr_size);
+    $$client_fd_ref = Sys::Socket->accept($server_fd, $sockaddr, \$sockaddr_size);
     
     unless (Sys::OS->is_windows) {
-      Sys->fcntl($$new_socket_fd_ref, IO->F_SETFD, IO->FD_CLOEXEC);
+      Sys->fcntl($$client_fd_ref, IO->F_SETFD, IO->FD_CLOEXEC);
     }
     
     $sockaddr = $sockaddr->upgrade;
@@ -1505,6 +1510,28 @@ class Sys {
     my $grent = Sys::User->getgrnam($name);
     
     return $grent;
+  }
+  
+  static method srand : void ($seed : int) {
+    Fn->set_seed($seed);
+  }
+  
+  static method rand : double ($max : int = 1) {
+    
+    my $seed_initialized = Fn->seed_initialized;
+    my $seed = 0;
+    if ($seed_initialized) {
+      $seed = Fn->get_seed;
+    }
+    else {
+      $seed = &process_id * (int)&time;
+    }
+    
+    my $random_number = Fn->rand(\$seed, $max);
+    
+    &srand($seed);
+    
+    return $random_number;
   }
   
 }

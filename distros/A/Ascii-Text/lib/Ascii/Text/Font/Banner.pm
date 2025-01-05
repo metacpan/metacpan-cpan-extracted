@@ -445,7 +445,7 @@ Ascii::Text::Font::Banner - Banner font
 
 =head1 VERSION
 
-Version 0.18
+Version 0.19
 
 =cut
 

@@ -8,7 +8,7 @@ my $arg_string = undef;
 if ( $^O =~ /Mac/ ) {
     $arg_string = MacPerl::Ask(
         'Please enter @ARGV (-h for help)',
-        defined $ARGV[0] ? "\"$ARGV[0]\"" : ""
+        defined( $ARGV[0] ) ? "\"$ARGV[0]\"" : ""
     );
 }
 
@@ -133,7 +133,7 @@ F<vars.txt>.
 
 This will produce a file F<somefile.pl.html> containing the script with
 html markup.  The output file will contain an embedded style sheet in
-the <HEAD> section which may be edited to change the appearance.
+the C<<HEAD>> section which may be edited to change the appearance.
 
   perltidy -html -css=mystyle.css somefile.pl
 
@@ -144,7 +144,7 @@ it will be created.  If it exists, it will not be overwritten.
 
   perltidy -html -pre somefile.pl
 
-Write an html snippet with only the PRE section to F<somefile.pl.html>.
+Write an html snippet with only the C<<PRE>> section to F<somefile.pl.html>.
 This is useful when code snippets are being formatted for inclusion in a
 larger web page.  No style sheet will be written in this case.
 
@@ -198,7 +198,7 @@ Show summary of usage and exit.
 
 Show perltidy VERSION number and exit.
 
-=item	B<-o>=filename,    B<--outfile>=filename
+=item   B<-o>=filename,    B<--outfile>=filename
 
 Name of the output file (only if a single input file is being
 processed).  If no output file is specified, and output is not
@@ -206,7 +206,7 @@ redirected to the standard output (see B<-st>), the output will go to
 F<filename.tdy>. [Note: - does not redirect to standard output. Use
 B<-st> instead.]
 
-=item	B<-st>,    B<--standard-output>
+=item   B<-st>,    B<--standard-output>
 
 Perltidy must be able to operate on an arbitrarily large number of files
 in a single run, with each output being directed to a different output
@@ -219,7 +219,7 @@ request outputting to the standard output.  For example,
 This option may only be used if there is just a single input file.
 The default is B<-nst> or B<--nostandard-output>.
 
-=item	B<-se>,    B<--standard-error-output>
+=item   B<-se>,    B<--standard-error-output>
 
 If perltidy detects an error when processing file F<somefile.pl>, its
 default behavior is to write error messages to file F<somefile.pl.ERR>.
@@ -228,13 +228,13 @@ output stream instead.  This directive may be negated with B<-nse>.
 Thus, you may place B<-se> in a F<.perltidyrc> and override it when
 desired with B<-nse> on the command line.
 
-=item	B<-oext>=ext,    B<--output-file-extension>=ext
+=item   B<-oext>=ext,    B<--output-file-extension>=ext
 
 Change the extension of the output file to be F<ext> instead of the
 default F<tdy> (or F<html> in case the -B<-html> option is used).
 See L<"Specifying File Extensions">.
 
-=item	B<-opath>=path,    B<--output-path>=path
+=item   B<-opath>=path,    B<--output-path>=path
 
 When perltidy creates a filename for an output file, by default it merely
 appends an extension to the path and basename of the input file.  This
@@ -253,9 +253,9 @@ appear in whatever directory contains F<somefile.pl>.
 If the path contains spaces, it should be placed in quotes.
 
 This parameter will be ignored if output is being directed to standard output,
-or if it is being specified explicitly with the B<-outfile=s> parameter.
+or if it is being specified explicitly with the B<--outfile=s> parameter.
 
-=item	B<-b>,    B<--backup-and-modify-in-place>
+=item   B<-b>,    B<--backup-and-modify-in-place>
 
 Modify the input file or files in-place and save the original with the
 extension F<.bak>.  Any existing F<.bak> file will be deleted.  See next
@@ -272,11 +272,11 @@ standard output, or if the B<-html> flag is set.
 
 In particular, if you want to use both the B<-b> flag and the
 B<--perl-best-practices> (B<-pbp>) flag, then you must put a
-B<-nostandard-output> (B<-nst>) flag after the B<-pbp> flag because it contains a
+B<--nostandard-output> (B<-nst>) flag after the B<-pbp> flag because it contains a
 B<--standard-output> flag as one of its components, which means that output
 will go to the standard output stream.
 
-=item	B<-bext>=ext,    B<--backup-file-extension>=ext
+=item   B<-bext>=ext,    B<--backup-file-extension>=ext
 
 This parameter serves two purposes: (1) to change the extension of the backup
 file to be something other than the default F<.bak>, and (2) to indicate
@@ -297,11 +297,11 @@ created and only deleted if there were no errors).
 
 Here are some examples:
 
-  Parameter           Extension          Backup File Treatment
-  <-bext=bak>         F<.bak>            Keep (same as the default behavior)
-  <-bext='/'>         F<.bak>            Delete if no errors
-  <-bext='/backup'>   F<.backup>         Delete if no errors
-  <-bext='original/'> F<.original>       Delete if no errors
+  Parameter          Extension      Backup File Treatment
+  -bext=bak         .bak            Keep (same as default behavior)
+  -bext='/'         .bak            Delete if no errors
+  -bext='/backup'   .backup         Delete if no errors
+  -bext='original/' .original       Delete if no errors
 
 =item B<-bm=s>,  B<--backup-method=s>
 
@@ -442,7 +442,7 @@ If B<--format=tidy> (the default) then perltidy will reformat the input file,
 and if B<--format=html> then perltidy will produce html output.
 
 For convenience, the abbreviation B<--tidy> is equivalent to B<--format=tidy>,
-and B<--html> is equivalent to B<--format=html>.
+and B<-html> is equivalent to B<--format=html>.
 
 =item B<--notidy>
 
@@ -734,7 +734,7 @@ use on a command line.
 =item B<-it=n>,   B<--iterations=n>
 
 This flag causes perltidy to do B<n> complete iterations.  The reason for this
-flag is that code beautification is an iterative process and in some
+flag is that code formatting is an iterative process and in some
 cases the output from perltidy can be different if it is applied a second time.
 For most purposes the default of B<n=1> should be satisfactory.  However B<n=2>
 can be useful when a major style change is being made, or when code is being
@@ -749,12 +749,10 @@ This flag has no effect when perltidy is used to generate html.
 =item B<-conv>,   B<--converge>
 
 This flag is equivalent to B<-it=4> and is included to simplify iteration
-control.  For all practical purposes one either does or does not want to be
-sure that the output is converged, and there is no penalty to using a large
-iteration limit since perltidy will check for convergence and stop iterating as
-soon as possible.  The default is B<-nconv> (no convergence check).  Using
-B<-conv> will approximately double run time since typically one extra iteration
-is required to verify convergence.  No extra iterations are required if no new
+control.  Perltidy will check for convergence and stop iterating as soon as
+possible.  The default is B<-nconv> (no convergence check).  Using B<-conv>
+will approximately double run time since typically one extra iteration is
+required to verify convergence.  No extra iterations are required if no new
 line breaks are made, and two extra iterations are occasionally needed when
 reformatting complex code structures, such as deeply nested ternary statements.
 
@@ -799,31 +797,31 @@ disturbing existing formatting the default is not to use it, B<-nxci>.
 
 Please see the section L<"B<-pbp>, B<--perl-best-practices>"> for an example of
 how this flag can improve the formatting of ternary statements.  It can also
-improve indentation of some multi-line qw lists as shown below.
+improve indentation of some multiline qw lists as shown below.
 
-            # perltidy
-            foreach $color (
-                qw(
+        # perltidy
+        foreach $color (
+            qw(
+            AntiqueWhite3 Bisque1 Bisque2 Bisque3 Bisque4
+            SlateBlue3 RoyalBlue1 SteelBlue2 DeepSkyBlue3
+            ),
+            qw(
+            LightBlue1 DarkSlateGray1 Aquamarine2 DarkSeaGreen2
+            SeaGreen1 Yellow1 IndianRed1 IndianRed2 Tan1 Tan4
+            )
+          )
+
+        # perltidy -xci
+        foreach $color (
+            qw(
                 AntiqueWhite3 Bisque1 Bisque2 Bisque3 Bisque4
                 SlateBlue3 RoyalBlue1 SteelBlue2 DeepSkyBlue3
-                ),
-                qw(
+            ),
+            qw(
                 LightBlue1 DarkSlateGray1 Aquamarine2 DarkSeaGreen2
                 SeaGreen1 Yellow1 IndianRed1 IndianRed2 Tan1 Tan4
-                )
-              )
-
-            # perltidy -xci
-            foreach $color (
-                qw(
-                    AntiqueWhite3 Bisque1 Bisque2 Bisque3 Bisque4
-                    SlateBlue3 RoyalBlue1 SteelBlue2 DeepSkyBlue3
-                ),
-                qw(
-                    LightBlue1 DarkSlateGray1 Aquamarine2 DarkSeaGreen2
-                    SeaGreen1 Yellow1 IndianRed1 IndianRed2 Tan1 Tan4
-                )
-              )
+            )
+          )
 
 =item B<-mci>, B<--minimize-continuation-indentation>
 
@@ -831,20 +829,20 @@ This flag allows perltidy to remove continuation indentation in some
 special cases where it is not really unnecessary. For a simple example,
 the default formatting for the following snippet is:
 
-        # perltidy -nmci
-        $self->blurt( "Error: No INPUT definition for type '$type', typekind '"
-              . $type->xstype
-              . "' found" );
+    # perltidy -nmci
+    $self->blurt( "Error: No INPUT for type '$type', typekind '"
+          . $type->xstype
+          . "' found" );
 
 The second and third lines are one level deep in a container, and are also
 statement continuations, so they get indented by the sum of the full indentation B<-i>
 value and the continuation indentation B<-ci> value.  If this flag is set, the indentation is reduced by
 B<-ci> spaces, giving
 
-        # perltidy -mci
-        $self->blurt( "Error: No INPUT definition for type '$type', typekind '"
-            . $type->xstype
-            . "' found" );
+    # perltidy -mci
+    $self->blurt( "Error: No INPUT for type '$type', typekind '"
+        . $type->xstype
+        . "' found" );
 
 This flag is off by default.
 
@@ -914,9 +912,9 @@ Some limitations on these flags are:
 A limitation on B<-lp>, but not B<-xlp>, occurs in situations where perltidy
 does not have complete freedom to choose line breaks. Then it may temporarily revert
 to its default indentation method.  This can occur for example if there are
-blank lines, block comments, multi-line quotes, or side comments between the
+blank lines, block comments, multiline quotes, or side comments between the
 opening and closing parens, braces, or brackets.  It will also occur if a
-multi-line anonymous sub occurs within a container since that will impose
+multiline anonymous sub occurs within a container since that will impose
 specific line breaks (such as line breaks after statements).
 
 =item *
@@ -924,7 +922,7 @@ specific line breaks (such as line breaks after statements).
 For both the B<-lp> and B<-xlp> flags, any parameter which significantly
 restricts the ability of perltidy to choose newlines will conflict with these
 flags and will cause them to be deactivated.  These include B<--indent-only>, B<--freeze-newlines>,
-B<-noadd-newlines>, and B<-nodelete-old-newlines>.
+B<--noadd-newlines>, and B<--nodelete-old-newlines>.
 
 =item *
 
@@ -1017,10 +1015,10 @@ letter which is used to limit the selection further depending on the type of
 token immediately before the paren.  The possible letters are currently 'k',
 'K', 'f', 'F', 'w', and 'W', with these meanings for matching whatever precedes an opening paren:
 
- 'k' matches if the previous nonblank token is a perl built-in keyword
+ 'k' matches if the previous nonblank token is a perl keyword
      (such as 'if', 'while'),
- 'K' matches if 'k' does not, meaning that the previous token is not a keyword.
- 'f' matches if the previous token is a function other than a keyword.
+ 'K' matches if 'k' does not: previous token is not a keyword
+ 'f' matches if previous token is a function (not a keyword)
  'F' matches if 'f' does not.
  'w' matches if either 'k' or 'f' match.
  'W' matches if 'w' does not.
@@ -1047,8 +1045,8 @@ on container contents.  The numeric codes are:
 
   '0' or blank: no restriction is placed on container contents
   '1' the container contents must be a simple list without sublists
-  '2' the container contents must be a simple list without sublists, without
-      code blocks, and without ternary operators
+  '2' the container contents must be a simple list without sublists,
+      without code blocks, and without ternary operators
 
 For example,
 
@@ -1115,6 +1113,25 @@ terminates a code block .  For example,
 
 The default is not to do this, indicated by B<-nicb>.
 
+=item B<-ils>, B<--indent-leading-semicolon>
+
+A line which begins with a leading semicolon will, by default, have the extra
+number of indentation spaces defined by B<--continuation-indentation=n>.
+This extra indentation can be removed by setting B<-nils>.
+
+    # default
+    $z = sqrt( $x**2 + $y**2 )
+
+      ;    # <-- indented by ci spaces
+
+    # -nils
+    $z = sqrt( $x**2 + $y**2 )
+
+    ;    # <-- not indented by ci spaces
+
+Note that leading semicolons do not normally occur unless requested with
+B<--break-at-old-semicolon-breakpoints> or forced, for example by
+a blank line as in this example.
 
 =item B<-nib>, B<--non-indenting-braces>
 
@@ -1126,14 +1143,14 @@ side comment is B<#<<<> by default.  If found, the code between this opening bra
 corresponding closing brace will not be given the normal extra indentation
 level.  For example:
 
-            { #<<<   a closure to contain lexical vars
+        { #<<<   a closure to contain lexical vars
 
-            my $var;  # this line does not get one level of indentation
-            ...
+        my $var;  # this line does not get one level of indentation
+        ...
 
-            }
+        }
 
-            # this line does not 'see' $var;
+        # this line does not 'see' $var;
 
 This can be useful, for example, when combining code from different files.
 Different sections of code can be placed within braces to keep their lexical
@@ -1292,21 +1309,60 @@ the parameter B<-bt=n> or B<--brace-tightness=n>.
 
 And finally, curly braces which contain blocks of code are controlled by the
 parameter B<-bbt=n> or B<--block-brace-tightness=n> as illustrated in the
-example below.
+example below (B<-bbt=0> is the default).
 
- %bf = map { $_ => -M $_ } grep { /\.deb$/ } dirents '.'; # -bbt=0 (default)
+ %bf = map { $_ => -M $_ } grep { /\.deb$/ } dirents '.'; # -bbt=0
  %bf = map { $_ => -M $_ } grep {/\.deb$/} dirents '.';   # -bbt=1
  %bf = map {$_ => -M $_} grep {/\.deb$/} dirents '.';     # -bbt=2
 
 To simplify input in the case that all of the tightness flags have the same
-value <n>, the parameter <-act=n> or B<--all-containers-tightness=n> is an
-abbreviation for the combination <-pt=n -sbt=n -bt=n -bbt=n>.
+value B<n>, the parameter B<-act=n> or B<--all-containers-tightness=n> is an
+abbreviation for the combination B<-pt=n -sbt=n -bt=n -bbt=n>.
+
+=item B<-mutt=s>,   B<--multiple-token-tightness=s>
+
+To review, the tightness controls described in the previous section have three
+possible integer values: 0, 1, and 2, where B<n=0> always adds a space, and
+B<n=2> never adds a space.
+
+The default value B<n=1> adds space only if the container holds multiple
+tokens.  Some perltidy tokens may be rather long, and it can be
+preferable to space some of them as if they were multple tokens.  This can be
+done with this paramter.
+
+For example, in the following expression the C<qw> list is a single token and
+therefore there the default formatting does not put spaces within the square
+brackets:
+
+    my $rlist = [qw(alpha beta gamma)];
+
+This can be changed with
+
+    # perltidy -mutt='qw'
+    my $rlist = [ qw(alpha beta gamma) ];
+
+This tells perltidy to space a C<qw>list as if it were multiple tokens when the
+default tightness is used.
+
+The parameter B<s> may contain any of the following perl operators:
+
+    qw q qq qx qr s y tr m
+
+Other possible specifications are
+
+    q*   - all of the above operators
+    Q    - all of the above plus any quoted text
+    h    - a here-doc target, such as '<<EOT'
+    <<>> - the double-diamond operator
+
+A symbol may be negated by preceding it with a carat B<^> symbol.
+The double-diamond operator is always included unless negated in this way.
 
 =item B<-xbt>,   B<--extended-block-tightness>
 
-The previous section described two controls for spacing within curly braces,
-namely B<-block-brace-tightness=n> for code block braces and
-B<-brace-tightness=n> for all other braces.
+There are two controls for spacing within curly braces, namely
+B<--block-brace-tightness=n> for code block braces and B<--brace-tightness=n>
+for all other braces.
 
 There is a little fuzziness in this division of brace types though because the
 curly braces considered by perltidy to contain code blocks for formatting
@@ -1353,11 +1409,11 @@ selects all of the keywords.
 
 Examples:
 
-   -xbtl='k'          # selects just the keywords [DEFAULT]
-   -xbtl="t"          # selects just the special type symbols
-   -xbtl="k t"        # selects all keywords and symbols, or more simply
-   -xbtl="kt"         # selects all keywords and symbols
-   -xbtl="print say"  # selects just keywords B<print> and B<say>:
+  -xbtl='k'          # selects just the keywords [DEFAULT]
+  -xbtl="t"          # selects just the special type symbols
+  -xbtl="k t"        # selects all keywords and symbols, or simply
+  -xbtl="kt"         # selects all keywords and symbols
+  -xbtl="print say"  # selects just keywords B<print> and B<say>:
 
 Here are some formatting examples using the default values of
 B<--brace-tightness=n> and B<--block-brace-tightness=n>. Note that in these
@@ -1402,8 +1458,8 @@ Some programmers prefer a space before all terminal semicolons.  The
 default is for no such space, and is indicated with B<-nsts> or
 B<--nospace-terminal-semicolon>.
 
-	$i = 1 ;     #  -sts
-	$i = 1;      #  -nsts   (default)
+        $i = 1 ;     #  -sts
+        $i = 1;      #  -nsts   (default)
 
 =item B<-sfs>,   B<--space-for-semicolon>
 
@@ -1438,10 +1494,11 @@ B<-naws>.  (Use B<--freeze-whitespace> (B<-fws>) to leave whitespace completely 
 
 =item B<-dws>,  B<--delete-old-whitespace>
 
-Setting this option allows perltidy to remove some old whitespace
-between characters, if necessary.  This is the default.  If you
-do not want any old whitespace removed, use B<-ndws> or
-B<--nodelete-old-whitespace>.
+Setting this option allows perltidy to remove optional whitespace between
+characters in the input file.  The default is to not to do this
+(B<-nodelete-old-whitespace>).  This parameter has little effect by itself.
+But in combination with B<--noadd-whitespace> it will cause most of the
+whitespace in a file to be removed.
 
 =item B<Detailed whitespace controls around tokens>
 
@@ -1491,7 +1548,7 @@ and look at the F<.DEBUG> file to see the tokenization.
 
 To illustrate, suppose we do not want a space after a colon which introduces a
 sub attribute. We need to know its type. It is not a colon because that is the
-type of a ternary operator. The ouput of B<--dump-token-types> states that it
+type of a ternary operator. The output of B<--dump-token-types> states that it
 is token type 'A'.  To verify this, we can run C<perltidy -D> on a short piece
 of code containing such a colon, such as
 
@@ -1531,7 +1588,7 @@ Suppose the user requests that / signs have a space to the left but not to the r
 
 If formatted in this way, the program will not run (at least with recent versions of perl) because the $x is taken to be a filehandle and / is assumed to start a quote. In a complex program, there might happen to be a / which terminates the multiline quote without a syntax error, allowing the program to run, but not as intended.
 
-Related issues arise with other binary operator symbols, such as + and -, and in older versions of perl there could be problems with ternary operators.  So to avoid changing program behavior, perltidy has the simple rule that whitespace around possible filehandles is left unchanged.  Likewise, whitespace around barewords is left unchanged.  The reason is that if the barewords are defined in other modules, or in code that has not even been written yet, perltidy will not have seen their prototypes and must treat them cautiously.
+Related issues arise with other binary operator symbols, such as + and -, and in older versions of perl there could be problems with ternary operators.  So to avoid changing program behavior, perltidy has the simple rule that whitespace around possible filehandles is left unchanged.  Likewise, whitespace around unknown barewords is left unchanged.  The reason is that if the barewords are defined in other modules, or in code that has not even been written yet, perltidy will not have seen their prototypes and must treat them cautiously.
 
 In perltidy this is implemented in the tokenizer by marking token following a
 B<print> keyword as a special type B<Z>.  When formatting is being done,
@@ -1575,15 +1632,15 @@ But the following will give a syntax error:
 For another example, the following two lines will be parsed without syntax error:
 
   # original programming, syntax ok
-  for my $severity ( reverse $SEVERITY_LOWEST+1 .. $SEVERITY_HIGHEST ) { ...  }
+  for my $severity ( reverse $LOWEST+1 .. $HIGHEST ) { ...  }
 
   # perltidy default, syntax ok
-  for my $severity ( reverse $SEVERITY_LOWEST + 1 .. $SEVERITY_HIGHEST ) { ... }
+  for my $severity ( reverse $LOWEST + 1 .. $HIGHEST ) { ... }
 
 But the following will give a syntax error:
 
   # perltidy -nwrs='+', syntax error:
-  for my $severity ( reverse $SEVERITY_LOWEST +1 .. $SEVERITY_HIGHEST ) { ... }
+  for my $severity ( reverse $LOWEST +1 .. $HIGHEST ) { ... }
 
 To avoid subtle parsing problems like this, it is best to avoid spacing a
 binary operator asymmetrically with a space on the left but not on the right.
@@ -1802,10 +1859,10 @@ B<-nlop>:
 =item B<Trimming whitespace around C<qw> quotes>
 
 B<-tqw> or B<--trim-qw> provide the default behavior of trimming
-spaces around multi-line C<qw> quotes and indenting them appropriately.
+spaces around multiline C<qw> quotes and indenting them appropriately.
 
 B<-ntqw> or B<--notrim-qw> cause leading and trailing whitespace around
-multi-line C<qw> quotes to be left unchanged.  This option will not
+multiline C<qw> quotes to be left unchanged.  This option will not
 normally be necessary, but was added for testing purposes, because in
 some versions of perl, trimming C<qw> quotes changes the syntax tree.
 
@@ -1856,12 +1913,12 @@ you may use B<-nibc> to keep block comments left-justified.  Here is an
 example:
 
              # this comment is indented      (-ibc, default)
-	     if ($task) { yyy(); }
+             if ($task) { yyy(); }
 
 The alternative is B<-nibc>:
 
  # this comment is not indented              (-nibc)
-	     if ($task) { yyy(); }
+             if ($task) { yyy(); }
 
 See also the next item, B<-isbc>, as well as B<-sbc>, for other ways to
 have some indented and some outdented block comments.
@@ -1899,13 +1956,13 @@ by the B<-l=n> maximum line length parameter.  For example, the following
 long single line would remain intact with -l=80 and -iscl:
 
      perltidy -l=80 -iscl
-        $vmsfile =~ s/;[\d\-]*$//; # Clip off version number; we can use a newer version as well
+        $vmsfile =~ s/;[\d\-]*$//; # Clip off version number; we can use a newer version
 
 whereas without the -iscl flag the line will be broken:
 
      perltidy -l=80
         $vmsfile =~ s/;[\d\-]*$//
-          ;    # Clip off version number; we can use a newer version as well
+          ;    # Clip off version number; we can use a newer version
 
 =item B<-ipc>,  B<--ignore-perlcritic-comments>
 
@@ -2309,7 +2366,7 @@ and '#>>>', like this:
 B<--code-skipping> uses starting and ending markers '#<<V' and '#>>V', like
 this:
 
- #<<V  code skipping: perltidy will pass this verbatim without error checking
+ #<<V  code skipping: perltidy passes this verbatim, no error checking
 
     token ident_digit {
         [ [ <?word> | _ | <?digit> ] <?ident_digit>
@@ -2387,9 +2444,9 @@ for characters to be taken literally rather than as patterns.
 
 Some examples show how example strings become patterns:
 
- -fsb='#\{\{\{' becomes /^#\{\{\{\s/  which matches  #{{{ but not #{{{{
- -fsb='#\*\*'   becomes /^#\*\*\s/    which matches  #** but not #***
- -fsb='#\*{2,}' becomes /^#\*{2,}\s/  which matches  #** and #*****
+ -fsb='#\{\{\{' becomes /^#\{\{\{\s/ which matches #{{{ but not #{{{{
+ -fsb='#\*\*'   becomes /^#\*\*\s/   which matches #** but not #***
+ -fsb='#\*{2,}' becomes /^#\*{2,}\s/ which matches #** and #*****
 
 =item B<-fse=string>,  B<--format-skipping-end=string>
 
@@ -2444,10 +2501,12 @@ The range of lines is specified by integers B<n1> and B<n2>, where B<n1> is the 
 
 Examples:
 
-  -line-range-tidy=43:109      # tidy lines 43 through 109
-  -line-range-tidy=' 43 : 109' # tidy lines 43 through 109 (spaces ok in quotes)
-  -line-range-tidy=1:          # tidy all lines
-  -line-range-tidy=0:90        # ERROR (n1 must be >= 1)
+ --line-range-tidy=43:109      # tidy lines 43 through 109
+ --line-range-tidy=' 43 : 109' # tidy lines 43 through 109
+ --line-range-tidy=1:          # tidy all lines
+ --line-range-tidy=0:90        # ERROR (n1 must be >= 1)
+
+The second example shows that spaces are okay if placed in quotes.
 
 =back
 
@@ -2484,7 +2543,7 @@ B<-fnl>, and they will remain fixed, and the rest of the commands in
 this section and sections
 L<"Controlling List Formatting">,
 L<"Retaining or Ignoring Existing Line Breaks">.
-You may want to use B<-nooutdent-long-lines> with this.
+You may want to use B<--nooutdent-long-lines> with this.
 
 Note: If you also want to keep your blank lines exactly
 as they are, you can use the B<--freeze-blank-lines> flag which is described
@@ -2513,10 +2572,10 @@ alternatives:
 
   # -nce (default)
   if ($task) {
-	yyy();
+      yyy();
   }
   else {
-	zzz();
+      zzz();
   }
 
 In this example the keyword B<else> is placed on the same line which begins with
@@ -2561,7 +2620,7 @@ This flag is equivalent to B<--cuddled-else> (B<-ce>).
 
 The built-in default cuddled block types are B<else, elsif, continue, catch, finally>.
 
-Additional block types to which the B<-cuddled-blocks> style applies can be defined by
+Additional block types to which the B<--cuddled-blocks> style applies can be defined by
 this parameter.  This parameter is a character string, giving a list of
 block types separated by commas or spaces.  For example, to cuddle code blocks
 of type sort, map and grep, in addition to the default types, the string could
@@ -2587,7 +2646,7 @@ unless this formatting style is activated with B<--cuddled-else>.
 
 =item B<-cblx>,    B<--cuddled-block-list-exclusive>
 
-When cuddled else formatting is selected with B<-cuddled-else>, setting this
+When cuddled else formatting is selected with B<--cuddled-else>, setting this
 flag causes perltidy to ignore its built-in defaults and rely exclusively on
 the block types specified on the B<--cuddled-block-list> flag described in the
 previous section.  For example, to avoid using cuddled B<catch> and B<finally>,
@@ -2605,8 +2664,8 @@ to cause it to span multiple lines.  This parameter controls that decision. The
 options are:
 
    cbo=0  Never force a short block to break.
-   cbo=1  If the first of a pair of blocks is broken in the input file,
-          then break the second [DEFAULT].
+   cbo=1  If the first of a pair of blocks is broken in the input
+          file, then break the second [DEFAULT].
    cbo=2  Break open all blocks for maximal cuddled formatting.
 
 The default and recommended value is B<cbo=1>.  With this value, if the starting
@@ -2639,7 +2698,7 @@ the keyword introducing it if possible.  For example,
   }
 
 When B<-bl> is set, the blocks to which this applies can be controlled with the
-parameters B<--brace-left-list> and B<-brace-left-exclusion-list> described in the next sections.
+parameters B<--brace-left-list> and B<--brace-left-exclusion-list> described in the next sections.
 
 =item B<-bll=s>, B<--brace-left-list=s>
 
@@ -2991,10 +3050,10 @@ If the trailing code fits on a single line, then
 If the trailing code requires multiple lines, then
 
   -bfvt=0 Insert a line break
-  -bfvt=1 Insert a line break except for a cuddled block chain [Default]
+  -bfvt=1 Insert a line break except for a cuddled block chain
   -bfvt=2 Do not insert a line break
 
-So the most compact code is achieved with B<-bfvt=2>.
+The default is B<-bfvt=1>. The most compact code is achieved with B<-bfvt=2>.
 
 Example (non-cuddled, multiple lines ):
 
@@ -3048,14 +3107,14 @@ symbol.
 
 For example:
 
-	# default formatting
+        # default formatting
         do {
             {
                 next if $x == $y;
             }
         } until $x++ > $z;
 
-	# perltidy -wn
+        # perltidy -wn
         do { {
             next if $x == $y;
         } } until $x++ > $z;
@@ -3075,7 +3134,7 @@ the outer container of an adjacent pair. Consequently, any number of adjacent
 opening or closing symbols may join together in weld.  For example, here are
 three levels of wrapped function calls:
 
-	# default formatting
+        # default formatting
         my (@date_time) = Localtime(
             Date_to_Time(
                 Add_Delta_DHMS(
@@ -3105,36 +3164,36 @@ is achieved in a single run.
 
 Here is an example illustrating a welded container within a welded containers:
 
-	# default formatting
-        $x->badd(
-            bmul(
-                $class->new(
-                    abs(
-                        $sx * int( $xr->numify() ) & $sy * int( $yr->numify() )
-                    )
-                ),
-                $m
-            )
-        );
-
-	# perltidy -wn
-        $x->badd( bmul(
-            $class->new( abs(
-                $sx * int( $xr->numify() ) & $sy * int( $yr->numify() )
-            ) ),
+    # default formatting
+    $x->badd(
+        bmul(
+            $class->new(
+                abs(
+                    $sx * int( $xr->num() ) & $sy * int( $yr->num() )
+                )
+            ),
             $m
-        ) );
+        )
+    );
+
+    # perltidy -wn
+    $x->badd( bmul(
+        $class->new( abs(
+            $sx * int( $xr->num() ) & $sy * int( $yr->num() )
+        ) ),
+        $m
+    ) );
 
 The welded closing tokens are by default on a separate line but this can be
 modified with the B<--vertical-tightness-closing=n> (B<-vtc=n>) flag (described
 in the next section).  For example,
 the same example adding B<-vtc=2> is
 
-	# perltidy -wn -vtc=2
-        $x->badd( bmul(
-            $class->new( abs(
-                $sx * int( $xr->numify() ) & $sy * int( $yr->numify() ) ) ),
-            $m ) );
+    # perltidy -wn -vtc=2
+    $x->badd( bmul(
+        $class->new( abs(
+            $sx * int( $xr->num() ) & $sy * int( $yr->num() ) ) ),
+        $m ) );
 
 This format option is quite general but there are some limitations.
 
@@ -3218,25 +3277,26 @@ token immediately before the container.  If given, it goes just before the
 container symbol.  The possible letters are currently 'k', 'K', 'f', 'F',
 'w', and 'W', with these meanings:
 
- 'k' matches if the previous nonblank token is a perl built-in keyword (such as 'if', 'while'),
- 'K' matches if 'k' does not, meaning that the previous token is not a keyword.
- 'f' matches if the previous token is a function other than a keyword.
- 'F' matches if 'f' does not.
- 'w' matches if either 'k' or 'f' match.
- 'W' matches if 'w' does not.
+ 'k' matches if the previous nonblank token is a perl keyword
+     (such as 'if', 'while'),
+ 'K' matches if 'k' does not: previous token is not a keyword
+ 'f' matches if previous token is a function (not a keyword)
+ 'F' matches if 'f' does not
+ 'w' matches if either 'k' or 'f' match
+ 'W' matches if 'w' does not
 
 For example, compare
 
         # perltidy -wn
         if ( defined( $_Cgi_Query{
-            $Config{'methods'}{'authentication'}{'remote'}{'cgi'}{'username'}
+            $Config{'methods'}{'auth'}{'remote'}{'cgi'}{'username'}
         } ) )
 
 with
 
         # perltidy -wn -wnxl='^K( {'
         if ( defined(
-            $_Cgi_Query{ $Config{'methods'}{'authentication'}{'remote'}{'cgi'}
+            $_Cgi_Query{ $Config{'methods'}{'auth'}{'remote'}{'cgi'}
                   {'username'} }
         ) )
 
@@ -3246,14 +3306,14 @@ but the curly brace is rejected by the rule.
 
 Here are some additional example strings and their meanings:
 
-    '^('   - the weld must not start with a paren
-    '.('   - the second and later tokens may not be parens
-    '.w('  - the second and later tokens may not keyword or function call parens
-    '('    - no parens in a weld
-    '^K('  - exclude a leading paren preceded by a non-keyword
-    '.k('  - exclude a secondary paren preceded by a keyword
-    '[ {'  - exclude all brackets and braces
-    '[ ( ^K{' - exclude everything except nested structures like do {{  ... }}
+ '^('   - the weld must not start with a paren
+ '.('   - second and later tokens may not be parens
+ '.w('  - second and later tokens may not be a keyword or call parens
+ '('    - no parens in a weld
+ '^K('  - exclude a leading paren preceded by a non-keyword
+ '.k('  - exclude a secondary paren preceded by a keyword
+ '[ {'  - exclude all brackets and braces
+ '[ ( ^K{' - exclude all except nested structures like do {{  ... }}
 
 
 =item B<Vertical tightness> of non-block curly braces, parentheses, and square brackets.
@@ -3354,18 +3414,18 @@ so the closing paren is placed on a new line.
 
 The difference between B<-vt=1> and B<-vt=2> is shown here:
 
-    # perltidy -lp -vt=1
-    $init->add(
-                mysprintf( "(void)find_threadsv(%s);",
-                           cstring( $threadsv_names[ $op->targ ] )
-                )
-    );
+  # perltidy -lp -vt=1
+  $init->add(
+              mysprintf( "(void)find_threadsv(%s);",
+                         cstring( $threadsv_names[ $op->targ ] )
+              )
+  );
 
-    # perltidy -lp -vt=2
-    $init->add( mysprintf( "(void)find_threadsv(%s);",
-                           cstring( $threadsv_names[ $op->targ ] )
-                )
-    );
+  # perltidy -lp -vt=2
+  $init->add( mysprintf( "(void)find_threadsv(%s);",
+                         cstring( $threadsv_names[ $op->targ ] )
+              )
+  );
 
 With B<-vt=1>, the line ending in C<add(> does not combine with the next
 line because the next line is not balanced.  This can help with
@@ -3374,9 +3434,9 @@ readability, but B<-vt=2> can be used to ignore this rule.
 The tightest, and least readable, code is produced with both C<-vt=2> and
 C<-vtc=2>:
 
-    # perltidy -lp -vt=2 -vtc=2
-    $init->add( mysprintf( "(void)find_threadsv(%s);",
-                           cstring( $threadsv_names[ $op->targ ] ) ) );
+  # perltidy -lp -vt=2 -vtc=2
+  $init->add( mysprintf( "(void)find_threadsv(%s);",
+                         cstring( $threadsv_names[ $op->targ ] ) ) );
 
 Notice how the code in all of these examples collapses vertically as
 B<-vt> increases, but the indentation remains unchanged.  This is
@@ -3564,7 +3624,7 @@ non-block containers are stacked, the flag B<-sac> or B<--stack-all-containers>
 is an abbreviation for B<--stack-opening-tokens --stack-closing-tokens>.
 
 Please note that if both opening and closing tokens are to be stacked, then the
-newer flag B<-weld-nested-containers> may be preferable because it insures that
+newer flag B<--weld-nested-containers> may be preferable because it insures that
 stacking is always done symmetrically.  It also removes an extra level of
 unnecessary indentation within welded containers.  It is able to do this
 because it works on formatting globally rather than locally, as the B<--stack-opening-tokens> and B<--stack-closing-tokens> flags do.
@@ -3630,7 +3690,7 @@ The -baao sets the default to be to break after all of the following operators:
 and the B<-bbao> flag sets the default to break before all of these operators.
 These can be used to define an initial break preference which can be fine-tuned
 with the B<--want-break-after> and B<--want-break-before> flags.  For example,
-to break before all operators except an B<=> one could use C<--bbao -wba='='>
+to break before all operators except an B<=> one could use C<-bbao -wba='='>
 rather than listing every single perl operator except B<=> on a B<-wbb> flag.
 
 =over 4
@@ -3686,13 +3746,13 @@ This formatting loses the nice structure.  The original line breaks can be
 retained by adding comment or a blank line somewhere between the
 two parens. For example,
 
-    my @list = (
-        1,    # a side comment forces the original line breakpoints to be kept
-        1, 1,
-        1, 2, 1,
-        1, 3, 3, 1,
-        1, 4, 6, 4, 1,
-    );
+  my @list = (
+      1,    # a side comment forces the original breakpoints to be kept
+      1, 1,
+      1, 2, 1,
+      1, 3, 3, 1,
+      1, 4, 6, 4, 1,
+  );
 
 We could achieve the same result with a blank line or full comment
 anywhere between the opening and closing parens.  Vertical alignment
@@ -3728,6 +3788,86 @@ the original style, yields
 
 A disadvantage of this flag compared to the methods discussed above is that all
 tables in the file must already be nicely formatted.
+
+=item B<-btct=s>,  B<--break-at-trailing-comma-types=s>
+
+A B<trailing comma> is an optional comma following the last item of a list.
+The B<-btct=s> tells perltidy to end a line at selected trailing commas.
+The string B<s> selects the trailing commas, as follows:
+
+  s=1 or '*' : every trailing comma
+  s=m a trailing comma in a multiline list
+  s=b a bare trailing comma
+  s=0 none
+
+For example, given the following input
+
+        $w->bind(
+            '<Page_Down>' => xx,
+        );
+
+The default formatting would flatten this into a single line.  But the
+container can be kept open with
+
+        # perltidy -btct='b'
+        $w->bind(
+            '<Page_Down>' => xx,
+        );
+
+This can be particularly useful for short function calls like this,
+where the default perltidy formatting does not keep the container open.
+
+The options B<s=m> and B<s=1> can be used to open up containers with
+non-bare trailing commas. For example, given this input
+
+        $w->bind( '<Page_Down>' => xx, );
+
+we can break it open with
+
+        # perltidy -btct=1
+        $w->bind(
+            '<Page_Down>' => xx,
+        );
+
+Afterwards, we could switch to B<-btct='b'> since the trailing comma is now
+bare.
+But the B<-btct> parameter must be retained in this case because otherwise this
+small list will be flattened the next time it is formatted.
+
+This logic can be restricted to specific container types by including an
+opening token ahead of the letter in the above table.  For example
+
+    -btct='(b'
+
+means that this operation should only apply to bare trailing commas within
+parentheses.
+
+For parentheses, an additional item of information which can be given is an
+alphanumeric letter which is used to limit the selection further depending on
+the type of token immediately before the opening paren.  The possible letters
+are currently 'k', 'K', 'f', 'F', 'w', and 'W', with these meanings for
+matching whatever precedes an opening paren:
+
+ 'k' matches if the previous nonblank token is a perl keyword
+     (such as 'if', 'while'),
+ 'K' matches if 'k' does not: previous token is not a keyword
+ 'f' matches if previous token is a function (not a keyword)
+ 'F' matches if 'f' does not.
+ 'w' matches if either 'k' or 'f' match.
+ 'W' matches if 'w' does not.
+
+These are the same codes used for B<--line-up-parentheses-inclusion-list>.
+For example,
+
+    -btct='f(b'
+
+means that bare trailing commas in function call lists in the input stream
+should be followed by line breaks in the formatted output stream.
+
+The section L<"Adding and Deleting Commas"> describes additional controls for
+working with trailing commas. These can be combined with the
+B<-break-trailing-comma-types> parameter for additional control of list
+formatting.
 
 =item B<-mft=n>,  B<--maximum-fields-per-table=n>
 
@@ -3802,6 +3942,67 @@ Here is an example.
         "09" => 30, "10" => 31, "11" => 30, "12" => 31
     );
 
+=item B<-qwaf>,  B<--qw-as-function>
+
+This option tells perltidy to format a B<qw> list which is delimited with
+parentheses as if it were a function call whose call args are a list of quoted
+items.  Normally, a B<qw> list is output verbatim except for an adjustment of
+leading whitespace to indicate the indentation level. For example, here is an
+example of the default formatting of a poorly formatted B<qw> list:
+
+    # perltidy
+    @fields = qw( $st_dev     $st_ino    $st_mode $st_nlink   $st_uid
+      $st_gid $st_rdev    $st_size $st_atime   $st_mtime  $st_ctime
+      $st_blksize $st_blocks);
+
+If we format with B<-qwaf> then the result will be:
+
+    # perltidy -qwaf
+    @fields = qw(
+        $st_dev   $st_ino   $st_mode  $st_nlink
+        $st_uid   $st_gid   $st_rdev  $st_size
+        $st_atime $st_mtime $st_ctime $st_blksize
+        $st_blocks
+    );
+
+The way this works is that just before formatting begins, the tokens of the
+B<qw> text are replaced with the tokens of an equivalent function call with a
+comma-separated list of quoted items as call args. Then it is formatted like
+any other list. Special comma tokens are employed which have no display text, so
+when the code is eventually displayed it remains a valid B<qw> quote.
+
+Some things to note are:
+
+=over 4
+
+=item *
+
+This only works for B<qw> quotes which begin with B<qw(>, with no space
+before the paren.
+
+=item *
+
+If the option B<--space-function-paren> is employed, it is ignored for
+these special function calls because it would deactivate them.
+
+=item *
+
+Otherwise the various formatting control flags operate on these lists the same
+as for other comma-separated lists. In particular, note that if
+B<--break-at-old-comma-breakpoints>, or B<-boc>, is set, then the old line
+break locations will be retained. And old line breaks will be retained if
+there are any blank lines between the opening and closing parens.
+
+=item *
+
+Before using this option for the first time, it is a good idea to scan the code
+and decide if any lists have a special order which should be retained.  This
+can be accomplished for example by changing the quote delimiters to something
+other than parens, or by inserting a blank line as discussed at the start of
+this section.
+
+=back
+
 =back
 
 =head2 Adding and Deleting Commas
@@ -3830,6 +4031,7 @@ actions taken when this flag is set are as follows:
 Repeated commas like ',,' are removed with a warning.
 
 =item *
+
 Repeated fat commas like '=> =>' are removed with a warning.
 
 =item *
@@ -3851,88 +4053,126 @@ set.
 
 This option is on by default.  Use B<-ndrc> to turn it off.
 
-=item B<--want-trailing-commas=s> or B<-wtc=s>, B<--add-trailing-commas> or B<-atc>, and B<--delete-trailing-commas> or B<-dtc>
+=item B<Adding and Deleting Trailing Commas>
 
-A trailing comma is a comma following the last item of a list. Perl allows
+A B<trailing comma> is a comma following the last item of a list. Perl allows
 trailing commas but they are not required.  Including them can sometimes
-simplify the maintenance of large or complex lists.
-By default, perltidy does not add
-or delete trailing commas, but it is possible to manipulate them with the
-following set of related parameters:
+simplify the maintenance of large or complex lists, and help display structure.
+But they may not be appropriate in all lists, for example in a list which
+always has just one term.  By default, perltidy does not add or delete trailing
+commas, but it is possible to manipulate them with the following set of related
+parameters:
 
 =over 4
 
 =item *
-B<--want-trailing-commas=s, -wtc=s> - defines where trailing commas are wanted
+
+B<--want-trailing-commas=s, -wtc=s> - defines where trailing commas are wanted (the style)
 
 =item *
+
 B<--add-trailing-commas,    -atc>   - gives permission to add trailing commas to match the style wanted
 
 =item *
+
 B<--delete-trailing-commas, -dtc>   - gives permission to delete trailing commas which do not match the style wanted
-
-=item *
-B<--add-lone-trailing-commas, -altc>  - gives permission to add a comma if it will be the only comma. This is off by default and explained below.
-
-=item *
-B<--delete-lone-trailing-commas, -dltc>  - gives permission to delete the only comma in a list. This is on by default and explained below.
 
 =back
 
 The parameter B<--want-trailing-commas=s>, or B<-wtc=s>, defines a preferred style.  The string B<s> indicates which lists should get trailing commas, as follows:
 
-  s=0 : no list should have a trailing comma
-  s=1 or * : every list should have a trailing comma
-  s=m a multi-line list should have a trailing commas
-  s=b trailing commas should be 'bare' (comma followed by newline)
-  s=h lists of key=>value pairs, with about one one '=>' and one ',' per line,
-      with a bare trailing comma
-  s=i lists with about one comma per line, with a bare trailing comma
-  s=' ' or -wtc not defined : leave trailing commas unchanged [DEFAULT].
+ s=1 or '*' : every list
+ s=m a multiline list
+ s=b a multiline list, bare trailing comma
+ s=i a multiline list, bare trailing comma, about one comma per line
+ s=h a multiline list, bare trailing comma, about one key=>value
+       pair per line
+ s=0 : no list
 
-This parameter by itself only indicates the where trailing commas are
-wanted.  Perltidy only adds these trailing commas if the flag B<--add-trailing-commas>, or B<-atc> is set.  And perltidy only removes unwanted trailing commas
-if the flag B<--delete-trailing-commas>, or B<-dtc> is set.
+ s=' ' or not defined : leave trailing commas unchanged [DEFAULT]
+
+where:
+
+=over 4
+
+=item *
+
+A B<list> here is basically taken to be a container of items (parens, square
+brackets, or braces), which is not a code block, which contains one or more
+commas or fat commas.  These parameters only apply to something that fits this
+definition of a list.
+
+A paren-less list of parameters is not a list by this definition, so
+these parameters do not apply to a paren-less list.
+
+=item *
+
+A B<multiline list> is a list for which the opening and closing brackets
+on different lines.
+
+=item *
+
+A B<bare trailing comma> is a comma which is at the end of a line. That is,
+the closing container token follows on a different line.  So a list with a
+bare trailing comma is a special case of a multiline list.
+
+=item *
+
+In fact the above options for trailing commas can be seen as a hierarchy
+of nesting sets which can be expressed as
+
+   1 > m > b > i > h > 0
+
+This indicates that multiline trailing commas B<m> are a
+subset of all trailing commas, and bare trailing commas B<b> are a subset
+of all multiline trailing commas, and so on.
+
+=back
+
+This parameter by itself only indicates where trailing commas are wanted.
+Perltidy only adds these trailing commas if permission is granted by setting
+the flag B<--add-trailing-commas>, or B<-atc>.  And perltidy only removes
+unwanted trailing commas if the flag B<--delete-trailing-commas>, or B<-dtc> is
+set.
 
 Here are some example parameter combinations and their meanings
 
-  -wtc=0 -dtc   : delete all trailing commas
-  -wtc=1 -atc   : all lists get trailing commas
-  -wtc=m -atc   : all multi-line lists get trailing commas, but
-                  single line lists remain unchanged.
-  -wtc=m -dtc   : multi-line lists remain unchanged, but
-                  any trailing commas on single line lists are removed.
-  -wtc=m -atc -dtc  : all multi-line lists get trailing commas, and
-                      any trailing commas on single line lists are removed.
+ -wtc=0 -dtc   : delete all trailing commas
+ -wtc=1 -atc   : add trailing commas to all lists
+ -wtc=m -atc   : add trailing commas to all multiline lists
+                 (single line lists remain unchanged)
+ -wtc=b -atc   : add commas so that all lists whose closing
+                 bracket starts a new line have trailing commas
+ -wtc=b -dtc   : all trailing commas which are not bare
+                 (not followed by a newline) get deleted.
+ -wtc=b -atc -dtc  : do both of the above operations so that
+                     all trailing commas are bare
 
-For example, given the following input without a trailing comma
+For example, given the following input
 
-    bless {
-        B    => $B,
-        Root => $Root
-    } => $package;
+    $wine_list = $top->Box(
+        "-length" => 5,
+        "-width"  => 3
+    )->select( "red", "white", "gold", );
 
-we can add a trailing comma after the variable C<$Root> using
+we have
 
-    # perltidy -wtc=m -atc
-    bless {
-        B    => $B,
-        Root => $Root,
-    } => $package;
+    # perltidy -wtc=b -atc -dtc
+    $wine_list = $top->Box(
+        "-length" => 5,
+        "-width"  => 3,
+    )->select( "red", "white", "gold" );
 
-This could also be achieved in this case with B<-wtc=b> instead of B<-wtc=m>
-because the trailing comma here is bare (separated from its closing brace by a
-newline).  And it could also be achieved with B<-wtc=h> because this particular
-list is a list of key=>value pairs.
+A comma was added after the C<3>, since it is bare, and a comma was removed
+after C<"gold">, since it not bare.
 
-The above styles should cover the main of situations of interest, but it is
-possible to apply a different style to each type of container token by
+It is possible to apply a different style to each type of container token by
 including an opening token ahead of the style character in the above table.
 For example
 
     -wtc='(m [b'
 
-means that lists within parens should have multi-line trailing commas, and that
+means that lists within parens should have multiline trailing commas, and that
 lists within square brackets have bare trailing commas. Since there is no
 specification for curly braces in this example, their trailing commas would
 remain unchanged.
@@ -3943,10 +4183,10 @@ the type of token immediately before the opening paren.  The possible letters
 are currently 'k', 'K', 'f', 'F', 'w', and 'W', with these meanings for
 matching whatever precedes an opening paren:
 
- 'k' matches if the previous nonblank token is a perl built-in keyword
+ 'k' matches if the previous nonblank token is a perl keyword
      (such as 'if', 'while'),
- 'K' matches if 'k' does not, meaning that the previous token is not a keyword.
- 'f' matches if the previous token is a function other than a keyword.
+ 'K' matches if 'k' does not: previous token is not a keyword
+ 'f' matches if previous token is a function (not a keyword)
  'F' matches if 'f' does not.
  'w' matches if either 'k' or 'f' match.
  'W' matches if 'w' does not.
@@ -3954,9 +4194,25 @@ matching whatever precedes an opening paren:
 These are the same codes used for B<--line-up-parentheses-inclusion-list>.
 For example,
 
-  -wtc = 'w(m'
+  -wtc='w(m'
 
-means that trailing commas are wanted for multi-line parenthesized lists following a function call or keyword.
+means that trailing commas are wanted for multiline parenthesized lists following a function call or keyword.
+
+Finally, a leading B<+> can be placed on any term to indicate that it only
+applies when adding commas. A leading B<-> indicates that it only applies when
+deleting commas. For example,
+
+  -wtc='+h -b' -atc -dtc
+
+means that missing trailing commas should be added to lists of key => value
+pairs, and trailing commas which are not bare should be removed. No other
+changes are made.  When both plus and minus terms are used like this, they must
+not be in conflict.  There is no conflict in this example because the trailing
+comma locations of the key=>value pairs selected by the B<+h> term are a subset
+of all bare trailing commas, and thus will not be deleted by the B<-b> term.
+The general rule is that the letter of the plus term should occur after the
+letter of the minus term in the hierarchical nesting order,
+B<< 1 > m > b > i > h > 0 >>.
 
 B<Some points to note> regarding adding and deleting trailing commas:
 
@@ -3964,65 +4220,116 @@ B<Some points to note> regarding adding and deleting trailing commas:
 
 =item *
 
-For the implementation of these parameters, a B<list> is basically taken to be
-a container of items (parens, square brackets, or braces), which is not a code
-block, with one or more commas or fat commas.  These parameters only apply to
-something that fits this definition of a list.
+It is recommended to also use the B<--converge> parameter when adding and/or
+deleting trailing commas, especially if the formatter may be making other line
+break changes at the same time.  The reason is that the decision regarding
+whether or not a list is multiline or bare is made based on the B<input> stream
+if only one iteration is made, which is the default.
 
-Note that a paren-less list of parameters is not a list by this definition, so
-these parameters have no effect on a paren-less list.
+When iterations are requested with the B<--converge> parameter, any comma
+deletion operations are postponed until the start of the B<second iteration>,
+after most changes in line breaks have been made.
 
-=item *
+To illustrate, if we start with
 
-By B<multiline> list is meant a list for which the first comma and trailing comma
-are on different lines.
+        f(
+            a => 1,
+            b => 2, );
 
-=item *
+and attempt to delete non-bare commas,
 
-A B<bare> trailing comma is a comma which is at the end of a line. That is,
-the closing container token follows on a different line.  So a list with a
-bare trailing comma is a special case of a multi-line list.
+        # perltidy -wtc=b -dtc
+        f(
+            a => 1,
+            b => 2
+        );
 
-=item *
+we delete a comma which has become bare, which is not what is wanted. This
+happened because the change was based on the starting rather than the final
+line breaks.  Running with B<--converge> gives the desired result:
 
-The decision regarding whether or not a list is multi-line or bare is made
-based on the B<input> stream if only one iteration is made, which is the
-default.
+        # perltidy -wtc=b -dtc --converge
+        f(
+            a => 1,
+            b => 2,
+        );
 
-It can sometimes be preferable to base decisions on trailing commas
-on the final line breaks rather than the initial line breaks.
-This can be accomplished by telling perltidy to perform two or more internal
-iterations, for example with the B<--converge> parameter. In this case
-any comma addition or deletion operations are postponed until the
-start of the second iteration, after changes in line breaks have been made.
-For a discussion see L<https://github.com/perltidy/perltidy/issues/156>.
+because comma changes are based on the line breaks after the first iteration.
 
 A parameter B<--delay-trailing-comma-operations>, or B<-dtco>, is available to
-control behavior if desired. Negating this parameter, with B<-ndtco>, tells
+control this behavior if desired. Negating this parameter, with B<-ndtco>, tells
 perltidy to always use the starting state to make decisions regarding comma
-addition and deletion, even when iterations are requested.
+addition and deletion, even when iterations are requested. This should not
+normally be necessary.
+
+=item *
+
+Perltidy does not add a trailing comma in some B<edge cases> which appear to
+be near a stability limit.  So if a comma is unexpectedly not added, this is
+probably the reason.
+
+=item *
+
+If the parameter B<--break-at-trailing-comma-types>, or B<-btct>. is also
+employed, it operates on the state after any adding or deleting of commas. And
+it will allow trailing commas to be added in most edge cases.  For example,
+given the following input text
+
+    plot(
+        'g', Canvas => $overview_canvas
+    );
+
+formatting  with C<-wtc=f(b) -atc> will not add a trailing comma because the
+list will be flattened and the comma will not remain bare.  But we can add a
+trailing comma, and keep the container open, with
+
+    # perltidy -wtc='f(b' -atc -btct='f(b'
+    plot(
+        'g', Canvas => $overview_canvas,
+    );
+
+As another example, given the same text on a single line without a trailing comma
+
+    plot( 'g', Canvas => $overview_canvas );
+
+we can add a trailing comma and break the container open with
+
+    # perltidy -wtc=1 -atc -btct=1
+    plot(
+        'g', Canvas => $overview_canvas,
+    );
+
+After that, we could use C<-btct='f(b'> to keep the container open.
 
 =item *
 
 When using these parameters for the first time it is a good idea to practice
 on some test scripts and verify that the results are as expected.
 
-=item *
-
-Since the default behavior is not to add or delete commas, these parameters
-can be useful on a temporary basis for reformatting a script.
-
 =back
 
 B<Special Considerations for Lone Trailing Commas>
 
 Adding or deleting the only comma in a list can have some implications which
-need to be explained and possibly controlled.
+need to be explained and possibly controlled. Two additional controls are
+available for these lone commas:
 
-The main issue with deleting a lone comma is that if it
-is deleted, then it might not be possible add it back automatically
-since perltidy uses the existance of commas to help locate lists. For example,
-given
+=over 4
+
+=item *
+
+B<--add-lone-trailing-commas, -altc>  - gives permission to add a comma if it will be the only comma. This is on by default and explained below.
+
+=item *
+
+B<--delete-lone-trailing-commas, -dltc>  - gives permission to delete the only comma in a list. This is on by default and explained below.
+
+=back
+
+One issue with deleting a lone comma is that if it is deleted, then it
+might not be possible add it back automatically since perltidy uses the
+existence of commas to help locate containers where commas are appropriate. For
+example, given
 
     my ( $self, ) = @_;
 
@@ -4039,36 +4346,40 @@ to restrict testing to operations which are reversible.  Note that this
 parameter is a fine-tuning control for B<--delete-trailing-commas> which
 must also be set for it to have any effect.
 
-Perltidy can add a lone comma to certain lists which themselves contain
-lists. For example, a comma can be added after the closing hash brace in
-the following snippet:
+However, if a single item in a list is itself is a list with multiple lines,
+such as the item in braces here
 
     $self->make_grammar(
         {
             iterator => $self->_iterator,
             parser   => $self,
-            version  => $self->version,
         }
     );
 
-However, the parameter B<--add-lone-trailing-commas> must be set to allow such
-a comma to be added.  The reason is that adding such a comma would prevent the
-B<--weld-nested-containers> flag from operating on this structure.  This can be
-confusing, so this parameter is off by default.  Note that this parameter is a
-fine-tuning control for B<--add-trailing-commas> which must also be set for it
-to have any effect. To  illustrate its use on the above example:
+then perltidy can add and/or delete a lone comma:
 
-    # perltidy -atc -altc -wtc=b
+    # perltidy -atc -wtc=b
     $self->make_grammar(
         {
             iterator => $self->_iterator,
             parser   => $self,
-            version  => $self->version,
         },
     );
 
-This comma can be removed to allow welding with the control described in the
-next section.
+But it turns out that these cases usually coincide with situations where the
+B<--weld-nested-containers>, or B<-wn>, parameter would apply, and adding such
+commas can block welding.  For example, the B<-wn> parameter would succeed on
+the first of the above snippets, but it would fail on the second because of the
+added trailing comma.
+
+The parameter B<--add-lone-trailing-commas>, or B<-altc> allows these commas to
+be added, provide that B<--add-trailing-commas> is also set. It is on by
+default.  Users of B<-wn> may want to turn it off with
+B<--noadd-lone-trailing-commas>, B<-naltc> to prevent such commas from being
+added.
+
+If such commas do get added, then can be removed to allow welding with the
+control described in the next section.
 
 =item B<-dwic>,  B<--delete-weld-interfering-commas>
 
@@ -4082,7 +4393,6 @@ For example, a comma in this script prevents welding:
         {
             iterator => $self->_iterator,
             parser   => $self,
-            version  => $self->version,
         },
     );
 
@@ -4092,7 +4402,6 @@ Adding B<-dwic> removes the comma and allows welding:
     $self->make_grammar( {
         iterator => $self->_iterator,
         parser   => $self,
-        version  => $self->version,
     } );
 
 This feature is off by default.
@@ -4124,7 +4433,7 @@ This operation is independent of B<--add-trailing-commas> and B<--delete-trailin
 In the following expression, the arrow operator '->' between the closing and
 opening brackets of hash keys and array indexes are optional:
 
-   return $self->{'commandline'}->{'arg_list'}->[0]->[0]->{'hostgroups'};
+   return $self->{'commandline'}->{'args'}->[0]->[0]->{'hgroups'};
 
 These will be called B<interbracket arrows> here, for lack of a better term.
 Perltidy will not change them by default, but they can be added or removed with
@@ -4137,7 +4446,7 @@ the following parameters.
 This parameter deletes interbracket arrows. Applied to the above example we have
 
     # perltidy -dia
-    return $self->{'commandline'}{'arg_list'}[0][0]{'hostgroups'};
+    return $self->{'commandline'}{'args'}[0][0]{'hgroups'};
 
 By default this applies to all interbracket arrows, but selective deletion is possible
 with controls described below.
@@ -4148,7 +4457,7 @@ This parameter adds interbracket arrows. Applied to the line of code above, we
 get back the original line.
 
     # perltidy -aia
-    return $self->{'commandline'}->{'arg_list'}->[0]->[0]->{'hostgroups'};
+    return $self->{'commandline'}->{'args'}->[0]->[0]->{'hgroups'};
 
 Selective changes can be made with controls described below.
 
@@ -4231,16 +4540,16 @@ This parameter makes it possible to skip adding or deleting arrows following a
 container which is complex in some sense. Three levels of complexity can be
 specified with the integer B<n>, as follows:
 
-   n=0   the contents of the left container must be a single thing (token)
-   n=1   the left container must not contain other containers [DEFAULT]
-   n=2   the left container may contain anything
+ n=0  the left container must contain be a single thing (token)
+ n=1  the left container must not contain other containers [DEFAULT]
+ n=2  the left container may contain anything
 
 Some examples:
 
-    # Container                complexity
-    {'commandline'}            0 single token         OK by default
-    { $type . $name }          1 multiple tokens      OK by default
-    [ $plot{'x-axis'} - 1 ]    2 contains a container SKIPPED by default
+ # Container               complexity
+ {'commandline'}           0 single token         OK by default
+ { $type . $name }         1 multiple tokens      OK by default
+ [ $plot{'x-axis'} - 1 ]   2 contains a container SKIPPED by default
 
 So, with the default complexity level of 1, an arrow could be added or deleted
 following the first two of these containers but not the third.
@@ -4380,17 +4689,17 @@ short expressions into a single line.
 For example, given this snippet:
 
     return unless $cmd = $cmd || ($dot
-        && $Last_Shell) || &prompt('|');
+        && $Last) || &prompt('|');
 
     # perltidy -bol [default]
     return
       unless $cmd = $cmd
       || ( $dot
-        && $Last_Shell )
+        && $Last )
       || &prompt('|');
 
     # perltidy -nbol
-    return unless $cmd = $cmd || ( $dot && $Last_Shell ) || &prompt('|');
+    return unless $cmd = $cmd || ( $dot && $Last ) || &prompt('|');
 
 =item B<-bom>,  B<--break-at-old-method-breakpoints>
 
@@ -4399,34 +4708,31 @@ a breakpoint, but method chains will fill to the line width before a break is
 considered.  With B<-bom>, breaks before the arrow are preserved, so if you
 have pre-formatted a method chain:
 
-  my $q = $rs
-    ->related_resultset('CDs')
-    ->related_resultset('Tracks')
-    ->search({
-      'track.id' => {-ident => 'none_search.id'},
-    })->as_query;
+    # perltidy -bom
+    $Document
+      ->schild(0)
+      ->schildren();
 
-It will B<keep> these breaks, rather than become this:
+the flag B<-bom> will B<keep> these line breaks, rather than become this:
 
-  my $q = $rs->related_resultset('CDs')->related_resultset('Tracks')->search({
-      'track.id' => {-ident => 'none_search.id'},
-    })->as_query;
+    # perltidy [DEFAULT]
+    $Document->schild(0)->schildren();
 
 This flag will also look for and keep a 'cuddled' style of calls,
 in which lines begin with a closing paren followed by a call arrow,
 as in this example:
 
-  # perltidy -bom -wn
-  my $q = $rs->related_resultset(
-      'CDs'
-  )->related_resultset(
-      'Tracks'
-  )->search( {
-      'track.id' => { -ident => 'none_search.id' },
-  } )->as_query;
+    # perltidy -bom
+    my $q = $rs->related_resultset(
+        'CDs'
+    )->related_resultset(
+        'Tracks'
+    )->search(
+        {
+            'track.id' => { -ident => 'none_search.id' },
+        }
+    )->as_query;
 
-You may want to include the B<-weld-nested-containers> flag in this case to keep
-nested braces and parens together, as in the last line.
 
 =item B<-bos>,  B<--break-at-old-semicolon-breakpoints>
 
@@ -4440,10 +4746,18 @@ The default formatting will be:
 
   $z = sqrt( $x**2 + $y**2 );
 
-The result using B<perltidy -bos> keeps the isolated semicolon:
+Using the B<-bos> flag keeps the isolated semicolon:
 
+  # perltidy -bos
   $z = sqrt( $x**2 + $y**2 )
     ;
+
+The extra continuation indentation spaces on the semicolon can be
+removed by also setting B<--noindent-leading-semicolon>.
+
+  # perltidy -bos -nils
+  $z = sqrt( $x**2 + $y**2 )
+  ;
 
 The default is not to do this, B<-nbos>.
 
@@ -4530,10 +4844,10 @@ these meanings (these are the same as used in the
 B<--weld-nested-exclusion-list> and B<--line-up-parentheses-exclusion-list>
 parameters):
 
- 'k' matches if the previous nonblank token is a perl built-in keyword
+ 'k' matches if the previous nonblank token is a perl keyword
      (such as 'if', 'while'),
- 'K' matches if 'k' does not, meaning that the previous token is not a keyword.
- 'f' matches if the previous token is a function other than a keyword.
+ 'K' matches if 'k' does not: previous token is not a keyword
+ 'f' matches if previous token is a function (not a keyword)
  'F' matches if 'f' does not.
  'w' matches if either 'k' or 'f' match.
  'W' matches if 'w' does not.
@@ -4637,7 +4951,7 @@ such blank lines from being introduced.
 
 The parameter B<-blbs=n> requests that least B<n> blank lines precede a sub
 definition which does not follow a comment and which is more than one-line
-long.  The default is <-blbs=1>.  B<BEGIN> and B<END> blocks are included.
+long.  The default is B<-blbs=1>.  B<BEGIN> and B<END> blocks are included.
 
 The requested number of blanks statement will be inserted regardless of the
 value of B<--maximum-consecutive-blank-lines=n> (B<-mbl=n>) with the exception
@@ -4781,8 +5095,8 @@ treated.
 The possible values of B<n> are:
 
  n=0 ignore all old blank lines
- n=1 stable: keep old blanks, but limited by the value of the B<-mbl=n> flag
- n=2 keep all old blank lines, regardless of the value of the B<-mbl=n> flag
+ n=1 stable: keep old blanks, but limited by the B<-mbl=n> flag
+ n=2 keep all old blank lines, regardless of the B<-mbl=n> flag
 
 The default is B<n=1>.
 
@@ -4829,38 +5143,38 @@ B<-nkgb> or B<--nokeyword-group-blanks>, is short for B<-kgbb=1 -kgba=1 nkgbi>
 Before describing the meaning of the parameters in detail let us look at an
 example which is formatted with default parameter settings.
 
-        print "Entering test 2\n";
-        use Test;
-        use Encode qw(from_to encode decode
-          encode_utf8 decode_utf8
-          find_encoding is_utf8);
-        use charnames qw(greek);
-        my @encodings     = grep( /iso-?8859/, Encode::encodings() );
-        my @character_set = ( '0' .. '9', 'A' .. 'Z', 'a' .. 'z' );
-        my @source        = qw(ascii iso8859-1 cp1250);
-        my @destiny       = qw(cp1047 cp37 posix-bc);
-        my @ebcdic_sets   = qw(cp1047 cp37 posix-bc);
-        my $str           = join( '', map( chr($_), 0x20 .. 0x7E ) );
-        return unless ($str);
+    print "Entering test 2\n";
+    use Test;
+    use Encode qw(from_to encode decode
+      encode_utf8 decode_utf8
+      find_encoding is_utf8);
+    use charnames qw(greek);
+    my @encodings     = grep( /iso-?8859/, Encode::encodings() );
+    my @character_set = ( '0' .. '9', 'A' .. 'Z', 'a' .. 'z' );
+    my @source        = qw(ascii iso8859-1 cp1250);
+    my @destiny       = qw(cp1047 cp37 posix-bc);
+    my @ebcdic_sets   = qw(cp1047 cp37 posix-bc);
+    my $str           = join( '', map( chr($_), 0x20 .. 0x7E ) );
+    return unless ($str);
 
 using B<perltidy -kgb> gives:
 
-        print "Entering test 2\n";
-                                      <----------this blank controlled by -kgbb
-        use Test;
-        use Encode qw(from_to encode decode
-          encode_utf8 decode_utf8
-          find_encoding is_utf8);
-        use charnames qw(greek);
-                                      <---------this blank controlled by -kgbi
-        my @encodings     = grep( /iso-?8859/, Encode::encodings() );
-        my @character_set = ( '0' .. '9', 'A' .. 'Z', 'a' .. 'z' );
-        my @source        = qw(ascii iso8859-1 cp1250);
-        my @destiny       = qw(cp1047 cp37 posix-bc);
-        my @ebcdic_sets   = qw(cp1047 cp37 posix-bc);
-        my $str           = join( '', map( chr($_), 0x20 .. 0x7E ) );
-                                      <----------this blank controlled by -kgba
-        return unless ($str);
+    print "Entering test 2\n";
+                              <----------this blank controlled by -kgbb
+    use Test;
+    use Encode qw(from_to encode decode
+      encode_utf8 decode_utf8
+      find_encoding is_utf8);
+    use charnames qw(greek);
+                              <---------this blank controlled by -kgbi
+    my @encodings     = grep( /iso-?8859/, Encode::encodings() );
+    my @character_set = ( '0' .. '9', 'A' .. 'Z', 'a' .. 'z' );
+    my @source        = qw(ascii iso8859-1 cp1250);
+    my @destiny       = qw(cp1047 cp37 posix-bc);
+    my @ebcdic_sets   = qw(cp1047 cp37 posix-bc);
+    my $str           = join( '', map( chr($_), 0x20 .. 0x7E ) );
+                              <----------this blank controlled by -kgba
+    return unless ($str);
 
 Blank lines have been introduced around the B<my> and B<use> sequences.  What
 happened is that the default keyword list includes B<my> and B<use> but not
@@ -5011,7 +5325,8 @@ To use this style with B<-xlp> (B<--extended-line-up-parentheses>) instead of B<
 B<-pbp> is an abbreviation for the parameters in the book B<Perl Best Practices>
 by Damian Conway:
 
-    -l=78 -i=4 -ci=4 -st -se -vt=2 -cti=0 -pt=1 -bt=1 -sbt=1 -bbt=1 -nsfs -nolq
+    -l=78 -i=4 -ci=4 -st -se -vt=2 -cti=0 -pt=1 -bt=1 -sbt=1 -bbt=1
+    -nsfs -nolq
     -wbb="% + - * / x != == >= <= =~ !~ < > | & =
           **= += *= &= <<= &&= -= /= |= >>= ||= //= .= %= ^= x="
 
@@ -5034,7 +5349,7 @@ following snippet illustrates these options.
         )
         . (
         $page
-        ? ( $section ? ' in ' : '' ) . "the $page$page_ext manpage"
+        ? ( $section ? ' in ' : '' ) . "the $page_ext manpage"
         : ' elsewhere in this document'
         );
 
@@ -5046,7 +5361,7 @@ following snippet illustrates these options.
       )
       . (
         $page
-        ? ( $section ? ' in ' : '' ) . "the $page$page_ext manpage"
+        ? ( $section ? ' in ' : '' ) . "the $page_ext manpage"
         : ' elsewhere in this document'
       );
 
@@ -5057,7 +5372,7 @@ following snippet illustrates these options.
         :                   "the section on $section"
         )
         . ( $page
-            ? ( $section ? ' in ' : '' ) . "the $page$page_ext manpage"
+            ? ( $section ? ' in ' : '' ) . "the $page_ext manpage"
             : ' elsewhere in this document'
         );
 
@@ -5130,9 +5445,9 @@ blocks for certain block types.  This flag allows the user to prevent this behav
 include any of the words C<sort>, C<map>, C<grep>, C<eval>,  or it may be C<*>
 to indicate all of these.
 
-So for example to prevent multi-line B<eval> blocks from becoming one-line
-blocks, the command would be B<-olbxl='eval'>.  In this case, existing one-line B<eval> blocks will remain on one-line if possible, and existing multi-line
-B<eval> blocks will remain multi-line blocks.
+So for example to prevent multiline B<eval> blocks from becoming one-line
+blocks, the command would be B<-olbxl='eval'>.  In this case, existing one-line B<eval> blocks will remain on one-line if possible, and existing multiline
+B<eval> blocks will remain multiline blocks.
 
 =item B<-olbn=n>, B<--one-line-block-nesting=n>
 
@@ -5166,9 +5481,9 @@ omitted at the end of a one-line block containing just a single statement.
 By default, perltidy follows the input file regarding these semicolons,
 but this behavior can be controlled by this flag.  The values of n are:
 
-  n=0 remove terminal semicolons in one-line blocks having a single statement
-  n=1 stable; keep input file placement of terminal semicolons [DEFAULT ]
-  n=2 add terminal semicolons in all one-line blocks
+ n=0 remove terminal semicolons in single-statement one-line blocks
+ n=1 stable; keep input terminal semicolons [DEFAULT ]
+ n=2 add terminal semicolons in all one-line blocks
 
 Note that the B<n=2> option has no effect if adding semicolons is prohibited
 with the B<-nasc> flag.  Also not that while B<n=2> adds missing semicolons to
@@ -5180,7 +5495,7 @@ semicolon.  So these two options are not exact inverses.
 
 Sometimes it might be desirable to convert a script to have one-line blocks
 whenever possible.  Although there is currently no flag for this, a simple
-workaround is to execute perltidy twice, once with the flag B<-noadd-newlines>
+workaround is to execute perltidy twice, once with the flag B<--noadd-newlines>
 and then once again with normal parameters, like this:
 
      cat infile | perltidy -nanl | perltidy >outfile
@@ -5214,7 +5529,7 @@ when the script is reformatted again with the normal parameters, the blocks
 which were broken will remain broken (with the exceptions noted above).
 
 Another trick for doing this for certain block types is to format one time with
-the B<-cuddled-else> flag and B<--cuddled-break-option=2>. Then format again
+the B<--cuddled-else> flag and B<--cuddled-break-option=2>. Then format again
 with the normal parameters.  This will break any one-line blocks which are
 involved in a cuddled-else style.
 
@@ -5323,8 +5638,8 @@ include the types which are to be aligned in the list of B<--valign-inclusion-li
 In that case you may leave the B<valign-exclusion-list> undefined, or use the special symbol B<*> for the exclusion list.
 For example, the following parameters enable alignment only at commas and 'fat commas':
 
-  --valign-inclusion-list=', =>'
-  --valign-exclusion-list='*'     ( this is optional and may be omitted )
+ --valign-inclusion-list=', =>'
+ --valign-exclusion-list='*'  ( this is optional and may be omitted )
 
 These parameter lists should consist of space-separated tokens from the above
 list of possible alignment tokens, or a '*'.  If an unrecognized token
@@ -5338,24 +5653,24 @@ The default values of these parameters enable all alignments and are equivalent 
 
 To illustrate, consider the following snippet with default formatting
 
-    # perltidy
-    $co_description = ($color) ? 'bold cyan'  : '';           # description
-    $co_prompt      = ($color) ? 'bold green' : '';           # prompt
-    $co_unused      = ($color) ? 'on_green'   : 'reverse';    # unused
+  # perltidy
+  $co_description = ($color) ? 'bold cyan'  : '';           # descr
+  $co_prompt      = ($color) ? 'bold green' : '';           # prompt
+  $co_unused      = ($color) ? 'on_green'   : 'reverse';    # unused
 
 To exclude all alignments except the equals (i.e., include only equals) we could use:
 
-    # perltidy -vil='='
-    $co_description = ($color) ? 'bold cyan' : '';          # description
-    $co_prompt      = ($color) ? 'bold green' : '';         # prompt
-    $co_unused      = ($color) ? 'on_green' : 'reverse';    # unused
+  # perltidy -vil='='
+  $co_description = ($color) ? 'bold cyan' : '';          # descr
+  $co_prompt      = ($color) ? 'bold green' : '';         # prompt
+  $co_unused      = ($color) ? 'on_green' : 'reverse';    # unused
 
 To exclude only the equals we could use:
 
-    # perltidy -vxl='='
-    $co_description = ($color) ? 'bold cyan' : '';     # description
-    $co_prompt = ($color) ? 'bold green' : '';         # prompt
-    $co_unused = ($color) ? 'on_green' : 'reverse';    # unused
+  # perltidy -vxl='='
+  $co_description = ($color) ? 'bold cyan' : '';     # descr
+  $co_prompt = ($color) ? 'bold green' : '';         # prompt
+  $co_unused = ($color) ? 'on_green' : 'reverse';    # unused
 
 Notice in this last example that although only the equals alignment was
 excluded, the ternary alignments were also lost.  This happens because the
@@ -5370,20 +5685,20 @@ controlled separately with the parameter B<--valign-side-comments> described abo
 By default, postfix B<if> terms align and postfix B<unless> terms align,
 but separately.  For example,
 
-    # perltidy [DEFAULT]
-    print "Tried to add: @ResolveRPM\n" if ( @ResolveRPM and !$Quiet );
-    print "Would need: @DepList\n"      if ( @DepList    and !$Quiet );
-    print "RPM Output:\n"                 unless $Quiet;
-    print join( "\n", @RPMOutput ) . "\n" unless $Quiet;
+  # perltidy [DEFAULT]
+  print "Tried to add: @Resolve\n" if ( @Resolve and !$Quiet );
+  print "Would need: @DepList\n"   if ( @DepList and !$Quiet );
+  print "Output:\n"                  unless $Quiet;
+  print join( "\n", @Output ) . "\n" unless $Quiet;
 
 The B<-viu> flag causes a postfix B<unless> to be treated as if it were a
-postfix B<if> for purposes of alignment.  Thus
+postfix B<if> for purposes of alignment, and thus they align:
 
-    # perltidy -viu
-    print "Tried to add: @ResolveRPM\n"   if ( @ResolveRPM and !$Quiet );
-    print "Would need: @DepList\n"        if ( @DepList    and !$Quiet );
-    print "RPM Output:\n"                 unless $Quiet;
-    print join( "\n", @RPMOutput ) . "\n" unless $Quiet;
+  # perltidy -viu
+  print "Tried to add: @Resolve\n"   if ( @Resolve and !$Quiet );
+  print "Would need: @DepList\n"     if ( @DepList and !$Quiet );
+  print "Output:\n"                  unless $Quiet;
+  print join( "\n", @Output ) . "\n" unless $Quiet;
 
 =item B<Aligning signed numbers with --valign-signed-numbers or -vsn>
 
@@ -5416,17 +5731,20 @@ Some points regarding B<-vsn> are:
 =over 4
 
 =item *
+
 This option works by inserting a single space ahead of unsigned numbers
 when possible. This is not done if it would require increasing the
 maximum width of a column.
 
 =item *
+
 This option is mainly limited to lists of comma-separated numbers.  For
 multiline lists of numbers, having trailing commas can sometimes improve the
 results.  If missing, perltidy can add them for example
 with parameters B<-wtc=b -atc>.  See L<"Adding and Deleting Commas">.
 
 =item *
+
 This option has a control parameter B<--valign-signed-number-limit=N>, or
 B<-vsnl=N>. This value controls formatting of very long columns of numbers and
 should not normally need to be changed.  To see its purpose, consider a very
@@ -5674,7 +5992,7 @@ Here is an example of a F<.perltidyrc> file:
   # This implements a highly spaced style
   -se    # errors to standard error output
   -w     # show all warnings
-  -bl	 # braces on new lines
+  -bl    # braces on new lines
   -pt=0  # parens not tight at all
   -bt=0  # braces not tight
   -sbt=0 # square brackets not tight
@@ -5683,7 +6001,7 @@ The parameters in the F<.perltidyrc> file are installed first, so any
 parameters given on the command line will have priority over them.
 
 To avoid confusion, perltidy ignores any command in the .perltidyrc
-file which would cause some kind of dump and an exit.  These are:
+file which would cause some kind of dump and an exit.  These include:
 
  -h -v -ddf -dln -dop -dsn -dtt -dwls -dwrs -ss
 
@@ -5711,7 +6029,7 @@ line.  Then rename the desired file to F<.perltidyrc> when finished.
 =item *
 
 The parameters in the F<.perltidyrc> file can be switched off with
-the B<-npro> option.
+the B<-npro> option on the command line.
 
 =item *
 
@@ -5745,10 +6063,10 @@ shorthand for one or more styles which are frequently, but not always,
 used.  The notation is to group the options within curly braces which
 are preceded by the name of the alias (without leading dashes), like this:
 
-	newword {
-	-opt1
-	-opt2
-	}
+        newword {
+        -opt1
+        -opt2
+        }
 
 where B<newword> is the abbreviation, and B<opt1>, etc, are existing parameters
 I<or other abbreviations>.  The main syntax requirement is that the new
@@ -5757,11 +6075,11 @@ Space before and after the curly braces is optional.
 
 For a specific example, the following line
 
-        oneliner { --maximum-line-length=0 --noadd-newlines --noadd-terminal-newline}
+  oneliner { --maximum-line-length=0 --noadd-newlines --noadd-terminal-newline}
 
 or equivalently with abbreviations
 
-	oneliner { -l=0 -nanl -natnl }
+  oneliner { -l=0 -nanl -natnl }
 
 could be placed in a F<.perltidyrc> file to temporarily override the maximum
 line length with a large value, to temporarily prevent new line breaks from
@@ -5769,7 +6087,7 @@ being added, and to prevent an extra newline character from being added the
 file.  All other settings in the F<.perltidyrc> file still apply.  Thus it
 provides a way to format a long 'one liner' when perltidy is invoked with
 
-	perltidy --oneliner ...
+        perltidy --oneliner ...
 
 (Either C<-oneliner> or C<--oneliner> may be used).
 
@@ -5802,7 +6120,7 @@ named B<--dump-...> will simply write some requested information to standard
 output and then immediately exit.
 
 B<--dump-cuddled-block-list> or B<-dcbl> will dump to standard output the
-internal hash of cuddled block types created by a B<-cuddled-block-list> input
+internal hash of cuddled block types created by a B<--cuddled-block-list> input
 string.
 
 B<--dump-defaults> or B<-ddf> will write the default option set to standard output and quit
@@ -5831,6 +6149,8 @@ around tokens.
 B<--dump-want-right-space> or B<-dwrs>  will write the hash C<%want_right_space>
 to standard output and quit.  See the section on controlling whitespace
 around tokens.
+
+See L<"Analyzing Code"> for additional B<--dump-> parameters.
 
 =item B<Other parameters related to processing>
 
@@ -5932,10 +6252,12 @@ B<--warn->:
 =over 4
 
 =item *
+
 The B<--dump-> parameters read a file, write information to the standard output,
 and then exit without doing any formatting.
 
 =item *
+
 The B<--warn-> parameters, on the other hand, cause perltidy to function
 normally but issue warnings to the error output when certain conditions are
 encountered.
@@ -5960,16 +6282,16 @@ command line.  For example
 produces an output file F<blocks.csv> whose lines hold these
 parameters:
 
-    filename     - the name of the file
-    line         - the line number of the opening brace of this block
-    line_count   - the number of lines between opening and closing braces
-    code_lines   - the number of lines excluding blanks, comments, and pod
-    type         - the block type (sub, for, foreach, ...)
-    name         - the block name if applicable (sub name, label, asub name)
-    depth        - the nesting depth of the opening block brace
-    max_change   - the change in depth to the most deeply nested code block
-    block_count  - the total number of code blocks nested in this block
-    mccabe_count - the McCabe complexity measure of this code block
+  filename     - name of the file
+  line         - line number of the opening brace of this block
+  line_count   - number of lines between opening and closing braces
+  code_lines   - number of lines excluding blanks, comments, and pod
+  type         - block type (sub, for, foreach, ...)
+  name         - block name if applicable (sub or asub name, label..)
+  depth        - nesting depth of the opening block brace
+  max_change   - change in depth to the most deeply nested code block
+  block_count  - total number of code blocks nested in this block
+  mccabe_count - McCabe complexity measure of this code block
 
 This feature was developed to help identify complex sections of code as an aid
 in refactoring.  The McCabe complexity measure follows the definition used by
@@ -6006,7 +6328,7 @@ a few symbols for special block types, as follows:
    +    - any nested inner block loop
    package - any package or class
    closure - any nameless block
-   elsif3  - an if-elsif-..-else chain with 3 or more elsif's (3 is arbitrary, see below)
+   elsif3  - an if-elsif- chain with 3 or more elsif's (see below)
 
 A chain of B<if-elsif-...> blocks may be reported as a single line item by entering the word B<elsif> with an appended integer, as indicated by the last item in
 this list. The integer indicates the number of B<elsif> blocks required for
@@ -6025,31 +6347,42 @@ C<somefile.pl>:
 =over 4
 
 =item *
+
 This selects both C<subs> and C<packages> which have 20 or more lines of code.
 This can be useful in code which contains multiple packages.
 
     perltidy -dbs -dbt='sub package' somefile.pl >blocks.csv
 
 =item *
+
 This selects block types C<sub for foreach while> with 10 or more code lines.
 
     perltidy -dbs -dbl=10 -dbt='sub for foreach while' somefile.pl >blocks.csv
 
 =item *
+
 This selects blocks with 2 or more code lines which are type C<sub> or which
 are inner loops.
 
     perltidy -dbs -dbl=2 -dbt='sub +' somefile.pl >blocks.csv
 
 =item *
+
 This selects every block and package.
 
     perltidy -dbs -dbl=1 -dbt='* closure' somefile.pl >blocks.csv
 
 =item *
-This selects every if-chain which contains 2 or more B<elsif> blocks:
+
+This selects every if-chain which contains 2 or more C<elsif> blocks:
 
     perltidy -dbs -dbl=1 -dbt='elsif2' somefile.pl >blocks.csv
+
+=item *
+
+This selects every C<while> block with 6 or more code lines
+
+    perltidy -dbs -dbt=while -dbl=6 somfile.pl >while.csv
 
 =back
 
@@ -6221,6 +6554,23 @@ this wildcard suffix is in the exclusion list:
 
     -wvxl='*_uu'
 
+=item B<Use --dump-unique-keys> to help locate misspelled hash keys
+
+The parameter B<--dump-unique-keys>, or B<-duk>, dumps a list of hash keys
+which appear to be used just once, and do not appear among the quoted
+strings in a file. For example:
+
+   perltidy -duk File.pm >output.txt
+
+The lines in the output file list each unique key and its line number.
+Typically, most of the listed keys listed will be perfectly valid keys needed,
+for example, for communication with other modules or for future development.
+But the list might also include something unexpected, such as a misspelled key.
+
+A program C<dump_unique_keys.pl> at
+L<https://github.com/perltidy/perltidy/tree/master/examples> can run perltidy
+with B<-duk> on multiple files, and then remove any common keys from the list.
+
 =item B<Use --dump-mixed-call-parens to find functions called both with and without parens>
 
 The parameter B<--dump-mixed-call-parens>, or B<-dmcp>, provides information on
@@ -6347,7 +6697,29 @@ For example
 In this case, the sub is expecting a total of three args (C<$self>, C<$v1>, and
 C<$v2>) but only receives two (C<$self> and C<42>), so an undercount is
 reported.  This is not necessarily an error because the sub may allow for this
-possibility, but it is worth checking.  The simple static processing done by perltidy cannot determine which sub args are optional.
+possibility, but it is worth checking.
+
+Although it is not possible to automatically determine which sub args are
+optional, if optional sub args are enclosed in an extra set of parentheses,
+perltidy will take this a signal that they are optional and not issue a
+warning.  So if the above example is written as
+
+    sub gnab_gib {
+        my $self = shift;
+        my ( $v1, ($v2) ) = @_;  # <-- $v2 is optional
+        ...;
+    }
+
+then perltidy will consider that the second arg is optional and not issue
+a warning for:
+
+    $self->gnab_gib(42);
+
+For multiple default call args, place one set of parens around them all. Some
+examples:
+
+    my ( ($v1) ) = @_;              # <-- $v1 is optional
+    my ( $v1, ( $v2, $v3 ) ) = @_;  # <-- $v2, $v3 are optional
 
 =item B<i:> B<indeterminate:> a specific number of expected args for a sub could not be determined, but it is called with a specific number. This issue is reported for the B<--dump-> option but not the B<--warn-> option.
 
@@ -6358,6 +6730,7 @@ B<Notes and Limitations:>
 =over 4
 
 =item *
+
 This option works best for subs which unpack call args in an orderly manner
 near the beginning of the sub from C<@_> and/or with C<shift> operations.  It
 will also work for direct access to specific elements of the @_ array.  However
@@ -6365,12 +6738,15 @@ if the coding for arg extraction is complex then the number of sub args will be
 considered indeterminate and a count cannot be checked.
 
 =item *
+
 Sub calls made without parentheses around the args are not checked.
 
 =item *
+
 Anonymous subs and lexical subs (introduced with C<my>) are not checked.
 
 =item *
+
 Only calls which appear to be to subs defined within the file being
 processed are checked. But note that a file may contain multiple packages.
 
@@ -6390,6 +6766,7 @@ Several companion controls are available to avoid unwanted error messages:
 =over 4
 
 =item *
+
 B<--warn-mismatched-arg-types=s>, or B<-wmat=s>, can be used to
 select specific tests, type B<a> (arrow test) or B<o> (overcounts) or B<u> (undercounts). All checks may be requested with B<-wmat='*'> or B<-wmat=1>. This is the default.
 
@@ -6400,6 +6777,7 @@ To restrict the check to a specific warning type, set the string equal to the le
 will format F<somefile.pl> and report any arrow-type mismatches and overcount mismatches, but will skip undercount mismatches.
 
 =item *
+
 B<--warn-mismatched-arg-exclusion-list>, or B<-wmaxl=string>, can be given to
 skip the warning checks for a list of subroutine names, entered as a quoted
 string of space- or comma-separated names, without a package prefix. All subs
@@ -6407,6 +6785,7 @@ with those names will be skipped, regardless of package. A leading and/or
 trailing B<*> on a name may be used to indicate a partial string match.
 
 =item *
+
 B<--warn-mismatched-arg-undercount-cutoff=n>, or B<-wmauc=n>, can be used to
 avoid B<undercount> warnings when the expected number of args is less than B<n>.
 Please note that this number B<n> is the number of args from the point of
@@ -6420,7 +6799,13 @@ error for a program can be determined by running with B<-wma -wmauc=0>.  If
 there are undercount errors, a note at the bottom of the error output
 indicates the value of B<n> required to avoid reporting them.
 
+As noted above for the parameter B<--dump-mismatched-args>, if optional call
+args are enclosed in separate parentheses, then perltidy will recognize them as
+optional args and avoid needless warnings.  If this method is used,
+then B<-wmauc=0> should be used for maximal checking.
+
 =item *
+
 B<--warn-mismatched-arg-overcount-cutoff=n>, or B<-wmaoc=n>, can be used to
 avoid B<overcount> warnings when the expected number of args is less than B<n>.
 The default value is B<n=1>. This avoids warning messages for subroutines
@@ -6467,8 +6852,8 @@ These issue types are illustrated with the following code
         ( $name, $flags ); # 2 values but no 'return' statement
     }
 
-    ( $name, $flags ) = macho();  # 'x' (want array but no return stmt)
-    $name = macho();              # 'y' (want scalar but no return stmt)
+    ( $name, $flags ) = macho();  # 'x' (want array, but no return)
+    $name = macho();              # 'y' (want scalar but no return)
 
     sub wimp {
         ...;
@@ -6477,7 +6862,7 @@ These issue types are illustrated with the following code
 
     ( $name, $flags, $access) = wimp(); # 'o' (want array 3 > 2)
     ($name) = wimp();                   # 'u' (want array 1 < 2)
-    $name   = wimp();                   # 's' (want scalar but 2 values returned)
+    $name   = wimp();  # 's' (want scalar but 2 values returned)
 
 This analysis works by scanning all call statements and all sub return
 statements, and comparing the the number of items wanted with the possible
@@ -6507,6 +6892,7 @@ The following companion controls are available to avoid unwanted error messages:
 =over 4
 
 =item *
+
 B<--warn-mismatched-return-types=string>, or B<-wmrt=string>, can be used to limit checks.
 
 To restrict the checking, set the string equal to the letter(s) of that warning,
@@ -6519,6 +6905,7 @@ types B<u> and B<y>.  All checks may be requested with B<-wmrt='*'> or
 B<-wmrt=1>.  This is the default.
 
 =item *
+
 B<--warn-mismatched-return-exclusion-list>, or B<-wmrxl=string>, can be given to
 skip the warning checks for a list of subroutine names, entered as a quoted
 string of space- or comma-separated names, without a package prefix. All subs
@@ -6555,7 +6942,7 @@ Use B<--nolook-for-selfloader>, or B<-nlsl>, to deactivate this feature.
 The flag B<-html> causes perltidy to write an html file with extension
 F<.html>.  So, for example, the following command
 
-	perltidy -html somefile.pl
+        perltidy -html somefile.pl
 
 will produce a syntax-colored html file named F<somefile.pl.html>
 which may be viewed with a browser.
@@ -6568,7 +6955,7 @@ fully reformatted, html copy of a script.
 =item  The B<-pre> flag for code snippets
 
 When the B<-pre> flag is given, only the pre-formatted section, within
-the <PRE> and </PRE> tags, will be output.  This simplifies inclusion
+the C<<PRE>> and C<</PRE>> tags, will be output.  This simplifies inclusion
 of the output in other files.  The default is to output a complete
 web page.
 
@@ -6725,31 +7112,31 @@ hex RGB color value or an ascii name for a color, such as 'red'.
 To illustrate, the following command will produce an html
 file F<somefile.pl.html> with "aqua" keywords:
 
-	perltidy -html -hck=00ffff somefile.pl
+        perltidy -html -hck=00ffff somefile.pl
 
 and this should be equivalent for most browsers:
 
-	perltidy -html -hck=aqua somefile.pl
+        perltidy -html -hck=aqua somefile.pl
 
 Perltidy merely writes any non-hex names that it sees in the html file.
 The following 16 color names are defined in the HTML 3.2 standard:
 
-	black   => 000000,
-	silver  => c0c0c0,
-	gray    => 808080,
-	white   => ffffff,
-	maroon  => 800000,
-	red     => ff0000,
-	purple  => 800080,
-	fuchsia => ff00ff,
-	green   => 008000,
-	lime    => 00ff00,
-	olive   => 808000,
-	yellow  => ffff00
-	navy    => 000080,
-	blue    => 0000ff,
-	teal    => 008080,
-	aqua    => 00ffff,
+        black   => 000000,
+        silver  => c0c0c0,
+        gray    => 808080,
+        white   => ffffff,
+        maroon  => 800000,
+        red     => ff0000,
+        purple  => 800080,
+        fuchsia => ff00ff,
+        green   => 008000,
+        lime    => 00ff00,
+        olive   => 808000,
+        yellow  => ffff00
+        navy    => 000080,
+        blue    => 0000ff,
+        teal    => 008080,
+        aqua    => 00ffff,
 
 Many more names are supported in specific browsers, but it is safest
 to use the hex codes for other colors.  Helpful color tables can be
@@ -6769,7 +7156,7 @@ NOT use italics, use B<--nohtml-italic-xxxxxx> or B<-nhix>.
 For example, to use bold braces and lime color, non-bold, italics keywords the
 following command would be used:
 
-	perltidy -html -hbs -hck=00FF00 -nhbk -hik somefile.pl
+        perltidy -html -hbs -hck=00FF00 -nhbk -hik somefile.pl
 
 The background color can be specified with B<--html-color-background=n>,
 or B<-hcbg=n> for short, where n is a 6 character hex RGB value.  The
@@ -6843,20 +7230,20 @@ The following list shows all short parameter names which allow a prefix
  ce     conv   cpb    cs     csc    cscb   cscw   dac    dbc    dbs
  dcbl   dcsc   ddf    dia    dior   dln    dltc   dma    dmcp   dmr
  dnl    dop    dp     dpro   drc    dsc    dsm    dsn    dtc    dtco
- dtt    duv    dwic   dwls   dwrs   dws    eos    f      fpva   frm
- fs     fso    gcs    hbc    hbcm   hbco   hbh    hbhh   hbi    hbj
- hbk    hbm    hbn    hbp    hbpd   hbpu   hbq    hbs    hbsc   hbv
- hbw    hent   hic    hicm   hico   hih    hihh   hii    hij    hik
- him    hin    hip    hipd   hipu   hiq    his    hisc   hiv    hiw
- hsc    html   ibc    icb    icp    iob    ipc    isbc   iscl   kgb
- kgbd   kgbi   kis    lal    log    lop    lp     lsl    mci    mem
- nib    ohbr   okw    ola    olc    oll    olq    opr    opt    osbc
- osbr   otr    ple    pod    pvl    q      sac    sbc    sbl    scbb
- schb   scp    scsb   sct    se     sfp    sfs    skp    sob    sobb
- sohb   sop    sosb   sot    ssc    st     sts    t      tac    tbc
- toc    tp     tqw    trp    ts     tsc    tso    vbc    vc     viu
- vmll   vsc    vsn    vwe    w      wfc    wia    wma    wme    wmr
- wn     x      xbt    xci    xlp    xs
+ dtt    duk    duv    dwic   dwls   dwrs   dws    eos    f      fpva
+ frm    fs     fso    gcs    hbc    hbcm   hbco   hbh    hbhh   hbi
+ hbj    hbk    hbm    hbn    hbp    hbpd   hbpu   hbq    hbs    hbsc
+ hbv    hbw    hent   hic    hicm   hico   hih    hihh   hii    hij
+ hik    him    hin    hip    hipd   hipu   hiq    his    hisc   hiv
+ hiw    hsc    html   ibc    icb    icp    ils    iob    ipc    isbc
+ iscl   kgb    kgbd   kgbi   kis    lal    log    lop    lp     lsl
+ mci    mem    nib    ohbr   okw    ola    olc    oll    olq    opr
+ opt    osbc   osbr   otr    ple    pod    pvl    q      qwaf   sac
+ sbc    sbl    scbb   schb   scp    scsb   sct    se     sfp    sfs
+ skp    sob    sobb   sohb   sop    sosb   sot    ssc    st     sts
+ t      tac    tbc    toc    tp     tqw    trp    ts     tsc    tso
+ vbc    vc     viu    vmll   vsc    vsn    vwe    w      wfc    wia
+ wma    wme    wmr    wn     x      xbt    xci    xlp    xs
 
 Equivalently, the prefix 'no' or 'no-' on the corresponding long names may be
 used.
@@ -6955,7 +7342,7 @@ The perltidy binary uses the Perl::Tidy module and is installed when that module
 
 =head1 VERSION
 
-This man page documents perltidy version 20240903
+This man page documents perltidy version 20250105
 
 =head1 BUG REPORTS
 
@@ -6965,7 +7352,7 @@ To report a new bug or problem, use the "issues" link on this page.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2000-2024 by Steve Hancock
+Copyright (c) 2000-2025 by Steve Hancock
 
 =head1 LICENSE
 

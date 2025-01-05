@@ -14,7 +14,7 @@ use Getopt::Long 2.33;
 use Scalar::Util 1.26 qw{ blessed looks_like_number };
 use Text::ParseWords ();
 
-our $VERSION = '0.054';
+our $VERSION = '0.055';
 
 our @CARP_NOT = qw{
     Astro::App::Satpass2
@@ -22,6 +22,7 @@ our @CARP_NOT = qw{
     Astro::App::Satpass2::Format
     Astro::App::Satpass2::Format::Dump
     Astro::App::Satpass2::Format::Template
+    Astro::App::Satpass2::Format::Template::Provider
     Astro::App::Satpass2::FormatTime
     Astro::App::Satpass2::FormatTime::Cldr
     Astro::App::Satpass2::FormatTime::DateTime
@@ -60,10 +61,12 @@ our @EXPORT_OK = qw{
     __parse_class_and_args
     ARRAY_REF CODE_REF HASH_REF REGEXP_REF SCALAR_REF
     HAVE_DATETIME
+    OS_IS_WINDOWS
     @CARP_NOT
 };
 
 our %EXPORT_TAGS = (
+    os	=> [ grep { m/ \A OS_ /smx } @EXPORT_OK ],
     ref	=> [ grep { m/ _REF \z /smx } @EXPORT_OK ],
 );
 
@@ -82,6 +85,11 @@ use constant SCALAR_REF	=> ref \1;
 	1;
     } || 0;
 }
+
+use constant OS_IS_WINDOWS	=> {
+    dos		=> 1,
+    MSWin32	=> 1,
+}->{$^O} || 0;
 
 # Documented in POD
 
@@ -867,8 +875,7 @@ otherwise C<Carp> is loaded and C<Carp::croak()> is called.
 
 =head1 CONSTANTS
 
-This module supports the following exportable constants. You can export
-them all using tag C<':ref'>.
+This module supports the following exportable constants.
 
 =head2 ARRAY_REF
 
@@ -896,6 +903,11 @@ This Boolean constant is true if L<DateTime|DateTime> and
 L<DateTime::TimeZone|DateTime::TimeZone> can be loaded, and false if
 not.
 
+=head2 OS_IS_WINDOWS
+
+This Boolean constant is true if C<%^O> is C<'dos'> or C<'MSWin32'>.
+Otherwise it is false.
+
 =head1 GLOBALS
 
 This module exports the following globals:
@@ -903,6 +915,18 @@ This module exports the following globals:
 =head2 @CARP_NOT
 
 This global contains all modules in this package.
+
+=head1 EXPORT TAGS
+
+The following export tags are supported:
+
+=head2 :os
+
+This exports all manifest constants beginning with C<'OS_'>.
+
+=head2 :ref
+
+This exports all manifest constants ending with C<'_REF'>.
 
 =head1 SUPPORT
 
@@ -917,7 +941,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011-2024 by Thomas R. Wyant, III
+Copyright (C) 2011-2025 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

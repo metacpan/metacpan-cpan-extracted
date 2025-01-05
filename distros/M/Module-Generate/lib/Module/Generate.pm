@@ -9,7 +9,7 @@ use Perl::Tidy;
 use Data::Dumper;
 use Module::Starter;
 $Data::Dumper::Deparse = 1;
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 our %CLASS;
 our $SUB_INDEX = 1;
 
@@ -715,7 +715,7 @@ Module::Generate - Assisting with module generation.
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =cut
 

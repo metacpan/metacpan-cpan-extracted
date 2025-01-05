@@ -7,9 +7,9 @@ eg/My/Macros.pm
 eg/pass_ics
 eg/quarters_vcalendar
 eg/README
-eg/tle_celestia.tt
-eg/tle_json.tt
-eg/tle_stellarium.tt
+eg/tle_celestia.tt2
+eg/tle_json.tt2
+eg/tle_stellarium.tt2
 inc/My/Module/Build.pm
 inc/My/Module/Meta.pm
 inc/My/Module/Recommend.pm
@@ -22,6 +22,7 @@ lib/Astro/App/Satpass2/Copier.pm
 lib/Astro/App/Satpass2/Format.pm
 lib/Astro/App/Satpass2/Format/Dump.pm
 lib/Astro/App/Satpass2/Format/Template.pm
+lib/Astro/App/Satpass2/Format/Template/Provider.pm
 lib/Astro/App/Satpass2/FormatTime.pm
 lib/Astro/App/Satpass2/FormatTime/Cldr.pm
 lib/Astro/App/Satpass2/FormatTime/DateTime.pm
@@ -68,7 +69,7 @@ t/format_time_datetime_strftime.t
 t/format_time_posix_strftime.t
 t/format_value.t
 t/geocode_osm.t
-t/list.tt
+t/list.tt2
 t/locale.t
 t/locale/fu_BAR.pm
 t/macro_code.t

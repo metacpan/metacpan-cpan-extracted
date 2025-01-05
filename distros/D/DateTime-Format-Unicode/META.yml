@@ -25,8 +25,8 @@ no_index:
     - t
     - inc
 requires:
-  DateTime::Locale::FromCLDR: v0.6.0
-  Locale::Unicode: v0.3.9
+  DateTime::Locale::FromCLDR: v0.6.1
+  Locale::Unicode: v0.3.11
   POSIX: '0'
   Scalar::Util: '0'
   Want: '0.17'
@@ -39,5 +39,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jackdeguest/DateTime-Format-Unicode/issues
   repository: https://gitlab.com/jackdeguest/DateTime-Format-Unicode
-version: v0.1.5
+version: v0.1.6
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

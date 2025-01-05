@@ -10,12 +10,12 @@ use Travel::Status::DE::EFA::Stop;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '3.05';
+our $VERSION = '3.06';
 
 Travel::Status::DE::EFA::Departure->mk_ro_accessors(
 	qw(countdown datetime delay destination is_cancelled key line lineref mot
 	  occupancy operator origin platform platform_db platform_name rt_datetime
-	  sched_datetime stateless stop_id train_type train_name train_no type)
+	  sched_datetime stateless stop_id_num train_type train_name train_no type)
 );
 
 my @mot_mapping = qw{
@@ -69,7 +69,7 @@ sub new {
 		platform_type  => $departure->{pointType},
 		key            => $departure->{servingLine}{key},
 		stateless      => $departure->{servingLine}{stateless},
-		stop_id        => $departure->{stopID},
+		stop_id_num    => $departure->{stopID},
 		line           => $departure->{servingLine}{symbol},
 		train_type     => $departure->{servingLine}{trainType},
 		train_name     => $departure->{servingLine}{trainName},
@@ -154,7 +154,8 @@ sub parse_route {
 				sched_dep => $dep,
 				arr_delay => $ref->{arrValid} ? $ref->{arrDelay} : undef,
 				dep_delay => $ref->{depValid} ? $ref->{depDelay} : undef,
-				id        => $ref->{id},
+				id_num    => $ref->{id},
+				id_code   => $ref->{gid},
 				full_name => $stop->{name},
 				place     => $stop->{place},
 				name      => $stop->{nameWO},
@@ -165,6 +166,22 @@ sub parse_route {
 	}
 
 	return \@ret;
+}
+
+sub id {
+	my ($self) = @_;
+
+	if ( $self->{id} ) {
+		return $self->{id};
+	}
+
+	return $self->{id} = sprintf( '%s@%d(%s)%d',
+		$self->stateless =~ s{ }{}gr,
+		scalar $self->route_pre
+		? ( $self->route_pre )[0]->id
+		: $self->stop_id_num,
+		$self->sched_datetime->strftime('%Y%m%d'),
+		$self->key );
 }
 
 sub hints {
@@ -248,6 +265,9 @@ sub route_interesting {
 sub TO_JSON {
 	my ($self) = @_;
 
+	# compute on-demand keys
+	$self->id;
+
 	my $ret = { %{$self} };
 
 	delete $ret->{strp_stopseq};
@@ -283,7 +303,7 @@ departure received by Travel::Status::DE::EFA
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 
@@ -323,6 +343,13 @@ Destination name.
 Additional information related to the departure (list of strings). If
 departures for an address were requested, this is the stop name, otherwise it
 may be recent news related to the line's schedule.
+
+=item $departure->id
+
+Stringified unique(?) identifier of this departure; suitable for passing to
+Travel::Status::DE::EFA->new(stopseq) after decomposing it again.
+The returned string combines B<stateless>, B<stop_id_num> (or the ID of the first
+stop in B<route_pre>, if present), B<sched_datetime>, and B<key>.
 
 =item $departure->is_cancelled
 
@@ -493,7 +520,7 @@ Travel::Status::DE::EFA(3pm).
 
 =head1 AUTHOR
 
-Copyright (C) 2011-2023 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2011-2025 Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

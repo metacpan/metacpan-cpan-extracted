@@ -26,5 +26,5 @@ resources:
   bugtracker: https://github.com/briandfoy/test-isbn/issues
   homepage: https://github.com/briandfoy/test-isbn
   repository: https://github.com/briandfoy/test-isbn
-version: '2.044'
+version: '2.045'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

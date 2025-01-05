@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## DateTime Format Relative Time - ~/lib/DateTime/Format/RelativeTime.pm
-## Version v0.1.3
+## Version v0.1.6
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/12/30
-## Modified 2025/01/04
+## Modified 2025/01/05
 ## All rights reserved
 ## 
 ## 
@@ -24,10 +24,10 @@ BEGIN
     use DateTime;
     use DateTime::Locale::FromCLDR;
     use Locale::Intl;
-    use Locale::Unicode::Data v1.3.0;
+    use Locale::Unicode::Data v1.3.2;
     use Scalar::Util ();
     use Want;
-    our $VERSION = 'v0.1.3';
+    our $VERSION = 'v0.1.6';
 };
 
 use strict;
@@ -86,6 +86,7 @@ sub new
     # RangeError: invalid value "plop" for option month
     my %valid_options = 
     (
+        localeMatcher           => ['lookup', 'best fit'],
         # numberingSystem is processed separately
         numberingSystem         => qr/[a-zA-Z][a-zA-Z0-9]+/,
         style                   => [qw( long narrow short )],
@@ -282,25 +283,34 @@ sub error
     my $self = shift( @_ );
     if( @_ )
     {
-        my $msg = join( '', map( ( ref( $_ ) eq 'CODE' ) ? $_->() : $_, @_ ) );
-        $self->{error} = $ERROR = DateTime::Format::RelativeTime::Exception->new({
-            skip_frames => 1,
-            message => $msg,
-        });
+        my $def = {};
+        if( @_ == 1 &&
+            defined( $_[0] ) &&
+            ref( $_[0] ) eq 'HASH' &&
+            exists( $_[0]->{message} ) )
+        {
+            $def = shift( @_ );
+        }
+        else
+        {
+            $def->{message} = join( '', map( ( ref( $_ ) eq 'CODE' ) ? $_->() : $_, @_ ) );
+        }
+        $def->{skip_frames} = 1 unless( exists( $def->{skip_frames} ) );
+        $self->{error} = $ERROR = DateTime::Format::RelativeTime::Exception->new( $def );
         if( $self->fatal )
         {
             die( $self->{error} );
         }
         else
         {
-            warn( $msg ) if( warnings::enabled() );
+            warn( $def->{message}  ) if( warnings::enabled() );
             if( Want::want( 'ARRAY' ) )
             {
                 rreturn( [] );
             }
             elsif( Want::want( 'OBJECT' ) )
             {
-                rreturn( DateTime::Format::Intl::NullObject->new );
+                rreturn( DateTime::Format::RelativeTime::NullObject->new );
             }
             return;
         }
@@ -429,7 +439,7 @@ sub format_to_parts
     my $tree = $cldr->make_inheritance_tree( $locale ) ||
         return( $self->pass_error( $cldr->error ) );
     # We set an array of possible styles to try to find the most appropriate, while putting the user preferred one first
-    my @styles = ( $cldr_style, ( grep{ $_ ne $style } qw( long short narrow ) ) );
+    my @styles = ( $cldr_style, ( grep{ $_ ne $style } qw( standard short narrow ) ) );
     # If the algorithm is set to auto, we check if we can find a relative value -1, 0 or 1 for our unit type
     # If not, we fall back to the numeric pattern
     if( $algo eq 'auto' && 
@@ -461,6 +471,7 @@ sub format_to_parts
     {
         my $count = $cldr->plural_count( abs( $num ), $locale );
         my $cldr_num = ( $num < 0 ? -1 : 1 );
+        my @best = ();
         LOCALE: foreach my $loc ( @$tree )
         {
             foreach my $this_style ( @styles )
@@ -478,16 +489,24 @@ sub format_to_parts
                     return( $self->pass_error( $cldr->error ) ) if( !defined( $ref ) && $cldr->error );
                     if( $ref && scalar( keys( %$ref ) ) )
                     {
-                        $pattern = $ref->{format_pattern};
-                        last LOCALE;
+                        # If this style matches exactly that of user preferred one, we stop here, otherwise, we add it with a score so we can take the best pick after.
+                        if( $this_style eq $cldr_style )
+                        {
+                            $pattern = $ref->{format_pattern};
+                            last LOCALE;
+                        }
+                        else
+                        {
+                            push( @best, { style => $this_style, pattern => $pattern });
+                        }
                     }
                 }
             }
         }
-        # Now, we need to check for the locale's number system
-        my $locale_ns_def = $unicode->number_systems;
-        # Possible values: native, traditional, finance
-        # foreach my $ns_type ( qw( native traditional finance ) )
+        if( !defined( $pattern ) && scalar( @best ) )
+        {
+            $pattern = $best[0];
+        }
     }
     return( $self->error( "No suitable pattern could be found. Something is wrong with the Locale::Unicode::Data database." ) ) if( !defined( $pattern ) );
 
@@ -525,9 +544,72 @@ sub formatToParts { return( shift->format_to_parts( @_ ) ); }
 sub pass_error
 {
     my $self = shift( @_ );
+    my $pack = ref( $self ) || $self;
+    my $opts = {};
+    my( $err, $class, $code );
+    no strict 'refs';
+    if( scalar( @_ ) )
+    {
+        # Either an hash defining a new error and this will be passed along to error(); or
+        # an hash with a single property: { class => 'Some::ExceptionClass' }
+        if( scalar( @_ ) == 1 && ref( $_[0] ) eq 'HASH' )
+        {
+            $opts = $_[0];
+        }
+        else
+        {
+            if( scalar( @_ ) > 1 && ref( $_[-1] ) eq 'HASH' )
+            {
+                $opts = pop( @_ );
+            }
+            $err = $_[0];
+        }
+    }
+    $err = $opts->{error} if( !defined( $err ) && CORE::exists( $opts->{error} ) && defined( $opts->{error} ) && CORE::length( $opts->{error} ) );
+    # We set $class only if the hash provided is a one-element hash and not an error-defining hash
+    $class = $opts->{class} if( CORE::exists( $opts->{class} ) && defined( $opts->{class} ) && CORE::length( $opts->{class} ) );
+    $code  = $opts->{code} if( CORE::exists( $opts->{code} ) && defined( $opts->{code} ) && CORE::length( $opts->{code} ) );
+    
+    # called with no argument, most likely from the same class to pass on an error 
+    # set up earlier by another method; or
+    # with an hash containing just one argument class => 'Some::ExceptionClass'
+    if( !defined( $err ) && ( !scalar( @_ ) || defined( $class ) ) )
+    {
+        # $error is a previous erro robject
+        my $error = ref( $self ) ? $self->{error} : length( ${ $pack . '::ERROR' } ) ? ${ $pack . '::ERROR' } : undef;
+        if( !defined( $error ) )
+        {
+            warn( "No error object provided and no previous error set either! It seems the previous method call returned a simple undef" );
+        }
+        else
+        {
+            $err = ( defined( $class ) ? bless( $error => $class ) : $error );
+            $err->code( $code ) if( defined( $code ) );
+        }
+    }
+    elsif( defined( $err ) && 
+           Scalar::Util::blessed( $err ) && 
+           ( scalar( @_ ) == 1 || 
+             ( scalar( @_ ) == 2 && defined( $class ) ) 
+           ) )
+    {
+        $self->{error} = ${ $pack . '::ERROR' } = ( defined( $class ) ? bless( $err => $class ) : $err );
+        $self->{error}->code( $code ) if( defined( $code ) && $self->{error}->can( 'code' ) );
+        
+        if( $self->{fatal} || ( defined( ${"${class}\::FATAL_EXCEPTIONS"} ) && ${"${class}\::FATAL_EXCEPTIONS"} ) )
+        {
+            die( $self->{error} );
+        }
+    }
+    # If the error provided is not an object, we call error to create one
+    else
+    {
+        return( $self->error( @_ ) );
+    }
+    
     if( Want::want( 'OBJECT' ) )
     {
-        rreturn( DateTime::Format::Intl::NullObject->new );
+        rreturn( DateTime::Format::RelativeTime::NullObject->new );
     }
     return;
 }
@@ -1076,7 +1158,7 @@ For users requiring exact decimal representation beyond this precision, consider
 
 =head1 VERSION
 
-    v0.1.3
+    v0.1.6
 
 =head1 DESCRIPTION
 
@@ -1176,7 +1258,7 @@ Whether to use numeric values in the output. Possible values are C<always> and C
 
 =head2 format
 
-    my $fmt = new DateTime::Format::RelativeTime( 'en', { style => 'short' });
+    my $fmt = DateTime::Format::RelativeTime->new( 'en', { style => 'short' });
 
     say $fmt->format( 3, 'quarter' );
     # Expected output: "in 3 qtrs."
@@ -1238,7 +1320,7 @@ B<Note>: Most of the time, the formatting returned by C<format()> is consistent.
 
 =head2 formatToParts
 
-    my $fmt = new DateTime::Format::RelativeTime( 'en', { numeric => 'auto' });
+    my $fmt = DateTime::Format::RelativeTime->new( 'en', { numeric => 'auto' });
     my $parts = $fmt->formatToParts( 10, 'seconds' );
 
     say $parts->[0]->{value};
@@ -1250,7 +1332,7 @@ B<Note>: Most of the time, the formatting returned by C<format()> is consistent.
     say $parts->[2]->{value};
     # Expected output: " seconds"
 
-    my $fmt = new DateTime::Format::RelativeTime( 'en', { numeric => 'auto' });
+    my $fmt = DateTime::Format::RelativeTime->new( 'en', { numeric => 'auto' });
 
     # Format relative time using the day unit
     $fmt->formatToParts( -1, 'day' );
@@ -1304,10 +1386,10 @@ Plural forms are also permitted.
 
 =head2 resolvedOptions
 
-    my $fmt = new DateTime::Format::RelativeTime('en', { style => 'narrow' });
+    my $fmt = DateTime::Format::RelativeTime->new('en', { style => 'narrow' });
     my $options1 = $fmt->resolvedOptions();
     
-    my $fmt2 = new DateTime::Format::RelativeTime('es', { numeric => 'auto' });
+    my $fmt2 = DateTime::Format::RelativeTime->new('es', { numeric => 'auto' });
     my $options2 = $fmt2->resolvedOptions();
     
     say "$options1->{locale}, $options1->{style}, $options1->{numeric}";
@@ -1395,7 +1477,9 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 =head1 SEE ALSO
 
-L<perl>
+L<Locale::Unicode::Data>, L<Locale::Unicode>, L<Locale::Intl>, L<DateTime::Format::Intl>, L<DateTime::Locale::FromCLDR>
+
+L<DateTime::Format::Natural>, L<DateTimeX::Format::Ago>
 
 =head1 COPYRIGHT & LICENSE
 

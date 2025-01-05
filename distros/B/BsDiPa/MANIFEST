@@ -1,0 +1,25 @@
+lib/BsDiPa.pm		S-bsdipa perl module
+Makefile.PL		perl Makefile
+MANIFEST		This list of files
+MANIFEST.SKIP		Files to exclude from MANIFEST
+README			Introductional reading
+BsDiPa.xs		S-bsdipa XS file
+test.pl			Automated test
+c-lib/s-bsdipa-config.h	Generated configuration header
+c-lib/divsufsort.h
+c-lib/libdivsufsort/CHANGELOG.md
+c-lib/libdivsufsort/LICENSE
+c-lib/libdivsufsort/README.md
+c-lib/libdivsufsort/divsufsort.c
+c-lib/libdivsufsort/divsufsort_private.h
+c-lib/libdivsufsort/sssort.c
+c-lib/libdivsufsort/trsort.c
+c-lib/s-bspatch.c
+c-lib/configh.sh
+c-lib/makefile
+c-lib/s-bsdipa-lib.h
+c-lib/s-bsdipa-io.h
+c-lib/s-bsdiff.c
+c-lib/README
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

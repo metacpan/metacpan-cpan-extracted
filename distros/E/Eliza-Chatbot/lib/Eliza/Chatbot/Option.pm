@@ -43,7 +43,7 @@ Eliza::Chatbot::Options
 
 =head1 VERSION
 
-Version 0.08
+Version 0.10
 
 =head1 Options
 

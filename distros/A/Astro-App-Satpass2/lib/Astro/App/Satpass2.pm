@@ -10,6 +10,7 @@ use Astro::App::Satpass2::Macro::Command;
 use Astro::App::Satpass2::Macro::Code;
 use Astro::App::Satpass2::ParseTime;
 use Astro::App::Satpass2::Utils qw{
+    :os
     :ref
     __arguments __legal_options
     expand_tilde find_package_pod
@@ -91,7 +92,7 @@ use constant NULL_REF	=> ref NULL;
 
 use constant SUN_CLASS_DEFAULT	=> 'Astro::Coord::ECI::Sun';
 
-our $VERSION = '0.054';
+our $VERSION = '0.055';
 
 # The following 'cute' code is so that we do not determine whether we
 # actually have optional modules until we really need them, and yet do
@@ -2961,7 +2962,7 @@ sub _set_webcmd {
     return ($self->{$name} = $val);
 }
 
-sub show : Verb( changes! deprecated! readonly! ) {
+sub show : Verb( changes! deprecated! readonly! ) Tweak( -completion _readline_complete_subcommand ) {
     my ( $self, $opt, @args ) = __arguments( @_ );
 
     foreach my $name ( qw{ deprecated readonly } ) {
@@ -3014,6 +3015,18 @@ sub _show_formatter_attribute {
     my ( $self, $name ) = @_;
     my $val = $self->{formatter}->decode( $name );
     return ( qw{ formatter }, $name, $val );
+}
+
+# Calls to the following _show_sub method are generated dynamically
+# above, so there is no way Perl::Critic can find them.
+
+sub _show_sub {	## no critic (ProhibitUnusedPrivateSubroutines)
+    # my ( $app, $text, $line, $start, @arg ) = @_;
+    my ( undef, undef, undef, undef, @arg ) = @_;
+    @arg > 1
+	or return;
+    my $re = qr/ \A \Q$arg[-1]\E /smx;
+    return [ grep { $_ =~ $re } sort keys %accessor ];
 }
 
 sub _show_sun_class {
@@ -3649,7 +3662,7 @@ sub version : Verb() {
 
 @{[__PACKAGE__]} $VERSION - Satellite pass predictor
 based on Astro::Coord::ECI @{[Astro::Coord::ECI->VERSION]}
-Copyright (C) 2009-2024 by Thomas R. Wyant, III
+Copyright (C) 2009-2025 by Thomas R. Wyant, III
 
 EOD
 }
@@ -3847,7 +3860,7 @@ sub _apply_boolean_default {
 	defined $choice
 	    or $choice = [];
 	ARRAY_REF eq ref $choice
-	    or $self->weep( 'Choice invalid' );
+	    or $self->weep( 'Choice must be an ARRAY ref' );
 	my @rslt;
 	my @selector;
 	foreach my $sel ( @{ $choice } ) {
@@ -4044,6 +4057,7 @@ sub _file_reader {
 
 sub _file_reader_ {	## no critic (ProhibitUnusedPrivateSubroutines)
     my ( $self, $file, $opt ) = @_;
+    $opt ||= {};
 
     defined $file
 	and chomp $file;
@@ -4062,18 +4076,15 @@ sub _file_reader_ {	## no critic (ProhibitUnusedPrivateSubroutines)
 	    $self->wail( "Failed to retrieve $file: ",
 		$resp->status_line() );
 	};
-	$opt->{glob} and return $resp->decoded_content();
 	$opt = { %{ $opt }, encoding => $resp->content_charset() };
 	return $self->_file_reader(
 	    \( scalar $resp->content() ),
 	    $opt,
 	);
     } else {
-	my $encoding = $opt->{encoding} || 'utf-8';
-	my $fh = IO::File->new(
-	    $self->expand_tilde( $file ),
-	    "<:encoding($encoding)",
-	) or do {
+	my $encoding = $self->_file_reader__encoding( $opt );
+	open my $fh, "<$encoding", $self->expand_tilde( $file )	## no critic (RequireBriefOpen)
+	    or do {
 	    $opt->{optional} and return;
 	    $self->wail( "Failed to open $file: $!" );
 	};
@@ -4083,6 +4094,17 @@ sub _file_reader_ {	## no critic (ProhibitUnusedPrivateSubroutines)
 	return scalar <$fh>;
     }
 }
+
+sub _file_reader__encoding {
+    my ( undef, $opt ) = @_;
+    $opt ||= {};
+    my $encoding = $opt->{encoding} || 'utf-8';
+    $encoding = ":encoding($encoding)";
+    OS_IS_WINDOWS
+	and substr $encoding, 0, 0, ':crlf';
+    return $encoding;
+}
+
 
 sub _file_reader__validate_url {
     my ( undef, $url ) = @_;		# Invocant unused
@@ -4141,14 +4163,16 @@ sub _file_reader_CODE {		## no critic (ProhibitUnusedPrivateSubroutines)
 sub _file_reader_SCALAR {	## no critic (ProhibitUnusedPrivateSubroutines)
     my ( $self, $file, $opt ) = @_;
 
+    my $encoding = $self->_file_reader__encoding( $opt );
+    open my $fh, "<$encoding", $file	## no critic (RequireBriefOpen)
+	or do {
+	$opt->{optional} and return;
+	$self->wail( "Failed to open SCALAR reference: $!" );
+    };
     $opt->{glob}
-	and return ${ $file };
-    my $mode = $opt->{encoding} ? "<:encoding($opt->{encoding})" : '<';
-
-    my $fh = IO::File->new( $file, $mode )	# Needs IO::File 1.14.
-	or $self->wail( "Failed to open SCALAR ref: $!" );
-
-    return sub { return scalar <$fh> };
+	or return sub { return scalar <$fh> };
+    local $/ = undef;
+    return scalar <$fh>;
 }
 
 # $inx = $self->_find_in_sky( $name )
@@ -8537,7 +8561,7 @@ used for what it does.
 
 This string attribute specifies the format used to display
 dates. Documentation of the C<strftime (3)> subroutine may be found at
-L<https://linux.die.net/man/3/strftime> among other places.
+L<https://man7.org/linux/man-pages/man3/strftime.3.html> among other places.
 
 The above is a long URL, and may be split across multiple lines. More
 than that, the formatter may have inserted a hyphen at the break, which
@@ -9072,7 +9096,7 @@ interpret the value of this attribute as a C<strftime(3)> format.
 
 This string attribute specifies the strftime(3) format used to display
 times.  Documentation of the C<strftime(3)> subroutine may be found at
-L<https://linux.die.net/man/3/strftime> among other places.
+L<https://man7.org/linux/man-pages/man3/strftime.3.html> among other places.
 
 The above is a long URL, and may be split across multiple lines. More
 than that, the formatter may have inserted a hyphen at the break, which
@@ -9780,7 +9804,7 @@ Thomas R. Wyant, III (F<wyant at cpan dot org>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2024 by Thomas R. Wyant, III
+Copyright (C) 2009-2025 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

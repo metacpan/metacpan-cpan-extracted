@@ -1,5 +1,15 @@
 Revision history for Perl module DateTime::Format::RelativeTime
 
+v0.1.6 2025-01-05T14:38:17+0900
+    - Improved method pass_error
+    - Updated dependencies
+
+v0.1.5 2025-01-05T09:20:19+0900
+    - Corrected slight inaccuracy in pattern searching algorithm in formatting
+
+v0.1.4 2025-01-05T08:37:04+0900
+    - Minor correction for the 'error' method and object instnatiation parameter (localeMatcher)
+
 v0.1.3 2025-01-04T08:05:17+0900
     - Correcting minor oversight about debugging tool remaining in the distribution code
 

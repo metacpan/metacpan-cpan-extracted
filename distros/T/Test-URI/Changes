@@ -1,5 +1,8 @@
 Revision history for Perl module Test::URI
 
+1.086 2025-01-04T15:57:17Z
+	* refresh distro and move to BRIANDFOY
+
 1.085 2024-02-04T06:36:26Z
 	* refresh distro, update email address
 

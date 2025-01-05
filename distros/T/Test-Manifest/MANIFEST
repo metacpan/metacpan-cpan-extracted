@@ -9,6 +9,7 @@ MANIFEST.SKIP
 META.json
 META.yml
 README.pod
+SECURITY.md
 t/00load.t
 t/01get_test_files.t
 t/01make_test_manifest.t

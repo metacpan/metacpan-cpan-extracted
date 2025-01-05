@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## DateTime Format Intl - ~/lib/DateTime/Format/Intl.pm
-## Version v0.1.6
-## Copyright(c) 2024 DEGUEST Pte. Ltd.
+## Version v0.1.8
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/09/16
-## Modified 2024/12/31
+## Modified 2025/01/05
 ## All rights reserved
 ## 
 ## 
@@ -29,7 +29,7 @@ BEGIN
     use Locale::Unicode::Data;
     use Scalar::Util ();
     use Want;
-    our $VERSION = 'v0.1.6';
+    our $VERSION = 'v0.1.8';
     our $CACHE = {};
     our $LAST_CACHE_CLEAR = time();
     our $MAX_CACHE_SIZE = 30;
@@ -108,6 +108,7 @@ sub new
         # RangeError: invalid value "plop" for option month
         my %valid_options = 
         (
+            localeMatcher           => ['lookup', 'best fit'],
             # calendar is processed separately
             # numberingSystem is processed separately
             calendar                => qr/[a-zA-Z][a-zA-Z0-9]+(?:\-[a-zA-Z][a-zA-Z0-9]+)*/,
@@ -629,18 +630,27 @@ sub error
     my $self = shift( @_ );
     if( @_ )
     {
-        my $msg = join( '', map( ( ref( $_ ) eq 'CODE' ) ? $_->() : $_, @_ ) );
-        $self->{error} = $ERROR = DateTime::Format::Intl::Exception->new({
-            skip_frames => 1,
-            message => $msg,
-        });
+        my $def = {};
+        if( @_ == 1 &&
+            defined( $_[0] ) &&
+            ref( $_[0] ) eq 'HASH' &&
+            exists( $_[0]->{message} ) )
+        {
+            $def = shift( @_ );
+        }
+        else
+        {
+            $def->{message} = join( '', map( ( ref( $_ ) eq 'CODE' ) ? $_->() : $_, @_ ) );
+        }
+        $def->{skip_frames} = 1 unless( exists( $def->{skip_frames} ) );
+        $self->{error} = $ERROR = DateTime::Format::Intl::Exception->new( $def );
         if( $self->fatal )
         {
             die( $self->{error} );
         }
         else
         {
-            warn( $msg ) if( warnings::enabled() );
+            warn( $def->{message}  ) if( warnings::enabled() );
             if( Want::want( 'ARRAY' ) )
             {
                 rreturn( [] );
@@ -1005,6 +1015,69 @@ sub interval_skeleton { return( shift->{_interval_skeleton} ); }
 sub pass_error
 {
     my $self = shift( @_ );
+    my $pack = ref( $self ) || $self;
+    my $opts = {};
+    my( $err, $class, $code );
+    no strict 'refs';
+    if( scalar( @_ ) )
+    {
+        # Either an hash defining a new error and this will be passed along to error(); or
+        # an hash with a single property: { class => 'Some::ExceptionClass' }
+        if( scalar( @_ ) == 1 && ref( $_[0] ) eq 'HASH' )
+        {
+            $opts = $_[0];
+        }
+        else
+        {
+            if( scalar( @_ ) > 1 && ref( $_[-1] ) eq 'HASH' )
+            {
+                $opts = pop( @_ );
+            }
+            $err = $_[0];
+        }
+    }
+    $err = $opts->{error} if( !defined( $err ) && CORE::exists( $opts->{error} ) && defined( $opts->{error} ) && CORE::length( $opts->{error} ) );
+    # We set $class only if the hash provided is a one-element hash and not an error-defining hash
+    $class = $opts->{class} if( CORE::exists( $opts->{class} ) && defined( $opts->{class} ) && CORE::length( $opts->{class} ) );
+    $code  = $opts->{code} if( CORE::exists( $opts->{code} ) && defined( $opts->{code} ) && CORE::length( $opts->{code} ) );
+    
+    # called with no argument, most likely from the same class to pass on an error 
+    # set up earlier by another method; or
+    # with an hash containing just one argument class => 'Some::ExceptionClass'
+    if( !defined( $err ) && ( !scalar( @_ ) || defined( $class ) ) )
+    {
+        # $error is a previous erro robject
+        my $error = ref( $self ) ? $self->{error} : length( ${ $pack . '::ERROR' } ) ? ${ $pack . '::ERROR' } : undef;
+        if( !defined( $error ) )
+        {
+            warn( "No error object provided and no previous error set either! It seems the previous method call returned a simple undef" );
+        }
+        else
+        {
+            $err = ( defined( $class ) ? bless( $error => $class ) : $error );
+            $err->code( $code ) if( defined( $code ) );
+        }
+    }
+    elsif( defined( $err ) && 
+           Scalar::Util::blessed( $err ) && 
+           ( scalar( @_ ) == 1 || 
+             ( scalar( @_ ) == 2 && defined( $class ) ) 
+           ) )
+    {
+        $self->{error} = ${ $pack . '::ERROR' } = ( defined( $class ) ? bless( $err => $class ) : $err );
+        $self->{error}->code( $code ) if( defined( $code ) && $self->{error}->can( 'code' ) );
+        
+        if( $self->{fatal} || ( defined( ${"${class}\::FATAL_EXCEPTIONS"} ) && ${"${class}\::FATAL_EXCEPTIONS"} ) )
+        {
+            die( $self->{error} );
+        }
+    }
+    # If the error provided is not an object, we call error to create one
+    else
+    {
+        return( $self->error( @_ ) );
+    }
+    
     if( Want::want( 'OBJECT' ) )
     {
         rreturn( DateTime::Format::Intl::NullObject->new );
@@ -5176,7 +5249,7 @@ Or, you could set the global variable C<$FATAL_EXCEPTIONS> instead:
 
 =head1 VERSION
 
-    v0.1.6
+    v0.1.8
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,8 @@
 Revision history for Test-Alien-CPP
 
+1.04      2025-01-04 11:52:46 -0700
+  - Fix undefined unitialized warnings on some systems (DJERIUS++, gh#15)
+
 1.03      2022-05-10 14:44:45 -0600
   - Fix bug in synopsis example (gh#10, gh#11)
 

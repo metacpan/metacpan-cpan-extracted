@@ -56,6 +56,6 @@
          "web" : "https://github.com/briandfoy/test-manifest"
       }
    },
-   "version" : "2.024",
+   "version" : "2.025",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

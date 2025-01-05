@@ -7,11 +7,12 @@
 package Perl::Tidy::HtmlWriter;
 use strict;
 use warnings;
-our $VERSION = '20240903';
+our $VERSION = '20250105';
 
 use Carp;
 use English qw( -no_match_vars );
 use File::Basename;
+use File::Temp qw();
 
 use constant EMPTY_STRING => q{};
 use constant SPACE        => q{ };
@@ -123,7 +124,7 @@ sub new {
 
         # pre section goes directly to the output stream
         $html_pre_fh = $html_fh;
-        $html_pre_fh->print( <<"PRE_END");
+        $html_pre_fh->print(<<"PRE_END");
 <pre>
 PRE_END
     }
@@ -252,7 +253,7 @@ EOM
         # but just quit if we hit EOF without any other entries
         # in this case, there will be no toc
         return if ( $type eq 'EOF' );
-        $html_toc_fh->print( <<"TOC_END");
+        $html_toc_fh->print(<<"TOC_END");
 <!-- BEGIN CODE INDEX --><a name="code-index"></a>
 <ul>
 TOC_END
@@ -309,7 +310,7 @@ TOC_END
 
     # end the table of contents, if any, on the end of file
     if ( $type eq 'EOF' ) {
-        $html_toc_fh->print( <<"TOC_END");
+        $html_toc_fh->print(<<"TOC_END");
 </ul>
 <!-- END CODE INDEX -->
 TOC_END
@@ -678,9 +679,9 @@ sub set_default_properties {
     set_default_color( "html-color-$short_to_long_names{$short_name}", $color );
     my $key;
     $key           = "html-bold-$short_to_long_names{$short_name}";
-    $rOpts->{$key} = ( defined $rOpts->{$key} ) ? $rOpts->{$key} : $bold;
+    $rOpts->{$key} = defined( $rOpts->{$key} ) ? $rOpts->{$key} : $bold;
     $key           = "html-italic-$short_to_long_names{$short_name}";
-    $rOpts->{$key} = ( defined $rOpts->{$key} ) ? $rOpts->{$key} : $italic;
+    $rOpts->{$key} = defined( $rOpts->{$key} ) ? $rOpts->{$key} : $italic;
     return;
 } ## end sub set_default_properties
 
@@ -734,14 +735,17 @@ sub pod_to_html {
         # "backlink=s", "cachedir=s", "htmlroot=s", "libpods=s",
         # "podpath=s", "podroot=s"
         # Note: -css=s is handled by perltidy itself
-        foreach my $kw (qw(backlink cachedir htmlroot libpods podpath podroot))
+        foreach
+          my $kw (qw( backlink cachedir htmlroot libpods podpath podroot ))
         {
             if ( $rOpts->{$kw} ) { push @args, "--$kw=$rOpts->{$kw}" }
         }
 
         # Toggle switches; these have extra leading 'pod'
         # "header!", "index!", "recurse!", "quiet!", "verbose!"
-        foreach my $kw (qw(podheader podindex podrecurse podquiet podverbose)) {
+        foreach
+          my $kw (qw( podheader podindex podrecurse podquiet podverbose ))
+        {
             my $kwd = $kw;    # allows us to strip 'pod'
             if    ( $rOpts->{$kw} ) { $kwd =~ s/^pod//; push @args, "--$kwd" }
             elsif ( defined( $rOpts->{$kw} ) ) {
@@ -760,7 +764,7 @@ sub pod_to_html {
         # Must clean up if pod2html dies (it can);
         # Be careful not to overwrite callers __DIE__ routine
         local $SIG{__DIE__} = sub {
-            unlink $tmpfile if -e $tmpfile;
+            unlink($tmpfile) if -e $tmpfile;
             Perl::Tidy::Die( $_[0] );
         };
 
@@ -903,7 +907,7 @@ sub pod_to_html {
 
             # Intermingle code and pod sections if we saw multiple =cut's.
             if ( $self->{_pod_cut_count} > 1 ) {
-                my $rpre_string = shift( @{$rpre_string_stack} );
+                my $rpre_string = shift @{$rpre_string_stack};
                 if ( ${$rpre_string} ) {
                     $html_print->('<pre>');
                     $html_print->( ${$rpre_string} );
@@ -937,18 +941,19 @@ sub pod_to_html {
                 if ( $self->{_pod_cut_count} <= 1 ) {
                     $html_print->('<hr />');
                 }
-                while ( my $rpre_string = shift( @{$rpre_string_stack} ) ) {
+                while ( @{$rpre_string_stack} ) {
+                    my $rpre_string = shift @{$rpre_string_stack};
                     $html_print->('<pre>');
                     $html_print->( ${$rpre_string} );
                     $html_print->('</pre>');
-                }
+                } ## end while ( @{$rpre_string_stack...})
             }
             $html_print->($line);
         }
         else {
             $html_print->($line);
         }
-    }
+    } ## end while ( defined( my $line...))
 
     $success_flag = 1;
     if ( !$saw_body ) {
@@ -1175,7 +1180,7 @@ sub close_html_file {
     # Path 1: finish up if in -pre mode
     # ---------------------------------
     if ( $rOpts->{'html-pre-only'} ) {
-        $html_fh->print( <<"PRE_END");
+        $html_fh->print(<<"PRE_END");
 </pre>
 PRE_END
         $html_fh->close()
@@ -1215,12 +1220,12 @@ PRE_END
 
     # or use css embedded in this file
     else {
-        $fh_css->print( <<'ENDCSS');
+        $fh_css->print(<<'ENDCSS');
 <style type="text/css">
 <!--
 ENDCSS
         write_style_sheet_data($fh_css);
-        $fh_css->print( <<"ENDCSS");
+        $fh_css->print(<<"ENDCSS");
 -->
 </style>
 ENDCSS
@@ -1248,7 +1253,7 @@ ENDCSS
         my $date = localtime;
         $timestamp = "on $date";
     }
-    $html_fh->print( <<"HTML_START");
+    $html_fh->print(<<"HTML_START");
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <!-- Generated by perltidy $timestamp -->
@@ -1260,21 +1265,21 @@ HTML_START
     # output the css, if used
     if ($css_string) {
         $html_fh->print($css_string);
-        $html_fh->print( <<"ENDCSS");
+        $html_fh->print(<<"ENDCSS");
 </head>
 <body>
 ENDCSS
     }
     else {
 
-        $html_fh->print( <<"HTML_START");
+        $html_fh->print(<<"HTML_START");
 </head>
 <body bgcolor=\"$rOpts->{'html-color-background'}\" text=\"$rOpts->{'html-color-punctuation'}\">
 HTML_START
     }
 
     $html_fh->print("<a name=\"-top-\"></a>\n");
-    $html_fh->print( <<"EOM");
+    $html_fh->print(<<"EOM");
 <h1>$title</h1>
 EOM
 
@@ -1289,7 +1294,7 @@ EOM
     # copy the pre section(s)
     my $fname_comment = $input_file;
     $fname_comment =~ s/--+/-/g;    # protect HTML comment tags
-    $html_fh->print( <<"END_PRE");
+    $html_fh->print(<<"END_PRE");
 <hr />
 <!-- contents of filename: $fname_comment -->
 <pre>
@@ -1300,7 +1305,7 @@ END_PRE
     }
 
     # and finish the html page
-    $html_fh->print( <<"HTML_END");
+    $html_fh->print(<<"HTML_END");
 </pre>
 </body>
 </html>

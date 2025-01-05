@@ -1,5 +1,5 @@
 #
-# GENERATED WITH PDL::PP from glm.pd! Don't modify!
+# GENERATED WITH PDL::PP from lib/PDL/Stats/GLM.pd! Don't modify!
 #
 package PDL::Stats::GLM;
 
@@ -22,7 +22,7 @@ use DynaLoader;
 
 
 
-#line 3 "glm.pd"
+#line 3 "lib/PDL/Stats/GLM.pd"
 
 use strict;
 use warnings;
@@ -67,7 +67,7 @@ P-values, where appropriate, are provided if PDL::GSL::CDF is installed.
     print "$_\t$m{$_}\n" for (sort keys %m);
 
 =cut
-#line 71 "GLM.pm"
+#line 71 "lib/PDL/Stats/GLM.pm"
 
 
 =head1 FUNCTIONS
@@ -420,9 +420,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 385 "glm.pd"
+#line 385 "lib/PDL/Stats/GLM.pd"
 
-#line 386 "glm.pd"
+#line 386 "lib/PDL/Stats/GLM.pd"
 
 # my tmp var for PDL 2.007 slice upate
 my $_tmp;
@@ -2476,7 +2476,7 @@ Copyright (C) 2009 Maggie J. Xiong <maggiexyz users.sourceforge.net>
 All rights reserved. There is no warranty. You are allowed to redistribute this software / documentation as described in the file COPYING in the PDL distribution.
 
 =cut
-#line 2480 "GLM.pm"
+#line 2480 "lib/PDL/Stats/GLM.pm"
 
 # Exit with OK status
 

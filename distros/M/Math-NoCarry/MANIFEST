@@ -7,6 +7,7 @@ Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 README.pod
+SECURITY.md
 t/add.t
 t/load.t
 t/multiply.t

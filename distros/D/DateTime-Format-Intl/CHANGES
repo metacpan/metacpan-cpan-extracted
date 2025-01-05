@@ -1,5 +1,11 @@
 Revision history for Perl module DateTime::Format::Intl
 
+v0.1.8 2025-01-05T14:30:41+0900
+    - Updated dependencies
+
+v0.1.7 2025-01-05T08:35:03+0900
+    - Minor correction for missing check of object instantiation argument (localeMatcher)
+
 v0.1.6 2025-01-03T20:11:28+0900
     - Minor correction to the algorithm on the handling of numbering system to get it closer to the Web API
 

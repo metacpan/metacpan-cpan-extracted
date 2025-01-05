@@ -1,6 +1,6 @@
-Revision history for Perl extension Daje-Workflow-Init
+Revision history for Perl extension Daje-Workflow-Loader
 
-0.04 2025-01-04T06:55:21Z
+0.05 2025-01-04T16:15:27Z
 
-    - Bug fix checks and activities
+    - Changed to use Daje::Config
 

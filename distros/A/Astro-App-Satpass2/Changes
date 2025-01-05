@@ -1,3 +1,22 @@
+0.055		2025-01-04	T. R. Wyant
+    Add autocomplete to 'show' command.
+
+    Rename all .tt files to tt2.
+
+    Read files encoded rather than binmode() so I can specify :crlf on
+    Windows machines.
+
+    Go from linux.die.net to man7.org for man links because the latter
+    does not block Perl and therefore foil Test::Pod::LinkCheck::Lite.
+
+    Do not trim object name to 24 chars in pass_ics template.
+
+    Harden ::Macro::Code command discovery.
+    The problem was that in the case of inlineable subroutines (i.e. 'use
+    constant ...' a reference to the value was the actual value, not the
+    subroutine .. i.e. a REF, not a GLOB. So when tried to dereference the
+    CODE slot we blew up.
+
 0.054		2024-03-31	T. R. Wyant
     Prefer Astro::Coord::ECI::Utils::gm_strftime to POSIX::strftime
     because the behavior of POSIX::strftime when formatting GMT changed in

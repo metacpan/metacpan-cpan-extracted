@@ -54,6 +54,6 @@
          "web" : "https://github.com/briandfoy/test-isbn"
       }
    },
-   "version" : "2.044",
+   "version" : "2.045",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

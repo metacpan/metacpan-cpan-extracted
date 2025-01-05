@@ -19,6 +19,8 @@ sub max_wait { shift->{max_wait} }
 
 sub code { shift->{code} }
 
+sub host { shift->{host} }
+
 # Class Methods
 sub new {
   my $class = shift;
@@ -61,6 +63,12 @@ sub init_fields {
   
   # my_pid field
   $self->{my_pid} = $$;
+  
+  my $host = $options{host};
+  unless (defined $host) {
+    $host = '127.0.0.1';
+  }
+  $self->{host} = $host;
   
 }
 
@@ -158,6 +166,12 @@ The maximum number of times to wait to check that a server has been started by a
   my $code = $self->code;
 
 An anon subroutine to run a server.
+
+=head2 host
+
+  my $host = $self->host;
+
+A host name.
 
 =head1 Class Methods
 

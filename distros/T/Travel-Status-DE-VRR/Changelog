@@ -1,3 +1,13 @@
+Travel::Status::DE::VRR 3.06 - Sun Jan 05 2025
+
+    * EFA APIs know two types of stop IDs: numbers and codes. This module now
+      consistently refers to numeric stop IDs as "id_num" and stop ID codes as
+      "id_code".
+    * Departure: Rename ->stop_id to ->stop_id_num
+    * Stop: Rename ->id to ->id_num
+    * Stop: Rename ->stop_id to ->id_code
+    * Departure: Add ->id accessor.
+
 Travel::Status::DE::VRR 3.05 - Mon Dec 30 2024
 
     * efa-m: add --raw-json option

@@ -6,24 +6,23 @@ use PDL::Core::Dev;
 WriteMakefile(
     NAME                => 'PDL::Stats',
     AUTHOR              => 'Maggie J. Xiong  <maggiexyz users.sourceforge.net>',
-    VERSION_FROM        => 'Stats.pm',
-    ABSTRACT_FROM       => 'Stats.pm',
+    VERSION_FROM        => 'lib/PDL/Stats.pm',
+    ABSTRACT_FROM       => 'lib/PDL/Stats.pm',
     MIN_PERL_VERSION => '5.016', # https://github.com/Perl/perl5/issues/11835
     LICENSE=> 'perl',
     PREREQ_PM => {
-        'PDL'  => '2.073', # PDL_IF_BAD
+        'PDL'  => '2.096', # deep mode
     },
     CONFIGURE_REQUIRES => {
-        'PDL'  => '2.073',
+        'PDL'  => '2.096',
     },
     BUILD_REQUIRES => {
-        'PDL'  => '2.073',
+        'PDL'  => '2.096',
     },
     TEST_REQUIRES => {
         'Test::More' => '0.88', # done_testing
         'Test::PDL' => '0.21',
     },
-    dist                => { PREOP => '$(PERL) -MPDL::Core::Dev -e pdlpp_mkgen $(DISTVNAME)' },
     clean               => { FILES => ['PDL-Stats-*'] },
     META_MERGE          => {
       "meta-spec" => { version => 2 },
@@ -50,7 +49,13 @@ WriteMakefile(
     },
 );
 
-sub MY::postamble {
-  my $oneliner = PDL::Core::Dev::_oneliner(qq{exit if \$ENV{DESTDIR}; use PDL::Doc; eval { PDL::Doc::add_module(shift); }});
-  qq|\ninstall :: pure_install\n\t$oneliner \$(NAME)\n|;
+{
+my @pd_srcs;
+package MY; # so that "SUPER" works right
+sub init_PM {
+  my ($self) = @_;
+  $self->SUPER::init_PM;
+  @pd_srcs = ::pdlpp_eumm_update_deep($self);
+}
+sub postamble { ::pdlpp_postamble_int(@pd_srcs) }
 }

@@ -1,6 +1,6 @@
 use 5.38.0;
 use experimental 'class';
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 class Game::Snake::Tail :isa(Game::Snake::Head) {
 	use Raylib::FFI;

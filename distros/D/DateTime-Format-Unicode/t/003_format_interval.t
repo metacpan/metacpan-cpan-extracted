@@ -63,7 +63,7 @@ my $tests =
                 d1 => { year => 2024, month => 1, day => 1, hour => 4, minute => 0, second => 0, time_zone => 'UTC' },
                 d2 => { year => 2024, month => 1, day => 1, hour => 5, minute => 0, second => 0, time_zone => 'UTC' },
                 pattern => 'Bh',
-                expects => '새벽 4시~5시',
+                expects => '아침 4시~5시',
             },
         ],
     },

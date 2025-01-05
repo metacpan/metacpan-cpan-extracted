@@ -1,5 +1,5 @@
 package VAPID;
-use 5.006; use strict; use warnings; our $VERSION = '1.01';
+use 5.006; use strict; use warnings; our $VERSION = '1.02';
 use Crypt::JWT qw(encode_jwt); use Crypt::PK::ECC; use URI;
 use MIME::Base64 qw/encode_base64url decode_base64url/;
 use base 'Import::Export';
@@ -190,7 +190,7 @@ VAPID - Voluntary Application Server Identification
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =cut
 
@@ -347,7 +347,7 @@ Required for Chrome; Firefox works even without this file:
 
 =head2 STEP 5 - generate headers
 
-	my $notificaiton_host = URI->new($subscription_url)->host;
+	my $notification_host = URI->new($subscription_url)->host;
 	my $auth_headers = generate_vapid_header(
 		"https://$notification_host",
 		'mailto:email@lnation.org',

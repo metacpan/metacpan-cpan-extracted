@@ -1,5 +1,5 @@
 package Module::Generate::YAML;
-use 5.006; use strict; use warnings; our $VERSION = '0.02';
+use 5.006; use strict; use warnings; our $VERSION = '1.00';
 use Module::Generate::Hash; use PerlIO::via::YAML;
 use base 'Import::Export'; our %EX = ( generate => [qw/all/] );
 sub generate { open my $fh, '<via(YAML)', $_[0] or die $!; my $yaml = load $fh; close $fh; Module::Generate::Hash::generate($yaml); }
@@ -12,7 +12,7 @@ Module::Generate::YAML - Assisting with module generation via YAML.
 
 =head1 VERSION
 
-Version 0.02
+Version 1.00
 
 =cut
 

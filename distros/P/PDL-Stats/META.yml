@@ -3,11 +3,11 @@ abstract: 'a collection of statistics modules in Perl Data Language, with a quic
 author:
   - 'Maggie J. Xiong  <maggiexyz users.sourceforge.net>'
 build_requires:
-  PDL: '2.073'
+  PDL: '2.096'
   Test::More: '0.88'
   Test::PDL: '0.21'
 configure_requires:
-  PDL: '2.073'
+  PDL: '2.096'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -23,9 +23,9 @@ recommends:
   PDL::GSL: '0'
   PDL::Graphics::PGPLOT: '0'
 requires:
-  PDL: '2.073'
+  PDL: '2.096'
   perl: '5.016'
 resources:
   repository: git://github.com/PDLPorters/PDL-Stats
-version: '0.852'
+version: '0.853'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

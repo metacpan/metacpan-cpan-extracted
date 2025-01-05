@@ -56,6 +56,13 @@ option fh => (
 	description => 'file to write the ascii text to',
 );
 
+option list => (
+	type => Bool,
+	description => 'List all available fonts',
+	option_alias => 'l',
+	value => 0
+);
+
 option image => (
 	type => Bool,
 	description => 'write the ascii text to an image, used in conjunction with fh and imager_font.',
@@ -72,6 +79,7 @@ option imager_font => (
 sub callback {
         my ($self) = @_; 
 	my $fh;
+	return $self->callback_list if ($self->list);
 	my $class = 'Ascii::Text';
 	if ($self->image) {
 		$class = 'Ascii::Text::Image';
@@ -93,5 +101,25 @@ sub callback {
 	}
 	$ascii->($self->text, ($self->image ? ($self->fh, 1) : ()));
 }
+
+use ExtUtils::Installed;
+sub callback_list {
+	my ($self) = @_;
+
+	my $base_path = __FILE__;
+	$base_path =~ s/(.*Text[\/\\])(.*)/$1/;
+	$base_path .= 'Font';
+
+	
+	opendir my $dir, $base_path or die $!;
+	my @files = grep { $_ !~ s/\.pm//; $_ !~ m/^\./ } readdir $dir;
+	closedir $dir;
+
+	$self->print_color('bright_green', "You have the following fonts installed \n");
+	for (@files) {
+		$self->print_color('bright_cyan', "- $_\n");
+	}
+}
+
 
 1;

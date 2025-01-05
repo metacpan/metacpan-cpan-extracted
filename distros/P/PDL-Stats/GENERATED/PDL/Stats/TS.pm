@@ -1,5 +1,5 @@
 #
-# GENERATED WITH PDL::PP from ts.pd! Don't modify!
+# GENERATED WITH PDL::PP from lib/PDL/Stats/TS.pd! Don't modify!
 #
 package PDL::Stats::TS;
 
@@ -22,7 +22,7 @@ use DynaLoader;
 
 
 
-#line 1 "ts.pd"
+#line 1 "lib/PDL/Stats/TS.pd"
 
 =encoding utf8
 
@@ -53,7 +53,7 @@ use PDL::Stats::Basic;
 use PDL::Stats::Kmeans;
 
 my $DEV = ($^O =~ /win/i)? '/png' : '/xs';
-#line 57 "TS.pm"
+#line 57 "lib/PDL/Stats/TS.pm"
 
 
 =head1 FUNCTIONS
@@ -99,14 +99,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 74 "ts.pd"
+#line 74 "lib/PDL/Stats/TS.pd"
 sub PDL::acf {
   my ($self, $h) = @_;
   $h ||= $self->dim(0) - 1;
   PDL::_acf_int($self, my $r = PDL->null, $h+1);
   $r;
 }
-#line 110 "TS.pm"
+#line 110 "lib/PDL/Stats/TS.pm"
 
 *acf = \&PDL::acf;
 
@@ -154,14 +154,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 129 "ts.pd"
+#line 129 "lib/PDL/Stats/TS.pd"
 sub PDL::acvf {
   my ($self, $h) = @_;
   $h ||= $self->dim(0) - 1;
   PDL::_acvf_int($self, my $v = PDL->null, $h+1);
   $v;
 }
-#line 165 "TS.pm"
+#line 165 "lib/PDL/Stats/TS.pm"
 
 *acvf = \&PDL::acvf;
 
@@ -224,7 +224,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 252 "ts.pd"
+#line 252 "lib/PDL/Stats/TS.pd"
 sub PDL::fill_ma {
   my ($x, $q) = @_;
   PDL::_fill_ma_int($x, $q, my $x_filled = PDL->null);
@@ -233,7 +233,7 @@ sub PDL::fill_ma {
 #    if $x_filled->badflag;
   return $x_filled;
 }
-#line 237 "TS.pm"
+#line 237 "lib/PDL/Stats/TS.pm"
 
 *fill_ma = \&PDL::fill_ma;
 
@@ -484,7 +484,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 468 "ts.pd"
+#line 468 "lib/PDL/Stats/TS.pd"
 sub PDL::pred_ar {
   my ($x, $b, $t, $opt) = @_;
   my %opt = ( CONST => 1 );
@@ -502,7 +502,7 @@ sub PDL::pred_ar {
     return $x->append($ext($b->dim(0) : -1));
   }
 }
-#line 506 "TS.pm"
+#line 506 "lib/PDL/Stats/TS.pm"
 
 *pred_ar = \&PDL::pred_ar;
 
@@ -510,9 +510,9 @@ sub PDL::pred_ar {
 
 
 
-#line 515 "ts.pd"
+#line 515 "lib/PDL/Stats/TS.pd"
 
-#line 516 "ts.pd"
+#line 516 "lib/PDL/Stats/TS.pd"
 
 =head2 season_m
 
@@ -738,7 +738,7 @@ Copyright (C) 2009 Maggie J. Xiong <maggiexyz users.sourceforge.net>
 All rights reserved. There is no warranty. You are allowed to redistribute this software / documentation as described in the file COPYING in the PDL distribution.
 
 =cut
-#line 742 "TS.pm"
+#line 742 "lib/PDL/Stats/TS.pm"
 
 # Exit with OK status
 

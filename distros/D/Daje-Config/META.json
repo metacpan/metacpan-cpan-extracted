@@ -1,0 +1,76 @@
+{
+   "abstract" : "Loads the JSON based workflows and put them in a hash",
+   "author" : [
+      "janeskil1525 <janeskil1525@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.25",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Daje-Config",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojo::File" : "0",
+            "Mojo::JSON" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Daje::Config" : {
+         "file" : "lib/Daje/Config.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/janeskil1525/Daje-Config/issues"
+      },
+      "homepage" : "https://github.com/janeskil1525/Daje-Config",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/janeskil1525/Daje-Config.git",
+         "web" : "https://github.com/janeskil1525/Daje-Config"
+      }
+   },
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_static_install" : 1
+}

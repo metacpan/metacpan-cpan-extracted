@@ -1,3 +1,6 @@
+0.853 2025-01-03
+- uses PDL 2.096+ lib/*.pd format for quicker builds
+
 0.852 2024-12-28
 - no longer uses PDL::Slatec
 

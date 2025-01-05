@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -26,7 +26,7 @@
             "Dist::Zilla::Plugin::Author::Plicease::Upload" : "0",
             "Dist::Zilla::Plugin::Prereqs" : "0",
             "Dist::Zilla::Plugin::RemovePrereqs" : "0",
-            "Dist::Zilla::PluginBundle::Author::Plicease" : "2.69",
+            "Dist::Zilla::PluginBundle::Author::Plicease" : "2.79",
             "Perl::Critic::Policy::BuiltinFunctions::ProhibitBooleanGrep" : "0",
             "Perl::Critic::Policy::BuiltinFunctions::ProhibitStringyEval" : "0",
             "Perl::Critic::Policy::BuiltinFunctions::ProhibitStringySplit" : "0",
@@ -133,13 +133,14 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "1.03",
+   "version" : "1.04",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
-      "Roy Storey (KIWIROY)"
+      "Roy Storey (KIWIROY)",
+      "Diab Jerius (DJERIUS)"
    ],
-   "x_generated_by_perl" : "v5.35.10",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_generated_by_perl" : "v5.40.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0
 }

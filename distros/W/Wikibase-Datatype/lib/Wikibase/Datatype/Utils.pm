@@ -13,7 +13,10 @@ use Readonly;
 Readonly::Array our @EXPORT_OK => qw(check_datetime check_entity check_language
 	check_lexeme check_property check_sense);
 
-our $VERSION = 0.36;
+our $SKIP_CHECK_LANG => 0;
+our @LANGUAGE_CODES => ();
+
+our $VERSION = 0.37;
 
 sub check_datetime {
 	my ($self, $key) = @_;
@@ -77,8 +80,19 @@ sub check_entity {
 sub check_language {
 	my ($self, $key) = @_;
 
-	if (none { $_ eq $self->{$key} } all_language_codes()) {
-		err "Language code '".$self->{$key}."' isn't ISO 639-1 code.";
+	if (! $SKIP_CHECK_LANG) {
+		my @language_codes;
+		my $error_message;
+		if (@LANGUAGE_CODES) {
+			@language_codes = @LANGUAGE_CODES;
+			$error_message = "Language code '".$self->{$key}."' isn't user defined language code.";
+		} else {
+			@language_codes = all_language_codes();
+			$error_message = "Language code '".$self->{$key}."' isn't code supported by Wikibase.";
+		}
+		if (none { $_ eq $self->{$key} } @language_codes) {
+			err $error_message;
+		}
 	}
 
 	return;
@@ -155,6 +169,20 @@ Wikibase::Datatype::Utils - Wikibase datatype utilities.
 
 Datatype utilities for checking of data objects.
 
+=head1 VARIABLES
+
+=head2 C<$SKIP_CHECK_LANG>
+
+Boolean variable to skip check of right language.
+
+Default value is 0, checking is working.
+
+=head2 C<@LANGUAGE_CODES>
+
+List of supported language codes defined by user.
+
+Default value is (), checking official language codes.
+
 =head1 SUBROUTINES
 
 =head2 C<check_datetime>
@@ -226,8 +254,7 @@ Returns undef.
          Parameter '%s' must begin with 'Q' and number after it.";
 
  check_language():
-         Language code '%s' isn't ISO 639-1 code.
-         Language with ISO 639-1 code '%s' doesn't exist.
+         Language code '%s' isn't code supported by Wikibase.
 
  check_lexeme():
          Parameter '%s' must begin with 'L' and number after it.";
@@ -497,6 +524,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.36
+0.37
 
 =cut

@@ -9,7 +9,7 @@ use Imager;
 use Imager::Color;
 use Imager::Font;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use Rope;
 use Rope::Autoload;
@@ -110,7 +110,7 @@ Ascii::Text::Image - module for generating images using ASCII text.
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 

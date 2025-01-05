@@ -1,5 +1,9 @@
 Revision history for Perl module DateTime::Format::Unicode
 
+v0.1.6 2025-01-05T14:08:56+0900
+    - Improved method pass_error
+    - Updated unit test
+
 v0.1.5 2024-10-10T20:17:50+0900
     - Minor correction to align handling of number system closer to standard
 

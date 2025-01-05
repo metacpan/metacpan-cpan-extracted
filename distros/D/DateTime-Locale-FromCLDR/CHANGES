@@ -1,5 +1,9 @@
 Revision history for Perl module DateTime::Locale::FromCLDR
 
+v0.6.1 2025-01-05T13:46:13+0900
+    - Improved method pass_error
+    - Updated and improved unit tests for locale data
+
 v0.6.0 2024-10-10T13:25:52+0900
     - Added method number_systems()
 

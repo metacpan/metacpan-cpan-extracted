@@ -422,7 +422,7 @@ class TestCase::Sys::Socket {
     
     return 1;
   }
-
+  
   static method connect : int ($port : int) {
     # IPv4 address
     {
@@ -443,7 +443,7 @@ class TestCase::Sys::Socket {
         return 0;
       }
     }
-
+    
     # Exception
     {
       # AF_INET6 is wrong setting
@@ -467,9 +467,12 @@ class TestCase::Sys::Socket {
       }
       
     }
-
-=pod TODO
-
+    
+    return 1;
+  }
+  
+  static method connect_ipv6 : int ($port : int) {
+  
     # IPv6 address
     {
       my $socket = Sys::Socket->socket(SOCKET->AF_INET6, SOCKET->SOCK_STREAM, 0);
@@ -486,14 +489,10 @@ class TestCase::Sys::Socket {
         return 0;
       }
     }
-
-=cut
     
-    $@ = undef;
-
     return 1;
   }
-
+  
   static method close : int ($port : int) {
     # Socket
     my $socket = Sys::Socket->socket(SOCKET->AF_INET, SOCKET->SOCK_STREAM, 0);

@@ -6,4 +6,4 @@ use Test::NoWarnings;
 use Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::StatedIn::VIAF;
 
 # Test.
-is($Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::StatedIn::VIAF::VERSION, 0.36, 'Version.');
+is($Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::StatedIn::VIAF::VERSION, 0.37, 'Version.');

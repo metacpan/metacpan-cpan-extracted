@@ -1,14 +1,15 @@
 package SMS::Send::Kannel::SMSbox;
 use strict;
 use warnings;
+use SMS::Send::Driver::WebService 0.07 qw{}; #warnings property
 use base qw{SMS::Send::Driver::WebService};
 
-our $VERSION = '0.05';
+our $VERSION = '0.07';
 our $PACKAGE = __PACKAGE__;
 
 =head1 NAME
 
-SMS::Send::Kannel::SMSbox - SMS::Send driver for Kannel SMSbox web service
+SMS::Send::Kannel::SMSbox - SMS::Send driver for Kannel SMSbox Web Service
 
 =head1 SYNOPSIS
 
@@ -23,13 +24,13 @@ Using L<SMS::Send> Driver API
   use SMS::Send;
   my $service = SMS::Send->new('Kannel::SMSbox');
   my $success = $service->send_sms(
-                                   to   => '+1-800-555-1212',
+                                   to   => '+1-800-555-0000',
                                    text => 'Hello World!',
                                   );
 
 =head1 DESCRIPTION
 
-SMS::Send driver for Kannel SMSbox web service.
+SMS::Send driver for Kannel SMSbox Web Service
 
 =head1 USAGE
 
@@ -40,7 +41,7 @@ SMS::Send driver for Kannel SMSbox web service.
                                        host     => $host,
                                       );
   my $success = $service->send_sms(
-                                   to   => '+18005551212',
+                                   to   => '+18005550000',
                                    text => 'Hello World!',
                                   );
 
@@ -56,7 +57,9 @@ sub send_sms {
   my $self = shift;
   my %argv = @_;
   my $to   = $argv{"to"} or die("Error: to address required");
+  print "Package: $PACKAGE, Method: send_sms, to: $to\n" if $self->debug >= 3;
   my $text = defined($argv{"text"}) ? $argv{"text"} : '';
+  print "Package: $PACKAGE, Method: send_sms, text: $text\n" if $self->debug >= 3;
   my $url  = $self->url; #isa URI
   my @form = (
                username   => $self->username,
@@ -65,18 +68,19 @@ sub send_sms {
                text       => $text,
              );
   $url->query_form(\@form);
-  #print "$url\n";
+  print "Package: $PACKAGE, Method: send_sms, URL: $url\n" if $self->debug >= 2;
   my $response = $self->ua->get($url);
   die(sprintf("HTTP Error: %s", $response->status_line)) unless $response->is_success;
-  my $content  = $response->decoded_content;
-  $self->{"__content"}=$content;
-  #use Data::Dumper qw{Dumper};
-  #print Dumper($content);
-  my $data     = $content;
-  $self->{"__data"}=$data;
-  #print Dumper($data);
-  my $status   = $data || '';
-  return $status =~ m/^0:/ ? 1 : 0; #0: Accepted for delivery
+  if ($self->debug >= 6) {
+    require Data::Dumper;
+    print Data::Dumper::Dumper($response);
+  }
+  my $content          = $response->decoded_content;
+  print "Package: $PACKAGE, Method: send_sms, content: $content\n" if $self->debug >= 1;
+  $self->{"__data"}    = $self->{"__content"} = $content;
+  my $status           = $content =~ m/^0:/ ? 1 : 0;
+  warn("Package: $PACKAGE, Method: send_sms, Status: $status, Content: $content\n") if ($status != 1 and $self->warnings);
+  return $status;
 }
 
 =head1 PROPERTIES
@@ -199,6 +203,40 @@ Returns a L<URI> object based on above properties
 
 #see SMS::Send::Driver::WebService->url
 
+=head2 warnings
+
+Default: 0
+
+Override in sub class
+
+  sub _warnings_default {1};
+
+Override in configuration
+
+  [Kannel::SMSbox]
+  warnings=1
+
+=cut
+
+#see SMS::Send::Driver::WebService->warnings
+
+=head2 debug
+
+Default: 0
+
+Override in sub class
+
+  sub _debug_default {5};
+
+Override in configuration
+
+  [Kannel::SMSbox]
+  debug=5
+
+=cut
+
+#see SMS::Send::Driver::WebService->debug
+
 =head1 BUGS
 
 =head1 SUPPORT
@@ -206,12 +244,10 @@ Returns a L<URI> object based on above properties
 =head1 AUTHOR
 
   Michael R. Davis
-  CPAN ID: MRDVT
-  Satellite Tracking of People, LLC
-  mdavis@stopllc.com
-  http://www.stopllc.com/
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2025 Michael R. Davis
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

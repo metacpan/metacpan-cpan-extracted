@@ -1,6 +1,6 @@
 package SPVM::Sys;
 
-our $VERSION = "0.526001";
+our $VERSION = "0.529001";
 
 1;
 
@@ -318,9 +318,11 @@ Exceptions thrown by L<Sys::IO#flock|SPVM::Sys::IO/"flock"> method could be thro
 
 =head2 mkdir
 
-C<static method mkdir : void ($dir : string, $mode : int);>
+C<static method mkdir : void ($dir : string, $mode : int = -1);>
 
 Creates the directory given the path $dir and the mode $mode.
+
+If $mode is less than 0, $mode is set to 0777.
 
 The permissions of the created directory are ($mode & ~L<umask|/"umask"> & 0777).
 
@@ -1098,17 +1100,21 @@ Exceptions thrown by L<Sys::Socket#listen|SPVM::Sys::Socket/"listen"> method cou
 
 =head2 accept
 
-C<static method accept : L<Sys::Socket::Sockaddr|SPVM::Sys::Socket::Sockaddr> ($new_socket_fd_ref : int*, $socket_fd : int);>
+C<static method accept : L<Sys::Socket::Sockaddr|SPVM::Sys::Socket::Sockaddr> ($client_fd_ref : int*, $server_fd : int);>
 
-Accepts an incoming socket connect, just as the C<accept> system call does. Returns the packed address.
+Performs accept operation.
 
-A new connected socket file descriptor is set to the value referenced by $new_socket_fd_ref.
+Implementation:
 
-Thie methods calls L<Sys::Socket#accept|SPVM::Sys::Socket/"accept"> method.
+Thie methods calls L<Sys::Socket#accept|SPVM::Sys::Socket/"accept"> method given the file descriptor $server_fd, a client address for output, the size of the client address.
 
-The returned packed address is upgraded to a child class of the L<Sys::Socket::Sockaddr|SPVM::Sys::Socket::Sockaddr> using L<upgrade|SPVM::Sys::Socket::Sockaddr/"upgrade"> method.
+The client address for output and the size of the client address are automatically created.
 
-If the system supports C<FD_CLOEXEC>, this flag is set to the value referenced by $new_socket_fd_ref using L</"fcntl">.
+$$client_fd_ref is set to the return value.
+
+The client address is upgraded to a child class of the L<Sys::Socket::Sockaddr|SPVM::Sys::Socket::Sockaddr> using L<upgrade|SPVM::Sys::Socket::Sockaddr/"upgrade"> method.
+
+If the system supports C<FD_CLOEXEC>, The file descriptor flag of $$client_fd_ref is set to C<FD_CLOEXEC> using L</"fcntl"> method.
 
 Exceptions:
 
@@ -1626,6 +1632,38 @@ Searches a group entry given The group ID $id. If found, returns the group entry
 C<static method getgrnam : L<Sys::User::Group|SPVM::Sys::User::Group> ($name : string);>
 
 Searches a group entry given The group name $name. If found, returns the group entry, otherwise return undef.
+
+=head2 srand
+
+C<static method srand : void ($seed : int);>
+
+Sets the random number $seed for L</"rand"> method.
+
+Implementation:
+
+Calls L<Fn#set_seed|SPVM::Fn/"set_seed"> method given $seed.
+
+=head2 rand
+
+C<static method rand : double ($max : int = 1);>
+
+Returns a random fractional number greater than or equal to 0 and less than $max.
+
+If you change the random seed, you can use L</"srand"> method.
+
+Implementation:
+
+If C<seed> stack variable is initialized, the random seed is got from the variable.
+
+Otherwise the random seed is created from the process ID and epoch time.
+
+And calls L<Fn#rand|SPVM::Fn/"rand"> method given the reference of the seed, $max.
+
+And calls L</"srand"> method given the returned seed to update C<seed> stack variable.
+
+Exceptions:
+
+Exceptions thrown by L<Fn#rand|SPVM::Fn/"rand"> method could be thrown.
 
 =head1 Modules
 

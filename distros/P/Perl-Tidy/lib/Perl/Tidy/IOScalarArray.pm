@@ -14,7 +14,7 @@ package Perl::Tidy::IOScalarArray;
 use strict;
 use warnings;
 use Carp;
-our $VERSION = '20240903';
+our $VERSION = '20250105';
 
 use constant DEVEL_MODE => 0;
 
@@ -50,7 +50,7 @@ sub DESTROY {
 
 sub new {
     my ( $package, $rarray, $mode ) = @_;
-    my $ref = ref $rarray;
+    my $ref = ref($rarray);
     if ( $ref ne 'ARRAY' ) {
         confess <<EOM;
 ------------------------------------------------------------------------

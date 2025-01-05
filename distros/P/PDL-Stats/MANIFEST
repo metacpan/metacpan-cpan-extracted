@@ -1,25 +1,21 @@
-Basic/Makefile.PL
-Basic/stats_basic.pd
 Changes
-GLM/glm.pd
-GLM/Makefile.PL
-Kmeans/kmeans.pd
-Kmeans/Makefile.PL
+lib/PDL/Stats.pm
+lib/PDL/Stats/Basic.pd
+lib/PDL/Stats/GLM.pd
+lib/PDL/Stats/Kmeans.pd
+lib/PDL/Stats/TS.pd
 Makefile.PL
 MANIFEST			This list of files
 README.md
-Stats.pm
 t/00-report-prereqs.t
 t/stats_basic.t
 t/stats_glm.t
 t/stats_kmeans.t
 t/stats_ols_rptd.t
 t/stats_ts.t
-TS/Makefile.PL
-TS/ts.pd
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
-GENERATED/PDL/Stats/Basic.pm             mod=PDL::Stats::Basic pd=Basic/stats_basic.pd (added by pdlpp_mkgen)
-GENERATED/PDL/Stats/GLM.pm               mod=PDL::Stats::GLM pd=GLM/glm.pd (added by pdlpp_mkgen)
-GENERATED/PDL/Stats/Kmeans.pm            mod=PDL::Stats::Kmeans pd=Kmeans/kmeans.pd (added by pdlpp_mkgen)
-GENERATED/PDL/Stats/TS.pm                mod=PDL::Stats::TS pd=TS/ts.pd (added by pdlpp_mkgen)
+GENERATED/PDL/Stats/Basic.pm             mod=PDL::Stats::Basic pd=lib/PDL/Stats/Basic.pd (added by pdlpp_mkgen)
+GENERATED/PDL/Stats/GLM.pm               mod=PDL::Stats::GLM pd=lib/PDL/Stats/GLM.pd (added by pdlpp_mkgen)
+GENERATED/PDL/Stats/Kmeans.pm            mod=PDL::Stats::Kmeans pd=lib/PDL/Stats/Kmeans.pd (added by pdlpp_mkgen)
+GENERATED/PDL/Stats/TS.pm                mod=PDL::Stats::TS pd=lib/PDL/Stats/TS.pd (added by pdlpp_mkgen)

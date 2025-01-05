@@ -28,9 +28,9 @@ my %WriteMakefileArgs = (
         'warnings::register'            => 0,
         # 2008-02-29
         'DateTime'                      => '0.42',
-        'DateTime::Locale::FromCLDR'    => 'v0.6.0',
-        'Locale::Intl'                  => 'v0.1.2',
-        'Locale::Unicode::Data'         => 'v1.3.0',
+        'DateTime::Locale::FromCLDR'    => 'v0.6.1',
+        'Locale::Intl'                  => 'v0.1.3',
+        'Locale::Unicode::Data'         => 'v1.3.2',
         'Scalar::Util'                  => 0,
         # Version compatible with perl v5.10.1
         'Want'                          => '0.17',
@@ -46,6 +46,7 @@ my %WriteMakefileArgs = (
         'Test::Time'        => 0,
     },
     LICENSE             => 'perl_5',
+    # Released on 2009-08-23
     MIN_PERL_VERSION    => 'v5.10.1',
     (MM->can('signature_target') ? (SIGN => 1) : ()),
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', DIST_CP => 'cp', PREOP => './dev/cleanup.pl' },

@@ -3,7 +3,7 @@
 #
 #    perltidy - a perl script indenter and formatter
 #
-#    Copyright (c) 2000-2024 by Steve Hancock
+#    Copyright (c) 2000-2025 by Steve Hancock
 #    Distributed under the GPL license agreement; see file COPYING
 #
 #    This program is free software; you can redistribute it and/or modify
@@ -101,6 +101,7 @@ use Encode::Guess;
 use IO::File;
 use File::Basename;
 use File::Copy;
+use File::Spec ();
 
 # perl stat function index names, based on
 #    https://perldoc.perl.org/functions/stat
@@ -135,7 +136,7 @@ BEGIN {
     # then the Release version must be bumped, and it is probably past time for
     # a release anyway.
 
-    $VERSION = '20240903';
+    $VERSION = '20250105';
 } ## end BEGIN
 
 sub DESTROY {
@@ -166,7 +167,14 @@ EOM
 
 sub streamhandle {
 
-    # given filename and mode (r or w), create an object which:
+    my ( $filename, $mode, ($is_encoded_data) ) = @_;
+
+    # Given:
+    #   $filename
+    #   $mode = 'r' or 'w' (only 'w' is used now, see note below)
+    #   $is_encoded_data (optional flag)
+
+    # Create an object which:
     #   has a 'getline' method if mode='r', and
     #   has a 'print' method if mode='w'.
     # The objects also need a 'close' method.
@@ -189,12 +197,11 @@ sub streamhandle {
     # - false: unencoded binary data is being transferred,
     #    set binary mode for files and for stdin.
 
-    my ( $filename, $mode, $is_encoded_data ) = @_;
-
-    # Note: mode 'r' works but is no longer used.
-    # Use sub stream_slurp instead for mode 'r' (for efficiency).
-    if ( $mode ne 'w' && $mode ne 'W' ) {
-        if ( DEVEL_MODE || ( $mode ne 'r' && $mode ne 'R' ) ) {
+    # NOTE: mode 'r' works but is no longer used.
+    # Use sub stream_slurp instead for mode 'r', for efficiency.
+    $mode = lc($mode);
+    if ( $mode ne 'w' ) {
+        if ( DEVEL_MODE || $mode ne 'r' ) {
             Fault("streamhandle called in unexpected mode '$mode'\n");
         }
     }
@@ -220,7 +227,7 @@ sub streamhandle {
             # operator.  If this causes trouble, the check can be
             # skipped and we can just let it crash if there is no
             # getline.
-            if ( $mode =~ /[rR]/ ) {
+            if ( $mode eq 'r' ) {
 
                 # RT#97159; part 1 of 2: updated to use 'can'
                 if ( $ref->can('getline') ) {
@@ -239,7 +246,7 @@ EOM
 
             # Accept an object with a print method for writing.
             # See note above about IO::File
-            if ( $mode =~ /[wW]/ ) {
+            if ( $mode eq 'w' ) {
 
                 # RT#97159; part 2 of 2: updated to use 'can'
                 if ( $ref->can('print') ) {
@@ -310,7 +317,11 @@ EOM
 
 sub stream_slurp {
 
-    my ( $filename, $timeout_in_seconds ) = @_;
+    my ( $filename, ($timeout_in_seconds) ) = @_;
+
+    # Given:
+    #   $filename
+    #   $timeout_in_seconds (optional timeout, in seconds)
 
     # Read the text in $filename and
     # return:
@@ -397,44 +408,6 @@ EOM
     return $rinput_string;
 } ## end sub stream_slurp
 
-{    ## begin closure for sub catfile
-
-    my $missing_file_spec;
-
-    BEGIN {
-        $missing_file_spec = !eval { require File::Spec; 1 };
-    }
-
-    sub catfile {
-
-        # concatenate a path and file basename
-        # returns undef in case of error
-
-        my @parts = @_;
-
-        # use File::Spec if we can
-        if ( !$missing_file_spec ) {
-            return File::Spec->catfile(@parts);
-        }
-
-        # Perl 5.004 systems may not have File::Spec so we'll make
-        # a simple try.  We assume File::Basename is available.
-        # return if not successful.
-        my $name      = pop @parts;
-        my $path      = join '/', @parts;
-        my $test_file = $path . $name;
-        my ( $test_name, $test_path ) = fileparse($test_file);
-        return $test_file if ( $test_name eq $name );
-        return            if ( $OSNAME eq 'VMS' );
-
-        # this should work at least for Windows and Unix:
-        $test_file = $path . '/' . $name;
-        ( $test_name, $test_path ) = fileparse($test_file);
-        return $test_file if ( $test_name eq $name );
-        return;
-    } ## end sub catfile
-} ## end closure for sub catfile
-
 # Here is a map of the flow of data from the input source to the output
 # line sink:
 #
@@ -507,7 +480,12 @@ sub is_char_mode {
 my $md5_hex = sub {
     my ($buf) = @_;
 
-    # Evaluate the MD5 sum for a string
+    # Evaluate the MD5 sum for a string:
+    # Given:
+    #   $buf = a string
+    # Return:
+    #   $digest = its MD5 sum
+
     # Patch for [rt.cpan.org #88020]
     # Use utf8::encode since md5_hex() only operates on bytes.
     # my $digest = md5_hex( utf8::encode($sink_buffer) );
@@ -557,6 +535,7 @@ BEGIN {
         _user_formatter_           => $i++,
         _input_copied_verbatim_    => $i++,
         _input_output_difference_  => $i++,
+        _dump_to_stdout_           => $i++,
     };
 } ## end BEGIN
 
@@ -721,14 +700,14 @@ EOM
         my $flag = shift;
         if   ($flag) { goto ERROR_EXIT }
         else         { goto NORMAL_EXIT }
-        croak "unexpected return to Exit";
+        croak "unexpected return to sub Exit";
     } ## end sub Exit
 
     sub Die {
         my $msg = shift;
         Warn($msg);
         Exit(1);
-        croak "unexpected return to Die";
+        croak "unexpected return from sub Exit";
     } ## end sub Die
 
     sub Fault {
@@ -757,8 +736,7 @@ $pkg reports VERSION='$VERSION'.
 ==============================================================================
 EOM
 
-        # This return is to keep Perl-Critic from complaining.
-        return;
+        croak "unexpected return from sub Die";
     } ## end sub Fault
 
     # extract various dump parameters
@@ -801,7 +779,7 @@ EOM
     # see if ARGV is overridden
     if ( defined($argv) ) {
 
-        my $rargv = ref $argv;
+        my $rargv = ref($argv);
         if ( $rargv eq 'SCALAR' ) { $argv = ${$argv}; $rargv = undef }
 
         # ref to ARRAY
@@ -954,13 +932,17 @@ EOM
         dump-mixed-call-parens
         dump-mismatched-args
         dump-mismatched-returns
+        dump-unique-keys
         )
       )
     {
-        if ( $rOpts->{$opt_name} && $num_files != 1 ) {
-            Die(<<EOM);
+        if ( $rOpts->{$opt_name} ) {
+            $self->[_dump_to_stdout_] = 1;
+            if ( $num_files != 1 ) {
+                Die(<<EOM);
 --$opt_name expects 1 filename in the arg list but saw $num_files filenames
 EOM
+            }
         }
     }
 
@@ -1034,7 +1016,7 @@ EOM
 
             # These options can take filenames, so we will ignore them here
             my %is_option_with_file_parameter;
-            my @qf = qw(outfile profile);
+            my @qf = qw( outfile profile );
             @is_option_with_file_parameter{@qf} = (1) x scalar(@qf);
 
             # Expand an abbreviation into a long name
@@ -1096,8 +1078,46 @@ EOM
     }
 
     # use stdin by default if no source array and no args
+    elsif ( !@Arg_files ) {
+        unshift( @Arg_files, '-' );
+    }
+
+    # check file existence and expand any globs
     else {
-        unshift( @Arg_files, '-' ) unless @Arg_files;
+        my @updated_files;
+        foreach my $input_file (@Arg_files) {
+            if ( -e $input_file ) {
+                push @updated_files, $input_file;
+            }
+            else {
+
+                # file doesn't exist - check for a file glob
+                if ( $input_file =~ /([\?\*\[\{])/ ) {
+
+                    # Windows shell may not remove quotes, so do it
+                    my $ifile = $input_file;
+                    if ( $ifile =~ /^\'(.+)\'$/ ) { $ifile = $1 }
+                    if ( $ifile =~ /^\"(.+)\"$/ ) { $ifile = $1 }
+                    my $pattern = fileglob_to_re($ifile);
+                    my $dh;
+                    if ( opendir( $dh, './' ) ) {
+                        my @files =
+                          grep { /$pattern/ && !-d } readdir($dh);
+                        closedir($dh);
+                        next unless (@files);
+                        push @updated_files, @files;
+                        next;
+                    }
+                }
+                Warn("skipping file: '$input_file': no matches found\n");
+                next;
+            }
+        } ## end loop over input filenames
+
+        @Arg_files = @updated_files;
+        if ( !@Arg_files ) {
+            Die("no matching input files found\n");
+        }
     }
 
     # Flag for loading module Unicode::GCString for evaluating text width:
@@ -1190,17 +1210,19 @@ sub make_file_extension {
 
     # Make a file extension, adding any leading '.' if necessary.
     # (the '.' may actually be an '_' under VMS).
-    my ( $self, $extension, $default ) = @_;
+    my ( $self, $extension, ($default) ) = @_;
 
-    # '$extension' is the first choice (usually a user entry)
-    # '$default'   is an optional backup extension
+    # Given:
+    #  $extension = the first choice (usually a user entry)
+    #  $default   = an optional backup extension
+    # Return:
+    #  $extension = the actual file extension
 
     $extension = EMPTY_STRING unless defined($extension);
     $extension =~ s/^\s+//;
     $extension =~ s/\s+$//;
 
     # Use default extension if nothing remains of the first choice
-    #
     if ( length($extension) == 0 ) {
         $extension = $default;
         $extension = EMPTY_STRING unless defined($extension);
@@ -1221,7 +1243,8 @@ sub check_in_place_modify {
 
     my ( $self, $source_stream, $destination_stream ) = @_;
 
-    # get parameters associated with the -b option
+    # See if --backup-and-modify-in-place (-b) is set, and if so,
+    # return its associated parameters
     my $rOpts = $self->[_rOpts_];
 
     # check for -b option;
@@ -1239,7 +1262,7 @@ sub check_in_place_modify {
     if ($in_place_modify) {
         if (   $rOpts->{'standard-output'}
             || $destination_stream
-            || ref $source_stream
+            || ref($source_stream)
             || $rOpts->{'outfile'}
             || defined( $rOpts->{'output-path'} ) )
         {
@@ -1567,6 +1590,8 @@ sub set_output_file_permissions {
 
     my ( $self, $output_file, $rinput_file_stat, $in_place_modify ) = @_;
 
+    # Set the permissions for the output file
+
     # Given:
     #  $output_file      = the file whose permissions we will set
     #  $rinput_file_stat = the result of stat($input_file)
@@ -1631,9 +1656,10 @@ sub set_output_file_permissions {
 } ## end sub set_output_file_permissions
 
 sub get_decoded_string_buffer {
+
     my ( $self, $input_file, $display_name ) = @_;
 
-    # Decode the input buffer if necessary or requested
+    # Decode the input buffer from utf8 if necessary or requested
 
     # Given:
     #   $input_file   = the input file or stream
@@ -2010,6 +2036,14 @@ sub process_all_files {
 
     my ( $self, $rcall_hash ) = @_;
 
+    # This routine is the main loop to process all files.
+    # Total formatting is done with these layers of subroutines:
+    #   perltidy                - main routine; checks run parameters
+    #  *process_all_files       - main loop to process all files; *THIS LAYER
+    #   process_filter_layer    - do any pre and post processing;
+    #   process_iteration_layer - handle any iterations on formatting
+    #   process_single_case     - solves one formatting problem
+
     my $rinput_hash               = $rcall_hash->{rinput_hash};
     my $rfiles                    = $rcall_hash->{rfiles};
     my $source_stream             = $rcall_hash->{source_stream};
@@ -2022,14 +2056,6 @@ sub process_all_files {
     my $rpending_complaint        = $rcall_hash->{rpending_complaint};
     my $rpending_logfile_message  = $rcall_hash->{rpending_logfile_message};
 
-    # This routine is the main loop to process all files.
-    # Total formatting is done with these layers of subroutines:
-    #   perltidy                - main routine; checks run parameters
-    #  *process_all_files       - main loop to process all files; *THIS LAYER
-    #   process_filter_layer    - do any pre and post processing;
-    #   process_iteration_layer - handle any iterations on formatting
-    #   process_single_case     - solves one formatting problem
-
     my $rOpts              = $self->[_rOpts_];
     my $dot                = $self->[_file_extension_separator_];
     my $diagnostics_object = $self->[_diagnostics_object_];
@@ -2041,8 +2067,7 @@ sub process_all_files {
     my $debugfile_stream   = $rinput_hash->{'debugfile'};
 
     my $number_of_files = @{$rfiles};
-    while ( my $input_file = shift @{$rfiles} ) {
-
+    foreach my $input_file ( @{$rfiles} ) {
         my $fileroot;
         my @input_file_stat;
         my $display_name;
@@ -2080,25 +2105,6 @@ sub process_all_files {
             $fileroot     = $input_file;
             $display_name = $input_file;
             if ( !-e $input_file ) {
-
-                # file doesn't exist - check for a file glob
-                if ( $input_file =~ /([\?\*\[\{])/ ) {
-
-                    # Windows shell may not remove quotes, so do it
-                    my $ifile = $input_file;
-                    if ( $ifile =~ /^\'(.+)\'$/ ) { $ifile = $1 }
-                    if ( $ifile =~ /^\"(.+)\"$/ ) { $ifile = $1 }
-                    my $pattern = fileglob_to_re($ifile);
-                    my $dh;
-                    if ( opendir( $dh, './' ) ) {
-                        my @files =
-                          grep { /$pattern/ && !-d } readdir($dh);
-                        closedir($dh);
-                        next unless (@files);
-                        unshift @{$rfiles}, @files;
-                        next;
-                    }
-                }
                 Warn("skipping file: '$input_file': no matches found\n");
                 next;
             }
@@ -2169,7 +2175,7 @@ sub process_all_files {
                       Die("unable to create directory $new_path: $OS_ERROR\n");
                 }
                 my $path = $new_path;
-                $fileroot = catfile( $path, $base );
+                $fileroot = File::Spec->catfile( $path, $base );
                 if ( !$fileroot ) {
                     Die(<<EOM);
 ------------------------------------------------------------------------
@@ -2304,6 +2310,11 @@ EOM
             }
         }
 
+        # prepare standard output in case of a dump to stdout
+        if ( $is_encoded_data && $self->[_dump_to_stdout_] ) {
+            binmode *STDOUT, ':encoding(UTF-8)';
+        }
+
         $rstatus->{'file_count'} += 1;
         $rstatus->{'output_name'}     = $output_name;
         $rstatus->{'iteration_count'} = 0;
@@ -2378,16 +2389,16 @@ EOM
 
         $logger_object->finish()
           if $logger_object;
-    } ## end of main loop to process all files
+    } ## end loop over files
 
     return;
 } ## end sub process_all_files
 
 sub write_tidy_output {
 
-    # Write tidied output in '$routput_string' to its final destination
-
     my ( $self, $rcall_hash ) = @_;
+
+    # Write tidied output in '$routput_string' to its final destination
 
     my $routput_string   = $rcall_hash->{routput_string};
     my $rinput_file_stat = $rcall_hash->{rinput_file_stat};
@@ -2704,7 +2715,7 @@ EOM
 } ## end sub process_filter_layer
 
 # For safety, set an upper bound on number of iterations before stopping.
-# The average number of iterations is 2. No known cases exceed 5.
+# The average number of iterations is 2. No known cases exceed 4.
 use constant ITERATION_LIMIT => 6;
 
 sub process_iteration_layer {
@@ -2936,9 +2947,21 @@ EOM
                 if ( !defined( $saw_md5{$digest} ) ) {
                     $saw_md5{$digest} = $iter;
                 }
+
+                # do a second iteration if all ok and requested by formatter
+                # to allow delayed adding/deleting of commas (git156, git143)
+                elsif ( $iter == 1
+                    && !$stop_now
+                    && $formatter->can('want_second_iteration')
+                    && $formatter->want_second_iteration() )
+                {
+                    ## deja vu, but do not set $stop_now
+                    $saw_md5{$digest} = $iter;
+                }
                 else {
 
                     # Deja vu, stop iterating
+
                     $stop_now = 1;
                     my $iterm = $iter - 1;
                     if ( $saw_md5{$digest} != $iterm ) {
@@ -2991,6 +3014,12 @@ EOM
                         }
                     }
                     elsif ( !$stopping_on_error ) {
+
+                        # The md5 sum implies convergence but the convergence
+                        # was not detected by the Formatter.  This is not
+                        # critical but should be investigated.  It happened
+                        # once when a line break was placed before a phantom
+                        # comma under -qwaf, and has been fixed.
                         print {*STDERR}
 "STRANGE no conv in $display_name: stopping on it=$iter, but not converged in formatter\n";
                     }
@@ -3028,8 +3057,9 @@ EOM
 
 sub process_single_case {
 
-    # run the formatter on a single defined case
     my ( $self, $tokenizer, $formatter ) = @_;
+
+    # Run the formatter on a single defined case
 
     # Total formatting is done with these layers of subroutines:
     #   perltidy                - main routine; checks run parameters
@@ -3167,42 +3197,61 @@ sub line_diff {
     # differences.
     my $diff_marker = EMPTY_STRING;
     my $pos         = -1;
-    my $pos1        = $pos;
+    my $pos1        = -1;
     if ( defined($s1) && defined($s2) ) {
-        my $count = 0;
-        my $mask  = $s1 ^ $s2;
+        my $mask = $s1 ^ $s2;
 
         while ( $mask =~ /[^\0]/g ) {
-            $count++;
             my $pos_last = $pos;
             $pos = $LAST_MATCH_START[0];
-            if ( $count == 1 ) { $pos1 = $pos; }
+            if ( $pos1 < 0 ) { $pos1 = $pos; }
             $diff_marker .= SPACE x ( $pos - $pos_last - 1 ) . '^';
 
             # we could continue to mark all differences, but there is no point
             last;
-        }
+        } ## end while ( $mask =~ /[^\0]/g)
     }
     return ( $diff_marker, $pos1 );
 } ## end sub line_diff
 
 sub compare_string_buffers {
 
-    my ( $rbufi, $rbufo ) = @_;
+    my ( $string_i, $string_o, ($max_diff_count) ) = @_;
 
     # Compare input and output string buffers and return a brief text
     # description of the first difference.
 
-    my $leni = defined($rbufi) ? length( ${$rbufi} ) : 0;
-    my $leno = defined($rbufo) ? length( ${$rbufo} ) : 0;
-    my $msg =
-      "Input  file length is $leni chars\nOutput file length is $leno chars\n";
+    # Given:
+    #   $string_i = input string, or ref to input string
+    #   $string_o = output string, or ref to output string
+    #   $max_diff_count = optional maximum number of differences to show,
+    #       default=1
+    # Return:
+    #   a string showing differences
+
+    my $rbufi = ref($string_i) ? $string_i : \$string_i;
+    my $rbufo = ref($string_o) ? $string_o : \$string_o;
+
+    if ( !defined($max_diff_count) ) { $max_diff_count = 1 }
+
+    my ( @aryi, @aryo );
+    my ( $leni, $leno ) = ( 0, 0 );
+    if ( defined($rbufi) ) {
+        $leni = length( ${$rbufi} );
+        @aryi = split /^/, ${$rbufi};
+    }
+    if ( defined($rbufo) ) {
+        $leno = length( ${$rbufo} );
+        @aryo = split /^/, ${$rbufo};
+    }
+    my $nlines_i = @aryi;
+    my $nlines_o = @aryo;
+    my $msg      = <<EOM;
+Input   file length has $leni chars in $nlines_i lines
+Output  file length has $leno chars in $nlines_o lines
+EOM
     return $msg unless ( $leni && $leno );
-    my @aryi = split /^/, ${$rbufi};
-    my @aryo = split /^/, ${$rbufo};
-    my ( $linei,  $lineo );
-    my ( $counti, $counto )                          = ( 0, 0 );
-    my ( $last_nonblank_line, $last_nonblank_count ) = ( EMPTY_STRING, 0 );
+
     my $truncate = sub {
         my ( $str, $lenmax ) = @_;
         if ( length($str) > $lenmax ) {
@@ -3210,26 +3259,33 @@ sub compare_string_buffers {
         }
         return $str;
     }; ## end $truncate = sub
-    while (1) {
-        if ($linei) {
-            $last_nonblank_line  = $linei;
-            $last_nonblank_count = $counti;
+
+    my $last_nonblank_line  = EMPTY_STRING;
+    my $last_nonblank_count = 0;
+
+    # loop over lines until we find a difference
+    my $count      = 0;
+    my $diff_count = 0;
+    while ( @aryi && @aryo ) {
+        $count++;
+        my $linei = shift @aryi;
+        my $lineo = shift @aryo;
+        chomp $linei;
+        chomp $lineo;
+        if ( $linei eq $lineo ) {
+            if ( length($linei) ) {
+                $last_nonblank_line  = $linei;
+                $last_nonblank_count = $count;
+            }
+            next;
         }
-        $linei = shift @aryi;
-        $lineo = shift @aryo;
 
-        # compare chomp'ed lines
-        if ( defined($linei) ) { $counti++; chomp $linei }
-        if ( defined($lineo) ) { $counto++; chomp $lineo }
-
-        # see if one or both ended before a difference
-        last unless ( defined($linei) && defined($lineo) );
-
-        next if ( $linei eq $lineo );
-
-        # lines differ ...
+        #---------------------------
+        # lines differ ... finish up
+        #---------------------------
         my ( $line_diff, $pos1 ) = line_diff( $linei, $lineo );
-        my $reason = "Files first differ at character $pos1 of line $counti";
+        my $ch1    = $pos1 + 1;
+        my $reason = "Files first differ at character $ch1 of line $count";
 
         my ( $leading_ws_i, $leading_ws_o ) = ( EMPTY_STRING, EMPTY_STRING );
         if ( $linei =~ /^(\s+)/ ) { $leading_ws_i = $1; }
@@ -3267,22 +3323,27 @@ sub compare_string_buffers {
  $last_nonblank_count:$last_nonblank_line
 EOM
         }
-        $line_diff = SPACE x ( 2 + length($counto) ) . $line_diff;
+        $line_diff = SPACE x ( 2 + length($count) ) . $line_diff;
         $msg .= <<EOM;
-<$counti:$linei
->$counto:$lineo
+<$count:$linei
+>$count:$lineo
 $line_diff
 EOM
-        return $msg;
-    } ## end while
+        $diff_count++;
+        last if ( $diff_count >= $max_diff_count );
+    } ## end while ( @aryi && @aryo )
 
-    # no line differences found, but one file may have fewer lines
-    if ( $counti > $counto ) {
+    if ($diff_count) { return $msg }
+
+    #------------------------------------------------------
+    # no differences found, see if one file has fewer lines
+    #------------------------------------------------------
+    if ( $nlines_i > $nlines_o ) {
         $msg .= <<EOM;
 Files initially match file but output file has fewer lines
 EOM
     }
-    elsif ( $counti < $counto ) {
+    elsif ( $nlines_i < $nlines_o ) {
         $msg .= <<EOM;
 Files initially match file but input file has fewer lines
 EOM
@@ -3318,7 +3379,7 @@ sub make_logfile_header {
     }
     my $options_string = join( SPACE, @{$rraw_options} );
 
-    if ($config_file) {
+    if ( defined($config_file) ) {
         $msg .= "Found Configuration File >>> $config_file \n";
     }
     $msg .= "Configuration and command line parameters for this run:\n";
@@ -3527,6 +3588,7 @@ sub generate_options {
     $add_option->( 'outdent-labels',                       'ola',   '!' );
     $add_option->( 'outdent-long-quotes',                  'olq',   '!' );
     $add_option->( 'indent-closing-brace',                 'icb',   '!' );
+    $add_option->( 'indent-leading-semicolon',             'ils',   '!' );
     $add_option->( 'closing-token-indentation',            'cti',   '=i' );
     $add_option->( 'closing-paren-indentation',            'cpi',   '=i' );
     $add_option->( 'closing-brace-indentation',            'cbi',   '=i' );
@@ -3555,6 +3617,7 @@ sub generate_options {
     $add_option->( 'keyword-paren-inner-tightness',             'kpit',  '=i' );
     $add_option->( 'keyword-paren-inner-tightness-list',        'kpitl', '=s' );
     $add_option->( 'logical-padding',                           'lop',   '!' );
+    $add_option->( 'multiple-token-tightness',                  'mutt',  '=s' );
     $add_option->( 'nospace-after-keyword',                     'nsak',  '=s' );
     $add_option->( 'nowant-left-space',                         'nwls',  '=s' );
     $add_option->( 'nowant-right-space',                        'nwrs',  '=s' );
@@ -3586,6 +3649,7 @@ sub generate_options {
     $add_option->( 'valign-wide-equals',                        'vwe',   '!' );
     $add_option->( 'extended-block-tightness',                  'xbt',   '!' );
     $add_option->( 'extended-block-tightness-list',             'xbtl',  '=s' );
+    $add_option->( 'qw-as-function',                            'qwaf',  '!' );
 
     ########################################
     $category = 4;    # Comment controls
@@ -3689,9 +3753,10 @@ sub generate_options {
     ########################################
     $category = 6;    # Controlling list formatting
     ########################################
-    $add_option->( 'break-at-old-comma-breakpoints', 'boc', '!' );
-    $add_option->( 'comma-arrow-breakpoints',        'cab', '=i' );
-    $add_option->( 'maximum-fields-per-table',       'mft', '=i' );
+    $add_option->( 'break-at-old-comma-breakpoints', 'boc',  '!' );
+    $add_option->( 'break-at-trailing-comma-types',  'btct', '=s' );
+    $add_option->( 'comma-arrow-breakpoints',        'cab',  '=i' );
+    $add_option->( 'maximum-fields-per-table',       'mft',  '=i' );
 
     ########################################
     $category = 7;    # Retaining or ignoring existing line breaks
@@ -3786,6 +3851,7 @@ sub generate_options {
     $add_option->( 'dump-short-names',                'dsn',   '!' );
     $add_option->( 'dump-token-types',                'dtt',   '!' );
     $add_option->( 'dump-unusual-variables',          'duv',   '!' );
+    $add_option->( 'dump-unique-keys',                'duk',   '!' );
     $add_option->( 'dump-want-left-space',            'dwls',  '!' );
     $add_option->( 'dump-want-right-space',           'dwrs',  '!' );
     $add_option->( 'fuzzy-line-length',               'fll',   '!' );
@@ -3834,6 +3900,7 @@ sub generate_options {
     # These settings should approximate the perlstyle(1) suggestions.
     #------------------------------------------------------------------
     my @defaults = qw(
+      add-lone-trailing-commas
       add-newlines
       add-terminal-newline
       add-semicolons
@@ -3894,9 +3961,9 @@ sub generate_options {
       hanging-side-comments
       indent-block-comments
       indent-columns=4
+      indent-leading-semicolon
       integer-range-check=2
       interbracket-arrow-complexity=1
-      delay-trailing-comma-operations
       iterations=1
       keep-old-blank-lines=1
       keyword-paren-inner-tightness=1
@@ -4420,6 +4487,8 @@ sub process_command_line {
         $rpending_complaint_uu, $dump_options_type
     ) = @q;
 
+    # This is the outer sub which handles memoization
+
     my $use_cache = !defined($perltidyrc_stream) && !$dump_options_type;
     if ($use_cache) {
         my $cache_key = join( chr(28), @ARGV );
@@ -4448,6 +4517,8 @@ sub _process_command_line {
         $perltidyrc_stream,  $is_Windows, $Windows_type,
         $rpending_complaint, $dump_options_type
     ) = @_;
+
+    # This is the inner sub which actually processes the command line
 
     use Getopt::Long;
 
@@ -4487,9 +4558,9 @@ sub _process_command_line {
     }
 
     my @raw_options        = ();
-    my $config_file        = EMPTY_STRING;
     my $saw_ignore_profile = 0;
     my $saw_dump_profile   = 0;
+    my $config_file;
 
     #--------------------------------------------------------------
     # Take a first look at the command-line parameters.  Do as many
@@ -4508,7 +4579,7 @@ sub _process_command_line {
             $saw_dump_profile = 1;
         }
         elsif ( $i =~ /^-(pro|profile)=(.+)/ ) {
-            if ($config_file) {
+            if ( defined($config_file) ) {
                 Warn(
 "Only one -pro=filename allowed, using '$2' instead of '$config_file'\n"
                 );
@@ -4522,9 +4593,9 @@ sub _process_command_line {
                 {
                     $start_dir = '.' if !$start_dir;
                     $start_dir = Cwd::realpath($start_dir);
-                    if ( my $found_file =
-                        find_file_upwards( $start_dir, $search_file ) )
-                    {
+                    my $found_file =
+                      find_file_upwards( $start_dir, $search_file );
+                    if ( defined($found_file) ) {
                         $config_file = $found_file;
                     }
                 }
@@ -4533,7 +4604,6 @@ sub _process_command_line {
                 Die(
                     "cannot find file given with -pro=$config_file: $OS_ERROR\n"
                 );
-                $config_file = EMPTY_STRING;
             }
         }
         elsif ( $i =~ /^-(pro|profile)=?$/ ) {
@@ -4599,7 +4669,7 @@ sub _process_command_line {
         # as call parameter to perltidy and -pro=filename on command
         # line.
         if ($perltidyrc_stream) {
-            if ($config_file) {
+            if ( defined($config_file) ) {
                 Warn(<<EOM);
  Conflict: a perltidyrc configuration file was specified both as this
  perltidy call parameter: $perltidyrc_stream
@@ -4615,14 +4685,15 @@ EOM
         # look for a config file if we don't have one yet
         my $rconfig_file_chatter;
         ${$rconfig_file_chatter} = EMPTY_STRING;
-        $config_file =
-          find_config_file( $is_Windows, $Windows_type, $rconfig_file_chatter,
-            $rpending_complaint )
-          unless $config_file;
+        if ( !defined($config_file) ) {
+            $config_file =
+              find_config_file( $is_Windows, $Windows_type,
+                $rconfig_file_chatter, $rpending_complaint );
+        }
 
         # open any config file
         my $rconfig_string;
-        if ($config_file) {
+        if ( defined($config_file) ) {
             $rconfig_string = stream_slurp($config_file);
             if ( !defined($rconfig_string) ) {
                 Die(
@@ -4667,10 +4738,11 @@ EOM
                 # a look at @ARGV.
                 if (@ARGV) {
                     my $count = @ARGV;
-                    my $str   = "\'" . pop(@ARGV) . "\'";
-                    while ( my $param = pop(@ARGV) ) {
+                    my $str   = EMPTY_STRING;
+                    foreach my $param (@ARGV) {
                         if ( length($str) < 70 ) {
-                            $str .= ", '$param'";
+                            if ($str) { $str .= ', ' }
+                            $str .= "'$param'";
                         }
                         else {
                             $str .= ", ...";
@@ -4716,7 +4788,7 @@ EOM
                 #  dump-block-minimum-lines',        'dbl',   '=i' );
                 #  dump-block-types',                'dbt',   '=s' );
 
-                foreach (
+                foreach my $cmd (
                     @dump_commands,
                     qw{
                     help
@@ -4725,9 +4797,9 @@ EOM
                     }
                   )
                 {
-                    if ( defined( $Opts{$_} ) ) {
-                        delete $Opts{$_};
-                        Warn("ignoring --$_ in config file: $config_file\n");
+                    if ( defined( $Opts{$cmd} ) ) {
+                        delete $Opts{$cmd};
+                        Warn("ignoring --$cmd in config file: $config_file\n");
                     }
                 }
             }
@@ -4749,7 +4821,7 @@ EOM
         if ( $Opts{$long_name} ) {
             my $short_name = $early_exit_commands{$long_name};
             Die(<<EOM);
-Ambigiguos entry; please enter '--$long_name' or '-$short_name'
+Ambiguous entry; please enter '--$long_name' or '-$short_name'
 EOM
         }
     }
@@ -4768,21 +4840,15 @@ EOM
 } ## end sub _process_command_line
 
 sub make_grep_alias_string {
+
     my ($rOpts) = @_;
 
     # pre-process the --grep-alias-list parameter
 
     # Defaults: list operators in List::Util
     # Possible future additions:  pairfirst pairgrep pairmap
-    my $default_string = join SPACE, qw(
-      all
-      any
-      first
-      none
-      notall
-      reduce
-      reductions
-    );
+    my $default_string = join SPACE,
+      qw( all any first none notall reduce reductions );
 
     # make a hash of any excluded words
     my %is_excluded_word;
@@ -4830,6 +4896,7 @@ sub make_grep_alias_string {
 } ## end sub make_grep_alias_string
 
 sub cleanup_word_list {
+
     my ( $rOpts, $option_name, $rforced_words ) = @_;
 
     # Clean up the list of words in a user option to simplify use by
@@ -4964,21 +5031,21 @@ EOM
     # seen as 2 parameters, vtc and 1, so the abbreviations
     # won't be seen.  Therefore, we will catch them here if
     # they get through.
-    if ( defined $rOpts->{'vertical-tightness'} ) {
+    if ( defined( $rOpts->{'vertical-tightness'} ) ) {
         my $vt = $rOpts->{'vertical-tightness'};
         $rOpts->{'paren-vertical-tightness'}          = $vt;
         $rOpts->{'square-bracket-vertical-tightness'} = $vt;
         $rOpts->{'brace-vertical-tightness'}          = $vt;
     }
 
-    if ( defined $rOpts->{'vertical-tightness-closing'} ) {
+    if ( defined( $rOpts->{'vertical-tightness-closing'} ) ) {
         my $vtc = $rOpts->{'vertical-tightness-closing'};
         $rOpts->{'paren-vertical-tightness-closing'}          = $vtc;
         $rOpts->{'square-bracket-vertical-tightness-closing'} = $vtc;
         $rOpts->{'brace-vertical-tightness-closing'}          = $vtc;
     }
 
-    if ( defined $rOpts->{'closing-token-indentation'} ) {
+    if ( defined( $rOpts->{'closing-token-indentation'} ) ) {
         my $cti = $rOpts->{'closing-token-indentation'};
         $rOpts->{'closing-square-bracket-indentation'} = $cti;
         $rOpts->{'closing-brace-indentation'}          = $cti;
@@ -5174,7 +5241,10 @@ EOM
 } ## end sub check_options
 
 sub find_file_upwards {
+
     my ( $search_dir, $search_file ) = @_;
+
+    # This implements the ... upward search for a file
 
     $search_dir  =~ s{/+$}{};
     $search_file =~ s{^/+}{};
@@ -5190,7 +5260,7 @@ sub find_file_upwards {
         else {
             $search_dir = dirname($search_dir);
         }
-    }
+    } ## end while (1)
 
     # This return is for Perl-Critic.
     # We shouldn't get out of the while loop without a return
@@ -5200,6 +5270,7 @@ sub find_file_upwards {
 sub expand_command_abbreviations {
 
     # go through @ARGV and expand any abbreviations
+    # note that @ARGV has been localized
 
     my ( $rexpansion, $rraw_options, $config_file ) = @_;
 
@@ -5287,7 +5358,7 @@ After $max_passes passes ARGV has $num entries
 EOM
             }
 
-            if ($config_file) {
+            if ( defined($config_file) ) {
                 Die(<<"DIE");
 Please check your configuration file $config_file for circular-references.
 To deactivate it, use -npro.
@@ -5356,8 +5427,7 @@ sub check_vms_filename {
 
 sub Win_OS_Type {
 
-    # TODO: are these more standard names?
-    # Win32s Win95 Win98 WinMe WinNT3.51 WinNT4 Win2000 WinXP/.Net Win2003
+    my $rpending_complaint = shift;
 
     # Returns a string that determines what MS OS we are on.
     # Returns win32s,95,98,Me,NT3.51,NT4,2000,XP/.Net,Win2003
@@ -5365,8 +5435,10 @@ sub Win_OS_Type {
     # Original code contributed by: Yves Orton
     # We need to know this to decide where to look for config files
 
-    my $rpending_complaint = shift;
-    my $os                 = EMPTY_STRING;
+    # TODO: are these more standard names?
+    # Win32s Win95 Win98 WinMe WinNT3.51 WinNT4 Win2000 WinXP/.Net Win2003
+
+    my $os = EMPTY_STRING;
     return $os unless ( $OSNAME =~ /win32|dos/i );    # is it a MS box?
 
     # Systems built from Perl source may not have Win32.pm
@@ -5456,7 +5528,7 @@ sub find_config_file {
     # sub to check file existence and record all tests
     my $exists_config_file = sub {
         my $config_file = shift;
-        return 0 unless $config_file;
+        return 0 unless defined($config_file);
         ${$rconfig_file_chatter} .= "# Testing: $config_file\n";
         return -f $config_file;
     }; ## end $exists_config_file = sub
@@ -5466,7 +5538,7 @@ sub find_config_file {
 
         # resolve <dir>/.../<file>, meaning look upwards from directory
         my $config_file = shift;
-        if ($config_file) {
+        if ( defined($config_file) ) {
             if ( my ( $start_dir, $search_file ) =
                 ( $config_file =~ m{^(.*)\.\.\./(.*)$} ) )
             {
@@ -5474,9 +5546,8 @@ sub find_config_file {
                   "# Searching Upward: $config_file\n";
                 $start_dir = '.' if !$start_dir;
                 $start_dir = Cwd::realpath($start_dir);
-                if ( my $found_file =
-                    find_file_upwards( $start_dir, $search_file ) )
-                {
+                my $found_file = find_file_upwards( $start_dir, $search_file );
+                if ( defined($found_file) ) {
                     $config_file = $found_file;
                     ${$rconfig_file_chatter} .= "# Found: $config_file\n";
                 }
@@ -5496,11 +5567,11 @@ sub find_config_file {
     }
 
     # Default environment vars.
-    my @envs = qw(PERLTIDY HOME);
+    my @envs = qw( PERLTIDY HOME );
 
     # Check the NT/2k/XP locations, first a local machine def, then a
     # network def
-    push @envs, qw(USERPROFILE HOMESHARE) if $OSNAME =~ /win32/i;
+    push @envs, qw( USERPROFILE HOMESHARE ) if $OSNAME =~ /win32/i;
 
     # Now go through the environment ...
     foreach my $var (@envs) {
@@ -5516,12 +5587,13 @@ sub find_config_file {
             }
 
             # test ENV as directory:
-            $config_file = catfile( $ENV{$var}, ".perltidyrc" );
+            $config_file = File::Spec->catfile( $ENV{$var}, ".perltidyrc" );
             $config_file = $resolve_config_file->($config_file);
             return $config_file if $exists_config_file->($config_file);
 
             if ($is_Windows) {
-                $config_file = catfile( $ENV{$var}, "perltidy.ini" );
+                $config_file =
+                  File::Spec->catfile( $ENV{$var}, "perltidy.ini" );
                 $config_file = $resolve_config_file->($config_file);
                 return $config_file if $exists_config_file->($config_file);
             }
@@ -5543,20 +5615,20 @@ sub find_config_file {
             # i.e. C:\Documents and Settings\User\perltidy.ini
             if ($allusers) {
 
-                $config_file = catfile( $allusers, ".perltidyrc" );
+                $config_file = File::Spec->catfile( $allusers, ".perltidyrc" );
                 return $config_file if $exists_config_file->($config_file);
 
-                $config_file = catfile( $allusers, "perltidy.ini" );
+                $config_file = File::Spec->catfile( $allusers, "perltidy.ini" );
                 return $config_file if $exists_config_file->($config_file);
             }
 
             # Check system directory.
             # retain old code in case someone has been able to create
             # a file with a leading period.
-            $config_file = catfile( $system, ".perltidyrc" );
+            $config_file = File::Spec->catfile( $system, ".perltidyrc" );
             return $config_file if $exists_config_file->($config_file);
 
-            $config_file = catfile( $system, "perltidy.ini" );
+            $config_file = File::Spec->catfile( $system, "perltidy.ini" );
             return $config_file if $exists_config_file->($config_file);
         }
     }
@@ -5625,7 +5697,7 @@ sub dump_config_file {
     if ($rconfig_string) {
         my @lines = split /^/, ${$rconfig_string};
         print {*STDOUT} "# Dump of file: '$config_file'\n";
-        while ( defined( my $line = shift @lines ) ) { print {*STDOUT} $line }
+        foreach my $line (@lines) { print {*STDOUT} $line }
     }
     else {
         print {*STDOUT} "# ...no config file found\n";
@@ -5710,25 +5782,25 @@ sub read_config_file {
     #   \@config_list = ref to final parameters and values which will be
     #     placed in @ARGV for processing by GetOptions
     #   $death_message = error message returned if a fatal error occurs
-
     my @config_list = ();
 
+    # remove side comments and join multiline quotes
+    my ( $rline_hash, $death_message ) =
+      strip_comments_and_join_quotes( $rconfig_string, $config_file );
+
     # file is bad if non-empty $death_message is returned
-    my $death_message = EMPTY_STRING;
+    if ($death_message) {
+        return ( \@config_list, $death_message );
+    }
 
     my $name = undef;
-    my $line_no;
     my $opening_brace_line;
-    my @lines = split /^/, ${$rconfig_string};
-    while ( defined( my $line = shift @lines ) ) {
-        $line_no++;
-        chomp $line;
-        ( $line, $death_message ) =
-          strip_comment( $line, $config_file, $line_no );
-        last if ($death_message);
-        next unless $line;
-        $line =~ s/^ \s+ | \s+ $//gx;    # trim both ends
-        next unless $line;
+    foreach my $item ( @{$rline_hash} ) {
+        my $line    = $item->{line};
+        my $line_no = $item->{line_no};
+        $line =~ s/^\s+//;
+        $line =~ s/\s+$//;
+        next unless ( length($line) );
 
         my $body = $line;
 
@@ -5812,92 +5884,144 @@ EOM
     return ( \@config_list, $death_message );
 } ## end sub read_config_file
 
-sub strip_comment {
+sub strip_comments_and_join_quotes {
 
-    # Strip any comment from a command line
-    my ( $instr, $config_file, $line_no ) = @_;
+    my ( $rconfig_string, $config_file ) = @_;
+
+    # Tasks:
+    # 1. Strip comments from .perltidyrc lines
+    # 2. Join lines which are spanned by a quote
 
     # Given:
-    #   $instr = string with the text of an input line
+    #   $rconfig_string = the configuration file
     #   $config_file = filename, for error messages
-    #   $line_no = line number, for error messages
     # Return:
-    #   string with any comment removed
-    #   $msg = any error message
+    #   $rline_hash = hash with modified lines and their input numbers
+    #   $msg = any error message; code will die on any message.
 
-    my $msg = EMPTY_STRING;
+    # return variables
+    my $msg        = EMPTY_STRING;
+    my $rline_hash = [];
 
-    # check for full-line comment
-    if ( $instr =~ /^\s*#/ ) {
-        return ( EMPTY_STRING, $msg );
-    }
+    # quote state variables
+    my $quote_char          = EMPTY_STRING;
+    my $quote_start_line    = EMPTY_STRING;
+    my $quote_start_line_no = -1;
+    my $in_string           = EMPTY_STRING;
+    my $out_string          = EMPTY_STRING;
 
-    # nothing to do if no comments
-    if ( $instr !~ /#/ ) {
-        return ( $instr, $msg );
-    }
+    my @lines   = split /^/, ${$rconfig_string};
+    my $line_no = 0;
 
-    # handle case of no quotes
-    if ( $instr !~ /['"]/ ) {
+    # loop over lines
+    foreach my $line (@lines) {
+        $line_no++;
+        $line =~ s/^\s+//;
+        $line =~ s/\s+$//;
+        next unless ( length($line) );
 
-        # We now require a space before the # of a side comment
-        # this allows something like:
-        #    -sbcp=#
-        # Otherwise, it would have to be quoted:
-        #    -sbcp='#'
-        $instr =~ s/\s+\#.*$//;
-        return ( $instr, $msg );
-    }
+        if ( !$quote_char ) {
 
-    # handle comments and quotes
-    my $outstr     = EMPTY_STRING;
-    my $quote_char = EMPTY_STRING;
-    while (1) {
-
-        # looking for ending quote character
-        if ($quote_char) {
-            if ( $instr =~ /\G($quote_char)/gc ) {
-                $quote_char = EMPTY_STRING;
-                $outstr .= $1;
+            # skip a full-line comment
+            if ( substr( $line, 0, 1 ) eq '#' ) {
+                next;
             }
-            elsif ( $instr =~ /\G(.)/gc ) {
-                $outstr .= $1;
-            }
-
-            # error..we reached the end without seeing the ending quote char
-            else {
-                $msg = <<EOM;
-Error reading file $config_file at line number $line_no.
-Did not see ending quote character <$quote_char> in this text:
-$instr
-Please fix this line or use -npro to avoid reading this file
-EOM
-                last;
-            }
+            $in_string  = $line;
+            $out_string = EMPTY_STRING;
         }
-
-        # accumulating characters and looking for start of a quoted string
         else {
-            if ( $instr =~ /\G([\"\'])/gc ) {
-                $outstr .= $1;
-                $quote_char = $1;
+
+            # treat previous newline as a space
+            $in_string = SPACE . $line;
+        }
+
+        # loop over string characters
+        #  $in_string  = the input string
+        #  $out_string = the output string
+        #  $quote_char = quote character being sought
+        while (1) {
+
+            # accumulating characters not in quote
+            if ( !$quote_char ) {
+
+                if ( $in_string =~ /\G([\"\'])/gc ) {
+
+                    # starting new quote..
+                    $out_string .= $1;
+                    $quote_char          = $1;
+                    $quote_start_line_no = $line_no;
+                    $quote_start_line    = $line;
+                }
+                elsif ( $in_string =~ /\G#/gc ) {
+
+                    # A space is required before the # of a side comment
+                    # This allows something like:
+                    #    -sbcp=#
+                    # Otherwise, it would have to be quoted:
+                    #    -sbcp='#'
+                    if ( !length($out_string) || $out_string =~ s/\s+$// ) {
+                        last;
+                    }
+                    $out_string .= '#';
+                }
+                elsif ( $in_string =~ /\G([^\#\'\"]+)/gc ) {
+
+                    # neither quote nor side comment
+                    $out_string .= $1;
+                }
+                else {
+
+                    # end of line
+                    last;
+                }
             }
 
-            # Note: not yet enforcing the space-before-hash rule for side
-            # comments if the parameter is quoted.
-            elsif ( $instr =~ /\G#/gc ) {
-                last;
-            }
-            elsif ( $instr =~ /\G(.)/gc ) {
-                $outstr .= $1;
-            }
+            # looking for ending quote character
             else {
-                last;
+                if ( $in_string =~ /\G($quote_char)/gc ) {
+
+                    # end of quote
+                    $out_string .= $1;
+                    $quote_char = EMPTY_STRING;
+                }
+                elsif ( $in_string =~ /\G([^$quote_char]+)/gc ) {
+
+                    # accumulate quoted text
+                    $out_string .= $1;
+                }
+                else {
+
+                    # end of line
+                    last;
+                }
             }
+        } ## end while (1)
+
+        if ( !$quote_char ) {
+            push @{$rline_hash},
+              {
+                line    => $out_string,
+                line_no => $line_no,
+              };
         }
+
+    } ## end loop over lines
+
+    if ($quote_char) {
+        my $max_len = 80;
+        if ( length($quote_start_line) > $max_len ) {
+            $quote_start_line =
+              substr( $quote_start_line, 0, $max_len - 3 ) . '...';
+        }
+        $msg = <<EOM;
+Error: hit EOF reading file '$config_file' looking for end of quoted text
+which started at line $quote_start_line_no with quote character <$quote_char>:
+$quote_start_line
+Please fix or use -npro to avoid reading this file
+EOM
     }
-    return ( $outstr, $msg );
-} ## end sub strip_comment
+    return ( $rline_hash, $msg );
+} ## end sub strip_comments_and_join_quotes
 
 sub parse_args {
 
@@ -5958,7 +6082,7 @@ EOM
                 last;
             }
         }
-    }
+    } ## end while (1)
     return ( \@body_parts, $msg );
 } ## end sub parse_args
 
@@ -6054,7 +6178,7 @@ sub show_version {
     print {*STDOUT} <<"EOM";
 This is perltidy, v$VERSION
 
-Copyright 2000-2024, Steve Hancock
+Copyright 2000-2025 by Steve Hancock
 
 Perltidy is free software and may be copied under the terms of the GNU
 General Public License, which is included in the distribution files.

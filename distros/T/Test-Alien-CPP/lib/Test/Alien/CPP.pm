@@ -9,7 +9,7 @@ use Text::ParseWords qw( shellwords );
 use base qw( Exporter );
 
 # ABSTRACT: Testing tools for Alien modules for projects that use C++
-our $VERSION = '1.03'; # VERSION
+our $VERSION = '1.04'; # VERSION
 
 
 our @EXPORT = @Test::Alien::EXPORT;
@@ -47,7 +47,9 @@ sub xs_ok
     my @new = ref($cppguess{$name}) eq 'ARRAY' ? @{ delete $cppguess{$name} } : shellwords(delete $cppguess{$name});
     my @old = do {
       my $value = delete $xs->{$stage{$name}}->{$name};
-      ref($value) eq 'ARRAY' ? @$value : shellwords($value);
+      !defined $value            ? ()
+        : ref($value) eq 'ARRAY' ? @$value
+        :                          shellwords($value);
     };
     $xs->{$stage{$name}}->{$name} = [@old, @new];
   }
@@ -74,7 +76,7 @@ Test::Alien::CPP - Testing tools for Alien modules for projects that use C++
 
 =head1 VERSION
 
-version 1.03
+version 1.04
 
 =head1 SYNOPSIS
 
@@ -143,9 +145,11 @@ Contributors:
 
 Roy Storey (KIWIROY)
 
+Diab Jerius (DJERIUS)
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017-2022 by Graham Ollis.
+This software is copyright (c) 2017-2024 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

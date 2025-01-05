@@ -104,6 +104,8 @@ complete( 'planet m', [ qw{ mars mercury } ] );
 
 complete( 'planet v', [ qw{ venus } ] );
 
+complete( 'show i', [ qw{ illum initfile } ] );
+
 complete( 'sky ', [ qw{ add class clear drop list load lookup tle } ] );
 
 complete( 'sky l', [ qw{ list load lookup } ] );

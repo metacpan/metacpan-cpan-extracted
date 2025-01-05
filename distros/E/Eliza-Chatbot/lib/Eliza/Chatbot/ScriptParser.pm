@@ -107,7 +107,7 @@ Eliza::Chatbot::ScriptParser
 
 =head1 Version
 
-Version 0.08
+Version 0.10
 
 =head1 Options
 

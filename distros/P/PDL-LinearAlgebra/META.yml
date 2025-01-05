@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Devel::CheckLib: '0'
   ExtUtils::F77: '1.26'
-  PDL: '2.091'
+  PDL: '2.096'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
@@ -21,11 +21,11 @@ no_index:
     - t
     - inc
 requires:
-  PDL: '2.091'
+  PDL: '2.096'
 resources:
-  bugtracker: https://github.com/PDLPorters/pdl-linearalgebra/issues
+  IRC: irc://irc.perl.org/#pdl
+  bugtracker: https://github.com/PDLPorters/PDL-LinearAlgebra/issues
   homepage: http://pdl.perl.org/
-  repository: git://github.com/PDLPorters/pdl-linearalgebra.git
-version: '0.431'
-x_IRC: irc://irc.perl.org/#pdl
+  repository: git://github.com/PDLPorters/PDL-LinearAlgebra.git
+version: '0.432'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

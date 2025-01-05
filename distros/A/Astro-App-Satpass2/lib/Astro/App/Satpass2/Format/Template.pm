@@ -16,6 +16,7 @@ use Astro::App::Satpass2::Utils qw{
     @CARP_NOT
 };
 use Astro::App::Satpass2::Wrap::Array;
+use Astro::App::Satpass2::Format::Template::Provider;
 use Astro::Coord::ECI::TLE 0.059 qw{ :constants };
 use Astro::Coord::ECI::Utils 0.059 qw{
     deg2rad embodies julianday PI rad2deg TWOPI
@@ -23,11 +24,10 @@ use Astro::Coord::ECI::Utils 0.059 qw{
 use Clone qw{ };
 use POSIX qw{ floor };
 use Template;
-use Template::Provider;
 use Text::Abbrev;
 use Text::Wrap qw{ wrap };
 
-our $VERSION = '0.054';
+our $VERSION = '0.055';
 
 use constant FORMAT_VALUE	=> 'Astro::App::Satpass2::FormatValue';
 
@@ -53,7 +53,7 @@ sub _new_tt {
     $self->{tt} = Template->new(
 	{
 	    LOAD_TEMPLATES => [
-		Template::Provider->new(
+		Astro::App::Satpass2::Format::Template::Provider->new(
 		    ABSOLUTE	=> $permissive,
 		    RELATIVE	=> $permissive,
 		),
@@ -1060,7 +1060,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010-2024 by Thomas R. Wyant, III
+Copyright (C) 2010-2025 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

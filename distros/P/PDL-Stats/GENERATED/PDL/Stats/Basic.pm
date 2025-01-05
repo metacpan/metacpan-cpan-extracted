@@ -1,5 +1,5 @@
 #
-# GENERATED WITH PDL::PP from stats_basic.pd! Don't modify!
+# GENERATED WITH PDL::PP from lib/PDL/Stats/Basic.pd! Don't modify!
 #
 package PDL::Stats::Basic;
 
@@ -22,7 +22,7 @@ use DynaLoader;
 
 
 
-#line 4 "stats_basic.pd"
+#line 4 "lib/PDL/Stats/Basic.pd"
 
 use PDL::LiteF;
 use PDL::NiceSlice;
@@ -54,7 +54,7 @@ or
     my $stdv = stdv( $data );  
 
 =cut
-#line 58 "Basic.pm"
+#line 58 "lib/PDL/Stats/Basic.pm"
 
 
 =head1 FUNCTIONS
@@ -777,9 +777,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 807 "stats_basic.pd"
+#line 807 "lib/PDL/Stats/Basic.pd"
 
-#line 808 "stats_basic.pd"
+#line 808 "lib/PDL/Stats/Basic.pd"
 
 =head2 binomial_test
 
@@ -1210,7 +1210,7 @@ Copyright (C) 2009 Maggie J. Xiong <maggiexyz users.sourceforge.net>
 All rights reserved. There is no warranty. You are allowed to redistribute this software / documentation as described in the file COPYING in the PDL distribution.
 
 =cut
-#line 1214 "Basic.pm"
+#line 1214 "lib/PDL/Stats/Basic.pm"
 
 # Exit with OK status
 

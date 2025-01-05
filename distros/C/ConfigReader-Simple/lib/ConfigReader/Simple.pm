@@ -9,7 +9,7 @@ use vars qw($VERSION $AUTOLOAD %ERROR $ERROR $Warn $Die);
 use Carp qw(croak carp);
 
 $ERROR     = '';
-$VERSION   = '1.296';
+$VERSION   = '1.297';
 $Warn      = 0;
 $Die       = '';
 
@@ -795,7 +795,7 @@ brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2002-2024, brian d foy <briandfoy@pobox.com>. All rights reserved.
+Copyright © 2002-2025, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the Artistic License 2.0.

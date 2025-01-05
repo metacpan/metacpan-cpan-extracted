@@ -4,7 +4,7 @@ use warnings;
 use 5.010;
 use utf8;
 
-our $VERSION = '3.05';
+our $VERSION = '3.06';
 
 binmode( STDOUT, ':encoding(utf-8)' );
 
@@ -186,7 +186,7 @@ sub new_efa {
 sub show_help {
 	my ($code) = @_;
 
-	print "Usage: efa-m [-d <dd.mm.yyyy>] [-t <hh:mm>] [place] <station>\n"
+	print "Usage: efa-m [-d <dd.mm.yyyy>] [-t <hh:mm>] <stop>\n"
 	  . "See also: man efa-m\n";
 
 	exit $code;
@@ -322,7 +322,7 @@ sub show_coord {
 		printf(
 			"%5.1f km  %-${max_len}s  %s\n",
 			$stop->distance_m * 1e-3,
-			$stop->full_name, $stop->id
+			$stop->full_name, $stop->id_code
 		);
 	}
 }
@@ -330,7 +330,8 @@ sub show_coord {
 sub show_stopfinder {
 	my $max_len = max map { length( $_->full_name ) } $efa->results;
 	for my $stop ( $efa->results ) {
-		printf( "%-${max_len}s  %s\n", $stop->full_name, $stop->id );
+		printf( "%-${max_len}s  %s  %s\n",
+			$stop->full_name, $stop->id_num, $stop->id_code );
 	}
 }
 
@@ -483,11 +484,7 @@ sub show_results {
 		@output_line = ( $dtime, $platform, $line, q{}, $d->destination, $d );
 
 		if ($show_jid) {
-			$output_line[2] .= sprintf( '  %s@%d(%s)%d',
-				$d->stateless =~ s{ }{}gr,
-				scalar $d->route_pre ? ( $d->route_pre )[0]->id : $d->stop_id,
-				$d->sched_datetime->strftime('%Y%m%d'),
-				$d->key );
+			$output_line[2] .= '  ' . $d->id;
 		}
 
 		if ( $edata{route} ) {
@@ -613,7 +610,7 @@ B<efa-m> [B<-s> I<service>] I<tripid>
 
 =head1 VERSION
 
-version 3.05
+version 3.06
 
 =head1 DESCRIPTION
 
@@ -625,8 +622,8 @@ The operating mode depends on the contents of its mandatory argument.
 
 =head2 Departure Monitor (I<name>)
 
-Shows departures it I<name> or I<city> I<name>. For each departure,
-B<efa-m> shows
+Shows departures at I<name> or I<city> I<name>; I<name> may also be a stop ID
+number or code. For each departure, B<efa-m> shows
 
 =over
 
@@ -644,10 +641,10 @@ B<efa-m> shows
 
 =back
 
-If I<city> is specified, I<name> refers to a location within I<city>. Otherwise,
-I<name> must be self-contained. I.e., both C<< efa Essen Hbf >> and
-C<< efa "Essen Hbf" >> are valid. Note, however, than C<< efa E Hbf >> works,
-but C<< efa "E Hbf" >> does not.
+If I<city> is specified, I<name> refers to a location within I<city>.
+Otherwise, I<name> must be self-contained. I.e., both C<< efa-m Essen Hbf >>
+and C<< efa-m "Essen Hbf" >> are valid. Note, however, than C<< efa-m E Hbf >>
+works, but C<< efa-m "E Hbf" >> does not.
 
 By default, I<name> refers to a stop, this can be changed by specifying
 I<type>.  Supported types are B<address> and B<poi> (point of interest).
@@ -655,11 +652,13 @@ I<type>.  Supported types are B<address> and B<poi> (point of interest).
 =head2 Location Search (B<?>I<query>|I<lat>B<:>I<lon>)
 
 List stops that match I<query> or that are located in the vicinity of
-I<lat>B<:>I<lon> geocoordinates.
+I<lat>B<:>I<lon> geocoordinates. In addition to stop names, the output also
+includes stop ID codes (both modes) and numbers (only available in I<query>
+mode).
 
 =head2 Trip Details (I<JourneyID>)
 
-List trip information as well as arrival and departure time, name, and platform
+List trip information including arrival and departure time, name, and platform
 of each stop on the trip's route.
 
 =head1 OPTIONS
@@ -667,13 +666,12 @@ of each stop on the trip's route.
 Values in brackets indicate options that only apply to the corresponding
 operating mode(s).
 
-
 =over
 
 =item B<-A>, B<--auto-url>, B<--discover-and-print> (monitor)
 
-Probe all known EFA entry points for the specified stop. Print the first
-result which was not an error.
+Probe all known EFA services for the specified stop. Print the first result
+which was not an error.
 
 Note that this may take a while and will not necessarily return the best
 result.  Also, using thi option by default is not recommended, as it puts EFA
@@ -686,8 +684,8 @@ May also be specified as I<dd.mm.>
 
 =item B<-D>, B<--discover> (monitor)
 
-Probe all known EFA entry points for the specified stop. Print the URLs and
-names of all entry points which did not return an error.
+Probe all known EFA services for the specified stop. Print the URLs and names
+of all services which did not return an error.
 
 =item B<-j>, B<--with-jid> (monitor)
 
@@ -795,7 +793,7 @@ already included.
 
 =item B<-s>, B<--service> I<name>
 
-Short name of the EFA entry point. See Travel::Status::DE::EFA(3pm) and the
+Short name of the EFA service. See Travel::Status::DE::EFA(3pm) and the
 B<--list> option for a list of services.
 
 =item B<-t>, B<--time> I<hh:mm> (monitor)
@@ -860,7 +858,7 @@ departure and departure delay
 
 =head1 AUTHOR
 
-Copyright (C) 2011-2023 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2011-2023 Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

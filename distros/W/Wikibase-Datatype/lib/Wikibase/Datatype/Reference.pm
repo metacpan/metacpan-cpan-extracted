@@ -7,7 +7,7 @@ use Error::Pure qw(err);
 use Mo qw(build is);
 use Mo::utils qw(check_array_object check_required);
 
-our $VERSION = 0.36;
+our $VERSION = 0.37;
 
 has snaks => (
 	is => 'ro',
@@ -161,6 +161,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.36
+0.37
 
 =cut

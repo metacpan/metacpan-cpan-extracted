@@ -1,5 +1,8 @@
 Revision history for Perl module Locale::Intl
 
+v0.1.3 2025-01-05T14:03:11+0900
+    - Improved method pass_error
+
 v0.1.2 2024-10-09T20:25:08+0900
     - Remove of erroneous dependency on curry
 

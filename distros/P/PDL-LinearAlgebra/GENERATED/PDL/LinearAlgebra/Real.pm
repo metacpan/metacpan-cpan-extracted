@@ -1,5 +1,5 @@
 #
-# GENERATED WITH PDL::PP from real.pd! Don't modify!
+# GENERATED WITH PDL::PP from lib/PDL/LinearAlgebra/Real.pd! Don't modify!
 #
 package PDL::LinearAlgebra::Real;
 
@@ -11,7 +11,7 @@ use PDL::Exporter;
 use DynaLoader;
 
 
-   our $VERSION = '0.14';
+   our $VERSION = '0.432';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::LinearAlgebra::Real $VERSION;
@@ -22,7 +22,7 @@ use DynaLoader;
 
 
 
-#line 79 "real.pd"
+#line 83 "lib/PDL/LinearAlgebra/Real.pd"
 
 use strict;
 
@@ -70,7 +70,7 @@ This module provides an interface to parts of the real lapack library.
 These routines accept either float or double ndarrays.
 
 =cut
-#line 74 "Real.pm"
+#line 74 "lib/PDL/LinearAlgebra/Real.pm"
 
 
 =head1 FUNCTIONS
@@ -8089,7 +8089,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 10595 "real.pd"
+#line 10599 "lib/PDL/LinearAlgebra/Real.pd"
 
 =head1 AUTHOR
 
@@ -8100,7 +8100,7 @@ it under the terms of the Perl Artistic License as in the file Artistic_2
 in this distribution.
 
 =cut
-#line 8104 "Real.pm"
+#line 8104 "lib/PDL/LinearAlgebra/Real.pm"
 
 # Exit with OK status
 

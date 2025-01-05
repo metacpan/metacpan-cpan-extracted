@@ -696,7 +696,7 @@ Ascii::Text::Font::Boomer - Boomer font
 
 =head1 VERSION
 
-Version 0.18
+Version 0.19
 
 =cut
 

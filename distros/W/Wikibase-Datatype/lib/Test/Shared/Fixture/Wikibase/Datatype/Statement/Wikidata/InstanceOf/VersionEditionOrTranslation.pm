@@ -8,7 +8,7 @@ use Test::Shared::Fixture::Wikibase::Datatype::Reference::Wikidata::VIAF;
 use Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::InstanceOf::VersionEditionOrTranslation;
 use Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::Of::Poem;
 
-our $VERSION = 0.36;
+our $VERSION = 0.37;
 
 sub new {
 	my $class = shift;
@@ -164,6 +164,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.36
+0.37
 
 =cut

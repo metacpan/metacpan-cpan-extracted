@@ -52,6 +52,6 @@
          "web" : "https://github.com/briandfoy/math-nocarry"
       }
    },
-   "version" : "1.115",
+   "version" : "1.116",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

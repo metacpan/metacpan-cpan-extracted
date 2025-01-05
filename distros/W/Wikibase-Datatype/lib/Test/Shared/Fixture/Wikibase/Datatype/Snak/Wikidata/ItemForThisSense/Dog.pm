@@ -6,7 +6,7 @@ use warnings;
 
 use Test::Shared::Fixture::Wikibase::Datatype::Value::Item::Wikidata::Dog;
 
-our $VERSION = 0.36;
+our $VERSION = 0.37;
 
 sub new {
 	my $class = shift;
@@ -142,6 +142,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.36
+0.37
 
 =cut

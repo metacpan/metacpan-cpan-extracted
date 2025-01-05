@@ -1,5 +1,5 @@
 #
-# GENERATED WITH PDL::PP from kmeans.pd! Don't modify!
+# GENERATED WITH PDL::PP from lib/PDL/Stats/Kmeans.pd! Don't modify!
 #
 package PDL::Stats::Kmeans;
 
@@ -22,7 +22,7 @@ use DynaLoader;
 
 
 
-#line 3 "kmeans.pd"
+#line 3 "lib/PDL/Stats/Kmeans.pd"
 
 use Carp;
 use PDL::LiteF;
@@ -81,7 +81,7 @@ plot the clusters if there are only 2 vars in $data,
       for (0 .. $k{cluster}->dim(1)-1);
 
 =cut
-#line 85 "Kmeans.pm"
+#line 85 "lib/PDL/Stats/Kmeans.pm"
 
 
 =head1 FUNCTIONS
@@ -92,9 +92,9 @@ plot the clusters if there are only 2 vars in $data,
 
 
 
-#line 74 "kmeans.pd"
+#line 74 "lib/PDL/Stats/Kmeans.pd"
 
-#line 75 "kmeans.pd"
+#line 75 "lib/PDL/Stats/Kmeans.pd"
 
 # my tmp var for PDL 2.007 slice upate
 my $_tmp;
@@ -125,7 +125,7 @@ sub random_cluster {
   } while (PDL::any $cluster->sumover == 0 );
   return $cluster;
 }
-#line 129 "Kmeans.pm"
+#line 129 "lib/PDL/Stats/Kmeans.pm"
 
 *_random_cluster = \&PDL::_random_cluster;
 
@@ -287,9 +287,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 311 "kmeans.pd"
+#line 311 "lib/PDL/Stats/Kmeans.pd"
 
-#line 312 "kmeans.pd"
+#line 312 "lib/PDL/Stats/Kmeans.pd"
 
 sub _scree_ind {
   # use as scree cutoff the point with max distance to the line formed
@@ -322,7 +322,7 @@ sub _d_point2line {
 
   return _d_p2l( $self->mv(0,-1)->dog, $p1->mv(0,-1)->dog, $p2->mv(0,-1)->dog );
 }
-#line 326 "Kmeans.pm"
+#line 326 "lib/PDL/Stats/Kmeans.pm"
 
 *_d_p2l = \&PDL::_d_p2l;
 
@@ -330,9 +330,9 @@ sub _d_point2line {
 
 
 
-#line 362 "kmeans.pd"
+#line 362 "lib/PDL/Stats/Kmeans.pd"
 
-#line 363 "kmeans.pd"
+#line 363 "lib/PDL/Stats/Kmeans.pd"
 =head2 kmeans
 
 =for ref
@@ -695,7 +695,7 @@ Copyright (C) 2009 Maggie J. Xiong <maggiexyz users.sourceforge.net>
 All rights reserved. There is no warranty. You are allowed to redistribute this software / documentation as described in the file COPYING in the PDL distribution.
 
 =cut
-#line 699 "Kmeans.pm"
+#line 699 "lib/PDL/Stats/Kmeans.pm"
 
 # Exit with OK status
 

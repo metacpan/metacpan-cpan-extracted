@@ -6,4 +6,4 @@ use Test::NoWarnings;
 use Wikibase::Datatype::Languages;
 
 # Test.
-is($Wikibase::Datatype::Languages::VERSION, 0.36, 'Version.');
+is($Wikibase::Datatype::Languages::VERSION, 0.37, 'Version.');

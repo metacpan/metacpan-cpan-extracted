@@ -1,5 +1,5 @@
 #
-# GENERATED WITH PDL::PP from trans.pd! Don't modify!
+# GENERATED WITH PDL::PP from lib/PDL/LinearAlgebra/Trans.pd! Don't modify!
 #
 package PDL::LinearAlgebra::Trans;
 
@@ -10,7 +10,7 @@ our @EXPORT_OK = qw( mexp mexpts mlog msqrt mpow
 			macosh masinh matanh masech macsch macoth
 			sec asec sech asech 
 			cot acot acoth coth mfun
-			csc acsc csch acsch toreal pi geexp __Ncgeexp cgeexp __Nctrsqrt ctrsqrt __Nctrfun ctrfun );
+			csc acsc csch acsch toreal pi geexp cgeexp ctrsqrt ctrfun );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
@@ -18,7 +18,7 @@ use PDL::Exporter;
 use DynaLoader;
 
 
-   our $VERSION = '0.14';
+   our $VERSION = '0.432';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::LinearAlgebra::Trans $VERSION;
@@ -29,7 +29,7 @@ use DynaLoader;
 
 
 
-#line 30 "trans.pd"
+#line 37 "lib/PDL/LinearAlgebra/Trans.pd"
 
 use PDL::Core;
 use PDL::Slices;
@@ -62,7 +62,7 @@ acsc, csch, acsch. Beware, importing this module will overwrite the hidden
 PDL routine sec. If you need to call it specify its origin module : PDL::Basic::sec(args)
 
 =cut
-#line 66 "Trans.pm"
+#line 66 "lib/PDL/LinearAlgebra/Trans.pm"
 
 
 =head1 FUNCTIONS
@@ -129,13 +129,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-*__Ncgeexp = \&PDL::__Ncgeexp;
 
-
-
-
-
-#line 22 "../pp_defc.pl"
 
 =head2 cgeexp
 
@@ -150,21 +144,22 @@ The algorithm is described in Roger B. Sidje (rbs@maths.uq.edu.au)
 "EXPOKIT: Software Package for Computing Matrix Exponentials".
 ACM - Transactions On Mathematical Software, 24(1):130-156, 1998
 
+=for bad
+
+cgeexp does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::cgeexp {
-  goto &PDL::__Ncgeexp;
-}
+
+
+
 *cgeexp = \&PDL::cgeexp;
-#line 160 "Trans.pm"
-
-*__Nctrsqrt = \&PDL::__Nctrsqrt;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 ctrsqrt
 
@@ -180,41 +175,52 @@ Report No. 336, Manchester Centre for Computational Mathematics,
 Manchester, England, January 1999. It's available at http://www.ma.man.ac.uk/~higham/pap-mf.html)
 If uplo is true, A is lower triangular.
 
+=for bad
+
+ctrsqrt does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::ctrsqrt {
-  goto &PDL::__Nctrsqrt;
-}
+
+
+
 *ctrsqrt = \&PDL::ctrsqrt;
-#line 190 "Trans.pm"
-
-*__Nctrfun = \&PDL::__Nctrfun;
 
 
 
 
 
-#line 22 "../pp_defc.pl"
 
 =head2 ctrfun
 
 =for sig
 
-  Signature: (complex [io]A(n,n);int uplo();complex [o] B(n,n);int [o]info(); complex [t]diag(n);SV* func)
+  Signature: (complex [io]A(n,n);int uplo();complex [o] B(n,n);int [o]info(); complex [t]diag(n); SV* func)
 
 =for ref
 
 Apply an arbitrary function to a complex triangular matrix. Uses a recurrence of Parlett.
 If uplo is true, A is lower triangular.
 
+=for bad
+
+ctrfun does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
 =cut
 
-sub PDL::ctrfun {
-  goto &PDL::__Nctrfun;
-}
+
+
+
 *ctrfun = \&PDL::ctrfun;
 
-#line 803 "trans.pd"
+
+
+
+
+#line 810 "lib/PDL/LinearAlgebra/Trans.pd"
+
 my $pi;
 BEGIN { $pi = pdl(3.1415926535897932384626433832795029) }
 sub pi () { $pi->copy };
@@ -1199,7 +1205,7 @@ it under the terms of the Perl Artistic License as in the file Artistic_2
 in this distribution.
 
 =cut
-#line 1203 "Trans.pm"
+#line 1209 "lib/PDL/LinearAlgebra/Trans.pm"
 
 # Exit with OK status
 

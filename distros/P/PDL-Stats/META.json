@@ -22,12 +22,12 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "PDL" : "2.073"
+            "PDL" : "2.096"
          }
       },
       "configure" : {
          "requires" : {
-            "PDL" : "2.073"
+            "PDL" : "2.096"
          }
       },
       "develop" : {
@@ -41,7 +41,7 @@
             "PDL::Graphics::PGPLOT" : "0"
          },
          "requires" : {
-            "PDL" : "2.073",
+            "PDL" : "2.096",
             "perl" : "5.016"
          }
       },
@@ -60,6 +60,6 @@
          "web" : "https://github.com/PDLPorters/PDL-Stats"
       }
    },
-   "version" : "0.852",
+   "version" : "0.853",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

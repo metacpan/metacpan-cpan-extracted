@@ -1,5 +1,8 @@
 Revision history for Perl module Locale::Unicode
 
+v0.3.11 2025-01-05T13:50:41+0900
+    - Changed INIT block to simple enclosure
+
 v0.3.10 2025-01-04T11:24:53+0900
     - Resolved warning about undefined value. Thanks to Slaven Rezić: Gitlab #2
 

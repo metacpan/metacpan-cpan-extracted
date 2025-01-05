@@ -8,7 +8,7 @@ use warnings;
 use utf8;
 
 use Astro::Coord::ECI::TLE 0.059 qw{ :constants };
-our $VERSION = '0.054';
+our $VERSION = '0.055';
 
 my @event_names;
 $event_names[PASS_EVENT_NONE]		= '';
@@ -288,7 +288,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014-2024 by Thomas R. Wyant, III
+Copyright (C) 2014-2025 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

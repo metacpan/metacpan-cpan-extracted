@@ -316,7 +316,7 @@ int32_t SPVM__Sys__Socket__accept(SPVM_ENV* env, SPVM_VALUE* stack) {
   void* obj_addr = stack[1].oval;
   
   if (!obj_addr) {
-    return env->die(env, stack, "The socket address $addr must be defined.", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "The client address $addr must be defined.", __func__, FILE_NAME, __LINE__);
   }
   
   struct sockaddr* addr = env->get_pointer(env, stack, obj_addr);
@@ -325,16 +325,16 @@ int32_t SPVM__Sys__Socket__accept(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   socklen_t sl_addrlen = *addrlen_ref;
   
-  int32_t status = accept(sockfd, addr, &sl_addrlen);
+  int32_t client_fd = accept(sockfd, addr, &sl_addrlen);
   
-  if (status == -1) {
+  if (client_fd == -1) {
     env->die(env, stack, "[System Error]accept() failed:%s.", spvm_socket_strerror(env, stack, spvm_socket_errno(), 0), __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_SYSTEM_CLASS;
   }
   
   *addrlen_ref = sl_addrlen;
   
-  stack[0].ival = status;
+  stack[0].ival = client_fd;
   
   return 0;
 }

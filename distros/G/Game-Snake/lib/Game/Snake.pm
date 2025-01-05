@@ -1,6 +1,6 @@
 use 5.38.0;
 use experimental 'class';
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 class Game::Snake {
 	use Raylib::App;	
 	use Raylib::FFI;
@@ -183,7 +183,7 @@ class Game::Snake {
 		);
 
 
-		if ($score % $last_score == 0) {
+		if ($score % ($last_score * 2) == 0) {
 			$fps++;
 			$last_score = $score;
 		}
@@ -273,7 +273,7 @@ Game::Snake - A clone of the classic snake game using raylib
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 

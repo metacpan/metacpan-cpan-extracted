@@ -8,15 +8,13 @@
 #if PERL_API_REVISION != 5
 #error This module is only for Perl 5
 #else
-#if PERL_API_VERSION == 34
-#else
 #if PERL_API_VERSION == 36
-#define RC_LOOKBEHIND_END
-#define RC_OPFAIL
 #else
 #if PERL_API_VERSION == 38
-#define RC_LOOKBEHIND_END
-#define RC_OPFAIL
+#define RC_CHARCLASS_RENAME
+#define RC_REGNODE_REFACTOR
+#else
+#if PERL_API_VERSION == 40
 #define RC_CHARCLASS_RENAME
 #define RC_REGNODE_REFACTOR
 #else
@@ -39,8 +37,7 @@
 #else
 #define RC_BRANCH_REGNODE_SIZE 2
 #define RC_CURLY_REGNODE_SIZE 4
-/* TODO: check */
-#define INFINITE_COUNT 0xffffffff
+#define INFINITE_COUNT 0x7fffffff
 #endif
 
 #define ALNUM_BLOCK 0x0001
@@ -521,19 +518,7 @@ static int convert_invlist_to_map(SV *invlist, int invert, U32 *map)
     };
 
     static UV xposix_alnum_invlist[] = { 128,
-#if PERL_API_VERSION == 34
-#include "XPosixAlnum.32"
-#else
-#if PERL_API_VERSION == 36
 #include "XPosixAlnum.36"
-#else
-#if PERL_API_VERSION == 38
-#include "XPosixAlnum.36"
-#else
-#error unexpected PERL_API_VERSION
-#endif
-#endif
-#endif
     };
 
     static UV xposix_alpha_invlist[] = { 128,
@@ -1004,7 +989,6 @@ static int get_assertion_offset(regnode *p)
     return offs;
 }
 
-#ifdef RC_OPFAIL
 static int get_alt_assertion_arg(regnode *p)
 {
     int arg;
@@ -1029,7 +1013,6 @@ static int get_alt_assertion_size(regnode *p)
 
     return NEXT_OFF(p);
 }
-#endif
 
 static int get_synth_offset(regnode *p)
 {
@@ -1557,12 +1540,10 @@ static int compare_after_assertion(int anchored, Arrow *a1, Arrow *a2)
     return compare(anchored, &tail1, a2);
 }
 
-#ifdef RC_OPFAIL
 static int compare_after_alt_assertion(int anchored, Arrow *a1, Arrow *a2)
 {
     return compare_left_tail(anchored, a1, a2);
 }
-#endif
 
 static int compare_positive_assertions(int anchored, Arrow *a1, Arrow *a2)
 {
@@ -1684,7 +1665,6 @@ static int compare_negative_assertions(int anchored, Arrow *a1, Arrow *a2)
     return compare(anchored, &left, &right);
 }
 
-#ifdef RC_OPFAIL
 static int compare_negative_alt_assertions(int anchored, Arrow *a1, Arrow *a2)
 {
     regnode *p1, *p2;
@@ -1733,7 +1713,6 @@ static int compare_negative_alt_assertions(int anchored, Arrow *a1, Arrow *a2)
        but they weren't seen yet (nor particularly looked for)... */
     return compare_mismatch(anchored, a1, a2);
 }
-#endif
 
 static int compare_subexpressions(int anchored, Arrow *a1, Arrow *a2)
 {
@@ -5445,10 +5424,7 @@ void rc_init()
     memset(trivial_nodes, 0, SIZEOF_ARRAY(trivial_nodes));
     trivial_nodes[SUCCEED] = trivial_nodes[NOTHING] =
         trivial_nodes[TAIL] = trivial_nodes[WHILEM] =
-#ifdef RC_LOOKBEHIND_END
-        trivial_nodes[LOOKBEHIND_END] =
-#endif
-        1;
+        trivial_nodes[LOOKBEHIND_END] = 1;
 
     memset(dispatch, 0, sizeof(FCompare) * REGNODE_MAX * REGNODE_MAX);
 
@@ -5496,14 +5472,10 @@ void rc_init()
     dispatch[CLOSE][MBOL] = compare_left_tail;
     dispatch[IFMATCH][MBOL] = compare_after_assertion;
     dispatch[UNLESSM][MBOL] = compare_after_assertion;
-#ifdef RC_OPFAIL
     dispatch[OPFAIL][MBOL] = compare_after_alt_assertion;
-#endif
     dispatch[MINMOD][MBOL] = compare_left_tail;
     dispatch[LNBREAK][MBOL] = compare_tails;
-#ifdef RC_LOOKBEHIND_END
     dispatch[LOOKBEHIND_END][MBOL] = compare_left_tail;
-#endif
     dispatch[OPTIMIZED][MBOL] = compare_left_tail;
 
     dispatch[SUCCEED][SBOL] = compare_left_tail;
@@ -5521,13 +5493,9 @@ void rc_init()
     dispatch[CLOSE][SBOL] = compare_left_tail;
     dispatch[IFMATCH][SBOL] = compare_after_assertion;
     dispatch[UNLESSM][SBOL] = compare_after_assertion;
-#ifdef RC_OPFAIL
     dispatch[OPFAIL][SBOL] = compare_after_alt_assertion;
-#endif
     dispatch[MINMOD][SBOL] = compare_left_tail;
-#ifdef RC_LOOKBEHIND_END
     dispatch[LOOKBEHIND_END][SBOL] = compare_left_tail;
-#endif
     dispatch[OPTIMIZED][SBOL] = compare_left_tail;
 
     dispatch[SUCCEED][EOS] = compare_left_tail;
@@ -5547,13 +5515,9 @@ void rc_init()
     dispatch[CLOSE][EOS] = compare_left_tail;
     dispatch[IFMATCH][EOS] = compare_after_assertion;
     dispatch[UNLESSM][EOS] = compare_after_assertion;
-#ifdef RC_OPFAIL
     dispatch[OPFAIL][EOS] = compare_after_alt_assertion;
-#endif
     dispatch[MINMOD][EOS] = compare_left_tail;
-#ifdef RC_LOOKBEHIND_END
     dispatch[LOOKBEHIND_END][EOS] = compare_left_tail;
-#endif
     dispatch[OPTIMIZED][EOS] = compare_left_tail;
 
     dispatch[SUCCEED][EOL] = compare_left_tail;
@@ -5573,13 +5537,9 @@ void rc_init()
     dispatch[CLOSE][EOL] = compare_left_tail;
     dispatch[IFMATCH][EOL] = compare_after_assertion;
     dispatch[UNLESSM][EOL] = compare_after_assertion;
-#ifdef RC_OPFAIL
     dispatch[OPFAIL][EOL] = compare_after_alt_assertion;
-#endif
     dispatch[MINMOD][EOL] = compare_left_tail;
-#ifdef RC_LOOKBEHIND_END
     dispatch[LOOKBEHIND_END][EOL] = compare_left_tail;
-#endif
     dispatch[OPTIMIZED][EOL] = compare_left_tail;
 
     dispatch[SUCCEED][MEOL] = compare_left_tail;
@@ -5612,14 +5572,10 @@ void rc_init()
     dispatch[CLOSE][MEOL] = compare_left_tail;
     dispatch[IFMATCH][MEOL] = compare_after_assertion;
     dispatch[UNLESSM][MEOL] = compare_after_assertion;
-#ifdef RC_OPFAIL
     dispatch[OPFAIL][MEOL] = compare_after_alt_assertion;
-#endif
     dispatch[MINMOD][MEOL] = compare_left_tail;
     dispatch[LNBREAK][MEOL] = compare_mismatch;
-#ifdef RC_LOOKBEHIND_END
     dispatch[LOOKBEHIND_END][MEOL] = compare_left_tail;
-#endif
     dispatch[OPTIMIZED][MEOL] = compare_left_tail;
 
     dispatch[SUCCEED][SEOL] = compare_left_tail;
@@ -5645,14 +5601,10 @@ void rc_init()
     dispatch[CLOSE][SEOL] = compare_left_tail;
     dispatch[IFMATCH][SEOL] = compare_after_assertion;
     dispatch[UNLESSM][SEOL] = compare_after_assertion;
-#ifdef RC_OPFAIL
     dispatch[OPFAIL][SEOL] = compare_after_alt_assertion;
-#endif
     dispatch[MINMOD][SEOL] = compare_left_tail;
     dispatch[LNBREAK][SEOL] = compare_mismatch;
-#ifdef RC_LOOKBEHIND_END
     dispatch[LOOKBEHIND_END][SEOL] = compare_left_tail;
-#endif
     dispatch[OPTIMIZED][SEOL] = compare_left_tail;
 
     dispatch[SUCCEED][BOUND] = compare_left_tail;
@@ -5687,14 +5639,10 @@ void rc_init()
     dispatch[CLOSE][BOUND] = compare_left_tail;
     dispatch[IFMATCH][BOUND] = compare_after_assertion;
     dispatch[UNLESSM][BOUND] = compare_after_assertion;
-#ifdef RC_OPFAIL
     dispatch[OPFAIL][BOUND] = compare_after_alt_assertion;
-#endif
     dispatch[MINMOD][BOUND] = compare_left_tail;
     dispatch[LNBREAK][BOUND] = compare_mismatch;
-#ifdef RC_LOOKBEHIND_END
     dispatch[LOOKBEHIND_END][BOUND] = compare_left_tail;
-#endif
     dispatch[OPTIMIZED][BOUND] = compare_left_tail;
 
     dispatch[SUCCEED][NBOUND] = compare_left_tail;
@@ -5729,14 +5677,10 @@ void rc_init()
     dispatch[CLOSE][NBOUND] = compare_left_tail;
     dispatch[IFMATCH][NBOUND] = compare_after_assertion;
     dispatch[UNLESSM][NBOUND] = compare_after_assertion;
-#ifdef RC_OPFAIL
     dispatch[OPFAIL][NBOUND] = compare_after_alt_assertion;
-#endif
     dispatch[MINMOD][NBOUND] = compare_left_tail;
     dispatch[LNBREAK][NBOUND] = compare_mismatch;
-#ifdef RC_LOOKBEHIND_END
     dispatch[LOOKBEHIND_END][NBOUND] = compare_left_tail;
-#endif
     dispatch[OPTIMIZED][NBOUND] = compare_left_tail;
 
     dispatch[SUCCEED][REG_ANY] = compare_left_tail;
@@ -5773,14 +5717,10 @@ void rc_init()
     dispatch[CLOSE][REG_ANY] = compare_left_tail;
     dispatch[IFMATCH][REG_ANY] = compare_after_assertion;
     dispatch[UNLESSM][REG_ANY] = compare_after_assertion;
-#ifdef RC_OPFAIL
     dispatch[OPFAIL][REG_ANY] = compare_after_alt_assertion;
-#endif
     dispatch[MINMOD][REG_ANY] = compare_left_tail;
     dispatch[LNBREAK][REG_ANY] = compare_mismatch;
-#ifdef RC_LOOKBEHIND_END
     dispatch[LOOKBEHIND_END][REG_ANY] = compare_left_tail;
-#endif
     dispatch[OPTIMIZED][REG_ANY] = compare_left_tail;
 
     dispatch[SUCCEED][SANY] = compare_left_tail;
@@ -5817,14 +5757,10 @@ void rc_init()
     dispatch[CLOSE][SANY] = compare_left_tail;
     dispatch[IFMATCH][SANY] = compare_after_assertion;
     dispatch[UNLESSM][SANY] = compare_after_assertion;
-#ifdef RC_OPFAIL
     dispatch[OPFAIL][SANY] = compare_after_alt_assertion;
-#endif
     dispatch[MINMOD][SANY] = compare_left_tail;
     dispatch[LNBREAK][SANY] = compare_mismatch;
-#ifdef RC_LOOKBEHIND_END
     dispatch[LOOKBEHIND_END][SANY] = compare_left_tail;
-#endif
     dispatch[OPTIMIZED][SANY] = compare_left_tail;
 
     dispatch[SUCCEED][ANYOF] = compare_left_tail;
@@ -5861,14 +5797,10 @@ void rc_init()
     dispatch[CLOSE][ANYOF] = compare_left_tail;
     dispatch[IFMATCH][ANYOF] = compare_after_assertion;
     dispatch[UNLESSM][ANYOF] = compare_after_assertion;
-#ifdef RC_OPFAIL
     dispatch[OPFAIL][ANYOF] = compare_after_alt_assertion;
-#endif
     dispatch[MINMOD][ANYOF] = compare_left_tail;
     dispatch[LNBREAK][ANYOF] = compare_mismatch;
-#ifdef RC_LOOKBEHIND_END
     dispatch[LOOKBEHIND_END][ANYOF] = compare_left_tail;
-#endif
     dispatch[OPTIMIZED][ANYOF] = compare_left_tail;
 
     dispatch[SUCCEED][ANYOFD] = compare_left_tail;
@@ -5903,14 +5835,10 @@ void rc_init()
     dispatch[CLOSE][ANYOFD] = compare_left_tail;
     dispatch[IFMATCH][ANYOFD] = compare_after_assertion;
     dispatch[UNLESSM][ANYOFD] = compare_after_assertion;
-#ifdef RC_OPFAIL
     dispatch[OPFAIL][ANYOFD] = compare_after_alt_assertion;
-#endif
     dispatch[MINMOD][ANYOFD] = compare_left_tail;
     dispatch[LNBREAK][ANYOFD] = compare_mismatch;
-#ifdef RC_LOOKBEHIND_END
     dispatch[LOOKBEHIND_END][ANYOFD] = compare_left_tail;
-#endif
     dispatch[OPTIMIZED][ANYOFD] = compare_left_tail;
 
     dispatch[SUCCEED][ANYOFR] = compare_left_tail;
@@ -5945,14 +5873,10 @@ void rc_init()
     dispatch[CLOSE][ANYOFR] = compare_left_tail;
     dispatch[IFMATCH][ANYOFR] = compare_after_assertion;
     dispatch[UNLESSM][ANYOFR] = compare_after_assertion;
-#ifdef RC_OPFAIL
     dispatch[OPFAIL][ANYOFR] = compare_after_alt_assertion;
-#endif
     dispatch[MINMOD][ANYOFR] = compare_left_tail;
     dispatch[LNBREAK][ANYOFR] = compare_mismatch;
-#ifdef RC_LOOKBEHIND_END
     dispatch[LOOKBEHIND_END][ANYOFR] = compare_left_tail;
-#endif
     dispatch[OPTIMIZED][ANYOFR] = compare_left_tail;
 
     dispatch[SUCCEED][ANYOFM] = compare_left_tail;
@@ -5988,14 +5912,10 @@ void rc_init()
     dispatch[CLOSE][ANYOFM] = compare_left_tail;
     dispatch[IFMATCH][ANYOFM] = compare_after_assertion;
     dispatch[UNLESSM][ANYOFM] = compare_after_assertion;
-#ifdef RC_OPFAIL
     dispatch[OPFAIL][ANYOFM] = compare_after_alt_assertion;
-#endif
     dispatch[MINMOD][ANYOFM] = compare_left_tail;
     dispatch[LNBREAK][ANYOFM] = compare_mismatch;
-#ifdef RC_LOOKBEHIND_END
     dispatch[LOOKBEHIND_END][ANYOFM] = compare_left_tail;
-#endif
     dispatch[OPTIMIZED][ANYOFM] = compare_left_tail;
 
     dispatch[SUCCEED][NANYOFM] = compare_left_tail;
@@ -6031,14 +5951,10 @@ void rc_init()
     dispatch[CLOSE][NANYOFM] = compare_left_tail;
     dispatch[IFMATCH][NANYOFM] = compare_after_assertion;
     dispatch[UNLESSM][NANYOFM] = compare_after_assertion;
-#ifdef RC_OPFAIL
     dispatch[OPFAIL][NANYOFM] = compare_after_alt_assertion;
-#endif
     dispatch[MINMOD][NANYOFM] = compare_left_tail;
     dispatch[LNBREAK][NANYOFM] = compare_mismatch;
-#ifdef RC_LOOKBEHIND_END
     dispatch[LOOKBEHIND_END][NANYOFM] = compare_left_tail;
-#endif
     dispatch[OPTIMIZED][NANYOFM] = compare_left_tail;
 
     dispatch[SUCCEED][POSIXD] = compare_left_tail;
@@ -6073,14 +5989,10 @@ void rc_init()
     dispatch[CLOSE][POSIXD] = compare_left_tail;
     dispatch[IFMATCH][POSIXD] = compare_after_assertion;
     dispatch[UNLESSM][POSIXD] = compare_after_assertion;
-#ifdef RC_OPFAIL
     dispatch[OPFAIL][POSIXD] = compare_after_alt_assertion;
-#endif
     dispatch[MINMOD][POSIXD] = compare_left_tail;
     dispatch[LNBREAK][POSIXD] = compare_mismatch;
-#ifdef RC_LOOKBEHIND_END
     dispatch[LOOKBEHIND_END][POSIXD] = compare_left_tail;
-#endif
     dispatch[OPTIMIZED][POSIXD] = compare_left_tail;
 
     dispatch[SUCCEED][POSIXU] = compare_left_tail;
@@ -6116,14 +6028,10 @@ void rc_init()
     dispatch[CLOSE][POSIXU] = compare_left_tail;
     dispatch[IFMATCH][POSIXU] = compare_after_assertion;
     dispatch[UNLESSM][POSIXU] = compare_after_assertion;
-#ifdef RC_OPFAIL
     dispatch[OPFAIL][POSIXU] = compare_after_alt_assertion;
-#endif
     dispatch[MINMOD][POSIXU] = compare_left_tail;
     dispatch[LNBREAK][POSIXU] = compare_mismatch;
-#ifdef RC_LOOKBEHIND_END
     dispatch[LOOKBEHIND_END][POSIXU] = compare_left_tail;
-#endif
     dispatch[OPTIMIZED][POSIXU] = compare_left_tail;
 
     dispatch[SUCCEED][POSIXA] = compare_left_tail;
@@ -6158,14 +6066,10 @@ void rc_init()
     dispatch[CLOSE][POSIXA] = compare_left_tail;
     dispatch[IFMATCH][POSIXA] = compare_after_assertion;
     dispatch[UNLESSM][POSIXA] = compare_after_assertion;
-#ifdef RC_OPFAIL
     dispatch[OPFAIL][POSIXA] = compare_after_alt_assertion;
-#endif
     dispatch[MINMOD][POSIXA] = compare_left_tail;
     dispatch[LNBREAK][POSIXA] = compare_mismatch;
-#ifdef RC_LOOKBEHIND_END
     dispatch[LOOKBEHIND_END][POSIXA] = compare_left_tail;
-#endif
     dispatch[OPTIMIZED][POSIXA] = compare_left_tail;
 
     dispatch[SUCCEED][NPOSIXD] = compare_left_tail;
@@ -6200,14 +6104,10 @@ void rc_init()
     dispatch[CLOSE][NPOSIXD] = compare_left_tail;
     dispatch[IFMATCH][NPOSIXD] = compare_after_assertion;
     dispatch[UNLESSM][NPOSIXD] = compare_after_assertion;
-#ifdef RC_OPFAIL
     dispatch[OPFAIL][NPOSIXD] = compare_after_alt_assertion;
-#endif
     dispatch[MINMOD][NPOSIXD] = compare_left_tail;
     dispatch[LNBREAK][NPOSIXD] = compare_mismatch;
-#ifdef RC_LOOKBEHIND_END
     dispatch[LOOKBEHIND_END][NPOSIXD] = compare_left_tail;
-#endif
     dispatch[OPTIMIZED][NPOSIXD] = compare_left_tail;
 
     dispatch[SUCCEED][NPOSIXU] = compare_left_tail;
@@ -6242,14 +6142,10 @@ void rc_init()
     dispatch[CLOSE][NPOSIXU] = compare_left_tail;
     dispatch[IFMATCH][NPOSIXU] = compare_after_assertion;
     dispatch[UNLESSM][NPOSIXU] = compare_after_assertion;
-#ifdef RC_OPFAIL
     dispatch[OPFAIL][NPOSIXU] = compare_after_alt_assertion;
-#endif
     dispatch[MINMOD][NPOSIXU] = compare_left_tail;
     dispatch[LNBREAK][NPOSIXU] = compare_mismatch;
-#ifdef RC_LOOKBEHIND_END
     dispatch[LOOKBEHIND_END][NPOSIXU] = compare_left_tail;
-#endif
     dispatch[OPTIMIZED][NPOSIXU] = compare_left_tail;
 
     dispatch[SUCCEED][NPOSIXA] = compare_left_tail;
@@ -6284,14 +6180,10 @@ void rc_init()
     dispatch[CLOSE][NPOSIXA] = compare_left_tail;
     dispatch[IFMATCH][NPOSIXA] = compare_after_assertion;
     dispatch[UNLESSM][NPOSIXA] = compare_after_assertion;
-#ifdef RC_OPFAIL
     dispatch[OPFAIL][NPOSIXA] = compare_after_alt_assertion;
-#endif
     dispatch[MINMOD][NPOSIXA] = compare_left_tail;
     dispatch[LNBREAK][NPOSIXA] = compare_mismatch;
-#ifdef RC_LOOKBEHIND_END
     dispatch[LOOKBEHIND_END][NPOSIXA] = compare_left_tail;
-#endif
     dispatch[OPTIMIZED][NPOSIXA] = compare_left_tail;
 
     for (i = 0; i < REGNODE_MAX; ++i)
@@ -6312,13 +6204,9 @@ void rc_init()
     dispatch[CLOSE][BRANCH] = compare_left_tail;
     dispatch[IFMATCH][BRANCH] = compare_after_assertion;
     dispatch[UNLESSM][BRANCH] = compare_after_assertion;
-#ifdef RC_OPFAIL
     dispatch[OPFAIL][BRANCH] = compare_after_alt_assertion;
-#endif
     dispatch[MINMOD][BRANCH] = compare_left_tail;
-#ifdef RC_LOOKBEHIND_END
     dispatch[LOOKBEHIND_END][BRANCH] = compare_left_tail;
-#endif
     dispatch[OPTIMIZED][BRANCH] = compare_left_tail;
 
     dispatch[SUCCEED][EXACT] = compare_left_tail;
@@ -6355,14 +6243,10 @@ void rc_init()
     dispatch[CLOSE][EXACT] = compare_left_tail;
     dispatch[IFMATCH][EXACT] = compare_after_assertion;
     dispatch[UNLESSM][EXACT] = compare_after_assertion;
-#ifdef RC_OPFAIL
     dispatch[OPFAIL][EXACT] = compare_after_alt_assertion;
-#endif
     dispatch[MINMOD][EXACT] = compare_left_tail;
     dispatch[LNBREAK][EXACT] = compare_mismatch;
-#ifdef RC_LOOKBEHIND_END
     dispatch[LOOKBEHIND_END][EXACT] = compare_left_tail;
-#endif
     dispatch[OPTIMIZED][EXACT] = compare_left_tail;
 
     dispatch[SUCCEED][EXACTF] = compare_left_tail;
@@ -6398,14 +6282,10 @@ void rc_init()
     dispatch[CLOSE][EXACTF] = compare_left_tail;
     dispatch[IFMATCH][EXACTF] = compare_after_assertion;
     dispatch[UNLESSM][EXACTF] = compare_after_assertion;
-#ifdef RC_OPFAIL
     dispatch[OPFAIL][EXACTF] = compare_after_alt_assertion;
-#endif
     dispatch[MINMOD][EXACTF] = compare_left_tail;
     dispatch[LNBREAK][EXACTF] = compare_mismatch;
-#ifdef RC_LOOKBEHIND_END
     dispatch[LOOKBEHIND_END][EXACTF] = compare_left_tail;
-#endif
     dispatch[OPTIMIZED][EXACTF] = compare_left_tail;
 
     dispatch[SUCCEED][EXACTFU] = compare_left_tail;
@@ -6440,14 +6320,10 @@ void rc_init()
     dispatch[CLOSE][EXACTFU] = compare_left_tail;
     dispatch[IFMATCH][EXACTFU] = compare_after_assertion;
     dispatch[UNLESSM][EXACTFU] = compare_after_assertion;
-#ifdef RC_OPFAIL
     dispatch[OPFAIL][EXACTFU] = compare_after_alt_assertion;
-#endif
     dispatch[MINMOD][EXACTFU] = compare_left_tail;
     dispatch[LNBREAK][EXACTFU] = compare_mismatch;
-#ifdef RC_LOOKBEHIND_END
     dispatch[LOOKBEHIND_END][EXACTFU] = compare_left_tail;
-#endif
     dispatch[OPTIMIZED][EXACTFU] = compare_left_tail;
 
     dispatch[EXACT_REQ8][EXACT_REQ8] = compare_exact_exact;
@@ -6462,13 +6338,9 @@ void rc_init()
     dispatch[TAIL][NOTHING] = compare_tails;
     dispatch[WHILEM][NOTHING] = compare_tails;
     dispatch[CLOSE][NOTHING] = compare_tails;
-#ifdef RC_OPFAIL
     dispatch[OPFAIL][NOTHING] = compare_tails;
-#endif
     dispatch[MINMOD][NOTHING] = compare_tails;
-#ifdef RC_LOOKBEHIND_END
     dispatch[LOOKBEHIND_END][NOTHING] = compare_tails;
-#endif
     dispatch[OPTIMIZED][NOTHING] = compare_tails;
 
     for (i = 0; i < REGNODE_MAX; ++i)
@@ -6481,13 +6353,9 @@ void rc_init()
     dispatch[TAIL][TAIL] = compare_tails;
     dispatch[WHILEM][TAIL] = compare_tails;
     dispatch[CLOSE][TAIL] = compare_tails;
-#ifdef RC_OPFAIL
     dispatch[OPFAIL][TAIL] = compare_tails;
-#endif
     dispatch[MINMOD][TAIL] = compare_tails;
-#ifdef RC_LOOKBEHIND_END
     dispatch[LOOKBEHIND_END][TAIL] = compare_tails;
-#endif
     dispatch[OPTIMIZED][TAIL] = compare_tails;
 
     for (i = 0; i < REGNODE_MAX; ++i)
@@ -6512,13 +6380,9 @@ void rc_init()
     dispatch[CLOSE][STAR] = compare_left_tail;
     dispatch[IFMATCH][STAR] = compare_after_assertion;
     dispatch[UNLESSM][STAR] = compare_after_assertion;
-#ifdef RC_OPFAIL
     dispatch[OPFAIL][STAR] = compare_after_alt_assertion;
-#endif
     dispatch[MINMOD][STAR] = compare_left_tail;
-#ifdef RC_LOOKBEHIND_END
     dispatch[LOOKBEHIND_END][STAR] = compare_left_tail;
-#endif
     dispatch[OPTIMIZED][STAR] = compare_left_tail;
 
     for (i = 0; i < REGNODE_MAX; ++i)
@@ -6538,13 +6402,9 @@ void rc_init()
     dispatch[CLOSE][PLUS] = compare_left_tail;
     dispatch[IFMATCH][PLUS] = compare_after_assertion;
     dispatch[UNLESSM][PLUS] = compare_after_assertion;
-#ifdef RC_OPFAIL
     dispatch[OPFAIL][PLUS] = compare_after_alt_assertion;
-#endif
     dispatch[MINMOD][PLUS] = compare_left_tail;
-#ifdef RC_LOOKBEHIND_END
     dispatch[LOOKBEHIND_END][PLUS] = compare_left_tail;
-#endif
     dispatch[OPTIMIZED][PLUS] = compare_left_tail;
 
     for (i = 0; i < REGNODE_MAX; ++i)
@@ -6565,13 +6425,9 @@ void rc_init()
     dispatch[IFMATCH][CURLY] = compare_after_assertion;
     dispatch[UNLESSM][CURLY] = compare_after_assertion;
     dispatch[SUSPEND][CURLY] = compare_suspend_curly;
-#ifdef RC_OPFAIL
     dispatch[OPFAIL][CURLY] = compare_after_alt_assertion;
-#endif
     dispatch[MINMOD][CURLY] = compare_left_tail;
-#ifdef RC_LOOKBEHIND_END
     dispatch[LOOKBEHIND_END][CURLY] = compare_left_tail;
-#endif
     dispatch[OPTIMIZED][CURLY] = compare_left_tail;
 
     for (i = 0; i < REGNODE_MAX; ++i)
@@ -6592,13 +6448,9 @@ void rc_init()
     dispatch[IFMATCH][CURLYM] = compare_after_assertion;
     dispatch[UNLESSM][CURLYM] = compare_after_assertion;
     dispatch[SUSPEND][CURLYM] = compare_suspend_curly;
-#ifdef RC_OPFAIL
     dispatch[OPFAIL][CURLYM] = compare_after_alt_assertion;
-#endif
     dispatch[MINMOD][CURLYM] = compare_left_tail;
-#ifdef RC_LOOKBEHIND_END
     dispatch[LOOKBEHIND_END][CURLYM] = compare_left_tail;
-#endif
     dispatch[OPTIMIZED][CURLYM] = compare_left_tail;
 
     for (i = 0; i < REGNODE_MAX; ++i)
@@ -6619,13 +6471,9 @@ void rc_init()
     dispatch[IFMATCH][CURLYX] = compare_after_assertion;
     dispatch[UNLESSM][CURLYX] = compare_after_assertion;
     dispatch[SUSPEND][CURLYX] = compare_suspend_curly;
-#ifdef RC_OPFAIL
     dispatch[OPFAIL][CURLYX] = compare_after_alt_assertion;
-#endif
     dispatch[MINMOD][CURLYX] = compare_left_tail;
-#ifdef RC_LOOKBEHIND_END
     dispatch[LOOKBEHIND_END][CURLYX] = compare_left_tail;
-#endif
     dispatch[OPTIMIZED][CURLYX] = compare_left_tail;
 
     for (i = 0; i < REGNODE_MAX; ++i)
@@ -6638,13 +6486,9 @@ void rc_init()
     dispatch[TAIL][WHILEM] = compare_tails;
     dispatch[WHILEM][WHILEM] = compare_tails;
     dispatch[CLOSE][WHILEM] = compare_tails;
-#ifdef RC_OPFAIL
     dispatch[OPFAIL][WHILEM] = compare_tails;
-#endif
     dispatch[MINMOD][WHILEM] = compare_tails;
-#ifdef RC_LOOKBEHIND_END
     dispatch[LOOKBEHIND_END][WHILEM] = compare_tails;
-#endif
     dispatch[OPTIMIZED][WHILEM] = compare_tails;
 
     for (i = 0; i < REGNODE_MAX; ++i)
@@ -6664,13 +6508,9 @@ void rc_init()
     dispatch[TAIL][CLOSE] = compare_tails;
     dispatch[WHILEM][CLOSE] = compare_tails;
     dispatch[CLOSE][CLOSE] = compare_tails;
-#ifdef RC_OPFAIL
     dispatch[OPFAIL][CLOSE] = compare_tails;
-#endif
     dispatch[MINMOD][CLOSE] = compare_tails;
-#ifdef RC_LOOKBEHIND_END
     dispatch[LOOKBEHIND_END][CLOSE] = compare_tails;
-#endif
     dispatch[OPTIMIZED][CLOSE] = compare_tails;
 
     dispatch[SUCCEED][IFMATCH] = compare_left_tail;
@@ -6707,14 +6547,10 @@ void rc_init()
     dispatch[CLOSE][IFMATCH] = compare_left_tail;
     dispatch[IFMATCH][IFMATCH] = compare_positive_assertions;
     dispatch[UNLESSM][IFMATCH] = compare_mismatch;
-#ifdef RC_OPFAIL
     dispatch[OPFAIL][IFMATCH] = compare_mismatch;
-#endif
     dispatch[MINMOD][IFMATCH] = compare_left_tail;
     dispatch[LNBREAK][IFMATCH] = compare_mismatch;
-#ifdef RC_LOOKBEHIND_END
     dispatch[LOOKBEHIND_END][IFMATCH] = compare_left_tail;
-#endif
     dispatch[OPTIMIZED][IFMATCH] = compare_left_tail;
 
     dispatch[SUCCEED][UNLESSM] = compare_left_tail;
@@ -6751,17 +6587,12 @@ void rc_init()
     dispatch[CLOSE][UNLESSM] = compare_left_tail;
     dispatch[IFMATCH][UNLESSM] = compare_mismatch;
     dispatch[UNLESSM][UNLESSM] = compare_negative_assertions;
-#ifdef RC_OPFAIL
     dispatch[OPFAIL][UNLESSM] = compare_mismatch;
-#endif
     dispatch[MINMOD][UNLESSM] = compare_left_tail;
     dispatch[LNBREAK][UNLESSM] = compare_mismatch;
-#ifdef RC_LOOKBEHIND_END
     dispatch[LOOKBEHIND_END][UNLESSM] = compare_left_tail;
-#endif
     dispatch[OPTIMIZED][UNLESSM] = compare_left_tail;
 
-#ifdef RC_OPFAIL
     dispatch[SUCCEED][OPFAIL] = compare_left_tail;
     dispatch[MBOL][OPFAIL] = compare_bol;
     dispatch[SBOL][OPFAIL] = compare_bol;
@@ -6799,11 +6630,8 @@ void rc_init()
     dispatch[OPFAIL][OPFAIL] = compare_negative_alt_assertions;
     dispatch[MINMOD][OPFAIL] = compare_left_tail;
     dispatch[LNBREAK][OPFAIL] = compare_mismatch;
-#ifdef RC_LOOKBEHIND_END
     dispatch[LOOKBEHIND_END][OPFAIL] = compare_left_tail;
-#endif
     dispatch[OPTIMIZED][OPFAIL] = compare_left_tail;
-#endif
 
     dispatch[SUSPEND][SUSPEND] = compare_subexpressions;
 
@@ -6818,9 +6646,7 @@ void rc_init()
     dispatch[WHILEM][MINMOD] = compare_tails;
     dispatch[CLOSE][MINMOD] = compare_tails;
     dispatch[MINMOD][MINMOD] = compare_tails;
-#ifdef RC_LOOKBEHIND_END
     dispatch[LOOKBEHIND_END][MINMOD] = compare_tails;
-#endif
     dispatch[OPTIMIZED][MINMOD] = compare_tails;
 
     dispatch[SUCCEED][LNBREAK] = compare_left_tail;
@@ -6856,16 +6682,11 @@ void rc_init()
     dispatch[CLOSE][LNBREAK] = compare_left_tail;
     dispatch[IFMATCH][LNBREAK] = compare_after_assertion;
     dispatch[UNLESSM][LNBREAK] = compare_after_assertion;
-#ifdef RC_OPFAIL
     dispatch[OPFAIL][LNBREAK] = compare_after_alt_assertion;
-#endif
     dispatch[MINMOD][LNBREAK] = compare_left_tail;
-#ifdef RC_LOOKBEHIND_END
     dispatch[LOOKBEHIND_END][LNBREAK] = compare_left_tail;
-#endif
     dispatch[LNBREAK][LNBREAK] = compare_tails;
 
-#ifdef RC_LOOKBEHIND_END
     for (i = 0; i < REGNODE_MAX; ++i)
     {
         dispatch[i][LOOKBEHIND_END] = compare_next;
@@ -6879,7 +6700,6 @@ void rc_init()
     dispatch[MINMOD][LOOKBEHIND_END] = compare_tails;
     dispatch[LOOKBEHIND_END][LOOKBEHIND_END] = compare_tails;
     dispatch[OPTIMIZED][LOOKBEHIND_END] = compare_tails;
-#endif
 
     for (i = 0; i < REGNODE_MAX; ++i)
     {
@@ -6892,8 +6712,6 @@ void rc_init()
     dispatch[WHILEM][OPTIMIZED] = compare_tails;
     dispatch[CLOSE][OPTIMIZED] = compare_tails;
     dispatch[MINMOD][OPTIMIZED] = compare_tails;
-#ifdef RC_LOOKBEHIND_END
     dispatch[LOOKBEHIND_END][OPTIMIZED] = compare_tails;
-#endif
     dispatch[OPTIMIZED][OPTIMIZED] = compare_tails;
 }

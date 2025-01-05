@@ -1,3 +1,6 @@
+2.098 2024-01-04
+- Graphics::TriD::Rout::{combcoords,attract,repulse} moved to ImageND
+
 2.097 2024-12-09
 - install pdldoc, add repo metadata
 

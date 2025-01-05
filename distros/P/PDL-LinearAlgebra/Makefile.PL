@@ -44,6 +44,10 @@ EOF
   );
 }
 
+my $preop = '$(PERLRUNINST) -MPDL::Core::Dev -e pdlpp_mkgen $(DISTVNAME)';
+my $package_name = "PDL::LinearAlgebra";
+(my $repo = $package_name) =~ s#::#-#g;
+$repo = "PDLPorters/$repo";
 WriteMakefile(
   NAME => 'PDL::LinearAlgebra',
   ABSTRACT => 'PDL bindings to some BLAS and LAPACK library routines',
@@ -54,30 +58,31 @@ WriteMakefile(
     "meta-spec" => { version => 2 },
     resources => {
       homepage => 'http://pdl.perl.org/',
+      bugtracker  => {web=>"https://github.com/$repo/issues"},
       repository  => {
-        url => 'git://github.com/PDLPorters/pdl-linearalgebra.git',
+        url => "git://github.com/$repo.git",
         type => 'git',
-        web => 'https://github.com/PDLPorters/pdl-linearalgebra',
+        web => "https://github.com/$repo",
       },
-      bugtracker => {web=>'https://github.com/PDLPorters/pdl-linearalgebra/issues'},
+      x_IRC => 'irc://irc.perl.org/#pdl',
     },
-    x_IRC => 'irc://irc.perl.org/#pdl',
   },
   CONFIGURE_REQUIRES =>  {
-    "PDL" => '2.091',
+    "PDL" => '2.096',
     "Devel::CheckLib" => 0,
     "ExtUtils::F77" => '1.26',
   },
   PREREQ_PM => {
-    "PDL" => '2.091', # tricpy etc
+    "PDL" => '2.096', # lib/*.pd
   },
   TEST_REQUIRES =>  {
     "Test::More" => '0.88', # done_testing
   },
-  dist => { PREOP=>'$(PERL) -MPDL::Core::Dev -e pdlpp_mkgen $(DISTVNAME)' }, # GENERATED subdir in dist tarball
+  INC => $inc,
+  LIBS => [$libs0],
+  dist => { COMPRESS => 'gzip', SUFFIX => 'gz', PREOP => $preop },
   clean => { FILES => '*~' },
 );
-
 
 sub find_libs {
   return if $^O !~ /linux/i;
@@ -107,7 +112,16 @@ sub find_macos_libs {
   qq{-L"$pref/lib" -llapack -lblas};
 }
 
+my @pd_srcs;
+sub MY::init_PM {
+  package MY; # so that "SUPER" works right
+  my ($self) = @_;
+  $self->SUPER::init_PM;
+  delete $self->{PM}{'pp_defc.pl'};
+  @pd_srcs = ::pdlpp_eumm_update_deep($self);
+}
 sub MY::postamble {
   my $oneliner = PDL::Core::Dev::_oneliner(qq{exit if \$ENV{DESTDIR}; use PDL::Doc; eval { PDL::Doc::add_module(shift); }});
-  qq|\ninstall :: pure_install\n\t$oneliner \$(NAME)\n|;
+  pdlpp_postamble(@pd_srcs) .
+    qq|\ninstall :: pure_install\n\t$oneliner \$(NAME)\n|;
 }

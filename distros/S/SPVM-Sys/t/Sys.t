@@ -324,6 +324,8 @@ ok(SPVM::TestCase::Sys->set_env);
   }
 }
 
+ok(SPVM::TestCase::Sys->rand);
+
 SPVM::api->set_exception(undef);
 
 SPVM::TestCase::Sys->SET_TEST_DIR(undef);

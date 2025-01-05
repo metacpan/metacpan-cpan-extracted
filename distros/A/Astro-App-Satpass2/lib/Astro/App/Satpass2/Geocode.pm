@@ -14,7 +14,7 @@ use Astro::App::Satpass2::Utils qw{
 };
 use Astro::App::Satpass2::Warner;
 
-our $VERSION = '0.054';
+our $VERSION = '0.055';
 
 sub new {
     my ( $class, %args ) = @_;
@@ -228,7 +228,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011-2024 by Thomas R. Wyant, III
+Copyright (C) 2011-2025 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

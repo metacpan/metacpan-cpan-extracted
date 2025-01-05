@@ -10,6 +10,44 @@ class Sys::Socket::Errno {
   
   native static method strerror : string ($errno : int, $length : int = 0);
   
+  static method is_read_again : int ($errno : int) {
+    my $again
+      =  $errno == &EWOULDBLOCK
+      || $errno == &EINTR
+    ;
+    
+    return $again;
+  }
+  
+  static method is_write_again : int ($errno : int) {
+    my $again
+      =  $errno == &EWOULDBLOCK
+      || $errno == &EINTR;
+    
+    return $again;
+  }
+  
+  static method is_connect_again : int ($errno : int) {
+    
+    my $again = 
+      $errno == &EWOULDBLOCK
+      || $errno == &EINPROGRESS
+      || $errno == &EINTR
+    ;
+    
+    return $again;
+  }
+  
+  static method is_accept_again : int ($errno : int) {
+    
+    my $again
+      =  $errno == &EWOULDBLOCK
+      || $errno == &EINTR;
+    ;
+    
+    return $again;
+  }
+  
   static method EINTR : int () {
     if (Sys::OS->is_windows) {
       return Errno->WSAEINTR;
