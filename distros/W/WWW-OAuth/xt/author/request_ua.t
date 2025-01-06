@@ -50,7 +50,7 @@ my $ua = Mojo::UserAgent->new;
 my $tx = $ua->build_tx(GET => "http://127.0.0.1:$port");
 my $mojo_req = oauth_request($tx->req);
 $tx = $mojo_req->request_with($ua);
-ok $tx->success, 'request succeeded';
+ok !$tx->error, 'request succeeded';
 is $tx->res->body, 'foo', 'got response';
 
 $tx = $ua->build_tx(GET => "http://127.0.0.1:$port");
@@ -58,7 +58,7 @@ $mojo_req = oauth_request($tx->req);
 my $got_response;
 $mojo_req->request_with($ua, sub {
 	my ($ua, $tx) = @_;
-	ok $tx->success, 'request succeeded';
+	ok !$tx->error, 'request succeeded';
 	is $tx->res->body, 'foo', 'got response';
 	$got_response = 1;
 	Mojo::IOLoop->stop;
@@ -73,7 +73,7 @@ $mojo_req = oauth_request($tx->req);
 undef $got_response;
 $mojo_req->request_with_p($ua)->then(sub {
 	my $tx = shift;
-	ok $tx->success, 'request succeeded';
+	ok !$tx->error, 'request succeeded';
 	is $tx->res->body, 'foo', 'got response';
 	$got_response = 1;
 	Mojo::IOLoop->stop;

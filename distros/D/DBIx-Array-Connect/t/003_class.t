@@ -1,15 +1,15 @@
 # -*- perl -*-
+{
+  package My::Connect;
+  use strict;
+  use warnings;
+  use base qw{DBIx::Array::Connect};
+  use Path::Class qw{}; #we have a file too
+  sub class {"DBIx::Array::Export"};
+  sub path {[Path::Class::file($0)->dir]};
+  sub basename {"db-config.ini"};
+}
 
-package My::Connect;
-use strict;
-use warnings;
-use base qw{DBIx::Array::Connect};
-use Path::Class qw{}; #we have a file too
-sub class {"DBIx::Array::Export"};
-sub path {[Path::Class::file($0)->dir]};
-sub basename {"db-config.ini"};
-
-package main;
 use strict;
 use warnings;
 use Test::More tests => 6;

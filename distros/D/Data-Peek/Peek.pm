@@ -6,7 +6,7 @@ use warnings;
 use XSLoader;
 
 use vars qw( $VERSION @ISA @EXPORT @EXPORT_OK );
-$VERSION   = "0.52";
+$VERSION   = "0.53";
 @ISA       = qw( Exporter );
 @EXPORT    = qw( DDumper DTidy DDsort DPeek DDisplay DDump DHexDump
 		 DDual DGrow );
@@ -456,7 +456,7 @@ In void context, DDual does the equivalent of
       "  NV: ", DPeek ($d[2]), "\n",
       "  RV: ", DPeek ($d[3]), "\n";
     }
-  
+
 =head2 my $len = DGrow ($pv, $size)
 
 Fastest way to preallocate space for a PV scalar. Returns the allocated
@@ -702,7 +702,7 @@ H.Merijn Brand <hmbrand@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2023 H.Merijn Brand
+Copyright (C) 2008-2025 H.Merijn Brand
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

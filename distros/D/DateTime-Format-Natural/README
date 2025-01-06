@@ -236,6 +236,7 @@ CREDITS
      Jim Avera
      Olaf Alders
      Karen Etheridge
+     Graham Ollis
 
 SEE ALSO
     dateparse, DateTime, Date::Calc, <http://datetime.perl.org>

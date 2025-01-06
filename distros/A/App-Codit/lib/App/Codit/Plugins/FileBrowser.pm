@@ -9,7 +9,7 @@ App::Codit::Plugins::FileBrowser - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.14;
+$VERSION = 0.15;
 
 use base qw( Tk::AppWindow::BaseClasses::Plugin );
 
@@ -28,7 +28,7 @@ Otherwise it will open in the appropriate application of your desktop.
 
 Clicking the right mouse button will open a context menu with options for opening, copy, cut, paste and delete selected files.
 
-All columns are sortable and sizable. If you left-click the header it will give you options to display hidden files (that start with a ‘.’), Sort case dependant or not and directories first.
+All columns are sortable and sizable. If you left-click the header it will give you options to display hidden files (that start with a dot), Sort case dependant or not and directories first.
 
 The following keyboard shortcuts are available when the file list has the focus:
 

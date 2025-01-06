@@ -1,5 +1,8 @@
 Revision history for DateTime-Format-RFC3339
 
+1.10.0  2025-01-05
+        - Corrected the version of ExtUtils::MakeMaker that's required.
+
 1.8.0   2024-01-21
         - Added missing Perl v5.10 requirement.
         - Updated the version of ExtUtils::MakeMaker that's required.

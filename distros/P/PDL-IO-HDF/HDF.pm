@@ -37,7 +37,7 @@ interfaces, for that see the docs on those modules.
 
 use strict;
 use warnings;
-our $VERSION = '2.002';
+our $VERSION = '2.003';
 $VERSION = eval $VERSION;
 
 use PDL::Primitive;

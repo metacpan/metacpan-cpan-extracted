@@ -1,5 +1,14 @@
 Revision history for Perl extension DateTime::Format::Natural.
 
+1.19  2025-01-05  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+1.18_01  2025-01-04  <schubiger@cpan.org>
+
+ - Use List::Util instead of List::MoreUtils.
+   [github #22 - Graham Ollis]
+
 1.18  2023-10-05  <schubiger@cpan.org>
 
  - Merged development version to stable.

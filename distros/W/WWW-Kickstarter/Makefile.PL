@@ -22,7 +22,7 @@ WriteMakefile(
       prereqs => {
          configure => {
             requires => {
-               'ExtUtils::MakeMaker'   => 6.52,
+               'ExtUtils::MakeMaker'   => 6.74,
             },
          },
          runtime => {

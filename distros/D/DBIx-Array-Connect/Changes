@@ -1,5 +1,14 @@
 Revision history for Perl module DBIx::Array::Connect
 
+0.08 2025-01-05
+  - Moved from private repo to GitHub
+
+0.07 2017-04-12
+  - Added section_hash method
+
+0.06 2016-07-15
+  - Updated path function to search local paths "." and dirname($) first
+
 0.05 2012-11-03
   - Fixed exception logic in file method
 

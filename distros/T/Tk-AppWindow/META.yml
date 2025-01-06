@@ -22,7 +22,7 @@ requires:
   File::Basename: '2.85'
   File::MimeInfo: '0.35'
   File::Path: '2.18'
-  File::Spec: '3.84'
+  File::Spec: '3.75'
   FreeDesktop::Icons: '0.01'
   Imager: '1.019'
   Imager::File::PNG: '0.99'
@@ -44,5 +44,5 @@ requires:
 resources:
   bugtracker: https://github.com/haje61/Tk-AppWindow/issues
   repository: git://github.com/haje61/Tk-AppWindow.git
-version: '0.18'
+version: '0.19'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

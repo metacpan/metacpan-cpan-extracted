@@ -1,5 +1,5 @@
 #
-# GENERATED WITH PDL::PP! Don't modify!
+# GENERATED WITH PDL::PP from color_space.pd! Don't modify!
 #
 package PDL::Graphics::ColorSpace;
 
@@ -11,7 +11,7 @@ use PDL::Exporter;
 use DynaLoader;
 
 
-   our $VERSION = '0.203';
+   our $VERSION = '0.204';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Graphics::ColorSpace $VERSION;
@@ -21,8 +21,8 @@ use DynaLoader;
 
 
 
-#line 13 "color_space.pd"
 
+#line 13 "color_space.pd"
 
 =encoding utf8
 
@@ -179,18 +179,12 @@ my $RGB_SPACE = $PDL::Graphics::ColorSpace::RGBSpace::RGB_SPACE;
 #line 180 "ColorSpace.pm"
 
 
-
-
-
-
 =head1 FUNCTIONS
 
 =cut
 
 
 
-
-#line 949 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -199,7 +193,6 @@ my $RGB_SPACE = $PDL::Graphics::ColorSpace::RGBSpace::RGB_SPACE;
 =for sig
 
   Signature: (rgb(c=3); [o]cmyk(d=4))
-
 
 =pod
 
@@ -215,29 +208,21 @@ Usage:
 
     my $cmyk = rgb_to_cmyk( $rgb );
 
-
-
 =for bad
 
 =for bad
 
 If C<rgb_to_cmyk> encounters a bad value in any of the R, G, or B values the output ndarray will be marked as bad and the associated C, M, Y, and K values will all be marked as bad.
 
-
-
 =cut
-#line 230 "ColorSpace.pm"
 
 
 
-#line 951 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *rgb_to_cmyk = \&PDL::rgb_to_cmyk;
-#line 237 "ColorSpace.pm"
 
 
 
-#line 949 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -246,7 +231,6 @@ If C<rgb_to_cmyk> encounters a bad value in any of the R, G, or B values the out
 =for sig
 
   Signature: (cmyk(d=4); [o]rgb(c=3))
-
 
 =pod
 
@@ -262,29 +246,21 @@ Usage:
 
     my $rgb = cmyk_to_rgb( $cmyk );
 
-
-
 =for bad
 
 =for bad
 
 If C<cmyk_to_rgb> encounters a bad value in any of the C, M, Y, or K quantities, the output ndarray will be marked as bad and the associated R, G, and B color values will all be marked as bad.
 
-
-
 =cut
-#line 277 "ColorSpace.pm"
 
 
 
-#line 951 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *cmyk_to_rgb = \&PDL::cmyk_to_rgb;
-#line 284 "ColorSpace.pm"
 
 
 
-#line 949 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -293,7 +269,6 @@ If C<cmyk_to_rgb> encounters a bad value in any of the C, M, Y, or K quantities,
 =for sig
 
   Signature: (rgb(c=3); [o]hsl(c=3))
-
 
 =pod
 
@@ -309,29 +284,21 @@ Usage:
 
     my $hsl = rgb_to_hsl( $rgb );
 
-
-
 =for bad
 
 =for bad
 
 If C<rgb_to_hsl> encounters a bad value in any of the R, G, or B values the output ndarray will be marked as bad and the associated H, S, and L values will all be marked as bad.
 
-
-
 =cut
-#line 324 "ColorSpace.pm"
 
 
 
-#line 951 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *rgb_to_hsl = \&PDL::rgb_to_hsl;
-#line 331 "ColorSpace.pm"
 
 
 
-#line 949 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -340,7 +307,6 @@ If C<rgb_to_hsl> encounters a bad value in any of the R, G, or B values the outp
 =for sig
 
   Signature: (hsl(c=3); [o]rgb(c=3))
-
 
 =pod
 
@@ -356,29 +322,21 @@ Usage:
 
     my $rgb = hsl_to_rgb( $hsl );
 
-
-
 =for bad
 
 =for bad
 
 If C<hsl_to_rgb> encounters a bad value in any of the H, S, or V quantities, the output ndarray will be marked as bad and the associated R, G, and B color values will all be marked as bad.
 
-
-
 =cut
-#line 371 "ColorSpace.pm"
 
 
 
-#line 951 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *hsl_to_rgb = \&PDL::hsl_to_rgb;
-#line 378 "ColorSpace.pm"
 
 
 
-#line 949 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -387,7 +345,6 @@ If C<hsl_to_rgb> encounters a bad value in any of the H, S, or V quantities, the
 =for sig
 
   Signature: (rgb(c=3); [o]hsv(c=3))
-
 
 =pod
 
@@ -403,29 +360,21 @@ Usage:
 
     my $hsv = rgb_to_hsv( $rgb );
 
-
-
 =for bad
 
 =for bad
 
 If C<rgb_to_hsv> encounters a bad value in any of the R, G, or B values the output ndarray will be marked as bad and the associated H, S, and V values will all be marked as bad.
 
-
-
 =cut
-#line 418 "ColorSpace.pm"
 
 
 
-#line 951 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *rgb_to_hsv = \&PDL::rgb_to_hsv;
-#line 425 "ColorSpace.pm"
 
 
 
-#line 949 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -434,7 +383,6 @@ If C<rgb_to_hsv> encounters a bad value in any of the R, G, or B values the outp
 =for sig
 
   Signature: (hsv(c=3); [o]rgb(c=3))
-
 
 =pod
 
@@ -450,29 +398,21 @@ Usage:
 
     my $rgb = hsv_to_rgb( $hsv );
 
-
-
 =for bad
 
 =for bad
 
 If C<hsv_to_rgb> encounters a bad value in any of the H, S, or V quantities, the output ndarray will be marked as bad and the associated R, G, and B color values will all be marked as bad.
 
-
-
 =cut
-#line 465 "ColorSpace.pm"
 
 
 
-#line 951 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *hsv_to_rgb = \&PDL::hsv_to_rgb;
-#line 472 "ColorSpace.pm"
 
 
 
-#line 949 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -491,48 +431,35 @@ Internal function for white point calculation. Use it if you must.
 xyY_to_xyz processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 497 "ColorSpace.pm"
 
 
 
-#line 951 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *xyY_to_xyz = \&PDL::xyY_to_xyz;
-#line 504 "ColorSpace.pm"
 
-
-
-#line 951 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
-
-*_rgb_to_xyz = \&PDL::_rgb_to_xyz;
-#line 511 "ColorSpace.pm"
 
 
 
-#line 951 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+*_rgb_to_xyz = \&PDL::_rgb_to_xyz;
 
-*_xyz_to_rgb = \&PDL::_xyz_to_rgb;
-#line 518 "ColorSpace.pm"
 
 
 
-#line 951 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+*_xyz_to_rgb = \&PDL::_xyz_to_rgb;
 
-*_xyz_to_lab = \&PDL::_xyz_to_lab;
-#line 525 "ColorSpace.pm"
 
 
 
-#line 951 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+*_xyz_to_lab = \&PDL::_xyz_to_lab;
 
-*_lab_to_xyz = \&PDL::_lab_to_xyz;
-#line 532 "ColorSpace.pm"
 
 
 
-#line 949 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+*_lab_to_xyz = \&PDL::_lab_to_xyz;
+
+
+
 
 
 
@@ -541,7 +468,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (lab(c=3); [o]lch(c=3))
-
 
 =pod
 
@@ -557,29 +483,21 @@ Usage:
 
     my $lch = lab_to_lch( $lab );
 
-
-
 =for bad
 
 =for bad
 
 If C<lab_to_lch> encounters a bad value in any of the L, a, or b values the output ndarray will be marked as bad and the associated L, C, and H values will all be marked as bad.
 
-
-
 =cut
-#line 572 "ColorSpace.pm"
 
 
 
-#line 951 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *lab_to_lch = \&PDL::lab_to_lch;
-#line 579 "ColorSpace.pm"
 
 
 
-#line 949 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -588,7 +506,6 @@ If C<lab_to_lch> encounters a bad value in any of the L, a, or b values the outp
 =for sig
 
   Signature: (lch(c=3); [o]lab(c=3))
-
 
 =pod
 
@@ -604,29 +521,21 @@ Usage:
 
     my $lab = lch_to_lab( $lch );
 
-
-
 =for bad
 
 =for bad
 
 If C<lch_to_lab> encounters a bad value in any of the L, C, or H values the output ndarray will be marked as bad and the associated L, a, and b values will all be marked as bad.
 
-
-
 =cut
-#line 619 "ColorSpace.pm"
 
 
 
-#line 951 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *lch_to_lab = \&PDL::lch_to_lab;
-#line 626 "ColorSpace.pm"
 
 
 
-#line 949 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -647,7 +556,6 @@ Usage:
 
     my $rgb_linear = rgb_to_linear( $gammaed, 2.2 );
 
-
 =for bad
 
 =for bad
@@ -656,20 +564,15 @@ If C<rgb_to_linear> encounters a bad value in any of the R, G, or B
 values the output ndarray will be marked as bad and the associated R,
 G, and B values will all be marked as bad.
 
-
 =cut
-#line 662 "ColorSpace.pm"
 
 
 
-#line 951 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *rgb_to_linear = \&PDL::rgb_to_linear;
-#line 669 "ColorSpace.pm"
 
 
 
-#line 949 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -690,7 +593,6 @@ Usage:
 
     my $gammaed = rgb_from_linear( $rgb_linear, 2.2 );
 
-
 =for bad
 
 =for bad
@@ -699,22 +601,18 @@ If C<rgb_from_linear> encounters a bad value in any of the R, G, or B
 values the output ndarray will be marked as bad and the associated R,
 G, and B values will all be marked as bad.
 
-
 =cut
-#line 705 "ColorSpace.pm"
 
 
 
-#line 951 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *rgb_from_linear = \&PDL::rgb_from_linear;
-#line 712 "ColorSpace.pm"
+
+
 
 
 
 #line 752 "color_space.pd"
-
-
 
 =head2 rgb_to_xyz
 
@@ -745,7 +643,6 @@ sub PDL::rgb_to_xyz {
     return _rgb_to_xyz( $rgb, $spec->{gamma}, $m );
 }
 
-
 =head2 xyz_to_rgb
 
 =for ref
@@ -774,7 +671,6 @@ sub PDL::xyz_to_rgb {
     my $mstar = exists $spec->{mstar} ? PDL->topdl( $spec->{mstar} ) : PDL->topdl( $spec->{m} )->inv;
     return _xyz_to_rgb( $xyz, $spec->{gamma}, $mstar );
 }
-
 
 =head2 xyz_to_lab
 
@@ -805,7 +701,6 @@ sub PDL::xyz_to_lab {
     return _xyz_to_lab( $xyz, $w );
 }
 
-
 =head2 lab_to_xyz
 
 =for ref
@@ -834,7 +729,6 @@ sub PDL::lab_to_xyz {
     my $w = PDL->topdl($spec->{white_point});
     return _lab_to_xyz( $lab, $w );
 }
-
 
 =head2 rgb_to_lch
 
@@ -865,7 +759,6 @@ sub PDL::rgb_to_lch {
     return lab_to_lch( $lab );
 }
 
-
 =head2 lch_to_rgb
 
 =for ref
@@ -895,7 +788,6 @@ sub PDL::lch_to_rgb {
     return xyz_to_rgb( $xyz, $spec );
 }
 
-
 =head2 rgb_to_lab
 
 =for ref
@@ -924,7 +816,6 @@ sub PDL::rgb_to_lab {
     return xyz_to_lab( rgb_to_xyz( $rgb, $spec ), $spec );
 }
 
-
 =head2 lab_to_rgb
 
 =for ref
@@ -952,7 +843,6 @@ sub PDL::lab_to_rgb {
     my $spec = get_space($space);
     return xyz_to_rgb( lab_to_xyz( $lab, $spec ), $spec );
 }
-
 
 =head2 add_rgb_space
 
@@ -1000,7 +890,6 @@ Usage:
 *add_rgb_space = \&PDL::Graphics::ColorSpace::RGBSpace::add_rgb_space;
 *get_space = \&PDL::Graphics::ColorSpace::RGBSpace::get_space;
 
-
 =head1 SEE ALSO
 
 Graphics::ColorObject
@@ -1016,12 +905,7 @@ Original work sponsored by Shutterstock, LLC L<http://www.shutterstock.com/>
 All rights reserved. There is no warranty. You are allowed to redistribute this software / documentation as described in the file COPYING in the PDL distribution.
 
 =cut
-#line 1020 "ColorSpace.pm"
-
-
-
-
-
+#line 909 "ColorSpace.pm"
 
 # Exit with OK status
 

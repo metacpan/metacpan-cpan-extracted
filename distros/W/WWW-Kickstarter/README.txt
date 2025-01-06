@@ -8,17 +8,17 @@ INSTALLATION
 
 To install this module, run the following commands:
 
-   perl Makefile.PL
-   make
-   make test
-   make install
+    perl Makefile.PL
+    make
+    make test
+    make install
 
 
 DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-    ExtUtils::MakeMaker 6.52    (For installation only)
+    ExtUtils::MakeMaker 6.74    (For installation only)
     Software::License::CC0_1_0  (For installation only)
     Test::More                  (For testing only)
     autovivification

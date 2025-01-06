@@ -1,7 +1,7 @@
 package Switch::Right;
 
 use 5.036;
-our $VERSION = '0.000005';
+our $VERSION = '0.000006';
 
 use experimental qw< builtin refaliasing try >;
 use builtin      qw< true false is_bool blessed created_as_number reftype >;
@@ -96,32 +96,35 @@ sub _pure_given_impl { my ($source) = @_;
     state @pure_statements;
     @pure_statements = ();
     state $VALIDATE_PURE_GIVEN = qr{
-        \A  given (?<GIVEN> $OWS  \(
-                (?<JUNC> (?: $OWS (?> any | all | none )  $OWS  => )?+ )
-                             $OWS (?>(?<EXPR> (?&PerlExpression)))
-                             $OWS \)
-                             $OWS (?>(?<BLOCK>  (?&PureBlock)  ))
+        \A  given (?<GIVEN>  (?<ws_post_kw>   $OWS    )  \(
+                             (?<JUNC>     (?: $OWS (?> any | all | none )  $OWS  => )?+  )
+                             (?<ws_pre_expr>  $OWS    )  (?>(?<EXPR> (?&PerlExpression)))
+                             (?<ws_pre_close> $OWS    )  \)
+                             (?<ws_pre_block> $OWS \{ $OWS )  (?>(?<BLOCK>  (?&PureBlock)  ))  \}
             )
             (?>(?<TRAILING_CODE>  .*  ))
 
             (?(DEFINE)
                 (?<PureBlock>    # Distinguish "when", "default", and "given" from other statements...
-                    \{  $OWS
                     (?:
-                        when $OWS \( $OWS
+                        when (?<WHENOPEN> $OWS \( $OWS )
                         (?>
                             (?<WHENEXPR> (?<WHENTRUE>  true  )
                             |            (?<WHENFALSE> false )
                             ) \b
                         |
-                            (?<WHENJUNC> (?: (?> any | all | none ) $OWS => )?+ )
-                                             $OWS (?<WHENEXPR> (?>(?&PerlExpression)))
+                            (?<WHENJUNC> (?: (?> any | all | none ) $OWS => $OWS )?+ )
+                            (?<WHENEXPR> (?>(?&PerlExpression)))
                         )
-                             $OWS \) $OWS (?>(?<WHENBLOCK> (?&PerlBlock) ))  $OWS
-                        (?{ push @pure_statements, { TYPE => 'when', %+ }; })
+                        (?<WHENCLOSE> $OWS \) $OWS )
+                        (?>(?<WHENBLOCK> (?&PerlBlock) ))
+                        (?<WHENPOST> $OWS )
+                            (?{ push @pure_statements, { TYPE => 'when', %+ }; })
                     |
-                        default $OWS (?>(?<DEFBLOCK> (?&PerlBlock) ))  $OWS
-                        (?{ push @pure_statements, { TYPE => 'default', %+ }; })
+                        default (?<DEFPRE>  $OWS )
+                                (?>(?<DEFBLOCK> (?&PerlBlock) ))
+                                (?<DEFPOST> $OWS )
+                            (?{ push @pure_statements, { TYPE => 'default', %+ }; })
                     |
                         (?<NESTEDGIVEN>
                             given \b $OWS  \(
@@ -130,13 +133,17 @@ sub _pure_given_impl { my ($source) = @_;
                                     $OWS \)
                                     $OWS (?>(?<BLOCK>  (?&NestedPureBlock)  )) $OWS
                         )
-                        (?{ push @pure_statements, { TYPE => 'given', %+ }; })
+                            (?{ push @pure_statements, { TYPE => 'given', %+ }; })
                     |
-                        (?! when \b | default \b )
-                        (?>(?<STATEMENT> (?&PerlStatement) ))  $OWS
-                        (?{ push @pure_statements, { TYPE => 'other', %+ }; })
+                        (?! $OWS (?> when | default ) \b )
+                        (?>(?<STATEMENT> (?&PerlStatement)  $OWS ))
+                            (?{ push @pure_statements, { TYPE => 'other', %+ }; })
                     )*+
-                    \}
+
+                    # Possible trailing whitespace at the end of the block...
+                    ( (?>(?<STATEMENT> (?&PerlNWS) ))
+                        (?{ push @pure_statements, { TYPE => 'other', %+ }; })
+                    )?+
                 )
                 (?<NestedPureBlock>    # Non-capturing version of the above
                     \{  $OWS
@@ -180,9 +187,10 @@ sub _pure_given_impl { my ($source) = @_;
         my $nesting_depth     = 0;
         my $after_a_statement = 0;
         my $GIVEN_EXPR = _apply_term_magic($matched{EXPR});
+
         return
-              "if (1) { local *_ = \\scalar($GIVEN_EXPR); if(0){}"
-            . join("\n", map {
+              "if (1) $matched{ws_post_kw} { local *_ = $matched{ws_pre_expr} \\scalar($GIVEN_EXPR); $matched{ws_pre_close} if(0) $matched{ws_pre_block} }"
+            . join("", map {
                 my $PREFIX = $after_a_statement ? 'if(0){}' : q{};
                 if ($_->{TYPE} eq 'when') {
                     my $BLOCK = $_->{WHENBLOCK};
@@ -190,12 +198,12 @@ sub _pure_given_impl { my ($source) = @_;
                     elsif ($_->{WHENFALSE}) { substr($BLOCK,1,0) = $WHENFALSEMSG; }
                     my $JUNC = $_->{WHENJUNC} // q{};
                     $after_a_statement = 0;
-                      "$PREFIX elsif (smartmatch($matched{JUNC} \$_, $JUNC scalar("
-                    . _apply_term_magic($_->{WHENEXPR}) . "))) $BLOCK"
+                      "$PREFIX elsif $_->{WHENOPEN} smartmatch($matched{JUNC} \$_, $JUNC scalar("
+                    . _apply_term_magic($_->{WHENEXPR}) . ")) $_->{WHENCLOSE} $BLOCK $_->{WHENPOST}"
                 }
                 elsif ($_->{TYPE} eq 'default') {
                     $after_a_statement = 0;
-                    "$PREFIX elsif (1) $_->{DEFBLOCK}"
+                    "$PREFIX elsif (1) $_->{DEFPRE} $_->{DEFBLOCK} $_->{DEFPOST}"
                 }
                 elsif ($_->{TYPE} eq 'given') {
                     my $nested = _pure_given_impl($_->{NESTEDGIVEN});
@@ -853,7 +861,7 @@ Switch::Right -  Switch and smartmatch done right this time
 
 =head1 VERSION
 
-This document describes Switch::Right version 0.000005
+This document describes Switch::Right version 0.000006
 
 
 =head1 SYNOPSIS

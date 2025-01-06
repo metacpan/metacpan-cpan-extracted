@@ -8,7 +8,7 @@ use warnings;
 use File::Spec;
 use Alien::proj;
 
-our $VERSION = "2.097";
+our $VERSION = "2.098";
 pp_setversion($VERSION);
 
 pp_add_isa( 'PDL::Transform' );

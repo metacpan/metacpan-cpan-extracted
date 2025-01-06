@@ -2,10 +2,12 @@ package DBIx::Array::Connect;
 use strict;
 use warnings;
 use base qw{Package::New};
+use File::Basename qw{};
 use Config::IniFiles qw{};
 use Path::Class qw{};
 
-our $VERSION='0.05';
+our $VERSION='0.08';
+our $PACKAGE=__PACKAGE__;
 
 =head1 NAME
 
@@ -126,6 +128,26 @@ sub sections {
   return wantarray ? @list : \@list;
 }
 
+=head2 section_hash
+
+Returns the contents of the INI section as a hash or hash reference.
+
+  my $hash_ref = $dac->section_hash("db1"); #isa HASH
+  my %hash     = $dac->section_hash("db1"); #isa LIST
+
+=cut
+
+sub section_hash {
+  my $self    = shift;
+  my $section = shift or die("Error: $PACKAGE->section_hash requires section name parameter.");
+  my @return  = ();
+  foreach my $parameter ($self->cfg->Parameters($section)) {
+    my @value = $self->cfg->val($section, $parameter);
+    push @return, @value == 1 ? ($parameter, $value[0]) : ($parameter, \@value);
+  }
+  return wantarray ? @return : {@return};
+}
+
 =head2 class
 
 Returns the class in to which to bless objects.  The "class" is assumed to be a base DBIx::Array object.  This package MAY work with other objects that have a connect method that pass directly to DBI->connect.  The object must have a similar execute method to support the package's execute on connect capability.
@@ -184,8 +206,8 @@ Sets and returns a list of search paths for the INI file.
   my $path=$dac->path;            # []
   my $path=$dac->path(".", ".."); # []
 
-Default: ["/etc"] on Linux-like systems
-Default: ['C:\Windows'] on Windows-like systems
+Default: [".", dirname($0), "/etc"]       on Linux-like systems
+Default: [".", dirname($0), 'C:\Windows'] on Windows-like systems
 
 Overloading path is a good way to migrate from one location to another over time.
 
@@ -206,7 +228,7 @@ sub path {
   my $self=shift;
   $self->{"path"}=[@_] if @_;
   unless (ref($self->{"path"}) eq "ARRAY") {
-    my @path=();
+    my @path=(".", File::Basename::dirname($0));
     if ($^O eq "MSWin32") {
       eval("use Win32");
       push @path, eval("Win32::GetFolderPath(Win32::CSIDL_WINDOWS)");
@@ -324,21 +346,9 @@ Once the file method has cached a filename, basename and path are ignored. Once 
 
 The file, path and basename methods are common exports from other packages.  Be wary!
 
-=head1 BUGS
-
-Send email to author and log on RT.
-
-=head1 SUPPORT
-
-DavisNetworks.com supports all Perl applications including this package.
-
 =head1 AUTHOR
 
   Michael R. Davis
-  CPAN ID: MRDVT
-  Satellite Tracking of People, LLC
-  mdavis@stopllc.com
-  http://www.stopllc.com/
 
 =head1 COPYRIGHT
 

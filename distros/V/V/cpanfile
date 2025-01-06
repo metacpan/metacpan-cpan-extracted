@@ -1,19 +1,15 @@
-requires  "File::Spec";
+requires   "File::Spec";
 
 on "configure" => sub {
     requires   "ExtUtils::MakeMaker";
 
-    recommends "ExtUtils::MakeMaker"  => "7.70";
-    };
-
-on "build" => sub {
-    requires   "ExtUtils::MakeMaker";
-
-    recommends "ExtUtils::MakeMaker"  => "7.70";
+    recommends "ExtUtils::MakeMaker"      => "7.70";
     };
 
 on "test" => sub {
-    requires   "Test::Builder::Module";
     requires   "Test::Fatal";
-    requires   "Test::More";
+    requires   "Test::Simple"             => "0.88";
+    requires   "Test:Warnings";
+
+    recommends "Test::Simple"             => "1.302207";
     };

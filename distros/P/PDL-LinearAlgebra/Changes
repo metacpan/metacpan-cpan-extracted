@@ -1,3 +1,6 @@
+0.433 2025-01-06
+- make Trans::toreal do nothing if given real-typed data
+
 0.432 2025-01-04
 - uses PDL 2.096+ lib/*.pd format for quicker builds
 

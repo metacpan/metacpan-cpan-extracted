@@ -19,8 +19,9 @@ my @cases = (
 plan tests => 5 * @cases + 2;
 
 my $parser = Chemistry::OpenSMILES::Parser->new;
+my $moiety;
 
-my( $moiety ) = $parser->parse( 'N[C@](Br)(O)C' );
+( $moiety ) = $parser->parse( 'N[C@](Br)(O)C' );
 chirality_to_pseudograph( $moiety );
 
 is( $moiety->vertices, 23 );
@@ -67,3 +68,28 @@ for my $case (@cases) {
     is( scalar( grep { is_cis_trans_bond( $moiety, @$_ ) } $moiety->edges ),
         $cis_trans_bonds );
 }
+
+# The following test must not throw any warnings
+
+( $moiety ) = $parser->parse( 'C=C=C=C' );
+
+# copy() makes a shallow copy without edge attributes, thus they
+# have to be added later:
+my $copy = $moiety->copy;
+for my $bond ($moiety->edges) {
+    next unless $moiety->has_edge_attribute( @$bond, 'bond' );
+    $copy->set_edge_attribute( @$bond,
+                               'bond',
+                               $moiety->get_edge_attribute( @$bond, 'bond' ) );
+}
+
+cis_trans_to_pseudoedges( $copy );
+
+# Drop cis/trans markers from the input graph and mark them
+# anew.
+for my $bond ($moiety->edges) {
+    next unless is_cis_trans_bond( $moiety, @$bond );
+    $moiety->delete_edge_attribute( @$bond, 'bond' );
+}
+
+mark_all_double_bonds( $moiety, [] );

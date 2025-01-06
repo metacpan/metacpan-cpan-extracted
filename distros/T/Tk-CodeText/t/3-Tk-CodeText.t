@@ -13,6 +13,7 @@ my $text;
 if (defined $app) {
 	$text = $app->CodeText(
 		-autoindent => 1,
+		-autocomplete => 1,
 		-tabs => '7m',
 		-font => 'Monospace 12',
 		-logcall => sub { print STDERR shift, "\n" },

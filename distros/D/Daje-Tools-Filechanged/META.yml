@@ -26,14 +26,14 @@ no_index:
 provides:
   Daje::Tools::Filechanged:
     file: lib/Daje/Tools/Filechanged.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/janeskil1525/Daje-Tools-Filechanged/issues
   homepage: https://github.com/janeskil1525/Daje-Tools-Filechanged
   repository: https://github.com/janeskil1525/Daje-Tools-Filechanged.git
-version: '0.01'
+version: '0.02'
 x_contributors:
   - 'janeskil1525 <janeskil1525@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

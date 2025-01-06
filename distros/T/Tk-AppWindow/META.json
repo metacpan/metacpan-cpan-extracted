@@ -36,7 +36,7 @@
             "File::Basename" : "2.85",
             "File::MimeInfo" : "0.35",
             "File::Path" : "2.18",
-            "File::Spec" : "3.84",
+            "File::Spec" : "3.75",
             "FreeDesktop::Icons" : "0.01",
             "Imager" : "1.019",
             "Imager::File::PNG" : "0.99",
@@ -69,6 +69,6 @@
          "web" : "https://github.com/haje61/Tk-AppWindow"
       }
    },
-   "version" : "0.18",
+   "version" : "0.19",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

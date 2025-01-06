@@ -1,19 +1,31 @@
---- #YAML:1.0
-name:                DBIx-Array-Connect
-version:             0.05
-abstract:            Database Connections from an INI Configuration File
-license:             ~
-author:              
-    - Michael R. Davis (mdavis@stopllc.com)
-generated_by:        ExtUtils::MakeMaker version 6.42
-distribution_type:   module
-requires:     
-    Config::IniFiles:              0
-    DBIx::Array:                   0.14
-    Package::New:                  0
-    Path::Class:                   0
-    Sys::Path:                     0
-    Test::Simple:                  0.44
+---
+abstract: 'Database Connections from an INI Configuration File'
+author:
+  - 'Michael R. Davis'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150001'
+license: gpl
 meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
-    version: 1.3
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Array-Connect
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Config::IniFiles: '0'
+  DBIx::Array: '0.14'
+  Package::New: '0'
+  Path::Class: '0'
+  Sys::Path: '0'
+  Test::Simple: '0.44'
+resources:
+  bugtracker: https://github.com/mrdvt92/perl-DBIx-Array-Connect/issues
+  homepage: https://github.com/mrdvt92/perl-DBIx-Array-Connect
+  repository: https://github.com/mrdvt92/perl-DBIx-Array-Connect.git
+version: '0.08'

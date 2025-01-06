@@ -2,6 +2,7 @@
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
+#include <sys/types.h>
 #ifdef HAVE_CRYPT_URANDOM_NATIVE_GETRANDOM
 #include <sys/random.h>
 #else
@@ -21,7 +22,6 @@
 #else
 #define GRND_NONBLOCK	0x0001
 #endif
-#include <sys/types.h>
 #include <errno.h>
 
 MODULE = Crypt::URandom  PACKAGE = Crypt::URandom  PREFIX = crypt_urandom_

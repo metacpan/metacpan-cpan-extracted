@@ -1,5 +1,5 @@
 package Photonic::WE::S::Green;
-$Photonic::WE::S::Green::VERSION = '0.023';
+$Photonic::WE::S::Green::VERSION = '0.024';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::WE::S::Green
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 COPYRIGHT NOTICE
 
@@ -151,6 +151,8 @@ has 'epsilonTensor' =>  (is=>'lazy', isa=>PDLComplex, init_arg=>undef,
                          documentation=>'macroscopic response');
 
 with 'Photonic::Roles::KeepStates', 'Photonic::Roles::UseMask';
+
+#  Antisymmetric part is missing. Compare to ST and to R2!
 
 sub _build_greenTensor {
     my $self=shift;

@@ -1,5 +1,10 @@
 Revision history for Perl module
 
+1.117 2025-01-05T22:42:44Z
+	* refresh distro and move to BRIANDFOY
+	* fix problem testing on v5.8 since HTML::Tagset changed its minimum
+	version for no reason https://github.com/libwww-perl/HTML-Tagset/pull/14
+
 1.116 2024-01-10T16:25:59Z
 	* Refresh the distro for email update
 

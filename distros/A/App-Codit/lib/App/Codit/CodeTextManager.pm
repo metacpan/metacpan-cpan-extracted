@@ -26,6 +26,7 @@ sub Populate {
 	my $text = $self->CodeText(
 		-contextmenu => $ext->ContextMenu,
 		-height => 8,
+		-keyreleasecall => ['KeyReleased', $self],
 		-logcall => ['log', $ext],
 		-modifiedcall => ['Modified', $self],
 		-saveimage => $ext->getArt('document-save', 16),
@@ -36,10 +37,13 @@ sub Populate {
 	my $xt = $text->Subwidget('XText');
 	$xt->bind('<Control-f>', sub { $ext->cmdExecute('doc_find') });
 	$xt->bind('<Control-r>', sub { $ext->cmdExecute('doc_replace') });
-	$xt->bind('<KeyRelease>', [$self, 'KeyReleased', Ev('A')]);
 	$self->{NAME} = '';
 
 	$self->ConfigSpecs(
+		-contentacpopsize => [{-acpopsize => $xt}],
+		-contentacscansize => [{-acscansize => $xt}],
+		-contentactivedelay => [{-activedelay => $xt}],
+		-contentautocomplete => [{-autocomplete => $xt}],
 		-contentautoindent => [{-autoindent => $xt}],
 		-contentbackground => [{-background => $xt}],
 		-contentbgdspace => ['PASSIVE', undef, undef, '#E600A8'],

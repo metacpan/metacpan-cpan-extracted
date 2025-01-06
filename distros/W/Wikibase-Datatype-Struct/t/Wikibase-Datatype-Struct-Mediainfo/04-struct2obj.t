@@ -23,7 +23,7 @@ is($ret->title, undef, 'Method title().');
 
 # Test.
 $struct_hr = {
-	'claims' => {
+	'statements' => {
 		'P21' => [{
 			'mainsnak' => {
 				'datatype' => 'wikibase-item',

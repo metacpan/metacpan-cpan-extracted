@@ -7,7 +7,7 @@ use PDL::Exporter;
 our @ISA = qw/PDL::Exporter/;
 our @EXPORT_OK = qw/simplex make_simplex/;
 our %EXPORT_TAGS = ( Func => [@EXPORT_OK] );
-our $VERSION = '2.096';
+our $VERSION = '2.097';
 
 *simplex = \&PDL::simplex;
 

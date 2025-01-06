@@ -9,7 +9,7 @@ use Role::Tiny ();
 use Scalar::Util 'blessed';
 use WWW::Form::UrlEncoded 'build_urlencoded_utf8', 'parse_urlencoded_arrayref';
 
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 
 our @EXPORT_OK = qw(form_urlencode form_urldecode oauth_request);
 

@@ -3,14 +3,23 @@ NAME
     Policys
 
 VERSION
-    version 0.03
+    version 0.04
 
 SYNOPSIS
+      use strict;
+      use warnings;
+
+      use Software::Security::Policy::Individual;
+
       my $policy = Software::Security::Policy::Individual->new({
-        maintainer => 'security@example.com',
+        maintainer  => 'Timothy Legge <timlegge@gmail.com>',
+        program     => 'Software::Security::Policy',
+        timeframe   => '7 days',
+        url         => 'https://github.com/CPAN-Security/Software-Security-Policy/blob/main/SECURITY.md',
+        support_years   => '10',
       });
 
-      print $output_fh $policy->fulltext;
+      print $policy->fulltext, "\n";
 
 METHODS
     new
@@ -38,6 +47,9 @@ METHODS
         defined (eg. 'days')
 
     url a url where the most current security policy can be found.
+
+    git_url
+        a git url where the most current security policy can be found.
 
     support_years
         the number of years for which past major versions of Perl would be
@@ -94,6 +106,11 @@ METHODS
     policy can be found, if one is available. If possible, this will point
     at plain text, but it may point to an HTML resource.
 
+  git_url
+    This method returns the git URL at which a canonical text of the
+    security policy can be found, if one is available. If possible, this
+    will point at plain text, but it may point to an HTML resource.
+
   summary
     This method returns a snippet of text, usually a few lines, indicating
     the maintainer as well as an indication of the policy under which the
@@ -115,6 +132,9 @@ SEE ALSO
     Extra policys are maintained on CPAN in separate modules.
 
 COPYRIGHT
+    This software is copyright (c) 2024-2025 by Timothy Legge
+    <timlegge@gmail.com>.
+
     This module is based extensively on Software::License. Only the changes
     required for this module are attributable to the author of this module.
     All other code is attributable to the author of Software::License.
@@ -123,7 +143,7 @@ AUTHOR
     Timothy Legge <timlegge@gmail.com>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2024 by Timothy Legge
+    This software is copyright (c) 2025 by Timothy Legge
     <timlegge@gmail.com>.
 
     This is free software; you can redistribute it and/or modify it under

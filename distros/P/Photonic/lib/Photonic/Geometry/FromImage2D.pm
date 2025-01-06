@@ -1,5 +1,5 @@
 package Photonic::Geometry::FromImage2D;
-$Photonic::Geometry::FromImage2D::VERSION = '0.023';
+$Photonic::Geometry::FromImage2D::VERSION = '0.024';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::Geometry::FromImage2D
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 COPYRIGHT NOTICE
 
@@ -99,8 +99,8 @@ use Moo;
 use MooX::StrictConstructor;
 
 BEGIN {
-# Put inoffensive path. Or else, PDL::IO::Pic fails in taint mode.
-    $ENV{'PATH'} = '/bin:/usr/bin';
+# Put inoffensive path in taint mode. Or else, PDL::IO::Pic fails.
+    $ENV{PATH} = '/bin:/usr/bin' if ${^TAINT};
 }
 
 use PDL::Lite;
@@ -119,7 +119,6 @@ sub _build_B {
     my $self=shift;
     my $path=$self->path;
     ( $path ) = ($path =~ m|^([A-Z0-9_.-\\/]+)$|ig);
-    ($ENV{PATH})=($ENV{PATH}=~m|^([A-Z0-9_.-\\/]+)$|ig);
     confess
 	"Only letters, numbers, underscores, dots, slashes and hyphens " .
 	"allowed in file names"

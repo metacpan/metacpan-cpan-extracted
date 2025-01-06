@@ -19,6 +19,7 @@ WriteMakefile(
   VERSION_FROM => 'lib/PDL/Transform/Proj4.pd',
   MIN_PERL_VERSION => '5.016',
   AUTHOR => 'PerlDL Developers <pdl-general@lists.sourceforge.net>',
+  LICENSE=> "perl",
   CONFIGURE_REQUIRES => {
     'ExtUtils::MakeMaker' => 0,
     'PDL' => '2.096',

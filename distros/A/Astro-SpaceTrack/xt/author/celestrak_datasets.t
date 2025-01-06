@@ -151,16 +151,48 @@ done_testing;
 
 sub parse_string {
     my ( $string, @extra ) = @_;
+
+=begin comment
+
+    # The following horrible hack became unnecessary as of December 30
+    # 2024.
+
+    # The following horrible hack is because as of December 28 2024 the
+    # Celestrak supplemental dataset ends in an un-terminated comment
+    # which HTML::TreeBuilder 5.07 handles incorrectly (IM(NS)HO). So:
+    {	# Single-iteration loop
+	$string =~ m/ <!-- /smxgc
+	    or last;
+	$string =~ m/ --> /smxgc
+	    and redo;
+	$string .= ' -->';
+    }
+    # I wish I could capture the HTML::Parser events corresponding to
+    # the above, but it looks like there are none, so I have to hack it
+    # with regexen. GAH!
+
+=end comment
+
+=cut
+
     my $tree = HTML::TreeBuilder->new_from_content( $string );
     my %data;
     foreach my $anchor ( $tree->look_down( _tag => 'a' ) ) {
 	my $href = $anchor->attr( 'href' )
 	    or next;
 
-	# Exclude pre-launch and post-deployment data sets, which are
-	# ephemeral.
 	my $parent = $anchor->parent();
 	my @sibs = $parent->content_list();
+
+	# Handle the case where the name of the data set is an anchor.
+	ref $sibs[0]
+	    and $sibs[0] == $anchor
+	    and next;
+	ref $sibs[0]
+	    and $sibs[0] = $sibs[0]->as_trimmed_text();
+
+	# Exclude pre-launch and post-deployment data sets, which are
+	# ephemeral.
 	not ref $sibs[0]
 	    and $sibs[0] =~ m/ \b (?:
 		pre-launch | post-deployment |

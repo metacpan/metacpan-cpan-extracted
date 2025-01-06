@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.14";
+$VERSION="0.15";
 use Tk;
 use App::Codit::CodeTextManager;
 
@@ -269,6 +269,7 @@ sub Populate {
 		-savegeometry => 1,
 		-updatesmenuitem => 1,
 
+		#configure the application layout.
 		-panelgeometry => 'grid',
 		-panellayout => [
 			CENTER => {
@@ -335,6 +336,7 @@ sub Populate {
 			},
 		],
 
+		#help info
 		-aboutinfo => {
 			author => 'Hans Jeuken',
 			components => [
@@ -357,8 +359,13 @@ sub Populate {
 		},
 		-helpfile => 'http://www.perlgui.org/wp-content/uploads/2024/12/manual-0.14.pdf',
 
+		#configure content manager
 		-contentmanagerclass => 'CodeTextManager',
 		-contentmanageroptions => [
+			'-contentacpopsize',
+			'-contentacscansize',
+			'-contentactivedelay',
+			'-contentautocomplete',
 			'-contentautoindent',
 			'-contentbackground',
 			'-contentbgdspace',
@@ -381,20 +388,32 @@ sub Populate {
 			'-highlight_themefile',
 		],
 
+		#configure the settings panel
 		-useroptions => [
 			'*page' => 'Editing',
 			'*section' => 'Editor settings',
 			-contentfont => ['font', 'Font'],
+			'*frame',
 			-contentautoindent => ['boolean', 'Auto indent'],
-			-contentindent => ['text', 'Indent style', -regex => qr/^\d+|tab$/, -width => 4],
 			-contenttabs => ['text', 'Tab size', -regex => qr/^\d+\.?\d*[c|i|m|p]$/, -width => 4],
-			-contentwrap => ['radio', 'Wrap', -values => [qw[none char word]]],
+			'*column',
 			-doc_show_spaces => ['boolean', 'Show spaces'],
+			-contentindent => ['text', 'Indent style', -regex => qr/^\d+|tab$/, -width => 4],
+			'*end',
+			-contentwrap => ['radio', 'Wrap', -values => [qw[none char word]]],
 			'*end',
 			'*section' => 'Show indicators',
 			-showfolds => ['boolean', 'Fold indicators'],
 			-shownumbers => ['boolean', 'Line numbers'],
+			'*column',
 			-showstatus => ['boolean', 'Doc status'],
+			'*end',
+			'*section' => 'Auto complete',
+			-contentautocomplete => ['boolean', 'Enabled'],
+			-contentactivedelay => ['spin', 'Pop delay', -width => 4],
+			'*column',
+			-contentacpopsize => ['spin', 'Pop size', -width => 4],
+			-contentacscansize => ['spin', 'Scan size', -width => 4],
 			'*end',
 
 			'*page' => 'Colors',
@@ -419,8 +438,12 @@ sub Populate {
 			'*column',
 			-contentmatchbg => ['color', 'Background', -width => 8],
 			'*end',
-			'*section' => 'Bookmarks',
-			-contentbookmarkcolor => ['color', 'Background', -width => 8],
+			'*section' => 'Other',
+			-errorcolor => ['color', 'Error', -width => 8],
+			-warningcolor => ['color', 'Warning', -width => 8],
+			'*column',
+			-linkcolor => ['color', 'Link', -width => 8],
+			-contentbookmarkcolor => ['color', 'Bookmark bg', -width => 8],
 			'*end',
 
 			'*page' => 'GUI',

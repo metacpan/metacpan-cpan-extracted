@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright PROCURA B.V. (c) 2008-2023 H.Merijn Brand
+# Copyright PROCURA B.V. (c) 2008-2025 H.Merijn Brand
 
 require 5.008001; # <- also see postamble at the bottom for META.yml
 use strict;
@@ -78,8 +78,7 @@ my $rv = WriteMakefile (%wm);
 
 package MY;
 
-sub postamble
-{
+sub postamble {
     my $valgrind = join " ", qw(
 	PERL_DESTRUCT_LEVEL=2 PERL_DL_NONLAZY=1
 	    valgrind
@@ -127,15 +126,9 @@ sub postamble
 	'	-@cpants_lint.pl $(DISTVNAME).tgz',
 	'	-@rm -f Debian_CPANTS.txt',
 	'',
-	'doc docs:		doc/Peek.md doc/Peek.html doc/Peek.man',
+	'doc docs:		doc/Peek.md doc/Peek.html doc/Peek.3 doc/Peek.man',
 	'doc/Peek.md:		Peek.pm',
-	'	pod2markdown  < $? > $@',
-	'doc/Peek.html:	Peek.pm',
-	'	pod2html      < $? 2>&1 | grep -v "^Cannot find" > $@',
-	'doc/Peek.3:		Peek.pm',
-	'	pod2man       < $? > $@',
-	'doc/Peek.man:	doc/Peek.3',
-	'	nroff -mandoc < $? > $@',
+	'	perl doc/make-doc.pl',
 	'',
 	$min_vsn;
     } # postamble
@@ -169,7 +162,7 @@ H.Merijn Brand <hmbrand@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2023 H.Merijn Brand
+Copyright (C) 2008-2025 H.Merijn Brand
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

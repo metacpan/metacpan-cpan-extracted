@@ -1,14 +1,10 @@
 .gitignore
-Build.PL
 Changes
 lib/Syntax/Feature/Void.pm
-lib/Syntax/Feature/Void.xs
 LICENSE.txt
-make_call_parser.PL
+Makefile.PL
 MANIFEST
 MANIFEST.SKIP
-META.yml
-META.json
 ppport.h
 README.txt
 t/00_load.t
@@ -21,3 +17,6 @@ t/06_devel_pod_coverage.t
 t/07_basic.t
 t/08_pragma_a.t
 t/09_pragma_b.t
+Void.xs
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

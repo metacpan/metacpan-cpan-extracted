@@ -10,7 +10,7 @@ use Wikibase::Datatype::Value::Lexeme;
 
 Readonly::Array our @EXPORT_OK => qw(obj2struct struct2obj);
 
-our $VERSION = 0.13;
+our $VERSION = 0.14;
 
 sub obj2struct {
 	my $obj = shift;
@@ -209,12 +209,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2020-2024 Michal Josef Špaček
+© 2020-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.13
+0.14
 
 =cut

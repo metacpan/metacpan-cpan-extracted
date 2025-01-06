@@ -3,6 +3,7 @@ abstract: 'OpenSMILES format reader and writer'
 author:
   - 'Andrius Merkys <merkys@cpan.org>'
 build_requires:
+  Algorithm::Combinatorics: '0'
   Data::Dumper: '0'
   Module::Build: '0.28'
   Module::Build::Parse::Yapp: v0.1.2
@@ -21,11 +22,12 @@ requires:
   Graph: '0.97'
   List::Util: '1.45'
   Parse::Yapp: '0'
+  Set::Object: '0'
   perl: '5.010000'
 resources:
   bugtracker: https://github.com/merkys/chemistry-opensmiles/issues
   homepage: https://search.cpan.org/dist/Chemistry-OpenSMILES
   repository: git://github.com/merkys/chemistry-opensmiles.git
-version: 0.10.0
+version: 0.11.0
 x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

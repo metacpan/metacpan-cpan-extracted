@@ -1,3 +1,7 @@
+0.21 2025-01-05 H.Merijn Brand
+ - remove xt/ from dist
+ - require 5.14.0
+
 0.20 2025-01-03 H.Merijn Brand
  - This release is in fond memories of Abe Timmerman
  - New maint

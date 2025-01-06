@@ -7,6 +7,7 @@ Makefile.PL
 MANIFEST
 MANIFEST.SKIP
 README.pod
+SECURITY.md
 t/compile.t
 t/find_by_directory_contains.t
 t/find_by_extension.t

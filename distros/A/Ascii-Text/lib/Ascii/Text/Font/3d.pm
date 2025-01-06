@@ -1176,7 +1176,7 @@ Ascii::Text::Font::3d - 3d font
 
 =head1 VERSION
 
-Version 0.19
+Version 0.20
 
 =cut
 

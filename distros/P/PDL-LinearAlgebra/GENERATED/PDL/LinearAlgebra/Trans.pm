@@ -18,7 +18,7 @@ use PDL::Exporter;
 use DynaLoader;
 
 
-   our $VERSION = '0.432';
+   our $VERSION = '0.433';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::LinearAlgebra::Trans $VERSION;
@@ -263,13 +263,13 @@ sub PDL::acoth($) {my $tmp = 1/pdl($_[0]) ; $tmp->atanh}
 
 my $_tol = 9.99999999999999e-15;
 
-sub toreal{
-	return $_[0] if $_[0]->isempty;
-	$_tol = $_[1] if defined $_[1];
-	my ($min, $max, $tmp);
-	($min, $max) = $_[0]->im->minmax;
-	return $_[0]->re->sever unless (abs($min) > $_tol || abs($max) > $_tol);
-	$_[0];
+sub toreal {
+  $_tol = $_[1] if defined $_[1];
+  return $_[0] if $_[0]->isempty or $_[0]->type->real;
+  my ($min, $max, $tmp);
+  ($min, $max) = $_[0]->im->minmax;
+  return $_[0]->re->sever unless (abs($min) > $_tol || abs($max) > $_tol);
+  $_[0];
 }
 
 =head2 mlog

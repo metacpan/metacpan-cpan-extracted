@@ -9,7 +9,7 @@ Tk::CodeText - Programmer's Swiss army knife Text widget.
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.59';
+$VERSION = '0.60';
 
 use base qw(Tk::Derived Tk::Frame);
 
@@ -84,8 +84,8 @@ static unsigned char indicatoropen_bits[] = {
 
 B<Tk::CodeText> aims to be a Scintilla like text widget for Perl/Tk.
 
-This is a rewrite, almost from scratch and not backwards compatible
-with version 0.3.4 and earlier.
+Version 0.40 of B<Tk::CodeText> was re-written from scratch. This version and all later
+versions are not backwards compatible with version 0.3.4 and earlier.
 
 It leans heavily on L<Syntax::Kamelon>.
 
@@ -113,6 +113,8 @@ It keeps track of the last saving point and selections
 
 =item automatic indentation
 
+=item autocomplete
+
 =item matching of nested {}, () and [] pairs
 
 =back
@@ -120,6 +122,38 @@ It keeps track of the last saving point and selections
 =head1 OPTIONS
 
 =over 4
+
+=item Name: B<acPopSize>
+
+=item Class: B<AcPopSize>
+
+=item Switch: B<-acpopsize>
+
+The length of the typed string to trigger autocomplete into making suggestions. Default value 5.
+
+=item Name: B<acScanSize>
+
+=item Class: B<AcScanSize>
+
+=item Switch: B<-acscansize>
+
+The minimal length of a word to be included in the autocomplete word database. Default value 5.
+
+=item Name: B<activeDelay>
+
+=item Class: B<ActiveDelay>
+
+=item Switch: B<-activedelay>
+
+The waiting time in miliseconds before an autocomplete pop up can occur. Default value 300.
+
+=item Name: B<autoComplete>
+
+=item Class: B<AutoComplete>
+
+=item Switch: B<-autocomplete>
+
+Boolean. Default value I<false>. Enables or disables autocomplete.
 
 =item Switch: B<-autoindent>
 
@@ -375,6 +409,7 @@ sub Populate {
 	my @opt = (
 #		-width => 20,
 #		-height => 10,
+		-escapepressed => sub { $self->FindClose },
 		-findandreplacecall => sub { $self->FindAndOrReplace(@_) },
 		-modifycall => ['OnModify', $self],
 		-relief => 'flat',
@@ -1385,6 +1420,11 @@ sub position {
 
 Redoes the last undo.
 
+=item B<replace>I<$begin, $end, $string)>
+
+Replaces the text from index I<$begin> to I<$end> with the text in I<$string>. 
+Counts for one event in the undo stack.
+
 =cut
 
 =item B<save>I<($file)>
@@ -1661,6 +1701,8 @@ sub ViewMenuItems {
 
 	my $a;
 	tie $a, 'Tk::Configure', $self, '-autoindent';
+	my $c;
+	tie $c, 'Tk::Configure', $self, '-autocomplete';
 	my $f;
 	tie $f, 'Tk::Configure', $self, '-showfolds';
 	my $n;
@@ -1693,6 +1735,7 @@ sub ViewMenuItems {
 	);
 	my @items = ( 
 		[checkbutton => '~Auto indent', @values, -variable => \$a],
+		[checkbutton => 'A~uto complete', @values, -variable => \$c],
 		['cascade'=> '~Wrap', -tearoff => 0, -menuitems => [
 			[radiobutton => 'Word', -variable => \$v, -value => 'word'],
 			[radiobutton => 'Character', -variable => \$v, -value => 'char'],
@@ -1703,6 +1746,7 @@ sub ViewMenuItems {
 			[checkbutton => '{} Curlies', @opt, -variable => \$curlies, -onvalue => '{}'],
 			[checkbutton => '[] Brackets',@opt, -variable => \$brackets, -onvalue => '[]'],
 		]],
+		[command => 'Au~to complete settings', -command => [acSettings => $self]],
 		[command => '~Colors', -command => [themeDialog => $self]],
 		'separator',
 		[checkbutton => 'Code ~folds', @values, -variable => \$f],
@@ -1725,6 +1769,11 @@ Returns the line number of the last visible line.
 =cut
 
 =back
+
+=head1 EXECUTABLES
+
+This module packs an executable, B<codetext>. It is a simple Notepad like editor but with all the features
+of B<Tk::CodeText>. Type 'codetext -h' in the command line for options.
 
 =head1 AUTHOR
 

@@ -28,7 +28,6 @@ lib/App/Codit/Plugins/PodViewer.pm
 lib/App/Codit/Plugins/SearchReplace.pm
 lib/App/Codit/Plugins/Sessions.pm
 lib/App/Codit/Plugins/Snippets.pm
-lib/App/Codit/Plugins/WordCompletion.pm
 lib/App/Codit/SessionManager.pm
 LICENSE
 Makefile.PL
@@ -51,6 +50,5 @@ t/110-App-Codit-Plugins-PodViewer.t
 t/120-App-Codit-Plugins-SearchReplace.t
 t/130-App-Codit-Plugins-Snippets.t
 t/140-App-Codit-Plugins-Sessions.t
-t/150-App-Codit-Plugins-WordCompletion.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

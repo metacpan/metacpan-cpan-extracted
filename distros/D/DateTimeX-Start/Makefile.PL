@@ -22,7 +22,7 @@ WriteMakefile(
       prereqs => {
          configure => {
             requires => {
-               'ExtUtils::MakeMaker' => 6.52,
+               'ExtUtils::MakeMaker' => 6.74,
             },
          },
          runtime => {
@@ -58,11 +58,10 @@ WriteMakefile(
       },
 
       resources => {
-         homepage => 'http://search.cpan.org/dist/DateTimeX-Start/',
+         homepage => 'https://metacpan.org/dist/DateTimeX-Start/',
          license => [ 'http://creativecommons.org/publicdomain/zero/1.0/' ],
          bugtracker => {
-            web    => 'http://rt.cpan.org/NoAuth/ReportBug.html?Queue=DateTimeX-Start',
-            mailto => 'bug-DateTimeX-Start@rt.cpan.org',
+            web => 'https://github.com/ikegami/perl-DateTimeX-Start/issues'
          },
          repository => {
             type => 'git',

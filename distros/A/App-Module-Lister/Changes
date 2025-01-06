@@ -1,5 +1,8 @@
 Revision history for Perl module App::Module::Lister
 
+1.002 2025-01-06T06:18:17Z
+	* refresh distro and move to BRIANDFOY
+
 1.001 2024-01-13T00:18:26Z
 	* Refresh the distro, bump to 1.x release, update email address
 

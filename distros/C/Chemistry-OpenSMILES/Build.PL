@@ -20,7 +20,7 @@ my %module_build_args = (
     "Andrius Merkys <merkys\@cpan.org>"
   ],
   "dist_name" => "Chemistry-OpenSMILES",
-  "dist_version" => "0.10.0",
+  "dist_version" => "0.11.0",
   "license" => "bsd",
   "module_name" => "Chemistry::OpenSMILES",
   "recursive_test_files" => 1,
@@ -28,9 +28,11 @@ my %module_build_args = (
     "Graph" => "0.97",
     "List::Util" => "1.45",
     "Parse::Yapp" => 0,
+    "Set::Object" => 0,
     "perl" => "5.010000"
   },
   "test_requires" => {
+    "Algorithm::Combinatorics" => 0,
     "Data::Dumper" => 0,
     "Test::More" => 0
   }
@@ -38,6 +40,7 @@ my %module_build_args = (
 
 
 my %fallback_build_requires = (
+  "Algorithm::Combinatorics" => 0,
   "Data::Dumper" => 0,
   "Module::Build" => "0.28",
   "Module::Build::Parse::Yapp" => "v0.1.2",

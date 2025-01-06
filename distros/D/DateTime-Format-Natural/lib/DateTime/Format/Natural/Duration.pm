@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use DateTime::Format::Natural::Duration::Checks;
-use List::MoreUtils qw(all);
+use List::Util 1.33 qw(all);
 
 our $VERSION = '0.07';
 

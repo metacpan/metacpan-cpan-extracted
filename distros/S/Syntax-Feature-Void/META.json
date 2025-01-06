@@ -4,55 +4,71 @@
       "Eric Brine <ikegami@adaelis.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "unknown",
+      "unrestricted"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Syntax-Feature-Void",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "ExtUtils::CBuilder" : "0",
-            "Test::More" : "0"
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.3614",
-            "Software::License::CC0_1_0" : "0"
+            "ExtUtils::MakeMaker" : "6.74"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage" : "0.18",
+            "Test::Pod::Coverage" : "1.08"
          }
       },
       "runtime" : {
          "requires" : {
-            "Devel::CallParser" : "0",
-            "Lexical::Sub" : "0",
             "XSLoader" : "0",
             "perl" : "5.014",
+            "strict" : "0",
             "syntax" : "0.004",
-            "version" : "0"
+            "version" : "0",
+            "warnings" : "0"
          }
-      }
-   },
-   "provides" : {
-      "Syntax::Feature::Void" : {
-         "file" : "lib/Syntax/Feature/Void.pm",
-         "version" : "v1.2.0"
+      },
+      "test" : {
+         "recommends" : {
+            "Test::Pod" : "1.22"
+         },
+         "requires" : {
+            "Test::More" : "0"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Syntax-Feature-Void"
+         "web" : "https://github.com/ikegami/perl-Syntax-Feature-Void/issues"
       },
-      "homepage" : "http://search.cpan.org/dist/Syntax-Feature-Void/",
+      "homepage" : "https://metacpan.org/dist/Syntax-Feature-Void",
+      "license" : [
+         "http://creativecommons.org/publicdomain/zero/1.0/"
+      ],
       "repository" : {
-         "url" : "http://github.com/ikegami/perl-Syntax-Feature-Void"
+         "type" : "git",
+         "url" : "https://github.com/ikegami/perl-Syntax-Feature-Void.git",
+         "web" : "https://github.com/ikegami/perl-Syntax-Feature-Void"
       }
    },
-   "version" : "v1.2.0",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "v1.4.0",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

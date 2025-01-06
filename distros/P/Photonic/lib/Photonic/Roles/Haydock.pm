@@ -1,5 +1,5 @@
 package Photonic::Roles::Haydock;
-$Photonic::Roles::Haydock::VERSION = '0.023';
+$Photonic::Roles::Haydock::VERSION = '0.024';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::Roles::Haydock
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 COPYRIGHT NOTICE
 
@@ -63,7 +63,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 =item (for developers)
 
     package Photonic::LE::NR2::Haydock;
-    $Photonic::LE::NR2::Haydock::VERSION= '0.023';
+    $Photonic::LE::NR2::Haydock::VERSION= '0.024';
     use namespace::autoclean;
     use Moo;
     has...
@@ -283,7 +283,7 @@ has 'converged'=>(is=>'ro', isa=>Bool, init_arg=>undef,
                   writer=>'_converged',
                   documentation=>'The calculation did converge');
 requires qw(iterate magnitude innerProduct
-    _checkorthogonalize);
+    _checkorthogonalize);   # why iterate if defined below?
 
 # Fields to store and restore
 my @allfields= qw(iteration keepStates converged);

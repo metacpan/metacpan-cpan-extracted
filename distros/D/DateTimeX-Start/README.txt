@@ -19,7 +19,7 @@ DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-    ExtUtils::MakeMaker 6.52    (For installation only)
+    ExtUtils::MakeMaker 6.74    (For installation only)
     Software::License::CC0_1_0  (For installation only)
     Test::More                  (For testing only)
     Carp
@@ -39,11 +39,9 @@ perldoc command.
 
     perldoc DateTimeX::Start
 
-You can also find it online at these locations:
+You can also find it online at this location:
 
-    http://search.cpan.org/dist/DateTimeX-Start
-
-    https://metacpan.org/release/DateTimeX-Start
+    https://metacpan.org/dist/DateTimeX-Start
 
 
 COPYRIGHT AND LICENSE

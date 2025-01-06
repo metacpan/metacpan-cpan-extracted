@@ -11,7 +11,7 @@ use Exporter qw(import);
 
 our( @EXPORT, @EXPORT_OK, %EXPORT_TAGS );
 
-our $VERSION = '0.905';
+our $VERSION = '0.906';
 
 =encoding utf8
 
@@ -922,7 +922,7 @@ brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2021-2024, brian d foy, All Rights Reserved.
+Copyright © 2021-2025, brian d foy, All Rights Reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

@@ -9,7 +9,7 @@ use constant unaltered => false;
 
 use File::Find;
 use File::Spec::Functions qw(abs2rel);
-use List::MoreUtils qw(any);
+use List::Util 1.33 qw(any);
 use Module::Util qw(fs_path_to_module);
 use Test::More;
 

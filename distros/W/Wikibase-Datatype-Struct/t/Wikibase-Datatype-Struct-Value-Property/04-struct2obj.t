@@ -3,7 +3,7 @@ use warnings;
 
 use English;
 use Error::Pure::Utils qw(clean);
-use Test::More 'tests' => 8;
+use Test::More 'tests' => 11;
 use Test::NoWarnings;
 use Wikibase::Datatype::Struct::Value::Property;
 
@@ -32,6 +32,17 @@ clean();
 
 # Test.
 $struct_hr = {
+	'type' => undef,
+};
+eval {
+	Wikibase::Datatype::Struct::Value::Property::struct2obj($struct_hr);
+};
+is($EVAL_ERROR, "Structure isn't for 'property' datatype.\n",
+	"Structure isn't for 'property' datatype (undefined type).");
+clean();
+
+# Test.
+$struct_hr = {
 	'type' => 'bad',
 };
 eval {
@@ -49,7 +60,33 @@ eval {
 	Wikibase::Datatype::Struct::Value::Property::struct2obj($struct_hr);
 };
 is($EVAL_ERROR, "Structure isn't for 'property' datatype.\n",
+	"Structure isn't for 'property' datatype (no value).");
+clean();
+
+# Test.
+$struct_hr = {
+	'type' => 'wikibase-entityid',
+	'value' => {},
+};
+eval {
+	Wikibase::Datatype::Struct::Value::Property::struct2obj($struct_hr);
+};
+is($EVAL_ERROR, "Structure isn't for 'property' datatype.\n",
 	"Structure isn't for 'property' datatype (no value/entity-type).");
+clean();
+
+# Test.
+$struct_hr = {
+	'type' => 'wikibase-entityid',
+	'value' => {
+		'entity-type' => undef,
+	},
+};
+eval {
+	Wikibase::Datatype::Struct::Value::Property::struct2obj($struct_hr);
+};
+is($EVAL_ERROR, "Structure isn't for 'property' datatype.\n",
+	"Structure isn't for 'property' datatype (undefined value/entity-type).");
 clean();
 
 # Test.

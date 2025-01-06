@@ -1,3 +1,10 @@
+0.14 2025-01-06T11:31:46+01:00
+ - Add tests for Monolingual::struct2obj().
+ - Add tests for Property::struct2obj().
+ - Fix test for Mediainfo.
+ - Rewrite List::MoreUtils::none to List::Util.
+ - Update copyright years.
+
 0.13 2024-11-10T17:20:57+01:00
  - Add Value::Lexeme to Wikibase::Datatype::Struct doc.
  - Add flag 'add' => '' to Form and Sense as information to create Form or

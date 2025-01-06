@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use base 'Import::Export';
 
@@ -30,7 +30,7 @@ Term::ANSI::Sprintf - sprintf with ANSI colors
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =head1 SYNOPSIS
 
@@ -52,7 +52,7 @@ Version 0.05
 	%green
 	%yellow
 	%blue
-	%magento
+	%magenta
 	%cyan
 	%white
 
@@ -61,7 +61,7 @@ Version 0.05
 	%bright_green
 	%bright_yellow
 	%bright_blue
-	%bright_magento
+	%bright_magenta
 	%bright_cyan
 	%bright_white
 
@@ -69,14 +69,14 @@ Version 0.05
 	%black_on_green
 	%black_on_yellow
 	%black_on_blue
-	%black_on_magento
+	%black_on_magenta
 	%black_on_cyan
 	%black_on_white
 	%black_on_bright_red
 	%black_on_bright_green
 	%black_on_bright_yellow
 	%black_on_bright_blue
-	%black_on_bright_magento
+	%black_on_bright_magenta
 	%black_on_bright_cyan
 	%black_on_bright_white
 

@@ -1,5 +1,4 @@
 *.bak
-*.tar.gz
 *~
 .releaserc
 blib/

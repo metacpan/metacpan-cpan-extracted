@@ -4,7 +4,7 @@
       "Steven Schubiger <schubiger@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -31,7 +31,7 @@
             "DateTime::TimeZone" : "0",
             "Exporter" : "0",
             "Getopt::Long" : "0",
-            "List::MoreUtils" : "0",
+            "List::Util" : "1.33",
             "Params::Validate" : "1.15",
             "Scalar::Util" : "0",
             "Storable" : "0",
@@ -54,7 +54,7 @@
    "provides" : {
       "DateTime::Format::Natural" : {
          "file" : "lib/DateTime/Format/Natural.pm",
-         "version" : "1.18"
+         "version" : "1.19"
       },
       "DateTime::Format::Natural::Calc" : {
          "file" : "lib/DateTime/Format/Natural/Calc.pm",
@@ -122,6 +122,6 @@
          "url" : "https://github.com/stsc/DateTime-Format-Natural"
       }
    },
-   "version" : "1.18",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "1.19",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

@@ -17,14 +17,14 @@ use Carp qw(croak);
 use DateTime ();
 use DateTime::HiRes ();
 use DateTime::TimeZone ();
-use List::MoreUtils qw(all any none);
+use List::Util 1.33 qw(all any none);
 use Params::Validate ':all';
 use Scalar::Util qw(blessed);
 use Storable qw(dclone);
 
 use DateTime::Format::Natural::Utils qw(trim);
 
-our $VERSION = '1.18';
+our $VERSION = '1.19';
 
 validation_options(
     on_fail => sub
@@ -1012,6 +1012,7 @@ valuable suggestions and patches:
  Jim Avera
  Olaf Alders
  Karen Etheridge
+ Graham Ollis
 
 =head1 SEE ALSO
 

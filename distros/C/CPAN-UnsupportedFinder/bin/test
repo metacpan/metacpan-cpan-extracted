@@ -1,0 +1,24 @@
+#!/usr/bin/env perl
+
+use lib 'lib';
+
+use CPAN::UnsupportedFinder;
+
+my $finder = CPAN::UnsupportedFinder->new(verbose => 1);
+my $results = $finder->analyze('CGI-Info', 'Test-MockModule', 'Old-Unused-Module');
+
+for my $module (@$results) {
+    print "Unsupported Module: $module->{module}\n";
+    print "Failure Rate: $module->{failure_rate}\n";
+    print "Last Update: $module->{last_update}\n";
+}
+
+# Output results in JSON for CI
+# my $json_report = $finder->output_results($results, 'json');
+# print $json_report;
+
+# Output results in HTML for local debugging
+# my $html_report = $finder->output_results($results, 'html');
+# open my $fh, '>', 'report.html' or die "Cannot open file: $!";
+# print $fh $html_report;
+# close $fh;

@@ -47,10 +47,10 @@ t/22-warnings-bareword.t
 t/23-report-warnings.t
 t/24-only-report-warnings.t
 t/25-allowed_patterns.t
+t/26-test2-compat.t
+t/27-module-ordering.t
+t/28-redefine-done_testing.t
 t/lib/SilenceStderr.pm
-t/module-ordering.t
-t/redefine-done_testing.t
-t/test2-compat.t
 t/zzz-check-breaks.t
 xt/author/00-compile.t
 xt/author/distmeta.t

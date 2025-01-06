@@ -102,6 +102,7 @@ $hash{TEST_REQUIRES} = {
   'Test::More' => '0.88',
 };
 $hash{AUTHOR} = 'PerlDL Developers <pdl-general@lists.sourceforge.net>';
+$hash{LICENSE} = "perl";
 
 sub MY::postamble { pdlpp_postamble( $package ); }
 

@@ -1,4 +1,4 @@
-#!perl -T
+#!perl
 
 use strict;
 use warnings;
@@ -7,9 +7,9 @@ use Test::More tests => 4;
 
 my @warnings;
 BEGIN {
-   $SIG{__WARN__} = sub {
+   $SIG{ __WARN__ } = sub {
       push @warnings, $_[0];
-      print(STDERR $_[0]);
+      print( STDERR $_[0] );
    };
 }
 
@@ -22,17 +22,17 @@ sub data {
 
 {
    my @rv = sub { data() }->();
-   is(0+@rv, 3, "baseline");
+   is( 0+@rv, 3, "baseline" );
 }
 
 {
-   my @rv = sub { void(data()) }->();
-   is(0+@rv, 0, "With parens");
+   my @rv = sub { void( data() ) }->();
+   is( 0+@rv, 0, "With parens" );
 }
 
 {
    my @rv = sub { void data() }->();
-   is(0+@rv, 0, "Without parens");
+   is( 0+@rv, 0, "Without parens" );
 }
 
-ok(!@warnings, "no warnings");
+ok( !@warnings, "no warnings" );

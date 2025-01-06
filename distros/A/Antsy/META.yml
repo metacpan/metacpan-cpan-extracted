@@ -25,5 +25,5 @@ resources:
   bugtracker: https://github.com/briandfoy/antsy/issues
   homepage: https://github.com/briandfoy/antsy
   repository: https://github.com/briandfoy/antsy
-version: '0.905'
+version: '0.906'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

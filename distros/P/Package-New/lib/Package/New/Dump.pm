@@ -3,7 +3,7 @@ use base qw{Package::New};
 use strict;
 use warnings;
 
-our $VERSION='0.08';
+our $VERSION='0.10';
 
 =head1 NAME
 
@@ -54,20 +54,9 @@ sub dump {
   }
 }
 
-=head1 BUGS
-
-Log on RT and contact the author.
-
-=head1 SUPPORT
-
-DavisNetworks.com provides support services for all Perl applications including this package.
-
 =head1 AUTHOR
 
   Michael R. Davis
-  CPAN ID: MRDVT
-  DavisNetworks.com
-  http://www.DavisNetworks.com/
 
 =head1 COPYRIGHT
 

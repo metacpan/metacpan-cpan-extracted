@@ -1,7 +1,7 @@
 package Chemistry::OpenSMILES::Writer;
 
 # ABSTRACT: OpenSMILES format writer
-our $VERSION = '0.10.0'; # VERSION
+our $VERSION = '0.11.0'; # VERSION
 
 use strict;
 use warnings;
@@ -105,7 +105,7 @@ sub write_SMILES
 
         # Dealing with chirality
         for my $atom (@chiral) {
-            next unless $atom->{chirality} =~ /^@(@?|SP[123]|TB1?[1-9]|TB20)$/;
+            next unless $atom->{chirality} =~ /^@(@?|SP[123]|TB1?[1-9]|TB20|OH[1-9]|OH[12][0-9]|OH30)$/;
 
             my @neighbours = $graph->neighbours($atom);
             my $has_lone_pair;
@@ -202,6 +202,7 @@ sub write_SMILES
                     $chirality_now = _trigonal_bipyramidal_chirality( @order_new, $chirality_now );
                 } else {
                     # Octahedral centers
+                    $chirality_now = _octahedral_chirality( @order_new, $chirality_now );
                 }
             }
 
@@ -397,83 +398,123 @@ sub _square_planar_chirality
 sub _trigonal_bipyramidal_chirality
 {
     my $chirality = pop @_;
-    my @order = @_;
+    my @target = @_;
 
-    $chirality = int substr $chirality, 3;
-    my $TB = $TB[$chirality - 1];
-    my @axis = map { $_ - 1 } @{$TB->{axis}};
-    my $order = $TB->{order};
-    my $opposite = 1 + first { $TB[$_]->{axis}[0] == $TB->{axis}[0] &&
-                               $TB[$_]->{axis}[1] == $TB->{axis}[1] &&
-                               $TB[$_]->{order}   ne $TB->{order} } 0..$#TB;
-
-    if( ($order[$axis[0]] == $axis[0] && $order[$axis[1]] == $axis[1]) ||
-        ($order[$axis[0]] == $axis[1] && $order[$axis[1]] == $axis[0]) ) {
-        # Axis is the same or inverted
-        @order = grep { $_ != $axis[0] && $_ != $axis[1] } @order;
-        while( $order[0] != min @order ) {
-            push @order, shift @order;
-        }
-        if( $order[$axis[0]] == $axis[1] && $order[$axis[1]] == $axis[0] ) {
-            ( $chirality, $opposite ) = ( $opposite, $chirality );
-        }
-        return '@TB' . $chirality if $order[1] < $order[2];
-        return '@TB' . $opposite;
-    } else {
-        # Axis has changed
-        my @axis_now = ( (first { $order[$_] == $axis[0] } 0..4),
-                         (first { $order[$_] == $axis[1] } 0..4) );
-        $chirality = 1 +  first { $TB[$_]->{axis}[0] == $axis_now[0] + 1 &&
-                                  $TB[$_]->{axis}[1] == $axis_now[1] + 1 &&
-                                  $TB[$_]->{order}   eq $order } 0..$#TB;
-        $opposite  = 1 +  first { $TB[$_]->{axis}[0] == $axis_now[0] + 1 &&
-                                  $TB[$_]->{axis}[1] == $axis_now[1] + 1 &&
-                                  $TB[$_]->{order}   ne $order } 0..$#TB;
-        @order = grep { $_ != $axis_now[0] && $_ != $axis_now[1] } @order;
-        while( $order[0] != min @order ) {
-            push @order, shift @order;
-        }
-        return '@TB' . $chirality if $order[1] < $order[2];
-        return '@TB' . $opposite;
+    if( join( ',', sort @target ) ne '0,1,2,3,4' ) {
+        die '_trigonal_bipyramidal_chirality() accepts only permutations of ' .
+            "numbers '0', '1', '2', '3' and '4', unexpected input received";
     }
+
+    $chirality =~ s/^\@TB//;
+    $chirality = int $chirality;
+
+    my $TB = $TB[$chirality - 1];
+
+    # First on, decode the source.
+    # Axis will stay on @axis, and sides will be stored on @sides
+    my @axis  = map { $_ - 1 } @{$TB->{axis}};
+    my @sides = grep { $_ != $axis[0] && $_ != $axis[1] } 0..4;
+
+    # Find the new location of the axis, remove it from @target
+    my @axis_location = ( ( first { $target[$_] == $axis[0] } 0..4 ),
+                          ( first { $target[$_] == $axis[1] } 0..4 ) );
+    @target = grep { $_ != $axis[0] && $_ != $axis[1] } @target;
+
+    # Invert the axis if needed
+    if( $axis_location[0] > $axis_location[1] ) {
+        @axis_location = reverse @axis_location;
+        @target        = reverse @target;
+    }
+
+    # Cycle the sides clockwise until the first is aligned
+    while( $sides[0] != $target[0] ) {
+        push @sides, shift @sides;
+    }
+    my $order = $TB->{order};
+    $order = $order eq '@' ? '@@' : '@' unless $sides[1] == $target[1];
+
+    $chirality = 1 + first { $TB[$_]->{order} eq $order &&
+                             $TB[$_]->{axis}[0] == $axis_location[0] + 1 &&
+                             $TB[$_]->{axis}[1] == $axis_location[1] + 1 }
+                           0..$#TB;
+    return '@TB' . $chirality;
 }
 
 sub _octahedral_chirality
 {
     my $chirality = pop @_;
-    my @order = @_;
+    my @target = @_;
 
-    $chirality = int substr $chirality, 3;
-    my $OH = $OH[$chirality - 1];
-    my $shape = $OH->{shape};
-    my @axis = map { $_ - 1 } @{$OH->{axis}};
-    my $order = $OH->{order};
-
-    if( ($order[$axis[0]] == $axis[0] && $order[$axis[1]] == $axis[1]) ||
-        ($order[$axis[0]] == $axis[1] && $order[$axis[1]] == $axis[0]) ) {
-        # Axis is the same or inverted
-        my $SP = _square_planar_chirality( (map { $_ - 1 } @order), $shape_to_SP{$shape} );
-        # If axis is inverted, direction has to be inverted as well
-        # CHECKME: Does the change of shape affect direction?
-        if( $order[$axis[0]] == $axis[1] && $order[$axis[1]] == $axis[0] ) {
-            $order = $order eq '@' ? '@@' : '@';
-        }
-        $chirality = 1 + first { $OH[$_]->{shape} eq $SP_to_shape{$SP} &&
-                                 $OH[$_]->{axis}[0] == 1 && $OH[$_]->{axis}[1] == 6 &&
-                                 $OH[$_]->{order} eq $order } 0..$#OH;
-        return '@OH' . $chirality;
-    } else {
-        # Axis has changed
-        my @axes = ( \@axis );
-        my @remaining_numbers = grep { $_ != $axis[0] && $_ != $axis[1] } 0..5;
-        @remaining_numbers = map { $remaining_numbers[$_] } ( 0, 3, 1, 2 ) if $shape eq '4';
-        @remaining_numbers = map { $remaining_numbers[$_] } ( 0, 1, 3, 2 ) if $shape eq 'Z';
-        @remaining_numbers = reverse @remaining_numbers if $order eq '@@';
-        # TODO: Change of axis direction inverts the sign.
-        # TODO: When axis A is replaced by axis B, axis C remains unchanged.
-        # TODO: If axis change is to @, A is left untouched, replaces B.
-        # TODO: If axis change is to @@, A is inverted, replaces B.
+    if( join( ',', sort @target ) ne '0,1,2,3,4,5' ) {
+        die '_octahedral_chirality() accepts only permutations of ' .
+            "numbers '0', '1', '2', '3', '4' and '5, unexpected input received";
     }
+
+    $chirality =~ s/^\@OH//;
+    $chirality = int $chirality;
+
+    # First on, decode the source.
+    # Axis will stay on @axis, and sides will be stored on @sides in contiguous clockwise order.
+    my @axis  = map { $_ - 1 } @{$OH[$chirality-1]->{axis}};
+    my @sides = grep { $_ != $axis[0] && $_ != $axis[1] } 0..5;
+
+    if( $OH[$chirality-1]->{shape} eq 'Z' ) {
+        ( $sides[2], $sides[3] ) = ( $sides[3], $sides[2] );
+    }
+
+    if( $OH[$chirality-1]->{shape} eq '4' ) {
+        ( $sides[0], $sides[3] ) = ( $sides[3], $sides[0] );
+    }
+
+    # Adjust for enumeration direction
+    @sides = reverse @sides if $OH[$chirality-1]->{order} eq '@';
+
+    # Align the axis start
+    if(      $axis[0] == $target[0] ) { # same axis start, do nothing
+    } elsif( $axis[1] == $target[0] ) { # axis inversion
+        @axis  = reverse @axis;
+        @sides = reverse @sides;
+    } else { # axis start at one of the sides
+        my $axis_index = first { $sides[$_] == $target[0] } 0..3;
+        my @axis_now = ( $sides[$axis_index], $sides[($axis_index + 2) % 4] );
+        ( $sides[$axis_index], $sides[($axis_index + 2) % 4] ) = reverse @axis;
+        @axis = @axis_now;
+    }
+
+    shift @target; # axis start is no longer needed
+    my $axis_end = first { $target[$_] == $axis[1] } 0..4;
+    @target = map { $target[$_] } grep { $_ != $axis_end } 0..4; # remove axis end
+
+    # Cycle the sides clockwise until the first is aligned
+    while( $sides[0] != $target[0] ) {
+        push @sides, shift @sides;
+    }
+    shift @sides;
+    shift @target;
+
+    # Check the alignment of the other sides to find the shape and order
+    my $shape;
+    my $order;
+    if(      $target[0] == $sides[0] && $target[1] == $sides[1] ) {
+        ( $shape, $order ) = ( 'U', '@@' );
+    } elsif( $target[0] == $sides[0] && $target[1] == $sides[2] ) {
+        ( $shape, $order ) = ( 'Z', '@@' );
+    } elsif( $target[0] == $sides[1] && $target[1] == $sides[0] ) {
+        ( $shape, $order ) = ( '4', '@' );
+    } elsif( $target[0] == $sides[1] && $target[1] == $sides[2] ) {
+        ( $shape, $order ) = ( '4', '@@' );
+    } elsif( $target[0] == $sides[2] && $target[1] == $sides[0] ) {
+        ( $shape, $order ) = ( 'Z', '@' );
+    } elsif( $target[0] == $sides[2] && $target[1] == $sides[1] ) {
+        ( $shape, $order ) = ( 'U', '@' );
+    } else {
+        die 'unexpected situation achieved in _octahedral_chirality()';
+    }
+    $chirality = 1 + first { $OH[$_]->{shape}   eq $shape &&
+                             $OH[$_]->{order}   eq $order &&
+                             $OH[$_]->{axis}[1] == $axis_end + 2 }
+                           0..$#OH;
+    return '@OH' . $chirality;
 }
 
 sub _order

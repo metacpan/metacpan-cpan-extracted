@@ -1,5 +1,37 @@
 # -*- mode: org; -*-
 
+* TODO [2024-12-21 Sat] Geometry
+  - It would be nice to be able to set the origin of the unit cell in geometry
+  - It would be nice to have functions to map from pixel to cartesian
+    coordinates and back in geometry
+* TODO [2024-12-11 Wed] Documentation
+  Should complete and verify documentation. For example, routines ST
+  are not documented yet.
+* TODO [2024-12-07 Sat] P::WE::R2::...
+  Make a new version of P::WE::R2 in which the metric is not g, but
+  g^dagger. This would make B g->g^dager B g Hermitian even if the
+  host epsilon_A is dissipative, and the code would be simpler. The
+  Haydock coefficients a_n, b_n would be complex, but there would be no need
+  for the signs g_n.
+* TODO [2024-12-06 Fri] Vectors2DList or Geometry
+  Vectors 2D list should base the vectors on the actual coordinates,
+  not in the index coordinates, i.e., it should use the r attribute
+  from the geometry. Otherwise, it couldn't be used for non-orthogonal
+  coordinates. Or instead, add routines to P::Roles::Geometry to
+  convert from pixel to real space (or reciprocal) coordinates and back.
+* TODO [2024-12-05 Thu] Immutability
+  Immutable objects that return a pdl may be silently changed if the
+  pdl itself is changed. It must be fixed, but I don't know what is
+  the best way.
+* DONE Field modifies silently haydock coefficients
+  - [2024-12-04 Wed] We found P::LE::NR2::Field uses cgtsv, a routine that modifies its
+    arguments. We used to pass a subdiagonal and supradiagonal which are
+    both given by the b coefficients. We used the same ndarray, so when
+    the subdiagonal is modified, the supradiagonal is erroneously
+    modified. The results were wrong.
+  - [2025-01-05 Sun] Modified Utils::cgtsv so that it takes care of
+    copying the arrays that get modified
+* TODO [2024-11-01 Fri] It seems WE::S::Green doesn't compute antisymmetric part. Fix and test.
 * DONE [2021-09-30 Sun] Add example/test with non Cartesian coordinates
 * TODO [2021-09-25 Sat] Check if it is clear that complexCoeffs is equivalent to non is_hermitian
 * DONE Return as, bs, b2s as pdl instead of array?
@@ -10,6 +42,7 @@
 * DONE Relax need for odd dimensions
 * TODO Merge exact surface SHG calculation with current surface calculation.
 * TODO Write and publish paper.
+  Wrote a contribution to Science Perl, to appear in 2025.
 * DONE Allow non-orthogonal unit vectors
 * DONE Allow saving states for reorthogonalization and reinitialization
   Done for reorthogonalization. Reinitialization pending.

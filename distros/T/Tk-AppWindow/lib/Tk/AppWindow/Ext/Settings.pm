@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Tk;
 use vars qw($VERSION);
-$VERSION="0.18";
+$VERSION="0.19";
 
 use base qw( Tk::AppWindow::BaseClasses::Extension );
 
@@ -266,7 +266,7 @@ sub GetUserOptions {
 			shift @options;
 			next;
 		}
-		next if (($key eq '*end') or ($key eq '*column') or ($key eq '*expand'));
+		next if (($key eq '*end') or ($key eq '*column') or ($key eq '*expand') or ($key eq '*frame'));
 		shift @options;
 		$usopt{$key} = $self->configGet($key);
 	}
@@ -299,7 +299,7 @@ sub LoadSettings {
 			shift @temp;
 			next;
 		}
-		next if (($key eq '*end') or ($key eq '*column') or ($key eq '*expand'));
+		next if (($key eq '*end') or ($key eq '*column') or ($key eq '*expand') or ($key eq '*frame'));
 		shift @temp;
 		$useroptions{$key} = 1;
 	}

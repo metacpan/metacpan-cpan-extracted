@@ -11,6 +11,7 @@ $repo = "PDLPorters/$repo";
 WriteMakefile(
   NAME => $package_name,
   AUTHOR => 'PerlDL Developers <pdl-general@lists.sourceforge.net>',
+  LICENSE=> "perl",
   VERSION_FROM => 'HDF.pm',
   CONFIGURE_REQUIRES => {
     'ExtUtils::MakeMaker' => 0,

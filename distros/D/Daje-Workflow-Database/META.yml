@@ -26,14 +26,15 @@ no_index:
 provides:
   Daje::Workflow::Database:
     file: lib/Daje/Workflow/Database.pm
-    version: '0.08'
+    version: '0.12'
 requires:
   Mojo::Base: '0'
+  Mojo::Loader: '0'
   Mojo::Pg: '0'
 resources:
   bugtracker: https://github.com/janeskil1525/Daje-Workflow-Database/issues
   homepage: https://github.com/janeskil1525/Daje-Workflow-Database
   repository: https://github.com/janeskil1525/Daje-Workflow-Database.git
-version: '0.08'
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

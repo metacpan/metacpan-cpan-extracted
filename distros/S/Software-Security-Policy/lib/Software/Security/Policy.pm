@@ -3,7 +3,7 @@ use warnings;
 package Software::Security::Policy;
 # ABSTRACT: packages that provide templated Security Policys
 
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 use Data::Section -setup => { header_re => qr/\A__([^_]+)__\Z/ };
 use Text::Template ();
@@ -18,7 +18,14 @@ sub new {
 }
 
 
-sub url { $_[0]->{url} || 'SECURITY.md' }
+sub url { (defined $_[0]->{url} ? $_[0]->{url} :
+            (defined $_[0]->{git_url} ? $_[0]->{git_url} :
+                'SECURITY.md')) }
+
+sub git_url { (defined $_[0]->{git_url} ? $_[0]->{git_url} :
+            (defined $_[0]->{url} ? $_[0]->{url} :
+                'SECURITY.md')) }
+
 
 sub support_years { $_[0]->{support_years} || '10'}
 
@@ -93,15 +100,24 @@ Software::Security::Policy - packages that provide templated Security Policys
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
+  use strict;
+  use warnings;
+
+  use Software::Security::Policy::Individual;
+
   my $policy = Software::Security::Policy::Individual->new({
-    maintainer => 'security@example.com',
+    maintainer  => 'Timothy Legge <timlegge@gmail.com>',
+    program     => 'Software::Security::Policy',
+    timeframe   => '7 days',
+    url         => 'https://github.com/CPAN-Security/Software-Security-Policy/blob/main/SECURITY.md',
+    support_years   => '10',
   });
 
-  print $output_fh $policy->fulltext;
+  print $policy->fulltext, "\n";
 
 =head1 METHODS
 
@@ -144,6 +160,10 @@ Only used if timeframe is undefined and timeframe_quantity is defined
 =item url
 
 a url where the most current security policy can be found.
+
+=item git_url
+
+a git url where the most current security policy can be found.
 
 =item support_years
 
@@ -210,6 +230,12 @@ This method returns the URL at which a canonical text of the security policy can
 found, if one is available.  If possible, this will point at plain text, but it
 may point to an HTML resource.
 
+=head2 git_url
+
+This method returns the git URL at which a canonical text of the security policy can be
+found, if one is available.  If possible, this will point at plain text, but it
+may point to an HTML resource.
+
 =head2 summary
 
 This method returns a snippet of text, usually a few lines, indicating the
@@ -239,6 +265,8 @@ Extra policys are maintained on CPAN in separate modules.
 
 =head1 COPYRIGHT
 
+This software is copyright (c) 2024-2025 by Timothy Legge <timlegge@gmail.com>.
+
 This module is based extensively on Software::License.  Only the
 changes required for this module are attributable to the author of
 this module.  All other code is attributable to the author of
@@ -250,7 +278,7 @@ Timothy Legge <timlegge@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Timothy Legge <timlegge@gmail.com>.
+This software is copyright (c) 2025 by Timothy Legge <timlegge@gmail.com>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -2,13 +2,13 @@ use strict;
 use warnings;
 package Software::Security::Policy::Individual;
 
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 use parent 'Software::Security::Policy';
 # ABSTRACT: The Individual Security Policy
 
 sub name { 'individual' }
-sub version {'0.1.8' }
+sub version {'1.0.0' }
 
 1;
 
@@ -22,7 +22,7 @@ Software::Security::Policy::Individual - The Individual Security Policy
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 AUTHOR
 
@@ -30,7 +30,7 @@ Timothy Legge <timlegge@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Timothy Legge <timlegge@gmail.com>.
+This software is copyright (c) 2025 by Timothy Legge <timlegge@gmail.com>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -44,22 +44,24 @@ __SUMMARY__
 Report issues via email at: {{ $self->maintainer }}.
 
 __SECURITY-POLICY__
-This is the Security Policy for the {{ $self->program }} distribution.
+This is the Security Policy for the Perl {{ $self->program }} distribution.
 
-The latest version of this Security Policy can be found on the
-{{ $self->program }} website at {{ $self->url }}
+The latest version of the Security Policy can be found in the
+[git repository for {{ $self->program }}]({{ $self->git_url }}).
 
 This text is based on the CPAN Security Group's Guidelines for Adding
-a Security Policy to Perl Distributions (version 0.1.8)
+a Security Policy to Perl Distributions (version 1.0.0)
 https://security.metacpan.org/docs/guides/security-policy-for-authors.html
 
 # How to Report a Security Vulnerability
 
 Security vulnerabilities can be reported by e-mail to the current
-project maintainers at {{ $self->maintainer }}
+project maintainers at {{ $self->maintainer }}.
 
 Please include as many details as possible, including code samples
-or test cases, so that we can reproduce the issue.
+or test cases, so that we can reproduce the issue.  Check that your
+report does not expose any sensitive data, such as passwords,
+tokens, or personal information.
 
 If you would like any help with triaging the issue, or if the issue
 is being actively exploited, please copy the report to the CPAN
@@ -82,7 +84,7 @@ on the CPANSec website.
 The maintainer(s) aim to acknowledge your security report as soon as
 possible.  However, this project is maintained by a single person in
 their spare time, and they cannot guarantee a rapid response.  If you
-have not received a response from the them within {{ $self->timeframe }}, then
+have not received a response from them within {{ $self->timeframe }}, then
 please send a reminder to them and copy the report to CPANSec at
 <cpan-security@security.metacpan.org>.
 
@@ -97,7 +99,7 @@ modules or downstream software that uses this software.
 
 They may also forward this issue to CPANSec.
 
-# Which Software this Policy Applies to
+# Which Software This Policy Applies To
 
 Any security vulnerabilities in {{ $self->program }} are covered by this policy.
 

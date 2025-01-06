@@ -45,7 +45,6 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Import::Into" : "0",
             "PadWalker" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Pod::Wordlist" : "0",
@@ -72,14 +71,10 @@
             "Carp" : "0",
             "Exporter" : "0",
             "Test::Builder" : "0",
-            "base" : "0",
             "parent" : "0",
             "perl" : "5.006",
             "strict" : "0",
             "warnings" : "0"
-         },
-         "suggests" : {
-            "Import::Into" : "0"
          }
       },
       "test" : {
@@ -186,11 +181,11 @@
    "provides" : {
       "Test2::Warnings" : {
          "file" : "lib/Test2/Warnings.pm",
-         "version" : "0.036"
+         "version" : "0.037"
       },
       "Test::Warnings" : {
          "file" : "lib/Test/Warnings.pm",
-         "version" : "0.036"
+         "version" : "0.037"
       }
    },
    "release_status" : "stable",
@@ -208,7 +203,7 @@
       "x_IRC" : "irc://irc.perl.org/#perl-qa",
       "x_MailingList" : "http://lists.perl.org/list/perl-qa.html"
    },
-   "version" : "0.036",
+   "version" : "0.037",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.041007"
@@ -1045,7 +1040,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.036",
+                  "tag" : "v0.037",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },
@@ -1223,8 +1218,7 @@
                   ],
                   "modules" : [
                      "Test::Tester",
-                     "PadWalker",
-                     "Import::Into"
+                     "PadWalker"
                   ],
                   "modules_from_features" : null,
                   "to_relationship" : "suggests"

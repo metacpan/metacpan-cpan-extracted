@@ -1,5 +1,8 @@
 Revision history for Perl module String::ProperCase::Surname
 
+0.04 2025-01-05
+  - Moved from private repo to GitHub
+
 0.03 2012-08-21
   - Added DeLuke surname
   - Added RPM spec file

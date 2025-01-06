@@ -1,0 +1,30 @@
+runtime:
+  requires:
+    perl: '5.008001'
+    Carp: 0
+    Class::Tiny::Chained: 0
+    Crypt::URandom: '0.37'
+    Digest::SHA: 0
+    List::Util: '1.33'
+    Module::Runtime: 0
+    Role::Tiny: '2.000000'
+    Scalar::Util: 0
+    URI: '1.28'
+    URI::Escape: '3.26'
+    WWW::Form::UrlEncoded: '0.23'
+  recommends:
+    WWW::Form::UrlEncoded::XS: '0.23'
+test:
+  requires:
+    Data::Dumper: 0
+    JSON::PP: 0
+    Test::More: '0.88'
+    Test::Needs: 0
+develop:
+  requires:
+    HTTP::Request: 0
+    HTTP::Tiny: '0.014'
+    LWP::UserAgent: 0
+    Test::TCP: 0
+  recommends:
+    Mojolicious: '7.54'

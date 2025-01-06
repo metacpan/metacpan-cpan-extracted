@@ -21,5 +21,5 @@ no_index:
 requires:
   Import::Export: '1.00'
   perl: '5.006'
-version: '0.05'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+version: '0.06'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,9 @@
 Revision history for Test-Warnings
 
+0.037     2025-01-05 20:38:16Z
+          - remove unneeded use of Import::Into
+          - fix tests that invoke Test::Warnings->import directly
+
 0.036     2025-01-03 18:30:28Z
           - avoid redefinition warnings when $^W is enabled in tests
             (RT#158297)

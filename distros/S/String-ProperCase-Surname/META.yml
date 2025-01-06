@@ -1,16 +1,26 @@
---- #YAML:1.0
-name:                String-ProperCase-Surname
-version:             0.03
-abstract:            Converts Surnames to Proper Case
-license:             ~
-author:              
-    - Michael R. Davis (mdavis@stopllc.com)
-generated_by:        ExtUtils::MakeMaker version 6.42
-distribution_type:   module
-requires:     
-    strict:                        0
-    Test::Simple:                  0.44
-    warnings:                      0
+---
+abstract: 'Converts Surnames to Proper Case'
+author:
+  - 'Michael R. Davis'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150001'
+license: bsd
 meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
-    version: 1.3
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: String-ProperCase-Surname
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Test::Simple: '0.44'
+resources:
+  bugtracker: https://github.com/mrdvt92/perl-String-ProperCase-Surname/issues
+  homepage: https://github.com/mrdvt92/perl-String-ProperCase-Surname
+  repository: https://github.com/mrdvt92/perl-String-ProperCase-Surname.git
+version: '0.04'

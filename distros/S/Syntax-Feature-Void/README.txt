@@ -9,22 +9,19 @@ INSTALLATION
 
 To install this module, run the following commands:
 
-   perl Build.PL
-   ./Build
-   ./Build test
-   ./Build install
+    perl Makefile.PL
+    make
+    make test
+    make install
 
 
 DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-    Perl 5.14.0
-    Module::Build 0.36_14       (For installation only)
+    ExtUtils::MakeMaker 6.74    (For installation only)
     Software::License::CC0_1_0  (For installation only)
     Test::More                  (For testing only)
-    Devel::CallParser
-    Lexical::Sub
     strict
     syntax 0.004
     version
@@ -32,29 +29,19 @@ This module requires these other modules and libraries:
     warnings
 
 
-SUPPORT AND DOCUMENTATION
+DOCUMENTATION
 
 After installing, you can find documentation for this module with the
 perldoc command.
 
     perldoc Syntax::Feature::Void
 
-You can also look for information at:
+You can also find it online at this location:
 
-    RT, CPAN's request tracker
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Syntax-Feature-Void
-
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/Syntax-Feature-Void
-
-    CPAN Ratings
-        http://cpanratings.perl.org/d/Syntax-Feature-Void
-
-    Search CPAN
-        http://search.cpan.org/dist/Syntax-Feature-Void
+    https://metacpan.org/dist/Syntax-Feature-Void
 
 
-COPYRIGHT AND LICENCE
+COPYRIGHT AND LICENSE
 
 No rights reserved.
 

@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
 	'Rope' => 0,
 	'Imager' => 0,
 	'Type::Tiny' => 0,
-     	'Ascii::Text' => 0,
+     	'Ascii::Text' => 0.20,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Ascii-Text-Image-*' },

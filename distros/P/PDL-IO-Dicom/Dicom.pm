@@ -45,7 +45,7 @@ use PDL::IO::Misc;
 use Exporter;
 our @ISA = qw( Exporter ); 
 our @EXPORT = qw( rdcm );
-our $VERSION = '2.097';
+our $VERSION = '2.098';
 
 my $debug = 0;
 

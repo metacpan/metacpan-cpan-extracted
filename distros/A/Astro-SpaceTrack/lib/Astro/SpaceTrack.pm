@@ -131,7 +131,7 @@ use Exporter;
 
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.167';
+our $VERSION = '0.168';
 our @EXPORT_OK = qw{
     shell
 
@@ -245,7 +245,7 @@ use constant CELESTRAK_API_OPTIONS	=> [
 ];
 
 use constant CELESTRAK_OPTIONS	=> [
-    @{ CLASSIC_RETRIEVE_OPTIONS() },	# TODO deprecate and remove
+    # @{ CLASSIC_RETRIEVE_OPTIONS() },	# TODO deprecate and remove
     @{ CELESTRAK_API_OPTIONS() },
 ];
 
@@ -336,6 +336,26 @@ my %catalogs = (	# Catalog names (and other info) for each source.
 	eutelsat	=> { name => 'Eutelsat' },
     },
     celestrak_supplemental => {
+	# Removed 2024-12-27
+	# Added back 2024-12-29
+	ast		=> {
+	    name	=> 'AST Space Mobile',
+	    rms		=> 1,
+	    match	=> 1,
+	},
+	# Removed 2024-12-27
+	# Added back 2024-12-29
+	cpf		=> {
+	    name	=> 'CPF (no match data)',
+	    # source	=> 'CPF',
+	    rms		=> 1,
+	},
+	# Removed 2024-12-27
+	# Added back 2024-12-29
+	css		=> {
+	    name	=> 'CSS (no match data)',
+	    rms		=> 1,
+	},
 	gps		=> {
 	    name	=> 'GPS Operational',
 	    # source	=> 'GPS-A',
@@ -347,6 +367,19 @@ my %catalogs = (	# Catalog names (and other info) for each source.
 	    # source	=> 'GLONASS-RE',
 	    rms		=> 1,
 	    match	=> 1,
+	},
+	iridium		=> {
+	    name	=> 'Iridium Next',
+	    # source	=> 'Iridium-E',
+	    rms		=> 1,
+	    match	=> 1,
+	},
+	# Removed 2024-12-27
+	# Added back 2024-12-29
+	iss		=> {
+	    name	=> 'ISS (from NASA, no match data)',
+	    # source	=> 'ISS-E',
+	    rms		=> 1,
 	},
 	# Removed 2024-01-12
 	#meteosat	=> {
@@ -361,6 +394,29 @@ my %catalogs = (	# Catalog names (and other info) for each source.
 	    rms		=> 1,
 	    match	=> 1,
 	},
+	# Removed 2024-12-27
+	# Added back 2024-12-29
+	kuiper		=> {
+	    name	=> 'Project Kuiper (Amazon; no match data)',
+	    rms		=> 1,
+	},
+	oneweb		=> {
+	    name	=> 'OneWeb',
+	    # source	=> 'OneWeb-E',
+	    rms		=> 1,
+	    match	=> 1,
+	},
+	# Removed 2024-12-25
+	#orbcomm		=> {
+	#    name	=> 'Orbcomm (no RMS or match data)',
+	#    # source	=> 'Orbcomm-TLE',
+	#},
+	planet		=> {
+	    name	=> 'Planet (no, not Mercury etc)',
+	    # source	=> 'Planet-E',
+	    rms		=> 1,
+	    match	=> 1,
+	},
 	# Removed 2024-04-26
 	# Added back 2024-05-23
 	ses		=> {
@@ -369,56 +425,15 @@ my %catalogs = (	# Catalog names (and other info) for each source.
 	    rms		=> 1,
 	    match	=> 1,
 	},
-	telesat		=> {
-	    name	=> 'Telesat',
-	    # source	=> 'Telesat-E',
-	    rms		=> 1,
-	    match	=> 1,
-	},
-	orbcomm		=> {
-	    name	=> 'Orbcomm (no RMS or match data)',
-	    # source	=> 'Orbcomm-TLE',
-	},
-	iss		=> {
-	    name	=> 'ISS (from NASA, no match data)',
-	    # source	=> 'ISS-E',
-	    rms		=> 1,
-	},
-	cpf		=> {
-	    name	=> 'CPF (no match data)',
-	    # source	=> 'CPF',
-	    rms		=> 1,
-	},
 	starlink	=> {
 	    name	=> 'Starlink',
 	    # source	=> 'SpaceX-E',
 	    rms		=> 1,
 	    match	=> 1,
 	},
-	oneweb		=> {
-	    name	=> 'OneWeb',
-	    # source	=> 'OneWeb-E',
-	    rms		=> 1,
-	    match	=> 1,
-	},
-	planet		=> {
-	    name	=> 'Planet (no, not Mercury etc)',
-	    # source	=> 'Planet-E',
-	    rms		=> 1,
-	    match	=> 1,
-	},
-	iridium		=> {
-	    name	=> 'Iridium Next',
-	    # source	=> 'Iridium-E',
-	    rms		=> 1,
-	    match	=> 1,
-	},
-	kuiper		=> {
-	    name	=> 'Project Kuiper (Amazon; no match data)',
-	    rms		=> 1,
-	},
-	ast		=> {
-	    name	=> 'AST Space Mobile',
+	telesat		=> {
+	    name	=> 'Telesat',
+	    # source	=> 'Telesat-E',
 	    rms		=> 1,
 	    match	=> 1,
 	},
@@ -454,12 +469,13 @@ my %catalogs = (	# Catalog names (and other info) for each source.
 	    spacetrack_type	=> 'quicksat',
 	    url		=> 'https://www.mmccants.org/programs/qsmag.zip',
 	},
-	rcs	=> {
-	    name	=> 'McCants-format RCS data (404 2024-04-27)',
-	    member	=> undef,	# rcs
-	    spacetrack_type	=> 'rcs.mccants',
-	    url		=> 'https://www.mmccants.org/catalogs/rcs.zip',
-	},
+	# Removed 2024-12-29.
+	#rcs	=> {
+	#    name	=> 'McCants-format RCS data (404 2024-04-27)',
+	#    member	=> undef,	# rcs
+	#    spacetrack_type	=> 'rcs.mccants',
+	#    url		=> 'https://www.mmccants.org/catalogs/rcs.zip',
+	#},
 	vsnames	=> {
 	    name	=> 'Molczan-format magnitude file (visual only)',
 	    member	=> undef,	# vsnames
@@ -1211,10 +1227,6 @@ If this method succeeds, the response will contain headers
 These can be accessed by C<< $st->content_type( $resp ) >> and
 C<< $st->content_source( $resp ) >> respectively.
 
-You can specify the C<retrieve()> options on this method as well, but
-they are deprecated and will produce a fatal error if used. In the first
-release after October 27 2024 all code for these will be removed.
-
 =cut
 
 # Called dynamically
@@ -1234,8 +1246,8 @@ sub celestrak {
 	HTTP_PRECONDITION_FAILED,
 	'No catalog name specified' );
 
-    $self->_deprecation_notice( celestrak => $name );
-    $self->_deprecation_notice( celestrak => "--$_" ) foreach sort keys %{ $opt };
+    # $self->_deprecation_notice( celestrak => $name );
+    # $self->_deprecation_notice( celestrak => "--$_" ) foreach sort keys %{ $opt };
 
     my $query;
     ref( $query = $self->_celestrak_validate_query(
@@ -1368,15 +1380,20 @@ C<--query> are invalid.
 
 Valid catalog names are:
 
- cpf: CPF TLEs
- glonass: Glonass satellites
- gps: GPS satellites
- intelsat: Intelsat satellites
- iss: ISS (from NASA, no rms data
- meteosat: Meteosat satellites
- orbcomm: Orbcomm satellites (no RMS data)
- ses: SES satellites
- starlink Starlink TLEs
+ ast      AST Space Mobile
+ cpf      CPF (no match data)
+ css      CSS (no match data)
+ glonass  Glonass satellites
+ gps      GPS satellites
+ intelsat Intelsat satellites
+ iridium  Iridium Next
+ iss      ISS (from NASA, no match data)
+ kuiper   Project Kuiper (Amazon; no match data)
+ oneweb   OneWeb
+ planet   Planet (no, not Mercury etc.)
+ ses      SES satellites
+ starlink Starlink
+ telesat  Telesat
 
 You can specify options as either command-type options (e.g.
 C<< celestrak_supplemental( '-file', 'foo.dat' ) >>) or as a leading
@@ -2139,10 +2156,6 @@ The following commands are defined:
       addendum = extra text for the shell () banner;
       banner = false to supress the shell () banner;
       cookie_expires = Perl date the session cookie expires;
-      direct = true to fetch orbital elements directly
-        from a redistributer. Currently this only affects the
-        celestrak() method. The default is true, and it is
-        deprecated.
       filter = true supresses all output to stdout except
         orbital elements;
       identity = load username and password from identity file
@@ -2900,13 +2913,7 @@ catalog names are:
  integrated: Integrated TLE file (inttles.zip)
  mcnames: Molczan-format magnitude file (mcnames.zip)
  quicksat: Quicksat-format magnitude file (qsmag.zip)
- rcs: McCants-format RCS file (rcs.zip) -- 404 as of 2024-04-27
  vsnames: Molczan-format magnitudes of visual bodies (vsnames.zip)
-
-The C<'rcs'> catalog was missing as of April 27 2024. Obviously I can
-not provide missing data. This catalog is deprecated immediately, and
-will be removed in the first release after November 1 2024. On the other
-hand, if it shows up again in that time, forget I said any of this.
 
 You can specify options as either command-type options (e.g. C<<
 mccants( '-file', 'foo.dat', ... ) >>) or as a leading hash reference
@@ -5140,11 +5147,11 @@ sub _check_cookie_generic {
     my %deprecate = (
 	celestrak => {
 #	    sts	=> 3,
-	    '--descending'	=> 3,
-	    '--end_epoch'	=> 3,
-	    '--last5'		=> 3,
-	    '--sort'		=> 3,
-	    '--start_epoch'	=> 3,
+#	    '--descending'	=> 3,
+#	    '--end_epoch'	=> 3,
+#	    '--last5'		=> 3,
+#	    '--sort'		=> 3,
+#	    '--start_epoch'	=> 3,
 	},
 	attribute	=> {
 	    direct		=> 2,
@@ -7176,7 +7183,7 @@ Thomas R. Wyant, III (F<wyant at cpan dot org>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2005-2024 by Thomas R. Wyant, III (F<wyant at cpan dot org>).
+Copyright 2005-2025 by Thomas R. Wyant, III (F<wyant at cpan dot org>).
 
 =head1 LICENSE
 

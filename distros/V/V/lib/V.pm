@@ -1,12 +1,12 @@
 package V;
 
-require 5.010000;
+require 5.014000;
 
 use strict;
 use warnings;
 
 use vars qw( $VERSION $NO_EXIT );
-$VERSION  = "0.20";
+$VERSION  = "0.21";
 
 $NO_EXIT ||= 0; # prevent import() from exit()ing and fall of the edge
 
@@ -170,8 +170,8 @@ inspiration. L<Module::Info> was used to copy code from.
 
 =head1 AUTHOR
 
-Abe Timmerman -- 2002 - 2024 (✝ 2024-08-15 😢)
-H.Merijn Brand C<< <hmbrand@cpan.org> >>.
+ Abe Timmerman -- 2002 - 2024 (✝ 2024-08-15 😢)
+ H.Merijn Brand C<< <hmbrand@cpan.org> >> (2024 ...)
 
 =head1 COPYRIGHT AND LICENSE
 

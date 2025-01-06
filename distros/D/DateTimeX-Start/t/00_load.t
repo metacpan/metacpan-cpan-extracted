@@ -1,4 +1,4 @@
-#!perl -T
+#!perl
 
 use strict;
 use warnings;
@@ -12,8 +12,8 @@ BEGIN {
 diag( "Testing DateTimeX::Start $DateTimeX::Start::VERSION" );
 diag( "Using Perl $]" );
 
-for (sort grep /\.pm\z/, keys %INC) {
+for ( sort grep /\.pm\z/, keys %INC ) {
    s{\.pm\z}{};
    s{/}{::}g;
-   eval { diag(join(' ', $_, $_->VERSION || '<unknown>')) };
+   eval { diag( join( ' ', $_, $_->VERSION || '<unknown>' ) ) };
 }

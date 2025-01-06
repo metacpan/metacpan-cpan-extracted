@@ -19,10 +19,10 @@ no_index:
     - t
     - inc
 requires:
-  Ascii::Text: '0'
+  Ascii::Text: '0.2'
   Imager: '0'
   Rope: '0'
   Type::Tiny: '0'
   perl: '5.006'
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

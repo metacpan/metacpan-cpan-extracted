@@ -25,6 +25,10 @@ use Mojo::File;
 #       path => "path",
 #    )->load();
 #
+#    # All files in path
+#    my $file_collection = Daje::Config->new(
+#       path => "path",
+#    )->load_list();
 #
 # DESCRIPTION
 # ===========
@@ -45,7 +49,7 @@ use Mojo::File;
 # janeskil1525 E<lt>janeskil1525@gmail.comE<gt>
 #
 
-our $VERSION = "0.05";
+our $VERSION = "0.06";
 
 has 'path';
 has 'type' => "config";
@@ -54,7 +58,7 @@ has 'type' => "config";
 sub load($self, $filename = "") {
     my $config;
     unless (defined $filename and length($filename) > 0) {
-        my $collection = $self->_load_list();
+        my $collection = $self->load_list();
         $collection->each(sub($file, $num) {
             $config = $self->_load_config($config, $file);
         });
@@ -75,7 +79,7 @@ sub _load_config($self, $config, $file) {
 }
 
 # List of workflows in path (for internal use)
-sub _load_list($self) {
+sub load_list($self) {
     my $collection;
     eval {
         my $path = Mojo::File->new($self->path());

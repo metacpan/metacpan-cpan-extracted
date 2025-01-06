@@ -7,16 +7,25 @@ Tk::XText - Extended Text widget
 =cut
 
 use vars qw($VERSION);
-$VERSION = '0.59';
+$VERSION = '0.60';
 use strict;
 use warnings;
 use Carp;
 
 use Tk;
 use Math::Round;
+require Tk::DialogBox;
+require Tk::LabFrame;
+require Tk::Spinbox;
+require Tk::HList;
 
 use base qw(Tk::Derived Tk::Text);
 Construct Tk::Widget 'XText';
+
+#boilerplating for auto complete facilities
+my %delimhash = (	'.',	1, '(', 1, ')',	1, ':',	1, '!',	1, '+',	1, ',',	1, '-',	1, '<',	1, '=',	1, '>',	1, '%',	1, '&',	1, '*', 1, '"', 1, '\'', 1,
+	'/',	1, ';',	1, '?',	1, '[',	1, ']',	1, '^',	1, '{',	1, '|',	1, '}',	1, '~',	1, '\\', 1, '$', 1, '@', 1, '#', 1, '`', 1, ' ', 1, "\t", 1
+);
 
 =head1 SYNOPSIS
 
@@ -26,8 +35,8 @@ Construct Tk::Widget 'XText';
 =head1 DESCRIPTION
 
 B<Tk::XText> inherits L<Tk::Text>. It adds an advanced Undo/Redo stack, 
-facilities for indenting and unindenting, commenting and uncommenting 
-and autoindendation.
+facilities for indenting and unindenting, commenting and uncommenting, 
+autocomplete and autoindent, loading, saving and exporting.
 
 It's main purpose is to serve as the text widget in the L<Tk::CodeText> 
 mega widget.
@@ -38,6 +47,38 @@ within the L<Tk::CodeText> context. Otherwise see there.
 =head1 OPTIONS
 
 =over 4
+
+=item Name: B<acPopSize>
+
+=item Class: B<AcPopSize>
+
+=item Switch: B<-acpopsize>
+
+.
+
+=item Name: B<acScanSize>
+
+=item Class: B<AcScanSize>
+
+=item Switch: B<-acscansize>
+
+.
+
+=item Name: B<activeDelay>
+
+=item Class: B<ActiveDelay>
+
+=item Switch: B<-activedelay>
+
+.
+
+=item Name: B<autoComplete>
+
+=item Class: B<AutoComplete>
+
+=item Switch: B<-autocomplete>
+
+.
 
 =item Name: B<autoIndent>
 
@@ -50,6 +91,10 @@ within the L<Tk::CodeText> context. Otherwise see there.
 =item Switch: B<-contextmenu>
 
 .
+
+=item Switch: B<-escapepressed>
+
+Callback. Called when the user presses the escape key.
 
 =item Switch: B<-findoptions>
 
@@ -66,6 +111,10 @@ within the L<Tk::CodeText> context. Otherwise see there.
 =item Switch: B<-indentstyle>
 
 .
+
+=item Switch: B<-keyreleasecall>
+
+Callback. Called when the user releases a key. Gets the I<Ev(A)> value of the event as parameter.
 
 =item Switch: B<-logcall>
 
@@ -140,25 +189,66 @@ sub Populate {
 	my ($self, $args) = @_;
 	$self->SUPER::Populate($args);
 
+	$self->{FINDCLEARENABLED} = 1;
+
+	#undo/redo stack
 	$self->{BUFFER} = '';
 	$self->{BUFFERMODE} = '';
 	$self->{BUFFERMODIFIED} = 0;
 	$self->{BUFFERSTART} = '1.0';
 	$self->{BUFFERREPLACE} = '';
-	$self->{FINDCLEARENABLED} = 1;
 	$self->{REDOSTACK} = [];
 	$self->{UNDOSTACK} = [];
+
+	#autoComplete
+	$self->{ACLINE} = 1;
+	$self->{DOCPOOL} = {};
+	$self->{POPBLOCK} = 0;
+	$self->{RUNNING} = 0;
+	$self->{TRIGGERWORD} = '';
 
 	$self->ResetRedo;
 	$self->ResetUndo;
 
 	
+	my $choicepop = $self->Toplevel;
+	$choicepop->overrideredirect(1);
+	$choicepop->withdraw;
+	$self->{POP} = $choicepop;
+	my $bindsub = $self->bind('<Button-1>');
+	if ($bindsub) {
+		$self->{'bind_sub'} = $bindsub;
+		$self->bind('<Button-1>', sub {
+			$bindsub->Call;
+			$self->acPopDown;
+		});
+	} else {
+		$self->bind('<Button-1>',  [$self, 'acPopDown'] );
+	}
+
+	my $lb = $choicepop->HList(
+		-borderwidth => 1,
+		-highlightthickness => 0,
+		-browsecmd => ['acSelect', $self],
+		-relief => 'raised',
+		-selectmode => 'single',
+	)->pack(-expand => 1, -fill => 'both');
+	$lb->bind('<Escape>', [$self, 'acPopDown']);
+	$lb->bind('<Return>', [$self, 'acSelect']);
+	$self->{LISTBOX} = $lb;
+
 	$self->ConfigSpecs(
+		-activedelay => ['PASSIVE', 'activeDelay', 'ActiveDelay', 300],
+		-acpopsize => ['PASSIVE', 'acPopSize', 'AcPopSize', 5],
+		-acscansize => ['PASSIVE', 'acScanSize', 'AcScanSize', 5],
+		-autocomplete => ['PASSIVE', 'autoComplete', 'AutoComplete', ''],
 		-autoindent => ['PASSIVE', 'autoIndent', 'AutoIndent', 0],
 		-contextmenu => ['PASSIVE'],
+		-escapepressed => ['CALLBACK', undef, undef, sub {}],
 		-findandreplacecall => ['PASSIVE'],
 		-findoptions	=> ['METHOD', undef, undef, [-background => '#C0FFC0', -foreground => '#000000']],
 		-indentstyle => ['PASSIVE', 'indentStyle', 'IndentStyle', "tab"],
+		-keyreleasecall => ['CALLBACK', undef, undef, sub {}],
 		-logcall => ['CALLBACK', undef, undef, sub {}],
 		-match => ['PASSIVE', 'match', 'Match', '[]{}()'],
 		-matchoptions	=> ['METHOD', undef, undef, [-background => '#0000FF', -foreground => '#FFFF00']],
@@ -178,11 +268,352 @@ sub Populate {
 	$self->eventAdd('<<UnComment>>', '<Control-G>');
 	$self->eventAdd('<<Undo>>', '<Control-z>');
 	$self->eventAdd('<<Redo>>', '<Control-Z>');
-	$self->bind('<KeyRelease>', 'matchCheck');
+	$self->bind('<KeyRelease>', [$self, 'KeyReleased', Ev('A')]);
 	$self->bind('<ButtonRelease-1>', 'matchCheck');
 	$self->bind('<Control-a>', 'selectAll');
 	$self->markSet('match', '0.0');
 	$self->after(10, ['DoPostConfig', $self]);
+}
+
+sub acGetChoices {
+	my ($self, $word) = @_;
+	my $data = $self->acPool;
+	my @choices = ();
+	for (keys %$data) {
+		my $test = $_;
+		next if length($test) < length($word);
+		if ($test ne $word) {
+			push @choices, $test if lc(substr($test, 0, length($word))) eq lc($word);
+		}
+	}
+	@choices = sort {uc($a) cmp uc($b)} @choices;
+	return @choices
+}
+
+sub acGetIndexes {
+	my $self = shift;
+
+	#find starting point
+	my $ins = $self->index('insert');
+	my $start = $ins;
+	while ((not exists $delimhash{$self->get("$start - 1c", $start)}) and (not $start =~ /\.0$/)) {
+		$start = $self->index("$start - 1c");
+	}
+	
+	#find end point
+	my $end = $ins;
+	my $lineend = $self->index("$end lineend");
+	while ((not exists $delimhash{$self->get($end, "$end + 1c")}) and ($end ne $lineend)) {
+		$end = $self->index("$end + 1c");
+	}
+
+	return ($start, $end);
+}
+
+sub acGetWord {
+	my $self = shift;
+	my $ins = $self->index('insert');
+	my $line = $self->get("$ins linestart", $ins);
+	if (($line =~ /([a-z0-9_]+)$/i) and (length($1) >= $self->cget('-acpopsize'))) {
+		return $1;
+	}
+	return undef
+}
+
+sub acListbox { return $_[0]->{LISTBOX} }
+
+sub acLine {
+	my $self = shift;
+	$self->{ACLINE} = shift if @_;
+	return $self->{ACLINE}
+}
+
+sub acPool { return $_[0]->{DOCPOOL} }
+
+sub acPop { return $_[0]->{POP} }
+
+sub acPopDown {
+	my $self = shift;
+	my $pop = $self->acPop;
+	return unless $pop->ismapped;
+	$pop->withdraw;
+	$pop->parent->grabRelease;
+	$self->focus();
+	if (ref $self->{'_BE_grabinfo'} eq 'CODE') {
+		$self->{'_BE_grabinfo'}->();
+		delete $self->{'_BE_grabinfo'};
+	}
+}
+
+sub acPostChoices {
+	my ($self, $name) = @_;
+
+	#first some show stoppers
+	return if $self->{POPBLOCK};
+
+	my $word = $self->acGetWord;
+	unless (defined $word) {
+		$self->acPopDown;
+		return
+	}
+
+	my @choices = $self->acGetChoices($word);
+	return unless @choices;
+
+	#fill the list
+	my $lb = $self->acListbox;
+	$lb->deleteAll;
+	for (@choices) {
+		$lb->add($_, -text => $_);
+	}
+	$lb->selectionSet($choices[0]);
+
+	my @coord = $self->bbox($self->index('insert'));
+	if (@coord) {
+		#calculate position of the popup
+		my $x = $coord[0] + $self->rootx;
+		my $y = $coord[1] + $coord[3] + $self->rooty + 2;
+	
+		#calculate size of the popup
+		my $longest = '';
+		for (@choices) {
+			$longest = $_ if length($_) > length($longest);
+		}
+		my $font = $lb->cget('-font');
+		my $width = $lb->fontMeasure($font, $longest) + 10;
+
+		my $size = $lb->fontActual($font, '-size');
+		my $lineheight = int($lb->fontMetrics($font, '-linespace') * 1.35);
+
+		my $items = @choices;
+		my $height = ($items * $lineheight) + 2;
+		
+		#pop this thing
+		my $pop = $self->acPop ;
+		unless ($pop->ismapped) {
+			$pop->geometry($width . "x$height+$x+$y");
+			$pop->deiconify;
+			$pop->raise;
+		}
+	}
+}
+
+sub acRunning {
+	my $self = shift;
+	$self->{RUNNING} = shift if @_;
+	return $self->{RUNNING}
+}
+
+sub acScan {
+	my $self = shift;
+
+	unless ($self->cget('-autocomplete')) {
+		$self->acScanEnd;
+		return
+	}
+	
+	my $end = $self->linenumber('end - 1c');
+	my $count = 0;
+	my $line = $self->acLine;
+	$line = 1 unless defined $line;
+	my $data = $self->acPool;
+	while ($count < 100) {
+		#end job if done
+		if ($line > $end) {
+			$self->acLine(1);
+			$self->acScanEnd;
+			return
+		}
+
+		#skip line if it holds the insert cursor;
+		my $insline = $self->linenumber($self->index('insert'));
+		if ($insline eq $line) {
+			$line ++;
+			$count ++;
+			next
+		}
+
+		#scan line
+		my $content = $self->get("$line.0", "$line.0 lineend");
+		while ($content ne '') {
+			if ($content =~ s/^([a-z0-9_]+)//i) {
+				my $word = $1;
+				if (length($word) >= $self->cget('-acscansize')) {
+					$data->{$word} = 1;
+				}
+			} else {
+				$content =~ s/^.//;
+			}
+		}
+
+		$line++;
+		$count ++;
+	}
+	$self->acLine($line);
+	$self->after(50, ['acScan', $self]);
+}
+
+sub acScanEnd {
+	my $self = shift;
+	return unless $self->acRunning;
+	my $data = $self->acPool;
+	if (defined $data) {
+		for (keys %$data) {
+			delete $data->{$_} if $data->{$_} eq 0;
+		}
+	}
+	$self->acRunning(0);
+}
+
+sub acScanStart {
+	my $self = shift;
+	return unless $self->cget('-autocomplete');
+	return if $self->acRunning;
+	my $data = $self->acPool;
+	if (defined $data) {
+		for (keys %$data) {
+			$data->{$_} = 0;
+		}
+	}
+	$self->acRunning(1);
+	$self->acScan;
+}
+
+sub acSelect {
+	my $self = shift;
+	$self->acPopDown;
+	my ( $select ) = $self->acListbox->infoSelection;
+	return unless defined $select;
+	my ($start, $end) = $self->acGetIndexes;
+	
+	#replace with select
+	$self->{POPBLOCK} = 1;
+	$self->replace($start, $end, $select);
+	$self->{POPBLOCK} = 0;
+}
+
+sub acSettings {
+	my $self = shift;
+
+	my $delay = $self->cget('-activedelay');
+	my $popsize = $self->cget('-acpopsize');
+	my $scansize = $self->cget('-acscansize');
+
+	my $db = $self->DialogBox(
+		-title => 'Auto complete',
+		-buttons => ['Ok', 'Cancel'],
+	);
+	my @padding = (-padx => 2, -pady => 2);
+	my $f = $db->LabFrame(
+		-label => 'Settings',
+		-labelside => 'acrosstop',
+	)->pack(-expand => 1, -fill => 'both', @padding);
+	my $row = 0;
+	for (
+		['Pop delay', \$delay],
+		['Pop size', \$popsize],
+		['Scan size', \$scansize],
+	) {
+		my ($text, $var) = @$_;
+		$f->Label(
+			-anchor => 'e',
+			-text => "$text:",
+		)->grid(@padding, -row => $row, -column => 0, -sticky => 'ew');
+		$f->Spinbox(
+			-textvariable => $var,
+		)->grid(@padding, -row => $row, -column => 1, -sticky => 'ew');
+		$row ++
+	}
+	my $answer = $db->Show(-popover => $self);
+	if ($answer eq 'Ok') {
+		for (
+			['-activedelay', $delay],
+			['-acpopsize', $popsize],
+			['-acscansize', $scansize],
+		) {
+			my ($option, $value) = @$_;
+			if ($value =~ /^\d+$/) { #only digits
+				$self->configure($option, $value);
+			} else {
+				$self->log("Illegal value for $option")
+			}
+		}
+	}
+	$db->destroy;
+}
+
+sub activate {
+	my ($self, $key) = @_;
+
+	#pop down choice list if no word is found
+	my $word = $self->acGetWord;
+	$self->acPopDown unless defined $word;
+
+	#all kinds of conditions for not proceeding
+	if ($key eq '') {
+		$self->activateCancel;
+		return
+	}
+	return if $self->{POPBLOCK};
+	return unless $self->cget('-autocomplete');
+
+	unless (defined $word) {
+		$self->acTriggerWord('');
+		return;
+	}
+
+	my $tword = $self->acTriggerWord;
+	$tword = quotemeta($tword);
+	return @_ if ($tword ne '') and ($word =~ /^$tword/);
+	$self->acTriggerWord($word);
+
+	$self->{'active_id'} = $self->after($self->cget('-activedelay'), ['acPostChoices', $self]);
+	return @_;
+}
+
+sub activateCancel {
+	my $self = shift;
+	my $id = $self->{'active_id'};
+	$self->afterCancel($id) if defined $id;
+	delete $self->{'active_id'};
+}
+
+sub acTriggerWord {
+	my $self = shift;
+	$self->{TRIGGERWORD} = shift if @_;
+	return $self->{TRIGGERWORD}
+}
+
+sub arrowDown {
+	my ($self, $index) = @_;
+	if ($self->acPop->ismapped) {
+		my $lb = $self->acListbox;
+		my @children = $lb->infoChildren;
+		my $last = pop @children;
+		my ($sel) = $lb->infoSelection;
+		return if $sel eq $last;
+		my $next = $lb->infoNext($sel);
+		$lb->selectionClear;
+		$lb->selectionSet($next);
+	} else {
+		$self->SetCursor($index);
+	}
+}
+
+sub arrowUp {
+	my ($self, $index) = @_;
+	if ($self->acPop->ismapped) {
+		my $lb = $self->acListbox;
+		my @children = $lb->infoChildren;
+		my $first = shift @children;
+		my ($sel) = $lb->infoSelection;
+		return if $sel eq $first;
+		my $next = $lb->infoPrev($sel);
+		$lb->selectionClear;
+		$lb->selectionSet($next);
+	} else {
+		$self->SetCursor($index);
+	}
 }
 
 sub Backspace {
@@ -195,7 +626,7 @@ sub Backspace {
 		} else {
 			$self->SUPER::delete('insert-1c')
 		}
-		$self->Callback('-modifycall', 'insert');
+		$self->modifiedCall('insert');
 	}
 }
 
@@ -208,7 +639,7 @@ sub bindRdOnly {
 	$mw->bind($class,'<Alt-KeyPress>','NoOp');
 	$mw->bind($class,'<Meta-KeyPress>','NoOp');
 	$mw->bind($class,'<Control-KeyPress>','NoOp');
-	$mw->bind($class,'<Escape>','unselectAll');
+	$mw->bind($class,'<Escape>','EscapePressed');
  
 	$mw->bind($class,'<1>',['Button1',Ev('x'),Ev('y')]);
 	$mw->bind($class,'<B1-Motion>','B1_Motion' ) ;
@@ -233,12 +664,12 @@ sub bindRdOnly {
 	$mw->bind($class,'<Control-Right>',['SetCursor',Ev('index','insert+1c wordend')]);
 	$mw->bind($class,'<Shift-Control-Right>',['KeySelect',Ev('index','insert wordend')]);
  
-	$mw->bind($class,'<Up>',['SetCursor',Ev('UpDownLine',-1)]);
+	$mw->bind($class,'<Up>', ['arrowUp', Ev('UpDownLine',-1)]);
 	$mw->bind($class,'<Shift-Up>',['KeySelect',Ev('UpDownLine',-1)]);
 	$mw->bind($class,'<Control-Up>',['SetCursor',Ev('PrevPara','insert')]);
 	$mw->bind($class,'<Shift-Control-Up>',['KeySelect',Ev('PrevPara','insert')]);
  
-	$mw->bind($class,'<Down>',['SetCursor',Ev('UpDownLine',1)]);
+	$mw->bind($class,'<Down>', ['arrowDown', Ev('UpDownLine',1)]);
 	$mw->bind($class,'<Shift-Down>',['KeySelect',Ev('UpDownLine',1)]);
 	$mw->bind($class,'<Control-Down>',['SetCursor',Ev('NextPara','insert')]);
 	$mw->bind($class,'<Shift-Control-Down>',['KeySelect',Ev('NextPara','insert')]);
@@ -336,7 +767,7 @@ sub ClassInit {
 	$class->bindRdOnly($mw);
  
 	$mw->bind($class,'<Tab>', 'insertTab');
-	$mw->bind($class,'<Return>', ['Insert',"\n"]);
+	$mw->bind($class,'<Return>', 'returnPressed');
 	$mw->bind($class,'<Delete>','Delete');
 	$mw->bind($class,'<BackSpace>','Backspace');
 	$mw->bind($class,'<Insert>', 'ToggleInsertMode' ) ;
@@ -374,7 +805,7 @@ sub clear {
 	$self->editModified(0);
 	$self->OverstrikeMode(0);
 
-	$self->Callback('-modifycall', '1.0');
+	$self->modifiedCall('1.0');
 }
 
 sub clearModified {
@@ -429,7 +860,7 @@ sub comment {
 			$self->unselectAll;
 			$self->tagAdd('sel',$rb, $re);
 			$self->RecordUndo('replace', $modified, $rb, $old, $new);
-			$self->Callback('-modifycall', $rb);
+			$self->modifiedCall($rb);
 			my $lines = $self->linenumber($re) - $self->linenumber($rb);
 			$self->log("Commented $lines lines");
 		} elsif (defined $slstart) { 
@@ -448,7 +879,7 @@ sub comment {
 		}
 		my $new = $self->get($begin, "$begin lineend");
 		$self->RecordUndo('replace', $modified, $begin, $old, $new);
-		$self->Callback('-modifycall', $begin);
+		$self->modifiedCall($begin);
 	}
 }
 
@@ -471,7 +902,7 @@ sub delete {
 	my $string = $self->get(@_);
 	$self->RecordUndo('delete', $self->editModified, $begin, $string);
 	$self->SUPER::delete(@_);
-	$self->Callback('-modifycall', $begin);
+	$self->modifiedCall($begin);
 }
 
 sub DoPostConfig {
@@ -529,6 +960,16 @@ sub EditMenuItems {
 }
 
 sub EmptyDocument { $_[0]->clear }
+
+sub EscapePressed {
+	my $self = shift;
+	if ($self->acPop->ismapped) {
+		$self->acPopDown;
+	} else {
+		$self->unselectAll;
+		$self->Callback('-escapepressed');
+	}
+}
 
 sub FindAll {
 	my ($self, $mode, $case, $pattern) = @_;
@@ -607,43 +1048,35 @@ sub FindInLine {
 	my ($self, $linenum, $mode, $case, $search) = @_;
 	my $srch;
 	if ($mode eq '-exact') {
-		$srch = quotemeta($search)
+		$search = quotemeta($search)
 	} else {
-		eval "\$srch = qr/$search/";
+		eval "qr/$search/";
 		my $error = $@;
 		if ($error ne '') {
 			$error =~ s/\n//;
 			$self->log($error);
-			return undef
+			return ()
 		}
+	}
+	if ($case eq '-case') {
+		$srch = qr/$search/
+	} else {
+		$srch = qr/$search/i
 	}
 	my $linestart = "$linenum.0";
 	my $lineend = $self->index("$linestart lineend");
 	my $line = $self->get($linestart, $lineend);
 	my @hits = ();
-	if ($case eq '-case') {
-		while ($line =~ /($srch)/g) {
-			my $end = pos($line);
-			my $begin = $end - length($1);
-			my @cap = ();
-			if ($#- > 1) {
-				no strict 'refs';
-				@cap = map {$$_} 2 .. $#-;
-			}
-			push @hits, ["$linenum.$begin", "$linenum.$end", \@cap];
+	while ($line =~ /($srch)/g) {
+		my $end = pos($line);
+		my $begin = $end - length($1);
+		my @cap = ();
+		if ($#- > 1) {
+			no strict 'refs';
+			@cap = map {$$_} 2 .. $#-;
 		}
-	} else {
-		while ($line =~ /($srch)/gi) {
-			my $end = pos($line);
-			my $begin = $end - length($1);
-			my @cap = ();
-			if ($#- > 1) {
-				no strict 'refs';
-				@cap = map {$$_} 2 .. $#-;
-			}
-			push @hits, ["$linenum.$begin", "$linenum.$end", \@cap];
-		}
-	}	
+		push @hits, ["$linenum.$begin", "$linenum.$end", \@cap];
+	}
 	return @hits;
 }
 
@@ -850,7 +1283,7 @@ sub indent {
 		my $new = $ichar . $old;
 		$self->RecordUndo('replace', $self->editModified, $begin, $old, $new);
 		$self->SUPER::insert($begin, $ichar);
-		$self->Callback('-modifycall', $begin);
+		$self->modifiedCall($begin);
 	}
 }
 
@@ -874,7 +1307,7 @@ sub insert {
 	$pos = $self->index($pos);
 	$self->RecordUndo('insert', $self->editModified,$pos, $string);
 	$self->SUPER::insert($pos, $string);
-	$self->Callback('-modifycall', $pos);
+	$self->modifiedCall($pos);
 }
 
 sub Insert {
@@ -906,7 +1339,7 @@ sub InsertKeypress {
 		$self->RecordUndo('replace', $self->editModified, $index, $current, $char);
 		$self->SUPER::delete($index) unless $current eq '';
 		$self->SUPER::insert($index, $char);
-		$self->Callback('-modifycall', $index);
+		$self->modifiedCall($index);
 	} else {
 		$self->Insert($char);
 	}
@@ -920,6 +1353,13 @@ sub insertTab {
 	} else {
 		$self->SUPER::insertTab;
 	}
+}
+
+sub KeyReleased {
+	my ($self, $key) = @_;
+	$self->matchCheck;
+	$self->activate($key);
+	$self->Callback('-keyreleasecall', $key);
 }
 
 =item B<linenumber>
@@ -952,7 +1392,7 @@ sub load {
 	close INFILE;
 	$self->goTo('1.0');
 	$self->editModified(0);
-	$self->Callback('-modifycall', '1.0');
+	$self->modifiedCall('1.0');
 	$self->log("Loaded $file");
 	return 1
 }
@@ -1047,6 +1487,11 @@ sub matchoptions {
 	}
 }
 
+sub modifiedCall {
+	my ($self, $index) = @_;
+	$self->Callback('-modifycall', $index);
+	$self->acScanStart;
+}
 
 sub OverstrikeMode {
 	my ($self, $mode) = @_;
@@ -1227,19 +1672,15 @@ sub redo {
 		} else {
 			carp "invalid redo mode $mode, should be 'delete', 'insert', or 'replace'\n";
 		}
-# 		if ($self->UndoStackEmpty) {
-# 			$self->editModified($self->UndoEmptyModified);
-# 		} else {
 		$self->editModified($o->{'redo_modified'});
 		$self->BufferModified($o->{'redo_modified'});
 		$o->{'modified'} = $mod;
-# 		}
 		if (my $sel = $o->{'selection'}) {
 			$self->unselectAll;
 			$self->tagAdd('sel',@$sel);
 		}
 		my $pos = $o->{'content'}->[0];
-		$self->Callback('-modifycall', $pos);
+		$self->modifiedCall($pos);
 	}
 }
 
@@ -1247,13 +1688,17 @@ sub RedoStack {
 	return $_[0]->{REDOSTACK}
 }
 
+=item B<replace>I<$begin, $end, $string)>
+
+=cut
+
 sub replace {
 	my ($self, $begin, $end, $replace) = @_;
 	my $orig = $self->get($begin, $end);
 	$self->SUPER::delete($begin, $end);
 	$self->SUPER::insert($begin, $replace);
 	$self->RecordUndo('replace', $self->editModified, $begin, $orig, $replace);
-	
+	$self->modifiedCall($begin);
 }
 
 sub ReplaceSelectionsWith {
@@ -1282,7 +1727,7 @@ sub ReplaceSelectionsWith {
 		$self->RecordUndo('replace', $self->editModified, $first, $old, $new_text);
 		$self->SUPER::insert($last, $new_text);
 		$self->SUPER::delete($first, $last);
-		$self->Callback('-modifycall', $first);
+		$self->modifiedCall($first);
 
 	}
 	############################################################
@@ -1301,6 +1746,16 @@ sub ResetRedo {
 
 sub ResetUndo {
 	$_[0]->{UNDOSTACK} = [];
+}
+
+sub returnPressed {
+	my $self = shift;
+	my $pop = $self->acPop;
+	if ($pop->ismapped) {
+		$self->acSelect
+	} else {
+		$self->Insert("\n");
+	}
 }
 
 =item B<save>
@@ -1382,7 +1837,7 @@ sub selectionModify {
 	$self->tagAdd('sel', @ranges);
 	my $new = $self->get(@ranges);
 	$self->RecordUndo('replace', $modified, $ranges[0], $old, $new);
-	$self->Callback('-modifycall', $ranges[0]);
+	$self->modifiedCall($ranges[0]);
 	my $lines = $self->linenumber($ranges[1]) - $self->linenumber($ranges[0]);
 	$self->log("$operation $lines lines");
 }
@@ -1414,7 +1869,7 @@ sub uncomment {
 				$self->unselectAll;
 				$self->tagAdd('sel', $rb, $re);
 				$self->RecordUndo('replace', $modified, $rb, $old, $new);
-				$self->Callback('-modifycall', $rb);
+				$self->modifiedCall($rb);
 				my $lines = $self->linenumber($re) - $self->linenumber($rb);
 				$self->log("Uncommented $lines lines");
 			}
@@ -1439,7 +1894,7 @@ sub uncomment {
 		}
 		my $new = $self->get($rb, "$rb lineend");
 		$self->RecordUndo('replace', $modified, $rb, $old, $new);
-		$self->Callback('-modifycall', $rb);
+		$self->modifiedCall($rb);
 	}
 }
 
@@ -1484,19 +1939,15 @@ sub undo {
 		} else {
 			carp "invalid undo mode '$mode"."', should be 'delete', 'insert', or 'replace'\n";
 		}
-# 		if ($self->RedoStackEmpty) {
-# 			$self->editModified($self->RedoEmptyModified);
-# 		} else {
 		$self->editModified($o->{'modified'});
 		$self->BufferModified($o->{'modified'});
 		$o->{'redo_modified'} = $mod;
-# 		}
 		if (my $sel = $o->{'selection'}) {
 			$self->unselectAll;
 			$self->tagAdd('sel',@$sel);
 		}
 		my $pos = $o->{'content'}->[0];
-		$self->Callback('-modifycall', $pos);
+		$self->modifiedCall($pos);
 	}
 }
 
@@ -1526,7 +1977,7 @@ sub unindent {
 		}
 		my $new = $self->get($start, "$start lineend");
 		$self->RecordUndo('replace', $modified, $start, $old, $new);
-		$self->Callback('-modifycall', $start);
+		$self->modifiedCall($start);
 	}
 }
 
@@ -1580,6 +2031,7 @@ Unknown. If you find any, please contact the author.
 
 =over 4
 
+=item L<Tk::Text>
 
 =back
 

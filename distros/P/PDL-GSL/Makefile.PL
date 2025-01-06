@@ -48,6 +48,7 @@ WriteMakefile(
   NAME => $package_name,
   VERSION_FROM => 'lib/PDL/GSL.pm',
   AUTHOR => 'PerlDL Developers <pdl-general@lists.sourceforge.net>',
+  LICENSE=> "perl",
   MIN_PERL_VERSION => '5.016',
   CONFIGURE_REQUIRES => {
     'ExtUtils::MakeMaker' => 0,

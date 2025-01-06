@@ -3,10 +3,11 @@ lib/String/ProperCase/Surname.pm
 LICENSE
 Makefile.PL
 MANIFEST
-README
+README.md
 t/001_use.t
 t/002_require.t
 t/003_hash.t
-Todo
 perl-String-ProperCase-Surname.spec
-META.yml                                 Module meta-data (added by MakeMaker)
+scripts/perl-String-ProperCase-Surname.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

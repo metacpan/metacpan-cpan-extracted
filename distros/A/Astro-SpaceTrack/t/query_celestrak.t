@@ -51,8 +51,8 @@ SKIP: {
 }
 
 SKIP: {
-    is_success_or_skip( $st, celestrak_supplemental => 'orbcomm',
-	'Fetch Celestrak supplemental Orbcomm data', 2 );
+    is_success_or_skip( $st, celestrak_supplemental => 'iss',
+	'Fetch Celestrak supplemental ISS data', 2 );
 
     is $st->content_type(), 'orbit', "Content type is 'orbit'";
 

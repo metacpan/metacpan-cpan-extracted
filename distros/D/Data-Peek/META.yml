@@ -1,7 +1,7 @@
 --- 
 abstract: Modified and extended debugging facilities
 author: 
-  - H.Merijn Brand <h.m.brand@xs4all.nl>
+  - H.Merijn Brand <hmbrand@cpan.org>
 build_requires: 
   perl: '5.008001'
 configure_requires: 
@@ -16,11 +16,11 @@ name: Data-Peek
 provides: 
   Data::Peek: 
     file: Peek.pm
-    version: '0.52'
+    version: '0.53'
 recommends: 
-  Data::Dumper: '2.184'
+  Data::Dumper: '2.189'
   Perl::Tidy: 0
-  Test::More: '1.302191'
+  Test::More: '1.302207'
 requires: 
   Data::Dumper: 0
   Test::More: '0.90'
@@ -32,4 +32,4 @@ resources:
   bugtracker: https://github.com/Tux/Data-Peek/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/Data-Peek
-version: '0.52'
+version: '0.53'

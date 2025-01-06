@@ -52,6 +52,6 @@
          "web" : "https://github.com/briandfoy/app-module-lister"
       }
    },
-   "version" : "1.001",
+   "version" : "1.002",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

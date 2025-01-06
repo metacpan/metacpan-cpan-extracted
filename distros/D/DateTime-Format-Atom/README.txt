@@ -12,11 +12,12 @@ To install this module, run the following commands:
     make test
     make install
 
+
 DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-    ExtUtils::MakeMaker 6.52    (For installation only)
+    ExtUtils::MakeMaker 6.74    (For installation only)
     Software::License::CC0_1_0  (For installation only)
     Test::More                  (For testing only)
     DateTime::Format::RFC3339
@@ -37,7 +38,7 @@ You can also find it online at this location:
     https://metacpan.org/dist/DateTime-Format-Atom
 
 
-COPYRIGHT AND LICENCE
+COPYRIGHT AND LICENSE
 
 No rights reserved.
 

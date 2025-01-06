@@ -1,24 +1,17 @@
+
 package Syntax::Feature::Void;
 
 use strict;
 use warnings;
 
-use version; our $VERSION = qv('v1.2.0');
+use version; our $VERSION = qv( 'v1.4.0' );
 
-use Devel::CallParser qw( );
-use XSLoader          qw( );
+use XSLoader qw( );
 
-XSLoader::load('Syntax::Feature::Void', $VERSION);
+XSLoader::load( 'Syntax::Feature::Void', $VERSION );
 
-sub import {
-    require Lexical::Sub;
-    Lexical::Sub->import( void => \&void );
-}
-
-sub unimport {
-    require Lexical::Sub;
-    Lexical::Sub->unimport( void => \&void );
-}
+sub import   { $^H{ hint_key() } = 1; }
+sub unimport { $^H{ hint_key() } = 0; }
 
 *install   = \&import;    # For syntax.pm
 *uninstall = \&unimport;  # For syntax.pm
@@ -35,7 +28,7 @@ Syntax::Feature::Void - Provides the C<void> operator to force void context.
 
 =head1 VERSION
 
-Version 1.2.0
+Version 1.4.0
 
 
 =head1 SYNOPSIS
@@ -60,10 +53,9 @@ Syntax::Feature::Void is a lexically-scoped pragma that
 provides the C<void> operator to force void context.
 Not that anyone needs that.
 
-This module serves as a demonstration of the
-L<C<cv_set_call_parser>|perlapi/cv_set_call_parser> and
-L<C<cv_set_call_checker>|perlapi/cv_set_call_checker>
-Perl API calls.
+This module serves as a demonstration of the ability to
+add keywords to the Perl language using
+L<C<PL_keyword_plugin>|perlapi/PL_keyword_plugin>.
 
 
 =head2 C<< use syntax qw( void ); >>
@@ -77,7 +69,8 @@ Enables the use of C<void> until the end of the current lexical scope.
 
 =head2 C<< no Syntax::Feature::Void; >>
 
-Restores the standard behaviour of C<void> (a sub call) until the end of the current lexical scope.
+Restores the standard behaviour of C<void> (a sub call) until the
+end of the current lexical scope.
 
 
 =head2 C<< void EXPR >>
@@ -95,6 +88,8 @@ Evalutes EXPR in void context.
 
 =item * C<uninstall>
 
+=item * C<hint_key>
+
 =back
 
 =end comment
@@ -106,49 +101,51 @@ Evalutes EXPR in void context.
 
 =item * L<syntax>
 
-=item * L<Devel::CallParser>
-
-=item * L<Devel::CallChecker>
-
-=item * L<Lexical::Sub>
-
 =item * L<perlapi>
+
+=back
+
+
+=head1 DOCUMENTATION AND SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Syntax::Feature::Void
+
+You can also find it online at this location:
+
+=over
+
+=item * L<https://metacpan.org/dist/Syntax-Feature-Void>
+
+=back
+
+If you need help, the following are great resources:
+
+=over
+
+=item * L<https://stackoverflow.com/|StackOverflow>
+
+=item * L<http://www.perlmonks.org/|PerlMonks>
+
+=item * You may also contact the author directly.
 
 =back
 
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-Syntax-Feature-Void at rt.cpan.org>,
-or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Syntax-Feature-Void>.
+Please report any bugs or feature requests using L<https://github.com/ikegami/perl-Syntax-Feature-Void/issues>.
 I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
 
 
-=head1 SUPPORT
+=head1 REPOSITORY
 
-You can find documentation for this module with the perldoc command.
+=over
 
-    perldoc Syntax::Feature::Void
+=item * Web: L<https://github.com/ikegami/perl-Syntax-Feature-Void>
 
-You can also look for information at:
-
-=over 4
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Syntax-Feature-Void>
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Syntax-Feature-Void>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Syntax-Feature-Void>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Syntax-Feature-Void>
+=item * git: L<https://github.com/ikegami/perl-Syntax-Feature-Void.git>
 
 =back
 
@@ -158,7 +155,7 @@ L<http://cpanratings.perl.org/d/Syntax-Feature-Void>
 Eric Brine, C<< <ikegami@adaelis.com> >>
 
 
-=head1 COPYRIGHT & LICENSE
+=head1 COPYRIGHT AND LICENSE
 
 No rights reserved.
 

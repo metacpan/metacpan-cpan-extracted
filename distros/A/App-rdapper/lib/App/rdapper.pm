@@ -26,13 +26,15 @@ use constant {
 use vars qw($VERSION);
 use strict;
 
-$VERSION = '1.04';
+$VERSION = '1.05';
 
 #
 # global arg variables (note: nopager is now ignored)
 #
-my ($type, $object, $help, $short, $bypass, $auth, $nopager, $raw, $both,
-    $registrar, $nocolor, $reverse, $version);
+my (
+    $type, $object, $help, $short, $bypass, $auth, $nopager, $raw, $both,
+    $registrar, $nocolor, $reverse, $version, $search
+);
 
 #
 # options spec for Getopt::Long
@@ -51,6 +53,13 @@ my %opts = (
     'nocolor'       => \$nocolor,
     'reverse'       => \$reverse,
     'version'       => \$version,
+    'search'        => \$search,
+    'autnum'        => sub { $type = 'autnum' },
+    'domain'        => sub { $type = 'domain' },
+    'entity'        => sub { $type = 'entity' },
+    'ip'            => sub { $type = 'ip' },
+    'tld'           => sub { $type = 'tld' },
+    'url'           => sub { $type = 'url' },
 );
 
 my %funcs = (
@@ -109,6 +118,8 @@ my %ADR_DISPLAY_NAMES = (
     &ADR_CC     => 'Country',
 );
 
+my $json = JSON->new->utf8->canonical->pretty->convert_blessed;
+
 my $rdap;
 
 my $out = \*STDOUT;
@@ -130,13 +141,13 @@ sub main {
         'cache_ttl' => 300,
     );
 
+    $package->show_version if ($version);
+
     $registrar ||= $both;
 
     $object = shift(@_) if (!$object);
 
     $package->show_usage if ($help || length($object) < 1);
-
-    $package->show_version if ($version);
 
     if (!$type) {
         if ($object =~ /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/)              { $type = 'ip'      }
@@ -151,6 +162,11 @@ sub main {
 
     my %args;
     ($args{'user'}, $args{'pass'}) = split(/:/, $auth, 2) if ($auth);
+
+    if ($search) {
+        $package->search($rdap, $object, $type, %args);
+        return;
+    }
 
     my $response;
     if ('ip' eq $type) {
@@ -219,8 +235,92 @@ sub show_usage {
 
 sub show_version {
     my $package = shift;
-    printf("%s v%s\n", $package, $VERSION);
+    $out->say(sprintf('%s v%s', $package, $VERSION));
     exit;
+}
+
+sub search {
+    my ($package, $rdap, $object, $type, %args) = @_;
+
+    if ('domain' eq $type) {
+        $package->domain_search($rdap, $object, %args);
+
+    } else {
+        $package->error('Current unable to do searches for %s objects.', $type);
+
+    }
+}
+
+sub domain_search {
+    my ($package, $rdap, $query, %args) = @_;
+
+    my @labels = grep { length > 0 } split(/\./, lc($query), 2);
+
+    my $prefix = shift(@labels);
+    my $suffix = shift(@labels) || '*';
+
+    my $servers = {};
+    my $zones = {};
+
+    foreach my $service (Net::RDAP::Registry->load_registry(Net::RDAP::Registry::DNS_URL)->services) {
+        foreach my $zone ($service->registries) {
+            my $url = Net::RDAP::Registry->get_best_url($service->urls);
+
+            if (!exists($servers->{$url->as_string})) {
+                $servers->{$url->as_string} = Net::RDAP::Service->new($url);
+            }
+
+            $zones->{lc($zone)} = $url->as_string;
+        }
+    }
+
+    my @zones = sort(keys(%{$zones}));
+    @zones = grep { lc($suffix) eq $_ || $suffix =~ /\.$_/i } @zones if ($suffix ne '*');
+
+    foreach my $zone (@zones) {
+        my $server = $servers->{$zones->{$zone}};
+        my $result = $server->domains(name => $prefix);
+
+        if ($result->isa('Net::RDAP::Error')) {
+            $package->warning(sprintf('%s.%s: %s %s', $prefix, $zone, $result->errorCode, $result->title));
+
+        } elsif ($result->isa('Net::RDAP::SearchResult')) {
+            $package->display_domain_search_results($result);
+
+        }
+    }
+}
+
+sub display_domain_search_results {
+    my ($package, $result) = @_;
+
+    foreach my $domain ($result->domains) {
+        $out->say($domain->name->name);
+    }
+}
+
+sub display_nameserver_search_results {
+    my ($package, $result) = @_;
+
+    foreach my $nameserver ($result->nameservers) {
+        $out->say($nameserver->name->name);
+    }
+}
+
+sub display_entity_search_results {
+    my ($package, $result) = @_;
+
+    foreach my $entity ($result->entities) {
+        $out->say($entity->handle);
+    }
+}
+
+sub display_search {
+    my ($package, $result) = @_;
+
+    $package->display_domain_search_results($result)        if (exists($result->{domainSearchResults}));
+    $package->display_nameserver_search_results($result)    if (exists($result->{nameserverSearchResults}));
+    $package->display_entity_search_results($result)        if (exists($result->{entitySearchResults}));
 }
 
 sub display {
@@ -234,6 +334,7 @@ sub display {
             $package->error('%03u (%s)', $object->errorCode, $object->title);
 
         }
+
         return undef;
     }
 
@@ -265,7 +366,13 @@ sub display {
     }
 
     if ($raw) {
-        $out->print(to_json({%{$object}}));
+        $out->print($json->encode($object));
+
+        return 1;
+    }
+
+    if ($object->isa('Net::RDAP::SearchResult')) {
+        $package->display_search($object);
 
         return 1;
     }
@@ -615,13 +722,13 @@ sub print_kv {
 sub warning {
     my ($package, $fmt, @params) = @_;
     my $str = sprintf("Warning: $fmt", @params);
-    $err->print(colourise([qw(yellow)], $str)."\n");
+    $err->say(colourise([qw(yellow)], $str));
 }
 
 sub error {
     my ($package, $fmt, @params) = @_;
     my $str = sprintf("Error: $fmt", @params);
-    $err->print(colourise([qw(red)], $str)."\n");
+    $err->say(colourise([qw(red)], $str));
     exit 1;
 }
 
@@ -669,7 +776,21 @@ Alternatively, you can pull the L<image from Docker Hub|https://hub.docker.com/r
 
 =head1 SYNOPSIS
 
+General form:
+
     rdapper [OPTIONS] OBJECT
+
+Examples:
+
+    rdapper example.com
+
+    rdapper --tld foo
+
+    rdapper 192.168.0.1
+
+    rdapper https://rdap.org/domain/example.com
+
+    rdapper --search "exampl*.com"
 
 =head1 DESCRIPTION
 
@@ -688,12 +809,12 @@ You can pass any internet resource as an argument; this may be:
 
 =item * a top-level domain such as C<com>;
 
-=item * a "reverse" domain name such as C<168.192.in-addr.arpa>;
-
 =item * a IPv4 or IPv6 address or CIDR prefix, such as C<192.168.0.1> or
 C<2001:DB8::/32>;
 
 =item * an Autonymous System Number such as C<AS65536>.
+
+=item * a "reverse" domain name such as C<168.192.in-addr.arpa>;
 
 =item * the URL of an RDAP resource such as
 C<https://example.com/rdap/domain/example.com>.
@@ -707,8 +828,10 @@ ABC123-EXAMPLE>.
 =back
 
 C<rdapper> also implements limited support for in-bailiwick nameservers, but you
-must use the C<--type=nameserver> argument to disambiguate from domain names. The
+must use the C<--nameserver> argument to disambiguate from domain names. The
 RDAP server of the parent domain's registry will be queried.
+
+=head2 ARGUMENTS
 
 =over
 
@@ -740,6 +863,8 @@ want to see the record for the .help TLD, use C<--type=tld help>).
 
 =back
 
+=item * C<--$TYPE> - alias for C<--type=$TYPE>. eg C<--domain>, C<--autnum>, etc.
+
 =item * C<--help> - display help message.
 
 =item * C<--version> - display package and version.
@@ -757,7 +882,25 @@ you aren't expecting them to.
 
 =item * C<--nocolor> - disable ANSI colors in the formatted output.
 
+=item * C<--search> - perform a search.
+
 =back
+
+=head1 RDAP Search
+
+Some RDAP servers support the ability to perform simple substring searches.
+You can use the C<--search> option to enable this functionality.
+
+When the C<--search> option is used, C<OBJECT> will be used as a search term. If
+it contains no dots (e.g. C<exampl*>), then C<rdapper> will send a search query
+for C<exampl*> to I<all> known RDAP servers. If it contains one or more dots
+(e.g. C<exampl*.com>), it will send the search query to the RDAP server for the
+specified TLD (if any).
+
+Any errors observed will be printed to C<STDERR>; any search results will be
+printed to C<STDOUT>.
+
+As of writing, search is only available for domain names.
 
 =head1 COPYRIGHT & LICENSE
 

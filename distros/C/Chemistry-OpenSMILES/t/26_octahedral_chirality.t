@@ -14,7 +14,6 @@ my @cases = (
     [ 'Cl[Co@OH19](C)(I)(F)(S)Br', [ qw( I Co Cl Br F S C ) ], 'I([Co@OH27](Cl)(Br)(F)(S([H]))(C((([H][H][H])))))' ],
 );
 
-plan skip_all => 'not yet implemented' unless $ENV{AUTHOR_TESTING};
 plan tests => scalar @cases;
 
 for my $case (@cases) {
@@ -23,7 +22,7 @@ for my $case (@cases) {
     my $result;
 
     my $order_sub = sub {
-        my( $vertices ) = @_;
+        my $vertices = shift;
         for my $symbol (@{$case->[1]}) {
             my $vertex = first { $_->{symbol} eq $symbol } values %$vertices;
             return $vertex if $vertex;
@@ -34,6 +33,6 @@ for my $case (@cases) {
     $parser = Chemistry::OpenSMILES::Parser->new;
     @moieties = $parser->parse( $case->[0] );
 
-    $result = write_SMILES( \@moieties, $order_sub );
-    is( $result, $case->[2] );
+    $result = write_SMILES( \@moieties, { order_sub => $order_sub } );
+    is $result, $case->[2];
 }

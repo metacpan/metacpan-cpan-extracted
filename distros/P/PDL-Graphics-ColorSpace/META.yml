@@ -9,7 +9,7 @@ configure_requires:
   PDL: '2.074'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
-license: unknown
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -24,5 +24,5 @@ resources:
   IRC: irc://irc.perl.org/#pdl
   bugtracker: https://github.com/PDLPorters/PDL-Graphics-ColorSpace/issues
   repository: git://github.com/PDLPorters/PDL-Graphics-ColorSpace.git
-version: '0.203'
+version: '0.204'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

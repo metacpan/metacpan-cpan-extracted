@@ -1,8 +1,10 @@
 .aspell.local.pws
 blib/
+xt/
 core-t/
 debian/
 doc/
+sandbox/
 Makefile$
 Makefile.bak
 make-doc\.pl

@@ -63,6 +63,13 @@ option list => (
 	value => 0
 );
 
+option all => (
+	type => Bool,
+	description => 'Print out in all available fonts'
+
+);
+
+
 option image => (
 	type => Bool,
 	description => 'write the ascii text to an image, used in conjunction with fh and imager_font.',
@@ -96,20 +103,18 @@ sub callback {
 		imager_font => $self->imager_font,
 		($fh ? (fh => $fh) : ()),
 	);
+	$ascii->($self->text, ($self->image ? ($self->fh, 1) : ()));
 	if (!$self->image && $self->fh) {
 		close $fh;
 	}
-	$ascii->($self->text, ($self->image ? ($self->fh, 1) : ()));
 }
 
-use ExtUtils::Installed;
 sub callback_list {
 	my ($self) = @_;
 
 	my $base_path = __FILE__;
 	$base_path =~ s/(.*Text[\/\\])(.*)/$1/;
 	$base_path .= 'Font';
-
 	
 	opendir my $dir, $base_path or die $!;
 	my @files = grep { $_ !~ s/\.pm//; $_ !~ m/^\./ } readdir $dir;
@@ -120,6 +125,5 @@ sub callback_list {
 		$self->print_color('bright_cyan', "- $_\n");
 	}
 }
-
 
 1;

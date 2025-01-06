@@ -2,7 +2,7 @@
 
 package t::Test::abeltje;
 
-use 5.010001;
+use 5.014000;
 use strict;
 use warnings;
 

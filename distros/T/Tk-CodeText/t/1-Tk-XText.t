@@ -1,7 +1,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 139;
+use Test::More tests => 142;
 use Test::Tk;
 
 use Data::Dumper;
@@ -222,7 +222,7 @@ push @tests, (
 );
 
 #testing accessors
-my @accessors = qw(Buffer BufferMode BufferModified BufferReplace BufferStart);
+my @accessors = qw(acLine acRunning acTriggerWord Buffer BufferMode BufferModified BufferReplace BufferStart);
 for (@accessors) {
 	my $method = $_;
 	push @tests, [sub {

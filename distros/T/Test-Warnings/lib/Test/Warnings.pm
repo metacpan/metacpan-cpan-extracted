@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Test::Warnings; # git description: v0.035-3-g0d65702
+package Test::Warnings; # git description: v0.036-7-gf66b289
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Test for warnings and the lack of them
 # KEYWORDS: testing tests warnings
 
-our $VERSION = '0.036';
+our $VERSION = '0.037';
 
 use parent 'Exporter';
 use Test::Builder;
@@ -43,7 +43,7 @@ sub import {
     delete @names{qw(:no_end_test :fail_on_warning :report_warnings)};
 
     {
-        my $callpkg = caller(1);
+        my $callpkg = caller(0);
         no strict 'refs';
         no warnings 'once';
         undef *{$callpkg.'::done_testing'} if *{$callpkg.'::done_testing'}{CODE};
@@ -244,7 +244,7 @@ Test::Warnings - Test for warnings and the lack of them
 
 =head1 VERSION
 
-version 0.036
+version 0.037
 
 =head1 SYNOPSIS
 

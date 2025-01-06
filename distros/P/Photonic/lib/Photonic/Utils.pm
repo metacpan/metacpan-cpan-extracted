@@ -1,5 +1,5 @@
 package Photonic::Utils;
-$Photonic::Utils::VERSION = '0.023';
+$Photonic::Utils::VERSION = '0.024';
 
 =encoding UTF-8
 
@@ -349,15 +349,10 @@ sub vectors2Dlist { #2D vector fields ready for gnuploting
 }
 
 sub cgtsv {
-    confess "Wrong number of arguments" unless scalar(@_)==4;
-    my ($c, $d, $e, $b) = @_;
-    my $i = PDL->null;
-    for (grep $_->is_inplace, $c, $d, $e, $b) {
-        $_ = $_->copy;
-        $_->set_inplace(0);
-    }
-    PDL::LinearAlgebra::Complex::cgtsv($c, $d, $e, $b, $i);
-    confess "Error solving tridiag system" unless $i == 0;
+    confess "Wrong number of arguments" unless @_ == 4;
+    my ($c, $d, $e, $b) = map $_->new_or_inplace, @_;
+    my $i = PDL::LinearAlgebra::Complex::cgtsv($c, $d, $e, $b);
+    confess "Error solving tridiag system: info=$i" if $i->any;
     $b;
 }
 
@@ -435,7 +430,7 @@ Photonic::Utils
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 SYNOPSIS
 

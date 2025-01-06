@@ -1,5 +1,8 @@
 # Changes for Antsy
 
+0.906 2025-01-06T06:15:05Z
+	* refresh distro and move to BRIANDFOY
+
 0.905 2024-01-14T05:00:23Z
 	* fix extra file in MANIFEST (#11)
 

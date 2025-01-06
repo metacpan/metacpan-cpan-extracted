@@ -17,7 +17,7 @@ our %EXPORT_TAGS = ( 'all' => \@EXPORT_OK, );
 our @CARP_NOT = ('Crypt::URandom');
 
 BEGIN {
-    our $VERSION = '0.46';
+    our $VERSION = '0.47';
     eval {
         require XSLoader;
 
@@ -218,7 +218,7 @@ Crypt::URandom - Provide non blocking randomness
 
 =head1 VERSION
 
-This document describes Crypt::URandom version 0.46
+This document describes Crypt::URandom version 0.47
 
 
 =head1 SYNOPSIS
@@ -349,6 +349,10 @@ The /dev/urandom device returned an error when being opened
 
 Crypt::URandom requires no configuration files or environment variables.
 
+If the environment variable CRYPT_URANDOM_BUILD_DEBUG is specified when
+running C<perl Makefile.PL> or C<make test> AND L<getrandom(2)> or it's
+equivalents cannot be detected, extra debug will be shown to show the
+failures to detect these functions.
 
 =head1 DEPENDENCIES
 

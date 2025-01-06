@@ -1,6 +1,11 @@
 Revision history for Crypt-URandom
 
-0.46  Sat Jan 03 19:44:05 2025
+0.48  Mon Jan 05 21:40:53 2025
+     - Adding LICENSE file
+     - Hiding compiler output behind CRYPT_URANDOM_BUILD_DEBUG
+     - Small cleanups
+
+0.47  Sat Jan 03 19:44:05 2025
      - CPAN Testers fixes and cleanups
 
 0.45  Sat Jan 03 09:25:36 2025

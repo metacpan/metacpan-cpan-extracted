@@ -1,5 +1,8 @@
 Revision history for WWW-Kickstarter
 
+1.16.0  2025-01-05
+        - Corrected the version of ExtUtils::MakeMaker that's required.
+
 1.14.0  2018-10-31
         - The API started returning null for location and possibly other values.
           This was causing the construction of objects to fail.

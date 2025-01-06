@@ -1,7 +1,13 @@
 Tk::CodeText module changes log
 
-0.59 22 Dec 2024
+0.60 05 Jan 2025
+	- Fixed method replace.
+	- Added autocomplete facilities.
+	- Search and Replace bar hides at escape key.
+
+0.59 24 Dec 2024
 	- Fixed toggling insert/overwrite mode.
+	- Overhauled search and replace stack. They now no longer work with the 'sel' tag.
 
 0.58 18 Dec 2024
 	- Fixed it better.

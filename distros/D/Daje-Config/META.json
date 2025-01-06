@@ -55,7 +55,7 @@
    "provides" : {
       "Daje::Config" : {
          "file" : "lib/Daje/Config.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -70,7 +70,7 @@
          "web" : "https://github.com/janeskil1525/Daje-Config"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

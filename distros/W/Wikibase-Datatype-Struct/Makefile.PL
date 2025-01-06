@@ -21,7 +21,7 @@ recursive_author_tests('xt');
 requires 'English' => 0;
 requires 'Error::Pure' => 0.15;
 requires 'Exporter' => 0;
-requires 'List::MoreUtils' => 0;
+requires 'List::Util' => 1.33;
 requires 'Readonly' => 0;
 requires 'URI' => 0;
 requires 'Wikibase::Datatype::Form' => 0;
@@ -76,7 +76,7 @@ test_requires 'Wikibase::Datatype::Value::Sense' => 0.29;
 test_requires 'Wikibase::Datatype::Value::String' => 0;
 test_requires 'Wikibase::Datatype::Value::Time' => 0;
 tests_recursive;
-version '0.13';
+version '0.14';
 
 # Run.
 WriteAll();

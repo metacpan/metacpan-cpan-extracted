@@ -1,5 +1,8 @@
 Revision history for Perl module Chemistry::Elements
 
+1.078 2025-01-05T11:14:20Z
+	* refresh distro and move to BRIANDFOY
+
 1.077 2024-01-15T21:20:02Z
 	* refresh distro, update email addresses
 

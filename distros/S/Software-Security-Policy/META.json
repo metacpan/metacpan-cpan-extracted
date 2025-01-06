@@ -47,25 +47,25 @@
    "provides" : {
       "Software::Security::Policy" : {
          "file" : "lib/Software/Security/Policy.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Software::Security::Policy::Individual" : {
          "file" : "lib/Software/Security/Policy/Individual.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/timlegge/Software-Security-Policy/issues"
+         "web" : "https://github.com/CPAN-Security/Software-Security-Policy/issues"
       },
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/timlegge/Software-Security-Policy.git",
-         "web" : "https://github.com/timlegge/Software-Security-Policy"
+         "url" : "git://github.com/CPAN-Security/Software-Security-Policy.git",
+         "web" : "https://github.com/CPAN-Security/Software-Security-Policy"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_generated_by_perl" : "v5.38.2",
    "x_maintainers" : [
       "Timothy Legge <timlegge@gmail.com>"

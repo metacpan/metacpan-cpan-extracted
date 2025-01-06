@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use 5.010001;
+use 5.014000;
 use strict;
 use warnings;
 
@@ -12,13 +12,16 @@ WriteMakefile (
     ABSTRACT_FROM  => "lib/V.pm",
     AUTHOR         => 'H.Merijn Brand <hmbrand@cpan.org>',
 
-    BUILD_REQUIRES => {
+    TEST_REQUIRES => {
 	"Test::Simple"   => 0.88,
 	"Test::Fatal"    => 0,
 	"Test::Warnings" => 0,
 	},
     PREREQ_PM => {
 	version          => 0.77,
+	},
+    macro => {
+	TARFLAGS => "--format=ustar -c -v -f",
 	},
 
     MIN_PERL_VERSION     => "5.010001",
@@ -54,5 +57,32 @@ sub postamble {
 	    ''
 	: "";
     join "\n" =>
+	'cover $make_sep test_cover:',
+	'	ccache -C',
+	'	-@rm -f *.gc??',
+	'	cover -test',
+	'	cover -report html_basic',
+	'',
+	'spellcheck:',
+	'	pod-spell-check --aspell --ispell',
+	'',
+	'checkmeta:	spellcheck',
+	'	perl sandbox/genMETA.pl -c',
+	'',
+	'fixmeta:	distmeta',
+	'	perl sandbox/genMETA.pl',
+	'',
+	'tgzdist:	checkmeta fixmeta $(DISTVNAME).tar.gz distcheck',
+	'	-@mv -f $(DISTVNAME).tar.gz $(DISTVNAME).tgz',
+	'	-@cpants_lint.pl $(DISTVNAME).tgz',
+	'	-@rm -f Debian_CPANTS.txt',
+	'	-@echo "Consider running sandbox/used-by.pl now"',
+	'',
+	'test_used:	test',
+	'	prove -vwb sandbox/used-by.pl',
+	'',
+	'doc docs:',
+	'	perl doc/make-doc.pl',
+	'',
 	$do_xt;
     } # postamble

@@ -6,8 +6,12 @@ Daje::Workflow::Database - It's the database migrate plugin for Daje::Workflow
 # SYNOPSIS
 
     use Daje::Workflow::Database;
+
+    push @{$migrations}, {class => 'Daje::Workflow::Database', name => 'workflow', migration => 2};
+
     Daje::Workflow::Database->new(
          pg            => $pg,
+         migrations    => $migrations,
      )->migrate();
 
 # DESCRIPTION

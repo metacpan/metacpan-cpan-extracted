@@ -65,6 +65,13 @@ __Image::LibRSVG__
 
 This will allow you to load vector graphics based themes like Breeze. We did not include it as a prerequisite since it does not respond well to unattended install. It requires the gnome library librsvg-2 and its development files to be installed.
 
+# When updating from version 0.14 or earlier
+
+As of version 0.15 the plugin WordCompletion has been removed. It might still be present
+on your system. All functionality has been moved to the Tk::CodeText text widget. Do not
+load this plugin. It will interfere. Best remove the WordCompletion.pm from wherever
+App/Codit/Plugins folder in the perl install dir. You may need sudo priviliges for that.
+
 # Running Codit
 
 You can launch Codit from the command line as follows:

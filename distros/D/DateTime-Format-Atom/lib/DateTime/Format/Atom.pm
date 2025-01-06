@@ -4,7 +4,7 @@ package DateTime::Format::Atom;
 use strict;
 use warnings;
 
-use version; our $VERSION = qv( 'v1.6.0' );
+use version; our $VERSION = qv( 'v1.8.0' );
 
 use DateTime::Format::RFC3339 qw( );
 
@@ -65,7 +65,7 @@ DateTime::Format::Atom - Parse and format Atom datetime strings
 
 =head1 VERSION
 
-Version 1.6.0
+Version 1.8.0
 
 
 =head1 SYNOPSIS
@@ -186,7 +186,7 @@ I will be notified, and then you'll automatically be notified of progress on you
 Eric Brine, C<< <ikegami@adaelis.com> >>
 
 
-=head1 COPYRIGHT & LICENSE
+=head1 COPYRIGHT AND LICENSE
 
 No rights reserved.
 

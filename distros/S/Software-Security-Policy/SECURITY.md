@@ -2,22 +2,25 @@
 
 Report issues via email at: Timothy Legge <timlegge@gmail.com>.
 
-This is the Security Policy for the Software::Security::Policy distribution.
 
-The latest version of this Security Policy can be found on the
-Software::Security::Policy website at https://github.com/timlegge/Software-Security-Policy/blob/main/SECURITY.md
+This is the Security Policy for the Perl Software::Security::Policy distribution.
+
+The latest version of the Security Policy can be found in the
+[git repository for Software::Security::Policy](https://github.com/CPAN-Security/Software-Security-Policy/blob/main/SECURITY.md).
 
 This text is based on the CPAN Security Group's Guidelines for Adding
-a Security Policy to Perl Distributions (version 0.1.8)
+a Security Policy to Perl Distributions (version 1.0.0)
 https://security.metacpan.org/docs/guides/security-policy-for-authors.html
 
 # How to Report a Security Vulnerability
 
 Security vulnerabilities can be reported by e-mail to the current
-project maintainers at Timothy Legge <timlegge@gmail.com>
+project maintainers at Timothy Legge <timlegge@gmail.com>.
 
 Please include as many details as possible, including code samples
-or test cases, so that we can reproduce the issue.
+or test cases, so that we can reproduce the issue.  Check that your
+report does not expose any sensitive data, such as passwords,
+tokens, or personal information.
 
 If you would like any help with triaging the issue, or if the issue
 is being actively exploited, please copy the report to the CPAN
@@ -40,7 +43,7 @@ on the CPANSec website.
 The maintainer(s) aim to acknowledge your security report as soon as
 possible.  However, this project is maintained by a single person in
 their spare time, and they cannot guarantee a rapid response.  If you
-have not received a response from the them within 5 days, then
+have not received a response from them within 7 days, then
 please send a reminder to them and copy the report to CPANSec at
 <cpan-security@security.metacpan.org>.
 
@@ -55,7 +58,7 @@ modules or downstream software that uses this software.
 
 They may also forward this issue to CPANSec.
 
-# Which Software this Policy Applies to
+# Which Software This Policy Applies To
 
 Any security vulnerabilities in Software::Security::Policy are covered by this policy.
 

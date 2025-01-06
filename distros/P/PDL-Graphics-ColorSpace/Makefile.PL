@@ -10,6 +10,7 @@ $hash{clean}{FILES} .= ' color_space$(OBJ_EXT)';
 
 WriteMakefile( %hash,
     AUTHOR              => 'Maggie J. Xiong  <maggiexyz+github gmail.com>',
+    LICENSE=> 'perl',
     PM => {
       'ColorSpace.pm'           => '$(INST_LIBDIR)/ColorSpace.pm',
       'ColorSpace/RGBSpace.pm'  => '$(INST_LIBDIR)/ColorSpace/RGBSpace.pm',

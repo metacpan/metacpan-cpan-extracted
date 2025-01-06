@@ -1,5 +1,5 @@
 package Photonic::WE::ST::Field;
-$Photonic::WE::ST::Field::VERSION = '0.023';
+$Photonic::WE::ST::Field::VERSION = '0.024';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::WE::ST::Field
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 COPYRIGHT NOTICE
 

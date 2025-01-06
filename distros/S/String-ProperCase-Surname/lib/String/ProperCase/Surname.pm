@@ -3,9 +3,9 @@ use strict;
 use warnings;
 use base qw{Exporter};
 
-our $VERSION='0.03';
-our @EXPORT=qw(ProperCase);
-our @EXPORT_OK=qw(ProperCase);
+our $VERSION   = '0.04';
+our @EXPORT    = qw(ProperCase);
+our @EXPORT_OK = qw(ProperCase);
 
 =head1 NAME
 
@@ -157,24 +157,13 @@ sub ProperCase {
   return $string;
 }
 
-=head1 BUGS
-
-Log on RT and email the Author
-
 =head1 LIMITATIONS
 
 Surname default mixed case hash will never be perfect for every implementation.
 
-=head1 SUPPORT
-
-DavisNetworks.com supports all Perl applications including this package.
-
 =head1 AUTHOR
 
   Michael R. Davis
-  CPAN ID: MRDVT
-  qw/perl michaelrdavis com/
-  http://www.davisnetworks.com/
 
 =head1 COPYRIGHT
 

@@ -1,4 +1,4 @@
-# **V** version 0.18
+# **V**
 
 This module uses stolen code from
 [`Module::Info`](https://metacpan.org/pod/Module::Info) to find the location
@@ -9,15 +9,16 @@ on the perl5-porters list. See [the
 discussion](https://www.nntp.perl.org/group/perl.perl5.porters/2002/01/msg51007.html)
 
 ```bash
-$ perl -MV=CPAN
+🐧 perl -MV=CPAN
 CPAN
-        /opt/homebrew/opt/perl/lib/perl5/5.38/CPAN.pm: 2.36
+        /pro/lib/perl5/site_perl/5.40.0/CPAN.pm: 2.38
+        /pro/lib/perl5/5.40.0/CPAN.pm: 2.36
 ```
 
 or if you want more than one package
 
 ```bash
-$ perl -MV=CPAN,V
+🐧 perl -MV=CPAN,V
 ```
 
 As of version **0.17** it will show all `package`s and `class`es in a file with
@@ -25,9 +26,9 @@ a version. (If one wants *all* packages/classes in the files, set the
 environment variable `PERL_V_SHOW_ALL`)
 
 ```bash
-$ perl -MV=SOAP::Lite
+🐧 perl -MV=SOAP::Lite
 SOAP::Lite
-        /opt/homebrew/opt/perl/lib/perl5/site_perl/5.38/SOAP/Lite.pm:
+        /pro/lib/perl5/site_perl/5.40.0/SOAP/Lite.pm:
             SOAP::Lite: 1.27
             SOAP::Client: 1.27
 ```
@@ -42,7 +43,7 @@ To install this module type the following commands:
 
 # DEPENDENCIES
 
-This module requires no extra modules or libraries from perl version 5.10.1
+This module requires no extra modules or libraries from perl version 5.14.0
 (exept [`Test::More`](https://metacpan.org/pod/Test::More),
 [`Test::Warnings`](https://metacpan.org/pod/Test::Warnings),
 [`Test::Fatal`](https://metacpan.org/pod/Test::Fatal) for the test-suite).
@@ -54,7 +55,8 @@ V`](https://metacpan.org/pod/V)
 
 # COPYRIGHT
 
-&copy; 2002 Abe Timmerman <abeltje@cpan.org>. All rights reserved.
+&copy; 2002..2024 Abe Timmerman <abeltje@cpan.org>. All rights reserved.
+&copy; 2024..2025 H.Merijn Brand <hmbrand@cpan.org>. All rights reserved.
 
 # LICENSE
 
@@ -64,4 +66,3 @@ it under the same terms as Perl itself.
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-

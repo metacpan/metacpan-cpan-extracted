@@ -1,7 +1,13 @@
 Revision history for Syntax-Feature-Void
 
-1.2.0  2017/08/07
-       - Updated to be comaptible with Perl 5.26.
+1.4.0  2025-01-06
+       - Switched to using the keyword plugin since Devel::CallParser
+         and Lexical::Sub are no longer compatible.
+       - Remove references to search.cpan.org and rt.cpan.org.
+       - Switch to using ExtUtils::MakeMaker.
 
-1.0.0  2014/08/17
+1.2.0  2017-08-07
+       - Updated to be compatible with Perl 5.26.
+
+1.0.0  2014-08-17
        - Initial version.

@@ -1,12 +1,12 @@
 {
    "abstract" : "Simple base package from which to inherit",
    "author" : [
-      "Michael R. Davis (mdavis@stopllc.com)"
+      "Michael R. Davis"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150001",
    "license" : [
-      "unknown"
+      "bsd"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -38,5 +38,15 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.09"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mrdvt92/perl-Package-New/issues"
+      },
+      "homepage" : "https://github.com/mrdvt92/perl-Package-New",
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/mrdvt92/perl-Package-New.git"
+      }
+   },
+   "version" : "0.10"
 }

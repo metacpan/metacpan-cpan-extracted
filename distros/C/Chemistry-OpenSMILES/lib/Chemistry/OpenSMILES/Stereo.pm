@@ -1,7 +1,7 @@
 package Chemistry::OpenSMILES::Stereo;
 
 # ABSTRACT: Stereochemistry handling routines
-our $VERSION = '0.10.0'; # VERSION
+our $VERSION = '0.11.0'; # VERSION
 
 use strict;
 use warnings;
@@ -19,6 +19,7 @@ use Chemistry::OpenSMILES::Writer qw( write_SMILES );
 use Graph::Traversal::BFS;
 use Graph::Undirected;
 use List::Util qw( all any first max min sum sum0 uniq );
+use Set::Object qw( set );
 
 require Exporter;
 our @ISA = qw( Exporter );
@@ -33,15 +34,32 @@ sub mark_all_double_bonds
 {
     my( $graph, $setting_sub, $order_sub, $color_sub ) = @_;
 
+    my @double_bonds = grep { is_double_bond( $graph, @$_ ) } $graph->edges;
+    if( ref $setting_sub eq 'ARRAY' ) {
+        # List of double bonds with their setting are given
+        @double_bonds = map { [ @{$_}[1..2] ] } @$setting_sub;
+        my %cis = map { ( join( '', sort @{$_}[1..2] ) => { atoms => set( $_->[0], $_->[3] ), setting => $_->[4] } ) }
+                      @$setting_sub;
+        $setting_sub = sub {
+            my $key = join '', sort @_[1..2];
+            return undef unless exists $cis{$key};
+
+            my $setting = $cis{$key}->{setting};
+            return $setting unless ($cis{$key}->{atoms} * set( $_[0], $_[3] ))->size == 1;
+            return $setting eq 'cis' ? 'trans' : 'cis';
+        };
+    }
+
     # By default, whenever there is a choice between atoms, the one with
     # lowest position in the input SMILES is chosen:
-    $order_sub = sub { return $_[0]->{number} } unless $order_sub;
+    $order_sub = sub { $_[0]->{number} } unless $order_sub;
 
     # Select non-ring double bonds
-    my @double_bonds = grep { is_double_bond( $graph, @$_ ) &&
-                              !is_ring_bond( $graph, @$_ ) &&
-                              !is_unimportant_double_bond( $graph, @$_, $color_sub ) }
-                            $graph->edges;
+    @double_bonds = grep { !is_ring_bond( $graph, @$_ ) &&
+                           !is_unimportant_double_bond( $graph, @$_, $color_sub ) }
+                         @double_bonds;
+
+    return unless @double_bonds;
 
     # Construct a double bond incidence graph. Vertices are double bonds
     # and edges are between those double bonds that separated by a single
@@ -123,7 +141,7 @@ sub mark_cis_trans
 
     # By default, whenever there is a choice between atoms, the one with
     # lowest position in the input SMILES is chosen:
-    $order_sub = sub { return $_[0]->{number} } unless $order_sub;
+    $order_sub = sub { $_[0]->{number} } unless $order_sub;
 
     my @neighbours2 = $graph->neighbours( $atom2 );
     my @neighbours3 = $graph->neighbours( $atom3 );
@@ -353,14 +371,14 @@ sub cis_trans_to_pseudoedges
         next if @atom2_neighbours < 2 || @atom2_neighbours > 3 ||
                 @atom3_neighbours < 2 || @atom3_neighbours > 3;
 
-        my( $atom1 ) = grep { is_cis_trans_bond( $moiety, $atom2, $_ ) }
-                            @atom2_neighbours;
-        my( $atom4 ) = grep { is_cis_trans_bond( $moiety, $atom3, $_ ) }
-                            @atom3_neighbours;
+        my $atom1 = first { is_cis_trans_bond( $moiety, $atom2, $_ ) }
+                          @atom2_neighbours;
+        my $atom4 = first { is_cis_trans_bond( $moiety, $atom3, $_ ) }
+                          @atom3_neighbours;
         next unless $atom1 && $atom4;
 
-        my( $atom1_para ) = grep { $_ != $atom1 && $_ != $atom3 } @atom2_neighbours;
-        my( $atom4_para ) = grep { $_ != $atom4 && $_ != $atom2 } @atom3_neighbours;
+        my $atom1_para = first { $_ != $atom1 && $_ != $atom3 } @atom2_neighbours;
+        my $atom4_para = first { $_ != $atom4 && $_ != $atom2 } @atom3_neighbours;
 
         my $is_cis = $moiety->get_edge_attribute( $atom1, $atom2, 'bond' ) ne
                      $moiety->get_edge_attribute( $atom3, $atom4, 'bond' );

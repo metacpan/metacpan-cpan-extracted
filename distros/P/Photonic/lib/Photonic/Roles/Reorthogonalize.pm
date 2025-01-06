@@ -1,5 +1,5 @@
 package Photonic::Roles::Reorthogonalize;
-$Photonic::Roles::Reorthogonalize::VERSION = '0.023';
+$Photonic::Roles::Reorthogonalize::VERSION = '0.024';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::Roles::ReorthogonalizeC
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 COPYRIGHT NOTICE
 
@@ -185,10 +185,10 @@ sub _fullorthogonalize_indeed {
 sub _checkorthogonalize {
     my ($self, $n, $a, $b, $c, $b_np1, $g_n, $g_np1)=@_;
     return 0 if $self->fullorthogonalize_N; #already orthogonalizing
-    if($self->_justorthogonalized){
+    if ($self->_justorthogonalized) {
 	$self->_write_justorthogonalized(0);
-	my $current_W=PDL->ones($n)*$self->noise;
-	my $next_W=PDL->ones($n+1)*$self->noise;
+	my $current_W=PDL->ones($g_n->type, $n)*$self->noise;
+	my $next_W=PDL->ones($g_np1->type, $n+1)*$self->noise;
 	$current_W->(-1).=$g_n;
 	$next_W->(-1).=$g_np1;
 	$self->_current_W($current_W);

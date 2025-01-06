@@ -13,9 +13,10 @@ WriteMakefile(
 	'Raksha Singla  <raksharuia@gmail.com>',
 	'Merlyn Jaqueline Juarez-Gutierrez <merlynj@icf.unam.mx>',
 	],
+    ABSTRACT=> 'A perl package for calculations on photonics and metamaterials.',
     VERSION_FROM => 'lib/Photonic.pm',
     LICENSE    => 'perl',
-    MIN_PERL_VERSION => '5.14.0',
+    MIN_PERL_VERSION => '5.16.0',                 # so PDL::FFTW3 also installs
     PREREQ_PM => {
 	'Carp'                           => '0',
 	'IO::File'                       => '0',
@@ -25,7 +26,7 @@ WriteMakefile(
 	'namespace::autoclean'           => '0',
 	'Type::Tiny'                     => '0',
 	'MooX::StrictConstructor'        => '0',
-	'PDL'                            => '2.049', # PDL::Complex->from_native
+	'PDL'                            => '2.093', # PDL::Complex->from_native, inner for complex
 	'PDL::Constants'                 => '0',
 	'PDL::Core'                      => '0',
 	'PDL::Core::Dev'                 => '0',
@@ -41,9 +42,7 @@ WriteMakefile(
     },
     TEST_REQUIRES => {
         'Machine::Epsilon'            => '0',
-	'Test::More'                  => '0',
-	'Test::Version'               => '1.003001'
-
+	'Test::More'                  => '0.88',
     },
     CONFIGURE_REQUIRES => {
 	'ExtUtils::MakeMaker' => '0',

@@ -24,3 +24,9 @@ Revision history for Switch-Right
 0.000005  Sun Jun 30 16:06:49 2024
 
     Added warnings for "when (true)" and "when (false)"
+
+
+0.000006  Mon Jan  6 11:43:55 2025
+
+    Fixed line number anomalies introduced during preprocessing
+    (Thanks, Graham!)

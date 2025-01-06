@@ -27,5 +27,5 @@ resources:
   bugtracker: https://github.com/PDLPorters/PDL-LinearAlgebra/issues
   homepage: http://pdl.perl.org/
   repository: git://github.com/PDLPorters/PDL-LinearAlgebra.git
-version: '0.432'
+version: '0.433'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

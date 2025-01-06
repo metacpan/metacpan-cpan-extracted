@@ -1,7 +1,6 @@
 ^.git/
 ^.gitignore$
 .bak$
-.tar.gz$
 ~$
 .releaserc
 ^blib/

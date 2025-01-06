@@ -4,7 +4,7 @@ Crypt::URandom - Provide non blocking randomness
 
 # VERSION
 
-This document describes Crypt::URandom version 0.46\_03
+This document describes Crypt::URandom version 0.47
 
 # SYNOPSIS
 
@@ -111,6 +111,11 @@ than or equal to Windows 2000.
 # CONFIGURATION AND ENVIRONMENT
 
 Crypt::URandom requires no configuration files or environment variables.
+
+If the environment variable CRYPT\_URANDOM\_BUILD\_DEBUG is specified when
+running `perl Makefile.PL` or `make test` AND [getrandom(2)](http://man.he.net/man2/getrandom) or it's
+equivalents cannot be detected, extra debug will be shown to show the
+failures to detect these functions.
 
 # DEPENDENCIES
 

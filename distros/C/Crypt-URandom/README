@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    This document describes Crypt::URandom version 0.46
+    This document describes Crypt::URandom version 0.47
 
 SYNOPSIS
 
@@ -117,6 +117,11 @@ CONFIGURATION AND ENVIRONMENT
 
     Crypt::URandom requires no configuration files or environment
     variables.
+
+    If the environment variable CRYPT_URANDOM_BUILD_DEBUG is specified when
+    running perl Makefile.PL or make test AND getrandom(2) or it's
+    equivalents cannot be detected, extra debug will be shown to show the
+    failures to detect these functions.
 
 DEPENDENCIES
 

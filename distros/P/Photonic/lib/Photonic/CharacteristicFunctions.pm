@@ -1,5 +1,5 @@
 package Photonic::CharacteristicFunctions;
-$Photonic::CharacteristicFunctions::VERSION = '0.023';
+$Photonic::CharacteristicFunctions::VERSION = '0.024';
 
 =encoding UTF-8
 
@@ -109,7 +109,7 @@ Photonic::CharacteristicFunctions
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 SYNOPSIS
 

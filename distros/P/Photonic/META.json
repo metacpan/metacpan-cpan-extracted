@@ -1,5 +1,5 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "A perl package for calculations on photonics and metamaterials.",
    "author" : [
       "W. Luis Mochan <mochan@fis.unam.mx>",
       "Guillermo Ortiz <gortiz@exa.unne.edu.ar>",
@@ -10,7 +10,7 @@
       "Merlyn Jaqueline Juarez-Gutierrez <merlynj@icf.unam.mx>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -51,7 +51,7 @@
             "Machine::Epsilon" : "0",
             "Moo" : "0",
             "MooX::StrictConstructor" : "0",
-            "PDL" : "2.049",
+            "PDL" : "2.093",
             "PDL::Constants" : "0",
             "PDL::Core" : "0",
             "PDL::Core::Dev" : "0",
@@ -66,14 +66,13 @@
             "Storable" : "0",
             "Type::Tiny" : "0",
             "namespace::autoclean" : "0",
-            "perl" : "5.014000"
+            "perl" : "5.016000"
          }
       },
       "test" : {
          "requires" : {
             "Machine::Epsilon" : "0",
-            "Test::More" : "0",
-            "Test::Version" : "1.003001"
+            "Test::More" : "0.88"
          }
       }
    },
@@ -84,6 +83,6 @@
          "web" : "https://github.com/wlmb/Photonic"
       }
    },
-   "version" : "0.023",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.024",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

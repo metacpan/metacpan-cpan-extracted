@@ -1,56 +1,65 @@
 {
-   "abstract" : "Print version of the specified module(s).",
-   "author" : [
-      "H.Merijn Brand <hmbrand@cpan.org>"
-   ],
+   "abstract" : "Print version of the specified module(s)",
+   "prereqs" : {
+      "runtime" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "perl" : "5.014000"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Test::Simple" : "1.302207"
+         },
+         "requires" : {
+            "Test::Simple" : "0.88",
+            "Test::Fatal" : "0"
+         }
+      },
+      "configure" : {
+         "recommends" : {
+            "ExtUtils::MakeMaker" : "7.70"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      }
+   },
+   "version" : "0.21",
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "release_status" : "stable",
+   "resources" : {
+      "x_IRC" : "irc://irc.perl.org/#csv",
+      "repository" : {
+         "url" : "https://github.com/Tux/V",
+         "type" : "git",
+         "web" : "https://github.com/Tux/V"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "homepage" : "https://metacpan.org/pod/V",
+      "bugtracker" : {
+         "web" : "https://github.com/Tux/V/issues"
+      }
+   },
+   "name" : "V",
+   "provides" : {
+      "V" : {
+         "file" : "lib/V.pm",
+         "version" : "0.21"
+      }
+   },
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
-      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : 2,
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
    },
-   "name" : "V",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc"
-      ]
-   },
-   "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Test::Fatal" : "0",
-            "Test::Simple" : "0.88",
-            "Test::Warnings" : "0"
-         }
-      },
-      "configure" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
-      "runtime" : {
-         "requires" : {
-            "perl" : "5.010001",
-            "version" : "0.77"
-         }
-      }
-   },
-   "release_status" : "stable",
-   "resources" : {
-      "bugtracker" : {
-         "web" : "https://github.com/Tux/V/issues"
-      },
-      "homepage" : "https://github.com/Tux/V",
-      "repository" : {
-         "type" : "git",
-         "url" : "https://github.com/Tux/V.git"
-      },
-      "x_IRC" : "irc://irc.perl.org/#csv"
-   },
-   "version" : "0.20",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "author" : [
+      "H.Merijn Brand <hmbrand@cpan.org>",
+      "Abe Timmerman"
+   ],
+   "generated_by" : "Author"
 }

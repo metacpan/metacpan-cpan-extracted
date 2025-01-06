@@ -1,3 +1,9 @@
+0.11.0 2025-01-06
+
+    - Fixing handling of octahedral chirality.
+    - Implementing an alternative method to mark cis/trans settings by
+      giving their list instead of providing a callback.
+
 0.10.0 2024-11-28
 
     - Reworking the logic of marking atoms with nonstandard valences.

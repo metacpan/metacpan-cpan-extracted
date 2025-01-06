@@ -54,6 +54,6 @@
          "web" : "https://github.com/briandfoy/file-find-closures"
       }
    },
-   "version" : "1.116",
+   "version" : "1.117",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

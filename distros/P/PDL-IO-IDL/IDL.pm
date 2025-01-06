@@ -95,7 +95,7 @@ our @EXPORT_OK = qw( ridl );
 our @EXPORT = @EXPORT_OK;
 our @EXPORT_TAGS = ( Func=>[@EXPORT_OK] );
 
-our $VERSION = "2.097";
+our $VERSION = "2.098";
 $VERSION = eval $VERSION;
 
 use PDL;

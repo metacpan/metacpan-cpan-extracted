@@ -25,6 +25,7 @@ do { my $x = {
                       'requires' => {
                                       'Carp' => '0',
                                       'Class::Tiny::Chained' => '0',
+                                      'Crypt::URandom' => '0.37',
                                       'Digest::SHA' => '0',
                                       'List::Util' => '1.33',
                                       'Module::Runtime' => '0',

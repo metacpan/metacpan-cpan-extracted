@@ -6,11 +6,11 @@ use warnings;
 
 use English;
 use Error::Pure qw(err);
-use List::MoreUtils qw(none);
+use List::Util 1.33 qw(none);
 
 Readonly::Array our @EXPORT_OK => qw(obj_array_ref2struct struct2snaks_array_ref);
 
-our $VERSION = 0.13;
+our $VERSION = 0.14;
 
 sub obj_array_ref2struct {
 	my ($snaks_ar, $key, $base_uri, $snak_obj, $struct_snak_obj) = @_;
@@ -281,7 +281,7 @@ Returns reference to array with snaks objects.
 
 L<Error::Pure>,
 L<Exporter>,
-L<List::MoreUtils>.
+L<List::Util>.
 
 =head1 SEE ALSO
 
@@ -305,12 +305,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2020-2024 Michal Josef Špaček
+© 2020-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.13
+0.14
 
 =cut

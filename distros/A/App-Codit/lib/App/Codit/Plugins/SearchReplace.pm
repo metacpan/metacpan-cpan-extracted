@@ -9,7 +9,7 @@ App::Codit::Plugins::SearchReplace - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.14;
+$VERSION = 0.15;
 
 use base qw( Tk::AppWindow::BaseClasses::Plugin );
 use Tk;
@@ -641,6 +641,10 @@ sub ShowResults {
 	}
 	$self->after(500, sub { $widg->tagRaise('Find') }); #make sure syntax highlighting does not overwrite the tags
 	$self->after(3000, sub { $widg->tagRaise('Find') if Exists $widg }); #make sure syntax highlighting does not overwrite the tags
+	my $nhits = @hits;
+	my @e = $list->infoChildren('');
+	my $ndocs = @e;
+	$self->log("$nhits hits in $ndocs documents");
 	return @_;
 }
 

@@ -5,10 +5,10 @@ author:
 build_requires:
   Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '6.52'
+  ExtUtils::MakeMaker: '6.74'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.0402, CPAN::Meta::Converter version 2.150001'
-license: unrestricted
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -36,4 +36,5 @@ resources:
   homepage: http://search.cpan.org/dist/WWW-Kickstarter/
   license: http://creativecommons.org/publicdomain/zero/1.0/
   repository: https://github.com/ikegami/perl-WWW-Kickstarter.git
-version: v1.14.0
+version: v1.16.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

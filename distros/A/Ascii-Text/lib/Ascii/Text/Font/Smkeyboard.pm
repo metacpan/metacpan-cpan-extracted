@@ -895,7 +895,7 @@ Ascii::Text::Font::Smkeyboard - Smkeyboard Font
 
 =head1 VERSION
 
-Version 0.19
+Version 0.20
 
 =cut
 

@@ -10,6 +10,7 @@ WriteMakefile(
   NAME => $package_name,
   VERSION_FROM => 'IDL.pm',
   AUTHOR => 'PerlDL Developers <pdl-general@lists.sourceforge.net>',
+  LICENSE=> "perl",
   CONFIGURE_REQUIRES => {
     'ExtUtils::MakeMaker' => 0,
     'PDL' => '2.094',

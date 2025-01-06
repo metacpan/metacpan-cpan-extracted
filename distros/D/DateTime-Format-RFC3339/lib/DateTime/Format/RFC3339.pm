@@ -4,7 +4,7 @@ package DateTime::Format::RFC3339;
 use strict;
 use warnings;
 
-use version; our $VERSION = qv( 'v1.8.0' );
+use version; our $VERSION = qv( 'v1.10.0' );
 
 use Carp     qw( croak );
 use DateTime qw( );
@@ -156,7 +156,7 @@ DateTime::Format::RFC3339 - Parse and format RFC3339 datetime strings
 
 =head1 VERSION
 
-Version 1.8.0
+Version 1.10.0
 
 
 =head1 SYNOPSIS
@@ -316,7 +316,7 @@ I will be notified, and then you'll automatically be notified of progress on you
 Eric Brine, C<< <ikegami@adaelis.com> >>
 
 
-=head1 COPYRIGHT & LICENSE
+=head1 COPYRIGHT AND LICENSE
 
 No rights reserved.
 

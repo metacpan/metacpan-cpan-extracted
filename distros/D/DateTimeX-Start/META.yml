@@ -5,10 +5,10 @@ author:
 build_requires:
   Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '6.52'
+  ExtUtils::MakeMaker: '6.74'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
-license: unrestricted
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -27,9 +27,9 @@ requires:
   version: '0'
   warnings: '0'
 resources:
-  bugtracker: http://rt.cpan.org/NoAuth/ReportBug.html?Queue=DateTimeX-Start
-  homepage: http://search.cpan.org/dist/DateTimeX-Start/
+  bugtracker: https://github.com/ikegami/perl-DateTimeX-Start/issues
+  homepage: https://metacpan.org/dist/DateTimeX-Start/
   license: http://creativecommons.org/publicdomain/zero/1.0/
   repository: https://github.com/ikegami/perl-DateTimeX-Start.git
-version: v1.6.0
+version: v1.8.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -15,7 +15,7 @@ can_ok($dac, qw{cfg file basename path});
 can_ok($dac, qw{connect});
 
 isa_ok($dac->path, "ARRAY");
-is(scalar(@{$dac->path}), 1, "sizeof");
+is(scalar(@{$dac->path}), 3, "sizeof");
 
 isa_ok($dac->path(qw{. ..}), "ARRAY");
 is(scalar(@{$dac->path}), 2, "sizeof");

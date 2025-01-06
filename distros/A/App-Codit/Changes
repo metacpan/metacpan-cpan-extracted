@@ -1,5 +1,12 @@
 Revision history for Perl extension App::Codit.
 
+0.15 Sun Jan 05 2025
+	- Moved autocomplete code from plugin WordCompletion to module Tk::CodeText.
+	- Integrated the new Tk::CodeText in Codit.
+	- Reorganized the settings form.
+	- Removed plugin WordCompletion. It is now obsolete.
+	- Updated Readme.md
+
 0.14 Fri Dec 27 2024
 	- Search input in plugin SearchReplace is validated and quoted.
 	- Replaces can be made with $1, $2 etc captures from the search on regular expression.
