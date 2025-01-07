@@ -1,0 +1,52 @@
+{
+   "abstract" : "A simple Perl module for generating bar charts using D3.js",
+   "author" : [
+      "Nigel Horne <njh@bandsman.co.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "HTML-D3",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "JSON::MaybeXS" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::DescribeMe" : "0",
+            "Test::HTML::T5" : "0",
+            "Test::Most" : "0",
+            "Test::Needs" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {},
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

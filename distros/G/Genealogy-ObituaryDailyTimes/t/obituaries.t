@@ -1,7 +1,7 @@
 #!perl -wT
 
 use strict;
-use Test::Most tests => 14;
+use Test::Most tests => 15;
 
 use lib 'lib';
 use lib 't/lib';
@@ -12,7 +12,7 @@ BEGIN {
 }
 
 SKIP: {
-	skip 'Database not installed', 13 if(!-r 'lib/Genealogy/ObituaryDailyTimes/data/obituaries.sql');
+	skip 'Database not installed', 14 if(!-r 'lib/Genealogy/ObituaryDailyTimes/data/obituaries.sql');
 
 	Database::Abstraction::init('directory' => 'lib/Genealogy/ObituaryDailyTimes/data');
 
@@ -67,7 +67,12 @@ SKIP: {
 		diag(Data::Dumper->new([\@macfarlane])->Dump());
 	}
 
-	is(grep($_->{'url'} eq 'https://www.freelists.org/post/obitdailytimes/Obituary-Daily-Times-v28no008', @macfarlane), 1, 'Find the expected URL exactly one time');
+	is(grep($_->{'url'} eq 'https://www.freelists.org/post/obitdailytimes/Obituary-Daily-Times-v28no008', @macfarlane), 1, 'Volume 28 is indexed');
+
+	# V30
+	my @krug = $search->search(first => 'Dan', middle => 'M', last => 'Krug', age => 80);
+
+	is(grep($_->{'url'} eq 'https://www.freelists.org/post/obitdailytimes/Obituary-Daily-Times-v30no001', @krug), 1, 'Volume 30 is indexed');
 
 	# Continuity line
 	my $adams = $search->search({ first => 'Almetta', middle => 'Ivaleen', last => 'Adams' });

@@ -6,6 +6,13 @@ use Carp;
 use File::Spec;
 use Module::Info;
 use Genealogy::ObituaryDailyTimes::obituaries;
+use Scalar::Util;
+
+use constant URLS => {
+	# 'M' => "https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit&page=",
+	'M' => "https://wayback.archive-it.org/20669/20231102044925/https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit&page=",
+	'F' => "https://www.freelists.org/post/obitdailytimes/Obituary-Daily-Times-",
+};
 
 =head1 NAME
 
@@ -13,11 +20,11 @@ Genealogy::ObituaryDailyTimes - Lookup an entry in the Obituary Daily Times
 
 =head1 VERSION
 
-Version 0.13
+Version 0.14
 
 =cut
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 =head1 SYNOPSIS
 
@@ -31,9 +38,15 @@ our $VERSION = '0.13';
 
 Creates a Genealogy::ObituaryDailyTimes object.
 
-Takes two optional arguments:
-	directory: that is the directory containing obituaries.sql
-	logger: an object to send log messages to
+Accepts the following optional arguments:
+
+=over 4
+
+=item * C<directory> - The directory containing the file obituaries.sql
+
+=item * C<logger> - An object to send log messages to
+
+=back
 
 =cut
 
@@ -42,14 +55,16 @@ sub new {
 	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
 	if(!defined($class)) {
-		# Use Genealogy::ObituaryDailyTimes->new, not Genealogy::ObituaryDailyTimes::new
-		# carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
-		# return;
+		if((scalar keys %args) > 0) {
+			# Use Genealogy::ObituaryDailyTimes->new, not Genealogy::ObituaryDailyTimes::new
+			carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+			return;
+		}
 
 		# FIXME: this only works when no arguments are given
 		$class = __PACKAGE__;
-	} elsif(ref($class)) {
-		# clone the given object
+	} elsif(Scalar::Util::blessed($class)) {
+		# If $class is an object, clone it with new arguments
 		return bless { %{$class}, %args }, ref($class);
 	}
 
@@ -65,7 +80,7 @@ sub new {
 		return;
 	}
 
-	# cache_duration can be overriden by the args
+	# cache_duration can be overridden by the args
 	return bless {
 		cache_duration => '1 day',	# The database is updated daily
 		%args,
@@ -73,6 +88,20 @@ sub new {
 }
 
 =head2 search
+
+Supports two return modes:
+
+=over 4
+
+=item * C<List context>
+
+Returns an array of hash references.
+
+=item * C<Scalar context>
+
+Returns a single hash reference.
+
+=back
 
     my $obits = Genealogy::ObituaryDailyTimes->new();
 
@@ -83,7 +112,8 @@ sub new {
 
 =cut
 
-sub search {
+sub search
+{
 	my $self = shift;
 	my $params = $self->_get_params('last', @_);
 
@@ -127,45 +157,48 @@ sub _create_url {
 	}
 
 	if($source eq 'M') {
-		# return "https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit&page=$page";
-		return "https://wayback.archive-it.org/20669/20231102044925/https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit&page=$page";
+		return URLS->{'M'} . $page;
 	}
 	if($source eq 'F') {
-		return "https://www.freelists.org/post/obitdailytimes/Obituary-Daily-Times-$page";
+		return URLS->{'F'} . $page;
 	}
 	if($source eq 'L') {
-		return $obit->{'newspaper'};
+		my $newspaper = $obit->{'newspaper'} || Carp::croak(__PACKAGE__, ": undefined newspaper.  Newspaper much be given when source type is 'L'");
+		return $newspaper;
 	}
-	Carp::croak(__PACKAGE__, ": Invalid source, '$source'");
+	Carp::croak(__PACKAGE__, ": Invalid source, '$source'. Valid sources are 'M', 'F' and 'L'");
 }
 
 # Helper routine to parse the arguments given to a function,
+# Processes arguments passed to methods and ensures they are in a usable format,
 #	allowing the caller to call the function in anyway that they want
 #	e.g. foo('bar'), foo(arg => 'bar'), foo({ arg => 'bar' }) all mean the same
 #	when called _get_params('arg', @_);
 sub _get_params
 {
-	my $self = shift;
+	shift;  # Discard the first argument (typically $self)
 	my $default = shift;
 
-	my %rc;
+	# Directly return hash reference if the first parameter is a hash reference
+	return $_[0] if(ref $_[0] eq 'HASH');
 
-	if(ref($_[0]) eq 'HASH') {
-		%rc = %{$_[0]};
-	} elsif(scalar(@_) % 2 == 0) {
+	my %rc;
+	my $num_args = scalar @_;
+
+	# Populate %rc based on the number and type of arguments
+	if(($num_args == 1) && (defined $default)) {
+		# %rc = ($default => shift);
+		return { $default => shift };
+	} elsif($num_args == 1) {
+		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '()');
+	} elsif(($num_args == 0) && (defined($default))) {
+		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], "($default => \$val)");
+	} elsif(($num_args % 2) == 0) {
 		%rc = @_;
-	} elsif(scalar(@_) == 1) {
-		if(defined($default)) {
-			$rc{$default} = shift;
-		} else {
-			my @c = caller(1);
-			my $func = $c[3];	# calling function name
-			Carp::croak('Usage: ', __PACKAGE__, "->$func($default => " . '$val)');
-		}
-	} elsif((scalar(@_) == 0) && defined($default)) {
-		my @c = caller(1);
-		my $func = $c[3];	# calling function name
-		Carp::croak('Usage: ', __PACKAGE__, "->$func($default => " . '$val)');
+	} elsif($num_args == 0) {
+		return;
+	} else {
+		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '()');
 	}
 
 	return \%rc;
@@ -217,7 +250,7 @@ L<http://deps.cpantesters.org/?module=Genealogy::ObituaryDailyTimes>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2020-2024 Nigel Horne.
+Copyright 2020-2025 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

@@ -1,6 +1,7 @@
-use v5.36;
 package PDL::ApplyDim;
-$PDL::ApplyDim::VERSION = '0.001';
+
+use v5.36;
+our $VERSION = '0.002';
 use Carp;
 require Exporter;
 our @ISA=qw(Exporter);
@@ -75,21 +76,12 @@ sub _unshuffle_end($dims, $ndims){
 
 1;
 
-# ABSTRACT: Conjugate a function with a permutation of the dimensions of an ndarray
-
 __END__
 
-=pod
-
-=encoding UTF-8
-
+# ABSTRACT: Conjugate a function with a permutation of the dimensions of an ndarray
 =head1 NAME
 
-PDL::ApplyDim - Conjugate a function with a permutation of the dimensions of an ndarray
-
-=head1 VERSION
-
-version 0.001
+PDL::ApplyDim - shuffle before and after applying function
 
 =head1 SYNOPSIS
 
@@ -99,8 +91,8 @@ version 0.001
     sub mult_columns($x, $dx, $m) { # multiply some columns of $x by $m
 	$x->slice("0:-1:$dx")*=$m;
     }
-    say $nd->apply_to(\&mult_columns, 1, 2, 3);      # multiply even rows of $nd by 3
-    say $nd->apply_not_to(\&mult_columns,0,2,3);     # same
+    say $nd->apply_to(\&mult_columns, 1, 2, 3); #multiply even rows of $nd by 3
+    say $nd->apply_not_to(\&mult_columns,0,2,3);# same
 
 =head1 DESCRIPTION
 
@@ -117,7 +109,7 @@ The idea is to hide the C<mv> operations and write this as
 
 or
 
-    apply_to($pdl, \&function, $dim, $some, $extra, $args);
+    apply_to($pdl, "function", $dim, $some, $extra, $args);
 
 Similarly
 
@@ -125,9 +117,9 @@ Similarly
 
 moves the dimension to the back.
 
-Instead of a scalar argument C<$dim> and array reference may be
-passed, as C<[$d0, $d1...]> to move the dimensions C<$d0, $d1...> to the
-front or to the back instead of a single dimension.
+Besides a number, C<$dim> may also be an array reference, such as as
+=C<[$d0, $d1...]>, to move the dimensions C<$d0, $d1...> to the
+front or to the back instead of just a single dimension.
 
 =head1 METHODS
 
@@ -149,13 +141,17 @@ several dimensions.
 
 =head1 AUTHOR
 
-W. Luis Mochan <mochan@fis.unam.mx>
+W. Luis Mochan E<lt>mochan@fis.unam.mxE<gt>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 COPYRIGHT
 
-This software is copyright (c) 2024 by W. Luis Mochan.
+Copyright 2025- W. Luis Mochan
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+# =head1 SEE ALSO
 
 =cut

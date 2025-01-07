@@ -1,0 +1,490 @@
+#!perl
+use strict;
+use warnings;
+use 5.020;
+
+our $VERSION = '0.01';
+
+use utf8;
+use DateTime;
+use Encode qw(decode);
+use JSON;
+use Getopt::Long qw(:config no_ignore_case);
+use List::Util   qw(max);
+use Travel::Status::DE::DBRIS;
+
+my ( $date, $time );
+my $mots;
+my $developer_mode;
+my $show_jid;
+my $use_cache = 1;
+my $cache;
+my ( $json_output, $raw_json_output );
+
+my @output;
+
+binmode( STDOUT, ':encoding(utf-8)' );
+for my $arg (@ARGV) {
+	$arg = decode( 'UTF-8', $arg );
+}
+
+my $output_bold  = -t STDOUT ? "\033[1m" : q{};
+my $output_reset = -t STDOUT ? "\033[0m" : q{};
+
+GetOptions(
+	'd|date=s'             => \$date,
+	'h|help'               => sub { show_help(0) },
+	'j|with-jid'           => \$show_jid,
+	'm|modes-of-transit=s' => \$mots,
+	't|time=s'             => \$time,
+	'V|version'            => \&show_version,
+	'cache!'               => \$use_cache,
+	'devmode'              => \$developer_mode,
+	'json'                 => \$json_output,
+	'raw-json'             => \$raw_json_output,
+
+) or show_help(1);
+
+if ($use_cache) {
+	my $cache_path = ( $ENV{XDG_CACHE_HOME} // "$ENV{HOME}/.cache" )
+	  . '/Travel-Status-DE-DBRIS';
+	eval {
+		require Cache::File;
+		$cache = Cache::File->new(
+			cache_root      => $cache_path,
+			default_expires => '90 seconds',
+			lock_level      => Cache::File::LOCK_LOCAL(),
+		);
+	};
+	if ($@) {
+		$cache = undef;
+	}
+}
+
+my %opt = (
+	cache          => $cache,
+	station        => shift || show_help(1),
+	developer_mode => $developer_mode,
+);
+
+if ( $opt{station} =~ m{ ^ (?<lat> [0-9.]+ ) : (?<lon> [0-9].+ ) $ }x ) {
+	$opt{geoSearch} = {
+		latitude  => $+{lat},
+		longitude => $+{lon},
+	};
+	delete $opt{station};
+}
+elsif ( $opt{station} =~ m{ ^ [?] (?<query> .*) $ }x ) {
+	$opt{locationSearch} = $+{query};
+	delete $opt{station};
+}
+elsif ( $opt{station} =~ m{[|]} ) {
+	$opt{journey} = $opt{station};
+	delete $opt{station};
+}
+elsif ( $opt{station} !~ m{ ^ \d+ $ }x ) {
+	my $status = Travel::Status::DE::DBRIS->new(
+		cache          => $cache,
+		locationSearch => $opt{station},
+		developer_mode => $developer_mode,
+	);
+	if ( my $err = $status->errstr ) {
+		say STDERR "Request error while looking up '$opt{station}': ${err}";
+		exit 2;
+	}
+	my $found;
+	for my $result ( $status->results ) {
+		if ( defined $result->eva ) {
+			if ( lc( $result->name ) ne lc( $opt{station} ) ) {
+				say $result->name;
+			}
+			$opt{station} = $result;
+			$found = 1;
+			last;
+		}
+	}
+	if ( not $found ) {
+		say "Could not find stop '$opt{station}'";
+		exit 1;
+	}
+}
+
+if ( $date or $time ) {
+	my $dt = DateTime->now( time_zone => 'Europe/Berlin' );
+	if ($date) {
+		if ( $date
+			=~ m{ ^ (?<day> \d{1,2} ) [.] (?<month> \d{1,2} ) [.] (?<year> \d{4})? $ }x
+		  )
+		{
+			$dt->set(
+				day   => $+{day},
+				month => $+{month}
+			);
+			if ( $+{year} ) {
+				$dt->set( year => $+{year} );
+			}
+		}
+		else {
+			say '--date must be specified as DD.MM.[YYYY]';
+			exit 1;
+		}
+	}
+	if ($time) {
+		if ( $time =~ m{ ^ (?<hour> \d{1,2} ) : (?<minute> \d{1,2} ) $ }x ) {
+			$dt->set(
+				hour   => $+{hour},
+				minute => $+{minute},
+				second => 0,
+			);
+		}
+		else {
+			say '--time must be specified as HH:MM';
+			exit 1;
+		}
+	}
+	$opt{datetime} = $dt;
+}
+
+if ($mots) {
+	$opt{modes_of_transit} = [ split( qr{, *}, $mots ) ];
+}
+
+my $status = Travel::Status::DE::DBRIS->new(%opt);
+
+sub show_help {
+	my ($code) = @_;
+
+	print "Usage: db-ris-m [-j] <station|journeyID|lat:lon>\n"
+	  . "See also: man dbris-m\n";
+
+	exit $code;
+}
+
+sub show_version {
+	say "dbris-m version ${VERSION}";
+
+	exit 0;
+}
+
+sub spacer {
+	my ($len) = @_;
+	return ( $len % 2 ? q { } : q{} ) . ( q{ ·} x ( $len / 2 ) );
+}
+
+sub display_occupancy {
+	my ($occupancy) = @_;
+
+	if ( not $occupancy ) {
+		return q{ };
+	}
+	if ( $occupancy == 1 ) {
+		return q{.};
+	}
+	if ( $occupancy == 2 ) {
+		return q{o};
+	}
+	if ( $occupancy == 3 ) {
+		return q{*};
+	}
+	if ( $occupancy == 4 ) {
+		return q{!};
+	}
+	return q{?};
+}
+
+sub format_occupancy {
+	my ($stop) = @_;
+
+	return display_occupancy( $stop->occupancy_first )
+	  . display_occupancy( $stop->occupancy_second );
+}
+
+sub format_delay {
+	my ( $delay, $len ) = @_;
+	if ( $delay and $len ) {
+		return sprintf( "(%+${len}d)", $delay );
+	}
+	return q{};
+}
+
+if ( my $err = $status->errstr ) {
+	say STDERR "Request error: ${err}";
+	exit 2;
+}
+
+if ($raw_json_output) {
+	say JSON->new->convert_blessed->encode( $status->{raw_json} );
+	exit 0;
+}
+
+if ($json_output) {
+	if ( $opt{journey} ) {
+		say JSON->new->convert_blessed->encode( $status->result );
+	}
+	else {
+		say JSON->new->convert_blessed->encode( [ $status->results ] );
+	}
+	exit 0;
+}
+
+if ( $opt{station} ) {
+	my $max_line = max map { length( $_->line ) } $status->results;
+	my $max_dest
+	  = max map { length( $_->destination // q{} ) } $status->results;
+	my $max_delay = max map { length( $_->delay // q{} ) } $status->results;
+	my $max_platform
+	  = max map { length( $_->rt_platform // $_->platform // q{} ) }
+	  $status->results;
+
+	$max_delay += 1;
+
+	for my $result ( $status->results ) {
+		printf(
+			"%s  %s  %${max_line}s  %${max_dest}s  %${max_platform}s\n",
+			$result->is_cancelled ? '--:--' : $result->dep->strftime('%H:%M'),
+			$result->delay
+			? sprintf( "(%+${max_delay}d)", $result->delay )
+			: q{ } x ( $max_delay + 2 ),
+			$result->line,
+			$result->destination // $result->via_last // q{???},
+			$result->rt_platform // $result->platform // q{}
+		);
+		if ($show_jid) {
+			say $result->id =~ s{ }{}gr;
+		}
+		for my $message ( $result->messages ) {
+			say $message->{text};
+		}
+		if ( $show_jid or scalar $result->messages ) {
+			say q{};
+		}
+	}
+}
+elsif ( $opt{journey} ) {
+	my $trip = $status->result;
+
+	my $max_name     = max map { length( $_->name ) } $trip->route;
+	my $max_platform = max map { length( $_->platform // q{} ) } $trip->route;
+	my $max_delay
+	  = max map { $_->delay ? length( $_->delay ) + 3 : 0 } $trip->route;
+	my $max_occupancy = max map { $_->occupancy ? 2 : 0 } $trip->route;
+
+	my $mark_stop = 0;
+	my $now       = DateTime->now( time_zone => 'Europe/Berlin' );
+	for my $i ( reverse 1 .. ( scalar $trip->route // 0 ) ) {
+		my $stop = ( $trip->route )[ $i - 1 ];
+		if (
+			not $stop->is_cancelled
+			and (  $stop->dep and $now <= $stop->dep
+				or $stop->arr and $now <= $stop->arr )
+		  )
+		{
+			$mark_stop = $stop;
+		}
+	}
+
+	printf( "%s am %s\n\n", $trip->train, $trip->day->strftime('%d.%m.%Y') );
+
+	for my $stop ( $trip->route ) {
+		if ( $stop == $mark_stop ) {
+			print($output_bold);
+		}
+		if ( $stop->is_cancelled ) {
+			print('    --:--    ');
+		}
+		elsif ( $stop->arr and $stop->dep ) {
+			printf( '%s → %s',
+				$stop->arr->strftime('%H:%M'),
+				$stop->dep->strftime('%H:%M'),
+			);
+		}
+		elsif ( $stop->dep ) {
+			printf( '        %s', $stop->dep->strftime('%H:%M') );
+		}
+		elsif ( $stop->arr ) {
+			printf( '%s        ', $stop->arr->strftime('%H:%M') );
+		}
+		else {
+			print('             ');
+		}
+		printf( " %${max_delay}s",
+			format_delay( $stop->delay, $max_delay - 3 ) );
+		if ($max_occupancy) {
+			printf( "  %${max_occupancy}s", format_occupancy($stop) );
+		}
+		printf( "  %-${max_name}s  %${max_platform}s\n",
+			$stop->name, $stop->platform // q{} );
+		if ( $stop == $mark_stop ) {
+			print($output_reset);
+		}
+	}
+	if ( $trip->attributes ) {
+		say q{};
+	}
+	for my $attr ( $trip->attributes ) {
+		say $attr->{value};
+	}
+	if ( $trip->messages ) {
+		say q{};
+	}
+	for my $message ( $trip->messages ) {
+		say $message->{text};
+	}
+}
+elsif ( $opt{geoSearch} ) {
+	for my $result ( $status->results ) {
+		if ( defined $result->eva ) {
+			printf( "%8d  %s\n", $result->eva, $result->name );
+		}
+	}
+}
+elsif ( $opt{locationSearch} ) {
+	for my $result ( $status->results ) {
+		if ( defined $result->eva ) {
+			printf( "%8d  %s\n", $result->eva, $result->name );
+		}
+	}
+}
+
+__END__
+
+=head1 NAME
+
+dbris-m - Interface to bahn.de public transit services
+
+=head1 SYNOPSIS
+
+B<dbris-m> [B<-d> I<DD.MM.YYYY>] [B<-t> I<HH:MM>] [B<-j>] I<station>
+
+B<dbris-m> I<JourneyID>
+
+B<dbris-m> B<?>I<query>|I<lat>B<:>I<lon>
+
+=head1 VERSION
+
+version 0.01
+
+=head1 DESCRIPTION
+
+B<dbris-m> is an interface to the public transport services available on
+bahn.de. According to word of mouth, it uses the HAFAS backend that can also
+be accessed by Travel::Status::DE::HAFAS(3pm)'s DB service. However, the
+bahn.de entry point is likely more reliable in the long run.
+
+B<dbris-m> can serve as an arrival/departure monitor, request details about a
+specific trip, and look up public transport stops by name or geolocation. The
+operating mode depends on the contents of its non-option argument.
+
+=head2 Departure Monitor (I<station>)
+
+Show departures at I<station>. I<station> may be given as a station name or
+station ID.  For each departure, B<dbris-m> shows
+
+=over
+
+=item * estimated departure time,
+
+=item * delay, if known,
+
+=item * trip name, number, or line,
+
+=item * direction / destination, and
+
+=item * platform, if known.
+
+=back
+
+=head2 Trip details (I<JourneyID>)
+
+List intermediate stops of I<JourneyID> (as given by the departure monitor when
+invoed with B<-j> / B<--with-jid>) with arrival/departure time, delay (if
+available), occupancy (if available), and stop name. Also includes some generic
+trip information.
+
+=head2 Location Search (B<?>I<query>|I<lat>B<:>I<lon>)
+
+List stations that match I<query> or that are located in the vicinity of
+I<lat>B<:>I<lon> geocoordinates with station ID and name.
+
+=head1 OPTIONS
+
+Values in brackets indicate options that only apply to the corresponding
+operating mode(s).
+
+=over
+
+=item B<-d>, B<--date> I<DD.MM.[YYYY]> (departure monitor)
+
+Request departures on the specified date.
+Default: today.
+
+=item B<-j>, B<--with-jid> (departure monitor)
+
+Show JourneyID for each listed arrival/departure.
+These can be used to obtain details on individual trips with subsequent
+B<dbris-m> invocations.
+
+=item B<--json>
+
+Print result(s) as JSON and exit. This is a dump of internal data structures
+and not guaranteed to remain stable between minor versions. Please use the
+Travel::Status::DE::DBRIS(3pm) module if you need a proper API.
+
+=item B<--no-cache>
+
+By default, if the Cache::File module is available, server replies are cached
+for 90 seconds in F<~/.cache/Travel-Status-DE-DBRIS> (or a path relative to
+C<$XDG_CACHE_HOME>, if set). Use this option to disable caching. You can use
+B<--cache> to re-enable it.
+
+=item B<--raw-json>
+
+Print unprocessed API response as JSON and exit.
+Useful for debugging and development purposes.
+
+=item B<-t>, B<--date> I<HH:MM> (departure monitor)
+
+Request departures on or after the specified time.
+Default: now.
+
+=item B<-V>, B<--version>
+
+Show version information and exit.
+
+=back
+
+=head1 EXIT STATUS
+
+0 upon success, 1 upon internal error, 2 upon backend error.
+
+=head1 CONFIGURATION
+
+None.
+
+=head1 DEPENDENCIES
+
+=over
+
+=item * Class::Accessor(3pm)
+
+=item * DateTime(3pm)
+
+=item * LWP::UserAgent(3pm)
+
+=back
+
+=head1 BUGS AND LIMITATIONS
+
+=over
+
+=item * This module is very much work-in-progress
+
+=back
+
+=head1 AUTHOR
+
+Copyright (C) 2024-2025 Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
+
+=head1 LICENSE
+
+This program is licensed under the same terms as Perl itself.

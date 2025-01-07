@@ -1,2 +1,9 @@
+0.113001  2025-01-06 10:13:27-05:00 America/New_York
+        - nothing new since the trial release
+
+0.113000  2025-01-03 15:27:19-05:00 America/New_York (TRIAL RELEASE)
+        - no longer ignores keys/indexes with undef values in the left hand
+          side; this is https://rt.cpan.org/Ticket/Display.html?id=109262
+
 0.112850 -- Wed Oct 12 12:43:16 CDT 2011
   * Initial Release

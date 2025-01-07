@@ -161,6 +161,15 @@ while(freelists($ua, 'v29no' . sprintf('%03d', $issue))) {
 	$issue++;
 }
 
+flush($dbh);
+
+$issue = 1;
+# 2025
+while(freelists($ua, 'v30no' . sprintf('%03d', $issue))) {
+	flush($dbh) if(scalar(@queue) > 10_000);
+	$issue++;
+}
+
 print "\n";
 
 flush($dbh);
@@ -454,13 +463,11 @@ sub queue($$$$$$$$$)
 {
 	my ($first, $last, $maiden, $age, $place, $date, $newspaper, $source, $page) = @_;
 
-	die $source if($source !~ /M|F|L/);
+	# Ensure source is valid and date is defined and starts with a digit
+	die $source unless $source =~ /^[MFL]$/;
+	return unless defined $date && $date =~ /^\d/;
 
-	# If we don't know the date of publication, it's not easy to find
-	return unless(defined($date));
-
-	return unless($date =~ /^\d/);
-
+	# Build columns hash with mandatory fields
 	my %columns = (
 		first => $first,
 		last => $last,
@@ -468,20 +475,27 @@ sub queue($$$$$$$$$)
 		newspaper => $newspaper,
 		place => $place,
 		source => $source,
-		page => $page,
+		page => $page
 	);
 
-	if(defined($age) && ($age ne '')) {
-		return if($age =~ /\D/);
-		$age =~ s/\s+//g;
-		$columns{'age'} = $age;
+	# Add age if it's a valid positive integer
+	# if(defined($age) && ($age ne '')) {
+		# return if($age =~ /\D/);
+		# $age =~ s/\s+//g;
+		# $columns{'age'} = $age;
+	# }
+	if(defined $age && $age =~ /^\d+$/) {
+		# $age =~ s/\s+//g;
+		$columns{age} = $age;
 	}
 
-	if($maiden) {
-		$columns{'maiden'} = $maiden;
-	}
+	# Add maiden name if provided
+	$columns{maiden} = $maiden if $maiden;
+
+	# Add entry to queue
 	push @queue, \%columns;
 }
+
 
 sub flush($)
 {
@@ -592,14 +606,8 @@ sub normalise_name($)
 	my $name = shift;
 	$name =~ s/\"//g;
 
-	my $key = lc($name);
-
-	if($normalised{$key}) {
-		return $normalised{$key};
-	}
-	my $value = nc($name);
-	$normalised{$key} = $value;
-	return $value;
+	# Get the lowercased key and return existing normalised value if present
+	return $normalised{lc($name)} ||= nc($name);
 }
 
 # "first","middle","last","maiden","age","place","date","url"

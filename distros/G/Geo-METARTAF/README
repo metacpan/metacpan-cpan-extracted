@@ -1,0 +1,52 @@
+Geo::METARTAF decodes aviation METAR, SPECI, and TAF weather forecast 
+code strings into English or, if you sub-class, some other language.
+
+
+METAR (Meteorological Aerodrome Report), SPECI (Special METAR), and
+TAF (Terminal Aerodrome Forecast) are ASCII strings containing codes
+describing the weather at airports and weather bureaus around the world.
+
+This module attempts to decode these reports into a form of English
+that is (hopefully) more understandable than the reports themselves.
+
+The decoded data is based on the Transport Canada AIM.
+
+It is possible to sub-class the translation routines to enable
+translation to other langauages. 
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Geo::METARTAF
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Geo-METARTAF
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Geo-METARTAF
+
+    Search CPAN
+        https://metacpan.org/release/Geo-METARTAF
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2025 by Peter Carter.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

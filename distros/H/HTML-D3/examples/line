@@ -1,0 +1,30 @@
+#!/usr/bin/env perl
+
+use lib 'lib';
+use strict;
+use warnings;
+
+use HTML::D3;
+
+my $chart = HTML::D3->new(
+	width => 800,
+	height => 600,
+	title => 'Monthly Revenue Trends',
+);
+
+my $data = [
+	['January', 1000],
+	['February', 1200],
+	['March', 950],
+	['April', 1100],
+	['May', 1250],
+];
+
+my $html_output = $chart->render_line_chart($data);
+
+# Save the output as an HTML file
+open my $fh, '>', 'line.html' or die $!;
+print $fh $html_output;
+close $fh;
+
+print "Interactive line chart saved as 'line.html'. Open it in a browser.\n";

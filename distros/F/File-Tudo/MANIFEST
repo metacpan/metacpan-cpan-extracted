@@ -1,0 +1,13 @@
+bin/perl-tudo
+Changes
+Installing
+lib/File/Tudo.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README.md
+t/00_init.t
+t/10_tudo.t
+t/data/sample.todo

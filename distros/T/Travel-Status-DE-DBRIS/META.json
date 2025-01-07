@@ -1,0 +1,76 @@
+{
+   "abstract" : "Interface to bahn.de / bahnhof.de departure monitors",
+   "author" : [
+      "Copyright (C) 2024-2025 Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4234",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Travel-Status-DE-DBRIS",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Compile" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Cache::File" : "0"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "Class::Accessor" : "0.16",
+            "DateTime" : "0",
+            "DateTime::Format::Strptime" : "0",
+            "Getopt::Long" : "0",
+            "JSON" : "0",
+            "LWP::Protocol::https" : "0",
+            "LWP::UserAgent" : "0",
+            "List::Util" : "0",
+            "perl" : "v5.20.0"
+         }
+      }
+   },
+   "provides" : {
+      "Travel::Status::DE::DBRIS" : {
+         "file" : "lib/Travel/Status/DE/DBRIS.pm",
+         "version" : "0.01"
+      },
+      "Travel::Status::DE::DBRIS::Journey" : {
+         "file" : "lib/Travel/Status/DE/DBRIS/Journey.pm",
+         "version" : "0.01"
+      },
+      "Travel::Status::DE::DBRIS::JourneyAtStop" : {
+         "file" : "lib/Travel/Status/DE/DBRIS/JourneyAtStop.pm",
+         "version" : "0.01"
+      },
+      "Travel::Status::DE::DBRIS::Location" : {
+         "file" : "lib/Travel/Status/DE/DBRIS/Location.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/derf/Travel-Status-DE-DBRIS"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

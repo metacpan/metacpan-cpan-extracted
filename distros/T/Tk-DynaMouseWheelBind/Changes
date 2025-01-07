@@ -1,5 +1,9 @@
 Revision history for Tk::DynaMouseWheelBind
 
+0.08 Mon Jan 06 2025
+	-removed not needed bindtags call.
+	-changed but tracker.
+
 0.07 Sat Sep 07 2024
 	-disabled mouse wheel test. We know the widget is ok. The test must be flunky.
 
@@ -13,7 +17,7 @@ Revision history for Tk::DynaMouseWheelBind
 	-modified testing so testers reports are more detailed. At this moment we do not know exactly which tests fail.
 
 0.03 Mon Jun 03 2024
-	-fixed error: an't call method "XEvent" on an undefined value
+	-fixed error: can't call method "XEvent" on an undefined value
 
 0.02 Tue May 21 2024
 	-added missing prerequisite Test::Tk

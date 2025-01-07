@@ -35,6 +35,12 @@ In order to release a new version of this project
     make manifest
     make dist
 
+Tag the version in git with the appropriate version number:
+
+    git -a v0.32 -m v0.32
+    git push --tags
+
+
 ## INSTALLATION
 
 To install this module, run the following commands:

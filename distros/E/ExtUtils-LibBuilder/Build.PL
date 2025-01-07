@@ -10,6 +10,7 @@ my $builder = Module::Build->new(
     requires => {
         'perl' => '5.006',
     },
+    configure_requires => { 'Module::Build' => 0.42 },
     build_requires      => {
                             'ExtUtils::CBuilder' => '0.23',
                             'File::Spec'         => 0,

@@ -36,7 +36,7 @@ test_requires 'Test::NoWarnings' => 0;
 test_requires 'Test::Output' => 0;
 test_requires 'Test::Warn' => 0.31;
 tests_recursive;
-version '0.03';
+version '0.04';
 
 # Run.
 WriteAll();

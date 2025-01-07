@@ -33,7 +33,7 @@ test_requires 'version'         => '0.9908';
 
 recommends 'ExtUtils::MakeMaker'   => '6.66';
 recommends 'File::Spec::Functions' => '3.4';
-recommends 'List::Util '           => '1.27';
+recommends 'List::Util'            => '1.27';
 recommends 'Test::Pod'             => '1.48';
 recommends 'Test::Pod::Coverage'   => '1.08';
 

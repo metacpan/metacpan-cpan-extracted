@@ -3,7 +3,7 @@ use ExtUtils::MakeMaker;
 use strict;
 my %prereq = (
 	'Test::Tk'            => '3.03',
-	'Tk'                  => '804.023',
+	'Tk'                  => '804.032',
 );
 
 WriteMakefile(
@@ -20,6 +20,9 @@ WriteMakefile(
             type => 'git',
             url  => 'git://github.com/haje61/Tk-DynaMouseWheelBind.git',
             web  => 'https://github.com/haje61/Tk-DynaMouseWheelBind',
+         },
+         bugtracker => {
+            web  => "https://github.com/haje61/Tk-DynaMouseWheelBind/issues",
          },
       }}
     ) : () ),

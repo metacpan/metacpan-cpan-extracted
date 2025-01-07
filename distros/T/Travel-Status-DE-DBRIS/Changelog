@@ -1,0 +1,4 @@
+Travel::Status::DE::DBRIS 0.01 - Mon Jan 06 2025
+
+    * Initial release
+    * Supports station board requests, trip details, and station search

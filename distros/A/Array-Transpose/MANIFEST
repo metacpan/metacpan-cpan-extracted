@@ -3,12 +3,11 @@ lib/Array/Transpose.pm
 LICENSE
 Makefile.PL
 MANIFEST
-MANIFEST.SKIP
-README
+README.md
 scripts/Array-Transpose-example.pl
 t/001_load.t
 t/002_load.t
 t/003_empty.t
-Todo
 perl-Array-Transpose.spec
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

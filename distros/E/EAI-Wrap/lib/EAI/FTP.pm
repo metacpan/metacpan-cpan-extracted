@@ -1,4 +1,4 @@
-package EAI::FTP 1.917;
+package EAI::FTP 1.918;
 
 use strict; use feature 'unicode_strings'; use warnings;
 use Exporter qw(import); use Net::SFTP::Foreign (); use Net::SFTP::Foreign::Constants qw( SFTP_ERR_LOCAL_UTIME_FAILED ); use Net::FTP (); use Text::Glob qw(match_glob);
@@ -750,7 +750,7 @@ returns the net-sftp-foreign/ftp handler and the RemoteHost string to allow dire
 
 =head1 COPYRIGHT
 
-Copyright (c) 2024 Roland Kapl
+Copyright (c) 2025 Roland Kapl
 
 All rights reserved.  This program is free software; you can
 redistribute it and/or modify it under the same terms as Perl itself.

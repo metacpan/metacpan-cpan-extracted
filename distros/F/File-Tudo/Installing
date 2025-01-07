@@ -1,0 +1,25 @@
+File::Tudo supports both Unix-like and Windows operating systems.
+
+File::Tudo requires a Perl interpretter that supports at least version 5.016.
+
+The follow modules are required (many of which should be included with Perl):
+  Configure:
+    ExtUtils::MakeMaker
+  Testing:
+    File::Spec
+    Test::More
+  Runtime:
+    Carp
+    File::HomeDir
+    File::Spec
+    Getopt::Long
+
+To build, test, and install File::Tudo:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+For more information on configuring the build process, consult the
+documentation for ExtUtils::MakeMaker.

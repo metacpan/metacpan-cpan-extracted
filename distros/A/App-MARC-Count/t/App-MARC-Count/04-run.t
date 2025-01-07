@@ -5,7 +5,7 @@ use App::MARC::Count;
 use English;
 use File::Object;
 use File::Spec::Functions qw(abs2rel);
-use Test::More 'tests' => 7;
+use Test::More 'tests' => 8;
 use Test::NoWarnings;
 use Test::Output;
 use Test::Warn 0.31;
@@ -63,7 +63,7 @@ stdout_is(
 		App::MARC::Count->new->run;
 		return;
 	},
-	"3\n",
+	"2\n",
 	'Run count for MARC XML file with 3 records.',
 );
 
@@ -78,6 +78,19 @@ combined_like(
 	},
 	qr{^Cannot process '1' record\. Error: Field 300 must have indicators \(use ' ' for empty indicators\)},
 	'Run count for MARC XML file with 1 records (with error).',
+);
+
+# Test.
+@ARGV = (
+	$data_dir->file('ex3.xml')->s,
+);
+combined_like(
+	sub {
+		App::MARC::Count->new->run;
+		return;
+	},
+	qr{^Cannot process '2' record\. Previous record is Služby v systému národních výborů : vybrané kapitoly : určeno pro posl. fak. obchodní, obor Ekonomika služeb a cestovního ruchu / Vladislav Gabriel, Ladislav Zapadlo\nError: Field 300 must have indicators \(use ' ' for empty indicators\)},
+	'Run count for MARC XML file with 2 records (second is with error).',
 );
 
 sub help {

@@ -1,0 +1,38 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.89.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 08d100e36a4434be77de14d98b401687af53bf76a000cac242fc7c0c5099398b Build.PL
+SHA256 d8e9a1c0d89e6836036981aa8abd7115f87fe81fd7dd4b09a6d0da4678a653ef COPYING
+SHA256 5095ed657d2ce4adb1623addcb5c750a55cc3fda1a7b804b9bc0cba54f181efc Changelog
+SHA256 7eae985a7571173be746e7e2e5a4075cad4e86e327aab50a8c8d4449f6b85b21 MANIFEST
+SHA256 ff1d5ed96924b98111149cee15610101096d35a9dfdf390708f88a3c2e00752c META.json
+SHA256 476c00f0a762f8427852873f23a27fd8ee26798bb505117bd4c0953fd81c3bc9 META.yml
+SHA256 d1055f9ca39f5e7b609c9d8d06a959954f7201c23f3bb07d2064388c0854fd65 README.md
+SHA256 755dee1a466e0b9bfe761a249c6a90b08e5a878c648b575a3c00d8f2f30afe4d bin/dbris-m
+SHA256 76a9c53b487fb09ff14ca9323f0c7719c11878cad2eb9e7fa76a40051d79fae1 lib/Travel/Status/DE/DBRIS.pm
+SHA256 142c221b5b8c474d189534df451c2d3420f604d33babe9930daa1a83d20c3f9a lib/Travel/Status/DE/DBRIS/Journey.pm
+SHA256 87b6e0b34ab0271d377a89e32aa27be8f1df4684c20106a7b481b08a61811b15 lib/Travel/Status/DE/DBRIS/JourneyAtStop.pm
+SHA256 70bacc4786f0ba968a4982009492e8c2180e75ac43c7336d29b8cd0c99f78e8f lib/Travel/Status/DE/DBRIS/Location.pm
+SHA256 588a60b456403a9f2a901b11646918be3f2fe413d4b1b792dccd18a80bb264e9 xt/00-compile-pm.t
+SHA256 32c2f94b5292bcf6ef1994151a5d84b4581c5cf920418841c551d6f5489621cd xt/01-compile-pl.t
+SHA256 574e3508c4f991d21b61f06a070d71f04f4403b094f55423150cb5dbb18194a9 xt/10-pod-coverage.t
+-----BEGIN PGP SIGNATURE-----
+
+iHUEARYDAB0WIQRk/m7AVVYPnvE6MEQZ5uUk67F3ugUCZ3wGBgAKCRAZ5uUk67F3
+umE+AP407K8V9rvf1xNkWols1TXBnN22y3w8WBFH8QB58xawswEAknNPisewuBei
+4FSPCmhVCVMJJTdS+yn8IacjjuXPpwY=
+=teOA
+-----END PGP SIGNATURE-----

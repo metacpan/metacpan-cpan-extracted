@@ -1,0 +1,28 @@
+#!/usr/bin/env perl
+
+use lib 'lib';
+use strict;
+use warnings;
+
+use HTML::D3;
+
+my $chart = HTML::D3->new(
+	width => 800,
+	height => 600,
+	title => 'Sales Data (Interactive)',
+);
+
+my $data = [
+	['January', 100],
+	['February', 200],
+	['March', 150],
+];
+
+my $html_output = $chart->render_bar_chart($data);
+
+# Save the output as an HTML file
+open(my $fh, '>', 'bar.html') or die $!;
+print $fh $html_output;
+close $fh;
+
+print "Interactive chart saved as 'bar.html'. Open it in a browser.\n";

@@ -1,0 +1,32 @@
+---
+abstract: 'Tudo TODO file interface'
+author:
+  - 'Samuel Young <samyoung12788@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-Tudo
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  File::HomeDir: '0'
+  File::Spec: '0'
+  Getopt::Long: '0'
+  perl: '5.016'
+resources:
+  bugtracker: https://codeberg.org/1-1sam/tudo/issues
+  repository: https://codeberg.org/1-1sam/tudo.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

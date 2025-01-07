@@ -39,7 +39,9 @@ BEGIN { $^H{"t::func/func"}++ }
    }
 
    func withattr :MyCustomAttribute(value here) { }
-   is( $modify_invoked, 1, 'MODIFY_CODE_ATTRIBUTES invoked' );
+   func attrnospace:MyCustomAttribute(value here) { }
+
+   is( $modify_invoked, 2, 'MODIFY_CODE_ATTRIBUTES invoked' );
 }
 
 # named func in another package

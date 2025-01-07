@@ -385,6 +385,10 @@ sub ACTION_test {
         my $oldlibpath = $ENV{LIBPATH} || '/lib:/usr/lib';
         $ENV{LIBPATH} = catdir($self->blib, "usrlib").":$oldlibpath";
     }
+    elsif ($^O =~ /haiku/i) {
+        my $oldlibpath = $ENV{LIBRARY_PATH} || '/boot/system/lib:/boot/system/lib/x86';
+        $ENV{LIBRARY_PATH} = catdir($self->blib, "usrlib").":$oldlibpath";
+    }
     elsif ($^O =~ /cygwin/i) {
         # cygwin uses windows lib searching (PATH instead of LD_LIBRARY_PATH)
         my $oldpath = $ENV{PATH};

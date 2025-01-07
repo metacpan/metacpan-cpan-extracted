@@ -261,5 +261,33 @@ subtest '-copy -recurse -immutable on immutable hash' => sub {
 
 };
 
+{
+    package MyObject;
+    sub new { bless {}, $_[0]; }
+    sub foo { return 'bar'; }
+    sub bar { return 'foo'; }
+}
+
+subtest '-recurse with object' => sub {
+
+    my %hash = (
+        a => {
+            b => {
+                c => MyObject->new,
+            },
+        },
+    );
+
+    my ( $func ) = Hash::Wrap->import( {
+        -as        => '-return',
+        -recurse   => -1,
+    } );
+
+    my $wrap = $func->( \%hash );
+
+    is ( $wrap->a->b->c->foo, 'bar' );
+
+};
+
 done_testing;
 

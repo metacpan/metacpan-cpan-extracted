@@ -13,7 +13,7 @@ package # hide from PAUSE indexer
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.07;
+$VERSION = 0.08;
 
 # keep Tk::Widgets namespace clean
 my ($motion, $do_scroll, $mousewheel_event, $setup );
@@ -66,7 +66,6 @@ $setup = sub{
 		$delta = shift;
 		# just in case, the mouse has not been moved yet:
 		my $w = $under_cursor ||= $widget;
-		my @tags = $w->bindtags;
 		my $has_binding;
 		until ($has_binding || $w->isa('Tk::Toplevel')){
 			if($w->Tk::bind(ref($w),'<<DynaMouseWheel>>')){

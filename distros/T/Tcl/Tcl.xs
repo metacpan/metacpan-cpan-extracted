@@ -19,6 +19,10 @@
 #endif
 
 #include <tcl.h>
+#if TCL_MAJOR_VERSION < 9
+    typedef int Tcl_Size;
+#endif /* TCL_MAJOR_VERSION */
+
 
 #ifdef USE_TCL_STUBS
 
@@ -448,7 +452,7 @@ NpInitialize(pTHX_ SV *X)
      * calls without grabbing them by symbol out of the dll.
      * This will be Tcl_PkgRequire for non-stubs builds.
      */
-    if (initstubs(g_Interp, "8.4", 0) == NULL) {
+    if (initstubs(g_Interp, NULL, 0) == NULL) {
 	warn("Failed to initialize Tcl stubs!");
 	return TCL_ERROR;
     }
@@ -531,7 +535,7 @@ static SV *
 SvFromTclObj(pTHX_ Tcl_Obj *objPtr)
 {
     SV *sv;
-    int len;
+    Tcl_Size len;
     const char *str;
 
     if (objPtr == NULL) {
@@ -593,7 +597,7 @@ SvFromTclObj(pTHX_ Tcl_Obj *objPtr)
 	 * be typed as a list, although we don't want to see it that way.
 	 * Just treat empty list objects as an empty (not undef) SV.
 	 */
-	int objc;
+	Tcl_Size objc;
 	Tcl_Obj **objv;
 
 	Tcl_ListObjGetElements(NULL, objPtr, &objc, &objv);
@@ -957,7 +961,7 @@ prepare_Tcl_result(pTHX_ Tcl interp, char *caller)
 {
     dSP;
     Tcl_Obj *objPtr, **objv;
-    int gimme, objc, i;
+    Tcl_Size gimme, objc, i;
 
     objPtr = Tcl_GetObjResult(interp);
 
@@ -1631,7 +1635,7 @@ void
 Tcl_SplitList(interp, str)
 	Tcl		interp
 	char *		str
-	int		argc = NO_INIT
+	Tcl_Size	argc = NO_INIT
 	const char **	argv = NO_INIT
 	const char **	tofree = NO_INIT
     PPCODE:
@@ -1724,7 +1728,7 @@ SV*
 as_string(SV* sv,...)
     PREINIT:
 	Tcl_Obj* objPtr;
-	int len;
+	Tcl_Size len;
 	const char *str;
     CODE:
 	objPtr = TclObjFromSv(aTHX_ sv);

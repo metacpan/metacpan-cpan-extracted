@@ -1,5 +1,8 @@
 Changes for Debug::Client
 
+0.33 2025-01-07
+ - Minor fix in Makefile.PL
+
 0.32 2024-10-26
  - Replaced deprecated given/when by if/elsif/else statements.
 

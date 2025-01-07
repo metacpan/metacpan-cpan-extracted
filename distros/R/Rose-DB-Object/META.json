@@ -40,7 +40,6 @@
             "DateTime" : "0",
             "File::Path" : "0",
             "File::Spec" : "0",
-            "List::MoreUtils" : "0",
             "Math::BigInt" : "1.77",
             "Rose::DB" : "0.782",
             "Rose::DateTime::Util" : "0.532",
@@ -66,6 +65,6 @@
       },
       "x_MailingList" : "http://groups.google.com/group/rose-db-object"
    },
-   "version" : "0.821",
+   "version" : "0.822",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

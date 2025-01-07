@@ -1,2 +1,5 @@
+0.002  2025-01-06 20:36:05 CST
+  - Migrate manually to Dist::Milla
+  - Some changes to documentation
 0.001 2024-12-31
-- Initial version
+  - Initial version

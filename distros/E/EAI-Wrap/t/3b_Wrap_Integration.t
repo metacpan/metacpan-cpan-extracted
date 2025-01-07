@@ -98,7 +98,7 @@ is_deeply($loads[0]{process}{filenames}, ["testContent.txt"], "extractArchives \
 # 8
 is_deeply($loads[0]{process}{archivefilenames}, ["test.zip"], "extractArchives \$process{archivefilenames} test.zip");
 # 9
-is_deeply($execute{retrievedFiles}, [], "extractArchives \$execute{retrievedFiles} empty");
+is_deeply($loads[0]{process}{retrievedFiles}, [], "extractArchives \$loads[0]{process}{retrievedFiles} empty");
 readFileData($loads[0]);
 # 10
 is_deeply($loads[0]{process}{data},$expected_datastruct,"readFileData expected content");

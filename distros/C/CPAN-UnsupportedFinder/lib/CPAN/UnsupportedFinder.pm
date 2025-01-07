@@ -1,12 +1,14 @@
 package CPAN::UnsupportedFinder;
 
+# FIXME: magic dates should be configurable
+
 use strict;
 use warnings;
 
 use Carp;
 use HTTP::Tiny;
 use Log::Log4perl;
-use JSON;
+use JSON::MaybeXS;
 use Scalar::Util;
 
 =head1 NAME
@@ -19,25 +21,25 @@ CPAN::UnsupportedFinder analyzes CPAN modules for test results and maintenance s
 
 =head1 VERSION
 
-Version 0.02
+Version 0.04
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 =head1 SYNOPSIS
 
-  use CPAN::UnsupportedFinder;
+    use CPAN::UnsupportedFinder;
 
-  # Note use of hyphens not colons
-  my $finder = CPAN::UnsupportedFinder->new(verbose => 1);
-  my $results = $finder->analyze('Some-Module', 'Another-Module');
+    # Note use of hyphens not colons
+    my $finder = CPAN::UnsupportedFinder->new(verbose => 1);
+    my $results = $finder->analyze('Some-Module', 'Another-Module');
 
-  for my $module (@$results) {
+    for my $module (@$results) {
 	  print "Module: $module->{module}\n";
 	  print "Failure Rate: $module->{failure_rate}\n";
 	  print "Last Update: $module->{last_update}\n";
-  }
+    }
 
 =head1 METHODS
 
@@ -47,13 +49,25 @@ Creates a new instance. Accepts the following arguments:
 
 =over 4
 
-=item verbose
+=item * verbose
 
 Enable verbose output.
 
+=item * api_url
+
+metacpan URL, defaults to L<https://fastapi.metacpan.org/v1>
+
+=item * cpan_testers
+
+CPAN testers URL, detaults to L<https://api.cpantesters.org/api/v1>
+
+=item * logger
+
+Where to log messages, defaults to L<Log::Log4perl>
+
 =back
 
-=cut 
+=cut
 
 sub new {
 	my $class = shift;
@@ -83,13 +97,16 @@ sub new {
 	}
 
 	my $self = {
-		api_url	=> 'https://fastapi.metacpan.org/v1',
+		api_url => 'https://fastapi.metacpan.org/v1',
 		cpan_testers => 'https://api.cpantesters.org/api/v1',
-		verbose	=> $args{verbose} || 0,
+		verbose => 0,
+		%args
 	};
 
-	Log::Log4perl->easy_init($self->{verbose} ? $Log::Log4perl::DEBUG : $Log::Log4perl::ERROR);
-	$self->{logger} = Log::Log4perl->get_logger();
+	if(!defined($self->{logger})) {
+		Log::Log4perl->easy_init($self->{verbose} ? $Log::Log4perl::DEBUG : $Log::Log4perl::ERROR);
+		$self->{logger} = Log::Log4perl->get_logger();
+	}
 
 	# Return the blessed object
 	return bless $self, $class;
@@ -109,7 +126,7 @@ sub analyze {
 	for my $module (@modules) {
 		$self->{logger}->debug('Analyzing module');
 
-		my $test_data	= $self->_fetch_testers_data($module);
+		my $test_data = $self->_fetch_testers_data($module);
 		my $release_data = $self->_fetch_release_data($module);
 
 		my $unsupported = $self->_evaluate_support($module, $test_data, $release_data);
@@ -118,6 +135,43 @@ sub analyze {
 
 	return \@results;
 }
+
+=head2 output_results
+
+    $report = $object->output_results($results, $format);
+
+Generates a report in the specified format.
+
+=over 4
+
+=item * C<$results> (ArrayRef)
+
+An array reference containing hashrefs with information about modules (module name, failure rate, last update)
+as created by the analyze() method.
+
+=item * C<$format> (String)
+
+A string indicating the desired format for the report. Can be one of the following:
+
+=over 4
+
+=item C<text> (default)
+
+Generates a plain text report.
+
+=item C<html>
+
+Generates an HTML report.
+
+=item C<json>
+
+Generates a JSON report.
+
+=back
+
+=back
+
+=cut
 
 sub output_results {
 	my ($self, $results, $format) = @_;
@@ -151,7 +205,7 @@ sub _generate_html_report {
 
 	my $html = '<html><head><title>Unsupported Modules Report</title></head><body><h1>Unsupported Modules Report</h1><ul>';
 
-	for my $module (@$results) {
+	for my $module (@{$results}) {
 		$html .= "<li><strong>$module->{module}</strong>:<br>";
 		$html .= "Failure Rate: $module->{failure_rate}<br>";
 		$html .= "Last Update: $module->{last_update}<br></li>";
@@ -163,18 +217,21 @@ sub _generate_html_report {
 
 sub _fetch_testers_data {
 	my ($self, $module) = @_;
+
 	my $url = "$self->{cpan_testers}/summary/$module";
 	return $self->_fetch_data($url);
 }
 
 sub _fetch_release_data {
 	my ($self, $module) = @_;
+
 	my $url = "$self->{api_url}/release/_search?q=distribution:$module&size=1&sort=date:desc";
 	return $self->_fetch_data($url);
 }
 
 sub _fetch_data {
 	my ($self, $url) = @_;
+
 	$self->{logger}->debug("Fetching data from $url");
 
 	my $http = HTTP::Tiny->new;
@@ -192,35 +249,85 @@ sub _fetch_data {
 sub _fetch_reverse_dependencies {
 	my ($self, $module) = @_;
 	my $url = "$self->{api_url}/reverse_dependencies/$module";
+
 	return $self->_fetch_data($url);
 }
+
+# Evaluate the support status of a module.
+
+# Evaluates the module's failure rate, last update date, test history, and dependencies.
+
+# $module: The name of the module being evaluated.
+# $test_data: Test results data for the module.
+# $release_data: Release metadata for the module.
+
+# Returns a hashref containing the module's evaluation details if it's flagged as unsupported,
+# undef if the module is considered supported.
 
 sub _evaluate_support {
 	my ($self, $module, $test_data, $release_data) = @_;
 
 	my $failure_rate = $self->_calculate_failure_rate($test_data);
-	my $last_update = $self->_get_last_release_date($release_data);
+	my $last_update = $self->_get_last_release_date($release_data) || 'Unknown';
+
 	# Reverse Dependencies: Modules with many reverse dependencies have higher priority for support.
 	my $reverse_deps = $self->_fetch_reverse_dependencies($module);
 
-	if($failure_rate > 0.5 || !$last_update || $last_update lt '2022-01-01') {
+	# Check if there are any test results in the last 6 months
+	my $has_recent_tests = $self->_has_recent_tests($test_data);
+
+	# Check if the module has dependencies marked as deprecated or unsupported
+	my $has_unsupported_dependencies = $self->_has_unsupported_dependencies($module);
+
+	# Check if the module is unsupported based on the criteria
+	# Flag module as unsupported if:
+	# - High failure rate (> 50%)
+	# - No recent updates
+	# - No recent test results in the last 6 months
+	# - Has unsupported dependencies
+	if(($failure_rate > 0.5) || (!$last_update || $last_update lt '2022-01-01') || !$has_recent_tests || $has_unsupported_dependencies) {
 		return {
 			module	=> $module,
 			failure_rate => $failure_rate,
-			last_update => $last_update || 'Unknown',
+			last_update => $last_update,
+			recent_tests => $has_recent_tests ? 'Yes' : 'No',
 			reverse_deps => $reverse_deps->{total} || 0,
+			has_unsupported_deps => $has_unsupported_dependencies ? 'Yes' : 'No',
 		};
 	}
 
-	return;
+	return; # Module is considered supported
 }
+
+# Helper function to calculate the date six months ago
+sub _six_months_ago {
+	my @time = localtime(time - 6 * 30 * 24 * 60 * 60);	# Approximate six months in seconds
+	return sprintf "%04d-%02d-%02d", $time[5] + 1900, $time[4] + 1, $time[3];
+}
+
+sub _has_recent_tests {
+	my ($self, $test_data) = @_;
+
+	# Assume $test_data contains test reports with a timestamp field
+	my $six_months_ago = time - (6 * 30 * 24 * 60 * 60); # Roughly 6 months in seconds
+
+	foreach my $test (@$test_data) {
+		if ($test->{timestamp} && $test->{timestamp} > $six_months_ago) {
+			return 1;	# Recent test found
+		}
+	}
+
+	return 0;	# No recent tests found
+}
+
 
 sub _calculate_failure_rate {
 	my ($self, $test_data) = @_;
+
 	return 0 unless $test_data && $test_data->{results};
 
 	my $total_tests = $test_data->{results}{total};
-	my $failures	= $test_data->{results}{fail};
+	my $failures = $test_data->{results}{fail};
 
 	return $total_tests ? $failures / $total_tests : 1;
 }
@@ -230,6 +337,65 @@ sub _get_last_release_date {
 	return unless $release_data && $release_data->{hits}{hits}[0];
 
 	return $release_data->{hits}{hits}[0]{_source}{date};
+}
+
+sub _has_unsupported_dependencies {
+	my ($self, $module) = @_;
+
+	my $ua = HTTP::Tiny->new();
+	my $url = "https://fastapi.metacpan.org/v1/release/$module";
+
+	my $response = $ua->get($url);
+	if (!$response->{success}) {
+		$self->{'logger'}->warn("Failed to fetch MetaCPAN data for $module: $response->{status} $response->{reason}");
+		return 0;
+	}
+
+	my $release_data = eval { decode_json($response->{content}) };
+	if (!$release_data) {
+		$self->{'logger'}->warn("Failed to parse MetaCPAN response for $module");
+		return 0;
+	}
+
+	# Extract dependencies
+	my $dependencies = $release_data->{dependency} || [];
+	foreach my $dependency (@$dependencies) {
+		# Skip if the dependency is marked as optional
+		next if $dependency->{phase} && $dependency->{phase} eq 'develop';
+
+		my $dep_module = $dependency->{module};
+		my $dep_status = $self->_check_module_status($dep_module);
+
+		if ($dep_status->{deprecated} || $dep_status->{backpan_only}) {
+			return 1; # Found an unsupported dependency
+		}
+	}
+
+	return 0; # No unsupported dependencies found
+}
+
+sub _check_module_status {
+	my ($self, $module) = @_;
+
+	my $ua = HTTP::Tiny->new();
+	my $url = "https://fastapi.metacpan.org/v1/module/$module";
+
+	my $response = $ua->get($url);
+	if (!$response->{success}) {
+		$self->{'logger'}->warn("Failed to fetch MetaCPAN status for $module: $response->{status} $response->{reason}");
+		return {};
+	}
+
+	my $module_data = eval { decode_json($response->{content}) };
+	if (!$module_data) {
+		$self->{'logger'}->warn("Failed to parse MetaCPAN response for $module");
+		return {};
+	}
+
+	return {
+		deprecated => $module_data->{status} && $module_data->{status} eq 'deprecated',
+		backpan_only => $module_data->{maturity} && $module_data->{maturity} eq 'backpan',
+	};
 }
 
 1;

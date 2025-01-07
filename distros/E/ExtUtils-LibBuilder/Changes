@@ -1,5 +1,8 @@
 Revision history for ExtUtils-LibBuilder
 
+0.09    Mon Jan  6 13:36:44 UTC 2025
+        - Added support to Haiku OS (thanks to Joachim Mairböc)
+
 0.08    Mon Oct 19 17:46:02 WEST 2015
         - Minor spelling fix (thanks to Gregor Herrmann,
         from Debian community).

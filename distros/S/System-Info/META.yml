@@ -17,7 +17,7 @@ name: System-Info
 provides: 
   System::Info: 
     file: lib/System/Info.pm
-    version: '0.065'
+    version: '0.066'
   System::Info::AIX: 
     file: lib/System/Info/AIX.pm
     version: '0.050'
@@ -58,7 +58,7 @@ provides:
     file: lib/System/Info/Windows.pm
     version: '0.051'
 recommends: 
-  Test::More: '1.302198'
+  Test::More: '1.302207'
 requires: 
   POSIX: 0
   Test::More: '0.88'
@@ -69,4 +69,4 @@ resources:
   bugtracker: https://github.com/Tux/System-Info/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/System-Info
-version: '0.065'
+version: '0.066'

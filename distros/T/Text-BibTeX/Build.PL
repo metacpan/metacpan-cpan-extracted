@@ -22,7 +22,7 @@ my $builder = MyBuilder->new(
     configure_requires => {
         'Module::Build'        => '0.36',
         'Config::AutoConf'     => '0.16',
-        'ExtUtils::LibBuilder' => '0.02',
+        'ExtUtils::LibBuilder' => '0.09',
     },
     requires => {
         'Scalar::Util'       => '1.42',
@@ -85,6 +85,15 @@ if ( $^O =~ /mswin32/i ) {
     else {
         print STDERR "libbtparse.dll will be installed in $libdir\n";
         unlink catfile( $libdir, $target );
+    }
+}
+elsif ( $^O =~ /haiku/i ) {
+    $libdir =~ s/\bbin\b/lib/;
+    $hdrdir = $libdir;
+    $hdrdir =~ s!\blib\b!develop/headers!;
+    if ( $Config{archname} =~ /BePC/ ) {
+        $libdir .= "/x86";
+        $hdrdir .= "/x86";
     }
 }
 else {

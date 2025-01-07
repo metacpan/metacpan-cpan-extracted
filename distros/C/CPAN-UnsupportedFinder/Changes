@@ -1,0 +1,20 @@
+Revision history for CPAN-UnsupportedFinder
+
+0.04	Mon Jan  6 22:08:23 EST 2025
+	Documented the output_results() method
+	Use JSON::MaybeXS instead of JSON
+	Flag modules with no recent test results in the last six months
+	Flag modules with unsupported dependencies
+	Allow logger to be passed in
+
+0.03	Mon Jan  6 09:53:06 EST 2025
+	Allow URLs to be overridden in the constructor
+	Added more tests
+	Renamed bin as examples
+
+0.02	Sun Jan  5 16:37:57 EST 2025
+	Improved GitHub Actions support
+	Added support for Appveyor
+
+0.01	Sun Jan  5 16:21:51 EST 2025
+        First draft

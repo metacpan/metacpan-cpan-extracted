@@ -1,4 +1,4 @@
-package EAI::DB 1.917;
+package EAI::DB 1.918;
 
 use strict; use feature 'unicode_strings'; use warnings;
 use Exporter qw(import); use DBI qw(:sql_types); use DBD::ODBC (); use Data::Dumper qw(Dumper); use Log::Log4perl qw(get_logger); use Carp qw(confess longmess);
@@ -78,7 +78,7 @@ sub readFromDB ($$) {
 		$dbh->{RaiseError} = 1; # to enable following try/catch (eval)
 		eval {
 			my $sth = $dbh->prepare($statement);
-			$sth->execute;
+			$sth->execute();
 			@{$DB->{columnnames}} = @{$sth->{NAME}} if $sth->{NAME}; # take field names from the statement handle of query, used for later processing
 			@$data = @{$sth->fetchall_arrayref({})};
 		};
@@ -110,7 +110,7 @@ sub readFromDBHash ($$) {
 		$dbh->{RaiseError} = 1; # to enable following try/catch (eval)
 		eval {
 			my $sth = $dbh->prepare($statement);
-			$sth->execute;
+			$sth->execute();
 			@{$DB->{columnnames}} = @{$sth->{NAME}} if $sth->{NAME}; # take field names from the statement handle of query, used for later processing
 			%$data = %{$sth->fetchall_hashref(@keyfields)};
 		};
@@ -723,7 +723,7 @@ returns the DBI handler and the DSN string to allow direct commands with the han
 
 =head1 COPYRIGHT
 
-Copyright (c) 2024 Roland Kapl
+Copyright (c) 2025 Roland Kapl
 
 All rights reserved.  This program is free software; you can
 redistribute it and/or modify it under the same terms as Perl itself.

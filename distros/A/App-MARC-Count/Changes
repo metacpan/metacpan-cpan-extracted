@@ -1,3 +1,8 @@
+0.04 2025-01-06T23:15:32+01:00
+ - Finish cover testing.
+ - Fix count.
+ - Update copyright years.
+
 0.03 2024-07-08T19:24:37+02:00
  - Add test for run().
  - Rename example file to better name.

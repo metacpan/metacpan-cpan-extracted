@@ -1,26 +1,27 @@
---- #YAML:1.0
-name:               Array-Transpose
-version:            0.06
-abstract:           Transposes a 2-Dimensional Array
+---
+abstract: 'Transposes a 2-Dimensional Array'
 author:
-    - Michael R. Davis (domain=>stopllc,tld=>com,account=>mdavis)
-license:            unknown
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Michael R. Davis'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    Exporter:      0
-    strict:        0
-    Test::Simple:  0.44
-    vars:          0
-    warnings:      0
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.55_02
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150001'
+license: bsd
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Array-Transpose
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Exporter: '0'
+  Test::Simple: '0.44'
+resources:
+  bugtracker: https://github.com/mrdvt92/perl-Array-Transpose/issues
+  homepage: https://github.com/mrdvt92/perl-Array-Transpose
+  repository: https://github.com/mrdvt92/perl-Array-Transpose.git
+version: '0.07'

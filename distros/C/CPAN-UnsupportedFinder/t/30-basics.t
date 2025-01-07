@@ -7,11 +7,11 @@ use Test::Most;
 use Test::HTML::Lint;
 use Test::JSON;
 
-use Test::RequiresInternet ('fastapi.metacpan.org' => 443, 'api.cpantesters.org' => 443);
+use Test::RequiresInternet ('fastapi.metacpan.org' => 'https', 'api.cpantesters.org' => 'https');
 
 BEGIN {
-	plan skip_all => 'NO_NETWORK_TESTING set' if $ENV{'NO_NETWORK_TESTING'};
-	plan tests => 11;
+	plan(skip_all => 'NO_NETWORK_TESTING set') if $ENV{'NO_NETWORK_TESTING'};
+	plan(tests => 22);
 	use_ok('CPAN::UnsupportedFinder')
 }
 
@@ -29,21 +29,24 @@ my $results = $finder->analyze(@modules);
 ok(ref($results) eq 'ARRAY', 'analyze returns an arrayref');
 
 # Test the content of the returned arrayref (assuming it's structured correctly)
-foreach my $module (@$results) {
-	ok(exists $module->{module}, 'Module key exists');
-	ok(exists $module->{failure_rate}, 'Failure rate key exists');
-	ok(exists $module->{last_update}, 'Last update key exists');
+foreach my $module (@{$results}) {
+	foreach my $key('module', 'failure_rate', 'last_update', 'recent_tests', 'reverse_deps', 'has_unsupported_deps') {
+		ok(exists($module->{$key}), "$key exists");
+	}
 }
 
 # Test that the failure rate calculation is between 0 and 1
-foreach my $module (@$results) {
+foreach my $module (@{$results}) {
 	ok($module->{failure_rate} >= 0 && $module->{failure_rate} <= 1, 'Failure rate is between 0 and 1');
 }
 
 # Test that the last update is a valid date (assuming you expect a YYYY-MM-DD format)
 foreach my $module (@$results) {
-	# ok($module->{last_update} =~ /^\d{4}-\d{2}-\d{2}$/, 'Last update is a valid date' );
-	cmp_ok($module->{'last_update'}, 'eq', 'Unknown', 'Unknown module has no valid date');
+	if($module->{'module'} eq 'Old-Unused-Module') {
+		cmp_ok($module->{'last_update'}, 'eq', 'Unknown', 'Unknown module has no valid date');
+	} else {
+		like($module->{'last_update'}, qr/^\d{4}-\d{2}-\d{2}/, 'Last update is a valid date');
+	}
 }
 
 # Test the output format methods

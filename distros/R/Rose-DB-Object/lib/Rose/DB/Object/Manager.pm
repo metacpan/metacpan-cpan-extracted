@@ -5,7 +5,7 @@ use strict;
 use Carp();
 
 use List::Util qw(first);
-#use List::MoreUtils qw(uniq);
+#use List::Util 1.45 qw(uniq);
 use Scalar::Util qw(weaken refaddr);
 
 use Rose::DB::Object::Iterator;

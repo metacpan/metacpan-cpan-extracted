@@ -4,13 +4,13 @@
       "Alberto Simoes <ambs@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4214",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "ExtUtils-LibBuilder",
    "prereqs" : {
@@ -36,7 +36,7 @@
    "provides" : {
       "ExtUtils::LibBuilder" : {
          "file" : "lib/ExtUtils/LibBuilder.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
@@ -48,6 +48,6 @@
          "url" : "http://github.com/ambs/ExtUtils-LibBuilder"
       }
    },
-   "version" : "0.08",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.09",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

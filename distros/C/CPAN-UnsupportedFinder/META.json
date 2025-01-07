@@ -35,22 +35,25 @@
             "Carp" : "0",
             "ExtUtils::MakeMaker" : "6.64",
             "HTTP::Tiny" : "0",
-            "JSON" : "0",
+            "JSON::MaybeXS" : "0",
             "Log::Log4perl" : "0",
             "Scalar::Util" : "0"
          }
       },
       "test" : {
          "requires" : {
+            "Test::Compile" : "0",
+            "Test::DescribeMe" : "0",
             "Test::HTML::Lint" : "0",
             "Test::JSON" : "0",
             "Test::Most" : "0",
+            "Test::Needs" : "0",
             "Test::RequiresInternet" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {},
-   "version" : "0.02",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

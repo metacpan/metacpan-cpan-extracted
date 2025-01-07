@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use ExtUtils::MakeMaker 6.64;	# 6.64 for TEST_REQUIRES
+use ExtUtils::MakeMaker;
 
 my @dirs;
 
@@ -29,17 +29,20 @@ foreach my $dir(@dirs) {
 
 my $prereqs = {
 	'autodie' => 0,
+	'constant' => 0,
 	'Carp' => 0,
 	'Database::Abstraction' => 0.04,
 	'DBD::SQLite' => 0,
 	'DBD::SQLite::Constants' => 0,
 	'Error::Simple' => 0,
+	'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
 	'File::Basename' => 0,
 	'File::pfopen' => 0,
 	'File::Slurp' => 0,
 	'File::Spec' => 0,
 	'File::Temp' => 0,
 	'Module::Info' => 0,
+	'Scalar::Util' => 0,
 	'Text::CSV' => 0
 };
 
@@ -55,10 +58,19 @@ unless(defined($ENV{'NO_NETWORK_TESTING'})) {
 	$prereqs->{'Try::Tiny'} = 0;
 }
 
+my $dist = {
+	COMPRESS => 'gzip -9f',
+	SUFFIX => 'gz'
+};
+
+if($^O eq 'darwin') {
+	$dist->{'TAR'} = 'gtar';
+}
+
 WriteMakefile(
 	NAME		=> 'Genealogy::ObituaryDailyTimes',
 	AUTHOR		=> q{Nigel Horne <njh@bandsman.co.uk>},
-	VERSION_FROM	=> 'lib/Genealogy/ObituaryDailyTimes.pm',
+	VERSION_FROM	=> 'lib/Genealogy/ObituaryDailyTimes.pm',	# finds $VERSION in the module
 	ABSTRACT_FROM	=> 'lib/Genealogy/ObituaryDailyTimes.pm',
 	((defined($ExtUtils::MakeMaker::VERSION) &&
 	 ($ExtUtils::MakeMaker::VERSION >= 6.3002))
@@ -70,13 +82,14 @@ WriteMakefile(
 	PL_FILES => (defined($ENV{'AUTOMATED_TESTING'}) ? {} : {'bin/create_db.PL' => 'bin/create_db'}),
 	TEST_REQUIRES => {
 		'Test::Carp' => 0,
+		'Test::DescribeMe' => 0,
 		'Test::Most' => 0,
 		'Test::NoWarnings' => 0,
 		'Test::Needs' => 0,
 		# 'Test::Kwalitee' => 0,
 		'IPC::System::Simple' => 0,
 	}, PREREQ_PM => $prereqs,
-	dist => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+	dist => $dist,
 	clean => { FILES => 'Genealogy-ObituaryDailyTimes-*' },
 	realclean => {
 		FILES => 'Genealogy-ObituaryDailyTimes-* lib/Genealogy/ObituaryDailyTimes/data'

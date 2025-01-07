@@ -1,0 +1,351 @@
+#!/usr/bin/perl
+use 5.016;
+use strict;
+use warnings;
+
+use Getopt::Long;
+
+use File::Tudo qw(default_todo tudo);
+
+my $PRGNAM = 'perl-tudo';
+my $PRGVER = $File::Tudo::VERSION;
+
+my $HELP_MSG = <<HERE;
+$PRGNAM - $PRGVER
+Usage:
+  $PRGNAM [options] <todo>
+    Add <tood> to TODO file
+  $PRGNAM [options] --list
+    List TODOs currently in TODO file
+  $PRGNAM [options] --show <entry>
+    Print entry number <entry>
+  $PRGNAM [options] --rm <target>
+    Remove TODOs matching <target>
+
+Global options:
+  --file <file>
+    Specify path to TODO file
+
+Informative options:
+  --help
+    Print this help message
+  --version
+    Print version/copyright info
+HERE
+
+my $VER_MSG = <<HERE;
+$PRGNAM - $PRGVER
+
+Copyright 2025, Samuel Young
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+HERE
+
+my %MODE_TABLE = (
+	ADD  => \&add,
+	LS   => \&ls,
+	RM   => \&rm,
+	SHOW => \&show,
+);
+
+sub synopsis {
+
+	my $str = shift;
+
+	my $fl = (split /\n/, $str)[0];
+
+	my $syn = length $fl > 72 ? substr $fl, 0, 72 : $fl;
+
+	$syn .= '...' if ($str =~ tr/\n//) or length $fl > 72;
+
+	return $syn;
+
+}
+
+sub yesno {
+
+	my $prompt = shift;
+
+	while (1) {
+
+		print "$prompt [y/N] ";
+
+		my $res = readline *STDIN;
+		chomp $res;
+
+		if (fc $res eq fc 'y') {
+			return 1;
+		} elsif ($res eq '' or fc $res eq fc 'n') {
+			return 0;
+		} else {
+			warn "Invalid reponse '$res'\n";
+		}
+
+	}
+
+}
+
+sub rm_by_int {
+
+	my $todos = shift;
+	my $int   = shift;
+
+	my %removed;
+	my @kept;
+
+	for my $i (0 .. $#$todos) {
+
+		if ($i + 1 == $int) {
+			$removed{$i + 1} = $todos->[$i];
+		} else {
+			push @kept, $todos->[$i];
+		}
+
+	}
+
+	@{$todos} = @kept;
+
+	return %removed;
+
+}
+
+sub rm_by_str {
+
+	my $todos = shift;
+	my $str   = shift;
+
+	my %removed;
+	my @kept;
+
+	for my $i (0 .. $#$todos) {
+
+		my $todo = $todos->[$i];
+
+		if ($todo =~ /$str/) {
+			$removed{$i + 1} = $todo;
+		} else {
+			push @kept, $todo;
+		}
+
+	}
+
+	@{$todos} = @kept;
+
+	return %removed;
+
+}
+
+sub add {
+
+	my $param = shift;
+
+	tudo($param->{Add}, $param->{File});
+
+	say "Added 1 TODO to $param->{File}";
+
+}
+
+sub ls {
+
+	my $param = shift;
+
+	my $tudo = File::Tudo->new($param->{File});
+
+	my $n = 0;
+	for my $todo (@{$tudo->todo}) {
+
+		$n++;
+
+		say "$n: " . synopsis($todo);
+
+	}
+
+}
+
+sub rm {
+
+	my $param = shift;
+
+	my $tudo = File::Tudo->new($param->{File});
+
+	my %removed;
+
+	if ($param->{Rm} =~ /\d+/) {
+		%removed = rm_by_int($tudo->todo, $param->{Rm});
+	} else {
+		%removed = rm_by_str($tudo->todo, $param->{Rm});
+	}
+
+	unless (%removed) {
+		say "Found no matching TODOs, doing nothing";
+		return;
+	}
+
+	say "The following TODOs will be removed:";
+	for my $k (sort keys %removed) {
+		say "  $k: " . synopsis($removed{$k});
+	}
+	my $ok = yesno("Is this okay?");
+
+	if ($ok) {
+		$tudo->write;
+		my $n = scalar keys %removed;
+		say "Removed $n TODOs";
+	} else {
+		say "Doing nothing";
+	}
+
+}
+
+sub show {
+
+	my $param = shift;
+
+	my $tudo = File::Tudo->new($param->{File});
+
+	if ($param->{Show} <= 0) {
+		die "--show argument must be greater than 0\n";
+	}
+
+	if ($param->{Show} > @{$tudo->todo}) {
+		die "--show argument is greater than the number of TODOs present\n";
+	}
+
+	say $tudo->todo->[$param->{Show} - 1];
+
+}
+
+sub main {
+
+	my $param = {
+		Mode => 'ADD',
+		Add  => undef,
+		Rm   => undef,
+		Show => undef,
+		File => default_todo,
+	};
+
+	GetOptions(
+		"list"    => sub { $param->{Mode} = 'LS' },
+		"show=i"  => sub { $param->{Mode} = 'SHOW'; $param->{Show} = $_[1] },
+		"rm=s"    => sub { $param->{Mode} = 'RM'; $param->{Rm} = $_[1] },
+		"file=s"  => sub { $param->{File} = $_[1] },
+		"help"    => sub { print $HELP_MSG; exit 0 },
+		"version" => sub { print $VER_MSG;  exit 0 },
+	) or die "Error in command line arguments\n";
+
+	if ($param->{Mode} eq 'ADD') {
+		unless (@ARGV) {
+			die $HELP_MSG;
+		}
+		$param->{Add} = shift @ARGV;
+	}
+
+	$MODE_TABLE{$param->{Mode}}($param);
+
+}
+
+main;
+
+
+
+=head1 NAME
+
+perl-tudo - Tudo TODO file command-line interface (in Perl!)
+
+=head1 SYNOPSIS
+
+  perl-tudo [options] <todo>
+  perl-tudo [options] --list
+  perl-tudo [options] --show <entry>
+  perl-tudo [options] --rm <target>
+
+=head1 DESCRIPTION
+
+perl-tudo is a command-line program using the L<File::Tudo> module for
+interacting with Tudo TODO files.
+
+By default, perl-tudo takes a single string as an argument and appends it to the
+end of the TODO file it is configured to work on.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--list>
+
+Instead of appending TODOs to the current TODO file, list a quick preview of
+each TODO entry currently in the file.
+
+=item B<--show> I<entry>
+
+Instead of appending TODOs to the current TODO file, print entry number
+specified by I<entry>.
+
+=item B<--rm> I<target>
+
+Instead of appending TODOs to the current TODO file, remove any TODO entry that
+matches I<target>. I<target> can be one of the following:
+
+=over 4
+
+=item Integar
+
+If I<target> is an integar, remove the I<n>th TODO entry (I<n> being the number
+specified by I<target>).
+
+=item String
+
+If I<target> is a normal string, remove any TODO entry that contains said
+string.
+
+=back
+
+=item B<--file> I<file>
+
+Specify the path to the TODO file to work on. Defaults to either the
+C<TODO_FILE> environment variable if set, or C<~/TODO> otherwise.
+
+=item B<--help>
+
+Print perl-tudo help message and exit.
+
+=item B<--version>
+
+Print perl-tudo version/copyright info and exit.
+
+=back
+
+=head1 ENVIRONMENT
+
+=over 4
+
+=item TODO_FILE
+
+Default TODO file path.
+
+=back
+
+=head1 AUTHOR
+
+Written by Samuel Young, E<lt>samyoung12788@gmail.comE<gt>.
+
+=head1 BUGS
+
+Don't be ridiculous...
+
+Report bugs on my Codeberg, L<https://codeberg.org/1-1sam>.
+
+=head1 COPYRIGHT
+
+Copyright 2025, Samuel Young
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+=head1 SEE ALSO
+
+L<File::Tudo>
+
+=cut

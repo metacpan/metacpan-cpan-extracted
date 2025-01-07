@@ -1,4 +1,4 @@
-package EAI::Wrap 1.917;
+package EAI::Wrap 1.918;
 
 use strict; use feature 'unicode_strings'; use warnings;
 use Exporter qw(import); use Data::Dumper qw(Dumper); use File::Copy qw(copy move); use Cwd qw(chdir); use Archive::Extract (); use Carp qw(confess longmess);
@@ -16,7 +16,7 @@ BEGIN {
 use EAI::Common; use EAI::DateUtil; use EAI::DB; use EAI::File; use EAI::FTP;
 
 # first structures and functions from this module, then from DateUtil, DB, File, FTP, Common; last useful external functions
-our @EXPORT = qw(%common %config %execute @loads @optload %opt removeFilesinFolderOlderX openDBConn openFTPConn redoFiles getLocalFiles getFilesFromFTP getFiles checkFiles extractArchives getAdditionalDBData readFileData dumpDataIntoDB markProcessed writeFileFromDB writeFileFromMemory putFileInLocalDir markForHistoryDelete uploadFileToFTP uploadFileCMD uploadFile processingEnd processingPause processingContinues standardLoop moveFilesToHistory deleteFiles
+our @EXPORT = qw(%common %config %execute @loads @optload %opt removeFilesinFolderOlderX openDBConn openFTPConn redoFiles getLocalFiles getFilesFromFTP getFiles checkFiles extractArchives getAdditionalDBData readFileData dumpDataIntoDB markProcessed writeFileFromDB writeFileFromMemory putFileInLocalDir markUploadForHistoryDelete uploadFileToFTP uploadFileCMD uploadFile processingEnd processingPause processingContinues standardLoop moveFilesToHistory deleteFiles
 monthsToInt intToMonths addLocaleMonths get_curdate get_curdatetime get_curdate_dot formatDate formatDateFromYYYYMMDD get_curdate_dash get_curdate_gen get_curdate_dash_plus_X_years get_curtime get_curtime_HHMM get_lastdateYYYYMMDD get_lastdateDDMMYYYY is_first_day_of_month is_last_day_of_month get_last_day_of_month weekday is_weekend is_holiday is_easter addCalendar first_week first_weekYYYYMMDD last_week last_weekYYYYMMDD convertDate convertDateFromMMM convertDateToMMM convertToDDMMYYYY addDays addDaysHol addMonths subtractDays subtractDaysHol convertcomma convertToThousendDecimal get_dateseries parseFromDDMMYYYY parseFromYYYYMMDD convertEpochToYYYYMMDD convertJulianToYYYYMMDD make_time formatTime get_curtime_epochs localtime timelocal_modern
 newDBH beginWork commit rollback readFromDB readFromDBHash doInDB storeInDB deleteFromDB updateInDB getConn setConn
 readText readExcel readXML writeText writeExcel
@@ -135,7 +135,7 @@ sub openFTPConn ($;$) {
 	my ($FTP,$process) = EAI::Common::extractConfigs("opening FTP connection",$arg,"FTP","process");
 	my $hostname = $FTP->{remoteHost};
 	$hostname = $FTP->{remoteHost}{$execute{env}} if ref($FTP->{remoteHost}) eq "HASH";
-	if ($enforceConn) {
+	if ($enforceConn and !$common{task}{redoFile}) {
 		$logger->info("enforced FTP connect");
 	} else {
 		# don't connect if redo from local file
@@ -184,7 +184,7 @@ sub redoFiles ($) {
 	my $arg = shift;
 	my $logger = get_logger();
 	return unless $common{task}{redoFile};
-	my ($File) = EAI::Common::extractConfigs("setting/renaming redo files",$arg,"File");
+	my ($File,$process) = EAI::Common::extractConfigs("setting/renaming redo files",$arg,"File","process");
 	my $redoDir = $execute{redoDir};
 	# file extension for local redo 
 	my ($barename,$ext) = $File->{filename} =~ /(.*)\.(.*?)$/; # get file bare name and extension from filename
@@ -219,9 +219,9 @@ sub redoFiles ($) {
 				# only rename if not prohibited and not a glob, else just push into retrievedFiles
 				if (!$File->{avoidRenameForRedo} and $File->{filename} !~ /\*/) {
 					rename $redofile, "$barename.$ext" or $logger->error("error renaming file $redofile to $barename.$ext : $!".longmess());
-					push @{$execute{retrievedFiles}}, "$barename.$ext";
+					push @{$process->{retrievedFiles}}, "$barename.$ext";
 				} else {
-					push @{$execute{retrievedFiles}}, $redofile;
+					push @{$process->{retrievedFiles}}, $redofile;
 				}
 			}
 		}
@@ -239,7 +239,7 @@ sub getLocalFiles ($) {
 	my $logger = get_logger();
 	my ($File,$process) = EAI::Common::extractConfigs("Getting local files",$arg,"File","process");
 	return 1 if $process->{successfullyDone} and $process->{successfullyDone} =~ /getLocalFiles/ and $execute{retryBecauseOfError};
-	@{$execute{retrievedFiles}} = (); # reset last retrieved
+	@{$process->{retrievedFiles}} = (); # reset last retrieved
 	if ($File->{localFilesystemPath}) {
 		my $localFilesystemPath = $File->{localFilesystemPath};
 		$localFilesystemPath.="/" if $localFilesystemPath !~ /^.*\/$/;
@@ -260,13 +260,13 @@ sub getLocalFiles ($) {
 				# no glob char -> single file
 				push @multipleFiles, $File->{filename};
 			}
-			push @{$execute{retrievedFiles}}, @multipleFiles;
+			push @{$process->{retrievedFiles}}, @multipleFiles;
 			for my $localfile (@multipleFiles) {
 				unless ($File->{localFilesystemPath} eq ".") {
 					$logger->info("copying local file: ".$localFilesystemPath.$localfile." to ".$execute{homedir});
 					copy ($localFilesystemPath.$localfile, ".") or do {
 						$logger->error("couldn't copy ".$localFilesystemPath.$localfile.": $!".longmess());
-						@{$execute{retrievedFiles}} = ();
+						@{$process->{retrievedFiles}} = ();
 						$process->{hadErrors} = 1;
 						return 0;
 					};
@@ -290,13 +290,13 @@ sub getFilesFromFTP ($) {
 	my $logger = get_logger();
 	my ($FTP,$File,$process) = EAI::Common::extractConfigs("Getting files from ftp",$arg,"FTP","File","process");
 	return 1 if $process->{successfullyDone} and $process->{successfullyDone} =~ /getFilesFromFTP/ and $execute{retryBecauseOfError};
-	@{$execute{retrievedFiles}} = (); # reset last retrieved, but this is also necessary to create the retrievedFiles hash entry for passing back the list from getFiles
+	@{$process->{retrievedFiles}} = (); # reset last retrieved, but this is also necessary to create the retrievedFiles hash entry for passing back the list from getFiles
 	if (defined($FTP->{remoteDir})) {
 		if ($common{task}{redoFile}) {
 			return redoFiles($arg);
 		} else {
 			if ($File->{filename}) {
-				unless (EAI::FTP::fetchFiles($FTP,{firstRunSuccess=>$execute{firstRunSuccess},homedir=>$execute{homedir},fileToRetrieve=>$File->{filename},fileToRetrieveOptional=>$File->{optional},retrievedFiles=>$execute{retrievedFiles}})) {
+				unless (EAI::FTP::fetchFiles($FTP,{firstRunSuccess=>$execute{firstRunSuccess},homedir=>$execute{homedir},fileToRetrieve=>$File->{filename},fileToRetrieveOptional=>$File->{optional},retrievedFiles=>$process->{retrievedFiles}})) {
 					$logger->warn("EAI::FTP::fetchFiles not successful".longmess());
 				}
 			} else {
@@ -337,8 +337,8 @@ sub checkFiles ($) {
 	my ($File,$process) = EAI::Common::extractConfigs("checking for existence of files",$arg,"File","process");
 	my $redoDir = ($common{task}{redoFile} ? $execute{redoDir}."/" : "");
 	my $fileDoesntExist = 0;
-	if ($execute{retrievedFiles} and @{$execute{retrievedFiles}} >= 1) {
-		for my $singleFilename (@{$execute{retrievedFiles}}) {
+	if ($process->{retrievedFiles} and @{$process->{retrievedFiles}} >= 1) {
+		for my $singleFilename (@{$process->{retrievedFiles}}) {
 			$logger->debug("checking file: ".$redoDir.$singleFilename);
 			open (CHECKFILE, "<".$redoDir.$singleFilename) or $fileDoesntExist=1;
 			close CHECKFILE;
@@ -357,7 +357,7 @@ sub checkFiles ($) {
 				$logger->warn("file ".$File->{filename}." missing being retried, skipping".longmess());
 			}
 		} else {
-			if (!$execute{retrievedFiles} or @{$execute{retrievedFiles}} == 0) {
+			if (!$process->{retrievedFiles} or @{$process->{retrievedFiles}} == 0) {
 				$logger->error("file ".$File->{filename}." was not retrieved (maybe no successful call done to getFilesFromFTP or getLocalFiles ?)".longmess());
 			} else {
 				$logger->error("file ".$File->{filename}." doesn't exist and is not marked as optional!".longmess());
@@ -369,7 +369,7 @@ sub checkFiles ($) {
 	}
 	# extract from files if needed
 	if ($File->{extract}) {
-		if (@{$execute{retrievedFiles}} == 1) {
+		if (@{$process->{retrievedFiles}} == 1) {
 			$logger->info("file to be extracted exists, now extracting archive");
 			return extractArchives($arg);
 		} else {
@@ -379,8 +379,8 @@ sub checkFiles ($) {
 		}
 	}
 	# add the files retrieved
-	if ($execute{retrievedFiles} && @{$execute{retrievedFiles}} > 0) {
-		push @{$process->{filenames}}, @{$execute{retrievedFiles}};
+	if ($process->{retrievedFiles} && @{$process->{retrievedFiles}} > 0) {
+		push @{$process->{filenames}}, @{$process->{retrievedFiles}};
 		$logger->info("files checked: @{$process->{filenames}}");
 		return 1;
 	} else {
@@ -396,8 +396,8 @@ sub extractArchives ($) {
 	my ($process) = EAI::Common::extractConfigs("extracting archives",$arg,"process");
 	return 1 if $process->{successfullyDone} and $process->{successfullyDone}  =~ /extractArchives/ and $execute{retryBecauseOfError};
 	my $redoDir = ($common{task}{redoFile} ? $execute{redoDir}."/" : "");
-	if ($execute{retrievedFiles}) { 
-		my $filename = $execute{retrievedFiles}[0]; # only one file expected.
+	if ($process->{retrievedFiles}) { 
+		my $filename = $process->{retrievedFiles}[0]; # only one file expected.
 		if (! -e $redoDir.$filename) {
 			$logger->error($redoDir.$filename." doesn't exist for extraction".longmess());
 			$process->{hadErrors} = 1;
@@ -422,7 +422,7 @@ sub extractArchives ($) {
 		push @{$process->{filenames}}, @{$ae->files};
 		push @{$process->{archivefilenames}}, $filename; # archive itself needs to be removed/historized
 		# reset retrievedFiles to get rid of fetched archives (not to be processed further)
-		@{$execute{retrievedFiles}} = ();
+		@{$process->{retrievedFiles}} = ();
 	} else {
 		$logger->error("no files available to extract..".longmess());
 		$process->{hadErrors} = 1;
@@ -522,16 +522,20 @@ sub dumpDataIntoDB ($) {
 						last;
 					}
 					if ($dopostdumpexec) {
-						for my $exec (@{$postDumpExec->{execs}}) {
-							if ($exec) { # only if defined (there could be an interpolation of perl variables, if these are contained in $exec. This is for setting $selectedDate in postDumpProcessing.
-								$logger->debug("pre eval execute: $exec");
-								# eval qq{"$exec"} doesn't evaluate $exec but the quoted string (to enforce interpolation where needed)
-								$exec = eval qq{"$exec"} if $exec =~ /$/; # only interpolate if perl scalars are contained
-								$logger->info("post execute: $exec");
-								if (!EAI::DB::doInDB({doString => $exec})) {
-									$logger->error("error executing postDumpExec: '".$exec."' .. ".longmess());
-									$hadDBErrors=1;
-									last;
+						for my $preexec (@{$postDumpExec->{execs}}) {
+							if ($preexec) { # only if defined (there could be an interpolation of perl variables, if these are contained in $exec. This is for setting $selectedDate in postDumpProcessing.
+								$logger->debug("pre eval execute: $preexec");
+								# eval qq{"$preexec"} doesn't evaluate $preexec but the quoted string (to enforce interpolation where needed)
+								my $exec = eval qq{"$preexec"} if $preexec =~ /$/; # only interpolate if perl scalars are contained
+								if ($@) {
+									$logger->error("error evaluating '".$preexec."': $@".longmess());
+								} else {
+									$logger->info("post execute: $exec");
+									if (!EAI::DB::doInDB({doString => $exec})) {
+										$logger->error("error executing postDumpExec: '".$exec."' .. ".longmess());
+										$hadDBErrors=1;
+										last;
+									}
 								}
 							}
 						}
@@ -692,12 +696,12 @@ sub putFileInLocalDir ($) {
 }
 
 # mark to be removed or be moved to history after upload
-sub markForHistoryDelete ($) {
+sub markUploadForHistoryDelete ($) {
 	my $arg = shift;
 	my $logger = get_logger();
 	my ($File) = EAI::Common::extractConfigs("",$arg,"File");
 	if ($File->{dontKeepHistory}) {
-		push @{$execute{uploadFilesToDelete}}, $File->{filename};
+		push @{$execute{filesUploadedToDelete}}, $File->{filename};
 	} elsif (!$File->{dontMoveIntoHistory}) {
 		push @{$execute{filesToMoveinHistoryUpload}}, $File->{filename};
 	}
@@ -709,7 +713,7 @@ sub uploadFileToFTP ($) {
 	my $logger = get_logger();
 	my ($FTP,$File,$process) = EAI::Common::extractConfigs("uploading files to FTP",$arg,"FTP","File","process");
 	return 1 if $process->{successfullyDone} and $process->{successfullyDone} =~ /uploadFileToFTP/ and $execute{retryBecauseOfError};
-	markForHistoryDelete($arg) unless ($FTP->{localDir});
+	markUploadForHistoryDelete($arg) unless ($FTP->{localDir});
 	if (defined($FTP->{remoteDir})) {
 		$logger->debug ("upload of file '".$File->{filename}."' using FTP");
 		EAI::Common::setErrSubject("Upload of file to FTP remoteDir ".$FTP->{remoteDir});
@@ -730,7 +734,7 @@ sub uploadFileCMD ($) {
 	my $logger = get_logger();
 	my ($FTP,$File,$process) = EAI::Common::extractConfigs("uploading files with CMD",$arg,"FTP","File","process");
 	return 1 if $process->{successfullyDone} and $process->{successfullyDone} =~ /uploadFileCMD/ and $execute{retryBecauseOfError};
-	markForHistoryDelete($arg) unless ($FTP->{localDir});
+	markUploadForHistoryDelete($arg) unless ($FTP->{localDir});
 	if ($process->{uploadCMD}) {
 		$logger->debug ("upload of file '".$File->{filename}."' using uploadCMD ".$process->{uploadCMD});
 		EAI::Common::setErrSubject("Uploading of file with ".$process->{uploadCMD});
@@ -834,8 +838,7 @@ sub processingEnd {
 		# clean up locally
 		EAI::Common::setErrSubject("local archiving/removal");
 		moveFilesToHistory($common{task}{customHistoryTimestamp});
-		deleteFiles($execute{filesToDelete}) if $execute{filesToDelete};
-		deleteFiles($execute{uploadFilesToDelete},1) if $execute{uploadFilesToDelete};
+		deleteFiles();
 		if ($common{task}{plannedUntil}) {
 			$execute{processEnd} = 0; # reset, if repetition is planned
 			$retrySeconds = $common{task}{retrySecondsPlanned};
@@ -890,8 +893,7 @@ sub processingEnd {
 			$logger->info("finished processing due to defined ending retry after midnight: nextStartTime=$nextStartTime, startingTime=$execute{startingTime}, currentTime=$currentTime, \$common{task}{retryEndsAfterMidnight}=$common{task}{retryEndsAfterMidnight}") if ($common{task}{retryEndsAfterMidnight} and ($nextStartTime =~ /1....../ or (substr($execute{startingTime},0,2) > substr($currentTime,0,2))));
 			$logger->info("finished processing due to time out: next start time($nextStartTime) >= endTime($endTime)") if $nextStartTime >= $endTime;
 			moveFilesToHistory($common{task}{customHistoryTimestamp});
-			deleteFiles($execute{filesToDelete}) if $execute{filesToDelete};
-			deleteFiles($execute{uploadFilesToDelete},1) if $execute{uploadFilesToDelete};
+			deleteFiles();
 			$execute{processEnd}=1;
 		} else {
 			# reset hadErrors flag, successfullyDone (only for planned retries) and filenames/filesProcessed
@@ -983,10 +985,12 @@ sub moveFilesToHistory (;$) {
 	my $redoDir = ($common{task}{redoFile} ? $execute{redoDir}."/" : "");
 	EAI::Common::setErrSubject("local archiving");
 	for my $histFolder ("historyFolder", "historyFolderUpload") {
-		my @filenames = @{$execute{filesToMoveinHistory}} if $execute{filesToMoveinHistory};
-		if ($histFolder eq "historyFolderUpload" and $execute{filesToMoveinHistoryUpload}) {
-			@filenames = @{$execute{filesToMoveinHistoryUpload}};
+		my @filenames = ();
+		if ($histFolder eq "historyFolderUpload") {
+			@filenames = @{$execute{filesToMoveinHistoryUpload}} if $execute{filesToMoveinHistoryUpload} and @{$execute{filesToMoveinHistoryUpload}};
 			$redoDir = ""; # no redoDir for uploads !
+		} else {
+			@filenames = @{$execute{filesToMoveinHistory}} if $execute{filesToMoveinHistory} and @{$execute{filesToMoveinHistory}};
 		}
 		for (@filenames) {
 			my ($strippedName, $ext) = /(.+)\.(.+?)$/;
@@ -997,29 +1001,32 @@ sub moveFilesToHistory (;$) {
 				$redoSpec =~ s/[\/\\\*\|\?:<>"]/_/g;
 				$cutOffSpec = $archiveTimestamp.'_'.$redoSpec;
 			}
-			if (!$execute{alreadyMovedOrDeleted}{$_}) {
-				my $histTarget = $execute{$histFolder}."/".$strippedName."_".$cutOffSpec.".".$ext;
-				$logger->info("moving file $redoDir$_ into $histTarget");
-				rename $redoDir.$_, $histTarget or $logger->error("error when moving file $redoDir$_ into $histTarget: $!".longmess());
-				$execute{alreadyMovedOrDeleted}{$_} = 1;
-			}
+			my $histTarget = $execute{$histFolder}."/".$strippedName."_".$cutOffSpec.".".$ext;
+			$logger->info("moving local ".($common{task}{redoFile} ? "re-done " : "")."file $redoDir$_ into $histTarget");
+			rename $redoDir.$_, $histTarget or $logger->error("error when moving local file $redoDir$_ into $histTarget: $!".longmess());
 		}
 	}
+	@{$execute{filesToMoveinHistoryUpload}}=();
+	@{$execute{filesToMoveinHistory}}=();
 }
 
 # removing files
-sub deleteFiles ($;$) {
-	my ($filenames,$uploadFileFlag) = @_;
+sub deleteFiles () {
 	my $logger = get_logger();
 	my $redoDir = ($common{task}{redoFile} ? $execute{redoDir}."/" : "");
-	$redoDir = "" if $uploadFileFlag;
-	EAI::Common::setErrSubject("local cleanup"); #
-	for (@$filenames) {
-		if (!$execute{alreadyMovedOrDeleted}{$_}) {
-			$logger->info("removing ".($common{task}{redoFile} ? "re-done " : "")."file $redoDir$_ ");
-			unlink $redoDir.$_ or $logger->error("error when removing file $redoDir".$_." : $!".longmess());
-			$execute{alreadyMovedOrDeleted}{$_} = 1;
+	EAI::Common::setErrSubject("local cleanup");
+	my %alreadyDeleted; # to avoid unnecessary errors when unlinking below
+	for my $whatToDelete ("filesToDelete","filesUploadedToDelete") {
+		#$redoDir = "" if $whatToDelete eq "filesUploadedToDelete";
+		my @filenames = @{$execute{$whatToDelete}} if $execute{$whatToDelete} and @{$execute{$whatToDelete}};
+		for (@filenames) {
+			unless ($alreadyDeleted{"$redoDir$_"}) {
+				$logger->info("removing local ".($common{task}{redoFile} ? "re-done " : "")."file $redoDir$_ ");
+				unlink $redoDir.$_ or $logger->error("error when removing local file $redoDir$_ : $!".longmess());
+				$alreadyDeleted{"$redoDir$_"} = 1;
+			}
 		}
+		@{$execute{$whatToDelete}}=();
 	}
 }
 1;
@@ -1195,7 +1202,7 @@ A special merge is done for configurations defined in hash C<lookups>, which may
 
 hash of parameters for current task execution, which is not set by the user but can be read to set other parameters and control the flow. Most important here are C<$execute{env}>, giving the current used environment (Prod, Test, Dev, whatever), C<$execute{envraw}> (same as C<$execute{env}>, with Production being empty here), the several file lists (files being procesed, files for deletion/moving, etc.), flags for ending/interrupting processing and directory locations as the home dir and history folders for processed files.
 
-Detailed information about these parameters can be found in section L<execute|/execute> of the configuration parameter reference, there are parameters for files (L<filesProcessed|/filesProcessed>, L<filesToDelete|/filesToDelete>, L<filesToMoveinHistory|/filesToMoveinHistory>, L<filesToMoveinHistoryUpload|/filesToMoveinHistoryUpload>, L<retrievedFiles|/retrievedFiles>) and L<uploadFilesToDelete|/uploadFilesToDelete>, directories (L<homedir|/homedir>, L<historyFolder|/historyFolder>, L<historyFolderUpload|/historyFolderUpload> and L<redoDir|/redoDir>), process controlling parameters (L<failcount|/failcount>, L<firstRunSuccess|/firstRunSuccess>, L<retryBecauseOfError|/retryBecauseOfError>, L<retrySeconds|/retrySeconds> and L<processEnd|/processEnd>).
+Detailed information about these parameters can be found in section L<execute|/execute> of the configuration parameter reference, there are parameters for files (L<filesProcessed|/filesProcessed>, L<filesToDelete|/filesToDelete>, L<filesToMoveinHistory|/filesToMoveinHistory>, L<filesToMoveinHistoryUpload|/filesToMoveinHistoryUpload>, L<retrievedFiles|/retrievedFiles>) and L<filesUploadedToDelete|/filesUploadedToDelete>, directories (L<homedir|/homedir>, L<historyFolder|/historyFolder>, L<historyFolderUpload|/historyFolderUpload> and L<redoDir|/redoDir>), process controlling parameters (L<failcount|/failcount>, L<firstRunSuccess|/firstRunSuccess>, L<retryBecauseOfError|/retryBecauseOfError>, L<retrySeconds|/retrySeconds> and L<processEnd|/processEnd>).
 
 Retrying after C<$execute{processEnd}> is false (this parameter is set during C<processingEnd()>, combining this call and check can be done in loop header at start with C<processingContinues()>) can happen because of two reasons: First, due to C<task =E<gt> {plannedUntil =E<gt> "HHMM"}> being set to a time until the task has to be retried, however this is done at most until midnight. Second, because an error occurred, in such a case C<$process-E<gt>{hadErrors}> is set for each load that failed. C<$process{successfullyDone}> is also important in this context as it prevents the repeated run of following API procedures if the loads didn't have an error during their execution:
 
@@ -1269,7 +1276,7 @@ combines above two procedures in a general procedure to get files from FTP or lo
 
 argument $arg (ref to current load or common)
 
-check files for continuation of processing and extract archives if needed. Arguments are fetched from common or loads[i], using File parameter. The processed files are put into process->{filenames} (always runs in a faulting loop). Important: files (their filenames) not retrieved by getFilesFromFTP or getLocalFiles have to be put into $execute{retrievedFiles} (e.g. push @{$execute{retrievedFiles}}, $filenameTobeChecked)!
+check files for continuation of processing and extract archives if needed. Arguments are fetched from common or loads[i], using File parameter. The processed files are put into process->{filenames} (always runs in a faulting loop). Important: files (their filenames) not retrieved by getFilesFromFTP or getLocalFiles have to be put into $process->{retrievedFiles} (e.g. push @{$process->{retrievedFiles}}, $filenameTobeChecked)!
 
 =item extractArchives ($)
 
@@ -1319,11 +1326,11 @@ argument $arg (ref to current load or common)
 
 put files into local folder if required. Arguments are fetched from common or loads[i], using File parameter.
 
-=item markForHistoryDelete ($)
+=item markUploadForHistoryDelete ($)
 
 argument $arg (ref to current load or common)
 
-mark to be removed or be moved to history after upload. Arguments are fetched from common or loads[i], using File parameter. (always runs in a faulting loop)
+mark files to be removed or be moved to history after upload. Arguments are fetched from common or loads[i], using File parameter. (always runs in a faulting loop)
 
 =item uploadFileToFTP ($)
 
@@ -1392,13 +1399,11 @@ Instead of checking C<processingEnd()> and C<processingContinues()>, a check of 
 
 optional argument $archiveTimestamp
 
-move transferred files marked for moving (filesToMoveinHistory/filesToMoveinHistoryUpload) into history and/or historyUpload folder. Optionally a custom timestamp can be passed.
+move transferred files marked for moving in C<$execute{filesToMoveinHistory}> or C<$execute{filesToMoveinHistoryUpload}> into history and/or historyUpload folder. Optionally a custom timestamp can be passed.
  
-=item deleteFiles ($)
+=item deleteFiles ()
 
-argument $filenames, ref to array
-
-delete transferred files given in $filenames
+delete transferred files set in C<$execute{filesToDelete}> and C<$execute{filesUploadedToDelete}>
 
 =back
 
@@ -1416,11 +1421,11 @@ parameter category for site global settings, usually defined in site.config and 
 
 =item checkLogExistDelay
 
-ref to hash {Test => 2, Dev => 3, "" => 0}, mapping to set delays for checkLogExist per environment in $execute{env}, this can be further overriden per job (and environment) in checkLookup.
+ref to following hash: {Test => 2, Dev => 3, "" => 0}, mapping to set delays for checkLogExist per environment in $execute{env}, this can be further overriden per job (and environment) in checkLookup.
 
 =item checkLookup
 
-ref to datastructure {"scriptname.pl + optional addToScriptName" => {errmailaddress => "",errmailsubject => "",timeToCheck =>"", freqToCheck => "", logFileToCheck => "", logcheck => "",logRootPath =>""},...} used for logchecker, each entry of the hash lookup table defines a log to be checked, defining errmailaddress to receive error mails, errmailsubject, timeToCheck as earliest time to check for existence in log, freqToCheck as frequency of checks (daily/monthly/etc), logFileToCheck as the name of the logfile to check, logcheck as the regex to check in the logfile and logRootPath as the folder where the logfile is found. lookup key: $execute{scriptname} + $execute{addToScriptName}
+ref to following datastructure: {"scriptname.pl + optional addToScriptName" => {errmailaddress => "",errmailsubject => "",timeToCheck =>"", freqToCheck => "", logFileToCheck => "", logcheck => "",logRootPath =>""},...} used for logchecker, each entry of the hash lookup table defines a log to be checked, defining errmailaddress to receive error mails, errmailsubject, timeToCheck as earliest time to check for existence in log, freqToCheck as frequency of checks (daily/monthly/etc), logFileToCheck as the name of the logfile to check, logcheck as the regex to check in the logfile and logRootPath as the folder where the logfile is found. lookup key: $execute{scriptname} + $execute{addToScriptName}
 
 =item errmailaddress
 
@@ -1444,11 +1449,11 @@ from address for central logcheck/errmail sending, also used as default sender a
 
 =item historyFolder
 
-ref to hash {"scriptname.pl + optional addToScriptName" => "folder"}, folders where downloaded files are historized, lookup key as in checkLookup, default in "" => "defaultfolder". historyFolder, historyFolderUpload, logRootPath and redoDir are always built with an environment subfolder, the default is built as folderPath/endFolder/environ, otherwise it is built as folderPath/environ/endFolder. Environment subfolders (environ) are also built depending on prodEnvironmentInSeparatePath: either folderPath/endFolder/$execute{env} (prodEnvironmentInSeparatePath = true, Prod has own subfolder) or folderPath/endFolder/$execute{envraw} (prodEnvironmentInSeparatePath = false, Prod is in common folder, other environments have their own folder)
+ref to following hash: {"scriptname.pl + optional addToScriptName" => "folder"}, folders where downloaded files are historized, lookup key as in checkLookup, default in "" => "defaultfolder". historyFolder, historyFolderUpload, logRootPath and redoDir are always built with an environment subfolder, the default is built as folderPath/endFolder/environ, otherwise it is built as folderPath/environ/endFolder. Environment subfolders (environ) are also built depending on prodEnvironmentInSeparatePath: either folderPath/endFolder/$execute{env} (prodEnvironmentInSeparatePath = true, Prod has own subfolder) or folderPath/endFolder/$execute{envraw} (prodEnvironmentInSeparatePath = false, Prod is in common folder, other environments have their own folder)
 
 =item historyFolderUpload
 
-ref to hash {"scriptname.pl + optional addToScriptName" => "folder"}, folders where uploaded files are historized, lookup key as in checkLookup, default in "" => "defaultfolder"
+ref to following hash: {"scriptname.pl + optional addToScriptName" => "folder"}, folders where uploaded files are historized, lookup key as in checkLookup, default in "" => "defaultfolder"
 
 =item logCheckHoliday
 
@@ -1464,7 +1469,7 @@ prefix for previous (day) logs to be set in error mail (link), if not given, def
 
 =item logRootPath
 
-ref to hash {"scriptname.pl + optional addToScriptName" => "folder"}, paths to log file root folders (environment is added to that if non production), lookup key as checkLookup, default in "" => "defaultfolder"
+ref to following hash: {"scriptname.pl + optional addToScriptName" => "folder"}, paths to log file root folders (environment is added to that if non production), lookup key as checkLookup, default in "" => "defaultfolder"
 
 =item prodEnvironmentInSeparatePath
 
@@ -1472,11 +1477,11 @@ set to 1 if the production scripts/logs etc. are in a separate Path defined by f
 
 =item redoDir
 
-ref to hash {"scriptname.pl + optional addToScriptName" => "folder"}, folders where files for redo are contained, lookup key as checkLookup, default in "" => "defaultfolder"
+ref to following hash: {"scriptname.pl + optional addToScriptName" => "folder"}, folders where files for redo are contained, lookup key as checkLookup, default in "" => "defaultfolder"
 
 =item sensitive
 
-hash lookup table ({"prefix" => {user=>"",pwd =>"",hostkey=>"",privkey =>""},...}) for sensitive access information in DB and FTP (lookup keys are set with DB{prefix} or FTP{prefix}), may also be placed outside of site.config; all sensitive keys can also be environment lookups, e.g. hostkey=>{Test => "", Prod => ""} to allow for environment specific setting
+hash lookup table: {"prefix" => {user=>"",pwd =>"",hostkey=>"",privkey =>""},...} for sensitive access information in DB and FTP (lookup keys are set with DB{prefix} or FTP{prefix}), may also be placed outside of site.config; all sensitive keys can also be environment lookups, e.g. hostkey=>{Test => "", Prod => ""} to allow for environment specific setting
 
 =item smtpServer
 
@@ -1498,13 +1503,9 @@ hash of parameters for current task execution. This is not to be set by the user
 
 =over 4
 
-=item alreadyMovedOrDeleted
-
-hash for checking the already moved or deleted local files, to avoid moving/deleting them again at cleanup
-
 =item addToScriptName
 
-this can be set to be added to the scriptname for config{checkLookup} keys, e.g. some passed parameter.
+this can be set to be added to the scriptname for config{checkLookup} keys, e.g. some passed parameter. This is typically done in config{executeOnInit}
 
 =item env
 
@@ -1529,6 +1530,10 @@ for counting failures in processing to switch to longer wait period or finish al
 =item filesToDelete
 
 list of files to be deleted locally after download, necessary for cleanup at the end of the process
+
+=item filesUploadedToDelete
+
+list of files to be deleted locally after upload, necessary for cleanup at the end of the process
 
 =item filesToMoveinHistory
 
@@ -1578,10 +1583,6 @@ specifies that the process is ended, checked in EAI::Wrap::processingEnd
 
 actually set redoDir
 
-=item retrievedFiles
-
-files retrieved from FTP or redo directory
-
 =item retryBecauseOfError
 
 retryBecauseOfError shows if a rerun occurs due to errors (for successMail) 
@@ -1601,10 +1602,6 @@ tasks starting time for checking task{retryEndsAfterMidnight} against current ti
 =item timeToCheck
 
 for logchecker: scheduled time of job (don't look earlier for log entries)
-
-=item uploadFilesToDelete
-
-list of files to be deleted locally after upload, necessary for cleanup at the end of the process
 
 =back
 
@@ -2074,7 +2071,7 @@ set user directly, either directly (insecure -> visible) or via sensitive lookup
 
 =item process
 
-used to pass information within each process (data, additionalLookupData, filenames, hadErrors or commandline parameters starting with interactive) and for additional configurations not suitable for DB, File or FTP (e.g. uploadCMD* and onlyExecFor)
+used to pass information within each process (data, additionalLookupData, filenames, hadErrors, retrievedFiles or commandline parameters starting with interactive) and for additional configurations not suitable for DB, File or FTP (e.g. uploadCMD* and onlyExecFor)
 
 =over 4
 
@@ -2113,6 +2110,10 @@ interactive options (are not checked), can be used to pass arbitrary data via co
 =item onlyExecFor
 
 define loads to only be executed when $common{task}{execOnly} !~ $load->{process}{onlyExecFor}. Empty onlyExecFor loads are always executed regardless of $common{task}{execOnly}
+
+=item retrievedFiles
+
+files retrieved from FTP or redo directory
 
 =item successfullyDone
 
@@ -2204,7 +2205,7 @@ used for "wait with execution for first business date", either this is a calenda
 
 =head1 COPYRIGHT
 
-Copyright (c) 2024 Roland Kapl
+Copyright (c) 2025 Roland Kapl
 
 All rights reserved.  This program is free software; you can
 redistribute it and/or modify it under the same terms as Perl itself.

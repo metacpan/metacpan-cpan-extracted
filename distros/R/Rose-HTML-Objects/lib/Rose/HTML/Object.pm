@@ -6,7 +6,7 @@ use base 'Rose::HTML::Object::Localized';
 
 use Carp;
 use Scalar::Util();
-use List::MoreUtils qw(uniq);
+use List::Util qw(uniq);
 
 use Rose::HTML::Util();
 use Rose::HTML::Object::Message::Localizer;

@@ -2,12 +2,10 @@
 
 use strict;
 use warnings;
+
+use Test::DescribeMe qw(author);
 use Test::Most;
 use Test::Needs 'Test::Synopsis';
 
-if($ENV{AUTHOR_TESTING}) {
-	Test::Synopsis->import();
-	all_synopsis_ok();
-} else {
-	plan(skip_all => 'Author tests not required for installation');
-}
+Test::Synopsis->import();
+all_synopsis_ok();

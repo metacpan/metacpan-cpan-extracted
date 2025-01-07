@@ -121,6 +121,11 @@ if (defined($libpath) && defined($incpath)) {
 	$incpath = "-Itcl-core/include";
 	$libpath = "-Ltcl-core/$arch -l$stub";
 	if ($^O eq 'darwin') {
+	    # darwin has a broken ranlib that requires you to run it anytime
+	    # you copy an archive file, so ensure ours is up-to-date
+	    system("ranlib tcl-core/$arch/libtclstub8.4.a");
+	    system("git update-index --assume-unchanged tcl-core/$arch/libtclstub8.4.a")
+		if -d ".git";
 	    # OS X also requires the Carbon framework by default
 	    $libpath .= " -framework Carbon";
 	}
@@ -168,7 +173,11 @@ if (defined($libpath) && defined($incpath)) {
 		    $tclcfg{'tclConfig.sh'} =~ /^(.*)[\\\/][^\\\/]+$/;
 		    $incpath = "-I$1/../include";
 		    $libpath = "-L$1 $libpath";
-		} else {_die "can't continue"}
+		    # TODO: check whether those dirs has proper tcl.h and .a/.lib files
+		} else {
+		    # TODO: use tcl.h and library from tcl-core directory
+		    _die "can't continue";
+		}
 	    }
 	}
 	#?? $defs .= " -DLIB_RUNTIME_DIR=\\\"$1/lib\\\"" if $usestubs;
@@ -186,11 +195,6 @@ print "DEFINE = $defs\n";
 print "tclConfig.sh = ", $tclconfig || "", "\n";
 
 if ($^O eq 'darwin') {
-    # darwin has a broken ranlib that requires you to run it anytime
-    # you copy an archive file, so ensure ours is up-to-date
-    system("ranlib tcl-core/$arch/libtclstub8.4.a");
-    system("git update-index --assume-unchanged tcl-core/$arch/libtclstub8.4.a")
-	if -d ".git";
     if ($libpath =~ /-framework/) {
 	# Frameworks require slightly different compile options
 	@extraargs = (dynamic_lib => {OTHERLDFLAGS => $libpath});

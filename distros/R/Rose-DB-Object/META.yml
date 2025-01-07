@@ -26,7 +26,6 @@ requires:
   DateTime: '0'
   File::Path: '0'
   File::Spec: '0'
-  List::MoreUtils: '0'
   Math::BigInt: '1.77'
   Rose::DB: '0.782'
   Rose::DateTime::Util: '0.532'
@@ -41,5 +40,5 @@ resources:
   homepage: http://rosecode.org
   license: http://dev.perl.org/licenses/
   repository: https://github.com/siracusa/rose/tree/master/modules/Rose-DB-Object
-version: '0.821'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '0.822'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

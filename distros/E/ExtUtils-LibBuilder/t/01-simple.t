@@ -71,6 +71,10 @@ elsif ($^O =~ /aix/i) {
     my $oldlibpath = $ENV{LIBPATH} || '/lib:/usr/lib';
     $ENV{LIBPATH} = ".:$oldlibpath";
 }
+elsif ($^O =~ /haiku/i) {
+    my $oldlibpath = $ENV{LIBRARY_PATH} || '/boot/system/lib:/boot/system/lib/x86';
+    $ENV{LIBRARY_PATH} = ".:$oldlibpath";
+}
 
 my $P;
 $P = "./" unless $^O =~ /mswin32/i;

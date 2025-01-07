@@ -53,6 +53,7 @@ sub postamble {
     my $min_vsn = ($] >= 5.010 && -d "xt" && ($ENV{AUTOMATED_TESTING} || 0) != 1)
 	? join "\n" =>
 	    'test ::',
+	    '	-@perl doc/make-doc.pl',
 	    '	-@env TEST_FILES="xt/*.t" make -e test_dynamic',
 	    ''
 	: "";
@@ -82,5 +83,7 @@ sub postamble {
 	'	-@cpants_lint.pl $(DISTVNAME).tgz',
 	'	-@rm -f Debian_CPANTS.txt',
 	'',
+	'doc docs:',
+	'	perl doc/make-doc.pl',
 	$min_vsn;
     } # postamble

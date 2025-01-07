@@ -1,4 +1,12 @@
-0.004   2018-04-18 (PERLANCAR)
+0.005   2025-01-07  Released-By: PERLANCAR; Urgency: medium
+
+        - [doc] Discourage the use of rand() and this module, mention
+          Random::Simple.
+
+        - [security] Turn on -warn option by default.
+
+
+0.004   2018-04-18  Released-By: PERLANCAR
 
 	- Observe PERL_RANDOM_ANY_WARN environment variable.
 
@@ -6,18 +14,18 @@
 	  because MRS is only backed by a 32-bit random number generator.
 
 
-0.003   2018-01-02 (PERLANCAR)
+0.003   2018-01-02  Released-By: PERLANCAR
 
 	- Add import option: -warn => 1.
 
 
-0.002   2018-01-01 (PERLANCAR)
+0.002   2018-01-01  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [pod] POD fixes.
 
 
-0.001   2018-01-01 (PERLANCAR)
+0.001   2018-01-01  Released-By: PERLANCAR
 
         - First release.

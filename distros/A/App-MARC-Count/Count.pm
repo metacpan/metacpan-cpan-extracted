@@ -9,7 +9,7 @@ use Getopt::Std;
 use MARC::File::XML (BinaryEncoding => 'utf8', RecordFormat => 'MARC21');
 use Unicode::UTF8 qw(encode_utf8);
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Constructor.
 sub new {
@@ -47,9 +47,10 @@ sub run {
 
 	my $marc_file = MARC::File::XML->in($self->{'_marc_xml_file'});
 	my $ret_hr = {};
-	my $num = 1;
+	my $num = 0;
 	my $previous_record;
 	while (1) {
+		$num++;
 		my $record = eval {
 			$marc_file->next;
 		};
@@ -64,11 +65,10 @@ sub run {
 			next;
 		}
 		if (! defined $record) {
+			$num--;
 			last;
 		}
 		$previous_record = $record;
-
-		$num++;
 	}
 
 	# Print out.
@@ -297,12 +297,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2022-2024 Michal Josef Špaček
+© 2022-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

@@ -1,7 +1,14 @@
 Revision history for Perl extension Tcl.
 
+1.50	2025-01-06
+	- fix for Tcl9
+
+1.32	2024-01-06
+	- take build info from tclConfig.sh (which is often problematic,
+	  because often Win32 installations do not update the file)
+
 1.11,12	2018-07-14
-	- fixed Eval('str > 500bytes') 
+	- fixed Eval('str > 500bytes')
 	- yet more fixes to stub build
 
 1.06	2018-06-xx

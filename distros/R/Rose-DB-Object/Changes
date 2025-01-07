@@ -1,3 +1,7 @@
+0.822 (01.06.2025) - John Siracusa <siracusa@gmail.com>
+
+    * Replaced List::MoreUtils with List::Util. (Patch by github.com/plicease)
+
 0.821 (10.20.2024) - John Siracusa <siracusa@gmail.com>
 
     * Fixed a bug in generated trigger methods for foreign keys and many-

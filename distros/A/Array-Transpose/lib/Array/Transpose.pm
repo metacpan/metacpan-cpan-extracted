@@ -1,14 +1,10 @@
 package Array::Transpose;
 use strict;
 use warnings;
+use base qw{Exporter};
 
-BEGIN {
-    use Exporter ();
-    use vars qw($VERSION @ISA @EXPORT);
-    $VERSION     = '0.06';
-    @ISA         = qw(Exporter);
-    @EXPORT      = qw(transpose);
-}
+our $VERSION = '0.07';
+our @EXPORT  = qw(transpose);
 
 =head1 NAME
 
@@ -67,7 +63,7 @@ reflect A by its main diagonal (which starts from the top left) to obtain A'
 =head1 USAGE
 
   use Array::Transpose;
-  @array=transpose(\@array);
+  my @array = transpose(\@array);
 
 =head1 METHODS
 
@@ -75,20 +71,20 @@ reflect A by its main diagonal (which starts from the top left) to obtain A'
 
 Returns a transposed 2-Dimensional Array given a 2-Dimensional Array
 
-  my $out=transpose($in);  #$in=[[],[],[],...];
-  my @out=transpose(\@in); #@in=([],[],[],...);
+  my $out = transpose($in);  #$in=[[],[],[],...];
+  my @out = transpose(\@in); #@in=([],[],[],...);
 
 =cut
 
 sub transpose {
   die("Error: Expecting a single parameter")
     unless @_ == 1;
-  my $in=shift;  #[[],[],[]]
+  my $in = shift;  #[[],[],[]]
   die("Error: Expecting parameter to be an array reference")
     unless ref($in) eq "ARRAY";
-  my @out=();
+  my @out = ();
   if (@$in > 0) {
-    my $cols=scalar(@{$in->[0]}) || 0;
+    my $cols = scalar(@{$in->[0]}) || 0;
     foreach my $col (0 .. $cols-1) {
       push @out, [map {$_->[$col]} @$in];
     }
@@ -100,21 +96,9 @@ sub transpose {
 
 The transpose function assumes all rows have the same number of columns as the first row.
 
-=head1 BUGS
-
-Please log on RT and send an email to the author.
-
-=head1 SUPPORT
-
-DavisNetworks.com supports all Perl applications including this package.
-
 =head1 AUTHOR
 
   Michael R. Davis
-  CPAN ID: MRDVT
-  STOP, LLC
-  domain=>stopllc,tld=>com,account=>mdavis
-  http://www.stopllc.com/
 
 =head1 COPYRIGHT
 

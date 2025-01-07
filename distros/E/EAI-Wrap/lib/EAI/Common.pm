@@ -1,4 +1,4 @@
-package EAI::Common 1.917;
+package EAI::Common 1.918;
 
 use strict; use feature 'unicode_strings'; use warnings; no warnings 'uninitialized';
 use Exporter qw(import); use EAI::DateUtil; use Data::Dumper qw(Dumper); use Getopt::Long qw(:config no_ignore_case); use Log::Log4perl qw(get_logger); use MIME::Lite (); use Scalar::Util qw(looks_like_number); 
@@ -19,22 +19,22 @@ my %hashCheck = (
 		task => {},
 	},
 	config => { # parameter category for site global settings, usually defined in site.config and other associated configs loaded at INIT
-		checkLogExistDelay => {}, # ref to hash {Test => 2, Dev => 3, "" => 0}, mapping to set delays for checkLogExist per environment in $execute{env}, this can be further overriden per job (and environment) in checkLookup.
-		checkLookup => {}, # ref to datastructure {"scriptname.pl + optional addToScriptName" => {errmailaddress => "",errmailsubject => "",timeToCheck =>"", freqToCheck => "", logFileToCheck => "", logcheck => "",logRootPath =>""},...} used for logchecker, each entry of the hash lookup table defines a log to be checked, defining errmailaddress to receive error mails, errmailsubject, timeToCheck as earliest time to check for existence in log, freqToCheck as frequency of checks (daily/monthly/etc), logFileToCheck as the name of the logfile to check, logcheck as the regex to check in the logfile and logRootPath as the folder where the logfile is found. lookup key: $execute{scriptname} + $execute{addToScriptName}
+		checkLogExistDelay => {}, # ref to following hash: {Test => 2, Dev => 3, "" => 0}, mapping to set delays for checkLogExist per environment in $execute{env}, this can be further overriden per job (and environment) in checkLookup.
+		checkLookup => {}, # ref to following datastructure: {"scriptname.pl + optional addToScriptName" => {errmailaddress => "",errmailsubject => "",timeToCheck =>"", freqToCheck => "", logFileToCheck => "", logcheck => "",logRootPath =>""},...} used for logchecker, each entry of the hash lookup table defines a log to be checked, defining errmailaddress to receive error mails, errmailsubject, timeToCheck as earliest time to check for existence in log, freqToCheck as frequency of checks (daily/monthly/etc), logFileToCheck as the name of the logfile to check, logcheck as the regex to check in the logfile and logRootPath as the folder where the logfile is found. lookup key: $execute{scriptname} + $execute{addToScriptName}
 		errmailaddress => "", # default mail address for central logcheck/errmail sending 
 		errmailsubject => "", # default mail subject for central logcheck/errmail sending 
 		executeOnInit => "", # code to be executed during INIT of EAI::Wrap to allow for assignment of config/execute parameters from commandline params BEFORE Logging!
 		folderEnvironmentMapping => {}, # ref to hash {Test => "Test", Dev => "Dev", "" => "Prod"}, mapping for $execute{envraw} to $execute{env}
 		fromaddress => "", # from address for central logcheck/errmail sending, also used as default sender address for sendGeneralMail
-		historyFolder => {}, # ref to hash {"scriptname.pl + optional addToScriptName" => "folder"}, folders where downloaded files are historized, lookup key as in checkLookup, default in "" => "defaultfolder". historyFolder, historyFolderUpload, logRootPath and redoDir are always built with an environment subfolder, the default is built as folderPath/endFolder/environ, otherwise it is built as folderPath/environ/endFolder. Environment subfolders (environ) are also built depending on prodEnvironmentInSeparatePath: either folderPath/endFolder/$execute{env} (prodEnvironmentInSeparatePath = true, Prod has own subfolder) or folderPath/endFolder/$execute{envraw} (prodEnvironmentInSeparatePath = false, Prod is in common folder, other environments have their own folder)
-		historyFolderUpload => {}, # ref to hash {"scriptname.pl + optional addToScriptName" => "folder"}, folders where uploaded files are historized, lookup key as in checkLookup, default in "" => "defaultfolder"
+		historyFolder => {}, # ref to following hash: {"scriptname.pl + optional addToScriptName" => "folder"}, folders where downloaded files are historized, lookup key as in checkLookup, default in "" => "defaultfolder". historyFolder, historyFolderUpload, logRootPath and redoDir are always built with an environment subfolder, the default is built as folderPath/endFolder/environ, otherwise it is built as folderPath/environ/endFolder. Environment subfolders (environ) are also built depending on prodEnvironmentInSeparatePath: either folderPath/endFolder/$execute{env} (prodEnvironmentInSeparatePath = true, Prod has own subfolder) or folderPath/endFolder/$execute{envraw} (prodEnvironmentInSeparatePath = false, Prod is in common folder, other environments have their own folder)
+		historyFolderUpload => {}, # ref to following hash: {"scriptname.pl + optional addToScriptName" => "folder"}, folders where uploaded files are historized, lookup key as in checkLookup, default in "" => "defaultfolder"
 		logCheckHoliday => "", # calendar for business days in central logcheck/errmail sending. builtin calendars are AT (Austria), TG (Target), UK (United Kingdom) and WE (for only weekends). Calendars can be added with EAI::DateUtil::addCalendar
 		logs_to_be_ignored_in_nonprod => qr//, # regular expression to specify logs to be ignored in central logcheck/errmail sending
 		logprefixForLastLogfile => sub {}, # prefix for previous (day) logs to be set in error mail (link), if not given, defaults to get_curdate(). In case Log::Dispatch::FileRotate is used as the File Appender in Log4perl config, the previous log is identified with <logname>.1
-		logRootPath => {}, # ref to hash {"scriptname.pl + optional addToScriptName" => "folder"}, paths to log file root folders (environment is added to that if non production), lookup key as checkLookup, default in "" => "defaultfolder"
+		logRootPath => {}, # ref to following hash: {"scriptname.pl + optional addToScriptName" => "folder"}, paths to log file root folders (environment is added to that if non production), lookup key as checkLookup, default in "" => "defaultfolder"
 		prodEnvironmentInSeparatePath => 1, # set to 1 if the production scripts/logs etc. are in a separate Path defined by folderEnvironmentMapping (prod=root/Prod, test=root/Test, etc.), set to 0 if the production scripts/logs are in the root folder and all other environments are below that folder (prod=root, test=root/Test, etc.)
-		redoDir => {}, # ref to hash {"scriptname.pl + optional addToScriptName" => "folder"}, folders where files for redo are contained, lookup key as checkLookup, default in "" => "defaultfolder"
-		sensitive => {}, # hash lookup table ({"prefix" => {user=>"",pwd =>"",hostkey=>"",privkey =>""},...}) for sensitive access information in DB and FTP (lookup keys are set with DB{prefix} or FTP{prefix}), may also be placed outside of site.config; all sensitive keys can also be environment lookups, e.g. hostkey=>{Test => "", Prod => ""} to allow for environment specific setting
+		redoDir => {}, # ref to following hash: {"scriptname.pl + optional addToScriptName" => "folder"}, folders where files for redo are contained, lookup key as checkLookup, default in "" => "defaultfolder"
+		sensitive => {}, # hash lookup table: {"prefix" => {user=>"",pwd =>"",hostkey=>"",privkey =>""},...} for sensitive access information in DB and FTP (lookup keys are set with DB{prefix} or FTP{prefix}), may also be placed outside of site.config; all sensitive keys can also be environment lookups, e.g. hostkey=>{Test => "", Prod => ""} to allow for environment specific setting
 		smtpServer => "", # smtp server for den (error) mail sending
 		smtpTimeout => 60, # timeout for smtp response
 		testerrmailaddress => '', # error mail address in non prod environment
@@ -45,14 +45,14 @@ my %hashCheck = (
 		task => {},
 	},
 	execute => { # hash of parameters for current task execution. This is not to be set by the user, but can be used to as information to set other parameters and control the flow
-		alreadyMovedOrDeleted => {}, # hash for checking the already moved or deleted local files, to avoid moving/deleting them again at cleanup
-		addToScriptName => "", # this can be set to be added to the scriptname for config{checkLookup} keys, e.g. some passed parameter.
+		addToScriptName => "", # this can be set to be added to the scriptname for config{checkLookup} keys, e.g. some passed parameter. This is typically done in config{executeOnInit}
 		env => "", # Prod, Test, Dev, whatever is defined as the lookup value in folderEnvironmentMapping. homedir as fetched from the File::basename::dirname of the executing script using /^.*[\\\/](.*?)$/ is used as the key for looking up this value.
 		envraw => "", # Production has a special significance here as being an empty string. Otherwise like env.
 		errmailaddress => "", # target address for central logcheck/errmail sending in current process
 		errmailsubject => "", # mail subject for central logcheck/errmail sending in current process
 		failcount => 1, # for counting failures in processing to switch to longer wait period or finish altogether
 		filesToDelete => [], # list of files to be deleted locally after download, necessary for cleanup at the end of the process
+		filesUploadedToDelete => [], # list of files to be deleted locally after upload, necessary for cleanup at the end of the process
 		filesToMoveinHistory => [], # list of files to be moved in historyFolder locally, necessary for cleanup at the end of the process
 		filesToMoveinHistoryUpload => [], # list of files to be moved in historyFolderUpload locally, necessary for cleanup at the end of the process
 		firstRunSuccess => 1, # for planned retries (process=>plannedUntil filled) -> this is set after the first run to avoid error messages resulting of files having been moved/removed.
@@ -65,13 +65,11 @@ my %hashCheck = (
 		logRootPath => "", # actually set logRootPath
 		processEnd => 1, # specifies that the process is ended, checked in EAI::Wrap::processingEnd
 		redoDir => "", # actually set redoDir
-		retrievedFiles => [], # files retrieved from FTP or redo directory
 		retryBecauseOfError => 1, # retryBecauseOfError shows if a rerun occurs due to errors (for successMail) 
 		retrySeconds => 60, # how many seconds are passed between retries. This is set on error with process=>retrySecondsErr and if planned retry is defined with process=>retrySecondsPlanned
 		scriptname => "", # name of the current process script, also used in log/history setup together with addToScriptName for config{checkLookup} keys
 		startingTime => "", # tasks starting time for checking task{retryEndsAfterMidnight} against current time
 		timeToCheck => "", # for logchecker: scheduled time of job (don't look earlier for log entries)
-		uploadFilesToDelete => [], # list of files to be deleted locally after upload, necessary for cleanup at the end of the process
 	},
 	load => {
 		DB => {},
@@ -195,7 +193,7 @@ my %hashCheck = (
 		type => "", # (A)scii or (B)inary, only applies to Net::FTP
 		user => "", # set user directly, either directly (insecure -> visible) or via sensitive lookup
 	},
-	process => { # used to pass information within each process (data, additionalLookupData, filenames, hadErrors or commandline parameters starting with interactive) and for additional configurations not suitable for DB, File or FTP (e.g. uploadCMD* and onlyExecFor)
+	process => { # used to pass information within each process (data, additionalLookupData, filenames, hadErrors, retrievedFiles or commandline parameters starting with interactive) and for additional configurations not suitable for DB, File or FTP (e.g. uploadCMD* and onlyExecFor)
 		additionalLookupData => {}, # additional data retrieved from database with EAI::Wrap::getAdditionalDBData
 		archivefilenames => [], # in case a zip archive package is retrieved, the filenames of these packages are kept here, necessary for cleanup at the end of the process
 		countPercent => 0, # percentage for counting File text reading and DB storing, if given (greater 0) then on each reaching of the percentage in countPercent a progress is shown (e.g. every 10% if countPercent = 10). Any value >=100 will count ALL lines...
@@ -205,6 +203,7 @@ my %hashCheck = (
 		hadErrors => 1, # set to 1 if there were any errors in the process
 		interactive_ => "", # interactive options (are not checked), can be used to pass arbitrary data via command line into the script (eg a selected date for the run with interactive_date).
 		onlyExecFor => qr//, # define loads to only be executed when $common{task}{execOnly} !~ $load->{process}{onlyExecFor}. Empty onlyExecFor loads are always executed regardless of $common{task}{execOnly}
+		retrievedFiles => [], # files retrieved from FTP or redo directory
 		successfullyDone => "", # accumulates API sub names to prevent most API calls that ran successfully from being run again.
 		uploadCMD => "", # upload command for use with uploadFileCMD
 		uploadCMDPath => "", # path of upload command
@@ -731,7 +730,7 @@ sub sendGeneralMail ($$$$$$;$$$$$) {
 		$logger->error("no AttachType given for attachment $AttachFile".longmess());
 		return 0;
 	}
-	$msg->send('smtp', $config{smtpServer}) or $logger->error("\$msg->send failed: $@".longmess());
+	eval {$msg->send('smtp', $config{smtpServer})} or $logger->error("\$msg->send failed: $@".longmess());
 	if ($msg->last_send_successful()) {
 		$logger->info("Mail sent");
 		$logger->trace("sent message: ".$msg->as_string) if $logger->is_trace();
@@ -748,7 +747,7 @@ sub send_email {
 	my $self = shift;
 	my %p    = @_;
 	# catch wide non utf8 characters to avoid die in MIME::Lite
-	#eval {decode('UTF-8',$p{message},$Encode::FB_confess )} or $p{message} =~ s/[^\x00-\x7f]/?/g;
+	eval {decode('UTF-8',$p{message},$Encode::FB_confess )} or $p{message} =~ s/[^\x00-\x7f]/?/g;
 	my $msg = MIME::Lite->new(
 			From    => $self->{from},
 			To      => ( join ',', @{ $self->{to} } ),
@@ -922,7 +921,7 @@ Example:
 
 =head1 COPYRIGHT
 
-Copyright (c) 2024 Roland Kapl
+Copyright (c) 2025 Roland Kapl
 
 All rights reserved.  This program is free software; you can
 redistribute it and/or modify it under the same terms as Perl itself.
