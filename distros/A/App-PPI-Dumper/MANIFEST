@@ -19,6 +19,7 @@ regression/hello-P2.pl
 regression/hello-W.pl
 regression/hello.pl
 script/ppi_dumper
+SECURITY.md
 t/load.t
 t/pod.t
 t/pod_coverage.t

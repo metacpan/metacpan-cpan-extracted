@@ -4,7 +4,7 @@
       "\"iovation Inc., David E. Wheeler\""
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -46,7 +46,7 @@
          "prereqs" : {
             "runtime" : {
                "requires" : {
-                  "DBD::mysql" : "4.018",
+                  "DBD::MariaDB" : "1.0",
                   "MySQL::Config" : "0"
                }
             }
@@ -130,10 +130,10 @@
       "develop" : {
          "recommends" : {
             "DBD::Firebird" : "1.11",
+            "DBD::MariaDB" : "1.0",
             "DBD::ODBC" : "1.59",
             "DBD::Pg" : "2.0",
             "DBD::SQLite" : "1.37",
-            "DBD::mysql" : "4.018",
             "Dist::Zilla" : "5",
             "Dist::Zilla::Plugin::AutoPrereqs" : "0",
             "Dist::Zilla::Plugin::CPANFile" : "0",
@@ -172,11 +172,11 @@
          },
          "requires" : {
             "DBD::Firebird" : "1.11",
+            "DBD::MariaDB" : "1.0",
             "DBD::ODBC" : "1.59",
             "DBD::Oracle" : "1.23",
             "DBD::Pg" : "2.0",
             "DBD::SQLite" : "1.37",
-            "DBD::mysql" : "4.018",
             "MySQL::Config" : "0",
             "Time::HiRes" : "0",
             "Time::Local" : "0"
@@ -257,11 +257,11 @@
          },
          "suggests" : {
             "DBD::Firebird" : "1.11",
+            "DBD::MariaDB" : "1.0",
             "DBD::ODBC" : "1.59",
             "DBD::Oracle" : "1.23",
             "DBD::Pg" : "2.0",
             "DBD::SQLite" : "1.37",
-            "DBD::mysql" : "4.018",
             "MySQL::Config" : "0",
             "Time::HiRes" : "0",
             "Time::Local" : "0"
@@ -305,9 +305,9 @@
          "url" : "https://github.com/sqitchers/sqitch/"
       }
    },
-   "version" : "v1.4.1",
-   "x_generated_by_perl" : "v5.38.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "version" : "v1.5.0",
+   "x_generated_by_perl" : "v5.40.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
    "x_spdx_expression" : "MIT"
 }
 

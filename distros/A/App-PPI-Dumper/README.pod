@@ -72,22 +72,37 @@ module and only want to run the tests without installing anything.
 The meta data, such as the source repository and bug tracker, is in
 I<Makefile.PL> or the I<META.*> files it creates. You can find that on
 those CPAN web interfaces, but you can also look at files directly in
-the source repository:
-
-=over 4
-
-=item *	L<https://github.com/briandfoy/app-ppi-dumper>
-
-=back
+the source repository: L<https://github.com/briandfoy/app-ppi-dumper>
 
 If you find a problem, file a ticket in the L<issue
-tracker|https://github.com/briandfoy/app-ppi-dumper/issues>:
+tracker|https://github.com/briandfoy/app-ppi-dumper/issues>.
+
+There are also backup repositories hosted on other services. These
+reflect the state of the main repo and exist only for redundancy:
 
 =over 4
 
-=item *	L<https://github.com/briandfoy/app-ppi-dumper/issues>
+=item * L<https://bitbucket.com/briandfoy/app-ppi-dumper>
+
+=item * L<https://codeberg.org/briandfoy/app-ppi-dumper>
+
+=item * L<https://gitlab.com/briandfoy/app-ppi-dumper>
 
 =back
+
+=head2 GitHub Attestations
+
+This distribution now uses
+L<GitHub Attestations|https://github.blog/2024-05-02-introducing-artifact-attestations-now-in-public-beta/>,
+which allow you to verify that the archive file you have was made from
+the official repo.
+
+You need a GitHub account and the L<gh tool|https://github.com/larsks/ghcli>.
+
+	# download the distro file from GitHub, MetaCPAN, or a CPAN mirror
+	$ gh auth login
+	...follow instructions...
+	$ gh attestation verify App-PPI-Dumper-1.23.tar.gz --owner briandfoy
 
 =head2 Getting help
 

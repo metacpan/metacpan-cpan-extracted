@@ -5,7 +5,7 @@
 #          config values from a given file and
 #          return it as hash structure
 #
-# Copyright (c) 2000-2022 Thomas Linden <tlinden |AT| cpan.org>.
+# Copyright (c) 2000-2025 Thomas Linden <tlinden |AT| cpan.org>.
 # All Rights Reserved. Std. disclaimer applies.
 # Licensed under the Artistic License 2.0.
 #
@@ -32,11 +32,10 @@ use Carp::Heavy;
 use Carp;
 use Exporter;
 
-$Config::General::VERSION = "2.65";
+$Config::General::VERSION = "2.67";
 
-use vars  qw(@ISA @EXPORT_OK);
 use base qw(Exporter);
-@EXPORT_OK = qw(ParseConfig SaveConfig SaveConfigString);
+our @EXPORT_OK = qw(ParseConfig SaveConfig SaveConfigString);
 
 use constant _UTF8_BOM => "\x{ef}\x{bb}\x{bf}";
 
@@ -97,7 +96,8 @@ sub new {
               NormalizeValue        => 0,
               Plug                  => {},
               UseApacheIfDefine     => 0,
-              Define                => {}
+              Define                => {},
+              AlwaysQuoteOutput     => 0
              };
 
   # create the class instance
@@ -1425,11 +1425,11 @@ sub _write_scalar {
       $line =~ s/([#\$\\\"])/\\$1/g;
     }
 
-    # bugfix rt.cpan.org#42287
-    if ($line =~ /^\s/ or $line =~ /\s$/) {
-      # need to quote it
+    if ($line =~ /^\s/ || $line =~ /\s$/ || $this->{AlwaysQuoteOutput}) {
+      # quote lines containing whitespace
       $line = "\"$line\"";
     }
+
     $config_string .= $indent . $entry . $this->{StoreDelimiter} . $line . "\n";
   }
 
@@ -2119,6 +2119,11 @@ Same as B<-NormalizeBlock> but applied on options only.
 =item B<-NormalizeValue>
 
 Same as B<-NormalizeBlock> but applied on values only.
+
+=item B<-AlwaysQuoteOutput>
+
+If set to  true, then values containing whitespace  will always quoted
+when calling C<save_string()> or C<save_file()>.
 
 =back
 
@@ -2854,7 +2859,7 @@ I recommend you to read the following documents, which are supplied with Perl:
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2000-2022 Thomas Linden
+Copyright (c) 2000-2025 Thomas Linden
 
 This library is free software; you can redistribute it and/or
 modify it under the same terms of the Artistic License 2.0.
@@ -2883,7 +2888,7 @@ Thomas Linden <tlinden |AT| cpan.org>
 
 =head1 VERSION
 
-2.65
+2.67
 
 =cut
 

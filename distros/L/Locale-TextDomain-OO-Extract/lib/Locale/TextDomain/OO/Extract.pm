@@ -3,7 +3,7 @@ package Locale::TextDomain::OO::Extract; ## no critic (TidyCode)
 use strict;
 use warnings;
 
-our $VERSION = '2.016';
+our $VERSION = '2.017';
 
 1;
 
@@ -14,7 +14,7 @@ Locale::TextDomain::OO::Extract - Extracts internationalization data
 
 =head1 VERSION
 
-2.016
+2.017
 
 =head1 DESCRIPTION
 
@@ -325,7 +325,7 @@ Steffen Winkler
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2014 - 2024,
+Copyright (c) 2014 - 2025,
 Steffen Winkler
 C<< <steffenw at cpan.org> >>.
 All rights reserved.

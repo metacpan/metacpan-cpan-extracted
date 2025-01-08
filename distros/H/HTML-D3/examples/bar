@@ -1,9 +1,9 @@
 #!/usr/bin/env perl
 
-use lib 'lib';
 use strict;
 use warnings;
 
+use lib 'lib';
 use HTML::D3;
 
 my $chart = HTML::D3->new(

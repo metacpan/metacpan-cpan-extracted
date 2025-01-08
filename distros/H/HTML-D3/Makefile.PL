@@ -16,22 +16,25 @@ WriteMakefile(
 	VERSION_FROM => 'lib/HTML/D3.pm', # finds $VERSION in the module
 	AUTHOR => 'Nigel Horne <njh@bandsman.co.uk>',
 	ABSTRACT => 'A simple Perl module for generating bar charts using D3.js',
-	LICENSE => 'perl',
+	((defined($ExtUtils::MakeMaker::VERSION) && ($ExtUtils::MakeMaker::VERSION >= 6.3002))
+		? ('LICENSE'=> 'GPL')
+		: ()),
 	META_MERGE => {
 		resources => {
 			repository => {
 				type => 'git',
-				url => 'https://github.com/nigelhorne/d3-chart.git',
-				web => 'https://github.com/nigelhorne/d3-chart',
+				url => 'https://github.com/nigelhorne/HTML-D3.git',
+				web => 'https://github.com/nigelhorne/HTML-D3',
 			},
 			bugtracker => {
-				web => 'https://github.com/nigelhorne/d3-chart/issues',
+				web => 'https://github.com/nigelhorne/HTML-D3/issues',
 			},
 		},
 	},
 	PREREQ_PM => {
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
 		'JSON::MaybeXS' => 0,	# Required for encoding data to JSON
+		'Scalar::Util' => 0,
 	}, TEST_REQUIRES => {
 		'Test::DescribeMe' => 0,
 		'Test::HTML::T5' => 0,

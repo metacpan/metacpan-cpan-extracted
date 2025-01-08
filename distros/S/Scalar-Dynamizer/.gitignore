@@ -1,0 +1,65 @@
+# Temporary and backup files
+*.bak
+*.tmp
+*.swp
+*.swo
+*.~*
+*.old
+*.orig
+
+# Build artifacts
+blib/
+Makefile
+Makefile.old
+pm_to_blib
+MANIFEST.bak
+Build
+Build.bat
+MYMETA.*
+.build/
+_build/
+cover_db/
+blib/
+inc/
+.lwpcookies
+.last_cover_stats
+nytprof.out
+pod2htm*.tmp
+pm_to_blib
+
+# Dist files
+*.tar.gz
+*.zip
+
+# Test coverage and profiling
+nytprof.out
+cover_db/
+*.gcov
+*.gcda
+*.gcno
+*.prof
+
+# Local configuration files
+config.yml
+local_config.yml
+.DS_Store
+
+# VSCode files
+.vscode/
+*.code-workspace
+
+# Logs and temporary files
+*.log
+*.pid
+*.seed
+
+# Perl Module Build Files
+MYMETA.*
+Build
+Build.bat
+
+# Generated POD or documentation
+*.pod
+
+# Other
+*.iml

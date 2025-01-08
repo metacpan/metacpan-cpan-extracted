@@ -58,6 +58,6 @@
          "web" : "https://github.com/briandfoy/data-constraint"
       }
    },
-   "version" : "1.204",
+   "version" : "1.205",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -6,7 +6,7 @@ use Moo;
 use MooX::Types::MooseLike::Base qw(ArrayRef Str);
 use namespace::autoclean;
 
-our $VERSION = '2.016';
+our $VERSION = '2.017';
 
 extends qw(
     Locale::TextDomain::OO::Extract::Base::RegexBasedExtractor
@@ -305,8 +305,9 @@ sub stack_item_mapping {
 
     while ( my $string = shift @{$match} ) {
         $string =~ s{ \s+ \z }{}xms;
+        $string =~ s{ \A \s+ }{}xms;
         my ( $msgctxt, $msgid )
-            = $string =~ m{ \A \s* (?: ( [^\n]+ ) \Q{CONTEXT_SEPARATOR}\E )? ( .* ) \z }xms;
+            = $string =~ m{ \A (?: ( .*? ) \s* \Q{CONTEXT_SEPARATOR}\E )? \s* ( .* ) \z }xms;
         $self->add_message({
             reference => ( sprintf '%s:%s', $self->filename, $_->{line_number} ),
             msgctxt   => $msgctxt,
@@ -343,7 +344,7 @@ Locale::TextDomain::OO::Extract::HTML
 
 =head1 VERSION
 
-2.016
+2.017
 
 =head1 DESCRIPTION
 
@@ -473,7 +474,7 @@ Steffen Winkler
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2014 - 2024,
+Copyright (c) 2014 - 2025,
 Steffen Winkler
 C<< <steffenw at cpan.org> >>.
 All rights reserved.

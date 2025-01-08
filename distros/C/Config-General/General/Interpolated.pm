@@ -13,12 +13,10 @@ $Config::General::Interpolated::VERSION = "2.16";
 use strict;
 use Carp;
 use Config::General;
-use Exporter ();
 
 
 # Import stuff from Config::General
-use vars qw(@ISA @EXPORT);
-@ISA = qw(Config::General Exporter);
+our @ISA = qw(Config::General);
 
 
 sub new {

@@ -1,0 +1,22 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use lib 'lib';
+
+use Grammar::Improver;
+
+# Initialize the Grammar::Improver module
+my $improver = Grammar::Improver->new(
+	api_url => 'https://api.languagetool.org/v2/check',
+);
+
+# Example text
+my $text = 'This are a sample text with mistake.';
+
+# Improve grammar
+my $corrected_text = $improver->improve_grammar($text);
+
+print "Original Text: $text\n";
+print "Corrected Text: $corrected_text\n";

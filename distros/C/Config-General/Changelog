@@ -1,3 +1,15 @@
+2.67  - fix github.com/TLINDEN/Config-General/issues/5:
+	fixing tests (add missing file to dist tarball) contributed
+	by @paulwalrath.
+      - created gitignore file.
+
+2.66  - fix github.com/TLINDEN/Config-General/issues/1:
+	add support to quote values containing whitespace using the
+	new flag -AlwaysQuoteOutput.
+
+      - apply patch by @haarg github.com/TLINDEN/Config-General/pull/2:
+	fix exporter setup, use "our" where appropriate.
+
 2.65  - fix rt.cpan.org#132893: clarified license, now licensed
         under the Artistic License 2.0.
       - fix rt.cpan.org#139261: correctly include directories.

@@ -4,7 +4,7 @@
       "tokuhirom <tokuhirom@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.10",
+   "generated_by" : "Minilla/v3.1.25",
    "license" : [
       "perl_5"
    ],
@@ -55,7 +55,7 @@
    "provides" : {
       "Perl::MinimumVersion::Fast" : {
          "file" : "lib/Perl/MinimumVersion/Fast.pm",
-         "version" : "0.20"
+         "version" : "0.22"
       }
    },
    "release_status" : "stable",
@@ -65,18 +65,22 @@
       },
       "homepage" : "https://github.com/tokuhirom/Perl-MinimumVersion-Fast",
       "repository" : {
-         "url" : "git://github.com/tokuhirom/Perl-MinimumVersion-Fast.git",
+         "type" : "git",
+         "url" : "https://github.com/tokuhirom/Perl-MinimumVersion-Fast.git",
          "web" : "https://github.com/tokuhirom/Perl-MinimumVersion-Fast"
       }
    },
-   "version" : "0.20",
+   "version" : "0.22",
    "x_contributors" : [
       "Ahmad M. Zawawi <ahmad.zawawi@gmail.com>",
       "H.Merijn Brand - Tux <h.m.brand@xs4all.nl>",
+      "H.Merijn Brand - Tux <linux@tux.freedom.nl>",
       "Karen Etheridge <ether@cpan.org>",
       "Kenichi Ishigaki <ishigaki@cpan.org>",
-      "brian d foy <brian.d.foy@gmail.com>"
+      "Shoichi Kaji <skaji@cpan.org>",
+      "brian d foy <brian.d.foy@gmail.com>",
+      "brian d foy <briandfoy@pobox.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

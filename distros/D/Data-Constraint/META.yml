@@ -29,5 +29,5 @@ resources:
   bugtracker: https://github.com/briandfoy/data-constraint/issues
   homepage: https://github.com/briandfoy/data-constraint
   repository: https://github.com/briandfoy/data-constraint
-version: '1.204'
+version: '1.205'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

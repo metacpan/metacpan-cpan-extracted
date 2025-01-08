@@ -1,5 +1,8 @@
 # Changes for Mojo::Promise::Role::Any
 
+1.007 2025-01-08T02:38:37Z
+	* refresh distro and move to BRIANDFOY
+
 1.006 2024-01-18T07:08:31Z
 	* refresh distro, update email address
 

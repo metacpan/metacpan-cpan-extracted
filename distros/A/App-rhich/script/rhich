@@ -1,0 +1,40 @@
+#!/usr/bin/perl
+package rhich;
+use strict;
+use warnings;
+
+our $VERSION = '1.006';
+
+=encoding utf8
+
+=head1 NAME
+
+rhich - which(1) with a regex
+
+=head1 SYNOPSIS
+
+Run this program like you would which(1), but give is a regex.
+
+	% rhich perl
+	% rhich 'p.*rl'
+
+=head1 DESCRIPTION
+
+rhich(1) goes through the directories listed in PATH and lists files
+that match the regular expression given sas the argument.
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright © 2013-2025, brian d foy <briandfoy@pobox.com>. All rights reserved.
+
+You may use this under the same terms as the Artistic License 2.0.
+
+=head1 AUTHOR
+
+brian d foy, C<< <briandfoy@pobox.com> >>
+
+=cut
+
+use App::rhich;
+
+App::rhich::run();

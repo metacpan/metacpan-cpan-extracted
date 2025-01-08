@@ -4,7 +4,7 @@ HTML::D3 - A simple Perl module for generating charts using D3.js.
 
 # VERSION
 
-Version 0.03
+Version 0.04
 
 # SYNOPSIS
 
@@ -75,6 +75,35 @@ Generates HTML and JavaScript code to render a line chart. Accepts the following
 be an array reference with two elements: the label (string) and the value (numeric).
 
 Returns a string containing the HTML and JavaScript code for the chart.
+
+## render\_line\_chart\_with\_tooltips
+
+    $html = $chart->render_line_chart_with_tooltips($data);
+
+Generates HTML and JavaScript code to render a line chart with mouseover tooltips.
+Accepts the following arguments:
+
+- `$data` - An array reference containing data points. Each data point should
+be an array reference with two elements: the label (string) and the value (numeric).
+
+Returns a string containing the HTML and JavaScript code for the chart.
+
+## render\_multi\_series\_line\_chart\_with\_tooltips
+
+    $html = $chart->render_multi_series_line_chart_with_tooltips($data);
+
+Generates HTML and JavaScript code to render a chart of many lines with mouseover tooltips.
+
+Accepts the following arguments:
+
+- `$data` - An reference to an array of hashes containing data points.
+Each data point should be an array reference with two elements: the label (string) and the value (numeric).
+
+Returns a string containing the HTML and JavaScript code for the chart.
+
+# BUGS
+
+It would help to have the render routine to return the head and body components separately.
 
 # AUTHOR
 

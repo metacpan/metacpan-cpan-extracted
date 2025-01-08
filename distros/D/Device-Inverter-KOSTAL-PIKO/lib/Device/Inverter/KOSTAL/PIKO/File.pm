@@ -4,7 +4,7 @@ use 5.014;
 use utf8;
 use warnings;
 
-our $VERSION = '0.1';
+our $VERSION = '0.13';
 
 use Mouse;
 use Carp qw(carp confess croak);
@@ -76,8 +76,8 @@ sub BUILD {
         for ($line) {
 
             # Wechselricher Logdaten
-            when (/^Wechselrich?er Logdaten$/) {    # parse file header
-                {                                   # Wechselrichter Nr:	255
+            if (/^Wechselrich?er Logdaten$/) {    # parse file header
+                {                                 # Wechselrichter Nr:	255
                     $self->add_header($line);
                     my ( $line, %c ) =
                       $self->get_header_line(
@@ -88,8 +88,7 @@ sub BUILD {
                     elsif ( ( my $nr = $self->inverter->number ) != $c{nr} ) {
                         carp(
                             $self->errmsg(
-                                "Conflicting inverter numbers: $nr vs. $c{nr}"
-                            )
+                                "Conflicting inverter numbers: $nr vs. $c{nr}")
                         );
                     }
                 }
@@ -105,7 +104,7 @@ sub BUILD {
             }
 
    # Logdaten U[V], I[mA], P[W], E[kWh], F[Hz], R[kOhm], Ain T[digit], Zeit[sec]
-            when (/^Logdaten (.*)$/) {
+            elsif (/^Logdaten (.*)$/) {
                 $self->add_header($line);
                 for ( split /, /, $1 ) {
                     /^([^\[]+)\[(\w+)\]$/
@@ -116,13 +115,13 @@ sub BUILD {
             }
 
 # Zeit	DC1 U	DC1 I	DC1 P	DC1 T	DC1 S	DC2 U	DC2 I	DC2 P	DC2 T	DC2 S	DC3 U	DC3 I	DC3 P	DC3 T	DC3 S	AC1 U	AC1 I	AC1 P	AC1 T	AC2 U	AC2 I	AC2 P	AC2 T	AC3 U	AC3 I	AC3 P	AC3 T	AC F	FC I	Ain1	Ain2	Ain3	Ain4	AC S	Err	ENS S	ENS Err	KB S	total E	Iso R	Ereignis
-            when (/^Zeit\t(?:(?:[\w ]+)\t)+$/) {
+            elsif (/^Zeit\t(?:(?:[\w ]+)\t)+$/) {
                 $self->add_header($line);
                 $self->columns( split /\t/ );
             }
 
 #   40094373	   466	  1070	   483	49402	16393	   543	   520	   287	49421	49162	     0	    20	     0	49412	    3	   224	  1880	   409	49927	   223	  1100	   240	49911	   223	   230	    50	49892	50.0	    1	    0	    0	    0	    0	   28	    0	  3	    0
-            when (/^(?=[ 0-9]{10}\t) *([1-9][0-9]*)\t/) {
+            elsif (/^(?=[ 0-9]{10}\t) *([1-9][0-9]*)\t/) {
                 if ( !@logdata || $logdata[-1][0] < $1 ) {
                     push @logdata, [ $1 => [$_] ];
                 }
@@ -214,7 +213,7 @@ sub merge {
         for ( $self->logdata->[$i]->timestamp->epoch <=> $other_records[0]
             ->timestamp->epoch )
         {
-            when (0) {
+            if ( $_ == 0 ) {
                 if (
                     (
                         my $my_logdata =
@@ -232,7 +231,7 @@ sub merge {
                 shift @other_records;
                 return $new_records unless @other_records;
             }
-            when (1) {
+            elsif ( $_ == 1 ) {
 
                 # extremely slow:
                 # $self->insert_logdata( $i, shift @other_records );
@@ -240,8 +239,8 @@ sub merge {
                 ++$new_records;
                 return $new_records unless @other_records;
             }
-            when (-1) { ++$i }
-            die;
+            elsif ( $_ == -1 ) { ++$i }
+            else               { die }
         }
     }
     $self->append_logdata(@other_records);

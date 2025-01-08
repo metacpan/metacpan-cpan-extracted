@@ -1,0 +1,16 @@
+Changes
+examples/catfax.pl
+examples/toss.pl
+ignore.txt
+lib/Scalar/Dynamizer.pm
+lib/Scalar/Dynamizer/Tie.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+README.md
+t/00-load.t
+t/01-test.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t

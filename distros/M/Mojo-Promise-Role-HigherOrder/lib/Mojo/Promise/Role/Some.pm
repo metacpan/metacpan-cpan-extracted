@@ -3,7 +3,7 @@ use Mojo::Base '-role';
 
 use strict;
 
-our $VERSION = '1.006';
+our $VERSION = '1.007';
 
 =encoding utf8
 
@@ -116,7 +116,7 @@ brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2018-2024, brian d foy, All Rights Reserved.
+Copyright © 2018-2025, brian d foy, All Rights Reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

@@ -27,5 +27,5 @@ resources:
   bugtracker: https://github.com/briandfoy/mojo-promise-role-higherorder/issues
   homepage: https://github.com/briandfoy/mojo-promise-role-higherorder
   repository: https://github.com/briandfoy/mojo-promise-role-higherorder
-version: '1.006'
+version: '1.007'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

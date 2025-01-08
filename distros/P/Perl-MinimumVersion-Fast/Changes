@@ -1,17 +1,18 @@
 Revision history for Perl extension Perl-MinimumVersion-Fast
 
-0.20 2023-03-01T23:13:26Z
+0.22 2025-01-07T18:53:52Z
 
-    - Fix stdin support for perlver-fast
-      (Reported by Tux++)
+0.22 2025-01-07T06:49:00Z
 
-0.19 2020-04-15T05:27:20Z
+	- silence a warning (GitHub #23, Shoichi Kaji)
 
-    - Depends on Compiler::Lexer 0.23
+0.21 2025-01-07T06:49:00Z
+
+    - Remove notes about v5.6 now that we support that
 
 0.18 2015-07-22T00:33:00Z
 
-    - Support Perl 5.6
+    - Support reporting a minimum version of Perl 5.6
       (tokuhirom)
 
 0.17 2015-02-13T23:41:10Z

@@ -1,6 +1,8 @@
 Changes
 examples/bar
 examples/line
+examples/multiple
+examples/tooltip
 lib/HTML/D3.pm
 LICENSE
 Makefile.PL
@@ -11,12 +13,21 @@ t/00-load.t
 t/20-new.t
 t/bar.t
 t/comment-spelling.t
+t/cover.t
+t/critic.t
 t/eof.t
 t/eol.t
+t/fixme.t
+t/gv.t
 t/line.t
 t/manifest.t
+t/metrics.t
+t/multiple.t
+t/no404s.t
 t/noplan.t
 t/pod-coverage.t
 t/pod.t
+t/tooltip.t
+tooltips.html
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

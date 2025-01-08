@@ -14,11 +14,9 @@ use Config::General 1.18;
 
 use FileHandle;
 use Carp;
-use Exporter ();
-use vars qw(@ISA @EXPORT);
 
 # inherit new() and so on from Config::General
-@ISA = qw(Config::General Exporter);
+our @ISA = qw(Config::General);
 
 use strict;
 

@@ -8,7 +8,7 @@
 
 
 use Data::Dumper;
-use Test::More tests => 78;
+use Test::More tests => 79;
 #use Test::More qw(no_plan);
 
 # ahem, we deliver the test code with a local copy of
@@ -791,3 +791,13 @@ foreach my $def (keys %defs) {
   my %hash = $conf->getall();
   is_deeply \%hash, $expected58, "UseApacheIfDefine, -Define => $def";
 }
+
+# force quoting
+my $cfg59 = "t/cfg.59";
+my $expected59 = qq(foo   "bar baz"
+); # newline is important here, as we check write output
+my $conf59 = Config::General->new(
+    -ConfigFile        => $cfg59,
+    -AlwaysQuoteOutput => 1);
+my $got59 = $conf59->save_string();
+is_deeply \$expected59, \$got59, "quotes";

@@ -1,0 +1,30 @@
+Revision history for Perl module App::rhich
+
+1.006 2025-01-08T03:05:31Z
+	* first release of a little program I use instead of which(1).
+	My version takes a regex and looks in all the directories.
+
+1.006 2022-01-08T08:56:01Z
+	* First release, I guess? I use this as a pattern-aware which(1)-like
+	utility. 
+
+1.005 2021-01-13T11:14:01Z
+	* freshen distro, remove Travis CI, add Github Actions
+
+1.004 2018-04-24T12:31:13Z
+	* Remove a leftover debugging statement
+
+1.003 2018-04-24T12:14:28Z
+	* Clarify that it's the Artistic License 2.0
+	* Move to a full modulino
+
+1.02 - 2013-10-27
+	* Add a package name to the script
+
+1.01 - 2013-10-27
+	* First release of my rhich utility to do which (1) with
+	a regex
+	* This was a Learning Perl challenge:
+	http://www.learning-perl.com/2012/02/learning-perl-challenge-rhich/
+
+

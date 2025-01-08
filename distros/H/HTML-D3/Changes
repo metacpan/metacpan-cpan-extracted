@@ -1,5 +1,9 @@
 Revision history for HTML-D3 - Visualise various charts using D3
 
+0.04	Tue Jan  7 21:26:42 EST 2025
+	Added support for line charts with tooltips
+	Added support for multiple line charts with tooltips
+
 0.03	Mon Jan  6 20:55:12 EST 2025
 	Added line chart support
 	Use JSON::MaybeXS instead of JSON

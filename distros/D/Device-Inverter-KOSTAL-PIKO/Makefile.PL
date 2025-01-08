@@ -6,7 +6,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME          => 'Device::Inverter::KOSTAL::PIKO',
     AUTHOR        => q{Martin Sluka <perl@sluka.de>},
-    VERSION       => 0.12,
+    VERSION       => 0.13,
     EXE_FILES     => [ map "bin/piko_$_", qw/collect dump merge/ ],
     ( $ExtUtils::MakeMaker::VERSION >= 6.3002
         ? ( 'LICENSE' => 'perl' )

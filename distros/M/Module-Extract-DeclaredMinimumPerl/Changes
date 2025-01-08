@@ -1,5 +1,8 @@
 Revision history for Perl module Module::Extract::DeclaredMinimumPerl
 
+1.025 2025-01-08T07:49:42Z
+	* refresh distro and move to BRIANDFOY
+
 1.024 2024-01-28T09:16:53Z
 	* refresh distro, update email address
 

@@ -12,7 +12,7 @@ use base qw(Net::DNS::Resolver::Base DynaLoader), OS_CONF;
 our $VERSION;
 
 BEGIN {
-	$VERSION = '1.29';
+	$VERSION = '1.30';
 	eval { __PACKAGE__->bootstrap($VERSION) };
 }
 
@@ -39,10 +39,10 @@ Net::DNS::Resolver::Unbound - Net::DNS resolver based on libunbound
 
 =head1 SYNOPSIS
 
-    use Net::DNS;
-    use Net::DNS::Resolver::Unbound;
-    my $resolver = Net::DNS::Resolver::Unbound->new(...);
-    my $response = $resolver->send(...);
+	use Net::DNS;
+	use Net::DNS::Resolver::Unbound;
+	my $resolver = Net::DNS::Resolver::Unbound->new(...);
+	my $response = $resolver->send(...);
 
 =head1 DESCRIPTION
 
@@ -81,28 +81,26 @@ In particular, the queryID returned by Unbound is always zero.
 =back
 
 
-=head1 REPLACING C<Net::DNS::Resolver> DEFAULT BEHAVIOUR
+=head1 REPLACING Net::DNS::Resolver BASE CLASS
 
-By placing C<-register> in the import list to C<Net::DNS::Resolver::Unbound>,
-it will register itself with L<Net::DNS::Resolver> as the base class.
+Placing C<-register> in the L<Net::DNS::Resolver::Unbound> import list, will
+cause it to register itself with L<Net::DNS> as the resolver base class.
 
-    use Net::DNS::Resolver::Unbound -register;
-
-    my $resolver = Net::DNS::Resolver->new( ) or die "Cannot create resolver";
-
-    print "Created a resolver of type " . ref($resolver) . "\n";
+	use Net::DNS;
+	use Net::DNS::Resolver::Unbound -register;
+	my $resolver = Net::DNS::Resolver->new(...);
+	my $response = $resolver->send(...);
 
 Note that "-register" is a global setting that applies to the entire
 program; it cannot be applied only for certain callers, removed, or
 limited by lexical scope.
 
-
 =cut
 
 sub import {
-	my ( $pkg, @import ) = @_;
-	my @symbol = grep { $_ ne '-register' } @import;
-	@Net::DNS::Resolver::ISA = $pkg if scalar(@import) != scalar(@symbol);
+	my ( $class, @argument ) = @_;
+	my $register = grep {/^-register$/i} @argument;
+	@Net::DNS::Resolver::ISA = $class if $register;
 }
 
 
@@ -110,16 +108,15 @@ sub import {
 
 =head2 new
 
-    my $resolver = Net::DNS::Resolver::Unbound->new(
-	debug_level => 2,
-	defnames    => 1,
-	dnsrch,	    => 1,
-	domain	    => 'domain',
-	ndots	    => 1,
-	option	    => [ 'tls-cert-bundle', '/etc/ssl/cert.pem' ],
-	nameservers => [ ... ],
-	searchlist  => ['domain' ... ],
-	);
+	my $resolver = Net::DNS::Resolver::Unbound->new(
+				debug_level => 2,
+				defnames    => 1,
+				dnsrch,	    => 1,
+				domain	    => 'domain',
+				ndots	    => 1,
+				nameservers => [ ... ],
+				searchlist  => ['domain' ... ]
+				);
 
 Returns a new Net::DNS::Resolver::Unbound resolver object.
 
@@ -131,7 +128,7 @@ sub new {
 	$self->nameservers( $self->SUPER::nameservers );
 	delete $self->{$_} for IRRELEVENT;
 	$self->_finalise_config;				# default configuration
-	$self->{update} = {} if @args;				# force context rebuild
+	$self->{ub_upd} = {} if @args;				# force context rebuild
 	while ( my $attr = shift @args ) {
 		my $value = shift @args;
 		$self->$attr( ref($value) ? @$value : $value );
@@ -142,26 +139,22 @@ sub new {
 
 =head2 nameservers
 
-    my $stub_resolver = Net::DNS::Resolver::Unbound->new(
-	nameserver => '127.0.0.53'
-	);
+	my $dnssec_resolver = Net::DNS::Resolver::Unbound->new(
+		nameservers => [],	# override /etc/resolv.conf
+		add_ta_file => '/var/lib/unbound/root.key'
+		);
 
-    my $fully_recursive = Net::DNS::Resolver::Unbound->new(
-	nameservers => [],		# override /etc/resolv.conf
-	add_ta_file => '/var/lib/unbound/root.key'
-	);
+	my $DoT_resolver = Net::DNS::Resolver->new(
+		nameserver => '2606:4700:4700::1111@853#cloudflare-dns.com',
+		nameserver => '1.1.1.1@853#cloudflare-dns.com',
+		nameserver => '2001:4860:4860::8888@853#dns.google',
+		nameserver => '8.8.8.8@853#dns.google',
+		option	=> ['tls-cert-bundle' => '/etc/ssl/cert.pem'],
+		set_tls	=> 1
+		);
 
-    my $DoT_resolver = Net::DNS::Resolver->new(
-	nameserver => '2606:4700:4700::1111@853#cloudflare-dns.com',
-	nameserver => '2001:4860:4860::8888@853#dns.google',
-	nameserver => '8.8.8.8@853#dns.google',
-	nameserver => '9.9.9.9@853#dns.quad9.net',
-	option	   => [qw(tls-cert-bundle /etc/ssl/cert.pem)],
-	set_tls	   => 1
-	);
-
-    $resolver->nameservers( '::1', '127.0.0.1', ... );
-    @nameservers = $resolver->nameservers;
+	$resolver->nameservers( '::1', '127.0.0.1', ... );
+	@nameservers = $resolver->nameservers;
 
 By default, DNS queries are sent to the IP addresses listed in
 /etc/resolv.conf or similar platform-specific sources.
@@ -171,8 +164,8 @@ By default, DNS queries are sent to the IP addresses listed in
 sub nameservers {
 	my ( $self, @nameservers ) = @_;
 	if ( defined wantarray ) {
-		my $config   = $self->{config};
-		my $update   = $self->{update};
+		my $config   = $self->{ub_cfg};
+		my $update   = $self->{ub_upd};
 		my @setfwd   = ( $update->{set_fwd}, $config->{set_fwd}, [] );
 		my ($setfwd) = grep { defined $_ } @setfwd;
 		my @value    = map { ref($_) ? @$_ : $_ } $setfwd;
@@ -248,7 +241,7 @@ sub bgread {
 
 =head2 option
 
-    $resolver->option( 'tls-cert-bundle', '/etc/ssl/cert.pem' );
+	$resolver->option( 'tls-cert-bundle' => '/etc/ssl/cert.pem' );
 
 Set Unbound resolver (name,value) context option.
 
@@ -262,7 +255,7 @@ sub option {
 
 =head2 config
 
-    $resolver->config( 'Unbound.cfg' );
+	$resolver->config( 'Unbound.cfg' );
 
 This is a power-users interface that lets you specify all sorts of
 Unbound configuration options.
@@ -277,7 +270,7 @@ sub config {
 
 =head2 set_fwd
 
-    $resolver->set_fwd( 'IP address' );
+	$resolver->set_fwd( 'IP address' );
 
 Set IPv4 or IPv6 address to which DNS queries are to be directed.
 The destination machine is expected to run a recursive resolver.
@@ -295,8 +288,8 @@ sub set_fwd {
 
 =head2 set_tls
 
-    $resolver->set_tls( 0 );
-    $resolver->set_tls( 1 );
+	$resolver->set_tls( 0 );
+	$resolver->set_tls( 1 );
 
 Use DNS over TLS for queries to nameservers specified using set_fwd().
 
@@ -310,7 +303,7 @@ sub set_tls {
 
 =head2 set_stub
 
-    $resolver->set_stub( 'zone', '10.1.2.3', 0 );
+	$resolver->set_stub( 'zone', '10.1.2.3', 0 );
 
 Add a stub zone, with given address to send to. This is for custom root
 hints or pointing to a local authoritative DNS server. For DNS resolvers
@@ -326,7 +319,7 @@ sub set_stub {
 
 =head2 resolv_conf
 
-    $resolver->resolv_conf( 'filename' );
+	$resolver->resolv_conf( 'filename' );
 
 Extract nameserver list from resolv.conf(5) format configuration file.
 Any domain, searchlist, ndots or other settings are ignored.
@@ -344,7 +337,7 @@ sub resolv_conf {
 
 =head2 hosts
 
-    $resolver->hosts( 'filename' );
+	$resolver->hosts( 'filename' );
 
 Read list of hosts from the filename given, usually "/etc/hosts".
 These addresses are not flagged as DNSSEC secure when queried.
@@ -359,7 +352,7 @@ sub hosts {
 
 =head2 add_ta
 
-    $resolver->add_ta( 'trust anchor' );
+	$resolver->add_ta( 'trust anchor' );
 
 Add a trust anchor which is a string that holds a valid DNSKEY or DS RR
 in RFC1035 zonefile format.
@@ -375,7 +368,7 @@ sub add_ta {
 
 =head2 add_ta_file
 
-    $resolver->add_ta_file( '/var/lib/unbound/root.key' );
+	$resolver->add_ta_file( '/var/lib/unbound/root.key' );
 
 Pass the name of a file containing DS and DNSKEY records
 (as from dig or drill).
@@ -390,7 +383,7 @@ sub add_ta_file {
 
 =head2 add_ta_autr
 
-    $resolver->add_ta_autr( 'filename' );
+	$resolver->add_ta_autr( 'filename' );
 
 Add trust anchor to the given context that is tracked with RFC5011
 automated trust anchor maintenance.  The file is written when the
@@ -406,7 +399,7 @@ sub add_ta_autr {
 
 =head2 trusted_keys
 
-    $resolver->trusted_keys( 'filename' );
+	$resolver->trusted_keys( 'filename' );
 
 Pass the name of a BIND-style config file containing trusted-keys{}.
 
@@ -420,7 +413,7 @@ sub trusted_keys {
 
 =head2 debug_out
 
-    $resolver->debug_out( out );
+	$resolver->debug_out( out );
 
 Send debug output (and error output) to the specified stream.
 Pass a null argument to disable. Default is stderr.
@@ -435,7 +428,7 @@ sub debug_out {
 
 =head2 debug_level
 
-    $resolver->debug_level(0);
+	$resolver->debug_level(0);
 
 Set verbosity of the debug output directed to stderr.  Level 0 is off,
 1 minimal, 2 detailed, 3 lots, and 4 lots more.
@@ -451,7 +444,7 @@ sub debug_level {
 
 =head2 async_thread
 
-    $resolver->async_thread(1);
+	$resolver->async_thread(1);
 
 Set the context behaviour for asynchronous actions.
 Enable a call to resolve_async() to create a thread to handle work in
@@ -468,8 +461,8 @@ sub async_thread {
 
 =head2 print, string
 
-    $resolver->print;
-    print $resolver->string;
+	$resolver->print;
+	print $resolver->string;
 
 Prints the resolver state on the standard output.
 
@@ -488,9 +481,9 @@ sub string {
 ;; ${prefer}	$self->{$prefer}	ndots	$self->{ndots}
 ;; ${force}	$self->{$force}	debug	$self->{debug}
 END
-	$self->{update} ||= {};					# force config rebuild
+	$self->{ub_upd} ||= {};					# force config rebuild
 	$self->_finalise_config;
-	my %config = %{$self->{config}};
+	my %config = %{$self->{ub_cfg}};
 	my $optref = $config{set_option} || [];
 	my @option = @$optref;					# pre-sorted option list
 
@@ -543,12 +536,12 @@ sub _config {
 	my $ctx	  = $self->{test_ctx};
 	$self->{test_ctx} = $ctx = Net::DNS::Resolver::Unbound::Context->new() unless $ctx;
 	$ctx->$name(@arg) if @arg;				# error check only
-	my $state = $self->{update}->{$name};
+	my $state = $self->{ub_upd}->{$name};
 	if ( defined $state ) {					# second and subsequent entries
-		$state = $self->{update}->{$name} = [$state] unless ref $state;
+		$state = $self->{ub_upd}->{$name} = [$state] unless ref $state;
 		push @$state, $entry;
 	} else {						# initial entry
-		$self->{update}->{$name} = ( scalar(@arg) > 1 ) ? [$entry] : $entry;
+		$self->{ub_upd}->{$name} = ( scalar(@arg) > 1 ) ? [$entry] : $entry;
 	}
 	return;
 }
@@ -561,11 +554,11 @@ sub _option {
 	my $ctx	    = $self->{test_ctx};
 	$self->{test_ctx} = $ctx = Net::DNS::Resolver::Unbound::Context->new() unless $ctx;
 	$ctx->set_option( $opt, @arg ) if defined $entry;	# error check only
-	my $updopt = $self->{update}->{set_option};
+	my $updopt = $self->{ub_upd}->{set_option};
 	my %option = map {$_} @$updopt;
 
 	unless (@arg) {
-		my $setopt = $self->{config}->{set_option};
+		my $setopt = $self->{ub_cfg}->{set_option};
 		my %config = map {$_} @$setopt, @$updopt;
 		my $value  = $config{$opt};
 		return ref($value) ? @$value : $value;
@@ -581,7 +574,7 @@ sub _option {
 
 	$option{$opt} = [] unless defined $entry;		# delete entire option
 	my @option = map { ( $_, $option{$_} ) } keys %option;
-	$self->{update}->{set_option} = \@option;
+	$self->{ub_upd}->{set_option} = \@option;
 	return;
 }
 
@@ -598,12 +591,12 @@ my @IPconf = sort keys %IP_conf;
 sub _finalise_config {
 	my $self = shift;
 
-	my $update = delete $self->{update};
+	my $update = delete $self->{ub_upd};
 	return unless $update;
 	delete $self->{test_ctx};
 	delete $self->{ub_ctx};
 
-	my $config = $self->{config};
+	my $config = $self->{ub_cfg};
 	my $cfgopt = delete $config->{set_option};		# extract option lists
 	my $updopt = delete $update->{set_option};
 	my %config = ( %$config, %$update );			# merge config updates
@@ -632,7 +625,7 @@ sub _finalise_config {
 	}
 
 	$config{set_option} = \@option if @option;
-	$self->{config} = \%config;
+	$self->{ub_cfg} = \%config;
 	return;
 }
 

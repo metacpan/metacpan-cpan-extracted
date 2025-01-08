@@ -1,5 +1,8 @@
 Revision history for Perl extension Locale::TextDomain:OO::Extract.
 
+2.017  Mon Jan  8 09:44:32 2025
+- fixed extract HTML
+
 2.016  Mon Dec 23 07:08:26 2024
 - fixed extract HTML
 

@@ -30,5 +30,5 @@ resources:
   bugtracker: https://github.com/briandfoy/module-extract-declaredminimumperl/issues
   homepage: https://github.com/briandfoy/module-extract-declaredminimumperl
   repository: https://github.com/briandfoy/module-extract-declaredminimumperl
-version: '1.024'
+version: '1.025'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

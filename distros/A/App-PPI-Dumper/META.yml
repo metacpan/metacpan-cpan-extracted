@@ -28,5 +28,5 @@ resources:
   bugtracker: https://github.com/briandfoy/app-ppi-dumper/issues
   homepage: https://github.com/briandfoy/app-ppi-dumper
   repository: https://github.com/briandfoy/app-ppi-dumper
-version: '1.024'
+version: '1.025'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

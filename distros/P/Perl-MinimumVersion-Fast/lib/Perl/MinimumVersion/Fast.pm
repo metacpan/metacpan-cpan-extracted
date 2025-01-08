@@ -8,7 +8,7 @@ use version ();
 use Compiler::Lexer 0.13;
 use List::Util qw(max);
 
-our $VERSION = "0.20";
+our $VERSION = "0.22";
 
 my $MIN_VERSION   = version->new('5.006');
 my $VERSION_5_020 = version->new('5.020');
@@ -28,7 +28,7 @@ sub new {
         $filename = $stuff;
         open my $fh, '<', $filename
             or die "Unknown file: $filename";
-        $src = do { local $/; <$fh> }; 
+        $src = do { local $/; <$fh> };
     } else {
         $filename = '-';
         $src = $$stuff;
@@ -210,7 +210,7 @@ sub _build_minimum_syntax_version {
 
 sub minimum_version {
     my $self = shift;
-    return $self->{minimum_explicit_version} > $self->{minimum_syntax_version}
+    return defined $self->{minimum_explicit_version} && ($self->{minimum_explicit_version} > $self->{minimum_syntax_version})
         ? $self->{minimum_explicit_version}
         : $self->{minimum_syntax_version};
 }
@@ -264,11 +264,6 @@ version of perl required to be able to run it. Because it is based on goccy's L<
 it can do this without having to actually load the code.
 
 Perl::MinimumVersion::Fast is an alternative fast & lightweight implementation of Perl::MinimumVersion.
-
-This module supports only Perl 5.8.1+.
-If you want to support B<Perl 5.6>, use L<Perl::MinimumVersion> instead.
-
-In 2013, you don't need to support Perl 5.6 in most of case.
 
 =head1 METHODS
 

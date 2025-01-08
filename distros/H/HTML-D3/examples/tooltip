@@ -1,0 +1,30 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use lib 'lib';
+use HTML::D3;
+
+my $chart = HTML::D3->new(
+	width  => 800,
+	height => 600,
+	title  => 'Monthly Revenue Trends (With Tooltips)',
+);
+
+my $data = [
+	['January', 1000],
+	['February', 1200],
+	['March', 950],
+	['April', 1100],
+	['May', 1250],
+];
+
+my $html_output = $chart->render_line_chart_with_tooltips($data);
+
+# Save the output as an HTML file
+open my $fh, '>', 'tooltips.html' or die $!;
+print $fh $html_output;
+close $fh;
+
+print "Interactive line chart with tooltips saved as 'tooltips.html'. Open it in a browser.\n";

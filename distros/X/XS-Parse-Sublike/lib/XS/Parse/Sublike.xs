@@ -678,6 +678,9 @@ static int (*next_keyword_plugin)(pTHX_ char *, STRLEN, OP **);
 
 static int my_keyword_plugin(pTHX_ char *kw, STRLEN kwlen, OP **op_ptr)
 {
+  char *orig_kw = kw;
+  STRLEN orig_kwlen = kwlen;
+
 #ifdef HAVE_LEXICAL_SUB
   char *was_parser_bufptr = PL_parser->bufptr;
 
@@ -710,7 +713,7 @@ static int my_keyword_plugin(pTHX_ char *kw, STRLEN kwlen, OP **op_ptr)
       PL_parser->bufptr = was_parser_bufptr;
 next_keyword:
 #endif
-    return (*next_keyword_plugin)(aTHX_ kw, kwlen, op_ptr);
+    return (*next_keyword_plugin)(aTHX_ orig_kw, orig_kwlen, op_ptr);
   }
 
   lex_read_space(0);

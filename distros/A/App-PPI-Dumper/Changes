@@ -1,5 +1,8 @@
 Revision history for Perl module App::PPI::Dumper
 
+1.025 2025-01-08T03:21:34Z
+	* refresh distro and move to BRIANDFOY
+
 1.024 2024-01-22T17:59:32Z
 	* refresh distro, update email address
 

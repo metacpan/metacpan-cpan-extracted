@@ -1,5 +1,8 @@
 Revision history for Perl module Modulino::Demo
 
+1.006 2025-01-08T03:27:12Z
+	* refresh distro and move to BRIANDFOY
+
 1.005 2024-01-29T01:35:38Z
 	* refresh distro, update email address
 

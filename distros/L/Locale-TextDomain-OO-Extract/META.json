@@ -55,7 +55,7 @@
    "provides" : {
       "Locale::TextDomain::OO::Extract" : {
          "file" : "lib/Locale/TextDomain/OO/Extract.pm",
-         "version" : "2.016"
+         "version" : "2.017"
       },
       "Locale::TextDomain::OO::Extract::Base::RegexBasedExtractor" : {
          "file" : "lib/Locale/TextDomain/OO/Extract/Base/RegexBasedExtractor.pm",
@@ -63,7 +63,7 @@
       },
       "Locale::TextDomain::OO::Extract::HTML" : {
          "file" : "lib/Locale/TextDomain/OO/Extract/HTML.pm",
-         "version" : "2.016"
+         "version" : "2.017"
       },
       "Locale::TextDomain::OO::Extract::JavaScript" : {
          "file" : "lib/Locale/TextDomain/OO/Extract/JavaScript.pm",
@@ -104,6 +104,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "2.016",
+   "version" : "2.017",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

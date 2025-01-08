@@ -55,6 +55,6 @@
          "web" : "https://github.com/briandfoy/mojo-promise-role-higherorder"
       }
    },
-   "version" : "1.006",
+   "version" : "1.007",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

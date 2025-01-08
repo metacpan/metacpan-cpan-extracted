@@ -1,5 +1,8 @@
 Revision history for Device-Inverter-KOSTAL-PIKO
 
+0.13    2025-01-08
+        - replaced occurrences of deprecated "when"
+
 0.12    2021-06-07
         - recognize 0 values for floats
 

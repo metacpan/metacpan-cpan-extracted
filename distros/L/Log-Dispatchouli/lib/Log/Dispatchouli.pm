@@ -1,6 +1,6 @@
 use v5.20;
 use warnings;
-package Log::Dispatchouli 3.008;
+package Log::Dispatchouli 3.009;
 # ABSTRACT: a simple wrapper around Log::Dispatch
 
 # Not dangerous.  Accepted without change.
@@ -261,6 +261,17 @@ sub log_pid_for ($self, $output) {
 
   return $self->{log_pid_for}{$output} ? 1 : undef;
 }
+
+#pod =method enable_stdout
+#pod
+#pod =method enable_stderr
+#pod
+#pod These methods turn on logging to STDOUT or STDERR, respectively.  If that
+#pod logging has already been enabled, these methods do nothing.
+#pod
+#pod There is not, yet, a I<disable> version of these methods.
+#pod
+#pod =cut
 
 for my $dest (qw(out err)) {
   my $name = "std$dest";
@@ -888,7 +899,7 @@ Log::Dispatchouli - a simple wrapper around Log::Dispatch
 
 =head1 VERSION
 
-version 3.008
+version 3.009
 
 =head1 SYNOPSIS
 
@@ -976,6 +987,15 @@ Valid arguments are:
 The log path is either F</tmp> or the value of the F<DISPATCHOULI_PATH> env var.
 
 If the F<DISPATCHOULI_NOSYSLOG> env var is true, we don't log to syslog.
+
+=head2 enable_stdout
+
+=head2 enable_stderr
+
+These methods turn on logging to STDOUT or STDERR, respectively.  If that
+logging has already been enabled, these methods do nothing.
+
+There is not, yet, a I<disable> version of these methods.
 
 =head2 log
 
@@ -1397,17 +1417,13 @@ Ricardo Signes <rjbs@semiotic.systems>
 
 =item *
 
-Ricardo Signes <rjbs@users.noreply.github.com>
-
-=item *
-
 Sawyer X <xsawyerx@cpan.org>
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Ricardo SIGNES.
+This software is copyright (c) 2025 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,48 @@
+# Build files
+Makefile
+Makefile.old
+Build
+Build.bat
+
+# Metadata files
+META.*
+MYMETA.*
+
+# Build and coverage directories
+.build/
+_build/
+cover_db/
+blib/
+inc/
+
+# Temporary files
+*.tmp
+.lwpcookies
+.last_cover_stats
+nytprof.out
+pod2htm*.tmp
+pm_to_blib
+
+# Distribution files
+Scalar-Dynamizer-*
+Scalar-Dynamizer-*.tar.gz
+
+# Editor and IDE files
+.vscode/
+*.code-workspace
+.DS_Store
+
+# Logs and profiling data
+*.log
+*.prof
+*.gcov
+*.gcda
+*.gcno
+
+# Backup and temporary files
+*.bak
+*.old
+*.orig
+*.swp
+*.swo
+*~

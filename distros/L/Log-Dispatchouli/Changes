@@ -1,5 +1,9 @@
 Revision history for Log-Dispatchouli
 
+3.009     2025-01-07 21:22:25-05:00 America/New_York
+        - added documentation of the enable_stdout and enable_stderr methods,
+          added in 2.018
+
 3.008     2024-11-02 16:59:01+00:00 Europe/London
         - log_pid can now be a comma-delimited list of outputs, which is most
           likely useful for setting log_pid to "syslog" only
