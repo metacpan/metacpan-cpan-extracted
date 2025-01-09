@@ -5,6 +5,7 @@ use warnings;
 use Test::More;
 use English();
 use Carp();
+use POSIX();
 use English qw( -no_match_vars );
 use Exporter();
 use XSLoader();
@@ -18,7 +19,6 @@ SKIP: {
 		no warnings;
 		*CORE::GLOBAL::sysopen = sub { $! = POSIX::EACCES(); return };
 		use warnings;
-		require POSIX;
 		my $required_error_message = q[(?:] . (quotemeta POSIX::strerror(POSIX::EACCES())) . q[|Permission[ ]denied)];
 		require FileHandle;
 		@INC = qw(blib/lib); # making sure we're testing pure perl version

@@ -40,6 +40,7 @@ Multirow
 Pg
 PrintTable
 ProgressBar
+RDBMSs
 RTrim
 RaiseError
 SGR

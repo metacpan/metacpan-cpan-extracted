@@ -2,7 +2,7 @@
 use warnings;
 use strict;
 use 5.014;
-our $VERSION = '2.420';
+our $VERSION = '2.421';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -46,7 +46,7 @@ C<db-browser> - Browse SQL databases and their tables interactively.
 
 =head1 VERSION
 
-Version 2.420
+Version 2.421
 
 =head1 SYNOPSIS
 
@@ -852,7 +852,7 @@ C<WHERE>, C<WHEN> and C<HAVING>: in the C<%%> menu are also available parenthese
 
 =item Column Aliases
 
-Selecting C<as> allows one to set aliases for the selected columns.
+Selecting C<as> allows one to add, change or remove aliases for the selected columns.
 
 =back
 
@@ -992,7 +992,7 @@ ORDER BY
 
 =back
 
-Not all databases support aliases in GROUP BY and HAVING.
+Not all RDBMSs support aliases in GROUP BY and HAVING.
 
 =head3 Identifiers
 
@@ -1502,7 +1502,7 @@ Matthäus Kiem <cuer2s@gmail.com>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012-2024 Matthäus Kiem.
+Copyright 2012-2025 Matthäus Kiem.
 
 THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE
 IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.

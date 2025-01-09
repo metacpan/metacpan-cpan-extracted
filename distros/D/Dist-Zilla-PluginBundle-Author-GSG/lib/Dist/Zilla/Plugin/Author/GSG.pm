@@ -9,7 +9,7 @@ use namespace::autoclean;
 
 # ABSTRACT: Grant Street Group defaults CPAN dists
 use version;
-our $VERSION = 'v0.6.1'; # VERSION
+our $VERSION = 'v0.6.2'; # VERSION
 
 before 'BUILDARGS' => \&_BUILDARGS;
 
@@ -77,7 +77,7 @@ Dist::Zilla::Plugin::Author::GSG - Grant Street Group defaults CPAN dists
 
 =head1 VERSION
 
-version v0.6.1
+version v0.6.2
 
 =head1 SYNOPSIS
 
@@ -109,7 +109,7 @@ Grant Street Group <developers@grantstreet.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 - 2024 by Grant Street Group.
+This software is Copyright (c) 2019 - 2025 by Grant Street Group.
 
 This is free software, licensed under:
 

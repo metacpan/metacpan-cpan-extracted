@@ -5,38 +5,46 @@
 use strict;
 use warnings;
 use Config;
-use ExtUtils::MakeMaker 6.64;	# 6.64 for TEST_REQUIRES
+use ExtUtils::MakeMaker;
 use IO::Socket::INET;
 
-my $site = 'download.geonames.org';
+my $site;
 
 # Test for broken smokers that don't set AUTOMATED_TESTING
 if(my $reporter = $ENV{'PERL_CPAN_REPORTER_CONFIG'}) {
 	if($reporter =~ /smoker/i) {
-		warn 'AUTOMATED_TESTING added for you';
+		warn 'AUTOMATED_TESTING added for you' if(!defined($ENV{'AUTOMATED_TESTING'}));
 		$ENV{'AUTOMATED_TESTING'} = 1;
+		$ENV{'NO_NETWORK_TESTING'} = 1;
 	}
 }
 
-if(!IO::Socket::INET->new(PeerAddr => "$site:80", Timeout => 5)) {
-	print STDERR "NA: Can't connect to $site\n";
-	exit(0);
-}
+my @countries;
 
-if(defined($ENV{'GITHUB_ACTION'}) || defined($ENV{'TRAVIS_PERL_VERSION'}) || defined($ENV{'APPVEYOR'})) {
+if(defined($ENV{'GITHUB_ACTION'}) || defined($ENV{'CIRCLECI'}) || defined($ENV{'TRAVIS_PERL_VERSION'}) || defined($ENV{'APPVEYOR'})) {
 	# Prevent downloading and installing stuff
+	warn 'AUTOMATED_TESTING added for you' if(!defined($ENV{'AUTOMATED_TESTING'}));
 	$ENV{'AUTOMATED_TESTING'} = 1;
+	$ENV{'NO_NETWORK_TESTING'} = 1;
+} elsif((!defined($ENV{'AUTOMATED_TESTING'})) && (!defined($ENV{'NO_NETWORK_TESTING'}))) {
+	$site = 'download.geonames.org';
+	@countries = ('GB', 'US');
 }
 
-my @countries = ($ENV{'AUTOMATED_TESTING'} || $ENV{'NO_NETWORK_TESTING'}) ? () : ('GB', 'US');
 my $build_requires = {};
 my $test_requires = {
 	'Test::Carp' => 0,
+	'Test::DescribeMe' => 0,
 	'Test::Most' => 0,
 	'Test::Needs' => 0
 };
 
 if(scalar(@countries)) {
+	if(!IO::Socket::INET->new(PeerAddr => "$site:80", Timeout => 5)) {
+		print STDERR "NA: Can't connect to $site\n";
+		exit(0);
+	}
+
 	$build_requires = {	# For bin/create_sqlite
 		'DBI' => 0,
 		'File::Copy' => 0,
@@ -50,7 +58,7 @@ if(scalar(@countries)) {
 	foreach my $dir(@dirs) {
 		if(! -d $dir) {
 			print "Creating the download directory $dir\n";
-			mkdir $dir || die "$dir: $@";
+			mkdir $dir || die "$dir: $!";
 		}
 	}
 
@@ -72,7 +80,7 @@ if(scalar(@countries)) {
 
 		if(!-d $cache_dir) {
 			print "Creating the cache directory $cache_dir\n";
-			mkdir $cache_dir, 02755 || die "$cache_dir: $@";
+			mkdir $cache_dir, 02755 || die "$cache_dir: $!";
 		}
 		HTTP::Cache::Transparent::init({
 			BasePath => $cache_dir,
@@ -209,6 +217,30 @@ if(scalar(@countries)) {
 		$build_requires->{'File::Open::NoCache::ReadOnly'} = 0;
 		$build_requires->{'IO::AIO'} = 0;
 	}
+} else {
+	# Remove the data directory on smokers, CircleCI in particular can leave some around
+	my @dirs = (
+		'lib/Locale/Places/data',
+		'blib/lib/Locale/Places/data',
+	);
+	foreach my $dir(@dirs) {
+		if(-d $dir) {
+			print "Removing the download directory $dir\n";
+			while(my $file = glob("$dir/*")) {
+				unlink $file || die "$file: $!";
+			}
+			rmdir $dir || die "$dir: $!";
+		}
+	}
+}
+
+my $dist = {
+	COMPRESS => 'gzip -9f',
+	SUFFIX => 'gz'
+};
+
+if($^O eq 'darwin') {
+	$dist->{'TAR'} = 'gtar';
 }
 
 WriteMakefile(
@@ -229,6 +261,7 @@ WriteMakefile(
 	}, TEST_REQUIRES => $test_requires,
 	PREREQ_PM => {
 		'CHI' => 0,
+		'ExtUtils::MakeMaker' => 6.64,	# 6.64 for TEST_REQUIRES
 		'Database::Abstraction' => 0.04,
 		'DBI' => 0,
 		'DBD::CSV' => 0,
@@ -238,10 +271,10 @@ WriteMakefile(
 		'File::pfopen' => 0,
 		'File::Spec' => 0,
 		'Module::Info' => 0,
+		'Scalar::Util' => 0,
 		'Text::CSV' => 0,
-		'Text::xSV::Slurp' => 0,
-	},
-	dist	=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz' },
+		'Text::xSV::Slurp' => 0
+	}, dist => $dist,
 	clean	=> { FILES => 'Locale-Places-*' },
 	EXE_FILES	=> [ 'bin/translate' ],
 	# META_ADD => {

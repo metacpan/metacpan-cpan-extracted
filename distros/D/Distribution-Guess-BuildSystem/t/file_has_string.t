@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More 'no_plan';
+use Test::More ;
 use Test::Output;
 
 use File::Spec;
@@ -26,7 +26,7 @@ foreach my $file ( sort keys %$pass_tests )
 	{
 	my $name = File::Spec->catfile( split m|/|, $file );
 	ok( -e $name, "Passing file [$name] exists" );
-	
+
 	ok( $class->_file_has_string( $name, $pass_tests->{$file} ) );
 	}
 }
@@ -44,7 +44,7 @@ foreach my $file ( sort keys %$fail_tests )
 	{
 	my $name = File::Spec->catfile( split m|/|, $file );
 	ok( -e $name, "Passing file [$name] exists" );
-	
+
 	ok( ! $class->_file_has_string( $name, $fail_tests->{$file} ) );
 	}
 }
@@ -57,3 +57,5 @@ stderr_like
 	qr/not open/,
 	"fails for non-existent file";
 }
+
+done_testing();

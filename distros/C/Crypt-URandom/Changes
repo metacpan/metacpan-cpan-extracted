@@ -1,7 +1,10 @@
 Revision history for Crypt-URandom
 
+0.50  Thu Jan 09 08:50:18 2025
+     - Adding explicit requirements for tests.  Thanks to Leon Timmermans for GH#13
+
 0.49  Wed Jan 08 08:24:35 2025
-     - Fix URL for Artistic License.  Thanks for Petr Pisar for GH#12
+     - Fix URL for Artistic License.  Thanks to Petr Pisar for GH#12
 
 0.48  Tue Jan 07 08:01:04 2025
      - Documentation fixes
@@ -15,7 +18,7 @@ Revision history for Crypt-URandom
      - CPAN Testers fixes and cleanups
 
 0.45  Sat Jan 04 09:25:36 2025
-     - Fixing links in SECURITY.md.  Thanks for Robert Rothenberg for GH#11
+     - Fixing links in SECURITY.md.  Thanks to Robert Rothenberg for GH#11
 
 0.44  Sat Jan 04 08:12:40 2025
      - Added SECURITY.md.  Thanks to Robert Rothenberg for GH#10

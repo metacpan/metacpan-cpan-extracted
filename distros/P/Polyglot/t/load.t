@@ -1,11 +1,8 @@
-BEGIN {
-	@classes = qw(Polyglot);
+use Test::More;
+
+my @classes = qw(Polyglot);
+foreach my $class ( @classes ) {
+	use_ok $class or BAIL_OUT( "$class did not compile: @!" );
 	}
 
-use Test::Builder;
-use Test::More tests => scalar @classes;
-
-foreach my $class ( @classes )
-	{
-	print "bail out! $class did not compile\n" unless use_ok( $class );
-	}
+done_testing();

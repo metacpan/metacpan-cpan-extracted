@@ -5,7 +5,8 @@ use warnings;
 use Time::HiRes;
 use Carp qw(croak);
 
-our $VERSION = '0.15';
+# https://pause.perl.org/pause/query?ACTION=pause_operating_model#3_5_factors_considering_in_the_indexing_phase
+our $VERSION = '0.16';
 our $debug   = 0;
 
 #############################################################
@@ -44,6 +45,9 @@ sub seed {
 	$has_been_seeded = 1;
 }
 
+# Fetch random bytes from the OS supplied method
+# /dev/urandom = Linux, Unix, FreeBSD, Mac, Android
+# Windows requires the Win32::API call to call CryptGenRandom()
 sub os_random_bytes {
 	my $count  = shift();
 	my $ret    = "";
@@ -84,9 +88,39 @@ sub str_split {
 	return @ret;
 }
 
+# Binary to hex for human readability
 sub bin2hex {
 	my $bytes = shift();
 	my $ret   = (unpack("h* ", $bytes));
+
+	return $ret;
+}
+
+# Fetch random bytes from the OS supplied method
+# /dev/urandom = Linux, Unix, FreeBSD, Mac, Android
+# Windows requires the Win32::API call to call CryptGenRandom()
+sub _get_os_random_bytes_perl {
+	my $count  = shift();
+	my $ret    = "";
+
+	if ($^O eq 'MSWin32') {
+		require Win32::API;
+
+		my $rand = Win32::API->new('advapi32', 'INT SystemFunction036(PVOID RandomBuffer, ULONG RandomBufferLength)') or croak("Could not import SystemFunction036: $^E");
+
+		$ret = chr(0) x $count;
+		$rand->Call($ret, $count) or croak("Could not read from csprng: $^E");
+	} elsif (-r "/dev/urandom") {
+		open my $urandom, '<:raw', '/dev/urandom' or croak("Couldn't open /dev/urandom: $!");
+
+		sysread($urandom, $ret, $count) or croak("Couldn't read from csprng: $!");
+	} else {
+		croak("Unknown operating systen $^O");
+	};
+
+	if (length($ret) != $count) {
+		croak("Unable to read $count bytes from OS");
+	}
 
 	return $ret;
 }
@@ -95,14 +129,19 @@ sub bin2hex {
 sub seed_with_os_random {
 	my ($high, $low, $seed1, $seed2);
 
+	# PCG needs to be seeded with 2x 64bit unsigned integers
+	# We fetch 16 bytes from the OS to create the two seeds
+	# we need for proper seeding
+
 	my $bytes = os_random_bytes(16);
 	my @parts = str_split($bytes, 4);
 
 	if (length($bytes) != 16) {
-		die("Did not get enough entropy bytes from OS\n");
+		my $size = length($bytes);
+		die("Did not get enough entropy bytes from OS (got $size bytes)\n");
 	}
 
-	# Build the first 64bit seed manually
+	# Build the first 64bit seed from the random bytes
 	# Cannot use Q because it doesn't exist on 32bit Perls
 	$high  = unpack("L", $parts[0]);
 	$low   = unpack("L", $parts[1]);
@@ -117,6 +156,10 @@ sub seed_with_os_random {
 		print "RANDOM SEEDS: $seed1 / $seed2\n\n";
 	}
 
+	if ($seed1 == 0 && $seed2 == 0) {
+		die("ERROR: Seeding from OS failed. Both zero? #91393\n");
+	}
+
 	# Seed the PRNG with the values we just created
 	Random::Simple::_seed($seed1, $seed2); # C API
 
@@ -125,6 +168,11 @@ sub seed_with_os_random {
 	warmup(1024);
 }
 
+######################################################################
+# Below are the public user callable methods
+######################################################################
+
+# Get a string of random bytes
 sub random_bytes {
 	my $num = shift();
 
@@ -145,6 +193,8 @@ sub random_bytes {
 	return $ret;
 }
 
+# Get a random non-biased integer in a given range (inclusive)
+# Note: Range must be no larger than 2^32 - 2
 sub random_int {
 	my ($min, $max) = @_;
 
@@ -159,6 +209,7 @@ sub random_int {
 	return $ret;
 }
 
+# Get a random float between 0 and 1 inclusive
 sub random_float {
 	if (!$has_been_seeded) { seed_with_os_random(); }
 
@@ -172,6 +223,9 @@ sub random_float {
 }
 
 # Our rand() overrides CORE::rand()
+# This is slightly different than random_float because it returns
+# a number where: 0 <= x < 1
+#
 # This prototype is required so we can emulate CORE::rand(@array)
 sub rand(;$) {
 	my $mult = shift() || 1;

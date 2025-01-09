@@ -16,9 +16,9 @@ BEGIN {
 
 US: {
 	SKIP: {
-		if((!defined($ENV{'AUTOMATED_TESTING'}) && (!defined($ENV{'NO_NETWORK_TESTING'})))) {
+		if((!defined($ENV{'AUTOMATED_TESTING'}) && (!defined($ENV{'NO_NETWORK_TESTING'})) && (-d 'lib/Locale/Places/data'))) {
 			Database::Abstraction::init(directory => 'lib/Locale/Places/data');
-			my $places = new_ok('Locale::Places::US' => [logger => new_ok('MyLogger'), no_entry => 1]);
+			my $places = new_ok('Locale::Places::US' => [{logger => new_ok('MyLogger'), no_entry => 1}]);
 
 			eval { require 'autodie' };
 

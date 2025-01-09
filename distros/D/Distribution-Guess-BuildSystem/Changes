@@ -1,5 +1,8 @@
 Revision history for Perl module Distribution::Guess::BuildSystem
 
+1.006 2025-01-09T07:31:05Z
+	* refresh distro and move to BRIANDFOY
+
 1.005 2024-01-25T18:04:01Z
 	* refresh distro, update email address
 

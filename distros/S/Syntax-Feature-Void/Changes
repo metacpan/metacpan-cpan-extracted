@@ -1,5 +1,8 @@
 Revision history for Syntax-Feature-Void
 
+1.6.0  2025-01-08
+       - Improved emulation of `wrap_keyword_plugin`.
+
 1.4.0  2025-01-06
        - Switched to using the keyword plugin since Devel::CallParser
          and Lexical::Sub are no longer compatible.

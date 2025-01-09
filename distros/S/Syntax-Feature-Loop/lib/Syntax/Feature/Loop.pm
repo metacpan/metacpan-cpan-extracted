@@ -3,22 +3,14 @@ package Syntax::Feature::Loop;
 use strict;
 use warnings;
 
-use version; our $VERSION = qv('v1.8.0');
+use version; our $VERSION = qv('v1.10.0');
 
-use Devel::CallParser qw( );
-use XSLoader          qw( );
+use XSLoader qw( );
 
 XSLoader::load('Syntax::Feature::Loop', $VERSION);
 
-sub import {
-    require Lexical::Sub;
-    Lexical::Sub->import( loop => \&loop );
-}
-
-sub unimport {
-    require Lexical::Sub;
-    Lexical::Sub->unimport( loop => \&loop );
-}
+sub import   { $^H{ hint_key() } = 1; }
+sub unimport { $^H{ hint_key() } = 0; }
 
 *install   = \&import;    # For syntax.pm
 *uninstall = \&unimport;  # For syntax.pm
@@ -35,7 +27,7 @@ Syntax::Feature::Loop - Provides the C<loop BLOCK> syntax for unconditional loop
 
 =head1 VERSION
 
-Version 1.8.0
+Version 1.10.0
 
 
 =head1 SYNOPSIS
@@ -54,10 +46,9 @@ Version 1.8.0
 Syntax::Feature::Loop is a lexically-scoped pragma that
 provides the C<loop BLOCK> syntax for unconditional loops.
 
-This module serves as a demonstration of the
-L<C<cv_set_call_parser>|perlapi/cv_set_call_parser> and
-L<C<cv_set_call_checker>|perlapi/cv_set_call_checker>
-Perl API calls.
+This module serves as a demonstration of the ability to
+add keywords to the Perl language using
+L<C<PL_keyword_plugin>|perlapi/PL_keyword_plugin>.
 
 
 =head2 C<< use syntax qw( loop ); >>
@@ -104,6 +95,8 @@ terminate the statement with a semi-colon (C<;>).
 
 =item * C<uninstall>
 
+=item * C<hint_key>
+
 =back
 
 =end comment
@@ -115,49 +108,51 @@ terminate the statement with a semi-colon (C<;>).
 
 =item * L<syntax>
 
-=item * L<Devel::CallParser>
-
-=item * L<Devel::CallChecker>
-
-=item * L<Lexical::Sub>
-
 =item * L<perlapi>
+
+=back
+
+
+=head1 DOCUMENTATION AND SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Syntax::Feature::Loop
+
+You can also find it online at this location:
+
+=over
+
+=item * L<https://metacpan.org/dist/Syntax-Feature-Loop>
+
+=back
+
+If you need help, the following are great resources:
+
+=over
+
+=item * L<https://stackoverflow.com/|StackOverflow>
+
+=item * L<http://www.perlmonks.org/|PerlMonks>
+
+=item * You may also contact the author directly.
 
 =back
 
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-Syntax-Feature-Loop at rt.cpan.org>,
-or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Syntax-Feature-Loop>.
+Please report any bugs or feature requests using L<https://github.com/ikegami/perl-Syntax-Feature-Loop/issues>.
 I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
 
 
-=head1 SUPPORT
+=head1 REPOSITORY
 
-You can find documentation for this module with the perldoc command.
+=over
 
-    perldoc Syntax::Feature::Loop
+=item * Web: L<https://github.com/ikegami/perl-Syntax-Feature-Loop>
 
-You can also look for information at:
-
-=over 4
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Syntax-Feature-Loop>
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Syntax-Feature-Loop>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Syntax-Feature-Loop>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Syntax-Feature-Loop>
+=item * git: L<https://github.com/ikegami/perl-Syntax-Feature-Loop.git>
 
 =back
 
@@ -167,7 +162,7 @@ L<http://cpanratings.perl.org/d/Syntax-Feature-Loop>
 Eric Brine, C<< <ikegami@adaelis.com> >>
 
 
-=head1 COPYRIGHT & LICENSE
+=head1 COPYRIGHT AND LICENSE
 
 No rights reserved.
 

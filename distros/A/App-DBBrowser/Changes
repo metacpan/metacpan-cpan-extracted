@@ -1,5 +1,14 @@
 Revision history for App-DBBrowser
 
+
+2.421  2025-01-09
+        - Update join condition.
+        - Update join menu and union menu.
+        - Update function 'group_concat' and the respective equivalents.
+        - Don't delete the alias of a column if the column has been removed from the selected columns.
+        - String functions and Postgress: convert automatically to text if a column is not char and not varchar.
+        - Removed backwards compatibility layer for old search_and_replace settings storage format.
+
 2.420  2024-12-27
         - New option: use aliases in 'group by', 'having' or 'order by'.
 

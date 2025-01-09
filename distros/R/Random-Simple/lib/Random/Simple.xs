@@ -1,9 +1,10 @@
-#define PERL_NO_GET_CONTEXT // we'll define thread context if necessary (faster)
-#include "EXTERN.h"         // globals/constant import locations
-#include "perl.h"           // Perl symbols, structures and constants definition
-#include "XSUB.h"           // xsubpp functions and macros
-#include <stdlib.h>         // rand()
-#include <stdint.h>         // uint64_t
+#define PERL_NO_GET_CONTEXT  // we'll define thread context if necessary (faster)
+#include "EXTERN.h"          // globals/constant import locations
+#include "perl.h"            // Perl symbols, structures and constants definition
+#include "XSUB.h"            // xsubpp functions and macros
+#include <stdlib.h>          // rand()
+#include <stdint.h>          // uint64_t
+#include "time-common.h"     // for nanos()
 
 #include "pcg.h"
 

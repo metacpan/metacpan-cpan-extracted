@@ -56,6 +56,8 @@ WriteMakefile(
         'ExtUtils::MakeMaker' => 0,
     },
     TEST_REQUIRES => {
+        'Encode'      => 0,
+        'POSIX'       => 0,
         'Test::More'  => 0,
         'Test::Pod'  => 1.14,
     },

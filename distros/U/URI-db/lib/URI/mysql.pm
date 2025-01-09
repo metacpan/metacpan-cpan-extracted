@@ -1,9 +1,9 @@
 package URI::mysql;
 use base 'URI::_db';
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 sub default_port { 3306 }
-sub dbi_driver   { 'mysql' }
+sub dbi_driver   { 'MariaDB' }
 sub canonical_engine { 'mysql' }
 
 sub _dbi_param_map {

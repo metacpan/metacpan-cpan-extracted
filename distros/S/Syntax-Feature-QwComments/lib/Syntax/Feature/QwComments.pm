@@ -3,22 +3,14 @@ package Syntax::Feature::QwComments;
 use strict;
 use warnings;
 
-use version; our $VERSION = qv('v1.14.0');
+use version; our $VERSION = qv('v1.16.0');
 
-use Devel::CallParser qw( );
-use XSLoader          qw( );
+use XSLoader qw( );
 
 XSLoader::load('Syntax::Feature::QwComments', $VERSION);
 
-sub import {
-   require Lexical::Sub;
-   Lexical::Sub->import( 'qw' => \&replacement_qw );
-}
-
-sub unimport {
-   require Lexical::Sub;
-   Lexical::Sub->unimport( 'qw' => \&replacement_qw );
-}
+sub import   { $^H{ hint_key() } = 1; }
+sub unimport { $^H{ hint_key() } = 0; }
 
 *install   = \&import;    # For syntax.pm
 *uninstall = \&unimport;  # For syntax.pm
@@ -35,13 +27,13 @@ Syntax::Feature::QwComments - Pragma to allow comments in qw()
 
 =head1 VERSION
 
-Version 1.14.0
+Version 1.16.0
 
 
 =head1 SYNOPSIS
 
     use syntax qw( qw_comments );
-    
+
     my @a = qw(
        foo  # Now with comments!
        bar
@@ -50,10 +42,12 @@ Version 1.14.0
 
 =head1 DESCRIPTION
 
-Syntax::Feature::QwComments is a lexically-scoped pragma that allows comments inside of C<qw()>.
+Syntax::Feature::QwComments is a lexically-scoped pragma that
+allows comments inside of C<qw()>.
 
-C<qw()> should work identically with and without this pragma in all other respects except one:
-In addition to escaping delimiters and itself, C<\> will escape C<#>.
+C<qw()> should work identically with and without this pragma
+in all other respects except one: In addition to escaping delimiters
+and itself, C<\> will escape C<#>.
 
 This module was formerly known as feature::qw_comments.
 
@@ -82,7 +76,7 @@ The standard C<qw()> syntax is restored until the end of the current lexical sco
 
 =item * C<uninstall>
 
-=item * C<replacement_qw>
+=item * C<hint_key>
 
 =back
 
@@ -95,49 +89,51 @@ The standard C<qw()> syntax is restored until the end of the current lexical sco
 
 =item * L<syntax>
 
-=item * L<Devel::CallParser>
-
-=item * L<Devel::CallChecker>
-
-=item * L<Lexical::Sub>
-
 =item * L<perlapi>
+
+=back
+
+
+=head1 DOCUMENTATION AND SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Syntax::Feature::QwComments
+
+You can also find it online at this location:
+
+=over
+
+=item * L<https://metacpan.org/dist/Syntax-Feature-QwComments>
+
+=back
+
+If you need help, the following are great resources:
+
+=over
+
+=item * L<https://stackoverflow.com/|StackOverflow>
+
+=item * L<http://www.perlmonks.org/|PerlMonks>
+
+=item * You may also contact the author directly.
 
 =back
 
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-Syntax-Feature-QwComments at rt.cpan.org>,
-or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Syntax-Feature-QwComments>.
+Please report any bugs or feature requests using L<https://github.com/ikegami/perl-Syntax-Feature-QwComments/issues>.
 I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
 
 
-=head1 SUPPORT
+=head1 REPOSITORY
 
-You can find documentation for this module with the perldoc command.
+=over
 
-    perldoc Syntax::Feature::QwComments
+=item * Web: L<https://github.com/ikegami/perl-Syntax-Feature-QwComments>
 
-You can also look for information at:
-
-=over 4
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Syntax-Feature-QwComments>
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Syntax-Feature-QwComments>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Syntax-Feature-QwComments>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Syntax-Feature-QwComments>
+=item * git: L<https://github.com/ikegami/perl-Syntax-Feature-QwComments.git>
 
 =back
 
@@ -147,7 +143,7 @@ L<http://cpanratings.perl.org/d/Syntax-Feature-QwComments>
 Eric Brine, C<< <ikegami@adaelis.com> >>
 
 
-=head1 COPYRIGHT & LICENSE
+=head1 COPYRIGHT AND LICENSE
 
 No rights reserved.
 

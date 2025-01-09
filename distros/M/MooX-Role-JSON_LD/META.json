@@ -4,7 +4,7 @@
       "Dave Cross <dave@perlhacks.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -36,29 +36,33 @@
             "JSON::MaybeXS" : "0",
             "List::Util" : "1.33",
             "Moo" : "0",
-            "Moose" : "0",
             "Sub::Quote" : "0",
             "Types::Standard" : "0",
             "perl" : "5.006000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Moose" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/davorg/moox-role-json_ld/issues"
+         "web" : "https://github.com/davorg-cpan/moox-role-json_ld/issues"
       },
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/davorg/moox-role-json_ld.git",
-         "web" : "https://github.com/davorg/moox-role-json_ld"
+         "url" : "git://github.com/davorg-cpan/moox-role-json_ld.git",
+         "web" : "https://github.com/davorg-cpan/moox-role-json_ld"
       }
    },
-   "version" : "v1.0.1",
+   "version" : "v1.1.0",
    "x_contributors" : [
       "Robert Rothenberg <rrwo@cpan.org>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Anirvan Chatterjee <anirvan@cpan.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

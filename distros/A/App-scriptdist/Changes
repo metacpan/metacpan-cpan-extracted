@@ -1,5 +1,8 @@
 Revision history for Perl module App::scriptdist
 
+1.005 2025-01-09T07:15:45Z
+	* refresh distro
+
 1.004 2024-06-10T16:15:47Z
 	* %Content was not exported from App::scriptdist, leading to empty
 	files when no user-defined templates were available.

@@ -3,7 +3,9 @@ abstract: 'Provide non blocking randomness'
 author:
   - 'David Dick <ddick@cpan.org>'
 build_requires:
+  Encode: '0'
   ExtUtils::MakeMaker: '0'
+  POSIX: '0'
   Test::More: '0'
   Test::Pod: '1.14'
 configure_requires:
@@ -29,5 +31,5 @@ requires:
 resources:
   bugtracker: https://github.com/david-dick/crypt-urandom/issues
   repository: https://github.com/david-dick/crypt-urandom
-version: '0.49'
+version: '0.50'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

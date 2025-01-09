@@ -7,7 +7,7 @@ WriteMakefile(
     LICENSE       => 'perl',
     PREREQ_PM     => {
                       'Test::Simple'                  => 0.44,
-                      'SMS::Send::Driver::WebService' => 0,
+                      'SMS::Send::Driver::WebService' => 0.07,
                      },
     EXE_FILES     => [
                      qw{

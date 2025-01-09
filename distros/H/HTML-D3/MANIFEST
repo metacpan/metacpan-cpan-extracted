@@ -1,4 +1,5 @@
 Changes
+examples/animated
 examples/bar
 examples/line
 examples/multiple
@@ -11,6 +12,7 @@ MANIFEST.SKIP
 README.md
 t/00-load.t
 t/20-new.t
+t/animated.t
 t/bar.t
 t/comment-spelling.t
 t/cover.t
@@ -22,12 +24,14 @@ t/gv.t
 t/line.t
 t/manifest.t
 t/metrics.t
+t/modules-used.t
 t/multiple.t
 t/no404s.t
 t/noplan.t
+t/pod-cm.t
 t/pod-coverage.t
+t/pod-links.t
 t/pod.t
 t/tooltip.t
-tooltips.html
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

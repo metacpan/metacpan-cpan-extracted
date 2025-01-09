@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More 'no_plan';
+use Test::More;
 use File::Basename;
 use File::Spec;
 use Cwd;
@@ -117,4 +117,5 @@ foreach my $method ( @fail_methods )
 	}
 }
 
-1;
+done_testing();
+

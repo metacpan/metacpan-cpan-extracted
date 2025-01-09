@@ -1,5 +1,11 @@
 Revision history for Syntax-Feature-QwComments
 
+1.16.0  2025-01-08
+        - Switched to using the keyword plugin since Devel::CallParser
+          and Lexical::Sub are no longer compatible.
+        - Removed references to search.cpan.org and rt.cpan.org.
+        - Switched to using ExtUtils::MakeMaker.
+
 1.14.0  2017-08-07
         - Updated to be compatible with Perl 5.26.
 

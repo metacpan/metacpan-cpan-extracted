@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use Test::Carp;
-use Test::Most tests => 11;
+use Test::Most tests => 12;
 
 BEGIN {
 	use_ok('Locale::Places');
@@ -16,6 +16,7 @@ CARP: {
 	does_carp_that_matches(sub { $places->translate('me' => 'tulip') }, qr/usage/);
 	does_carp_that_matches(sub { $places->translate({ from => 'en' }) }, qr/usage/);
 	does_carp_that_matches(sub { $places->translate({ from => 'x' }) }, qr/usage/);
+	does_croak_that_matches(sub { Locale::Places->translate({ from => 'x' }) }, qr/must be called on an object/);
 
 	delete $ENV{'LC_MESSAGES'};
 	delete $ENV{'LC_ALL'};

@@ -3,12 +3,13 @@ abstract: 'Easily provide JSON-LD mark-up for your objects.'
 author:
   - 'Dave Cross <dave@perlhacks.com>'
 build_requires:
+  Moose: '0'
   Test::More: '0'
   namespace::autoclean: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,14 +23,13 @@ requires:
   JSON::MaybeXS: '0'
   List::Util: '1.33'
   Moo: '0'
-  Moose: '0'
   Sub::Quote: '0'
   Types::Standard: '0'
   perl: '5.006000'
 resources:
-  bugtracker: https://github.com/davorg/moox-role-json_ld/issues
-  repository: git://github.com/davorg/moox-role-json_ld.git
-version: v1.0.1
+  bugtracker: https://github.com/davorg-cpan/moox-role-json_ld/issues
+  repository: git://github.com/davorg-cpan/moox-role-json_ld.git
+version: v1.1.0
 x_contributors:
   - 'Robert Rothenberg <rrwo@cpan.org>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'

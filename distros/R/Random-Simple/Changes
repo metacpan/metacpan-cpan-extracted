@@ -1,3 +1,10 @@
+0.16 2024-01-08
+	- Better document code
+	- Catch if somehow our seeds are both zero
+	- Log the random seeds used in the unit tests
+	- Break all the random methods into their own test file
+	- Use two different PCG32 generators to make 64 bit values
+
 0.15 2024-12-11
 	- Require Win32::API for Windows builds
 	- Update POD documentation with correct bug reporting location

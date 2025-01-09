@@ -1,5 +1,8 @@
 Revision history for Perl module Polyglot
 
+1.006 2025-01-09T06:55:05Z
+	* refresh distro and move to BRIANDFOY
+
 1.005 2024-01-19T17:53:36Z
 	* distro refresh, update email address
 

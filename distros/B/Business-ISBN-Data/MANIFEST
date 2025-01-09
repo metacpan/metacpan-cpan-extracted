@@ -10,6 +10,7 @@ Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 README.pod
+SECURITY.md
 t/business-isbn.t
 t/check_data_structure.t
 t/default_data.t

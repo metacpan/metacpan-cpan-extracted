@@ -4,7 +4,7 @@ Locale::Places - Translate places between different languages using http://downl
 
 # VERSION
 
-Version 0.12
+Version 0.14
 
 # SYNOPSIS
 
@@ -18,7 +18,7 @@ London is Londres in French.
 Create a Locale::Places object.
 
 Takes one optional parameter, directory,
-which tells the object where to directory containing GB.sql and US.sql
+which tells the object where to find a directory called 'data' containing GB.sql and US.sql
 If that parameter isn't given,
 the module will attempt to find the databases,
 but that can't be guaranteed.
@@ -27,23 +27,21 @@ Any other options are passed to the underlying database driver.
 ## translate
 
 Translate a city into a different language.
-Takes one mandatory argument: 'place'.
-It also takes two other arguments:
-'from' and 'to',
-at least one of which must be given.
-If neither $to nor $from is given,
-the code makes a best guess based on the environment.
-If no translation can be found, returns place in the original language.
-Takes an optional argument 'country' which can be either GB (the default) or US
-which is the country of that 'place' is in.
 
+Parameters:
+\- place (mandatory): The name of the place to translate.
+\- from: The source language (optional; defaults to environment language).
+\- to: The target language (mandatory).
+\- country: The country where the place is located (optional; defaults to 'GB').
+
+Returns:
+\- Translated name if found, or undef if no translation exists.
+
+Example:
     use Locale::Places;
 
     # Prints "Douvres"
     print Locale::Places->new()->translate({ place => 'Dover', country => 'GB', from => 'en', to => 'fr' });
-
-    # Prints "Douvres" if we're working on a French system
-    print Locale::Places->new()->translate('Dover');
 
 ## AUTOLOAD
 
@@ -66,6 +64,9 @@ This is a problem with the data, which has this line:
     16324587    2653877 fr      Canterbury      1
 
 which overrides the translation by setting the 'isPreferredName' flag
+
+Can't specify below country level.
+For example, is Virginia a state or a town in Illinois or one in Minnesota?
 
 # SEE ALSO
 
@@ -105,7 +106,7 @@ You can also look for information at:
 
 # LICENCE AND COPYRIGHT
 
-Copyright 2020-2024 Nigel Horne.
+Copyright 2020-2025 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

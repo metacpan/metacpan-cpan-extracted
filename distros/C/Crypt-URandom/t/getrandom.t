@@ -1,5 +1,6 @@
 use Test::More;
 use FileHandle();
+use POSIX();
 use Config;
 use strict;
 use warnings;

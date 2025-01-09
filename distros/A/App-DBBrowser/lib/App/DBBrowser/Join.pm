@@ -5,14 +5,15 @@ use warnings;
 use strict;
 use 5.014;
 
-use List::MoreUtils qw( any );
+use List::MoreUtils qw( any uniq );
 
 use Term::Choose         qw();
 use Term::Form::ReadLine qw();
 use Term::TablePrint     qw();
 
 use App::DBBrowser::Auxil;
-#use App::DBBrowser::Subqueries; # required
+use App::DBBrowser::Subqueries;
+use App::DBBrowser::Table::Substatements;
 
 sub new {
     my ( $class, $info, $options, $d ) = @_;
@@ -50,7 +51,7 @@ sub join_tables {
         $tables = [ @{$sf->{d}{user_table_keys}} ];
     }
     my ( $sql, $data );
-    my $old_idx = 0;
+    my $old_idx_master = 0;
 
     MASTER: while ( 1 ) {
         $sql = {};
@@ -71,22 +72,22 @@ sub join_tables {
         my @pre = ( undef );
         my $menu = [ @pre, @choices ];
         my $info = $ax->get_sql_info( $sql );
-        my $idx = $tc->choose(
+        my $idx_master = $tc->choose(
             $menu,
-            { %{$sf->{i}{lyt_v}}, info => $info, prompt => 'Choose MAIN table:', index => 1, default => $old_idx }
+            { %{$sf->{i}{lyt_v}}, info => $info, prompt => 'Choose MAIN table:', index => 1, default => $old_idx_master }
         );
         $ax->print_sql_info( $info );
-        if ( ! defined $idx || ! defined $menu->[$idx] ) {
+        if ( ! defined $idx_master || ! defined $menu->[$idx_master] ) {
             return;
         }
         if ( $sf->{o}{G}{menu_memory} ) {
-            if ( $old_idx == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
-                $old_idx = 0;
-                next TABLE;
+            if ( $old_idx_master == $idx_master && ! $ENV{TC_RESET_AUTO_UP} ) {
+                $old_idx_master = 0;
+                next MASTER;
             }
-            $old_idx = $idx;
+            $old_idx_master = $idx_master;
         }
-        my $master = $menu->[$idx];
+        my $master = $menu->[$idx_master];
         if ( $master eq $join_info ) {
             $sf->__get_join_info();
             $sf->__print_join_info();
@@ -94,7 +95,6 @@ sub join_tables {
         }
         my $qt_master;
         if ( $master eq $derived_table ) {
-            require App::DBBrowser::Subqueries;
             my $sq = App::DBBrowser::Subqueries->new( $sf->{i}, $sf->{o}, $sf->{d} );
             $master = $sq->subquery( $sql );
             if ( ! defined $master ) {
@@ -103,7 +103,6 @@ sub join_tables {
             $qt_master = $master;
         }
         elsif ( $master eq $cte_table ) {
-            require App::DBBrowser::Subqueries;
             my $sq = App::DBBrowser::Subqueries->new( $sf->{i}, $sf->{o}, $sf->{d} );
             $master = $sq->choose_cte( $sql );
             if ( ! defined $master ) {
@@ -126,18 +125,20 @@ sub join_tables {
             next MASTER;
         }
         my @bu;
+        my $old_idx_type = 0;
 
         JOIN_TYPE: while ( 1 ) {
             my $enough_tables = '  Enough TABLES';
             my @pre = ( undef, $enough_tables );
+            my $menu = [ @pre, map( "- $_", @{$sf->{join_types}} ) ];
             my $info = $ax->get_sql_info( $sql );
             # Choose
-            my $join_type = $tc->choose(
-                [ @pre, map( "- $_", @{$sf->{join_types}} ) ],
-                { %{$sf->{i}{lyt_v}}, info => $info, prompt => 'Choose Join Type:' }
+            my $idx_type = $tc->choose(
+                $menu,
+                { %{$sf->{i}{lyt_v}}, info => $info, prompt => 'Choose Join Type:', index => 1, default => $old_idx_type }
             );
             $ax->print_sql_info( $info );
-            if ( ! defined $join_type ) {
+            if ( ! defined $idx_type || ! defined $menu->[$idx_type] ) {
                 if ( @bu ) {
                     pop @{$sql->{join_data}};
                     $data = pop @bu;
@@ -145,12 +146,20 @@ sub join_tables {
                 }
                 next MASTER;
             }
-            elsif ( $join_type eq $enough_tables ) {
+            if ( $sf->{o}{G}{menu_memory} ) {
+                if ( $old_idx_type == $idx_type && ! $ENV{TC_RESET_AUTO_UP} ) {
+                    $old_idx_type = 0;
+                    next JOIN_TYPE;
+                }
+                $old_idx_type = $idx_type;
+            }
+            if ( $menu->[$idx_type] eq $enough_tables ) {
                 if ( @{$data->{used_tables}} == 1 ) {
                     return;
                 }
                 last JOIN_TYPE;
             }
+            my $join_type = $menu->[$idx_type];
             $join_type =~ s/^-\s//;
             push @bu, $ax->clone_data( $data );
             push @{$sql->{join_data}}, { join_type => $join_type };
@@ -158,6 +167,9 @@ sub join_tables {
             if ( ! $ok ) {
                 $data = pop @bu;
                 pop @{$sql->{join_data}}
+            }
+            else {
+                $old_idx_type = 0;
             }
         }
         last MASTER;
@@ -207,55 +219,45 @@ sub __add_slave_with_join_condition {
     my ( $sf, $sql, $data, $tables ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my $used = ' (used)';
     my $join_info = $sf->{join_info};
     my $derived_table = $sf->{derived_table};
     my $cte_table = $sf->{cte_table};
-    my @choices;
-    for my $table ( @$tables, @{$data->{added_ctes}} ) {
-        if ( any { $_ eq $table } @{$data->{used_tables}} ) {
-            push @choices, '- ' . $table . $used;
-        }
-        else {
-            push @choices, '- ' . $table;
-        }
-    }
+    my @choices = map { '- '. $_ } @$tables;
     push @choices, $derived_table if $sf->{o}{enable}{j_derived};
     push @choices, $cte_table     if $sf->{o}{enable}{j_cte};
     push @choices, $join_info;
-    my $old_idx = 0;
+    my $old_idx_slave = 0;
 
     SLAVE: while ( 1 ) {
         my @pre = ( undef );
         my $menu = [ @pre, @choices ];
         my $info = $ax->get_sql_info( $sql );
         # Choose
-        my $idx = $tc->choose(
+        my $idx_slave = $tc->choose(
             $menu,
             { %{$sf->{i}{lyt_v}}, info => $info, prompt => 'Add table:', index => 1,
-              default => $old_idx, undef => $sf->{i}{_reset} }
+              default => $old_idx_slave, undef => $sf->{i}{_reset} }
         );
         $ax->print_sql_info( $info );
-        if ( ! defined $idx || ! defined $menu->[$idx] ) {
+        if ( ! defined $idx_slave || ! defined $menu->[$idx_slave] ) {
             return;
         }
         if ( $sf->{o}{G}{menu_memory} ) {
-            if ( $old_idx == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
-                $old_idx = 0;
+            if ( $old_idx_slave == $idx_slave && ! $ENV{TC_RESET_AUTO_UP} ) {
+                $old_idx_slave = 0;
                 next SLAVE;
             }
-            $old_idx = $idx;
+            $old_idx_slave = $idx_slave;
         }
-        if ( $menu->[$idx] eq $join_info ) {
+        if ( $menu->[$idx_slave] eq $join_info ) {
             $sf->__get_join_info();
             $sf->__print_join_info();
             next SLAVE;
         }
-        my $slave = $menu->[$idx];
+        my $slave = $menu->[$idx_slave];
         my $bu_data = $ax->clone_data( $data );
         my $qt_slave;
         if ( $slave eq $derived_table ) {
-            require App::DBBrowser::Subqueries;
             my $sq = App::DBBrowser::Subqueries->new( $sf->{i}, $sf->{o}, $sf->{d} );
             $slave = $sq->subquery( $sql );
             if ( ! defined $slave ) {
@@ -264,7 +266,6 @@ sub __add_slave_with_join_condition {
             $qt_slave = $slave;
         }
         elsif ( $slave eq $cte_table ) {
-            require App::DBBrowser::Subqueries;
             my $sq = App::DBBrowser::Subqueries->new( $sf->{i}, $sf->{o}, $sf->{d} );
             $slave = $sq->choose_cte( $sql );
             if ( ! defined $slave ) {
@@ -274,7 +275,6 @@ sub __add_slave_with_join_condition {
         }
         else {
             $slave =~ s/^-\s//;
-            $slave =~ s/\Q$used\E\z//;
             $qt_slave = $ax->quote_table( $sf->{d}{tables_info}{$slave} );
         }
         push @{$data->{used_tables}}, $slave;
@@ -284,23 +284,13 @@ sub __add_slave_with_join_condition {
         push @{$data->{aliases}}, [ $slave, $slave_alias ];
         ( $data->{col_names}{$slave}, undef ) = $ax->column_names_and_types( $qt_slave . " " . $ax->quote_alias( $slave_alias ), $sql->{ctes} );
         if ( ! defined $data->{col_names}{$slave} ) {
-            $sql->{join_data}[-1] = { join_type => $sql->{join_data}[-1]{join_type} };
-            delete @{$data}{ keys %$data };
-            # copy by key, so that $data still refers to the original hash:
-            for my $key ( keys %$bu_data ) {
-                $data->{$key} = $bu_data->{$key};
-            }
+            $sf->__reset_to_backuped_join_data( $sql, $data, $bu_data );
             next SLAVE;
         }
         if ( $sql->{join_data}[-1]{join_type} ne 'CROSS JOIN' ) {
-            my $ok = $sf->__add_join_condition( $sql, $data, $slave, $slave_alias );
+            my $ok = $sf->__add_join_condition( $sql, $data );
             if ( ! $ok ) {
-                $sql->{join_data}[-1] = { join_type => $sql->{join_data}[-1]{join_type} };
-                delete @{$data}{ keys %$data };
-                # copy by key, so that $data still refers to the original hash:
-                for my $key ( keys %$bu_data ) {
-                    $data->{$key} = $bu_data->{$key};
-                }
+                $sf->__reset_to_backuped_join_data( $sql, $data, $bu_data );
                 next SLAVE;
             }
         }
@@ -310,101 +300,43 @@ sub __add_slave_with_join_condition {
 }
 
 
+sub __reset_to_backuped_join_data {
+     my ( $sf, $sql, $data, $bu_data ) = @_;
+    $sql->{join_data}[-1] = { join_type => $sql->{join_data}[-1]{join_type} };
+    delete @{$data}{ keys %$data };
+    # copy by key, so that $data still refers to the original hash:
+    for my $key ( keys %$bu_data ) {
+        $data->{$key} = $bu_data->{$key};
+    }
+}
+
+
 sub __add_join_condition {
-    my ( $sf, $sql, $data, $slave, $slave_alias ) = @_;
-    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
+    my ( $sf, $sql, $data ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $sb = App::DBBrowser::Table::Substatements->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $aliases_hash = {};
     for my $ref ( @{$data->{aliases}} ) {
         push @{$aliases_hash->{$ref->[0]}}, $ref->[1];
     }
-    my %avail_pk_cols;
-    for my $used_table ( @{$data->{used_tables}} ) {
-        for my $table_alias ( @{$aliases_hash->{$used_table}} ) {
-            if ( $used_table eq $slave && $table_alias eq $slave_alias ) {
-                next;
-            }
+    my $cols_join_condition = [];
+    for my $used_table ( uniq @{$data->{used_tables}} ) {           # self join: a table name is used more than once
+        for my $table_alias ( @{$aliases_hash->{$used_table}} ) {   # self join: a table has more than one alias
             for my $col ( @{$data->{col_names}{$used_table}} ) {
-                $avail_pk_cols{ $table_alias . '.' . $col } = $ax->quote_column( $table_alias, $col );
+                push @$cols_join_condition, $ax->quote_column( $table_alias, $col );
             }
         }
     }
-    my %avail_fk_cols;
-    for my $col ( @{$data->{col_names}{$slave}} ) {
-        $avail_fk_cols{ $slave_alias . '.' . $col } = $ax->quote_column( $slave_alias, $col );
+    $sql->{cols_join_condition} = $cols_join_condition;
+    my $ret = $sb->add_condition( $sql, 'on', $cols_join_condition );
+    if ( $ret && length $sql->{on_stmt} ) {
+        $sql->{join_data}[-1]{condition} = $sql->{on_stmt};
+        $sql->{on_stmt} = '';
+        return 1;
     }
-    $sql->{join_data}[-1]{condition} = "ON";
-    my @bu;
-
-    JOIN_PREDICATE: while ( 1 ) {
-        my $AND = @bu ? " AND" : "";
-        my @pre = ( undef, $AND ? $sf->{i}{_confirm} : () );
-        my $fk_pre = '  '; #
-
-        PRIMARY_KEY: while ( 1 ) {
-            my $info = $ax->get_sql_info( $sql );
-            # Choose
-            my $pk_col = $tc->choose(
-                [ @pre,
-                  map(    '- ' . $_, sort keys %avail_pk_cols ),
-                  map( $fk_pre . $_, sort keys %avail_fk_cols ),
-                ],
-                { %{$sf->{i}{lyt_v}}, info => $info, prompt => 'Choose PRIMARY KEY column:' }
-            );
-            $ax->print_sql_info( $info );
-            if ( ! defined $pk_col ) {
-                if ( @bu ) {
-                    $sql->{join_data}[-1]{condition} = pop @bu;
-                    last PRIMARY_KEY;
-                }
-                return;
-            }
-            elsif ( $pk_col eq $sf->{i}{_confirm} ) {
-                if ( ! $AND ) {
-                    return;
-                }
-                my $condition = $sql->{join_data}[-1]{condition} =~ s/^ON //r;
-                $sql->{join_data}[-1]{condition} = "ON";
-                my $info = $ax->get_sql_info( $sql );
-                my $tr = Term::Form::ReadLine->new( $sf->{i}{tr_default} );
-                # Readline
-                $condition = $tr->readline( # conditions are boolean expressions
-                    'Edit: ',
-                    { info => $info, default => $condition, show_context => 1, history => [] }
-                );
-                $ax->print_sql_info( $info );
-                if ( ! length $condition ) {
-                    return;
-                }
-                $sql->{join_data}[-1]{condition} .= " " . $condition;
-                return 1;
-            }
-            elsif ( any { $fk_pre . $_ eq $pk_col } keys %avail_fk_cols ) {
-                next PRIMARY_KEY;
-            }
-            $pk_col =~ s/^-\s//;
-            push @bu, $sql->{join_data}[-1]{condition};
-            $sql->{join_data}[-1]{condition} .= $AND . " " . $avail_pk_cols{$pk_col} . " " . '=';
-            last PRIMARY_KEY;
-        }
-
-        FOREIGN_KEY: while ( 1 ) {
-            my $info = $ax->get_sql_info( $sql );
-            # Choose
-            my $fk_col = $tc->choose(
-                [ undef, map( "- $_", sort keys %avail_fk_cols ) ],
-                { %{$sf->{i}{lyt_v}}, info => $info, prompt => 'Choose FOREIGN KEY column:' }
-            );
-            $ax->print_sql_info( $info );
-            if ( ! defined $fk_col ) {
-                $sql->{join_data}[-1]{condition} = pop @bu;
-                next JOIN_PREDICATE;
-            }
-            $fk_col =~ s/^-\s//;
-            push @bu, $sql->{join_data}[-1]{condition};
-            $sql->{join_data}[-1]{condition} .= " " . $avail_fk_cols{$fk_col};
-            next JOIN_PREDICATE;
-        }
+    else {
+        $sql->{on_stmt} = '';
+        return;
     }
 }
 

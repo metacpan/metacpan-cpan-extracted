@@ -1,20 +1,24 @@
 .gitignore
-Build.PL
 Changes
 lib/Syntax/Feature/Loop.pm
-lib/Syntax/Feature/Loop.xs
-LICENSE
-make_call_parser.PL
+LICENSE.txt
+Makefile.PL
 MANIFEST
 MANIFEST.SKIP
-META.yml
-META.json
 ppport.h
 README.txt
 t/00_load.t
-t/01_basic.t
-t/02_pragma_a.t
-t/02_pragma_b.t
-t/03_line_numbers.t
-t/devel-pod-coverage.t
-t/pod.t
+t/01_devel_mark_check.t
+t/02_devel_version_check.t
+t/03_devel_whitespace.t
+t/04_devel_permissions.t
+t/05_pod.t
+t/06_devel_pod_coverage.t
+t/07_basic.t
+t/08_pragma_a.t
+t/09_pragma_b.t
+t/10_line_numbers.t
+Loop.xs
+wrap_keyword_plugin.inc.c
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

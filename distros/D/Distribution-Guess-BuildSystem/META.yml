@@ -28,5 +28,5 @@ resources:
   bugtracker: https://github.com/briandfoy/distribution-guess-buildsystem/issues
   homepage: https://github.com/briandfoy/distribution-guess-buildsystem
   repository: https://github.com/briandfoy/distribution-guess-buildsystem
-version: '1.005'
+version: '1.006'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

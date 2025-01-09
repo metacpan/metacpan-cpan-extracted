@@ -13,7 +13,7 @@ use App::DBBrowser::Auxil;
 #use App::DBBrowser::Subqueries;                          # required
 #use App::DBBrowser::Table::Extensions::Maths;            # required
 #use App::DBBrowser::Table::Extensions::Case;             # required
-#use App::DBBrowser::Table::Extensions::ColumnAliases     # required
+#use App::DBBrowser::Table::Extensions::ColumnAliases;    # required
 #use App::DBBrowser::Table::Extensions::ScalarFunctions;  # required
 #use App::DBBrowser::Table::Extensions::WindowFunctions;  # required
 
@@ -31,7 +31,7 @@ sub new {
     $sf->{window_func} = 'win()';
     $sf->{case} = 'case';
     $sf->{math} = 'math';
-    $sf->{col} = 'column';
+    $sf->{col} = 'col';
     $sf->{null} = 'NULL';
     $sf->{close_in} = ')end';
     $sf->{par_open} = '(';
@@ -145,8 +145,11 @@ sub __choose_extension {
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tr = Term::Form::ReadLine->new( $sf->{i}{tr_default} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my $qt_cols;
-    if ( $sql->{aggregate_mode} && $clause eq 'select' ) {
+    my $qt_cols; # in functions cols are used without aliases
+    if ( $clause eq 'on' ) {
+        $qt_cols = [ @{$sql->{cols_join_condition}} ];
+    }
+    elsif ( $sql->{aggregate_mode} && $clause eq 'select' ) {
         $qt_cols = [ @{$sql->{group_by_cols}}, @{$sql->{aggr_cols}} ];
     }
     elsif ( $sql->{aggregate_mode} && $clause eq 'having' ) {

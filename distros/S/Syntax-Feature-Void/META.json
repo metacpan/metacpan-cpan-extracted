@@ -36,6 +36,9 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "perl" : "5.028"
+         },
          "requires" : {
             "XSLoader" : "0",
             "perl" : "5.014",
@@ -69,6 +72,6 @@
          "web" : "https://github.com/ikegami/perl-Syntax-Feature-Void"
       }
    },
-   "version" : "v1.4.0",
+   "version" : "v1.6.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

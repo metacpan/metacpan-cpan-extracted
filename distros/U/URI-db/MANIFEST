@@ -4,6 +4,7 @@ lib/URI/_ado.pm
 lib/URI/_db.pm
 lib/URI/_odbc.pm
 lib/URI/cassandra.pm
+lib/URI/clickhouse.pm
 lib/URI/cockroach.pm
 lib/URI/cockroachdb.pm
 lib/URI/couch.pm

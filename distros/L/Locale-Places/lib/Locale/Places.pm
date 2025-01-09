@@ -12,6 +12,7 @@ use File::Spec;
 use Locale::Places::GB;
 use Locale::Places::US;
 use Module::Info;
+use Scalar::Util;
 
 =encoding utf8
 
@@ -21,11 +22,11 @@ Locale::Places - Translate places between different languages using http://downl
 
 =head1 VERSION
 
-Version 0.13
+Version 0.14
 
 =cut
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 =head1 SYNOPSIS
 
@@ -39,7 +40,7 @@ London is Londres in French.
 Create a Locale::Places object.
 
 Takes one optional parameter, directory,
-which tells the object where to directory containing GB.sql and US.sql
+which tells the object where to find a directory called 'data' containing GB.sql and US.sql
 If that parameter isn't given,
 the module will attempt to find the databases,
 but that can't be guaranteed.
@@ -48,16 +49,22 @@ Any other options are passed to the underlying database driver.
 =cut
 
 sub new {
-	my($proto, %args) = @_;
-	my $class = ref($proto) || $proto;
+	my $class = shift;
+
+	# Handle hash or hashref arguments
+	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
 	if(!defined($class)) {
-		# Locale::Places::new() used rather than Locale::Places->new()
-		# carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
-		# return;
+		if((scalar keys %args) > 0) {
+			# Locale::Places::new() used rather than Locale::Places->new()
+			carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+			return;
+		}
+
+		# FIXME: this only works when no arguments are given
 		$class = __PACKAGE__;
-	} elsif(ref($class)) {
-		# clone the given object
+	} elsif(Scalar::Util::blessed($class)) {
+		# If $class is an object, clone it with new arguments
 		return bless { %{$class}, %args }, ref($class);
 	}
 
@@ -73,86 +80,83 @@ sub new {
 		directory => $directory
 	});
 
+	# Return the blessed object
 	return bless { %args, directory => $directory }, $class;
 }
 
 =head2 translate
 
 Translate a city into a different language.
-Takes one mandatory argument: 'place'.
-It also takes two other arguments:
-'from' and 'to',
-at least one of which must be given.
-If neither $to nor $from is given,
-the code makes a best guess based on the environment.
-If no translation can be found, returns place in the original language.
-Takes an optional argument 'country' which can be either GB (the default) or US
-which is the country of that 'place' is in.
 
-   use Locale::Places;
+Parameters:
+- place (mandatory): The name of the place to translate.
+- from: The source language (optional; defaults to environment language).
+- to: The target language (mandatory).
+- country: The country where the place is located (optional; defaults to 'GB').
 
-   # Prints "Douvres"
-   print Locale::Places->new()->translate({ place => 'Dover', country => 'GB', from => 'en', to => 'fr' });
+Returns:
+- Translated name if found, or undef if no translation exists.
 
-   # Prints "Douvres" if we're working on a French system
-   print Locale::Places->new()->translate('Dover');
+Example:
+    use Locale::Places;
+
+    # Prints "Douvres"
+    print Locale::Places->new()->translate({ place => 'Dover', country => 'GB', from => 'en', to => 'fr' });
+
 
 =cut
 
-sub translate {
+sub translate
+{
 	my $self = shift;
 
+	# Ensure $self is valid
+	Carp::croak('translate() must be called on an object') unless Scalar::Util::blessed($self);
+
+	# Assign parameters based on input structure
 	my %params;
 	if(ref($_[0]) eq 'HASH') {
 		%params = %{$_[0]};
-	} elsif(scalar(@_) % 2 == 0) {
+	} elsif((scalar(@_) % 2) == 0) {
 		%params = @_;
 	} elsif(scalar(@_) == 1) {
-		$params{'place'} = shift;
-		$params{'from'} = 'en';
+		%params = (place => shift, from => 'en');
 	} else {
 		Carp::carp(__PACKAGE__, ': usage: translate(place => $place, from => $language1, to => $language2 [ , country => $country ])');
 		return;
 	}
 
-	my $place = $params{'place'};
-	if(!defined($place)) {
+	my $place = $params{place};
+	unless(defined $place) {
 		Carp::carp(__PACKAGE__, ': usage: translate(place => $place, from => $language1, to => $language2 [ , country => $country ])');
 		return;
 	}
 
-	my $to = $params{'to'};
-	my $from = $params{'from'};
-	if((!defined($from)) && !defined($to)) {
-		$to ||= $self->_get_language();
+	# Validate 'from' and 'to' languages
+	my $from = $params{from} || $self->_get_language();
+	my $to = $params{to} || $self->_get_language();
+	if(!defined($from)) {
 		if(!defined($to)) {
 			Carp::carp(__PACKAGE__, ': usage: translate(place => $place, from => $language1, to => $language2 [ , country => $country ])');
 			return;
 		}
-	}
-
-	$from ||= $self->_get_language();
-	if(!defined($from)) {
 		Carp::carp(__PACKAGE__, ": can't work out which language to translate from");
 		return;
 	}
-	$to ||= $self->_get_language();
 	if(!defined($to)) {
 		Carp::carp(__PACKAGE__, ": can't work out which language to translate to");
 		return;
 	}
-	return $place if($to eq $from);
 
-	my $country = $params{'country'} || 'GB';
-	my $db;
+	# Return early if 'from' and 'to' languages are the same
+	return $place if $to eq $from;
 
-	if(defined($country) && ($country eq 'US')) {
-		$self->{'US'} ||= Locale::Places::US->new(directory => $self->{'directory'});
-		$db = $self->{'US'};
-	} else {
-		$self->{'GB'} ||= Locale::Places::GB->new(directory => $self->{'directory'});
-		$db = $self->{'GB'};
-	}
+	# Select database based on country, defaulting to GB
+	my $country = $params{country} || 'GB';
+	my $db = $self->{$country} ||= do {
+		my $class = "Locale::Places::$country";
+		$class->new(directory => $self->{directory});
+	};
 
 	# my @places = @{$db->selectall_hashref({ type => $from, data => $place, ispreferredname => 1 })};
 	# ::diag("$place: $from => $to");
@@ -219,6 +223,16 @@ sub translate {
 			   (my $data = $db->data({ type => $to, code2 => $places[0] }))) {
 				return $data;
 			}
+		} else {
+			# Handle multiple translations - see if they happen to be the same
+			my %translations;
+			foreach my $entry (@places) {
+				my $data = $db->data({ type => $to, code2 => $entry });
+				$translations{$data}++ if(defined $data);
+			}
+			if(keys(%translations) == 1) {
+				return (keys %translations)[0];
+			}
 		}
 		# foreach (@places) {
 			# if(my $data = $db->data({ type => $to, code2 => $_ })) {
@@ -232,17 +246,18 @@ sub translate {
 			# }
 		# }
 	}
-	return;	# undef
+	return; # Return undef if no translation found
 }
 
+# Determine the current environment's default language.
 # https://www.gnu.org/software/gettext/manual/html_node/Locale-Environment-Variables.html
 # https://www.gnu.org/software/gettext/manual/html_node/The-LANGUAGE-variable.html
-sub _get_language {
-	if($ENV{'LANGUAGE'}) {
-		if($ENV{'LANGUAGE'} =~ /^([a-z]{2})/i) {
-			return lc($1);
-		}
+sub _get_language
+{
+	if(($ENV{'LANGUAGE'}) && ($ENV{'LANGUAGE'} =~ /^([a-z]{2})/i)) {
+		return lc($1);
 	}
+
 	foreach my $variable('LC_ALL', 'LC_MESSAGES', 'LANG') {
 		my $val = $ENV{$variable};
 		next unless(defined($val));
@@ -251,9 +266,11 @@ sub _get_language {
 			return lc($1);
 		}
 	}
-	if(defined($ENV{'LANG'}) && (($ENV{'LANG'} =~ /^C\./) || ($ENV{'LANG'} eq 'C'))) {
-		return 'en';
-	}
+
+	# if(defined($ENV{'LANG'}) && (($ENV{'LANG'} =~ /^C\./) || ($ENV{'LANG'} eq 'C'))) {
+		# return 'en';
+	# }
+	return 'en' if (defined $ENV{'LANG'}) && $ENV{'LANG'} =~ /^C(\.|$)/;
 	return;	# undef
 }
 
@@ -269,13 +286,12 @@ Translate to the given language, where the routine's name will be the target lan
 sub AUTOLOAD
 {
 	our $AUTOLOAD;
-	my $to = $AUTOLOAD;
+	my $self = shift or return;
 
-	$to =~ s/.*:://;
+	# Extract the target language from the AUTOLOAD variable
+	my ($to) = $AUTOLOAD =~ /::(\w+)$/;
 
 	return if($to eq 'DESTROY');
-
-	my $self = shift or return;
 
 	my %params;
         if(ref($_[0]) eq 'HASH') {
@@ -349,7 +365,7 @@ L<https://groups.google.com/g/geonames>
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright 2020-2024 Nigel Horne.
+Copyright 2020-2025 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

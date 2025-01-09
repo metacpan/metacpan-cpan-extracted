@@ -3,6 +3,7 @@ use alienfile;
 my $RTMIDI_MIN_VERSION = '4.0.0';
 my $RTMIDI_MAJOR_VERSION = 6;
 my $WIN = $^O eq 'MSWin32';
+my $CYG = $^O eq 'cygwin';
 
 plugin 'Gather::IsolateDynamic';
 plugin 'PkgConfig' => (
@@ -18,11 +19,15 @@ share {
     );
     plugin 'Extract' => 'tar.gz';
 
+    my @config = ( '--enable-static' );
+    push @config,  '--with-winmm' if $CYG;
+
     plugin $WIN
         ? 'Build::CMake'
         : 'Build::Autoconf';
 
     build $WIN
-        ? [ [ '%{cmake3}', @{ meta->prop->{plugin_build_cmake}->{args} }, '-S', '.', '-B', 'build' ], '%{cmake3} --build build', '%{cmake3} --install build' ]
-        : [ '%{configure} --enable-static', '%{make}', '%{make} install' ];
+        ? [ [ '%{cmake3}', @{ meta->prop->{plugin_build_cmake}->{args} }, '-S', '.', '-B', 'build', '-DRTMIDI_BUILD_TESTING=0' ], '%{cmake3} --build build', '%{cmake3} --install build' ]
+        : [ '%{configure} ' . join( ' ', @config ), '%{make} librtmidi.la', '%{make} install-exec-am install-data-am' ];
+        # ^ This smells pretty bad, patches welcome
 };

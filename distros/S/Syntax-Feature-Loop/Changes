@@ -1,16 +1,22 @@
 Revision history for Syntax-Feature-Loop
 
-1.8.0  2017/08/07
+1.10.0  2025-01-08
+       - Switched to using the keyword plugin since Devel::CallParser
+         and Lexical::Sub are no longer compatible.
+       - Removed references to search.cpan.org and rt.cpan.org.
+       - Switched to using ExtUtils::MakeMaker.
+
+1.8.0  2017-08-07
        - Updated to be compatible with Perl 5.26.
 
-1.6.0  2012/05/18
+1.6.0  2012-05-18
        - Fixed problem with Perl builds with support for
          multiple interpreters (such as builds with
          multi-threading support).
 
-1.4.0  2012/05/18
+1.4.0  2012-05-18
        - Renamed from feature::loop.
        - Documentation improvements.
 
-1.2.0  2012/05/16
+1.2.0  2012-05-16
        - Initial version.

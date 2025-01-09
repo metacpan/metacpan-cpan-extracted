@@ -5,7 +5,8 @@ use strict;
 
 use HTML::D3;
 use Test::HTML::T5;
-use Test::Most tests => 12;
+use Test::Most tests => 13;
+use Test::Warnings;
 
 # Test object creation
 my $chart = HTML::D3->new({

@@ -42,6 +42,8 @@
       },
       "test" : {
          "requires" : {
+            "Encode" : "0",
+            "POSIX" : "0",
             "Test::More" : "0",
             "Test::Pod" : "1.14"
          }
@@ -58,6 +60,6 @@
          "web" : "https://github.com/david-dick/crypt-urandom"
       }
    },
-   "version" : "0.49",
+   "version" : "0.50",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

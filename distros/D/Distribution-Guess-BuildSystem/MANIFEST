@@ -7,6 +7,7 @@ Makefile.PL
 MANIFEST
 MANIFEST.SKIP
 README.pod
+SECURITY.md
 t/_setting.t
 t/file_has_string.t
 t/just_give_me_a_hash.t

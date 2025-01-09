@@ -7,7 +7,7 @@ use vars qw( $VERSION );
 use warnings;
 no warnings;
 
-$VERSION = '1.123';
+$VERSION = '1.124';
 
 BEGIN {
 	my @Head_levels = 0 .. 4;

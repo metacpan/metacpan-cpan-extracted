@@ -3,17 +3,12 @@
 use strict;
 use warnings;
 
+use Test::DescribeMe qw(author);
 use Test::Most;
+use Test::Needs 'Test::Strict';
 
-if($ENV{AUTHOR_TESTING}) {
-	eval 'use Test::Strict';
-	if($@) {
-		plan(skip_all => 'Test::Strict required for testing use strict');
-	} else {
-		all_perl_files_ok();
-		warnings_ok('lib/Locale/Places.pm');
-		warnings_ok('lib/Locale/Places/GB.pm');
-	}
-} else {
-	plan(skip_all => 'Author tests not required for installation');
-}
+Test::Strict->import();
+all_perl_files_ok();
+warnings_ok('lib/Locale/Places.pm');
+warnings_ok('lib/Locale/Places/GB.pm');
+warnings_ok('lib/Locale/Places/US.pm');

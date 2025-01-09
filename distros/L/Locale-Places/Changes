@@ -1,6 +1,15 @@
 Revision history for Locale::Places
 
-0.13
+0.14	Wed Jan  8 17:25:41 EST 2025
+	Fix GitHub#9
+	Test on CircleCI
+	Use Test::DescribeMe to simplify tests
+	Use gtar to create a distribution on Macs
+	Refactor main loop of bin/create_db.PL for readability
+	Added -f to bin/create_db.PL
+	Have a go at handling multiple translations if they are the same
+
+0.13	Sun Jul 21 09:31:13 EDT 2024
 	Handle broken smokers
 		http://www.cpantesters.org/cpan/report/47923180-216c-11ef-abf5-d5346e8775ea
 	Added BUG about choosing which town to look up

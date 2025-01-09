@@ -1,4 +1,4 @@
-use Test::More 'no_plan';
+use Test::More;
 
 my $class  = 'Mac::OSVersion';
 my $method = 'minor_to_name';
@@ -33,3 +33,5 @@ subtest macos => sub {
 	ok( defined $name, "Name is defined" );
 	is( $name, 'Monterey', "Monterey is the right version with explicit major version 12" );
 	};
+
+done_testing();

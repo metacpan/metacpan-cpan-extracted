@@ -1,5 +1,13 @@
 # Change Log
 
+## [1.1.0] - 2025-01-08
+
+### Added
+
+- New `json_ld_wrapped()` method
+
+- Documentation for methods
+
 ## [1.0.1] - 2021-06-06
 
 ### Fixed

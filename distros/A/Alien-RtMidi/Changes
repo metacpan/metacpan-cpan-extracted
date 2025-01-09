@@ -1,5 +1,10 @@
 Revision history for perl module Alien::RtMidi
 
+0.07 2025-01-10
+
+  - Fix build on Cygwin by specifying WinMM API
+  - Skip building of RtMidi's test programs
+
 0.06 2024-06-20
 
   - Updated for RtMidi v6

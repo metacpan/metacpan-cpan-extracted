@@ -30,7 +30,11 @@ sub add_operator_and_value {
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my @operators = @{$sf->{o}{G}{operators}};
-    if ( $sf->{i}{driver} eq 'SQLite' ) {
+    my $not_equal = ( any { $_ =~ /^\s?!=\s?\z/ } @operators ) ? "!=" : "<>";
+    if ( $clause eq 'on' ) {
+        @operators = ( " = ", " $not_equal ", " < ", " > ", " >= ", " <= ", "LIKE", "NOT LIKE" );
+    }
+    elsif ( $sf->{i}{driver} eq 'SQLite' ) {
         @operators = grep { ! /^(?:ANY|ALL)\z/ } @operators;
     }
     elsif ( $sf->{i}{driver} eq 'Firebird' ) {
@@ -80,7 +84,6 @@ sub add_operator_and_value {
             $sql->{$stmt} .= $regex_op;
         }
         elsif ( $operator =~ /^(?:ALL|ANY)\z/) {
-            my $not_equal = ( any { $_ =~ /^\s?!=\s?\z/ } @operators ) ? "!=" : "<>";
             my @comb_op = ( "= $operator", "$not_equal $operator", "> $operator", "< $operator", ">= $operator", "<= $operator" );
             my @pre = ( undef );
             my $info = $ax->get_sql_info( $sql );
@@ -100,7 +103,13 @@ sub add_operator_and_value {
             $sql->{$stmt} .= ' ' . $operator;
         }
         $ax->print_sql_info( $ax->get_sql_info( $sql ) );
-        my $ok = $sf->read_and_add_value( $sql, $clause, $stmt, $qt_col, $operator );
+        my $ok;
+        if ( $clause eq 'on' ) {
+            $ok = $sf->choose_and_add_column( $sql, $clause, $stmt );
+        }
+        else {
+            $ok = $sf->read_and_add_value( $sql, $clause, $stmt, $qt_col, $operator );
+        }
         if ( $ok ) {
             return 1;
         }
@@ -111,6 +120,44 @@ sub add_operator_and_value {
         }
     }
 }
+
+
+sub choose_and_add_column {
+    my ( $sf, $sql, $clause, $stmt ) = @_;
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
+    my @pre = ( undef );
+    if ( $sf->{o}{enable}{extended_cols} ) {
+        push @pre, $sf->{i}{menu_addition};
+    }
+    my @choices = @{$sql->{cols_join_condition}};
+
+    COL: while ( 1 ) {
+        my $info = $ax->get_sql_info( $sql );
+        # Choose
+        my $qt_col = $tc->choose(
+            [ @pre, @choices ],
+            { %{$sf->{i}{lyt_h}}, info => $info }
+        );
+        $ax->print_sql_info( $info );
+        if ( ! defined $qt_col ) {
+            return;
+        }
+        if ( $qt_col eq $sf->{i}{menu_addition} ) {
+            my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
+            my $complex_col = $ext->column( $sql, $clause );
+            if ( ! defined $complex_col ) {
+                next COL;
+            }
+            $qt_col = $complex_col;
+        }
+        $sql->{$stmt} .= ' ' . $qt_col;
+        return 1;
+    }
+
+}
+
+
 
 
 sub read_and_add_value {

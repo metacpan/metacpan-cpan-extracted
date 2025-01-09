@@ -4,55 +4,74 @@
       "Eric Brine <ikegami@adaelis.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "unknown",
+      "unrestricted"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Syntax-Feature-Loop",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "ExtUtils::CBuilder" : "0",
-            "Test::More" : "0"
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.3614",
-            "Software::License::CC0_1_0" : "0"
+            "ExtUtils::MakeMaker" : "6.74"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage" : "0.18",
+            "Test::Pod::Coverage" : "1.08"
          }
       },
       "runtime" : {
+         "recommends" : {
+            "perl" : "5.028"
+         },
          "requires" : {
-            "Devel::CallParser" : "0",
-            "Lexical::Sub" : "0",
             "XSLoader" : "0",
             "perl" : "5.014",
+            "strict" : "0",
             "syntax" : "0.004",
-            "version" : "0"
+            "version" : "0",
+            "warnings" : "0"
          }
-      }
-   },
-   "provides" : {
-      "Syntax::Feature::Loop" : {
-         "file" : "lib/Syntax/Feature/Loop.pm",
-         "version" : "v1.8.0"
+      },
+      "test" : {
+         "recommends" : {
+            "Test::Pod" : "1.22"
+         },
+         "requires" : {
+            "Test::More" : "0"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Syntax-Feature-Loop"
+         "web" : "https://github.com/ikegami/perl-Syntax-Feature-Loop/issues"
       },
-      "homepage" : "http://search.cpan.org/dist/Syntax-Feature-Loop/",
+      "homepage" : "https://metacpan.org/dist/Syntax-Feature-Loop",
+      "license" : [
+         "http://creativecommons.org/publicdomain/zero/1.0/"
+      ],
       "repository" : {
-         "url" : "http://github.com/ikegami/perl-Syntax-Feature-Loop"
+         "type" : "git",
+         "url" : "https://github.com/ikegami/perl-Syntax-Feature-Loop.git",
+         "web" : "https://github.com/ikegami/perl-Syntax-Feature-Loop"
       }
    },
-   "version" : "v1.8.0",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "v1.10.0",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

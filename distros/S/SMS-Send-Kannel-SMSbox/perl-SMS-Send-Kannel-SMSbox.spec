@@ -1,5 +1,5 @@
 Name:           perl-SMS-Send-Kannel-SMSbox
-Version:        0.07
+Version:        0.08
 Release:        1%{?dist}
 Summary:        SMS::Send driver for Kannel SMSbox Web Service
 License:        GPL+ or Artistic

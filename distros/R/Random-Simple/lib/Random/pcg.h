@@ -18,23 +18,33 @@ static uint32_t pcg32_random_r(pcg32_random_t* rng) {
     return (xorshifted >> rot) | (xorshifted << ((-rot) & 31));
 }
 
-
 ///////////////////////////////////////////////////////////////////////////
 // Public methods
 ///////////////////////////////////////////////////////////////////////////
 
-pcg32_random_t prng;
+pcg32_random_t one;
+pcg32_random_t two;
 
 static void _seed(uint64_t seed1, uint64_t seed2) {
-	prng.state = seed1;
-	prng.inc   = seed2;
+	one.state = seed1;
+	one.inc   = seed2;
 
-	//printf("Seed: %lu / %lu\n", seed1, seed2);
+	//printf("One: %lu / %lu\n", one.state, one.inc);
+
+	// The second PRNG is only used when we generate
+	// 64 bit integers. We use the seeds for the first
+	// PRNG XORd with nanoseconds to mix them up a
+	// little bit. This should NOT be predictable in
+	// any easy way
+	two.state = seed1 ^ nanos();
+	two.inc   = seed2 ^ nanos();
+
+	//printf("Two: %lu / %lu\n", two.state, two.inc);
 }
 
 static uint64_t _rand64() {
-	uint64_t high = pcg32_random_r(&prng);
-	uint32_t low  = pcg32_random_r(&prng);
+	uint64_t high = pcg32_random_r(&one);
+	uint32_t low  = pcg32_random_r(&two);
 
 	uint64_t ret = (high << 32) | low;
 
@@ -44,7 +54,7 @@ static uint64_t _rand64() {
 }
 
 static uint32_t _rand32() {
-	uint32_t ret = pcg32_random_r(&prng);
+	uint32_t ret = pcg32_random_r(&one);
 
 	return ret;
 }

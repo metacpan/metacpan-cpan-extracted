@@ -52,6 +52,6 @@
          "web" : "https://github.com/briandfoy/polyglot"
       }
    },
-   "version" : "1.005",
+   "version" : "1.006",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

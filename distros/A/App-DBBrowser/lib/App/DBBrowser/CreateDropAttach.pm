@@ -8,12 +8,10 @@ use 5.014;
 use Term::Choose qw();
 
 use App::DBBrowser::Auxil;
-#use App::DBBrowser::CreateDropAttach::AttachDB;    # required
-#use App::DBBrowser::CreateDropAttach::CreateTable; # required
-#use App::DBBrowser::CreateDropAttach::DropTable;   # required
-use App::DBBrowser::DB;
-#use App::DBBrowser::Opt::DBSet;                    # required
-#use App::DBBrowser::Opt::Set;                      # required
+use App::DBBrowser::CreateDropAttach::AttachDB;
+use App::DBBrowser::CreateDropAttach::CreateTable;
+use App::DBBrowser::CreateDropAttach::DropTable;
+use App::DBBrowser::Opt::DBSet;
 
 
 sub new {
@@ -69,7 +67,6 @@ sub create_drop_or_attach {
         }
         my $choice = $menu->[$idx];
         if ( $choice =~ /^-\ Create/i ) {
-            require App::DBBrowser::CreateDropAttach::CreateTable;
             my $ct = App::DBBrowser::CreateDropAttach::CreateTable->new( $sf->{i}, $sf->{o}, $sf->{d} );
             if ( $choice eq $create_table ) {
                 if ( ! eval { $ct->create_table(); 1 } ) {
@@ -84,7 +81,6 @@ sub create_drop_or_attach {
             return 1;
         }
         elsif ( $choice =~ /^-\ Drop/i ) {
-            require App::DBBrowser::CreateDropAttach::DropTable;
             my $dt = App::DBBrowser::CreateDropAttach::DropTable->new( $sf->{i}, $sf->{o}, $sf->{d} );
             if ( $choice eq $drop_table ) {
                 if ( ! eval { $dt->drop_table(); 1 } ) {
@@ -99,7 +95,6 @@ sub create_drop_or_attach {
             return 1;
         }
         elsif ( $choice =~ /^-\ (?:Attach|Detach)/ ) {
-            require App::DBBrowser::CreateDropAttach::AttachDB;
             my $att = App::DBBrowser::CreateDropAttach::AttachDB->new( $sf->{i}, $sf->{o}, $sf->{d} );
             my $changed;
             if ( $choice eq $attach_databases ) {
@@ -119,7 +114,6 @@ sub create_drop_or_attach {
         elsif ( $choice eq $db_setting ) {
             my $changed;
             if ( ! eval {
-                require App::DBBrowser::Opt::DBSet;
                 my $db_opt_set = App::DBBrowser::Opt::DBSet->new( $sf->{i}, $sf->{o} );
                 $changed = $db_opt_set->database_setting( $sf->{d}{db} );
                 1 }

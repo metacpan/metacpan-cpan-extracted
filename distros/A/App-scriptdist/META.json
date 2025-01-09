@@ -54,6 +54,6 @@
          "web" : "https://github.com/briandfoy/scriptdist"
       }
    },
-   "version" : "1.004",
+   "version" : "1.005",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

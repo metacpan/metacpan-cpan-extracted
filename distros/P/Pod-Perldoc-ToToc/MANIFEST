@@ -9,6 +9,7 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 META.yml
 README.pod
+SECURITY.md
 t/example.t
 t/lib/parse.pl
 t/load.t

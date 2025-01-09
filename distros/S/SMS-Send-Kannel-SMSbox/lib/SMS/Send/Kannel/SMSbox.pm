@@ -1,10 +1,9 @@
 package SMS::Send::Kannel::SMSbox;
 use strict;
 use warnings;
-use SMS::Send::Driver::WebService 0.07 qw{}; #warnings property
 use base qw{SMS::Send::Driver::WebService};
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 our $PACKAGE = __PACKAGE__;
 
 =head1 NAME

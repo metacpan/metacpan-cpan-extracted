@@ -1,5 +1,8 @@
 Revision history for Perl module CACertOrg::CA
 
+20210114.003 2025-01-09T07:27:37Z
+	* add tests to verify the ditributed cert
+
 20210114.002 2024-01-14T04:56:48Z
 	* refresh distro, update email addresses
 	* the certificate has not changed

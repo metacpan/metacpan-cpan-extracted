@@ -19,8 +19,6 @@ use Term::Choose::Util     qw( get_term_width );
 use Term::Form             qw();
 
 use App::DBBrowser::Auxil;
-#use App::DBBrowser::Opt::Set;      # required
-
 
 
 sub new {

@@ -5,7 +5,7 @@ MooX::Role::JSON_LD - Easily provide JSON-LD mark-up for your objects.
 =head1 SYNOPSIS
 
     # Your Moo (or Moose) Class
-    package::My::Moo::Class
+    package My::Moo::Class;
 
     use Moo;
     with 'MooX::Role::JSON_LD';
@@ -160,7 +160,7 @@ use MRO::Compat;
 use Types::Standard qw[ArrayRef HashRef InstanceOf Str is_CodeRef is_HashRef
   is_ArrayRef is_Ref is_Object];
 
-our $VERSION = '1.0.1';
+our $VERSION = '1.1.0';
 
 requires qw[json_ld_type json_ld_fields];
 
@@ -210,7 +210,7 @@ sub process_hash {
   my @vals = values %$field;
 
   # Originally, this code used 'each', but there seemed
-  # to be some circumstances where the internet iterator
+  # to be some circumstances where the internal iterator
   # got confused - particularly when an object contained
   # a sub-object of the same type.
   for my $x (0 .. $#keys) {
@@ -264,7 +264,39 @@ sub json_ld {
   return $self->json_ld_encoder->encode($self->json_ld_data);
 }
 
+sub json_ld_wrapped {
+  my $self = shift;
+
+  return qq[<script type="application/ld+json">\n]
+    . $self->json_ld . "\n"
+    . qq[</script>\n];
+}
+
 1;
+
+=head1 METHODS
+
+This role adds three methods to your class. You can call these methods to
+output the object's JSON-LD in various formats.
+
+=over 4
+
+=item json_ld_data
+
+Returns a Perl data structure containing the data that will be encoded into
+JSON.
+
+=item json_ld
+
+Returns the data from C<json_ld_data> encoded into JSON.
+
+=item json_ld_wrapped
+
+Returns the JSON string from C<json_ld> wrapped in the
+C<< <script> .. </script> >> element you will usually need in order to
+embed the JSON in an HTML document.
+
+=back
 
 =head1 AUTHOR
 

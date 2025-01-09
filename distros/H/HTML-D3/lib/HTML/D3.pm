@@ -12,26 +12,26 @@ HTML::D3 - A simple Perl module for generating charts using D3.js.
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 SYNOPSIS
 
     use HTML::D3;
 
     my $chart = HTML::D3->new(
-        width  => 1024,
-        height => 768,
-        title  => 'Sample Bar Chart'
+	width  => 1024,
+	height => 768,
+	title  => 'Sample Bar Chart'
     );
 
     my $data = [
-        ['Category 1', 10],
-        ['Category 2', 20],
-        ['Category 3', 30]
+	['Category 1', 10],
+	['Category 2', 20],
+	['Category 3', 30]
     ];
 
     my $html = $chart->render_bar_chart($data);
@@ -40,9 +40,9 @@ our $VERSION = '0.04';
     $chart = HTML::D3->new(title => 'Sales Data');
 
     my $data = [
-        ['Product A', 100],
-        ['Product B', 150],
-        ['Product C', 200]
+	['Product A', 100],
+	['Product B', 150],
+	['Product C', 200]
     ];
 
     $html = $chart->render_line_chart($data);
@@ -137,7 +137,7 @@ sub render_bar_chart {
 
     # Generate JSON representation of data
     my $json_data = encode_json([
-        map { { label => $_->[0], value => $_->[1] } } @$data
+	map { { label => $_->[0], value => $_->[1] } } @$data
     ]);
 
     # Generate HTML and D3.js JavaScript for rendering the bar chart
@@ -148,49 +148,49 @@ sub render_bar_chart {
     <h1 style="text-align: center;">$self->{title}</h1>
     <svg id="chart" width="$self->{width}" height="$self->{height}" style="border: 1px solid black;"></svg>
     <script>
-        const data = $json_data;
+	const data = $json_data;
 
-        const svg = d3.select("#chart");
-        const margin = { top: 20, right: 30, bottom: 40, left: 40 };
-        const width = $self->{width} - margin.left - margin.right;
-        const height = $self->{height} - margin.top - margin.bottom;
+	const svg = d3.select("#chart");
+	const margin = { top: 20, right: 30, bottom: 40, left: 40 };
+	const width = $self->{width} - margin.left - margin.right;
+	const height = $self->{height} - margin.top - margin.bottom;
 
-        // Set up scales for x and y axes
-        const x = d3.scaleBand()
-            .domain(data.map(d => d.label))
-            .range([0, width])
-            .padding(0.1);
+	// Set up scales for x and y axes
+	const x = d3.scaleBand()
+	    .domain(data.map(d => d.label))
+	    .range([0, width])
+	    .padding(0.1);
 
-        const y = d3.scaleLinear()
-            .domain([0, d3.max(data, d => d.value)])
-            .nice()
-            .range([height, 0]);
+	const y = d3.scaleLinear()
+	    .domain([0, d3.max(data, d => d.value)])
+	    .nice()
+	    .range([height, 0]);
 
-        const chart = svg.append("g")
-            .attr("transform", `translate(\${margin.left},\${margin.top})`);
+	const chart = svg.append("g")
+	    .attr("transform", `translate(\${margin.left},\${margin.top})`);
 
-        // Add bars to the chart
-        chart.append("g")
-            .selectAll("rect")
-            .data(data)
-            .join("rect")
-            .attr("x", d => x(d.label))
-            .attr("y", d => y(d.value))
-            .attr("height", d => height - y(d.value))
-            .attr("width", x.bandwidth())
-            .attr("fill", "steelblue");
+	// Add bars to the chart
+	chart.append("g")
+	    .selectAll("rect")
+	    .data(data)
+	    .join("rect")
+	    .attr("x", d => x(d.label))
+	    .attr("y", d => y(d.value))
+	    .attr("height", d => height - y(d.value))
+	    .attr("width", x.bandwidth())
+	    .attr("fill", "steelblue");
 
-        // Add the y-axis
-        chart.append("g")
-            .call(d3.axisLeft(y));
+	// Add the y-axis
+	chart.append("g")
+	    .call(d3.axisLeft(y));
 
-        // Add the x-axis with labels rotated for better readability
-        chart.append("g")
-            .attr("transform", `translate(0,\${height})`)
-            .call(d3.axisBottom(x))
-            .selectAll("text")
-            .attr("transform", "rotate(-45)")
-            .style("text-anchor", "end");
+	// Add the x-axis with labels rotated for better readability
+	chart.append("g")
+	    .attr("transform", `translate(0,\${height})`)
+	    .call(d3.axisBottom(x))
+	    .selectAll("text")
+	    .attr("transform", "rotate(-45)")
+	    .style("text-anchor", "end");
     </script>
 </body>
 </html>
@@ -224,7 +224,7 @@ sub render_line_chart {
 
     # Generate JSON for data
     my $json_data = encode_json([
-        map { { label => $_->[0], value => $_->[1] } } @$data
+	map { { label => $_->[0], value => $_->[1] } } @$data
     ]);
 
     # Generate HTML and D3.js code
@@ -235,56 +235,56 @@ sub render_line_chart {
     <h1 style="text-align: center;">$self->{title}</h1>
     <svg id="chart" width="$self->{width}" height="$self->{height}" style="border: 1px solid black;"></svg>
     <script>
-        const data = $json_data;
+	const data = $json_data;
 
-        const svg = d3.select("#chart");
-        const margin = { top: 20, right: 30, bottom: 40, left: 40 };
-        const width = $self->{width} - margin.left - margin.right;
-        const height = $self->{height} - margin.top - margin.bottom;
+	const svg = d3.select("#chart");
+	const margin = { top: 20, right: 30, bottom: 40, left: 40 };
+	const width = $self->{width} - margin.left - margin.right;
+	const height = $self->{height} - margin.top - margin.bottom;
 
-        const x = d3.scalePoint()
-            .domain(data.map(d => d.label))
-            .range([0, width]);
+	const x = d3.scalePoint()
+	    .domain(data.map(d => d.label))
+	    .range([0, width]);
 
-        const y = d3.scaleLinear()
-            .domain([0, d3.max(data, d => d.value)])
-            .nice()
-            .range([height, 0]);
+	const y = d3.scaleLinear()
+	    .domain([0, d3.max(data, d => d.value)])
+	    .nice()
+	    .range([height, 0]);
 
-        const chart = svg.append("g")
-            .attr("transform", `translate(\${margin.left},\${margin.top})`);
+	const chart = svg.append("g")
+	    .attr("transform", `translate(\${margin.left},\${margin.top})`);
 
-        // Draw line
-        const line = d3.line()
-            .x(d => x(d.label))
-            .y(d => y(d.value));
+	// Draw line
+	const line = d3.line()
+	    .x(d => x(d.label))
+	    .y(d => y(d.value));
 
-        chart.append("path")
-            .datum(data)
-            .attr("fill", "none")
-            .attr("stroke", "steelblue")
-            .attr("stroke-width", 2)
-            .attr("d", line);
+	chart.append("path")
+	    .datum(data)
+	    .attr("fill", "none")
+	    .attr("stroke", "steelblue")
+	    .attr("stroke-width", 2)
+	    .attr("d", line);
 
-        // Add points to the line
-        chart.selectAll("circle")
-            .data(data)
-            .join("circle")
-            .attr("cx", d => x(d.label))
-            .attr("cy", d => y(d.value))
-            .attr("r", 4)
-            .attr("fill", "steelblue");
+	// Add points to the line
+	chart.selectAll("circle")
+	    .data(data)
+	    .join("circle")
+	    .attr("cx", d => x(d.label))
+	    .attr("cy", d => y(d.value))
+	    .attr("r", 4)
+	    .attr("fill", "steelblue");
 
-        // Add axes
-        chart.append("g")
-            .call(d3.axisLeft(y));
+	// Add axes
+	chart.append("g")
+	    .call(d3.axisLeft(y));
 
-        chart.append("g")
-            .attr("transform", `translate(0,\${height})`)
-            .call(d3.axisBottom(x))
-            .selectAll("text")
-            .attr("transform", "rotate(-45)")
-            .style("text-anchor", "end");
+	chart.append("g")
+	    .attr("transform", `translate(0,\${height})`)
+	    .call(d3.axisBottom(x))
+	    .selectAll("text")
+	    .attr("transform", "rotate(-45)")
+	    .style("text-anchor", "end");
     </script>
 </body>
 </html>
@@ -332,16 +332,16 @@ sub render_line_chart_with_tooltips
     <title>$self->{title}</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
-        .tooltip {
-            position: absolute;
-            background-color: white;
-            border: 1px solid #ccc;
-            padding: 5px;
-            font-size: 12px;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.2s ease-in-out;
-        }
+	.tooltip {
+	    position: absolute;
+	    background-color: white;
+	    border: 1px solid #ccc;
+	    padding: 5px;
+	    font-size: 12px;
+	    pointer-events: none;
+	    opacity: 0;
+	    transition: opacity 0.2s ease-in-out;
+	}
     </style>
 </head>
 <body>
@@ -349,70 +349,70 @@ sub render_line_chart_with_tooltips
     <svg id="chart" width="$self->{width}" height="$self->{height}" style="border: 1px solid black;"></svg>
     <div class="tooltip" id="tooltip"></div>
     <script>
-        const data = $json_data;
+	const data = $json_data;
 
-        const svg = d3.select("#chart");
-        const tooltip = d3.select("#tooltip");
-        const margin = { top: 20, right: 30, bottom: 40, left: 40 };
-        const width = $self->{width} - margin.left - margin.right;
-        const height = $self->{height} - margin.top - margin.bottom;
+	const svg = d3.select("#chart");
+	const tooltip = d3.select("#tooltip");
+	const margin = { top: 20, right: 30, bottom: 40, left: 40 };
+	const width = $self->{width} - margin.left - margin.right;
+	const height = $self->{height} - margin.top - margin.bottom;
 
-        const x = d3.scalePoint()
-            .domain(data.map(d => d.label))
-            .range([0, width]);
+	const x = d3.scalePoint()
+	    .domain(data.map(d => d.label))
+	    .range([0, width]);
 
-        const y = d3.scaleLinear()
-            .domain([0, d3.max(data, d => d.value)])
-            .nice()
-            .range([height, 0]);
+	const y = d3.scaleLinear()
+	    .domain([0, d3.max(data, d => d.value)])
+	    .nice()
+	    .range([height, 0]);
 
-        const chart = svg.append("g")
-            .attr("transform", `translate(\${margin.left},\${margin.top})`);
+	const chart = svg.append("g")
+	    .attr("transform", `translate(\${margin.left},\${margin.top})`);
 
-        // Draw line
-        const line = d3.line()
-            .x(d => x(d.label))
-            .y(d => y(d.value));
+	// Draw line
+	const line = d3.line()
+	    .x(d => x(d.label))
+	    .y(d => y(d.value));
 
-        chart.append("path")
-            .datum(data)
-            .attr("fill", "none")
-            .attr("stroke", "steelblue")
-            .attr("stroke-width", 2)
-            .attr("d", line);
+	chart.append("path")
+	    .datum(data)
+	    .attr("fill", "none")
+	    .attr("stroke", "steelblue")
+	    .attr("stroke-width", 2)
+	    .attr("d", line);
 
-        // Add points to the line
-        chart.selectAll("circle")
-            .data(data)
-            .join("circle")
-            .attr("cx", d => x(d.label))
-            .attr("cy", d => y(d.value))
-            .attr("r", 4)
-            .attr("fill", "steelblue")
-            .on("mouseover", (event, d) => {
-                tooltip.style("opacity", 1)
-                       .html(`Label: <b>\${d.label}</b><br>Value: <b>\${d.value}</b>`)
-                       .style("left", (event.pageX + 10) + "px")
-                       .style("top", (event.pageY - 30) + "px");
-            })
-            .on("mousemove", (event) => {
-                tooltip.style("left", (event.pageX + 10) + "px")
-                       .style("top", (event.pageY - 30) + "px");
-            })
-            .on("mouseout", () => {
-                tooltip.style("opacity", 0);
-            });
+	// Add points to the line
+	chart.selectAll("circle")
+	    .data(data)
+	    .join("circle")
+	    .attr("cx", d => x(d.label))
+	    .attr("cy", d => y(d.value))
+	    .attr("r", 4)
+	    .attr("fill", "steelblue")
+	    .on("mouseover", (event, d) => {
+		tooltip.style("opacity", 1)
+		       .html(`Label: <b>\${d.label}</b><br>Value: <b>\${d.value}</b>`)
+		       .style("left", (event.pageX + 10) + "px")
+		       .style("top", (event.pageY - 30) + "px");
+	    })
+	    .on("mousemove", (event) => {
+		tooltip.style("left", (event.pageX + 10) + "px")
+		       .style("top", (event.pageY - 30) + "px");
+	    })
+	    .on("mouseout", () => {
+		tooltip.style("opacity", 0);
+	    });
 
-        // Add axes
-        chart.append("g")
-            .call(d3.axisLeft(y));
+	// Add axes
+	chart.append("g")
+	    .call(d3.axisLeft(y));
 
-        chart.append("g")
-            .attr("transform", `translate(0,\${height})`)
-            .call(d3.axisBottom(x))
-            .selectAll("text")
-            .attr("transform", "rotate(-45)")
-            .style("text-anchor", "end");
+	chart.append("g")
+	    .attr("transform", `translate(0,\${height})`)
+	    .call(d3.axisBottom(x))
+	    .selectAll("text")
+	    .attr("transform", "rotate(-45)")
+	    .style("text-anchor", "end");
     </script>
 </body>
 </html>
@@ -458,16 +458,16 @@ sub render_multi_series_line_chart_with_tooltips
     <title>$self->{title}</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
-        .tooltip {
-            position: absolute;
-            background-color: white;
-            border: 1px solid #ccc;
-            padding: 5px;
-            font-size: 12px;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.2s ease-in-out;
-        }
+	.tooltip {
+	    position: absolute;
+	    background-color: white;
+	    border: 1px solid #ccc;
+	    padding: 5px;
+	    font-size: 12px;
+	    pointer-events: none;
+	    opacity: 0;
+	    transition: opacity 0.2s ease-in-out;
+	}
     </style>
 </head>
 <body>
@@ -475,80 +475,80 @@ sub render_multi_series_line_chart_with_tooltips
     <svg id="chart" width="$self->{width}" height="$self->{height}" style="border: 1px solid black;"></svg>
     <div class="tooltip" id="tooltip"></div>
     <script>
-        const data = $json_data;
+	const data = $json_data;
 
-        const svg = d3.select("#chart");
-        const tooltip = d3.select("#tooltip");
-        const margin = { top: 20, right: 30, bottom: 40, left: 40 };
-        const width = $self->{width} - margin.left - margin.right;
-        const height = $self->{height} - margin.top - margin.bottom;
+	const svg = d3.select("#chart");
+	const tooltip = d3.select("#tooltip");
+	const margin = { top: 20, right: 30, bottom: 40, left: 40 };
+	const width = $self->{width} - margin.left - margin.right;
+	const height = $self->{height} - margin.top - margin.bottom;
 
-        const chart = svg.append("g")
-            .attr("transform", `translate(\${margin.left},\${margin.top})`);
+	const chart = svg.append("g")
+	    .attr("transform", `translate(\${margin.left},\${margin.top})`);
 
-        // Extract all labels and flatten them into a unique array
-        const allLabels = Array.from(new Set(data.flatMap(series => series.data.map(d => d.label))));
+	// Extract all labels and flatten them into a unique array
+	const allLabels = Array.from(new Set(data.flatMap(series => series.data.map(d => d.label))));
 
-        const x = d3.scalePoint()
-            .domain(allLabels)
-            .range([0, width]);
+	const x = d3.scalePoint()
+	    .domain(allLabels)
+	    .range([0, width]);
 
-        const y = d3.scaleLinear()
-            .domain([0, d3.max(data.flatMap(series => series.data.map(d => d.value)))])
-            .nice()
-            .range([height, 0]);
+	const y = d3.scaleLinear()
+	    .domain([0, d3.max(data.flatMap(series => series.data.map(d => d.value)))])
+	    .nice()
+	    .range([height, 0]);
 
-        // Define color scale for series
-        const color = d3.scaleOrdinal(d3.schemeCategory10);
+	// Define color scale for series
+	const color = d3.scaleOrdinal(d3.schemeCategory10);
 
-        // Add axes
-        chart.append("g")
-            .call(d3.axisLeft(y));
+	// Add axes
+	chart.append("g")
+	    .call(d3.axisLeft(y));
 
-        chart.append("g")
-            .attr("transform", `translate(0,\${height})`)
-            .call(d3.axisBottom(x))
-            .selectAll("text")
-            .attr("transform", "rotate(-45)")
-            .style("text-anchor", "end");
+	chart.append("g")
+	    .attr("transform", `translate(0,\${height})`)
+	    .call(d3.axisBottom(x))
+	    .selectAll("text")
+	    .attr("transform", "rotate(-45)")
+	    .style("text-anchor", "end");
 
-        // Draw lines for each series
-        data.forEach((series, i) => {
-            const line = d3.line()
-                .x(d => x(d.label))
-                .y(d => y(d.value));
+	// Draw lines for each series
+	data.forEach((series, i) => {
+	    const line = d3.line()
+		.x(d => x(d.label))
+		.y(d => y(d.value));
 
-            // Add line
-            chart.append("path")
-                .datum(series.data)
-                .attr("fill", "none")
-                .attr("stroke", color(i))
-                .attr("stroke-width", 2)
-                .attr("d", line);
+	    // Add line
+	    chart.append("path")
+		.datum(series.data)
+		.attr("fill", "none")
+		.attr("stroke", color(i))
+		.attr("stroke-width", 2)
+		.attr("d", line);
 
-            // Add points and tooltips
-            chart.selectAll(\`circle.series-\${i}\`)
-                .data(series.data)
-                .join("circle")
-                .attr("class", \`series-\${i}\`)
-                .attr("cx", d => x(d.label))
-                .attr("cy", d => y(d.value))
-                .attr("r", 4)
-                .attr("fill", color(i))
-                .on("mouseover", (event, d) => {
-                    tooltip.style("opacity", 1)
-                           .html(\`Series: <b>\${series.name}</b><br>Label: <b>\${d.label}</b><br>Value: <b>\${d.value}</b>\`)
-                           .style("left", (event.pageX + 10) + "px")
-                           .style("top", (event.pageY - 30) + "px");
-                })
-                .on("mousemove", (event) => {
-                    tooltip.style("left", (event.pageX + 10) + "px")
-                           .style("top", (event.pageY - 30) + "px");
-                })
-                .on("mouseout", () => {
-                    tooltip.style("opacity", 0);
-                });
-        });
+	    // Add points and tooltips
+	    chart.selectAll(\`circle.series-\${i}\`)
+		.data(series.data)
+		.join("circle")
+		.attr("class", \`series-\${i}\`)
+		.attr("cx", d => x(d.label))
+		.attr("cy", d => y(d.value))
+		.attr("r", 4)
+		.attr("fill", color(i))
+		.on("mouseover", (event, d) => {
+		    tooltip.style("opacity", 1)
+			   .html(\`Series: <b>\${series.name}</b><br>Label: <b>\${d.label}</b><br>Value: <b>\${d.value}</b>\`)
+			   .style("left", (event.pageX + 10) + "px")
+			   .style("top", (event.pageY - 30) + "px");
+		})
+		.on("mousemove", (event) => {
+		    tooltip.style("left", (event.pageX + 10) + "px")
+			   .style("top", (event.pageY - 30) + "px");
+		})
+		.on("mouseout", () => {
+		    tooltip.style("opacity", 0);
+		});
+	});
     </script>
 </body>
 </html>
@@ -556,6 +556,147 @@ HTML
 
     return $html;
 }
+
+=head2 render_multi_series_line_chart_with_animated_tooltips
+
+    $html = $chart->render_multi_series_line_chart_with_animated_tooltips($data);
+
+Generates HTML and JavaScript code to render a chart of many lines with animated mouseover tooltips.
+
+Accepts the following arguments:
+
+=over 4
+
+=item * C<$data> - An reference to an array of hashes containing data points.
+Each data point should be an array reference with two elements: the label (string) and the value (numeric).
+
+=back
+
+Returns a string containing the HTML and JavaScript code for the chart.
+
+=cut
+
+sub render_multi_series_line_chart_with_animated_tooltips
+{
+	my ($self, $data) = @_;
+
+	# Validate input data
+	die 'Data must be an array of hashes' unless ref($data) eq 'ARRAY';
+
+	# Generate JSON for data
+	my $json_data = encode_json($data);
+
+	# Generate HTML and D3.js code
+	my $html = $self->_preamble();
+	$html .= <<"HTML";
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>$self->{title}</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+	.tooltip {
+	    position: absolute;
+	    background-color: white;
+	    border: 1px solid #ccc;
+	    padding: 5px;
+	    font-size: 12px;
+	    pointer-events: none;
+	    opacity: 0;
+	    transform: translateY(-10px);
+	    transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+	}
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center;">$self->{title}</h1>
+    <svg id="chart" width="$self->{width}" height="$self->{height}" style="border: 1px solid black;"></svg>
+    <div class="tooltip" id="tooltip"></div>
+    <script>
+	const data = $json_data;
+
+	const svg = d3.select("#chart");
+	const tooltip = d3.select("#tooltip");
+	const margin = { top: 20, right: 30, bottom: 40, left: 40 };
+	const width = $self->{width} - margin.left - margin.right;
+	const height = $self->{height} - margin.top - margin.bottom;
+
+	const chart = svg.append("g")
+	    .attr("transform", `translate(\${margin.left},\${margin.top})`);
+
+	// Extract all labels and flatten them into a unique array
+	const allLabels = Array.from(new Set(data.flatMap(series => series.data.map(d => d.label))));
+
+	const x = d3.scalePoint()
+	    .domain(allLabels)
+	    .range([0, width]);
+
+	const y = d3.scaleLinear()
+	    .domain([0, d3.max(data.flatMap(series => series.data.map(d => d.value)))])
+	    .nice()
+	    .range([height, 0]);
+
+	// Define color scale for series
+	const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+	// Add axes
+	chart.append("g")
+	    .call(d3.axisLeft(y));
+
+	chart.append("g")
+	    .attr("transform", `translate(0,\${height})`)
+	    .call(d3.axisBottom(x))
+	    .selectAll("text")
+	    .attr("transform", "rotate(-45)")
+	    .style("text-anchor", "end");
+
+	// Draw lines for each series
+	data.forEach((series, i) => {
+	    const line = d3.line()
+		.x(d => x(d.label))
+		.y(d => y(d.value));
+
+	    // Add line
+	    chart.append("path")
+		.datum(series.data)
+		.attr("fill", "none")
+		.attr("stroke", color(i))
+		.attr("stroke-width", 2)
+		.attr("d", line);
+
+	    // Add points and tooltips
+	    chart.selectAll(\`circle.series-\${i}\`)
+		.data(series.data)
+		.join("circle")
+		.attr("class", \`series-\${i}\`)
+		.attr("cx", d => x(d.label))
+		.attr("cy", d => y(d.value))
+		.attr("r", 4)
+		.attr("fill", color(i))
+		.on("mouseover", (event, d) => {
+		    tooltip.style("opacity", 1)
+			   .style("transform", "translateY(0)")
+			   .html(\`Series: <b>\${series.name}</b><br>Label: <b>\${d.label}</b><br>Value: <b>\${d.value}</b>\`)
+			   .style("left", (event.pageX + 10) + "px")
+			   .style("top", (event.pageY - 30) + "px");
+		})
+		.on("mousemove", (event) => {
+		    tooltip.style("left", (event.pageX + 10) + "px")
+			   .style("top", (event.pageY - 30) + "px");
+		})
+		.on("mouseout", () => {
+		    tooltip.style("opacity", 0)
+			   .style("transform", "translateY(-10px)");
+		});
+	});
+    </script>
+</body>
+</html>
+HTML
+
+    return $html;
+}
+
 sub _preamble
 {
 	my $html = <<'HTML';

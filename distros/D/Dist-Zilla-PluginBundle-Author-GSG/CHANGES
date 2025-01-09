@@ -1,6 +1,10 @@
 Changelog for Dist-Zilla-PluginBundle-Author-GSG
 
-v0.6.1 2024-06-11T18:01:40
+v0.6.2 2025-01-08T22:27:09
+ - Update README (Andrew Hewus Fresh)
+ - Add -- to Makefile.inc as appropriate (Andrew Hewus Fresh)
+
+v0.6.1 2024-06-11T16:58:28
  - Pull request #26: Patch - SM-4923 - Enable OurPkgVersion overwrite
    correctly (Andrew Hewus Fresh)
  - Correct spelling of overwrite option (Andrew Hewus Fresh)
@@ -244,8 +248,8 @@ v0.0.1 2019-03-27T01:48:40
  - Support main_module from dist.ini in Makefile (Andrew Fresh)
  - Use perl instead of sed to parse dist.ini (Andrew Fresh)
  - Simple explanation in CONTRIBUTING about how (Andrew Fresh)
- - Update README.md (Andrew Fresh)
  - More documentation improvmenets (Andrew Fresh)
+ - Update README.md (Andrew Fresh)
  - Rearrange Plugins to make documentation clearer (Andrew Fresh)
  - Initial stab at the beginnings of CONTRIBUTING doc (Andrew Fresh)
  - Add a clean and realclean targets (Andrew Fresh)

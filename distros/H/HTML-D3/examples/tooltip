@@ -23,8 +23,8 @@ my $data = [
 my $html_output = $chart->render_line_chart_with_tooltips($data);
 
 # Save the output as an HTML file
-open my $fh, '>', 'tooltips.html' or die $!;
+open my $fh, '>', 'chart.html' or die $!;
 print $fh $html_output;
 close $fh;
 
-print "Interactive line chart with tooltips saved as 'tooltips.html'. Open it in a browser.\n";
+print "Interactive line chart with tooltips saved as 'chart.html'. Open it in a browser.\n";

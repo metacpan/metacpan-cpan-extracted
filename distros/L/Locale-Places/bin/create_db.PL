@@ -2,6 +2,9 @@
 
 # Create SQLite3 from http://download.geonames.org/export/dump/GB.zip
 
+# -f:	force a build, otherwise it won't build on CPAN smokers or if the
+#	database already exists
+
 use strict;
 use warnings;
 use Config;
@@ -11,6 +14,7 @@ use File::Spec;
 use Try::Tiny;
 use autodie qw(:all);
 
+# Constants
 use	constant	AIO_READAHEAD_SIZE => 1048576;	# 1MB
 
 sub doit($$);
@@ -19,13 +23,24 @@ BEGIN {
 	$SIG{__WARN__} = sub {
 		my $warning = shift;
 		if(($warning =~ /^Use of uninitialized value/) ||
+		   ($warning =~ /Wide/) ||
+		   ($warning =~ /masks earlier declaration in same scope/) ||
+		   ($warning =~ /: attempt to add consecutive punctuation/) ||
+		   ($warning =~ /^Odd number of elements in hash assignment/) ||
 		   ($warning =~ /isn't numeric in numeric eq /i)) {
 			die $warning;
 		}
 	}
 }
 
-exit if($ENV{'AUTOMATED_TESTING'});
+my $dir = 'lib/Locale/Places/data';
+
+my $force_flag;
+if(defined($ARGV[0]) && ($ARGV[0] eq '-f')) {
+	$force_flag++;
+} elsif($ENV{'AUTOMATED_TESTING'}) {
+	exit(0);
+}
 
 if($Config{'osname'} ne 'MSWin32') {
 	require IO::AIO;
@@ -35,53 +50,98 @@ if($Config{'osname'} ne 'MSWin32') {
 	File::Open::NoCache::ReadOnly->import();
 }
 
-my $dir = 'lib/Locale/Places/data';
-foreach my $country('GB', 'US') {
-	my $csv = File::Spec->catdir($dir, "$country.csv");
-	my $sqlite = File::Spec->catdir($dir, "$country.sql");
+# Process countries
+foreach my $country ('GB', 'US') {
+	process_country($country);
+}
 
-	if(-r $sqlite) {
-		if((-s $sqlite) > 0) {	# Non empty?
-			# Don't bother building if the SQL file is less than a day old
-			next if(-M $sqlite < 1);
-			# Don't bother building if the SQL file is newer than the CSV file
-			next if((-M $sqlite) >= (-M $csv));
-		}
-		unlink $sqlite;
+sub process_country {
+	my $country = shift;
+
+	my $csv = File::Spec->catfile($dir, "$country.csv");
+	my $sqlite = File::Spec->catfile($dir, "$country.sql");
+
+	# Skip processing if SQLite file is valid and up to date
+	if(should_skip_build($sqlite, $csv)) {
+		return;
 	}
 
 	print "Building $sqlite\n";
 
-	my $fin;
-	if($Config{'osname'} eq 'MSWin32') {
-		open($fin, '<', $csv);
-	} else {
-		$csv = File::Open::NoCache::ReadOnly->new($csv);
-		$fin = $csv->fd();
-		aio_readahead($fin, 0, AIO_READAHEAD_SIZE);
+	# Open CSV file
+	my $fin = open_csv($csv, $Config{'osname'});
+
+	# Connect to SQLite database
+	my $dbh = DBI->connect("dbi:SQLite:dbname=$sqlite", undef, undef, {
+		RaiseError => 1,
+		AutoCommit => 0,
+		synchronous => 0,
+		locking_mode => 'EXCLUSIVE',
+	}) or die "$sqlite: $!";
+
+	# Initialize database
+	initialize_database($dbh, lc($country));
+
+	# Process and insert data
+	my $queue = doit($dbh, $fin);
+	flush($dbh, lc($country), $queue);
+
+	# Finalize database
+	finalize_database($dbh, $sqlite);
+
+	# close $fin;
+}
+
+sub should_skip_build {
+	my ($sqlite, $csv) = @_;
+
+	return 0 if($force_flag);	# -f option has been given
+	return 0 unless -r $sqlite;	# SQLite file does not exist
+	return 0 unless -s $sqlite;	# SQLite file is empty
+	return 1 if -M $sqlite < 1;	# SQLite file is less than a day old
+	return 1 if -M $sqlite < -M $csv;	# SQLite file is newer than CSV
+
+	unlink $sqlite;	# Remove outdated SQLite file
+	return 0;
+}
+
+sub open_csv {
+	my ($csv, $osname) = @_;
+
+	if($osname eq 'MSWin32') {
+		open my $fin, '<', $csv or die "Failed to open $csv: $!";
+		return $fin;
 	}
 
-	if(my $dbh = DBI->connect("dbi:SQLite:dbname=$sqlite", undef, undef, { RaiseError => 1, AutoCommit => 0, synchronous => 0, locking_mode => 'EXCLUSIVE' })) {
-		my $table = lc($country);
-		$dbh->do("CREATE TABLE $table(code1 INTEGER, code2 INTEGER, type VARCHAR(4), data VARCHAR NOT NULL, ispreferredname BIT, isshortname BIT)");
-		# keys
-		# if($place = $self->{$table}->fetchrow_hashref({ type => $from, data => $place })) {
-			# if(my $line = $self->{$table}->fetchrow_hashref({ type => $to, code2 => $place->{'code2'} })) {
-		$dbh->do('PRAGMA cache_size = -65536');	# 64MB
-		$dbh->do('PRAGMA journal_mode = OFF');
+	my $file = File::Open::NoCache::ReadOnly->new($csv) or die "Failed to open $csv: $!";
+	aio_readahead($file->fd(), 0, AIO_READAHEAD_SIZE);
+	return $file->fd();
+}
 
-		my $queue = doit($dbh, $fin);
+sub initialize_database {
+	my ($dbh, $table) = @_;
 
-		$csv = undef;
+	$dbh->do("DROP TABLE IF EXISTS $table");
+	$dbh->do(qq{
+		CREATE TABLE $table (
+			code1 INTEGER,
+			code2 INTEGER,
+			type VARCHAR(4),
+			data VARCHAR NOT NULL,
+			ispreferredname BIT,
+			isshortname BIT
+		)
+	});
+	$dbh->do('PRAGMA cache_size = -65536');	# 64MB
+	$dbh->do('PRAGMA journal_mode = OFF');
+}
 
-		flush($dbh, $table, $queue);
-		$dbh->commit();
-		$dbh->disconnect();
+sub finalize_database {
+	my ($dbh, $sqlite) = @_;
 
-		File::Copy::copy($sqlite, File::Spec->catfile('blib', $sqlite));
-	} else {
-		die "$sqlite: $!";
-	}
+	$dbh->commit();
+	$dbh->disconnect();
+	File::Copy::copy($sqlite, File::Spec->catfile('blib', $sqlite));
 }
 
 sub doit($$) {
@@ -114,6 +174,10 @@ sub doit($$) {
 			$queue{$code1}->{'isshortname'} = $isshortname;
 		}
 	}
+	if(scalar(keys(%queue)) == 0) {
+		die 'No entries found in the file';
+	}
+	print scalar(keys %queue), " entries to be added\n";
 	return \%queue;
 }
 
@@ -124,6 +188,7 @@ sub flush($$$)
 	my $query;
 
 	while(my ($key, $value) = each (%{$queue})) {
+		delete $queue->{$key};
 		if(!defined($query)) {
 			$query = "INSERT INTO $table(code1, code2, type, data, ispreferredname, isshortname) VALUES (";
 		} else {

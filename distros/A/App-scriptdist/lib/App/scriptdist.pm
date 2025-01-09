@@ -13,7 +13,7 @@ use vars qw(
 	$Quiet
 	);
 
-$VERSION = '1.004';
+$VERSION = '1.005';
 
 @EXPORT_OK = qw(
 	prompt find_files copy gitify content
@@ -247,6 +247,7 @@ $$hash{script}-*
 blib
 Makefile
 pm_to_blib
+MYMETA\.
 GITIGNORE
 
 	$Content{"t/test_manifest"} =<<"TEST_MANIFEST";
@@ -318,7 +319,7 @@ brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT
 
-Copyright © 2004-2024, brian d foy C<< <briandfoy@pobox.com> >>. All rights reserved.
+Copyright © 2004-2025, brian d foy C<< <briandfoy@pobox.com> >>. All rights reserved.
 
 This code is available under the Artistic License 2.0.
 

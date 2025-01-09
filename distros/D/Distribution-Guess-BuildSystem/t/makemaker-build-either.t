@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More 'no_plan';
+use Test::More;
 use File::Basename;
 use File::Spec;
 use Cwd;
@@ -12,12 +12,12 @@ my $class = 'Distribution::Guess::BuildSystem';
 my $test_file = basename( $0 );
 (my $test_dir = $test_file ) =~ s/\.t$//;
 
-my $test_distro_directory = File::Spec->catfile( 
-	qw( t test-distros ), $test_dir 
+my $test_distro_directory = File::Spec->catfile(
+	qw( t test-distros ), $test_dir
 	);
 
-ok( -d $test_distro_directory, 
-	"Test directory [$test_distro_directory] exists" 
+ok( -d $test_distro_directory,
+	"Test directory [$test_distro_directory] exists"
 	);
 
 use_ok( $class );
@@ -25,19 +25,19 @@ use_ok( $class );
 my $guesser = $class->new(
 	dist_dir => $test_distro_directory
 	);
-	
+
 isa_ok( $guesser, $class );
 
-can_ok( $guesser, 
+can_ok( $guesser,
 	qw(
-	makemaker_name makemaker_version make_command 
+	makemaker_name makemaker_version make_command
 	makefile_pl	makefile_pl_path
 	build_commands build_files build_file_paths
 	preferred_build_file preferred_build_command
-	) 
+	)
 	);
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Should be Makefile.PL and Build.PL
 {
 my $filenames = $guesser->build_files;
@@ -50,7 +50,7 @@ my $paths = $guesser->build_file_paths;
 isa_ok( $paths, ref {} );
 is( scalar keys %$paths, 2, "Only one path from build_file_path" );
 
-is( $paths->{ $guesser->makefile_pl }, $guesser->makefile_pl_path, 
+is( $paths->{ $guesser->makefile_pl }, $guesser->makefile_pl_path,
 	'build_files_paths matches makefile_pl_path' );
 }
 
@@ -66,16 +66,16 @@ ok( scalar grep { qr/\b[nd]?make(?:.exe)?\z/ } @keys, 'Uses a make variant' );
 ok( scalar grep { qr/perl/                   } @keys, 'Uses perl' );
 }
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Should be Makefile.PL
-is( $guesser->makefile_pl_path, 
+is( $guesser->makefile_pl_path,
 	File::Spec->catfile( $test_distro_directory, $guesser->makefile_pl ),
 	"makefile_pl_path gets right path to test build file"
 	);
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Should be Build.PL
-is( $guesser->build_pl_path, 
+is( $guesser->build_pl_path,
 	File::Spec->catfile( $test_distro_directory, $guesser->build_pl ),
 	"build_pl_path gets right path to test build file"
 	);
@@ -86,7 +86,7 @@ is( $guesser->preferred_build_file, $guesser->build_pl,
 is( $guesser->preferred_build_command, $guesser->build_command,
 	"the preferred build command is a make variant" );
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # These should return true
 {
 my @pass_methods = qw(
@@ -103,7 +103,7 @@ foreach my $method ( @pass_methods )
 	}
 }
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # These should return false
 {
 my @fail_methods = qw(
@@ -121,4 +121,5 @@ foreach my $method ( @fail_methods )
 	}
 }
 
-1;
+done_testing();
+

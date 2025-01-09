@@ -18,7 +18,7 @@ use Term::Choose::Screen   qw( clear_screen );
 use Term::Choose::Util     qw( get_term_size get_term_width unicode_sprintf insert_sep );
 use Term::Form             qw();
 
-#use App::DBBrowser::Opt::Set;              # required
+use App::DBBrowser::Opt::Set;
 
 
 sub new {
@@ -179,7 +179,6 @@ sub parse_with_template {
             $old_idx = $idx;
         }
         if ( $menu->[$idx] eq $reparse ) {
-            require App::DBBrowser::Opt::Set;
             my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
             $sf->{o} = $opt_set->set_options( 'import' );
             return -1;

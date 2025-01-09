@@ -10,7 +10,7 @@ use Encode                qw( encode decode );
 use File::Spec::Functions qw( catfile );
 
 #use String::Unescape  qw( unescape );             # required
-#use Text::CSV_XS      qw( csv );                  # required
+#use Text::CSV_XS      qw();                       # required
 
 use Term::Choose         qw();
 use Term::Choose::Screen qw( hide_cursor clear_screen );
@@ -18,7 +18,7 @@ use Term::Form::ReadLine qw();
 use Term::TablePrint     qw();
 
 use App::DBBrowser::Auxil;
-#use App::DBBrowser::Opt::Set;                      # required
+use App::DBBrowser::Opt::Set;
 use App::DBBrowser::Table::Substatements;
 #use App::DBBrowser::Table::InsertUpdateDelete;     # required
 
@@ -313,7 +313,6 @@ sub __get_filename_fs {
                 next FILE_NAME;
             }
             elsif ( $choice eq $hidden ) {
-                require App::DBBrowser::Opt::Set;
                 my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
                 $sf->{o} = $opt_set->set_options( 'export' );
                 next FULL_FILE_NAME;

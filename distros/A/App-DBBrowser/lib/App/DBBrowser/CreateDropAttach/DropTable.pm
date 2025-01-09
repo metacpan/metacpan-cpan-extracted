@@ -94,7 +94,7 @@ sub __drop {
         my $all_arrayref = $sth->fetchall_arrayref;
         $row_count = @$all_arrayref;
         unshift @$all_arrayref, $col_names;
-        my $prompt_pt = sprintf "DROP %s %s     (on last look at the %s)\n", uc $type, $sql->{table}, $type;
+        my $prompt_pt = sprintf "The %s to be deleted:", $type;
         my $tp = Term::TablePrint->new( $sf->{o}{table} );
         if ( ! $sf->{o}{G}{warnings_table_print} ) {
             local $SIG{__WARN__} = sub {};

@@ -18,10 +18,10 @@ no_index:
     - t
     - inc
 requires:
-  SMS::Send::Driver::WebService: '0'
+  SMS::Send::Driver::WebService: '0.07'
   Test::Simple: '0.44'
 resources:
   bugtracker: https://github.com/mrdvt92/perl-SMS-Send-Kannel-SMSbox/issues
   homepage: https://github.com/mrdvt92/perl-SMS-Send-Kannel-SMSbox
   repository: https://github.com/mrdvt92/perl-SMS-Send-Kannel-SMSbox.git
-version: '0.07'
+version: '0.08'

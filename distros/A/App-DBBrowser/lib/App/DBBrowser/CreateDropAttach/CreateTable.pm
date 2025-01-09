@@ -17,9 +17,10 @@ use Term::Form           qw();
 use Term::Form::ReadLine qw();
 
 use App::DBBrowser::Auxil;
-#use App::DBBrowser::Table::CommitWriteSQL  # required
 use App::DBBrowser::GetContent;
-#use App::DBBrowser::Subqueries;            # required
+use App::DBBrowser::Opt::Set;
+use App::DBBrowser::Subqueries;
+use App::DBBrowser::Table::CommitWriteSQL;
 
 
 sub new {
@@ -35,7 +36,6 @@ sub new {
 sub create_view {
     my ( $sf ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    require App::DBBrowser::Subqueries;
     my $sq = App::DBBrowser::Subqueries->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $tr = Term::Form::ReadLine->new( $sf->{i}{tr_default} );
@@ -304,7 +304,6 @@ sub __get_column_names {
         }
         my $header_row;
         if ( $menu->[$idx] eq $hidden ) {
-            require App::DBBrowser::Opt::Set;
             my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
             $opt_set->set_options( 'create' );
             next;
@@ -556,7 +555,6 @@ sub __create {
 
 sub __insert_data {
     my ( $sf, $sql ) = @_;
-    require App::DBBrowser::Table::CommitWriteSQL;
     my $cs = App::DBBrowser::Table::CommitWriteSQL->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $commit_ok = $cs->commit_sql( $sql );
     return $commit_ok;

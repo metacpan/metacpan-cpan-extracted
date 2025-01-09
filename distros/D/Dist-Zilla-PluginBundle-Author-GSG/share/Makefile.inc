@@ -11,7 +11,7 @@ SHARE_DIR   ?= $(shell \
     'print eval { dist_dir("Dist-Zilla-PluginBundle-Author-GSG") }' 2>/dev/null )
 
 CPANFILE_SNAPSHOT ?= $(shell \
-  carton exec perl -MFile::Spec -e \
+  carton exec -- perl -MFile::Spec -e \
 	'($$_) = grep { -e } map{ "$$_/../../cpanfile.snapshot" } \
 		grep { m(/lib/perl5$$) } @INC; \
 		print File::Spec->abs2rel($$_) . "\n" if $$_' 2>/dev/null )
@@ -67,7 +67,7 @@ ifneq (,$(wildcard $(DZIL)))
 EXTRA_UPDATES += Makefile.PL
 # Make sure this version is sync'd in t/*
 Makefile.PL: $(MAIN_MODULE) dist.ini $(DZIL) $(wildcard *.xs)
-	V=0.0.1 $(CARTON) exec dzil run sh -c "cp Makefile.PL ${CURDIR}/$@"
+	V=0.0.1 $(CARTON) exec -- dzil run -- sh -c "cp Makefile.PL ${CURDIR}/$@"
 endif
 
 Makefile: Makefile.PL
@@ -76,7 +76,7 @@ Makefile: Makefile.PL
 endif # Makefile.PL exists
 
 test : $(CPANFILE_SNAPSHOT)
-	@nice $(CARTON) exec ${RUN_TESTS}
+	@nice $(CARTON) exec -- ${RUN_TESTS}
 
 # This target requires that you add 'requires "Devel::Cover";'
 # to the cpanfile and then run "carton" to install it.
@@ -97,7 +97,7 @@ realclean: clean distclean
 	rm -rf local
 
 distclean:
-	test ! -e "$(DZIL)" || $(CARTON) exec dzil clean
+	test ! -e "$(DZIL)" || $(CARTON) exec -- dzil clean
 
 forceupdate: touchfiles update
 
@@ -108,10 +108,10 @@ update: README.md LICENSE.txt $(EXTRA_UPDATES)
 	@echo "Everything is up to date, use 'make forceupdate' to override"
 
 README.md: $(MAIN_MODULE) dist.ini $(DZIL)
-	$(CARTON) exec dzil run sh -c "pod2markdown $< > ${CURDIR}/$@"
+	$(CARTON) exec -- dzil run -- sh -c "pod2markdown $< > ${CURDIR}/$@"
 
 LICENSE.txt: dist.ini $(DZIL)
-	$(CARTON) exec dzil run sh -c "install -m 644 LICENSE ${CURDIR}/$@"
+	$(CARTON) exec -- dzil run -- sh -c "install -m 644 LICENSE ${CURDIR}/$@"
 
 .SECONDEXPANSION:
 $(CONTRIB): $(SHARE_DIR)/$$(@F)

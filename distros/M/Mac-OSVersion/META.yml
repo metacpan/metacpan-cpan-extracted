@@ -22,5 +22,5 @@ requires:
 resources:
   homepage: https://github.com/briandfoy/mac-osversion
   repository: https://github.com/briandfoy/mac-osversion
-version: '1.015'
+version: '1.016'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

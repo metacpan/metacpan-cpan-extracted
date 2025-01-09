@@ -56,6 +56,6 @@
          "web" : "https://github.com/briandfoy/pod-perldoc-totoc"
       }
    },
-   "version" : "1.123",
+   "version" : "1.124",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

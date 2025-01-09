@@ -320,6 +320,13 @@ sub col_function {
                     return;
                 }
                 if ( $func eq $concat ) {
+                    if ( $driver eq 'Pg' ) {
+                        for my $chosen_col ( @$chosen_cols ) {
+                            if ( $sql->{data_types}{$chosen_col} != 1 && $sql->{data_types}{$chosen_col} != 12 ) {
+                                $chosen_col .= "::text";
+                            }
+                        }
+                    }
                     $function_stmt = $sf->__func_Concat( $sql, $clause, $info, $func, $chosen_cols );
                 }
                 elsif ( $func eq $coalesce ) {
@@ -335,6 +342,12 @@ sub col_function {
                     }
                     pop @{$r_data->{nested_func}};
                     return;
+                }
+                if ( $driver eq 'Pg' && $type eq 'string' ) {
+                    if ( $sql->{data_types}{$chosen_col} != 1 && $sql->{data_types}{$chosen_col} != 12 ) {
+                        # 1 -> CHAR, 12 -> VARCHAR
+                        $chosen_col .= "::text";
+                    }
                 }
                 if ( $func =~ /^EPOCH_TO_/ ) {
                     my $dt = App::DBBrowser::Table::Extensions::ScalarFunctions::EpochToDate->new( $sf->{i}, $sf->{o}, $sf->{d} );
@@ -531,8 +544,8 @@ sub __func_Concat {
     my $history = [ '-', ' ', '_', ',', '/', '=', '+' ];
     # Readline
     my $sep = $ext->argument( $sql, $clause, { info => $info, history => $history, prompt => 'Separator: ' } );
-    if ( ! defined $sep ) {
-        return;
+    if ( ! length $sep || $sep eq "''" ) {
+        $sep = undef;
     }
     my $function_stmt = $fsql->concatenate( $chosen_cols, $sep );
     return $function_stmt;

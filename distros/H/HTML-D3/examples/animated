@@ -1,0 +1,40 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use lib 'lib';
+use HTML::D3;
+
+my $chart = HTML::D3->new(
+	width  => 800,
+	height => 600,
+	title  => 'Monthly Revenue Trends by Product (With Animated Tooltips)',
+);
+
+my $data = [
+	{
+		name => 'Product A',
+		data => [
+			{ label => 'January', value => 1000 },
+			{ label => 'February', value => 1200 },
+			{ label => 'March', value => 950 },
+		],
+	}, {
+		name => 'Product B',
+		data => [
+			{ label => 'January', value => 800 },
+			{ label => 'February', value => 1150 },
+			{ label => 'March', value => 1000 },
+		],
+	}
+];
+
+my $html_output = $chart->render_multi_series_line_chart_with_animated_tooltips($data);
+
+# Save the output as an HTML file
+open my $fh, '>', 'chart.html' or die $!;
+print $fh $html_output;
+close $fh;
+
+print "Interactive chart with animated tooltips saved as 'chart.html'. Open it in a browser.\n";

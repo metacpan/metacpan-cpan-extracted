@@ -9,8 +9,8 @@ use Term::Choose       qw();
 use Term::Choose::Util qw();
 
 use App::DBBrowser::Auxil;
+use App::DBBrowser::GetContent;
 use App::DBBrowser::Table::CommitWriteSQL;
-#use App::DBBrowser::GetContent; # required
 use App::DBBrowser::Table::Substatements;
 
 
@@ -117,13 +117,13 @@ sub table_write_access {
             }
             elsif ( $custom eq $cu{'commit'} ) {
                 if ( $stmt_type =~/^(Delete|Update)\z/i && ! length $sql->{where_stmt} ) {
-                    my ( $no, $yes ) = ( 'No', 'Yes' );
+                    my ( $no, $yes ) = ( '- NO', '- YES' );
                     my $prompt = uc( $stmt_type ) . ' without WHERE clause?';
                     my $menu = [ undef, $no, $yes ];
                     # Choose
                     my $choice = $tc->choose(
                         $menu,
-                        { %{$sf->{i}{lyt_h}}, info => $info, prompt => $prompt }
+                        { %{$sf->{i}{lyt_v}}, info => $info, prompt => $prompt, undef => '  <=' }
                     );
                     if ( ! defined $choice ) {
                         next STMT_TYPE;
@@ -146,7 +146,6 @@ sub table_write_access {
 
 sub __build_insert_stmt {
     my ( $sf, $sql ) = @_;
-    require App::DBBrowser::GetContent;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $gc = App::DBBrowser::GetContent->new( $sf->{i}, $sf->{o}, $sf->{d} );
     $ax->reset_sql( $sql );

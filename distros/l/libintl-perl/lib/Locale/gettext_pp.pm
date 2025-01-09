@@ -753,6 +753,8 @@ sub __locale_category
     my ($category, $category_name) = @_;
     
     local $@;
+    # See https://github.com/gflohr/libintl-perl/issues/14!
+    no warnings 'locale';
     my $value = eval {POSIX::setlocale ($category)};
     
     # We support only XPG syntax, i. e.

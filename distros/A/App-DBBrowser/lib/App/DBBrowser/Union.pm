@@ -1,5 +1,5 @@
 package # hide from PAUSE
-App::DBBrowser::Union; # required in App::DBBrowser.pm
+App::DBBrowser::Union;
 
 use warnings;
 use strict;
@@ -13,6 +13,7 @@ use App::DBBrowser::Auxil;
 use App::DBBrowser::Subqueries;
 use App::DBBrowser::Table::Extensions;
 use App::DBBrowser::Table::Substatements;
+
 
 sub new {
     my ( $class, $info, $options, $d ) = @_;
@@ -49,25 +50,14 @@ sub union_tables {
         my $cte_table     = '  Cte';
         my $where         = '  Where';
         my $parentheses   = '  Parentheses';
-        my @pre  = ( undef, $enough_tables );
+        my @pre = ( undef, $enough_tables );
         my @post;
         push @post, $derived_table if $sf->{o}{enable}{u_derived};
         push @post, $cte_table     if $sf->{o}{enable}{u_cte};
         push @post, $where         if $sf->{o}{enable}{u_where};
         push @post, $parentheses   if $sf->{o}{enable}{u_parentheses} && $sf->{i}{driver} !~ /^(?:SQLite|Firebird)\z/;
-        my $used = ' (used)';
-        my @tmp_tables;
-        for my $table ( @$tables ) {
-            if ( any { $_ eq $table } @$used_tables ) {
-                push @tmp_tables, '- ' . $table . $used;
-            }
-            else {
-                push @tmp_tables, '- ' . $table;
-            }
-        }
-
         my $prompt = 'Choose a table:';
-        my $menu  = [ @pre, @tmp_tables, @post ];
+        my $menu  = [ @pre, map( '- ' . $_, @$tables ), @post ];
         $sql->{subselect_stmts} = $sf->__get_sub_select_stmts( $data );
         my $info = $ax->get_sql_info( $sql );
         # Choose
@@ -132,7 +122,6 @@ sub union_tables {
         }
         else {
             $table =~ s/^-\s//;
-            $table =~ s/\Q$used\E\z//;
             $qt_table = $ax->quote_table( $sf->{d}{tables_info}{$table} );
         }
         my $operator;

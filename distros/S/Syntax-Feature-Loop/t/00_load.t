@@ -1,11 +1,19 @@
+#!perl
+
 use strict;
 use warnings;
 
 use Test::More tests => 1;
 
-BEGIN { require_ok( 'Syntax::Feature::Loop' ); }
+BEGIN {
+   require_ok( 'Syntax::Feature::Loop' );
+}
 
 diag( "Testing Syntax::Feature::Loop $Syntax::Feature::Loop::VERSION" );
 diag( "Using Perl $]" );
 
-1;
+for ( sort grep /\.pm\z/, keys %INC ) {
+   s{\.pm\z}{};
+   s{/}{::}g;
+   eval { diag( join( ' ', $_, $_->VERSION || '<unknown>' ) ) };
+}

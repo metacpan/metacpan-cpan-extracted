@@ -15,7 +15,7 @@ use Term::Choose qw();
 use App::DBBrowser::GetContent::Filter;
 use App::DBBrowser::GetContent::Parse;
 use App::DBBrowser::GetContent::Source;
-#use App::DBBrowser::Opt::Set               # required
+use App::DBBrowser::Opt::Set;
 
 use open ':encoding(locale)';
 
@@ -180,7 +180,6 @@ sub get_content {
                         $source->{old_idx_file} = $idx;
                     }
                     if ( $menu->[$idx]  eq $hidden ) {
-                        require App::DBBrowser::Opt::Set;
                         my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
                         $opt_set->set_options( 'import' );
                         next FILE;
@@ -280,7 +279,6 @@ sub get_content {
                             next FILE;
                         }
                         elsif ( $ok == -1 ) { # -1 -> REPARSE
-                            require App::DBBrowser::Opt::Set;
                             my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
                             $opt_set->set_options( 'import' );
                             next PARSE;

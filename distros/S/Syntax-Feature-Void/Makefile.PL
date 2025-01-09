@@ -27,12 +27,15 @@ WriteMakefile(
          },
          runtime => {
             requires => {
-			   'perl'                => 5.014000,
+               'perl'                => 5.014000,
                'strict'              => 0,
                'syntax'              => 0.004,
                'version'             => 0,
                'warnings'            => 0,
                'XSLoader'            => 0,
+            },
+            recommends => {
+               'perl'                => 5.028000,
             },
          },
          test => {

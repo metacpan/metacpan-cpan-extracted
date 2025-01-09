@@ -3,24 +3,13 @@
 #include "perl.h"
 #include "XSUB.h"
 #include "ppport.h"
+#include "wrap_keyword_plugin.inc.c"
 
 
 STATIC SV *hint_key_sv;
 
 
 #define is_syntax_enabled() SvTRUE( cop_hints_fetch_sv( PL_curcop, hint_key_sv, 0, 0 ) )
-
-
-// Only available since 5.28.
-#ifndef wrap_keyword_plugin
-STATIC void wrap_keyword_plugin( pTHX_ Perl_keyword_plugin_t new_plugin, Perl_keyword_plugin_t *old_plugin_p ) {
-#define wrap_keyword_plugin( a, b ) wrap_keyword_plugin( aTHX_ a, b )
-   if ( !*old_plugin_p ) {
-      *old_plugin_p = PL_keyword_plugin;
-      PL_keyword_plugin = new_plugin;
-   }
-}
-#endif
 
 
 STATIC OP *parse_void( pTHX ) {

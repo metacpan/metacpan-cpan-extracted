@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More 'no_plan';
+use Test::More;
 use File::Basename;
 use File::Spec;
 use Cwd;
@@ -118,5 +118,6 @@ my $guesser = $class->new(
 ok( ! $guesser->uses_module_build, "Does not use Module::Build" );
 ok( ! $guesser->uses_makemaker,    "Does not use Makemaker" );
 ok( ! $guesser->preferred_build_command, "Preferred command is false with no build file" );
-
 }
+
+done_testing();

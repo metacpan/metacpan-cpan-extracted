@@ -42,6 +42,10 @@ sub case {
     $tmp_sql->{case_info} = $r_data->{case_info};
     my $in = ' ' x $sf->{o}{G}{base_indent};
     my $count = @{$r_data->{case}};
+    if ( delete $tmp_sql->{when_stmt} ) {
+        # CASE in WHEN
+        $count++ ;
+    }
     my $pad1;
     my $pad2;
     if ( ! $count ) {
@@ -105,8 +109,8 @@ sub case {
             return $case_stmt;
         }
         elsif ( $menu->[$idx] eq $when ) {
-            my $substmt_type = "${pad2}WHEN";
-            my $ret = $sb->add_condition( $tmp_sql, $clause, $substmt_type, $qt_cols ); ##
+            my $clause_when = $clause . '_' . "${pad2}WHEN";
+            my $ret = $sb->add_condition( $tmp_sql, $clause_when, $qt_cols );
             if ( ! defined $ret ) {
                 delete $tmp_sql->{when_stmt};
                 $tmp_sql->{case_stmt} = pop @bu;

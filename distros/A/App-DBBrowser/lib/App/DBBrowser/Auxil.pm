@@ -175,9 +175,14 @@ sub get_stmt {
         if ( @join_data ) {
             my $master_data = shift @join_data;
             push @tmp, $sf->__stmt_fold( $used_for, $select_from . $master_data->{table}, $indent0 );
-            for my $slave_data ( @join_data ) {
-                my $sub_stmt = join ' ', grep { length } @{$slave_data}{ qw(join_type table condition) };
-                push @tmp, $sf->__stmt_fold( $used_for, $sub_stmt, $indent1 );
+            if ( @join_data ) {
+                my $last_table = pop @join_data;
+                for my $slave_data ( @join_data ) {
+                    my $sub_stmt = join ' ', grep { length } @{$slave_data}{ qw(join_type table condition) };
+                    push @tmp, $sf->__stmt_fold( $used_for, $sub_stmt, $indent1 );
+                }
+                my $sub_stmt = join ' ', grep { length } @{$last_table}{ qw(join_type table condition) }, $sql->{on_stmt};
+                push @tmp, $sf->__stmt_fold( $used_for, $sub_stmt, $indent1 );     # either condition or on_stmt
             }
         }
         else {
@@ -204,9 +209,11 @@ sub get_stmt {
         }
         push @tmp, $sf->__stmt_fold( $used_for, ")", $indent0 );
     }
-    my $print_stmt = join( "\n", @tmp );
-    $print_stmt .= "\n" if $used_for eq 'print'; ##
-    return $print_stmt;
+    my $stmt = join( "\n", @tmp );
+    if ( $used_for eq 'print' ) {
+        $stmt .= "\n" ;
+    }
+    return $stmt;
 }
 
 
@@ -453,6 +460,7 @@ sub __qualify_identifier {
     return $quoted_id;
 }
 
+
 sub __quote_identifier {
     my ( $sf, $type, @id ) = @_;
     if ( $sf->{o}{G}{'quote_' . $type} ) {
@@ -656,26 +664,6 @@ sub read_json {
     ) {
         die "In '$file_fs':\n$@";
     }
-
-############################################################## 2.402  03.01.2024
-    if ( $file_fs eq ( $sf->{i}{f_search_and_replace} // '' ) ) {
-        my @keys = keys %$ref;
-        if ( ref( $ref->{$keys[0]}[0] ) eq 'ARRAY' ) {
-            my $tmp;
-            for my $key ( @keys ) {
-                my $gr = [];
-                for my $sr ( @{$ref->{$key}} ) {
-                    $sr = { pattern => $sr->[0], replacement => $sr->[1], modifiers => $sr->[2] };
-                    push @$gr, $sr;
-                }
-                $tmp->{$key} = $gr;
-            }
-            $sf->write_json( $sf->{i}{f_search_and_replace}, $tmp );
-            return $tmp;
-        }
-    }
-##############################################################
-
     return $ref;
 }
 
