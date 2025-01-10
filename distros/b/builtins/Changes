@@ -38,3 +38,8 @@ Revision history for builtins
 0.000007  Thu Aug 29 21:05:29 2024
 
     * Fixed issues with Perl 5.40
+
+
+0.000008  Fri Jan 10 16:54:56 2025
+
+    * Fixed pointless shadow warnings under Perl 5.40

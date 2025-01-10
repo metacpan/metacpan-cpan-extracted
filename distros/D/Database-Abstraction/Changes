@@ -1,5 +1,9 @@
 Revision history for Database-Abstraction
 
+0.15	Thu Jan  9 19:43:43 EST 2025
+	Improved handling of empty values in slurp mode
+	AUTOLOAD: error on invalid column name in slurp mode
+
 0.14	Fri Jan  3 11:17:11 EST 2025
 	Added the dbname argument
 

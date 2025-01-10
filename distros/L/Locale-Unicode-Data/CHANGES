@@ -1,5 +1,8 @@
 Revision history for Perl module Locale::Unicode::Data
 
+v1.3.2 2025-01-05T11:58:23+0900
+    - Removed the INIT block not working well under modperl
+
 v1.3.1 2025-01-04T08:15:48+0900
     - Removing allow_tags from JSON instantiation and some debugging tool in unit tests. Gitlab issue #2 and #3 reported by Slaven Rezić
 

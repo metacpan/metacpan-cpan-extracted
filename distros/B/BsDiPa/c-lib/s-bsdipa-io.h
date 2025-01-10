@@ -77,7 +77,8 @@ extern "C" {
  * If try_oneshot is set and it matters to the I/O layer then it shall try to invoke hook only once;
  * if try_oneshot is given negative, and if the layer succeeds to comply, then is_last will also be
  * negative and the ownership of dat is transferred to the hook by definition -- and only then:
- * in fact the absolute value of is_last is the buffer size, of which len bytes are useful. */
+ * in fact the absolute value of is_last is the buffer size, of which len bytes are useful.
+ * Note that *only* in this case the buffer size is at least one greater than len! */
 typedef enum s_bsdipa_state (*s_bsdipa_io_write_ptf)(void *cookie, uint8_t const *dat, s_bsdipa_off_t len,
 		s_bsdipa_off_t is_last);
 /*s_BSDIPA_IO_LINKAGE enum s_bsdipa_state s_bsdipa_io_write_*(struct s_bsdipa_diff_ctx const *dcp,
@@ -232,17 +233,24 @@ s_bsdipa_io_write_zlib(struct s_bsdipa_diff_ctx const *dcp, s_bsdipa_io_write_pt
 	diflen = dcp->dc_diff_len;
 	extlen = dcp->dc_extra_len;
 
-	olen = (size_t)(sizeof(dcp->dc_header) + dcp->dc_ctrl_len + diflen + extlen); /* Cast guaranteed! */
+	/* All lengths fit in s_BSDIPA_OFF_MAX, which is signed: addition and cast ok */
+	olen = (size_t)(sizeof(dcp->dc_header) + dcp->dc_ctrl_len + diflen + extlen);
 	if(try_oneshot){
 		uLong ulo;
 
 		ulo = (uLong)olen; /* XXX check overflow? s_bsdipa_off_t>uLong case? */
 		ulo = deflateBound(zsp, ulo);
-		if(ulo >= s_BSDIPA_OFF_MAX /* implied || ulo != (uInt)ulo*/){
+		if(ulo >= s_BSDIPA_OFF_MAX){
 			try_oneshot = 0;
 			goto jolenmax;
 		}
-		olen = (size_t)++ulo; /* Note: length+1! */
+		/* Add "one additional byte" already here in case buffer takeover succeeds */
+		++ulo;
+		if(ulo != (uInt)ulo){
+			try_oneshot = 0;
+			goto jolenmax;
+		}
+		olen = (size_t)ulo;
 	}else if(olen <= 1000 * 150)
 		olen = 4096 * 4;
 	else if(olen <= 1000 * 1000)

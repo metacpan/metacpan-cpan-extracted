@@ -10,15 +10,15 @@ my %mocked;
 
 =head1 NAME
 
-Test::Mockingbird - Advanced mocking library for Perl with support for dependency injection and spies.
+Test::Mockingbird - Advanced mocking library for Perl with support for dependency injection and spies
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 

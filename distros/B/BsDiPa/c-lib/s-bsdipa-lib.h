@@ -148,7 +148,7 @@ typedef int64_t s_bsdipa_off_t;
 
 enum s_bsdipa_state{
 	s_BSDIPA_OK, /* Result is usable. */
-	s_BSDIPA_FBIG, /* Data length too large. */
+	s_BSDIPA_FBIG, /* Data or resulting control block length too large. */
 	s_BSDIPA_NOMEM, /* Allocation failure. */
 	s_BSDIPA_INVAL /* Any other error. */
 };
@@ -167,7 +167,7 @@ struct s_bsdipa_memory_ctx{
 	void (*mc_custom_free)(void *, void *);
 };
 
-/* [Informational:] Header. */
+/* [Informational:] Header.  It is guaranteed that .h_ctrl_len+.h_diff_len+.h_extra_len < s_BSDIPA_OFF_MAX! */
 struct s_bsdipa_header{
 	s_bsdipa_off_t h_ctrl_len; /* Length of control block. */
 	s_bsdipa_off_t h_diff_len; /* Length of difference data block. */
@@ -230,8 +230,8 @@ struct s_bsdipa_patch_ctx{
 	 * For the former case s_bsdipa_patch_parse_header() can be used to create .pc_header,
 	 * and .pc_patch_dat and .pc_patch_len are to be set thereafter.
 	 * In and for the latter case .pc_patch_dat must be NULL, .pc_header must have been filled in,
-	 * and all of .pc_ctrl_dat, .pc_diff_dat and .pc_extra_dat must be set;
-	 * *no* verification of header lengths is done in that mode.
+	 * and all of .pc_ctrl_dat, .pc_diff_dat and .pc_extra_dat must be set (to valid values:
+	 * *no* verification of header lengths is done in that mode).
 	 * NOTE: .pc_ctrl_dat, .pc_diff_dat, .pc_extra_dat and .pc_header are modified! */
 	uint8_t const *pc_patch_dat;
 	uint64_t pc_patch_len;
@@ -239,7 +239,8 @@ struct s_bsdipa_patch_ctx{
 	uint8_t const *pc_diff_dat;
 	uint8_t const *pc_extra_dat;
 	struct s_bsdipa_header pc_header; /* Deserialized header. */
-	/* Allocated result data (freed by s_bsdipa_patch_free()). */
+	/* Allocated result data (freed by s_bsdipa_patch_free()).
+	 * (The buffer is guaranteed to have room for one additional byte.) */
 	uint8_t *pc_restored_dat;
 	s_bsdipa_off_t pc_restored_len; /* (Actually a copy of pc_header.h_before_len.) */
 };

@@ -23,7 +23,7 @@ my %WriteMakefileArgs = (
     "DBIx::Class::IntrospectableM2M" => 0,
     "Data::Dumper::Concise" => "2.02",
     "DateTime" => 0,
-    "List::MoreUtils" => "0.22",
+    "List::Util" => "1.35",
     "SQL::Translator" => "0.11016",
     "Try::Tiny" => "0.3"
   },
@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
     "Test::Trap" => "0.2.2",
     "Test::Warn" => "0.2"
   },
-  "VERSION" => "0.44",
+  "VERSION" => "0.45",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,7 +48,7 @@ my %FallbackPrereqs = (
   "DBIx::Class::IntrospectableM2M" => 0,
   "Data::Dumper::Concise" => "2.02",
   "DateTime" => 0,
-  "List::MoreUtils" => "0.22",
+  "List::Util" => "1.35",
   "SQL::Translator" => "0.11016",
   "Test::DBIC::ExpectedQueries" => "2.001",
   "Test::Exception" => "0.43",

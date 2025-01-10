@@ -3,6 +3,7 @@ lib/Mojo/Server/DaemonControl.pm
 lib/Mojo/Server/DaemonControl/Worker.pm
 Makefile.PL
 MANIFEST			This list of files
+Mojo-Server-DaemonControl-0.06.tar.gz
 script/mojodctl
 t/00-project.t
 t/basics.t

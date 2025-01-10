@@ -1,5 +1,5 @@
-# Copyright (c) 2024 Löwenfelsen UG (haftungsbeschränkt)
-# Copyright (c) 2024 Philipp Schafft
+# Copyright (c) 2024-2025 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2024-2025 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -23,7 +23,7 @@ use constant TLv1_ISE   => 'afdb46f2-e13f-4419-80d7-c4b956ed85fa'; # tagpool-tag
 use constant F_M_L_ISE  => 'f06c2226-b33e-48f2-9085-cd906a3dcee0'; # tagpool-source-format-modern-limited
 use constant F_M_F_ISE  => '1c71f5b1-216d-4a9b-81a1-54dc22d8a067'; # tagpool-source-format-modern-full
 
-our $VERSION = v0.03;
+our $VERSION = v0.04;
 
 
 
@@ -340,7 +340,7 @@ sub write_tag_metadata {
     } elsif (scalar(@args) == 3) {
         ($tag, $relation, $data_raw) = @args;
     } elsif (scalar(@args) == 5) {
-        ($tag, $relation, $type, $encoding, $data_raw) = @_;
+        ($tag, $relation, $type, $encoding, $data_raw) = @args;
     } elsif ((scalar(@args) % 2) == 0) {
         %opts       = @args;
 
@@ -372,6 +372,23 @@ sub write_tag_metadata {
     $self->write_with_comment('tag-metadata', $tag, $relation, $context, $type, $encoding, $data_raw, $comment);
 }
 
+
+sub write_tag_generator_hint {
+    my ($self, $tag, $generator, $hint) = @_;
+    if (
+        defined($self->{features}{F_M_L_ISE()}) ||  # tagpool-source-format-modern-limited
+        defined($self->{features}{F_M_F_ISE()})     # tagpool-source-format-modern-full
+    ) {
+        state $generator_request = Data::Identifier->new(uuid => 'ab573786-73bc-4f5c-9b03-24ef8a70ae45');
+        state $generated_by      = Data::Identifier->new(uuid => '8efbc13b-47e5-4d92-a960-bd9a2efa9ccb');
+
+        $self->write_tag_metadata($tag, $generator_request, $hint);
+        $self->write_tag_relation($tag, $generated_by, Data::Identifier->new(from => $generator));
+    } else {
+        $self->write('tag-generator-hint', $tag, $generator, $hint);
+    }
+}
+
 1;
 
 __END__
@@ -386,7 +403,7 @@ File::ValueFile::Simple::Writer - module for reading and writing ValueFile files
 
 =head1 VERSION
 
-version v0.03
+version v0.04
 
 =head1 SYNOPSIS
 
@@ -435,9 +452,9 @@ This is the default.
 
 =head2 format
 
-    my Data::Identifier $format = $reader->format;
+    my Data::Identifier $format = $writer->format;
     # or:
-    my Data::Identifier $format = $reader->format(default => $def);
+    my Data::Identifier $format = $writer->format(default => $def);
 
 Returns the format of the file. This requires the format to be given via L</new>.
 If no format is set the default is returned.
@@ -445,7 +462,7 @@ If no default is given this method dies.
 
 =head2 features
 
-    my @features = $reader->features;
+    my @features = $writer->features;
 
 Returns the list of features of the file. This requires the features to be given via L</new>.
 
@@ -571,13 +588,23 @@ C<$link> must be any object that implements the methods C<tag>, C<relation>, C<c
 Each method must return the corresponding value in a format as defined above.
 Each method must also tolerable the options C<default>, C<no_defaults>, and C<as> to be passed (with any value).
 
+=head2 write_tag_generator_hint
+
+    $writer->write_tag_generator_hint($tag, $generator, $hint);
+
+Write a generator hint for the given C<$generator> and C<$hint> values.
+C<$tag> and C<$generator> may be an ISE or an instances of L<Data::Identifier>.
+C<$hint> is the raw hint.
+
+This method automatically selects the best command to write depending on the format and features.
+
 =head1 AUTHOR
 
 Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2024-2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
 
 This is free software, licensed under:
 

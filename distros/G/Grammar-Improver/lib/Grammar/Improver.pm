@@ -12,11 +12,11 @@ Grammar::Improver - A Perl module for improving grammar using LanguageTool API.
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 
@@ -24,6 +24,7 @@ our $VERSION = '0.01';
 
   my $improver = Grammar::Improver->new(
 	  api_url => 'https://api.languagetool.org/v2/check',
+	  api_key => $ENV{'LANGUAGETOOL_KEY'},
   );
 
   my $text = 'This are a sample text with mistake.';
@@ -78,7 +79,7 @@ sub improve_grammar {
 
 	# Create the request payload
 	my $payload = {
-		text	 => $text,
+		text => $text,
 		language => 'en-US',
 	};
 
@@ -95,27 +96,27 @@ sub improve_grammar {
 	);
 
 	# Check for errors
-	if ($response->is_success) {
-		my $response_content = $response->decoded_content;
-		my $response_data = decode_json($response_content);
-
-		# ::diag(Data::Dumper->new([$response_data])->Dump());
-
-		# Apply corrections
-		foreach my $match (reverse @{ $response_data->{matches} }) {
-			my $offset = $match->{offset};
-			my $length = $match->{length};
-			my $replacement = $match->{replacements}[0]{value} || '';
-
-			# print "offset = $offset, length = $length, replacement = $replacement\n";
-
-			# Apply replacement to text
-			substr($text, $offset, $length, $replacement);
-		}
-		return $text;
-	} else {
+	if(!$response->is_success()) {
 		Carp::croak('Error: ', $response->status_line());
 	}
+
+	my $response_content = $response->decoded_content;
+	my $response_data = decode_json($response_content);
+
+	# ::diag(Data::Dumper->new([$response_data])->Dump());
+
+	# Apply corrections
+	foreach my $match (reverse @{ $response_data->{matches} }) {
+		my $offset = $match->{offset};
+		my $length = $match->{length};
+		my $replacement = $match->{replacements}[0]{value} || '';
+
+		# print "offset = $offset, length = $length, replacement = $replacement\n";
+
+		# Apply replacement to text
+		substr($text, $offset, $length, $replacement);
+	}
+	return $text;
 }
 
 =head1 AUTHOR

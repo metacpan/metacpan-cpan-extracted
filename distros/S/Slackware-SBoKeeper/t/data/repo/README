@@ -1,0 +1,10 @@
+# 1:
+This directory exists for testing Slackware::SBoKeeper::Database.
+
+# mpv:
+This directory contains the info files of all SlackBuilds needed to build mpv.
+I use this to test the sbokeeper script itself. I thought mpv would be a good
+fit because it has a decently complex package tree that would be suitable to
+test the various sbokeeper commands. Each SlackBuild directory only contains
+the .info file and a .SlackBuild with everything but the original license
+removed.

@@ -12,7 +12,7 @@ my %WriteMakefileArgs = (
   NAME          => 'Mojo::Server::DaemonControl',
   ABSTRACT_FROM => 'lib/Mojo/Server/DaemonControl.pm',
   VERSION_FROM  => 'lib/Mojo/Server/DaemonControl.pm',
-  EXE_FILES     => [],
+  EXE_FILES     => [qw(script/mojodctl)],
   TEST_REQUIRES => {'Test2::V0'   => '0.000145'},
   PREREQ_PM     => {'Mojolicious' => '9.00'},
   META_MERGE    => {

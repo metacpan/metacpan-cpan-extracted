@@ -1,34 +1,39 @@
-use v5.36;
+# TEST THAT LINE NUMBERS ARE PRESERVED AFTER PREPROCESSING
 
+use v5.36;
 use strict;
 use warnings;
-use Test::More;
 
+
+use Test2::V0;
+
+plan tests => 5;
+
+no feature 'switch';
 use Switch::Back;
 
-plan tests => 1;
+@ARGV = 'get';
 
-my $x;
-given ($x) {
-    when (1) {
-        # nothing
-        # nothing
-        # nothing
-        # nothing
+given ( my $par = shift ) {
+    is __LINE__, 18;
+    when ('url') {
+        say 'parameter passed is "url"';
+        fail 'Incorrect branch (url) chosen';
+    }
+    is __LINE__, 23;
+    when ('get') {
+        is __LINE__, 25;
+        say 'parameter passed is "get"';
+        pass 'Correct branch (get) chosen';
     }
 
-    when (
-        2
-    ) { }
-
-    1
-    when
-    3;
+    is __LINE__, 30;
+    default {
+        fail 'Incorrect branch (default) chosen';
+    }
+    is __LINE__, 34;
 }
 
-
-is __LINE__(), 30 => 'Correct line number after keyword interpolation';
+is __LINE__, 37;
 
 done_testing();
-
-

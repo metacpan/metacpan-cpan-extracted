@@ -1,5 +1,5 @@
 package Slackware::SBoKeeper::System;
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 use 5.016;
 use strict;
 use warnings;
@@ -84,7 +84,7 @@ sub installed {
 	my $self = shift;
 	my $pkg  = shift;
 
-	return defined $PACKAGES{$pkg} ? 1 : 0;
+	return defined $PACKAGES{$pkg};
 
 }
 

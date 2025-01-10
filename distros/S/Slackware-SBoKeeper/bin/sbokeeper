@@ -115,8 +115,9 @@ installed on your system. If you are using one the following:
 
 =back
 
-then B<sbokeeper> will use the first one found's default repo location. If
-none can be found, B<sbokeeper> is going to croak and just tell you to set it
+then B<sbokeeper> will use the default repo location of the first package
+manager it finds installed on your system.
+If none can be found, B<sbokeeper> will croak and just tell you to set it
 manually.
 
 =item B<Tag>
@@ -270,6 +271,16 @@ package.
 Packages that are not present in the database but are needed by packages in the
 database.
 
+=item untracked
+
+SlackBuild packages that are installed on your system but not present in your
+database.
+
+=item phony
+
+Packages that are present in your database that are not actually installed on
+your system.
+
 =back
 
 If no I<cat> is specified, defaults to 'all'.
@@ -334,6 +345,10 @@ The following are valid aliases:
 =item @unnecessary
 
 =item @missing
+
+=item @untracked
+
+=item @phony
 
 =back
 

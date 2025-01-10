@@ -3,15 +3,20 @@ lib/Test/Mockingbird.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
 README.md
 t/00-load.t
-t/add.t
+t/class.t
 t/comment-spelling.t
 t/cover.t
 t/eof.t
 t/eol.t
+t/fixme.t
+t/gv.t
 t/inject.t
+t/manifest.t
 t/mock.t
+t/object.t
 t/spy.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

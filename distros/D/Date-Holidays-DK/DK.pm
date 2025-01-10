@@ -7,7 +7,7 @@ use Date::Easter;
 use utf8;
 
 use vars qw($VERSION @EXPORT);
-$VERSION = '0.04';
+$VERSION = '0.05';
 @EXPORT = qw(is_dk_holiday dk_holidays);
 
 # Fixed-date holidays
@@ -65,6 +65,12 @@ sub dk_holidays {
 
   # get the fixed dates
   my $h = {%$FIX};
+
+  if ($year >= 2024) {
+    $VAR = $VAR_POST2023;
+  } else {
+    $VAR = $VAR_PRE2024;
+  }
 
   my $easter = Date::Simple->new($year, easter($year));
 
@@ -142,7 +148,7 @@ dk_holidays() concept by Jonas B. Nielsen.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004-2005 Lars Thegler. All rights reserved.
+Copyright (c) 2004-2025 Lars Thegler. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

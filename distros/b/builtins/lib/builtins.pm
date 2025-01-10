@@ -3,11 +3,12 @@ package builtins;
 use 5.036;
 use warnings;
 
-our $VERSION = '0.000007';
+our $VERSION = '0.000008';
 
 sub import {
     no warnings 'shadow';
     warnings->unimport('experimental::builtin');
+    no warnings 'shadow';
     builtin->import( grep { not /^(?:un)?import$/ } keys %builtin:: );
 }
 

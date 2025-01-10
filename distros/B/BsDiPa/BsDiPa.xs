@@ -148,9 +148,11 @@ a_core_diff__write(void *user_cookie, uint8_t const *dat, s_bsdipa_off_t len, s_
 
 	/* Buffer takeover?  Even though likely short living, minimize wastage to XXX something reasonable */
 	if(is_last < 0 && (is_last > -65535 || is_last / 10 > -len)){
+		/* In this case the additional byte is guaranteed! */
 		l = len;
+		cp[(unsigned long)l] = '\0';
 		sv_usepvn_flags(p, (char*)dat, len, SV_SMAGIC | SV_HAS_TRAILING_NUL);
-		/*xxx instead sv_setvpn(p, dat, len);*/
+		/*xxx instead sv_setpvn(p, dat, len);*/
 	}else{
 		l = (s_bsdipa_off_t)SvCUR(p);
 
@@ -221,6 +223,8 @@ a_core_patch(int what, SV *after_sv, SV *patch_sv, SV *before_sv){
 	if(s != s_BSDIPA_OK)
 		goto jdone;
 
+	/* Make use of the guaranteed extra bytes to avoid perl assertions for TRAILING_NUL */
+	p.pc_restored_dat[(size_t)p.pc_restored_len] = '\0';
 	SvPVCLEAR(bref);
 	sv_usepvn_flags(bref, (char*)p.pc_restored_dat, p.pc_restored_len, SV_SMAGIC | SV_HAS_TRAILING_NUL);
 	p.pc_restored_dat = NULL;

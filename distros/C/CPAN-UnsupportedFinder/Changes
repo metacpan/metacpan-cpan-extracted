@@ -1,5 +1,12 @@
 Revision history for CPAN-UnsupportedFinder
 
+0.05	Thu Jan  9 13:40:41 EST 2025
+	Call _fetch_data rather than HTTP::Tiny directly
+	Use Test::Warnings
+	Added code coverage CI
+	Added more data to the output results
+	api.cpantesters.org is currently unavailable
+
 0.04	Mon Jan  6 22:08:23 EST 2025
 	Documented the output_results() method
 	Use JSON::MaybeXS instead of JSON

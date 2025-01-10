@@ -19,19 +19,24 @@ WriteMakefile(
 	((defined($ExtUtils::MakeMaker::VERSION) && ($ExtUtils::MakeMaker::VERSION >= 6.3002))
 		? ('LICENSE'=> 'GPL')
 		: ()),
-	META_MERGE => {
+	META_MERGE => {	# https://perldoc.perl.org/CPAN::Meta::Spec
+		'meta-spec' => { version => 2 },
 		resources => {
 			repository => {
+				repository => 'https://github.com/nigelhorne/Test-Mockingbird',
 				type => 'git',
-				url => 'https://github.com/nigelhorne/Test-Mockingbird.git',
-				web => 'https://github.com/nigelhorne/Test-Mockingbird',
-			},
-			bugtracker => {
-				web => 'https://github.com/nigelhorne/Test-Mockingbird/issues',
-			},
+				url => 'git://github.com/nigelhorne/Test-Mockingbird.git',
+				web => 'https://github.com/nigelhorne/Test-Mockingbird'
+			}, bugtracker => {
+				mailto => 'bug-Test-Mockingbird@rt.cpan.org',
+				url => 'https://github.com/nigelhorne/Test-Mockingbird/issues',
+				# web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Mockingbird',
+				web => 'https://github.com/nigelhorne/Test-Mockingbird/issues'
+			}
 		},
 	},
 	PREREQ_PM => {
+		'Carp' => 0,
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
 	}, TEST_REQUIRES => {
 		'Test::DescribeMe' => 0,

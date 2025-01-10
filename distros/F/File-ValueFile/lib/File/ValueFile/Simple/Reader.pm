@@ -25,7 +25,7 @@ use constant FORMAT_ISE     => '54bf8af4-b1d7-44da-af48-5278d11e8f32';
 use constant ASI_ISE        => 'ddd60c5c-2934-404f-8f2d-fcb4da88b633';
 use constant TAGNAME_ISE    => 'bfae7574-3dae-425d-89b1-9c087c140c23';
 
-our $VERSION = v0.03;
+our $VERSION = v0.04;
 
 
 
@@ -342,7 +342,7 @@ File::ValueFile::Simple::Reader - module for reading and writing ValueFile files
 
 =head1 VERSION
 
-version v0.03
+version v0.04
 
 =head1 SYNOPSIS
 
@@ -467,7 +467,7 @@ Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2024-2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
 
 This is free software, licensed under:
 

@@ -78,7 +78,7 @@ extern "C" {
   even in the case of corrupted input.
 */
 
-typedef voidpf (*alloc_func) OF((voidpf opaque, uInt items, uInt size));
+typedef voidpf (*alloc_func) OF((voidpf opaque, uInt args_width, uInt size));
 typedef void   (*free_func)  OF((voidpf opaque, voidpf address));
 
 struct internal_state;
@@ -1419,20 +1419,20 @@ ZEXTERN int ZEXPORT gzread OF((gzFile file, voidp buf, unsigned len));
    Z_STREAM_ERROR.
 */
 
-ZEXTERN z_size_t ZEXPORT gzfread OF((voidp buf, z_size_t size, z_size_t nitems,
+ZEXTERN z_size_t ZEXPORT gzfread OF((voidp buf, z_size_t size, z_size_t nargs_width,
                                      gzFile file));
 /*
-     Read and decompress up to nitems items of size size from file into buf,
+     Read and decompress up to nargs_width args_width of size size from file into buf,
    otherwise operating as gzread() does.  This duplicates the interface of
    stdio's fread(), with size_t request and return types.  If the library
    defines size_t, then z_size_t is identical to size_t.  If not, then z_size_t
    is an unsigned integer type that can contain a pointer.
 
-     gzfread() returns the number of full items read of size size, or zero if
+     gzfread() returns the number of full args_width read of size size, or zero if
    the end of the file was reached and a full item could not be read, or if
    there was an error.  gzerror() must be consulted if zero is returned in
    order to determine if there was an error.  If the multiplication of size and
-   nitems overflows, i.e. the product does not fit in a z_size_t, then nothing
+   nargs_width overflows, i.e. the product does not fit in a z_size_t, then nothing
    is read, zero is returned, and the error state is set to Z_STREAM_ERROR.
 
      In the event that the end of file is reached and only a partial item is
@@ -1452,15 +1452,15 @@ ZEXTERN int ZEXPORT gzwrite OF((gzFile file, voidpc buf, unsigned len));
 */
 
 ZEXTERN z_size_t ZEXPORT gzfwrite OF((voidpc buf, z_size_t size,
-                                      z_size_t nitems, gzFile file));
+                                      z_size_t nargs_width, gzFile file));
 /*
-     Compress and write nitems items of size size from buf to file, duplicating
+     Compress and write nargs_width args_width of size size from buf to file, duplicating
    the interface of stdio's fwrite(), with size_t request and return types.  If
    the library defines size_t, then z_size_t is identical to size_t.  If not,
    then z_size_t is an unsigned integer type that can contain a pointer.
 
-     gzfwrite() returns the number of full items written of size size, or zero
-   if there was an error.  If the multiplication of size and nitems overflows,
+     gzfwrite() returns the number of full args_width written of size size, or zero
+   if there was an error.  If the multiplication of size and nargs_width overflows,
    i.e. the product does not fit in a z_size_t, then nothing is written, zero
    is returned, and the error state is set to Z_STREAM_ERROR.
 */

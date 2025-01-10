@@ -1,5 +1,8 @@
 Revision history for Perl module Module::Starter::AddModule
 
+1.011 2025-01-10T04:36:08Z
+	* refresh distro and move to BRIANDFOY
+
 1.009 2024-01-31T03:02:33Z
 	* update minimum version to v5.12, since Software::LicenseUtil requires that
 	* refresh distro, update email addresses

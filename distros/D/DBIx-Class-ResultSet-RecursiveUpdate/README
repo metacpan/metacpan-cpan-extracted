@@ -1,9 +1,9 @@
 This archive contains the distribution DBIx-Class-ResultSet-RecursiveUpdate,
-version 0.44:
+version 0.45:
 
   like update_or_create - but recursive
 
-This software is copyright (c) 2024 by Zbigniew Lukasiak, John Napiorkowski, Alexander Hartmaier.
+This software is copyright (c) 2025 by Zbigniew Lukasiak, John Napiorkowski, Alexander Hartmaier.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

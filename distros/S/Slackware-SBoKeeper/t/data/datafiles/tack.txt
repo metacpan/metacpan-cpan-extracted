@@ -1,0 +1,16 @@
+PACKAGE: libplacebo
+DEPS: 
+MANUAL: 1
+%%
+PACKAGE: luajit
+DEPS: 
+MANUAL: 1
+%%
+PACKAGE: mpv
+DEPS: 
+MANUAL: 1
+%%
+PACKAGE: python3-meson-opt
+DEPS: 
+MANUAL: 1
+%%

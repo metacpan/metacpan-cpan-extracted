@@ -1,5 +1,10 @@
 Revision history for XS-Parse-Keyword
 
+0.48    2025-01-09
+        [CHANGES]
+         * Added `XPK_FLAG_PERMIT_LEXICAL`, allowing optional 'my'-prefixed
+           keywords
+
 0.47    2024-11-25
         [BUGFIXES]
          * Don't upset gcc 15, by ensuring that function pointer casts fully

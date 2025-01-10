@@ -10,7 +10,7 @@ App::Greple::xlate - greple을 위한 번역 지원 모듈
 
 # VERSION
 
-Version 0.9902
+Version 0.9904
 
 # DESCRIPTION
 

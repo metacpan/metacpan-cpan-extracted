@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Unicode Locale Identifier - ~/lib/Locale/Unicode/Data.pm
-## Version v1.3.1
-## Copyright(c) 2024 DEGUEST Pte. Ltd.
+## Version v1.3.2
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/06/15
-## Modified 2025/01/04
+## Modified 2025/01/05
 ## All rights reserved
 ## 
 ## 
@@ -39,10 +39,12 @@ BEGIN
     our $CLDR_VERSION = '45.0';
     our $DBH = {};
     our $STHS = {};
-    our $VERSION = 'v1.3.1';
+    our $VERSION = 'v1.3.2';
 };
 
-sub INIT
+use strict;
+use warnings;
+
 {
     my( $vol, $parent, $file ) = File::Spec->splitpath(__FILE__);
     $DB_FILE = File::Spec->catpath( $vol, $parent, 'unicode_cldr.sqlite3' );
@@ -50,10 +52,7 @@ sub INIT
     {
         $DB_FILE = File::Spec->rel2abs( $DB_FILE );
     }
-};
-
-use strict;
-use warnings;
+}
 
 sub new
 {
@@ -1370,6 +1369,69 @@ sub number_systems_l10n { return( shift->_fetch_all({
 sub pass_error
 {
     my $self = shift( @_ );
+    my $pack = ref( $self ) || $self;
+    my $opts = {};
+    my( $err, $class, $code );
+    no strict 'refs';
+    if( scalar( @_ ) )
+    {
+        # Either an hash defining a new error and this will be passed along to error(); or
+        # an hash with a single property: { class => 'Some::ExceptionClass' }
+        if( scalar( @_ ) == 1 && ref( $_[0] ) eq 'HASH' )
+        {
+            $opts = $_[0];
+        }
+        else
+        {
+            if( scalar( @_ ) > 1 && ref( $_[-1] ) eq 'HASH' )
+            {
+                $opts = pop( @_ );
+            }
+            $err = $_[0];
+        }
+    }
+    $err = $opts->{error} if( !defined( $err ) && CORE::exists( $opts->{error} ) && defined( $opts->{error} ) && CORE::length( $opts->{error} ) );
+    # We set $class only if the hash provided is a one-element hash and not an error-defining hash
+    $class = $opts->{class} if( CORE::exists( $opts->{class} ) && defined( $opts->{class} ) && CORE::length( $opts->{class} ) );
+    $code  = $opts->{code} if( CORE::exists( $opts->{code} ) && defined( $opts->{code} ) && CORE::length( $opts->{code} ) );
+    
+    # called with no argument, most likely from the same class to pass on an error 
+    # set up earlier by another method; or
+    # with an hash containing just one argument class => 'Some::ExceptionClass'
+    if( !defined( $err ) && ( !scalar( @_ ) || defined( $class ) ) )
+    {
+        # $error is a previous erro robject
+        my $error = ref( $self ) ? $self->{error} : length( ${ $pack . '::ERROR' } ) ? ${ $pack . '::ERROR' } : undef;
+        if( !defined( $error ) )
+        {
+            warn( "No error object provided and no previous error set either! It seems the previous method call returned a simple undef" );
+        }
+        else
+        {
+            $err = ( defined( $class ) ? bless( $error => $class ) : $error );
+            $err->code( $code ) if( defined( $code ) );
+        }
+    }
+    elsif( defined( $err ) && 
+           Scalar::Util::blessed( $err ) && 
+           ( scalar( @_ ) == 1 || 
+             ( scalar( @_ ) == 2 && defined( $class ) ) 
+           ) )
+    {
+        $self->{error} = ${ $pack . '::ERROR' } = ( defined( $class ) ? bless( $err => $class ) : $err );
+        $self->{error}->code( $code ) if( defined( $code ) && $self->{error}->can( 'code' ) );
+        
+        if( $self->{fatal} || ( defined( ${"${class}\::FATAL_EXCEPTIONS"} ) && ${"${class}\::FATAL_EXCEPTIONS"} ) )
+        {
+            die( $self->{error} );
+        }
+    }
+    # If the error provided is not an object, we call error to create one
+    else
+    {
+        return( $self->error( @_ ) );
+    }
+    
     if( Want::want( 'OBJECT' ) )
     {
         rreturn( Locale::Unicode::Data::NullObject->new );
@@ -1568,7 +1630,8 @@ my $plural_rules =
         zero  => sub
         {
             # Check for very small numbers, including 0 and close to zero
-            abs( $_[0] ) < 0.011  # Slightly larger threshold to catch 0.01 and 0.001
+            # Slightly larger threshold to catch 0.01 and 0.001
+            abs( $_[0] ) < 0.011
             ||
             # Include integers
             (
@@ -1592,7 +1655,8 @@ my $plural_rules =
             # Handle decimals for 'one', excluding numbers very close to zero
             (
                 int( $_[0] ) != $_[0] &&
-                $_[0] > 0.01 &&  # Exclude 0.01 explicitly
+                # Exclude 0.01 explicitly
+                $_[0] > 0.01 &&
                 $_[0] < 1.1
             )
         },
@@ -1643,7 +1707,8 @@ my $plural_rules =
             (
                 int( $_[0] ) != $_[0] &&
                 $_[0] > 0 &&
-                $_[0] < 2  # Include all non-integers between 0 and 2 for 'one'
+                # Include all non-integers between 0 and 2 for 'one'
+                $_[0] < 2
             )
         },
         two   => sub { $_[0] == 2 && int( $_[0] ) == $_[0] },
@@ -4840,7 +4905,7 @@ Or, you could set the global variable C<$FATAL_EXCEPTIONS> instead:
 
 =head1 VERSION
 
-    v1.3.1
+    v1.3.2
 
 =head1 DESCRIPTION
 

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright (c) 2023-2024 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2023-2025 Löwenfelsen UG (haftungsbeschränkt)
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -20,7 +20,7 @@ use Math::BigInt lib => 'GMP';
 use URI;
 use Data::Identifier::Generate;
 
-our $VERSION = v0.07;
+our $VERSION = v0.08;
 
 use constant {
     RE_UUID => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/,
@@ -29,6 +29,7 @@ use constant {
     RE_UINT => qr/^(?:0|[1-9][0-9]*)$/,
     RE_QID  => qr/^[QPL][1-9][0-9]*$/,
     RE_DOI  => qr/^10\.[1-9][0-9]+(?:\.[0-9]+)*\/./,
+    RE_UNICODE => qr/^U\+([0-9A-F]{4,7})$/,
 };
 
 use constant {
@@ -42,11 +43,13 @@ use constant {
     WK_BIC  => 'c8a3a132-f160-473c-b5f3-26a748f37e62', # bic
     WK_DOI  => '931f155e-5a24-499b-9fbb-ed4efefe27fe', # doi
     WK_FC   => 'd576b9d1-47d4-43ae-b7ec-bbea1fe009ba', # factgrid-identifier
+    WK_UNICODE_CP => '5f167223-cc9c-4b2f-9928-9fe1b253b560', # unicode-code-point
 
     NS_WD   => '9e10aca7-4a99-43ac-9368-6cbfa43636df', # Wikidata-namespace
     NS_FC   => '6491f7a9-0b29-4ef1-992c-3681cea18182', # factgrid-namespace
     NS_INT  => '5dd8ddbb-13a8-4d6c-9264-36e6dd6f9c99', # integer-namespace
     NS_DATE => 'fc43fbba-b959-4882-b4c8-90a288b7d416', # gregorian-date-namespace
+    NS_UNICODE_CP => '132aa723-a373-48bf-a88d-69f1e00f00cf', # 'unicode-character-namespace'
 };
 
 # Features:
@@ -76,6 +79,9 @@ my %well_known = (
     iban => __PACKAGE__->new($well_known_uuid => WK_IBAN),
     bic  => __PACKAGE__->new($well_known_uuid => WK_BIC),
     doi  => __PACKAGE__->new($well_known_uuid => WK_DOI,    validate => RE_DOI),
+
+    # Unofficial, not part of public API:
+    unicodecp => __PACKAGE__->new($well_known_uuid => WK_UNICODE_CP, validate => RE_UNICODE, namespace => NS_UNICODE_CP, generate => 'id-based'),
 );
 
 my %registered;
@@ -150,10 +156,12 @@ foreach my $ise (NS_WD, NS_INT, NS_DATE) {
         WK_BIC()                                => 'bic',
         WK_DOI()                                => 'doi',
         WK_FC()                                 => 'factgrid-identifier',
+        WK_UNICODE_CP()                         => 'unicode-code-point',
         NS_WD()                                 => 'Wikidata-namespace',
         NS_FC()                                 => 'factgrid-namespace',
         NS_INT()                                => 'integer-namespace',
         NS_DATE()                               => 'gregorian-date-namespace',
+        NS_UNICODE_CP()                         => 'unicode-character-namespace',
 
         'ddd60c5c-2934-404f-8f2d-fcb4da88b633'  => 'also-shares-identifier',
         'bfae7574-3dae-425d-89b1-9c087c140c23'  => 'tagname',
@@ -182,8 +190,6 @@ foreach my $ise (NS_WD, NS_INT, NS_DATE) {
         '06aff30f-70e8-48b4-8b20-9194d22fc460'  => 'SEEK_END',
         '59a5691a-6a19-4051-bc26-8db82c019df3'  => 'inode',
         '2c7e15ed-aa2f-4e2f-9a1d-64df0c85875a'  => 'chat-0-word-identifier',
-
-        '5f167223-cc9c-4b2f-9928-9fe1b253b560'  => 'unicode-code-point',
     );
 
     foreach my $ise (keys %displaynames) {
@@ -519,6 +525,12 @@ sub as {
         return $opts{extractor}->lookup($self->type->uuid => $self->id);
     } elsif ($as eq 'Data::URIID::Service' && defined($opts{extractor})) {
         return $opts{extractor}->service($self->uuid);
+    } elsif ($as eq 'Data::TagDB::Tag' && defined($opts{db})) {
+        if ($opts{autocreate}) {
+            return $opts{db}->create_tag($self);
+        } else {
+            return $opts{db}->tag_by_id($self);
+        }
     } elsif ($as eq 'Business::ISBN' && $self->type->eq('gtin')) {
         require Business::ISBN;
         my $val = Business::ISBN->new($self->id);
@@ -722,7 +734,7 @@ Data::Identifier - format independent identifier object
 
 =head1 VERSION
 
-version v0.07
+version v0.08
 
 =head1 SYNOPSIS
 
@@ -874,6 +886,14 @@ The name as to be returned by L</displayname>.
 Must be a scalar string value or a code reference that returns a scalar string.
 If it is a code reference the identifier object is passed as C<$_[0]>.
 
+=item C<extractor>
+
+An instance of L<Data::URIID>. This option is currently ignored.
+
+=item C<db>
+
+An instance of L<Data::TagDB>. This option is currently ignored.
+
 =back
 
 =head2 random
@@ -1010,6 +1030,7 @@ L<URI>,
 L<Data::Identifier>,
 L<Data::URIID::Result>,
 L<Data::URIID::Service>,
+L<Data::TagDB::Tag>,
 L<Business::ISBN>.
 Other packages might be supported. Packages need to be installed in order to be supported.
 Also some packages need special options to be passed to be available.
@@ -1029,6 +1050,17 @@ even if C<$as> would not be supported otherwise.
 The following options (all optional) are supported:
 
 =over
+
+=item C<autocreate>
+
+If the requested type refers to some permanent storage and the object does not exist for
+the given identifier whether to create a new object or not.
+
+Defaults to false.
+
+=item C<db>
+
+An instance of L<Data::TagDB>. This is used to create instances of related packages.
 
 =item C<default>
 
@@ -1178,7 +1210,7 @@ Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023-2024 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2023-2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
 
 This is free software, licensed under:
 

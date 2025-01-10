@@ -1,6 +1,6 @@
 package SPVM::Resource::Eigen;
 
-our $VERSION = "0.002";
+our $VERSION = "0.003";
 
 1;
 
@@ -19,6 +19,13 @@ MyClass.config:
   my $config = SPVM::Builder::Config->new_cpp17(file => __FILE__);
   
   $config->use_resource('Resource::Eigen');
+  
+  if ($^O eq 'MSWin32') {
+    $config->add_static_lib('stdc++');
+  }
+  else {
+    $config->add_lib('stdc++');
+  }
   
   $config;
 
@@ -55,6 +62,24 @@ C++
 =head1 Language Specification
 
 C++17
+
+=head1 Required Libraries
+
+Windows:
+
+=over 2
+
+=item * stdc++ (The static link is preffered)
+
+=back
+
+Unix/Linux/Mac:
+
+=over 2
+
+=item * stdc++
+
+=back
 
 =head1 Header Files
 

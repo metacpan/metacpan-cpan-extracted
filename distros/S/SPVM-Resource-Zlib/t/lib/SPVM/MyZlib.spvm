@@ -1,3 +1,6 @@
 class MyZlib {
+  
+  use Resource::Zlib;
+  
   native static method test_gzopen_gzread : void ($file : string);
 }

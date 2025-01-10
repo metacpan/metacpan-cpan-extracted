@@ -1,3 +1,7 @@
+v0.04   2025-01-09Z
+    - Corrected bug in 5 argument write_tag_metadata()
+    - Added write_tag_generator_hint()
+
 v0.03   2024-12-14Z
     - Fixed bug which resulted in comments being written to the wrong handle
     - Improved UTF-8 support, including autodetection of binary/UTF-8 mode

@@ -1,15 +1,13 @@
 use strict;
 use warnings;
+# vim: set ts=8 sts=2 sw=2 tw=100 et :
 
+use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 use Test::More 0.88;
 use Test::Warnings 0.009 ':no_end_test', ':all';
 use utf8;
 use Acme::ಠ_ಠ;
 use JSON::PP;
-
-binmode Test::More->builder->$_, ':encoding(UTF-8)' foreach qw(output failure_output todo_output);
-binmode STDOUT, ':encoding(UTF-8)';
-binmode STDERR, ':encoding(UTF-8)';
 
 my $line; my $file = __FILE__;
 is(

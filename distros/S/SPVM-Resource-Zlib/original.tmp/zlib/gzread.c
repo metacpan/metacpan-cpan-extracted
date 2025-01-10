@@ -406,10 +406,10 @@ int ZEXPORT gzread(file, buf, len)
 }
 
 /* -- see zlib.h -- */
-z_size_t ZEXPORT gzfread(buf, size, nitems, file)
+z_size_t ZEXPORT gzfread(buf, size, nargs_width, file)
     voidp buf;
     z_size_t size;
-    z_size_t nitems;
+    z_size_t nargs_width;
     gzFile file;
 {
     z_size_t len;
@@ -426,13 +426,13 @@ z_size_t ZEXPORT gzfread(buf, size, nitems, file)
         return 0;
 
     /* compute bytes to read -- error on overflow */
-    len = nitems * size;
-    if (size && len / size != nitems) {
+    len = nargs_width * size;
+    if (size && len / size != nargs_width) {
         gz_error(state, Z_STREAM_ERROR, "request does not fit in a size_t");
         return 0;
     }
 
-    /* read len or fewer bytes to buf, return the number of full items read */
+    /* read len or fewer bytes to buf, return the number of full args_width read */
     return len ? gz_read(state, buf, len) / size : 0;
 }
 

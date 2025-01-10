@@ -1,5 +1,8 @@
 Revision history for Perl module CPAN::PackageDetails
 
+0.264 2024-01-14T05:21:38Z
+	* refresh distro, update email addresses
+
 0.263 2021-02-05T07:21:57Z
 	* Fix a problem with indexing. $VERSION needs to be on it's own line
 	* Freshen the distro in various ways.

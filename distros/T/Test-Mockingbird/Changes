@@ -1,4 +1,9 @@
 Revision history for Test::Mockingbird - Advanced mocking library for Perl with support for dependency injection and spies
 
+0.02	Thu Jan  9 08:05:34 EST 2025
+	Updated spy.t to check that the spied routine is called,
+		and spying is stopped after restore
+	More tests
+
 0.01	Wed Jan  8 13:22:13 EST 2025
         First draft

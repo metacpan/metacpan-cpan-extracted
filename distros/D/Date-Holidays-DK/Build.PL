@@ -12,7 +12,7 @@ Module::Build->new(
   meta_merge => {
     resources => {
             homepage   => 'https://metacpan.org/pod/Date::Holidays::DK',
-            bugtracker => 'http://rt.cpan.org/NoAuth/Bugs.html?Dist=Date-Holidays-DK',
+            bugtracker => 'https://github.com/tagg/Date-Holidays-DK/issues',
             repository => 'https://github.com/tagg/Date-Holidays-DK',
     }
   },

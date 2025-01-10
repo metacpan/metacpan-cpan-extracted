@@ -19,7 +19,7 @@ BEGIN {
 
 use Cwd;
 
-$VERSION = '1.009';
+$VERSION = '1.011';
 
 =encoding utf8
 
@@ -131,7 +131,7 @@ brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2010-2024, brian d foy <briandfoy@pobox.com>. All rights reserved.
+Copyright © 2010-2025, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

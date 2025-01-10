@@ -1,3 +1,10 @@
+v0.08  2025-01-09Z
+    - Added more well known tags
+    - Added generator for colours
+    - Added generator for Unicode characters
+    - Allow passing around extractor (Data::URIID) and db (Data::TagDB) objects more freely.
+    - Added more support for Data::TagDB::Tag
+
 v0.07  2024-12-15Z
     - Feature: Added Data::Identifier::Wellknown
     - Added support for RGB colours in Data::Identifier::Generate

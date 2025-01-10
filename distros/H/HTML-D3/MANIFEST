@@ -1,6 +1,7 @@
 Changes
 examples/animated
 examples/bar
+examples/legends
 examples/line
 examples/multiple
 examples/tooltip
@@ -21,6 +22,7 @@ t/eof.t
 t/eol.t
 t/fixme.t
 t/gv.t
+t/legends.t
 t/line.t
 t/manifest.t
 t/metrics.t
@@ -31,6 +33,7 @@ t/noplan.t
 t/pod-cm.t
 t/pod-coverage.t
 t/pod-links.t
+t/pod-synopsis.t
 t/pod.t
 t/tooltip.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

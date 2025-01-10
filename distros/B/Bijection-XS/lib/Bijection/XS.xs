@@ -36,8 +36,7 @@ static char * _biject (int id) {
 static int _inverse (char * id) {
 	int out = 0;
 	for (int i = 0; i < strlen(id); i++) {
-		char * ahh = &id[i];
-		out = out * COUNT + SvIV(*hv_fetch(INDEX, ahh, 1, 0));
+		out = out * COUNT + SvIV(*hv_fetch(INDEX, &id[i], 1, 0));
 	}
 	return out - OFFSET;
 }

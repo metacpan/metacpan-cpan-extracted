@@ -1,5 +1,19 @@
 Revision history for Perl extension App-Greple-xlate
 
+0.9904 2025-01-10T07:26:52Z
+
+    - update script/xlate options
+      * -f -> -b : base language
+      * -z -> -f : pattern file
+
+0.9903 2025-01-10T05:39:50Z
+
+    - always create result file including engine name
+    - update script/xlate
+      * add -z option to specify pattern file
+      * introduce -L option to manage live container
+      * -f option set --xlate-from option
+
 0.9902 2025-01-01T02:24:46Z
 
     - execute "docker run" with "--init" option

@@ -49,6 +49,7 @@ t/41structures.t
 t/42containers.t
 t/43probing.t
 t/50flags-autosemi.t
+t/51flags-lexical.t
 t/60line.t
 t/70infix.t
 t/71infix-wrapper.t

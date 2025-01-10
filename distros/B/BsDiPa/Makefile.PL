@@ -1,7 +1,12 @@
 require 5.026_000;
 use ExtUtils::MakeMaker;
 
+# perl Makefile.PL; make distdir (; make distcheck)
 my ($VERSION, $CONTACT);
+my ($ADDCCF,$ADDLDF) = (' -fno-common -fstrict-aliasing -fstrict-overflow ' .
+		'-fstack-protector-strong -D_FORTIFY_SOURCE=3 ' .
+		'-DHAVE_SANITIZER -fsanitize=address', '-lasan');
+($ADDCCF, $ADDLDF) = ('', '');
 
 sub version_and_contact{
 	my ($f) = @_;
@@ -31,8 +36,8 @@ WriteMakefile(
 	),
 	MIN_PERL_VERSION => '5.26.0', # SvPVCLEAR()
 	OBJECT => 'BsDiPa.o',
-	CCFLAGS => '-I. -Ic-lib',
-	LIBS => '-lz', # TODO can we reach into perl's built-in zlib?
+	CCFLAGS => '-I. -Ic-lib' . $ADDCCF,
+	LIBS => '-lz' . $ADDLDF,
 	clean => { FILES => 'c-lib/s-bsdipa-config.h' }
 );
 

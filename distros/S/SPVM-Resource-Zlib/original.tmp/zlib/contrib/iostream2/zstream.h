@@ -112,8 +112,8 @@ class izstream
  * (0 for end of file, -1 for error).
  */
 template <class T, class Items>
-inline int read(izstream& zs, T* x, Items items) {
-    return ::gzread(zs.fp(), x, items*sizeof(T));
+inline int read(izstream& zs, T* x, Items args_width) {
+    return ::gzread(zs.fp(), x, args_width*sizeof(T));
 }
 
 /*
@@ -261,8 +261,8 @@ class ozstream
  * (0 in case of error).
  */
 template <class T, class Items>
-inline int write(ozstream& zs, const T* x, Items items) {
-    return ::gzwrite(zs.fp(), (voidp) x, items*sizeof(T));
+inline int write(ozstream& zs, const T* x, Items args_width) {
+    return ::gzwrite(zs.fp(), (voidp) x, args_width*sizeof(T));
 }
 
 /*

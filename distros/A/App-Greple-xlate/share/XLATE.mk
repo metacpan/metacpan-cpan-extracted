@@ -43,7 +43,7 @@ $(foreach lang,$(or $(shell cat $(file).LANG 2> /dev/null),$(XLATE_LANG)),
 $(foreach form,$(or $(shell cat $(file).FORMAT 2> /dev/null),$(XLATE_FORMAT)),
 $(foreach ecnt,$(words $(or $(shell cat $(file).ENGINE 2> /dev/null),$(XLATE_ENGINE))),
 $(foreach engn,$(or $(shell cat $(file).ENGINE 2> /dev/null),$(XLATE_ENGINE)),
-$(call $1,$(lang),$(form),$(file),$(engn),$(ecnt))
+$(call $1,$(lang),$(form),$(file),$(engn),$(if $(ELIMINATE_LANG_PART),$(ecnt),99))
 )))))
 endef
 

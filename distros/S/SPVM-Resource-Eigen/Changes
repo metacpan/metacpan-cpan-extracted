@@ -1,3 +1,13 @@
+0.003 2025-01-10
+  [Requirement Changes]
+    * Require SPVM 0.990038.
+  [Changes]
+    * Set is_resource field to 1.
+  [Test Fix]
+    * Fix a test that is not succeed in latest Linux.
+  [Document Change]
+    * Add "Required Libraries" heading.
+    
 0.002 2024-08-03
   [Requirement Changes]
     * Require -std=C++17 in gcc/clang compiler.

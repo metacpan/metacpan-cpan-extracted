@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use utf8;
 package Acme::ಠ_ಠ;
-# vim: set ts=8 sts=4 sw=4 tw=115 et :
+# vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Send warnings with ಠ_ಠ
 
 our $VERSION = '0.007';
@@ -10,9 +10,8 @@ our $VERSION = '0.007';
 use Acme::LookOfDisapproval;
 our @EXPORT = ('ಠ_ಠ');
 
-sub import
-{
-    goto &Acme::LookOfDisapproval::import;
+sub import {
+  goto &Acme::LookOfDisapproval::import;
 }
 
 1;
@@ -29,7 +28,7 @@ Acme::ಠ_ಠ - Send warnings with ಠ_ಠ
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -57,7 +56,7 @@ Behaves identically to L<perlfunc/warn>.
 Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-LookOfDisapproval>
 (or L<bug-Acme-LookOfDisapproval@rt.cpan.org|mailto:bug-Acme-LookOfDisapproval@rt.cpan.org>).
 
-I am also usually active on irc, as 'ether' at C<irc.perl.org>.
+I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
 
 =head1 AUTHOR
 

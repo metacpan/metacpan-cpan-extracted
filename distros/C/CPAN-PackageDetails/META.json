@@ -57,6 +57,6 @@
          "web" : "https://github.com/briandfoy/cpan-packagedetails"
       }
    },
-   "version" : "0.264",
+   "version" : "0.265",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

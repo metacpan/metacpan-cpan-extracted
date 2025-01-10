@@ -1,3 +1,8 @@
+0.042 2025-01-10
+  [Requirement Changes]
+    * Require SPVM 0.990038.
+  [Changes]
+    * Set is_resource field to 1.
 0.041 2023-05-03
   [New Features]
     * The version string can be got.

@@ -17,10 +17,11 @@ struct XSParseKeywordPieceType {
 };
 
 enum {
-  XPK_FLAG_EXPR       = (1<<0),
-  XPK_FLAG_STMT       = (1<<1),
-  XPK_FLAG_AUTOSEMI   = (1<<2),
-  XPK_FLAG_BLOCKSCOPE = (1<<3),
+  XPK_FLAG_EXPR           = (1<<0),
+  XPK_FLAG_STMT           = (1<<1),
+  XPK_FLAG_AUTOSEMI       = (1<<2),
+  XPK_FLAG_BLOCKSCOPE     = (1<<3),
+  XPK_FLAG_PERMIT_LEXICAL = (1<<4),
 };
 
 enum {

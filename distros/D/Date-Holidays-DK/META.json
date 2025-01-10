@@ -30,13 +30,13 @@
    "provides" : {
       "Date::Holidays::DK" : {
          "file" : "DK.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Date-Holidays-DK"
+         "web" : "https://github.com/tagg/Date-Holidays-DK/issues"
       },
       "homepage" : "https://metacpan.org/pod/Date::Holidays::DK",
       "license" : [
@@ -46,6 +46,6 @@
          "url" : "https://github.com/tagg/Date-Holidays-DK"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

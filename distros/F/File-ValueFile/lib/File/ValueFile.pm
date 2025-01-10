@@ -1,5 +1,5 @@
-# Copyright (c) 2024 Löwenfelsen UG (haftungsbeschränkt)
-# Copyright (c) 2024 Philipp Schafft
+# Copyright (c) 2024-2025 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2024-2025 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -14,7 +14,7 @@ use warnings;
 use Carp;
 use Data::Identifier v0.04;
 
-our $VERSION = v0.03;
+our $VERSION = v0.04;
 
 my @wellknown = (
     Data::Identifier->new(uuid => '54bf8af4-b1d7-44da-af48-5278d11e8f32', displayname => 'ValueFile'),
@@ -25,12 +25,14 @@ my @wellknown = (
     Data::Identifier->new(uuid => '5a1895b8-61f1-4ce1-a44f-1a239b7d9de7', displayname => 'tagpool-source-format-hybrid'),
     Data::Identifier->new(uuid => 'f06c2226-b33e-48f2-9085-cd906a3dcee0', displayname => 'tagpool-source-format-modern-limited'),
     Data::Identifier->new(uuid => '1c71f5b1-216d-4a9b-81a1-54dc22d8a067', displayname => 'tagpool-source-format-modern-full'),
+    Data::Identifier->new(uuid => '7e5d56d4-98e6-4205-89c0-763e1d729531', displayname => 'utf-8-marker'),
 );
 
 my %_is_utf8 = (
     (map {$_ => undef} (
             'e5da6a39-46d5-48a9-b174-5c26008e208e', # tagpool-source-format
             '11431b85-41cd-4be5-8d88-a769ebbd603f', # tagpool-directory-info-format
+            '7e5d56d4-98e6-4205-89c0-763e1d729531', # utf-8-marker
         )),
 );
 
@@ -98,7 +100,7 @@ File::ValueFile - module for reading and writing ValueFile files
 
 =head1 VERSION
 
-version v0.03
+version v0.04
 
 =head1 SYNOPSIS
 
@@ -160,7 +162,7 @@ Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2024-2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
 
 This is free software, licensed under:
 

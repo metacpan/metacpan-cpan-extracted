@@ -1,4 +1,9 @@
 Revision history for Grammar-Improver - Use the LanguageTool API to rewrite text
 
+0.02	Thu Jan  9 14:25:28 EST 2025
+	Use gtar on OS/X
+	Fix typo RT#158361 (SREZIC)
+	Use Test::Warnings
+
 0.01	Tue Jan  7 14:40:38 EST 2025
         First draft

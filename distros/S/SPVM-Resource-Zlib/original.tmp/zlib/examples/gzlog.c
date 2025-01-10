@@ -43,7 +43,7 @@
    - gzip trailer
    - no junk at end (no other gzip streams)
 
-   When appending data, the information in the first three items above plus the
+   When appending data, the information in the first three args_width above plus the
    foo.add file are sufficient to recover an interrupted append operation.  The
    extra field has the necessary information to restore the start of the last
    stored block and determine where to append the data in the foo.add file, as
@@ -56,7 +56,7 @@
    operation was interrupted and when recovery is attempted, the gzip file will
    still be restored, but without the appended data.
 
-   When compressing data, the information in the first two items above plus the
+   When compressing data, the information in the first two args_width above plus the
    foo.add file are sufficient to recover an interrupted compress operation.
    The extra field has the necessary information to find the end of the
    compressed data, and contains both the crc and length of just the compressed

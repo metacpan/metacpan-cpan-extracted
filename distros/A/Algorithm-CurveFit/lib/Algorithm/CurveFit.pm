@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 require Exporter;
 
@@ -59,7 +59,7 @@ sub curve_fit {
     # Parameters
     my $params = $args{params};
 
-	confess("Parameter 'params' has to be an array reference.")
+    confess("Parameter 'params' has to be an array reference.")
       if not defined $params
       or not ref($params) eq 'ARRAY';
     my @parameters = @$params;
@@ -162,7 +162,7 @@ sub curve_fit {
                     my $value = $deriv->($xv, @par_values);
                     if (not defined $value) { # fall back to numeric five-point stencil
                         my $h = SQRT_EPS*$xv; my $t = $xv + $h; $h = $t-$xv; # numerics. Cf. NR
-                        $value = $formula_sub->($xv, @parameters)
+                        $value = $formula_sub->($xv, map { $_->[1] } @parameters)
                     }
                     push @ary, $value;
                 }
@@ -177,7 +177,7 @@ sub curve_fit {
                     );
                     if (not defined $value) { # fall back to numeric five-point stencil
                         my $h = SQRT_EPS*$xv; my $t = $xv + $h; $h = $t-$xv; # numerics. Cf. NR
-                        $value = $formula_sub->($xv, @parameters)
+                        $value = $formula_sub->($xv, map { $_->[1] } @parameters)
                     }
                     push @ary, $value;
                 }
@@ -244,7 +244,7 @@ Algorithm::CurveFit - Nonlinear Least Squares Fitting
 
 =head1 SYNOPSIS
 
-use Algorithm::CurveFit;
+  use Algorithm::CurveFit;
 
   # Known form of the formula
   my $formula = 'c + a * x^2';
@@ -450,13 +450,14 @@ New versions of this module can be found on http://steffen-mueller.net or CPAN.
 This module uses the following modules. It might be a good idea to be familiar
 with them. L<Math::Symbolic>, L<Math::MatrixReal>, L<Test::More>
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Steffen Mueller, E<lt>smueller@cpan.org<gt>
+Steffen Mueller, E<lt>smueller@cpan.orgE<gt>
+Paul Cochrane, E<lt>ptc@cpan.orgE<gt> (maintainer)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2010 by Steffen Mueller
+Copyright (C) 2005-2010, 2025 by Steffen Mueller
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.6 or,

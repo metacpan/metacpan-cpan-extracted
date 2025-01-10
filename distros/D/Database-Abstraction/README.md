@@ -1,16 +1,28 @@
 # NAME
 
-Database::Abstraction - read-only database abstraction layer
+Database::Abstraction - read-only database abstraction layer (ORM)
 
 # VERSION
-
-Version 0.14
+Version 0.15
 
 # SYNOPSIS
 
-Abstract class giving read-only access to CSV, XML and SQLite databases via Perl without writing any SQL,
+Abstract class giving read-only access to CSV,
+XML and SQLite databases via Perl without writing any SQL,
 using caching for performance optimization.
-It offers functionalities like opening the database and fetching data based on various criteria,
+
+The module promotes code maintainability by abstracting database access logic into a single interface.
+Users can switch between different storage formats without changing application logic.
+The ability to handle numerous database and file formats adds versatility and makes it useful for a variety of applications.
+
+It's a simple ORM like interface which,
+for all of its simplicity,
+allows you to do a lot of the heavy lifting of simple database operations without any SQL.
+It offers functionalities like opening the database and fetching data based on various criteria.
+
+Built-in support for flexible and configurable caching improves performance for read-intensive applications.
+
+Supports logging to debug and monitor database operations.
 
 Look for databases in $directory in this order:
 
@@ -31,6 +43,7 @@ Look for databases in $directory in this order:
     File ends with .xml
 
 The AUTOLOAD feature allows for convenient access to database columns using method calls.
+It hides the complexity of querying the underlying data storage.
 
 If the table has a key column,
 entries are keyed on that and sorts are based on it.
@@ -109,7 +122,8 @@ Takes different argument formats (hash or positional)
 
 - `max_slurp_size`
 
-    CSV/PSV/XML files smaller than this are held in RAM (default is 16K).
+    CSV/PSV/XML files smaller than this are held in RAM (default is 16K),
+    falling back to SQL on larger data sets.
     Setting this value to 0 will turn this feature off,
     thus forcing SQL to be used to access the database
 
@@ -185,6 +199,8 @@ If the database has a column called "entry" you can do a quick lookup with
     print 'There are ', scalar(@entries), " entries in the database\n";
 
 Set distinct or unique to 1 if you're after a unique list.
+
+Throws an error in slurp mode when an invalid column name is given.
 
 # AUTHOR
 

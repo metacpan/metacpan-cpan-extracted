@@ -26,7 +26,7 @@ Install release dependencies:
 
 In order to release a new version of this project
 
-    Update the version number in lib/Debug/Client.pm
+    Update the version number in lib/Debug/Client.pm and in README.md
     Update the Changes file
 
     perl Makefile.PL
@@ -37,7 +37,7 @@ In order to release a new version of this project
 
 Tag the version in git with the appropriate version number:
 
-    git -a v0.32 -m v0.32
+    git tag -a v0.34 -m v0.34
     git push --tags
 
 

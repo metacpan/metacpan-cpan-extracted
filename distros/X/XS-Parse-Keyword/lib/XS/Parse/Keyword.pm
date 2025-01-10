@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Keyword 0.47;
+package XS::Parse::Keyword 0.48;
 
 use v5.14;
 use warnings;
@@ -93,6 +93,21 @@ The entire parse and build process will be wrapped in a pair of
 C<block_start()> and C<block_end()> calls. This ensures that, for example, any
 newly-introduced lexical variables do not escape from the scope of the syntax
 created by the keyword.
+
+=item C<XPK_FLAG_PERMIT_LEXICAL>
+
+The keyword permits a prefixed C<my>, for the author to indicate that it
+should have lexical effect. Typically this would only make sense for keywords
+that declare some new named entity, where normally that keyword's entity is
+named in the symbol table instead.
+
+At C<parse> and C<build> time, this fact will be indicated by
+C<< PL_parser->in_my >> being set to the C<< KEY_my >> value, rather than its
+usual zero.
+
+This flag is silently ignored on versions of Perl before 5.16, because on
+earlier versions the C<my> prefix-detecting workaround causes
+seemingly-unrelated parse failures in F<utf8.pm>.
 
 =back
 

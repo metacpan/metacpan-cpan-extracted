@@ -4,7 +4,7 @@ use strict;
 use FindBin qw($Bin);
 
 use lib 't/lib';
-use Test::Most tests => 14;
+use Test::Most tests => 18;
 use Test::NoWarnings;
 
 use_ok('Database::test1');
@@ -22,14 +22,14 @@ cmp_ok($res->{'entry'}, 'eq', 'one', 'fetchrow_hashref');
 cmp_ok($res->{'number'}, '==', 1, 'fetchrow_hashref');
 
 my @rc = $test1->entry(distinct => 1);
-cmp_ok(scalar(@rc), '==', 3, 'getting all the distinct entries works');
+cmp_ok(scalar(@rc), '==', 4, 'getting all the distinct entries works');
 
 @rc = $test1->entry();
 if($ENV{'TEST_VERBOSE'}) {
 	use Data::Dumper;
 	diag(Data::Dumper->new([\@rc])->Dump());
 }
-cmp_ok(scalar(@rc), '==', 3, 'getting all the entries works');
+cmp_ok(scalar(@rc), '==', 4, 'getting all the entries works');
 
 @rc = $test1->selectall_hash();
 if($ENV{'TEST_VERBOSE'}) {
@@ -37,7 +37,7 @@ if($ENV{'TEST_VERBOSE'}) {
 	diag(Data::Dumper->new([\@rc])->Dump());
 }
 
-cmp_ok(scalar(@rc), '==', 3, 'selectall_hashref returns all entries');
+cmp_ok(scalar(@rc), '==', 4, 'selectall_hashref returns all entries');
 
 my $entry = $test1->entry(number => 2);
 
@@ -55,4 +55,11 @@ if($ENV{'TEST_VERBOSE'}) {
 	diag(Data::Dumper->new([\@rc])->Dump());
 }
 
-cmp_ok(scalar(@rc), '==', 3, 'execute() returns all entries');
+cmp_ok(scalar(@rc), '==', 4, 'execute() returns all entries');
+
+dies_ok(sub { my $foo = $test1->foo('one') }, 'AUTOLOAD dies on invalid column');
+like($@, qr/There is no column foo in test1/, 'Correct test message for invalid column in AUTOLOAD');
+
+my $unknown;
+lives_ok(sub { $unknown = $test1->number('empty') }, 'AUTOLOAD survives empty column');
+ok(!defined($unknown));

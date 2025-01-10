@@ -1,0 +1,48 @@
+PACKAGE: libplacebo
+DEPS: python3-glad python3-meson-opt
+MANUAL: 0
+%%
+PACKAGE: luajit
+DEPS: 
+MANUAL: 0
+%%
+PACKAGE: mpv
+DEPS: libplacebo luajit python3-meson-opt
+MANUAL: 1
+%%
+PACKAGE: python3-build
+DEPS: python3-pyproject-hooks
+MANUAL: 0
+%%
+PACKAGE: python3-flit_core
+DEPS: 
+MANUAL: 0
+%%
+PACKAGE: python3-glad
+DEPS: python3-setuptools-opt
+MANUAL: 0
+%%
+PACKAGE: python3-installer
+DEPS: python3-flit_core
+MANUAL: 0
+%%
+PACKAGE: python3-meson-opt
+DEPS: python3-build python3-wheel
+MANUAL: 0
+%%
+PACKAGE: python3-packaging-opt
+DEPS: python3-build
+MANUAL: 0
+%%
+PACKAGE: python3-pyproject-hooks
+DEPS: python3-installer
+MANUAL: 0
+%%
+PACKAGE: python3-setuptools-opt
+DEPS: python3-packaging-opt python3-wheel
+MANUAL: 0
+%%
+PACKAGE: python3-wheel
+DEPS: python3-installer
+MANUAL: 0
+%%

@@ -1,20 +1,19 @@
 use strict;
 use warnings;
 use utf8;
-package Acme::LookOfDisapproval; # git description: v0.006-39-g517ae12
-# vim: set ts=8 sts=4 sw=4 tw=115 et :
+package Acme::LookOfDisapproval; # git description: v0.007-16-g8154023
+# vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Send warnings with ಠ_ಠ
-# KEYWORDS: unicode canary warning utf8 symbol
+# KEYWORDS: unicode canary warning utf8 symbol ಠ_ಠ
 
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 
 use Exporter;
 our @EXPORT = ('ಠ_ಠ');
 
-sub import
-{
-    utf8->import;
-    goto &Exporter::import;
+sub import {
+  utf8->import;
+  goto &Exporter::import;
 }
 
 sub ಠ_ಠ { goto &CORE::warn }
@@ -33,7 +32,7 @@ Acme::LookOfDisapproval - Send warnings with ಠ_ಠ
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -91,6 +90,10 @@ didn't work either (for example, see C<t/00-compile.t> -- C<< qx(^$X "require $_
 both needs the C<:binmode> or C<:encoding(UTF-8)> layer applied to C<STDOUT>, and
 requires the L<utf8> pragma applied in the sub-perl (leading to more patches).
 
+After pushing several patches to core L<Dist::Zilla> and some independently-distributed plugins,
+I have been able to switch back to packaging with L<Dist::Zilla>.
+Everything is now much more unicode-clean! 💃
+
 =head1 SEE ALSO
 
 =over 4
@@ -110,7 +113,7 @@ L<lambda> - another example of unicode sub names
 Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-LookOfDisapproval>
 (or L<bug-Acme-LookOfDisapproval@rt.cpan.org|mailto:bug-Acme-LookOfDisapproval@rt.cpan.org>).
 
-I am also usually active on irc, as 'ether' at C<irc.perl.org>.
+I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
 
 =head1 AUTHOR
 

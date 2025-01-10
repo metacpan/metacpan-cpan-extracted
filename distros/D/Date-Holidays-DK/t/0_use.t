@@ -1,5 +1,5 @@
 # -*- perl -*-
-use Test::More tests => 24;
+use Test::More tests => 26;
 use utf8;
 
 BEGIN {
@@ -34,11 +34,12 @@ sub t {
 }
 
 my $h;
-ok($h = dk_holidays(2004), 'call dk_holidays()');
+ok($h = dk_holidays(2004), 'call dk_holidays() for 2004');
 
 ok(eq_hash($h, {
   '0101' => "Nytårsdag",
   '0404' => "Palmesøndag",
+  '0507' => "Store Bededag",
   '0408' => "Skærtorsdag",
   '0409' => "Langfredag",
   '0411' => "Påskedag",
@@ -50,4 +51,22 @@ ok(eq_hash($h, {
   '1224' => "Juleaftensdag",
   '1225' => "Juledag",
   '1226' => "2. Juledag",
-}), 'check return values');
+}), 'check return values for 2004');
+
+ok($h = dk_holidays(2024), 'call dk_holidays() for 2024');
+
+ok(eq_hash($h, {
+  '0101' => "Nytårsdag",
+  '0324' => "Palmesøndag",
+  '0328' => "Skærtorsdag",
+  '0329' => "Langfredag",
+  '0331' => "Påskedag",
+  '0401' => "2. Påskedag",
+  '0509' => "Kristi Himmelfartsdag",
+  '0519' => "Pinsedag",
+  '0520' => "2. Pinsedag",
+  '0605' => "Grundlovsdag",
+  '1224' => "Juleaftensdag",
+  '1225' => "Juledag",
+  '1226' => "2. Juledag",
+}), 'check return values for 2024');

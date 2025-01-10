@@ -14,6 +14,8 @@ my %WriteMakefileArgs = (
         'ExtUtils::MakeMaker' => '0',
     },
     TEST_REQUIRES => {
+        'Cwd'        => '0',
+        'File::Spec' => '0',
         'Test::More' => '0',
     },
     PREREQ_PM => {

@@ -31,14 +31,14 @@ requires:
   DBIx::Class::IntrospectableM2M: '0'
   Data::Dumper::Concise: '2.02'
   DateTime: '0'
-  List::MoreUtils: '0.22'
+  List::Util: '1.35'
   SQL::Translator: '0.11016'
   Try::Tiny: '0.3'
   perl: '5.014'
 resources:
   bugtracker: https://github.com/gshank/dbix-class-resultset-recursiveupdate/issues
-  repository: git://github.com/gshank/dbix-class-resultset-recursiveupdate
-version: '0.44'
+  repository: https://github.com/gshank/dbix-class-resultset-recursiveupdate.git
+version: '0.45'
 x_Dist_Zilla:
   perl:
     version: '5.040000'
@@ -223,7 +223,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Test::Portability:
           options: ''
       name: Test::Portability
-      version: '2.001001'
+      version: '2.001003'
     -
       class: Dist::Zilla::Plugin::Test::DistManifest
       name: Test::DistManifest
@@ -252,7 +252,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.39.2
+          git_version: 2.39.5
           repo_root: .
       name: '@Git/Check'
       version: '2.051'
@@ -270,7 +270,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.39.2
+          git_version: 2.39.5
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -283,11 +283,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.44'
+          tag: '0.45'
           tag_format: '%v'
           tag_message: '%v'
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.39.2
+          git_version: 2.39.5
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -301,7 +301,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.39.2
+          git_version: 2.39.5
           repo_root: .
       name: '@Git/Push'
       version: '2.051'
@@ -355,5 +355,5 @@ x_Dist_Zilla:
       is_trial: 0
     version: '6.032'
 x_generated_by_perl: v5.40.0
-x_serialization_backend: 'YAML::Tiny version 1.74'
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

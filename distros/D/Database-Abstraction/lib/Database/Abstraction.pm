@@ -2,7 +2,7 @@ package Database::Abstraction;
 
 =head1 NAME
 
-Database::Abstraction - read-only database abstraction layer
+Database::Abstraction - read-only database abstraction layer (ORM)
 
 =cut
 
@@ -16,16 +16,19 @@ Database::Abstraction - read-only database abstraction layer
 #	must apply in writing for a licence for use from Nigel Horne at the
 #	above e-mail.
 
-# TODO: Switch "entry" to off by default, and enable by passing 'entry'
+# TODO:	Switch "entry" to off by default, and enable by passing 'entry'
 #	though that wouldn't be so nice for AUTOLOAD
-# TODO: support a directory hierarchy of databases
-# TODO: consider returning an object or array of objects, rather than hashes
+# TODO:	support a directory hierarchy of databases
+# TODO:	consider returning an object or array of objects, rather than hashes
 # TODO:	Add redis database - could be of use for Geo::Coder::Free
 #	use select() to select a database - use the table arg
 #	new(database => 'redis://servername');
 # TODO:	Add a "key" property, defaulting to "entry", which would be the name of the key
 # TODO:	The maximum number to return should be tuneable (as a LIMIT)
+# TODO:	Add full CRUD support
+# TODO:	It would be better for the default sep_char to be ',' rather than '!'
 # FIXME:	t/xml.t fails in slurping mode
+# TODO:	Other databases e.g. Redis, noSQL, remote databases such as MySQL, PostgresSQL
 
 use warnings;
 use strict;
@@ -44,18 +47,30 @@ our %defaults;
 use constant	DEFAULT_MAX_SLURP_SIZE => 16 * 1024;	# CSV files <= than this size are read into memory
 
 =head1 VERSION
-
-Version 0.14
+Version 0.15
 
 =cut
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 =head1 SYNOPSIS
 
-Abstract class giving read-only access to CSV, XML and SQLite databases via Perl without writing any SQL,
+Abstract class giving read-only access to CSV,
+XML and SQLite databases via Perl without writing any SQL,
 using caching for performance optimization.
-It offers functionalities like opening the database and fetching data based on various criteria,
+
+The module promotes code maintainability by abstracting database access logic into a single interface.
+Users can switch between different storage formats without changing application logic.
+The ability to handle numerous database and file formats adds versatility and makes it useful for a variety of applications.
+
+It's a simple ORM like interface which,
+for all of its simplicity,
+allows you to do a lot of the heavy lifting of simple database operations without any SQL.
+It offers functionalities like opening the database and fetching data based on various criteria.
+
+Built-in support for flexible and configurable caching improves performance for read-intensive applications.
+
+Supports logging to debug and monitor database operations.
 
 Look for databases in $directory in this order:
 
@@ -80,6 +95,7 @@ File ends with .xml
 =back
 
 The AUTOLOAD feature allows for convenient access to database columns using method calls.
+It hides the complexity of querying the underlying data storage.
 
 If the table has a key column,
 entries are keyed on that and sorts are based on it.
@@ -179,7 +195,8 @@ Where the database file is held
 
 =item * C<max_slurp_size>
 
-CSV/PSV/XML files smaller than this are held in RAM (default is 16K).
+CSV/PSV/XML files smaller than this are held in RAM (default is 16K),
+falling back to SQL on larger data sets.
 Setting this value to 0 will turn this feature off,
 thus forcing SQL to be used to access the database
 
@@ -401,39 +418,44 @@ sub _open {
 
 			# FIXME: Text::xSV::Slurp can't cope well with quotes in field contents
 			if((-s $slurp_file) <= $self->{'max_slurp_size'}) {
-				require Text::xSV::Slurp;
-				Text::xSV::Slurp->import();
-
-				$self->_trace('slurp in');
-
-				my @data = @{xsv_slurp(
-					shape => 'aoh',
-					text_csv => {
-						sep_char => $sep_char,
-						allow_loose_quotes => 1,
-						blank_is_undef => 1,
-						empty_is_undef => 1,
-						binary => 1,
-						escape_char => '\\',
-					},
-					# string => \join('', grep(!/^\s*(#|$)/, <DATA>))
-					file => $slurp_file
-				)};
-
-				# $self->{'data'} = @data;
-				if($self->{'no_entry'}) {
-					# Not keyed, will need to scan each entry
-					my $i = 0;
-					$self->{'data'} = ();
-					foreach my $d(@data) {
-						$self->{'data'}[$i++] = $d;
-					}
+				if((-s $slurp_file) == 0) {
+					# Empty file
+					$self->{'data'} = {};
 				} else {
-					# keyed on the $self->{'id'} (default: "entry") column
-					# Ignore blank lines or lines starting with # in the CSV file
-					@data = grep { $_->{$self->{'id'}} !~ /^\s*#/ } grep { defined($_->{$self->{'id'}}) } @data;
-					foreach my $d(@data) {
-						$self->{'data'}->{$d->{$self->{'id'}}} = $d;
+					require Text::xSV::Slurp;
+					Text::xSV::Slurp->import();
+
+					$self->_trace('slurp in');
+
+					my @data = @{xsv_slurp(
+						shape => 'aoh',
+						text_csv => {
+							sep_char => $sep_char,
+							allow_loose_quotes => 1,
+							blank_is_undef => 1,
+							empty_is_undef => 1,
+							binary => 1,
+							escape_char => '\\',
+						},
+						# string => \join('', grep(!/^\s*(#|$)/, <DATA>))
+						file => $slurp_file
+					)};
+
+					# $self->{'data'} = @data;
+					if($self->{'no_entry'}) {
+						# Not keyed, will need to scan each entry
+						my $i = 0;
+						$self->{'data'} = ();
+						foreach my $d(@data) {
+							$self->{'data'}[$i++] = $d;
+						}
+					} else {
+						# keyed on the $self->{'id'} (default: "entry") column
+						# Ignore blank lines or lines starting with # in the CSV file
+						@data = grep { $_->{$self->{'id'}} !~ /^\s*#/ } grep { defined($_->{$self->{'id'}}) } @data;
+						foreach my $d(@data) {
+							$self->{'data'}->{$d->{$self->{'id'}}} = $d;
+						}
 					}
 				}
 			}
@@ -818,6 +840,8 @@ If the database has a column called "entry" you can do a quick lookup with
 
 Set distinct or unique to 1 if you're after a unique list.
 
+Throws an error in slurp mode when an invalid column name is given.
+
 =cut
 
 sub AUTOLOAD {
@@ -866,14 +890,16 @@ sub AUTOLOAD {
 			#	so no need to do any SQL
 			if($self->{'no_entry'}) {
 				my ($key, $value) = %params;
-				foreach my $row(@{$data}) {
-					if(($row->{$key} eq $value) && (my $rc = $row->{$column})) {
-						if(defined($rc)) {
-							$self->_trace(__LINE__, ": AUTOLOAD $key: return '$rc' from slurped data");
-						} else {
-							$self->_trace(__LINE__, ": AUTOLOAD $key: return undef from slurped data");
+				if(defined($key)) {
+					foreach my $row(@{$data}) {
+						if(defined($row->{$key}) && ($row->{$key} eq $value) && (my $rc = $row->{$column})) {
+							if(defined($rc)) {
+								$self->_trace(__LINE__, ": AUTOLOAD $key: return '$rc' from slurped data");
+							} else {
+								$self->_trace(__LINE__, ": AUTOLOAD $key: return undef from slurped data");
+							}
+							return $rc
 						}
-						return $rc
 					}
 				}
 			} elsif(((scalar keys %params) == 1) && defined(my $key = $params{'entry'})) {
@@ -884,6 +910,10 @@ sub AUTOLOAD {
 				# my $rc = $data->{$key}->{$column};
 				my $rc;
 				if(defined(my $hash = $data->{$key})) {
+					# Look up the key
+					if(!exists($hash->{$column})) {
+						Carp::croak(__PACKAGE__, ": There is no column $column in $table");
+					}
 					$rc = $hash->{$column};
 				}
 				if(defined($rc)) {
@@ -909,7 +939,7 @@ sub AUTOLOAD {
 				# It's keyed, but we're not querying off it
 				my ($key, $value) = %params;
 				foreach my $row (values %{$data}) {
-					if(($row->{$key} eq $value) && (my $rc = $row->{$column})) {
+					if(defined($row->{$key}) && ($row->{$key} eq $value) && (my $rc = $row->{$column})) {
 						if(defined($rc)) {
 							$self->_trace(__LINE__, ": AUTOLOAD $key: return '$rc' from slurped data");
 						} else {

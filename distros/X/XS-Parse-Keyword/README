@@ -78,6 +78,21 @@ PARSE HOOKS
       any newly-introduced lexical variables do not escape from the scope
       of the syntax created by the keyword.
 
+    XPK_FLAG_PERMIT_LEXICAL
+
+      The keyword permits a prefixed my, for the author to indicate that it
+      should have lexical effect. Typically this would only make sense for
+      keywords that declare some new named entity, where normally that
+      keyword's entity is named in the symbol table instead.
+
+      At parse and build time, this fact will be indicated by
+      PL_parser->in_my being set to the KEY_my value, rather than its usual
+      zero.
+
+      This flag is silently ignored on versions of Perl before 5.16,
+      because on earlier versions the my prefix-detecting workaround causes
+      seemingly-unrelated parse failures in utf8.pm.
+
  The permit Stage
 
        const char *permit_hintkey;

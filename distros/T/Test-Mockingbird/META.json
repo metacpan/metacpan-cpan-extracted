@@ -32,6 +32,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
             "ExtUtils::MakeMaker" : "6.64"
          }
       },
@@ -44,7 +45,19 @@
       }
    },
    "release_status" : "stable",
-   "resources" : {},
-   "version" : "0.01",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Test-Mockingbird@rt.cpan.org",
+         "web" : "https://github.com/nigelhorne/Test-Mockingbird/issues",
+         "x_url" : "https://github.com/nigelhorne/Test-Mockingbird/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/nigelhorne/Test-Mockingbird.git",
+         "web" : "https://github.com/nigelhorne/Test-Mockingbird",
+         "x_repository" : "https://github.com/nigelhorne/Test-Mockingbird"
+      }
+   },
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

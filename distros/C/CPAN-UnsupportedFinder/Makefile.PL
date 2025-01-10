@@ -16,7 +16,9 @@ WriteMakefile(
 	VERSION_FROM => 'lib/CPAN/UnsupportedFinder.pm', # finds $VERSION in the module
 	AUTHOR => 'Nigel Horne <njh@bandsman.co.uk>',
 	ABSTRACT => 'Identifies unsupported or poorly maintained CPAN modules by analyzing CPAN Testers data and release info.',
-	LICENSE => 'perl',
+	((defined($ExtUtils::MakeMaker::VERSION) && ($ExtUtils::MakeMaker::VERSION >= 6.3002))
+		? ('LICENSE'=> 'GPL')
+		: ()),
 	PREREQ_PM => {
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
 		'HTTP::Tiny' => 0,
@@ -45,6 +47,7 @@ WriteMakefile(
 		'Test::Most' => 0,
 		'Test::Needs' => 0,
 		'Test::RequiresInternet' => 0,
+		'Test::Warnings' => 0
 	}, dist => $dist,
 	clean => { FILES => 'CPAN-UnsupportedFinder-*' },  # Clean up distribution files
 );

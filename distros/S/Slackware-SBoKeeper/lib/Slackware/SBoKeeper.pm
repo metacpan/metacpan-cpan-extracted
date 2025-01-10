@@ -1,6 +1,6 @@
 package Slackware::SBoKeeper;
 use 5.016;
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 use strict;
 use warnings;
 
@@ -171,6 +171,8 @@ valid categories:
   necessary     Packages added manually, or dependency of a manual package
   unnecessary   Packages not manually added and not depended on by another
   missing       Missing dependencies
+  untracked     Installed SlackBuild packages not present in database
+  phony         Packages in database that are not installed on system
 
 If no category is specified, defaults to 'all'.
 END
@@ -359,11 +361,75 @@ my $CONFIG_READERS = {
 
 		warn "'PkgtoolLogs' is deprecated\n";
 
-		# We can't return nothing, so return :-/
-		return ':-/';
-
 	},
 };
+
+my %PKG_CATEGORIES = (
+	'all' => sub {
+
+		my $sbok = shift;
+
+		return $sbok->packages;
+
+	},
+	'manual' => sub {
+
+		my $sbok = shift;
+
+		return grep { $sbok->is_manual($_) } $sbok->packages;
+
+	},
+	'nonmanual' => sub {
+
+		my $sbok = shift;
+
+		return grep { !$sbok->is_manual($_) } $sbok->packages;
+
+	},
+	'necessary' => sub {
+
+		my $sbok = shift;
+
+		return grep { $sbok->is_necessary($_) } $sbok->packages;
+
+	},
+	'unnecessary' => sub {
+
+		my $sbok = shift;
+
+		return grep { !$sbok->is_necessary($_) } $sbok->packages;
+
+	},
+	'missing' => sub {
+
+		my $sbok = shift;
+
+		my %missing = $sbok->missing;
+
+		return uniq sort map { @{$missing{$_}} } keys %missing;
+
+	},
+	'untracked' => sub {
+
+		my $sbok = shift;
+
+		return
+			grep { !$sbok->has($_) }
+			Slackware::SBoKeeper::System->packages_by_tag('_SBo')
+		;
+
+	},
+	'phony' => sub {
+
+		my $sbok = shift;
+
+		return
+			grep { !Slackware::SBoKeeper::System->installed($_) }
+			$sbok->packages
+		;
+
+	},
+);
 
 sub get_default_sbopath {
 
@@ -450,7 +516,12 @@ sub alias_expand {
 	foreach my $a (@alias) {
 		# Get rid of '@'
 		$a = substr $a, 1;
-		push @rtrn, $sbokeeper->packages($a);
+
+		unless (defined $PKG_CATEGORIES{$a}) {
+			die "'$a' is not a valid package category\n";
+		}
+
+		push @rtrn, $PKG_CATEGORIES{$a}($sbokeeper);
 	}
 
 	return uniq sort @rtrn;
@@ -828,7 +899,7 @@ sub diff {
 		Slackware::SBoKeeper::System->packages_by_tag($self->{Tag})
 	;
 
-	my %added = map { $_ => 1 } $sbokeeper->packages('all');
+	my %added = map { $_ => 1 } $sbokeeper->packages;
 
 	my (@idiff, @adiff);
 
@@ -969,12 +1040,22 @@ sub sbokeeper_print {
 		$self->{SBoPath}
 	);
 
-	my @pkgs =
-		uniq sort
-		map { $sbokeeper->packages($_) }
+	my @pkgs;
+
+	foreach my $c (@cat) {
+
 		# Get rid of alias '@' if present
-		map { s/^@//r } @cat
-	;
+		$c =~ s/^@//;
+
+		unless (defined $PKG_CATEGORIES{$c}) {
+			die "'$c' is not a valid package category\n";
+		}
+
+		push @pkgs, $PKG_CATEGORIES{$c}($sbokeeper);
+
+	}
+
+	@pkgs = uniq sort @pkgs;
 
 	print_package_list('', @pkgs) if @pkgs;
 
@@ -1001,7 +1082,7 @@ sub tree {
 
 	} else {
 
-		@pkgs = $sbokeeper->packages('manual');
+		@pkgs = grep { $sbokeeper->is_manual($_) } $sbokeeper->packages;
 
 	}
 
@@ -1088,7 +1169,7 @@ sub init {
 
 	$self->{Command} = lc shift @ARGV;
 
-	$self->{Args} = \@ARGV;
+	$self->{Args} = [@ARGV];
 
 	unless ($self->{DataFile}) {
 		make_path($DEFAULT_DATADIR) unless -d $DEFAULT_DATADIR;
@@ -1140,6 +1221,17 @@ sub run {
 
 	$COMMANDS{$self->{Command}}->{Method}($self);
 
+	1;
+
+}
+
+sub get {
+
+	my $self = shift;
+	my $get  = shift;
+
+	return $self->{$get};
+
 }
 
 1;
@@ -1174,6 +1266,42 @@ manual.
 =item run()
 
 Runs L<sbokeeper>.
+
+=item get($get)
+
+Get the value of attribute C<$get>. The following are valid attributes:
+
+=over 4
+
+=item ConfigFile
+
+Path to config file.
+
+=item DataFile
+
+Path to database file.
+
+=item SBoPath
+
+Path to local SlackBuild repo.
+
+=item Tag
+
+Package tag that the SlackBuild repo uses.
+
+=item YesAll
+
+Boolean determining whether to automatically accept any given prompts or not.
+
+=item Command
+
+The command that was supplied to L<sbokeeper>.
+
+=item Args
+
+Array ref of arguments given to command.
+
+=back
 
 =back
 

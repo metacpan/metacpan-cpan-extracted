@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2024 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2023-2025 Löwenfelsen UG (haftungsbeschränkt)
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -14,7 +14,7 @@ use warnings;
 use Carp;
 use Data::Identifier;
 
-our $VERSION = v0.07;
+our $VERSION = v0.08;
 
 
 sub known {
@@ -29,9 +29,9 @@ sub known {
             }
         } else {
             if ($opts{skip_invalid}) {
-                return grep {defined} map {eval {$_->Data::Identifier::as($as, %opts{qw(extractor no_defaults)}, %extra{qw(rawtype)})}} @{$list};
+                return grep {defined} map {eval {$_->Data::Identifier::as($as, %opts{qw(db extractor no_defaults)}, %extra{qw(rawtype)})}} @{$list};
             } else {
-                return map {$_->Data::Identifier::as($as, %opts{qw(extractor no_defaults)}, %extra{qw(rawtype)})} @{$list};
+                return map {$_->Data::Identifier::as($as, %opts{qw(db extractor no_defaults)}, %extra{qw(rawtype)})} @{$list};
             }
         }
     }
@@ -62,7 +62,7 @@ Data::Identifier::Interface::Known - format independent identifier object
 
 =head1 VERSION
 
-version v0.07
+version v0.08
 
 =head1 SYNOPSIS
 
@@ -129,11 +129,19 @@ or any other package name (containing two C<::> or starting with a upper case le
 
 If a value is given that is not supported for all items to be returned the method must C<die>.
 
+=item C<db>
+
+An instance of L<Data::TagDB>. See L<Data::Identifier/as> for more details.
+
 =item C<default>
 
 The default value to be returned if the class is unknown or unsupported.
 This must be an array reference.
 It is common to set this to C<[]> to return an empty list when this method would otherwise C<die>.
+
+=item C<extractor>
+
+An instance of L<Data::URIID>. See L<Data::Identifier/as> for more details.
 
 =item C<no_defaults>
 
@@ -170,7 +178,7 @@ Currently no options are defined. An implementation can therefore use:
 
     die 'Unsupported options passed' if scalar(keys %opts);
 
-The folling extra values are supported:
+The following extra values are supported:
 
 =over
 
@@ -192,7 +200,7 @@ Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023-2024 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2023-2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
 
 This is free software, licensed under:
 

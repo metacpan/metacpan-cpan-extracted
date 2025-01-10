@@ -1,5 +1,18 @@
 Revision history for sbokeeper.
 
+2.02 (1/9/2025):
+  Added:
+    * 'untracked' package category: Represents SlackBuild packages installed on
+      your system that are not present in the database.
+    * 'phony' package category: Represents packages that are present in your
+      database but are not actually installed on your system.
+    * The sbokeeper script now has tests itself. The new tests now require
+      File::Spec and Cwd, which shouldn't be a problem as they are distributed
+      with core Perl.
+    * Slackware::SBoKeeper::Home tests.
+  Improvements:
+    * Improved wording/grammar in documentation.
+
 2.01 (1/1/2025):
   Added:
     * -t/--tag option: Specify a SlackBuild package tag. Corresponding 'Tag'

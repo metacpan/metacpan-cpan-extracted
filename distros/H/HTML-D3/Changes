@@ -1,5 +1,8 @@
 Revision history for HTML-D3 - Visualise various charts using D3
 
+0.06	Thu Jan  9 21:51:36 EST 2025
+	Added support for legends
+
 0.05	Wed Jan  8 21:04:21 EST 2025
 	Added support for animated tooltips
 

@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2024 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2023-2025 Löwenfelsen UG (haftungsbeschränkt)
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -17,7 +17,7 @@ use Digest;
 
 use Data::Identifier;
 
-our $VERSION = v0.07;
+our $VERSION = v0.08;
 
 
 sub integer {
@@ -27,6 +27,46 @@ sub integer {
     $opts{namespace}    = Data::Identifier->NS_INT();
     $opts{displayname}//= $request;
 
+    return $pkg->generic(%opts);
+}
+
+
+sub unicode_character {
+    my ($pkg, $type, $request, %opts) = @_;
+    my $unicode_cp;
+    my $unicode_cp_str;
+
+    if ($type eq 'unicode') {
+        if ($request =~ /^[Uu]\+([0-9a-fA-F]+)$/) {
+            $unicode_cp = hex($1);
+        } else {
+            $unicode_cp = int($request);
+        }
+    } elsif ($type eq 'ascii') {
+        $unicode_cp = int($request);
+        croak 'US-ASCII character out of range: '.$unicode_cp if $unicode_cp < 0 || $unicode_cp > 0x7F;
+    } elsif ($type eq 'raw') {
+        croak 'Raw value is not exactly one character long' unless length($request) == 1;
+        $unicode_cp = ord($request);
+    }
+
+    croak 'Unicode character out of range: '.$unicode_cp if $unicode_cp < 0 || $unicode_cp > 0x10FFFF;
+
+    $unicode_cp_str = sprintf('U+%04X', $unicode_cp);
+
+    if ($unicode_cp == 0xFFFC || $unicode_cp == 0xFFFD || $unicode_cp == 0xFEFF || $unicode_cp == 0xFFFE) {
+        croak 'Rejected use of special character: '.$unicode_cp_str unless $opts{allow_special};
+    }
+
+    return Data::Identifier->new(unicodecp => $unicode_cp_str, displayname => $opts{displayname});
+}
+
+
+sub colour {
+    my ($pkg, $colour, %opts) = @_;
+    $opts{request}      = $colour;
+    $opts{style}        = 'colour';
+    $opts{namespace}    = '88d3944f-a13b-4e35-89eb-e3c1fbe53e76';
     return $pkg->generic(%opts);
 }
 
@@ -276,7 +316,7 @@ Data::Identifier::Generate - format independent identifier object
 
 =head1 VERSION
 
-version v0.07
+version v0.08
 
 =head1 SYNOPSIS
 
@@ -317,6 +357,77 @@ The displayname as to be used for the identifier.
 This is the same as defined by L<Data::Identifier/new>.
 
 Defaults to the passed number.
+
+=back
+
+=head2 unicode_character
+
+    my Data::Identifier $identifier = Data::Identifier::Generate->unicode_character($type => $request [, %opts] );
+    # e.g.:
+    my Data::Identifier $identifier = Data::Identifier::Generate->unicode_character(unicode => 0x1F981);
+    # or:
+    my Data::Identifier $identifier = Data::Identifier::Generate->unicode_character(unicode => 'U+1F981');
+
+Creates an identifier for the given unicode character.
+
+The following types are supported:
+
+=over
+
+=item C<unicode>
+
+The unicode code point as a number (e.g. C<0x1F981>) or as in the standard format (e.g. C<'U+1F981'>).
+
+=item C<ascii>
+
+The US-ASCII code point (e.g. C<65>).
+
+=item C<raw>
+
+A perl string with exactly one character. The character is
+
+=back
+
+The following options (all optional) are supported:
+
+=over
+
+=item C<allow_special>
+
+If special characters are allowed.
+This setting is a protection against false results,
+specifically with C<REPLACEMENT CHARACTER> and similar characters.
+
+Defaults to false.
+
+=item C<displayname>
+
+The displayname as to be used for the identifier.
+This is the same as defined by L<Data::Identifier/new>.
+
+Defaults to the data from the request.
+
+=back
+
+=head2 colour
+
+    my Data::Identifier $identifier = Data::Identifier::Generate->colour($colour [, %opts ] );
+    # e.g.:
+    my Data::Identifier $identifier = Data::Identifier::Generate->colour('#decc9c');
+
+Generates an identifier for a given colour.
+Currently the colour must be given as a string in form C<#RRGGBB>.
+
+The following options (all optional) are supported:
+
+=over
+
+=item C<displayname>
+
+The displayname as to be used for the identifier.
+This is the same as defined by L<Data::Identifier/new>.
+
+Defaults to the data from the request.
 
 =back
 
@@ -434,7 +545,7 @@ Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023-2024 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2023-2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
 
 This is free software, licensed under:
 

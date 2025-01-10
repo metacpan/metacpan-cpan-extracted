@@ -44,7 +44,27 @@ Repository:
 
 Contact: steffen at sdaoden dot eu.
 
----
+RELEASES
+--------
+
+v0.5.2, 2025-01-09:
+  - CHANGE/FIX: ensure patch fits in _OFF_MAX, including control data.
+    s_bsdipa_patch_parse_header() did verify that on the patch side,
+    but on the diff side we yet did not care, as in theory the data
+    could have been stored in individual chunks.
+  - FIX: perl CPAN testers started failing (in a second round?)
+    due to assertion failures regarding SV_HAS_TRAILING_NUL and that
+    missing.  Therefore ensure our memory results have one byte in
+    addition and do always terminate them.
+  - more perl module creation related tweaks.
+
+v0.5.1, 2025-01-05:
+  - perl module creation related tweaks.
+
+v0.5.0, 2024-12-26: (first release)
+
+DATA POINTS
+-----------
 
 Some data points follow.  (32 byte "magic window" is a good fit.)
 

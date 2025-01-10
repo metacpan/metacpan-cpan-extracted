@@ -1,3 +1,6 @@
 class TestCase::Resource::RE2 {
+  
+  use Resource::RE2;
+  
   native static method test : int ();
 }

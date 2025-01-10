@@ -15,15 +15,15 @@ name: Date-Holidays-DK
 provides:
   Date::Holidays::DK:
     file: DK.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   Date::Easter: '0'
   Date::Simple: '0'
   Test::More: '0'
 resources:
-  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Date-Holidays-DK
+  bugtracker: https://github.com/tagg/Date-Holidays-DK/issues
   homepage: https://metacpan.org/pod/Date::Holidays::DK
   license: http://dev.perl.org/licenses/
   repository: https://github.com/tagg/Date-Holidays-DK
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

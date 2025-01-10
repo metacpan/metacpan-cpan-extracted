@@ -1,5 +1,8 @@
 Revision history for Acme-LookOfDisapproval
 
+0.008     2025-01-09 19:59:59Z
+          - various toolchain updates, now using Dist::Zilla again.
+
 0.007     2018-09-02 21:00:36Z
           - switch from JSON to JSON::PP
           - many fixes to build infrastructure to keep pace with changes to

@@ -1,5 +1,11 @@
 Revision history for Perl extension Algorithm-CurveFit.
 
+1.06  Thu Jan  9 17:44 2025
+  - Fix formula_sub args when calculating derivatives.  The parameters
+    were passed into formula_sub incorrectly in one location in the code,
+    which only appeared as a bug after the change from Debian jessie to
+    Debian stretch.  See the bug report RT#121352 for many more details.
+
 1.05  Sat Jun  5 10:14 2010
   - Compile functions to Perl subs when possible for
     performance.
@@ -27,4 +33,3 @@ Revision history for Perl extension Algorithm-CurveFit.
 
 1.00  Mon Apr 25 16:25 2005
   - original version as uploaded to CPAN
-

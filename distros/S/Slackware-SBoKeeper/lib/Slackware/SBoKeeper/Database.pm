@@ -1,6 +1,6 @@
 package Slackware::SBoKeeper::Database;
 use 5.016;
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 use strict;
 use warnings;
 
@@ -248,24 +248,8 @@ sub has {
 sub packages {
 
 	my $self = shift;
-	my $cat  = shift;
 
-	if (!$cat or $cat eq 'all') {
-		return sort keys %{$self->{_data}};
-	} elsif ($cat eq 'manual') {
-		return grep { $self->is_manual($_) } $self->packages();
-	} elsif ($cat eq 'nonmanual') {
-		return grep { !$self->is_manual($_) } $self->packages();
-	} elsif ($cat eq 'necessary') {
-		return grep { $self->is_necessary($_) } $self->packages();
-	} elsif ($cat eq 'unnecessary') {
-		return grep { !$self->is_necessary($_) } $self->packages();
-	} elsif ($cat eq 'missing') {
-		my %missing = $self->missing();
-		return uniq sort map { @{$missing{$_}} } keys %missing;
-	} else {
-		die "$cat is not a valid package category\n";
-	}
+	return sort keys %{$self->{_data}};
 
 }
 
@@ -275,7 +259,7 @@ sub missing {
 
 	my %missing;
 
-	foreach my $p ($self->packages('all')) {
+	foreach my $p ($self->packages) {
 
 		my @pmissing =
 			grep { !$self->has($_) }
@@ -293,7 +277,7 @@ sub extradeps {
 
 	my $self = shift;
 
-	my @pkgs = $self->packages('all');
+	my @pkgs = $self->packages;
 
 	my %extra;
 
@@ -327,8 +311,12 @@ sub is_necessary {
 	}
 
 	# Check if $pkg is a dependency of any manually installed package
-	return (any { $self->is_dependency($pkg, $_) } $self->packages('manual'))
-		? 1 : 0;
+
+	return
+		any { $self->is_dependency($pkg, $_) }
+		grep { $self->is_manual($_) }
+		$self->packages
+	;
 
 }
 
@@ -557,43 +545,9 @@ Returns list of dependencies removed.
 
 Returns 1 or 0 depending on whether $pkg is currently in the database.
 
-=head2 packages($category)
+=head2 packages()
 
-Returns array of added packages that are in $category. The following are valid
-categories:
-
-=over 4
-
-=item all
-
-All packages present in database.
-
-=item manual
-
-All packages that were added manually.
-
-=item nonmanual
-
-All packages that were not added manually.
-
-=item necessary
-
-Packages that were either manually added or dependencies of a manually added
-package.
-
-=item unnecessary
-
-Packages that were neither manually added or dependencies of a manually added
-package.
-
-=item missing
-
-Packages that are not present in the database but are needed by packages in the
-database.
-
-=back
-
-If $category is omitted, do the same thing as 'all'.
+Returns array of packages present in database.
 
 =head2 missing()
 

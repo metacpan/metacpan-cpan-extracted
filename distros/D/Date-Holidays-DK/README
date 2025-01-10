@@ -17,7 +17,7 @@ or, if you've got Module::Build installed:
   perl Build test
   perl Build install
 
-Copyright (c) 2004-2024 Lars Thegler. All rights reserved.
+Copyright (c) 2004-2025 Lars Thegler. All rights reserved.
 
 This module is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

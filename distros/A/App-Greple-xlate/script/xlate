@@ -14,7 +14,7 @@ define pod <<"=cut"
 
 =head1 SYNOPSIS
 
-    xlate [ options ] -t lang file [ greple options ]
+    xlate [ options ] -t LANG FILE [ greple options ]
         -h   help
         -v   show version
         -d   debug
@@ -24,13 +24,14 @@ define pod <<"=cut"
         -r   refresh cache
         -u   force update cache
         -s   silent mode
+        -t # target language (required, no default)
+        -b # base language (informational)
         -e # translation engine (*deepl, gpt3, gpt4, gpt4o)
-        -p # pattern to determine translation area
+        -p # pattern string to determine translation area
+        -f # pattern file to determine translation area
+        -o # output format (*xtxt, cm, ifdef, space, space+, colon)
         -x # file containing mask patterns
         -w # wrap line by # width
-        -o # output format (*xtxt, cm, ifdef, space, space+, colon)
-        -f # from lang (ignored)
-        -t # to lang (required, no default)
         -m # max length per API call
         -l # show library files (XLATE.mk, xlate.el)
         --   end of option
@@ -44,7 +45,7 @@ define pod <<"=cut"
         -D * run xlate on the container with the same parameters
         -C * execute following command on the container, or run shell
         -S * start the live container
-        -A * attach to the live container
+        -L * use the live container
         N.B. These options terminate option handling
 
         -W   mount current working directory
@@ -63,20 +64,22 @@ define pod <<"=cut"
 
 =head1 VERSION
 
-    Version 0.9902
+    Version 0.9904
 
 =cut
 
 [[ $pod =~ Version\ +([0-9.]+) ]] && my_version=${BASH_REMATCH[1]}
 
 git_topdir() {
-    [ "$(git rev-parse --is-inside-work-tree 2>/dev/null)" == true ] || return
+    : git_topdir
+    [[ $(git rev-parse --is-inside-work-tree 2>/dev/null) == true ]] || return
     local         dir="$(git rev-parse --show-superproject-working-tree)"
-    [ "$dir" ] || dir="$(git rev-parse --show-toplevel)"
+    [[ $dir ]] || dir="$(git rev-parse --show-toplevel)"
     echo $dir
 }
 
 get_ip() {
+    : get_ip
     local ip=$(ifconfig 2>/dev/null | awk '/inet /{print $2}' | tail -1)
     echo $ip
 }
@@ -118,10 +121,11 @@ ENV=(
 )
 
 container_name() {
+    : container_name
     local name
     if [[ $givenname ]]
     then
-	name=$givename
+	name="$givenname"
     else
 	if [[ $image =~ (.*/)?([-_.a-zA-Z]+) ]]
 	then name=${BASH_REMATCH[2]}
@@ -130,6 +134,20 @@ container_name() {
 	[[ $volume ]] && name+=.${volume##*/}
     fi
     echo $name
+}
+
+docker_find() {
+    : docker_find
+    local OPT OPTARG OPTIND status id
+    while getopts "s:" OPT
+    do
+	case $OPT in
+	    s) status=$OPTARG ;;
+	esac
+    done
+    shift $((OPTIND - 1))
+    id=$(docker ps -q -f ${status:+status=$status} -f name="^/$1\$")
+    [[ $id ]] && echo $id || return 1
 }
 
 ##
@@ -141,7 +159,7 @@ then
 fi
 while getopts :dq${DOCKER_OPT:=dURAI:E:WHP:O:V:GN:KSALCD} OPT
 do
-    [ "$XLATE_RUNNING_ON_DOCKER" ] && break
+    [[ $XLATE_RUNNING_ON_DOCKER ]] && break
     case $OPT in
 	d) debug=yes ; set -x ;;
 	q) quiet=yes ;;
@@ -174,31 +192,40 @@ do
 	N) givenname="$OPTARG" ;;
 	K|S)
 	    : ${container:=$(container_name)}
-	    if [[ $(docker ps -a -q -f name="^/$container$") ]]
+	    if id=$(docker_find "$container")
 	    then
-		docker rm -f $container | sed 's/$/ is removed/'
+		docker rm -f $container | sed -e 's/$/ is removed/'
 	    fi
 	    case $OPT in
 		K) [[ ${@:$OPTIND:1} =~ A ]] && (( OPTIND++ )) || exit ;;
+		S) ;;
 	    esac
 	    ;&
-	A)
+	A|L)
 	    : ${container:=$(container_name)}
-	    if [[ $OPT == A ]]
+	    if [[ $OPT =~ [AL] ]]
 	    then
-		if [[ $(docker ps -q -f status=exited -f name="^/$container$") ]]
+		if id=$(docker_find -s exited "$container")
 		then
-		    warn start and attach to \"$container\"
-		    exec docker start -ia $container || exit 1
+		    warn start and attach to the "$container ($id)"
+		    exec docker start -ia $id || exit 1
 		fi
-		if [[ $(docker ps -q -f status=running -f name="^/$container$") ]]
+		if id=$(docker_find -s running "$container")
 		then
-		    warn attach to \"$container\"
-		    exec docker attach $container || exit 1
+		    shift $((OPTIND - 1))
+		    if [[ $# > 0 ]]
+		    then
+			declare -a dockopt=(--interactive)
+			[ -t 0 ] && dockopt+=(--tty)
+			export DOCKER_CLI_HINTS=false
+			exec docker exec ${dockopt[@]} $id "$@" || exit 1
+		    else
+			warn attach to the "$container ($id)"
+			exec docker attach $id || exit 1
+		    fi
+		    exit
 		fi
 	    fi
-	    ;&
-	L)
 	    : ${container:=$(container_name)}
 	    warn create live conainer \"$container\"
 	    remove=
@@ -230,13 +257,11 @@ do
 		--init
 		--interactive
 	    )
-	    if [ "$remove" ]
-	    then dockopt+=(--rm)
-	    else dockopt+=(${container:+--name "$container"})
-	    fi
-	    [ -t 0 ]            && dockopt+=(--tty)
-	    [ -e "$localtime" ] && dockopt+=(-v $localtime:$localtime:ro)
-	    [ "$mount" ]        && dockopt+=(
+	    [[ $remove ]]       && dockopt+=(--rm)
+	    [[ $remove ]]       || dockopt+=(${container:+--name "$container"})
+	    [[ -t 0 ]]          && dockopt+=(--tty)
+	    [[ -e $localtime ]] && dockopt+=(-v $localtime:$localtime:ro)
+	    [[ $mount ]]        && dockopt+=(
 		    -v "${volume:-$pwd}:${workdir}:${mount_mode}" 
 		    -w "${workdir}${relative:+/${relative}}"
 		)
@@ -261,7 +286,7 @@ share=$(perl -MFile::Share=:all -E "say dist_dir '$mod'")
 
 declare -a pattern
 
-while getopts dq"${DOCKER_OPT}"'Macrusne:w:o:f:t:m:x:p:l:hv' OPT
+while getopts dq"${DOCKER_OPT}"'Macrusne:w:o:b:t:m:x:g:p:f:l:hv' OPT
 do
     case $OPT in
 	[$DOCKER_OPT]) : ;;
@@ -277,16 +302,16 @@ do
 	e)    engine="$OPTARG" ;;
 	w)      wrap="$OPTARG" ;;
 	o)    format="$OPTARG" ;;
-	f) from_lang="$OPTARG" ;;
-	t)   to_lang="$OPTARG" ;;
+	b) base_lang="$OPTARG" ;;
+	t)  tgt_lang="$OPTARG" ;;
 	m)       max="$OPTARG" ;;
 	x)  maskfile="$OPTARG" ;;
-	p)
-	    pattern+=(-E "$OPTARG")
-	    ;;
+	g)  glossary="$OPTARG" ;;
+	p)  pattern+=(-E "$OPTARG") ;;
+	f)  pattern+=(-f "$OPTARG") ;;
 	l)
 	    file="$share/$OPTARG"
-	    if [ -f "$file" ]
+	    if [[ -f $file ]]
 	    then
 		cat $file
 	    else
@@ -315,7 +340,7 @@ shift $((OPTIND - 1))
 ##
 ## Make
 ##
-if [ "$run_make" == yes ]
+if [[ $run_make == yes ]]
 then
     declare -a opt
     for m in "$@"
@@ -332,7 +357,7 @@ then
     unset MAKELEVEL
     exec make -f $share/XLATE.mk \
 	 ${dryrun:+-n} \
-	 XLATE_LANG=\""$to_lang"\" \
+	 XLATE_LANG=\""$tgt_lang"\" \
 	 XLATE_DEBUG=$debug \
 	 XLATE_MAXLEN=$max \
 	 XLATE_USEAPI=$use_api \
@@ -344,7 +369,7 @@ then
     || exit 1
 fi
 
-if [[ ! $to_lang ]]
+if [[ ! $tgt_lang ]]
 then
     warn "-t option is required."
     exit 1
@@ -363,9 +388,10 @@ declare -a module option
 
 module+=(-Mxlate) 
 option+=(--xlate-engine="$engine")
-option+=(--xlate-to="$to_lang" --xlate-format="$format" --xlate-cache=yes)
+option+=(--xlate-to="$tgt_lang" --xlate-format="$format" --xlate-cache=yes)
 option+=(--all)
 
+[ "$base_lang"      ] && option+=(--xlate-from "$base_lang")
 [ "$use_api" == yes ] || use_clipboard=yes
 [ "$check"   == yes ] || option+=(--xlate${use_clipboard:+-labor})
 [ "$wrap"           ] && option+=(--xlate-fold-line --xlate-fold-width=$wrap)
@@ -375,6 +401,7 @@ option+=(--all)
 [ "$silent"  == yes ] && option+=(--no-xlate-progress)
 [ "$max"            ] && option+=(--xlate-maxlen="$max")
 [ "$maskfile"       ] && option+=(--xlate-setopt "maskfile=$maskfile")
+[ "$glossary"       ] && option+=(--xlate-glossary "$glossary")
 
 declare -a area
 case $1 in
@@ -410,15 +437,11 @@ else
 fi
 
 exec=(greple "${module[@]}" "${option[@]}" ${1+"$@"})
+[[ $dryrun ]] && exec=(echo "${exec[@]}")
 
-if [[ $dryrun ]]
-then
-    echo "${exec[@]}"
-else
-    "${exec[@]}"
-fi
+exec "${exec[@]}"
 
-exit
+exit 1
 
 : <<'=cut'
 
@@ -606,6 +629,14 @@ Force update of the translation cache.
 
 Run in silent mode.
 
+=item B<-t> I<lang>
+
+Specify the target language (required).
+
+=item B<-b> I<lang>
+
+Specify the base language (optional).
+
 =item B<-e> I<engine>
 
 Specify the translation engine to use.
@@ -613,6 +644,16 @@ Specify the translation engine to use.
 =item B<-p> I<pattern>
 
 Specify a pattern to determine the translation area.
+See L<App::Greple::xlate/NORMALIZATION>.
+
+=item B<-f> I<file>
+
+Specify a file containing pattern to determine the translation area.
+See L<App::Greple::xlate/NORMALIZATION>.
+
+=item B<-o> I<format>
+
+Specify the output format.
 
 =item B<-x> I<file>
 
@@ -621,18 +662,6 @@ Specify a file containing mask patterns.
 =item B<-w> I<width>
 
 Wrap lines at the specified width.
-
-=item B<-o> I<format>
-
-Specify the output format.
-
-=item B<-f> I<lang>
-
-Specify the source language (currently ignored).
-
-=item B<-t> I<lang>
-
-Specify the target language (required).
 
 =item B<-m> I<length>
 
@@ -660,31 +689,40 @@ Dry run.
 
 =head2 DOCKER OPTIONS
 
-Docker feature is invoked by the C<-D>, C<-C>, C<-S> or C<-A> option.
+Docker feature is invoked by the C<-D>, C<-C>, C<-S> or C<-L> option.
 Once any of these options appear, subsequent options are not
 interpreted, so it should always be the last of Docker related
 options.
 
 =over 7
 
-=item B<-D>
+=item B<-D> I<options>
 
 Run B<xlate> scirpt on the Docker container with the rest of the
 parameters.
 
-=item B<-C>
+=item B<-C> [ I<command> ]
 
 Execute the following command on the Docker container, or run a shell
 if no command is provided.
 
-=item B<-S>, B<-A>
+=item B<-S> [ I<command> ]
 
 Option C<-S> starts a new live container.  If the container exists, it
 is removed before starting.
 
-Option C<-A> attaches to a running container.  If the container does
-not exist, a new one is created, and if there is a stopped container,
-it is restarted before connecting.
+=item B<-L> [ I<command> ]
+
+When executed without arguments, option C<-L> attaches to a running
+container (performs C<docker attach>).  If the container does not
+exist, a new container is created, and if there is a stopped
+container, it is restarted before attaching.
+
+If executed with command arguments, the command is executed on the
+running container (performs C<docker exec>).  If the container does
+not exist, it creates a new container executing the given command.
+Therefore, the next time it attaches, it connects to the container
+that executes that command.
 
 Target container is distinguished by name.  The default container name
 is C<xlate>.  The last portion of the Docker image to run is given as
@@ -852,7 +890,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright © 2023-2024 Kazumasa Utashiro.
+Copyright © 2023-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

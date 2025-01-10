@@ -20,6 +20,7 @@ Makefile.PL
 MANIFEST
 MANIFEST.SKIP
 README.pod
+SECURITY.md
 t/_filter_older_dists.t
 t/allow_packages_only_once.t
 t/alpha_versions.t

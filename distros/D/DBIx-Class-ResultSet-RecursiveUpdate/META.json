@@ -48,7 +48,7 @@
             "DBIx::Class::IntrospectableM2M" : "0",
             "Data::Dumper::Concise" : "2.02",
             "DateTime" : "0",
-            "List::MoreUtils" : "0.22",
+            "List::Util" : "1.35",
             "SQL::Translator" : "0.11016",
             "Try::Tiny" : "0.3",
             "perl" : "5.014"
@@ -71,11 +71,11 @@
       },
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/gshank/dbix-class-resultset-recursiveupdate",
-         "web" : "http://github.com/gshank/dbix-class-resultset-recursiveupdate"
+         "url" : "https://github.com/gshank/dbix-class-resultset-recursiveupdate.git",
+         "web" : "https://github.com/gshank/dbix-class-resultset-recursiveupdate"
       }
    },
-   "version" : "0.44",
+   "version" : "0.45",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040000"
@@ -310,7 +310,7 @@
                }
             },
             "name" : "Test::Portability",
-            "version" : "2.001001"
+            "version" : "2.001003"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::DistManifest",
@@ -347,7 +347,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.39.2",
+                  "git_version" : "2.39.5",
                   "repo_root" : "."
                }
             },
@@ -371,7 +371,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.39.2",
+                  "git_version" : "2.39.5",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -388,12 +388,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.44",
+                  "tag" : "0.45",
                   "tag_format" : "%v",
                   "tag_message" : "%v"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.39.2",
+                  "git_version" : "2.39.5",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -413,7 +413,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.39.2",
+                  "git_version" : "2.39.5",
                   "repo_root" : "."
                }
             },
@@ -485,7 +485,7 @@
       }
    },
    "x_generated_by_perl" : "v5.40.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

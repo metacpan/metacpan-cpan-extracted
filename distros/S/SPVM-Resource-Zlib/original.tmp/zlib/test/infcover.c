@@ -52,7 +52,7 @@
                             using strm.
  */
 
-/* these items are strung together in a linked list, one for each allocation */
+/* these args_width are strung together in a linked list, one for each allocation */
 struct mem_item {
     void *ptr;                  /* pointer to allocated memory */
     size_t size;                /* requested size of allocation */

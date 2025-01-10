@@ -1,5 +1,4 @@
 Changes
-Debug-Client-0.32.tar.gz
 eg/debugger.pl
 inc/Module/Install.pm
 inc/Module/Install/Base.pm

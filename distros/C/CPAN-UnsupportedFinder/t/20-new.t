@@ -3,11 +3,9 @@
 use strict;
 
 # use lib 'lib';
-use Test::Most tests => 8;
+use Test::Most tests => 10;
 
-BEGIN {
-	use_ok('CPAN::UnsupportedFinder')
-}
+BEGIN { use_ok('CPAN::UnsupportedFinder') }
 
 isa_ok(CPAN::UnsupportedFinder->new(), 'CPAN::UnsupportedFinder', 'Creating CPAN::UnsupportedFinder object');
 isa_ok(CPAN::UnsupportedFinder::new(), 'CPAN::UnsupportedFinder', 'Creating CPAN::UnsupportedFinder object');
@@ -23,3 +21,7 @@ cmp_ok($obj->{'api_url'}, 'eq', 'http://example.com', 'direct key-value pairs');
 my $obj2 = $obj->new({ cpan_testers => 'https://www.google.com' });
 cmp_ok($obj2->{'api_url'}, 'eq', 'http://example.com', 'clone keeps old args');
 cmp_ok($obj2->{'cpan_testers'}, 'eq', 'https://www.google.com', 'clone adds new args');
+
+# Invalid argument
+ok(!defined(CPAN::UnsupportedFinder->new('foo')));
+ok(!defined(CPAN::UnsupportedFinder->new()->new('foo')));

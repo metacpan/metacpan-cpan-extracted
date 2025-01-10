@@ -1,0 +1,55 @@
+{
+   "abstract" : "Nonlinear Least Squares Fitting",
+   "author" : [
+      "Steffen Mueller <smueller@cpan.org>",
+      "Paul Cochrane <ptc@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4234",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Algorithm-CurveFit",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Test::Pod" : "1.0",
+            "Test::Pod::Coverage" : "1.0"
+         },
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Math::MatrixReal" : "0",
+            "Math::Symbolic" : "0.602",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Algorithm::CurveFit" : {
+         "file" : "lib/Algorithm/CurveFit.pm",
+         "version" : "1.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.06",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

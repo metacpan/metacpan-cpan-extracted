@@ -4,6 +4,12 @@ Revision history for Switch-Back
        Initial release.
 
 
-
 0.000002  Thu Jun 27 08:40:59 2024
-          No changes logged
+        No changes logged
+
+
+0.000003  Fri Jan 10 10:51:22 2025
+
+        Fixed line-number issues caused by preprocessing of given/when/default blocks
+        (Thanks, Graham!)
+

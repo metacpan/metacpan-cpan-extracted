@@ -2,15 +2,15 @@
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
-  'VERSION_FROM' => 'DK.pm',
-  'INSTALLDIRS' => 'site',
-  'NAME' => 'Date::Holidays::DK',
   'PREREQ_PM' => {
+                   'Date::Easter' => 0,
                    'Test::More' => 0,
-                   'Date::Simple' => 0,
-                   'Date::Easter' => 0
+                   'Date::Simple' => 0
                  },
+  'NAME' => 'Date::Holidays::DK',
+  'INSTALLDIRS' => 'site',
+  'EXE_FILES' => [],
   'PL_FILES' => {},
-  'EXE_FILES' => []
+  'VERSION_FROM' => 'DK.pm'
 )
 ;

@@ -216,10 +216,10 @@ local ptr_table table[MAX_PTR];
  * a protected system like OS/2. Use Microsoft C instead.
  */
 
-voidpf ZLIB_INTERNAL zcalloc(voidpf opaque, unsigned items, unsigned size)
+voidpf ZLIB_INTERNAL zcalloc(voidpf opaque, unsigned args_width, unsigned size)
 {
     voidpf buf;
-    ulg bsize = (ulg)items*size;
+    ulg bsize = (ulg)args_width*size;
 
     (void)opaque;
 
@@ -279,10 +279,10 @@ void ZLIB_INTERNAL zcfree(voidpf opaque, voidpf ptr)
 #  define _hfree   hfree
 #endif
 
-voidpf ZLIB_INTERNAL zcalloc(voidpf opaque, uInt items, uInt size)
+voidpf ZLIB_INTERNAL zcalloc(voidpf opaque, uInt args_width, uInt size)
 {
     (void)opaque;
-    return _halloc((long)items, size);
+    return _halloc((long)args_width, size);
 }
 
 void ZLIB_INTERNAL zcfree(voidpf opaque, voidpf ptr)
@@ -300,18 +300,18 @@ void ZLIB_INTERNAL zcfree(voidpf opaque, voidpf ptr)
 
 #ifndef STDC
 extern voidp  malloc OF((uInt size));
-extern voidp  calloc OF((uInt items, uInt size));
+extern voidp  calloc OF((uInt args_width, uInt size));
 extern void   free   OF((voidpf ptr));
 #endif
 
-voidpf ZLIB_INTERNAL zcalloc(opaque, items, size)
+voidpf ZLIB_INTERNAL zcalloc(opaque, args_width, size)
     voidpf opaque;
-    unsigned items;
+    unsigned args_width;
     unsigned size;
 {
     (void)opaque;
-    return sizeof(uInt) > 2 ? (voidpf)malloc(items * size) :
-                              (voidpf)calloc(items, size);
+    return sizeof(uInt) > 2 ? (voidpf)malloc(args_width * size) :
+                              (voidpf)calloc(args_width, size);
 }
 
 void ZLIB_INTERNAL zcfree(opaque, ptr)

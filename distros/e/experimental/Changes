@@ -1,5 +1,8 @@
 Revision history for experimental
 
+0.034     2025-01-09 22:11:31+01:00 Europe/Brussels
+          - Rerelease to deal with illegal core update
+
 0.033     2024-12-24 00:50:41+01:00 Europe/Brussels
           - feature extra_paired_delimiters not considered stable
 

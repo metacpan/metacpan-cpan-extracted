@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2024 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2023-2025 Löwenfelsen UG (haftungsbeschränkt)
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -20,7 +20,7 @@ use Data::Identifier::Generate;
 
 use parent 'Data::Identifier::Interface::Known';
 
-our $VERSION = v0.07;
+our $VERSION = v0.08;
 
 use constant {
     WK_UUID => '8be115d2-dc2f-4a98-91e1-a6e3075cbc31', # uuid
@@ -225,7 +225,7 @@ Data::Identifier::Wellknown - format independent identifier object
 
 =head1 VERSION
 
-version v0.07
+version v0.08
 
 =head1 SYNOPSIS
 
@@ -272,7 +272,7 @@ Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023-2024 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2023-2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
 
 This is free software, licensed under:
 
@@ -393,6 +393,9 @@ $type uuid
 .   a414c87d-efe0-4376-8eae-66aefa78cf92    date
 .   c64b5209-b975-4e59-9467-3c3b3f136b4e    colour-value
 .   d9bd807e-57cb-4736-9317-bf6bba5db48a    namespace
+
+.   84402088-2d3b-49c2-af16-f7715b54f051    creative-work
+.   68aa9198-110c-43bb-a8cc-e0a533e2341e    spacetime-subject
 
 $extra_classes identifier
 .   8be115d2-dc2f-4a98-91e1-a6e3075cbc31    uuid                        sid=2
@@ -720,6 +723,12 @@ $type uuid
 
 .   ae1072ef-0865-5104-b257-0d45441fa5e5    male
 .   3c4b6cdf-f5a8-50d6-8a3a-b0c0975f7e69    female
+
+$class gender-or-sex
+$type uuid
+
+.   d642eff3-bee6-5d09-aea9-7c47b181dd83    male
+.   db9b0db1-a451-59e8-aa3b-9994e683ded3    female
 
 
 $class flag
@@ -1256,6 +1265,20 @@ $type uuid
 .   54bf8af4-b1d7-44da-af48-5278d11e8f32    ValueFile
 .   f7674607-ae49-4a5a-bb2c-6392beeb9928    nowhere
 .   92292a4e-b060-417e-a90c-a270331259e9    needstagging
+.   7e5d56d4-98e6-4205-89c0-763e1d729531    utf-8-marker
+
+$extra_classes generator
+.   97b7f241-e1c5-4f02-ae3c-8e31e501e1dc    gregorian-date-generator
+.   55febcc4-6655-4397-ae3d-2353b5856b34    rgb-colour-generator
+.   913ee958-fda7-48ff-a57a-e34d11dc3273    gtin-generator
+.   d511f370-0e49-42d5-ad18-bf280dc97e08    body-generator
+.   bd1a1966-2e71-43cc-a7ce-f7a4547df450    character-generator
+.   2b85ca08-921c-4683-a102-f18748c88fda    birth-generator
+.   3e1c709e-32bf-4943-a9fa-8c25cb37dc92    death-generator
+.   39f643aa-37ab-413d-87d7-4260bb1785b9    roaraudio-error-generator
+.   d74f8c35-bcb8-465c-9a77-01010e8ed25c    unicode-character-generator
+.   a649d48d-35b0-4454-81af-c5fd2eb40373    media-sub-type-generator
+.   5c8c072e-f1a2-4824-9721-d57e811b6b4f    media-super-type-generator
 
 
 $class _leftover_sids

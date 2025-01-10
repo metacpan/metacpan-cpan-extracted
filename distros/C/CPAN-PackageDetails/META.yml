@@ -29,5 +29,5 @@ resources:
   bugtracker: https://github.com/briandfoy/cpan-packagedetails/issues
   homepage: https://github.com/briandfoy/cpan-packagedetails
   repository: https://github.com/briandfoy/cpan-packagedetails
-version: '0.264'
+version: '0.265'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

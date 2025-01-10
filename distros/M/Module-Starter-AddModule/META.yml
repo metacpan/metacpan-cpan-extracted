@@ -29,5 +29,5 @@ resources:
   bugtracker: https://github.com/briandfoy/module-starter-addmodule/issues
   homepage: https://github.com/briandfoy/module-starter-addmodule
   repository: https://github.com/briandfoy/module-starter-addmodule
-version: '1.009'
+version: '1.011'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -54,7 +54,7 @@ The perl package only uses C<s_BSDIPA_32> mode (31-bit size limits).
 
 =over
 
-=item C<VERSION> (string, eg, '0.5.0')
+=item C<VERSION> (string, eg, '0.5.2')
 
 A version string.
 
@@ -73,7 +73,7 @@ Result is usable.
 
 =item C<FBIG> (number)
 
-Data length too large.
+Data or resulting control block length too large.
 
 =item C<NOMEM> (number)
 
@@ -91,7 +91,7 @@ to the memory backing C<$after_sv>,
 and place the result in the (de-)reference(d) C<$patch_sv>.
 On error C<undef> is stored if only C<$patch_sv> is accessible.
 C<$magic_window> specifies lookaround bytes,
-if 0 the built-in default is used (32 at the time of this writing);
+if 0 the built-in default is used (16 at the time of this writing);
 the already unreasonable value 4096 is the maximum supported.
 
 =item C<core_diff_raw($before_sv, $after_sv, $patch_sv, $magic_window=0)>
@@ -115,7 +115,7 @@ Exactly like C<core_patch_zlib()>, but expects raw uncompressed patch.
 
 =head1 AUTHOR
 
-Steffen Nurpmeso E<lt>steffen@sdaoden.eu<gt>.
+Steffen Nurpmeso E<lt>steffen@sdaoden.euE<gt>.
 
 =head1 LICENSE
 

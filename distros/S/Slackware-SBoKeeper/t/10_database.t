@@ -6,7 +6,7 @@ use Test::More;
 
 use Slackware::SBoKeeper::Database;
 
-plan tests => 47;
+plan tests => 41;
 
 my $TEST_REPO = 't/data/repo';
 my $TEST_FILE = 'test-data-file.txt';
@@ -15,7 +15,7 @@ sub db_wipe {
 
 	my $db = shift;
 
-	$db->remove([ $db->packages('all') ]);
+	$db->remove([ $db->packages ]);
 
 }
 
@@ -50,7 +50,7 @@ is_deeply(
 );
 
 is_deeply(
-	[ $db->packages('all') ],
+	[ $db->packages ],
 	[ qw(a b c d e f) ],
 	'Package list and add list agree'
 );
@@ -116,7 +116,7 @@ isa_ok($rdb, 'Slackware::SBoKeeper::Database',
 );
 
 is_deeply(
-	[ $rdb->packages('all') ],
+	[ $rdb->packages ],
 	[ qw(a b c d e f) ],
 	'new() read database file correctly'
 );
@@ -128,7 +128,7 @@ is_deeply(
 );
 
 is_deeply(
-	[ $db->packages('all') ],
+	[ $db->packages ],
 	[ ],
 	'Package database is empty after wipe'
 );
@@ -148,49 +148,7 @@ is_deeply(
 );
 
 db_wipe($db);
-
-$db->add([ qw(a b f) ], 1);
-
-is_deeply(
-	[ $db->packages('all') ],
-	[ qw(a b c d e f) ],
-	'packages("all") list is ok'
-);
-
-is_deeply(
-	[ $db->packages('manual') ],
-	[ qw(a b f) ],
-	'packages("manual") list is ok'
-);
-
-is_deeply(
-	[ $db->packages('nonmanual') ],
-	[ qw(c d e) ],
-	'packages("nonmanual") list is ok'
-);
-
-$db->remove([ qw(f) ]);
-
-is_deeply(
-	[ $db->packages('necessary') ],
-	[ qw(a b) ],
-	'packages("necessary") list is ok'
-);
-
-is_deeply(
-	[ $db->packages('unnecessary') ],
-	[ qw(c d e) ],
-	'packages("unnecessary") list is ok'
-);
-
-db_wipe($db);
 $db->tack([ qw(f) ], 1);
-
-is_deeply(
-	[ $db->packages('missing') ],
-	[ qw(a b e) ],
-	'packages("missing") list is ok'
-);
 
 is_deeply(
 	{ $db->missing() },

@@ -2,8 +2,16 @@
 
 use strict;
 use warnings;
+
 use Test::Most;
-use Grammar::Improver;
+use Test::RequiresInternet ('api.languagetool.org' => 'https');
+use Test::Warnings;
+
+BEGIN {
+	plan(skip_all => 'NO_NETWORK_TESTING set') if $ENV{'NO_NETWORK_TESTING'};
+	plan(tests => 6);
+	use_ok('Grammar::Improver')
+}
 
 # Create an instance of Grammar::Improver
 my $improver = Grammar::Improver->new(

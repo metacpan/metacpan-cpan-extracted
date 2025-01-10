@@ -1,7 +1,7 @@
 {
    "abstract" : "Experimental features made easy",
    "author" : [
-      "Leon Timmermans <leont@cpan.org>"
+      "Leon Timmermans <fawaka@gmail.com>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
@@ -45,18 +45,17 @@
    "provides" : {
       "experimental" : {
          "file" : "lib/experimental.pm",
-         "version" : "0.033"
+         "version" : "0.034"
       },
       "stable" : {
          "file" : "lib/stable.pm",
-         "version" : "0.033"
+         "version" : "0.034"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-experimental at rt.cpan.org",
-         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=experimental"
+         "web" : "https://github.com/Dual-Life/experimental/issues"
       },
       "repository" : {
          "type" : "git",
@@ -64,7 +63,7 @@
          "web" : "https://github.com/Dual-Life/experimental"
       }
    },
-   "version" : "0.033",
+   "version" : "0.034",
    "x_contributors" : [
       "brian greenfield <0briang0@gmail.com>",
       "Dagfinn Ilmari Manns\u00e5ker <ilmari@ilmari.org>",
@@ -74,7 +73,6 @@
       "Grant McLean <grant@catalyst.net.nz>",
       "gregor herrmann <gregoa@debian.org>",
       "Karen Etheridge <ether@cpan.org>",
-      "Leon Timmermans <fawaka@gmail.com>",
       "Paul \"LeoNerd\" Evans <leonerd@leonerd.org.uk>",
       "Philippe Bruhat (BooK) <book@cpan.org>",
       "Ricardo Signes <rjbs@cpan.org>",

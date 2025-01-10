@@ -1,5 +1,5 @@
 package experimental;
-$experimental::VERSION = '0.033';
+$experimental::VERSION = '0.034';
 use strict;
 use warnings;
 use version ();
@@ -140,7 +140,7 @@ experimental - Experimental features made easy
 
 =head1 VERSION
 
-version 0.033
+version 0.034
 
 =head1 SYNOPSIS
 
@@ -304,7 +304,7 @@ L<perlexperiment|perlexperiment> contains more information about experimental fe
 
 =head1 AUTHOR
 
-Leon Timmermans <leont@cpan.org>
+Leon Timmermans <fawaka@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

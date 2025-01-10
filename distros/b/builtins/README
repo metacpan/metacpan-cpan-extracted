@@ -1,4 +1,4 @@
-builtins version 0.000007
+builtins version 0.000008
 
 Under Perl 5.36 or later, this module loads every available built-in function
 from the builtin:: namespace, and turns off the warnings about them still

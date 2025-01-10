@@ -10,6 +10,9 @@
 #include "perl.h"
 #include "XSUB.h"
 
+/* need core perl's keywords.h to get KEY_my */
+#include "keywords.h"
+
 #include "XSParseKeyword.h"
 #include "XSParseInfix.h"
 
@@ -957,11 +960,44 @@ static int my_keyword_plugin(pTHX_ char *kw, STRLEN kwlen, OP **op)
   if(PL_parser && PL_parser->error_count)
     return (*next_keyword_plugin)(aTHX_ kw, kwlen, op);
 
+  char *orig_kw = kw;
+  STRLEN orig_kwlen = kwlen;
+
   HV *hints = GvHV(PL_hintgv);
+
+  /* Can't ENTER/SAVE/LEAVE here because some keywords don't like it */
+  U16 was_parser_in_my = PL_parser->in_my;
+  PL_parser->in_my = 0;
+  char *was_parser_bufptr = PL_parser->bufptr;
+
+#if HAVE_PERL_VERSION(5, 16, 0)
+  /* Huge hack to be able to handle 'my KW' by eating the 'my' then advance to
+   * the next keyword.
+   * We don't support this on Perl 5.14, because it causes absolutely bizarre
+   * failures of `utf8.pm` and `utf8_heavy.pl`.
+   */
+  if(kwlen == 2 && strEQ(kw, "my")) {
+    lex_read_space(0);
+
+    I32 c = lex_peek_unichar(0);
+    if(!isIDFIRST_uni(c))
+      goto next_keyword;
+
+    kw = PL_parser->bufptr;
+
+    lex_read_unichar(0);
+    while((c = lex_peek_unichar(0)) && isIDCONT_uni(c))
+      lex_read_unichar(0);
+
+    kwlen = PL_parser->bufptr - kw;
+
+    PL_parser->in_my = KEY_my;
+  }
+#endif
 
   struct Registration *reg;
   for(reg = registrations; reg; reg = reg->next) {
-    if(reg->kwlen != kwlen || !strEQ(reg->kwname, kw))
+    if(reg->kwlen != kwlen || !strnEQ(reg->kwname, kw, kwlen))
       continue;
 
     if(reg->hooks->permit_hintkey &&
@@ -971,6 +1007,9 @@ static int my_keyword_plugin(pTHX_ char *kw, STRLEN kwlen, OP **op)
     if(reg->hooks->permit &&
       !(*reg->hooks->permit)(aTHX_ reg->hookdata))
       continue;
+
+    if(PL_parser->in_my && !(reg->hooks->flags & XPK_FLAG_PERMIT_LEXICAL))
+      croak("'my %.*s' is not permitted as a lexical keyword", kwlen, kw);
 
     if(reg->hooks->check)
       (*reg->hooks->check)(aTHX_ reg->hookdata);
@@ -986,10 +1025,15 @@ static int my_keyword_plugin(pTHX_ char *kw, STRLEN kwlen, OP **op)
     if(ret && !*op)
       *op = newOP(OP_NULL, 0);
 
+    PL_parser->in_my = was_parser_in_my;
     return ret;
   }
 
-  return (*next_keyword_plugin)(aTHX_ kw, kwlen, op);
+next_keyword:
+  if(PL_parser->bufptr > was_parser_bufptr)
+    PL_parser->bufptr = was_parser_bufptr;
+  PL_parser->in_my = was_parser_in_my;
+  return (*next_keyword_plugin)(aTHX_ orig_kw, orig_kwlen, op);
 }
 
 void XSParseKeyword_boot(pTHX)

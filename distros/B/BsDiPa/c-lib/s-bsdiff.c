@@ -215,13 +215,14 @@ s_bsdipa_diff(struct s_bsdipa_diff_ctx *dcp){
 
 	/* Compute the differences, writing ctrl as we go */
 	/* C99 */{
-		s_bsdipa_off_t scan, len, pos, lastscan, lastpos, lastoff, aftscore;
+		s_bsdipa_off_t ctrl_len_max, scan, len, pos, lastscan, lastpos, lastoff, aftscore;
 		uint32_t ctrlno;
 		struct s_bsdipa_ctrl_chunk **ccpp, *ccp;
 
 		ccpp = NULL;
 		ccp = NULL; /* xxx UNINIT() */
 		ctrlno = 0; /* xxx UNINIT() */
+		ctrl_len_max = s_BSDIPA_OFF_MAX - beflen - (sizeof(s_bsdipa_off_t) * 3) - 1;
 		scan = len = pos = lastscan = lastpos = lastoff = 0;
 
 		while(scan < beflen){
@@ -246,6 +247,11 @@ s_bsdipa_diff(struct s_bsdipa_diff_ctx *dcp){
 
 			if(len != aftscore || scan == beflen){
 				s_bsdipa_off_t s, Sf, lenf, i, lenb, j;
+
+				if(dcp->dc_ctrl_len >= ctrl_len_max){
+					rv = s_BSDIPA_FBIG;
+					goto jdone;
+				}
 
 				s = Sf = lenf = 0;
 
@@ -342,7 +348,7 @@ s_bsdipa_diff(struct s_bsdipa_diff_ctx *dcp){
 
 	dcp->dc_diff_dat = diffp;
 
-	/* Create readily prepared header */
+	/* Create readily prepared header; as documented, sum of lengths does not exceed _OFF_MAX */
 	a_bsdiff_xout(dcp->dc_ctrl_len, &dcp->dc_header[0]);
 	a_bsdiff_xout(dcp->dc_diff_len, &dcp->dc_header[sizeof(s_bsdipa_off_t)]);
 	a_bsdiff_xout(dcp->dc_extra_len, &dcp->dc_header[sizeof(s_bsdipa_off_t) * 2]);
