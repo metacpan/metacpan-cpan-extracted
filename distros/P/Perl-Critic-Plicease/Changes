@@ -1,5 +1,8 @@
 Revision history for Perl-Critic-Plicease
 
+0.10      2025-01-10 13:14:42 -0700
+  - Documentation improvements (gh#12, gh#13)
+
 0.09      2024-12-27 16:09:09 -0700
   - (ProhibitSignaturesAndAtUnderscore) Do not detect @_ inside nested sub (gh#10, gh#11)
 

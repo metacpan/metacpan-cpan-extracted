@@ -1,5 +1,5 @@
 package Crypt::Passphrase::Encoder;
-$Crypt::Passphrase::Encoder::VERSION = '0.019';
+$Crypt::Passphrase::Encoder::VERSION = '0.020';
 use strict;
 use warnings;
 
@@ -16,12 +16,12 @@ sub crypt_subtypes;
 
 sub accepts_hash {
 	my ($self, $hash) = @_;
-	return 0 if not defined $hash;
+	return !!0 if not defined $hash;
 	$self->{accepts_hash} //= do {
 		my $string = join '|', $self->crypt_subtypes or return;
-		qr/ \A \$ (?: $string ) \$ /x;
+		qr/ \A \$ (?: $string ) [\$,] /x;
 	};
-	return $hash =~ $self->{accepts_hash};
+	return scalar $hash =~ $self->{accepts_hash};
 }
 
 sub recode_hash {
@@ -45,7 +45,7 @@ Crypt::Passphrase::Encoder - Base class for Crypt::Passphrase encoders
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 DESCRIPTION
 
@@ -86,6 +86,8 @@ This method returns the types of crypt entries this validator supports. This is 
 =head3 recode_hash
 
  $encoder->recode_hash($hash)
+
+This method recodes the C<$hash> if possible. By default it will just return the hash unmodified, this is usualy what you want.
 
 =head2 Provided methods
 

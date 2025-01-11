@@ -64,7 +64,7 @@ use Daje::Workflow::Database::Model::Context;
 # janeskil1525 E<lt>janeskil1525@gmail.comE<gt>
 #
 
-our $VERSION = "0.08";
+our $VERSION = "0.09";
 
 has 'db';               # Constructor
 has 'workflow_pkey';    # Constructor
@@ -116,7 +116,8 @@ sub load_context($self) {
 
 sub save_context($self) {
     Daje::Workflow::Database::Model::Context->new(
-        db => $self->db
+        db              => $self->db,
+        workflow_pkey   => $self->workflow_pkey,
     )->save(
         $self->context
     );

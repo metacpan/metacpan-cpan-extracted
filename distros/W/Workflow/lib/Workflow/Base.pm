@@ -2,9 +2,11 @@ package Workflow::Base;
 
 use warnings;
 use strict;
-use base qw( Class::Accessor );
-use Log::Log4perl;
-$Workflow::Base::VERSION = '1.62';
+use v5.14.0;
+use parent qw( Class::Accessor );
+use Log::Any;
+
+$Workflow::Base::VERSION = '2.02';
 
 sub new {
     my ( $class, @params ) = @_;
@@ -23,7 +25,7 @@ sub new {
 sub init {return};
 
 sub log {
-    return ( $_[0]->{log} ||=  Log::Log4perl->get_logger(ref $_[0]) );
+    return ( $_[0]->{log} ||=  Log::Any->get_logger( category => ref $_[0] ) );
 }
 
 sub param {
@@ -36,13 +38,21 @@ sub param {
 
     if ( ref $name eq 'HASH' ) {
         foreach my $param_name ( keys %{$name} ) {
-            $self->{PARAMS}{$param_name} = $name->{$param_name};
+            if (defined $name->{$param_name}) {
+                $self->{PARAMS}{$param_name} = $name->{$param_name};
+            }
+            else {
+                delete $self->{PARAMS}->{$param_name};
+            }
         }
         return { %{ $self->{PARAMS} } };
     }
 
     unless ( defined $value ) {
-        return $self->{PARAMS}{$name};
+        if ( exists $self->{PARAMS}{$name} ) {
+            return $self->{PARAMS}{$name};
+        }
+        return;
     }
     return $self->{PARAMS}{$name} = $value;
 }
@@ -96,12 +106,12 @@ Workflow::Base - Base class with constructor
 
 =head1 VERSION
 
-This documentation describes version 1.62 of this package
+This documentation describes version 2.02 of this package
 
 =head1 SYNOPSIS
 
  package My::App::Foo;
- use base qw( Workflow::Base );
+ use parent qw( Workflow::Base );
 
 =head1 DESCRIPTION
 
@@ -196,7 +206,7 @@ it in a list. If given neither return an empty list.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2003-2023 Chris Winters. All rights reserved.
+Copyright (c) 2003-2021 Chris Winters. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

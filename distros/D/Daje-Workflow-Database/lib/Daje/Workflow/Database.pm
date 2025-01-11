@@ -40,7 +40,7 @@ use Mojo::Loader qw(load_class);
 # janeskil1525 E<lt>janeskil1525@gmail.comE<gt>
 #
 
-our $VERSION = "0.12";
+our $VERSION = "0.13";
 
 has 'pg';
 has 'migrations';
@@ -86,7 +86,7 @@ CREATE TABLE IF NOT EXISTS context
     modby varchar NOT NULL DEFAULT 'System',
     moddatetime timestamp without time zone NOT NULL DEFAULT NOW(),
     workflow_fkey bigint not null,
-    context bytea,
+    context JSON,
     CONSTRAINT context_workflow_fkey FOREIGN KEY (workflow_fkey)
         REFERENCES workflow (workflow_pkey)
 );

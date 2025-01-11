@@ -2,5 +2,5 @@
 # MIT License
 
 class Resource::Utf8proc {
-  version "0.001";
+  version "0.002";
 }

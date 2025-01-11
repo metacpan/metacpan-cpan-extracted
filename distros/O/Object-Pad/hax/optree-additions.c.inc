@@ -3,7 +3,6 @@
 #define newAELEMOP(flags, first, key)  S_newAELEMOP(aTHX_ flags, first, key)
 static OP *S_newAELEMOP(pTHX_ U32 flags, OP *first, I32 key)
 {
-#if HAVE_PERL_VERSION(5,16,0)
   if(key >= -128 && key < 128 && first->op_type == OP_PADAV) {
     OP *o = newOP(OP_AELEMFAST_LEX, flags);
     o->op_private = (I8)key;
@@ -11,7 +10,6 @@ static OP *S_newAELEMOP(pTHX_ U32 flags, OP *first, I32 key)
     op_free(first);
     return o;
   }
-#endif
 
   return newBINOP(OP_AELEM, flags, first, newSVOP(OP_CONST, 0, newSViv(key)));
 }

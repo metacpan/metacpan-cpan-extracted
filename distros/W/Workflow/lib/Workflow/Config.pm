@@ -2,18 +2,19 @@ package Workflow::Config;
 
 use warnings;
 use strict;
-use base qw( Class::Factory );
+use v5.14.0;
+use parent qw( Class::Factory );
 use Data::Dumper qw( Dumper );
-use Log::Log4perl qw( get_logger );
 use Workflow::Exception qw( configuration_error );
 
-$Workflow::Config::VERSION = '1.62';
+$Workflow::Config::VERSION = '2.02';
 
 # Map the valid type to the top-level XML tag or data
 # structure to look for.
 my %VALID_TYPES = (
     action    => 'actions',
     condition => 'conditions',
+    observer => 'observers',
     persister => 'persister',
     validator => 'validators',
     workflow  => 'workflow',
@@ -100,7 +101,9 @@ sub _expand_refs {
 
 __PACKAGE__->register_factory_type( perl => 'Workflow::Config::Perl' );
 __PACKAGE__->register_factory_type( pl   => 'Workflow::Config::Perl' );
-__PACKAGE__->register_factory_type( xml  => 'Workflow::Config::XML' );
+__PACKAGE__->register_factory_type( xml  => 'Workflow::Config::XML'  );
+__PACKAGE__->register_factory_type( yaml => 'Workflow::Config::YAML' );
+__PACKAGE__->register_factory_type( yml  => 'Workflow::Config::YAML' );
 
 1;
 
@@ -114,7 +117,7 @@ Workflow::Config - Parse configuration files for the workflow components
 
 =head1 VERSION
 
-This documentation describes version 1.62 of this package
+This documentation describes version 2.02 of this package
 
 =head1 SYNOPSIS
 
@@ -182,7 +185,7 @@ would do something like:
  use strict;
 
  # Requirement 1: Subclass Workflow::Config
- use base qw( Workflow::Config );
+ use parent qw( Workflow::Config );
 
  # Requirement 2: Implement required methods
  sub parse { ... }
@@ -346,6 +349,12 @@ multiple 'action' declarations
 each 'action' declaration holds 'name' and 'resulting_state' keys and
 may hold a 'condition' key with one or more named conditions
 
+=item *
+
+each 'observer' names either a C<sub> or a C<class>. The C<sub> should
+have a package prefix (C<Package::subname>). When a C<class> name is
+given, the C<update> sub is called as a class method in the given C<class>.
+
 =back
 
 =head2 condition
@@ -452,6 +461,9 @@ each 'action' may have any number of 'validator' hashrefs, each with a
    use_uuid       yes|no   # all persister classes
 
    driver         $   # DBI persisters
+   options        \@  # DBI persisters
+      name        $   # DBI persisters
+      value       $   # DBI persisters
    dsn            $   # DBI persisters
    user           $   # DBI persisters
    password       $   # DBI persisters
@@ -492,9 +504,38 @@ take preference over random IDs
 
 For documentation of the other keys, please refer to the respective classes.
 
+=head2 observer
+
+ observers:
+
+   observer \@
+     name       $
+     type       $
+     sub        $
+     class      $
+
+=over 4
+
+=item *
+
+C<name> specifies the name of the observer for debugging purposes.
+
+=item *
+
+C<type> names the type of workflow to apply the observer to. The default
+value is C<default>.
+
+=item *
+
+The C<sub> and C<class> values have the same specification as given for
+the workflow observer keys.
+
+=back
+
+
 =head1 COPYRIGHT
 
-Copyright (c) 2003-2023 Chris Winters. All rights reserved.
+Copyright (c) 2003-2021 Chris Winters. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

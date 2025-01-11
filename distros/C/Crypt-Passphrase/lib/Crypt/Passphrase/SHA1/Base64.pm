@@ -1,5 +1,5 @@
 package Crypt::Passphrase::SHA1::Base64;
-$Crypt::Passphrase::SHA1::Base64::VERSION = '0.019';
+$Crypt::Passphrase::SHA1::Base64::VERSION = '0.020';
 use strict;
 use warnings;
 
@@ -40,7 +40,7 @@ Crypt::Passphrase::SHA1::Base64 - Validate against base64ed SHA1 hashes with Cry
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 SYNOPSIS
 

@@ -1,3 +1,9 @@
+v0.12  2025-01-10Z
+    - Initial support for Fur Affinity, Imgur
+    - Added option services_online
+    - Fixed RT#157959
+    - Added examples/data-uriid-find-fetch-url
+
 v0.11  2024-12-15Z
     - Added support for digest/hash based URLs
     - Added support for Data::Identifier as a source

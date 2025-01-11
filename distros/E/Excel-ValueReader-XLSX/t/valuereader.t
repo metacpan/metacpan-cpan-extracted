@@ -177,6 +177,13 @@ my @expected_tab_cols_with_entities = (
 );
 
 
+my @expected_tab_by_ref = (
+  {Name => 'amp', Char => '&'},
+  {Name => 'gt',  Char => '>'},
+  {Name => 'lt',  Char => '<'},
+ );
+
+
 my @expected_without_r = (
   [qw/One      two      three/],
   [qw/four     five     six  /],
@@ -254,6 +261,9 @@ sub run_tests {
 
   my $tab_cols_with_entities = $reader->table('Cols_with_entities');
   is_deeply($tab_cols_with_entities, \@expected_tab_cols_with_entities, "tab_cols_with_entities, using $context");
+
+  my $tab_by_ref = $reader->table(sheet => "Entities", ref => "B1:C4");
+  is_deeply($tab_by_ref, \@expected_tab_by_ref, "tab_by_ref");
 
   # check a pivot table
   my $tab_entities = $reader->values('Tab_entities');

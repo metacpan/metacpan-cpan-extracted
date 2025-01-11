@@ -1,5 +1,11 @@
 Revision history for Object-Pad
 
+0.819   2025-01-10
+        [CHANGES]
+         * Initial experimental attempt to support lexical `my class` syntax
+         * Neater, smaller `hax/` files by squashing out code guarded on
+           versions of Perl before 5.18
+
 0.818   2024-12-23
         [BUGFIXES]
          * Ensure that `method :common` works with the new `OP_ARGELEM` code

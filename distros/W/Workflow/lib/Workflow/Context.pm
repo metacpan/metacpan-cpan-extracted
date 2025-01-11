@@ -2,9 +2,10 @@ package Workflow::Context;
 
 use warnings;
 use strict;
-use base qw( Workflow::Base );
+use v5.14.0;
+use parent qw( Workflow::Base );
 
-$Workflow::Context::VERSION = '1.62';
+$Workflow::Context::VERSION = '2.02';
 
 
 sub init {
@@ -35,7 +36,7 @@ Workflow::Context - Data blackboard for Workflows, Actions, Conditions and Valid
 
 =head1 VERSION
 
-This documentation describes version 1.62 of this package
+This documentation describes version 2.02 of this package
 
 =head1 SYNOPSIS
 
@@ -95,7 +96,7 @@ C<$other_context> wins.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2003-2023 Chris Winters. All rights reserved.
+Copyright (c) 2003-2021 Chris Winters. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

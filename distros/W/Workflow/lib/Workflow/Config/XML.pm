@@ -2,15 +2,14 @@ package Workflow::Config::XML;
 
 use warnings;
 use strict;
-use base qw( Workflow::Config );
-use Log::Log4perl qw( get_logger );
+use v5.14.0;
+use parent qw( Workflow::Config );
+use Log::Any qw( $log );
 use Workflow::Exception qw( configuration_error );
 use Carp qw(croak);
-use English qw( -no_match_vars );
+use Syntax::Keyword::Try;
 
-$Workflow::Config::XML::VERSION = '1.62';
-
-my ($log);
+$Workflow::Config::XML::VERSION = '2.02';
 
 my %XML_OPTIONS = (
     action => {
@@ -38,13 +37,16 @@ my %XML_OPTIONS = (
         ],
         KeyAttr => [],
     },
+    observer => {
+        ForceArray => [ 'observer' ],
+        KeyAttr => [],
+    }
 );
 
 my $XML_REQUIRED = 0;
 
 sub parse {
     my ( $self, $type, @items ) = @_;
-    $log ||= get_logger();
 
     $self->_check_config_type($type);
     my @config_items = Workflow::Config::_expand_refs(@items);
@@ -55,13 +57,14 @@ sub parse {
         my $file_name = ( ref $item ) ? '[scalar ref]' : $item;
         $log->info("Will parse '$type' XML config file '$file_name'");
         my $this_config;
-
-        local $EVAL_ERROR = undef;
-        eval { $this_config = $self->_translate_xml( $type, $item ); };
-
-        # If processing multiple config files, this makes it much easier
-        # to find a problem.
-        croak "Processing $file_name: $EVAL_ERROR" if $EVAL_ERROR;
+        try {
+            $this_config = $self->_translate_xml( $type, $item );
+        }
+        catch ($error) {
+            # If processing multiple config files, this makes it much easier
+            # to find a problem.
+            croak $log->error("Processing $file_name: ", $error);
+        }
         $log->info("Parsed XML '$file_name' ok");
 
         # This sets the outer-most tag to use
@@ -83,15 +86,16 @@ sub parse {
 sub _translate_xml {
     my ( $self, $type, $config ) = @_;
     unless ($XML_REQUIRED) {
-        local $EVAL_ERROR = undef;
-        eval { require XML::Simple };
-        if ($EVAL_ERROR) {
+        try {
+            require XML::Simple;
+        }
+        catch ($error) {
             configuration_error "XML::Simple must be installed to parse ",
                 "configuration files/data in XML format";
-        } else {
-            XML::Simple->import(':strict');
-            $XML_REQUIRED++;
         }
+
+        XML::Simple->import(':strict');
+        $XML_REQUIRED++;
     }
     my $options = $XML_OPTIONS{$type} || {};
     my $data = XMLin( $config, %{$options} );
@@ -110,7 +114,7 @@ Workflow::Config::XML - Parse workflow configurations from XML content
 
 =head1 VERSION
 
-This documentation describes version 1.62 of this package
+This documentation describes version 2.02 of this package
 
 =head1 SYNOPSIS
 
@@ -146,7 +150,7 @@ Returns a list of config parameters as a array upon success.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004-2023 Chris Winters. All rights reserved.
+Copyright (c) 2004-2021 Chris Winters. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

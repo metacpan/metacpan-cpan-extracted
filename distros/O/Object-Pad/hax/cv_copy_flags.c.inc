@@ -36,7 +36,6 @@ static CV *MY_cv_copy_flags(pTHX_ CV *orig, U32 flags)
   CvFLAGS(new) = CvFLAGS(orig) & ~CVf_CVGV_RC;
 
   CvFILE(new) = CvDYNFILE(orig) ? savepv(CvFILE(orig)) : CvFILE(orig);
-#if HAVE_PERL_VERSION(5, 18, 0)
   if(CvNAMED(orig)) {
     /* Perl core uses CvNAME_HEK_set() here, but that involves a call to a
      * non-public function unshare_hek(). The latter is only needed in the
@@ -48,7 +47,6 @@ static CV *MY_cv_copy_flags(pTHX_ CV *orig, U32 flags)
     CvNAMED_on(new);
   }
   else
-#endif
     CvGV_set(new, CvGV(orig));
 
   CvSTASH_set(new, CvSTASH(orig));
@@ -87,12 +85,6 @@ static CV *MY_cv_copy_flags(pTHX_ CV *orig, U32 flags)
       depth = 1;
     SV **origpad = AvARRAY(PadlistARRAY(CvPADLIST(orig))[depth]);
 
-#if !HAVE_PERL_VERSION(5, 18, 0)
-    /* Perls before 5.18.0 didn't copy the padnameslist
-     */
-    SvREFCNT_dec(PadlistNAMES(CvPADLIST(new)));
-    PadlistNAMES(CvPADLIST(new)) = (PADNAMELIST *)SvREFCNT_inc(PadlistNAMES(CvPADLIST(orig)));
-#endif
 
     av_fill(PL_comppad, fpad);
     PL_curpad = AvARRAY(PL_comppad);
@@ -131,33 +123,6 @@ static CV *MY_cv_copy_flags(pTHX_ CV *orig, U32 flags)
         SvPADTMP_on(newval);
       }
       else {
-#if !HAVE_PERL_VERSION(5, 18, 0)
-        /* Before perl 5.18.0, inner anon subs didn't find the right CvOUTSIDE
-         * at runtime, so we'll have to patch them up here
-         */
-        CV *origproto;
-        if(pname && PadnamePV(pname)[0] == '&' && 
-           CvOUTSIDE(origproto = MUTABLE_CV(origpad[padix])) == orig) {
-          /* quiet any "Variable $FOO is not available" warnings about lexicals
-           * yet to be introduced
-           */
-          ENTER_with_name("find_cv_outside");
-          SAVEINT(CvDEPTH(origproto));
-          CvDEPTH(origproto) = 1;
-
-          CV *newproto = cv_copy_flags(origproto, flags);
-          CvPADLIST_set(newproto, CvPADLIST(origproto));
-          CvSTART(newproto) = CvSTART(origproto);
-
-          SvREFCNT_dec(CvOUTSIDE(newproto));
-          CvOUTSIDE(newproto) = MUTABLE_CV(SvREFCNT_inc_simple_NN(new));
-
-          LEAVE_with_name("find_cv_outside");
-
-          newval = MUTABLE_SV(newproto);
-        }
-        else
-#endif
         if(origpad[padix])
           newval = SvREFCNT_inc_NN(origpad[padix]);
       }

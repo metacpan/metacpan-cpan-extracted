@@ -1,9 +1,16 @@
 Revision history for Genealogy::Wills
 
+0.06	Fri Jan 10 16:10:24 EST 2025
+	search() can now just take one parameter which is the last name
+	More handling of broken smokers
+		http://cpantesters.org/report/0c13a6c2-4618-11ef-958e-8f2e6e8775ea
+	Added t/30-basics.t
+
 0.05	Wed Jul  3 07:27:20 EDT 2024
 	Use CACHE_DIR instead of CACHEDIR
 	Handle broken smokers
 		https://www.cpantesters.org/cpan/report/8a8d8920-f24c-11ee-b45f-18f16d8775ea
+		https://www.cpantesters.org/cpan/report/ef9905ca-3a1c-11ef-a8e6-11166e8775ea
 
 0.04	Sun Feb 18 22:25:31 EST 2024
 	Added first, last, year as an index

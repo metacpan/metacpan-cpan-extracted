@@ -2,17 +2,19 @@ package Workflow::Condition::HasUser;
 
 use warnings;
 use strict;
-use base qw( Workflow::Condition );
-use Log::Log4perl qw( get_logger );
-use Workflow::Exception qw( condition_error );
+use v5.14.0;
 
-$Workflow::Condition::HasUser::VERSION = '1.62';
+use parent qw( Workflow::Condition );
+
+$Workflow::Condition::HasUser::VERSION = '2.02';
 
 my $DEFAULT_USER_KEY = 'current_user';
 
-sub _init {
+sub init {
     my ( $self, $params ) = @_;
     my $key_name = $params->{user_key} || $DEFAULT_USER_KEY;
+    $self->SUPER::init( $params );
+
     $self->param( user_key => $key_name );
 }
 
@@ -23,10 +25,9 @@ sub evaluate {
     my $current_user = $wf->context->param($user_key);
     $self->log->debug( "Current user in the context is '$current_user' retrieved ",
         "using parameter key '$user_key'" );
-    unless ($current_user) {
-        condition_error
-            "No current user available in workflow context key '$user_key'";
-    }
+
+    return Workflow::Condition::IsTrue->new() if($current_user);
+    return Workflow::Condition::IsFalse->new();
 }
 
 1;
@@ -41,7 +42,7 @@ Workflow::Condition::HasUser - Condition to determine if a user is available
 
 =head1 VERSION
 
-This documentation describes version 1.62 of this package
+This documentation describes version 2.02 of this package
 
 =head1 SYNOPSIS
 
@@ -108,7 +109,7 @@ Throws L<Workflow::Exception> if evaluation fails
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004-2023 Chris Winters. All rights reserved.
+Copyright (c) 2004-2021 Chris Winters. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

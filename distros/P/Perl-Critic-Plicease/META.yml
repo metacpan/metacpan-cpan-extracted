@@ -10,7 +10,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.008001'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,7 +25,7 @@ resources:
   bugtracker: https://github.com/uperl/Perl-Critic-Plicease/issues
   homepage: https://metacpan.org/pod/Perl::Critic::Plicease
   repository: git://github.com/uperl/Perl-Critic-Plicease.git
-version: '0.09'
+version: '0.10'
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Ville Skyttä (SCOP)'

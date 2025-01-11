@@ -1,0 +1,335 @@
+
+=encoding utf8
+
+=head1 NAME
+
+OIDC::Client::Config - Configuration Documentation
+
+=head1 DESCRIPTION
+
+These configuration entries apply to all framework plugins included
+in the L<OIDC-Client|https://metacpan.org/dist/OIDC-Client> distribution.
+
+For direct use with the L<OIDC::Client> module, all entries beginning
+with C<provider."provider".> apply, but this prefix must be removed from
+the configuration entry names.
+
+=head1 ENTRIES
+
+=head2 store_mode
+
+Defines where the tokens are stored.
+
+Possible values (C<session> by default) :
+
+=over
+
+=item session
+
+Stored data persists between requests until the session expires.
+
+=item stash
+
+Stored data can only be accessed in the current request.
+This may be useful for an API which must validate the token
+in the C<Authorization> header for each request (Resource Server).
+
+=back
+
+=head2 authentication_error_path
+
+Relative path of the endpoint to which the browser is redirected if an error
+is returned by the provider during the callback to the application after
+an authentication attempt, if an error occurs when the token is retrieved
+in exchange for the code or if an error occurs when verifying the token.
+
+From the redirection endpoint, the error message is present in
+C<error_message> flash data.
+
+If this path is not configured, an L<OIDC::Client::Error::Authentication> error
+is thrown.
+
+=head2 provider."provider".proxy_detect
+
+If true, detects the proxy server based on environment variables.
+
+=head2 provider."provider".user_agent
+
+Changes the user agent name.
+
+=head2 provider."provider".id
+
+OIDC client ID supplied by your provider. Mandatory
+
+=head2 provider."provider".secret
+
+OIDC client secret supplied by your provider.
+
+If not present, the secret must be defined in the C<OIDC_${provider}_SECRET>
+environment variable.
+
+=head2 provider."provider".audience
+
+Specifies the provider for whom the access token is intended.
+
+If this parameter is omitted, the access token returned by the provider is intended
+for your OIDC client (useful for making token exchanges).
+
+For an application, it's better to leave this parameter out and make token exchanges
+if you need to make API calls to other applications, but it can be useful for a batch
+if you know that the API calls will be made to a single application.
+
+=head2 provider."provider".role_prefix
+
+Defines a prefix common to the roles that will be ignored during a comparison test
+between a role to be verified and the list of user roles.
+
+For example, with C<MYAPP.> prefix, you cand do :
+
+    my $can_access_app = $auth_user->has_role('USER');
+
+instead of :
+
+    my $can_access_app = $auth_user->has_role('MYAPP.USER');
+
+=head2 provider."provider".well_known_url
+
+Endpoint which allows the library to retrieve the provider's metadata at the time
+of instantiation of the OIDC client only.
+
+If it's not defined, the following parameters must be manually specified
+when required:
+
+=over
+
+=item issuer
+
+Provider identifier which must correspond exactly to the C<iss> claim of the tokens
+received.
+
+=item jwks_url
+
+Endpoint for publishing the keys to be used to verify the signature of a JWT token.
+
+=item authorize_url
+
+Endpoint from which an interaction takes place between the provider and the browser
+in order to authenticate the user.
+
+=item token_url
+
+Endpoint on which the backend exchanges an authorization code with a token or refreshes
+a token.
+
+=item userinfo_url
+
+Endpoint used to retrieve user information.
+
+=item end_session_url
+
+Endpoint used to clean up the user session on the provider side.
+
+=back
+
+You can also configure the well know URL and _overload_ one or more metadata with
+these same configuration entries.
+
+=head2 provider."provider".signin_redirect_path
+
+Relative path of the endpoint used by the provider to redirect the user's browser
+to the application once authentication has been completed.
+
+=head2 provider."provider".signin_redirect_uri
+
+Alternative to C<signin_redirect_path>
+
+Absolute path to the endpoint used by the provider to redirect the user's browser
+to the application once authentication has been completed.
+
+=head2 provider."provider".scope
+
+String with space separators defining the desired scope of rights of the requested token.
+
+=head2 provider."provider".expiration_leeway
+
+Number of seconds of leeway for a token to be considered expired before it actually is.
+
+=head2 provider."provider".decode_jwt
+
+Options to be transferred to the
+[Crypt::JWT::decode_jwt()](https://metacpan.org/pod/Crypt::JWT#decode_jwt)
+function used to validate and decode a JWT token.
+
+By default, the transmitted options are :
+
+=over
+
+=item leeway: 60
+
+Clock skew of 1 minute
+
+=back
+
+=head2 provider."provider".claim_mapping
+
+Used to map the claims of an ID token to the I<identity> hashref
+and/or the user informations to an L<OIDC::Client::User> object.
+
+By default, no mapping is used.
+
+=head2 provider."provider".audience_alias
+
+Audience configuration for token exchanges.
+
+Gives an alias to an audience rather than using the technical identifier.
+
+For example :
+
+    <audience_alias other_app_name>
+        audience    other-app-audience
+    </audience_alias>
+
+=head2 provider."provider".audience_alias.audience
+
+Audience to be used for this audience alias.
+
+=head2 provider."provider".audience_alias.scope
+
+String with space separators defining the desired scope of rights of the requested
+exchanged token.
+
+=head2 provider."provider".authorize_endpoint_response_mode
+
+Defines how tokens are sent by the provider.
+
+Can take one of these values:
+
+=over
+
+=item query
+
+Tokens are sent in query parameters.
+
+=item form_post
+
+Tokens are sent in a POST form.
+
+=back
+
+=head2 provider."provider".authorize_endpoint_extra_params
+
+Defines additional parameters to be sent to the provider when the C<authorize> endpoint
+is called.
+
+=head2 provider."provider".token_endpoint_grant_type
+
+Defines the C<grant_type> parameter to be sent to the provider when the C<token> endpoint
+is called.
+
+Can take one of these values (C<authorization_code> by default) :
+
+=over
+
+=item authorization_code
+
+=item client_credentials
+
+=item password
+
+=back
+
+=head2 provider."provider".token_endpoint_auth_method
+
+Defines the authentication method to be used when calling the C<token> endpoint.
+
+Can take one of these values (C<post> by default) :
+
+=over
+
+=item post
+
+The client id and secret are sent in the POST body.
+
+=item basic
+
+The client id and the secret are sent in an C<Authorization> header.
+
+=back
+
+=head2 provider."provider".username
+
+For a grant_type C<password>, specifies the technical account to be used.
+
+=head2 provider."provider".password
+
+For a grant_type C<password>, specifies the technical account password to be used.
+
+=head2 provider."provider".logout_redirect_path
+
+Relative path of the endpoint used by the provider to redirect the user's browser
+to the application once the session has been cleaned up on the provider side.
+
+=head2 provider."provider".post_logout_redirect_uri
+
+Alternative to C<logout_redirect_path>
+
+Absolute path to the endpoint used by the provider to redirect the user's browser
+to the application once the session has been cleaned up on the provider side.
+
+=head2 provider."provider".logout_with_id_token
+
+Specifies whether the token id should be sent to the provider when the C<end_session>
+endpoint is called.
+
+True by default
+
+=head2 provider."provider".logout_extra_params
+
+Defines additional parameters to be sent to the provider when the C<end_session>
+endpoint is called.
+
+=head2 provider."provider".mocked_identity
+
+For local use only, bypasses the authentication flow by directly defining
+a mocked object representing an identity.
+
+Example:
+
+    <mocked_identity>
+        login       DOEJ
+        lastname    Doe
+        firstname   John
+        email       john.doe@gmail.com
+        roles       MYAPP.ROLE1
+        roles       MYAPP.ROLE2
+    </mocked_identity>
+
+=head2 provider."provider".mocked_claims
+
+For local use only, allows the verification of a token to be bypassed by directly
+defining a mocked object representing the claims.
+
+Example:
+
+    <mocked_claims>
+        sub         DOEJ
+        exp         123456
+        aud         MYAPP
+        scp         scope1
+        scp         scope2
+    </mocked_claims>
+
+=head2 provider."provider".mocked_userinfo
+
+For local use only, allows you to directly define a mocked object representing userinfo.
+
+Example:
+
+    <mocked_userinfo>
+        sub         DOEJ
+        lastName    Doe
+        firstName   John
+        email       john.doe@gmail.com
+        roles       MYAPP.ROLE1
+        roles       MYAPP.ROLE2
+    </mocked_userinfo>

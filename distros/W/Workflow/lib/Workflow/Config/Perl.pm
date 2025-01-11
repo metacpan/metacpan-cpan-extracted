@@ -2,17 +2,17 @@ package Workflow::Config::Perl;
 
 use warnings;
 use strict;
-use base qw( Workflow::Config );
-use Log::Log4perl qw( get_logger );
+use v5.14.0;
+use parent qw( Workflow::Config );
+use Log::Any qw( $log );
 use Workflow::Exception qw( configuration_error );
 use Data::Dumper qw( Dumper );
 use English qw( -no_match_vars );
 
-$Workflow::Config::Perl::VERSION = '1.62';
+$Workflow::Config::Perl::VERSION = '2.02';
 
 sub parse {
     my ( $self, $type, @items ) = @_;
-    my $log ||= get_logger();
 
     $self->_check_config_type($type);
 
@@ -67,7 +67,6 @@ sub parse {
 
 sub _translate_perl_file {
     my ( $class, $type, $file ) = @_;
-    my $log = get_logger();
 
     local $INPUT_RECORD_SEPARATOR = undef;
     open( CONF, '<', $file )
@@ -81,14 +80,26 @@ sub _translate_perl_file {
 
 sub _translate_perl {
     my ( $class, $type, $config, $file ) = @_;
-    my $log = get_logger();
 
     no strict 'vars';
-    local $EVAL_ERROR = undef;
-    my $data = eval $config;
-    if ($EVAL_ERROR) {
+    my $data;
+    my $error;
+    my $warnings = '';
+    my $success = do {
+        local $@;
+
+        local $SIG{__WARN__} = sub { $warnings .= $_[0] };
+        my $rv = eval "\$data = do { $config }; 1;";
+        $error = $EVAL_ERROR;
+        $rv;
+    };
+    if ($warnings) {
+        $warnings =~ s/\r?\n/\\n/g; # don't log line-endings
+        $log->warn( 'Config evaluation warned: ', $warnings );
+    }
+    if (not $success) {
         configuration_error "Cannot evaluate perl data structure ",
-            "in '$file': $EVAL_ERROR";
+            "in '$file': $error";
     }
     return $data;
 }
@@ -105,7 +116,7 @@ Workflow::Config::Perl - Parse workflow configurations as Perl data structures
 
 =head1 VERSION
 
-This documentation describes version 1.62 of this package
+This documentation describes version 2.02 of this package
 
 =head1 SYNOPSIS
 
@@ -151,7 +162,7 @@ The method returns a list of configuration parameters.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004-2023 Chris Winters. All rights reserved.
+Copyright (c) 2004-2021 Chris Winters. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

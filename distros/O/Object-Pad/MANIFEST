@@ -9,6 +9,7 @@ hax/force_list_keeping_pushmark.c.inc
 hax/lexer-additions.c.inc
 hax/make_argcheck_aux.c.inc
 hax/make_argcheck_ops.c.inc
+hax/newMYCONSTSUB.c.inc
 hax/newOP_CUSTOM.c.inc
 hax/OP_HELEMEXISTSOR.c.inc
 hax/op_sibling_splice.c.inc
@@ -67,6 +68,7 @@ t/31pad-outside.t
 t/32threads.t
 t/33class-anon.t
 t/34class-abstract.t
+t/35my-class.t
 t/40role.t
 t/41role-repr.t
 t/42role-BUILD.t

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tube name="Unicode Map">
+  <lines>
+    <line id="1" name="Line1" color="black"/>
+    <line id="2" name="Line2" color="green"/>
+  </lines>
+
+  <stations>
+    <station id="1-01" name="Anaheim"           line="1" link="1-02"/>
+    <station id="1-02" name="Hochheim (Main)"   line="1" link="1-01,1-03"/>
+    <station id="1-03" name="Flussheim (Main)"  line="1" link="1-02"/>
+
+    <station id="2-01" name="Santa Anaheim"     line="2" link="2-02"/>
+    <station id="2-02" name="Tiefheim (Main)"   line="2" link="2-01,2-03"/>
+    <station id="2-03" name="Flörsheim (Main)" line="2" link="2-02"/>
+  </stations>
+</tube>

@@ -7,7 +7,7 @@ use Perl::Critic::Utils qw( $SEVERITY_HIGH );
 use base qw( Perl::Critic::Policy );
 
 # ABSTRACT: Prohibit the use of @_ in subroutine using signatures
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 use constant DESC => 'Using @_ in a function with signatures';
@@ -96,12 +96,12 @@ Perl::Critic::Policy::Plicease::ProhibitSignaturesAndAtUnderscore - Prohibit the
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
- sub foo ($$) { my($a,$b) = @_; }                                    # ok
- use experimental qw( signatures ); foo ($a, $b) { my($c,$d) = @_; } # not ok
+ sub foo ($$) { my($x,$y) = @_; }                                    # ok
+ use experimental qw( signatures ); foo ($x, $y) { my($c,$d) = @_; } # not ok
 
 =head1 DESCRIPTION
 

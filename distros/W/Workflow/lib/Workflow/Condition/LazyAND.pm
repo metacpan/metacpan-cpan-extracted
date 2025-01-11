@@ -1,18 +1,19 @@
 package Workflow::Condition::LazyAND;
 
-use strict;
 use warnings;
+use strict;
+use v5.14.0;
 
-our $VERSION = '1.62';
+our $VERSION = '2.02';
 
-use base qw( Workflow::Condition::Nested );
-use Workflow::Exception qw( condition_error configuration_error );
-use English qw( -no_match_vars );
+use parent qw( Workflow::Condition );
+use Workflow::Exception qw( configuration_error );
 
 __PACKAGE__->mk_accessors('conditions');
 
-sub _init {
+sub init {
     my ( $self, $params ) = @_;
+    $self->SUPER::init( $params );
 
     # This is a tricky one. The admin may have configured this by repeating
     # the param name "condition" or by using unique names (e.g.: "condition1",
@@ -24,7 +25,6 @@ sub _init {
         push @conditions, $self->normalize_array( $params->{$key} );
     }
     $self->conditions( [@conditions] );
-
 }
 
 sub evaluate {
@@ -33,16 +33,17 @@ sub evaluate {
 
     my $total = 0;
 
+    return Workflow::Condition::IsFalse->new("No conditions were defined") unless(@{$conditions});
+
     foreach my $cond ( @{$conditions} ) {
         my $result = $self->evaluate_condition( $wf, $cond );
         if ( not $result ) {
-            condition_error("Condition '$cond' returned 'false'");
+            return Workflow::Condition::IsFalse->new("Stopped after checking $total conditions");
         }
         $total++;
     }
 
-    return $total
-        || condition_error("No condition seems to have been run in LazyAND");
+    return Workflow::Condition::IsTrue->new("Matched a total of $total conditions");
 }
 
 1;
@@ -57,7 +58,7 @@ Workflow::Condition::LazyAND
 
 =head1 VERSION
 
-This documentation describes version 1.62 of this package
+This documentation describes version 2.02 of this package
 
 =head1 DESCRIPTION
 
@@ -113,7 +114,7 @@ B<or>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2003-2023 Chris Winters. All rights reserved.
+Copyright (c) 2003-2021 Chris Winters. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

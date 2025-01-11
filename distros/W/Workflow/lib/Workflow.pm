@@ -3,20 +3,20 @@ package Workflow;
 use warnings;
 use strict;
 use v5.14.0; # warnings
-use base qw( Workflow::Base );
-use Log::Log4perl qw( get_logger );
+use parent qw( Workflow::Base );
 use Workflow::Context;
 use Workflow::Exception qw( workflow_error );
 use Exception::Class;
 use Workflow::Factory qw( FACTORY );
 use Carp qw(croak carp);
-use English qw( -no_match_vars );
+use Syntax::Keyword::Try;
 
-my @FIELDS   = qw( id type description state last_update time_zone );
+my @FIELDS   = qw( id type description state last_update time_zone
+    history_class last_action_executed );
 my @INTERNAL = qw( _factory _observers );
 __PACKAGE__->mk_accessors( @FIELDS, @INTERNAL );
 
-$Workflow::VERSION = '1.62';
+$Workflow::VERSION = '2.02';
 
 use constant NO_CHANGE_VALUE => 'NOCHANGE';
 
@@ -42,6 +42,16 @@ sub notify_observers {
 
     return;
 }
+
+sub get_initial_history_data {
+    my ( $self ) = @_;
+    return (
+        description => 'Create new workflow',
+        user        => 'n/a',
+        action      => 'Create workflow',
+        );
+}
+
 
 ########################################
 # PUBLIC METHODS
@@ -75,6 +85,13 @@ sub get_current_actions {
     return $wf_state->get_available_action_names( $self, $group );
 }
 
+sub get_all_actions {
+    my ( $self ) = @_;
+    $self->log->debug( "Getting all actions for wf '", $self->id, "'" );
+    my $wf_state = $self->_get_workflow_state;
+    return $wf_state->get_all_action_names( $self );
+}
+
 sub get_action {
     my ( $self, $action_name ) = @_;
 
@@ -103,112 +120,70 @@ sub get_action_fields {
 }
 
 sub execute_action {
-    my ( $self, $action_name, $autorun ) = @_;
+    my ( $self, $action_name, $action_args ) = @_;
 
-    # This checks the conditions behind the scenes, so there's no
-    # explicit 'check conditions' step here
+    $self->notify_observers( 'startup' );
 
-    my $action = $self->get_action($action_name);
+    while ( $action_name ) {
+        my $wf_state =
+            $self->_execute_single_action( $action_name, $action_args );
+        $action_args = undef;
 
-    # Need this in case we encounter an exception after we store the
-    # new state
-
-    my $old_state = $self->state;
-    my ( $new_state, $action_return );
-
-    local $EVAL_ERROR = undef;
-    eval {
-        $action->validate($self);
-        $self->log->debug("Action validated ok");
-        $action_return = $action->execute($self);
-        $self->log->debug("Action executed ok");
-
-        $new_state = $self->_get_next_state( $action_name, $action_return );
-        if ( $new_state ne NO_CHANGE_VALUE ) {
-            $self->log->info("Set new state '$new_state' after action executed");
-            $self->state($new_state);
+        if ( not $wf_state->autorun ) {
+            last;
         }
+        else {
+            $self->log->is_info
+                && $self->log->info(
+                "State '", $wf_state->state, "' marked to be run ",
+                "automatically; executing that state/action..."
+                );
 
-        # this will save the workflow histories as well as modify the
-        # state of the workflow history to reflect the NEW state of
-        # the workflow; if it fails we should have some means for the
-        # factory to rollback other transactions...
+            if ( $wf_state->may_stop() ) {
+                try {
+                    $action_name = $wf_state->get_autorun_action_name($self);
+                }
+                catch { }
+            }
+            else {
+                $action_name = $wf_state->get_autorun_action_name($self);
+            }
 
-        # Update
-        # Jim Brandt 4/16/2008: Implemented transactions for DBI persisters.
-        # Implementation still depends on each persister.
-
-        $self->_factory()->save_workflow($self);
-
-        # If using a DBI persister with no autocommit, commit here.
-        $self->_factory()->_commit_transaction($self);
-
-        $self->log->info("Saved workflow with possible new state ok");
-    };
-
-    # If there's an exception, reset the state to the original one and
-    # rethrow
-
-    if ($EVAL_ERROR) {
-        my $error = $EVAL_ERROR;
-        $self->log->error(
-            "Caught exception from action: $error; reset ",
-            "workflow to old state '$old_state'"
-        );
-        $self->state($old_state);
-
-        $self->_factory()->_rollback_transaction($self);
-
-        # If it is a validation error we rethrow it so it can be evaluated
-        # by the caller to provide better feedback to the user
-        if (Exception::Class->caught('Workflow::Exception::Validation')) {
-            $EVAL_ERROR->rethrow();
+            if ( $action_name ) {
+                $self->log->is_debug
+                    && $self->log->debug(
+                    "Found action '$action_name' to execute in autorun state ",
+                    $wf_state->state
+                    );
+            }
         }
-
-        # Don't use 'workflow_error' here since $error should already
-        # be a Workflow::Exception object or subclass
-
-        croak $error;
     }
 
-    # clear condition cache on state change
-    delete $self->{'_condition_result_cache'};
-    $self->notify_observers( 'execute', $old_state, $action_name, $autorun );
+    $self->notify_observers( 'finalize' );
 
-    my $new_state_obj = $self->_get_workflow_state;
-    if ( $old_state ne $new_state ) {
-        $self->notify_observers( 'state change', $old_state, $action_name,
-            $autorun );
-    }
-
-    if ( $new_state_obj->autorun ) {
-        $self->log->info(
-            "State '$new_state' marked to be run ",
-            "automatically; executing that state/action..."
-            );
-        $self->_auto_execute_state($new_state_obj);
-    }
     return $self->state;
 }
 
 sub add_history {
     my ( $self, @items ) = @_;
 
-    my @to_add = ();
+    my @to_add  = ();
+    my $history = $self->history_class;
     foreach my $item (@items) {
         if ( ref $item eq 'HASH' ) {
             $item->{workflow_id} = $self->id;
             $item->{time_zone}   = $self->time_zone();
-            push @to_add, Workflow::History->new($item);
+            push @to_add, $history->new($item);
             $self->log->debug("Adding history from hashref");
-        } elsif ( ref $item and $item->isa('Workflow::History') ) {
+        } elsif ( ref $item and $item->isa($history) ) {
             $item->workflow_id( $self->id );
             push @to_add, $item;
             $self->log->debug("Adding history object directly");
         } else {
-            workflow_error "I don't know how to add a history of ", "type '",
+            workflow_error "I don't know how to add a history of type '",
                 ref($item), "'";
         }
+
     }
     push @{ $self->{_histories} }, @to_add;
     $self->notify_observers( 'add history', \@to_add );
@@ -219,17 +194,30 @@ sub get_history {
     $self->{_histories} ||= [];
     my @uniq_history = ();
     my %seen_ids     = ();
-    my @all_history  = (
-        $self->_factory()->get_workflow_history($self),
-        @{ $self->{_histories} }
-    );
-    foreach my $history (@all_history) {
-        my $id = $history->id;
-        if ($id) {
+
+    my $history_class = $self->history_class;
+    foreach my $history (
+        $self->_factory()->get_workflow_history($self)
+        ) {
+        my $id = $history->{id};
+        if (defined $id) {
             unless ( $seen_ids{$id} ) {
+                $seen_ids{$id}++;
+                my $hist = $history_class->new($history);
+                $hist->set_saved;
+                push @uniq_history, $hist;
+            }
+        } else {
+            die "Persister returned history item without 'id' key";
+        }
+    }
+    foreach my $history (@{ $self->{_histories} }) {
+        my $id = $history->id;
+        if (defined $id) {
+            unless ( $seen_ids{$id} ) {
+                $seen_ids{$id}++;
                 push @uniq_history, $history;
             }
-            $seen_ids{$id}++;
         } else {
             push @uniq_history, $history;
         }
@@ -269,10 +257,11 @@ sub init {
     my $time_zone
         = exists $config->{time_zone} ? $config->{time_zone} : 'floating';
     $self->time_zone($time_zone);
+    $self->history_class( $config->{history_class} );
 
     # other properties go into 'param'...
     while ( my ( $key, $value ) = each %{$config} ) {
-        next if ( $key =~ /^(type|description)$/ );
+        next if ( $key =~ /^(type|description|history_class)$/ );
         next if ( ref $value );
         $self->log->debug("Assigning parameter '$key' -> '$value'");
         $self->param( $key, $value );
@@ -298,6 +287,87 @@ sub set {
             "Don't try to use my private setters from '$calling_pkg'!";
     }
     $self->{$prop} = $value;
+}
+
+
+sub _execute_single_action {
+    my ( $self, $action_name, $action_args ) = @_;
+
+    # This checks the conditions behind the scenes, so there's no
+    # explicit 'check conditions' step here
+    my $action = $self->get_action($action_name);
+
+    # Need this in case we encounter an exception after we store the
+    # new state
+    my $old_state = $self->state;
+
+    try {
+
+        $self->last_action_executed($action_name);
+
+        $action->validate($self, $action_args);
+
+        $self->notify_observers( 'run' );
+
+        $self->log->is_debug && $self->log->debug("Action validated ok");
+        if ($action_args) {
+            # Merge the action args into the context
+            $self->context->param( $action_args );
+        }
+        my $action_return = $action->execute($self) // '';
+        $self->log->is_debug && $self->log->debug("Action executed ok");
+
+        # In case the state has a map defined, this returns the next state based
+        # on $action_return. It will throw an error if the value is not part of
+        # the map and there is no default route defined
+        my $new_state = $self->_get_next_state( $action_name, $action_return );
+
+        if ( $new_state ne NO_CHANGE_VALUE ) {
+            $self->log->is_info
+                && $self->log->info(
+                "Set new state '$new_state' after action executed");
+            $self->state($new_state);
+        }
+
+        # this will save the workflow histories as well as modify the
+        # state of the workflow history to reflect the NEW state of
+        # the workflow; if it fails we should have some means for the
+        # factory to rollback other transactions...
+        $self->_factory()->save_workflow( $self );
+
+        $self->log->is_info
+            && $self->log->info("Saved workflow with possible new state ok");
+
+        $self->notify_observers( 'completed', { state => $old_state, action => $action_name });
+
+        if ( $old_state ne $new_state ) {
+            $self->notify_observers( 'state change', { from => $old_state, action => $action_name, to => $new_state } );
+        }
+
+        return $self->_get_workflow_state;
+
+    }
+    catch ($error) {
+        $self->log->error(
+            "Caught exception from action: $error; reset ",
+            "workflow to old state '$old_state'"
+        );
+        $self->state($old_state);
+
+        $self->notify_observers( 'rollback' );
+
+        # If it is a validation error we rethrow it so it can be evaluated
+        # by the caller to provide better feedback to the user
+        if (Exception::Class->caught('Workflow::Exception::Validation')) {
+            $error->rethrow();
+        }
+
+        # Don't use 'workflow_error' here since $error should already
+        # be a Workflow::Exception object or subclass
+
+        croak $error;
+    }
+
 }
 
 sub _get_action { # for backward compatibility with 1.49 and before
@@ -330,32 +400,6 @@ sub _get_next_state {
     return $wf_state->get_next_state( $action_name, $action_return );
 }
 
-sub _auto_execute_state {
-    my ( $self, $wf_state ) = @_;
-    my $action_name;
-
-    local $EVAL_ERROR = undef;
-    eval { $action_name = $wf_state->get_autorun_action_name($self); };
-    if ($EVAL_ERROR)
-    {    # we found an error, possibly more than one or none action
-            # are available in this state
-        if ( !$wf_state->may_stop() ) {
-
-            # we are in autorun, but stopping is not allowed, so
-            # rethrow
-            my $error = $EVAL_ERROR;
-            $error->rethrow();
-        }
-    } else {    # everything is fine, execute action
-        $self->log->debug(
-            "Found action '$action_name' to execute in ",
-            "autorun state ",
-            $wf_state->state
-            );
-        $self->execute_action( $action_name, 1 );
-    }
-}
-
 1;
 
 __END__
@@ -365,7 +409,7 @@ __END__
 =begin markdown
 
 [![CPAN version](https://badge.fury.io/pl/Workflow.svg)](http://badge.fury.io/pl/Workflow)
-[![Build Status](https://travis-ci.org/jonasbn/perl-workflow.svg?branch=master)](https://travis-ci.org/jonasbn/perl-workflow)
+[![Build status](https://github.com/jonasbn/perl-workflow/actions/workflows/ci.yml/badge.svg)](https://github.com/jonasbn/perl-workflow/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/github/jonasbn/perl-workflow/badge.svg?branch=master)](https://coveralls.io/github/jonasbn/perl-workflow?branch=master)
 
 =end markdown
@@ -376,7 +420,7 @@ Workflow - Simple, flexible system to implement workflows
 
 =head1 VERSION
 
-This documentation describes version 1.62 of Workflow
+This documentation describes version 2.02 of Workflow
 
 =head1 SYNOPSIS
 
@@ -389,8 +433,9 @@ This documentation describes version 1.62 of Workflow
 
  <workflow>
      <type>myworkflow</type>
-     <time_zone>local</time_zone>
-     <description>This is my workflow.</description>
+     <time_zone>local</time_zone>                         <!-- optional -->
+     <description>This is my workflow.</description>      <!-- optional -->
+     <history_class>My::Workflow::History</history_class> <!-- optional -->
 
      <state name="INITIAL">
          <action name="upload file" resulting_state="uploaded" />
@@ -496,10 +541,10 @@ This documentation describes version 1.62 of Workflow
  my $context = $workflow->context;
  $context->param( current_user => $user );
  $context->param( sections => \@sections );
- $context->param( path => $path_to_file );
 
  # Execute one of them
- $workflow->execute_action( 'upload file' );
+ $workflow->execute_action( 'upload file',
+                            { path => $path_to_file });
 
  print "New state: ", $workflow->state, "\n";
 
@@ -790,9 +835,9 @@ like:
  package FindSinead;
 
  sub update {
-     my ( $class, $wf, $event, $new_state ) = @_;
+     my ( $class, $wf, $event, $event_args ) = @_;
      return unless ( $event eq 'state change' );
-     return unless ( $new_state eq 'CREATED' );
+     return unless ( $event_args->{to} eq 'CREATED' );
      my $context = $wf->context;
      return unless ( $context->param( 'first_name' ) eq 'Sinead' );
 
@@ -835,36 +880,60 @@ No additional parameters.
 
 =item *
 
-B<save> - Issued after a workflow is successfully saved.
+B<startup> - Issued at the beginning of the execute loop, before the
+first action is called.
 
 No additional parameters.
 
 =item *
 
-B<execute> - Issued after a workflow is successfully executed and
-saved.
+B<finalize> - Issued at the end of the execute loop, after all action
+are handled.
 
-Adds the parameters C<$old_state>, C<$action_name> and C<$autorun>.
-C<$old_state> includes the state of the workflow before the action
-was executed, C<$action_name> is the action name that was executed and
-C<$autorun> is set to 1 if the action just executed was started
-using autorun.
+No additional parameters.
 
 =item *
 
-B<state change> - Issued after a workflow is successfully executed,
+B<run> - Issued before a single action is executed. Will be followed by
+either a C<save> or C<rollback> event.
+
+No additional parameters.
+
+=item *
+
+B<save> - Issued after the workflow was saved after running a single action.
+
+No additional parameters.
+
+=item *
+
+B<rollback> - Issued after the execution of a single action failed.
+
+No additional parameters.
+
+=item *
+
+B<completed> - Issued after a single action was successfully executed and
+saved.
+
+Receives a hashref as second parameter holding the keys C<state> and
+C<action>. C<$state> includes the state of the workflow before the action
+was executed, C<$action> is the action name that was executed.
+
+=item *
+
+B<state change> - Issued after a single action is successfully executed,
 saved and results in a state change. The event will not be fired if
 you executed an action that did not result in a state change.
 
-Adds the parameters C<$old_state>, C<$action> and C<$autorun>.
-C<$old_state> includes the state of the workflow before the action
-was executed, C<$action> is the action name that was executed and
-C<$autorun> is set to 1 if the action just executed was autorun.
+Receives a hashref as second parameter. The key C<from> holds the name
+of the state before the action, C<action> is the name of the action
+that was executed and C<to> holding the name of the target (current) state.
 
 =item *
 
-B<add history> - Issued after one or more history objects added to a
-workflow object.
+B<add history> - Issued after one or more history objects were added to
+a workflow object.
 
 The additional argument is an arrayref of all L<Workflow::History>
 objects added to the workflow. (Note that these will not be persisted
@@ -906,13 +975,16 @@ than the entire system.
 
 =head2 Object Methods
 
-=head3 execute_action( $action_name, $autorun )
+=head3 execute_action( $action_name, $args )
 
 Execute the action C<$action_name>. Typically this changes the state
 of the workflow. If C<$action_name> is not in the current state, fails
 one of the conditions on the action, or fails one of the validators on
-the action an exception is thrown. $autorun is used internally and
-is set to 1 if the action was executed using autorun.
+the action an exception is thrown.
+
+The C<$args> provided, are checked against the validators to ensure the
+context remains in a valid state; upon successful validation, the C<$args>
+are merged into the context and the action is executed as described above.
 
 After the action has been successfully executed and the workflow saved
 we issue a 'execute' observation with the old state, action name and
@@ -921,7 +993,7 @@ So if you wanted to write an observer you could create a
 method with the signature:
 
  sub update {
-     my ( $class, $workflow, $action, $old_state, $action_name, $autorun )
+     my ( $class, $workflow, $action, $old_state, $action_name )
         = @_;
      if ( $action eq 'execute' ) { .... }
  }
@@ -951,6 +1023,13 @@ to your action
 C<$group> should be string that reperesents desired group name. In @actions you will get
 list of action names available from the current state for the given environment limited by group.
 C<$group> is optional parameter.
+
+Returns: list of strings representing available actions
+
+=head3 get_all_actions
+
+Returns a list of ALL action names defined for the current state, weather or not
+they are available from the current environment.
 
 Returns: list of strings representing available actions
 
@@ -984,11 +1063,11 @@ One of the conditions for the action in this state is not met.
 
 =head3 get_action_fields( $action_name )
 
-Return a list of L<Workflow::Action::InputField> objects for the given
+Return a list of L<Workflow::InputField> objects for the given
 C<$action_name>. If C<$action_name> not in the current state or not
 accessible by the environment an exception is thrown.
 
-Returns: list of L<Workflow::Action::InputField> objects
+Returns: list of L<Workflow::InputField> objects
 
 =head3 add_history( @( \%params | $wf_history_object ) )
 
@@ -1028,6 +1107,28 @@ properties caller has to be a L<Workflow> namespace package.
 
 Sets property to value or throws L<Workflow::Exception>
 
+=head2 Observer methods
+
+=head3 add_observer( @observers )
+
+Adds one or more observers to a C<Workflow> instance. An observer is a
+function. See L</notify_observers> for its calling convention.
+
+This function is used internally by C<Workflow::Factory> to implement
+observability as documented in the section L</WORKFLOWS ARE OBSERVABLE>
+
+=head3 notify_observers( @arguments )
+
+Calls all observer functions registered through C<add_observer> with
+the workflow as the first argument and C<@arguments> as the remaining
+arguments:
+
+   $observer->( $wf, @arguments );
+
+Used by various parts of the library to notify observers of workflow
+instance related events.
+
+
 =head2 Properties
 
 Unless otherwise noted, properties are B<read-only>.
@@ -1037,18 +1138,18 @@ Unless otherwise noted, properties are B<read-only>.
 Some properties are set in the configuration file for each
 workflow. These remain static once the workflow is instantiated.
 
-B<type>
+=head4 B<type>
 
 Type of workflow this is. You may have many individual workflows
 associated with a type or you may have many different types
 running in a single workflow engine.
 
-B<description>
+=head4 B<description>
 
 Description (usually brief, hopefully with a URL...)  of this
 workflow.
 
-B<time_zone>
+=head4 B<time_zone>
 
 Workflow uses the DateTime module to create all date objects. The time_zone
 parameter allows you to pass a time zone value directly to the DateTime
@@ -1059,19 +1160,26 @@ See the DateTime module for acceptable values.
 
 You can get the following properties from any workflow object.
 
-B<id>
+=head4 B<id>
 
 ID of this workflow. This will B<always> be defined, since when the
 L<Workflow::Factory> creates a new workflow it first saves it to
 long-term storage.
 
-B<state>
+=head4 B<state>
 
 The current state of the workflow.
 
-B<last_update> (read-write)
+=head4 B<last_update> (read-write)
 
 Date of the workflow's last update.
+
+=head4 B<last_action_executed> (read)
+
+Contains the name of the action that was tried to be executed last, even if
+the execution could not be completed due to e.g. failed parameter validation,
+execption on code execution. Useful to find the step that failed when using
+autorun sequences, as C<state> will return the state from which it was called.
 
 =head3 context (read-write, see below)
 
@@ -1122,92 +1230,111 @@ Returns the name of the next state given the action
 C<$action_name>. Throws an exception if C<$action_name> not contained
 in the current state.
 
-=head3 add_observer( @observers )
 
-Adds one or more observers to a C<Workflow> instance. An observer is a
-function. See L</notify_observers> for its calling convention.
+=head2 Initial workflow history
 
-This function is used internally by C<Workflow::Factory> to implement
-observability as documented in the section L</WORKFLOWS ARE OBSERVABLE>
+When creating an initial L<Workflow::History> record when creating a workflow,
+several fields are required.
 
-=head3 notify_observers( @arguments )
+=head3 get_initial_history_data
 
-Calls all observer functions registered through C<add_observer> with
-the workflow as the first argument and C<@arguments> as the remaining
-arguments:
+This method returns a I<list> of key/value pairs to add in the initial history
+record. The following defaults are returned:
 
-   $observer->( $wf, @arguments );
+=over
 
-Used by various parts of the library to notify observers of workflow
-instance related events.
+=item * C<user>
+
+value: "n/a"
+
+
+=item * C<description>
+
+value: "Create new workflow"
+
+=item * C<action>
+
+value: "Create workflow"
+
+
+=back
+
+Override this method to change the values from their defaults. E.g.
+
+
+   sub get_initial_history_data {
+      return (
+           user => 1,
+           description => "none",
+           action => "run"
+      );
+   }
 
 
 =head1 CONFIGURATION AND ENVIRONMENT
 
 The configuration of Workflow is done using the format of your choice, currently
-XML and Perl is implemented, but additional formats can be added, please refer
+XML and Perl are implemented, but additional formats can be added. Please refer
 to L<Workflow::Config>, for implementation details.
+
+=head2 Configuration examples
+
+=head3 XML configuration
+
+
+ <workflow>
+     <type>myworkflow</type>
+     <class>My::Workflow</class>                     <!-- optional -->
+     <initial_state>INITIAL</initial_state>          <!-- optional -->
+     <time_zone>local</time_zone>                    <!-- optional -->
+     <description>This is my workflow.</description> <!-- optional -->
+
+     <!-- List one or more states -->
+     <state name="INITIAL">
+         <action name="upload file" resulting_state="uploaded" />
+         <action name="cancel upload" resulting_state="finished" />
+     </state>
+
+     <state name="uploaded">
+         <action name="verify file">
+            <resulting_state return="redo"     state="INITIAL" />
+            <resulting_state return="finished" state="finished"/>
+         </action>
+     </state>
+
+     <state name="finished" />
+ </workflow>
+
+=head2 Logging
+
+As of version 2.0, Workflow allows application developers to select their own
+logging solution of preference: The library is a L<Log::Any> log producer. See
+L<Log::Any::Adapter> for examples on how to configure logging. For those
+wanting to keep running their L<Log::Log4perl> configuration, please install
+L<Log::Any::Adapter::Log4perl> and add one C<use> statement and one line after
+the initialization of C<Log::Log4perl>:
+
+
+   use Log::Log4perl;
+   use Log::Any::Adapter;   # Add this additional use-statement
+
+   Log::Log4perl::init('/etc/log4perl.conf');
+   Log::Any::Adapter->set( 'Log4perl' ); # Additional: Log::Any initialization
+
 
 =head1 DEPENDENCIES
 
-=over
-
-=item L<Class::Accessor>
-
-=item L<Class::Factory>
-
-=item L<DateTime>
-
-=item L<DateTime::Format::Strptime>
-
-=item L<Exception::Class>
-
-=item L<Log::Log4perl>
-
-=item L<Safe>
-
-=item L<XML::Simple>
-
-=item L<DBI>
-
-=item L<Data::Dumper>
-
-=item L<Carp>
-
-=item L<File::Slurp>
-
-=item L<Data::UUID>
-
-=back
-
-=head2 DEPENDENCIES FOR THE EXAMPLE APPLICATION
+The full list of dependencies is specified in the cpanfile in the distribution
+archive. Additional dependencies are listed by feature. The following features
+are currently supported by this distribution:
 
 =over
 
-=item L<CGI>
+=item *
 
-=item L<CGI::Cookie>
+C<examples>
 
-=item L<DBD::SQLite>
-
-=item L<HTTP::Daemon>
-
-=item L<HTTP::Request>
-
-=item L<HTTP::Response>
-
-=item L<HTTP::Status>
-
-=item L<Template> (Template Toolkit)
-
-=back
-
-For Win32 systems you can get the Template Toolkit and DBD::SQLite
-PPDs from TheoryX:
-
-=over
-
-=item * L<http://theoryx5.uwinnipeg.ca/cgi-bin/ppmserver?urn:/PPMServer58>
+The additional dependencies required to run the example applications.
 
 =back
 
@@ -1220,8 +1347,8 @@ dependencies of Workflow, namely L<XML::Simple>.
 
 The L<XML::Simple> makes use of L<Lib::XML::SAX> or L<XML::Parser>, the default.
 
-In addition an L<XML::Parser> can makes use of plugin parser and some of these
-might not be able to parse the XML utilized in Workflow. The problem have been
+In addition L<XML::Parser> can make use of plugin parsers and some of these
+might not be able to parse the XML utilized in Workflow. This problem has been
 observed with L<XML::SAX::RTF>.
 
 The following diagnostic points to the problem:
@@ -1250,103 +1377,18 @@ A list of currently known issues can be seen via the same URL.
 
 =head1 TEST
 
-The test suite can be run using, L<Module::Build>
+The test suite can be run using L<prove>
 
-        % ./Build test
+  % prove --lib
 
 Some of the tests are reserved for the developers and are only run of the
-environment variable C<TEST_AUTHOR> is set to true.
+environment variable TEST_AUTHOR is set to true. Requirements for these tests
+will only be installed through L<Dist::Zilla>'s C<authordeps> command:
 
-=head1 TEST COVERAGE
+  % dzil authordeps --missing | cpanm --notest
 
-This is the current test coverage of Workflow version 1.58, with the C<TEST_AUTHOR>
-flag enabled
-
-    TEST_AUTHOR=1 dzil cover
-
-    ---------------------------- ------ ------ ------ ------ ------ ------ ------
-    File                           stmt   bran   cond    sub    pod   time  total
-    ---------------------------- ------ ------ ------ ------ ------ ------ ------
-    blib/lib/Workflow.pm           91.6   68.7   60.0   93.3  100.0    1.2   86.7
-    blib/lib/Workflow/Action.pm    93.5   60.0    n/a   94.1  100.0    4.4   91.4
-    ...b/Workflow/Action/Null.pm  100.0    n/a    n/a  100.0  100.0    2.3  100.0
-    blib/lib/Workflow/Base.pm      96.7   86.3   83.3  100.0  100.0    3.0   94.5
-    ...lib/Workflow/Condition.pm  100.0  100.0  100.0  100.0  100.0    4.4  100.0
-    .../Condition/CheckReturn.pm   71.7   35.7    n/a  100.0  100.0    0.0   67.6
-    ...low/Condition/Evaluate.pm   96.7   75.0    n/a  100.0  100.0    3.4   95.4
-    ...low/Condition/GreedyOR.pm  100.0  100.0    n/a  100.0  100.0    0.0  100.0
-    ...flow/Condition/HasUser.pm   70.0    n/a   33.3   83.3  100.0    0.0   70.0
-    ...flow/Condition/LazyAND.pm  100.0  100.0    n/a  100.0  100.0    0.0  100.0
-    ...kflow/Condition/LazyOR.pm  100.0  100.0    n/a  100.0  100.0    0.0  100.0
-    ...flow/Condition/Negated.pm  100.0    n/a    n/a  100.0  100.0    0.0  100.0
-    blib/lib/Workflow/Config.pm    96.2   81.2   33.3  100.0  100.0    3.1   92.2
-    ...b/Workflow/Config/Perl.pm   96.1   83.3   66.6   92.8  100.0    0.1   92.9
-    ...ib/Workflow/Config/XML.pm   94.1   62.5   50.0  100.0  100.0    4.6   90.2
-    blib/lib/Workflow/Context.pm  100.0    n/a    n/a  100.0  100.0    2.3  100.0
-    ...lib/Workflow/Exception.pm  100.0  100.0    n/a  100.0  100.0    0.9  100.0
-    blib/lib/Workflow/Factory.pm   87.4   79.3   61.5   84.6  100.0   30.9   84.3
-    blib/lib/Workflow/History.pm  100.0   87.5    n/a  100.0  100.0    4.3   98.2
-    ...ib/Workflow/InputField.pm   98.6   96.1   87.5  100.0  100.0    2.5   97.6
-    ...lib/Workflow/Persister.pm   98.4  100.0   71.4   94.7  100.0    2.4   96.4
-    ...Workflow/Persister/DBI.pm   86.7   72.0   35.2   90.6  100.0    7.7   83.0
-    ...er/DBI/AutoGeneratedId.pm   91.8   75.0   83.3  100.0  100.0    0.0   88.7
-    ...ersister/DBI/ExtraData.pm   29.8    0.0    0.0   60.0  100.0    0.6   29.7
-    ...rsister/DBI/SequenceId.pm  100.0    n/a   50.0  100.0  100.0    0.0   98.0
-    ...orkflow/Persister/File.pm   94.4   50.0   33.3  100.0  100.0    0.2   88.5
-    ...low/Persister/RandomId.pm  100.0    n/a  100.0  100.0  100.0    2.3  100.0
-    ...orkflow/Persister/UUID.pm  100.0    n/a    n/a  100.0  100.0    2.2  100.0
-    blib/lib/Workflow/State.pm     88.1   62.5   16.6   96.3  100.0    4.9   81.7
-    ...lib/Workflow/Validator.pm  100.0   83.3    n/a  100.0  100.0    2.4   97.5
-    ...dator/HasRequiredField.pm   90.9   50.0    n/a  100.0  100.0    2.3   87.8
-    ...dator/InEnumeratedType.pm  100.0  100.0    n/a  100.0  100.0    2.3  100.0
-    ...ator/MatchesDateFormat.pm  100.0  100.0  100.0  100.0  100.0    4.0  100.0
-    Total                          90.7   73.6   57.6   94.9  100.0  100.0   87.8
-    ---------------------------- ------ ------ ------ ------ ------ ------ ------
-
-Activities to get improved coverage are ongoing.
-
-=head1 QUALITY ASSURANCE
-
-The Workflow project utilizes L<Perl::Critic> in an attempt to avoid common
-pitfalls and programming mistakes.
-
-The static analysis performed by L<Perl::Critic> is integrated into the L</TEST>
-tool chain and is performed either by running the test suite.
-
-        % ./Build test
-
-Or by running the test file containing the L<Perl::Critic> tests explicitly.
-
-        % ./Build test --verbose 1 --test_files t/04_critic.t
-
-Or
-
-        % perl t/critic.t
-
-The test does however require that the TEST_AUTHOR flag is set since this is
-regarded as a part of the developer tool chain and we do not want to disturb
-users and CPAN testers with this.
-
-The following policies are disabled
-
-=over
-
-=item * L<Perl::Critic::Policy::ValuesAndExpressions::ProhibitMagicNumbers>
-
-=item * L<Perl::Critic::Policy::Subroutines::ProhibitExplicitReturnUndef>
-
-=item * L<Perl::Critic::Policy::NamingConventions::ProhibitAmbiguousNames>
-
-=item * L<Perl::Critic::Policy::ValuesAndExpressions::ProhibitConstantPragma>
-
-=back
-
-The complete policy configuration can be found in t/perlcriticrc.
-
-Currently a large number other policies are disabled, but these are being
-addressed as ongoing work and they will either be listed here or changes will
-be applied, which will address the Workflow code's problematic areas from
-L<Perl::Critic> perspective.
+The test to verify the (http/https) links in the POD documentation will only
+run when the variable POD_LINKS is set.
 
 =head1 CODING STYLE
 
@@ -1379,32 +1421,16 @@ The code is kept under revision control using Git:
 
 =over
 
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Workflow>
-
 =item * MetaCPAN
 
 L<https://metacpan.org/release/Workflow>
 
 =back
 
-=head1 SEE ALSO
-
-=over
-
-=item * November 2010 talk 'Workflow' given at Nordic Perl Workshop 2010 in Reykjavik, Iceland by jonasbn
-L<http://www.slideshare.net/jonasbn/workflow-npw2010>
-
-=item * August 2010 talk 'Workflow' given at YAPC::Europe 2010 in Pisa, Italy by jonasbn
-L<http://www.slideshare.net/jonasbn/workflow-yapceu2010>
-
-=back
-
 =head1 COPYRIGHT
 
 Copyright (c) 2003 Chris Winters and Arvato Direct;
-Copyright (c) 2004-2023 Chris Winters. All rights reserved.
+Copyright (c) 2004-2021 Chris Winters. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -1491,7 +1517,7 @@ able to attach event listeners (observers) to the process.
 
 Michael Roberts E<lt>michael@vivtek.comE<gt> graciously released the
 'Workflow' namespace on CPAN; check out his Workflow toolkit at
-L<http://www.vivtek.com/wftk.html>.
+L<http://www.vivtek.com/wftk/>.
 
 Michael Schwern E<lt>schwern@pobox.orgE<gt> barked via RT about a
 dependency problem and CPAN naming issue.

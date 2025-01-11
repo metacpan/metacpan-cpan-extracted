@@ -1,8 +1,5 @@
 /* vi: set ft=c : */
 
-#if !HAVE_PERL_VERSION(5, 16, 0)
-#  define CopLABEL_len_flags(c,len,flags)    Perl_fetch_cop_label(aTHX_ (c), len, flags)
-#endif
 
 static void walk_ops_find_labels(pTHX_ OP *o, HV *gotolabels)
 {
@@ -59,10 +56,8 @@ static OPCODE walk_ops_forbid(pTHX_ OP *o, U32 flags, HV *permittedloops, HV *pe
         goto forbid;
 
       SV *target = newSVpv(cPVOPo->op_pv, strlen(cPVOPo->op_pv));
-#if HAVE_PERL_VERSION(5, 16, 0)
       if(cPVOPo->op_private & OPpPV_IS_UTF8)
         SvUTF8_on(target);
-#endif
       SAVEFREESV(target);
 
       if(hv_fetch_ent(permittedgotos, target, FALSE, 0))
@@ -87,10 +82,8 @@ static OPCODE walk_ops_forbid(pTHX_ OP *o, U32 flags, HV *permittedloops, HV *pe
         goto forbid;
 
       SV *target = newSVpv(cPVOPo->op_pv, strlen(cPVOPo->op_pv));
-#if HAVE_PERL_VERSION(5, 16, 0)
       if(cPVOPo->op_private & OPpPV_IS_UTF8)
         SvUTF8_on(target);
-#endif
       SAVEFREESV(target);
 
       if(hv_fetch_ent(permittedloops, target, FALSE, 0))

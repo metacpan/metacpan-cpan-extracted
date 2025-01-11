@@ -1,5 +1,5 @@
-# Copyright (c) 2023-2024 Löwenfelsen UG (haftungsbeschränkt)
-# Copyright (c) 2023-2024 Philipp Schafft
+# Copyright (c) 2023-2025 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2023-2025 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -31,7 +31,7 @@ use constant {
 use constant RE_UUID => qr/^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$/;
 use constant RE_UINT => qr/^[1-9][0-9]*$/;
 
-our $VERSION = v0.11;
+our $VERSION = v0.12;
 
 use parent 'Data::URIID::Base';
 
@@ -151,6 +151,8 @@ my %best_services = (
     #'small-identifier'              => '',
     #'language-tag-identifier'       => '',
     #'chat-0-word-identifier'        => '',
+    'furaffinity-post-identifier'   => 'furaffinity',
+    'imgur-post-identifier'         => 'imgur',
 );
 
 # Load extra services:
@@ -279,6 +281,12 @@ my %url_templates = (
     ],
     'oidref' => [
         ['oid' => 'https://oidref.com/%s' => undef, [qw(info)]],
+    ],
+    'furaffinity' => [
+        ['furaffinity-post-identifier' => 'https://www.furaffinity.net/view/%s/', undef, [qw(info render)]],
+    ],
+    'imgur' => [
+        ['imgur-post-identifier' => 'https://imgur.com/%s', undef, [qw(info render)]],
     ],
 );
 my %digest_url_templates = (
@@ -627,6 +635,30 @@ my %url_parser = (
             id => \1,
             action => 'info',
         },
+        {
+            host => 'www.furaffinity.net',
+            path => qr#^/view/([1-9][0-9]*)/$#,
+            source => 'furaffinity',
+            type => 'furaffinity-post-identifier',
+            id => \1,
+            action => 'info',
+        },
+        {
+            host => 'imgur.com',
+            path => qr#^/([0-9a-zA-Z]{7})$#,
+            source => 'imgur',
+            type => 'imgur-post-identifier',
+            id => \1,
+            action => 'info',
+        },
+        {
+            host => 'i.imgur.com',
+            path => qr#^/([0-9a-zA-Z]{7})\.[a-z]{3,4}$#,
+            source => 'imgur',
+            type => 'imgur-post-identifier',
+            id => \1,
+            action => 'file-fetch',
+        },
     ],
 );
 
@@ -660,8 +692,9 @@ my %syntax = (
     'unesco-thesaurus-identifier'   => qr/^concept[0-9]+$/,
     'gtin'                          => qr/^[0-9]{8}(?:[0-9]{4,6})?$/,
     'language-tag-identifier'       => qr/^[0-9a-zA-Z-]+$/,
+    'imgur-post-identifier'         => qr/^[0-9a-zA-Z]{7}$/,
     (map {'osm-'.$_ => RE_UINT} qw(node way relation)),
-    (map {$_        => RE_UINT} qw(e621-post-identifier xkcd-num ngv-artist-identifier ngv-artwork-identifier find-a-grave-identifier libraries-australia-identifier nla-trove-people-identifier agsa-creator-identifier a-p-and-p-artist-identifier geonames-identifier small-identifier chat-0-word-identifier)),
+    (map {$_        => RE_UINT} qw(e621-post-identifier xkcd-num ngv-artist-identifier ngv-artwork-identifier find-a-grave-identifier libraries-australia-identifier nla-trove-people-identifier agsa-creator-identifier a-p-and-p-artist-identifier geonames-identifier small-identifier chat-0-word-identifier furaffinity-identifier)),
 );
 
 my %fellig_tables = (
@@ -815,9 +848,15 @@ sub _lookup_one {
         $_service->$_func($self, %opts)
     } // {};
     $have->{$service} = $res;
+
     foreach my $id_type (keys %{$res->{id} // {}}) {
         my $ise = $extractor->name_to_ise(type => $id_type);
         $self->{id}{$ise} //= $res->{id}{$id_type};
+    }
+
+    if (defined $res->{url_overrides}) {
+        $self->{url_overrides} //= {};
+        $self->{url_overrides}{$service} //= $res->{url_overrides};
     }
 
     return $res;
@@ -1356,6 +1395,15 @@ sub url {
         }
     }
 
+    if (defined($self->{url_overrides}) && defined($self->{url_overrides}{$service})) {
+        if (defined(my $action = $opts{action})) {
+            if (defined(my $url = $self->{url_overrides}{$service}{$action})) {
+                return URI->new($url);
+            }
+        }
+    }
+
+    return $opts{default} if exists $opts{default};
     croak 'Identifier does not generate a URL for the selected service';
 }
 
@@ -1468,7 +1516,7 @@ Data::URIID::Result - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.11
+version v0.12
 
 =head1 SYNOPSIS
 
@@ -1729,6 +1777,11 @@ The following options are defined:
 Returns an URL for the given action.
 Defaults to C<$result-E<gt>attribute('action')>.
 
+=item C<default>
+
+Returns the given value if no value is found.
+This can also be set to C<undef> to allow returning C<undef> in case of no value found instead of C<die>-ing.
+
 =item C<service>
 
 Returns an URL for the given service.
@@ -1748,7 +1801,7 @@ Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023-2024 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2023-2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
 
 This is free software, licensed under:
 

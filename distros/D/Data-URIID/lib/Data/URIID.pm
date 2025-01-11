@@ -1,5 +1,5 @@
-# Copyright (c) 2023-2024 Löwenfelsen UG (haftungsbeschränkt)
-# Copyright (c) 2023-2024 Philipp Schafft
+# Copyright (c) 2023-2025 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2023-2025 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -21,7 +21,7 @@ use I18N::LangTags::Detect;
 use Data::URIID::Result;
 use Data::URIID::Service;
 
-our $VERSION = v0.11;
+our $VERSION = v0.12;
 
 my %names = (
     service => {
@@ -62,6 +62,8 @@ my %names = (
         'iana'              => 'f11657cc-95da-4eae-95fc-62d16fecf473', # iana.org
         'uriid'             => '772aa1ed-9a3a-4806-94a1-42cbc0e9f962', # uriid.org
         'oidref'            => 'b5a63482-f92c-4ed5-8ec3-49caa0bafa66', # oidref.com
+        'furaffinity'       => '978a4622-2a87-4c67-b9bf-c1b1e5d69b05',
+        'imgur'             => 'e6c5f855-221a-4c48-9f31-cf0a852140da', # imgur.com
     },
     type => {
         'uuid'                          => '8be115d2-dc2f-4a98-91e1-a6e3075cbc31',
@@ -108,6 +110,8 @@ my %names = (
         'small-identifier'              => 'f87a38cb-fd13-4e15-866c-e49901adbec5',
         'language-tag-identifier'       => 'd0a4c6e2-ce2f-4d4c-b079-60065ac681f1',
         'chat-0-word-identifier'        => '2c7e15ed-aa2f-4e2f-9a1d-64df0c85875a',
+        'furaffinity-post-identifier'   => 'b8dd10ec-d46b-4316-b3f3-2bc28cff9d35',
+        'imgur-post-identifier'         => 'f2425e42-0083-4205-aa0b-2005f1fa62a3',
     },
     action => {
         #What about: search/lookup? list? content?
@@ -127,6 +131,18 @@ my %names = (
     },
 );
 
+my %service_lists = (
+    ALL         => [keys %{$names{service}}],
+    LOCAL       => [qw(Data::URIID Data::Identifier)],
+    REMOTE      => [qw(wikidata factgrid wikimedia-commons fellig noembed.com osm overpass xkcd doi iconclass e621 furaffinity imgur)],
+
+    wmf         => [qw(wikidata wikimedia-commons wikipedia)],
+    osm         => [qw(osm overpass)],
+
+    friendly    => [qw(fellig uriid)],
+    uafriendly  => [qw(@friendly)],
+);
+
 # Inverse of %names:
 my %ises;
 
@@ -136,12 +152,41 @@ foreach my $class (keys %names) {
     };
 }
 
+{
+    my $found;
+    do {
+        $found = undef;
+
+        foreach my $content (values %service_lists) {
+            my @newlist;
+
+            foreach my $entry (@{$content}) {
+                if ($entry =~ /^\@(.+)$/) {
+                    push(@newlist, @{$service_lists{$1}});
+                    $found = 1;
+                } else {
+                    push(@newlist, $entry);
+                }
+            }
+
+            @{$content} = @newlist;
+        }
+    } while ($found);
+}
+
 
 
 sub new {
     my ($pkg, %opts) = @_;
+    my $self = bless \%opts, $pkg;
 
-    return bless \%opts, $pkg;
+    if (defined(my $services_online = delete $self->{services_online})) {
+        foreach my $service_name ($self->match_services($services_online)) {
+            $self->service($service_name)->online(1);
+        }
+    }
+
+    return $self;
 }
 
 
@@ -353,6 +398,35 @@ sub service {
     );
 }
 
+sub match_services {
+    my ($self, @list) = @_;
+    my %selected;
+
+    @list = map {split /\s*[,:]\s*|\s+/} map {ref($_) eq 'ARRAY' ? @{$_} : $_} @list;
+
+    foreach my $entry (@list) {
+        my ($neg, $prefix, $name) = $entry =~ /^(\!?)(\@?)(.+)$/;
+        my @sublist;
+
+        if ($prefix eq '@') {
+            @sublist = @{$service_lists{$name} // croak 'Invalid service list: '.$name};
+        } else {
+            $name = $name->ise if ref $name;
+            $name = $self->name_to_ise(service => $name);
+            $name = $self->ise_to_name(service => $name);
+            @sublist = ($name);
+        }
+
+        if ($neg eq '') {
+            $selected{$_} = 1 foreach @sublist;
+        } else {
+            $selected{$_} = 0 foreach @sublist;
+        }
+    }
+
+    return grep {$selected{$_}} keys %selected;
+}
+
 
 1;
 
@@ -368,7 +442,7 @@ Data::URIID - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.11
+version v0.12
 
 =head1 SYNOPSIS
 
@@ -446,6 +520,41 @@ Boolean indicating whether online operations are permitted.
 
 Default false.
 See also L<"online">.
+
+=item C<services_online>
+
+List of services to set the online flag for.
+Similar to C<default_online>, this allows for enable online mode for services.
+The difference is that this option allows selective control.
+
+The argument takes a list (arrayref or C<,> or C<:> delimited string) of elements which each name a service
+or a group (prefixed with C<@>). Each entry might be prefixed with C<!> to negative (exclude) that element.
+
+Currently defined:
+C<@ALL> (all services),
+C<@LOCAL> (all services that provide offline mode; note that offline mode is not affected by this setting),
+C<@REMOTE> (all services that have an online mode),
+C<@friendly> (all services that have a friendly policy),
+C<@uafriendly> (all services that have a friendly policy but require the agent string to be set to something useful that includes contact details),
+C<@wmf> (Wikimedia Foundation, Inc. related services),
+C<@osm> (OpenStreetMap related services).
+
+Defaults to an empty list.
+
+B<Example:>
+
+    [qw(@friendly @osm !@wmf)] # All friendly services plus OpenStreetMap services, but not Wikimedia Foundation
+
+    '@uafriendly:!wikimedia-commons' # All services friendly (if 'agent' is set) but not Wikimedia commons.
+
+B<Note:>
+If a service is listed as negative in this setting this will not disable that service
+but just not enable it. It might be enabled by other options.
+This behaviour may change in future versions.
+
+B<Note:>
+You should not give this option together with C<default_online>.
+Future versions might change behaviour if both are given.
 
 =item C<ua>
 
@@ -555,7 +664,7 @@ Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023-2024 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2023-2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
 
 This is free software, licensed under:
 

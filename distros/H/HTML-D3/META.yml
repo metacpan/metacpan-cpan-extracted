@@ -27,5 +27,5 @@ requires:
   JSON::MaybeXS: '0'
   Scalar::Util: '0'
 resources: {}
-version: '0.06'
+version: '0.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

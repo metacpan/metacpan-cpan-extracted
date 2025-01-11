@@ -7,7 +7,7 @@ use Date::Calc            qw/Add_Delta_Days/;
 use POSIX                 qw/strftime modf/;
 use Carp                  qw/croak/;
 
-our $VERSION = '1.14';
+our $VERSION = '1.15';
 
 #======================================================================
 # ATTRIBUTES
@@ -255,7 +255,7 @@ sub _subrange {
 
   # restrict to the column range
   my @col_nums = map {$self->A1_to_num($_) - 1} ($col1, $col2);
-  if ($col_nums[0] > 1){
+  if ($col_nums[0] > 0){
     my @col_range = ($col_nums[0] .. $col_nums[1]);
     $values = [map { [ @$_[@col_range] ]} @$values];
   }
@@ -644,6 +644,10 @@ Ulibuck signaled bugs several minor bugs on the LibXML backend.
 =item *
 
 H.Merijn Brand suggested additions to the API and several improvements to the code source.
+
+=item *
+
+Ephraim Stevens signaled a bug in the table() method with 'ref' param.
 
 =back
 

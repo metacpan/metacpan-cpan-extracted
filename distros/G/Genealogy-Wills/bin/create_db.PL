@@ -64,7 +64,7 @@ if(-r $filename) {
 	unlink $filename;
 }
 
-my $cache_dir = $ENV{'CACHE_DIR'};
+my $cache_dir = $ENV{'CACHE_DIR'} || $ENV{'CACHEDIR'};
 if($cache_dir) {
 	mkdir $cache_dir, 0700 if(!-d $cache_dir);
 	$cache_dir = File::Spec->catfile($cache_dir, 'http-cache-transparent');

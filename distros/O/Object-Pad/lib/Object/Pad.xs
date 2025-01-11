@@ -25,6 +25,7 @@
 #include "exec_optree.c.inc"
 #include "forbid_outofblock_ops.c.inc"
 #include "optree-additions.c.inc"
+#include "newMYCONSTSUB.c.inc"
 #include "newOP_CUSTOM.c.inc"
 
 #if HAVE_PERL_VERSION(5, 26, 0)
@@ -440,11 +441,41 @@ static int build_classlike(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t n
   }
 
   bool is_anon = false;
+  bool is_lexical = (PL_parser->in_my != 0);
+
   SV *packagename = args[argi++]->sv;
   if(!packagename) {
+    if(is_lexical)
+      croak("Lexical class requires a name");
     is_anon = true;
     packagename = newSVpvf("Object::Pad::__ANONCLASS__::%" IVdf,
       next_anonclass_id++);
+  }
+
+  if(is_lexical) {
+    /* Lexical class is implemented by overriding the package name to
+     * something anonymous then setting up a const sub named after the
+     * requested name which just returns it
+     */
+    if(!hv_fetchs(hints, "Object::Pad/experimental(lexical_class)", 0))
+      Perl_ck_warner(aTHX_ packWARN(WARN_EXPERIMENTAL),
+        "'my class' is experimental and may be changed or removed without notice");
+
+    SV *lexname = packagename;
+    if(strstr(SvPV_nolen(lexname), "::"))
+      croak("Lexical class name must not be fully-qualified");
+
+    packagename = newSVpvf("%" SVf "::__LEXCLASS__/%" SVf,
+      SVfARG(PL_curstname), lexname);
+
+    int unique_suffix = 0;
+    while(gv_stashsv(packagename, 0)) {
+      /* Append a uniqueness number on the end of there's more than one */
+      sv_setpvf(packagename, "%" SVf "::__LEXCLASS__/%" SVf ".%d",
+        SVfARG(PL_curstname), lexname, ++unique_suffix);
+    }
+
+    newMYCONSTSUB_named_sv(lexname, packagename);
   }
 
   enum MetaType type = PTR2UV(hookdata);
@@ -496,9 +527,11 @@ static int build_classlike(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t n
     is_block = false;
     if(is_anon)
       croak("Anonymous class requires a {BLOCK}");
+    if(is_lexical)
+      croak("Lexical class requires a {BLOCK}");
   }
   else
-    croak("Expected a block or ';'");
+    croak("Expected a block or ';', found > %s", PL_parser->bufptr);
 
   if(!hv_fetchs(hints, "Object::Pad/configure(no_implicit_pragmata)", 0)) {
     bool was_explicit_strict =
@@ -599,11 +632,13 @@ static const struct XSParseKeywordPieceType pieces_classlike[] = {
 };
 
 static const struct XSParseKeywordHooks kwhooks_class = {
+  .flags = XPK_FLAG_PERMIT_LEXICAL,
   .permit_hintkey = "Object::Pad/class",
   .pieces = pieces_classlike,
   .build = &build_classlike,
 };
 static const struct XSParseKeywordHooks kwhooks_role = {
+  .flags = XPK_FLAG_PERMIT_LEXICAL,
   .permit_hintkey = "Object::Pad/role",
   .pieces = pieces_classlike,
   .build = &build_classlike,
@@ -2111,7 +2146,7 @@ BOOT:
   DMD_SET_PACKAGE_HELPER("Object::Pad::MOP::Class", &dumppackage_class);
 #endif
 
-  boot_xs_parse_keyword(0.46); /* XPK_PREFIXED_LISTEXPR_ENTERLEAVE */
+  boot_xs_parse_keyword(0.48); /* XPK_FLAG_PERMIT_LEXICAL */
 
   register_xs_parse_keyword("class", &kwhooks_class, (void *)METATYPE_CLASS);
   register_xs_parse_keyword("role",  &kwhooks_role,  (void *)METATYPE_ROLE);
@@ -2131,7 +2166,7 @@ BOOT:
 
   register_xs_parse_keyword("requires", &kwhooks_requires, NULL);
 
-  boot_xs_parse_sublike(0.31); /* start_signature */
+  boot_xs_parse_sublike(0.35); /* 'my' prefix scanning bugfix */
 
   register_xs_parse_sublike("method", &parse_method_hooks, (void *)PHASER_NONE);
 

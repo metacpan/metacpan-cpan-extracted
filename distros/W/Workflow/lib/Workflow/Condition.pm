@@ -2,16 +2,20 @@ package Workflow::Condition;
 
 use warnings;
 use strict;
-use base qw( Workflow::Base );
+
+use parent qw( Workflow::Base );
+use v5.14.0;
 use Carp qw(croak);
-use English qw( -no_match_vars );
-use Log::Log4perl qw( get_logger );
-use Workflow::Exception qw( workflow_error condition_error );
+use Log::Any qw( $log );
+use Workflow::Exception qw( workflow_error );
+use Workflow::Condition::IsFalse;
+use Workflow::Condition::IsTrue;
 
 $Workflow::Condition::CACHE_RESULTS = 1;
-$Workflow::Condition::VERSION = '1.62';
+$Workflow::Condition::VERSION = '2.02';
 
-my $log;
+$Workflow::Condition::STRICT_BOOLEANS = 1;
+
 my @FIELDS = qw( name class );
 __PACKAGE__->mk_accessors(@FIELDS);
 
@@ -19,20 +23,15 @@ sub init {
     my ( $self, $params ) = @_;
     $self->name( $params->{name} );
     $self->class( $params->{class} );
-    $self->_init($params);
 }
-
-sub _init {return}
 
 sub evaluate {
     my ($self) = @_;
     croak "Class ", ref($self), " must implement 'evaluate()'!\n";
 }
 
-
 sub evaluate_condition {
     my ( $class, $wf, $condition_name) = @_;
-    $log ||= get_logger();
     $wf->type;
 
     my $factory = $wf->_factory();
@@ -43,6 +42,7 @@ sub evaluate_condition {
 
     local $wf->{'_condition_result_cache'} =
         $wf->{'_condition_result_cache'} || {};
+
     if ( $Workflow::Condition::CACHE_RESULTS
          && exists $wf->{'_condition_result_cache'}->{$orig_condition} ) {
 
@@ -62,51 +62,28 @@ sub evaluate_condition {
         $condition = $wf->_factory()
             ->get_condition( $orig_condition, $wf->type );
         $log->debug( "Evaluating condition '$orig_condition'" );
+
         my $return_value;
-
-        local $EVAL_ERROR = undef;
-        eval { $return_value = $condition->evaluate($wf) };
-        if ($EVAL_ERROR) {
-
-            # Check if this is a Workflow::Exception::Condition
-            if (Exception::Class->caught('Workflow::Exception::Condition')) {
-                $wf->{'_condition_result_cache'}->{$orig_condition} = 0;
-                $log->debug(
-                    "condition '$orig_condition' failed due to: $EVAL_ERROR");
-                return 0;
-                # unreachable
-
-            } else {
-                $log->debug("Got uncatchable exception in condition $condition_name ");
-
-                # if EVAL_ERROR is an execption object rethrow it
-                $EVAL_ERROR->rethrow() if (ref $EVAL_ERROR ne '');
-
-                # if it is a string (bubbled up from die/croak), make an Exception Object
-                # For briefness, we just send back the first line of EVAL
-                my @t = split /\n/, $EVAL_ERROR;
-                my $ee = shift @t;
-
-                Exception::Class::Base->throw( error
-                                               => "Got unknown exception while handling condition '$condition_name' / " . $ee );
-                # unreachable
-
-            }
-            # unreachable
-
+        my $result = $condition->evaluate($wf);
+        if (ref $result eq 'Workflow::Condition::IsTrue'
+            or (not $Workflow::Condition::STRICT_BOOLEANS and $result)) {
+            $log->info( "Got true result with '$result' on '$orig_condition'");
+            $return_value = 1;
+        } elsif (ref $result eq 'Workflow::Condition::IsFalse'
+                 or not $Workflow::Condition::STRICT_BOOLEANS) {
+            $log->info( "Got false result with '$result' on '$orig_condition'");
+            $return_value = 0;
         } else {
-            $wf->{'_condition_result_cache'}->{$orig_condition} = $return_value;
-            $log->debug("condition '$orig_condition' succeeded; returned: ",
-                        $return_value ? 'true' : 'false');
-            return $return_value;
+            $log->fatal( "Evaluate on '$orig_condition' did not return a valid result object" );
+            $log->trace( 'Eval result', { result => $result } );
+            croak "Evaluate on '$orig_condition' did not return a valid result object";
         }
-        # unreachable
 
+        $wf->{'_condition_result_cache'}->{$orig_condition} = $return_value;
+
+        return $return_value;
     }
-    # unreachable
 }
-
-
 
 1;
 
@@ -120,7 +97,7 @@ Workflow::Condition - Evaluate a condition depending on the workflow state and e
 
 =head1 VERSION
 
-This documentation describes version 1.62 of this package
+This documentation describes version 2.02 of this package
 
 =head1 SYNOPSIS
 
@@ -160,13 +137,14 @@ This documentation describes version 1.62 of this package
  package MyApp::Condition::IsAdminUser;
 
  use strict;
- use base qw( Workflow::Condition );
- use Workflow::Exception qw( condition_error configuration_error );
+ use parent qw( Workflow::Condition );
+ use Workflow::Exception qw( configuration_error );
 
  __PACKAGE__->mk_accessors( 'admin_group_id' );
 
- sub _init {
+ sub init {
      my ( $self, $params ) = @_;
+     $self->SUPER::init( $params );
      unless ( $params->{admin_group_id} ) {
          configuration_error
              "You must define one or more values for 'admin_group_id' in ",
@@ -181,12 +159,12 @@ This documentation describes version 1.62 of this package
      my $admin_ids = $self->admin_group_id;
      my $current_user = $wf->context->param( 'current_user' );
      unless ( $current_user ) {
-         condition_error "No user defined, cannot check groups";
+         return ''; # return false
      }
      foreach my $group ( @{ $current_user->get_groups } ) {
-         return if ( $admin_ids->{ $group->id } );
+         return 1 if ( $admin_ids->{ $group->id } ); # return true
      }
-     condition_error "Not member of any Admin groups";
+     return ''; # return false
  }
 
 =head1 DESCRIPTION
@@ -231,7 +209,11 @@ first. If it doesn't find one, it will look for non-typed conditions.
 
 =head2 Strategy
 
-The idea behind conditions is that they can be stateless. So when the
+The methods below specify an interface. Classes used as conditions need
+to implement these methods.  The easiest way to achieve that is by
+inheriting from C< Workflow::Condition >.  This is not required, though.
+
+The idea behind conditions is that they are be stateless. So when the
 L<Workflow::Factory> object reads in the condition configuration it
 creates the condition objects and initializes them with whatever
 information is passed in.
@@ -243,16 +225,35 @@ condition may be called many, many times during a workflow lifecycle
 the current state of the workflow for things like menu options. So
 keep it short!
 
-=head2 Methods
 
-To create your own condition you should implement the following:
+=head2 Interface methods
+
+When implementing a condition in a class that doesn't have this class
+as a super-class, you must implement these methods.  If you implement
+a condition that I< does > have this class as a super-class, you I< may >
+need to override these methods.
+
+=head3 evaluate( $workflow )
+
+Determine whether your condition fails by returning a false value or
+a true value upon success. You can get the application context information
+necessary to process your condition from the C<$workflow> object.
+
+B<NOTE> Callers wanting to evaluate a condition, should not call
+this method directly, but rather use the
+C<< Workflow::Condition->evaluate_condition >> class method described below.
+
+=head2 Other methods
+
+To create your own condition based on this class, these methods are available
+and can be overridden to do specific tasks.
 
 =head3 init( \%params )
 
 This is optional, but called when the condition is first
 initialized. It may contain information you will want to initialize
 your condition with in C<\%params>, which are all the declared
-parameters in the condition declartion except for 'class' and 'name'.
+parameters in the condition declaration except for 'class' and 'name'.
 
 You may also do any initialization here -- you can fetch data from the
 database and store it in the class or object, whatever you need.
@@ -260,16 +261,6 @@ database and store it in the class or object, whatever you need.
 If you do not have sufficient information in C<\%params> you should
 throw an exception (preferably 'configuration_error' imported from
 L<Workflow::Exception>).
-
-=head3 evaluate( $workflow )
-
-Determine whether your condition fails by throwing an exception. You
-can get the application context information necessary to process your
-condition from the C<$workflow> object.
-
-=head3 _init
-
-This is a I<dummy>, please refer to L</init>
 
 =head2 Caching and inverting the result
 
@@ -317,11 +308,21 @@ value here. If a condition returns zero or an undefined value, but
 did not throw an exception, we consider it to be '1'. Otherwise, we
 consider it to be the value returned.
 
+=head1 SEE ALSO
 
+=over
+
+=item * L<Workflow::Base>
+
+=item * L<Log::Any>
+
+=item * L<Workflow::Exception>
+
+=back
 
 =head1 COPYRIGHT
 
-Copyright (c) 2003-2023 Chris Winters. All rights reserved.
+Copyright (c) 2003-2024 Chris Winters. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

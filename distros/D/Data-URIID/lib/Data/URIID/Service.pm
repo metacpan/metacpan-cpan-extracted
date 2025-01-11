@@ -1,5 +1,5 @@
-# Copyright (c) 2023-2024 Löwenfelsen UG (haftungsbeschränkt)
-# Copyright (c) 2023-2024 Philipp Schafft
+# Copyright (c) 2023-2025 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2023-2025 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -24,9 +24,11 @@ use DateTime::Format::ISO8601;
 use Data::URIID::Result;
 use Data::URIID::Colour;
 
-our $VERSION = v0.11;
+our $VERSION = v0.12;
 
 use parent 'Data::URIID::Base';
+
+my $HAVE_HTML_TreeBuilder_XPath = eval {require HTML::TreeBuilder::XPath; 1;};
 
 my @musicbrainz_wikidata_relations = qw(P434 P435 P436 P966 P982 P1004 P1330 P1407 P4404 P5813 P6423 P8052);
 
@@ -198,6 +200,12 @@ my @fellig_types = qw(fellig-identifier fellig-box-number uuid oid uri wikidata-
 my %attrmap_osm = (
     name        => 'displayname',
     description => 'description',
+);
+
+my %attrmap_open_graph = (
+    title       => 'displayname',
+    description => 'description',
+    image       => 'thumbnail',
 );
 
 my %own_metadata = (
@@ -686,6 +694,8 @@ sub _extra_lookup_services {
         'iconclass'             => ['iconclass-identifier'],
         'xkcd'                  => ['xkcd-num'],
         'e621'                  => ['e621-post-identifier'],
+        'furaffinity'           => ['furaffinity-post-identifier'],
+        'imgur'                 => ['imgur-post-identifier'],
     }
 }
 
@@ -693,6 +703,37 @@ sub _extra_lookup_services_digests {
     return {
         'e621'                  => ['md-5-128'],
     };
+}
+
+# Private helper:
+sub _get_html {
+    my ($self, $url, %opts) = @_;
+
+    if ($self->setting('network_deny')) {
+        return undef;
+    }
+
+    if ($HAVE_HTML_TreeBuilder_XPath) {
+        my Data::URIID $extractor = $self->extractor;
+
+        if (defined(my $query = $opts{query})) {
+            $url = ref($url) ? $url->clone : URI->new($url);
+            $url->query_form($url->query_form, %{$query});
+        }
+
+        # We cannot use decoded_content()'s charset decoding here as it's buggy for JSON (and others?) response (at least in v6.18).
+        return eval {
+            my $msg = $extractor->_ua->get($url, 'Accept' => 'text/html');
+            return undef unless $msg->is_success;
+            my $val = $msg->decoded_content(ref => 1, charset => 'none');
+            my $r = HTML::TreeBuilder::XPath->new;
+            $r->parse(decode($msg->content_charset, $$val));
+            $r->eof;
+            $r;
+        };
+    } else {
+        return undef;
+    }
 }
 
 # Private helper:
@@ -745,6 +786,31 @@ sub _get_json_file {
         local $/ = undef;
         from_json(scalar <$fh>);
     };
+}
+
+# Private helper:
+sub _load_open_graph {
+    my ($self, $res, $html, $keys, $filters) = @_;
+    my $attr = $res->{attributes} //= {};
+    my %raw = map {$_->attr('property') => $_->attr('content')} $html->findnodes('/html/head/meta[@property]');
+
+    $filters //= {};
+
+    foreach my $key (@{$keys}) {
+        my $attrname = $attrmap_open_graph{$key} // croak 'BUG: Unknown key name: '.$key;
+        my $filter   = $filters->{$key};
+
+        if (defined(my $value = $raw{'og:'.$key})) {
+            if (length($value)) {
+                if (defined $filter) {
+                    next unless $value =~ $filter;
+                }
+
+                $attr->{$attrname} //= {};
+                $attr->{$attrname}{'*'} //= $value;
+            }
+        }
+    }
 }
 
 # Private helper:
@@ -824,6 +890,8 @@ sub _offline_lookup__Data__Identifier {
     my $ise_order = $result->{primary}{ise_order} // [qw(uuid oid uri)];
     my %attr;
     my %ids;
+
+    eval { $result->id('uri') }; # prefil cache. See RT#157959
 
     foreach my $id (
         map {
@@ -1236,6 +1304,48 @@ sub _online_lookup__e621 {
     return \%res;
 }
 
+sub _online_lookup__furaffinity {
+    my ($self, $result, %opts) = @_;
+    my $html = $self->_get_html($result->url(service => 'furaffinity', action => 'info')) // return undef;
+    my %attr;
+    my %res = (attributes => \%attr);
+    my %raw = map {$_->attr('property') => $_->attr('content')} $html->findnodes('/html/head/meta[@property]');
+
+    $self->_load_open_graph(\%res, $html, [qw(title description image)], {image => qr#^https://t\.furaffinity\.net/#});
+
+    foreach my $download ($html->findnodes('/html/body//div[@id="submission_page"]//a[text()="Download" and @href]')) {
+        my $url = URI->new($download->attr('href'), 'https');
+
+        $url->scheme('https');
+        $url = $url->as_string;
+
+        $res{url_overrides} = {
+            'fetch' => $url,
+            'file-fetch' => $url,
+        };
+    }
+
+    return \%res;
+}
+
+sub _online_lookup__imgur {
+    my ($self, $result, %opts) = @_;
+    my $html = $self->_get_html($result->url(service => 'imgur', action => 'info')) // return undef;
+    my %attr;
+    my %res = (attributes => \%attr);
+    my %raw = map {$_->attr('name') => $_->attr('content')} $html->findnodes('/html/head/meta[@name]');
+
+    $res{url_overrides} = {};
+
+    $self->_load_open_graph(\%res, $html, [qw(title image)]);
+
+    if (defined($raw{'twitter:player:stream'}) && length($raw{'twitter:player:stream'})) {
+        $res{url_overrides}{'stream-fetch'} = $raw{'twitter:player:stream'};
+    }
+
+    return \%res;
+}
+
 # --- Overrides for Data::URIID::Base ---
 
 sub displayname {
@@ -1257,7 +1367,7 @@ Data::URIID::Service - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.11
+version v0.12
 
 =head1 SYNOPSIS
 
@@ -1351,7 +1461,7 @@ Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023-2024 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2023-2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
 
 This is free software, licensed under:
 

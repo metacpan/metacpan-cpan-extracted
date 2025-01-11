@@ -1,5 +1,5 @@
 package Crypt::Passphrase;
-$Crypt::Passphrase::VERSION = '0.019';
+$Crypt::Passphrase::VERSION = '0.020';
 use strict;
 use warnings;
 
@@ -156,7 +156,7 @@ Crypt::Passphrase - A module for managing passwords in a cryptographically agile
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 SYNOPSIS
 
@@ -253,7 +253,7 @@ Calling this only ever makes sense after a password has been verified.
 
  $passphrase->recode_hash($hash)
 
-This recodes a hash if possible. This is mainly relevant when upgrading to a new pepper, but can also be relevant when a cipher has multiple known encodings (e.g. scrypt).
+This recodes a hash if needed. This is mainly relevant when upgrading to a new pepper, but can also be relevant when a cipher has multiple known encodings (e.g. scrypt). It will return the hash unmodified otherwise.
 
 =head2 curry_with_hash
 
@@ -281,7 +281,9 @@ Hashing passwords is by its nature a heavy operations. It can be abused by malig
 
 In some situations, it may be appropriate to have different password settings for different users (e.g. set them more strict for administrators than for ordinary users).
 
-=head1 BACKENDS
+=head1 SEE ALSO
+
+=head2 Encoders
 
 The following encoders are currently available on CPAN:
 
@@ -299,6 +301,18 @@ And older but still safe password hashing algorithm, recommended for lower-end p
 
 Another state-of-the-art memory-hard password hashing algorithm. Finalist of the Password Hash Competition of 2015 and used in some recent Linux distributions for user passwords.
 
+=item * L<Crypt::Passphrase::Argon2::AES|Crypt::Passphrase::Argon2::AES>
+
+A peppering implementation that AES encrypts an argon2 hash. Recommended when wanting to pepper with argon2 as it allows offline repeppering and offers strong cryptographic guarantees.
+
+=item * L<Crypt::Passphrase::Argon2::HSM|Crypt::Passphrase::Argon2::HSM>
+
+A peppering implementation like above, except it uses a PKCS11 Hardware Security Module instead of encrypting locally for additional information security. Supported algorithms will depend on your HSM.
+
+=item * L<Crypt::Passphrase::Bcrypt::AES|Crypt::Passphrase::Bcrypt::AES>
+
+A peppering implementation that AES encrypts a bcrypt hash. Recommended when wanting to pepper with bcrypt as it allows offline repeppering and offers strong cryptographic guarantees.
+
 =item * L<Crypt::Passphrase::PBKDF2|Crypt::Passphrase::PBKDF2>
 
 A FIPS-standardized hashing algorithm. Only recommended when FIPS-compliance is required.
@@ -309,25 +323,47 @@ An implementation of SHA-512, SHA256 and MD5 based C<crypt()>. Recommended if yo
 
 =item * L<Crypt::Passphrase::Scrypt|Crypt::Passphrase::Scrypt>
 
-A first-generation memory-hard algorithm, Argon2 is recommended instead if you want a memory-hard algorithm.
+A first-generation memory-hard algorithm, if you want a memory-hard algorithm something more recent like argon2 or yescrypt is recommended instead.
 
 =item * L<Crypt::Passphrase::System|Crypt::Passphrase::System>
 
-Your system's C<crypt> implementation. Support for various algorithms varies between platforms and platform versions, and while on some platforms it's a good backend one should not rely on this for a portable result.
-
-=item * L<Crypt::Passphrase::Argon2::AES|Crypt::Passphrase::Argon2::AES>
-
-A peppering implementation that AES encrypts an argon2 hash. Recommended when wanting to pepper with argon2 as it allows offline repeppering and offers strong cryptographic guarantees.
+Your system's C<crypt> implementation. Support for various algorithms varies between platforms and platform versions, and while on some platforms it's a decent backend one should not rely on this for a portable result. This is mainly useful if you can't depend on XS module being available and is provided in this distribution.
 
 =item * L<Crypt::Passphrase::Pepper::Simple|Crypt::Passphrase::Pepper::Simple>
 
-A meta-encoder that adds peppering to your passwords by pre-hashing the inputs. Recommended when wanting to pepper with hashes other than argon2 as it can be combined with any encoder.
+A meta-encoder that adds peppering to your passwords by pre-hashing the inputs. Recommended only when wanting to pepper with hashes other than argon2 or bcrypt as it can be combined with any encoder. It is provided in this distribution.
 
 =back
 
-Additionally, the following integrations are supported
+=head2 Validators
 
-=head1 INTEGRATIONS
+Additionally, the following validators are supported
+
+=over 4
+
+=item * L<Crypt::Passphrase::SHA1::Hex|Crypt::Passphrase::SHA1::Hex>
+
+A validator for hex encoded unsalted SHA1. It is provided in this distribution.
+
+=item * L<Crypt::Passphrase::SHA1::Base64|Crypt::Passphrase::SHA1::Base64>
+
+A validator for base64 encoded unsalted SHA1. It is provided in this distribution.
+
+=item * L<Crypt::Passphrase::MD5::Hex|Crypt::Passphrase::MD5::Hex>
+
+A validator for hex encoded unsalted MD5. It is provided in this distribution.
+
+=item * L<Crypt::Passphrase::MD5::Base64|Crypt::Passphrase::MD5::Base64>
+
+A validator for base64 encoded unsalted MD5. It is provided in this distribution.
+
+=item * L<Crypt::Passphrase::Bcrypt::Compat|Crypt::Passphrase::Bcrypt::Compat>
+
+This is an alternative validator for bcrypt that exists because L<Crypt::Eksblowfish::Bcrypt|Crypt::Eksblowfish::Bcrypt> can produce C<$2$> type hashes that aren't supported by modern bcrypt implementations when in some configurations (when C<key_nul> is false). This should only be used if you have such hashes.
+
+=back
+
+=head2 Integrations
 
 A number of integrations of Crypt::Passphrase exist:
 
@@ -335,9 +371,15 @@ A number of integrations of Crypt::Passphrase exist:
 
 =item * L<DBIx::Class::CryptColumn|DBIx::Class::CryptColumn>
 
+This will automatically inflate a password column to a L<Crypt::Passphrase::PassphraseHash|Crypt::Passphrase::PassphraseHash> object, and optionally add several helpful methods to the row object.
+
 =item * L<Mojolicious::Plugin::Passphrase|Mojolicious::Plugin::Passphrase>
 
+This integrates Crypt::Passphrase into the L<Mojolicious|Mojolicious> web framework.
+
 =item * L<Dancer2::Plugin::CryptPassphrase|Dancer2::Plugin::CryptPassphrase>
+
+This integrates Crypt::Passphrase into the L<Dancer2|Dancer2> web framework.
 
 =back
 

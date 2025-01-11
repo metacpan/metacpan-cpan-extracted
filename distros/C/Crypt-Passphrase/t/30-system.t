@@ -21,6 +21,21 @@ ok(!$passphrase->needs_rehash($hash1), 'Self-generated password doesn\'t need to
 my $hash2 = 'tesvSclXGCVNk';
 ok($passphrase->verify_password('test1234', $hash2), 'descrypt works');
 
+for my $type (Crypt::Passphrase::System->crypt_subtypes) {
+	my $passphrase = Crypt::Passphrase->new(encoder => {
+			module => 'System',
+			type   => $type,
+		}
+	);
+
+	subtest "Testing type '$type'", sub {
+		my $hash = $passphrase->hash_password('password');
+		note "Hash is $hash";
+		ok($passphrase->verify_password('password', $hash), 'Self-generated password validates');
+		ok(!$passphrase->needs_rehash($hash), 'Self-generated password doesn\'t need to be regenerated');
+	};
+}
+
 SKIP: {
 	skip 'no SHACrypt', 1 unless $supported{6};
 	my $hash3 = crypt('password', '$6$rounds=100000$AAAAAAAAAAAAAAAAAAAAAA');

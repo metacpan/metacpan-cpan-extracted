@@ -2,14 +2,10 @@
 
 use strict;
 use warnings;
-use lib qw(../lib lib ../t t);
+use lib qw(t);
 
 use Test::More;
-
-
-require Workflow::Factory;
-require Workflow::Persister::DBI;
-
+use Log::Any qw( $log );
 
 my $debug = $ENV{TEST_DEBUG};
 
@@ -17,22 +13,13 @@ my $debug = $ENV{TEST_DEBUG};
 my $cfgbase = $0;
 $cfgbase =~ s/\.t$/.d/;
 
-my $LOG_FILE  = 'workflow_tests.log';
-my $CONF_FILE = $cfgbase . '/log4perl.conf';
 
-require Log::Log4perl;
-if ($debug) {
-    if ( -f $LOG_FILE ) {
-        unlink($LOG_FILE);
-    }
-    Log::Log4perl::init($CONF_FILE);
-}
-else {
-    no warnings 'once';
-    Log::Log4perl::easy_init($Log::Log4perl::OFF);
-}
 
-plan tests => 26;
+require Workflow::Factory;
+require Workflow::Persister::DBI;
+
+
+plan tests => 13;
 
 my $workflow_conf  = $cfgbase . '/workflow_def_wfnest.xml';
 my $action_conf    = $cfgbase . '/workflow_activity_wfnest.xml';
@@ -71,26 +58,6 @@ $workflow->execute_action('initialize');
 is( $workflow->state, 'INITIALIZED', 'initialized state' );
 
 ##################################################
-# RUN TESTS FOR 'Workflow::Condition::GreedyOR'
-##################################################
-
-#diag( "Available actions: " . join(', ', $workflow->get_current_actions));
-$workflow->execute_action('test_greedy_or');
-is( $workflow->state, 'TEST_GREEDY_OR', 'wfcond state after test_greedy_or' );
-
-Log::Log4perl::get_logger()->error('START OFFENDING TEST');
-$workflow->execute_action('greedy_or_1');
-is( $workflow->state, 'INITIALIZED', 'wfcond state after greedy_or_1' )
-    or $workflow->execute_action('ack_subtest_fail');
-
-$workflow->execute_action('test_greedy_or');
-is( $workflow->state, 'TEST_GREEDY_OR', 'wfcond state after test_greedy_or' );
-$workflow->execute_action('greedy_or_2');
-is( $workflow->state, 'SUBTEST_FAIL', 'wfcond state after test_greedy_or' );
-$workflow->execute_action('ack_subtest_fail');
-is( $workflow->state, 'INITIALIZED', 'wfcond state after ack_subtest_fail' );
-
-##################################################
 # RUN TESTS FOR 'Workflow::Condition::LazyAND'
 ##################################################
 
@@ -123,33 +90,6 @@ is( $workflow->state, 'TEST_LAZY_OR', 'wfcond state after test_lazy_or' );
 $workflow->execute_action('lazy_or_2');
 is( $workflow->state, 'INITIALIZED', 'wfcond state after lazy_or_2' )
     or $workflow->execute_action('ack_subtest_fail');
-
-##################################################
-# RUN TESTS FOR 'Workflow::Condition::CheckReturn'
-##################################################
-
-$workflow->execute_action('test_check_return');
-is( $workflow->state, 'TEST_CHECK_RETURN',
-    'wfcond state after test_check_return' );
-$workflow->execute_action('check_return_1');
-is( $workflow->state, 'INITIALIZED', 'wfcond state after check_return_1' )
-    or $workflow->execute_action('ack_subtest_fail');
-
-$workflow->execute_action('test_check_return');
-is( $workflow->state, 'TEST_CHECK_RETURN',
-    'wfcond state after test_check_return' );
-$workflow->execute_action('check_return_2');
-is( $workflow->state, 'SUBTEST_FAIL', 'wfcond state after check_return_2' );
-$workflow->execute_action('ack_subtest_fail');
-is( $workflow->state, 'INITIALIZED', 'wfcond state after ack_subtest_fail' );
-
-$workflow->execute_action('test_check_return');
-is( $workflow->state, 'TEST_CHECK_RETURN',
-    'wfcond state after test_check_return' );
-$workflow->execute_action('check_return_3');
-is( $workflow->state, 'SUBTEST_FAIL', 'wfcond state after check_return_3' );
-$workflow->execute_action('ack_subtest_fail');
-is( $workflow->state, 'INITIALIZED', 'wfcond state after ack_subtest_fail' );
 
 ##################################################
 # DONE WITH ALL TESTS

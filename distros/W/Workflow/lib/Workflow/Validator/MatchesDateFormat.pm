@@ -2,18 +2,19 @@ package Workflow::Validator::MatchesDateFormat;
 
 use warnings;
 use strict;
-use base qw( Workflow::Validator );
+use v5.14.0;
+use parent qw( Workflow::Validator );
 use DateTime::Format::Strptime;
 use Workflow::Exception qw( configuration_error validation_error );
-use English qw( -no_match_vars );
-use Carp qw(carp);
+use Scalar::Util qw( blessed );
 
-$Workflow::Validator::MatchesDateFormat::VERSION = '1.62';
+$Workflow::Validator::MatchesDateFormat::VERSION = '2.02';
 
 __PACKAGE__->mk_accessors('formatter');
 
-sub _init {
+sub init {
     my ( $self, $params ) = @_;
+    $self->SUPER::init( $params );
     unless ( $params->{date_format} ) {
         configuration_error "You must define a value for 'date_format' in ",
             "declaration of validator ", $self->name;
@@ -34,14 +35,9 @@ sub validate {
     my ( $self, $wf, $date_string ) = @_;
     return unless ($date_string);
 
-    # already converted!
-    local $EVAL_ERROR = undef;
-    if ( ref $date_string and eval { $date_string->isa('DateTime'); } ) {
+    if ( blessed $date_string and $date_string->isa('DateTime') ) {
+        # already converted!
         return;
-    }
-
-    if ($EVAL_ERROR) {
-        carp 'Unable to assert DateTime or similar object';
     }
 
     my $fmt         = $self->formatter;
@@ -65,7 +61,7 @@ Workflow::Validator::MatchesDateFormat - Ensure a stringified date matches a giv
 
 =head1 VERSION
 
-This documentation describes version 1.62 of this package
+This documentation describes version 2.02 of this package
 
 =head1 SYNOPSIS
 
@@ -141,7 +137,7 @@ parameter, which should adhere to a predefined date format.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2003-2023 Chris Winters. All rights reserved.
+Copyright (c) 2003-2021 Chris Winters. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

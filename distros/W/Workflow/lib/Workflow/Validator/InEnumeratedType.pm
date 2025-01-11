@@ -2,13 +2,15 @@ package Workflow::Validator::InEnumeratedType;
 
 use warnings;
 use strict;
-use base qw( Workflow::Validator );
+use v5.14.0;
+use parent qw( Workflow::Validator );
 use Workflow::Exception qw( configuration_error validation_error );
 
-$Workflow::Validator::InEnumeratedType::VERSION = '1.62';
+$Workflow::Validator::InEnumeratedType::VERSION = '2.02';
 
-sub _init {
+sub init {
     my ( $self, $params ) = @_;
+    $self->SUPER::init( $params );
     $self->{_enum}       = [];
     $self->{_enum_match} = {};
     unless ( $params->{value} ) {
@@ -59,7 +61,7 @@ Workflow::Validator::InEnumeratedType - Ensure a value is one of a declared set 
 
 =head1 VERSION
 
-This documentation describes version 1.62 of this package
+This documentation describes version 2.02 of this package
 
 =head1 SYNOPSIS
 
@@ -215,7 +217,7 @@ part of the set.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2003-2023 Chris Winters. All rights reserved.
+Copyright (c) 2003-2021 Chris Winters. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

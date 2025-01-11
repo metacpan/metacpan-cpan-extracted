@@ -2,5 +2,5 @@
 # MIT License
 
 class Resource::SocketUtil {
-  version "1.002";
+  version "1.003";
 }

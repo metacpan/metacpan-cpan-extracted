@@ -8,6 +8,7 @@ Makefile.PL
 README
 cpanfile
 dist.ini
+examples/data-uriid-find-fetch-url
 lib/Data/URIID.pm
 lib/Data/URIID/Base.pm
 lib/Data/URIID/Colour.pm

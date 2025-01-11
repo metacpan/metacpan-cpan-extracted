@@ -1,5 +1,8 @@
 Revision history for HTML-D3 - Visualise various charts using D3
 
+0.07	Fri Jan 10 21:16:49 EST 2025
+	Added support for interactive legends
+
 0.06	Thu Jan  9 21:51:36 EST 2025
 	Added support for legends
 

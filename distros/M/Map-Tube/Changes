@@ -1,5 +1,11 @@
 Revision history for Map::Tube
 
+3.91  2025-01-10T19:45:00+00:00
+      - Fixed regex quoting order as pointed out by @gwselke.
+
+3.90  2025-01-10T14:55:00+00:00
+      - Dealt with subtle bug #16 in _is_directly_linked(), thanks @gwselke.
+
 3.89  2024-12-18T10:00:00+00:00
       - Updated pod to reflect the recent changes.
 

@@ -2,14 +2,14 @@ package Workflow::Persister;
 
 use warnings;
 use strict;
-use base qw( Workflow::Base );
-use English qw( -no_match_vars );
-use Log::Log4perl qw( get_logger );
+use 5.013002;
+use parent qw( Workflow::Base );
 use Workflow::Exception qw( persist_error );
+use Syntax::Keyword::Try;
 
 use constant DEFAULT_ID_LENGTH => 8;
 
-$Workflow::Persister::VERSION = '1.62';
+$Workflow::Persister::VERSION = '2.02';
 
 my @FIELDS = qw( name class
     use_random use_uuid
@@ -53,13 +53,14 @@ sub assign_generators {
 
 sub init_random_generators {
     my ( $self, $params ) = @_;
-    my $length = $params->{id_length} || DEFAULT_ID_LENGTH;
-
-    local $EVAL_ERROR = undef;
-    eval { require Workflow::Persister::RandomId };
-    if (my $msg = $EVAL_ERROR) {
-        $msg =~ s/\\n/ /g;
-        $self->log->error($msg);
+    my $length  = $params->{id_length} || DEFAULT_ID_LENGTH;
+    try {
+        require Workflow::Persister::RandomId;
+    }
+    catch ($msg) {
+        my $logmsg = ($msg =~ s/\\n/ /gr);
+        $self->log->error($logmsg);
+        die $msg;
     }
     my $generator
         = Workflow::Persister::RandomId->new( { id_length => $length } );
@@ -69,11 +70,13 @@ sub init_random_generators {
 sub init_uuid_generators {
     my ( $self, $params ) = @_;
 
-    local $EVAL_ERROR = undef;
-    eval { require Workflow::Persister::UUID };
-    if (my $msg = $EVAL_ERROR) {
-        $msg =~ s/\\n/ /g;
-        $self->log->error($msg);
+    try {
+        require Workflow::Persister::UUID
+    }
+    catch ($msg) {
+        my $logmsg = ($msg =~ s/\\n/ /gr);
+        $self->log->error($logmsg);
+        die $msg;
     }
     my $generator = Workflow::Persister::UUID->new();
     return ( $generator, $generator );
@@ -100,21 +103,6 @@ sub fetch_workflow {
         "'fetch_workflow()'";
 }
 
-# This is the only one that isn't required...
-sub fetch_extra_workflow_data {
-    my ( $self, $wf ) = @_;
-
-    $self->log->info("Called empty 'fetch_extra_workflow_data()' (ok)");
-    $self->log->debug(
-        "An empty implementation is not an error as you may ",
-        "not need this extra functionality. If you do you ",
-        "should use a persister for this purpose (e.g., ",
-        "Workflow::Persister::DBI::ExtraData) or ",
-        "create your own and just implement this method."
-    );
-    return;
-}
-
 sub create_history {
     my ( $self, $wf, @history ) = @_;
     persist_error "Persister '", ref($self), "' must implement ",
@@ -125,21 +113,6 @@ sub fetch_history {
     my ( $self, $wf ) = @_;
     persist_error "Persister '", ref($self), "' must implement ",
         "'fetch_history()'";
-}
-
-sub get_create_user {
-    my ( $self, $wf ) = @_;
-    return 'n/a';
-}
-
-sub get_create_description {
-    my ( $self, $wf ) = @_;
-    return 'Create new workflow';
-}
-
-sub get_create_action {
-    my ( $self, $wf ) = @_;
-    return 'Create workflow';
 }
 
 # Only required for DBI persisters.
@@ -163,7 +136,7 @@ Workflow::Persister - Base class for workflow persistence
 
 =head1 VERSION
 
-This documentation describes version 1.62 of this package
+This documentation describes version 2.02 of this package
 
 =head1 SYNOPSIS
 
@@ -214,7 +187,8 @@ Returns the ID for the workflow.
 Stub that warns that the method should be overwritten in the derived
 Persister. Since this is a SUPER class.
 
-Update the workflow state.
+Update the workflow state including serialization of the workflow
+context.
 
 Returns nothing.
 
@@ -226,6 +200,11 @@ Persister. Since this is a SUPER class.
 Retrieve the workflow data corresponding to C<$workflow_id>. It not
 found return undef, if found return a hashref with at least the keys
 C<state> and C<last_update> (a L<DateTime> instance).
+
+If the workflow has associated serialized context, return the
+deserialized hash value in the C<context> key.  The keys in the hash
+will be made available through the C<param> method in the workflow's
+context (accessible through the C<context> method).
 
 =head3 create_history( $workflow, @history )
 
@@ -242,40 +221,14 @@ C<id> and C<saved> values set according to the saved results.
 Stub that warns that the method should be overwritten in the derived
 Persister. Since this is a SUPER class.
 
-The derived class method should return a list of L<Workflow::History> objects.
-
-
-=head3 get_create_user( $workflow )
-
-When creating an initial L<Workflow::History> record to insert into the database,
-the return value of this method is used for the value of the "user" field.
-
-Override this method to change the value from the default, "n/a".
-
-=head3 get_create_description( $workflow )
-
-When creating an initial L<Workflow::History> record to insert into the database,
-the return value of this method is used for the value of the "description" field.
-
-Override this method to change the value from the default, "Create new workflow".
-
-
-=head3 get_create_action( $workflow )
-
-When creating an initial L<Workflow::History> record to insert into the database,
-the return value of this method is used for the value of the "action" field.
-
-Override this method to change the value from the default, "Create workflow".
+The derived class method should return a list of hashes containing at least
+the `id` key. The hashes will be used by the workflow object to instantiate
+L<Workflow::History> objects (or a derived class).
 
 
 =head3 assign_generators( \%params )
 
 Assigns proper generators based on intialization, see L</init>
-
-=head3 fetch_extra_workflow_data ( $workflow )
-
-A stub that warns that the method should be overwritten in the derived
-Persister. Since this is a SUPER class.
 
 =head3 commit_transaction
 
@@ -336,7 +289,7 @@ we shift parameters in?
 
 =head1 COPYRIGHT
 
-Copyright (c) 2003-2023 Chris Winters. All rights reserved.
+Copyright (c) 2003-2021 Chris Winters. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

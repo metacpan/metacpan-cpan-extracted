@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2019-2024 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2019-2025 -- leonerd@leonerd.org.uk
 
-package Object::Pad 0.818;
+package Object::Pad 0.819;
 
 use v5.18;
 use warnings;
@@ -146,6 +146,8 @@ only silence the module's warnings selectively:
    use Object::Pad ':experimental(inherit_field)';
 
    use Object::Pad ':experimental(apply_phaser)';
+
+   use Object::Pad ':experimental(lexical_class)';
 
    use Object::Pad ':experimental(:all)';  # all of the above
 
@@ -512,6 +514,61 @@ It should be stressed again: This option is I<only> intended for gradual
 upgrade of existing classical Perl code into using C<Object::Pad>. When all
 existing code is using C<Object::Pad> then this attribute can be removed from
 the role.
+
+=head2 my class
+
+   my class Name :ATTRS... { ... }
+
+I<Since version 0.819; experimental>
+
+If a C<class> keyword is preceded by C<my> it creates a class that has lexical
+visiblity, rather than being available globally via a fully-qualified name in
+the symbol table. This is useful for creating internal helper classes within
+modules, such as for returning complex structures, or simply to use internally
+without being visible to the caller. As the class itself is only visible
+lexically, callers in other scopes are unable to see it to create new
+instances of it.
+
+   class My::Module;
+
+   my class HelperStructure
+   {
+      field $name :param :reader;
+      field $value :param :reader;
+   }
+
+   method get_thing ()
+   {
+      return HelperStructure->new(
+         name  => "the name",
+         value => "the value",
+      );
+   }
+
+B<Note:> the above is technically a lie. Current versions of perl do not
+support truely anonymous packages to be used as classes, so even these
+"lexical" classes are in fact named on the symbol table. However, they are
+given a name that is syntactically-impossible for regular code to create or
+use, and a const-returning lexical function is created with the correct
+lexical name, which returns the true name of the class, so that the
+C<< ->new >> method can still be called on it.
+
+As a result of this limitation, there are a number of operations that lexical
+classes do not currently support - such as subclassing. It is hoped that later
+versions of either this module, or perl itself, will be able to expand on
+these abilities. For now, this feature remains an experimental best-effort
+basis.
+
+Due to the way this lexical function works, it can stand in for the class name
+when used with the C<< ->isa >> method. Note carefully here, that the lexical
+class is used directly as a bareword and not quoted.
+
+   if( $obj->isa( HelperStructure ) ) { ... }
+
+Additionally, as the right-hand side operand of the C<isa> operator (in Perl
+version 5.32 or later) does not need quoting, it can be used there directly:
+
+   if( $obj isa HelperStructure ) { ... }
 
 =head2 inherit
 
@@ -1528,7 +1585,7 @@ sub import_into
    my $class = shift;
    my $caller = shift;
 
-   $class->_import_experimental( \@_, qw( init_expr mop custom_field_attr adjust_params composed_adjust inherit_field apply_phaser ) );
+   $class->_import_experimental( \@_, qw( init_expr mop custom_field_attr adjust_params composed_adjust inherit_field apply_phaser lexical_class ) );
 
    $class->_import_configuration( \@_ );
 

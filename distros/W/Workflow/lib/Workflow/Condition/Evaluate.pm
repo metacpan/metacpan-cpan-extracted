@@ -2,13 +2,12 @@ package Workflow::Condition::Evaluate;
 
 use warnings;
 use strict;
-use base qw( Workflow::Condition );
-use Log::Log4perl qw( get_logger );
+use v5.14.0;
+use parent qw( Workflow::Condition );
 use Safe;
-use Workflow::Exception qw( condition_error configuration_error );
-use English qw( -no_match_vars );
+use Workflow::Exception qw( configuration_error );
 
-$Workflow::Condition::Evaluate::VERSION = '1.62';
+$Workflow::Condition::Evaluate::VERSION = '2.02';
 
 my @FIELDS = qw( test );
 __PACKAGE__->mk_accessors(@FIELDS);
@@ -16,8 +15,9 @@ __PACKAGE__->mk_accessors(@FIELDS);
 # These get put into the safe compartment...
 $Workflow::Condition::Evaluate::context = undef;
 
-sub _init {
+sub init {
     my ( $self, $params ) = @_;
+    $self->SUPER::init( $params );
 
     $self->test( $params->{test} );
     unless ( $self->test ) {
@@ -40,21 +40,16 @@ sub evaluate {
     my $safe = Safe->new();
 
     $safe->share('$context');
-    local $EVAL_ERROR = undef;
+    local $@;
     my $rv = $safe->reval($to_eval);
-    if ($EVAL_ERROR) {
-        condition_error
-            "Condition expressed in code threw exception: $EVAL_ERROR";
-    }
 
     $self->log->debug( "Safe eval ran ok, returned: '",
                        ( defined $rv ? $rv : '<undef>' ),
                        "'" );
-    unless ($rv) {
-        condition_error "Condition expressed by test '$to_eval' did not ",
-            "return a true value.";
-    }
-    return $rv;
+
+    return $rv ?
+        Workflow::Condition::IsTrue->new() :
+        Workflow::Condition::IsFalse->new();
 }
 
 1;
@@ -69,7 +64,7 @@ Workflow::Condition::Evaluate - Inline condition that evaluates perl code for tr
 
 =head1 VERSION
 
-This documentation describes version 1.62 of this package
+This documentation describes version 2.02 of this package
 
 =head1 SYNOPSIS
 
@@ -138,7 +133,7 @@ A hashref of all the parameters in the L<Workflow::Context> object
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004-2023 Chris Winters. All rights reserved.
+Copyright (c) 2004-2021 Chris Winters. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

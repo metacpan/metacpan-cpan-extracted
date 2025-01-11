@@ -1,26 +1,32 @@
 package Workflow::Condition::Negated;
 
-use strict;
 use warnings;
+use strict;
+use v5.14.0;
 
-our $VERSION = '1.62';
+our $VERSION = '2.02';
 
-use base qw( Workflow::Condition );
+use parent qw( Workflow::Condition );
 
 my @FIELDS = qw( name class negated );
 __PACKAGE__->mk_accessors(@FIELDS);
 
-sub _init {
+sub init {
     my ( $self, $params ) = @_;
     my $negated = $params->{name};
+    $self->SUPER::init( $params );
+
     $negated =~ s/ \A ! //gx;
     $self->negated( $negated );
-    $self->SUPER::_init($params);
 }
 
 sub evaluate {
     my ($self, $wf) = @_;
-    return not $self->evaluate_condition($wf, $self->negated);
+    if ($self->evaluate_condition($wf, $self->negated)) {
+        return Workflow::Condition::IsFalse->new();
+    } else {
+        return Workflow::Condition::IsTrue->new();
+    }
 }
 
 
@@ -36,7 +42,7 @@ Workflow::Condition::Negated - Negate workflow condition result
 
 =head1 VERSION
 
-This documentation describes version 1.62 of this package
+This documentation describes version 2.02 of this package
 
 =head1 DESCRIPTION
 
@@ -73,7 +79,7 @@ See L<Workflow>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004-2023 Chris Winters. All rights reserved.
+Copyright (c) 2004-2021 Chris Winters. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

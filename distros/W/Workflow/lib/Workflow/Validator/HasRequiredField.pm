@@ -2,10 +2,11 @@ package Workflow::Validator::HasRequiredField;
 
 use warnings;
 use strict;
-use base qw( Workflow::Validator );
+use v5.14.0;
+use parent qw( Workflow::Validator );
 use Workflow::Exception qw( validation_error );
 
-$Workflow::Validator::HasRequiredField::VERSION = '1.62';
+$Workflow::Validator::HasRequiredField::VERSION = '2.02';
 
 sub validate {
     my ( $self, $wf, @required_fields ) = @_;
@@ -34,7 +35,7 @@ Workflow::Validator::HasRequiredField - Validator to ensure certain data are in 
 
 =head1 VERSION
 
-This documentation describes version 1.62 of this package
+This documentation describes version 2.02 of this package
 
 =head1 SYNOPSIS
 
@@ -103,7 +104,7 @@ L<Workflow::Exception>'s are thrown in case of missing fields.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2003-2023 Chris Winters. All rights reserved.
+Copyright (c) 2003-2021 Chris Winters. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

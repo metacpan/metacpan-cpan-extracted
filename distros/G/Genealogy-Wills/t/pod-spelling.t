@@ -3,19 +3,14 @@
 use strict;
 use warnings;
 
+use Test::DescribeMe qw(author);
 use Test::Most;
+use Test::Needs 'Test::Spelling';
 
-if($ENV{AUTHOR_TESTING}) {
-	eval 'use Test::Spelling';
-	if($@) {
-		plan(skip_all => 'Test::Spelling required for testing POD spelling');
-	} else {
-		add_stopwords(<DATA>);
-		all_pod_files_spelling_ok();
-	}
-} else {
-	plan(skip_all => 'Author tests not required for installation');
-}
+Test::Spelling->import();
+
+add_stopwords(<DATA>);
+all_pod_files_spelling_ok();
 
 __END__
 CPANTS

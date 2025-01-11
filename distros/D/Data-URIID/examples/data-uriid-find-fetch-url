@@ -1,0 +1,42 @@
+#!/usr/bin/perl
+
+# Copyright (c) 2025 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2025 Philipp Schafft
+
+# licensed under Artistic License 2.0 (see LICENSE file)
+
+use strict;
+use warnings;
+use v5.16;
+
+use Data::URIID;
+
+# Create extractor object
+my $extractor = Data::URIID->new(
+    # Enable online lookups for friendly services
+    services_online => '@friendly',
+
+    # Enable online operation
+    online          => 1,
+);
+
+# Loop over all arguments
+outer:
+foreach my $req (@ARGV) {
+    my $result = $extractor->lookup($req);
+
+    # Foreach service, however the original service first
+    # (it will in fact be used twice, but it's unlikely that this may have any effect)
+    foreach my $service ($result->attribute('service'), $extractor->known('service')) {
+        # Loop over our actions in order of preferences.
+        foreach my $action (qw(file-fetch stream-fetch fetch)) {
+            if (defined(my $url = $result->url(service => $service, action => $action, default => undef))) {
+                # If we found a URL print it and go to the next link
+                say $url;
+                next outer;
+            }
+        }
+    }
+}
+
+#ll

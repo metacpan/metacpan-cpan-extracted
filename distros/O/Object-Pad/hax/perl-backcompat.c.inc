@@ -15,22 +15,6 @@
 #  define G_LIST  G_ARRAY
 #endif
 
-#if !HAVE_PERL_VERSION(5, 18, 0)
-typedef AV PADNAMELIST;
-#  define PadlistARRAY(pl)        ((PAD **)AvARRAY(pl))
-#  define PadlistNAMES(pl)        (*PadlistARRAY(pl))
-
-typedef SV PADNAME;
-#  define PadnamePV(pn)           (SvPOKp(pn) ? SvPVX(pn) : NULL)
-#  define PadnameLEN(pn)          SvCUR(pn)
-#  define PadnameIsSTATE(pn)      (!!SvPAD_STATE(pn))
-#  define PadnameOUTER(pn)        (SvFAKE(pn) && !SvPAD_STATE(pn))
-#  define PadnamelistARRAY(pnl)   AvARRAY(pnl)
-#  define PadnamelistMAX(pnl)     AvFILLp(pnl)
-
-#  define PadARRAY(p)             AvARRAY(p)
-#  define PadMAX(pad)             AvFILLp(pad)
-#endif
 
 #if !HAVE_PERL_VERSION(5, 22, 0)
 #  define CvPADLIST_set(cv, padlist)  (CvPADLIST(cv) = padlist)
@@ -172,8 +156,9 @@ static PADOFFSET MY_pad_add_name(pTHX_ const char *name, STRLEN len, U32 flags, 
 #endif
 
 #if !HAVE_PERL_VERSION(5, 26, 0)
-#  define isIDFIRST_utf8_safe(s, e)  (PERL_UNUSED_ARG(e), isIDFIRST_utf8(s))
-#  define isIDCONT_utf8_safe(s, e)   (PERL_UNUSED_ARG(e), isIDCONT_utf8(s))
+/* PERL_UNUSED_ARG() isn't usable to fix this on early perl versions */
+#  define isIDFIRST_utf8_safe(s, e)  ((void)sizeof(e), isIDFIRST_utf8(s))
+#  define isIDCONT_utf8_safe(s, e)   ((void)sizeof(e), isIDCONT_utf8(s))
 #endif
 
 #ifndef CXp_EVALBLOCK

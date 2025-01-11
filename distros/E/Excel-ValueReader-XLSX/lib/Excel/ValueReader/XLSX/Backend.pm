@@ -6,7 +6,7 @@ use Archive::Zip 1.61     qw(AZ_OK);
 use Carp                  qw/croak/;
 use Scalar::Util          qw/openhandle/;
 
-our $VERSION = '1.13';
+our $VERSION = '1.15';
 
 #======================================================================
 # ATTRIBUTES

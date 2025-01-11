@@ -2,12 +2,12 @@ package Workflow::Persister::DBI::ExtraData;
 
 use warnings;
 use strict;
-use base qw( Workflow::Persister::DBI );
-use Log::Log4perl qw( get_logger );
+use v5.14.0;
+use parent qw( Workflow::Persister::DBI );
 use Workflow::Exception qw( configuration_error persist_error );
-use English qw( -no_match_vars );
+use Syntax::Keyword::Try;
 
-$Workflow::Persister::DBI::ExtraData::VERSION = '1.62';
+$Workflow::Persister::DBI::ExtraData::VERSION = '2.02';
 
 my @FIELDS = qw( table data_field context_key );
 __PACKAGE__->mk_accessors(@FIELDS);
@@ -47,10 +47,12 @@ sub init {
                               ? $self->context_key : '' ) ) );
 }
 
-sub fetch_extra_workflow_data {
-    my ( $self, $wf ) = @_;
+sub fetch_workflow {
+    my ( $self, $wf_id ) = @_;
+    my $wf_info = $self->SUPER::fetch_workflow( $wf_id );
+    my $context = $wf_info->{context} // {};
 
-    $self->log->debug( "Fetching extra workflow data for '", $wf->id, "'" );
+    $self->log->debug( "Fetching extra workflow data for '", $wf_id, "'" );
 
     my $sql = q{SELECT %s FROM %s WHERE workflow_id = ?};
     my $data_field = $self->data_field;
@@ -62,37 +64,38 @@ sub fetch_extra_workflow_data {
     $sql = sprintf $sql, $select_data_fields,
         $self->handle->quote_identifier( $self->table );
     $self->log->debug( "Using SQL: ", $sql);
-    $self->log->debug( "Bind parameters: ", $wf->id );
+    $self->log->debug( "Bind parameters: ", $wf_id );
 
     my ($sth);
-    local $EVAL_ERROR = undef;
-    eval {
+    try {
         $sth = $self->handle->prepare($sql);
-        $sth->execute( $wf->id );
-    };
-    if ($EVAL_ERROR) {
+        $sth->execute( $wf_id );
+    }
+    catch ($error) {
         persist_error "Failed to retrieve extra data from table ",
-            $self->table, ": $EVAL_ERROR";
-    } else {
-        $self->log->debug("Prepared/executed extra data fetch ok");
-        my $row = $sth->fetchrow_arrayref;
-        if ( ref $data_field ) {
-            foreach my $i ( 0 .. $#{$data_field} ) {
-                $wf->context->param( $data_field->[$i], $row->[$i] );
-                $self->log->info(
-                    sub { sprintf "Set data from %s.%s into context key %s ok",
-                              $self->table, $data_field->[$i],
-                              $data_field->[$i] } );
-            }
-        } else {
-            my $value = $row->[0];
-            $wf->context->param( $self->context_key, $value );
+            $self->table, ": $error";
+    }
+
+    $self->log->debug("Prepared/executed extra data fetch ok");
+    my $row = $sth->fetchrow_arrayref;
+    if ( ref $data_field ) {
+        foreach my $i ( 0 .. $#{$data_field} ) {
+            $context->{$data_field->[$i]} = $row->[$i];
             $self->log->info(
                 sub { sprintf "Set data from %s.%s into context key %s ok",
-                          $self->table, $self->data_field,
-                          $self->context_key } );
+                          $self->table, $data_field->[$i],
+                          $data_field->[$i] } );
         }
+    } else {
+        my $value = $row->[0];
+        $context->{ $self->context_key } = $value;
+        $self->log->info(
+            sub { sprintf "Set data from %s.%s into context key %s ok",
+                      $self->table, $self->data_field,
+                      $self->context_key } );
     }
+
+    return $wf_info;
 }
 
 1;
@@ -107,7 +110,7 @@ Workflow::Persister::DBI::ExtraData - Fetch extra data with each workflow and pu
 
 =head1 VERSION
 
-This documentation describes version 1.62 of this package
+This documentation describes version 2.02 of this package
 
 =head1 SYNOPSIS
 
@@ -210,18 +213,16 @@ Initializes persister for extra workflow data.
 
 Throws L<Workflow::Exception> if initialization is not successful.
 
-=head3 fetch_extra_workflow_data ( $wf )
+=head3 fetch_workflow ( $wf_id )
 
-Fetches extra data from database and feeds this to context of given workflow.
-
-Takes a single parameter, a workflow object to which extra data are feed if
-retrieved successfully.
+Fetches extra data from database and adds it to the restored workflow
+context data returned with the fetched workflow.
 
 Throws L<Workflow::Exception> if retrieval is not successful.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2003-2023 Chris Winters. All rights reserved.
+Copyright (c) 2003-2021 Chris Winters. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

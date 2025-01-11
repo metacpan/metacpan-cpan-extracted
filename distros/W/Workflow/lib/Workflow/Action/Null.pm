@@ -2,9 +2,10 @@ package Workflow::Action::Null;
 
 use warnings;
 use strict;
-use base qw( Workflow::Action );
+use v5.14.0;
+use parent qw( Workflow::Action );
 
-$Workflow::Action::Null::VERSION = '1.62';
+$Workflow::Action::Null::VERSION = '2.02';
 
 sub execute {
     my ($self) = @_;
@@ -23,7 +24,7 @@ Workflow::Action::Null - Workflow action for the terminally lazy
 
 =head1 VERSION
 
-This documentation describes version 1.62 of this package
+This documentation describes version 2.02 of this package
 
 =head1 SYNOPSIS
 
@@ -60,7 +61,7 @@ it by returning C<undef>.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2003-2023 Chris Winters. All rights reserved.
+Copyright (c) 2003-2021 Chris Winters. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

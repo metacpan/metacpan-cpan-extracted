@@ -135,6 +135,7 @@ sub save($self, $context) {
 
     } else {
         delete %$context{context_pkey};
+        $context->{workflow_fkey} = $self->workflow_pkey;
         $context->{context_pkey} = $self->db->query(
             "INSERT context (context, workflow_fkey) VALUES (?,?) RETURNING context_pkey",
                 [{type => PG_BYTEA, value => $context->{context}}, $context->{workflow_fkey}]

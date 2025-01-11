@@ -1,6 +1,6 @@
 package SPVM::Resource::Utf8proc;
 
-our $VERSION = "0.001";
+our $VERSION = "0.002";
 
 1;
 
@@ -96,25 +96,25 @@ GNU C99
 
 =head2 Download
   
-  mkdir -p original.tmp
-  git clone https://github.com/JuliaStrings/utf8proc.git original.tmp/utf8proc
-  git -C original.tmp/utf8proc checkout tags/v2.9.0 -b branch_v2.9.0
+  mkdir -p .tmp
+  git clone https://github.com/JuliaStrings/utf8proc.git .tmp/utf8proc
+  git -C .tmp/utf8proc checkout tags/v2.9.0 -b branch_v2.9.0
   
   # Check the current branch
-  git -C original.tmp/utf8proc branch
+  git -C .tmp/utf8proc branch
 
 =head2 Extracting Header Files
 
 The header files of C<utf8proc> is copied into the C<include> directory by the following command.
 
-  rsync -av --include='*.h' --exclude='*' original.tmp/utf8proc/ lib/SPVM/Resource/Utf8proc.native/include/
-  cp original.tmp/utf8proc/utf8proc_data.c lib/SPVM/Resource/Utf8proc.native/include/utf8proc_data.c
+  rsync -av --include='*.h' --exclude='*' .tmp/utf8proc/ lib/SPVM/Resource/Utf8proc.native/include/
+  cp .tmp/utf8proc/utf8proc_data.c lib/SPVM/Resource/Utf8proc.native/include/utf8proc_data.c
 
 =head2 Extracting Source Files
 
 The source files of C<utf8proc> are copied into the C<src> directory by the following command.
 
-  cp original.tmp/utf8proc/utf8proc.c lib/SPVM/Resource/Utf8proc.native/src/utf8proc.c
+  cp .tmp/utf8proc/utf8proc.c lib/SPVM/Resource/Utf8proc.native/src/utf8proc.c
 
 =head1 Repository
 

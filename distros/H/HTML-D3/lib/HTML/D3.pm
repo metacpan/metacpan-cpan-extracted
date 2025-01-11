@@ -14,11 +14,11 @@ HTML::D3 - A simple Perl module for generating charts using D3.js.
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =head1 SYNOPSIS
 
@@ -874,6 +874,168 @@ HTML
 
     return $html;
 }
+
+sub render_multi_series_line_chart_with_interactive_legends
+{
+	my ($self, $data) = @_;
+
+	# Validate input data
+	die 'Data must be an array of hashes' unless ref($data) eq 'ARRAY';
+
+	# Generate JSON for data
+	my $json_data = encode_json($data);
+
+	# Generate HTML and D3.js code
+	my $html = $self->_preamble();
+	$html .= <<"HTML";
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>$self->{title}</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        .tooltip {
+            position: absolute;
+            background-color: white;
+            border: 1px solid #ccc;
+            padding: 5px;
+            font-size: 12px;
+            pointer-events: none;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+        }
+        .legend {
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .legend rect {
+            stroke-width: 1;
+            stroke: #ccc;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center;">$self->{title}</h1>
+    <svg id="chart" width="$self->{width}" height="$self->{height}" style="border: 1px solid black;"></svg>
+    <div class="tooltip" id="tooltip"></div>
+    <script>
+        const data = $json_data;
+
+        const svg = d3.select("#chart");
+        const tooltip = d3.select("#tooltip");
+        const margin = { top: 20, right: 150, bottom: 40, left: 40 };
+        const width = $self->{width} - margin.left - margin.right;
+        const height = $self->{height} - margin.top - margin.bottom;
+
+        const chart = svg.append("g")
+            .attr("transform", `translate(\${margin.left},\${margin.top})`);
+
+        const legendArea = svg.append("g")
+            .attr("transform", `translate(\${width + margin.left + 20},\${margin.top})`);
+
+	 // Extract all labels and flatten them into a unique array
+        const allLabels = Array.from(new Set(data.flatMap(series => series.data.map(d => d.label))));
+
+        const x = d3.scalePoint()
+            .domain(allLabels)
+            .range([0, width]);
+
+        const y = d3.scaleLinear()
+            .domain([0, d3.max(data.flatMap(series => series.data.map(d => d.value)))])
+            .nice()
+            .range([height, 0]);
+
+	// Define color scale for series
+        const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+        // Add axes
+        chart.append("g")
+            .call(d3.axisLeft(y));
+
+        chart.append("g")
+            .attr("transform", `translate(0,\${height})`)
+            .call(d3.axisBottom(x))
+            .selectAll("text")
+            .attr("transform", "rotate(-45)")
+            .style("text-anchor", "end");
+
+        // Draw lines for each series
+        data.forEach((series, i) => {
+            const line = d3.line()
+                .x(d => x(d.label))
+                .y(d => y(d.value));
+
+            // Add line
+            chart.append("path")
+                .datum(series.data)
+                .attr("fill", "none")
+                .attr("stroke", color(i))
+                .attr("stroke-width", 2)
+                .attr("class", \`line-\${i}\`)
+                .attr("d", line);
+
+            // Add points and tooltips
+            chart.selectAll(\`circle.series-\${i}\`)
+                .data(series.data)
+                .join("circle")
+                .attr("class", \`series-\${i}\`)
+                .attr("cx", d => x(d.label))
+                .attr("cy", d => y(d.value))
+                .attr("r", 4)
+                .attr("fill", color(i))
+                .on("mouseover", (event, d) => {
+                    tooltip.style("opacity", 1)
+                           .style("transform", "translateY(0)")
+                           .html(\`Series: <b>\${series.name}</b><br>Label: <b>\${d.label}</b><br>Value: <b>\${d.value}</b>\`)
+                           .style("left", (event.pageX + 10) + "px")
+                           .style("top", (event.pageY - 30) + "px");
+                })
+                .on("mousemove", (event) => {
+                    tooltip.style("left", (event.pageX + 10) + "px")
+                           .style("top", (event.pageY - 30) + "px");
+                })
+                .on("mouseout", () => {
+                    tooltip.style("opacity", 0)
+                           .style("transform", "translateY(-10px)");
+                });
+        });
+
+        // Add legend with interactivity
+        data.forEach((series, i) => {
+            const legend = legendArea.append("g")
+                .attr("transform", `translate(0, \${i * 20})`)
+                .attr("class", "legend")
+                .on("click", () => {
+                    const isVisible = d3.selectAll(\`path.line-\${i}\`).style("opacity") === "1";
+
+                    // Toggle visibility
+                    d3.selectAll(\`path.line-\${i}\`).style("opacity", isVisible ? 0 : 1);
+                    d3.selectAll(\`circle.series-\${i}\`).style("opacity", isVisible ? 0 : 1);
+
+                    // Dim legend if series is hidden
+                    legend.select("text").style("opacity", isVisible ? 0.5 : 1);
+                });
+
+            legend.append("rect")
+                .attr("width", 12)
+                .attr("height", 12)
+                .attr("fill", color(i));
+
+            legend.append("text")
+                .attr("x", 20)
+                .attr("y", 10)
+                .text(series.name)
+                .style("alignment-baseline", "middle");
+        });
+    </script>
+</body>
+</html>
+HTML
+
+    return $html;
+}
+
 sub _preamble
 {
 	my $html = <<'HTML';

@@ -5,14 +5,14 @@ package Workflow::Action;
 
 use warnings;
 use strict;
-use base qw( Workflow::Base );
-use Log::Log4perl qw( get_logger );
-use Workflow::Action::InputField;
+use v5.14.0;
+use parent qw( Workflow::Base );
+use Workflow::InputField;
 use Workflow::Validator::HasRequiredField;
 use Workflow::Factory qw( FACTORY );
 use Carp qw(croak);
 
-$Workflow::Action::VERSION = '1.62';
+$Workflow::Action::VERSION = '2.02';
 
 my @PROPS    = qw( name class description group );
 my @INTERNAL = qw( _factory );
@@ -66,26 +66,28 @@ sub get_validators {
 }
 
 sub validate {
-    my ( $self, $wf ) = @_;
+    my ( $self, $wf, $action_args ) = @_;
     my @validators = $self->get_validators;
     return unless ( scalar @validators );
 
-    my $context = $wf->context;
+    $action_args //= {};
+    my %all_args = (
+        %{ $wf->context->param() },
+        %{$action_args}
+        );
     foreach my $validator_info (@validators) {
         my $validator    = $validator_info->{validator};
         my $args         = $validator_info->{args};
 
-        # TODO: Revisit this statement it does not look right
-        # runtime_args becomes the WF object??
-        my @runtime_args = ($wf);
+        my @runtime_args = ();
         foreach my $arg ( @{$args} ) {
             if ( $arg =~ /^\$(.*)$/ ) {
-                push @runtime_args, scalar $context->param($1);
+                push @runtime_args, $all_args{$1};
             } else {
                 push @runtime_args, $arg;
             }
         }
-        $validator->validate(@runtime_args);
+        $validator->validate($wf, @runtime_args);
     }
 }
 
@@ -120,7 +122,7 @@ sub init {
         } else {
             $self->log->debug("Using standard field class");
             $self->add_fields(
-                Workflow::Action::InputField->new($field_info) );
+                Workflow::InputField->new($field_info) );
         }
     }
 
@@ -167,7 +169,7 @@ Workflow::Action - Base class for Workflow actions
 
 =head1 VERSION
 
-This documentation describes version 1.62 of this package
+This documentation describes version 2.02 of this package
 
 =head1 SYNOPSIS
 
@@ -188,8 +190,9 @@ This documentation describes version 1.62 of this package
 
  package MyApp::Action::CreateUser;
 
- use base qw( Workflow::Action );
+ use parent qw( Workflow::Action );
  use Workflow::Exception qw( workflow_error );
+ use Syntax::Keyword::Try;
 
  sub execute {
      my ( $self, $wf ) = @_;
@@ -198,16 +201,15 @@ This documentation describes version 1.62 of this package
      # Since 'username' and 'email' have already been validated we
      # don't need to check them for uniqueness, well-formedness, etc.
 
-     my $user = eval {
-         User->create({ username => $context->param( 'username' ),
-                        email    => $context->param( 'email' ) })
-     };
-
-     # Wrap all errors returned...
-
-     if ( $@ ) {
+     my $user;
+     try {
+         $user = User->create({ username => $context->param( 'username' ),
+                                email    => $context->param( 'email' ) })
+     }
+     catch ($error) {
+        # Wrap all errors returned...
          workflow_error
-             "Cannot create new user with name '", $context->param( 'username' ), "': $EVAL_ERROR";
+             "Cannot create new user with name '", $context->param( 'username' ), "': $error";
      }
 
      # Set the created user in the context for the application and/or
@@ -247,7 +249,10 @@ to all types. For example:
     <type>Ticket</type>
     <description>Actions for the Ticket workflow only.</description>
     <action name="TIX_NEW"
-           class="TestApp::Action::TicketCreate">
+            group="some_action_group"
+            class="TestApp::Action::TicketCreate">
+       <description>My action description</description> <!-- optional -->
+       <!-- the 'group' attribute is optional -->
   ...Addtional configuration...
 
 The type must match an existing workflow type or the action will never
@@ -259,24 +264,24 @@ Each action supports the following attributes:
 
 =over
 
-=item * C<class>
+=item * C<class> (required)
 
 The Perl class which provides the behaviour of the action.
 
-=item * C<description>
+=item * C<description> (optional)
 
 A free text field describing the action.
 
-=item * C<group>
+=item * C<group> (optional)
 
 The group for use with the L<Workflow::State/get_available_action_names>
 C<$group> filter.
 
-=item * C<name>
+=item * C<name> (required)
 
 The name by which workflows can reference the action.
 
-=item * C<type>
+=item * C<type> (optional)
 
 Associates the action with workflows of the same type, when set. When
 not set, the action is available to all workflows.
@@ -375,7 +380,7 @@ an example on how you easily do this by overriding new():
   use warnings;
   use strict;
 
-  use base qw( Workflow::Action );
+  use parent qw( Workflow::Action );
   use Workflow::Exception qw( workflow_error );
 
   # extra action class properties
@@ -406,7 +411,7 @@ an example on how you easily do this by overriding new():
   use warnings;
   use strict;
 
-  use base qw( your::base::action::class );
+  use parent qw( your::base::action::class );
   use Workflow::Exception qw( workflow_error );
 
   sub execute {
@@ -418,15 +423,15 @@ an example on how you easily do this by overriding new():
 
 =head3 required_fields()
 
-Return a list of L<Workflow::Action::InputField> objects that are required.
+Return a list of L<Workflow::InputField> objects that are required.
 
 =head3 optional_fields()
 
-Return a list of L<Workflow::Action::InputField> objects that are optional.
+Return a list of L<Workflow::InputField> objects that are optional.
 
 =head3 fields()
 
-Return a list of all L<Workflow::Action::InputField> objects
+Return a list of all L<Workflow::InputField> objects
 associated with this action.
 
 
@@ -440,7 +445,7 @@ It sets up the necessary validators based on the on configured actions, input fi
 
 =head3 add_field( @fields )
 
-Add one or more L<Workflow::Action::InputField>s to the action.
+Add one or more L<Workflow::InputField>s to the action.
 
 =head3 add_validators( @validator_config )
 
@@ -457,17 +462,19 @@ L<Workflow::Validator> object, while 'args' contains an arrayref of
 arguments to pass to the validator, some of which may need to be
 evaluated at runtime.
 
-=head3 validate( $workflow )
+=head3 validate( $workflow, $action_args )
 
-Run through all validators for this action. If any fail they will
+Run through all validators for this action, using the arguments
+provided with the C<execute_action> call. If any fail they will
 throw a L<Workflow::Exception>, the validation subclass.
 
 =head3 execute( $workflow )
 
 Subclasses B<must> implement -- this will perform the actual
-work. It's not required that you return anything, but if the action
-may be used in a L<Workflow::State> object that has multiple resulting
-states you should return a simple scalar for a return value.
+work. Must B<not> return a non-scalar reference or blessed object but
+can return undef. If the action may be used in a L<Workflow::State> object
+that has multiple resulting states you should return a simple scalar.
+
 
 =head3 add_fields
 
@@ -486,7 +493,7 @@ fields.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2003-2023 Chris Winters. All rights reserved.
+Copyright (c) 2003-2021 Chris Winters. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

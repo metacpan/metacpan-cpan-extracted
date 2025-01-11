@@ -1,6 +1,6 @@
 package Map::Tube;
 
-$Map::Tube::VERSION   = '3.89';
+$Map::Tube::VERSION   = '3.91';
 $Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube - Lightweight Routing Framework.
 
 =head1 VERSION
 
-Version 3.89
+Version 3.91
 
 =cut
 
@@ -812,7 +812,7 @@ sub _get_shortest_route {
             my $links = [ split /\,/, $f_node->{link} ];
             while (scalar(@$links) > 0) {
                 my ($success, $link) = $self->_get_next_link($from, $seen, $links);
-                $success or ($links = [ grep(!/\b$link\b/, @$links) ]) and next;
+                $success or ($links = [ grep(!/\b\Q$link\E\b/, @$links) ]) and next;
 
                 if (($self->_get_length($link) == 0) || ($length > ($index + 1))) {
                     $self->_set_length($link, $length + 1);
@@ -821,13 +821,13 @@ sub _get_shortest_route {
                 }
 
                 $seen->{$link} = 1;
-                $links = [ grep(!/\b$link\b/, @$links) ];
+                $links = [ grep(!/\b\Q$link\E\b/, @$links) ];
             }
         }
 
         $index = $length + 1;
         $from  = shift @$nodes;
-        $nodes = [ grep(!/\b$from\b/, @$nodes) ] if defined $from;
+        $nodes = [ grep(!/\b\Q$from\E\b/, @$nodes) ] if defined $from;
     }
 }
 
@@ -1033,7 +1033,7 @@ sub _is_directly_linked {
     my ($self, $start_station, $end_station) = @_;
     my $linked_stations = $self->get_linked_stations($start_station);
 
-    return grep /$end_station/, @$linked_stations;
+    return grep { $_ eq $end_station }  @$linked_stations;
 }
 
 sub _init_table {

@@ -1,0 +1,99 @@
+{
+   "abstract" : "OpenID Connect Client",
+   "author" : [
+      "S\u00e9bastien Mourlhou"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "OIDC-Client",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Catalyst::Action::RenderView" : "0",
+            "Catalyst::Plugin::ConfigLoader" : "0",
+            "Catalyst::Plugin::Session::Store::FastMmap" : "0",
+            "Catalyst::Plugin::Static::Simple" : "0",
+            "Catalyst::Runtime" : "0",
+            "Catalyst::View::JSON" : "0",
+            "Config::General" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::More" : "0.88",
+            "Test::NoBreakpoints" : "0.15",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Portability::Files" : "0",
+            "Test::Vars" : "0",
+            "Test::WWW::Mechanize::Catalyst::WithContext" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Clone" : "0",
+            "Crypt::JWT" : "0",
+            "Data::UUID" : "0",
+            "List::MoreUtils" : "0",
+            "List::Util" : "0",
+            "Module::Load" : "0",
+            "Mojolicious" : "0",
+            "Moose" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "MooseX::Params::Validate" : "0",
+            "Readonly" : "0",
+            "Scalar::Util" : "0",
+            "Throwable::Error" : "0",
+            "Try::Tiny" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "v5.20.0"
+         },
+         "suggests" : {
+            "Catalyst::Runtime" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Log::Any" : "0",
+            "Log::Any::Test" : "0",
+            "Test::Deep" : "0",
+            "Test::Exception" : "0",
+            "Test::MockModule" : "0",
+            "Test::MockObject" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sebmourlhou/oidc-client/issues"
+      },
+      "homepage" : "https://github.com/sebmourlhou/oidc-client",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/sebmourlhou/oidc-client.git",
+         "web" : "https://github.com/sebmourlhou/oidc-client"
+      }
+   },
+   "version" : "0.01",
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
+   "x_spdx_expression" : "Artistic-2.0"
+}
+
