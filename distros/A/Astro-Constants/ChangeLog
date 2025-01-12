@@ -1,3 +1,10 @@
+0.14051   2025-01-11 18:06:06+00:00 Europe/London
+====
+* moved constants into main module, Astro::Constants
+* removed Astro::Constants::CGS from distribution
+* removed short names
+* changed `:long` tag to `:all`
+
 v0.14	2020 Apr
 ====
 * updated values to the **2018 CODATA** standard

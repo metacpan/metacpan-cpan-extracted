@@ -6,7 +6,7 @@ Tired of your programs producing garbage because you mis-typed the gravitational
 or assigned a value instead of checking equality?  Why not rely on a module that does
 all that work for you and gives you all the constants ready to use with a simple
 ```
-use Astro::Constants qw/:cosmology/;
+use Astro::Constants qw( :cosmology );
 ```
 instead of relying on 
 [Magic Numbers](https://en.wikipedia.org/wiki/Magic_number_%28programming%29#Unnamed_numerical_constants)
@@ -31,4 +31,4 @@ The url http://astroconst.org used to house this project.  It's now been abandon
 
 ## Racing Stripes
 Looking for speed in your script?  Consider upgrading your perl to v5.23.4
-which has a 40% improvement over v5.20.3
+which has a 40% improvement over v5.20.3 and newer perls are even faster!

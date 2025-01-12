@@ -5,9 +5,8 @@
 #
 # hard coded to run from top directory and uses only data/PhysicalConstants.xml
 
-use strict;
+use v5.20; # postfix deref
 use autodie;
-use Modern::Perl;
 use XML::LibXML;
 
 #die "Usage: $0 infile outfile" unless @ARGV == 1;
@@ -27,7 +26,7 @@ write_module_header($ac_fh, 'Astro::Constants', $VERSION);
 write_pod_synopsis($ac_fh);
 
 for my $constant ( $xml->getElementsByTagName('PhysicalConstant') ) {
-	my ($short_name, $long_name, $mks_value, $cgs_value, $values, ) = undef;
+	my ($short_name, $long_name, $mks_value, $values, ) = undef;
 
 	for my $name ( $constant->getChildrenByTagName('name') ) {
 		$short_name = $name->textContent() if $name->getAttribute('type') eq 'short';
@@ -39,7 +38,6 @@ for my $constant ( $xml->getElementsByTagName('PhysicalConstant') ) {
 	for my $value ( $constant->getChildrenByTagName('value') ) {
 		if ( $value->hasAttribute('system') ) {
 			$values->{mks} = $value->textContent() if $value->getAttribute('system') eq 'MKS';
-			$values->{cgs} = $value->textContent() if $value->getAttribute('system') eq 'CGS';
 		}
 		else {
 			$values->{value} = $value->textContent();
@@ -116,7 +114,6 @@ sub write_method_pod {
 
 	my $display;
 	$display .= "    $values->{mks}\tMKS\n" if $values->{mks};
-	$display .= "    $values->{cgs}\tCGS\n" if $values->{cgs};
 	$display ||= "    $values->{value}\n";
 
 	say $fh <<"POD";	# writing for Dist::Zilla enhanced Pod
@@ -154,13 +151,7 @@ sub write_pod_synopsis {
 =head1 DESCRIPTION
 
 This module provides physical and mathematical constants for use
-in Astronomy and Astrophysics.  The two metric systems of units,
-MKS and CGS, are kept in two separate modules and are called by
-name explicitly.
-It allows you to choose between constants in units of
-centimetres /grams /seconds
-with B<Astro::Constants::CGS> and metres /kilograms /seconds with
-B<Astro::Constants::MKS>.
+in Astronomy and Astrophysics.
 
 The C<:long> tag imports all the constants in their long name forms
 (i.e. GRAVITATIONAL).  Useful subsets can be imported with these tags:

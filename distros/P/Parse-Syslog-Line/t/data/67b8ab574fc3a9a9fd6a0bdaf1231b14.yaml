@@ -8,19 +8,12 @@ expected:
   datetime_utc: 2015-11-13T13:40:01Z
   domain: ~
   epoch: 1447422001
-  facility: ~
-  facility_int: ~
   host: ether
   host_raw: ether
   message: 'rsyslogd-2177: imuxsock begins to drop messages from pid 17840 due to rate-limiting'
   message_raw: '2015 Nov 13 13:40:01 ether rsyslogd-2177: imuxsock begins to drop messages from pid 17840 due to rate-limiting'
-  preamble: ~
-  priority: ~
-  priority_int: ~
   program_name: rsyslogd-2177
-  program_pid: ~
   program_raw: rsyslogd-2177
-  program_sub: ~
   time: 13:40:01
   tz: Z
 name: Year with old date

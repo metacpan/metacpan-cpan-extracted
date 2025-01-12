@@ -6,7 +6,6 @@ expected:
   datetime_raw: Jan 1 12:22:26
   datetime_str: 2018-01-01T12:22:26Z
   datetime_utc: 2018-01-01T12:22:26Z
-  domain: ~
   epoch: 1514809346
   facility: local7
   facility_int: 184
@@ -19,9 +18,7 @@ expected:
   priority: notice
   priority_int: 5
   program_name: '%SYS-5-CONFIG_I'
-  program_pid: ~
   program_raw: '%SYS-5-CONFIG_I'
-  program_sub: ~
   time: 12:22:26
   tz: Z
 name: Cisco NTP Unconfigured

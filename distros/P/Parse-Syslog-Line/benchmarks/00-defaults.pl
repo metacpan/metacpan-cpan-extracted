@@ -1,10 +1,11 @@
 #!perl
 
-use v5.14;
+use v5.16;
 use warnings;
 use Dumbbench;
 use Const::Fast;
 use Parse::Syslog::Line;
+psl_enable_sdata();
 
 use FindBin;
 use lib "$FindBin::Bin/../t/lib";
@@ -21,7 +22,7 @@ my $stub = sub {
     my ($test) = @_;
     @copy = @msgs unless @copy and $last ne $test;
     $last=$test;
-    parse_syslog_line(shift @copy);
+    my $doc = parse_syslog_line(shift @copy);
 };
 
 my $bench = Dumbbench->new(

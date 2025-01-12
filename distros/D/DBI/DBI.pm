@@ -1,6 +1,7 @@
 # $Id$
 # vim: ts=8:sw=4:et
 #
+# Copyright (c) 2024-2025  DBI Team
 # Copyright (c) 1994-2024  Tim Bunce  Ireland
 #
 # See COPYRIGHT section in pod text below for usage and distribution rights.
@@ -15,7 +16,7 @@ use warnings;
 
 our ($XS_VERSION, $VERSION);
 BEGIN {
-$VERSION = "1.645"; # ==> ALSO update the version in the pod text below!
+$VERSION = "1.646"; # ==> ALSO update the version in the pod text below!
 $XS_VERSION = $VERSION;
 $VERSION =~ tr/_//d;
 }
@@ -147,7 +148,7 @@ sure that your issue isn't related to the driver you're using.
 
 =head2 NOTES
 
-This is the DBI specification that corresponds to DBI version 1.645
+This is the DBI specification that corresponds to DBI version 1.646
 (see L<DBI::Changes> for details).
 
 The DBI is evolving at a steady pace, so it's good to check that
@@ -5437,8 +5438,6 @@ may be undefined if the driver doesn't have access to the information.
 See also L</"Catalog Methods"> and L</"Standards Reference Information">.
 
 =head3 C<statistics_info>
-
-B<Warning:> This method is experimental and may change.
 
   $sth = $dbh->statistics_info( $catalog, $schema, $table, $unique_only, $quick );
 

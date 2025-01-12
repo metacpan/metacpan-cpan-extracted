@@ -31,11 +31,12 @@ requires:
 resources:
   IRC: irc://irc.perl.org/#dbi
   MailingList: mailto:dbi-dev@perl.org
+  bugtracker: https://github.com/perl5-dbi/dbi/issues
   homepage: http://dbi.perl.org/
   license: http://dev.perl.org/licenses/
   repository: https://github.com/perl5-dbi/dbi
-version: '1.645'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '1.646'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
 x_suggests:
   Clone: 0.47
   DB_File: 0

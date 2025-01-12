@@ -1,5 +1,9 @@
 Revision history for Perl extension Tk::PodViewer.
 
+0.06  Sat Jan 11 1025
+	- reduced line distance between item statement and it's first paragraph.
+	- fixed nested item lists
+
 0.05  Sat Nov 09 2024
 	- fixed issue with consequtive non breakable spaces
 

@@ -1,0 +1,34 @@
+---
+expected:
+  SDATA:
+    component_id: caddy_parser
+    component_kind: transform
+    component_type: 'remap}: vector::internal_events::remap: Mapping failed with event.'
+    error: function call error for \"parse_json\" at
+    error_type: conversion_failed
+    internal_log_rate_limit: 'true'
+    stage: processing
+  _json_error: "Failed to decode json: '\"' expected, at character offset 1 (before \"component_kind=\"tran...\") at /Volumes/Code/CPAN/Parse-Syslog-Line/t/bin/../../lib/Parse/Syslog/Line.pm line 966.\n"
+  content: '2024-11-06T00:11:42.563896Z ERROR transform{component_kind="transform" component_id=caddy_parser component_type=remap}: vector::internal_events::remap: Mapping failed with event. error="function call error for \"parse_json\" at (4:25): unable to parse json: expected value at line 1 column 1" error_type="conversion_failed" stage="processing" internal_log_rate_limit=true'
+  date: 2018-11-05
+  datetime_local: 2018-11-05T16:11:42Z
+  datetime_raw: Nov  5 16:11:42
+  datetime_str: 2018-11-05T16:11:42Z
+  datetime_utc: 2018-11-05T16:11:42Z
+  domain: ~
+  epoch: 1541434302
+  host: alma9
+  host_raw: alma9
+  message: 'vector[3086855]: 2024-11-06T00:11:42.563896Z ERROR transform{component_kind="transform" component_id=caddy_parser component_type=remap}: vector::internal_events::remap: Mapping failed with event. error="function call error for \"parse_json\" at (4:25): unable to parse json: expected value at line 1 column 1" error_type="conversion_failed" stage="processing" internal_log_rate_limit=true'
+  message_raw: 'Nov  5 16:11:42 alma9 vector[3086855]: 2024-11-06T00:11:42.563896Z ERROR transform{component_kind="transform" component_id=caddy_parser component_type=remap}: vector::internal_events::remap: Mapping failed with event. error="function call error for \"parse_json\" at (4:25): unable to parse json: expected value at line 1 column 1" error_type="conversion_failed" stage="processing" internal_log_rate_limit=true'
+  program_name: vector
+  program_pid: 3086855
+  program_raw: 'vector[3086855]'
+  program_sub: ~
+  time: 16:11:42
+  tz: Z
+name: NonJSON curly braces
+options:
+  AutoDetectJSON: 1
+  AutoDetectKeyValues: 1
+string: 'Nov  5 16:11:42 alma9 vector[3086855]: 2024-11-06T00:11:42.563896Z ERROR transform{component_kind="transform" component_id=caddy_parser component_type=remap}: vector::internal_events::remap: Mapping failed with event. error="function call error for \"parse_json\" at (4:25): unable to parse json: expected value at line 1 column 1" error_type="conversion_failed" stage="processing" internal_log_rate_limit=true'

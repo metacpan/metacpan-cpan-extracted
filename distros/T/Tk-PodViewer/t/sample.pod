@@ -38,7 +38,9 @@ End of verbatim
 
 =back
 
-End of sub list
+=item End of sub list
+
+This text should be indented.
 
 =back
 

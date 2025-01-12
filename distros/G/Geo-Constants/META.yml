@@ -1,13 +1,27 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         Geo-Constants
-version:      0.06
-version_from: lib/Geo/Constants.pm
-installdirs:  site
+---
+abstract: 'Package for standard Geo:: constants.'
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Geo-Constants
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-    Exporter:                      0
-    strict:                        0
-    vars:                          0
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.17
+  Exporter: '0'
+  Test::Simple: '0.44'
+resources:
+  bugtracker: https://github.com/mrdvt92/perl-Geo-Constants/issues
+  homepage: https://github.com/mrdvt92/perl-Geo-Constants
+  repository: https://github.com/mrdvt92/perl-Geo-Constants.git
+version: '0.07'

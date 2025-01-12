@@ -6,7 +6,6 @@ expected:
   datetime_raw: Jan 1 00:10:02
   datetime_str: 2018-01-01T00:10:02Z
   datetime_utc: 2018-01-01T00:10:02Z
-  domain: ~
   epoch: 1514765402
   facility: local7
   facility_int: 184
@@ -19,9 +18,7 @@ expected:
   priority: warn
   priority_int: 4
   program_name: '%C4K_EBM-4-HOSTFLAPPING'
-  program_pid: ~
   program_raw: '%C4K_EBM-4-HOSTFLAPPING'
-  program_sub: ~
   time: 00:10:02
   tz: Z
 name: Cisco Catalyst

@@ -21,11 +21,11 @@ CPAN::UnsupportedFinder analyzes CPAN modules for test results and maintenance s
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 SYNOPSIS
 
@@ -85,7 +85,7 @@ sub new {
 
 	if(!defined($class)) {
 		if((scalar keys %args) > 0) {
-			# Using CPAN::UnsupportedFinder->new(), not CPAN::UnsupportedFinder::new()
+			# Using CPAN::UnsupportedFinder::new(), not CPAN::UnsupportedFinder->new()
 			carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
 			return;
 		}
@@ -190,13 +190,13 @@ sub _generate_text_report {
 	my ($self, $results) = @_;
 	my $report = '';
 
-	for my $module (@$results) {
+	for my $module (@{$results}) {
 		$report .= "Module: $module->{module}\n";
 		$report .= "\tFailure Rate: $module->{failure_rate}\n";
 		$report .= "\tLast Update: $module->{last_update}\n";
 		$report .= "\tHas Recent Tests: $module->{recent_tests}\n";
-		$report .= "\tReverse Dependancies: $module->{reverse_deps}\n";
-		$report .= "\tHas Unsupported Dependancies: $module->{has_unsupported_deps}\n";
+		$report .= "\tReverse Dependencies: $module->{reverse_deps}\n";
+		$report .= "\tHas Unsupported Dependencies: $module->{has_unsupported_deps}\n";
 	}
 
 	return $report;
@@ -212,8 +212,8 @@ sub _generate_html_report {
 		$html .= "Failure Rate: $module->{failure_rate}<br>";
 		$html .= "Last Update: $module->{last_update}<br>";
 		$html .= "Has Recent Tests: $module->{recent_tests}<br>";
-		$html .= "Reverse Dependancies: $module->{reverse_deps}<br>";
-		$html .= "Has Unsupported Dependancies: $module->{has_unsupported_deps}<br></li>";
+		$html .= "Reverse Dependencies: $module->{reverse_deps}<br>";
+		$html .= "Has Unsupported Dependencies: $module->{has_unsupported_deps}<br></li>";
 	}
 
 	$html .= '</ul></body></html>';
@@ -245,12 +245,19 @@ sub _fetch_data {
 		$self->{logger}->debug("Data fetched successfully from $url");
 		return eval { decode_json($response->{content}) };
 	}
+	$self->{logger}->debug("Status = $response->{status}");
+	if(($response->{'status'} != 200) && ($url =~ /::/)) {
+		# Some modules use hyphens as delineators
+		$url =~ s/::/-/g;
+		return $self->_fetch_data($url);
+	}
 	$self->{logger}->error("Failed to fetch data from $url: $response->{status}");
 	return;
 }
 
 sub _fetch_reverse_dependencies {
 	my ($self, $module) = @_;
+
 	my $url = "$self->{api_url}/reverse_dependencies/$module";
 
 	return $self->_fetch_data($url);
@@ -299,7 +306,7 @@ sub _evaluate_support {
 		};
 	}
 
-	return; # Module is considered supported
+	return;	# Module is considered supported
 }
 
 # Helper function to calculate the date six months ago
@@ -331,6 +338,7 @@ sub _has_recent_tests
 }
 
 
+# The API is currently unavailable
 sub _calculate_failure_rate {
 	my ($self, $test_data) = @_;
 
@@ -352,7 +360,7 @@ sub _get_last_release_date {
 sub _has_unsupported_dependencies {
 	my ($self, $module) = @_;
 
-	my $url = "https://fastapi.metacpan.org/v1/release/$module";
+	my $url = "$self->{api_url}/release/$module";
 
 	my $release_data = $self->_fetch_data($url);
 	if(!$release_data) {
@@ -380,7 +388,7 @@ sub _has_unsupported_dependencies {
 sub _check_module_status {
 	my ($self, $module) = @_;
 
-	my $url = "https://fastapi.metacpan.org/v1/module/$module";
+	my $url = "$self->{api_url}/module/$module";
 
 	my $module_data = $self->_fetch_data($url);
 	# my $module_data = eval { decode_json($response->{content}) };
@@ -405,7 +413,7 @@ Nigel Horne <njh@bandsman.co.uk>
 
 =head1 BUGS
 
-The cpantesters api, L<https://api.cpantesters.org/>, is currently unavailable,
+The cpantesters API, L<https://api.cpantesters.org/>, is currently unavailable,
 so the routine _has_recent_tests() currently always returns 1.
 
 =head1 LICENCE

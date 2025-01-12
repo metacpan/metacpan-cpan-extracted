@@ -55,6 +55,10 @@ the Daje-Workflow engine
 
     get_state($self,();
 
+## get\_state\_observers($self,
+
+    get_state_observers($self,();
+
 ## get\_workflow($self,
 
     get_workflow($self,();

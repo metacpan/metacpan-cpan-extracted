@@ -2,23 +2,22 @@
 <Collection>
   <title>Astro::Constants</title>
   <description>Physical constants for astronomy for use in Astro::Constants v0.14</description>
+  <language>en</language>
   <timestamp>Sat Apr 18 10:30:23 2020</timestamp>
   <version>v0.14</version>
   <reference_standard>2018 CODATA</reference_standard>
   <link href="http://metacpan.org/pod/Astro::Constants"/>
   <items>
     <PhysicalConstant>
-      <name type="long">SPEED_LIGHT</name>
-      <name type="short">A_c</name>
+      <name>SPEED_LIGHT</name>
       <alternateName>LIGHT_SPEED</alternateName>
       <description>speed of light in a vacuum</description>
-      <value system="MKS">299792458</value>
-      <value system="CGS">2.99792458e10</value>
+      <value>299792458</value>
       <uncertainty type="defined"/>
       <dimensions length="1" time="-2"/>
       <maxValue/>
       <minValue/>
-      <source url="http://physics.nist.gov/cgi-bin/cuu/Value?c" authority="2018 CODATA" year="2019" />
+      <source url="http://physics.nist.gov/cgi-bin/cuu/Value?c" authority="2018 CODATA" year="2019"/>
       <categoryList>
         <category>fundamental</category>
         <category>cosmology</category>
@@ -26,35 +25,31 @@
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">BOLTZMANN</name>
-      <name type="short">A_k</name>
+      <name>BOLTZMANN</name>
       <alternateName/>
       <description>Boltzmann's constant</description>
-      <value system="MKS">1.380649e-23</value>
-      <value system="CGS">1.380649e-16</value>
+      <value>1.380649e-23</value>
       <uncertainty type="relative">0</uncertainty>
       <dimensions mass="1" length="2" time="-2" temperature="-1"/>
       <maxValue/>
       <minValue/>
-      <source url="http://physics.nist.gov/cgi-bin/cuu/Value?k" authority="2018 CODATA" year="2019" />
+      <source url="http://physics.nist.gov/cgi-bin/cuu/Value?k" authority="2018 CODATA" year="2019"/>
       <categoryList>
         <category>fundamental</category>
         <category>electromagnetic</category>
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">GRAVITATIONAL</name>
-      <name type="short">A_G</name>
+      <name>GRAVITATIONAL</name>
       <alternateName/>
       <symbol>G</symbol>
       <description>universal gravitational constant</description>
-      <value system="MKS">6.67430e-11</value>
-      <value system="CGS">6.67430e-8</value>
+      <value>6.67430e-11</value>
       <uncertainty type="relative">2.2e-5</uncertainty>
       <dimensions length="3" mass="-1" time="-2"/>
       <maxValue/>
       <minValue/>
-      <source url="http://physics.nist.gov/cgi-bin/cuu/Value?bg" authority="2018 CODATA" year="2019" />
+      <source url="http://physics.nist.gov/cgi-bin/cuu/Value?bg" authority="2018 CODATA" year="2019"/>
       <categoryList>
         <category>fundamental</category>
         <category>cosmology</category>
@@ -62,12 +57,10 @@
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">ELECTRON_VOLT</name>
-      <name type="short">A_eV</name>
+      <name>ELECTRON_VOLT</name>
       <alternateName/>
       <description>electron volt</description>
-      <value system="MKS">1.602176634e-19</value>
-      <value system="CGS">1.602176634e-12</value>
+      <value>1.602176634e-19</value>
       <uncertainty type="relative">0</uncertainty>
       <dimensions mass="1" length="2" time="-2"/>
       <maxValue/>
@@ -81,12 +74,10 @@
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">PLANCK</name>
-      <name type="short">A_h</name>
+      <name>PLANCK</name>
       <alternateName/>
       <description>Planck constant</description>
-      <value system="MKS">6.62607015e-34</value>
-      <value system="CGS">6.62607015e-27</value>
+      <value>6.62607015e-34</value>
       <uncertainty type="relative">0</uncertainty>
       <dimensions mass="1" length="2" time="-1"/>
       <maxValue/>
@@ -100,12 +91,10 @@
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">H_BAR</name>
-      <name type="short">A_hbar</name>
+      <name>H_BAR</name>
       <alternateName>HBAR</alternateName>
       <description>the reduced Planck constant, Planck's constant (exact) /2pi</description>
-      <value system="MKS">1.0545718176763e-34</value>
-      <value system="CGS">1.054571817e-27</value>
+      <value>1.0545718176763e-34</value>
       <uncertainty type="relative">1.5e-9</uncertainty>
       <dimensions mass="1" length="2" time="-1"/>
       <maxValue/>
@@ -119,12 +108,10 @@
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">CHARGE_ELEMENTARY</name>
-      <name type="short">A_e</name>
+      <name>CHARGE_ELEMENTARY</name>
       <alternateName>ELECTRON_CHARGE</alternateName>
       <description>electron charge (defined positive)</description>
-      <value system="MKS">1.602176634e-19</value>
-      <value system="CGS">4.8032046729e-10</value>
+      <value>1.602176634e-19</value>
       <uncertainty type="relative">0</uncertainty>
       <dimensions current="1" time="1"/>
       <maxValue/>
@@ -137,24 +124,22 @@
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">STEFAN_BOLTZMANN</name>
-      <name type="short">A_sigma</name>
+      <name>STEFAN_BOLTZMANN</name>
       <alternateName/>
       <symbol>
-	<symbolRepresentation>
-	  <latex>\sigma</latex>
-	  <html>&amp;sigma;</html>
-	  <unicode>σ</unicode>
+        <symbolRepresentation>
+          <latex>\sigma</latex>
+          <html>&amp;sigma;</html>
+          <unicode>σ</unicode>
         </symbolRepresentation>
       </symbol>
       <description>Stefan-Boltzmann constant</description>
-      <value system="MKS">5.670374419e-8</value>
-      <value system="CGS">5.670367e-5</value>
+      <value>5.670374419e-8</value>
       <uncertainty type="relative">1.7e-10</uncertainty>
       <dimensions mass="1" time="-3" temperature="-4"/>
       <maxValue/>
       <minValue/>
-      <source url="http://physics.nist.gov/cgi-bin/cuu/Value?sigma" authority="2018 CODATA" year="2019" />
+      <source url="http://physics.nist.gov/cgi-bin/cuu/Value?sigma" authority="2018 CODATA" year="2019"/>
       <source url="https://en.wikipedia.org/wiki/Stefan%E2%80%93Boltzmann_constant"/>
       <categoryList>
         <category>fundamental</category>
@@ -164,13 +149,11 @@
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">DENSITY_RADIATION</name>
-      <name type="short">A_arad</name>
+      <name>DENSITY_RADIATION</name>
       <alternateName>A_RAD</alternateName>
       <symbol>a</symbol>
       <description>radiation density constant, 4 * sigma / c</description>
-      <value system="MKS">7.565723e-16</value>
-      <value system="CGS">7.565723e-15</value>
+      <value>7.565723e-16</value>
       <uncertainty type="relative">2.3e-6</uncertainty>
       <dimensions mass="1" length="-1" time="-1" temperature="-4"/>
       <maxValue/>
@@ -185,18 +168,16 @@
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">WIEN</name>
-      <name type="short">A_Wien</name>
+      <name>WIEN</name>
       <alternateName/>
       <symbol>b</symbol>
       <description>Wien wavelength displacement law constant</description>
-      <value system="MKS">2.897771955e-3</value>
-      <value system="CGS">2.897771955e-1</value>
+      <value>2.897771955e-3</value>
       <uncertainty type="relative">1e-10</uncertainty>
       <dimensions length="1" temperature="1"/>
       <maxValue/>
       <minValue/>
-      <source url="http://physics.nist.gov/cgi-bin/cuu/Value?bwien" authority="2018 CODATA" year="2019" />
+      <source url="http://physics.nist.gov/cgi-bin/cuu/Value?bwien" authority="2018 CODATA" year="2019"/>
       <categoryList>
         <category>fundamental</category>
         <category>electromagnetic</category>
@@ -206,22 +187,20 @@
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">ALPHA</name>
-      <name type="short">A_alpha</name>
+      <name>ALPHA</name>
       <alternateName/>
       <symbol>
-	<symbolRepresentation>
-	  <latex>\alpha</latex>
+        <symbolRepresentation>
+          <latex>\alpha</latex>
         </symbolRepresentation>
       </symbol>
       <description>fine structure constant</description>
-      <value system="MKS">7.2973525693e-3</value>
-      <value system="CGS">7.2973525693e-3</value>
+      <value>7.2973525693e-3</value>
       <uncertainty type="relative">1.5e-10</uncertainty>
       <dimensions/>
       <maxValue/>
       <minValue/>
-      <source url="http://physics.nist.gov/cgi-bin/cuu/Value?alph" authority="2018 CODATA" year="2019" />
+      <source url="http://physics.nist.gov/cgi-bin/cuu/Value?alph" authority="2018 CODATA" year="2019"/>
       <categoryList>
         <category>fundamental</category>
         <category>cosmology</category>
@@ -230,14 +209,13 @@
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">IMPEDANCE_VACUUM</name>
-      <name type="short">A_Z0</name>
+      <name>IMPEDANCE_VACUUM</name>
       <alternateName>VACUUM_IMPEDANCE</alternateName>
       <symbol>
-	<symbolRepresentation>
+        <symbolRepresentation>
           <latex>Z_{0}</latex>
-	  <html>Z&lt;sub&gt;0&lt;/sub&gt;</html>
-	  <unicode>Z₀</unicode>
+          <html>Z&lt;sub&gt;0&lt;/sub&gt;</html>
+          <unicode>Z₀</unicode>
         </symbolRepresentation>
       </symbol>
       <description>characteristic impedance of vacuum</description>
@@ -255,22 +233,20 @@
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">PERMITIV_FREE_SPACE</name>
-      <name type="short">A_eps0</name>
+      <name>PERMITIV_FREE_SPACE</name>
       <alternateName>PERMITIVITY_0</alternateName>
       <symbol>
-	<symbolRepresentation>
-	  <latex>\varepsilon_{0}</latex>
+        <symbolRepresentation>
+          <latex>\varepsilon_{0}</latex>
         </symbolRepresentation>
       </symbol>
       <description>permittivity of free space, epsilon_0, the electric constant</description>
-      <value system="MKS">8.8541878128e-12</value>
-      <value system="CGS">1</value>
+      <value>8.8541878128e-12</value>
       <uncertainty type="relative">1.5e-10</uncertainty>
       <dimensions time="4" current="2" length="-3" mass="-1"/>
       <maxValue/>
       <minValue/>
-      <source url="http://physics.nist.gov/cgi-bin/cuu/Value?ep0" authority="2018 CODATA" year="2019" />
+      <source url="http://physics.nist.gov/cgi-bin/cuu/Value?ep0" authority="2018 CODATA" year="2019"/>
       <categoryList>
         <category>fundamental</category>
         <category>electromagnetic</category>
@@ -278,18 +254,16 @@
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">PERMEABL_FREE_SPACE</name>
-      <name type="short">A_mu0</name>
+      <name>PERMEABL_FREE_SPACE</name>
       <alternateName>PERMEABILITY_0</alternateName>
       <alternateName>CONSTANT_MAGNETIC</alternateName>
       <symbol>
-	<symbolRepresentation>
-	  <latex>\mu_{0}</latex>
+        <symbolRepresentation>
+          <latex>\mu_{0}</latex>
         </symbolRepresentation>
       </symbol>
       <description>permeability of free space, mu_0, the magnetic constant</description>
-      <value system="MKS">1.25663706212e-6</value>
-      <value system="CGS">1</value>
+      <value>1.25663706212e-6</value>
       <uncertainty type="relative">1.5e-10</uncertainty>
       <dimensions mass="1" length="1" time="-2" current="-2"/>
       <maxValue/>
@@ -302,8 +276,7 @@
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">PI</name>
-      <name type="short">A_pi</name>
+      <name>PI</name>
       <alternateName/>
       <description>trig constant pi</description>
       <value>3.14159265358979324</value>
@@ -317,8 +290,7 @@
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">FOUR_PI</name>
-      <name type="short">A_4pi</name>
+      <name>FOUR_PI</name>
       <alternateName>FOURPI</alternateName>
       <description>trig constant pi times 4 (shorthand for some calculations)</description>
       <value>12.5663706143592</value>
@@ -332,8 +304,7 @@
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">STERADIAN</name>
-      <name type="short">A_ster</name>
+      <name>STERADIAN</name>
       <alternateName/>
       <description>a measure of solid angle in square degrees and a SI derived unit</description>
       <value>3282.80635001174</value>
@@ -347,8 +318,7 @@
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">EXP</name>
-      <name type="short">A_exp</name>
+      <name>EXP</name>
       <alternateName/>
       <description>base of natural logarithm</description>
       <value>2.71828182846</value>
@@ -362,30 +332,26 @@
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">ATOMIC_MASS_UNIT</name>
-      <name type="short">A_amu</name>
+      <name>ATOMIC_MASS_UNIT</name>
       <alternateName/>
       <symbol>u</symbol>
       <description>unified atomic mass unit, 1 u</description>
-      <value system="MKS">1.66053906660e-27</value>
-      <value system="CGS">1.66053906660e-24</value>
+      <value>1.66053906660e-27</value>
       <uncertainty type="relative">3.0e-10</uncertainty>
       <dimensions mass="1"/>
       <maxValue/>
       <minValue/>
-      <source url="http://physics.nist.gov/cgi-bin/cuu/Value?ukg" authority="2018 CODATA" year="2019" />
+      <source url="http://physics.nist.gov/cgi-bin/cuu/Value?ukg" authority="2018 CODATA" year="2019"/>
       <categoryList>
         <category>conversion</category>
         <category>nuclear</category>
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">PARSEC</name>
-      <name type="short">A_pc</name>
+      <name>PARSEC</name>
       <alternateName/>
       <description>parsec</description>
-      <value system="MKS">3.08567758149e16</value>
-      <value system="CGS">3.08567758149e18</value>
+      <value>3.08567758149e16</value>
       <uncertainty type="relative">1e-11</uncertainty>
       <dimensions length="1"/>
       <maxValue/>
@@ -398,17 +364,16 @@
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">ASTRONOMICAL_UNIT</name>
-      <name type="short">A_AU</name>
+      <name>ASTRONOMICAL_UNIT</name>
       <alternateName/>
       <description>astronomical unit</description>
-      <value system="MKS">149_597_870_700</value>
-      <value system="CGS">1.496e13</value>
+      <value>149597870700</value>
+      <!-- <value>149_597_870_700</value> -->
       <uncertainty type="relative">0</uncertainty>
       <dimensions length="1"/>
       <maxValue/>
       <minValue/>
-      <source url="https://cneos.jpl.nasa.gov/glossary/au.html" authority="IAU" />
+      <source url="https://cneos.jpl.nasa.gov/glossary/au.html" authority="IAU"/>
       <categoryList>
         <category>conversion</category>
         <category>cosmology</category>
@@ -416,12 +381,11 @@
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">LIGHT_YEAR</name>
-      <name type="short">A_ly</name>
+      <name>LIGHT_YEAR</name>
       <alternateName/>
       <description>the distance that light travels in vacuum in one Julian year</description>
-      <value system="MKS">9_460_730_472_580_800</value>
-      <value system="CGS">9.4607304725808e17</value>
+      <value>9460730472580800</value>
+      <!-- <value>9_460_730_472_580_800</value> -->
       <uncertainty type="defined"/>
       <dimensions length="1"/>
       <maxValue/>
@@ -434,12 +398,10 @@
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">ANGSTROM</name>
-      <name type="short">A_AA</name>
+      <name>ANGSTROM</name>
       <alternateName/>
       <description>Angstrom</description>
-      <value system="MKS">1e-10</value>
-      <value system="CGS">1e-8</value>
+      <value>1e-10</value>
       <uncertainty type="relative">0</uncertainty>
       <dimensions length="1"/>
       <maxValue/>
@@ -452,18 +414,16 @@
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">JANSKY</name>
-      <name type="short">A_Jy</name>
+      <name>JANSKY</name>
       <alternateName/>
       <symbol>Jy</symbol>
       <description>Jansky, a unit of flux density</description>
-      <value system="MKS">1e-26</value>
-      <value system="CGS">1e-23</value>
+      <value>1e-26</value>
       <uncertainty type="relative">0</uncertainty>
       <dimensions mass="1" time="-2"/>
       <maxValue/>
       <minValue/>
-      <source url="https://en.wikipedia.org/wiki/Jansky" authority="IAU" />
+      <source url="https://en.wikipedia.org/wiki/Jansky" authority="IAU"/>
       <categoryList>
         <category>conversion</category>
         <category>cosmology</category>
@@ -471,8 +431,7 @@
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">AVOGADRO</name>
-      <name type="short">A_NA</name>
+      <name>AVOGADRO</name>
       <alternateName/>
       <description>Avogadro's number</description>
       <value>6.02214076e23</value>
@@ -480,18 +439,18 @@
       <dimensions amountOfSubstance="-1"/>
       <maxValue/>
       <minValue/>
-      <source url="http://physics.nist.gov/cgi-bin/cuu/Value?na" authority="2018 CODATA" year="2019" />
+      <source url="http://physics.nist.gov/cgi-bin/cuu/Value?na" authority="2018 CODATA" year="2019"/>
       <categoryList>
         <category>conversion</category>
         <category>nuclear</category>
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">YEAR</name>
-      <name type="short">A_yr</name>
+      <name>YEAR</name>
       <alternateName>YEAR_JULIAN</alternateName>
       <description>defined as exactly 365.25 days of 86400 SI seconds</description>
-      <value>31_557_600</value>
+      <value>31557600</value>
+      <!-- <value>31_557_600</value> -->
       <uncertainty type="relative">0</uncertainty>
       <dimensions time="1"/>
       <maxValue/>
@@ -503,10 +462,11 @@
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">YEAR_TROPICAL</name>
+      <name>YEAR_TROPICAL</name>
       <alternateName/>
       <description>the period of time for the ecliptic longitude of the Sun to increase 360 degrees, approximated by the Gregorian calendar</description>
-      <value>31_556_925.1</value>
+      <value>31556925.1</value>
+      <!-- <value>31_556_925.1</value> -->
       <uncertainty type="absolute">0.1</uncertainty>
       <dimensions time="1"/>
       <maxValue>31556959</maxValue>
@@ -518,10 +478,11 @@
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">YEAR_SIDEREAL</name>
+      <name>YEAR_SIDEREAL</name>
       <alternateName/>
       <description>the period of revolution of the Earth around the Sun in a fixed reference frame</description>
-      <value>31_558_149.8</value>
+      <value>31558149.8</value>
+      <!-- <value>31_558_149.8</value> -->
       <uncertainty type="absolute">1</uncertainty>
       <dimensions time="1"/>
       <maxValue/>
@@ -533,10 +494,11 @@
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">YEAR_ANOMALISTIC</name>
+      <name>YEAR_ANOMALISTIC</name>
       <alternateName/>
       <description>the period between successive passages of the Earth through perihelion</description>
-      <value>31_558_432.6</value>
+      <value>31558432.6</value>
+      <!-- <value>31_558_432.6</value> -->
       <uncertainty type="absolute">0.1</uncertainty>
       <dimensions time="1"/>
       <maxValue/>
@@ -548,10 +510,11 @@
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">YEAR_ECLIPSE</name>
+      <name>YEAR_ECLIPSE</name>
       <alternateName/>
       <description>the period between successive passages of the Sun (as seen from the geocenter) through the same lunar node</description>
-      <value>29_947_974.3</value>
+      <value>29947974.3</value>
+      <!-- <value>29_947_974.3</value> -->
       <uncertainty type="absolute">0.1</uncertainty>
       <dimensions time="1"/>
       <maxValue/>
@@ -563,12 +526,10 @@
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">MASS_SOLAR</name>
-      <name type="short">A_msun</name>
+      <name>MASS_SOLAR</name>
       <alternateName>SOLAR_MASS</alternateName>
       <description>solar mass</description>
-      <value system="MKS">1.9884e30</value>
-      <value system="CGS">1.9884e33</value>
+      <value>1.9884e30</value>
       <uncertainty type="relative">0.0001</uncertainty>
       <dimensions mass="1"/>
       <maxValue/>
@@ -580,29 +541,26 @@
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">LUMINOSITY_SOLAR</name>
-      <name type="short">A_Lsun</name>
+      <name>LUMINOSITY_SOLAR</name>
       <alternateName>SOLAR_LUMINOSITY</alternateName>
       <description>solar luminosity</description>
-      <value system="MKS">3.828e26</value>
-      <value system="CGS">3.828e33</value>
+      <value>3.828e26</value>
       <uncertainty type="relative">0.0003</uncertainty>
       <dimensions mass="1" length="2" time="-3"/>
       <maxValue/>
       <minValue/>
-      <source url="https://en.wikipedia.org/wiki/Solar_luminosity" authority="IAU" year="2015" />
+      <source url="https://en.wikipedia.org/wiki/Solar_luminosity" authority="IAU" year="2015"/>
       <categoryList>
         <category>cosmology</category>
         <category>planetary</category>
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">DENSITY_CRITICAL_RHOc</name>
-      <name type="short">A_rhoc</name>
+      <name>DENSITY_CRITICAL_RHOc</name>
       <alternateName>RHO_C</alternateName>
       <symbol>
-	<symbolRepresentation>
-		<latex>\frac{\rho_{c}{h^{2}}}</latex>
+        <symbolRepresentation>
+          <latex>\frac{\rho_{c}{h^{2}}}</latex>
         </symbolRepresentation>
       </symbol>
       <description>Critical Density parameter expressed in terms of
@@ -610,8 +568,7 @@
 	      ρ_c / h² = 3 × (100 km s⁻¹ Mpc⁻¹)² / 8πG
 	      ]]>
 Multiply by the square of the dimensionless Hubble parameter, h, in your calculations to get the actual value</description>
-      <value system="MKS">1.87834e-26</value>
-      <value system="CGS">1.87834e-29</value>
+      <value>1.87834e-26</value>
       <uncertainty type="relative">2.3e-5</uncertainty>
       <dimensions mass="1" length="-3"/>
       <maxValue/>
@@ -622,8 +579,7 @@ Multiply by the square of the dimensionless Hubble parameter, h, in your calcula
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">HUBBLE_TIME</name>
-      <name type="short">A_tH</name>
+      <name>HUBBLE_TIME</name>
       <alternateName/>
       <description>Hubble time *h, the inverse of Hubble's constant valued at 100 km/s/Mpc (DEPRECATED - see ChangeLog)</description>
       <value>3.0853056e17</value>
@@ -638,8 +594,7 @@ Multiply by the square of the dimensionless Hubble parameter, h, in your calcula
       <deprecated version="0.11" date="2017-04-26"/>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">TEMPERATURE_CMB</name>
-      <name type="short">A_TCMB</name>
+      <name>TEMPERATURE_CMB</name>
       <alternateName>CMB_TEMPERATURE</alternateName>
       <description>cosmic microwave background temperature in Kelvin</description>
       <value>2.72548</value>
@@ -648,14 +603,13 @@ Multiply by the square of the dimensionless Hubble parameter, h, in your calcula
       <dimensions temperature="1"/>
       <maxValue/>
       <minValue/>
-      <source url="https://en.wikipedia.org/wiki/Cosmic_microwave_background" reference="Bibcode:2009ApJ...707..916F" year="2009" />
+      <source url="https://en.wikipedia.org/wiki/Cosmic_microwave_background" reference="Bibcode:2009ApJ...707..916F" year="2009"/>
       <categoryList>
         <category>cosmology</category>
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">MAGNITUDE_SOLAR_V</name>
-      <name type="short">A_Vsun</name>
+      <name>MAGNITUDE_SOLAR_V</name>
       <alternateName>SOLAR_V_MAG</alternateName>
       <description>visual brightness of the Sun</description>
       <value>-26.74</value>
@@ -670,8 +624,7 @@ Multiply by the square of the dimensionless Hubble parameter, h, in your calcula
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">MAGNITUDE_SOLAR_V_ABSOLUTE</name>
-      <name type="short">A_MVsun</name>
+      <name>MAGNITUDE_SOLAR_V_ABSOLUTE</name>
       <alternateName>SOLAR_V_ABS_MAG</alternateName>
       <description>solar absolute V magnitude</description>
       <value>4.83</value>
@@ -686,12 +639,10 @@ Multiply by the square of the dimensionless Hubble parameter, h, in your calcula
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">RADIUS_SOLAR</name>
-      <name type="short">A_rsun</name>
+      <name>RADIUS_SOLAR</name>
       <alternateName>SOLAR_RADIUS</alternateName>
       <description>solar radius</description>
-      <value system="MKS">6.96e8</value>
-      <value system="CGS">6.96e10</value>
+      <value>6.96e8</value>
       <uncertainty type="relative">0.002</uncertainty>
       <dimensions length="1"/>
       <maxValue/>
@@ -702,12 +653,10 @@ Multiply by the square of the dimensionless Hubble parameter, h, in your calcula
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">MASS_EARTH</name>
-      <name type="short">A_mearth</name>
+      <name>MASS_EARTH</name>
       <alternateName>EARTH_MASS</alternateName>
       <description>mass of Earth</description>
-      <value system="MKS">5.9722e24</value>
-      <value system="CGS">5.9722e27</value>
+      <value>5.9722e24</value>
       <uncertainty type="absolute">6e20</uncertainty>
       <dimensions mass="1"/>
       <maxValue/>
@@ -718,12 +667,11 @@ Multiply by the square of the dimensionless Hubble parameter, h, in your calcula
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">RADIUS_EARTH</name>
-      <name type="short">A_rearth</name>
+      <name>RADIUS_EARTH</name>
       <alternateName>EARTH_RADIUS</alternateName>
       <description>radius of Earth</description>
-      <value system="MKS">6.378_136_6e6</value>
-      <value system="CGS">6.378_136_6e8</value>
+      <value>6.3781366e6</value>
+      <!-- <value>6.378_136_6e6</value> -->
       <uncertainty type="absolute">0.1</uncertainty>
       <dimensions length="1"/>
       <maxValue/>
@@ -734,8 +682,7 @@ Multiply by the square of the dimensionless Hubble parameter, h, in your calcula
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">TEMPERATURE_SOLAR_SURFACE</name>
-      <name type="short">A_Tsun</name>
+      <name>TEMPERATURE_SOLAR_SURFACE</name>
       <alternateName>SOLAR_TEMPERATURE</alternateName>
       <description>surface temperature of sun (photosphere)</description>
       <value>5772</value>
@@ -749,12 +696,10 @@ Multiply by the square of the dimensionless Hubble parameter, h, in your calcula
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">DENSITY_SOLAR</name>
-      <name type="short">A_dsun</name>
+      <name>DENSITY_SOLAR</name>
       <alternateName>SOLAR_DENSITY</alternateName>
       <description>mean solar density</description>
-      <value system="MKS">1408</value>
-      <value system="CGS">1.408</value>
+      <value>1408</value>
       <uncertainty type="relative">0.001</uncertainty>
       <dimensions mass="1" length="-3"/>
       <maxValue/>
@@ -765,12 +710,10 @@ Multiply by the square of the dimensionless Hubble parameter, h, in your calcula
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">DENSITY_EARTH</name>
-      <name type="short">A_dearth</name>
+      <name>DENSITY_EARTH</name>
       <alternateName>EARTH_DENSITY</alternateName>
       <description>mean Earth density</description>
-      <value system="MKS">5515</value>
-      <value system="CGS">5.515</value>
+      <value>5515</value>
       <uncertainty type="relative">0.0002</uncertainty>
       <dimensions mass="1" length="-3"/>
       <maxValue/>
@@ -781,12 +724,10 @@ Multiply by the square of the dimensionless Hubble parameter, h, in your calcula
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">GRAVITY_SOLAR</name>
-      <name type="short">A_gsun</name>
+      <name>GRAVITY_SOLAR</name>
       <alternateName>SOLAR_GRAVITY</alternateName>
       <description>solar surface gravity</description>
-      <value system="MKS">274.78</value>
-      <value system="CGS">27478</value>
+      <value>274.78</value>
       <uncertainty type="relative">0.0004</uncertainty>
       <dimensions length="1" time="-2"/>
       <maxValue/>
@@ -797,12 +738,10 @@ Multiply by the square of the dimensionless Hubble parameter, h, in your calcula
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">GRAVITY_EARTH</name>
-      <name type="short">A_gearth</name>
+      <name>GRAVITY_EARTH</name>
       <alternateName>EARTH_GRAVITY</alternateName>
       <description>Earth surface gravity</description>
-      <value system="MKS">9.80665</value>
-      <value system="CGS">980.665</value>
+      <value>9.80665</value>
       <uncertainty type="relative">0.000001</uncertainty>
       <dimensions length="1" time="-2"/>
       <maxValue/>
@@ -813,12 +752,10 @@ Multiply by the square of the dimensionless Hubble parameter, h, in your calcula
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">RADIUS_LUNAR</name>
-      <name type="short">A_rmoon</name>
+      <name>RADIUS_LUNAR</name>
       <alternateName>LUNAR_RADIUS</alternateName>
       <description>lunar radius</description>
-      <value system="MKS">1.7381e6</value>
-      <value system="CGS">1.7381e8</value>
+      <value>1.7381e6</value>
       <uncertainty type="relative">6e-5</uncertainty>
       <dimensions length="1"/>
       <maxValue/>
@@ -829,12 +766,10 @@ Multiply by the square of the dimensionless Hubble parameter, h, in your calcula
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">MASS_LUNAR</name>
-      <name type="short">A_mmoon</name>
+      <name>MASS_LUNAR</name>
       <alternateName>LUNAR_MASS</alternateName>
       <description>lunar mass</description>
-      <value system="MKS">7.346e22</value>
-      <value system="CGS">7.346e25</value>
+      <value>7.346e22</value>
       <uncertainty type="relative">0.0002</uncertainty>
       <dimensions mass="kg"/>
       <maxValue/>
@@ -845,12 +780,10 @@ Multiply by the square of the dimensionless Hubble parameter, h, in your calcula
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">AXIS_SM_LUNAR</name>
-      <name type="short">A_amoon</name>
+      <name>AXIS_SM_LUNAR</name>
       <alternateName>LUNAR_SM_AXIS</alternateName>
       <description>lunar orbital semi-major axis</description>
-      <value system="MKS">3.84402e8</value>
-      <value system="CGS">3.84402e10</value>
+      <value>3.84402e8</value>
       <uncertainty type="relative">3e-9</uncertainty>
       <dimensions length="1"/>
       <maxValue/>
@@ -861,8 +794,7 @@ Multiply by the square of the dimensionless Hubble parameter, h, in your calcula
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">ECCENTRICITY_LUNAR</name>
-      <name type="short">A_emoon</name>
+      <name>ECCENTRICITY_LUNAR</name>
       <alternateName>LUNAR_ECCENTRICITY</alternateName>
       <description>lunar orbital eccentricity</description>
       <value>0.0549</value>
@@ -876,34 +808,30 @@ Multiply by the square of the dimensionless Hubble parameter, h, in your calcula
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">THOMSON_CROSS_SECTION</name>
-      <name type="short">A_sigmaT</name>
+      <name>THOMSON_CROSS_SECTION</name>
       <alternateName>THOMSON_XSECTION</alternateName>
       <symbol>
-	<symbolRepresentation>
+        <symbolRepresentation>
           <latex>\sigma_{e}</latex>
         </symbolRepresentation>
       </symbol>
       <description>Thomson cross-section</description>
-      <value system="MKS">6.6524587321e-29</value>
-      <value system="CGS">6.6524587321e-25</value>
+      <value>6.6524587321e-29</value>
       <uncertainty type="relative">9.1e-10</uncertainty>
       <dimensions length="2"/>
       <maxValue/>
       <minValue/>
-      <source url="http://physics.nist.gov/cgi-bin/cuu/Value?sigmae" authority="2018 CODATA" year="2019" />
+      <source url="http://physics.nist.gov/cgi-bin/cuu/Value?sigmae" authority="2018 CODATA" year="2019"/>
       <categoryList>
         <category>electromagnetic</category>
         <category>nuclear</category>
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">MASS_ELECTRON</name>
-      <name type="short">A_me</name>
+      <name>MASS_ELECTRON</name>
       <alternateName>ELECTRON_MASS</alternateName>
       <description>mass of electron</description>
-      <value system="MKS">9.1093837015e-31</value>
-      <value system="CGS">9.1093837015e-28</value>
+      <value>9.1093837015e-31</value>
       <uncertainty type="relative">3e-10</uncertainty>
       <dimensions mass="1"/>
       <maxValue/>
@@ -915,42 +843,37 @@ Multiply by the square of the dimensionless Hubble parameter, h, in your calcula
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">MASS_PROTON</name>
-      <name type="short">A_mp</name>
+      <name>MASS_PROTON</name>
       <alternateName>PROTON_MASS</alternateName>
       <description>mass of proton</description>
-      <value system="MKS">1.67262192369e-27</value>
-      <value system="CGS">1.67262192369e-24</value>
+      <value>1.67262192369e-27</value>
       <uncertainty type="relative">3.1e-10</uncertainty>
       <dimensions mass="1"/>
       <maxValue/>
       <minValue/>
-      <source url="http://physics.nist.gov/cgi-bin/cuu/Value?mp" authority="2018 CODATA" year="2019" />
+      <source url="http://physics.nist.gov/cgi-bin/cuu/Value?mp" authority="2018 CODATA" year="2019"/>
       <categoryList>
         <category>nuclear</category>
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">MASS_NEUTRON</name>
-      <name type="short">A_mn</name>
+      <name>MASS_NEUTRON</name>
       <alternateName>NEUTRON_MASS</alternateName>
       <description>neutron mass</description>
-      <value system="MKS">1.67492749804e-27</value>
-      <value system="CGS">1.67492749804e-24</value>
+      <value>1.67492749804e-27</value>
       <uncertainty type="relative">5.7e-10</uncertainty>
       <dimensions mass="1"/>
       <maxValue/>
       <minValue/>
-      <source url="http://physics.nist.gov/cgi-bin/cuu/Value?mn" authority="2018 CODATA" year="2019" />
+      <source url="http://physics.nist.gov/cgi-bin/cuu/Value?mn" authority="2018 CODATA" year="2019"/>
       <categoryList>
         <category>nuclear</category>
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">MASS_HYDROGEN</name>
-      <name type="short">A_mH</name>
+      <name>MASS_HYDROGEN</name>
       <alternateName>HYDROGEN_MASS</alternateName>
-      <description>mass of Hydrogen atom --   
+      <description>mass of Hydrogen atom --
 This value is from the IUPAC and is a little smaller than MASS_PROTON + MASS_ELECTRON, but within the uncertainty given here.  The current value is 1.008u +/- 0.0002 derived from a range of terrestrial materials.  If this is for precision work, you had best understand what you're using.  See https://iupac.org/what-we-do/periodic-table-of-elements/
 </description>
       <value>1.6738e-27</value>
@@ -959,17 +882,16 @@ This value is from the IUPAC and is a little smaller than MASS_PROTON + MASS_ELE
       <dimensions mass="1"/>
       <maxValue/>
       <minValue/>
-      <source url="https://www.degruyter.com/downloadpdf/j/pac.2016.88.issue-3/pac-2015-0305/pac-2015-0305.pdf" authority="IUPAC" />
+      <source url="https://www.degruyter.com/downloadpdf/j/pac.2016.88.issue-3/pac-2015-0305/pac-2015-0305.pdf" authority="IUPAC"/>
       <categoryList>
         <category>nuclear</category>
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">MASS_ALPHA</name>
-      <name type="short">A_ma</name>
+      <name>MASS_ALPHA</name>
       <symbol>
-	<symbolRepresentation>
-	  <latex>m_{\alpha}</latex>
+        <symbolRepresentation>
+          <latex>m_{\alpha}</latex>
         </symbolRepresentation>
       </symbol>
       <description>mass of alpha particle</description>
@@ -978,60 +900,56 @@ This value is from the IUPAC and is a little smaller than MASS_PROTON + MASS_ELE
       <dimensions mass="1"/>
       <maxValue/>
       <minValue/>
-      <source url="http://physics.nist.gov/cgi-bin/cuu/Value?mal" authority="2018 CODATA" year="2019" />
+      <source url="http://physics.nist.gov/cgi-bin/cuu/Value?mal" authority="2018 CODATA" year="2019"/>
       <categoryList>
         <category>nuclear</category>
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">RADIUS_ELECTRON</name>
-      <name type="short">A_re</name>
+      <name>RADIUS_ELECTRON</name>
       <alternateName>ELECTRON_RADIUS</alternateName>
       <symbol>
-	<symbolRepresentation>
-	  <latex>r_{e}</latex>
+        <symbolRepresentation>
+          <latex>r_{e}</latex>
         </symbolRepresentation>
       </symbol>
       <description>classical electron radius</description>
-      <value system="MKS">2.8179403262e-15</value>
-      <value system="CGS">2.8179403262e-13</value>
+      <value>2.8179403262e-15</value>
       <uncertainty type="relative">4.5e-10</uncertainty>
       <dimensions length="1"/>
       <maxValue/>
       <minValue/>
-      <source url="http://physics.nist.gov/cgi-bin/cuu/Value?re" authority="2018 CODATA" year="2019" />
+      <source url="http://physics.nist.gov/cgi-bin/cuu/Value?re" authority="2018 CODATA" year="2019"/>
       <categoryList>
         <category>nuclear</category>
         <category>electromagnetic</category>
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">RADIUS_BOHR</name>
-      <name type="short">A_a0</name>
+      <name>RADIUS_BOHR</name>
       <alternateName>BOHR_RADIUS</alternateName>
       <symbol>
-	<symbolRepresentation>
-	  <latex>a_{0}</latex>
+        <symbolRepresentation>
+          <latex>a_{0}</latex>
         </symbolRepresentation>
       </symbol>
       <description>Bohr radius</description>
-      <value system="MKS">5.29177210903e-11</value>
-      <value system="CGS">5.29177210903e-9</value>
+      <value>5.29177210903e-11</value>
       <uncertainty type="relative">1.5e-10</uncertainty>
       <dimensions length="1"/>
       <maxValue/>
       <minValue/>
-      <source url="http://physics.nist.gov/cgi-bin/cuu/Value?bohrrada0" authority="2018 CODATA" year="2019" />
+      <source url="http://physics.nist.gov/cgi-bin/cuu/Value?bohrrada0" authority="2018 CODATA" year="2019"/>
       <categoryList>
         <category>electromagnetic</category>
         <category>nuclear</category>
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">RADIUS_JUPITER</name>
-      <name type="short">A_rjup</name>
+      <name>RADIUS_JUPITER</name>
       <description>Volumetric mean radius of Jupiter</description>
-      <value system="MKS">69_911_000</value>
+      <value>69911000</value>
+      <!-- <value>69_911_000</value> -->
       <uncertainty type="relative">1.5e-5</uncertainty>
       <dimensions length="1"/>
       <maxValue/>
@@ -1042,10 +960,9 @@ This value is from the IUPAC and is a little smaller than MASS_PROTON + MASS_ELE
       </categoryList>
     </PhysicalConstant>
     <PhysicalConstant>
-      <name type="long">MASS_JUPITER</name>
-      <name type="short">A_mjup</name>
+      <name>MASS_JUPITER</name>
       <description>mass of Jupiter</description>
-      <value system="MKS">1.89819e27</value>
+      <value>1.89819e27</value>
       <uncertainty type="relative">5e-6</uncertainty>
       <dimensions mass="1"/>
       <maxValue/>

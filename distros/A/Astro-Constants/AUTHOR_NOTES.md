@@ -17,6 +17,7 @@ As always check
 [the github repository](https://github.com/duffee/Astro-Constants/issues "Astro::Constants issues")
 for current status on issues.
 
+Only use decimal version numbers; 0.14.1 will not be indexed
 
 # How to Release
 
@@ -24,21 +25,23 @@ for current status on issues.
 
 The author keeps forgetting how to run dzil.
 
-* ```dzil build```	- builds the module
-* ```dzil test```		- tests the module
-* ```dzil release```	- builds a distribution for uploading to CPAN
+* ```dzil build```      - builds the module
+* ```dzil test```       - tests the module
+* ```dzil release```    - builds a distribution for uploading to CPAN
 * ```dzil authordeps --missing```	- find missing module dependancies
-* ```dzil mkrpmspec```	- part of the Fedora RPM build process
+* ```dzil mkrpmspec```  - part of the Fedora RPM build process
 
 ## Release checklist
 
-* tests pass
+* tests pass with `prove -vlr t xt`
 * update version in dist.ini
 * check [CPANTS](http://matrix.cpantesters.org/?dist=Astro-Constants)
 * check [RT](https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-Constants)
 * check [Git Pulse](https://github.com/duffee/Astro-Constants/pulse/monthly) for pending issues and pull requests
 * update ChangeLog with history from ```git log```
+* check POD matches current state of the module
 * link Constants.pm to Constants/DatasourceYear.pm or move old version of Constants.pm to Constants/2017.pm if changes to values in PhysicalConstants.xml
+* commit all files in repository
 * update git repo tag to new version number
 * build CPAN release - ```dzil release```
 * [upload](https://pause.perl.org/pause/authenquery?ACTION=add_uri) to CPAN (dzil does this)
@@ -46,6 +49,14 @@ The author keeps forgetting how to run dzil.
 * add missing steps to this checklist
 
 # Design Decisions
+
+## Dist::Zilla and PodWeaver
+
+Dzil can be a pain, but it makes the release to CPAN step easier and promises to build me an RPM spec file.
+PodWeaver adds in the NAME and VERSION sections of the Pod,
+in case you're wondering why it's not in the **build_module.pl** script.
+
+Need to remember to commit all the files in the repository before releasing.
 
 ## Perl Critic
 
@@ -135,3 +146,10 @@ One step per version.  No faster.
 I chose to keep the Constant definitions in XML for its language independance and validation tools.
 Other people have the ability to edit the file and I'd like a way of verifying that the definition
 file is correct before the processing tools get blown out of the water.
+
+# Packaging for Distros
+
+## Fedora
+
+Looking at [Fedora's 2024 instructions](https://docs.fedoraproject.org/en-US/package-maintainers/Installing_Packager_Tools/)
+I installed `fedora-packager` and  `fedora-review`.

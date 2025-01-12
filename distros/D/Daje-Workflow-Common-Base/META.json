@@ -57,7 +57,7 @@
       },
       "Daje::Workflow::Common::Base" : {
          "file" : "lib/Daje/Workflow/Common/Base.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "Daje::Workflow::Common::Checks::Base" : {
          "file" : "lib/Daje/Workflow/Common/Checks/Base.pm"
@@ -75,7 +75,7 @@
          "web" : "https://github.com/janeskil1525/Daje-Workflow-Common-Base"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

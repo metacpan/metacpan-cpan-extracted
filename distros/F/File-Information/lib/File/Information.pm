@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2024-2025 Löwenfelsen UG (haftungsbeschränkt)
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -20,7 +20,7 @@ use File::Information::Inode;
 use File::Information::Filesystem;
 use File::Information::Tagpool;
 
-our $VERSION = v0.04;
+our $VERSION = v0.05;
 
 my $HAVE_FILE_VALUEFILE = eval {require File::ValueFile::Simple::Reader; 1;};
 my $HAVE_UNIX_MKNOD     = eval {require Unix::Mknod; 1;};
@@ -42,7 +42,7 @@ sub new {
         }
     }
 
-    $self->{$_} = $opts{$_} foreach qw(tagpool_rc tagpool_path device_path digest_sizelimit);
+    $self->{$_} = $opts{$_} foreach qw(tagpool_rc tagpool_path device_path digest_sizelimit mountinfo_path);
 
     $self->{digest_sizelimit} //= 512*1024*1024; # 512MB
 
@@ -94,6 +94,98 @@ sub for_handle {
 }
 
 
+
+#@returns File::Information::Base
+sub for_identifier {
+    my ($self, %opts);
+
+    if (scalar(@_) == 2) {
+        ($self, $opts{identifier}) = @_;
+    } elsif (scalar(@_) == 3) {
+        ($self, $opts{type}, $opts{identifier}) = @_;
+    } else {
+        ($self, %opts) = @_;
+    }
+
+    croak 'No identifier given' unless defined $opts{identifier};
+
+    if (!defined($opts{type}) && ref($opts{identifier})) {
+        my $id = $opts{identifier};
+
+        if ($id->isa('Data::URIID::Result')) {
+            $opts{type} = $id->id_type;
+            unless (defined $opts{type}) {
+                # Special case: we might know a digest or something, but not an identifier.
+                require File::Information::Remote;
+                return File::Information::Remote->_new(instance => $self, data_uriid_result => $id);
+            }
+        } elsif ($id->isa('Data::Identifier')) {
+            $opts{type} = $id->type;
+        }
+    }
+
+    croak 'No type given' unless defined $opts{type};
+
+    if (ref $opts{type}) {
+        $opts{type} = $opts{type}->ise;
+    } elsif ($opts{type} eq 'uuid') {
+        $opts{type} = '8be115d2-dc2f-4a98-91e1-a6e3075cbc31';
+    }
+
+    if (ref(my $id = $opts{identifier})) {
+        if ($id->isa('Data::URIID::Result') || $id->isa('Data::Identifier')) {
+            $opts{identifier} = $id->id;
+        } elsif ($id->isa('Data::URIID::Base')) {
+            $opts{identifier} = $id->ise;
+        }
+    }
+
+    if ($opts{type} eq '8be115d2-dc2f-4a98-91e1-a6e3075cbc31') {
+        if ($opts{identifier} !~ /^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/) {
+            croak 'Invalid format for UUID';
+        }
+
+        $self->_load_filesystems;
+
+        foreach my $fs (values %{$self->{filesystems}}) {
+            my $ise = $fs->get('uuid', as => 'uuid', default => undef) // next;
+            return $fs if $ise eq $opts{identifier};
+        }
+
+        {
+            require File::ValueFile::Simple::Reader;
+
+            my $uuid = $opts{identifier};
+
+            foreach my $pool ($self->tagpool) {
+                my $ise = $pool->get('uuid', as => 'uuid');
+                my $hash;
+
+                return $pool if $ise eq $uuid;
+
+                $hash = eval {
+                    my $reader = File::ValueFile::Simple::Reader->new($pool->_catfile('data', 'info.'.$uuid));
+                    $reader->read_as_hash;
+                };
+
+                next unless defined $hash;
+                next unless defined $hash->{'pool-name-suffix'};
+                return $self->for_link(path => $pool->_catfile('data', $hash->{'pool-name-suffix'}), %opts);
+            }
+        }
+    }
+
+    if (defined(my $extractor = eval {$self->extractor})) {
+        if (defined(my $result = eval {$extractor->lookup($opts{type}, $opts{identifier})})) {
+            require File::Information::Remote;
+            return File::Information::Remote->_new(instance => $self, data_uriid_result => $result);
+        }
+    }
+
+    croak 'Not found';
+}
+
+
 sub tagpool {
     my ($self) = @_;
     return values %{$self->_tagpool}
@@ -136,6 +228,7 @@ sub digest_info {
                 name => $_,
                 bits => int(($_ =~ /-([0-9]+)$/)[0]),
                 aliases => [],
+                %{$File::Information::Base::_digest_info_extra{$_}//{}},
             }} (
             values(%File::Information::Base::_digest_name_converter),
             qw(md-4-128 ripemd-1-160 tiger-1-192 tiger-2-192),
@@ -342,7 +435,8 @@ sub _load_filesystems {
         }
 
         if ($HAVE_UNIX_MKNOD && $^O eq 'linux') {
-            if (open(my $mountinfo, '<', '/proc/self/mountinfo')) {
+            $self->{mountinfo_path} //= '/proc/self/mountinfo';
+            if (open(my $mountinfo, '<', $self->{mountinfo_path})) {
                 while (defined(my $line = <$mountinfo>)) {
                     my ($mount_id, $parent_id, $major, $minor, $root, $mountpoint, $mount_options, $options, $fs_type, $source, $super_options) =
                         $line =~ m#^(\S+)\s+(\S+)\s+([0-9]+):([0-9]+)\s+(/\S*)\s+(/\S*)\s+(\S+)\s+((?:\S+:\S+\s+)*)-\s+(\S+)\s+(/\S+|none|\S+)\s+(\S+)$#;
@@ -411,7 +505,7 @@ File::Information - generic module for extracting information from filesystems
 
 =head1 VERSION
 
-version v0.04
+version v0.05
 
 =head1 SYNOPSIS
 
@@ -501,6 +595,12 @@ An digest or a list of digests to be defined unsafe. See L</digest_info> for det
 Dies if a digest in the list is unknown (this is for security reasons).
 This option only allows to mark additinal digests unsafe. It does not allow to mark already marked ones safe again.
 
+=item C<mountinfo_path>
+
+The path to the mountinfo file. This is a special file on Linux that contains information on mounted filesystems.
+Defaults to C</proc/self/mountinfo>.
+This option has no effect on systems other than Linux.
+
 =back
 
 =head2 for_link
@@ -542,6 +642,23 @@ The following options are supported:
 Required if not using the one-argument form. Gives an open handle to the inode.
 
 =back
+
+=head2 for_identifier
+
+    my File::Information::Base $obj = $instance->for_identifier($identifier);
+    # or:
+    my File::Information::Base $obj = $instance->for_identifier(uuid => $uuid);
+    # or:
+    my File::Information::Base $obj = $instance->for_identifier(type => 'uuid', id => $uuid [, %opts ]);
+
+B<Note:>
+This is an experimental method. It may be renamed, removed, or changed in any way with future releases.
+
+This method returns an object based on it's identifier. This method might return different kinds of objects
+such as links, inodes, filesystems, or tagpools.
+
+The identifier can be passed as an instance of e.g. L<Data::Identifier> or as a plain UUID.
+Other types may or may not be supported.
 
 =head2 tagpool
 
@@ -632,6 +749,10 @@ A boolean indicating if the digest is considered unsafe by this module.
 B<Security:> Note that a digest not defined unsafe by this module may still be unsafe to use.
 This can for example happen if the digest became unsafe after the release of the version of this module.
 
+=item C<rfc9530>
+
+The name of the algorithm as per RFC 9530 if any.
+
 =back
 
 =head1 AUTHOR
@@ -640,7 +761,7 @@ Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2024-2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
 
 This is free software, licensed under:
 

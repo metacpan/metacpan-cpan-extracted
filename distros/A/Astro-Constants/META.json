@@ -1,10 +1,10 @@
 {
-   "abstract" : "This library provides physical constants for use in Physics and Astronomy based on values from 2018 CODATA.",
+   "abstract" : "Perl library to provide physical constants for use in Physics and Astronomy based on values from 2018 CODATA.",
    "author" : [
       "Boyd Duffee <duffee@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -19,6 +19,23 @@
             "ExtUtils::MakeMaker" : "0"
          }
       },
+      "develop" : {
+         "recommends" : {
+            "Dist::Zilla::Plugin::MetaProvides::Package" : "0",
+            "Dist::Zilla::Plugin::RPM" : "0",
+            "Dist::Zilla::Plugin::Repository" : "0",
+            "FindBin" : "0",
+            "Module::Util" : "0",
+            "Mojo::Template" : "0",
+            "Pod::Elemental::Transformer::List" : "0"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "Getopt::Long" : "0",
+            "XML::LibXML" : "0",
+            "perl" : "5.026"
+         }
+      },
       "runtime" : {
          "requires" : {
             "perl" : "5.006"
@@ -26,6 +43,7 @@
       },
       "test" : {
          "requires" : {
+            "Test2::V0" : "0",
             "Test::More" : "0",
             "Test::Number::Delta" : "0"
          }
@@ -34,15 +52,19 @@
    "provides" : {
       "Astro::Constants" : {
          "file" : "lib/Astro/Constants.pm",
-         "version" : "0.1401"
+         "version" : "0.14051"
+      },
+      "Astro::Constants::2019" : {
+         "file" : "lib/Astro/Constants/2019.pm",
+         "version" : "0.14051"
       },
       "Astro::Constants::CGS" : {
          "file" : "lib/Astro/Constants/CGS.pm",
-         "version" : "0.1401"
+         "version" : "0.14051"
       },
       "Astro::Constants::MKS" : {
          "file" : "lib/Astro/Constants/MKS.pm",
-         "version" : "0.1401"
+         "version" : "0.14051"
       }
    },
    "release_status" : "stable",
@@ -57,8 +79,9 @@
          "web" : "https://github.com/duffee/Astro-Constants"
       }
    },
-   "version" : "0.1401",
-   "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.09"
+   "version" : "0.14051",
+   "x_generated_by_perl" : "v5.38.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

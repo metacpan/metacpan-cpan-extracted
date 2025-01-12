@@ -7,8 +7,6 @@ use base 'Module::Build';
 
 use FFI::CheckLib;
 
-
-
 sub new {
     my ($class, %arg) = @_;
 
@@ -21,7 +19,5 @@ Installation failed.
 
     $class->SUPER::new(%arg);
 }
-
-
 
 1;

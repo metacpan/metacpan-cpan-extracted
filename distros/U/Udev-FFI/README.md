@@ -277,6 +277,7 @@ Mohammad S Anwar
 
 # COPYRIGHT AND LICENSE
 
-Copyright (C) 2017-2022 by Ilya Pavlov
+Copyright (C) 2017-2025 by Ilya Pavlov
 
-This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language
+system itself.

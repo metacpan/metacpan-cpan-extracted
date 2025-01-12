@@ -8,15 +8,10 @@ expected:
   datetime_utc: 2018-05-19T22:05:47Z
   domain: ~
   epoch: 1526767547
-  facility: ~
-  facility_int: ~
   host: janus
   host_raw: janus
   message: 'postfix/smtps/smtpd[11513]: disconnect from unknown[139.28.175.150]'
   message_raw: 'May 19 22:05:47 janus postfix/smtps/smtpd[11513]: disconnect from unknown[139.28.175.150]'
-  preamble: ~
-  priority: ~
-  priority_int: ~
   program_name: postfix
   program_pid: 11513
   program_raw: 'postfix/smtps/smtpd[11513]'

@@ -1,5 +1,10 @@
-require Exporter;
 package Geo::Constants;
+use strict;
+use warnings;
+use base qw{Exporter};
+
+our $VERSION   = '0.07';
+our @EXPORT_OK = qw{PI DEG RAD KNOTS};
 
 =head1 NAME
 
@@ -20,15 +25,6 @@ Geo::Constants - Package for standard Geo:: constants.
 
 =head1 DESCRIPTION
 
-=cut
-
-use strict;
-#use vars qw($VERSION $PACKAGE @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-use vars qw($VERSION @ISA @EXPORT_OK);
-@ISA = qw(Exporter);
-@EXPORT_OK = (qw{PI DEG RAD KNOTS});
-$VERSION = sprintf("%d.%02d", q{Revision: 0.06} =~ /(\d+)\.(\d+)/);
-
 =head1 CONSTRUCTOR
 
 =head2 new
@@ -40,21 +36,24 @@ The new() constructor
 =cut
 
 sub new {
-  my $this = shift();
-  my $class = ref($this) || $this;
-  my $self = {};
+  my $this  = shift;
+  my $class = ref($this) ? ref($this) : $this;
+  my $self  = {};
   bless $self, $class;
   $self->initialize(@_);
   return $self;
 }
 
-=head1 METHODS
+=head2 initialize
 
 =cut
 
 sub initialize {
-  my $self = shift();
+  my $self=shift;
+  %$self=@_;
 }
+
+=head1 FUNCTIONS
 
 =head2 PI
 
@@ -76,6 +75,8 @@ sub PI {
   use Geo::Constants qw{DEG};
   my $degrees_per_radian = DEG();
 
+UOM: degrees/radian
+
 =cut
 
 sub DEG {
@@ -89,6 +90,8 @@ sub DEG {
   use Geo::Constants qw{DEG};
   my $radians_per_degree = RAD();
 
+UOM: radians/degree
+
 =cut
 
 sub RAD {
@@ -99,7 +102,9 @@ sub RAD {
 
 1 nautical mile per hour = (1852/3600) m/s - United States Department of Commerce, National Institute of Standards and Technology, NIST Special Publication 330, 2001 Edition
 
-Returns 1852/3600
+Returns 1852/3600 m/s/knot
+
+UOM: meters/second per knot
 
 =cut
 
@@ -107,32 +112,20 @@ sub KNOTS {
   return 1852/3600; #1 nautical mile per hour = (1852/3600) m/s
 }
 
-1;
-
-__END__
-
-=head1 TODO
-
-Add more constants
-
-=head1 BUGS
-
-Please send to the geo-perl email list.
-
-=head1 LIMITS
-
 =head1 AUTHOR
 
-Michael R. Davis qw/perl michaelrdavis com/
+Michael R. Davis
 
 =head1 LICENSE
 
-Copyright (c) 2006 Michael R. Davis (mrdvt92)
+Copyright (c) 2006-2025 Michael R. Davis
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-Geo::Functions
-Geo::Ellipsoids
+L<Geo::Functions>, L<Geo::Ellipsoids>, L<Astro::Constants>
+
+=cut
+
+1;

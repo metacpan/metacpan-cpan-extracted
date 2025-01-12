@@ -13,19 +13,12 @@ expected:
   datetime_utc: 2018-05-20T06:40:53Z
   domain: ~
   epoch: 1526798453
-  facility: ~
-  facility_int: ~
   host: janus
   host_raw: janus
   message: 'sudo: brad : TTY=pts/3 ; PWD=/home/brad/code/CPAN/eris-logging ; USER=root ; COMMAND=/bin/grep pam /var/log/messages'
   message_raw: 'May 20 06:40:53 janus sudo:     brad : TTY=pts/3 ; PWD=/home/brad/code/CPAN/eris-logging ; USER=root ; COMMAND=/bin/grep pam /var/log/messages'
-  preamble: ~
-  priority: ~
-  priority_int: ~
   program_name: sudo
-  program_pid: ~
   program_raw: sudo
-  program_sub: ~
   time: 06:40:53
   tz: Z
 name: crond message with key/value detection enabled

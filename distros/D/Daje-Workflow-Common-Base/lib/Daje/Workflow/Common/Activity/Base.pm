@@ -37,7 +37,7 @@ has 'db';
 has 'context';
 has 'error';
 has 'activity_data';
-
+has 'model';
 
 1;
 

@@ -1,15 +1,27 @@
 use ExtUtils::MakeMaker;
 WriteMakefile(
-  NAME      => q{Geo::Constants},
-  VERSION_FROM => q{lib/Geo/Constants.pm},
-  PREREQ_PM => {
-                 strict            => 0,
-                 vars              => 0,
-                 Exporter          => 0,
-               },
-               ($] >= 5.005 ? 
-                 (
-                   ABSTRACT_FROM => 'lib/Geo/Constants.pm',
-                 ) : ()
-               ),
-             );
+  NAME          => 'Geo::Constants',
+  VERSION_FROM  => 'lib/Geo/Constants.pm',
+  ABSTRACT_FROM => 'lib/Geo/Constants.pm',
+  LICENSE       => 'perl',
+  PREREQ_PM     => {
+                    'Exporter'     => 0,
+                    'Test::Simple' => 0.44, #Tests
+                   },
+  'META_MERGE' => {
+    'resources' => {
+      'repository' => {
+        'web' => 'https://github.com/mrdvt92/perl-Geo-Constants.git',
+        'url' => 'git@github.com:mrdvt92/perl-Geo-Constants.git',
+        'type' => 'git'
+      },
+      'homepage' => 'https://github.com/mrdvt92/perl-Geo-Constants',
+      'bugtracker' => {
+        'web' => 'https://github.com/mrdvt92/perl-Geo-Constants/issues'
+      }
+    },
+    'meta-spec' => {
+      'version' => 2
+    }
+  },
+);

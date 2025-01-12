@@ -1,6 +1,6 @@
 use strict;
 use Test::More skip_all => 'waiting for Astro::Constants::CODATA::2014';
-use Astro::Constants::MKS qw/:long/;
+use Astro::Constants qw( :all );
 
 skip
 diag("Testing values from CODATA 2014");

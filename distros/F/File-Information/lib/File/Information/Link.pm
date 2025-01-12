@@ -20,15 +20,27 @@ use File::Basename ();
 
 use File::Information::Inode;
 
-our $VERSION = v0.04;
+our $VERSION = v0.05;
 
+my $HAVE_DATA_IDENTIFIER_GENERATE = eval {require Data::Identifier::Generate; 1};
+my $HAVE_DATA_IDENTIFIER = eval {require Data::Identifier; 1;};
 my $HAVE_XML_SIMPLE = eval {require XML::Simple; 1;};
 my $HAVE_URI_FILE = eval {require URI::file; 1;};
 my $HAVE_DIGEST = eval {require Digest; 1;};
 
+my %_dot_comments_rating = (
+    0 => '06813a68-06f2-5d42-b230-28445e5f5dc1',
+    1 => '4b31eb8c-546a-578b-83bb-e5d6e6a53263',
+    2 => 'bb986cde-9f2e-5c1d-9f56-cb3fa019077d',
+    3 => 'c7ea5002-eed0-58f6-9707-edfd673c6e02',
+    4 => 'a0e425a4-a447-5b54-bafc-46ea54eb9d55',
+    5 => '14c1ebe1-9901-534d-b837-ea22cba1adfe',
+);
+
 my %_properties = (
     link_basename       => {loader => \&_load_basename},
     link_basename_clean => {loader => \&_load_basename},
+    link_dotfile        => {loader => \&_load_basename, rawtype => 'bool'},
 );
 
 if ($HAVE_XML_SIMPLE) {
@@ -38,6 +50,12 @@ if ($HAVE_XML_SIMPLE) {
 
 if ($HAVE_URI_FILE && $HAVE_DIGEST) {
     $_properties{link_thumbnail} = {loader => \&_load_thumbnail, rawtype => 'filename'};
+}
+
+if ($HAVE_DATA_IDENTIFIER) {
+    while (my ($key, $value) = each %_dot_comments_rating) {
+        Data::Identifier->new(uuid => $value, displayname => $key)->register;
+    }
 }
 
 sub _new {
@@ -146,6 +164,7 @@ sub _load_dotcomments {
             my $value = $xml->{rating} // $xml->{Rating};
             if (defined($value) && ref($value) && defined($value->{value}) && !ref($value->{value}) && $value->{value} =~ /^[1-5]$/) {
                 $pv->{dotcomments_rating} = {raw => int($value->{value})};
+                $pv->{dotcomments_rating}{uuid} = $_dot_comments_rating{$value->{value}} if defined $_dot_comments_rating{$value->{value}}
             }
         }
 
@@ -158,17 +177,28 @@ sub _load_dotcomments {
                 if (ref($value)) {
                     foreach my $entry (@{$value}) {
                         if (ref($entry) && defined($entry->{value}) && length($entry->{value})) {
-                            push(@list, $entry->{value});
+                            push(@list, {raw => $entry->{value}});
                         }
                     }
                 }
             }
 
             if (defined($pv->{dotcomments_keywords}) && defined($pv->{dotcomments_keywords}{raw})) {
-                push(@list, grep {length} split(/\s*,\s*/, $pv->{dotcomments_keywords}{raw}));
+                push(@list, map {{raw => $_}} grep {length} split(/\s*,\s*/, $pv->{dotcomments_keywords}{raw}));
             }
 
-            $pv->{dotcomments_categories}{raw} = \@list;
+            if ($HAVE_DATA_IDENTIFIER_GENERATE) {
+                foreach my $entry (@list) {
+                    $entry->{'Data::Identifier'} = Data::Identifier::Generate->generic(
+                        displayname => $entry->{raw},
+                        request => $entry->{raw},
+                        style => 'name-based',
+                        namespace => 'eb239013-7556-4091-959f-4d78ca826757',
+                    );
+                }
+            }
+
+            $pv->{dotcomments_categories} = \@list;
         }
     }
 }
@@ -179,6 +209,7 @@ sub _load_basename {
     my $pv = ($self->{properties_values} //= {})->{current} //= {};
 
     $pv->{link_basename} = {raw => $basename};
+    $pv->{link_dotfile}  = {raw => !!($basename =~ /^\./)};
 
     $basename =~ s/(.)(?:\.tar)?\.[^\.]+$/$1/;
     $basename =~ s/^[a-z]+\.[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}\.(.)/$1/;
@@ -226,7 +257,7 @@ File::Information::Link - generic module for extracting information from filesys
 
 =head1 VERSION
 
-version v0.04
+version v0.05
 
 =head1 SYNOPSIS
 
@@ -270,7 +301,7 @@ Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2024-2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
 
 This is free software, licensed under:
 

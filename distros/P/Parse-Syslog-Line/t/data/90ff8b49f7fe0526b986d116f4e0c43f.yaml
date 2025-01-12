@@ -18,9 +18,7 @@ expected:
   priority: alert
   priority_int: 1
   program_name: '%ASA-3-313001'
-  program_pid: ~
   program_raw: '%ASA-3-313001'
-  program_sub: ~
   time: 18:39:00
   tz: Z
 name: Cisco ASA Alt

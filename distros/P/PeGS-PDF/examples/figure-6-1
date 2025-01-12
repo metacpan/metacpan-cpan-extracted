@@ -1,0 +1,21 @@
+#!/usr/local/bin/perl
+
+use PeGS::PDF;
+
+my $W    = 3.5 * 72;
+my $H    = 2.55 * 72;
+
+my $pdf = PeGS::PDF->new(
+	{
+	file => "/Users/brian/Desktop/figure-6-1.pdf",
+	x    => $W,
+	'y'  => $H,
+	}
+	);
+die "Could not create object!" unless ref $pdf;
+
+	my $a_ref = [ 1 .. 3 ];
+
+$pdf->make_reference( '$a_ref', $a_ref, 10, 140 );
+
+$pdf->close;

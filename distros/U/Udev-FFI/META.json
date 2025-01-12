@@ -4,7 +4,7 @@
       "Ilya Pavlov, <ilux@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.20",
+   "generated_by" : "Minilla/v3.1.25",
    "license" : [
       "perl_5"
    ],
@@ -51,14 +51,14 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.98"
+            "Test2" : "1.302207"
          }
       }
    },
    "provides" : {
       "Udev::FFI" : {
          "file" : "lib/Udev/FFI.pm",
-         "version" : "0.105000"
+         "version" : "0.105002"
       },
       "Udev::FFI::Device" : {
          "file" : "lib/Udev/FFI/Device.pm"
@@ -91,12 +91,12 @@
          "web" : "https://github.com/Ilya33/udev-ffi"
       }
    },
-   "version" : "0.105000",
+   "version" : "0.105002",
    "x_authority" : "cpan:ILUX",
    "x_contributors" : [
       "Ilya Pavlov <fsilux@gmail.com>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_serialization_backend" : "JSON::PP version 4.07",
    "x_static_install" : 0
 }

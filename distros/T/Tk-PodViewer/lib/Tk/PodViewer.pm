@@ -3,7 +3,7 @@ package Tk::PodViewer;
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.05';
+$VERSION = '0.06';
 use base qw(Tk::Derived Tk::Frame);
 
 Construct Tk::Widget 'PodViewer';
@@ -141,7 +141,7 @@ sub clear {
 	my $self = shift;
 	$self->Subwidget('txt')->delete('1.0', 'end');
 	$self->{INDENTSTACK} = ['indent0'];
-	$self->{INITEM} = 0;
+	$self->{INITEM} = [];
 	$self->{STACK} = [];
 	$self->Callback('-loadcall', '');
 }
@@ -369,9 +369,18 @@ sub indentUp {
 }
 
 sub inItem {
-	my $self = shift;
-	$self->{INITEM} = shift if @_;
-	return $self->{INITEM}
+	my ($self, $flag) = @_;
+	my $i = $self->{INITEM};
+	if (defined $flag) {
+		if ($flag) {
+			push @$i, $flag
+		} else {
+			warn "We are not in =item" unless @$i;
+			pop @$i
+		}
+	}
+	my $size = @$i;
+	return $size
 }
 
 sub linkClicked {
@@ -460,7 +469,6 @@ sub load {
 	while (my $token = $p->get_token) {
 		if($token->is_start) {
 			my $name = $token->tagname;
-			my $startline = $token->attr('start_line');
 
 			if ($self->ignore($name)) { #do nothing
 
@@ -530,7 +538,7 @@ sub load {
 				$self->inItem(0);
 				$self->indentDown;
 			} elsif ($name eq 'item-text') {
-				$self->insert('end', "\n\n");
+				$self->insert('end', "\n");
 			} elsif ($name =~ /^Para/) {
 				$self->indentDown if $self->inItem;
 				$self->insert('end', "\n\n");

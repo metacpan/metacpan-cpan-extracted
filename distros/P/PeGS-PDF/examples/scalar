@@ -1,0 +1,22 @@
+#!/usr/local/bin/perl
+
+my $W    = 1.5 * 72;
+my $H    = 1.5  * 72;
+
+use PeGS::PDF;
+
+my $pdf = PeGS::PDF->new(
+	{
+	file => "/Users/brian/Desktop/scalar.pdf",
+	x    => $W,
+	'y'  => $H,
+	}
+	);
+
+#$pdf->text( 10, 10, "W is $W, H is $H, " . scalar localtime );
+
+my $foo = 'Buster';
+$pdf->make_scalar( '$cat', \$foo, 10, 60 );
+
+
+$pdf->close;

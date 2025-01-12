@@ -4,13 +4,10 @@ use strict;
 use warnings;
 
 use Errno qw(EPERM);
-use Carp qw(croak);
 use IO::Select;
 
 use Udev::FFI::Functions qw(:all);
 use Udev::FFI::Device;
-
-
 
 sub new {
     my $class = shift;
@@ -123,6 +120,7 @@ sub start {
     $self->{_select}->add($fdh);
 
     $self->{_is_started} = 1;
+
     return 1;
 }
 
@@ -132,8 +130,10 @@ sub poll {
     my $self = shift;
     my $timeout = shift;
 
-     croak('udev monitor is not running')
-        unless $self->{_is_started};
+    if (0 == $self->{'_is_started'}) {
+        require Carp;
+        Carp::croak('udev monitor is not running');
+    }
 
     if ($self->{_select}->can_read($timeout)) {
         my $device = udev_monitor_receive_device($self->{_monitor});

@@ -1,4 +1,20 @@
-v0.04  XXX
+v0.05  2025-01-11Z
+    - Added option mountinfo_path (Linux only)
+    - Added *experimental* list support for properties
+    - Added support for properties:
+        - tagpool_file_tags
+        - link_dotfile
+        - hidden
+        - system
+    - Improved .comments/ support
+    - Added *experimental* $instance->for_identifier()
+    - Added infos on RFC 9530 digest names
+    - Added *experimental* remote file support
+    - Added *experimental* support for using verify() with two distinct base objects
+    - Fixed utag format hash string generation for 0-byte files
+    - Fixed digest values by force preloading of related properties
+
+v0.04  2024-11-14Z
     - Improved documentation
     - Added Note that Data::Identifier will become a hard dependency soon
     - Added initial support to interact with a database and Data::TagDB::Tag

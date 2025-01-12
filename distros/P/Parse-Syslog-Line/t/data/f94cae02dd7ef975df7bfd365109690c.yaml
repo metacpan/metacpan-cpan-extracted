@@ -6,7 +6,6 @@ expected:
   datetime_raw: Jan  1 00:00:00
   datetime_str: 2018-01-01T00:00:00Z
   datetime_utc: 2018-01-01T00:00:00Z
-  domain: ~
   epoch: 1514764800
   facility: user
   facility_int: 8
@@ -18,9 +17,7 @@ expected:
   priority: err
   priority_int: 3
   program_name: dhcpd
-  program_pid: ~
   program_raw: dhcpd
-  program_sub: ~
   time: 00:00:00
   tz: Z
 name: IP as Hostname

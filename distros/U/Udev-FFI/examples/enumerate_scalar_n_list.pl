@@ -7,8 +7,6 @@ use Data::Dumper;
 
 use Udev::FFI;
 
-
-
 my $udev = Udev::FFI->new() or
     die("Can't create Udev::FFI object: $@.\n");
 

@@ -1,9 +1,10 @@
 #!perl
 
-use strict;
+use v5.16;
 use warnings;
 use Parse::Syslog::Line;
 use Time::HiRes qw(gettimeofday tv_interval);
+psl_enable_sdata();
 
 use FindBin;
 use lib "$FindBin::Bin/../t/lib";

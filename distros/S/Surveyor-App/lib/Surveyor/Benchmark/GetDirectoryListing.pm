@@ -4,7 +4,7 @@ package Surveyor::Benchmark::GetDirectoryListing;
 use strict;
 use warnings;
 
-our $VERSION = '0.124';
+our $VERSION = '0.125';
 
 =encoding utf8
 
@@ -92,7 +92,7 @@ brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2013-2024, brian d foy <briandfoy@pobox.com>. All rights reserved.
+Copyright © 2013-2025, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

@@ -17,7 +17,7 @@ use Carp;
 use File::Spec;
 use Fcntl qw(S_ISREG S_ISDIR S_ISLNK S_ISBLK S_ISCHR S_ISFIFO S_ISSOCK S_IWUSR S_IWGRP S_IWOTH SEEK_SET);
 
-our $VERSION = v0.04;
+our $VERSION = v0.05;
 
 my $HAVE_XATTR              = eval {require File::ExtAttr; 1;};
 my $HAVE_UUID_TINY          = eval {require UUID::Tiny; 1;};
@@ -129,9 +129,9 @@ if ($HAVE_FILE_VALUEFILE) {
     $_properties{'tagpool_directory_setting_'.($_ =~ tr/-/_/r)}{rawtype} = 'ise' foreach qw(tag tag-root tag-parent tag-type);
     $_properties{'tagpool_directory_throw_option_'.$_} = {%{$config}} foreach qw(linkname linktype filter);
 
-    $_properties{'tagpool_file_'.($_ =~ tr/-/_/r)} = {loader => \&_load_tagpool_file} foreach qw(title comment description mtime timestamp inode size actual-size original-url original-description-url pool-name-suffix original-filename uuid mediatype write-mode finalmode thumbnail);
+    $_properties{'tagpool_file_'.($_ =~ tr/-/_/r)} = {loader => \&_load_tagpool_file} foreach qw(title comment description mtime timestamp inode size actual-size original-url original-description-url pool-name-suffix original-filename uuid mediatype write-mode finalmode thumbnail tags);
     $_properties{'tagpool_file_'.$_}{rawtype} = 'unixts' foreach qw(mtime timestamp);
-    $_properties{'tagpool_file_'.($_ =~ tr/-/_/r)}{rawtype} = 'uuid' foreach qw(uuid write-mode finalmode);
+    $_properties{'tagpool_file_'.($_ =~ tr/-/_/r)}{rawtype} = 'uuid' foreach qw(uuid write-mode finalmode tags);
     $_properties{'tagpool_file_'.($_ =~ tr/-/_/r)}{rawtype} = 'mediatype' foreach qw(mediatype);
     $_properties{'tagpool_file_'.($_ =~ tr/-/_/r)}{rawtype} = 'filename' foreach qw(thumbnail);
 
@@ -718,6 +718,8 @@ sub _load_tagpool_file {
             {
                 my @next = @{$tags->{'tagged-as'} // []};
 
+                $pv->{current}{tagpool_file_tags} = [map {{raw => $_}} @next];
+
                 while (scalar(@next)) {
                     my @current = @next;
                     @next = ();
@@ -928,7 +930,7 @@ File::Information::Inode - generic module for extracting information from filesy
 
 =head1 VERSION
 
-version v0.04
+version v0.05
 
 =head1 SYNOPSIS
 
@@ -1007,7 +1009,7 @@ Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2024-2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
 
 This is free software, licensed under:
 

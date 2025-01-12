@@ -20,13 +20,11 @@ This describes the attributes of one physical constant.
 Options are enclosed in [ ]'s and defaults are **bolded**.
 
 * **name**	- the name of the constant as used in your programming language
-  - *type*	- attribute which describes how the name is used.  [**long**, short]
 * **alternateName**	- used for older names, aliases, can be more than one
   - *type*	- attribute which describes how the alternateName is used.  [alias, deprecated]
   - *version* - version of Constants file in which type decided
 * **description**	- text to describe the constant
-* **value**	- the numerical value of the constant
-  - *system*	- the system of units for the value [**MKS**, CGS]
+* **value**	- the numerical value of the constant in SI units
 * **uncertainty**	- the uncertainty or error in the value
   - *type*	- is the uncertainty in the same units or expressed as a ratio to the value [absolute, relative].
 * **dimensions**	- for future use in dimensional analysis,  lists which of the 7 dimensions the constant consists of (e.g. M for mass, L for length, L3 for volume, ML-3 for density)
@@ -59,7 +57,6 @@ How can this schema be extended.  We want flexibility, but not breaking changes.
 Here are some possibilities.
 
 * **name**	- could add a *language* attribute for names in other programming languages [ruby, python, go].
-* **value**	- for *system*, MKS could change to SI.  Why Oh Why would you introduce imperial measurements?
 * **source**	- original source for this constant
   * should the Collection source element be a sourceList instead?
 
@@ -79,3 +76,7 @@ This is what I think the Schema should become.
 ## Changed in v0.14
 * change ```<url href=""/>``` to ```<source url="http://site" />```
 * change ```<source>``` to ```<reference_standard>``` in main heading
+
+## Changed in v0.15
+* removed *type* from **name**
+* removed *system* from **value** - allows numerical type check

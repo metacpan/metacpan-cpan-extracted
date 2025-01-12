@@ -3,12 +3,12 @@ abstract: 'Perl bindings for libudev using ffi.'
 author:
   - 'Ilya Pavlov, <ilux@cpan.org>'
 build_requires:
-  Test::More: '0.98'
+  Test2: '1.302207'
 configure_requires:
   FFI::CheckLib: '0'
   Module::Build: '0.4005'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.20, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.25, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,7 +27,7 @@ no_index:
 provides:
   Udev::FFI:
     file: lib/Udev/FFI.pm
-    version: '0.105000'
+    version: '0.105002'
   Udev::FFI::Device:
     file: lib/Udev/FFI/Device.pm
   Udev::FFI::Devnum:
@@ -49,7 +49,7 @@ resources:
   bugtracker: https://github.com/Ilya33/udev-ffi/issues
   homepage: https://github.com/Ilya33/udev-ffi
   repository: https://github.com/Ilya33/udev-ffi.git
-version: '0.105000'
+version: '0.105002'
 x_authority: cpan:ILUX
 x_contributors:
   - 'Ilya Pavlov <fsilux@gmail.com>'

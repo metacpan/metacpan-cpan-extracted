@@ -1,6 +1,7 @@
 Revision history for Perl extension Daje-Workflow-Loader
 
-0.06 2025-01-10T13:39:42Z
+0.07 2025-01-12T06:55:47Z
 
+    - 2025-01-12 Removed unused dependency
     - Changed to use Daje::Config
 

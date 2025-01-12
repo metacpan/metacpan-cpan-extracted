@@ -22,8 +22,10 @@ lib/Udev/FFI/Helper.pm
 lib/Udev/FFI/Monitor.pm
 minil.toml
 t/00_diag.t
-t/01_use.t
+t/01_libudev.t
 t/02_basic.t
+t/03_udevadm.t
+t/04_udev_ffi_new_diag.t
 t/udev_ffi_new.t
 META.yml
 MANIFEST

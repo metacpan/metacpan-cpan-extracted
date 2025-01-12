@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.014;
+use 5.016000;
 
 use ExtUtils::MakeMaker;
 
@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
     "bin/parse-syslog-line.pl"
   ],
   "LICENSE" => "bsd",
-  "MIN_PERL_VERSION" => "5.014",
+  "MIN_PERL_VERSION" => "5.016000",
   "NAME" => "Parse::Syslog::Line",
   "PREREQ_PM" => {
     "Carp" => 0,
@@ -26,6 +26,7 @@ my %WriteMakefileArgs = (
     "English" => 0,
     "Exporter" => 0,
     "Getopt::Long::Descriptive" => 0,
+    "Hash::Merge::Simple" => 0,
     "JSON::MaybeXS" => 0,
     "Module::Load" => 0,
     "Module::Loaded" => 0,
@@ -51,12 +52,11 @@ my %WriteMakefileArgs = (
     "Test::Deep" => 0,
     "Test::MockTime" => 0,
     "Test::More" => 0,
-    "YAML" => 0,
     "bignum" => 0,
     "lib" => 0,
     "strict" => 0
   },
-  "VERSION" => "6.0",
+  "VERSION" => "6.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -77,6 +77,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "FindBin" => 0,
   "Getopt::Long::Descriptive" => 0,
+  "Hash::Merge::Simple" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "JSON::MaybeXS" => 0,
@@ -91,7 +92,6 @@ my %FallbackPrereqs = (
   "Test::MockTime" => 0,
   "Test::More" => 0,
   "Time::Moment" => 0,
-  "YAML" => 0,
   "YAML::XS" => 0,
   "bignum" => 0,
   "lib" => 0,

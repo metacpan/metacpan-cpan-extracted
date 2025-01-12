@@ -16,6 +16,7 @@ lib/File/Information/Filesystem.pm
 lib/File/Information/Inode.pm
 lib/File/Information/Link.pm
 lib/File/Information/Lock.pm
+lib/File/Information/Remote.pm
 lib/File/Information/Tagpool.pm
 lib/File/Information/VerifyBase.pm
 lib/File/Information/VerifyResult.pm

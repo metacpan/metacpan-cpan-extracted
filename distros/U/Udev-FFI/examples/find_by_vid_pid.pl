@@ -6,14 +6,12 @@ use warnings;
 
 use Udev::FFI;
 
-
 my $vid = $ARGV[0];
 my $pid = $ARGV[1];
 
 if (!defined($vid) || !defined($pid)) {
     die("Usage: find_by_vid_pid.pl VID PID\nExample: find_by_vid_pid.pl bced 0b08\n");
 }
-
 
 my $udev = Udev::FFI->new() or
     die("Can't create Udev::FFI object: $@.\n");

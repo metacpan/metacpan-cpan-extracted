@@ -3,8 +3,8 @@
 #
 # $Id$
 #
+#  Copyright (c) 2024-2025  DBI Team
 #  Copyright (c) 1994-2024  Tim Bunce  Ireland
-#  Copyright (c) 2024-2024  DBI team
 #
 # See COPYRIGHT section in DBI.pm for usage and distribution rights.
 
@@ -67,6 +67,7 @@ my %opts = (
     META_MERGE                => {
 	resources             => {
 	    repository        => "https://github.com/perl5-dbi/dbi",
+	    bugtracker        => "https://github.com/perl5-dbi/dbi/issues",
 	    MailingList       => 'mailto:dbi-dev@perl.org',
 	    license           => "http://dev.perl.org/licenses/",
 	    homepage          => "http://dbi.perl.org/",
@@ -356,14 +357,14 @@ changes_pm1 = ' . File::Spec->catfile ('lib', 'DBI', 'Changes.pm') . '
 changes_pm2 = ' . File::Spec->catfile ($self->{INST_LIB}, 'DBI', 'Changes.pm') . '
 '.q{
 
-config :: $(changes_pm)
+config :: $(changes_pm1)
 	$(NOECHO) $(NOOP)
 
-$(changes_pm): Changes
+$(changes_pm2) $(changes_pm1): Changes
 	$(MKPATH) $(inst_libdbi)
-	$(RM_F) $(changes_pm)
+	$(RM_F) $(changes_pm1) $(changes_pm2)
 	perl changes2pm.pl
-	$(CP) $(changes_pm1) $(changes_pm2)
+	$(CP)   $(changes_pm1) $(changes_pm2)
 
 ptest:  all
 	prove --blib --jobs 8 --shuffle
@@ -379,16 +380,14 @@ checkkeywords:
 	find . -type f \( -name .svn -prune -o -name \*.pm -o -name \*.PL -o -name \*.pl \) \
             -exec bash -c '[ -z "$$(svn pg svn:keywords {})" ] && echo svn propset svn:keywords \"Id Revision\" {}' \;
 
-.PHONY:	doc
+.PHONY:	doc change changes
+changes:	$(changes_pm1)
 doc:
-	perl make-doc.pl
+	perl doc/make-doc.pl
 dbipport:
 	perl sandbox/genPPPort_h.pl
 ppport:		dbipport.h
 	perl dbipport.h --compat-version=5.8.0 DBI.xs
-
-lib/DBI/Changes.pm:	Changes
-	perl changes2pm.pl
 
 checkpod:
 	$(RM_RF) blib

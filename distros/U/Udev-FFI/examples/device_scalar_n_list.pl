@@ -7,8 +7,6 @@ use Data::Dumper;
 
 use Udev::FFI;
 
-
-
 die("Usage: device_scalar_n_list.pl NETWORK_INTERFACE_NAME")
     unless (defined($ARGV[0]));
 

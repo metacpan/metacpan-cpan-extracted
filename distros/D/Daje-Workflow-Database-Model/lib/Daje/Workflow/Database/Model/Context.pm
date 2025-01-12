@@ -90,8 +90,8 @@ sub _load_pk($self) {
 
     my $context;
     $context = $data->hash if $data->rows > 0;
-    if (defined $context->{context}) {
-        $context->{context} = from_json $context->{context};
+    if (defined $context and exists $context->{context}) {
+        $context->{context} = from_json($context->{context});
     }
     return $context;
 }
@@ -120,25 +120,29 @@ sub _load_fk($self) {
 
     my $context;
     $context = $data->hash if $data->rows > 0;
-    if (defined $context->{context}) {
-        $context->{context} = from_json $context->{context};
+    if (defined $context and exists $context->{context}) {
+        $context->{context} = from_json($context->{context});
     }
     return $context;
 }
 
 sub save($self, $context) {
 
+    $context->{context_pkey} = 0 unless exists $context->{context_pkey};
+    $context->{context} = to_json($context->{context});
+
     if ($context->{context_pkey} > 0) {
         $self->db->query("UPDATE context SET context = ? WHERE context_pkey = ?",
-            [{type => PG_BYTEA, value => $context->{context}}, $context->{context_pkey}]
+            ("$context->{context}", "$context->{context_pkey}")
         );
 
     } else {
         delete %$context{context_pkey};
         $context->{workflow_fkey} = $self->workflow_pkey;
+
         $context->{context_pkey} = $self->db->query(
-            "INSERT context (context, workflow_fkey) VALUES (?,?) RETURNING context_pkey",
-                [{type => PG_BYTEA, value => $context->{context}}, $context->{workflow_fkey}]
+            "INSERT INTO context (context, workflow_fkey) VALUES (?,?)  RETURNING context_pkey",
+            ("$context->{context}", "$context->{workflow_fkey}")
         )->hash->{context_pkey};
     }
 
@@ -146,6 +150,7 @@ sub save($self, $context) {
 }
 
 1;
+
 
 
 

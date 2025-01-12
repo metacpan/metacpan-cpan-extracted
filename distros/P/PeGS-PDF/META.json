@@ -1,0 +1,59 @@
+{
+   "abstract" : "Draw simple Perl Graphical Structures",
+   "author" : [
+      "brian d foy <briandfoy@pobox.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "PeGS-PDF",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::Spec::Functions" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "List::Util" : "0",
+            "PDF::EasyPDF" : "0",
+            "perl" : "5.036"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/briandfoy/pegs-pdf/issues"
+      },
+      "homepage" : "https://github.com/briandfoy/pegs-pdf",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/briandfoy/pegs-pdf",
+         "web" : "https://github.com/briandfoy/pegs-pdf"
+      }
+   },
+   "version" : "0.103",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

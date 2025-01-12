@@ -69,9 +69,7 @@ expected:
   priority: info
   priority_int: 6
   program_name: RT_FLOW
-  program_pid: ~
   program_raw: RT_FLOW
-  program_sub: ~
   time: 03:38:26
   tz: Z
   version: 1

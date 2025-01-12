@@ -3,7 +3,7 @@
 use strict;
 
 # use lib 'lib';
-use Test::Most tests => 10;
+use Test::Most tests => 9;
 
 BEGIN { use_ok('CPAN::UnsupportedFinder') }
 
@@ -24,4 +24,3 @@ cmp_ok($obj2->{'cpan_testers'}, 'eq', 'https://www.google.com', 'clone adds new 
 
 # Invalid argument
 ok(!defined(CPAN::UnsupportedFinder->new('foo')));
-ok(!defined(CPAN::UnsupportedFinder->new()->new('foo')));

@@ -1,7 +1,7 @@
 use strict;
 use Test::More;
 use Test::Number::Delta;
-use Astro::Constants::MKS qw/:long/;
+use Astro::Constants qw( :all );
 
 diag("Testing values from IAU 2009/2012 System of Astronomical Constants");
 

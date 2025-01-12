@@ -1,7 +1,7 @@
 use Test::More;
-use Astro::Constants::MKS qw/:long pretty precision/;
+use Astro::Constants qw( :all pretty precision );
 
-can_ok('Astro::Constants::MKS', qw/pretty precision/);
+can_ok('Astro::Constants', qw/pretty precision/);
 
 like( pretty(SPEED_LIGHT), qr/\d\.\d{2,5}([Ee][+-]?\d+)?$/, 'SPEED_LIGHT to 3 sig figs');
 like( pretty(BOLTZMANN), qr/\d\.\d{2,5}([Ee][+-]?\d+)?$/, 'BOLTZMANN to 3 sig figs');

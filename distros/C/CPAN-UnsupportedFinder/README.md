@@ -8,7 +8,7 @@ CPAN::UnsupportedFinder analyzes CPAN modules for test results and maintenance s
 
 # VERSION
 
-Version 0.05
+Version 0.06
 
 # SYNOPSIS
 
@@ -83,7 +83,7 @@ Nigel Horne <njh@bandsman.co.uk>
 
 # BUGS
 
-The cpantesters api, [https://api.cpantesters.org/](https://api.cpantesters.org/), is currently unavailable,
+The cpantesters API, [https://api.cpantesters.org/](https://api.cpantesters.org/), is currently unavailable,
 so the routine \_has\_recent\_tests() currently always returns 1.
 
 # LICENCE

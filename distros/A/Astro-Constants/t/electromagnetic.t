@@ -1,5 +1,5 @@
 use Test::More;
-use Astro::Constants::MKS qw/:electromagnetic/;
+use Astro::Constants qw( :electromagnetic );
 
 is(PERMEABL_FREE_SPACE, 1.25663706212e-06, 'PERMEABL_FREE_SPACE');
 is(ELECTRON_CHARGE, 1.602176634e-19, 'ELECTRON_CHARGE');

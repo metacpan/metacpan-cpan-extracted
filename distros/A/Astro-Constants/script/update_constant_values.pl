@@ -5,13 +5,13 @@
 #
 # hard coded to run from top directory and uses only data/PhysicalConstants.xml
 
-use strict;
+use v5.20; # postfix deref
 use autodie;
-use Modern::Perl;
-use XML::LibXML;
+use FindBin qw($Bin);
+use HTML::Parser;
 use LWP::Simple;
 use List::Util qw/shuffle/;
-use HTML::Parser;
+use XML::LibXML;
 
 #die "Usage: $0 infile outfile" unless @ARGV == 1;
 
@@ -22,7 +22,7 @@ my $SLEEP = 0;
 my ($n, @values_parsed, @uncertainties_parsed, );
 my ($td_flag, $font_flag, $text_flag, $uncertainty_flag) = 0;
 
-my $xml = XML::LibXML->load_xml(location => 'data/PhysicalConstants.xml');
+my $xml = XML::LibXML->load_xml(location => "$Bin/../data/PhysicalConstants.xml");
 my $nist_parser = HTML::Parser->new(
 	start_h => [\&start_nist, "self, tagname, attr"],
 	end_h => [\&end_nist, "tagname, attr"],

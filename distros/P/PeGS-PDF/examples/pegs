@@ -1,0 +1,31 @@
+#!/usr/local/bin/perl
+
+use PeGS::PDF;
+
+my $W    = 4.25 * 72;
+my $H    = 5.5  * 72;
+
+my $pdf = PeGS::PDF->new(
+	{
+	file => "/Users/brian/Desktop/mypdffile.pdf",
+	x    => $W,
+	'y'  => $H,
+	}
+	);
+die "Could not create object!" unless ref $pdf;
+
+$pdf->text( 10, 10, "W is $W, H is $H, " . scalar localtime );
+
+my $foo = 'Buster';
+$pdf->make_scalar( '$foo', \$foo, 10, 60 );
+
+$pdf->make_array( '@foo', [ map { 'a' x rand(15) } 0 .. 4 ], 100, 150 );
+
+$pdf->make_hash( '%foo', { map {$_, $_ x 5 } 'a' .. 'd' }, 10, 300 );
+
+$pdf->make_reference( '$ref', \$foo, 200, 250 );
+
+$pdf->make_magic_circle( 175, 225, 10 );
+#$pdf->rectangle( 165, 215, 20, 20 );
+
+$pdf->close;

@@ -52,6 +52,6 @@
          "web" : "https://github.com/briandfoy/surveyor-app"
       }
    },
-   "version" : "0.124",
+   "version" : "0.125",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

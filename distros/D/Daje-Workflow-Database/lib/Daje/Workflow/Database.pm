@@ -40,7 +40,7 @@ use Mojo::Loader qw(load_class);
 # janeskil1525 E<lt>janeskil1525@gmail.comE<gt>
 #
 
-our $VERSION = "0.13";
+our $VERSION = "0.14";
 
 has 'pg';
 has 'migrations';
@@ -130,6 +130,19 @@ DROP INDEX idx_unique_context_workflow_fkey;
 CREATE INDEX IF NOT EXISTS idx_context_workflow_fkey
     ON context(workflow_fkey);
 
+-- 3 up
+ALTER TABLE history
+    ADD COLUMN internal BIGINT NOT NULL DEFAULT 0;
+
+ALTER TABLE history
+    ADD COLUMN class VARCHAR NOT NULL DEFAULT '';
+
+-- 3 down
+ALTER TABLE history
+    DROP COLUMN internal;
+
+ALTER TABLE history
+    DROP COLUMN class;
 __END__
 
 

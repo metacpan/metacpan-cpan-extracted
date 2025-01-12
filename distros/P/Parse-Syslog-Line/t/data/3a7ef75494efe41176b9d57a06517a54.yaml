@@ -10,19 +10,12 @@ expected:
   datetime_utc: 2015-09-30T11:26:06.779373Z
   domain: ~
   epoch: 1443612366.779373
-  facility: ~
-  facility_int: ~
   host: my-host
   host_raw: my-host
   message: 'my-script.pl: {"lunchTime":1443612366.442}'
   message_raw: '2015-09-30T06:26:06.779373-05:00 my-host my-script.pl: {"lunchTime":1443612366.442}'
-  preamble: ~
-  priority: ~
-  priority_int: ~
   program_name: my-script.pl
-  program_pid: ~
   program_raw: my-script.pl
-  program_sub: ~
   time: 06:26:06.779373
   tz: -0500
 name: AutoDetectJSON

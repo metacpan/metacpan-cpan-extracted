@@ -1,6 +1,6 @@
 package Astro::Constants::CGS;
 # ABSTRACT: This library provides physical constants for use in Physics and Astronomy based on values from 2018 CODATA.
-$Astro::Constants::CGS::VERSION = '0.1401';
+$Astro::Constants::CGS::VERSION = '0.14051';
 use 5.006;
 use strict;
 use warnings;
@@ -269,7 +269,7 @@ Astro::Constants::CGS - This library provides physical constants for use in Phys
 
 =head1 VERSION
 
-version 0.1401
+version 0.14051
 
 =head1 NOTICE OF DEPRECATION
 
@@ -283,7 +283,7 @@ Boyd Duffee <duffee@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Boyd Duffee.
+This software is copyright (c) 2024 by Boyd Duffee.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

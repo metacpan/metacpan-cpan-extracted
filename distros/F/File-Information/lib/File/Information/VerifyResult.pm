@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2024-2025 Löwenfelsen UG (haftungsbeschränkt)
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -17,7 +17,7 @@ use Carp;
 
 use File::Information::VerifyTestResult;
 
-our $VERSION = v0.04;
+our $VERSION = v0.05;
 
 # ----------------
 
@@ -31,7 +31,7 @@ sub _new {
     $self->{tests} = \%tests;
 
     foreach my $name (File::Information::VerifyTestResult->_supported_tests) {
-        my $res = File::Information::VerifyTestResult->_new(test => $name, %opts{'instance', 'base', 'extractor', 'db', 'lifecycle_from', 'lifecycle_to'});
+        my $res = File::Information::VerifyTestResult->_new(test => $name, %opts{'instance', 'base', 'base_from', 'base_to', 'extractor', 'db', 'lifecycle_from', 'lifecycle_to'});
         my $class = $res->can('_class') ? $res->_class : $res->isa(__PACKAGE__) ? File::Information::VerifyTestResult->CLASS_STRONG : File::Information::VerifyTestResult->CLASS_WEAK;
         $tests{$name} = $res;
 
@@ -66,7 +66,7 @@ File::Information::VerifyResult - generic module for extracting information from
 
 =head1 VERSION
 
-version v0.04
+version v0.05
 
 =head1 SYNOPSIS
 
@@ -88,7 +88,7 @@ Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2024-2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
 
 This is free software, licensed under:
 

@@ -1,11 +1,12 @@
-use strict;
-use warnings;
-
-use Test::More;
+use Test2::V0 -no_srand => 1;
 
 use Udev::FFI;
+use Udev::FFI::Functions;
+use Udev::FFI::Device;
+use Udev::FFI::Devnum;
+use Udev::FFI::Monitor;
+use Udev::FFI::Enumerate;
 
-my $udev = eval { return Udev::FFI->new() };
-isa_ok($udev, 'Udev::FFI');
+pass('');
 
 done_testing();

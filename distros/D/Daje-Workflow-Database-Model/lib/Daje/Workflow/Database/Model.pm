@@ -3,6 +3,7 @@ use Mojo::Base -base, -signatures;
 
 use Daje::Workflow::Database::Model::Workflow;
 use Daje::Workflow::Database::Model::Context;
+use Daje::Workflow::Database::Model::History;
 
 # NAME
 # ====
@@ -25,13 +26,11 @@ use Daje::Workflow::Database::Model::Context;
 #
 #     my $context = $self->context();
 #
+#     $data->insert_history("History");
+#
 #
 # REQUIRES
 # ========
-#
-# Daje::Workflow::Database::Model::Context
-#
-# Daje::Workflow::Database::Model::Workflow
 #
 # Mojo::Base
 #
@@ -49,6 +48,7 @@ use Daje::Workflow::Database::Model::Context;
 #
 #  save_workflow($self, $workflow)
 #
+#  insert_history($self, $history_text, $class = " ", $internal =  1)
 #
 # LICENSE
 # =======
@@ -64,7 +64,7 @@ use Daje::Workflow::Database::Model::Context;
 # janeskil1525 E<lt>janeskil1525@gmail.comE<gt>
 #
 
-our $VERSION = "0.09";
+our $VERSION = "0.14";
 
 has 'db';               # Constructor
 has 'workflow_pkey';    # Constructor
@@ -114,17 +114,25 @@ sub load_context($self) {
     return;
 }
 
-sub save_context($self) {
+sub save_context($self, $context) {
     Daje::Workflow::Database::Model::Context->new(
         db              => $self->db,
         workflow_pkey   => $self->workflow_pkey,
     )->save(
-        $self->context
+        $context
     );
+    $self->context($context);
     return ;
 }
 
-sub insert_history($self, $history) {
+sub insert_history($self, $history_text, $class = " ", $internal =  1) {
+    return unless defined $history_text and length($history_text) > 0;
+
+    my $history->{workflow_fkey} = $self->workflow_pkey();
+    $history->{history} = $history_text;
+    $history->{class} = $class;
+    $history->{internal} = $internal;
+
     Daje::Workflow::Database::Model::History->new(
         db => $self->db
     )->insert(
@@ -134,6 +142,7 @@ sub insert_history($self, $history) {
 
 1;
 __END__
+
 
 
 
@@ -166,15 +175,13 @@ Daje::Workflow::Database::Model - is the data models used by Daje-Workflow
 
     my $context = $self->context();
 
+    $data->insert_history("History");
+
 
 
 
 =head1 REQUIRES
 
-
-Daje::Workflow::Database::Model::Context
-
-Daje::Workflow::Database::Model::Workflow
 
 Mojo::Base
 
@@ -194,6 +201,7 @@ Mojo::Base
 
  save_workflow($self, $workflow)
 
+ insert_history($self, $history_text, $class = " ", $internal =  1)
 
 
 

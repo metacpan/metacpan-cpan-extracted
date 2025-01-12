@@ -54,7 +54,7 @@ use Daje::Config;
 has 'workflow';
 has 'path';
 
-our $VERSION = "0.06";
+our $VERSION = "0.07";
 
 # Load the data into the object
 sub load($self) {

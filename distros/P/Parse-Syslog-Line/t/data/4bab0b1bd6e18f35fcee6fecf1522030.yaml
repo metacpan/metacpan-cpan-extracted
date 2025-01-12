@@ -18,9 +18,7 @@ expected:
   priority: info
   priority_int: 6
   program_name: logger
-  program_pid: ~
   program_raw: info logger
-  program_sub: ~
   time: 10:55:37
   tz: Z
 name: F5 includes level

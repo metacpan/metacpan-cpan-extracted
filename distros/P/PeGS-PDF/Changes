@@ -1,0 +1,14 @@
+Revision history for Perl module Pegs::PDF
+
+0.103 2025-01-11T11:49:07Z
+	* this used to be under BDFOY, then I think I deleted it maybe.
+	Now I'm moving it to BRIANDFOY.
+	* The module is barely useable, but I used it to make diagrams
+	for Effective Perl Programming
+
+0.101_01 2018-06-16T17:31:22Z
+	* Change to Artistic License 2.0.
+
+0.10_02 - 2014-03-11
+	* Get rid of Module::Build. Other minor updates.
+

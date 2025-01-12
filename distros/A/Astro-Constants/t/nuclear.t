@@ -1,5 +1,5 @@
 use Test::More;
-use Astro::Constants::MKS qw/:nuclear precision/;
+use Astro::Constants qw( :nuclear precision );
 
 	unlike(SPEED_LIGHT, qr/\d/, "Shouldn't import SPEED_LIGHT with :nuclear");
 	unlike(JANSKY, qr/\d/, "Shouldn't import JANSKY with :nuclear");

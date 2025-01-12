@@ -1,0 +1,32 @@
+#!/usr/bin/env perl
+
+# Prints all of my unsupported modules on CPAN
+
+use strict;
+use warnings;
+
+use CPAN::UnsupportedFinder;
+use LWP::Simple::WithCache;
+
+my $content = LWP::Simple::WithCache::get('http://www.cpan.org/modules/02packages.details.txt');
+
+die unless defined($content);
+
+my $in_header = 1;
+my $finder = CPAN::UnsupportedFinder->new(verbose => 0);
+
+# Process the content line by line
+foreach my $line (split /\n/, $content) {
+	if($line eq '') {
+		$in_header = 0;
+		next;
+	}
+	next if($in_header);
+	my @fields = split(/\s+/, $line);
+
+	next if($fields[2] !~ /N\/NH\/NHORNE\//);
+
+	my $results = $finder->analyze($fields[0]);
+
+	print $finder->output_results($results) if(scalar(@{$results}));
+}

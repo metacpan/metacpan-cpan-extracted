@@ -6,8 +6,6 @@ META.json
 MYMETA.json
 MYMETA.yml
 README.md
-conf/database.json
-conf/generate.json
 cpanfile
 lib/Daje/Workflow/Loader.pm
 minil.toml

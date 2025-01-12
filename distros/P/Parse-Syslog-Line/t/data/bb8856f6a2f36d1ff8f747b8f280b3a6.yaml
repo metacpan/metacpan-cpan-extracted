@@ -19,9 +19,7 @@ expected:
   priority: notice
   priority_int: 5
   program_name: '%CRYPTO-5-IPSEC_SETUP_FAILURE'
-  program_pid: ~
   program_raw: '%CRYPTO-5-IPSEC_SETUP_FAILURE'
-  program_sub: ~
   time: 19:12:19
   tz: Z
 name: Cisco Date Insanity

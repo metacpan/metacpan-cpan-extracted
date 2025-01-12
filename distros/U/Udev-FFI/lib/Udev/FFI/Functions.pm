@@ -3,15 +3,11 @@ package Udev::FFI::Functions;
 use strict;
 use warnings;
 
-our (@ISA, @EXPORT_OK, %EXPORT_TAGS);
+use base qw(Exporter);
 
-require Exporter;
-@ISA = qw(Exporter);
-
-use FFI::Platypus;
+use File::Which ();
 use FFI::CheckLib;
-use File::Which;
-
+use FFI::Platypus;
 
 use constant {
     UDEVADM_LOCATIONS => [
@@ -19,8 +15,6 @@ use constant {
         '/sbin/udevadm'
     ]
 };
-
-
 
 my $FUNCTIONS = {
     # struct udev *udev_new(void);
@@ -396,9 +390,9 @@ my $FUNCTIONS = {
 
 
 
-@EXPORT_OK = keys(%$FUNCTIONS);
+our @EXPORT_OK = keys(%$FUNCTIONS);
 
-%EXPORT_TAGS = (
+our %EXPORT_TAGS = (
     'all' => \@EXPORT_OK
 );
 
@@ -408,12 +402,13 @@ my $init = 0;
 
 
 sub udev_version {
-    my $full_path = which('udevadm');
+    my $full_path = File::Which::which('udevadm');
 
     unless (defined($full_path)) {
-        for (@{ +UDEVADM_LOCATIONS }) {
+        for (@{ UDEVADM_LOCATIONS() }) {
             if (-f) {
                 $full_path = $_;
+
                 last;
             }
         }
@@ -421,9 +416,9 @@ sub udev_version {
 
     unless (defined($full_path)) {
         $@ = "Can't find `udevadm` utility";
+
         return undef;
     }
-
 
     {
         local $SIG{__WARN__} = sub {}; # silence shell output if error
@@ -437,11 +432,13 @@ sub udev_version {
             }
 
             $@ = "Can't get udev version from `udevadm` utility";
+
             return undef;
         }
     }
 
     $@ = "Can't run `udevadm` utility";
+
     return undef;
 }
 
@@ -451,7 +448,7 @@ my $_function_not_attach = sub {
     my $udev_version = udev_version();
 
     die("function '".$_[0]."' not attached from udev library\n`udevadm` ".
-        "version: ".(defined($udev_version) ?$udev_version :'unknown')."\n");
+        "version: ".(defined($udev_version) ? $udev_version : 'unknown')."\n");
 };
 
 

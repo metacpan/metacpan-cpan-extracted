@@ -3,35 +3,26 @@ package Udev::FFI::Devnum;
 use strict;
 use warnings;
 
-our (@ISA, @EXPORT_OK, %EXPORT_TAGS);
+use base qw(Exporter);
 
-require Exporter;
-@ISA = qw(Exporter);
+our @EXPORT_OK = qw(major minor makedev);
 
-@EXPORT_OK = qw(major minor makedev);
-
-%EXPORT_TAGS = (
+our %EXPORT_TAGS = (
     'all' => \@EXPORT_OK
 );
-
-
 
 sub major {
     (($_[0]>>32)&0xFFFFF000) | (($_[0]>>8)&0x0FFF);
 }
 
-
 sub minor {
     (($_[0]>>12)&0xFFFFFF00) | ($_[0]&0xFF);
 }
-
 
 sub makedev {
     (($_[0]&0xFFFFF000)<<32) | (($_[0]&0x0FFF)<<8) |
         (($_[1]&0xFFFFFF00)<<12) | ($_[1]&0xFF);
 }
-
-
 
 1;
 

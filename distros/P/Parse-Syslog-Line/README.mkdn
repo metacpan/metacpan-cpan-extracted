@@ -4,7 +4,7 @@ Parse::Syslog::Line - Simple syslog line parser
 
 # VERSION
 
-version 6.0
+version 6.1
 
 # SYNOPSIS
 
@@ -251,14 +251,6 @@ The changes to the API and fields returned are as follows:
     - `NormalizeToUTC` is **deprecated**, every log now returns `datetime_utc`
     - `OutputTimeZone` is **deprecated**, use `TimeMomentFormatString`
 - **Field Changes**
-    - `date_raw`
-
-        **Removed** from the fields returned, use `datetime_raw`.
-
-    - `datetime_obj`
-
-        **Removed** from the fields returned as we dropped support for [DateTime](https://metacpan.org/pod/DateTime).
-
     - `datetime_utc`
 
         Present in every document, use this for portability.
@@ -454,6 +446,10 @@ line in the stream that starts with non-whitespace.  Any lines beginning with
 whitespace will be assumed to be a continuation of the previous line.
 
 It is not exported by default.
+
+## psl\_enable\_sdata
+
+Call this to turn on all the Structured Data Parsing Options
 
 ## preamble\_priority
 

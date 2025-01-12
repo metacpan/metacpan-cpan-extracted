@@ -1,9 +1,53 @@
 ==================================================
-Changes from 2022-11-29 00:00:00 +0000 to present.
+Changes from 2023-01-13 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 6.0 at 2024-11-28 01:13:56 +0000
+version 6.1 at 2025-01-12 00:55:29 +0000
+----------------------------------------
+
+  Change: 81cdc83eeb1014dfd3d143355ec65a20b7240890
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2025-01-11 16:54:41 +0000
+
+    Make SDATA cumulative and improve performance
+
+    Each `SDATA` extractor will add to the SDATA hash, instead of having the
+    "last" collector win. This shouldn't affect much, but would allow for logs
+    containing JSON and lazy K/V pairs to expose both via SDATA.
+
+    The order of the SDATA collectors determines precedence. The highest
+    priority is RFC5424 Structured Data, followed by JSON, followed by "lazy"
+    K/V data.
+
+    Also: * Bump everything to `use v5.16` as that's the minimum Perl version *
+    Add KV and JSON detection to the benchmark script for flame graphs on those
+    parts * Fix cpanfile generation * Fix Github actions * Add
+    `normalize_test_result()` function for handling elements in the
+
+    results that might change based on the environment * Remove named captures.
+    Named captures do make things more readable,
+
+    but they are dramatically slower. Removing these from the library has
+
+    increased the parse speed significantly. * Add `psl_enable_sdata()`
+    function to adjust enable full structured
+
+    data parse mode. * Don't create the empty hash as the copy takes more time
+    than not
+
+    reallocating it. Adjust tests to remove the empty keys. 
+
+  Change: 43f3f7976a945434667b53c58df369fc2214826c
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2025-01-10 21:49:50 +0000
+
+    Fallback to KV detection if JSON decoding fails
+
+    * Added a test for non-JSON curly braces 
+
+----------------------------------------
+version 6.0 at 2024-11-28 01:08:19 +0000
 ----------------------------------------
 
   Change: 03feb42143a10130f5ba401d481459fb1452e75f
@@ -294,5 +338,5 @@ version 5.1 at 2024-05-24 18:17:59 +0000
     Attempt to enable GitHub Actions to run the test suite. 
 
 =================================================
-Plus 39 releases after 2022-11-29 00:00:00 +0000.
+Plus 39 releases after 2023-01-13 00:00:00 +0000.
 =================================================

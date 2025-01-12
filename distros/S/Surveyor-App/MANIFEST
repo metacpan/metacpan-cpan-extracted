@@ -9,6 +9,7 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README.pod
 scripts/survey
+SECURITY.md
 t/load.t
 t/pod.t
 t/pod_coverage.t

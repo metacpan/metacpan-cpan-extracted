@@ -1,0 +1,24 @@
+#!/usr/local/bin/perl
+
+use PeGS::PDF;
+
+my $W    = 3.25 * 72;
+my $H    = 7.25  * 72;
+
+my $pdf = PeGS::PDF->new(
+	{
+	file => "/Users/brian/Desktop/reference.pdf",
+	'x'  => $W,
+	'y'  => $H,
+	}
+	);
+die "Could not create object!" unless ref $pdf;
+
+
+my $array = [ qw( Mimi Buster Ginger Ella ) ];
+my $big_array = [ $array, $array ];
+
+$pdf->make_array( '$big_array', $big_array, 10, 330 );
+
+
+$pdf->close;

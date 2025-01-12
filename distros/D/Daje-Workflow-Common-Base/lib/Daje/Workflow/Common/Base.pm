@@ -26,7 +26,7 @@ use Mojo::Base -base, -signatures;
 # janeskil1525 E<lt>janeskil1525@gmail.comE<gt>
 #
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
 
 

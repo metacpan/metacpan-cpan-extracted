@@ -1,6 +1,6 @@
 package test::Data;
 
-use strict;
+use v5.16;
 use warnings;
 
 use Exporter;
@@ -11,17 +11,19 @@ use Storable qw(dclone);
 use YAML::XS ();
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(get_test_data);
-our @EXPORT_OK = qw(get_test_data);
+our @EXPORT = qw(get_test_data normalize_test_result);
+our @EXPORT_OK = qw(get_test_data normalize_test_result);
 our %EXPORT_TAGS = ();
 
+my @DELETE_KEYS = qw( datetime_obj );
 my %TESTS;
 
 sub _load_tests {
+    my ($path) = @_;
     return if %TESTS;
 
     my $has_json = eval { load 'JSON::MaybeXS'; 1; };
-    my $bin      = path("$FindBin::Bin");
+    my $bin      = path($path || "$FindBin::Bin");
     my $parent   = $bin->parent();
     my $dir      = $parent->child(t => 'data');
 
@@ -49,6 +51,7 @@ sub _load_tests {
                 local $_ = $test->{$check};
                 die "Validating $check failed!" unless $checks{$check}->();
             }
+            $test->{expected} = normalize_test_result($test->{expected});
             $TESTS{$name} = $test;
             1;
         } or do {
@@ -62,8 +65,20 @@ sub _load_tests {
 }
 
 sub get_test_data {
-    _load_tests();
+    _load_tests(@_);
     return dclone(\%TESTS);
+}
+
+sub normalize_test_result {
+    my ($doc) = @_;
+
+    # Remove some items
+    delete $doc->{$_} for @DELETE_KEYS;
+
+    # Trim the JSON Error
+    $doc->{_json_error} =~ s{\s+at\s+\S+\s+line\s+\d+\.$}{} if $doc->{_json_error};
+
+    return $doc;
 }
 
 1;

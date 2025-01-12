@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2024-2025 Löwenfelsen UG (haftungsbeschränkt)
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -15,7 +15,7 @@ use parent 'File::Information::VerifyBase';
 
 use Carp;
 
-our $VERSION = v0.04;
+our $VERSION = v0.05;
 
 use constant {
     CLASS_METADATA  => 'meatdata',
@@ -84,8 +84,8 @@ sub _class {
 
 sub _test_get {
     my ($self, $test) = @_;
-    my $from = $self->base->get($test->{key}, lifecycle => $self->{lifecycle_from}, default => undef, as => 'raw');
-    my $to   = $self->base->get($test->{key}, lifecycle => $self->{lifecycle_to},   default => undef, as => 'raw');
+    my $from = $self->base_from->get($test->{key}, lifecycle => $self->{lifecycle_from}, default => undef, as => 'raw');
+    my $to   = $self->base_to->get($test->{key}, lifecycle => $self->{lifecycle_to},   default => undef, as => 'raw');
 
     #warn sprintf('key=<%s>, %s -> %s: from=<%s>, to=<%s>', $test->{key}, $self->{lifecycle_from}, $self->{lifecycle_to}, $from // '', $to // '');
 
@@ -95,8 +95,8 @@ sub _test_get {
 
 sub _test_digest {
     my ($self, $test) = @_;
-    my $from = $self->base->digest($test->{digest}, lifecycle => $self->{lifecycle_from}, default => undef, as => 'hex');
-    my $to   = $self->base->digest($test->{digest}, lifecycle => $self->{lifecycle_to},   default => undef, as => 'hex');
+    my $from = $self->base_from->digest($test->{digest}, lifecycle => $self->{lifecycle_from}, default => undef, as => 'hex');
+    my $to   = $self->base_to->digest($test->{digest}, lifecycle => $self->{lifecycle_to},   default => undef, as => 'hex');
 
     return $self->STATUS_NO_DATA unless defined($from) && defined($to);
     #warn sprintf('key=<%s>, %s -> %s: from=<%s>, to=<%s>', $test->{digest}, $self->{lifecycle_from}, $self->{lifecycle_to}, $from // '', $to // '');
@@ -105,8 +105,15 @@ sub _test_digest {
 
 sub _test_inode {
     my ($self, $test) = @_;
-    if ($self->base->can('inode')) {
-        return $self->base->inode->verify(lifecycle_from => $self->{lifecycle_from}, lifecycle_to => $self->{lifecycle_to});
+    my $base_from  = $self->base_from;
+    my $base_to    = $self->base_to;
+    my $inode_from = $base_from->can('inode') ? $base_from->inode : $base_from->isa('File::Information::Remote') ? $base_from : undef;
+    my $inode_to   = $base_to->can('inode')   ? $base_to->inode   : $base_to->isa('File::Information::Remote')   ? $base_to   : undef;
+
+    if (defined($inode_from) && defined($inode_to)) {
+        if ($base_from != $inode_from || $base_to != $inode_to) {
+            return $inode_from->verify(lifecycle_from => $self->{lifecycle_from}, lifecycle_to => $self->{lifecycle_to}, base_to => $inode_to);
+        }
     }
     return $self->STATUS_NO_DATA;
 }
@@ -125,7 +132,7 @@ File::Information::VerifyTestResult - generic module for extracting information 
 
 =head1 VERSION
 
-version v0.04
+version v0.05
 
 =head1 SYNOPSIS
 
@@ -147,7 +154,7 @@ Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2024-2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
 
 This is free software, licensed under:
 

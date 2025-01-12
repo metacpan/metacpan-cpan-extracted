@@ -1,15 +1,13 @@
 requires 'perl', '5.008001';
 
-requires 'FFI::Platypus';
-requires 'FFI::CheckLib';
 requires 'File::Which';
-
+requires 'FFI::CheckLib';
+requires 'FFI::Platypus';
 
 on 'configure' => sub {
     requires 'FFI::CheckLib';
 };
 
-
 on 'test' => sub {
-    requires 'Test::More', '0.98';
+    requires 'Test2', '>= 1.302207';
 };

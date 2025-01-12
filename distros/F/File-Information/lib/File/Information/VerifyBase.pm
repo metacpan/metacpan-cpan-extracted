@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2024-2025 Löwenfelsen UG (haftungsbeschränkt)
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -13,7 +13,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = v0.04;
+our $VERSION = v0.05;
 
 use constant {
     STATUS_ERROR                => 'error',
@@ -67,6 +67,20 @@ sub base {
 }
 
 
+#@returns File::Information::Base
+sub base_from {
+    my ($self) = @_;
+    return $self->{base_from} // $self->{base};
+}
+
+
+#@returns File::Information::Base
+sub base_to {
+    my ($self) = @_;
+    return $self->{base_to} // $self->{base};
+}
+
+
 #@returns File::Information
 sub instance {
     my ($self) = @_;
@@ -96,7 +110,8 @@ sub _new {
     $self->{lifecycle_to}   //= 'final';
 
     croak 'No instance is given' unless defined $self->{instance};
-    croak 'No base is given' unless defined $self->{base};
+    croak 'No base_from is given' unless defined($self->{base_from}) || defined($self->{base});
+    croak 'No base_to is given' unless defined($self->{base_to}) || defined($self->{base});
     croak 'No lifecycle_from is given' unless defined $self->{lifecycle_from};
     croak 'No lifecycle_to is given' unless defined $self->{lifecycle_to};
 
@@ -117,7 +132,7 @@ File::Information::VerifyBase - generic module for extracting information from f
 
 =head1 VERSION
 
-version v0.04
+version v0.05
 
 =head1 SYNOPSIS
 
@@ -188,6 +203,31 @@ The parts that have been performed did not fail.
 
 Returns the base that was used to create this object.
 
+B<Note:>
+This method is deprecated and will be removed in future versions.
+
+See also
+L</base_from>,
+L</base_to>.
+
+=head2 base_from
+
+    my File::Information::Base $base = $obj->base_from;
+
+Returns the base object used for the I<from> side of the verify.
+
+See also
+L</base_to>.
+
+=head2 base_to
+
+    my File::Information::Base $base = $obj->base_from;
+
+Returns the base object used for the I<to> side of the verify.
+
+See also
+L</base_from>.
+
 =head2 instance
 
     my File::Information $instance = $obj->instance;
@@ -212,7 +252,7 @@ Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2024-2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
 
 This is free software, licensed under:
 

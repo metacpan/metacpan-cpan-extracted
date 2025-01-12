@@ -1,0 +1,28 @@
+Changes
+examples/array
+examples/array-of-hashes
+examples/figure-6-1
+examples/figure-6-2
+examples/hash
+examples/hash_ref
+examples/pegs
+examples/placeholder.pl
+examples/reference
+examples/scalar
+examples/two_refs
+INSTALL.SKIP
+lib/PeGS/PDF.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.pod
+SECURITY.md
+t/load.t
+t/new.t
+t/pod.t
+t/pod_coverage.t
+t/test_manifest
+t/xypoint.t
+xt/changes.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

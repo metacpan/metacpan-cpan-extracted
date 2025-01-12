@@ -28,7 +28,7 @@ provides:
     file: lib/Daje/Workflow/Common/Activity/Base.pm
   Daje::Workflow::Common::Base:
     file: lib/Daje/Workflow/Common/Base.pm
-    version: '0.02'
+    version: '0.03'
   Daje::Workflow::Common::Checks::Base:
     file: lib/Daje/Workflow/Common/Checks/Base.pm
 requires:
@@ -37,6 +37,6 @@ resources:
   bugtracker: https://github.com/janeskil1525/Daje-Workflow-Common-Base/issues
   homepage: https://github.com/janeskil1525/Daje-Workflow-Common-Base
   repository: https://github.com/janeskil1525/Daje-Workflow-Common-Base.git
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

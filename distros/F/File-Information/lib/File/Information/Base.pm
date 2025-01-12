@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2024-2025 Löwenfelsen UG (haftungsbeschränkt)
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -22,7 +22,7 @@ use constant { # Taken from Data::Identifier
     WK_FINAL    => 'f418cdb9-64a7-4f15-9a18-63f7755c5b47',
 };
 
-our $VERSION = v0.04;
+our $VERSION = v0.05;
 
 our %_digest_name_converter = ( # stolen from Data::URIID::Result
     fc('md5')   => 'md-5-128',
@@ -34,6 +34,13 @@ our %_digest_name_converter = ( # stolen from Data::URIID::Result
         fc('sha-'.$_)  => 'sha-2-'.$_,
         fc('sha3-'.$_) => 'sha-3-'.$_,
         } qw(224 256 384 512)),
+);
+
+our %_digest_info_extra = (
+    'md-5-128'  => {rfc9530 => 'md5'},
+    'sha-1-160' => {rfc9530 => 'sha'},
+    'sha-2-256' => {rfc9530 => 'sha-256'},
+    'sha-2-512' => {rfc9530 => 'sha-512'},
 );
 
 our %_mediatypes = ( # Copied from tags-universal
@@ -101,7 +108,7 @@ my %_properties = (
     uuid        => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_uuid tagpool_directory_setting_tag uuid(xattr_utag_ise) uuid(db_inode_tag) :self dev_disk_by_uuid tagpool_pool_uuid)], rawtype => 'uuid'},
     oid         => {loader => \&_load_aggregate, sources => [qw(::Inode oid(xattr_utag_ise) oid(db_inode_tag))], rawtype => 'oid'},
     uri         => {loader => \&_load_aggregate, sources => [qw(::Inode uri(xattr_utag_ise) uri(db_inode_tag))], rawtype => 'uri'},
-    ise         => {loader => \&_load_aggregate, sources => [qw(:self uuid oid uri ::Inode xattr_utag_ise)], rawtype => 'ise'},
+    ise         => {loader => \&_load_aggregate, sources => [qw(:self uuid oid uri ::Inode xattr_utag_ise ::Base data_uriid_ise)], rawtype => 'ise'},
     inodeise    => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_uuid tagpool_directory_setting_tag xattr_utag_ise db_inode_tag)], rawtype => 'ise'},
     contentise  => {loader => \&_load_aggregate, sources => [qw(::Inode content_sha_1_160_sha_3_512_uuid content_sha_3_512_uuid)], rawtype => 'ise'},
 
@@ -109,18 +116,22 @@ my %_properties = (
     title       => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_title        tagpool_directory_title         xattr_dublincore_title dotcomments_caption)]},
     comment     => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_comment      tagpool_directory_comment       xattr_xdg_comment      dotcomments_note)]},
     description => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_description  tagpool_directory_description   xattr_dublincore_description)]},
-    displayname => {loader => \&_load_aggregate, sources => [qw(:self   title link_basename_clean dev_disk_by_label dev_mapper_name dev_name)]},
-    mediatype   => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_mediatype xattr_utag_final_file_encoding magic_mediatype)], rawtype => 'mediatype'},
+    displayname => {loader => \&_load_aggregate, sources => [qw(:self   title link_basename_clean dev_disk_by_label dev_mapper_name dev_name data_uriid_attr_displayname)]},
+    mediatype   => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_mediatype xattr_utag_final_file_encoding magic_mediatype ::Base data_uriid_attr_media_subtype)], rawtype => 'mediatype'},
     writemode   => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_write_mode xattr_utag_write_mode)], rawtype => 'ise'},
 
     thumbnail   => {loader => \&_load_aggregate, sources => [qw(::Link link_thumbnail ::Inode tagpool_file_thumbnail)], rawtype => 'filename'},
     finalmode   => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_finalmode xattr_utag_final_mode)], rawtype => 'ise'},
+    hidden      => {loader => \&_load_aggregate, sources => [qw(::Link link_dotfile ::Inode ntfs_file_attribute_hidden)], rawtype => 'bool', towards => 1},
+    system      => {loader => \&_load_aggregate, sources => [qw(::Inode ntfs_file_attribute_system)], rawtype => 'bool', towards => 1},
     readonly    => {loader => \&_load_readonly, rawtype => 'bool'},
 
     fetchurl    => {loader => \&_load_aggregate, sources => [qw(:self tagpool_file_original_url xattr_xdg_origin_url zonetransfer_hosturl)]},
 
     # TODO: displaycolour icontext charset (hash) (mediatype / encoding)
 );
+
+my @_digest_preload_properties = qw(xattr_utag_final_file_hash xattr_utag_final_file_size tagpool_file_size);
 
 sub _new {
     my ($pkg, %opts) = @_;
@@ -154,12 +165,55 @@ sub get {
     $pv = $pv->{$lifecycle} //= {};
 
     # load the value if needed.
-    if ((!defined($pv->{$key}) || !scalar(%{$pv->{$key}})) && defined(my $loader = $info->{loader})) {
+    if ((!defined($pv->{$key}) || (ref($pv->{$key}) eq 'HASH' && !scalar(%{$pv->{$key}}))) && defined(my $loader = $info->{loader})) {
         $loader = $self->can($loader) unless ref $loader;
-        $self->$loader($key, %opts);
+        $self->$loader($key, %opts, list => undef);
     }
 
     $v = $pv->{$key} //= {};
+
+    if ($opts{list}) {
+        my $default = delete $opts{default};
+
+        delete $opts{list};
+
+        if (ref($v) eq 'ARRAY') {
+            my @list;
+            my $error;
+
+            foreach my $entry (@{$v}) {
+                local $pv->{$key} = $entry;
+                my $val = $self->get($key, %opts, default => undef);
+
+                if (defined $val) {
+                    push(@list, $val);
+                } else {
+                    $error = 1;
+                    last;
+                }
+            }
+
+            if ($error) {
+                return @{$default} if defined $default;
+                $v = {}; # handle like an empty entry.
+            } else {
+                return @list;
+            }
+        } else {
+            my $val = $self->get($key, %opts, default => undef);
+
+            #warn sprintf('key=%s, v=%s, val=%s, default=%s', $key, $v, $val // '<undef>', $default // '<undef>');
+            if (defined $val) {
+                return ($val);
+            } else {
+                return @{$default} if defined $default;
+                #confess 'Doof';
+                $v = {}; # handle like an empty entry.
+            }
+        }
+    } elsif (ref($v) eq 'ARRAY') {
+        $v = {}; # handle like an empty entry.
+    }
 
     # Try: Check if we have what we want.
     $res = $v->{$as};
@@ -245,14 +299,11 @@ sub get {
         $v->{$as} = $res if defined($res) && $as !~ /^IO::/; # Cache unless it is a file handle.
     }
 
-    # TODO: Add support for lists here:
-    $res = undef if ref($res) eq 'ARRAY';
-
     return $res if defined $res;
 
     return $opts{default} if exists $opts{default};
 
-    croak 'Cannot get value for key '.$key;
+    confess 'Cannot get value for key '.$key;
 }
 
 
@@ -296,6 +347,10 @@ sub digest {
     # Check utag name:
     if ($key !~ /^[a-z]+-[0-9]+-[1-9][0-9]*$/) {
         croak sprintf('Unknown digest format "%s"', $key);
+    }
+
+    foreach my $property (@_digest_preload_properties) {
+        eval {$self->get($property, lifecycle => $lifecycle)};
     }
 
     $value = $self->{digest}{$lifecycle}{$key};
@@ -356,7 +411,11 @@ sub digest {
         return MIME::Base64::encode(pack('H*', $value), '');
     } elsif ($as eq 'utag') {
         if (defined(my $size = $self->get('size', lifecycle => $lifecycle, default => undef))) {
-            return sprintf('v0 %s bytes 0-%u/%u %s', $key, $size - 1, $size, $value);
+            if ($size > 0) {
+                return sprintf('v0 %s bytes 0-%u/%u %s', $key, $size - 1, $size, $value);
+            } else {
+                return sprintf('v0 %s bytes 0-/%u %s', $key, $size, $value);
+            }
         }
 
         return sprintf('v0 %s bytes 0-/* %s', $key, $value);
@@ -375,7 +434,7 @@ sub digest {
 sub verify {
     my ($self, %opts) = @_;
     require File::Information::VerifyResult;
-    return File::Information::VerifyResult->_new(base => $self, instance => $self->instance, %opts{'lifecycle_from', 'lifecycle_to'});
+    return File::Information::VerifyResult->_new(base => $self, instance => $self->instance, %opts{'lifecycle_from', 'lifecycle_to', 'base_from', 'base_to'});
 }
 
 
@@ -449,14 +508,29 @@ sub _load_aggregate {
                 }
             }
 
-            $pv->{$key} = {raw => $value} if defined($value) && !ref($value) && $value =~ $re;
+            if (defined($value) && !ref($value) && $value =~ $re) {
+                if (defined($pv->{$key}) && defined($info->{towards})) {
+                    next if ($value xor $info->{towards});
+                }
+
+                $pv->{$key} = {raw => $value};
+            }
         } else {
+            my $value_ref;
+
             #warn sprintf('%s <- %s %s %s', $key, $current, $source, $opts{lifecycle});
             next unless defined $current->get($source, %opts, default => undef, as => 'raw');
-            $pv->{$key} = eval {$current->{properties_values}{$opts{lifecycle}}{$source}};
+
+            $value_ref = eval {$current->{properties_values}{$opts{lifecycle}}{$source}};
+
+            if (defined($value_ref) && defined($pv->{$key}) && defined($info->{towards})) {
+                next if ($value_ref->{raw} xor $info->{towards});
+            }
+
+            $pv->{$key} = $value_ref;
         }
 
-        last if defined($pv->{$key}) && scalar(keys %{$pv->{$key}});
+        last if !defined($info->{towards}) && defined($pv->{$key}) && scalar(keys %{$pv->{$key}});
     }
 }
 
@@ -502,7 +576,7 @@ File::Information::Base - generic module for extracting information from filesys
 
 =head1 VERSION
 
-version v0.04
+version v0.05
 
 =head1 SYNOPSIS
 
@@ -516,6 +590,8 @@ Common methods are documented in this file. Details (such as supported keys) are
 =head2 get
 
     my $value = $obj->get($key [, %opts]);
+    # or:
+    my @value = $obj->get($key [, %opts], list => 1);
 
 Get a value for a given key. The keys supported by this function depend on the module.
 Below you find a list with keys for aggregated values. Aggregated values are virtual and
@@ -549,6 +625,22 @@ from C<die>-ing when no value is available to returning C<undef>.
 The lifecycle to get the value for. The default is C<current>.
 See also L<File::Information/lifecycles>.
 
+=item C<list>
+
+B<Note:>
+This is B<experimental>. Exact semantics of this mode may change or it
+may be removed completly in later versions.
+
+Enables list support. In list mode this method returns an array of values.
+This can be used to access keys that hold multiple values.
+
+To access keys that hold multiple values his mode must be used.
+Currently the list mode can also be used on keys that only hole one value.
+Then a list of on element is returned.
+
+When this mode is used, C<default> must be an array reference.
+Most commonly it will be C<[]>.
+
 =back
 
 The following keys for B<aggregated values> are supported:
@@ -581,6 +673,16 @@ The final mode of the document. Normally this is unset,
 auto-final (meaning the document should become final once successfully verifies it's final state),
 or final (it reached it's final state).
 
+=item C<hidden>
+
+Hidden files are generally not shown to the user (unless specifically requested).
+This is most common for system files or files that hold state information
+(like temporary files).
+
+The exact meaning depend on the operating system, the filesystem, and the softwar interacting
+with them. On most UNIX like systems files with a filename starting with a dot are considered
+hidden (sometimes also called dot-files). On FAT lineage filesystems there is a special hidden attribute.
+
 =item C<inodeise>
 
 An ISE for the inode. All hardlinks share this ISE but (bit-perfect) copies do not.
@@ -601,6 +703,15 @@ The POD of the document.
 
 If the file is ready only. This is different from immutable files in that they still can be deleted (or other file attributes be changed).
 B<Note:> In the C<final> lifecycle all files are read only.
+
+=item C<system>
+
+If the file is a system file. The exact meaning system files depend on the operating system.
+Generally speaking a user should not write to or delete system files (directly).
+
+Configuration files are generally not considered system files (as they may be edited by the user).
+Filesystems may contain special files that are considered system files. For example some filesystems
+might expose a list of bad blocks as a special file.
 
 =item C<size>
 
@@ -719,6 +830,20 @@ The lifecycle to verify.
 
 The lifecycle to verify against/to compare to.
 
+=item C<base_from>
+
+The base object to compare (defaults to C<$obj>).
+
+B<Note:>
+This is an experimental option.
+
+=item C<base_to>
+
+The base object to compare (defaults to C<$obj>) against.
+
+B<Note:>
+This is an experimental option.
+
 =back
 
 =head2 uuid, oid, uri, ise, displayname, displaycolour, icontext, description
@@ -766,7 +891,7 @@ Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2024-2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
 
 This is free software, licensed under:
 

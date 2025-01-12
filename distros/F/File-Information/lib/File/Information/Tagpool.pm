@@ -20,7 +20,7 @@ use Scalar::Util qw(weaken);
 
 use File::Information::Lock;
 
-our $VERSION = v0.04;
+our $VERSION = v0.05;
 
 my $HAVE_FILE_VALUEFILE = eval {require File::ValueFile::Simple::Reader; require File::ValueFile::Simple::Writer; 1;};
 my $HAVE_UUID_TINY = eval {require UUID::Tiny; 1;};
@@ -369,7 +369,7 @@ File::Information::Tagpool - generic module for extracting information from file
 
 =head1 VERSION
 
-version v0.04
+version v0.05
 
 =head1 SYNOPSIS
 
@@ -479,7 +479,7 @@ Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2024-2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
 
 This is free software, licensed under:
 

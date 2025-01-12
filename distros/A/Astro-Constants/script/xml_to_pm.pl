@@ -5,49 +5,41 @@
 #
 # hard coded to run from top directory and uses only data/PhysicalConstants.xml
 
-use strict;
+use v5.20; # postfix deref
 use autodie;
-use Modern::Perl;
+use Getopt::Long;
+use Module::Util qw( module_path );
 use XML::LibXML;
 
 #die "Usage: $0 infile outfile" unless @ARGV == 1;
+my $datafile = 'data/PhysicalConstants.xml';
+my $module   = 'Constants.pm';
 
-my ($tagname, );
-my $dzil_methodtag = q{=method};
+my ($verbose, $tagname, @pod );
 
-my $xml = XML::LibXML->load_xml(location => 'data/PhysicalConstants.xml');
+GetOptions ("data=s" => \$datafile,
+            "name=s" => \$module,
+            "verbose"  => \$verbose)
+or die("Error in command line arguments\n");
+
+die 'Option "output" not working yet' unless $module eq 'Constants.pm'; # use File::Basename
+
+my $xml = XML::LibXML->load_xml(location => $datafile);
 
 my $lib = 'lib';	# where is the lib directory
 mkdir "$lib/Astro/Constants" unless -d "$lib/Astro/Constants";
 open my $ac_fh, '>:utf8', "$lib/Astro/Constants.pm";
-open my $mks_fh, '>:utf8', "$lib/Astro/Constants/MKS.pm";
-open my $cgs_fh, '>:utf8', "$lib/Astro/Constants/CGS.pm";
 
 write_module_header($ac_fh, 'Astro::Constants');
-write_module_header($mks_fh, 'Astro::Constants::MKS');
-write_module_header($cgs_fh, 'Astro::Constants::CGS');
 
 write_pod_synopsis($ac_fh);
 
 for my $constant ( $xml->getElementsByTagName('PhysicalConstant') ) {
-	my ($short_name, $long_name, $mks_value, $cgs_value, $values, $options, ) = undef;
+	my ($options, ) = undef;
 
-	for my $name ( $constant->getChildrenByTagName('name') ) {
-		$short_name = $name->textContent() if $name->getAttribute('type') eq 'short';
-		$long_name = $name->textContent() if $name->getAttribute('type') eq 'long';
-	}
-
+	my $name        = $constant->getChildrenByTagName('name')->shift()->textContent();
+	my $value       = $constant->getChildrenByTagName('value')->shift()->textContent();
 	my $description = $constant->getChildrenByTagName('description')->shift()->textContent();
-	for my $value ( $constant->getChildrenByTagName('value') ) {
-		if ( $value->hasAttribute('system') ) {
-			$values->{mks} = $value->textContent() if $value->getAttribute('system') eq 'MKS';
-			$values->{cgs} = $value->textContent() if $value->getAttribute('system') eq 'CGS';
-		}
-		else {
-			$values->{value} = $value->textContent();
-			next;
-		}
-	}
 
 	# recognise that there can be more than one alternateName
 	my $alternate = undef;
@@ -62,45 +54,37 @@ for my $constant ( $xml->getElementsByTagName('PhysicalConstant') ) {
 				push @{$tagname->{deprecated}}, $alternate;
 			}
 			else {
-				push @{$tagname->{long}}, $alternate;
+				push @{$tagname->{all}}, $alternate;
 			}
 			push @alternates, $alternate;
 
-			write_constant($mks_fh, ($values->{mks} || $values->{value}), $alternate) 
-				if $values->{mks} || $values->{value};
-			write_constant($cgs_fh, ($values->{cgs} || $values->{value}), $alternate) 
-				if $values->{cgs} || $values->{value};
+			write_constant($ac_fh, $value, $alternate) if $value;
 		}
 	}
 	$options->{deprecated} = 1 if $constant->getChildrenByTagName('deprecated');
 
 	#### write to the module files
-	write_method_pod($ac_fh, $long_name, $short_name, $description, $values, \@alternates);
-	write_constant($mks_fh, ($values->{mks} || $values->{value}), $long_name, $short_name, $options) 
-			if $values->{mks} || $values->{value};
-	write_constant($cgs_fh, ($values->{cgs} || $values->{value}), $long_name, $short_name) 
-			if $values->{cgs} || $values->{value};
+	write_method_pod($name, $description, $value, \@alternates);
+	write_constant($ac_fh, $value, $name, $options) if $value;
 
-	push @{$tagname->{long}}, $long_name if $long_name;
-	push @{$tagname->{short}}, '$' . $short_name if $short_name;
+	push @{$tagname->{all}}, $name if $name;
 		
 
 	for my $cat_node ( $constant->getElementsByTagName('category') ) {
 		my $category =	$cat_node->textContent();
 		next unless $category;
-		push @{$tagname->{$category}}, $long_name;
+		push @{$tagname->{$category}}, $name;
 		push @{$tagname->{$category}}, $alternate if $alternate;
 	}
 
 	my $precision = $constant->getChildrenByTagName('uncertainty')->shift();
-	store_precision($long_name, 
+	store_precision($name,
 		$precision->textContent(), 
 		$precision->getAttribute('type'));
 }
 
 write_pod_footer($ac_fh);
-write_module_footer($mks_fh, $tagname);
-write_module_footer($cgs_fh, $tagname);
+write_module_footer($ac_fh, $tagname);
 
 exit;
 
@@ -111,34 +95,17 @@ sub write_module_header {
 
 	print $fh <<HEADER;
 package $name;
-# ABSTRACT: This library provides physical constants for use in Physics and Astronomy based on values from 2018 CODATA.
+# ABSTRACT: Perl library to provide physical constants for use in Physics and Astronomy based on values from 2018 CODATA.
+#
+#  They are not constant but are changing still. - Cymbeline, Act II, Scene 5
 
 use 5.006;
 use strict;
 use warnings;
+
+use base qw(Exporter);
+
 HEADER
-	if ($name eq 'Astro::Constants') {
-		print $fh "\n  'They are not constant but are changing still. - Cymbeline, Act II, Scene 5';\n\n";
-	}
-	else {
-		print $fh "use base qw/Exporter/;\n\n";
-	}
-	if ($name eq 'Astro::Constants::CGS') {
-		print $fh <<"NOTICE";
-warn "use of $name is deprecated and will be removed from the package in version 0.15";
-warn "write new code to use Astro::Constants::MKS instead";
-
-=head1 NOTICE OF DEPRECATION
-
-This module is now deprecated and will be removed from the package in version 0.15.
-Write new code to use L<Astro::Constants> or check the documentation.
-The IAU stopped using cgs units last century, so it's about time this module was archived.
-
-=cut
-
-
-NOTICE
-	}
 }
 
 sub write_module_footer {
@@ -164,9 +131,8 @@ sub precision {
 	return \$_precision{\$name}->{value};
 }
 
-our \@EXPORT_OK = qw( 
-	@{$tags->{long}}
-	@{$tags->{short}}
+our \@EXPORT_OK = qw(
+	@{$tags->{all}}
 	@{$tags->{alternates}}
 	pretty precision
 );
@@ -175,63 +141,55 @@ our \%EXPORT_TAGS = (
 FOOT
 
 	for my $name (sort keys %{$tags}) {
-		print $fh "\t$name => [qw/ @{$tags->{$name}} /],\n";
+		print $fh "\t$name => [qw( @{$tags->{$name}} )],\n";
 	}
 
 	print $fh ");\n";
-	print $fh "push \@EXPORT_OK, qw/@{$tags->{deprecated}}/;\n" 
+	print $fh "push \@EXPORT_OK, qw(@{$tags->{deprecated}});\n" 
 		if exists $tags->{deprecated} && @{$tags->{deprecated}};
 	print $fh <<FOOT;
 
-'Perl is my Igor';
+1; # Perl is my Igor
 FOOT
 
 }
 
 sub write_method_pod {
-	my ($fh, $long_name, $short_name, $description, $values, $alt_ref, ) = @_;
+	my ($name, $description, $value, $alt_ref, ) = @_;
 
-	my $display;
-	$display .= "    $values->{mks}\tMKS\n" if $values->{mks};
-	$display ||= "    $values->{value}\n";
+	my $method_pod = <<"POD";
 
-	say $fh <<"POD";	# writing for Dist::Zilla enhanced Pod
+=constant $name
 
-$dzil_methodtag $long_name
+    $value
 
-$display
 $description
-
 POD
-	say $fh "This constant is also available using the short name C<\$$short_name>" if $short_name;
-	if ($short_name && @$alt_ref > 1) {
-		say $fh 'as well as these alternate names (imported using the :alternate tag): ', join ', ', @$alt_ref;
-	}
-	elsif ($short_name && @$alt_ref) {
-		say $fh 'as well as the alternate name C<', $alt_ref->[0], 
-				"> (imported using the :alternate tag for backwards compatibility)";
-	}
-	elsif (@$alt_ref > 1) {
-		say $fh "This constant is also available using these alternate names (imported using the :alternate tag): ", 
-				join ', ', @$alt_ref;
+    push @pod, $method_pod;
+
+	if (@$alt_ref > 1) {
+		push @pod, "\nThis constant is also available using these alternate names (imported using the :alternate tag): ",
+				join(', ', @$alt_ref), "\n";
 	}
 	elsif (@$alt_ref) {
-		say $fh "This constant is also available using the alternate name C<", $alt_ref->[0], 
-                "> (imported using the :alternate tag for backwards compatibility)";
+		push @pod, "\nThis constant is also available using the alternate name C<", $alt_ref->[0], 
+                "> (imported using the :alternate tag for backwards compatibility)\n";
 	}
-	print $fh "\n";
 }
 
 sub write_pod_synopsis {
 	my ($fh, ) = @_;
 
 	say $fh <<'POD';
+=encoding utf8
+
 =head1 SYNOPSIS
 
-    use strict;		# important!
-    use Astro::Constants::MKS qw/:long/;
+    use strict;
+    use Astro::Constants qw( :all );
 
-    # to calculate the gravitational force of the Sun on the Earth in Newtons, use GMm/r^2
+    # to calculate the gravitational force of the Sun on the Earth
+    # in Newtons, use GMm/r^2
     my $force_sun_earth = GRAVITATIONAL * MASS_SOLAR * MASS_EARTH / ASTRONOMICAL_UNIT**2;
 
 =head1 DESCRIPTION
@@ -247,23 +205,20 @@ for their constants and may produce different results in comparison.
 On the roadmap is a set of modules to allow you to specify the year or
 data set for the values of constants, defaulting to the most recent.
 
-The C<:long> tag imports all the constants in their long name forms
+The C<:all> tag imports all the constants in their long name forms
 (i.e. GRAVITATIONAL).  Useful subsets can be imported with these tags:
 C<:fundamental> C<:conversion> C<:mathematics> C<:cosmology> 
 C<:planetary> C<:electromagnetic> or C<:nuclear>.
 Alternate names such as LIGHT_SPEED instead of SPEED_LIGHT or HBAR
 instead of H_BAR are imported with C<:alternates>.  I'd like
 to move away from their use, but they have been in the module for years.
-Short forms of the constant names are included to provide backwards
-compatibility with older versions based on Jeremy Bailin's Astroconst
-library and are available through the import tag C<:short>.
 
 Long name constants are constructed with the L<constant> pragma and
 are not interpolated in double quotish situations because they are 
 really inlined functions.
-Short name constants are constructed with the age-old idiom of fiddling
+Short name constants were constructed with the age-old idiom of fiddling
 with the symbol table using typeglobs, e.g. C<*PI = \3.14159>,
-and may be slower than the long name constants.
+and can be slower than the long name constants.
 
 =head2 Why use this module
 
@@ -298,8 +253,7 @@ Nothing is exported by default, so the module doesn't clobber any of your variab
 Select from the following tags:
 
 =for :list
-* C<:long>                (use this one to get the most constants)
-* C<:short>
+* C<:all>             (everything except :deprecated)
 * C<:fundamental>
 * C<:conversion>
 * C<:mathematics>
@@ -308,6 +262,8 @@ Select from the following tags:
 * C<:electromagnetic>
 * C<:nuclear>
 * C<:alternates>
+* C<:deprecated>
+=cut
 
 POD
 }
@@ -315,12 +271,15 @@ POD
 sub write_pod_footer {
 	my ($fh, ) = @_;
 
-	say $fh <<POD;
-$dzil_methodtag pretty
+    say $fh @pod; # delayed writing pod until after the code.
+	say $fh <<'POD';
+=head1 FUNCTIONS
+
+=head2 pretty
 
 This is a helper function that rounds a value or list of values to 5 significant figures.
 
-$dzil_methodtag precision
+=head2 precision
 
 Give this method the string of the constant and it returns the precision or uncertainty
 listed.
@@ -352,19 +311,18 @@ Reference Documents:
 
 =for :list
 * L<IAU 2009 system of astronomical constants|http://aa.usno.navy.mil/publications/reports/Luzumetal2011.pdf>
-* L<Astronomical Constants 2016.pdf|http://asa.usno.navy.mil/static/files/2016/Astronomical_Constants_2016.pdf>
+* L<Astronomical Constants 2016|http://asa.usno.navy.mil/static/files/2016/Astronomical_Constants_2016.pdf>
 * L<IAU recommendations concerning units|https://www.iau.org/publications/proceedings_rules/units>
 * L<Re-definition of the Astronomical Unit|http://syrte.obspm.fr/IAU_resolutions/Res_IAU2012_B2.pdf>
 
 =head1 REPOSITORY
 
-* L<https://github.com/duffee/Astro-Constants>
+* L<github|https://github.com/duffee/Astro-Constants>
 
 =head1 ISSUES
 
-File issues/suggestions at the Github repository L<https://github.com/duffee/Astro-Constants>.
-The venerable L<RT|https://rt.cpan.org/Dist/Display.html?Status=Active&Queue=Astro-Constants>
-is the canonical bug tracker that is clocked by L<meta::cpan|https://metacpan.org/pod/Astro::Constants>.
+Feel free to file bugs or suggestions in the
+L<Issues|https://github.com/duffee/Astro-Constants/issues> section of the Github repository.
 
 Using C<strict> is a must with this code.  Any constants you forgot to import will
 evaluate to 0 and silently introduce errors in your code.  Caveat Programmer.
@@ -373,9 +331,8 @@ If you are using this module, drop me a line using any available means at your
 disposal, including
 *gasp* email (address in the Author section), to let me know how you're using it. 
 What new features would you like to see?
-If you've had an experience with using the module, let other people know what you
-think, good or bad, by rating it at
-L<cpanratings|http://cpanratings.perl.org/rate/?distribution=Astro-Constants>.
+
+Current best method to contact me is via a Github Issue.
 
 =head2 Extending the data set
 
@@ -390,11 +347,11 @@ the original astroconst sites have disappeared
 
 =head1 ROADMAP
 
-I plan to deprecate the short names and change the order in which
-long names are constructed, moving to a I<noun_adjective> format.
+I have moved to a I<noun_adjective> format for long names.
 LIGHT_SPEED and SOLAR_MASS become SPEED_LIGHT and MASS_SOLAR.
 This principle should make the code easier to read with the most
 important information coming at the beginning of the name.
+See also L<Astro::Constants::Roadmap>
 
 =head1 ASTROCONST  X<ASTROCONST>
 
@@ -441,21 +398,19 @@ first place, tidying up Makefile.PL, testing and improving the
 documentation.
 
 =cut
-
 POD
 }
 
 sub write_constant {
-	my ($fh, $value, $long_name, $short_name, $options) = @_;
+	my ($fh, $value, $name, $options) = @_;
 
 	if ($options && $options->{deprecated}) {
 		print $fh <<"WARNING";
-sub $long_name { warn "$long_name deprecated"; return $value; }
+sub $name { warn "$name deprecated"; return $value; }
 WARNING
 	}
 	else {
-		say $fh "use constant $long_name => $value;";
-		say $fh "\*$short_name = \\$value;" if $short_name;
+		say $fh "use constant $name => $value;";
 	}
 }
 
@@ -474,9 +429,9 @@ sub store_precision {
 sub write_precision {
 	my ($fh) = @_;
 
-	say $fh "\n", 'my %_precision = (';
+	say $fh 'my %_precision = (';
 	for my $name (sort keys %precision) {
-		my ($value, $type) = @{$precision{$name}}{qw/value type/};
+		my ($value, $type) = @{$precision{$name}}{qw(value type)};
 		say $fh "\t$name \t=> {value => $value, \ttype => '$type'},"; 
 	}
 	say $fh ');';

@@ -1,5 +1,5 @@
 use Test::More;
-use Astro::Constants::MKS qw/:planetary/;
+use Astro::Constants qw( :planetary );
 
 is(MASS_EARTH, 5.9722e24, 'MASS_EARTH');
 is(AXIS_SM_LUNAR, 3.84402e8, 'AXIS_SM_LUNAR');

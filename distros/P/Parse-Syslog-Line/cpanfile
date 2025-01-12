@@ -7,6 +7,7 @@ requires "Data::Printer" => "0";
 requires "English" => "0";
 requires "Exporter" => "0";
 requires "Getopt::Long::Descriptive" => "0";
+requires "Hash::Merge::Simple" => "0";
 requires "JSON::MaybeXS" => "0";
 requires "Module::Load" => "0";
 requires "Module::Loaded" => "0";
@@ -15,7 +16,7 @@ requires "Pod::Usage" => "0";
 requires "Ref::Util" => "0";
 requires "Time::Moment" => "0";
 requires "YAML::XS" => "0";
-requires "perl" => "5.014";
+requires "perl" => "v5.16.0";
 requires "warnings" => "0";
 recommends "Cpanel::JSON::XS" => "0";
 
@@ -34,16 +35,15 @@ on 'test' => sub {
   requires "Test::Deep" => "0";
   requires "Test::MockTime" => "0";
   requires "Test::More" => "0";
-  requires "YAML" => "0";
   requires "bignum" => "0";
   requires "lib" => "0";
-  requires "perl" => "5.014";
+  requires "perl" => "v5.16.0";
   requires "strict" => "0";
 };
 
 on 'configure' => sub {
   requires "ExtUtils::MakeMaker" => "0";
-  requires "perl" => "v5.14.0";
+  requires "perl" => "v5.16.0";
 };
 
 on 'develop' => sub {

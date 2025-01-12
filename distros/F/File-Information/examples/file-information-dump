@@ -40,14 +40,14 @@ foreach my $filename (@ARGV) {
     say $filename;
     say '-' x length($filename);
 
-    dump_base(Link  => $link);
-    dump_base(Inode => scalar eval {$link->inode});
-    dump_base(Filesystem => scalar eval {$link->filesystem});
-    dump_base(Tagpool => $_) foreach eval {$link->tagpool};
+    dump_base($link);
+    dump_base(scalar eval {$link->inode});
+    dump_base(scalar eval {$link->filesystem});
+    dump_base($_) foreach eval {$link->tagpool};
 }
 
 sub dump_base {
-    my ($title, $base) = @_;
+    my ($base) = @_;
     my File::Information $instance;
     my @hashes;
     my @properties;
@@ -59,8 +59,11 @@ sub dump_base {
     @hashes     = sort map {$_->{name}} $base->digest_info;
     @properties = sort map {$_->{name}} $base->property_info;
 
-    say ' ', $title;
-    say ' ', '-' x length($title);
+    {
+        my $title = ref($base) =~ s/^.*:://r;
+        say ' ', $title;
+        say ' ', '-' x length($title);
+    }
 
     {
         # Figure out the witdh of the key column.
@@ -68,8 +71,8 @@ sub dump_base {
         outer:
         foreach my $key (@properties) {
             foreach my $lifecycle ($instance->lifecycles) {
-                my $value = $base->get($key, lifecycle => $lifecycle, default => undef, as => 'raw');
-                if (defined $value) {
+                my @values = $base->get($key, lifecycle => $lifecycle, list => 1, default => [], as => 'raw');
+                if (scalar @values) {
                     my $l = length($key);
                     $max_len = $l if $l > $max_len;
                     next outer;
@@ -94,38 +97,46 @@ sub dump_base {
     # Print properties:
     foreach my $key (@properties) {
         foreach my $lifecycle ($instance->lifecycles) {
-            my $value;
+            my $first = 1;
+            my @values;
             my $type;
 
             foreach my $as (@as_types) {
-                $value = $base->get($key, lifecycle => $lifecycle, default => undef, as => $as);
+                @values = $base->get($key, lifecycle => $lifecycle, list => 1, default => [], as => $as);
                 $type = $as;
-                last if defined $value;
+                last if scalar @values;
             }
-            next unless defined $value;
+            next unless scalar @values;
 
-            if (blessed($value)) {
-                if ($value->isa('Data::Identifier')) {
-                    my $id = $value;
-                    $value = sprintf('%s / %s', $id->type->displayname, $id->id);
-                    if (defined(my $displayname = $id->displayname(no_defaults => 1, default => undef))) {
-                        $value .= sprintf(' (%s)', $displayname);
+            foreach my $value (@values) {
+                if (blessed($value)) {
+                    if ($value->isa('Data::Identifier')) {
+                        my $id = $value;
+                        $value = sprintf('%s / %s', $id->type->displayname, $id->id);
+                        if (defined(my $displayname = $id->displayname(no_defaults => 1, default => undef))) {
+                            $value .= sprintf(' (%s)', $displayname);
+                        }
+                    } elsif ($value->isa('Data::TagDB::Tag')) {
+                        my $tag = $value;
+                        $value = sprintf('Tag <%s>', $tag->ise);
+                        if (defined(my $displayname = $tag->displayname(no_defaults => 1, default => undef))) {
+                            $value .= sprintf(' (%s)', $displayname);
+                        }
                     }
-                } elsif ($value->isa('Data::TagDB::Tag')) {
-                    my $tag = $value;
-                    $value = sprintf('Tag <%s>', $tag->ise);
-                    if (defined(my $displayname = $tag->displayname(no_defaults => 1, default => undef))) {
-                        $value .= sprintf(' (%s)', $displayname);
-                    }
+                } elsif ($type eq 'bool') {
+                    $value = $value ? 'true' : 'false';
+                } elsif (looks_like_number($value)) {
+                    # no-op
+                } else {
+                    $value = sprintf('\'%s\'', $value);
                 }
-            } elsif ($type eq 'bool') {
-                $value = $value ? 'true' : 'false';
-            } elsif (looks_like_number($value)) {
-                # no-op
-            } else {
-                $value = sprintf('\'%s\'', $value);
+                if ($first) {
+                    printf("  %7s :: %-*s = %s\n", $lifecycle, $max_len, $key, $value);
+                    $first = undef;
+                } else {
+                    printf("%s & %s\n", ' ' x ($max_len + 7 + 6), $value);
+                }
             }
-            printf("  %7s :: %-*s = %s\n", $lifecycle, $max_len, $key, $value);
         }
     }
 

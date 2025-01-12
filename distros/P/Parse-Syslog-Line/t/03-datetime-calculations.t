@@ -1,6 +1,6 @@
 #!perl
 
-use strict;
+use v5.16;
 use warnings;
 use bignum;
 
@@ -13,7 +13,7 @@ use DateTime;
 use DateTime::TimeZone;
 use Time::Moment;
 use Storable qw(dclone);
-use YAML  ();
+use YAML::XS ();
 
 use Parse::Syslog::Line qw/:with_timezones/;
 
@@ -122,7 +122,7 @@ subtest 'Millisecond resolution' => sub {
             $got,
             superhashof($exp),
             $case_name,
-        ) || diag YAML::Dump $got;
+        ) || diag YAML::XS::Dump $got;
     }
 };
 

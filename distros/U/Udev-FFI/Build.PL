@@ -39,7 +39,7 @@ my %args = (
     },
 
     test_requires => {
-        'Test::More' => '0.98',
+        'Test2' => '1.302207',
     },
 
     name            => 'Udev-FFI',

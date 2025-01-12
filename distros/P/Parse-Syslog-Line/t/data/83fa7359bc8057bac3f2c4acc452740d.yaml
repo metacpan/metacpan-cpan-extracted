@@ -8,15 +8,10 @@ expected:
   datetime_utc: 2018-01-01T00:00:00Z
   domain: ~
   epoch: 1514764800
-  facility: ~
-  facility_int: ~
   host: example
   host_raw: example
   message: 'syslogd 1.2.3: restart (remote reception).'
   message_raw: 'Jan  1 00:00:00 example syslogd 1.2.3: restart (remote reception).'
-  preamble: ~
-  priority: ~
-  priority_int: ~
   program_name: syslogd
   program_pid: ~
   program_raw: syslogd 1.2.3

@@ -12,6 +12,25 @@ DBI::Changes - List of significant changes to the DBI
 
 =encoding UTF-8
 
+=head2 Changes in DBI 1.646 - 11 Jan 2025
+
+=over 2
+
+=item *
+
+Remove "experimental" tag from statistics_info () (issue#134)
+
+=item *
+
+RT tickets moved to github issues (rwfranks++)
+- All RT tickets now marked as resolved with reference to GitHub issue
+
+=item *
+
+Fix install issue (issue #168)
+
+=back
+
 =head2 Changes in DBI 1.645 - 03 Sep 2024
 
 =over 2
@@ -754,7 +773,7 @@ Jens Rehsack, Martin J. Evans, and H.Merijn Brand for all their contributions.
     thanks to Greg Sabino Mullane.
   Fixed a few harmless compiler warnings on cygwin.
 
-1.603, 2008-03-22, Tim Bunce
+=head2 Changes in DBI 1.603 - 22 Mar 2008
 
   Fixed pure-perl fetchall_arrayref with $max_rows argument
     to not error when fetching after all rows already fetched.

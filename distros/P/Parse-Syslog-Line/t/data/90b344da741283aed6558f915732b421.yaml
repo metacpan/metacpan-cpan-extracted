@@ -18,9 +18,7 @@ expected:
   priority: info
   priority_int: 6
   program_name: scsitarget.ispfct.targetReset
-  program_pid: ~
   program_raw: '[filer-201 scsitarget.ispfct.targetReset:notice]'
-  program_sub: ~
   time: 11:28:13
   tz: Z
 name: NetApp Filer Alt1

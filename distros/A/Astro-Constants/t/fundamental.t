@@ -1,5 +1,5 @@
 use Test::More;
-use Astro::Constants::MKS qw/:fundamental/;
+use Astro::Constants qw( :fundamental );
 
 	is(SPEED_LIGHT, 299_792_458, 'SPEED_LIGHT');
 	is(BOLTZMANN, 1.380649e-23, 'BOLTZMANN');

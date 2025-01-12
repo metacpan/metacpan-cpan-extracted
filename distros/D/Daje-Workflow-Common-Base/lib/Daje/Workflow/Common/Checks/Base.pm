@@ -33,6 +33,7 @@ use Mojo::Base -base, -signatures;
 has 'context';
 has 'checks';
 has 'error';
+has 'model';
 
 1;
 

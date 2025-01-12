@@ -6,8 +6,6 @@ use warnings;
 use Udev::FFI;
 use Udev::FFI::Devnum qw(:all); #import major, minor and makedev
 
-
-
 my $udev = Udev::FFI->new() or
     die("Can't create Udev::FFI object: $@.\n");
 

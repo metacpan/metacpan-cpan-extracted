@@ -8,14 +8,9 @@ use Udev::FFI::Device;
 use Udev::FFI::Monitor;
 use Udev::FFI::Enumerate;
 
-
-$Udev::FFI::VERSION = '0.105000';
-
-
+$Udev::FFI::VERSION = '0.105002';
 
 *Udev::FFI::udev_version = \&Udev::FFI::Functions::udev_version;
-
-
 
 sub new {
     my $class = shift;
@@ -31,6 +26,7 @@ sub new {
     }
 
     bless($self, $class);
+
     return $self;
 }
 
@@ -425,8 +421,9 @@ Mohammad S Anwar
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017-2022 by Ilya Pavlov
+Copyright (C) 2017-2025 by Ilya Pavlov
 
-This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language
+system itself.
 
 =cut

@@ -3,15 +3,11 @@ package Udev::FFI::Helper;
 use strict;
 use warnings;
 
-our (@ISA, @EXPORT_OK, %EXPORT_TAGS);
-
-require Exporter;
-@ISA = qw(Exporter);
+use base qw(Exporter);
 
 use Udev::FFI::Functions qw(:all);
 
-
-@EXPORT_OK = qw(get_entries_all);
+our @EXPORT_OK = qw(get_entries_all);
 
 
 

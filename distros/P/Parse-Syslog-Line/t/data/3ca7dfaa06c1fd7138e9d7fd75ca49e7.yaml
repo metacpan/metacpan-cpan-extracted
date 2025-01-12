@@ -6,21 +6,13 @@ expected:
   datetime_raw: Jan  1 00:00:00
   datetime_str: 2018-01-01T00:00:00Z
   datetime_utc: 2018-01-01T00:00:00Z
-  domain: ~
   epoch: 1514764800
-  facility: ~
-  facility_int: ~
   host: 11.22.33.44
   host_raw: 11.22.33.44
   message: 'dhcpd: DHCPINFORM from 172.16.2.137 via vlan3'
   message_raw: 'Jan  1 00:00:00 11.22.33.44 dhcpd: DHCPINFORM from 172.16.2.137 via vlan3'
-  preamble: ~
-  priority: ~
-  priority_int: ~
   program_name: dhcpd
-  program_pid: ~
   program_raw: dhcpd
-  program_sub: ~
   time: 00:00:00
   tz: Z
 name: 'IP without Hostname, no preamble'

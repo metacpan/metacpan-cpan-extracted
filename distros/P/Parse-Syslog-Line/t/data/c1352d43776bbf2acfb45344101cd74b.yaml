@@ -8,15 +8,10 @@ expected:
   datetime_utc: 2021-02-18T17:07:26Z
   domain: example.com
   epoch: 1613668046
-  facility: ~
-  facility_int: ~
   host: webproxy101
   host_raw: webproxy101.example.com
   message: '(squid-1)[58016]: 10.1.2.3 - - [18/Feb/2021:17:07:26 +0000] "CONNECT hcaptcha.com:443 HTTP/1.1" 200 3879 "-" "-" TCP_TUNNEL:HIER_DIRECT'
   message_raw: '2021 Feb 18 17:07:26 webproxy101.example.com (squid-1)[58016]: 10.1.2.3 - - [18/Feb/2021:17:07:26 +0000] "CONNECT hcaptcha.com:443 HTTP/1.1" 200 3879 "-" "-" TCP_TUNNEL:HIER_DIRECT'
-  preamble: ~
-  priority: ~
-  priority_int: ~
   program_name: (squid-1)
   program_pid: 58016
   program_raw: '(squid-1)[58016]'

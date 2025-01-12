@@ -7,7 +7,6 @@ use warnings;
 
 use Udev::FFI;
 
-
 use constant {
     DEVICE_INPUT_OTHER          => 0,
     DEVICE_INPUT_MOUSE          => 1,
@@ -20,8 +19,6 @@ use constant {
 };
 
 my $udev;
-
-
 
 sub _get_device_type {
     my $device = shift;
@@ -63,8 +60,6 @@ sub _get_device_type {
     return DEVICE_INPUT_OTHER;
 }
 
-
-
 sub _check_for_mouse_devices {
     my $enumerate = $udev->new_enumerate() or
         die("Can't create enumerate context: $@");
@@ -89,8 +84,6 @@ sub _check_for_mouse_devices {
     return 0;
 }
 
-
-
 $udev = Udev::FFI->new() or
     die("Can't create Udev::FFI object: $@.\n");
 
@@ -110,7 +103,6 @@ if (1 == _check_for_mouse_devices()) {
 else {
     system(ON_TOUCHPAD_COMMAND);
 }
-
 
 for (;;) {
     my $device = $monitor->poll(); # blocking read

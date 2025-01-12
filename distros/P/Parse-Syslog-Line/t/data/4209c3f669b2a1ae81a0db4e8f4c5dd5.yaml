@@ -6,12 +6,9 @@ expected:
   datetime_raw: Jan  1 08:15:00
   datetime_str: 2018-01-01T08:15:00Z
   datetime_utc: 2018-01-01T08:15:00Z
-  domain: ~
   epoch: 1514794500
   facility: cron
   facility_int: 72
-  host: ~
-  host_raw: ~
   message: '/usr/sbin/cron[73991]: (root) CMD (/usr/libexec/atrun)'
   message_raw: '<78>Jan  1 08:15:00 /usr/sbin/cron[73991]: (root) CMD (/usr/libexec/atrun)'
   preamble: 78

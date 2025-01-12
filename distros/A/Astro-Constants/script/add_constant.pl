@@ -1,29 +1,26 @@
 #!/usr/bin/perl -w
 #
 # Adds a constant to PhysicalConstants.xml
-# Boyd Duffee, July 2017
+# Boyd Duffee, July 2017 & April 2024
 #
-# TODO
-# - check that constant name does not already exist
-# - write out a file of local changes so that the main file can be patched
-# - use relative paths to run script from anywhere
+# validation is not fatal, it only warns of errors
 
-use strict;
+use v5.10;
 use autodie;
-use 5.010;
+use FindBin qw($Bin);
 use XML::LibXML;
 
-my $file = $ARGV[0] || '../data/PhysicalConstants.xml';
-die "Can't file $file (run from the script directory)" unless -f $file;
+my $file = $ARGV[0] || "$Bin/../data/PhysicalConstants.xml";
+die "Can't file $file\n" unless -f $file;
 my $schema_file = $file;
 $schema_file =~ s/\.xml$/.xsd/; 
 
 my $bak = $file . '.bak';
-die "Script won't overwrite backup file $bak  Stopping." if -f $bak;
+die "Script won't overwrite backup file $bak  Stopping.\n" if -f $bak;
 
 my $xml = XML::LibXML->load_xml(location => $file, no_blanks => 1);
-my ($short, $long, $description, $cgs, $value, $precision, $category_list, @categories,
-	$dimensions, $minValue, $maxValue, $url,  );
+my ($name, $description, $value, $precision, $category_list, @categories,
+	$dimensions, $minValue, $maxValue, $source,  );
 
 my %category = ( fundamental => 1 , cosmology => 1, electromagnetic => 1,
 	planetary => 1, conversion => 1, nuclear => 1, mathematical => 1,
@@ -44,14 +41,14 @@ write_entries();
 exit;
 
 sub populate_fields {
-	get_long_name();
-	get_short_name();
-	get_description();
-	get_value();
-	get_precision();
-	get_dimensions();
-	get_url();
-	get_categories();
+    get_name();
+    check_not_a_duplicate() or return;
+    get_description();
+    get_value();
+    get_precision();
+    get_dimensions();
+    get_source();
+    get_categories();
 }
 
 sub get_constant_definition {
@@ -66,14 +63,13 @@ sub edit_fields {
 	print <<"EDIT";
 
 I have the following values for your new PhysicalConstant
-long name [required]\t $long
-short name\t $short
+name [required]\t $name
 description\t $description
-value (mks)\t $value
+value (in SI)\t $value
 precision\t $precision
 categories\t $category_list
 
-Do you want to make any changes? [Y/n]
+Do you want to make any changes to this definition? [Y/n]
 EDIT
 
 	my $ans = <STDIN>;
@@ -83,8 +79,7 @@ EDIT
 sub write_entries {
 	print <<"EDIT";
 These are the values that will be written to $file
-long name\t $long
-short name\t $short
+name\t $name
 description\t $description
 value \t $value
 precision\t $precision
@@ -94,8 +89,6 @@ I should ask if you really want to overwrite the file,
 but I do it automatically for now.  The original file 
 was written to $bak
 
-I should really, REALLY, validate the new xml file
-against PhysicalConstant.xsd before overwriting the main file.
 EDIT
 
 	if (-f $schema_file) {
@@ -112,6 +105,12 @@ EDIT
 	open my $fh, '>', $file;
 	print {$fh} $xml->toString(2);
 	close $fh;
+
+    # write a patch file for the change
+    open my $pfh, '>', $file . '.patch';
+    print {$pfh} `diff -u $bak $file`;
+    close $pfh;
+    print "Patch file writen to $file.patch\n";
 }
 
 sub append_to_list {
@@ -119,17 +118,10 @@ sub append_to_list {
     my $new_constant = $xml->createElement( 'PhysicalConstant' );
     $xml->getElementsByTagName('items')->[0]->addChild($new_constant);
 
-    if ($long) {
-        my $name = XML::LibXML::Element->new('name');
-        $name->setAttribute( 'type', 'long' );
-        $name->appendText( $long );
-        $new_constant->addChild($name);
-    }
-    if ($short) {
-        my $name = XML::LibXML::Element->new('name');
-        $name->setAttribute( 'type', 'short' );
-        $name->appendText( $short );
-        $new_constant->addChild($name);
+    if ($name) {
+        my $e = XML::LibXML::Element->new('name');
+        $e->appendText( $name );
+        $new_constant->addChild($e);
     }
     if ($description) {
         my $e = XML::LibXML::Element->new('description');
@@ -138,7 +130,6 @@ sub append_to_list {
     }
     if (defined $value) {
         my $e = XML::LibXML::Element->new('value');
-        $e->setAttribute( 'system', 'MKS' );
         $e->appendText( $value );
         $new_constant->addChild($e);
     }
@@ -172,9 +163,9 @@ sub append_to_list {
 	else {
 		$new_constant->addChild( XML::LibXML::Element->new('minValue') );
 	}
-    if ($url) {
-        my $e = XML::LibXML::Element->new('url');
-        $e->setAttribute( 'href', $url );
+    if ($source) {
+        my $e = XML::LibXML::Element->new('source');
+        $e->setAttribute( 'url', $source );
         $new_constant->addChild($e);
     }
     if (scalar @categories) {
@@ -192,22 +183,17 @@ sub append_to_list {
 
 #### could use these subs to validate ####
 #
-sub get_short_name {
-	print "Short name for constant (A_c)\t";
-	$short = <STDIN>;
-	$short =~ s/\s//g;
-}
 
-sub get_long_name {
+sub get_name {
 	GET_NAME: {
-		print "Long name for constant (SPEED_LIGHT)\t";
-		$long = <STDIN>;
-		chomp $long;
-		unless ($long) {
+		print "Name for constant (SPEED_LIGHT)\t";
+		$name = <STDIN>;
+		chomp $name;
+		unless ($name) {
 			print "This field is mandatory\n";
 			redo GET_NAME;
 		}
-		$long =~ s/\s//g;
+		$name =~ s/\s//g;
 	}
 }
 
@@ -236,10 +222,10 @@ sub get_dimensions {
 	chomp $dimensions;
 }
 
-sub get_url {
-	print "An official url publishing the value of the constant\t";
-	$url = <STDIN>;
-	chomp $url;
+sub get_source {
+	print "An official URL publishing the value of the constant\t";
+	$source = <STDIN>;
+	chomp $source;
 }
 
 sub get_categories {
@@ -252,4 +238,15 @@ sub get_categories {
 
 	# a default
 	@categories = qw/unclassified/ unless scalar @categories;
+}
+
+sub check_not_a_duplicate {
+    my @constants = $xml->getElementsByTagName('PhysicalConstant');
+    for my $node (@constants) {
+        if ($node->getChildrenByTagName('name') eq $name) {
+            warn "$name already exists.  Skipping\n";
+            return;
+        }
+    }
+    return 1; # no duplicates
 }

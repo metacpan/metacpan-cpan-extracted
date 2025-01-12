@@ -1,3 +1,20 @@
+0.050   2025-01-12  Released-By: PERLANCAR; Urgency: medium
+
+        - Re-add tips & tricks section.
+
+
+0.049.1 2025-01-12  Released-By: PERLANCAR; Urgency: medium
+
+        - [incompatible change] By defaultchomp the lines first and add
+          output separator again later when printing, unless instructed not
+          to by --no-chomp (-C).
+
+          This also "fixes" sorting that does not seem to work, because newlines
+          are accidentally included.
+
+          UPDATE 2025-01-12: rename release 0.048 to 0.049.1 due to conflict.
+
+
 0.049   2023-11-28  Released-By: PERLANCAR; Urgency: medium
 
         - [doc] Tweak Synopsis.

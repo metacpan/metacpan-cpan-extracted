@@ -2,22 +2,23 @@
 
 package Parse::Syslog::Line;
 
-use v5.14;
+use v5.16;
 use warnings;
 
 use Carp;
 use Const::Fast;
 use English qw(-no_match_vars);
 use Exporter;
-use JSON::MaybeXS  qw( decode_json );
-# RECOMMEND PREREQ: Cpanel::JSON::XS
-use Module::Load   qw( load );
-use Module::Loaded qw( is_loaded );
-use POSIX          qw( strftime tzset );
-use Ref::Util      qw( is_arrayref );
+use Hash::Merge::Simple qw( dclone_merge );
+use JSON::MaybeXS       qw( decode_json );
+use Module::Load        qw( load );
+use Module::Loaded      qw( is_loaded );
+use POSIX               qw( strftime tzset );
+use Ref::Util           qw( is_arrayref );
 use Time::Moment;
+# RECOMMEND PREREQ: Cpanel::JSON::XS
 
-our $VERSION = '6.0';
+our $VERSION = '6.1';
 
 # Default for Handling Parsing
 our $DateParsing     = 1;
@@ -105,10 +106,11 @@ const our %CONV_MASK => (
 
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(parse_syslog_line);
+our @EXPORT = qw(parse_syslog_line psl_enable_sdata);
 our @EXPORT_OK = qw(
     parse_syslog_line
     parse_syslog_lines
+    psl_enable_sdata
     preamble_priority preamble_facility
     %LOG_FACILITY %LOG_PRIORITY
     get_syslog_timezone set_syslog_timezone
@@ -124,7 +126,7 @@ our %EXPORT_TAGS = (
 const my %RE => (
     IPv4            => qr/(?>(?:[0-9]{1,3}\.){3}[0-9]{1,3})/,
     preamble        => qr/^\<(\d+)\>(\d{0,2}(?=\s))?\s*/,
-    date            => qr/
+    date_named_capture => qr/
             (?:(?<year>\d{4})\s)?             # Option Year: YYYY
             (?<date>                          # Whole String
                 (?<month>[A-Za-z]{3})         # Month: Mmm
@@ -136,6 +138,21 @@ const my %RE => (
                     :(?<second>[0-9]{2})
                 (?:\.                         # Time: .DDD millisecond or .DDDDDD microsecond resolution
                     (?<highprecision>(?:[0-9]{3}){1,2})
+                )?
+            )
+    /x,
+    date => qr/
+            (?:(\d{4})\s)?          # Option Year: YYYY --> 1
+            (                       # Whole String -------> 2
+                ([A-Za-z]{3})       # Month: Mmm   -------> 3
+                \s+
+                ([0-9]+)            # Day: DD ------------> 4
+                \s+
+                ([0-9]{1,2})        # Hour: HH -----------> 5
+                    :([0-9]{2})     # Minute: MM ---------> 6
+                    :([0-9]{2})     # Second: SS ---------> 7
+                (?:\.               # Time: .DDD millisecond or .DDDDDD microsecond resolution
+                    ((?:[0-9]{3}){1,2}) # Highprecision --> 8
                 )?
             )
     /x,
@@ -174,9 +191,9 @@ const my %RE => (
                 (?<offset_minutes>[0-9]{2})
             )
     )/x,
-    host            => qr/\s*(?<host>[^:\s]+)\s+/,
+    host            => qr/\s*([^:\s]+)\s+/,
     cisco_detection => qr/\s*[0-9]*:\s+/,
-    program_raw     => qr/\s*([^\[][^:]+)(?<program_sep>:|\s-)\s+/,
+    program_raw     => qr/\s*([^\[][^:]+)(:|\s-)\s+/,
     program_name    => qr/(.[^\[\(\ ]*)(.*)/,
     program_sub     => qr/(?>\(([^\)]+)\))/,
     program_pid     => qr/(?>\[([^\]]+)\])/,
@@ -241,15 +258,6 @@ my %MoY;
 
 
 
-my %_empty_msg = map { $_ => undef } qw(
-    preamble priority priority_int facility facility_int
-    datetime_raw date time epoch tz
-    datetime_local datetime_str datetime_utc
-    host_raw host domain
-    program_raw program_name program_pid program_sub
-);
-
-
 my $SYSLOG_TIMEZONE = '';
 
 sub parse_syslog_line {
@@ -261,7 +269,7 @@ sub parse_syslog_line {
     state $DisableWarnings = $ENV{PARSE_SYSLOG_LINE_QUIET} || $ENV{TEST_ACTIVE} || $ENV{TEST2_ACTIVE};
 
     # Initialize everything to undef
-    my %msg =  $PruneEmpty ? () : %_empty_msg;
+    my %msg =  ();
     $msg{message_raw} = $raw_string unless $PruneRaw;
 
     # Lines that begin with a space aren't syslog messages, skip
@@ -286,11 +294,20 @@ sub parse_syslog_line {
     # Handle Date/Time
     my %date = ();
     if( $raw_string =~ s/^$RE{date}//o) {
-        $msg{datetime_raw} = $+{date};
-        $msg{datetime_raw} .= " $+{year}"
-            if $+{year};
+        # Positional
+        $msg{datetime_raw} = $2;
+        $msg{datetime_raw} .= " $1" if $1;
         # Copy into the date hash
-        %date = %+;
+        %date = (
+            year          => $1,
+            date          => $2,
+            month         => $3,
+            day           => $4,
+            hour          => $5,
+            minute        => $6,
+            second        => $7,
+            highprecision => $8,
+        );
         $date{month_abbr} = 1;
     }
     elsif( $raw_string =~ s/^$RE{date_iso8601}//o) {
@@ -339,7 +356,7 @@ sub parse_syslog_line {
                         $date{year} = 1900 + (localtime)[5];
                     }
                     $tm = eval { Time::Moment->new(%date) };
-                    if ( $tm ) {
+                    if ( defined $tm ) {
                         # Check that the timestamp isn't more than 1 day in the future
                         $tm = Time::Moment->new(%date, year => $date{year} - 1)
                             if !$has_year && $tm->epoch > (time + 86400);
@@ -378,7 +395,7 @@ sub parse_syslog_line {
     #
     # Host Information:
     if( $raw_string =~ s/^$RE{host}//o ) {
-        my $hostStr = $+{host};
+        my $hostStr = $1;
         my($ip) = ($hostStr =~ /($RE{IPv4})/o);
         if( defined $ip && length $ip ) {
             $msg{host_raw} = $hostStr;
@@ -392,9 +409,9 @@ sub parse_syslog_line {
         }
     }
     # Check for relayed logs, grab the origin
-    while( $raw_string =~ /^(?:\s*[0-9]+\s+)?(?<any_date>$RE{date_iso8601}|$RE{date})\s+$RE{host}/go ) {
-        $msg{origin} = $+{host};
-        $msg{origin_date} = $+{any_date};
+    while( $raw_string =~ /^(?:\s*[0-9]+\s+)?$RE{date_iso8601}\s+$RE{host}/go ) {
+        $msg{origin} = $2;
+        $msg{origin_date} = $1;
         $raw_string = substr($raw_string,pos($raw_string));
     }
 
@@ -419,8 +436,8 @@ sub parse_syslog_line {
     my $progsep = ':';
     if( $ExtractProgram ) {
         if( $raw_string =~ s/^$RE{program_raw}//o ) {
-            $progsep = $+{program_sep};
             $msg{program_raw} = $1;
+            $progsep = $2 || '';
             my $progStr = join ' ', grep {!exists $INT_PRIORITY{$_}} split /\s+/, $msg{program_raw};
             if( $progStr =~ /^$RE{program_name}/o ) {
                 $msg{program_name} = $1;
@@ -505,14 +522,15 @@ sub parse_syslog_line {
             $CpanelJSONXSWarning = 1;
         }
         eval {
-            $msg{SDATA} = decode_json(substr($msg{content},$pos));
+            my $json = decode_json(substr($msg{content},$pos));
+            $msg{SDATA} = $msg{SDATA} ? dclone_merge($json,$msg{SDATA}) : $json;
             1;
         } or do {
             my $err = $@;
             $msg{_json_error} = sprintf "Failed to decode json: %s", $err;
         };
     }
-    elsif( $AutoDetectKeyValues && $msg{content} =~ /(?:^|\s)[a-zA-Z\.0-9\-_]+=\S+/ ) {
+    if( $AutoDetectKeyValues && $msg{content} =~ /(?:^|\s)[a-zA-Z\.0-9\-_]+=\S+/ ) {
         my %sdata = ();
         while( $msg{content} =~ /$RE{kvdata}/og ) {
             my ($k,$v) = ($1,$2);
@@ -533,14 +551,16 @@ sub parse_syslog_line {
                 $sdata{$k} = $v;
             }
         }
-        $msg{SDATA} = \%sdata if keys %sdata;
+        if ( %sdata ) {
+            $msg{SDATA} = $msg{SDATA} ? dclone_merge(\%sdata,$msg{SDATA}) : \%sdata;
+        }
     }
 
     if( $PruneRaw ) {
         delete $msg{$_} for grep { $_ =~ /_raw$/ } keys %msg;
     }
     if( $PruneEmpty ) {
-        delete $msg{$_} for grep { !defined $msg{$_} || !length $msg{$_} } keys %msg;
+        delete $msg{$_} for grep { !length $msg{$_} } keys %msg;
     }
     if( @PruneFields ) {
         no warnings;
@@ -580,6 +600,13 @@ sub parse_syslog_line {
         return @structured;
     }
 
+}
+
+
+sub psl_enable_sdata {
+    $AutoDetectJSON        = 1;
+    $AutoDetectKeyValues   = 1;
+    $RFC5424StructuredData = 1;
 }
 
 
@@ -646,7 +673,7 @@ Parse::Syslog::Line - Simple syslog line parser
 
 =head1 VERSION
 
-version 6.0
+version 6.1
 
 =head1 SYNOPSIS
 
@@ -906,14 +933,6 @@ need to build it yourself.
 
 =over 2
 
-=item C<date_raw>
-
-B<Removed> from the fields returned, use C<datetime_raw>.
-
-=item C<datetime_obj>
-
-B<Removed> from the fields returned as we dropped support for L<DateTime>.
-
 =item C<datetime_utc>
 
 Present in every document, use this for portability.
@@ -1117,6 +1136,10 @@ line in the stream that starts with non-whitespace.  Any lines beginning with
 whitespace will be assumed to be a continuation of the previous line.
 
 It is not exported by default.
+
+=head2 psl_enable_sdata
+
+Call this to turn on all the Structured Data Parsing Options
 
 =head2 preamble_priority
 

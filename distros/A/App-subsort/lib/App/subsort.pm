@@ -3,9 +3,9 @@ package App::subsort;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-11-28'; # DATE
+our $DATE = '2025-01-12'; # DATE
 our $DIST = 'App-subsort'; # DIST
-our $VERSION = '0.049'; # VERSION
+our $VERSION = '0.050'; # VERSION
 
 1;
 # ABSTRACT: Sort lines of text using Sort::Sub routine
@@ -22,7 +22,7 @@ App::subsort - Sort lines of text using Sort::Sub routine
 
 =head1 VERSION
 
-This document describes version 0.049 of App::subsort (from Perl distribution App-subsort), released on 2023-11-28.
+This document describes version 0.050 of App::subsort (from Perl distribution App-subsort), released on 2025-01-12.
 
 =head1 SYNOPSIS
 
@@ -64,7 +64,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2020, 2019, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

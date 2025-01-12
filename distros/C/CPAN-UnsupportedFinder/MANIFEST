@@ -1,4 +1,6 @@
 Changes
+examples/all
+examples/nhorne
 examples/test
 lib/CPAN/UnsupportedFinder.pm
 LICENSE
@@ -19,6 +21,7 @@ t/no404s.t
 t/noplan.t
 t/pod-cm.t
 t/pod-coverage.t
+t/pod-synopsis.t
 t/pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
