@@ -1,3 +1,10 @@
+0.003   2025-01-12  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Mention Sort::Sub::by_sortexample.
+
+
 0.002   2021-08-06  Released-By: PERLANCAR; Urgency: medium
 
 	- Bump prereq version Test::Sort::Sub -> 0.120 (GH#1).

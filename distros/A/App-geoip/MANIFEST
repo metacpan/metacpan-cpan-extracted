@@ -1,6 +1,7 @@
 geoip
 ChangeLog
 CONTRIBUTING.md
+SECURITY.md
 cpanfile
 lib/App/geoip.pm
 Makefile.PL

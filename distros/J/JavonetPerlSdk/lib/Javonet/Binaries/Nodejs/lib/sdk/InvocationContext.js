@@ -1,8 +1,10 @@
+const DelegatesCache = require('../core/delegatesCache/DelegatesCache')
 const Interpreter = require('../core/interpreter/Interpreter')
 const Command = require('../utils/Command')
 const CommandType = require('../utils/CommandType')
 const ConnectionType = require('../utils/ConnectionType')
 const ExceptionThrower = require('../utils/exception/ExceptionThrower')
+const RuntimeName = require('../utils/RuntimeName')
 
 /**
  * InvocationContext is a class that represents a context for invoking commands.
@@ -339,6 +341,40 @@ class InvocationContext {
     }
 
     /**
+     * Creates a null object of a specific type on the target runtime.
+     * @param {string} methodName - The name of the method to invoke.
+     * @param {...any} args - Method arguments.
+     * @returns {InvocationContext} An InvocationContext instance with the command to create a null object.
+     * TODO: connect documentation page url
+     * @see [Javonet Guides](https://www.javonet.com/guides/)
+     * @method
+     */
+    getStaticMethodAsDelegate(methodName, ...args) {
+        const localCommand = new Command(this.#runtimeName, CommandType.GetStaticMethodAsDelegate, [
+            methodName,
+            ...args,
+        ])
+        return this.#createInstanceContext(localCommand)
+    }
+
+    /**
+     * Creates a null object of a specific type on the target runtime.
+     * @param {string} methodName - The name of the method to invoke.
+     * @param {...any} args - Method arguments.
+     * @returns {InvocationContext} An InvocationContext instance with the command to create a null object.
+     * TODO: connect documentation page url
+     * @see [Javonet Guides](https://www.javonet.com/guides/)
+     * @method
+     */
+    getInstanceMethodAsDelegate(methodName, ...args) {
+        const localCommand = new Command(this.#runtimeName, CommandType.GetInstanceMethodAsDelegate, [
+            methodName,
+            ...args,
+        ])
+        return this.#createInstanceContext(localCommand)
+    }
+
+    /**
      * Retrieves an array from the target runtime.
      * @returns {InvocationContext} A new InvocationContext instance that wraps the command to retrieve the array.
      * @see [Javonet Guides](https://www.javonet.com/guides/v2/javascript/arrays-and-collections/retrieve-array)
@@ -390,6 +426,13 @@ class InvocationContext {
                 payloadItem[i] = this.#encapsulatePayloadItem(payloadItem[i])
             }
             return new Command(this.runtimeName, CommandType.Array, payloadItem)
+        } else if (typeof payloadItem === 'function') {
+            let newArray = new Array(payloadItem.length + 1)
+            for (let i = 0; i < newArray.length; i++) {
+                newArray[i] = typeof Object
+            }
+            const args = [DelegatesCache.addDelegate(payloadItem), RuntimeName.Nodejs].push(...newArray);
+            return new Command(this.#runtimeName, CommandType.PassDelegate, args)
         } else {
             return new Command(this.runtimeName, CommandType.Value, [payloadItem])
         }

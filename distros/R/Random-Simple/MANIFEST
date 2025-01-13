@@ -10,8 +10,13 @@ LICENSE
 Makefile.PL
 MANIFEST			This list of files
 README
-t/01-general.t
 example.pl
 Changes
+t/00-seeding.t
+t/01-random_bytes.t
+t/02-random_int.t
+t/03-rand.t
+t/04-randx.t
+t/05-random_float.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -47,11 +47,12 @@ our %defaults;
 use constant	DEFAULT_MAX_SLURP_SIZE => 16 * 1024;	# CSV files <= than this size are read into memory
 
 =head1 VERSION
-Version 0.15
+
+Version 0.16
 
 =cut
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 =head1 SYNOPSIS
 
@@ -106,9 +107,17 @@ The key column's default name is 'entry', but it can be overridden by the 'id' p
 CSV files that are not no_entry can have empty lines or comment lines starting with '#',
 to make them more readable.
 
-For example, you can access the files in /var/db/foo.csv via this class:
+=head1 EXAMPLE
 
-    package MyPackageName::Database::Foo;
+If the file /var/dat/foo.csv contains something like:
+
+    "customer_id","name"
+    "plugh","John"
+    "xyzzy","Jane"
+
+Create a driver for the file in .../Database/foo.pm:
+
+    package Database::foo;
 
     use Database::Abstraction;
 
@@ -123,11 +132,19 @@ For example, you can access the files in /var/db/foo.csv via this class:
         return $class->SUPER::new(no_entry => 1, sep_char => ',', %args);
     }
 
-You can then access the data using:
+You can then use this code to access the data via the driver:
 
-    my $foo = MyPackageName::Database::Foo->new(directory => '/var/dat');
+    # Opens the file, e.g. /var/dat/foo.csv
+    my $foo = Database::foo->new(directory => '/var/dat');
+
+    # Prints "John"
     print 'Customer name ', $foo->name(customer_id => 'plugh'), "\n";
 
+    # Prints:
+    #  $VAR1 = {
+    #     'customer_id' => 'xyzzy',
+    #     'name' => 'Jane'
+    #  };
     my $row = $foo->fetchrow_hashref(customer_id => 'xyzzy');
     print Data::Dumper->new([$row])->Dump();
 
@@ -658,11 +675,19 @@ Returns a hash reference for a single row in a table.
 Special argument: table: determines the table to read from if not the default,
 which is worked out from the class name
 
+When no_entry is not set allow just one argument to be given: the entry value.
+
 =cut
 
 sub fetchrow_hashref {
 	my $self = shift;
-	my $params = $self->_get_params(undef, @_);
+	my $params;
+
+	if(!$self->{'no_entry'}) {
+		$params = $self->_get_params('entry', @_);
+	} else {
+		$params = $self->_get_params(undef, @_);
+	}
 
 	my $table = $params->{'table'} || $self->{'table'} || ref($self);
 	$table =~ s/.*:://;
@@ -1053,7 +1078,7 @@ sub _get_params
 	my $default = shift;
 
 	# Directly return hash reference if the first parameter is a hash reference
-	return $_[0] if ref $_[0] eq 'HASH';
+	return $_[0] if(ref $_[0] eq 'HASH');
 
 	my %rc;
 	my $num_args = scalar @_;
@@ -1064,10 +1089,14 @@ sub _get_params
 		return { $default => shift };
 	} elsif($num_args == 1) {
 		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '()');
-	} elsif($num_args == 0 && defined $default) {
-		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '($default => \$val)');
+	} elsif(($num_args == 0) && (defined($default))) {
+		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], "($default => \$val)");
 	} elsif(($num_args % 2) == 0) {
 		%rc = @_;
+	} elsif($num_args == 0) {
+		return;
+	} else {
+		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '()');
 	}
 
 	return \%rc;
@@ -1091,7 +1120,7 @@ XML slurping is hard,
 so if XML fails for you on a small file force non-slurping mode with
 
     $foo = MyPackageName::Database::Foo->new({
-        directory => '/var/db',
+        directory => '/var/dat',
         max_slurp_size => 0	# force to not use slurp and therefore to use SQL
     });
 

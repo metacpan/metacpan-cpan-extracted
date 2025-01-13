@@ -1,5 +1,19 @@
 Revision history for perl distribution Archive-SCS
 
+1.06 - 2025-01-12
+
+  - Add file system directory format handler
+
+  - Rename methods and constructor parameters in mountables to match the new
+    directory format handler's semantics:
+    - file => path
+    - handles_file => handles_path
+
+  - Release fix: CityHash failed to build on compilers that indicate SSE4.2
+    support
+
+  - Release fix: Raise minimum Perl version to v5.34 (isa infix bug)
+
 1.05 - 2024-11-26
 
   - Change the search order for the install dir to search paths provided as

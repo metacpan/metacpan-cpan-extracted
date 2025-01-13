@@ -27,9 +27,9 @@ requires:
 resources:
   bugtracker: https://github.com/PDLPorters/pdl-io-hdf5/issues
   homepage: http://pdl.perl.org/
-  license: http://cpansearch.perl.org/src/CHM/PDL-IO-HDF5-0.73/COPYRIGHT
+  license: http://dev.perl.org/licenses/
   repository: https://github.com/PDLPorters/pdl-io-hdf5
-version: '0.73'
+version: '0.761'
 x_meta_spec:
   url: http://search.cpan.org/perldoc?CPAN::Meta::Spec
   version: '2'

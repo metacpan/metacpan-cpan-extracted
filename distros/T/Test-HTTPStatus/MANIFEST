@@ -6,18 +6,21 @@ LICENSE
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
-README.pod
-t/coverage.t
+README.md
+t/changes.t
+t/comment-spelling.t
+t/eof.t
 t/eol.t
 t/get_status.t
 t/links.t
 t/load.t
 t/no404s.t
+t/pod-cm.t
+t/pod-coverage.t
+t/pod-spelling.t
 t/pod.t
-t/pod_coverage.t
 t/status.t
 t/test_manifest
 t/vars.t
-xt/changes.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,7 +1,7 @@
 --- 
 abstract: Show geographical data based on hostname or IP address(es)
 author: 
-  - H.Merijn Brand <h.m.brand@xs4all.nl>
+  - H.Merijn Brand <hmbrand@cpan.org>
 build_requires: 
   Config: 0
 configure_requires: 
@@ -16,19 +16,19 @@ name: App-geoip
 provides: 
   App::geoip: 
     file: lib/App/geoip.pm
-    version: '0.17'
+    version: '0.18'
 recommends: 
   Archive::Zip: '1.68'
-  DBI: '1.643'
-  Data::Dumper: '2.184'
-  Getopt::Long: '2.54'
+  DBI: '1.646'
+  Data::Dumper: '2.189'
+  Getopt::Long: '2.58'
   JSON::PP: '4.16'
-  LWP::Simple: '6.67'
-  Math::Trig: '1.23'
+  LWP::Simple: '6.77'
+  Math::Trig: '1.62'
   Net::CIDR: '0.21'
   Pod::Usage: '2.03'
-  Socket: '2.036'
-  Text::CSV_XS: '1.49'
+  Socket: '2.038'
+  Text::CSV_XS: '1.59'
 requires: 
   Archive::Zip: 0
   DBI: 0
@@ -50,4 +50,4 @@ resources:
   homepage: https://metacpan.org/pod/App::geoip
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/GeoIP2
-version: '0.17'
+version: '0.18'

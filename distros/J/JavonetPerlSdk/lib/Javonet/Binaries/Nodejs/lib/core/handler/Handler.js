@@ -23,6 +23,11 @@ const EnableTypeHandler = require('./EnableTypeHandler')
 const { CommandType, Command, ExceptionSerializer } = require('../../..')
 const ReferencesCache = require('../referenceCache/ReferencesCache')
 const InvokeStandaloneMethodHandler = require('./InvokeStandaloneMethodHandler')
+const GetStaticMethodAsDelegateHandler = require('./GetStaticMethodAsDelegateHandler')
+const GetInstanceMethodAsDelegateHandler = require('./GetInstanceMethodAsDelegateHandler')
+const PassDelegateHandler = require('./PassDelegateHandler')
+const InvokeDelegateHandler = require('./InvokeDelegateHandler')
+const { ConvertTypeHandler } = require('../../utils/TypesConverter')
 
 function isResponseSimpleType(response) {
     let type = typeof response
@@ -56,6 +61,11 @@ const handlers = {
     [CommandType.Array]: ArrayHandler,
     [CommandType.EnableNamespace]: EnableNamespaceHandler,
     [CommandType.EnableType]: EnableTypeHandler,
+    [CommandType.GetStaticMethodAsDelegate]: GetStaticMethodAsDelegateHandler,
+    [CommandType.GetInstanceMethodAsDelegate]: GetInstanceMethodAsDelegateHandler,
+    [CommandType.PassDelegate]: PassDelegateHandler,
+    [CommandType.InvokeDelegate]: InvokeDelegateHandler,
+    [CommandType.ConvertType]: ConvertTypeHandler,
 }
 
 Object.keys(handlers).forEach((commandTypeHandler) => {

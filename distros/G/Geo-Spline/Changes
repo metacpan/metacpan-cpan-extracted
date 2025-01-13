@@ -1,0 +1,57 @@
+Revision history for Perl module Geo::Spline
+
+0.17 2025-01-12
+  - Moved from private repo to GitHub
+  - Moved to modern tests
+  - Documentation
+  - Added RPM spec file
+
+0.16 2006-02-01
+  - Documentation
+
+0.15 2006-01-04
+  - Documentation
+
+0.14 2006-01-03
+  - Documentation
+
+0.13 2006-12-06
+  - added ellipsoid method
+
+0.12 2006-12-06
+  - Some how the wrong META.yml got in the distribution
+
+0.11 2006-12-05
+  - Require Geo::Ellipsoids => 0.08
+
+0.10 2006-12-05
+  - Replaced constants with Geo::Ellipsoids
+
+0.09 2006-12-03
+  - Documentation
+
+0.08 2006-11-29
+  - Documentation
+  - All methods will return either arrays or references based on wantarray.
+  - Added dependancy on "use constant" to Makefile.PL
+
+0.07 2006-11-05
+  - Added Excel Document
+
+0.06 2006-11-04
+  - Major interface changes
+
+0.05 2006-11-04
+  - Documentation
+
+0.04 2006-11-04
+  - Documentation
+
+0.03 2006-11-04
+  - Fixed type-O in Meta.yml
+
+0.02 2006-10-31
+  - normalized heading to be positive
+
+0.01 2006-10-30
+  - Original version

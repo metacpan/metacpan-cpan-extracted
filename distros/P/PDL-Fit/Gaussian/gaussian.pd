@@ -61,6 +61,20 @@ estimate of the FWHM is the length of the ndarray/3, so it might fail
 if the ndarray is too long. (This is non-robust anyway). Most data
 does just fine and this is a good default gaussian fitter.
 
+The values of the error code $err correspond to:
+
+=over 4
+
+=item 0: successful fit
+
+=item 1: internal problem with memory allocation
+
+=item 2: insufficient number of data points
+
+=item 3: fit did not converge
+
+=back
+
 SEE ALSO: fitgauss1dr() for fitting radial gaussians
 
 =head2 fitgauss1dr
@@ -91,6 +105,20 @@ pixels (i.e. those at the end of the data ndarray). The initial
 estimate of the FWHM is the length of the ndarray/3, so it might fail
 if the ndarray is too long. (This is non-robust anyway). Most data
 does just fine and this is a good default gaussian fitter.
+
+The values of the error code $err correspond to:
+
+=over 4
+
+=item 0: successful fit
+
+=item 1: internal problem with memory allocation
+
+=item 2: insufficient number of data points
+
+=item 3: fit did not converge
+
+=back
 
 SEE ALSO: fitgauss1d() to fit centre as well.
 

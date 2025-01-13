@@ -53,14 +53,14 @@
       },
       "homepage" : "http://pdl.perl.org/",
       "license" : [
-         "http://cpansearch.perl.org/src/CHM/PDL-IO-HDF5-0.73/COPYRIGHT"
+         "http://dev.perl.org/licenses/"
       ],
       "repository" : {
          "type" : "git",
          "web" : "https://github.com/PDLPorters/pdl-io-hdf5"
       }
    },
-   "version" : "0.73",
+   "version" : "0.761",
    "x_meta_spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
       "version" : "2"

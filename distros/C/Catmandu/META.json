@@ -4,7 +4,7 @@
       "Nicolas Steenlant <nicolas.steenlant@ugent.be>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.22, Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Milla version v1.0.22, Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -51,7 +51,7 @@
          },
          "requires" : {
             "Any::URI::Escape" : "0",
-            "App::Cmd" : "0.33",
+            "App::Cmd" : "<= 0.336",
             "CGI::Expand" : "2.02",
             "Class::Method::Modifiers" : "0",
             "Clone" : "0.31",
@@ -59,11 +59,12 @@
             "Cpanel::JSON::XS" : "3.0213",
             "Data::Compare" : "1.22",
             "Data::Util" : "0.66",
+            "Getopt::Long::Descriptive" : "<= 0.115",
             "HTTP::Request" : "0",
             "Hash::Merge::Simple" : "0",
             "IO::Handle::Util" : "0.01",
             "LWP::UserAgent" : "0",
-            "List::MoreUtils" : "0.401",
+            "List::SomeUtils" : "0.59",
             "Log::Any" : "0",
             "Log::Any::Adapter" : "0",
             "MIME::Types" : "0",
@@ -121,7 +122,7 @@
          "web" : "https://github.com/LibreCat/Catmandu"
       }
    },
-   "version" : "1.2022",
+   "version" : "1.2023",
    "x_contributors" : [
       "Christian Pietsch <chr.pietsch+github@googlemail.com>",
       "Dave Sherohman <dsheroh@cpan.org>",
@@ -130,6 +131,7 @@
       "EC2 Default User <ec2-user@ip-10-114-199-125.ec2.internal>",
       "EC2 Default User <ec2-user@ip-10-194-230-16.ec2.internal>",
       "EC2 Default User <ec2-user@ip-10-77-5-148.ec2.internal>",
+      "Graham Ollis <gollis@fastly.com>",
       "Jakob Vo\u00df <jakob.voss@gbv.de>",
       "Johann Rolschewski <jorol@cpan.org>",
       "Magnus Enger <magnus@enger.priv.no>",
@@ -146,7 +148,7 @@
       "Vitali Peil <vpeil@cpan.org>",
       "Zakariyya Mughal <zaki.mughal@gmail.com>"
    ],
-   "x_generated_by_perl" : "v5.41.4",
+   "x_generated_by_perl" : "v5.24.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 0

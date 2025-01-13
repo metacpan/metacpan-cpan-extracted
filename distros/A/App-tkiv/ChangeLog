@@ -1,3 +1,10 @@
+0.134 - 13 Jan 2025, H.Merijn Brand
+    * More specific version declarations based on known CVE's
+    * Pre-grenerated documentation
+    * It's 2024
+    * It's 2025
+    * Add SECURITY.md
+
 0.133 - 06 Jan 2023, H.Merijn Brand
     * It's 2023
 

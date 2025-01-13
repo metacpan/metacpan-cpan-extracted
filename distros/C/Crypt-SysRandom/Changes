@@ -1,0 +1,7 @@
+Revision history for Crypt-SysRandom
+
+0.002     2025-01-13 00:03:03+01:00 Europe/Brussels
+          - fix UNISTD_GETENTROPY feature detection
+
+0.001     2025-01-12 17:51:05+01:00 Europe/Brussels
+          Initial release to an unsuspecting world

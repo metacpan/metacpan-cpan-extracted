@@ -1,8 +1,8 @@
-use v5.32;
+use v5.34;
 use warnings;
 use Object::Pad 0.73;
 
-class Archive::SCS 1.05;
+class Archive::SCS 1.06;
 
 use stable 0.031 'isa';
 
@@ -12,10 +12,11 @@ use List::Util 1.45 qw(first uniqstr);
 use Module::Load 'load';
 use Path::Tiny 0.054 'path';
 
+use Archive::SCS::Directory;
 use Archive::SCS::HashFS;
 use Archive::SCS::HashFS2;
 
-field @formats = qw( HashFS2 HashFS );
+field @formats = qw( HashFS2 HashFS Directory );
 
 field @mounts;
 field %entries;
@@ -35,28 +36,30 @@ method set_formats {
 }
 
 
-method format_module ($file) {
-  open my $fh, '<:raw', $file or croak
-    sprintf "%s: $!", $file->basename;
-  read $fh, my $header, 8 or croak
-    sprintf "%s: $!", $file->basename;
+method format_module ($path) {
+  my $header = '';
+  if ($path->is_file) {
+    open my $fh, '<:raw', $path or croak
+      sprintf "%s: $!", $path->basename;
+    read $fh, $header, 8 or croak
+      sprintf "%s: $!", $path->basename;
+    close $fh;
+  }
 
   my @modules = map { __PACKAGE__ . "::$_" } @formats;
-  my $module = first { $_->handles_file($fh, $header) } @modules or croak
-    sprintf "%s: No suitable format handler found", $file->basename;
-
-  close $fh;
+  my $module = first { $_->handles_path($path, $header) } @modules or croak
+    sprintf "%s: No suitable format handler found", $path->basename;
   return $module;
 }
 
 
 method mount ($mountable) {
   if ( not $mountable isa Archive::SCS::Mountable ) {
-    my $file = path $mountable;
-    my $format = $self->format_module($file);
-    $mountable = $format->new(file => $file);
+    my $path = path $mountable;
+    my $format = $self->format_module($path);
+    $mountable = $format->new(path => $path);
   }
-  my $basename = $mountable->file->basename;
+  my $basename = $mountable->path->basename;
 
   $self->is_mounted($mountable) and croak
     sprintf "%s: Already mounted", $basename;
@@ -72,9 +75,9 @@ method mount ($mountable) {
 
 method unmount ($mount) {
   if ( not $mount isa Archive::SCS::Mountable ) {
-    my $file = path $mount;
-    $mount = first { $file->realpath eq $_->file->realpath } @mounts or croak
-      sprintf "%s: Not mounted", $file->basename;
+    my $path = path $mount;
+    $mount = first { $path->realpath eq $_->path->realpath } @mounts or croak
+      sprintf "%s: Not mounted", $path->basename;
   }
 
   $mount->unmount;
@@ -91,7 +94,7 @@ method unmount ($mount) {
 
 
 method is_mounted ($mountable) {
-  first { $mountable->file->realpath eq $_->file->realpath } @mounts
+  first { $mountable->path->realpath eq $_->path->realpath } @mounts
 }
 
 
@@ -164,7 +167,7 @@ Archive::SCS - SCS archive controller
 =head1 DESCRIPTION
 
 Handles the union file system used by SCS archive files.
-Allows mounting of multiple files and
+Allows mounting of multiple files or extracted directories and
 performs lookups in all of them using the SCS hash algorithm.
 
 These modules exist primarily to support the F<scs_archive>
@@ -272,6 +275,8 @@ are the following:
 
 =over
 
+=item * L<Archive::SCS::Directory>
+
 =item * L<Archive::SCS::HashFS>
 
 =item * L<Archive::SCS::HashFS2>
@@ -281,7 +286,7 @@ are the following:
 =head2 unmount
 
   $archive = $scs->unmount($pathname);
-  $archive = $scs->mount($mountable);
+  $archive = $scs->unmount($mountable);
 
 Removes the given SCS archive from currently mounted archives.
 Returns the archive's L<Archive::SCS::Mountable> object.
@@ -300,7 +305,7 @@ L<nautofon|https://github.com/nautofon>
 
 =head1 COPYRIGHT
 
-This software is copyright (c) 2024 by nautofon.
+This software is copyright (c) 2025 by nautofon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -198,7 +198,6 @@ B<Usage:>
 );
 
 #   Mapping of PDL types to what types they are written to in the HDF5 file.
-my %PDLtoHDF5fileMapping;
 if ( isbigendian() ) {
   %PDLtoHDF5fileMapping = (
     $PDL::Types::PDL_SB => PDL::IO::HDF5::H5T_STD_I8BE(),

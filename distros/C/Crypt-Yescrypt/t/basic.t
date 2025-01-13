@@ -1,16 +1,11 @@
-use warnings;
+#! perl
+
 use strict;
+use warnings;
 
 use Test::More;
 
 use Crypt::Yescrypt qw/yescrypt yescrypt_check yescrypt_needs_rehash yescrypt_kdf/;
-use MIME::Base64 'decode_base64';
-
-sub de_base64($) {
-	my($text) = @_;
-	$text =~ tr#./A-Za-z0-9#A-Za-z0-9+/#;
-	return decode_base64($text);
-}
 
 my $password = "Hello World,";
 my $salt = "A" x 16;

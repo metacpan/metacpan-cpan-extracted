@@ -2,11 +2,11 @@ package Catmandu::Fix::index;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2022';
+our $VERSION = '1.2023';
 
 use Moo;
 use Catmandu::Util::Path qw(as_path);
-use List::MoreUtils qw(indexes first_index);
+use List::SomeUtils qw(indexes first_index);
 use namespace::clean;
 use Catmandu::Fix::Has;
 

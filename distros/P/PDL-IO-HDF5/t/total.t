@@ -170,5 +170,84 @@ is( join(",",sort @groups), 'dude2,mygroup' );
 @groups = $group2->groups;
 
 is( scalar(@groups), 0 );
+undef $hdfobj;
+
+{
+# Script to test the attribute index functionality of the PDL::IO::HDF5 Class
+# New File Check:
+my $filename = "total.hdf5";
+ok(my $hdfobj = PDL::IO::HDF5->new($filename));
+
+# It is normally a no-no to call a internal method, but we
+#  are just testing here:
+$hdfobj->_buildAttrIndex;
+
+my $baseline = {
+    '/' =>     {
+        attr1 => 'dudeman23',
+        attr2 => 'What??',
+    },
+    '/dude2' =>     {
+        attr1 => 'dudeman23',
+        attr2 => 'What??',
+    },
+    '/mygroup' =>     {
+        attr1 => 'dudeman23',
+        attr2 => 'What??',
+    },
+    '/mygroup/subgroup' =>     {
+        attr1 => 'dudeman23',
+        attr2 => 'What??',
+    },
+};
+is_deeply($hdfobj->{attrIndex}, $baseline);
+
+my @values = $hdfobj->allAttrValues('attr1');
+$baseline = [ 'dudeman23', 'dudeman23', 'dudeman23', 'dudeman23' ];
+is_deeply \@values, $baseline;
+
+@values = $hdfobj->allAttrValues('attr1','attr2');
+$baseline = [
+    [ 'dudeman23', 'What??', ], [ 'dudeman23', 'What??', ],
+    [ 'dudeman23', 'What??', ], [ 'dudeman23', 'What??', ]
+];
+is_deeply \@values, $baseline;
+
+my @names = $hdfobj->allAttrNames;
+is_deeply \@names, [ 'attr1', 'attr2', ];
+
+# Test building the groupIndex
+$hdfobj->_buildGroupIndex('attr1','attr2');
+$hdfobj->_buildGroupIndex('attr2');
+$hdfobj->_buildGroupIndex('attr1','attr3');
+
+$baseline = {
+  'attr1attr2' => {
+    'dudeman23What??' => [ '/', '/dude2', '/mygroup', '/mygroup/subgroup' ]
+  },
+  'attr1attr3' => {
+    'dudeman23_undef_' => [ '/', '/dude2', '/mygroup', '/mygroup/subgroup' ]
+  },
+  'attr2' => {
+    'What??' => [ '/', '/dude2', '/mygroup', '/mygroup/subgroup' ]
+  }
+};
+
+my $result = $hdfobj->{groupIndex};
+is_deeply $result, $baseline or diag explain $result;
+
+my @groups = $hdfobj->getGroupsByAttr( 'attr1'  => 'dudeman23',
+					'attr2' => 'What??');
+$baseline = [
+    '/',
+    '/dude2',
+    '/mygroup',
+    '/mygroup/subgroup',
+];
+is_deeply \@groups, $baseline;
+
+# clean up file
+}
+unlink $filename if( -e $filename);
 
 done_testing;

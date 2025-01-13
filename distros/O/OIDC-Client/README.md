@@ -19,10 +19,6 @@ It includes :
 - exchanges the access token
 - redirects the browser to the logout URL
 
-## Security Recommendation
-
-When using OIDC-Client with one of its framework plugins (e.g., for Mojolicious or Catalyst), it is highly recommended to configure the framework to store session data, including sensitive tokens such as access and refresh tokens, on the backend rather than in client-side cookies. Although cookies can be signed and encrypted, storing tokens in the client exposes them to potential security threats.
-
 ## Documentation Index
 
 - Mojolicious Application
@@ -36,6 +32,14 @@ When using OIDC-Client with one of its framework plugins (e.g., for Mojolicious 
 - Batch or script
 
     [Client module documentation](https://metacpan.org/pod/OIDC::Client)
+
+## Note on Dependencies
+
+To ensure a smooth and consistent installation process, all dependencies for both the Mojolicious and Catalyst plugins are included in this distribution. Even if you only use one of these plugins, the other dependencies will not be loaded into memory at runtime, as Perl only loads modules explicitly required by the application. This approach prioritizes simplicity and ensures compatibility across different environments.
+
+## Security Recommendation
+
+When using OIDC-Client with one of its framework plugins (e.g., for Mojolicious or Catalyst), it is highly recommended to configure the framework to store session data, including sensitive tokens such as access and refresh tokens, on the backend rather than in client-side cookies. Although cookies can be signed and encrypted, storing tokens in the client exposes them to potential security threats.
 
 ## Limitations
 

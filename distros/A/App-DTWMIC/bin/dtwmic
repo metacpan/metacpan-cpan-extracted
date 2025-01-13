@@ -1,22 +1,17 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 # App::DTWMIC - Copyright (C) 2019 Ilya Pavlov
 # App::DTWMIC is licensed under the
 # GNU Lesser General Public License v2.1
 
 use strict;
 use warnings;
-
 use utf8;
 
-use List::Util qw(max);
 use Getopt::Long;
 
 use App::DTWMIC;
-
-use YAML::Tiny;
 use Udev::FFI;
-#use Gtk3 '-init';
-
+use YAML::Syck;
 
 use constant {
     DEVICE_INPUT_OTHER          => 0,
@@ -30,10 +25,8 @@ use constant {
     ]
 };
 
-
 my $config;
-
-
+my $udev;
 
 sub _get_device_type {
     my $device = shift;
@@ -44,9 +37,8 @@ sub _get_device_type {
     my $id_input_touchscreen    = $device->get_property_value('ID_INPUT_TOUCHSCREEN');
 
     if (defined($id_input_mouse) && $id_input_mouse eq '1') {
-        # ID_INPUT_MOUSE: Touchscreens and tablets have this flag as
-        # well, since by the type of events they can produce they act as
-        # a mouse.
+        # ID_INPUT_MOUSE: Touchscreens and tablets have this flag as well, since by the type of events they can produce
+        # they act as a mouse.
         # https://askubuntu.com/questions/520359/how-to-detect-touchscreen-devices-from-a-script
 
         if (defined($id_input_touchpad) && $id_input_touchpad eq '1') {
@@ -71,11 +63,8 @@ sub _get_device_type {
         return DEVICE_INPUT_TOUCHSCREEN;
     }
 
-
     return DEVICE_INPUT_OTHER;
 }
-
-
 
 sub _get_device_data {
     my $device = shift;
@@ -91,50 +80,91 @@ sub _get_device_data {
     $name = 'unknown'
         unless defined $name;
 
+    $name =~ s/^"(.*)"$/$1/;
+
     return {
         type    => $device_type,
         sysname => $parent->get_sysname(),
         data    => {
-            name    => $name
+            name => $name
         }
     };
 }
-
-
 
 sub _enable_touchpads($$) {
     my $toushpads = shift;
     my $is_enable = shift;
 
-    for (keys(%$toushpads)) {
-        my $cmd = $is_enable ?$config->{touchpadon} :$config->{touchpadoff};
-        my $tname = $toushpads->{$_}{name};
-        $cmd =~ s/(?<=[^\\])\$TOUCHPAD_NAME(?=[^a-zA-Z_\d])/$tname/;
+    for my $toushpad (values(%$toushpads)) {
+        my $cmd = $is_enable ? $config->{'touchpadon'} : $config->{'touchpadoff'};
 
-        system($cmd);
+        if (ref($cmd) eq '') { # legacy
+            $cmd =~ s/(?<=^|[^\\])\$TOUCHPAD_NAME(?=[^a-zA-Z_\d]|$)/$toushpad->{'name'}/;
+            $cmd = [$cmd];
+        }
+        elsif (ref($cmd) eq 'ARRAY') {
+            for (@$cmd) {
+                s/(?<=^|[^\\])\$TOUCHPAD_NAME(?=[^a-zA-Z_\d]|$)/$toushpad->{'name'}/;
+            }
+        }
+        else {
+            return;
+        }
+
+        system(@$cmd);
     }
 }
 
+sub _update_state() {
+    my $touchpads = {};
+    my $has_mouse_devices = 0;
 
+    my $enumerate = $udev->new_enumerate() or
+        die("Can't create enumerate context: $@");
+
+    $enumerate->add_match_subsystem('input') or
+        die("Can't add match subsystem: $!");
+
+    $enumerate->scan_devices() or
+        die("Can't scan devices: $!");
+
+    my $devices = $enumerate->get_list_entries() or
+        die("Can't get devices: $!");
+
+    for (keys(%$devices)) {
+        if (defined(my $device = $udev->new_device_from_syspath($_))) {
+            my $device_data = _get_device_data($device);
+            next
+                unless %$device_data;
+
+            if (DEVICE_INPUT_TOUCHPAD == $device_data->{'type'}) {
+                $touchpads->{ $device_data->{'sysname'} } = $device_data->{'data'};
+            }
+            elsif (DEVICE_INPUT_MOUSE == $device_data->{'type'}) {
+                ++$has_mouse_devices;
+            }
+        }
+    }
+
+    _enable_touchpads($touchpads, 0 == $has_mouse_devices ? 1 : 0);
+}
 
 my $config_path;
-my $list;
 
 {
-    my $help;
-    my $version;
-    #my $configure;
+    my $cmd_flag_help;
+    my $cmd_flag_list;
+    my $cmd_flag_version;
 
     GetOptions(
-        'h|help' => \$help,
-        'v|version' => \$version,
-        'l|list' => \$list,
+        'h|help' => \$cmd_flag_help,
+        'v|version' => \$cmd_flag_version,
+        'l|list' => \$cmd_flag_list,
         'f|config-file=s' => \$config_path,
-    #    'c|configure' => \$configure
     )
-    or do { $help = 1 };
+    or do { $cmd_flag_help = 1 };
 
-    if (defined($help)) {
+    if (defined($cmd_flag_help)) {
         print q{Usage:
     dtwmic [OPTIONS]
     dtwmic f|config-file=CUSTOM_CONFIG_FILE_PATH
@@ -145,89 +175,73 @@ my $list;
 
     a default config file is created on the first run in ~/.config/dtwmic/config.yml (if not exists)
 };
+
         exit(0);
     }
 
-    if (defined($version)) {
-        print "dtwmic version is $App::DTWMIC::VERSION\n";
+    if (defined($cmd_flag_version)) {
+        print("dtwmic version is $App::DTWMIC::VERSION\n");
+
         exit(0);
     }
-}
 
+    $udev = Udev::FFI->new() or
+        die("Can't initialize Udev::FFI library: $@");
 
-my $udev = Udev::FFI->new() or
-    die("Can't initialize Udev::FFI library: $@");
+    if (defined($cmd_flag_list)) {
+        my $enumerate = $udev->new_enumerate() or
+            die("Can't create enumerate context: $@");
 
-my $enumerate = $udev->new_enumerate() or
-    die("Can't create enumerate context: $@");
+        $enumerate->add_match_subsystem('input') or
+            die("Can't add match subsystem: $!");
 
-$enumerate->add_match_subsystem('input') or
-    die("Can't add match subsystem: $!");
+        $enumerate->scan_devices() or
+            die("Can't scan devices: $!");
 
+        my $devices = $enumerate->get_list_entries() or
+            die("Can't get devices: $!");
 
-my $mouse_devices = {};
-my $touchpads = {};
-my $tablets = {};
+        my $input_devices = {};
+        my $max_str_length = 0;
+        my $str_length;
 
-if (defined($list)) {
-    $enumerate->scan_devices() or
-        die("Can't scan devices: $!");
+        for (keys(%$devices)) {
+            if (defined(my $device = $udev->new_device_from_syspath($_))) {
+                my $device_data = _get_device_data($device);
+                next
+                    unless %$device_data;
 
-    my $devices = $enumerate->get_list_entries() or
-        die "Can't get devices: $!";
+                $input_devices->{ $device_data->{'type'} }{ $device_data->{'sysname'} } = $device_data->{'data'};
 
-    my @lengths;
-
-    for (keys(%$devices)) {
-        if (defined(my $device = $udev->new_device_from_syspath($_))) {
-            my $device_data = _get_device_data($device);
-            next
-                unless %$device_data;
-
-            my $p_devices;
-            if (DEVICE_INPUT_MOUSE == $device_data->{type}) {
-                $p_devices = $mouse_devices;
+                $str_length = length($device_data->{'data'}{'name'});
+                if ($str_length > $max_str_length) {
+                    $max_str_length = $str_length;
+                }
             }
-            elsif (DEVICE_INPUT_TOUCHPAD == $device_data->{type}) {
-                $p_devices = $touchpads;
-            }
-            elsif (DEVICE_INPUT_TABLET == $device_data->{type}) {
-                $p_devices = $tablets;
-            }
-            else {
-                next;
-            }
-
-            $p_devices->{ $device_data->{sysname} } = $device_data->{data};
-
-            push(@lengths, length( $device_data->{data}{name} ));
         }
+
+        $max_str_length += 8 - ($max_str_length % 4);
+
+        for my $dev_type (@{ [[DEVICE_INPUT_MOUSE, 'MOUSE DEVICES'], [DEVICE_INPUT_TOUCHPAD, 'TOUCHPAD DEVICES']] }) {
+            print("$dev_type->[1]:\n");
+
+            while (my ($sysname, $device_data) = each(%{ $input_devices->{ $dev_type->[0] } })) {
+                print('  '.$device_data->{'name'}.(' ' x ($max_str_length - length($device_data->{'name'}))).
+                    "sysname: $sysname\n");
+            }
+
+            print("\n");
+        }
+
+        exit(0);
     }
-
-
-    my $max_str_length = max(@lengths) + 8;
-    $max_str_length -= ($max_str_length % 4);
-
-    print "MOUSE DEVICES:\n";
-    for (keys(%$mouse_devices)) {
-        print '  '.$mouse_devices->{$_}{name}.(' ' x ($max_str_length - length($mouse_devices->{$_}{name}))).'sysname: '.$_."\n";
-    }
-
-    print "TOUCHPAD DEVICES:\n";
-    for (keys(%$touchpads)) {
-        print '  '.$touchpads->{$_}{name}.(' ' x ($max_str_length - length($touchpads->{$_}{name}))).'sysname: '.$_."\n";
-    }
-
-
-    exit(0);
 }
-
 
 if (!defined($config_path)) {
     require File::HomeDir;
 
-    my $config_dir = File::HomeDir->my_home.'/.config/dtwmic/';
-    if (!-d $config_dir) {
+    my $config_dir = File::HomeDir->my_home().'/.config/dtwmic/';
+    unless (-d $config_dir) {
         require File::Path;
         File::Path->import('make_path');
 
@@ -238,15 +252,16 @@ if (!defined($config_path)) {
 
     $config_path = $config_dir.'config.yml';
 
-    if (!-f $config_path) {
+    unless (-f $config_path) {
         require File::Which;
         File::Which->import();
 
         my $synclient_path = which('synclient');
         if(!defined($synclient_path)) {
-            for(@{ +SYNCLIENT_LOCATIONS }) {
+            for(@{ SYNCLIENT_LOCATIONS() }) {
                 if(-f) {
                     $synclient_path = $_;
+
                     last;
                 }
             }
@@ -257,15 +272,17 @@ if (!defined($config_path)) {
             die("Can't create default config file $config_path: $!\n");
 
         if (defined($synclient_path)) {
+            $synclient_path =~ s/"/\\"/;
+
             print $fh qq{# \$TOUCHPAD_NAME variable available here
-touchpadon: $synclient_path touchpadoff=0
-touchpadoff: $synclient_path touchpadoff=1
+touchpadon: ["$synclient_path", touchpadoff=0]
+touchpadoff: ["$synclient_path", touchpadoff=1]
 };
         }
         else {
             print $fh qq{# \$TOUCHPAD_NAME variable available here
-touchpadon: xinput set-prop \$TOUCHPAD_NAME "Device Enabled" 1
-touchpadoff: xinput set-prop \$TOUCHPAD_NAME "Device Enabled" 0
+touchpadon: [xinput, set-prop, \$TOUCHPAD_NAME, "Device Enabled", 1]
+touchpadoff: [xinput, set-prop, \$TOUCHPAD_NAME, "Device Enabled", 0]
 };
         }
 
@@ -273,14 +290,12 @@ touchpadoff: xinput set-prop \$TOUCHPAD_NAME "Device Enabled" 0
     }
 }
 
-
 eval {
-    $config = YAML::Tiny->read($config_path)->[0];
+    $config = YAML::Syck::LoadFile($config_path);
 };
 if ($@) {
     die("Can't load config file $config_path: $@\n");
 }
-
 
 my $monitor = $udev->new_monitor() or
     die "Can't create udev monitor: $@";
@@ -291,89 +306,14 @@ $monitor->filter_by_subsystem_devtype('input') or
 $monitor->start() or
     die "Can't start udev monitor: $!";
 
-
-$enumerate->scan_devices() or
-    die("Can't scan devices: $!");
-
-my $devices = $enumerate->get_list_entries() or
-    die "Can't get devices: $!";
-
-
-for (keys(%$devices)) {
-    if (defined(my $device = $udev->new_device_from_syspath($_))) {
-        my $device_data = _get_device_data($device);
-        next
-            unless %$device_data;
-
-        my $p_devices;
-        if (DEVICE_INPUT_MOUSE == $device_data->{type}) {
-            $p_devices = $mouse_devices;
-        }
-        elsif (DEVICE_INPUT_TOUCHPAD == $device_data->{type}) {
-            $p_devices = $touchpads;
-        }
-        elsif (DEVICE_INPUT_TABLET == $device_data->{type}) {
-            $p_devices = $tablets;
-        }
-        else {
-            next;
-        }
-
-        $p_devices->{ $device_data->{sysname} } = $device_data->{data};
-    }
-}
-
-
-if (%$mouse_devices) {
-    _enable_touchpads($touchpads, 0);
-}
-else {
-    _enable_touchpads($touchpads, 1);
-}
-
-
-my $has_mouse_devices = %$mouse_devices ?1 :0;
+_update_state();
 
 for (;;) {
     my $device = $monitor->poll();
     my $action = $device->get_action();
 
-    my $device_data = _get_device_data($device);
-    next
-        unless %$device_data;
-
-    my $has_mouse_devices_old;
-
-    my $p_devices;
-    if (DEVICE_INPUT_MOUSE == $device_data->{type}) {
-        $p_devices = $mouse_devices;
-    }
-    elsif (DEVICE_INPUT_TOUCHPAD == $device_data->{type}) {
-        $p_devices = $touchpads;
-    }
-    elsif (DEVICE_INPUT_TABLET == $device_data->{type}) {
-        $p_devices = $tablets;
-    }
-    else {
-        next;
-    }
-
-
-    if ($action eq 'add') {
-        $p_devices->{ $device_data->{sysname} } = $device_data->{data};
-
-        if (0 == $has_mouse_devices && %$mouse_devices) {
-            _enable_touchpads($touchpads, 0);
-            $has_mouse_devices = 1;
-        }
-    }
-    elsif ($action eq 'remove') {
-        delete $p_devices->{ $device_data->{sysname} };
-
-        if (0 != $has_mouse_devices && !%$mouse_devices) {
-            _enable_touchpads($touchpads, 1);
-            $has_mouse_devices = 0;
-        }
+    if ($action eq 'add' || $action eq 'remove') {
+        _update_state();
     }
 }
 

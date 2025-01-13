@@ -1,0 +1,210 @@
+#!perl
+
+use App::grepurl;
+
+App::grepurl->run( @ARGV );
+
+=head1 NAME
+
+grepurl - print links in HTML
+=encoding utf8
+
+=head1 SYNOPSIS
+
+	grepurl [-bdv] [-e extension[,extension] [-E extension[,extension]
+		[-h host[,host]] [-H host[,host]] [-p regex] [-P regex]
+		[-s scheme[,scheme]] [-s scheme[,scheme]] [-u URL]
+
+=head1 DESCRIPTION
+
+This is the script interface to L<App::grepurl> which is a modulino.
+
+The grepurl program searches through the URL specified in the -u
+switch and prints the URLs that satisfies the given set of options.
+It applies the options roughly in order of which part of the URL
+the option affects (scheme, host, path, extension).
+
+So far, grepurl expects to search through HTML, although I want to
+add other content types, especially plain text, RSS feeds, and so on.
+
+=head1 OPTIONS
+
+=over 4
+
+=item -a
+
+arrange (sort) links in ascending order
+
+=item -A
+
+arrange (sort) links in descending order
+
+=item -b
+
+turn relative URLs into absolute ones
+
+=item -d
+
+turn on debugging output
+
+=item -e EXTENSION
+
+select links with these extensions (comma separated)
+
+=item -E EXTENSION
+
+exclude links with these extensions (comma separated)
+
+=item -h HOST
+
+select links with these hosts (comma separated)
+
+=item -H HOST
+
+exclude links with these hosts (comma separated)
+
+=item -p REGEX
+
+select only paths that match this Perl regex
+
+=item -P REGEX
+
+exclude paths that match this Perl regex
+
+=item -r REGEX
+
+select only URLs that match this Perl regex (applies to entire URL)
+
+=item -R REGEX
+
+exclude URLs that match this Perl regex (applies to entire URL)
+
+=item -s SCHEME
+
+select only these schemes (comma separated)
+
+=item -S SCHEME
+
+exclude these schemes (comma separated)
+
+=item -t FILE
+
+extract URLs from plain text file (not implemented)
+
+=item -u URL
+
+extract URLs from URL (may be file://), expects HTML
+
+=item -v
+
+turn on verbose output
+
+=item -1
+
+print found URLs only once (print a unique list)
+
+=back
+
+=head2 Examples
+
+=over 4
+
+=item Print all the links
+
+	grepurl -u http://www.example.com/
+
+=item Print all the links, and resolve relative URLs
+
+	grepurl -b -u http://www.example.com/
+
+=item Print links with the edxtension .jpg
+
+	grepurl -e jpg -u http://www.example.com/
+
+=item Print links with the edxtension .jpg and .jpeg
+
+	grepurl -e jpg,jpeg -u http://www.example.com/
+
+=item Do not print links with the extension .cfm or .asp
+
+	grepurl -E cfm,asp -u http://www.example.com/
+
+=item Print only links to www.panix.com
+
+	grepurl -h www.panix.com -u http://www.example.com/
+
+=item Print only links to www.panix.com or www.perl.com
+
+	grepurl -h www.panix.com,www.perl.com -u http://www.example.com/
+
+=item Do not print links to www.microsoft.com
+
+	grepurl -H www.microsoft.com -u http://www.example.com/
+
+=item Print links with "perl" in the path
+
+	grepurl -p perl -u http://www.example.com
+
+=item Print links with "perl" or "pearl" in the path
+
+	grepurl -p "pea?rl" -u http://www.example.com
+
+=item Print links with "fred" or "barney" in the path
+
+	grepurl -p "fred|barney" -u http://www.example.com
+
+=item Do not print links with "SCO" in the path
+
+	grepurl -P SCO -u http://www.example.com
+
+=item Do not print links whose path matches "Micro.*"
+
+	grepurl -P "Micro.*" -u http://www.example.com
+
+=item Do not print links whose URL matches "Micro.*" anywhere
+
+	grepurl -R "Micro.*" -u http://www.example.com
+
+=item Print only web links
+
+	grepurl -s http -u http://www.example.com/
+
+=item Print ftp and gopher links
+
+	grepurl -s ftp,gopher -u http://www.example.com/
+
+=item Exclude ftp and gopher links
+
+	grepurl -S ftp,gopher -u http://www.example.com/
+
+=item Arrange the links in an ascending sort
+
+	grepurl -a -u http://www.example.com/
+
+=item Arrange the links in an descending sort
+
+	grepurl -A -u http://www.example.com/
+
+=item Arrange the links in an descending sort, and print unique URLs
+
+	grepurl -A -1 -u http://www.example.com/
+
+=back
+
+=head1 SOURCE AVAILABILITY
+
+This source is in Github:
+
+	https://github.com/briandfoy/app-grepurl
+
+=head1 AUTHOR
+
+brian d foy, C<< <bdfoy@cpan.org> >>
+
+=head1 COPYRIGHT
+
+Copyright © 2004-2025, brian d foy <bdfoy@cpan.org>. All rights reserved.
+
+You may use this program under the terms of the Artistic License 2.0.
+
+=cut

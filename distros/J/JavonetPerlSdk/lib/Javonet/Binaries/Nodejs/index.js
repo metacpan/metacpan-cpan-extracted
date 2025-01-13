@@ -4,6 +4,7 @@ const CommandSerializer = require('./lib/core/protocol/CommandSerializer')
 const TypeDeserializer = require('./lib/core/protocol/TypeDeserializer')
 const TypeSerializer = require('./lib/core/protocol/TypeSerializer')
 const Interpreter = require('./lib/core/interpreter/Interpreter')
+const DelegatesCache = require('./lib/core/delegatesCache/DelegatesCache')
 
 // Sdk
 const RuntimeContext = require('./lib/sdk/RuntimeContext')
@@ -36,6 +37,7 @@ module.exports = {
     TypeDeserializer,
     TypeSerializer,
     Interpreter,
+    DelegatesCache,
 
     // Sdk
     InvocationContext,

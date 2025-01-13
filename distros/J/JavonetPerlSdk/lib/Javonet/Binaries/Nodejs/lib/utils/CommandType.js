@@ -37,7 +37,12 @@ const CommandType = /** @type {const} */ ({
     EnableNamespace: 34,
     EnableType: 35,
     CreateNull: 36,
-    InvokeStandaloneMethod: 37,
+    GetStaticMethodAsDelegate: 37,
+    GetInstanceMethodAsDelegate: 38,
+    PassDelegate: 39,
+    InvokeDelegate: 40,
+    ConvertType: 41,
+    InvokeStandaloneMethod: 42,
 })
 
 module.exports = CommandType

@@ -4,7 +4,7 @@ package Surveyor::Benchmark::HTMLEntities;
 use strict;
 use warnings;
 
-our $VERSION = '1.025';
+our $VERSION = '1.026';
 our $HTML;
 
 use HTML::Entities;
@@ -135,7 +135,7 @@ brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2013-2024, brian d foy <briandfoy@pobox.com>. All rights reserved.
+Copyright © 2013-2025, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 You may redistribute this under the terms of Artistic License 2.0.
 

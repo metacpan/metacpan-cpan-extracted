@@ -1,86 +1,92 @@
 {
    "generated_by" : "Author",
+   "provides" : {
+      "App::geoip" : {
+         "version" : "0.18",
+         "file" : "lib/App/geoip.pm"
+      }
+   },
+   "release_status" : "stable",
    "resources" : {
-      "license" : [
-         "http://dev.perl.org/licenses/"
-         ],
       "repository" : {
          "url" : "https://github.com/Tux/GeoIP2",
          "type" : "git",
          "web" : "https://github.com/Tux/GeoIP2"
-         },
-      "homepage" : "https://metacpan.org/pod/App::geoip",
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
       "bugtracker" : {
          "web" : "https://github.com/Tux/GeoIP2/issues"
-         },
-      "x_IRC" : "irc://irc.perl.org/#csv"
       },
-   "license" : [
-      "perl_5"
-      ],
-   "version" : "0.17",
+      "x_IRC" : "irc://irc.perl.org/#csv",
+      "homepage" : "https://metacpan.org/pod/App::geoip"
+   },
    "name" : "App-geoip",
-   "abstract" : "Show geographical data based on hostname or IP address(es)",
    "prereqs" : {
-      "test" : {
-         "requires" : {
-            "Test::More" : "0"
-            }
-         },
       "build" : {
          "requires" : {
             "Config" : "0"
-            }
-         },
-      "runtime" : {
-         "recommends" : {
-            "Getopt::Long" : "2.54",
-            "Math::Trig" : "1.23",
-            "Net::CIDR" : "0.21",
-            "JSON::PP" : "4.16",
-            "Text::CSV_XS" : "1.49",
-            "Archive::Zip" : "1.68",
-            "Data::Dumper" : "2.184",
-            "Socket" : "2.036",
-            "LWP::Simple" : "6.67",
-            "DBI" : "1.643",
-            "Pod::Usage" : "2.03"
-            },
-         "requires" : {
-            "perl" : "5.014",
-            "Math::Trig" : "0",
-            "Net::CIDR" : "0",
-            "Socket" : "0",
-            "DBI" : "0",
-            "LWP::Simple" : "0",
-            "Text::CSV_XS" : "1.39",
-            "JSON::PP" : "0",
-            "Pod::Text" : "0",
-            "Getopt::Long" : "0",
-            "List::Util" : "0",
-            "Archive::Zip" : "0",
-            "Data::Dumper" : "0"
-            }
-         },
+         }
+      },
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
-            }
+         },
+         "suggests" : {
+            "ExtUtils::MakeMaker" : "7.70"
+         },
+         "recommends" : {
+            "ExtUtils::MakeMaker" : "7.22"
          }
       },
-   "release_status" : "stable",
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Net::CIDR" : "0.21",
+            "JSON::PP" : "4.16",
+            "Text::CSV_XS" : "1.59",
+            "Math::Trig" : "1.62",
+            "LWP::Simple" : "6.77",
+            "Socket" : "2.038",
+            "Getopt::Long" : "2.58",
+            "Archive::Zip" : "1.68",
+            "Data::Dumper" : "2.189",
+            "DBI" : "1.646",
+            "Pod::Usage" : "2.03"
+         },
+         "requires" : {
+            "Socket" : "0",
+            "Getopt::Long" : "0",
+            "Pod::Text" : "0",
+            "Math::Trig" : "0",
+            "Text::CSV_XS" : "1.39",
+            "perl" : "5.014",
+            "LWP::Simple" : "0",
+            "JSON::PP" : "0",
+            "Net::CIDR" : "0",
+            "DBI" : "0",
+            "List::Util" : "0",
+            "Archive::Zip" : "0",
+            "Data::Dumper" : "0"
+         }
+      }
+   },
+   "abstract" : "Show geographical data based on hostname or IP address(es)",
+   "author" : [
+      "H.Merijn Brand <hmbrand@cpan.org>"
+   ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
       "version" : 2
-      },
-   "provides" : {
-      "App::geoip" : {
-         "version" : "0.17",
-         "file" : "lib/App/geoip.pm"
-         }
-      },
-   "author" : [
-      "H.Merijn Brand <h.m.brand@xs4all.nl>"
-      ],
-   "dynamic_config" : 1
-   }
+   },
+   "version" : "0.18",
+   "dynamic_config" : 1,
+   "license" : [
+      "perl_5"
+   ]
+}

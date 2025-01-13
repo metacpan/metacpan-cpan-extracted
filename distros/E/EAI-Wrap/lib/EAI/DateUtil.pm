@@ -1,4 +1,4 @@
-package EAI::DateUtil 1.918;
+package EAI::DateUtil 1.919;
 
 use strict; use warnings; use feature 'unicode_strings'; use utf8;
 use Exporter qw(import); use Time::Local qw( timelocal_modern timegm_modern ); use Time::localtime; use POSIX qw(mktime); use Carp qw(cluck);
@@ -124,7 +124,7 @@ sub get_curdate_dash_plus_X_years ($;$$) {
 		return sprintf("%02d-%02d-%04d",$dateval->mday(), $dateval->mon()+1, $dateval->year()+1900+$y);
 	} else {
 		# add X years (minus daysToSubtract) from today
-		my $offsetday = (localtime->mday() eq "29" and !IsLeapYear(localtime->year()+ 1900 + $y) ? 1 : 0); # regard february in leap years
+		my $offsetday = (localtime->mday() eq "29" && !IsLeapYear(localtime->year()+ 1900 + $y) ? 1 : 0); # regard february in leap years
 		return sprintf("%02d-%02d-%04d",localtime->mday()-$offsetday, localtime->mon()+1, localtime->year()+ 1900 + $y);
 	}
 }

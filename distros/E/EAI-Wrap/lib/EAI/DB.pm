@@ -1,4 +1,4 @@
-package EAI::DB 1.918;
+package EAI::DB 1.919;
 
 use strict; use feature 'unicode_strings'; use warnings;
 use Exporter qw(import); use DBI qw(:sql_types); use DBD::ODBC (); use Data::Dumper qw(Dumper); use Log::Log4perl qw(get_logger); use Carp qw(confess longmess);
@@ -106,7 +106,7 @@ sub readFromDBHash ($$) {
 		confess "no valid dbh connection available" if !defined($dbh);
 		confess "no statement (hashkey query) given" if (!$statement);
 		confess "no key fields list (hashkey keyfields) given" if (!@keyfields);
-		$logger->debug("statement: ".$statement);
+		$logger->debug("statement: ".$statement.", keyfields: @keyfields");
 		$dbh->{RaiseError} = 1; # to enable following try/catch (eval)
 		eval {
 			my $sth = $dbh->prepare($statement);

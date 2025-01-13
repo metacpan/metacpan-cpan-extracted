@@ -15,7 +15,7 @@ use Moo::Role;
 use Carp qw(croak);
 use namespace::clean;
 
-our $VERSION='1.008';
+our $VERSION='1.009';
 our $SKIP_TRIGGER=0;
 
 # used as a place holder for extended format data
@@ -431,23 +431,52 @@ Attrivutes:
 =cut
 
 sub MODIFY_CODE_ATTRIBUTES {
+  my $self=shift;
+  my $code=shift;
+  return () unless @_;
+  my @attr;
+  if(my $root=$self->SUPER::can('MODIFY_CODE_ATTRIBUTES')) {
+    if($root eq \&MODIFY_CODE_ATTRIBUTES) {
+      @attr=@_;
+    } else {
+      my @list;
+      for my $attr (@_) {
+        my ($type,$level)=split /_/,$attr;
+        if(exists $LEVEL_MAP{$level} and $type=~ m/^(?:BENCHMARK|RESULT)$/s) {
+          push @attr,$attr,
+        } else {
+          push @list,$attr;
+        }
+      }
 
-  my ($self,$code,$attr)=@_;
+      push @attr,$self->$root($code,@list);
+    }
+  } else {
+    @attr=@_;
+  }
+  my $attr=shift @attr;
   my $trace=$self->strack_trace_to_level(2);
   
-
-  my $name=svref_2object($code)->GV->NAME;
-  $trace->{sub}="${self}::$name";
+  my $gv=svref_2object($code)->GV;
+  my $name=$gv->NAME;
+  my $tn="${self}::$name";
+  $trace->{sub}=$tn;
+  $trace->{line}=$gv->LINE;
   my ($type,$level)=split /_/,$attr;
-  return $attr unless exists $LEVEL_MAP{$level} and $type=~ m/^(?:BENCHMARK|RESULT)$/s;
-  croak "Cannot add $attr to ${self}::$name"  if __PACKAGE__->can($name);
+  return ($attr,@attr) unless exists $LEVEL_MAP{$level} and $type=~ m/^(?:BENCHMARK|RESULT)$/s;
 
   my $lc=lc($type);
   my $method="_attribute_${lc}_common";
-  my $ref=$self->$method($trace,$level,$code);
-
-  #return $self->SUPER::MODIFY_CODE_ATTRIBUTES($self,$ref,$attr) if $self->can('SUPER::MODIFY_CODE_ATTRIBUTES');
-  return ();
+  my $target=$code;
+  {
+    no strict 'refs';
+    if(my $nc=\&{$tn} ne $code) {
+      # the code we intended to modify was changed
+      $target=$nc
+    }
+  }
+  my $ref=$self->$method($trace,$level,$target);
+  return (@attr);
 }
 
 
@@ -494,9 +523,7 @@ sub _attribute_result_common {
   };
   no strict;
   no warnings 'redefine';
-  my $eval="*$method=\$ref";
-  eval $eval;
-  croak $@ if $@;
+  *{$method}=$ref;
   return $ref;
 }
 
@@ -554,9 +581,7 @@ sub _attribute_benchmark_common {
   };
   no strict;
   no warnings 'redefine';
-  my $eval="*$method=\$ref";
-  eval $eval;
-  croak $@ if $@;
+  *{$method}=$ref;
   return $ref;
 }
 

@@ -26,7 +26,7 @@ no_index:
 provides:
   Daje::Workflow::FileChanged::Activity:
     file: lib/Daje/Workflow/FileChanged/Activity.pm
-    version: '0.01'
+    version: '0.03'
   Daje::Workflow::FileChanged::Database::DB:
     file: lib/Daje/Workflow/FileChanged/Database/DB.pm
     version: '0.01'
@@ -41,6 +41,6 @@ resources:
   bugtracker: https://github.com/janeskil1525/Daje-Workflow-FileChanged-Activity/issues
   homepage: https://github.com/janeskil1525/Daje-Workflow-FileChanged-Activity
   repository: https://github.com/janeskil1525/Daje-Workflow-FileChanged-Activity.git
-version: '0.01'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

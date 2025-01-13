@@ -157,7 +157,7 @@ Number of seconds of leeway for a token to be considered expired before it actua
 =head2 provider."provider".decode_jwt
 
 Options to be transferred to the
-[Crypt::JWT::decode_jwt()](https://metacpan.org/pod/Crypt::JWT#decode_jwt)
+L<Crypt::JWT::decode_jwt()|https://metacpan.org/pod/Crypt::JWT#decode_jwt>
 function used to validate and decode a JWT token.
 
 By default, the transmitted options are :

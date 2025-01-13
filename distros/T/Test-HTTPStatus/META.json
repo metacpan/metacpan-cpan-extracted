@@ -4,7 +4,7 @@
       "brian d foy <bdfoy@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -41,7 +41,9 @@
       "test" : {
          "requires" : {
             "Test::Builder::Module" : "0",
-            "Test::Most" : "0"
+            "Test::DescribeMe" : "0",
+            "Test::Most" : "0",
+            "Test::Needs" : "0"
          }
       }
    },
@@ -57,6 +59,6 @@
          "web" : "https://github.com/nigelhorne/Test-HTTPStatus"
       }
    },
-   "version" : "2.05",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "2.06",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

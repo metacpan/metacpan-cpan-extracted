@@ -1,107 +1,113 @@
 {
-   "dynamic_config" : 1,
-   "author" : [
-      "H.Merijn Brand <h.m.brand@xs4all.nl>"
-      ],
-   "generated_by" : "Author",
    "optional_features" : {
       "opt_format_tiff" : {
-         "description" : "Support for TIFF",
          "prereqs" : {
             "runtime" : {
                "requires" : {
                   "Tk::TIFF" : "0"
-                  }
                }
             }
          },
+         "description" : "Support for TIFF"
+      },
       "opt_xeleven_protocol" : {
-         "description" : "Use X11::Protocol to get the screen size",
          "prereqs" : {
             "runtime" : {
                "requires" : {
                   "X11::Protocol" : "0"
-                  }
                }
             }
+         },
+         "description" : "Use X11::Protocol to get the screen size"
+      }
+   },
+   "dynamic_config" : 1,
+   "version" : "0.134",
+   "resources" : {
+      "repository" : {
+         "web" : "https://github.com/Tux/App-tkiv",
+         "url" : "https://github.com/Tux/App-tkiv",
+         "type" : "git"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "bugtracker" : {
+         "web" : "https://github.com/Tux/App-tkiv/issues"
+      }
+   },
+   "name" : "App-tkiv",
+   "provides" : {
+      "App::tkiv" : {
+         "version" : "0.134",
+         "file" : "lib/App/tkiv.pm"
+      }
+   },
+   "abstract" : "An image viewer in Perl::Tk based on IrfanView",
+   "generated_by" : "Author",
+   "prereqs" : {
+      "runtime" : {
+         "recommends" : {
+            "Image::Size" : "3.300",
+            "X11::Protocol" : "0.56",
+            "Data::Peek" : "0.53",
+            "Image::Info" : "1.45",
+            "Tk" : "804.036",
+            "Getopt::Long" : "2.58",
+            "Image::ExifTool" : "13.10",
+            "Tk::TIFF" : "0.11"
+         },
+         "requires" : {
+            "Tk::Balloon" : "0",
+            "File::Temp" : "0",
+            "perl" : "5.010",
+            "Tk::BrowseEntry" : "0",
+            "Tk::JPEG" : "0",
+            "Image::ExifTool" : "0",
+            "Getopt::Long" : "2.27",
+            "Tk::Dialog" : "0",
+            "Tk::Animation" : "0",
+            "Tk::Pixmap" : "0",
+            "Tk::Photo" : "0",
+            "Data::Peek" : "0",
+            "File::Copy" : "0",
+            "Tk::Bitmap" : "0",
+            "Tk::DirTree" : "0",
+            "Tk::PNG" : "0",
+            "Tk::Pane" : "0",
+            "Tk" : "804.027"
          }
       },
-   "name" : "App-tkiv",
-   "version" : "0.133",
-   "prereqs" : {
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
-            }
          },
-      "runtime" : {
          "recommends" : {
-            "Tk" : "804.036",
-            "Image::Info" : "1.43",
-            "Tk::TIFF" : "0.11",
-            "Data::Peek" : "0.52",
-            "Image::Size" : "3.300",
-            "X11::Protocol" : "0.56",
-            "Getopt::Long" : "2.54",
-            "Image::ExifTool" : "12.50"
-            },
-         "requires" : {
-            "Tk::Photo" : "0",
-            "Tk::Bitmap" : "0",
-            "Tk::Dialog" : "0",
-            "Tk::BrowseEntry" : "0",
-            "Image::ExifTool" : "0",
-            "Tk::Pane" : "0",
-            "Tk::Balloon" : "0",
-            "Tk::DirTree" : "0",
-            "Tk::PNG" : "0",
-            "Tk::Animation" : "0",
-            "File::Copy" : "0",
-            "Data::Peek" : "0",
-            "Tk" : "804.027",
-            "Tk::JPEG" : "0",
-            "Getopt::Long" : "2.27",
-            "perl" : "5.010",
-            "File::Temp" : "0",
-            "Tk::Pixmap" : "0"
-            }
+            "ExtUtils::MakeMaker" : "7.22"
          },
+         "suggests" : {
+            "ExtUtils::MakeMaker" : "7.70"
+         }
+      },
       "test" : {
-         "requires" : {
-            "Test::More" : "0.88",
-            "Test::Harness" : "0"
-            },
          "recommends" : {
-            "Test::More" : "1.302191"
-            }
-         }
-      },
-   "resources" : {
-      "bugtracker" : {
-         "web" : "https://github.com/Tux/App-tkiv/issues"
+            "Test::More" : "1.302207"
          },
-      "license" : [
-         "http://dev.perl.org/licenses/"
-         ],
-      "repository" : {
-         "type" : "git",
-         "url" : "https://github.com/Tux/App-tkiv",
-         "web" : "https://github.com/Tux/App-tkiv"
+         "requires" : {
+            "Test::Harness" : "0",
+            "Test::More" : "0.88"
          }
-      },
+      }
+   },
    "meta-spec" : {
       "version" : 2,
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
-      },
-   "release_status" : "stable",
-   "abstract" : "An image viewer in Perl::Tk based on IrfanView",
-   "provides" : {
-      "App::tkiv" : {
-         "version" : "0.133",
-         "file" : "lib/App/tkiv.pm"
-         }
-      },
+   },
+   "author" : [
+      "H.Merijn Brand <hmbrand@cpan.org>"
+   ],
    "license" : [
       "perl_5"
-      ]
-   }
+   ],
+   "release_status" : "stable"
+}

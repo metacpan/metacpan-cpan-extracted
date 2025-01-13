@@ -2,7 +2,7 @@
 [![coverage](https://coveralls.io/repos/github/nautofon/Archive-SCS/badge.svg?branch=main)](https://coveralls.io/github/nautofon/Archive-SCS?branch=main)
 [![kwalitee](https://cpants.cpanauthors.org/dist/Archive-SCS.svg)](https://cpants.cpanauthors.org/release/NAUTOFON/Archive-SCS)
 [![cpan](https://badge.fury.io/pl/Archive-SCS.svg)](https://metacpan.org/dist/Archive-SCS)
-[![perl 5.32](https://img.shields.io/badge/perl-v5.32+-blue.svg)](https://www.perl.org)
+[![perl 5.34](https://img.shields.io/badge/perl-v5.34+-blue.svg)](https://www.perl.org)
 [![license](https://img.shields.io/cpan/l/Archive-SCS)](https://raw.githubusercontent.com/nautofon/Archive-SCS/main/LICENSE)
 [![discussion](https://img.shields.io/badge/discussion-SCS_forum-e8d78a)](https://forum.scssoft.com/viewtopic.php?t=330746)
 
@@ -38,7 +38,7 @@ Discussion thread on the SCS forum:
 
 #### Installing Perl
 
-Archive::SCS requires Perl v5.32 or later.
+Archive::SCS requires Perl v5.34 or later.
 
 Your operating system probably comes with Perl pre-installed. Even so,
 the general advice these days is to *not* use system Perl, but rather
@@ -112,7 +112,7 @@ for example by posting in the
 
 ### License
 
-Copyright © 2024 [nautofon](https://github.com/nautofon)
+Copyright © 2025 [nautofon](https://github.com/nautofon)
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

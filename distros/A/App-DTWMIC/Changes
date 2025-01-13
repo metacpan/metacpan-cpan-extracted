@@ -1,5 +1,8 @@
 Revision history for App-DTWMIC
 
+0.003 2025-01-12T16:13:16Z
+    - migrate to YAML::Syck
+
 0.002 2019-02-09T09:44:40Z
     - Update docs
 

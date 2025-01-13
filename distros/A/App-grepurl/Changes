@@ -1,0 +1,14 @@
+Revision history for Perl module grepurl
+
+1.013 2025-01-12T12:54:57Z
+	* refresh distro and move to BRIANDFOY
+
+0.10 - 2004-02-20
+	* initial release---grep the urls in an HTML document
+
+1.02 - 2014-01-03
+	* Get rid of MYMETA
+
+1.01 - 2013-05-18
+	* Update docs, minor cleanups, bump to release version
+

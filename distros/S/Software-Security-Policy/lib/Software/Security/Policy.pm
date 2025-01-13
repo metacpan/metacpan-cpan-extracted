@@ -3,64 +3,15 @@ use warnings;
 package Software::Security::Policy;
 # ABSTRACT: packages that provide templated Security Policys
 
-our $VERSION = '0.04'; # VERSION
-
-use Data::Section -setup => { header_re => qr/\A__([^_]+)__\Z/ };
-use Text::Template ();
+our $VERSION = '0.07'; # VERSION
 
 
-sub new {
-  my ($class, $arg) = @_;
-
-  Carp::croak "no maintainer is specified" unless $arg->{maintainer};
-
-  bless $arg => $class;
-}
-
-
-sub url { (defined $_[0]->{url} ? $_[0]->{url} :
-            (defined $_[0]->{git_url} ? $_[0]->{git_url} :
-                'SECURITY.md')) }
-
-sub git_url { (defined $_[0]->{git_url} ? $_[0]->{git_url} :
-            (defined $_[0]->{url} ? $_[0]->{url} :
-                'SECURITY.md')) }
-
-
-sub support_years { $_[0]->{support_years} || '10'}
-
-sub timeframe {
-    return $_[0]->{timeframe} if defined $_[0]->{timeframe};
-    return $_[0]->{timeframe_quantity} . ' ' . $_[0]->{timeframe_units}
-        if defined $_[0]->{timeframe_quantity} &&
-            defined $_[0]->{timeframe_units};
-    return '5 days';
-}
-
-sub maintainer { $_[0]->{maintainer}     }
-
-sub _dotless_maintainer {
-  my $maintainer = $_[0]->maintainer;
-  $maintainer =~ s/\.$//;
-  return $maintainer;
-}
-
-
-sub program { $_[0]->{program} || $_[0]->{Program} || 'this program' }
-
-
-sub Program { $_[0]->{Program} || $_[0]->{program} || 'This program' }
-
-
-sub summary { shift->_fill_in('SUMMARY') }
-
-
-sub security_policy { shift->_fill_in('SECURITY-POLICY') }
-
-
-sub fulltext {
+sub name {
   my ($self) = @_;
-  return join "\n", $self->summary, $self->security_policy;
+  my $pkg = ref $self ? ref $self : $self;
+  $pkg =~ s/^Software::Security::Policy:://;
+  $pkg =~ s/::/ /g;
+  return $pkg;
 }
 
 
@@ -74,21 +25,10 @@ sub version  {
   return join '.', @vparts;
 }
 
-sub _fill_in {
-  my ($self, $which) = @_;
-
-  Carp::confess "couldn't build $which section" unless
-    my $template = $self->section_data($which);
-
-  return Text::Template->fill_this_in(
-    $$template,
-    HASH => { self => \$self },
-    DELIMITERS => [ qw({{ }}) ],
-  );
-}
-
 
 1;
+
+__END__
 
 =pod
 
@@ -100,7 +40,7 @@ Software::Security::Policy - packages that provide templated Security Policys
 
 =head1 VERSION
 
-version 0.04
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -114,67 +54,42 @@ version 0.04
     program     => 'Software::Security::Policy',
     timeframe   => '7 days',
     url         => 'https://github.com/CPAN-Security/Software-Security-Policy/blob/main/SECURITY.md',
-    support_years   => '10',
+    perl_support_years   => '10',
   });
 
   print $policy->fulltext, "\n";
 
-=head1 METHODS
+=head1 DESCRIPTION
 
-=over
+This is a framework for generating a SECURITY.md file to your Perl distributions that will let people know:
 
-=item new
+=over 4
 
-  my $policy = $subclass->new(\%arg);
+=item 1. How to contact the maintainers if they find a security issue with your software
 
-This method returns a new security policy object for the given
-security policy class.  Valid arguments are:
+=item 2. What software will be supported for security issues
 
 =back
 
-=head2 ATTRIBUTES
+The contact point is very important for modules that have been around for a long time and have had several authors over the years. When there is a long list of maintainers, it's not clear who to contact.
 
-=over
+You don't want people reporting security vulnerabilities in public on the RT or GitHub issues for your project, nor do you want a post on IRC, Reddit or social media about it.
 
-=item maintainer
+If your software is on GitHub, you can set up L<private vulnerability|https://docs.github.com/en/code-security/security-advisories/working-with-repository-security-advisories/configuring-private-vulnerability-reporting-for-a-repository> reporting. GitLab has a similar system.
 
-the current maintainer for the distibrution; required
+Otherwise, a single email address is acceptable. An alias that forwards to all of the maintainers or at the very least, a single maintainer who has agreed to that role will work.
 
-=item timeframe
+It's also important to realise as a maintainer that you are not on your own when you receive a vulnerability report. You are welcome and even encouraged to reach out to CPANSec for assistance triaging and fixing the issue, as well as handling notifications and reporting.
 
-the time to expect acknowledgement of a security issue.  Should
-include the units such as '5 days or 2 weeks'; defaults to 5 days
+The supported software version may seem obvious, but it's important to spell out: will you be updating only the latest version? What versions of Perl will you support? If your module uses or embeds other libraries, how will they be supported?
 
-=item timeframe_quantity
+=head1 ATTRIBUTES
 
-the amount of time to expect an acknowledgement of a security issue.
-Only used if timeframe is undefined and timeframe_units is defined
-(eg. '5')
-
-=item timeframe_units
-
-the units of time to expect an acknowledgement of a security issue.
-Only used if timeframe is undefined and timeframe_quantity is defined
-(eg. 'days')
-
-=item url
-
-a url where the most current security policy can be found.
-
-=item git_url
-
-a git url where the most current security policy can be found.
-
-=item support_years
-
-the number of years for which past major versions of Perl would be
-supported
-
-=item program
+=head2 program
 
 the name of software for use in the middle of a sentence
 
-=item Program
+=head2 Program
 
 the name of software for use in the beginning of a sentence
 
@@ -182,59 +97,7 @@ C<program> and C<Program> arguments may be specified both, either one or none.
 Each argument, if not specified, is defaulted to another one, or to properly
 capitalized "this program", if both arguments are omitted.
 
-=back
-
-=head2 support_years
-
-Get the number of years of support to be expected
-
-=head2 timeframe
-
-Get the expected response time. Defaults to 5 days and uses
-timeframe_quantity and timeframe_units if the timeframe attribute
-us undefined.
-
-=head2 maintainer
-
-Get the maintainer that should be contacted for security issues.
-
-=head2 url
-
-Get the URL of the latest security policy version.
-
-These methods are attribute readers.
-
-=head2 program
-
-Name of software for using in the middle of a sentence.
-
-The method returns value of C<program> constructor argument (if it evaluates as true, i. e.
-defined, non-empty, non-zero), or value of C<Program> constructor argument (if it is true), or
-"this program" as the last resort.
-
-=head2 Program
-
-Name of software for using at the beginning of a sentence.
-
-The method returns value of C<Program> constructor argument (if it is true), or value of C<program>
-constructor argument (if it is true), or "This program" as the last resort.
-
-=head2 name
-
-This method returns the name of the policy, suitable for shoving in the middle
-of a sentence, generally with a leading capitalized "The."
-
-=head2 url
-
-This method returns the URL at which a canonical text of the security policy can be
-found, if one is available.  If possible, this will point at plain text, but it
-may point to an HTML resource.
-
-=head2 git_url
-
-This method returns the git URL at which a canonical text of the security policy can be
-found, if one is available.  If possible, this will point at plain text, but it
-may point to an HTML resource.
+=head1 METHODS
 
 =head2 summary
 
@@ -248,12 +111,17 @@ This method returns the full text of the policy.
 
 =head2 fulltext
 
-This method returns the complete text of the policy.
+This method returns the complete text of the policy (summary and policy).
+
+=head2 name
+
+This method returns the name of the policy, suitable for shoving in the middle
+of a sentence, generally with a leading capitalized "The."
 
 =head2 version
 
 This method returns the version of the policy.  If the security
-policy is not versioned, this method will return false.
+policy is not versioned, this method will return undef.
 
 =head1 SEE ALSO
 
@@ -262,15 +130,6 @@ The specific policy:
 =for :list * L<Software::Security::Policy::Individual>
 
 Extra policys are maintained on CPAN in separate modules.
-
-=head1 COPYRIGHT
-
-This software is copyright (c) 2024-2025 by Timothy Legge <timlegge@gmail.com>.
-
-This module is based extensively on Software::License.  Only the
-changes required for this module are attributable to the author of
-this module.  All other code is attributable to the author of
-Software::License.
 
 =head1 AUTHOR
 
@@ -284,11 +143,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-__DATA__
-__SUMMARY__
-This is the Security Policy for the {{ $self->program }} distribution.
-
-Report issues to:
-
-  {{ $self->maintainer }}

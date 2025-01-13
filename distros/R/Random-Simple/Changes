@@ -1,4 +1,7 @@
-0.16 2024-01-08
+0.17 2025-01-12
+	- Add back in the unit tests
+
+0.16 2025-01-08
 	- Better document code
 	- Catch if somehow our seeds are both zero
 	- Log the random seeds used in the unit tests

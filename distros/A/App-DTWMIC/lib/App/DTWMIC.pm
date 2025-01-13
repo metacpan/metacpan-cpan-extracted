@@ -8,7 +8,7 @@ use utf8;
 
 use 5.008_005;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 
 

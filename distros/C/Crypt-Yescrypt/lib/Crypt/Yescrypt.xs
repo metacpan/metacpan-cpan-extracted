@@ -21,6 +21,12 @@ static int timing_safe_compare(const unsigned char *str1, const unsigned char *s
 
 #define MAP_CONSTANT(cons) newCONSTSUB(stash, #cons, newSVuv(cons))
 
+// Unicode stuff. This will force byte semantics on all string
+#undef SvPV
+#define SvPV(sv, len) SvPVbyte(sv, len)
+#undef SvPV_nolen
+#define SvPV_nolen(sv) SvPVbyte_nolen(sv)
+
 MODULE = Crypt::Yescrypt	PACKAGE = Crypt::Yescrypt
 
 PROTOTYPES: DISABLE
@@ -51,21 +57,15 @@ BOOT:
 
 	MAP_CONSTANT(YESCRYPT_RW_DEFAULTS);
 
-const char* yescrypt(SV* password, SV* salt, UV flavor, UV n, UV r, UV p = 1, UV t = 0, UV g = 0)
-	PREINIT:
-	const uint8_t *password_raw, *salt_raw, *setting;
-	STRLEN password_len, salt_len;
-	yescrypt_local_t local;
-	uint8_t settings[PREFIX_LEN + 1];
-	uint8_t buf[PREFIX_LEN + 1 + HASH_LEN + 1];
+const char* yescrypt(const unsigned char* password, size_t length(password), const unsigned char* salt, size_t length(salt), UV flavor, UV n, UV r, UV p = 1, UV t = 0, UV g = 0)
 	CODE:
+		yescrypt_local_t local;
+		uint8_t settings[PREFIX_LEN + 1];
+		uint8_t buf[PREFIX_LEN + 1 + HASH_LEN + 1];
 		yescrypt_params_t params = { flavor, (uint64_t)1 << n, r, p, t, g, 0 };
 		if (!yescrypt_init_local(&local)) {
-			password_raw = (const uint8_t*)SvPVbyte(password, password_len);
-			salt_raw = (const uint8_t*)SvPVbyte(salt, salt_len);
-
-			setting = yescrypt_encode_params_r(&params, salt_raw, salt_len, settings, sizeof(settings));
-			RETVAL = (char*)yescrypt_r(NULL, &local, password_raw, password_len, setting, NULL, buf, sizeof(buf));
+			yescrypt_encode_params_r(&params, salt, STRLEN_length_of_salt, settings, sizeof(settings));
+			RETVAL = (char*)yescrypt_r(NULL, &local, password, STRLEN_length_of_password, settings, NULL, buf, sizeof(buf));
 			yescrypt_free_local(&local);
 		}
 		else
@@ -73,18 +73,15 @@ const char* yescrypt(SV* password, SV* salt, UV flavor, UV n, UV r, UV p = 1, UV
 	OUTPUT:
 		RETVAL
 
-int yescrypt_check(SV* password, const char* hash, STRLEN length(hash))
+int yescrypt_check(const unsigned char* password, size_t length(password), const char* hash, STRLEN length(hash))
 	PREINIT:
-	const uint8_t *password_raw;
 	STRLEN password_len;
 	yescrypt_local_t local;
 	uint8_t outhash[PREFIX_LEN + 1 + HASH_LEN + 1];
 	CODE:
 		RETVAL = 0;
 		if (!yescrypt_init_local(&local)) {
-			password_raw = (const uint8_t*)SvPVbyte(password, password_len);
-
-			const uint8_t* ret = yescrypt_r(NULL, &local, password_raw, password_len, (const uint8_t*)hash, NULL, outhash, sizeof(outhash));
+			const uint8_t* ret = yescrypt_r(NULL, &local, password, STRLEN_length_of_password, (const uint8_t*)hash, NULL, outhash, sizeof(outhash));
 			yescrypt_free_local(&local);
 
 			if (ret && strlen((const char*)outhash) == STRLEN_length_of_hash)
@@ -93,34 +90,28 @@ int yescrypt_check(SV* password, const char* hash, STRLEN length(hash))
 	OUTPUT:
 		RETVAL
 
-int yescrypt_needs_rehash(SV* hash, UV flavor, UV n, UV r, UV p = 1, UV t = 0, UV g = 0)
+int yescrypt_needs_rehash(const unsigned char* hash, size_t length(hash), UV flavor, UV n, UV r, UV p = 1, UV t = 0, UV g = 0)
 	PREINIT:
 	uint8_t settings[PREFIX_LEN + 1];
-	const uint8_t *hash_raw, *setting;
-	STRLEN hash_len, setting_len;
+	STRLEN setting_len;
 	CODE:
-		hash_raw = (const uint8_t *)SvPVbyte(hash, hash_len);
 		yescrypt_params_t params = { flavor, (uint64_t)1 << n, r, p, t, g, 0 };
-		setting = yescrypt_encode_params_r(&params, (const uint8_t*)"", 0, settings, sizeof(settings));
+		yescrypt_encode_params_r(&params, (const uint8_t*)"", 0, settings, sizeof(settings));
 		setting_len = strlen((const char*)settings);
-		RETVAL = hash_len < setting_len || !timing_safe_compare(hash_raw, setting, setting_len - 1);
+		RETVAL = STRLEN_length_of_hash < setting_len || !timing_safe_compare(hash, settings, setting_len - 1);
 	OUTPUT:
 		RETVAL
 
-SV* yescrypt_kdf(SV* password, SV* salt, size_t buffer_size, UV flavor, UV n, UV r, UV p = 1, UV t = 0, UV g = 0)
+SV* yescrypt_kdf(const unsigned char* password, size_t length(password), const unsigned char* salt, size_t length(salt), size_t buffer_size, UV flavor, UV n, UV r, UV p = 1, UV t = 0, UV g = 0)
 	PREINIT:
-	const uint8_t *password_raw, *salt_raw;
-	STRLEN password_len, salt_len;
 	int rc;
 	yescrypt_local_t local;
 	CODE:
 		if (!yescrypt_init_local(&local)) {
 			yescrypt_params_t params = { flavor, 1ul << n, r, p, t, g, 0 };
-			password_raw = (const uint8_t *)SvPVbyte(password, password_len);
-			salt_raw = (const uint8_t *)SvPVbyte(salt, salt_len);
 
 			RETVAL = newSV(buffer_size);
-			rc = yescrypt_kdf(NULL, &local, password_raw, password_len, salt_raw, salt_len, &params, (uint8_t*)SvPVX(RETVAL), buffer_size);
+			rc = yescrypt_kdf(NULL, &local, password, STRLEN_length_of_password, salt, STRLEN_length_of_salt, &params, (uint8_t*)SvPVX(RETVAL), buffer_size);
 			yescrypt_free_local(&local);
 			if (rc == 0) {
 				SvPOK_only(RETVAL);

@@ -15,8 +15,7 @@ sub save_hash($self, $file, $hash) {
         {
             on_conflict => [
                 file => {
-                    hash => $hash,
-                    moddatetime => 'NOW()'
+                    hash => $hash
                 }
             ]
         }

@@ -3,7 +3,7 @@ NAME
     Policys
 
 VERSION
-    version 0.04
+    version 0.07
 
 SYNOPSIS
       use strict;
@@ -16,101 +16,58 @@ SYNOPSIS
         program     => 'Software::Security::Policy',
         timeframe   => '7 days',
         url         => 'https://github.com/CPAN-Security/Software-Security-Policy/blob/main/SECURITY.md',
-        support_years   => '10',
+        perl_support_years   => '10',
       });
 
       print $policy->fulltext, "\n";
 
-METHODS
-    new
-          my $policy = $subclass->new(\%arg);
+DESCRIPTION
+    This is a framework for generating a SECURITY.md file to your Perl
+    distributions that will let people know:
 
-        This method returns a new security policy object for the given
-        security policy class. Valid arguments are:
+    1. How to contact the maintainers if they find a security issue with
+    your software
+    2. What software will be supported for security issues
 
-  ATTRIBUTES
-    maintainer
-        the current maintainer for the distibrution; required
+    The contact point is very important for modules that have been around
+    for a long time and have had several authors over the years. When there
+    is a long list of maintainers, it's not clear who to contact.
 
-    timeframe
-        the time to expect acknowledgement of a security issue. Should
-        include the units such as '5 days or 2 weeks'; defaults to 5 days
+    You don't want people reporting security vulnerabilities in public on
+    the RT or GitHub issues for your project, nor do you want a post on IRC,
+    Reddit or social media about it.
 
-    timeframe_quantity
-        the amount of time to expect an acknowledgement of a security issue.
-        Only used if timeframe is undefined and timeframe_units is defined
-        (eg. '5')
+    If your software is on GitHub, you can set up private vulnerability
+    <https://docs.github.com/en/code-security/security-advisories/working-wi
+    th-repository-security-advisories/configuring-private-vulnerability-repo
+    rting-for-a-repository> reporting. GitLab has a similar system.
 
-    timeframe_units
-        the units of time to expect an acknowledgement of a security issue.
-        Only used if timeframe is undefined and timeframe_quantity is
-        defined (eg. 'days')
+    Otherwise, a single email address is acceptable. An alias that forwards
+    to all of the maintainers or at the very least, a single maintainer who
+    has agreed to that role will work.
 
-    url a url where the most current security policy can be found.
+    It's also important to realise as a maintainer that you are not on your
+    own when you receive a vulnerability report. You are welcome and even
+    encouraged to reach out to CPANSec for assistance triaging and fixing
+    the issue, as well as handling notifications and reporting.
 
-    git_url
-        a git url where the most current security policy can be found.
+    The supported software version may seem obvious, but it's important to
+    spell out: will you be updating only the latest version? What versions
+    of Perl will you support? If your module uses or embeds other libraries,
+    how will they be supported?
 
-    support_years
-        the number of years for which past major versions of Perl would be
-        supported
-
-    program
-        the name of software for use in the middle of a sentence
-
-    Program
-        the name of software for use in the beginning of a sentence
-
-        "program" and "Program" arguments may be specified both, either one
-        or none. Each argument, if not specified, is defaulted to another
-        one, or to properly capitalized "this program", if both arguments
-        are omitted.
-
-  support_years
-    Get the number of years of support to be expected
-
-  timeframe
-    Get the expected response time. Defaults to 5 days and uses
-    timeframe_quantity and timeframe_units if the timeframe attribute us
-    undefined.
-
-  maintainer
-    Get the maintainer that should be contacted for security issues.
-
-  url
-    Get the URL of the latest security policy version.
-
-    These methods are attribute readers.
-
+ATTRIBUTES
   program
-    Name of software for using in the middle of a sentence.
-
-    The method returns value of "program" constructor argument (if it
-    evaluates as true, i. e. defined, non-empty, non-zero), or value of
-    "Program" constructor argument (if it is true), or "this program" as the
-    last resort.
+    the name of software for use in the middle of a sentence
 
   Program
-    Name of software for using at the beginning of a sentence.
+    the name of software for use in the beginning of a sentence
 
-    The method returns value of "Program" constructor argument (if it is
-    true), or value of "program" constructor argument (if it is true), or
-    "This program" as the last resort.
+    "program" and "Program" arguments may be specified both, either one or
+    none. Each argument, if not specified, is defaulted to another one, or
+    to properly capitalized "this program", if both arguments are omitted.
 
-  name
-    This method returns the name of the policy, suitable for shoving in the
-    middle of a sentence, generally with a leading capitalized "The."
-
-  url
-    This method returns the URL at which a canonical text of the security
-    policy can be found, if one is available. If possible, this will point
-    at plain text, but it may point to an HTML resource.
-
-  git_url
-    This method returns the git URL at which a canonical text of the
-    security policy can be found, if one is available. If possible, this
-    will point at plain text, but it may point to an HTML resource.
-
+METHODS
   summary
     This method returns a snippet of text, usually a few lines, indicating
     the maintainer as well as an indication of the policy under which the
@@ -120,24 +77,21 @@ METHODS
     This method returns the full text of the policy.
 
   fulltext
-    This method returns the complete text of the policy.
+    This method returns the complete text of the policy (summary and
+    policy).
+
+  name
+    This method returns the name of the policy, suitable for shoving in the
+    middle of a sentence, generally with a leading capitalized "The."
 
   version
     This method returns the version of the policy. If the security policy is
-    not versioned, this method will return false.
+    not versioned, this method will return undef.
 
 SEE ALSO
     The specific policy:
 
     Extra policys are maintained on CPAN in separate modules.
-
-COPYRIGHT
-    This software is copyright (c) 2024-2025 by Timothy Legge
-    <timlegge@gmail.com>.
-
-    This module is based extensively on Software::License. Only the changes
-    required for this module are attributable to the author of this module.
-    All other code is attributable to the author of Software::License.
 
 AUTHOR
     Timothy Legge <timlegge@gmail.com>

@@ -1,4 +1,7 @@
 Changes for OIDC-Client distribution
 
+0.02 2025-01-12
+  - fix dependencies
+
 0.01 2025-01-10
   - initial version

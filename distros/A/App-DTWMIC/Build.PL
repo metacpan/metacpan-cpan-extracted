@@ -24,8 +24,8 @@ my %args = (
     requires => {
         'File::HomeDir' => '0',
         'File::Which' => '0',
-        'Udev::FFI' => '0.102000',
-        'YAML::Tiny' => '0',
+        'Udev::FFI' => '0.103000',
+        'YAML::Syck' => '0',
         'perl' => '5.008005',
     },
 

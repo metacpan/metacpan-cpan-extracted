@@ -5,6 +5,7 @@ inc/city.h
 lib/Archive/SCS.pm
 lib/Archive/SCS/CityHash.pm
 lib/Archive/SCS/CityHash.xs
+lib/Archive/SCS/Directory.pm
 lib/Archive/SCS/DirIndex.pm
 lib/Archive/SCS/GameDir.pm
 lib/Archive/SCS/HashFS.pm
@@ -21,6 +22,7 @@ t/00-compile.t
 t/01-cityhash.t
 t/40-hashfs-roundtrip.t
 t/50-hashfs2.t
+t/55-directory.t
 t/60-game-dir.t
 t/61-game-dir-mount.t
 t/70-cli.t

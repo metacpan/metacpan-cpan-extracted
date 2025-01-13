@@ -1,4 +1,4 @@
-package EAI::FTP 1.918;
+package EAI::FTP 1.919;
 
 use strict; use feature 'unicode_strings'; use warnings;
 use Exporter qw(import); use Net::SFTP::Foreign (); use Net::SFTP::Foreign::Constants qw( SFTP_ERR_LOCAL_UTIME_FAILED ); use Net::FTP (); use Text::Glob qw(match_glob);
@@ -54,7 +54,7 @@ sub _glob ($;$) {
 			$remoteGlob = $remoteFile;
 		}
 		my @returnedFiles = match_glob ($remoteGlob, $ftp->ls($remotePath)); # get all files in remote path
-		return map { (($remotePath eq "." or $withoutPath) ? $_ : $remotePath."/".$_) } @returnedFiles; # filter files by glob
+		return map { (($remotePath eq "." || $withoutPath) ? $_ : $remotePath."/".$_) } @returnedFiles; # filter files by glob
 	}
 }
 
@@ -366,7 +366,7 @@ sub archiveFiles ($) {
 			_setcwd(undef) or $logger->error("can't change into home (\$param->{noDirectRemoteDirChange} is set, first changing to home)".longmess()); # starting / means start from home...
 		}
 		$remoteDir = substr($remoteDir,1) if substr($remoteDir,0,1) eq "/" and $param->{noDirectRemoteDirChange};
-		my $archiveDir = ((substr($param->{archiveDir},-1) eq "/" or $param->{archiveDir} eq "") ? $param->{archiveDir} : $param->{archiveDir}."/") if $param->{archiveDir}; $archiveDir.="";
+		my $archiveDir = ((substr($param->{archiveDir},-1) eq "/" || $param->{archiveDir} eq "") ? $param->{archiveDir} : $param->{archiveDir}."/") if $param->{archiveDir}; $archiveDir.="";
 		if (_setcwd($remoteDir)) {
 			$logger->debug("changed into $remoteDir");
 			for my $remoteFile (@filesToArchive) {
@@ -451,7 +451,7 @@ sub login ($$;$) {
 	};
 	$RemoteHost = $setRemoteHost;
 	if (!defined($ftpHandles{$RemoteHost}) or (defined($enforceConn) and $enforceConn)) {
-		$logger->debug((defined($enforceConn) and $enforceConn ? "enforceConn is defined" : "ftp connection doesn't exist").", creating new ftp connection");
+		$logger->debug((defined($enforceConn) && $enforceConn ? "enforceConn is defined" : "ftp connection doesn't exist").", creating new ftp connection");
 		undef $ftpHandles{$RemoteHost} if defined($ftpHandles{$RemoteHost}); # close ftp connection if open.
 	} else {
 		$logger->info("ftp connection already exists, using handle from \$ftpHandles{'$RemoteHost'}");

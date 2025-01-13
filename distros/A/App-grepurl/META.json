@@ -1,0 +1,61 @@
+{
+   "abstract" : "print links in HTML",
+   "author" : [
+      "brian d foy <briandfoy@pobox.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-grepurl",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::Spec::Functions" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojo::DOM" : "0",
+            "Mojo::URL" : "0",
+            "Mojo::UserAgent" : "0",
+            "perl" : "5.016"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Data" : "0.95",
+            "Test::More" : "1"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/briandfoy/app-grepurl/issues"
+      },
+      "homepage" : "https://github.com/briandfoy/app-grepurl",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/briandfoy/app-grepurl",
+         "web" : "https://github.com/briandfoy/app-grepurl"
+      }
+   },
+   "version" : "1.013",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

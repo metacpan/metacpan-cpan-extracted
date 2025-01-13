@@ -4,7 +4,7 @@ use strict;
 use FindBin qw($Bin);
 
 use lib 't/lib';
-use Test::Most tests => 18;
+use Test::Most tests => 20;
 use Test::NoWarnings;
 
 use_ok('Database::test1');
@@ -17,6 +17,9 @@ is($test1->number('four'), undef, 'CSV AUTOLOAD works not found');
 my $res = $test1->fetchrow_hashref(entry => 'one');
 cmp_ok($res->{'entry'}, 'eq', 'one', 'fetchrow_hashref');
 cmp_ok($res->{'number'}, '==', 1, 'fetchrow_hashref');
+$res = $test1->fetchrow_hashref('one');
+cmp_ok($res->{'entry'}, 'eq', 'one', 'fetchrow_hashref - key is entry');
+cmp_ok($res->{'number'}, '==', 1, 'fetchrow_hashref - key is entry');
 $res = $test1->fetchrow_hashref(number => 1);
 cmp_ok($res->{'entry'}, 'eq', 'one', 'fetchrow_hashref');
 cmp_ok($res->{'number'}, '==', 1, 'fetchrow_hashref');

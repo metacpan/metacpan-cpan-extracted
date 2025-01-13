@@ -10,7 +10,7 @@ use 5.005;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 my %err = (
    '0' => "",
@@ -545,11 +545,11 @@ sub day
 {
 	my $pkg = shift;
 	my $d = sprintf "%d", ref($pkg) ? shift : $pkg;
-	if ($d =~ /1$/) {
+	if ($d == 1 || $d == 21 || $d == 31) {
 		return "${d}st";
-	} elsif ($d =~ /2$/) {
+	} elsif ($d == 2 || $d == 22) {
 		return "${d}nd";
-	} elsif ($d =~ /3$/) {
+	} elsif ($d == 3 || $d == 23) {
 		return "${d}rd";
 	}
 	return "${d}th";

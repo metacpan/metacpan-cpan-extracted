@@ -19,7 +19,7 @@ use OIDC::Client::ResponseParser;
 use OIDC::Client::TokenResponseParser;
 use OIDC::Client::Error::TokenValidation;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 with 'OIDC::Client::Role::LoggerWrapper';
 
@@ -597,7 +597,7 @@ Must be the expected subject defined in the parameters (see beelow).
 
 =back
 
-The [Crypt::JWT::decode_jwt()](https://metacpan.org/pod/Crypt::JWT#decode_jwt)
+The L<Crypt::JWT::decode_jwt()|https://metacpan.org/pod/Crypt::JWT#decode_jwt>
 function is used to validate and decode a JWT token. Remember that you can change
 the options transmitted to this function (see L<OIDC::Client::Config>).
 

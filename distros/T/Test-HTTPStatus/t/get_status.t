@@ -21,12 +21,12 @@ SKIP: {
 
 subtest no_url => sub {
 	my $status = Test::HTTPStatus::_get_status();
-	is( $status->{status}, NO_URL, "No URL" );
-	};
+	is( $status->{status}, NO_URL, 'No URL' );
+};
 
 subtest bad_url => sub {
 	my $status = Test::HTTPStatus::_get_status('foo');
-	is( $status->{status}, undef, "HTTP Server Error" );
-	};
+	is( $status->{status}, undef, 'HTTP Server Error' );
+};
 
 done_testing();

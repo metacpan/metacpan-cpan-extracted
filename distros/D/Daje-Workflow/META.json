@@ -59,19 +59,13 @@
    "provides" : {
       "Daje::Workflow" : {
          "file" : "lib/Daje/Workflow.pm",
-         "version" : "0.02"
+         "version" : "0.04"
       },
       "Daje::Workflow::Activities" : {
          "file" : "lib/Daje/Workflow/Activities.pm"
       },
-      "Daje::Workflow::Activities::Activity::Base::Common" : {
-         "file" : "lib/Daje/Workflow/Activities/Activity/Base/Common.pm"
-      },
       "Daje::Workflow::Checks" : {
          "file" : "lib/Daje/Workflow/Checks.pm"
-      },
-      "Daje::Workflow::Checks::Base::Common" : {
-         "file" : "lib/Daje/Workflow/Checks/Base/Common.pm"
       },
       "Daje::Workflow::Checks::Mandatory" : {
          "file" : "lib/Daje/Workflow/Checks/Mandatory.pm"
@@ -82,6 +76,9 @@
       },
       "Daje::Workflow::Errors::Error" : {
          "file" : "lib/Daje/Workflow/Errors/Error.pm"
+      },
+      "Daje::Workflow::Observers" : {
+         "file" : "lib/Daje/Workflow/Observers.pm"
       }
    },
    "release_status" : "stable",
@@ -96,7 +93,7 @@
          "web" : "https://github.com/janeskil1525/Daje-Workflow"
       }
    },
-   "version" : "0.02",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

@@ -22,6 +22,7 @@ use DynaLoader;
 
 
 
+
 #line 4 "gaussian.pd"
 
 =head1 NAME
@@ -82,6 +83,20 @@ estimate of the FWHM is the length of the ndarray/3, so it might fail
 if the ndarray is too long. (This is non-robust anyway). Most data
 does just fine and this is a good default gaussian fitter.
 
+The values of the error code $err correspond to:
+
+=over 4
+
+=item 0: successful fit
+
+=item 1: internal problem with memory allocation
+
+=item 2: insufficient number of data points
+
+=item 3: fit did not converge
+
+=back
+
 SEE ALSO: fitgauss1dr() for fitting radial gaussians
 
 =head2 fitgauss1dr
@@ -113,13 +128,27 @@ estimate of the FWHM is the length of the ndarray/3, so it might fail
 if the ndarray is too long. (This is non-robust anyway). Most data
 does just fine and this is a good default gaussian fitter.
 
+The values of the error code $err correspond to:
+
+=over 4
+
+=item 0: successful fit
+
+=item 1: internal problem with memory allocation
+
+=item 2: insufficient number of data points
+
+=item 3: fit did not converge
+
+=back
+
 SEE ALSO: fitgauss1d() to fit centre as well.
 
 =cut
 
 use strict;
 use warnings;
-#line 123 "Gaussian.pm"
+#line 152 "Gaussian.pm"
 
 *fitgauss1d = \&PDL::fitgauss1d;
 
@@ -132,7 +161,7 @@ use warnings;
 
 
 
-#line 196 "gaussian.pd"
+#line 224 "gaussian.pd"
 
 =head1 BUGS
 
@@ -149,7 +178,7 @@ COPYING in the PDL distribution. If this file is separated from the
 PDL distribution, the copyright notice should be included in the file.
 
 =cut
-#line 153 "Gaussian.pm"
+#line 182 "Gaussian.pm"
 
 # Exit with OK status
 

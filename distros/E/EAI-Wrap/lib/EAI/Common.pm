@@ -1,4 +1,4 @@
-package EAI::Common 1.918;
+package EAI::Common 1.919;
 
 use strict; use feature 'unicode_strings'; use warnings; no warnings 'uninitialized';
 use Exporter qw(import); use EAI::DateUtil; use Data::Dumper qw(Dumper); use Getopt::Long qw(:config no_ignore_case); use Log::Log4perl qw(get_logger); use MIME::Lite (); use Scalar::Util qw(looks_like_number); 
@@ -482,7 +482,7 @@ sub getLogFPath {
 our $alreadySent = 0;
 sub MailFilter {
 	my %p = @_;
-	return (!$alreadySent and ($p{log4p_level} eq "ERROR" or $p{log4p_level} eq "FATAL") ? $alreadySent = 1 : 0);
+	return (!$alreadySent && ($p{log4p_level} eq "ERROR" || $p{log4p_level} eq "FATAL") ? $alreadySent = 1 : 0);
 };
 
 # sets the error subject for the subsequent error mails from logger->error()
@@ -684,11 +684,11 @@ sub sendGeneralMail ($$$$$$;$$$$$) {
 	my ($From, $To, $Cc, $Bcc, $Subject, $Data, $Type, $Encoding, $AttachType, $AttachFile, $enforceToAddressInTest) = @_;
 	my $logger = get_logger();
 	$logger->error("cannot send mail as \$config{smtpServer} not set".longmess()) if !$config{smtpServer};
-	$logger->info("sending general mail From:".($From ? $From : $config{fromaddress}).", To:".($execute{envraw} and !$enforceToAddressInTest ? $config{testerrmailaddress} : $To).", CC:".($execute{envraw} ? "" : $Cc).", Bcc:".($execute{envraw} ? "" : $Bcc).", Subject:".($execute{envraw} ? $execute{envraw}.": " : "").$Subject.", Type:".($Type ? $Type : "TEXT").", Encoding:".($Type eq 'multipart/related' ? undef : $Encoding)."AttachType: $AttachType, AttachFile: $AttachFile, enforceToAddressInTest: $enforceToAddressInTest");
+	$logger->info("sending general mail From:".($From ? $From : $config{fromaddress}).", To:".($execute{envraw} && !$enforceToAddressInTest ? $config{testerrmailaddress} : $To).", CC:".($execute{envraw} ? "" : $Cc).", Bcc:".($execute{envraw} ? "" : $Bcc).", Subject:".($execute{envraw} ? $execute{envraw}.": " : "").$Subject.", Type:".($Type ? $Type : "TEXT").", Encoding:".($Type eq 'multipart/related' ? undef : $Encoding)."AttachType: $AttachType, AttachFile: $AttachFile, enforceToAddressInTest: $enforceToAddressInTest");
 	$logger->debug("Mailbody: $Data");
 	my $msg = MIME::Lite->new(
 			From    => ($From ? $From : $config{fromaddress}),
-			To      => ($execute{envraw} and !$enforceToAddressInTest ? $config{testerrmailaddress} : $To),
+			To      => ($execute{envraw} && !$enforceToAddressInTest ? $config{testerrmailaddress} : $To),
 			Cc      => ($execute{envraw} ? "" : $Cc),
 			Bcc     => ($execute{envraw} ? "" : $Bcc),
 			Subject => ($execute{envraw} ? $execute{envraw}.": " : "").$Subject,

@@ -1,0 +1,14 @@
+Build.PL
+Changes
+Daje-Generate-Templates.iml
+LICENSE
+README.md
+cpanfile
+lib/Daje/Generate/Templates.pm
+lib/Daje/Generate/Templates/Perl.pm
+lib/Daje/Generate/Templates/Sql.pm
+minil.toml
+t/00_compile.t
+META.json
+META.yml
+MANIFEST

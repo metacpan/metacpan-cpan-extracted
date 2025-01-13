@@ -72,3 +72,5 @@
 	- switched from "die/warn" to "confess/cluck", fixed plink verbose (-v) argument problem in FTP.pm
 1.918  Mon Jan 06 18:30:00 2025
 	- get rid of $execute{alreadyMovedOrDeleted}, instead reset files*To* arrays after deleting/moving, don't connect to FTP anymore when redoFile flag set, moved $execute{retrievedFiles} into $process->{retrievedFiles} to avoid problems with same names in different processes, added evaluation check in post execute (e.g. interpolation errors in $postDumpExec->{execs}), renamed markForHistoryDelete into markUploadForHistoryDelete to differentiate, renamed $execute{uploadFilesToDelete} to $execute{filesUploadedToDelete} for similarity to other arrays, removed different calls to deleteFiles, now both upload and download deletions are done inside deleteFiles, amended testcases
+1.919  Sun Jan 12 23:30:00 2025
+	- fixed all ternary operators with and -> &&, standardLoop now doesn't need a getAddtlDBData flag to get additional data, added tests for standardLoop

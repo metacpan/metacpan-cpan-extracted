@@ -7,6 +7,7 @@ with 'Catalyst::ClassData';
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
+use Catalyst::Action;
 use Carp qw(croak);
 use Clone qw(clone);
 use List::Util qw(first);
@@ -72,7 +73,6 @@ sub setup_finalize ($app) {
       my $path = $action_type eq 'login' ? $config_provider->{signin_redirect_path}
                                          : $config_provider->{logout_redirect_path};
       next if !$path || $seen_path{$path}++;
-      require Catalyst::Action;
       push @new_actions, Catalyst::Action->new(
         class      => __PACKAGE__,
         namespace  => '',

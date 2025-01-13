@@ -1,9 +1,14 @@
-0.050   2025-01-12  Released-By: PERLANCAR; Urgency: medium
+0.051   2025-01-12  Released-By: PERLANCAR; Urgency: medium
 
-        - Re-add tips & tricks section.
+        - Edit Changes.
 
 
-0.049.1 2025-01-12  Released-By: PERLANCAR; Urgency: medium
+0.050   2025-01-12  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+        - Merge changes from 0.049 and 0.049.1.
+
+
+0.049.1 2025-01-12  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
         - [incompatible change] By defaultchomp the lines first and add
           output separator again later when printing, unless instructed not

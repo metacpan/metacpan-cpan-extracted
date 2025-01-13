@@ -125,7 +125,6 @@ my $meta_merge = {
      'Andrew Benson <abenson AT obs.carnegiescience.edu>',
    ],
    'license'  => [ 'perl_5' ],
-   'version' => '0.73',
    'meta_spec' => {
       'version' => '2',
       'url'     => 'http://search.cpan.org/perldoc?CPAN::Meta::Spec',
@@ -155,7 +154,7 @@ my $meta_merge = {
       },
    },
    resources => {
-      license     => [ 'http://cpansearch.perl.org/src/CHM/PDL-IO-HDF5-0.73/COPYRIGHT' ],
+      license     => [ 'http://dev.perl.org/licenses/' ],
       homepage    => 'http://pdl.perl.org/',
       bugtracker  => {
          web    => 'https://github.com/PDLPorters/pdl-io-hdf5/issues',
@@ -199,4 +198,4 @@ WriteMakefile(
   'dist'         => { COMPRESS => 'gzip', SUFFIX => 'gz', PREOP => $preop },
 );
 
-sub MY::postamble { pdlpp_postamble($package); }	
+sub MY::postamble { pdlpp_postamble($package); }

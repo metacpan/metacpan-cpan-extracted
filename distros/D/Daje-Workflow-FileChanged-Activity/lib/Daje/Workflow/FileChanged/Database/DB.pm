@@ -11,7 +11,7 @@ __DATA__
 CREATE TABLE IF NOT EXISTS file_hashes (
     file text PRIMARY KEY,
     hash text NOT NULL,
-    moddatetime text
+    moddatetime timestamp not null default now()
 );
 
 -- 1 down

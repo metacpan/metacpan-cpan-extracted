@@ -54,8 +54,7 @@ my $rv = WriteMakefile (%wm);
 
 package MY;
 
-sub postamble
-{
+sub postamble {
     my $min_vsn = ($] >= 5.010 && -d "xt" && -d "tmp" && ($ENV{AUTOMATED_TESTING} || 0) != 1)
 	? join "\n" =>
 	    'test ::',
@@ -77,6 +76,8 @@ sub postamble
 	'	-@cpants_lint.pl $(DISTVNAME).tgz',
 	'	-@rm -f Debian_CPANTS.txt',
 	'',
+	'doc docs:		doc/tkiv.md doc/tkiv.html doc/tkiv.3',
+	'	perl doc/make-doc.pl',
 	$min_vsn;
     } # postamble
 

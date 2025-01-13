@@ -2,3 +2,5 @@ Revision history for Geo-METARTAF
 
 1.00    January 3, 2025
         First version
+1.01	January 12, 2025
+	Fixed issue when decoding 11th, 12th, and 13th (they were displayed as 11st, 12nd, and 13rd)

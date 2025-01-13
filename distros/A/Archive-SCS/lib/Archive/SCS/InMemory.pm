@@ -1,8 +1,8 @@
-use v5.32;
+use v5.34;
 use warnings;
 use Object::Pad 0.73;
 
-class Archive::SCS::InMemory 1.05
+class Archive::SCS::InMemory 1.06
   :isa( Archive::SCS::Mountable );
 
 use stable 0.031 'isa';
@@ -12,12 +12,12 @@ use Archive::SCS::DirIndex;
 use Carp 'croak';
 use File::Temp 0.05 'mktemp';
 use List::Util 'first';
-use Path::Tiny 0.017 'path';
+use Path::Tiny 0.017 ();
 
 our @CARP_NOT = qw( Archive::SCS );
 
 field $is_mounted = 0;
-field $file = path mktemp 'Archive-SCS-InMemory-XXXXXXXX';
+field $path :reader = Path::Tiny::path mktemp 'Archive-SCS-InMemory-XXXXXXXX';
 # Archive::SCS expects that mounts relate to a file path,
 # so we need to make up a random one.
 
@@ -27,7 +27,8 @@ field @files;
 
 
 method file () {
-  $file
+  warnings::warnif deprecated => "file() is deprecated; use path()";
+  $path
 }
 
 
@@ -209,7 +210,7 @@ L<nautofon|https://github.com/nautofon>
 
 =head1 COPYRIGHT
 
-This software is copyright (c) 2024 by nautofon.
+This software is copyright (c) 2025 by nautofon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

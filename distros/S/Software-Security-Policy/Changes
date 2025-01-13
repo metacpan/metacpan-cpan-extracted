@@ -1,5 +1,42 @@
 Revision history for Perl extension Software::Security::Policy
 
+0.07 -- Sun Jan 12 16:59:50 AST 2025
+
+    [Major items]
+    - Large code organization change from Leon Timmermans (LEONT)
+    - so that it's easier to implement a new policy
+    - Messed up the git commits - forgot to push Changes updates
+
+    [Detailed Change Log]
+    - 052ab40 Increment repo version
+    - 8383a8f v0.06
+    - 541a4a0 Increment repo Version
+    - 892b300 v0.05
+    - 8930480 Add a default name method based on the package name
+    - fc2b199 Split SPP and SPPI for better reusability
+
+0.06 -- Sun Jan 12 09:40:01 AST 2025
+
+    [Major items]
+    - Breaking Change replace support_years with perl_support_years
+    - Re-release 0.05 - forgot to add a Changes update
+
+    [Detailed Change Log]
+    - 052ab40 Increment repo version
+    - 892b300 v0.05
+    - 1b250d0 Fixes #2 Use perl_support_years instead of support_years
+    - a7ccd93 v0.04
+
+0.05 -- Sun Jan 12 09:33:39 AST 2025
+
+    [Major items]
+    Breaking Change replace support_years with perl_support_years
+
+    [Detailed Change Log]
+    - 892b300 v0.05
+    - 1b250d0 Fixes #2 Use perl_support_years instead of support_years
+    - a7ccd93 v0.04
+
 0.04 -- Sun Jan 05 19:33:52 AST 2025
 
     [Major items]

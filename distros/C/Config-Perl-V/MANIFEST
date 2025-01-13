@@ -34,6 +34,10 @@ t/40_plv5358dnqm.t
 t/41_plv5360dnqm.t
 t/42_plv5373tld.t
 t/43_plv53710rcs.t
+t/44_plv5380tqm.t
+t/45_plv5400tqm.t
+t/46_plv5411tqmrcs.t
 examples/show-v.pl
+SECURITY.md		Guide for reporting security issues
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

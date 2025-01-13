@@ -3,7 +3,7 @@ package PDL::Fit;
 use strict;
 use warnings;
 
-our $VERSION = '2.098';
+our $VERSION = '2.099';
 
 =head1 NAME
 

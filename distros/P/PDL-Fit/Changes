@@ -1,3 +1,5 @@
+- document return values for fitgauss1d{,r} (#1) - thanks @d-lamb
+
 2.098 2025-01-06
 - add licence information
 

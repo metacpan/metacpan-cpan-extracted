@@ -3,6 +3,7 @@ use Mojo::Base 'Daje::Workflow::Common::Activity::Base', -base, -signatures;
 
 use Daje::Config;
 use Daje::Tools::Filechanged;
+use Daje::Workflow::FileChanged::Database::Model::FileHashes;
 
 # NAME
 #
@@ -48,7 +49,7 @@ use Daje::Tools::Filechanged;
 #
 
 
-our $VERSION = "0.01";
+our $VERSION = "0.03";
 
 sub changed_files($self) {
 
@@ -57,7 +58,13 @@ sub changed_files($self) {
         path => $self->context->{context}->{source_dir}
     )->load_list();
 
-    my $filehash = Daje::Workflow::FileChanged::Database::Model::FileHashes->new(db => $self->db);
+    $self->model->insert_history(
+        $filelist->size . " files found", "Daje::Workflow::FileChanged::Activity", 0
+    );
+
+    my $filehash = Daje::Workflow::FileChanged::Database::Model::FileHashes->new(
+        db => $self->db
+    );
     my $changed = Daje::Tools::Filechanged->new();
     $filelist->each(sub ($file, $num) {
         my $hash_data = $filehash->load_hash($file);
@@ -71,6 +78,11 @@ sub changed_files($self) {
             }
         }
     });
+
+    $self->model->insert_history(
+        scalar(@changed_files) . " changed files found", "Daje::Workflow::FileChanged::Activity", 0
+    );
+
     if (@changed_files > 0) {
         $self->context->{context}->{changed_files} = \@changed_files;
     }

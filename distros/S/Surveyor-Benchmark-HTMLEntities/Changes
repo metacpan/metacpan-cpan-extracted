@@ -1,5 +1,8 @@
 Revision history for Perl module Surveyor::Benchmark::HTMLEntities
 
+1.026 2025-01-12T10:54:32Z
+	* refresh distro and move to BRIANDFOY
+
 1.025 2024-02-02T20:17:49Z
 	* refresh distro, update email addresses
 

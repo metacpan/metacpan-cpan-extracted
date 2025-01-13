@@ -55,11 +55,11 @@
    "provides" : {
       "App::sortsub" : {
          "file" : "lib/App/sortsub.pm",
-         "version" : "0.050"
+         "version" : "0.051"
       },
       "App::subsort" : {
          "file" : "lib/App/subsort.pm",
-         "version" : "0.050"
+         "version" : "0.051"
       }
    },
    "release_status" : "stable",
@@ -74,7 +74,7 @@
          "web" : "https://github.com/perlancar/perl-App-subsort"
       }
    },
-   "version" : "0.050",
+   "version" : "0.051",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040000"

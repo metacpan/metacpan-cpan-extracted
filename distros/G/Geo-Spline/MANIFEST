@@ -1,13 +1,11 @@
-bin/example-point.pl
-bin/example-pointlist.pl
-bin/example-track2spline.pl
-CHANGES
+Changes
 doc/spline.png
-doc/spline.xls
 lib/Geo/Spline.pm
 LICENSE
 Makefile.PL
 MANIFEST
-META.yml
-README
+README.md
 t/base.t
+perl-Geo-Spline.spec
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

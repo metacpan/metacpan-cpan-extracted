@@ -1,5 +1,8 @@
 Revision history for Database-Abstraction
 
+0.16	Sun Jan 12 12:15:01 EST 2025
+	fetchrow_hashref() - when no_entry is not set allow just one argument to be given: the entry value
+
 0.15	Thu Jan  9 19:43:43 EST 2025
 	Improved handling of empty values in slurp mode
 	AUTOLOAD: error on invalid column name in slurp mode

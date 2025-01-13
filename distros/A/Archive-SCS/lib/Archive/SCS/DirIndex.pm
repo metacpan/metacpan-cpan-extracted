@@ -2,7 +2,7 @@ use v5.28;
 use warnings;
 use Object::Pad 0.73;
 
-class Archive::SCS::DirIndex 1.05;
+class Archive::SCS::DirIndex 1.06;
 
 field $dirs  :param = [];
 field $files :param = [];

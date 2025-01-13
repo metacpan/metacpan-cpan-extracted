@@ -17,7 +17,6 @@ t/total.t
 t/unlink.t
 t/vlenString.t
 t/xData.t
-t/ztotal_index.t
 tkviewtest
 typemap
 varlen.hdf5

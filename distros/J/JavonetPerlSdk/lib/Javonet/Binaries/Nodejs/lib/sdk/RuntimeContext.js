@@ -5,6 +5,8 @@ const CommandType = require('../utils/CommandType')
 const { InvocationContext, InvocationWsContext } = require('./InvocationContext')
 const ConnectionType = require('../utils/ConnectionType')
 const ExceptionThrower = require('../utils/exception/ExceptionThrower')
+const DelegatesCache = require('../core/delegatesCache/DelegatesCache')
+const RuntimeName = require('../utils/RuntimeName')
 
 /**
  * Represents a single context which allows interaction with a selected technology.
@@ -251,6 +253,13 @@ class RuntimeContext {
                 payloadItem[i] = this.#encapsulatePayloadItem(payloadItem[i])
             }
             return new Command(this.runtimeName, CommandType.Array, payloadItem)
+        } else if (typeof payloadItem === 'function') {
+            let newArray = new Array(payloadItem.length + 1)
+            for (let i = 0; i < newArray.length; i++) {
+                newArray[i] = 'object'
+            }
+            const args = [DelegatesCache.addDelegate(payloadItem), RuntimeName.Nodejs].push(...newArray);
+            return new Command(this.runtimeName, CommandType.PassDelegate, args)
         } else {
             return new Command(this.runtimeName, CommandType.Value, [payloadItem])
         }

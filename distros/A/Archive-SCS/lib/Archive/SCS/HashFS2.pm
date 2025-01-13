@@ -1,8 +1,8 @@
-use v5.32;
+use v5.34;
 use warnings;
 use Object::Pad 0.73;
 
-class Archive::SCS::HashFS2 1.05
+class Archive::SCS::HashFS2 1.06
   :isa( Archive::SCS::Mountable );
 
 use stable 0.031 'isa';
@@ -21,13 +21,13 @@ use Carp 'croak';
 use Compress::Raw::Zlib 2.048 qw(Z_OK Z_STREAM_END);
 use Fcntl 'SEEK_SET';
 use List::Util 'first';
-use Path::Tiny 0.011 'path';
+use Path::Tiny 0.011 ();
 
 our @CARP_NOT = qw( Archive::SCS );
 
 my $MAGIC = 'SCS#';
 
-field $file :param;
+field $path :param :reader;
 field $fh;
 
 field %entries;
@@ -35,8 +35,8 @@ field @dirs;
 field @files;
 
 ADJUST {
-  $file isa Path::Tiny && $file->exists or croak
-    "Param file must be a valid Path::Tiny object";
+  $path isa Path::Tiny && $path->exists or croak
+    "Param path must be a valid Path::Tiny object";
 }
 
 my $zlib = do {
@@ -47,22 +47,29 @@ my $zlib = do {
 
 
 method file () {
-  $file
+  warnings::warnif deprecated => "file() is deprecated; use path()";
+  $path
 }
 
 
 sub handles_file ($class, $fh, $header) {
+  warnings::warnif deprecated => "handles_file() is deprecated; use handles_path()";
+  $header =~ /^\Q$MAGIC\E\x02\x00/
+}
+
+
+sub handles_path ($class, $path, $header) {
   $header =~ /^\Q$MAGIC\E\x02\x00/
 }
 
 
 method mount () {
-  my $filename = $file->basename;
+  my $filename = $path->basename;
   $self->is_mounted and croak sprintf "%s: Already mounted", $filename;
 
   # Read HashFS file header
 
-  open $fh, '<:raw', $file or croak "$filename: $!";
+  open $fh, '<:raw', $path or croak "$filename: $!";
   read $fh, my $header, 0x34 or croak "$filename: $!";
 
   my ($magic, $version, $salt, $hash_method, $entry_count,
@@ -148,7 +155,7 @@ method mount () {
 
 
 method unmount () {
-  close $fh or croak sprintf "%s: $!", $file->basename;
+  close $fh or croak sprintf "%s: $!", $path->basename;
   $fh = undef;
 }
 
@@ -218,7 +225,7 @@ method entry_meta ($hash) {
 
 
 method read_entry ($hash) {
-  $fh or croak sprintf "%s: Not mounted", $file->basename;
+  $fh or croak sprintf "%s: Not mounted", $path->basename;
 
   my $entry = $entries{ $hash };
 
@@ -226,10 +233,10 @@ method read_entry ($hash) {
   my $length = read $fh, my $data, $entry->{zsize};
 
   defined $length or croak
-    sprintf "%s: %s", $file->basename, $!;
+    sprintf "%s: %s", $path->basename, $!;
   $length == $entry->{zsize} or croak
     sprintf "%s: Read %i bytes, expected %i bytes",
-    $file->basename, $length, $entry->{zsize};
+    $path->basename, $length, $entry->{zsize};
 
   if ($entry->{compression} == 0x10) { # zlib
     my $status = $zlib->inflate( \(my $raw = $data), \$data );
@@ -237,14 +244,14 @@ method read_entry ($hash) {
     $status == Z_OK || $status == Z_STREAM_END
       or warnings::warnif io =>
       sprintf "%s: Inflation failed: %s (%i)",
-      $file->basename, $zlib->msg // "", $status;
+      $path->basename, $zlib->msg // "", $status;
 
     $zlib->inflateReset;
 
     length $data == $entry->{size}
       or warnings::warnif io =>
       sprintf "%s: Inflated to %i bytes, expected %i bytes",
-      $file->basename, length $data, $entry->{size};
+      $path->basename, length $data, $entry->{size};
   }
 
   if ($entry->{is_dir}) {
@@ -380,7 +387,7 @@ sub create_file ($pathname, $scs) {
     (length $index1), (@entries * 5), (length $index2),
     $start1, $start2, 0;
 
-  my $fh = (path $pathname)->openw_raw;
+  my $fh = Path::Tiny->new($pathname)->openw_raw;
   print $fh $header, "\0" x ($start - length $header);
   print $fh $entries{$_}->{data}, "\0" x $entries{$_}->{padding} for @entries;
   print $fh $index1, "\0" x $padding1;
@@ -410,8 +417,8 @@ Archive::SCS::HashFS2 - SCS HashFS version 2 format handler
 
 =head1 SYNOPSIS
 
-  my $file = Path::Tiny->new('.../base_share.scs');
-  my $archive = Archive::SCS::HashFS2->new(file => $file)->mount;
+  my $path = Path::Tiny->new('.../base_share.scs');
+  my $archive = Archive::SCS::HashFS2->new(path => $path)->mount;
 
   $archive->read_dir_tree;
   my @contents = sort $archive->list_dirs, $archive->list_files;
@@ -432,10 +439,6 @@ Hash values used with this module must be in the internal format
 =head2 entries
 
   $entry_hashes = $archive->entries;
-
-=head2 file
-
-  $path_tiny = $archive->file;
 
 =head2 is_mounted
 
@@ -459,7 +462,16 @@ Hash values used with this module must be in the internal format
 
 =head2 new
 
-  $archive = Archive::SCS::HashFS2->new(file => $path_tiny);
+  $archive = Archive::SCS::HashFS2->new(path => $path_tiny);
+
+=head2 path
+
+  $path_tiny = $archive->path;
+
+I<Since version 1.06.>
+
+In version 1.05 and earlier, there was an equivalent C<file()>
+method, which is now deprecated.
 
 =head2 read_dir_tree
 
@@ -491,7 +503,7 @@ L<nautofon|https://github.com/nautofon>
 
 =head1 COPYRIGHT
 
-This software is copyright (c) 2024 by nautofon.
+This software is copyright (c) 2025 by nautofon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

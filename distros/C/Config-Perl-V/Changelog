@@ -1,3 +1,14 @@
+0.37	- 13 Jan 2025, H.Merijn Brand
+    * Update version requirements based on CVE's
+    * Add HAS_LONG_DOUBLE and HAS_STRTOLD (5.37.11)
+    * Add 5.38.0 test
+    * Update doc for groff-1.24
+    * It's 2024
+    * Add 5.40.0 test
+    * Add 5.41.1 test with RC_STACK
+    * It's 2025
+    * Add SECURITY.md
+
 0.36	- 01 Mar 2023, H.Merijn Brand
     * Add PERL_RC_STACK config for 5.37.10
     * Fix parsing attributes with single quotes in their value

@@ -57,7 +57,7 @@
    "provides" : {
       "Daje::Workflow::FileChanged::Activity" : {
          "file" : "lib/Daje/Workflow/FileChanged/Activity.pm",
-         "version" : "0.01"
+         "version" : "0.03"
       },
       "Daje::Workflow::FileChanged::Database::DB" : {
          "file" : "lib/Daje/Workflow/FileChanged/Database/DB.pm",
@@ -79,7 +79,7 @@
          "web" : "https://github.com/janeskil1525/Daje-Workflow-FileChanged-Activity"
       }
    },
-   "version" : "0.01",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

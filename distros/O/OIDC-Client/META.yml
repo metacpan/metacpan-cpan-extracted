@@ -3,6 +3,12 @@ abstract: 'OpenID Connect Client'
 author:
   - 'Sébastien Mourlhou'
 build_requires:
+  Catalyst::Action::RenderView: '0'
+  Catalyst::Plugin::ConfigLoader: '0'
+  Catalyst::Plugin::Session::Store::FastMmap: '0'
+  Catalyst::Plugin::Static::Simple: '0'
+  Catalyst::View::JSON: '0'
+  Config::General: '0'
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
@@ -13,6 +19,7 @@ build_requires:
   Test::MockModule: '0'
   Test::MockObject: '0'
   Test::More: '0'
+  Test::WWW::Mechanize::Catalyst::WithContext: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -24,6 +31,9 @@ meta-spec:
 name: OIDC-Client
 requires:
   Carp: '0'
+  Catalyst::Action: '0'
+  Catalyst::ClassData: '0'
+  Catalyst::Runtime: '0'
   Clone: '0'
   Crypt::JWT: '0'
   Data::UUID: '0'
@@ -44,7 +54,7 @@ resources:
   bugtracker: https://github.com/sebmourlhou/oidc-client/issues
   homepage: https://github.com/sebmourlhou/oidc-client
   repository: https://github.com/sebmourlhou/oidc-client.git
-version: '0.01'
+version: '0.02'
 x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: Artistic-2.0

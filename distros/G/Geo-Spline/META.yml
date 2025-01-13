@@ -1,16 +1,29 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         Geo-Spline
-version:      0.16
-version_from: lib/Geo/Spline.pm
-installdirs:  site
+---
+abstract: 'Calculate geographic locations between GPS fixes.'
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Geo-Spline
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-    constant:                      0
-    Geo::Constants:                0.04
-    Geo::Ellipsoids:               0.09
-    Geo::Functions:                0.03
-    strict:                        0
-    vars:                          0
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.17
+  Geo::Constants: '0.04'
+  Geo::Ellipsoids: '0.09'
+  Geo::Functions: '0.03'
+  Test::Simple: '0.44'
+resources:
+  bugtracker: https://github.com/mrdvt92/perl-Geo-Spline/issues
+  homepage: https://github.com/mrdvt92/perl-Geo-Spline
+  repository: https://github.com/mrdvt92/perl-Geo-Spline.git
+version: '0.17'

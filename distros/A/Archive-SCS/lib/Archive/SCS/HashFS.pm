@@ -1,8 +1,8 @@
-use v5.32;
+use v5.34;
 use warnings;
 use Object::Pad 0.73;
 
-class Archive::SCS::HashFS 1.05
+class Archive::SCS::HashFS 1.06
   :isa( Archive::SCS::Mountable );
 
 use stable 0.031 'isa';
@@ -19,13 +19,13 @@ use Carp 'croak';
 use Compress::Raw::Zlib 2.048 qw(crc32 Z_OK Z_STREAM_END);
 use Fcntl 'SEEK_SET';
 use List::Util 'first';
-use Path::Tiny 0.053 'path';
+use Path::Tiny 0.053 ();
 
 our @CARP_NOT = qw( Archive::SCS );
 
 my $MAGIC = 'SCS#';
 
-field $file :param;
+field $path :param :reader;
 field $fh;
 
 field %entries;
@@ -33,8 +33,8 @@ field @dirs;
 field @files;
 
 ADJUST {
-  $file isa Path::Tiny && $file->exists or croak
-    "Param file must be a valid Path::Tiny object";
+  $path isa Path::Tiny && $path->exists or croak
+    "Param path must be a valid Path::Tiny object";
 }
 
 my $zlib = do {
@@ -45,22 +45,29 @@ my $zlib = do {
 
 
 method file () {
-  $file
+  warnings::warnif deprecated => "file() is deprecated; use path()";
+  $path
 }
 
 
 sub handles_file ($class, $fh, $header) {
+  warnings::warnif deprecated => "handles_file() is deprecated; use handles_path()";
   ! -d $fh && $header =~ /^\Q$MAGIC\E\x01\x00/
 }
 
 
+sub handles_path ($class, $path, $header) {
+  $header =~ /^\Q$MAGIC\E\x01\x00/
+}
+
+
 method mount () {
-  my $filename = $file->basename;
+  my $filename = $path->basename;
   $self->is_mounted and croak sprintf "%s: Already mounted", $filename;
 
   # Read HashFS file header
 
-  open $fh, '<:raw', $file or croak "$filename: $!";
+  open $fh, '<:raw', $path or croak "$filename: $!";
   my $success = read $fh, my $header, 20;
   $success and $MAGIC eq substr $header, 0, 4 or croak
     "$filename: Not an SCS HashFS archive";
@@ -106,7 +113,7 @@ method mount () {
 
 
 method unmount () {
-  close $fh or croak sprintf "%s: $!", $file->basename;
+  close $fh or croak sprintf "%s: $!", $path->basename;
   $fh = undef;
 }
 
@@ -152,7 +159,7 @@ method entry_meta ($hash) {
 
 
 method read_entry ($hash) {
-  $fh or croak sprintf "%s: Not mounted", $file->basename;
+  $fh or croak sprintf "%s: Not mounted", $path->basename;
 
   my $entry = $entries{ $hash };
 
@@ -160,10 +167,10 @@ method read_entry ($hash) {
   my $length = read $fh, my $data, $entry->{zsize};
 
   defined $length or croak
-    sprintf "%s: %s", $file->basename, $!;
+    sprintf "%s: %s", $path->basename, $!;
   $length == $entry->{zsize} or croak
     sprintf "%s: Read %i bytes, expected %i bytes",
-    $file->basename, $length, $entry->{zsize};
+    $path->basename, $length, $entry->{zsize};
 
   my $crc;
   if ($entry->{is_compressed}) {
@@ -172,7 +179,7 @@ method read_entry ($hash) {
     $status == Z_OK || $status == Z_STREAM_END
       or warnings::warnif io =>
       sprintf "%s: Inflation failed: %s (%i)",
-      $file->basename, $zlib->msg // "", $status;
+      $path->basename, $zlib->msg // "", $status;
 
     $crc = $zlib->crc32;
     $zlib->inflateReset;
@@ -180,7 +187,7 @@ method read_entry ($hash) {
     length $data == $entry->{size}
       or warnings::warnif io =>
       sprintf "%s: Inflated to %i bytes, expected %i bytes",
-      $file->basename, length $data, $entry->{size};
+      $path->basename, length $data, $entry->{size};
   }
   else {
     $crc = crc32($data);
@@ -188,7 +195,7 @@ method read_entry ($hash) {
   $crc == $entry->{crc}
     or warnings::warnif io =>
     sprintf "%s: Found CRC32 %08X, expected %08X",
-    $file->basename, $crc, $entry->{crc};
+    $path->basename, $crc, $entry->{crc};
   # The official SCS extractor doesn't seem to verify the CRC
 
   # Parse directory listing
@@ -263,7 +270,7 @@ sub create_file ($pathname, $scs) {
     $offset += length $entries{$hash}->{data};
   }
 
-  my $fh = (path $pathname)->openw_raw;
+  my $fh = Path::Tiny->new($pathname)->openw_raw;
   print $fh pack 'A4 vv A4 VV',
     $MAGIC, 1, 0, 'CITY', (scalar @entries), my $start = 0x40;
   print $fh "\0" x ($start - 0x14);
@@ -291,8 +298,8 @@ Archive::SCS::HashFS - SCS HashFS version 1 format handler
 
 =head1 SYNOPSIS
 
-  my $file = Path::Tiny->new('.../base.scs');
-  my $archive = Archive::SCS::HashFS->new(file => $file)->mount;
+  my $path = Path::Tiny->new('.../base.scs');
+  my $archive = Archive::SCS::HashFS->new(path => $path)->mount;
 
   $archive->read_dir_tree;
   my @contents = sort $archive->list_dirs, $archive->list_files;
@@ -313,10 +320,6 @@ Hash values used with this module must be in the internal format
 =head2 entries
 
   $entry_hashes = $archive->entries;
-
-=head2 file
-
-  $path_tiny = $archive->file;
 
 =head2 is_mounted
 
@@ -341,6 +344,15 @@ Hash values used with this module must be in the internal format
 =head2 new
 
   $archive = Archive::SCS::HashFS->new(file => $path_tiny);
+
+=head2 path
+
+  $path_tiny = $archive->path;
+
+I<Since version 1.06.>
+
+In version 1.05 and earlier, there was an equivalent C<file()>
+method, which is now deprecated.
 
 =head2 read_dir_tree
 
@@ -378,7 +390,7 @@ L<nautofon|https://github.com/nautofon>
 
 =head1 COPYRIGHT
 
-This software is copyright (c) 2024 by nautofon.
+This software is copyright (c) 2025 by nautofon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

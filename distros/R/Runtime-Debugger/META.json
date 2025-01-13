@@ -38,7 +38,7 @@
    "provides" : {
       "Runtime::Debugger" : {
          "file" : "lib/Runtime/Debugger.pm",
-         "version" : "1.08"
+         "version" : "1.09"
       }
    },
    "release_status" : "stable",
@@ -53,6 +53,6 @@
          "url" : "https://github.com/poti1/runtime-debugger"
       }
    },
-   "version" : "1.08",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "1.09",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

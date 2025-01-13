@@ -1,3 +1,6 @@
+0.761 2025-01-12
+- build issues fixed (#6) - thanks @a-shahba
+
 0.76 2024-10-09
 - handle PDL 2.064+ types like signed byte (#5) - thanks @a-shahba for report
 

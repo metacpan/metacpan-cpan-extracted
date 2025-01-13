@@ -2,10 +2,9 @@ use v5.32;
 use warnings;
 use Object::Pad 0.73;
 
-class Archive::SCS::GameDir 1.05;
+class Archive::SCS::GameDir 1.06;
 
 use builtin 'trim';
-use stable 0.031 'isa';
 no warnings 'experimental::builtin';
 
 use Archive::SCS;
@@ -289,7 +288,7 @@ L<nautofon|https://github.com/nautofon>
 
 =head1 COPYRIGHT
 
-This software is copyright (c) 2024 by nautofon.
+This software is copyright (c) 2025 by nautofon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

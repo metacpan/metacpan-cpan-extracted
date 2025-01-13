@@ -120,13 +120,7 @@ sub postamble {
         '',
 	'doc:			doc/geoip.md doc/geoip.html doc/geoip.man',
 	'doc/geoip.md:		geoip',
-	'	pod2markdown  < $? > $@',
-	'doc/geoip.html:	geoip',
-	'	pod2html      < $? 2>&1 | grep -v "^Cannot find" > $@',
-	'doc/geoip.3:		geoip',
-	'	pod2man       < $? > $@',
-	'doc/geoip.man:	doc/geoip.3',
-	'	nroff -mandoc < $? > $@',
+	'	perl doc/make-doc.pl',
         @mpm;
     } # postamble
 

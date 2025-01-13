@@ -1,6 +1,6 @@
 use Config;
 
-our $VERSION = '0.76';
+our $VERSION = '0.761';
 pp_setversion(qq{'$VERSION'});
 
 # Necessary includes for .xs file
@@ -1616,19 +1616,13 @@ pp_addhdr(<<'EOXS');
 #   This originally generated using h2xs and manually editing
 #
 */ 
-static int
-not_here(s)
-char *s;
+static int not_here(char *s)
 {
     croak("%s not implemented on this architecture", s);
     return -1;
 }
 
-hid_t
-constant(name, arg)
-char *name;
-int arg;
-{
+hid_t constant(char *name, int arg) {
     errno = 0;
     switch (*name) {
     case 'A':

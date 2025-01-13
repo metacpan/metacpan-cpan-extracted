@@ -1,5 +1,5 @@
 #
-# GENERATED WITH PDL::PP! Don't modify!
+# GENERATED WITH PDL::PP from hdf5.pd! Don't modify!
 #
 package PDL::IO::HDF5;
 
@@ -11,7 +11,7 @@ use PDL::Exporter;
 use DynaLoader;
 
 
-   our $VERSION = '0.76';
+   our $VERSION = '0.761';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::IO::HDF5 $VERSION;
@@ -22,7 +22,8 @@ use DynaLoader;
 
 
 
-#line 2519 "hdf5.pd"
+
+#line 2513 "hdf5.pd"
 
 use PDL::Lite;
 use PDL::Char;
@@ -1108,7 +1109,7 @@ John Cerney, j-cerney1@raytheon.com
 Andrew Benson, abenson@obs.carnegiescience.edu
 
 =cut
-#line 1112 "HDF5.pm"
+#line 1113 "HDF5.pm"
 
 # Exit with OK status
 

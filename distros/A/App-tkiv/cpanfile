@@ -1,6 +1,6 @@
 requires   "Data::Peek";
 requires   "File::Copy";
-requires   "File::Temp";
+requires   "File::Temp";  # ignore : CVE-2011-4116
 requires   "Getopt::Long"             => "2.27";
 requires   "Image::ExifTool";
 requires   "Tk"                       => "804.027";
@@ -16,10 +16,10 @@ requires   "Tk::Pane";
 requires   "Tk::Photo";
 requires   "Tk::Pixmap";
 
-recommends "Data::Peek"               => "0.52";
-recommends "Getopt::Long"             => "2.54";
-recommends "Image::ExifTool"          => "12.50";
-recommends "Image::Info"              => "1.43";
+recommends "Data::Peek"               => "0.53";
+recommends "Getopt::Long"             => "2.58";
+recommends "Image::ExifTool"          => "13.10";
+recommends "Image::Info"              => "1.45";
 recommends "Image::Size"              => "3.300";
 recommends "Tk"                       => "804.036";
 recommends "Tk::TIFF"                 => "0.11";
@@ -27,13 +27,17 @@ recommends "X11::Protocol"            => "0.56";
 
 on "configure" => sub {
     requires   "ExtUtils::MakeMaker";
+
+    recommends "ExtUtils::MakeMaker"      => "7.22";
+
+    suggests   "ExtUtils::MakeMaker"      => "7.70";
     };
 
 on "test" => sub {
     requires   "Test::Harness";
     requires   "Test::More"               => "0.88";
 
-    recommends "Test::More"               => "1.302191";
+    recommends "Test::More"               => "1.302207";
     };
 
 feature "opt_format_tiff", "Support for TIFF" => sub {

@@ -35,22 +35,34 @@ my $class = Module::Build->subclass(
             print "\nInstalling readline-dev\n";
             my $os_name;
 
+            # Determine OS name.
             my $os_file = "/etc/os-release";
             if (-e $os_file){
+                my $is_ID_line = qr{
+                    ^ ID = (?:
+                        " (?<id> \S+ ) "
+                        |
+                        ' (?<id> \S+ ) '
+                        |
+                        (?<id> \S+ )
+                    )
+                }x;
                 open my $fh, "<", $os_file or warn $!;
                 while (<$fh>) {
-                    next unless / ^ ID = "(\S+)" /x;
-                    $os_name = lc($1 // "");
+                    chomp;
+                    next unless /$is_ID_line/;
+                    $os_name = lc($+{id} // "");
                     last;
                 }
                 close $fh;
-                return if !$os_name;
             }
             elsif( $ENV{PREFIX} ){
                 return if $ENV{PREFIX} !~ / \b termux \b /xi;
                 $os_name = "termux";
             }
+            $os_name //= "Not Sure";
 
+            # Generate installation command.
             my %commands = (
                 centos => 'sudo dnf install -y readline-devel',
                 gentoo => 'sudo emerge --ask sys-libs/readline',
@@ -59,7 +71,10 @@ my $class = Module::Build->subclass(
                 termux => 'pkg install readline ncurses && cpanm -v --notest Term::ReadLine::Gnu',
             );
             my $install_command = $commands{$os_name};
-            return if !$install_command;
+            if (!$install_command){
+                print "Not install command detected for os: $os_name\n";
+                return;
+            }
 
             print "Installing readline-dev for '$os_name' via '$install_command'\n";
             system "$install_command";

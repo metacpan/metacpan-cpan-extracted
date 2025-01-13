@@ -2,7 +2,7 @@ sub INIT {require './t/setup.pl';}
 use strict; use warnings;
 use EAI::Wrap; use Data::Dumper; use Archive::Zip qw( :ERROR_CODES :CONSTANTS ); use File::Copy 'move';
 use Test::More; use Test::File; use File::Spec; use Test::Timer;
-use Test::More tests => 29;
+use Test::More tests => 31;
 chdir "./t";
 
 # 1
@@ -48,7 +48,6 @@ file_exists_ok("test.txt","getLocalFiles test.txt");
 like($process{successfullyDone}, qr/getLocalFiles/, "getLocalFiles set \$process{successfullyDone} for reprocessing");
 
 # 8
-#checkFiles({File => {filename => "test.txt"}, process => \%process});
 is_deeply($process{filenames},["test.txt"],"checkFiles test.txt");
 markProcessed({File => {filename => "test.txt"}, process => \%process});
 
@@ -125,10 +124,47 @@ is($hadDBErrors,1,"evalCustomCode set \$hadDBErrors correctly with anon sub");
 EAI::Wrap::evalCustomCode('$hadDBErrors = 2;',"evalCustomCodeTest2",\$hadDBErrors);
 is($hadDBErrors,2,"evalCustomCode set \$hadDBErrors correctly with string eval");
 
+# 30
+open (TESTFILE, ">redo/test.csv");
+print TESTFILE "col1,col2\nval1,val2\n";
+close TESTFILE;
 
-unlink "test.zip";
-unlink "test.txt";
-unlink "testContent.txt";
+@loads = (
+	{
+		File => {
+			format_skip => 1,
+			format_header => "col1,col2",
+			format_quotedcsv => 1,
+			format_sep => ",",
+			localFilesystemPath => "redo",
+			filename => "test.csv",
+			dontKeepHistory => 1
+		},
+	}
+);
+setupEAIWrap();
+standardLoop();
+is_deeply($loads[0]{process},{'data' => [{'col1' => 'val1','col2' => 'val2'}],'filenames' => ['test.csv'],'filesProcessed' => {'test.csv' => 1},'retrievedFiles' => ['test.csv'],'successfullyDone' => 'getLocalFilesreadFileData'},"test.csv read succesfully with standardLoop via \@loads");
+undef(@loads);
+
+%common = (
+	File => {
+		format_skip => 1,
+		format_header => "col1,col2",
+		format_quotedcsv => 1,
+		format_sep => ",",
+		localFilesystemPath => "redo",
+		filename => "test.csv",
+		dontKeepHistory => 1
+	},
+);
+setupEAIWrap();
+standardLoop();
+is_deeply($common{process},{'data' => [{'col1' => 'val1','col2' => 'val2'}],'filenames' => ['test.csv'],'filesProcessed' => {'test.csv' => 1},'retrievedFiles' => ['test.csv'],'successfullyDone' => 'getLocalFilesreadFileData'},"test.csv read succesfully with standardLoop via \%common");
+
+# cleanup
+unlink glob "redo/test*.csv";
+unlink glob "test.*";
 unlink "localDir/test.txt";
 unlink "History/test_DefinedTimestamp.txt";
 rmdir "redo" or print "can't remove redo: $!\n"; rmdir "History"; rmdir "localDir";

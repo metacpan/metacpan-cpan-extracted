@@ -45,7 +45,7 @@ class GetTypeHandler(AbstractCommandHandler):
             exc_type, exc_value = type(e), e
             sys_path = "\n".join(sys.path)
             available_types = "\n".join(self.get_all_available_types())
-            new_message = str(e) + "\nLoaded directories: " + sys_path  + "\nAvailable user types:\n" + available_types + "\n\n\n"
+            new_message = str(e) + "\nLoaded directories:\n" + sys_path  + "\nAvailable user types:\n" + available_types + "\n\n\n"
             new_exc = exc_type(new_message).with_traceback(e.__traceback__)
             raise new_exc from None
 
@@ -65,22 +65,21 @@ class GetTypeHandler(AbstractCommandHandler):
         loaded_module = import_module(module_name)
         return getattr(loaded_module, class_name)
 
-
     def get_all_available_types(self):
-        available_types = []
+        available_types = set()
         for directory in LoadLibraryHandler.loaded_directories:
             for root, _, files in os.walk(directory):
+                if "Binaries" in root:
+                    continue
                 for file in files:
                     if file.lower().endswith(".py") and file != "__init__.py":
                         module_name = os.path.splitext(file)[0]
-                        module_path = os.path.relpath(os.path.join(root, module_name), directory)
-                        module_path = module_path.replace(os.sep, ".")
+                        module_path = os.path.relpath(os.path.join(root, module_name), directory).replace(os.sep, ".")
                         try:
                             module = importlib.import_module(module_path)
                             for name, obj in inspect.getmembers(module, inspect.isclass):
-                                # Store the fully qualified class name
                                 qualified_name = f"{module_path}.{name}"
-                                available_types.append(qualified_name)
-                        except Exception as e:
-                            logging.error(f"Error importing {module_path}: {e}")
-        return available_types
+                                available_types.add(qualified_name)
+                        except Exception:
+                            pass
+        return list(available_types)

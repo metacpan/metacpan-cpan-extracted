@@ -18,3 +18,6 @@
  - Added Unit test for order validation
 1.008
  - $Log::LogMethods::SKIP_TRIGGER=1, now just disables the trigger
+1.009
+ - Plays nicer with MODIFY_CODE_ATTRIBUTES in a parent class
+ - now handles bad code attributes properly, does not die returns a list

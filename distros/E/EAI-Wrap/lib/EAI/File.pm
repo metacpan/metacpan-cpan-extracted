@@ -1,4 +1,4 @@
-package EAI::File 1.918;
+package EAI::File 1.919;
 
 use strict; use feature 'unicode_strings'; use warnings; no warnings 'uninitialized';
 use Exporter qw(import); use Text::CSV(); use Data::XLSX::Parser(); use Spreadsheet::ParseExcel(); use Spreadsheet::WriteExcel(); use Excel::Writer::XLSX(); use XML::LibXML(); use XML::LibXML::Debugging();
@@ -18,8 +18,8 @@ sub getcommon ($) {
 	my $sep = $File->{format_sep} if $File->{format_sep};
 	$sep = $File->{format_defaultsep} if !$sep; # use default if not given
 	# for fixed format and non existing separator, header and targetheader strings are parsed/split using tab as separator
-	my @header = split(($sep =~ /^fix/ or !$sep ? "\t" : $sep), $File->{format_header}) if $File->{format_header};
-	my @targetheader = split(($sep =~ /^fix/ or !$sep ? "\t" : $sep), $File->{format_targetheader}) if $File->{format_targetheader};
+	my @header = split(($sep =~ /^fix/ || !$sep ? "\t" : $sep), $File->{format_header}) if $File->{format_header};
+	my @targetheader = split(($sep =~ /^fix/ || !$sep ? "\t" : $sep), $File->{format_targetheader}) if $File->{format_targetheader};
 	$Data::Dumper::Terse = 1;
 	get_logger()->debug("\$skip:$skip\n\$sep:".Data::Dumper::qquote($sep)."\n\@header:@header\n\@targetheader:@targetheader\n\$lineProcessing:$lineProcessing\n\$fieldProcessing:$fieldProcessing\n\$firstLineProc:$firstLineProc\n\$thousandsep:$thousandsep\n\$decimalsep:$decimalsep");
 	$Data::Dumper::Terse = 0;

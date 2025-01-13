@@ -1,4 +1,4 @@
-package EAI::Wrap 1.918;
+package EAI::Wrap 1.919;
 
 use strict; use feature 'unicode_strings'; use warnings;
 use Exporter qw(import); use Data::Dumper qw(Dumper); use File::Copy qw(copy move); use Cwd qw(chdir); use Archive::Extract (); use Carp qw(confess longmess);
@@ -34,13 +34,14 @@ sub INIT {
 	$EAI_WRAP_SENS_CONFIG_PATH =~ s/\\/\//g;
 	print STDOUT "EAI_WRAP_CONFIG_PATH: ".($EAI_WRAP_CONFIG_PATH ? $EAI_WRAP_CONFIG_PATH : "not set").", EAI_WRAP_SENS_CONFIG_PATH: ".($EAI_WRAP_SENS_CONFIG_PATH ? $EAI_WRAP_SENS_CONFIG_PATH : "not set")."\n";
 	readConfigs();
-	
+
 	$execute{homedir} = File::Basename::dirname(File::Spec->rel2abs((caller(0))[1])); # folder, where the main script is being executed.
 	$execute{scriptname} = File::Basename::fileparse((caller(0))[1]);
 	my ($homedirnode) = ($execute{homedir} =~ /^.*[\\\/](.*?)$/);
 	$execute{envraw} = $config{folderEnvironmentMapping}{$homedirnode};
 	my $modulepath = File::Basename::dirname(File::Spec->rel2abs(__FILE__)); # get this module's folder as additional folderEnvironmentMapping.
 	$execute{envraw} = $config{folderEnvironmentMapping}{$modulepath} if !$execute{envraw}; # if nothing found check if modulepath is configured to get envraw from there...
+	$execute{envraw} = "" if !defined($execute{envraw});
 	print STDOUT "\$execute{homedir}: $execute{homedir}, \$execute{scriptname}: $execute{scriptname}, \$homedirnode: $homedirnode, \$modulepath: $modulepath, \$execute{envraw}: $execute{envraw}\n";
 	if ($execute{envraw}) {
 		$execute{env} = $execute{envraw};
@@ -70,6 +71,7 @@ sub readConfigs (;$) {
 	}
 }
 
+# factored out doExecuteOnInit part to allow call in processingEnd
 sub doExecuteOnInit () {
 	if ($config{executeOnInit}) {
 		print STDOUT "doing executeOnInit\n";
@@ -921,6 +923,7 @@ sub processingEnd {
 }
 
 my $processingInitialized = 0; # specifies that the process was initialized
+
 # wrapper for processingEnd to be used at the beginning of the process loop
 sub processingContinues {
 	if ($processingInitialized) {
@@ -933,9 +936,10 @@ sub processingContinues {
 	}
 }
 
-sub standardLoop (;$) {
-	my $getAddtlDBData = shift;
+# executes the given configuration in a standard extract/transform/load loop
+sub standardLoop () {
 	my $logger = get_logger();
+	$processingInitialized = 0;
 	while (processingContinues()) {
 		if ($common{DB}{DSN}) {
 			openDBConn(\%common,1) or $logger->error("failed opening DB connection".longmess());
@@ -944,19 +948,21 @@ sub standardLoop (;$) {
 			openFTPConn(\%common,1) or $logger->error("failed opening FTP connection".longmess());
 		}
 		if (@loads) {
+			$logger->info("\@loads are defined, looping through loads");
 			for my $load (@loads) {
 				if (getFiles($load)) {
-					getAdditionalDBData($load) if $getAddtlDBData;
+					getAdditionalDBData($load) if $load->{additionalLookup};
 					readFileData($load);
-					dumpDataIntoDB($load);
+					dumpDataIntoDB($load) if $load->{DB}{DSN};
 					markProcessed($load);
 				}
 			}
 		} else {
+			$logger->info("no \@loads are defined, processing \%common");
 			if (getFiles(\%common)) {
-				getAdditionalDBData(\%common) if $getAddtlDBData;
+				getAdditionalDBData(\%common) if $common{additionalLookup};
 				readFileData(\%common);
-				dumpDataIntoDB(\%common);
+				dumpDataIntoDB(\%common) if $common{DB}{DSN};
 				markProcessed(\%common);
 			}
 		}
@@ -1350,10 +1356,10 @@ argument $arg (ref to current load or common)
 
 combines above two procedures in a general procedure to upload files via FTP or CMD or to put into local dir. Arguments are fetched from common or loads[i], using File and process parameters
 
-=item standardLoop (;$)
+=item standardLoop ()
 
 executes the given configuration in a standard extract/transform/load loop (as shown below), depending on whether loads are given an additional loop is done for all loads within the @loads list. 
-If the definition only contains the common hash then there is no loop. The additional optional parameter $getAddtlDBData activates getAdditionalDBData before reading in file data.
+If the definition only contains the common hash then there is no loop over loads.
 No other processing is possible (creating files from data, uploading, etc.)
 
   while (processingContinues()) {
@@ -1366,17 +1372,17 @@ No other processing is possible (creating files from data, uploading, etc.)
   	if (@loads) {
   		for my $load (@loads) {
   			if (getFiles($load)) {
-  				getAdditionalDBData($load) if $getAddtlDBData;
+  				getAdditionalDBData($load) if $load->{additionalLookup};
   				readFileData($load);
-  				dumpDataIntoDB($load);
+  				dumpDataIntoDB($load) if $load->{DB}{DSN};
   				markProcessed($load);
   			}
   		}
   	} else {
   		if (getFiles(\%common)) {
-  			getAdditionalDBData(\%common) if $getAddtlDBData;
+  			getAdditionalDBData(\%common) if $common{additionalLookup};;
   			readFileData(\%common);
-  			dumpDataIntoDB(\%common);
+  			dumpDataIntoDB(\%common) if $common{DB}{DSN};
   			markProcessed(\%common);
   		}
   	}

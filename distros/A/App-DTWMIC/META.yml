@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.4005'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.2, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.1.25, CPAN::Meta::Converter version 2.150010'
 license: lgpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,18 +26,18 @@ no_index:
 provides:
   App::DTWMIC:
     file: lib/App/DTWMIC.pm
-    version: '0.002'
+    version: '0.003'
 requires:
   File::HomeDir: '0'
   File::Which: '0'
-  Udev::FFI: '0.102000'
-  YAML::Tiny: '0'
+  Udev::FFI: '0.103000'
+  YAML::Syck: '0'
   perl: '5.008005'
 resources:
   bugtracker: https://github.com/Ilya33/App-DTWMIC/issues
   homepage: https://github.com/Ilya33/App-DTWMIC
-  repository: git://github.com/Ilya33/App-DTWMIC.git
-version: '0.002'
+  repository: https://github.com/Ilya33/App-DTWMIC.git
+version: '0.003'
 x_authority: cpan:ILUX
 x_contributors:
   - 'Ilya Pavlov <iluxz@mail.ru>'

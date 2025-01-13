@@ -4,36 +4,12 @@ use strict;
 use warnings;
 use Test::More;
 use Test::MockModule;
-use Module::Load 'load';
 use Mojolicious::Lite;
-use Try::Tiny;
 
 use FindBin qw($Bin);
 use lib "$Bin/lib/MyCatalystApp/lib";
 
-my @required_modules = qw(
-  Catalyst::Runtime
-  Catalyst::Action::RenderView
-  Catalyst::Plugin::ConfigLoader
-  Catalyst::Plugin::Session::Store::FastMmap
-  Catalyst::Plugin::Static::Simple
-  Catalyst::View::JSON
-  Config::General
-  Test::WWW::Mechanize::Catalyst::WithContext
-);
-my @missing_modules;
-foreach my $module (@required_modules) {
-  try {
-    load $module;
-  }
-  catch {
-    push @missing_modules, $module;
-  };
-}
-if (@missing_modules) {
-  plan skip_all => sprintf('%s %s required', join(', ', @missing_modules),
-                                                        @missing_modules > 1 ? 'are' : 'is');
-}
+use Test::WWW::Mechanize::Catalyst::WithContext;
 
 local $ENV{MOJO_LOG_LEVEL} = 'error';
 

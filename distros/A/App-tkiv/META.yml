@@ -1,7 +1,7 @@
 --- 
 abstract: An image viewer in Perl::Tk based on IrfanView
 author: 
-  - H.Merijn Brand <h.m.brand@xs4all.nl>
+  - H.Merijn Brand <hmbrand@cpan.org>
 configure_requires: 
   ExtUtils::MakeMaker: 0
 dynamic_config: 1
@@ -23,14 +23,14 @@ optional_features:
 provides: 
   App::tkiv: 
     file: lib/App/tkiv.pm
-    version: '0.133'
+    version: '0.134'
 recommends: 
-  Data::Peek: '0.52'
-  Getopt::Long: '2.54'
-  Image::ExifTool: '12.50'
-  Image::Info: '1.43'
+  Data::Peek: '0.53'
+  Getopt::Long: '2.58'
+  Image::ExifTool: '13.10'
+  Image::Info: '1.45'
   Image::Size: '3.300'
-  Test::More: '1.302191'
+  Test::More: '1.302207'
   Tk: '804.036'
   Tk::TIFF: '0.11'
   X11::Protocol: '0.56'
@@ -59,4 +59,4 @@ resources:
   bugtracker: https://github.com/Tux/App-tkiv/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/App-tkiv
-version: '0.133'
+version: '0.134'

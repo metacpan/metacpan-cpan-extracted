@@ -19,6 +19,7 @@ try {
   require Archive::SCS::Mountable;
   require Archive::SCS::TObj;
 
+  require Archive::SCS::Directory;
   require Archive::SCS::HashFS;
   require Archive::SCS::HashFS2;
   require Archive::SCS::InMemory;
