@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use vars qw($VERSION);
-$VERSION = '0.53';
+$VERSION = '0.61';
 
 use Tk;
 require Tk::CodeText;
@@ -110,7 +110,7 @@ GetOptions(
 	#wrap
 	'w=s' => \$wrap,
 	'wrap=s' => \$wrap,
-	#xnlfolder
+	#xmlfolder
 	'x=s' => \$xmlfolder,
 	'xmlfolder=s' => \$xmlfolder,
 ) or die $help_text;
@@ -169,10 +169,10 @@ my $txt = $app->CodeText(%options,
 	-height => 3,
 )->pack(-expand => 1, -fill => 'both');
 
-$app->bind('<Control-f>', [$txt, 'FindPopUp']);
+$app->bind('<Control-b>', [$txt, 'bookmarkNew']);
+$app->bind('<Control-B>', [$txt, 'bookmarkRemove']);
 $app->bind('<Control-n>', \&emptyDoc);
 $app->bind('<Control-o>', \&loadDoc);
-$app->bind('<Control-r>', [$txt, 'FindAndReplacePopUp']);
 $app->bind('<Control-s>', \&saveDoc);
 $app->bind('<Control-q>', \&quit);
 
@@ -233,7 +233,27 @@ $menu = $app->Menu(
 			],
 		],
 		['cascade' => '~Bookmarks',
-			-menuitems => [ $txt->bookmarkMenuItems	],
+			-menuitems => [	
+				['command' => '~Add bookmark',
+					-command => ['bookmarkNew', $txt],
+					-accelerator => 'CTRL+B',
+				],
+				['command' => '~Remove bookmark',
+					-command => ['bookmarkRemove', $txt],
+					-accelerator => 'CTRL+SHIFT+B',
+				],
+				['command' => 'Re~move all bookmarks',
+					-command => ['bookmarkRemoveAll', $txt],
+				],
+				['separator' => '-'],
+				['command' => '~Next bookmark',
+					-command => ['bookmarkNext', $txt],
+				],
+				['command' => '~Previous bookmark',
+					-command => ['bookmarkPrev', $txt],
+				],
+				['separator' => '-'],
+			],
 			-postcommand => sub { $txt->bookmarkMenuPop($menu, 'Bookmarks') },
 		],
 	],

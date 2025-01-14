@@ -1,3 +1,15 @@
+0.62	- 2025-01-13, H.Merijn Brand
+    * doc should not be part of test
+
+0.61	- 2025-01-13, H.Merijn Brand
+    * Replace "use vars" with "our" (James Raspass: PR #9)
+    * Specify recommended versions based on known CVE's
+    * Update doc for groff-1.24
+    * It's 2024
+    * Tested with perl-5.40.0
+    * It's 2025
+    * Add SECURITY.md
+
 0.60	- 2023-01-06, H.Merijn Brand
     * It's 2023
 

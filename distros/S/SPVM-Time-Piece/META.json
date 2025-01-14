@@ -44,9 +44,11 @@
    "release_status" : "stable",
    "resources" : {
       "repository" : {
-         "type" : "git"
+         "type" : "git",
+         "url" : "https://github.com/yuki-kimoto/SPVM-Time-Piece.git",
+         "web" : "https://github.com/yuki-kimoto/SPVM-Time-Piece"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

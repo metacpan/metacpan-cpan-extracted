@@ -1,4 +1,4 @@
-#!perl -w
+#!/usr/bin/env perl
 
 use strict;
 use warnings;
@@ -155,5 +155,4 @@ PARAM: {
 
 		close $fh
 	};
-
 }

@@ -6,9 +6,9 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-02-02'; # DATE
+our $DATE = '2025-01-14'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.034'; # VERSION
+our $VERSION = '1.035'; # VERSION
 
 use App::CSVUtils qw(
                         gen_csv_util
@@ -18,7 +18,7 @@ gen_csv_util(
     name => 'csv_concat',
     summary => 'Concatenate several CSV files together, '.
         'collecting all the fields',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 Example, concatenating this CSV:
 
@@ -50,11 +50,51 @@ will result in:
     ,,,X
     ,,,Y
 
-Keywords: join, merge
+When `--overlay` option is enabled, the result will be:
 
-_
+    col1,col2,col4,col3
+    1,2,b,X
+    3,4,d,Y
+    ,e,f,
+
+When `--overlay` as well as `--overwrite-fields` option are enabled, the result
+will be:
+
+    col1,col2,col4,col3
+    1,a,b,X
+    3,c,d,Y
+    ,e,f,
+
+Keywords: join, merge, overlay
+
+MARKDOWN
     add_args => {
-        %App::CSVUtils::argspecopt_with_data_rows,
+        overlay => {
+            summary => 'Whether to overlay rows from second and subsequent CSV files to the first',
+            schema => 'bool*',
+            description => <<'MARKDOWN',
+
+By default, rows from the second CSV file will be added after all the rows from
+the first CSV are added, and so on. However, when this option is enabled, the
+rows the second and subsequent CSV files will be added together (overlaid). See
+the utility's example for an illustration.
+
+See also the `--overwrite-fields` option.
+
+MARKDOWN
+        },
+        overwrite_fields => {
+            summary => 'Whether fields from subsequent CSV files should overwrite existing fields from previous CSV files',
+            schema => 'bool*',
+            description => <<'MARKDOWN',
+
+When in overlay mode (`--overlay`), by default the value for a field is
+retrieved from the first CSV file that has the field. With `--overwrite-fields`
+option enabled, the value will be retrieved from the last CSV that has the
+field. See the utility's example for an illustration.
+
+MARKDOWN
+        },
     },
     tags => ['category:combining', 'join', 'merge'],
 
@@ -98,22 +138,53 @@ _
             }
         }
 
-        # print all the data rows
         my $csv = $r->{input_parser};
-        for my $i (0 .. $#{ $r->{all_input_fh} }) {
-            log_trace "[%d/%d] Adding rows from file #%d ...",
-                $i+1, scalar(@{$r->{all_input_fh}}), $i+1;
-            my $fh = $r->{all_input_fh}[$i];
-            my $input_fields = $r->{all_input_fields}[$i];
-            while (my $row = $csv->getline($fh)) {
+
+        if ($r->{util_args}{overlay}) {
+
+            my $overwrite_fields = $r->{util_args}{overwrite_fields};
+            my $output_fields_idx = $r->{output_fields_idx};
+            while (1) {
+                my $has_not_eof;
                 my $combined_row = [("") x @{ $r->{output_fields} }];
-                for my $j (0 .. $#{ $input_fields }) {
-                    my $field = $input_fields->[$j];
-                    $combined_row->[ $r->{output_fields_idx}{$field} ] = $row->[$j];
-                }
+                my %seen_fields;
+                for my $i (0 .. $#{ $r->{all_input_fh} }) {
+                    my $fh = $r->{all_input_fh}[$i];
+
+                    next if eof($fh);
+                    $has_not_eof++;
+                    my $row = $csv->getline($fh);
+                    my $input_fields = $r->{all_input_fields}[$i];
+                    for my $j (0 .. $#{ $input_fields }) {
+                        my $field = $input_fields->[$j];
+                        if (!($seen_fields{$field}++) || $overwrite_fields) {
+                            $combined_row->[ $output_fields_idx->{$field} ] = $row->[$j];
+                        }
+                    }
+                } # for all_input_fh
+                last unless $has_not_eof;
                 $r->{code_print_row}->($combined_row);
-            }
-        } # for all input fh
+            } # while 1
+
+        } else {
+
+            # print all the data rows
+            for my $i (0 .. $#{ $r->{all_input_fh} }) {
+                log_trace "[%d/%d] Adding rows from file #%d ...",
+                    $i+1, scalar(@{$r->{all_input_fh}}), $i+1;
+                my $fh = $r->{all_input_fh}[$i];
+                my $input_fields = $r->{all_input_fields}[$i];
+                while (my $row = $csv->getline($fh)) {
+                    my $combined_row = [("") x @{ $r->{output_fields} }];
+                    for my $j (0 .. $#{ $input_fields }) {
+                        my $field = $input_fields->[$j];
+                        $combined_row->[ $r->{output_fields_idx}{$field} ] = $row->[$j];
+                    }
+                    $r->{code_print_row}->($combined_row);
+                }
+            } # for all input fh
+
+        }
     },
 );
 
@@ -132,7 +203,7 @@ App::CSVUtils::csv_concat - Concatenate several CSV files together, collecting a
 
 =head1 VERSION
 
-This document describes version 1.034 of App::CSVUtils::csv_concat (from Perl distribution App-CSVUtils), released on 2024-02-02.
+This document describes version 1.035 of App::CSVUtils::csv_concat (from Perl distribution App-CSVUtils), released on 2025-01-14.
 
 =head1 FUNCTIONS
 
@@ -175,7 +246,22 @@ will result in:
  ,,,X
  ,,,Y
 
-Keywords: join, merge
+When C<--overlay> option is enabled, the result will be:
+
+ col1,col2,col4,col3
+ 1,2,b,X
+ 3,4,d,Y
+ ,e,f,
+
+When C<--overlay> as well as C<--overwrite-fields> option are enabled, the result
+will be:
+
+ col1,col2,col4,col3
+ 1,a,b,X
+ 3,c,d,Y
+ ,e,f,
+
+Keywords: join, merge, overlay
 
 This function is not exported.
 
@@ -338,13 +424,29 @@ Overriden by C<--output-sep-char>, C<--output-quote-char>, C<--output-escape-cha
 options. If one of those options is specified, then C<--output-tsv> will be
 ignored.
 
+=item * B<overlay> => I<bool>
+
+Whether to overlay rows from second and subsequent CSV files to the first.
+
+By default, rows from the second CSV file will be added after all the rows from
+the first CSV are added, and so on. However, when this option is enabled, the
+rows the second and subsequent CSV files will be added together (overlaid). See
+the utility's example for an illustration.
+
+See also the C<--overwrite-fields> option.
+
 =item * B<overwrite> => I<bool>
 
 Whether to override existing output file.
 
-=item * B<with_data_rows> => I<bool>
+=item * B<overwrite_fields> => I<bool>
 
-Whether to also output data rows.
+Whether fields from subsequent CSV files should overwrite existing fields from previous CSV files.
+
+When in overlay mode (C<--overlay>), by default the value for a field is
+retrieved from the first CSV file that has the field. With C<--overwrite-fields>
+option enabled, the value will be retrieved from the last CSV that has the
+field. See the utility's example for an illustration.
 
 
 =back
@@ -397,7 +499,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

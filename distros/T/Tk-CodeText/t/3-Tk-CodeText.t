@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 30;
+use Test::More tests => 29;
 use Test::Tk;
 use Tk;
 
@@ -17,7 +17,7 @@ if (defined $app) {
 		-tabs => '7m',
 		-font => 'Monospace 12',
 		-logcall => sub { print STDERR shift, "\n" },
-		-modifiedcall => sub { my $index = shift; print "index $index\n"; },
+#		-modifiedcall => sub { my $index = shift; print "index $index\n"; },
 #		-readonly => 1,
 		-syntax => 'XML',
 	)->pack(
@@ -84,7 +84,7 @@ if (defined $app) {
 }
 
 #testing accessors
-testaccessors($text, qw /Colored ColorInf FoldButtons FoldInf highlightinterval linespercycle LoopActive NoHighlighting SaveFirstVisible SaveLastVisible/);
+testaccessors($text, qw /Colored ColorInf FoldButtons highlightinterval linespercycle LoopActive NoHighlighting SaveFirstVisible SaveLastVisible/);
 
 push @tests, (
 	[ sub { return defined $text }, 1, 'CodeText widget created' ],

@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.32
+    version 0.33
 
 SYNOPSIS
 
@@ -63,6 +63,45 @@ PROPERTIES
 
     Sets the clean_install property on Alien::Build::MM.
 
+ eumm_hash_var
+
+    Sets the variable name that is used in the Makefile.PL for its
+    arguments. Defaults to %WriteMakefileArgs, and is required to begin
+    with % or $. This is useful when defining your own Makefile template
+    with Dist::Zilla::Plugin::MakeMaker::Custom.
+
+NOTES
+
+    When defining your own Makefile.PL template (to use with
+    Dist::Zilla::Plugin::MakeMaker::Custom, for example,) you can specify
+    where you want this module to insert its code by having this line in
+    the template:
+
+      # ALIEN BUILD MM
+
+    An example template to use would be this:
+
+      use ExtUtils::MakeMaker ##{ $eumm_version ##};
+      
+      my %args = (
+        NAME => "My::Alien::Module",
+      ##{ $plugin->get_default(qw(ABSTRACT AUTHOR LICENSE VERSION)) ##}
+      ##{ $plugin->get_prereqs(1) ##}
+      );
+      
+      # ALIEN BUILD MM
+      
+      WriteMakefile(%args);
+
+    and a dist.ini using this template would include this:
+
+      [MakeMaker::Custom]
+      # We need to manipulate %args on-the-fly if we set the version of ExtUtils::MakeMaker any lower.
+      eumm_version: 6.64
+    
+      [AlienBuild]
+      eumm_hash_var: %args
+
 SEE ALSO
 
     Alien::Build, alienfile, Alien::Base, Alien::Build::MM,
@@ -70,11 +109,15 @@ SEE ALSO
 
 AUTHOR
 
-    Graham Ollis <plicease@cpan.org>
+    Author: Graham Ollis <plicease@cpan.org>
+
+    Contributors:
+
+    Curtis Jewell (CSJEWELL)
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2017 by Graham Ollis.
+    This software is copyright (c) 2017-2025 by Graham Ollis.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -13,7 +13,7 @@ our @EXPORT = qw(
 	string_between_ok
 	);
 
-our $VERSION = '1.246';
+our $VERSION = '1.247';
 
 use Scalar::Util;
 use Test::Builder;
@@ -452,7 +452,7 @@ brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2002-2024, brian d foy <briandfoy@pobox.com>. All rights reserved.
+Copyright © 2002-2025, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License 2.0.

@@ -1,5 +1,8 @@
 Revision history for Perl module String::Sprintf
 
+1.004 2025-01-13T12:59:31Z
+	* refresh distro
+
 1.003 2024-02-11T06:57:29Z
 	* refresh distro, update email address, move to BRIANDFOY
 

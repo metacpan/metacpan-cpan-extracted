@@ -28,7 +28,7 @@ use constant {
     FEATURE_HYBRID               => '5a1895b8-61f1-4ce1-a44f-1a239b7d9de7',
 };
 
-our $VERSION = v0.07;
+our $VERSION = v0.08;
 
 my %table_defs = (
     tag      => 'CREATE TABLE IF NOT EXISTS tag (id INTEGER NOT NULL UNIQUE PRIMARY KEY AUTOINCREMENT);',
@@ -138,6 +138,16 @@ sub dbh {
 
 sub include {
     my ($self, @sources) = @_;
+    my $cache = $self->db->create_cache;
+    my Data::TagDB $db = $self->db;
+    my Data::TagDB::WellKnown $wk = $db->wk;
+
+    $cache->add(
+        $wk->also_shares_identifier(1),
+        $wk->uuid(1),
+        $wk->tagname(1),
+    );
+
     foreach my $entry (@sources) {
         my $source;
 
@@ -145,8 +155,6 @@ sub include {
         $source = $entry->{source};
 
         if ($source eq 'Data::TagDB::WellKnown') {
-            my Data::TagDB $db = $self->db;
-            my Data::TagDB::WellKnown $wk = $db->wk;
             my Data::TagDB::Tag $asi = $wk->also_shares_identifier(1);
             my Data::TagDB::Tag $tagname = $wk->tagname(1);
             my Data::TagDB::Tag $sid = $wk->small_identifier(1);
@@ -162,8 +170,6 @@ sub include {
             }
         } elsif ($source eq 'Data::URIID') {
             require Data::URIID;
-            my Data::TagDB $db = $self->db;
-            my Data::TagDB::WellKnown $wk = $db->wk;
             my Data::TagDB::Tag $uuid = $wk->uuid(1);
             my $extractor = Data::URIID->new;
 
@@ -176,8 +182,6 @@ sub include {
             }
         } elsif ($source eq 'Data::Identifier') {
             require Data::Identifier;
-            my Data::TagDB $db = $self->db;
-            my Data::TagDB::WellKnown $wk = $db->wk;
             my Data::TagDB::Tag $uuid = $wk->uuid(1);
             my Data::TagDB::Tag $sid = $wk->small_identifier(1);
             foreach my $identifier (Data::Identifier->wellknown) {
@@ -188,7 +192,6 @@ sub include {
                         ]);
             }
         } elsif (($source =~ /::/ || $source =~ /^[A-Z]/) && $source->isa('Data::Identifier::Interface::Known')) {
-            my Data::TagDB $db = $self->db;
             foreach my $identifier (Data::Identifier->known(':all', as => 'Data::Identifier')) {
                 $db->create_tag($identifier);
             }
@@ -439,7 +442,7 @@ Data::TagDB::Migration - Work with Tag databases
 
 =head1 VERSION
 
-version v0.07
+version v0.08
 
 =head1 SYNOPSIS
 
@@ -577,7 +580,7 @@ Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2024-2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
 
 This is free software, licensed under:
 

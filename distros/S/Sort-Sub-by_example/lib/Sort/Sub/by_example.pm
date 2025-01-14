@@ -7,7 +7,7 @@ use warnings;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2025-01-12'; # DATE
 our $DIST = 'Sort-Sub-by_example'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 sub meta {
     return {
@@ -29,11 +29,10 @@ sub gen_sorter {
 
     my ($is_reverse, $is_ci, $args) = @_;
 
-    die "Reverse sorting not yet supported" if $is_reverse;
-
     my $example = ref $args->{example} eq 'ARRAY' ?
         [@{$args->{example}}] : [split /\s*,\s*/, $args->{example}];
     $example = [map {lc} @$example] if $is_ci;
+    $example = [reverse @$example] if $is_reverse;
 
     my $cmp = Sort::ByExample->cmp($example);
     #use Data::Dmp; dd $cmp
@@ -54,7 +53,7 @@ Sort::Sub::by_example - Sort by example
 
 =head1 VERSION
 
-This document describes version 0.003 of Sort::Sub::by_example (from Perl distribution Sort-Sub-by_example), released on 2025-01-12.
+This document describes version 0.004 of Sort::Sub::by_example (from Perl distribution Sort-Sub-by_example), released on 2025-01-12.
 
 =head1 SYNOPSIS
 

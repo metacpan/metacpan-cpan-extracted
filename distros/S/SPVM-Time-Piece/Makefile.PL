@@ -33,8 +33,8 @@ WriteMakefile(
     resources => {
       repository => {
         type => 'git',
-        url  => '',
-        web  => '',
+        url  => 'https://github.com/yuki-kimoto/SPVM-Time-Piece.git',
+        web  => 'https://github.com/yuki-kimoto/SPVM-Time-Piece',
       },
     },
     no_index => {
@@ -62,8 +62,7 @@ sub MY::postamble {
   unless ($no_build_spvm_modules) {
     require SPVM::Builder::Util::API;
     
-    
-    
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Time::Piece');
   }
   
   return $make_rule;

@@ -15,14 +15,14 @@ sub not_in_file_ok {
 
 	while (my $line = <$fh>) {
 		while (my ($desc, $regex) = each %regex) {
-			if ($line =~ $regex) {
+			if($line =~ $regex) {
 				push @{$violated{$desc}||=[]}, $.;
 			}
 		}
 	}
 	close $fh;
 
-	if (%violated) {
+	if(%violated) {
 		fail("$filename contains boilerplate text");
 		diag "$_ appears on lines @{$violated{$_}}" for keys %violated;
 	} else {
@@ -40,15 +40,15 @@ sub module_boilerplate_ok {
 }
 
 TODO: {
-	local $TODO = "Need to replace the boilerplate text";
+	local $TODO = 'Need to replace the boilerplate text';
 
 	not_in_file_ok(README =>
-		"The README is used..." => qr/The README is used/,
+		'The README is used...' => qr/The README is used/,
 		"'version information here'" => qr/to provide version information/,
 	);
 
 	not_in_file_ok(Changes =>
-		"placeholder date/time" => qr(Date/time)
+		'placeholder date/time' => qr(Date/time)
 	);
 
 	module_boilerplate_ok('lib/CGI/Info.pm');

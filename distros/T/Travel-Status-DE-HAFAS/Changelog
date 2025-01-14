@@ -1,0 +1,449 @@
+Travel::Status::DE::HAFAS 6.16 - Mon Jan 13 2024
+
+    * Remove DB HAFAS service. It has been returnig HTTP 503 Service
+      Temporarily Unavailable since Jan 8, 11:30 CET and has very likely been
+      shut down permanently.
+    * Travel::Status::DE::DeutscheBahn is no longer part of this
+      distribution (see above); it is now called Travel::Status::DE::HAFAS.
+    * hafas-m: Use VRN service by default. Its coverage appears to closely
+      match the discontinued DB service.
+    * HAFAS->new, HAFAS->new_p: Do not use the (discontinued) DB service by
+      default, and do not replace it with a new default. The "service"
+      option is now mandatory.
+
+Travel::Status::DE::DeutscheBahn 6.15 - Sat Dec 21 2024
+
+    * HAFAS: add SaarVV service definition
+
+Travel::Status::DE::DeutscheBahn 6.14 - Tue Dec 03 2024
+
+    * DB service: Bump HCI Core and ext versions. Note that the service
+      no longer reports route data for stationboard results after this change.
+    * ZVV service: Update HAFAS endpoint URL.
+
+Travel::Status::DE::DeutscheBahn 6.13 - Tue Dec 03 2024
+
+    * HAFAS->station: correctly identify referenced stations in non-DB backends
+
+Travel::Status::DE::DeutscheBahn 6.12 - Mon Dec 02 2024
+
+    * Do not cache upstream CGI_NO_SERVER and CGI_READ_FAILED errors. These
+      are typically temporary.
+
+Travel::Status::DE::DeutscheBahn 6.11 - Fri Oct 11 2024
+
+    * HAFAS: Add mobiliteit service definition
+
+Travel::Status::DE::DeutscheBahn 6.10 - Sat Sep 28 2024
+
+    * HAFAS: Hardcode request seconds to 00 to improve caching
+    * hafas-m: Cache backend replies by default (if Cache::File is available)
+
+Travel::Status::DE::DeutscheBahn 6.09 - Mon Aug 19 2024
+
+    * Improve handling of services which do not provide intermediate stops
+    * HAFAS: Add Resrobot service definition
+    * HAFAS: get_service et al.: return coverage data provided by
+      transport-apis, if available
+
+Travel::Status::DE::DeutscheBahn 6.08 - Thu Aug 15 2024
+
+    * HAFAS: Add DSB (Rejseplanen), TPG and ZVV service definitions
+    * HAFAS: Update endpoint URL for BLS service
+
+Travel::Status::DE::DeutscheBahn 6.07 - Mon Aug 12 2024
+
+    * HAFAS: Fix enum error in ÖBB service
+    * HAFAS: Add RSAG service definition
+
+Travel::Status::DE::DeutscheBahn 6.06 - Sun Aug 11 2024
+
+    * HAFAS: Remove undocumented Math::Polygon dependency that was accidentally
+      added in 6.05
+    * HAFAS: Add STV, RMV, VMT, VRN service definitions
+
+Travel::Status::DE::DeutscheBahn 6.05 - Sun Aug 11 2024
+
+    * HAFAS: Add KVB service definition
+    * Use mode of transport definitions provided by
+      https://github.com/public-transport/transport-apis
+
+Travel::Status::DE::DeutscheBahn 6.04 - Sat Aug 10 2024
+
+    * hafas-m: Add -n / --num-results option
+    * HAFAS: Add BVG and VOS service definitions
+
+Travel::Status::DE::DeutscheBahn 6.03 - Mon Apr 15 2024
+
+    * Journey: Add product_at accessor
+
+Travel::Status::DE::DeutscheBahn 6.02 - Fri Apr 12 2024
+
+    * hafas-m: Add -j / --with-jid option
+    * $hafas->station: Correctly determine "name" and "eva" for stations that
+      have multiple EVA IDs and names.
+
+Travel::Status::DE::DeutscheBahn 6.01 - Thu Apr 04 2024
+
+    * Journey: Add operators accessor
+    * Add CMTA (Capital Metropolitan Transportation Authority) and BLS (BLS AG)
+      services
+
+Travel::Status::DE::DeutscheBahn 6.00 - Tue Apr 02 2024
+
+    * Add AVV (Aachener Verkehrsverbund), BART (Bay Area Rapid Transit), and IE
+      (Iarnród Éireann / Irish Rail) backends
+    * Support backend-specific time zones; add time_zone to service description
+    * Handle cross-timezone journeys and stops whose time zone differs from
+      the backend's default time zone. As of this release, all input and output
+      datetimes refer to the backend's default time zone rather than local
+      time (Stop and Journey accessors) / whatever (hafas-m and HAFAS
+      arguments). Use the new tz_offset accessor to determine local time.
+      This is a breaking change.
+    * Journey, Stop: Add tz_offset accessor
+
+Travel::Status::DE::DeutscheBahn 5.06 - Thu Mar 28 2024
+
+    * Add Travel::Status::DE::HAFAS::Product module to handle line numbers,
+      operators, and similar. This enables proper support for journeys with
+      multiple operators and possibly multiple train/line numbers along the
+      route. It also exposes the line ID.
+    * Journey: Add product accessor
+    * Stop: Add prod_arr, prod_dep accessors
+    * hafas-m: Improve stop list display in journey mode
+    * Fix polyline and platform number support in ÖBB backend (and possibly
+      other non-DB backends)
+    * ÖBB backend: correctly handle polylines and platform numbers
+    * ÖBB backend: Remove redundant train numbers from $journey->name /
+      $journey->line / $product->name
+    * ÖBB backend: update productbits (thanks to Cassidy Dingenskirchen)
+
+Travel::Status::DE::DeutscheBahn 5.05 - Wed Feb 21 2024
+
+    * ÖBB backend: handle midnight crossing and fix associated warnings
+      (patch by Cassidy Dingenskirchen)
+    * ÖBB backend: adjust request version to fix backend errors with certain
+      trains (patch by Cassidy Dingenskirchen)
+
+Travel::Status::DE::DeutscheBahn 5.04 - Sat Dec 30 2023
+
+    * Journey: Add is_additional accessor
+    * Stop: Add is_additional accessor
+
+Travel::Status::DE::DeutscheBahn 5.03 - Wed Dec 19 2023
+
+    * Journey: Fix route_interesting accessor (broken by 5.00)
+
+Travel::Status::DE::DeutscheBahn 5.02 - Wed Dec 14 2023
+
+    * Fix calls to $journey->route crashing in handle_day_change or add_message
+      in some circumstances if the $hafas object that created $journey has
+      gone out of scope (and become eligible for garbage collection) in the
+      meantime. The culprit was a mis-application of weaken() introduced in
+      v5.01.
+    * hafas-m: Add -v/--via option
+
+Travel::Status::DE::DeutscheBahn 5.01 - Sat Nov 25 2023
+
+    * Fix incorrect handling of HIM messages (introduced in 4.19)
+    * hafas-m: Declutter station board output: sort by real-time data and show
+      all messages at the end
+    * Journey: Support construction from JSON that does not provide a date
+      attribute (i.e., add date parameter to constructor)
+    * Stop: Add messages accessor
+
+Travel::Status::DE::DeutscheBahn 5.00 - Tue Nov 21 2023
+
+    * hafas-m: Add --raw-json option (useful for HAFAS client development)
+    * hafas-m: Add train search support, e.g. "hafas-m '!EC 6'"
+    * HAFAS->new, HAFAS->new_p: Add journeyMatch flag
+    * Add Travel::Status::DE::HAFAS::Location module
+    * HAFAS::Stop: Fix some documented accessors not being provided by the
+      module
+    * HAFAS::Stop: Add "loc" accessor that returns the corresponding Location
+      instance
+    * HAFAS::Stop: Breaking change: The "eva", "name", "lat", "lon",
+      "distance_m", and "weight" accessors are no longer supported. Use the
+      (identically named) Location accessors instead, i.e., "$stop->loc->name"
+      instead of "$stop->name", etc.
+
+Travel::Status::DE::DeutscheBahn 4.19 - Sat Nov 11 2023
+
+    * hafas-m: Fall back to locationSearch if StopFinder is unavailable
+    * Message: Expose message type; document ->code and ->type
+
+Travel::Status::DE::DeutscheBahn 4.18 - Sun Oct 29 2023
+
+    * Allow HAFAS and hafas-m users to specify the backend language
+    * Update services list to include known language specifiers
+    * hafas-m: Add -l / --language option
+    * HAFAS->new, ->new_p: Add language option
+
+Travel::Status::DE::DeutscheBahn 4.17 - Sun Sep 03 2023
+
+    * Journey: handle empty / undefined nameS fields
+
+Travel::Status::DE::DeutscheBahn 4.16 - Sun Sep 03 2023
+
+    * Journey: Fix date parser for cross-midnight journeys that start on the
+      1st through 9th day of a month.
+
+Travel::Status::DE::DeutscheBahn 4.15 - Wed Aug 22 2023
+
+    * HAFAS: Add similar_stops_p function
+
+Travel::Status::DE::DeutscheBahn 4.14 - Tue Aug 22 2023
+
+    * Journey: Correctly calculate datetimes when requesting a cross-midnight
+      journey after midnight. Previously, those were off by 24 hours.
+
+Travel::Status::DE::DeutscheBahn 4.13 - Mon Aug 21 2023
+
+    * new_p: Return a Travel::Status::DE::HAFAS instance in addition to the
+      error message when rejecting a promise after receiving a HAFAS reply
+
+Travel::Status::DE::DeutscheBahn 4.12 - Mon May 29 2023
+
+    * Fix Journey->route and HAFAS geoSearch / locationSearch returning
+      incorrect geocoordinates (latitude and longitude were mixed up)
+
+Travel::Status::DE::DeutscheBahn 4.11 - Thu May 25 2023
+
+    * hafas-m: Add --json option
+
+Travel::Status::DE::DeutscheBahn 4.10 - Tue Apr 18 2023
+
+    * HAFAS->new, ->new_p: Add locationSearch option (search stops by name)
+    * Journey->route, ->route_interesting:
+      Return Travel::Status::DE::HAFAS::Stop instances
+
+Travel::Status::DE::DeutscheBahn 4.09 - Mon Apr 10 2023
+
+    * HAFAS->new: Add geoSearch option (search stops by coordinates)
+
+Travel::Status::DE::DeutscheBahn 4.08 - Sun Feb 12 2023
+
+    * Journey: Correctly report route_end / origin in arrivals mode
+    * Journey->route: Add platform, sched_platform, rt_platform, and
+      is_changed_platform accessors
+
+Travel::Status::DE::DeutscheBahn 4.07 - Sun Feb 05 2023
+
+    * hafas-m: Fix uninitialized value warnings in "--list" output
+    * Improve support for non-DB HAFAS instances
+    * Fix day change handling in departure board mode.
+      Previously, journeys arriving / departing after midnight had wrong
+      timestamps in some cases.
+
+Travel::Status::DE::DeutscheBahn 4.06 - Sat Feb 04 2023
+
+    * HAFAS->station: rename "uic" to "eva"; add "names" and "evas" keys
+    * Rename Journey->uic to Journey->eva
+
+Travel::Status::DE::DeutscheBahn 4.05 - Fri Feb 03 2023
+
+    * StopFinder: add new_p constructor for async requests via promises
+
+Travel::Status::DE::DeutscheBahn 4.04 - Mon Jan 30 2023
+
+    * Journey->is_cancelled: correctly report cancellations in station board
+      mode
+
+Travel::Status::DE::DeutscheBahn 4.03 - Sat Jan 28 2023
+
+    * HAFAS: Add "station" accessor
+    * Journey: Add "station", "station_uic" and "line_no" accessors
+    * Journey->line now returns journey type as well as line number
+    * Journey->line_no provides the old Journey->line behaviour
+    * Journey: Add "route_interesting" accessor
+
+Travel::Status::DE::DeutscheBahn 4.02 - Sun Nov 06 2022
+
+    * HAFAS->new: Add "results" and "lookahead" options
+    * Build.PL: Specify File::Slurp test dependency
+
+Travel::Status::DE::DeutscheBahn 4.01 - Sat Oct 29 2022
+
+    * Journey: Add "class" accessor
+    * Message: Correctly document "short" and "text" accessors
+      ("header" and "lead" were not supported), add "is_him" accessor
+    * Specify List::MoreUtils and List::Util dependencies for bin/hafas-m
+
+Travel::Status::DE::DeutscheBahn 4.00 - Fri Oct 28 2022
+
+    * Use mgate.exe HAFAS interface instead of stboard.exe/bhftafel.exe.
+      This introduces several breaking changes in hafas-m,
+      Travel::Status::DE::HAFAS, and Travel::StatuS::DE::HAFAS::Result.
+    * hafas-m: Options -l/--lang, -L/--ignore-late, and -u/--url are no longer
+      supported
+    * hafas-m now supports journey details by specifying a journey ID instead
+      of a station name.
+    * Travel::Status::DE::HAFAS->new: "date" and "time" keys are no longer
+      supported. Use "datetime" instead.
+    * Travel::Status::DE::HAFAS->new: "lang" key is no longer supported.
+    * Travel::Status::DE::HAFAS->new: "url" key is no longer supported.
+    * Travel::Status::DE::HAFAS->new: "mode" key is no longer supported. Set
+      "arrivals" to a true value to request arrivals instead of departures.
+    * Travel::Status::DE::HAFAS->new: add optional "cache" key and support for
+      "journey" requests with optional "with_polyline" key.
+    * Travel::Status::DE::HAFAS: add new_p constructor for async requests via
+      Promises.
+    * Travel::Status::DE::HAFAS: Add "result" and "messages" accessors.
+    * Rename Travel::Status::DE::HAFAS::Result to ...::Journey. The accessors
+      "sched_date", "date", "info", "countdown", "countdown_sec",
+      "raw_e_delay", "raw_delay", "sched_time", "time", "train", "train_no"
+      and "line_no" are no longer supported. Introduces several new ones
+      instead.
+    * The module no longer depends on XML::LibXML
+    * New dependency: Digest::MD5
+
+Travel::Status::DE::DeutscheBahn 3.01 - Sat Jun 06 2020
+
+    * Fix support for ÖBB and other backends which recently switched from
+      two- to four-digit years
+
+Travel::Status::DE::DeutscheBahn 3.00 - Sat May 09 2020
+
+    * Result: The date, datetime, and time accessors now report realtime
+      data if available
+    * Result: Add sched_date, sched_datetime, and sched_time accessors for
+      schedule data
+
+Travel::Status::DE::DeutscheBahn 2.05 - Sun May 03 2020
+
+    * Document LWP::Protocol::https dependency
+    * Remove BVG (Berliner Verkehrsgesellschaft) and SBB
+      (Schweizerische Bundesbahnen) services
+
+Travel::Status::DE::DeutscheBahn 2.04 - Sun Dec 30 2018
+
+    * Handle invalid XML when using the VBB backend
+
+Travel::Status::DE::DeutscheBahn 2.03 - Sat Dec 16 2017
+
+    * Update DB backend API URL
+
+Travel::Status::DE::DeutscheBahn 2.02 - Sun Jan 08 2017
+
+    * New dependencies: DateTime and DateTime::Format::Strptime
+    * Result: New accessors ->datetime, ->countdown and ->countdown_sec
+
+Travel::Status::DE::DeutscheBahn 2.01 - Sat Oct 10 2015
+
+    * Result: Fix ->type accessor (was not working for all backends)
+    * Result: Add ->train_no / ->line_no accessor
+
+Travel::Status::DE::DeutscheBahn 2.00 - Fri Sep 25 2015
+
+    * This release is NOT backwards compatible with 1.xx versions
+    * It now uses the HAFAS API instead of parsing bahn.de/ris and also
+      supports various other HAFAS installations
+    * New module dependencies: JSON, List::MoreUtils
+    * Renamed db-ris to hafas-m
+    * New modules: Travel::Status::DE::HAFAS and
+      Travel::Status::DE::HAFAS::StopFinder
+    * Renamed Travel::Status::DE::DeutscheBahn::Result to
+      Travel::Status::DE::HAFAS::Result
+    * db-ris/hafas-m: The options -f /--full-route and -v/--via are no longer
+      supported
+    * db-ris/hafas-m: New options -s / --service, -u / --url and --list
+    * Travel::Status::DE::DeutscheBahn/HAFAS->new: The mot parameter is no
+      longer supported. Use the new excluded_mots and exclusive_mots parameters
+      instead
+    * Travel::Status::DE::DeutscheBahn/HAFAS->new: Add service and url
+      parameters
+    * Travel::Status::DE::DeutscheBahn/HAFAS: Add errcode, similar_stops
+      and get_active_service accessors
+    * Travel::Status::DE::DeutscheBahn/HAFAS: Add static methods get_services
+      and get_service
+    * Result: Remove route, route_raw, route_info, route_interesting and
+      route_timetable accessors
+    * Result: Add is_changed_platform and messages accessors
+    * Result->info is now undef instead of an empty string when no information
+      is available
+
+Travel::Status::DE::DeutscheBahn 1.05 - Thu May 14 2015
+
+    * Result->route_interesting: Also consider airports
+    * Result: Add route_info accessor
+    * Result: Add is_cancelled accessor
+
+Travel::Status::DE::DeutscheBahn 1.04 - Sun May 03 2015
+
+    * Result: Add type accessor
+    * DeutscheBahn->new: Add lwp_options parameter to pass options to
+      LWP::UserAgent->new
+
+Travel::Status::DE::DeutscheBahn 1.03 - Tue Oct 21 2014
+
+    * Add primitive JSON serializer to Travel::Status::DE::DeutscheBahn::Result
+    * Fix $result->delay (was broken by changes in the RIS output format)
+
+Travel::Status::DE::DeutscheBahn 1.02 - Tue Sep 17 2013
+
+    * Respect proxy environment variables
+    * Add -a / --arrivals option to show arrivals instead of departures
+    * Disable smartmatch warnings on perl >= 5.018
+
+Travel::Status::DE::DeutscheBahn 1.01 - Sat Dec 03 2011
+
+    * Detect ambiguous input errors (available via errstr)
+    * Add language switch for additional information (german/english)
+
+    [Travel::Status::DE::DeutscheBahn::Result]
+    * Result: Add line (== train) and date accessors
+
+    [db-ris]
+    * Add -l / --lang option
+
+Travel::Status::DE::DeutscheBahn 1.00 - Sun Sep 04 2011
+
+    [db-ris]
+    * Add --full-route option
+
+    [Travel::Status::DE::DeutscheBahn]
+    * Fix bug when receiving no platform numbers from the DB RIS
+
+    [Travel::Status::DE::DeutscheBahn::Result]
+    * Add route_timetable accessor containing station names and
+      their corresponding arrival times
+
+Travel::Status::DE::DeutscheBahn 0.05 - Tue Aug 09 2011
+
+    [Travel::Status::DE::DeutscheBahn]
+    * Fix ->results returning duplicate connections when accessed more than
+      one time
+    * new: Only die when encountering wrong options, set ->errstr otherwise
+    * Adds new ->errstr accessor to check for request errors
+
+Travel::Status::DE::DeutscheBahn 0.04 - Wed Jul 13 2011
+
+    [Travel::Status::DE::DeutscheBahn::Result]
+    * The info accessor now strips the mostly useless "k.A." / "pünktlich"
+      (train on time) text parts
+    * Add (slightly experimental) route_interesting accessor
+    * Add delay accessor
+
+Travel::Status::DE::DeutscheBahn 0.03 - Wed Jul 13 2011
+
+    * Clarify derl dependency (we actually need >= 5.10.1)
+
+    [Travel::Status::DE::DeutscheBahn]
+    * Strip leading / trailing whitespace in result fields
+
+Travel::Status::DE::DeutscheBahn 0.02 - Wed Jul 06 2011
+
+    [db-ris]
+    * Only display info when a train is late, not when on time / unknown
+    * Add --ignore-late option
+
+    [Travel::Status::DE::DeutscheBahn]
+    * Add route_raw accessor
+    * Proper HTTP request error handling
+    * Strip leading whitespace from ::Result info
+    * Do not include canceled stops in the route
+
+Travel::Status::DE::DeutscheBahn 0.01 - Mon Jun 27 2011
+
+    * Initial release
+    * Crawls almost all data available in the web interface

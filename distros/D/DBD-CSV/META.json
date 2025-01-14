@@ -1,81 +1,94 @@
 {
-   "provides" : {
-      "DBD::CSV" : {
-         "version" : "0.60",
-         "file" : "lib/DBD/CSV.pm"
-         }
-      },
-   "abstract" : "DBI driver for CSV files",
-   "author" : [
-      "Jochen Wiedmann",
-      "Jeff Zucker",
-      "H.Merijn Brand <h.m.brand@xs4all.nl>",
-      "Jens Rehsack <rehsack@cpan.org>"
-      ],
-   "prereqs" : {
-      "configure" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "DBI" : "1.628"
-            }
-         },
-      "test" : {
-         "requires" : {
-            "charnames" : "0",
-            "Test::Harness" : "0",
-            "Test::More" : "0.90",
-            "Cwd" : "0",
-            "Encode" : "0"
-            },
-         "recommends" : {
-            "Test::More" : "1.302191"
-            }
-         },
-      "build" : {
-         "requires" : {
-            "Config" : "0"
-            }
-         },
-      "runtime" : {
-         "recommends" : {
-            "DBI" : "1.643",
-            "SQL::Statement" : "1.414",
-            "DBD::File" : "0.44",
-            "Text::CSV_XS" : "1.49"
-            },
-         "requires" : {
-            "perl" : "5.008001",
-            "DBI" : "1.628",
-            "SQL::Statement" : "1.405",
-            "Text::CSV_XS" : "1.01",
-            "DBD::File" : "0.42"
-            }
-         }
-      },
-   "generated_by" : "Author",
-   "license" : [
-      "perl_5"
-      ],
    "meta-spec" : {
-      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
-      },
-   "version" : "0.60",
-   "release_status" : "stable",
-   "x_installdirs" : "site",
+      "version" : 2,
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
+   },
    "name" : "DBD-CSV",
    "resources" : {
-      "bugtracker" : {
-         "web" : "https://github.com/perl5-dbi/DBD-CSV/issues"
-         },
       "repository" : {
          "web" : "https://github.com/perl5-dbi/DBD-CSV",
          "url" : "https://github.com/perl5-dbi/DBD-CSV",
          "type" : "git"
-         },
+      },
       "license" : [
          "http://dev.perl.org/licenses/"
-         ]
+      ],
+      "bugtracker" : {
+         "web" : "https://github.com/perl5-dbi/DBD-CSV/issues"
+      }
+   },
+   "provides" : {
+      "DBD::CSV" : {
+         "version" : "0.62",
+         "file" : "lib/DBD/CSV.pm"
+      }
+   },
+   "dynamic_config" : 1,
+   "prereqs" : {
+      "configure" : {
+         "suggests" : {
+            "ExtUtils::MakeMaker" : "7.70"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "DBI" : "1.628"
+         },
+         "recommends" : {
+            "ExtUtils::MakeMaker" : "7.22"
+         }
       },
-   "dynamic_config" : 1
-   }
+      "runtime" : {
+         "suggests" : {
+            "DBI" : "1.646"
+         },
+         "recommends" : {
+            "DBD::File" : "0.44",
+            "SQL::Statement" : "1.414",
+            "DBI" : "1.643",
+            "Text::CSV_XS" : "1.59"
+         },
+         "requires" : {
+            "DBD::File" : "0.42",
+            "SQL::Statement" : "1.405",
+            "DBI" : "1.628",
+            "perl" : "5.008001",
+            "Text::CSV_XS" : "1.01"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Encode" : "3.12",
+            "Test::More" : "1.302207"
+         },
+         "requires" : {
+            "Test::Harness" : "0",
+            "Test::More" : "0.90",
+            "charnames" : "0",
+            "Cwd" : "0",
+            "Encode" : "0"
+         },
+         "suggests" : {
+            "Encode" : "3.21"
+         }
+      },
+      "build" : {
+         "requires" : {
+            "Config" : "0"
+         }
+      }
+   },
+   "license" : [
+      "perl_5"
+   ],
+   "author" : [
+      "Jochen Wiedmann",
+      "Jeff Zucker",
+      "H.Merijn Brand <hmbrand@cpan.org>",
+      "Jens Rehsack <rehsack@cpan.org>"
+   ],
+   "abstract" : "DBI driver for CSV files",
+   "generated_by" : "Author",
+   "version" : "0.62",
+   "x_installdirs" : "site",
+   "release_status" : "stable"
+}

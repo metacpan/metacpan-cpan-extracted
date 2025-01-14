@@ -7,6 +7,7 @@ pod_spelling_system:
     - ffi
     - alienfile
     - alienized
+    - CSJEWELL
 
 pod_coverage:
   skip: 0

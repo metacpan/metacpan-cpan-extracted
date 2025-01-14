@@ -21,6 +21,7 @@ requires:
   SPVM: '0.989064'
   SPVM::Sys: '0.512'
   SPVM::Time::Local: '0.110'
-resources: {}
-version: '0.003'
+resources:
+  repository: https://github.com/yuki-kimoto/SPVM-Time-Piece.git
+version: '0.004'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

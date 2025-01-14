@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Aromaticity handling routines
-our $VERSION = '0.11.0'; # VERSION
+our $VERSION = '0.11.1'; # VERSION
 
 use Chemistry::OpenSMILES qw(
     is_aromatic

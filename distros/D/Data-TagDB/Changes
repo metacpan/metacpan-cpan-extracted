@@ -1,3 +1,9 @@
+v0.08  2025-01-13Z
+    - Added tag_by_specification() allowing for user tag lookups
+    - Added cache cleanup code
+    - Improved iterator interface (allowing easy creation of iterators from arrays)
+    - Added iterator support to cloudlets
+
 v0.07  2024-11-27Z
     - Improved iterator interface
     - Improved importer

@@ -1,5 +1,5 @@
-# Copyright (c) 2024 Löwenfelsen UG (haftungsbeschränkt)
-# Copyright (c) 2024 Philipp Schafft
+# Copyright (c) 2024-2025 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2024-2025 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -12,6 +12,8 @@ use strict;
 use warnings;
 
 use Carp;
+
+use Data::TagDB::Iterator;
 
 
 
@@ -58,6 +60,20 @@ sub entries {
 }
 
 
+sub roots_iterator {
+    my ($self) = @_;
+    my @entries = $self->roots;
+    return Data::TagDB::Iterator->from_array(\@entries, db => $self->db);
+}
+
+
+sub entries_iterator {
+    my ($self) = @_;
+    my @entries = $self->entries;
+    return Data::TagDB::Iterator->from_array(\@entries, db => $self->db);
+}
+
+
 sub is_root {
     my ($self, $tag) = @_;
     return $self->{entries}{$tag->dbid};
@@ -85,7 +101,7 @@ Data::TagDB::Cloudlet - Work with Tag databases
 
 =head1 VERSION
 
-version v0.07
+version v0.08
 
 =head1 SYNOPSIS
 
@@ -145,6 +161,18 @@ Returns the list of root tags.
 
 Returns the list of all entries.
 
+=head2 roots_iterator
+
+    my Data::TagDB::Iterator $iter = $cl->roots_iterator;
+
+Create an iterator for root entries.
+
+=head2 entries_iterator
+
+    my Data::TagDB::Iterator $iter = $cl->entries_iterator;
+
+Create an iterator for all entries.
+
 =head2 is_root
 
     my $bool = $cl->is_root($tag);
@@ -163,7 +191,7 @@ Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2024-2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
 
 This is free software, licensed under:
 

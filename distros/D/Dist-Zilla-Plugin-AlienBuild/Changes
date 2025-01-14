@@ -1,5 +1,10 @@
 Revision history for Dist-Zilla-Plugin-AlienBuild
 
+0.33      2025-01-13 08:32:12 -0700
+  - Added eumm_hash_var property to override the default of %WriteMakefileArgs (gh#13, csjewell++)
+  - [AlienBuild] keeps existing EUMM version requirement if it is at least 6.52 (gh#13, csjewell++)
+  - Added Documentation notes on using [AlienBuild] with 'MakeMaker::Custom' (gh#13, csjewell++)
+
 0.32      2021-06-22 10:39:23 -0600
   - Document required (!) name property for [AlienBase::Doc] (gh#10)
 

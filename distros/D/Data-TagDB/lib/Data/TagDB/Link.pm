@@ -13,7 +13,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = v0.07;
+our $VERSION = v0.08;
 
 
 
@@ -64,7 +64,7 @@ Data::TagDB::Link - Work with Tag databases
 
 =head1 VERSION
 
-version v0.07
+version v0.08
 
 =head1 SYNOPSIS
 
@@ -94,7 +94,7 @@ Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2024-2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
 
 This is free software, licensed under:
 

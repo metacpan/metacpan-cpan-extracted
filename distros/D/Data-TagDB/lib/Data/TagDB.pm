@@ -15,6 +15,7 @@ use Scalar::Util qw(weaken blessed);
 
 use Carp;
 use DBI;
+use UUID::Tiny ();
 
 use Data::TagDB::Tag;
 use Data::TagDB::Relation;
@@ -25,7 +26,7 @@ use Data::TagDB::WellKnown;
 use Data::TagDB::Cloudlet;
 use Data::URIID::Colour;
 
-our $VERSION = v0.07;
+our $VERSION = v0.08;
 
 
 
@@ -70,6 +71,7 @@ sub disconnect {
     my ($self) = @_;
     $self->assert_connected->disconnect;
     $self->{dbh} = undef;
+    $self->_cache_clear;
 }
 
 
@@ -100,6 +102,125 @@ sub tag_by_id {
     } else {
         return $self->tag_by_dbid($self->_get_data(_tag_by_dbid_type_and_data => ($type->dbid, $id)));
     }
+}
+
+
+sub tag_by_specification {
+    my ($self, $specification, %opts) = @_;
+    my $wk = $self->wk;
+    my $style = $opts{style};
+    my $important = $opts{important};
+    my $role = $opts{role};
+    my @candidates;
+
+    croak 'No style given' unless defined($style) && length($style);
+
+    if ($style eq 'ise') {
+        @candidates = (eval { $self->tag_by_id(uuid => $specification) } // eval { $self->tag_by_id(oid => $specification) } // eval { $self->tag_by_id(uri => $specification) });
+    } elsif ($style eq 'tagpool') {
+        unless ($opts{as_is}) {
+            $important ||= $specification =~ s/\!$//;
+
+            if (!defined($role) && $specification =~ s/^(.+)\@([^@]+)$/$2/) {
+                $role = $self->tag_by_specification($1, %opts);
+            }
+        }
+
+        if ($specification =~ /^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/) {
+            return $self->tag_by_id(uuid => $specification);
+        }
+
+        @candidates = $self->metadata(
+            relation => $wk->also_shares_identifier,
+            type => $wk->tagname,
+            encoding => undef,
+            data_raw => $specification,
+        )->collect('tag');
+    } elsif ($style eq 'sirtx') {
+        my ($type, $id);
+        my $backup_type;
+
+        $specification =~ s/^\[(.+)\]$/$1/;
+
+        if ($specification =~ /^\/([0-9]+)$/) {
+            $id = $1;
+            $type = $wk->sirtx_function_number;
+        } elsif ($specification =~ /^\*([0-9]+)$/) {
+            @candidates = ($opts{sirtx_local_ids}{int $1});
+        } elsif ($specification eq '*') {
+            @candidates = ($opts{sirtx_local_ids}{0});
+        } elsif ($specification =~ /^\'([0-9]+)$/) {
+            my $uuid = UUID::Tiny::create_uuid_as_string(UUID::Tiny::UUID_SHA1(), '5dd8ddbb-13a8-4d6c-9264-36e6dd6f9c99', int($1));
+            @candidates = ($self->tag_by_id(uuid => $uuid));
+        } elsif ($specification eq '\'') {
+            @candidates = ($wk->zero);
+        } elsif ($specification =~ /^\&([0-9a-zA-Z_]+)$/) {
+            my $port_tag = $self->tag_by_specification($1, %opts);
+            my $ports = $opts{sirtx_ports};
+            my $len = scalar(@{$ports});
+
+            for (my $i = 0; !scalar(@candidates) && $i < $len; $i += 2) {
+                my $p = $ports->[$i];
+                if ($port_tag == $p || $port_tag->dbid eq $p->dbid) {
+                    @candidates = ($ports->[$i+1]);
+                }
+            }
+        } elsif ($specification =~ /^(.+):(.+)$/) {
+            ($type, $id) = ($1, $2);
+        } else {
+            $type = $wk->sirtx_logical;
+            $backup_type = $wk->sirtx_function_name;
+            $id = $specification;
+        }
+
+        if (defined $type) {
+            unless (ref $type) {
+                $type = $self->tag_by_specification($type, %opts);
+            }
+
+            @candidates = $self->metadata(
+                relation => $wk->also_shares_identifier,
+                type => $type,
+                encoding => undef,
+                data_raw => $id,
+            )->collect('tag');
+
+            if (scalar(@candidates) == 0 && defined($backup_type)) {
+                @candidates = $self->metadata(
+                    relation => $wk->also_shares_identifier,
+                    type => $backup_type,
+                    encoding => undef,
+                    data_raw => $id,
+                )->collect('tag');
+            }
+        }
+    } else {
+        croak 'Invalid/unsupported style: '.$style;
+    }
+
+    if ($important) {
+        @candidates = $self->relation(
+            tag => \@candidates,
+            relation => $wk->flagged_as,
+            related => $wk->important,
+        )->collect('tag');
+    }
+
+    if (defined $role) {
+        @candidates = grep {
+            $_->cloudlet('roles')->is_entry($role)
+        } @candidates;
+    }
+
+    if (scalar(@candidates) == 1) {
+        return $candidates[0];
+    } elsif (scalar(@candidates) > 1) {
+        croak 'Nore than one match found';
+    } else {
+        croak 'Tag not found';
+    }
+
+    die 'BUG';
 }
 
 
@@ -350,9 +471,17 @@ sub tag_by_dbid {
     if (defined $cache->{$dbid}) {
         return $cache->{$dbid};
     } else {
+        state $done = 0;
         my $tag = Data::TagDB::Tag->_new(db => $self, dbid => $dbid);
+
+        if ($done++ > 1024) {
+            $self->_cache_maintain;
+            $done = 0;
+        }
+
         $cache->{$dbid} = $tag;
         weaken($cache->{$dbid});
+
         return $tag;
     }
 }
@@ -366,6 +495,21 @@ sub _tag_by_ise_cached {
         $self->{cache_ise}{$ise} = $tag->dbid;
         return $tag;
     }
+}
+
+sub _cache_maintain {
+    my ($self) = @_;
+    my $cache = $self->{cache_tag};
+
+    foreach my $key (keys %{$cache}) {
+        delete $cache->{$key} unless defined $cache->{$key};
+    }
+}
+
+sub _cache_clear {
+    my ($self) = @_;
+    $self->_cache_maintain;
+    %{$self->{cache_ise}} = ();
 }
 
 sub _default_type {
@@ -620,7 +764,7 @@ Data::TagDB - Work with Tag databases
 
 =head1 VERSION
 
-version v0.07
+version v0.08
 
 =head1 SYNOPSIS
 
@@ -649,6 +793,9 @@ L<Data::TagDB::Factory> (via L</factory>) is provided for easy creation of new t
 B<Note:>
 Correct transaction management can improve performance I<significantly>. Sometimes the improvement can be by a factor of a few thousand.
 Applications should therefore consider to group requests into transactions. This is also true for ready only requests.
+
+B<Note:>
+Future versions of this module will depend on L<Data::Identifier>.
 
 =head1 METHODS
 
@@ -710,6 +857,74 @@ Gets a tag by an an identifier of the provided type. The type must be a C<Data::
 a string that is a valid hint.
 
 If only argument is provided the argument must be an instance of L<Data::Identifier>.
+
+=head2 tag_by_specification
+
+    my Data::TagDB::Tag $tag = $db->tag_by_specification($specification, style => $style [, %opts ]);
+
+Gets a tag by specification according to a style.
+This method is mostly useful to parse user input and find the corresponding tag.
+
+B<Note:>
+This method is experimental. It may change prototype, and behaviour or may be removed in future versions without warning.
+Role matching depends on L<Data::TagDB::Tag/cloudlet> and is subject to its status.
+
+The following styles are supported:
+
+=over
+
+=item C<ise>
+
+The given specification is an UUID, OID, or URI.
+
+=item C<tagpool>
+
+The given specification is in tagpool format.
+Both C<type@tag> and C<tag!> notation is supported (can also be mixed freely).
+
+Parsing interacts with options the same way as tagpool does.
+
+=item C<sirtx>
+
+The given specification is in SIRTX format.
+Currently only I<*local>, I<'number>, I<logical>, and I<type:id> formats are supported.
+There is very limited support for I<&port>.
+Bracket-escape is only supported for top level.
+
+Supports the options C<sirtx_local_ids>, and C<sirtx_ports>.
+
+=back
+
+The following (all optional) options are supported:
+
+=over
+
+=item C<as_is>
+
+If true, this disables special parsing rules.
+For style C<tagpool> it disables all parsing but the check for UUIDs.
+
+=item C<important>
+
+Requires the tag to be marked important.
+
+=item C<role>
+
+A role the tag is required to have.
+
+=item C<sirtx_local_ids>
+
+An hashref with the local id (without the C<*>) as key and L<Data::TagDB::Tag> as value.
+
+=item C<sirtx_ports>
+
+An arrayref with an even number of elements (key-value pairs).
+Elements with an even index are considered the key (port).
+They are followed by the corresponding (port) value.
+
+All elements must be an instance of L<Data::TagDB::Tag>.
+
+=back
 
 =head2 relation
 
@@ -930,7 +1145,7 @@ Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2024-2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
 
 This is free software, licensed under:
 

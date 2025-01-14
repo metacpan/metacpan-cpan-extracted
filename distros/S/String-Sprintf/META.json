@@ -67,6 +67,6 @@
          "web" : "https://github.com/briandfoy/string-sprintf"
       }
    },
-   "version" : "1.003",
+   "version" : "1.004",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

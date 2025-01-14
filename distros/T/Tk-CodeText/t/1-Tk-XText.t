@@ -18,8 +18,9 @@ my $rtext;
 my $btext;
 if (defined $app) {
 	my $nb = $app->NoteBook->pack(-expand => 1, -fill => 'both');
-	my $tp = $nb->add('Widget', -label => 'Widget');
+	my $tp = $nb->add('Widget', -label => 'Widget',-raisecmd => sub { $text->focus });
 	$text = $tp->XText(
+		-autocomplete => 1,
 		-modifycall => \&tmodified,
 		-tabs => '7m',
 		-font => 'Hack 12',
@@ -31,7 +32,7 @@ if (defined $app) {
 		-fill => 'both',
 	);
 
-	my $up = $nb->add('UPage', -label => 'Undo stack');
+	my $up = $nb->add('UPage', -label => 'Undo stack', -raisecmd => sub { $utext->focus });
 	$utext = $up->ROText(
 		-tabs => '7m',
 		-font => 'Hack 12',
@@ -40,7 +41,7 @@ if (defined $app) {
 		-fill => 'both',
 	);
 
-	my $rp = $nb->add('RPage', -label => 'Redo stack');
+	my $rp = $nb->add('RPage', -label => 'Redo stack', -raisecmd => sub { $rtext->focus });
 	$rtext = $rp->ROText(
 		-tabs => '7m',
 		-font => 'Hack 12',
@@ -49,7 +50,7 @@ if (defined $app) {
 		-fill => 'both',
 	);
 
-	my $bp = $nb->add('Buffer', -label => 'Buffer');
+	my $bp = $nb->add('Buffer', -label => 'Buffer', -raisecmd => sub { $btext->focus });
 	$btext = $bp->ROText(
 		-tabs => '7m',
 		-font => 'Hack 12',
@@ -174,8 +175,11 @@ my $init = [ sub {
 	$text->clearModified(0);
 	return $text->get('1.0', 'end - 1c');
 }, $original, 'Initialise with original text'];
+
 my $ismodified = [ sub { return ($text->editModified >= 1) }, 1, 'Is modified'];
+
 my $isnotmodified = [ sub { return $text->editModified }, 0, 'Is not modified'];
+
 my $reset = [ sub { $text->clear; return $text->get('1.0', 'end - 1c') }, '', 'Reset widget'];
 
 sub backspace {

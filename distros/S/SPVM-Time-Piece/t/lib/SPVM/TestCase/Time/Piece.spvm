@@ -29,16 +29,6 @@ class TestCase::Time::Piece {
       }
     }
     
-    unless (Sys::OS->is_windows) {
-      my $tp = Time::Piece->localtime(-(Time::Seconds->ONE_DAY->seconds * 2), 1);
-      
-      warn "[Test Output]localtime:allow_minus:" . $tp->cdate;
-      
-      unless (Fn->contains($tp->cdate, "1969")) {
-        return 0;
-      }
-    }
-    
     return 1;
   }
   
@@ -60,16 +50,6 @@ class TestCase::Time::Piece {
       warn "[Test Output]gmtime:no_args:" . $tp->cdate;
       
       unless ($tp->epoch > 0) {
-        return 0;
-      }
-    }
-    
-    unless (Sys::OS->is_windows) {
-      my $tp = Time::Piece->gmtime(-(Time::Seconds->ONE_DAY->seconds * 2), 1);
-      
-      warn "[Test Output]gmtime:allow_minus:" . $tp->cdate;
-      
-      unless (Fn->contains($tp->cdate, "1969")) {
         return 0;
       }
     }

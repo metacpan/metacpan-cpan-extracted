@@ -1,0 +1,147 @@
+{
+  "name": "Steirischer Verkehrsverbund (Verbundlinie)",
+  "type": {
+    "hafasMgate": true
+  },
+  "supportedLanguages": [
+    "de",
+    "en"
+  ],
+  "timezone": "Europe/Vienna",
+  "attribution": {
+    "name": "Verkehrsverbund Steiermark GmbH",
+    "homepage": "https://verbundlinie.at/",
+    "isProprietary": true
+  },
+  "coverage": {
+    "realtimeCoverage": {
+      "region": ["AT-6"],
+      "area": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [15.11, 46.58],
+              [15.51, 46.55],
+              [15.52, 46.55],
+              [15.84, 46.65],
+              [16.08, 46.57],
+              [16.11, 46.65],
+              [16.06, 46.81],
+              [16.24, 46.98],
+              [16.22, 47.02],
+              [16.15, 47.22],
+              [16.11, 47.33],
+              [16.23, 47.37],
+              [16.24, 47.46],
+              [16.22, 47.47],
+              [16.14, 47.6],
+              [16.1, 47.59],
+              [15.94, 47.6],
+              [15.76, 47.77],
+              [15.74, 47.77],
+              [15.38, 47.89],
+              [15.36, 47.89],
+              [14.93, 47.78],
+              [14.68, 47.84],
+              [14.67, 47.82],
+              [14.31, 47.68],
+              [13.73, 47.8],
+              [13.7, 47.68],
+              [13.7, 47.68],
+              [13.67, 47.53],
+              [13.52, 47.55],
+              [13.52, 47.49],
+              [13.49, 47.43],
+              [13.5, 47.4],
+              [13.56, 47.23],
+              [13.6, 47.22],
+              [13.8, 47.23],
+              [13.86, 47.17],
+              [13.78, 47.15],
+              [13.81, 47.1],
+              [13.72, 46.83],
+              [13.84, 46.85],
+              [14.2, 47.0],
+              [14.38, 46.91],
+              [14.4, 46.92],
+              [14.83, 46.98],
+              [14.95, 46.89],
+              [14.88, 46.71],
+              [14.95, 46.72],
+              [15.08, 46.54],
+              [15.11, 46.58]
+            ]
+          ]
+        ]
+      }
+    }
+  },
+  "options": {
+    "auth": {
+      "type": "AID",
+      "aid": "wf7mcf9bv3nv8g5f"
+    },
+    "client": {
+      "id": "VAO",
+      "type": "WEB",
+      "name": "webapp",
+      "l": "vs_stv"
+    },
+    "endpoint": "https://verkehrsauskunft.verbundlinie.at/hamm/gate",
+    "ext": "VAO.13",
+    "products": [
+      {
+        "id": "trains",
+        "bitmasks": [1, 2],
+        "name": "Bahn & S-Bahn"
+      },
+      {
+        "id": "regional-bus",
+        "bitmasks": [64],
+        "name": "Regionalbus"
+      },
+      {
+        "id": "city-bus",
+        "bitmasks": [128],
+        "name": "Stadtbus"
+      },
+      {
+        "id": "tram",
+        "bitmasks": [16],
+        "name": "Straßenbahn"
+      },
+      {
+        "id": "long-distance-bus",
+        "bitmasks": [32],
+        "name": "Fernbus"
+      },
+      {
+        "id": "other",
+        "bitmasks": [2048],
+        "name": "Sonstige"
+      },
+      {
+        "id": "on-call",
+        "bitmasks": [1024],
+        "name": "Anrufbus"
+      },
+      {
+        "id": "subway",
+        "bitmasks": [4],
+        "name": "U-Bahn"
+      },
+      {
+        "id": "aerial-lift",
+        "bitmasks": [256],
+        "name": "Seil-/Zahnradbahn"
+      },
+      {
+        "id": "ferry",
+        "bitmasks": [512],
+        "name": "Schiff"
+      }
+    ],
+    "ver": "1.59"
+  }
+}

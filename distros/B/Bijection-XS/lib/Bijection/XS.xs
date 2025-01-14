@@ -22,9 +22,10 @@ void reverse(char *s) {
 }
 
 
-static char * _biject (int id, char * out) {
+static char * _biject (int id) {
 	dTHX;
 	id = id + OFFSET;
+	char out[100] = "";
 	while (id > 0) {
 		sprintf(out, "%s%s", out, SvPV_nolen(*av_fetch(ALPHA, id % COUNT, 0))); 
 		id = floor(id / COUNT);
@@ -56,10 +57,10 @@ bijection_set(...)
 		if (SvTYPE(first) == SVt_IV &&  SvIV(first) > 0) {
 			OFFSET = SvIV(av_shift(ALPHA));
 		} else {
-			OFFSET = av_count(ALPHA);
+			OFFSET = av_len(ALPHA) + 1;
 		}
 
-		COUNT = av_count(ALPHA);
+		COUNT = av_len(ALPHA) + 1;
 		INDEX = newHV();
 		for (int i = 0; i < COUNT; i++) {
 			char * key = SvPV_nolen(*av_fetch(ALPHA, i, 0));
@@ -84,9 +85,7 @@ biject(id)
 		if (SvIV(id) < 0) {
         		croak("id to encode must be an integer and non-negative");
 		}
-
-		char str[100] = "";
-		_biject(SvIV(id), str);
+		char * str = _biject(SvIV(id));
 		RETVAL = newSVpv(str, strlen(str));
 	OUTPUT:
 		RETVAL

@@ -3,7 +3,7 @@ use strict;
 use Carp;
 
 use vars qw($VERSION);
-$VERSION     = '1.003';
+$VERSION     = '1.004';
 
 
 sub formatter {  # constructor

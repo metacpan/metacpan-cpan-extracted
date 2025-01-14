@@ -5,11 +5,10 @@ use warnings;
 
 use Config;
 use Exporter;
-use vars qw($VERSION @ISA @EXPORT_OK %EXPORT_TAGS);
-$VERSION     = "0.37";
-@ISA         = qw( Exporter );
-@EXPORT_OK   = qw( plv2hash summary myconfig signature );
-%EXPORT_TAGS = (
+our $VERSION     = "0.38";
+our @ISA         = qw( Exporter );
+our @EXPORT_OK   = qw( plv2hash summary myconfig signature );
+our %EXPORT_TAGS = (
     'all' => [ @EXPORT_OK  ],
     'sig' => [ "signature" ],
     );

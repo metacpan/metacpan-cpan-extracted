@@ -35,11 +35,12 @@
             "Carp" : "0",
             "Class::Autouse" : "0",
             "Cwd" : "0",
+            "ExtUtils::MakeMaker" : "6.64",
             "File::Basename" : "0",
             "File::Spec" : "3.4",
             "HTTP::BrowserDetect" : "3.1",
             "JSON::MaybeXS" : "0",
-            "List::MoreUtils" : "0",
+            "List::Util" : "1.33",
             "Log::Any" : "0",
             "Scalar::Util" : "0",
             "Socket" : "0",
@@ -87,6 +88,6 @@
          "x_repository" : "https://github.com/nigelhorne/CGI-Info"
       }
    },
-   "version" : "0.87",
+   "version" : "0.88",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

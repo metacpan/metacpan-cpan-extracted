@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-02-02'; # DATE
+our $DATE = '2025-01-14'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.034'; # VERSION
+our $VERSION = '1.035'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/CSVUtils/csv_concat/csv_concat",
@@ -41,7 +41,7 @@ csv-concat - Concatenate several CSV files together, collecting all the fields
 
 =head1 VERSION
 
-This document describes version 1.034 of csv-concat (from Perl distribution App-CSVUtils), released on 2024-02-02.
+This document describes version 1.035 of csv-concat (from Perl distribution App-CSVUtils), released on 2025-01-14.
 
 =head1 SYNOPSIS
 
@@ -49,7 +49,7 @@ B<csv-concat> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L
 
 B<csv-concat> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<csv-concat> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--inplace|/"--inplace">>] [B<L<--inplace-backup-ext|/"--inplace-backup-ext=s, -b">>=I<str>|B<L<-b|/"--inplace-backup-ext=s, -b">>=I<str>] [B<L<--input-escape-char|/"--input-escape-char=s">>=I<str>] [(B<L<--input-filename|/"--input-filenames-json=s">>=I<L<filename|Sah::Schema::filename>>)+|B<L<--input-filenames-json|/"--input-filenames-json=s">>=I<json>] [B<L<--input-header|/"--no-input-header">>|B<L<--no-input-header|/"--no-input-header">>|B<L<--noinput-header|/"--no-input-header">>] [B<L<--input-quote-char|/"--input-quote-char=s">>=I<str>] [B<L<--input-sep-char|/"--input-sep-char=s">>=I<str>] [B<L<--input-tsv|/"--input-tsv">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--output-always-quote|/"--output-always-quote">>|B<L<--no-output-always-quote|/"--output-always-quote">>|B<L<--nooutput-always-quote|/"--output-always-quote">>] [B<L<--output-escape-char|/"--output-escape-char=s">>=I<str>] [B<L<--output-filename|/"--output-filename=s, -o">>=I<L<filename|Sah::Schema::filename>>|B<L<-o|/"--output-filename=s, -o">>=I<L<filename|Sah::Schema::filename>>] [B<L<--output-header|/"--output-header">>|B<L<--no-output-header|/"--output-header">>|B<L<--nooutput-header|/"--output-header">>] [B<L<--output-quote-char|/"--output-quote-char=s">>=I<str>] [B<L<--output-quote-empty|/"--output-quote-empty">>|B<L<--no-output-quote-empty|/"--output-quote-empty">>|B<L<--nooutput-quote-empty|/"--output-quote-empty">>] [B<L<--output-sep-char|/"--output-sep-char=s">>=I<str>] [B<L<--output-tsv|/"--output-tsv">>|B<L<--no-output-tsv|/"--output-tsv">>|B<L<--nooutput-tsv|/"--output-tsv">>] [B<L<--overwrite|/"--overwrite, -O">>|B<L<-O|/"--overwrite, -O">>|B<L<--no-overwrite|/"--overwrite, -O">>|B<L<--nooverwrite|/"--overwrite, -O">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--with-data-rows|/"--with-data-rows">>|B<L<--without-data-rows|/"--with-data-rows">>] -- [I<L<input_filename|/"--input-filenames-json=s">>] ...
+B<csv-concat> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--inplace|/"--inplace">>] [B<L<--inplace-backup-ext|/"--inplace-backup-ext=s, -b">>=I<str>|B<L<-b|/"--inplace-backup-ext=s, -b">>=I<str>] [B<L<--input-escape-char|/"--input-escape-char=s">>=I<str>] [(B<L<--input-filename|/"--input-filenames-json=s">>=I<L<filename|Sah::Schema::filename>>)+|B<L<--input-filenames-json|/"--input-filenames-json=s">>=I<json>] [B<L<--input-header|/"--no-input-header">>|B<L<--no-input-header|/"--no-input-header">>|B<L<--noinput-header|/"--no-input-header">>] [B<L<--input-quote-char|/"--input-quote-char=s">>=I<str>] [B<L<--input-sep-char|/"--input-sep-char=s">>=I<str>] [B<L<--input-tsv|/"--input-tsv">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--output-always-quote|/"--output-always-quote">>|B<L<--no-output-always-quote|/"--output-always-quote">>|B<L<--nooutput-always-quote|/"--output-always-quote">>] [B<L<--output-escape-char|/"--output-escape-char=s">>=I<str>] [B<L<--output-filename|/"--output-filename=s, -o">>=I<L<filename|Sah::Schema::filename>>|B<L<-o|/"--output-filename=s, -o">>=I<L<filename|Sah::Schema::filename>>] [B<L<--output-header|/"--output-header">>|B<L<--no-output-header|/"--output-header">>|B<L<--nooutput-header|/"--output-header">>] [B<L<--output-quote-char|/"--output-quote-char=s">>=I<str>] [B<L<--output-quote-empty|/"--output-quote-empty">>|B<L<--no-output-quote-empty|/"--output-quote-empty">>|B<L<--nooutput-quote-empty|/"--output-quote-empty">>] [B<L<--output-sep-char|/"--output-sep-char=s">>=I<str>] [B<L<--output-tsv|/"--output-tsv">>|B<L<--no-output-tsv|/"--output-tsv">>|B<L<--nooutput-tsv|/"--output-tsv">>] [B<L<--overlay|/"--overlay">>|B<L<--no-overlay|/"--overlay">>|B<L<--nooverlay|/"--overlay">>] [B<L<--overwrite|/"--overwrite, -O">>|B<L<-O|/"--overwrite, -O">>|B<L<--no-overwrite|/"--overwrite, -O">>|B<L<--nooverwrite|/"--overwrite, -O">>] [B<L<--overwrite-fields|/"--overwrite-fields">>|B<L<--no-overwrite-fields|/"--overwrite-fields">>|B<L<--nooverwrite-fields|/"--overwrite-fields">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- [I<L<input_filename|/"--input-filenames-json=s">>] ...
 
 =head1 DESCRIPTION
 
@@ -83,7 +83,22 @@ will result in:
  ,,,X
  ,,,Y
 
-Keywords: join, merge
+When C<--overlay> option is enabled, the result will be:
+
+ col1,col2,col4,col3
+ 1,2,b,X
+ 3,4,d,Y
+ ,e,f,
+
+When C<--overlay> as well as C<--overwrite-fields> option are enabled, the result
+will be:
+
+ col1,col2,col4,col3
+ 1,a,b,X
+ 3,c,d,Y
+ ,e,f,
+
+Keywords: join, merge, overlay
 
 =head1 OPTIONS
 
@@ -93,9 +108,27 @@ C<*> marks required options.
 
 =over
 
-=item B<--with-data-rows>
+=item B<--overlay>
 
-Whether to also output data rows.
+Whether to overlay rows from second and subsequent CSV files to the first.
+
+By default, rows from the second CSV file will be added after all the rows from
+the first CSV are added, and so on. However, when this option is enabled, the
+rows the second and subsequent CSV files will be added together (overlaid). See
+the utility's example for an illustration.
+
+See also the C<--overwrite-fields> option.
+
+
+=item B<--overwrite-fields>
+
+Whether fields from subsequent CSV files should overwrite existing fields from previous CSV files.
+
+When in overlay mode (C<--overlay>), by default the value for a field is
+retrieved from the first CSV file that has the field. With C<--overwrite-fields>
+option enabled, the value will be retrieved from the last CSV that has the
+field. See the utility's example for an illustration.
+
 
 =back
 
@@ -479,7 +512,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

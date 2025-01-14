@@ -31,8 +31,6 @@ package MY;
 
 sub postamble {
     join "\n" =>
-	'test::	doc',
-	'',
 	'cover test_cover:',
 	'	ccache -C',
 	'	cover -test',

@@ -13,7 +13,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.014'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.019, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,7 +29,7 @@ requires:
   Data::Section: '0.004'
   Dist::Zilla: '6.000'
   Moose: '0'
-  Path::Tiny: '0'
+  Path::Tiny: '0.130'
   Sub::Exporter::ForMethods: '0'
   perl: '5.014'
 resources:
@@ -37,8 +37,11 @@ resources:
   bugtracker: https://github.com/PerlAlien/Dist-Zilla-Plugin-AlienBuild/issues
   homepage: https://metacpan.org/pod/Dist::Zilla::Plugin::AlienBuild
   repository: git://github.com/PerlAlien/Dist-Zilla-Plugin-AlienBuild.git
-version: '0.32'
-x_generated_by_perl: v5.34.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+version: '0.33'
+x_contributors:
+  - 'Graham Ollis <plicease@cpan.org>'
+  - 'Curtis Jewell (CSJEWELL)'
+x_generated_by_perl: v5.40.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_use_unsafe_inc: 0

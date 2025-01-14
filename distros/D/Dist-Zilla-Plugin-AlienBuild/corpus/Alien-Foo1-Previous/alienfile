@@ -1,0 +1,8 @@
+use alienfile;
+
+configure { requires 'Foo::Config' => '0.55' };
+
+requires 'Foo::Build' => '0.01';
+
+share { requires 'Foo::Share' => '0.02' };
+sys { requires 'Foo::System' => '0.03' };

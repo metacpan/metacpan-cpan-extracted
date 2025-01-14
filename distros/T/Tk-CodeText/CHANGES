@@ -1,5 +1,13 @@
 Tk::CodeText module changes log
 
+0.61 05 Jan 2025
+	- Auto complete pops list down on focus out and on no matching words.
+	- Auto complete list adjusts position on <Configure> and scroll events.
+	- Can log different types of messages.
+	- Only one error is logged if Find action fails.
+	- Simplified bindings
+	- Overhauled code folding. Runs much cleaner.
+
 0.60 05 Jan 2025
 	- Fixed method replace.
 	- Added autocomplete facilities.

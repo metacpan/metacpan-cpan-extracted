@@ -3,6 +3,14 @@
 # but updated with information from Transport Canada AIM.
 # These changes may cause the module to fail with European data.
 # Copyright (c) 2025 Peter Carter
+# Version	Date	  Description
+# -------    ----------   --------------------------------------
+#  1.00      2025-01-03   First version
+#  1.01      2025-01-12   Fixed issue when decoding 11th, 12th,
+#                         and 13th (they were displayed as 11st,
+#                         12nd, and 13rd)
+#  1.02      2025-01-13   Fixed two issues: error code display
+#                         and vicinity (VC) phenomena display
 
 package Geo::METARTAF;
 
@@ -10,7 +18,7 @@ use 5.005;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 my %err = (
    '0' => "",
@@ -38,6 +46,8 @@ my %ignore = (
    AUTO => 1,
    COR  => 1,
 );
+
+my $report_type = '';
 		   
 # Module methods
 
@@ -173,7 +183,7 @@ sub minimal
 }
 
 # Return error codes
-sub errorp
+sub error
 {
 	my $self = shift;
 	return $err{$self->error_code} . "\n";
@@ -200,10 +210,10 @@ sub decode
 	my $t = shift @tok;
 	if ($t eq 'TAF') {
 		$self->{taf} = 1;
-      $self->{report_type} = $t;
+      $report_type = $t;
 	} elsif ($t eq 'METAR' || $t eq 'SPECI') {
 		$self->{taf} = 0;
-      $self->{report_type} = $t;
+      $report_type = $t;
 	} else {
 	   $self->{error_code} = 4;
 		return;
@@ -266,7 +276,7 @@ sub decode
    my $ceiling = 100000;
 
 	my @section = (
-	   $self->_section('HEAD', $self->{report_type}, $self->{icao}, $self->{day}, $self->{time}, $self->{amendedOrCorrected})
+	   $self->_section('HEAD', $report_type, $self->{icao}, $self->{day}, $self->{time}, $self->{amendedOrCorrected})
 	);
 	
 	push @section, $self->_section('VALID', $self->{valid_from_day}, $self->{valid_from_hour}, $self->{valid_to_day}, $self->{valid_to_hour}) if $self->{valid_from_day};
@@ -778,7 +788,7 @@ sub as_string
 			next;
 		} elsif ($t eq 'VC') {
          # VC is within 5-10 NM of an aerodrome, but not at the aerodrome, in a TAF
-         if ($self->{report_type} eq 'TAF')  {
+         if ($report_type eq 'TAF')  {
             $wt{'VC'} = 'within 5-10 NM of the aerodrome (but not at the aerodrome)';
          }
          # But in a METAR/SPECI, it is within 5 SM of an aerodrome (but not at the aerodrome)

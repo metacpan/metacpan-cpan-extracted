@@ -13,7 +13,7 @@ use 5.008;
 use Log::Any qw($log);
 # use Cwd;
 # use JSON::Parse;
-use List::MoreUtils;	# Can go when expect goes
+use List::Util ();	# Can go when expect goes
 # use Sub::Private;
 use Sys::Path;
 
@@ -25,26 +25,35 @@ sub _sanitise_input($);
 
 CGI::Info - Information about the CGI environment
 
+=head1 DESCRIPTION
+
+CGI::Info gets information about the system that a CGI script is running on.
+
 =head1 VERSION
 
-Version 0.87
+Version 0.88
 
 =cut
 
-our $VERSION = '0.87';
+our $VERSION = '0.88';
 
 =head1 SYNOPSIS
 
+The CGI::Info module,
+is a Perl library designed to provide information about the environment in which a CGI script operates.
+It aims to eliminate hard-coded script details,
+enhancing code readability and portability.
+Additionally, it offers a simple web application firewall to add a layer of security.
+
 All too often Perl programs have information such as the script's name
 hard-coded into their source.
-Generally speaking, hard-coding is bad style since it can make programs
-difficult to read and it reduces readability and portability.
+Generally speaking,
+hard-coding is bad style since it can make programs difficult to read and it reduces readability and portability.
 CGI::Info attempts to remove that.
 
 Furthermore, to aid script debugging, CGI::Info attempts to do sensible
 things when you're not running the program in a CGI environment.
 
-CGI::Info also provides a simple web application firewall.
 Whilst you shouldn't rely on it alone to provide security to your website,
 it is another layer and every little helps.
 
@@ -85,7 +94,15 @@ sub new
 	my $class = shift;
 
 	# Handle hash or hashref arguments
-	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
+	my %args;
+	if((@_ == 1) && (ref $_[0] eq 'HASH')) {
+		%args = %{$_[0]};
+	} elsif((@_ % 2) == 0) {
+		%args = @_;
+	} else {
+		carp(__PACKAGE__, ': Invalid arguments passed to new()');
+		return;
+	}
 
 	if(defined($args{expect})) {
 		if(ref($args{expect}) ne 'ARRAY') {
@@ -97,10 +114,11 @@ sub new
 
 	if(!defined($class)) {
 		if((scalar keys %args) > 0) {
-			# Using CGI::Info->new(), not CGI::Info::new()
+			# Using CGI::Info:new(), not CGI::Info->new()
 			carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
 			return;
 		}
+
 		# FIXME: this only works when no arguments are given
 		$class = __PACKAGE__;
 	} elsif(Scalar::Util::blessed($class)) {
@@ -120,8 +138,9 @@ sub new
 
 =head2 script_name
 
-Returns the name of the CGI script.
-This is useful for POSTing, thus avoiding putting hardcoded paths into forms
+Retrieves the name of the executing CGI script.
+This is useful for POSTing,
+thus avoiding hard-coded paths into forms.
 
 	use CGI::Info;
 
@@ -145,38 +164,39 @@ sub script_name
 sub _find_paths {
 	my $self = shift;
 
-	require File::Basename && File::Basname->import() unless File::Basename->can('basename');
+	require File::Basename && File::Basename->import() unless File::Basename->can('basename');
 
 	# Determine script name
-	my $script_name = $ENV{'SCRIPT_NAME'} // $0;
+	my $script_name = $self->_get_env('SCRIPT_NAME') // $0;
 	$self->{script_name} = $self->_untaint_filename({
 		filename => File::Basename::basename($script_name)
 	});
 
 	# Determine script path
-	if($ENV{'SCRIPT_FILENAME'}) {
-		$self->{script_path} = $ENV{'SCRIPT_FILENAME'};
-	} elsif($ENV{'SCRIPT_NAME'} && $ENV{'DOCUMENT_ROOT'}) {
-		$script_name = $ENV{'SCRIPT_NAME'};
+	if(my $script_path = $self->_get_env('SCRIPT_FILENAME')) {
+		$self->{script_path} = $script_path;
+	} elsif($script_name = $self->_get_env('SCRIPT_NAME')) {
+		if(my $document_root = $self->_get_env('DOCUMENT_ROOT')) {
+			$script_name = $self->_get_env('SCRIPT_NAME');
 
-		# It's usually the case, e.g. /cgi-bin/foo.pl
-		$script_name =~ s{^/}{};
+			# It's usually the case, e.g. /cgi-bin/foo.pl
+			$script_name =~ s{^/}{};
 
-		$self->{script_path} = File::Spec->catfile($ENV{'DOCUMENT_ROOT'}, $script_name);
-	} elsif($ENV{'SCRIPT_NAME'} && !$ENV{'DOCUMENT_ROOT'}) {
-		if(File::Spec->file_name_is_absolute($ENV{'SCRIPT_NAME'}) && (-r $ENV{'SCRIPT_NAME'})) {
-			# Called from a command line with a full path
-			$self->{script_path} = $ENV{'SCRIPT_NAME'};
+			$self->{script_path} = File::Spec->catfile($document_root, $script_name);
 		} else {
-			require Cwd unless Cwd->can('abs_path');
+			if(File::Spec->file_name_is_absolute($script_name) && (-r $script_name)) {
+				# Called from a command line with a full path
+				$self->{script_path} = $script_name;
+			} else {
+				require Cwd unless Cwd->can('abs_path');
 
-			$script_name = $ENV{'SCRIPT_NAME'};
-			if($script_name =~ /^\/(.+)/) {
-				# It's usually the case, e.g. /cgi-bin/foo.pl
-				$script_name = $1;
+				if($script_name =~ /^\/(.+)/) {
+					# It's usually the case, e.g. /cgi-bin/foo.pl
+					$script_name = $1;
+				}
+
+				$self->{script_path} = File::Spec->catfile(Cwd::abs_path(), $script_name);
 			}
-
-			$self->{script_path} = File::Spec->catfile(Cwd::abs_path(), $script_name);
 		}
 	} elsif(File::Spec->file_name_is_absolute($0)) {
 		# Called from a command line with a full path
@@ -646,8 +666,9 @@ sub params {
 			if($stdin_data) {
 				$buffer = $stdin_data;
 			} else {
-				require JSON::MaybeXS;
-				JSON::MaybeXS->import();
+				require JSON::MaybeXS && JSON::MaybeXS->import() unless JSON::MaybeXS->can('parse_json');
+				# require JSON::MaybeXS;
+				# JSON::MaybeXS->import();
 
 				if(read(STDIN, $buffer, $content_length) != $content_length) {
 					$self->_warn({
@@ -739,7 +760,7 @@ sub params {
 			}
 		}
 
-		if($self->{expect} && (List::MoreUtils::none { $_ eq $key } @{$self->{expect}})) {
+		if($self->{expect} && (List::Util::none { $_ eq $key } @{$self->{expect}})) {
 			next;
 		}
 		$value = _sanitise_input($value);
@@ -858,7 +879,7 @@ sub _get_params
 	my $default = shift;
 
 	# Directly return hash reference if the first parameter is a hash reference
-	return $_[0] if ref $_[0] eq 'HASH';
+	return $_[0] if(ref $_[0] eq 'HASH');
 
 	my %rc;
 	my $num_args = scalar @_;
@@ -869,10 +890,14 @@ sub _get_params
 		return { $default => shift };
 	} elsif($num_args == 1) {
 		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '()');
-	} elsif($num_args == 0 && defined $default) {
-		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '($default => \$val)');
+	} elsif(($num_args == 0) && (defined($default))) {
+		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], "($default => \$val)");
 	} elsif(($num_args % 2) == 0) {
 		%rc = @_;
+	} elsif($num_args == 0) {
+		return;
+	} else {
+		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '()');
 	}
 
 	return \%rc;
@@ -1417,7 +1442,7 @@ sub is_robot {
 			'http://www.seokicks.de/robot.html',
 		);
 		$referrer =~ s/\\/_/g;
-		if(($referrer =~ /\)/) || (List::MoreUtils::any { $_ =~ /^$referrer/ } @crawler_lists)) {
+		if(($referrer =~ /\)/) || (List::Util::any { $_ =~ /^$referrer/ } @crawler_lists)) {
 			$self->_debug("is_robot: blocked trawler $referrer");
 
 			if($self->{cache}) {
@@ -1811,6 +1836,23 @@ sub _warn {
 	}
 }
 
+# Ensure all environment variables are sanitized and validated before use.
+# Use regular expressions to enforce strict input formats.
+
+sub _get_env
+{
+	my ($self, $var) = @_;
+
+	return unless defined $ENV{$var};
+
+	# Strict sanitization: allow alphanumeric and limited special characters
+	if($ENV{$var} =~ /^[\w\.\-\/]+$/) {
+		return $ENV{$var};
+	}
+	$self->_warn("Invalid value in environment variable: $var");
+	return undef;
+}
+
 =head2 reset
 
 Class method to reset the class.
@@ -1903,10 +1945,12 @@ L<http://deps.cpantesters.org/?module=CGI::Info>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010-2024 Nigel Horne.
+Copyright 2010-2025 Nigel Horne.
 
 This program is released under the following licence: GPL2
 
 =cut
 
 1;
+
+__END__

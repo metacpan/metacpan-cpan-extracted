@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-02-02'; # DATE
+our $DATE = '2025-01-14'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.034'; # VERSION
+our $VERSION = '1.035'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/CSVUtils/csv_select_fields/csv_select_fields",
@@ -41,7 +41,7 @@ csv-select-fields - Select (only output) field(s) using a combination of exclude
 
 =head1 VERSION
 
-This document describes version 1.034 of csv-select-fields (from Perl distribution App-CSVUtils), released on 2024-02-02.
+This document describes version 1.035 of csv-select-fields (from Perl distribution App-CSVUtils), released on 2025-01-14.
 
 =head1 SYNOPSIS
 
@@ -125,17 +125,17 @@ Field names to include, takes precedence over --exclude-field-pat (JSON-encoded)
 
 See C<--include-field>.
 
-=item B<-a>
-
-Shortcut for --field-pat=.*, effectively selecting all fields.
-
-See C<--include-field-pat>.
-
 =item B<-A>
 
 Shortcut for --exclude-field-pat=.*, effectively excluding all fields.
 
 See C<--exclude-field-pat>.
+
+=item B<-a>
+
+Shortcut for --field-pat=.*, effectively selecting all fields.
+
+See C<--include-field-pat>.
 
 =back
 
@@ -533,7 +533,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

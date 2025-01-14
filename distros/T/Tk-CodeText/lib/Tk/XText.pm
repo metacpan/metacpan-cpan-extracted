@@ -7,7 +7,7 @@ Tk::XText - Extended Text widget
 =cut
 
 use vars qw($VERSION);
-$VERSION = '0.60';
+$VERSION = '0.61';
 use strict;
 use warnings;
 use Carp;
@@ -203,7 +203,6 @@ sub Populate {
 	#autoComplete
 	$self->{ACLINE} = 1;
 	$self->{DOCPOOL} = {};
-	$self->{POPBLOCK} = 0;
 	$self->{RUNNING} = 0;
 	$self->{TRIGGERWORD} = '';
 
@@ -258,10 +257,12 @@ sub Populate {
 		-modifycall => ['CALLBACK', undef, undef, sub {}],
 		-readonly => ['PASSIVE', undef, undef, 0],
 		-slcomment => ['PASSIVE'],
+		-yscrollcmd => ['CALLBACK', undef, undef, sub {}],
 		DEFAULT => [ 'SELF' ],
 	);
-	$self->eventAdd('<<Find>>', '<F8>');
-	$self->eventAdd('<<Replace>>', '<Shift-F8>');
+	$self->eventAdd('<<Find>>', '<Control-f>');
+	$self->eventAdd('<<Replace>>', '<Control-r>');
+	$self->eventAdd('<<Indent>>', '<Control-j>');
 	$self->eventAdd('<<Indent>>', '<Control-j>');
 	$self->eventAdd('<<UnIndent>>', '<Control-J>');
 	$self->eventAdd('<<Comment>>', '<Control-g>');
@@ -273,6 +274,36 @@ sub Populate {
 	$self->bind('<Control-a>', 'selectAll');
 	$self->markSet('match', '0.0');
 	$self->after(10, ['DoPostConfig', $self]);
+}
+
+sub acGeometry {
+	my $self = shift;
+	my $lb = $self->acListbox;
+	my @choices = $lb->infoChildren('');
+	my @coord = $self->bbox($self->index('insert'));
+	if (@coord) {
+		#calculate position of the popup
+		my $x = $coord[0] + $self->rootx;
+		my $y = $coord[1] + $coord[3] + $self->rooty + 2;
+	
+		#calculate size of the popup
+		my $longest = '';
+		for (@choices) {
+			$longest = $_ if length($_) > length($longest);
+		}
+		my $font = $lb->cget('-font');
+		my $width = $self->fontMeasure($font, $longest) + 10;
+
+		my $size = $self->fontActual($font, '-size');
+		my $lineheight = int($self->fontMetrics($font, '-linespace') * 1.35);
+
+		my $items = @choices;
+		my $height = ($items * $lineheight) + 2;
+
+		$self->acPop->geometry($width . "x$height+$x+$y");
+		return 1
+	}
+	return 0
 }
 
 sub acGetChoices {
@@ -349,17 +380,14 @@ sub acPostChoices {
 	my ($self, $name) = @_;
 
 	#first some show stoppers
-	return if $self->{POPBLOCK};
-
 	my $word = $self->acGetWord;
 	unless (defined $word) {
 		$self->acPopDown;
 		return
 	}
-
 	my @choices = $self->acGetChoices($word);
 	return unless @choices;
-
+	
 	#fill the list
 	my $lb = $self->acListbox;
 	$lb->deleteAll;
@@ -368,30 +396,10 @@ sub acPostChoices {
 	}
 	$lb->selectionSet($choices[0]);
 
-	my @coord = $self->bbox($self->index('insert'));
-	if (@coord) {
-		#calculate position of the popup
-		my $x = $coord[0] + $self->rootx;
-		my $y = $coord[1] + $coord[3] + $self->rooty + 2;
-	
-		#calculate size of the popup
-		my $longest = '';
-		for (@choices) {
-			$longest = $_ if length($_) > length($longest);
-		}
-		my $font = $lb->cget('-font');
-		my $width = $lb->fontMeasure($font, $longest) + 10;
-
-		my $size = $lb->fontActual($font, '-size');
-		my $lineheight = int($lb->fontMetrics($font, '-linespace') * 1.35);
-
-		my $items = @choices;
-		my $height = ($items * $lineheight) + 2;
-		
-		#pop this thing
-		my $pop = $self->acPop ;
-		unless ($pop->ismapped) {
-			$pop->geometry($width . "x$height+$x+$y");
+	#pop this thing
+	my $pop = $self->acPop ;
+	unless ($pop->ismapped) {
+		if ($self->acGeometry) {
 			$pop->deiconify;
 			$pop->raise;
 		}
@@ -487,9 +495,7 @@ sub acSelect {
 	my ($start, $end) = $self->acGetIndexes;
 	
 	#replace with select
-	$self->{POPBLOCK} = 1;
 	$self->replace($start, $end, $select);
-	$self->{POPBLOCK} = 0;
 }
 
 sub acSettings {
@@ -535,7 +541,7 @@ sub acSettings {
 			if ($value =~ /^\d+$/) { #only digits
 				$self->configure($option, $value);
 			} else {
-				$self->log("Illegal value for $option")
+				$self->log("Illegal value for $option", 'error')
 			}
 		}
 	}
@@ -545,16 +551,19 @@ sub acSettings {
 sub activate {
 	my ($self, $key) = @_;
 
-	#pop down choice list if no word is found
+	#pop down choice list if no word or choices to the word is found
 	my $word = $self->acGetWord;
 	$self->acPopDown unless defined $word;
+	if (defined $word) {
+		my @choices = $self->acGetChoices($word);
+		$self->acPopDown unless @choices
+	}
 
 	#all kinds of conditions for not proceeding
 	if ($key eq '') {
 		$self->activateCancel;
 		return
 	}
-	return if $self->{POPBLOCK};
 	return unless $self->cget('-autocomplete');
 
 	unless (defined $word) {
@@ -633,7 +642,6 @@ sub Backspace {
 sub bindRdOnly {
 	my ($class,$mw) = @_;
 
-	# Standard Motif bindings:
 	$mw->bind($class,'<Meta-B1-Motion>','NoOp');
 	$mw->bind($class,'<Meta-1>','NoOp');
 	$mw->bind($class,'<Alt-KeyPress>','NoOp');
@@ -704,7 +712,10 @@ sub bindRdOnly {
 	$mw->bind($class,'<Control-backslash>','unselectAll');
 
 	$mw->bind($class,'<Destroy>','Destroy');
-	$mw->bind($class, '<3>', ['PostPopupMenu', Ev('X'), Ev('Y')]  );
+	$mw->bind($class,'<FocusOut>','acPopDown');
+	$mw->bind($class,'<Configure>','acGeometry');
+	$mw->bind($class, '<3>', ['PostPopupMenu', Ev('X'), Ev('Y')]);
+	$mw->bind($class, '<KeyRelease>', ['KeyReleased', Ev('A')]);
 	$mw->YMouseWheelBind($class);
 	$mw->XMouseWheelBind($class);
 
@@ -774,8 +785,8 @@ sub ClassInit {
 	$mw->bind($class,'<KeyPress>',['InsertKeypress',Ev('A')]);
 	$class->clipboardOperations($mw,'Copy', 'Cut', 'Paste');
 	
- 	$mw->bind($class, '<<Find>>', 'FindPopUp');
-	$mw->bind($class, '<<Replace>>', 'FindAndReplacePopUp');
+	$mw->bind($class, '<<Find>>', ['findandreplacepopup', 1]);
+	$mw->bind($class, '<<Replace>>', ['findandreplacepopup', 0]);
 	$mw->bind($class, '<<Comment>>', 'comment');
 	$mw->bind($class, '<<Comment>>', 'comment');
 	$mw->bind($class, '<<UnComment>>', 'uncomment');
@@ -974,9 +985,11 @@ sub EscapePressed {
 sub FindAll {
 	my ($self, $mode, $case, $pattern) = @_;
 	$self->FindClear;
+	my $search = $self->FindExpression($mode, $case, $pattern);
+	return unless defined $search;
 	my @all = ();
 	for (1 .. $self->linenumber('end - 1c')) {
-		my @hits = $self->FindInLine($_, $mode, $case, $pattern);
+		my @hits = $self->FindInLine($_, $search);
 		for (@hits) {
 			push @all, $_;
 			my ($begin, $end) = @$_;
@@ -1031,6 +1044,8 @@ sub FindandReplaceAll {
 
 sub findandreplacepopup {
 	my $self = shift;
+	my $val = $_[0];
+	print "findandreplacepopup $val\n";
 	my $call = $self->cget('-findandreplacecall');
 	if (defined $call) {
 		&$call(@_);
@@ -1044,8 +1059,8 @@ sub FindClear {
 	$self->tagRemove('Find', '1.0', 'end');
 }
 
-sub FindInLine {
-	my ($self, $linenum, $mode, $case, $search) = @_;
+sub FindExpression {
+	my ($self, $mode, $case, $search) = @_;
 	my $srch;
 	if ($mode eq '-exact') {
 		$search = quotemeta($search)
@@ -1054,7 +1069,7 @@ sub FindInLine {
 		my $error = $@;
 		if ($error ne '') {
 			$error =~ s/\n//;
-			$self->log($error);
+			$self->log($error, 'error');
 			return ()
 		}
 	}
@@ -1063,11 +1078,14 @@ sub FindInLine {
 	} else {
 		$srch = qr/$search/i
 	}
-	my $linestart = "$linenum.0";
-	my $lineend = $self->index("$linestart lineend");
-	my $line = $self->get($linestart, $lineend);
+	return $srch;
+}
+
+sub FindInLine {
+	my ($self, $linenum, $search) = @_;
+	my $line = $self->get("$linenum.0", "$linenum.0 lineend");
 	my @hits = ();
-	while ($line =~ /($srch)/g) {
+	while ($line =~ /($search)/g) {
 		my $end = pos($line);
 		my $begin = $end - length($1);
 		my @cap = ();
@@ -1083,6 +1101,8 @@ sub FindInLine {
 sub FindNext {
 	my ($self, $direction, $mode, $case, $pattern, $first) = @_;
 	$first = 1 unless defined $first;
+	my $search = $self->FindExpression($mode, $case, $pattern);
+	return unless defined $search;
 	$self->FindClear;
 	my $pos = $self->index('insert');
 	my $start = $self->linenumber($pos);
@@ -1090,14 +1110,12 @@ sub FindNext {
 	if ($direction eq '-forward') {
 		for ($self->linenumber($pos) .. $last) {
 			my $linenum = $_;
-			my @hits = $self->FindInLine($linenum, $mode, $case, $pattern);
+			my @hits = $self->FindInLine($linenum, $search);
 			if (@hits) {
 				while ((@hits) and ($self->compare($pos, '>=', $hits[0]->[0]))) { shift @hits	}
 				if (@hits) {
 					my $hit = $hits[0];
-					my ($begin, $end) = @$hit;
-					$self->tagAdd('Find', $begin, $end);
-					$self->tagRaise('Find');
+					$self->FindTag($hit);
 					$self->goTo($hit->[0]);
 					return $hit->[0]
 				}
@@ -1108,14 +1126,12 @@ sub FindNext {
 	} else {
 		for (reverse ('1.0' .. $self->linenumber($pos))) {
 			my $linenum = $_;
-			my @hits = $self->FindInLine($linenum, $mode, $case, $pattern, 0);
+			my @hits = $self->FindInLine($linenum, $search);
 			if (@hits) {
 				while ((@hits) and ($self->compare($pos, '<=', $hits[@hits - 1]->[0]))) { pop @hits }
 				if (@hits) {
 					my $hit = $hits[@hits - 1];
-					my ($begin, $end) = @$hit;
-					$self->tagAdd('Find', $begin, $end);
-					$self->tagRaise('Find');
+					$self->FindTag($hit);
 					$self->goTo($hit->[0]);
 					return $hit->[0]
 				}
@@ -1145,13 +1161,20 @@ sub findoptions {
 	}
 }
 
+sub FindTag {
+	my ($self, $hit) = @_;
+	my ($begin, $end) = @$hit;
+	$self->tagAdd('Find', $begin, $end);
+	$self->tagRaise('Find');
+}
+
 sub FindValidateReg {
 	my ($self, $regexp) = @_;
 	eval "qr/$regexp/";
 	my $error = $@;
 	if ($error) {
 		$error =~ s/\n//;
-		$self->log($error);
+		$self->log($error, 'error');
 		return ''
 	}
 	return 1
@@ -1402,8 +1425,8 @@ sub load {
 =cut
 
 sub log {
-	my ($self, $message) = @_;
-	$self->Callback('-logcall', $message);
+	my $self = shift;
+	$self->Callback('-logcall', @_);
 }
 
 sub matchCheck {
@@ -1998,6 +2021,19 @@ sub visualEnd {
 	my $self = shift;
 	my $height = $self->height;
 	return $self->linenumber('@0,' . $height);
+}
+
+sub xview {
+	my $self = shift;
+	$self->SUPER::xview(@_);
+	$self->acGeometry;
+}
+
+sub yview {
+	my $self = shift;
+	my $r = $self->SUPER::yview(@_);
+	$self->Callback('-yscrollcmd', @_);
+	$self->acGeometry;
 }
 
 =back

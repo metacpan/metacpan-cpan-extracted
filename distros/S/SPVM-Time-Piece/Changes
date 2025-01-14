@@ -1,3 +1,10 @@
+0.004 2025-01-14
+  [Bug Fix]
+    * Fix a bug that the native class of Time::Piece is not compiled.
+  [Changes]
+    * Link stdc++ explictly.
+  [Internal Changes]
+    * Update .gitignore and MANIFEST.SKIP.
 0.003 2023-12-22
   [New Features]
     * Allow the localtime and gmtime method in the Time::Piece minus epoch time by $allow_minus optional argument.
@@ -12,4 +19,3 @@
 0.001 2023-12-20
   [Changes]
     * First release.
-  

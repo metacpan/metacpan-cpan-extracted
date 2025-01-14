@@ -34,6 +34,11 @@ my @cases = (
     [ 'CC[C@](CO)(CCl)C', 0 ],
     [ 'CC[C@](CC)(CC)CC', 1 ],
     [ 'C[S@](O)(O)[O-]',  0 ], # FIXME: Something is off here, should be 1!
+
+    # Anomers
+    [ '[C@]1(F)(Cl)CCCCC1', 0 ],
+    [ '[C@]1(F)(F)CCCCC1',  1 ],
+    [ '[C@H2]1CCCCC1',      1 ],
 );
 
 plan tests => scalar @cases;

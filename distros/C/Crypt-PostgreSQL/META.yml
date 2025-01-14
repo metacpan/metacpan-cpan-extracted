@@ -1,0 +1,28 @@
+---
+abstract: 'generate PostgreSQl password hashes'
+author:
+  - 'Guido Brugnara <brugnara@cpan.org>'
+build_requires:
+  Test::Simple: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Crypt-PostgreSQL
+requires:
+  Carp: '0'
+  Crypt::Digest::SHA256: '0'
+  Crypt::KeyDerivation: '0'
+  Crypt::Mac::HMAC: '0'
+  Crypt::URandom: '0'
+  Digest::MD5: '0'
+  MIME::Base64: '0'
+  perl: v5.6.0
+version: '0.01'
+x_generated_by_perl: v5.34.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

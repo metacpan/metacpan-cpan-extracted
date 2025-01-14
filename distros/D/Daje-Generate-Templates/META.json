@@ -1,5 +1,5 @@
 {
-   "abstract" : "It's new $module",
+   "abstract" : "It's templates used for generation of Perl and SQL",
    "author" : [
       "janeskil1525 <janeskil1525@gmail.com>"
    ],
@@ -54,7 +54,7 @@
    "provides" : {
       "Daje::Generate::Templates" : {
          "file" : "lib/Daje/Generate/Templates.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Daje::Generate::Templates::Perl" : {
          "file" : "lib/Daje/Generate/Templates/Perl.pm",
@@ -76,7 +76,7 @@
          "web" : "https://github.com/janeskil1525/Daje-Generate-Templates"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

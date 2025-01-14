@@ -1,0 +1,911 @@
+#!perl
+use strict;
+use warnings;
+use 5.014;
+
+our $VERSION = '6.16';
+
+use utf8;
+use DateTime;
+use Encode qw(decode);
+use JSON;
+use Getopt::Long    qw(:config no_ignore_case);
+use List::MoreUtils qw(uniq);
+use List::Util      qw(first max);
+use Travel::Status::DE::HAFAS;
+
+my ( $date, $time, $language );
+my $arrivals;
+my $show_jid;
+my $num_results = 30;
+my $types       = q{};
+my $developer_mode;
+my $via;
+my $use_cache = 1;
+my $cache;
+my ( $json_output,   $raw_json_output );
+my ( $list_services, $service );
+my ( @excluded_mots, @exclusive_mots );
+
+my @output;
+
+binmode( STDOUT, ':encoding(utf-8)' );
+for my $arg (@ARGV) {
+	$arg = decode( 'UTF-8', $arg );
+}
+
+my $output_bold  = -t STDOUT ? "\033[1m" : q{};
+my $output_reset = -t STDOUT ? "\033[0m" : q{};
+
+GetOptions(
+	'a|arrivals'      => \$arrivals,
+	'd|date=s'        => \$date,
+	'h|help'          => sub { show_help(0) },
+	'j|with-jid'      => \$show_jid,
+	'l|language=s'    => \$language,
+	'm|mot=s'         => \$types,
+	'n|num-results=s' => \$num_results,
+	's|service=s'     => \$service,
+	't|time=s'        => \$time,
+	'v|via=s'         => \$via,
+	'V|version'       => \&show_version,
+	'cache!'          => \$use_cache,
+	'devmode'         => \$developer_mode,
+	'json'            => \$json_output,
+	'raw-json'        => \$raw_json_output,
+	'list'            => \$list_services,
+
+) or show_help(1);
+
+if ($list_services) {
+	printf(
+		"%-40s %-14s %-15s %s\n\n",
+		'operator', 'abbr. (-s)', 'languages (-l)',
+		'time zone'
+	);
+	for my $service ( Travel::Status::DE::HAFAS::get_services() ) {
+		if ( $service->{shortname} eq 'DB' ) {
+
+			# HTTP 503 Service Unavailable
+			next;
+		}
+		printf(
+			"%-40s %-14s %-15s %s\n",
+			@{$service}{qw(name shortname)},
+			join( q{ }, @{ $service->{languages} // [] } ),
+			$service->{time_zone} // q{},
+		);
+	}
+	exit 0;
+}
+
+$service //= 'VRN';
+
+if ($use_cache) {
+	my $cache_path = ( $ENV{XDG_CACHE_HOME} // "$ENV{HOME}/.cache" )
+	  . '/Travel-Status-DE-HAFAS';
+	eval {
+		require Cache::File;
+		$cache = Cache::File->new(
+			cache_root      => $cache_path,
+			default_expires => '90 seconds',
+			lock_level      => Cache::File::LOCK_LOCAL(),
+		);
+	};
+	if ($@) {
+		$cache = undef;
+	}
+}
+
+parse_mot_options();
+
+my %opt = (
+	cache          => $cache,
+	excluded_mots  => \@excluded_mots,
+	exclusive_mots => \@exclusive_mots,
+	station        => shift || show_help(1),
+	arrivals       => $arrivals,
+	developer_mode => $developer_mode,
+	service        => $service,
+	language       => $language,
+	results        => $num_results,
+);
+
+if ( $opt{station} =~ m{ ^ (?<lat> [0-9.]+ ) : (?<lon> [0-9].+ ) $ }x ) {
+	$opt{geoSearch} = {
+		lat => $+{lat},
+		lon => $+{lon},
+	};
+	delete $opt{station};
+}
+elsif ( $opt{station} =~ m{ ^ [?] (?<query> .*) $ }x ) {
+	$opt{locationSearch} = $+{query};
+	delete $opt{station};
+}
+elsif ( $opt{station} =~ m{[|]} ) {
+	$opt{journey} = { id => $opt{station} };
+	delete $opt{station};
+}
+elsif ( $opt{station} =~ m{ ^ [!] (?<query> .*) $ }x ) {
+	$opt{journeyMatch} = $+{query};
+	delete $opt{station};
+}
+
+if ( $date or $time ) {
+	my $desc = Travel::Status::DE::HAFAS::get_service($service) // {};
+	my $dt
+	  = DateTime->now( time_zone => $desc->{time_zone} // 'Europe/Berlin' );
+	if ($date) {
+		if ( $date
+			=~ m{ ^ (?<day> \d{1,2} ) [.] (?<month> \d{1,2} ) [.] (?<year> \d{4})? $ }x
+		  )
+		{
+			$dt->set(
+				day   => $+{day},
+				month => $+{month}
+			);
+			if ( $+{year} ) {
+				$dt->set( year => $+{year} );
+			}
+		}
+		else {
+			say "--date must be specified as DD.MM.[YYYY]";
+			exit 1;
+		}
+	}
+	if ($time) {
+		if ( $time =~ m{ ^ (?<hour> \d{1,2} ) : (?<minute> \d{1,2} ) $ }x ) {
+			$dt->set(
+				hour   => $+{hour},
+				minute => $+{minute},
+				second => 0,
+			);
+		}
+		else {
+			say "--time must be specified as HH:MM";
+			exit 1;
+		}
+	}
+	$opt{datetime} = $dt;
+}
+
+my $status = Travel::Status::DE::HAFAS->new(%opt);
+
+sub show_help {
+	my ($code) = @_;
+
+	print 'Usage: hafas-m [-d <dd.mm.yyyy>] [-m <motlist>] [-t <time>] '
+	  . "<station>\n"
+	  . "See also: man hafas-m\n";
+
+	exit $code;
+}
+
+sub show_version {
+	say "hafas-m version ${VERSION}";
+
+	exit 0;
+}
+
+sub spacer {
+	my ($len) = @_;
+	return ( $len % 2 ? q { } : q{} ) . ( q{ ·} x ( $len / 2 ) );
+}
+
+sub parse_mot_options {
+	my $default_yes = 1;
+
+	for my $type ( split( qr{,}, $types ) ) {
+		if ( $type eq 'help' or $type eq 'list' or $type eq q{?} ) {
+			$service //= 'ÖBB';
+			my $desc = Travel::Status::DE::HAFAS::get_service($service);
+			if ($desc) {
+				for my $mot ( @{ $desc->{productbits} } ) {
+					if ( ref($mot) eq 'ARRAY' ) {
+						if ( $mot->[0] ne '_' ) {
+							printf( "%-20s (%s)\n", @{$mot} );
+						}
+					}
+					elsif ( $mot ne '_' ) {
+						say $mot;
+					}
+				}
+				exit 0;
+			}
+			else {
+				say STDERR 'no modes of transport known for this service';
+				exit 1;
+			}
+		}
+		elsif ( substr( $type, 0, 1 ) eq q{!} ) {
+			push( @excluded_mots, substr( $type, 1 ) );
+		}
+		else {
+			push( @exclusive_mots, $type );
+		}
+	}
+	return;
+}
+
+sub show_similar_stops {
+	my @candidates = $status->similar_stops;
+	if (@candidates) {
+		say 'You might want to try one of the following stops:';
+		for my $c (@candidates) {
+			printf( "%s (%s)\n", $c->{name}, $c->{id} );
+		}
+		return;
+	}
+	my $hafas = Travel::Status::DE::HAFAS->new(
+		locationSearch => $opt{station},
+		developer_mode => $developer_mode,
+		service        => $service,
+		language       => $language,
+	);
+	if ( $hafas->results ) {
+		say 'You might want to try one of the following stops:';
+		for my $r ( $hafas->results ) {
+			printf( "%s (%s)\n", $r->name, $r->eva );
+		}
+	}
+	return;
+}
+
+sub journey_has_via {
+	my ( $journey, $via ) = @_;
+
+	if ( $via =~ m{ ^ [0-9,]+ $ }x ) {
+		for my $eva ( split( qr{,}, $via ) ) {
+			if ( my $stop = first { $_->loc->eva == $eva } $journey->route ) {
+				return $stop;
+			}
+		}
+		return;
+	}
+
+	if ( my $stop = first { $_->loc->name =~ m{$via}io } $journey->route ) {
+		return $stop;
+	}
+	return;
+}
+
+sub display_result {
+	my (@lines) = @_;
+
+	my @line_length;
+
+	if ( not @lines ) {
+		die("Nothing to show\n");
+	}
+
+	for my $i ( 0 .. 4 ) {
+		$line_length[$i] = max map { length( $_->[$i] ) } @lines;
+	}
+
+	for my $line (@lines) {
+
+		my $d             = $line->[6];
+		my $first_message = 1;
+		for my $msg ( $d->messages ) {
+			if ( $msg->ref_count == 0 ) {
+				if ($first_message) {
+					print "\n";
+					$first_message = 0;
+				}
+				if ( $msg->short ) {
+					printf( "# %s\n", $msg->short );
+				}
+				printf( "# %s\n", $msg->text );
+			}
+		}
+
+		printf(
+			join( q{  }, ( map { "%-${_}s" } @line_length ) ),
+			@{$line}[ 0 .. 4 ]
+		);
+		if ( $line->[5] ) {
+			print q{  } . $line->[5];
+		}
+		print "\n";
+	}
+
+	return;
+}
+
+sub display_occupancy {
+	my ($occupancy) = @_;
+
+	if ( not $occupancy ) {
+		return q{ };
+	}
+	if ( $occupancy == 1 ) {
+		return q{.};
+	}
+	if ( $occupancy == 2 ) {
+		return q{o};
+	}
+	if ( $occupancy == 3 ) {
+		return q{*};
+	}
+	if ( $occupancy == 4 ) {
+		return q{!};
+	}
+	return q{?};
+}
+
+sub format_delay {
+	my ( $delay, $len ) = @_;
+	if ( $delay and $len ) {
+		return sprintf( "(%+${len}d)", $delay );
+	}
+	return q{};
+}
+
+if ( my $err = $status->errstr ) {
+	say STDERR "Request error: ${err}";
+	if (    $status->errcode
+		and ( $status->errcode eq 'H730' or $status->errcode eq 'LOCATION' )
+		and not $raw_json_output )
+	{
+		show_similar_stops();
+	}
+	exit 2;
+}
+
+if ($raw_json_output) {
+	say JSON->new->convert_blessed->encode( $status->{raw_json} );
+	exit 0;
+}
+
+if ($json_output) {
+	if ( $opt{journey} ) {
+		say JSON->new->convert_blessed->encode( $status->result );
+	}
+	else {
+		say JSON->new->convert_blessed->encode( [ $status->results ] );
+	}
+	exit 0;
+}
+
+if ( $opt{journeyMatch} ) {
+	if ( scalar $status->results == 1 ) {
+		my ($journey) = $status->results;
+		$opt{journey} = { id => $journey->id };
+		delete $opt{journeyMatch};
+		$status = Travel::Status::DE::HAFAS->new(%opt);
+		if ( my $err = $status->errstr ) {
+			say STDERR "Request error: ${err}";
+			if (
+				$status->errcode
+				and
+				( $status->errcode eq 'H730' or $status->errcode eq 'LOCATION' )
+				and not $raw_json_output
+			  )
+			{
+				show_similar_stops();
+			}
+			exit 2;
+		}
+	}
+	else {
+		for my $result ( $status->results ) {
+			my $start = ( $result->route )[0];
+			my $end   = ( $result->route )[-1];
+			say $result->id =~ s{ }{}gr;
+			print $result->name;
+			if ( $result->number ) {
+				printf( "  |  Nr  %s", $result->number );
+			}
+			if ( $result->line_no ) {
+				printf( "  |  Linie %s", $result->line_no );
+			}
+			say q{};
+			printf( "%s  ab  %s\n",
+				$start->dep->strftime('%H:%M'),
+				$start->loc->name );
+			printf( "%s  an  %s\n\n",
+				$end->arr->strftime('%H:%M'),
+				$end->loc->name );
+		}
+		exit 0;
+	}
+}
+
+if ( $opt{geoSearch} ) {
+	for my $result ( $status->results ) {
+		printf(
+			"%5.1f km  %8d  %s\n",
+			$result->distance_m * 1e-3,
+			$result->eva, $result->name
+		);
+	}
+}
+elsif ( $opt{locationSearch} ) {
+	for my $result ( $status->results ) {
+		printf( "%8d  %s\n", $result->eva, $result->name );
+	}
+}
+elsif ( $opt{journey} ) {
+	my $result = $status->result;
+	my @prods;
+	my @directions;
+	my $prev_prod = 0;
+
+	printf( "%s → %s", $result->name, $result->route_end );
+	if ( $result->number ) {
+		printf( " / Nr %s", $result->number );
+	}
+	if ( $result->line_no ) {
+		printf( " / Linie %s", $result->line_no );
+	}
+
+	if ( $result->route ) {
+		printf( "\nFahrt %s am %s\n",
+			$result->id,
+			( $result->route )[0]->sched_dep->strftime('%d.%m.%Y') );
+	}
+	else {
+		printf( "\nFahrt %s\n", $result->id );
+	}
+
+	my $delay_len     = 0;
+	my $delay_fmt     = 0;
+	my $occupancy_len = 0;
+	my $stop_len      = 0;
+	for my $stop ( $result->route ) {
+		if ( $stop->delay ) {
+			$delay_len = max( $delay_len, length( $stop->delay ) + 1 );
+		}
+		if ( $stop->load and ( $stop->load->{FIRST} or $stop->load->{SECOND} ) )
+		{
+			$occupancy_len = 2;
+		}
+		if ( length( $stop->loc->name ) > $stop_len ) {
+			$stop_len = length( $stop->loc->name );
+		}
+		my $prod = $stop->prod_dep // $stop->prod_arr;
+		if ( $prod and $prod != $prev_prod ) {
+			push( @prods, $prod );
+			$prev_prod = $prod;
+		}
+		if ( $stop->direction ) {
+			push( @directions, $stop->direction );
+		}
+	}
+	if ($delay_len) {
+		$delay_fmt = $delay_len + 3;
+	}
+
+	if ( $result->operators ) {
+		printf( "Betrieb: %s\n", join( q{, }, $result->operators ) );
+	}
+
+	$prev_prod = 0;
+
+	my $desc = Travel::Status::DE::HAFAS::get_service($service) // {};
+	my $now
+	  = DateTime->now( time_zone => $desc->{time_zone} // 'Europe/Berlin' );
+	my $mark_stop = 0;
+	for my $i ( reverse 1 .. ( scalar $result->route // 0 ) ) {
+		my $stop = ( $result->route )[ $i - 1 ];
+		if ( not $stop->dep_cancelled and $stop->dep and $now <= $stop->dep ) {
+			$mark_stop = $stop;
+		}
+		elsif ( not $stop->arr_cancelled and $stop->arr and $now <= $stop->arr )
+		{
+			$mark_stop = $stop;
+		}
+	}
+
+	my $message_id = 1;
+
+	print "\n";
+
+	if ( not $result->route ) {
+		say 'Route unknown: this backend does not provide intermediate stops';
+	}
+
+	for my $stop ( $result->route ) {
+		my $msg_line = q{};
+		for my $message ( $stop->messages ) {
+			if (    $message->ref_count > 0
+				and $message->code ne
+				'text.journeystop.product.or.direction.changes.stop.message'
+				and $message->text ne 'Halt entfällt' )
+			{
+				if ( not $message->{id} ) {
+					$message->{id} = $message_id++;
+				}
+				$msg_line .= sprintf( ' (%d)', $message->{id} );
+			}
+		}
+
+		my $prod_line = q{};
+		if ( @prods > 1 ) {
+			my $prod = $stop->prod_dep // $stop->prod_arr;
+			if ( $prod and $prod != $prev_prod ) {
+				$prod_line
+				  = sprintf( " %s (%s)", $prod->name, $prod->operator );
+				$prev_prod = $prod;
+			}
+		}
+
+		my $dir_line = q{};
+		if ( @directions > 1 and $stop->direction ) {
+			$dir_line = ' → ' . $stop->direction;
+		}
+
+		my $tz_line = q{};
+		if ( $stop->tz_offset and ( $stop->arr or $stop->dep ) ) {
+			$tz_line = ( $prod_line or $dir_line ) ? q{ · } : q{ };
+			$tz_line .= 'local ';
+			if ( $stop->arr ) {
+				$tz_line
+				  .= $stop->arr->clone->add( minutes => $stop->tz_offset )
+				  ->strftime('%H:%M');
+			}
+			if ( $stop->arr and $stop->dep ) {
+				$tz_line .= ' → ';
+			}
+			if ( $stop->dep ) {
+				$tz_line
+				  .= $stop->dep->clone->add( minutes => $stop->tz_offset )
+				  ->strftime('%H:%M');
+			}
+			$tz_line .= q{  };
+		}
+
+		printf(
+"%s%5s %s %5s %-${delay_fmt}s%${occupancy_len}s%-${occupancy_len}s %s%s%s%s%s%s%s\n",
+			$stop == $mark_stop  ? $output_bold : q{},
+			$stop->arr_cancelled ? '--:--'
+			: ( $stop->arr ? $stop->arr->strftime('%H:%M') : q{} ),
+			( $stop->arr and $stop->dep ) ? '→' : q{ },
+			$stop->dep_cancelled          ? '--:--'
+			: ( $stop->dep ? $stop->dep->strftime('%H:%M') : q{} ),
+			format_delay( $stop->delay, $delay_len ),
+			$stop->load->{FIRST} ? display_occupancy( $stop->load->{FIRST} )
+			: q{},
+			$stop->load->{SECOND} ? display_occupancy( $stop->load->{SECOND} )
+			: q{},
+			$stop->loc->name,
+			$stop == $mark_stop ? $output_reset : q{},
+			( $tz_line or $prod_line or $dir_line or $msg_line )
+			? spacer( $stop_len + 1 - length( $stop->loc->name ) )
+			: q{},
+			$prod_line,
+			$dir_line,
+			$tz_line,
+			$msg_line,
+		);
+	}
+
+	for my $msg ( $result->messages ) {
+		if ( $msg->code eq
+			'text.journeystop.product.or.direction.changes.journey.message' )
+		{
+			next;
+		}
+		say '';
+		if ( $msg->short ) {
+			printf( "%s\n", $msg->short );
+		}
+		printf( "%s\n", $msg->text );
+	}
+
+	for my $msg ( $status->messages ) {
+		if ( $msg->{id} ) {
+			say '';
+			if ( $msg->short ) {
+				printf( "(%d) %s\n", $msg->{id}, $msg->short );
+			}
+			printf( "(%d) %s\n", $msg->{id}, $msg->text );
+		}
+	}
+}
+else {
+	my @results = map { $_->[1] }
+	  sort { $a->[0] <=> $b->[0] }
+	  map { [ $_->datetime->epoch, $_ ] } $status->results;
+
+	if ($via) {
+		@results = grep { journey_has_via( $_, $via ) } @results;
+	}
+
+	my $delay_len     = 0;
+	my $occupancy_len = 0;
+	my $offset_len    = 0;
+	for my $d (@results) {
+		if ( $d->delay ) {
+			$delay_len = max( $delay_len, length( $d->delay ) + 1 );
+		}
+		if ( $d->load and ( $d->load->{FIRST} or $d->load->{SECOND} ) ) {
+			$occupancy_len = 2;
+		}
+		if ( $d->tz_offset ) {
+			$offset_len = 1;
+		}
+	}
+
+	my $message_id = 1;
+	for my $m ( $status->messages ) {
+		if ( $m->ref_count > 0 ) {
+			$m->{id} = $message_id++;
+		}
+	}
+
+	for my $d (@results) {
+
+		my $info_line = q{};
+
+		for my $message ( $d->messages ) {
+			if ( $message->ref_count > 0 ) {
+				$message->{show} = 1;
+				$info_line = sprintf( '(%d) %s', $message->{id}, $info_line );
+			}
+		}
+
+		if ( $d->load ) {
+			$info_line
+			  = display_occupancy( $d->load->{FIRST} )
+			  . display_occupancy( $d->load->{SECOND} ) . '  '
+			  . $info_line;
+		}
+
+		if ($show_jid) {
+			$info_line = $d->id =~ s{ }{}gr . '  ' . $info_line;
+		}
+
+		my $entry = [
+			  ( $d->is_cancelled ? '--:--' : $d->datetime->strftime('%H:%M') )
+			. ( $d->tz_offset    ? q{*}    : ( q{ } x $offset_len ) ),
+			$d->is_cancelled
+			? q{}
+			: format_delay( $d->delay, $delay_len ),
+			$d->name,
+			$d->route_end // q{???},
+			( $d->platform // q{} ) . ( $d->is_changed_platform ? ' !' : q{} ),
+			$info_line,
+			$d
+		];
+
+		if ($via) {
+			my $stop = journey_has_via( $d, $via );
+
+			# HAFAS does not provide real-time data for route entries, so we have to guesstimate the arrival time
+			$entry->[0] .= ' → '
+			  . (
+				$stop->arr_cancelled
+				? '--:--'
+				: $stop->arr->clone->add( minutes => $d->delay // 0 )
+				  ->strftime('%H:%M')
+			  );
+		}
+
+		push( @output, $entry, );
+	}
+
+	display_result(@output);
+
+	if ($offset_len) {
+		printf( "\n* reported for %s; local time differs\n",
+			$status->get_active_service->{time_zone} // 'Europe/Berlin' );
+	}
+
+	for my $m ( $status->messages ) {
+		if ( $m->ref_count > 0 and $m->{show} ) {
+			if ( $m->short and $m->text ) {
+				printf( "\n# (%d) %s\n# %s\n", $m->{id}, $m->short, $m->text );
+			}
+			elsif ( $m->short or $m->text ) {
+				printf( "\n# (%d) %s\n", $m->{id}, $m->text || $m->short );
+			}
+		}
+	}
+}
+
+__END__
+
+=head1 NAME
+
+hafas-m - Interface to the DeutscheBahn/HAFAS online departure monitor
+
+=head1 SYNOPSIS
+
+B<hafas-m> [B<-a>] [B<-d> I<date>] [B<-t> I<time>] [B<-m> I<motlist>]
+[B<-v> I<via>] [B<-s> I<service>] [B<-l> I<language>] I<station>
+
+B<hafas-m> [B<-s> I<service>] B<?>I<query>|I<lat>B<:>I<lon>
+
+B<hafas-m> [B<-s> I<service>] [B<-l> I<language>] B<!>I<query>|I<journeyID>
+
+=head1 VERSION
+
+version 6.16
+
+=head1 DESCRIPTION
+
+hafas-m is an interface to HAFAS public transport services such as the one
+operated by Deutsche Bahn.
+
+It can serve as an arrival/departure monitor, request details about a specific
+trip/journey, and look up public transport stops by name or geolocation.
+The operating mode depends on the contents of its non-option argument.
+
+=head2 Arrival/Departure Monitor (I<station>)
+
+Show departures (or arrivals) at I<station>, optionally filtered by mode of
+transport. I<station> may be given as a station name or HAFAS station ID.
+For each train, B<hafas-m> shows
+
+=over
+
+=item * estimated departure (or arrival) time,
+
+=item * delay, if known,
+
+=item * trip name, number, or line,
+
+=item * direction / destination,
+
+=item * platform, if known (B<!> indicates a platform change), and
+
+=item * expected occupancy of first and second class, if known.
+
+=back
+
+Times are always given in the selected service's default time zone (see
+B<--list>). Times that differ from the queried stop's local time are marked
+with C<< * >>. Occupancy indicators are, from least occupied to fully booked:
+B<.> B<o> B<*> B<!>.
+
+=head2 Location Search (B<?>I<query>|I<lat>B<:>I<lon>)
+
+List stations that match I<query> or that are located in the vicinity of
+I<lat>B<:>I<lon> geocoordinates with EVA ID and name.
+
+=head2 Trip Search (B<!>I<query>)
+
+Show trip details (see below) for the train number provided in I<query>
+(e.g. "ICE 205" or "S 31111") if it resolves into a single journey ID.
+Otherwise, list all journey IDs that match I<query>.
+
+=head2 Trip Details (I<journeyID>)
+
+List intermediate stops of I<journeyID> (as given by arrival/departure monitor
+mode when invoked with B<-j>, B<--with-jid>) with arrival/departure time, delay
+(if available), occupancy (if available), and stop name. Also includes
+line/journey, operator, and heading information.
+
+Times are reported in the selected HAFAS service's default time zone (typically
+Europe/Berlin). If a stop's local time differs, it is also provided.
+
+=head1 OPTIONS
+
+Values in brackets indicate options that only apply to the corresponding
+operating mode(s).
+
+=over
+
+=item B<-a>, B<--arrivals> (monitor)
+
+Show arrivals instead of departures, including trains ending at the specified
+station. Note that this causes the output to display the start instead of
+the end station.
+
+=item B<-d>, B<--date> I<dd>.I<mm>.[I<yyyy>]
+
+Request date.  Default: today.
+
+=item B<-j>, B<--with-jid> (monitor)
+
+Show journey IDs in arrival/departure board. These can be used to obtain
+details on individual journeys with subsequent B<hafas-m> invocations.
+
+=item B<--json>
+
+Print result(s) as JSON and exit. This is a dump of internal data structures
+and not guaranteed to remain stable between minor versions. Please use the
+Travel::Status::DE::HAFAS(3pm) module if you need a proper API.
+
+=item B<-l>, B<--language> I<language>
+
+Request free-text messages to be provided in I<language>.
+See B<--list> for a list of languages supported by individual HAFAS instances.
+Note that requesting an invalid/unsupported language may lead to garbage output.
+
+=item B<--list>
+
+List known HAFAS instances and exit. Use B<-s>|B<--service> to select a
+service from this list for a HAFAS request.
+
+=item B<-m>, B<--mot> I<motlist> (monitor)
+
+By default, B<hafas-m> shows all modes of transport arriving/departing at the
+specified station. With I<motlist>, it is possible to either exclude a list of
+modes, or exclusively show only a select list of modes.
+
+To exclude modes, set I<motlist> to B<!>I<mot1>,B<!>I<mot2>,...
+
+To show them exclusively, set I<motlist> to I<mot1>,I<mot2>,...
+
+The I<mot> types depend on the used service. Use C<< -m help >> to list them.
+
+=item B<-n>, B<--num-results> I<count> (monitor)
+
+Request up to I<count> results. Default: 30.
+
+=item B<--no-cache>
+
+If the Cache::File module is available, server replies are cached in
+F<~/.cache/Travel-Status-DE-HAFAS> (or a path relative to C<$XDG_CACHE_HOME>,
+if set) for 90 seconds. Use this option to disable caching. You can also use
+B<--cache> to re-enable it.
+
+=item B<--raw-json>
+
+Print unprocessed HAFAS response as JSON and exit.
+Useful for debugging and development purposes.
+
+=item B<-s>, B<--service> I<service>
+
+Request arrivals/departures using the API provided by I<service>, defaults to
+E<Ouml>BB (E<Ouml>sterreichische Bundesbahnen). See B<--list> for a list of
+known services.
+
+=item B<-t>, B<--time> I<hh>:I<mm> (monitor)
+
+Request time. Must be specified in the selected HAFAS service's default time
+zone, see B<--list>. Default: now.
+
+=item B<-v>, B<--via> I<stopname>|I<eva1>,I<eva2>,... (monitor)
+
+Only show departures that pass by I<stopname> (or arivals that have passed by
+I<stopname>). If I<stopname> is given as a list of numeric EVA IDs, only
+arrivals/departures with an exact EVA ID match are shown. Otherwise I<stopname>
+is treated as a regular expression and matched against stop names.
+
+=item B<-V>, B<--version>
+
+Show version information and exit.
+
+=back
+
+=head1 EXIT STATUS
+
+0 upon success, 1 upon internal error, 2 upon backend error.
+
+=head1 CONFIGURATION
+
+None.
+
+=head1 DEPENDENCIES
+
+=over
+
+=item * Class::Accessor(3pm)
+
+=item * LWP::UserAgent(3pm)
+
+=back
+
+=head1 BUGS AND LIMITATIONS
+
+=over
+
+=item * DB HAFAS is no more. At this point, there is no suitable HAFAS instance
+that covers local and regional / long-distance transit in Germany.
+
+=item * HAFAS does not provide real-time data for routes of stationboard
+entries.  Hence, B<--via> estimates the arrival time from scheduled
+departure and departure delay
+
+=back
+
+=head1 AUTHOR
+
+Copyright (C) 2015-2025 Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
+
+=head1 LICENSE
+
+This program is licensed under the same terms as Perl itself.

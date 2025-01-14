@@ -2,6 +2,7 @@ ChangeLog
 MANIFEST
 Makefile.PL
 CONTRIBUTING.md
+SECURITY.md
 cpanfile
 README
 lib/Bundle/DBD/CSV.pm

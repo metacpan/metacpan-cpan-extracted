@@ -1,5 +1,5 @@
 package Crypt::Passphrase::Yescrypt;
-$Crypt::Passphrase::Yescrypt::VERSION = '0.001';
+$Crypt::Passphrase::Yescrypt::VERSION = '0.002';
 use strict;
 use warnings;
 
@@ -12,7 +12,7 @@ sub new {
 
 	return bless {
 		flags       => $args{flags}       // 0xb6,
-		block_count => $args{block_count} //   12,
+		block_count => $args{block_count} //   16,
 		block_size  => $args{block_size}  //   32,
 		parallelism => $args{parallelism} //    1,
 		time        => $args{time}        //    0,
@@ -21,15 +21,18 @@ sub new {
 	}, $class;
 }
 
+my @attributes = qw/flags block_count block_size parallelism time upgrades/;
+
 sub hash_password {
 	my ($self, $password) = @_;
 	my $salt = $self->random_bytes($self->{salt_size});
-	return yescrypt($password, $salt, @{$self}{qw/flags block_count block_size parallelism time upgrades/});
+	my $result = yescrypt($password, $salt, @{$self}{@attributes});
+	return $result // Carp::croak("Can't hash password");
 }
 
 sub needs_rehash {
 	my ($self, $hash) = @_;
-	return yescrypt_needs_rehash($hash, @{$self}{qw/flags block_count block_size parallelism time upgrades/});
+	return yescrypt_needs_rehash($hash, @{$self}{@attributes});
 }
 
 sub crypt_subtypes {
@@ -57,7 +60,17 @@ Crypt::Passphrase::Yescrypt - A yescrypt encoder for Crypt::Passphrase
 
 =head1 VERSION
 
-version 0.001
+version 0.002
+
+=head1 SYNOPSIS
+
+ my $passphrase = Crypt::Passphrase->new(
+   encoder => {
+     module => 'Yescrypt',
+     block_count => 12,
+     block_size  => 32,
+   },
+ );
 
 =head1 DESCRIPTION
 
@@ -73,11 +86,11 @@ This creates a new yescrypt encoder, it takes named parameters that are all opti
 
 =item * block_size
 
-The number of 128 byte units in a block. Reasonable values are from C<8> to C<96>. It default to C<32> (C<4kiB>).
+The number of 128 byte units in a block. Reasonable values are from C<8> to C<96>. It defaults to C<32> (C<4kiB>).
 
 =item * block_count
 
-The log₂ of the number of blocks that will be used. It defaults to C<12> for C<4096> blocks and may change in the future.
+The log₂ of the number of blocks that will be used. It defaults to C<16> for C<65536> blocks and may change in the future.
 
 =item * parallelism
 
@@ -85,7 +98,7 @@ The number of threads used for the hash. This defaults to C<1>, and you're unlik
 
 =item * time
 
-This is the time parameter that the algorithm to use up more time. This default to C<0> and should only be used when using more memory isn't an option.
+This is the time parameter that the algorithm to use up more time. This defaults to C<0> and should only be used when using more memory isn't an option.
 
 =item * flags
 
@@ -107,7 +120,7 @@ This hashes the passwords with yescrypt according to the specified settings and 
 
 This returns true if the hash uses a different cipher or subtype, or if any of the parameters are different from that desired by the encoder.
 
-=head2 crypt_types()
+=head2 crypt_subtypes()
 
 This class supports the following crypt types: C<y> and C<7>.
 

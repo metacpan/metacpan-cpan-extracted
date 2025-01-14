@@ -9,7 +9,7 @@ Tk::CodeText - Programmer's Swiss army knife Text widget.
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.60';
+$VERSION = '0.61';
 
 use base qw(Tk::Derived Tk::Frame);
 
@@ -87,7 +87,7 @@ B<Tk::CodeText> aims to be a Scintilla like text widget for Perl/Tk.
 Version 0.40 of B<Tk::CodeText> was re-written from scratch. This version and all later
 versions are not backwards compatible with version 0.3.4 and earlier.
 
-It leans heavily on L<Syntax::Kamelon>.
+It leans heavily on L<Syntax::Kamelon>. 
 
 It features:
 
@@ -407,13 +407,15 @@ sub Populate {
 
 	#create the textwidget
 	my @opt = (
-#		-width => 20,
-#		-height => 10,
-		-escapepressed => sub { $self->FindClose },
+		-escapepressed => ['FindClose', $self],
 		-findandreplacecall => sub { $self->FindAndOrReplace(@_) },
 		-modifycall => ['OnModify', $self],
 		-relief => 'flat',
 		-scrollbars => $scrollbars,
+		-yscrollcmd => sub {
+			$self->lnumberCheck;
+			$self->foldsCheck;
+		},
 	);
 	my $text;
 	if ($scrollbars eq '') {
@@ -422,8 +424,6 @@ sub Populate {
 		$text = $ef->Scrolled('XText', @opt)
 	}
 	$text->pack(-side => 'left', -expand =>1, -fill => 'both');
-	$text->bind('Control-b>', [$self, 'bookmarkNew']);
-	$text->bind('Control-B>', [$self, 'bookmarkRemove']);
 	
 	#create the find and replace panel
 	my @pack = (-side => 'left', -padx => 2, -pady => 2);
@@ -560,47 +560,6 @@ sub Populate {
 
 	$self->tagConfigure('Hidden', -elide => 1);
 
-	my $yscroll = $text->Subwidget('yscrollbar');
-	my $scrollcommand = $yscroll->cget( -command );
-	$yscroll->configure(
-		-command => sub {
-			$scrollcommand->Call(@_);
-			$self->lnumberCheck;
-			$self->foldsCheck;
-		}
-	);
-
-	#configure all the bindings for the text widget
-	$text->bind('<KeyPress>', [$self, 'OnKeyPress', Ev('K') ]);
-	#lazy events
-	my @levents = qw(
-		ButtonPress B2-Motion 
-		B1-Motion MouseWheel
-	);
-	foreach my $levent (@levents) {
-		my $bindsub = $text->bind("<$levent>");
-		if ($bindsub) {
-			$text->bind("<$levent>", sub {
-				$bindsub->Call;
-				$self->contentCheckLight;
-			});
-		} else {
-			$text->bind( "<$levent>", sub { $self->contentCheckLight } );
-		}
-	}
-	#forced events
-	my @events = qw(Expose Visibility Configure Return);
-	foreach my $event (@events) {
-		my $bindsub = $text->bind("<$event>");
-		if ($bindsub) {
-			$text->bind("<$event>", sub {
-				$bindsub->Call;
-				$self->contentCheck;
-			});
-		} else {
-			$text->bind( "<$event>", sub { $self->contentCheck } );
-		}
-	}
  	$self->after(10, sub {
 		$self->{POSTCONFIG} = 1;
 		$self->themeUpdate;
@@ -886,23 +845,13 @@ Comments the current line or selection.
 sub contentCheck {
 	my $self = shift;
 	$self->lnumberCheck;
-	$self->foldsCheck;
+#	$self->foldsCheck;
 	$self->bookmarkCheck;
-}
-
-sub contentCheckLight {
-	my $self = shift;
-	my $start = $self->SaveFirstVisible;
-	my $end = $self->SaveLastVisible;
-	if (($start ne $self->visualBegin) or ($end ne $self->visualEnd)) {
-		$self->contentCheck;
-	} else {
-		$self->bookmarkCheck;
-	}
 }
 
 sub FindAndOrReplace {
 	my ($self, $flag) = @_;
+	print "flag $flag\n";
 	my $geosave = $self->toplevel->geometry;
 	my $sandr = $self->Subwidget('SandR');
 	if ($flag) {
@@ -918,7 +867,6 @@ sub FindAndOrReplace {
 	);
 	$self->Subwidget('FindEntry')->focus;
 	$self->toplevel->geometry($geosave);
-
 }
 
 sub FindClose {
@@ -1039,29 +987,27 @@ sub foldFlip {
 	}
 }
 
-sub FoldInf {
-	my $self = shift;
-	$self->{FOLDINF} = shift if @_;
-	return $self->{FOLDINF}
-}
-
 sub foldsCheck {
 	my $self = shift;
 	return unless $self->cget('-showfolds');
 
+	my $line = $self->visualBegin;
 	my $last = $self->visualEnd;
+
 	return if $self->Colored < $last;
 
 	my $folds = $self->Kamelon->Formatter->Folds;
-	my $inf = $self->FoldInf;
-	my $fbuttons = $self->FoldButtons;
 	my $fframe = $self->Subwidget('Folds');
-	my $line = $self->visualBegin;
+	my $btns = $self->FoldButtons;
 
-	#clear out currently mapped fold keys
-	$self->foldsClear;
+	#clear out out of sight fold buttons
+	for (keys %$btns) {
+		if (($_ < $self->visualBegin) or ($_ > $self->visualEnd)) {
+			my $b = delete $btns->{$_};
+			$b->{'button'}->destroy;
+		}
+	}
 
-	my $count = 0;
 	my @shown = ();
 	while ($line <= $last) {
 		while ($self->isHidden($line)) { $line ++ }
@@ -1073,15 +1019,14 @@ sub foldsCheck {
 			my $delta = int(($he - $bh) / 2);
 			$but->place(-x => 0, -y => $y + $delta);
 			push @shown, $but;
-			$inf->[$count] = $but;
+		} elsif (exists $btns->{$line}) {
+			my $b = delete $btns->{$line};
+			$b->{'button'}->destroy;
+		} else {
 		}
-		$count ++;
 		$line ++;
 	}
 	$self->{FOLDSSHOWN} = \@shown;
-	while (@$inf >= $count) {
-		pop @$inf;
-	}
 }
 
 sub foldsClear {
@@ -1136,12 +1081,6 @@ Sets the insert cursor to $index.
 
 =cut
 
-sub goTo {
-	my ($self, $index) = @_;
-	$self->Subwidget('XText')->goTo($index);
-	$self->contentCheckLight;
-}
-
 sub hideLine {
 	my ($self, $line) = @_;
 	$self->tagAdd('Hidden', "$line.0", "$line.0 lineend + 1c");
@@ -1172,7 +1111,6 @@ sub highlightLine {
 	my $k = $cli->[$num - 1];
 	$kam->StateSet(@$k);
 	my $txt = $xt->get($begin, $end); #get the text to be highlighted
-#	print "'$txt'\n";
 	if ($txt ne '') { #if the line is not empty
 		my $pos = 0;
 		my $start = 0;
@@ -1186,6 +1124,7 @@ sub highlightLine {
 		$xt->tagRaise('sel');
 	};
 	$cli->[$num] = [ $kam->StateGet ];
+#	$self->foldsCheck if $num eq $self->visualEnd;
 }
 
 sub highlightLoop {
@@ -1196,7 +1135,6 @@ sub highlightLoop {
 	}
 	my $xt = $self->Subwidget('XText');
 	my $lpc = $self->cget('-linespercycle');
-#	$lpc = 10 unless defined $lpc;
 	my $colored = $self->Colored;
 	$self->highlightRemove($colored, $colored + $lpc);
 	for (1 .. $lpc) {
@@ -1207,6 +1145,7 @@ sub highlightLoop {
 			$colored ++;
 			$self->Colored($colored);
 		} else {
+			$self->after(100, ['foldsCheck', $self]);
 			$self->LoopActive(0);
 		}
 		last unless $self->LoopActive;
@@ -1226,28 +1165,23 @@ sub highlightPurge {
 	if (@$cli) { splice(@$cli, $line) };
 		
 	#purge folds
-	$self->foldsClear;
 	my $folds = $self->Kamelon->Formatter->Folds;
 	for (keys %$folds) {
 		delete $folds->{$_} if $_ >= $line
 	}
-	#clear out unused fold buttons
-	my $btns = $self->FoldButtons;
-	for (keys %$btns) {
-		unless (exists $folds->{$_}) {
-			my $b = delete $btns->{$_};
-			$b->{'button'}->destroy;
-		}
-	}
+
 	$self->highlightLoop unless $self->LoopActive;
 }
 
 sub highlightRemove {
 	my ($self, $begin, $end) = @_;
-	$end = $self->linenumber('end') unless defined $end;
 	$begin = 1 unless defined $begin;
+	$end = $self->linenumber('end') unless defined $end;
+	$begin = "$begin.0";
+	$end = $self->index("$end.0 lineend");
+	
 	for ($self->tags) {
-		$self->tagRemove($_, "$begin.0", "$end.0 lineend" )
+		$self->tagRemove($_, $begin, $end)
 	}
 }
 
@@ -1337,13 +1271,8 @@ sub lnumberCheck {
 		}
 
 		#configure and position the number label
-
-#		#take care of bookmarked lines
-#		my $labbg = $numframe->cget('-background');
-#		$labbg = $self->cget('-bookmarkcolor') if $self->bookmarked($line);
 		my $lab = $nimf->[$count];
 		$lab->configure(
-#			-background => $labbg,
 			-text => $line,
 			-width => length($last),
 		);
@@ -1376,6 +1305,7 @@ sub load{
 	if ($self->Subwidget('XText')->load($file)) {
 		my $syntax = $self->Kamelon->SuggestSyntax($file);
 		$self->configure(-syntax => $syntax) if defined $syntax;
+		$self->after(500, ['contentCheck', $self]);
 		return 1
 	}
 	return 0
@@ -1391,13 +1321,6 @@ sub NoHighlighting {
 	my $self = shift;
 	$self->{NOHIGHLIGHTING} = shift if @_;
 	return $self->{NOHIGHLIGHTING}
-}
-
-sub OnKeyPress {
-	my ($self, $key) = @_;
-	if (length($key) > 1) {
-		$self->contentCheckLight;
-	}
 }
 
 sub OnModify {

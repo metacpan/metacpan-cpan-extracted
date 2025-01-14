@@ -15,7 +15,7 @@ use Carp;
 
 use parent 'Data::TagDB::WeakBaseObject';
 
-our $VERSION = v0.07;
+our $VERSION = v0.08;
 
 my %wk_ise = (
     # Hints as taken from tagdb-cgi-import;
@@ -102,6 +102,12 @@ my %wk_ise = (
     # Wikidata:
     wd_unicode_character        => '615351ce-3254-5684-a1ab-93f7c852e626', # P487
     wd_sRGB_colour_hex_triplet  => 'bcff702a-5d22-5e56-abaf-bda489b8438e', # P465
+
+
+    # SIRTX:
+    sirtx_logical               => '5e80c7b7-215e-4154-b310-a5387045c336',
+    sirtx_function_number       => 'd73b6550-5309-46ad-acc9-865c9261065b',
+    sirtx_function_name         => 'd690772e-de18-4714-aa4e-73fd35e8efc9',
 );
 
 my %aliases = (
@@ -255,7 +261,7 @@ Data::TagDB::WellKnown - Work with Tag databases
 
 =head1 VERSION
 
-version v0.07
+version v0.08
 
 =head1 SYNOPSIS
 
@@ -277,7 +283,7 @@ Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2024-2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
 
 This is free software, licensed under:
 

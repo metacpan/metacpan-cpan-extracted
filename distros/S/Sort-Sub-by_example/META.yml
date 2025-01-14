@@ -20,7 +20,7 @@ name: Sort-Sub-by_example
 provides:
   Sort::Sub::by_example:
     file: lib/Sort/Sub/by_example.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   Sort::ByExample: '0'
   perl: '5.010001'
@@ -30,7 +30,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Sort-Sub-by_example
   homepage: https://metacpan.org/release/Sort-Sub-by_example
   repository: git://github.com/perlancar/perl-Sort-Sub-by_example.git
-version: '0.003'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.040000'

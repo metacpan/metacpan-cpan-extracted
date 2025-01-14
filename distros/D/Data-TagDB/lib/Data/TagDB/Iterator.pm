@@ -1,5 +1,5 @@
-# Copyright (c) 2024 Löwenfelsen UG (haftungsbeschränkt)
-# Copyright (c) 2024 Philipp Schafft
+# Copyright (c) 2024-2025 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2024-2025 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -13,7 +13,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = v0.07;
+our $VERSION = v0.08;
 
 
 
@@ -23,6 +23,12 @@ sub new {
     croak 'Missing required member: db' unless defined $opts{db};
 
     return bless \%opts, $pkg;
+}
+
+
+sub from_array {
+    my ($pkg, $array, %opts) = @_;
+    return Data::TagDB::Iterator::_Array->new(%opts, array => $array);
 }
 
 
@@ -145,6 +151,19 @@ package Data::TagDB::Iterator::_Mapped {
     }
 };
 
+package Data::TagDB::Iterator::_Array {
+    use parent -norequire, 'Data::TagDB::Iterator';
+
+    sub next {
+        my ($self) = @_;
+        $self->{index} //= 0;
+
+        return $self->{array}[$self->{index}++];
+    }
+
+    sub finish {}
+};
+
 1;
 
 __END__
@@ -159,7 +178,7 @@ Data::TagDB::Iterator - Work with Tag databases
 
 =head1 VERSION
 
-version v0.07
+version v0.08
 
 =head1 SYNOPSIS
 
@@ -171,9 +190,16 @@ Generic iterator for database entries
 
 =head2 new
 
-    my Data::TagDB::Iterator = XXX->new(...);
+    my Data::TagDB::Iterator $iter = XXX->new(...);
 
 Returns a new iterator. Maybe called in sub-packages implementing actual iterators.
+
+=head2 from_array
+
+    my $Data::TagDB::Iterator $iter = Data::TagDB::Iterator->from_array(\@array, ...);
+
+Creates an iterator from a simple array reference.
+The reference becomes part of the object (so no copy is made).
 
 =head2 db
 
@@ -251,7 +277,7 @@ Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2024-2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
 
 This is free software, licensed under:
 

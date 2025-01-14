@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::AlienBase::Wrapper 0.32 {
+package Dist::Zilla::Plugin::AlienBase::Wrapper 0.33 {
 
   use 5.014;
   use Moose;
@@ -114,7 +114,7 @@ Dist::Zilla::Plugin::AlienBase::Wrapper - Use aliens in your Makefile.PL or Buil
 
 =head1 VERSION
 
-version 0.32
+version 0.33
 
 =head1 SYNOPSIS
 
@@ -146,11 +146,15 @@ to specify a minimum version requirement.  (Example C<Alien::Libarchive3@0.28>).
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Curtis Jewell (CSJEWELL)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Graham Ollis.
+This software is copyright (c) 2017-2025 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

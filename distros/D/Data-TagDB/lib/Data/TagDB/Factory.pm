@@ -20,7 +20,7 @@ use parent 'Data::TagDB::WeakBaseObject';
 use constant NS_DATE => 'fc43fbba-b959-4882-b4c8-90a288b7d416';
 use constant RE_UUID => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/;
 
-our $VERSION = v0.07;
+our $VERSION = v0.08;
 
 
 
@@ -509,7 +509,7 @@ Data::TagDB::Factory - Work with Tag databases
 
 =head1 VERSION
 
-version v0.07
+version v0.08
 
 =head1 SYNOPSIS
 
@@ -725,7 +725,7 @@ Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2024-2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
 
 This is free software, licensed under:
 

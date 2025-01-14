@@ -1,0 +1,18 @@
+EC 392 → Koebenhavn H  |  Zug  392  |  Linie EC 392
+        15:03 (+10)  **  Hamburg Hbf → Koebenhavn H (1) (2)
+16:30 → 16:32 ( +4)      Schleswig → København H
+16:57 → 17:01 ( +2)      Padborg st
+17:42 → 17:42            Kolding st
+18:20 → 18:23            Odense st
+19:02 → 19:07            Ringsted st
+19:36                    Koebenhavn H
+
+keine Fahrradbeförderung möglich (Schleswig - Koebenhavn H)
+
+Bitte reservieren (Schleswig - Koebenhavn H)
+
+Ohne gastronomisches Angebot (Hamburg Hbf - Schleswig)
+
+(1) Verspätung aus vorheriger Fahrt
+
+(2) Gleiswechsel
