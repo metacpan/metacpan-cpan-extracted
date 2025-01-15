@@ -1,6 +1,6 @@
 package App::Greple::xlate;
 
-our $VERSION = "0.9904";
+our $VERSION = "0.9905";
 
 =encoding utf-8
 
@@ -16,7 +16,7 @@ App::Greple::xlate - translation support module for greple
 
 =head1 VERSION
 
-Version 0.9904
+Version 0.9905
 
 =head1 DESCRIPTION
 
@@ -391,61 +391,13 @@ Also, since makefiles for various document styles are provided,
 translation into other languages is possible without special
 specification.  Use C<-M> option.
 
-You can also combine the Docker and make options so that you can run
-make in a Docker environment.
+You can also combine the Docker and C<make> options so that you can
+run C<make> in a Docker environment.
 
-Running like C<xlate -GC> will launch a shell with the current working
+Running like C<xlate -C> will launch a shell with the current working
 git repository mounted.
 
 Read Japanese article in L</SEE ALSO> section for detail.
-
-    xlate [ options ] -t lang file [ greple options ]
-        -h   help
-        -v   show version
-        -d   debug
-        -n   dry-run
-        -a   use API
-        -c   just check translation area
-        -r   refresh cache
-        -u   force update cache
-        -s   silent mode
-        -e # translation engine (*deepl, gpt3, gpt4, gpt4o)
-        -p # pattern to determine translation area
-        -x # file containing mask patterns
-        -w # wrap line by # width
-        -o # output format (*xtxt, cm, ifdef, space, space+, colon)
-        -f # from lang (ignored)
-        -t # to lang (required, no default)
-        -m # max length per API call
-        -l # show library files (XLATE.mk, xlate.el)
-        --   end of option
-        N.B. default is marked as *
-
-    Make options
-        -M   run make
-        -n   dry-run
-
-    Docker options
-        -D * run xlate on the container with the same parameters
-        -C * execute following command on the container, or run shell
-        -S * start the live container
-        -A * attach to the live container
-        N.B. -D/-C/-A terminates option handling
-
-        -G   mount git top-level directory
-        -H   mount home directory
-        -V # specify mount directory
-        -U   do not mount
-        -R   mount read-only
-        -L   do not remove and keep live container
-        -K   kill and remove live container
-        -E # specify environment variable to be inherited
-        -I # docker image or version (default: tecolicom/xlate:version)
-
-    Control Files:
-        *.LANG    translation languates
-        *.FORMAT  translation foramt (xtxt, cm, ifdef, colon, space)
-        *.ENGINE  translation engine (deepl, gpt3, gpt4, gpt4o)
 
 =head1 EMACS
 
@@ -688,28 +640,7 @@ sub setup {
     }
 }
 
-sub normalize {
-    local $_ = shift;
-    my $paragraph = shift;
-    if (not $paragraph) {
-	return
-	s{^.+}{
-	    ${^MATCH}
-		=~ s/\A\s+|\s+\z//gr
-	}pmger;
-    }
-    s{^.+(?:\n.+)*}{
-	${^MATCH}
-	# remove leading/trailing spaces
-	    =~ s/\A\s+|\s+\z//gr
-	# remove newline after Japanese Punct char
-	    =~ s/(?<=\p{InFullwidth})(?<=\pP)\n//gr
-	# join Japanese lines without space
-	    =~ s/(?<=\p{InFullwidth})\n(?=\p{InFullwidth})//gr
-	# join ASCII lines with single space
-	    =~ s/\s+/ /gr
-    }pmger;
-}
+use App::Greple::xlate::Text;
 
 sub postgrep {
     my $grep = shift;
@@ -718,8 +649,9 @@ sub postgrep {
 	my($b, @match) = @$r;
 	for my $m (@match) {
 	    my($s, $e, $i) = @$m;
-	    my $paragraph = ($i % 2 == 0);
-	    my $key = normalize $grep->cut(@$m), $paragraph;
+	    my $key = App::Greple::xlate::Text
+		->new($grep->cut(@$m), paragraph => ($i % 2 == 0))
+		->normalized;
 	    if (not exists $cache{$key}) {
 		$cache{$key} = undef;
 		push @miss, $key;
@@ -774,49 +706,13 @@ sub fold_lines {
     $_;
 }
 
-sub strip {
-    my($text, $paragraph) = @_;
-    goto &paragraph_strip if $paragraph;
-    my @text = $text =~ /.*\n|.+\z/g;
-    my @space = map {
-	[ s/\A(\s+)// ? $1 : '', s/(\h+)$// ? $1 : '' ]
-    } @text;
-    $_[0] = join '', @text;
-    sub { # unstrip
-	for (@_) {
-	    my @text = /.*\n|.+\z/g;
-	    if (@space == @text + 1) {
-		push @text, '';
-	    }
-	    die "UNMATCH:\n".Dumper(\@text, \@space) if @text != @space;
-	    for my $i (keys @text) {
-		my($head, $tail) = @{$space[$i]};
-		$text[$i] =~ s/\A/$head/ if length $head > 0;
-		$text[$i] =~ s/\Z/$tail/ if length $tail > 0;
-	    }
-	    $_ = join '', @text;
-	}
-    };
-}
-sub paragraph_strip {
-    local *_ = \$_[0];
-    my $head = s/\A(\s+)// ? $1 : '' ;
-    my $tail = s/(\h+)$//  ? $1 : '' ;
-    sub {
-	for (@_) {
-	    s/\A/$head/ if length $head > 0;
-	    s/\Z/$tail/ if length $tail > 0;
-	}
-    };
-}
 sub xlate {
     my $param = { @_ };
     my($index, $text) = @{$param}{qw(index match)};
-    my $paragraph = $index % 2 == 0;
-    my $unstrip = strip($text, $paragraph);
-    my $key = normalize($text, $paragraph);
-    my $s = $cache{$key} // "!!! TRANSLATION ERROR !!!\n";
-    $unstrip->($text, $s);
+    my $obj = App::Greple::xlate::Text->new($text,
+					    paragraph => ($index % 2 == 0));
+    my $s = $cache{$obj->normalized} // "!!! TRANSLATION ERROR !!!\n";
+    $obj->unstrip($s);
     $s = fold_lines $s if $fold_line;
     if (state $formatter = $formatter{$output_format}) {
 	return $formatter->($text, $s);

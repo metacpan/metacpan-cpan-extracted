@@ -133,7 +133,7 @@ sub Name {
 =item B<ReConfigure>
 
 Does nothing. It is called when the user clicks the Apply button in the settings dialog. Overwrite it to act on 
-modified settings.
+modified settings. It should return 0 or 1 depending on succes.
 
 =cut
 

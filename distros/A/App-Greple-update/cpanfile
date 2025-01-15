@@ -1,4 +1,4 @@
-requires 'perl', '5.014';
+requires 'perl', 'v5.18.2';
 
 requires 'List::Util';
 requires 'Text::ParseWords';

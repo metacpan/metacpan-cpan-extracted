@@ -53,6 +53,6 @@
          "web" : "https://github.com/briandfoy/Log-Log4perl-Appender-ScreenColoredLevels-UsingMyColors"
       }
    },
-   "version" : "0.115",
+   "version" : "0.116",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

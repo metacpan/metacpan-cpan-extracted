@@ -9,7 +9,7 @@ Tk::AppWindow::Ext::Panels - manage the layout of your application
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION="0.16";
+$VERSION="0.20";
 use Tk;
 require Tk::Adjuster;
 require Tk::Pane;
@@ -34,12 +34,12 @@ Each Frame can be in a shown or hidden state.
 
 =over 4
 
-=item B<-panelgeometry>
+=item B<-panelgeometry> I<hookable>
 
 Specifies the geometry manager used for the panel layout. Possible
 values are 'pack' and 'grid'. Default value 'pack'.
 
-=item B<-panellayout>
+=item B<-panellayout> I<hookable>
 
 Specify the structure of your layout. 
 
@@ -106,7 +106,7 @@ Default value:
     },
  ]
 
-=item B<-workspace>
+=item B<-workspace> I<hookable>
 
 Specifies the central workspace of your application.
 Default value is WORK.

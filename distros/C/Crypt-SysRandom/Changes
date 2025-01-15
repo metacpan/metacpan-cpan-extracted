@@ -1,5 +1,11 @@
 Revision history for Crypt-SysRandom
 
+0.004     2025-01-14 21:26:35+01:00 Europe/Brussels
+          - Link to Bcrypt.dll on Windows
+
+0.003     2025-01-14 13:18:37+01:00 Europe/Brussels
+          - Fix typo in Windows feature check
+
 0.002     2025-01-13 00:03:03+01:00 Europe/Brussels
           - fix UNISTD_GETENTROPY feature detection
 

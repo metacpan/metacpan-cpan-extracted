@@ -1,0 +1,498 @@
+=head1 NAME 
+
+Tk::AppWindow::ConfigVariables - Overview of available config variables
+
+=head1 DESCRIPTION
+
+This is a list of available configvariables for L<Tk::AppWindow>. You will find a link to the
+related module after the name the command. Please note that if the variable is
+held by an extension or plugin that extension or plugin must be loaded for it to
+work.
+
+You can get and set variables as follows:
+
+ my $value = $app->configGet('-variable_name')
+ $app->configPut('-variable_name', $value)
+
+Generated: Tue Jan 14 10:16:42 2025
+
+=head1 CONFIG VARIABLES
+
+=over
+
+
+=item B<-aboutinfo> in L<Tk::AppWindow::Ext::Help>
+
+Specify the link to a hash. Possible keys:
+
+=over 4
+
+=item B<author>
+
+Your name
+
+=item B<components>
+
+Specify a list of modules you want the version numbers displayed.
+Opens a new tab.
+
+=item B<email>
+
+Who to contact
+
+=item B<http>
+
+The website that supports this application
+
+=item B<license>
+
+Specify your license. By default it is set to I<Same as Perl>.
+Set it to I<undef> if you do not want it to show.
+
+=item B<licensefile>
+
+Specify a plain text file as your license file. It is displayed in a new
+tab with a L<Tk::ROText> widget.
+
+=item B<licenselink>
+
+Works only if the I<license> key is defined. Specify the weblink to your license. By default it 
+is set to L<https://dev.perl.org/licenses/>.
+Set it to I<undef> if you do not want it to show.
+
+=item B<version>
+
+Specify the version of your application. By default it is set to the
+version numer of the main window widget. Set it to undef if you do not
+want it to show.
+
+=back
+
+=item B<-appname> in L<Tk::AppWindow>
+
+Set the name of your application.
+
+If this option is not specified, the name of your application
+will be set to the filename of your executable with the first
+character in upper case.
+
+=item B<-automenu> in L<Tk::AppWindow::Ext::MenuBar>
+
+Default value 1.
+
+Specifies if the menu items of all extensions should be loaded automatically.
+
+=item B<-autotool> in L<Tk::AppWindow::Ext::ToolBar>
+
+Default value 1.
+
+Specifies if the toolbar items of all extensions should be loaded automatically.
+
+=item B<-commands> in L<Tk::AppWindow>
+
+Defines commands to be used in your application. It takes a paired list of
+command names and callbacks as parameter.
+
+ my $app = $k::AppWindw->new(
+    -commands => [
+       do_something1 => ['method', $obj],
+       do_something2 => sub { return 1 },
+    ],
+ );
+
+Only available at create time.
+
+=item B<-compoundcolspace> in L<Tk::AppWindow::Ext::Art>
+
+Default value 5. Used in the B<createCompound> method to
+set horizontal spacing.
+
+=item B<-configfolder> I<hookable> in L<Tk::AppWindow::Ext::ConfigFolder>
+
+The default value depends on your operating system.
+
+On Windows: $ENV{LOCALAPPDATA}/appname
+Others: $ENV{HOME}/.local/share/appname
+
+You can overwrite it at launch by setting a folder yourself.
+
+=item B<-contentmanagerclass> in L<Tk::AppWindow::Ext::MDI>
+
+This one should always be specified and you should always define a 
+content manager class inheriting L<Tk::AppWindow::BaseClasses::ContentManager>.
+This base class is a valid Tk widget.
+
+=item B<-contentmanageroptions> in L<Tk::AppWindow::Ext::MDI>
+
+The possible options to pass on to the contentmanager.
+These will also become options to the main application.
+
+=item B<-cycleinterval> in L<Tk::AppWindow::Ext::Daemons>
+
+Default value 10 miliseconds. This is the base interval for the Deamons system. 
+
+How often a job is executed is defined by their own interval parameter. The real interval time of a job is the base interval
+multiplied by the job interval.
+
+=item B<-diskmonitorinterval> in L<Tk::AppWindow::Ext::MDI>
+
+Default value 100. This means every 100 cycles of the B<Daemons> extension. Specifies the interval for
+monitoring the disk status of documents. 
+
+=item B<-documentinterface> in L<Tk::AppWindow::Ext::Selector>
+
+Default value 'MDI'. Sets the extension name for the
+multiple docoment interface that B<Selector> communicates with.
+
+=item B<-errorcolor> in L<Tk::AppWindow>
+
+Default value '#FF0000' (red).
+
+=item B<-extensions> in L<Tk::AppWindow>
+
+Specifies the list of extensions to be loaded.
+
+ my $app = Tk::AppWindow->new(
+    -extensions => [ 
+       qw/Art ConfigFolder Daemons 
+       Help Keyboard MDI MenuBar
+       Panels Plugins SDI Selector
+       Settings SideBars StatusBar
+       ToolBar/
+    ],
+ );
+
+The following order matters for the buildup of menus and bars.
+Only available at create time.
+
+=item B<-filetypes> in L<Tk::AppWindow::Ext::MDI>
+
+Default value is "All files|*"
+
+=item B<-helpfile> in L<Tk::AppWindow::Ext::Help>
+
+Point to your help file. Can be a weblink.
+If it is a I<.pod> file it will launch a dialog box with
+a I<PodText> widget.
+
+=item B<-historymenupath> in L<Tk::AppWindow::Ext::MDI>
+
+Specifies the default location in the main menu of the history menu.
+Default value is File::Open recent. See also L<Tk::AppWindow::Ext::MenuBar>.
+
+=item B<-iconpath> in L<Tk::AppWindow::Ext::Art>
+
+Specify a list of folders where your icon libraries are located.
+Only available at create time.
+
+=item B<-iconsize> in L<Tk::AppWindow::Ext::Art>
+
+Default is 16.
+
+=item B<-icontheme> in L<Tk::AppWindow::Ext::Art>
+
+Default is Oxygen.
+
+=item B<-keyboardboardbindings> in L<Tk::AppWindow::Ext::Keyboard>
+
+Default value is an empty list.
+
+Specify a paired list of keyboard bindings.
+
+=item B<-linkcolor> in L<Tk::AppWindow>
+
+Foreground color for links. Default value '#3030DF'.
+
+=item B<-logcall> in L<Tk::AppWindow>
+
+Callback to log messages.
+
+=item B<-logerrorcall> in L<Tk::AppWindow>
+
+Callback to log errors.
+
+=item B<-logo> in L<Tk::AppWindow>
+
+Specifies the image file to be used as logo for your application.
+Default value is Tk::findINC('Tk/AppWindow/aw_logo.png').
+
+=item B<-logwarningcall> in L<Tk::AppWindow>
+
+Callback to log warnings.
+
+=item B<-mainmenuitems> in L<Tk::AppWindow::Ext::MenuBar>
+
+Default value [].
+
+Configure your menu here. See the section B<CONFIGURING MENUS> below.
+
+=item B<-maxhistory> in L<Tk::AppWindow::Ext::MDI>
+
+Default value is 12.
+
+=item B<-maxtablength> in L<Tk::AppWindow::Ext::MDI>
+
+Default value 16
+
+Maximum size of the document tab in the document bar.
+
+=item B<-menucolspace> in L<Tk::AppWindow::Ext::MenuBar>
+
+Default value 3
+
+Space between the colums in a menu item.
+
+=item B<-menuiconsize> in L<Tk::AppWindow::Ext::MenuBar>
+
+Default value 16
+
+=item B<-modifiedmonitorinterval> in L<Tk::AppWindow::Ext::MDI>
+
+Default value 25. This means every 25 cycles of the B<Daemons> extension. Specifies the interval for
+monitoring the modified status of documents. 
+
+=item B<-namespace> in L<Tk::AppWindow>
+
+Specifies an additional name space for extensions and plugins.
+If you set it, for example, to 'Foo::Bar', then your extensions
+may also live in 'Foo::Bar::Ext' and your plugins may live 
+in 'Foo::Bar::Plugins'.
+
+Only available at create time.
+
+=item B<-noplugins> in L<Tk::AppWindow::Ext::Plugins>
+
+Boolean flag, no plugins will be loaded at startup.  The list of plugins in the config file will
+be ignored if this option is set. Default value 0.
+
+=item B<-panelgeometry> I<hookable> in L<Tk::AppWindow::Ext::Panels>
+
+Specifies the geometry manager used for the panel layout. Possible
+values are 'pack' and 'grid'. Default value 'pack'.
+
+=item B<-panellayout> I<hookable> in L<Tk::AppWindow::Ext::Panels>
+
+Specify the structure of your layout. 
+
+The keys used below are all home to the geometry manager used. Plus a
+few more. These are:
+
+=over 4
+
+=item B<-canhide>
+
+Specify if a panel is capable of hiding and showing. By default 0.
+
+=item B<-adjuster>
+
+If specified the panel is adjustable. The value is transferred to the
+B<-side> option of the adjuster.
+
+=back
+
+Default value:
+
+ [
+    CENTER => {
+       -in => 'MAIN',
+       -side => 'top',
+       -fill => 'both',
+       -expand => 1,
+    },
+    WORK => {
+       -in => 'CENTER',
+       -side => 'left',
+       -fill => 'both',
+       -expand => 1,
+    },
+    TOP => {
+       -in => 'MAIN',
+       -side => 'top',
+       -before => 'CENTER',
+       -fill => 'x',
+       -canhide => 1,
+    },
+    BOTTOM => {
+       -in => 'MAIN',
+       -after => 'CENTER',
+       -side => 'top',
+       -fill => 'x',
+       -canhide => 1,
+    },
+    LEFT => {
+       -in => 'CENTER',
+       -before => 'WORK',
+       -side => 'left',
+       -fill => 'y',
+       -canhide => 1,
+       -adjuster => 'left',
+    },
+    RIGHT => {
+       -in => 'CENTER',
+       -after => 'WORK',
+       -side => 'left',
+       -fill => 'y',
+       -canhide => 1,
+       -adjuster => 'right',
+    },
+ ]
+
+=item B<-plugins> in L<Tk::AppWindow::Ext::Plugins>
+
+List of plugins that will be loaded at startup. The list of plugins in the config file will
+be ignored if this option is set.
+
+=item B<-rawiconpath> I<hookable> in L<Tk::AppWindow::Ext::Art>
+
+List of folders where you store your raw icons. Defaults to an empty list.
+
+=item B<-readonly> in L<Tk::AppWindow::Ext::MDI>
+
+Default value 0. If set to 1 MDI will operate in read only mode.
+
+=item B<-savegeometry> in L<Tk::AppWindow>
+
+Default value 0. Saves the geometry on quit and loads it on start. Only works
+if the extension B<ConfigFolder> is loaded.
+
+=item B<-settingsfile> I<hookable> in L<Tk::AppWindow::Ext::Settings>
+
+Name of the settings file. Default is I<settingsrc>.
+
+=item B<-sidebariconsize> I<hookable> in L<Tk::AppWindow::Ext::SideBars>
+
+Default value 32.
+
+=item B<-statusbarpanel> in L<Tk::AppWindow::Ext::StatusBar>
+
+Default value 'BOTTOM'. Sets the name of the panel home to B<StatusBar>.
+
+=item B<-statusbarvisible> in L<Tk::AppWindow::Ext::StatusBar>
+
+Default value 1. Show or hide status bar.
+
+=item B<-statusitemborderwidth> in L<Tk::AppWindow::Ext::StatusBar>
+
+Default value 2.
+
+=item B<-statusitempadding> in L<Tk::AppWindow::Ext::StatusBar>
+
+Default value 2.
+
+=item B<-statusitemrelief> in L<Tk::AppWindow::Ext::StatusBar>
+
+Default value 'groove'.
+
+=item B<-statusmsgitemoninit> in L<Tk::AppWindow::Ext::StatusBar>
+
+Default value 1.
+
+=item B<-statusupdatecycle> in L<Tk::AppWindow::Ext::StatusBar>
+
+Default value 500. Repeat time for updating the items on the status bar.
+
+=item B<-toolbarpanel> in L<Tk::AppWindow::Ext::ToolBar>
+
+Default value 'TOP'. Sets the name of the panel home to B<ToolBar>.
+
+=item B<-toolbarvisible> in L<Tk::AppWindow::Ext::ToolBar>
+
+Default value 1. Show or hide tool bar.
+
+=item B<-tooliconsize> in L<Tk::AppWindow::Ext::ToolBar>
+
+Default value 16
+
+=item B<-toolitems> in L<Tk::AppWindow::Ext::ToolBar>
+
+Default value [].
+
+Configure your tool bar here. Example:
+
+ [    #type             #label    #command       #icon               #help
+    [	'tool_button',   'New',     'doc_new',     'document-new',     'Create a new document' ],
+ 
+    [	'tool_list',     'popcommand' ],
+    [	'tool_button',   'Save',    'doc_save',    'document-save',    'Save current document' ],
+    [	'tool_button',   'Save as', 'doc_save_as', 'document-save-as', 'Rename and save current document' ],
+    [	'tool_separator' ],
+    [	'tool_button',   'Save all','doc_save_all','document-save-as', 'Save all modified documents' ],
+    [	'tool_list_end' ],
+ 
+    [	'tool_separator' ],
+ 
+      #type             #label,   #class
+    [	'tool_widget',    'Widget', 'MyWidget', @options ],
+    [	'tool_widget',    '*Nolabel,'MyWidget', @options ],
+ ]
+
+'MyWidget', must be the class name of a packable Tk widget.
+
+=item B<-tooltextposition> in L<Tk::AppWindow::Ext::ToolBar>
+
+Specifies where text should be displayed in tool buttons.
+Default value I<right>. Can be I<top>, I<left>, I<bottom>, I<right> or I<none>.
+
+=item B<-treeiconsize> in L<Tk::AppWindow::Ext::Selector>
+
+By default undefined. Sets and returns the size of icons
+in the document tree.
+
+=item B<-updatesmenuitem> in L<Tk::AppWindow::Ext::Help>
+
+Default value 0;
+
+If set a menu entrie 'Check for updates' is added to the menu.
+
+=item B<-useroptions> I<hookable> in L<Tk::AppWindow::Ext::Settings>
+
+Name of the settings file. Default is I<settingsrc>. A typical setup might look
+like this:
+
+ -useroptions => [
+    '*page' => 'Editing',
+    '*section' => 'User interface',
+    -contentforeground => ['color', 'Foreground'],
+    -contentbackground => ['color', 'Background'],
+    -contentfont => ['font', 'Font'],
+    '*end',
+    '*section' => 'Editor settings',
+    -contenttabs => ['text', 'Tab size'],
+    -contentwrap => ['radio', 'Wrap', [qw[none char word]]],
+    '*end',
+    '*page' => 'Icons',
+    -icontheme => ['list', 'Icon theme', 'available_icon_themes'],
+    -iconsize => ['list', 'Icon size', 'available_icon_sizes'],
+    '*page' => 'Bars',
+    '*section' => 'Menubar',
+    -menuiconsize => ['list', 'Icon size', 'available_icon_sizes'],
+    '*end',
+    '*section' => 'Toolbar',
+    -toolbarvisible => ['boolean', 'Visible at launch'],
+    -tooliconsize => ['list', 'Icon size', 'available_icon_sizes'],
+    -tooltextposition => ['radio', 'Text position', [qw[none left right top bottom]]],
+    '*end',
+    '*section' => 'Statusbar',
+    -statusbarvisible => ['boolean', 'Visible at launch'],
+    '*end',
+ ],
+
+It uses L<Tk::QuickForm> in the popup. See there for details of this option.
+
+=item B<-workspace> I<hookable> in L<Tk::AppWindow::Ext::Panels>
+
+Specifies the central workspace of your application.
+Default value is WORK.
+
+=back
+
+=head1 LICENSE
+
+Same as Perl.
+
+=head1 AUTHOR
+
+Hans Jeuken (hanje at cpan dot org)
+
+=cut
+

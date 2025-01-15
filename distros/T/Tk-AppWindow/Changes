@@ -1,5 +1,10 @@
 Revision history for Perl extension Tk::AppWindow.
 
+0.20 Tue Jan 14 2025
+	- Fixed bug in extension Plugins, ReConfigure method.
+	- Fixed error in pod of extension Settings and Help.
+	- Added pod's Tk::AppWindow::Commands and Tk::AppWindow::ConfigVariables.
+
 0.19 Sun Jan 05 2025
 	- Lowered required version of File::Spec to 3.75
 	- Fixed bug in extension Settings. *frame was not recognized as Tk::QuickForm directive.

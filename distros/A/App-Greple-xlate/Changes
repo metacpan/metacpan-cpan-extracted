@@ -1,5 +1,12 @@
 Revision history for Perl extension App-Greple-xlate
 
+0.9905 2025-01-14T12:38:56Z
+
+    - fix bug of script/xlate
+    - introduce App::Greple::xlate::Text
+    - add optex setup in Docker image
+    - deprecate xlate -A option
+
 0.9904 2025-01-10T07:26:52Z
 
     - update script/xlate options

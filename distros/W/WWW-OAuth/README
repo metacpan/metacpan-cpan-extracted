@@ -220,6 +220,10 @@ BUGS
 
     Report any issues on the public bugtracker.
 
+    This module was developed primarily to interface with the Twitter API,
+    which is now functionally unusable, so further development of this
+    module is unlikely without another use case.
+
 AUTHOR
 
     Dan Book <dbook@cpan.org>

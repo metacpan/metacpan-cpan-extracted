@@ -28,7 +28,7 @@ provides:
     file: lib/Daje/Workflow/GenerateSQL/Script/Fields.pm
   Daje::Workflow::GenerateSQL::Activity:
     file: lib/Daje/Workflow/GenerateSQL/Activity.pm
-    version: '0.01'
+    version: '0.03'
   Daje::Workflow::GenerateSQL::Base::Common:
     file: lib/Daje/Workflow/GenerateSQL/Base/Common.pm
   Daje::Workflow::GenerateSQL::Manager::Sql:
@@ -41,11 +41,14 @@ provides:
   Daje::Workflow::GenerateSQL::Script::Sql:
     file: lib/Daje/Workflow/GenerateSQL/Script/Sql.pm
 requires:
+  Daje::Workflow::Common::Activity::Base: '0'
+  Mojo::Base: '0'
+  Syntax::Keyword::Match: '0'
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/janeskil1525/Daje-Workflow-GenerateSQL-Activity/issues
   homepage: https://github.com/janeskil1525/Daje-Workflow-GenerateSQL-Activity
   repository: https://github.com/janeskil1525/Daje-Workflow-GenerateSQL-Activity.git
-version: '0.01'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

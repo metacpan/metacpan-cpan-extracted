@@ -32,7 +32,7 @@ use base qw( Tk::AppWindow::BaseClasses::Extension );
 
 =over 4
 
-=item Switch: B<-configfolder>
+=item Switch: B<-configfolder> I<hookable>
 
 The default value depends on your operating system.
 

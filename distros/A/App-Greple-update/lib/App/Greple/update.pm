@@ -1,3 +1,4 @@
+
 =encoding utf8
 
 =head1 NAME
@@ -20,7 +21,7 @@ Options:
 
 =head1 VERSION
 
-Version 1.03
+Version 1.04
 
 =head1 DESCRIPTION
 
@@ -46,6 +47,12 @@ This module has been spun off from L<App::Greple::subst> module.
 Consult it for more practical use case.
 
 =head1 OPTIONS
+
+There are two kinds of options for this module, such as C<--diff> and
+C<--update::diff>.  This is to avoid option name conflicts when used
+in combination with other modules.  If you are using this module from
+another module and want to use the C<--diff> option in it, call as
+C<--update::diff>.
 
 =over 7
 
@@ -75,7 +82,9 @@ C<.bak_2> ... are used.
 
 =item B<--update::discard>
 
-Simply discard the command output without updating file.
+Simply discard the command output without updating file.  This option
+can be used when the output of the command is not needed and only side
+effects are expected.
 
 =begin comment
 
@@ -132,7 +141,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2022-2024 Kazumasa Utashiro.
+Copyright 2022-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -143,7 +152,7 @@ package App::Greple::update;
 use v5.14;
 use warnings;
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 use utf8;
 use open IO => ':utf8';
@@ -264,9 +273,8 @@ sub update_file {
     return if $arg{discard};
     $divert_buffer = decode 'utf8', $divert_buffer;
 
-    if ($_ eq $divert_buffer or $divert_buffer eq '') {
-	return;
-    }
+    return if $divert_buffer eq $_;
+    return if $divert_buffer eq '';
 
     if (my $suffix = $opt_suffix) {
 	$newname = $filename . $suffix;
@@ -314,7 +322,7 @@ expand ++dump --all -h --color=never --no-newline --no-line-number
 option --update::diff    ++dump --of &update_diff
 option --update::create  ++dump --begin update_divert --end update_file() --update-suffix=.new
 option --update::update  ++dump --begin update_divert --end update_file(replace)
-option --update::discard ++dump --begin update_divert --end update_file(discard)
+option --update::discard        --begin update_divert --end update_file(discard)
 
 option --diff    --update::diff
 option --create  --update::create

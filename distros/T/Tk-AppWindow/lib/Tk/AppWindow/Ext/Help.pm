@@ -99,7 +99,7 @@ If set a menu entrie 'Check for updates' is added to the menu.
 
 =back
 
-=head1 B<COMMANDS>
+=head1 COMMANDS
 
 The following commands are defined.
 

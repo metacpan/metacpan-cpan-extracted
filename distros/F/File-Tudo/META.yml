@@ -28,5 +28,5 @@ requires:
 resources:
   bugtracker: https://codeberg.org/1-1sam/tudo/issues
   repository: https://codeberg.org/1-1sam/tudo.git
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

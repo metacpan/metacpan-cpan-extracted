@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Tk;
 use vars qw($VERSION);
-$VERSION="0.19";
+$VERSION="0.20";
 
 use base qw( Tk::AppWindow::BaseClasses::Extension );
 
@@ -37,11 +37,11 @@ Loads settings file at startup.
 
 =over 4
 
-=item B<-settingsfile>
+=item B<-settingsfile> I<hookable>
 
 Name of the settings file. Default is I<settingsrc>.
 
-=item B<-useroptions>
+=item B<-useroptions> I<hookable>
 
 Name of the settings file. Default is I<settingsrc>. A typical setup might look
 like this:
@@ -74,7 +74,7 @@ like this:
     '*end',
  ],
 
-It uses L<Tk::TabbedForm> in the popup. See there for details of this option.
+It uses L<Tk::QuickForm> in the popup. See there for details of this option.
 
 =back
 

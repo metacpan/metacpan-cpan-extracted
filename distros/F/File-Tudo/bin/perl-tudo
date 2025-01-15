@@ -15,6 +15,8 @@ $PRGNAM - $PRGVER
 Usage:
   $PRGNAM [options] <todo>
     Add <tood> to TODO file
+  $PRGNAM [options] --addendum <entry> <addendum>
+    Append <addendum> to the end of entry number <entry>
   $PRGNAM [options] --list
     List TODOs currently in TODO file
   $PRGNAM [options] --show <entry>
@@ -43,10 +45,11 @@ under the terms of the Artistic License 2.0.
 HERE
 
 my %MODE_TABLE = (
-	ADD  => \&add,
-	LS   => \&ls,
-	RM   => \&rm,
-	SHOW => \&show,
+	ADD      => \&add,
+	LS       => \&ls,
+	RM       => \&rm,
+	SHOW     => \&show,
+	ADDENDUM => \&addendum,
 );
 
 sub synopsis {
@@ -204,38 +207,61 @@ sub show {
 
 	my $tudo = File::Tudo->new($param->{File});
 
-	if ($param->{Show} <= 0) {
+	if ($param->{Entry} <= 0) {
 		die "--show argument must be greater than 0\n";
 	}
 
-	if ($param->{Show} > @{$tudo->todo}) {
+	if ($param->{Entry} > @{$tudo->todo}) {
 		die "--show argument is greater than the number of TODOs present\n";
 	}
 
-	say $tudo->todo->[$param->{Show} - 1];
+	say $tudo->todo->[$param->{Entry} - 1];
+
+}
+
+sub addendum {
+
+	my $param = shift;
+
+	my $tudo = File::Tudo->new($param->{File});
+
+	if ($param->{Entry} <= 0) {
+		die "--addendum argument must be greater than 0\n";
+	}
+
+	if ($param->{Entry} > @{$tudo->todo}) {
+		die "--addendum argument is greater than the number of TOODs present\n";
+	}
+
+	$tudo->todo->[$param->{Entry} - 1] .= "\n" . $param->{Add};
+
+	$tudo->write;
+
+	say "Updated TODO $param->{Entry} in $param->{File}";
 
 }
 
 sub main {
 
 	my $param = {
-		Mode => 'ADD',
-		Add  => undef,
-		Rm   => undef,
-		Show => undef,
-		File => default_todo,
+		Mode  => 'ADD',
+		Add   => undef,
+		Rm    => undef,
+		Entry => undef,
+		File  => default_todo,
 	};
 
 	GetOptions(
-		"list"    => sub { $param->{Mode} = 'LS' },
-		"show=i"  => sub { $param->{Mode} = 'SHOW'; $param->{Show} = $_[1] },
-		"rm=s"    => sub { $param->{Mode} = 'RM'; $param->{Rm} = $_[1] },
-		"file=s"  => sub { $param->{File} = $_[1] },
-		"help"    => sub { print $HELP_MSG; exit 0 },
-		"version" => sub { print $VER_MSG;  exit 0 },
+		"addendum=i" => sub { $param->{Mode} = 'ADDENDUM'; $param->{Entry} = $_[1] },
+		"list"       => sub { $param->{Mode} = 'LS' },
+		"show=i"     => sub { $param->{Mode} = 'SHOW'; $param->{Entry} = $_[1] },
+		"rm=s"       => sub { $param->{Mode} = 'RM'; $param->{Rm} = $_[1] },
+		"file=s"     => sub { $param->{File} = $_[1] },
+		"help"       => sub { print $HELP_MSG; exit 0 },
+		"version"    => sub { print $VER_MSG;  exit 0 },
 	) or die "Error in command line arguments\n";
 
-	if ($param->{Mode} eq 'ADD') {
+	if ($param->{Mode} eq 'ADD' or $param->{Mode} eq 'ADDENDUM') {
 		unless (@ARGV) {
 			die $HELP_MSG;
 		}
@@ -257,6 +283,7 @@ perl-tudo - Tudo TODO file command-line interface (in Perl!)
 =head1 SYNOPSIS
 
   perl-tudo [options] <todo>
+  perl-tudo [options] --addendum <entry> <addendum>
   perl-tudo [options] --list
   perl-tudo [options] --show <entry>
   perl-tudo [options] --rm <target>
@@ -272,6 +299,11 @@ end of the TODO file it is configured to work on.
 =head1 OPTIONS
 
 =over 4
+
+=item B<--addendum> I<entry>
+
+Instead of appending the given string to the current TODO file, append the
+given string to the end of entry number I<entry>.
 
 =item B<--list>
 

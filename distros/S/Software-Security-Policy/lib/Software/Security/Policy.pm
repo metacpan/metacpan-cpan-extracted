@@ -3,7 +3,7 @@ use warnings;
 package Software::Security::Policy;
 # ABSTRACT: packages that provide templated Security Policys
 
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 
 sub name {
@@ -40,7 +40,7 @@ Software::Security::Policy - packages that provide templated Security Policys
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 

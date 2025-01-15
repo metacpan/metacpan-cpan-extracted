@@ -6,13 +6,14 @@ use v5.34.0; # The Perl version on Slackware 15.0 (sbozyp's min supported versio
 
 package Sbozyp;
 
-our $VERSION = '0.1.5';
+our $VERSION = '0.2.1';
 
 use File::Basename qw(basename dirname);
 use File::Temp;
 use File::Path qw(make_path remove_tree);
 use Getopt::Long qw(GetOptionsFromArray :config no_ignore_case no_bundling);
 use Carp qw(carp confess);
+use POSIX qw(mkfifo WNOHANG);
 use Pod::Usage qw(pod2usage);
 
 $SIG{INT} = sub { die "\nsbozyp: got a SIGINT ... going down!\n" };
@@ -88,18 +89,21 @@ sub install_command_main {
     i_am_root_or_die('the install command requires root');
     my @pkgs = map { $_ = pkg($_) } @_;
     my @queue; for my $pkg (@pkgs) {
-        @queue = merge_pkg_queues(@queue, $opt_nodeps ? ($pkg) : pkg_queue($pkg))
+        my @pkg_queue = $opt_nodeps ? ($pkg) : pkg_queue($pkg);
+        unless ($opt_force) {
+            @pkg_queue = grep { !pkg_installed_and_up_to_date($_) } @pkg_queue;
+        }
+        @queue = merge_pkg_queues(@queue, @pkg_queue);
     }
-    @queue = manage_install_queue_ui(@queue) unless $opt_noninteractive;
-    for my $pkg (@queue) {
-        my $installed_version = pkg_installed($pkg);
-        if ($opt_force or !defined($installed_version) or version_gt($pkg->{VERSION}, $installed_version)) {
+    if (@queue) {
+        @queue = manage_install_queue_ui(@queue) unless $opt_noninteractive;
+        for my $pkg (@queue) {
             my $slackware_pkg = build_slackware_pkg($pkg);
             install_slackware_pkg($slackware_pkg);
             if ($CONFIG{CLEANUP}) { sbozyp_unlink($slackware_pkg) }
-        } else {
-            print "sbozyp: skipping install of '$pkg->{PKGNAME}' as it is installed and up to date\n";
         }
+    } else {
+        print "sbozyp: all packages (and their deps) requested for installation are up to date, invoke with -f option to force installation\n"
     }
 }
 
@@ -305,6 +309,16 @@ sub pkg_installed {
     return $version;
 }
 
+sub pkg_installed_and_up_to_date {
+    my ($pkg) = @_;
+    my $installed_version = pkg_installed($pkg);
+    if (!defined $installed_version or version_gt($pkg->{VERSION}, $installed_version)) {
+        return 0;
+    } else {
+        return 1;
+    }
+}
+
 sub all_categories {
     my @categories = sort map {
         basename($_);
@@ -378,6 +392,7 @@ sub sbozyp_system {
     unless (0 == $exit_status) {
         sbozyp_die("the following system command exited with status $exit_status: @cmd");
     }
+    return $exit_status;
 }
 
 sub clear_terminal {
@@ -398,7 +413,7 @@ sub sbozyp_qx {
 
 sub sbozyp_tee {
     my ($cmd) = @_;
-    my $tmp = File::Temp->new(DIR => $CONFIG{TMPDIR}, TEMPLATE => 'sbozyp_tee_XXXXXX');
+    my $tmp = File::Temp->new(DIR=>$CONFIG{TMPDIR}, TEMPLATE=>'sbozyp_tee_XXXXXX');
     $cmd = "set -o pipefail && ( $cmd ) | tee '$tmp'";
     sbozyp_system('bash', '-c', $cmd);
     seek $tmp, 0, 0;
@@ -421,6 +436,18 @@ sub sbozyp_open {
 sub sbozyp_unlink {
     my ($file) = @_;
     unlink $file or sbozyp_die("could not unlink file '$file': $!");
+}
+
+sub sbozyp_mkfifo {
+    my ($path) = @_;
+    defined mkfifo($path, 0700) or sbozyp_die("could not mkfifo at '$path': $!");
+    return $path;
+}
+
+sub sbozyp_fork {
+    my $pid = fork();
+    defined $pid or sbozyp_die("fork failed: $!");
+    return $pid;
 }
 
 sub sbozyp_copy {
@@ -766,9 +793,37 @@ sub build_slackware_pkg {
     local $ENV{OUTPUT} = $CONFIG{TMPDIR}; # all SlackBuilds use the $OUTPUT env var to determine output pkg location
     my $staging_dir = prepare_pkg($pkg);
     my $slackbuild = $pkg->{PRGNAM} . '.SlackBuild';
-    my $slackbuild_stdout = sbozyp_tee("cd '$staging_dir' && chmod +x ./$slackbuild && ./$slackbuild");
-    my ($slackware_pkg) = $slackbuild_stdout =~ /Slackware package (.+) created/;
-    return $slackware_pkg;
+    my $cmd = "cd '$staging_dir' && chmod +x ./$slackbuild && ./$slackbuild";
+    # This next bit of code is a bit confusing, but the idea is that we want to
+    # print the slackbuild output to stdout, while also reading the stdout to
+    # look for the created slackware package name, which is we return. This
+    # solution does not waste disk space. See issue #6 for more details.
+    my $tmpdir = File::Temp->newdir(DESTROY=>1,DIR=>$CONFIG{TMPDIR},TEMPLATE=>'sbozyp_tmpfifo_XXXXXX');
+    my $fifo_path = sbozyp_mkfifo("$tmpdir/fifo");
+    my $pid = sbozyp_fork();
+    if ($pid == 0) { # child
+        my $fifo_w_fh = sbozyp_open('>', $fifo_path);
+        sbozyp_system('bash', '-c', "set -o pipefail; ( $cmd ) | tee '$fifo_path'");
+        print $fifo_w_fh "sbozyp: SLACKBUILD SUCCEEDED: $fifo_path\n";
+        exit 0;
+    } else { # parent
+        my $slackware_pkg;
+        my $slackware_pkg_regex = qr/^Slackware package (.+) created\.$/;
+        my $build_success_regex = qr/^sbozyp: SLACKBUILD SUCCEEDED: \Q$fifo_path\E$/;
+        my $build_succeeded = 0;
+        my $fifo_r_fh = sbozyp_open('<', $fifo_path);
+        while (waitpid($pid, WNOHANG) == 0 or defined(my $stdout_line = <$fifo_r_fh>)) {
+            if (defined $stdout_line) {
+                $slackware_pkg = $1 if $stdout_line =~ $slackware_pkg_regex;
+                $build_succeeded = 1 if $stdout_line =~ $build_success_regex;
+            }
+        }
+        if (!$build_succeeded) { sbozyp_die("failed to build '$pkg->{PKGNAME}'") }
+        if (!defined $slackware_pkg) {
+            sbozyp_die("successfully built '$pkg->{PKGNAME}' but couldn't determine the path of the created Slackware package");
+        }
+        return $slackware_pkg
+    }
 }
 
 sub install_slackware_pkg {
@@ -1055,7 +1110,7 @@ Nicholas Hubbard (nicholashubbard@posteo.net)
 
 =head1 COPYRIGHT
 
-Copyright (c) 2023-2024 by Nicholas Hubbard (nicholashubbard@posteo.net)
+Copyright (c) 2023-2025 by Nicholas Hubbard (nicholashubbard@posteo.net)
 
 =head1 LICENSE
 

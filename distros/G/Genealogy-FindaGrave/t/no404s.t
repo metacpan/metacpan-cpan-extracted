@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 use Test::DescribeMe qw(author);
-use Test::Most;
 use Test::Needs 'Test::Pod::No404s';
 
 Test::Pod::No404s->import();

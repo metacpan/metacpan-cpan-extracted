@@ -1,9 +1,31 @@
 ==================================================
-Changes from 1738-09-21 00:00:00 +0000 to present.
+Changes from 1751-04-03 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.004 at 2012-07-05 11:51:56 +0000
+version 0.100 at 2025-01-15 00:29:43 +0000
+------------------------------------------
+
+  Change: 27967414e3d2c447e29d86267463687be9eaa734
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2025-01-15 01:28:13 +0000
+
+    Removing Path::Class, using Path::Tiny, 13 years later update 
+
+  Change: a900f2d02d7214f9e2df0853338f1a09d669d078
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2019-08-25 20:30:50 +0000
+
+    Added new .travis.yml 
+
+  Change: 7ba573d0776d9cb0dba2fb7f546d746b9e2fd525
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-04-21 01:39:25 +0000
+
+    Added .travis.yml 
+
+------------------------------------------
+version 0.004 at 2012-07-05 11:51:45 +0000
 ------------------------------------------
 
   Change: b967115f405c5a5da771af6dc080f18eeb6f749b
@@ -11,6 +33,10 @@ version 0.004 at 2012-07-05 11:51:56 +0000
   Date : 2012-07-05 07:51:45 +0000
 
     Switched to dzil pluginbundle Author::GETTY 
+
+------------------------------------------
+version 0.003 at 2012-07-04 21:19:17 +0000
+------------------------------------------
 
   Change: ba0fa74514b6ad0cc89adc263686d0e9b046bc77
   Author: Torsten Raudssus <torsten@raudss.us>

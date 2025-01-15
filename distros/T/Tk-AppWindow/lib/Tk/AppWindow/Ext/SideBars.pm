@@ -9,7 +9,7 @@ Tk::AppWindow::Ext::SideBars - Basic functionality for side bars.
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = "0.16";
+$VERSION = "0.20";
 use Tk;
 require Tk::YANoteBook;
 
@@ -33,7 +33,7 @@ It inherits L<Tk::AppWindow::BaseClasses::Extension>
 
 =over 4
 
-=item Switch: B<-sidebariconsize>
+=item Switch: B<-sidebariconsize> I<hookable>
 
 Default value 32.
 

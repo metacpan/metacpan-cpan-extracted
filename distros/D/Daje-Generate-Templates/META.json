@@ -42,6 +42,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Mojo::Base" : "0",
             "perl" : "5.008001"
          }
       },
@@ -54,7 +55,7 @@
    "provides" : {
       "Daje::Generate::Templates" : {
          "file" : "lib/Daje/Generate/Templates.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "Daje::Generate::Templates::Perl" : {
          "file" : "lib/Daje/Generate/Templates/Perl.pm",
@@ -76,7 +77,7 @@
          "web" : "https://github.com/janeskil1525/Daje-Generate-Templates"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

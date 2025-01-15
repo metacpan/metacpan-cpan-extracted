@@ -54,9 +54,9 @@ my %WriteMakefileArgs = (
     "Test::MockModule" => 0,
     "Test::MockObject" => 0,
     "Test::More" => 0,
-    "Test::WWW::Mechanize::Catalyst::WithContext" => 0
+    "Test::WWW::Mechanize::Catalyst::WithContext" => "0.03"
   },
-  "VERSION" => "0.02",
+  "VERSION" => "0.03",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -96,7 +96,7 @@ my %FallbackPrereqs = (
   "Test::MockModule" => 0,
   "Test::MockObject" => 0,
   "Test::More" => 0,
-  "Test::WWW::Mechanize::Catalyst::WithContext" => 0,
+  "Test::WWW::Mechanize::Catalyst::WithContext" => "0.03",
   "Throwable::Error" => 0,
   "Try::Tiny" => 0,
   "namespace::autoclean" => 0

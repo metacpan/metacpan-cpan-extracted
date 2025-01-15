@@ -26,18 +26,19 @@ no_index:
 provides:
   Daje::Generate::Templates:
     file: lib/Daje/Generate/Templates.pm
-    version: '0.02'
+    version: '0.03'
   Daje::Generate::Templates::Perl:
     file: lib/Daje/Generate/Templates/Perl.pm
     version: '0.01'
   Daje::Generate::Templates::Sql:
     file: lib/Daje/Generate/Templates/Sql.pm
 requires:
+  Mojo::Base: '0'
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/janeskil1525/Daje-Generate-Templates/issues
   homepage: https://github.com/janeskil1525/Daje-Generate-Templates
   repository: https://github.com/janeskil1525/Daje-Generate-Templates.git
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

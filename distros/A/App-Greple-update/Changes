@@ -1,5 +1,10 @@
 Revision history for Perl extension App-Greple-update
 
+1.04 2025-01-15T05:17:26Z
+
+    - do not apply ++dump option for --update::discard
+    - require perl@v5.18.2
+
 1.03 2024-02-15T01:27:53Z
 
     - do not use "--all 0" to avoid empty file update

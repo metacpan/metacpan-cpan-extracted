@@ -17,19 +17,18 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.026000",
   "NAME" => "Blockchain::Ethereum::Transaction",
   "PREREQ_PM" => {
-    "Blockchain::Ethereum::RLP" => "0.010",
-    "Crypt::Digest::Keccak256" => "0.078",
-    "Object::Pad" => "0.814"
+    "Blockchain::Ethereum::RLP" => "0.011",
+    "Crypt::Digest::Keccak256" => "0.078"
   },
   "TEST_REQUIRES" => {
-    "Blockchain::Ethereum::Keystore" => "0.010",
+    "Blockchain::Ethereum::Keystore" => "0.011",
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::CheckDeps" => "0.010",
     "Test::More" => "0.94"
   },
-  "VERSION" => "0.010",
+  "VERSION" => "0.011",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,13 +36,12 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Blockchain::Ethereum::Keystore" => "0.010",
-  "Blockchain::Ethereum::RLP" => "0.010",
+  "Blockchain::Ethereum::Keystore" => "0.011",
+  "Blockchain::Ethereum::RLP" => "0.011",
   "Crypt::Digest::Keccak256" => "0.078",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Object::Pad" => "0.814",
   "Test::CheckDeps" => "0.010",
   "Test::More" => "0.94"
 );

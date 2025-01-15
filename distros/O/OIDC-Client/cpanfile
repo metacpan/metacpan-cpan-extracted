@@ -33,7 +33,7 @@ test_requires 'Test::Exception';
 test_requires 'Test::MockModule';
 test_requires 'Test::MockObject';
 test_requires 'Test::More';
-test_requires 'Test::WWW::Mechanize::Catalyst::WithContext';
+test_requires 'Test::WWW::Mechanize::Catalyst::WithContext', '0.03';
 
 author_requires 'Test::CPAN::Meta';
 author_requires 'Test::Perl::Critic';

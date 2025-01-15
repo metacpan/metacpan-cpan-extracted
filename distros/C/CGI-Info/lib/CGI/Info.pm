@@ -31,11 +31,11 @@ CGI::Info gets information about the system that a CGI script is running on.
 
 =head1 VERSION
 
-Version 0.88
+Version 0.89
 
 =cut
 
-our $VERSION = '0.88';
+our $VERSION = '0.89';
 
 =head1 SYNOPSIS
 
@@ -1846,10 +1846,11 @@ sub _get_env
 	return unless defined $ENV{$var};
 
 	# Strict sanitization: allow alphanumeric and limited special characters
-	if($ENV{$var} =~ /^[\w\.\-\/]+$/) {
+	if($ENV{$var} =~ /^[\w\.\-\/:\\]+$/) {
 		return $ENV{$var};
 	}
 	$self->_warn("Invalid value in environment variable: $var");
+
 	return undef;
 }
 

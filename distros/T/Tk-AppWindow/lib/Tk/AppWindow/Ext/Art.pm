@@ -10,7 +10,7 @@ Tk::AppWindow::Ext::Art - Use icon libraries quick & easy
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION="0.18";
+$VERSION="0.20";
 use Config;
 my $mswin = 0;
 $mswin = 1 if $Config{'osname'} eq 'MSWin32';
@@ -93,7 +93,7 @@ Default is 16.
 
 Default is Oxygen.
 
-=item Switch: B<-rawiconpath>
+=item Switch: B<-rawiconpath> I<hookable>
 
 List of folders where you store your raw icons. Defaults to an empty list.
 

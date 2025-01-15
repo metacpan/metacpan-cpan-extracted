@@ -9,7 +9,7 @@ use feature ":5.10";
 use Config;
 use File::Spec::Functions qw(catdir rel2abs splitpath);
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use constant DFLT_TOCOPY_SECTION  => "__TOCOPY__";
 
@@ -522,7 +522,7 @@ Config::INI::RefVars - INI file reader that supports make-style variable referen
 
 =head1 VERSION
 
-Version 0.19
+Version 0.20
 
 =head1 SYNOPSIS
 

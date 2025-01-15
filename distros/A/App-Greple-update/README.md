@@ -19,7 +19,7 @@ Options:
 
 # VERSION
 
-Version 1.03
+Version 1.04
 
 # DESCRIPTION
 
@@ -46,6 +46,12 @@ Consult it for more practical use case.
 
 # OPTIONS
 
+There are two kinds of options for this module, such as `--diff` and
+`--update::diff`.  This is to avoid option name conflicts when used
+in combination with other modules.  If you are using this module from
+another module and want to use the `--diff` option in it, call as
+`--update::diff`.
+
 - **--update**
 - **--update::update**
 
@@ -70,7 +76,9 @@ Consult it for more practical use case.
 - **--discard**
 - **--update::discard**
 
-    Simply discard the command output without updating file.
+    Simply discard the command output without updating file.  This option
+    can be used when the output of the command is not needed and only side
+    effects are expected.
 
 - **--diff**
 - **--update::diff**
@@ -104,7 +112,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright 2022-2024 Kazumasa Utashiro.
+Copyright 2022-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

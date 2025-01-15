@@ -19,7 +19,7 @@ use OIDC::Client::ResponseParser;
 use OIDC::Client::TokenResponseParser;
 use OIDC::Client::Error::TokenValidation;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 with 'OIDC::Client::Role::LoggerWrapper';
 

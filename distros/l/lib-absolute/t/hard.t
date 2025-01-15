@@ -3,13 +3,13 @@
 use strict;
 use warnings;
 use Test::More;
-use Path::Class;
+use Path::Tiny;
 use Cwd;
 
 my @INC_BACKUP = @INC;
 
 my $dir = getcwd;
-my $mydir = file(__FILE__)->dir->absolute;
+my $mydir = path(__FILE__)->parent->absolute;
 
 chdir($mydir);
 unshift @INC, 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';

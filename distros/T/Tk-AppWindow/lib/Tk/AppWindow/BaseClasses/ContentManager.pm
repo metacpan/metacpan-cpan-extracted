@@ -11,7 +11,7 @@ use warnings;
 use Carp;
 
 use vars qw($VERSION);
-$VERSION="0.02";
+$VERSION="0.20";
 
 use Tk;
 use base qw(Tk::Derived Tk::Frame);
@@ -40,7 +40,7 @@ It is Tk::Frame based and you can inherit it as a Tk mega widget;
 The methods below are used by the extensions MDI and SDI. It is for you to make
 them do the right stuff by overriding them.
 
-=head1 CONFIG VARIABLES
+=head1 OPTIONS
 
 =over 4
 

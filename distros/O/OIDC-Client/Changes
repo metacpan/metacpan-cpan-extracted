@@ -1,5 +1,9 @@
 Changes for OIDC-Client distribution
 
+0.03 2025-01-14
+  - need v0.03 for Test::WWW::Mechanize::Catalyst::WithContext
+  - fine tuning for the distribution builder
+
 0.02 2025-01-12
   - fix dependencies
 

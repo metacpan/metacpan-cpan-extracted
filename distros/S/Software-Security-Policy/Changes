@@ -1,5 +1,17 @@
 Revision history for Perl extension Software::Security::Policy
 
+0.08 -- Tue Jan 14 21:55:47 AST 2025
+
+    [Major items]
+    - Update to add a minimum_perl_version.
+    - Section on Perl versions hidden if neither minimum_perl_version nor
+    - perl_support_years is used
+
+    [Detailed Change Log]
+    - 6ddc1f5 Increment repo version
+    - 4792489 Add support for minimum_perl_version
+    - 1a0ba78 v0.07
+
 0.07 -- Sun Jan 12 16:59:50 AST 2025
 
     [Major items]

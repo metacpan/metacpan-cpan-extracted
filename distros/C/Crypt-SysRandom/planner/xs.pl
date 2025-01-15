@@ -7,7 +7,7 @@ load_module('Dist::Build::XS');
 load_module('Dist::Build::XS::Conf');
 
 my @possibilities = (
-	[ 'getrandom in sys/random.h', 'SYS_RANDOM_GETRANDOM', <<EOF ],
+	[ 'getrandom in sys/random.h', 'SYS_RANDOM_GETRANDOM', [], <<EOF ],
 #include <sys/types.h>
 #include <sys/random.h>
 
@@ -18,7 +18,7 @@ int main(void)
         return 0;
 }
 EOF
-	['getrandom in sys/syscall.h', 'SYSCALL_GETRANDOM', <<EOF],
+	['getrandom in sys/syscall.h', 'SYSCALL_GETRANDOM', [], <<EOF],
 #define _GNU_SOURCE
 #include <sys/syscall.h>
 #include <unistd.h>
@@ -30,7 +30,7 @@ int main(void)
         return 0;
 }
 EOF
-	['getentropy in sys/random.h', 'SYS_RANDOM_GETENTROPY', <<EOF ],
+	['getentropy in sys/random.h', 'SYS_RANDOM_GETENTROPY', [], <<EOF ],
 #include <sys/types.h>
 #include <sys/random.h>
 
@@ -41,7 +41,7 @@ int main(void)
         return 0;
 }
 EOF
-	['getentropy in unistd.h', 'UNISTD_GETENTROPY', <<EOF ],
+	['getentropy in unistd.h', 'UNISTD_GETENTROPY', [], <<EOF ],
 #include <unistd.h>
 
 int main(void)
@@ -51,7 +51,7 @@ int main(void)
         return 0;
 }
 EOF
-	['Microsoft BcryptGenRandom', 'BCRYPT_GENRANDOM', <<EOF ],
+	['Microsoft BcryptGenRandom', 'BCRYPT_GENRANDOM', ['Bcrypt'], <<EOF ],
 #define WIN32_NO_STATUS
 #include <windows.h>
 #undef WIN32_NO_STATUS
@@ -63,15 +63,15 @@ EOF
 int main(void)
 {
         char buf[16];
-        int r = BCryptGenRandom(NULL, buf, sizeof(bug), BCRYPT_USE_SYSTEM_PREFERRED_RNG);
+        int r = BCryptGenRandom(NULL, buf, sizeof(buf), BCRYPT_USE_SYSTEM_PREFERRED_RNG);
         return 0;
 }
 EOF
 );
 
 for my $possibility (@possibilities) {
-	my ($name, $define, $code) = @{ $possibility };
-	if (try_compile_run(source => $code, define => "HAVE_\U$define", quiet => 1)) {
+	my ($name, $define, $libs, $code) = @{ $possibility };
+	if (try_compile_run(source => $code, define => "HAVE_\U$define", libraries => $libs, quiet => 1)) {
 		print "Found $name\n";
 		last;
 	}

@@ -1,4 +1,10 @@
 Revision history for the Perl module File::Tudo.
 
+0.02 1/14/2024:
+  Added:
+    * --addendum option: Append string to the end of an entry.
+  Fixes:
+    * Correct repository links in META files.
+
 0.01 1/6/2024:
   Initial release.

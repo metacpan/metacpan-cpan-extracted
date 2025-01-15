@@ -64,7 +64,7 @@ define pod <<"=cut"
 
 =head1 VERSION
 
-    Version 0.9904
+    Version 0.9905
 
 =cut
 
@@ -146,7 +146,7 @@ docker_find() {
 	esac
     done
     shift $((OPTIND - 1))
-    id=$(docker ps -q -f ${status:+status=$status} -f name="^/$1\$")
+    id=$(docker ps -a -q ${status:+-f status=$status} -f name="^/$1\$")
     [[ $id ]] && echo $id || return 1
 }
 
@@ -173,7 +173,7 @@ do
 	    ;;
 	E) ENV+=("$OPTARG") ;;
 	P) ports+=("$OPTARG") ;;
-	O) others+=("$OPTARG") ;;
+	O) others+=($OPTARG) ;;
 
 	# mount related options
 	U) mount= ;;
@@ -197,13 +197,13 @@ do
 		docker rm -f $container | sed -e 's/$/ is removed/'
 	    fi
 	    case $OPT in
-		K) [[ ${@:$OPTIND:1} =~ A ]] && (( OPTIND++ )) || exit ;;
+		K) [[ ${@:$OPTIND:1} =~ L ]] && (( OPTIND++ )) || exit ;;
 		S) ;;
 	    esac
 	    ;&
-	A|L)
+	L)
 	    : ${container:=$(container_name)}
-	    if [[ $OPT =~ [AL] ]]
+	    if [[ $OPT =~ L ]]
 	    then
 		if id=$(docker_find -s exited "$container")
 		then
@@ -231,7 +231,7 @@ do
 	    remove=
 	    ;&
 	C|D)
-	    if [[ $volume && $volume != $pwd ]]
+	    if [[ $mount && $volume && $volume != $pwd ]]
 	    then
 		warn "Mount $volume to $workdir"
 		[[ ${pwd#$volume/} != $pwd ]] && relative="${pwd#$volume/}"
@@ -275,7 +275,8 @@ do
 		${others[@]}
 		${ENV[@]/#/-e }
 	    )
-	    exec docker run "${dockopt[@]}" "${image}" "${command[@]}" || exit 1
+	    exec=(docker run "${dockopt[@]}" "${image}" "${command[@]}")
+	    exec "${exec[@]}" || exit 1
 	    ;;
     esac
 done
@@ -509,6 +510,12 @@ Docker's containerization benefits.
 
 =over 4
 
+=item B<Git Friendly>
+
+If you are working in a git environment, the git top directory is
+automatically mounted, which works seamlessly with git commands.
+Otherwise the current directory is mounted.
+
 =item B<Containerized Environment>
 
 By running xlate in a Docker container, you ensure a consistent and
@@ -526,12 +533,6 @@ efficiently within a containerized environment. For example:
 
 This command runs B<xlate> in a Docker container, utilizing make to
 process multiple files with specified target languages.
-
-=item B<Flexible Mount Options>
-
-If you are working in a git environment, the git top directory is
-automatically mounted, which works seamlessly with git commands.
-Otherwise the current directory is mounted.
 
 =item B<Environment Variable Handling>
 

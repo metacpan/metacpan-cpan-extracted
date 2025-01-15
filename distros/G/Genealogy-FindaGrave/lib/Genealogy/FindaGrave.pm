@@ -20,11 +20,11 @@ Genealogy::FindaGrave - Find URLs on FindaGrave for a person
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =head1 SYNOPSIS
 
@@ -55,6 +55,7 @@ Creates a Genealogy::FindaGrave object.
 It takes two mandatory arguments firstname and lastname.
 
 Also one of either date_of_birth and date_of_death must be given.
+FIXME: Note that these are years, and should have been called year_of_*.
 
 There are four optional arguments: middlename, country, ua and host.
 
@@ -70,24 +71,34 @@ sub new {
 	# Handle hash or hashref arguments
 	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
-	# Ensure the correct instantiation method is used
-	unless(defined $class) {
-		carp(__PACKAGE__, ' Use ->new() not ::new() to instantiate');
-		return;
-	}
+	if(!defined($class)) {
+		if((scalar keys %args) > 0) {
+			# Using Genealogy::FindaGrave:new(), not Genealogy::FindaGrave->new()
+			carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+			return;
+		}
 
-	# If $class is an object, clone it with new arguments
-	return bless { %{$class}, %args }, ref($class) if(Scalar::Util::blessed($class));
+		# FIXME: this only works when no arguments are given
+		$class = __PACKAGE__;
+	} elsif(Scalar::Util::blessed($class)) {
+		# If $class is an object, clone it with new arguments
+		return bless { %{$class}, %args }, ref($class);
+	}
 
 	die 'First name is not optional' unless($args{'firstname'});
 	die 'Last name is not optional' unless($args{'lastname'});
 	die 'You must give one of the date of birth or death'
 		unless($args{'date_of_death'} || $args{'date_of_birth'});
 
+	# Check for clearly wrong dates
+	my $this_year = (localtime)[5] + 1900;
+	die 'Invalid birth date' if(defined($args{'date_of_birth'}) && ($args{'date_of_birth'} > $this_year));
+	die 'Invalid death date' if(defined($args{'date_of_death'}) && ($args{'date_of_death'} > $this_year));
+
 	# Set up user agent (ua) if not provided
 	my $ua = $args{'ua'} || LWP::UserAgent->new(agent => __PACKAGE__ . "/$VERSION");
 	# $ua->default_header(accept_encoding => 'gzip,deflate');	# TODO - add unzip/inflation
-	$ua->env_proxy(1);
+	$ua->env_proxy(1) unless($args{'ua'});
 
 	# Disable SSL verification if the host is not defined (not recommended in production)
 	# $ua->ssl_opts(verify_hostname => 0) unless defined $args{'host'};
@@ -140,7 +151,7 @@ sub new {
 
 	if($resp->is_error()) {
 		Carp::carp("API returned error: on $url ", $resp->status_line());
-		return { };
+		return;
 	}
 
 	unless($resp->is_success()) {
@@ -328,7 +339,7 @@ L<https://metacpan.org/release/Genealogy-FindaGrave>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016-2024 Nigel Horne.
+Copyright 2016-2025 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

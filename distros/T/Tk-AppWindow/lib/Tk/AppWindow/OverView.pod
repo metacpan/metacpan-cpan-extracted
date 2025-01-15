@@ -177,6 +177,10 @@ Hans Jeuken (hanje at cpan dot org)
 
 =item L<Tk::AppWindow>
 
+=item L<Tk::AppWindow::Commands>
+
+=item L<Tk::AppWindow::ConfigVariables>
+
 =item L<Tk::AppWindow::CookBook>
 
 =item L<Tk::AppWindow::CookBook::ContentManager>

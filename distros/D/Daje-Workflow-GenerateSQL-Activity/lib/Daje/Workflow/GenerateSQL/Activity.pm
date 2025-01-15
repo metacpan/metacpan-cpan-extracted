@@ -41,11 +41,7 @@ use Mojo::Base 'Daje::Workflow::Common::Activity::Base', -base, -signatures;
 # janeskil1525 E<lt>janeskil1525@gmail.comE<gt>
 #
 
-
-
-our $VERSION = "0.01";
-
-
+our $VERSION = "0.03";
 
 # use Daje::Generate::Input::Sql::ConfigManager;
 
@@ -65,20 +61,20 @@ sub process ($self) {
             #$self->config_manager->save_new_hash(@{$files_list}[$i]);
         }
     }
-
+    $self->error->add_error('test error');
     return;
 }
 
 sub _process_sql($self, $file) {
-     my $sql = "";
-#     try {
-#         my $table = $self->_load_table($file);
-#         $table->generate_table();
-#         $sql = $table->sql();
-#     } catch ($e) {
-#         die "Create sql failed '$e'";
-#     };
-#
+    my $sql = "";
+    try {
+        my $table = $self->_load_table($file);
+        $table->generate_table();
+        $sql = $table->sql();
+    };
+    $self->error->add_error($@) if defined $@;
+
+
 #     try {
 #         Daje::Generate::Output::Sql::SqlManager->new(
 #             config => $self->config,
@@ -94,12 +90,10 @@ sub _process_sql($self, $file) {
 
 sub _load_table($self, $file) {
 
-    # my $json = $self->config_manager->load_json($file);
-    # my $template = $self->_load_templates(
-    #     'Daje::Generate::Templates::Sql',
-    #     "table,foreign_key,index,section,file"
-    # );
-    # my $table;
+    my $json = $self->config_manager->load_json($file);
+    my $template = $self->_load_templates();
+    my $table;
+
     # try {
     #     $table = Daje::Workflow::GenerateSQL::Manager::Sql::SqlManager->new(
     #         template => $template,
@@ -112,7 +106,19 @@ sub _load_table($self, $file) {
     # return $table;
 }
 
+sub _load_templates($self, $source, $datasections) {
+    my $template;
+    eval {
+        $template = Daje::Tools::Datasections->new(
+            data_sections => $self->activity_data->{template}->{data_sections},
+            source        => $self->activity_data->{template}->{source},
+        );
+        $template->load_data_sections();
+    };
+    $self->error->add_error($@) if defined $@;
 
+    return $template;
+}
 
 
 

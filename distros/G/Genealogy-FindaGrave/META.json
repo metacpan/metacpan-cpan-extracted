@@ -62,6 +62,6 @@
          "web" : "https://github.com/nigelhorne/Genealogy-FindaGrave"
       }
    },
-   "version" : "0.07",
+   "version" : "0.08",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

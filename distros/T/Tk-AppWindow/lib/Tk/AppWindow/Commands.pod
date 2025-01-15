@@ -1,0 +1,124 @@
+=head1 NAME 
+
+Tk::AppWindow::Commands - Overview of available commands
+
+=head1 DESCRIPTION
+
+This is a list of available commands for L<Tk::AppWindow>. You will find a link to the
+related module after the name the command. Please note that if the command is
+held by an extension or plugin that extension or plugin must be loaded for it to
+work.
+
+A command can be executed as follows:
+
+ my $result = $app->cmdExecute('command_name', @options)
+ my @result = $app->cmdExecute('command_name', @options)
+
+Generated: Tue Jan 14 10:16:22 2025
+
+=head1 COMMANDS
+
+=over
+
+=item B<about> in L<Tk::AppWindow::Ext::Help>
+
+Pops the about box.
+
+=item B<available_icon_sizes> in L<Tk::AppWindow::Ext::Art>
+
+Returns a list of available icon sizes.
+
+=item B<available_icon_themes> in L<Tk::AppWindow::Ext::Art>
+
+Returns a list of available icon themes.
+
+=item B<deferred_open> in L<Tk::AppWindow::Ext::MDI>
+
+Takes a document name that is in deferred state as parameter and creates a new content handler for it.
+Returns a boolean indicating the succesfull load of its content.
+
+=item B<doc_close> in L<Tk::AppWindow::Ext::MDI>
+
+Takes a document name as parameter and closes it.
+If no parameter is specified closes the current selected document.
+Returns a boolean for succes or failure.
+
+=item B<doc_new> in L<Tk::AppWindow::Ext::MDI>
+
+Takes a document name as parameter and creates a new document.
+If no parameter is specified an Untitled document is created.
+Returns a boolean for succes or failure.
+
+=item B<doc_open> in L<Tk::AppWindow::Ext::MDI>
+
+Takes a filename as parameter and opens it in deferred state.
+If no parameter is specified a file dialog is issued.
+Returns a boolean for succes or failure.
+
+=item B<doc_rename> in L<Tk::AppWindow::Ext::MDI>
+
+Takes two document names as parameters and renames the first one to
+the second one in the interface.
+
+=item B<doc_save> in L<Tk::AppWindow::Ext::MDI>
+
+Takes a document name as parameter and saves it if it is modified.
+If no parameter is specified the current selected document is saved.
+Returns a boolean for succes or failure.
+
+=item B<doc_save_all> in L<Tk::AppWindow::Ext::MDI>
+
+Saves all open and modified documents.
+Returns a boolean for succes or failure.
+
+=item B<doc_save_as> in L<Tk::AppWindow::Ext::MDI>
+
+Takes a document name as parameter and issues a file dialog to rename it.
+If no parameter is specified the current selected document is initiated in the dialog.
+Returns a boolean for succes or failure.
+
+=item B<doc_select> in L<Tk::AppWindow::Ext::MDI>
+
+Select an opened document.
+
+=item B<help> in L<Tk::AppWindow::Ext::Help>
+
+Loads the helpfile in your system's default application or browser.
+
+=item B<plugsdialog> in L<Tk::AppWindow::Ext::Plugins>
+
+Creates a dialog window in which the user can select and unselect plugins
+
+=item B<pop_hist_menu> in L<Tk::AppWindow::Ext::MDI>
+
+Is called when the file menu is opened in the menubar. It populates the
+'Open recent' menu with the current history.
+
+=item B<quit> in L<Tk::AppWindow>
+
+Calls the CmdQuit method. See there.
+
+=item B<set_title> in L<Tk::AppWindow::Ext::MDI>
+
+Takes a document name as parameter and sets the main window title accordingly.
+
+=item B<settings> in L<Tk::AppWindow::Ext::Settings>
+
+Launches the settings dialog.
+
+=item B<updates> in L<Tk::AppWindow::Ext::Help>
+
+Pops the updates box and starts checking for updates.
+
+=back
+
+=head1 LICENSE
+
+Same as Perl.
+
+=head1 AUTHOR
+
+Hans Jeuken (hanje at cpan dot org)
+
+=cut
+

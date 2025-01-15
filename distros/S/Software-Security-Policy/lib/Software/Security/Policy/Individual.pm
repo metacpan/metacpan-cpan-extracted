@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Software::Security::Policy::Individual;
 
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 use parent 'Software::Security::Policy';
 # ABSTRACT: The Individual Security Policy
@@ -31,7 +31,9 @@ sub git_url { (defined $_[0]->{git_url} ? $_[0]->{git_url} :
                 'SECURITY.md')) }
 
 
-sub perl_support_years { (defined $_[0]->{perl_support_years} ? $_[0]->{perl_support_years} : '10') };
+sub perl_support_years { $_[0]->{perl_support_years} };
+
+sub minimum_perl_version { $_[0]->{minimum_perl_version} }
 
 sub timeframe {
     return $_[0]->{timeframe} if defined $_[0]->{timeframe};
@@ -92,6 +94,29 @@ sub _fill_in {
 }
 
 
+sub _perl_supported_version_section {
+  my $self = shift;
+  my $program = $self->program;
+  if (my $minimum_perl_version = $self->minimum_perl_version) {
+    return <<EOF;
+
+Note that the $program project only supports major versions of Perl since
+$minimum_perl_version, even though $program will run on
+older versions of Perl. If a security fix requires us to increase
+the minimum version of Perl that is supported, then we may do so.
+EOF
+  } elsif (my $perl_support_years = $self->perl_support_years) {
+    return <<EOF
+
+Note that the $program project only supports major versions of Perl
+released in the past $perl_support_years years, even though $program will run on
+older versions of Perl.  If a security fix requires us to increase
+the minimum version of Perl that is supported, then we may do so.
+EOF
+  } else {
+    return '';
+  }
+}
 1;
 
 =pod
@@ -104,7 +129,7 @@ Software::Security::Policy::Individual - The Individual Security Policy
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -187,6 +212,10 @@ Each argument, if not specified, is defaulted to another one, or to properly
 capitalized "this program", if both arguments are omitted.
 
 =back
+
+=head2 minimum_perl_version
+
+The minimum version of perl that is supported.
 
 =head2 perl_support_years
 
@@ -365,12 +394,7 @@ uses {{ $self->program }}, or plugins to it that are not included with the
 
 The maintainer(s) will only commit to releasing security fixes for
 the latest version of {{ $self->program }}.
-
-Note that the {{ $self->program }} project only supports major versions of Perl
-released in the past {{ $self->perl_support_years }} years, even though {{ $self->program }} will run on
-older versions of Perl.  If a security fix requires us to increase
-the minimum version of Perl that is supported, then we may do so.
-
+{{ $self->_perl_supported_version_section }}
 # Installation and Usage Issues
 
 The distribution metadata specifies minimum versions of

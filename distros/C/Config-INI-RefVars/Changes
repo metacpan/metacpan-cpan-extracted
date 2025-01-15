@@ -1,5 +1,9 @@
 Revision history for Config-INI-RefVars
 
+0.20    2025/01/14
+
+    - Removed unwanted helper script from MANIFEST.
+
 0.19    2025/01/03
 
     - Fixed problem with POD.

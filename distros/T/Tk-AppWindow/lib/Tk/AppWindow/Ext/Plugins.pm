@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.08";
+$VERSION="0.20";
 use Tk;
 use Pod::Usage;
 use File::Basename;
@@ -39,7 +39,6 @@ This extension will load the extension B<ConfigFolder> if it is not loaded alrea
 =head1 CONFIG VARIABLES
 
 =over 4
-
 
 =item Switch: B<-noplugins>
 
@@ -292,18 +291,18 @@ sub PopPlugsDialog {
 	$dialog->destroy;
 }
 
-=item B<Reconfigure>
+=item B<ReConfigure>
 
-Calls Reconfigure on all loaded plugins 1 if all succesfull;
+Calls ReConfigure on all loaded plugins. Returns 1 if all succesfull;
 
 =cut
 
-sub Reconfigure {
+sub ReConfigure {
 	my $self = shift;
-	my @plugs = $self->PluginList;
+	my @plugs = $self->plugList;
 	my $succes = 1;
 	for (@plugs) {
-		$succes = 0 unless $self->GetPlugin($_)->Reconfigure
+		$succes = 0 unless $self->plugGet($_)->ReConfigure
 	}
 	return $succes
 }

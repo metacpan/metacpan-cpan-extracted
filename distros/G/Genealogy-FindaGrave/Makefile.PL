@@ -93,9 +93,9 @@ sub are_online
 	my $host = 'www.findagrave.com:80';
 
 	if($ENV{'http_proxy'} && ($ENV{'http_proxy'} =~ /^.+\/\/(\w+:\d+)$/)) {
-		$host = $1;
+		$host = "$1:3128";
 	} elsif($ENV{'HTTP_PROXY'} && ($ENV{'HTTP_PROXY'} =~ /^.+\/\/(\w+:\d+)$/)) {
-		$host = $1;
+		$host = "$1:3128";
 	}
 	if(my $s = IO::Socket::INET->new(
 		# PeerAddr => 'www.ripe.net:43',

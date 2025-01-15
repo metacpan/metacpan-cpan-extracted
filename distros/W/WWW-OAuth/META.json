@@ -79,27 +79,27 @@
    "provides" : {
       "WWW::OAuth" : {
          "file" : "lib/WWW/OAuth.pm",
-         "version" : "1.001"
+         "version" : "1.002"
       },
       "WWW::OAuth::Request" : {
          "file" : "lib/WWW/OAuth/Request.pm",
-         "version" : "1.001"
+         "version" : "1.002"
       },
       "WWW::OAuth::Request::Basic" : {
          "file" : "lib/WWW/OAuth/Request/Basic.pm",
-         "version" : "1.001"
+         "version" : "1.002"
       },
       "WWW::OAuth::Request::HTTP_Request" : {
          "file" : "lib/WWW/OAuth/Request/HTTP_Request.pm",
-         "version" : "1.001"
+         "version" : "1.002"
       },
       "WWW::OAuth::Request::Mojo" : {
          "file" : "lib/WWW/OAuth/Request/Mojo.pm",
-         "version" : "1.001"
+         "version" : "1.002"
       },
       "WWW::OAuth::Util" : {
          "file" : "lib/WWW/OAuth/Util.pm",
-         "version" : "1.001"
+         "version" : "1.002"
       }
    },
    "release_status" : "stable",
@@ -114,7 +114,7 @@
          "web" : "https://github.com/Grinnz/WWW-OAuth"
       }
    },
-   "version" : "1.001",
+   "version" : "1.002",
    "x_contributors" : [
       "Dan Book <grinnz@grinnz.com>"
    ],

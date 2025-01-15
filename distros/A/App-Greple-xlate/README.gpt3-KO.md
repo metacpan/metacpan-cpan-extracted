@@ -10,7 +10,7 @@ App::Greple::xlate - greple을 위한 번역 지원 모듈
 
 # VERSION
 
-Version 0.9904
+Version 0.9905
 
 # DESCRIPTION
 
@@ -256,59 +256,11 @@ Version 0.9904
 
 또한, 다양한 문서 스타일에 대한 makefile이 제공되므로, 특별한 지정 없이 다른 언어로 번역할 수 있습니다. `-M` 옵션을 사용하십시오.
 
-Docker와 make 옵션을 결합하여 Docker 환경에서 make를 실행할 수도 있습니다.
+Docker 및 `make` 옵션을 결합하여 Docker 환경에서 `make`를 실행할 수도 있습니다.
 
-`xlate -GC`와 같이 실행하면 현재 작업 중인 git 저장소가 마운트된 셸이 시작됩니다.
+`xlate -C`와 같이 실행하면 현재 작업 중인 git 저장소가 마운트된 쉘을 시작합니다.
 
 자세한 내용은 ["SEE ALSO"](#see-also) 섹션에 있는 일본어 기사를 읽어보세요.
-
-    xlate [ options ] -t lang file [ greple options ]
-        -h   help
-        -v   show version
-        -d   debug
-        -n   dry-run
-        -a   use API
-        -c   just check translation area
-        -r   refresh cache
-        -u   force update cache
-        -s   silent mode
-        -e # translation engine (*deepl, gpt3, gpt4, gpt4o)
-        -p # pattern to determine translation area
-        -x # file containing mask patterns
-        -w # wrap line by # width
-        -o # output format (*xtxt, cm, ifdef, space, space+, colon)
-        -f # from lang (ignored)
-        -t # to lang (required, no default)
-        -m # max length per API call
-        -l # show library files (XLATE.mk, xlate.el)
-        --   end of option
-        N.B. default is marked as *
-
-    Make options
-        -M   run make
-        -n   dry-run
-
-    Docker options
-        -D * run xlate on the container with the same parameters
-        -C * execute following command on the container, or run shell
-        -S * start the live container
-        -A * attach to the live container
-        N.B. -D/-C/-A terminates option handling
-
-        -G   mount git top-level directory
-        -H   mount home directory
-        -V # specify mount directory
-        -U   do not mount
-        -R   mount read-only
-        -L   do not remove and keep live container
-        -K   kill and remove live container
-        -E # specify environment variable to be inherited
-        -I # docker image or version (default: tecolicom/xlate:version)
-
-    Control Files:
-        *.LANG    translation languates
-        *.FORMAT  translation foramt (xtxt, cm, ifdef, colon, space)
-        *.ENGINE  translation engine (deepl, gpt3, gpt4, gpt4o)
 
 # EMACS
 

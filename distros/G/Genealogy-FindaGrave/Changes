@@ -1,5 +1,10 @@
 Revision history for Genealogy::FindaGrave
 
+0.08	Tue Jan 14 14:34:36 EST 2025
+	Connect to squid port when proxy is set
+	Ensure new() fails properly when the API gives an error
+	new() now fails if a clearly invalid year is given
+
 0.07	Mon Nov 11 07:59:23 EST 2024
 	Renamed from WWW::Scrape::FindaGrave
 	Updated for latest website

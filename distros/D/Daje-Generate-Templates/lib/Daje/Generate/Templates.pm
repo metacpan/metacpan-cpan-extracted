@@ -33,7 +33,7 @@ use Mojo::Base -base;
 #
 # W
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
 
 

@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.19";
+$VERSION="0.20";
 
 use base qw(Tk::Derived Tk::MainWindow);
 Construct Tk::Widget 'AppWindow';
@@ -104,6 +104,18 @@ Only available at create time.
 
 Foreground color for links. Default value '#3030DF'.
 
+=item Switch: B<-logcall>
+
+Callback to log messages.
+
+=item Switch: B<-logerrorcall>
+
+Callback to log errors.
+
+=item Switch: B<-logwarningcall>
+
+Callback to log warnings.
+
 =item Switch: B<-logo>
 
 Specifies the image file to be used as logo for your application.
@@ -160,6 +172,7 @@ sub Populate {
 	$self->DynaMouseWheelBind(
 		'Tk::Canvas',
 		'Tk::HList',
+		'Tk::IconList',
 		'Tk::ITree',
 		'Tk::Pane',
 		'Tk::Tree',
@@ -225,7 +238,6 @@ sub Populate {
 		print STDERR "$message\n";
 	};
 	$self->ConfigSpecs(
-		-initpaneldelay => ['PASSIVE', undef, undef, 500],
 		-linkcolor => ['PASSIVE', 'linkColor', 'LinkColor', '#3030DF'],
 		-logcall => ['CALLBACK', undef, undef, $logcall], 
 		-logerrorcall => ['CALLBACK', undef, undef, $logcall], 
@@ -1312,6 +1324,10 @@ If you find any, please contact the author.
 =item L<Tk::AppWindow::CookBook>
 
 =item L<Tk::AppWindow::BaseClasses::Extension>
+
+=item L<Tk::AppWindow::Commands>
+
+=item L<Tk::AppWindow::ConfigVariables>
 
 =back
 

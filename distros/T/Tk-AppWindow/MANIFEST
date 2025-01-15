@@ -8,6 +8,8 @@ lib/Tk/AppWindow/BaseClasses/ContentManager.pm
 lib/Tk/AppWindow/BaseClasses/Extension.pm
 lib/Tk/AppWindow/BaseClasses/Plugin.pm
 lib/Tk/AppWindow/BaseClasses/PluginJobs.pm
+lib/Tk/AppWindow/Commands.pod
+lib/Tk/AppWindow/ConfigVariables.pod
 lib/Tk/AppWindow/CookBook.pod
 lib/Tk/AppWindow/CookBook/ContentManager.pod
 lib/Tk/AppWindow/CookBook/Extension.pod
@@ -44,6 +46,7 @@ t/030-Tk-AppWindow-BaseClasses-Extension.t
 t/040-Tk-AppWindow-BaseClasses-Plugin.t
 t/050-Tk-AppWindow-BaseClasses-PluginJobs.t
 t/060-Tk-AppWindow.t
+t/065-Tk-AppWindow-pop.t
 t/070-Tk-AppWindow-Ext-Art.t
 t/075-Tk-AppWindow-Ext-Art-compound.t
 t/080-Tk-AppWindow-Ext-Daemons.t
@@ -70,6 +73,7 @@ t/lib/TestTextManager.pm
 t/lib/Tk/AppWindow/Ext/Dummy.pm
 t/lib/Tk/AppWindow/Ext/TestPlugin.pm
 t/sample_help.pod
+t/settings/history
 t/Themes/PNG1/actions/22/document-new.png
 t/Themes/PNG1/actions/22/document-save.png
 t/Themes/PNG1/actions/32/edit-cut.png
@@ -95,5 +99,6 @@ t/Themes/SVG1/apps/22/kate.svg
 t/Themes/SVG1/apps/32/utilities-terminal.svg
 t/Themes/SVG1/apps/32/vlc.svg
 t/Themes/SVG1/index.theme
+
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

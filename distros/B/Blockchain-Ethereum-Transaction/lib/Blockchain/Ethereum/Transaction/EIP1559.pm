@@ -1,27 +1,45 @@
-use v5.26;
+package Blockchain::Ethereum::Transaction::EIP1559;
 
+use v5.26;
 use strict;
 use warnings;
-no indirect;
-use feature 'signatures';
 
-use Object::Pad ':experimental(init_expr)';
 # ABSTRACT: Ethereum Fee Market transaction abstraction
-
-package Blockchain::Ethereum::Transaction::EIP1559;
-class Blockchain::Ethereum::Transaction::EIP1559
-    :does(Blockchain::Ethereum::Transaction);
-
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.010';          # VERSION
+our $VERSION   = '0.011';          # VERSION
+
+use parent 'Blockchain::Ethereum::Transaction';
 
 use constant TRANSACTION_PREFIX => pack("H*", '02');
 
-field $max_priority_fee_per_gas :reader :writer :param;
-field $max_fee_per_gas :reader :writer :param;
-field $access_list :reader :writer :param = [];
+sub new {
+    my ($class, %args) = @_;
 
-method serialize() {
+    my $self = $class->SUPER::new(%args);
+
+    foreach (qw( max_priority_fee_per_gas max_fee_per_gas access_list )) {
+        $self->{$_} = $args{$_} if exists $args{$_};
+    }
+
+    bless $self, $class;
+    return $self;
+
+}
+
+sub max_priority_fee_per_gas {
+    return shift->{max_priority_fee_per_gas};
+}
+
+sub max_fee_per_gas {
+    return shift->{max_fee_per_gas};
+}
+
+sub access_list {
+    return shift->{access_list} // [];
+}
+
+sub serialize {
+    my $self = shift;
 
     my @params = (
         $self->chain_id,    #
@@ -45,7 +63,8 @@ method serialize() {
     return TRANSACTION_PREFIX . $self->rlp->encode(\@params);
 }
 
-method generate_v ($y_parity) {
+sub generate_v {
+    my ($self, $y_parity) = @_;
 
     # eip-1559 uses y directly as the v point
     # instead of using recovery id as the legacy
@@ -69,7 +88,7 @@ Blockchain::Ethereum::Transaction::EIP1559 - Ethereum Fee Market transaction abs
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 

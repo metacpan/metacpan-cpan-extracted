@@ -1,23 +1,34 @@
-use v5.26;
+package Blockchain::Ethereum::Transaction::Legacy;
 
+use v5.26;
 use strict;
 use warnings;
-no indirect;
-use feature 'signatures';
 
-use Object::Pad;
 # ABSTRACT: Ethereum Legacy transaction abstraction
-
-package Blockchain::Ethereum::Transaction::Legacy;
-class Blockchain::Ethereum::Transaction::Legacy
-    :does(Blockchain::Ethereum::Transaction);
-
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.010';          # VERSION
+our $VERSION   = '0.011';          # VERSION
 
-field $gas_price :reader :writer :param;
+use parent 'Blockchain::Ethereum::Transaction';
 
-method serialize {
+sub new {
+    my ($class, %args) = @_;
+
+    my $self = $class->SUPER::new(%args);
+
+    foreach (qw( gas_price )) {
+        $self->{$_} = $args{$_} if exists $args{$_};
+    }
+
+    bless $self, $class;
+    return $self;
+}
+
+sub gas_price {
+    return shift->{gas_price};
+}
+
+sub serialize {
+    my $self = shift;
 
     my @params = (
         $self->nonce,    #
@@ -39,7 +50,8 @@ method serialize {
     return $self->rlp->encode(\@params);
 }
 
-method generate_v ($y_parity) {
+sub generate_v {
+    my ($self, $y_parity) = @_;
 
     my $v = sprintf("0x%x", (hex $self->chain_id) * 2 + 35 + $y_parity);
 
@@ -61,7 +73,7 @@ Blockchain::Ethereum::Transaction::Legacy - Ethereum Legacy transaction abstract
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 

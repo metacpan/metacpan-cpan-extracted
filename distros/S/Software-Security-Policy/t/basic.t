@@ -24,6 +24,7 @@ like($policy->fulltext, qr(https://www.example.com/INDIVIDUAL-SECURITY-POLICY), 
 
 $policy = $class->new({
         maintainer  => 'X. Ample <x.example@example.com>',
+        perl_support_years   => '10',
     });
 
 is($policy->maintainer, 'X. Ample <x.example@example.com>', 'maintainer');

@@ -11,7 +11,7 @@ Genealogy::FindaGrave - Find URLs on FindaGrave for a person
 
 # VERSION
 
-Version 0.07
+Version 0.08
 
 # SYNOPSIS
 
@@ -42,6 +42,7 @@ Creates a Genealogy::FindaGrave object.
 It takes two mandatory arguments firstname and lastname.
 
 Also one of either date\_of\_birth and date\_of\_death must be given.
+FIXME: Note that these are years, and should have been called year\_of\_\*.
 
 There are four optional arguments: middlename, country, ua and host.
 
@@ -93,6 +94,6 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2016-2024 Nigel Horne.
+Copyright 2016-2025 Nigel Horne.
 
 This program is released under the following licence: GPL2

@@ -687,7 +687,7 @@ sub set_locale {
 	require POSIX;
 
     # See https://github.com/gflohr/libintl-perl/issues/14!
-    no warnings 'locale';
+    no if $] >= 5.022, warnings => 'locale';
 
     $country = '' unless defined $country;
     $charset = '' unless defined $charset;
@@ -819,7 +819,7 @@ sub __set_locale_windows {
 	my ($category, $language, $country, $charset) = @_;
 
     # See https://github.com/gflohr/libintl-perl/issues/14!
-    no warnings 'locale';
+	no if $] >= 5.022, warnings => 'locale'; 
 
     my $set_locale;
 

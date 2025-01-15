@@ -70,6 +70,7 @@ lib/App/Greple/xlate.pm
 lib/App/Greple/xlate/Cache.pm
 lib/App/Greple/xlate/Lang.pm
 lib/App/Greple/xlate/Mask.pm
+lib/App/Greple/xlate/Text.pm
 lib/App/Greple/xlate/deepl.pm
 lib/App/Greple/xlate/gpt3.pm
 lib/App/Greple/xlate/gpt4.pm

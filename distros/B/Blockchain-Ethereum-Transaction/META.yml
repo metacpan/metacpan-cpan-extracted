@@ -3,7 +3,7 @@ abstract: 'Ethereum transaction abstraction'
 author:
   - 'Reginaldo Costa <refeco@cpan.org>'
 build_requires:
-  Blockchain::Ethereum::Keystore: '0.010'
+  Blockchain::Ethereum::Keystore: '0.011'
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
@@ -21,22 +21,21 @@ name: Blockchain-Ethereum-Transaction
 provides:
   Blockchain::Ethereum::Transaction:
     file: lib/Blockchain/Ethereum/Transaction.pm
-    version: '0.010'
+    version: '0.011'
   Blockchain::Ethereum::Transaction::EIP1559:
     file: lib/Blockchain/Ethereum/Transaction/EIP1559.pm
-    version: '0.010'
+    version: '0.011'
   Blockchain::Ethereum::Transaction::Legacy:
     file: lib/Blockchain/Ethereum/Transaction/Legacy.pm
-    version: '0.010'
+    version: '0.011'
 requires:
-  Blockchain::Ethereum::RLP: '0.010'
+  Blockchain::Ethereum::RLP: '0.011'
   Crypt::Digest::Keccak256: '0.078'
-  Object::Pad: '0.814'
   perl: v5.26.0
 resources:
   homepage: https://github.com/refeco/Blockchain-Ethereum-Transaction
   repository: https://github.com/refeco/Blockchain-Ethereum-Transaction.git
-version: '0.010'
+version: '0.011'
 x_authority: cpan:REFECO
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.74'

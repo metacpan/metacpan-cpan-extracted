@@ -7,6 +7,7 @@ META.yml
 Makefile.PL
 README.md
 cpanfile
+dist.ini
 lib/Catalyst/Plugin/OIDC.pm
 lib/Mojolicious/Plugin/OIDC.pm
 lib/OIDC/Client.pm
@@ -22,6 +23,7 @@ lib/OIDC/Client/Role/LoggerWrapper.pm
 lib/OIDC/Client/TokenResponse.pm
 lib/OIDC/Client/TokenResponseParser.pm
 lib/OIDC/Client/User.pm
+perlcritic.rc
 t/00-compile.t
 t/catalyst-plugin-auth-code-flow-IT.t
 t/client.t

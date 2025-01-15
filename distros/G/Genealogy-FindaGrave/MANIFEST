@@ -10,6 +10,7 @@ README.md
 t/00-load.t
 t/10-new.t
 t/20-findagrave.t
+t/30-basics.t
 t/boiler.t
 t/changes.t
 t/critic.t

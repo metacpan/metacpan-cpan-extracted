@@ -3,7 +3,7 @@ use warnings;
 
 use Test::Pod;
 
-my @poddirs = qw( blib );
+my @poddirs = qw( lib );
 
 my @files = all_pod_files( map {  $_ } @poddirs );
 
