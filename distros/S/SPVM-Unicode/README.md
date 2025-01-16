@@ -1,4 +1,3 @@
 # SPVM::Unicode
 
-SPVM::Unicode is a SPVM module.
-
+<a href="https://metacpan.org/pod/SPVM::Unicode">SPVM::Unicode - CPAN</a>

@@ -1,0 +1,31 @@
+---
+abstract: 'Re-arrange a Math::Symbolic expression into a product of factors'
+author:
+  - 'Matt Johnson <mjohnson@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Math-Symbolic-Custom-Factor
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Math::Symbolic: '0.613'
+  Math::Symbolic::Custom::Collect: '0.32'
+  Math::Symbolic::Custom::Polynomial: '0.3'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/mjohnson108/p5-msc-factor/issues
+  homepage: https://github.com/mjohnson108/
+  repository: https://github.com/mjohnson108/p5-msc-factor.git
+version: '0.1'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -5,13 +5,13 @@ use warnings;
 use Carp qw< confess >;
 
 use File::Find;
-use PPI::Document;
+use PPI::Document 1.281;
 
 use Test::More;
 
 #-----------------------------------------------------------------------------
 
-our $VERSION = '0.114';
+our $VERSION = '0.115';
 
 #-----------------------------------------------------------------------------
 

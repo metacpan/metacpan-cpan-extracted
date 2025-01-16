@@ -6,7 +6,7 @@ use v5.34.0; # The Perl version on Slackware 15.0 (sbozyp's min supported versio
 
 package Sbozyp;
 
-our $VERSION = '0.2.1';
+our $VERSION = '0.2.2';
 
 use File::Basename qw(basename dirname);
 use File::Temp;
@@ -793,37 +793,16 @@ sub build_slackware_pkg {
     local $ENV{OUTPUT} = $CONFIG{TMPDIR}; # all SlackBuilds use the $OUTPUT env var to determine output pkg location
     my $staging_dir = prepare_pkg($pkg);
     my $slackbuild = $pkg->{PRGNAM} . '.SlackBuild';
-    my $cmd = "cd '$staging_dir' && chmod +x ./$slackbuild && ./$slackbuild";
-    # This next bit of code is a bit confusing, but the idea is that we want to
-    # print the slackbuild output to stdout, while also reading the stdout to
-    # look for the created slackware package name, which is we return. This
-    # solution does not waste disk space. See issue #6 for more details.
-    my $tmpdir = File::Temp->newdir(DESTROY=>1,DIR=>$CONFIG{TMPDIR},TEMPLATE=>'sbozyp_tmpfifo_XXXXXX');
-    my $fifo_path = sbozyp_mkfifo("$tmpdir/fifo");
-    my $pid = sbozyp_fork();
-    if ($pid == 0) { # child
-        my $fifo_w_fh = sbozyp_open('>', $fifo_path);
-        sbozyp_system('bash', '-c', "set -o pipefail; ( $cmd ) | tee '$fifo_path'");
-        print $fifo_w_fh "sbozyp: SLACKBUILD SUCCEEDED: $fifo_path\n";
-        exit 0;
-    } else { # parent
-        my $slackware_pkg;
-        my $slackware_pkg_regex = qr/^Slackware package (.+) created\.$/;
-        my $build_success_regex = qr/^sbozyp: SLACKBUILD SUCCEEDED: \Q$fifo_path\E$/;
-        my $build_succeeded = 0;
-        my $fifo_r_fh = sbozyp_open('<', $fifo_path);
-        while (waitpid($pid, WNOHANG) == 0 or defined(my $stdout_line = <$fifo_r_fh>)) {
-            if (defined $stdout_line) {
-                $slackware_pkg = $1 if $stdout_line =~ $slackware_pkg_regex;
-                $build_succeeded = 1 if $stdout_line =~ $build_success_regex;
-            }
-        }
-        if (!$build_succeeded) { sbozyp_die("failed to build '$pkg->{PKGNAME}'") }
-        if (!defined $slackware_pkg) {
-            sbozyp_die("successfully built '$pkg->{PKGNAME}' but couldn't determine the path of the created Slackware package");
-        }
-        return $slackware_pkg
+    my $cmd = sbozyp_open('-|', "cd '$staging_dir' && chmod +x ./$slackbuild && ./$slackbuild");
+    my $slackware_pkg;
+    while (my $line = <$cmd>) {
+        $slackware_pkg = $1 if $line =~ /^Slackware package (.+) created\.$/;
+        print $line; # magically knows to print to stdout or stderr
     }
+    close $cmd;
+    sbozyp_die("failed to build '$pkg->{PKGNAME}'") if $? != 0;
+    sbozyp_die("successfully built '$pkg->{PKGNAME}' but couldn't determine the path of the created Slackware package") if !defined $slackware_pkg;
+    return $slackware_pkg;
 }
 
 sub install_slackware_pkg {

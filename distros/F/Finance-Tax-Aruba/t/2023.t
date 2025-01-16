@@ -22,7 +22,7 @@ my @tests = (
 
             net_yearly_income => 10535.52,
             tax_fixed         => 0,
-            tax_rate          => 12,
+            tax_rate          => 10,
         },
     },
     {
@@ -98,7 +98,7 @@ my @tests = (
             net_yearly_income => 63301.32,
 
             tax_fixed => 0,
-            tax_rate  => 12,
+            tax_rate  => 10,
 
         },
     },
@@ -151,10 +151,10 @@ my @tests = (
 
         results => {
             tax_fixed        => 0,
-            tax_rate         => 12,
+            tax_rate         => 10,
             company_costs    => 78810,
-            government_costs => 18630,
-            social_costs     => 22230,
+            government_costs => 18060,
+            social_costs     => 21660,
         },
     },
 );

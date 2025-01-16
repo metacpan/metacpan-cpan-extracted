@@ -5,7 +5,7 @@ use 5.006001;
 use strict;
 use warnings;
 
-use PPI::Document;
+use PPI::Document 1.281;
 use Test::More 0.88;	# Because of done_testing();
 
 note <<'EOD';

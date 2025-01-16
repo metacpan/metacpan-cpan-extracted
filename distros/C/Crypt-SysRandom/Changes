@@ -1,5 +1,8 @@
 Revision history for Crypt-SysRandom
 
+0.005     2025-01-15 14:25:11+01:00 Europe/Brussels
+          - Fix linking on Windows
+
 0.004     2025-01-14 21:26:35+01:00 Europe/Brussels
           - Link to Bcrypt.dll on Windows
 

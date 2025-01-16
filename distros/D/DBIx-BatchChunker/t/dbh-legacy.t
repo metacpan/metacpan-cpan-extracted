@@ -68,8 +68,8 @@ subtest 'Active DBI Processing (+ sleep)' => sub {
 
     # Calculate
     ok($batch_chunker->calculate_ranges, 'calculate_ranges ok');
-    ok($batch_chunker->min_id,           'min_id ok');
-    ok($batch_chunker->max_id,           'max_id ok');
+    ok(defined $batch_chunker->min_id,   'min_id ok');
+    ok(defined $batch_chunker->max_id,   'max_id ok');
 
     my $range = $batch_chunker->max_id - $batch_chunker->min_id + 1;
     my $multiplier_range = ceil($range / $CHUNK_SIZE);
@@ -128,8 +128,8 @@ subtest 'Query DBI Processing (+ min_chunk_percent)' => sub {
 
     # Calculate
     ok($batch_chunker->calculate_ranges, 'calculate_ranges ok');
-    ok($batch_chunker->min_id,           'min_id ok');
-    ok($batch_chunker->max_id,           'max_id ok');
+    ok(defined $batch_chunker->min_id,   'min_id ok');
+    ok(defined $batch_chunker->max_id,   'max_id ok');
 
     my $range = $batch_chunker->max_id - $batch_chunker->min_id + 1;
     my $multiplier_range = ceil($range / $CHUNK_SIZE);
@@ -183,8 +183,8 @@ subtest 'Query DBI Processing + single_row (+ rsc)' => sub {
 
     # Calculate
     ok($batch_chunker->calculate_ranges, 'calculate_ranges ok');
-    ok($batch_chunker->min_id,           'min_id ok');
-    ok($batch_chunker->max_id,           'max_id ok');
+    ok(defined $batch_chunker->min_id,   'min_id ok');
+    ok(defined $batch_chunker->max_id,   'max_id ok');
 
     # Process
     $batch_chunker->execute;
@@ -230,8 +230,8 @@ subtest 'DIY Processing (+ min_chunk_percent)' => sub {
 
     # Calculate
     ok($batch_chunker->calculate_ranges, 'calculate_ranges ok');
-    ok($batch_chunker->min_id,           'min_id ok');
-    ok($batch_chunker->max_id,           'max_id ok');
+    ok(defined $batch_chunker->min_id,   'min_id ok');
+    ok(defined $batch_chunker->max_id,   'max_id ok');
 
     my $range = $batch_chunker->max_id - $batch_chunker->min_id + 1;
     my $multiplier_range = ceil($range / $CHUNK_SIZE);

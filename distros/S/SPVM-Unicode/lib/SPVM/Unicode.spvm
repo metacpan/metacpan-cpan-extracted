@@ -2,6 +2,8 @@
 # MIT License
 
 class Unicode : precompile {
+  version "0.051";
+  
   use IntList;
   
   native static method uchar : int ($string : string, $offset_ref : int*);

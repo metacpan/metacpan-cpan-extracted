@@ -5,7 +5,7 @@ use warnings;
 
 use English qw(-no_match_vars);
 
-use PPI::Document;
+use PPI::Document 1.281;
 
 use Perl::Critic::TestUtils qw(bundled_policy_names);
 
@@ -13,7 +13,7 @@ use Test::More;
 
 #-----------------------------------------------------------------------------
 
-our $VERSION = '0.114';
+our $VERSION = '0.115';
 
 #-----------------------------------------------------------------------------
 

@@ -8,7 +8,7 @@ use warnings;
 use English qw{ -no_match_vars };
 use Getopt::Long 2.33 qw{ :config auto_version };
 use Perl::Critic;
-use Perl::Critic::Utils qw{ all_perl_files };
+use Perl::Critic::Utils qw{ all_perl_files $SPACE };
 use Perl::Critic::Violation;
 # The following is superfluous as far as Perl::Critic is concerned, but
 # handy if we want to run the debugger.
@@ -16,7 +16,7 @@ use Perl::Critic::Policy::Variables::ProhibitUnusedVarsStricter;
 use Readonly;
 use Pod::Usage;
 
-our $VERSION = '0.114';
+our $VERSION = '0.115';
 
 Readonly::Scalar my $DEFAULT_SINGLE_FILE_FORMAT => 4;
 Readonly::Scalar my $DEFAULT_MULTI_FILE_FORMAT  => 5;
@@ -24,6 +24,7 @@ Readonly::Array my @INVERTED_OPTIONS    => qw{
     prohibit_reference_only_variables
     prohibit_returned_lexicals
 };
+Readonly::Scalar my $REF_ARRAY  => ref [];
 
 my %opt = map { $_ => 1 } @INVERTED_OPTIONS;
 
@@ -46,6 +47,11 @@ foreach my $key ( @INVERTED_OPTIONS ) {
         or delete $opt{$key};
 }
 
+foreach ( values %opt ) {
+    $REF_ARRAY eq ref
+        and $_ = join $SPACE, @{ $_ };
+}
+
 if ( ! @ARGV ) {
     -e 'MANIFEST'
         or die "No arguments specified and no MANIFEST found\n";
@@ -60,7 +66,7 @@ my $critic = Perl::Critic->new(
 
 $critic->add_policy(
     -policy => 'Variables::ProhibitUnusedVarsStricter',
-    -config => \%opt
+    -params => \%opt
 );
 
 {
@@ -224,7 +230,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2012-2022 by Thomas R. Wyant, III
+Copyright (C) 2012-2022, 2024-2025 by Thomas R. Wyant, III
 
 =head1 LICENSE
 

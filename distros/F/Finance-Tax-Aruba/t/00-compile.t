@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 8 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Finance/Tax/Aruba.pm',
@@ -14,6 +14,7 @@ my @module_files = (
     'Finance/Tax/Aruba/Income/2020.pm',
     'Finance/Tax/Aruba/Income/2021.pm',
     'Finance/Tax/Aruba/Income/2023.pm',
+    'Finance/Tax/Aruba/Income/2025.pm',
     'Finance/Tax/Aruba/Role/Income/TaxYear.pm'
 );
 

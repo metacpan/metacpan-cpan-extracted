@@ -1,10 +1,10 @@
 {
-   "abstract" : "Unicode Utilities.",
+   "abstract" : "Unicode Utilities",
    "author" : [
       "Yuki Kimoto<kimoto.yuki@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -27,19 +27,26 @@
       },
       "configure" : {
          "requires" : {
-            "SPVM" : "0.9701"
+            "SPVM" : "0.990038"
          }
       },
       "runtime" : {
+         "requires" : {
+            "SPVM" : "0.990038"
+         }
+      },
+      "test" : {
          "requires" : {}
       }
    },
    "release_status" : "stable",
    "resources" : {
       "repository" : {
-         "type" : "git"
+         "type" : "git",
+         "url" : "https://github.com/yuki-kimoto/SPVM-Unicode.git",
+         "web" : "https://github.com/yuki-kimoto/SPVM-Unicode"
       }
    },
-   "version" : "0.05",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.051",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

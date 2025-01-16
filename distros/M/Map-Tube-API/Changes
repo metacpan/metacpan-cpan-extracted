@@ -1,5 +1,8 @@
 Revision history for Map::Tube::API
 
+0.08  Wed Jan 15 22:10:00 2025
+      - Documented maps: Rome and RheinRuhr.
+
 0.07  Sun Jan 28 16:50:00 2024
       - Added Map::Tube::Bielefeld, thanks Michal Josef Špaček.
 

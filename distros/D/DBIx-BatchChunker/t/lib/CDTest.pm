@@ -288,9 +288,10 @@ sub populate_schema {
 
     $schema->populate('Track', [
         [ qw/trackid cd  position title/ ],
-        [ 4, 2, 1, "Stung with Success"],
-        [ 5, 2, 2, "Stripy"],
-        [ 6, 2, 3, "Sticky Honey"],
+        [ 0, 2, 1, "NOT THE BEES!"],  # ID=0 example (with ID gaps)
+        [ 4, 2, 2, "Stung with Success"],
+        [ 5, 2, 3, "Stripy"],
+        [ 6, 2, 4, "Sticky Honey"],
         [ 7, 3, 1, "Yowlin"],
         [ 8, 3, 2, "Howlin"],
         [ 9, 3, 3, "Fowlin"],
@@ -436,4 +437,3 @@ sub _random_words {
 }
 
 1;
-

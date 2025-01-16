@@ -6,7 +6,7 @@ use warnings;
 
 use English qw{ -no_match_vars };
 
-use PPI::Document;
+use PPI::Document 1.281;
 use PPIx::QuoteLike 0.011;
 use PPIx::QuoteLike::Constant 0.011 qw{
     LOCATION_LINE
@@ -25,7 +25,9 @@ use Perl::Critic::Utils qw< :booleans :characters hashify :severities >;
 
 use base 'Perl::Critic::Policy';
 
-our $VERSION = '0.114';
+our $VERSION = '0.115';
+
+Readonly::Scalar my $DEREF => q/->/;
 
 #-----------------------------------------------------------------------------
 
@@ -251,6 +253,8 @@ sub _get_symbol_declarations {
     $self->{_check_catch}
         and $self->_get_catch_declarations( $document );
 
+    $self->_get_signature_declarations( $document );
+
     return;
 
 }
@@ -393,6 +397,43 @@ sub _get_catch_declarations {
             # Should be only one, but ...
             $self->_record_symbol_definition(
                 $sym, $sym->statement() );
+        }
+    }
+    return;
+}
+
+#-----------------------------------------------------------------------------
+
+# Signatures are a special case not only because the 'my' is implied but
+# because unused variable placeholders are specified by a lone sigil,
+# which parses as a PPI::Token::Symbol, at least most of the time. NOTE
+# that you need at least PPI 1.290 to actually get a PPI::Structure::Signature.
+sub _get_signature_declarations {
+    my ( $self, $document ) = @_;
+
+    foreach my $sig ( @{ $document->find( 'PPI::Structure::Signature' )
+        || [] } ) {
+
+        foreach my $expr ( $sig->schildren() ) {
+            # The signature contains a PPI::Statement::Expression.
+            # Within the expression, the first symbol we encounter is a
+            # declaration. Subsequent symbols will be uses until the
+            # next comma. We don't need to record the uses, because they
+            # will be found when we scan the document for them.
+            my $declaration = 1;
+            foreach my $elem ( $expr->schildren() ) {
+                if ( $elem->isa( 'PPI::Token::Symbol' ) ) {
+                    if ( $declaration ) {
+                        $declaration = 0;   # No more until next comma
+                        length( $elem->content() ) > 1
+                            and $self->_record_symbol_definition(
+                            $elem, $elem->statement() );
+                    }
+                } elsif ( $elem->isa( 'PPI::Token::Operator' ) ) {
+                    $IS_COMMA{ $elem->content() }
+                        and $declaration = 1;
+                }
+            }
         }
     }
     return;
@@ -608,6 +649,24 @@ sub _is_allowed_computation {
 
         # We are presumed to be a subroutine call.
         my $content = $next_sib->content();
+        $self->{_allow_if_computed_by}{$content}
+            and return $content;
+
+        # We might be a static method call. This looks like
+        # bareword_1->bareword_2.
+        $next_sib = $next_sib->snext_sibling()
+            or return;
+        $next_sib->isa( 'PPI::Token::Operator' )
+            and $next_sib->content() eq $DEREF
+            or return;
+        $content .= $next_sib->content();
+
+        $next_sib = $next_sib->snext_sibling()
+            or return;
+        $next_sib->isa( 'PPI::Token::Word' )
+            or return;
+        $content .= $next_sib->content();
+
         $self->{_allow_if_computed_by}{$content}
             and return $content;
 
@@ -828,8 +887,6 @@ sub _returned_lexical {
         $self->_get_regexp_symbol_uses( $document );
 
         $self->_get_double_quotish_string_uses( $document );
-
-        $self->_get_subroutine_signature_uses( $document );
 
         return;
     }
@@ -1063,60 +1120,6 @@ sub _get_regexp_symbol_uses {
 
 #-----------------------------------------------------------------------------
 
-# Stolen shamelessly from OALDERS' App::perlimports::Include
-sub _get_subroutine_signature_uses {
-    my ( $self, $document ) = @_;
-
-    # FIXME as of PPI 1.272, signatures are parsed as prototypes.
-    foreach my $class ( qw{ PPI::Token::Prototype } ) {
-        foreach my $elem ( @{ $document->find( $class ) || [] } ) {
-            my $sig = $elem->content();
-
-            # Skip over things that might actually be prototypes. Some
-            # of them may actually be signatures, but if so they specify
-            # only ignored variables, or maybe magic variables like $_
-            # or @_.
-            $sig =~ m/ [[:alpha:]\d] /smx
-                or next;
-
-            # Strip leading and trailing parens. OALDERS' comments say
-            # that sometimes the trailing one is missing.
-            $sig =~ s/ \A \s* [(] \s* //smx;
-            $sig =~ s/ \s* [)] \s* \z //smx;
-
-            # Rewrite the signature as statements.
-            my @args;
-            foreach ( split / , /smx, $sig ) {
-                s/ \s+ \z //smx;
-                s/ \A \s+ //smx;
-                # Skip unused arguments, since we're not interested in
-                # their position in the argument list.
-                m/ \A [\$\@%] (?: \s* = | \z ) /smx
-                    and next;
-                # Ignore empty defaults.
-                s/ = \z //smx;
-                # FIXME there ought to be a 'my' in front, but because
-                # this policy has no way to find the uses of this
-                # variable it results in false positives. MAYBE I could
-                # fix this by calling _get_symbol_declarations() on
-                # $subdoc (in _element_to_ppi() so it only gets called
-                # once), but I don't think I want that in the same
-                # commit, or even the same release, as the bug fix.
-                push @args, "$_;";
-            }
-
-            my $subdoc = $self->_element_to_ppi( $elem, "@args" )
-                or next;
-
-            $self->_get_symbol_uses( $subdoc, $elem );
-        }
-    }
-
-    return;
-}
-
-#-----------------------------------------------------------------------------
-
 sub _get_violations {
     my ( $self ) = @_;
 
@@ -1314,67 +1317,6 @@ sub _location_is_in_right_hand_side_of_assignment {
 
 # END OF CODE THAT ABSOLUTELY SHOULD NOT BE HERE
 
-#-----------------------------------------------------------------------------
-
-# Cribbed shamelessly from PPIx::Regexp::Token::Code->ppi().
-# FIXME duplicate code should be consolidated somewhere, but I don't
-# know where. Maybe in the above scope code, since that's what I'm
-# trying to solve.
-sub _element_to_ppi {
-    my ( $self, $elem, $content ) = @_;
-
-    exists $self->{$PACKAGE}{sub_document}{ refaddr( $elem ) }
-        and return $self->{$PACKAGE}{sub_document}{ refaddr( $elem ) };
-
-    defined $content
-        or $content = $self->content();
-
-    my $doc_content;
-
-    my $location = $elem->location();
-    if ( $location ) {
-        my $fn;
-        if( defined( $fn = $location->[LOCATION_LOGICAL_FILE] ) ) {
-            $fn =~ s/ (?= [\\"] ) /\\/smxg;
-            $doc_content = qq{#line $location->[LOCATION_LOGICAL_LINE] "$fn"\n};
-        } else {
-            $doc_content = qq{#line $location->[LOCATION_LOGICAL_LINE]\n};
-        }
-        $doc_content .= q< > x ( $location->[LOCATION_COLUMN] - 1 );
-    }
-
-    $doc_content .= $content;
-
-    my $doc = PPI::Document->new( \$doc_content );
-
-    if ( $location ) {
-        # Generate locations now.
-        $doc->location();
-        # Remove the stuff we originally injected. NOTE that we can
-        # only get away with doing this if the removal does not
-        # invalidate the locations of the other tokens that we just
-        # generated.
-        my $annotation;
-        # Remove the '#line' directive if we find it
-        $annotation = $doc->child( 0 )
-            and $annotation->isa( 'PPI::Token::Comment' )
-            and $annotation->content() =~ m/ \A \#line\b /smx
-            and $annotation->remove();
-        # Remove the white space if we find it, and if it in fact
-        # represents only the white space we injected to get the
-        # column numbers right.
-        my $wid = $location->[LOCATION_COLUMN] - 1;
-        $wid
-            and $annotation = $doc->child( 0 )
-            and $annotation->isa( 'PPI::Token::Whitespace' )
-            and $wid == length $annotation->content()
-            and $annotation->remove();
-    }
-
-    $self->{$PACKAGE}{parent_element}{ refaddr( $doc ) } = $elem;
-    return ( $self->{$PACKAGE}{sub_document}{ refaddr( $elem ) } = $doc );
-}
-
 1;
 
 __END__
@@ -1516,8 +1458,22 @@ these, you can add a block like this to your F<.perlcriticrc> file:
     allow_if_computed_by = stat unpack Scope::Guard
 
 This property takes as its value a whitespace-delimited list of class or
-subroutine names. Nothing complex is done to implement this -- the
-policy simply looks at the first word after the equals sign, if any.
+subroutine names.
+
+As of version 0.115, static method calls are recognized; that is, you
+can specify C<< Class->method >> to C<allow_if_computed_by>.
+
+Nothing complex is done to implement this. the policy simply looks for
+the first equals sign, and allows the otherwise-unused variable if the
+equals sign is followed by:
+
+=over
+
+=item A symbol followed by a dereference and a bareword (e.g. C<< $foo->bar >>;
+
+=item A bareword, possibly followed by a dereference and a bareword (e.g. C<foo> or C<< foo->bar >>).
+
+=back
 
 =head2 allow_state_in_expression
 
@@ -1625,7 +1581,7 @@ look like
     #     0     1     2     3     4    5
     my (undef,undef,undef,$mday,$mon,$year) = localtime();
 
-=head2 Slice the Right-Hand Side
+=head3 Slice the Right-Hand Side
 
 The unwanted values can also be eliminated by slicing the right-hand
 side of the assignment. This looks like
@@ -1637,6 +1593,21 @@ or, if you prefer,
 
     #     3     4    5
     my ($mday,$mon,$year) = ( localtime() )[ 3, 4, 5 ];
+
+=head2 Subroutine Signatures
+
+Subroutine signatures are available via C<use feature 'signatures';>
+beginning with Perl 5.20, or via C<use v5.36;> beginning with that
+version.
+
+Unused variables in signatures are specified by just giving the sigil
+for the argument. For example,
+
+    sub hi ( $, $who='world', @ ) {
+        say "Hello, $who";
+    }
+
+takes at least two arguments, but only makes use of the second one.
 
 =head1 SUPPORT
 
@@ -1651,7 +1622,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2012-2022 Thomas R. Wyant, III
+Copyright (C) 2012-2022, 2024-2025 Thomas R. Wyant, III
 
 =head1 LICENSE
 

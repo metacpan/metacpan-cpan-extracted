@@ -1,5 +1,8 @@
 Revision history for RT-Extension-SwitchUsers
 
+0.08 2025-01-15
+ - Add the missing acl.Pg to fix permission issue of new table
+
 0.07 2023-12-15
   - Skip ACL on Creator/LastUpdatedBy check in SwitchUsers. Allows additional
     transaction recording to succeed without error when SwitchUsers is utilized.

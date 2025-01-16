@@ -1,3 +1,9 @@
+0.115		2025-01-15	T. R. Wyant
+    Re-implement signatures in terms of PPI::Structure::Signature. This
+    requires PPI 1.281 or above.
+
+    Allow static method calls in allow_if_computed_by.
+
 0.114		2022-03-09	T. R. Wyant
     Clarify POD for prohibit_returned_lexicals to make clear (I hope)
     that it applies to 'state' varables as well as 'my' variables, but

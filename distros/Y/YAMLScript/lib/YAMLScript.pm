@@ -1,4 +1,4 @@
-# Copyright 2023-2024 Ingy dot Net
+# Copyright 2023-2025 Ingy dot Net
 # This code is licensed under MIT license (See License for details)
 
 use strict;
@@ -10,7 +10,7 @@ use FFI::CheckLib ();
 use FFI::Platypus;
 use Cpanel::JSON::XS ();
 
-our $VERSION = '0.1.87';
+our $VERSION = '0.1.88';
 
 our $libyamlscript_version = $VERSION;
 

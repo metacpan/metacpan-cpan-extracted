@@ -24,7 +24,7 @@ my %WriteMakefileArgs = (
     "Clone" => 0,
     "Crypt::JWT" => 0,
     "Data::UUID" => 0,
-    "List::MoreUtils" => 0,
+    "List::MoreUtils" => "0.423",
     "List::Util" => 0,
     "Module::Load" => 0,
     "Mojolicious" => 0,
@@ -56,7 +56,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::WWW::Mechanize::Catalyst::WithContext" => "0.03"
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.04",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -80,7 +80,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "List::MoreUtils" => 0,
+  "List::MoreUtils" => "0.423",
   "List::Util" => 0,
   "Log::Any" => 0,
   "Log::Any::Test" => 0,

@@ -4,7 +4,7 @@
       "Grant Street Group <developers@grantstreet.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -77,11 +77,11 @@
    "provides" : {
       "DBIx::BatchChunker" : {
          "file" : "lib/DBIx/BatchChunker.pm",
-         "version" : "v1.0.1"
+         "version" : "v1.0.2"
       },
       "DBIx::BatchChunker::LoopState" : {
          "file" : "lib/DBIx/BatchChunker/LoopState.pm",
-         "version" : "v1.0.1"
+         "version" : "v1.0.2"
       }
    },
    "release_status" : "stable",
@@ -95,8 +95,8 @@
          "web" : "https://github.com/GrantStreetGroup/DBIx-BatchChunker"
       }
    },
-   "version" : "v1.0.1",
-   "x_generated_by_perl" : "v5.20.1",
+   "version" : "v1.0.2",
+   "x_generated_by_perl" : "v5.36.1",
    "x_serialization_backend" : "JSON::XS version 4.03",
    "x_spdx_expression" : "Artistic-2.0",
    "x_static_install" : 1

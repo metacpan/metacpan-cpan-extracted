@@ -3,7 +3,7 @@ package DBIx::BatchChunker::LoopState;
 our $AUTHORITY = 'cpan:GSG';
 # ABSTRACT: Loop state object for DBIx::BatchChunker
 use version;
-our $VERSION = 'v1.0.1'; # VERSION
+our $VERSION = 'v1.0.2'; # VERSION
 
 use Moo;
 use MooX::StrictConstructor;
@@ -144,13 +144,15 @@ has end => (
 #pod Last "processed" value of L</end>.  This also includes skipped blocks.  Used in L</start>
 #pod calculations and to determine if the end of the loop has been reached.
 #pod
+#pod Initially C<undef>, if no blocks have been processed yet.
+#pod
 #pod =cut
 
 has prev_end => (
     is       => 'rw',
-    isa      => UnsignedInt,
+    isa      => Maybe[UnsignedInt],
     lazy     => 1,
-    default  => sub { shift->start - 1 },
+    default  => undef,
 );
 
 #pod =head2 last_range
@@ -338,7 +340,7 @@ DBIx::BatchChunker::LoopState - Loop state object for DBIx::BatchChunker
 
 =head1 VERSION
 
-version v1.0.1
+version v1.0.2
 
 =head1 SYNOPSIS
 
@@ -403,6 +405,8 @@ beginning of the loop.
 Last "processed" value of L</end>.  This also includes skipped blocks.  Used in L</start>
 calculations and to determine if the end of the loop has been reached.
 
+Initially C<undef>, if no blocks have been processed yet.
+
 =head2 last_range
 
 A hashref of min/max values used for the bisecting of one block, measured in chunk
@@ -454,7 +458,7 @@ Grant Street Group <developers@grantstreet.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 - 2023 by Grant Street Group.
+This software is Copyright (c) 2018 - 2025 by Grant Street Group.
 
 This is free software, licensed under:
 

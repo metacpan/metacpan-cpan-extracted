@@ -3,7 +3,9 @@ NAME
 
 DESCRIPTION
     This extension provides a way to switch current logged in user to others
-    defined in user custom field "Switch Users Accounts".
+    defined in user custom field "Switch Users Accounts", which contains a
+    list of user names (one name per line) that can be modified on admin
+    user or "About me" pages.
 
 RT VERSION
     Works with RT 5
@@ -53,7 +55,7 @@ BUGS
     or via the web at
         http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-SwitchUsers
 LICENSE AND COPYRIGHT
-    This software is Copyright (c) 2018-2023 by Best Practical Solutions,
+    This software is Copyright (c) 2018-2025 by Best Practical Solutions,
     LLC
 
     This is free software, licensed under:

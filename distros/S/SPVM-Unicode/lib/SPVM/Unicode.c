@@ -3,12 +3,11 @@
 
 #include "spvm_native.h"
 
-#include "spvm_utf8proc.h"
+#include "SPVM__Unicode__utf8proc.h"
 
 const char* MFILE = "SPVM/Unicode.c";
 
 int32_t SPVM__Unicode__uchar(SPVM_ENV* env, SPVM_VALUE* stack) {
-  (void)env;
   
   void* obj_str = stack[0].oval;
   
@@ -17,14 +16,18 @@ int32_t SPVM__Unicode__uchar(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t* offset_ref = stack[1].iref;
   
+  if (!offset_ref) {
+    return env->die(env, stack, "The reference of the offset $offset_ref must be defined.");
+  }
+  
   if (*offset_ref < 0 || *offset_ref > str_len - 1) {
     stack[0].ival = -1;
     return 0;
   }
   
-  spvm_utf8proc_int32_t dst;
-  int32_t uchar_len = (int32_t)spvm_utf8proc_iterate((const spvm_utf8proc_uint8_t*)(str + *offset_ref), str_len, &dst);
-
+  SPVM__Unicode__utf8proc_int32_t dst;
+  int32_t uchar_len = (int32_t)SPVM__Unicode__utf8proc_iterate((const SPVM__Unicode__utf8proc_uint8_t*)(str + *offset_ref), str_len, &dst);
+  
   int32_t uchar;
   if (uchar_len > 0) {
     uchar = dst;
@@ -43,12 +46,11 @@ int32_t SPVM__Unicode__uchar(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPVM__Unicode__uchar_to_utf8(SPVM_ENV* env, SPVM_VALUE* stack) {
-  (void)env;
   
   int32_t uchar = stack[0].ival;
   
   char tmp_utf8_bytes[4];
-  int32_t utf8_len = (int32_t)spvm_utf8proc_encode_char((spvm_utf8proc_int32_t)uchar, (spvm_utf8proc_uint8_t*)tmp_utf8_bytes);
+  int32_t utf8_len = (int32_t)SPVM__Unicode__utf8proc_encode_char((SPVM__Unicode__utf8proc_int32_t)uchar, (SPVM__Unicode__utf8proc_uint8_t*)tmp_utf8_bytes);
   
   if (utf8_len == 0) {
     stack[0].oval = NULL;

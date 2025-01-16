@@ -228,7 +228,10 @@ static int parse(pTHX_
     lex_read_space(0);
 
     if(require_parts & XS_PARSE_SUBLIKE_PART_SIGNATURE) {
-#if HAVE_PERL_VERSION(5, 32, 0)
+#if HAVE_PERL_VERSION(5, 41, 8)
+      SAVEFEATUREBITS();
+      PL_compiling.cop_features.bits[FEATURE_SIGNATURES_INDEX] |= FEATURE_SIGNATURES_BIT;
+#elif HAVE_PERL_VERSION(5, 32, 0)
       SAVEI32(PL_compiling.cop_features);
       PL_compiling.cop_features |= FEATURE_SIGNATURES_BIT;
 #else

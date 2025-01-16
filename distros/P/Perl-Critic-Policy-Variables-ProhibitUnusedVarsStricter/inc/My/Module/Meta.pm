@@ -7,7 +7,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = '0.114';
+our $VERSION = '0.115';
 
 sub new {
     my ( $class ) = @_;
@@ -35,7 +35,7 @@ sub build_requires {
     return +{
         'Carp'      => 0,
 	'Perl::Critic::TestUtils'	=> 0,
-	'PPI::Document'			=> 0,
+	'PPI::Document'		    => 1.281,	# For PPI::Structure::Signature
 	'Test::More'	=> 0.88,	# for done_testing();
         'Test::Perl::Critic::Policy'    => 0,
         lib         => 0,
@@ -153,7 +153,7 @@ sub requires {
 	'Perl::Critic::Exception::Fatal::PolicyDefinition' => 1.119,
         'Perl::Critic::Policy'      => 1.119,
         'Perl::Critic::Utils'       => 1.119,
-	'PPI::Document'		    => 0,
+	'PPI::Document'		    => 1.281,	# For PPI::Structure::Signature
 	# 'PPI::Token::Symbol'        => 0,
         'PPIx::QuoteLike'           => 0.011,   # For full scope inside ""
 	'PPIx::QuoteLike::Constant' => 0.011,
@@ -269,7 +269,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2013-2022 by Thomas R. Wyant, III
+Copyright (C) 2013-2022, 2024-2025 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

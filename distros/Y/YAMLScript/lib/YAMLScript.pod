@@ -134,7 +134,7 @@ See L<https://github.com/yaml/yamlscript?#installing-yamlscript|https://github.c
 
 =head2 LICENSE & COPYRIGHT
 
-Copyright 2022-2024 Ingy döt Net L<ingy@ingy.net|mailto:ingy@ingy.net>
+Copyright 2022-2025 Ingy döt Net L<ingy@ingy.net|mailto:ingy@ingy.net>
 
 This project is licensed under the terms of the C<MIT> license. See L<LICENSE|https://github.com/yaml/yamlscript/blob/main/License> for more details.
 

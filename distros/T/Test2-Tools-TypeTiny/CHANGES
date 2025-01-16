@@ -1,0 +1,7 @@
+Changelog for Test2-Tools-TypeTiny
+
+v0.90.0 2025-01-15T22:08:27
+ - Update LICENSE / README (Brendan Byrd)
+ - Pull request #1: SM-5283 (Brendan Byrd)
+ - Create Test2::Tools::TypeTiny (Brendan Byrd)
+ - Initial commit (Brendan Byrd)

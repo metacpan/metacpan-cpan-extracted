@@ -4,7 +4,7 @@ author:
   - 'Thomas R. Wyant, III (wyant at cpan dot org)'
 build_requires:
   Carp: '0'
-  PPI::Document: '0'
+  PPI::Document: '1.281'
   Perl::Critic::TestUtils: '0'
   Test::More: '0.88'
   Test::Perl::Critic::Policy: '0'
@@ -14,7 +14,7 @@ configure_requires:
   strict: '0'
   warnings: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,10 +32,10 @@ no_index:
 provides:
   Perl::Critic::Policy::Variables::ProhibitUnusedVarsStricter:
     file: lib/Perl/Critic/Policy/Variables/ProhibitUnusedVarsStricter.pm
-    version: '0.114'
+    version: '0.115'
 requires:
   English: '0'
-  PPI::Document: '0'
+  PPI::Document: '1.281'
   PPIx::QuoteLike: '0.011'
   PPIx::QuoteLike::Constant: '0.011'
   PPIx::Regexp: '0.071'
@@ -53,5 +53,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perl-Critic-Policy-Variables-ProhibitUnusedVarsStricter
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-Perl-Critic-Policy-Variables-ProhibitUnusedVarsStricter.git
-version: '0.114'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '0.115'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

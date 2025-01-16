@@ -5,7 +5,7 @@ use 5.006001;
 use strict;
 use warnings;
 
-use PPI::Document;
+use PPI::Document 1.281;
 use Perl::Critic::Utils qw{ is_function_call is_method_call };
 use Test::More 0.88;	# Because of done_testing();
 
@@ -20,15 +20,19 @@ EOD
 
 open my $fh, '<:encoding(utf-8)', 'MANIFEST'
     or plan skip_all => "Unable to open MANIFEST: $!";
-while ( <$fh> ) {
-    chomp;
-    s/ \t .* //smx;
-    m| \A lib/ .* \.pm \z |smx
-	or next;
-    require_wrapper( $_,
-	ppi	=> '_get_derived_ppi_document',
-	parent	=> '_get_parent_element,_element_is_in_lexical_scope_after_statement_containing',
-    );
+{
+    local $_ = undef;	# while (<>) ... does not localize $_.
+
+    while ( <$fh> ) {
+	chomp;
+	s/ \t .* //smx;
+	m| \A lib/ .* \.pm \z |smx
+	    or next;
+	require_wrapper( $_,
+	    ppi	=> '_get_derived_ppi_document',
+	    parent	=> '_get_parent_element,_element_is_in_lexical_scope_after_statement_containing',
+	);
+    }
 }
 
 sub require_wrapper {

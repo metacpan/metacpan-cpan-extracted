@@ -1,8 +1,8 @@
 /* 
-  This file is original utf8proc_data.c. To use utf8proc in SPVM, the symbol "utf8proc", "UTF8PROC" is renamed to "spvm_utf8proc", "SPVM_UTF8PROC"
+  This file is original utf8proc_data.c. To use utf8proc in SPVM, the symbol "utf8proc", "UTF8PROC" is renamed to "SPVM__Unicode__utf8proc", "SPVM_UTF8PROC"
 */
 
-const spvm_utf8proc_uint16_t spvm_utf8proc_sequences[] = {
+const SPVM__Unicode__utf8proc_uint16_t SPVM__Unicode__utf8proc_sequences[] = {
   97, 98, 99, 100, 101, 102, 103, 
   104, 105, 106, 107, 108, 109, 110, 111, 
   112, 113, 114, 115, 116, 117, 118, 119, 
@@ -1208,7 +1208,7 @@ const spvm_utf8proc_uint16_t spvm_utf8proc_sequences[] = {
   56604, 55354, 56605, 55354, 56606, 55354, 56607, 55354, 
   56608, 55354, 56609, };
 
-const spvm_utf8proc_uint16_t spvm_utf8proc_stage1table[] = {
+const SPVM__Unicode__utf8proc_uint16_t SPVM__Unicode__utf8proc_stage1table[] = {
   0, 256, 512, 768, 1024, 1280, 1536, 
   1792, 2048, 2304, 2560, 2816, 3072, 3328, 3584, 
   3840, 4096, 4352, 4608, 4864, 5120, 5376, 5632, 
@@ -1755,7 +1755,7 @@ const spvm_utf8proc_uint16_t spvm_utf8proc_stage1table[] = {
   18432, 18432, 18432, 18432, 18432, 18432, 18432, 18432, 
   40960, };
 
-const spvm_utf8proc_uint16_t spvm_utf8proc_stage2table[] = {
+const SPVM__Unicode__utf8proc_uint16_t SPVM__Unicode__utf8proc_stage2table[] = {
   1, 2, 2, 2, 2, 2, 2, 
   2, 2, 3, 4, 3, 5, 6, 2, 
   2, 2, 2, 2, 2, 2, 2, 2, 
@@ -6910,7 +6910,7 @@ const spvm_utf8proc_uint16_t spvm_utf8proc_stage2table[] = {
   4086, 4086, 4086, 4086, 4086, 4086, 4086, 0, 
   0, };
 
-const spvm_utf8proc_property_t spvm_utf8proc_properties[] = {
+const SPVM__Unicode__utf8proc_property_t SPVM__Unicode__utf8proc_properties[] = {
   {0, 0, 0, 0, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX,  false,false,false,false, 1, 0, SPVM_UTF8PROC_BOUNDCLASS_OTHER},
   {SPVM_UTF8PROC_CATEGORY_CC, 0, SPVM_UTF8PROC_BIDI_CLASS_BN, 0, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, false, true, false, true, 0, 0, SPVM_UTF8PROC_BOUNDCLASS_CONTROL},
   {SPVM_UTF8PROC_CATEGORY_CC, 0, SPVM_UTF8PROC_BIDI_CLASS_BN, 0, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, false, false, false, true, 0, 0, SPVM_UTF8PROC_BOUNDCLASS_CONTROL},
@@ -13909,7 +13909,7 @@ const spvm_utf8proc_property_t spvm_utf8proc_properties[] = {
   {SPVM_UTF8PROC_CATEGORY_LO, 0, SPVM_UTF8PROC_BIDI_CLASS_L, 0, 8057, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, false, false, false, false, 2, 0, SPVM_UTF8PROC_BOUNDCLASS_OTHER},
 };
 
-const spvm_utf8proc_uint16_t spvm_utf8proc_combinations[] = {
+const SPVM__Unicode__utf8proc_uint16_t SPVM__Unicode__utf8proc_combinations[] = {
   0, 46, 192, 193, 194, 195, 196, 197, 0, 
   256, 258, 260, 550, 461, 0, 0, 512, 
   514, 0, 0, 0, 0, 0, 0, 0, 

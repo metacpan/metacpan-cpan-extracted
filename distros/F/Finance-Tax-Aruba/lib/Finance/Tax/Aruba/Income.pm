@@ -1,5 +1,5 @@
 package Finance::Tax::Aruba::Income;
-our $VERSION = '0.010';
+our $VERSION = '0.012';
 use warnings;
 use strict;
 
@@ -46,7 +46,7 @@ Finance::Tax::Aruba::Income - Income tax calculations for Aruba
 
 =head1 VERSION
 
-version 0.010
+version 0.012
 
 =head1 SYNOPSIS
 

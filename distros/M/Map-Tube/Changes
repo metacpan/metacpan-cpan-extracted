@@ -1,5 +1,8 @@
 Revision history for Map::Tube
 
+3.92  2025-01-15T21:50:00+00:00
+      - Documented new map Map::Tube::RheinRuhr by @gwselke.
+
 3.91  2025-01-10T19:45:00+00:00
       - Fixed regex quoting order as pointed out by @gwselke.
 

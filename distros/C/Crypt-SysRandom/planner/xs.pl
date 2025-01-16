@@ -6,6 +6,8 @@ use warnings;
 load_module('Dist::Build::XS');
 load_module('Dist::Build::XS::Conf');
 
+my $libraries;
+
 my @possibilities = (
 	[ 'getrandom in sys/random.h', 'SYS_RANDOM_GETRANDOM', [], <<EOF ],
 #include <sys/types.h>
@@ -72,6 +74,7 @@ EOF
 for my $possibility (@possibilities) {
 	my ($name, $define, $libs, $code) = @{ $possibility };
 	if (try_compile_run(source => $code, define => "HAVE_\U$define", libraries => $libs, quiet => 1)) {
+		$libraries = $libs;
 		print "Found $name\n";
 		last;
 	}
@@ -79,4 +82,6 @@ for my $possibility (@possibilities) {
 
 die "No suitable implementation found" unless defines() > 0;
 
-add_xs();
+add_xs(
+	libraries => $libraries,
+);

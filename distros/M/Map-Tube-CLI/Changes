@@ -1,5 +1,9 @@
 Revision history for Map::Tube::CLI
 
+0.80  Wed Jan 15 21:55:00 2025
+      - Added support for new map: Rhein/Ruhr.
+      - Upgraded dependency on Map::Tube v3.92.
+
 0.79  Sun Dec 15 09:55:00 2024
       - Handle debug and error together better.
 

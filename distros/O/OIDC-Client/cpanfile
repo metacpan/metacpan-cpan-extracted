@@ -8,7 +8,7 @@ requires 'Clone';
 requires 'Crypt::JWT';
 requires 'Data::UUID';
 requires 'List::Util';
-requires 'List::MoreUtils';
+requires 'List::MoreUtils', '0.423';
 requires 'Module::Load';
 requires 'Mojolicious';
 requires 'Moose';

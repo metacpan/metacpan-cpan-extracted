@@ -1,6 +1,6 @@
 package Map::Tube::CLI;
 
-$Map::Tube::CLI::VERSION   = '0.79';
+$Map::Tube::CLI::VERSION   = '0.80';
 $Map::Tube::CLI::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::CLI - Command Line Interface for Map::Tube::* map.
 
 =head1 VERSION
 
-Version 0.79
+Version 0.80
 
 =cut
 
@@ -204,6 +204,8 @@ sure you have the latest maps when you install.
 =item * L<Novosibirsk|Map::Tube::Novosibirsk>
 
 =item * L<Prague|Map::Tube::Prague>
+
+=item * L<RheinRuhr|Map::Tube::RheinRuhr>
 
 =item * L<Rome|Map::Tube::Rome>
 
@@ -584,6 +586,7 @@ sub _supported_maps {
         'NIZHNYNOVGOROD'  => 'Map::Tube::NizhnyNovgorod',
         'NOVOSIBIRSK'     => 'Map::Tube::Novosibirsk',
         'PRAGUE'          => 'Map::Tube::Prague',
+        'RHEINRUHR'       => 'Map::Tube::RheinRuhr',
         'ROME'            => 'Map::Tube::Rome',
         'SAINTPETERSBURG' => 'Map::Tube::SaintPetersburg',
         'SAMARA'          => 'Map::Tube::Samara',

@@ -1,5 +1,8 @@
 Changes for OIDC-Client distribution
 
+0.04 2025-01-15
+  - need v0.423 for List::MoreUtils
+
 0.03 2025-01-14
   - need v0.03 for Test::WWW::Mechanize::Catalyst::WithContext
   - fine tuning for the distribution builder

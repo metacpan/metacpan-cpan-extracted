@@ -1,5 +1,9 @@
 Revision history for ExtUtils-Builder
 
+0.014     2025-01-15 18:47:22+01:00 Europe/Brussels
+          - Use absolute paths inside run_dsl
+          - Remove tempdir in t/40-eumm-plan.t
+
 0.013     2024-10-06 15:44:28+02:00 Europe/Brussels
           - Add code/command/function helper functions to ExtUtils::Builder::Util
           - Add main_module helper to ExtUtils::Builder::MakeMaker

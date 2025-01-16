@@ -1,6 +1,13 @@
 Changelog for DBIx-BatchChunker
 
-v1.0.1 2023-03-30T22:01:34
+v1.0.2 2025-01-15T21:21:46
+ - Add a Track ID=0 row in the CDTest schema, to test out the fixed
+   scenario (Brendan Byrd)
+ - Update root files (Brendan Byrd)
+ - Account for PK ID=0, by setting prev_end to undef, instead of start-1
+   (Brendan Byrd)
+
+v1.0.1 2023-03-30T22:01:19
  - Update README / LICENSE / Makefile (Brendan Byrd)
  - xt & POD fixes (Brendan Byrd)
  - Pull request #12: SM-4113 (Brendan Byrd)
@@ -66,14 +73,6 @@ v0.940.1 2020-05-08T19:25:47
 
 v0.940.0 2019-08-06T22:24:54
  - No changes found
-
-0.94 2019-08-06T22:24:54
- - Fix attribute typo in SYNOPSIS (Brendan Byrd)
- - Update version date in CHANGES (Brendan Byrd)
- - SM-1858: Use MooX::StrictConstructor to prevent attribute misspellings
-   (Brendan Byrd)
- - SM-1828: Prep for new version 0.94 (Brendan Byrd)
- - SM-1828: Change boolean $rs calls to "defined $rs" (Brendan Byrd)
 
 0.93 2019-01-09T20:08:59
  - SM-1647: Prep for new version 0.93 (Brendan Byrd)

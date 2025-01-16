@@ -1,0 +1,72 @@
+Math::Symbolic::Custom::Factor
+==============================
+
+Provides method to_factored() through the Math::Symbolic module extension class. This method attempts to factorize a Math::Symbolic expression.
+
+use strict;
+use Math::Symbolic qw/:all/;
+use Math::Symbolic::Custom::Factor;
+
+# to_factored() returns the full expression as a product of factors
+# and an array ref to the factors themselves (so that multiplying them 
+# together and collecting up should produce the original expression).
+my ($factored, $factors) = parse_from_string("3*x + 12*y")->to_factored();
+# $factored and the factors in $factors->[] are Math::Symbolic expressions.
+print "Full expression: $factored\n";   # Full expression: (x + (4 * y)) * 3
+print "Factors: '", join(q{', '}, @{$factors}), "'\n\n";  # Factors: '3', 'x + (4 * y)'
+
+($factored, $factors) = parse_from_string("x^2 - 81")->to_factored();
+print "Full expression: $factored\n";   # Full expression: (9 + x) * (x - 9)
+print "Factors: '", join(q{', '}, @{$factors}), "'\n\n";  # Factors: 'x - 9', '9 + x'
+
+($factored, $factors) = parse_from_string("6*x^2 + 37*x + 6")->to_factored();
+print "Full expression: $factored\n";   # Full expression: (6 + x) * (1 + (6 * x))
+print "Factors: '", join(q{', '}, @{$factors}), "'\n\n";  # Factors: '6 + x', '1 + (6 * x)'
+
+($factored, $factors) = parse_from_string("y^4 - 5*y^3 - 5*y^2 + 23*y + 10")->to_factored();
+print "Full expression: $factored\n";   # Full expression: ((y - 5) * (((y ^ 2) - 1) - (2 * y))) * (2 + y)
+print "Factors: '", join(q{', '}, @{$factors}), "'\n\n";  # Factors: '2 + y', 'y - 5', '((y ^ 2) - 1) - (2 * y)'
+
+# This one does not factor (using the strategies in this module).
+# The original expression is returned (albeit re-arranged) and the number of entries in
+# @{$factors} is 1.
+($factored, $factors) = parse_from_string("x^2 + 2*x + 2")->to_factored();
+print "Full expression: $factored\n";   # Full expression: (2 + (2 * x)) + (x ^ 2)
+print "Factors: '", join(q{', '}, @{$factors}), "'\n";  # Factors: '(2 + (2 * x)) + (x ^ 2)'
+print "Did not factorize\n\n" if scalar(@{$factors}) == 1; # Did not factorize
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Math::Symbolic::Custom::Factor
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Math-Symbolic-Custom-Factor
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Math-Symbolic-Custom-Factor
+
+    Search CPAN
+        https://metacpan.org/release/Math-Symbolic-Custom-Factor
+
+
+LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2025 by Matt Johnson.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

@@ -28,7 +28,7 @@ my %opts = (
                 months=i
                 rate=f
                 from
-                year=s
+                year=i
                 yearly
             ),
             'as-np',
@@ -38,7 +38,6 @@ my %opts = (
             'pension-employer=f',
             'tax-free=f',
             'bonus=f',
-            'year=i',
             'fringe=f',
         );
     };
@@ -299,7 +298,7 @@ loon.pl - A salary cost calculator
 
 =head1 VERSION
 
-version 0.010
+version 0.012
 
 =head1 SYNOPSIS
 

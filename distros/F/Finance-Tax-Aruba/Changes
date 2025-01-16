@@ -10,6 +10,16 @@ TODO:
     * Add Profit tax
     * Add tourist levy
 
+0.012     2025-01-15 17:33:59Z
+
+
+    * Fix bug for 2023/2024 income tax rate of lowest tier
+
+0.011     2025-01-15 17:13:34Z
+
+    * Add 2025 support
+    * Fix small bug in loon.pl
+
 0.010     2024-10-15 21:35:02Z
 
     * Add 2024 support (same as 2023)

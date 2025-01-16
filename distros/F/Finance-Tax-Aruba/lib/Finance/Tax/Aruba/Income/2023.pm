@@ -1,5 +1,5 @@
 package Finance::Tax::Aruba::Income::2023;
-our $VERSION = '0.010';
+our $VERSION = '0.012';
 use Moose;
 use namespace::autoclean;
 
@@ -15,7 +15,7 @@ has '+taxfree_max' => (
 
 sub _build_tax_bracket {
     return [
-        { min => 0, max => 34930, fixed => 0, rate => 12 },
+        { min => 0, max => 34930, fixed => 0, rate => 10 },
         {
             min   => 34930,
             max   => 63904,
@@ -60,7 +60,7 @@ Finance::Tax::Aruba::Income::2023 - Income tax calculator for the year 2023
 
 =head1 VERSION
 
-version 0.010
+version 0.012
 
 =head1 SYNOPSIS
 

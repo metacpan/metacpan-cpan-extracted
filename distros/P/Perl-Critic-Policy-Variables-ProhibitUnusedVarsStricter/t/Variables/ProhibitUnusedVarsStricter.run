@@ -428,12 +428,20 @@ print { $fh } "Hello, sailor!\n";
 #-----------------------------------------------------------------------------
 
 ## name Can add to allowed computation list
-## parms { allow_if_computed_by => 'scope_watch' }
+## parms { allow_if_computed_by => 'scope_watch Static->method' }
 ## failures 0
 ## cut
 
 {
     my $foo = scope_watch();
+}
+
+{
+    my $bar = $foo->scope_watch();
+}
+
+{
+    my $baz = Static->method();
 }
 
 #-----------------------------------------------------------------------------
@@ -683,38 +691,40 @@ try {
 
 #-----------------------------------------------------------------------------
 
-## name Signatures (thanks to oalders)
+## name All signature variables used
 ## failures 0
 ## cut
 
-const my $THING => 99;
+use feature 'signatures';
 
-sub something ( $arg = $THING ) {
-    print "got $arg\n";
+sub hi ( $who ) { say "Hello, $who!" }
+
+#-----------------------------------------------------------------------------
+
+## name Signature with default
+## failures 0
+## cut
+
+use feature 'signatures';
+
+use Readonly;
+
+Readonly::Scalar my $WHO => 'world';
+
+sub hi ( $who = $WHO ) {
+    say "Hello, $who";
 }
 
 #-----------------------------------------------------------------------------
 
 ## name Signature with unused argument
 ## failures 1
-## TODO variable definitions in sub-documents not recognized
 ## cut
 
-const my $THING => 99;
+use feature 'signatures';
 
-sub something ( $arg = $THING ) {
-}
-
-#-----------------------------------------------------------------------------
-
-## name Signature with ignored arguments
-## failures 1
-## TODO variable definitions in sub-documents not recognized
-## cut
-
-const my $THING => 99;
-
-sub something ( $=, $arg = $THING, @ ) {
+sub hi ( $who ) {
+    say 'Hello, world!';
 }
 
 #-----------------------------------------------------------------------------

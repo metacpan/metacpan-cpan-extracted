@@ -6,13 +6,13 @@ use warnings;
 use Test::More 0.89;
 
 use Config;
+use Cwd qw/getcwd/;
 use File::Temp qw/tempdir/;
 use ExtUtils::Builder::Util 'get_perl';
 
-system $^X, '-e0' and plan(skip_all => 'Can\'t find perl');
+my $tempdir = tempdir(CLEANUP => 1, TEMPLATE => 'ExtUtilsBuilderXXXX');
 
-my $tempdir = tempdir();
-
+my $pwd = getcwd;
 chdir $tempdir;
 
 open my $mfpl, '>', 'Makefile.PL';
@@ -45,7 +45,7 @@ END
 
 close $mfpl;
 
-system $^X, 'Makefile.PL';
+system get_perl(), 'Makefile.PL';
 
 ok(-e 'Makefile', 'Makefile exists');
 
@@ -58,5 +58,7 @@ my $make = $ENV{MAKE} // $Config{make};
 system $make;
 ok(-e 'very_unlikely_name', "Unlikely file has been touched");
 ok(-e 'other_unlikely_name', "Unlikely file has been touched");
+
+chdir $pwd;
 
 done_testing;

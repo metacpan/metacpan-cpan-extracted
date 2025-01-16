@@ -60,8 +60,8 @@ subtest 'One->Many Processing' => sub {
 
     # Calculate
     ok($batch_chunker->calculate_ranges, 'calculate_ranges ok');
-    ok($batch_chunker->min_id,           'min_id ok');
-    ok($batch_chunker->max_id,           'max_id ok');
+    ok(defined $batch_chunker->min_id,   'min_id ok');
+    ok(defined $batch_chunker->max_id,   'max_id ok');
 
     # Process
 

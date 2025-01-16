@@ -21,5 +21,8 @@ t/test-data/002-empty.txt
 t/test-data/002-spaces-only.txt
 t/test-data/02-table-weird.txt
 t/test-data/02-table.txt
+
 xt/boilerplate.t
+xt/pod.t
+xt/pod-spell.t
 META.yml                                 Module meta-data (added by MakeMaker)

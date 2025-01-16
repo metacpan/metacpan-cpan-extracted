@@ -45,7 +45,7 @@ This L<Alien|https://metacpan.org/pod/Alien> module provides access to the libya
 
 =head2 COPYRIGHT AND LICENSE
 
-Copyright 2022-2024 by Ingy döt Net
+Copyright 2022-2025 by Ingy döt Net
 
 This is free software, licensed under:
 

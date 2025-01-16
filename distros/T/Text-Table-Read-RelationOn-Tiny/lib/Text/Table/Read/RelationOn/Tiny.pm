@@ -9,7 +9,7 @@ use Carp;
 
 # The following must be on the same line to ensure that $VERSION is read
 # correctly by PAUSE and installer tools. See docu of 'version'.
-use version 0.77; our $VERSION = version->declare("v2.3.1");
+use version 0.77; our $VERSION = version->declare("v2.3.3");
 
 
 sub new {
@@ -484,7 +484,7 @@ Text::Table::Read::RelationOn::Tiny - Read binary "relation on (over) a set" fro
 
 =head1 VERSION
 
-Version v2.3.1
+Version v2.3.3
 
 
 =head1 SYNOPSIS
@@ -534,7 +534,7 @@ but you cannot omit the upper left C<|> character.
 
 =item *
 
-The hotizontal rules are optional.
+The horizontal rules are optional.
 
 =item *
 
@@ -548,7 +548,7 @@ C<pedantic> with a true value.
 
 =item *
 
-If you have not specified a base set in the construcor call, the entries
+If you have not specified a base set in the constructor call, the entries
 (names) in the table header are the element names of the set. Of course, they
 must be unique. One of these names may be the empty string. Names my contain
 spaces or punctuation chars. The C<|>, of course, cannot be part of a name.
@@ -670,7 +670,7 @@ the elements independent from what elements are equivalent in your relation.
 =item C<ext>
 
 "External data". If this boolean option is true, then the array referenced by
-C<set> is not copied. Instead, the contructor uses directly the reference you
+C<set> is not copied. Instead, the constructor uses directly the reference you
 passed by C<set> and C<elems> will return this reference. This means, that you
 must specify C<set> if you set C<ext> to true.
 
@@ -739,9 +739,9 @@ checks are done:
 
 =over
 
-=item * Each row (incl. the header) must have a trailing C<|> character
+=item * Each row (including the header) must have a trailing C<|> character
 
-=item * C<|> characters (and C<+> characters of row seperators) must be aligned.
+=item * C<|> characters (and C<+> characters of row separators) must be aligned.
 
 =item * Row separators are also checked, but they are still optional.
 
@@ -818,7 +818,7 @@ In scalar context, the method returns simply the object.
 In list context, the method returns a list containing three references
 corresponding to the accessor methods C<matrix>, C<elems> and C<elem_ids>: the
 hash representing the incidence matrix, the element array and the element
-index (id) hash. Thus, wirting:
+index (id) hash. Thus, writing:
 
   my ($matrix, $elems, $elem_ids) = $obj->get($my_input);
 
@@ -848,61 +848,61 @@ Returns 1 (true) if you specified constructor argument C<set> when calling the
 constructor, otherwise it returns an empty string (false).
 
 
-=head3 C<elems [I<DUP>]>
+=head3 C<elems [I<C<DUP>>]>
 
 Returns a reference to the array of elements (names from the table's header
 line), or C<undef> if you did neither call C<get> for the current object nor
 specified option C<set> when calling the constructor. See description of
 C<get> and C<new>.
 
-If optinal scalar argument I<DUP> has a true value, then a reference to a
+If optional scalar argument I<C<DUP>> has a true value, then a reference to a
 clone of this array is returned. Default is false.
 
-B<Note>: Without passing a true value via I<DUP> this returns a reference to
+B<Note>: Without passing a true value via I<C<DUP>> this returns a reference to
 an internal member, so don't change the content in this case!
 
 
-=head3 C<elem_ids [I<DUP>]>
+=head3 C<elem_ids [I<C<DUP>>]>
 
 Returns a reference to a hash mapping elements to ids (indices in array
 returned by C<elems>), or C<undef> if you did neither call C<get> for the
 current object nor specified argument C<set> when calling the constructor.
 
-If optinal scalar argument I<DUP> has a true value, then a reference to a
+If optional scalar argument I<C<DUP>> has a true value, then a reference to a
 clone of this hash is returned. Default is false.
 
-B<Note>: Without passing a true value via I<DUP> this returns a reference to
+B<Note>: Without passing a true value via I<C<DUP>> this returns a reference to
 an internal member, so don't change the content in this case!
 
 
-=head3 C<tab_elems [I<DUP>]>
+=head3 C<tab_elems [I<C<DUP>>]>
 
 Returns a reference to a hash whose keys are the elements that may appear in
 the table. If you did not specify equivalent elements (see description of
 C<new>), then the contents of this hash is identical with C<elem_ids>.
 
-If optinal scalar argument I<DUP> has a true value, then a reference to a
+If optional scalar argument I<C<DUP>> has a true value, then a reference to a
 clone of this hash is returned. Default is false.
 
-B<Note>: Without passing a true value via I<DUP> this returns a reference to
+B<Note>: Without passing a true value via I<C<DUP>> this returns a reference to
 an internal member, so don't change the content in this case!
 
 
-=head3 C<eq_ids [I<DUP>]>
+=head3 C<eq_ids [I<C<DUP>>]>
 
 Returns a reference to a hash. If you specified equivalent elements (see
 description of C<new>), then the keys are the indices (see C<elem_ids> and
-C<elems>) of the representants and each value is an array of indices of the
-corresponding equivalent elements (without the representant).
+C<elems>) of the representatives and each value is an array of indices of the
+corresponding equivalent elements (without the representative).
 
 If you did not specify equivalent elements, the this method return C<undef>
 after the constructor call, but the first call to C<get> sets it to an empty
 hash.
 
-If optinal scalar argument I<DUP> has a true value, then a reference to a
+If optional scalar argument I<C<DUP>> has a true value, then a reference to a
 clone of this hash is returned. Default is false.
 
-B<Note>: Without passing a true value via I<DUP> this returns a reference to
+B<Note>: Without passing a true value via I<C<DUP>> this returns a reference to
 an internal member, so don't change the content in this case!
 
 
@@ -941,7 +941,7 @@ is returned. Default is false.
 
 =back
 
-B<Note>: Without setting I<dup> to true this returns a reference to an
+B<Note>: Without setting I<C<dup>> to true this returns a reference to an
 internal member, so don't change the content!
 
 
@@ -953,8 +953,8 @@ named argument C<bless> doing a job corresponding to the C<bless> argument of
 C<matrix>.
 
 B<Note>: Unlike C<matrix> the matrix returned by C<matrix_named> is not a data
-member and thus it is computed everytime you call this method. This also means
-that you can change the content of the returned matrix without damaging
+member and thus it is computed every time you call this method. This also
+means that you can change the content of the returned matrix without damaging
 anything.
 
 

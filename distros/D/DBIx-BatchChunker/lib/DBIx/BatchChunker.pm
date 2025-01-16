@@ -3,7 +3,7 @@ package DBIx::BatchChunker;
 our $AUTHORITY = 'cpan:GSG';
 # ABSTRACT: Run large database changes safely
 use version;
-our $VERSION = 'v1.0.1'; # VERSION
+our $VERSION = 'v1.0.2'; # VERSION
 
 use Moo;
 use MooX::StrictConstructor;
@@ -1178,16 +1178,27 @@ sub execute {
     }) );
 
     # Da loop
-    while ($ls->prev_end < $self->max_id || $ls->start) {
+    while (
+        !defined $ls->prev_end ||      # first chunk
+        defined  $ls->start    ||      # still in the middle of chunk resizing
+        $ls->prev_end < $self->max_id  # processed chunk, but still more to go
+    ) {
         $ls->multiplier_range($ls->multiplier_range + $ls->multiplier_step);
-        $ls->start           ($ls->prev_end + 1) unless defined $ls->start;   # this could be already set because of early 'next' calls
+
+        # this could be already set, if chunk resizing
+        $ls->start(
+            defined $ls->prev_end ? $ls->prev_end + 1 :
+            defined $ls->min_id   ? $ls->min_id       :
+            1
+        ) unless defined $ls->start;
+
         $ls->end(
             min(
                 $ls->start + ceil($ls->multiplier_range * $ls->chunk_size) - 1, # ceil, because multiplier_* could be fractional
                 $self->max_id,  # ensure we never exceed max_id
             )
         );
-        $ls->chunk_count     (undef);
+        $ls->chunk_count(undef);
 
         # Early loop exit because of maximum run time
         if ($self->max_runtime && time - $ls->total_timer > $self->max_runtime) {
@@ -1215,7 +1226,7 @@ sub execute {
     }
 
     # Re-set min_id and clear the loop state
-    $self->min_id( $ls->prev_end );
+    $self->min_id( $ls->prev_end ) if defined $ls->prev_end;
     $self->clear_loop_state;
 
     # Keep the finished time from the progress bar, in case there are other loops or output
@@ -1772,7 +1783,7 @@ DBIx::BatchChunker - Run large database changes safely
 
 =head1 VERSION
 
-version v1.0.1
+version v1.0.2
 
 =head1 SYNOPSIS
 
@@ -2404,7 +2415,7 @@ Grant Street Group <developers@grantstreet.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 - 2023 by Grant Street Group.
+This software is Copyright (c) 2018 - 2025 by Grant Street Group.
 
 This is free software, licensed under:
 

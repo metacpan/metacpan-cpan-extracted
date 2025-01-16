@@ -6,8 +6,8 @@ use Test::TestFinanceAW qw(:all);
 
 my @tests = (
     {
-        year    => 2024,
-        isa     => 'Finance::Tax::Aruba::Income::2023',
+        year    => 2025,
+        isa     => 'Finance::Tax::Aruba::Income::2025',
         income  => 1000,
         results => {
             taxfree_max => 30_000,
@@ -22,43 +22,43 @@ my @tests = (
 
             net_yearly_income => 10535.52,
             tax_fixed         => 0,
-            tax_rate          => 12,
+            tax_rate          => 0,
         },
     },
     {
-        year    => 2024,
-        isa     => 'Finance::Tax::Aruba::Income::2023',
+        year    => 2025,
+        isa     => 'Finance::Tax::Aruba::Income::2025',
         income  => 7000,
         results => {
             wervingskosten    => 1500,
             aov_yearly_income => 79980,
             azv_yearly_income => 79980,
 
-            tax_fixed => 3493,
+            tax_fixed => 0,
             tax_rate  => 21,
         },
     },
     {
-        year    => 2024,
-        isa     => 'Finance::Tax::Aruba::Income::2023',
+        year    => 2025,
+        isa     => 'Finance::Tax::Aruba::Income::2025',
         income  => 9000,
         results => {
-            tax_fixed => 9577.5,
+            tax_fixed => 6084.54,
             tax_rate  => 42,
         },
     },
     {
-        year    => 2024,
-        isa     => 'Finance::Tax::Aruba::Income::2023',
+        year    => 2025,
+        isa     => 'Finance::Tax::Aruba::Income::2025',
         income  => 15000,
         results => {
-            tax_fixed => 39659.20,
+            tax_fixed => 36166.20,
             tax_rate  => 52,
         },
     },
     {
-        year   => 2024,
-        isa    => 'Finance::Tax::Aruba::Income::2023',
+        year   => 2025,
+        isa    => 'Finance::Tax::Aruba::Income::2025',
         income => 7000,
         label  => "One child policy",
 
@@ -74,14 +74,14 @@ my @tests = (
             child_deductions  => 700,
             net_yearly_income => 74001.32,
 
-            tax_fixed => 3493,
+            tax_fixed => 0,
             tax_rate  => 21,
 
         },
     },
     {
-        year   => 2024,
-        isa    => 'Finance::Tax::Aruba::Income::2023',
+        year   => 2025,
+        isa    => 'Finance::Tax::Aruba::Income::2025',
         income => 7000,
         label  => "Test with all kinds of kids",
 
@@ -98,13 +98,13 @@ my @tests = (
             net_yearly_income => 63301.32,
 
             tax_fixed => 0,
-            tax_rate  => 12,
+            tax_rate  => 0,
 
         },
     },
     {
-        year              => 2023,
-        isa               => 'Finance::Tax::Aruba::Income::2023',
+        year              => 2025,
+        isa               => 'Finance::Tax::Aruba::Income::2025',
         income            => 6250,
         label             => "Test premiums paid by employer and no pension",
         fringe            => 40,
@@ -119,14 +119,14 @@ my @tests = (
             azv_percentage_employer => 10.5,
             aov_percentage_employer => 15.5,
 
-            tax_fixed => 3493,
+            tax_fixed => 0,
             tax_rate  => 21,
 
         },
     },
     {
-        year                  => 2024,
-        isa                   => 'Finance::Tax::Aruba::Income::2023',
+        year                  => 2025,
+        isa                   => 'Finance::Tax::Aruba::Income::2025',
         income                => 6250,
         label                 => "Pension 1% by employee",
         pension_employee_perc => 1,
@@ -135,14 +135,14 @@ my @tests = (
             wervingskosten        => 1500,
             pension_employer_perc => 5,
 
-            tax_fixed => 3493,
+            tax_fixed => 0,
             tax_rate  => 21,
 
         },
     },
     {
-        year   => 2024,
-        isa    => 'Finance::Tax::Aruba::Income::2023',
+        year   => 2025,
+        isa    => 'Finance::Tax::Aruba::Income::2025',
         income => 5000,
         label  => "Company cost test",
 
@@ -151,10 +151,10 @@ my @tests = (
 
         results => {
             tax_fixed        => 0,
-            tax_rate         => 12,
+            tax_rate         => 0,
             company_costs    => 78810,
-            government_costs => 18630,
-            social_costs     => 22230,
+            government_costs => 15210,
+            social_costs     => 18810,
         },
     },
 );

@@ -1,5 +1,5 @@
 /* 
-  This file is original utf8proc.c. To use utf8proc in SPVM, the symbol "utf8proc", "UTF8PROC" is renamed to "spvm_utf8proc", "SPVM_UTF8PROC"
+  This file is original utf8proc.c. To use utf8proc in SPVM, the symbol "utf8proc", "UTF8PROC" is renamed to "SPVM__Unicode__utf8proc", "SPVM_UTF8PROC"
 */
 
 /* -*- mode: c; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*- */
@@ -26,7 +26,7 @@
  *  DEALINGS IN THE SOFTWARE.
  */
 
-#include "spvm_utf8proc.h"
+#include "SPVM__Unicode__utf8proc.h"
 
 /*
  *  This library contains derived data from a modified version of the
@@ -35,16 +35,16 @@
  *  The original data files are available at
  *  http://www.unicode.org/Public/UNIDATA/
  *
- *  Please notice the copyright statement in the file "spvm_utf8proc_data.c".
+ *  Please notice the copyright statement in the file "SPVM__Unicode__utf8proc_data.c".
  */
 
-#include "spvm_utf8proc_data.c"
+#include "SPVM__Unicode__utf8proc_data.c"
 
 /*
- *  File name:    spvm_utf8proc.c
+ *  File name:    SPVM__Unicode__utf8proc.c
  *
  *  Description:
- *  Implementation of libspvm_utf8proc.
+ *  Implementation of libSPVM__Unicode__utf8proc.
  */
 
 #ifndef SSIZE_MAX
@@ -54,7 +54,7 @@
 #  define UINT16_MAX 65535U
 #endif
 
-const spvm_utf8proc_int8_t spvm_utf8proc_utf8class[256] = {
+const SPVM__Unicode__utf8proc_int8_t SPVM__Unicode__utf8proc_utf8class[256] = {
   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -97,11 +97,11 @@ const spvm_utf8proc_int8_t spvm_utf8proc_utf8class[256] = {
    be different, being based on ABI compatibility.): */
 #define STRINGIZEx(x) #x
 #define STRINGIZE(x) STRINGIZEx(x)
-const char *spvm_utf8proc_version(void) {
+const char *SPVM__Unicode__utf8proc_version(void) {
   return STRINGIZE(SPVM_UTF8PROC_VERSION_MAJOR) "." STRINGIZE(SPVM_UTF8PROC_VERSION_MINOR) "." STRINGIZE(SPVM_UTF8PROC_VERSION_PATCH) "";
 }
 
-const char *spvm_utf8proc_errmsg(spvm_utf8proc_ssize_t errcode) {
+const char *SPVM__Unicode__utf8proc_errmsg(SPVM__Unicode__utf8proc_ssize_t errcode) {
   switch (errcode) {
     case SPVM_UTF8PROC_ERROR_NOMEM:
     return "Memory for processing UTF-8 data could not be allocated.";
@@ -119,11 +119,11 @@ const char *spvm_utf8proc_errmsg(spvm_utf8proc_ssize_t errcode) {
 }
 
 #define utf_cont(ch)  (((ch) & 0xc0) == 0x80)
-spvm_utf8proc_ssize_t spvm_utf8proc_iterate(
-  const spvm_utf8proc_uint8_t *str, spvm_utf8proc_ssize_t strlen, spvm_utf8proc_int32_t *dst
+SPVM__Unicode__utf8proc_ssize_t SPVM__Unicode__utf8proc_iterate(
+  const SPVM__Unicode__utf8proc_uint8_t *str, SPVM__Unicode__utf8proc_ssize_t strlen, SPVM__Unicode__utf8proc_int32_t *dst
 ) {
-  spvm_utf8proc_uint32_t uc;
-  const spvm_utf8proc_uint8_t *end;
+  SPVM__Unicode__utf8proc_uint32_t uc;
+  const SPVM__Unicode__utf8proc_uint8_t *end;
 
   *dst = -1;
   if (!strlen) return 0;
@@ -167,79 +167,79 @@ spvm_utf8proc_ssize_t spvm_utf8proc_iterate(
   return 4;
 }
 
-spvm_utf8proc_bool spvm_utf8proc_codepoint_valid(spvm_utf8proc_int32_t uc) {
-    return (((spvm_utf8proc_uint32_t)uc)-0xd800 > 0x07ff) && ((spvm_utf8proc_uint32_t)uc < 0x110000);
+SPVM__Unicode__utf8proc_bool SPVM__Unicode__utf8proc_codepoint_valid(SPVM__Unicode__utf8proc_int32_t uc) {
+    return (((SPVM__Unicode__utf8proc_uint32_t)uc)-0xd800 > 0x07ff) && ((SPVM__Unicode__utf8proc_uint32_t)uc < 0x110000);
 }
 
-spvm_utf8proc_ssize_t spvm_utf8proc_encode_char(spvm_utf8proc_int32_t uc, spvm_utf8proc_uint8_t *dst) {
+SPVM__Unicode__utf8proc_ssize_t SPVM__Unicode__utf8proc_encode_char(SPVM__Unicode__utf8proc_int32_t uc, SPVM__Unicode__utf8proc_uint8_t *dst) {
   if (uc < 0x00) {
     return 0;
   } else if (uc < 0x80) {
-    dst[0] = (spvm_utf8proc_uint8_t) uc;
+    dst[0] = (SPVM__Unicode__utf8proc_uint8_t) uc;
     return 1;
   } else if (uc < 0x800) {
-    dst[0] = (spvm_utf8proc_uint8_t)(0xC0 + (uc >> 6));
-    dst[1] = (spvm_utf8proc_uint8_t)(0x80 + (uc & 0x3F));
+    dst[0] = (SPVM__Unicode__utf8proc_uint8_t)(0xC0 + (uc >> 6));
+    dst[1] = (SPVM__Unicode__utf8proc_uint8_t)(0x80 + (uc & 0x3F));
     return 2;
   // Note: we allow encoding 0xd800-0xdfff here, so as not to change
   // the API, however, these are actually invalid in UTF-8
   } else if (uc < 0x10000) {
-    dst[0] = (spvm_utf8proc_uint8_t)(0xE0 + (uc >> 12));
-    dst[1] = (spvm_utf8proc_uint8_t)(0x80 + ((uc >> 6) & 0x3F));
-    dst[2] = (spvm_utf8proc_uint8_t)(0x80 + (uc & 0x3F));
+    dst[0] = (SPVM__Unicode__utf8proc_uint8_t)(0xE0 + (uc >> 12));
+    dst[1] = (SPVM__Unicode__utf8proc_uint8_t)(0x80 + ((uc >> 6) & 0x3F));
+    dst[2] = (SPVM__Unicode__utf8proc_uint8_t)(0x80 + (uc & 0x3F));
     return 3;
   } else if (uc < 0x110000) {
-    dst[0] = (spvm_utf8proc_uint8_t)(0xF0 + (uc >> 18));
-    dst[1] = (spvm_utf8proc_uint8_t)(0x80 + ((uc >> 12) & 0x3F));
-    dst[2] = (spvm_utf8proc_uint8_t)(0x80 + ((uc >> 6) & 0x3F));
-    dst[3] = (spvm_utf8proc_uint8_t)(0x80 + (uc & 0x3F));
+    dst[0] = (SPVM__Unicode__utf8proc_uint8_t)(0xF0 + (uc >> 18));
+    dst[1] = (SPVM__Unicode__utf8proc_uint8_t)(0x80 + ((uc >> 12) & 0x3F));
+    dst[2] = (SPVM__Unicode__utf8proc_uint8_t)(0x80 + ((uc >> 6) & 0x3F));
+    dst[3] = (SPVM__Unicode__utf8proc_uint8_t)(0x80 + (uc & 0x3F));
     return 4;
   } else return 0;
 }
 
 /* internal "unsafe" version that does not check whether uc is in range */
-spvm_utf8proc_ssize_t unsafe_encode_char(spvm_utf8proc_int32_t uc, spvm_utf8proc_uint8_t *dst) {
+SPVM__Unicode__utf8proc_ssize_t unsafe_encode_char(SPVM__Unicode__utf8proc_int32_t uc, SPVM__Unicode__utf8proc_uint8_t *dst) {
    if (uc < 0x00) {
       return 0;
    } else if (uc < 0x80) {
-      dst[0] = (spvm_utf8proc_uint8_t)uc;
+      dst[0] = (SPVM__Unicode__utf8proc_uint8_t)uc;
       return 1;
    } else if (uc < 0x800) {
-      dst[0] = (spvm_utf8proc_uint8_t)(0xC0 + (uc >> 6));
-      dst[1] = (spvm_utf8proc_uint8_t)(0x80 + (uc & 0x3F));
+      dst[0] = (SPVM__Unicode__utf8proc_uint8_t)(0xC0 + (uc >> 6));
+      dst[1] = (SPVM__Unicode__utf8proc_uint8_t)(0x80 + (uc & 0x3F));
       return 2;
    } else if (uc == 0xFFFF) {
-       dst[0] = (spvm_utf8proc_uint8_t)0xFF;
+       dst[0] = (SPVM__Unicode__utf8proc_uint8_t)0xFF;
        return 1;
    } else if (uc == 0xFFFE) {
-       dst[0] = (spvm_utf8proc_uint8_t)0xFE;
+       dst[0] = (SPVM__Unicode__utf8proc_uint8_t)0xFE;
        return 1;
    } else if (uc < 0x10000) {
-      dst[0] = (spvm_utf8proc_uint8_t)(0xE0 + (uc >> 12));
-      dst[1] = (spvm_utf8proc_uint8_t)(0x80 + ((uc >> 6) & 0x3F));
-      dst[2] = (spvm_utf8proc_uint8_t)(0x80 + (uc & 0x3F));
+      dst[0] = (SPVM__Unicode__utf8proc_uint8_t)(0xE0 + (uc >> 12));
+      dst[1] = (SPVM__Unicode__utf8proc_uint8_t)(0x80 + ((uc >> 6) & 0x3F));
+      dst[2] = (SPVM__Unicode__utf8proc_uint8_t)(0x80 + (uc & 0x3F));
       return 3;
    } else if (uc < 0x110000) {
-      dst[0] = (spvm_utf8proc_uint8_t)(0xF0 + (uc >> 18));
-      dst[1] = (spvm_utf8proc_uint8_t)(0x80 + ((uc >> 12) & 0x3F));
-      dst[2] = (spvm_utf8proc_uint8_t)(0x80 + ((uc >> 6) & 0x3F));
-      dst[3] = (spvm_utf8proc_uint8_t)(0x80 + (uc & 0x3F));
+      dst[0] = (SPVM__Unicode__utf8proc_uint8_t)(0xF0 + (uc >> 18));
+      dst[1] = (SPVM__Unicode__utf8proc_uint8_t)(0x80 + ((uc >> 12) & 0x3F));
+      dst[2] = (SPVM__Unicode__utf8proc_uint8_t)(0x80 + ((uc >> 6) & 0x3F));
+      dst[3] = (SPVM__Unicode__utf8proc_uint8_t)(0x80 + (uc & 0x3F));
       return 4;
    } else return 0;
 }
 
 /* internal "unsafe" version that does not check whether uc is in range */
-const spvm_utf8proc_property_t *unsafe_get_property(spvm_utf8proc_int32_t uc) {
+const SPVM__Unicode__utf8proc_property_t *unsafe_get_property(SPVM__Unicode__utf8proc_int32_t uc) {
   /* ASSERT: uc >= 0 && uc < 0x110000 */
-  return spvm_utf8proc_properties + (
-    spvm_utf8proc_stage2table[
-      spvm_utf8proc_stage1table[uc >> 8] + (uc & 0xFF)
+  return SPVM__Unicode__utf8proc_properties + (
+    SPVM__Unicode__utf8proc_stage2table[
+      SPVM__Unicode__utf8proc_stage1table[uc >> 8] + (uc & 0xFF)
     ]
   );
 }
 
-const spvm_utf8proc_property_t *spvm_utf8proc_get_property(spvm_utf8proc_int32_t uc) {
-  return uc < 0 || uc >= 0x110000 ? spvm_utf8proc_properties : unsafe_get_property(uc);
+const SPVM__Unicode__utf8proc_property_t *SPVM__Unicode__utf8proc_get_property(SPVM__Unicode__utf8proc_int32_t uc) {
+  return uc < 0 || uc >= 0x110000 ? SPVM__Unicode__utf8proc_properties : unsafe_get_property(uc);
 }
 
 /* return whether there is a grapheme break between boundclasses lbc and tbc
@@ -257,7 +257,7 @@ const spvm_utf8proc_property_t *spvm_utf8proc_get_property(spvm_utf8proc_int32_t
 
    See the special support in grapheme_break_extended, for required bookkeeping by the caller.
 */
-spvm_utf8proc_bool grapheme_break_simple(int lbc, int tbc) {
+SPVM__Unicode__utf8proc_bool grapheme_break_simple(int lbc, int tbc) {
   return
     (lbc == SPVM_UTF8PROC_BOUNDCLASS_START) ? true :       // GB1
     (lbc == SPVM_UTF8PROC_BOUNDCLASS_CR &&                 // GB3
@@ -287,11 +287,11 @@ spvm_utf8proc_bool grapheme_break_simple(int lbc, int tbc) {
     true; // GB999
 }
 
-spvm_utf8proc_bool grapheme_break_extended(int lbc, int tbc, spvm_utf8proc_int32_t *state)
+SPVM__Unicode__utf8proc_bool grapheme_break_extended(int lbc, int tbc, SPVM__Unicode__utf8proc_int32_t *state)
 {
   int lbc_override = ((state && *state != SPVM_UTF8PROC_BOUNDCLASS_START)
                       ? *state : lbc);
-  spvm_utf8proc_bool break_permitted = grapheme_break_simple(lbc_override, tbc);
+  SPVM__Unicode__utf8proc_bool break_permitted = grapheme_break_simple(lbc_override, tbc);
   if (state) {
     // Special support for GB 12/13 made possible by GB999. After two RI
     // class codepoints we want to force a break. Do this by resetting the
@@ -315,23 +315,23 @@ spvm_utf8proc_bool grapheme_break_extended(int lbc, int tbc, spvm_utf8proc_int32
   return break_permitted;
 }
 
-spvm_utf8proc_bool spvm_utf8proc_grapheme_break_stateful(
-    spvm_utf8proc_int32_t c1, spvm_utf8proc_int32_t c2, spvm_utf8proc_int32_t *state) {
+SPVM__Unicode__utf8proc_bool SPVM__Unicode__utf8proc_grapheme_break_stateful(
+    SPVM__Unicode__utf8proc_int32_t c1, SPVM__Unicode__utf8proc_int32_t c2, SPVM__Unicode__utf8proc_int32_t *state) {
 
-  return grapheme_break_extended(spvm_utf8proc_get_property(c1)->boundclass,
-                                 spvm_utf8proc_get_property(c2)->boundclass,
+  return grapheme_break_extended(SPVM__Unicode__utf8proc_get_property(c1)->boundclass,
+                                 SPVM__Unicode__utf8proc_get_property(c2)->boundclass,
                                  state);
 }
 
 
-spvm_utf8proc_bool spvm_utf8proc_grapheme_break(
-    spvm_utf8proc_int32_t c1, spvm_utf8proc_int32_t c2) {
-  return spvm_utf8proc_grapheme_break_stateful(c1, c2, NULL);
+SPVM__Unicode__utf8proc_bool SPVM__Unicode__utf8proc_grapheme_break(
+    SPVM__Unicode__utf8proc_int32_t c1, SPVM__Unicode__utf8proc_int32_t c2) {
+  return SPVM__Unicode__utf8proc_grapheme_break_stateful(c1, c2, NULL);
 }
 
-spvm_utf8proc_int32_t seqindex_decode_entry(const spvm_utf8proc_uint16_t **entry)
+SPVM__Unicode__utf8proc_int32_t seqindex_decode_entry(const SPVM__Unicode__utf8proc_uint16_t **entry)
 {
-  spvm_utf8proc_int32_t entry_cp = **entry;
+  SPVM__Unicode__utf8proc_int32_t entry_cp = **entry;
   if ((entry_cp & 0xF800) == 0xD800) {
     *entry = *entry + 1;
     entry_cp = ((entry_cp & 0x03FF) << 10) | (**entry & 0x03FF);
@@ -340,24 +340,24 @@ spvm_utf8proc_int32_t seqindex_decode_entry(const spvm_utf8proc_uint16_t **entry
   return entry_cp;
 }
 
-spvm_utf8proc_int32_t seqindex_decode_index(const spvm_utf8proc_uint32_t seqindex)
+SPVM__Unicode__utf8proc_int32_t seqindex_decode_index(const SPVM__Unicode__utf8proc_uint32_t seqindex)
 {
-  const spvm_utf8proc_uint16_t *entry = &spvm_utf8proc_sequences[seqindex];
+  const SPVM__Unicode__utf8proc_uint16_t *entry = &SPVM__Unicode__utf8proc_sequences[seqindex];
   return seqindex_decode_entry(&entry);
 }
 
-spvm_utf8proc_ssize_t seqindex_write_char_decomposed(spvm_utf8proc_uint16_t seqindex, spvm_utf8proc_int32_t *dst, spvm_utf8proc_ssize_t bufsize, spvm_utf8proc_option_t options, int *last_boundclass) {
-  spvm_utf8proc_ssize_t written = 0;
-  const spvm_utf8proc_uint16_t *entry = &spvm_utf8proc_sequences[seqindex & 0x1FFF];
+SPVM__Unicode__utf8proc_ssize_t seqindex_write_char_decomposed(SPVM__Unicode__utf8proc_uint16_t seqindex, SPVM__Unicode__utf8proc_int32_t *dst, SPVM__Unicode__utf8proc_ssize_t bufsize, SPVM__Unicode__utf8proc_option_t options, int *last_boundclass) {
+  SPVM__Unicode__utf8proc_ssize_t written = 0;
+  const SPVM__Unicode__utf8proc_uint16_t *entry = &SPVM__Unicode__utf8proc_sequences[seqindex & 0x1FFF];
   int len = seqindex >> 13;
   if (len >= 7) {
     len = *entry;
     entry++;
   }
   for (; len >= 0; entry++, len--) {
-    spvm_utf8proc_int32_t entry_cp = seqindex_decode_entry(&entry);
+    SPVM__Unicode__utf8proc_int32_t entry_cp = seqindex_decode_entry(&entry);
 
-    written += spvm_utf8proc_decompose_char(entry_cp, dst+written,
+    written += SPVM__Unicode__utf8proc_decompose_char(entry_cp, dst+written,
       (bufsize > written) ? (bufsize - written) : 0, options,
     last_boundclass);
     if (written < 0) return SPVM_UTF8PROC_ERROR_OVERFLOW;
@@ -365,56 +365,56 @@ spvm_utf8proc_ssize_t seqindex_write_char_decomposed(spvm_utf8proc_uint16_t seqi
   return written;
 }
 
-spvm_utf8proc_int32_t spvm_utf8proc_tolower(spvm_utf8proc_int32_t c)
+SPVM__Unicode__utf8proc_int32_t SPVM__Unicode__utf8proc_tolower(SPVM__Unicode__utf8proc_int32_t c)
 {
-  spvm_utf8proc_int32_t cl = spvm_utf8proc_get_property(c)->lowercase_seqindex;
+  SPVM__Unicode__utf8proc_int32_t cl = SPVM__Unicode__utf8proc_get_property(c)->lowercase_seqindex;
   return cl != UINT16_MAX ? seqindex_decode_index(cl) : c;
 }
 
-spvm_utf8proc_int32_t spvm_utf8proc_toupper(spvm_utf8proc_int32_t c)
+SPVM__Unicode__utf8proc_int32_t SPVM__Unicode__utf8proc_toupper(SPVM__Unicode__utf8proc_int32_t c)
 {
-  spvm_utf8proc_int32_t cu = spvm_utf8proc_get_property(c)->uppercase_seqindex;
+  SPVM__Unicode__utf8proc_int32_t cu = SPVM__Unicode__utf8proc_get_property(c)->uppercase_seqindex;
   return cu != UINT16_MAX ? seqindex_decode_index(cu) : c;
 }
 
-spvm_utf8proc_int32_t spvm_utf8proc_totitle(spvm_utf8proc_int32_t c)
+SPVM__Unicode__utf8proc_int32_t SPVM__Unicode__utf8proc_totitle(SPVM__Unicode__utf8proc_int32_t c)
 {
-  spvm_utf8proc_int32_t cu = spvm_utf8proc_get_property(c)->titlecase_seqindex;
+  SPVM__Unicode__utf8proc_int32_t cu = SPVM__Unicode__utf8proc_get_property(c)->titlecase_seqindex;
   return cu != UINT16_MAX ? seqindex_decode_index(cu) : c;
 }
 
 /* return a character width analogous to wcwidth (except runtime and
    hopefully less buggy than most system wcwidth functions). */
-int spvm_utf8proc_charwidth(spvm_utf8proc_int32_t c) {
-  return spvm_utf8proc_get_property(c)->charwidth;
+int SPVM__Unicode__utf8proc_charwidth(SPVM__Unicode__utf8proc_int32_t c) {
+  return SPVM__Unicode__utf8proc_get_property(c)->charwidth;
 }
 
-spvm_utf8proc_category_t spvm_utf8proc_category(spvm_utf8proc_int32_t c) {
-  return spvm_utf8proc_get_property(c)->category;
+SPVM__Unicode__utf8proc_category_t SPVM__Unicode__utf8proc_category(SPVM__Unicode__utf8proc_int32_t c) {
+  return SPVM__Unicode__utf8proc_get_property(c)->category;
 }
 
 /* Comment out to suppress warnings of SPVM Unicode module
-const char *spvm_utf8proc_category_string(spvm_utf8proc_int32_t c) {
+const char *SPVM__Unicode__utf8proc_category_string(SPVM__Unicode__utf8proc_int32_t c) {
   const char s[][3] = {"Cn","Lu","Ll","Lt","Lm","Lo","Mn","Mc","Me","Nd","Nl","No","Pc","Pd","Ps","Pe","Pi","Pf","Po","Sm","Sc","Sk","So","Zs","Zl","Zp","Cc","Cf","Cs","Co"};
-  return s[spvm_utf8proc_category(c)];
+  return s[SPVM__Unicode__utf8proc_category(c)];
 }
 */
 
-#define spvm_utf8proc_decompose_lump(replacement_uc) \
-  return spvm_utf8proc_decompose_char((replacement_uc), dst, bufsize, \
+#define SPVM__Unicode__utf8proc_decompose_lump(replacement_uc) \
+  return SPVM__Unicode__utf8proc_decompose_char((replacement_uc), dst, bufsize, \
   options & ~SPVM_UTF8PROC_LUMP, last_boundclass)
 
-spvm_utf8proc_ssize_t spvm_utf8proc_decompose_char(spvm_utf8proc_int32_t uc, spvm_utf8proc_int32_t *dst, spvm_utf8proc_ssize_t bufsize, spvm_utf8proc_option_t options, int *last_boundclass) {
-  const spvm_utf8proc_property_t *property;
-  spvm_utf8proc_propval_t category;
-  spvm_utf8proc_int32_t hangul_sindex;
+SPVM__Unicode__utf8proc_ssize_t SPVM__Unicode__utf8proc_decompose_char(SPVM__Unicode__utf8proc_int32_t uc, SPVM__Unicode__utf8proc_int32_t *dst, SPVM__Unicode__utf8proc_ssize_t bufsize, SPVM__Unicode__utf8proc_option_t options, int *last_boundclass) {
+  const SPVM__Unicode__utf8proc_property_t *property;
+  SPVM__Unicode__utf8proc_propval_t category;
+  SPVM__Unicode__utf8proc_int32_t hangul_sindex;
   if (uc < 0 || uc >= 0x110000) return SPVM_UTF8PROC_ERROR_NOTASSIGNED;
   property = unsafe_get_property(uc);
   category = property->category;
   hangul_sindex = uc - SPVM_UTF8PROC_HANGUL_SBASE;
   if (options & (SPVM_UTF8PROC_COMPOSE|SPVM_UTF8PROC_DECOMPOSE)) {
     if (hangul_sindex >= 0 && hangul_sindex < SPVM_UTF8PROC_HANGUL_SCOUNT) {
-      spvm_utf8proc_int32_t hangul_tindex;
+      SPVM__Unicode__utf8proc_int32_t hangul_tindex;
       if (bufsize >= 1) {
         dst[0] = SPVM_UTF8PROC_HANGUL_LBASE +
           hangul_sindex / SPVM_UTF8PROC_HANGUL_NCOUNT;
@@ -437,29 +437,29 @@ spvm_utf8proc_ssize_t spvm_utf8proc_decompose_char(spvm_utf8proc_int32_t uc, spv
     if (!category) return 0;
   }
   if (options & SPVM_UTF8PROC_LUMP) {
-    if (category == SPVM_UTF8PROC_CATEGORY_ZS) spvm_utf8proc_decompose_lump(0x0020);
+    if (category == SPVM_UTF8PROC_CATEGORY_ZS) SPVM__Unicode__utf8proc_decompose_lump(0x0020);
     if (uc == 0x2018 || uc == 0x2019 || uc == 0x02BC || uc == 0x02C8)
-      spvm_utf8proc_decompose_lump(0x0027);
+      SPVM__Unicode__utf8proc_decompose_lump(0x0027);
     if (category == SPVM_UTF8PROC_CATEGORY_PD || uc == 0x2212)
-      spvm_utf8proc_decompose_lump(0x002D);
-    if (uc == 0x2044 || uc == 0x2215) spvm_utf8proc_decompose_lump(0x002F);
-    if (uc == 0x2236) spvm_utf8proc_decompose_lump(0x003A);
+      SPVM__Unicode__utf8proc_decompose_lump(0x002D);
+    if (uc == 0x2044 || uc == 0x2215) SPVM__Unicode__utf8proc_decompose_lump(0x002F);
+    if (uc == 0x2236) SPVM__Unicode__utf8proc_decompose_lump(0x003A);
     if (uc == 0x2039 || uc == 0x2329 || uc == 0x3008)
-      spvm_utf8proc_decompose_lump(0x003C);
+      SPVM__Unicode__utf8proc_decompose_lump(0x003C);
     if (uc == 0x203A || uc == 0x232A || uc == 0x3009)
-      spvm_utf8proc_decompose_lump(0x003E);
-    if (uc == 0x2216) spvm_utf8proc_decompose_lump(0x005C);
+      SPVM__Unicode__utf8proc_decompose_lump(0x003E);
+    if (uc == 0x2216) SPVM__Unicode__utf8proc_decompose_lump(0x005C);
     if (uc == 0x02C4 || uc == 0x02C6 || uc == 0x2038 || uc == 0x2303)
-      spvm_utf8proc_decompose_lump(0x005E);
+      SPVM__Unicode__utf8proc_decompose_lump(0x005E);
     if (category == SPVM_UTF8PROC_CATEGORY_PC || uc == 0x02CD)
-      spvm_utf8proc_decompose_lump(0x005F);
-    if (uc == 0x02CB) spvm_utf8proc_decompose_lump(0x0060);
-    if (uc == 0x2223) spvm_utf8proc_decompose_lump(0x007C);
-    if (uc == 0x223C) spvm_utf8proc_decompose_lump(0x007E);
+      SPVM__Unicode__utf8proc_decompose_lump(0x005F);
+    if (uc == 0x02CB) SPVM__Unicode__utf8proc_decompose_lump(0x0060);
+    if (uc == 0x2223) SPVM__Unicode__utf8proc_decompose_lump(0x007C);
+    if (uc == 0x223C) SPVM__Unicode__utf8proc_decompose_lump(0x007E);
     if ((options & SPVM_UTF8PROC_NLF2LS) && (options & SPVM_UTF8PROC_NLF2PS)) {
       if (category == SPVM_UTF8PROC_CATEGORY_ZL ||
           category == SPVM_UTF8PROC_CATEGORY_ZP)
-        spvm_utf8proc_decompose_lump(0x000A);
+        SPVM__Unicode__utf8proc_decompose_lump(0x000A);
     }
   }
   if (options & SPVM_UTF8PROC_STRIPMARK) {
@@ -479,7 +479,7 @@ spvm_utf8proc_ssize_t spvm_utf8proc_decompose_char(spvm_utf8proc_int32_t uc, spv
     }
   }
   if (options & SPVM_UTF8PROC_CHARBOUND) {
-    spvm_utf8proc_bool boundary;
+    SPVM__Unicode__utf8proc_bool boundary;
     int tbc = property->boundclass;
     boundary = grapheme_break_extended(*last_boundclass, tbc, last_boundclass);
     if (boundary) {
@@ -492,33 +492,33 @@ spvm_utf8proc_ssize_t spvm_utf8proc_decompose_char(spvm_utf8proc_int32_t uc, spv
   return 1;
 }
 
-spvm_utf8proc_ssize_t spvm_utf8proc_decompose(
-  const spvm_utf8proc_uint8_t *str, spvm_utf8proc_ssize_t strlen,
-  spvm_utf8proc_int32_t *buffer, spvm_utf8proc_ssize_t bufsize, spvm_utf8proc_option_t options
+SPVM__Unicode__utf8proc_ssize_t SPVM__Unicode__utf8proc_decompose(
+  const SPVM__Unicode__utf8proc_uint8_t *str, SPVM__Unicode__utf8proc_ssize_t strlen,
+  SPVM__Unicode__utf8proc_int32_t *buffer, SPVM__Unicode__utf8proc_ssize_t bufsize, SPVM__Unicode__utf8proc_option_t options
 ) {
-    return spvm_utf8proc_decompose_custom(str, strlen, buffer, bufsize, options, NULL, NULL);
+    return SPVM__Unicode__utf8proc_decompose_custom(str, strlen, buffer, bufsize, options, NULL, NULL);
 }
 
-spvm_utf8proc_ssize_t spvm_utf8proc_decompose_custom(
-  const spvm_utf8proc_uint8_t *str, spvm_utf8proc_ssize_t strlen,
-  spvm_utf8proc_int32_t *buffer, spvm_utf8proc_ssize_t bufsize, spvm_utf8proc_option_t options,
-  spvm_utf8proc_custom_func custom_func, void *custom_data
+SPVM__Unicode__utf8proc_ssize_t SPVM__Unicode__utf8proc_decompose_custom(
+  const SPVM__Unicode__utf8proc_uint8_t *str, SPVM__Unicode__utf8proc_ssize_t strlen,
+  SPVM__Unicode__utf8proc_int32_t *buffer, SPVM__Unicode__utf8proc_ssize_t bufsize, SPVM__Unicode__utf8proc_option_t options,
+  SPVM__Unicode__utf8proc_custom_func custom_func, void *custom_data
 ) {
   /* strlen will be ignored, if SPVM_UTF8PROC_NULLTERM is set in options */
-  spvm_utf8proc_ssize_t wpos = 0;
+  SPVM__Unicode__utf8proc_ssize_t wpos = 0;
   if ((options & SPVM_UTF8PROC_COMPOSE) && (options & SPVM_UTF8PROC_DECOMPOSE))
     return SPVM_UTF8PROC_ERROR_INVALIDOPTS;
   if ((options & SPVM_UTF8PROC_STRIPMARK) &&
       !(options & SPVM_UTF8PROC_COMPOSE) && !(options & SPVM_UTF8PROC_DECOMPOSE))
     return SPVM_UTF8PROC_ERROR_INVALIDOPTS;
   {
-    spvm_utf8proc_int32_t uc;
-    spvm_utf8proc_ssize_t rpos = 0;
-    spvm_utf8proc_ssize_t decomp_result;
+    SPVM__Unicode__utf8proc_int32_t uc;
+    SPVM__Unicode__utf8proc_ssize_t rpos = 0;
+    SPVM__Unicode__utf8proc_ssize_t decomp_result;
     int boundclass = SPVM_UTF8PROC_BOUNDCLASS_START;
     while (1) {
       if (options & SPVM_UTF8PROC_NULLTERM) {
-        rpos += spvm_utf8proc_iterate(str + rpos, -1, &uc);
+        rpos += SPVM__Unicode__utf8proc_iterate(str + rpos, -1, &uc);
         /* checking of return value is not necessary,
            as 'uc' is < 0 in case of error */
         if (uc < 0) return SPVM_UTF8PROC_ERROR_INVALIDUTF8;
@@ -526,13 +526,13 @@ spvm_utf8proc_ssize_t spvm_utf8proc_decompose_custom(
         if (uc == 0) break;
       } else {
         if (rpos >= strlen) break;
-        rpos += spvm_utf8proc_iterate(str + rpos, strlen - rpos, &uc);
+        rpos += SPVM__Unicode__utf8proc_iterate(str + rpos, strlen - rpos, &uc);
         if (uc < 0) return SPVM_UTF8PROC_ERROR_INVALIDUTF8;
       }
       if (custom_func != NULL) {
         uc = custom_func(uc, custom_data);   /* user-specified custom mapping */
       }
-      decomp_result = spvm_utf8proc_decompose_char(
+      decomp_result = SPVM__Unicode__utf8proc_decompose_char(
         uc, buffer + wpos, (bufsize > wpos) ? (bufsize - wpos) : 0, options,
         &boundclass
       );
@@ -540,15 +540,15 @@ spvm_utf8proc_ssize_t spvm_utf8proc_decompose_custom(
       wpos += decomp_result;
       /* prohibiting integer overflows due to too long strings: */
       if (wpos < 0 ||
-          wpos > (spvm_utf8proc_ssize_t)(SSIZE_MAX/sizeof(spvm_utf8proc_int32_t)/2))
+          wpos > (SPVM__Unicode__utf8proc_ssize_t)(SSIZE_MAX/sizeof(SPVM__Unicode__utf8proc_int32_t)/2))
         return SPVM_UTF8PROC_ERROR_OVERFLOW;
     }
   }
   if ((options & (SPVM_UTF8PROC_COMPOSE|SPVM_UTF8PROC_DECOMPOSE)) && bufsize >= wpos) {
-    spvm_utf8proc_ssize_t pos = 0;
+    SPVM__Unicode__utf8proc_ssize_t pos = 0;
     while (pos < wpos-1) {
-      spvm_utf8proc_int32_t uc1, uc2;
-      const spvm_utf8proc_property_t *property1, *property2;
+      SPVM__Unicode__utf8proc_int32_t uc1, uc2;
+      const SPVM__Unicode__utf8proc_property_t *property1, *property2;
       uc1 = buffer[pos];
       uc2 = buffer[pos+1];
       property1 = unsafe_get_property(uc1);
@@ -566,12 +566,12 @@ spvm_utf8proc_ssize_t spvm_utf8proc_decompose_custom(
   return wpos;
 }
 
-spvm_utf8proc_ssize_t spvm_utf8proc_normalize_utf32(spvm_utf8proc_int32_t *buffer, spvm_utf8proc_ssize_t length, spvm_utf8proc_option_t options) {
+SPVM__Unicode__utf8proc_ssize_t SPVM__Unicode__utf8proc_normalize_utf32(SPVM__Unicode__utf8proc_int32_t *buffer, SPVM__Unicode__utf8proc_ssize_t length, SPVM__Unicode__utf8proc_option_t options) {
   /* SPVM_UTF8PROC_NULLTERM option will be ignored, 'length' is never ignored */
   if (options & (SPVM_UTF8PROC_NLF2LS | SPVM_UTF8PROC_NLF2PS | SPVM_UTF8PROC_STRIPCC)) {
-    spvm_utf8proc_ssize_t rpos;
-    spvm_utf8proc_ssize_t wpos = 0;
-    spvm_utf8proc_int32_t uc;
+    SPVM__Unicode__utf8proc_ssize_t rpos;
+    SPVM__Unicode__utf8proc_ssize_t wpos = 0;
+    SPVM__Unicode__utf8proc_int32_t uc;
     for (rpos = 0; rpos < length; rpos++) {
       uc = buffer[rpos];
       if (uc == 0x000D && rpos < length-1 && buffer[rpos+1] == 0x000A) rpos++;
@@ -600,23 +600,23 @@ spvm_utf8proc_ssize_t spvm_utf8proc_normalize_utf32(spvm_utf8proc_int32_t *buffe
     length = wpos;
   }
   if (options & SPVM_UTF8PROC_COMPOSE) {
-    spvm_utf8proc_int32_t *starter = NULL;
-    spvm_utf8proc_int32_t current_char;
-    const spvm_utf8proc_property_t *starter_property = NULL, *current_property;
-    spvm_utf8proc_propval_t max_combining_class = -1;
-    spvm_utf8proc_ssize_t rpos;
-    spvm_utf8proc_ssize_t wpos = 0;
-    spvm_utf8proc_int32_t composition;
+    SPVM__Unicode__utf8proc_int32_t *starter = NULL;
+    SPVM__Unicode__utf8proc_int32_t current_char;
+    const SPVM__Unicode__utf8proc_property_t *starter_property = NULL, *current_property;
+    SPVM__Unicode__utf8proc_propval_t max_combining_class = -1;
+    SPVM__Unicode__utf8proc_ssize_t rpos;
+    SPVM__Unicode__utf8proc_ssize_t wpos = 0;
+    SPVM__Unicode__utf8proc_int32_t composition;
     for (rpos = 0; rpos < length; rpos++) {
       current_char = buffer[rpos];
       current_property = unsafe_get_property(current_char);
       if (starter && current_property->combining_class > max_combining_class) {
         /* combination perhaps possible */
-        spvm_utf8proc_int32_t hangul_lindex;
-        spvm_utf8proc_int32_t hangul_sindex;
+        SPVM__Unicode__utf8proc_int32_t hangul_lindex;
+        SPVM__Unicode__utf8proc_int32_t hangul_sindex;
         hangul_lindex = *starter - SPVM_UTF8PROC_HANGUL_LBASE;
         if (hangul_lindex >= 0 && hangul_lindex < SPVM_UTF8PROC_HANGUL_LCOUNT) {
-          spvm_utf8proc_int32_t hangul_vindex;
+          SPVM__Unicode__utf8proc_int32_t hangul_vindex;
           hangul_vindex = current_char - SPVM_UTF8PROC_HANGUL_VBASE;
           if (hangul_vindex >= 0 && hangul_vindex < SPVM_UTF8PROC_HANGUL_VCOUNT) {
             *starter = SPVM_UTF8PROC_HANGUL_SBASE +
@@ -629,7 +629,7 @@ spvm_utf8proc_ssize_t spvm_utf8proc_normalize_utf32(spvm_utf8proc_int32_t *buffe
         hangul_sindex = *starter - SPVM_UTF8PROC_HANGUL_SBASE;
         if (hangul_sindex >= 0 && hangul_sindex < SPVM_UTF8PROC_HANGUL_SCOUNT &&
             (hangul_sindex % SPVM_UTF8PROC_HANGUL_TCOUNT) == 0) {
-          spvm_utf8proc_int32_t hangul_tindex;
+          SPVM__Unicode__utf8proc_int32_t hangul_tindex;
           hangul_tindex = current_char - SPVM_UTF8PROC_HANGUL_TBASE;
           if (hangul_tindex >= 0 && hangul_tindex < SPVM_UTF8PROC_HANGUL_TCOUNT) {
             *starter += hangul_tindex;
@@ -645,12 +645,12 @@ spvm_utf8proc_ssize_t spvm_utf8proc_normalize_utf32(spvm_utf8proc_int32_t *buffe
             current_property->comb_index >= 0x8000) {
           int sidx = starter_property->comb_index;
           int idx = current_property->comb_index & 0x3FFF;
-          if (idx >= spvm_utf8proc_combinations[sidx] && idx <= spvm_utf8proc_combinations[sidx + 1] ) {
-            idx += sidx + 2 - spvm_utf8proc_combinations[sidx];
+          if (idx >= SPVM__Unicode__utf8proc_combinations[sidx] && idx <= SPVM__Unicode__utf8proc_combinations[sidx + 1] ) {
+            idx += sidx + 2 - SPVM__Unicode__utf8proc_combinations[sidx];
             if (current_property->comb_index & 0x4000) {
-              composition = (spvm_utf8proc_combinations[idx] << 16) | spvm_utf8proc_combinations[idx+1];
+              composition = (SPVM__Unicode__utf8proc_combinations[idx] << 16) | SPVM__Unicode__utf8proc_combinations[idx+1];
             } else
-              composition = spvm_utf8proc_combinations[idx];
+              composition = SPVM__Unicode__utf8proc_combinations[idx];
 
             if (composition > 0 && (!(options & SPVM_UTF8PROC_STABLE) ||
                 !(unsafe_get_property(composition)->comp_exclusion))) {
@@ -678,97 +678,97 @@ spvm_utf8proc_ssize_t spvm_utf8proc_normalize_utf32(spvm_utf8proc_int32_t *buffe
   return length;
 }
 
-spvm_utf8proc_ssize_t spvm_utf8proc_reencode(spvm_utf8proc_int32_t *buffer, spvm_utf8proc_ssize_t length, spvm_utf8proc_option_t options) {
+SPVM__Unicode__utf8proc_ssize_t SPVM__Unicode__utf8proc_reencode(SPVM__Unicode__utf8proc_int32_t *buffer, SPVM__Unicode__utf8proc_ssize_t length, SPVM__Unicode__utf8proc_option_t options) {
   /* SPVM_UTF8PROC_NULLTERM option will be ignored, 'length' is never ignored
      ASSERT: 'buffer' has one spare byte of free space at the end! */
-  length = spvm_utf8proc_normalize_utf32(buffer, length, options);
+  length = SPVM__Unicode__utf8proc_normalize_utf32(buffer, length, options);
   if (length < 0) return length;
   {
-    spvm_utf8proc_ssize_t rpos, wpos = 0;
-    spvm_utf8proc_int32_t uc;
+    SPVM__Unicode__utf8proc_ssize_t rpos, wpos = 0;
+    SPVM__Unicode__utf8proc_int32_t uc;
     if (options & SPVM_UTF8PROC_CHARBOUND) {
         for (rpos = 0; rpos < length; rpos++) {
             uc = buffer[rpos];
-            wpos += unsafe_encode_char(uc, ((spvm_utf8proc_uint8_t *)buffer) + wpos);
+            wpos += unsafe_encode_char(uc, ((SPVM__Unicode__utf8proc_uint8_t *)buffer) + wpos);
         }
     } else {
         for (rpos = 0; rpos < length; rpos++) {
             uc = buffer[rpos];
-            wpos += spvm_utf8proc_encode_char(uc, ((spvm_utf8proc_uint8_t *)buffer) + wpos);
+            wpos += SPVM__Unicode__utf8proc_encode_char(uc, ((SPVM__Unicode__utf8proc_uint8_t *)buffer) + wpos);
         }
     }
-    ((spvm_utf8proc_uint8_t *)buffer)[wpos] = 0;
+    ((SPVM__Unicode__utf8proc_uint8_t *)buffer)[wpos] = 0;
     return wpos;
   }
 }
 
-spvm_utf8proc_ssize_t spvm_utf8proc_map(
-  const spvm_utf8proc_uint8_t *str, spvm_utf8proc_ssize_t strlen, spvm_utf8proc_uint8_t **dstptr, spvm_utf8proc_option_t options
+SPVM__Unicode__utf8proc_ssize_t SPVM__Unicode__utf8proc_map(
+  const SPVM__Unicode__utf8proc_uint8_t *str, SPVM__Unicode__utf8proc_ssize_t strlen, SPVM__Unicode__utf8proc_uint8_t **dstptr, SPVM__Unicode__utf8proc_option_t options
 ) {
-    return spvm_utf8proc_map_custom(str, strlen, dstptr, options, NULL, NULL);
+    return SPVM__Unicode__utf8proc_map_custom(str, strlen, dstptr, options, NULL, NULL);
 }
 
-spvm_utf8proc_ssize_t spvm_utf8proc_map_custom(
-  const spvm_utf8proc_uint8_t *str, spvm_utf8proc_ssize_t strlen, spvm_utf8proc_uint8_t **dstptr, spvm_utf8proc_option_t options,
-  spvm_utf8proc_custom_func custom_func, void *custom_data
+SPVM__Unicode__utf8proc_ssize_t SPVM__Unicode__utf8proc_map_custom(
+  const SPVM__Unicode__utf8proc_uint8_t *str, SPVM__Unicode__utf8proc_ssize_t strlen, SPVM__Unicode__utf8proc_uint8_t **dstptr, SPVM__Unicode__utf8proc_option_t options,
+  SPVM__Unicode__utf8proc_custom_func custom_func, void *custom_data
 ) {
-  spvm_utf8proc_int32_t *buffer;
-  spvm_utf8proc_ssize_t result;
+  SPVM__Unicode__utf8proc_int32_t *buffer;
+  SPVM__Unicode__utf8proc_ssize_t result;
   *dstptr = NULL;
-  result = spvm_utf8proc_decompose_custom(str, strlen, NULL, 0, options, custom_func, custom_data);
+  result = SPVM__Unicode__utf8proc_decompose_custom(str, strlen, NULL, 0, options, custom_func, custom_data);
   if (result < 0) return result;
-  buffer = (spvm_utf8proc_int32_t *) malloc(result * sizeof(spvm_utf8proc_int32_t) + 1);
+  buffer = (SPVM__Unicode__utf8proc_int32_t *) malloc(result * sizeof(SPVM__Unicode__utf8proc_int32_t) + 1);
   if (!buffer) return SPVM_UTF8PROC_ERROR_NOMEM;
-  result = spvm_utf8proc_decompose_custom(str, strlen, buffer, result, options, custom_func, custom_data);
+  result = SPVM__Unicode__utf8proc_decompose_custom(str, strlen, buffer, result, options, custom_func, custom_data);
   if (result < 0) {
     free(buffer);
     return result;
   }
-  result = spvm_utf8proc_reencode(buffer, result, options);
+  result = SPVM__Unicode__utf8proc_reencode(buffer, result, options);
   if (result < 0) {
     free(buffer);
     return result;
   }
   {
-    spvm_utf8proc_int32_t *newptr;
-    newptr = (spvm_utf8proc_int32_t *) realloc(buffer, (size_t)result+1);
+    SPVM__Unicode__utf8proc_int32_t *newptr;
+    newptr = (SPVM__Unicode__utf8proc_int32_t *) realloc(buffer, (size_t)result+1);
     if (newptr) buffer = newptr;
   }
-  *dstptr = (spvm_utf8proc_uint8_t *)buffer;
+  *dstptr = (SPVM__Unicode__utf8proc_uint8_t *)buffer;
   return result;
 }
 
-spvm_utf8proc_uint8_t *spvm_utf8proc_NFD(const spvm_utf8proc_uint8_t *str) {
-  spvm_utf8proc_uint8_t *retval;
-  spvm_utf8proc_map(str, 0, &retval, SPVM_UTF8PROC_NULLTERM | SPVM_UTF8PROC_STABLE |
+SPVM__Unicode__utf8proc_uint8_t *SPVM__Unicode__utf8proc_NFD(const SPVM__Unicode__utf8proc_uint8_t *str) {
+  SPVM__Unicode__utf8proc_uint8_t *retval;
+  SPVM__Unicode__utf8proc_map(str, 0, &retval, SPVM_UTF8PROC_NULLTERM | SPVM_UTF8PROC_STABLE |
     SPVM_UTF8PROC_DECOMPOSE);
   return retval;
 }
 
-spvm_utf8proc_uint8_t *spvm_utf8proc_NFC(const spvm_utf8proc_uint8_t *str) {
-  spvm_utf8proc_uint8_t *retval;
-  spvm_utf8proc_map(str, 0, &retval, SPVM_UTF8PROC_NULLTERM | SPVM_UTF8PROC_STABLE |
+SPVM__Unicode__utf8proc_uint8_t *SPVM__Unicode__utf8proc_NFC(const SPVM__Unicode__utf8proc_uint8_t *str) {
+  SPVM__Unicode__utf8proc_uint8_t *retval;
+  SPVM__Unicode__utf8proc_map(str, 0, &retval, SPVM_UTF8PROC_NULLTERM | SPVM_UTF8PROC_STABLE |
     SPVM_UTF8PROC_COMPOSE);
   return retval;
 }
 
-spvm_utf8proc_uint8_t *spvm_utf8proc_NFKD(const spvm_utf8proc_uint8_t *str) {
-  spvm_utf8proc_uint8_t *retval;
-  spvm_utf8proc_map(str, 0, &retval, SPVM_UTF8PROC_NULLTERM | SPVM_UTF8PROC_STABLE |
+SPVM__Unicode__utf8proc_uint8_t *SPVM__Unicode__utf8proc_NFKD(const SPVM__Unicode__utf8proc_uint8_t *str) {
+  SPVM__Unicode__utf8proc_uint8_t *retval;
+  SPVM__Unicode__utf8proc_map(str, 0, &retval, SPVM_UTF8PROC_NULLTERM | SPVM_UTF8PROC_STABLE |
     SPVM_UTF8PROC_DECOMPOSE | SPVM_UTF8PROC_COMPAT);
   return retval;
 }
 
-spvm_utf8proc_uint8_t *spvm_utf8proc_NFKC(const spvm_utf8proc_uint8_t *str) {
-  spvm_utf8proc_uint8_t *retval;
-  spvm_utf8proc_map(str, 0, &retval, SPVM_UTF8PROC_NULLTERM | SPVM_UTF8PROC_STABLE |
+SPVM__Unicode__utf8proc_uint8_t *SPVM__Unicode__utf8proc_NFKC(const SPVM__Unicode__utf8proc_uint8_t *str) {
+  SPVM__Unicode__utf8proc_uint8_t *retval;
+  SPVM__Unicode__utf8proc_map(str, 0, &retval, SPVM_UTF8PROC_NULLTERM | SPVM_UTF8PROC_STABLE |
     SPVM_UTF8PROC_COMPOSE | SPVM_UTF8PROC_COMPAT);
   return retval;
 }
 
-spvm_utf8proc_uint8_t *spvm_utf8proc_NFKC_Casefold(const spvm_utf8proc_uint8_t *str) {
-  spvm_utf8proc_uint8_t *retval;
-  spvm_utf8proc_map(str, 0, &retval, SPVM_UTF8PROC_NULLTERM | SPVM_UTF8PROC_STABLE |
+SPVM__Unicode__utf8proc_uint8_t *SPVM__Unicode__utf8proc_NFKC_Casefold(const SPVM__Unicode__utf8proc_uint8_t *str) {
+  SPVM__Unicode__utf8proc_uint8_t *retval;
+  SPVM__Unicode__utf8proc_map(str, 0, &retval, SPVM_UTF8PROC_NULLTERM | SPVM_UTF8PROC_STABLE |
     SPVM_UTF8PROC_COMPOSE | SPVM_UTF8PROC_COMPAT | SPVM_UTF8PROC_CASEFOLD | SPVM_UTF8PROC_IGNORE);
   return retval;
 }

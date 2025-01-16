@@ -18,6 +18,9 @@ unless ($meta) {
 
 }
 
+my %configure_and_runtime_requires = (
+  'SPVM' => '0.990038',
+);
 WriteMakefile(
   NAME              => 'SPVM::Unicode',
   VERSION_FROM      => 'lib/SPVM/Unicode.pm',
@@ -33,20 +36,28 @@ WriteMakefile(
     resources => {
       repository => {
         type => 'git',
-        url  => '',
-        web  => '',
+        url  => 'https://github.com/yuki-kimoto/SPVM-Unicode.git',
+        web  => 'https://github.com/yuki-kimoto/SPVM-Unicode',
       },
     },
   },
   # SPVM::Builder::Util::API is needed for Makefile.PL
   CONFIGURE_REQUIRES => {
-    'SPVM'              => '0.9701',
+    %configure_and_runtime_requires
+  },
+  PREREQ_PM         => {
+    %configure_and_runtime_requires,
+  },
+  TEST_REQUIRES => {
+    
   },
 );
 
 sub MY::postamble {
 
   my $make_rule = '';
+  
+  local @INC = ('lib', @INC);
   
   unless ($no_build_spvm_modules) {
     require SPVM::Builder::Util::API;

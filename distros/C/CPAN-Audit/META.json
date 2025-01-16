@@ -21,9 +21,7 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "YAML::Tiny" : "0"
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
@@ -65,6 +63,6 @@
          "web" : "https://github.com/briandfoy/cpan-audit"
       }
    },
-   "version" : "20250109.001",
+   "version" : "20250115.001",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

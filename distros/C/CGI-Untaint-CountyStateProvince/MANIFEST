@@ -4,27 +4,33 @@ lib/CGI/Untaint/CountyStateProvince.pm
 LICENSE
 Makefile.PL
 MANIFEST
+MANIFEST.SKIP
 README
 README.md
 t/00-load.t
 t/boiler.t
 t/cgi-untaint-csp.t
+t/comment-spelling.t
 t/coverage.t
 t/critic.t
 t/cv.t
+t/eof.t
+t/eol.t
 t/gv.t
 t/kwalitee.t
-t/links.t
 t/manifest.t
 t/metrics.t
 t/no404s.t
 t/noplan.t
 t/pod-cm.t
+t/pod-links.t
+t/pod-spelling.t
+t/pod-synopsis.t
 t/pod.t
 t/port.t
 t/prereq.t
 t/snippets.t
-t/spelling.t
+t/untaint_re.t
 t/vars.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

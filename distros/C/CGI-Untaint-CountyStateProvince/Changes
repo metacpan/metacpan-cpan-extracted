@@ -1,5 +1,10 @@
 Revision history for CGI-Untaint-CountyStateProvince
 
+0.07	Wed Jan 15 07:25:40 EST 2025
+	Use Test::DescribeMe to simplify tests
+	Use gtar to create a distribution on Macs
+	Fix the regex
+
 0.06	Sun Dec 15 13:14:52 EST 2019
 	Beef up the example in the documentation
 	We don't need Test::Kwalitee to build

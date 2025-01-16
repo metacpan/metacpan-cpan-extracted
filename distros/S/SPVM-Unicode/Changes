@@ -1,3 +1,15 @@
+0.051  2025-01-16
+  [Internal Changes]
+    * Update .gitignore and MANIFEST.SKIP.
+    * Compile sources by GNU C99 instead of C99.
+    * Change source file names not to conflict them.
+  [Exception Changes]
+    * Unicode#uchar method throws an exception if $offset_ref is not defined.
+  [New Features]
+    * Add version.
+  [Requirement Changes]
+    * Require SPVM 0.990038.
+    
 0.05  2023-04-04
   [License Change]
     * The license is changed to MIT License.
