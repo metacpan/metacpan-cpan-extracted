@@ -5,7 +5,7 @@
 # Dominic Hargreaves (c) 2016
 # Artistic License
 package Oxford::Calendar;
-$Oxford::Calendar::VERSION = "2.12";
+$Oxford::Calendar::VERSION = "2.13";
 use strict;
 use Text::Abbrev;
 use Date::Calc qw(Add_Delta_Days Decode_Date_EU Delta_Days Mktime Easter_Sunday Date_to_Days Day_of_Week_to_Text Day_of_Week);
@@ -634,15 +634,29 @@ Calendar:
     start: 17/01/2021
   Hilary 2022:
     start: 16/01/2022
-    provisional: 1
   Hilary 2023:
     start: 15/01/2023
-    provisional: 1
   Hilary 2024:
     start: 14/01/2024
-    provisional: 1
   Hilary 2025:
     start: 19/01/2025
+  Hilary 2026:
+    start: 18/01/2026
+    provisional: 1
+  Hilary 2027:
+    start: 17/01/2027
+    provisional: 1
+  Hilary 2028:
+    start: 16/01/2028
+    provisional: 1
+  Hilary 2029:
+    start: 14/01/2029
+    provisional: 1
+  Hilary 2030:
+    start: 13/01/2030
+    provisional: 1
+  Hilary 2031:
+    start: 19/01/2031
     provisional: 1
   Michaelmas 2001:
     start: 07/10/2001
@@ -686,15 +700,29 @@ Calendar:
     start: 11/10/2020
   Michaelmas 2021:
     start: 10/10/2021
-    provisional: 1
   Michaelmas 2022:
     start: 09/10/2022
-    provisional: 1
   Michaelmas 2023:
     start: 08/10/2023
-    provisional: 1
   Michaelmas 2024:
     start: 13/10/2024
+  Michaelmas 2025:
+    start: 12/10/2025
+    provisional: 1
+  Michaelmas 2026:
+    start: 11/10/2026
+    provisional: 1
+  Michaelmas 2027:
+    start: 10/10/2027
+    provisional: 1
+  Michaelmas 2028:
+    start: 08/10/2028
+    provisional: 1
+  Michaelmas 2029:
+    start: 07/10/2029
+    provisional: 1
+  Michaelmas 2030:
+    start: 13/10/2030
     provisional: 1
   Trinity 2001:
     start: 22/04/2001
@@ -740,13 +768,27 @@ Calendar:
     start: 25/04/2021
   Trinity 2022:
     start: 24/04/2022
-    provisional: 1
   Trinity 2023:
     start: 23/04/2023
-    provisional: 1
   Trinity 2024:
     start: 21/04/2024
-    provisional: 1
   Trinity 2025:
     start: 27/04/2025
+  Trinity 2026:
+    start: 26/04/2026
+    provisional: 1
+  Trinity 2027:
+    start: 25/04/2027
+    provisional: 1
+  Trinity 2028:
+    start: 23/04/2028
+    provisional: 1
+  Trinity 2029:
+    start: 22/04/2029
+    provisional: 1
+  Trinity 2030:
+    start: 28/04/2030
+    provisional: 1
+  Trinity 2031:
+    start: 27/04/2031
     provisional: 1

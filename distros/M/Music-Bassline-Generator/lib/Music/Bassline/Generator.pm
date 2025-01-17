@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Generate musical basslines
 
-our $VERSION = '0.0607';
+our $VERSION = '0.0608';
 
 use Moo;
 use strictures 2;
@@ -16,6 +16,7 @@ use Music::Note ();
 use Music::Scales qw(get_scale_notes get_scale_MIDI);
 use Music::VoiceGen ();
 use Set::Array ();
+use Try::Tiny qw(try catch);
 use namespace::clean;
 
 use constant E1 => 28; # lowest note on a bass guitar in standard tuning
@@ -227,16 +228,22 @@ sub generate {
 
     my @chosen;
     if (@fixed > 1) {
-        my $voice = Music::VoiceGen->new(
-            pitches   => \@fixed,
-            intervals => $self->intervals,
-        );
+        try {
+            my $voice = Music::VoiceGen->new(
+                pitches   => \@fixed,
+                intervals => $self->intervals,
+            );
 
-        # Try to start the phrase in the middle of the scale
-        $voice->context($fixed[int @fixed / 2]);
+            # Try to start the phrase in the middle of the scale
+            $voice->context($fixed[int @fixed / 2]);
 
-        # Get a passage of quasi-random pitches
-        @chosen = map { $voice->rand } 1 .. $num;
+            # Get a passage of quasi-random pitches
+            @chosen = map { $voice->rand } 1 .. $num;
+        }
+        catch {
+            # warn "Can't instantiate Music::VoiceGen: $_\n";
+            @chosen = ($fixed[0]) x $num;
+        };
     }
     else {
         @chosen = ($fixed[0]) x $num;
@@ -318,7 +325,7 @@ Music::Bassline::Generator - Generate musical basslines
 
 =head1 VERSION
 
-version 0.0607
+version 0.0608
 
 =head1 SYNOPSIS
 
@@ -356,7 +363,7 @@ possibly sour notes.  This is an approximate composition tool, and not
 a drop-in bass player.  Import rendered MIDI into a DAW and alter
 notes until they sound suitable.
 
-To constrain the notes to a chosen set of scale dregrees, use the
+To constrain the notes to a chosen set of scale degrees, use the
 B<positions> attribute described below.
 
 =head1 ATTRIBUTES
@@ -556,7 +563,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021-2023 by Gene Boggs.
+This software is Copyright (c) 2021-2025 by Gene Boggs.
 
 This is free software, licensed under:
 

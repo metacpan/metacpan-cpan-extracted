@@ -1,6 +1,6 @@
 package Slackware::SBoKeeper;
 use 5.016;
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 use strict;
 use warnings;
 
@@ -31,6 +31,7 @@ Commands:
   rm        <pkgs>       Remove pkg(s).
   clean                  Remove unnecessary pkgs.
   deps      <pkg>        Print dependencies for pkg.
+  rdeps     <pkg>        Print reverse dependencies for pkg.
   depadd    <pkg> <deps> Add deps to pkg's dependencies.
   deprm     <pkg> <deps> Remove deps from pkg's dependencies.
   pull                   Find and add installed SlackBuilds.org pkgs.
@@ -40,6 +41,7 @@ Commands:
   unmanual  <pkgs>       Unset pkg(s) as manually added.
   print     <cats>       Print all pkgs in specified categories.
   tree      <pkgs>       Print dependency tree.
+  rtree     <pkgs>       Print reverse dependency tree.
   dump                   Dump database.
   help      <cmd>        Print cmd help message.
 
@@ -108,6 +110,13 @@ Usage: deps <pkg>
 Prints list of dependencies for specified package, according to the database.
 Does not print complete dependency tree, for that one should use the tree
 command.
+END
+	'rdeps' => <<END,
+Usage: rdeps <pkg>
+
+Prints list of reverse dependencies for specified package (packages that depend
+on pkg), according to the database. Does not print complete reverse dependency
+tree, for that one should use the rtree command.
 END
 	'depadd' => <<END,
 Usage: depadd <pkg> <dep> ...
@@ -183,6 +192,11 @@ Prints a dependency tree. If pkgs is not specified, prints a dependency tree
 for each manually added package. If pkgs are given, prints a dependency tree of
 each package specified.
 END
+	'rtree' => <<END,
+Usage: rtree <pkgs> ...
+
+Prints a reverse dependency tree for each package specified.
+END
 	'dump' => <<END,
 Usage: dump
 
@@ -247,6 +261,12 @@ my %COMMANDS = (
 		NeedSlack    => 0,
 		Args         => 0,
 	},
+	'rdeps' => {
+		Method       => \&rdeps,
+		NeedDatabase => 1,
+		NeedSlack    => 0,
+		Args         => 1,
+	},
 	'deps' => {
 		Method       => \&deps,
 		NeedDatabase => 1,
@@ -306,6 +326,12 @@ my %COMMANDS = (
 		NeedDatabase => 1,
 		NeedSlack    => 0,
 		Args         => 0,
+	},
+	'rtree' => {
+		Method       => \&rtree,
+		NeedDatabase => 1,
+		NeedSlack    => 0,
+		Args         => 1,
 	},
 	'dump' => {
 		Method       => \&dump,
@@ -556,18 +582,32 @@ sub package_branch {
 
 	my $sbokeeper = shift;
 	my $pkg       = shift;
-	my $str       = shift;
+	my $level     = shift // 0;
 
 	my $has = $sbokeeper->has($pkg);
 
 	# Add '(missing)' if package is not present in database but depended on by
 	# another package.
-	printf "%s%s %s\n", $str, $pkg, $has ? '' : '(missing?)';
+	printf "%s%s %s\n", '  ' x $level, $pkg, $has ? '' : '(missing?)';
 
 	return unless $has;
 
 	foreach my $d ($sbokeeper->immediate_dependencies($pkg)) {
-		package_branch($sbokeeper, $d, $str . '  ');
+		package_branch($sbokeeper, $d, $level + 1);
+	}
+
+}
+
+sub rpackage_branch {
+
+	my $sbokeeper = shift;
+	my $pkg       = shift;
+	my $level     = shift // 0;
+
+	printf "%s%s\n", '  ' x $level, $pkg;
+
+	foreach my $rd ($sbokeeper->reverse_dependencies($pkg)) {
+		rpackage_branch($sbokeeper, $rd, $level + 1);
 	}
 
 }
@@ -761,6 +801,27 @@ sub deps {
 	my @deps = $sbokeeper->immediate_dependencies($pkg);
 
 	print @deps ? "@deps\n" : "No dependencies found\n";
+
+}
+
+sub rdeps {
+
+	my $self = shift;
+
+	my $sbokeeper = Slackware::SBoKeeper::Database->new(
+		$self->{DataFile},
+		$self->{SBoPath}
+	);
+
+	my $pkg = shift @{$self->{Args}};
+
+	unless ($sbokeeper->has($pkg)) {
+		die "$pkg not present in database\n";
+	}
+
+	my @rdeps = $sbokeeper->reverse_dependencies($pkg);
+
+	print @rdeps ? "@rdeps\n" : "No reverse dependencies found\n";
 
 }
 
@@ -1087,7 +1148,30 @@ sub tree {
 	}
 
 	foreach my $p (@pkgs) {
-		package_branch($sbokeeper, $p, '');
+		package_branch($sbokeeper, $p);
+		print "\n";
+	}
+
+}
+
+sub rtree {
+
+	my $self = shift;
+
+	my $sbokeeper = Slackware::SBoKeeper::Database->new(
+		$self->{DataFile},
+		$self->{SBoPath}
+	);
+
+	my @pkgs = alias_expand($sbokeeper, $self->{Args});
+
+	foreach my $p (@pkgs) {
+		die "$p is not present in package database\n"
+			unless $sbokeeper->has($p);
+	}
+
+	foreach my $p (@pkgs) {
+		rpackage_branch($sbokeeper, $p);
 		print "\n";
 	}
 
@@ -1324,6 +1408,8 @@ for information on their functionality.
 
 =item deps()
 
+=item rdeps()
+
 =item depadd()
 
 =item deprm()
@@ -1341,6 +1427,8 @@ for information on their functionality.
 =item sbokeeper_print()
 
 =item tree()
+
+=item rtree()
 
 =item dump()
 

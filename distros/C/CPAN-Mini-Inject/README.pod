@@ -80,6 +80,21 @@ the source repository: L<https://github.com/briandfoy/cpan-mini-inject>
 If you find a problem, file a ticket in the L<issue
 tracker|https://github.com/briandfoy/cpan-mini-inject/issues>.
 
+There are also backup repositories hosted on other services. These
+reflect the state of the main repo and exist only for redundancy:
+
+=over 4
+
+=item * L<https://bitbucket.com/briandfoy/cpan-mini-inject>
+
+=item * L<https://codeberg.org/briandfoy/cpan-mini-inject>
+
+=item * L<https://gitlab.com/briandfoy/cpan-mini-inject>
+
+=back
+
+=head2 GitHub Attestations
+
 Starting with 1.005, CPAN::Mini::Inject now uses
 L<GitHub Attestations|https://github.blog/2024-05-02-introducing-artifact-attestations-now-in-public-beta/>,
 which allow you to verify that the archive file you have was made from

@@ -2,11 +2,11 @@ package Catmandu::Fix::lookup;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2023';
+our $VERSION = '1.2024';
 
 use Catmandu::Importer::CSV;
 use Catmandu::Util::Path qw(as_path);
-use Catmandu::Util qw(is_value);
+use Catmandu::Util       qw(is_value);
 use Moo;
 use namespace::clean;
 use Catmandu::Fix::Has;

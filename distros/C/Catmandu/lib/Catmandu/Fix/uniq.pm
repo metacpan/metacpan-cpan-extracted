@@ -2,9 +2,9 @@ package Catmandu::Fix::uniq;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2023';
+our $VERSION = '1.2024';
 
-use List::SomeUtils qw(uniq);
+use List::SomeUtils      qw(uniq);
 use Catmandu::Util::Path qw(as_path);
 use Moo;
 use namespace::clean;

@@ -2,14 +2,21 @@ package Catmandu::CLI;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2023';
+our $VERSION = '1.2024';
 
 use Catmandu::Util qw(is_instance);
 use Catmandu;
 use Log::Any::Adapter;
 use Data::Dumper;
+use Getopt::Long;
 
 use parent qw(App::Cmd);
+
+BEGIN {
+    # Unknown opts are added to the args instead of generating a usage error
+    # so we can handle them dynamically (see Catmandu::Cmd _parse_options).
+    Getopt::Long::Configure("pass_through");
+}
 
 sub deleted_commands {
     [
@@ -21,7 +28,7 @@ sub deleted_commands {
             Catmandu::Cmd::module_info
             Catmandu::Cmd::move
             Catmandu::Cmd::store_info
-            )
+        )
     ];
 }
 

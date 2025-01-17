@@ -23,7 +23,10 @@ WriteMakefile
         'Config::Simple' => '4.0',
         'File::HomeDir'  => '1.0',
         'Getopt::Long'   => '2.0',
-        'Moose'          => '2.0',
+        'Test::More'     => 0,
+        'Test::Deep'     => 0,
+        'Test::Warn'     => 0,
+
     },
     META_MERGE       => {
         'meta-spec' => { version => 2 },

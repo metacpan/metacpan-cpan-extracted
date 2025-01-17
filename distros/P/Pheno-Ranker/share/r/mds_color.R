@@ -4,7 +4,7 @@ library(dplyr)
 library(stringr)
 
 # Read in the input file as a matrix 
-data <- as.matrix(read.table("matrix.txt", header = TRUE, row.names = 1))
+data <- as.matrix(read.table("matrix.txt", header = TRUE, row.names = 1, check.names = FALSE))
 
 # Calculate distance matrix
 #d <- dist(data)

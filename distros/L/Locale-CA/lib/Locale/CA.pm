@@ -11,11 +11,11 @@ Locale::CA - two letter codes for province identification in Canada and vice ver
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =head1 SYNOPSIS
 
@@ -37,14 +37,17 @@ our $VERSION = '0.07';
 
 Creates a Locale::CA object.
 
+Can be called both as a class method (Locale::CA->new()) and as an object method ($object->new()).
+
 =cut
 
 sub new {
 	my $proto = shift;
 	my $class = ref($proto) || $proto;
 
+	# If the class is undefined, fallback to the current package name
 	if(!defined($class)) {
-		# Use Lingua::CA->new(), not Lingua::CA::new()
+		# Use Locale::CA->new(), not Locale::CA::new()
 		# Carp::carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
 		# return;
 
@@ -54,32 +57,46 @@ sub new {
 
 	my %params;
 	if(ref($_[0]) eq 'HASH') {
+		# If the first argument is a hash reference, dereference it
 		%params = %{$_[0]};
 	} elsif(scalar(@_) % 2 == 0) {
+		# If there is an even number of arguments, treat them as key-value pairs
 		%params = @_;
-	} else {
+	} elsif(scalar(@_) == 1) {
+		# If there is one argument, assume the first is 'lang'
 		$params{'lang'} = shift;
+	} else {
+		# If there is an odd number of arguments, treat it as an error
+		Carp::croak(__PACKAGE__, ': Invalid arguments passed to new()');
+		return;
 	}
 
+	# Determine the language and load the corresponding data
 	my $data;
 	if(defined(my $lang = ($params{'lang'} || _get_language()))) {
 		if(($lang eq 'fr') || ($lang eq 'en')) {
+			# Load data for the specified language (English or French)
 			$data = Data::Section::Simple::get_data_section("provinces_$lang");
 		} else {
+			# Invalid language specified, throw an error
 			Carp::croak("lang can only be one of 'en' or 'fr', given $lang");
 		}
 	} else {
+		# If no language is specified, fallback to English
 		$data = Data::Section::Simple::get_data_section('provinces_en');
 	}
 
-
+	# Parse the data into bidirectional mappings
 	my $self = {};
 	for(split /\n/, $data) {
 		my($code, $province) = split /:/;
+		# Map codes to provinces
 		$self->{code2province}{$code} = $province;
+		# Map provinces to codes
 		$self->{province2code}{$province} = $code;
 	}
 
+	# Bless the hash reference into an object of the specified class
 	return bless $self, $class;
 }
 
@@ -187,22 +204,26 @@ Based on L<Locale::US> - Copyright (c) 2002 - C<< $present >> Terrence Brannon.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012-2024 Nigel Horne.
+Copyright 2012-2025 Nigel Horne.
 
 This program is released under the following licence: GPL2
 
 =cut
 
 1; # End of Locale::CA
+
+# Put the one you want to expand in code2province second
+#	so it overwrites the other when it's loaded
+
 __DATA__
 @@ provinces_en
-AB:ALBERTA
 AB:ALBT.
+AB:ALBERTA
 BC:BRITISH COLUMBIA
 MB:MANITOBA
 NB:NEW BRUNSWICK
-NL:NEWFOUNDLAND AND LABRADOR
 NL:NEWFOUNDLAND
+NL:NEWFOUNDLAND AND LABRADOR
 NT:NORTHWEST TERRITORIES
 NS:NOVA SCOTIA
 ON:ONTARIO
@@ -211,14 +232,14 @@ QC:QUEBEC
 SK:SASKATCHEWAN
 YT:YUKON
 @@ provinces_fr
-AB:ALBERTA
 AB:ALBT.
 AB:ALTA.
+AB:ALBERTA
 BC:COLOMBIE-BRITANNIQUE
 MB:MANITOBA
 NB:NOUVEAU-BRUNSWICK
-NL:TERRE-NEUVE-ET-LABRADOR
 NL:TERRE-NEUVE
+NL:TERRE-NEUVE-ET-LABRADOR
 NT:TERRITOIRES DU NORD-OUEST
 NS:NOUVELLE-ÉCOSSE
 ON:ONTARIO

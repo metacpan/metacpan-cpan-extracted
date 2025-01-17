@@ -10,7 +10,7 @@ Locale::CA - two letter codes for province identification in Canada and vice ver
 
 # VERSION
 
-Version 0.07
+Version 0.08
 
 # SYNOPSIS
 
@@ -31,6 +31,8 @@ Version 0.07
 ## new
 
 Creates a Locale::CA object.
+
+Can be called both as a class method (Locale::CA->new()) and as an object method ($object->new()).
 
 ## all\_province\_codes
 
@@ -85,6 +87,6 @@ Based on [Locale::US](https://metacpan.org/pod/Locale%3A%3AUS) - Copyright (c) 2
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2012-2024 Nigel Horne.
+Copyright 2012-2025 Nigel Horne.
 
 This program is released under the following licence: GPL2

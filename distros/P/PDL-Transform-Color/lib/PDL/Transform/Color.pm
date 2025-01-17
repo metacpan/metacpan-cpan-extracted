@@ -114,7 +114,7 @@ spectrum.  However, the absorption/sensitivity bands overlap
 significantly, therefore no physical light (of any wavelength) can
 form a proper "primary color" (orthonormal basis element) of this
 space.  While any vector in color space can be represented as a linear
-sum of three indepenent basis vectors ("primary colors"), there is no
+sum of three independent basis vectors ("primary colors"), there is no
 such thing as a negative intensity and therefore any tricolor
 representation of the color space is limited to a "gamut" that can be
 formed by I<positive> linear combinations of the selected primary colors.
@@ -339,7 +339,7 @@ use PDL::Graphics::ColorSpace;
 use Carp;
 
 our @ISA = ( 'Exporter', 'PDL::Transform' );
-our $VERSION = '1.007';
+our $VERSION = '1.008';
 $VERSION = eval $VERSION;
 
 our @EXPORT_OK = qw/ t_gamma t_brgb t_srgb t_shift_illuminant t_shift_rgb t_cmyk t_rgi t_cieXYZ t_xyz t_xyY t_xyy t_lab t_xyz2lab t_hsl t_hsv t_pc t_pcp/;

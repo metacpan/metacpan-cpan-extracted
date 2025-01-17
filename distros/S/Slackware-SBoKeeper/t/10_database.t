@@ -6,7 +6,7 @@ use Test::More;
 
 use Slackware::SBoKeeper::Database;
 
-plan tests => 41;
+plan tests => 47;
 
 my $TEST_REPO = 't/data/repo';
 my $TEST_FILE = 'test-data-file.txt';
@@ -68,6 +68,20 @@ foreach my $p (qw(a b c d e)) {
 	ok($db->is_dependency($p, 'f'), 'is_dependency() works');
 }
 
+foreach my $p (qw(a b e)) {
+	ok($db->is_immediate_dependency($p, 'f'), 'is_immediate_dependency() works');
+}
+
+ok(
+	!$db->is_immediate_dependency('c', 'f'),
+	'is_immediate_dependency() only works on immediate dependencies'
+);
+
+ok(
+	!$db->is_immediate_dependency('d', 'f'),
+	'is_immediate_dependency() only works on immediate dependencies'
+);
+
 is_deeply(
 	[ $db->immediate_dependencies('f') ],
 	[ qw(a b e) ],
@@ -78,6 +92,12 @@ is_deeply(
 	[ $db->dependencies('f') ],
 	[ qw(a b c d e) ],
 	'dependencies() works'
+);
+
+is_deeply(
+	[ $db->reverse_dependencies('a') ],
+	[ qw(b e f) ],
+	'reverse_dependencies() works'
 );
 
 is_deeply(

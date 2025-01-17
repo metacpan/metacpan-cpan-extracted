@@ -2,7 +2,7 @@ package Catmandu::Importer::TSV;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2023';
+our $VERSION = '1.2024';
 
 use Catmandu::Importer::CSV;
 use Moo;
@@ -10,7 +10,7 @@ use namespace::clean;
 
 with 'Catmandu::Importer';
 
-has header   => (is => 'ro', default => sub {1});
+has header => (is => 'ro', default => sub {1});
 has sep_char => (
     is      => 'ro',
     default => sub {"\t"},

@@ -3,105 +3,118 @@ package MySQL::Hi;
 use strict;
 use warnings;
 
-our $VERSION = "0.03";
+our $VERSION = "1.00";
 
 use Carp;
 use Config::Simple;
 
-use Moose;
-use Moose::Util::TypeConstraints;
 use File::HomeDir;
 
-
-# MySQL username
+# Defaults
 #
-has user => (
-    is      => 'ro',
-    isa     => subtype(
-        'Str' => where {
-            defined
-                && length > 0
-                && ! /^\s*$/i
-            },
-            message { 'Invalid username' }
-    ),
-    default => sub { $ENV{USER} },
-);
-
-# Config file
-#
-has config => (
-    is      => 'ro',
-    isa     => 'Str',
-    lazy    => 1,
-    builder => '_build_config',
+my %defaults = (
+    host     => 'localhost',
+    port     => 3306,
+    password => '',
 );
 
 
-# Credentials:
+# Constructor
 #
-# db_name => {
-#     mode1 => {
-#         host     => "hostname",
-#         password => "t0p$ecR3T",
-#         post     => 3306,
-#     }
-#     ...
-# }
+# IN:
+#     %params = (
+#         user =>   'john_doe',
+#         config => '/home/john_doe/mysqlhi.conf',
+#     );
 #
-has cred => (
-    is      => 'ro',
-    isa     => 'HashRef[HashRef[HashRef[Maybe[Str]]]]',
-    lazy    => 1,
-    builder => '_builder_read_credentials',
-    traits  => ['Hash'],
-    handles => {
-        get_cred => 'get',
-    },
-);
+sub new {
+    my ( $class, %params ) = @_;
 
+    my ( $user, $config ) = _parse_params( %params );
+    my $cred              = _read_credentials( $config );
 
-# Params from the config file to be used to create credentials
-# ( and default values )
-#
-has known_params => (
-    is      => 'ro',
-    isa     => 'HashRef',
-    default => sub {
-        +{
-            host     => 'localhost',
-            port     => 3306,
-            password => undef,
-        };
-    },
-    traits  => ['Hash'],
-    handles => {
-        all_params    => 'keys',
-        knows         => 'exists',
-        default_value => 'get',
-    },
-);
+    my $self = bless {
+        _user    => $user,
+        _config  => $config,
+        _cred    => $cred,
+        _options => {},
+        _dsn     => {},
+    }, $class;
 
-
-# Builds config file name in the user directory
-#
-sub _build_config {
-    my ( $self ) = @_;
-    my $user = $self->user();
-    my $home = File::HomeDir->home();
-    if ( !$home ) {
-        croak "Cannot detect your home directory. You should explicitly specify the path to your config file\n";
-    }
-    return  "$home/mysqlhi.conf";
+    return $self;
 }
 
 
-# Reads credentials from the config file
+# Parse params
 #
-sub _builder_read_credentials {
-    my ( $self ) = @_;
+sub _parse_params {
+    my ( %params ) = @_;
+    my $user   = delete $params{user};
 
-    my $config = $self->config();
+    if ( defined $user ) {
+        $user =~ s/\s//g;
+        croak "Invalid user"
+            if length( $user ) == 0;
+    }
+    else {
+        $user = $ENV{USER};
+    }
+
+    # Get config
+    my $config = delete $params{config};
+
+    if ( !defined( $config ) || length( $config ) == 0 ) {
+        my $home = File::HomeDir->home();
+        if ( !$home ) {
+            croak "Cannot detect your home directory. You should explicitly specify the path to your config file\n";
+        }
+        $config = "$home/mysqlhi.conf";
+    }
+
+    if ( my @keys = keys %params ) {
+        carp "Unknown constructor params: " . join(", ", @keys )
+    }
+
+    return ( $user, $config );
+}
+
+
+# Makes sure that db name and mode are correct
+#
+sub _parse_db_mode {
+    my ( $db, $mode ) = @_;
+
+    # DB name must exist
+    if ( !defined $db || $db =~ /^\s*$/ ) {
+        croak "No DB name provided";
+    }
+
+    $db =~ s/^\s+//;
+    $db =~ s/\s+$//;
+
+    # Empty or only spaces for $mode means no mode
+    if ( defined $mode ) {
+        $mode =~ s/^\s+//;
+        $mode =~ s/\s+$//;
+        if ( $mode =~ /^\s*$/ ) {
+            undef $mode;
+        }
+    }
+
+    # Allowing $db to contain mode.
+    my $db_mode = join ':', $db, ( $mode // () );
+    my @db_mode = split ':', $db_mode, 2;
+    $db_mode = join ':', @db_mode;
+    return wantarray
+        ?  ( $db_mode[0], $db_mode[1], $db_mode )
+        : $db_mode;
+}
+
+
+# Read credentials from the config file
+#
+sub _read_credentials {
+    my $config = shift;
     if ( !-f $config ) {
         croak "File '$config' does not exist\n";
     }
@@ -119,59 +132,59 @@ sub _builder_read_credentials {
         }
         my ( $db_mode, $param ) = split '\.', $key, 2;
 
-        unless ( $self->knows( $param ) ) {
-            carp "Unknown param '$param'\n";
+        $db_mode = _parse_db_mode( $db_mode );
+
+        # Fill in with default values
+        if ( !exists $cred{ $db_mode } ) {
+            for my $default ( keys %defaults ) {
+                $cred{ $db_mode }{ $default } = $defaults{ $default };
+            }
+        }
+
+        unless ( exists $defaults{ $param } ) {
+            carp "Unknown parameter '$param' in [$db_mode]\n";
             next;
         }
 
-        my ( $db, $mode ) = split ':', $db_mode, 2;
-        $mode //= '';
-
-        $cred{$db}{$mode}{$param} = $vars{ $key };
+        $cred{ $db_mode }{ $param } = $vars{ $key };
     }
 
     return \%cred;
 }
 
 
+# Accessors
+#
+sub user {
+    return $_[0]->{_user};
+}
+
+sub config {
+    return $_[0]->{_config};
+}
+
+sub default_value {
+    my ( $self, $key ) = @_;
+    return exists $defaults{ $key }
+        ? $defaults{ $key }
+        : undef;
+}
+
 # Return credentials for a specific DB and mode
 #
 sub get_credentials {
     my ( $self, $db, $mode ) = @_;
 
-    my %credentials = ();
+    return $self->{_cred}
+        if !$db;
 
-    if ( $db ) {
-        if ( my $db_cred = $self->get_cred( $db ) ) {
-            if ( my $db_mode = $db_cred->{ $mode } ) {
-                for my $key ( $self->all_params() ) {
-                    $credentials{ $key } = exists $db_mode->{ $key }
-                        ? $db_mode->{ $key }
-                        : $self->default_value( $key );
-                }
-            }
-        }
-    }
+    my $db_mode = join(':', $db, ($mode || () ) );
 
-    return %credentials;
-}
+    return $self->{_cred}{ $db_mode }
+        if exists $self->{_cred}{ $db_mode };
 
-
-# Splits the string [db]:[mode]
-#
-sub _parse_db_mode {
-    my ( $self, $db, $mode ) = @_;
-
-    my ( $d, $m ) = split ':', $db, 2;
-
-    if ( $m && $mode && $m ne $mode ) {
-        croak "Don't know which mode to use: '$m' or '$mode'\n";
-    }
-    else {
-        $m ||= $mode || '';
-    }
-
-    return ( $d, $m );
+    carp "No credentials for the '$db_mode' in config $self->{_config}\n";
+    return \%defaults;
 }
 
 
@@ -180,27 +193,21 @@ sub _parse_db_mode {
 sub get_options {
     my ( $self, $db, $mode ) = @_;
 
-    ( $db, $mode ) = $self->_parse_db_mode( $db, $mode );
+    ( $db, $mode, my $db_mode ) = _parse_db_mode( $db, $mode );
 
-    my %credentials = $self->get_credentials( $db, $mode );
+    if ( !exists $self->{_options}{ $db_mode } ) {
+        my $credentials = $self->get_credentials( $db, $mode );
 
-    croak "Can't find credentials for database '$db:"
-        . ( $mode || '[no mode]' )
-        . "'\n"
-        unless %credentials;
+        $self->{_options}{ $db_mode } = [
+            "-u" => $self->user(),
+            "-h" => $credentials->{host},
+            "-P" => $credentials->{port},
+            "-p$credentials->{password}",
+            "-D" => $db,
+        ];
+    }
 
-    $credentials{ $_ } //= ''
-        for keys %credentials;
-
-    my @options = (
-        "-u" => $self->user(),
-        "-h" => $credentials{host},
-        "-P" => $credentials{port},
-        "-p$credentials{password}",
-        "-D" => $db,
-    );
-
-    return @options;
+    return @{ $self->{_options}{ $db_mode } };
 }
 
 
@@ -209,26 +216,25 @@ sub get_options {
 sub get_dsn {
     my ( $self, $db, $mode ) = @_;
 
-    ( $db, $mode ) = $self->_parse_db_mode( $db, $mode );
+    ( $db, $mode, my $db_mode ) = _parse_db_mode( $db, $mode );
 
-    my %credentials = $self->get_credentials( $db, $mode );
+    if ( !exists $self->{_dsn}{ $db_mode } ) {
+        my $credentials = $self->get_credentials( $db, $mode );
 
-    croak "Can't find credentials for database '$db:"
-        . ( $mode || '[no mode]' )
-        . "'\n"
-        unless %credentials;
+        $self->{_dsn}{ $db_mode } = [
+            'DBI:mysql:'
+            . 'host=' . $credentials->{host}
+            . ';port=' . $credentials->{port}
+            . ';database=' . $db,
+            $self->user(),
+            $credentials->{password} // ''
+        ];
+    }
 
-    my $password = $credentials{password} // '';
-    my $str = 'DBI:mysql:'
-        . 'host=' . $credentials{host}
-        . ';port=' . $credentials{port}
-        . ';database=' . $db;
-
-    return ( $str, $self->user(), $password );
+    return @{ $self->{_dsn}{ $db_mode } };
 }
 
 
-__PACKAGE__->meta->make_immutable;
 
 1;
 
@@ -244,7 +250,8 @@ MySQL::Hi - Credentials for MySQL/MariaDB from config files
 
     my $hi = MySQL::Hi->new(
         user => $user,
-        config => '/path/to/config.conf' );
+        config => '/path/to/config.conf'
+    );
 
     # Command line options
     my @options = $hi->get_options( $db, $mode );
@@ -254,11 +261,17 @@ MySQL::Hi - Credentials for MySQL/MariaDB from config files
 
 =head1 DESCRIPTION
 
-The module to read config with credentials for MySQL/MariaDB conection.
+The module reads a config file and memorises the settings which are
+necessary to connect to MySQL/MariaDB. It B<DOES NOT> perform any
+conections, but rather provides a convenient way to get credentials for
+accessing MySQL/MariaDB servers from Perl code or CLI.
 
-It does B<NOT> do any MySQL/MariaDB connections, it is B<ONLY> needed to
-read a config file and return credentials, comannd line options for
-MySQL/MariaDB client, or DSN for L<DBD::mysql> driver.
+The module is used in the L<mysqlhi> script, which is a part of this
+distribution. The script prepares and executes C<mysql> command for
+fast access to MySQL/MariaDB from command line.
+
+It can also be used in Perl code to get DSN from a config file ready to
+pass to L<DBD::mysql> driver.
 
 =head1 METHODS
 
@@ -277,13 +290,12 @@ Username to connect to DB. If omitted, curent username is taken.
 =item config
 
 Path to a cofigfile. By default it searces for the file F<mysqlhi.conf>
-in user's home directory. See L<mysqlhi/"Config file"> for config file
-format.
+in the user's home directory. See L<mysqlhi/"Config file"> for config
+file format.
 
-B<NOTE:> I only tested it on Debian and Ubuntu. I have not tested it on
-other operating systems. As long as it uses L<File::HomeDir> it should,
-in theory, work on other OSes too. If it does not, your patches are
-welcome.
+B<NOTE:> I only tested it on Linux, not on other operating systems. As
+long as it uses L<File::HomeDir> it should, in theory, work on other OSes
+too. If it does not, your patches are welcome.
 
 =back
 
@@ -295,28 +307,31 @@ C<exec>:
     exec 'mysql', $hi->get_options( $db, $mode );
 
 B<NOTE:> C<exec> should be used with multiple parameters. This will make
-sure that all parameters are passed to the command correctly, and it
-will run C<mysql> directly without C<sh -c> predicate. As a useful side
-effect, in the list of processes your MySQL/MariaDB client will not show
-password.
+sure that all parameters are passed to the command correctly, and that
+C<mysql> runs directly without C<sh -c> predicate, which, in turn,
+guarantees that MySQL password is not exposed in the list of processes.
 
 The method accepts two parameters: C<$db> (database name) and C<$mode>
-(Optional, used to specify credentials for a certain mod). See
-L<mysqlhi> for information about modes.
+(optional, used to specify credentials for a certain mode).
+See L<mysqlhi> for information about modes.
 
 =item get_dsn( $db[, $mode] )
 
-Accepts the same parameter as C<get_credentials>, Returns DSN, username
+Accepts the same parameter as C<get_credentials>, returns DSN, username
 and password which can be used directly in C<DBI->connect()>:
 
     DBI->conect( $hi->get_dsn( $db, $mode ) )
 
 =item get_credentials( [ $db, $mode] ] )
 
-With no param it return all parsed credentials from the config file.
+If C<$db> and C<$mode> are provided, returns a hashref with credentials
+for this databade in this mode. Returns default settings otherwise:
 
-If C<$db> and C<$mode> are provided, return a hashref with credentials
-for this databade in this mode.
+    {
+        host     => 'localhost',
+        port     => 3306,
+        password => '',
+    }
 
 =back
 
@@ -334,7 +349,7 @@ Andrei Pratasavitski <andrei.protasovitski@gmail.com>
 
 =head1 LICENSE
 
-    This script is free software; you can redistribute it and/or modify
+    This module is free software; you can redistribute it and/or modify
     it under the same terms as Perl itself.
 
 =cut

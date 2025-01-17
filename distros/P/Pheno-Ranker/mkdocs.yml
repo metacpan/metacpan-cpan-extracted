@@ -1,7 +1,7 @@
 site_name: 'Pheno-Ranker Documentation'
 site_description: 'Pheno-Ranker Documentation'
 site_author: 'Manuel Rueda, PhD'
-copyright: '&copy; Copyright 2023-2024, Manuel Rueda, CNAG'
+copyright: '&copy; Copyright 2023-2025, Manuel Rueda, CNAG'
 repo_name: 'Pheno-Ranker'
 repo_url: https://github.com/mrueda/pheno-ranker
 edit_uri: edit/main/docs/

@@ -1,0 +1,5 @@
+1.00 2025-01-16
+
+  - Get rid of Moose dependency
+  - Add "--version" command key
+  - Improved documentation

@@ -188,6 +188,13 @@ dependencies, for that I'd recommend the B<tree> command. The dependency list
 is according to the dependencies found in the database, not the dependencies
 listed in the SlackBuild repo.
 
+=item B<rdeps> I<pkg>
+
+Prints a list of reverse dependencies for I<pkg> (packages that depend on
+I<pkg>). Does not print reverse dependencies of those dependencies, for that I'd
+recommend the B<rtree> command. The dependency list is according to the
+dependencies found in the database, not those listed in the SlackBuild repo.
+
 =item B<depadd> I<pkg> I<deps ...>
 
 Add I<deps> to I<pkg>'s dependency list. Dependencies that are not present in
@@ -305,6 +312,12 @@ A dependency tree will look something like this:
        python3-installer
          python3-flit_core
    python3-glad
+
+This command supports aliases.
+
+=item B<rtree> I<pkgs ...>
+
+Same thing as B<tree>, but for reverse dependencies instead.
 
 This command supports aliases.
 

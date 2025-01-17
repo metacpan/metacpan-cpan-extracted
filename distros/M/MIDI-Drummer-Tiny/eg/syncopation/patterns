@@ -2,7 +2,6 @@
 use strict;
 use warnings;
 
-use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Drummer-Tiny);
 use MIDI::Drummer::Tiny::Syncopate;
 use Music::RhythmSet::Util qw(rand_onsets);
 

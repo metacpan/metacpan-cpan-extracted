@@ -368,7 +368,7 @@ A script to convert a CSV to an input suitable for C<Pheno-Ranker>
 
 (only needed if you did not install C<Pheno-Ranker>)
 
- $ cpanm --sudo --installdeps .
+ $ cpanm --installdeps .
 
 =head3 System requirements
 

@@ -19,10 +19,10 @@ name: App-subsort
 provides:
   App::sortsub:
     file: lib/App/sortsub.pm
-    version: '0.051'
+    version: '0.052'
   App::subsort:
     file: lib/App/subsort.pm
-    version: '0.051'
+    version: '0.052'
 requires:
   Complete::File: '0.440'
   Complete::Module: '0.263'
@@ -40,7 +40,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-subsort
   homepage: https://metacpan.org/release/App-subsort
   repository: git://github.com/perlancar/perl-App-subsort.git
-version: '0.051'
+version: '0.052'
 x_Dist_Zilla:
   perl:
     version: '5.040000'

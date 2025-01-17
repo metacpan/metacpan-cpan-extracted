@@ -1,5 +1,10 @@
 Revision history for sbokeeper.
 
+2.03 (1/16/2025):
+  Added:
+    * rdeps command: Print reverse dependencies for specified package.
+    * rtree command: Print reverse dependency tree for specified package(s).
+
 2.02 (1/9/2025):
   Added:
     * 'untracked' package category: Represents SlackBuild packages installed on

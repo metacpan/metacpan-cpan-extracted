@@ -1,3 +1,4 @@
+.gitattributes
 .github/workflows/linux-ubuntu-latest-32bit.yml
 .github/workflows/linux-ubuntu-latest-perl-5.8.9.yml
 .github/workflows/linux-ubuntu-latest.yml
@@ -8,11 +9,6 @@
 Changes
 lib/SPVM/Unicode/Normalize.c
 lib/SPVM/Unicode/Normalize.config
-lib/SPVM/Unicode/Normalize.native/include/.gitkeep
-lib/SPVM/Unicode/Normalize.native/include/spvm_utf8proc.h
-lib/SPVM/Unicode/Normalize.native/include/spvm_utf8proc_data.c
-lib/SPVM/Unicode/Normalize.native/src/.gitkeep
-lib/SPVM/Unicode/Normalize.native/src/spvm_utf8proc.c
 lib/SPVM/Unicode/Normalize.pm
 lib/SPVM/Unicode/Normalize.spvm
 LICENSE

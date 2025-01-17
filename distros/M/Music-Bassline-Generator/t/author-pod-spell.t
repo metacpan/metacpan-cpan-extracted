@@ -38,3 +38,4 @@ midinum
 mixolydian
 pentatonic
 phrygian
+th

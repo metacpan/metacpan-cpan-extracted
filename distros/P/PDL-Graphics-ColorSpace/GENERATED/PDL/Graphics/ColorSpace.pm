@@ -11,10 +11,11 @@ use PDL::Exporter;
 use DynaLoader;
 
 
-   our $VERSION = '0.204';
+   our $VERSION = '0.205';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Graphics::ColorSpace $VERSION;
+
 
 
 
@@ -28,7 +29,7 @@ use DynaLoader;
 
 =head1 NAME
 
-PDL::Graphics::ColorSpace
+PDL::Graphics::ColorSpace - colour-space conversions for PDL
 
 =head1 SYNOPSIS
 
@@ -176,7 +177,7 @@ use PDL::LiteF;
 use PDL::Graphics::ColorSpace::RGBSpace;
 
 my $RGB_SPACE = $PDL::Graphics::ColorSpace::RGBSpace::RGB_SPACE;
-#line 180 "ColorSpace.pm"
+#line 181 "ColorSpace.pm"
 
 
 =head1 FUNCTIONS
@@ -192,7 +193,8 @@ my $RGB_SPACE = $PDL::Graphics::ColorSpace::RGBSpace::RGB_SPACE;
 
 =for sig
 
-  Signature: (rgb(c=3); [o]cmyk(d=4))
+ Signature: (rgb(c=3); [o]cmyk(d=4))
+ Types: (double)
 
 =pod
 
@@ -207,6 +209,10 @@ The first dimension of the ndarrays holding the rgb values must be size 3, i.e. 
 Usage:
 
     my $cmyk = rgb_to_cmyk( $rgb );
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
@@ -230,7 +236,8 @@ If C<rgb_to_cmyk> encounters a bad value in any of the R, G, or B values the out
 
 =for sig
 
-  Signature: (cmyk(d=4); [o]rgb(c=3))
+ Signature: (cmyk(d=4); [o]rgb(c=3))
+ Types: (double)
 
 =pod
 
@@ -245,6 +252,10 @@ The first dimension of the ndarrays holding the cmyk values must be size 4, i.e.
 Usage:
 
     my $rgb = cmyk_to_rgb( $cmyk );
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
@@ -268,7 +279,8 @@ If C<cmyk_to_rgb> encounters a bad value in any of the C, M, Y, or K quantities,
 
 =for sig
 
-  Signature: (rgb(c=3); [o]hsl(c=3))
+ Signature: (rgb(c=3); [o]hsl(c=3))
+ Types: (double)
 
 =pod
 
@@ -283,6 +295,10 @@ The first dimension of the ndarrays holding the hsl and rgb values must be size 
 Usage:
 
     my $hsl = rgb_to_hsl( $rgb );
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
@@ -306,7 +322,8 @@ If C<rgb_to_hsl> encounters a bad value in any of the R, G, or B values the outp
 
 =for sig
 
-  Signature: (hsl(c=3); [o]rgb(c=3))
+ Signature: (hsl(c=3); [o]rgb(c=3))
+ Types: (double)
 
 =pod
 
@@ -321,6 +338,10 @@ The first dimension of the ndarrays holding the hsl and rgb values must be size 
 Usage:
 
     my $rgb = hsl_to_rgb( $hsl );
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
@@ -344,7 +365,8 @@ If C<hsl_to_rgb> encounters a bad value in any of the H, S, or V quantities, the
 
 =for sig
 
-  Signature: (rgb(c=3); [o]hsv(c=3))
+ Signature: (rgb(c=3); [o]hsv(c=3))
+ Types: (double)
 
 =pod
 
@@ -359,6 +381,10 @@ The first dimension of the ndarrays holding the hsv and rgb values must be size 
 Usage:
 
     my $hsv = rgb_to_hsv( $rgb );
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
@@ -382,7 +408,8 @@ If C<rgb_to_hsv> encounters a bad value in any of the R, G, or B values the outp
 
 =for sig
 
-  Signature: (hsv(c=3); [o]rgb(c=3))
+ Signature: (hsv(c=3); [o]rgb(c=3))
+ Types: (double)
 
 =pod
 
@@ -397,6 +424,10 @@ The first dimension of the ndarrays holding the hsv and rgb values must be size 
 Usage:
 
     my $rgb = hsv_to_rgb( $hsv );
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
@@ -420,15 +451,29 @@ If C<hsv_to_rgb> encounters a bad value in any of the H, S, or V quantities, the
 
 =for sig
 
-  Signature: (xyY(c=3); [o]xyz(c=3))
+ Signature: (xyY(c=3); [o]xyz(c=3))
+ Types: (double)
+
+=for usage
+
+ $xyz = xyY_to_xyz($xyY);
+ xyY_to_xyz($xyY, $xyz);    # all arguments given
+ $xyz = $xyY->xyY_to_xyz;   # method call
+ $xyY->xyY_to_xyz($xyz);
+ $xyY->inplace->xyY_to_xyz; # can be used inplace
+ xyY_to_xyz($xyY->inplace);
 
 =for ref
 
 Internal function for white point calculation. Use it if you must.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-xyY_to_xyz processes bad values.
+C<xyY_to_xyz> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -467,7 +512,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (lab(c=3); [o]lch(c=3))
+ Signature: (lab(c=3); [o]lch(c=3))
+ Types: (double)
 
 =pod
 
@@ -482,6 +528,10 @@ The first dimension of the ndarrays holding the lab values must be size 3, i.e. 
 Usage:
 
     my $lch = lab_to_lch( $lab );
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
@@ -505,7 +555,8 @@ If C<lab_to_lch> encounters a bad value in any of the L, a, or b values the outp
 
 =for sig
 
-  Signature: (lch(c=3); [o]lab(c=3))
+ Signature: (lch(c=3); [o]lab(c=3))
+ Types: (double)
 
 =pod
 
@@ -520,6 +571,10 @@ The first dimension of the ndarrays holding the lch values must be size 3, i.e. 
 Usage:
 
     my $lab = lch_to_lab( $lch );
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
@@ -543,7 +598,8 @@ If C<lch_to_lab> encounters a bad value in any of the L, C, or H values the outp
 
 =for sig
 
-  Signature: (rgb(c=3); gamma(); [o]out(c=3))
+ Signature: (rgb(c=3); gamma(); [o]out(c=3))
+ Types: (double)
 
 =for ref
 
@@ -555,6 +611,10 @@ with linear values.
 Usage:
 
     my $rgb_linear = rgb_to_linear( $gammaed, 2.2 );
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
@@ -580,7 +640,8 @@ G, and B values will all be marked as bad.
 
 =for sig
 
-  Signature: (rgb(c=3); gamma(); [o]out(c=3))
+ Signature: (rgb(c=3); gamma(); [o]out(c=3))
+ Types: (double)
 
 =for ref
 
@@ -592,6 +653,10 @@ with the specified gamma.
 Usage:
 
     my $gammaed = rgb_from_linear( $rgb_linear, 2.2 );
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
@@ -905,7 +970,7 @@ Original work sponsored by Shutterstock, LLC L<http://www.shutterstock.com/>
 All rights reserved. There is no warranty. You are allowed to redistribute this software / documentation as described in the file COPYING in the PDL distribution.
 
 =cut
-#line 909 "ColorSpace.pm"
+#line 974 "ColorSpace.pm"
 
 # Exit with OK status
 

@@ -1,5 +1,9 @@
 Revision history for Music-Bassline-Generator
 
+0.0608 2025-01-17 00:47:01
+    - Lose local author lib line in eg/.
+    - Use a try-catch so we don't unceremoniously die.
+
 0.0607 2023-11-12 13:50:03
     - Oops. Revert array deref syntax to the old-skool way.
 

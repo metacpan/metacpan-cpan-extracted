@@ -6,7 +6,10 @@ Easy way to connect to MySQL/MariaDB via command line.
 
 =head1 Installation
 
-2B added...
+    $ perl Makefile.PL
+    $ make
+    $ sudo make install
+    $ make clean
 
 =head1 Usage
 

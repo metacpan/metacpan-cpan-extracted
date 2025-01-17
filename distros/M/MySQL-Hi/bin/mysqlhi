@@ -1,4 +1,4 @@
-#!perl
+#!/usr/bin/env perl
 
 use strict;
 use warnings;
@@ -7,87 +7,107 @@ use feature qw/say/;
 use Getopt::Long;
 use MySQL::Hi;
 
-# First arguments is DB name
-# Mandatory
-my $db = shift @ARGV;
+&main();
+exit 0;
 
-if ( !$db ) {
-    die "No DB name provided\n";
+sub main {
+
+    # First arguments is DB name
+    my $db = shift @ARGV;
+
+    # If only asked for a version,
+    # ignore other params, show version
+    # and exit
+    if ( $db eq "--version" || $db eq "-v" ) {
+        &print_version();
+    }
+    else {
+        # DB name is mandatory
+        if ( !$db ) {
+            die "No DB name provided\n";
+        }
+
+        # Read other params
+        GetOptions(
+            'user|u=s'   => \( my $user ),
+            'config|c=s' => \( my $config ),
+            'mode|m=s'   => \( my $mode ),
+            'exec|e=s'   => \( my $exec ),
+            'command'    => \( my $show_command ),
+            'version|v'  => \( my $show_version ),
+        );
+
+        local $SIG{__WARN__} = sub {
+            my $warn = $_[0];
+            $warn =~ s/\n+ at .*$//;
+            print STDERR $warn;
+        };
+
+        local $SIG{__DIE__} = sub {
+            my $die = $_[0];
+            $die =~ s/\n+ at .*$//;
+            # Catch no supported config syntax here
+            if ( $die =~ /No supported configuration file syntax found/ ) {
+                $die = "No supported configuration file syntax found.\n";
+            }
+            print STDERR "$die";
+            exit 1;
+        };
+
+        if ( $show_version ) {
+            &print_version();
+        }
+
+        my $db_cred;
+        eval {
+            $db_cred = MySQL::Hi->new(
+                $user ? ( user   => $user ) : (),
+                $config ? ( config => $config ) : (),
+            );
+            1;
+        } or do {
+            my $error = $@ || 'Zombie error';
+            die "$error\n";
+        };
+
+        my @prompt     = ( '--prompt=\u@\h:[\d]>\_' );
+        my @pager      = ( '--pager=less -iSFX' );
+        my @connection;
+
+        eval {
+            @connection = $db_cred->get_options( $db, $mode );
+            1;
+        } or do {
+            my $error = $@ || 'Zombie error';
+            die "$error\n";
+        };
+
+        my @options = $exec ? ( -e => $exec ) : ( @prompt, @pager );
+
+        my @command = (
+            @options,
+            @connection,
+        );
+
+        say join ' ', 'mysql', map {
+            my $p = $_;
+            $p =~ s/^-p.+$/-p/;
+            if ( $p =~ /^--/ ) {
+                my ( $op, $val ) = split '=', $p, 2;
+                $val =~ s/'/\'/g;
+                $p = "$op='$val'";
+            }
+            $p;
+        } @command
+            if $show_command;
+
+        exec 'mysql', @command;
+    }
 }
 
-# Read other params
-GetOptions(
-    'user|u=s'     => \( my $user ),
-    'config|c=s'   => \( my $config ),
-    'mode|m=s'     => \( my $mode ),
-    'exec|e=s'     => \( my $exec ),
-    'command'      => \( my $show_command ),
-);
-
-
-local $SIG{__WARN__} = sub {
-    my $warn = $_[0];
-    $warn =~ s/\n+ at .*$//;
-    print STDERR $warn;
-};
-
-local $SIG{__DIE__} = sub {
-    my $die = $_[0];
-    $die =~ s/\n+ at .*$//;
-    # Catch no supported config syntax here
-    if ( $die =~ /No supported configuration file syntax found/ ) {
-        $die = "No supported configuration file syntax found.\n";
-    }
-    print STDERR "$die";
-    exit 1;
-};
-
-my $db_cred;
-eval {
-    $db_cred = MySQL::Hi->new(
-        $user ? ( user   => $user ) : (),
-        $config ? ( config => $config ) : (),
-    );
-    1;
-} or do {
-    my $error = $@ || 'Zombie error';
-    die "$error\n";
-};
-
-my @prompt     = ( '--prompt=\u@\h:[\d]>\_' );
-my @pager      = ( '--pager=less -iSFX' );
-my @connection;
-
-eval {
-    @connection = $db_cred->get_options( $db, $mode );
-    1;
-} or do {
-    my $error = $@ || 'Zombie error';
-    die "$error\n";
-};
-
-my @options = $exec ? ( -e => $exec ) : ( @prompt, @pager );
-
-my @command = (
-    @options,
-    @connection,
-);
-
-say join ' ', 'mysql', map {
-    my $p = $_;
-    $p =~ s/^-p.+$/-p/;
-    if ( $p =~ /^--/ ) {
-        my ( $op, $val ) = split '=', $p, 2;
-        $val =~ s/'/\'/g;
-        $p = "$op='$val'";
-    }
-    $p;
-} @command
-    if $show_command;
-
-exec 'mysql', @command;
-
-exit 0;
+sub print_version {
+    print "mysqlhi: version $MySQL::Hi::VERSION\n";
+}
 
 
 
@@ -102,6 +122,7 @@ mysqlhi - MySQL Hop In: easy run of MySQL/MariaDB client
     $ mysqlhi dbname
     $ mysqlhi dbname -c /path/to/config.conf
     $ mysqlhi dbname -e 'SHOW TABLES'
+    $ mysqlho --version
 
 =head1 DESCRIPTION
 
@@ -109,19 +130,19 @@ Allows to run MySQL/MariaDB client with credentials read from a config
 file.
 
 The C<mysqlhi> script reads a config file, searches for settings for the
-database provided as a first parameter and runs C<mysql> with proper
-params.
+database provided as a first parameter and runs C<mysql> to connect to
+it.
 
 =head2 Typical usecase
 
 You use C<mysql> command line tool often to connect to different schemas
-and/or databases. Each database has it's own permissions, passwords,
+and/or databases. Each database has its own permissions, passwords,
 etc., they can be phisycally on different servers.
 
-Instead of typing long list of command line parameters and remembering
-passwords for each host/schema, you can create C<$HOME/mysqlhi> file
-where you store all necessary settings to access to your databases by
-simply typing:
+Instead of typing a long list of command line parameters and remembering
+passwords for each host/schema, you can create C<$HOME/mysqlhi.cong>
+file where you describe the settings for all DBs you need to have CLI
+access and then access them as simple as that:
 
     $ mysqlhi dbname
 
@@ -138,32 +159,107 @@ For accessing master you secify the mode:
     $ mysqlhi dbname -m rw
 
 There are no predefined modes, feel free to create as many as you want
-at your convenience.
+at your convenience. For example, you may want to have access to both
+development and production DBs, so you can create modes C<prod> and
+C<dev>. Or even further with replication: C<prod_rw>, C<prod-ro>,
+C<dev:rw>, C<dev:ro>, and so on.
+
+B<NOTE>: Do not use C<.> in the mode because this character has special
+meaning in L<Config::Simple> and it may be parsed wrongly. Any symbol
+that has special meaning in your shell must be escaped according to the
+syntax of your shell.
+
+=head2 Config file
+
+By default C<mysqlhi> searches for the file F<mysqlhi.conf> in user's
+home directory. You can cpecify another config file with C<-c>
+parameter.
+
+The format of the config file is the following:
+
+    [dbname:mode]
+    host=localhost
+    port=3306
+    password=hunter2
+
+Where:
+
+=over
+
+=item dbname
+
+Database name, this will be used in C<-D> parameter of C<mysql> command.
+
+=item mode
+
+The C<:mode> part can be omitted. Though, it can be useful to separate
+connections to the same schema on different boxes in replication chain.
+See L</"--mode=E<lt>modenameE<gt>E<verbar>-m E<lt>modenameE<gt>">.
+
+=item host
+
+Hostname where MySQL/MariaDB server is runing. If omitted, C<localhost>
+is used.
+
+=item port
+
+Port on the host which is used by MySQL/MariaDB for connections. By
+default 3306 is used.
+
+=item password
+
+The password of a user to access C<dbname> on the MySQL/MariaDB server.
+Default value is empty string.
+
+=back
+
+You can omit any of the C<host>, C<port>, in this case the default
+values will be used. If you omit C<password>, the password prompt will
+be shown.
+
+If you omit all C<host>, C<port> and C<password>, the default parameters
+will used (C<localhost>, C<3306>), the password will be prompted and a
+warning message will be thrown.
 
 =head2 Command line keys
 
-The forst parameter is always a database name. If it is not specified,
-the error message will be thrown. All other parameters are optional.
+The first parameter must be a database name. If it is not specified,
+an error will occur. All other parameters are optional.
 
 =over
 
 =item --user=<username>|-u <username>
 
-Username which will be used to connect to server. By default C<mysqlhi>
-uses current user name. With C<-u> key you can override it.
+MySQL username. By default C<mysqlhi> uses current user name. With C<-u>
+key you can override it.
 
-=item --config </path/to/config.conf>|-c </path/to/config.conf>
+=item --config=</path/to/config.conf>|-c </path/to/config.conf>
 
-Config file where credentials are placed. If omitted, F<mysqlhi.conf>
-from you home directory is used.
+Path to the config file. If omitted, F<mysqlhi.conf> from user's home
+directory is used.
 
-B<NOTE:> I only tested it on Debian and Ubuntu. I have not tested it on
-other operation systems. It should, in theory, work on other OSes too.
-If it does not, your patches are welcome.
+B<NOTE:> I only tested it on Linux, not on other operating systems. It
+should, in theory, work on other OSes too. If it does not, your patches
+are welcome.
 
 =item --mode=<modename>|-m <modename>
 
-Which connection mode to use.
+Which connection mode to use. There can be several different hosts with
+the same DB name, for example, in replication chain. Or, there can be
+different permissions to the same DB. Modes can be used as short and/or
+meaningful extentions to a DB name that specify the exact way of
+connecting.
+
+In your L</"Config file> you can have something like this:
+
+    [db:rw]
+    host=master.host
+
+    [db:ro]
+    host=slave.host
+
+By specifying C<-m rw> you will connect to the master host, while
+C<-m ro> will lead you to the slave one.
 
 =item --exec='<SQL STATEMENT>'|-e '<SQL STATEMENT>'
 
@@ -178,50 +274,12 @@ config file.
 B<NOTE 1:> A password is not being shown.
 
 B<NOTE 2:> The comand may not be useful for copying and pasting, because
-it no escaping mechanism is applied.
+it's not escaping for special characters is applied.
 
-=back
+=item --version|-v
 
-=head2 Config file
-
-By default C<mysqlhi> searches for the file F<mysqlhi.conf> in user's
-home directory. You can cpecify another config file with C<-c>
-parameter.
-
-The format of the config file is the following:
-
-    [dbname:mode]
-    host=localhost
-    port=3306
-    password=t0p$eCr3T
-
-Where:
-
-=over
-
-=item dbname
-
-Database name, this will be used in C<-D> parameter of C<mysql> command.
-
-=item mode
-
-The C<:mode> part can be omitted. Though, it can be useful to separate
-connections to the same schema on different boxes in replication chain.
-
-=item host
-
-Hostname where MySQL/MariaDB server is runing. If omitted, C<localhost>
-is used
-
-=item port
-
-Port on the host which is used by MySQL/MariaDB for connections. By
-default 3306 is used.
-
-=item password
-
-The password for to connect to the MySQL/MariaDB server. Default value
-is empty string.
+Shows the version of the distribution. If used as the first command key,
+all following keys will be ignored.
 
 =back
 

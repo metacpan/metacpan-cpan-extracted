@@ -1,3 +1,7 @@
+2.100 2025-01-16
+- install Fits.pm so Debian packaging is happy
+
+2.099 2025-01-13
 - document return values for fitgauss1d{,r} (#1) - thanks @d-lamb
 
 2.098 2025-01-06

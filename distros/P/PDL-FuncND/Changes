@@ -1,5 +1,22 @@
 Revision history for PDL-FuncND
 
+0.13      2025-01-16 15:01:26-05:00 America/New_York
+
+  * No changes from 0.12
+  * Promote to stable. Thanks CPAN Testers!
+
+0.12      2025-01-13 12:00:50-05:00 America/New_York (TRIAL RELEASE)
+
+ [TEST]
+
+  * Tests used overloaded PDL operations on undefined values; the
+    behavior of which has changed.  (https://github.com/PDLPorters/pdl/issues/519) ++mohawk2/etj
+
+ [BUILD]
+
+  * moved to Dist::Zilla for build. thanks to mohawk2/etj for their
+    work on a parallel move to EUMM.
+
 0.11   2014-10-23T17:41:48-0400
 
  [DOCUMENTATION]

@@ -43,3 +43,5 @@ t/27_valence.t
 t/28_octahedral_chirality.t
 t/29_trigonal_bipyramidal_chirality.t
 t/30_trigonal_bipyramidal_chirality.t
+t/31_write.t
+t/32_write.t

@@ -12,7 +12,7 @@ int32_t SPVM__Unicode__Normalize__NFC(SPVM_ENV* env, SPVM_VALUE* stack) {
   void* obj_string = stack[0].oval;
   
   if (!obj_string) {
-    return env->die(env, stack, "$string must be defined.", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "The string $string must be defined.", __func__, FILE_NAME, __LINE__);
   }
   
   const char* string = env->get_chars(env, stack, obj_string);
@@ -44,7 +44,7 @@ int32_t SPVM__Unicode__Normalize__NFD(SPVM_ENV* env, SPVM_VALUE* stack) {
   void* obj_string = stack[0].oval;
   
   if (!obj_string) {
-    return env->die(env, stack, "$string must be defined.", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "The string $string must be defined.", __func__, FILE_NAME, __LINE__);
   }
   
   const char* string = env->get_chars(env, stack, obj_string);
@@ -76,7 +76,7 @@ int32_t SPVM__Unicode__Normalize__NFKC(SPVM_ENV* env, SPVM_VALUE* stack) {
   void* obj_string = stack[0].oval;
   
   if (!obj_string) {
-    return env->die(env, stack, "$string must be defined.", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "The string $string must be defined.", __func__, FILE_NAME, __LINE__);
   }
   
   const char* string = env->get_chars(env, stack, obj_string);
@@ -108,7 +108,7 @@ int32_t SPVM__Unicode__Normalize__NFKD(SPVM_ENV* env, SPVM_VALUE* stack) {
   void* obj_string = stack[0].oval;
   
   if (!obj_string) {
-    return env->die(env, stack, "$string must be defined.", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "The string $string must be defined.", __func__, FILE_NAME, __LINE__);
   }
   
   const char* string = env->get_chars(env, stack, obj_string);

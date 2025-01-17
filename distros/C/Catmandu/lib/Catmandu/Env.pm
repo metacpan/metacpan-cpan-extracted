@@ -2,7 +2,7 @@ package Catmandu::Env;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2023';
+our $VERSION = '1.2024';
 
 use Catmandu::Util qw(require_package use_lib read_yaml read_json :is :check);
 use Catmandu::Fix;
@@ -32,7 +32,7 @@ has load_paths => (
     default => sub {[]},
     coerce  => sub {
         [
-            map     {File::Spec->canonpath($_)}
+            map {File::Spec->canonpath($_)}
                 map {$_ eq ':up' ? _search_up($_) : $_} split /,/,
             join ',',
             ref $_[0] ? @{$_[0]} : $_[0]

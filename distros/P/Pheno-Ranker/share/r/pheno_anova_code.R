@@ -12,7 +12,7 @@ args <- commandArgs(trailingOnly = TRUE)
 
 #MDS plot
 # Read in the input file as a matrix 
-data <- as.matrix(read.table("matrix.txt", header = TRUE, row.names = 1))
+data <- as.matrix(read.table("matrix.txt", header = TRUE, row.names = 1, check.names = FALSE))
 
 #calculate distance matrix
 #d <- dist(data)
@@ -30,7 +30,6 @@ df <- data.frame(x, y, label=row.names(data))
 
 # Add a new variable to the data frame based on the label prefixes
 df <- df %>% mutate(label_prefix = str_extract(label, "^[^_]*_"))
-
 
 # Save image
 png(filename = "mds.png", width = 1000, height = 1000,

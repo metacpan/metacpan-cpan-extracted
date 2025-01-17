@@ -25,11 +25,9 @@ sub nfact {
 
     my ( $s, $beta, $n ) = @_;
 
-    my $alpha_n = ref $s && $s->nelem > 1 ? sqrt( determinant($s)) : $s**$n;
+    my $alpha_n = ref $s && $s->nelem > 1 ? sqrt( determinant( $s ) ) : $s**$n;
 
-    my $norm = _gamma( $beta )
-      / _gamma( $beta - $n / 2 )
-      / ( pi**( $n / 2 ) * $alpha_n );
+    my $norm = _gamma( $beta ) / _gamma( $beta - $n / 2 ) / ( pi**( $n / 2 ) * $alpha_n );
 
     return $norm;
 }
@@ -50,10 +48,10 @@ sub _moffatND_symmetric {
 
     my $ndims = @{$x};
 
-    my $m;
-    $m += ( ( $x->[$_] - $c->[$_] ) / $s )**2 for 0 .. $ndims - 1;
+    my $m = ( ( $x->[0] - $c->[0] ) / $s )**2;
+    $m += ( ( $x->[$_] - $c->[$_] ) / $s )**2 for 1 .. $ndims - 1;
 
-    my $norm = nfact($s, $b, $ndims);
+    my $norm = nfact( $s, $b, $ndims );
 
     return $norm * ( 1 + $m )**( -$b );
 }
@@ -68,14 +66,14 @@ sub _moffat2D {
 
     my ( $s00, $s01, $s10, $s11 ) = $s->list;
 
-    my $norm = nfact($s, $b, 2);
+    my $norm = nfact( $s, $b, 2 );
 
 #<<<  don't tidy
     return $norm *
       ( 1
-	+  (   $dy * ($s00 * $dy - $s10 * $dx )
-	     + $dx * ($s11 * $dx - $s01 * $dy )
-	   ) / determinant( $s )
+        +  (   $dy * ($s00 * $dy - $s10 * $dx )
+             + $dx * ($s11 * $dx - $s01 * $dy )
+           ) / determinant( $s )
       )**-$b;
 #>>>
 }
@@ -83,7 +81,7 @@ sub _moffat2D {
 # test 2D, symmetric
 {
 
-    my @c = ( $N / 2, $N / 2 ); #( 0.22, 1.93 );
+    my @c = ( $N / 2, $N / 2 );    #( 0.22, 1.93 );
     my $x = xvals( $N, $N );
     my $y = yvals( $N, $N );
 
@@ -97,7 +95,7 @@ sub _moffat2D {
             beta   => $beta,
             scale  => $s,
             center => \@c,
-	    norm => 1,
+            norm   => 1,
         } );
 
     ok( all( approx( $got, $exp ) ), q[2D, symmetric] )
@@ -105,10 +103,9 @@ sub _moffat2D {
 
     # test assymetric test code
     {
-        my $s = identity( 2 ) * $s**2;
+        my $s   = identity( 2 ) * $s**2;
         my $got = _moffat2D( [ $x, $y ], \@c, $beta, $s );
-        ok( all( approx( $got, $exp ) ),
-            q[2D, symmetric, assymetric test code] )
+        ok( all( approx( $got, $exp ) ), q[2D, symmetric, assymetric test code] )
           or diag( "   got: $got\n    exp: $exp" );
     }
 

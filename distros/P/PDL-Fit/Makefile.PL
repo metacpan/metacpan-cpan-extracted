@@ -21,7 +21,7 @@ WriteMakefile(
   PREREQ_PM => {
     'PDL' => '2.094',
   },
-  PM => { map {($_ => '$(INST_LIBDIR)/Fit/'.$_)} <[LP]*.pm> },
+  PM => { (map {($_ => '$(INST_LIBDIR)/Fit/'.$_)} <[LP]*.pm>),'Fit.pm'=>'$(INST_LIBDIR)/Fit.pm' },
   dist => { COMPRESS => 'gzip', SUFFIX => 'gz', PREOP => $preop },
   META_MERGE => {
     "meta-spec" => { version => 2 },

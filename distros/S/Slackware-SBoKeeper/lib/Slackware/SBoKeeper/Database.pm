@@ -1,6 +1,6 @@
 package Slackware::SBoKeeper::Database;
 use 5.016;
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 use strict;
 use warnings;
 
@@ -342,6 +342,22 @@ sub is_dependency {
 
 }
 
+sub is_immediate_dependency {
+
+	my $self = shift;
+	my $dep  = shift;
+	my $of   = shift;
+
+	foreach my $p (@{$self->{_data}->{$of}->{Deps}}) {
+		if ($p eq $dep) {
+			return 1;
+		}
+	}
+
+	return 0;
+
+}
+
 sub is_manual {
 
 	my $self = shift;
@@ -451,6 +467,17 @@ sub real_immediate_dependencies {
 	close $fh;
 
 	return sort @deps;
+
+}
+
+sub reverse_dependencies {
+
+	my $self = shift;
+	my $pkg  = shift;
+
+	return grep {
+		$self->is_immediate_dependency($pkg, $_)
+	} $self->packages;
 
 }
 
@@ -571,6 +598,12 @@ $of. Returns 1 for yes, 0 for no.
 
 $dep and $of must already be added to the object.
 
+=head2 is_immediate_dependency($dep, $of)
+
+Checks to see if $dep is a dependency of $of. Returns 1 for yes, 0 for no.
+
+$dep and $of must already be added to the object.
+
 =head2 is_manual($pkg)
 
 Checks if $pkg is manually installed. Returns 1 for yes, 0 no.
@@ -599,6 +632,11 @@ SlackBuild repo. $pkg does not have to have been added previously.
 Returns list of packages that are an immediate dependency of $pkg, according
 to the SlackBuild repo. Does not return packages that are dependencies of those
 dependencies. $pkg does not have to have been added previously.
+
+=head2 reverse_dependencies($pkg)
+
+Returns list of packages that depend on $pkg, according to the sbokeeper
+database.
 
 =head2 unmanual($pkg)
 

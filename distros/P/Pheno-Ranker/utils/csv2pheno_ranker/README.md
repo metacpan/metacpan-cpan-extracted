@@ -41,7 +41,7 @@ A script to convert a CSV to an input suitable for `Pheno-Ranker`
 
 (only needed if you did not install `Pheno-Ranker`)
 
-    $ cpanm --sudo --installdeps .
+    $ cpanm --installdeps .
 
 ### System requirements
 

@@ -2,11 +2,11 @@ package Catmandu::Fix::sum;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2023';
+our $VERSION = '1.2024';
 
-use Catmandu::Util qw(is_number);
+use Catmandu::Util       qw(is_number);
 use Catmandu::Util::Path qw(as_path);
-use List::Util qw(all sum);
+use List::Util           qw(all sum);
 use Moo;
 use namespace::clean;
 use Catmandu::Fix::Has;

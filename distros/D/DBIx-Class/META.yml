@@ -62,7 +62,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=DBIx-Class
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Perl5/DBIx-Class
-version: 0.082843
+version: 0.082844
 x_authority: cpan:RIBASUSHI
 x_contributors:
   - 'abraxxa: Alexander Hartmaier <abraxxa@cpan.org>'

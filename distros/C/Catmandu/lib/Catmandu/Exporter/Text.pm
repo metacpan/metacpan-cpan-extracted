@@ -2,7 +2,7 @@ package Catmandu::Exporter::Text;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2023';
+our $VERSION = '1.2024';
 
 use Moo;
 use Catmandu::Util;
@@ -34,10 +34,16 @@ sub unbackslash ($) {
 
 # End from String::Escape
 
-has line_sep =>
-    (is => 'ro', default => sub {"\n"}, coerce => sub {unbackslash($_[0]);});
-has field_sep =>
-    (is => 'ro', default => sub {undef}, coerce => sub {unbackslash($_[0])});
+has line_sep => (
+    is      => 'ro',
+    default => sub {"\n"},
+    coerce  => sub {unbackslash($_[0]);}
+);
+has field_sep => (
+    is      => 'ro',
+    default => sub {undef},
+    coerce  => sub {unbackslash($_[0])}
+);
 
 sub add {
     my ($self, $data) = @_;

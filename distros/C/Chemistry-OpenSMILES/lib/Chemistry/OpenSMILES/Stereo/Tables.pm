@@ -1,7 +1,7 @@
 package Chemistry::OpenSMILES::Stereo::Tables;
 
 # ABSTRACT: Stereochemistry tables
-our $VERSION = '0.11.1'; # VERSION
+our $VERSION = '0.11.2'; # VERSION
 
 use strict;
 use warnings;

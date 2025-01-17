@@ -9,7 +9,6 @@ use warnings;
 # My write-up is at https://ology.github.io/2022/11/13/the-black-page-in-perl/
 
 # use local author libraries
-use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Drummer-Tiny MIDI-Util Music-Duration);
 use MIDI::Drummer::Tiny ();
 use Music::Duration ();
 use MIDI::Util qw(dura_size);

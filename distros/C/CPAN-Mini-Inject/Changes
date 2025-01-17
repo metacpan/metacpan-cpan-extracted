@@ -1,5 +1,13 @@
 Revision history for CPAN-Mini-Inject
 
+1.007 2025-01-16T21:09:23Z
+	
+	* pass CPAN::Mini config parameters to CPAN::Mini while calling
+	update (#16)
+
+1.006_001 2025-01-15T18:43:49Z
+	* pass all configuration options to CPAN::Mini->update_mirror (#16)
+
 1.005 2024-09-09T13:18:08Z
 	* temporary fix for CPAN::Meta until upstream is released. See
 	https://github.com/Perl-Toolchain-Gang/CPAN-Meta/issues/138 .

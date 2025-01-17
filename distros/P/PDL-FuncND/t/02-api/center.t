@@ -46,13 +46,11 @@ while ( my ( $label, $spec ) = each %specs ) {
     subtest "undefined center: $label" => sub {
 
         my %got = trap {
-            PDL::FuncND::_handle_options(
-                $spec->{self},
-                { %{ $spec->{opts} } },
-                @{ $spec->{args} } );
+            PDL::FuncND::_handle_options( $spec->{self}, { %{ $spec->{opts} } }, @{ $spec->{args} } );
         };
 
         $trap->return_ok( 0, "return" );
+        return if !defined $got{center};
         _ok( $got{center}, pdl( 0, 0 ), "value => piddle(0, 0)" );
     };
 

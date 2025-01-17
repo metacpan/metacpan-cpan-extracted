@@ -2,12 +2,12 @@ package Catmandu::Fix::eval;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2023';
+our $VERSION = '1.2024';
 
 use Moo;
 use List::Util qw(all);
 use Catmandu::Fix;
-use Catmandu::Util qw(is_string is_array_ref);
+use Catmandu::Util       qw(is_string is_array_ref);
 use Catmandu::Util::Path qw(as_path);
 use namespace::clean;
 use Catmandu::Fix::Has;
@@ -23,7 +23,7 @@ sub _build_fixer {
         my $data = $_[0];
         for my $fixes (@{$getter->($data)}) {
             $fixes = [$fixes] unless is_array_ref($fixes);
-            next unless @$fixes && all {is_string($_)} @$fixes;
+            next              unless @$fixes && all {is_string($_)} @$fixes;
             my $fixer = Catmandu::Fix->new(fixes => $fixes);
             $data = $fixer->fix($data);
         }

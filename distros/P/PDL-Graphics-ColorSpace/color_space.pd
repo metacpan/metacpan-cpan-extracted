@@ -6,7 +6,7 @@ pp_add_exported(
   'add_rgb_space',
 );
 
-$PDL::Graphics::ColorSpace::VERSION = '0.204';
+$PDL::Graphics::ColorSpace::VERSION = '0.205';
 
 pp_setversion("'$PDL::Graphics::ColorSpace::VERSION'");
 
@@ -16,7 +16,7 @@ pp_addpm({At=>'Top'}, <<'EOD');
 
 =head1 NAME
 
-PDL::Graphics::ColorSpace
+PDL::Graphics::ColorSpace - colour-space conversions for PDL
 
 =head1 SYNOPSIS
 

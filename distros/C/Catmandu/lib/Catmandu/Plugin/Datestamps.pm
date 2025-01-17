@@ -2,14 +2,14 @@ package Catmandu::Plugin::Datestamps;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2023';
+our $VERSION = '1.2024';
 
 use Catmandu::Util qw(check_string now);
 use Moo::Role;
 use MooX::Aliases;
 use namespace::clean;
 
-has datestamp_format      => (is => 'lazy');
+has datestamp_format => (is => 'lazy');
 has datestamp_created_key => (
     is    => 'lazy',
     isa   => \&check_string,

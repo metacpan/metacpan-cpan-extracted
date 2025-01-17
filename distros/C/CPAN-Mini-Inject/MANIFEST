@@ -6,6 +6,7 @@ Makefile.PL
 MANIFEST
 MANIFEST.SKIP
 README.pod
+SECURITY.md
 t/.mcpani/config
 t/.mcpani/config_bad
 t/.mcpani/config_badremote

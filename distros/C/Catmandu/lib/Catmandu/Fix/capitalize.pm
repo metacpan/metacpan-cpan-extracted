@@ -2,11 +2,11 @@ package Catmandu::Fix::capitalize;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2023';
+our $VERSION = '1.2024';
 
 use Moo;
 use Catmandu::Util::Path qw(as_path);
-use Catmandu::Util qw(as_utf8);
+use Catmandu::Util       qw(as_utf8);
 use namespace::clean;
 use Catmandu::Fix::Has;
 

@@ -35,6 +35,7 @@ use OpenGL qw/ :glfunctions :glconstants /;
 use OpenGL::GLUT qw/ :all /;
 use PDL::Graphics::OpenGL::Perl::OpenGL;
 use PDL::Graphics::OpenGLQ;
+use PDL::Graphics::TriD::Objects;
 use base qw/PDL::Graphics::TriD::GObject/;
 
 sub gdraw {

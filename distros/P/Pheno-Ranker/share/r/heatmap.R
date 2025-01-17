@@ -3,7 +3,7 @@ library("pheatmap")
 #library("heatmaply") # could not install
 
 # Read in the input file as a matrix
-data <- as.matrix(read.table("matrix.txt", header = TRUE, row.names = 1))
+data <- as.matrix(read.table("matrix.txt", header = TRUE, row.names = 1, check.names = FALSE))
 
 # Save image
 png(filename = "heatmap.png", width = 1000, height = 1000,

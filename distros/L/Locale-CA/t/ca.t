@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 21;
+use Test::Most tests => 22;
 use Test::NoWarnings;
 
 BEGIN {
@@ -29,4 +29,5 @@ ALL: {
 	cmp_ok($u->{province2code}{'ONTARIO'}, 'eq', 'ON', 'province2code');
 	cmp_ok($u->{province2code}{'ALBERTA'}, 'eq', 'AB', 'Alberta');
 	cmp_ok($u->{province2code}{'ALBT.'}, 'eq', 'AB', 'Albt.');
+	cmp_ok($u->{code2province}{'AB'}, 'eq', 'ALBERTA', 'Ensure ALBERTA not ALBT.');
 }

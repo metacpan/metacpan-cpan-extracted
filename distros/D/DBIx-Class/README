@@ -1,4 +1,4 @@
-DBIx::Class is Copyright (c) 2005-2022 by mst, castaway, ribasushi, and others.
+DBIx::Class is Copyright (c) 2005-2025 by mst, castaway, ribasushi, and others.
 See AUTHORS and LICENSE included with this distribution. All rights reserved.
 
 NAME
@@ -191,7 +191,7 @@ AUTHORS
     questions and suggestions have been shown to catalyze monumental
     improvements in consistency, accuracy and performance.
 
-    List of the awesome contributors who made DBIC v0.082843 possible
+    List of the awesome contributors who made DBIC v0.082844 possible
 
         abraxxa: Alexander Hartmaier <abraxxa@cpan.org>
 

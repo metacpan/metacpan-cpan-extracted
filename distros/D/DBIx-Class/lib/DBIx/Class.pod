@@ -209,7 +209,7 @@ contribution, but deserve acknowledgement just the same. Time and time again
 the seemingly most insignificant questions and suggestions have been shown
 to catalyze monumental improvements in consistency, accuracy and performance.
 
-List of the awesome contributors who made DBIC v0.082843 possible
+List of the awesome contributors who made DBIC v0.082844 possible
 
 =encoding utf8
 

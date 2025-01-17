@@ -271,7 +271,7 @@ use PDL::Options q/iparse/;
 use File::Temp qw/tempfile tempdir/;
 use Scalar::Util q/looks_like_number/;
 
-our $VERSION = '1.015';
+our $VERSION = '1.016';
 $VERSION =~ s/_//g;
 
 ##############################
@@ -1567,7 +1567,7 @@ Craig DeForest, C<< <craig@deforest.org> >>
 Copyright 2013 Craig DeForest
 
 This program is free software; you can redistribute it and/or modify
-it under the terms of either: the Gnu General Public License v2 as
+it under the terms of either: the Gnu General Public License v1 as
 published by the Free Software Foundation; or the Perl Artistic
 License included with the Perl language.
 

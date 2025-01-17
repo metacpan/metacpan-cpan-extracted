@@ -12,9 +12,9 @@ use Getopt::Long::More;
 use Sort::Sub ();
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-01-12'; # DATE
+our $DATE = '2025-01-13'; # DATE
 our $DIST = 'App-subsort'; # DIST
-our $VERSION = '0.051'; # VERSION
+our $VERSION = '0.052'; # VERSION
 
 my %opts = (
     chomp => 1,
@@ -69,6 +69,9 @@ Options:
   --version, -v      Show version and exit.
   --list, -l         List available Sort::Sub routines.
 
+  --no-chomp, -C     Don't chomp newlines (input record separator) from input
+                       and don't re-add newlines (output record separator) when
+                       printing.
   --ignore-case, -f  Do a case-insensitive sort.
   --reverse, -r      Do a reverse sort.
   --arg=s, -A        Argument to pass to sorter. In the form of name=val. Can
@@ -262,7 +265,7 @@ subsort - Sort lines of text (or records) using Sort::Sub routines
 
 =head1 VERSION
 
-This document describes version 0.051 of subsort (from Perl distribution App-subsort), released on 2025-01-12.
+This document describes version 0.052 of subsort (from Perl distribution App-subsort), released on 2025-01-13.
 
 =head1 SYNOPSIS
 

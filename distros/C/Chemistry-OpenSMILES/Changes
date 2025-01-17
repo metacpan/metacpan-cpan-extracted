@@ -1,3 +1,7 @@
+0.11.2 2025-01-16
+
+    - Fixing nondeterminism in relative cis/trans marker placement.
+
 0.11.1 2025-01-14
 
     - Recognising unimportant anomer chiral centers.

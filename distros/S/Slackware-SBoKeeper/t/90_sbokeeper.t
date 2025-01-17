@@ -14,11 +14,13 @@ use Slackware::SBoKeeper::System;
 # We can test the following commands for not dying, but cannot test that their
 # output is correct:
 # * deps
+# * rdeps
 # * diff
 # * depwant
 # * depextra
 # * print
 # * tree
+# * rtree
 # * dump
 # * help
 #
@@ -26,7 +28,7 @@ use Slackware::SBoKeeper::System;
 # on the system's state:
 # * pull
 
-plan tests => 90;
+plan tests => 96;
 
 my $TMP_DATA = 'tmp-data.txt';
 my $DATA_DIR = File::Spec->catfile(qw(t data datafiles));
@@ -113,6 +115,9 @@ is(
 # testing to make sure it doesn't crash and burn.
 $obj = new_test_obj(qw(deps mpv));
 ok($obj->run(), "'deps' runs ok");
+
+$obj = new_test_obj(qw(rdeps luajit python3-meson-opt libplacebo mpv));
+ok($obj->run(), "'rdeps' runs ok");
 
 $obj = new_test_obj(qw(rm luajit python3-meson-opt libplacebo mpv));
 ok($obj->run(), "'rm' runs ok");
@@ -226,12 +231,15 @@ SKIP: {
 $obj = new_test_obj(qw(tree mpv luajit python3-meson-opt libplacebo));
 ok($obj->run(), "'tree' runs ok");
 
+$obj = new_test_obj(qw(rtree mpv luajit python3-meson-opt libplacebo));
+ok($obj->run(), "'rtree' runs ok");
+
 $obj = new_test_obj(qw(dump));
 ok($obj->run(), "'dump' runs ok");
 
 for my $help (qw(
-	add tack addish tackish rm clean deps depadd deprm pull diff depwant
-	depextra unmanual print tree dump help
+	add tack addish tackish rm clean deps rdeps depadd deprm pull diff depwant
+	depextra unmanual print tree rtree dump help
 )) {
 
 	$obj = new_test_obj(qw(help), $help);

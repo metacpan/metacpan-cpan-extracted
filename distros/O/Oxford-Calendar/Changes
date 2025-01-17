@@ -1,3 +1,8 @@
+2.13  2025-01-16
+    - Update calendar from information in
+      https://www.ox.ac.uk/about/facts-and-figures/dates-of-term
+      (thanks, Damen Wagner, merges #2)
+
 2.12  2020-06-06
     - Update calendar from information in
       https://www.ox.ac.uk/about/facts-and-figures/dates-of-term

@@ -2477,7 +2477,7 @@ use strict;
 		olson_name => "Philippines",
 		regions => {
 			"" => {
-				location_coords => "+1435+12100",
+				location_coords => "+143512+1205804",
 				olson_description => "",
 				timezone_name => "Asia/Manila",
 			},

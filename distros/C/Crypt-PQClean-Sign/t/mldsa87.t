@@ -11,4 +11,8 @@ ok(defined $signature, 'Generated signature');
 my $valid = mldsa87_verify($signature, $message, $pk);
 ok($valid, 'Signature is valid');
 
+my $message2 = "Hello, post-quantum?";
+my $invalid = mldsa87_verify($signature, $message2, $pk);
+ok(!$invalid, 'Signature is invalid');
+
 done_testing();

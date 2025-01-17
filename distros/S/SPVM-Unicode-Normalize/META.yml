@@ -23,5 +23,5 @@ requires:
   SPVM::Resource::Utf8proc: '0.001'
 resources:
   repository: https://github.com/yuki-kimoto/SPVM-Unicode-Normalize.git
-version: '0.003'
+version: '0.004'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

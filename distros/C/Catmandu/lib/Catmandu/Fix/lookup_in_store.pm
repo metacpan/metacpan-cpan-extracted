@@ -2,11 +2,11 @@ package Catmandu::Fix::lookup_in_store;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2023';
+our $VERSION = '1.2024';
 
 use Catmandu;
 use Catmandu::Util::Path qw(as_path);
-use Catmandu::Util qw(is_value);
+use Catmandu::Util       qw(is_value);
 use Moo;
 use namespace::clean;
 use Catmandu::Fix::Has;
@@ -15,7 +15,7 @@ with 'Catmandu::Fix::Builder';
 
 has path       => (fix_arg => 1);
 has store_name => (fix_arg => 1);
-has bag_name   => (fix_opt => 1, init_arg => 'bag');
+has bag_name   => (fix_opt => 1, init_arg  => 'bag');
 has default    => (fix_opt => 1, predicate => 1);
 has delete     => (fix_opt => 1);
 has store_args => (fix_opt => 'collect');

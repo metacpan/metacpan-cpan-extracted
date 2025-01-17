@@ -19,7 +19,8 @@ use Dist::Metadata ();
 
 BEGIN {
   use version 0.9915;
-  use CPAN::Meta::Converter;
+  use # hide from PAUSE
+  	CPAN::Meta::Converter;
 
   # This is here because the CPAN::Meta package has not been updated
   # since 2016 and it's unlikely that they'd accept a patch for this.
@@ -61,7 +62,7 @@ CPAN::Mini::Inject - Inject modules into a CPAN::Mini mirror.
 
 =cut
 
-our $VERSION = '1.005';
+our $VERSION = '1.007';
 our @ISA     = qw( CPAN::Mini );
 
 =head1 SYNOPSIS
@@ -283,10 +284,15 @@ sub update_mirror {
 
   $ENV{FTP_PASSIVE} = 1 if $self->config->get( 'passive' );
 
-  $options{local}     ||= $self->config->get( 'local' );
-  $options{trace}     ||= 0;
-  $options{skip_perl} ||= $self->config->get( 'perl' ) || 1;
+  $options{local}        ||= $self->config->get( 'local' );
+  $options{trace}        ||= 0;
+  $options{skip_perl}    ||= $self->config->get( 'perl' ) || 1;
   $options{skip_cleanup} ||= $self->config->get( 'skip_cleanup' ) || 0;
+
+  # module_filters, log_level, and force
+  my @extra = grep { defined $self->config->get($_) } qw(module_filters log_level force);
+
+  $options{$_} = $self->config->get($_) for @extra;
 
   $self->testremote( $options{trace} )
    unless ( $self->site || $options{remote} );

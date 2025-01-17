@@ -2,9 +2,9 @@ package Catmandu::Fix::Condition::Builder::Simple;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2023';
+our $VERSION = '1.2024';
 
-use List::SomeUtils qw(all_u any);
+use List::SomeUtils      qw(all_u any);
 use Catmandu::Util::Path qw(as_path);
 use Moo::Role;
 use namespace::clean;

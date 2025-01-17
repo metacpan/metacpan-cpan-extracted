@@ -1,5 +1,5 @@
 package MIDI::Drummer::Tiny::Syncopate;
-$MIDI::Drummer::Tiny::Syncopate::VERSION = '0.4305';
+$MIDI::Drummer::Tiny::Syncopate::VERSION = '0.4307';
 our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Syncopation logic
@@ -91,7 +91,7 @@ MIDI::Drummer::Tiny::Syncopate - Syncopation logic
 
 =head1 VERSION
 
-version 0.4305
+version 0.4307
 
 =head1 SYNOPSIS
 
@@ -205,7 +205,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014-2023 by Gene Boggs.
+This software is copyright (c) 2014-2025 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

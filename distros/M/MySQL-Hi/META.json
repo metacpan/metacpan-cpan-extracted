@@ -4,7 +4,7 @@
       "Andrei Pratasavitski <andrei.protasovitski@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -36,7 +36,9 @@
             "Config::Simple" : "4.0",
             "File::HomeDir" : "1.0",
             "Getopt::Long" : "2.0",
-            "Moose" : "2.0",
+            "Test::Deep" : "0",
+            "Test::More" : "0",
+            "Test::Warn" : "0",
             "perl" : "5.010000",
             "strict" : "0",
             "warnings" : "0"
@@ -51,6 +53,6 @@
          "web" : "https://gitlab.com/as_pushkin/mysqlhi"
       }
    },
-   "version" : "0.03",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "1.00",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

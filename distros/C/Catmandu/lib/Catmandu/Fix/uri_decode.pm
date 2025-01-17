@@ -2,12 +2,12 @@ package Catmandu::Fix::uri_decode;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2023';
+our $VERSION = '1.2024';
 
 use Moo;
 use Catmandu::Util::Path qw(as_path);
-use Encode qw(decode_utf8);
-use URI::Escape qw(uri_unescape);
+use Encode               qw(decode_utf8);
+use URI::Escape          qw(uri_unescape);
 use namespace::clean;
 use Catmandu::Fix::Has;
 

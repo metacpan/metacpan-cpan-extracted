@@ -1,0 +1,35 @@
+name: SPHINCS+
+type: signature
+claimed-nist-level: 1
+length-public-key: 32
+length-secret-key: 64
+length-signature: 7856
+testvectors-sha256: 73227687507e01bbedad53e309507042052e6a86bea5fd65ea0efaf4a14800db
+nistkat-sha256: ffad452b5ec3217d204ed13f5af76009ce265dd61ce9097714d941fec106dd01
+principal-submitters:
+  - Andreas Hülsing
+auxiliary-submitters:
+  - Jean-Philippe Aumasson
+  - Daniel J. Bernstein,
+  - Christoph Dobraunig
+  - Maria Eichlseder
+  - Scott Fluhrer
+  - Stefan-Lukas Gazdag
+  - Panos Kampanakis
+  - Stefan Kölbl
+  - Tanja Lange
+  - Martin M. Lauridsen
+  - Florian Mendel
+  - Ruben Niederhagen
+  - Christian Rechberger
+  - Joost Rijneveld
+  - Peter Schwabe
+implementations:
+    - name: clean
+      version: https://github.com/sphincs/sphincsplus/commit/77755c94d0bc744478044d6efbb888dc13156441
+    - name: aesni
+      version: https://github.com/sphincs/sphincsplus/commit/77755c94d0bc744478044d6efbb888dc13156441
+      supported_platforms:
+        - architecture: x86_64
+          required_flags:
+            - aes

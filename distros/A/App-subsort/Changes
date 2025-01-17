@@ -1,3 +1,10 @@
+0.052   2025-01-13  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Forgot to update usage (add --no-chomp, -C).
+
+
 0.051   2025-01-12  Released-By: PERLANCAR; Urgency: medium
 
         - Edit Changes.

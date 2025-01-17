@@ -2,10 +2,10 @@ package Catmandu::Fix::int;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2023';
+our $VERSION = '1.2024';
 
 use Moo;
-use Catmandu::Util qw(is_string is_array_ref is_hash_ref);
+use Catmandu::Util       qw(is_string is_array_ref is_hash_ref);
 use Catmandu::Util::Path qw(as_path);
 use namespace::clean;
 use Catmandu::Fix::Has;

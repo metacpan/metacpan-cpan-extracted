@@ -31,6 +31,7 @@ the copyright notice should be included in the file.
 package PDL::Graphics::TriD::MathGraph;
 use strict;
 use warnings;
+use PDL::Graphics::TriD::Objects;
 use base qw/PDL::Graphics::TriD::GObject/;
 use OpenGL qw(:all);
 use PDL::Graphics::OpenGL::Perl::OpenGL;

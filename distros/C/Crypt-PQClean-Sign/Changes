@@ -1,5 +1,8 @@
 Revision history for Perl extension Crypt::PQClean::Sign.
 
+0.04  Thu Jan 16 15:53:00 2025
+        - improve tests
+
 0.03  Sun Dec 29 09:26:00 2024
         - strictly check signature size
 

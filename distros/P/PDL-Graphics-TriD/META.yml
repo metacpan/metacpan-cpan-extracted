@@ -30,5 +30,5 @@ resources:
   bugtracker: https://github.com/PDLPorters/PDL-Graphics-TriD/issues
   homepage: http://pdl.perl.org/
   repository: git://github.com/PDLPorters/PDL-Graphics-TriD.git
-version: '2.099'
+version: '2.100'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

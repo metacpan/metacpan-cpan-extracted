@@ -44,7 +44,7 @@ for my $pars ( [ '0D', 0 ], [ '1D', 1 ], [ '2D', 2, ] ) {
     {
         my ( $name, $sub, $pars ) = @$func;
 
-	$pars = {} unless defined $pars;
+        $pars = {} unless defined $pars;
 
         subtest "$name: $label" => sub {
 

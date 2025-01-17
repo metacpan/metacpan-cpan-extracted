@@ -52,7 +52,7 @@ treatments = medicalActions.treatment
 
 (only needed if you did not install `Pheno-Ranker`)
 
-    $ cpanm --sudo --installdeps .
+    $ cpanm --installdeps .
 
 ### System requirements
 

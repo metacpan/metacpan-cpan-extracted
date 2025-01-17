@@ -1,7 +1,7 @@
 package Chemistry::OpenSMILES::Stereo;
 
 # ABSTRACT: Stereochemistry handling routines
-our $VERSION = '0.11.1'; # VERSION
+our $VERSION = '0.11.2'; # VERSION
 
 use strict;
 use warnings;
@@ -162,7 +162,7 @@ sub mark_cis_trans
 
     if( @cistrans_bonds2 + @cistrans_bonds3 > 1 ) {
         warn 'cannot represent cis/trans bond between atoms ' .
-             join( ' and ', sort map { $_->{number} } $atom2, $atom3 ) .
+             join( ' and ', sort { $a <=> $b } map { $_->{number} } $atom2, $atom3 ) .
              ' as there are other cis/trans bonds nearby' . "\n";
         return;
     }
@@ -173,7 +173,7 @@ sub mark_cis_trans
          !any { is_single_bond( $graph, $atom3, $_ ) } @neighbours3) ) {
         # Azide group (N=N#N) or conjugated allene-like systems (=C=)
         warn 'atoms ' .
-             join( ' and ', sort map { $_->{number} } $atom2, $atom3 ) .
+             join( ' and ', sort { $a <=> $b } map { $_->{number} } $atom2, $atom3 ) .
              ' are part of conjugated double/triple bond system, thus ' .
              'cis/trans setting of their bond is impossible to represent ' .
              '(not supported yet)' . "\n";
@@ -212,17 +212,22 @@ sub mark_cis_trans
 
     if( !$bond_will_be_marked ) {
         warn 'cannot represent cis/trans bond between atoms ' .
-             join( ' and ', sort map { $_->{number} } $atom2, $atom3 ) .
+             join( ' and ', sort { $a <=> $b } map { $_->{number} } $atom2, $atom3 ) .
              ' as there are no eligible single bonds nearby' . "\n";
         return;
     }
 
-    # If there is an atom with cis/trans bond, then this is this one
+    # If there is an atom with cis/trans bond, then this is this one.
+    # Adjustment to pre-order (neither the requested order, nor the post-order!) is needed to maintain relative settings in order.
+    # Otherwise nondeterminism may occur and result in different (albeit isomorphic) output SMILES like:
+    # C/C=C\CCCCC/C=C\C
+    # C/C=C\CCCCC\C=C/C
     my( $first_atom ) = @cistrans_bonds2 ? @cistrans_bonds2 : @neighbours2;
     if( !@cistrans_bonds2 ) {
-        $graph->set_edge_attribute( $first_atom, $atom2, 'bond', '/' );
+        $graph->set_edge_attribute( $first_atom, $atom2, 'bond', $first_atom->{number} < $atom2->{number} ? '/' : '\\' );
     }
 
+    # Adjustments to pre-order (neither the requested order, nor the post-order!) are done here.
     my $atom4_marked;
     for my $atom4 (@neighbours3) {
         my $atom1 = $first_atom;
@@ -231,7 +236,7 @@ sub mark_cis_trans
         my $other = $graph->get_edge_attribute( $atom1, $atom2, 'bond' );
         $other = toggle_cistrans $other if $setting eq 'cis';
         $other = toggle_cistrans $other if $atom1->{number} > $atom2->{number};
-        $other = toggle_cistrans $other if $atom4->{number} < $atom3->{number};
+        $other = toggle_cistrans $other if $atom3->{number} > $atom4->{number};
         $graph->set_edge_attribute( $atom3, $atom4, 'bond', $other );
         $atom4_marked = $atom4 unless $atom4_marked;
     }
@@ -244,7 +249,7 @@ sub mark_cis_trans
         my $other = $graph->get_edge_attribute( $atom3, $atom4, 'bond' );
         $other = toggle_cistrans $other if $setting eq 'cis';
         $other = toggle_cistrans $other if $atom1->{number} > $atom2->{number};
-        $other = toggle_cistrans $other if $atom4->{number} < $atom3->{number};
+        $other = toggle_cistrans $other if $atom3->{number} > $atom4->{number};
         $graph->set_edge_attribute( $atom1, $atom2, 'bond', $other );
     }
 }
@@ -383,6 +388,8 @@ sub cis_trans_to_pseudoedges
         my $is_cis = $moiety->get_edge_attribute( $atom1, $atom2, 'bond' ) ne
                      $moiety->get_edge_attribute( $atom3, $atom4, 'bond' );
 
+        # Here atom numbers have to be compared to differentiate between cases like:
+        # C/C=C\C and C(\C)=C/C
         $is_cis = !$is_cis if $atom1->{number} > $atom2->{number};
         $is_cis = !$is_cis if $atom3->{number} > $atom4->{number};
 

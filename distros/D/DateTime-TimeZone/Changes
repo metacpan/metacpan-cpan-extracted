@@ -1,12 +1,20 @@
+2.64    2025-01-16
+
+- This release is based on version 2024a of the Olson database. This release includes contemporary
+  changes for Paraguay.
+
+
 2.63    2024-09-07
 
 - This release is based on version 2024b of the Olson database. This release does not include any
   changes to current or future zones, only historical changes.
 
+
 2.62    2024-02-02
 
 - This release is based on version 2024a of the Olson database. This release
   includes contemporary changes for Kazakhstan and Palestine.
+
 
 2.61    2023-12-30
 

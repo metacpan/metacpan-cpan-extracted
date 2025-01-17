@@ -11,4 +11,8 @@ ok(defined $signature, 'Generated signature');
 my $valid = sphincs_shake128s_verify($signature, $message, $pk);
 ok($valid, 'Signature is valid');
 
+my $message2 = "Hello, post-quantum?";
+my $invalid = sphincs_shake128s_verify($signature, $message2, $pk);
+ok(!$invalid, 'Signature is invalid');
+
 done_testing();

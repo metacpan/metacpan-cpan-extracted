@@ -2,7 +2,7 @@ package Catmandu::Addable;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2023';
+our $VERSION = '1.2024';
 
 use Catmandu::Util qw(:is :check);
 use Moo::Role;
@@ -19,7 +19,7 @@ around add => sub {
     my ($orig, $self, $data) = @_;
     return unless defined $data;
     $data = $self->_fixer->fix($data) if $self->_fixer;
-    $orig->($self, $data) if defined $data;
+    $orig->($self, $data)             if defined $data;
     $data;
 };
 

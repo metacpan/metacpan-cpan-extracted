@@ -846,7 +846,7 @@ Craig DeForest, C<< <craig@deforest.org> >>
 Copyright 2013 Craig DeForest
 
 This program is free software; you can redistribute it and/or modify
-it under the terms of either: the Gnu General Public License v2 as
+it under the terms of either: the Gnu General Public License v1 as
 published by the Free Software Foundation; or the Perl Artistic
 License included with the Perl language.
 

@@ -2,7 +2,7 @@ package Catmandu::Searchable;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2023';
+our $VERSION = '1.2024';
 
 use Catmandu::Util qw(is_natural is_positive);
 use Moo::Role;
@@ -14,8 +14,8 @@ requires 'search';
 requires 'searcher';
 requires 'delete_by_query';
 
-has default_limit => (is => 'ro', builder => 'default_default_limit');
-has maximum_limit => (is => 'ro', builder => 'default_maximum_limit');
+has default_limit  => (is => 'ro', builder => 'default_default_limit');
+has maximum_limit  => (is => 'ro', builder => 'default_maximum_limit');
 has maximum_offset => (is => 'ro');
 
 sub default_default_limit {10}

@@ -2,11 +2,11 @@ package Catmandu::Fix::filter;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2023';
+our $VERSION = '1.2024';
 
-use Catmandu::Util qw(is_array_ref);
+use Catmandu::Util        qw(is_array_ref);
 use Catmandu::Util::Regex qw(as_regex);
-use Catmandu::Util::Path qw(as_path);
+use Catmandu::Util::Path  qw(as_path);
 use Moo;
 use namespace::clean;
 use Catmandu::Fix::Has;

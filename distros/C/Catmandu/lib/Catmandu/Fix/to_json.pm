@@ -2,9 +2,9 @@ package Catmandu::Fix::to_json;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2023';
+our $VERSION = '1.2024';
 
-use Cpanel::JSON::XS ();
+use Cpanel::JSON::XS     ();
 use Catmandu::Util::Path qw(as_path);
 use Moo;
 use namespace::clean;

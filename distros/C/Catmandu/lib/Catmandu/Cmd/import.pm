@@ -2,7 +2,7 @@ package Catmandu::Cmd::import;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2023';
+our $VERSION = '1.2024';
 
 use parent 'Catmandu::Cmd';
 use Catmandu;
@@ -19,6 +19,11 @@ sub command_opt_spec {
         ["delete",         "delete existing items first"],
         ["transaction|tx", "wrap in a transaction"],
     );
+}
+
+sub validate_args {
+    my ($self, $opt, $args) = @_;
+    return;
 }
 
 sub command {

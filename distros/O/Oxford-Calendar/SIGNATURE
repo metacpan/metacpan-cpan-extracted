@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.83.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,14 +12,30 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA256
+Hash: RIPEMD160
 
-SHA256 9379b8e8f7b938cb3207fc7dc800f1396abcadfdc8b8b2dcc0b4417372e0d42b Changes
+SHA256 20395853afaa1357516b82ca9bff9b836177d07c6180ea0c4eb72a20a87899d7 Changes
 SHA256 29e7cf54934ae979fbc2c6077e17734547130245915383c0f41486115be7e303 MANIFEST
-SHA256 5cd8b6b1f9c699a948c0ef8b0bc8c4c358162e9837498b32cbbcadd81b7aac65 META.json
-SHA256 541bcafb68edb91446bb2e9791412b092bb29265abf9f84f9b40d91bbfcfcd8b META.yml
+SHA256 9f499d6b30d91ca4521ffa3ac8f5b96c8ba857d790a24fa6e183813ee2eff94c META.json
+SHA256 1a1aed5a33d02564ebf307b948df33e07cdfef0837058a137425b356945168ff META.yml
 SHA256 b7bd2934c937e1bdc4bc1f0ca3a8894fc5d30d1d9dc83070971b22c21147f7c0 Makefile.PL
-SHA256 cbdece77d91501fc7df67acc47b28d056921220a12e2af7b09b592dacabe2610 lib/Oxford/Calendar.pm
-SHA256 83071807081aa51748405dfb0352f8b42c606c667f5c92f36f5edb46b5db329e t/00_all.t
+SHA256 4e338da4cd4ba68a0f8fda79c245a7ecd6d25e97db8a456e4d7bd89e996b61fe lib/Oxford/Calendar.pm
+SHA256 4222530fa125d30cd7785494c78b513d65425623e702c66c5a58c014ff916257 t/00_all.t
 SHA256 c9fded5f4744d30c789329869bdbdce9a6e17e915215d77f4fdf2428ecd2bb22 t/01_bug_sundays_0th_or_earlier.t
 SHA256 9c1777fb625c1a1219d1e49b4bfaf73d37a1412ea0e7a4c3c0f8e6843538d549 t/02_bug_nearest_dst.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBAwAdFiEEy0llJ/kAnyscGnbawAV+cU1pT7IFAmeJDioACgkQwAV+cU1p
+T7Ly7w//W7fd6p9w+lq63Pou35PqJPESxHzz5o1+0MqcD6XtWupH/xlfcJCuv45z
+GxSkuxCRr9DtorE/HgOJDUZ/guhkqDJQKaVSseCrBBCgCsqT2Q7KOmIdSVjJTz4O
+G6xcsgLah4Usb+midsz2TsrQrm7/0psaZKL2bV0ooa0rqxhQxiNXj0u3YhgA1hlv
+qND74s22jLHk3RPt+AVOkCGWWIaGR5S721la2wzMO9hvV7HwfWmA0xp+qedzRGBO
+c9ZFCW9qqdHby2p+UsYcNO/bv/MVou7+NcH5+oVUyAb1J0ZHKiWBVVYU07ZFpygr
+bK4vWDnYjAEbdfVaUh3Xi3QMTndHv23vNK/IqpHdFRR8Q1P9QUyc34N3elCmHkw4
+WNL7xSdE3HRgSG3MeTAQmosg/JcuAPt2LDRDIX+YLqhzx5u6Y+L8G6rutuR39sOL
+Xv6CC+1DLWq9W+vx+8dXaV7kmJDoVSxURkALOyBEPUVCmGSviTgiYX9nGe2CsVmg
++6rkE8g4eoiMX9DwfsgHNQWiyLQvevupt2ypLqVeYPezTM5wyE5ZnJOLN+c7mgca
+KLus65Q6VZWUtSPt3KvdnQyeCRYfVV2Yb9r9rBjV5BmqfvMawggAhGHLSAVzSKyb
+JW+w0+xE793BrmDbijXPa2Ie8np5HABp4I2jfs20SiUhzc2j/Tw=
+=TUqe
+-----END PGP SIGNATURE-----

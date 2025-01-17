@@ -2,7 +2,7 @@ package Catmandu::Store::Multi::Bag;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2023';
+our $VERSION = '1.2024';
 
 use Moo;
 use Hash::Merge::Simple qw(merge);
@@ -46,7 +46,7 @@ sub get {
         my $item = $bag ? $bag->get($id) : undef;
         if ($item) {
             $found  = 1;
-            $result = merge $result , $item;
+            $result = merge $result, $item;
         }
     }
 

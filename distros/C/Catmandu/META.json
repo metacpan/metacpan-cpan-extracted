@@ -1,10 +1,10 @@
 {
    "abstract" : "a data toolkit",
    "author" : [
-      "Nicolas Steenlant <nicolas.steenlant@ugent.be>"
+      "Nicolas Steenlant, C<< <nicolas.steenlant at ugent.be> >>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.22, Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Milla version v1.0.22, Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -51,7 +51,7 @@
          },
          "requires" : {
             "Any::URI::Escape" : "0",
-            "App::Cmd" : "<= 0.336",
+            "App::Cmd" : "0.33",
             "CGI::Expand" : "2.02",
             "Class::Method::Modifiers" : "0",
             "Clone" : "0.31",
@@ -59,7 +59,7 @@
             "Cpanel::JSON::XS" : "3.0213",
             "Data::Compare" : "1.22",
             "Data::Util" : "0.66",
-            "Getopt::Long::Descriptive" : "<= 0.115",
+            "Getopt::Long" : "0",
             "HTTP::Request" : "0",
             "Hash::Merge::Simple" : "0",
             "IO::Handle::Util" : "0.01",
@@ -122,7 +122,7 @@
          "web" : "https://github.com/LibreCat/Catmandu"
       }
    },
-   "version" : "1.2023",
+   "version" : "1.2024",
    "x_contributors" : [
       "Christian Pietsch <chr.pietsch+github@googlemail.com>",
       "Dave Sherohman <dsheroh@cpan.org>",
@@ -139,6 +139,7 @@
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Nicolas Franck <njfranck@ca20c533.ugent.be>",
       "Nicolas Franck <njfranck@cpan.org>",
+      "Nicolas Steenlant <nicolas.steenlant@ugent.be>",
       "Patrick Hochstenbach <patrick.hochstenbach@gmail.com>",
       "Pieter De Praetere <pieter@packed.be>",
       "Snorri Briem <Snorri.Briem@lub.lu.se>",
@@ -148,7 +149,7 @@
       "Vitali Peil <vpeil@cpan.org>",
       "Zakariyya Mughal <zaki.mughal@gmail.com>"
    ],
-   "x_generated_by_perl" : "v5.24.0",
+   "x_generated_by_perl" : "v5.40.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 0

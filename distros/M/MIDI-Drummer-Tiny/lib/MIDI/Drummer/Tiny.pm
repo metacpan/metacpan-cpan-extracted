@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Glorified metronome
 
-our $VERSION = '0.4305';
+our $VERSION = '0.4307';
 
 use Moo;
 use strictures 2;
@@ -199,11 +199,12 @@ sub count_in {
 sub metronome38 {
     my $self = shift;
     my $bars = shift || $self->bars;
+    my $cymbal = shift || $self->closed_hh;
 
     for ( 1 .. $bars ) {
-        $self->note( $self->eighth, $self->closed_hh, $self->kick );
-        $self->note( $self->eighth, $self->closed_hh);
-        $self->note( $self->eighth, $self->closed_hh, $self->snare );
+        $self->note( $self->eighth, $cymbal, $self->kick );
+        $self->note( $self->eighth, $cymbal);
+        $self->note( $self->eighth, $cymbal, $self->snare );
     }
 }
 
@@ -211,11 +212,12 @@ sub metronome38 {
 sub metronome34 {
     my $self = shift;
     my $bars = shift || $self->bars;
+    my $cymbal = shift || $self->closed_hh;
 
     for ( 1 .. $bars ) {
-        $self->note( $self->quarter, $self->ride1, $self->kick );
-        $self->note( $self->quarter, $self->ride1 );
-        $self->note( $self->quarter, $self->ride1, $self->snare );
+        $self->note( $self->quarter, $cymbal, $self->kick );
+        $self->note( $self->quarter, $cymbal );
+        $self->note( $self->quarter, $cymbal, $self->snare );
     }
 }
 
@@ -224,28 +226,29 @@ sub metronome44 {
     my $self = shift;
     my $bars = shift || $self->bars;
     my $flag = shift // 0;
+    my $cymbal = shift || $self->closed_hh;
 
     my $i = 0;
 
     for my $n ( 1 .. $self->beats * $bars ) {
         if ( $n % 2 == 0 )
         {
-            $self->note( $self->quarter, $self->closed_hh, $self->snare );
+            $self->note( $self->quarter, $cymbal, $self->snare );
         }
         else {
             if ( $flag == 0 )
             {
-                $self->note( $self->quarter, $self->closed_hh, $self->kick );
+                $self->note( $self->quarter, $cymbal, $self->kick );
             }
             else
             {
                 if ( $i % 2 == 0 )
                 {
-                    $self->note( $self->quarter, $self->closed_hh, $self->kick );
+                    $self->note( $self->quarter, $cymbal, $self->kick );
                 }
                 else
                 {
-                    $self->note( $self->eighth, $self->closed_hh, $self->kick );
+                    $self->note( $self->eighth, $cymbal, $self->kick );
                     $self->note( $self->eighth, $self->kick );
                 }
             }
@@ -259,16 +262,17 @@ sub metronome44 {
 sub metronome44swing {
     my $self = shift;
     my $bars = shift || $self->bars;
+    my $cymbal = shift || $self->ride1;
 
     for my $n ( 1 .. $bars ) {
-        $self->note( $self->quarter,          $self->ride1, $self->kick );
-        $self->note( $self->triplet_eighth,   $self->ride1 );
+        $self->note( $self->quarter,          $cymbal, $self->kick );
+        $self->note( $self->triplet_eighth,   $cymbal );
         $self->rest( $self->triplet_eighth );
-        $self->note( $self->triplet_eighth,   $self->ride1, $self->kick );
-        $self->note( $self->quarter,          $self->ride1, $self->snare );
-        $self->note( $self->triplet_eighth,   $self->ride1, $self->kick );
+        $self->note( $self->triplet_eighth,   $cymbal, $self->kick );
+        $self->note( $self->quarter,          $cymbal, $self->snare );
+        $self->note( $self->triplet_eighth,   $cymbal, $self->kick );
         $self->rest( $self->triplet_eighth );
-        $self->note( $self->triplet_eighth,   $self->ride1 );
+        $self->note( $self->triplet_eighth,   $cymbal );
     }
 }
 
@@ -276,16 +280,18 @@ sub metronome44swing {
 sub metronome54 {
     my $self = shift;
     my $bars = shift || $self->bars;
+    my $cymbal = shift || $self->closed_hh;
+
     for my $n (1 .. $bars) {
-        $self->note($self->quarter, $self->closed_hh, $self->kick);
-        $self->note($self->quarter, $self->closed_hh);
-        $self->note($self->quarter, $self->closed_hh, $self->snare);
-        $self->note($self->quarter, $self->closed_hh);
+        $self->note($self->quarter, $cymbal, $self->kick);
+        $self->note($self->quarter, $cymbal);
+        $self->note($self->quarter, $cymbal, $self->snare);
+        $self->note($self->quarter, $cymbal);
         if ($n % 2) {
-            $self->note($self->quarter, $self->closed_hh);
+            $self->note($self->quarter, $cymbal);
         }
         else {
-            $self->note($self->eighth, $self->closed_hh);
+            $self->note($self->eighth, $cymbal);
             $self->note($self->eighth, $self->kick);
         }
     }
@@ -295,12 +301,14 @@ sub metronome54 {
 sub metronome58 {
     my $self = shift;
     my $bars = shift || $self->bars;
+    my $cymbal = shift || $self->closed_hh;
+
     for my $n (1 .. $bars) {
-        $self->note($self->eighth, $self->closed_hh, $self->kick);
-        $self->note($self->eighth, $self->closed_hh);
-        $self->note($self->eighth, $self->closed_hh, $self->snare);
-        $self->note($self->eighth, $self->closed_hh);
-        $self->note($self->eighth, $self->closed_hh);
+        $self->note($self->eighth, $cymbal, $self->kick);
+        $self->note($self->eighth, $cymbal);
+        $self->note($self->eighth, $cymbal, $self->snare);
+        $self->note($self->eighth, $cymbal);
+        $self->note($self->eighth, $cymbal);
     }
 }
 
@@ -308,13 +316,15 @@ sub metronome58 {
 sub metronome68 {
     my $self = shift;
     my $bars = shift || $self->bars;
+    my $cymbal = shift || $self->closed_hh;
+
     for my $n (1 .. $bars) {
-        $self->note($self->eighth, $self->closed_hh, $self->kick);
-        $self->note($self->eighth, $self->closed_hh);
-        $self->note($self->eighth, $self->closed_hh);
-        $self->note($self->eighth, $self->closed_hh, $self->snare);
-        $self->note($self->eighth, $self->closed_hh);
-        $self->note($self->eighth, $self->closed_hh);
+        $self->note($self->eighth, $cymbal, $self->kick);
+        $self->note($self->eighth, $cymbal);
+        $self->note($self->eighth, $cymbal);
+        $self->note($self->eighth, $cymbal, $self->snare);
+        $self->note($self->eighth, $cymbal);
+        $self->note($self->eighth, $cymbal);
     }
 }
 
@@ -322,15 +332,17 @@ sub metronome68 {
 sub metronome74 {
     my $self = shift;
     my $bars = shift || $self->bars;
+    my $cymbal = shift || $self->closed_hh;
+
     for my $n (1 .. $bars) {
-        $self->note($self->quarter, $self->closed_hh, $self->kick);
-        $self->note($self->quarter, $self->closed_hh);
-        $self->note($self->quarter, $self->closed_hh, $self->snare);
-        $self->note($self->eighth, $self->closed_hh);
+        $self->note($self->quarter, $cymbal, $self->kick);
+        $self->note($self->quarter, $cymbal);
+        $self->note($self->quarter, $cymbal, $self->snare);
+        $self->note($self->eighth, $cymbal);
         $self->note($self->eighth, $self->kick);
-        $self->note($self->quarter, $self->closed_hh, $self->kick);
-        $self->note($self->quarter, $self->closed_hh, $self->snare);
-        $self->note($self->quarter, $self->closed_hh);
+        $self->note($self->quarter, $cymbal, $self->kick);
+        $self->note($self->quarter, $cymbal, $self->snare);
+        $self->note($self->quarter, $cymbal);
     }
 }
 
@@ -338,14 +350,16 @@ sub metronome74 {
 sub metronome78 {
     my $self = shift;
     my $bars = shift || $self->bars;
+    my $cymbal = shift || $self->closed_hh;
+
     for my $n (1 .. $bars) {
-        $self->note($self->eighth, $self->closed_hh, $self->kick);
-        $self->note($self->eighth, $self->closed_hh);
-        $self->note($self->eighth, $self->closed_hh);
-        $self->note($self->eighth, $self->closed_hh, $self->kick);
-        $self->note($self->eighth, $self->closed_hh, $self->snare);
-        $self->note($self->eighth, $self->closed_hh);
-        $self->note($self->eighth, $self->closed_hh);
+        $self->note($self->eighth, $cymbal, $self->kick);
+        $self->note($self->eighth, $cymbal);
+        $self->note($self->eighth, $cymbal);
+        $self->note($self->eighth, $cymbal, $self->kick);
+        $self->note($self->eighth, $cymbal, $self->snare);
+        $self->note($self->eighth, $cymbal);
+        $self->note($self->eighth, $cymbal);
     }
 }
 
@@ -659,7 +673,7 @@ MIDI::Drummer::Tiny - Glorified metronome
 
 =head1 VERSION
 
-version 0.4305
+version 0.4307
 
 =head1 SYNOPSIS
 
@@ -912,6 +926,7 @@ given, the closed hihat is used.
 
   $d->metronome38;
   $d->metronome38($bars);
+  $d->metronome38($bars, $cymbal);
 
 Add a steady 3/8 beat to the score.
 
@@ -919,6 +934,7 @@ Add a steady 3/8 beat to the score.
 
   $d->metronome34;
   $d->metronome34($bars);
+  $d->metronome34($bars, $cymbal);
 
 Add a steady 3/4 beat to the score.
 
@@ -927,6 +943,7 @@ Add a steady 3/4 beat to the score.
   $d->metronome44;
   $d->metronome44($bars);
   $d->metronome44($bars, $flag);
+  $d->metronome44($bars, $flag, $cymbal);
 
 Add a steady 4/4 beat to the score.
 
@@ -937,6 +954,7 @@ eighth-note kicks.
 
   $d->metronome44swing;
   $d->metronome44swing($bars);
+  $d->metronome44swing($bars, $cymbal);
 
 Add a steady 4/4 swing beat to the score.
 
@@ -944,6 +962,7 @@ Add a steady 4/4 swing beat to the score.
 
   $d->metronome54;
   $d->metronome54($bars);
+  $d->metronome54($bars, $cymbal);
 
 Add a 5/4 beat to the score.
 
@@ -951,6 +970,7 @@ Add a 5/4 beat to the score.
 
   $d->metronome58;
   $d->metronome58($bars);
+  $d->metronome58($bars, $cymbal);
 
 Add a 5/8 beat to the score.
 
@@ -958,6 +978,7 @@ Add a 5/8 beat to the score.
 
   $d->metronome68;
   $d->metronome68($bars);
+  $d->metronome68($bars, $cymbal);
 
 Add a 6/8 beat to the score.
 
@@ -965,6 +986,7 @@ Add a 6/8 beat to the score.
 
   $d->metronome74;
   $d->metronome74($bars);
+  $d->metronome74($bars, $cymbal);
 
 Add a 7/4 beat to the score.
 
@@ -972,6 +994,7 @@ Add a 7/4 beat to the score.
 
   $d->metronome78;
   $d->metronome78($bars);
+  $d->metronome78($bars, $cymbal);
 
 Add a 7/8 beat to the score.
 
@@ -1201,7 +1224,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014-2023 by Gene Boggs.
+This software is copyright (c) 2014-2025 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

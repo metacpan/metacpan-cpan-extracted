@@ -1,7 +1,7 @@
 package Chemistry::OpenSMILES::Writer;
 
 # ABSTRACT: OpenSMILES format writer
-our $VERSION = '0.11.1'; # VERSION
+our $VERSION = '0.11.2'; # VERSION
 
 use strict;
 use warnings;
@@ -60,7 +60,7 @@ sub write_SMILES
                                    if( $vertex_symbols{$unseen} ) {
                                        ( $seen, $unseen ) = ( $unseen, $seen );
                                    }
-                                   push @symbols, _tree_edge( $seen, $unseen, $self, $order_sub );
+                                   push @symbols, _tree_edge( $seen, $unseen, $self );
                                    $discovered_from{$unseen} = $seen },
 
             non_tree_edge => sub { my @sorted = sort { $vertex_symbols{$a} <=>
@@ -85,12 +85,10 @@ sub write_SMILES
             next_root => undef,
         };
 
-        if( $order_sub ) {
-            $operations->{first_root} =
-                sub { return $order_sub->( $_[1], $_[0]->graph ) };
-            $operations->{next_successor} =
-                sub { return $order_sub->( $_[1], $_[0]->graph ) };
-        }
+        $operations->{first_root} =
+            sub { $order_sub->( $_[1], $_[0]->graph ) };
+        $operations->{next_successor} =
+            sub { $order_sub->( $_[1], $_[0]->graph ) };
 
         my $traversal = Graph::Traversal::DFS->new( $graph, %$operations );
         $traversal->dfs;
@@ -253,10 +251,7 @@ sub write_SMILES
 }
 
 # DEPRECATED
-sub write
-{
-    &write_SMILES;
-}
+sub write { &write_SMILES }
 
 sub _tree_edge
 {

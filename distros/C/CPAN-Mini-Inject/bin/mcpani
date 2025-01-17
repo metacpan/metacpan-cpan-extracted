@@ -68,14 +68,12 @@ sub update {
 
 sub mirror {
   my $mcpi = shift;
-  my %mirroropts;
 
-  $mirroropts{remote} = $options{remote}
-   if ( defined( $options{remote} ) );
-  $mirroropts{local} = $options{local}
-   if ( defined( $options{local} ) );
-  $mirroropts{trace} = $options{verbose}
-   if ( defined( $options{verbose} ) );
+  # these come from the command line
+  my %mirroropts =
+    map { $_ => $options{$_} }
+    grep { defined $options{$_} }
+    qw(remote local verbose);
 
   $mcpi->update_mirror( %mirroropts );
 }

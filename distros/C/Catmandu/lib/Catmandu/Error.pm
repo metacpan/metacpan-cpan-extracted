@@ -2,7 +2,7 @@ package Catmandu::Error;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2023';
+our $VERSION = '1.2024';
 
 use Moo;
 use namespace::clean;
@@ -41,7 +41,7 @@ package Catmandu::Error::Source;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2023';
+our $VERSION = '1.2024';
 
 use Moo::Role;
 use Catmandu::Util;
@@ -64,7 +64,7 @@ package Catmandu::BadVal;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2023';
+our $VERSION = '1.2024';
 
 use Moo;
 use namespace::clean;
@@ -75,7 +75,7 @@ package Catmandu::BadArg;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2023';
+our $VERSION = '1.2024';
 
 use Moo;
 use namespace::clean;
@@ -86,7 +86,7 @@ package Catmandu::NotImplemented;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2023';
+our $VERSION = '1.2024';
 
 use Moo;
 use namespace::clean;
@@ -97,7 +97,7 @@ package Catmandu::NoSuchPackage;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2023';
+our $VERSION = '1.2024';
 
 use Moo;
 use namespace::clean;
@@ -135,7 +135,7 @@ package Catmandu::FixParseError;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2023';
+our $VERSION = '1.2024';
 
 use Moo;
 use namespace::clean;
@@ -157,7 +157,7 @@ package Catmandu::NoSuchFixPackage;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2023';
+our $VERSION = '1.2024';
 
 use Moo;
 use namespace::clean;
@@ -181,7 +181,7 @@ package Catmandu::BadFixArg;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2023';
+our $VERSION = '1.2024';
 
 use Moo;
 use namespace::clean;
@@ -208,7 +208,7 @@ package Catmandu::FixError;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2023';
+our $VERSION = '1.2024';
 
 use Moo;
 use Data::Dumper;
@@ -226,7 +226,7 @@ sub log_message {
     my $data   = $self->data;
     my $msg    = "One of your fixes threw an error...";
     $msg .= "\nError: $err";
-    $msg .= "\nSource: $fix" if $fix;
+    $msg .= "\nSource: $fix"             if $fix;
     $msg .= "\nInput:\n" . Dumper($data) if defined $data;
     $msg;
 }
@@ -235,7 +235,7 @@ package Catmandu::HTTPError;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2023';
+our $VERSION = '1.2024';
 
 use Moo;
 use Data::Dumper;
