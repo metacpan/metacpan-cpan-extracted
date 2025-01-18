@@ -8,18 +8,18 @@ Locale::CLDR::Locales::An - Package for language Aragonese
 
 package Locale::CLDR::Locales::An;
 # This file auto generated from Data\common\main\an.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -1551,9 +1551,9 @@ has 'datetime_formats_interval' => (
 				y => q{M/y – M/y},
 			},
 			yMEd => {
-				M => q{E, d/M/y},
+				M => q{E, d/M/y – E, d/M/y},
 				d => q{E, d/M/y – E, d/M/y},
-				y => q{E, d/M/Y – E, d/M/Y},
+				y => q{E, d/M/y – E, d/M/y},
 			},
 			yMMM => {
 				M => q{LLL–LLL y},

@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.40'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 keywords:
   - locale
   - CLDR
@@ -22,105 +22,105 @@ name: Locale-CLDR-Locales-Es
 provides:
   Locale::CLDR::Locales::Es:
     file: lib/Locale/CLDR/Locales/Es.pm
-    version: v0.44.1
+    version: v0.46.0
   Locale::CLDR::Locales::Es::Latn:
     file: lib/Locale/CLDR/Locales/Es/Latn.pm
-    version: v0.44.1
+    version: v0.46.0
   Locale::CLDR::Locales::Es::Latn::419:
     file: lib/Locale/CLDR/Locales/Es/Latn/419.pm
-    version: v0.44.1
+    version: v0.46.0
   Locale::CLDR::Locales::Es::Latn::Ar:
     file: lib/Locale/CLDR/Locales/Es/Latn/Ar.pm
-    version: v0.44.1
+    version: v0.46.0
   Locale::CLDR::Locales::Es::Latn::Bo:
     file: lib/Locale/CLDR/Locales/Es/Latn/Bo.pm
-    version: v0.44.1
+    version: v0.46.0
   Locale::CLDR::Locales::Es::Latn::Br:
     file: lib/Locale/CLDR/Locales/Es/Latn/Br.pm
-    version: v0.44.1
+    version: v0.46.0
   Locale::CLDR::Locales::Es::Latn::Bz:
     file: lib/Locale/CLDR/Locales/Es/Latn/Bz.pm
-    version: v0.44.1
+    version: v0.46.0
   Locale::CLDR::Locales::Es::Latn::Cl:
     file: lib/Locale/CLDR/Locales/Es/Latn/Cl.pm
-    version: v0.44.1
+    version: v0.46.0
   Locale::CLDR::Locales::Es::Latn::Co:
     file: lib/Locale/CLDR/Locales/Es/Latn/Co.pm
-    version: v0.44.1
+    version: v0.46.0
   Locale::CLDR::Locales::Es::Latn::Cr:
     file: lib/Locale/CLDR/Locales/Es/Latn/Cr.pm
-    version: v0.44.1
+    version: v0.46.0
   Locale::CLDR::Locales::Es::Latn::Cu:
     file: lib/Locale/CLDR/Locales/Es/Latn/Cu.pm
-    version: v0.44.1
+    version: v0.46.0
   Locale::CLDR::Locales::Es::Latn::Do:
     file: lib/Locale/CLDR/Locales/Es/Latn/Do.pm
-    version: v0.44.1
+    version: v0.46.0
   Locale::CLDR::Locales::Es::Latn::Ea:
     file: lib/Locale/CLDR/Locales/Es/Latn/Ea.pm
-    version: v0.44.1
+    version: v0.46.0
   Locale::CLDR::Locales::Es::Latn::Ec:
     file: lib/Locale/CLDR/Locales/Es/Latn/Ec.pm
-    version: v0.44.1
+    version: v0.46.0
   Locale::CLDR::Locales::Es::Latn::Es:
     file: lib/Locale/CLDR/Locales/Es/Latn/Es.pm
-    version: v0.44.1
+    version: v0.46.0
   Locale::CLDR::Locales::Es::Latn::Gq:
     file: lib/Locale/CLDR/Locales/Es/Latn/Gq.pm
-    version: v0.44.1
+    version: v0.46.0
   Locale::CLDR::Locales::Es::Latn::Gt:
     file: lib/Locale/CLDR/Locales/Es/Latn/Gt.pm
-    version: v0.44.1
+    version: v0.46.0
   Locale::CLDR::Locales::Es::Latn::Hn:
     file: lib/Locale/CLDR/Locales/Es/Latn/Hn.pm
-    version: v0.44.1
+    version: v0.46.0
   Locale::CLDR::Locales::Es::Latn::Ic:
     file: lib/Locale/CLDR/Locales/Es/Latn/Ic.pm
-    version: v0.44.1
+    version: v0.46.0
   Locale::CLDR::Locales::Es::Latn::Mx:
     file: lib/Locale/CLDR/Locales/Es/Latn/Mx.pm
-    version: v0.44.1
+    version: v0.46.0
   Locale::CLDR::Locales::Es::Latn::Ni:
     file: lib/Locale/CLDR/Locales/Es/Latn/Ni.pm
-    version: v0.44.1
+    version: v0.46.0
   Locale::CLDR::Locales::Es::Latn::Pa:
     file: lib/Locale/CLDR/Locales/Es/Latn/Pa.pm
-    version: v0.44.1
+    version: v0.46.0
   Locale::CLDR::Locales::Es::Latn::Pe:
     file: lib/Locale/CLDR/Locales/Es/Latn/Pe.pm
-    version: v0.44.1
+    version: v0.46.0
   Locale::CLDR::Locales::Es::Latn::Ph:
     file: lib/Locale/CLDR/Locales/Es/Latn/Ph.pm
-    version: v0.44.1
+    version: v0.46.0
   Locale::CLDR::Locales::Es::Latn::Pr:
     file: lib/Locale/CLDR/Locales/Es/Latn/Pr.pm
-    version: v0.44.1
+    version: v0.46.0
   Locale::CLDR::Locales::Es::Latn::Py:
     file: lib/Locale/CLDR/Locales/Es/Latn/Py.pm
-    version: v0.44.1
+    version: v0.46.0
   Locale::CLDR::Locales::Es::Latn::Sv:
     file: lib/Locale/CLDR/Locales/Es/Latn/Sv.pm
-    version: v0.44.1
+    version: v0.46.0
   Locale::CLDR::Locales::Es::Latn::Us:
     file: lib/Locale/CLDR/Locales/Es/Latn/Us.pm
-    version: v0.44.1
+    version: v0.46.0
   Locale::CLDR::Locales::Es::Latn::Uy:
     file: lib/Locale/CLDR/Locales/Es/Latn/Uy.pm
-    version: v0.44.1
+    version: v0.46.0
   Locale::CLDR::Locales::Es::Latn::Ve:
     file: lib/Locale/CLDR/Locales/Es/Latn/Ve.pm
-    version: v0.44.1
+    version: v0.46.0
 requires:
   DateTime: '0.72'
-  Locale::CLDR: v0.44.1
+  Locale::CLDR: v0.46.0
   Moo: '2'
   MooX::ClassAttribute: '0.011'
   Type::Tiny: '0'
-  perl: v5.10.1
+  perl: v5.12.0
   version: '0.95'
 resources:
   bugtracker: https://github.com/ThePilgrim/perlcldr/issues
   homepage: https://github.com/ThePilgrim/perlcldr
   repository: https://github.com/ThePilgrim/perlcldr.git
-version: v0.44.1
+version: v0.46.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Rif - Package for language Riffian
 
 package Locale::CLDR::Locales::Rif;
 # This file auto generated from Data\common\main\rif.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -35,20 +35,10 @@ has 'display_name_language' => (
  				'ar_001' => 'taɛrabt tamaynut',
  				'bn' => 'tabanɣaliyt',
  				'de' => 'talimant',
- 				'de_AT' => 'talimant (AT)',
- 				'de_CH' => 'talimant (CH)',
  				'en' => 'taglinzit',
- 				'en_AU' => 'taglinzit (AU)',
- 				'en_CA' => 'taglinzit (CA)',
- 				'en_GB' => 'taglinzit (GB)',
- 				'en_US' => 'taglinzit (US)',
+ 				'en_GB@alt=short' => 'taglinzit (UK)',
  				'es' => 'taseppanyut',
- 				'es_419' => 'taseppanyut talatinit',
- 				'es_ES' => 'taseppanyut (ES)',
- 				'es_MX' => 'taseppanyut (MX)',
  				'fr' => 'tafransist',
- 				'fr_CA' => 'tafransist (CA)',
- 				'fr_CH' => 'tafransist (CH)',
  				'hi_Latn' => 'tahindawiyt',
  				'id' => 'tayindusiyt',
  				'it' => 'tatayalt',
@@ -57,12 +47,12 @@ has 'display_name_language' => (
  				'nl' => 'tahulandiyt',
  				'nl_BE' => 'taflamant',
  				'pl' => 'tapulandiyt',
- 				'pt' => 'tapuruɣaliyt',
- 				'pt_BR' => 'tapuruɣaliyt (BR)',
- 				'pt_PT' => 'tapuruɣaliyt (PT)',
+ 				'pt' => 'tapurtuɣaliyt',
+ 				'pt_BR' => 'tapurtuɣaliyt (brazil)',
+ 				'pt_PT' => 'tapurtuɣaliyt (uruppa)',
  				'rif' => 'Tarifit',
  				'ru' => 'tarusiyt',
- 				'th' => 'taṭayiyt',
+ 				'th' => 'taṭayit',
  				'tr' => 'taṭurkiyt',
  				'und' => 'tutlayt nneɣni',
  				'zh' => 'tatcinwiyt',
@@ -438,7 +428,7 @@ has 'display_name_type' => (
  				'standard' => q{asettef sṭandar},
  			},
  			'numbers' => {
- 				'latn' => q{nnurwat irumiyyen},
+ 				'latn' => q{nnumrawat irumiyyen},
  			},
 
 		}
@@ -525,11 +515,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'per' => {
-						'1' => q({0} xef {1}),
+						'1' => q({0} di {1}),
 					},
 					# Core Unit Identifier
 					'per' => {
-						'1' => q({0} xef {1}),
+						'1' => q({0} di {1}),
 					},
 				},
 				'narrow' => {
@@ -602,6 +592,46 @@ has 'number_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		decimalFormat => {
+			'long' => {
+				'1000' => {
+					'other' => '0 alaf',
+				},
+				'10000' => {
+					'other' => '00 alaf',
+				},
+				'100000' => {
+					'other' => '000 alaf',
+				},
+				'1000000' => {
+					'other' => '0 melyun',
+				},
+				'10000000' => {
+					'other' => '00 melyun',
+				},
+				'100000000' => {
+					'other' => '000 melyun',
+				},
+				'1000000000' => {
+					'other' => '0 melyar',
+				},
+				'10000000000' => {
+					'other' => '00 melyar',
+				},
+				'100000000000' => {
+					'other' => '000 melyar',
+				},
+				'1000000000000' => {
+					'other' => '0 trilyun',
+				},
+				'10000000000000' => {
+					'other' => '00 trilyun',
+				},
+				'100000000000000' => {
+					'other' => '000 trilyun',
+				},
+			},
+		},
 		percentFormat => {
 			'default' => {
 				'standard' => {
@@ -1261,7 +1291,7 @@ has 'datetime_formats_interval' => (
 				M => q{MM – MM},
 			},
 			MEd => {
-				M => q{E dd/MM},
+				M => q{E dd/MM – E dd/MM},
 				d => q{E dd/MM – E dd/MM},
 			},
 			MMM => {
@@ -1347,6 +1377,184 @@ has 'time_zone_names' => (
 		regionFormat => q(akud n {0}),
 		regionFormat => q(akud unebdu n {0}),
 		regionFormat => q(akud anaway n {0}),
+		'Africa/Abidjan' => {
+			exemplarCity => q#abidjan#,
+		},
+		'Africa/Accra' => {
+			exemplarCity => q#akra#,
+		},
+		'Africa/Addis_Ababa' => {
+			exemplarCity => q#adisababa#,
+		},
+		'Africa/Algiers' => {
+			exemplarCity => q#ddzayer#,
+		},
+		'Africa/Asmera' => {
+			exemplarCity => q#asmara#,
+		},
+		'Africa/Bamako' => {
+			exemplarCity => q#bamaku#,
+		},
+		'Africa/Bangui' => {
+			exemplarCity => q#bangi#,
+		},
+		'Africa/Banjul' => {
+			exemplarCity => q#banjul#,
+		},
+		'Africa/Bissau' => {
+			exemplarCity => q#bisaw#,
+		},
+		'Africa/Blantyre' => {
+			exemplarCity => q#blanṭayr#,
+		},
+		'Africa/Brazzaville' => {
+			exemplarCity => q#brazabil#,
+		},
+		'Africa/Bujumbura' => {
+			exemplarCity => q#bujumbura#,
+		},
+		'Africa/Cairo' => {
+			exemplarCity => q#lqahira#,
+		},
+		'Africa/Casablanca' => {
+			exemplarCity => q#ddarbida#,
+		},
+		'Africa/Ceuta' => {
+			exemplarCity => q#sebta#,
+		},
+		'Africa/Conakry' => {
+			exemplarCity => q#kunakri#,
+		},
+		'Africa/Dakar' => {
+			exemplarCity => q#dakar#,
+		},
+		'Africa/Dar_es_Salaam' => {
+			exemplarCity => q#daressalam#,
+		},
+		'Africa/Djibouti' => {
+			exemplarCity => q#djibuti#,
+		},
+		'Africa/Douala' => {
+			exemplarCity => q#diwala#,
+		},
+		'Africa/El_Aaiun' => {
+			exemplarCity => q#leɛyun#,
+		},
+		'Africa/Freetown' => {
+			exemplarCity => q#fritawn#,
+		},
+		'Africa/Gaborone' => {
+			exemplarCity => q#gaburun#,
+		},
+		'Africa/Harare' => {
+			exemplarCity => q#harari#,
+		},
+		'Africa/Johannesburg' => {
+			exemplarCity => q#djuhanasburg#,
+		},
+		'Africa/Juba' => {
+			exemplarCity => q#juba#,
+		},
+		'Africa/Kampala' => {
+			exemplarCity => q#kampala#,
+		},
+		'Africa/Khartoum' => {
+			exemplarCity => q#xarṭum#,
+		},
+		'Africa/Kigali' => {
+			exemplarCity => q#kigali#,
+		},
+		'Africa/Kinshasa' => {
+			exemplarCity => q#kincasa#,
+		},
+		'Africa/Lagos' => {
+			exemplarCity => q#lagus#,
+		},
+		'Africa/Libreville' => {
+			exemplarCity => q#liberbil#,
+		},
+		'Africa/Lome' => {
+			exemplarCity => q#lumi#,
+		},
+		'Africa/Luanda' => {
+			exemplarCity => q#lwanda#,
+		},
+		'Africa/Lubumbashi' => {
+			exemplarCity => q#lubumbaci#,
+		},
+		'Africa/Lusaka' => {
+			exemplarCity => q#lusaka#,
+		},
+		'Africa/Malabo' => {
+			exemplarCity => q#malabu#,
+		},
+		'Africa/Maputo' => {
+			exemplarCity => q#maputu#,
+		},
+		'Africa/Maseru' => {
+			exemplarCity => q#maziru#,
+		},
+		'Africa/Mbabane' => {
+			exemplarCity => q#mbaban#,
+		},
+		'Africa/Mogadishu' => {
+			exemplarCity => q#mugadicu#,
+		},
+		'Africa/Monrovia' => {
+			exemplarCity => q#munrubya#,
+		},
+		'Africa/Nairobi' => {
+			exemplarCity => q#nayrubi#,
+		},
+		'Africa/Ndjamena' => {
+			exemplarCity => q#njamina#,
+		},
+		'Africa/Niamey' => {
+			exemplarCity => q#nyamiy#,
+		},
+		'Africa/Nouakchott' => {
+			exemplarCity => q#nwakcuṭ#,
+		},
+		'Africa/Ouagadougou' => {
+			exemplarCity => q#wagadugu#,
+		},
+		'Africa/Porto-Novo' => {
+			exemplarCity => q#purtunubu#,
+		},
+		'Africa/Sao_Tome' => {
+			exemplarCity => q#sawtumi#,
+		},
+		'Africa/Tripoli' => {
+			exemplarCity => q#ṭarablus#,
+		},
+		'Africa/Tunis' => {
+			exemplarCity => q#tunes#,
+		},
+		'Africa/Windhoek' => {
+			exemplarCity => q#binhuwk#,
+		},
+		'Africa_Central' => {
+			long => {
+				'standard' => q#akud n tefriqt n lwesṭ#,
+			},
+		},
+		'Africa_Eastern' => {
+			long => {
+				'standard' => q#akud n tefriqt n ccerq#,
+			},
+		},
+		'Africa_Southern' => {
+			long => {
+				'standard' => q#akud n tefriqt n wadday#,
+			},
+		},
+		'Africa_Western' => {
+			long => {
+				'daylight' => q#akud n uzil n tefriqt n lɣerb#,
+				'generic' => q#akud n tefriqt n lɣerb#,
+				'standard' => q#akud anaway n tefriqt n lɣerb#,
+			},
+		},
 		'Alaska' => {
 			long => {
 				'daylight' => q#akud n uzil n alaska#,
@@ -1364,11 +1572,92 @@ has 'time_zone_names' => (
 		'America/Adak' => {
 			exemplarCity => q#adak#,
 		},
+		'America/Anchorage' => {
+			exemplarCity => q#ancuraj#,
+		},
+		'America/Anguilla' => {
+			exemplarCity => q#angwiya#,
+		},
+		'America/Antigua' => {
+			exemplarCity => q#antigwa#,
+		},
+		'America/Araguaina' => {
+			exemplarCity => q#aragwayna#,
+		},
+		'America/Argentina/La_Rioja' => {
+			exemplarCity => q#lariyuxa#,
+		},
+		'America/Argentina/Rio_Gallegos' => {
+			exemplarCity => q#riyugayyigus#,
+		},
+		'America/Argentina/Salta' => {
+			exemplarCity => q#salṭa#,
+		},
+		'America/Argentina/San_Juan' => {
+			exemplarCity => q#sanxwan#,
+		},
+		'America/Argentina/San_Luis' => {
+			exemplarCity => q#sanluwis#,
+		},
+		'America/Argentina/Tucuman' => {
+			exemplarCity => q#tutcuman#,
+		},
+		'America/Argentina/Ushuaia' => {
+			exemplarCity => q#ucwaya#,
+		},
 		'America/Aruba' => {
 			exemplarCity => q#aruba#,
 		},
+		'America/Asuncion' => {
+			exemplarCity => q#asuntyun#,
+		},
+		'America/Bahia' => {
+			exemplarCity => q#bahiya#,
+		},
+		'America/Bahia_Banderas' => {
+			exemplarCity => q#bayya di bandiras#,
+		},
 		'America/Barbados' => {
 			exemplarCity => q#barbadus#,
+		},
+		'America/Belem' => {
+			exemplarCity => q#bilim#,
+		},
+		'America/Belize' => {
+			exemplarCity => q#biliz#,
+		},
+		'America/Blanc-Sablon' => {
+			exemplarCity => q#blank-sablun#,
+		},
+		'America/Boa_Vista' => {
+			exemplarCity => q#buwabista#,
+		},
+		'America/Bogota' => {
+			exemplarCity => q#buguṭa#,
+		},
+		'America/Boise' => {
+			exemplarCity => q#boysi#,
+		},
+		'America/Buenos_Aires' => {
+			exemplarCity => q#bwinusayris#,
+		},
+		'America/Cambridge_Bay' => {
+			exemplarCity => q#kambridj bay#,
+		},
+		'America/Campo_Grande' => {
+			exemplarCity => q#campugrandi#,
+		},
+		'America/Cancun' => {
+			exemplarCity => q#kankun#,
+		},
+		'America/Caracas' => {
+			exemplarCity => q#karakas#,
+		},
+		'America/Catamarca' => {
+			exemplarCity => q#katamarka#,
+		},
+		'America/Cayenne' => {
+			exemplarCity => q#kayen#,
 		},
 		'America/Cayman' => {
 			exemplarCity => q#sayman#,
@@ -1376,11 +1665,38 @@ has 'time_zone_names' => (
 		'America/Chicago' => {
 			exemplarCity => q#cikagu#,
 		},
+		'America/Chihuahua' => {
+			exemplarCity => q#ciwawa#,
+		},
+		'America/Ciudad_Juarez' => {
+			exemplarCity => q#tidad xwaris#,
+		},
 		'America/Coral_Harbour' => {
 			exemplarCity => q#atikukan#,
 		},
+		'America/Cordoba' => {
+			exemplarCity => q#qurṭuba#,
+		},
 		'America/Costa_Rica' => {
 			exemplarCity => q#kustarika#,
+		},
+		'America/Creston' => {
+			exemplarCity => q#kristun#,
+		},
+		'America/Cuiaba' => {
+			exemplarCity => q#kiyaba#,
+		},
+		'America/Curacao' => {
+			exemplarCity => q#kuracaw#,
+		},
+		'America/Danmarkshavn' => {
+			exemplarCity => q#danmarkshaven#,
+		},
+		'America/Dawson' => {
+			exemplarCity => q#dawsun#,
+		},
+		'America/Dawson_Creek' => {
+			exemplarCity => q#dawsun krik#,
 		},
 		'America/Denver' => {
 			exemplarCity => q#dinver#,
@@ -1391,26 +1707,293 @@ has 'time_zone_names' => (
 		'America/Dominica' => {
 			exemplarCity => q#duminika#,
 		},
+		'America/Edmonton' => {
+			exemplarCity => q#idmunṭun#,
+		},
+		'America/Eirunepe' => {
+			exemplarCity => q#irunippi#,
+		},
+		'America/El_Salvador' => {
+			exemplarCity => q#ssalbadur#,
+		},
+		'America/Fort_Nelson' => {
+			exemplarCity => q#furt nilsun#,
+		},
+		'America/Fortaleza' => {
+			exemplarCity => q#furṭaliza#,
+		},
+		'America/Glace_Bay' => {
+			exemplarCity => q#glasbay#,
+		},
 		'America/Godthab' => {
 			exemplarCity => q#nuk#,
+		},
+		'America/Goose_Bay' => {
+			exemplarCity => q#guzbay#,
+		},
+		'America/Grand_Turk' => {
+			exemplarCity => q#grandṭurk#,
+		},
+		'America/Grenada' => {
+			exemplarCity => q#grinada#,
+		},
+		'America/Guadeloupe' => {
+			exemplarCity => q#gwadlup#,
 		},
 		'America/Guatemala' => {
 			exemplarCity => q#gwatimala#,
 		},
+		'America/Guayaquil' => {
+			exemplarCity => q#gwayakil#,
+		},
+		'America/Guyana' => {
+			exemplarCity => q#guyana#,
+		},
+		'America/Halifax' => {
+			exemplarCity => q#halifax#,
+		},
 		'America/Havana' => {
 			exemplarCity => q#havana#,
+		},
+		'America/Hermosillo' => {
+			exemplarCity => q#hirmusiyyu#,
+		},
+		'America/Indiana/Knox' => {
+			exemplarCity => q#nux, indyana#,
+		},
+		'America/Indiana/Marengo' => {
+			exemplarCity => q#maringu, indyana#,
+		},
+		'America/Indiana/Petersburg' => {
+			exemplarCity => q#pitersburg, indyana#,
+		},
+		'America/Indiana/Tell_City' => {
+			exemplarCity => q#tilsiti, indyana#,
+		},
+		'America/Indiana/Vevay' => {
+			exemplarCity => q#vivi, indyana#,
+		},
+		'America/Indiana/Vincennes' => {
+			exemplarCity => q#vinsanz, indyana#,
+		},
+		'America/Indiana/Winamac' => {
+			exemplarCity => q#winamak, indyana#,
 		},
 		'America/Indianapolis' => {
 			exemplarCity => q#indyanapulis#,
 		},
+		'America/Inuvik' => {
+			exemplarCity => q#inuvik#,
+		},
+		'America/Iqaluit' => {
+			exemplarCity => q#ikaluwit#,
+		},
+		'America/Jamaica' => {
+			exemplarCity => q#jamayka#,
+		},
+		'America/Jujuy' => {
+			exemplarCity => q#jujuy#,
+		},
+		'America/Juneau' => {
+			exemplarCity => q#junaw#,
+		},
+		'America/Kentucky/Monticello' => {
+			exemplarCity => q#muntitcilu, kinṭaki#,
+		},
+		'America/Kralendijk' => {
+			exemplarCity => q#kralendik#,
+		},
+		'America/La_Paz' => {
+			exemplarCity => q#lappaz#,
+		},
+		'America/Lima' => {
+			exemplarCity => q#lima#,
+		},
+		'America/Los_Angeles' => {
+			exemplarCity => q#lusanjlus#,
+		},
+		'America/Louisville' => {
+			exemplarCity => q#lwisvil#,
+		},
+		'America/Lower_Princes' => {
+			exemplarCity => q#bariyyu n luwerprans#,
+		},
+		'America/Maceio' => {
+			exemplarCity => q#masiyu#,
+		},
+		'America/Managua' => {
+			exemplarCity => q#mangwa#,
+		},
+		'America/Manaus' => {
+			exemplarCity => q#manaws#,
+		},
+		'America/Marigot' => {
+			exemplarCity => q#mariguṭ#,
+		},
+		'America/Martinique' => {
+			exemplarCity => q#martinik#,
+		},
+		'America/Matamoros' => {
+			exemplarCity => q#matamurus#,
+		},
+		'America/Mazatlan' => {
+			exemplarCity => q#mazatlan#,
+		},
+		'America/Mendoza' => {
+			exemplarCity => q#minduza#,
+		},
+		'America/Menominee' => {
+			exemplarCity => q#minumini#,
+		},
+		'America/Merida' => {
+			exemplarCity => q#mirida#,
+		},
+		'America/Metlakatla' => {
+			exemplarCity => q#mitlakatla#,
+		},
+		'America/Mexico_City' => {
+			exemplarCity => q#miksiku siti#,
+		},
+		'America/Miquelon' => {
+			exemplarCity => q#mikilon#,
+		},
+		'America/Moncton' => {
+			exemplarCity => q#muktun#,
+		},
+		'America/Monterrey' => {
+			exemplarCity => q#muntiri#,
+		},
+		'America/Montevideo' => {
+			exemplarCity => q#muntibidyu#,
+		},
+		'America/Montserrat' => {
+			exemplarCity => q#muntsirat#,
+		},
+		'America/Nassau' => {
+			exemplarCity => q#nassaw#,
+		},
+		'America/New_York' => {
+			exemplarCity => q#nyuyurk#,
+		},
+		'America/Nome' => {
+			exemplarCity => q#num#,
+		},
+		'America/Noronha' => {
+			exemplarCity => q#nurunha#,
+		},
+		'America/North_Dakota/Beulah' => {
+			exemplarCity => q#bulah, nurtdakuṭa#,
+		},
+		'America/North_Dakota/Center' => {
+			exemplarCity => q#santer, nurtdakuṭa#,
+		},
+		'America/North_Dakota/New_Salem' => {
+			exemplarCity => q#nyusalem, nurtdakuṭa#,
+		},
+		'America/Ojinaga' => {
+			exemplarCity => q#ujinaga#,
+		},
 		'America/Panama' => {
 			exemplarCity => q#panama#,
+		},
+		'America/Paramaribo' => {
+			exemplarCity => q#paramaribu#,
+		},
+		'America/Phoenix' => {
+			exemplarCity => q#finiks#,
+		},
+		'America/Port-au-Prince' => {
+			exemplarCity => q#ppurtuprins#,
+		},
+		'America/Port_of_Spain' => {
+			exemplarCity => q#ppurtufspin#,
+		},
+		'America/Porto_Velho' => {
+			exemplarCity => q#purtubilhu#,
+		},
+		'America/Puerto_Rico' => {
+			exemplarCity => q#ppurturiku#,
+		},
+		'America/Punta_Arenas' => {
+			exemplarCity => q#puntarinas#,
+		},
+		'America/Rankin_Inlet' => {
+			exemplarCity => q#rankinilit#,
+		},
+		'America/Recife' => {
+			exemplarCity => q#risifi#,
 		},
 		'America/Regina' => {
 			exemplarCity => q#rigina#,
 		},
+		'America/Resolute' => {
+			exemplarCity => q#rizulṭ#,
+		},
+		'America/Rio_Branco' => {
+			exemplarCity => q#riyubranku#,
+		},
+		'America/Santarem' => {
+			exemplarCity => q#santarim#,
+		},
+		'America/Santiago' => {
+			exemplarCity => q#santyagu#,
+		},
+		'America/Santo_Domingo' => {
+			exemplarCity => q#santudumingu#,
+		},
+		'America/Sao_Paulo' => {
+			exemplarCity => q#sawpawlu#,
+		},
+		'America/Scoresbysund' => {
+			exemplarCity => q#iṭukurturmit#,
+		},
 		'America/Sitka' => {
 			exemplarCity => q#sitka#,
+		},
+		'America/St_Barthelemy' => {
+			exemplarCity => q#sanbartilimi#,
+		},
+		'America/St_Johns' => {
+			exemplarCity => q#sanjuns#,
+		},
+		'America/St_Kitts' => {
+			exemplarCity => q#sankits#,
+		},
+		'America/St_Lucia' => {
+			exemplarCity => q#sanlucya#,
+		},
+		'America/St_Thomas' => {
+			exemplarCity => q#sanṭumas#,
+		},
+		'America/St_Vincent' => {
+			exemplarCity => q#sanvinsint#,
+		},
+		'America/Swift_Current' => {
+			exemplarCity => q#swiftkurrent#,
+		},
+		'America/Tegucigalpa' => {
+			exemplarCity => q#tigicigalpa#,
+		},
+		'America/Thule' => {
+			exemplarCity => q#tula#,
+		},
+		'America/Tijuana' => {
+			exemplarCity => q#tiywana#,
+		},
+		'America/Toronto' => {
+			exemplarCity => q#ṭurunṭu#,
+		},
+		'America/Tortola' => {
+			exemplarCity => q#ṭurṭula#,
+		},
+		'America/Vancouver' => {
+			exemplarCity => q#fankufer#,
+		},
+		'America/Whitehorse' => {
+			exemplarCity => q#waythurs#,
+		},
+		'America/Winnipeg' => {
+			exemplarCity => q#winippig#,
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#yakutat#,
@@ -1443,12 +2026,147 @@ has 'time_zone_names' => (
 				'standard' => q#akud anaway n pasifik#,
 			},
 		},
+		'Arabian' => {
+			long => {
+				'daylight' => q#akud n uzil n waɛrab#,
+				'generic' => q#akud n waɛrab#,
+				'standard' => q#akud anaway n waɛrab#,
+			},
+		},
+		'Arctic/Longyearbyen' => {
+			exemplarCity => q#lunyabyan#,
+		},
 		'Argentina' => {
 			long => {
 				'daylight' => q#akud n uzil n arjentina#,
 				'generic' => q#akud n arjentina#,
 				'standard' => q#akud anaway n arjentina#,
 			},
+		},
+		'Argentina_Western' => {
+			long => {
+				'daylight' => q#akud n uzil n lɣerb n arjentina#,
+				'generic' => q#akud n lɣerb n arjentina#,
+				'standard' => q#akud anaway n lɣerb n arjentina#,
+			},
+		},
+		'Armenia' => {
+			long => {
+				'daylight' => q#akud n uzil n arminya#,
+				'generic' => q#akud n arminya#,
+				'standard' => q#akud anaway n arminya#,
+			},
+		},
+		'Asia/Aden' => {
+			exemplarCity => q#ɛadan#,
+		},
+		'Asia/Amman' => {
+			exemplarCity => q#ɛamman#,
+		},
+		'Asia/Anadyr' => {
+			exemplarCity => q#anadic#,
+		},
+		'Asia/Baghdad' => {
+			exemplarCity => q#baɣdad#,
+		},
+		'Asia/Bahrain' => {
+			exemplarCity => q#baḥrin#,
+		},
+		'Asia/Baku' => {
+			exemplarCity => q#batci#,
+		},
+		'Asia/Barnaul' => {
+			exemplarCity => q#barnul#,
+		},
+		'Asia/Beirut' => {
+			exemplarCity => q#bayrut#,
+		},
+		'Asia/Chita' => {
+			exemplarCity => q#cita#,
+		},
+		'Asia/Damascus' => {
+			exemplarCity => q#dimacq#,
+		},
+		'Asia/Dubai' => {
+			exemplarCity => q#dubay#,
+		},
+		'Asia/Famagusta' => {
+			exemplarCity => q#famagusṭa#,
+		},
+		'Asia/Gaza' => {
+			exemplarCity => q#ɣezza#,
+		},
+		'Asia/Hebron' => {
+			exemplarCity => q#lxalil#,
+		},
+		'Asia/Irkutsk' => {
+			exemplarCity => q#irkutsek#,
+		},
+		'Asia/Jerusalem' => {
+			exemplarCity => q#lquds#,
+		},
+		'Asia/Kamchatka' => {
+			exemplarCity => q#kamcatka#,
+		},
+		'Asia/Khandyga' => {
+			exemplarCity => q#xandiga#,
+		},
+		'Asia/Krasnoyarsk' => {
+			exemplarCity => q#krasnuyarsk#,
+		},
+		'Asia/Kuwait' => {
+			exemplarCity => q#kuwit#,
+		},
+		'Asia/Magadan' => {
+			exemplarCity => q#magadan#,
+		},
+		'Asia/Muscat' => {
+			exemplarCity => q#masqaṭ#,
+		},
+		'Asia/Nicosia' => {
+			exemplarCity => q#nikuzya#,
+		},
+		'Asia/Novokuznetsk' => {
+			exemplarCity => q#nubukuznitesk#,
+		},
+		'Asia/Novosibirsk' => {
+			exemplarCity => q#nubusibiresk#,
+		},
+		'Asia/Omsk' => {
+			exemplarCity => q#omsek#,
+		},
+		'Asia/Qatar' => {
+			exemplarCity => q#qaṭar#,
+		},
+		'Asia/Riyadh' => {
+			exemplarCity => q#riyad#,
+		},
+		'Asia/Sakhalin' => {
+			exemplarCity => q#saxalin#,
+		},
+		'Asia/Srednekolymsk' => {
+			exemplarCity => q#sridnikulimsek#,
+		},
+		'Asia/Tbilisi' => {
+			exemplarCity => q#tbilisi#,
+		},
+		'Asia/Tomsk' => {
+			exemplarCity => q#tumsek#,
+		},
+		'Asia/Ust-Nera' => {
+			exemplarCity => q#ustnira#,
+		},
+		'Asia/Vladivostok' => {
+			exemplarCity => q#bladibustuk#,
+		},
+		'Asia/Yakutsk' => {
+			exemplarCity => q#yatutsek#,
+		},
+		'Asia/Yekaterinburg' => {
+			exemplarCity => q#yekaterinburg#,
+		},
+		'Asia/Yerevan' => {
+			exemplarCity => q#yiriban#,
 		},
 		'Atlantic' => {
 			long => {
@@ -1457,8 +2175,49 @@ has 'time_zone_names' => (
 				'standard' => q#akud anaway n atlantik#,
 			},
 		},
+		'Atlantic/Azores' => {
+			exemplarCity => q#azures#,
+		},
 		'Atlantic/Bermuda' => {
 			exemplarCity => q#birmuda#,
+		},
+		'Atlantic/Canary' => {
+			exemplarCity => q#kanari#,
+		},
+		'Atlantic/Cape_Verde' => {
+			exemplarCity => q#qabubirdi#,
+		},
+		'Atlantic/Faeroe' => {
+			exemplarCity => q#faraw#,
+		},
+		'Atlantic/Madeira' => {
+			exemplarCity => q#madiyra#,
+		},
+		'Atlantic/Reykjavik' => {
+			exemplarCity => q#reykjavik#,
+		},
+		'Atlantic/South_Georgia' => {
+			exemplarCity => q#sawtgyurgya#,
+		},
+		'Atlantic/St_Helena' => {
+			exemplarCity => q#santhilina#,
+		},
+		'Atlantic/Stanley' => {
+			exemplarCity => q#sṭanli#,
+		},
+		'Azerbaijan' => {
+			long => {
+				'daylight' => q#akud n uzil n azrabidjan#,
+				'generic' => q#akud n azrabidjan#,
+				'standard' => q#akud anaway n azrabidjan#,
+			},
+		},
+		'Azores' => {
+			long => {
+				'daylight' => q#akud n uzil n azures#,
+				'generic' => q#akud n azures#,
+				'standard' => q#akud anaway n azuresn azures#,
+			},
 		},
 		'Bolivia' => {
 			long => {
@@ -1472,11 +2231,25 @@ has 'time_zone_names' => (
 				'standard' => q#akud anaway n brazilya#,
 			},
 		},
+		'Cape_Verde' => {
+			long => {
+				'daylight' => q#akud n uzil n qabubirdi#,
+				'generic' => q#akud n qabubirdi#,
+				'standard' => q#akud anaway n qabubirdi#,
+			},
+		},
 		'Chile' => {
 			long => {
 				'daylight' => q#akud n uzil n cili#,
 				'generic' => q#akud n cili#,
 				'standard' => q#akud anaway n cili#,
+			},
+		},
+		'China' => {
+			long => {
+				'daylight' => q#akud n uzil n tcina#,
+				'generic' => q#akud n tcina#,
+				'standard' => q#akud anaway n tcina#,
 			},
 		},
 		'Colombia' => {
@@ -1493,6 +2266,13 @@ has 'time_zone_names' => (
 				'standard' => q#akud anaway n kuba#,
 			},
 		},
+		'Easter' => {
+			long => {
+				'daylight' => q#akud n uzil n isterayland#,
+				'generic' => q#akud n isterayland#,
+				'standard' => q#akud anaway n isterayland#,
+			},
+		},
 		'Ecuador' => {
 			long => {
 				'standard' => q#akud n ikwadur#,
@@ -1503,14 +2283,244 @@ has 'time_zone_names' => (
 				'standard' => q#akud agraɣlan amezday#,
 			},
 		},
+		'Europe/Amsterdam' => {
+			exemplarCity => q#amesterdem#,
+		},
+		'Europe/Andorra' => {
+			exemplarCity => q#andura#,
+		},
+		'Europe/Astrakhan' => {
+			exemplarCity => q#astraxan#,
+		},
+		'Europe/Athens' => {
+			exemplarCity => q#atina#,
+		},
+		'Europe/Belgrade' => {
+			exemplarCity => q#bilgrad#,
+		},
+		'Europe/Berlin' => {
+			exemplarCity => q#birlin#,
+		},
+		'Europe/Bratislava' => {
+			exemplarCity => q#bratislaba#,
+		},
+		'Europe/Brussels' => {
+			exemplarCity => q#bruksil#,
+		},
+		'Europe/Bucharest' => {
+			exemplarCity => q#buxarist#,
+		},
+		'Europe/Budapest' => {
+			exemplarCity => q#budabist#,
+		},
+		'Europe/Busingen' => {
+			exemplarCity => q#buzingen#,
+		},
+		'Europe/Chisinau' => {
+			exemplarCity => q#cisinaw#,
+		},
+		'Europe/Copenhagen' => {
+			exemplarCity => q#kuppenhagen#,
+		},
+		'Europe/Dublin' => {
+			exemplarCity => q#dablin#,
+			long => {
+				'daylight' => q#akud anaway ayirlandi#,
+			},
+		},
+		'Europe/Gibraltar' => {
+			exemplarCity => q#jabalṭariq#,
+		},
+		'Europe/Guernsey' => {
+			exemplarCity => q#girensiy#,
+		},
+		'Europe/Helsinki' => {
+			exemplarCity => q#hilsinki#,
+		},
+		'Europe/Isle_of_Man' => {
+			exemplarCity => q#tagzirt n man#,
+		},
+		'Europe/Istanbul' => {
+			exemplarCity => q#sṭanbul#,
+		},
+		'Europe/Jersey' => {
+			exemplarCity => q#jirsiy#,
+		},
+		'Europe/Kaliningrad' => {
+			exemplarCity => q#kaliningrad#,
+		},
+		'Europe/Kiev' => {
+			exemplarCity => q#kyib#,
+		},
+		'Europe/Kirov' => {
+			exemplarCity => q#kirub#,
+		},
+		'Europe/Lisbon' => {
+			exemplarCity => q#licbuna#,
+		},
+		'Europe/Ljubljana' => {
+			exemplarCity => q#lyubliyana#,
+		},
+		'Europe/London' => {
+			exemplarCity => q#lundun#,
+			long => {
+				'daylight' => q#akud n uzil n uglinzi#,
+			},
+		},
+		'Europe/Luxembourg' => {
+			exemplarCity => q#lluksemburg#,
+		},
+		'Europe/Madrid' => {
+			exemplarCity => q#madri#,
+		},
+		'Europe/Malta' => {
+			exemplarCity => q#malta#,
+		},
+		'Europe/Mariehamn' => {
+			exemplarCity => q#maryaham#,
+		},
+		'Europe/Minsk' => {
+			exemplarCity => q#minsk#,
+		},
+		'Europe/Monaco' => {
+			exemplarCity => q#munaku#,
+		},
+		'Europe/Moscow' => {
+			exemplarCity => q#musku#,
+		},
+		'Europe/Oslo' => {
+			exemplarCity => q#uslu#,
+		},
+		'Europe/Paris' => {
+			exemplarCity => q#pari#,
+		},
+		'Europe/Podgorica' => {
+			exemplarCity => q#pudgurisa#,
+		},
+		'Europe/Prague' => {
+			exemplarCity => q#pprag#,
+		},
+		'Europe/Riga' => {
+			exemplarCity => q#riga#,
+		},
+		'Europe/Rome' => {
+			exemplarCity => q#ruma#,
+		},
+		'Europe/Samara' => {
+			exemplarCity => q#samara#,
+		},
+		'Europe/San_Marino' => {
+			exemplarCity => q#sanmarinu#,
+		},
+		'Europe/Sarajevo' => {
+			exemplarCity => q#sarayubu#,
+		},
+		'Europe/Saratov' => {
+			exemplarCity => q#saratub#,
+		},
+		'Europe/Simferopol' => {
+			exemplarCity => q#simfarupul#,
+		},
+		'Europe/Skopje' => {
+			exemplarCity => q#skupya#,
+		},
+		'Europe/Sofia' => {
+			exemplarCity => q#sufya#,
+		},
+		'Europe/Stockholm' => {
+			exemplarCity => q#sṭukhulm#,
+		},
+		'Europe/Tallinn' => {
+			exemplarCity => q#talin#,
+		},
+		'Europe/Tirane' => {
+			exemplarCity => q#tiran#,
+		},
+		'Europe/Ulyanovsk' => {
+			exemplarCity => q#ulyanubesk#,
+		},
+		'Europe/Vaduz' => {
+			exemplarCity => q#vaduts#,
+		},
+		'Europe/Vatican' => {
+			exemplarCity => q#lbatikan#,
+		},
+		'Europe/Vienna' => {
+			exemplarCity => q#byinna#,
+		},
+		'Europe/Vilnius' => {
+			exemplarCity => q#filinyus#,
+		},
+		'Europe/Volgograd' => {
+			exemplarCity => q#bulgugrad#,
+		},
+		'Europe/Warsaw' => {
+			exemplarCity => q#warsaw#,
+		},
+		'Europe/Zagreb' => {
+			exemplarCity => q#zagreb#,
+		},
+		'Europe/Zurich' => {
+			exemplarCity => q#zyurix#,
+		},
+		'Europe_Central' => {
+			long => {
+				'daylight' => q#akud n uzil n wuruppa n lwesṭ#,
+				'generic' => q#akud n wuruppa n lwesṭ#,
+				'standard' => q#akud anaway n wuruppa n lwesṭ#,
+			},
+		},
+		'Europe_Eastern' => {
+			long => {
+				'daylight' => q#akud n uzil n wuruppa n ccerq#,
+				'generic' => q#akud n wuruppa n ccerq#,
+				'standard' => q#akud anaway n wuruppa n ccerq#,
+			},
+		},
+		'Europe_Further_Eastern' => {
+			long => {
+				'standard' => q#akud n wuruppa tacerqect qaɛ#,
+			},
+		},
+		'Europe_Western' => {
+			long => {
+				'daylight' => q#akud n uzil n wuruppa n lɣerb#,
+				'generic' => q#akud n wuruppa n lɣerb#,
+				'standard' => q#akud anaway n wuruppa n lɣerb#,
+			},
+		},
+		'Falkland' => {
+			long => {
+				'daylight' => q#akud n uzil n falkland#,
+				'generic' => q#akud n falkland#,
+				'standard' => q#akud anaway n falkland#,
+			},
+		},
 		'French_Guiana' => {
 			long => {
 				'standard' => q#akud n ɣana tafransist#,
 			},
 		},
+		'French_Southern' => {
+			long => {
+				'standard' => q#akud n tiwaddayin tifransisin#,
+			},
+		},
 		'GMT' => {
 			long => {
 				'standard' => q#GMT#,
+			},
+		},
+		'Galapagos' => {
+			long => {
+				'standard' => q#akud n galappagus#,
+			},
+		},
+		'Georgia' => {
+			long => {
+				'daylight' => q#akud n uzil n jyurjya#,
+				'generic' => q#akud n jyurjya#,
+				'standard' => q#akud anaway n jyurjya#,
 			},
 		},
 		'Greenland_Eastern' => {
@@ -1527,6 +2537,11 @@ has 'time_zone_names' => (
 				'standard' => q#akud anaway n lwesṭ n grinland#,
 			},
 		},
+		'Gulf' => {
+			long => {
+				'standard' => q#akud n lxalij#,
+			},
+		},
 		'Guyana' => {
 			long => {
 				'standard' => q#akud n guyana#,
@@ -1539,11 +2554,61 @@ has 'time_zone_names' => (
 				'standard' => q#akud anaway n haway-alucyan#,
 			},
 		},
-		'Mexico_Northwest' => {
+		'Hong_Kong' => {
 			long => {
-				'daylight' => q#akud n uzil n sennej i lɣerb n miksiku#,
-				'generic' => q#akud n sennej i lɣerb n miksiku#,
-				'standard' => q#akud anaway n sennej i lɣerb n miksiku#,
+				'daylight' => q#akud n uzil n hungkung#,
+				'generic' => q#akud n hungkung#,
+				'standard' => q#akud anaway n hungkung#,
+			},
+		},
+		'Hovd' => {
+			long => {
+				'daylight' => q#akud n uzil n hubd#,
+				'generic' => q#akud n hubd#,
+				'standard' => q#akud anaway n hubd#,
+			},
+		},
+		'Indian/Antananarivo' => {
+			exemplarCity => q#antananaribu#,
+		},
+		'Indian/Chagos' => {
+			exemplarCity => q#ttcagus#,
+		},
+		'Indian/Comoro' => {
+			exemplarCity => q#kumuru#,
+		},
+		'Indian/Kerguelen' => {
+			exemplarCity => q#kergilan#,
+		},
+		'Indian/Mahe' => {
+			exemplarCity => q#mahi#,
+		},
+		'Indian/Mauritius' => {
+			exemplarCity => q#muriṭanya#,
+		},
+		'Indian/Mayotte' => {
+			exemplarCity => q#mayuṭ#,
+		},
+		'Indian/Reunion' => {
+			exemplarCity => q#riyunyun#,
+		},
+		'Indian_Ocean' => {
+			long => {
+				'standard' => q#akud n lebḥer ahindi#,
+			},
+		},
+		'Israel' => {
+			long => {
+				'daylight' => q#akud n uzil n yisrayil#,
+				'generic' => q#akud n yisrayil#,
+				'standard' => q#akud anaway n yisrayil#,
+			},
+		},
+		'Mauritius' => {
+			long => {
+				'daylight' => q#akud n uzil n mawritus#,
+				'generic' => q#akud n mawritus#,
+				'standard' => q#akud anaway n mawritus#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -1551,6 +2616,79 @@ has 'time_zone_names' => (
 				'daylight' => q#akud n uzil n pasifik amiksikan#,
 				'generic' => q#akud n pasifik amiksikan#,
 				'standard' => q#akud anaway n pasifik amiksikan#,
+			},
+		},
+		'Newfoundland' => {
+			long => {
+				'daylight' => q#akud n uzil n nyuw fawemd land#,
+				'generic' => q#akud n nyuw fawemd land#,
+				'standard' => q#akud anaway n nyuw fawemd land#,
+			},
+		},
+		'Noronha' => {
+			long => {
+				'daylight' => q#akud n uzil n firnardu dinurunha#,
+				'generic' => q#akud n firnardu dinurunha#,
+				'standard' => q#akud anaway n firnardu dinurunha#,
+			},
+		},
+		'Pacific/Easter' => {
+			exemplarCity => q#ister#,
+		},
+		'Pacific/Galapagos' => {
+			exemplarCity => q#galapagus#,
+		},
+		'Paraguay' => {
+			long => {
+				'daylight' => q#akud n uzil n pparagway#,
+				'generic' => q#akud n pparagway#,
+				'standard' => q#akud anaway n pparagway#,
+			},
+		},
+		'Peru' => {
+			long => {
+				'daylight' => q#akud n uzil n ppiru#,
+				'generic' => q#akud n ppiru#,
+				'standard' => q#akud anaway n ppiru#,
+			},
+		},
+		'Pierre_Miquelon' => {
+			long => {
+				'daylight' => q#akud n uzil n sant-pyiɣ d mikilun#,
+				'generic' => q#akud n sant-pyiɣ d mikilun#,
+				'standard' => q#akud anaway n sant-pyiɣ d mikilun#,
+			},
+		},
+		'Reunion' => {
+			long => {
+				'standard' => q#akud n riyunyun#,
+			},
+		},
+		'Seychelles' => {
+			long => {
+				'standard' => q#akud n saycal#,
+			},
+		},
+		'South_Georgia' => {
+			long => {
+				'standard' => q#akud n jyurjya n wadday#,
+			},
+		},
+		'Suriname' => {
+			long => {
+				'standard' => q#akud n surinam#,
+			},
+		},
+		'Uruguay' => {
+			long => {
+				'daylight' => q#akud n uzil n urugway#,
+				'generic' => q#akud n urugway#,
+				'standard' => q#akud anaway n urugway#,
+			},
+		},
+		'Venezuela' => {
+			long => {
+				'standard' => q#akud n vinzwila#,
 			},
 		},
 		'Yukon' => {

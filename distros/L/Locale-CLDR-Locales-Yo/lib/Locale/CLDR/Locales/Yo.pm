@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Yo - Package for language Yoruba
 
 package Locale::CLDR::Locales::Yo;
 # This file auto generated from Data\common\main\yo.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -45,18 +45,20 @@ has 'display_name_language' => (
  				'an' => 'Èdè Aragoni',
  				'ann' => 'Èdè Obolo',
  				'anp' => 'Èdè Angika',
- 				'ar' => 'Èdè Árábìkì',
+ 				'ar' => 'Èdè Lárúbáwá',
+ 				'ar_001' => 'Èdè Lárúbáwá (Agbáyé)',
  				'arn' => 'Èdè Mapushe',
  				'arp' => 'Èdè Arapaho',
  				'ars' => 'Èdè Arabiki ti Najidi',
- 				'as' => 'Èdè Ti Assam',
+ 				'as' => 'Èdè Assam',
  				'asa' => 'Èdè Asu',
  				'ast' => 'Èdè Asturian',
  				'atj' => 'Èdè Atikameki',
  				'av' => 'Èdè Afariki',
  				'awa' => 'Èdè Awadi',
  				'ay' => 'Èdè Amara',
- 				'az' => 'Èdè Azerbaijani',
+ 				'az' => 'Èdè Asabaijani',
+ 				'az@alt=short' => 'Èdè Aseri',
  				'ba' => 'Èdè Bashiri',
  				'ban' => 'Èdè Balini',
  				'bas' => 'Èdè Basaa',
@@ -69,6 +71,7 @@ has 'display_name_language' => (
  				'bi' => 'Èdè Bisilama',
  				'bin' => 'Èdè Bini',
  				'bla' => 'Èdè Sikiska',
+ 				'blo' => 'Anii',
  				'bm' => 'Èdè Báḿbàrà',
  				'bn' => 'Èdè Bengali',
  				'bo' => 'Tibetán',
@@ -77,18 +80,18 @@ has 'display_name_language' => (
  				'bs' => 'Èdè Bosnia',
  				'bug' => 'Èdè Bugini',
  				'byn' => 'Èdè Bilini',
- 				'ca' => 'Èdè Catala',
+ 				'ca' => 'Èdè Katala',
  				'cay' => 'Èdè Kayuga',
  				'ccp' => 'Èdè Chakma',
  				'ce' => 'Èdè Chechen',
- 				'ceb' => 'Èdè Cebuano',
+ 				'ceb' => 'Èdè Sebuano',
  				'cgg' => 'Èdè Chiga',
  				'ch' => 'Èdè S̩amoro',
  				'chk' => 'Èdè Shuki',
  				'chm' => 'Èdè Mari',
  				'cho' => 'Èdè Shokita',
  				'chp' => 'Èdè Shipewa',
- 				'chr' => 'Èdè Shẹ́rókiì',
+ 				'chr' => 'Èdè Ṣẹ́rókiì',
  				'chy' => 'Èdè Sheyeni',
  				'ckb' => 'Ààrin Gbùngbùn Kurdish',
  				'clc' => 'Èdè Shikoti',
@@ -102,9 +105,9 @@ has 'display_name_language' => (
  				'cs' => 'Èdè Seeki',
  				'csw' => 'Èdè Swampi Kri',
  				'cu' => 'Èdè Síláfííkì Ilé Ìjọ́sìn',
- 				'cv' => 'Èdè Shufasi',
+ 				'cv' => 'Èdè Ṣufasi',
  				'cy' => 'Èdè Welshi',
- 				'da' => 'Èdè Ilẹ̀ Denmark',
+ 				'da' => 'Èdè Denmaki',
  				'dak' => 'Èdè Dakota',
  				'dar' => 'Èdè Dagiwa',
  				'dav' => 'Táítà',
@@ -182,13 +185,13 @@ has 'display_name_language' => (
  				'hu' => 'Èdè Hungaria',
  				'hup' => 'Èdè Hupa',
  				'hur' => 'Èdè Hakomelemi',
- 				'hy' => 'Èdè Ile Armenia',
+ 				'hy' => 'Èdè Armenia',
  				'hz' => 'Èdè Herero',
  				'ia' => 'Èdè pipo',
  				'iba' => 'Èdè Iba',
  				'ibb' => 'Èdè Ibibio',
  				'id' => 'Èdè Indonéṣíà',
- 				'ie' => 'Iru Èdè',
+ 				'ie' => 'Èdè àtọwọ́dá',
  				'ig' => 'Èdè Yíbò',
  				'ii' => 'Ṣíkuán Yì',
  				'ikt' => 'Èdè Iwoorun Inutitu ti Kanada',
@@ -241,6 +244,7 @@ has 'display_name_language' => (
  				'kv' => 'Èdè Komi',
  				'kw' => 'Èdè Kọ́nììṣì',
  				'kwk' => 'Èdè Kwawala',
+ 				'kxv' => 'Kufi',
  				'ky' => 'Kírígíìsì',
  				'la' => 'Èdè Latini',
  				'lad' => 'Èdè Ladino',
@@ -249,8 +253,10 @@ has 'display_name_language' => (
  				'lez' => 'Èdè Lesgina',
  				'lg' => 'Ganda',
  				'li' => 'Èdè Limbogishi',
+ 				'lij' => 'Liguriani',
  				'lil' => 'Èdè Liloeti',
  				'lkt' => 'Lákota',
+ 				'lmo' => 'Lombardi',
  				'ln' => 'Lìǹgálà',
  				'lo' => 'Láò',
  				'lou' => 'Èdè Kreoli ti Louisiana',
@@ -263,7 +269,7 @@ has 'display_name_language' => (
  				'lun' => 'Èdè Lunda',
  				'lus' => 'Èdè Miso',
  				'luy' => 'Luyíà',
- 				'lv' => 'Èdè Latvianu',
+ 				'lv' => 'Èdè látífíànì',
  				'mad' => 'Èdè Maduri',
  				'mag' => 'Èdè Magahi',
  				'mai' => 'Èdè Matihi',
@@ -280,7 +286,7 @@ has 'display_name_language' => (
  				'mi' => 'Màórì',
  				'mic' => 'Èdè Mikmaki',
  				'min' => 'Èdè Minakabau',
- 				'mk' => 'Èdè Macedonia',
+ 				'mk' => 'Èdè Masidonia',
  				'ml' => 'Málàyálámù',
  				'mn' => 'Mòngólíà',
  				'mni' => 'Èdè Manipuri',
@@ -309,6 +315,7 @@ has 'display_name_language' => (
  				'nia' => 'Èdè Nia',
  				'niu' => 'Èdè Niu',
  				'nl' => 'Èdè Dọ́ọ̀ṣì',
+ 				'nl_BE' => 'Èdè Flemiṣi',
  				'nmg' => 'Kíwáṣíò',
  				'nn' => 'Nọ́ọ́wè Nínọ̀sìkì',
  				'nnh' => 'Ngiembùnù',
@@ -321,14 +328,14 @@ has 'display_name_language' => (
  				'nv' => 'Èdè Nafajo',
  				'ny' => 'Ńyájà',
  				'nyn' => 'Ńyákọ́lè',
- 				'oc' => 'Èdè Occitani',
+ 				'oc' => 'Èdè Ọ̀kísítáànì',
  				'ojb' => 'Èdè Ariwa-iwoorun Ojibwa',
  				'ojc' => 'Èdè Ojibwa Aarin',
  				'ojs' => 'Èdè Oji Kri',
  				'ojw' => 'Èdè Iwoorun Ojibwa',
  				'oka' => 'Èdè Okanaga',
  				'om' => 'Òròmọ́',
- 				'or' => 'Òdíà',
+ 				'or' => 'Èdè Òdíà',
  				'os' => 'Ọṣẹ́tíìkì',
  				'pa' => 'Èdè Punjabi',
  				'pag' => 'Èdè Pangasina',
@@ -345,6 +352,7 @@ has 'display_name_language' => (
  				'pt_BR' => 'Èdè Pọtogí (Orilẹ̀-èdè Bràsíl)',
  				'pt_PT' => 'Èdè Pọtogí (orílẹ̀-èdè Yúróòpù)',
  				'qu' => 'Kúẹ́ńjùà',
+ 				'raj' => 'Rajastánì',
  				'rap' => 'Èdè Rapanu',
  				'rar' => 'Èdè Rarotonga',
  				'rhg' => 'Èdè Rohinga',
@@ -396,13 +404,14 @@ has 'display_name_language' => (
  				'sw' => 'Èdè Swahili',
  				'swb' => 'Èdè Komora',
  				'syr' => 'Èdè Siriaki',
+ 				'szl' => 'Silìṣíànì',
  				'ta' => 'Èdè Tamili',
  				'tce' => 'Èdè Gusu Tushoni',
  				'te' => 'Èdè Telugu',
  				'tem' => 'Èdè Timne',
  				'teo' => 'Tẹ́sò',
  				'tet' => 'Èdè Tetum',
- 				'tg' => 'Tàjíìkì',
+ 				'tg' => 'Èdè Tàjíìkì',
  				'tgx' => 'Èdè Tagisi',
  				'th' => 'Èdè Tai',
  				'tht' => 'Èdè Tajiti',
@@ -418,7 +427,7 @@ has 'display_name_language' => (
  				'tr' => 'Èdè Tọọkisi',
  				'trv' => 'Èdè Taroko',
  				'ts' => 'Èdè Songa',
- 				'tt' => 'Tatarí',
+ 				'tt' => 'Tátárì',
  				'ttm' => 'Èdè Ariwa Tusoni',
  				'tum' => 'Èdè Tumbuka',
  				'tvl' => 'Èdè Tifalu',
@@ -434,7 +443,9 @@ has 'display_name_language' => (
  				'ur' => 'Èdè Udu',
  				'uz' => 'Èdè Uzbek',
  				've' => 'Èdè Fenda',
+ 				'vec' => 'Fènéṣìànì',
  				'vi' => 'Èdè Jetinamu',
+ 				'vmw' => 'Màkúwà',
  				'vo' => 'Fọ́lápùùkù',
  				'vun' => 'Funjo',
  				'wa' => 'Èdè Waluni',
@@ -445,13 +456,15 @@ has 'display_name_language' => (
  				'wuu' => 'Èdè Wu ti Saina',
  				'xal' => 'Èdè Kalimi',
  				'xh' => 'Èdè Xhosa',
+ 				'xnr' => 'Kangiri',
  				'xog' => 'Ṣógà',
  				'yav' => 'Yangbẹn',
  				'ybb' => 'Èdè Yemba',
  				'yi' => 'Èdè Yiddishi',
  				'yo' => 'Èdè Yorùbá',
  				'yrl' => 'Èdè Ningatu',
- 				'yue' => 'Èdè Cantonese',
+ 				'yue' => 'Èdè Kantonese',
+ 				'za' => 'Ṣúwáànù',
  				'zgh' => 'Àfẹnùkò Támásáìtì ti Mòrókò',
  				'zh' => 'Edè Ṣáínà',
  				'zh@alt=menu' => 'Edè Ṣáínà, Mandárínì',
@@ -484,6 +497,8 @@ has 'display_name_script' => (
  			'Arab' => 'èdè Lárúbáwá',
  			'Aran' => 'Èdè Aran',
  			'Armn' => 'Àmẹ́níà',
+ 			'Bamu' => 'Bamumu',
+ 			'Batk' => 'Bataki',
  			'Beng' => 'Báńgílà',
  			'Bopo' => 'Bopomófò',
  			'Brai' => 'Bíráìlè',
@@ -494,7 +509,8 @@ has 'display_name_script' => (
  			'Deva' => 'Dẹfanagárì',
  			'Ethi' => 'Ẹtiópíìkì',
  			'Geor' => 'Jọ́jíànù',
- 			'Grek' => 'Jọ́jíà',
+ 			'Gong' => 'Gunjala Gondi',
+ 			'Grek' => 'Gíríkì',
  			'Gujr' => 'Gujaráti',
  			'Guru' => 'Gurumúkhì',
  			'Hanb' => 'Han pẹ̀lú Bopomófò',
@@ -502,25 +518,38 @@ has 'display_name_script' => (
  			'Hani' => 'Háànù',
  			'Hans' => 'tí wọ́n mú rọrùn.',
  			'Hans@alt=stand-alone' => 'Hans tí wọ́n mú rọrùn.',
- 			'Hant' => 'Hans àtọwọ́dọ́wọ́',
+ 			'Hant' => 'Àbáláyé',
+ 			'Hant@alt=stand-alone' => 'Hans àbáláyé',
  			'Hebr' => 'Hébérù',
  			'Hira' => 'Hiragánà',
+ 			'Hmnp' => 'Nyiakengi Puase Himongi',
  			'Hrkt' => 'ìlànà àfọwọ́kọ ará Jàpánù',
+ 			'Java' => 'Èdè Jafaniisi',
  			'Jpan' => 'èdè jàpáànù',
+ 			'Kali' => 'Èdè Kaya Li',
  			'Kana' => 'Katakánà',
  			'Khmr' => 'Kẹmẹ̀',
  			'Knda' => 'Kanada',
  			'Kore' => 'Kóríà',
+ 			'Lana' => 'Èdè Lana',
  			'Laoo' => 'Láò',
  			'Latn' => 'Èdè Látìn',
+ 			'Lepc' => 'Èdè Lepika',
+ 			'Limb' => 'Èdè Limbu',
+ 			'Lisu' => 'Furasa',
+ 			'Mand' => 'Èdè Mandaiani',
  			'Mlym' => 'Málàyálámù',
- 			'Mong' => 'Mòngólíà',
+ 			'Mong' => 'Èdè Mòngólíà',
  			'Mtei' => 'Èdè Meitei Mayeki',
  			'Mymr' => 'Myánmarà',
+ 			'Newa' => 'Èdè Newa',
  			'Nkoo' => 'Èdè Nkoo',
  			'Olck' => 'Èdè Ol Siki',
  			'Orya' => 'Òdíà',
+ 			'Osge' => 'Èdè Osage',
+ 			'Plrd' => 'Fonẹtiiki Polaadi',
  			'Rohg' => 'Èdè Hanifi',
+ 			'Saur' => 'Èdè Saurasitira',
  			'Sinh' => 'Sìnhálà',
  			'Sund' => 'Èdè Sundani',
  			'Syrc' => 'Èdè Siriaki',
@@ -531,6 +560,7 @@ has 'display_name_script' => (
  			'Tibt' => 'Tíbétán',
  			'Vaii' => 'Èdè Fai',
  			'Yiii' => 'Èdè Yi',
+ 			'Zinh' => 'Tí a jogún',
  			'Zmth' => 'Àmì Ìṣèsìrò',
  			'Zsye' => 'Émójì',
  			'Zsym' => 'Àwọn àmì',
@@ -597,9 +627,9 @@ has 'display_name_region' => (
  			'AR' => 'Agentínà',
  			'AS' => 'Sámóánì ti Orílẹ́ède Àméríkà',
  			'AT' => 'Asítíríà',
- 			'AU' => 'Ástràlìá',
+ 			'AU' => 'Austrálíà',
  			'AW' => 'Árúbà',
- 			'AX' => 'Àwọn Erékùsù ti Åland',
+ 			'AX' => 'Àwọn Erékùsù ti Aland',
  			'AZ' => 'Asẹ́bájánì',
  			'BA' => 'Bọ̀síníà àti Ẹtisẹgófínà',
  			'BB' => 'Bábádósì',
@@ -644,6 +674,7 @@ has 'display_name_region' => (
  			'CX' => 'Erékùsù Christmas',
  			'CY' => 'Kúrúsì',
  			'CZ' => 'Ṣẹ́ẹ́kì',
+ 			'CZ@alt=variant' => 'Ṣẹ́ẹ́kì Olómìnira',
  			'DE' => 'Jámánì',
  			'DG' => 'Diego Gaṣia',
  			'DJ' => 'Díbọ́ótì',
@@ -657,12 +688,12 @@ has 'display_name_region' => (
  			'EG' => 'Égípítì',
  			'EH' => 'Ìwọ̀òòrùn Sàhárà',
  			'ER' => 'Eritira',
- 			'ES' => 'Sipani',
+ 			'ES' => 'Sípéìnì',
  			'ET' => 'Etopia',
  			'EU' => 'Àpapọ̀ Yúróòpù',
  			'EZ' => 'Agbègbè Yúrò',
  			'FI' => 'Filandi',
- 			'FJ' => 'Fiji',
+ 			'FJ' => 'Fíjì',
  			'FK' => 'Etikun Fakalandi',
  			'FM' => 'Makoronesia',
  			'FO' => 'Àwọn Erékùsù ti Faroe',
@@ -680,9 +711,9 @@ has 'display_name_region' => (
  			'GN' => 'Gene',
  			'GP' => 'Gadelope',
  			'GQ' => 'Ekutoria Gini',
- 			'GR' => 'Geriisi',
+ 			'GR' => 'Gíríìsì',
  			'GS' => 'Gúúsù Georgia àti Gúúsù Àwọn Erékùsù Sandwich',
- 			'GT' => 'Guatemala',
+ 			'GT' => 'Guatemálà',
  			'GU' => 'Guamu',
  			'GW' => 'Gene-Busau',
  			'GY' => 'Guyana',
@@ -694,11 +725,11 @@ has 'display_name_region' => (
  			'HT' => 'Haati',
  			'HU' => 'Hungari',
  			'IC' => 'Ẹrékùsù Kánárì',
- 			'ID' => 'Indonesia',
+ 			'ID' => 'Indonéṣíà',
  			'IE' => 'Ailandi',
  			'IL' => 'Iserẹli',
- 			'IM' => 'Isle of Man',
- 			'IN' => 'India',
+ 			'IM' => 'Erékùṣù ilẹ̀ Man',
+ 			'IN' => 'Íńdíà',
  			'IO' => 'Etíkun Índíánì ti Ìlú Bírítísì',
  			'IO@alt=biot' => 'Àlà-ilẹ̀ Bírítéènì ní Etíkun Índíà',
  			'IO@alt=chagos' => 'Àkójọpọ̀ Àwọn Erékùṣù Ṣágòsì',
@@ -706,7 +737,7 @@ has 'display_name_region' => (
  			'IR' => 'Irani',
  			'IS' => 'Aṣilandi',
  			'IT' => 'Itáli',
- 			'JE' => 'Jersey',
+ 			'JE' => 'Jẹsì',
  			'JM' => 'Jamaika',
  			'JO' => 'Jọdani',
  			'JP' => 'Japani',
@@ -735,7 +766,7 @@ has 'display_name_region' => (
  			'MA' => 'Moroko',
  			'MC' => 'Monako',
  			'MD' => 'Modofia',
- 			'ME' => 'Montenegro',
+ 			'ME' => 'Montenégrò',
  			'MF' => 'Ìlú Màtìnì',
  			'MG' => 'Madasika',
  			'MH' => 'Etikun Máṣali',
@@ -759,7 +790,7 @@ has 'display_name_region' => (
  			'NA' => 'Namibia',
  			'NC' => 'Kaledonia Titun',
  			'NE' => 'Nàìjá',
- 			'NF' => 'Etikun Nọ́úfókì',
+ 			'NF' => 'Erékùsù Nọ́úfókì',
  			'NG' => 'Nàìjíríà',
  			'NI' => 'Nikaragua',
  			'NL' => 'Nedalandi',
@@ -770,8 +801,8 @@ has 'display_name_region' => (
  			'NZ' => 'Ṣilandi Titun',
  			'NZ@alt=variant' => 'Sílándì Titun ti Atìríà',
  			'OM' => 'Ọọma',
- 			'PA' => 'Panama',
- 			'PE' => 'Peru',
+ 			'PA' => 'Paramá',
+ 			'PE' => 'Pèérù',
  			'PF' => 'Firenṣi Polinesia',
  			'PG' => 'Paapu ti Giini',
  			'PH' => 'Filipini',
@@ -822,12 +853,13 @@ has 'display_name_region' => (
  			'TH' => 'Tailandi',
  			'TJ' => 'Takisitani',
  			'TK' => 'Tokelau',
- 			'TL' => 'ÌlàOòrùn Tímọ̀',
+ 			'TL' => 'Tímọ̀ Lẹsiti',
  			'TL@alt=variant' => 'Ìlà Òòrùn Tímọ̀',
- 			'TM' => 'Tọọkimenisita',
+ 			'TM' => 'Tọ́kìmẹ́nísítànì',
  			'TN' => 'Tuniṣia',
  			'TO' => 'Tonga',
  			'TR' => 'Tọọki',
+ 			'TR@alt=variant' => 'Tọ́kì',
  			'TT' => 'Tirinida ati Tobaga',
  			'TV' => 'Tufalu',
  			'TW' => 'Taiwani',
@@ -837,7 +869,7 @@ has 'display_name_region' => (
  			'UM' => 'Àwọn Erékùsù Kékèké Agbègbè US',
  			'UN' => 'Ìṣọ̀kan àgbáyé',
  			'US' => 'Amẹrikà',
- 			'UY' => 'Nruguayi',
+ 			'UY' => 'Úrúgúwè',
  			'UZ' => 'Nṣibẹkisitani',
  			'VA' => 'Ìlú Vatican',
  			'VC' => 'Fisẹnnti ati Genadina',
@@ -849,7 +881,7 @@ has 'display_name_region' => (
  			'WF' => 'Wali ati futuna',
  			'WS' => 'Samọ',
  			'XA' => 'ìsọ̀rọ̀sí irọ́',
- 			'XB' => 'ibi irọ́',
+ 			'XB' => 'Agbègbè irọ́',
  			'XK' => 'Kòsófò',
  			'YE' => 'Yemeni',
  			'YT' => 'Mayote',
@@ -869,9 +901,9 @@ has 'display_name_key' => (
 	default		=> sub {
 		{
 			'calendar' => 'Kàlẹ́ńdà',
- 			'cf' => 'Ìgúnrégé Kọ́rẹ́ńsì',
+ 			'cf' => 'Ònà Ìgbekalẹ̀ owó',
  			'collation' => 'Ètò Ẹlẹ́sẹẹsẹ',
- 			'currency' => 'Kọ́rẹ́ńsì',
+ 			'currency' => 'Owó',
  			'hc' => 'Òbíríkiti Wákàtí (12 vs 24)',
  			'lb' => 'Àra Ìda Ìlà',
  			'ms' => 'Èto Ìdiwọ̀n',
@@ -906,7 +938,7 @@ has 'display_name_type' => (
  			},
  			'cf' => {
  				'account' => q{Ìgúnrégé Ìṣirò Owó Kọ́rẹ́ńsì},
- 				'standard' => q{Ìgúnrégé Gbèdéke Kọ́rẹ́ńsì},
+ 				'standard' => q{Ònà ìgbekalẹ̀ owó tó jẹ́ àjùmọ̀lò},
  			},
  			'collation' => {
  				'ducet' => q{Ètò Ẹlẹ́sẹẹsẹ Àkùàyàn Unicode},
@@ -1095,6 +1127,214 @@ has 'units' => (
 						'1' => q(yóòbù {0}),
 					},
 					# Long Unit Identifier
+					'10p-1' => {
+						'1' => q(desi{0}),
+					},
+					# Core Unit Identifier
+					'1' => {
+						'1' => q(desi{0}),
+					},
+					# Long Unit Identifier
+					'10p-12' => {
+						'1' => q(piko{0}),
+					},
+					# Core Unit Identifier
+					'12' => {
+						'1' => q(piko{0}),
+					},
+					# Long Unit Identifier
+					'10p-15' => {
+						'1' => q(femuto{0}),
+					},
+					# Core Unit Identifier
+					'15' => {
+						'1' => q(femuto{0}),
+					},
+					# Long Unit Identifier
+					'10p-18' => {
+						'1' => q(ato{0}),
+					},
+					# Core Unit Identifier
+					'18' => {
+						'1' => q(ato{0}),
+					},
+					# Long Unit Identifier
+					'10p-2' => {
+						'1' => q(senti{0}),
+					},
+					# Core Unit Identifier
+					'2' => {
+						'1' => q(senti{0}),
+					},
+					# Long Unit Identifier
+					'10p-21' => {
+						'1' => q(seputo{0}),
+					},
+					# Core Unit Identifier
+					'21' => {
+						'1' => q(seputo{0}),
+					},
+					# Long Unit Identifier
+					'10p-24' => {
+						'1' => q(yokito{0}),
+					},
+					# Core Unit Identifier
+					'24' => {
+						'1' => q(yokito{0}),
+					},
+					# Long Unit Identifier
+					'10p-27' => {
+						'1' => q(ronto{0}),
+					},
+					# Core Unit Identifier
+					'27' => {
+						'1' => q(ronto{0}),
+					},
+					# Long Unit Identifier
+					'10p-3' => {
+						'1' => q(mili{0}),
+					},
+					# Core Unit Identifier
+					'3' => {
+						'1' => q(mili{0}),
+					},
+					# Long Unit Identifier
+					'10p-30' => {
+						'1' => q(kuekito{0}),
+					},
+					# Core Unit Identifier
+					'30' => {
+						'1' => q(kuekito{0}),
+					},
+					# Long Unit Identifier
+					'10p-6' => {
+						'1' => q(maikiro{0}),
+					},
+					# Core Unit Identifier
+					'6' => {
+						'1' => q(maikiro{0}),
+					},
+					# Long Unit Identifier
+					'10p-9' => {
+						'1' => q(nano{0}),
+					},
+					# Core Unit Identifier
+					'9' => {
+						'1' => q(nano{0}),
+					},
+					# Long Unit Identifier
+					'10p1' => {
+						'1' => q(deka{0}),
+					},
+					# Core Unit Identifier
+					'10p1' => {
+						'1' => q(deka{0}),
+					},
+					# Long Unit Identifier
+					'10p12' => {
+						'1' => q(tera{0}),
+					},
+					# Core Unit Identifier
+					'10p12' => {
+						'1' => q(tera{0}),
+					},
+					# Long Unit Identifier
+					'10p15' => {
+						'1' => q(peta{0}),
+					},
+					# Core Unit Identifier
+					'10p15' => {
+						'1' => q(peta{0}),
+					},
+					# Long Unit Identifier
+					'10p18' => {
+						'1' => q(ekisa{0}),
+					},
+					# Core Unit Identifier
+					'10p18' => {
+						'1' => q(ekisa{0}),
+					},
+					# Long Unit Identifier
+					'10p2' => {
+						'1' => q(hekito{0}),
+					},
+					# Core Unit Identifier
+					'10p2' => {
+						'1' => q(hekito{0}),
+					},
+					# Long Unit Identifier
+					'10p21' => {
+						'1' => q(seta{0}),
+					},
+					# Core Unit Identifier
+					'10p21' => {
+						'1' => q(seta{0}),
+					},
+					# Long Unit Identifier
+					'10p24' => {
+						'1' => q(yota{0}),
+					},
+					# Core Unit Identifier
+					'10p24' => {
+						'1' => q(yota{0}),
+					},
+					# Long Unit Identifier
+					'10p27' => {
+						'1' => q(ronna{0}),
+					},
+					# Core Unit Identifier
+					'10p27' => {
+						'1' => q(ronna{0}),
+					},
+					# Long Unit Identifier
+					'10p3' => {
+						'1' => q(kilo{0}),
+					},
+					# Core Unit Identifier
+					'10p3' => {
+						'1' => q(kilo{0}),
+					},
+					# Long Unit Identifier
+					'10p30' => {
+						'1' => q(kueta{0}),
+					},
+					# Core Unit Identifier
+					'10p30' => {
+						'1' => q(kueta{0}),
+					},
+					# Long Unit Identifier
+					'10p6' => {
+						'1' => q(mega{0}),
+					},
+					# Core Unit Identifier
+					'10p6' => {
+						'1' => q(mega{0}),
+					},
+					# Long Unit Identifier
+					'10p9' => {
+						'1' => q(giga{0}),
+					},
+					# Core Unit Identifier
+					'10p9' => {
+						'1' => q(giga{0}),
+					},
+					# Long Unit Identifier
+					'area-acre' => {
+						'name' => q(sare),
+					},
+					# Core Unit Identifier
+					'acre' => {
+						'name' => q(sare),
+					},
+					# Long Unit Identifier
+					'area-hectare' => {
+						'name' => q(hekita),
+					},
+					# Core Unit Identifier
+					'hectare' => {
+						'name' => q(hekita),
+					},
+					# Long Unit Identifier
 					'concentr-item' => {
 						'name' => q(àwọ́n ohun),
 						'other' => q({0} àwon ohun),
@@ -1111,6 +1351,22 @@ has 'units' => (
 					# Core Unit Identifier
 					'permille' => {
 						'other' => q({0} ìdákan nínú ẹgbẹ̀rún),
+					},
+					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(ẹ̀yà nínú ìdá blíọ̀nù),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(ẹ̀yà nínú ìdá blíọ̀nù),
+					},
+					# Long Unit Identifier
+					'consumption-mile-per-gallon-imperial' => {
+						'name' => q(maili ninu ami galọọnu kan),
+					},
+					# Core Unit Identifier
+					'mile-per-gallon-imperial' => {
+						'name' => q(maili ninu ami galọọnu kan),
 					},
 					# Long Unit Identifier
 					'digital-bit' => {
@@ -1257,6 +1513,18 @@ has 'units' => (
 						'name' => q(iseju aya kekere),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(àwọn alẹ́),
+						'other' => q(àwọn alẹ́ {0}),
+						'per' => q({0}/alẹ́),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(àwọn alẹ́),
+						'other' => q(àwọn alẹ́ {0}),
+						'per' => q({0}/alẹ́),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'name' => q(idamerin),
 						'other' => q({0} idamerin),
@@ -1289,12 +1557,12 @@ has 'units' => (
 					# Long Unit Identifier
 					'duration-year' => {
 						'name' => q(ọ̀dún),
-						'per' => q({0} ọd),
+						'other' => q({0} ọ̀dún),
 					},
 					# Core Unit Identifier
 					'year' => {
 						'name' => q(ọ̀dún),
-						'per' => q({0} ọd),
+						'other' => q({0} ọ̀dún),
 					},
 					# Long Unit Identifier
 					'force-kilowatt-hour-per-100-kilometer' => {
@@ -1337,6 +1605,14 @@ has 'units' => (
 						'other' => q({0} àwọn fọ́lọ́ọ̀ngì),
 					},
 					# Long Unit Identifier
+					'length-meter' => {
+						'name' => q(mita),
+					},
+					# Core Unit Identifier
+					'meter' => {
+						'name' => q(mita),
+					},
+					# Long Unit Identifier
 					'light-candela' => {
 						'name' => q(kandẹ́là),
 						'other' => q({0} kandẹ́là),
@@ -1373,6 +1649,14 @@ has 'units' => (
 						'other' => q({0} àwon okùta),
 					},
 					# Long Unit Identifier
+					'mass-tonne' => {
+						'name' => q(mẹtiriki tọọnu),
+					},
+					# Core Unit Identifier
+					'tonne' => {
+						'name' => q(mẹtiriki tọọnu),
+					},
+					# Long Unit Identifier
 					'power2' => {
 						'other' => q({0} sikuwe),
 					},
@@ -1387,6 +1671,14 @@ has 'units' => (
 					# Core Unit Identifier
 					'power3' => {
 						'other' => q(kubiki {0}),
+					},
+					# Long Unit Identifier
+					'pressure-millimeter-ofhg' => {
+						'name' => q(milimita ti makuiri),
+					},
+					# Core Unit Identifier
+					'millimeter-ofhg' => {
+						'name' => q(milimita ti makuiri),
 					},
 					# Long Unit Identifier
 					'speed-beaufort' => {
@@ -1399,6 +1691,16 @@ has 'units' => (
 						'other' => q(Beaufort {0}),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(ìmọ́lẹ̀),
+						'other' => q({0} ìmọ́lẹ̀),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(ìmọ́lẹ̀),
+						'other' => q({0} ìmọ́lẹ̀),
+					},
+					# Long Unit Identifier
 					'volume-bushel' => {
 						'name' => q(búsẹ́ẹ̀li),
 						'other' => q({0} búsẹ́ẹ̀li),
@@ -1409,14 +1711,22 @@ has 'units' => (
 						'other' => q({0} búsẹ́ẹ̀li),
 					},
 					# Long Unit Identifier
+					'volume-cup' => {
+						'name' => q(àwọn ife),
+					},
+					# Core Unit Identifier
+					'cup' => {
+						'name' => q(àwọn ife),
+					},
+					# Long Unit Identifier
 					'volume-dessert-spoon' => {
-						'name' => q(àmì ṣíbí oúnjẹ́ kékeré),
-						'other' => q({0} àmì ṣíbí oúnjẹ́ kékeré),
+						'name' => q(àwọn ṣíbí oúnjẹ́ kékeré),
+						'other' => q(àwọn {0} àmì ṣíbí oúnjẹ́ kékeré),
 					},
 					# Core Unit Identifier
 					'dessert-spoon' => {
-						'name' => q(àmì ṣíbí oúnjẹ́ kékeré),
-						'other' => q({0} àmì ṣíbí oúnjẹ́ kékeré),
+						'name' => q(àwọn ṣíbí oúnjẹ́ kékeré),
+						'other' => q(àwọn {0} àmì ṣíbí oúnjẹ́ kékeré),
 					},
 					# Long Unit Identifier
 					'volume-dessert-spoon-imperial' => {
@@ -1425,6 +1735,14 @@ has 'units' => (
 					# Core Unit Identifier
 					'dessert-spoon-imperial' => {
 						'name' => q(ṣíbí oúnjẹ kékeré),
+					},
+					# Long Unit Identifier
+					'volume-liter' => {
+						'name' => q(lita),
+					},
+					# Core Unit Identifier
+					'liter' => {
+						'name' => q(lita),
 					},
 					# Long Unit Identifier
 					'volume-quart-imperial' => {
@@ -1496,10 +1814,12 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'area-acre' => {
+						'name' => q(sare),
 						'other' => q({0}ac),
 					},
 					# Core Unit Identifier
 					'acre' => {
+						'name' => q(sare),
 						'other' => q({0}ac),
 					},
 					# Long Unit Identifier
@@ -1512,10 +1832,12 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'area-hectare' => {
+						'name' => q(hekita),
 						'other' => q({0}ha),
 					},
 					# Core Unit Identifier
 					'hectare' => {
+						'name' => q(hekita),
 						'other' => q({0}ha),
 					},
 					# Long Unit Identifier
@@ -1775,6 +2097,18 @@ has 'units' => (
 						'other' => q({0}/ìṣ),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(àwọn alẹ́),
+						'other' => q(àwọn alẹ́{0}),
+						'per' => q({0}/alẹ́),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(àwọn alẹ́),
+						'other' => q(àwọn alẹ́{0}),
+						'per' => q({0}/alẹ́),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'other' => q({0} i),
 					},
@@ -1791,6 +2125,16 @@ has 'units' => (
 					'week' => {
 						'name' => q(ọṣẹ́),
 						'per' => q({0}/ọ̀ṣẹ̀),
+					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(ọd),
+						'other' => q({0} ọd),
+					},
+					# Core Unit Identifier
+					'year' => {
+						'name' => q(ọd),
+						'other' => q({0} ọd),
 					},
 					# Long Unit Identifier
 					'electric-ampere' => {
@@ -2003,6 +2347,14 @@ has 'units' => (
 					# Core Unit Identifier
 					'furlong' => {
 						'other' => q({0}fur),
+					},
+					# Long Unit Identifier
+					'length-meter' => {
+						'name' => q(mita),
+					},
+					# Core Unit Identifier
+					'meter' => {
+						'name' => q(mita),
 					},
 					# Long Unit Identifier
 					'light-candela' => {
@@ -2265,6 +2617,16 @@ has 'units' => (
 						'other' => q({0}kn),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(ìmọ́lẹ̀),
+						'other' => q({0}ìmọ́lẹ̀),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(ìmọ́lẹ̀),
+						'other' => q({0}ìmọ́lẹ̀),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'other' => q({0}m/s),
 					},
@@ -2406,10 +2768,12 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'volume-cup' => {
+						'name' => q(ife),
 						'other' => q({0}c),
 					},
 					# Core Unit Identifier
 					'cup' => {
+						'name' => q(ife),
 						'other' => q({0}c),
 					},
 					# Long Unit Identifier
@@ -2518,10 +2882,12 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'volume-liter' => {
+						'name' => q(lita),
 						'per' => q({0}/L),
 					},
 					# Core Unit Identifier
 					'liter' => {
+						'name' => q(lita),
 						'per' => q({0}/L),
 					},
 					# Long Unit Identifier
@@ -2663,6 +3029,22 @@ has 'units' => (
 					# Core Unit Identifier
 					'1024p8' => {
 						'1' => q(àmì {0}),
+					},
+					# Long Unit Identifier
+					'area-acre' => {
+						'name' => q(sare),
+					},
+					# Core Unit Identifier
+					'acre' => {
+						'name' => q(sare),
+					},
+					# Long Unit Identifier
+					'area-hectare' => {
+						'name' => q(hekita),
+					},
+					# Core Unit Identifier
+					'hectare' => {
+						'name' => q(hekita),
 					},
 					# Long Unit Identifier
 					'concentr-item' => {
@@ -2849,6 +3231,18 @@ has 'units' => (
 						'per' => q({0}/oṣù),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(àwọn alẹ́),
+						'other' => q(àwọn alẹ́ {0}),
+						'per' => q({0}/alẹ́),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(àwọn alẹ́),
+						'other' => q(àwọn alẹ́ {0}),
+						'per' => q({0}/alẹ́),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'name' => q(idame),
 						'other' => q({0} idame),
@@ -2888,13 +3282,11 @@ has 'units' => (
 					'duration-year' => {
 						'name' => q(ọd),
 						'other' => q({0} ọd),
-						'per' => q({0}/ọd),
 					},
 					# Core Unit Identifier
 					'year' => {
 						'name' => q(ọd),
 						'other' => q({0} ọd),
-						'per' => q({0}/ọd),
 					},
 					# Long Unit Identifier
 					'force-kilowatt-hour-per-100-kilometer' => {
@@ -2945,13 +3337,21 @@ has 'units' => (
 						'other' => q({0} fọ́),
 					},
 					# Long Unit Identifier
+					'length-meter' => {
+						'name' => q(mita),
+					},
+					# Core Unit Identifier
+					'meter' => {
+						'name' => q(mita),
+					},
+					# Long Unit Identifier
 					'light-candela' => {
-						'name' => q(sídiì),
+						'name' => q(kandẹ́là),
 						'other' => q({0} sídiì),
 					},
 					# Core Unit Identifier
 					'candela' => {
-						'name' => q(sídiì),
+						'name' => q(kandẹ́là),
 						'other' => q({0} sídiì),
 					},
 					# Long Unit Identifier
@@ -2983,12 +3383,30 @@ has 'units' => (
 						'name' => q(àwon okùta),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(ìmọ́lẹ̀),
+						'other' => q({0} ìmọ́lẹ̀),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(ìmọ́lẹ̀),
+						'other' => q({0} ìmọ́lẹ̀),
+					},
+					# Long Unit Identifier
 					'volume-bushel' => {
 						'name' => q(Búsẹ́ẹ̀li),
 					},
 					# Core Unit Identifier
 					'bushel' => {
 						'name' => q(Búsẹ́ẹ̀li),
+					},
+					# Long Unit Identifier
+					'volume-cup' => {
+						'name' => q(ife),
+					},
+					# Core Unit Identifier
+					'cup' => {
+						'name' => q(ife),
 					},
 					# Long Unit Identifier
 					'volume-dessert-spoon' => {
@@ -3041,6 +3459,14 @@ has 'units' => (
 						'other' => q({0} jígà),
 					},
 					# Long Unit Identifier
+					'volume-liter' => {
+						'name' => q(lita),
+					},
+					# Core Unit Identifier
+					'liter' => {
+						'name' => q(lita),
+					},
+					# Long Unit Identifier
 					'volume-pinch' => {
 						'name' => q(píńṣì),
 						'other' => q({0} píńṣì),
@@ -3076,6 +3502,15 @@ has 'nostr' => (
 	isa			=> RegexpRef,
 	init_arg	=> undef,
 	default		=> sub { qr'^(?i:Bẹ́ẹ̀kọ́|K)$' }
+);
+
+has 'listPatterns' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+				2 => q({0} àti{1}),
+		} }
 );
 
 has 'number_formats' => (
@@ -4087,25 +4522,6 @@ has 'calendar_months' => (
 	default		=> sub { {
 			'gregorian' => {
 				'format' => {
-					abbreviated => {
-						nonleap => [
-							'Ṣẹ́r',
-							'Èrèl',
-							'Ẹrẹ̀n',
-							'Ìgb',
-							'Ẹ̀bi',
-							'Òkú',
-							'Agẹ',
-							'Ògú',
-							'Owe',
-							'Ọ̀wà',
-							'Bél',
-							'Ọ̀pẹ'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'Oṣù Ṣẹ́rẹ́',
@@ -4129,18 +4545,18 @@ has 'calendar_months' => (
 				'stand-alone' => {
 					abbreviated => {
 						nonleap => [
-							'Ṣẹ́',
-							'Èr',
-							'Ẹr',
-							'Ìg',
-							'Ẹ̀b',
-							'Òk',
-							'Ag',
-							'Òg',
-							'Ow',
-							'Ọ̀w',
-							'Bé',
-							'Ọ̀p'
+							'Oṣù Ṣẹ́rẹ́',
+							'Oṣù Èrèlè',
+							'Oṣù Ẹrẹ̀nà',
+							'Oṣù Ìgbé',
+							'Oṣù Ẹ̀bibi',
+							'Oṣù Òkúdu',
+							'Oṣù Agẹmọ',
+							'Oṣù Ògún',
+							'Oṣù Owewe',
+							'Oṣù Ọ̀wàrà',
+							'Oṣù Bélú',
+							'Oṣù Ọ̀pẹ̀'
 						],
 						leap => [
 							
@@ -4165,25 +4581,6 @@ has 'calendar_months' => (
 							
 						],
 					},
-					wide => {
-						nonleap => [
-							'Ṣẹ́rẹ́',
-							'Èrèlè',
-							'Ẹrẹ̀nà',
-							'Ìgbé',
-							'Ẹ̀bibi',
-							'Òkúdu',
-							'Agẹmọ',
-							'Ògún',
-							'Owewe',
-							'Ọ̀wàrà',
-							'Bélú',
-							'Ọ̀pẹ̀'
-						],
-						leap => [
-							
-						],
-					},
 				},
 			},
 	} },
@@ -4197,13 +4594,22 @@ has 'calendar_days' => (
 			'gregorian' => {
 				'format' => {
 					abbreviated => {
-						mon => 'Aj',
-						tue => 'Ìsẹ́g',
-						wed => 'Ọjọ́r',
-						thu => 'Ọjọ́b',
-						fri => 'Ẹt',
-						sat => 'Àbám',
-						sun => 'Àìk'
+						mon => 'Ajé',
+						tue => 'Ìsẹ́gun',
+						wed => 'Ọjọ́rú',
+						thu => 'Ọjọ́bọ',
+						fri => 'Ẹtì',
+						sat => 'Àbámẹ́ta',
+						sun => 'Àìkú'
+					},
+					short => {
+						mon => 'Ajé',
+						tue => 'Ìsẹ́gun',
+						wed => 'Ọjọ́rú',
+						thu => 'Ọjọ́bọ',
+						fri => 'Ẹtì',
+						sat => 'Àbámẹ́ta',
+						sun => 'Àìkú'
 					},
 					wide => {
 						mon => 'Ọjọ́ Ajé',
@@ -4216,6 +4622,15 @@ has 'calendar_days' => (
 					},
 				},
 				'stand-alone' => {
+					abbreviated => {
+						mon => 'Ajé',
+						tue => 'Ìsẹ́gun',
+						wed => 'Ọjọ́rú',
+						thu => 'Ọjọ́bọ',
+						fri => 'Ẹtì',
+						sat => 'Àbámẹ́ta',
+						sun => 'Àìkú'
+					},
 					narrow => {
 						mon => 'A',
 						tue => 'Ì',
@@ -4224,6 +4639,15 @@ has 'calendar_days' => (
 						fri => 'Ẹ',
 						sat => 'À',
 						sun => 'À'
+					},
+					short => {
+						mon => 'Ajé',
+						tue => 'Ìsẹ́gun',
+						wed => 'Ọjọ́rú',
+						thu => 'Ọjọ́bọ',
+						fri => 'Ẹtì',
+						sat => 'Àbámẹ́ta',
+						sun => 'Àìkú'
 					},
 					wide => {
 						mon => 'Ajé',
@@ -4255,13 +4679,6 @@ has 'calendar_quarters' => (
 						1 => 'Ìdámẹ́rin Kejì',
 						2 => 'Ìdámẹ́rin Kẹta',
 						3 => 'Ìdámẹ́rin Kẹrin'
-					},
-				},
-				'stand-alone' => {
-					narrow => {0 => 'kí',
-						1 => 'Ke',
-						2 => 'Kẹt',
-						3 => 'Kẹr'
 					},
 				},
 			},
@@ -4540,7 +4957,7 @@ has 'time_zone_names' => (
 		regionFormat => q({0} Ìlànà Àkókò),
 		'Afghanistan' => {
 			long => {
-				'standard' => q#Afghanistan Time#,
+				'standard' => q#Àkókò Afghanistan#,
 			},
 		},
 		'Africa_Central' => {
@@ -4567,7 +4984,7 @@ has 'time_zone_names' => (
 		},
 		'Alaska' => {
 			long => {
-				'daylight' => q#Àkókò Ìyálẹ̀ta Alásíkà#,
+				'daylight' => q#Àkókò Ojúmọ́ Alásíkà#,
 				'generic' => q#Àkókò Alásíkà#,
 				'standard' => q#Àkókò Àfẹnukò Alásíkà#,
 			},
@@ -4789,9 +5206,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#ìlú New York#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#ìlú Nipigoni#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#ìlú Nomi#,
 		},
@@ -4810,9 +5224,6 @@ has 'time_zone_names' => (
 		'America/Panama' => {
 			exemplarCity => q#ìlú Panama#,
 		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#ìlú Panituni#,
-		},
 		'America/Phoenix' => {
 			exemplarCity => q#ìlú Fínísì#,
 		},
@@ -4824,9 +5235,6 @@ has 'time_zone_names' => (
 		},
 		'America/Puerto_Rico' => {
 			exemplarCity => q#ìlú Puerto Riko#,
-		},
-		'America/Rainy_River' => {
-			exemplarCity => q#ìlú Raini Rifà#,
 		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#ìlú Rankin Inlet#,
@@ -4873,9 +5281,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#ìlú Tulè#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#ìlú Omi Thunder#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#ìlú Tíjúana#,
 		},
@@ -4896,9 +5301,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#ìlú Yakuta#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#ìlú Yelonáfù#,
 		},
 		'America_Central' => {
 			long => {
@@ -4930,16 +5332,16 @@ has 'time_zone_names' => (
 		},
 		'Apia' => {
 			long => {
-				'daylight' => q#Apia Daylight Time#,
-				'generic' => q#Apia Time#,
-				'standard' => q#Apia Standard Time#,
+				'daylight' => q#Àkókò Ojúmọmọ Apia#,
+				'generic' => q#Àkókò Apia#,
+				'standard' => q#Àkókò Àfẹnukò Apia#,
 			},
 		},
 		'Arabian' => {
 			long => {
-				'daylight' => q#Arabian Daylight Time#,
-				'generic' => q#Arabian Time#,
-				'standard' => q#Arabian Standard Time#,
+				'daylight' => q#Àkókò Ojúmọmọ Arabia#,
+				'generic' => q#Àkókò Arabia#,
+				'standard' => q#Àkókò Àfẹnukò Arabia#,
 			},
 		},
 		'Argentina' => {
@@ -4958,10 +5360,13 @@ has 'time_zone_names' => (
 		},
 		'Armenia' => {
 			long => {
-				'daylight' => q#Armenia Summer Time#,
-				'generic' => q#Armenia Time#,
-				'standard' => q#Armenia Standard Time#,
+				'daylight' => q#Àkókò Sọmà Arabia#,
+				'generic' => q#Àkókò Armenia#,
+				'standard' => q#Àkókò Àfẹnukò Armenia#,
 			},
+		},
+		'Asia/Saigon' => {
+			exemplarCity => q#Ilu Ho Chi Minh#,
 		},
 		'Atlantic' => {
 			long => {
@@ -4975,37 +5380,37 @@ has 'time_zone_names' => (
 		},
 		'Australia_Central' => {
 			long => {
-				'daylight' => q#Australian Central Daylight Time#,
-				'generic' => q#Central Australia Time#,
-				'standard' => q#Australian Central Standard Time#,
+				'daylight' => q#Àkókò Ojúmọmọ Ààrin Gùngùn Australia#,
+				'generic' => q#Àkókò Ààrin Gùngùn Australia#,
+				'standard' => q#Àkókò Àfẹnukò Ààrin Gùngùn Australia#,
 			},
 		},
 		'Australia_CentralWestern' => {
 			long => {
-				'daylight' => q#Australian Central Western Daylight Time#,
-				'generic' => q#Australian Central Western Time#,
-				'standard' => q#Australian Central Western Standard Time#,
+				'daylight' => q#Àkókò Ojúmọmọ Ààrin Gùngùn Ìwọ̀-Oòrùn Australia#,
+				'generic' => q#Àkókò Ààrin Gùngùn Ìwọ̀-Oòrùn Australia#,
+				'standard' => q#Àkókò Àfẹnukò Ààrin Gùngùn Ìwọ̀-Oòrùn Australia#,
 			},
 		},
 		'Australia_Eastern' => {
 			long => {
-				'daylight' => q#Australian Eastern Daylight Time#,
-				'generic' => q#Eastern Australia Time#,
-				'standard' => q#Australian Eastern Standard Time#,
+				'daylight' => q#Àkókò Ojúmọmọ Ìlà-Oòrùn Australia#,
+				'generic' => q#Àkókò Ìlà-Oòrùn Australia#,
+				'standard' => q#Àkókò Àfẹnukò Ìlà-Oòrùn Australia#,
 			},
 		},
 		'Australia_Western' => {
 			long => {
-				'daylight' => q#Australian Western Daylight Time#,
-				'generic' => q#Western Australia Time#,
-				'standard' => q#Australian Western Standard Time#,
+				'daylight' => q#Àkókò Ojúmọmọ Ìwọ̀-Oòrùn Australia#,
+				'generic' => q#Àkókò Ìwọ̀-Oòrùn Australia#,
+				'standard' => q#Àkókò Àfẹnukò Ìwọ̀-Oòrùn Australia#,
 			},
 		},
 		'Azerbaijan' => {
 			long => {
-				'daylight' => q#Azerbaijan Summer Time#,
-				'generic' => q#Azerbaijan Time#,
-				'standard' => q#Azerbaijan Standard Time#,
+				'daylight' => q#Àkókò Sọmà Azerbaijan#,
+				'generic' => q#Àkókò Azerbaijan#,
+				'standard' => q#Àkókò Àfẹnukò Azerbaijan#,
 			},
 		},
 		'Azores' => {
@@ -5017,14 +5422,14 @@ has 'time_zone_names' => (
 		},
 		'Bangladesh' => {
 			long => {
-				'daylight' => q#Bangladesh Summer Time#,
-				'generic' => q#Bangladesh Time#,
-				'standard' => q#Bangladesh Standard Time#,
+				'daylight' => q#Àkókò Sọmà Bangladesh#,
+				'generic' => q#Àkókò Bangladesh#,
+				'standard' => q#Àkókò Àfẹnukò Bangladesh#,
 			},
 		},
 		'Bhutan' => {
 			long => {
-				'standard' => q#Bhutan Time#,
+				'standard' => q#Àkókò Bhutan#,
 			},
 		},
 		'Bolivia' => {
@@ -5046,21 +5451,21 @@ has 'time_zone_names' => (
 		},
 		'Cape_Verde' => {
 			long => {
-				'daylight' => q#Àkókò Sọ́mà Képú Fáàdì#,
+				'daylight' => q#Àkókò Ẹ̀rún Képú Fáàdì#,
 				'generic' => q#Àkókò Képú Fáàdì#,
 				'standard' => q#Àkókò Àfẹnukò Képú Fáàdì#,
 			},
 		},
 		'Chamorro' => {
 			long => {
-				'standard' => q#Chamorro Standard Time#,
+				'standard' => q#Àkókò Àfẹnukò Chamorro#,
 			},
 		},
 		'Chatham' => {
 			long => {
-				'daylight' => q#Chatham Daylight Time#,
-				'generic' => q#Chatham Time#,
-				'standard' => q#Chatham Standard Time#,
+				'daylight' => q#Àkókò Ojúmọmọ Chatam#,
+				'generic' => q#Àkókò Chatam#,
+				'standard' => q#Àkókò Àfẹnukò Chatam#,
 			},
 		},
 		'Chile' => {
@@ -5077,21 +5482,14 @@ has 'time_zone_names' => (
 				'standard' => q#Àkókò Ìfẹnukòsí Ṣáínà#,
 			},
 		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Choibalsan Summer Time#,
-				'generic' => q#Choibalsan Time#,
-				'standard' => q#Choibalsan Standard Time#,
-			},
-		},
 		'Christmas' => {
 			long => {
-				'standard' => q#Christmas Island Time#,
+				'standard' => q#Àkókò Erékùsù Christmas#,
 			},
 		},
 		'Cocos' => {
 			long => {
-				'standard' => q#Cocos Islands Time#,
+				'standard' => q#Àkókò Àwọn Erékùsù Cocos#,
 			},
 		},
 		'Colombia' => {
@@ -5103,9 +5501,9 @@ has 'time_zone_names' => (
 		},
 		'Cook' => {
 			long => {
-				'daylight' => q#Cook Islands Half Summer Time#,
-				'generic' => q#Cook Islands Time#,
-				'standard' => q#Cook Islands Standard Time#,
+				'daylight' => q#Àkókò Ilaji Sọma Àwọn Erekusu Kuuku#,
+				'generic' => q#Àkókò Àwọn Erekusu Kuuku#,
+				'standard' => q#Àkókò Àfẹnukò Àwọn Erekusu Kuuku#,
 			},
 		},
 		'Cuba' => {
@@ -5117,12 +5515,12 @@ has 'time_zone_names' => (
 		},
 		'Davis' => {
 			long => {
-				'standard' => q#Davis Time#,
+				'standard' => q#Àkókò Davis#,
 			},
 		},
 		'DumontDUrville' => {
 			long => {
-				'standard' => q#Dumont-d’Urville Time#,
+				'standard' => q#Àkókò Dumont-d’Urville#,
 			},
 		},
 		'East_Timor' => {
@@ -5152,12 +5550,12 @@ has 'time_zone_names' => (
 		},
 		'Europe/Dublin' => {
 			long => {
-				'daylight' => q#Irish Standard Time#,
+				'daylight' => q#Àkókò Àfẹnukò Airiisi#,
 			},
 		},
 		'Europe/London' => {
 			long => {
-				'daylight' => q#British Summer Time#,
+				'daylight' => q#Àkókò Sọmà Gẹẹsi#,
 			},
 		},
 		'Europe_Central' => {
@@ -5195,9 +5593,9 @@ has 'time_zone_names' => (
 		},
 		'Fiji' => {
 			long => {
-				'daylight' => q#Fiji Summer Time#,
-				'generic' => q#Fiji Time#,
-				'standard' => q#Fiji Standard Time#,
+				'daylight' => q#Àkókò Sọma Fiji#,
+				'generic' => q#Àkókò Fiji#,
+				'standard' => q#Àkókò Àfẹnukò Fiji#,
 			},
 		},
 		'French_Guiana' => {
@@ -5222,19 +5620,19 @@ has 'time_zone_names' => (
 		},
 		'Gambier' => {
 			long => {
-				'standard' => q#Gambier Time#,
+				'standard' => q#Àkókò Gambia#,
 			},
 		},
 		'Georgia' => {
 			long => {
-				'daylight' => q#Georgia Summer Time#,
-				'generic' => q#Georgia Time#,
-				'standard' => q#Georgia Standard Time#,
+				'daylight' => q#Àkókò Sọmà Georgia#,
+				'generic' => q#Àkókò Georgia#,
+				'standard' => q#Àkókò Àfẹnukò Georgia#,
 			},
 		},
 		'Gilbert_Islands' => {
 			long => {
-				'standard' => q#Gilbert Islands Time#,
+				'standard' => q#Àkókò Àwọn Erekusu Gilibati#,
 			},
 		},
 		'Greenland_Eastern' => {
@@ -5253,7 +5651,7 @@ has 'time_zone_names' => (
 		},
 		'Gulf' => {
 			long => {
-				'standard' => q#Gulf Standard Time#,
+				'standard' => q#Àkókò Àfẹnukò Gulf#,
 			},
 		},
 		'Guyana' => {
@@ -5270,21 +5668,21 @@ has 'time_zone_names' => (
 		},
 		'Hong_Kong' => {
 			long => {
-				'daylight' => q#Hong Kong Summer Time#,
-				'generic' => q#Hong Kong Time#,
-				'standard' => q#Hong Kong Standard Time#,
+				'daylight' => q#Àkókò Sọmà Hong Kong#,
+				'generic' => q#Àkókò Hong Kong#,
+				'standard' => q#Àkókò Ìfẹnukòsí Hong Kong#,
 			},
 		},
 		'Hovd' => {
 			long => {
-				'daylight' => q#Hovd Summer Time#,
-				'generic' => q#Hovd Time#,
-				'standard' => q#Hovd Standard Time#,
+				'daylight' => q#Àkókò Sọmà Hofidi#,
+				'generic' => q#Àkókò Hofidi#,
+				'standard' => q#Àkókò Ìfẹnukòsí Hofidi#,
 			},
 		},
 		'India' => {
 			long => {
-				'standard' => q#India Standard Time#,
+				'standard' => q#Àkókò Àfẹnukò India#,
 			},
 		},
 		'Indian_Ocean' => {
@@ -5304,7 +5702,7 @@ has 'time_zone_names' => (
 		},
 		'Indonesia_Eastern' => {
 			long => {
-				'standard' => q#Eastern Indonesia Time#,
+				'standard' => q#Àkókò Ìlà oorùn Indonesia#,
 			},
 		},
 		'Indonesia_Western' => {
@@ -5314,9 +5712,9 @@ has 'time_zone_names' => (
 		},
 		'Iran' => {
 			long => {
-				'daylight' => q#Iran Daylight Time#,
-				'generic' => q#Iran Time#,
-				'standard' => q#Iran Standard Time#,
+				'daylight' => q#Àkókò Ojúmọmọ Irani#,
+				'generic' => q#Àkókò Irani#,
+				'standard' => q#Àkókò Àfẹnukò Irani#,
 			},
 		},
 		'Irkutsk' => {
@@ -5328,94 +5726,94 @@ has 'time_zone_names' => (
 		},
 		'Israel' => {
 			long => {
-				'daylight' => q#Israel Daylight Time#,
-				'generic' => q#Israel Time#,
-				'standard' => q#Israel Standard Time#,
+				'daylight' => q#Àkókò Ojúmọmọ Israel#,
+				'generic' => q#Àkókò Israel#,
+				'standard' => q#Àkókò Àfẹnukò Israel#,
 			},
 		},
 		'Japan' => {
 			long => {
-				'daylight' => q#Japan Daylight Time#,
-				'generic' => q#Japan Time#,
-				'standard' => q#Japan Standard Time#,
+				'daylight' => q#Àkókò Sọmà Japan#,
+				'generic' => q#Àkókò Japan#,
+				'standard' => q#Àkókò Ìfẹnukòsí Japan#,
+			},
+		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Aago Kasasitáànì#,
 			},
 		},
 		'Kazakhstan_Eastern' => {
 			long => {
-				'standard' => q#East Kazakhstan Time#,
+				'standard' => q#Àkókò Ìlà-Oòrùn Kasasitáànì#,
 			},
 		},
 		'Kazakhstan_Western' => {
 			long => {
-				'standard' => q#West Kazakhstan Time#,
+				'standard' => q#Àkókò Ìwọ̀-Oòrùn Kasasitáànì#,
 			},
 		},
 		'Korea' => {
 			long => {
-				'daylight' => q#Korean Daylight Time#,
-				'generic' => q#Korean Time#,
-				'standard' => q#Korean Standard Time#,
+				'daylight' => q#Àkókò Ojúmọmọ Koria#,
+				'generic' => q#Àkókò Koria#,
+				'standard' => q#Àkókò Ìfẹnukòsí Koria#,
 			},
 		},
 		'Kosrae' => {
 			long => {
-				'standard' => q#Kosrae Time#,
+				'standard' => q#Àkókò Kosirai#,
 			},
 		},
 		'Krasnoyarsk' => {
 			long => {
-				'daylight' => q#Krasnoyarsk Summer Time#,
-				'generic' => q#Krasnoyarsk Time#,
-				'standard' => q#Krasnoyarsk Standard Time#,
+				'daylight' => q#Àkókò Sọmà Krasinoyasiki#,
+				'generic' => q#Àkókò Krasinoyasiki#,
+				'standard' => q#Àkókò Àfẹnukò Krasinoyasiki#,
 			},
 		},
 		'Kyrgystan' => {
 			long => {
-				'standard' => q#Kyrgyzstan Time#,
+				'standard' => q#Àkókò Kirigisitaani#,
 			},
 		},
 		'Line_Islands' => {
 			long => {
-				'standard' => q#Line Islands Time#,
+				'standard' => q#Àkókò Àwọn Erekusu Laini#,
 			},
 		},
 		'Lord_Howe' => {
 			long => {
-				'daylight' => q#Lord Howe Daylight Time#,
-				'generic' => q#Lord Howe Time#,
-				'standard' => q#Lord Howe Standard Time#,
-			},
-		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Macquarie Island Time#,
+				'daylight' => q#Àkókò Ojúmọmọ Lord Howe#,
+				'generic' => q#Àkókò Lord Howe#,
+				'standard' => q#Àkókò Àfẹnukò Lord Howe#,
 			},
 		},
 		'Magadan' => {
 			long => {
-				'daylight' => q#Magadan Summer Time#,
-				'generic' => q#Magadan Time#,
-				'standard' => q#Magadan Standard Time#,
+				'daylight' => q#Àkókò Sọmà Magadani#,
+				'generic' => q#Àkókò Magadani#,
+				'standard' => q#Àkókò Àfẹnukò Magadani#,
 			},
 		},
 		'Malaysia' => {
 			long => {
-				'standard' => q#Malaysia Time#,
+				'standard' => q#Àkókò Malaysia#,
 			},
 		},
 		'Maldives' => {
 			long => {
-				'standard' => q#Maldives Time#,
+				'standard' => q#Àkókò Maldives#,
 			},
 		},
 		'Marquesas' => {
 			long => {
-				'standard' => q#Marquesas Time#,
+				'standard' => q#Àkókò Makuesasi#,
 			},
 		},
 		'Marshall_Islands' => {
 			long => {
-				'standard' => q#Marshall Islands Time#,
+				'standard' => q#Àkókò Àwọn Erekusu Masaali#,
 			},
 		},
 		'Mauritius' => {
@@ -5427,14 +5825,7 @@ has 'time_zone_names' => (
 		},
 		'Mawson' => {
 			long => {
-				'standard' => q#Mawson Time#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Àkókò Ojúmọmọ Apá Ìwọ̀ Oorùn Mẹ́ṣíkò#,
-				'generic' => q#Àkókò Apá Ìwọ̀ Oorùn Mẹ́ṣíkò#,
-				'standard' => q#Àkókò Àfẹnukò Apá Ìwọ̀ Oorùn Mẹ́ṣíkò#,
+				'standard' => q#Àkókò Mawson#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -5446,45 +5837,45 @@ has 'time_zone_names' => (
 		},
 		'Mongolia' => {
 			long => {
-				'daylight' => q#Ulaanbaatar Summer Time#,
-				'generic' => q#Ulaanbaatar Time#,
-				'standard' => q#Ulaanbaatar Standard Time#,
+				'daylight' => q#Àkókò Sọmà Ulaanbaatar#,
+				'generic' => q#Àkókò Ulaanbaatar#,
+				'standard' => q#Àkókò Ìfẹnukòsí Ulaanbaatar#,
 			},
 		},
 		'Moscow' => {
 			long => {
-				'daylight' => q#Moscow Summer Time#,
-				'generic' => q#Moscow Time#,
-				'standard' => q#Moscow Standard Time#,
+				'daylight' => q#Àkókò Sọmà Mosiko#,
+				'generic' => q#Àkókò Mosiko#,
+				'standard' => q#Àkókò Àfẹnukò Mosiko#,
 			},
 		},
 		'Myanmar' => {
 			long => {
-				'standard' => q#Myanmar Time#,
+				'standard' => q#Àkókò Ìlà Myanmar#,
 			},
 		},
 		'Nauru' => {
 			long => {
-				'standard' => q#Nauru Time#,
+				'standard' => q#Àkókò Nauru#,
 			},
 		},
 		'Nepal' => {
 			long => {
-				'standard' => q#Nepal Time#,
+				'standard' => q#Àkókò Nepali#,
 			},
 		},
 		'New_Caledonia' => {
 			long => {
-				'daylight' => q#New Caledonia Summer Time#,
-				'generic' => q#New Caledonia Time#,
-				'standard' => q#New Caledonia Standard Time#,
+				'daylight' => q#Àkókò Sọma Kalidonia Tuntun#,
+				'generic' => q#Àkókò Kalidonia Tuntun#,
+				'standard' => q#Àkókò Àfẹnukò Kalidonia Tuntun#,
 			},
 		},
 		'New_Zealand' => {
 			long => {
-				'daylight' => q#New Zealand Daylight Time#,
-				'generic' => q#New Zealand Time#,
-				'standard' => q#New Zealand Standard Time#,
+				'daylight' => q#Àkókò Ojúmọmọ New Zealand#,
+				'generic' => q#Àkókò New Zealand#,
+				'standard' => q#Àkókò Àfẹnukò New zealand#,
 			},
 		},
 		'Newfoundland' => {
@@ -5496,14 +5887,14 @@ has 'time_zone_names' => (
 		},
 		'Niue' => {
 			long => {
-				'standard' => q#Niue Time#,
+				'standard' => q#Àkókò Niue#,
 			},
 		},
 		'Norfolk' => {
 			long => {
-				'daylight' => q#Norfolk Island Daylight Time#,
-				'generic' => q#Norfolk Island Time#,
-				'standard' => q#Norfolk Island Standard Time#,
+				'daylight' => q#Àkókò Ojúmọmọ Erékùsù Norfolk#,
+				'generic' => q#Àkókò Erékùsù Norfolk#,
+				'standard' => q#Àkókò Àfẹnukò Erékùsù Norfolk#,
 			},
 		},
 		'Noronha' => {
@@ -5515,33 +5906,33 @@ has 'time_zone_names' => (
 		},
 		'Novosibirsk' => {
 			long => {
-				'daylight' => q#Novosibirsk Summer Time#,
-				'generic' => q#Novosibirsk Time#,
-				'standard' => q#Novosibirsk Standard Time#,
+				'daylight' => q#Àkókò Sọmà Noforibisiki#,
+				'generic' => q#Àkókò Nofosibiriski#,
+				'standard' => q#Àkókò Àfẹnukò Nofosibiriki#,
 			},
 		},
 		'Omsk' => {
 			long => {
-				'daylight' => q#Omsk Summer Time#,
-				'generic' => q#Omsk Time#,
-				'standard' => q#Omsk Standard Time#,
+				'daylight' => q#Àkókò Sọmà Omisiki#,
+				'generic' => q#Àkókò Omisiki#,
+				'standard' => q#Àkókò Àfẹnukò Omisiki#,
 			},
 		},
 		'Pakistan' => {
 			long => {
-				'daylight' => q#Pakistan Summer Time#,
-				'generic' => q#Pakistan Time#,
-				'standard' => q#Pakistan Standard Time#,
+				'daylight' => q#Àkókò Sọmà Pakistani#,
+				'generic' => q#Àkókò Pakistani#,
+				'standard' => q#Àkókò Àfẹnukò Pakistani#,
 			},
 		},
 		'Palau' => {
 			long => {
-				'standard' => q#Palau Time#,
+				'standard' => q#Àkókò Palau#,
 			},
 		},
 		'Papua_New_Guinea' => {
 			long => {
-				'standard' => q#Papua New Guinea Time#,
+				'standard' => q#Àkókò Papua New Guinea#,
 			},
 		},
 		'Paraguay' => {
@@ -5560,14 +5951,14 @@ has 'time_zone_names' => (
 		},
 		'Philippines' => {
 			long => {
-				'daylight' => q#Philippine Summer Time#,
-				'generic' => q#Philippine Time#,
-				'standard' => q#Philippine Standard Time#,
+				'daylight' => q#Àkókò Sọmà Filipininni#,
+				'generic' => q#Àkókò Filipininni#,
+				'standard' => q#Àkókò Àfẹnukò Filipininni#,
 			},
 		},
 		'Phoenix_Islands' => {
 			long => {
-				'standard' => q#Phoenix Islands Time#,
+				'standard' => q#Àkókò Àwọn Erékùsù Phoenix#,
 			},
 		},
 		'Pierre_Miquelon' => {
@@ -5579,17 +5970,17 @@ has 'time_zone_names' => (
 		},
 		'Pitcairn' => {
 			long => {
-				'standard' => q#Pitcairn Time#,
+				'standard' => q#Àkókò Pitcairn#,
 			},
 		},
 		'Ponape' => {
 			long => {
-				'standard' => q#Ponape Time#,
+				'standard' => q#Àkókò Ponape#,
 			},
 		},
 		'Pyongyang' => {
 			long => {
-				'standard' => q#Pyongyang Time#,
+				'standard' => q#Àkókò Pyongyangi#,
 			},
 		},
 		'Reunion' => {
@@ -5599,21 +5990,21 @@ has 'time_zone_names' => (
 		},
 		'Rothera' => {
 			long => {
-				'standard' => q#Rothera Time#,
+				'standard' => q#Àkókò Rothera#,
 			},
 		},
 		'Sakhalin' => {
 			long => {
-				'daylight' => q#Sakhalin Summer Time#,
-				'generic' => q#Sakhalin Time#,
-				'standard' => q#Sakhalin Standard Time#,
+				'daylight' => q#Àkókò Sọmà Sakhalin#,
+				'generic' => q#Àkókò Sakhalin#,
+				'standard' => q#Àkókò Àfẹnukò Sakhalin#,
 			},
 		},
 		'Samoa' => {
 			long => {
-				'daylight' => q#Samoa Daylight Time#,
-				'generic' => q#Samoa Time#,
-				'standard' => q#Samoa Standard Time#,
+				'daylight' => q#Àkókò Ojúmọmọ Samoa#,
+				'generic' => q#Àkókò Samoa#,
+				'standard' => q#Àkókò Àfẹnukò Samoa#,
 			},
 		},
 		'Seychelles' => {
@@ -5623,12 +6014,12 @@ has 'time_zone_names' => (
 		},
 		'Singapore' => {
 			long => {
-				'standard' => q#Singapore Standard Time#,
+				'standard' => q#Àkókò Àfẹnukò Singapore#,
 			},
 		},
 		'Solomon' => {
 			long => {
-				'standard' => q#Solomon Islands Time#,
+				'standard' => q#Àkókò Àwọn Erekusu Solomon#,
 			},
 		},
 		'South_Georgia' => {
@@ -5643,53 +6034,53 @@ has 'time_zone_names' => (
 		},
 		'Syowa' => {
 			long => {
-				'standard' => q#Syowa Time#,
+				'standard' => q#Àkókò Syowa#,
 			},
 		},
 		'Tahiti' => {
 			long => {
-				'standard' => q#Tahiti Time#,
+				'standard' => q#Àkókò Tahiti#,
 			},
 		},
 		'Taipei' => {
 			long => {
-				'daylight' => q#Taipei Daylight Time#,
-				'generic' => q#Taipei Time#,
-				'standard' => q#Taipei Standard Time#,
+				'daylight' => q#Àkókò Ojúmọmọ Taipei#,
+				'generic' => q#Àkókò Taipei#,
+				'standard' => q#Àkókò Ìfẹnukòsí Taipei#,
 			},
 		},
 		'Tajikistan' => {
 			long => {
-				'standard' => q#Tajikistan Time#,
+				'standard' => q#Àkókò Tajikisitaani#,
 			},
 		},
 		'Tokelau' => {
 			long => {
-				'standard' => q#Tokelau Time#,
+				'standard' => q#Àkókò Tokelau#,
 			},
 		},
 		'Tonga' => {
 			long => {
-				'daylight' => q#Tonga Summer Time#,
-				'generic' => q#Tonga Time#,
-				'standard' => q#Tonga Standard Time#,
+				'daylight' => q#Àkókò Sọmà Tonga#,
+				'generic' => q#Àkókò Tonga#,
+				'standard' => q#Àkókò Àfẹnukò Tonga#,
 			},
 		},
 		'Truk' => {
 			long => {
-				'standard' => q#Chuuk Time#,
+				'standard' => q#Àkókò Chuuk#,
 			},
 		},
 		'Turkmenistan' => {
 			long => {
-				'daylight' => q#Turkmenistan Summer Time#,
-				'generic' => q#Turkmenistan Time#,
-				'standard' => q#Turkmenistan Standard Time#,
+				'daylight' => q#Àkókò Sọmà Turkmenistani#,
+				'generic' => q#Àkókò Turkimenistani#,
+				'standard' => q#Àkókò Àfẹnukò Turkimenistani#,
 			},
 		},
 		'Tuvalu' => {
 			long => {
-				'standard' => q#Tuvalu Time#,
+				'standard' => q#Àkókò Tufalu#,
 			},
 		},
 		'Uruguay' => {
@@ -5701,16 +6092,16 @@ has 'time_zone_names' => (
 		},
 		'Uzbekistan' => {
 			long => {
-				'daylight' => q#Uzbekistan Summer Time#,
-				'generic' => q#Uzbekistan Time#,
-				'standard' => q#Uzbekistan Standard Time#,
+				'daylight' => q#Àkókò Sọmà Usibekistani#,
+				'generic' => q#Àkókò Usibekistani#,
+				'standard' => q#Àkókò Àfẹnukò Usibekistani#,
 			},
 		},
 		'Vanuatu' => {
 			long => {
-				'daylight' => q#Vanuatu Summer Time#,
-				'generic' => q#Vanuatu Time#,
-				'standard' => q#Vanuatu Standard Time#,
+				'daylight' => q#Àkókò Sọmà Fanuatu#,
+				'generic' => q#Àkókò Fanuatu#,
+				'standard' => q#Àkókò Àfẹnukò Fanuatu#,
 			},
 		},
 		'Venezuela' => {
@@ -5720,45 +6111,45 @@ has 'time_zone_names' => (
 		},
 		'Vladivostok' => {
 			long => {
-				'daylight' => q#Vladivostok Summer Time#,
-				'generic' => q#Vladivostok Time#,
-				'standard' => q#Vladivostok Standard Time#,
+				'daylight' => q#Àkókò Sọmà Filadifositoki#,
+				'generic' => q#Àkókò Filadifositoki#,
+				'standard' => q#Àkókò Àfẹnukò Filadifositoki#,
 			},
 		},
 		'Volgograd' => {
 			long => {
-				'daylight' => q#Volgograd Summer Time#,
-				'generic' => q#Volgograd Time#,
-				'standard' => q#Volgograd Standard Time#,
+				'daylight' => q#Àkókò Sọmà Foligogiradi#,
+				'generic' => q#Àkókò Foligogiradi#,
+				'standard' => q#Àkókò Àfẹnukò Foligogiradi#,
 			},
 		},
 		'Vostok' => {
 			long => {
-				'standard' => q#Vostok Time#,
+				'standard' => q#Àkókò Vostok#,
 			},
 		},
 		'Wake' => {
 			long => {
-				'standard' => q#Wake Island Time#,
+				'standard' => q#Àkókò Erékùsù Wake#,
 			},
 		},
 		'Wallis' => {
 			long => {
-				'standard' => q#Wallis & Futuna Time#,
+				'standard' => q#Àkókò Wallis & Futuina#,
 			},
 		},
 		'Yakutsk' => {
 			long => {
-				'daylight' => q#Yakutsk Summer Time#,
-				'generic' => q#Yakutsk Time#,
-				'standard' => q#Yakutsk Standard Time#,
+				'daylight' => q#Àkókò Sọmà Yatutsk#,
+				'generic' => q#Àkókò Yatutsk#,
+				'standard' => q#Àkókò Àfẹnukò Yatutsk#,
 			},
 		},
 		'Yekaterinburg' => {
 			long => {
-				'daylight' => q#Yekaterinburg Summer Time#,
-				'generic' => q#Yekaterinburg Time#,
-				'standard' => q#Yekaterinburg Standard Time#,
+				'daylight' => q#Àkókò Sọmà Yekaterinburg#,
+				'generic' => q#Àkókò Yekaterinburg#,
+				'standard' => q#Àkókò Àfẹnukò Yekaterinburg#,
 			},
 		},
 		'Yukon' => {

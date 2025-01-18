@@ -3,18 +3,18 @@ abstract: 'An Argon2 encoder for Crypt::Passphrase'
 author:
   - 'Leon Timmermans <leont@cpan.org>'
 build_requires:
+  Crypt::Passphrase: '0.010'
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
   Test::More: '0'
   lib: '0'
-  parent: '0'
   perl: '5.013002'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.010'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,22 +23,23 @@ name: Crypt-Passphrase-Argon2
 provides:
   Crypt::Passphrase::Argon2:
     file: lib/Crypt/Passphrase/Argon2.pm
-    version: '0.009'
+    version: '0.010'
   Crypt::Passphrase::Argon2::Encrypted:
     file: lib/Crypt/Passphrase/Argon2/Encrypted.pm
-    version: '0.009'
+    version: '0.010'
 requires:
   Carp: '0'
   Crypt::Argon2: '0.017'
-  Crypt::Passphrase: '0.010'
+  Crypt::Passphrase::Encoder: '0'
   MIME::Base64: '0'
+  parent: '0'
   perl: '5.013002'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/Leont/crypt-passphrase-argon2/issues
   repository: git://github.com/Leont/crypt-passphrase-argon2.git
-version: '0.009'
-x_generated_by_perl: v5.36.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+version: '0.010'
+x_generated_by_perl: v5.38.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

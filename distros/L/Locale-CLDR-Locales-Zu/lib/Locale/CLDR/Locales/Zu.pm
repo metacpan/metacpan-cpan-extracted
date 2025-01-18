@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Zu - Package for language Zulu
 
 package Locale::CLDR::Locales::Zu;
 # This file auto generated from Data\common\main\zu.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -48,7 +48,7 @@ has 'display_name_language' => (
  				'ann' => 'isi-Obolo',
  				'anp' => 'isi-Angika',
  				'ar' => 'isi-Arabic',
- 				'ar_001' => 'isi-Arabic esivamile sesimanje',
+ 				'ar_001' => 'Isi-Arabic Esivamile Sesimanje',
  				'arn' => 'isi-Mapuche',
  				'arp' => 'isi-Arapaho',
  				'ars' => 'isi-Najdi Arabic',
@@ -74,6 +74,7 @@ has 'display_name_language' => (
  				'bi' => 'isi-Bislama',
  				'bin' => 'isi-Bini',
  				'bla' => 'isi-Siksika',
+ 				'blo' => 'isi-Anii',
  				'bm' => 'isi-Bambara',
  				'bn' => 'isi-Bengali',
  				'bo' => 'isi-Tibetan',
@@ -253,6 +254,7 @@ has 'display_name_language' => (
  				'kv' => 'isi-Komi',
  				'kw' => 'isi-Cornish',
  				'kwk' => 'Kwakʼwala',
+ 				'kxv' => 'Kuvi',
  				'ky' => 'isi-Kyrgyz',
  				'la' => 'isi-Latin',
  				'lad' => 'isi-Ladino',
@@ -261,8 +263,10 @@ has 'display_name_language' => (
  				'lez' => 'isi-Lezghian',
  				'lg' => 'isi-Ganda',
  				'li' => 'isi-Limburgish',
+ 				'lij' => 'IsiLigurian',
  				'lil' => 'isi-Lillooet',
  				'lkt' => 'isi-Lakota',
+ 				'lmo' => 'IsiLombard',
  				'ln' => 'isi-Lingala',
  				'lo' => 'isi-Lao',
  				'lou' => 'isi-Louisiana Creole',
@@ -421,6 +425,7 @@ has 'display_name_language' => (
  				'sw_CD' => 'isi-Congo Swahili',
  				'swb' => 'isi-Comorian',
  				'syr' => 'isi-Syriac',
+ 				'szl' => 'iSilesian',
  				'ta' => 'isi-Tamil',
  				'tce' => 'Southern Tutchone',
  				'te' => 'isi-Telugu',
@@ -461,7 +466,9 @@ has 'display_name_language' => (
  				'uz' => 'isi-Uzbek',
  				'vai' => 'isi-Vai',
  				've' => 'isi-Venda',
+ 				'vec' => 'IsiVenetian',
  				'vi' => 'isi-Vietnamese',
+ 				'vmw' => 'Makhuwa',
  				'vo' => 'isi-Volapük',
  				'vun' => 'isiVunjo',
  				'wa' => 'isi-Walloon',
@@ -473,6 +480,7 @@ has 'display_name_language' => (
  				'wuu' => 'isi-Wu Chinese',
  				'xal' => 'isi-Kalmyk',
  				'xh' => 'isiXhosa',
+ 				'xnr' => 'Kangri',
  				'xog' => 'isi-Soga',
  				'yav' => 'isi-Yangben',
  				'ybb' => 'isi-Yemba',
@@ -481,11 +489,13 @@ has 'display_name_language' => (
  				'yrl' => 'isi-Nheengatu',
  				'yue' => 'isi-Cantonese',
  				'yue@alt=menu' => 'isi-Chinese, Cantonese',
+ 				'za' => 'IsiZhuang',
  				'zgh' => 'isi-Moroccan Tamazight esivamile',
  				'zh' => 'isi-Chinese',
  				'zh@alt=menu' => 'isi-Chinese, Mandarin',
  				'zh_Hans' => 'isi-Chinese (esenziwe-lula)',
- 				'zh_Hant' => 'isi-Chinese (Sasendulo)',
+ 				'zh_Hans@alt=long' => 'Isi-Chinese Esenziwe Lula',
+ 				'zh_Hant' => 'Isi-Chinese Sasendulo',
  				'zh_Hant@alt=long' => 'isi-Chinese (sasendulo)',
  				'zu' => 'isiZulu',
  				'zun' => 'isi-Zuni',
@@ -1209,7 +1219,6 @@ has 'display_name_type' => (
  				'phonebook' => q{Ukuhlunga kwebhuku lefoni},
  				'phonetic' => q{Hlela Ngokwefonetiki},
  				'pinyin' => q{Ukuhlunga nge-Pinyin},
- 				'reformed' => q{Ukuhlunga okwenziwe kabusha},
  				'search' => q{Usesho olujwayelekile},
  				'searchjl' => q{Sesha nge-Hangul Ongwaqa Basekuqaleni},
  				'standard' => q{I-oda yokuhlunga ejwayelekile},
@@ -1809,16 +1818,6 @@ has 'units' => (
 						'other' => q({0} amaviki),
 					},
 					# Long Unit Identifier
-					'duration-year' => {
-						'one' => q({0} y),
-						'other' => q({0} y),
-					},
-					# Core Unit Identifier
-					'year' => {
-						'one' => q({0} y),
-						'other' => q({0} y),
-					},
-					# Long Unit Identifier
 					'energy-foodcalorie' => {
 						'name' => q(Calories),
 						'one' => q({0} Calorie),
@@ -2413,16 +2412,6 @@ has 'units' => (
 					'week' => {
 						'one' => q({0} w),
 						'other' => q({0} w),
-					},
-					# Long Unit Identifier
-					'duration-year' => {
-						'one' => q({0} y),
-						'other' => q({0} y),
-					},
-					# Core Unit Identifier
-					'year' => {
-						'one' => q({0} y),
-						'other' => q({0} y),
 					},
 					# Long Unit Identifier
 					'electric-ampere' => {
@@ -3625,18 +3614,6 @@ has 'units' => (
 						'name' => q(amaviki),
 						'one' => q({0} viki),
 						'other' => q({0} amaviki),
-					},
-					# Long Unit Identifier
-					'duration-year' => {
-						'name' => q(y),
-						'one' => q({0} y),
-						'other' => q({0} yrs),
-					},
-					# Core Unit Identifier
-					'year' => {
-						'name' => q(y),
-						'one' => q({0} y),
-						'other' => q({0} yrs),
 					},
 					# Long Unit Identifier
 					'energy-foodcalorie' => {
@@ -5890,9 +5867,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#i-New York#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#i-Nipigon#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#i-Nome#,
 		},
@@ -5913,9 +5887,6 @@ has 'time_zone_names' => (
 		},
 		'America/Panama' => {
 			exemplarCity => q#i-Panama#,
-		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#i-Pangnirtung#,
 		},
 		'America/Paramaribo' => {
 			exemplarCity => q#i-Paramaribo#,
@@ -5938,9 +5909,6 @@ has 'time_zone_names' => (
 		'America/Punta_Arenas' => {
 			exemplarCity => q#i-Punta Arenas#,
 		},
-		'America/Rainy_River' => {
-			exemplarCity => q#i-Rainy River#,
-		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#i-Rankin Inlet#,
 		},
@@ -5955,9 +5923,6 @@ has 'time_zone_names' => (
 		},
 		'America/Rio_Branco' => {
 			exemplarCity => q#i-Rio Branco#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#i-Santa Isabel#,
 		},
 		'America/Santarem' => {
 			exemplarCity => q#i-Santarem#,
@@ -6004,9 +5969,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#i-Thule#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#i-Thunder Bay#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#i-Tijuana#,
 		},
@@ -6027,9 +5989,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#i-Yakutat#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#i-Yellowknife#,
 		},
 		'America_Central' => {
 			long => {
@@ -6187,9 +6146,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#i-Chita#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#i-Choibalsan#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#i-Colombo#,
@@ -6426,9 +6382,6 @@ has 'time_zone_names' => (
 		'Australia/Broken_Hill' => {
 			exemplarCity => q#i-Broken Hill#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#i-Currie#,
-		},
 		'Australia/Darwin' => {
 			exemplarCity => q#i-Darwin#,
 		},
@@ -6555,13 +6508,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Isikhathi semini sase-China#,
 				'generic' => q#Isikhathi sase-China#,
 				'standard' => q#Isikhathi esivamile sase-China#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Isikhathi sehlobo e-Choibalsan#,
-				'generic' => q#Isikhathi sase-Choibalsan#,
-				'standard' => q#Isikhathi Esivamile sase-Choibalsan#,
 			},
 		},
 		'Christmas' => {
@@ -6786,9 +6732,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#i-Ulyanovsk#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#i-Uzhhorod#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#i-Vaduz#,
 		},
@@ -6809,9 +6752,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#i-Zagreb#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#i-Zaporozhye#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#i-Zurich#,
@@ -7036,6 +6976,11 @@ has 'time_zone_names' => (
 				'standard' => q#esase-Petropavlovsk-Kamchatski Standard Time#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Isikhathi saseKazakhstan#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#Isikhathi sase-Mpumalanga ne-Kazakhstan#,
@@ -7082,11 +7027,6 @@ has 'time_zone_names' => (
 				'standard' => q#Isikhathi sase-Lord Howe esivamile#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Isikhathi sase-Macquarie Island#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Isikhathi sasehlobo e-Magadan#,
@@ -7124,13 +7064,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Isikhathi sase-Mawson#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Isikhathi sase-Northwest Mexico sasemini#,
-				'generic' => q#Isikhathi sase-Northwest Mexico#,
-				'standard' => q#Isikhathi sase-Northwest Mexico esijwayelekile#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -7267,9 +7200,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Honolulu' => {
 			exemplarCity => q#i-Honolulu#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#i-Johnston#,
 		},
 		'Pacific/Kiritimati' => {
 			exemplarCity => q#i-Kiritimati#,

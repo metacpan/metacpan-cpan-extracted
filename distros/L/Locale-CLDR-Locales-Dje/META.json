@@ -4,7 +4,7 @@
       "John Imrie <john.imrie1@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "keywords" : [
       "locale",
       "CLDR",
@@ -34,11 +34,11 @@
       "runtime" : {
          "requires" : {
             "DateTime" : "0.72",
-            "Locale::CLDR" : "v0.44.1",
+            "Locale::CLDR" : "v0.46.0",
             "Moo" : "2",
             "MooX::ClassAttribute" : "0.011",
             "Type::Tiny" : "0",
-            "perl" : "v5.10.1",
+            "perl" : "v5.12.0",
             "version" : "0.95"
          }
       }
@@ -46,15 +46,15 @@
    "provides" : {
       "Locale::CLDR::Locales::Dje" : {
          "file" : "lib/Locale/CLDR/Locales/Dje.pm",
-         "version" : "v0.44.1"
+         "version" : "v0.46.0"
       },
       "Locale::CLDR::Locales::Dje::Latn" : {
          "file" : "lib/Locale/CLDR/Locales/Dje/Latn.pm",
-         "version" : "v0.44.1"
+         "version" : "v0.46.0"
       },
       "Locale::CLDR::Locales::Dje::Latn::Ne" : {
          "file" : "lib/Locale/CLDR/Locales/Dje/Latn/Ne.pm",
-         "version" : "v0.44.1"
+         "version" : "v0.46.0"
       }
    },
    "release_status" : "stable",
@@ -67,6 +67,6 @@
          "url" : "https://github.com/ThePilgrim/perlcldr.git"
       }
    },
-   "version" : "v0.44.1",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "v0.46.0",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

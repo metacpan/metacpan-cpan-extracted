@@ -1,5 +1,10 @@
 Revision history for Perl extension Tk::ListEntry.
 
+0.05  Fri Jan 17 2025
+	- Calls method raise during pop up. Hopefully fixes popping up beneath a window.
+	- Added options -anchor, -background -font, -foreground, -justify, -textvariable -width, and -wraplength as transferred to the text label.
+	- Bug tracker for CPAN now points to Github.
+
 0.04  Thu Jul 4 2024
 	Added option -nowithdraw
 	Fixed documentation

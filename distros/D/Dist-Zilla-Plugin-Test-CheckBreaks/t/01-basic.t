@@ -78,8 +78,7 @@ cmp_deeply(
     'prereqs are properly injected for the test phase; correct dumped configs',
 ) or diag 'got distmeta: ', explain $tzil->distmeta;
 
-subtest 'run the generated test' => sub
-{
+subtest 'run the generated test' => sub {
     my $wd = pushd $build_dir;
     do $file;
     note 'ran tests successfully' if not $@;

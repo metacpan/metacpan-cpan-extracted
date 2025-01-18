@@ -1,17 +1,17 @@
 package Locale::CLDR::Transformations::Any::Lt::Title;
 # This file auto generated from Data\common\transforms\lt-Title.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -40,49 +40,49 @@ has 'transforms' => (
 			type => 'conversion',
 			data => [
 				{
-					before  => q(\p{cased}\p{case-ignorable}*),
+					before  => q(\p{Cased}\p{Case_Ignorable}*),
 					after   => q([^\p{ccc=Not_Reordered}\p{ccc=Above}]*\p{ccc=Above}),
 					replace => q(I),
 					result  => q(i\u0307),
 					revisit => 0,
 				},
 				{
-					before  => q(\p{cased}\p{case-ignorable}*),
+					before  => q(\p{Cased}\p{Case_Ignorable}*),
 					after   => q([^\p{ccc=Not_Reordered}\p{ccc=Above}]*\p{ccc=Above}),
 					replace => q(J),
 					result  => q(j\u0307),
 					revisit => 0,
 				},
 				{
-					before  => q(\p{cased}\p{case-ignorable}*),
+					before  => q(\p{Cased}\p{Case_Ignorable}*),
 					after   => q([^\p{ccc=Not_Reordered}\p{ccc=Above}]*\p{ccc=Above}),
 					replace => q(Į),
 					result  => q(i\u0328\u0307),
 					revisit => 0,
 				},
 				{
-					before  => q(\p{cased}\p{case-ignorable}*),
+					before  => q(\p{Cased}\p{Case_Ignorable}*),
 					after   => q(),
 					replace => q(Ì),
 					result  => q(i\u0307\u0300),
 					revisit => 0,
 				},
 				{
-					before  => q(\p{cased}\p{case-ignorable}*),
+					before  => q(\p{Cased}\p{Case_Ignorable}*),
 					after   => q(),
 					replace => q(Í),
 					result  => q(i\u0307\u0301),
 					revisit => 0,
 				},
 				{
-					before  => q(\p{cased}\p{case-ignorable}*),
+					before  => q(\p{Cased}\p{Case_Ignorable}*),
 					after   => q(),
 					replace => q(Ĩ),
 					result  => q(i\u0307\u0303),
 					revisit => 0,
 				},
 				{
-					before  => q(\p{cased}\p{case-ignorable}*),
+					before  => q(\p{Cased}\p{Case_Ignorable}*),
 					after   => q(),
 					replace => q((.)),
 					result  => q(&Any-Lower($1)),

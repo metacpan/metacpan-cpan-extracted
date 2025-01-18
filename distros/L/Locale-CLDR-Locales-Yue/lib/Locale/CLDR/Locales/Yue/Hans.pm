@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Yue::Hans - Package for language Cantonese
 
 package Locale::CLDR::Locales::Yue::Hans;
 # This file auto generated from Data\common\main\yue_Hans.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -944,6 +944,7 @@ has 'display_name_language' => (
  				'bjn' => '班亚尔文',
  				'bkm' => '康姆文',
  				'bla' => '锡克锡卡文',
+ 				'blo' => '阿尼文',
  				'bm' => '班巴拉文',
  				'bn' => '孟加拉文',
  				'bo' => '藏文',
@@ -1072,7 +1073,6 @@ has 'display_name_language' => (
  				'gmh' => '中古高地德文',
  				'gn' => '瓜拉尼文',
  				'goh' => '古高地日耳曼文',
- 				'gom' => '孔卡尼文',
  				'gon' => '冈德文',
  				'gor' => '科隆达罗文',
  				'got' => '哥德文',
@@ -1182,6 +1182,7 @@ has 'display_name_language' => (
  				'kv' => '科米文',
  				'kw' => '康瓦耳文',
  				'kwk' => '夸夸瓦拉文',
+ 				'kxv' => '库维文',
  				'ky' => '吉尔吉斯文',
  				'la' => '拉丁文',
  				'lad' => '拉迪诺文',
@@ -1476,6 +1477,7 @@ has 'display_name_language' => (
  				'vi' => '越南文',
  				'vls' => '西佛兰德文',
  				'vmf' => '美茵-法兰克尼亚文',
+ 				'vmw' => '马库瓦文',
  				'vo' => '沃拉普克文',
  				'vot' => '沃提克文',
  				'vro' => '佛罗文',
@@ -1491,6 +1493,7 @@ has 'display_name_language' => (
  				'xal' => '卡尔梅克文',
  				'xh' => '科萨文',
  				'xmf' => '明格列尔文',
+ 				'xnr' => '康格里文',
  				'xog' => '索加文',
  				'yao' => '瑶文',
  				'yap' => '雅浦文',
@@ -2181,7 +2184,6 @@ has 'display_name_type' => (
  				'phonebook' => q{电话簿排序},
  				'phonetic' => q{发音排序},
  				'pinyin' => q{拼音排序},
- 				'reformed' => q{改良排序},
  				'search' => q{一般用途搜寻},
  				'searchjl' => q{韩文子音排序},
  				'standard' => q{标准排序},
@@ -2426,6 +2428,16 @@ has 'units' => (
 						'per' => q(每平方英里 {0}),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(十亿分点浓度),
+						'other' => q({0} 十亿分点浓度),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(十亿分点浓度),
+						'other' => q({0} 十亿分点浓度),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(每 100 公里公升),
 						'other' => q(每 100 公里 {0} 公升),
@@ -2494,6 +2506,18 @@ has 'units' => (
 					# Core Unit Identifier
 					'month' => {
 						'per' => q(每月 {0}),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(晚),
+						'other' => q({0} 晚),
+						'per' => q({0}/晚),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(晚),
+						'other' => q({0} 晚),
+						'per' => q({0}/晚),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -2770,6 +2794,16 @@ has 'units' => (
 						'other' => q(每小时 {0} 公里),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(光速),
+						'other' => q({0} 光速),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(光速),
+						'other' => q({0} 光速),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'name' => q(每秒公尺),
 						'other' => q(每秒 {0} 米),
@@ -2888,6 +2922,14 @@ has 'units' => (
 						'other' => q({0}m/s²),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'other' => q({0}ppb),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'other' => q({0}ppb),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(升/100公里),
 					},
@@ -2904,6 +2946,18 @@ has 'units' => (
 					'byte' => {
 						'name' => q(B),
 						'other' => q({0}byte),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(晚),
+						'other' => q({0}晚),
+						'per' => q({0}/晚),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(晚),
+						'other' => q({0}晚),
+						'per' => q({0}/晚),
 					},
 					# Long Unit Identifier
 					'graphics-megapixel' => {
@@ -2996,6 +3050,16 @@ has 'units' => (
 					# Core Unit Identifier
 					'kilometer-per-hour' => {
 						'other' => q({0}公里/小时),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(光速),
+						'other' => q({0}光速),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(光速),
+						'other' => q({0}光速),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -3538,6 +3602,14 @@ has 'units' => (
 						'other' => q({0} 点子),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(浓度/十亿),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(浓度/十亿),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(升/100 公里),
 						'other' => q(每100公里 {0} 升),
@@ -3688,6 +3760,18 @@ has 'units' => (
 					'nanosecond' => {
 						'name' => q(奈秒),
 						'other' => q({0} 奈秒),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(晚),
+						'other' => q({0} 晚),
+						'per' => q({0}/晚),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(晚),
+						'other' => q({0} 晚),
+						'per' => q({0}/晚),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -4628,6 +4712,16 @@ has 'units' => (
 					'knot' => {
 						'name' => q(节),
 						'other' => q({0} 节),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(光速),
+						'other' => q({0} 光速),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(光速),
+						'other' => q({0} 光速),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -9291,9 +9385,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#纽约#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#尼皮冈#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#诺姆#,
 		},
@@ -9314,9 +9405,6 @@ has 'time_zone_names' => (
 		},
 		'America/Panama' => {
 			exemplarCity => q#巴拿马#,
-		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#潘尼尔东#,
 		},
 		'America/Paramaribo' => {
 			exemplarCity => q#巴拉马利波#,
@@ -9339,9 +9427,6 @@ has 'time_zone_names' => (
 		'America/Punta_Arenas' => {
 			exemplarCity => q#蓬塔阿雷纳斯#,
 		},
-		'America/Rainy_River' => {
-			exemplarCity => q#雨河镇#,
-		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#兰今湾#,
 		},
@@ -9356,9 +9441,6 @@ has 'time_zone_names' => (
 		},
 		'America/Rio_Branco' => {
 			exemplarCity => q#里约布兰#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#圣伊萨贝尔#,
 		},
 		'America/Santarem' => {
 			exemplarCity => q#圣塔伦#,
@@ -9405,9 +9487,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#杜里#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#珊德湾#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#提华纳#,
 		},
@@ -9428,9 +9507,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#雅库塔#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#耶洛奈夫#,
 		},
 		'America_Central' => {
 			long => {
@@ -9605,9 +9681,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#赤塔#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#乔巴山#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#可伦坡#,
@@ -9847,9 +9920,6 @@ has 'time_zone_names' => (
 		'Australia/Broken_Hill' => {
 			exemplarCity => q#布罗肯希尔#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#克黎#,
-		},
 		'Australia/Darwin' => {
 			exemplarCity => q#达尔文#,
 		},
@@ -9981,13 +10051,6 @@ has 'time_zone_names' => (
 				'daylight' => q#中国夏令时间#,
 				'generic' => q#中国时间#,
 				'standard' => q#中国标准时间#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#乔巴山夏令时间#,
-				'generic' => q#乔巴山时间#,
-				'standard' => q#乔巴山标准时间#,
 			},
 		},
 		'Christmas' => {
@@ -10212,9 +10275,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#乌里扬诺夫斯克#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#乌兹哥洛#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#瓦都兹#,
 		},
@@ -10235,9 +10295,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#札格瑞布#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#札波罗结#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#苏黎世#,
@@ -10467,6 +10524,11 @@ has 'time_zone_names' => (
 				'standard' => q#彼得罗巴甫洛夫斯克标准时间#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#哈萨克时间#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#东哈萨克时间#,
@@ -10525,11 +10587,6 @@ has 'time_zone_names' => (
 				'standard' => q#澳门标准时间#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#麦觉理时间#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#马加丹夏令时间#,
@@ -10567,13 +10624,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#莫森时间#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#墨西哥西北部夏令时间#,
-				'generic' => q#墨西哥西北部时间#,
-				'standard' => q#墨西哥西北部标准时间#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -10715,9 +10765,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Honolulu' => {
 			exemplarCity => q#檀香山#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#强斯顿#,
 		},
 		'Pacific/Kanton' => {
 			exemplarCity => q#坎顿#,

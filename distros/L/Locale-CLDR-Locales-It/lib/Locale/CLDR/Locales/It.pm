@@ -8,18 +8,18 @@ Locale::CLDR::Locales::It - Package for language Italian
 
 package Locale::CLDR::Locales::It;
 # This file auto generated from Data\common\main\it.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -3107,6 +3107,7 @@ has 'display_name_language' => (
  				'bjn' => 'banjar',
  				'bkm' => 'kom',
  				'bla' => 'siksika',
+ 				'blo' => 'anii',
  				'bm' => 'bambara',
  				'bn' => 'bengalese',
  				'bo' => 'tibetano',
@@ -3249,7 +3250,6 @@ has 'display_name_language' => (
  				'gmh' => 'tedesco medio alto',
  				'gn' => 'guaraní',
  				'goh' => 'tedesco antico alto',
- 				'gom' => 'konkani goano',
  				'gon' => 'gondi',
  				'gor' => 'gorontalo',
  				'got' => 'gotico',
@@ -3356,6 +3356,7 @@ has 'display_name_language' => (
  				'kv' => 'komi',
  				'kw' => 'cornico',
  				'kwk' => 'kwakʼwala',
+ 				'kxv' => 'kuvi',
  				'ky' => 'kirghiso',
  				'la' => 'latino',
  				'lad' => 'giudeo-spagnolo',
@@ -3371,6 +3372,7 @@ has 'display_name_language' => (
  				'lil' => 'lillooet',
  				'liv' => 'livone',
  				'lkt' => 'lakota',
+ 				'lld' => 'ladino',
  				'lmo' => 'lombardo',
  				'ln' => 'lingala',
  				'lo' => 'lao',
@@ -3385,7 +3387,6 @@ has 'display_name_language' => (
  				'lua' => 'luba-lulua',
  				'lui' => 'luiseno',
  				'lun' => 'lunda',
- 				'luo' => 'luo',
  				'lus' => 'lushai',
  				'luy' => 'luyia',
  				'lv' => 'lettone',
@@ -3644,12 +3645,12 @@ has 'display_name_language' => (
  				'und' => 'lingua imprecisata',
  				'ur' => 'urdu',
  				'uz' => 'uzbeco',
- 				'vai' => 'vai',
  				've' => 'venda',
  				'vec' => 'veneto',
  				'vep' => 'vepso',
  				'vi' => 'vietnamita',
  				'vls' => 'fiammingo occidentale',
+ 				'vmw' => 'macua',
  				'vo' => 'volapük',
  				'vot' => 'voto',
  				'vro' => 'võro',
@@ -3665,6 +3666,7 @@ has 'display_name_language' => (
  				'xal' => 'kalmyk',
  				'xh' => 'xhosa',
  				'xmf' => 'mengrelio',
+ 				'xnr' => 'kangri',
  				'xog' => 'soga',
  				'yao' => 'yao (bantu)',
  				'yap' => 'yapese',
@@ -3935,7 +3937,7 @@ has 'display_name_region' => (
  			'AO' => 'Angola',
  			'AQ' => 'Antartide',
  			'AR' => 'Argentina',
- 			'AS' => 'Samoa americane',
+ 			'AS' => 'Samoa Americane',
  			'AT' => 'Austria',
  			'AU' => 'Australia',
  			'AW' => 'Aruba',
@@ -3954,7 +3956,7 @@ has 'display_name_region' => (
  			'BM' => 'Bermuda',
  			'BN' => 'Brunei',
  			'BO' => 'Bolivia',
- 			'BQ' => 'Caraibi olandesi',
+ 			'BQ' => 'Caraibi Olandesi',
  			'BR' => 'Brasile',
  			'BS' => 'Bahamas',
  			'BT' => 'Bhutan',
@@ -3997,7 +3999,7 @@ has 'display_name_region' => (
  			'EC' => 'Ecuador',
  			'EE' => 'Estonia',
  			'EG' => 'Egitto',
- 			'EH' => 'Sahara occidentale',
+ 			'EH' => 'Sahara Occidentale',
  			'ER' => 'Eritrea',
  			'ES' => 'Spagna',
  			'ET' => 'Etiopia',
@@ -4043,7 +4045,7 @@ has 'display_name_region' => (
  			'IL' => 'Israele',
  			'IM' => 'Isola di Man',
  			'IN' => 'India',
- 			'IO' => 'Territorio britannico dell’Oceano Indiano',
+ 			'IO' => 'Territorio Britannico dell’Oceano Indiano',
  			'IO@alt=chagos' => 'Arcipelago Chagos',
  			'IQ' => 'Iraq',
  			'IR' => 'Iran',
@@ -4088,7 +4090,7 @@ has 'display_name_region' => (
  			'MN' => 'Mongolia',
  			'MO' => 'RAS di Macao',
  			'MO@alt=short' => 'Macao',
- 			'MP' => 'Isole Marianne settentrionali',
+ 			'MP' => 'Isole Marianne Settentrionali',
  			'MQ' => 'Martinica',
  			'MR' => 'Mauritania',
  			'MS' => 'Montserrat',
@@ -4115,7 +4117,7 @@ has 'display_name_region' => (
  			'OM' => 'Oman',
  			'PA' => 'Panama',
  			'PE' => 'Perù',
- 			'PF' => 'Polinesia francese',
+ 			'PF' => 'Polinesia Francese',
  			'PG' => 'Papua Nuova Guinea',
  			'PH' => 'Filippine',
  			'PK' => 'Pakistan',
@@ -4123,7 +4125,7 @@ has 'display_name_region' => (
  			'PM' => 'Saint-Pierre e Miquelon',
  			'PN' => 'Isole Pitcairn',
  			'PR' => 'Portorico',
- 			'PS' => 'Territori palestinesi',
+ 			'PS' => 'Territori Palestinesi',
  			'PS@alt=short' => 'Palestina',
  			'PT' => 'Portogallo',
  			'PW' => 'Palau',
@@ -4160,7 +4162,7 @@ has 'display_name_region' => (
  			'TA' => 'Tristan da Cunha',
  			'TC' => 'Isole Turks e Caicos',
  			'TD' => 'Ciad',
- 			'TF' => 'Terre australi francesi',
+ 			'TF' => 'Terre Australi Francesi',
  			'TG' => 'Togo',
  			'TH' => 'Thailandia',
  			'TJ' => 'Tagikistan',
@@ -4349,7 +4351,6 @@ has 'display_name_type' => (
  				'phonebook' => q{Ordinamento Elenco telefonico},
  				'phonetic' => q{Ordinamento fonetico},
  				'pinyin' => q{Ordinamento pinyin},
- 				'reformed' => q{Ordinamento riformato},
  				'search' => q{Ricerca generica},
  				'searchjl' => q{Cerca per consonante hangul iniziale},
  				'standard' => q{Ordinamento standard},
@@ -4435,6 +4436,7 @@ has 'display_name_type' => (
  				'latn' => q{Cifre occidentali},
  				'lepc' => q{Cifre lepcha},
  				'limb' => q{Cifre limbu},
+ 				'mathmono' => q{Cifre matematiche a spaziatura fissa},
  				'mlym' => q{Cifre malayalam},
  				'mong' => q{Numeri mongoli},
  				'mtei' => q{Cifre Meetei Mayek},
@@ -4503,9 +4505,9 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{[ªáâåäã æ ç êë íîï ñ ºôöõø œ ß úûü ÿ]},
+			auxiliary => qr{[ªáâåäã æ ç êë íîï ñ ºóôöõø œ ß úûü ÿ]},
 			index => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
-			main => qr{[aà b c d eéè f g h iì j k l m n oóò p q r s t uù v w x y z]},
+			main => qr{[aà b c d eéè f g h iì j k l m n oò p q r s t uù v w x y z]},
 			punctuation => qr{[\- ‑ — , ; \: ! ? . … '’ "“” « » ( ) \[ \] \{ \} @ /]},
 		};
 	},
@@ -5066,12 +5068,14 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'concentr-milligram-ofglucose-per-deciliter' => {
+						'1' => q(masculine),
 						'name' => q(milligrammi per decilitro),
 						'one' => q({0} milligrammo per decilitro),
 						'other' => q({0} milligrammi per decilitro),
 					},
 					# Core Unit Identifier
 					'milligram-ofglucose-per-deciliter' => {
+						'1' => q(masculine),
 						'name' => q(milligrammi per decilitro),
 						'one' => q({0} milligrammo per decilitro),
 						'other' => q({0} milligrammi per decilitro),
@@ -5159,6 +5163,20 @@ has 'units' => (
 						'name' => q(punto base),
 						'one' => q({0} punto base),
 						'other' => q({0} punti base),
+					},
+					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'1' => q(feminine),
+						'name' => q(parti per miliardo),
+						'one' => q({0} parte per miliardo),
+						'other' => q({0} parti per miliardo),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'1' => q(feminine),
+						'name' => q(parti per miliardo),
+						'one' => q({0} parte per miliardo),
+						'other' => q({0} parti per miliardo),
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
@@ -5501,6 +5519,22 @@ has 'units' => (
 						'name' => q(nanosecondi),
 						'one' => q({0} nanosecondo),
 						'other' => q({0} nanosecondi),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'1' => q(feminine),
+						'name' => q(notti),
+						'one' => q({0} notte),
+						'other' => q({0} notti),
+						'per' => q({0} a notte),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'1' => q(feminine),
+						'name' => q(notti),
+						'one' => q({0} notte),
+						'other' => q({0} notti),
+						'per' => q({0} a notte),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -6180,12 +6214,14 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-point' => {
+						'1' => q(masculine),
 						'name' => q(punti tipografici),
 						'one' => q({0} punto tipografico),
 						'other' => q({0} punti tipografici),
 					},
 					# Core Unit Identifier
 					'point' => {
+						'1' => q(masculine),
 						'name' => q(punti tipografici),
 						'one' => q({0} punto tipografico),
 						'other' => q({0} punti tipografici),
@@ -6682,12 +6718,14 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'pressure-millimeter-ofhg' => {
+						'1' => q(masculine),
 						'name' => q(millimetri di mercurio),
 						'one' => q({0} millimetro di mercurio),
 						'other' => q({0} millimetri di mercurio),
 					},
 					# Core Unit Identifier
 					'millimeter-ofhg' => {
+						'1' => q(masculine),
 						'name' => q(millimetri di mercurio),
 						'one' => q({0} millimetro di mercurio),
 						'other' => q({0} millimetri di mercurio),
@@ -6755,6 +6793,18 @@ has 'units' => (
 						'name' => q(nodi),
 						'one' => q({0} nodo),
 						'other' => q({0} nodi),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'1' => q(feminine),
+						'one' => q({0} alla velocità della luce),
+						'other' => q({0} alla velocità della luce),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'1' => q(feminine),
+						'one' => q({0} alla velocità della luce),
+						'other' => q({0} alla velocità della luce),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -6839,14 +6889,6 @@ has 'units' => (
 						'name' => q(Kelvin),
 						'one' => q({0} Kelvin),
 						'other' => q({0} Kelvin),
-					},
-					# Long Unit Identifier
-					'times' => {
-						'1' => q({0} {1}),
-					},
-					# Core Unit Identifier
-					'times' => {
-						'1' => q({0} {1}),
 					},
 					# Long Unit Identifier
 					'torque-newton-meter' => {
@@ -7559,6 +7601,16 @@ has 'units' => (
 						'other' => q({0}ppm),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'one' => q({0}ppb),
+						'other' => q({0}ppb),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'one' => q({0}ppb),
+						'other' => q({0}ppb),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-kilometer' => {
 						'one' => q({0}L/km),
 						'other' => q({0}L/km),
@@ -7811,6 +7863,20 @@ has 'units' => (
 					'nanosecond' => {
 						'one' => q({0}ns),
 						'other' => q({0}ns),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(notti),
+						'one' => q({0} notte),
+						'other' => q({0} notti),
+						'per' => q({0}/notte),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(notti),
+						'one' => q({0} notte),
+						'other' => q({0} notti),
+						'per' => q({0}/notte),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -8745,6 +8811,16 @@ has 'units' => (
 					'knot' => {
 						'one' => q({0}kn),
 						'other' => q({0}kn),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'one' => q({0}l),
+						'other' => q({0}l),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'one' => q({0}l),
+						'other' => q({0}l),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -9471,6 +9547,20 @@ has 'units' => (
 						'per' => q({0}/mese),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(notti),
+						'one' => q({0} notte),
+						'other' => q({0} notti),
+						'per' => q({0}/notte),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(notti),
+						'one' => q({0} notte),
+						'other' => q({0} notti),
+						'per' => q({0}/notte),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'name' => q(trim.),
 						'one' => q({0} trim.),
@@ -9731,6 +9821,16 @@ has 'units' => (
 					'beaufort' => {
 						'one' => q(Bft {0}),
 						'other' => q(Bft {0}),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'one' => q({0} luce),
+						'other' => q({0} luce),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'one' => q({0} luce),
+						'other' => q({0} luce),
 					},
 					# Long Unit Identifier
 					'temperature-celsius' => {
@@ -9996,6 +10096,13 @@ has 'listPatterns' => (
 		} }
 );
 
+has 'minimum_grouping_digits' => (
+	is			=>'ro',
+	isa			=> Int,
+	init_arg	=> undef,
+	default		=> 2,
+);
+
 has 'number_symbols' => (
 	is			=> 'ro',
 	isa			=> HashRef,
@@ -10078,28 +10185,28 @@ has 'number_formats' => (
 					'other' => '0',
 				},
 				'1000000' => {
-					'one' => '0 Mio',
-					'other' => '0 Mio',
+					'one' => '0 Mln',
+					'other' => '0 Mln',
 				},
 				'10000000' => {
-					'one' => '00 Mio',
-					'other' => '00 Mio',
+					'one' => '00 Mln',
+					'other' => '00 Mln',
 				},
 				'100000000' => {
-					'one' => '000 Mio',
-					'other' => '000 Mio',
+					'one' => '000 Mln',
+					'other' => '000 Mln',
 				},
 				'1000000000' => {
-					'one' => '0 Mrd',
-					'other' => '0 Mrd',
+					'one' => '0 Mld',
+					'other' => '0 Mld',
 				},
 				'10000000000' => {
-					'one' => '00 Mrd',
-					'other' => '00 Mrd',
+					'one' => '00 Mld',
+					'other' => '00 Mld',
 				},
 				'100000000000' => {
-					'one' => '000 Mrd',
-					'other' => '000 Mrd',
+					'one' => '000 Mld',
+					'other' => '000 Mld',
 				},
 				'1000000000000' => {
 					'one' => '0 Bln',
@@ -12662,9 +12769,6 @@ has 'time_zone_names' => (
 		'Africa/Ndjamena' => {
 			exemplarCity => q#N’Djamena#,
 		},
-		'Africa/Sao_Tome' => {
-			exemplarCity => q#São Tomé#,
-		},
 		'Africa/Tunis' => {
 			exemplarCity => q#Tunisi#,
 		},
@@ -12707,17 +12811,11 @@ has 'time_zone_names' => (
 		'America/Argentina/Tucuman' => {
 			exemplarCity => q#Tucumán#,
 		},
-		'America/Asuncion' => {
-			exemplarCity => q#Asunción#,
-		},
 		'America/Bogota' => {
 			exemplarCity => q#Bogotá#,
 		},
 		'America/Cayenne' => {
 			exemplarCity => q#Caienna#,
-		},
-		'America/Curacao' => {
-			exemplarCity => q#Curaçao#,
 		},
 		'America/Guadeloupe' => {
 			exemplarCity => q#Guadalupa#,
@@ -12745,9 +12843,6 @@ has 'time_zone_names' => (
 		},
 		'America/Puerto_Rico' => {
 			exemplarCity => q#Portorico#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#Santa Isabel#,
 		},
 		'America/Santarem' => {
 			exemplarCity => q#Santarém#,
@@ -12937,9 +13032,6 @@ has 'time_zone_names' => (
 		'Atlantic/St_Helena' => {
 			exemplarCity => q#Sant’Elena#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#Currie#,
-		},
 		'Australia_Central' => {
 			long => {
 				'daylight' => q#Ora legale dell’Australia centrale#,
@@ -13042,13 +13134,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Ora legale della Cina#,
 				'generic' => q#Ora della Cina#,
 				'standard' => q#Ora standard della Cina#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Ora legale di Choibalsan#,
-				'generic' => q#Ora di Choibalsan#,
-				'standard' => q#Ora standard di Choibalsan#,
 			},
 		},
 		'Christmas' => {
@@ -13188,9 +13273,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Tirane' => {
 			exemplarCity => q#Tirana#,
-		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#Užhorod#,
 		},
 		'Europe/Vatican' => {
 			exemplarCity => q#Città del Vaticano#,
@@ -13415,6 +13497,11 @@ has 'time_zone_names' => (
 				'standard' => q#Ora standard di Petropavlovsk-Kamchatski#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Ora del Kazakistan#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#Ora del Kazakistan orientale#,
@@ -13468,11 +13555,6 @@ has 'time_zone_names' => (
 				'standard' => q#Ora standard di Macao#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Ora dell’Isola Macquarie#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Ora legale di Magadan#,
@@ -13510,13 +13592,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Ora di Mawson#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Ora legale del Messico nord-occidentale#,
-				'generic' => q#Ora del Messico nord-occidentale#,
-				'standard' => q#Ora standard del Messico nord-occidentale#,
 			},
 		},
 		'Mexico_Pacific' => {

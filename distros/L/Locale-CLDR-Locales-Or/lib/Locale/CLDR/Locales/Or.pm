@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Or - Package for language Odia
 
 package Locale::CLDR::Locales::Or;
 # This file auto generated from Data\common\main\or.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -52,7 +52,7 @@ has 'display_name_language' => (
  				'ann' => 'ଅବୋଲା',
  				'anp' => 'ଅଁଗୀକା',
  				'ar' => 'ଆରବିକ୍',
- 				'ar_001' => 'ଆଧୁନିକ ମାନାଙ୍କ ଆରବୀୟ',
+ 				'ar_001' => 'ଆଧୁନିକ ମାନକ ଆରବିକ୍‌',
  				'arc' => 'ଆରାମାଇକ୍',
  				'arn' => 'ମାପୁଚେ',
  				'arp' => 'ଆରାପାହୋ',
@@ -82,6 +82,7 @@ has 'display_name_language' => (
  				'bik' => 'ବିକୋଲ୍',
  				'bin' => 'ବିନି',
  				'bla' => 'ସିକସିକା',
+ 				'blo' => 'ବ୍ଲୋ',
  				'bm' => 'ବାମ୍ବାରା',
  				'bn' => 'ବଙ୍ଗଳା',
  				'bo' => 'ତିବ୍ବତୀୟ',
@@ -130,7 +131,7 @@ has 'display_name_language' => (
  				'cu' => 'ଚର୍ଚ୍ଚ ସ୍ଲାଭିକ୍',
  				'cv' => 'ଚୁଭାଶ୍',
  				'cy' => 'ୱେଲ୍ସ',
- 				'da' => 'ଡାନ୍ନିସ୍',
+ 				'da' => 'ଡାନିସ୍‌',
  				'dak' => 'ଡାକୋଟା',
  				'dar' => 'ଡାରାଗ୍ୱା',
  				'dav' => 'ତାଇତି',
@@ -167,7 +168,7 @@ has 'display_name_language' => (
  				'en_US@alt=short' => 'ଯୁକ୍ତରାଷ୍ଟ୍ର ଇଂରାଜୀ',
  				'enm' => 'ମଧ୍ୟ ଇଁରାଜୀ',
  				'eo' => 'ଏସ୍ପାରେଣ୍ଟୋ',
- 				'es' => 'ସ୍ପେନିୟ',
+ 				'es' => 'ସ୍ପାନିସ୍‌',
  				'es_419' => 'ଲାଟିନ୍‌ ଆମେରିକୀୟ ସ୍ପାନିସ୍‌',
  				'es_ES' => 'ୟୁରୋପୀୟ ସ୍ପାନିସ୍‌',
  				'es_MX' => 'ମେକ୍ସିକାନ ସ୍ପାନିସ୍‌',
@@ -182,7 +183,7 @@ has 'display_name_language' => (
  				'fi' => 'ଫିନ୍ନିସ୍',
  				'fil' => 'ଫିଲିପିନୋ',
  				'fj' => 'ଫିଜି',
- 				'fo' => 'ଫାରୋଏସେ',
+ 				'fo' => 'ଫାରୋଇଜ୍‌',
  				'fon' => 'ଫନ୍',
  				'fr' => 'ଫରାସୀ',
  				'fr_CA' => 'କାନାଡିୟ ଫ୍ରେଞ୍ଚ',
@@ -194,14 +195,14 @@ has 'display_name_language' => (
  				'frs' => 'ପୂର୍ବ ଫ୍ରିସିୟାନ୍',
  				'fur' => 'ଫ୍ରିୟୁଲୀୟାନ୍',
  				'fy' => 'ପାଶ୍ଚାତ୍ୟ ଫ୍ରିସିଆନ୍',
- 				'ga' => 'ଇରିସ୍',
+ 				'ga' => 'ଆଇରିସ୍‌',
  				'gaa' => 'ଗା',
  				'gay' => 'ଗାୟୋ',
  				'gba' => 'ଗବାୟା',
  				'gd' => 'ସ୍କଟିସ୍ ଗାଏଲିକ୍',
  				'gez' => 'ଗୀଜ୍',
  				'gil' => 'ଜିବ୍ରାଟୀଜ୍',
- 				'gl' => 'ଗାଲସିଆନ୍',
+ 				'gl' => 'ଗାଲିସିଆନ୍‌',
  				'gmh' => 'ମିଡିଲ୍ ହାଇ ଜର୍ମାନ୍',
  				'gn' => 'ଗୁଆରାନୀ',
  				'goh' => 'ପୁରୁଣା ହାଇ ଜର୍ମାନ୍',
@@ -211,7 +212,7 @@ has 'display_name_language' => (
  				'grb' => 'ଗ୍ରେବୋ',
  				'grc' => 'ପ୍ରାଚୀନ୍ ୟୁନାନୀ',
  				'gsw' => 'ସୁଇସ୍ ଜର୍ମାନ୍',
- 				'gu' => 'ଗୁଜୁରାଟୀ',
+ 				'gu' => 'ଗୁଜରାଟୀ',
  				'guz' => 'ଗୁସି',
  				'gv' => 'ମାଁକ୍ସ',
  				'gwi' => 'ଗୱିଚ’ଇନ୍',
@@ -219,14 +220,14 @@ has 'display_name_language' => (
  				'hai' => 'ହାଇଡା',
  				'haw' => 'ହାୱାଇନ୍',
  				'hax' => 'ସାଉଥ୍ ହାଇଡା',
- 				'he' => 'ହେବ୍ର୍ୟୁ',
+ 				'he' => 'ହିବ୍ରୁ',
  				'hi' => 'ହିନ୍ଦୀ',
  				'hi_Latn@alt=variant' => 'ହିଂଲିସ',
  				'hil' => 'ହିଲିଗୈନନ୍',
  				'hit' => 'ହିତୀତେ',
  				'hmn' => 'ହଁଙ୍ଗ',
  				'ho' => 'ହିରି ମୋଟୁ',
- 				'hr' => 'କ୍ରୋଆଟିଆନ୍',
+ 				'hr' => 'କ୍ରୋଏସୀୟ',
  				'hsb' => 'ଉପର ସର୍ବିଆନ୍',
  				'ht' => 'ହୈତାୟିନ୍',
  				'hu' => 'ହଙ୍ଗେରୀୟ',
@@ -255,8 +256,8 @@ has 'display_name_language' => (
  				'jmc' => 'ମାଚେମେ',
  				'jpr' => 'ଜୁଡେଓ-ପର୍ସିଆନ୍',
  				'jrb' => 'ଜୁଡେଓ-ଆରବୀକ୍',
- 				'jv' => 'ଜାଭାନୀଜ୍',
- 				'ka' => 'ଜର୍ଜିୟ',
+ 				'jv' => 'ଜାଭାନିଜ୍‌',
+ 				'ka' => 'ଜର୍ଜିଆନ୍‌',
  				'kaa' => 'କାରା-କଲ୍ପକ୍',
  				'kab' => 'କବାଇଲ୍',
  				'kac' => 'କଚିନ୍',
@@ -275,7 +276,7 @@ has 'display_name_language' => (
  				'khq' => 'କୋୟରା ଚିନି',
  				'ki' => 'କୀକୁୟୁ',
  				'kj' => 'କ୍ୱାନ୍ୟାମ୍',
- 				'kk' => 'କାଜାକ୍',
+ 				'kk' => 'କାଜାଖ୍‌',
  				'kkj' => 'କାକୋ',
  				'kl' => 'କାଲାଲିସୁଟ୍',
  				'kln' => 'କାଲେନଜିନ୍',
@@ -300,6 +301,7 @@ has 'display_name_language' => (
  				'kv' => 'କୋମି',
  				'kw' => 'କୋର୍ନିସ୍',
  				'kwk' => 'କ୍ଵାକୱାଲା',
+ 				'kxv' => 'କୁୱି',
  				'ky' => 'କୀରଗୀଜ୍',
  				'la' => 'ଲାଟିନ୍',
  				'lad' => 'ଲାଦିନୋ',
@@ -310,8 +312,10 @@ has 'display_name_language' => (
  				'lez' => 'ଲେଜଗିୟାନ୍',
  				'lg' => 'ଗନ୍ଦା',
  				'li' => 'ଲିମ୍ବୁର୍ଗିସ୍',
+ 				'lij' => 'ଲିଗୁରିଆନ୍‌',
  				'lil' => 'ଲିଲ୍ଲୁଏଟ',
  				'lkt' => 'ଲାକୋଟା',
+ 				'lmo' => 'ଲୋମ୍ବାର୍ଡ୍‌',
  				'ln' => 'ଲିଙ୍ଗାଲା',
  				'lo' => 'ଲାଓ',
  				'lol' => 'ମଙ୍ଗୋ',
@@ -349,7 +353,7 @@ has 'display_name_language' => (
  				'min' => 'ମିନାଙ୍ଗାବାଉ',
  				'mk' => 'ମାସେଡୋନିଆନ୍',
  				'ml' => 'ମାଲାୟଲମ୍',
- 				'mn' => 'ମଙ୍ଗୋଳିୟ',
+ 				'mn' => 'ମଙ୍ଗୋଲୀୟ',
  				'mnc' => 'ମାଞ୍ଚୁ',
  				'mni' => 'ମଣିପୁରୀ',
  				'moe' => 'ଇନ୍ନୁ-ଏମୁନ',
@@ -359,7 +363,7 @@ has 'display_name_language' => (
  				'ms' => 'ମାଲୟ',
  				'mt' => 'ମାଲଟୀଜ୍',
  				'mua' => 'ମୁନଡାଂ',
- 				'mul' => 'ବିବିଧ ଭାଷାମାନ',
+ 				'mul' => 'ବିବିଧ ଭାଷା',
  				'mus' => 'କ୍ରୀକ୍',
  				'mwl' => 'ମିରାଣ୍ଡିଜ୍',
  				'mwr' => 'ମାରୱାରୀ',
@@ -380,7 +384,7 @@ has 'display_name_language' => (
  				'nl' => 'ଡଚ୍',
  				'nl_BE' => 'ଫ୍ଲେମିଶ୍',
  				'nmg' => 'କୱାସିଓ',
- 				'nn' => 'ନରୱେଜିଆନ୍ ନିୟୋର୍ସ୍କ',
+ 				'nn' => 'ନରୱେଜିଆନ୍ ନିନର୍ସ୍କ୍‌',
  				'nnh' => 'ନାଗିମବୋନ୍',
  				'no' => 'ନରୱେଜିଆନ୍',
  				'nog' => 'ନୋଗାଇ',
@@ -446,14 +450,14 @@ has 'display_name_language' => (
  				'rwk' => 'ଆରଡବ୍ୟୁଏ',
  				'sa' => 'ସଂସ୍କୃତ',
  				'sad' => 'ସଣ୍ଡାୱେ',
- 				'sah' => 'ସାଖା',
+ 				'sah' => 'ୟାକୂଟ୍‌',
  				'sam' => 'ସାମୌରିଟନ୍ ଆରମାଇକ୍',
  				'saq' => 'ସମବୁରୁ',
  				'sas' => 'ସାସାକ୍',
  				'sat' => 'ସାନ୍ତାଳି',
  				'sba' => 'ନଗାମବେ',
  				'sbp' => 'ସାନଗୁ',
- 				'sc' => 'ସର୍ଦିନିଆନ୍',
+ 				'sc' => 'ସାର୍ଡିନିଆନ୍‌',
  				'scn' => 'ସିଶିଲିଆନ୍',
  				'sco' => 'ସ୍କଟସ୍',
  				'sd' => 'ସିନ୍ଧୀ',
@@ -493,11 +497,12 @@ has 'display_name_language' => (
  				'sus' => 'ଶୁଶୁ',
  				'sux' => 'ସୁମେରିଆନ୍',
  				'sv' => 'ସ୍ୱେଡିସ୍',
- 				'sw' => 'ସ୍ୱାହିଲ୍',
+ 				'sw' => 'ସ୍ୱାହିଲି',
  				'sw_CD' => 'କଙ୍ଗୋ ସ୍ୱାହିଲି',
  				'swb' => 'କୋମୋରିୟ',
  				'syc' => 'କ୍ଲାସିକାଲ୍ ସିରିକ୍',
- 				'syr' => 'ସିରିକ୍',
+ 				'syr' => 'ସିରିଆକ୍‌',
+ 				'szl' => 'ସାଇଲେସିଆନ୍‌',
  				'ta' => 'ତାମିଲ୍',
  				'tce' => 'ସାଉଥ୍ ଟଚୋନ୍',
  				'te' => 'ତେଲୁଗୁ',
@@ -509,7 +514,7 @@ has 'display_name_language' => (
  				'tgx' => 'ତାଗିଶ',
  				'th' => 'ଥାଇ',
  				'tht' => 'ତହଲତାନ୍',
- 				'ti' => 'ଟ୍ରିଗିନିଆ',
+ 				'ti' => 'ଟାଇଗ୍ରିନିଆ',
  				'tig' => 'ଟାଇଗ୍ରେ',
  				'tiv' => 'ତୀଭ୍',
  				'tk' => 'ତୁର୍କମେନ୍',
@@ -539,14 +544,16 @@ has 'display_name_language' => (
  				'udm' => 'ଉଦମୂର୍ତ୍ତ',
  				'ug' => 'ୟୁଘୁର୍',
  				'uga' => 'ୟୁଗୋରଟିକ୍',
- 				'uk' => 'ୟୁକ୍ରାନିଆନ୍',
+ 				'uk' => 'ୟୁକ୍ରେନିଆନ୍',
  				'umb' => 'ଉମ୍ବୁଣ୍ଡୁ',
  				'und' => 'ଅଜଣା ଭାଷା',
  				'ur' => 'ଉର୍ଦ୍ଦୁ',
  				'uz' => 'ଉଜବେକ୍',
  				'vai' => 'ଭାଇ',
  				've' => 'ଭେଣ୍ଡା',
+ 				'vec' => 'ଭନିଶନ୍‌',
  				'vi' => 'ଭିଏତନାମିଜ୍',
+ 				'vmw' => 'ମାଖୁୱା',
  				'vo' => 'ବୋଲାପୁକ',
  				'vot' => 'ଭୋଟିକ୍',
  				'vun' => 'ଭୁନଜୋ',
@@ -559,6 +566,7 @@ has 'display_name_language' => (
  				'wuu' => 'ୱୁ ଚାଇନିଜ',
  				'xal' => 'କାଲ୍ମୀକ୍',
  				'xh' => 'ଖୋସା',
+ 				'xnr' => 'କାଙ୍ଗ୍ରି',
  				'xog' => 'ସୋଗା',
  				'yao' => 'ୟାଓ',
  				'yap' => 'ୟାପୀସ୍',
@@ -567,16 +575,16 @@ has 'display_name_language' => (
  				'yi' => 'ୟିଡିସ୍',
  				'yo' => 'ୟୋରୁବା',
  				'yrl' => 'ନିଙ୍ଗାଟୁ',
- 				'yue' => 'କାନଟୋନେସେ',
- 				'yue@alt=menu' => 'ଚାଇନିଜ୍‌, କାନଟୋନେସେ',
- 				'za' => 'ଜୁଆଙ୍ଗ',
+ 				'yue' => 'କାଣ୍ଟୋନିଜ୍‌',
+ 				'yue@alt=menu' => 'ଚାଇନିଜ୍‌, କାଣ୍ଟୋନିଜ୍‌',
+ 				'za' => 'ଜୁଆଙ୍ଗ୍‌',
  				'zap' => 'ଜାପୋଟେକ୍',
  				'zbl' => 'ବ୍ଲିସିମ୍ବଲସ୍',
  				'zen' => 'ଜେନାଗା',
  				'zgh' => 'ମାନାଙ୍କ ମରୋକିୟ ତାମାଜିଘାଟ୍',
  				'zh' => 'ଚାଇନିଜ୍‌',
  				'zh@alt=menu' => 'ଚାଇନିଜ୍, ମାଣ୍ଡାରିନ୍',
- 				'zh_Hans' => 'ସରଳୀକୃତ ଚାଇନିଜ୍‌',
+ 				'zh_Hans' => 'ସରଳୀକୃତ ଚାଇନିଜ',
  				'zh_Hans@alt=long' => 'ସରଳୀକୃତ ମାଣ୍ଡାରିନ୍ ଚାଇନିଜ୍',
  				'zh_Hant' => 'ପାରମ୍ପରିକ ଚାଇନିଜ୍‌',
  				'zh_Hant@alt=long' => 'ପାରମ୍ପରିକ ମାଣ୍ଡାରିନ୍ ଚାଇନିଜ୍',
@@ -603,7 +611,7 @@ has 'display_name_script' => (
 			my %scripts = (
 			'Adlm' => 'ଆଡଲମ୍',
  			'Arab' => 'ଆରବିକ୍',
- 			'Aran' => 'ଆରାନ',
+ 			'Aran' => 'ନାଷ୍ଟାଲିକ୍‌',
  			'Armi' => 'ଇମ୍ପେରିଆଲ୍ ଆରମିକ୍',
  			'Armn' => 'ଆର୍ମେନୀୟ',
  			'Avst' => 'ଆବେସ୍ଥାନ୍',
@@ -626,7 +634,7 @@ has 'display_name_script' => (
  			'Cprt' => 'ସିପ୍ରଅଟ୍',
  			'Cyrl' => 'ସିରିଲିକ୍',
  			'Cyrs' => 'ଓଲ୍ଡ ଚର୍ଚ୍ଚ ସାଲଭୋନିକ୍ ସିରିଲିକ୍',
- 			'Deva' => 'ଦେବନଗରୀ',
+ 			'Deva' => 'ଦେବନାଗରୀ',
  			'Dsrt' => 'ଡେସର୍ଟ',
  			'Egyd' => 'ଇଜିପ୍ଟିଆନ୍ ଡେମୋଟିକ୍',
  			'Egyh' => 'ଇଜିପ୍ଟିଆନ୍ ହାଇଅରଟିକ୍',
@@ -637,7 +645,7 @@ has 'display_name_script' => (
  			'Glag' => 'ଗ୍ଲାଗ୍ଲୋଟିକ୍',
  			'Goth' => 'ଗୋଥିକ୍',
  			'Grek' => 'ଗ୍ରୀକ୍',
- 			'Gujr' => 'ଗୁଜୁରାଟୀ',
+ 			'Gujr' => 'ଗୁଜରାଟୀ',
  			'Guru' => 'ଗୁରମୁଖୀ',
  			'Hanb' => 'ବୋପୋମୋଫୋ ସହିତ ହାନ୍‌',
  			'Hang' => 'ହାଙ୍ଗୁଲ୍',
@@ -679,14 +687,14 @@ has 'display_name_script' => (
  			'Mani' => 'ମନଶୀନ୍',
  			'Maya' => 'ମୟାନ୍ ହାୟରଲଜିକସ୍',
  			'Mero' => 'ମେରୋଇଟିକ୍',
- 			'Mlym' => 'ମାଲାୟଲମ୍',
+ 			'Mlym' => 'ମାଲାୟାଲମ୍',
  			'Mong' => 'ମଙ୍ଗୋଲିଆନ୍',
  			'Moon' => 'ଚନ୍ଦ୍ର',
  			'Mtei' => 'ମାଏତି ମାୟେକ୍',
  			'Mymr' => 'ମ୍ୟାନମାର୍',
  			'Nkoo' => 'ଏନ୍ କୋ',
  			'Ogam' => 'ଓଘାମା',
- 			'Olck' => 'ଓଲ୍ ଚିକି',
+ 			'Olck' => 'ଅଲ୍ ଚିକି',
  			'Orkh' => 'ଓରୋଖନ୍',
  			'Orya' => 'ଓଡ଼ିଆ',
  			'Osma' => 'ଓସୋମାନିୟା',
@@ -699,7 +707,7 @@ has 'display_name_script' => (
  			'Plrd' => 'ପୋଲାର୍ଡ ଫୋନେଟିକ୍',
  			'Prti' => 'ଇନସ୍କ୍ରୀପସାନଲ୍ ପାର୍ଥିଆନ୍',
  			'Rjng' => 'ରେଜାଙ୍ଗ',
- 			'Rohg' => 'ରୋହଗ',
+ 			'Rohg' => 'ହାନିଫି',
  			'Roro' => 'ରୋଙ୍ଗୋରୋଙ୍ଗୋ',
  			'Runr' => 'ରନିକ୍',
  			'Samr' => 'ସମୌରିଟନ୍',
@@ -708,7 +716,7 @@ has 'display_name_script' => (
  			'Sgnw' => 'ସାଙ୍କେତିକ ଲିଖ',
  			'Shaw' => 'ସାବିୟାନ୍',
  			'Sinh' => 'ସିଂହଳ',
- 			'Sund' => 'ସୁଦାନୀଜ୍',
+ 			'Sund' => 'ସୁଦାନିଜ୍',
  			'Sylo' => 'ସୀଲିତୋ ନଗରୀ',
  			'Syrc' => 'ସିରିୟାକ୍',
  			'Syre' => 'ଏଷ୍ଟ୍ରାଙ୍ଗେଲୋ ସିରିକ୍',
@@ -721,7 +729,7 @@ has 'display_name_script' => (
  			'Tavt' => 'ତାଇ ଭିଏତ୍',
  			'Telu' => 'ତେଲୁଗୁ',
  			'Teng' => 'ତେଙ୍ଗୱାର୍',
- 			'Tfng' => 'ତିଫିଙ୍ଘା',
+ 			'Tfng' => 'ଟିଫିନାଘ୍‌',
  			'Tglg' => 'ଟାଗାଲୋଗ୍',
  			'Thaa' => 'ଥାନା',
  			'Thai' => 'ଥାଇ',
@@ -815,7 +823,7 @@ has 'display_name_region' => (
  			'BL' => 'ସେଣ୍ଟ ବାର୍ଥେଲେମି',
  			'BM' => 'ବର୍ମୁଡା',
  			'BN' => 'ବ୍ରୁନେଇ',
- 			'BO' => 'ବୋଲଭିଆ',
+ 			'BO' => 'ବୋଲିଭିଆ',
  			'BQ' => 'କାରବିୟନ୍‌ ନେଦରଲ୍ୟାଣ୍ଡ',
  			'BR' => 'ବ୍ରାଜିଲ୍',
  			'BS' => 'ବାହାମାସ୍',
@@ -834,13 +842,13 @@ has 'display_name_region' => (
  			'CI' => 'କୋତ୍ ଡି ଭ୍ଵାର୍',
  			'CI@alt=variant' => 'ଆଇଭରୀ କୋଷ୍ଟ',
  			'CK' => 'କୁକ୍‌ ଦ୍ୱୀପପୁଞ୍ଜ',
- 			'CL' => 'ଚିଲ୍ଲୀ',
+ 			'CL' => 'ଚିଲି',
  			'CM' => 'କାମେରୁନ୍',
- 			'CN' => 'ଚିନ୍',
- 			'CO' => 'କୋଲମ୍ବିଆ',
+ 			'CN' => 'ଚୀନ୍‌',
+ 			'CO' => 'କଲମ୍ବିଆ',
  			'CP' => 'କ୍ଲିପରଟନ୍‌ ଦ୍ୱୀପ',
  			'CR' => 'କୋଷ୍ଟା ରିକା',
- 			'CU' => 'କ୍ୱିବା',
+ 			'CU' => 'କ‍୍ୟୁବା',
  			'CV' => 'କେପ୍ ଭର୍ଦେ',
  			'CW' => 'କୁରାକାଓ',
  			'CX' => 'ଖ୍ରୀଷ୍ଟମାସ ଦ୍ୱୀପ',
@@ -855,7 +863,7 @@ has 'display_name_region' => (
  			'DO' => 'ଡୋମିନିକାନ୍‌ ସାଧାରଣତନ୍ତ୍ର',
  			'DZ' => 'ଆଲଜେରିଆ',
  			'EA' => 'ସିଉଟା ଏବଂ ମେଲିଲା',
- 			'EC' => 'ଇକ୍ୱାଡୋର୍',
+ 			'EC' => 'ଇକ୍ୱେଡର୍‌',
  			'EE' => 'ଏସ୍ତୋନିଆ',
  			'EG' => 'ଇଜିପ୍ଟ',
  			'EH' => 'ପଶ୍ଚିମ ସାହାରା',
@@ -867,7 +875,7 @@ has 'display_name_region' => (
  			'FI' => 'ଫିନଲ୍ୟାଣ୍ଡ',
  			'FJ' => 'ଫିଜି',
  			'FK' => 'ଫକ୍‌ଲ୍ୟାଣ୍ଡ ଦ୍ଵୀପପୁଞ୍ଜ',
- 			'FK@alt=variant' => 'ଫକଲ୍ୟାଣ୍ଡ ଦ୍ୱୀପପୁଞ୍ଜ (ଇସଲାସ୍‌ ମାଲଭିନାସ୍‌)',
+ 			'FK@alt=variant' => 'ଫକ୍‌ଲ୍ୟାଣ୍ଡ ଦ୍ଵୀପପୁଞ୍ଜ (ଇସଲାସ୍‌ ମାଲଭିନାସ୍‌)',
  			'FM' => 'ମାଇକ୍ରୋନେସିଆ',
  			'FO' => 'ଫାରୋଇ ଦ୍ୱୀପପୁଞ୍ଜ',
  			'FR' => 'ଫ୍ରାନ୍ସ',
@@ -884,7 +892,7 @@ has 'display_name_region' => (
  			'GM' => 'ଗାମ୍ବିଆ',
  			'GN' => 'ଗୁଇନିଆ',
  			'GP' => 'ଗୁଆଡେଲୋପ୍',
- 			'GQ' => 'ଇକ୍ବାଟେରିଆଲ୍ ଗୁଇନିଆ',
+ 			'GQ' => 'ଇକ୍ବାଟୋରିଆଲ୍ ଗୁଇନିଆ',
  			'GR' => 'ଗ୍ରୀସ୍',
  			'GS' => 'ଦକ୍ଷିଣ ଜର୍ଜିଆ ଏବଂ ଦକ୍ଷିଣ ସାଣ୍ଡୱିଚ୍ ଦ୍ୱୀପପୁଞ୍ଜ',
  			'GT' => 'ଗୁଏତମାଲା',
@@ -904,7 +912,8 @@ has 'display_name_region' => (
  			'IL' => 'ଇସ୍ରାଏଲ୍',
  			'IM' => 'ଆଇଲ୍‌ ଅଫ୍‌ ମ୍ୟାନ୍‌',
  			'IN' => 'ଭାରତ',
- 			'IO' => 'ବ୍ରିଟିଶ୍‌ ଭାରତ ମାହାସାଗର କ୍ଷେତ୍ର',
+ 			'IO' => 'ବ୍ରିଟିଶ୍‌ ଭାରତୀୟ ମହାସାଗର କ୍ଷେତ୍ର',
+ 			'IO@alt=chagos' => 'ଚାଗୋସ୍ ଆର୍କିପେଲାଗୋ',
  			'IQ' => 'ଇରାକ୍',
  			'IR' => 'ଇରାନ',
  			'IS' => 'ଆଇସଲ୍ୟାଣ୍ଡ',
@@ -923,11 +932,11 @@ has 'display_name_region' => (
  			'KR' => 'ଦକ୍ଷିଣ କୋରିଆ',
  			'KW' => 'କୁଏତ୍',
  			'KY' => 'କେମ୍ୟାନ୍‌ ଦ୍ୱୀପପୁଞ୍ଜ',
- 			'KZ' => 'କାଜାକାସ୍ତାନ',
+ 			'KZ' => 'କାଜାଖସ୍ତାନ୍‌',
  			'LA' => 'ଲାଓସ୍',
  			'LB' => 'ଲେବାନନ୍',
  			'LC' => 'ସେଣ୍ଟ ଲୁସିଆ',
- 			'LI' => 'ଲିଚେଟନଷ୍ଟେଇନ୍',
+ 			'LI' => 'ଲିକ୍ଟନ୍‌ଷ୍ଟାଇନ୍‌',
  			'LK' => 'ଶ୍ରୀଲଙ୍କା',
  			'LR' => 'ଲାଇବେରିଆ',
  			'LS' => 'ଲେସୋଥୋ',
@@ -976,7 +985,7 @@ has 'display_name_region' => (
  			'PA' => 'ପାନାମା',
  			'PE' => 'ପେରୁ',
  			'PF' => 'ଫ୍ରେଞ୍ଚ ପଲିନେସିଆ',
- 			'PG' => 'ପପୁଆ ନ୍ୟୁ ଗୁଏନିଆ',
+ 			'PG' => 'ପପୁଆ ନ୍ୟୁ ଗିନି',
  			'PH' => 'ଫିଲିପାଇନସ୍',
  			'PK' => 'ପାକିସ୍ତାନ',
  			'PL' => 'ପୋଲାଣ୍ଡ',
@@ -999,7 +1008,7 @@ has 'display_name_region' => (
  			'SB' => 'ସୋଲୋମନ୍‌ ଦ୍ୱୀପପୁଞ୍ଜ',
  			'SC' => 'ସେଚେଲସ୍',
  			'SD' => 'ସୁଦାନ',
- 			'SE' => 'ସ୍ୱେଡେନ୍',
+ 			'SE' => 'ସ୍ୱିଡେନ୍‌',
  			'SG' => 'ସିଙ୍ଗାପୁର୍',
  			'SH' => 'ସେଣ୍ଟ ହେଲେନା',
  			'SI' => 'ସ୍ଲୋଭେନିଆ',
@@ -1044,10 +1053,10 @@ has 'display_name_region' => (
  			'UY' => 'ଉରୁଗୁଏ',
  			'UZ' => 'ଉଜବେକିସ୍ତାନ',
  			'VA' => 'ଭାଟିକାନ୍ ସିଟି',
- 			'VC' => 'ସେଣ୍ଟ ଭିନସେଣ୍ଟ ଏବଂ ଦି ଗ୍ରେନାଡିସ୍',
+ 			'VC' => 'ସେଣ୍ଟ ଭିନସେଣ୍ଟ ଏବଂ ଗ୍ରେନାଡାଇନ୍ସ',
  			'VE' => 'ଭେନେଜୁଏଲା',
  			'VG' => 'ବ୍ରିଟିଶ୍‌ ଭର୍ଜିନ୍ ଦ୍ୱୀପପୁଞ୍ଜ',
- 			'VI' => 'ଯୁକ୍ତରାଷ୍ଟ୍ର ଭିର୍ଜିନ୍ ଦ୍ଵୀପପୁଞ୍ଜ',
+ 			'VI' => 'ଯୁକ୍ତରାଷ୍ଟ୍ର ଭର୍ଜିନ୍ ଦ୍ଵୀପପୁଞ୍ଜ',
  			'VN' => 'ଭିଏତନାମ୍',
  			'VU' => 'ଭାନୁଆତୁ',
  			'WF' => 'ୱାଲିସ୍ ଏବଂ ଫୁତୁନା',
@@ -1096,9 +1105,9 @@ has 'display_name_key' => (
  			'collation' => 'ସର୍ଟ୍‌ କ୍ରମ',
  			'currency' => 'ମୁଦ୍ରା',
  			'hc' => 'ଘଣ୍ଟା ଚକ୍ର (12 ବନାମ 24)',
- 			'lb' => 'ଧାଡ଼ି ବିରତି ଶୈଳୀ',
+ 			'lb' => 'ଲାଇନ୍‌ ବ୍ରେକ୍‌ ଷ୍ଟାଇଲ୍‌',
  			'ms' => 'ମାପ ପଦ୍ଧତି',
- 			'numbers' => 'ସଂଖ୍ୟାଗୁଡ଼ିକ',
+ 			'numbers' => 'ସଂଖ୍ୟା',
 
 		}
 	},
@@ -1111,15 +1120,15 @@ has 'display_name_type' => (
 	default		=> sub {
 		{
 			'calendar' => {
- 				'buddhist' => q{ବୌଦ୍ଧଧର୍ମାଲମ୍ବୀଙ୍କ କ୍ୟାଲେଣ୍ଡର୍‌},
+ 				'buddhist' => q{ବୌଦ୍ଧ କ୍ୟାଲେଣ୍ଡର୍‌},
  				'chinese' => q{ଚାଇନିଜ୍‌ କ୍ୟାଲେଣ୍ଡର୍‌},
- 				'coptic' => q{କପ୍ଟିକ୍},
+ 				'coptic' => q{କପ୍ଟିକ୍ କ୍ୟାଲେଣ୍ଡର୍‌},
  				'dangi' => q{ଦାଙ୍ଗି କ୍ୟାଲେଣ୍ଡର୍‌},
  				'ethiopic' => q{ଇଥିଓପିକ୍‌ କ୍ୟାଲେଣ୍ଡର୍‌},
  				'ethiopic-amete-alem' => q{ଏଥିଓପିକ୍-ଆମେଟ୍-ଆଲେମ୍},
  				'gregorian' => q{ଗ୍ରେଗୋରିୟ କ୍ୟାଲେଣ୍ଡର୍},
  				'hebrew' => q{ହିବୃ କ୍ୟାଲେଣ୍ଡର୍‌},
- 				'indian' => q{ଇଣ୍ତିଆନ୍},
+ 				'indian' => q{ଭାରତୀୟ ରାଷ୍ଟ୍ରୀୟ କ୍ୟାଲେଣ୍ଡର୍‌},
  				'islamic' => q{ହିଜ୍ରି କ୍ୟାଲେଣ୍ଡର},
  				'islamic-civil' => q{ହିଜ୍ରି କ୍ୟାଲେଣ୍ଡର (ଟାବୁଲାର୍, ନାଗରିକ ଯୁଗ)},
  				'islamic-umalqura' => q{ହିଜ୍ରି କ୍ୟାଲେଣ୍ଡର (ଉମ୍ ଅଲ୍-କୁରା)},
@@ -1135,7 +1144,7 @@ has 'display_name_type' => (
  			'collation' => {
  				'ducet' => q{ଡିଫଲ୍ଟ ୟୁନିକୋଡ୍‌ ସର୍ଟ୍‌ କ୍ରମ},
  				'search' => q{ସାଧାରଣ ଉଦ୍ଦେଶ୍ୟ-ବିଶିଷ୍ଟ ସନ୍ଧାନ},
- 				'standard' => q{ମାନାଙ୍କ ସର୍ଟ୍‌ କ୍ରମ},
+ 				'standard' => q{ଷ୍ଟାଣ୍ଡାର୍ଡ୍‌ ସର୍ଟ୍‌ କ୍ରମ},
  			},
  			'hc' => {
  				'h11' => q{12 ଘଣ୍ଟିଆ ପଦ୍ଧତି (0–11)},
@@ -1144,13 +1153,13 @@ has 'display_name_type' => (
  				'h24' => q{24 ଘଣ୍ଟିଆ ପଦ୍ଧତି (1–24)},
  			},
  			'lb' => {
- 				'loose' => q{ଢିଲା ଧାଡ଼ି ବିରତି ଶୈଳୀ},
- 				'normal' => q{ସାଧାରଣ ଧାଡ଼ି ବିରତି ଶୈଳୀ},
+ 				'loose' => q{କୋହଳ ଲାଇନ୍‌ ବ୍ରେକ୍‌ ଷ୍ଟାଇଲ୍‌},
+ 				'normal' => q{ସାଧାରଣ ଲାଇନ୍‌ ବ୍ରେକ୍‌ ଷ୍ଟାଇଲ୍‌},
  				'strict' => q{କଠୋର ଧାଡ଼ି ବିରତି ଶୈଳୀ},
  			},
  			'ms' => {
  				'metric' => q{ମେଟ୍ରିକ୍‌ ପଦ୍ଧତି},
- 				'uksystem' => q{ସାମ୍ରାଜ୍ୟ ସମ୍ବନ୍ଧୀୟ ମାପ ପଦ୍ଧତି},
+ 				'uksystem' => q{ଇମ୍ପେରିଆଲ୍‌ ମାପ ପଦ୍ଧତି},
  				'ussystem' => q{ୟୁଏସ୍‌ ମାପ ପଦ୍ଧତି},
  			},
  			'numbers' => {
@@ -1168,7 +1177,7 @@ has 'display_name_type' => (
  				'greklow' => q{ଗ୍ରୀକ୍‌ ଛୋଟ ଅକ୍ଷର ସଂଖ୍ୟାଗୁଡ଼ିକ},
  				'gujr' => q{ଗୁଜରାଟୀ ଅଙ୍କଗୁଡ଼ିକ},
  				'guru' => q{ଗୁରମୁଖୀ ଅଙ୍କଗୁଡ଼ିକ},
- 				'hanidec' => q{ଚିନି ଦଶମିକ ସଂଖ୍ୟାଗୁଡ଼ିକ},
+ 				'hanidec' => q{ଚାଇନିଜ୍‌ ଦଶମିକ ସଂଖ୍ୟା},
  				'hans' => q{ସରଳୀକୃତ ଚିନି ସଂଖ୍ୟାଗୁଡ଼ିକ},
  				'hansfin' => q{ସରଳୀକୃତ ଚିନି ଆର୍ଥିକ ସଂଖ୍ୟାଗୁଡ଼ିକ},
  				'hant' => q{ପାରମ୍ପରିକ ଚିନି ସଂଖ୍ୟାଗୁଡ଼ିକ},
@@ -1240,7 +1249,7 @@ has 'characters' => (
 		return {
 			auxiliary => qr{[‌‍]},
 			index => ['ଅ', 'ଆ', 'ଇ', 'ଈ', 'ଉ', 'ଊ', 'ଋ', 'ଏ', 'ଐ', 'ଓ', 'ଔ', 'କ', 'ଖ', 'ଗ', 'ଘ', 'ଙ', 'ଚ', 'ଛ', 'ଜ', 'ଝ', 'ଞ', 'ଟ', 'ଠ', 'ଡ', 'ଢ', 'ଣ', 'ତ', 'ଥ', 'ଦ', 'ଧ', 'ନ', 'ପ', 'ଫ', 'ବ', 'ଭ', 'ମ', 'ଯ', 'ର', 'ଲ', 'ଳ', 'ଶ', 'ଷ', 'ସ', 'ହ', '{କ୍ଷ}'],
-			main => qr{[଼ ଅ ଆ ଇ ଈ ଉ ଊ ଋ ଏ ଐ ଓ ଔ ଁ ଂ ଃ କ ଖ ଗ ଘ ଙ ଚ ଛ ଜ ଝ ଞ ଟ ଠ ଡ{ଡ଼} ଢ{ଢ଼} ଣ ତ ଥ ଦ ଧ ନ ପ ଫ ବ ଭ ମ ଯୟ ର ଲ ଳ ଵ ୱ ଶ ଷ ସ ହ ା ି ୀ ୁ ୂ ୃ େ ୈ ୋ ୌ ୍]},
+			main => qr{[଼ ଅ ଆ ଇ ଈ ଉ ଊ ଋ ଏ ଐ ଓ ଔ ଁ ଂ ଃ କ ଖ ଗ ଘ ଙ ଚ ଛ ଜ ଝ ଞ ଟ ଠ ଡ{ଡ଼} ଢ{ଢ଼} ଣ ତ ଥ ଦ ଧ ନ ପ ଫ ବ ଭ ମ ଯୟ ର ଲ ଳ ଵ ୱ ଶ ଷ ସ ହ {କ୍ଷ} ା ି ୀ ୁ ୂ ୃ େ ୈ ୋ ୌ ୍]},
 			numbers => qr{[\- ‑ , . % ‰ + 0୦ 1୧ 2୨ 3୩ 4୪ 5୫ 6୬ 7୭ 8୮ 9୯]},
 			punctuation => qr{[\- ‐‑ – — , ; \: ! ? . … '‘’ "“” ( ) \[ \] § @ * / \& # † ‡ ′ ″]},
 		};
@@ -1751,6 +1760,18 @@ has 'units' => (
 						'other' => q({0} ପରମାଇରିଆଡ),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(ବିଲିୟନ ପ୍ରତି ଅଂଶଗୁଡିକ),
+						'one' => q({0} ପାର୍ଟ୍ସ ପ୍ରତି ବିଲିୟନ୍),
+						'other' => q({0} ପାର୍ଟ୍ସ ପ୍ରତି ବିଲିୟନ୍),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(ବିଲିୟନ ପ୍ରତି ଅଂଶଗୁଡିକ),
+						'one' => q({0} ପାର୍ଟ୍ସ ପ୍ରତି ବିଲିୟନ୍),
+						'other' => q({0} ପାର୍ଟ୍ସ ପ୍ରତି ବିଲିୟନ୍),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(100 କିଲୋମିଟର୍ ପ୍ରତି ଲିଟର୍),
 						'one' => q(100 କିଲୋମିଟର୍ ପ୍ରତି {0} ଲିଟର୍),
@@ -1886,11 +1907,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'digital-petabyte' => {
-						'name' => q(PB),
+						'name' => q(ପେଟାବାଇଟ୍‌),
 					},
 					# Core Unit Identifier
 					'petabyte' => {
-						'name' => q(PB),
+						'name' => q(ପେଟାବାଇଟ୍‌),
 					},
 					# Long Unit Identifier
 					'digital-terabit' => {
@@ -2009,6 +2030,20 @@ has 'units' => (
 						'other' => q({0} ନାନୋସେକେଣ୍ଡ),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(ରାତି),
+						'one' => q({0} ରାତି),
+						'other' => q({0} ରାତି),
+						'per' => q({0} ପ୍ରତି ରାତି),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(ରାତି),
+						'one' => q({0} ରାତି),
+						'other' => q({0} ରାତି),
+						'per' => q({0} ପ୍ରତି ରାତି),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'one' => q({0} କ୍ୱାର୍ଟର୍),
 						'other' => q({0} କ୍ୱାର୍ଟର୍ସ),
@@ -2036,11 +2071,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'duration-year' => {
-						'per' => q(ବର୍ଷକୁ {0}),
+						'per' => q({0} ପ୍ରତି ବର୍ଷ),
 					},
 					# Core Unit Identifier
 					'year' => {
-						'per' => q(ବର୍ଷକୁ {0}),
+						'per' => q({0} ପ୍ରତି ବର୍ଷ),
 					},
 					# Long Unit Identifier
 					'electric-ampere' => {
@@ -2584,13 +2619,15 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-solar-radius' => {
+						'name' => q(ସୋଲାର ବ୍ୟାସାର୍ଦ୍ଧ),
 						'one' => q({0} ସୋଲାର ବ୍ୟାସାର୍ଦ୍ଧ),
-						'other' => q({0} ସୋଲାର ରାଡି),
+						'other' => q({0} ସୋଲାର ବ୍ୟାସାର୍ଦ୍ଧ),
 					},
 					# Core Unit Identifier
 					'solar-radius' => {
+						'name' => q(ସୋଲାର ବ୍ୟାସାର୍ଦ୍ଧ),
 						'one' => q({0} ସୋଲାର ବ୍ୟାସାର୍ଦ୍ଧ),
-						'other' => q({0} ସୋଲାର ରାଡି),
+						'other' => q({0} ସୋଲାର ବ୍ୟାସାର୍ଦ୍ଧ),
 					},
 					# Long Unit Identifier
 					'light-candela' => {
@@ -2979,6 +3016,18 @@ has 'units' => (
 						'other' => q({0} କିଲୋମିଟର୍ ପ୍ରତି ଘଣ୍ଟା),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(ଆଲୋକ),
+						'one' => q({0} ଆଲୋକ),
+						'other' => q({0} ଆଲୋକ),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(ଆଲୋକ),
+						'one' => q({0} ଆଲୋକ),
+						'other' => q({0} ଆଲୋକ),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'name' => q(ମିଟର୍ ପ୍ରତି ସେକେଣ୍ଡ୍),
 						'one' => q({0} ମିଟର୍ ପ୍ରତି ସେକେଣ୍ଡ୍),
@@ -3053,13 +3102,13 @@ has 'units' => (
 					# Long Unit Identifier
 					'torque-pound-force-foot' => {
 						'name' => q(ପାଉଣ୍ଡ-ଫିଟ),
-						'one' => q({0} ପାଉଣ୍ଡ-ଫୁଟ),
+						'one' => q({0} ପାଉଣ୍ଡ୍-ଫୋର୍ସ୍‌-ଫୁଟ୍‌),
 						'other' => q({0} ପାଉଣ୍ଡ-ଫିଟ),
 					},
 					# Core Unit Identifier
 					'pound-force-foot' => {
 						'name' => q(ପାଉଣ୍ଡ-ଫିଟ),
-						'one' => q({0} ପାଉଣ୍ଡ-ଫୁଟ),
+						'one' => q({0} ପାଉଣ୍ଡ୍-ଫୋର୍ସ୍‌-ଫୁଟ୍‌),
 						'other' => q({0} ପାଉଣ୍ଡ-ଫିଟ),
 					},
 					# Long Unit Identifier
@@ -3719,6 +3768,16 @@ has 'units' => (
 						'name' => q(‱),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'one' => q({0}ppb),
+						'other' => q({0}ppb),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'one' => q({0}ppb),
+						'other' => q({0}ppb),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(ଲି/100କିମି),
 						'one' => q({0}ଲି/100 କିମି),
@@ -3833,6 +3892,20 @@ has 'units' => (
 					'month' => {
 						'one' => q({0}ମାସ),
 						'other' => q({0}ମାସ),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(ରାତି),
+						'one' => q({0} ରାତି),
+						'other' => q({0} ରାତି),
+						'per' => q({0}/ରାତି),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(ରାତି),
+						'one' => q({0} ରାତି),
+						'other' => q({0} ରାତି),
+						'per' => q({0}/ରାତି),
 					},
 					# Long Unit Identifier
 					'duration-second' => {
@@ -3959,14 +4032,14 @@ has 'units' => (
 					# Long Unit Identifier
 					'length-astronomical-unit' => {
 						'name' => q(ଖଗୋ. ଇକା.),
-						'one' => q({0} ଖଗୋ. ଇକା.),
-						'other' => q({0} ଖଗୋ. ଇକା.),
+						'one' => q({0}au),
+						'other' => q({0}au),
 					},
 					# Core Unit Identifier
 					'astronomical-unit' => {
 						'name' => q(ଖଗୋ. ଇକା.),
-						'one' => q({0} ଖଗୋ. ଇକା.),
-						'other' => q({0} ଖଗୋ. ଇକା.),
+						'one' => q({0}au),
+						'other' => q({0}au),
 					},
 					# Long Unit Identifier
 					'length-centimeter' => {
@@ -4005,10 +4078,14 @@ has 'units' => (
 					# Long Unit Identifier
 					'length-fathom' => {
 						'name' => q(ଫେଦମ୍),
+						'one' => q({0}fth),
+						'other' => q({0} fth),
 					},
 					# Core Unit Identifier
 					'fathom' => {
 						'name' => q(ଫେଦମ୍),
+						'one' => q({0}fth),
+						'other' => q({0} fth),
 					},
 					# Long Unit Identifier
 					'length-furlong' => {
@@ -4109,6 +4186,14 @@ has 'units' => (
 						'name' => q(pm),
 						'one' => q({0}ପି.ମି.),
 						'other' => q({0}ପି.ମି.),
+					},
+					# Long Unit Identifier
+					'length-solar-radius' => {
+						'name' => q(R☉),
+					},
+					# Core Unit Identifier
+					'solar-radius' => {
+						'name' => q(R☉),
 					},
 					# Long Unit Identifier
 					'length-yard' => {
@@ -4313,6 +4398,18 @@ has 'units' => (
 						'name' => q(ଗଣ୍ଠି),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(ଆଲୋକ),
+						'one' => q({0} ଆଲୋକ),
+						'other' => q({0} ଆଲୋକ),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(ଆଲୋକ),
+						'one' => q({0} ଆଲୋକ),
+						'other' => q({0} ଆଲୋକ),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'name' => q(ମିଟର/ସେ),
 					},
@@ -4386,17 +4483,25 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'volume-cubic-centimeter' => {
-						'name' => q(ଘନସେମି),
 						'one' => q({0}/ଘନସେମି),
 						'other' => q({0}/ଘନସେମି),
-						'per' => q({0}/ଘନସେମି),
 					},
 					# Core Unit Identifier
 					'cubic-centimeter' => {
-						'name' => q(ଘନସେମି),
 						'one' => q({0}/ଘନସେମି),
 						'other' => q({0}/ଘନସେମି),
-						'per' => q({0}/ଘନସେମି),
+					},
+					# Long Unit Identifier
+					'volume-cubic-foot' => {
+						'name' => q(ft³),
+						'one' => q({0}ft³),
+						'other' => q({0}ft³),
+					},
+					# Core Unit Identifier
+					'cubic-foot' => {
+						'name' => q(ft³),
+						'one' => q({0}ft³),
+						'other' => q({0}ft³),
 					},
 					# Long Unit Identifier
 					'volume-cubic-inch' => {
@@ -4412,29 +4517,23 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'volume-cubic-kilometer' => {
-						'name' => q(ଘନକି.ମି.),
 						'one' => q({0}ଘନକି.ମି.),
 						'other' => q({0}ଘନକି.ମି.),
 					},
 					# Core Unit Identifier
 					'cubic-kilometer' => {
-						'name' => q(ଘନକି.ମି.),
 						'one' => q({0}ଘନକି.ମି.),
 						'other' => q({0}ଘନକି.ମି.),
 					},
 					# Long Unit Identifier
 					'volume-cubic-meter' => {
-						'name' => q(ଘନମି),
 						'one' => q({0}/ ଘନମି),
 						'other' => q({0}/ ଘନମି),
-						'per' => q({0}/ ଘନମି),
 					},
 					# Core Unit Identifier
 					'cubic-meter' => {
-						'name' => q(ଘନମି),
 						'one' => q({0}/ ଘନମି),
 						'other' => q({0}/ ଘନମି),
-						'per' => q({0}/ ଘନମି),
 					},
 					# Long Unit Identifier
 					'volume-cubic-mile' => {
@@ -4449,6 +4548,18 @@ has 'units' => (
 						'other' => q({0}ଘନମାଇଲ୍),
 					},
 					# Long Unit Identifier
+					'volume-cubic-yard' => {
+						'name' => q(yd³),
+						'one' => q({0}yd³),
+						'other' => q({0}yd³),
+					},
+					# Core Unit Identifier
+					'cubic-yard' => {
+						'name' => q(yd³),
+						'one' => q({0}yd³),
+						'other' => q({0}yd³),
+					},
+					# Long Unit Identifier
 					'volume-cup' => {
 						'one' => q({0} କପ),
 						'other' => q({0} କପ),
@@ -4457,6 +4568,18 @@ has 'units' => (
 					'cup' => {
 						'one' => q({0} କପ),
 						'other' => q({0} କପ),
+					},
+					# Long Unit Identifier
+					'volume-cup-metric' => {
+						'name' => q(mcup),
+						'one' => q({0}mc),
+						'other' => q({0}mc),
+					},
+					# Core Unit Identifier
+					'cup-metric' => {
+						'name' => q(mcup),
+						'one' => q({0}mc),
+						'other' => q({0}mc),
 					},
 					# Long Unit Identifier
 					'volume-deciliter' => {
@@ -4471,12 +4594,60 @@ has 'units' => (
 						'other' => q({0} ଡେ. ଲି.),
 					},
 					# Long Unit Identifier
+					'volume-dessert-spoon' => {
+						'name' => q(dsp),
+						'one' => q({0}dsp),
+						'other' => q({0}dsp),
+					},
+					# Core Unit Identifier
+					'dessert-spoon' => {
+						'name' => q(dsp),
+						'one' => q({0}dsp),
+						'other' => q({0}dsp),
+					},
+					# Long Unit Identifier
+					'volume-dessert-spoon-imperial' => {
+						'name' => q(dsp Imp),
+						'one' => q({0}dsp-Imp),
+						'other' => q({0}dsp-Imp),
+					},
+					# Core Unit Identifier
+					'dessert-spoon-imperial' => {
+						'name' => q(dsp Imp),
+						'one' => q({0}dsp-Imp),
+						'other' => q({0}dsp-Imp),
+					},
+					# Long Unit Identifier
+					'volume-dram' => {
+						'name' => q(fl.dr.),
+						'one' => q({0}fl.dr.),
+						'other' => q({0}fl.dr.),
+					},
+					# Core Unit Identifier
+					'dram' => {
+						'name' => q(fl.dr.),
+						'one' => q({0}fl.dr.),
+						'other' => q({0}fl.dr.),
+					},
+					# Long Unit Identifier
 					'volume-drop' => {
 						'name' => q(dr),
+						'one' => q({0}dr),
+						'other' => q({0}dr),
 					},
 					# Core Unit Identifier
 					'drop' => {
 						'name' => q(dr),
+						'one' => q({0}dr),
+						'other' => q({0}dr),
+					},
+					# Long Unit Identifier
+					'volume-fluid-ounce' => {
+						'name' => q(fl oz),
+					},
+					# Core Unit Identifier
+					'fluid-ounce' => {
+						'name' => q(fl oz),
 					},
 					# Long Unit Identifier
 					'volume-gallon' => {
@@ -4507,6 +4678,16 @@ has 'units' => (
 						'per' => q({0}/ ଇମ୍ପିଗେଲନ୍),
 					},
 					# Long Unit Identifier
+					'volume-hectoliter' => {
+						'one' => q({0}hL),
+						'other' => q({0} ହେଲି),
+					},
+					# Core Unit Identifier
+					'hectoliter' => {
+						'one' => q({0}hL),
+						'other' => q({0} ହେଲି),
+					},
+					# Long Unit Identifier
 					'volume-liter' => {
 						'one' => q({0}ଲି),
 						'other' => q({0}ଲି),
@@ -4515,6 +4696,18 @@ has 'units' => (
 					'liter' => {
 						'one' => q({0}ଲି),
 						'other' => q({0}ଲି),
+					},
+					# Long Unit Identifier
+					'volume-megaliter' => {
+						'name' => q(ML),
+						'one' => q({0}ML),
+						'other' => q({0}ML),
+					},
+					# Core Unit Identifier
+					'megaliter' => {
+						'name' => q(ML),
+						'one' => q({0}ML),
+						'other' => q({0}ML),
 					},
 					# Long Unit Identifier
 					'volume-milliliter' => {
@@ -4539,6 +4732,30 @@ has 'units' => (
 						'name' => q(ଚିମୁଟ),
 						'one' => q({0} ଚିମୁଟ),
 						'other' => q({0} ଚିମୁଟ),
+					},
+					# Long Unit Identifier
+					'volume-pint-metric' => {
+						'name' => q(pt),
+						'one' => q({0}mpt),
+						'other' => q({0}mpt),
+					},
+					# Core Unit Identifier
+					'pint-metric' => {
+						'name' => q(pt),
+						'one' => q({0}mpt),
+						'other' => q({0}mpt),
+					},
+					# Long Unit Identifier
+					'volume-teaspoon' => {
+						'name' => q(tsp),
+						'one' => q({0}tsp),
+						'other' => q({0}tsp),
+					},
+					# Core Unit Identifier
+					'teaspoon' => {
+						'name' => q(tsp),
+						'one' => q({0}tsp),
+						'other' => q({0}tsp),
 					},
 				},
 				'short' => {
@@ -5007,6 +5224,14 @@ has 'units' => (
 						'name' => q(ପରମାଇରିଆଡ),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(ପାର୍ଟ୍ସ/ବିଲିୟନ୍),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(ପାର୍ଟ୍ସ/ବିଲିୟନ୍),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(ଲି/100 କିମି),
 						'one' => q({0} ଲି/100 କିମି),
@@ -5181,12 +5406,12 @@ has 'units' => (
 					# Long Unit Identifier
 					'duration-decade' => {
 						'one' => q({0} ଦଶନ୍ଧି),
-						'other' => q({0} dec),
+						'other' => q({0} ଦଶନ୍ଧି),
 					},
 					# Core Unit Identifier
 					'decade' => {
 						'one' => q({0} ଦଶନ୍ଧି),
-						'other' => q({0} dec),
+						'other' => q({0} ଦଶନ୍ଧି),
 					},
 					# Long Unit Identifier
 					'duration-hour' => {
@@ -5245,6 +5470,20 @@ has 'units' => (
 						'one' => q({0} ମାସ),
 						'other' => q({0} ମାସ),
 						'per' => q({0}/ମାସ),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(ରାତି),
+						'one' => q({0} ରାତି),
+						'other' => q({0} ରାତି),
+						'per' => q({0}/ରାତି),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(ରାତି),
+						'one' => q({0} ରାତି),
+						'other' => q({0} ରାତି),
+						'per' => q({0}/ରାତି),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -5493,14 +5732,14 @@ has 'units' => (
 					# Long Unit Identifier
 					'length-astronomical-unit' => {
 						'name' => q(ଆୟୁ),
-						'one' => q({0} ଆୟୁ),
-						'other' => q({0} ଆୟୁ),
+						'one' => q({0} au),
+						'other' => q({0} au),
 					},
 					# Core Unit Identifier
 					'astronomical-unit' => {
 						'name' => q(ଆୟୁ),
-						'one' => q({0} ଆୟୁ),
-						'other' => q({0} ଆୟୁ),
+						'one' => q({0} au),
+						'other' => q({0} au),
 					},
 					# Long Unit Identifier
 					'length-centimeter' => {
@@ -5681,14 +5920,14 @@ has 'units' => (
 					# Long Unit Identifier
 					'length-nautical-mile' => {
 						'name' => q(ନୌମି),
-						'one' => q({0} ନୌମି),
-						'other' => q({0} ନୌମି),
+						'one' => q({0} nmi),
+						'other' => q({0} nmi),
 					},
 					# Core Unit Identifier
 					'nautical-mile' => {
 						'name' => q(ନୌମି),
-						'one' => q({0} ନୌମି),
-						'other' => q({0} ନୌମି),
+						'one' => q({0} nmi),
+						'other' => q({0} nmi),
 					},
 					# Long Unit Identifier
 					'length-parsec' => {
@@ -5728,11 +5967,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-solar-radius' => {
-						'name' => q(ସୋଲାର ରାଡି),
+						'name' => q(ସୋଲାର ବ୍ୟାସାର୍ଦ୍ଧ),
 					},
 					# Core Unit Identifier
 					'solar-radius' => {
-						'name' => q(ସୋଲାର ରାଡି),
+						'name' => q(ସୋଲାର ବ୍ୟାସାର୍ଦ୍ଧ),
 					},
 					# Long Unit Identifier
 					'length-yard' => {
@@ -6065,6 +6304,18 @@ has 'units' => (
 						'other' => q({0} ନଟ୍),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(ଆଲୋକ),
+						'one' => q({0} ଆଲୋକ),
+						'other' => q({0} ଆଲୋକ),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(ଆଲୋକ),
+						'one' => q({0} ଆଲୋକ),
+						'other' => q({0} ଆଲୋକ),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'name' => q(ମିଟର୍/ସେ),
 						'one' => q({0} ମି/ସେ),
@@ -6231,14 +6482,14 @@ has 'units' => (
 					# Long Unit Identifier
 					'volume-cubic-yard' => {
 						'name' => q(ୟାର୍ଡ୍³),
-						'one' => q({0} ୟାର୍ଡ୍³),
-						'other' => q({0} ୟାର୍ଡ୍³),
+						'one' => q({0} yd³),
+						'other' => q({0} yd³),
 					},
 					# Core Unit Identifier
 					'cubic-yard' => {
 						'name' => q(ୟାର୍ଡ୍³),
-						'one' => q({0} ୟାର୍ଡ୍³),
-						'other' => q({0} ୟାର୍ଡ୍³),
+						'one' => q({0} yd³),
+						'other' => q({0} yd³),
 					},
 					# Long Unit Identifier
 					'volume-cup' => {
@@ -6254,13 +6505,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'volume-cup-metric' => {
-						'name' => q(ମେକ),
 						'one' => q({0} ମେକ),
 						'other' => q({0} ମେକ),
 					},
 					# Core Unit Identifier
 					'cup-metric' => {
-						'name' => q(ମେକ),
 						'one' => q({0} ମେକ),
 						'other' => q({0} ମେକ),
 					},
@@ -6275,6 +6524,16 @@ has 'units' => (
 						'name' => q(ଡେଲି),
 						'one' => q({0} ଡେଲି),
 						'other' => q({0} ଡେଲି),
+					},
+					# Long Unit Identifier
+					'volume-dessert-spoon-imperial' => {
+						'one' => q({0} dsp-Imp.),
+						'other' => q({0} dsp-Imp.),
+					},
+					# Core Unit Identifier
+					'dessert-spoon-imperial' => {
+						'one' => q({0} dsp-Imp.),
+						'other' => q({0} dsp-Imp.),
 					},
 					# Long Unit Identifier
 					'volume-fluid-ounce' => {
@@ -6389,14 +6648,14 @@ has 'units' => (
 					# Long Unit Identifier
 					'volume-pint-metric' => {
 						'name' => q(ମେପା),
-						'one' => q({0} ମେପା),
-						'other' => q({0} ମେପା),
+						'one' => q({0} mpt),
+						'other' => q({0} mpt),
 					},
 					# Core Unit Identifier
 					'pint-metric' => {
 						'name' => q(ମେପା),
-						'one' => q({0} ମେପା),
-						'other' => q({0} ମେପା),
+						'one' => q({0} mpt),
+						'other' => q({0} mpt),
 					},
 					# Long Unit Identifier
 					'volume-quart' => {
@@ -6425,14 +6684,14 @@ has 'units' => (
 					# Long Unit Identifier
 					'volume-teaspoon' => {
 						'name' => q(ଛୋଟ ଚାମଚ),
-						'one' => q({0} ଛୋଟ ଚାମଚ),
-						'other' => q({0} ଛୋଟ ଚାମଚ),
+						'one' => q({0} tsp),
+						'other' => q({0} tsp),
 					},
 					# Core Unit Identifier
 					'teaspoon' => {
 						'name' => q(ଛୋଟ ଚାମଚ),
-						'one' => q({0} ଛୋଟ ଚାମଚ),
-						'other' => q({0} ଛୋଟ ଚାମଚ),
+						'one' => q({0} tsp),
+						'other' => q({0} tsp),
 					},
 				},
 			} }
@@ -7452,6 +7711,8 @@ has 'currencies' => (
 		'XOF' => {
 			display_name => {
 				'currency' => q(ପଶ୍ଚିମ ଆଫ୍ରିକିୟ CFA ଫ୍ରାଙ୍କ୍),
+				'one' => q(ପଶ୍ଚିମ ଆଫ୍ରିକୀୟ CFA ଫ୍ରାଙ୍କ୍),
+				'other' => q(ପଶ୍ଚିମ ଆଫ୍ରିକିୟ CFA ଫ୍ରାଙ୍କ୍),
 			},
 		},
 		'XPF' => {
@@ -7536,17 +7797,76 @@ has 'calendar_months' => (
 			},
 			'indian' => {
 				'format' => {
-					wide => {
+					abbreviated => {
 						nonleap => [
 							'ଚୈତ୍ର',
 							'ବୈଶାଖ',
-							'ଜ୍ୟୋଷ୍ଠ',
+							'ଜ୍ୟେଷ୍ଠ',
 							'ଆଷାଢ଼',
 							'ଶ୍ରାବଣ',
 							'ଭାଦ୍ରବ',
 							'ଆଶ୍ଵିନ',
 							'କାର୍ତ୍ତିକ',
-							'ଆଗ୍ରାହୟଣ',
+							'ମାର୍ଗଶିର',
+							'ପୌଷ',
+							'ମାଘ',
+							'ଫାଲଗୁନ'
+						],
+						leap => [
+							
+						],
+					},
+					wide => {
+						nonleap => [
+							'ଚୈତ୍ର',
+							'ବୈଶାଖ',
+							'ଜ୍ୟେଷ୍ଠ',
+							'ଆଷାଢ଼',
+							'ଶ୍ରାବଣ',
+							'ଭାଦ୍ରବ',
+							'ଆଶ୍ଵିନ',
+							'କାର୍ତ୍ତିକ',
+							'ମାର୍ଗଶିର',
+							'ପୌଷ',
+							'ମାଘ',
+							'ଫାଲଗୁନ'
+						],
+						leap => [
+							
+						],
+					},
+				},
+				'stand-alone' => {
+					abbreviated => {
+						nonleap => [
+							'ଚୈତ୍ର',
+							'ବୈଶାଖ',
+							'ଜ୍ୟେଷ୍ଠ',
+							'ଆଷାଢ଼',
+							'ଶ୍ରାବଣ',
+							'ଭାଦ୍ରବ',
+							'ଆଶ୍ଵିନ',
+							'କାର୍ତ୍ତିକ',
+							'ମାର୍ଗଶିର',
+							'ପୌଷ',
+							'ମାଘ',
+							'ଫାଲଗୁନ'
+						],
+						leap => [
+							
+						],
+					},
+					wide => {
+						nonleap => [
+							'ଚୈତ୍ର',
+							'ବୈଶାଖ',
+							'ଜ୍ୟେଷ୍ଠ',
+							'ଆଷାଢ଼',
+							'ଶ୍ରାବଣ',
+							'ଭାଦ୍ରବ',
+							'ଆଶ୍ଵିନ',
+							'କାର୍ତ୍ତିକ',
+							'ମାର୍ଗଶିର',
 							'ପୌଷ',
 							'ମାଘ',
 							'ଫାଲଗୁନ'
@@ -7608,6 +7928,11 @@ has 'calendar_quarters' => (
 	default		=> sub { {
 			'gregorian' => {
 				'format' => {
+					abbreviated => {0 => 'Q1',
+						1 => 'Q2',
+						2 => '3ୟ ତ୍ରୟମାସ',
+						3 => '4ର୍ଥ ତ୍ରୟମାସ'
+					},
 					wide => {0 => '1ମ ତ୍ରୟମାସ',
 						1 => '2ୟ ତ୍ରୟମାସ',
 						2 => '3ୟ ତ୍ରୟମାସ',
@@ -7644,7 +7969,7 @@ has 'day_periods' => (
 				},
 				'narrow' => {
 					'am' => q{AM},
-					'pm' => q{ଅପରାହ୍ନ},
+					'pm' => q{PM},
 				},
 			},
 		},
@@ -7774,6 +8099,7 @@ has 'datetime_formats_available_formats' => (
 			GyMMM => q{MMM y G},
 			GyMMMEd => q{E, MMM d, y G},
 			GyMMMd => q{MMM d, y G},
+			GyMd => q{M/d/y G},
 			MEd => q{E, M/d},
 			MMMEd => q{E, MMM d},
 			MMMMW => q{MMMM ର ସପ୍ତାହ W},
@@ -7808,6 +8134,40 @@ has 'datetime_formats_interval' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
+			GyM => {
+				G => q{M/y GGGGG – M/y GGGGG},
+				M => q{M/y – M/y GGGGG},
+				y => q{M/y – M/y GGGGG},
+			},
+			GyMEd => {
+				G => q{E, M/d/y GGGGG – E, M/d/y GGGGG},
+				M => q{E, M/d/y – E, M/d/y GGGGG},
+				d => q{E, M/d/y – E, M/d/y GGGGG},
+				y => q{E, M/d/y – E, M/d/y GGGGG},
+			},
+			GyMMM => {
+				G => q{MMM y G – MMM y G},
+				M => q{MMM – MMM y G},
+				y => q{MMM y – MMM y G},
+			},
+			GyMMMEd => {
+				G => q{E, MMM d, y G – E, MMM d, y G},
+				M => q{E, MMM d – E, MMM d, y G},
+				d => q{E, MMM d – E, MMM d, y G},
+				y => q{E, MMM d, y – E, MMM d, y G},
+			},
+			GyMMMd => {
+				G => q{MMM d, y G – MMM d, y G},
+				M => q{MMM d – MMM d, y G},
+				d => q{MMM d – d, y G},
+				y => q{MMM d, y – MMM d, y G},
+			},
+			GyMd => {
+				G => q{M/d/y GGGGG – M/d/y GGGGG},
+				M => q{M/d/y – M/d/y GGGGG},
+				d => q{M/d/y – M/d/y GGGGG},
+				y => q{M/d/y – M/d/y GGGGG},
+			},
 			M => {
 				M => q{M – M},
 			},
@@ -7866,7 +8226,92 @@ has 'datetime_formats_interval' => (
 			},
 		},
 		'gregorian' => {
+			Gy => {
+				G => q{y G – y G},
+				y => q{y – y G},
+			},
+			GyM => {
+				G => q{M/y G – M/y G},
+				M => q{M/y – M/y G},
+				y => q{M/y – M/y G},
+			},
+			GyMEd => {
+				G => q{E, M/d/y G – E, M/d/y G},
+				M => q{E, M/d/y – E, M/d/y G},
+				d => q{E, M/d/y – E, M/d/y G},
+				y => q{E, M/d/y – E, M/d/y G},
+			},
+			GyMMM => {
+				G => q{MMM y G – MMM y G},
+				M => q{MMM – MMM y G},
+				y => q{MMM y – MMM y G},
+			},
+			GyMMMEd => {
+				G => q{E, MMM d, y G – E, MMM d, y G},
+				M => q{E, MMM d – E, MMM d, y G},
+				d => q{E, MMM d – E, MMM d, y G},
+				y => q{E, MMM d, y – E, MMM d, y G},
+			},
+			GyMMMd => {
+				G => q{MMM d, y G – MMM d, y G},
+				M => q{MMM d – MMM d, y G},
+				d => q{MMM d – d, y G},
+				y => q{MMM d, y – MMM d, y G},
+			},
+			GyMd => {
+				G => q{M/d/y G – M/d/y G},
+				M => q{M/d/y – M/d/y G},
+				d => q{M/d/y G – M/d/y G},
+				y => q{M/d/y – M/d/y G},
+			},
+			MEd => {
+				M => q{E, M/d – E, M/d},
+				d => q{E, M/d – E, M/d},
+			},
+			MMM => {
+				M => q{MMM – MMM},
+			},
+			MMMEd => {
+				M => q{E, MMM d – E, MMM d},
+				d => q{E, MMM d – E, MMM d},
+			},
+			Md => {
+				M => q{M/d – M/d},
+				d => q{M/d – M/d},
+			},
 			fallback => '{0} – {1}',
+			yM => {
+				M => q{M/y – M/y},
+				y => q{M/y – M/y},
+			},
+			yMEd => {
+				M => q{E, M/d/y – E, M/d/y},
+				d => q{E, M/d/y – E, M/d/y},
+				y => q{E, M/d/y – E, M/d/y},
+			},
+			yMMM => {
+				M => q{MMM – MMM y},
+				y => q{MMM y – MMM y},
+			},
+			yMMMEd => {
+				M => q{E, MMM d – E, MMM d, y},
+				d => q{E, MMM d – E, MMM d, y},
+				y => q{E, MMM d, y – E, MMM d, y},
+			},
+			yMMMM => {
+				M => q{MMMM – MMMM y},
+				y => q{MMMM y – MMMM y},
+			},
+			yMMMd => {
+				M => q{MMM d – MMM d, y},
+				d => q{MMM d – d, y},
+				y => q{MMM d, y – MMM d, y},
+			},
+			yMd => {
+				M => q{M/d/y – M/d/y},
+				d => q{M/d/y – M/d/y},
+				y => q{M/d/y – M/d/y},
+			},
 		},
 	} },
 );
@@ -8012,7 +8457,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#ବାବେନ୍‌#,
 		},
 		'Africa/Mogadishu' => {
-			exemplarCity => q#ମୋଗାଡିଶୁ#,
+			exemplarCity => q#ମୋଗାଦିଶୁ#,
 		},
 		'Africa/Monrovia' => {
 			exemplarCity => q#ମନରୋଭିଆ#,
@@ -8033,7 +8478,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#ଅଉଗାଡଉଗଉ#,
 		},
 		'Africa/Porto-Novo' => {
-			exemplarCity => q#ପୋଟୋ-ନୋଭୋ#,
+			exemplarCity => q#ପୋର୍ଟୋ-ନୋଭୋ#,
 		},
 		'Africa/Sao_Tome' => {
 			exemplarCity => q#ସାଓ ଟୋମେ#,
@@ -8259,10 +8704,10 @@ has 'time_zone_names' => (
 			exemplarCity => q#ଗ୍ରେନାଡା#,
 		},
 		'America/Guadeloupe' => {
-			exemplarCity => q#ଗୁଆଡେଲୋଉପେ#,
+			exemplarCity => q#ଗୁଆଡେଲୋପ୍‌#,
 		},
 		'America/Guatemala' => {
-			exemplarCity => q#ଗୁଆତେମାଲା#,
+			exemplarCity => q#ଗୁଆଟେମାଲା#,
 		},
 		'America/Guayaquil' => {
 			exemplarCity => q#ଗୁୟାକ୍ୱିଲ#,
@@ -8334,7 +8779,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#ଲସ୍ ଏଞ୍ଜେଲେସ୍#,
 		},
 		'America/Louisville' => {
-			exemplarCity => q#ଲୌଇସଭିଲ୍ଲେ#,
+			exemplarCity => q#ଲୁଇଭିଲ୍ଲେ#,
 		},
 		'America/Lower_Princes' => {
 			exemplarCity => q#ନିମ୍ନ ପ୍ରିନ୍ସ’ର କ୍ଵାଟର୍#,
@@ -8396,9 +8841,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#ନ୍ୟୁ ୟୋର୍କ୍#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#ନିପିଗୋନ୍#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#ନୋମେ#,
 		},
@@ -8420,9 +8862,6 @@ has 'time_zone_names' => (
 		'America/Panama' => {
 			exemplarCity => q#ପାନାମା#,
 		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#ପାଙ୍ଗନିର୍ଟୁଙ୍ଗ#,
-		},
 		'America/Paramaribo' => {
 			exemplarCity => q#ପାରାମାରିବୋ#,
 		},
@@ -8443,9 +8882,6 @@ has 'time_zone_names' => (
 		},
 		'America/Punta_Arenas' => {
 			exemplarCity => q#ପୁଣ୍ଟା ଏରିନାସ୍‌#,
-		},
-		'America/Rainy_River' => {
-			exemplarCity => q#ରେଇନି ରିଭର୍#,
 		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#ରାନକିନ୍ ଇନଲେଟ୍#,
@@ -8507,9 +8943,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#ଥୁଲେ#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#ଥଣ୍ଡର୍ ବେ#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#ତିଜୁଆନା#,
 		},
@@ -8530,9 +8963,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#ୟାକୁଟାଟ୍#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#ୟେଲ୍ଲୋନାଇଫ୍#,
 		},
 		'America_Central' => {
 			long => {
@@ -8708,9 +9138,6 @@ has 'time_zone_names' => (
 		'Asia/Chita' => {
 			exemplarCity => q#ଚିଟା#,
 		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#ଚୋଇବାଲସାନ୍‌#,
-		},
 		'Asia/Colombo' => {
 			exemplarCity => q#କଲମ୍ବୋ#,
 		},
@@ -8850,7 +9277,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#ସିଓଲ#,
 		},
 		'Asia/Shanghai' => {
-			exemplarCity => q#ସଂଘାଇ#,
+			exemplarCity => q#ସାଂଘାଇ#,
 		},
 		'Asia/Singapore' => {
 			exemplarCity => q#ସିଙ୍ଗାପୁର୍‌#,
@@ -8949,9 +9376,6 @@ has 'time_zone_names' => (
 		'Australia/Broken_Hill' => {
 			exemplarCity => q#ବ୍ରୋକେନ୍‌ ହିଲ୍‌#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#କ୍ୟୁରୀ#,
-		},
 		'Australia/Darwin' => {
 			exemplarCity => q#ଡାରୱିନ୍‌#,
 		},
@@ -9015,12 +9439,12 @@ has 'time_zone_names' => (
 			long => {
 				'daylight' => q#ଆଜୋରେସ୍ ଗ୍ରୀଷ୍ମକାଳ ସମୟ#,
 				'generic' => q#ଆଜୋରେସ୍ ସମୟ#,
-				'standard' => q#ଆଜୋରେସ୍ ମାନାଙ୍କ ସମୟ#,
+				'standard' => q#ଆଜୋରେସ୍ ମାନକ ସମୟ#,
 			},
 		},
 		'Bangladesh' => {
 			long => {
-				'daylight' => q#ବାଂଲାଦେଶ ଗ୍ରୀଷ୍ମକାଳ ସମୟ#,
+				'daylight' => q#ବାଂଲାଦେଶ ଗ୍ରୀଷ୍ମକାଳୀନ ସମୟ#,
 				'generic' => q#ବାଂଲାଦେଶ ସମୟ#,
 				'standard' => q#ବାଂଲାଦେଶ ମାନାଙ୍କ ସମୟ#,
 			},
@@ -9049,14 +9473,14 @@ has 'time_zone_names' => (
 		},
 		'Cape_Verde' => {
 			long => {
-				'daylight' => q#କେପ୍‌ ଭର୍ଦେ ଖରାଦିନ ସମୟ#,
+				'daylight' => q#କେପ୍‌ ଭର୍ଦେ ଗ୍ରୀଷ୍ମକାଳୀନ ସମୟ#,
 				'generic' => q#କେପ୍‌ ଭର୍ଦେ ସମୟ#,
 				'standard' => q#କେପ୍‌ ଭର୍ଦେ ମାନାଙ୍କ ସମୟ#,
 			},
 		},
 		'Chamorro' => {
 			long => {
-				'standard' => q#ଚାମୋରୋ ମାନାଙ୍କ ସମୟ#,
+				'standard' => q#ଚାମୋରୋ ମାନକ ସମୟ#,
 			},
 		},
 		'Chatham' => {
@@ -9077,14 +9501,7 @@ has 'time_zone_names' => (
 			long => {
 				'daylight' => q#ଚୀନ ଦିବାଲୋକ ସମୟ#,
 				'generic' => q#ଚୀନ ସମୟ#,
-				'standard' => q#ଚୀନ ମାନାଙ୍କ ସମୟ#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#ଚୋଇବାଲସାନ ଗ୍ରୀଷ୍ମକାଳ ସମୟ#,
-				'generic' => q#ଚୋଇବାଲସାନ ସମୟ#,
-				'standard' => q#ଚୋଇବାଲସାନ ମାନାଙ୍କ ସମୟ#,
+				'standard' => q#ଚୀନ ମାନକ ସମୟ#,
 			},
 		},
 		'Christmas' => {
@@ -9101,14 +9518,14 @@ has 'time_zone_names' => (
 			long => {
 				'daylight' => q#କଲମ୍ବିଆ ଗ୍ରୀଷ୍ମକାଳ ସମୟ#,
 				'generic' => q#କଲମ୍ବିଆ ସମୟ#,
-				'standard' => q#କଲମ୍ବିଆ ମାନାଙ୍କ ସମୟ#,
+				'standard' => q#କଲମ୍ବିଆ ମାନକ ସମୟ#,
 			},
 		},
 		'Cook' => {
 			long => {
 				'daylight' => q#କୁକ୍‌ ଦ୍ୱୀପପୁଞ୍ଜ ଅର୍ଦ୍ଧ ଗୀଷ୍ମକାଳୀନ ସମୟ#,
 				'generic' => q#କୁକ୍‌ ଦ୍ୱୀପପୁଞ୍ଜ ସମୟ#,
-				'standard' => q#କୁକ୍‌ ଦ୍ୱୀପପୁଞ୍ଜ ମାନାଙ୍କ ସମୟ#,
+				'standard' => q#କୁକ୍‌ ଦ୍ୱୀପପୁଞ୍ଜ ମାନକ ସମୟ#,
 			},
 		},
 		'Cuba' => {
@@ -9154,7 +9571,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#ଅଜଣା ସହର#,
 		},
 		'Europe/Amsterdam' => {
-			exemplarCity => q#ଆମଷ୍ଟ୍ରେଡାମ୍#,
+			exemplarCity => q#ଆମଷ୍ଟରଡାମ୍#,
 		},
 		'Europe/Andorra' => {
 			exemplarCity => q#ଆନଡୋରା#,
@@ -9166,7 +9583,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#ଏଥେନ୍ସ#,
 		},
 		'Europe/Belgrade' => {
-			exemplarCity => q#ବେଲଗ୍ରେଡେ#,
+			exemplarCity => q#ବେଲଗ୍ରେଡ୍‌#,
 		},
 		'Europe/Berlin' => {
 			exemplarCity => q#ବର୍ଲିନ୍#,
@@ -9195,7 +9612,7 @@ has 'time_zone_names' => (
 		'Europe/Dublin' => {
 			exemplarCity => q#ଡବଲିନ୍#,
 			long => {
-				'daylight' => q#ଆଇରିଶ୍‌ ମାନାଙ୍କ ସମୟ#,
+				'daylight' => q#ଆଇରିଶ୍‌ ମାନକ ସମୟ#,
 			},
 		},
 		'Europe/Gibraltar' => {
@@ -9309,9 +9726,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#ୟୁଲୟାନୋଭସ୍କ#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#ଉଜହୋରୋଦ୍#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#ଭାଡୁଜ#,
 		},
@@ -9333,9 +9747,6 @@ has 'time_zone_names' => (
 		'Europe/Zagreb' => {
 			exemplarCity => q#ଜାଗ୍ରେବ୍#,
 		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#ଜାପୋରୋଜହୟେ#,
-		},
 		'Europe/Zurich' => {
 			exemplarCity => q#ଜୁରିକ୍#,
 		},
@@ -9343,7 +9754,7 @@ has 'time_zone_names' => (
 			long => {
 				'daylight' => q#କେନ୍ଦ୍ରୀୟ ୟୁରୋପୀୟ ଗ୍ରୀଷ୍ମକାଳ ସମୟ#,
 				'generic' => q#କେନ୍ଦ୍ରୀୟ ୟୁରୋପୀୟ ସମୟ#,
-				'standard' => q#କେନ୍ଦ୍ରୀୟ ୟୁରୋପୀୟ ମାନାଙ୍କ ସମୟ#,
+				'standard' => q#କେନ୍ଦ୍ର ୟୁରୋପୀୟ ମାନକ ସମୟ#,
 			},
 		},
 		'Europe_Eastern' => {
@@ -9369,14 +9780,14 @@ has 'time_zone_names' => (
 			long => {
 				'daylight' => q#ଫକଲ୍ୟାଣ୍ଡ ଦ୍ୱୀପପୁଞ୍ଜ ଗ୍ରୀଷ୍ମକାଳ ସମୟ#,
 				'generic' => q#ଫକଲ୍ୟାଣ୍ଡ ଦ୍ୱୀପପୁଞ୍ଜ ସମୟ#,
-				'standard' => q#ଫକଲ୍ୟାଣ୍ଡ ଦ୍ୱୀପପୁଞ୍ଜ ମାନାଙ୍କ ସମୟ#,
+				'standard' => q#ଫକଲ୍ୟାଣ୍ଡ ଦ୍ୱୀପପୁଞ୍ଜ ମାନକ ସମୟ#,
 			},
 		},
 		'Fiji' => {
 			long => {
-				'daylight' => q#ଫିଜି ଗ୍ରୀଷ୍ମକାଳ ସମୟ#,
+				'daylight' => q#ଫିଜି ଗ୍ରୀଷ୍ମକାଳୀନ ସମୟ#,
 				'generic' => q#ଫିଜି ସମୟ#,
-				'standard' => q#ଫିଜି ମାନାଙ୍କ ସମୟ#,
+				'standard' => q#ଫିଜି ମାନକ ସମୟ#,
 			},
 		},
 		'French_Guiana' => {
@@ -9454,19 +9865,19 @@ has 'time_zone_names' => (
 			long => {
 				'daylight' => q#ହଂ କଂ ଗ୍ରୀଷ୍ମକାଳ ସମୟ#,
 				'generic' => q#ହଂ କଂ ସମୟ#,
-				'standard' => q#ହଂ କଂ ମାନାଙ୍କ ସମୟ#,
+				'standard' => q#ହଂ କଂ ମାନକ ସମୟ#,
 			},
 		},
 		'Hovd' => {
 			long => {
 				'daylight' => q#ହୋଭଡ୍‌ ଗ୍ରୀଷ୍ମକାଳ ସମୟ#,
 				'generic' => q#ହୋଭଡ୍‌ ସମୟ#,
-				'standard' => q#ହୋଭଡ୍‌ ମାନାଙ୍କ ସମୟ#,
+				'standard' => q#ହୋଭଡ୍‌ ମାନକ ସମୟ#,
 			},
 		},
 		'India' => {
 			long => {
-				'standard' => q#ଭାରତ ମାନାଙ୍କ ସମୟ#,
+				'standard' => q#ଭାରତୀୟ ମାନକ ସମୟ#,
 			},
 			short => {
 				'standard' => q#IST#,
@@ -9534,14 +9945,14 @@ has 'time_zone_names' => (
 			long => {
 				'daylight' => q#ଇରାନ ଦିବାଲୋକ ସମୟ#,
 				'generic' => q#ଇରାନ ସମୟ#,
-				'standard' => q#ଇରାନ ମାନାଙ୍କ ସମୟ#,
+				'standard' => q#ଇରାନ ମାନକ ସମୟ#,
 			},
 		},
 		'Irkutsk' => {
 			long => {
 				'daylight' => q#ଇର୍କୁଟସ୍କ୍ ଗ୍ରୀଷ୍ମକାଳୀନ ସମୟ#,
 				'generic' => q#ଇଅରକୁଟସ୍କ ସମୟ#,
-				'standard' => q#ଇଅରକୁଟସ୍କ ମାନାଙ୍କ ସମୟ#,
+				'standard' => q#ଇର୍କୁଟସ୍କ୍ ମାନକ ସମୟ#,
 			},
 		},
 		'Israel' => {
@@ -9555,7 +9966,7 @@ has 'time_zone_names' => (
 			long => {
 				'daylight' => q#ଜାପାନ ଦିବାଲୋକ ସମୟ#,
 				'generic' => q#ଜାପାନ ସମୟ#,
-				'standard' => q#ଜାପାନ ମାନାଙ୍କ ସମୟ#,
+				'standard' => q#ଜାପାନ ମାନକ ସମୟ#,
 			},
 		},
 		'Kamchatka' => {
@@ -9563,6 +9974,11 @@ has 'time_zone_names' => (
 				'daylight' => q#ପେଟ୍ରୋପାଭଲୋଭ୍ସକ-କମଚଟସ୍କି ଗ୍ରୀଷ୍ମ ସମୟ#,
 				'generic' => q#ପେଟ୍ରୋପାଭଲୋଭ୍ସକ-କମଚଟସ୍କି ସମୟ#,
 				'standard' => q#ପେଟ୍ରୋପାଭଲୋଭ୍ସକ-କମଚଟସ୍କି ମାନକ ସମୟ#,
+			},
+		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#କାଜାକସ୍ତାନ୍ ସମୟ#,
 			},
 		},
 		'Kazakhstan_Eastern' => {
@@ -9579,7 +9995,7 @@ has 'time_zone_names' => (
 			long => {
 				'daylight' => q#କୋରିୟ ଦିବାଲୋକ ସମୟ#,
 				'generic' => q#କୋରିୟ ସମୟ#,
-				'standard' => q#କୋରିୟ ମାନାଙ୍କ ସମୟ#,
+				'standard' => q#କୋରିୟ ମାନକ ସମୟ#,
 			},
 		},
 		'Kosrae' => {
@@ -9623,11 +10039,6 @@ has 'time_zone_names' => (
 				'standard' => q#ମକାଓ ମାନକ ସମୟ#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#ମାକ୍ୱେରୀ ଦ୍ୱୀପ ସମୟ#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#ମାଗାଡାନ୍ ଗ୍ରୀଷ୍ମକାଳ ସମୟ#,
@@ -9667,13 +10078,6 @@ has 'time_zone_names' => (
 				'standard' => q#ମାୱସନ୍‌ ସମୟ#,
 			},
 		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#ଉତ୍ତରପଶ୍ଚିମ ମେକ୍ସିକୋ ଦିବାଲୋକ ସମୟ#,
-				'generic' => q#ଉତ୍ତରପଶ୍ଚିମ ମେକ୍ସିକୋ ସମୟ#,
-				'standard' => q#ଉତ୍ତରପଶ୍ଚିମ ମେକ୍ସିକୋ ମାନାଙ୍କ ସମୟ#,
-			},
-		},
 		'Mexico_Pacific' => {
 			long => {
 				'daylight' => q#ମେକ୍ସିକାନ୍ ପାସିଫିକ୍ ଦିବାଲୋକ ସମୟ#,
@@ -9683,9 +10087,9 @@ has 'time_zone_names' => (
 		},
 		'Mongolia' => {
 			long => {
-				'daylight' => q#ଉଲାନ୍‌ ବାଟର୍‌ ଗ୍ରୀଷ୍ମକାଳ ସମୟ#,
+				'daylight' => q#ଉଲାନ୍‌ବାଟର୍‌ ଗ୍ରୀଷ୍ମକାଳୀନ ସମୟ#,
 				'generic' => q#ଉଲାନ୍‌ବାଟର୍‌ ସମୟ#,
-				'standard' => q#ଉଲାନ୍‌ବାଟର୍‌ ମାନାଙ୍କ ସମୟ#,
+				'standard' => q#ଉଲାନ୍‌ବାଟର୍‌ ମାନକ ସମୟ#,
 			},
 		},
 		'Moscow' => {
@@ -9814,9 +10218,6 @@ has 'time_zone_names' => (
 		'Pacific/Honolulu' => {
 			exemplarCity => q#ହୋନୋଲୁଲୁ#,
 		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#ଜନଷ୍ଟନ୍#,
-		},
 		'Pacific/Kanton' => {
 			exemplarCity => q#କ୍ୟାଣ୍ଟନ#,
 		},
@@ -9893,7 +10294,7 @@ has 'time_zone_names' => (
 			long => {
 				'daylight' => q#ପାକିସ୍ତାନ ଗ୍ରୀଷ୍ମକାଳ ସମୟ#,
 				'generic' => q#ପାକିସ୍ତାନ ସମୟ#,
-				'standard' => q#ପାକିସ୍ତାନ ମାନାଙ୍କ ସମୟ#,
+				'standard' => q#ପାକିସ୍ତାନ ମାନକ ସମୟ#,
 			},
 		},
 		'Palau' => {
@@ -9903,7 +10304,7 @@ has 'time_zone_names' => (
 		},
 		'Papua_New_Guinea' => {
 			long => {
-				'standard' => q#ପପୁଆ ନ୍ୟୁ ଗୁନିଆ ସମୟ#,
+				'standard' => q#ପପୁଆ ନ୍ୟୁ ଗିନି ସମୟ#,
 			},
 		},
 		'Paraguay' => {
@@ -9929,7 +10330,7 @@ has 'time_zone_names' => (
 		},
 		'Phoenix_Islands' => {
 			long => {
-				'standard' => q#ଫୋନିକ୍ସ ଦ୍ୱୀପପୁଞ୍ଜ ସମୟ#,
+				'standard' => q#ଫିନିକ୍ସ ଦ୍ୱୀପପୁଞ୍ଜ ସମୟ#,
 			},
 		},
 		'Pierre_Miquelon' => {
@@ -9941,7 +10342,7 @@ has 'time_zone_names' => (
 		},
 		'Pitcairn' => {
 			long => {
-				'standard' => q#ପିଟକାରିନ୍‌ ସମୟ#,
+				'standard' => q#ପିଟକେର୍ନ୍‌ ସମୟ#,
 			},
 		},
 		'Ponape' => {
@@ -9989,7 +10390,7 @@ has 'time_zone_names' => (
 			long => {
 				'daylight' => q#ସାମୋଆ ଦିବାଲୋକ ସମୟ#,
 				'generic' => q#ସାମୋଆ ସମୟ#,
-				'standard' => q#ସାମୋଆ ମାନାଙ୍କ ସମୟ#,
+				'standard' => q#ସାମୋଆ ମାନକ ସମୟ#,
 			},
 		},
 		'Seychelles' => {
@@ -9999,7 +10400,7 @@ has 'time_zone_names' => (
 		},
 		'Singapore' => {
 			long => {
-				'standard' => q#ସିଙ୍ଗାପୁର୍‌ ମାନାଙ୍କ ସମୟ#,
+				'standard' => q#ସିଙ୍ଗାପୁର୍‌ ମାନକ ସମୟ#,
 			},
 		},
 		'Solomon' => {
@@ -10031,7 +10432,7 @@ has 'time_zone_names' => (
 			long => {
 				'daylight' => q#ତାଇପେଇ ଦିବାଲୋକ ସମୟ#,
 				'generic' => q#ତାଇପେଇ ସମୟ#,
-				'standard' => q#ତାଇପେଇ ମାନାଙ୍କ ସମୟ#,
+				'standard' => q#ତାଇପେଇ ମାନକ ସମୟ#,
 			},
 		},
 		'Tajikistan' => {
@@ -10046,9 +10447,9 @@ has 'time_zone_names' => (
 		},
 		'Tonga' => {
 			long => {
-				'daylight' => q#ଟୋଙ୍ଗା ଗ୍ରୀଷ୍ମକାଳ ସମୟ#,
+				'daylight' => q#ଟୋଙ୍ଗା ଗ୍ରୀଷ୍ମକାଳୀନ ସମୟ#,
 				'generic' => q#ଟୋଙ୍ଗା ସମୟ#,
-				'standard' => q#ଟୋଙ୍ଗା ମାନାଙ୍କ ସମୟ#,
+				'standard' => q#ଟୋଙ୍ଗା ମାନକ ସମୟ#,
 			},
 		},
 		'Truk' => {
@@ -10077,16 +10478,16 @@ has 'time_zone_names' => (
 		},
 		'Uzbekistan' => {
 			long => {
-				'daylight' => q#ଉଜବେକିସ୍ତାନ ଖରାଦିନ ସମୟ#,
+				'daylight' => q#ଉଜବେକିସ୍ତାନ ଗ୍ରୀଷ୍ମକାଳୀନ ସମୟ#,
 				'generic' => q#ଉଜବେକିସ୍ତାନ ସମୟ#,
-				'standard' => q#ଉଜବେକିସ୍ତାନ ମାନାଙ୍କ ସମୟ#,
+				'standard' => q#ଉଜବେକିସ୍ତାନ ମାନକ ସମୟ#,
 			},
 		},
 		'Vanuatu' => {
 			long => {
-				'daylight' => q#ଭାନୁଆଟୁ ଖରାଦିନ ସମୟ#,
+				'daylight' => q#ଭାନୁଆଟୁ ଗ୍ରୀଷ୍ମକାଳୀନ ସମୟ#,
 				'generic' => q#ଭାନୁଆଟୁ ସମୟ#,
-				'standard' => q#ଭାନୁଆଟୁ ମାନାଙ୍କ ସମୟ#,
+				'standard' => q#ଭାନୁଆଟୁ ମାନକ ସମୟ#,
 			},
 		},
 		'Venezuela' => {

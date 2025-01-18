@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Gaa - Package for language Ga
 
 package Locale::CLDR::Locales::Gaa;
 # This file auto generated from Data\common\main\gaa.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -380,9 +380,9 @@ has 'display_name_code_patterns' => (
 	init_arg	=> undef,
 	default		=> sub {
 		{
-			'language' => 'Language: {0}',
- 			'script' => 'Script: {0}',
- 			'region' => 'Region: {0}',
+			'language' => 'Wiemɔ {0}',
+ 			'script' => 'Woloŋmaa {0}',
+ 			'region' => 'Kpokpaanɔ {0}',
 
 		}
 	},
@@ -399,7 +399,7 @@ has 'characters' => (
 		return {
 			auxiliary => qr{[áã é íĩ ó ũ]},
 			index => ['A', 'B', 'D', 'E', 'Ɛ', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ŋ', 'O', 'Ɔ', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'Y', 'Z'],
-			main => qr{[a b d e ɛ f g h i j k l m n ŋ o ɔ p q r s t u v w y z]},
+			main => qr{[a b d e ɛ f g h i j k l m n ŋ o ɔ p r s t u v w y z]},
 			punctuation => qr{[\- ‐‑ – — , ; \: ! ? . … '‘’ "“” ( ) \[ \] § @ * / \& # † ‡ ′ ″]},
 		};
 	},
@@ -1568,7 +1568,7 @@ has 'calendar_months' => (
 							'Aharabata',
 							'Oflɔ',
 							'Otsokrikri',
-							'Abeibe',
+							'Abɛibe',
 							'Agbiɛnaa',
 							'Otukwajaŋ',
 							'Maawɛ',
@@ -1608,7 +1608,7 @@ has 'calendar_months' => (
 							'Aharabata',
 							'Oflɔ',
 							'Otsokrikri',
-							'Abeibe',
+							'Abɛibe',
 							'Agbiɛnaa',
 							'Otukwajan',
 							'Maawɛ',
@@ -2195,9 +2195,6 @@ has 'time_zone_names' => (
 		'America/Puerto_Rico' => {
 			exemplarCity => q#Puerto Riko#,
 		},
-		'America/Rainy_River' => {
-			exemplarCity => q#Faa Ni Nɛɔ#,
-		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#Rankin Ŋshɔnine#,
 		},
@@ -2219,17 +2216,11 @@ has 'time_zone_names' => (
 		'America/Tegucigalpa' => {
 			exemplarCity => q#Tegusigalpa#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#Sarawa Ŋshɔnine Bibioo#,
-		},
 		'America/Vancouver' => {
 			exemplarCity => q#Vankouver#,
 		},
 		'America/Whitehorse' => {
 			exemplarCity => q#Okpɔŋɔ Yɛŋ#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#Kakla Wuɔfɔ#,
 		},
 		'America_Central' => {
 			long => {
@@ -2273,9 +2264,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Aqtobe' => {
 			exemplarCity => q#Aktobe#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#Tsoibalsan#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#Kolombo#,
@@ -2329,9 +2317,6 @@ has 'time_zone_names' => (
 		'Australia/Broken_Hill' => {
 			exemplarCity => q#Ŋmeŋme Ni Ekumɔ#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#Kurrie#,
-		},
 		'Australia/Eucla' => {
 			exemplarCity => q#Yukla#,
 		},
@@ -2382,6 +2367,11 @@ has 'time_zone_names' => (
 				'standard' => q#Antarktik Kɛ Wuoyigbɛbii Ni Wieɔ Frɛntsi Be#,
 			},
 		},
+		'GMT' => {
+			long => {
+				'standard' => q#Betsɔɔmɔ ni ka ŋɛlɛ kome nɔ#,
+			},
+		},
 		'Greenland_Eastern' => {
 			long => {
 				'daylight' => q#Greenland Bokãgbɛ Be Yɛ Latsa Beiaŋ#,
@@ -2425,13 +2415,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Mauritius Be Yɛ Latsa Beiaŋ#,
 				'generic' => q#Mauritius Be#,
 				'standard' => q#Mauritius Be Yɛ Fɛi Beiaŋ#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Meziko Kooyi-Anaigbɛ Be Yɛ Latsa Beiaŋ#,
-				'generic' => q#Meziko Kooyi-Anaigbɛ Be#,
-				'standard' => q#Meziko Kooyi-Anaigbɛ Be Yɛ Fɛi Beiaŋ#,
 			},
 		},
 		'Mexico_Pacific' => {

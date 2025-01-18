@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Fi - Package for language Finnish
 
 package Locale::CLDR::Locales::Fi;
 # This file auto generated from Data\common\main\fi.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -7067,7 +7067,6 @@ has 'display_name_language' => (
  				'gmh' => 'keskiyläsaksa',
  				'gn' => 'guarani',
  				'goh' => 'muinaisyläsaksa',
- 				'gom' => 'goankonkani',
  				'gon' => 'gondi',
  				'gor' => 'gorontalo',
  				'got' => 'gootti',
@@ -7197,6 +7196,7 @@ has 'display_name_language' => (
  				'lil' => 'lillooet',
  				'liv' => 'liivi',
  				'lkt' => 'lakota',
+ 				'lld' => 'ladin',
  				'lmo' => 'lombardi',
  				'ln' => 'lingala',
  				'lo' => 'lao',
@@ -7211,7 +7211,6 @@ has 'display_name_language' => (
  				'lua' => 'luluanluba',
  				'lui' => 'luiseño',
  				'lun' => 'lunda',
- 				'luo' => 'luo',
  				'lus' => 'lusai',
  				'luy' => 'luhya',
  				'lv' => 'latvia',
@@ -7473,7 +7472,6 @@ has 'display_name_language' => (
  				'und' => 'tuntematon kieli',
  				'ur' => 'urdu',
  				'uz' => 'uzbekki',
- 				'vai' => 'vai',
  				've' => 'venda',
  				'vec' => 'venetsia',
  				'vep' => 'vepsä',
@@ -8288,7 +8286,6 @@ has 'display_name_type' => (
  				'phonebook' => q{puhelinluettelojärjestys},
  				'phonetic' => q{äänteellinen järjestys},
  				'pinyin' => q{pinyin-järjestys},
- 				'reformed' => q{uudistettu järjestys},
  				'search' => q{yleishakujärjestys},
  				'searchjl' => q{haku hangul-alkukonsonantin mukaan},
  				'standard' => q{normaalijärjestys},
@@ -9097,6 +9094,18 @@ has 'units' => (
 						'other' => q({0} peruspistettä),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(miljardisosat),
+						'one' => q({0} miljardisosa),
+						'other' => q({0} miljardisosaa),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(miljardisosat),
+						'one' => q({0} miljardisosa),
+						'other' => q({0} miljardisosaa),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(litrat / 100 kilometriä),
 						'one' => q({0} litra / 100 km),
@@ -9391,6 +9400,20 @@ has 'units' => (
 						'name' => q(nanosekunnit),
 						'one' => q({0} nanosekunti),
 						'other' => q({0} nanosekuntia),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(yöt),
+						'one' => q({0} yö),
+						'other' => q({0} yötä),
+						'per' => q({0} / yö),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(yöt),
+						'one' => q({0} yö),
+						'other' => q({0} yötä),
+						'per' => q({0} / yö),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -11409,6 +11432,20 @@ has 'units' => (
 						'other' => q({0}ns),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(yöt),
+						'one' => q({0}yö),
+						'other' => q({0}yöt),
+						'per' => q({0}/yö),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(yöt),
+						'one' => q({0}yö),
+						'other' => q({0}yöt),
+						'per' => q({0}/yö),
+					},
+					# Long Unit Identifier
 					'duration-second' => {
 						'name' => q(s),
 						'one' => q({0}s),
@@ -13103,6 +13140,20 @@ has 'units' => (
 						'one' => q({0} kk),
 						'other' => q({0} kk),
 						'per' => q({0}/kk),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(yöt),
+						'one' => q({0} yö),
+						'other' => q({0} yö),
+						'per' => q({0}/yö),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(yöt),
+						'one' => q({0} yö),
+						'other' => q({0} yö),
+						'per' => q({0}/yö),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -15552,15 +15603,15 @@ has 'currencies' => (
 		'SLE' => {
 			display_name => {
 				'currency' => q(Sierra Leonen leone),
-				'one' => q(Sierra Leonen leonea),
+				'one' => q(Sierra Leonen leone),
 				'other' => q(Sierra Leonen leonea),
 			},
 		},
 		'SLL' => {
 			display_name => {
-				'currency' => q(Sierra Leonen leone \(1964—2022\)),
-				'one' => q(Sierra Leonen leone \(1964—2022\)),
-				'other' => q(Sierra Leonen leonea \(1964—2022\)),
+				'currency' => q(Sierra Leonen leone \(1964–2022\)),
+				'one' => q(Sierra Leonen leone \(1964–2022\)),
+				'other' => q(Sierra Leonen leonea \(1964–2022\)),
 			},
 		},
 		'SOS' => {
@@ -15821,8 +15872,8 @@ has 'currencies' => (
 		'VEB' => {
 			display_name => {
 				'currency' => q(Venezuelan bolívar \(1871–2008\)),
-				'one' => q(Venezuelan bolivar \(1871–2008\)),
-				'other' => q(Venezuelan bolivaria \(1871–2008\)),
+				'one' => q(Venezuelan bolívar \(1871–2008\)),
+				'other' => q(Venezuelan bolívaria \(1871–2008\)),
 			},
 		},
 		'VEF' => {
@@ -16271,18 +16322,18 @@ has 'calendar_months' => (
 				'format' => {
 					abbreviated => {
 						nonleap => [
-							'tammik.',
-							'helmik.',
-							'maalisk.',
-							'huhtik.',
-							'toukok.',
-							'kesäk.',
-							'heinäk.',
-							'elok.',
-							'syysk.',
-							'lokak.',
-							'marrask.',
-							'jouluk.'
+							'tammi',
+							'helmi',
+							'maalis',
+							'huhti',
+							'touko',
+							'kesä',
+							'heinä',
+							'elo',
+							'syys',
+							'loka',
+							'marras',
+							'joulu'
 						],
 						leap => [
 							
@@ -16653,7 +16704,7 @@ has 'calendar_days' => (
 						thu => 'torstaina',
 						fri => 'perjantaina',
 						sat => 'lauantaina',
-						sun => 'sunnuntaina'
+						sun => 'sunnuntai'
 					},
 				},
 				'stand-alone' => {
@@ -17362,10 +17413,10 @@ has 'datetime_formats_available_formats' => (
 			Ehms => q{E h.mm.ss a},
 			Gy => q{y G},
 			GyMMM => q{LLL y G},
-			GyMMMEd => q{E d. MMM y G},
+			GyMMMEd => q{E d.M.y G},
 			GyMMMMEd => q{E d. MMMM y G},
 			GyMMMMd => q{d. MMMM y G},
-			GyMMMd => q{d. MMM y G},
+			GyMMMd => q{d.M.y G},
 			GyMd => q{M.d.y G},
 			H => q{H},
 			Hm => q{H.mm},
@@ -17373,11 +17424,11 @@ has 'datetime_formats_available_formats' => (
 			Hmsv => q{H.mm.ss v},
 			Hmv => q{H.mm v},
 			MEd => q{E d.M.},
-			MMMEd => q{ccc d. MMM},
+			MMMEd => q{ccc d.M.},
 			MMMMEd => q{ccc d. MMMM},
 			MMMMW => q{LLLL'n' W. 'viikko'},
 			MMMMd => q{d. MMMM},
-			MMMd => q{d. MMM},
+			MMMd => q{d.M.},
 			Md => q{d.M.},
 			h => q{h a},
 			hm => q{h.mm a},
@@ -17389,12 +17440,12 @@ has 'datetime_formats_available_formats' => (
 			yMEd => q{E d.M.y},
 			yMM => q{M.y},
 			yMMM => q{LLL y},
-			yMMMEd => q{E d. MMM y},
+			yMMMEd => q{E d.M.y},
 			yMMMM => q{LLLL y},
 			yMMMMEd => q{E d. MMMM y},
 			yMMMMccccd => q{cccc d. MMMM y},
 			yMMMMd => q{d. MMMM y},
-			yMMMd => q{d. MMM y},
+			yMMMd => q{d.M.y},
 			yMd => q{d.M.y},
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
@@ -17794,9 +17845,6 @@ has 'time_zone_names' => (
 		'Africa/Ndjamena' => {
 			exemplarCity => q#N’Djamena#,
 		},
-		'Africa/Sao_Tome' => {
-			exemplarCity => q#São Tomé#,
-		},
 		'Africa_Central' => {
 			long => {
 				'standard' => q#Keski-Afrikan aika#,
@@ -17846,9 +17894,6 @@ has 'time_zone_names' => (
 		'America/Argentina/Tucuman' => {
 			exemplarCity => q#Tucumán#,
 		},
-		'America/Asuncion' => {
-			exemplarCity => q#Asunción#,
-		},
 		'America/Bogota' => {
 			exemplarCity => q#Bogotá#,
 		},
@@ -17857,9 +17902,6 @@ has 'time_zone_names' => (
 		},
 		'America/Cuiaba' => {
 			exemplarCity => q#Cuiabá#,
-		},
-		'America/Curacao' => {
-			exemplarCity => q#Curaçao#,
 		},
 		'America/Eirunepe' => {
 			exemplarCity => q#Eirunepé#,
@@ -17890,9 +17932,6 @@ has 'time_zone_names' => (
 		},
 		'America/North_Dakota/New_Salem' => {
 			exemplarCity => q#New Salem, Pohjois-Dakota#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#Santa Isabel#,
 		},
 		'America/Santarem' => {
 			exemplarCity => q#Santarém#,
@@ -18035,9 +18074,6 @@ has 'time_zone_names' => (
 		'Asia/Chita' => {
 			exemplarCity => q#Tšita#,
 		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#Tšoibalsa#,
-		},
 		'Asia/Damascus' => {
 			exemplarCity => q#Damaskos#,
 		},
@@ -18137,9 +18173,6 @@ has 'time_zone_names' => (
 		},
 		'Atlantic/St_Helena' => {
 			exemplarCity => q#Saint Helena#,
-		},
-		'Australia/Currie' => {
-			exemplarCity => q#Currie#,
 		},
 		'Australia_Central' => {
 			long => {
@@ -18248,13 +18281,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Kiinan kesäaika#,
 				'generic' => q#Kiinan aika#,
 				'standard' => q#Kiinan normaaliaika#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Tšoibalsan kesäaika#,
-				'generic' => q#Tšoibalsan aika#,
-				'standard' => q#Tšoibalsan normaaliaika#,
 			},
 		},
 		'Christmas' => {
@@ -18403,9 +18429,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#Uljanovsk#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#Užgorod#,
-		},
 		'Europe/Vatican' => {
 			exemplarCity => q#Vatikaani#,
 		},
@@ -18417,9 +18440,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Warsaw' => {
 			exemplarCity => q#Varsova#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#Zaporižžja#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#Zürich#,
@@ -18574,9 +18594,6 @@ has 'time_zone_names' => (
 		'Indian/Maldives' => {
 			exemplarCity => q#Malediivit#,
 		},
-		'Indian/Reunion' => {
-			exemplarCity => q#Réunion#,
-		},
 		'Indian_Ocean' => {
 			long => {
 				'standard' => q#Intian valtameren aika#,
@@ -18637,6 +18654,11 @@ has 'time_zone_names' => (
 				'standard' => q#Kamtšatkan normaaliaika#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Kazakstanin aika#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#Itä-Kazakstanin aika#,
@@ -18695,11 +18717,6 @@ has 'time_zone_names' => (
 				'standard' => q#Macaon normaaliaika#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Macquariensaaren aika#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Magadanin kesäaika#,
@@ -18737,13 +18754,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Mawsonin aika#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Luoteis-Meksikon kesäaika#,
-				'generic' => q#Luoteis-Meksikon aika#,
-				'standard' => q#Luoteis-Meksikon normaaliaika#,
 			},
 		},
 		'Mexico_Pacific' => {

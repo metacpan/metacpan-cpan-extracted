@@ -1,17 +1,17 @@
 package Locale::CLDR::NumberingSystems;
 # This file auto generated from Data\common\supplemental\numberingSystems.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo::Role;
 
@@ -88,6 +88,10 @@ has 'numbering_system' => (
 			type	=> 'numeric',
 			data	=> [qw(０ １ ２ ３ ４ ５ ６ ７ ８ ９)],
 		},
+		'gara'	=> {
+			type	=> 'numeric',
+			data	=> [qw(𐵀 𐵁 𐵂 𐵃 𐵄 𐵅 𐵆 𐵇 𐵈 𐵉)],
+		},
 		'geor'	=> {
 			type	=> 'algorithmic',
 			data	=> 'georgian',
@@ -111,6 +115,10 @@ has 'numbering_system' => (
 		'gujr'	=> {
 			type	=> 'numeric',
 			data	=> [qw(૦ ૧ ૨ ૩ ૪ ૫ ૬ ૭ ૮ ૯)],
+		},
+		'gukh'	=> {
+			type	=> 'numeric',
+			data	=> [qw(𖄰 𖄱 𖄲 𖄳 𖄴 𖄵 𖄶 𖄷 𖄸 𖄹)],
 		},
 		'guru'	=> {
 			type	=> 'numeric',
@@ -184,6 +192,10 @@ has 'numbering_system' => (
 			type	=> 'numeric',
 			data	=> [qw(೦ ೧ ೨ ೩ ೪ ೫ ೬ ೭ ೮ ೯)],
 		},
+		'krai'	=> {
+			type	=> 'numeric',
+			data	=> [qw(𖵰 𖵱 𖵲 𖵳 𖵴 𖵵 𖵶 𖵷 𖵸 𖵹)],
+		},
 		'lana'	=> {
 			type	=> 'numeric',
 			data	=> [qw(᪀ ᪁ ᪂ ᪃ ᪄ ᪅ ᪆ ᪇ ᪈ ᪉)],
@@ -252,6 +264,14 @@ has 'numbering_system' => (
 			type	=> 'numeric',
 			data	=> [qw(၀ ၁ ၂ ၃ ၄ ၅ ၆ ၇ ၈ ၉)],
 		},
+		'mymrepka'	=> {
+			type	=> 'numeric',
+			data	=> [qw(𑛚 𑛛 𑛜 𑛝 𑛞 𑛟 𑛠 𑛡 𑛢 𑛣)],
+		},
+		'mymrpao'	=> {
+			type	=> 'numeric',
+			data	=> [qw(𑛐 𑛑 𑛒 𑛓 𑛔 𑛕 𑛖 𑛗 𑛘 𑛙)],
+		},
 		'mymrshan'	=> {
 			type	=> 'numeric',
 			data	=> [qw(႐ ႑ ႒ ႓ ႔ ႕ ႖ ႗ ႘ ႙)],
@@ -276,6 +296,10 @@ has 'numbering_system' => (
 			type	=> 'numeric',
 			data	=> [qw(᱐ ᱑ ᱒ ᱓ ᱔ ᱕ ᱖ ᱗ ᱘ ᱙)],
 		},
+		'onao'	=> {
+			type	=> 'numeric',
+			data	=> [qw(𞗱 𞗲 𞗳 𞗴 𞗵 𞗶 𞗷 𞗸 𞗹 𞗺)],
+		},
 		'orya'	=> {
 			type	=> 'numeric',
 			data	=> [qw(୦ ୧ ୨ ୩ ୪ ୫ ୬ ୭ ୮ ୯)],
@@ -283,6 +307,10 @@ has 'numbering_system' => (
 		'osma'	=> {
 			type	=> 'numeric',
 			data	=> [qw(𐒠 𐒡 𐒢 𐒣 𐒤 𐒥 𐒦 𐒧 𐒨 𐒩)],
+		},
+		'outlined'	=> {
+			type	=> 'numeric',
+			data	=> [qw(𜳰 𜳱 𜳲 𜳳 𜳴 𜳵 𜳶 𜳷 𜳸 𜳹)],
 		},
 		'rohg'	=> {
 			type	=> 'numeric',
@@ -323,6 +351,10 @@ has 'numbering_system' => (
 		'sund'	=> {
 			type	=> 'numeric',
 			data	=> [qw(᮰ ᮱ ᮲ ᮳ ᮴ ᮵ ᮶ ᮷ ᮸ ᮹)],
+		},
+		'sunu'	=> {
+			type	=> 'numeric',
+			data	=> [qw(𑯰 𑯱 𑯲 𑯳 𑯴 𑯵 𑯶 𑯷 𑯸 𑯹)],
 		},
 		'takr'	=> {
 			type	=> 'numeric',
@@ -399,7 +431,7 @@ around _default_numbering_system => sub {
         return @{$self->$orij};
     }
     else {
-        return $self->$orij->[0];
+        return $self->$orij->[0] // '';
     }
 };
 

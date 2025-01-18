@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Nqo - Package for language N’Ko
 
 package Locale::CLDR::Locales::Nqo;
 # This file auto generated from Data\common\main\nqo.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -42,11 +42,14 @@ has 'display_name_language' => (
  				'ast' => 'ߊߛߑߕߎߙߌߞߊ߲',
  				'az' => 'ߊߖߍߙߑߓߊߦߌߖߊߞߊ߲',
  				'az@alt=short' => 'ߊߖߋߙߌߞߊ߲',
+ 				'bal' => 'ߓߊߟߎߗߌߞߊ߲',
  				'bas' => 'ߓߛߊߞߊ߲',
  				'be' => 'ߓߌߟߏߙߎ߳ߛߌߞߊ߲',
  				'bem' => 'ߓߋ߲ߓߊߞߊ߲',
+ 				'bew' => 'ߓߋߕߊߥߌߞߊ߲',
  				'bez' => 'ߓߋߣߊߞߊ߲',
  				'bg' => 'ߓߌߟߑߜ߭ߊߙߌߞߊ߲',
+ 				'blo' => 'ߊߣߌ߯ߞߊ߲',
  				'bm' => 'ߒߞߏ ߡߊߟߌ',
  				'bn' => 'ߓߍ߲ߜ߭ߊߟߌߞߊ߲',
  				'bo' => 'ߕߌߓߋߕߌߞߊ߲',
@@ -211,6 +214,7 @@ has 'display_name_language' => (
  				'or' => 'ߏߖߊߞߊ߲',
  				'os' => 'ߏߛߍߕߌߞߊ߲',
  				'pa' => 'ߔߍ߲ߖߊߓߌߞߊ߲',
+ 				'pap' => 'ߔߊߔߌߦߊߡߊ߲ߕߏߞߊ߲',
  				'pcm' => 'ߖߋ߬ߟߌ߬ߓߊߟߊ߫ ߔߌߘߑߜ߭ߍ߲ߞߊ߲',
  				'pl' => 'ߔߟߏߣߍߞߊ߲',
  				'prg' => 'ߔߎߙߛߌߞߊ߲',
@@ -233,6 +237,7 @@ has 'display_name_language' => (
  				'saq' => 'ߛߊ߲ߓߙߎߞߊ߲',
  				'sat' => 'ߛߊ߲ߕߊߟߌߞߊ߲',
  				'sbp' => 'ߌߛߊ߲ߜ߭ߎߞߊ߲',
+ 				'scn' => 'ߛߌߛߟߌߦߊߞߊ߲',
  				'sd' => 'ߛߌ߲ߘߌߞߊ߲',
  				'se' => 'ߛߋߡߌ߫ ߕߟߋ߬ߓߐ߬ߞߊ߲',
  				'seh' => 'ߛߌߛߋߣߊߞߊ߲',
@@ -258,6 +263,7 @@ has 'display_name_language' => (
  				'tg' => 'ߕߊߖߞߌߞߊ߲',
  				'th' => 'ߕߊߦߌߞߊ߲',
  				'ti' => 'ߕߜ߭ߌߙߌߢߊߞߊ߲',
+ 				'tig' => 'ߕߌߜ߭ߙߋߞߊ߲',
  				'tk' => 'ߕߎߙߞߌߡߍߣߌߞߊ߲',
  				'to' => 'ߕߏ߲ߖ߭ߌߞߊ߲',
  				'tr' => 'ߕߙߎߞߌߞߊ߲',
@@ -270,6 +276,7 @@ has 'display_name_language' => (
  				'ur' => 'ߎߙߘߎߞߊ߲',
  				'uz' => 'ߎߖ߭ߑߓߋߞߌߞߊ߲',
  				'vai' => 'ߒߝ߭ߊߦߌ߲ߞߊ߲',
+ 				'vec' => 'ߝ߭ߣߋߛߌߦߊߞߊ߲',
  				'vi' => 'ߝ߭ߌߦߋߕߌߣߊߡߌߞߊ߲',
  				'vo' => 'ߝ߭ߏߟߊߔߎߞߊ߲',
  				'vun' => 'ߝ߭ߎߖߏߞߊ߲',
@@ -1252,6 +1259,9 @@ has 'number_symbols' => (
 		'latn' => {
 			'group' => q(،),
 		},
+		'nkoo' => {
+			'group' => q(،),
+		},
 	} }
 );
 
@@ -1260,6 +1270,41 @@ has 'currencies' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'AED' => {
+			symbol => 'ߊߐߘ',
+			display_name => {
+				'currency' => q(ߊߙߊߓߎߟߊ߫ ߡߊ߲߬ߛߊ߬ߙߋ߬ߠߊ ߟߊߘߍ߬ߣߍ߲ ߘߌ߬ߙߑߤߊߡ),
+				'other' => q(ߊߙߊߓߎߟߊ߫ ߡߊ߲߬ߛߊ߬ߙߋ߬ߠߊ ߟߊߘߍ߬ߣߍ߲ ߘߌ߬ߙߑߤߊߡ),
+			},
+		},
+		'AFN' => {
+			symbol => 'ߊߝߊ',
+			display_name => {
+				'currency' => q(ߊߝߎߜ߭ߊߣߌߛߑߕߊ߲߫ ߊߝߑߜ߭ߊߣߌߛ),
+				'other' => q(ߊߝߎߜ߭ߊߣߌߛߑߕߊ߲߫ ߊߝߑߜ߭ߊߣߌߛ),
+			},
+		},
+		'ALL' => {
+			symbol => 'ߊߟߟ',
+			display_name => {
+				'currency' => q(ߊߟߑߓߊߣߌ߫ ߟߍߞ),
+				'other' => q(ߊߟߑߓߊߣߌ߫ ߟߍߞ),
+			},
+		},
+		'AMD' => {
+			symbol => 'ߊߡߘ',
+			display_name => {
+				'currency' => q(ߊߙߑߡߋߣߌ߫ ߘߌ߬ߙߑߤߊߡ),
+				'other' => q(ߊߙߑߡߋߣߌ߫ ߘߌ߬ߙߑߤߊߡ),
+			},
+		},
+		'ANG' => {
+			symbol => 'ߊ߲ߕߝ',
+			display_name => {
+				'currency' => q(ߞߎߙߊߛߊߥߏ߫ ߊ߲ߕߌ߫ ߝߑߟߏߙߌ߲ߛ),
+				'other' => q(ߞߎߙߊߛߊߥߏ߫ ߊ߲ߕߌ߫ ߝߑߟߏߙߌ߲ߛ),
+			},
+		},
 		'AOA' => {
 			symbol => 'ߊ߲ߜ߭ߎ',
 			display_name => {
@@ -1283,10 +1328,114 @@ has 'currencies' => (
 				'currency' => q(ߊ߲ߜ߭ߏߟߊ߫ ߞߎߥߊߖ߭ߊ ߝߊ߲߬ߞߊߘߏ߲߬ߣߍ߲ \( ߁߉߉߅–߁߉߉߉ \)),
 			},
 		},
+		'ARS' => {
+			symbol => 'ߊߖ߭ߔ',
+			display_name => {
+				'currency' => q(ߊߙߑߖ߭ߊ߲ߕߌ߲߫ ߔߋߛߏ),
+				'other' => q(ߊߙߑߖ߭ߊ߲ߕߌ߲߫ ߔߋߛߏ),
+			},
+		},
+		'AUD' => {
+			symbol => '$ߐ',
+			display_name => {
+				'currency' => q(ߐߛߑߕߙߊߟߌ߫ ߘߟߊ),
+				'other' => q(ߐߛߑߕߙߊߟߌ߫ ߘߟߊ),
+			},
+		},
+		'AWG' => {
+			symbol => 'ߊߥߖ߭',
+			display_name => {
+				'currency' => q(ߊߙߎߓߊ߫ ߝߑߟߏߙߌ߲ߛ),
+				'other' => q(ߊߙߎߓߊ߫ ߝߑߟߏߙߌ߲ߛ),
+			},
+		},
+		'AZN' => {
+			symbol => 'ߊߖߣ',
+			display_name => {
+				'currency' => q(ߊߖߍߙߑߓߊߦߌߖߊ߲߫ ߊߗ߭ߋߙߌ),
+				'other' => q(ߊߖߍߙߑߓߊߦߌߖߊ߲߫ ߊߗ߭ߋߙߌ),
+			},
+		},
+		'BAM' => {
+			symbol => 'ߓߍߡ',
+			display_name => {
+				'currency' => q(ߓߐߛߑߣߌ߫ ߍߙߑߗ߭ߋߜ߭ߏߝ߭ߌߣ ߡߊߙߞ ߝߊ߬ߟߋ߲߬ߕߊ),
+				'other' => q(ߓߐߛߑߣߌ߫ ߍߙߑߗ߭ߋߜ߭ߏߝ߭ߌߣ ߡߊߙߞ ߝߊ߬ߟߋ߲߬ߕߊ),
+			},
+		},
+		'BBD' => {
+			symbol => 'ߓߓߘ',
+			display_name => {
+				'currency' => q(ߓߊߙߑߓߊߘߐߛ ߘߟߊ),
+				'other' => q(ߓߊߙߑߓߊߘߐߛ ߘߟߊ),
+			},
+		},
+		'BDT' => {
+			symbol => 'ߓߘߕ',
+			display_name => {
+				'currency' => q(ߓߊ߲ߜ߭ߑߟߊߘߍߛ ߕߞߊ),
+				'other' => q(ߓߊ߲ߜ߭ߑߟߊߘߍߛ ߕߞߊ),
+			},
+		},
+		'BGN' => {
+			symbol => 'ߓߜ߭ߟ',
+			display_name => {
+				'currency' => q(ߓߎ߳ߟߑߜ߭ߊߙߌ߫ ߟߍߝ߭),
+				'other' => q(ߓߎ߳ߟߑߜ߭ߊߙߌ߫ ߟߍߝ߭),
+			},
+		},
+		'BHD' => {
+			symbol => 'ߓߤߘ',
+			display_name => {
+				'currency' => q(ߓߤߊ߬ߙߊߦߌߣ ߘߌ߬ߣߊߙ),
+				'other' => q(ߓߤߊ߬ߙߊߦߌߣ ߘߌ߬ߣߊߙ),
+			},
+		},
 		'BIF' => {
 			symbol => 'ߓߙߝ',
 			display_name => {
 				'currency' => q(ߓߎߙߎ߲ߘߌߞߊ ߟߎ߬ ߟߊ߫ ߝߊߙߊ߲),
+			},
+		},
+		'BMD' => {
+			symbol => 'ߓߡߘ',
+			display_name => {
+				'currency' => q(ߓߍߙߑߡߎߘߊ߫ ߘߟߊ),
+				'other' => q(ߓߍߙߑߡߎߘߊ߫ ߘߟߊ),
+			},
+		},
+		'BND' => {
+			symbol => 'ߓߣߘ',
+			display_name => {
+				'currency' => q(ߓߙߎߣߌ߫ ߘߟߊ),
+				'other' => q(ߓߙߎߣߌ߫ ߘߟߊ),
+			},
+		},
+		'BOB' => {
+			symbol => 'ߓߏߓ',
+			display_name => {
+				'currency' => q(ߓߏߟߝ߭ߌ߫ ߓߏߟߝ߭ߌߦߊߣߏ߬),
+				'other' => q(ߓߏߟߝ߭ߌ߫ ߓߏߟߝ߭ߌߦߊߣߏ߬),
+			},
+		},
+		'BRL' => {
+			display_name => {
+				'currency' => q(ߓߙߋߖ߭ߌߟ ߙߋߦߊߟ),
+				'other' => q(ߓߙߋߖ߭ߌߟ ߙߋߦߊߟ),
+			},
+		},
+		'BSD' => {
+			symbol => 'ߓߛߘ',
+			display_name => {
+				'currency' => q(ߓߤߊߡߊߛ ߘߟߊ),
+				'other' => q(ߓߤߊߡߊߛ ߘߟߊ),
+			},
+		},
+		'BTN' => {
+			symbol => 'ߓߕߒ',
+			display_name => {
+				'currency' => q(ߓߎߕߊ߲߫ ߒߜ߭ߎߟߑߕߙߎߡ),
+				'other' => q(ߓߎߕߊ߲߫ ߒߜ߭ߎߟߑߕߙߎߡ),
 			},
 		},
 		'BWP' => {
@@ -1295,10 +1444,79 @@ has 'currencies' => (
 				'currency' => q(ߓߐߛߎߥߣߊߞߊ ߟߎ߬ ߟߊ߫ ߔߎߟߊ),
 			},
 		},
+		'BYN' => {
+			symbol => 'ߓߌߙ',
+			display_name => {
+				'currency' => q(ߓߌߟߏߙߌߛ ߙߓߎߟ),
+				'other' => q(ߓߌߟߏߙߌߛ ߙߓߎߟ),
+			},
+		},
+		'BZD' => {
+			display_name => {
+				'currency' => q(ߓߙߋߖ߭ߌߟ ߘߟߊ),
+				'other' => q(ߓߙߋߖ߭ߌߟ ߘߟߊ),
+			},
+		},
 		'CDF' => {
 			symbol => 'ߞߝ',
 			display_name => {
 				'currency' => q(ߞߏ߲߬ߜ߭ߏ߬ߞߊ ߟߎ߬ ߟߊ߫ ߝߊߙߊ߲),
+			},
+		},
+		'CHF' => {
+			symbol => 'ߛߥߝ',
+			display_name => {
+				'currency' => q(ߛߎߥߌߛ ߝߊߙߊ߲),
+				'other' => q(ߛߎߥߌߛ ߝߊߙߊ߲),
+			},
+		},
+		'CLP' => {
+			symbol => 'ߛߟߔ',
+			display_name => {
+				'currency' => q(ߛ߭ߟߌ߫ ߔߋߛߏ),
+				'other' => q(ߛ߭ߟߌ߫ ߔߋߛߏ),
+			},
+		},
+		'CNH' => {
+			symbol => 'ߛߦߤ',
+			display_name => {
+				'currency' => q(ߛߌߣ ߦߎߥߊߣ \(ߝߊ߲߬ߕߙߊ ߖߌߘߊ\)),
+				'other' => q(ߛߌߣ ߦߎߥߊߣ \(ߝߊ߲߬ߕߙߊ ߖߌߘߊ\)),
+			},
+		},
+		'CNY' => {
+			symbol => 'ߛߣߦ',
+			display_name => {
+				'currency' => q(ߦߎߥߊߣ ߙߊ߲ߡߌ߲ߓߌ߫),
+				'other' => q(ߦߎߥߊߣ ߙߊ߲ߡߌ߲ߓߌ߫),
+			},
+		},
+		'COP' => {
+			symbol => 'ߞߐߔ',
+			display_name => {
+				'currency' => q(ߞߐߟߐ߲ߓߌ߫ ߔߋߛߏ),
+				'other' => q(ߞߐߟߐ߲ߓߌ߫ ߔߋߛߏ),
+			},
+		},
+		'CRC' => {
+			symbol => 'ߞߙߞ',
+			display_name => {
+				'currency' => q(ߞߐߛߑߕߊߙߌߞߊ߫ ߞߐߟߐߣ),
+				'other' => q(ߞߐߛߑߕߊߙߌߞߊ߫ ߞߐߟߐߣ),
+			},
+		},
+		'CUC' => {
+			symbol => 'ߞߎ߳ߞ',
+			display_name => {
+				'currency' => q(ߞߎ߳ߓߊ߫ ߔߋߛߏ߫ ߝߊ߬ߟߋ߲߬ߕߊ),
+				'other' => q(ߞߎ߳ߓߊ߫ ߔߋߛߏ߫ ߝߊ߬ߟߋ߲߬ߕߊ),
+			},
+		},
+		'CUP' => {
+			symbol => 'ߞߎ߳ߔ',
+			display_name => {
+				'currency' => q(ߞߎ߳ߓߊ߫ ߔߋߛߏ߫߫),
+				'other' => q(ߞߎ߳ߓߊ߫ ߔߋߛߏ߫߫),
 			},
 		},
 		'CVE' => {
@@ -1307,10 +1525,31 @@ has 'currencies' => (
 				'currency' => q(ߜߙߋߞߎ߲߫ ߝߙߌߛߌߞߊ ߟߎ߬ ߍߛߑߞߎߘߐߛ),
 			},
 		},
+		'CZK' => {
+			symbol => 'ߗߞߞ',
+			display_name => {
+				'currency' => q(ߗߋߞߏߛߟߏߝ߭ߊߞߌ߫ ߞߎߙߐߣ),
+				'other' => q(ߗߋߞߏߛߟߏߝ߭ߊߞߌ߫ ߞߎߙߐߣ),
+			},
+		},
 		'DJF' => {
 			symbol => 'ߖߓߝ',
 			display_name => {
 				'currency' => q(ߖߌߓߎߕߌߞߊ ߟߎ߬ ߟߊ߫ ߝߊߙߊ߲),
+			},
+		},
+		'DKK' => {
+			symbol => 'ߘߞߞ',
+			display_name => {
+				'currency' => q(ߘߊߣߌߡߊߙߞ ߞߎߙߐߣ),
+				'other' => q(ߘߊߣߌߡߊߙߞ ߞߎߙߐߣ),
+			},
+		},
+		'DOP' => {
+			symbol => 'ߘߏߔ',
+			display_name => {
+				'currency' => q(ߘߏߡߣߌߞ ߞߊ߲ߓߍ߲ ߔߋߛߏ),
+				'other' => q(ߘߏߡߣߌߞ ߞߊ߲ߓߍ߲ ߔߋߛߏ),
 			},
 		},
 		'DZD' => {
@@ -1337,6 +1576,39 @@ has 'currencies' => (
 				'currency' => q(ߋߗߏߔߌߞߊ ߟߎ߬ ߟߊ߫ ߓߌߙߑߛ),
 			},
 		},
+		'EUR' => {
+			display_name => {
+				'currency' => q(ߋߙߏ),
+				'other' => q(ߋߙߏ),
+			},
+		},
+		'FJD' => {
+			symbol => '$ ߝߖ',
+			display_name => {
+				'currency' => q(ߝߖߌ߫ ߘߟߊ),
+				'other' => q(ߝߖߌ߫ ߘߟߊ),
+			},
+		},
+		'FKP' => {
+			symbol => 'ߝߞߔ',
+			display_name => {
+				'currency' => q(ߝߊߟߞߑߟߊ߲ߘ ߌߛߑߟߊ߲ߘ ߔߐߣߌ߬),
+				'other' => q(ߝߊߟߞߑߟߊ߲ߘ ߌߛߑߟߊ߲ߘ ߔߐߣߌ߬),
+			},
+		},
+		'GBP' => {
+			display_name => {
+				'currency' => q(ߡߊ߬ߛߊ߬ߟߊ߫-ߘߍ߬ߣߍ߲ ߔߐߣߌ߬),
+				'other' => q(ߡߊ߬ߛߊ߬ߟߊ߫-ߘߍ߬ߣߍ߲ ߔߐߣߌ߬),
+			},
+		},
+		'GEL' => {
+			symbol => 'ߖ߭ߐߟ',
+			display_name => {
+				'currency' => q(ߖ߭ߐߙߑߖߌ߫ ߟߊߙߌ),
+				'other' => q(ߖ߭ߐߙߑߖߌ߫ ߟߊߙߌ),
+			},
+		},
 		'GHC' => {
 			display_name => {
 				'currency' => q(ߛߘߌ),
@@ -1348,6 +1620,13 @@ has 'currencies' => (
 			display_name => {
 				'currency' => q(ߜ߭ߊ߯ߣߊ߫ ߛߘߌ),
 				'other' => q(ߜ߭ߊ߯ߣߞߊ ߟߎ߬ ߛߘߌ),
+			},
+		},
+		'GIP' => {
+			symbol => 'ߖ߭ߓߔ£',
+			display_name => {
+				'currency' => q(ߖ߭ߌߓߑߙߊߟߑߕߊ߫ ߔߐߣߌ߬),
+				'other' => q(ߖ߭ߌߓߑߙߊߟߑߕߊ߫ ߔߐߣߌ߬),
 			},
 		},
 		'GMD' => {
@@ -1374,6 +1653,13 @@ has 'currencies' => (
 				'currency' => q(ߕߍߡߊߓߊ߲߮ ߖߌ߬ߣߍ߬ߞߊ ߟߎ߬ ߟߊ߫ ߋߞߥߋߟߋ),
 			},
 		},
+		'GTQ' => {
+			symbol => 'ߜ߭ߕߞ',
+			display_name => {
+				'currency' => q(ߜ߭ߎߥߊߕߋߡߟߊ߫ ߞߋߕߑߗ߭ߊߟ),
+				'other' => q(ߜ߭ߎߥߊߕߋߡߟߊ߫ ߞߋߕߑߗ߭ߊߟ),
+			},
+		},
 		'GWE' => {
 			symbol => 'ߖߓߍ',
 			display_name => {
@@ -1386,16 +1672,188 @@ has 'currencies' => (
 				'currency' => q(ߖߌߣߍ߫ ߓߌߛߊߥߏߞߊ ߟߎ߬ ߟߊ߫ ߔߋߖ߭ߏ),
 			},
 		},
+		'GYD' => {
+			symbol => 'ߜ߭ߎ߳ߘ',
+			display_name => {
+				'currency' => q(ߜ߭ߎ߳ߦߊߣ ߘߟߊ),
+				'other' => q(ߜ߭ߎ߳ߦߊߣ ߘߟߊ),
+			},
+		},
+		'HKD' => {
+			symbol => 'ߤߞߘ',
+			display_name => {
+				'currency' => q(ߤߐ߲ߞߐ߲߫ ߘߟߊ),
+				'other' => q(ߤߐ߲ߞߐ߲߫ ߘߟߊ),
+			},
+		},
+		'HNL' => {
+			symbol => 'ߤߘߟ',
+			display_name => {
+				'currency' => q(ߤߐ߲ߘߎߙߊ߫ ߟߋ߲ߔߌߙߊ),
+				'other' => q(ߤߐ߲ߘߎߙߊ߫ ߟߋ߲ߔߌߙߊ),
+			},
+		},
+		'HRK' => {
+			symbol => 'ߞߛߞ',
+			display_name => {
+				'currency' => q(ߞߙߏߥߊߛߌ߫ ߞߎߣߊ߬),
+				'other' => q(ߞߙߏߥߊߛߌ߫ ߞߎߣߊ߬),
+			},
+		},
+		'HTG' => {
+			symbol => 'ߤߕߜ߭',
+			display_name => {
+				'currency' => q(ߤߊߦߕߌ߫ ߜ߭ߎߙߑߘ),
+				'other' => q(ߤߊߦߕߌ߫ ߜ߭ߎߙߑߘ),
+			},
+		},
+		'HUF' => {
+			symbol => 'ߤߜ߭ߝ',
+			display_name => {
+				'currency' => q(ߢߐ߲ߜ߭ߙߌ߫ ߝߏߙߍ߲ߕ),
+				'other' => q(ߢߐ߲ߜ߭ߙߌ߫ ߝߏߙߍ߲ߕ),
+			},
+		},
+		'IDR' => {
+			symbol => 'ߍ߲ߘߙ',
+			display_name => {
+				'currency' => q(ߍ߲ߘߣߏߛߌ߫ ߙߎߔߌ),
+				'other' => q(ߍ߲ߘߣߏߛߌ߫ ߙߎߔߌ),
+			},
+		},
+		'ILS' => {
+			display_name => {
+				'currency' => q(ߌߛߑߙߊߍߟ ߛߌߞߍߟ ߞߎߘߊ),
+				'other' => q(ߌߛߑߙߊߍߟ ߛߌߞߍߟ ߞߎߘߊ),
+			},
+		},
+		'INR' => {
+			display_name => {
+				'currency' => q(ߤߌ߲ߘߎ߬ ߙߎߔߌ),
+				'other' => q(ߤߌ߲ߘߎ߬ ߙߎߔߌ),
+			},
+		},
+		'IQD' => {
+			symbol => 'ߌߞߘ',
+			display_name => {
+				'currency' => q(ߌߙߊߞߌ߬ ߘߌ߬ߣߊߙ),
+				'other' => q(ߌߙߊߞߌ߬ ߘߌ߬ߣߊߙ),
+			},
+		},
+		'IRR' => {
+			symbol => 'ߌߙߙ',
+			display_name => {
+				'currency' => q(ߌߙߊ߲߫ ߙߌ߬ߦߊߟ),
+				'other' => q(ߌߙߊ߲߫ ߙߌ߬ߦߊߟ),
+			},
+		},
+		'ISK' => {
+			symbol => 'ߌߛߞ',
+			display_name => {
+				'currency' => q(ߌߛߑߟߊ߲ߘ ߞߎߙߐߣ),
+				'other' => q(ߌߛߑߟߊ߲ߘ ߞߎߙߐߣ),
+			},
+		},
+		'JMD' => {
+			symbol => 'ߖߡߘ',
+			display_name => {
+				'currency' => q(ߖߡߊߦߌߞ ߘߟߊ),
+				'other' => q(ߖߡߊߦߌߞ ߘߟߊ),
+			},
+		},
+		'JOD' => {
+			symbol => 'ߖߐߘ',
+			display_name => {
+				'currency' => q(ߖߐߙߑߘߊߣߌ߫ ߘߌ߬ߣߊߙ),
+				'other' => q(ߖߐߙߑߘߊߣߌ߫ ߘߌ߬ߣߊߙ),
+			},
+		},
+		'JPY' => {
+			symbol => 'ߗ߭ߔߦ',
+			display_name => {
+				'currency' => q(ߣߌߔߐ߲߫ ߦߍߣ),
+				'other' => q(ߣߌߔߐ߲߫ ߦߍߣ),
+			},
+		},
 		'KES' => {
 			symbol => 'ߞߋߛ',
 			display_name => {
 				'currency' => q(ߝߋߣߌߦߞߊ ߟߎ߬ ߟߊ߫ ߛߌߟߌ߲ߜ߭),
 			},
 		},
+		'KGS' => {
+			symbol => 'ߞߜ߭ߛ',
+			display_name => {
+				'currency' => q(ߞߌߙߜ߭ߌߛߑߕߊ߲߫ ߛߐߡ),
+				'other' => q(ߞߌߙߜ߭ߌߛߑߕߊ߲߫ ߛߐߡ),
+			},
+		},
+		'KHR' => {
+			symbol => 'ߞߓߙ',
+			display_name => {
+				'currency' => q(ߞߊ߲ߓߐߘߑߖ ߙߌߦߍߟ),
+				'other' => q(ߞߊ߲ߓߐߘߑߖ ߙߌߦߍߟ),
+			},
+		},
 		'KMF' => {
 			symbol => 'ߞߡߝ',
 			display_name => {
 				'currency' => q(ߞߐߡ߲߯ߙߌߞߊ ߟߎ߬ ߟߊ߫ ߝߊߙߊ߲),
+			},
+		},
+		'KPW' => {
+			symbol => 'ߞߞߥ',
+			display_name => {
+				'currency' => q(ߞߐ߬ߘߎ߮-ߞߏߙߋ߫ ߥߐߣ),
+				'other' => q(ߞߐ߬ߘߎ߮-ߞߏߙߋ߫ ߥߐߣ),
+			},
+		},
+		'KRW' => {
+			display_name => {
+				'currency' => q(ߥߙߏ߬ߘߎ߮-ߞߏߙߋ߫ ߥߐߣ),
+				'other' => q(ߥߙߏ߬ߘߎ߮-ߞߏߙߋ߫ ߥߐߣ),
+			},
+		},
+		'KWD' => {
+			symbol => 'ߞߥߘ',
+			display_name => {
+				'currency' => q(ߞߎ߬ߥߍߕ ߘߌ߬ߣߊߙ),
+				'other' => q(ߞߎ߬ߥߍߕ ߘߌ߬ߣߊߙ),
+			},
+		},
+		'KYD' => {
+			symbol => 'ߞߌߘ',
+			display_name => {
+				'currency' => q(ߞߊߦߌߡߊ߲߫ ߌߛߑߟߊ߲ߘ ߘߟߊ),
+				'other' => q(ߞߊߦߌߡߊ߲߫ ߌߛߑߟߊ߲ߘ ߘߟߊ),
+			},
+		},
+		'KZT' => {
+			symbol => 'ߞߗ߭ߕ',
+			display_name => {
+				'currency' => q(ߞߗ߭ߊߞߌߛߑߕߊ߲߫ ߕߊ߲ߖ߭),
+				'other' => q(ߞߗ߭ߊߞߌߛߑߕߊ߲߫ ߕߊ߲ߖ߭),
+			},
+		},
+		'LAK' => {
+			symbol => 'ߟߊߞ',
+			display_name => {
+				'currency' => q(ߟߊߏߕߌ߫ ߞߌߔ),
+				'other' => q(ߟߊߏߕߌ߫ ߞߌߔ),
+			},
+		},
+		'LBP' => {
+			symbol => 'ߟߓ£',
+			display_name => {
+				'currency' => q(ߟߌߓߊ߲߫ ߔߐߣߌ߬),
+				'other' => q(ߟߌߓߊ߲߫ ߔߐߣߌ߬),
+			},
+		},
+		'LKR' => {
+			symbol => 'ߟߞߙ',
+			display_name => {
+				'currency' => q(ߛߙߌ߫ ߟߊ߲ߞߊ߫ ߙߎߔߌ),
+				'other' => q(ߛߙߌ߫ ߟߊ߲ߞߊ߫ ߙߎߔߌ),
 			},
 		},
 		'LRD' => {
@@ -1430,6 +1888,13 @@ has 'currencies' => (
 				'currency' => q(ߡߊ߬ߙߐ߬ߞߎߞߊ ߟߎ߬ ߟߊ߫ ߝߊߙߊ߲),
 			},
 		},
+		'MDL' => {
+			symbol => 'ߡߘߟ',
+			display_name => {
+				'currency' => q(ߝߐߟߑߘߊߝ߭ߌ߫ ߟߋ߳),
+				'other' => q(ߝߐߟߑߘߊߝ߭ߌ߫ ߟߋ߳),
+			},
+		},
 		'MGA' => {
 			symbol => 'ߡߘߙ',
 			display_name => {
@@ -1442,10 +1907,38 @@ has 'currencies' => (
 				'currency' => q(ߡߘߊߜ߭ߊߑߞߊ߯ߙߌߞߊ ߟߎ߬ ߟߊ߫ ߝߊߙߊ߲),
 			},
 		},
+		'MKD' => {
+			symbol => 'ߡߞߘ',
+			display_name => {
+				'currency' => q(ߡߊߛߋߘߏߣߌ߫ ߘߋߣߊߙ),
+				'other' => q(ߡߊߛߋߘߏߣߌ߫ ߘߋߣߊߙ),
+			},
+		},
 		'MLF' => {
 			symbol => 'ߡߝ',
 			display_name => {
 				'currency' => q(ߡߊߟߌߞߊ ߟߎ߬ ߟߊ߫ ߝߊߙߊ߲),
+			},
+		},
+		'MMK' => {
+			symbol => 'ߡߡߞ',
+			display_name => {
+				'currency' => q(ߡߌߦߊ߲ߡߊߙ ߞߌߦߊߕ),
+				'other' => q(ߡߌߦߊ߲ߡߊߙ ߞߌߦߊߕ),
+			},
+		},
+		'MNT' => {
+			symbol => 'ߡߣߕ',
+			display_name => {
+				'currency' => q(ߡߐ߲ߜ߭ߐߟߌ߫ ߕߎߜ߭ߙߌߞ),
+				'other' => q(ߡߐ߲ߜ߭ߐߟߌ߫ ߕߎߜ߭ߙߌߞ),
+			},
+		},
+		'MOP' => {
+			symbol => 'ߡߏߔ',
+			display_name => {
+				'currency' => q(ߡߞߊߥߏ߫ ߔߕߊߞߊ߫),
+				'other' => q(ߡߞߊߥߏ߫ ߔߕߊߞߊ߫),
 			},
 		},
 		'MRO' => {
@@ -1466,10 +1959,31 @@ has 'currencies' => (
 				'currency' => q(ߡߏߙߛߌߞߊ ߟߎ߬ ߟߊ߫ ߙߔߎ),
 			},
 		},
+		'MVR' => {
+			symbol => 'ߡߝ߭ߙ',
+			display_name => {
+				'currency' => q(ߡߊߟߑߘߝ߭ߌ߫ ߙߎߝߌߦߊ),
+				'other' => q(ߡߊߟߑߘߝ߭ߌ߫ ߙߎߝߌߦߊ),
+			},
+		},
 		'MWK' => {
 			symbol => 'ߡߟߞ',
 			display_name => {
 				'currency' => q(ߡߟߊߥߌߞߊ ߟߎ߬ ߟߊ߫ ߞߎߥߛߊ),
+			},
+		},
+		'MXN' => {
+			symbol => 'ߡߞ$',
+			display_name => {
+				'currency' => q(ߡߍߞߑߛߌߞ ߔߋߛߏ),
+				'other' => q(ߡߍߞߑߛߌߞ ߔߋߛߏ),
+			},
+		},
+		'MYR' => {
+			symbol => 'ߡߦߙ',
+			display_name => {
+				'currency' => q(ߡߊߟߍߘߎ߯ ߙߌ߲ߖ߭ߌ),
+				'other' => q(ߡߊߟߍߘߎ߯ ߙߌ߲ߖ߭ߌ),
 			},
 		},
 		'MZE' => {
@@ -1502,16 +2016,141 @@ has 'currencies' => (
 				'currency' => q(ߖߋ߬ߟߌ߬ߓߊ߬ߞߊ ߟߎ߬ ߟߊ߫ ߣߍߙߊ),
 			},
 		},
+		'NIO' => {
+			symbol => 'ߣߌߏ',
+			display_name => {
+				'currency' => q(ߣߌߞߙߊߜ߭ߎߥߊ߫ ߞߐߙߑߘߏߓߊ߫ ߏߙߏ߫),
+				'other' => q(ߣߌߞߙߊߜ߭ߎߥߊ߫ ߞߐߙߑߘߏߓߊ߫ ߏߙߏ߫),
+			},
+		},
+		'NOK' => {
+			symbol => 'ߣߐߞ',
+			display_name => {
+				'currency' => q(ߣߐߙߑߝ߭ߍߛ ߞߎߙߐߣ),
+				'other' => q(ߣߐߙߑߝ߭ߍߛ ߞߎߙߐߣ),
+			},
+		},
+		'NPR' => {
+			symbol => 'ߣߔߙ',
+			display_name => {
+				'currency' => q(ߣߋߔߊߟ ߙߎߔߌ),
+				'other' => q(ߣߋߔߊߟ ߙߎߔߌ),
+			},
+		},
+		'NZD' => {
+			symbol => '$ߣߖ߭',
+			display_name => {
+				'currency' => q(ߣߌߦߎߖ߭ߌߟߊ߲ߘߌ߫ ߘߟߊ),
+				'other' => q(ߣߌߦߎߖ߭ߌߟߊ߲ߘߌ߫ ߘߟߊ),
+			},
+		},
+		'OMR' => {
+			symbol => 'ߏߡߙ',
+			display_name => {
+				'currency' => q(ߏߡߊߣ ߙߌ߬ߦߊߟ),
+				'other' => q(ߏߡߊߣ ߙߌ߬ߦߊߟ),
+			},
+		},
+		'PAB' => {
+			symbol => 'ߔߊߓ',
+			display_name => {
+				'currency' => q(ߔߣߊߡߊ߫ ߓߊߟߑߓߏߥߊ߫),
+				'other' => q(ߔߣߊߡߊ߫ ߓߊߟߑߓߏߥߊ߫),
+			},
+		},
+		'PEN' => {
+			symbol => 'ߔߋߛ',
+			display_name => {
+				'currency' => q(ߔߋߙߎ߫ ߛߐߟ),
+				'other' => q(ߔߋߙߎ߫ ߛߐߟ),
+			},
+		},
+		'PGK' => {
+			symbol => 'ߔߖߞ',
+			display_name => {
+				'currency' => q(ߔߊߔߎߥߊ߫ ߖߌ߬ߣߍ߬ ߞߎߘߊ߫ ߞߌߣߊ),
+				'other' => q(ߔߊߔߎߥߊ߫ ߖߌ߬ߣߍ߬ ߞߎߘߊ߫ ߞߌߣߊ),
+			},
+		},
+		'PHP' => {
+			display_name => {
+				'currency' => q(ߝߟߌߔߌߣ ߔߋߛߏ),
+				'other' => q(ߝߟߌߔߌߣ ߔߋߛߏ),
+			},
+		},
+		'PKR' => {
+			symbol => 'ߔߞߙ',
+			display_name => {
+				'currency' => q(ߔߊߞߌߛߑߕߊ߲߫ ߙߎߔߌ),
+				'other' => q(ߔߊߞߌߛߑߕߊ߲߫ ߙߎߔߌ),
+			},
+		},
+		'PLN' => {
+			symbol => 'ߔߟߗ߭',
+			display_name => {
+				'currency' => q(ߔߏߟߐߢ ߗ߭ߑߟߏߕߌ߫),
+				'other' => q(ߔߏߟߐߢ ߗ߭ߑߟߏߕߌ߫),
+			},
+		},
+		'PYG' => {
+			symbol => 'ߔߙߜ߭',
+			display_name => {
+				'currency' => q(ߔߙߊߜ߭ߏߦߋ߫ ߜ߭ߎߙߊߣߊߛ),
+				'other' => q(ߔߙߊߜ߭ߏߦߋ߫ ߜ߭ߎߙߊߣߊߛ),
+			},
+		},
+		'QAR' => {
+			symbol => 'ߞߊߙ',
+			display_name => {
+				'currency' => q(ߞߕߊߙ ߙߌ߬ߦߊߟ),
+				'other' => q(ߞߕߊߙ ߙߌ߬ߦߊߟ),
+			},
+		},
 		'RHD' => {
 			symbol => 'ߖ߭ߓߘ',
 			display_name => {
 				'currency' => q(ߖ߭ߌ߲ߓߊߓߏߦߋߞߊ ߟߎ߬ ߟߊ߫ ߘߏߟߊ߯ߙ),
 			},
 		},
+		'RON' => {
+			symbol => 'ߙߎߟ',
+			display_name => {
+				'currency' => q(ߙߎߡߊߣߌ߫ ߟߋ߳),
+				'other' => q(ߙߎߡߊߣߌ߫ ߟߋ߳),
+			},
+		},
+		'RSD' => {
+			symbol => 'ߙߛߘ',
+			display_name => {
+				'currency' => q(ߛߍߙߑߓߌ߫ ߘߋߣߊߙ),
+				'other' => q(ߛߍߙߑߓߌ߫ ߘߋߣߊߙ),
+			},
+		},
+		'RUB' => {
+			symbol => 'ߌߎߙ',
+			display_name => {
+				'currency' => q(ߌ߬ߙߌ߬ߛߌ߫ ߙߎߓߎߟ),
+				'other' => q(ߌ߬ߙߌ߬ߛߌ߫ ߙߎߓߎߟ),
+			},
+		},
 		'RWF' => {
 			symbol => 'ߙߥߝ',
 			display_name => {
 				'currency' => q(ߙߎߥߊ߲ߘߞߊ ߟߎ߬ ߟߊ߫ ߝߊߙߊ߲),
+			},
+		},
+		'SAR' => {
+			symbol => 'ߛߊߙ',
+			display_name => {
+				'currency' => q(ߛߎ߰ߘߎ߬ߟߊ߫ ߙߌ߬ߦߊߟ),
+				'other' => q(ߛߎ߰ߘߎ߬ߟߊ߫ ߙߌ߬ߦߊߟ),
+			},
+		},
+		'SBD' => {
+			symbol => 'ߛߓߘ',
+			display_name => {
+				'currency' => q(ߛߟߏ߬ߡߣߊ߬ ߕߌ߲ ߠߎ߬ ߘߟߊ),
+				'other' => q(ߛߟߏ߬ߡߣߊ߬ ߕߌ߲ ߠߎ߬ ߘߟߊ),
 			},
 		},
 		'SCR' => {
@@ -1538,6 +2177,20 @@ has 'currencies' => (
 				'currency' => q(ߛߎ߬ߘ߲ߊ߬ߞߊ ߟߊ߫ ߔߐߣߌ߬ \( ߁߉߅߆–߂߀߀߇ \)),
 			},
 		},
+		'SEK' => {
+			symbol => 'ߛߥߞ',
+			display_name => {
+				'currency' => q(ߛߎߥߍߘ ߞߎߙߐߣ),
+				'other' => q(ߛߎߥߍߘ ߞߎߙߐߣ),
+			},
+		},
+		'SGD' => {
+			symbol => 'ߛߜ߭ߘ',
+			display_name => {
+				'currency' => q(ߛߍ߲ߜ߭ߊߔߎߙ ߘߟߊ),
+				'other' => q(ߛߍ߲ߜ߭ߊߔߎߙ ߘߟߊ),
+			},
+		},
 		'SHP' => {
 			symbol => 'ߛߤߔ',
 			display_name => {
@@ -1551,6 +2204,7 @@ has 'currencies' => (
 			},
 		},
 		'SLL' => {
+			symbol => 'ߛߟߟ',
 			display_name => {
 				'currency' => q(ߛߙߊ߬ߟߏ߲߬ߞߊ ߟߎ߬ ߟߊ߫ ߔߐߣߌ߬ - 1964-2022),
 			},
@@ -1559,6 +2213,13 @@ has 'currencies' => (
 			symbol => 'ߛߡߛ',
 			display_name => {
 				'currency' => q(ߛߏߡߊߟߌߞߊ ߟߎ߬ ߟߊ߫ ߛߌߟߌ߲ߜ߭),
+			},
+		},
+		'SRD' => {
+			symbol => 'ߛߎߘ',
+			display_name => {
+				'currency' => q(ߛߎߙߌߣߊߡߍߛ ߘߟߊ),
+				'other' => q(ߛߎߙߌߣߊߡߍߛ ߘߟߊ),
 			},
 		},
 		'SSP' => {
@@ -1579,10 +2240,38 @@ has 'currencies' => (
 				'currency' => q(ߛߊߏߕߏߡߋߞߊ ߟߎ߬ ߟߊ߫ ߘߏߓߙߊߛ),
 			},
 		},
+		'SYP' => {
+			symbol => 'ߛߌߔ',
+			display_name => {
+				'currency' => q(ߛߌ߯ߙߌ߫ ߔߐߣߌ߬),
+				'other' => q(ߛߌ߯ߙߌ߫ ߔߐߣߌ߬),
+			},
+		},
 		'SZL' => {
 			symbol => 'ߛߖ߭ߟ',
 			display_name => {
 				'currency' => q(ߛߑߥߊߕߣߞߊ ߟߎ߬ ߟߌߟߊ߲ߖ߭ߋߣߌߛ),
+			},
+		},
+		'THB' => {
+			symbol => 'ߕߘߓ',
+			display_name => {
+				'currency' => q(ߕߊߦߌߘߎ߯ ߓߊߘ),
+				'other' => q(ߕߊߦߌߘߎ߯ ߓߊߘ),
+			},
+		},
+		'TJS' => {
+			symbol => 'ߕߖߛ',
+			display_name => {
+				'currency' => q(ߕߊߖߞߌߛߑߕߊ߲߫ ߛߡߏߣߌ),
+				'other' => q(ߕߊߖߞߌߛߑߕߊ߲߫ ߛߡߏߣߌ),
+			},
+		},
+		'TMT' => {
+			symbol => 'ߕߡߕ',
+			display_name => {
+				'currency' => q(ߕߎߙߑߞߌߡߋߣߌߛߑߕߊ߲߫ ߡߣߊ߫ ߞߎߘߊ),
+				'other' => q(ߕߎߙߑߞߌߡߋߣߌߛߑߕߊ߲߫ ߡߣߊ߫ ߞߎߘߊ),
 			},
 		},
 		'TND' => {
@@ -1591,10 +2280,45 @@ has 'currencies' => (
 				'currency' => q(ߕߎߣߛߌߞߊ ߟߎ߬ ߟߊ߫ ߘߌ߬ߣߊ߯ߙ),
 			},
 		},
+		'TOP' => {
+			symbol => 'ߕߏߔ',
+			display_name => {
+				'currency' => q(ߕߏ߲ߜ߭ߊ߲߫ ߓߊ߲ߜ߭ߊ߫),
+				'other' => q(ߕߏ߲ߜ߭ߊ߲߫ ߓߊ߲ߜ߭ߊ߫),
+			},
+		},
+		'TRY' => {
+			symbol => 'ߕߎߟ',
+			display_name => {
+				'currency' => q(ߕߎߙߑߞߌ߫ ߟߌߙߊ߬),
+				'other' => q(ߕߎߙߑߞߌ߫ ߟߌߙߊ߬),
+			},
+		},
+		'TTD' => {
+			symbol => 'ߕߕߘ',
+			display_name => {
+				'currency' => q(ߕߙߌߘߊߘ ߣߌ߫ ߕߏߓߊߜ߭ߏ߫ ߘߟߊ),
+				'other' => q(ߕߙߌߘߊߘ ߣߌ߫ ߕߏߓߊߜ߭ߏ߫ ߘߟߊ),
+			},
+		},
+		'TWD' => {
+			symbol => 'ߕߥߘ',
+			display_name => {
+				'currency' => q(ߕߊߦߌߥߊ߲߫ ߘߟߊ߫ ߞߎߘߊ),
+				'other' => q(ߕߊߦߌߥߊ߲߫ ߘߟߊ߫ ߞߎߘߊ),
+			},
+		},
 		'TZS' => {
 			symbol => 'ߕߖ߭ߛ',
 			display_name => {
 				'currency' => q(ߕߊ߲ߖ߭ߊ߯ߣߌߞߊ ߟߎ߬ ߟߊ߫ ߛߌߟߌ߲ߜ߭),
+			},
+		},
+		'UAH' => {
+			symbol => 'ߌߞߤ',
+			display_name => {
+				'currency' => q(ߌߞߑߙߍߣ ߤߙߌߝ߭ߣߌߦߊߛ),
+				'other' => q(ߌߞߑߙߍߣ ߤߙߌߝ߭ߣߌߦߊߛ),
 			},
 		},
 		'UGS' => {
@@ -1609,16 +2333,91 @@ has 'currencies' => (
 				'currency' => q(ߎߜ߭ߊ߲ߘߞߊ ߟߎ߬ ߟߊ߫ ߛߌߟߌ߲ߜ߭),
 			},
 		},
+		'USD' => {
+			symbol => 'ߊߞߘ$',
+			display_name => {
+				'currency' => q(ߊߡߋߙߌߞߌ߬߬ ߞߊ߬ߝߏ߫ ߘߍ߬ߣߍ߲ ߘߟߊ),
+				'other' => q(ߊߡߋߙߌߞߌ߬߬ ߞߊ߬ߝߏ߫ ߘߍ߬ߣߍ߲ ߘߟߊ),
+			},
+		},
+		'UYU' => {
+			symbol => 'ߎ߳ߔ',
+			display_name => {
+				'currency' => q(ߎ߳ߜ߭ߋߦߌ߫ ߔߋߛߏ),
+				'other' => q(ߎ߳ߜ߭ߋߦߌ߫ ߔߋߛߏ),
+			},
+		},
+		'UZS' => {
+			symbol => 'ߎߗ߭ߛ',
+			display_name => {
+				'currency' => q(ߎߗ߭ߑߓߋߞߌߛߑߕߊ߲߫ ߛߎߡ),
+				'other' => q(ߎߗ߭ߑߓߋߞߌߛߑߕߊ߲߫ ߛߎߡ),
+			},
+		},
+		'VES' => {
+			symbol => 'ߝ߭ߋߓ',
+			display_name => {
+				'currency' => q(ߝ߭ߣߋߗ߭ߎߦߋߟߊ߫ ߓߏߟߌߝ߭ߊߙ),
+				'other' => q(ߝ߭ߣߋߗ߭ߎߦߋߟߊ߫ ߓߏߟߌߝ߭ߊߙ),
+			},
+		},
+		'VND' => {
+			display_name => {
+				'currency' => q(ߝ߭ߌߦߍߕߑߣߊߡ ߘߐ߲ߜ߭),
+				'other' => q(ߝ߭ߌߦߍߕߑߣߊߡ ߘߐ߲ߜ߭),
+			},
+		},
+		'VUV' => {
+			symbol => 'ߝ߭ߕߝ߭',
+			display_name => {
+				'currency' => q(ߝ߭ߊߣߎߦߊߕߎ߫ ߝ߭ߊߕߎ),
+				'other' => q(ߝ߭ߊߣߎߦߊߕߎ߫ ߝ߭ߊߕߎ),
+			},
+		},
+		'WST' => {
+			symbol => '$ߥߛ',
+			display_name => {
+				'currency' => q(ߛߊߡߏߥߊ߲߫ ߕߟߊ),
+				'other' => q(ߛߊߡߏߥߊ߲߫ ߕߟߊ),
+			},
+		},
 		'XAF' => {
 			symbol => 'ߝߛߝ',
 			display_name => {
 				'currency' => q(ߝߘߊ߬ߝߌ߲߬ߠߊ߫ ߕߊ߲ߓߊ߲ ߠߎ߬ ߝߊߙߊ߲߫ ߛߍߝߊ),
 			},
 		},
+		'XCD' => {
+			symbol => 'ߛߟߘ',
+			display_name => {
+				'currency' => q(ߛߍߕ ߟߎߛߌߦߊ߫),
+				'other' => q(ߛߍߕ ߟߎߛߌߦߊ߫),
+			},
+		},
 		'XOF' => {
 			symbol => '߾',
 			display_name => {
 				'currency' => q(ߝߊߙߊ߲߫ ߛߍߝߊ),
+			},
+		},
+		'XPF' => {
+			symbol => '߾ ߝߛߝ',
+			display_name => {
+				'currency' => q(ߝߑߙߊ߲߫ ߛߍߝߊ),
+				'other' => q(ߝߑߙߊ߲߫ ߛߍߝߊ),
+			},
+		},
+		'XXX' => {
+			display_name => {
+				'currency' => q(ߝߊ߬ߘߊ߲߬ߞߊ߫ ߟߐ߲ߓߊߟߌ),
+				'other' => q(ߝߊ߬ߘߊ߲߬ߞߊ߫ ߟߐ߲ߓߊߟߌ),
+			},
+		},
+		'YER' => {
+			symbol => 'ߦߡߙ',
+			display_name => {
+				'currency' => q(ߦߡߊߣߌ߲߫ ߙߌ߬ߦߊߟ),
+				'other' => q(ߦߡߊߣߌ߲߫ ߙߌ߬ߦߊߟ),
 			},
 		},
 		'ZAR' => {
@@ -1947,6 +2746,11 @@ has 'time_zone_names' => (
 		regionFormat => q({0} ߕߎ߬ߡߊ),
 		regionFormat => q({0} ߕߎ߬ߡߊ߬-ߦߟߍߡߊ߲),
 		regionFormat => q({0} ߕߎ߬ߡߊ߬-ߦߟߍߡߊ߲ߓߊߟߌ),
+		'Afghanistan' => {
+			long => {
+				'standard' => q#ߊߝߑߜ߭ߊߣߌߛߑߕߊ߲߫ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
 		'Africa/Abidjan' => {
 			exemplarCity => q#ߊߓߌߖߊ߲߬#,
 		},
@@ -1988,6 +2792,9 @@ has 'time_zone_names' => (
 		},
 		'Africa/Casablanca' => {
 			exemplarCity => q#ߞߛߊߓߎߟߊ߲ߞߊ߫#,
+		},
+		'Africa/Ceuta' => {
+			exemplarCity => q#ߛߋߥߎߕߊ߫#,
 		},
 		'Africa/Conakry' => {
 			exemplarCity => q#ߞߐߣߊߞߙߌ߫#,
@@ -2122,17 +2929,1257 @@ has 'time_zone_names' => (
 				'standard' => q#ߝߘߊ߬ߝߌ߲߬ߠߊ߫ ߕߟߋ߬ߓߋ ߕߎ߬ߡߊ߬ߙߋ߲ ߢߊߓߘߍ#,
 			},
 		},
+		'Alaska' => {
+			long => {
+				'daylight' => q#ߊߟߊߛߑߞߊ߫ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߊߟߊߛߑߞߊ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߊߟߊߛߑߞߊ߫ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Amazon' => {
+			long => {
+				'daylight' => q#ߊߡߊߖ߭ߏ߲߫ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߊߡߊߖ߭ߏ߲߫ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߊߡߊߖ߭ߏߣ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'America/Adak' => {
+			exemplarCity => q#ߊߘߊߞ#,
+		},
+		'America/Anchorage' => {
+			exemplarCity => q#ߊ߲ߞߏߙߊߖ߭#,
+		},
+		'America/Anguilla' => {
+			exemplarCity => q#ߊ߲ߜ߭ߌߟߊ߫#,
+		},
+		'America/Antigua' => {
+			exemplarCity => q#ߊ߲ߕߌߜ߭ߊ߫#,
+		},
+		'America/Araguaina' => {
+			exemplarCity => q#ߊߙߊߜ߭ߎߥߊߦߌߣߊ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+		},
+		'America/Argentina/La_Rioja' => {
+			exemplarCity => q#ߟߊ ߙߌߦߏߖߊ߫#,
+		},
+		'America/Argentina/Rio_Gallegos' => {
+			exemplarCity => q#ߙߌߦߏ߫ ߜ߭ߊߟߟߋߜ߭ߐߛ#,
+		},
+		'America/Argentina/Salta' => {
+			exemplarCity => q#ߛߊߟߑߕߊ߫#,
+		},
+		'America/Argentina/San_Juan' => {
+			exemplarCity => q#ߛߊ߲߫ ߖߎߥߊ߲߫#,
+		},
+		'America/Argentina/San_Luis' => {
+			exemplarCity => q#ߛߊ߲߫ ߟߎߥߌߛ#,
+		},
+		'America/Argentina/Tucuman' => {
+			exemplarCity => q#ߕߞߎߡߊ߲߫#,
+		},
+		'America/Argentina/Ushuaia' => {
+			exemplarCity => q#ߎߛߑߥߦߊ߫#,
+		},
+		'America/Aruba' => {
+			exemplarCity => q#ߊߙߎߓߊ߫#,
+		},
+		'America/Asuncion' => {
+			exemplarCity => q#ߊߛߎ߲ߛߌߦߐ߲߫#,
+		},
+		'America/Bahia' => {
+			exemplarCity => q#ߓߊߤߌߦߊ߫#,
+		},
+		'America/Bahia_Banderas' => {
+			exemplarCity => q#ߓߊߤߌߦߊ ߘߋ߬ ߓߊ߲ߘߋߙߊ߫#,
+		},
+		'America/Barbados' => {
+			exemplarCity => q#ߓߊߙߑߓߘ#,
+		},
+		'America/Belem' => {
+			exemplarCity => q#ߓߟߋߡ#,
+		},
+		'America/Belize' => {
+			exemplarCity => q#ߓߋߟߋߌߖ߭ߊ߫#,
+		},
+		'America/Blanc-Sablon' => {
+			exemplarCity => q#ߓߑߟߊ߲ߛ-ߛߊߓߑߟߐ߲߫#,
+		},
+		'America/Boa_Vista' => {
+			exemplarCity => q#ߓߏߥߊ߫ ߝ߭ߌߛߑߕߊ߫#,
+		},
+		'America/Bogota' => {
+			exemplarCity => q#ߓߜ߭ߏߕߊ߫#,
+		},
+		'America/Boise' => {
+			exemplarCity => q#ߓߎߥߊߛ#,
+		},
+		'America/Buenos_Aires' => {
+			exemplarCity => q#ߓߌߦߣߏߛߍߙ#,
+		},
+		'America/Cambridge_Bay' => {
+			exemplarCity => q#ߞߊ߲ߓߙߌߘߖ ߓߊߦ#,
+		},
+		'America/Campo_Grande' => {
+			exemplarCity => q#ߞߊ߲ߔߏ߫ ߜ߭ߑߙߊ߲ߘ#,
+		},
+		'America/Cancun' => {
+			exemplarCity => q#ߞߊ߲ߞߎ߲߫#,
+		},
+		'America/Caracas' => {
+			exemplarCity => q#ߞߙߊߞߊߛ#,
+		},
+		'America/Catamarca' => {
+			exemplarCity => q#ߞߕߊߡߊߙߑߞߊ߫#,
+		},
+		'America/Cayenne' => {
+			exemplarCity => q#ߞߊߦߑߣߋ߫#,
+		},
+		'America/Cayman' => {
+			exemplarCity => q#ߞߊߦߌߡߊ߲߫#,
+		},
+		'America/Chicago' => {
+			exemplarCity => q#ߛߌߞߊߜ߭ߏ߫#,
+		},
+		'America/Chihuahua' => {
+			exemplarCity => q#ߛߌߤߎߥߊߤߎ߫#,
+		},
+		'America/Ciudad_Juarez' => {
+			exemplarCity => q#ߛߌߦߎߘߊߘ ߖߎߥߊߙߋ߫#,
+		},
+		'America/Coral_Harbour' => {
+			exemplarCity => q#ߊߕߌߞߏߞߊ߲߫#,
+		},
+		'America/Cordoba' => {
+			exemplarCity => q#ߞߐߙߑߘߏߓߊ߫#,
+		},
+		'America/Costa_Rica' => {
+			exemplarCity => q#ߞߏߛߑߕߊߙߌߞߊ߫#,
+		},
+		'America/Creston' => {
+			exemplarCity => q#ߞߙߌߛߑߕߐ߲߫#,
+		},
+		'America/Cuiaba' => {
+			exemplarCity => q#ߞߎߦߌߦߓߊ߫#,
+		},
+		'America/Curacao' => {
+			exemplarCity => q#ߞߎߙߛߊߥߏ߫#,
+		},
+		'America/Danmarkshavn' => {
+			exemplarCity => q#ߘߊ߲ߡߊߙߞߛߑߤߊߝ߭ߣ#,
+		},
+		'America/Dawson' => {
+			exemplarCity => q#ߘߊߥߎߛߐ߲߫#,
+		},
+		'America/Dawson_Creek' => {
+			exemplarCity => q#ߘߊߥߎߛߐ߲߫ ߞߙߌߞ#,
+		},
+		'America/Denver' => {
+			exemplarCity => q#ߘߊ߲ߝ߭ߍߙ#,
+		},
+		'America/Detroit' => {
+			exemplarCity => q#ߘߋߕߙߏߥߊ#,
+		},
+		'America/Dominica' => {
+			exemplarCity => q#ߘߏߡߋߣߌߞ#,
+		},
+		'America/Edmonton' => {
+			exemplarCity => q#ߋߘߑߡߐ߲ߕߐ߲߫#,
+		},
+		'America/Eirunepe' => {
+			exemplarCity => q#ߋߙߎߣߔߋ#,
+		},
+		'America/El_Salvador' => {
+			exemplarCity => q#ߛߊߟߑߝ߭ߊߘߐߙ#,
+		},
+		'America/Fort_Nelson' => {
+			exemplarCity => q#ߝߐߙߕ ߣߋߟߑߛߐ߲߫#,
+		},
+		'America/Fortaleza' => {
+			exemplarCity => q#ߝߐߙߑߕߊߟߋߖ߭ߊ߫#,
+		},
+		'America/Glace_Bay' => {
+			exemplarCity => q#ߜ߭ߑߟߊߛ ߕߌ߲#,
+		},
+		'America/Godthab' => {
+			exemplarCity => q#ߣߎ߯ߞ#,
+		},
+		'America/Goose_Bay' => {
+			exemplarCity => q#ߜ߭ߏߛߋ߫ ߕߌ߲#,
+		},
+		'America/Grand_Turk' => {
+			exemplarCity => q#ߜ߭ߑߙߊ߲ߘ ߕߎߙߞ#,
+		},
+		'America/Grenada' => {
+			exemplarCity => q#ߜ߭ߙߋߣߘߊ߫#,
+		},
+		'America/Guadeloupe' => {
+			exemplarCity => q#ߜ߭ߑߥߊߘߌߟߎߔ#,
+		},
+		'America/Guatemala' => {
+			exemplarCity => q#ߜ߭ߊ߬ߕߌ߬ߡߊ߬ߟߊ߫#,
+		},
+		'America/Guayaquil' => {
+			exemplarCity => q#ߜ߭ߎߥߦߊߞߌߟ#,
+		},
+		'America/Guyana' => {
+			exemplarCity => q#ߜ߭ߎߦߣߊ߫#,
+		},
+		'America/Halifax' => {
+			exemplarCity => q#ߤߊߟߌߝߊߞߛ#,
+		},
+		'America/Havana' => {
+			exemplarCity => q#ߤߝ߭ߊߣߊ߫#,
+		},
+		'America/Hermosillo' => {
+			exemplarCity => q#ߤߋߙߑߡߏߛߌߟߏ߫#,
+		},
+		'America/Indiana/Knox' => {
+			exemplarCity => q#ߞߑߣߏߞߛ [ߌ߲ߘߌߦߣߊ߫]#,
+		},
+		'America/Indiana/Marengo' => {
+			exemplarCity => q#ߡߊߙߌ߲ߜ߭ߏ߫ [ߌ߲ߘߌߦߣߊ߫]#,
+		},
+		'America/Indiana/Petersburg' => {
+			exemplarCity => q#ߔߋߕߍߙߛߑߓߎߙߜ߭ [ߌ߲ߘߌߦߣߊ߫]#,
+		},
+		'America/Indiana/Tell_City' => {
+			exemplarCity => q#ߕߍߟ ߛߕߌ߫ [ߌ߲ߘߌߦߣߊ߫]#,
+		},
+		'America/Indiana/Vevay' => {
+			exemplarCity => q#ߝ߭ߋߝ߭ߊߦ [ߌ߲ߘߌߦߣߊ߫]#,
+		},
+		'America/Indiana/Vincennes' => {
+			exemplarCity => q#ߝ߭ߍ߲ߛߊ߲߫ [ߌ߲ߘߌߦߣߊ߫]#,
+		},
+		'America/Indiana/Winamac' => {
+			exemplarCity => q#ߥߌߣߡߊߞ [ߌ߲ߘߌߦߣߊ߫]#,
+		},
+		'America/Indianapolis' => {
+			exemplarCity => q#ߌ߲ߘߌߦߊߣߊߔߏߟߌߛ#,
+		},
+		'America/Inuvik' => {
+			exemplarCity => q#ߌߣߎߝ߭ߌߞ#,
+		},
+		'America/Iqaluit' => {
+			exemplarCity => q#ߌߞߊߟߎߦߌߕ#,
+		},
+		'America/Jamaica' => {
+			exemplarCity => q#ߖߡߊߦߌߞߊ߫#,
+		},
+		'America/Jujuy' => {
+			exemplarCity => q#ߖߎߖߎߦߌ߫#,
+		},
+		'America/Juneau' => {
+			exemplarCity => q#ߖߎߣߋߥߏ߫#,
+		},
+		'America/Kentucky/Monticello' => {
+			exemplarCity => q#ߡߐ߲ߕߌߛߋߟߏ߬ [ߞߊ߲ߕߎߞߌ߫]#,
+		},
+		'America/Kralendijk' => {
+			exemplarCity => q#ߞߑߙߊߟߊ߲ߘߌߖߞ#,
+		},
+		'America/La_Paz' => {
+			exemplarCity => q#ߟߊ ߔߊߖ߭#,
+		},
+		'America/Lima' => {
+			exemplarCity => q#ߟߌߡߊ߫#,
+		},
+		'America/Los_Angeles' => {
+			exemplarCity => q#ߟߐߛ ߊ߲ߖ߭ߋߟߍߛ#,
+		},
+		'America/Louisville' => {
+			exemplarCity => q#ߟߎߦߌߛߝ߭ߌߟ#,
+		},
+		'America/Lower_Princes' => {
+			exemplarCity => q#ߟߏߥߍ ߔߑߙߍ߲ߛ ߞߊߙߑߕߋ߫#,
+		},
+		'America/Maceio' => {
+			exemplarCity => q#ߡߊߛߋߦߏ߫#,
+		},
+		'America/Managua' => {
+			exemplarCity => q#ߡߣߊߜ߭ߎߥߊ߫#,
+		},
+		'America/Manaus' => {
+			exemplarCity => q#ߡߣߊߥߐߛ#,
+		},
+		'America/Marigot' => {
+			exemplarCity => q#ߡߊߙߌߜ߭ߐߕ#,
+		},
+		'America/Martinique' => {
+			exemplarCity => q#ߡߊߙߑߕߣߌߞ#,
+		},
+		'America/Matamoros' => {
+			exemplarCity => q#ߡߕߊߡߙߏߛ#,
+		},
+		'America/Mazatlan' => {
+			exemplarCity => q#ߡߖ߭ߊߕߑߟߊ߲߫#,
+		},
+		'America/Mendoza' => {
+			exemplarCity => q#ߡߊ߲ߘߏߖ߭ߊ#,
+		},
+		'America/Menominee' => {
+			exemplarCity => q#ߡߋߣߏߡߌ߲߫#,
+		},
+		'America/Merida' => {
+			exemplarCity => q#ߡߋߙߌߘߊ߫#,
+		},
+		'America/Metlakatla' => {
+			exemplarCity => q#ߡߋߕߑߟߞߊߦߑߟߊ߫#,
+		},
+		'America/Mexico_City' => {
+			exemplarCity => q#ߡߍߞߛߌߞߏ߫#,
+		},
+		'America/Miquelon' => {
+			exemplarCity => q#ߡߌߞߋߟߐ߲߫#,
+		},
+		'America/Moncton' => {
+			exemplarCity => q#ߡߐ߲ߞߑߕߐ߲߫#,
+		},
+		'America/Monterrey' => {
+			exemplarCity => q#ߡߐ߲ߕߋߚߋߦ#,
+		},
+		'America/Montevideo' => {
+			exemplarCity => q#ߡߐ߲ߕߋߝ߭ߌߘߋߥߏ߫#,
+		},
+		'America/Montserrat' => {
+			exemplarCity => q#ߡߐ߲ߕߛߑߚߊߕ#,
+		},
+		'America/Nassau' => {
+			exemplarCity => q#ߣߊߛߊߥߏ߫#,
+		},
+		'America/New_York' => {
+			exemplarCity => q#ߣߋߥ ߦߐߙߞ#,
+		},
+		'America/Nome' => {
+			exemplarCity => q#ߣߏߡߋ߫#,
+		},
+		'America/Noronha' => {
+			exemplarCity => q#ߣߐߙߐ߲ߤߊ߲߫#,
+		},
+		'America/North_Dakota/Beulah' => {
+			exemplarCity => q#ߓߋߦߎߟߊ߫ (ߞߐ߰ߘߎ߮ ߘߊߞߏߕߊ߫)#,
+		},
+		'America/North_Dakota/Center' => {
+			exemplarCity => q#ߛߊ߲ߕߙߌ߫ (ߞߐ߰ߘߎ߮ ߘߊߞߏߕߊ߫)#,
+		},
+		'America/North_Dakota/New_Salem' => {
+			exemplarCity => q#ߣߋߥ ߛߊߟߋߡ (ߞߐ߰ߘߎ߮ ߘߊߞߏߕߊ߫)#,
+		},
+		'America/Ojinaga' => {
+			exemplarCity => q#ߏߖߌߣߜ߭ߊ߫#,
+		},
+		'America/Panama' => {
+			exemplarCity => q#ߔߣߊߡߊ߬#,
+		},
+		'America/Paramaribo' => {
+			exemplarCity => q#ߔߙߊߡߊߙߌߓߏ߫#,
+		},
+		'America/Phoenix' => {
+			exemplarCity => q#ߝߏߋߣߌߞߛ#,
+		},
+		'America/Port-au-Prince' => {
+			exemplarCity => q#ߔߐߙߕ-ߏ-ߔߑߙߍ߲ߛ#,
+		},
+		'America/Port_of_Spain' => {
+			exemplarCity => q#ߔߐߙߕ ߊߛߑߔߊ߲߫#,
+		},
+		'America/Porto_Velho' => {
+			exemplarCity => q#ߔߐߙߑߕߏ߫ ߝ߭ߋߟߏ߫#,
+		},
+		'America/Puerto_Rico' => {
+			exemplarCity => q#ߔߐߙߕ-ߏ-ߙߌߞߏ߫#,
+		},
+		'America/Punta_Arenas' => {
+			exemplarCity => q#ߔߎ߲ߕߊ߫ ߊߙߋߣߊ߫#,
+		},
+		'America/Rankin_Inlet' => {
+			exemplarCity => q#ߙߊ߲ߞߌ߲߫ ߌ߲ߟߍߕ#,
+		},
+		'America/Recife' => {
+			exemplarCity => q#ߙߋߛߌߝ#,
+		},
+		'America/Regina' => {
+			exemplarCity => q#ߙߋߖ߭ߌߣߊ߫#,
+		},
+		'America/Resolute' => {
+			exemplarCity => q#ߙߋߖ߭ߏߟߎߕ#,
+		},
+		'America/Rio_Branco' => {
+			exemplarCity => q#ߙߌߦߏ߫ ߓߑߙߊ߲ߞߏ߫#,
+		},
+		'America/Santarem' => {
+			exemplarCity => q#ߛߊ߲ߕߊߙߍߡ#,
+		},
+		'America/Santiago' => {
+			exemplarCity => q#ߛߊ߲ߕߌߦߊߜ߭ߏ߫#,
+		},
+		'America/Santo_Domingo' => {
+			exemplarCity => q#ߛߊ߲ߕߏ-ߘߏߡߌ߲ߜ߭#,
+		},
+		'America/Sao_Paulo' => {
+			exemplarCity => q#ߛߊ߲ߔߊߥߟߏ߫#,
+		},
+		'America/Scoresbysund' => {
+			exemplarCity => q#ߌߕߕߏߞߞߏߙߑߕߏߙߑߟߜߕ#,
+		},
+		'America/Sitka' => {
+			exemplarCity => q#ߛߌߕߑߞߊ߫#,
+		},
+		'America/St_Barthelemy' => {
+			exemplarCity => q#ߛߍ߲-ߓߊߙߕߑߤߟߋߡߌ߫#,
+		},
+		'America/St_Johns' => {
+			exemplarCity => q#ߛߍ߲-ߖ߭ߊ߲ ߕߋ ߕߍߚ-ߣߋߝ߭#,
+		},
+		'America/St_Kitts' => {
+			exemplarCity => q#ߛߍ߲-ߞߙߌߛߑߕߐߝ#,
+		},
+		'America/St_Lucia' => {
+			exemplarCity => q#ߛߍ-ߟߎߥߌߛ#,
+		},
+		'America/St_Thomas' => {
+			exemplarCity => q#ߛߍ߲-ߕߏߡߊߛ#,
+		},
+		'America/St_Vincent' => {
+			exemplarCity => q#ߛߍ߲-ߝ߭ߍ߲ߛߊ߲߫#,
+		},
+		'America/Swift_Current' => {
+			exemplarCity => q#ߛߥߌߝ ߞߎߙߊ߲߫#,
+		},
+		'America/Tegucigalpa' => {
+			exemplarCity => q#ߕߋߜ߭ߎߛߌߜ߭ߊߟߑߔߊ߫#,
+		},
+		'America/Thule' => {
+			exemplarCity => q#ߕߎߟߋ߫#,
+		},
+		'America/Tijuana' => {
+			exemplarCity => q#ߕߌߖߎߥߣߊ߫#,
+		},
+		'America/Toronto' => {
+			exemplarCity => q#ߕߏߙߏ߲ߕߏ߫#,
+		},
+		'America/Tortola' => {
+			exemplarCity => q#ߕߏߙߑߕߏߟߊ߫#,
+		},
+		'America/Vancouver' => {
+			exemplarCity => q#ߝ߭ߊ߲ߞߎߝ߭ߍߙ#,
+		},
+		'America/Whitehorse' => {
+			exemplarCity => q#ߥߌߕߋߤߐߙߛ#,
+		},
+		'America/Winnipeg' => {
+			exemplarCity => q#ߥߌ߲ߣߌߔߋߜ߭#,
+		},
+		'America/Yakutat' => {
+			exemplarCity => q#ߦߊߞߎߕߊ߫#,
+		},
+		'America_Central' => {
+			long => {
+				'daylight' => q#ߞߐ߰ߘߎ߮ ߊߡߋߙߌߞߌ߬ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߊߡߋߙߌߞߌ߬ ߕߊ߲ߓߊ߲ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߞߐ߰ߘߎ߮ ߊߡߋߙߌߞߌ߬ ߕߎ߬ߡߘߊ߬ ߕߊ߲ߓߊ߲߫ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'America_Eastern' => {
+			long => {
+				'daylight' => q#ߞߐ߰ߘߎ߰ ߊߡߋߙߌߞߌ߬ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߞߐ߰ߘߎ߰ ߊߡߋߙߌߞߌ߬ ߕߟߋ߬ߓߐ߬ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߞߐ߰ߘߎ߰ ߊߡߋߙߌߞߌ߬ ߕߟߋ߬ߓߐ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'America_Mountain' => {
+			long => {
+				'daylight' => q#ߞߙߎ߬ߞߊ߲߬ߠߊ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߞߙߎ߬ߞߊ߲߬ߠߊ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߞߙߎ߬ߞߊ߲߬ߠߊ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'America_Pacific' => {
+			long => {
+				'daylight' => q#ߞߐ߰ߘߎ߰ ߊߡߋߙߌߞߌ߬ ߣߌ߫ ߖߐ߫ ߟߌ߲ߓߊ߲ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߞߐ߰ߘߎ߰ ߊߡߋߙߌߞߌ߬ ߣߌ߫ ߖߐ߫ ߟߌ߲ߓߊ߲ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߞߐ߰ߘߎ߰ ߊߡߋߙߌߞߌ߬ ߣߌ߫ ߖߐ߫ ߟߌ߲ߓߊ߲ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Antarctica/Casey' => {
+			exemplarCity => q#ߞߊߛߋߦߌ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+		},
+		'Antarctica/Davis' => {
+			exemplarCity => q#ߘߊߝ߭ߌߛ#,
+		},
+		'Antarctica/DumontDUrville' => {
+			exemplarCity => q#ߘߎߡߐ߲-ߎߙߑߝ߭ߌߟ#,
+		},
+		'Antarctica/Macquarie' => {
+			exemplarCity => q#ߡߞߊߙߌ߫#,
+		},
+		'Antarctica/Mawson' => {
+			exemplarCity => q#ߡߊߥߑߛߐ߲߫#,
+		},
+		'Antarctica/McMurdo' => {
+			exemplarCity => q#ߡߞߑߡߎߙߑߘߏ߫#,
+		},
+		'Antarctica/Palmer' => {
+			exemplarCity => q#ߔߊߟߑߡߍߙ#,
+		},
+		'Antarctica/Rothera' => {
+			exemplarCity => q#ߙߏߕߋߙߊ߫#,
+		},
+		'Antarctica/Syowa' => {
+			exemplarCity => q#ߛߏߥߊ߫#,
+		},
+		'Antarctica/Troll' => {
+			exemplarCity => q#ߕߙߏߟ#,
+		},
+		'Antarctica/Vostok' => {
+			exemplarCity => q#ߝ߭ߏߛߑߕߏߞ#,
+		},
+		'Apia' => {
+			long => {
+				'daylight' => q#ߊߔߌߦߊ߫ ߕߟߋ߬ߡߊ߬ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+				'generic' => q#ߊߔߌߦߊ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߊߔߌߦߊ߫ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Arabian' => {
+			long => {
+				'daylight' => q#ߊߙߊߓߎߟߊ߫ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+				'generic' => q#ߊߙߊߓߎߟߊ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߊߙߊߓߎߟߊ߫ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Arctic/Longyearbyen' => {
+			exemplarCity => q#ߟߐ߲ߜ߭ߌߋߦߊߙߑߓߌߦߍ߲߫#,
+		},
+		'Argentina' => {
+			long => {
+				'daylight' => q#ߊߙߑߖ߭ߊ߲ߕߌ߲߫ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߊߙߑߖ߭ߊ߲ߕߌ߲߫ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߊߙߑߖ߭ߊ߲ߕߌ߲߫ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Argentina_Western' => {
+			long => {
+				'daylight' => q#ߕߟߋ߬ߓߋ ߊߙߑߖ߭ߊ߲ߕߌ߲߫ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߕߟߋ߬ߓߋ ߊߙߑߖ߭ߊ߲ߕߌ߲߫ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߕߟߋ߬ߓߋ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Armenia' => {
+			long => {
+				'daylight' => q#ߊߙߑߡߋߣߌ߫ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+				'generic' => q#ߊߙߑߡߋߣߌ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߊߙߑߡߋߣߌ߫ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Asia/Aden' => {
+			exemplarCity => q#ߊߘߍ߲߫#,
+		},
+		'Asia/Almaty' => {
+			exemplarCity => q#ߊߟߑߡߊ ߊߕߊ߫#,
+		},
+		'Asia/Amman' => {
+			exemplarCity => q#ߊߡߡߊ߲߫#,
+		},
+		'Asia/Anadyr' => {
+			exemplarCity => q#ߊߣߊߘߌߙ#,
+		},
+		'Asia/Aqtau' => {
+			exemplarCity => q#ߊߞߑߕߊߥߎ߫#,
+		},
+		'Asia/Aqtobe' => {
+			exemplarCity => q#ߊߞߑߕߏߓߌ߲ߛߞ#,
+		},
+		'Asia/Ashgabat' => {
+			exemplarCity => q#ߊߛߑߜ߭ߊߓߊߕ#,
+		},
+		'Asia/Atyrau' => {
+			exemplarCity => q#ߊߕߌߙߊߎ߫#,
+		},
+		'Asia/Baghdad' => {
+			exemplarCity => q#ߓߊߜ߭ߑߘߊߘ#,
+		},
+		'Asia/Bahrain' => {
+			exemplarCity => q#ߓߤߊߙߍ߲߫#,
+		},
+		'Asia/Baku' => {
+			exemplarCity => q#ߓߊߞߎ߫#,
+		},
+		'Asia/Bangkok' => {
+			exemplarCity => q#ߓߊ߲ߞߐߞ#,
+		},
+		'Asia/Barnaul' => {
+			exemplarCity => q#ߓߊߙߑߣߐߟ#,
+		},
+		'Asia/Beirut' => {
+			exemplarCity => q#ߓߋߦߌߙߎߕ#,
+		},
+		'Asia/Bishkek' => {
+			exemplarCity => q#ߓߌߗߍߞ#,
+		},
+		'Asia/Brunei' => {
+			exemplarCity => q#ߓߙߎߣߋߦߌ߫#,
+		},
+		'Asia/Calcutta' => {
+			exemplarCity => q#ߞߊߟߑߞߎߕߊ߫#,
+		},
+		'Asia/Chita' => {
+			exemplarCity => q#ߗߌߕߊ߫#,
+		},
+		'Asia/Colombo' => {
+			exemplarCity => q#ߞߏߟߏ߲ߓߏ߫#,
+		},
+		'Asia/Damascus' => {
+			exemplarCity => q#ߘߡߊߛ#,
+		},
+		'Asia/Dhaka' => {
+			exemplarCity => q#ߘߞߊ߫#,
+		},
+		'Asia/Dili' => {
+			exemplarCity => q#ߘߟߌ߫#,
+		},
+		'Asia/Dubai' => {
+			exemplarCity => q#ߘߎ߬ߓߊߦߌ߬#,
+		},
+		'Asia/Dushanbe' => {
+			exemplarCity => q#ߘߎߛߊ߲ߓߋ߫#,
+		},
+		'Asia/Famagusta' => {
+			exemplarCity => q#ߝߡߊߜ߭ߎߛߑߕߊ߫#,
+		},
+		'Asia/Gaza' => {
+			exemplarCity => q#ߜ߭ߊߖ߭ߊ߫#,
+		},
+		'Asia/Hebron' => {
+			exemplarCity => q#ߤߋߓߑߙߐ߲߫#,
+		},
+		'Asia/Hong_Kong' => {
+			exemplarCity => q#ߤߐ߲ߜ߭ ߞߐ߲ߜ߭#,
+		},
+		'Asia/Hovd' => {
+			exemplarCity => q#ߤߏߝ߭ߘ#,
+		},
+		'Asia/Irkutsk' => {
+			exemplarCity => q#ߌߙߑߞߎߕߑߘߞߌ߫#,
+		},
+		'Asia/Jakarta' => {
+			exemplarCity => q#ߖߞߊߙߑߕߊ߫#,
+		},
+		'Asia/Jayapura' => {
+			exemplarCity => q#ߖߦߊߔߎߙߊ߫#,
+		},
+		'Asia/Jerusalem' => {
+			exemplarCity => q#ߖ߭ߋߙߎߖ߭ߊߟߍߡ#,
+		},
+		'Asia/Kabul' => {
+			exemplarCity => q#ߞߊߓߎߟ#,
+		},
+		'Asia/Kamchatka' => {
+			exemplarCity => q#ߞߊ߲ߦߑߗߊߕߑߞߌ߫#,
+		},
+		'Asia/Karachi' => {
+			exemplarCity => q#ߞߙߊߛߌ߫#,
+		},
+		'Asia/Katmandu' => {
+			exemplarCity => q#ߞߊߕߑߡߊ߲ߘߎ߫#,
+		},
+		'Asia/Khandyga' => {
+			exemplarCity => q#ߞ߭ߊ߲ߘߌߜ߭ߊ߫#,
+		},
+		'Asia/Krasnoyarsk' => {
+			exemplarCity => q#ߞߙߊߛߑߟߏߦߑߦߊߙߑߛߞߌ߫#,
+		},
+		'Asia/Kuala_Lumpur' => {
+			exemplarCity => q#ߞߎߥߟߊ ߟߎ߲ߔߎߙ#,
+		},
+		'Asia/Kuching' => {
+			exemplarCity => q#ߞߎߗߌ߲ߜ߭#,
+		},
+		'Asia/Kuwait' => {
+			exemplarCity => q#ߞߎߥߍߦߌߕ#,
+		},
+		'Asia/Macau' => {
+			exemplarCity => q#ߡߞߊߥߏ߫#,
+		},
+		'Asia/Magadan' => {
+			exemplarCity => q#ߡߜ߭ߊߘߊ߲߫#,
+		},
+		'Asia/Makassar' => {
+			exemplarCity => q#ߡߞߊߛߊߙ#,
+		},
+		'Asia/Manila' => {
+			exemplarCity => q#ߡߊߣߌߟ#,
+		},
+		'Asia/Muscat' => {
+			exemplarCity => q#ߡߊߛߑߞߊߕ#,
+		},
+		'Asia/Nicosia' => {
+			exemplarCity => q#ߣߌߞߏߛߌߦߊ߫#,
+		},
+		'Asia/Novokuznetsk' => {
+			exemplarCity => q#ߣߝ߭ߏߞߎߖ߭ߣߍߕߑߛߞߌ߫#,
+		},
+		'Asia/Novosibirsk' => {
+			exemplarCity => q#ߣߝ߭ߏߞߛߓߌߙߑߛߞߌ߫#,
+		},
+		'Asia/Omsk' => {
+			exemplarCity => q#ߏߡߑߛߞ#,
+		},
+		'Asia/Oral' => {
+			exemplarCity => q#ߏߙߊߟ#,
+		},
+		'Asia/Phnom_Penh' => {
+			exemplarCity => q#ߔߑߣߐ߲߫ ߔߍ߲߫#,
+		},
+		'Asia/Pontianak' => {
+			exemplarCity => q#ߔߐ߲ߕߌߦߊߣߊߞ#,
+		},
+		'Asia/Pyongyang' => {
+			exemplarCity => q#ߔߌߦߐ߲ߜ߭ߦߊ߲ߜ߭#,
+		},
+		'Asia/Qatar' => {
+			exemplarCity => q#ߞߕߊߙ#,
+		},
+		'Asia/Qostanay' => {
+			exemplarCity => q#ߞߏߛߑߕߣߊߦ#,
+		},
+		'Asia/Qyzylorda' => {
+			exemplarCity => q#ߞߖ߭ߌߟߏߙߑߘߊ߫#,
+		},
+		'Asia/Rangoon' => {
+			exemplarCity => q#ߙߊ߲ߜ߭ߎ߲߫#,
+		},
+		'Asia/Riyadh' => {
+			exemplarCity => q#ߙߌߦߊߘ#,
+		},
+		'Asia/Saigon' => {
+			exemplarCity => q#ߤߐ߯-ߗߌ-ߡߌ߲-ߘߎ߱#,
+		},
+		'Asia/Sakhalin' => {
+			exemplarCity => q#ߛߞߊߟߌߣ#,
+		},
+		'Asia/Samarkand' => {
+			exemplarCity => q#ߛߡߊߙߑߞߊ߲ߘ#,
+		},
+		'Asia/Seoul' => {
+			exemplarCity => q#ߛߋߎߟ#,
+		},
+		'Asia/Shanghai' => {
+			exemplarCity => q#ߛߊ߲ߜ߭ߊߦߌ߫#,
+		},
+		'Asia/Singapore' => {
+			exemplarCity => q#ߛߍ߲ߜ߭ߊߔߎߙ#,
+		},
+		'Asia/Srednekolymsk' => {
+			exemplarCity => q#ߛߙߋߘߑߣߏߞߐߟߌߡߑߛߞߌ߫#,
+		},
+		'Asia/Taipei' => {
+			exemplarCity => q#ߕߊߦߌߔߋ߫#,
+		},
+		'Asia/Tashkent' => {
+			exemplarCity => q#ߕߊߛߗߑߞߍ߲ߕ#,
+		},
+		'Asia/Tbilisi' => {
+			exemplarCity => q#ߕߓߌߟߛߌ߫#,
+		},
+		'Asia/Tehran' => {
+			exemplarCity => q#ߕߤߋߙߊ߲߫#,
+		},
+		'Asia/Thimphu' => {
+			exemplarCity => q#ߕߌ߲ߔߎ߫#,
+		},
+		'Asia/Tokyo' => {
+			exemplarCity => q#ߕߏߞߌߦߏ߫#,
+		},
+		'Asia/Tomsk' => {
+			exemplarCity => q#ߕߏߡߑߛߞ#,
+		},
+		'Asia/Ulaanbaatar' => {
+			exemplarCity => q#ߎߟߊ߲ߓߊߕߐߙ#,
+		},
+		'Asia/Urumqi' => {
+			exemplarCity => q#ߎߙߎ߲ߞߌ߫#,
+		},
+		'Asia/Ust-Nera' => {
+			exemplarCity => q#ߎߛߕ-ߣߋߙߊ߫#,
+		},
+		'Asia/Vientiane' => {
+			exemplarCity => q#ߝ߭ߌߦߍߕߌߣߊߡ#,
+		},
+		'Asia/Vladivostok' => {
+			exemplarCity => q#ߝ߭ߑߟߊߘߌߝ߭ߏߛߑߕߐߞ#,
+		},
+		'Asia/Yakutsk' => {
+			exemplarCity => q#ߦߊߞߎߕߑߛߞ#,
+		},
+		'Asia/Yekaterinburg' => {
+			exemplarCity => q#ߦߋߞߊߕߋߙߌ߲ߓߎߙߜ߭#,
+		},
+		'Asia/Yerevan' => {
+			exemplarCity => q#ߦߙߋߝ߭ߊ߲߫#,
+		},
+		'Atlantic' => {
+			long => {
+				'daylight' => q#ߟߌ߲ߓߊ߲-ߡߊ߲ߞߊ߲ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߟߌ߲ߓߊ߲-ߡߊ߲ߞߊ߲ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߟߌ߲ߓߊ߲-ߡߊ߲ߞߊ߲ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Atlantic/Azores' => {
+			exemplarCity => q#ߊߗ߭ߏߙߍߛ#,
+		},
+		'Atlantic/Bermuda' => {
+			exemplarCity => q#ߓߍߙ߸ߡߎߘߍߛ#,
+		},
+		'Atlantic/Canary' => {
+			exemplarCity => q#ߞߣߊߙߌ߫#,
+		},
 		'Atlantic/Cape_Verde' => {
 			exemplarCity => q#ߜߦߋߞߎ߲߫-ߝߙߌߛߌ߫#,
 		},
+		'Atlantic/Faeroe' => {
+			exemplarCity => q#ߝߊߙߏߋ߫#,
+		},
+		'Atlantic/Madeira' => {
+			exemplarCity => q#ߡߊߘߍߙ#,
+		},
+		'Atlantic/Reykjavik' => {
+			exemplarCity => q#ߙߋߦߑߞߌߦߊߝ߭ߍߞ#,
+		},
+		'Atlantic/South_Georgia' => {
+			exemplarCity => q#ߞߐ߰ߘߎ߮ ߖ߭ߐߙߑߖ߭ߌߟߊ߫#,
+		},
 		'Atlantic/St_Helena' => {
 			exemplarCity => q#ߛߍ߲ߕ ߤߋߟߍߣ#,
+		},
+		'Atlantic/Stanley' => {
+			exemplarCity => q#ߛߑߕߊ߲ߟߋߦ#,
+		},
+		'Australia/Adelaide' => {
+			exemplarCity => q#ߊߘߋߟߊߦߘ#,
+		},
+		'Australia/Brisbane' => {
+			exemplarCity => q#ߓߑߙߌߛߑߓߊ߲߫#,
+		},
+		'Australia/Broken_Hill' => {
+			exemplarCity => q#ߓߑߙߏߞߍ߲߫ ߤߌߟ#,
+		},
+		'Australia/Darwin' => {
+			exemplarCity => q#ߘߊߙߑߥߌ߲߫#,
+		},
+		'Australia/Eucla' => {
+			exemplarCity => q#ߋߞߑߟߊ߫#,
+		},
+		'Australia/Hobart' => {
+			exemplarCity => q#ߤߏߓߊߙߕ#,
+		},
+		'Australia/Lindeman' => {
+			exemplarCity => q#ߟߌ߲ߘߋߡߊ߲߫#,
+		},
+		'Australia/Lord_Howe' => {
+			exemplarCity => q#ߟߐߙߘ ߤߏߥߋ߫#,
+		},
+		'Australia/Melbourne' => {
+			exemplarCity => q#ߡߋߟߑߓߎߙߣ#,
+		},
+		'Australia/Perth' => {
+			exemplarCity => q#ߔߍߙߕ#,
+		},
+		'Australia/Sydney' => {
+			exemplarCity => q#ߛߌߘߑߣߋ߫#,
+		},
+		'Australia_Central' => {
+			long => {
+				'daylight' => q#ߕߍߡߟߊ ߏߛߑߕߙߊߟߌ߫ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߕߍߡߟߊ ߏߛߑߕߙߊߟߌ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߕߍߡߟߊ ߏߛߑߕߙߊߟߌ߫ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Australia_CentralWestern' => {
+			long => {
+				'daylight' => q#ߏߛߑߕߙߊߟߌ߫ ߕߟߋ߬ߓߋ߬-ߕߍߡߟߊ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߏߛߑߕߙߊߟߌ߫ ߕߟߋ߬ߓߋ߬-ߕߍߡߟߊ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߏߛߑߕߙߊߟߌ߫ ߕߟߋ߬ߓߋ߬-ߕߍߡߟߊ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Australia_Eastern' => {
+			long => {
+				'daylight' => q#ߕߟߋ߬ߓߐ ߏߛߑߕߙߊߟߌ߫ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߕߟߋ߬ߓߐ ߏߛߑߕߙߊߟߌ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߕߟߋ߬ߓߐ ߏߛߑߕߙߊߟߌ߫ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Australia_Western' => {
+			long => {
+				'daylight' => q#ߕߟߋ߬ߓߋ ߏߛߑߕߙߊߟߌ߫ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߕߟߋ߬ߓߋ ߏߛߑߕߙߊߟߌ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߕߟߋ߬ߓߋ ߏߛߑߕߙߊߟߌ߫ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Azerbaijan' => {
+			long => {
+				'daylight' => q#ߊߖ߭ߍߙߑߓߊߦߑߖߊ߲߫ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+				'generic' => q#ߊߖ߭ߍߙߑߓߊߦߑߖߊ߲߫ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߊߖ߭ߍߙߑߓߊߦߑߖߊ߲߫ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Azores' => {
+			long => {
+				'daylight' => q#ߊߗ߭ߐߙߛ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߊߗ߭ߐߙߛ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߊߗ߭ߐߙߛ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Bangladesh' => {
+			long => {
+				'daylight' => q#ߓߊ߲ߜ߭ߑߟߊߘߍߛ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߓߊ߲ߜ߭ߑߟߊߘߍߛ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߓߊ߲ߜ߭ߑߟߊߘߍߛ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Bhutan' => {
+			long => {
+				'standard' => q#ߓߎߕߊ߲߫ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'Bolivia' => {
+			long => {
+				'standard' => q#ߓߏߟߝ߭ߌ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'Brasilia' => {
+			long => {
+				'daylight' => q#ߓߙߋߖ߭ߟߌߟߊ߫ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߓߙߋߖ߭ߟߌߟߊ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߓߙߋߖ߭ߟߌߟߊ߫ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Brunei' => {
+			long => {
+				'standard' => q#ߓߙߎߣߋߦߌ߫ ߘߊߙߎߛߑߛߟߊߡ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
 		},
 		'Cape_Verde' => {
 			long => {
 				'daylight' => q#ߜߙߋߞߎ߲߫-ߝߙߌߛߌ߫ ߕߟߋ߬ߡߊ߬ ߕߎߡߊߙߋ߲#,
 				'generic' => q#ߜߙߋߞߎ߲߫-ߝߙߌߛߌ߫ ߕߎ߬ߡߊ߬ߙߋ߲#,
 				'standard' => q#ߜߙߋߞߎ߲߫-ߝߙߌߛߌ߫ ߕߎ߬ߡߊ߬ߙߋ߲ ߢߊߓߘߍ#,
+			},
+		},
+		'Chamorro' => {
+			long => {
+				'standard' => q#ߛ߭ߊߡߏߙߏ߫ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Chatham' => {
+			long => {
+				'daylight' => q#ߗߕߊߡ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߗߕߊߡ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߗߕߊߡ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Chile' => {
+			long => {
+				'daylight' => q#ߛߟߌ߫ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߛߟߌ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߛߟߌ߫ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'China' => {
+			long => {
+				'daylight' => q#ߛߌߣ ߕߟߋ߬ߡߊ߬ ߕߎ߬ߡߊ߬ߘߊ#,
+				'generic' => q#ߛߌߣ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߛߌߣ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Christmas' => {
+			long => {
+				'standard' => q#ߞߑߙߌߛߑߡߊߛ ߕߌ߲ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'Cocos' => {
+			long => {
+				'standard' => q#ߞߏߞߏߛ ߕߌ߲ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'Colombia' => {
+			long => {
+				'daylight' => q#ߞߐߟߐ߲ߓߌ߫ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߞߐߟߐ߲ߓߌ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߞߐߟߐ߲ߓߌ߫ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Cook' => {
+			long => {
+				'daylight' => q#ߞߏߞ ߕߟߋ߬ߡߊ߬ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+				'generic' => q#ߞߏߞ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߞߏߞ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Cuba' => {
+			long => {
+				'daylight' => q#ߞߎ߱ߓߊ߫ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߞߎ߳ߓߊ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߞߎ߳ߓߊ߫ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Davis' => {
+			long => {
+				'standard' => q#ߘߊߝ߭ߌߛ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'DumontDUrville' => {
+			long => {
+				'standard' => q#ߘߎߡߐ߲-ߘߎߙߑߝ߭ߌߟ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'East_Timor' => {
+			long => {
+				'standard' => q#ߕߟߋ߬ߓߐ ߕߌߡߐߙ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'Easter' => {
+			long => {
+				'daylight' => q#ߌߛߑߟߊ߲ߘ ߕߌ߲ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߌߛߑߟߊ߲ߘ ߕߌ߲ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߌߛߑߟߊ߲ߘ ߕߌ߲ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Ecuador' => {
+			long => {
+				'standard' => q#ߌߞߑߥߊߘߐߙ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'Etc/UTC' => {
+			long => {
+				'standard' => q#ߖߊ߯ߓߊ߫ ߕߎߡߘߊ߫ ߘߏ߲߬ߖߟߎ߬ߡߊ߬ߣߍ߲#,
+			},
+		},
+		'Etc/Unknown' => {
+			exemplarCity => q#ߛߏ߫ ߟߐ߲ߓߊߟߌ߫#,
+		},
+		'Europe/Amsterdam' => {
+			exemplarCity => q#ߊߡߛߑߕߍߙߑߘߊߡ#,
+		},
+		'Europe/Andorra' => {
+			exemplarCity => q#ߊ߲ߘߏߙߋ߫#,
+		},
+		'Europe/Astrakhan' => {
+			exemplarCity => q#ߊߛߑߕߙߊߞߑߤߊ߲߫#,
+		},
+		'Europe/Athens' => {
+			exemplarCity => q#ߊߕߍߣ#,
+		},
+		'Europe/Belgrade' => {
+			exemplarCity => q#ߓߍߟߑߜ߭ߙߊߘ#,
+		},
+		'Europe/Berlin' => {
+			exemplarCity => q#ߓߍߙߑߟߍ߲߫#,
+		},
+		'Europe/Bratislava' => {
+			exemplarCity => q#ߓߑߙߊߕߌߛߑߟߝ߭ߊ߫#,
+		},
+		'Europe/Brussels' => {
+			exemplarCity => q#ߓߑߙߎߞߑߛߍߟ#,
+		},
+		'Europe/Bucharest' => {
+			exemplarCity => q#ߓߎߞߊߙߍߛ#,
+		},
+		'Europe/Budapest' => {
+			exemplarCity => q#ߓߎߘߊߓߍߛߕ#,
+		},
+		'Europe/Busingen' => {
+			exemplarCity => q#ߓߎߛߍ߲ߜ߭ߍ߲߫#,
+		},
+		'Europe/Chisinau' => {
+			exemplarCity => q#ߗߛߌߣߊߥ#,
+		},
+		'Europe/Copenhagen' => {
+			exemplarCity => q#ߞߏߔߋߣߊߜ߭#,
+		},
+		'Europe/Dublin' => {
+			exemplarCity => q#ߘߎߓߑߟߍ߫#,
+			long => {
+				'daylight' => q#ߌߙߑߟߊ߲ߘ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Europe/Gibraltar' => {
+			exemplarCity => q#ߖ߭ߌߓߙߊߟߑߕߊ߫#,
+		},
+		'Europe/Guernsey' => {
+			exemplarCity => q#ߜ߭ߍߙߑߣߛߋߦ#,
+		},
+		'Europe/Helsinki' => {
+			exemplarCity => q#ߤߍߟߑߛߌ߲ߞߌ߫#,
+		},
+		'Europe/Isle_of_Man' => {
+			exemplarCity => q#ߡߊ߲߫ ߕߌ߲#,
+		},
+		'Europe/Istanbul' => {
+			exemplarCity => q#ߌߛߑߕߊ߲ߓߎߟ#,
+		},
+		'Europe/Jersey' => {
+			exemplarCity => q#ߖߋߙߑߛߌ߫#,
+		},
+		'Europe/Kaliningrad' => {
+			exemplarCity => q#ߞߊߟߌߣߌ߲ߜ߭ߙߊߘ#,
+		},
+		'Europe/Kiev' => {
+			exemplarCity => q#ߞߌߦߍߝ߭#,
+		},
+		'Europe/Kirov' => {
+			exemplarCity => q#ߞߌߙߐߝ߭#,
+		},
+		'Europe/Lisbon' => {
+			exemplarCity => q#ߟߌߛߑߓߐ߲߫#,
+		},
+		'Europe/Ljubljana' => {
+			exemplarCity => q#ߟߑߖߎߓߑߖߣߊ߫#,
+		},
+		'Europe/London' => {
+			exemplarCity => q#ߟߐ߲ߘߙߍߛ#,
+			long => {
+				'daylight' => q#ߓߙߌߕߊ߲߫ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+			},
+		},
+		'Europe/Luxembourg' => {
+			exemplarCity => q#ߟߎߞߑߛߊ߲ߓߎߙߜ߭#,
+		},
+		'Europe/Madrid' => {
+			exemplarCity => q#ߡߊߘߙߌߘ#,
+		},
+		'Europe/Malta' => {
+			exemplarCity => q#ߡߊߟߑߕ#,
+		},
+		'Europe/Mariehamn' => {
+			exemplarCity => q#ߡߊߙߌߤߊߡ#,
+		},
+		'Europe/Minsk' => {
+			exemplarCity => q#ߡߌ߲ߛߞ#,
+		},
+		'Europe/Monaco' => {
+			exemplarCity => q#ߡߏߣߊߞߏ߫#,
+		},
+		'Europe/Moscow' => {
+			exemplarCity => q#ߡߏߛߑߞߎ߫#,
+		},
+		'Europe/Oslo' => {
+			exemplarCity => q#ߏߛߑߟߏ߫#,
+		},
+		'Europe/Paris' => {
+			exemplarCity => q#ߔߊ߬ߙߌ߫#,
+		},
+		'Europe/Podgorica' => {
+			exemplarCity => q#ߔߏߘߜ߭ߢߙߌߞߊ߫#,
+		},
+		'Europe/Prague' => {
+			exemplarCity => q#ߔߙߊߜ߭#,
+		},
+		'Europe/Riga' => {
+			exemplarCity => q#ߙߌߜ߭ߊ߫#,
+		},
+		'Europe/Rome' => {
+			exemplarCity => q#ߙߐߡ#,
+		},
+		'Europe/Samara' => {
+			exemplarCity => q#ߛߡߊߙߊ߫#,
+		},
+		'Europe/San_Marino' => {
+			exemplarCity => q#ߛߍ߲-ߡߊߙߌߦߏ߫#,
+		},
+		'Europe/Sarajevo' => {
+			exemplarCity => q#ߛߙߊߖ߭ߋߝ߭ߏ߫#,
+		},
+		'Europe/Saratov' => {
+			exemplarCity => q#ߛߙߊߕߐߝ߭#,
+		},
+		'Europe/Simferopol' => {
+			exemplarCity => q#ߛߌ߲ߝߋߙߔߏߟ#,
+		},
+		'Europe/Skopje' => {
+			exemplarCity => q#ߛߑߞߏߔߑߖߋ߫#,
+		},
+		'Europe/Sofia' => {
+			exemplarCity => q#ߛߏߝߌߦߊ߫#,
+		},
+		'Europe/Stockholm' => {
+			exemplarCity => q#ߛߑߕߏߞߐߟߡ#,
+		},
+		'Europe/Tallinn' => {
+			exemplarCity => q#ߕߊߟߌ߲ߣ#,
+		},
+		'Europe/Tirane' => {
+			exemplarCity => q#ߕߌߙߣߊ߫#,
+		},
+		'Europe/Ulyanovsk' => {
+			exemplarCity => q#ߎߟߌߦߊߣߏߝ߭ߑߛߞ#,
+		},
+		'Europe/Vaduz' => {
+			exemplarCity => q#ߝ߭߮ߊߘߎߖ߭#,
+		},
+		'Europe/Vatican' => {
+			exemplarCity => q#ߝ߭ߊߕߌߞߊ߲߫#,
+		},
+		'Europe/Vienna' => {
+			exemplarCity => q#ߝ߭ߌߦߍߣ#,
+		},
+		'Europe/Vilnius' => {
+			exemplarCity => q#ߝ߭ߌߟߑߣߌߦߎߛ#,
+		},
+		'Europe/Volgograd' => {
+			exemplarCity => q#ߝ߭ߏߟߜ߭ߏߜ߭ߙߊߘ#,
+		},
+		'Europe/Warsaw' => {
+			exemplarCity => q#ߝ߭ߊߙߑߛߏߝ߭ߌ߫#,
+		},
+		'Europe/Zagreb' => {
+			exemplarCity => q#ߗ߭ߊߜ߭ߙߍߓ#,
+		},
+		'Europe/Zurich' => {
+			exemplarCity => q#ߖ߭ߎߙߌߞ#,
+		},
+		'Europe_Central' => {
+			long => {
+				'daylight' => q#ߕߍߡߊ߫ ߋߙߐߔߎ߫ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߕߍߡߊ߫ ߋߙߐߔߎ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߕߍߡߊ߫ ߋߙߐߔߎ߫ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Europe_Eastern' => {
+			long => {
+				'daylight' => q#ߕߟߋ߬ߓߐ ߋߙߐߔߎ߫ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߕߟߋ߬ߓߐ ߋߙߐߔߎ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߕߟߋ߬ߓߐ ߋߙߐߔߎ߫ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Europe_Further_Eastern' => {
+			long => {
+				'standard' => q#ߞߊߟߌߣߌ߲ߜ߭ߙߊߘ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'Europe_Western' => {
+			long => {
+				'daylight' => q#ߕߟߋ߬ߓߋ ߋߙߐߔߎ߫ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߕߟߋ߬ߓߋ ߋߙߐߔߎ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߕߟߋ߬ߓߋ ߋߙߐߔߎ߫ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Falkland' => {
+			long => {
+				'daylight' => q#ߝߊߟߞߑߟߊ߲ߘ ߕߌ߲ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߝߊߟߞߑߟߊ߲ߘ ߕߌ߲ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߝߊߟߞߑߟߊ߲ߘ ߕߌ߲ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Fiji' => {
+			long => {
+				'daylight' => q#ߝߖߌ߫ ߕߟߋ߬ߡߊ߬ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+				'generic' => q#ߝߖߌ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߝߖߌ߫ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'French_Guiana' => {
+			long => {
+				'standard' => q#ߝߊ߬ߙߊ߲߬ߛߌ߬ ߜ߭ߎߦߣߊ߫ ߕߎ߬ߡߊ߬ߘߊ#,
 			},
 		},
 		'French_Southern' => {
@@ -2145,11 +4192,89 @@ has 'time_zone_names' => (
 				'standard' => q#ߜ߭ߙߋߣߍߕ ߕߎ߬ߡߊ߬ߘߊ#,
 			},
 		},
+		'Galapagos' => {
+			long => {
+				'standard' => q#ߜ߭ߟߊߔߊߜ߭ߐߛ ߕߎ߬ߡߊ߬ߘߊ߫#,
+			},
+		},
+		'Gambier' => {
+			long => {
+				'standard' => q#ߜ߭ߊ߲ߓߌߦߍߙ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'Georgia' => {
+			long => {
+				'daylight' => q#ߖ߭ߐߙߑߖ߭ߌ߫ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+				'generic' => q#ߖ߭ߐߙߑߖ߭ߌ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߖ߭ߐߙߑߖ߭ߌ߫ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Gilbert_Islands' => {
+			long => {
+				'standard' => q#ߖ߭ߌߟߑߓߍߙߕ ߕߌ߲ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'Greenland_Eastern' => {
+			long => {
+				'daylight' => q#ߕߟߋ߬ߓߐ ߜ߭ߌߙߌ߲ߟߊ߲ߘ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߕߟߋ߬ߓߐ ߜ߭ߌߙߌ߲ߟߊ߲ߘ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߕߟߋ߬ߓߐ ߜ߭ߌߙߌ߲ߟߊ߲ߘ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Greenland_Western' => {
+			long => {
+				'daylight' => q#ߕߟߋ߬ߓߋ ߜ߭ߌߙߌ߲ߟߊ߲ߘ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߕߟߋ߬ߓߋ ߜ߭ߌߙߌ߲ߟߊ߲ߘ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߕߟߋ߬ߓߋ ߜ߭ߌߙߌ߲ߟߊ߲ߘ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Gulf' => {
+			long => {
+				'standard' => q#ߖߌߘߏ߮ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'Guyana' => {
+			long => {
+				'standard' => q#ߜ߭ߎߦߣߊ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'Hawaii_Aleutian' => {
+			long => {
+				'daylight' => q#ߤߥߊߦ - ߊߟߋߦߎߕߌߦߊ߲߫ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߤߥߊߦ - ߊߟߋߦߎߕߌߦߊ߲߫ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߤߥߊߦ - ߊߟߋߦߎߕߌߦߊ߲߫ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Hong_Kong' => {
+			long => {
+				'daylight' => q#ߤߐ߲ߜ߭ ߞߐ߲ߜ߭ ߕߟߋ߬ߡߊ߬ ߕߎ߬ߡߊ߬ߘߊ#,
+				'generic' => q#ߤߐ߲ߜ߭ ߞߐ߲ߜ߭ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߤߐ߲ߜ߭ ߞߐ߲ߜ߭ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Hovd' => {
+			long => {
+				'daylight' => q#ߤߏߝ߭ߘ ߕߟߋ߬ߡߊ߬ ߕߎ߬ߡߊ߬ߘߊ#,
+				'generic' => q#ߤߏߝ߭ߘ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߤߏߝ߭ߘ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'India' => {
+			long => {
+				'standard' => q#ߤߌ߲ߘߌ߫ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
 		'Indian/Antananarivo' => {
 			exemplarCity => q#ߊ߲ߕߣߊߣߊߙߌߝ߭ߏ߫#,
 		},
 		'Indian/Chagos' => {
 			exemplarCity => q#ߛߊߜ߭ߐߛ#,
+		},
+		'Indian/Christmas' => {
+			exemplarCity => q#ߞߙߌߛߑߡߊߛ#,
+		},
+		'Indian/Cocos' => {
+			exemplarCity => q#ߞߏߞߏߛ#,
 		},
 		'Indian/Comoro' => {
 			exemplarCity => q#ߞߐߡߐ߯ߙ#,
@@ -2159,6 +4284,9 @@ has 'time_zone_names' => (
 		},
 		'Indian/Mahe' => {
 			exemplarCity => q#ߡߊߤߋ߫#,
+		},
+		'Indian/Maldives' => {
+			exemplarCity => q#ߡߊߟߑߘߌߝ߭#,
 		},
 		'Indian/Mauritius' => {
 			exemplarCity => q#ߡߏߙߌߛ#,
@@ -2174,6 +4302,132 @@ has 'time_zone_names' => (
 				'standard' => q#ߍ߲ߘߎ߫ ߟߌ߲ߓߊ߲ߘߎ߯ ߕߎ߬ߡߊ߬ߙߋ߲#,
 			},
 		},
+		'Indochina' => {
+			long => {
+				'standard' => q#ߤߌ߲ߘߏ߫ ߛߌߣ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'Indonesia_Central' => {
+			long => {
+				'standard' => q#ߕߍߡߊ߫ ߍ߲ߘߋߣߏߛߌ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'Indonesia_Eastern' => {
+			long => {
+				'standard' => q#ߕߟߋ߬ߓߐ ߍ߲ߘߋߣߏߛߌ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'Indonesia_Western' => {
+			long => {
+				'standard' => q#ߕߟߋ߬ߓߋ ߍ߲ߘߋߣߏߛߌ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'Iran' => {
+			long => {
+				'daylight' => q#ߌߙߊ߲߫ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߌߙߊ߲߫ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߌߙߊ߲߫ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Irkutsk' => {
+			long => {
+				'daylight' => q#ߌߙߑߞߎߕߑߛߞ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߌߙߑߞߎߕߑߛߞ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߌߙߑߞߎߕߑߛߞ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Israel' => {
+			long => {
+				'daylight' => q#ߌߛߌ߬ߙߊ߬ߦߌߟߊ߫ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+				'generic' => q#ߌߛߌ߬ߙߊ߬ߦߌߟߊ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߌߛߌ߬ߙߊ߬ߦߌߟߊ߫ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Japan' => {
+			long => {
+				'daylight' => q#ߖ߭ߊߔߐ߲߫ ߕߟߋ߬ߡߊ߬ ߕߎ߬ߡߊ߬ߘߊ#,
+				'generic' => q#ߖ߭ߊߔߐ߲߫ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߖ߭ߊߔߐ߲߫ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#ߞߖ߭ߊߞߌߛߑߕߊ߲߫ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'Kazakhstan_Eastern' => {
+			long => {
+				'standard' => q#ߕߟߋ߬ߓߐ ߞߖ߭ߊߞߌߛߑߕߊ߲߫ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'Kazakhstan_Western' => {
+			long => {
+				'standard' => q#ߕߟߋ߬ߓߋ ߞߖ߭ߊߞߌߛߑߕߊ߲߫ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'Korea' => {
+			long => {
+				'daylight' => q#ߞߏߙߋ߫ ߕߟߋ߬ߡߊ߬ ߕߎ߬ߡߊ߬ߘߊ#,
+				'generic' => q#ߞߏߙߋ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߞߏߙߋ߫ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Kosrae' => {
+			long => {
+				'standard' => q#ߞߏߛߑߙߊ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'Krasnoyarsk' => {
+			long => {
+				'daylight' => q#ߞߙߊߛߑߣߏߦߌߦߊߙߑߛߞ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߞߙߊߛߑߣߏߦߌߦߊߙߑߛߞ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߞߙߊߛߑߣߏߦߌߦߊߙߑߛߞ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Kyrgystan' => {
+			long => {
+				'standard' => q#ߜ߭ߌߙߑߜ߭ߌߛߑߕߊ߲߫ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'Line_Islands' => {
+			long => {
+				'standard' => q#ߌߛߑߟߊ߲ߘ ߞߍ߬ߙߍ߲߬ߘߍ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'Lord_Howe' => {
+			long => {
+				'daylight' => q#ߟߐߙߘ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߟߐߙߘ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߟߐߙߘ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Magadan' => {
+			long => {
+				'daylight' => q#ߡߜ߭ߊߘߊ߲߫ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߡߜ߭ߊߘߊ߲߫ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߡߜ߭ߊߘߊ߲߫ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Malaysia' => {
+			long => {
+				'standard' => q#ߡߊߟߍߘߎ߯ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'Maldives' => {
+			long => {
+				'standard' => q#ߡߊߟߑߘߌߝ߭ ߕߌ߲ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'Marquesas' => {
+			long => {
+				'standard' => q#ߡߊߙߞߌߛߊߛ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'Marshall_Islands' => {
+			long => {
+				'standard' => q#ߡߊߙߑߛߊߟ ߕߌ߲ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
 		'Mauritius' => {
 			long => {
 				'daylight' => q#ߡߏߙߌߛ ߕߟߋ߬ߡߊ߬ ߕߎߡߊߙߋ߲#,
@@ -2181,14 +4435,449 @@ has 'time_zone_names' => (
 				'standard' => q#ߡߏߙߌߛ ߕߎ߬ߡߊ߬ߙߋ߲ ߢߊߓߘߍ#,
 			},
 		},
+		'Mawson' => {
+			long => {
+				'standard' => q#ߡߊߥߑߛߐ߲߫ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'Mexico_Pacific' => {
+			long => {
+				'daylight' => q#ߖߐ߫ ߟߌ߲ߓߊ߲ ߡߍ߲ߞߛߌߞߌ߬ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߖߐ߫ ߟߌ߲ߓߊ߲ ߡߍ߲ߞߛߌߞߌ߬ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߖߐ߫ ߟߌ߲ߓߊ߲ ߡߍ߲ߞߛߌߞߌ߬ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Mongolia' => {
+			long => {
+				'daylight' => q#ߎߟߊ߲ߓߕߐߙ ߕߟߋ߬ߡߊ߬ ߕߎ߬ߡߊ߬ߘߊ#,
+				'generic' => q#ߎߟߊ߲ߓߕߐߙ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߎߟߊ߲ߓߕߐߙ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Moscow' => {
+			long => {
+				'daylight' => q#ߡߏߛߑߞߎ߫ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߡߏߛߑߞߎ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߡߏߛߑߞߎ߫ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Myanmar' => {
+			long => {
+				'standard' => q#ߡߌߦߊߣߑߡߊߙ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'Nauru' => {
+			long => {
+				'standard' => q#ߣߊߥߙߎ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'Nepal' => {
+			long => {
+				'standard' => q#ߣߋߔߊߟ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'New_Caledonia' => {
+			long => {
+				'daylight' => q#ߞߊߟߌߘߏߣߌ߫ ߞߎߘߊ߫ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߞߊߟߌߘߏߣߌ߫ ߞߎߘߊ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߞߊߟߌߘߏߣߌ߫ ߞߎߘߊ߫ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'New_Zealand' => {
+			long => {
+				'daylight' => q#ߣߌߦߎ-ߖ߭ߋߟߊ߲ߘ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߣߌߦߎ-ߖ߭ߋߟߊ߲ߘ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߣߌߦߎ-ߖ߭ߋߟߊ߲ߘ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Newfoundland' => {
+			long => {
+				'daylight' => q#ߝߎ߲ߘߑߟߊ߲ߘ ߞߎߘߊ߫ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߝߎ߲ߘߑߟߊ߲ߘ ߞߎߘߊ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߝߎ߲ߘߑߟߊ߲ߘ ߞߎߘߊ߫ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Niue' => {
+			long => {
+				'standard' => q#ߣߌߦߋ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'Norfolk' => {
+			long => {
+				'daylight' => q#ߣߐߙ ߝߐߟߞ ߕߌ߲ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߣߐߙ ߝߐߟߞ ߕߌ߲ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߣߐߙ ߝߐߟߞ ߕߌ߲ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Noronha' => {
+			long => {
+				'daylight' => q#ߝߍߙߑߣߊ߲ߘߏ߫ ߘߋ߬ ߣߏߙߏ߲ߤߊ߫ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߝߍߙߑߣߊ߲ߘߏ߫ ߘߋ߬ ߣߏߙߏ߲ߤߊ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߝߍߙߑߣߊ߲ߘߏ߫ ߘߋ߬ ߣߏߙߏ߲ߤߊ߫ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Novosibirsk' => {
+			long => {
+				'daylight' => q#ߣߝ߭ߏߛߓߌߙߑߛߞ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߣߝ߭ߏߛߓߌߙߑߛߞ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߣߝ߭ߏߛߓߌߙߑߛߞ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Omsk' => {
+			long => {
+				'daylight' => q#ߏߡߑߛߞ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߏߡߑߛߞ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߏߡߑߛߞ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Pacific/Apia' => {
+			exemplarCity => q#ߊߔߌߦߊ߫#,
+		},
+		'Pacific/Auckland' => {
+			exemplarCity => q#ߏߞߑߟߊ߲ߘ#,
+		},
+		'Pacific/Bougainville' => {
+			exemplarCity => q#ߓߎߜ߭ߍ߲ߝ߭ߌߟ#,
+		},
+		'Pacific/Chatham' => {
+			exemplarCity => q#ߗߕߊߡ#,
+		},
+		'Pacific/Easter' => {
+			exemplarCity => q#ߍߛߑߕߍߙ#,
+		},
+		'Pacific/Efate' => {
+			exemplarCity => q#ߋߝߊߕߋ߫#,
+		},
+		'Pacific/Fakaofo' => {
+			exemplarCity => q#ߝߞߊߏߝߏ߫#,
+		},
+		'Pacific/Fiji' => {
+			exemplarCity => q#ߝߖߌ߫#,
+		},
+		'Pacific/Funafuti' => {
+			exemplarCity => q#ߝߎߣߊߝߎߕߌ߫#,
+		},
+		'Pacific/Galapagos' => {
+			exemplarCity => q#ߜ߭ߟߊߔߊߜ߭ߐߛ#,
+		},
+		'Pacific/Gambier' => {
+			exemplarCity => q#ߜ߭ߊ߲ߓߌߦߋߙ#,
+		},
+		'Pacific/Guadalcanal' => {
+			exemplarCity => q#ߜ߭ߎߥߘߊߟߑߞߣߊߟ#,
+		},
+		'Pacific/Guam' => {
+			exemplarCity => q#ߜ߭ߎߥߊ߲߫#,
+		},
+		'Pacific/Kanton' => {
+			exemplarCity => q#ߞߊ߲ߕߐ߲߫#,
+		},
+		'Pacific/Kiritimati' => {
+			exemplarCity => q#ߞߙߌߕߌߡߊߕߌ߫#,
+		},
+		'Pacific/Kosrae' => {
+			exemplarCity => q#ߞߐߛ.ߙߊ߫#,
+		},
+		'Pacific/Kwajalein' => {
+			exemplarCity => q#ߞߑߥߖߊߟߋߦߌ߲߫#,
+		},
+		'Pacific/Majuro' => {
+			exemplarCity => q#ߡߊߖߎߙߏ߫#,
+		},
+		'Pacific/Marquesas' => {
+			exemplarCity => q#ߡߊߙߞߌߛ#,
+		},
+		'Pacific/Midway' => {
+			exemplarCity => q#ߡߌߘߑߥߊߦ#,
+		},
+		'Pacific/Nauru' => {
+			exemplarCity => q#ߣߊߥߙߎ߫#,
+		},
+		'Pacific/Niue' => {
+			exemplarCity => q#ߣߌߦߎߋ߫#,
+		},
+		'Pacific/Norfolk' => {
+			exemplarCity => q#ߣߐߙߑߝߐߟߞ#,
+		},
+		'Pacific/Noumea' => {
+			exemplarCity => q#ߣߎߡߋߦߊ߫#,
+		},
+		'Pacific/Pago_Pago' => {
+			exemplarCity => q#ߔߊߜ߭ߏ߫ ߡߏߜ߭ߏ߫#,
+		},
+		'Pacific/Palau' => {
+			exemplarCity => q#ߔߟߊߏߛ#,
+		},
+		'Pacific/Pitcairn' => {
+			exemplarCity => q#ߔߌߕߞߍߙߣ#,
+		},
+		'Pacific/Ponape' => {
+			exemplarCity => q#ߝߏ߲ߔߋߦߌ߫#,
+		},
+		'Pacific/Port_Moresby' => {
+			exemplarCity => q#ߡߏߙߍߛߑߓߌ߫ ߘߊ߲ߞߊ߲#,
+		},
+		'Pacific/Rarotonga' => {
+			exemplarCity => q#ߙߊߙߏߕߏ߲ߜ߭ߊ߫#,
+		},
+		'Pacific/Saipan' => {
+			exemplarCity => q#ߛߍ߲ߔߊ߲߫#,
+		},
+		'Pacific/Tahiti' => {
+			exemplarCity => q#ߕߊߤߕߌ߫#,
+		},
+		'Pacific/Tarawa' => {
+			exemplarCity => q#ߕߙߊߥߊ߫#,
+		},
+		'Pacific/Tongatapu' => {
+			exemplarCity => q#ߕߏ߲ߜ߭ߕߊߔߎ߫#,
+		},
+		'Pacific/Truk' => {
+			exemplarCity => q#ߗߎ߯ߞ#,
+		},
+		'Pacific/Wake' => {
+			exemplarCity => q#ߥߊߞߋ߫#,
+		},
+		'Pacific/Wallis' => {
+			exemplarCity => q#ߥߊߟߟߌߛ#,
+		},
+		'Pakistan' => {
+			long => {
+				'daylight' => q#ߔߊߞߌߛߑߕߊ߲߫ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߔߊߞߌߛߑߕߊ߲߫ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߔߊߞߌߛߑߕߊ߲߫ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Palau' => {
+			long => {
+				'standard' => q#ߔߟߊߐߛ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'Papua_New_Guinea' => {
+			long => {
+				'standard' => q#ߔߊߓߎߥߊ߫ ߖߌ߬ߣߍ߬ ߞߎߘߊ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'Paraguay' => {
+			long => {
+				'daylight' => q#ߔߙߊߜ߭ߎߥߋ߫ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߔߙߊߜ߭ߎߥߋ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߔߙߊߜ߭ߎߥߋ߫ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Peru' => {
+			long => {
+				'daylight' => q#ߔߋߙߎ߫ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߔߋߙߎ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߔߋߙߎ߫ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Philippines' => {
+			long => {
+				'daylight' => q#ߝߟߌߔߌ߲߫ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߝߟߌߔߌ߲߫ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߝߟߌߔߌ߲߫ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Phoenix_Islands' => {
+			long => {
+				'standard' => q#ߝߏߣߌߞߛ ߕߌ߲ ߠߎ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'Pierre_Miquelon' => {
+			long => {
+				'daylight' => q#ߛߍ߲-ߔߌߦߍߙ-ߋ-ߡߌߞߋߟߐ߲߫ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߛߍ߲-ߔߌߦߍߙ-ߋ-ߡߌߞߋߟߐ߲߫ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߛߍ߲-ߔߌߦߍߙ-ߋ-ߡߌߞߋߟߐ߲߫ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Pitcairn' => {
+			long => {
+				'standard' => q#ߔߌߕߑߞߍߙߣ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'Ponape' => {
+			long => {
+				'standard' => q#ߔߏ߲ߔߍ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'Pyongyang' => {
+			long => {
+				'standard' => q#ߔߌߦߐ߲ߜ߭ߦߊ߲ߜ߭ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
 		'Reunion' => {
 			long => {
 				'standard' => q#ߙߋߣߌߦߐ߲߫ ߕߎ߬ߡߊ߬ߙߋ߲#,
 			},
 		},
+		'Rothera' => {
+			long => {
+				'standard' => q#ߙߏߕߋߙߊ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'Sakhalin' => {
+			long => {
+				'daylight' => q#ߛߊߞߑߤߊߟߌߣ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߛߊߞߑߤߊߟߌߣ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߛߊߞߑߤߊߟߌߣ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Samoa' => {
+			long => {
+				'daylight' => q#ߛߊߡߏߥߊ߫ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߛߊߡߏߥߊ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߛߊߡߏߥߊ߫ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
 		'Seychelles' => {
 			long => {
 				'standard' => q#ߛߋߦߌߛߌߟ ߕߎ߬ߡߊ߬ߙߋ߲#,
+			},
+		},
+		'Singapore' => {
+			long => {
+				'standard' => q#ߛߍ߲ߜ߭ߊߔߎߙ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Solomon' => {
+			long => {
+				'standard' => q#ߛߟߏ߬ߡߣߊ߬ ߕߌ߲ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'South_Georgia' => {
+			long => {
+				'standard' => q#ߥߙߏ߬ߘߎ߮ ߖ߭ߐߙߑߖ߭ߌߟߊ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'Suriname' => {
+			long => {
+				'standard' => q#ߛߎߙߌߣߊߡ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'Syowa' => {
+			long => {
+				'standard' => q#ߛߦߏߥߊ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'Tahiti' => {
+			long => {
+				'standard' => q#ߕߊߤߕߌ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'Taipei' => {
+			long => {
+				'daylight' => q#ߕߊߦߌߔߋ߫ ߕߟߋ߬ߡߊ߬ ߕߎ߬ߡߊ߬ߘߊ#,
+				'generic' => q#ߕߊߦߌߔߋ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߕߊߦߌߔߋ߫ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Tajikistan' => {
+			long => {
+				'standard' => q#ߕߊߖߞߌߛߑߕߊ߲߫ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'Tokelau' => {
+			long => {
+				'standard' => q#ߕߏߞߋߟߏ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'Tonga' => {
+			long => {
+				'daylight' => q#ߕߏ߲ߜ߭ߊ߫ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߕߏ߲ߜ߭ߊ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߕߏ߲ߜ߭ߊ߫ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Truk' => {
+			long => {
+				'standard' => q#ߗߎߞ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'Turkmenistan' => {
+			long => {
+				'daylight' => q#ߕߎߙߞߑߡߋߣߌߛߑߕߊ߲߫ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߕߎߙߞߌߡߋߣߌߛߑߕߊ߲߫ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߕߎߙߞߌߡߋߣߌߛߑߕߊ߲߫ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Tuvalu' => {
+			long => {
+				'standard' => q#ߕߎߝ߭ߊߟߎ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'Uruguay' => {
+			long => {
+				'daylight' => q#ߎ߳ߙߑߜ߭ߋߦߌ߫ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߎ߳ߙߑߜ߭ߋߦߌ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߎ߳ߙߑߜ߭ߋߦߌ߫ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Uzbekistan' => {
+			long => {
+				'daylight' => q#ߏߖ߭ߑߓߊߞߌߛߑߕߊ߲߫ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߏߖ߭ߑߓߊߞߌߛߑߕߊ߲߫ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߏߖ߭ߑߓߊߞߌߛߑߕߊ߲߫ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Vanuatu' => {
+			long => {
+				'daylight' => q#ߝ߭ߊߣߎߥߊߕߎ߫ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߝ߭ߊߣߎߥߊߕߎ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߝ߭ߊߣߎߥߊߕߎ߫ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Venezuela' => {
+			long => {
+				'standard' => q#ߝ߭ߣߋߖ߭ߎߦߋߟߊ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'Vladivostok' => {
+			long => {
+				'daylight' => q#ߝ߭ߟߊߘߑߝ߭ߏߛߑߕߏߞ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߝ߭ߟߊߘߑߝ߭ߏߛߑߕߏߞ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߝ߭ߟߊߘߑߝ߭ߏߛߑߕߏߞ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Volgograd' => {
+			long => {
+				'daylight' => q#ߝ߭ߏߟߑߜ߭ߏߜ߭ߙߊߘ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߝ߭ߏߟߑߜ߭ߏߜ߭ߙߊߘ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߝ߭ߏߟߑߜ߭ߏߜ߭ߙߊߘ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Vostok' => {
+			long => {
+				'standard' => q#ߝ߭ߐߛߑߕߐߞ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'Wake' => {
+			long => {
+				'standard' => q#ߥߊߞ ߕߌ߲ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'Wallis' => {
+			long => {
+				'standard' => q#ߥߊߟߌߛ ߣߌ߫ ߝߕߎߣߊ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+			},
+		},
+		'Yakutsk' => {
+			long => {
+				'daylight' => q#ߦߊߞߎߕߑߛߞߌ߫ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߦߊߞߎߕߑߛߞߌ߫ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߦߊߞߎߕߑߛߞߌ߫ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Yekaterinburg' => {
+			long => {
+				'daylight' => q#ߦߋߞߊߕߋߙߌ߲ߓߎߙߜ߭ ߕߟߋ߬ߡߊ߬ ߕߎߡߘߊ#,
+				'generic' => q#ߦߋߞߊߕߋߙߌ߲ߓߎߙߜ߭ ߕߎ߬ߡߊ߬ߘߊ#,
+				'standard' => q#ߦߋߞߊߕߋߙߌ߲ߓߎߙߜ߭ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
+			},
+		},
+		'Yukon' => {
+			long => {
+				'standard' => q#ߦߎߞߐ߲߫ ߕߎ߬ߡߘߊ߬ ߛߎߡߊ߲ߘߊ߲ߕߊ#,
 			},
 		},
 	 } }

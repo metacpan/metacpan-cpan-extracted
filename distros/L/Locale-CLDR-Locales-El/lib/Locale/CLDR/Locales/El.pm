@@ -8,18 +8,18 @@ Locale::CLDR::Locales::El - Package for language Greek
 
 package Locale::CLDR::Locales::El;
 # This file auto generated from Data\common\main\el.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -1594,6 +1594,7 @@ has 'display_name_language' => (
  				'bin' => 'Μπίνι',
  				'bkm' => 'Κομ',
  				'bla' => 'Σικσίκα',
+ 				'blo' => 'Ανίι',
  				'bm' => 'Μπαμπάρα',
  				'bn' => 'Βεγγαλικά',
  				'bo' => 'Θιβετιανά',
@@ -1820,6 +1821,7 @@ has 'display_name_language' => (
  				'kv' => 'Κόμι',
  				'kw' => 'Κορνουαλικά',
  				'kwk' => 'Κουακουάλα',
+ 				'kxv' => 'Κούβι',
  				'ky' => 'Κιργιζικά',
  				'la' => 'Λατινικά',
  				'lad' => 'Λαδίνο',
@@ -1830,8 +1832,10 @@ has 'display_name_language' => (
  				'lez' => 'Λεζγκικά',
  				'lg' => 'Γκάντα',
  				'li' => 'Λιμβουργιανά',
+ 				'lij' => 'Λιγουριανά',
  				'lil' => 'Λιλουέτ',
  				'lkt' => 'Λακότα',
+ 				'lmo' => 'Λομβαρδικά',
  				'ln' => 'Λινγκάλα',
  				'lo' => 'Λαοτινά',
  				'lol' => 'Μόνγκο',
@@ -2025,6 +2029,7 @@ has 'display_name_language' => (
  				'swb' => 'Κομοριανά',
  				'syc' => 'Κλασικά Συριακά',
  				'syr' => 'Συριακά',
+ 				'szl' => 'Σιλεσικά',
  				'ta' => 'Ταμιλικά',
  				'tce' => 'Νότια Τουτσόνε',
  				'te' => 'Τελούγκου',
@@ -2074,7 +2079,9 @@ has 'display_name_language' => (
  				'uz' => 'Ουζμπεκικά',
  				'vai' => 'Βάι',
  				've' => 'Βέντα',
+ 				'vec' => 'Βενετικά',
  				'vi' => 'Βιετναμικά',
+ 				'vmw' => 'Μακούα',
  				'vo' => 'Βολαπιούκ',
  				'vot' => 'Βότικ',
  				'vun' => 'Βούντζο',
@@ -2088,6 +2095,7 @@ has 'display_name_language' => (
  				'wuu' => 'Κινεζικά Γου',
  				'xal' => 'Καλμίκ',
  				'xh' => 'Κόσα',
+ 				'xnr' => 'Κάνγκρι',
  				'xog' => 'Σόγκα',
  				'yao' => 'Γιάο',
  				'yap' => 'Γιαπίζ',
@@ -2728,7 +2736,6 @@ has 'display_name_type' => (
  				'phonebook' => q{Σειρά ταξινόμησης τηλεφωνικού καταλόγου},
  				'phonetic' => q{Φωνητική σειρά ταξινόμησης},
  				'pinyin' => q{Σειρά ταξινόμησης Πινγίν},
- 				'reformed' => q{Ανασχηματισμένη σειρά ταξινόμησης},
  				'search' => q{Αναζήτηση γενικού τύπου},
  				'searchjl' => q{Αναζήτηση κατά αρχικό σύμφωνο Χανγκούλ},
  				'standard' => q{Τυπική σειρά ταξινόμησης},
@@ -3419,12 +3426,14 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'concentr-milligram-ofglucose-per-deciliter' => {
+						'1' => q(neuter),
 						'name' => q(χιλιοστόγραμμα ανά δεκατόλιτρο),
 						'one' => q({0} χιλιοστόγραμμο ανά δεκατόλιτρο),
 						'other' => q({0} χιλιοστόγραμμα ανά δεκατόλιτρο),
 					},
 					# Core Unit Identifier
 					'milligram-ofglucose-per-deciliter' => {
+						'1' => q(neuter),
 						'name' => q(χιλιοστόγραμμα ανά δεκατόλιτρο),
 						'one' => q({0} χιλιοστόγραμμο ανά δεκατόλιτρο),
 						'other' => q({0} χιλιοστόγραμμα ανά δεκατόλιτρο),
@@ -3500,6 +3509,20 @@ has 'units' => (
 						'1' => q(neuter),
 						'one' => q({0} τοις δεκάκις χιλίοις),
 						'other' => q({0} τοις δεκάκις χιλίοις),
+					},
+					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'1' => q(neuter),
+						'name' => q(μέρη στο δισεκατομμύριο),
+						'one' => q({0} μέρος στο δισεκατομμύριο),
+						'other' => q({0} μέρη στο δισεκατομμύριο),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'1' => q(neuter),
+						'name' => q(μέρη στο δισεκατομμύριο),
+						'one' => q({0} μέρος στο δισεκατομμύριο),
+						'other' => q({0} μέρη στο δισεκατομμύριο),
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
@@ -3850,6 +3873,22 @@ has 'units' => (
 						'other' => q({0} νανοδευτερόλεπτα),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'1' => q(feminine),
+						'name' => q(νύχτες),
+						'one' => q({0} νύχτα),
+						'other' => q({0} νύχτες),
+						'per' => q({0}/νύχτα),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'1' => q(feminine),
+						'name' => q(νύχτες),
+						'one' => q({0} νύχτα),
+						'other' => q({0} νύχτες),
+						'per' => q({0}/νύχτα),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'1' => q(neuter),
 						'name' => q(τέταρτα),
@@ -4025,12 +4064,14 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'energy-kilocalorie' => {
+						'1' => q(feminine),
 						'name' => q(χιλιοθερμίδες),
 						'one' => q({0} χιλιοθερμίδα),
 						'other' => q({0} χιλιοθερμίδες),
 					},
 					# Core Unit Identifier
 					'kilocalorie' => {
+						'1' => q(feminine),
 						'name' => q(χιλιοθερμίδες),
 						'one' => q({0} χιλιοθερμίδα),
 						'other' => q({0} χιλιοθερμίδες),
@@ -4507,11 +4548,13 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-point' => {
+						'1' => q(feminine),
 						'one' => q({0} στιγμή),
 						'other' => q({0} στιγμές),
 					},
 					# Core Unit Identifier
 					'point' => {
+						'1' => q(feminine),
 						'one' => q({0} στιγμή),
 						'other' => q({0} στιγμές),
 					},
@@ -4969,12 +5012,14 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'pressure-millimeter-ofhg' => {
+						'1' => q(neuter),
 						'name' => q(χιλιοστόμετρα στήλης υδραργύρου),
 						'one' => q({0} χιλιοστόμετρο στήλης υδραργύρου),
 						'other' => q({0} χιλιοστόμετρα στήλης υδραργύρου),
 					},
 					# Core Unit Identifier
 					'millimeter-ofhg' => {
+						'1' => q(neuter),
 						'name' => q(χιλιοστόμετρα στήλης υδραργύρου),
 						'one' => q({0} χιλιοστόμετρο στήλης υδραργύρου),
 						'other' => q({0} χιλιοστόμετρα στήλης υδραργύρου),
@@ -5007,12 +5052,14 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'speed-beaufort' => {
+						'1' => q(neuter),
 						'name' => q(μποφόρ),
 						'one' => q({0} μποφόρ),
 						'other' => q({0} μποφόρ),
 					},
 					# Core Unit Identifier
 					'beaufort' => {
+						'1' => q(neuter),
 						'name' => q(μποφόρ),
 						'one' => q({0} μποφόρ),
 						'other' => q({0} μποφόρ),
@@ -5042,6 +5089,20 @@ has 'units' => (
 						'name' => q(κόμβος),
 						'one' => q({0} κόμβος),
 						'other' => q({0} κόμβοι),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'1' => q(neuter),
+						'name' => q(φως),
+						'one' => q({0} φως),
+						'other' => q({0} φως),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'1' => q(neuter),
+						'name' => q(φως),
+						'one' => q({0} φως),
+						'other' => q({0} φως),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -6042,6 +6103,20 @@ has 'units' => (
 						'name' => q(ns),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(νύχτ.),
+						'one' => q({0} νύχτ.),
+						'other' => q({0} νύχτ.),
+						'per' => q({0}/νύχτ.),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(νύχτ.),
+						'one' => q({0} νύχτ.),
+						'other' => q({0} νύχτ.),
+						'per' => q({0}/νύχτ.),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'one' => q({0} τέτ.),
 						'other' => q({0} τέτ.),
@@ -6440,6 +6515,18 @@ has 'units' => (
 						'name' => q(χλμ/ώ.),
 						'one' => q({0} χλμ/ώ.),
 						'other' => q({0} χλμ/ώ.),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(φώς),
+						'one' => q({0} φως),
+						'other' => q({0} φως),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(φώς),
+						'one' => q({0} φως),
+						'other' => q({0} φως),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -7116,6 +7203,14 @@ has 'units' => (
 						'name' => q(τοις δεκάκις χιλίοις),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(μέρη/δισεκατομμύριο),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(μέρη/δισεκατομμύριο),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(λ./100 χλμ.),
 						'one' => q({0} λ./100 χλμ.),
@@ -7288,6 +7383,20 @@ has 'units' => (
 					# Core Unit Identifier
 					'nanosecond' => {
 						'name' => q(νανοδεύτερα),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(νύχτ.),
+						'one' => q({0} νύχτ.),
+						'other' => q({0} νύχτ.),
+						'per' => q({0}/νύχτ.),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(νύχτ.),
+						'one' => q({0} νύχτ.),
+						'other' => q({0} νύχτ.),
+						'per' => q({0}/νύχτ.),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -8036,6 +8145,18 @@ has 'units' => (
 						'name' => q(κμβ),
 						'one' => q({0} κμβ),
 						'other' => q({0} κμβ),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(φως),
+						'one' => q({0} φως),
+						'other' => q({0} φως),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(φως),
+						'one' => q({0} φως),
+						'other' => q({0} φως),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -12053,9 +12174,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#Νέα Υόρκη#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#Νιπιγκόν#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#Νόμε#,
 		},
@@ -12076,9 +12194,6 @@ has 'time_zone_names' => (
 		},
 		'America/Panama' => {
 			exemplarCity => q#Παναμάς#,
-		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#Πανγκνίρτουνγκ#,
 		},
 		'America/Paramaribo' => {
 			exemplarCity => q#Παραμαρίμπο#,
@@ -12101,9 +12216,6 @@ has 'time_zone_names' => (
 		'America/Punta_Arenas' => {
 			exemplarCity => q#Πούντα Αρένας#,
 		},
-		'America/Rainy_River' => {
-			exemplarCity => q#Ρέινι Ρίβερ#,
-		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#Ράνκιν Ίνλετ#,
 		},
@@ -12118,9 +12230,6 @@ has 'time_zone_names' => (
 		},
 		'America/Rio_Branco' => {
 			exemplarCity => q#Ρίο Μπράνκο#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#Σάντα Ιζαμπέλ#,
 		},
 		'America/Santarem' => {
 			exemplarCity => q#Σανταρέμ#,
@@ -12167,9 +12276,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#Θούλη#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#Θάντερ Μπέι#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#Τιχουάνα#,
 		},
@@ -12190,9 +12296,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#Γιάκουτατ#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#Γέλοουναϊφ#,
 		},
 		'America_Central' => {
 			long => {
@@ -12353,9 +12456,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#Τσιτά#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#Τσοϊμπαλσάν#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#Κολόμπο#,
@@ -12595,9 +12695,6 @@ has 'time_zone_names' => (
 		'Australia/Broken_Hill' => {
 			exemplarCity => q#Μπρόκεν Χιλ#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#Κάρι#,
-		},
 		'Australia/Darwin' => {
 			exemplarCity => q#Ντάργουιν#,
 		},
@@ -12724,13 +12821,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Θερινή ώρα Κίνας#,
 				'generic' => q#Ώρα Κίνας#,
 				'standard' => q#Χειμερινή ώρα Κίνας#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Θερινή ώρα Τσοϊμπαλσάν#,
-				'generic' => q#Ώρα Τσοϊμπαλσάν#,
-				'standard' => q#Χειμερινή ώρα Τσοϊμπαλσάν#,
 			},
 		},
 		'Christmas' => {
@@ -12955,9 +13045,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#Ουλιάνοφσκ#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#Ούζχοροντ#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#Βαντούζ#,
 		},
@@ -12978,9 +13065,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#Ζάγκρεμπ#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#Ζαπορόζιε#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#Ζυρίχη#,
@@ -13225,6 +13309,11 @@ has 'time_zone_names' => (
 				'standard' => q#Χειμερινή ώρα Πετροπαβλόβσκ-Καμτσάτσκι#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Ώρα Καζακστάν#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#Ώρα Ανατολικού Καζακστάν#,
@@ -13278,11 +13367,6 @@ has 'time_zone_names' => (
 				'standard' => q#Χειμερινή ώρα Μακάο#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Ώρα Νησιού Μακουάρι#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Θερινή ώρα Μαγκαντάν#,
@@ -13320,13 +13404,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Ώρα Μόσον#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Θερινή ώρα Βορειοδυτικού Μεξικού#,
-				'generic' => q#Ώρα Βορειοδυτικού Μεξικού#,
-				'standard' => q#Χειμερινή ώρα Βορειοδυτικού Μεξικού#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -13468,9 +13545,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Honolulu' => {
 			exemplarCity => q#Χονολουλού#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#Τζόνστον#,
 		},
 		'Pacific/Kanton' => {
 			exemplarCity => q#Καντών#,

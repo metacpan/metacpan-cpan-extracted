@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Eu - Package for language Basque
 
 package Locale::CLDR::Locales::Eu;
 # This file auto generated from Data\common\main\eu.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -72,6 +72,7 @@ has 'display_name_language' => (
  				'bi' => 'bislama',
  				'bin' => 'edoera',
  				'bla' => 'siksikera',
+ 				'blo' => 'aniiera',
  				'bm' => 'bambarera',
  				'bn' => 'bengalera',
  				'bo' => 'tibetera',
@@ -195,7 +196,7 @@ has 'display_name_language' => (
  				'iba' => 'ibanera',
  				'ibb' => 'ibibioera',
  				'id' => 'indonesiera',
- 				'ie' => 'interlingue',
+ 				'ie' => 'interlinguea',
  				'ig' => 'igboera',
  				'ii' => 'Sichuango yiera',
  				'ikt' => 'Kanada mendebaldeko inuitera',
@@ -250,6 +251,7 @@ has 'display_name_language' => (
  				'kv' => 'komiera',
  				'kw' => 'kornubiera',
  				'kwk' => 'kwakwala',
+ 				'kxv' => 'kuvia',
  				'ky' => 'kirgizera',
  				'la' => 'latina',
  				'lad' => 'ladinoa',
@@ -261,6 +263,7 @@ has 'display_name_language' => (
  				'lij' => 'liguriera',
  				'lil' => 'lillooetera',
  				'lkt' => 'lakotera',
+ 				'lmo' => 'lombardiera',
  				'ln' => 'lingala',
  				'lo' => 'laosera',
  				'lou' => 'Louisianako kreolera',
@@ -416,6 +419,7 @@ has 'display_name_language' => (
  				'sw_CD' => 'Kongoko swahilia',
  				'swb' => 'komoreera',
  				'syr' => 'asiriera',
+ 				'szl' => 'silesiera',
  				'ta' => 'tamilera',
  				'tce' => 'hegoaldeko tutchoneera',
  				'te' => 'telugua',
@@ -459,6 +463,7 @@ has 'display_name_language' => (
  				've' => 'vendera',
  				'vec' => 'veneziera',
  				'vi' => 'vietnamera',
+ 				'vmw' => 'makhuwera',
  				'vo' => 'volapük',
  				'vun' => 'vunjoa',
  				'wa' => 'valoniera',
@@ -469,6 +474,7 @@ has 'display_name_language' => (
  				'wuu' => 'wu txinera',
  				'xal' => 'kalmykera',
  				'xh' => 'xhosera',
+ 				'xnr' => 'kangrera',
  				'xog' => 'sogera',
  				'yav' => 'yangbenera',
  				'ybb' => 'yemba',
@@ -477,9 +483,10 @@ has 'display_name_language' => (
  				'yrl' => 'nheengatua',
  				'yue' => 'kantonera',
  				'yue@alt=menu' => 'Kantongo txinera',
+ 				'za' => 'zhuangera',
  				'zgh' => 'amazigera estandarra',
  				'zh' => 'txinera',
- 				'zh@alt=menu' => 'mandarinera',
+ 				'zh@alt=menu' => 'mandarina',
  				'zh_Hans' => 'txinera sinplifikatua',
  				'zh_Hans@alt=long' => 'mandarin sinplifikatua',
  				'zh_Hant' => 'txinera tradizionala',
@@ -526,7 +533,7 @@ has 'display_name_script' => (
  			'Bugi' => 'buginera',
  			'Buhd' => 'buhid',
  			'Cakm' => 'txakma',
- 			'Cans' => 'Kanadiako aborigenen silabiko bateratua',
+ 			'Cans' => 'Kanadako aborigenen silabario bateratua',
  			'Cari' => 'kariera',
  			'Cham' => 'txamera',
  			'Cher' => 'txerokiarra',
@@ -570,21 +577,21 @@ has 'display_name_script' => (
  			'Hrkt' => 'silabario japoniarrak',
  			'Hung' => 'hungariera zaharra',
  			'Ital' => 'italiera zaharra',
- 			'Jamo' => 'jamo-bihurketa',
+ 			'Jamo' => 'jamoa',
  			'Java' => 'javaniera',
  			'Jpan' => 'japoniarra',
  			'Kali' => 'kayah li',
  			'Kana' => 'katakana',
  			'Kawi' => 'kawi',
  			'Khar' => 'kharoshthi',
- 			'Khmr' => 'khemerarra',
+ 			'Khmr' => 'khmertarra',
  			'Khoj' => 'khojkiera',
  			'Kits' => 'khitanerako script txikiak',
  			'Knda' => 'kanadarra',
  			'Kore' => 'korearra',
  			'Kthi' => 'kaithiera',
  			'Lana' => 'lannera',
- 			'Laoo' => 'laosarra',
+ 			'Laoo' => 'laostarra',
  			'Latn' => 'latinoa',
  			'Lepc' => 'leptxa',
  			'Limb' => 'linbuera',
@@ -602,7 +609,7 @@ has 'display_name_script' => (
  			'Mend' => 'mende',
  			'Merc' => 'meroitiar etzana',
  			'Mero' => 'meroitirra',
- 			'Mlym' => 'malayalamarra',
+ 			'Mlym' => 'malabartarra',
  			'Modi' => 'modiera',
  			'Mong' => 'mongoliarra',
  			'Mroo' => 'mroera',
@@ -656,7 +663,7 @@ has 'display_name_script' => (
  			'Takr' => 'takriera',
  			'Tale' => 'tai le',
  			'Talu' => 'tai lue berria',
- 			'Taml' => 'tamilarra',
+ 			'Taml' => 'tamildarra',
  			'Tang' => 'tangutera',
  			'Tavt' => 'tai viet',
  			'Telu' => 'teluguarra',
@@ -852,7 +859,7 @@ has 'display_name_region' => (
  			'IM' => 'Man uhartea',
  			'IN' => 'India',
  			'IO' => 'Indiako Ozeanoko lurralde britainiarra',
- 			'IO@alt=chagos' => 'Chagos uhartedia',
+ 			'IO@alt=chagos' => 'Txagos uhartedia',
  			'IQ' => 'Irak',
  			'IR' => 'Iran',
  			'IS' => 'Islandia',
@@ -1218,7 +1225,6 @@ has 'display_name_type' => (
  				'phonebook' => q{Telefonoen zerrenda},
  				'phonetic' => q{Ordenatzeko irizpide fonetikoa},
  				'pinyin' => q{Pinyin hurrenkera},
- 				'reformed' => q{Erreformaren araberako hurrenkera},
  				'search' => q{Bilaketa orokorra},
  				'searchjl' => q{Bilatu hangularen lehen kontsonantearen arabera},
  				'standard' => q{Ordenatzeko irizpide estandarra},
@@ -1304,7 +1310,7 @@ has 'display_name_type' => (
  				'jpanfin' => q{Finantzetarako zenbaki japoniarrak},
  				'kali' => q{Kayah Li digituak},
  				'kawi' => q{kawi digituak},
- 				'khmr' => q{Digitu khemerarrak},
+ 				'khmr' => q{Digitu khmertarrak},
  				'knda' => q{Digitu kannadarrak},
  				'lana' => q{Tai Tham Hora digituak},
  				'lanatham' => q{Tai Tham Tham digituak},
@@ -1317,7 +1323,7 @@ has 'display_name_type' => (
  				'mathmono' => q{Zuriune bakarreko digitu matematikoak},
  				'mathsanb' => q{Sans-Serif Bold digitu matematikoak},
  				'mathsans' => q{Sans-Serif digitu matematikoak},
- 				'mlym' => q{Digitu malayalamarrak},
+ 				'mlym' => q{Digitu malabartarrak},
  				'modi' => q{Modi digituak},
  				'mong' => q{Digitu mongoliarrak},
  				'mroo' => q{Mro digituak},
@@ -1326,7 +1332,7 @@ has 'display_name_type' => (
  				'mymrshan' => q{Shan digitu birmaniarrak},
  				'mymrtlng' => q{Tai Laing digitu birmaniarrak},
  				'nagm' => q{nag mundari digituak},
- 				'native' => q{Zenbaki-sistema},
+ 				'native' => q{Digitu natiboak},
  				'nkoo' => q{N’Ko digituak},
  				'olck' => q{Ol Chiki digituak},
  				'orya' => q{Digitu oriyarrak},
@@ -1342,8 +1348,8 @@ has 'display_name_type' => (
  				'sund' => q{Digitu sundadarrak},
  				'takr' => q{Digitu takriarrak},
  				'talu' => q{Digitu tai lue berriak},
- 				'taml' => q{Zenbaki tamilar tradizionalak},
- 				'tamldec' => q{Digitu tamilarrak},
+ 				'taml' => q{Zenbaki tamildar tradizionalak},
+ 				'tamldec' => q{Digitu tamildarrak},
  				'telu' => q{Digitu teluguarrak},
  				'thai' => q{Digitu thailandiarrak},
  				'tibt' => q{Digitu tibetarrak},
@@ -1587,11 +1593,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'10p-30' => {
-						'1' => q(quecto{0}),
+						'1' => q(kekto{0}),
 					},
 					# Core Unit Identifier
 					'30' => {
-						'1' => q(quecto{0}),
+						'1' => q(kekto{0}),
 					},
 					# Long Unit Identifier
 					'10p-6' => {
@@ -1972,6 +1978,18 @@ has 'units' => (
 						'other' => q({0} zati milioi bakoitzeko),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(zati mila milioiko),
+						'one' => q({0} zati mila milioiko),
+						'other' => q({0} zati mila milioiko),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(zati mila milioiko),
+						'one' => q({0} zati mila milioiko),
+						'other' => q({0} zati mila milioiko),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(litro 100 kilometro bakoitzeko),
 						'one' => q({0} litro 100 kilometro bakoitzeko),
@@ -2250,6 +2268,20 @@ has 'units' => (
 						'name' => q(nanosegundoak),
 						'one' => q({0} nanosegundo),
 						'other' => q({0} nanosegundo),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(gauak),
+						'one' => q({0} gau),
+						'other' => q({0} gau),
+						'per' => q({0} gau bakoitzeko),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(gauak),
+						'one' => q({0} gau),
+						'other' => q({0} gau),
+						'per' => q({0} gau bakoitzeko),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -3228,6 +3260,18 @@ has 'units' => (
 						'other' => q({0} kilometro orduko),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(argia),
+						'one' => q({0} argi),
+						'other' => q({0} argi),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(argia),
+						'one' => q({0} argi),
+						'other' => q({0} argi),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'one' => q({0} metro segundoko),
 						'other' => q({0} metro segundoko),
@@ -3646,6 +3690,18 @@ has 'units' => (
 						'name' => q(mmol/l),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(zati / m. m.),
+						'one' => q({0} zati / m. m.),
+						'other' => q({0} zati / m. m.),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(zati / m. m.),
+						'one' => q({0} zati / m. m.),
+						'other' => q({0} zati / m. m.),
+					},
+					# Long Unit Identifier
 					'consumption-mile-per-gallon-imperial' => {
 						'one' => q({0} m/g brit.),
 						'other' => q({0} m/g brit.),
@@ -3700,6 +3756,20 @@ has 'units' => (
 					'month' => {
 						'one' => q({0} hil),
 						'other' => q({0} hil),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(gau),
+						'one' => q({0} g.),
+						'other' => q({0} g.),
+						'per' => q({0}/gau),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(gau),
+						'one' => q({0} g.),
+						'other' => q({0} g.),
+						'per' => q({0}/gau),
 					},
 					# Long Unit Identifier
 					'duration-second' => {
@@ -3886,6 +3956,18 @@ has 'units' => (
 					'knot' => {
 						'one' => q({0}kn),
 						'other' => q({0}kn),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(argia),
+						'one' => q({0} a.),
+						'other' => q({0} a.),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(argia),
+						'one' => q({0} a.),
+						'other' => q({0} a.),
 					},
 					# Long Unit Identifier
 					'temperature-fahrenheit' => {
@@ -4206,6 +4288,18 @@ has 'units' => (
 						'other' => q(‱ {0}),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(zati / mila milioi),
+						'one' => q({0} zati / m. m.),
+						'other' => q({0} zati / m. m.),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(zati / mila milioi),
+						'one' => q({0} zati / m. m.),
+						'other' => q({0} zati / m. m.),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(l/100 km),
 						'one' => q({0} l/100 km),
@@ -4334,6 +4428,20 @@ has 'units' => (
 						'one' => q({0} hilabete),
 						'other' => q({0} hilabete),
 						'per' => q({0}/hil),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(gau),
+						'one' => q({0} gau),
+						'other' => q({0} gau),
+						'per' => q({0}/gau),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(gau),
+						'one' => q({0} gau),
+						'other' => q({0} gau),
+						'per' => q({0}/gau),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -4788,6 +4896,18 @@ has 'units' => (
 						'name' => q(korapilo),
 						'one' => q({0} korapilo),
 						'other' => q({0} korapilo),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(argia),
+						'one' => q({0} argi),
+						'other' => q({0} argi),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(argia),
+						'one' => q({0} argi),
+						'other' => q({0} argi),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -8099,6 +8219,7 @@ has 'eras' => (
 				'1' => 'o'
 			},
 			wide => {
+				'0' => 'Kristo aurretik',
 				'1' => 'Kristo ondoren'
 			},
 		},
@@ -8246,6 +8367,7 @@ has 'datetime_formats_available_formats' => (
 			Bhm => q{B h:mm},
 			Bhms => q{B h:mm:s},
 			EBhm => q{E B h:mm},
+			EBhms => q{E B h:mm:ss},
 			Ed => q{d, EEEE},
 			Ehm => q{E h:mm a},
 			Ehms => q{E h:mm:ss a},
@@ -8816,7 +8938,7 @@ has 'time_zone_names' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default	=> sub { {
-		hourFormat => q(+HH:mm;−HH:mm),
+		hourFormat => q(+HH:mm;–HH:mm),
 		regionFormat => q({0} aldeko ordua),
 		regionFormat => q({0} (udako ordua)),
 		regionFormat => q({0} aldeko ordu estandarra),
@@ -8946,9 +9068,6 @@ has 'time_zone_names' => (
 		'America/Cuiaba' => {
 			exemplarCity => q#Cuiabá#,
 		},
-		'America/Curacao' => {
-			exemplarCity => q#Curaçao#,
-		},
 		'America/Dominica' => {
 			exemplarCity => q#Dominika#,
 		},
@@ -8990,9 +9109,6 @@ has 'time_zone_names' => (
 		},
 		'America/Port_of_Spain' => {
 			exemplarCity => q#Port-of-Spain#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#Santa Isabel#,
 		},
 		'America/Santarem' => {
 			exemplarCity => q#Santarém#,
@@ -9146,9 +9262,6 @@ has 'time_zone_names' => (
 		'Asia/Chita' => {
 			exemplarCity => q#Txita#,
 		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#Txoibalsan#,
-		},
 		'Asia/Colombo' => {
 			exemplarCity => q#Kolombo#,
 		},
@@ -9263,9 +9376,6 @@ has 'time_zone_names' => (
 		'Atlantic/St_Helena' => {
 			exemplarCity => q#Santa Helena#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#Currie#,
-		},
 		'Australia_Central' => {
 			long => {
 				'daylight' => q#Australiako erdialdeko udako ordua#,
@@ -9373,13 +9483,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Txinako udako ordua#,
 				'generic' => q#Txinako ordua#,
 				'standard' => q#Txinako ordu estandarra#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Txoibalsango udako ordua#,
-				'generic' => q#Txoibalsango ordua#,
-				'standard' => q#Txoibalsango ordu estandarra#,
 			},
 		},
 		'Christmas' => {
@@ -9513,9 +9616,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#Ulianovsk#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#Uzhhorod#,
-		},
 		'Europe/Vatican' => {
 			exemplarCity => q#Vatikano Hiria#,
 		},
@@ -9524,9 +9624,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Warsaw' => {
 			exemplarCity => q#Varsovia#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#Zaporizhia#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#Zürich#,
@@ -9755,6 +9852,11 @@ has 'time_zone_names' => (
 				'standard' => q#Petropavlovsk-Kamchatskiko ordu estandarra#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Kazakhstango ordua#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#Kazakhstango ekialdeko ordua#,
@@ -9813,11 +9915,6 @@ has 'time_zone_names' => (
 				'standard' => q#Macaoko ordu estandarra#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Macquarie uharteko ordua#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Magadango udako ordua#,
@@ -9855,13 +9952,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Mawsoneko ordua#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Mexikoko ipar-ekialdeko udako ordua#,
-				'generic' => q#Mexikoko ipar-ekialdeko ordua#,
-				'standard' => q#Mexikoko ipar-ekialdeko ordu estandarra#,
 			},
 		},
 		'Mexico_Pacific' => {

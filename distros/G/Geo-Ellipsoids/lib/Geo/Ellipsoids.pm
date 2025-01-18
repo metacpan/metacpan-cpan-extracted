@@ -1,4 +1,11 @@
 package Geo::Ellipsoids;
+use strict;
+use warnings;
+use Geo::Constants qw{PI};
+use Geo::Functions qw{rad_deg};
+
+our $VERSION       = '0.17';
+our $DEFAULT_ELIPS = 'WGS84';
 
 =head1 NAME
 
@@ -18,15 +25,7 @@ Geo::Ellipsoids - Package for standard Geo:: ellipsoid a, b, f and 1/f values.
 
 =head1 DESCRIPTION
 
-=cut
-
-use strict;
-use vars qw($VERSION);
-use constant DEFAULT_ELIPS => 'WGS84';
-use Geo::Constants qw{PI};
-use Geo::Functions qw{rad_deg};
-
-$VERSION = sprintf("%d.%02d", q{Revision: 0.16} =~ /(\d+)\.(\d+)/);
+Package for standard Geo:: ellipsoid a, b, f and 1/f values.
 
 =head1 CONSTRUCTOR
 
@@ -39,9 +38,9 @@ The new() constructor may be called with any parameter that is appropriate to th
 =cut
 
 sub new {
-  my $this = shift();
-  my $class = ref($this) || $this;
-  my $self = {};
+  my $this  = shift;
+  my $class = ref($this) ? ref($this) : $this;
+  my $self  = {};
   bless $self, $class;
   $self->initialize(@_);
   return $self;
@@ -49,11 +48,13 @@ sub new {
 
 =head1 METHODS
 
+=head2 initialize
+
 =cut
 
 sub initialize {
-  my $self = shift();
-  my $param = shift();
+  my $self  = shift;
+  my $param = shift;
   $self->set($param);
 }
 
@@ -68,22 +69,22 @@ Method sets the current ellipsoid.  This method is called when the object is con
 =cut
 
 sub set {
-  my $self=shift();
-  my $param=shift()||DEFAULT_ELIPS;
+  my $self  = shift;
+  my $param = shift || $DEFAULT_ELIPS;
   undef($self->{'shortname'});
   undef($self->{'longname'});
-  if ("HASH" eq ref($param)) {
+  if ('HASH' eq ref($param)) {
     return $self->_setref($param);
   } elsif ('' eq ref($param)) {
     return $self->_setname($param);
   } else {
-    die("Error: Parameter must be the name of an ellipsoid or a hash reference");
+    die('Error: Parameter must be the name of an ellipsoid or a hash reference');
   } 
 }
 
 =head2 list
 
-Method returns a list of known elipsoid names.
+Method returns a list of known ellipsoid names.
 
   my @list=$obj->list;
 
@@ -95,9 +96,9 @@ Method returns a list of known elipsoid names.
 =cut 
 
 sub list {
-  my $self=shift();
-  my $data=$self->data;
-  my @keys=keys %$data;
+  my $self = shift;
+  my $data = $self->data;
+  my @keys = keys %$data;
   return wantarray ? @keys : \@keys;
 }
 
@@ -110,8 +111,8 @@ Method returns the value of the semi-major axis.
 =cut
 
 sub a {
-  my $self=shift();
-  return $self->{'a'} || die('Error: $self->{"a"} must be defined here');
+  my $self = shift;
+  return $self->{'a'} || die(q{Error: $self->{'a'} must be defined here});
 }
 
 =head2 b
@@ -123,7 +124,7 @@ Method returns the value of the semi-minor axis.
 =cut
 
 sub b {
-  my $self=shift();
+  my $self = shift;
   if (defined $self->{'b'}) {
     return $self->{'b'};
   } elsif (defined $self->{'f'}) {
@@ -144,7 +145,7 @@ Method returns the value of flatting
 =cut
 
 sub f {
-  my $self=shift();
+  my $self = shift;
   if (defined $self->{'f'}) {
     return $self->{'f'};
   } elsif (defined $self->{'b'}) {
@@ -160,12 +161,12 @@ sub f {
 
 Method returns the value of the inverse flatting
 
-  my $i=$obj->i; #i=1/f=a/(a-b)
+  my $i = $obj->i; #i=1/f=a/(a-b)
 
 =cut
 
 sub i {
-  my $self=shift();
+  my $self = shift;
   if (defined $self->{'i'}) {
     return $self->{'i'};
   } elsif (defined $self->{'b'}) {
@@ -185,12 +186,12 @@ sub i {
 
 Method synonym for the i method
 
-  my $i=$obj->invf; #i=1/f
+  my $i = $obj->invf; #i=1/f
 
 =cut
 
 sub invf {
-  my $self = shift();
+  my $self = shift;
   return $self->i(@_);
 }
 
@@ -203,7 +204,7 @@ Method returns the value of the first eccentricity, e.  This is the eccentricity
 =cut
 
 sub e {
-  my $self=shift();
+  my $self = shift;
   return sqrt($self->e2);
 }
 
@@ -211,13 +212,13 @@ sub e {
 
 Method returns the value of eccentricity squared (e.g. e^2). This is not the second eccentricity, e' or e-prime see the "ep" method.
 
-  my $e=sqrt($obj->e2); #e^2 = f(2-f) = 2f-f^2 = 1-b^2/a^2
+  my $e2 = sqrt($obj->e2); #e^2 = f(2-f) = 2f-f^2 = 1-b^2/a^2
 
 =cut
 
 sub e2 {
-  my $self=shift();
-  my $f=$self->f();
+  my $self = shift;
+  my $f    = $self->f();
   return $f*(2 - $f);
 }
 
@@ -225,12 +226,12 @@ sub e2 {
 
 Method returns the value of the second eccentricity, e' or e-prime.  The second eccentricity is related to the first eccentricity by the equation: 1=(1-e^2)(1+e'^2).
 
-  my $ep=$obj->ep;
+  my $ep = $obj->ep;
 
 =cut
 
 sub ep {
-  my $self=shift();
+  my $self = shift;
   return sqrt($self->ep2);
 }
 
@@ -243,9 +244,9 @@ Method returns the square of value of second eccentricity, e' (e-prime).  This i
 =cut
 
 sub ep2 {
-  my $self=shift();
-  my $a=$self->a();
-  my $b=$self->b();
+  my $self = shift;
+  my $a    = $self->a();
+  my $b    = $self->b();
   return $a**2/$b**2 - 1;
 }
 
@@ -253,20 +254,20 @@ sub ep2 {
 
 Method returns the value of n given latitude (degrees).  Typically represented by the Greek letter nu, this is the radius of curvature of the ellipsoid perpendicular to the meridian plane.  It is also the distance from the point in question to the polar axis, measured perpendicular to the ellipsoid's surface.
 
-  my $n=$obj->n($lat);
+  my $n = $obj->n($lat);
 
 Note: Some define a variable n as (a-b)/(a+b) this is not that variable.
 
 Note: It appears that n can also be calculated as 
 
-  n=a^2/sqrt(a^2 * cos($lat)^2 + $b^2 * sin($lat)^2);
+  n = a^2/sqrt(a^2 * cos($lat)^2 + $b^2 * sin($lat)^2);
 
 =cut
 
 sub n {
-  my $self=shift();
-  my $lat=shift(); #degrees
-  die("Error: Latitude (degrees) required.") unless defined $lat;
+  my $self = shift;
+  my $lat  = shift; #degrees
+  die('Error: Latitude (degrees) required.') unless defined $lat;
   return $self->n_rad(rad_deg($lat));
 }
 
@@ -274,18 +275,18 @@ sub n {
 
 Method returns the value of n given latitude (radians).
 
-  my $n=$obj->n_rad($lat);
+  my $n_rad = $obj->n_rad($lat);
 
 Reference: John P. Snyder, "Map Projections: A Working Manual", USGS, page 25, equation (4-20) http://pubs.er.usgs.gov/usgspubs/pp/pp1395
 
 =cut
 
 sub n_rad {
-  my $self=shift();
-  my $lat=shift(); #radians
-  die("Error: Latitude (radians) required.") unless defined $lat;
-  my $a=$self->a;
-  my $e2=$self->e2;
+  my $self = shift;
+  my $lat  = shift; #radians
+  die('Error: Latitude (radians) required.') unless defined $lat;
+  my $a    = $self->a;
+  my $e2   = $self->e2;
   return $a / sqrt(1 - $e2 * sin($lat)**2);
 }
 
@@ -298,9 +299,9 @@ rho is the radius of curvature of the earth in the meridian plane.
 =cut
 
 sub rho {
-  my $self=shift();
-  my $lat=shift(); #degrees
-  die("Error: Latitude (degrees) required.") unless defined $lat;
+  my $self = shift;
+  my $lat  = shift; #degrees
+  die('Error: Latitude (degrees) required.') unless defined $lat;
   return $self->rho_rad(rad_deg($lat));
 }
 
@@ -308,18 +309,18 @@ sub rho {
 
 rho is the radius of curvature of the earth in the meridian plane. Sometimes denoted as R'.
 
-  my $rho=$obj->rho_rad($lat);
+  my $rho = $obj->rho_rad($lat);
 
 Reference: John P. Snyder, "Map Projections: A Working Manual", USGS, page 24, equation (4-18) http://pubs.er.usgs.gov/usgspubs/pp/pp1395
 
 =cut
 
 sub rho_rad {
-  my $self=shift();
-  my $lat=shift(); #radians
-  die("Error: Latitude (radians) required.") unless defined $lat;
-  my $a=$self->a;
-  my $e2=$self->e2;
+  my $self = shift;
+  my $lat  = shift; #radians
+  die('Error: Latitude (radians) required.') unless defined $lat;
+  my $a    = $self->a;
+  my $e2   = $self->e2;
   return $a * (1-$e2) / ( 1 - $e2 * sin($lat)**2 )**(3/2)
   #return $a * (1-$e2) / sqrt(1 - $e2 * sin($lat)**(3/2)); #Bad formula from somewhere
 }
@@ -333,7 +334,7 @@ Method returns the value of the semi-minor axis times 2*PI.
 =cut
 
 sub polar_circumference {
-  my $self=shift();
+  my $self = shift;
   return 2 * PI() * $self->b();
 }
 
@@ -346,40 +347,40 @@ Method returns the value of the semi-major axis times 2*PI.
 =cut
 
 sub equatorial_circumference {
-  my $self=shift();
+  my $self = shift;
   return 2 * PI() * $self->a();
 }
 
 sub _setref {
-  my $self=shift();
-  my $param=shift();
+  my $self  = shift;
+  my $param = shift;
   if ('HASH' eq ref($param)) {
     if (defined($param->{'a'})) {
-      $self->{'a'}=$param->{'a'};
-      $self->{'shortname'}='Custom' unless defined($self->shortname);
+      $self->{'a'}          = $param->{'a'};
+      $self->{'shortname'}  = 'Custom' unless defined($self->shortname);
       if (defined $param->{'i'}) {
-        $self->{'i'}=$param->{'i'};
+        $self->{'i'}        = $param->{'i'};
         undef($self->{'b'});
         undef($self->{'f'});
-        $self->{'longname'}='Custom Ellipsoid {a=>'.$self->a.',i=>'.$self->i.'}'  unless defined($self->longname);
+        $self->{'longname'} = 'Custom Ellipsoid {a=>'.$self->a.',i=>'.$self->i.'}'  unless defined($self->longname);
       } elsif (defined $param->{'b'}){
-        $self->{'b'}=$param->{'b'};
+        $self->{'b'}        = $param->{'b'};
         undef($self->{'i'});
         undef($self->{'f'});
-        $self->{'longname'}='Custom Ellipsoid {a=>'.$self->a.',b=>'.$self->b.'}'  unless defined($self->longname);
+        $self->{'longname'} = 'Custom Ellipsoid {a=>'.$self->a.',b=>'.$self->b.'}'  unless defined($self->longname);
       } elsif (defined $param->{'f'}){
-        $self->{'f'}=$param->{'f'};
+        $self->{'f'}        = $param->{'f'};
         undef($self->{'b'});
         undef($self->{'i'});
-        $self->{'longname'}='Custom Ellipsoid {a=>'.$self->a.',f=>'.$self->f.'}'  unless defined($self->longname);
+        $self->{'longname'} = 'Custom Ellipsoid {a=>'.$self->a.',f=>'.$self->f.'}'  unless defined($self->longname);
       } else {
-        $self->{'b'}=$param->{'a'};
+        $self->{'b'}        = $param->{'a'};
         undef($self->{'f'});
         undef($self->{'i'});
-        $self->{'longname'}='Custom Sphere {a=>'.$self->a.'}' unless defined($self->longname);
+        $self->{'longname'} = 'Custom Sphere {a=>'.$self->a.'}' unless defined($self->longname);
       }
     } else {
-      die("Error: a must be defined");
+      die('Error: a must be defined');
     }
   } else {
     die('Error: a hash reference e.g. {a=>###, i=>###} must be define');
@@ -388,13 +389,13 @@ sub _setref {
 }
 
 sub _setname {
-  my $self=shift();
-  my $param=shift();
-  my $ref=$self->name2ref($param);
-  if ("HASH" eq ref($ref)) {
+  my $self  = shift;
+  my $param = shift;
+  my $ref   = $self->name2ref($param);
+  if ('HASH' eq ref($ref)) {
     $self->{'shortname'}=$param;
-    my $data=$self->data;
-    my %data=map {$_, $data->{$_}->{'name'}} (keys %$data);
+    my $data            = $self->data;
+    my %data            = map {$_, $data->{$_}->{'name'}} (keys %$data);
     $self->{'longname'} = $data{$param};
     return $self->_setref($ref);
   } else {
@@ -406,12 +407,12 @@ sub _setname {
 
 Method returns the shortname, which is the hash key, of the current ellipsoid
 
-  my $shortname=$obj->shortname;
+  my $shortname = $obj->shortname;
 
 =cut
 
 sub shortname {
-  my $self = shift();
+  my $self = shift;
   return $self->{'shortname'};
 }
 
@@ -419,12 +420,12 @@ sub shortname {
 
 Method returns the long name of the current ellipsoid
 
-  my $longname=$obj->longname;
+  my $longname = $obj->longname;
 
 =cut
 
 sub longname {
-  my $self = shift();
+  my $self = shift;
   return $self->{'longname'};
 }
 
@@ -432,7 +433,7 @@ sub longname {
 
 Method returns a hash reference for the ellipsoid definition data structure.
 
-  my $datastructure=$obj->data;
+  my $datastructure = $obj->data;
 
 =cut
 
@@ -464,7 +465,7 @@ sub data {
 
     'Australian National'=>{name=>'Australian National Spheroid of 1965',
                             data=>{a=>6378160,i=>298.25},
-                            alias=>["Australian 1965"]},
+                            alias=>['Australian 1965']},
 
     'Bessel 1841'=>{name=>'Bessel 1841 Ellipsoid',
                     data=>{a=>6377397.155,i=>299.1528128}},
@@ -498,7 +499,7 @@ sub data {
 
     'Krassovsky 1938'=>{name=>'Krassovsky 1938',
                         data=>{a=>6378245,i=>298.3},
-                        alias=>["Krasovsky 1940"]},
+                        alias=>['Krasovsky 1940']},
 
     'NWL-9D'=>{name=>'NWL-9D Ellipsoid',
                data=>{a=>6378145,i=>298.25},
@@ -533,9 +534,9 @@ Method returns a hash reference (e.g. {a=>6378137,i=>298.257223563}) when passed
 =cut
 
 sub name2ref {
-  my $self=shift();
-  my $key=shift();
-  my $data=$self->data;
+  my $self = shift;
+  my $key  = shift;
+  my $data = $self->data;
   return $data->{$key}->{'data'};
 }
 
@@ -543,38 +544,20 @@ sub name2ref {
 
 __END__
 
-=head1 TODO
-
-What should we do about bad input?  I tend to die in the module which for most situations is fine.  I guess you could always overload die to handle exceptions for web based solutions and the like.
-
-Support for ellipsoid aliases in the data structure
-
-=head1 BUGS
-
-Please send to the geo-perl email list.
-
-=head1 LIMITS
-
-No guarantees that Perl handles all of the double precision calculations in the same manner as Fortran.
-
 =head1 AUTHOR
 
-Michael R. Davis qw/perl michaelrdavis com/
+Michael R. Davis
 
 =head1 LICENSE
 
-Copyright (c) 2006 Michael R. Davis (mrdvt92)
+Copyright (c) 2006 Michael R. Davis
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-Geo::Forward
-Geo::Ellipsoid
-Geo::Coordinates::UTM
-Geo::GPS::Data::Ellipsoid
-GIS::Distance
+L<Geo::Forward>, L<Geo::Ellipsoid>, L<Geo::Coordinates::UTM>, L<Geo::GPS::Data::Ellipsoid>, L<GIS::Distance>
 
 =cut
 

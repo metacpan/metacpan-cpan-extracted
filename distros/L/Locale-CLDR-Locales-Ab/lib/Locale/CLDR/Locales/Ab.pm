@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Ab - Package for language Abkhazian
 
 package Locale::CLDR::Locales::Ab;
 # This file auto generated from Data\common\main\ab.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -2174,9 +2174,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#Ниу-Иорк#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#Нипигон#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#Ном#,
 		},
@@ -2198,9 +2195,6 @@ has 'time_zone_names' => (
 		'America/Panama' => {
 			exemplarCity => q#Панама#,
 		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#Пангниртанг#,
-		},
 		'America/Paramaribo' => {
 			exemplarCity => q#Парамарибо#,
 		},
@@ -2221,9 +2215,6 @@ has 'time_zone_names' => (
 		},
 		'America/Punta_Arenas' => {
 			exemplarCity => q#Пунта-Аренас#,
-		},
-		'America/Rainy_River' => {
-			exemplarCity => q#Реини-Ривер#,
 		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#Ранкин-Инлет#,
@@ -2285,9 +2276,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#Туле#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#Тандер-Беи#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#Тихуана#,
 		},
@@ -2308,9 +2296,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#Иакутат#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#Иеллоунаиф#,
 		},
 		'America_Central' => {
 			long => {
@@ -2485,9 +2470,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#Чита#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#Чоибалсан#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#Коломбо#,
@@ -2860,13 +2842,6 @@ has 'time_zone_names' => (
 				'standard' => q#Китаи, астандартә аамҭа#,
 			},
 		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Чоибалсан, аԥхынтәи аамҭа#,
-				'generic' => q#Чоибалсан#,
-				'standard' => q#Чоибалсан, астандартә аамҭа#,
-			},
-		},
 		'Christmas' => {
 			long => {
 				'standard' => q#ад-ха Қьырса#,
@@ -3084,9 +3059,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#Улиановск#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#Ужҳород#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#Вадуц#,
 		},
@@ -3107,9 +3079,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#Загреб#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#Запороже#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#Циурих#,
@@ -3397,11 +3366,6 @@ has 'time_zone_names' => (
 				'standard' => q#Макао, астандартә аамҭа#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Маккуори#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Магадан, аԥхынтәи аамҭа#,
@@ -3439,13 +3403,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Моусон#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Аҩадамра-Ҭашәаратәи амексикатә аԥхынтәи аамҭа#,
-				'generic' => q#Аҩадамра-Ҭашәаратәи амексикатә аамҭа#,
-				'standard' => q#Аҩадамра-Ҭашәаратәи амексикатә астандартә аамҭа#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -3581,9 +3538,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Guam' => {
 			exemplarCity => q#Гуам#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#Џонстон#,
 		},
 		'Pacific/Kanton' => {
 			exemplarCity => q#Кантон#,

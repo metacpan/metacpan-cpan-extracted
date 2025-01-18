@@ -1,5 +1,9 @@
 Revision history for Crypt-Passphrase-Argon2
 
+0.010     2025-01-18 03:29:31+01:00 Europe/Brussels
+          - Eliminate $to argument to recode_hash
+          - Tolerate decrypt failures in recode_hash
+
 0.009     2023-05-04 15:24:08+02:00 Europe/Amsterdam
           - Increase default output size to 32
           - Make cipher part of peppered crypt identifiers

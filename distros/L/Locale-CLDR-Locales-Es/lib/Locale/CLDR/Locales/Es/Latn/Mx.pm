@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Es::Latn::Mx - Package for language Spanish
 
 package Locale::CLDR::Locales::Es::Latn::Mx;
 # This file auto generated from Data\common\main\es_MX.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -63,7 +63,6 @@ has 'display_name_language' => (
  				'kgp' => 'kaingang',
  				'krc' => 'karachái bálkaro',
  				'kum' => 'cumuco',
- 				'lo' => 'lao',
  				'mga' => 'irlandés medieval',
  				'nan' => 'min nan (Chino)',
  				'nr' => 'ndebele meridional',
@@ -168,14 +167,6 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
-					# Long Unit Identifier
-					'concentr-milligram-ofglucose-per-deciliter' => {
-						'name' => q(miligramos por decilitro),
-					},
-					# Core Unit Identifier
-					'milligram-ofglucose-per-deciliter' => {
-						'name' => q(miligramos por decilitro),
-					},
 					# Long Unit Identifier
 					'concentr-percent' => {
 						'name' => q(por ciento),
@@ -493,14 +484,6 @@ has 'units' => (
 						'other' => q({0}mm),
 					},
 					# Long Unit Identifier
-					'length-nautical-mile' => {
-						'name' => q(M),
-					},
-					# Core Unit Identifier
-					'nautical-mile' => {
-						'name' => q(M),
-					},
-					# Long Unit Identifier
 					'mass-kilogram' => {
 						'one' => q({0} kg),
 						'other' => q({0}kg),
@@ -509,14 +492,6 @@ has 'units' => (
 					'kilogram' => {
 						'one' => q({0} kg),
 						'other' => q({0}kg),
-					},
-					# Long Unit Identifier
-					'power-horsepower' => {
-						'name' => q(CV),
-					},
-					# Core Unit Identifier
-					'horsepower' => {
-						'name' => q(CV),
 					},
 					# Long Unit Identifier
 					'pressure-atmosphere' => {
@@ -796,20 +771,6 @@ has 'number_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		decimalFormat => {
-			'long' => {
-				'1000000000000' => {
-					'one' => '0 billón',
-					'other' => '0 billones',
-				},
-				'10000000000000' => {
-					'one' => '00 billones',
-					'other' => '00 billones',
-				},
-				'100000000000000' => {
-					'one' => '000 billones',
-					'other' => '000 billones',
-				},
-			},
 			'short' => {
 				'1000' => {
 					'one' => '0 k',
@@ -833,19 +794,6 @@ has 'currencies' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'AMD' => {
-			display_name => {
-				'one' => q(dram armenio),
-				'other' => q(drams armenios),
-			},
-		},
-		'BDT' => {
-			display_name => {
-				'currency' => q(taka bangladesí),
-				'one' => q(taka bangladesí),
-				'other' => q(takas bangladesíes),
-			},
-		},
 		'BTN' => {
 			display_name => {
 				'currency' => q(ngultrum butanés),
@@ -858,27 +806,6 @@ has 'currencies' => (
 		},
 		'FKP' => {
 			symbol => '£',
-		},
-		'KGS' => {
-			display_name => {
-				'currency' => q(som kirguís),
-				'one' => q(som kirguís),
-				'other' => q(soms kirguises),
-			},
-		},
-		'KHR' => {
-			display_name => {
-				'currency' => q(riel camboyano),
-				'one' => q(riel camboyano),
-				'other' => q(rieles camboyanos),
-			},
-		},
-		'LAK' => {
-			display_name => {
-				'currency' => q(kip laosiano),
-				'one' => q(kip laosiano),
-				'other' => q(kips laosianos),
-			},
 		},
 		'LVL' => {
 			display_name => {
@@ -912,13 +839,6 @@ has 'currencies' => (
 		'SSP' => {
 			symbol => '£',
 		},
-		'STN' => {
-			display_name => {
-				'currency' => q(dobra santotomense),
-				'one' => q(dobra santotomense),
-				'other' => q(dobras santotomenses),
-			},
-		},
 		'SYP' => {
 			symbol => '£',
 		},
@@ -936,13 +856,6 @@ has 'currencies' => (
 			display_name => {
 				'one' => q(bolívar venezolano),
 				'other' => q(bolivares venezolanos),
-			},
-		},
-		'VND' => {
-			display_name => {
-				'currency' => q(dong vietnamita),
-				'one' => q(dong vietnamita),
-				'other' => q(dongs vietnamitas),
 			},
 		},
 		'XXX' => {
@@ -1074,10 +987,6 @@ has 'day_periods' => (
 			},
 			'stand-alone' => {
 				'abbreviated' => {
-					'am' => q{a. m.},
-					'pm' => q{p. m.},
-				},
-				'narrow' => {
 					'am' => q{a. m.},
 					'pm' => q{p. m.},
 				},
@@ -1384,11 +1293,6 @@ has 'time_zone_names' => (
 		'Gilbert_Islands' => {
 			long => {
 				'standard' => q#hora de las Islas Gilbert#,
-			},
-		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#hora de la isla Macquarie#,
 			},
 		},
 		'Marshall_Islands' => {

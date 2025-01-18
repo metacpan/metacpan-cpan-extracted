@@ -62,7 +62,7 @@ is_deeply ($am_pm, { am => 'a. m.', pm => 'p. m.', morning1 => 'matinada', mor
 $am_pm = $locale->am_pm_format_abbreviated();
 is_deeply ($am_pm, { am => 'a. m.', pm => 'p. m.', morning1 => 'matinada', morning2 => 'matí', afternoon1 => 'migdia', afternoon2 => 'tarda', evening1 => 'vespre', night1 => 'nit', midnight => 'mitjanit' }, 'AM PM format abbreviated');
 $am_pm = $locale->am_pm_format_narrow();
-is_deeply ($am_pm, { am => 'a. m.', pm => 'p. m.', morning1 => 'mat.', morning2 => 'matí', afternoon1 => 'migdia', afternoon2 => 'tarda', evening1 => 'vespre', night1 => 'nit', midnight => 'mitjanit' }, 'AM PM format narrow');
+is_deeply ($am_pm, { am => 'a. m.', pm => 'p. m.', morning1 => 'matinada', morning2 => 'matí', afternoon1 => 'migdia', afternoon2 => 'tarda', evening1 => 'vespre', night1 => 'nit', midnight => 'mitjanit' }, 'AM PM format narrow');
 $am_pm = $locale->am_pm_stand_alone_wide();
 is_deeply ($am_pm, { am => 'a. m.', pm => 'p. m.', morning1 => 'matinada', morning2 => 'matí', afternoon1 => 'migdia', afternoon2 => 'tarda', evening1 => 'vespre', night1 => 'nit', midnight => 'mitjanit' }, 'AM PM stand alone wide');
 $am_pm = $locale->am_pm_stand_alone_abbreviated();

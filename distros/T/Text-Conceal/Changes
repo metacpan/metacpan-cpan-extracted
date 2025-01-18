@@ -1,5 +1,9 @@
 Revision history for Perl extension Text-Conceal
 
+1.04 2025-01-18T02:58:22Z
+
+    - requires Text::ANSI::Fold@2.2702
+
 1.03 2023-10-21T05:00:24Z
 
     - Introduce 'duplicate' parameter.

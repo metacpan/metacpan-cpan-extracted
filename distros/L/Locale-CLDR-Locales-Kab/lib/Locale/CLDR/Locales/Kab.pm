@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Kab - Package for language Kabyle
 
 package Locale::CLDR::Locales::Kab;
 # This file auto generated from Data\common\main\kab.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -294,6 +294,7 @@ has 'display_name_language' => (
  				'nmg' => 'Takwazyut',
  				'nn' => 'Tanuṛvijt ninuṛsk',
  				'nnh' => 'Tangimbunt',
+ 				'no' => 'Tanuṛvijit',
  				'nog' => 'Tanugayt',
  				'nqo' => 'Tankut',
  				'nr' => 'Tandibilit n unzul',
@@ -6970,6 +6971,9 @@ has 'time_zone_names' => (
 		'America/El_Salvador' => {
 			exemplarCity => q#Salvadur#,
 		},
+		'America/Fort_Nelson' => {
+			exemplarCity => q#Fuṛt Nilṣun#,
+		},
 		'America/Fortaleza' => {
 			exemplarCity => q#Furṭaliza#,
 		},
@@ -7132,9 +7136,6 @@ has 'time_zone_names' => (
 		'Asia/Calcutta' => {
 			exemplarCity => q#Kulkata#,
 		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#Kwabalsan#,
-		},
 		'Asia/Colombo' => {
 			exemplarCity => q#Kulumbu#,
 		},
@@ -7253,9 +7254,6 @@ has 'time_zone_names' => (
 		'Australia/Brisbane' => {
 			exemplarCity => q#Brisban#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#Currie#,
-		},
 		'Australia/Melbourne' => {
 			exemplarCity => q#Malburn#,
 		},
@@ -7364,13 +7362,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Akud n unebdu n Cin#,
 				'generic' => q#Akud n Cin#,
 				'standard' => q#Akud amezday n Cin#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Akud n unebdu n Kwabalsan#,
-				'generic' => q#Akud n Kwabalsan#,
-				'standard' => q#Akud amezday n Kwabalsan#,
 			},
 		},
 		'Christmas' => {
@@ -7806,11 +7797,6 @@ has 'time_zone_names' => (
 				'standard' => q#Akud Amagnu n Lord Howe#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Akud n Markari#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Akud n unebdu n Magadan#,
@@ -7848,13 +7834,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Akud n Mawsun#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Akud n unebdu n ugafa amalu n Miksik#,
-				'generic' => q#Akud n ugafa amalu n Miksik#,
-				'standard' => q#Akud amezday n ugafa amalu n Miksik#,
 			},
 		},
 		'Mexico_Pacific' => {

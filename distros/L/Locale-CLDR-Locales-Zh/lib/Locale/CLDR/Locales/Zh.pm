@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Zh - Package for language Chinese
 
 package Locale::CLDR::Locales::Zh;
 # This file auto generated from Data\common\main\zh.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -1337,6 +1337,13 @@ has 'algorithmic_number_format_data' => (
     } },
 );
 
+has default_collation => (
+    is => 'ro',
+    isa => Str,
+    init_arg => undef,
+    default => sub { 'pinyin' },
+);
+
 # Need to add code for Key type pattern
 sub display_name_pattern {
 	my ($self, $name, $region, $script, $variant) = @_;
@@ -1418,6 +1425,7 @@ has 'display_name_language' => (
  				'bin' => '比尼语',
  				'bkm' => '科姆语',
  				'bla' => '西克西卡语',
+ 				'blo' => '阿尼语',
  				'blt' => '黑傣语',
  				'bm' => '班巴拉语',
  				'bn' => '孟加拉语',
@@ -1566,7 +1574,8 @@ has 'display_name_language' => (
  				'hax' => '南海达语',
  				'he' => '希伯来语',
  				'hi' => '印地语',
- 				'hi_Latn@alt=variant' => '印式英语',
+ 				'hi_Latn' => '印地语（拉丁字母）',
+ 				'hi_Latn@alt=variant' => '印地英语',
  				'hil' => '希利盖农语',
  				'hit' => '赫梯语',
  				'hmn' => '苗语',
@@ -1587,7 +1596,7 @@ has 'display_name_language' => (
  				'id' => '印度尼西亚语',
  				'ie' => '国际文字（E）',
  				'ig' => '伊博语',
- 				'ii' => '四川彝语',
+ 				'ii' => '凉山彝语',
  				'ik' => '伊努皮克语',
  				'ikt' => '西加拿大因纽特语',
  				'ilo' => '伊洛卡诺语',
@@ -1649,6 +1658,7 @@ has 'display_name_language' => (
  				'kv' => '科米语',
  				'kw' => '康沃尔语',
  				'kwk' => '夸夸瓦拉语',
+ 				'kxv' => '库维语',
  				'ky' => '柯尔克孜语',
  				'la' => '拉丁语',
  				'lad' => '拉迪诺语',
@@ -1662,6 +1672,8 @@ has 'display_name_language' => (
  				'lij' => '利古里亚语',
  				'lil' => '利洛埃特语',
  				'lkt' => '拉科塔语',
+ 				'lld' => '拉定语',
+ 				'lmo' => '伦巴第语',
  				'ln' => '林加拉语',
  				'lo' => '老挝语',
  				'lol' => '蒙戈语',
@@ -1693,7 +1705,7 @@ has 'display_name_language' => (
  				'mfe' => '毛里求斯克里奥尔语',
  				'mg' => '马拉加斯语',
  				'mga' => '中古爱尔兰语',
- 				'mgh' => '马库阿语',
+ 				'mgh' => '马库阿-梅托语',
  				'mgo' => '梅塔语',
  				'mh' => '马绍尔语',
  				'mi' => '毛利语',
@@ -1761,7 +1773,7 @@ has 'display_name_language' => (
  				'om' => '奥罗莫语',
  				'or' => '奥里亚语',
  				'os' => '奥塞梯语',
- 				'osa' => '奥塞治语',
+ 				'osa' => '欧塞奇语',
  				'ota' => '奥斯曼土耳其语',
  				'pa' => '旁遮普语',
  				'pag' => '邦阿西南语',
@@ -1911,6 +1923,7 @@ has 'display_name_language' => (
  				'vec' => '威尼斯语',
  				'vep' => '维普森语',
  				'vi' => '越南语',
+ 				'vmw' => '马库阿语',
  				'vo' => '沃拉普克语',
  				'vot' => '沃提克语',
  				'vun' => '温旧语',
@@ -1924,8 +1937,9 @@ has 'display_name_language' => (
  				'wuu' => '吴语',
  				'xal' => '卡尔梅克语',
  				'xh' => '科萨语',
+ 				'xnr' => '康格里语',
  				'xog' => '索加语',
- 				'yao' => '瑶族语',
+ 				'yao' => '尧语',
  				'yap' => '雅浦语',
  				'yav' => '洋卞语',
  				'ybb' => '耶姆巴语',
@@ -1983,7 +1997,7 @@ has 'display_name_script' => (
  			'Beng' => '孟加拉文',
  			'Bhks' => '拜克舒克文',
  			'Blis' => '布列斯符号',
- 			'Bopo' => '汉语拼音',
+ 			'Bopo' => '注音符号',
  			'Brah' => '婆罗米文字',
  			'Brai' => '布莱叶盲文',
  			'Bugi' => '布吉文',
@@ -2021,7 +2035,7 @@ has 'display_name_script' => (
  			'Grek' => '希腊文',
  			'Gujr' => '古吉拉特文',
  			'Guru' => '果鲁穆奇文',
- 			'Hanb' => '汉语注音',
+ 			'Hanb' => '注音汉字',
  			'Hang' => '谚文',
  			'Hani' => '汉字',
  			'Hano' => '汉奴罗文',
@@ -2035,7 +2049,7 @@ has 'display_name_script' => (
  			'Hluw' => '安那托利亚象形文字',
  			'Hmng' => '杨松录苗文',
  			'Hmnp' => '尼亚肯蒲丘苗文',
- 			'Hrkt' => '假名表',
+ 			'Hrkt' => '假名',
  			'Hung' => '古匈牙利文',
  			'Inds' => '印度河文字',
  			'Ital' => '古意大利文',
@@ -2574,6 +2588,7 @@ has 'display_name_variant' => (
  			'PAHAWH4' => '帕哈苗文4代',
  			'PAMAKA' => 'Pamaka 方言',
  			'PEANO' => '皮亚诺方言',
+ 			'PEHOEJI' => '白话字',
  			'PETR1708' => '俄文拼字（1708年）',
  			'PINYIN' => '拼音罗马字',
  			'POLYTON' => '多音字母',
@@ -2594,6 +2609,7 @@ has 'display_name_variant' => (
  			'SURMIRAN' => '瑞士苏迈拉方言',
  			'SURSILV' => '瑞士苏瑟瓦方言',
  			'SUTSILV' => '瑞士苏希瓦方言',
+ 			'TAILO' => '台罗',
  			'TARASK' => '传统正写法',
  			'TONGYONG' => '通用拼音',
  			'UCCOR' => '统一的拼字',
@@ -2658,9 +2674,9 @@ has 'display_name_type' => (
  				'hebrew' => q{希伯来历},
  				'indian' => q{印度国定历},
  				'islamic' => q{伊斯兰历},
- 				'islamic-civil' => q{伊斯兰希吉来日历},
+ 				'islamic-civil' => q{表格式伊斯兰历（民用纪元）},
  				'islamic-rgsa' => q{沙特阿拉伯伊斯兰历},
- 				'islamic-tbla' => q{伊斯兰天文历},
+ 				'islamic-tbla' => q{表格式伊斯兰历（天文纪元）},
  				'islamic-umalqura' => q{伊斯兰历（乌姆库拉）},
  				'iso8601' => q{国际标准历法},
  				'japanese' => q{和历},
@@ -2699,7 +2715,6 @@ has 'display_name_type' => (
  				'phonebook' => q{电话簿排序},
  				'phonetic' => q{语音排序},
  				'pinyin' => q{拼音排序},
- 				'reformed' => q{改良排序},
  				'search' => q{常规搜索},
  				'searchjl' => q{按韩文字开首辅音来搜索},
  				'standard' => q{标准排序},
@@ -3199,6 +3214,16 @@ has 'units' => (
 						'other' => q(百万分之{0}),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(十亿分比),
+						'other' => q(十亿分之{0}),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(十亿分比),
+						'other' => q(十亿分之{0}),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(升/100千米),
 						'other' => q({0}升/100千米),
@@ -3347,6 +3372,18 @@ has 'units' => (
 					'terabyte' => {
 						'name' => q(太字节),
 						'other' => q({0}太字节),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(晚),
+						'other' => q({0}晚),
+						'per' => q({0}/晚),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(晚),
+						'other' => q({0}晚),
+						'per' => q({0}/晚),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -3931,6 +3968,16 @@ has 'units' => (
 						'other' => q({0}节),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(光),
+						'other' => q({0}光),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(光),
+						'other' => q({0}光),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'name' => q(米/秒),
 						'other' => q(每秒{0}米),
@@ -4265,6 +4312,18 @@ has 'units' => (
 					# Core Unit Identifier
 					'nanosecond' => {
 						'other' => q({0}ns),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(晚),
+						'other' => q({0}晚),
+						'per' => q({0}/晚),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(晚),
+						'other' => q({0}晚),
+						'per' => q({0}/晚),
 					},
 					# Long Unit Identifier
 					'electric-ampere' => {
@@ -5005,6 +5064,16 @@ has 'units' => (
 						'other' => q({0}kn),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(光),
+						'other' => q({0}光),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(光),
+						'other' => q({0}光),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'name' => q(米/秒),
 						'other' => q({0}m/s),
@@ -5669,6 +5738,18 @@ has 'units' => (
 						'other' => q({0}纳秒),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(晚),
+						'other' => q({0}晚),
+						'per' => q({0}/晚),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(晚),
+						'other' => q({0}晚),
+						'per' => q({0}/晚),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'name' => q(季),
 						'other' => q({0}季),
@@ -6175,6 +6256,16 @@ has 'units' => (
 					'millimeter-ofhg' => {
 						'name' => q(mmHg),
 						'other' => q({0} mmHg),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(光),
+						'other' => q({0}光),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(光),
+						'other' => q({0}光),
 					},
 					# Long Unit Identifier
 					'temperature-kelvin' => {
@@ -7258,7 +7349,7 @@ has 'currencies' => (
 		},
 		'IDR' => {
 			display_name => {
-				'currency' => q(印度尼西亚盾),
+				'currency' => q(印度尼西亚卢比),
 			},
 		},
 		'IEP' => {
@@ -7363,7 +7454,6 @@ has 'currencies' => (
 			},
 		},
 		'KRW' => {
-			symbol => '￦',
 			display_name => {
 				'currency' => q(韩元),
 			},
@@ -9915,6 +10005,9 @@ has 'datetime_formats_available_formats' => (
 			MEd => q{M-dE},
 			MMM => q{LLL},
 			Md => q{M-d},
+			yyyyMEd => q{Gy/M/dE},
+			yyyyMMMEd => q{Gy年M月d日E},
+			yyyyMd => q{Gy/M/d},
 		},
 		'japanese' => {
 			GyMd => q{Gy-MM-dd},
@@ -11041,9 +11134,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#纽约#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#尼皮贡#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#诺姆#,
 		},
@@ -11064,9 +11154,6 @@ has 'time_zone_names' => (
 		},
 		'America/Panama' => {
 			exemplarCity => q#巴拿马#,
-		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#旁涅唐#,
 		},
 		'America/Paramaribo' => {
 			exemplarCity => q#帕拉马里博#,
@@ -11089,9 +11176,6 @@ has 'time_zone_names' => (
 		'America/Punta_Arenas' => {
 			exemplarCity => q#蓬塔阿雷纳斯#,
 		},
-		'America/Rainy_River' => {
-			exemplarCity => q#雷尼河#,
-		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#兰今湾#,
 		},
@@ -11106,9 +11190,6 @@ has 'time_zone_names' => (
 		},
 		'America/Rio_Branco' => {
 			exemplarCity => q#里奥布郎库#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#圣伊萨贝尔#,
 		},
 		'America/Santarem' => {
 			exemplarCity => q#圣塔伦#,
@@ -11155,9 +11236,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#图勒#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#桑德贝#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#蒂华纳#,
 		},
@@ -11178,9 +11256,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#亚库塔特#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#耶洛奈夫#,
 		},
 		'America_Central' => {
 			long => {
@@ -11355,9 +11430,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#赤塔#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#乔巴山#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#科伦坡#,
@@ -11597,9 +11669,6 @@ has 'time_zone_names' => (
 		'Australia/Broken_Hill' => {
 			exemplarCity => q#布罗肯希尔#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#柯里#,
-		},
 		'Australia/Darwin' => {
 			exemplarCity => q#达尔文#,
 		},
@@ -11731,13 +11800,6 @@ has 'time_zone_names' => (
 				'daylight' => q#中国夏令时间#,
 				'generic' => q#中国时间#,
 				'standard' => q#中国标准时间#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#乔巴山夏令时间#,
-				'generic' => q#乔巴山时间#,
-				'standard' => q#乔巴山标准时间#,
 			},
 		},
 		'Christmas' => {
@@ -11962,9 +12024,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#乌里扬诺夫斯克#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#乌日哥罗德#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#瓦杜兹#,
 		},
@@ -11985,9 +12044,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#萨格勒布#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#扎波罗热#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#苏黎世#,
@@ -12049,7 +12105,7 @@ has 'time_zone_names' => (
 		},
 		'Galapagos' => {
 			long => {
-				'standard' => q#加拉帕戈斯时间#,
+				'standard' => q#科隆群岛时间#,
 			},
 		},
 		'Gambier' => {
@@ -12217,6 +12273,11 @@ has 'time_zone_names' => (
 				'standard' => q#彼得罗巴甫洛夫斯克-堪察加标准时间#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#哈萨克斯坦时间#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#哈萨克斯坦东部时间#,
@@ -12275,11 +12336,6 @@ has 'time_zone_names' => (
 				'standard' => q#澳门标准时间#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#麦夸里岛时间#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#马加丹夏令时间#,
@@ -12317,13 +12373,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#莫森时间#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#墨西哥西北部夏令时间#,
-				'generic' => q#墨西哥西北部时间#,
-				'standard' => q#墨西哥西北部标准时间#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -12452,7 +12501,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#富纳富提#,
 		},
 		'Pacific/Galapagos' => {
-			exemplarCity => q#加拉帕戈斯#,
+			exemplarCity => q#科隆群岛#,
 		},
 		'Pacific/Gambier' => {
 			exemplarCity => q#甘比尔#,
@@ -12465,9 +12514,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Honolulu' => {
 			exemplarCity => q#檀香山#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#约翰斯顿#,
 		},
 		'Pacific/Kanton' => {
 			exemplarCity => q#坎顿岛#,

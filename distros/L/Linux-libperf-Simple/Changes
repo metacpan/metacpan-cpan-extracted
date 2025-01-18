@@ -1,0 +1,10 @@
+1.001 2025-01-18
+
+- remove bus-cycles counter capture
+- (slightly) improve error reporting
+- add troubleshooting notes
+- exclude MANIFEST.bak from the MANIFEST
+
+1.000 2025-01-18
+
+- initial release

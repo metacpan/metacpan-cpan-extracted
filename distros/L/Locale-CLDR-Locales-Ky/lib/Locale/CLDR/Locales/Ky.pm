@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Ky - Package for language Kyrgyz
 
 package Locale::CLDR::Locales::Ky;
 # This file auto generated from Data\common\main\ky.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -939,6 +939,7 @@ has 'display_name_language' => (
  				'bi' => 'бисламача',
  				'bin' => 'биниче',
  				'bla' => 'сиксикача',
+ 				'blo' => 'анииче',
  				'bm' => 'бамбарача',
  				'bn' => 'бангладешче',
  				'bo' => 'тибетче',
@@ -1055,6 +1056,7 @@ has 'display_name_language' => (
  				'iba' => 'ибанча',
  				'ibb' => 'ибибиочо',
  				'id' => 'индонезияча',
+ 				'ie' => 'интерлинг',
  				'ig' => 'игбочо',
  				'ii' => 'сычуань йиче',
  				'ikt' => 'инуктитутча (Канада)',
@@ -1108,6 +1110,7 @@ has 'display_name_language' => (
  				'kv' => 'комиче',
  				'kw' => 'корнишче',
  				'kwk' => 'кваквалача (индей тили)',
+ 				'kxv' => 'куви',
  				'ky' => 'кыргызча',
  				'la' => 'латынча',
  				'lad' => 'ладиночо',
@@ -1116,8 +1119,10 @@ has 'display_name_language' => (
  				'lez' => 'лезгинче',
  				'lg' => 'гандача',
  				'li' => 'лимбургиче',
+ 				'lij' => 'лигурча',
  				'lil' => 'лиллуэтче (индей тили)',
  				'lkt' => 'лакотача',
+ 				'lmo' => 'ломбардча',
  				'ln' => 'лингалача',
  				'lo' => 'лаочо',
  				'lou' => 'луизиана креолчо',
@@ -1273,6 +1278,7 @@ has 'display_name_language' => (
  				'sw_CD' => 'конго суахаличе',
  				'swb' => 'коморчо',
  				'syr' => 'сирияча',
+ 				'szl' => 'силесче',
  				'ta' => 'тамилче',
  				'tce' => 'түштүк тутчонече (индей тили)',
  				'te' => 'телугуча',
@@ -1313,7 +1319,9 @@ has 'display_name_language' => (
  				'uz' => 'өзбекче',
  				'vai' => 'вайиче',
  				've' => 'вендача',
+ 				'vec' => 'венециянча',
  				'vi' => 'вьетнамча',
+ 				'vmw' => 'махувача',
  				'vo' => 'волапюкча',
  				'vun' => 'вунжочо',
  				'wa' => 'валлончо',
@@ -1325,6 +1333,7 @@ has 'display_name_language' => (
  				'wuu' => '"У" диалектинде (Кытай)',
  				'xal' => 'калмыкча',
  				'xh' => 'косача',
+ 				'xnr' => 'кангри',
  				'xog' => 'согача',
  				'yav' => 'янгбенче',
  				'ybb' => 'йембача',
@@ -1333,6 +1342,7 @@ has 'display_name_language' => (
  				'yrl' => 'ньенгатуча (түштүк америка тилдери)',
  				'yue' => 'кантончо',
  				'yue@alt=menu' => 'кытайча (кантончо)',
+ 				'za' => 'чжуанча',
  				'zgh' => 'марокко тамазигт адабий тилинде',
  				'zh' => 'кытайча',
  				'zh@alt=menu' => 'кытайча (мандарин)',
@@ -1557,7 +1567,7 @@ has 'display_name_region' => (
  			'GB@alt=short' => 'УБ',
  			'GD' => 'Гренада',
  			'GE' => 'Грузия',
- 			'GF' => 'Француздук Гвиана',
+ 			'GF' => 'Франция Гвианасы',
  			'GG' => 'Гернси',
  			'GH' => 'Гана',
  			'GI' => 'Гибралтар',
@@ -1593,7 +1603,7 @@ has 'display_name_region' => (
  			'JE' => 'Жерси',
  			'JM' => 'Ямайка',
  			'JO' => 'Иордания',
- 			'JP' => 'Япония',
+ 			'JP' => 'Жапония',
  			'KE' => 'Кения',
  			'KG' => 'Кыргызстан',
  			'KH' => 'Камбоджа',
@@ -2361,6 +2371,18 @@ has 'units' => (
 						'other' => q(миллионго {0} бөлүк),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(мкг/л),
+						'one' => q({0} мкг/л),
+						'other' => q({0} мкг/л),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(мкг/л),
+						'one' => q({0} мкг/л),
+						'other' => q({0} мкг/л),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(100 километрге литр),
 						'one' => q(100 километрге {0} литр),
@@ -2615,6 +2637,20 @@ has 'units' => (
 						'name' => q(наносекунд),
 						'one' => q({0} наносекунд),
 						'other' => q({0} наносекунд),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(түн),
+						'one' => q({0}/түн),
+						'other' => q({0}/түн),
+						'per' => q({0}/түнүнө),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(түн),
+						'one' => q({0}/түн),
+						'other' => q({0}/түн),
+						'per' => q({0}/түнүнө),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -3467,6 +3503,18 @@ has 'units' => (
 						'other' => q({0} түйүн),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(жарык),
+						'one' => q({0} жарык),
+						'other' => q({0} жарык),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(жарык),
+						'one' => q({0} жарык),
+						'other' => q({0} жарык),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'name' => q(секундасына метр),
 						'one' => q(секундасына {0} метр),
@@ -3921,6 +3969,18 @@ has 'units' => (
 						'name' => q(%),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(мкг/л),
+						'one' => q({0} мкг/л),
+						'other' => q({0} мкг/л),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(мкг/л),
+						'one' => q({0} мкг/л),
+						'other' => q({0} мкг/л),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(100 км/л),
 					},
@@ -3985,6 +4045,20 @@ has 'units' => (
 					# Core Unit Identifier
 					'minute' => {
 						'name' => q(мүн),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(түн),
+						'one' => q({0}/түн),
+						'other' => q({0}/түн),
+						'per' => q({0}/түн),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(түн),
+						'one' => q({0}/түн),
+						'other' => q({0}/түн),
+						'per' => q({0}/түн),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -4169,6 +4243,18 @@ has 'units' => (
 					'millibar' => {
 						'one' => q({0} мб),
 						'other' => q({0} мб),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(жарык),
+						'one' => q({0} жарык),
+						'other' => q({0} жарык),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(жарык),
+						'one' => q({0} жарык),
+						'other' => q({0} жарык),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -4699,6 +4785,18 @@ has 'units' => (
 						'name' => q(миллионго/бөлүк),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(мкг/л),
+						'one' => q({0} мкг/л),
+						'other' => q({0} мкг/л),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(мкг/л),
+						'one' => q({0} мкг/л),
+						'other' => q({0} мкг/л),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(л/100 км),
 						'one' => q({0} л/100км),
@@ -5007,6 +5105,20 @@ has 'units' => (
 						'name' => q(наносек),
 						'one' => q({0} нс),
 						'other' => q({0} нс),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(түн),
+						'one' => q({0}/түн),
+						'other' => q({0}/түн),
+						'per' => q({0}/түн),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(түн),
+						'one' => q({0}/түн),
+						'other' => q({0}/түн),
+						'per' => q({0}/түн),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -5853,6 +5965,18 @@ has 'units' => (
 						'name' => q(тн),
 						'one' => q({0} тн),
 						'other' => q({0} тн),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(жарык),
+						'one' => q({0} жарык),
+						'other' => q({0} жарык),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(жарык),
+						'one' => q({0} жарык),
+						'other' => q({0} жарык),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -8397,9 +8521,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#Нью-Йорк#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#Нипигон#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#Ном#,
 		},
@@ -8420,9 +8541,6 @@ has 'time_zone_names' => (
 		},
 		'America/Panama' => {
 			exemplarCity => q#Панама#,
-		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#Пангиртуң#,
 		},
 		'America/Paramaribo' => {
 			exemplarCity => q#Парамарибо#,
@@ -8445,9 +8563,6 @@ has 'time_zone_names' => (
 		'America/Punta_Arenas' => {
 			exemplarCity => q#Пунта-Аренас#,
 		},
-		'America/Rainy_River' => {
-			exemplarCity => q#Рейни Ривер#,
-		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#Рэнкин Инлет#,
 		},
@@ -8462,9 +8577,6 @@ has 'time_zone_names' => (
 		},
 		'America/Rio_Branco' => {
 			exemplarCity => q#Рио Бранко#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#Санта Изабел#,
 		},
 		'America/Santarem' => {
 			exemplarCity => q#Сантарем#,
@@ -8511,9 +8623,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#Туле#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#Сандер Бей#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#Тихуана#,
 		},
@@ -8534,9 +8643,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#Якутат#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#Йеллоунайф#,
 		},
 		'America_Central' => {
 			long => {
@@ -8690,9 +8796,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#Чита#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#Чойбалсан#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#Коломбо#,
@@ -8932,9 +9035,6 @@ has 'time_zone_names' => (
 		'Australia/Broken_Hill' => {
 			exemplarCity => q#Броукен Хил#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#Керри#,
-		},
 		'Australia/Darwin' => {
 			exemplarCity => q#Дарвин#,
 		},
@@ -9061,13 +9161,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Кытай жайкы убакыты#,
 				'generic' => q#Кытай убактысы#,
 				'standard' => q#Кытай кышкы убакыты#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Чойбалсан жайкы убактысы#,
-				'generic' => q#Чойбалсан убактысы#,
-				'standard' => q#Чойбалсан кышкы убакыты#,
 			},
 		},
 		'Christmas' => {
@@ -9292,9 +9385,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#Ульяновск#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#Ужгород#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#Фадуц#,
 		},
@@ -9315,9 +9405,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#Загреб#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#Запорожье#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#Цюрих#,
@@ -9535,6 +9622,11 @@ has 'time_zone_names' => (
 				'standard' => q#Жапон кышкы убакыты#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Казакстан убактысы#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#Чыгыш Казакстан убактысы#,
@@ -9581,11 +9673,6 @@ has 'time_zone_names' => (
 				'standard' => q#Лорд Хау кышкы убакыты#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Макуари убактысы#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Магадан жайкы убактысы#,
@@ -9623,13 +9710,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Моусон убактысы#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Түндүк-чыгыш Мексика жайкы убактысы#,
-				'generic' => q#Түндүк-чыгыш Мексика убактысы#,
-				'standard' => q#Түндүк-чыгыш Мексика кышкы убактысы#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -9766,9 +9846,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Honolulu' => {
 			exemplarCity => q#Гонолулу#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#Жонстон#,
 		},
 		'Pacific/Kanton' => {
 			exemplarCity => q#Кантон#,

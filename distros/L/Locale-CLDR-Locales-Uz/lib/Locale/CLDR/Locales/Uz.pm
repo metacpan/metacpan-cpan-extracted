@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Uz - Package for language Uzbek
 
 package Locale::CLDR::Locales::Uz;
 # This file auto generated from Data\common\main\uz.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -73,6 +73,7 @@ has 'display_name_language' => (
  				'bi' => 'bislama',
  				'bin' => 'bini',
  				'bla' => 'siksika',
+ 				'blo' => 'Anii',
  				'bm' => 'bambara',
  				'bn' => 'bengal',
  				'bo' => 'tibet',
@@ -196,6 +197,7 @@ has 'display_name_language' => (
  				'iba' => 'iban',
  				'ibb' => 'ibibio',
  				'id' => 'indonez',
+ 				'ie' => 'interlingve',
  				'ig' => 'igbo',
  				'ii' => 'sichuan',
  				'ikt' => 'sharqiy-kanada inuktitut',
@@ -249,6 +251,7 @@ has 'display_name_language' => (
  				'kv' => 'komi',
  				'kw' => 'korn',
  				'kwk' => 'kvakvala',
+ 				'kxv' => 'kuvi',
  				'ky' => 'qirgʻizcha',
  				'la' => 'lotincha',
  				'lad' => 'ladino',
@@ -257,8 +260,10 @@ has 'display_name_language' => (
  				'lez' => 'lezgin',
  				'lg' => 'ganda',
  				'li' => 'limburg',
+ 				'lij' => 'liguryan',
  				'lil' => 'lilluet',
  				'lkt' => 'lakota',
+ 				'lmo' => 'lombard',
  				'ln' => 'lingala',
  				'lo' => 'laos',
  				'lou' => 'luiziana kreol',
@@ -269,7 +274,6 @@ has 'display_name_language' => (
  				'lu' => 'luba-katanga',
  				'lua' => 'luba-lulua',
  				'lun' => 'lunda',
- 				'luo' => 'luo',
  				'lus' => 'lushay',
  				'luy' => 'luhya',
  				'lv' => 'latishcha',
@@ -413,7 +417,8 @@ has 'display_name_language' => (
  				'sw' => 'suaxili',
  				'sw_CD' => 'suaxili (Kongo)',
  				'swb' => 'qamar',
- 				'syr' => 'suriyacha',
+ 				'syr' => 'suryoniy',
+ 				'szl' => 'silez',
  				'ta' => 'tamil',
  				'tce' => 'janubiy tutchone',
  				'te' => 'telugu',
@@ -451,9 +456,10 @@ has 'display_name_language' => (
  				'und' => 'noma’lum til',
  				'ur' => 'urdu',
  				'uz' => 'o‘zbek',
- 				'vai' => 'vai',
  				've' => 'venda',
+ 				'vec' => 'venet',
  				'vi' => 'vyetnam',
+ 				'vmw' => 'makua',
  				'vo' => 'volapyuk',
  				'vun' => 'vunjo',
  				'wa' => 'vallon',
@@ -465,6 +471,7 @@ has 'display_name_language' => (
  				'wuu' => 'vu xitoy',
  				'xal' => 'qalmoq',
  				'xh' => 'kxosa',
+ 				'xnr' => 'kangri',
  				'xog' => 'soga',
  				'yav' => 'yangben',
  				'ybb' => 'yemba',
@@ -473,9 +480,11 @@ has 'display_name_language' => (
  				'yrl' => 'nyengatu',
  				'yue' => 'kanton',
  				'yue@alt=menu' => 'xitoy, kanton',
+ 				'za' => 'Chjuan',
  				'zgh' => 'tamazigxt',
  				'zh' => 'xitoy',
  				'zh@alt=menu' => 'xitoy, mandarin',
+ 				'zh_Hans' => 'zh_Hans',
  				'zh_Hans@alt=long' => 'xitoy (soddalashtirilgan mandarin)',
  				'zh_Hant' => 'xitoy (an’anaviy)',
  				'zh_Hant@alt=long' => 'xitoy (an’anaviy mandarin)',
@@ -1571,6 +1580,18 @@ has 'units' => (
 						'other' => q({0} promiriada),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(qism/milliard),
+						'one' => q({0} ta qism/milliard),
+						'other' => q({0} ta qism/milliard),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(qism/milliard),
+						'one' => q({0} ta qism/milliard),
+						'other' => q({0} ta qism/milliard),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(litr/100 km),
 						'one' => q({0} litr/100 km),
@@ -1783,6 +1804,20 @@ has 'units' => (
 					'nanosecond' => {
 						'one' => q({0} nanosoniya),
 						'other' => q({0} nanosoniya),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(kecha),
+						'one' => q({0} kecha),
+						'other' => q({0} kecha),
+						'per' => q({0}/kecha),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(kecha),
+						'one' => q({0} kecha),
+						'other' => q({0} kecha),
+						'per' => q({0}/kecha),
 					},
 					# Long Unit Identifier
 					'duration-second' => {
@@ -2653,18 +2688,6 @@ has 'units' => (
 						'other' => q({0} nyuton-metr),
 					},
 					# Long Unit Identifier
-					'torque-pound-force-foot' => {
-						'name' => q(funt-fut),
-						'one' => q({0} funt-kuch-fut),
-						'other' => q({0} funt-fut),
-					},
-					# Core Unit Identifier
-					'pound-force-foot' => {
-						'name' => q(funt-fut),
-						'one' => q({0} funt-kuch-fut),
-						'other' => q({0} funt-fut),
-					},
-					# Long Unit Identifier
 					'volume-centiliter' => {
 						'name' => q(santilitr),
 						'one' => q({0} santilitr),
@@ -2872,6 +2895,14 @@ has 'units' => (
 						'one' => q({0} metrik pint),
 						'other' => q({0} metrik pint),
 					},
+					# Long Unit Identifier
+					'volume-quart-imperial' => {
+						'name' => q(imp.kvarta),
+					},
+					# Core Unit Identifier
+					'quart-imperial' => {
+						'name' => q(imp.kvarta),
+					},
 				},
 				'narrow' => {
 					# Long Unit Identifier
@@ -2955,6 +2986,18 @@ has 'units' => (
 						'other' => q({0}ppm),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(qism/milliard),
+						'one' => q({0} ta qism/mlrd),
+						'other' => q({0} ta qism/mlrd),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(qism/milliard),
+						'one' => q({0} ta qism/mlrd),
+						'other' => q({0} ta qism/mlrd),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'one' => q({0}L/100km),
 						'other' => q({0}L/100km),
@@ -2971,6 +3014,20 @@ has 'units' => (
 					# Core Unit Identifier
 					'millisecond' => {
 						'name' => q(mson),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(kecha),
+						'one' => q({0} kecha),
+						'other' => q({0} kecha),
+						'per' => q({0}/nkecha),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(kecha),
+						'one' => q({0} kecha),
+						'other' => q({0} kecha),
+						'per' => q({0}/nkecha),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -3002,13 +3059,13 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-inch' => {
-						'one' => q({0} dyuym),
-						'other' => q({0} dyuym),
+						'one' => q({0} duym),
+						'other' => q({0} duym),
 					},
 					# Core Unit Identifier
 					'inch' => {
-						'one' => q({0} dyuym),
-						'other' => q({0} dyuym),
+						'one' => q({0} duym),
+						'other' => q({0} duym),
 					},
 					# Long Unit Identifier
 					'length-light-year' => {
@@ -3019,16 +3076,6 @@ has 'units' => (
 					'light-year' => {
 						'one' => q({0} yo.y.),
 						'other' => q({0} yo.y.),
-					},
-					# Long Unit Identifier
-					'length-mile' => {
-						'one' => q({0} milya),
-						'other' => q({0} milya),
-					},
-					# Core Unit Identifier
-					'mile' => {
-						'one' => q({0} milya),
-						'other' => q({0} milya),
 					},
 					# Long Unit Identifier
 					'light-candela' => {
@@ -3074,43 +3121,13 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'power-horsepower' => {
-						'one' => q({0} hp),
+						'one' => q({0} o.k.),
 						'other' => q({0} hp),
 					},
 					# Core Unit Identifier
 					'horsepower' => {
-						'one' => q({0} hp),
+						'one' => q({0} o.k.),
 						'other' => q({0} hp),
-					},
-					# Long Unit Identifier
-					'power-kilowatt' => {
-						'one' => q({0} kW),
-						'other' => q({0} kW),
-					},
-					# Core Unit Identifier
-					'kilowatt' => {
-						'one' => q({0} kW),
-						'other' => q({0} kW),
-					},
-					# Long Unit Identifier
-					'power-watt' => {
-						'one' => q({0} W),
-						'other' => q({0} W),
-					},
-					# Core Unit Identifier
-					'watt' => {
-						'one' => q({0} W),
-						'other' => q({0} W),
-					},
-					# Long Unit Identifier
-					'pressure-hectopascal' => {
-						'one' => q({0} hPa),
-						'other' => q({0} hPa),
-					},
-					# Core Unit Identifier
-					'hectopascal' => {
-						'one' => q({0} hPa),
-						'other' => q({0} hPa),
 					},
 					# Long Unit Identifier
 					'speed-mile-per-hour' => {
@@ -3133,18 +3150,6 @@ has 'units' => (
 						'other' => q({0}N⋅m),
 					},
 					# Long Unit Identifier
-					'torque-pound-force-foot' => {
-						'name' => q(funt-fut),
-						'one' => q({0} funt-fut),
-						'other' => q({0} funt-fut),
-					},
-					# Core Unit Identifier
-					'pound-force-foot' => {
-						'name' => q(funt-fut),
-						'one' => q({0} funt-fut),
-						'other' => q({0} funt-fut),
-					},
-					# Long Unit Identifier
 					'volume-cubic-mile' => {
 						'one' => q({0} mi³),
 						'other' => q({0} mi³),
@@ -3155,6 +3160,16 @@ has 'units' => (
 						'other' => q({0} mi³),
 					},
 					# Long Unit Identifier
+					'volume-dessert-spoon-imperial' => {
+						'one' => q({0} imp. desert qoshiq),
+						'other' => q({0} imp. desert qoshiq),
+					},
+					# Core Unit Identifier
+					'dessert-spoon-imperial' => {
+						'one' => q({0} imp. desert qoshiq),
+						'other' => q({0} imp. desert qoshiq),
+					},
+					# Long Unit Identifier
 					'volume-liter' => {
 						'one' => q({0}L),
 						'other' => q({0}L),
@@ -3163,6 +3178,14 @@ has 'units' => (
 					'liter' => {
 						'one' => q({0}L),
 						'other' => q({0}L),
+					},
+					# Long Unit Identifier
+					'volume-quart-imperial' => {
+						'name' => q(imp.kvarta),
+					},
+					# Core Unit Identifier
+					'quart-imperial' => {
+						'name' => q(imp.kvarta),
 					},
 				},
 				'short' => {
@@ -3421,6 +3444,18 @@ has 'units' => (
 						'name' => q(promiriada),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(qism/milliard),
+						'one' => q({0} ta qism/mlrd),
+						'other' => q({0} ta qism/mlrd),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(qism/milliard),
+						'one' => q({0} ta qism/mlrd),
+						'other' => q({0} ta qism/mlrd),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(L/100 km),
 						'one' => q({0} L/100 km),
@@ -3645,6 +3680,20 @@ has 'units' => (
 					# Core Unit Identifier
 					'nanosecond' => {
 						'name' => q(nanosoniya),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(kecha),
+						'one' => q({0} kecha),
+						'other' => q({0} kecha),
+						'per' => q({0}/kecha),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(kecha),
+						'one' => q({0} kecha),
+						'other' => q({0} kecha),
+						'per' => q({0}/kecha),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -4606,15 +4655,15 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'volume-dessert-spoon-imperial' => {
-						'name' => q(imp desert qoshiq),
-						'one' => q({0} imp desert qoshiq),
-						'other' => q({0} imp desert qoshiq),
+						'name' => q(imp. desert qoshiq),
+						'one' => q({0} imp. desert qoshiq),
+						'other' => q({0} imp. desert qoshiq),
 					},
 					# Core Unit Identifier
 					'dessert-spoon-imperial' => {
-						'name' => q(imp desert qoshiq),
-						'one' => q({0} imp desert qoshiq),
-						'other' => q({0} imp desert qoshiq),
+						'name' => q(imp. desert qoshiq),
+						'one' => q({0} imp. desert qoshiq),
+						'other' => q({0} imp. desert qoshiq),
 					},
 					# Long Unit Identifier
 					'volume-dram' => {
@@ -4768,13 +4817,13 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'volume-quart-imperial' => {
-						'name' => q(imp kvarta),
+						'name' => q(imp.kvarta),
 						'one' => q({0} imp. kvarta),
 						'other' => q({0} imp. kvarta),
 					},
 					# Core Unit Identifier
 					'quart-imperial' => {
-						'name' => q(imp kvarta),
+						'name' => q(imp.kvarta),
 						'one' => q({0} imp. kvarta),
 						'other' => q({0} imp. kvarta),
 					},
@@ -4835,6 +4884,9 @@ has 'number_symbols' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'arab' => {
+			'exponential' => q(^),
+		},
 		'arabext' => {
 			'minusSign' => q(-),
 			'nan' => q(son emas),
@@ -5931,16 +5983,16 @@ has 'calendar_months' => (
 						nonleap => [
 							'Muh.',
 							'Saf.',
-							'Rob. avv.',
-							'Rob. ox.',
+							'Rab. avv.',
+							'Rab. son.',
 							'Jum. avv.',
-							'Jum. ox.',
+							'Jum. son.',
 							'Raj.',
 							'Sha.',
 							'Ram.',
 							'Shav.',
-							'Zul-q.',
-							'Zul-h.'
+							'Zulq.',
+							'Zulh.'
 						],
 						leap => [
 							
@@ -5950,16 +6002,56 @@ has 'calendar_months' => (
 						nonleap => [
 							'Muharram',
 							'Safar',
-							'Robi’ ul-avval',
-							'Robi’ ul-oxir',
-							'Jumad ul-avval',
-							'Jumad ul-oxir',
+							'Rabiʼul avval',
+							'Rabiʼus soniy',
+							'Jumodul avval',
+							'Jumodus soniy',
 							'Rajab',
 							'Sha’bon',
 							'Ramazon',
 							'Shavvol',
-							'Zul-qa’da',
-							'Zul-hijja'
+							'Zulqaʼda',
+							'Zulhijja'
+						],
+						leap => [
+							
+						],
+					},
+				},
+				'stand-alone' => {
+					abbreviated => {
+						nonleap => [
+							'Muh.',
+							'Saf.',
+							'Rab. avv.',
+							'Rab. son.',
+							'Jum. avv.',
+							'Jum. son.',
+							'Raj.',
+							'Sha.',
+							'Ram.',
+							'Shav.',
+							'Zulq.',
+							'Zulh.'
+						],
+						leap => [
+							
+						],
+					},
+					wide => {
+						nonleap => [
+							'Muharram',
+							'Safar',
+							'Rabiʼul avval',
+							'Rabiʼus soniy',
+							'Jumodul avval',
+							'Jumodus soniy',
+							'Rajab',
+							'Sha’bon',
+							'Ramazon',
+							'Shavvol',
+							'Zulqaʼda',
+							'Zulhijja'
 						],
 						leap => [
 							
@@ -7045,9 +7137,6 @@ has 'time_zone_names' => (
 		'America/Ojinaga' => {
 			exemplarCity => q#Oxinaga#,
 		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#Pangnirtang#,
-		},
 		'America/Phoenix' => {
 			exemplarCity => q#Feniks#,
 		},
@@ -7066,9 +7155,6 @@ has 'time_zone_names' => (
 		'America/Punta_Arenas' => {
 			exemplarCity => q#Punta-Arenas#,
 		},
-		'America/Rainy_River' => {
-			exemplarCity => q#Reyni-River#,
-		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#Rankin-Inlet#,
 		},
@@ -7083,9 +7169,6 @@ has 'time_zone_names' => (
 		},
 		'America/Rio_Branco' => {
 			exemplarCity => q#Riu-Branku#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#Santa-Izabel#,
 		},
 		'America/Santiago' => {
 			exemplarCity => q#Santyago#,
@@ -7126,9 +7209,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#Tule#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#Tander-Bey#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#Tixuana#,
 		},
@@ -7140,9 +7220,6 @@ has 'time_zone_names' => (
 		},
 		'America/Winnipeg' => {
 			exemplarCity => q#Vinnipeg#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#Yellounayf#,
 		},
 		'America_Central' => {
 			long => {
@@ -7276,9 +7353,6 @@ has 'time_zone_names' => (
 		'Asia/Calcutta' => {
 			exemplarCity => q#Kalkutta#,
 		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#Choybalsan#,
-		},
 		'Asia/Colombo' => {
 			exemplarCity => q#Kolombo#,
 		},
@@ -7346,7 +7420,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Pxenyan#,
 		},
 		'Asia/Qostanay' => {
-			exemplarCity => q#Kustanay#,
+			exemplarCity => q#Qoʻstanay#,
 		},
 		'Asia/Qyzylorda' => {
 			exemplarCity => q#Qizilo‘rda#,
@@ -7444,9 +7518,6 @@ has 'time_zone_names' => (
 		},
 		'Australia/Broken_Hill' => {
 			exemplarCity => q#Broken-Xill#,
-		},
-		'Australia/Currie' => {
-			exemplarCity => q#Kerri#,
 		},
 		'Australia/Darwin' => {
 			exemplarCity => q#Darvin#,
@@ -7571,13 +7642,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Xitoy yozgi vaqti#,
 				'generic' => q#Xitoy vaqti#,
 				'standard' => q#Xitoy standart vaqti#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Choybalsan yozgi vaqti#,
-				'generic' => q#Choybalsan vaqti#,
-				'standard' => q#Choybalsan standart vaqti#,
 			},
 		},
 		'Christmas' => {
@@ -7749,9 +7813,6 @@ has 'time_zone_names' => (
 		'Europe/Tirane' => {
 			exemplarCity => q#Tirana#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#Ujgorod#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#Vaduts#,
 		},
@@ -7766,9 +7827,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Warsaw' => {
 			exemplarCity => q#Varshava#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#Zaporojye#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#Syurix#,
@@ -7983,6 +8041,11 @@ has 'time_zone_names' => (
 				'standard' => q#Yaponiya standart vaqti#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Qozogʻiston vaqti#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#Sharqiy Qozogʻiston vaqti#,
@@ -8029,11 +8092,6 @@ has 'time_zone_names' => (
 				'standard' => q#Lord-Xau standart vaqti#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Makkuori oroli vaqti#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Magadan yozgi vaqti#,
@@ -8071,13 +8129,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Mouson vaqti#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Shimoli-g‘arbiy Meksika yozgi vaqti#,
-				'generic' => q#Shimoli-g‘arbiy Meksika vaqti#,
-				'standard' => q#Shimoli-g‘arbiy Meksika standart vaqti#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -8193,9 +8244,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Honolulu' => {
 			exemplarCity => q#Gonolulu#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#Jonston#,
 		},
 		'Pacific/Kwajalein' => {
 			exemplarCity => q#Kvajaleyn#,

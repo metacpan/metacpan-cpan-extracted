@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Fy - Package for language Western Frisian
 
 package Locale::CLDR::Locales::Fy;
 # This file auto generated from Data\common\main\fy.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -76,12 +76,14 @@ has 'display_name_language' => (
  				'bez' => 'Bena',
  				'bfd' => 'Bafut',
  				'bg' => 'Bulgaarsk',
+ 				'bgc' => 'Haryanvi',
  				'bho' => 'Bhojpuri',
  				'bi' => 'Bislama',
  				'bik' => 'Bikol',
  				'bin' => 'Bini',
  				'bkm' => 'Kom',
  				'bla' => 'Siksika',
+ 				'blo' => 'Anii',
  				'bm' => 'Bambara',
  				'bn' => 'Bengaalsk',
  				'bo' => 'Tibetaansk',
@@ -120,6 +122,7 @@ has 'display_name_language' => (
  				'crh' => 'Krim-Tataarsk',
  				'cs' => 'Tsjechysk',
  				'csb' => 'Kasjoebysk',
+ 				'csw' => 'Swampy Cree',
  				'cu' => 'Kerkslavysk',
  				'cv' => 'Tsjoevasjysk',
  				'cy' => 'Welsk',
@@ -209,6 +212,8 @@ has 'display_name_language' => (
  				'haw' => 'Hawaïaansk',
  				'he' => 'Hebreeuwsk',
  				'hi' => 'Hindi',
+ 				'hi_Latn' => 'Hindy (Latyn)',
+ 				'hi_Latn@alt=variant' => 'Hinglysk (Latyn)',
  				'hil' => 'Hiligaynon',
  				'hit' => 'Hettitysk',
  				'hmn' => 'Hmong',
@@ -255,6 +260,7 @@ has 'display_name_language' => (
  				'kea' => 'Kaapverdysk Creools',
  				'kfo' => 'Koro',
  				'kg' => 'Kongo',
+ 				'kgp' => 'Kaingang',
  				'kha' => 'Khasi',
  				'kho' => 'Khotaneesk',
  				'khq' => 'Koyra Chiini',
@@ -284,6 +290,7 @@ has 'display_name_language' => (
  				'kut' => 'Kutenai',
  				'kv' => 'Komi',
  				'kw' => 'Cornish',
+ 				'kxv' => 'Kuvy',
  				'ky' => 'Kirgizysk',
  				'la' => 'Latyn',
  				'lad' => 'Ladino',
@@ -294,7 +301,9 @@ has 'display_name_language' => (
  				'lez' => 'Lezgysk',
  				'lg' => 'Ganda',
  				'li' => 'Limburgs',
+ 				'lij' => 'Liguriaansk',
  				'lkt' => 'Lakota',
+ 				'lmo' => 'Lombardysk',
  				'ln' => 'Lingala',
  				'lo' => 'Laotiaansk',
  				'lol' => 'Mongo',
@@ -390,11 +399,13 @@ has 'display_name_language' => (
  				'pam' => 'Pampanga',
  				'pap' => 'Papiaments',
  				'pau' => 'Palauaansk',
+ 				'pcm' => 'Nigeriaansk Pidgin',
  				'peo' => 'Aldperzysk',
  				'phn' => 'Foenisysk',
  				'pi' => 'Pali',
  				'pl' => 'Poalsk',
  				'pon' => 'Pohnpeiaansk',
+ 				'prg' => 'Aldprusysk',
  				'pro' => 'Aldprovençaals',
  				'ps' => 'Pasjtoe',
  				'ps@alt=variant' => 'Pashto',
@@ -469,6 +480,7 @@ has 'display_name_language' => (
  				'swb' => 'Shimaore',
  				'syc' => 'Klassiek Syrysk',
  				'syr' => 'Syrysk',
+ 				'szl' => 'Silesysk',
  				'ta' => 'Tamil',
  				'te' => 'Telugu',
  				'tem' => 'Timne',
@@ -512,7 +524,9 @@ has 'display_name_language' => (
  				'uz' => 'Oezbeeks',
  				'vai' => 'Vai',
  				've' => 'Venda',
+ 				'vec' => 'Venetiaansk',
  				'vi' => 'Vietnamees',
+ 				'vmw' => 'Makhuwa',
  				'vo' => 'Volapük',
  				'vot' => 'Votysk',
  				'vun' => 'Vunjo',
@@ -524,6 +538,7 @@ has 'display_name_language' => (
  				'wo' => 'Wolof',
  				'xal' => 'Kalmyk',
  				'xh' => 'Xhosa',
+ 				'xnr' => 'Kangri',
  				'xog' => 'Soga',
  				'yao' => 'Yao',
  				'yap' => 'Yapees',
@@ -531,6 +546,7 @@ has 'display_name_language' => (
  				'ybb' => 'Yemba',
  				'yi' => 'Jiddysk',
  				'yo' => 'Yoruba',
+ 				'yrl' => 'Nheengatu',
  				'yue' => 'Kantoneesk',
  				'za' => 'Zhuang',
  				'zap' => 'Zapotec',
@@ -538,8 +554,11 @@ has 'display_name_language' => (
  				'zen' => 'Zenaga',
  				'zgh' => 'Standert Marokkaanske Tamazight',
  				'zh' => 'Sineesk',
+ 				'zh@alt=menu' => 'Mandarynsk',
  				'zh_Hans' => 'Ferienfâldich Sineesk',
+ 				'zh_Hans@alt=long' => 'Mandarynsk (ferienfâldige)',
  				'zh_Hant' => 'Tradisjoneel Sineesk',
+ 				'zh_Hant@alt=long' => 'Mandarynsk (tradisjoneel)',
  				'zu' => 'Zulu',
  				'zun' => 'Zuni',
  				'zxx' => 'Gjin linguïstyske ynhâld',
@@ -561,9 +580,11 @@ has 'display_name_script' => (
 	default		=> sub {
 		sub {
 			my %scripts = (
-			'Afak' => 'Defaka',
+			'Adlm' => 'Adlam',
+ 			'Afak' => 'Defaka',
  			'Arab' => 'Arabysk',
  			'Arab@alt=variant' => 'Perso-Arabysk',
+ 			'Aran' => 'Nastaliq',
  			'Armi' => 'Keizerlijk Aramees',
  			'Armn' => 'Armeens',
  			'Avst' => 'Avestaansk',
@@ -603,6 +624,7 @@ has 'display_name_script' => (
  			'Grek' => 'Grieks',
  			'Gujr' => 'Gujarati',
  			'Guru' => 'Gurmukhi',
+ 			'Hanb' => 'Han mei Bopomofo',
  			'Hang' => 'Hangul',
  			'Hani' => 'Han',
  			'Hano' => 'Hanunoo',
@@ -676,6 +698,7 @@ has 'display_name_script' => (
  			'Plrd' => 'Pollard-fonetysk',
  			'Prti' => 'Inscriptioneel Parthysk',
  			'Rjng' => 'Rejang',
+ 			'Rohg' => 'Hanifi Rohingya',
  			'Roro' => 'Rongorongo',
  			'Runr' => 'Runic',
  			'Samr' => 'Samaritaansk',
@@ -719,6 +742,7 @@ has 'display_name_script' => (
  			'Yiii' => 'Yi',
  			'Zinh' => 'Oergeërfd',
  			'Zmth' => 'Wiskundige notatie',
+ 			'Zsye' => 'emoji',
  			'Zsym' => 'Symbolen',
  			'Zxxx' => 'Ongeschreven',
  			'Zyyy' => 'Algemeen',
@@ -768,6 +792,7 @@ has 'display_name_region' => (
  			'151' => 'East-Europa',
  			'154' => 'Noard-Europa',
  			'155' => 'West-Europa',
+ 			'202' => 'Sub-Saharaansk Afrika',
  			'419' => 'Latynsk-Amearika',
  			'AC' => 'Ascension',
  			'AD' => 'Andorra',
@@ -816,6 +841,7 @@ has 'display_name_region' => (
  			'CG@alt=variant' => 'Congo (Republyk)',
  			'CH' => 'Switserlân',
  			'CI' => 'Ivoorkust',
+ 			'CI@alt=variant' => 'Ivoarkust',
  			'CK' => 'Cookeilannen',
  			'CL' => 'Chili',
  			'CM' => 'Kameroen',
@@ -829,6 +855,7 @@ has 'display_name_region' => (
  			'CX' => 'Krysteilan',
  			'CY' => 'Syprus',
  			'CZ' => 'Tsjechje',
+ 			'CZ@alt=variant' => 'Tsjechië',
  			'DE' => 'Dútslân',
  			'DG' => 'Diego Garcia',
  			'DJ' => 'Djibouti',
@@ -845,6 +872,7 @@ has 'display_name_region' => (
  			'ES' => 'Spanje',
  			'ET' => 'Ethiopië',
  			'EU' => 'Europeeske Unie',
+ 			'EZ' => 'eurosône',
  			'FI' => 'Finlân',
  			'FJ' => 'Fiji',
  			'FK' => 'Falklâneilannen',
@@ -886,6 +914,8 @@ has 'display_name_region' => (
  			'IM' => 'Isle of Man',
  			'IN' => 'India',
  			'IO' => 'Britse Gebieden yn de Indyske Oseaan',
+ 			'IO@alt=biot' => 'Britske Gebieten yn de Yndyske Oseaan',
+ 			'IO@alt=chagos' => 'Britske Gebieten yn de Yndyske Oseaan',
  			'IQ' => 'Irak',
  			'IR' => 'Iran',
  			'IS' => 'Yslân',
@@ -923,6 +953,7 @@ has 'display_name_region' => (
  			'MF' => 'Saint-Martin',
  			'MG' => 'Madeiaskar',
  			'MH' => 'Marshalleilannen',
+ 			'MK' => 'Noard-Masedoanië',
  			'ML' => 'Mali',
  			'MM' => 'Myanmar (Birma)',
  			'MN' => 'Mongolië',
@@ -1015,6 +1046,7 @@ has 'display_name_region' => (
  			'UA' => 'Oekraïne',
  			'UG' => 'Oeganda',
  			'UM' => 'Lyts ôflizzen eilannen fan de Ferienigde Staten',
+ 			'UN' => 'FN',
  			'US' => 'Ferienigde Staten',
  			'US@alt=short' => 'VS',
  			'UY' => 'Uruguay',
@@ -1028,6 +1060,8 @@ has 'display_name_region' => (
  			'VU' => 'Vanuatu',
  			'WF' => 'Wallis en Futuna',
  			'WS' => 'Samoa',
+ 			'XA' => 'Pseudo-Aksinten',
+ 			'XB' => 'Pseudo-Bidi',
  			'XK' => 'Kosovo',
  			'YE' => 'Jemen',
  			'YT' => 'Mayotte',
@@ -1119,6 +1153,7 @@ has 'display_name_key' => (
 	default		=> sub {
 		{
 			'calendar' => 'Kalender',
+ 			'cf' => 'falutanotaasje',
  			'colalternate' => 'sortearje van symbolen negeren',
  			'colbackwards' => 'Omgekeerd sortearje op accenten',
  			'colcasefirst' => 'Yndiele op haad/lytse letters',
@@ -1128,6 +1163,9 @@ has 'display_name_key' => (
  			'colnumeric' => 'Numeriek sortearje',
  			'colstrength' => 'Sorteervoorrang',
  			'currency' => 'Valuta',
+ 			'hc' => 'oeresysteem (12 of 24)',
+ 			'lb' => 'styl regelôfbrekking',
+ 			'ms' => 'maatsysteem',
  			'numbers' => 'Sifers',
  			'timezone' => 'Tijdzone',
  			'va' => 'Landvariant',
@@ -1147,6 +1185,7 @@ has 'display_name_type' => (
  				'buddhist' => q{Boeddhistyske kalinder},
  				'chinese' => q{Sineeske kalinder},
  				'coptic' => q{Koptyske kalinder},
+ 				'dangi' => q{Dangi-kalinder},
  				'ethiopic' => q{Ethiopyske kalinder},
  				'ethiopic-amete-alem' => q{Ethiopyske Amete Alem-kalinder},
  				'gregorian' => q{Gregoriaanske kalinder},
@@ -1154,9 +1193,15 @@ has 'display_name_type' => (
  				'indian' => q{Indiase natjonale kalinder},
  				'islamic' => q{Islamityske kalinder},
  				'islamic-civil' => q{Islamityske kalinder (cyclysk)},
+ 				'islamic-umalqura' => q{Islamityske kalinder (Umm al-Qura)},
+ 				'iso8601' => q{ISO-8601-kalinder},
  				'japanese' => q{Japanske kalinder},
  				'persian' => q{Perzyske kalinder},
  				'roc' => q{Kalinder fan de Sineeske Republyk},
+ 			},
+ 			'cf' => {
+ 				'account' => q{finansjele falutanotaasje},
+ 				'standard' => q{standert falutanotaasje},
  			},
  			'colalternate' => {
  				'non-ignorable' => q{Symbolen sortearje},
@@ -1211,9 +1256,25 @@ has 'display_name_type' => (
  				'hwidth' => q{Halve breedte},
  				'npinyin' => q{Numeriek},
  			},
+ 			'hc' => {
+ 				'h11' => q{12-oeresysteem (0-11)},
+ 				'h12' => q{12-oeresysteem (1-12)},
+ 				'h23' => q{12-oeresysteem (0-23)},
+ 				'h24' => q{12-oeresysteem (1-24)},
+ 			},
+ 			'lb' => {
+ 				'loose' => q{losse styl regelôfbrekking},
+ 				'normal' => q{normale styl regelôfbrekking},
+ 				'strict' => q{strikte styl regelôfbrekking},
+ 			},
  			'm0' => {
  				'bgn' => q{BGN},
  				'ungegn' => q{UNGEGN},
+ 			},
+ 			'ms' => {
+ 				'metric' => q{metrysk stelsel},
+ 				'uksystem' => q{Britsk ymperiaal stelsel},
+ 				'ussystem' => q{Amerikaansk ymperiaal stelsel},
  			},
  			'numbers' => {
  				'arab' => q{Arabysk-Indyske sifers},
@@ -1222,6 +1283,7 @@ has 'display_name_type' => (
  				'armnlow' => q{Kleine Armeense sifers},
  				'bali' => q{Balinese sifers},
  				'beng' => q{Bengaalse sifers},
+ 				'cakm' => q{Chakma sifers},
  				'deva' => q{Devanagari sifers},
  				'ethi' => q{Ethiopyske sifers},
  				'finance' => q{Finansjele sifers},
@@ -1246,8 +1308,10 @@ has 'display_name_type' => (
  				'latn' => q{Westerse sifers},
  				'mlym' => q{Malayalam sifers},
  				'mong' => q{Mongoolse sifers},
+ 				'mtei' => q{Meetei Mayek sifers},
  				'mymr' => q{Myanmarese sifers},
  				'native' => q{Binnenlânse sifers},
+ 				'olck' => q{Ol Chiki sifers},
  				'orya' => q{Oriya sifers},
  				'roman' => q{Romeinske sifers},
  				'romanlow' => q{Lytse Romeinske sifers},
@@ -1320,6 +1384,14 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					# Long Unit Identifier
+					'' => {
+						'name' => q(haadwynstreek),
+					},
+					# Core Unit Identifier
+					'' => {
+						'name' => q(haadwynstreek),
+					},
 					# Long Unit Identifier
 					'acceleration-g-force' => {
 						'one' => q({0} G-kracht),
@@ -1409,6 +1481,20 @@ has 'units' => (
 					'square-mile' => {
 						'one' => q({0} fjouwerkante myl),
 						'other' => q({0} fjouwerkante myl),
+					},
+					# Long Unit Identifier
+					'coordinate' => {
+						'east' => q({0} easterlingte),
+						'north' => q({0} noarderbreedte),
+						'south' => q({0} suderbreedte),
+						'west' => q({0} westerlingte),
+					},
+					# Core Unit Identifier
+					'coordinate' => {
+						'east' => q({0} easterlingte),
+						'north' => q({0} noarderbreedte),
+						'south' => q({0} suderbreedte),
+						'west' => q({0} westerlingte),
 					},
 					# Long Unit Identifier
 					'duration-millisecond' => {
@@ -1699,6 +1785,14 @@ has 'units' => (
 						'other' => q({0} graden Fahrenheit),
 					},
 					# Long Unit Identifier
+					'times' => {
+						'1' => q({0}{1}),
+					},
+					# Core Unit Identifier
+					'times' => {
+						'1' => q({0}{1}),
+					},
+					# Long Unit Identifier
 					'volume-cubic-kilometer' => {
 						'one' => q({0} kubike kilometer),
 						'other' => q({0} kubike kilometer),
@@ -1731,6 +1825,14 @@ has 'units' => (
 				},
 				'narrow' => {
 					# Long Unit Identifier
+					'' => {
+						'name' => q(wynstreek),
+					},
+					# Core Unit Identifier
+					'' => {
+						'name' => q(wynstreek),
+					},
+					# Long Unit Identifier
 					'area-acre' => {
 						'one' => q({0} acre),
 						'other' => q({0} acres),
@@ -1739,6 +1841,20 @@ has 'units' => (
 					'acre' => {
 						'one' => q({0} acre),
 						'other' => q({0} acres),
+					},
+					# Long Unit Identifier
+					'coordinate' => {
+						'east' => q({0} EL),
+						'north' => q({0} NB),
+						'south' => q({0} SB),
+						'west' => q({0} WL),
+					},
+					# Core Unit Identifier
+					'coordinate' => {
+						'east' => q({0} EL),
+						'north' => q({0} NB),
+						'south' => q({0} SB),
+						'west' => q({0} WL),
 					},
 					# Long Unit Identifier
 					'duration-day' => {
@@ -1830,8 +1946,24 @@ has 'units' => (
 						'one' => q({0}°),
 						'other' => q({0}°),
 					},
+					# Long Unit Identifier
+					'times' => {
+						'1' => q({0}{1}),
+					},
+					# Core Unit Identifier
+					'times' => {
+						'1' => q({0}{1}),
+					},
 				},
 				'short' => {
+					# Long Unit Identifier
+					'' => {
+						'name' => q(wynstreek),
+					},
+					# Core Unit Identifier
+					'' => {
+						'name' => q(wynstreek),
+					},
 					# Long Unit Identifier
 					'acceleration-g-force' => {
 						'name' => q(G-krachten),
@@ -1915,6 +2047,20 @@ has 'units' => (
 					# Core Unit Identifier
 					'square-mile' => {
 						'name' => q(fjouwerkante myl),
+					},
+					# Long Unit Identifier
+					'coordinate' => {
+						'east' => q({0} EL),
+						'north' => q({0} NB),
+						'south' => q({0} SB),
+						'west' => q({0} WL),
+					},
+					# Core Unit Identifier
+					'coordinate' => {
+						'east' => q({0} EL),
+						'north' => q({0} NB),
+						'south' => q({0} SB),
+						'west' => q({0} WL),
 					},
 					# Long Unit Identifier
 					'duration-day' => {
@@ -2171,6 +2317,14 @@ has 'units' => (
 					# Core Unit Identifier
 					'fahrenheit' => {
 						'name' => q(graden Fahrenheit),
+					},
+					# Long Unit Identifier
+					'times' => {
+						'1' => q({0}{1}),
+					},
+					# Core Unit Identifier
+					'times' => {
+						'1' => q({0}{1}),
 					},
 					# Long Unit Identifier
 					'volume-cubic-kilometer' => {
@@ -2679,6 +2833,13 @@ has 'currencies' => (
 		'CLP' => {
 			display_name => {
 				'currency' => q(Sileenske peso),
+			},
+		},
+		'CNH' => {
+			display_name => {
+				'currency' => q(Sineeske yuan \(offshore\)),
+				'one' => q(Sineeske yuan \(offshore\)),
+				'other' => q(Sineeske yuan \(offshore\)),
 			},
 		},
 		'CNY' => {
@@ -4331,10 +4492,13 @@ has 'datetime_formats_available_formats' => (
 		},
 		'generic' => {
 			Ed => q{E d},
+			Ehm => q{E h:mm a},
+			Ehms => q{E h:mm:ss a},
 			Gy => q{y G},
 			GyMMM => q{MMM y G},
 			GyMMMEd => q{E d MMM y G},
 			GyMMMd => q{d MMM y G},
+			GyMd => q{d/M/y GGGGG},
 			MEd => q{E d-M},
 			MMMEd => q{E d MMM},
 			MMMMd => q{d MMMM},
@@ -4361,6 +4525,7 @@ has 'datetime_formats_available_formats' => (
 			GyMMM => q{MMM y G},
 			GyMMMEd => q{E d MMM y G},
 			GyMMMd => q{d MMM y G},
+			GyMd => q{d/M/y GGGGG},
 			MEd => q{E d-M},
 			MMMEd => q{E d MMM},
 			MMMMW => q{'wike' W 'fan' MMMM},
@@ -4400,6 +4565,49 @@ has 'datetime_formats_interval' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
+			Bh => {
+				B => q{h B – h B},
+			},
+			Bhm => {
+				B => q{h:mm B – h:mm B},
+			},
+			Gy => {
+				G => q{G y – G y},
+			},
+			GyM => {
+				G => q{M-y – M-y GGGGG},
+				M => q{M-y – M-y GGGGG},
+				y => q{M-y – M-y GGGGG},
+			},
+			GyMEd => {
+				G => q{E d-M-y GGGGG – E d-M-y GGGGG},
+				M => q{E d-M-y – E d-M-y GGGGG},
+				d => q{E d-M-y – E d-M-y GGGGG},
+				y => q{E d-M-y – E d-M-y GGGGG},
+			},
+			GyMMM => {
+				G => q{MMM y G – MMM y G},
+				M => q{MMM – MMM y G},
+				y => q{MMM y – MMM y G},
+			},
+			GyMMMEd => {
+				G => q{E d MMM y G – E d MMM y G},
+				M => q{E d MMM – E d MMM y G},
+				d => q{E d MMM – E d MMM y G},
+				y => q{E d MMM y – E d MMM y G},
+			},
+			GyMMMd => {
+				G => q{d MMM y G – d MMM y G},
+				M => q{d MMM – d MMM y G},
+				d => q{d–d MMM y G},
+				y => q{d MMM y – d MMM y G},
+			},
+			GyMd => {
+				G => q{d-M-y GGGGG – d-M-y GGGGG},
+				M => q{d-M-y – d-M-y GGGGG},
+				d => q{d-M-y – d-M-y GGGGG},
+				y => q{d-M-y – d-M-y GGGGG},
+			},
 			M => {
 				M => q{M–M},
 			},
@@ -4480,6 +4688,50 @@ has 'datetime_formats_interval' => (
 			},
 		},
 		'gregorian' => {
+			Bh => {
+				B => q{h B – h B},
+			},
+			Bhm => {
+				B => q{h:mm B – h:mm B},
+			},
+			Gy => {
+				G => q{y G – y G},
+				y => q{y – y G},
+			},
+			GyM => {
+				G => q{GGGGG y-MM – GGGGG y-MM},
+				M => q{M/y – M/y G},
+				y => q{M/y – M/y G},
+			},
+			GyMEd => {
+				G => q{E, M/d/y G – E, M/d/y G},
+				M => q{E, M/d/y – E, M/d/y G},
+				d => q{E, M/d/y – E, M/d/y G},
+				y => q{E, M/d/y – E, M/d/y G},
+			},
+			GyMMM => {
+				G => q{MMM y G – MMM y G},
+				M => q{MMM – MMM y G},
+				y => q{MMM y – MMM y G},
+			},
+			GyMMMEd => {
+				G => q{E, MMM d, y G – E, MMM d, y G},
+				M => q{E, MMM d – E, MMM d, y G},
+				d => q{E, MMM d – E, MMM d, y G},
+				y => q{E, MMM d, y – E, MMM d, y G},
+			},
+			GyMMMd => {
+				G => q{MMM d, y G – MMM d, y G},
+				M => q{MMM d – MMM d, y G},
+				d => q{MMM d – d, y G},
+				y => q{MMM d, y – MMM d, y G},
+			},
+			GyMd => {
+				G => q{M/d/y G – M/d/y G},
+				M => q{M/d/y – M/d/y G},
+				d => q{M/d/y – M/d/y G},
+				y => q{M/d/y – M/d/y G},
+			},
 			M => {
 				M => q{M–M},
 			},
@@ -4705,6 +4957,9 @@ has 'time_zone_names' => (
 		'America/Bogota' => {
 			exemplarCity => q#Bogotá#,
 		},
+		'America/Cancun' => {
+			exemplarCity => q#Cancun#,
+		},
 		'America/Cordoba' => {
 			exemplarCity => q#Córdoba#,
 		},
@@ -4780,6 +5035,13 @@ has 'time_zone_names' => (
 				'daylight' => q#Anadyr-simmertiid#,
 				'generic' => q#Anadyr-tiid#,
 				'standard' => q#Anadyr-standerttiid#,
+			},
+		},
+		'Apia' => {
+			long => {
+				'daylight' => q#Apia-simmertiid#,
+				'generic' => q#Apia-tiid#,
+				'standard' => q#Apia-standerttiid#,
 			},
 		},
 		'Aqtau' => {
@@ -5037,13 +5299,6 @@ has 'time_zone_names' => (
 				'standard' => q#Sineeske standerttiid#,
 			},
 		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Tsjojbalsan simmertiid#,
-				'generic' => q#Tsjojbalsan tiid#,
-				'standard' => q#Tsjojbalsan standerttiid#,
-			},
-		},
 		'Christmas' => {
 			long => {
 				'standard' => q#Krysteilânske tiid#,
@@ -5102,6 +5357,11 @@ has 'time_zone_names' => (
 				'standard' => q#Ecuadoraanske tiid#,
 			},
 		},
+		'Etc/UTC' => {
+			long => {
+				'standard' => q#koördinearre wrâldtiid#,
+			},
+		},
 		'Etc/Unknown' => {
 			exemplarCity => q#Unbekende stêd#,
 		},
@@ -5149,9 +5409,6 @@ has 'time_zone_names' => (
 		'Europe/Luxembourg' => {
 			exemplarCity => q#Luxemburg#,
 		},
-		'Europe/Monaco' => {
-			exemplarCity => q#Monako#,
-		},
 		'Europe/Moscow' => {
 			exemplarCity => q#Moskou#,
 		},
@@ -5164,9 +5421,6 @@ has 'time_zone_names' => (
 		'Europe/Tirane' => {
 			exemplarCity => q#Tirana#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#Oezjhorod#,
-		},
 		'Europe/Vatican' => {
 			exemplarCity => q#Fatikaanstêd#,
 		},
@@ -5178,9 +5432,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Warsaw' => {
 			exemplarCity => q#Warschau#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#Zaporizja#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#Zürich#,
@@ -5207,6 +5458,11 @@ has 'time_zone_names' => (
 				'daylight' => q#EEST#,
 				'generic' => q#EET#,
 				'standard' => q#EET#,
+			},
+		},
+		'Europe_Further_Eastern' => {
+			long => {
+				'standard' => q#Fierder-eastlik-Europeeske tiid#,
 			},
 		},
 		'Europe_Western' => {
@@ -5405,6 +5661,11 @@ has 'time_zone_names' => (
 				'standard' => q#Petropavlovsk-Kamtsjatski-standerttiid#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Kazakhstan-tiid#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#East-Kazachse tiid#,
@@ -5463,11 +5724,6 @@ has 'time_zone_names' => (
 				'standard' => q#Macause standerttiid#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Macquarie-eilânske tiid#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Magadan-simmertiid#,
@@ -5505,6 +5761,13 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Mawson tiid#,
+			},
+		},
+		'Mexico_Pacific' => {
+			long => {
+				'daylight' => q#Meksikaanske Pacific-simmerttiid#,
+				'generic' => q#Meksikaanske Pacific-tiid#,
+				'standard' => q#Meksikaanske Pacific-standerttiid#,
 			},
 		},
 		'Mongolia' => {
@@ -5671,6 +5934,11 @@ has 'time_zone_names' => (
 		'Ponape' => {
 			long => {
 				'standard' => q#Pohnpei tiid#,
+			},
+		},
+		'Pyongyang' => {
+			long => {
+				'standard' => q#Pyongyang-tiid#,
 			},
 		},
 		'Qyzylorda' => {
@@ -5854,6 +6122,11 @@ has 'time_zone_names' => (
 				'daylight' => q#Jekaterinenburg-simmertiid#,
 				'generic' => q#Jekaterinenburg-tiid#,
 				'standard' => q#Jekaterinenburg-standerttiid#,
+			},
+		},
+		'Yukon' => {
+			long => {
+				'standard' => q#Yukon-tiid#,
 			},
 		},
 	 } }

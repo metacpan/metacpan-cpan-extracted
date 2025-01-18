@@ -8,18 +8,18 @@ Locale::CLDR::Locales::En::Latn::Ca - Package for language English
 
 package Locale::CLDR::Locales::En::Latn::Ca;
 # This file auto generated from Data\common\main\en_CA.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -721,13 +721,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'volume-dessert-spoon' => {
-						'name' => q(US dessertspoon),
 						'one' => q({0} US dessertspoon),
 						'other' => q({0} US dessertspoons),
 					},
 					# Core Unit Identifier
 					'dessert-spoon' => {
-						'name' => q(US dessertspoon),
 						'one' => q({0} US dessertspoon),
 						'other' => q({0} US dessertspoons),
 					},
@@ -1002,14 +1000,6 @@ has 'units' => (
 						'name' => q(A),
 					},
 					# Long Unit Identifier
-					'electric-ohm' => {
-						'name' => q(Ω),
-					},
-					# Core Unit Identifier
-					'ohm' => {
-						'name' => q(Ω),
-					},
-					# Long Unit Identifier
 					'electric-volt' => {
 						'name' => q(V),
 					},
@@ -1112,18 +1102,6 @@ has 'units' => (
 					# Core Unit Identifier
 					'cup' => {
 						'name' => q(cups),
-					},
-					# Long Unit Identifier
-					'volume-dessert-spoon' => {
-						'name' => q(US dsp),
-						'one' => q({0}USdsp),
-						'other' => q({0}USdsp),
-					},
-					# Core Unit Identifier
-					'dessert-spoon' => {
-						'name' => q(US dsp),
-						'one' => q({0}USdsp),
-						'other' => q({0}USdsp),
 					},
 					# Long Unit Identifier
 					'volume-dessert-spoon-imperial' => {
@@ -1316,14 +1294,6 @@ has 'units' => (
 						'other' => q({0} sq yd),
 					},
 					# Long Unit Identifier
-					'concentr-item' => {
-						'name' => q(items),
-					},
-					# Core Unit Identifier
-					'item' => {
-						'name' => q(items),
-					},
-					# Long Unit Identifier
 					'concentr-milligram-ofglucose-per-deciliter' => {
 						'name' => q(milligrams/decilitre),
 					},
@@ -1405,25 +1375,21 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'digital-bit' => {
-						'name' => q(bits),
 						'one' => q({0} bit),
 						'other' => q({0} bits),
 					},
 					# Core Unit Identifier
 					'bit' => {
-						'name' => q(bits),
 						'one' => q({0} bit),
 						'other' => q({0} bits),
 					},
 					# Long Unit Identifier
 					'digital-byte' => {
-						'name' => q(bytes),
 						'one' => q({0} byte),
 						'other' => q({0} bytes),
 					},
 					# Core Unit Identifier
 					'byte' => {
-						'name' => q(bytes),
 						'one' => q({0} byte),
 						'other' => q({0} bytes),
 					},
@@ -1724,18 +1690,6 @@ has 'units' => (
 						'other' => q({0} cu yd),
 					},
 					# Long Unit Identifier
-					'volume-dessert-spoon' => {
-						'name' => q(US dssp),
-						'one' => q({0} US dssp),
-						'other' => q({0} US dssp),
-					},
-					# Core Unit Identifier
-					'dessert-spoon' => {
-						'name' => q(US dssp),
-						'one' => q({0} US dssp),
-						'other' => q({0} US dssp),
-					},
-					# Long Unit Identifier
 					'volume-dessert-spoon-imperial' => {
 						'name' => q(dssp),
 						'one' => q({0} dssp),
@@ -1911,13 +1865,6 @@ has 'currencies' => (
 				'other' => q(Belarusian new roubles \(1994–1999\)),
 			},
 		},
-		'BYN' => {
-			display_name => {
-				'currency' => q(Belarusian Rouble),
-				'one' => q(Belarusian rouble),
-				'other' => q(Belarusian roubles),
-			},
-		},
 		'BYR' => {
 			display_name => {
 				'currency' => q(Belarusian Rouble \(2000–2016\)),
@@ -1936,13 +1883,6 @@ has 'currencies' => (
 				'currency' => q(Latvian Rouble),
 				'one' => q(Latvian rouble),
 				'other' => q(Latvian roubles),
-			},
-		},
-		'RUB' => {
-			display_name => {
-				'currency' => q(Russian Rouble),
-				'one' => q(Russian rouble),
-				'other' => q(Russian roubles),
 			},
 		},
 		'RUR' => {
@@ -2144,7 +2084,7 @@ has 'day_periods' => (
 				},
 				'narrow' => {
 					'afternoon1' => q{aft},
-					'am' => q{a.m.},
+					'am' => q{am},
 					'evening1' => q{eve},
 					'midnight' => q{mid},
 					'morning1' => q{mor},
@@ -2633,68 +2573,18 @@ has 'time_zone_names' => (
 				'standard' => q#Eastern Standard Time#,
 			},
 		},
-		'America_Mountain' => {
-			long => {
-				'daylight' => q#Mountain Daylight Saving Time#,
-				'generic' => q#Mountain Time#,
-				'standard' => q#Mountain Standard Time#,
-			},
-		},
-		'America_Pacific' => {
-			long => {
-				'daylight' => q#Pacific Daylight Saving Time#,
-				'generic' => q#Pacific Time#,
-				'standard' => q#Pacific Standard Time#,
-			},
-		},
-		'Apia' => {
-			long => {
-				'daylight' => q#Apia Daylight Saving Time#,
-				'generic' => q#Apia Time#,
-				'standard' => q#Apia Standard Time#,
-			},
-		},
-		'Arabian' => {
-			long => {
-				'daylight' => q#Arabian Daylight Saving Time#,
-				'generic' => q#Arabian Time#,
-				'standard' => q#Arabian Standard Time#,
-			},
-		},
 		'Argentina' => {
 			short => {
 				'generic' => q#ART#,
 			},
 		},
-		'Asia/Aqtau' => {
-			exemplarCity => q#Aktau#,
-		},
 		'Asia/Rangoon' => {
 			exemplarCity => q#Rangoon#,
-		},
-		'Atlantic' => {
-			long => {
-				'daylight' => q#Atlantic Daylight Saving Time#,
-				'generic' => q#Atlantic Time#,
-				'standard' => q#Atlantic Standard Time#,
-			},
 		},
 		'Atlantic/St_Helena' => {
 			exemplarCity => q#Saint Helena#,
 		},
-		'Australia_Central' => {
-			long => {
-				'daylight' => q#Australian Central Daylight Saving Time#,
-				'generic' => q#Central Australia Time#,
-				'standard' => q#Australian Central Standard Time#,
-			},
-		},
 		'Australia_CentralWestern' => {
-			long => {
-				'daylight' => q#Australian Central Western Daylight Saving Time#,
-				'generic' => q#Australian Central Western Time#,
-				'standard' => q#Australian Central Western Standard Time#,
-			},
 			short => {
 				'daylight' => q#ACWDT#,
 				'generic' => q#ACWT#,
@@ -2702,11 +2592,6 @@ has 'time_zone_names' => (
 			},
 		},
 		'Australia_Eastern' => {
-			long => {
-				'daylight' => q#Australian Eastern Daylight Saving Time#,
-				'generic' => q#Eastern Australia Time#,
-				'standard' => q#Australian Eastern Standard Time#,
-			},
 			short => {
 				'daylight' => q#AEDT#,
 				'generic' => q#AET#,
@@ -2714,11 +2599,6 @@ has 'time_zone_names' => (
 			},
 		},
 		'Australia_Western' => {
-			long => {
-				'daylight' => q#Australian Western Daylight Saving Time#,
-				'generic' => q#Western Australia Time#,
-				'standard' => q#Australian Western Standard Time#,
-			},
 			short => {
 				'daylight' => q#AWDT#,
 				'standard' => q#AWST#,
@@ -2746,21 +2626,9 @@ has 'time_zone_names' => (
 			},
 		},
 		'Chatham' => {
-			long => {
-				'daylight' => q#Chatham Daylight Saving Time#,
-				'generic' => q#Chatham Time#,
-				'standard' => q#Chatham Standard Time#,
-			},
 			short => {
 				'daylight' => q#CHADT#,
 				'standard' => q#CHAST#,
-			},
-		},
-		'China' => {
-			long => {
-				'daylight' => q#China Daylight Saving Time#,
-				'generic' => q#China Time#,
-				'standard' => q#China Standard Time#,
 			},
 		},
 		'Christmas' => {
@@ -2776,13 +2644,6 @@ has 'time_zone_names' => (
 		'Colombia' => {
 			short => {
 				'daylight' => q#COST#,
-			},
-		},
-		'Cuba' => {
-			long => {
-				'daylight' => q#Cuba Daylight Saving Time#,
-				'generic' => q#Cuba Time#,
-				'standard' => q#Cuba Standard Time#,
 			},
 		},
 		'East_Timor' => {
@@ -2822,16 +2683,14 @@ has 'time_zone_names' => (
 				'generic' => q#EGT#,
 			},
 		},
+		'Gulf' => {
+			short => {
+				'standard' => q#Gulf Time#,
+			},
+		},
 		'Guyana' => {
 			short => {
 				'standard' => q#GYT#,
-			},
-		},
-		'Hawaii_Aleutian' => {
-			long => {
-				'daylight' => q#Hawaii-Aleutian Daylight Saving Time#,
-				'generic' => q#Hawaii-Aleutian Time#,
-				'standard' => q#Hawaii-Aleutian Standard Time#,
 			},
 		},
 		'India' => {
@@ -2870,34 +2729,6 @@ has 'time_zone_names' => (
 				'standard' => q#IRST#,
 			},
 		},
-		'Israel' => {
-			long => {
-				'daylight' => q#Israel Daylight Saving Time#,
-				'generic' => q#Israel Time#,
-				'standard' => q#Israel Standard Time#,
-			},
-		},
-		'Japan' => {
-			long => {
-				'daylight' => q#Japan Daylight Saving Time#,
-				'generic' => q#Japan Time#,
-				'standard' => q#Japan Standard Time#,
-			},
-		},
-		'Korea' => {
-			long => {
-				'daylight' => q#Korean Daylight Saving Time#,
-				'generic' => q#Korean Time#,
-				'standard' => q#Korean Standard Time#,
-			},
-		},
-		'Lord_Howe' => {
-			long => {
-				'daylight' => q#Lord Howe Daylight Saving Time#,
-				'generic' => q#Lord Howe Time#,
-				'standard' => q#Lord Howe Standard Time#,
-			},
-		},
 		'Malaysia' => {
 			short => {
 				'standard' => q#MYT#,
@@ -2908,49 +2739,16 @@ has 'time_zone_names' => (
 				'standard' => q#MVT#,
 			},
 		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Northwest Mexico Daylight Saving Time#,
-				'generic' => q#Northwest Mexico Time#,
-				'standard' => q#Northwest Mexico Standard Time#,
-			},
-		},
-		'Mexico_Pacific' => {
-			long => {
-				'daylight' => q#Mexican Pacific Daylight Saving Time#,
-				'generic' => q#Mexican Pacific Time#,
-				'standard' => q#Mexican Pacific Standard Time#,
-			},
-		},
 		'Nepal' => {
 			short => {
 				'standard' => q#NPT#,
 			},
 		},
-		'New_Zealand' => {
-			long => {
-				'daylight' => q#New Zealand Daylight Saving Time#,
-				'generic' => q#New Zealand Time#,
-				'standard' => q#New Zealand Standard Time#,
-			},
-		},
 		'Newfoundland' => {
-			long => {
-				'daylight' => q#Newfoundland Daylight Saving Time#,
-				'generic' => q#Newfoundland Time#,
-				'standard' => q#Newfoundland Standard Time#,
-			},
 			short => {
 				'daylight' => q#NDT#,
 				'generic' => q#NT#,
 				'standard' => q#NST#,
-			},
-		},
-		'Norfolk' => {
-			long => {
-				'daylight' => q#Norfolk Island Daylight Saving Time#,
-				'generic' => q#Norfolk Island Time#,
-				'standard' => q#Norfolk Island Standard Time#,
 			},
 		},
 		'Noronha' => {
@@ -2988,16 +2786,9 @@ has 'time_zone_names' => (
 		},
 		'Samoa' => {
 			long => {
-				'daylight' => q#Samoa Daylight Saving Time#,
+				'daylight' => q#Samoan Time#,
 				'generic' => q#Samoa Time#,
 				'standard' => q#Samoa Standard Time#,
-			},
-		},
-		'Taipei' => {
-			long => {
-				'daylight' => q#Taipei Daylight Saving Time#,
-				'generic' => q#Taipei Time#,
-				'standard' => q#Taipei Standard Time#,
 			},
 		},
 		'Uruguay' => {

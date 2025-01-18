@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Lb - Package for language Luxembourgish
 
 package Locale::CLDR::Locales::Lb;
 # This file auto generated from Data\common\main\lb.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -252,6 +252,10 @@ has 'algorithmic_number_format_data' => (
 					divisor => q(1),
 					rule => q(null),
 				},
+				'x.x' => {
+					divisor => q(1),
+					rule => q(←← Komma →→),
+				},
 				'1' => {
 					base_value => q(1),
 					divisor => q(1),
@@ -440,13 +444,9 @@ has 'algorithmic_number_format_data' => (
 					divisor => q(1),
 					rule => q(net eng Nummer),
 				},
-				'x.x' => {
-					divisor => q(1),
-					rule => q(←← Komma →→),
-				},
 				'max' => {
 					divisor => q(1),
-					rule => q(←← Komma →→),
+					rule => q(net eng Nummer),
 				},
 			},
 		},
@@ -559,6 +559,10 @@ has 'algorithmic_number_format_data' => (
 					divisor => q(1),
 					rule => q(=%spellout-cardinal-neuter=),
 				},
+				'x.x' => {
+					divisor => q(1),
+					rule => q(=0.0=),
+				},
 				'1010' => {
 					base_value => q(1010),
 					divisor => q(100),
@@ -657,13 +661,9 @@ has 'algorithmic_number_format_data' => (
 					divisor => q(1),
 					rule => q(net eng Nummer),
 				},
-				'x.x' => {
-					divisor => q(1),
-					rule => q(=0.0=),
-				},
 				'max' => {
 					divisor => q(1),
-					rule => q(=0.0=),
+					rule => q(net eng Nummer),
 				},
 			},
 		},
@@ -677,6 +677,10 @@ has 'algorithmic_number_format_data' => (
 					base_value => q(0),
 					divisor => q(1),
 					rule => q(nullter),
+				},
+				'x.x' => {
+					divisor => q(1),
+					rule => q(=#,##0.0=.),
 				},
 				'1' => {
 					base_value => q(1),
@@ -781,13 +785,9 @@ has 'algorithmic_number_format_data' => (
 					divisor => q(1),
 					rule => q(net eng Nummer),
 				},
-				'x.x' => {
-					divisor => q(1),
-					rule => q(=#,##0.0=.),
-				},
 				'max' => {
 					divisor => q(1),
-					rule => q(=#,##0.0=.),
+					rule => q(net eng Nummer),
 				},
 			},
 		},
@@ -926,6 +926,10 @@ has 'algorithmic_number_format_data' => (
 					divisor => q(1),
 					rule => q(nullt),
 				},
+				'x.x' => {
+					divisor => q(1),
+					rule => q(=#,##0.0=.),
+				},
 				'1' => {
 					base_value => q(1),
 					divisor => q(1),
@@ -1029,13 +1033,9 @@ has 'algorithmic_number_format_data' => (
 					divisor => q(1),
 					rule => q(net eng Nummer),
 				},
-				'x.x' => {
-					divisor => q(1),
-					rule => q(=#,##0.0=.),
-				},
 				'max' => {
 					divisor => q(1),
-					rule => q(=#,##0.0=.),
+					rule => q(net eng Nummer),
 				},
 			},
 		},
@@ -1242,7 +1242,6 @@ has 'display_name_language' => (
  				'gmh' => 'Mëttelhéichdäitsch',
  				'gn' => 'Guarani',
  				'goh' => 'Alhéichdäitsch',
- 				'gom' => 'Goan-Konkani',
  				'gon' => 'Gondi-Sprooch',
  				'gor' => 'Mongondou',
  				'got' => 'Gotesch',
@@ -2224,7 +2223,6 @@ has 'display_name_type' => (
  				'gb2312han' => q{Vereinfacht Chinesesch - GB2312},
  				'phonebook' => q{Telefonsbuch-Zortéierung},
  				'pinyin' => q{Pinyin-Zortéierregelen},
- 				'reformed' => q{Reforméiert Zortéierreiefolleg},
  				'search' => q{Allgemeng Sich},
  				'searchjl' => q{Sich no Ufanksbuschtawen aus dem koreaneschen Alphabet},
  				'standard' => q{Standard Zortéierreiefolleg},
@@ -7074,13 +7072,6 @@ has 'time_zone_names' => (
 				'standard' => q#Chinesesch Normalzäit#,
 			},
 		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Choibalsan-Summerzäit#,
-				'generic' => q#Choibalsan-Zäit#,
-				'standard' => q#Choibalsan-Normalzäit#,
-			},
-		},
 		'Christmas' => {
 			long => {
 				'standard' => q#Chrëschtdagsinsel-Zäit#,
@@ -7191,9 +7182,6 @@ has 'time_zone_names' => (
 		'Europe/Tirane' => {
 			exemplarCity => q#Tirana#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#Uschgorod#,
-		},
 		'Europe/Vatican' => {
 			exemplarCity => q#Vatikan#,
 		},
@@ -7208,9 +7196,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Warsaw' => {
 			exemplarCity => q#Warschau#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#Saporischschja#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#Zürech#,
@@ -7460,11 +7445,6 @@ has 'time_zone_names' => (
 				'standard' => q#Lord-Howe-Normalzäit#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Macquarieinsel-Zäit#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Magadan-Summerzäit#,
@@ -7502,13 +7482,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Mawson-Zäit#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Nordwest-Mexiko-Summerzäit#,
-				'generic' => q#Nordwest-Mexiko-Zäit#,
-				'standard' => q#Nordwest-Mexiko-Normalzäit#,
 			},
 		},
 		'Mexico_Pacific' => {

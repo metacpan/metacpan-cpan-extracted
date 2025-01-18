@@ -1,17 +1,17 @@
 package Locale::CLDR::Transformations::Ungegn::Grek::Latn;
 # This file auto generated from Data\common\transforms\Greek_Latin_UNGEGN.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -125,7 +125,7 @@ has 'transforms' => (
 				},
 				{
 					before  => q(),
-					after   => q([\p{Mn} \p{Me}] * (?:(?=[\p{Ll}])[\p{latin}\p{greek}])),
+					after   => q([\p{Mn} \p{Me}] * (?:(?=[\p{Ll}])[\p{Latin}\p{Greek}])),
 					replace => q(Ψ),
 					result  => q(Ps),
 					revisit => 0,
@@ -363,7 +363,7 @@ has 'transforms' => (
 				},
 				{
 					before  => q(),
-					after   => q([\p{Mn} \p{Me}] * (?:(?=[\p{Ll}])[\p{latin}\p{greek}])),
+					after   => q([\p{Mn} \p{Me}] * (?:(?=[\p{Ll}])[\p{Latin}\p{Greek}])),
 					replace => q(Θ),
 					result  => q(Th),
 					revisit => 0,
@@ -636,7 +636,7 @@ has 'transforms' => (
 				},
 				{
 					before  => q(),
-					after   => q([\p{Mn} \p{Me}] * (?:(?=[\p{Ll}])[\p{latin}\p{greek}])),
+					after   => q([\p{Mn} \p{Me}] * (?:(?=[\p{Ll}])[\p{Latin}\p{Greek}])),
 					replace => q(Χ),
 					result  => q(Ch),
 					revisit => 0,

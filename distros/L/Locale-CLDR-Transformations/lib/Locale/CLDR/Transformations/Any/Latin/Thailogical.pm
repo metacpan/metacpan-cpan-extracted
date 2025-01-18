@@ -1,17 +1,17 @@
 package Locale::CLDR::Transformations::Any::Latin::Thailogical;
 # This file auto generated from Data\common\transforms\ThaiLogical-Latin.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -301,7 +301,7 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
-					replace => q(u([^\p \{ ccc = 0 \} \p \{ ccc = above \}]*)̄),
+					replace => q(u([^\p \{ ccc = 0 \} \p \{ ccc = Above \}]*)̄),
 					result  => q(ู),
 					revisit => 2,
 				},
@@ -322,7 +322,7 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
-					replace => q(ụ([^\p \{ ccc = 0 \} \p \{ ccc = above \}]*)̄),
+					replace => q(ụ([^\p \{ ccc = 0 \} \p \{ ccc = Above \}]*)̄),
 					result  => q(ื),
 					revisit => 2,
 				},
@@ -336,7 +336,7 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
-					replace => q(i([^\p \{ ccc = 0 \} \p \{ ccc = above \}]*)̄),
+					replace => q(i([^\p \{ ccc = 0 \} \p \{ ccc = Above \}]*)̄),
 					result  => q(ี),
 					revisit => 2,
 				},
@@ -357,14 +357,14 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
-					replace => q(a([^\p \{ ccc = 0 \} \p \{ ccc = above \}]*)̉),
+					replace => q(a([^\p \{ ccc = 0 \} \p \{ ccc = Above \}]*)̉),
 					result  => q(ำ),
 					revisit => 2,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q(a([^\p \{ ccc = 0 \} \p \{ ccc = above \}]*)̄),
+					replace => q(a([^\p \{ ccc = 0 \} \p \{ ccc = Above \}]*)̄),
 					result  => q(า),
 					revisit => 2,
 				},
@@ -413,7 +413,7 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
-					replace => q(s([^\p \{ ccc = 0 \} \p \{ ccc = above \}]*)̄),
+					replace => q(s([^\p \{ ccc = 0 \} \p \{ ccc = Above \}]*)̄),
 					result  => q(ส),
 					revisit => 2,
 				},
@@ -427,7 +427,7 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
-					replace => q(ṣ([^\p \{ ccc = 0 \} \p \{ ccc = above \}]*)̄),
+					replace => q(ṣ([^\p \{ ccc = 0 \} \p \{ ccc = Above \}]*)̄),
 					result  => q(ศ),
 					revisit => 2,
 				},
@@ -483,7 +483,7 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
-					replace => q(f([^\p \{ ccc = 0 \} \p \{ ccc = above \}]*)̄),
+					replace => q(f([^\p \{ ccc = 0 \} \p \{ ccc = Above \}]*)̄),
 					result  => q(ฝ),
 					revisit => 2,
 				},
@@ -735,7 +735,7 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
-					replace => q(h([^\p \{ ccc = 0 \} \p \{ ccc = above \}]*)̄),
+					replace => q(h([^\p \{ ccc = 0 \} \p \{ ccc = Above \}]*)̄),
 					result  => q(ห),
 					revisit => 2,
 				},

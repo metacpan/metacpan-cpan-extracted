@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Jv - Package for language Javanese
 
 package Locale::CLDR::Locales::Jv;
 # This file auto generated from Data\common\main\jv.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -70,6 +70,7 @@ has 'display_name_language' => (
  				'bi' => 'Bislama',
  				'bin' => 'Bini',
  				'bla' => 'Siksiká',
+ 				'blo' => 'Anii',
  				'bm' => 'Bambara',
  				'bn' => 'Bengali',
  				'bo' => 'Tibet',
@@ -142,7 +143,7 @@ has 'display_name_language' => (
  				'eu' => 'Basque',
  				'ewo' => 'Ewondo',
  				'fa' => 'Persia',
- 				'ff' => 'Fulah',
+ 				'ff' => 'Fula',
  				'fi' => 'Suomi',
  				'fil' => 'Tagalog',
  				'fj' => 'Fijian',
@@ -188,6 +189,7 @@ has 'display_name_language' => (
  				'iba' => 'Iban',
  				'ibb' => 'Ibibio',
  				'id' => 'Indonesia',
+ 				'ie' => 'Interlingue',
  				'ig' => 'Iqbo',
  				'ii' => 'Sichuan Yi',
  				'ikt' => 'Kanada Inuktitut Sisih Kulon',
@@ -240,6 +242,7 @@ has 'display_name_language' => (
  				'kv' => 'Komi',
  				'kw' => 'Kernowek',
  				'kwk' => 'Kwakʼwala',
+ 				'kxv' => 'Kuvi',
  				'ky' => 'Kirgis',
  				'la' => 'Latin',
  				'lad' => 'Ladino',
@@ -248,6 +251,7 @@ has 'display_name_language' => (
  				'lez' => 'Lesghian',
  				'lg' => 'Ganda',
  				'li' => 'Limburgish',
+ 				'lij' => 'Liguria',
  				'lil' => 'Lillooet',
  				'lkt' => 'Lakota',
  				'lmo' => 'Lombard',
@@ -361,12 +365,12 @@ has 'display_name_language' => (
  				'rwk' => 'Rwa',
  				'sa' => 'Sanskerta',
  				'sad' => 'Sandawe',
- 				'sah' => 'Sakha',
+ 				'sah' => 'Yakut',
  				'saq' => 'Samburu',
  				'sat' => 'Santali',
  				'sba' => 'Ngambai',
  				'sbp' => 'Sangu',
- 				'sc' => 'Sardinian',
+ 				'sc' => 'Sardinia',
  				'scn' => 'Sisilia',
  				'sco' => 'Skots',
  				'sd' => 'Sindhi',
@@ -398,6 +402,7 @@ has 'display_name_language' => (
  				'sw' => 'Swahili',
  				'swb' => 'Komorian',
  				'syr' => 'Siriak',
+ 				'szl' => 'Silesia',
  				'ta' => 'Tamil',
  				'tce' => 'Tutkhone Sisih Kidul',
  				'te' => 'Telugu',
@@ -437,7 +442,9 @@ has 'display_name_language' => (
  				'uz' => 'Uzbek',
  				'vai' => 'Vai',
  				've' => 'Venda',
+ 				'vec' => 'Venesia',
  				'vi' => 'Vietnam',
+ 				'vmw' => 'Makhuwa',
  				'vo' => 'Volapuk',
  				'vun' => 'Vunjo',
  				'wa' => 'Walloon',
@@ -448,6 +455,7 @@ has 'display_name_language' => (
  				'wuu' => 'Tyonghwa Wu',
  				'xal' => 'Kalmik',
  				'xh' => 'Xhosa',
+ 				'xnr' => 'Kangri',
  				'xog' => 'Soga',
  				'yav' => 'Yangben',
  				'ybb' => 'Yemba',
@@ -456,6 +464,7 @@ has 'display_name_language' => (
  				'yrl' => 'Nheengatu',
  				'yue' => 'Kanton',
  				'yue@alt=menu' => 'Tyonghwa, Kanton',
+ 				'za' => 'Zhuang',
  				'zgh' => 'Tamazight Moroko Standar',
  				'zh' => 'Tyonghwa',
  				'zh@alt=menu' => 'Tyonghwa, Mandarin',
@@ -534,7 +543,7 @@ has 'display_name_script' => (
  			'Tfng' => 'Tifinak',
  			'Thaa' => 'Thaana',
  			'Thai' => 'Thailand',
- 			'Tibt' => 'Tibetan',
+ 			'Tibt' => 'Tibet',
  			'Vaii' => 'Vai',
  			'Yiii' => 'Yi',
  			'Zmth' => 'Notasi Matematika',
@@ -622,7 +631,7 @@ has 'display_name_region' => (
  			'BO' => 'Bolivia',
  			'BQ' => 'Karibia Walanda',
  			'BR' => 'Brasil',
- 			'BS' => 'Bahamas',
+ 			'BS' => 'Bahama',
  			'BT' => 'Bhutan',
  			'BV' => 'Pulo Bovèt',
  			'BW' => 'Botswana',
@@ -1697,6 +1706,18 @@ has 'units' => (
 						'other' => q({0} nanodetik),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(wengi),
+						'other' => q({0} wengi),
+						'per' => q({0}/wengi),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(wengi),
+						'other' => q({0} wengi),
+						'per' => q({0}/wengi),
+					},
+					# Long Unit Identifier
 					'duration-second' => {
 						'name' => q(detik),
 						'other' => q({0} detik),
@@ -2421,6 +2442,16 @@ has 'units' => (
 						'other' => q({0} kilometer saben jam),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(cahya),
+						'other' => q({0} cahya),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(cahya),
+						'other' => q({0} cahya),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'name' => q(meter saben detik),
 						'other' => q({0} meter saben detik),
@@ -2648,11 +2679,13 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'volume-pinch' => {
-						'name' => q(sak juwit),
+						'name' => q(jiwit),
+						'other' => q({0} jiwit),
 					},
 					# Core Unit Identifier
 					'pinch' => {
-						'name' => q(sak juwit),
+						'name' => q(jiwit),
+						'other' => q({0} jiwit),
 					},
 					# Long Unit Identifier
 					'volume-tablespoon' => {
@@ -2751,6 +2784,14 @@ has 'units' => (
 						'name' => q(mdtk),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(wengi),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(wengi),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'other' => q({0}seprapat),
 					},
@@ -2799,6 +2840,14 @@ has 'units' => (
 						'other' => q({0}tpi),
 					},
 					# Long Unit Identifier
+					'light-candela' => {
+						'other' => q({0} cd),
+					},
+					# Core Unit Identifier
+					'candela' => {
+						'other' => q({0} cd),
+					},
+					# Long Unit Identifier
 					'mass-tonne' => {
 						'other' => q({0}t),
 					},
@@ -2813,6 +2862,16 @@ has 'units' => (
 					# Core Unit Identifier
 					'horsepower' => {
 						'other' => q({0}dj),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(cahya),
+						'other' => q({0} cahya),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(cahya),
+						'other' => q({0} cahya),
 					},
 					# Long Unit Identifier
 					'torque-pound-force-foot' => {
@@ -2880,11 +2939,13 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'volume-pinch' => {
-						'other' => q({0}juwit),
+						'name' => q(jiwit),
+						'other' => q({0}jiwit),
 					},
 					# Core Unit Identifier
 					'pinch' => {
-						'other' => q({0}juwit),
+						'name' => q(jiwit),
+						'other' => q({0}jiwit),
 					},
 					# Long Unit Identifier
 					'volume-pint-metric' => {
@@ -3319,6 +3380,18 @@ has 'units' => (
 						'other' => q({0} nd),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(wengi),
+						'other' => q({0} wengi),
+						'per' => q({0}/wengi),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(wengi),
+						'other' => q({0} wengi),
+						'per' => q({0}/wengi),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'name' => q(seprapat),
 						'other' => q({0} seprapat),
@@ -3633,12 +3706,10 @@ has 'units' => (
 					# Long Unit Identifier
 					'light-candela' => {
 						'name' => q(kandela),
-						'other' => q({0} kandela),
 					},
 					# Core Unit Identifier
 					'candela' => {
 						'name' => q(kandela),
-						'other' => q({0} kandela),
 					},
 					# Long Unit Identifier
 					'light-lux' => {
@@ -3803,6 +3874,16 @@ has 'units' => (
 					'knot' => {
 						'name' => q(knot),
 						'other' => q({0} knot),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(cahya),
+						'other' => q({0} cahya),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(cahya),
+						'other' => q({0} cahya),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -4026,13 +4107,13 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'volume-pinch' => {
-						'name' => q(juwit),
-						'other' => q({0} sak juwit),
+						'name' => q(jiwit),
+						'other' => q({0} jiwit),
 					},
 					# Core Unit Identifier
 					'pinch' => {
-						'name' => q(juwit),
-						'other' => q({0} sak juwit),
+						'name' => q(jiwit),
+						'other' => q({0} jiwit),
 					},
 					# Long Unit Identifier
 					'volume-pint' => {
@@ -4636,8 +4717,8 @@ has 'currencies' => (
 		},
 		'LSL' => {
 			display_name => {
-				'currency' => q(Lesotho Loti),
-				'other' => q(Lesotho lotis),
+				'currency' => q(Loti Lesotho),
+				'other' => q(Loti Lesotho),
 			},
 		},
 		'LYD' => {
@@ -4773,7 +4854,8 @@ has 'currencies' => (
 		},
 		'PHP' => {
 			display_name => {
-				'currency' => q(Piso Filipina),
+				'currency' => q(Peso Filipina),
+				'other' => q(Peso Filipina),
 			},
 		},
 		'PKR' => {
@@ -5786,9 +5868,6 @@ has 'time_zone_names' => (
 		'America/Puerto_Rico' => {
 			exemplarCity => q#Puerto Riko#,
 		},
-		'America/Rainy_River' => {
-			exemplarCity => q#Kali Rainy#,
-		},
 		'America/St_Barthelemy' => {
 			exemplarCity => q#Santa Barthelemy#,
 		},
@@ -5809,9 +5888,6 @@ has 'time_zone_names' => (
 		},
 		'America/Swift_Current' => {
 			exemplarCity => q#Arus Banter#,
-		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#Teluk Gludhug#,
 		},
 		'America_Central' => {
 			long => {
@@ -5922,9 +5998,6 @@ has 'time_zone_names' => (
 		'Atlantic/St_Helena' => {
 			exemplarCity => q#Santa Helena#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#Currie#,
-		},
 		'Australia_Central' => {
 			long => {
 				'daylight' => q#Wektu Ketigo Australia Tengah#,
@@ -6027,13 +6100,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Wektu Ketigo Cina#,
 				'generic' => q#Wektu Cina#,
 				'standard' => q#Wektu Standar Cina#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#WEktu Ketigo Choibalsan#,
-				'generic' => q#Wektu Choibalsan#,
-				'standard' => q#Wektu Standar Choibalsan#,
 			},
 		},
 		'Christmas' => {
@@ -6328,6 +6394,11 @@ has 'time_zone_names' => (
 				'standard' => q#Wektu Standar Jepang#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Wektu Kazakhstan#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#Wektu Kazakhstan Wetan#,
@@ -6374,11 +6445,6 @@ has 'time_zone_names' => (
 				'standard' => q#Wektu Standar Lord Howe#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Wektu Pulo Macquarie#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Wektu Ketigo Magadan#,
@@ -6416,13 +6482,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Wektu Mawson#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Wektu Ketigo Meksiko Lor-Kulon#,
-				'generic' => q#Wektu Meksiko Lor-Kulon#,
-				'standard' => q#Wektu Standar Meksiko Lor-Kulon#,
 			},
 		},
 		'Mexico_Pacific' => {

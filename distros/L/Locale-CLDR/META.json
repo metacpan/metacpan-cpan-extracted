@@ -4,7 +4,7 @@
       "John Imrie <john.imrie1@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "keywords" : [
       "locale",
       "CLDR"
@@ -36,7 +36,6 @@
             "Class::Load" : "0",
             "DateTime" : "0.72",
             "DateTime::Locale" : "0",
-            "List::MoreUtils" : "0",
             "List::Util" : "1.45",
             "Moo" : "2",
             "MooX::ClassAttribute" : "0.011",
@@ -44,7 +43,7 @@
             "Unicode::Regex::Set" : "0",
             "bigfloat" : "0",
             "namespace::autoclean" : "0.16",
-            "perl" : "v5.10.1",
+            "perl" : "v5.12.0",
             "version" : "0.95"
          }
       }
@@ -52,79 +51,79 @@
    "provides" : {
       "Locale::CLDR" : {
          "file" : "lib/Locale/CLDR.pm",
-         "version" : "v0.44.1"
+         "version" : "v0.46.0"
       },
       "Locale::CLDR::CalendarPreferences" : {
          "file" : "lib/Locale/CLDR/CalendarPreferences.pm",
-         "version" : "v0.44.1"
+         "version" : "v0.46.0"
       },
       "Locale::CLDR::Collator" : {
          "file" : "lib/Locale/CLDR/Collator.pm",
-         "version" : "v0.44.1"
+         "version" : "v0.46.0"
       },
       "Locale::CLDR::CollatorBase" : {
          "file" : "lib/Locale/CLDR/CollatorBase.pm",
-         "version" : "v0.44.1"
+         "version" : "v0.46.0"
       },
       "Locale::CLDR::Currencies" : {
          "file" : "lib/Locale/CLDR/Currencies.pm",
-         "version" : "v0.44.1"
+         "version" : "v0.46.0"
       },
       "Locale::CLDR::EraBoundries" : {
          "file" : "lib/Locale/CLDR/EraBoundries.pm",
-         "version" : "v0.44.1"
+         "version" : "v0.46.0"
       },
       "Locale::CLDR::LanguageMatching" : {
          "file" : "lib/Locale/CLDR/LanguageMatching.pm",
-         "version" : "v0.44.1"
+         "version" : "v0.46.0"
       },
       "Locale::CLDR::LikelySubtags" : {
          "file" : "lib/Locale/CLDR/LikelySubtags.pm",
-         "version" : "v0.44.1"
+         "version" : "v0.46.0"
       },
       "Locale::CLDR::Locales::En" : {
          "file" : "lib/Locale/CLDR/Locales/En.pm",
-         "version" : "v0.44.1"
+         "version" : "v0.46.0"
       },
       "Locale::CLDR::Locales::En::Latn" : {
          "file" : "lib/Locale/CLDR/Locales/En/Latn.pm",
-         "version" : "v0.44.1"
+         "version" : "v0.46.0"
       },
       "Locale::CLDR::Locales::En::Latn::Us" : {
          "file" : "lib/Locale/CLDR/Locales/En/Latn/Us.pm",
-         "version" : "v0.44.1"
+         "version" : "v0.46.0"
       },
       "Locale::CLDR::Locales::Root" : {
          "file" : "lib/Locale/CLDR/Locales/Root.pm",
-         "version" : "v0.44.1"
+         "version" : "v0.46.0"
       },
       "Locale::CLDR::MeasurementSystem" : {
          "file" : "lib/Locale/CLDR/MeasurementSystem.pm",
-         "version" : "v0.44.1"
+         "version" : "v0.46.0"
       },
       "Locale::CLDR::NumberFormatter" : {
          "file" : "lib/Locale/CLDR/NumberFormatter.pm",
-         "version" : "v0.44.1"
+         "version" : "v0.46.0"
       },
       "Locale::CLDR::NumberingSystems" : {
          "file" : "lib/Locale/CLDR/NumberingSystems.pm",
-         "version" : "v0.44.1"
+         "version" : "v0.46.0"
       },
       "Locale::CLDR::Plurals" : {
          "file" : "lib/Locale/CLDR/Plurals.pm",
-         "version" : "v0.44.1"
+         "version" : "v0.46.0"
       },
       "Locale::CLDR::RegionContainment" : {
          "file" : "lib/Locale/CLDR/RegionContainment.pm",
-         "version" : "v0.44.1"
+         "version" : "v0.46.0"
       },
       "Locale::CLDR::ValidCodes" : {
          "file" : "lib/Locale/CLDR/ValidCodes.pm",
-         "version" : "v0.44.1"
+         "version" : "v0.46.0"
       },
       "Locale::CLDR::WeekData" : {
          "file" : "lib/Locale/CLDR/WeekData.pm",
-         "version" : "v0.44.1"
+         "version" : "v0.46.0"
       }
    },
    "release_status" : "stable",
@@ -137,6 +136,6 @@
          "url" : "https://github.com/ThePilgrim/perlcldr.git"
       }
    },
-   "version" : "v0.44.1",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "v0.46.0",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

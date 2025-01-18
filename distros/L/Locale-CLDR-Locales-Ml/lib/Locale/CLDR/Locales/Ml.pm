@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Ml - Package for language Malayalam
 
 package Locale::CLDR::Locales::Ml;
 # This file auto generated from Data\common\main\ml.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -87,6 +87,7 @@ has 'display_name_language' => (
  				'bin' => 'ബിനി',
  				'bkm' => 'കോം',
  				'bla' => 'സിക്സിക',
+ 				'blo' => 'അനി',
  				'bm' => 'ബംബാറ',
  				'bn' => 'ബംഗ്ലാ',
  				'bo' => 'ടിബറ്റൻ',
@@ -315,6 +316,7 @@ has 'display_name_language' => (
  				'kv' => 'കോമി',
  				'kw' => 'കോർണിഷ്',
  				'kwk' => 'ക്വാക്വല',
+ 				'kxv' => 'കുവി',
  				'ky' => 'കിർഗിസ്',
  				'la' => 'ലാറ്റിൻ',
  				'lad' => 'ലഡീനോ',
@@ -325,6 +327,7 @@ has 'display_name_language' => (
  				'lez' => 'ലസ്ഗിയൻ',
  				'lg' => 'ഗാണ്ട',
  				'li' => 'ലിംബർഗിഷ്',
+ 				'lij' => 'ലിഗൂറിയൻ',
  				'lil' => 'ലില്ലുവെറ്റ്',
  				'lkt' => 'ലകൗട്ട',
  				'lmo' => 'ലൊംബാർഡ്',
@@ -523,6 +526,7 @@ has 'display_name_language' => (
  				'swb' => 'കൊമോറിയൻ',
  				'syc' => 'പുരാതന സുറിയാനിഭാഷ',
  				'syr' => 'സുറിയാനി',
+ 				'szl' => 'സൈലേഷ്യൻ',
  				'ta' => 'തമിഴ്',
  				'tce' => 'സതേൺ ടറ്റ്ഷോൺ',
  				'te' => 'തെലുങ്ക്',
@@ -572,7 +576,9 @@ has 'display_name_language' => (
  				'uz' => 'ഉസ്‌ബെക്ക്',
  				'vai' => 'വൈ',
  				've' => 'വെന്ദ',
+ 				'vec' => 'വെനീഷ്യൻ',
  				'vi' => 'വിയറ്റ്നാമീസ്',
+ 				'vmw' => 'മഖുവ',
  				'vo' => 'വോളാപുക്',
  				'vot' => 'വോട്ടിക്',
  				'vun' => 'വുൻജോ',
@@ -586,6 +592,7 @@ has 'display_name_language' => (
  				'wuu' => 'വു ചൈനീസ്',
  				'xal' => 'കാൽമിക്',
  				'xh' => 'ഖോസ',
+ 				'xnr' => 'കാങ്ടി',
  				'xog' => 'സോഗോ',
  				'yao' => 'യാവോ',
  				'yap' => 'യെപ്പീസ്',
@@ -976,7 +983,7 @@ has 'display_name_region' => (
  			'ML' => 'മാലി',
  			'MM' => 'മ്യാൻമാർ (ബർമ്മ)',
  			'MN' => 'മംഗോളിയ',
- 			'MO' => 'മക്കാവു SAR ചൈന',
+ 			'MO' => 'മക്കാവു എസ്.എ.ആർ. ചൈന',
  			'MO@alt=short' => 'മക്കാവു',
  			'MP' => 'ഉത്തര മറിയാനാ ദ്വീപുകൾ',
  			'MQ' => 'മാർട്ടിനിക്ക്',
@@ -1248,8 +1255,8 @@ has 'display_name_type' => (
  				'strict' => q{നിയന്ത്രിത രേഖ വിഭാജി ശൈലി},
  			},
  			'm0' => {
- 				'bgn' => q{യു.എസ്. BGN ലിപ്യന്തരണം},
- 				'ungegn' => q{യു.എൻ. GEGN ലിപ്യന്തരണം},
+ 				'bgn' => q{യു.എസ്. ബി.ജി.എൻ. ലിപ്യന്തരണം},
+ 				'ungegn' => q{യു.എൻ. ജി.ഇ.ജി.എൻ. ലിപ്യന്തരണം},
  			},
  			'ms' => {
  				'metric' => q{മെട്രിക്ക് സംവിധാനം},
@@ -1377,10 +1384,9 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{[‌‍ഃ ൠ ഌ ൡ ൿ]},
+			auxiliary => qr{[‌‍ഃ ൠ ഌ ൡ ൿ ൺ ൻ ം ർ ൽ ൾ ാ ി ീ ു ൂ ൃ െ േ ൈ ൊ ോ ൗ ്]},
 			index => ['അ', 'ആ', 'ഇ', 'ഈ', 'ഉ', 'ഊ', 'ഋ', 'എ', 'ഏ', 'ഐ', 'ഒ', 'ഓ', 'ഔ', 'ക', 'ഖ', 'ഗ', 'ഘ', 'ങ', 'ച', 'ഛ', 'ജ', 'ഝ', 'ഞ', 'ട', 'ഠ', 'ഡ', 'ഢ', 'ണ', 'ത', 'ഥ', 'ദ', 'ധ', 'ന', 'പ', 'ഫ', 'ബ', 'ഭ', 'മ', 'യ', 'ര', 'ല', 'വ', 'ശ', 'ഷ', 'സ', 'ഹ', 'ള', 'ഴ', 'റ'],
-			main => qr{[അ ആ ഇ ഈ ഉ ഊ ഋ എ ഏ ഐ ഒ ഓ ഔ ക ഖ ഗ ഘ ങ ച ഛ ജ ഝ ഞ ട ഠ ഡ ഢ ണ ൺ ത ഥ ദ ധ ന ൻ പ ഫ ബ ഭ മ ം യ ര ർ ല ൽ വ ശ ഷ സ ഹ ള ൾ ഴ റ ാ ി ീ ു ൂ ൃ െ േ ൈ ൊ ോ ൌ ൗ ്]},
-			numbers => qr{[\- ‑ , . % ‰ + 0൦ 1൧ 2൨ 3൩ 4൪ 5൫ 6൬ 7൭ 8൮ 9൯]},
+			main => qr{[അ{അഃ} {അം} ആ ഇ ഈ ഉ ഊ ഋ എ ഏ ഐ ഒ ഓ ഔ ക ഖ ഗ ഘ ങ ച ഛ ജ ഝ ഞ ട ഠ ഡ ഢ ണ ത ഥ ദ ധ ന പ ഫ ബ ഭ മ യ ര ല വ ശ ഷ സ ഹ ള ഴ റ]},
 			punctuation => qr{[\- ‐‑ – — , ; \: ! ? . … '‘’ "“” ( ) \[ \] § @ * / \& # † ‡ ′ ″]},
 		};
 	},
@@ -1880,14 +1886,16 @@ has 'units' => (
 					# Long Unit Identifier
 					'concentr-karat' => {
 						'1' => q(neuter),
-						'one' => q({0} ക്യാരറ്റ്),
-						'other' => q({0} ക്യാരറ്റ്),
+						'name' => q(കാരറ്റ്),
+						'one' => q({0} കാരറ്റ്),
+						'other' => q({0} കാരറ്റ്),
 					},
 					# Core Unit Identifier
 					'karat' => {
 						'1' => q(neuter),
-						'one' => q({0} ക്യാരറ്റ്),
-						'other' => q({0} ക്യാരറ്റ്),
+						'name' => q(കാരറ്റ്),
+						'one' => q({0} കാരറ്റ്),
+						'other' => q({0} കാരറ്റ്),
 					},
 					# Long Unit Identifier
 					'concentr-milligram-ofglucose-per-deciliter' => {
@@ -1916,16 +1924,10 @@ has 'units' => (
 					# Long Unit Identifier
 					'concentr-mole' => {
 						'1' => q(neuter),
-						'name' => q(മോളുകൾ),
-						'one' => q({0} മോൾ),
-						'other' => q({0} മോളുകൾ),
 					},
 					# Core Unit Identifier
 					'mole' => {
 						'1' => q(neuter),
-						'name' => q(മോളുകൾ),
-						'one' => q({0} മോൾ),
-						'other' => q({0} മോളുകൾ),
 					},
 					# Long Unit Identifier
 					'concentr-percent' => {
@@ -1953,14 +1955,14 @@ has 'units' => (
 					'concentr-permillion' => {
 						'1' => q(neuter),
 						'name' => q(പാർട്‌സ് / മില്ല്യൺ),
-						'one' => q(പാർട്ട് / മില്ല്യൺ),
+						'one' => q({0} പാർട്ട് / മില്ല്യൺ),
 						'other' => q({0} പാർട്‌സ് / മില്ല്യൺ),
 					},
 					# Core Unit Identifier
 					'permillion' => {
 						'1' => q(neuter),
 						'name' => q(പാർട്‌സ് / മില്ല്യൺ),
-						'one' => q(പാർട്ട് / മില്ല്യൺ),
+						'one' => q({0} പാർട്ട് / മില്ല്യൺ),
 						'other' => q({0} പാർട്‌സ് / മില്ല്യൺ),
 					},
 					# Long Unit Identifier
@@ -1974,6 +1976,18 @@ has 'units' => (
 						'1' => q(neuter),
 						'one' => q({0} പെ൪മിറിയാഡ്),
 						'other' => q({0} പെ൪മിറിയാഡ്),
+					},
+					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(പാർട്‌സ്/ബില്ല്യൺ),
+						'one' => q({0} പാർട്ട്/ബില്ല്യൺ),
+						'other' => q({0} പാർട്‌സ്/ബില്ല്യൺ),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(പാർട്‌സ്/ബില്ല്യൺ),
+						'one' => q({0} പാർട്ട്/ബില്ല്യൺ),
+						'other' => q({0} പാർട്‌സ്/ബില്ല്യൺ),
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
@@ -2193,15 +2207,11 @@ has 'units' => (
 					'duration-decade' => {
 						'1' => q(neuter),
 						'name' => q(ദശാബ്‌ദം),
-						'one' => q(ദശാബ്‌ദം),
-						'other' => q({0} ദശാബ്‌ദം),
 					},
 					# Core Unit Identifier
 					'decade' => {
 						'1' => q(neuter),
 						'name' => q(ദശാബ്‌ദം),
-						'one' => q(ദശാബ്‌ദം),
-						'other' => q({0} ദശാബ്‌ദം),
 					},
 					# Long Unit Identifier
 					'duration-hour' => {
@@ -2274,6 +2284,20 @@ has 'units' => (
 					'nanosecond' => {
 						'one' => q({0} നാനോസെക്കൻഡ്),
 						'other' => q({0} നാനോസെക്കൻഡ്),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(രാത്രികൾ),
+						'one' => q({0} രാത്രി),
+						'other' => q({0} രാത്രികൾ),
+						'per' => q({0}/രാത്രി),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(രാത്രികൾ),
+						'one' => q({0} രാത്രി),
+						'other' => q({0} രാത്രികൾ),
+						'per' => q({0}/രാത്രി),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -2482,16 +2506,14 @@ has 'units' => (
 					# Long Unit Identifier
 					'force-newton' => {
 						'1' => q(neuter),
-						'name' => q(ന്യൂട്ടൻസ്),
 						'one' => q({0} ന്യൂട്ടൻ),
-						'other' => q({0} ന്യൂട്ടൻസ്),
+						'other' => q({0} ന്യൂട്ടൻ),
 					},
 					# Core Unit Identifier
 					'newton' => {
 						'1' => q(neuter),
-						'name' => q(ന്യൂട്ടൻസ്),
 						'one' => q({0} ന്യൂട്ടൻ),
-						'other' => q({0} ന്യൂട്ടൻസ്),
+						'other' => q({0} ന്യൂട്ടൻ),
 					},
 					# Long Unit Identifier
 					'force-pound-force' => {
@@ -2610,14 +2632,14 @@ has 'units' => (
 						'1' => q(neuter),
 						'name' => q(പിക്സൽസ്),
 						'one' => q({0} പിക്സൽ),
-						'other' => q({0} px),
+						'other' => q({0} പിക്സൽ),
 					},
 					# Core Unit Identifier
 					'pixel' => {
 						'1' => q(neuter),
 						'name' => q(പിക്സൽസ്),
 						'one' => q({0} പിക്സൽ),
-						'other' => q({0} px),
+						'other' => q({0} പിക്സൽ),
 					},
 					# Long Unit Identifier
 					'graphics-pixel-per-centimeter' => {
@@ -2888,23 +2910,25 @@ has 'units' => (
 					# Long Unit Identifier
 					'mass-carat' => {
 						'1' => q(neuter),
-						'one' => q({0} ക്യാരറ്റ്),
-						'other' => q({0} ക്യാരറ്റ്),
+						'name' => q(കാരറ്റ്),
+						'one' => q({0} കാരറ്റ്),
+						'other' => q({0} കാരറ്റ്),
 					},
 					# Core Unit Identifier
 					'carat' => {
 						'1' => q(neuter),
-						'one' => q({0} ക്യാരറ്റ്),
-						'other' => q({0} ക്യാരറ്റ്),
+						'name' => q(കാരറ്റ്),
+						'one' => q({0} കാരറ്റ്),
+						'other' => q({0} കാരറ്റ്),
 					},
 					# Long Unit Identifier
 					'mass-dalton' => {
-						'one' => q(ഡാൽട്ടൻ),
+						'one' => q({0} ഡാൽട്ടൺ),
 						'other' => q({0} ഡാൽട്ടണുകൾ),
 					},
 					# Core Unit Identifier
 					'dalton' => {
-						'one' => q(ഡാൽട്ടൻ),
+						'one' => q({0} ഡാൽട്ടൺ),
 						'other' => q({0} ഡാൽട്ടണുകൾ),
 					},
 					# Long Unit Identifier
@@ -3111,13 +3135,13 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'power2' => {
-						'one' => q(വർഗ്ഗം {0}),
-						'other' => q(വർഗ്ഗം {0}),
+						'one' => q(ചതുരശ്ര {0}),
+						'other' => q(ചതുരശ്ര {0}),
 					},
 					# Core Unit Identifier
 					'power2' => {
-						'one' => q(വർഗ്ഗം {0}),
-						'other' => q(വർഗ്ഗം {0}),
+						'one' => q(ചതുരശ്ര {0}),
+						'other' => q(ചതുരശ്ര {0}),
 					},
 					# Long Unit Identifier
 					'power3' => {
@@ -3147,27 +3171,23 @@ has 'units' => (
 					'pressure-bar' => {
 						'1' => q(neuter),
 						'name' => q(ബാറുകൾ),
-						'one' => q({0} ബാർ),
-						'other' => q({0} ബാറുകൾ),
 					},
 					# Core Unit Identifier
 					'bar' => {
 						'1' => q(neuter),
 						'name' => q(ബാറുകൾ),
-						'one' => q({0} ബാർ),
-						'other' => q({0} ബാറുകൾ),
 					},
 					# Long Unit Identifier
 					'pressure-hectopascal' => {
-						'name' => q(ഹെക്‌ടോപാസ്‌ക്കൽ),
-						'one' => q({0} ഹെക്‌ടോപാസ്‌ക്കൽ),
-						'other' => q({0} ഹെക്‌ടോപാസ്‌ക്കൽ),
+						'name' => q(ഹെക്‌ടോപാസ്‌കൽ),
+						'one' => q({0} ഹെക്‌ടോപാസ്‌കൽ),
+						'other' => q({0} ഹെക്‌ടോപാസ്‌കൽ),
 					},
 					# Core Unit Identifier
 					'hectopascal' => {
-						'name' => q(ഹെക്‌ടോപാസ്‌ക്കൽ),
-						'one' => q({0} ഹെക്‌ടോപാസ്‌ക്കൽ),
-						'other' => q({0} ഹെക്‌ടോപാസ്‌ക്കൽ),
+						'name' => q(ഹെക്‌ടോപാസ്‌കൽ),
+						'one' => q({0} ഹെക്‌ടോപാസ്‌കൽ),
+						'other' => q({0} ഹെക്‌ടോപാസ്‌കൽ),
 					},
 					# Long Unit Identifier
 					'pressure-inch-ofhg' => {
@@ -3197,13 +3217,13 @@ has 'units' => (
 					'pressure-megapascal' => {
 						'name' => q(മെഗാപാസ്കൽ),
 						'one' => q({0} മെഗാപാസ്കൽ),
-						'other' => q({0} മെഗാപാസ്കലുകൾ),
+						'other' => q({0} മെഗാപാസ്കൽ),
 					},
 					# Core Unit Identifier
 					'megapascal' => {
 						'name' => q(മെഗാപാസ്കൽ),
 						'one' => q({0} മെഗാപാസ്കൽ),
-						'other' => q({0} മെഗാപാസ്കലുകൾ),
+						'other' => q({0} മെഗാപാസ്കൽ),
 					},
 					# Long Unit Identifier
 					'pressure-millibar' => {
@@ -3232,14 +3252,14 @@ has 'units' => (
 					# Long Unit Identifier
 					'pressure-pascal' => {
 						'1' => q(neuter),
-						'name' => q(പാസ്കൽസ്),
+						'name' => q(പാസ്കൽ),
 						'one' => q({0} പാസ്കൽ),
 						'other' => q({0} പാസ്കൽസ്),
 					},
 					# Core Unit Identifier
 					'pascal' => {
 						'1' => q(neuter),
-						'name' => q(പാസ്കൽസ്),
+						'name' => q(പാസ്കൽ),
 						'one' => q({0} പാസ്കൽ),
 						'other' => q({0} പാസ്കൽസ്),
 					},
@@ -3343,13 +3363,13 @@ has 'units' => (
 					'torque-newton-meter' => {
 						'name' => q(ന്യൂട്ടൺ മീറ്റർ),
 						'one' => q({0} ന്യൂട്ടൺ മീറ്റർ),
-						'other' => q({0} ന്യൂട്ടൺ മീറ്ററുകൾ),
+						'other' => q({0} ന്യൂട്ടൺ മീറ്റർ),
 					},
 					# Core Unit Identifier
 					'newton-meter' => {
 						'name' => q(ന്യൂട്ടൺ മീറ്റർ),
 						'one' => q({0} ന്യൂട്ടൺ മീറ്റർ),
-						'other' => q({0} ന്യൂട്ടൺ മീറ്ററുകൾ),
+						'other' => q({0} ന്യൂട്ടൺ മീറ്റർ),
 					},
 					# Long Unit Identifier
 					'torque-pound-force-foot' => {
@@ -3796,12 +3816,36 @@ has 'units' => (
 						'other' => q({0} ച.മൈ),
 					},
 					# Long Unit Identifier
+					'concentr-karat' => {
+						'name' => q(കാരറ്റ്),
+						'one' => q({0} കാ.),
+						'other' => q({0}കാ.),
+					},
+					# Core Unit Identifier
+					'karat' => {
+						'name' => q(കാരറ്റ്),
+						'one' => q({0} കാ.),
+						'other' => q({0}കാ.),
+					},
+					# Long Unit Identifier
 					'concentr-permyriad' => {
 						'name' => q(‱),
 					},
 					# Core Unit Identifier
 					'permyriad' => {
 						'name' => q(‱),
+					},
+					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(പി.പി.ബി.),
+						'one' => q({0}പി.പി.ബി.),
+						'other' => q({0}പി.പി.ബി.),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(പി.പി.ബി.),
+						'one' => q({0}പി.പി.ബി.),
+						'other' => q({0}പി.പി.ബി.),
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
@@ -3906,6 +3950,20 @@ has 'units' => (
 					# Core Unit Identifier
 					'nanosecond' => {
 						'name' => q(നാ.സെ.),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(രാത്രികൾ),
+						'one' => q({0}രാത്രി),
+						'other' => q({0}രാത്രികൾ),
+						'per' => q({0}/രാത്രി),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(രാത്രികൾ),
+						'one' => q({0}രാത്രി),
+						'other' => q({0}രാത്രികൾ),
+						'per' => q({0}/രാത്രി),
 					},
 					# Long Unit Identifier
 					'duration-second' => {
@@ -4097,11 +4155,13 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'mass-carat' => {
+						'name' => q(കാരറ്റ്),
 						'one' => q({0}CD),
 						'other' => q({0}CD),
 					},
 					# Core Unit Identifier
 					'carat' => {
+						'name' => q(കാരറ്റ്),
 						'one' => q({0}CD),
 						'other' => q({0}CD),
 					},
@@ -4464,6 +4524,14 @@ has 'units' => (
 						'1' => q(യോ{0}),
 					},
 					# Long Unit Identifier
+					'10p3' => {
+						'1' => q(കി.{0}),
+					},
+					# Core Unit Identifier
+					'10p3' => {
+						'1' => q(കി.{0}),
+					},
+					# Long Unit Identifier
 					'acceleration-g-force' => {
 						'name' => q(ജി-ഫോഴ്‌സ്),
 						'one' => q({0} ജി),
@@ -4691,15 +4759,15 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'concentr-karat' => {
-						'name' => q(ക്യാരറ്റ്),
-						'one' => q({0} ക്യാ.),
-						'other' => q({0} ക്യാ.),
+						'name' => q(കാരറ്റ്),
+						'one' => q({0} കാ.),
+						'other' => q({0} കാ.),
 					},
 					# Core Unit Identifier
 					'karat' => {
-						'name' => q(ക്യാരറ്റ്),
-						'one' => q({0} ക്യാ.),
-						'other' => q({0} ക്യാ.),
+						'name' => q(കാരറ്റ്),
+						'one' => q({0} കാ.),
+						'other' => q({0} കാ.),
 					},
 					# Long Unit Identifier
 					'concentr-milligram-ofglucose-per-deciliter' => {
@@ -4756,6 +4824,18 @@ has 'units' => (
 					# Core Unit Identifier
 					'permyriad' => {
 						'name' => q(പെ൪മിറിയാഡ്),
+					},
+					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(പാർട്‌സ്/ബില്ല്യൺ),
+						'one' => q({0} പി.പി.ബി.),
+						'other' => q({0} പി.പി.ബി.),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(പാർട്‌സ്/ബില്ല്യൺ),
+						'one' => q({0} പി.പി.ബി.),
+						'other' => q({0} പി.പി.ബി.),
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
@@ -5062,6 +5142,20 @@ has 'units' => (
 						'name' => q(നാനോസെക്കൻഡ്),
 						'one' => q({0} നാ.സെ.),
 						'other' => q({0} നാ.സെ.),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(രാത്രികൾ),
+						'one' => q({0} രാത്രി),
+						'other' => q({0} രാത്രികൾ),
+						'per' => q({0}/രാത്രി),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(രാത്രികൾ),
+						'one' => q({0} രാത്രി),
+						'other' => q({0} രാത്രികൾ),
+						'per' => q({0}/രാത്രി),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -5631,11 +5725,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'mass-carat' => {
-						'name' => q(ക്യാരറ്റ്),
+						'name' => q(കാരറ്റ്),
 					},
 					# Core Unit Identifier
 					'carat' => {
-						'name' => q(ക്യാരറ്റ്),
+						'name' => q(കാരറ്റ്),
 					},
 					# Long Unit Identifier
 					'mass-dalton' => {
@@ -6505,16 +6599,16 @@ has 'number_formats' => (
 					'other' => '000 ദശലക്ഷം',
 				},
 				'1000000000' => {
-					'one' => '0 ലക്ഷം കോടി',
-					'other' => '0 ലക്ഷം കോടി',
+					'one' => '0 ബില്യൺ',
+					'other' => '0 ബില്യൺ',
 				},
 				'10000000000' => {
-					'one' => '00 ലക്ഷം കോടി',
-					'other' => '00 ലക്ഷം കോടി',
+					'one' => '00 ബില്യൺ',
+					'other' => '00 ബില്യൺ',
 				},
 				'100000000000' => {
-					'one' => '000 ലക്ഷം കോടി',
-					'other' => '000 ലക്ഷം കോടി',
+					'one' => '000 ബില്യൺ',
+					'other' => '000 ബില്യൺ',
 				},
 				'1000000000000' => {
 					'one' => '0 ട്രില്യൺ',
@@ -8425,6 +8519,25 @@ has 'calendar_months' => (
 							
 						],
 					},
+					narrow => {
+						nonleap => [
+							'1',
+							'2',
+							'3',
+							'4',
+							'5',
+							'6',
+							'7',
+							'8',
+							'9',
+							'10',
+							'11',
+							'12'
+						],
+						leap => [
+							
+						],
+					},
 					wide => {
 						nonleap => [
 							'ചൈത്രം',
@@ -8439,27 +8552,6 @@ has 'calendar_months' => (
 							'പൗഷം',
 							'മാഘം',
 							'ഫാൽഗുനം'
-						],
-						leap => [
-							
-						],
-					},
-				},
-				'stand-alone' => {
-					narrow => {
-						nonleap => [
-							'ചൈ',
-							'വൈ',
-							'ജ്യേ',
-							'ആ',
-							'ശ്രാ',
-							'ഭാ',
-							'ആ',
-							'കാ',
-							'മാ',
-							'പൗ',
-							'മാ',
-							'ഫ'
 						],
 						leap => [
 							
@@ -9088,7 +9180,7 @@ has 'eras' => (
 		},
 		'gregorian' => {
 			abbreviated => {
-				'0' => 'ക്രി.മു.',
+				'0' => 'ബി.സി.',
 				'1' => 'എഡി'
 			},
 			wide => {
@@ -9244,7 +9336,7 @@ has 'datetime_formats_available_formats' => (
 			Bhms => q{B h:mm:ss},
 			EBhm => q{E, B h:mm},
 			EBhms => q{E, B h:mm:ss},
-			GyMd => q{M/d/y GGGGG},
+			GyMd => q{M/d/y G},
 			MEd => q{d/M, E},
 			MMMMEd => q{MMMM d, E},
 			MMMMW => q{MMMM - ആഴ്ച W},
@@ -9921,9 +10013,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#ന്യൂയോർക്ക്#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#നിപ്പിഗോൺ#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#നോം#,
 		},
@@ -9944,9 +10033,6 @@ has 'time_zone_names' => (
 		},
 		'America/Panama' => {
 			exemplarCity => q#പനാമ#,
-		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#പാൻഗ്‌നിറ്റംഗ്#,
 		},
 		'America/Paramaribo' => {
 			exemplarCity => q#പരാമാരിബോ#,
@@ -9969,9 +10055,6 @@ has 'time_zone_names' => (
 		'America/Punta_Arenas' => {
 			exemplarCity => q#പുന്റ അരീനസ്#,
 		},
-		'America/Rainy_River' => {
-			exemplarCity => q#റെയ്നി റിവർ#,
-		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#റാങ്കിൻ ഇൻലെറ്റ്#,
 		},
@@ -9986,9 +10069,6 @@ has 'time_zone_names' => (
 		},
 		'America/Rio_Branco' => {
 			exemplarCity => q#റിയോ ബ്രാങ്കോ#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#സാന്ത ഇസബേൽ#,
 		},
 		'America/Santarem' => {
 			exemplarCity => q#സാന്ററെം#,
@@ -10035,9 +10115,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#തൂളി#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#തണ്ടർ ബേ#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#തിയുവാന#,
 		},
@@ -10058,9 +10135,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#യാകുറ്റാറ്റ്#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#യെല്ലോനൈഫ്#,
 		},
 		'America_Central' => {
 			long => {
@@ -10235,9 +10309,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#ചീറ്റ#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#ചൊയ്ബൽസൻ#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#കൊളം‌ബോ#,
@@ -10477,9 +10548,6 @@ has 'time_zone_names' => (
 		'Australia/Broken_Hill' => {
 			exemplarCity => q#ബ്രോക്കൺ ഹിൽ#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#ക്യൂറി#,
-		},
 		'Australia/Darwin' => {
 			exemplarCity => q#ഡാർവിൻ#,
 		},
@@ -10606,13 +10674,6 @@ has 'time_zone_names' => (
 				'daylight' => q#ചൈന ഡേലൈറ്റ് സമയം#,
 				'generic' => q#ചൈന സമയം#,
 				'standard' => q#ചൈന സ്റ്റാൻഡേർഡ് സമയം#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#ചോയിബൽസാൻ ഗ്രീഷ്‌മകാല സമയം#,
-				'generic' => q#ചോയി‍ബൽസാൻ സമയം#,
-				'standard' => q#ചോയ്‌ബൽസാൻ സ്റ്റാൻഡേർഡ് സമയം#,
 			},
 		},
 		'Christmas' => {
@@ -10837,9 +10898,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#ഉല്ല്യാനോവ്‌സ്‌ക്#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#ഉസ്ഗൊറോഡ്#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#വാദുസ്#,
 		},
@@ -10860,9 +10918,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#സാക്രെബ്#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#സാപ്പറോസൈ#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#സൂറിച്ച്#,
@@ -11095,6 +11150,11 @@ has 'time_zone_names' => (
 				'standard' => q#പെട്രോപാവ്‌ലോസ്ക് കംചാസ്കി സ്റ്റാൻഡേർഡ് സമയം#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#കസാഖിസ്ഥാൻ സമയം#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#കിഴക്കൻ കസാഖിസ്ഥാൻ സമയം#,
@@ -11153,11 +11213,6 @@ has 'time_zone_names' => (
 				'standard' => q#മകൌ സ്റ്റാൻഡേർഡ് സമയം#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#മക്വാറി ദ്വീപ് സമയം#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#മഗാദൻ ഗ്രീഷ്‌മകാല സമയം#,
@@ -11195,13 +11250,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#മാസൺ സമയം#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#വടക്കുപടിഞ്ഞാറൻ മെക്സിക്കൻ ഡേലൈറ്റ് സമയം#,
-				'generic' => q#വടക്കുപടിഞ്ഞാറൻ മെക്സിക്കൻ സമയം#,
-				'standard' => q#വടക്കുപടിഞ്ഞാറൻ മെക്‌സിക്കൻ സ്റ്റാൻഡേർഡ് സമയം#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -11343,9 +11391,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Honolulu' => {
 			exemplarCity => q#ഹോണലൂലു#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#ജോൺസ്റ്റൺ#,
 		},
 		'Pacific/Kanton' => {
 			exemplarCity => q#കാൻട്ടൻ#,

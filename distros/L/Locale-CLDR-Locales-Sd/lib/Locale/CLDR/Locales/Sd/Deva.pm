@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Sd::Deva - Package for language Sindhi
 
 package Locale::CLDR::Locales::Sd::Deva;
 # This file auto generated from Data\common\main\sd_Deva.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -205,6 +205,32 @@ has 'nostr' => (
 	default		=> sub { qr'^(?i:न|न|no|n)$' }
 );
 
+has 'number_symbols' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+		'arabext' => {
+			'decimal' => q(.),
+		},
+	} }
+);
+
+has 'number_formats' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+		percentFormat => {
+			'default' => {
+				'standard' => {
+					'default' => '0%',
+				},
+			},
+		},
+} },
+);
+
 has 'currencies' => (
 	is			=> 'ro',
 	isa			=> HashRef,
@@ -325,15 +351,15 @@ has 'calendar_months' => (
 					wide => {
 						nonleap => [
 							'जनवरी',
-							'फरवरी',
+							'फेबरवरी',
 							'मार्चु',
-							'अप्रैल',
+							'अप्रेल',
 							'मई',
 							'जून',
 							'जुलाई',
-							'अगस्ट',
+							'आगस्ट',
 							'सप्टेंबर',
-							'ओक्टोबर',
+							'आक्टोबर',
 							'नवंबर',
 							'डिसंबर'
 						],
@@ -384,13 +410,13 @@ has 'calendar_months' => (
 					wide => {
 						nonleap => [
 							'जनवरी',
-							'फरवरी',
+							'फेबरवरी',
 							'मार्चु',
-							'अप्रैल',
+							'अप्रेल',
 							'मई',
 							'जून',
 							'जुलाई',
-							'अगस्ट',
+							'आगस्ट',
 							'सप्टेंबर',
 							'ऑक्टोबर',
 							'नवंबर',
@@ -424,7 +450,7 @@ has 'calendar_days' => (
 					wide => {
 						mon => 'सूमर',
 						tue => 'मंगलु',
-						wed => 'बु॒धर',
+						wed => 'ॿुधर',
 						thu => 'विस्पत',
 						fri => 'जुमो',
 						sat => 'छंछर',
@@ -633,9 +659,9 @@ has 'time_zone_names' => (
 	default	=> sub { {
 		gmtFormat => q(जीएमटी{0}),
 		gmtZeroFormat => q(जीएमटी),
-		regionFormat => q({0} वक्त),
+		regionFormat => q({0} वक़्तु),
 		regionFormat => q({0} दीं॒ह जो वक्त),
-		regionFormat => q({0} मअयारी वक्त),
+		regionFormat => q({0} मइयारी वक़्तु),
 		'America_Central' => {
 			long => {
 				'daylight' => q#मरकज़ी दीं॒ह जो वक्त#,
@@ -702,7 +728,7 @@ has 'time_zone_names' => (
 		},
 		'GMT' => {
 			long => {
-				'standard' => q#ग्रीनविच मीन वक्तु#,
+				'standard' => q#ग्रीनविच मीन वक़्तु#,
 			},
 		},
 	 } }

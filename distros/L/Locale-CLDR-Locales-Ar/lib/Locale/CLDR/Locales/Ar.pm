@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Ar - Package for language Arabic
 
 package Locale::CLDR::Locales::Ar;
 # This file auto generated from Data\common\main\ar.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -1502,6 +1502,7 @@ has 'display_name_language' => (
  				'bin' => 'البينية',
  				'bkm' => 'لغة الكوم',
  				'bla' => 'السيكسيكية',
+ 				'blo' => 'الآنية',
  				'bm' => 'البامبارا',
  				'bn' => 'البنغالية',
  				'bo' => 'التبتية',
@@ -1560,7 +1561,6 @@ has 'display_name_language' => (
  				'dav' => 'تيتا',
  				'de' => 'الألمانية',
  				'de_AT' => 'الألمانية النمساوية',
- 				'de_CH' => 'الألمانية العليا السويسرية',
  				'del' => 'الديلوير',
  				'den' => 'السلافية',
  				'dgr' => 'الدوجريب',
@@ -1583,11 +1583,7 @@ has 'display_name_language' => (
  				'el' => 'اليونانية',
  				'elx' => 'الإمايت',
  				'en' => 'الإنجليزية',
- 				'en_AU' => 'الإنجليزية الأسترالية',
- 				'en_CA' => 'الإنجليزية الكندية',
- 				'en_GB' => 'الإنجليزية البريطانية',
  				'en_GB@alt=short' => 'الإنجليزية المملكة المتحدة',
- 				'en_US' => 'الإنجليزية الأمريكية',
  				'en_US@alt=short' => 'الإنجليزية الولايات المتحدة',
  				'enm' => 'الإنجليزية الوسطى',
  				'eo' => 'الإسبرانتو',
@@ -1609,8 +1605,6 @@ has 'display_name_language' => (
  				'fo' => 'الفاروية',
  				'fon' => 'الفون',
  				'fr' => 'الفرنسية',
- 				'fr_CA' => 'الفرنسية الكندية',
- 				'fr_CH' => 'الفرنسية السويسرية',
  				'frc' => 'الفرنسية الكاجونية',
  				'frm' => 'الفرنسية الوسطى',
  				'fro' => 'الفرنسية القديمة',
@@ -1730,6 +1724,7 @@ has 'display_name_language' => (
  				'kv' => 'الكومي',
  				'kw' => 'الكورنية',
  				'kwk' => 'الكواكوالا',
+ 				'kxv' => 'الكوفية',
  				'ky' => 'القيرغيزية',
  				'la' => 'اللاتينية',
  				'lad' => 'اللادينو',
@@ -1740,6 +1735,7 @@ has 'display_name_language' => (
  				'lez' => 'الليزجية',
  				'lg' => 'الغاندا',
  				'li' => 'الليمبورغية',
+ 				'lij' => 'الليغورية',
  				'lil' => 'الليلويتية',
  				'lkt' => 'لاكوتا',
  				'lmo' => 'اللومبردية',
@@ -1812,7 +1808,6 @@ has 'display_name_language' => (
  				'nia' => 'النياس',
  				'niu' => 'النيوي',
  				'nl' => 'الهولندية',
- 				'nl_BE' => 'الفلمنكية',
  				'nmg' => 'كواسيو',
  				'nn' => 'النرويجية نينورسك',
  				'nnh' => 'لغة النجيمبون',
@@ -1936,6 +1931,7 @@ has 'display_name_language' => (
  				'swb' => 'القمرية',
  				'syc' => 'سريانية تقليدية',
  				'syr' => 'السريانية',
+ 				'szl' => 'السيليزية',
  				'ta' => 'التاميلية',
  				'tce' => 'التوتشون الجنوبية',
  				'te' => 'التيلوغوية',
@@ -1985,7 +1981,9 @@ has 'display_name_language' => (
  				'uz' => 'الأوزبكية',
  				'vai' => 'الفاي',
  				've' => 'الفيندا',
+ 				'vec' => 'البندقية',
  				'vi' => 'الفيتنامية',
+ 				'vmw' => 'الماكوا',
  				'vo' => 'لغة الفولابوك',
  				'vot' => 'الفوتيك',
  				'vun' => 'الفونجو',
@@ -1999,6 +1997,7 @@ has 'display_name_language' => (
  				'wuu' => 'الوو الصينية',
  				'xal' => 'الكالميك',
  				'xh' => 'الخوسا',
+ 				'xnr' => 'كانغري',
  				'xog' => 'السوغا',
  				'yao' => 'الياو',
  				'yap' => 'اليابيز',
@@ -2606,7 +2605,6 @@ has 'display_name_type' => (
  				'phonebook' => q{الترتيب حسب دليل الهاتف},
  				'phonetic' => q{الترتيب حسب اللفظ},
  				'pinyin' => q{الترتيب حسب نظام بنيين الصيني},
- 				'reformed' => q{الترتيب المحسَّن},
  				'search' => q{بحث لأغراض عامة},
  				'searchjl' => q{بحث باستخدام حرف الهانغول الساكن الأول},
  				'standard' => q{ترتيب الفرز القياسي},
@@ -3346,23 +3344,25 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'concentr-milligram-ofglucose-per-deciliter' => {
-						'few' => q({0} مغم/ديسيبل),
-						'many' => q({0} مغم/ديسيبل),
-						'name' => q(مغم/ديسيبل),
-						'one' => q({0} مغم/ديسيبل),
-						'other' => q({0} مغم/ديسيبل),
-						'two' => q({0} مغم/ديسيبل),
-						'zero' => q({0} مغم/ديسيبل),
+						'1' => q(masculine),
+						'few' => q({0} مغم/ديسيلتر),
+						'many' => q({0} مغم/ديسيلتر),
+						'name' => q(مغم/ديسيلتر),
+						'one' => q(مغم/ديسيلتر),
+						'other' => q({0} مغم/ديسيلتر),
+						'two' => q(مغم/ديسيلتر),
+						'zero' => q({0} مغم/ديسيل),
 					},
 					# Core Unit Identifier
 					'milligram-ofglucose-per-deciliter' => {
-						'few' => q({0} مغم/ديسيبل),
-						'many' => q({0} مغم/ديسيبل),
-						'name' => q(مغم/ديسيبل),
-						'one' => q({0} مغم/ديسيبل),
-						'other' => q({0} مغم/ديسيبل),
-						'two' => q({0} مغم/ديسيبل),
-						'zero' => q({0} مغم/ديسيبل),
+						'1' => q(masculine),
+						'few' => q({0} مغم/ديسيلتر),
+						'many' => q({0} مغم/ديسيلتر),
+						'name' => q(مغم/ديسيلتر),
+						'one' => q(مغم/ديسيلتر),
+						'other' => q({0} مغم/ديسيلتر),
+						'two' => q(مغم/ديسيلتر),
+						'zero' => q({0} مغم/ديسيل),
 					},
 					# Long Unit Identifier
 					'concentr-millimole-per-liter' => {
@@ -3463,6 +3463,28 @@ has 'units' => (
 					# Core Unit Identifier
 					'permyriad' => {
 						'1' => q(feminine),
+					},
+					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'1' => q(masculine),
+						'few' => q({0} أجزاء بالمليار),
+						'many' => q({0} جزءًا بالمليار),
+						'name' => q(جزء بالمليار),
+						'one' => q({0} جزء بالمليار),
+						'other' => q({0} جزء بالمليار),
+						'two' => q(جزآن بالمليار),
+						'zero' => q({0} جزء بالمليار),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'1' => q(masculine),
+						'few' => q({0} أجزاء بالمليار),
+						'many' => q({0} جزءًا بالمليار),
+						'name' => q(جزء بالمليار),
+						'one' => q({0} جزء بالمليار),
+						'other' => q({0} جزء بالمليار),
+						'two' => q(جزآن بالمليار),
+						'zero' => q({0} جزء بالمليار),
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
@@ -3837,6 +3859,30 @@ has 'units' => (
 						'zero' => q({0} نانو ثانية),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'1' => q(feminine),
+						'few' => q({0} ليالٍ),
+						'many' => q({0} ليلةً),
+						'name' => q(ليالي),
+						'one' => q(ليلة),
+						'other' => q({0} ليلة),
+						'per' => q({0} في الليلة),
+						'two' => q(ليلتان),
+						'zero' => q({0} ليلة),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'1' => q(feminine),
+						'few' => q({0} ليالٍ),
+						'many' => q({0} ليلةً),
+						'name' => q(ليالي),
+						'one' => q(ليلة),
+						'other' => q({0} ليلة),
+						'per' => q({0} في الليلة),
+						'two' => q(ليلتان),
+						'zero' => q({0} ليلة),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'1' => q(masculine),
 						'few' => q({0} أرباع سنوية),
@@ -4034,6 +4080,7 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'energy-kilocalorie' => {
+						'1' => q(masculine),
 						'few' => q({0} كيلو سعرة),
 						'many' => q({0} كيلو سعرة),
 						'name' => q(كيلو سعرة),
@@ -4044,6 +4091,7 @@ has 'units' => (
 					},
 					# Core Unit Identifier
 					'kilocalorie' => {
+						'1' => q(masculine),
 						'few' => q({0} كيلو سعرة),
 						'many' => q({0} كيلو سعرة),
 						'name' => q(كيلو سعرة),
@@ -4547,6 +4595,14 @@ has 'units' => (
 						'1' => q(masculine),
 					},
 					# Long Unit Identifier
+					'length-point' => {
+						'1' => q(feminine),
+					},
+					# Core Unit Identifier
+					'point' => {
+						'1' => q(feminine),
+					},
+					# Long Unit Identifier
 					'length-solar-radius' => {
 						'few' => q({0} نصف قطر شمسي),
 						'many' => q({0} نصف قطر شمسي),
@@ -5034,6 +5090,7 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'pressure-millimeter-ofhg' => {
+						'1' => q(masculine),
 						'few' => q({0} مليمتر زئبقي),
 						'many' => q({0} مليمتر زئبقي),
 						'name' => q(مليمتر زئبقي),
@@ -5044,6 +5101,7 @@ has 'units' => (
 					},
 					# Core Unit Identifier
 					'millimeter-ofhg' => {
+						'1' => q(masculine),
 						'few' => q({0} مليمتر زئبقي),
 						'many' => q({0} مليمتر زئبقي),
 						'name' => q(مليمتر زئبقي),
@@ -5754,23 +5812,23 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'concentr-milligram-ofglucose-per-deciliter' => {
-						'few' => q({0} مغ/ديسبل),
-						'many' => q({0} مغ/ديسبل),
-						'name' => q(مغ/ديسبل),
-						'one' => q({0} مغ/ديسبل),
-						'other' => q({0} مغ/ديسبل),
-						'two' => q({0} مغ/ديسبل),
-						'zero' => q({0} مغ/ديسبل),
+						'few' => q({0} مغ/ديسيل),
+						'many' => q({0} مغ/ديسيل),
+						'name' => q(مغ/ديسيل),
+						'one' => q({0} مغ/ديسيل),
+						'other' => q({0} مغ/ديسيل),
+						'two' => q({0} مغ/ديسيل),
+						'zero' => q({0} مغ/ديسيل),
 					},
 					# Core Unit Identifier
 					'milligram-ofglucose-per-deciliter' => {
-						'few' => q({0} مغ/ديسبل),
-						'many' => q({0} مغ/ديسبل),
-						'name' => q(مغ/ديسبل),
-						'one' => q({0} مغ/ديسبل),
-						'other' => q({0} مغ/ديسبل),
-						'two' => q({0} مغ/ديسبل),
-						'zero' => q({0} مغ/ديسبل),
+						'few' => q({0} مغ/ديسيل),
+						'many' => q({0} مغ/ديسيل),
+						'name' => q(مغ/ديسيل),
+						'one' => q({0} مغ/ديسيل),
+						'other' => q({0} مغ/ديسيل),
+						'two' => q({0} مغ/ديسيل),
+						'zero' => q({0} مغ/ديسيل),
 					},
 					# Long Unit Identifier
 					'concentr-percent' => {
@@ -5807,6 +5865,26 @@ has 'units' => (
 						'other' => q({0} ؊),
 						'two' => q({0} ؊),
 						'zero' => q({0} ؊),
+					},
+					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'few' => q({0} أجزاء/مليار),
+						'many' => q({0} جزءًا/مليار),
+						'name' => q(جزء/مليار),
+						'one' => q({0} جزء/مليار),
+						'other' => q({0} جزء/مليار),
+						'two' => q(جزآن/مليار),
+						'zero' => q({0} جزء/مليار),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'few' => q({0} أجزاء/مليار),
+						'many' => q({0} جزءًا/مليار),
+						'name' => q(جزء/مليار),
+						'one' => q({0} جزء/مليار),
+						'other' => q({0} جزء/مليار),
+						'two' => q(جزآن/مليار),
+						'zero' => q({0} جزء/مليار),
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
@@ -6033,6 +6111,28 @@ has 'units' => (
 						'name' => q(شهر),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'few' => q({0} ل),
+						'many' => q({0} ل),
+						'name' => q(ليلة),
+						'one' => q({0} ل),
+						'other' => q({0} ل),
+						'per' => q({0}/ل),
+						'two' => q({0} ل),
+						'zero' => q({0} ل),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'few' => q({0} ل),
+						'many' => q({0} ل),
+						'name' => q(ليلة),
+						'one' => q({0} ل),
+						'other' => q({0} ل),
+						'per' => q({0}/ل),
+						'two' => q({0} ل),
+						'zero' => q({0} ل),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'name' => q(ربع),
 						'per' => q({0}/ر),
@@ -6150,6 +6250,7 @@ has 'units' => (
 					'graphics-dot-per-inch' => {
 						'few' => q({0} ن/بوصة),
 						'many' => q({0} ن/بوصة),
+						'name' => q(ن/بوصة),
 						'one' => q({0} ن/بوصة),
 						'other' => q({0} ن/بوصة),
 						'two' => q({0} ن/بوصة),
@@ -6159,6 +6260,7 @@ has 'units' => (
 					'dot-per-inch' => {
 						'few' => q({0} ن/بوصة),
 						'many' => q({0} ن/بوصة),
+						'name' => q(ن/بوصة),
 						'one' => q({0} ن/بوصة),
 						'other' => q({0} ن/بوصة),
 						'two' => q({0} ن/بوصة),
@@ -7238,23 +7340,23 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'concentr-milligram-ofglucose-per-deciliter' => {
-						'few' => q({0} مغم/ديسبل),
-						'many' => q({0} مغم/ديسبل),
-						'name' => q(مغم/ديسبل),
-						'one' => q({0} مغم/ديسبل),
-						'other' => q({0} مغم/ديسبل),
-						'two' => q({0} مغم/ديسبل),
-						'zero' => q({0} مغم/ديسبل),
+						'few' => q({0} مغم/ديسيل),
+						'many' => q({0} مغم/ديسيل),
+						'name' => q(مغم/ديسيل),
+						'one' => q({0} مغم/ديسيل),
+						'other' => q({0} مغم/ديسيل),
+						'two' => q({0} مغم/ديسيل),
+						'zero' => q({0} مغم/ديسيل),
 					},
 					# Core Unit Identifier
 					'milligram-ofglucose-per-deciliter' => {
-						'few' => q({0} مغم/ديسبل),
-						'many' => q({0} مغم/ديسبل),
-						'name' => q(مغم/ديسبل),
-						'one' => q({0} مغم/ديسبل),
-						'other' => q({0} مغم/ديسبل),
-						'two' => q({0} مغم/ديسبل),
-						'zero' => q({0} مغم/ديسبل),
+						'few' => q({0} مغم/ديسيل),
+						'many' => q({0} مغم/ديسيل),
+						'name' => q(مغم/ديسيل),
+						'one' => q({0} مغم/ديسيل),
+						'other' => q({0} مغم/ديسيل),
+						'two' => q({0} مغم/ديسيل),
+						'zero' => q({0} مغم/ديسيل),
 					},
 					# Long Unit Identifier
 					'concentr-millimole-per-liter' => {
@@ -7355,6 +7457,26 @@ has 'units' => (
 						'other' => q({0} جزء/مليون),
 						'two' => q({0} جزء/مليون),
 						'zero' => q({0} جزء/مليون),
+					},
+					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'few' => q({0} أجزاء/مليار),
+						'many' => q({0} جزءًا/مليار),
+						'name' => q(جزء/مليار),
+						'one' => q({0} جزء/مليار),
+						'other' => q({0} جزء/مليار),
+						'two' => q(جزآن/مليار),
+						'zero' => q({0} جزء/مليار),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'few' => q({0} أجزاء/مليار),
+						'many' => q({0} جزءًا/مليار),
+						'name' => q(جزء/مليار),
+						'one' => q({0} جزء/مليار),
+						'other' => q({0} جزء/مليار),
+						'two' => q(جزآن/مليار),
+						'zero' => q({0} جزء/مليار),
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
@@ -7859,6 +7981,28 @@ has 'units' => (
 						'zero' => q({0} ن.ث.),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'few' => q({0} ليالٍ),
+						'many' => q({0} ليلةً),
+						'name' => q(ليلة),
+						'one' => q(ليلة),
+						'other' => q({0} ليلة),
+						'per' => q({0}/ل),
+						'two' => q(ليلتان),
+						'zero' => q({0} ليلة),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'few' => q({0} ليالٍ),
+						'many' => q({0} ليلةً),
+						'name' => q(ليلة),
+						'one' => q(ليلة),
+						'other' => q({0} ليلة),
+						'per' => q({0}/ل),
+						'two' => q(ليلتان),
+						'zero' => q({0} ليلة),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'few' => q({0} أرباع),
 						'many' => q({0} ربعًا),
@@ -8353,7 +8497,7 @@ has 'units' => (
 						'name' => q(نقطة/سم),
 						'one' => q({0} نقطة/سم),
 						'other' => q({0} نقطة/سم),
-						'two' => q({0} نقطتان/سم),
+						'two' => q({0} نقطة/سم),
 						'zero' => q({0} نقطة/سم),
 					},
 					# Core Unit Identifier
@@ -8363,27 +8507,27 @@ has 'units' => (
 						'name' => q(نقطة/سم),
 						'one' => q({0} نقطة/سم),
 						'other' => q({0} نقطة/سم),
-						'two' => q({0} نقطتان/سم),
+						'two' => q({0} نقطة/سم),
 						'zero' => q({0} نقطة/سم),
 					},
 					# Long Unit Identifier
 					'graphics-dot-per-inch' => {
 						'few' => q({0} نقاط/بوصة),
 						'many' => q({0} نقطة/بوصة),
-						'name' => q(نقطة لكل بوصة),
+						'name' => q(نقطة/بوصة),
 						'one' => q({0} نقطة/بوصة),
 						'other' => q({0} نقطة/بوصة),
-						'two' => q(نقطة/بوصة),
+						'two' => q({0} نقطة/بوصة),
 						'zero' => q({0} نقطة/بوصة),
 					},
 					# Core Unit Identifier
 					'dot-per-inch' => {
 						'few' => q({0} نقاط/بوصة),
 						'many' => q({0} نقطة/بوصة),
-						'name' => q(نقطة لكل بوصة),
+						'name' => q(نقطة/بوصة),
 						'one' => q({0} نقطة/بوصة),
 						'other' => q({0} نقطة/بوصة),
-						'two' => q(نقطة/بوصة),
+						'two' => q({0} نقطة/بوصة),
 						'zero' => q({0} نقطة/بوصة),
 					},
 					# Long Unit Identifier
@@ -10568,7 +10712,7 @@ has 'default_numbering_system' => (
 	is			=> 'ro',
 	isa			=> Str,
 	init_arg	=> undef,
-	default		=> 'arab',
+	default		=> 'latn',
 );
 
 has native_numbering_system => (
@@ -10585,7 +10729,10 @@ has 'number_symbols' => (
 	default		=> sub { {
 		'arab' => {
 			'exponential' => q(أس),
-			'nan' => q(ليس رقم),
+			'nan' => q(ليس رقمًا),
+		},
+		'arabext' => {
+			'nan' => q(ليس رقمًا),
 		},
 		'latn' => {
 			'minusSign' => q(‎-),
@@ -13686,22 +13833,22 @@ has 'datetime_formats_interval' => (
 				y => q{E، d‏/M‏/y – E، d‏/M‏/y},
 			},
 			yMMM => {
-				M => q{MMM – MMM، y},
-				y => q{MMM، y – MMM، y},
+				M => q{MMM – MMM y},
+				y => q{MMM y – MMM y},
 			},
 			yMMMEd => {
 				M => q{E، d MMM – E، d MMM، y},
 				d => q{E، d – E، d MMM، y},
-				y => q{E، d MMM، y – E، d MMM، y},
+				y => q{E، d MMM y – E، d MMM y},
 			},
 			yMMMM => {
-				M => q{MMMM – MMMM، y},
-				y => q{MMMM، y – MMMM، y},
+				M => q{MMMM – MMMM y},
+				y => q{MMMM y – MMMM y},
 			},
 			yMMMd => {
-				M => q{d MMM – d MMM، y},
-				d => q{d–d MMM، y},
-				y => q{d MMM، y – d MMM، y},
+				M => q{d MMM – d MMM y},
+				d => q{d–d MMM y},
+				y => q{d MMM y – d MMM y},
 			},
 			yMd => {
 				M => q{d‏/M‏/y – d‏/M‏/y},
@@ -14225,9 +14372,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#نيويورك#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#نيبيجون#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#نوم#,
 		},
@@ -14248,9 +14392,6 @@ has 'time_zone_names' => (
 		},
 		'America/Panama' => {
 			exemplarCity => q#بنما#,
-		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#بانجينتينج#,
 		},
 		'America/Paramaribo' => {
 			exemplarCity => q#باراماريبو#,
@@ -14273,9 +14414,6 @@ has 'time_zone_names' => (
 		'America/Punta_Arenas' => {
 			exemplarCity => q#بونتا أريناز#,
 		},
-		'America/Rainy_River' => {
-			exemplarCity => q#راني ريفر#,
-		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#رانكن انلت#,
 		},
@@ -14290,9 +14428,6 @@ has 'time_zone_names' => (
 		},
 		'America/Rio_Branco' => {
 			exemplarCity => q#ريوبرانكو#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#سانتا إيزابيل#,
 		},
 		'America/Santarem' => {
 			exemplarCity => q#سانتاريم#,
@@ -14339,9 +14474,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#ثيل#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#ثندر باي#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#تيخوانا#,
 		},
@@ -14362,9 +14494,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#ياكوتات#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#يلونيف#,
 		},
 		'America_Central' => {
 			long => {
@@ -14525,9 +14654,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#تشيتا#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#تشوبالسان#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#كولومبو#,
@@ -14767,9 +14893,6 @@ has 'time_zone_names' => (
 		'Australia/Broken_Hill' => {
 			exemplarCity => q#بروكن هيل#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#كوري#,
-		},
 		'Australia/Darwin' => {
 			exemplarCity => q#دارون#,
 		},
@@ -14896,13 +15019,6 @@ has 'time_zone_names' => (
 				'daylight' => q#توقيت الصين الصيفي#,
 				'generic' => q#توقيت الصين#,
 				'standard' => q#توقيت الصين الرسمي#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#التوقيت الصيفي لشويبالسان#,
-				'generic' => q#توقيت شويبالسان#,
-				'standard' => q#توقيت شويبالسان الرسمي#,
 			},
 		},
 		'Christmas' => {
@@ -15127,9 +15243,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#أوليانوفسك#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#أوزجرود#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#فادوز#,
 		},
@@ -15150,9 +15263,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#زغرب#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#زابوروزي#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#زيورخ#,
@@ -15385,6 +15495,11 @@ has 'time_zone_names' => (
 				'standard' => q#توقيت بيتروبافلوفسك-كامتشاتسكي#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#توقيت كازاخستان#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#توقيت شرق كازاخستان#,
@@ -15431,11 +15546,6 @@ has 'time_zone_names' => (
 				'standard' => q#توقيت لورد هاو الرسمي#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#توقيت ماكواري#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#توقيت ماغادان الصيفي#,
@@ -15473,13 +15583,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#توقيت ماوسون#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#التوقيت الصيفي لشمال غرب المكسيك#,
-				'generic' => q#توقيت شمال غرب المكسيك#,
-				'standard' => q#التوقيت الرسمي لشمال غرب المكسيك#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -15621,9 +15724,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Honolulu' => {
 			exemplarCity => q#هونولولو#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#جونستون#,
 		},
 		'Pacific/Kanton' => {
 			exemplarCity => q#كانتون#,

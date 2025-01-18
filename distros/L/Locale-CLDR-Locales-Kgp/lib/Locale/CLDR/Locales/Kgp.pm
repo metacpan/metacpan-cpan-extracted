@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Kgp - Package for language Kaingang
 
 package Locale::CLDR::Locales::Kgp;
 # This file auto generated from Data\common\main\kgp.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -1179,7 +1179,6 @@ has 'display_name_type' => (
  				'phonebook' => q{Terefonĩ Risita to ke},
  				'phonetic' => q{Fonẽtika to ke kuprãg},
  				'pinyin' => q{Pin-yin to nỹtĩ},
- 				'reformed' => q{Hár tãg nỹtĩ},
  				'search' => q{Jẽnfĩn to ke Kar},
  				'searchjl' => q{Hangul kãsonỹte ve jãnfĩn},
  				'standard' => q{to ke pẽ},
@@ -8403,9 +8402,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#Yjórki Tãg#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#Nĩpigãn#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#Jyjy#,
 		},
@@ -8426,9 +8422,6 @@ has 'time_zone_names' => (
 		},
 		'America/Panama' => {
 			exemplarCity => q#Panỹmỹ#,
-		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#Pỹgnĩrtũg#,
 		},
 		'America/Paramaribo' => {
 			exemplarCity => q#Paramỹrimu#,
@@ -8451,9 +8444,6 @@ has 'time_zone_names' => (
 		'America/Punta_Arenas' => {
 			exemplarCity => q#Pũta Arenỹ#,
 		},
-		'America/Rainy_River' => {
-			exemplarCity => q#Tamumã Goj#,
-		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#Rỹgkĩg Ĩrén#,
 		},
@@ -8468,9 +8458,6 @@ has 'time_zone_names' => (
 		},
 		'America/Rio_Branco' => {
 			exemplarCity => q#Goj Kupri#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#Sỹta Isamé#,
 		},
 		'America/Santarem' => {
 			exemplarCity => q#Sỹtarẽj#,
@@ -8517,9 +8504,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#Ture#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#Tũnner Mej#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#Tivỹnỹ#,
 		},
@@ -8540,9 +8524,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#Yjakutati#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#Rógro Mỹrér#,
 		},
 		'America_Central' => {
 			long => {
@@ -8714,9 +8695,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#Sita#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#Sojmarsỹ#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#Korãmmu#,
@@ -8941,9 +8919,6 @@ has 'time_zone_names' => (
 		'Australia/Broken_Hill' => {
 			exemplarCity => q#Mruken Hir#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#Kurije#,
-		},
 		'Australia/Darwin' => {
 			exemplarCity => q#Narvĩn#,
 		},
@@ -9075,13 +9050,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Rỹ Kã óra Sĩnỹ tá#,
 				'generic' => q#Óra Sĩnỹ tá#,
 				'standard' => q#Óra Pã Sĩnỹ tá#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Rỹ Kã óra Sojmarsỹ tá#,
-				'generic' => q#Óra Sojmarsỹ tá#,
-				'standard' => q#Óra Pã Sojmarsỹ tá#,
 			},
 		},
 		'Christmas' => {
@@ -9303,9 +9271,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#Urijanãvinhki#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#Ungoron#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#Vanuj#,
 		},
@@ -9326,9 +9291,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#Jagréme#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#Japorisija#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#Jurike#,
@@ -9616,11 +9578,6 @@ has 'time_zone_names' => (
 				'standard' => q#Óra Pã Mỹkav tá#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Óra Mỹkikuari Goj-vẽso tá#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Rỹ Kã óra Mỹganan tá#,
@@ -9658,13 +9615,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Óra Mỹusãn tá#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Rỹ Kã óra Mẽsiku Nãrti-Rãpur tá#,
-				'generic' => q#Óra Mẽsiku Nãrti-Rãpur tá#,
-				'standard' => q#Óra Pã Mẽsiku Nãrti-Rãpur tá#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -9803,9 +9753,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Honolulu' => {
 			exemplarCity => q#Honãruru#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#Nhionhtãn#,
 		},
 		'Pacific/Kiritimati' => {
 			exemplarCity => q#Kiritimỹti#,

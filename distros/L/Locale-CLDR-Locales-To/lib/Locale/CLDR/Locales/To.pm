@@ -8,18 +8,18 @@ Locale::CLDR::Locales::To - Package for language Tongan
 
 package Locale::CLDR::Locales::To;
 # This file auto generated from Data\common\main\to.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -102,6 +102,8 @@ has 'display_name_language' => (
  				'bjn' => 'lea fakapanisali',
  				'bkm' => 'lea fakakome',
  				'bla' => 'lea fakasikesikā',
+ 				'blo' => 'lea fakaʻanī',
+ 				'blt' => 'lea fakatāitāmi',
  				'bm' => 'lea fakapamipala',
  				'bn' => 'lea fakapāngilā',
  				'bo' => 'lea fakatipeti',
@@ -137,6 +139,7 @@ has 'display_name_language' => (
  				'chp' => 'lea fakasipeuiani',
  				'chr' => 'lea fakaselokī',
  				'chy' => 'lea fakaseiene',
+ 				'cic' => 'lea fakatisikasā',
  				'ckb' => 'lea fakakūtisi-loloto',
  				'ckb@alt=variant' => 'lea fakakūtisi-solani',
  				'clc' => 'lea fakatisilikōtini',
@@ -242,7 +245,6 @@ has 'display_name_language' => (
  				'gmh' => 'lea fakasiamane-hake-lotoloto',
  				'gn' => 'lea fakakualani',
  				'goh' => 'lea fakasiamane-hake-motuʻa',
- 				'gom' => 'lea fakakonikanī-koani',
  				'gon' => 'lea fakakonitī',
  				'gor' => 'lea fakakolonitalo',
  				'got' => 'lea fakakotika',
@@ -268,6 +270,7 @@ has 'display_name_language' => (
  				'hil' => 'lea fakahilikainoni',
  				'hit' => 'lea fakahitite',
  				'hmn' => 'lea fakamōngi',
+ 				'hnj' => 'lea fakamunginiā',
  				'ho' => 'lea fakahili-motu',
  				'hr' => 'lea fakakuloisia',
  				'hsb' => 'lea fakasōpia-hake',
@@ -354,6 +357,7 @@ has 'display_name_language' => (
  				'kv' => 'lea fakakomi',
  				'kw' => 'lea fakakoniuali',
  				'kwk' => 'lea fakakuakuala',
+ 				'kxv' => 'lea fakakuvi',
  				'ky' => 'lea fakakīsisi',
  				'la' => 'lea fakalatina',
  				'lad' => 'lea fakalatino',
@@ -369,6 +373,7 @@ has 'display_name_language' => (
  				'lil' => 'lea fakalilōeti',
  				'liv' => 'lea fakalivonia',
  				'lkt' => 'lea fakalakota',
+ 				'lld' => 'lea fakalatīni',
  				'lmo' => 'lea fakalomipāti',
  				'ln' => 'lea lingikala',
  				'lo' => 'lea fakalau',
@@ -407,6 +412,7 @@ has 'display_name_language' => (
  				'mgh' => 'lea fakamakūa-meʻeto',
  				'mgo' => 'lea fakametā',
  				'mh' => 'lea fakamāsolo',
+ 				'mhn' => 'lea fakamokeno',
  				'mi' => 'lea fakamāuli',
  				'mic' => 'lea fakamikemaki',
  				'min' => 'lea fakaminangikapau',
@@ -556,6 +562,7 @@ has 'display_name_language' => (
  				'si' => 'lea fakasingihala',
  				'sid' => 'lea fakasitamo',
  				'sk' => 'lea fakasolāvaki',
+ 				'skr' => 'lea fakasalāʻikī',
  				'sl' => 'lea fakasolovenia',
  				'slh' => 'lea fakalusūtisiti',
  				'sli' => 'lea fakasilesia-hifo',
@@ -620,6 +627,7 @@ has 'display_name_language' => (
  				'tr' => 'lea fakatoake',
  				'tru' => 'lea fakatuloio',
  				'trv' => 'lea fakataloko',
+ 				'trw' => 'lea fakatolivali',
  				'ts' => 'lea fakatisonga',
  				'tsd' => 'lea fakasakōnia',
  				'tsi' => 'lea fakatisīmisiani',
@@ -648,6 +656,7 @@ has 'display_name_language' => (
  				'vi' => 'lea fakavietinami',
  				'vls' => 'lea fakavelamingi-hihifo',
  				'vmf' => 'lea fakafalanikoni-loloto',
+ 				'vmw' => 'lea fakamakuva',
  				'vo' => 'lea fakavolapiki',
  				'vot' => 'lea fakavotiki',
  				'vro' => 'lea fakavōlo',
@@ -663,6 +672,7 @@ has 'display_name_language' => (
  				'xal' => 'lea fakakalimiki',
  				'xh' => 'lea fakatōsa',
  				'xmf' => 'lea fakamingilelia',
+ 				'xnr' => 'lea fakakangilī',
  				'xog' => 'lea fakasoka',
  				'yao' => 'lea fakaʻiao',
  				'yap' => 'lea fakaʻiapi',
@@ -750,6 +760,7 @@ has 'display_name_script' => (
  			'Elba' => 'tohinima fakaʻelepasani',
  			'Elym' => 'tohinima fakaʻelimiti',
  			'Ethi' => 'tohinima fakaʻītiōpia',
+ 			'Gara' => 'tohinima fakakalai',
  			'Geok' => 'tohinima fakakutusuli-seōsia',
  			'Geor' => 'tohinima fakaseōsia',
  			'Glag' => 'tohinima fakakalakoliti',
@@ -759,6 +770,7 @@ has 'display_name_script' => (
  			'Gran' => 'tohinima fakasilanitā',
  			'Grek' => 'tohinima fakakalisi',
  			'Gujr' => 'tohinima fakaʻinitia-kutalati',
+ 			'Gukh' => 'tohinima fakakulungikema',
  			'Guru' => 'tohinima fakakūmuki',
  			'Hanb' => 'tohinima fakahānipi',
  			'Hang' => 'tohinima fakakōlea-hāngūlu',
@@ -792,6 +804,7 @@ has 'display_name_script' => (
  			'Knda' => 'tohinima fakaʻinitia-kanata',
  			'Kore' => 'tohinima fakakōlea',
  			'Kpel' => 'tohinima fakakepele',
+ 			'Krai' => 'tohinima fakakilatilai',
  			'Kthi' => 'tohinima fakakaiatī',
  			'Lana' => 'tohinima fakalana',
  			'Laoo' => 'tohinima fakalau',
@@ -834,6 +847,7 @@ has 'display_name_script' => (
  			'Nshu' => 'tohinima fakanasiū',
  			'Ogam' => 'tohinima fakaʻokami',
  			'Olck' => 'tohinima fakaʻolisiki',
+ 			'Onao' => 'tohinima fakaʻoliʻonali',
  			'Orkh' => 'tohinima fakaʻolikoni',
  			'Orya' => 'tohinima fakaʻotia',
  			'Osge' => 'tohinima fakaʻosase',
@@ -869,6 +883,7 @@ has 'display_name_script' => (
  			'Sora' => 'tohinima fakasolasomipengi',
  			'Soyo' => 'tohinima fakasoiōmipo',
  			'Sund' => 'tohinima fakasunitā',
+ 			'Sunu' => 'tohinima fakasunuvali',
  			'Sylo' => 'tohinima fakasailoti-nakili',
  			'Syrc' => 'tohinima fakasuliāiā',
  			'Syre' => 'tohinima fakasuliāiā-ʻesitelangelo',
@@ -890,7 +905,9 @@ has 'display_name_script' => (
  			'Tibt' => 'tohinima fakataipeti',
  			'Tirh' => 'tohinima fakatīhuta',
  			'Tnsa' => 'tohinima fakatangisā',
+ 			'Todr' => 'tohinima fakatotili',
  			'Toto' => 'tohinima fakatoto',
+ 			'Tutg' => 'tohinima fakatulutikalāli',
  			'Ugar' => 'tohinima fakaʻūkaliti',
  			'Vaii' => 'tohinima fakavai',
  			'Visp' => 'tohinima fakafonētiki-hāmai',
@@ -1253,6 +1270,7 @@ has 'display_name_variant' => (
  			'AKUAPEM' => 'lea fakafeituʻu fakaʻakuapemi',
  			'ALALC97' => 'mataʻitohi liliu laipeli ʻamelika 1997',
  			'ALUKU' => 'lea fakafeituʻu fakaʻaluku',
+ 			'ANPEZO' => 'lea fakafeituʻu fakaʻanipeso',
  			'AO1990' => 'sipelatotonu ʻoe lea fakapotukali he 1990',
  			'ARANES' => 'lea fakafeituʻu fakaʻalanese',
  			'AREVELA' => 'lea fakaʻāmenia-hahake',
@@ -1265,6 +1283,7 @@ has 'display_name_variant' => (
  			'BARLA' => 'lea fakafeituʻu fakapālavenito-pupunga',
  			'BASICENG' => 'lea fakapilitānia fakafaingofua',
  			'BAUDDHA' => 'lea fakafeituʻu fakaputa-sanisikiliti-tuifio',
+ 			'BCIZBL' => 'fakaʻilonga pilisi',
  			'BISCAYAN' => 'lea fakafeituʻu fakapisikaea',
  			'BISKE' => 'lea fakafeituʻu fakapila mo fakasā-siōsio',
  			'BOHORIC' => 'motuʻalea fakapoholisi',
@@ -1320,6 +1339,7 @@ has 'display_name_variant' => (
  			'PAHAWH4' => 'lea fakafeituʻu pahau-mongi, sitepu hono fā',
  			'PAMAKA' => 'lea fakafeituʻu fakapamaka',
  			'PEANO' => 'lea fakalatina-peano',
+ 			'PEHOEJI' => 'mataʻitohi liliu fakapeʻōesī',
  			'PETR1708' => 'lea fakafeituʻu fakalūsia-peterine',
  			'PINYIN' => 'mataʻitohi liliu fakapīnīni',
  			'POLYTON' => 'fasiʻalea lahi',
@@ -1341,6 +1361,7 @@ has 'display_name_variant' => (
  			'SURSILV' => 'lea fakafeituʻu fakasulisiliva',
  			'SUTSILV' => 'lea fakafeituʻu fakasutisiliva',
  			'SYNNEJYL' => 'lea fakafeituʻu fakafonuasuti',
+ 			'TAILO' => 'mataʻitohi liliu fakatailo',
  			'TARASK' => 'sipelatotunu fakatalasikievika',
  			'TONGYONG' => 'lea fakafeituʻu fakasiaina-tōngiongi',
  			'TUNUMIIT' => 'lea fakafeituʻu fakatunimīti',
@@ -1349,6 +1370,7 @@ has 'display_name_variant' => (
  			'ULSTER' => 'lea fakafeituʻu fakaʻulisitā',
  			'UNIFON' => 'motuʻalea fonētiki ʻo Unifoni',
  			'VAIDIKA' => 'lea fakafeituʻu fakasanisikiliti-vetā',
+ 			'VALBADIA' => 'lea fakafeituʻu fakavalipātia',
  			'VALENCIA' => 'lea fakafeituʻu fakavalenisia',
  			'VALLADER' => 'lea fakafeituʻu fakavalate',
  			'VECDRUKA' => 'lea fakafeituʻu fakalativia-vekātuluka',
@@ -1460,12 +1482,14 @@ has 'display_name_type' => (
  				'diak' => q{fika fakativehi-akuru},
  				'ethi' => q{fika fakaʻītiōpia},
  				'fullwide' => q{fika laulahi},
+ 				'gara' => q{fika fakakalai},
  				'geor' => q{fika fakaseōsia},
  				'gong' => q{fika fakakoniti-kunisala},
  				'gonm' => q{fika fakakoniti–masalami},
  				'grek' => q{fika fakakalisi},
  				'greklow' => q{fika fakakalisi fakalalo},
  				'gujr' => q{fika fakakutalati},
+ 				'gukh' => q{fika fakakulungikema},
  				'guru' => q{fika fakakūmuki},
  				'hanidec' => q{fika fakasiaina},
  				'hans' => q{fika fakasiaina fakafaingofua},
@@ -1482,6 +1506,7 @@ has 'display_name_type' => (
  				'kawi' => q{fika fakakaui},
  				'khmr' => q{fika fakakamipōtia},
  				'knda' => q{fika fakakanata},
+ 				'krai' => q{fika fakakilatilai},
  				'lana' => q{fika fakatai-tami-hola},
  				'lanatham' => q{fika fakatai-tami-tami},
  				'laoo' => q{fika fakalau},
@@ -1499,13 +1524,17 @@ has 'display_name_type' => (
  				'mroo' => q{fika fakamolō},
  				'mtei' => q{fika fakametei-maieki},
  				'mymr' => q{fika fakapema},
+ 				'mymrepka' => q{fika fakapiloukaleni},
+ 				'mymrpao' => q{fika fakapaʻō},
  				'mymrshan' => q{fika fakapema-siani},
  				'mymrtlng' => q{fika fakapema-tai},
  				'nagm' => q{fika fakamunitali-naki},
  				'nkoo' => q{fika fakanikō},
  				'olck' => q{fika fakaʻolisiki},
+ 				'onao' => q{fika fakaʻoliʻonali},
  				'orya' => q{fika fakaʻotia},
  				'osma' => q{fika fakaʻosimania},
+ 				'outlined' => q{fika fakatapa},
  				'rohg' => q{fika fakalohingia-hanifi},
  				'roman' => q{fika fakaloma},
  				'romanlow' => q{fika fakaloma fakalalo},
@@ -1515,6 +1544,7 @@ has 'display_name_type' => (
  				'sinh' => q{fika fakasingihala},
  				'sora' => q{fika fakasola-somipenga},
  				'sund' => q{fika fakasunitā},
+ 				'sunu' => q{fika fakasunuvali},
  				'takr' => q{fika fakatakili},
  				'talu' => q{fika fakatai-lue foʻou},
  				'taml' => q{fika fakatamili tukufakaholo},
@@ -2112,6 +2142,16 @@ has 'units' => (
 						'other' => q(pemano ʻe {0}),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(konga ʻi he piliona),
+						'other' => q(konga ʻe {0} ʻi he piliona),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(konga ʻi he piliona),
+						'other' => q(konga ʻe {0} ʻi he piliona),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(lita he kilomita ʻe 100),
 						'other' => q(lita ʻe {0} he kilomita ʻe 100),
@@ -2336,6 +2376,18 @@ has 'units' => (
 						'other' => q(nanosekoni ʻe {0}),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(pō),
+						'other' => q(pō ʻe {0}),
+						'per' => q({0} he pō),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(pō),
+						'other' => q(pō ʻe {0}),
+						'per' => q({0} he pō),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'per' => q({0} he kuata),
 					},
@@ -2506,10 +2558,12 @@ has 'units' => (
 					# Long Unit Identifier
 					'force-kilowatt-hour-per-100-kilometer' => {
 						'name' => q(kilouate-houa he kilomita ʻe 100),
+						'other' => q(kilouate-houa ʻe {0} he kilomita ʻe 100),
 					},
 					# Core Unit Identifier
 					'kilowatt-hour-per-100-kilometer' => {
 						'name' => q(kilouate-houa he kilomita ʻe 100),
+						'other' => q(kilouate-houa ʻe {0} he kilomita ʻe 100),
 					},
 					# Long Unit Identifier
 					'force-newton' => {
@@ -3240,6 +3294,16 @@ has 'units' => (
 					'knot' => {
 						'name' => q(fakapona),
 						'other' => q(fakapona ʻe {0}),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(vavemaama),
+						'other' => q(vavemaama ʻe {0}),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(vavemaama),
+						'other' => q(vavemaama ʻe {0}),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -4100,6 +4164,18 @@ has 'units' => (
 						'other' => q({0} ns),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(pō),
+						'other' => q(pō ʻe {0}),
+						'per' => q({0}/pō),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(pō),
+						'other' => q(pō ʻe {0}),
+						'per' => q({0}/pō),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'name' => q(kt),
 						'other' => q({0} kt),
@@ -4848,6 +4924,16 @@ has 'units' => (
 					# Core Unit Identifier
 					'knot' => {
 						'other' => q({0} fp),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(vm),
+						'other' => q({0} vm),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(vm),
+						'other' => q({0} vm),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -5738,6 +5824,18 @@ has 'units' => (
 						'other' => q(ns ʻe {0}),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(pō),
+						'other' => q(pō ʻe {0}),
+						'per' => q({0}/pō),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(pō),
+						'other' => q(pō ʻe {0}),
+						'per' => q({0}/pō),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'name' => q(kuata),
 						'other' => q(kuata ʻe {0}),
@@ -6602,6 +6700,16 @@ has 'units' => (
 					'knot' => {
 						'name' => q(fp),
 						'other' => q(fp ʻe {0}),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(vm),
+						'other' => q(vm ʻe {0}),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(vm),
+						'other' => q(vm ʻe {0}),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -8180,29 +8288,17 @@ has 'time_zone_names' => (
 				'standard' => q#houa fakaʻamasōne taimi totonu#,
 			},
 		},
-		'America/Asuncion' => {
-			exemplarCity => q#Asunción#,
-		},
 		'America/Bahia_Banderas' => {
 			exemplarCity => q#Bahia Banderas#,
 		},
 		'America/Cancun' => {
 			exemplarCity => q#Cancun#,
 		},
-		'America/Curacao' => {
-			exemplarCity => q#Curaçao#,
-		},
 		'America/Merida' => {
 			exemplarCity => q#Merida#,
 		},
 		'America/New_York' => {
 			exemplarCity => q#Niu ʻIoke#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#Santa Isabel#,
-		},
-		'America/St_Barthelemy' => {
-			exemplarCity => q#St. Barthélemy#,
 		},
 		'America_Central' => {
 			long => {
@@ -8312,9 +8408,6 @@ has 'time_zone_names' => (
 		},
 		'Australia/Brisbane' => {
 			exemplarCity => q#Pelisipane#,
-		},
-		'Australia/Currie' => {
-			exemplarCity => q#Currie#,
 		},
 		'Australia/Melbourne' => {
 			exemplarCity => q#Melipoane#,
@@ -8431,13 +8524,6 @@ has 'time_zone_names' => (
 				'standard' => q#houa fakasiaina taimi totonu#,
 			},
 		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#houa fakakoipalisani taimi liliu#,
-				'generic' => q#houa fakakoipalisani#,
-				'standard' => q#houa fakakoipalisani taimi totonu#,
-			},
-		},
 		'Christmas' => {
 			long => {
 				'standard' => q#houa fakamotukilisimasi#,
@@ -8532,9 +8618,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Rome' => {
 			exemplarCity => q#Loma#,
-		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#Uzhhorod#,
 		},
 		'Europe/Vatican' => {
 			exemplarCity => q#Vatikani#,
@@ -8671,9 +8754,6 @@ has 'time_zone_names' => (
 				'standard' => q#houa fakaʻinitia#,
 			},
 		},
-		'Indian/Reunion' => {
-			exemplarCity => q#Réunion#,
-		},
 		'Indian_Ocean' => {
 			long => {
 				'standard' => q#houa fakamoanaʻinitia#,
@@ -8734,6 +8814,11 @@ has 'time_zone_names' => (
 				'standard' => q#houa fakalūsia-petelopavilovisiki taimi totonu#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#houa fakakasakitani#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#houa fakakasakitani-hahake#,
@@ -8792,11 +8877,6 @@ has 'time_zone_names' => (
 				'standard' => q#houa fakamakau taimi totonu#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#houa fakamotumakuali#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#houa fakalūsia-makatani taimi liliu#,
@@ -8834,13 +8914,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#houa fakamausoni#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#houa fakamekisikou-tokelauhihifo taimi liliu#,
-				'generic' => q#houa fakamekisikou-tokelauhihifo#,
-				'standard' => q#houa fakamekisikou-tokelauhihifo taimi totonu#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -8970,9 +9043,6 @@ has 'time_zone_names' => (
 				'standard' => q#HTT#,
 			},
 		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#Sionesitoni#,
-		},
 		'Pacific/Kanton' => {
 			exemplarCity => q#Kanitoni#,
 		},
@@ -9002,6 +9072,9 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Norfolk' => {
 			exemplarCity => q#Noafōki#,
+		},
+		'Pacific/Noumea' => {
+			exemplarCity => q#Numea#,
 		},
 		'Pacific/Pago_Pago' => {
 			exemplarCity => q#Pangopango#,

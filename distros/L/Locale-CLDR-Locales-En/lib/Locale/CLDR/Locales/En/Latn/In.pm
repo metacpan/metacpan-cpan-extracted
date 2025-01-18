@@ -8,18 +8,18 @@ Locale::CLDR::Locales::En::Latn::In - Package for language English
 
 package Locale::CLDR::Locales::En::Latn::In;
 # This file auto generated from Data\common\main\en_IN.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -978,6 +978,14 @@ has 'units' => (
 						'other' => q({0} earth radius),
 					},
 					# Long Unit Identifier
+					'mass-tonne' => {
+						'name' => q(metric tonnes),
+					},
+					# Core Unit Identifier
+					'tonne' => {
+						'name' => q(metric tonnes),
+					},
+					# Long Unit Identifier
 					'temperature-generic' => {
 						'name' => q(°),
 						'one' => q({0}°),
@@ -1025,12 +1033,12 @@ has 'number_formats' => (
 		decimalFormat => {
 			'default' => {
 				'1000' => {
-					'one' => '0T',
-					'other' => '0T',
+					'one' => '0K',
+					'other' => '0K',
 				},
 				'10000' => {
-					'one' => '00T',
-					'other' => '00T',
+					'one' => '00K',
+					'other' => '00K',
 				},
 				'100000' => {
 					'one' => '0L',
@@ -1053,12 +1061,12 @@ has 'number_formats' => (
 					'other' => '000Cr',
 				},
 				'10000000000' => {
-					'one' => '0TCr',
-					'other' => '0TCr',
+					'one' => '0KCr',
+					'other' => '0KCr',
 				},
 				'100000000000' => {
-					'one' => '00TCr',
-					'other' => '00TCr',
+					'one' => '00KCr',
+					'other' => '00KCr',
 				},
 				'1000000000000' => {
 					'one' => '0LCr',
@@ -1078,12 +1086,12 @@ has 'number_formats' => (
 			},
 			'short' => {
 				'1000' => {
-					'one' => '0T',
-					'other' => '0T',
+					'one' => '0K',
+					'other' => '0K',
 				},
 				'10000' => {
-					'one' => '00T',
-					'other' => '00T',
+					'one' => '00K',
+					'other' => '00K',
 				},
 				'100000' => {
 					'one' => '0L',
@@ -1106,12 +1114,12 @@ has 'number_formats' => (
 					'other' => '000Cr',
 				},
 				'10000000000' => {
-					'one' => '0TCr',
-					'other' => '0TCr',
+					'one' => '0KCr',
+					'other' => '0KCr',
 				},
 				'100000000000' => {
-					'one' => '00TCr',
-					'other' => '00TCr',
+					'one' => '00KCr',
+					'other' => '00KCr',
 				},
 				'1000000000000' => {
 					'one' => '0LCr',
@@ -1159,8 +1167,45 @@ has 'currencies' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'KGS' => {
+			display_name => {
+				'currency' => q(Kyrgyzstani Som),
+				'one' => q(Kyrgyzstani som),
+				'other' => q(Kyrgyzstani soms),
+			},
+		},
+		'KZT' => {
+			display_name => {
+				'one' => q(Kazakhstani Tenge),
+				'other' => q(Kazakhstani Tenges),
+			},
+		},
+		'SLE' => {
+			display_name => {
+				'one' => q(Sierra Leonean Leone),
+				'other' => q(Sierra Leonean Leones),
+			},
+		},
+		'TJS' => {
+			display_name => {
+				'one' => q(Tajikistani Somoni),
+				'other' => q(Tajikistani Somonis),
+			},
+		},
+		'TMT' => {
+			display_name => {
+				'one' => q(Turkmenistani Manat),
+				'other' => q(Turkmenistani Manat),
+			},
+		},
 		'USD' => {
 			symbol => '$',
+		},
+		'UZS' => {
+			display_name => {
+				'one' => q(Uzbekistani Som),
+				'other' => q(Uzbekistani Som),
+			},
 		},
 		'VEF' => {
 			display_name => {
@@ -1171,9 +1216,9 @@ has 'currencies' => (
 		},
 		'VES' => {
 			display_name => {
-				'currency' => q(VES),
-				'one' => q(VES),
-				'other' => q(VES),
+				'currency' => q(VEF),
+				'one' => q(VEF),
+				'other' => q(VEF),
 			},
 		},
 	} },
@@ -1274,22 +1319,6 @@ around day_period_data => sub {
     return $self->$orig;
 };
 
-has 'day_periods' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		'gregorian' => {
-			'stand-alone' => {
-				'narrow' => {
-					'am' => q{am},
-					'pm' => q{pm},
-				},
-			},
-		},
-	} },
-);
-
 has 'eras' => (
 	is			=> 'ro',
 	isa			=> HashRef,
@@ -1310,13 +1339,13 @@ has 'date_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
-			'full' => q{EEEE d MMMM, y G},
+			'full' => q{EEEE, d MMMM y G},
 			'long' => q{d MMMM, y G},
 			'medium' => q{d MMM, y G},
 			'short' => q{dd/MM/y GGGGG},
 		},
 		'gregorian' => {
-			'full' => q{EEEE d MMMM, y},
+			'full' => q{EEEE, d MMMM y},
 			'long' => q{d MMMM y},
 			'medium' => q{d MMM y},
 			'short' => q{dd/MM/yy},
@@ -1383,20 +1412,20 @@ has 'datetime_formats_available_formats' => (
 			Ehm => q{E, h:mm a},
 			Ehms => q{E, h:mm:ss a},
 			GyMMM => q{MMM, y G},
-			GyMMMEEEEd => q{EEEE d MMM, y G},
+			GyMMMEEEEd => q{EEEE, d MMM y G},
 			GyMMMEd => q{E, d MMM, y G},
 			GyMMMd => q{d MMM, y G},
 			MEd => q{E, d/M},
-			MMMEEEEd => q{EEEE d MMM},
-			MMMMEEEEd => q{EEEE d MMMM},
+			MMMEEEEd => q{EEEE, d MMM},
+			MMMMEEEEd => q{EEEE, d MMMM},
 			Md => q{d/M},
 			yyyyM => q{M/y GGGGG},
 			yyyyMEd => q{E, d/M/y GGGGG},
 			yyyyMMM => q{MMM, y G},
-			yyyyMMMEEEEd => q{EEEE d MMM, y G},
+			yyyyMMMEEEEd => q{EEEE, d MMM y G},
 			yyyyMMMEd => q{E, d MMM, y G},
 			yyyyMMMM => q{MMMM, y G},
-			yyyyMMMMEEEEd => q{EEEE d MMMM, y G},
+			yyyyMMMMEEEEd => q{EEEE, d MMMM y G},
 			yyyyMMMd => q{d MMM, y G},
 			yyyyMd => q{d/M/y G},
 		},
@@ -1407,26 +1436,31 @@ has 'datetime_formats_available_formats' => (
 			EHms => q{E, HH:mm:ss},
 			Ehm => q{E, h:mm a},
 			Ehms => q{E, h:mm:ss a},
-			GyMMMEEEEd => q{EEEE d MMM, y G},
-			MMMEEEEd => q{EEEE d MMM},
-			MMMMEEEEd => q{EEEE d MMMM},
+			GyMMMEEEEd => q{EEEE, d MMM y G},
+			MMMEEEEd => q{EEEE, d MMM},
+			MMMMEEEEd => q{EEEE, d MMMM},
 			yMEd => q{E, d/M/y},
-			yMMMEEEEd => q{EEEE d MMM, y},
+			yMMMEEEEd => q{EEEE, d MMM y},
 			yMMMEd => q{E, d MMM, y},
-			yMMMMEEEEd => q{EEEE d MMMM, y},
+			yMMMMEEEEd => q{EEEE, d MMMM y},
 			yMd => q{d/M/y},
 		},
 		'islamic' => {
 			Ed => q{E d},
 			GyMMM => q{MMM, y G},
+			GyMMMEEEEd => q{EEEE d MMM y G},
 			GyMMMEd => q{E, d MMM, y G},
 			GyMMMd => q{d MMM, y G},
 			MEd => q{E, d/M},
+			MMMEEEEd => q{EEE, d MMM},
+			MMMMEEEEd => q{d EEEE MMMM},
 			Md => q{d/M},
 			yyyyMEd => q{E d/M/y G},
 			yyyyMMM => q{MMM, y G},
+			yyyyMMMEEEEd => q{EEEE, d MMM y},
 			yyyyMMMEd => q{E, d MMM, y G},
 			yyyyMMMM => q{MMMM, y G},
+			yyyyMMMMEEEEd => q{EEEE, d MMMM y},
 			yyyyMMMd => q{d MMM, y G},
 			yyyyMd => q{d/M/y G},
 		},
@@ -1539,12 +1573,22 @@ has 'time_zone_names' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default	=> sub { {
-		'Asia/Rangoon' => {
-			exemplarCity => q#Rangoon#,
+		'Asia/Hovd' => {
+			exemplarCity => q#Khovd#,
+		},
+		'Asia/Qyzylorda' => {
+			exemplarCity => q#Kyzylorda#,
 		},
 		'Gulf' => {
 			short => {
 				'standard' => q#GST#,
+			},
+		},
+		'Hovd' => {
+			long => {
+				'daylight' => q#Khovd Summer Time#,
+				'generic' => q#Khovd Time#,
+				'standard' => q#Khovd Standard Time#,
 			},
 		},
 		'India' => {

@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Ca - Package for language Catalan
 
 package Locale::CLDR::Locales::Ca;
 # This file auto generated from Data\common\main\ca.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -1383,6 +1383,7 @@ has 'display_name_language' => (
  				'be' => 'belarús',
  				'bej' => 'beja',
  				'bem' => 'bemba',
+ 				'bew' => 'betawi',
  				'bez' => 'bena',
  				'bfd' => 'bafut',
  				'bfq' => 'badaga',
@@ -1395,6 +1396,7 @@ has 'display_name_language' => (
  				'bin' => 'edo',
  				'bkm' => 'kom',
  				'bla' => 'blackfoot',
+ 				'blo' => 'anii',
  				'bm' => 'bambara',
  				'bn' => 'bengalí',
  				'bo' => 'tibetà',
@@ -1428,6 +1430,7 @@ has 'display_name_language' => (
  				'chp' => 'chipewyan',
  				'chr' => 'cherokee',
  				'chy' => 'xeiene',
+ 				'cic' => 'chickasaw',
  				'ckb' => 'kurd central',
  				'ckb@alt=menu' => 'sorani',
  				'ckb@alt=variant' => 'kurd sorani',
@@ -1529,7 +1532,6 @@ has 'display_name_language' => (
  				'gmh' => 'alt alemany mitjà',
  				'gn' => 'guaraní',
  				'goh' => 'alt alemany antic',
- 				'gom' => 'concani de Goa',
  				'gon' => 'gondi',
  				'gor' => 'gorontalo',
  				'got' => 'gòtic',
@@ -1553,6 +1555,7 @@ has 'display_name_language' => (
  				'hil' => 'híligaynon',
  				'hit' => 'hitita',
  				'hmn' => 'hmong',
+ 				'hnj' => 'hmong njua',
  				'ho' => 'hiri motu',
  				'hr' => 'croat',
  				'hsb' => 'alt sòrab',
@@ -1634,6 +1637,7 @@ has 'display_name_language' => (
  				'kv' => 'komi',
  				'kw' => 'còrnic',
  				'kwk' => 'kwak’wala',
+ 				'kxv' => 'kuvi',
  				'ky' => 'kirguís',
  				'la' => 'llatí',
  				'lad' => 'judeocastellà',
@@ -1647,6 +1651,7 @@ has 'display_name_language' => (
  				'lij' => 'lígur',
  				'lil' => 'lillooet',
  				'lkt' => 'lakota',
+ 				'lld' => 'ladí',
  				'lmo' => 'llombard',
  				'ln' => 'lingala',
  				'lo' => 'laosià',
@@ -1660,7 +1665,6 @@ has 'display_name_language' => (
  				'lua' => 'luba-lulua',
  				'lui' => 'luisenyo',
  				'lun' => 'lunda',
- 				'luo' => 'luo',
  				'lus' => 'mizo',
  				'luy' => 'luyia',
  				'lv' => 'letó',
@@ -1904,12 +1908,12 @@ has 'display_name_language' => (
  				'und' => 'idioma desconegut',
  				'ur' => 'urdú',
  				'uz' => 'uzbek',
- 				'vai' => 'vai',
  				've' => 'venda',
  				'vec' => 'vènet',
  				'vep' => 'vepse',
  				'vi' => 'vietnamita',
  				'vls' => 'flamenc occidental',
+ 				'vmw' => 'makua',
  				'vo' => 'volapük',
  				'vot' => 'vòtic',
  				'vun' => 'vunjo',
@@ -1924,6 +1928,7 @@ has 'display_name_language' => (
  				'xal' => 'calmuc',
  				'xh' => 'xosa',
  				'xmf' => 'mingrelià',
+ 				'xnr' => 'kangri',
  				'xog' => 'soga',
  				'yao' => 'yao',
  				'yap' => 'yapeà',
@@ -2247,6 +2252,7 @@ has 'display_name_region' => (
  			'CN' => 'Xina',
  			'CO' => 'Colòmbia',
  			'CP' => 'Illa Clipperton',
+ 			'CQ' => 'Sark',
  			'CR' => 'Costa Rica',
  			'CU' => 'Cuba',
  			'CV' => 'Cap Verd',
@@ -2274,8 +2280,8 @@ has 'display_name_region' => (
  			'EZ' => 'zona euro',
  			'FI' => 'Finlàndia',
  			'FJ' => 'Fiji',
- 			'FK' => 'Illes Malvines',
- 			'FK@alt=variant' => 'Illes Malvines (Illes Falkland)',
+ 			'FK' => 'Illes Falkland',
+ 			'FK@alt=variant' => 'Illes Falkland (Illes Malvines)',
  			'FM' => 'Micronèsia',
  			'FO' => 'Illes Fèroe',
  			'FR' => 'França',
@@ -2313,7 +2319,7 @@ has 'display_name_region' => (
  			'IM' => 'Illa de Man',
  			'IN' => 'Índia',
  			'IO' => 'Territori Britànic de l’Oceà Índic',
- 			'IO@alt=chagos' => 'Arxipèlag de Chagos',
+ 			'IO@alt=chagos' => 'Illes Chagos',
  			'IQ' => 'Iraq',
  			'IR' => 'Iran',
  			'IS' => 'Islàndia',
@@ -2333,7 +2339,7 @@ has 'display_name_region' => (
  			'KW' => 'Kuwait',
  			'KY' => 'Illes Caiman',
  			'KZ' => 'Kazakhstan',
- 			'LA' => 'Laos',
+ 			'LA' => 'Lao',
  			'LB' => 'Líban',
  			'LC' => 'Saint Lucia',
  			'LI' => 'Liechtenstein',
@@ -2371,7 +2377,7 @@ has 'display_name_region' => (
  			'NA' => 'Namíbia',
  			'NC' => 'Nova Caledònia',
  			'NE' => 'Níger',
- 			'NF' => 'Norfolk',
+ 			'NF' => 'Illa Norfolk',
  			'NG' => 'Nigèria',
  			'NI' => 'Nicaragua',
  			'NL' => 'Països Baixos',
@@ -2429,7 +2435,7 @@ has 'display_name_region' => (
  			'TA' => 'Tristan da Cunha',
  			'TC' => 'Illes Turks i Caicos',
  			'TD' => 'Txad',
- 			'TF' => 'Territoris Australs Francesos',
+ 			'TF' => 'Terres Australs Antàrtiques Franceses',
  			'TG' => 'Togo',
  			'TH' => 'Tailàndia',
  			'TJ' => 'Tadjikistan',
@@ -2440,13 +2446,13 @@ has 'display_name_region' => (
  			'TN' => 'Tunísia',
  			'TO' => 'Tonga',
  			'TR' => 'Turquia',
- 			'TT' => 'Trinitat i Tobago',
+ 			'TT' => 'Trinidad i Tobago',
  			'TV' => 'Tuvalu',
  			'TW' => 'Taiwan',
  			'TZ' => 'Tanzània',
  			'UA' => 'Ucraïna',
  			'UG' => 'Uganda',
- 			'UM' => 'Illes Perifèriques Menors dels EUA',
+ 			'UM' => 'Illes Menors Allunyades dels Estats Units',
  			'UN' => 'Nacions Unides',
  			'UN@alt=short' => 'ONU',
  			'US' => 'Estats Units',
@@ -2456,8 +2462,8 @@ has 'display_name_region' => (
  			'VA' => 'Ciutat del Vaticà',
  			'VC' => 'Saint Vincent i les Grenadines',
  			'VE' => 'Veneçuela',
- 			'VG' => 'Illes Verges britàniques',
- 			'VI' => 'Illes Verges nord-americanes',
+ 			'VG' => 'Illes Verges Britàniques',
+ 			'VI' => 'Illes Verges dels Estats Units',
  			'VN' => 'Vietnam',
  			'VU' => 'Vanuatu',
  			'WF' => 'Wallis i Futuna',
@@ -2467,7 +2473,7 @@ has 'display_name_region' => (
  			'XK' => 'Kosovo',
  			'YE' => 'Iemen',
  			'YT' => 'Mayotte',
- 			'ZA' => 'República de Sud-àfrica',
+ 			'ZA' => 'Sud-àfrica',
  			'ZM' => 'Zàmbia',
  			'ZW' => 'Zimbàbue',
  			'ZZ' => 'regió desconeguda',
@@ -2627,7 +2633,6 @@ has 'display_name_type' => (
  				'phonebook' => q{ordre de la guia telefònica},
  				'phonetic' => q{ordre fonètic},
  				'pinyin' => q{ordre pinyin},
- 				'reformed' => q{ordre reformat},
  				'search' => q{cerca de propòsit general},
  				'searchjl' => q{cerca per consonant inicial del hangul},
  				'standard' => q{ordre estàndard},
@@ -3337,12 +3342,14 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'concentr-milligram-ofglucose-per-deciliter' => {
+						'1' => q(masculine),
 						'name' => q(mil·ligrams per decilitre),
 						'one' => q({0} mil·ligram per decilitre),
 						'other' => q({0} mil·ligrams per decilitre),
 					},
 					# Core Unit Identifier
 					'milligram-ofglucose-per-deciliter' => {
+						'1' => q(masculine),
 						'name' => q(mil·ligrams per decilitre),
 						'one' => q({0} mil·ligram per decilitre),
 						'other' => q({0} mil·ligrams per decilitre),
@@ -3424,6 +3431,20 @@ has 'units' => (
 						'1' => q(masculine),
 						'one' => q({0} per deu mil),
 						'other' => q({0} per deu mil),
+					},
+					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'1' => q(masculine),
+						'name' => q(part per mil milions),
+						'one' => q({0} part per mil milions),
+						'other' => q({0} parts per mil milions),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'1' => q(masculine),
+						'name' => q(part per mil milions),
+						'one' => q({0} part per mil milions),
+						'other' => q({0} parts per mil milions),
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
@@ -3766,6 +3787,22 @@ has 'units' => (
 						'other' => q({0} nanosegons),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'1' => q(feminine),
+						'name' => q(nits),
+						'one' => q({0} nit),
+						'other' => q({0} nits),
+						'per' => q({0} per nit),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'1' => q(feminine),
+						'name' => q(nits),
+						'one' => q({0} nit),
+						'other' => q({0} nits),
+						'per' => q({0} per nit),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'1' => q(masculine),
 						'name' => q(trimestres),
@@ -3945,12 +3982,14 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'energy-kilocalorie' => {
+						'1' => q(feminine),
 						'name' => q(quilocalories),
 						'one' => q({0} quilocaloria),
 						'other' => q({0} quilocalories),
 					},
 					# Core Unit Identifier
 					'kilocalorie' => {
+						'1' => q(feminine),
 						'name' => q(quilocalories),
 						'one' => q({0} quilocaloria),
 						'other' => q({0} quilocalories),
@@ -4433,11 +4472,13 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-point' => {
+						'1' => q(masculine),
 						'one' => q({0} punt tipogràfic),
 						'other' => q({0} punts tipogràfics),
 					},
 					# Core Unit Identifier
 					'point' => {
+						'1' => q(masculine),
 						'one' => q({0} punt tipogràfic),
 						'other' => q({0} punts tipogràfics),
 					},
@@ -4915,12 +4956,14 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'pressure-millimeter-ofhg' => {
+						'1' => q(masculine),
 						'name' => q(mil·límetres de mercuri),
 						'one' => q({0} mil·límetre de mercuri),
 						'other' => q({0} mil·límetres de mercuri),
 					},
 					# Core Unit Identifier
 					'millimeter-ofhg' => {
+						'1' => q(masculine),
 						'name' => q(mil·límetres de mercuri),
 						'one' => q({0} mil·límetre de mercuri),
 						'other' => q({0} mil·límetres de mercuri),
@@ -4988,6 +5031,20 @@ has 'units' => (
 						'name' => q(nusos),
 						'one' => q({0} nus),
 						'other' => q({0} nusos),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'1' => q(feminine),
+						'name' => q(llum),
+						'one' => q({0} llum),
+						'other' => q({0} llum),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'1' => q(feminine),
+						'name' => q(llum),
+						'one' => q({0} llum),
+						'other' => q({0} llum),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -5688,6 +5745,20 @@ has 'units' => (
 						'other' => q({0} m),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(nit),
+						'one' => q({0}/nit),
+						'other' => q({0}/nit),
+						'per' => q({0}/nit),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(nit),
+						'one' => q({0}/nit),
+						'other' => q({0}/nit),
+						'per' => q({0}/nit),
+					},
+					# Long Unit Identifier
 					'duration-year' => {
 						'per' => q({0}/any),
 					},
@@ -5868,6 +5939,18 @@ has 'units' => (
 					'millibar' => {
 						'one' => q({0} mb),
 						'other' => q({0} mb),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(llum),
+						'one' => q({0} llum),
+						'other' => q({0} llum),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(llum),
+						'one' => q({0} llum),
+						'other' => q({0} llum),
 					},
 					# Long Unit Identifier
 					'temperature-fahrenheit' => {
@@ -6108,6 +6191,14 @@ has 'units' => (
 						'other' => q({0} ‱),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(part/mil milions),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(part/mil milions),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(l/100 km),
 						'one' => q({0} l/100 km),
@@ -6260,6 +6351,20 @@ has 'units' => (
 						'name' => q(mesos),
 						'one' => q({0} mes),
 						'other' => q({0} m),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(nits),
+						'one' => q({0} nit),
+						'other' => q({0} nits),
+						'per' => q({0}/nit),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(nits),
+						'one' => q({0} nit),
+						'other' => q({0} nits),
+						'per' => q({0}/nit),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -6688,6 +6793,18 @@ has 'units' => (
 						'name' => q(mmHg),
 						'one' => q({0} mmHg),
 						'other' => q({0} mmHg),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(llum),
+						'one' => q({0} llum),
+						'other' => q({0} llum),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(llum),
+						'one' => q({0} llum),
+						'other' => q({0} llum),
 					},
 					# Long Unit Identifier
 					'temperature-celsius' => {
@@ -7533,9 +7650,9 @@ has 'currencies' => (
 		'BYN' => {
 			symbol => 'р.',
 			display_name => {
-				'currency' => q(ruble bielorús),
-				'one' => q(ruble bielorús),
-				'other' => q(rubles bielorussos),
+				'currency' => q(ruble belarús),
+				'one' => q(ruble belarús),
+				'other' => q(rubles belarussos),
 			},
 		},
 		'BYR' => {
@@ -9643,15 +9760,6 @@ has 'day_periods' => (
 					'night1' => q{nit},
 					'pm' => q{p. m.},
 				},
-				'narrow' => {
-					'afternoon1' => q{migdia},
-					'afternoon2' => q{tarda},
-					'evening1' => q{vespre},
-					'midnight' => q{mitjanit},
-					'morning1' => q{mat.},
-					'morning2' => q{matí},
-					'night1' => q{nit},
-				},
 				'wide' => {
 					'am' => q{a. m.},
 					'pm' => q{p. m.},
@@ -9881,7 +9989,7 @@ has 'datetime_formats_available_formats' => (
 			yMMMd => q{d MMM 'del' y},
 			yMd => q{d/M/y},
 			yQQQ => q{QQQ y},
-			yQQQQ => q{QQQQ y},
+			yQQQQ => q{QQQQ 'del' y},
 			yw => q{'setmana' w 'del' Y},
 		},
 	} },
@@ -10205,32 +10313,29 @@ has 'time_zone_names' => (
 		'Africa/Ndjamena' => {
 			exemplarCity => q#N’Djamena#,
 		},
-		'Africa/Sao_Tome' => {
-			exemplarCity => q#São Tomé#,
-		},
 		'Africa/Tripoli' => {
 			exemplarCity => q#Trípoli#,
 		},
 		'Africa_Central' => {
 			long => {
-				'standard' => q#Hora de l’Àfrica Central#,
+				'standard' => q#Hora de l’Àfrica central#,
 			},
 		},
 		'Africa_Eastern' => {
 			long => {
-				'standard' => q#Hora de l’Àfrica Oriental#,
+				'standard' => q#Hora de l’Àfrica oriental#,
 			},
 		},
 		'Africa_Southern' => {
 			long => {
-				'standard' => q#Hora estàndard del sud de l’Àfrica#,
+				'standard' => q#Hora estàndard de l’Àfrica meridional#,
 			},
 		},
 		'Africa_Western' => {
 			long => {
-				'daylight' => q#Hora d’estiu de l’Àfrica Occidental#,
-				'generic' => q#Hora de l’Àfrica Occidental#,
-				'standard' => q#Hora estàndard de l’Àfrica Occidental#,
+				'daylight' => q#Hora d’estiu de l’Àfrica occidental#,
+				'generic' => q#Hora de l’Àfrica occidental#,
+				'standard' => q#Hora estàndard de l’Àfrica occidental#,
 			},
 		},
 		'Alaska' => {
@@ -10256,9 +10361,6 @@ has 'time_zone_names' => (
 		'America/Argentina/Tucuman' => {
 			exemplarCity => q#Tucumán#,
 		},
-		'America/Asuncion' => {
-			exemplarCity => q#Asunción#,
-		},
 		'America/Belem' => {
 			exemplarCity => q#Belém#,
 		},
@@ -10282,9 +10384,6 @@ has 'time_zone_names' => (
 		},
 		'America/Cuiaba' => {
 			exemplarCity => q#Cuiabá#,
-		},
-		'America/Curacao' => {
-			exemplarCity => q#Curaçao#,
 		},
 		'America/Eirunepe' => {
 			exemplarCity => q#Eirunepé#,
@@ -10315,9 +10414,6 @@ has 'time_zone_names' => (
 		},
 		'America/Panama' => {
 			exemplarCity => q#Panamà#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#Santa Isabel#,
 		},
 		'America/Santarem' => {
 			exemplarCity => q#Santarém#,
@@ -10377,7 +10473,7 @@ has 'time_zone_names' => (
 		'Anadyr' => {
 			long => {
 				'daylight' => q#Horari d’estiu d’Anadyr#,
-				'generic' => q#Hora d’Anadyr#,
+				'generic' => q#Hora d’Anàdir#,
 				'standard' => q#Hora estàndard d’Anadyr#,
 			},
 		},
@@ -10555,14 +10651,11 @@ has 'time_zone_names' => (
 		'Atlantic/St_Helena' => {
 			exemplarCity => q#Saint Helena#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#Currie#,
-		},
 		'Australia_Central' => {
 			long => {
-				'daylight' => q#Hora d’estiu d’Austràlia Central#,
-				'generic' => q#Hora d’Austràlia Central#,
-				'standard' => q#Hora estàndard d’Austràlia Central#,
+				'daylight' => q#Hora d’estiu d’Austràlia central#,
+				'generic' => q#Hora d’Austràlia central#,
+				'standard' => q#Hora estàndard d’Austràlia central#,
 			},
 		},
 		'Australia_CentralWestern' => {
@@ -10574,16 +10667,16 @@ has 'time_zone_names' => (
 		},
 		'Australia_Eastern' => {
 			long => {
-				'daylight' => q#Hora d’estiu d’Austràlia Oriental#,
-				'generic' => q#Hora d’Austràlia Oriental#,
-				'standard' => q#Hora estàndard d’Austràlia Oriental#,
+				'daylight' => q#Hora d’estiu d’Austràlia oriental#,
+				'generic' => q#Hora d’Austràlia oriental#,
+				'standard' => q#Hora estàndard d’Austràlia oriental#,
 			},
 		},
 		'Australia_Western' => {
 			long => {
-				'daylight' => q#Hora d’estiu d’Austràlia Occidental#,
-				'generic' => q#Hora d’Austràlia Occidental#,
-				'standard' => q#Hora estàndard d’Austràlia Occidental#,
+				'daylight' => q#Hora d’estiu d’Austràlia occidental#,
+				'generic' => q#Hora d’Austràlia occidental#,
+				'standard' => q#Hora estàndard d’Austràlia occidental#,
 			},
 		},
 		'Azerbaijan' => {
@@ -10660,13 +10753,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Hora d’estiu de la Xina#,
 				'generic' => q#Hora de la Xina#,
 				'standard' => q#Hora estàndard de la Xina#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Hora d’estiu de Choibalsan#,
-				'generic' => q#Hora de Choibalsan#,
-				'standard' => q#Hora estàndard de Choibalsan#,
 			},
 		},
 		'Christmas' => {
@@ -10816,9 +10902,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#Uliànovsk#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#Újhorod#,
-		},
 		'Europe/Vatican' => {
 			exemplarCity => q#Vaticà#,
 		},
@@ -10831,17 +10914,14 @@ has 'time_zone_names' => (
 		'Europe/Warsaw' => {
 			exemplarCity => q#Varsòvia#,
 		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#Zaporíjia#,
-		},
 		'Europe/Zurich' => {
 			exemplarCity => q#Zúric#,
 		},
 		'Europe_Central' => {
 			long => {
-				'daylight' => q#Hora d’estiu del Centre d’Europa#,
-				'generic' => q#Hora del Centre d’Europa#,
-				'standard' => q#Hora estàndard del Centre d’Europa#,
+				'daylight' => q#Hora d’estiu d’Europa central#,
+				'generic' => q#Hora d’Europa central#,
+				'standard' => q#Hora estàndard d’Europa central#,
 			},
 			short => {
 				'daylight' => q#CEST#,
@@ -10851,9 +10931,9 @@ has 'time_zone_names' => (
 		},
 		'Europe_Eastern' => {
 			long => {
-				'daylight' => q#Hora d’estiu de l’Est d’Europa#,
-				'generic' => q#Hora de l’Est d’Europa#,
-				'standard' => q#Hora estàndard de l’Est d’Europa#,
+				'daylight' => q#Hora d’estiu d’Europa oriental#,
+				'generic' => q#Hora d’Europa oriental#,
+				'standard' => q#Hora estàndard d’Europa oriental#,
 			},
 			short => {
 				'daylight' => q#EEST#,
@@ -10863,14 +10943,14 @@ has 'time_zone_names' => (
 		},
 		'Europe_Further_Eastern' => {
 			long => {
-				'standard' => q#Hora de l’Extrem Orient Europeu#,
+				'standard' => q#Hora de l’extrem oriental d’Europa#,
 			},
 		},
 		'Europe_Western' => {
 			long => {
-				'daylight' => q#Hora d’estiu de l’Oest d’Europa#,
-				'generic' => q#Hora de l’Oest d’Europa#,
-				'standard' => q#Hora estàndard de l’Oest d’Europa#,
+				'daylight' => q#Hora d’estiu d’Europa occidental#,
+				'generic' => q#Hora d’Europa occidental#,
+				'standard' => q#Hora estàndard d’Europa occidental#,
 			},
 			short => {
 				'daylight' => q#WEST#,
@@ -10899,12 +10979,12 @@ has 'time_zone_names' => (
 		},
 		'French_Southern' => {
 			long => {
-				'standard' => q#Hora d’Antàrtida i França del Sud#,
+				'standard' => q#Hora d’Antàrtida i de les Terres Australs Antàrtiques Franceses#,
 			},
 		},
 		'GMT' => {
 			long => {
-				'standard' => q#Hora del Meridià de Greenwich#,
+				'standard' => q#Hora del meridià de Greenwich#,
 			},
 			short => {
 				'standard' => q#GMT#,
@@ -10930,6 +11010,13 @@ has 'time_zone_names' => (
 		'Gilbert_Islands' => {
 			long => {
 				'standard' => q#Hora de les illes Gilbert#,
+			},
+		},
+		'Greenland' => {
+			long => {
+				'daylight' => q#Hora d’estiu de Groenlàndia#,
+				'generic' => q#Hora de Groenlàndia#,
+				'standard' => q#Hora estàndard de Groenlàndia#,
 			},
 		},
 		'Greenland_Eastern' => {
@@ -11048,6 +11135,11 @@ has 'time_zone_names' => (
 				'standard' => q#Hora estàndard de Petropavlovsk de Kamtxatka#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Hora del Kazakhstan#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#Hora de l’est del Kazakhstan#,
@@ -11101,11 +11193,6 @@ has 'time_zone_names' => (
 				'standard' => q#Hora estàndard de Macau#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Hora de Macquarie#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Hora d’estiu de Magadan#,
@@ -11143,13 +11230,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Hora de Mawson#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Hora d’estiu del nord-oest de Mèxic#,
-				'generic' => q#Hora del nord-oest de Mèxic#,
-				'standard' => q#Hora estàndard del nord-oest de Mèxic#,
 			},
 		},
 		'Mexico_Pacific' => {

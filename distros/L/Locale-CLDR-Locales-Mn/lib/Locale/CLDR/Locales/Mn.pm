@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Mn - Package for language Mongolian
 
 package Locale::CLDR::Locales::Mn;
 # This file auto generated from Data\common\main\mn.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -67,11 +67,12 @@ has 'display_name_language' => (
  				'bem' => 'бемба',
  				'bez' => 'бена',
  				'bg' => 'болгар',
- 				'bgc' => 'Харьянви',
+ 				'bgc' => 'харьянви',
  				'bho' => 'божпури',
  				'bi' => 'бислам',
  				'bin' => 'бини',
  				'bla' => 'сиксика',
+ 				'blo' => 'Ани',
  				'bm' => 'бамбара',
  				'bn' => 'бенгал',
  				'bo' => 'төвд',
@@ -115,8 +116,7 @@ has 'display_name_language' => (
  				'dar' => 'даргва',
  				'dav' => 'тайта',
  				'de' => 'герман',
- 				'de_AT' => 'австри-герман',
- 				'de_CH' => 'швейцарь-герман',
+ 				'de_CH' => 'герман (Швейцар)',
  				'dgr' => 'догриб',
  				'dje' => 'зарма',
  				'doi' => 'догри',
@@ -152,8 +152,7 @@ has 'display_name_language' => (
  				'fo' => 'фарер',
  				'fon' => 'фон',
  				'fr' => 'франц',
- 				'fr_CA' => 'канад-франц',
- 				'fr_CH' => 'швейцари-франц',
+ 				'fr_CH' => 'франц (Швейцар)',
  				'frc' => 'франц, кажун',
  				'frr' => 'хойд фриз',
  				'fur' => 'фриулан',
@@ -247,6 +246,7 @@ has 'display_name_language' => (
  				'kv' => 'коми',
  				'kw' => 'корн',
  				'kwk' => 'квак вала',
+ 				'kxv' => 'куви',
  				'ky' => 'киргиз',
  				'la' => 'латин',
  				'lad' => 'ладин',
@@ -255,9 +255,10 @@ has 'display_name_language' => (
  				'lez' => 'лезги',
  				'lg' => 'ганда',
  				'li' => 'лимбург',
- 				'lij' => 'Лигури',
+ 				'lij' => 'лигури',
  				'lil' => 'лиллуэт',
  				'lkt' => 'лакота',
+ 				'lmo' => 'ломбард',
  				'ln' => 'лингала',
  				'lo' => 'лаос',
  				'lou' => 'луизиана креоле',
@@ -412,6 +413,7 @@ has 'display_name_language' => (
  				'sw_CD' => 'конгогийн свахили',
  				'swb' => 'комори',
  				'syr' => 'сири',
+ 				'szl' => 'силез',
  				'ta' => 'тамил',
  				'tce' => 'өмнөд тутчоне',
  				'te' => 'тэлүгү',
@@ -447,13 +449,14 @@ has 'display_name_language' => (
  				'ug' => 'уйгур',
  				'uk' => 'украин',
  				'umb' => 'умбунду',
- 				'und' => 'Үл мэдэгдэх хэл',
+ 				'und' => 'үл мэдэгдэх хэл',
  				'ur' => 'урду',
  				'uz' => 'узбек',
  				'vai' => 'вай',
  				've' => 'венда',
  				'vec' => 'венец',
  				'vi' => 'вьетнам',
+ 				'vmw' => 'макуа',
  				'vo' => 'волапюк',
  				'vun' => 'вунжо',
  				'wa' => 'уоллун',
@@ -464,6 +467,7 @@ has 'display_name_language' => (
  				'wuu' => 'хятад, ву хэл',
  				'xal' => 'халимаг',
  				'xh' => 'хоса',
+ 				'xnr' => 'кангри',
  				'xog' => 'сога',
  				'yav' => 'янгбен',
  				'ybb' => 'емба',
@@ -472,6 +476,7 @@ has 'display_name_language' => (
  				'yrl' => 'ньенгату',
  				'yue' => 'кантон',
  				'yue@alt=menu' => 'хятад, кантон',
+ 				'za' => 'чжуанг',
  				'zgh' => 'стандарт тамазайт (Морокко)',
  				'zh' => 'хятад',
  				'zh@alt=menu' => 'хятад, мандарин',
@@ -728,7 +733,7 @@ has 'display_name_region' => (
  			'419' => 'Латин Америк',
  			'AC' => 'Асенсион арал',
  			'AD' => 'Андорра',
- 			'AE' => 'Арабын Нэгдсэн Эмирт Улс',
+ 			'AE' => 'Арабын Нэгдсэн Эмират Улс',
  			'AF' => 'Афганистан',
  			'AG' => 'Антигуа ба Барбуда',
  			'AI' => 'Ангилья',
@@ -743,7 +748,7 @@ has 'display_name_region' => (
  			'AW' => 'Аруба',
  			'AX' => 'Аландын арлууд',
  			'AZ' => 'Азербайжан',
- 			'BA' => 'Босни-Герцеговин',
+ 			'BA' => 'Босни-Херцеговин',
  			'BB' => 'Барбадос',
  			'BD' => 'Бангладеш',
  			'BE' => 'Бельги',
@@ -771,9 +776,8 @@ has 'display_name_region' => (
  			'CF' => 'Төв Африкийн Бүгд Найрамдах Улс',
  			'CG' => 'Конго-Браззавиль',
  			'CG@alt=variant' => 'Конго (Бүгд Найрамдах улс)',
- 			'CH' => 'Швейцарь',
+ 			'CH' => 'Швейцар',
  			'CI' => 'Кот-д’Ивуар',
- 			'CI@alt=variant' => 'Зааны ясан эрэг',
  			'CK' => 'Күүкийн арлууд',
  			'CL' => 'Чили',
  			'CM' => 'Камерун',
@@ -805,7 +809,7 @@ has 'display_name_region' => (
  			'ET' => 'Этиоп',
  			'EU' => 'Европын Холбоо',
  			'EZ' => 'Евро бүс',
- 			'FI' => 'Финлянд',
+ 			'FI' => 'Финланд',
  			'FJ' => 'Фижи',
  			'FK' => 'Фолклендийн арлууд',
  			'FK@alt=variant' => 'Фолклендийн арлууд (Мальвины арлууд)',
@@ -832,7 +836,7 @@ has 'display_name_region' => (
  			'GU' => 'Гуам',
  			'GW' => 'Гвиней-Бисау',
  			'GY' => 'Гайана',
- 			'HK' => 'БНХАУ-ын Тусгай захиргааны бүс Хонг Конг',
+ 			'HK' => 'БНХАУ-ын Тусгай захиргааны бүс Хонг-Конг',
  			'HK@alt=short' => 'Хонг Конг',
  			'HM' => 'Херд ба Макдональдийн арлууд',
  			'HN' => 'Гондурас',
@@ -842,7 +846,7 @@ has 'display_name_region' => (
  			'IC' => 'Канарын арлууд',
  			'ID' => 'Индонез',
  			'IE' => 'Ирланд',
- 			'IL' => 'Израиль',
+ 			'IL' => 'Израил',
  			'IM' => 'Мэн Арал',
  			'IN' => 'Энэтхэг',
  			'IO' => 'Британийн харьяа Энэтхэгийн далай дахь нутаг дэвсгэр',
@@ -856,7 +860,7 @@ has 'display_name_region' => (
  			'JO' => 'Йордан',
  			'JP' => 'Япон',
  			'KE' => 'Кени',
- 			'KG' => 'Кыргызстан',
+ 			'KG' => 'Киргиз',
  			'KH' => 'Камбож',
  			'KI' => 'Кирибати',
  			'KM' => 'Коморын арлууд',
@@ -869,7 +873,7 @@ has 'display_name_region' => (
  			'LA' => 'Лаос',
  			'LB' => 'Ливан',
  			'LC' => 'Сент Люсиа',
- 			'LI' => 'Лихтенштейн',
+ 			'LI' => 'Лихтенштайн',
  			'LK' => 'Шри-Ланка',
  			'LR' => 'Либери',
  			'LS' => 'Лесото',
@@ -908,7 +912,7 @@ has 'display_name_region' => (
  			'NG' => 'Нигери',
  			'NI' => 'Никарагуа',
  			'NL' => 'Нидерланд',
- 			'NO' => 'Норвеги',
+ 			'NO' => 'Норвег',
  			'NP' => 'Балба',
  			'NR' => 'Науру',
  			'NU' => 'Ниуэ',
@@ -1068,7 +1072,6 @@ has 'display_name_type' => (
  				'gb2312han' => q{Хялбаршуулсан хятад Эрэмбэлэх дараалал - GB2312},
  				'phonebook' => q{Утасны дэвтрийн эрэмбэлэх дараалал},
  				'pinyin' => q{Пиньян эрэмбэлэх дараалал},
- 				'reformed' => q{Шинэчилсэн эрэмбэлэх дараалал},
  				'search' => q{ерөнхий хайлт},
  				'searchjl' => q{Хангүлээр эхний гийгүүлэгчээр хайх},
  				'standard' => q{стандарт эрэмбэлэх дараалал},
@@ -1321,11 +1324,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'10p-1' => {
-						'1' => q(деси{0}),
+						'1' => q(деци{0}),
 					},
 					# Core Unit Identifier
 					'1' => {
-						'1' => q(деси{0}),
+						'1' => q(деци{0}),
 					},
 					# Long Unit Identifier
 					'10p-12' => {
@@ -1706,6 +1709,18 @@ has 'units' => (
 						'other' => q(арван мянганы {0} хувь),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(мкг/кг),
+						'one' => q({0} мкг/кг),
+						'other' => q({0} мкг/кг),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(мкг/кг),
+						'one' => q({0} мкг/кг),
+						'other' => q({0} мкг/кг),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(100 километр тутамд ногдох литр),
 						'one' => q(100 километр тутамд {0} литр),
@@ -1920,6 +1935,20 @@ has 'units' => (
 						'name' => q(наносекунд),
 						'one' => q({0} наносекунд),
 						'other' => q({0} наносекунд),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(шөнө),
+						'one' => q({0} шөнө),
+						'other' => q({0} шөнө),
+						'per' => q({0}/шөнөдөө),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(шөнө),
+						'one' => q({0} шөнө),
+						'other' => q({0} шөнө),
+						'per' => q({0}/шөнөдөө),
 					},
 					# Long Unit Identifier
 					'duration-second' => {
@@ -2184,6 +2213,18 @@ has 'units' => (
 						'other' => q({0} мегаГерц),
 					},
 					# Long Unit Identifier
+					'graphics-dot-per-inch' => {
+						'name' => q(цэг/инч),
+						'one' => q({0} цэг/инч),
+						'other' => q({0} цэг/инч),
+					},
+					# Core Unit Identifier
+					'dot-per-inch' => {
+						'name' => q(цэг/инч),
+						'one' => q({0} цэг/инч),
+						'other' => q({0} цэг/инч),
+					},
+					# Long Unit Identifier
 					'graphics-pixel-per-centimeter' => {
 						'name' => q(пиксель/см),
 						'one' => q({0} пиксель/см),
@@ -2209,15 +2250,15 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-astronomical-unit' => {
-						'name' => q(сансрын нэгж),
-						'one' => q({0} сансрын нэгж),
-						'other' => q({0} сансрын нэгж),
+						'name' => q(одон орны нэгж),
+						'one' => q({0} одон орны нэгж),
+						'other' => q({0} одон орны нэгж),
 					},
 					# Core Unit Identifier
 					'astronomical-unit' => {
-						'name' => q(сансрын нэгж),
-						'one' => q({0} сансрын нэгж),
-						'other' => q({0} сансрын нэгж),
+						'name' => q(одон орны нэгж),
+						'one' => q({0} одон орны нэгж),
+						'other' => q({0} одон орны нэгж),
 					},
 					# Long Unit Identifier
 					'length-centimeter' => {
@@ -3360,6 +3401,18 @@ has 'units' => (
 						'name' => q(‱),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(мкг/кг),
+						'one' => q({0} мкг/кг),
+						'other' => q({0} мкг/кг),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(мкг/кг),
+						'one' => q({0} мкг/кг),
+						'other' => q({0} мкг/кг),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'one' => q({0} л/100км),
 						'other' => q({0}л/100км),
@@ -3416,6 +3469,20 @@ has 'units' => (
 					'month' => {
 						'one' => q({0}с),
 						'other' => q({0}с),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(шөнө),
+						'one' => q({0}шөнө),
+						'other' => q({0}шөнө),
+						'per' => q({0}/шөнө),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(шөнө),
+						'one' => q({0}шөнө),
+						'other' => q({0}шөнө),
+						'per' => q({0}/шөнө),
 					},
 					# Long Unit Identifier
 					'duration-week' => {
@@ -3477,15 +3544,15 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-astronomical-unit' => {
-						'name' => q(au),
-						'one' => q({0}au),
-						'other' => q({0}au),
+						'name' => q(о.о.н),
+						'one' => q({0}о.о.н),
+						'other' => q({0}о.о.н),
 					},
 					# Core Unit Identifier
 					'astronomical-unit' => {
-						'name' => q(au),
-						'one' => q({0}au),
-						'other' => q({0}au),
+						'name' => q(о.о.н),
+						'one' => q({0}о.о.н),
+						'other' => q({0}о.о.н),
 					},
 					# Long Unit Identifier
 					'length-foot' => {
@@ -4262,13 +4329,13 @@ has 'units' => (
 					# Long Unit Identifier
 					'concentr-permillion' => {
 						'name' => q(хувь/сая),
-						'one' => q({0}x10⁻⁶),
+						'one' => q(саяны {0} хувь),
 						'other' => q({0}x10⁻⁶),
 					},
 					# Core Unit Identifier
 					'permillion' => {
 						'name' => q(хувь/сая),
-						'one' => q({0}x10⁻⁶),
+						'one' => q(саяны {0} хувь),
 						'other' => q({0}x10⁻⁶),
 					},
 					# Long Unit Identifier
@@ -4278,6 +4345,18 @@ has 'units' => (
 					# Core Unit Identifier
 					'permyriad' => {
 						'name' => q(арван мянганы хувь),
+					},
+					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(мкг/кг),
+						'one' => q({0} мкг/кг),
+						'other' => q({0} мкг/кг),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(мкг/кг),
+						'one' => q({0} мкг/кг),
+						'other' => q({0} мкг/кг),
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
@@ -4590,6 +4669,20 @@ has 'units' => (
 						'other' => q({0} нс),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(шөнө),
+						'one' => q({0} шөнө),
+						'other' => q({0} шөнө),
+						'per' => q({0}/шөнө),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(шөнө),
+						'one' => q({0} шөнө),
+						'other' => q({0} шөнө),
+						'per' => q({0}/шөнө),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'name' => q(улирал),
 						'one' => q({0} улирал),
@@ -4898,16 +4991,28 @@ has 'units' => (
 						'other' => q({0} цэг/см),
 					},
 					# Long Unit Identifier
+					'graphics-dot-per-inch' => {
+						'name' => q(цэг/инч),
+						'one' => q({0} цэг/инч),
+						'other' => q({0} цэг/инч),
+					},
+					# Core Unit Identifier
+					'dot-per-inch' => {
+						'name' => q(цэг/инч),
+						'one' => q({0} цэг/инч),
+						'other' => q({0} цэг/инч),
+					},
+					# Long Unit Identifier
 					'length-astronomical-unit' => {
-						'name' => q(сн),
-						'one' => q({0} сн),
-						'other' => q({0} сн),
+						'name' => q(о.о.н),
+						'one' => q({0} о.о.н),
+						'other' => q({0} о.о.н),
 					},
 					# Core Unit Identifier
 					'astronomical-unit' => {
-						'name' => q(сн),
-						'one' => q({0} сн),
-						'other' => q({0} сн),
+						'name' => q(о.о.н),
+						'one' => q({0} о.о.н),
+						'other' => q({0} о.о.н),
 					},
 					# Long Unit Identifier
 					'length-centimeter' => {
@@ -5146,6 +5251,18 @@ has 'units' => (
 						'name' => q(ярд),
 						'one' => q({0} ярд),
 						'other' => q({0} ярд),
+					},
+					# Long Unit Identifier
+					'light-lumen' => {
+						'name' => q(люмен),
+						'one' => q({0} люмен),
+						'other' => q({0} люмен),
+					},
+					# Core Unit Identifier
+					'lumen' => {
+						'name' => q(люмен),
+						'one' => q({0} люмен),
+						'other' => q({0} люмен),
 					},
 					# Long Unit Identifier
 					'light-lux' => {
@@ -6047,6 +6164,18 @@ has 'nostr' => (
 	isa			=> RegexpRef,
 	init_arg	=> undef,
 	default		=> sub { qr'^(?i:үгүй|ү|no|n)$' }
+);
+
+has 'number_symbols' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+		'mong' => {
+			'decimal' => q(,),
+			'group' => q( ),
+		},
+	} }
 );
 
 has 'number_formats' => (
@@ -7438,26 +7567,26 @@ has 'datetime_formats_available_formats' => (
 			Ed => q{dd. E},
 			Ehm => q{E. h:mm a},
 			Ehms => q{E. h:mm:ss a},
-			GyMMM => q{G y 'оны' MMM},
-			GyMMMEd => q{G y 'оны' MMM'ын' d. E},
-			GyMMMd => q{G y 'оны' MMM'ын' d},
+			GyMMM => q{G y 'оны' MM-'р' 'сар'},
+			GyMMMEd => q{G y 'оны' MM-'р' 'сарын' d, E},
+			GyMMMd => q{G y 'оны' MM-'р' 'сарын' d},
 			GyMd => q{GGGGG y.MM.dd},
 			H => q{HH 'ц'},
 			M => q{LLLLL},
 			MEd => q{MMMMM/dd. E},
-			MMMEd => q{MMM'ын' d. E},
-			MMMMd => q{MMMM'ын' d},
-			MMMd => q{MMM'ын' d},
+			MMMEd => q{MM-'р' 'сарын' d, E},
+			MMMMd => q{MM-'р' 'сарын' d},
+			MMMd => q{MM-'р' 'сарын' d},
 			Md => q{MMMMM/dd},
 			h => q{h 'ц' a},
 			hm => q{h:mm a},
 			hms => q{h:mm:ss a},
 			yyyyM => q{GGGGG y MMMMM},
 			yyyyMEd => q{GGGGG y.MM.dd. E},
-			yyyyMMM => q{G y 'оны' MMM},
-			yyyyMMMEd => q{G y 'оны' MMM'ын' d. E},
-			yyyyMMMM => q{G y 'оны' MMMM},
-			yyyyMMMd => q{G y 'оны' MMM'ын' d},
+			yyyyMMM => q{G y 'оны' MM-'р' 'сар'},
+			yyyyMMMEd => q{G y 'оны' MM-'р' 'сарын' d, E},
+			yyyyMMMM => q{G y 'оны' MM-'р' 'сар'},
+			yyyyMMMd => q{G y 'оны' MM-'р' 'сарын' d},
 			yyyyMd => q{GGGGG y.MM.dd},
 			yyyyQQQ => q{G y 'оны' QQQ},
 			yyyyQQQQ => q{G y 'оны' QQQQ},
@@ -7960,7 +8089,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Белем#,
 		},
 		'America/Belize' => {
-			exemplarCity => q#Белизе#,
+			exemplarCity => q#Белиз#,
 		},
 		'America/Blanc-Sablon' => {
 			exemplarCity => q#Блан-Саблон#,
@@ -8041,7 +8170,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Детройт#,
 		},
 		'America/Dominica' => {
-			exemplarCity => q#Доминика#,
+			exemplarCity => q#Доминик#,
 		},
 		'America/Edmonton' => {
 			exemplarCity => q#Эдмонтон#,
@@ -8211,9 +8340,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#Нью-Йорк#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#Нипигон#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#Ном#,
 		},
@@ -8234,9 +8360,6 @@ has 'time_zone_names' => (
 		},
 		'America/Panama' => {
 			exemplarCity => q#Панама#,
-		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#Пангниртунг#,
 		},
 		'America/Paramaribo' => {
 			exemplarCity => q#Парамарибо#,
@@ -8259,9 +8382,6 @@ has 'time_zone_names' => (
 		'America/Punta_Arenas' => {
 			exemplarCity => q#Пунта Арена#,
 		},
-		'America/Rainy_River' => {
-			exemplarCity => q#Рейни Ривер#,
-		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#Рэнкин Инлет#,
 		},
@@ -8276,9 +8396,6 @@ has 'time_zone_names' => (
 		},
 		'America/Rio_Branco' => {
 			exemplarCity => q#Рио-Бранко#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#Санта Изабель#,
 		},
 		'America/Santarem' => {
 			exemplarCity => q#Сантарем#,
@@ -8325,9 +8442,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#Туле#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#Сандер Бэй#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#Тихуана#,
 		},
@@ -8348,9 +8462,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#Якутат#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#Йелоунайф#,
 		},
 		'America_Central' => {
 			long => {
@@ -8505,9 +8616,6 @@ has 'time_zone_names' => (
 		'Asia/Chita' => {
 			exemplarCity => q#Чита#,
 		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#Чойбалсан#,
-		},
 		'Asia/Colombo' => {
 			exemplarCity => q#Коломбо#,
 		},
@@ -8551,7 +8659,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Жайпур#,
 		},
 		'Asia/Jerusalem' => {
-			exemplarCity => q#Ерусалем#,
+			exemplarCity => q#Йерусалим#,
 		},
 		'Asia/Kabul' => {
 			exemplarCity => q#Кабул#,
@@ -8746,9 +8854,6 @@ has 'time_zone_names' => (
 		'Australia/Broken_Hill' => {
 			exemplarCity => q#Брокен Хилл#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#Кюрри#,
-		},
 		'Australia/Darwin' => {
 			exemplarCity => q#Дарвин#,
 		},
@@ -8877,13 +8982,6 @@ has 'time_zone_names' => (
 				'standard' => q#Хятадын стандарт цаг#,
 			},
 		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Чойбалсангийн зуны цаг#,
-				'generic' => q#Чойбалсангийн цаг#,
-				'standard' => q#Чойбалсангийн стандарт цаг#,
-			},
-		},
 		'Christmas' => {
 			long => {
 				'standard' => q#Крисмас арлын цаг#,
@@ -8987,7 +9085,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Кишинёв#,
 		},
 		'Europe/Copenhagen' => {
-			exemplarCity => q#Копенгаген#,
+			exemplarCity => q#Копенхаген#,
 		},
 		'Europe/Dublin' => {
 			exemplarCity => q#Дублин#,
@@ -9023,7 +9121,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Киров#,
 		},
 		'Europe/Lisbon' => {
-			exemplarCity => q#Лиссабон#,
+			exemplarCity => q#Лисбон#,
 		},
 		'Europe/Ljubljana' => {
 			exemplarCity => q#Любляна#,
@@ -9092,10 +9190,10 @@ has 'time_zone_names' => (
 			exemplarCity => q#Скопье#,
 		},
 		'Europe/Sofia' => {
-			exemplarCity => q#София#,
+			exemplarCity => q#Софи#,
 		},
 		'Europe/Stockholm' => {
-			exemplarCity => q#Стокольм#,
+			exemplarCity => q#Стокхолм#,
 		},
 		'Europe/Tallinn' => {
 			exemplarCity => q#Таллин#,
@@ -9105,9 +9203,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#Ульяновск#,
-		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#Ужгород#,
 		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#Вадуз#,
@@ -9129,9 +9224,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#Загреб#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#Запорожье#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#Цюрих#,
@@ -9288,7 +9380,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Мальдив#,
 		},
 		'Indian/Mauritius' => {
-			exemplarCity => q#Маврикий#,
+			exemplarCity => q#Маврики#,
 		},
 		'Indian/Mayotte' => {
 			exemplarCity => q#Майотта#,
@@ -9349,6 +9441,11 @@ has 'time_zone_names' => (
 				'standard' => q#Японы стандарт цаг#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Казахстаны цаг#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#Зүүн Казахстаны цаг#,
@@ -9395,11 +9492,6 @@ has 'time_zone_names' => (
 				'standard' => q#Лорд Хоугийн стандарт цаг#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Маккуори Арлын цаг#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Магаданы зуны цаг#,
@@ -9437,13 +9529,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Моусоны цаг#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Баруун хойд Мексикийн зуны цаг#,
-				'generic' => q#Баруун хойд Мексикийн цаг#,
-				'standard' => q#Баруун хойд Мексикийн стандарт цаг#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -9580,9 +9665,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Honolulu' => {
 			exemplarCity => q#Хонолулу#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#Жонстон#,
 		},
 		'Pacific/Kanton' => {
 			exemplarCity => q#Кантон#,

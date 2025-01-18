@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Ca::Latn::Es::Valencia - Package for language Catalan
 
 package Locale::CLDR::Locales::Ca::Latn::Es::Valencia;
 # This file auto generated from Data\common\main\ca_ES_VALENCIA.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -36,17 +36,25 @@ has 'display_name_language' => (
  				'as' => 'assamés',
  				'az' => 'azerbaidjanés',
  				'ban' => 'balinés',
+ 				'bar' => 'bavarés',
  				'ce' => 'txetxé',
  				'cy' => 'gal·lés',
  				'da' => 'danés',
  				'dum' => 'neerlandés mitjà',
  				'en' => 'anglés',
+ 				'en_AU' => 'anglés australià',
+ 				'en_CA' => 'anglés canadenc',
+ 				'en_GB' => 'anglés britànic',
  				'en_GB@alt=short' => 'anglés (GB)',
+ 				'en_US' => 'anglés americà',
  				'en_US@alt=short' => 'anglés (EUA)',
  				'enm' => 'anglés mitjà',
  				'fi' => 'finés',
  				'fo' => 'feroés',
  				'fr' => 'francés',
+ 				'fr_CA' => 'francés canadenc',
+ 				'fr_CH' => 'francés suís',
+ 				'frc' => 'francés cajun',
  				'frm' => 'francés mitjà',
  				'fro' => 'francés antic',
  				'ga' => 'irlandés',
@@ -69,6 +77,8 @@ has 'display_name_language' => (
  				'nl' => 'neerlandés',
  				'pl' => 'polonés',
  				'pt' => 'portugués',
+ 				'pt_BR' => 'portugués del Brasil',
+ 				'pt_PT' => 'portugués de Portugal',
  				'ro' => 'romanés',
  				'rup' => 'aromanés',
  				'rw' => 'ruandés',
@@ -83,7 +93,13 @@ has 'display_name_language' => (
  				'to' => 'tongalés',
  				'uk' => 'ucraïnés',
  				'yue' => 'cantonés',
+ 				'yue@alt=menu' => 'xinés, cantonés',
  				'zh' => 'xinés',
+ 				'zh@alt=menu' => 'xinés, mandarí',
+ 				'zh_Hans' => 'xinés simplificat',
+ 				'zh_Hans@alt=long' => 'xinés mandarí (simplificat)',
+ 				'zh_Hant' => 'xinés tradicional',
+ 				'zh_Hant@alt=long' => 'xinés mandarí (tradicional)',
 
 			);
 			if (@_) {
@@ -101,7 +117,8 @@ has 'display_name_script' => (
 	default		=> sub {
 		sub {
 			my %scripts = (
-			'Bali' => 'balinés',
+			'Aghb' => 'albanés caucàsic',
+ 			'Bali' => 'balinés',
  			'Bugi' => 'buginés',
  			'Hung' => 'hongarés antic',
  			'Java' => 'javanés',
@@ -172,6 +189,30 @@ has 'currencies' => (
 				'other' => q(lekë albanesos),
 			},
 		},
+		'AOA' => {
+			display_name => {
+				'currency' => q(kwanza angolés),
+				'one' => q(kwanza angolés),
+			},
+		},
+		'AOK' => {
+			display_name => {
+				'currency' => q(kwanza angolés \(1977–1991\)),
+				'one' => q(kwanza angolés \(1977–1991\)),
+			},
+		},
+		'AON' => {
+			display_name => {
+				'currency' => q(nou kwanza angolés \(1990–2000\)),
+				'one' => q(nou kwanza angolés \(1990–2000\)),
+			},
+		},
+		'AOR' => {
+			display_name => {
+				'currency' => q(kwanza angolés reajustat \(1995–1999\)),
+				'one' => q(kwanza angolés reajustat \(1995–1999\)),
+			},
+		},
 		'AZM' => {
 			display_name => {
 				'currency' => q(manat azerbaidjanés \(1993–2006\)),
@@ -186,6 +227,12 @@ has 'currencies' => (
 				'other' => q(manats azerbaidjanesos),
 			},
 		},
+		'CDF' => {
+			display_name => {
+				'currency' => q(franc congolés),
+				'one' => q(franc congolés),
+			},
+		},
 		'CLE' => {
 			display_name => {
 				'currency' => q(escut xilé),
@@ -198,6 +245,12 @@ has 'currencies' => (
 				'currency' => q(peso xilé),
 				'one' => q(peso xilé),
 				'other' => q(pesos xilens),
+			},
+		},
+		'CNH' => {
+			display_name => {
+				'currency' => q(iuan xinés extracontinental),
+				'one' => q(iuan xinés extracontinental),
 			},
 		},
 		'CNX' => {
@@ -226,6 +279,18 @@ has 'currencies' => (
 				'currency' => q(franc francés),
 				'one' => q(franc francés),
 				'other' => q(francs francesos),
+			},
+		},
+		'GHC' => {
+			display_name => {
+				'currency' => q(cedi ghanés \(1979–2007\)),
+				'one' => q(cedi ghanés \(1979–2007\)),
+			},
+		},
+		'GHS' => {
+			display_name => {
+				'currency' => q(cedi ghanés),
+				'one' => q(cedi ghanés),
 			},
 		},
 		'HUF' => {
@@ -340,6 +405,12 @@ has 'currencies' => (
 				'other' => q(francs de Ruanda),
 			},
 		},
+		'SDD' => {
+			display_name => {
+				'currency' => q(dinar sudanés),
+				'one' => q(dinar sudanés),
+			},
+		},
 		'SIT' => {
 			display_name => {
 				'currency' => q(tolar eslové),
@@ -389,6 +460,18 @@ has 'currencies' => (
 				'other' => q(francs UIC francesos),
 			},
 		},
+		'ZRN' => {
+			display_name => {
+				'currency' => q(nou zaire zairés),
+				'one' => q(nou zaire zairés),
+			},
+		},
+		'ZRZ' => {
+			display_name => {
+				'currency' => q(zaire zairés),
+				'one' => q(zaire zairés),
+			},
+		},
 		'ZWD' => {
 			display_name => {
 				'currency' => q(dòlar zimbabués \(1980–2008\)),
@@ -413,6 +496,150 @@ has 'currencies' => (
 	} },
 );
 
+
+has 'day_period_data' => (
+	is			=> 'ro',
+	isa			=> CodeRef,
+	init_arg	=> undef,
+	default		=> sub { sub {
+		# Time in hhmm format
+		my ($self, $type, $time, $day_period_type) = @_;
+		$day_period_type //= 'default';
+		SWITCH:
+		for ($type) {
+			if ($_ eq 'gregorian') {
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1900;
+					return 'evening1' if $time >= 1900
+						&& $time < 2100;
+					return 'morning1' if $time >= 0
+						&& $time < 600;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
+					return 'night1' if $time >= 2100
+						&& $time < 2400;
+				}
+				if($day_period_type eq 'selection') {
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1900;
+					return 'evening1' if $time >= 1900
+						&& $time < 2100;
+					return 'morning1' if $time >= 0
+						&& $time < 600;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
+					return 'night1' if $time >= 2100
+						&& $time < 2400;
+				}
+				last SWITCH;
+				}
+		}
+	} },
+);
+
+around day_period_data => sub {
+    my ($orig, $self) = @_;
+    return $self->$orig;
+};
+
+has 'day_periods' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+		'gregorian' => {
+			'format' => {
+				'abbreviated' => {
+					'afternoon2' => q{vesprada},
+				},
+				'narrow' => {
+					'afternoon2' => q{vesprada},
+				},
+				'wide' => {
+					'afternoon2' => q{vesprada},
+				},
+			},
+			'stand-alone' => {
+				'narrow' => {
+					'afternoon2' => q{vesprada},
+				},
+				'wide' => {
+					'afternoon2' => q{vesprada},
+				},
+			},
+		},
+	} },
+);
+
+has 'eras' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+		'gregorian' => {
+		},
+	} },
+);
+
+has 'date_formats' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+		'gregorian' => {
+		},
+	} },
+);
+
+has 'time_formats' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+		'gregorian' => {
+		},
+	} },
+);
+
+has 'datetime_formats' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+		'gregorian' => {
+		},
+	} },
+);
+
+has 'datetime_formats_available_formats' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+	} },
+);
+
+has 'datetime_formats_append_item' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+	} },
+);
+
+has 'datetime_formats_interval' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+	} },
+);
 
 no Moo;
 

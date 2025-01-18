@@ -1,6 +1,6 @@
 Locale-CLDR
 
-Please note that this code requires Perl 5.10.1 and above in the main. There are some parts that require
+Please note that this code requires Perl 5.12.0 and above in the main. There are some parts that require
 Perl 5.18 and if you are using Unicode in Perl you really should be using Perl 5.18 or later
 
 The general overview of the project is to convert the XML of the CLDR into a large number of small Perl

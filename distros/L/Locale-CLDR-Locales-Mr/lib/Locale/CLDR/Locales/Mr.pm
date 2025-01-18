@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Mr - Package for language Marathi
 
 package Locale::CLDR::Locales::Mr;
 # This file auto generated from Data\common\main\mr.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -83,6 +83,7 @@ has 'display_name_language' => (
  				'bik' => 'बिकोल',
  				'bin' => 'बिनी',
  				'bla' => 'सिक्सिका',
+ 				'blo' => 'ॲनीआय',
  				'bm' => 'बाम्बारा',
  				'bn' => 'बंगाली',
  				'bo' => 'तिबेटी',
@@ -239,13 +240,13 @@ has 'display_name_language' => (
  				'hu' => 'हंगेरियन',
  				'hup' => 'हूपा',
  				'hur' => 'हॉल्कमेलम',
- 				'hy' => 'आर्मेनियन',
+ 				'hy' => 'अर्मेनियन',
  				'hz' => 'हरेरो',
  				'ia' => 'इंटरलिंग्वा',
  				'iba' => 'इबान',
  				'ibb' => 'इबिबिओ',
  				'id' => 'इंडोनेशियन',
- 				'ie' => 'इन्टरलिंग',
+ 				'ie' => 'इंटरलिंग',
  				'ig' => 'ईग्बो',
  				'ii' => 'सिचुआन यी',
  				'ik' => 'इनूपियाक',
@@ -308,6 +309,7 @@ has 'display_name_language' => (
  				'kv' => 'कोमी',
  				'kw' => 'कोर्निश',
  				'kwk' => 'क्वक्क्वाला',
+ 				'kxv' => 'कुवी',
  				'ky' => 'किरगीझ',
  				'la' => 'लॅटिन',
  				'lad' => 'लादीनो',
@@ -318,8 +320,10 @@ has 'display_name_language' => (
  				'lez' => 'लेझ्घीयन',
  				'lg' => 'गांडा',
  				'li' => 'लिंबूर्गिश',
+ 				'lij' => 'लिगुरिअन',
  				'lil' => 'लिलूएट',
  				'lkt' => 'लाकोटा',
+ 				'lmo' => 'लोंबार्ड',
  				'ln' => 'लिंगाला',
  				'lo' => 'लाओ',
  				'lol' => 'मोंगो',
@@ -392,7 +396,7 @@ has 'display_name_language' => (
  				'nmg' => 'क्वासिओ',
  				'nn' => 'नॉर्वेजियन न्योर्स्क',
  				'nnh' => 'जिएम्बून',
- 				'no' => 'नोर्वेजियन',
+ 				'no' => 'नॉर्वेजियन',
  				'nog' => 'नोगाई',
  				'non' => 'पुरातन नॉर्स',
  				'nqo' => 'एन्को',
@@ -510,6 +514,7 @@ has 'display_name_language' => (
  				'swb' => 'कोमोरियन',
  				'syc' => 'अभिजात सिरियाक',
  				'syr' => 'सिरियाक',
+ 				'szl' => 'सिलेशियन',
  				'ta' => 'तामिळ',
  				'tce' => 'दक्षिणात्य टचोन',
  				'te' => 'तेलगू',
@@ -558,7 +563,9 @@ has 'display_name_language' => (
  				'uz' => 'उझ्बेक',
  				'vai' => 'वाई',
  				've' => 'व्हेंदा',
+ 				'vec' => 'व्हेनेशियन',
  				'vi' => 'व्हिएतनामी',
+ 				'vmw' => 'मखुवा',
  				'vo' => 'ओलापुक',
  				'vot' => 'वॉटिक',
  				'vun' => 'वुंजो',
@@ -572,6 +579,7 @@ has 'display_name_language' => (
  				'wuu' => 'व्हू चिनी',
  				'xal' => 'काल्मिक',
  				'xh' => 'खोसा',
+ 				'xnr' => 'कांगरी',
  				'xog' => 'सोगा',
  				'yao' => 'याओ',
  				'yap' => 'यापीस',
@@ -769,7 +777,7 @@ has 'display_name_region' => (
 	init_arg	=> undef,
 	default		=> sub {
 		{
-			'001' => 'विश्व',
+			'001' => 'जग',
  			'002' => 'आफ्रिका',
  			'003' => 'उत्तर अमेरिका',
  			'005' => 'दक्षिण अमेरिका',
@@ -1180,7 +1188,6 @@ has 'display_name_type' => (
  				'phonebook' => q{फोनबुक अनुक्रम},
  				'phonetic' => q{ध्वनीविचार क्रमवारी क्रम},
  				'pinyin' => q{पिनयिन अनुक्रम},
- 				'reformed' => q{पुनर्स्वरूपित अनुक्रम},
  				'search' => q{सामान्य हेतु शोध},
  				'searchjl' => q{हँगुल प्रारंभिक व्यंजनानुसार शोधा},
  				'standard' => q{प्रमाणित क्रमवारी क्रम},
@@ -1316,9 +1323,9 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{[‌‍ ॄ]},
+			auxiliary => qr{[‌‍ ़ ँ ऍ ऱ ॄ]},
 			index => ['\u200D', 'ॐ', 'ं', 'ः', 'अ', 'आ', 'इ', 'ई', 'उ', 'ऊ', 'ऋ', 'ऌ', 'ए', 'ऐ', 'ऑ', 'ओ', 'औ', 'क', 'ख', 'ग', 'घ', 'ङ', 'च', 'छ', 'ज', 'झ', 'ञ', 'ट', 'ठ', 'ड', 'ढ', 'ण', 'त', 'थ', 'द', 'ध', 'न', 'प', 'फ', 'ब', 'भ', 'म', 'य', 'र', 'ल', 'व', 'श', 'ष', 'स', 'ह', 'ळ', 'ऽ', 'ॅ', '्'],
-			main => qr{[़ ॐ ं ँ ः अ आ इ ई उ ऊ ऋ ऌ ऍ ए ऐ ऑ ओ औ क ख ग घ ङ च छ ज झ ञ ट ठ ड ढ ण त थ द ध न प फ ब भ म य रऱ ल व श ष स ह ळ ऽ ा ि ी ु ू ृ ॅ े ै ॉ ो ौ ्]},
+			main => qr{[ॐ ं ः अ आ इ ई उ ऊ ऋ ऌ ए ऐ ऑ ओ औ क ख ग घ ङ च छ ज झ ञ ट ठ ड ढ ण त थ द ध न प फ ब भ म य र ल व श ष स ह ळ {क्ष} {ज्ञ} ऽ ा ि ी ु ू ृ ॅ े ै ॉ ो ौ ्]},
 			numbers => qr{[\- ‑ , . % ‰ + 0० 1१ 2२ 3३ 4४ 5५ 6६ 7७ 8८ 9९]},
 			punctuation => qr{[\- ‐‑ – — , ; \: ! ? . … '‘’ "“” ( ) \[ \] @ * / \& # ′ ″]},
 		};
@@ -1826,15 +1833,17 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'concentr-milligram-ofglucose-per-deciliter' => {
+						'1' => q(neuter),
 						'name' => q(मिलीग्रामस् पर डेसीलिटर),
-						'one' => q({0} मिलीग्राम पर डेसीलिटर),
-						'other' => q({0} मिलीग्रामस् पर डेसीलिटर),
+						'one' => q({0} मिलीग्रॅम प्रति डेसीलिटर),
+						'other' => q({0} मिलीग्रॅम्स प्रति डेसीलिटर),
 					},
 					# Core Unit Identifier
 					'milligram-ofglucose-per-deciliter' => {
+						'1' => q(neuter),
 						'name' => q(मिलीग्रामस् पर डेसीलिटर),
-						'one' => q({0} मिलीग्राम पर डेसीलिटर),
-						'other' => q({0} मिलीग्रामस् पर डेसीलिटर),
+						'one' => q({0} मिलीग्रॅम प्रति डेसीलिटर),
+						'other' => q({0} मिलीग्रॅम्स प्रति डेसीलिटर),
 					},
 					# Long Unit Identifier
 					'concentr-millimole-per-liter' => {
@@ -1911,6 +1920,20 @@ has 'units' => (
 						'1' => q(masculine),
 						'one' => q({0} पर्मिरेड),
 						'other' => q({0} पर्मिरेड),
+					},
+					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'1' => q(neuter),
+						'name' => q(भाग प्रति अब्ज),
+						'one' => q({0} भाग प्रति अब्ज),
+						'other' => q({0} भाग प्रति अब्ज),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'1' => q(neuter),
+						'name' => q(भाग प्रति अब्ज),
+						'one' => q({0} भाग प्रति अब्ज),
+						'other' => q({0} भाग प्रति अब्ज),
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
@@ -2253,6 +2276,22 @@ has 'units' => (
 						'other' => q({0} नॅनोसेकंद),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'1' => q(feminine),
+						'name' => q(रात्री),
+						'one' => q(रात्र),
+						'other' => q({0} रात्री),
+						'per' => q({0}/रात्र),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'1' => q(feminine),
+						'name' => q(रात्री),
+						'one' => q(रात्र),
+						'other' => q({0} रात्री),
+						'per' => q({0}/रात्र),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'1' => q(feminine),
 						'one' => q({0} तिमाही),
@@ -2424,15 +2463,17 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'energy-kilocalorie' => {
-						'name' => q(किलोकॅलोरी),
-						'one' => q({0} किलोकॅलोरी),
-						'other' => q({0} किलोकॅलोरी),
+						'1' => q(feminine),
+						'name' => q(किलोकॅलरी),
+						'one' => q({0} किलोकॅलरी),
+						'other' => q({0} किलोकॅलरी),
 					},
 					# Core Unit Identifier
 					'kilocalorie' => {
-						'name' => q(किलोकॅलोरी),
-						'one' => q({0} किलोकॅलोरी),
-						'other' => q({0} किलोकॅलोरी),
+						'1' => q(feminine),
+						'name' => q(किलोकॅलरी),
+						'one' => q({0} किलोकॅलरी),
+						'other' => q({0} किलोकॅलरी),
 					},
 					# Long Unit Identifier
 					'energy-kilojoule' => {
@@ -2867,6 +2908,18 @@ has 'units' => (
 						'other' => q({0} पिकोमीटर),
 					},
 					# Long Unit Identifier
+					'length-point' => {
+						'1' => q(masculine),
+						'one' => q({0} बिंदु),
+						'other' => q({0} बिंदु),
+					},
+					# Core Unit Identifier
+					'point' => {
+						'1' => q(masculine),
+						'one' => q({0} बिंदु),
+						'other' => q({0} बिंदु),
+					},
+					# Long Unit Identifier
 					'length-solar-radius' => {
 						'one' => q({0} सौर त्रिज्या),
 						'other' => q({0} सौर त्रिज्या),
@@ -3264,12 +3317,14 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'pressure-millimeter-ofhg' => {
+						'1' => q(neuter),
 						'name' => q(मर्क्यूरी मिलिमीटर),
 						'one' => q({0} मर्क्यूरी मिलिमीटर),
 						'other' => q({0} मर्क्यूरी मिलिमीटर),
 					},
 					# Core Unit Identifier
 					'millimeter-ofhg' => {
+						'1' => q(neuter),
 						'name' => q(मर्क्यूरी मिलिमीटर),
 						'one' => q({0} मर्क्यूरी मिलिमीटर),
 						'other' => q({0} मर्क्यूरी मिलिमीटर),
@@ -3278,15 +3333,15 @@ has 'units' => (
 					'pressure-pascal' => {
 						'1' => q(masculine),
 						'name' => q(पास्काल),
-						'one' => q({0} पास्काल),
-						'other' => q({0} पास्काल),
+						'one' => q({0} पास्कल),
+						'other' => q({0} पास्कल),
 					},
 					# Core Unit Identifier
 					'pascal' => {
 						'1' => q(masculine),
 						'name' => q(पास्काल),
-						'one' => q({0} पास्काल),
-						'other' => q({0} पास्काल),
+						'one' => q({0} पास्कल),
+						'other' => q({0} पास्कल),
 					},
 					# Long Unit Identifier
 					'pressure-pound-force-per-square-inch' => {
@@ -3337,6 +3392,20 @@ has 'units' => (
 						'name' => q(नॉट),
 						'one' => q({0} नॉट),
 						'other' => q({0} नॉट),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'1' => q(masculine),
+						'name' => q(प्रकाश),
+						'one' => q(प्रकाश),
+						'other' => q({0} प्रकाश),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'1' => q(masculine),
+						'name' => q(प्रकाश),
+						'one' => q(प्रकाश),
+						'other' => q({0} प्रकाश),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -4049,6 +4118,18 @@ has 'units' => (
 						'other' => q({0}ppm),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(भाग/अब्ज),
+						'one' => q({0} भाग/अब्ज),
+						'other' => q({0} भाग/अब्ज),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(भाग/अब्ज),
+						'one' => q({0} भाग/अब्ज),
+						'other' => q({0} भाग/अब्ज),
+					},
+					# Long Unit Identifier
 					'consumption-mile-per-gallon' => {
 						'one' => q({0}mpg),
 						'other' => q({0}mpg),
@@ -4243,6 +4324,20 @@ has 'units' => (
 						'name' => q(नॅसे),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(रात्री),
+						'one' => q({0} रात्र),
+						'other' => q({0} रात्र),
+						'per' => q({0}/रात्र),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(रात्री),
+						'one' => q({0} रात्र),
+						'other' => q({0} रात्र),
+						'per' => q({0}/रात्र),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'one' => q({0}ति),
 						'other' => q({0}ति),
@@ -4297,6 +4392,18 @@ has 'units' => (
 					'british-thermal-unit' => {
 						'one' => q({0}Btu),
 						'other' => q({0}Btu),
+					},
+					# Long Unit Identifier
+					'energy-kilocalorie' => {
+						'name' => q(किकॅल),
+						'one' => q({0} किकॅ),
+						'other' => q({0} किकॅ),
+					},
+					# Core Unit Identifier
+					'kilocalorie' => {
+						'name' => q(किकॅल),
+						'one' => q({0} किकॅ),
+						'other' => q({0} किकॅ),
 					},
 					# Long Unit Identifier
 					'force-kilowatt-hour-per-100-kilometer' => {
@@ -4419,16 +4526,6 @@ has 'units' => (
 					'meter' => {
 						'one' => q({0}मी),
 						'other' => q({0}मी),
-					},
-					# Long Unit Identifier
-					'length-mile' => {
-						'one' => q({0}मैल),
-						'other' => q({0}मैल),
-					},
-					# Core Unit Identifier
-					'mile' => {
-						'one' => q({0}मैल),
-						'other' => q({0}मैल),
 					},
 					# Long Unit Identifier
 					'length-millimeter' => {
@@ -4643,6 +4740,18 @@ has 'units' => (
 					'kilometer-per-hour' => {
 						'one' => q({0}किप्रता),
 						'other' => q({0}किप्रता),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(प्र),
+						'one' => q({0} प्रकाश),
+						'other' => q({0} प्रकाश),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(प्र),
+						'one' => q({0} प्रकाश),
+						'other' => q({0} प्रकाश),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -5211,6 +5320,18 @@ has 'units' => (
 						'name' => q(पर्मिरेड),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(भाग/अब्ज),
+						'one' => q({0} भाग प्रति अब्ज),
+						'other' => q({0} भाप्रअ),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(भाग/अब्ज),
+						'one' => q({0} भाग प्रति अब्ज),
+						'other' => q({0} भाप्रअ),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(ली/100किमी),
 						'one' => q({0} ली/100किमी),
@@ -5469,6 +5590,20 @@ has 'units' => (
 						'other' => q({0} नॅसे),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(रात्री),
+						'one' => q({0} रात्र),
+						'other' => q({0} रात्र),
+						'per' => q({0}/रात्र),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(रात्री),
+						'one' => q({0} रात्र),
+						'other' => q({0} रात्र),
+						'per' => q({0}/रात्र),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'name' => q(तिमाही),
 						'one' => q({0} तिमाही),
@@ -5569,6 +5704,14 @@ has 'units' => (
 						'other' => q({0} बिटीयू),
 					},
 					# Long Unit Identifier
+					'energy-calorie' => {
+						'name' => q(कॅ),
+					},
+					# Core Unit Identifier
+					'calorie' => {
+						'name' => q(कॅ),
+					},
+					# Long Unit Identifier
 					'energy-electronvolt' => {
 						'name' => q(इलेक्ट्रॉनव्होल्ट),
 					},
@@ -5595,6 +5738,18 @@ has 'units' => (
 					# Core Unit Identifier
 					'joule' => {
 						'name' => q(ज्यूल),
+					},
+					# Long Unit Identifier
+					'energy-kilocalorie' => {
+						'name' => q(किकॅ),
+						'one' => q({0} किकॅ),
+						'other' => q({0} किकॅ),
+					},
+					# Core Unit Identifier
+					'kilocalorie' => {
+						'name' => q(किकॅ),
+						'one' => q({0} किकॅ),
+						'other' => q({0} किकॅ),
 					},
 					# Long Unit Identifier
 					'energy-kilojoule' => {
@@ -6121,6 +6276,18 @@ has 'units' => (
 						'name' => q(किमी/तास),
 						'one' => q({0} किप्रता),
 						'other' => q({0} किप्रता),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(प्र),
+						'one' => q({0} प्रकाश),
+						'other' => q({0} प्रकाश),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(प्र),
+						'one' => q({0} प्रकाश),
+						'other' => q({0} प्रकाश),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -7932,6 +8099,25 @@ has 'calendar_months' => (
 			},
 			'indian' => {
 				'format' => {
+					abbreviated => {
+						nonleap => [
+							'चैत्र',
+							'वैशाख',
+							'ज्येष्ठ',
+							'आषाढ',
+							'श्रावण',
+							'भाद्रपद',
+							'अश्विन',
+							'कार्तिक',
+							'मार्गशीर्ष',
+							'पौष',
+							'माघ',
+							'फाल्गुन'
+						],
+						leap => [
+							
+						],
+					},
 					wide => {
 						nonleap => [
 							'चैत्र',
@@ -7939,7 +8125,7 @@ has 'calendar_months' => (
 							'ज्येष्ठ',
 							'आषाढ',
 							'श्रावण',
-							'भाद्र',
+							'भाद्रपद',
 							'आश्विन',
 							'कार्तिक',
 							'मार्गशीर्ष',
@@ -7953,6 +8139,25 @@ has 'calendar_months' => (
 					},
 				},
 				'stand-alone' => {
+					abbreviated => {
+						nonleap => [
+							'चैत्र',
+							'वैशाख',
+							'ज्येष्ठ',
+							'आषाढ',
+							'श्रावण',
+							'भाद्रपद',
+							'अश्विन',
+							'कार्तिक',
+							'मार्गशीर्ष',
+							'पौष',
+							'माघ',
+							'फाल्गुन'
+						],
+						leap => [
+							
+						],
+					},
 					narrow => {
 						nonleap => [
 							'१',
@@ -7967,6 +8172,25 @@ has 'calendar_months' => (
 							'१०',
 							'११',
 							'१२'
+						],
+						leap => [
+							
+						],
+					},
+					wide => {
+						nonleap => [
+							'चैत्र',
+							'वैशाख',
+							'ज्येष्ठ',
+							'आषाढ',
+							'श्रावण',
+							'भाद्रपद',
+							'आश्विन',
+							'कार्तिक',
+							'मार्गशीर्ष',
+							'पौष',
+							'माघ',
+							'फाल्गुन'
 						],
 						leap => [
 							
@@ -9458,9 +9682,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#न्यूयॉर्क#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#निपिगोन#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#नोम#,
 		},
@@ -9481,9 +9702,6 @@ has 'time_zone_names' => (
 		},
 		'America/Panama' => {
 			exemplarCity => q#पनामा#,
-		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#पँगनिरतुंग#,
 		},
 		'America/Paramaribo' => {
 			exemplarCity => q#पारमरीबो#,
@@ -9506,9 +9724,6 @@ has 'time_zone_names' => (
 		'America/Punta_Arenas' => {
 			exemplarCity => q#पुंता अरीनास#,
 		},
-		'America/Rainy_River' => {
-			exemplarCity => q#रेनी नदी#,
-		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#रॅनकिन इनलेट#,
 		},
@@ -9523,9 +9738,6 @@ has 'time_zone_names' => (
 		},
 		'America/Rio_Branco' => {
 			exemplarCity => q#रियो ब्रांको#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#सांता इसाबेल#,
 		},
 		'America/Santarem' => {
 			exemplarCity => q#सँटारेम#,
@@ -9572,9 +9784,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#थुले#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#थंडर उपसागर#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#तिजुआना#,
 		},
@@ -9595,9 +9804,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#यकुतात#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#यलोनाइफ#,
 		},
 		'America_Central' => {
 			long => {
@@ -9747,7 +9953,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#बगदाद#,
 		},
 		'Asia/Bahrain' => {
-			exemplarCity => q#बेहरीन#,
+			exemplarCity => q#बहारिन#,
 		},
 		'Asia/Baku' => {
 			exemplarCity => q#बाकु#,
@@ -9772,9 +9978,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#चिता#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#चोईबाल्सन#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#कोलंबो#,
@@ -10014,9 +10217,6 @@ has 'time_zone_names' => (
 		'Australia/Broken_Hill' => {
 			exemplarCity => q#ब्रोकन हिल#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#कुह्री#,
-		},
 		'Australia/Darwin' => {
 			exemplarCity => q#डार्विन#,
 		},
@@ -10143,13 +10343,6 @@ has 'time_zone_names' => (
 				'daylight' => q#चीनी सूर्यप्रकाश वेळ#,
 				'generic' => q#चीनी वेळ#,
 				'standard' => q#चीनी प्रमाण वेळ#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#चोईबाल्सन उन्हाळी वेळ#,
-				'generic' => q#चोईबाल्सन वेळ#,
-				'standard' => q#चोईबाल्सन प्रमाण वेळ#,
 			},
 		},
 		'Christmas' => {
@@ -10374,9 +10567,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#उल्यानोव्स्क#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#उझहोरोड#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#वडूझ#,
 		},
@@ -10397,9 +10587,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#झॅग्रेब#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#झापोरोझे#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#झुरिक#,
@@ -10574,7 +10761,7 @@ has 'time_zone_names' => (
 		},
 		'Indian_Ocean' => {
 			long => {
-				'standard' => q#हिंदमहासागर वेळ#,
+				'standard' => q#हिंद महासागर वेळ#,
 			},
 		},
 		'Indochina' => {
@@ -10630,6 +10817,11 @@ has 'time_zone_names' => (
 				'daylight' => q#पेट्रोपाव्हलोस्क- कामचाट्स्की ग्रीष्मकालीन वेळ#,
 				'generic' => q#पेट्रोपाव्हलोस्क- कामचाट्स्की वेळ#,
 				'standard' => q#पेट्रोपाव्हलोस्क- कामचाट्स्की प्रमाणवेळ#,
+			},
+		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#कझाकस्तान वेळ#,
 			},
 		},
 		'Kazakhstan_Eastern' => {
@@ -10690,11 +10882,6 @@ has 'time_zone_names' => (
 				'standard' => q#मकाऊ प्रमाणवेळ#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#मॅक्वेरी बेट वेळ#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#मॅगाडन उन्हाळी वेळ#,
@@ -10732,13 +10919,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#मॉसन वेळ#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#वायव्य मेक्सिको सूर्यप्रकाश वेळ#,
-				'generic' => q#वायव्य मेक्सिको वेळ#,
-				'standard' => q#वायव्य मेक्सिको प्रमाण वेळ#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -10880,9 +11060,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Honolulu' => {
 			exemplarCity => q#होनोलुलू#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#जोहान्स्टन#,
 		},
 		'Pacific/Kanton' => {
 			exemplarCity => q#कँटन#,

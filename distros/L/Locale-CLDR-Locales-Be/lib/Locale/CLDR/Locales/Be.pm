@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Be - Package for language Belarusian
 
 package Locale::CLDR::Locales::Be;
 # This file auto generated from Data\common\main\be.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -2045,6 +2045,7 @@ has 'display_name_language' => (
  				'bi' => 'біслама',
  				'bin' => 'эда',
  				'bla' => 'блэкфут',
+ 				'blo' => 'аніі',
  				'bm' => 'бамбара',
  				'bn' => 'бенгальская',
  				'bo' => 'тыбецкая',
@@ -2229,6 +2230,7 @@ has 'display_name_language' => (
  				'kv' => 'комі',
  				'kw' => 'корнская',
  				'kwk' => 'квакіутль',
+ 				'kxv' => 'куві',
  				'ky' => 'кіргізская',
  				'la' => 'лацінская',
  				'lad' => 'ладына',
@@ -2237,8 +2239,10 @@ has 'display_name_language' => (
  				'lez' => 'лезгінская',
  				'lg' => 'ганда',
  				'li' => 'лімбургская',
+ 				'lij' => 'лігурская',
  				'lil' => 'лілуэт',
  				'lkt' => 'лакота',
+ 				'lmo' => 'ламбардская',
  				'ln' => 'лінгала',
  				'lo' => 'лаоская',
  				'lol' => 'монга',
@@ -2404,6 +2408,7 @@ has 'display_name_language' => (
  				'sw_CD' => 'кангалезская суахілі',
  				'swb' => 'каморская',
  				'syr' => 'сірыйская',
+ 				'szl' => 'сілезская',
  				'ta' => 'тамільская',
  				'tce' => 'паўднёвая тутчонэ',
  				'te' => 'тэлугу',
@@ -2443,7 +2448,9 @@ has 'display_name_language' => (
  				'uz' => 'узбекская',
  				'vai' => 'ваі',
  				've' => 'венда',
+ 				'vec' => 'венецыянская',
  				'vi' => 'в’етнамская',
+ 				'vmw' => 'макуа',
  				'vo' => 'валапюк',
  				'vun' => 'вунджо',
  				'wa' => 'валонская',
@@ -2455,6 +2462,7 @@ has 'display_name_language' => (
  				'wuu' => 'ву',
  				'xal' => 'калмыцкая',
  				'xh' => 'коса',
+ 				'xnr' => 'кангры',
  				'xog' => 'сога',
  				'yav' => 'янгбэн',
  				'ybb' => 'йемба',
@@ -2463,6 +2471,7 @@ has 'display_name_language' => (
  				'yrl' => 'ньенгату',
  				'yue' => 'кантонскі дыялект кітайскай',
  				'yue@alt=menu' => 'кітайская, кантонскі дыялект',
+ 				'za' => 'чжуанская',
  				'zap' => 'сапатэк',
  				'zgh' => 'стандартная мараканская тамазіхт',
  				'zh' => 'кітайская',
@@ -2718,7 +2727,7 @@ has 'display_name_region' => (
  			'IM' => 'Востраў Мэн',
  			'IN' => 'Індыя',
  			'IO' => 'Брытанская тэрыторыя ў Індыйскім акіяне',
- 			'IO@alt=chagos' => 'архіпелаг Чагас',
+ 			'IO@alt=chagos' => 'Архіпелаг Чагас',
  			'IQ' => 'Ірак',
  			'IR' => 'Іран',
  			'IS' => 'Ісландыя',
@@ -3733,6 +3742,22 @@ has 'units' => (
 						'other' => q({0} базіснага пункта),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'few' => q({0} часткі на мільярд),
+						'many' => q({0} частак на мільярд),
+						'name' => q(частак на мільярд),
+						'one' => q({0} частка на мільярд),
+						'other' => q({0} часткі на мільярд),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'few' => q({0} часткі на мільярд),
+						'many' => q({0} частак на мільярд),
+						'name' => q(частак на мільярд),
+						'one' => q({0} частка на мільярд),
+						'other' => q({0} часткі на мільярд),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'few' => q({0} літры на 100 кіламетраў),
 						'many' => q({0} літраў на 100 кіламетраў),
@@ -4121,6 +4146,24 @@ has 'units' => (
 						'name' => q(нанасекунды),
 						'one' => q({0} нанасекунда),
 						'other' => q({0} нанасекунды),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'few' => q({0} ночы),
+						'many' => q({0} начэй),
+						'name' => q(ночы),
+						'one' => q({0} ноч),
+						'other' => q({0} ночы),
+						'per' => q({0} за ноч),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'few' => q({0} ночы),
+						'many' => q({0} начэй),
+						'name' => q(ночы),
+						'one' => q({0} ноч),
+						'other' => q({0} ночы),
+						'per' => q({0} за ноч),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -6119,6 +6162,22 @@ has 'units' => (
 						'other' => q({0}%),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'few' => q({0} ч/млрд),
+						'many' => q({0} ч/млрд),
+						'name' => q(ч/млрд),
+						'one' => q({0} ч/млрд),
+						'other' => q({0} ч/млрд),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'few' => q({0} ч/млрд),
+						'many' => q({0} ч/млрд),
+						'name' => q(ч/млрд),
+						'one' => q({0} ч/млрд),
+						'other' => q({0} ч/млрд),
+					},
+					# Long Unit Identifier
 					'coordinate' => {
 						'east' => q({0} У),
 						'north' => q({0} Пн),
@@ -6131,6 +6190,24 @@ has 'units' => (
 						'north' => q({0} Пн),
 						'south' => q({0} Пд),
 						'west' => q({0} З),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'few' => q({0} ночы),
+						'many' => q({0} начэй),
+						'name' => q(ночы),
+						'one' => q({0} ноч),
+						'other' => q({0} ночы),
+						'per' => q({0}/ноч),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'few' => q({0} ночы),
+						'many' => q({0} начэй),
+						'name' => q(ночы),
+						'one' => q({0} ноч),
+						'other' => q({0} ночы),
+						'per' => q({0}/ноч),
 					},
 					# Long Unit Identifier
 					'energy-therm-us' => {
@@ -6821,6 +6898,22 @@ has 'units' => (
 						'other' => q({0} ‱),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'few' => q({0} ч/млрд),
+						'many' => q({0} ч/млрд),
+						'name' => q(частак/мільярд),
+						'one' => q({0} ч/млрд),
+						'other' => q({0} ч/млрд),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'few' => q({0} ч/млрд),
+						'many' => q({0} ч/млрд),
+						'name' => q(частак/мільярд),
+						'one' => q({0} ч/млрд),
+						'other' => q({0} ч/млрд),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'few' => q({0} л/100 км),
 						'many' => q({0} л/100 км),
@@ -7225,6 +7318,24 @@ has 'units' => (
 						'name' => q(нс),
 						'one' => q({0} нс),
 						'other' => q({0} нс),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'few' => q({0} ноч),
+						'many' => q({0} начэй),
+						'name' => q(ночы),
+						'one' => q({0} ноч),
+						'other' => q({0} ночы),
+						'per' => q({0}/ноч),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'few' => q({0} ноч),
+						'many' => q({0} начэй),
+						'name' => q(ночы),
+						'one' => q({0} ноч),
+						'other' => q({0} ночы),
+						'per' => q({0}/ноч),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -12192,9 +12303,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#Нью-Ёрк#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#Ніпіган#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#Ном#,
 		},
@@ -12215,9 +12323,6 @@ has 'time_zone_names' => (
 		},
 		'America/Panama' => {
 			exemplarCity => q#Панама#,
-		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#Пангніртанг#,
 		},
 		'America/Paramaribo' => {
 			exemplarCity => q#Парамарыба#,
@@ -12240,9 +12345,6 @@ has 'time_zone_names' => (
 		'America/Punta_Arenas' => {
 			exemplarCity => q#Пунта-Арэнас#,
 		},
-		'America/Rainy_River' => {
-			exemplarCity => q#Рэйні-Рывер#,
-		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#Ранкін-Інлет#,
 		},
@@ -12257,9 +12359,6 @@ has 'time_zone_names' => (
 		},
 		'America/Rio_Branco' => {
 			exemplarCity => q#Рыу-Бранку#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#Санта-Ісабель#,
 		},
 		'America/Santarem' => {
 			exemplarCity => q#Сантарэн#,
@@ -12306,9 +12405,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#Туле#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#Тандэр-Бэй#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#Тыхуана#,
 		},
@@ -12329,9 +12425,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#Якутат#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#Елаўнайф#,
 		},
 		'America_Central' => {
 			long => {
@@ -12485,9 +12578,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#Чыта#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#Чайбалсан#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#Каломба#,
@@ -12727,9 +12817,6 @@ has 'time_zone_names' => (
 		'Australia/Broken_Hill' => {
 			exemplarCity => q#Брокен-Хіл#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#Керы#,
-		},
 		'Australia/Darwin' => {
 			exemplarCity => q#Дарвін#,
 		},
@@ -12856,13 +12943,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Летні час Кітая#,
 				'generic' => q#Час Кітая#,
 				'standard' => q#Стандартны час Кітая#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Летні час Чайбалсана#,
-				'generic' => q#Час Чайбалсана#,
-				'standard' => q#Стандартны час Чайбалсана#,
 			},
 		},
 		'Christmas' => {
@@ -13087,9 +13167,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#Ульянаўск#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#Ужгарад#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#Вадуц#,
 		},
@@ -13110,9 +13187,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#Заграб#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#Запарожжа#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#Цюрых#,
@@ -13330,6 +13404,11 @@ has 'time_zone_names' => (
 				'standard' => q#Стандартны час Японіі#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Казахстанскі час#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#Усходнеказахстанскі час#,
@@ -13376,11 +13455,6 @@ has 'time_zone_names' => (
 				'standard' => q#Стандартны час Лорд-Хау#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Час вострава Макуоры#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Магаданскі летні час#,
@@ -13418,13 +13492,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Час станцыі Моўсан#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Паўночна-заходні мексіканскі летні час#,
-				'generic' => q#Паўночна-заходні мексіканскі час#,
-				'standard' => q#Паўночна-заходні мексіканскі стандартны час#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -13561,9 +13628,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Honolulu' => {
 			exemplarCity => q#Ганалулу#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#Джонстан#,
 		},
 		'Pacific/Kanton' => {
 			exemplarCity => q#Кантон#,

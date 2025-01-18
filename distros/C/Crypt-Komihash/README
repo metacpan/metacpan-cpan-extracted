@@ -1,0 +1,59 @@
+# NAME
+
+Crypt::Komihash - Komihash implementation in Perl
+
+# SYNOPSIS
+
+    use Crypt::Komihash qw(komihash komihash_hex komirand_seed komirand64);
+
+    my $input = "Hello world";
+    my $seed  = 0;
+
+    my $num     = komihash($input, $seed);     # 3745467240760726046
+    my $hex_str = komihash_hex($input, $seed); # 33fa929c7367d21e
+
+    komirand_seed($seed1, $seed2);
+    my $rand    = komirand64();
+
+# DESCRIPTION
+
+Komihash is a super fast modern hashing algorithm that converts strings into
+64bit integers. Mainly designed for hash-table, hash-map, and bloom-filter
+uses. As a bonus, Komihash also includes a pseudo random number generator.
+
+Komihash: [https://github.com/avaneev/komihash](https://github.com/avaneev/komihash)
+
+**Note:** This module _requires_ a 64bit CPU
+
+# METHODS
+
+### **$num = komihash($bytes, $seed = 0)**
+
+returns 64bit integer hash for the given input and seed.
+
+### **$hex = komihash\_hex($bytes, $seed = 0)**
+
+returns hex string hash for the given input and seed.
+
+### **komirand\_seed($seed1, $seed2)**
+
+seed the Komirand PRNG with two 64bit unsigned integers
+
+### **$num = komirand64()**
+
+returns a random 64bit unsigned integer
+
+# BUGS
+
+Submit issues on Github: [https://github.com/scottchiefbaker/perl-Crypt-Komihash/issues](https://github.com/scottchiefbaker/perl-Crypt-Komihash/issues)
+
+# SEE ALSO
+
+- Crypt::xxHash
+- Digest::FarmHash
+- Digest::SpookyHash
+- Digest::SHA
+
+# AUTHOR
+
+Scott Baker - [https://www.perturb.org/](https://www.perturb.org/)

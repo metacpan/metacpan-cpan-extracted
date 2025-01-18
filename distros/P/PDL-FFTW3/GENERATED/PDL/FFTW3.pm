@@ -11,10 +11,11 @@ use PDL::Exporter;
 use DynaLoader;
 
 
-   our $VERSION = '0.201';
+   our $VERSION = '0.203';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::FFTW3 $VERSION;
+
 
 
 
@@ -293,7 +294,7 @@ DeForest, C<< <craig@deforest.org> >>.
 Copyright 2013 Dima Kogan and Craig DeForest.
 
 This program is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License.
+under the same terms as PDL.
 
 =cut
 
@@ -885,7 +886,7 @@ sub irfftn  { _rank_springboard( "irfft", @_ ) }
 *PDL::ifftn  = \&ifftn;
 *PDL::rfftn  = \&rfftn;
 *PDL::irfftn = \&irfftn;
-#line 889 "FFTW3.pm"
+#line 890 "FFTW3.pm"
 
 # Exit with OK status
 

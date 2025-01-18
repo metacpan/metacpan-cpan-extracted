@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Chr - Package for language Cherokee
 
 package Locale::CLDR::Locales::Chr;
 # This file auto generated from Data\common\main\chr.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -338,6 +338,7 @@ has 'display_name_language' => (
  				'bi' => 'ᏈᏍᎳᎹ',
  				'bin' => 'ᏈᏂ',
  				'bla' => 'ᏏᎩᏏᎧ',
+ 				'blo' => 'ᎠᏂᎵ',
  				'bm' => 'ᏆᎻᏆᎳ',
  				'bn' => 'ᏇᏂᎦᎳ',
  				'bo' => 'ᏘᏇᏔᏂ',
@@ -459,6 +460,7 @@ has 'display_name_language' => (
  				'iba' => 'ᎢᏆᏂ',
  				'ibb' => 'ᎢᏈᏈᎣ',
  				'id' => 'ᎢᏂᏙᏂᏏᎠ',
+ 				'ie' => 'ᏈᏖᎵᏆ',
  				'ig' => 'ᎢᎦᎪ',
  				'ii' => 'ᏏᏧᏩᏂ Ᏹ',
  				'ikt' => 'ᏭᏕᎵᎬ ᎨᎾᏓ ᎢᏄᎩᏘᏚᏘ',
@@ -511,6 +513,7 @@ has 'display_name_language' => (
  				'kv' => 'ᎪᎻ',
  				'kw' => 'ᏎᎷᎭ',
  				'kwk' => 'ᏆᏆᎳ',
+ 				'kxv' => 'ᎫᏈ',
  				'ky' => 'ᎩᎵᏣᎢᏍ',
  				'la' => 'ᎳᏘᏂ',
  				'lad' => 'ᎳᏗᏃ',
@@ -519,8 +522,10 @@ has 'display_name_language' => (
  				'lez' => 'ᎴᏏᎦᏂ',
  				'lg' => 'ᎦᏂᏓ',
  				'li' => 'ᎴᎹᏊᎵᏏ',
+ 				'lij' => 'ᎵᏇᎢᎠ',
  				'lil' => 'ᎵᎶᎡᏘ',
  				'lkt' => 'ᎳᎪᏓ',
+ 				'lmo' => 'ᎶᏆᏗ',
  				'ln' => 'ᎵᏂᎦᎳ',
  				'lo' => 'ᎳᎣ',
  				'lou' => 'ᎷᏫᏏᎡᎾ ᎦᏬᏂᎯᏍᏗ',
@@ -676,6 +681,7 @@ has 'display_name_language' => (
  				'sw_CD' => 'ᎧᏂᎪ ᏍᏩᎯᎵ',
  				'swb' => 'ᎪᎼᎵᎠᏂ',
  				'syr' => 'ᏏᎵᎠᎩ',
+ 				'szl' => 'ᏏᎴᏏᏂ',
  				'ta' => 'ᏔᎻᎵ',
  				'tce' => 'ᏧᎦᏃᏮ ᏚᏦᏁ',
  				'te' => 'ᏖᎷᎦ',
@@ -715,7 +721,9 @@ has 'display_name_language' => (
  				'uz' => 'ᎤᏍᏇᎩ',
  				'vai' => 'ᏩᏱ',
  				've' => 'ᏫᏂᏓ',
+ 				'vec' => 'ᏈᏂᏒᏂ',
  				'vi' => 'ᏫᎡᏘᎾᎻᏍ',
+ 				'vmw' => 'ᎹᎱᏩ',
  				'vo' => 'ᏬᎳᏊᎩ',
  				'vun' => 'ᏭᎾᏦ',
  				'wa' => 'ᏩᎷᎾ',
@@ -726,6 +734,7 @@ has 'display_name_language' => (
  				'wuu' => 'Ꮽ ᏓᎶᏂᎨᏍᏛ',
  				'xal' => 'ᎧᎳᎻᎧ',
  				'xh' => 'ᏠᏌ',
+ 				'xnr' => 'ᎧᏈᎢ',
  				'xog' => 'ᏐᎦ',
  				'yav' => 'ᏰᎾᎦᏇᏂ',
  				'ybb' => 'ᏰᎹᏋ',
@@ -734,6 +743,7 @@ has 'display_name_language' => (
  				'yrl' => 'ᏂᎾᎦᏚ',
  				'yue' => 'ᎨᎾᏙᏂᏏ',
  				'yue@alt=menu' => 'ᏓᎶᏂᎨ, ᎨᎾᏙᏂᏏ',
+ 				'za' => 'ᎱᎠᏂ',
  				'zgh' => 'ᎠᏟᎶᏍᏗ ᎼᎶᎪ ᏔᎹᏏᏘ',
  				'zh' => 'ᏓᎶᏂᎨ',
  				'zh@alt=menu' => 'ᏓᎶᏂᎨ, ᎹᏓᏈᏂ',
@@ -1866,6 +1876,18 @@ has 'units' => (
 						'other' => q({0} ᏋᎻᎵᎠᏗ),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(ᏚᏙᏢᏒ ᎢᏳᏓᎵ ᎢᏳᏔᎵᎳᏗᏅᏛ),
+						'one' => q({0} ᎤᏙᏢᏒ ᎢᏳᏓᎵ ᎢᏳᏔᎵᎳᏗᏅᏛ),
+						'other' => q({0} ᏚᏙᏢᏒ ᎢᏳᏓᎵ ᎢᏳᏔᎵᎳᏗᏅᏛ),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(ᏚᏙᏢᏒ ᎢᏳᏓᎵ ᎢᏳᏔᎵᎳᏗᏅᏛ),
+						'one' => q({0} ᎤᏙᏢᏒ ᎢᏳᏓᎵ ᎢᏳᏔᎵᎳᏗᏅᏛ),
+						'other' => q({0} ᏚᏙᏢᏒ ᎢᏳᏓᎵ ᎢᏳᏔᎵᎳᏗᏅᏛ),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(ᏗᎵᏔᎢ 100 ᎠᎦᏴᎵ ᏗᏟᎶᏍᏗ ᎢᏳᏓᎵ),
 						'one' => q({0} ᎵᏔᎢ 100 ᎠᎦᏴᎵ ᏗᏟᎶᏍᏗ ᎢᏳᏓᎵ),
@@ -2156,6 +2178,20 @@ has 'units' => (
 					'nanosecond' => {
 						'one' => q({0} ᎾᏃᎠᏎᏢ),
 						'other' => q({0} ᎾᏃᏗᏎᏢ),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(ᏚᎵᏏᏂᏒ),
+						'one' => q({0} ᎤᏒ),
+						'other' => q({0} ᏚᎵᏏᏂᏒ),
+						'per' => q({0}/ᎤᏒ),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(ᏚᎵᏏᏂᏒ),
+						'one' => q({0} ᎤᏒ),
+						'other' => q({0} ᏚᎵᏏᏂᏒ),
+						'per' => q({0}/ᎤᏒ),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -3224,6 +3260,18 @@ has 'units' => (
 						'other' => q({0} ᏓᎧᏁᎲ),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(ᎠᏨᏍᏗ),
+						'one' => q({0} ᎠᏨᏍᏗ),
+						'other' => q({0} ᎠᏨᏍᏗ),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(ᎠᏨᏍᏗ),
+						'one' => q({0} ᎠᏨᏍᏗ),
+						'other' => q({0} ᎠᏨᏍᏗ),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'name' => q(ᏗᏟᎶᏗ ᎠᏎᏢ ᎢᏳᏓᎵ),
 						'one' => q({0} ᎠᏟᎶᏗ ᎠᏎᏢ ᎢᏳᏓᎵ),
@@ -3962,6 +4010,16 @@ has 'units' => (
 						'name' => q(‱),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'one' => q({0}ppb),
+						'other' => q({0}ppb),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'one' => q({0}ppb),
+						'other' => q({0}ppb),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(L/100km),
 						'one' => q({0}L/100km),
@@ -4252,6 +4310,20 @@ has 'units' => (
 					'nanosecond' => {
 						'one' => q({0}ᎾᏃ),
 						'other' => q({0}ᎾᏃ),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(ᏚᎵᏏᏂᏒ),
+						'one' => q({0}ᎤᏒ),
+						'other' => q({0}ᏚᎵᏏᏂᏒ),
+						'per' => q({0}/ᎤᏒ),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(ᏚᎵᏏᏂᏒ),
+						'one' => q({0}ᎤᏒ),
+						'other' => q({0}ᏚᎵᏏᏂᏒ),
+						'per' => q({0}/ᎤᏒ),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -5226,6 +5298,18 @@ has 'units' => (
 						'other' => q({0}kn),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(ᎠᏨᏍᏗ),
+						'one' => q({0}ᎠᏨᏍᏗ),
+						'other' => q({0}ᎠᏨᏍᏗ),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(ᎠᏨᏍᏗ),
+						'one' => q({0}ᎠᏨᏍᏗ),
+						'other' => q({0}ᎠᏨᏍᏗ),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'name' => q(m/s),
 						'one' => q({0}m/s),
@@ -5906,6 +5990,14 @@ has 'units' => (
 						'name' => q(ᏋᎻᎵᎠᏗ),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(ᏚᏙᏢᏒ/ᎢᏳᏔᎵᎳᏗᏅᏛ),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(ᏚᏙᏢᏒ/ᎢᏳᏔᎵᎳᏗᏅᏛ),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(L/100 km),
 						'one' => q({0} L/100 km),
@@ -6166,6 +6258,20 @@ has 'units' => (
 						'name' => q(ᎾᏃᏗᏎᏢ),
 						'one' => q({0} ᎾᏃ),
 						'other' => q({0} ᎾᏃ),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(ᏚᎵᏏᏂᏒ),
+						'one' => q({0} ᎤᏒ),
+						'other' => q({0} ᏚᎵᏏᏂᏒ),
+						'per' => q({0}/ᎤᏒ),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(ᏚᎵᏏᏂᏒ),
+						'one' => q({0} ᎤᏒ),
+						'other' => q({0} ᏚᎵᏏᏂᏒ),
+						'per' => q({0}/ᎤᏒ),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -6650,6 +6756,18 @@ has 'units' => (
 					# Core Unit Identifier
 					'kilometer-per-hour' => {
 						'name' => q(km/ᏑᏟᎶᏓ),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(ᎠᏨᏍᏗ),
+						'one' => q({0} ᎠᏨᏍᏗ),
+						'other' => q({0} ᎠᏨᏍᏗ),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(ᎠᏨᏍᏗ),
+						'one' => q({0} ᎠᏨᏍᏗ),
+						'other' => q({0} ᎠᏨᏍᏗ),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -8938,9 +9056,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#ᏄᏯᎩ#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#ᏂᏈᎪᏂ#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#ᏃᎺ#,
 		},
@@ -8962,9 +9077,6 @@ has 'time_zone_names' => (
 		'America/Panama' => {
 			exemplarCity => q#ᏆᎾᎹ#,
 		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#ᏆᏂᏂᏚᏂᎦ#,
-		},
 		'America/Paramaribo' => {
 			exemplarCity => q#ᏆᎳᎹᎴᏉ#,
 		},
@@ -8985,9 +9097,6 @@ has 'time_zone_names' => (
 		},
 		'America/Punta_Arenas' => {
 			exemplarCity => q#ᏊᏔ ᎡᏫᎾᏍ#,
-		},
-		'America/Rainy_River' => {
-			exemplarCity => q#ᎠᎦᏍᎦ ᎤᏪᏴ#,
 		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#ᎴᏂᎩᏂ ᎢᏂᎴᏘ#,
@@ -9049,9 +9158,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#ᏡᎵ#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#ᎠᏴᏓᏆᎶᏍᎦ ᎡᏉᏄᎸᏗ#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#ᏘᏳᏩᎾ#,
 		},
@@ -9072,9 +9178,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#ᏯᎫᏔᏘ#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#ᏓᎶᏂᎨ ᎭᏰᏍᏗ#,
 		},
 		'America_Central' => {
 			long => {
@@ -9248,9 +9351,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#ᏥᏔ#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#ᏦᏱᏆᎵᏌᏂ#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#ᎪᎶᎻᏉ#,
@@ -9495,9 +9595,6 @@ has 'time_zone_names' => (
 		'Australia/Broken_Hill' => {
 			exemplarCity => q#ᎤᏲᏨᎯ ᎦᏚᏏ#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#ᎫᎵ#,
-		},
 		'Australia/Darwin' => {
 			exemplarCity => q#ᏓᏩᏂ#,
 		},
@@ -9624,13 +9721,6 @@ has 'time_zone_names' => (
 				'daylight' => q#ᏓᎶᏂᎨᏍᏛ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏒ#,
 				'generic' => q#ᏓᎶᏂᎨᏍᏛ ᎠᏟᎢᎵᏒ#,
 				'standard' => q#ᏓᎶᏂᎨᏍᏛ ᎠᏟᎶᏍᏗ ᎠᏟᎢᎵᏒ#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#ᏦᏱᏆᎵᏌᏂ ᎪᎩ ᎠᏟᎢᎵᏒ#,
-				'generic' => q#ᏦᏱᏆᎵᏌᏂ ᎠᏟᎢᎵᏒ#,
-				'standard' => q#ᏦᏱᏆᎵᏌᏂ ᎠᏟᎶᏍᏗ ᎠᏟᎢᎵᏒ#,
 			},
 		},
 		'Christmas' => {
@@ -9855,9 +9945,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#ᎤᎵᏯᏃᏬᏍᎧ#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#ᎤᏍᎪᎶᏗ#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#ᏩᏚᏏ#,
 		},
@@ -9878,9 +9965,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#ᏌᏇᏈ#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#ᏌᏉᎶᏌᏱ#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#ᏑᎵᏥ#,
@@ -10103,6 +10187,11 @@ has 'time_zone_names' => (
 				'standard' => q#ᏣᏩᏂᏏ ᎠᏟᎶᏍᏗ ᎠᏟᎢᎵᏒ#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#ᎧᏎᎧᏍᏕᏂ ᎠᏟᎢᎵᏒ#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#ᏗᎧᎸᎬ ᎧᏎᎧᏍᏕᏂ ᎠᏟᎢᎵᏒ#,
@@ -10149,11 +10238,6 @@ has 'time_zone_names' => (
 				'standard' => q#ᎤᎬᏫᏳᎯ ᎭᏫ ᎠᏟᎶᏍᏗ ᎠᏟᎢᎵᏒ#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#ᎹᏇᎵ ᎤᎦᏚᏛᎢ ᎠᏟᎢᎵᏒ#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#ᎹᎦᏓᏂ ᎪᎩ ᎠᏟᎢᎵᏒ#,
@@ -10191,13 +10275,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#ᎹᏌᏂ ᎠᏟᎢᎵᏒ#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#ᏧᏴᏢ ᏭᏕᎵᎬ ᎠᏂᏍᏆᏂ ᎪᎯ ᎢᎦ ᎠᏟᎢᎵᏒ#,
-				'generic' => q#ᏧᏴᏢ ᏭᏕᎵᎬ ᎠᏂᏍᏆᏂ ᎠᏟᎢᎵᏒ#,
-				'standard' => q#ᏧᏴᏢ ᏭᏕᎵᎬ ᎠᏂᏍᏆᏂ ᎠᏟᎶᏍᏗ ᎠᏟᎢᎵᏒ#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -10339,9 +10416,6 @@ has 'time_zone_names' => (
 				'generic' => q#HST#,
 				'standard' => q#HST#,
 			},
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#ᏣᏂᏏᏂ#,
 		},
 		'Pacific/Kanton' => {
 			exemplarCity => q#ᎧᏛᏂ#,

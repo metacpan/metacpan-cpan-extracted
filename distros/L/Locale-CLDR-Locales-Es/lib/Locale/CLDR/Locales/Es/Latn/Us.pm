@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Es::Latn::Us - Package for language Spanish
 
 package Locale::CLDR::Locales::Es::Latn::Us;
 # This file auto generated from Data\common\main\es_US.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -39,6 +39,7 @@ has 'display_name_language' => (
  				'bgc' => 'hariana',
  				'bho' => 'bhojpuri',
  				'bla' => 'siksika',
+ 				'blo' => 'ani',
  				'bua' => 'buriat',
  				'clc' => 'chilcotín',
  				'crj' => 'cree del sureste',
@@ -61,7 +62,7 @@ has 'display_name_language' => (
  				'inh' => 'ingusetio',
  				'kab' => 'cabilio',
  				'krc' => 'karachay-balkar',
- 				'lo' => 'lao',
+ 				'lij' => 'ligur',
  				'lou' => 'creole de Luisiana',
  				'lrc' => 'lorí del norte',
  				'lsm' => 'saamia',
@@ -87,6 +88,7 @@ has 'display_name_language' => (
  				'tyv' => 'tuviniano',
  				'ug@alt=variant' => 'uigur variante',
  				'wal' => 'wolayta',
+ 				'xnr' => 'dogrí',
 
 			);
 			if (@_) {
@@ -242,14 +244,6 @@ has 'units' => (
 					# Core Unit Identifier
 					'30' => {
 						'1' => q(quecto {0}),
-					},
-					# Long Unit Identifier
-					'concentr-milligram-ofglucose-per-deciliter' => {
-						'name' => q(miligramos por decilitro),
-					},
-					# Core Unit Identifier
-					'milligram-ofglucose-per-deciliter' => {
-						'name' => q(miligramos por decilitro),
 					},
 					# Long Unit Identifier
 					'concentr-percent' => {
@@ -413,15 +407,27 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'speed-beaufort' => {
+						'1' => q(feminine),
 						'name' => q(Escala Beaufort),
 						'one' => q(Escala Beaufort {0}),
 						'other' => q(Escala Beaufort {0}),
 					},
 					# Core Unit Identifier
 					'beaufort' => {
+						'1' => q(feminine),
 						'name' => q(Escala Beaufort),
 						'one' => q(Escala Beaufort {0}),
 						'other' => q(Escala Beaufort {0}),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'one' => q({0} luz),
+						'other' => q({0} luces),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'one' => q({0} luz),
+						'other' => q({0} luces),
 					},
 					# Long Unit Identifier
 					'temperature-generic' => {
@@ -544,14 +550,12 @@ has 'units' => (
 						'name' => q(a),
 						'one' => q({0}a),
 						'other' => q({0}a),
-						'per' => q({0}/a),
 					},
 					# Core Unit Identifier
 					'year' => {
 						'name' => q(a),
 						'one' => q({0}a),
 						'other' => q({0}a),
-						'per' => q({0}/a),
 					},
 					# Long Unit Identifier
 					'energy-therm-us' => {
@@ -562,16 +566,6 @@ has 'units' => (
 					'therm-us' => {
 						'one' => q({0}th US),
 						'other' => q({0}th US),
-					},
-					# Long Unit Identifier
-					'length-astronomical-unit' => {
-						'one' => q({0}ua),
-						'other' => q({0}ua),
-					},
-					# Core Unit Identifier
-					'astronomical-unit' => {
-						'one' => q({0}ua),
-						'other' => q({0}ua),
 					},
 					# Long Unit Identifier
 					'length-fathom' => {
@@ -623,13 +617,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-nautical-mile' => {
-						'name' => q(mn),
 						'one' => q({0}mn),
 						'other' => q({0}mn),
 					},
 					# Core Unit Identifier
 					'nautical-mile' => {
-						'name' => q(mn),
 						'one' => q({0}mn),
 						'other' => q({0}mn),
 					},
@@ -640,6 +632,16 @@ has 'units' => (
 					# Core Unit Identifier
 					'beaufort' => {
 						'name' => q(B),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'one' => q({0}luz),
+						'other' => q({0}luces),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'one' => q({0}luz),
+						'other' => q({0}luces),
 					},
 					# Long Unit Identifier
 					'temperature-fahrenheit' => {
@@ -688,6 +690,14 @@ has 'units' => (
 					# Core Unit Identifier
 					'permille' => {
 						'name' => q(‰),
+					},
+					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(partes/mil millones),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(partes/mil millones),
 					},
 					# Long Unit Identifier
 					'digital-bit' => {
@@ -826,6 +836,16 @@ has 'units' => (
 						'other' => q({0} nudos),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'one' => q({0} luz),
+						'other' => q({0} de luces),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'one' => q({0} luz),
+						'other' => q({0} de luces),
+					},
+					# Long Unit Identifier
 					'torque-pound-force-foot' => {
 						'name' => q(lbf⋅ft),
 						'one' => q({0} lbf⋅ft),
@@ -942,13 +962,6 @@ has 'currencies' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'BDT' => {
-			display_name => {
-				'currency' => q(taka bangladesí),
-				'one' => q(taka bangladesí),
-				'other' => q(takas bangladesíes),
-			},
-		},
 		'BTN' => {
 			display_name => {
 				'currency' => q(ngultrum butanés),
@@ -968,13 +981,6 @@ has 'currencies' => (
 		},
 		'JPY' => {
 			symbol => '¥',
-		},
-		'LAK' => {
-			display_name => {
-				'currency' => q(kip laosiano),
-				'one' => q(kip laosiano),
-				'other' => q(kips laosianos),
-			},
 		},
 		'RON' => {
 			symbol => 'lei',
@@ -1005,13 +1011,6 @@ has 'currencies' => (
 		'VEF' => {
 			symbol => 'Bs',
 		},
-		'VND' => {
-			display_name => {
-				'currency' => q(dong vietnamita),
-				'one' => q(dong vietnamita),
-				'other' => q(dongs vietnamitas),
-			},
-		},
 		'XAF' => {
 			display_name => {
 				'currency' => q(franco CFA de África central),
@@ -1037,13 +1036,6 @@ has 'calendar_quarters' => (
 	default		=> sub { {
 			'gregorian' => {
 				'format' => {
-					wide => {0 => '1er trimestre',
-						1 => '2.º trimestre',
-						2 => '3.º trimestre',
-						3 => '4.º trimestre'
-					},
-				},
-				'stand-alone' => {
 					wide => {0 => '1er trimestre',
 						1 => '2.º trimestre',
 						2 => '3.º trimestre',
@@ -1129,10 +1121,6 @@ has 'day_periods' => (
 		'gregorian' => {
 			'stand-alone' => {
 				'abbreviated' => {
-					'am' => q{a. m.},
-					'pm' => q{p. m.},
-				},
-				'narrow' => {
 					'am' => q{a. m.},
 					'pm' => q{p. m.},
 				},
@@ -1458,11 +1446,6 @@ has 'time_zone_names' => (
 		'Indian_Ocean' => {
 			long => {
 				'standard' => q#hora del Océano Índico#,
-			},
-		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#hora de la isla Macquarie#,
 			},
 		},
 		'Marquesas' => {

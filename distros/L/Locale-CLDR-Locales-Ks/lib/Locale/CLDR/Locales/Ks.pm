@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Ks - Package for language Kashmiri
 
 package Locale::CLDR::Locales::Ks;
 # This file auto generated from Data\common\main\ks.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -56,7 +56,7 @@ has 'display_name_language' => (
  				'arn' => 'ایرو کونِیَن',
  				'arp' => 'اَراپاہو',
  				'arw' => 'اَراوَک',
- 				'as' => 'اسٲمۍ',
+ 				'as' => 'اسٲمؠ',
  				'ast' => 'ایسٹوٗریَن',
  				'av' => 'اَوارِک',
  				'awa' => 'اَوَدی',
@@ -76,7 +76,7 @@ has 'display_name_language' => (
  				'bin' => 'بِنی',
  				'bla' => 'سِکسِکا',
  				'bm' => 'بَمبارا',
- 				'bn' => 'بَنگٲلۍ',
+ 				'bn' => 'بَنگٲلؠ',
  				'bo' => 'تِبتی',
  				'br' => 'بریٹَن',
  				'bra' => 'برج',
@@ -132,14 +132,14 @@ has 'display_name_language' => (
  				'eka' => 'ایکاجُک',
  				'el' => 'یوٗنٲنی',
  				'elx' => 'ایلامایِٹ',
- 				'en' => 'اَنگیٖزۍ',
- 				'en_AU' => 'آسٹریلیَن اَنگریٖزۍ',
- 				'en_CA' => 'کینَڈِیٲیی اَنگریٖزۍ',
- 				'en_GB' => 'بَرطانوی اَنگریٖزۍ',
- 				'en_GB@alt=short' => 'UK اَنٛگریٖزۍ',
- 				'en_US' => 'امریٖکی اَنٛگریٖزۍ',
- 				'en_US@alt=short' => 'US اَنٛگریٖزۍ',
- 				'enm' => 'وَسطی اَنگریٖزۍ',
+ 				'en' => 'اَنگیٖزؠ',
+ 				'en_AU' => 'آسٹریلیَن اَنگریٖزؠ',
+ 				'en_CA' => 'کینَڈِیٲیی اَنگریٖزؠ',
+ 				'en_GB' => 'بَرطانوی اَنگریٖزؠ',
+ 				'en_GB@alt=short' => 'UK اَنٛگریٖزؠ',
+ 				'en_US' => 'امریٖکی اَنٛگریٖزؠ',
+ 				'en_US@alt=short' => 'US اَنٛگریٖزؠ',
+ 				'enm' => 'وَسطی اَنگریٖزؠ',
  				'eo' => 'ایسپَرینٹو',
  				'es' => 'ہسپانوی',
  				'es_419' => 'لاطیٖنی امریٖکی ہسپانوی',
@@ -189,7 +189,7 @@ has 'display_name_language' => (
  				'ha' => 'ہاوسا',
  				'hai' => 'ہَیدا',
  				'haw' => 'ہوایِیَن',
- 				'he' => 'عبرٲنۍ',
+ 				'he' => 'عبرٲنؠ',
  				'hi' => 'ہِندی',
  				'hil' => 'ہِلیٖگینَن',
  				'hit' => 'ہِتایِت',
@@ -215,7 +215,7 @@ has 'display_name_language' => (
  				'is' => 'آیِسلینڈِک',
  				'it' => 'اِطالوی',
  				'iu' => 'اِنُکتِتوٗ',
- 				'ja' => 'جاپٲنۍ',
+ 				'ja' => 'جاپٲنؠ',
  				'jbo' => 'لوجبان',
  				'jpr' => 'جوڈیو فارسی',
  				'jrb' => 'جوڈیو عربی',
@@ -297,7 +297,7 @@ has 'display_name_language' => (
  				'mni' => 'مَنیپوٗری',
  				'moh' => 'موہاک',
  				'mos' => 'موسی',
- 				'mr' => 'مَرٲٹھۍ',
+ 				'mr' => 'مَرٲٹھؠ',
  				'ms' => 'مَلَے',
  				'mt' => 'مَلتیٖس',
  				'mul' => 'واریاہ زبان',
@@ -311,7 +311,7 @@ has 'display_name_language' => (
  				'nb' => 'ناروییَن بوکمال',
  				'nd' => 'شُمال ڈَبیل',
  				'nds' => 'بۆنِم جٔرمَن',
- 				'ne' => 'نیپٲلۍ',
+ 				'ne' => 'نیپٲلؠ',
  				'new' => 'نیواری',
  				'ng' => 'ڈونگا',
  				'nia' => 'نِیاس',
@@ -339,7 +339,7 @@ has 'display_name_language' => (
  				'os' => 'اۆسیٹِک',
  				'osa' => 'اۆسیج',
  				'ota' => 'اوٹومَن تُرکِش',
- 				'pa' => 'پَنجٲبۍ',
+ 				'pa' => 'پَنجٲبؠ',
  				'pag' => 'پَنگاسِنَن',
  				'pal' => 'پَہلَوی',
  				'pam' => 'پَمپَنگا',
@@ -356,7 +356,7 @@ has 'display_name_language' => (
  				'pt_BR' => 'برازیٖلی پُرتَگیٖز',
  				'pt_PT' => 'یوٗرپی پُرتَگیٖز',
  				'qu' => 'کُویشُوا',
- 				'raj' => 'راجِستھٲنۍ',
+ 				'raj' => 'راجِستھٲنؠ',
  				'rap' => 'رَپانوی',
  				'rar' => 'رَروٹونگَن',
  				'rm' => 'رومانش',
@@ -442,7 +442,7 @@ has 'display_name_language' => (
  				'uga' => 'اُگارتِک',
  				'uk' => 'یوٗکرینیٲیی',
  				'umb' => 'یُمبُندوٗ',
- 				'und' => 'اَنزٲنۍ یا نَہ لَگہٕہار زبان',
+ 				'und' => 'اَنزٲنؠ یا نَہ لَگہٕہار زبان',
  				'ur' => 'اُردوٗ',
  				'uz' => 'اُزبیک',
  				'vai' => 'واے',
@@ -497,7 +497,7 @@ has 'display_name_script' => (
  			'Avst' => 'اَویستَن',
  			'Bali' => 'بالَنیٖز',
  			'Batk' => 'باتَک',
- 			'Beng' => 'بینگٲلۍ',
+ 			'Beng' => 'بینگٲلؠ',
  			'Blis' => 'بِلِس سِمبلز',
  			'Bopo' => 'بوپوموفو',
  			'Brah' => 'براہمی',
@@ -525,13 +525,13 @@ has 'display_name_script' => (
  			'Goth' => 'گوتھِک',
  			'Grek' => 'گرَنتھا',
  			'Gujr' => 'گریٖک',
- 			'Guru' => 'گُجرٲتۍ',
+ 			'Guru' => 'گُجرٲتؠ',
  			'Hang' => 'ہانگُل',
  			'Hani' => 'ہان',
  			'Hano' => 'ہانُنوٗ',
- 			'Hans' => 'سَہل ﴿ترجمع اِشارٕ: یِم ورژن رَسم الخط ہُک ناؤ چھُ چیٖنی باپتھ زَبانٕ ناؤ کِس مجموعَس سٕتۍ اِستعمال یِوان کرنٕہ۔﴾',
+ 			'Hans' => 'سَہل ﴿ترجمع اِشارٕ: یِم ورژن رَسم الخط ہُک ناؤ چھُ چیٖنی باپتھ زَبانٕ ناؤ کِس مجموعَس سٕتؠ اِستعمال یِوان کرنٕہ۔﴾',
  			'Hans@alt=stand-alone' => 'سَہل ہان ﴿ترجمع اِشارٕ: یِم ورژن رَسم الخط ہُک ناؤ چھُ چیٖنی باپتھ زَبانٕ ناؤ کِس مجموعَس بغٲرٕ الگ اِستعمال یِوان کرنٕہ۔﴾',
- 			'Hant' => 'رِوٲجی ﴿ترجمع اِشارٕ: یِم ورژن رَسم الخط ہُک ناؤ چھُ چیٖنی باپتھ زَبانٕ ناؤ کِس مجموعَس سٕتۍ اِستعمال یِوان کرنٕہ۔﴾',
+ 			'Hant' => 'رِوٲجی ﴿ترجمع اِشارٕ: یِم ورژن رَسم الخط ہُک ناؤ چھُ چیٖنی باپتھ زَبانٕ ناؤ کِس مجموعَس سٕتؠ اِستعمال یِوان کرنٕہ۔﴾',
  			'Hant@alt=stand-alone' => 'رِوٲجی ہان ﴿ترجمع اِشارٕ: یِم ورژن رَسم الخط ہُک ناؤ چھُ چیٖنی باپتھ زَبانٕ ناؤ کِس مجموعَس بغٲرٕ الگ اِستعمال یِوان کرنٕہ۔﴾',
  			'Hebr' => 'ہِبرِو',
  			'Hira' => 'ہیٖراگانا',
@@ -776,7 +776,7 @@ has 'display_name_region' => (
  			'IL' => 'اسرا ییل',
  			'IM' => 'آیِل آف مین',
  			'IN' => 'ہِندوستان',
- 			'IO' => 'برطانوی بحرِ ہِندۍ علاقہٕ',
+ 			'IO' => 'برطانوی بحرِ ہِندؠ علاقہٕ',
  			'IQ' => 'ایٖراق',
  			'IR' => 'ایٖران',
  			'IS' => 'اَیِسلینڑ',
@@ -852,7 +852,7 @@ has 'display_name_region' => (
  			'PK' => 'پاکِستان',
  			'PL' => 'پولینڈ',
  			'PM' => 'سینٹ پیٖری تہٕ موکیلِیَن',
- 			'PN' => 'پِٹکیرٕنۍ جٔزیٖرٕ',
+ 			'PN' => 'پِٹکیرٕنؠ جٔزیٖرٕ',
  			'PR' => 'پٔرٹو رِکو',
  			'PS' => 'فلسطینی علاقٕہ',
  			'PS@alt=short' => 'فلسطین',
@@ -947,22 +947,22 @@ has 'display_name_variant' => (
  			'1606NICT' => 'بعد وَقت وَسطی فرانس پؠٹھ ۱۶٠۶ تام',
  			'AREVELA' => 'مَشرِقی اَمریٖکا',
  			'BAKU1926' => 'جٔمع کٔرِتھ تُرکی لاطیٖنی اَچھر',
- 			'BISKE' => 'سین جارجِیو/بِلا بوٗلۍ',
+ 			'BISKE' => 'سین جارجِیو/بِلا بوٗلؠ',
  			'FONIPA' => 'آوازیات',
  			'FONUPA' => 'یوٗ پی اے آوازِیات',
- 			'LIPAW' => 'روٗسی زَبانہِ ہِنز لِپوواز بوٗلۍ',
+ 			'LIPAW' => 'روٗسی زَبانہِ ہِنز لِپوواز بوٗلؠ',
  			'MONOTON' => 'اَکٔے لہجہٕ واجؠن زَبان',
- 			'NEDIS' => 'نؠٹِسون بوٗلۍ',
- 			'NJIVA' => 'نیجِوا بوٗلۍ',
- 			'OSOJS' => 'اُشیکو/اوسوجین بوٗلۍ',
+ 			'NEDIS' => 'نؠٹِسون بوٗلؠ',
+ 			'NJIVA' => 'نیجِوا بوٗلؠ',
+ 			'OSOJS' => 'اُشیکو/اوسوجین بوٗلؠ',
  			'POLYTON' => 'واریاہ لہجہٕ واجؠن زَبان',
  			'POSIX' => 'کَمپیوٗٹَر',
  			'REVISED' => 'دُبارٕ دۄہراونہٕ آمُت عِلمہِ ہِجا',
  			'ROZAJ' => 'روٗسی',
  			'SAAHO' => 'سوہو',
- 			'SCOTLAND' => 'سُکاٹِش مَیعٲری اَنگریٖزۍ',
+ 			'SCOTLAND' => 'سُکاٹِش مَیعٲری اَنگریٖزؠ',
  			'SCOUSE' => 'سِکوس',
- 			'SOLBA' => 'ثٹولوِزا/سولبِکا بوٗلۍ',
+ 			'SOLBA' => 'ثٹولوِزا/سولبِکا بوٗلؠ',
  			'TARASK' => 'تاراسکیٖوِکا علمہ ہِجاِ',
 
 		}
@@ -997,7 +997,7 @@ has 'display_name_type' => (
  				'islamic' => q{اِسلٲمی کیلنڑَر},
  				'islamic-civil' => q{اِسلٲمی اِجتمٲیی کیلنڑَر},
  				'iso8601' => q{ISO-8601 کیلنڈر},
- 				'japanese' => q{جاپٲنۍ کیلنڑَر},
+ 				'japanese' => q{جاپٲنؠ کیلنڑَر},
  				'roc' => q{جموٗریٲتی چیٖنی کیلَنڑَر},
  			},
  			'collation' => {
@@ -1067,7 +1067,7 @@ has 'characters' => (
 		no warnings 'experimental::regex_sets';
 		return {
 			auxiliary => qr{[‎‏ َ ُ ِ ٔ ٕ ٟ ٖ ٗ ئ]},
-			main => qr{[ء آ أ ٲ ؤ ا ب پ ت ث ٹ ج چ ح خ د ذ ڈ ر ز ڑ ژ س ش ص ض ط ظ ع غ ف ق ک گ ل م ن ں ھ ہ و ۄ ۆ ی ۍ ؠ ے]},
+			main => qr{[ء آ أ ٲ ؤ ا ب پ ت ث ٹ ج چ ح خ د ذ ڈ ر ز ڑ ژ س ش ص ض ط ظ ع غ ف ق ک گ ل م ن ں ھ ہ و ۄ ۆ ی ؠ ے]},
 			numbers => qr{[‎ \- ‑ , ٫ ٬ . % ‰ + 0۰ 1۱ 2۲ 3۳ 4۴ 5۵ 6۶ 7۷ 8۸ 9۹]},
 			punctuation => qr{[\- ‐‑ – — , ; \: ! ? . … '‘’ "“” ( ) \[ \] § @ * / \& # † ‡ ′ ″]},
 		};
@@ -1820,12 +1820,12 @@ has 'currencies' => (
 		},
 		'ILS' => {
 			display_name => {
-				'currency' => q(اِزرٲیِلی نٔوۍ شؠقٕل),
+				'currency' => q(اِزرٲیِلی نٔوؠ شؠقٕل),
 			},
 		},
 		'INR' => {
 			display_name => {
-				'currency' => q(ہِندُستٲنۍ رۄپَے),
+				'currency' => q(ہِندُستٲنؠ رۄپَے),
 			},
 		},
 		'IQD' => {
@@ -2168,7 +2168,7 @@ has 'currencies' => (
 		},
 		'PKR' => {
 			display_name => {
-				'currency' => q(پاکِستٲنۍ رۄپَے),
+				'currency' => q(پاکِستٲنؠ رۄپَے),
 			},
 		},
 		'PLN' => {
@@ -3709,9 +3709,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#نِو یارک#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#نِپِگَن#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#نوم#,
 		},
@@ -3733,9 +3730,6 @@ has 'time_zone_names' => (
 		'America/Panama' => {
 			exemplarCity => q#پَناما#,
 		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#پَنگنِرٹَنگ#,
-		},
 		'America/Paramaribo' => {
 			exemplarCity => q#پَرامارِبو#,
 		},
@@ -3756,9 +3750,6 @@ has 'time_zone_names' => (
 		},
 		'America/Punta_Arenas' => {
 			exemplarCity => q#پونٹا اریناس#,
-		},
-		'America/Rainy_River' => {
-			exemplarCity => q#رینی رِوَر#,
 		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#رینکِن اِنلؠٹ#,
@@ -3820,9 +3811,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#تھیوٗلے#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#تھَنڈر خلیٖج#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#تِجُوانا#,
 		},
@@ -3843,9 +3831,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#یکوٗتات#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#یؠلو نایِف#,
 		},
 		'America_Central' => {
 			long => {
@@ -4007,9 +3992,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#چیٹا#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#چویبالسَن#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#کولَمبو#,
@@ -4249,9 +4231,6 @@ has 'time_zone_names' => (
 		'Australia/Broken_Hill' => {
 			exemplarCity => q#بروکٕن ہِل#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#کیوٗری#,
-		},
 		'Australia/Darwin' => {
 			exemplarCity => q#ڈاروِن#,
 		},
@@ -4378,13 +4357,6 @@ has 'time_zone_names' => (
 				'daylight' => q#چَینا ڈےلایِٔٹ ٹایِم#,
 				'generic' => q#چَینا ٹایِم#,
 				'standard' => q#چَینا سٹینڈرڈ ٹایِم#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#کوےبؠلسَن سَمَر ٹایِم#,
-				'generic' => q#کوےبؠلسَن ٹایِم#,
-				'standard' => q#کوےبؠلسَن سٹینڈرڈ ٹایِم#,
 			},
 		},
 		'Christmas' => {
@@ -4609,9 +4581,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#اولیانووسک#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#اُزگورود#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#وادُز#,
 		},
@@ -4632,9 +4601,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#زگریب#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#زَپوروزَے#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#زیوٗرِک#,
@@ -4806,7 +4772,7 @@ has 'time_zone_names' => (
 		},
 		'Indian_Ocean' => {
 			long => {
-				'standard' => q#ہِندوستٲنۍ اوشَن ٹائم#,
+				'standard' => q#ہِندوستٲنؠ اوشَن ٹائم#,
 			},
 		},
 		'Indochina' => {
@@ -4832,8 +4798,8 @@ has 'time_zone_names' => (
 		'Iran' => {
 			long => {
 				'daylight' => q#اِیٖرٲنی سَمَر ٹایِم#,
-				'generic' => q#اِیٖرٲنۍ ٹایِم#,
-				'standard' => q#اِیٖرٲنۍ سٹینڑاڑ ٹایِم#,
+				'generic' => q#اِیٖرٲنؠ ٹایِم#,
+				'standard' => q#اِیٖرٲنؠ سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Irkutsk' => {
@@ -4852,9 +4818,9 @@ has 'time_zone_names' => (
 		},
 		'Japan' => {
 			long => {
-				'daylight' => q#جاپٲنۍ ڑےلایِٔٹ ٹایِم#,
-				'generic' => q#جاپٲنۍ ٹایِم#,
-				'standard' => q#جاپٲنۍ سٹینڈرڈ ٹایِم#,
+				'daylight' => q#جاپٲنؠ ڑےلایِٔٹ ٹایِم#,
+				'generic' => q#جاپٲنؠ ٹایِم#,
+				'standard' => q#جاپٲنؠ سٹینڈرڈ ٹایِم#,
 			},
 		},
 		'Kamchatka' => {
@@ -4961,13 +4927,6 @@ has 'time_zone_names' => (
 				'standard' => q#ماسَن ٹایِم#,
 			},
 		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#شُمال مغربی میکسیکو ڈے لائٹ ٹائم#,
-				'generic' => q#شُمال مغربی میکسیکو ٹائم#,
-				'standard' => q#شُمال مغربی میکسیکو سٹینڈرڈ ٹائم#,
-			},
-		},
 		'Mexico_Pacific' => {
 			long => {
 				'daylight' => q#میکسیکن پیسیفک ڈے لائٹ ٹائم#,
@@ -5001,7 +4960,7 @@ has 'time_zone_names' => (
 		},
 		'Nepal' => {
 			long => {
-				'standard' => q#نؠپٲلۍ ٹایِم#,
+				'standard' => q#نؠپٲلؠ ٹایِم#,
 			},
 		},
 		'New_Caledonia' => {
@@ -5104,9 +5063,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Honolulu' => {
 			exemplarCity => q#ہونولو لو#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#جانسٹَن#,
 		},
 		'Pacific/Kiritimati' => {
 			exemplarCity => q#کِرِتِماتی#,

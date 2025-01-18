@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Ps::Arab::Pk - Package for language Pashto
 
 package Locale::CLDR::Locales::Ps::Arab::Pk;
 # This file auto generated from Data\common\main\ps_PK.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -572,11 +572,6 @@ has 'time_zone_names' => (
 		'Lord_Howe' => {
 			long => {
 				'daylight' => q#رب هاو د ورځے د رڼا وخت#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#د شمال لویدیځ مکسیکو رڼا ورځے وخت#,
 			},
 		},
 		'Mexico_Pacific' => {

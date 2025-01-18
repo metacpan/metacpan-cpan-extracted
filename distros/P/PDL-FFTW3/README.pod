@@ -269,6 +269,6 @@ DeForest, C<< <craig@deforest.org> >>.
 Copyright 2013 Dima Kogan and Craig DeForest.
 
 This program is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License.
+under the same terms as PDL.
 
 =cut

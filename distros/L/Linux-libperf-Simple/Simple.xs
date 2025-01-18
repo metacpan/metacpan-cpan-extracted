@@ -78,6 +78,7 @@ ev_attr[] =
         .disabled = 1,
       }
     },
+#if 0 /* not portable enough */
     {
       "bus-cycles",
       {
@@ -87,6 +88,7 @@ ev_attr[] =
         .disabled = 1,
       }
     },
+#endif
     {
       "cache-misses",
       {
@@ -145,12 +147,14 @@ lps_new(void) {
   dTHX;
   const char *err = NULL;
   libperf_simple *obj;
+  int code = 0;
 
   Newxz(obj, 1, libperf_simple);
 
   obj->threads = perf_thread_map__new_dummy();
   if (!obj->threads) {
     err = "Cannot create thread map";
+    code = errno;
     goto fail;
   }
   /* current process */
@@ -158,6 +162,7 @@ lps_new(void) {
 
   obj->evlist = perf_evlist__new();
   if (!obj->evlist) {
+    code = errno;
     err = "Cannot create evlist";
     goto fail;
   }
@@ -165,6 +170,7 @@ lps_new(void) {
   for (int i = 0; i < C_ARRAY_LENGTH(ev_attr); ++i) {
     struct perf_evsel *evsel = perf_evsel__new(&ev_attr[i].attr);
     if (!evsel) {
+      code = errno;
       err = Perl_form(aTHX_ "Cannot make evsel %d", i);
       goto fail;
     }
@@ -172,7 +178,7 @@ lps_new(void) {
     perf_evlist__add(obj->evlist, evsel);
   }
   perf_evlist__set_maps(obj->evlist, NULL, obj->threads);
-  if (perf_evlist__open(obj->evlist)) {
+  if ((code = perf_evlist__open(obj->evlist)) != 0) {
     err = "Failed to open evlist";
     goto fail;
   }
@@ -185,6 +191,10 @@ lps_new(void) {
   if (obj->threads)
     perf_thread_map__put(obj->threads);
   Safefree(obj);
+  if (code) {
+    SV *errsv = sv_2mortal(newSVpv(err, 0));
+    err = Perl_form(aTHX_ "%s: %d", err, code);
+  }
   Perl_croak(aTHX_ "%s", err);
 }
 

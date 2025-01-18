@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Mk - Package for language Macedonian
 
 package Locale::CLDR::Locales::Mk;
 # This file auto generated from Data\common\main\mk.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -565,6 +565,7 @@ has 'display_name_language' => (
  				'bjn' => 'банџарски',
  				'bkm' => 'ком',
  				'bla' => 'сиксика',
+ 				'blo' => 'ании',
  				'bm' => 'бамбара',
  				'bn' => 'бенгалски',
  				'bo' => 'тибетски',
@@ -702,12 +703,11 @@ has 'display_name_language' => (
  				'gd' => 'шкотски гелски',
  				'gez' => 'гиз',
  				'gil' => 'гилбертански',
- 				'gl' => 'галициски',
+ 				'gl' => 'галисиски',
  				'glk' => 'гилански',
  				'gmh' => 'средногорногермански',
  				'gn' => 'гварански',
  				'goh' => 'старогорногермански',
- 				'gom' => 'гоански конкани',
  				'gon' => 'гонди',
  				'gor' => 'горонтало',
  				'got' => 'готски',
@@ -746,7 +746,7 @@ has 'display_name_language' => (
  				'iba' => 'ибан',
  				'ibb' => 'ибибио',
  				'id' => 'индонезиски',
- 				'ie' => 'окцидентал',
+ 				'ie' => 'интерлингве',
  				'ig' => 'игбо',
  				'ii' => 'сичуан ји',
  				'ik' => 'инупијачки',
@@ -818,6 +818,7 @@ has 'display_name_language' => (
  				'kv' => 'коми',
  				'kw' => 'корнски',
  				'kwk' => 'кваквала',
+ 				'kxv' => 'куви',
  				'ky' => 'киргиски',
  				'la' => 'латински',
  				'lad' => 'ладино',
@@ -1108,11 +1109,12 @@ has 'display_name_language' => (
  				'uz' => 'узбечки',
  				'vai' => 'вај',
  				've' => 'венда',
- 				'vec' => 'венетски',
+ 				'vec' => 'венецијански',
  				'vep' => 'вепшки',
  				'vi' => 'виетнамски',
  				'vls' => 'западнофламански',
  				'vmf' => 'мајнскофранконски',
+ 				'vmw' => 'макуа',
  				'vo' => 'волапик',
  				'vot' => 'вотски',
  				'vro' => 'виру',
@@ -1128,6 +1130,7 @@ has 'display_name_language' => (
  				'xal' => 'калмички',
  				'xh' => 'коса',
  				'xmf' => 'мегрелски',
+ 				'xnr' => 'кангри',
  				'xog' => 'сога',
  				'yao' => 'јао',
  				'yap' => 'јапски',
@@ -1857,7 +1860,7 @@ has 'characters' => (
 			auxiliary => qr{[ѐ ѝ]},
 			index => ['А', 'Б', 'В', 'Г', 'Д', 'Ѓ', 'Е', 'Ж', 'З', 'Ѕ', 'И', 'Ј', 'К', 'Л', 'Љ', 'М', 'Н', 'Њ', 'О', 'П', 'Р', 'С', 'Т', 'Ќ', 'У', 'Ф', 'Х', 'Ц', 'Ч', 'Џ', 'Ш'],
 			main => qr{[а б в г д ѓ е ж з ѕ и ј к л љ м н њ о п р с т ќ у ф х ц ч џ ш]},
-			punctuation => qr{[\- ‐‑ – — , ; \: ! ? . … ‘‚ “„ ( ) \[ \] \{ \}]},
+			punctuation => qr{[\- ‐‑ – — , ; \: ! ? . … '‘‚ “„ ( ) \[ \] \{ \}]},
 		};
 	},
 EOT
@@ -2475,6 +2478,18 @@ has 'units' => (
 						'other' => q({0} десетилјадити делови),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(делови на милијарда),
+						'one' => q({0} дел на милијарда),
+						'other' => q({0} дела на милијарда),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(делови на милијарда),
+						'one' => q({0} дел на милијарда),
+						'other' => q({0} дела на милијарда),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(литри на 100 километри),
 						'one' => q({0} литар на 100 километри),
@@ -2757,6 +2772,20 @@ has 'units' => (
 						'name' => q(наносекунди),
 						'one' => q({0} наносекунда),
 						'other' => q({0} наносекунди),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(ноќи),
+						'one' => q({0} ноќ),
+						'other' => q({0} ноќи),
+						'per' => q({0}/ноќ),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(ноќи),
+						'one' => q({0} ноќ),
+						'other' => q({0} ноќи),
+						'per' => q({0}/ноќ),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -3873,6 +3902,18 @@ has 'units' => (
 						'other' => q({0} јазли),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(светлина),
+						'one' => q({0} светлина),
+						'other' => q({0} светлини),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(светлина),
+						'one' => q({0} светлина),
+						'other' => q({0} светлини),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'name' => q(метри во секунда),
 						'one' => q({0} метар во секунда),
@@ -4595,6 +4636,20 @@ has 'units' => (
 						'per' => q({0}/м.),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(ноќи),
+						'one' => q({0} н.),
+						'other' => q({0} н.),
+						'per' => q({0}/ноќ),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(ноќи),
+						'one' => q({0} н.),
+						'other' => q({0} н.),
+						'per' => q({0}/ноќ),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'name' => q(т.),
 						'one' => q({0} т.),
@@ -4801,6 +4856,18 @@ has 'units' => (
 					# Core Unit Identifier
 					'kilometer-per-hour' => {
 						'name' => q(km/hr),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(светлина),
+						'one' => q({0} светлина),
+						'other' => q({0} светлини),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(светлина),
+						'one' => q({0} светлина),
+						'other' => q({0} светлини),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -5335,6 +5402,20 @@ has 'units' => (
 						'other' => q({0} нс),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(ноќи),
+						'one' => q({0} ноќ),
+						'other' => q({0} ноќи),
+						'per' => q({0}/ноќ),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(ноќи),
+						'one' => q({0} ноќ),
+						'other' => q({0} ноќи),
+						'per' => q({0}/ноќ),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'name' => q(тримесечја),
 						'one' => q({0} тримес.),
@@ -5647,6 +5728,18 @@ has 'units' => (
 					# Core Unit Identifier
 					'kilometer-per-hour' => {
 						'name' => q(км/час),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(светлина),
+						'one' => q({0} светлина),
+						'other' => q({0} светлини),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(светлина),
+						'one' => q({0} светлина),
+						'other' => q({0} светлини),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -7120,9 +7213,9 @@ has 'currencies' => (
 		},
 		'SLL' => {
 			display_name => {
-				'currency' => q(Сиералеонско леоне \(1964—2022\)),
-				'one' => q(Сиералеонско леоне \(1964—2022\)),
-				'other' => q(Сиералеонски леони \(1964—2022\)),
+				'currency' => q(Сиералеонско леоне \(1964 – 2022\)),
+				'one' => q(Сиералеонско леоне \(1964 – 2022\)),
+				'other' => q(Сиералеонски леони \(1964 – 2022\)),
 			},
 		},
 		'SOS' => {
@@ -7742,15 +7835,22 @@ has 'calendar_quarters' => (
 	default		=> sub { {
 			'gregorian' => {
 				'format' => {
-					abbreviated => {0 => 'јан – мар',
-						1 => 'апр – јун',
-						2 => 'јул – сеп',
-						3 => 'окт – дек'
+					abbreviated => {0 => 'јан. – мар.',
+						1 => 'апр. – јун.',
+						2 => 'јул. – сеп.',
+						3 => 'окт. – дек.'
 					},
 					wide => {0 => 'прво тримесечје',
 						1 => 'второ тримесечје',
 						2 => 'трето тримесечје',
 						3 => 'четврто тримесечје'
+					},
+				},
+				'stand-alone' => {
+					abbreviated => {0 => 'јан. – мар.',
+						1 => 'апр. – јун.',
+						2 => 'јул. – сеп.',
+						3 => 'окт. – дек.'
 					},
 				},
 			},
@@ -8138,8 +8238,8 @@ has 'eras' => (
 		},
 		'gregorian' => {
 			abbreviated => {
-				'0' => 'п.н.е.',
-				'1' => 'н.е.'
+				'0' => 'пр. н. е.',
+				'1' => 'н. е.'
 			},
 			wide => {
 				'0' => 'пред нашата ера',
@@ -8194,13 +8294,13 @@ has 'date_formats' => (
 		'generic' => {
 			'full' => q{EEEE, d MMMM y 'г'. G},
 			'long' => q{d MMMM y 'г'. G},
-			'medium' => q{d.M.y G},
-			'short' => q{d.M.y GGGGG},
+			'medium' => q{d.M.y 'г'. G},
+			'short' => q{d.M.y 'г'. GGGGG},
 		},
 		'gregorian' => {
-			'full' => q{EEEE, d MMMM y},
-			'long' => q{d MMMM y},
-			'medium' => q{d.M.y},
+			'full' => q{EEEE, d MMMM y 'г'.},
+			'long' => q{d MMMM y 'г'.},
+			'medium' => q{d.M.y 'г'.},
 			'short' => q{d.M.yy},
 		},
 		'hebrew' => {
@@ -8339,7 +8439,7 @@ has 'datetime_formats_available_formats' => (
 			GyMMM => q{MMM y 'г'. G},
 			GyMMMEd => q{E, d MMM y 'г'. G},
 			GyMMMd => q{d MMM y 'г'. G},
-			GyMd => q{d.M.y GGGGG},
+			GyMd => q{d.M.y 'г'. GGGGG},
 			H => q{H},
 			Hm => q{H:mm},
 			Hms => q{H:mm:ss},
@@ -8354,25 +8454,25 @@ has 'datetime_formats_available_formats' => (
 			hms => q{h:mm:ss a},
 			y => q{y 'г'. G},
 			yyyy => q{y 'г'. G},
-			yyyyM => q{M.y G},
-			yyyyMEd => q{E, d.M.y G},
+			yyyyM => q{M.y 'г'. G},
+			yyyyMEd => q{E, d.M.y 'г'. G},
 			yyyyMMM => q{MMM y 'г'. G},
 			yyyyMMMEd => q{E, d MMM y 'г'. G},
 			yyyyMMMM => q{MMMM y 'г'. G},
 			yyyyMMMd => q{d MMM y 'г'. G},
-			yyyyMd => q{d.M.y G},
-			yyyyQQQ => q{QQQ y G},
-			yyyyQQQQ => q{QQQ y G},
+			yyyyMd => q{d.M.y 'г'. G},
+			yyyyQQQ => q{QQQ y 'г'. G},
+			yyyyQQQQ => q{QQQ y 'г'. G},
 		},
 		'gregorian' => {
 			Ed => q{E, d},
 			Ehm => q{E h:mm a},
 			Ehms => q{E h:mm:ss a},
-			Gy => q{y G},
-			GyMMM => q{MMM y G},
-			GyMMMEd => q{E, d MMM y G},
-			GyMMMd => q{d MMM y G},
-			GyMd => q{d.M.y GGGGG},
+			Gy => q{y 'г'. G},
+			GyMMM => q{MMM y 'г'. G},
+			GyMMMEd => q{E, d MMM y 'г'. G},
+			GyMMMd => q{d MMM y 'г'. G},
+			GyMd => q{d.M.y 'г'. G},
 			MEd => q{E, d.M},
 			MMMEd => q{E, d MMM},
 			MMMMEd => q{E, d MMMM},
@@ -8386,13 +8486,14 @@ has 'datetime_formats_available_formats' => (
 			hms => q{h:mm:ss a},
 			hmsv => q{h:mm:ss a v},
 			hmv => q{h:mm a v},
-			yM => q{M.y},
-			yMEd => q{E, d.M.y},
+			y => q{y 'г'.},
+			yM => q{M.y 'г'.},
+			yMEd => q{E, d.M.y 'г'.},
 			yMMM => q{MMM y 'г'.},
 			yMMMEd => q{E, d MMM y 'г'.},
 			yMMMM => q{MMMM y 'г'.},
 			yMMMd => q{d MMM y 'г'.},
-			yMd => q{d.M.y},
+			yMd => q{d.M.y 'г'.},
 			yQQQ => q{QQQ y 'г'.},
 			yQQQQ => q{QQQQ y 'г'.},
 			yw => q{w. 'седмица' 'од' Y},
@@ -8509,42 +8610,42 @@ has 'datetime_formats_interval' => (
 				m => q{h:mm – h:mm B},
 			},
 			Gy => {
-				G => q{y G – y G},
-				y => q{y – y G},
+				G => q{y 'г'. G – y 'г'. G},
+				y => q{y 'г'. – y 'г'. G},
 			},
 			GyM => {
-				G => q{M.y GGGGG – M.y GGGGG},
-				M => q{M.y – M.y GGGGG},
-				y => q{M.y – M.y GGGGG},
+				G => q{M.y 'г'. GGGGG – M.y 'г'. GGGGG},
+				M => q{M.y 'г'. – M.y 'г'. GGGGG},
+				y => q{M.y 'г'. – M.y 'г'. GGGGG},
 			},
 			GyMEd => {
-				G => q{E, d.M.y GGGGG – E, d.M.y GGGGG},
-				M => q{E, d.M.y – E, d.M.y GGGGG},
-				d => q{E, d.M.y – E, d.M.y GGGGG},
-				y => q{E, d.M.y – E, d.M.y GGGGG},
+				G => q{E, d.M.y 'г'. GGGGG – E, d.M.y 'г'. GGGGG},
+				M => q{E, d.M.y 'г'. – E, d.M.y 'г'. GGGGG},
+				d => q{E, d.M.y 'г'. – E, d.M.y 'г'. GGGGG},
+				y => q{E, d.M.y 'г'. – E, d.M.y 'г'. GGGGG},
 			},
 			GyMMM => {
-				G => q{MMM y G – MMM y G},
-				M => q{MMM – MMM y G},
-				y => q{MMM y – MMM y G},
+				G => q{MMM y 'г'. G – MMM y 'г'. G},
+				M => q{MMM – MMM y 'г'. G},
+				y => q{MMM y 'г'. – MMM y 'г'. G},
 			},
 			GyMMMEd => {
-				G => q{E, d MMM y G – E, d MMM y G},
-				M => q{E, d MMM – E, d MMM y G},
-				d => q{E, d MMM – E, d MMM y G},
-				y => q{E, d MMM y – E, d MMM y G},
+				G => q{E, d MMM y 'г'. G – E, d MMM y 'г'. G},
+				M => q{E, d MMM – E, d MMM y 'г'. G},
+				d => q{E, d MMM – E, d MMM y 'г'. G},
+				y => q{E, d MMM y 'г'. – E, d MMM y 'г'. G},
 			},
 			GyMMMd => {
-				G => q{d MMM y G – d MMM y G},
-				M => q{d MMM – d MMM y G},
-				d => q{d – d MMM y G},
-				y => q{d MMM y – d MMM y G},
+				G => q{d MMM y 'г'. G – d MMM y 'г'. G},
+				M => q{d MMM – d MMM y 'г'. G},
+				d => q{d – d MMM y 'г'. G},
+				y => q{d MMM y 'г'. – d MMM y 'г'. G},
 			},
 			GyMd => {
-				G => q{d.M.y GGGGG – d.M.y GGGGG},
-				M => q{d.M.y – d.M.y GGGGG},
-				d => q{d.M.y – d.M.y GGGGG},
-				y => q{d.M.y – d.M.y GGGGG},
+				G => q{d.M.y 'г'. GGGGG – d.M.y 'г'. GGGGG},
+				M => q{d.M.y 'г'. – d.M.y 'г'. GGGGG},
+				d => q{d.M.y 'г'. – d.M.y 'г'. GGGGG},
+				y => q{d.M.y 'г'. – d.M.y 'г'. GGGGG},
 			},
 			M => {
 				M => q{M – M},
@@ -8593,39 +8694,39 @@ has 'datetime_formats_interval' => (
 				h => q{h–h a v},
 			},
 			y => {
-				y => q{y – y G},
+				y => q{y 'г'. – y 'г'. G},
 			},
 			yM => {
-				M => q{M.y – M.y G},
-				y => q{M.y – M.y G},
+				M => q{M.y 'г'. – M.y 'г'. G},
+				y => q{M.y 'г'. – M.y 'г'. G},
 			},
 			yMEd => {
-				M => q{E, d.M.y – E, d.M.y G},
-				d => q{E, d.M.y – E, d.M.y G},
-				y => q{E, d.M.y – E, d.M.y G},
+				M => q{E, d.M.y 'г'. – E, d.M.y 'г'. G},
+				d => q{E, d.M.y 'г'. – E, d.M.y 'г'. G},
+				y => q{E, d.M.y 'г'. – E, d.M.y 'г'. G},
 			},
 			yMMM => {
-				M => q{MMM – MMM y G},
-				y => q{MMM y – MMM y G},
+				M => q{MMM – MMM y 'г'. G},
+				y => q{MMM y 'г'. – MMM y 'г'. G},
 			},
 			yMMMEd => {
-				M => q{E, d MMM – E, d MMM y G},
-				d => q{E, d – E, d MMM y G},
-				y => q{E, d MMM y – E, d MMM y G},
+				M => q{E, d MMM – E, d MMM y 'г'. G},
+				d => q{E, d – E, d MMM y 'г'. G},
+				y => q{E, d MMM y 'г'. – E, d MMM y 'г'. G},
 			},
 			yMMMM => {
-				M => q{MMMM – MMMM y G},
-				y => q{MMMM y – MMMM y G},
+				M => q{MMMM – MMMM y 'г'. G},
+				y => q{MMMM y 'г'. – MMMM y 'г'. G},
 			},
 			yMMMd => {
-				M => q{d MMM – d MMM y G},
-				d => q{d – d MMM y G},
-				y => q{d MMM y – d MMM y G},
+				M => q{d MMM – d MMM y 'г'. G},
+				d => q{d – d MMM y 'г'. G},
+				y => q{d MMM y 'г'. – d MMM y 'г'. G},
 			},
 			yMd => {
-				M => q{d.M.y – d.M.y G},
-				d => q{d.M.y – d.M.y G},
-				y => q{d.M.y – d.M.y G},
+				M => q{d.M.y 'г'. – d.M.y 'г'. G},
+				d => q{d.M.y 'г'. – d.M.y 'г'. G},
+				y => q{d.M.y 'г'. – d.M.y 'г'. G},
 			},
 		},
 		'gregorian' => {
@@ -8637,42 +8738,42 @@ has 'datetime_formats_interval' => (
 				m => q{h:mm – h:mm B},
 			},
 			Gy => {
-				G => q{y G – y G},
-				y => q{y – y G},
+				G => q{y 'г'. G – y 'г'. G},
+				y => q{y 'г'. – y 'г'. G},
 			},
 			GyM => {
-				G => q{M.y GGGGG – M.y GGGGG},
-				M => q{M.y – M.y GGGGG},
-				y => q{M.y – M.y GGGGG},
+				G => q{M.y 'г'. G – M.y 'г'. G},
+				M => q{M.y 'г'. – M.y 'г'. G},
+				y => q{M.y 'г'. – M.y 'г'. G},
 			},
 			GyMEd => {
-				G => q{E, d.M.y GGGGG – E, d.M.y GGGGG},
-				M => q{E, d.M.y – E, d.M.y GGGGG},
-				d => q{E, d.M.y – E, d.M.y GGGGG},
-				y => q{E, d.M.y – E, d.M.y GGGGG},
+				G => q{E, d.M.y 'г'. G – E, d.M.y 'г'. G},
+				M => q{E, d.M.y 'г'. – E, d.M.y 'г'. G},
+				d => q{E, d.M.y 'г'. – E, d.M.y 'г'. G},
+				y => q{E, d.M.y 'г'. – E, d.M.y 'г'. G},
 			},
 			GyMMM => {
-				G => q{MMM y G – MMM y G},
-				M => q{MMM – MMM y G},
-				y => q{MMM y – MMM y G},
+				G => q{MMM y 'г'. G – MMM y 'г'. G},
+				M => q{MMM – MMM y 'г'. G},
+				y => q{MMM y 'г'. – MMM y 'г'. G},
 			},
 			GyMMMEd => {
-				G => q{E, d MMM y G – E, d MMM y G},
-				M => q{E, d MMM – E, d MMM y G},
-				d => q{E, d MMM – E, d MMM y G},
-				y => q{E, d MMM y – E, d MMM y G},
+				G => q{E, d MMM y 'г'. G – E, d MMM y 'г'. G},
+				M => q{E, d MMM – E, d MMM y 'г'. G},
+				d => q{E, d MMM – E, d MMM y 'г'. G},
+				y => q{E, d MMM y 'г'. – E, d MMM y 'г'. G},
 			},
 			GyMMMd => {
-				G => q{d MMM y G – d MMM y G},
-				M => q{d MMM – d MMM y G},
-				d => q{d – d MMM y G},
-				y => q{d MMM y – d MMM y G},
+				G => q{d MMM y 'г'. G – d MMM y 'г'. G},
+				M => q{d MMM – d MMM y 'г'. G},
+				d => q{d – d MMM y 'г'. G},
+				y => q{d MMM y 'г'. – d MMM y 'г'. G},
 			},
 			GyMd => {
-				G => q{d.M.y GGGGG – d.M.y GGGGG},
-				M => q{d.M.y – d.M.y GGGGG},
-				d => q{d.M.y – d.M.y GGGGG},
-				y => q{d.M.y – d.M.y GGGGG},
+				G => q{d.M.y 'г'. G – d.M.y 'г'. G},
+				M => q{d.M.y 'г'. – d.M.y 'г'. G},
+				d => q{d.M.y 'г'. – d.M.y 'г'. G},
+				y => q{d.M.y 'г'. – d.M.y 'г'. G},
 			},
 			H => {
 				H => q{HH – HH},
@@ -8735,39 +8836,39 @@ has 'datetime_formats_interval' => (
 				h => q{h – h a v},
 			},
 			y => {
-				y => q{y – y},
+				y => q{y 'г'. – y 'г'.},
 			},
 			yM => {
-				M => q{M.y – M.y},
-				y => q{M.y – M.y},
+				M => q{M.y 'г'. – M.y 'г'.},
+				y => q{M.y 'г'. – M.y 'г'.},
 			},
 			yMEd => {
-				M => q{E, d.M.y – E, d.M.y},
-				d => q{E, d.M.y – E, d.M.y},
-				y => q{E, d.M.y – E, d.M.y},
+				M => q{E, d.M.y 'г'. – E, d.M.y 'г'.},
+				d => q{E, d.M.y 'г'. – E, d.M.y 'г'.},
+				y => q{E, d.M.y 'г'. – E, d.M.y 'г'.},
 			},
 			yMMM => {
-				M => q{MMM – MMM y},
-				y => q{MMM y – MMM y},
+				M => q{MMM – MMM y 'г'.},
+				y => q{MMM y 'г'. – MMM y 'г'.},
 			},
 			yMMMEd => {
-				M => q{E, d MMM – E, d MMM y},
-				d => q{E, d – E, d MMM y},
-				y => q{E, d MMM y – E, d MMM y},
+				M => q{E, d MMM – E, d MMM y 'г'.},
+				d => q{E, d MMM – E, d MMM y 'г'.},
+				y => q{E, d MMM y 'г'. – E, d MMM y 'г'.},
 			},
 			yMMMM => {
-				M => q{MMMM – MMMM y},
-				y => q{MMMM y – MMMM y},
+				M => q{MMMM – MMMM y 'г'.},
+				y => q{MMMM y 'г'. – MMMM y 'г'.},
 			},
 			yMMMd => {
-				M => q{d MMM – d MMM y},
-				d => q{d – d MMM y},
-				y => q{d MMM y – d MMM y},
+				M => q{d MMM – d MMM y 'г'.},
+				d => q{d – d MMM y 'г'.},
+				y => q{d MMM y 'г'. – d MMM y 'г'.},
 			},
 			yMd => {
-				M => q{d.M.y – d.M.y},
-				d => q{d.M.y – d.M.y},
-				y => q{d.M.y – d.M.y},
+				M => q{d.M.y 'г'. – d.M.y 'г'.},
+				d => q{d.M.y 'г'. – d.M.y 'г'.},
+				y => q{d.M.y 'г'. – d.M.y 'г'.},
 			},
 		},
 		'hebrew' => {
@@ -9403,9 +9504,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#Њујорк#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#Нипигон#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#Ном#,
 		},
@@ -9426,9 +9524,6 @@ has 'time_zone_names' => (
 		},
 		'America/Panama' => {
 			exemplarCity => q#Панама#,
-		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#Пангниртунг#,
 		},
 		'America/Paramaribo' => {
 			exemplarCity => q#Парамарибо#,
@@ -9451,9 +9546,6 @@ has 'time_zone_names' => (
 		'America/Punta_Arenas' => {
 			exemplarCity => q#Пунта Аренас#,
 		},
-		'America/Rainy_River' => {
-			exemplarCity => q#Рејни Ривер#,
-		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#Ренкин Инлет#,
 		},
@@ -9468,9 +9560,6 @@ has 'time_zone_names' => (
 		},
 		'America/Rio_Branco' => {
 			exemplarCity => q#Рио Бранко#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#Света Изабела#,
 		},
 		'America/Santarem' => {
 			exemplarCity => q#Сантарем#,
@@ -9517,9 +9606,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#Туле#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#Тандр Беј#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#Тихуана#,
 		},
@@ -9540,9 +9626,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#Јакутат#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#Јелоунајф#,
 		},
 		'America_Central' => {
 			long => {
@@ -9703,9 +9786,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#Чита#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#Чојбалсан#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#Коломбо#,
@@ -9945,9 +10025,6 @@ has 'time_zone_names' => (
 		'Australia/Broken_Hill' => {
 			exemplarCity => q#Брокен Хил#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#Курие#,
-		},
 		'Australia/Darwin' => {
 			exemplarCity => q#Дарвин#,
 		},
@@ -10074,13 +10151,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Летно сметање на времето во Кина#,
 				'generic' => q#Време во Кина#,
 				'standard' => q#Стандардно време во Кина#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Летно време во Чојбалсан#,
-				'generic' => q#Време во Чојбалсан#,
-				'standard' => q#Стандардно време во Чојбалсан#,
 			},
 		},
 		'Christmas' => {
@@ -10305,9 +10375,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#Улјановск#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#Ужгород#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#Вадуц#,
 		},
@@ -10328,9 +10395,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#Загреб#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#Запорожје#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#Цирих#,
@@ -10563,6 +10627,11 @@ has 'time_zone_names' => (
 				'standard' => q#Стандардно време во Јапонија#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Време во Казахстан#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#Време во Источен Казахстан#,
@@ -10609,11 +10678,6 @@ has 'time_zone_names' => (
 				'standard' => q#Стандардно време во Лорд Хау#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Време на Островот Макуари#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Летно време во Магадан#,
@@ -10651,13 +10715,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Време во Мосон#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Летно сметање на времето во северозападно Мексико#,
-				'generic' => q#Време во северозападно Мексико#,
-				'standard' => q#Стандардно време во северозападно Мексико#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -10794,9 +10851,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Honolulu' => {
 			exemplarCity => q#Хонолулу#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#Џонстон#,
 		},
 		'Pacific/Kanton' => {
 			exemplarCity => q#Кантон#,

@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Oc - Package for language Occitan
 
 package Locale::CLDR::Locales::Oc;
 # This file auto generated from Data\common\main\oc.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -3695,7 +3695,7 @@ has 'date_formats' => (
 			'full' => q{EEEE d MMMM 'de' y},
 			'long' => q{d MMMM 'de' y},
 			'medium' => q{d MMM y},
-			'short' => q{d/MM/yy},
+			'short' => q{dd/MM/yy},
 		},
 	} },
 );
@@ -3709,8 +3709,8 @@ has 'time_formats' => (
 		},
 		'gregorian' => {
 			'full' => q{HH:mm:ss zzzz},
-			'long' => q{H'h'mm:ss z},
-			'medium' => q{H'h'mm:ss},
+			'long' => q{HH:mm:ss z},
+			'medium' => q{HH:mm:ss},
 			'short' => q{H'h'mm},
 		},
 	} },
@@ -3750,9 +3750,7 @@ has 'datetime_formats_available_formats' => (
 		'gregorian' => {
 			Bh => q{h'h' B},
 			Bhm => q{h'h'mm B},
-			Bhms => q{h'h'mm:ss B},
 			EBhm => q{E h'h'mm B},
-			EBhms => q{E h'h'mm:ss B},
 			EHm => q{E HH'h'mm},
 			EHms => q{E HH'h'mm ss 'seg'.},
 			Ed => q{ccc d},
@@ -3933,7 +3931,7 @@ has 'datetime_formats_interval' => (
 			},
 			yMMMd => {
 				M => q{d MMM – d MMM 'de' y},
-				d => q{d – d MMM y},
+				d => q{MMM d – d 'de' y},
 				y => q{d LLL 'de' y – d LLL 'de' y},
 			},
 			yMd => {
@@ -4213,13 +4211,6 @@ has 'time_zone_names' => (
 				'daylight' => q#ora d’estiu de China#,
 				'generic' => q#ora de China#,
 				'standard' => q#ora estandarda de China#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#ora d’estiu de Choibalsan#,
-				'generic' => q#ora de Choibalsan#,
-				'standard' => q#ora estandarda de Choibalsan#,
 			},
 		},
 		'Christmas' => {
@@ -4567,11 +4558,6 @@ has 'time_zone_names' => (
 				'standard' => q#ora estandard de Lord Howe#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#ora de l’illa Macquarie#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#ora d’estiu de Magadan#,
@@ -4609,13 +4595,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#ora de Mawson#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#ora d’estiu del nòrd-èst de Mexic#,
-				'generic' => q#ora del nòrd-èst de Mexic#,
-				'standard' => q#ora estandarda del nòrd-èst de Mexic#,
 			},
 		},
 		'Mexico_Pacific' => {

@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Ee - Package for language Ewe
 
 package Locale::CLDR::Locales::Ee;
 # This file auto generated from Data\common\main\ee.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -514,10 +514,10 @@ has 'display_name_language' => (
  				'dyo' => 'dzola-fonyigbe',
  				'dz' => 'dzongkhagbe',
  				'ebu' => 'embugbe',
- 				'ee' => 'Eʋegbe',
+ 				'ee' => 'eʋegbe',
  				'efi' => 'efigbe',
  				'el' => 'grisigbe',
- 				'en' => 'Yevugbe',
+ 				'en' => 'iŋlisigbe',
  				'en_AU' => 'Yevugbe (Australia)',
  				'en_CA' => 'Yevugbe (Canada)',
  				'en_GB' => 'Yevugbe (Britain)',
@@ -801,7 +801,7 @@ has 'display_name_script' => (
  			'Laoo' => 'laogbeŋɔŋlɔ',
  			'Latf' => 'fraktur latin gbeŋɔŋlɔ',
  			'Latg' => 'gaelia latin gbeŋɔŋlɔ',
- 			'Latn' => 'Latingbeŋɔŋlɔ',
+ 			'Latn' => 'latingbeŋɔŋlɔ',
  			'Lepc' => 'leptsa gbeŋɔŋlɔ',
  			'Limb' => 'limbu gbeŋɔŋlɔ',
  			'Lina' => 'linia a gbeŋɔŋlɔ',
@@ -1247,7 +1247,6 @@ has 'display_name_type' => (
  				'gb2312han' => q{chinagbe yeye ƒe ɖoɖomɔ nu},
  				'phonebook' => q{fonegbalẽ me ɖoɖomɔ nu},
  				'pinyin' => q{pinyin ɖoɖomɔ nu},
- 				'reformed' => q{nugbugbɔtoɖo ƒe ɖoɖomɔ nu},
  				'search' => q{nudidi hena zazã gbadza},
  				'searchjl' => q{nudidi le hangul ƒe ɖoɖo gbãtɔ nu},
  				'stroke' => q{stroke ɖoɖomɔ nu},
@@ -1319,7 +1318,7 @@ has 'display_name_measurement_system' => (
 	init_arg	=> undef,
 	default		=> sub {
 		{
-			'metric' => q{metric},
+			'metric' => q{dzidzeti},
  			'UK' => q{uk},
  			'US' => q{us},
 
@@ -1335,7 +1334,7 @@ has 'display_name_code_patterns' => (
 		{
 			'language' => 'gbegbɔgblɔ {0}',
  			'script' => 'gbeŋɔŋlɔ {0}',
- 			'region' => 'memama {0}',
+ 			'region' => 'nutome {0}',
 
 		}
 	},
@@ -3466,7 +3465,7 @@ has 'calendar_months' => (
 							'dzodze',
 							'tedoxe',
 							'afɔfĩe',
-							'dama',
+							'dame',
 							'masa',
 							'siamlɔm',
 							'deasiamime',
@@ -4656,9 +4655,9 @@ has 'time_zone_names' => (
 	init_arg	=> undef,
 	default	=> sub { {
 		gmtFormat => q({0} GMT),
-		regionFormat => q({0} gaƒoƒo me),
-		regionFormat => q({0} kele gaƒoƒo me),
-		regionFormat => q({0} nutome gaƒoƒo me),
+		regionFormat => q({0} game),
+		regionFormat => q({0} ŋkekemeɣeyiɣi),
+		regionFormat => q({0} game ɖoɖoea),
 		'Acre' => {
 			long => {
 				'daylight' => q#Eker dzomeŋɔli gaƒoƒome#,
@@ -4698,7 +4697,7 @@ has 'time_zone_names' => (
 		'Africa_Western' => {
 			long => {
 				'daylight' => q#West Africa dzomeŋɔli gaƒoƒo me#,
-				'generic' => q#West Africa gaƒoƒo me#,
+				'generic' => q#West Africa game#,
 				'standard' => q#West Africa nutome gaƒoƒo me#,
 			},
 			short => {
@@ -4834,9 +4833,6 @@ has 'time_zone_names' => (
 				'standard' => q#Atlantic nutome gaƒoƒome#,
 			},
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#Currie#,
-		},
 		'Australia_Central' => {
 			long => {
 				'daylight' => q#Australian Central dzomeli gaƒoƒo me#,
@@ -4939,13 +4935,6 @@ has 'time_zone_names' => (
 				'daylight' => q#China kele gaƒoƒo me#,
 				'generic' => q#China gaƒoƒo me#,
 				'standard' => q#China nutome gaƒoƒo me#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Choibalsan dzomeŋɔli gaƒoƒo me#,
-				'generic' => q#Choibalsan gaƒoƒo me#,
-				'standard' => q#Choibalsan nutome gaƒoƒo me#,
 			},
 		},
 		'Christmas' => {
@@ -5262,11 +5251,6 @@ has 'time_zone_names' => (
 				'standard' => q#Makau gaƒoƒoɖoanyime#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Macquarie Island gaƒoƒo me#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Magadan dzomeŋɔli gaƒoƒo me#,
@@ -5304,13 +5288,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Mawson gaƒoƒo me#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Northwest Mexico kele gaƒoƒo me#,
-				'generic' => q#Northwest Mexico gaƒoƒo me#,
-				'standard' => q#Northwest Mexico nutome gaƒoƒo me#,
 			},
 		},
 		'Mexico_Pacific' => {

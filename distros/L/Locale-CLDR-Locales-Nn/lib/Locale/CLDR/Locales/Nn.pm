@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Nn - Package for language Norwegian Nynorsk
 
 package Locale::CLDR::Locales::Nn;
 # This file auto generated from Data\common\main\nn.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -384,7 +384,6 @@ has 'display_name_language' => (
  				'ebu' => 'embu',
  				'egy' => 'gammalegyptisk',
  				'elx' => 'elamite',
- 				'fil' => 'filippinsk',
  				'fro' => 'gammalfransk',
  				'frs' => 'austfrisisk',
  				'fur' => 'friulisk',
@@ -489,7 +488,6 @@ has 'display_name_script' => (
  			'Phlp' => 'salmepahlavi',
  			'Sarb' => 'gammalsydarabisk',
  			'Sgnw' => 'teiknskrift',
- 			'Syrc' => 'syriakisk',
  			'Syre' => 'syriakisk (estrangelo-variant)',
  			'Syrj' => 'syriakisk (vestleg variant)',
  			'Syrn' => 'syriakisk (austleg variant)',
@@ -559,7 +557,7 @@ has 'display_name_region' => (
  			'TL' => 'Aust-Timor',
  			'TL@alt=variant' => 'Aust-Timor',
  			'UM' => 'USAs ytre småøyar',
- 			'UN' => 'Sameinte nasjonar',
+ 			'UN' => 'Dei sameinte nasjonane',
  			'UN@alt=short' => 'SN',
  			'VC' => 'St. Vincent og Grenadinane',
  			'VG' => 'Dei britiske Jomfruøyane',
@@ -704,25 +702,6 @@ has 'display_name_measurement_system' => (
 	},
 );
 
-has 'characters' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> $^V ge v5.18.0
-	? eval <<'EOT'
-	sub {
-		no warnings 'experimental::regex_sets';
-		return {
-			auxiliary => qr{[áǎ čç đ èê ńñ ŋ š ŧ ü ž ä ö]},
-		};
-	},
-EOT
-: sub {
-		return {};
-},
-);
-
-
 has 'units' => (
 	is			=> 'ro',
 	isa			=> HashRef[HashRef[HashRef[Str]]],
@@ -848,14 +827,14 @@ has 'units' => (
 					# Long Unit Identifier
 					'concentr-permillion' => {
 						'name' => q(delar per million),
-						'one' => q({0} milliondel),
-						'other' => q({0} milliondelar),
+						'one' => q({0} del per million),
+						'other' => q({0} delar per million),
 					},
 					# Core Unit Identifier
 					'permillion' => {
 						'name' => q(delar per million),
-						'one' => q({0} milliondel),
-						'other' => q({0} milliondelar),
+						'one' => q({0} del per million),
+						'other' => q({0} delar per million),
 					},
 					# Long Unit Identifier
 					'consumption-mile-per-gallon' => {
@@ -974,6 +953,14 @@ has 'units' => (
 						'name' => q(nanosekund),
 						'one' => q({0} nanosekund),
 						'other' => q({0} nanosekund),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'1' => q(feminine),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'1' => q(feminine),
 					},
 					# Long Unit Identifier
 					'duration-second' => {
@@ -1828,6 +1815,14 @@ has 'units' => (
 						'name' => q(mmol/l),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(delar/milliard),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(delar/milliard),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-kilometer' => {
 						'name' => q(l/km),
 					},
@@ -2126,6 +2121,14 @@ has 'units' => (
 						'name' => q(solluminositetar),
 					},
 					# Long Unit Identifier
+					'mass-earth-mass' => {
+						'name' => q(jordmassar),
+					},
+					# Core Unit Identifier
+					'earth-mass' => {
+						'name' => q(jordmassar),
+					},
+					# Long Unit Identifier
 					'mass-solar-mass' => {
 						'name' => q(solmassar),
 					},
@@ -2152,14 +2155,6 @@ has 'units' => (
 						'name' => q(engelske mil/t),
 						'one' => q({0} mile/t),
 						'other' => q({0} mile/t),
-					},
-					# Long Unit Identifier
-					'times' => {
-						'1' => q({0}{1}),
-					},
-					# Core Unit Identifier
-					'times' => {
-						'1' => q({0}{1}),
 					},
 					# Long Unit Identifier
 					'volume-cubic-inch' => {
@@ -2361,23 +2356,6 @@ has 'number_formats' => (
 } },
 );
 
-has 'number_currency_formats' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		'latn' => {
-			'pattern' => {
-				'default' => {
-					'accounting' => {
-						'positive' => '#,##0.00 ¤',
-					},
-				},
-			},
-		},
-} },
-);
-
 has 'currencies' => (
 	is			=> 'ro',
 	isa			=> HashRef,
@@ -2509,8 +2487,6 @@ has 'currencies' => (
 		'BYN' => {
 			display_name => {
 				'currency' => q(nye belarusiske rublar),
-				'one' => q(ny belarusisk rubel),
-				'other' => q(nye belarusiske rublar),
 			},
 		},
 		'BYR' => {
@@ -2605,7 +2581,6 @@ has 'currencies' => (
 		'GWP' => {
 			display_name => {
 				'currency' => q(Guinea-Bissau-peso),
-				'one' => q(Guinea-Bissau-peso),
 			},
 		},
 		'HRD' => {
@@ -2813,8 +2788,6 @@ has 'currencies' => (
 		'RUR' => {
 			display_name => {
 				'currency' => q(russiske rublar \(1991–1998\)),
-				'one' => q(russisk rubel \(1991–1998\)),
-				'other' => q(russiske rublar \(1991–1998\)),
 			},
 		},
 		'SAR' => {
@@ -2843,14 +2816,9 @@ has 'currencies' => (
 				'other' => q(gamle sudanske pund),
 			},
 		},
-		'SLE' => {
-			display_name => {
-				'currency' => q(sierraleonske leonar),
-			},
-		},
 		'SLL' => {
 			display_name => {
-				'currency' => q(sierraleonske leonar \(1964—2022\)),
+				'currency' => q(sierraleonsk leone \(1964—2022\)),
 			},
 		},
 		'SUR' => {
@@ -3325,25 +3293,8 @@ has 'datetime_formats_interval' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
-			MMMEd => {
-				d => q{E d.–E d. MMM},
-			},
-			yM => {
-				M => q{MM.y–MM.y G},
-				y => q{MM.y–MM.y G},
-			},
-			yMEd => {
-				M => q{E dd.MM.y–E dd.MM.y G},
-				d => q{E dd.MM.y–E dd.MM.y G},
-				y => q{E dd.MM.y–E dd.MM.y G},
-			},
 			yMMMEd => {
 				d => q{E d.–E d. MMM y G},
-			},
-			yMd => {
-				M => q{dd.MM.y–dd.MM.y G},
-				d => q{dd.MM.y–dd.MM.y G},
-				y => q{dd.MM.y–dd.MM.y G},
 			},
 		},
 		'gregorian' => {
@@ -3405,7 +3356,7 @@ has 'time_zone_names' => (
 		},
 		'America_Eastern' => {
 			long => {
-				'daylight' => q#sommartid for den nordamerikansk austkysten#,
+				'daylight' => q#sommartid for den nordamerikanske austkysten#,
 				'generic' => q#tidssone for den nordamerikanske austkysten#,
 				'standard' => q#normaltid for den nordamerikanske austkysten#,
 			},
@@ -3464,9 +3415,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Ashgabat' => {
 			exemplarCity => q#Asjgabat#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#Tsjojbalsan#,
 		},
 		'Asia/Hovd' => {
 			exemplarCity => q#Khovd#,
@@ -3572,13 +3520,6 @@ has 'time_zone_names' => (
 				'daylight' => q#kinesisk sommartid#,
 				'generic' => q#kinesisk tid#,
 				'standard' => q#kinesisk normaltid#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#sommartid for Tsjojbalsan#,
-				'generic' => q#tidssone for Tsjojbalsan#,
-				'standard' => q#normaltid for Tsjojbalsan#,
 			},
 		},
 		'Cocos' => {
@@ -3824,13 +3765,6 @@ has 'time_zone_names' => (
 				'daylight' => q#mauritisk sommartid#,
 				'generic' => q#mauritisk tid#,
 				'standard' => q#mauritisk normaltid#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#sommartid for nordvestlege Mexico#,
-				'generic' => q#tidssone for nordvestlege Mexico#,
-				'standard' => q#normaltid for nordvestlege Mexico#,
 			},
 		},
 		'Mexico_Pacific' => {

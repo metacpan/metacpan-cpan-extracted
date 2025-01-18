@@ -18,7 +18,7 @@ is ($locale->locale_name('fr_BE'), 'galleg (Belgia)', 'Name with unknown region'
 is ($locale->locale_name('fr_BE'), 'galleg (Belgia)', 'Cached method') ;
 is ($locale->language_name, 'brezhoneg', 'Language name');
 is ($locale->language_name('wibble'), 'yezh dianav', 'Unknown Language name');
-is ($locale->script_name('Cyrs'), 'skritur dianav', 'Script name');
+is ($locale->script_name('Cyrs'), 'kirillek henslavonek', 'Script name');
 is ($locale->script_name('wibl'), 'skritur dianav', 'Invalid Script name');
 is ($locale->region_name('GB'), 'Rouantelezh-Unanet', 'Region name');
 is ($locale->region_name('wibble'), 'Rannved dianav', 'Invalid Region name');

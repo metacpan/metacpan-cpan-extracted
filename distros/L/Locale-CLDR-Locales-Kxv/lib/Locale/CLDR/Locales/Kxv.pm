@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Kxv - Package for language Kuvi
 
 package Locale::CLDR::Locales::Kxv;
 # This file auto generated from Data\common\main\kxv.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -31,12 +31,28 @@ has 'display_name_language' => (
 	default		=> sub {
 		 sub {
 			 my %languages = (
-				'ar' => 'arabic',
+				'af' => 'aprikaans',
+ 				'am' => 'aarmenia',
+ 				'ar' => 'arabic',
  				'ar_001' => 'punijuga mānānka arabic',
+ 				'as' => 'aasamis',
+ 				'az' => 'ajerbaijani',
+ 				'az@alt=short' => 'ājeri',
+ 				'be' => 'belarusiati',
+ 				'bg' => 'bulgeriati',
  				'bn' => 'bangali',
+ 				'bo' => 'tibetī',
+ 				'brx' => 'boḍo',
+ 				'bs' => 'bajniati',
+ 				'ca' => 'keṭelan',
+ 				'chr' => 'cerokī',
+ 				'cs' => 'cek',
+ 				'da' => 'denis',
  				'de' => 'jerman',
  				'de_AT' => 'ausṭriati jerman',
  				'de_CH' => 'svis high jerman',
+ 				'doi' => 'ḍogri',
+ 				'el' => 'grīk',
  				'en' => 'ingrajī',
  				'en_AU' => 'ausṭreliati ingarjī',
  				'en_CA' => 'kanaḍati ingarjī',
@@ -48,30 +64,86 @@ has 'display_name_language' => (
  				'es_419' => 'laṭin americati spenis',
  				'es_ES' => 'yuropīyati spenis',
  				'es_MX' => 'meksikoti spenis',
+ 				'et' => 'esṭoniyati',
+ 				'eu' => 'bask',
+ 				'fa' => 'persiati',
+ 				'fa_AF' => 'ḍari',
+ 				'fi' => 'pinnis',
+ 				'fil' => 'pilipino',
  				'fr' => 'prenc',
  				'fr_CA' => 'kanaḍati prenc',
  				'fr_CH' => 'svis prenc',
+ 				'gl' => 'galesiati',
+ 				'gu' => 'gujraṭī',
+ 				'he' => 'hibru',
  				'hi_Latn' => 'hindi',
+ 				'hr' => 'kroesiati',
+ 				'hu' => 'hngeriyati',
+ 				'hy' => 'aarmeniati',
  				'id' => 'inḍonesiyati',
+ 				'is' => 'aislanḍik',
  				'it' => 'iṭaliti',
  				'ja' => 'japanij',
+ 				'ka' => 'jorjiati',
+ 				'kk' => 'kjaak',
+ 				'km' => 'kmer',
+ 				'kn' => 'knnaḍa',
  				'ko' => 'koriati',
+ 				'kok' => 'konkanī',
+ 				'ks' => 'kasmīrī',
  				'kxv' => 'kuvi',
+ 				'ky' => 'kyrgyj',
+ 				'lo' => 'lao',
+ 				'lt' => 'lituaniyati',
+ 				'lv' => 'laṭviati',
+ 				'mai' => 'maitilī',
+ 				'mk' => 'mesiḍoniyati',
+ 				'ml' => 'malyalam',
+ 				'mn' => 'mongoliyati',
+ 				'mni' => 'maṇipurī',
+ 				'mr' => 'maraṭi',
+ 				'ms' => 'malei',
+ 				'my' => 'burmij',
+ 				'nb' => 'norvejiati būkmal',
+ 				'ne' => 'nepaḷī',
  				'nl' => 'ḍc',
  				'nl_BE' => 'vlaams',
+ 				'or' => 'oḍiaa',
+ 				'pa' => 'pnjabī',
  				'pl' => 'polis',
  				'pt' => 'portugīj',
  				'pt_BR' => 'brajilian portugīj',
  				'pt_PT' => 'yuropīyati portugīj',
+ 				'ro' => 'romaniyati',
+ 				'ro_MD' => 'molḍaviati',
  				'ru' => 'rusiyati',
+ 				'sa' => 'sanskrit',
+ 				'sat' => 'santalī',
+ 				'sd' => 'sindi',
+ 				'si' => 'sinhali',
+ 				'sk' => 'slovak',
+ 				'sl' => 'sloveniyati',
+ 				'sq' => 'albaniyati',
+ 				'sr' => 'sarbiyati',
+ 				'sv' => 'sviḍis',
+ 				'sw' => 'svahili',
+ 				'sw_CD' => 'kongo svahili',
+ 				'ta' => 'tamiḷ',
+ 				'te' => 'telugu',
  				'th' => 'tae',
  				'tr' => 'turkis',
+ 				'uk' => 'yukraniyati',
+ 				'ur' => 'urdu',
+ 				'uz' => 'ujbek',
+ 				'vi' => 'vietnaamti',
+ 				'xnr' => 'kangri',
  				'zh' => 'cainati',
  				'zh@alt=menu' => 'cainati, manḍarin',
  				'zh_Hans' => 'sahaj cainati',
  				'zh_Hans@alt=long' => 'sahaj manḍarin cainati',
  				'zh_Hant' => 'hirudlu cainati',
  				'zh_Hant@alt=long' => 'hirudlu manḍarin cainati',
+ 				'zu' => 'julu',
 
 			);
 			if (@_) {
@@ -90,14 +162,23 @@ has 'display_name_script' => (
 		sub {
 			my %scripts = (
 			'Arab' => 'aarabic',
+ 			'Beng' => 'bangalī',
+ 			'Brah' => 'brahmi',
+ 			'Cher' => 'cerokī',
  			'Cyrl' => 'sirilik',
  			'Deva' => 'devnagrī',
+ 			'Gujr' => 'gujraṭī',
+ 			'Guru' => 'gurmukī',
  			'Hans' => 'sahaj',
  			'Hans@alt=stand-alone' => 'sahaj han',
  			'Hant' => 'hirudlu',
  			'Hant@alt=stand-alone' => 'hirudlu han',
+ 			'Knda' => 'knnaḍa',
  			'Latn' => 'laṭin',
+ 			'Mlym' => 'malayalam',
  			'Orya' => 'oḍiaa',
+ 			'Saur' => 'saurastra',
+ 			'Taml' => 'tamiḷ',
  			'Telu' => 'telugu',
  			'Zxxx' => 'raciaahalee',
  			'Zzzz' => 'puṇāātiakr',
@@ -387,6 +468,25 @@ has 'display_name_region' => (
 	},
 );
 
+has 'display_name_key' => (
+	is			=> 'ro',
+	isa			=> HashRef[Str],
+	init_arg	=> undef,
+	default		=> sub {
+		{
+			'calendar' => 'kelenḍr',
+ 			'cf' => 'ṭakã pormat',
+ 			'collation' => 'mila krm',
+ 			'currency' => 'ṭakã',
+ 			'hc' => 'veḍiti gila (12 vrses 24)',
+ 			'lb' => 'daḍi ḍikihin aaḍa',
+ 			'ms' => 'laṭini leka',
+ 			'numbers' => 'sṅkya',
+
+		}
+	},
+);
+
 has 'display_name_type' => (
 	is			=> 'ro',
 	isa			=> HashRef[HashRef[Str]],
@@ -397,13 +497,41 @@ has 'display_name_type' => (
  				'gregorian' => q{gregoriyan kelenḍr},
  				'indian' => q{barat jatiya kelenḍr},
  			},
+ 			'cf' => {
+ 				'standard' => q{mānānka takã},
+ 			},
  			'collation' => {
+ 				'ducet' => q{ḍepalt yunikoḍ baga lẽ},
+ 				'phonebook' => q{pnbhi baga lẽ},
+ 				'search' => q{samani udesya parin},
  				'standard' => q{mānānka baga lẽ},
  			},
+ 			'hc' => {
+ 				'h11' => q{12 gṇṭati pddti (0 - 11)},
+ 				'h12' => q{12 gṇṭati pddti (1–12)},
+ 				'h23' => q{24 gṇṭati pddti (0 - 23)},
+ 				'h24' => q{24 gṇṭati pddti (1 - 24)},
+ 			},
+ 			'ms' => {
+ 				'metric' => q{meṭrik pddti},
+ 				'uksystem' => q{samrajyti aaṭini map pddti},
+ 				'ussystem' => q{aamerikati map pddti},
+ 			},
  			'numbers' => {
+ 				'arab' => q{arabic-bartiya nmbr},
+ 				'arabext' => q{nkiaati arabic - bartiya nmbr},
+ 				'beng' => q{bngalī nmbr},
  				'deva' => q{devnagrī nmbr},
+ 				'gujr' => q{gujraṭī nmbr},
+ 				'guru' => q{gurumukī nmbr},
+ 				'knda' => q{knnaḍ nmbr},
  				'latn' => q{veḍa kuṇpu nmbr},
+ 				'mlym' => q{malayalam nmbr},
  				'orya' => q{oḍiya nmbr},
+ 				'roman' => q{roman nmbr},
+ 				'romanlow' => q{roman mila kase nmbr},
+ 				'taml' => q{hirudulu tamiḷ nmbr},
+ 				'tamldec' => q{tamiḷ nmbr},
  				'telu' => q{telugū nmbr},
  			},
 
@@ -476,8 +604,120 @@ has 'number_formats' => (
 	default		=> sub { {
 		decimalFormat => {
 			'default' => {
+				'1000' => {
+					'other' => '0 h',
+				},
+				'10000' => {
+					'other' => '00 h',
+				},
+				'100000' => {
+					'other' => '000 h',
+				},
+				'1000000' => {
+					'other' => '0 mi',
+				},
+				'10000000' => {
+					'other' => '00 mi',
+				},
+				'100000000' => {
+					'other' => '000 mi',
+				},
+				'1000000000' => {
+					'other' => '0 bi',
+				},
+				'10000000000' => {
+					'other' => '00 bi',
+				},
+				'100000000000' => {
+					'other' => '000 bi',
+				},
+				'1000000000000' => {
+					'other' => '0 tri',
+				},
+				'10000000000000' => {
+					'other' => '00 tri',
+				},
+				'100000000000000' => {
+					'other' => '000 tri',
+				},
 				'standard' => {
 					'default' => '#,##,##0.###',
+				},
+			},
+			'long' => {
+				'1000' => {
+					'other' => '0 hjar',
+				},
+				'10000' => {
+					'other' => '00 hjar',
+				},
+				'100000' => {
+					'other' => '000 hjar',
+				},
+				'1000000' => {
+					'other' => '0 million',
+				},
+				'10000000' => {
+					'other' => '00 million',
+				},
+				'100000000' => {
+					'other' => '000 million',
+				},
+				'1000000000' => {
+					'other' => '0 billion',
+				},
+				'10000000000' => {
+					'other' => '00 billion',
+				},
+				'100000000000' => {
+					'other' => '000 billion',
+				},
+				'1000000000000' => {
+					'other' => '0 trillion',
+				},
+				'10000000000000' => {
+					'other' => '00 trillion',
+				},
+				'100000000000000' => {
+					'other' => '000 trillion',
+				},
+			},
+			'short' => {
+				'1000' => {
+					'other' => '0 h',
+				},
+				'10000' => {
+					'other' => '00 h',
+				},
+				'100000' => {
+					'other' => '000 h',
+				},
+				'1000000' => {
+					'other' => '0 mi',
+				},
+				'10000000' => {
+					'other' => '00 mi',
+				},
+				'100000000' => {
+					'other' => '000 mi',
+				},
+				'1000000000' => {
+					'other' => '0 bi',
+				},
+				'10000000000' => {
+					'other' => '00 bi',
+				},
+				'100000000000' => {
+					'other' => '000 bi',
+				},
+				'1000000000000' => {
+					'other' => '0 tri',
+				},
+				'10000000000000' => {
+					'other' => '00 tri',
+				},
+				'100000000000000' => {
+					'other' => '000 tri',
 				},
 			},
 		},
@@ -698,13 +938,6 @@ has 'calendar_quarters' => (
 						3 => '4th kuarṭr'
 					},
 				},
-				'stand-alone' => {
-					abbreviated => {0 => 'Q1',
-						1 => 'Q2',
-						2 => 'Q3',
-						3 => 'Q4'
-					},
-				},
 			},
 	} },
 );
@@ -817,6 +1050,11 @@ has 'datetime_formats_available_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
+			Bh => q{B h},
+			Bhm => q{B h:mm},
+			Bhms => q{B h:mm:ss},
+			EBhm => q{E B h:mm},
+			EBhms => q{E B h:mm:ss},
 			GyMMMEd => q{G E, d MMM y},
 			GyMMMd => q{G d MMM y},
 			GyMd => q{GGGGG d/M/y},
@@ -837,7 +1075,7 @@ has 'datetime_formats_available_formats' => (
 		},
 		'gregorian' => {
 			Bh => q{B h},
-			Bhm => q{>B h:mm},
+			Bhm => q{B h:mm},
 			Bhms => q{B h:mm:ss},
 			EBhm => q{E B h:mm},
 			EBhms => q{E B h:mm:ss},
@@ -851,6 +1089,7 @@ has 'datetime_formats_available_formats' => (
 			GyMd => q{GGGGG d/M/y},
 			MEd => q{E, d/M},
 			MMMEd => q{E, d MMM},
+			MMMMW => q{MMMM 'tã' 'vara' W},
 			MMMMd => q{d MMMM},
 			MMMd => q{d MMM},
 			Md => q{d/M},
@@ -863,6 +1102,7 @@ has 'datetime_formats_available_formats' => (
 			yMd => q{d/M/y},
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
+			yw => q{Y 'tã' 'vara' w},
 		},
 	} },
 );
@@ -881,6 +1121,15 @@ has 'datetime_formats_interval' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
+			Bh => {
+				B => q{B h – B h},
+				h => q{B h–h},
+			},
+			Bhm => {
+				B => q{B h:mm – B h:mm},
+				h => q{B h:mm–h:mm},
+				m => q{B h:mm–h:mm},
+			},
 			M => {
 				M => q{M–M},
 			},
@@ -1506,9 +1755,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#niyu york#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#nipigen#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#nom#,
 		},
@@ -1530,9 +1776,6 @@ has 'time_zone_names' => (
 		'America/Panama' => {
 			exemplarCity => q#panama#,
 		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#pangnirtung#,
-		},
 		'America/Paramaribo' => {
 			exemplarCity => q#paramaribo#,
 		},
@@ -1553,9 +1796,6 @@ has 'time_zone_names' => (
 		},
 		'America/Punta_Arenas' => {
 			exemplarCity => q#puṇṭa erenas#,
-		},
-		'America/Rainy_River' => {
-			exemplarCity => q#reni rivr#,
 		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#rankin inledṭ#,
@@ -1617,9 +1857,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#tule#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#tanḍr be#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#tihvana#,
 		},
@@ -1640,9 +1877,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#yakuṭaṭ#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#yellonaip#,
 		},
 		'America_Central' => {
 			long => {
@@ -1796,9 +2030,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#cita#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#koibalsan#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#kolombo#,
@@ -2166,13 +2397,6 @@ has 'time_zone_names' => (
 				'standard' => q#cin mānānka belā#,
 			},
 		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#koibālsn kār~ā belā#,
-				'generic' => q#koibālsn belā#,
-				'standard' => q#koibālsn mānānka belā#,
-			},
-		},
 		'Christmas' => {
 			long => {
 				'standard' => q#krismās dīp belā#,
@@ -2395,9 +2619,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#ulyanovsk#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#ujhorod#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#vaḍuj#,
 		},
@@ -2418,9 +2639,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#tegusigalpa#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#japorjye#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#juric#,
@@ -2638,6 +2856,11 @@ has 'time_zone_names' => (
 				'standard' => q#jāpān mānānka belā#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#kājākstān belā#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#weḍāhapu kājākstān belā#,
@@ -2684,11 +2907,6 @@ has 'time_zone_names' => (
 				'standard' => q#laṛ hawe mānānka belā#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#makwārī dīp belā#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#māgādan ḍelāit belā#,
@@ -2726,13 +2944,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#māwosn belā#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#utar weḍā kūṇpū meksik ḍelāiṭ belā#,
-				'generic' => q#utar weḍā kūṇpū meksik belā#,
-				'standard' => q#utar weḍā kūṇpū meksik mānānka belā#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -2863,9 +3074,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Guam' => {
 			exemplarCity => q#guam#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#johnsṭon#,
 		},
 		'Pacific/Kanton' => {
 			exemplarCity => q#kanṭon#,

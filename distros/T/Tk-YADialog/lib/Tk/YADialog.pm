@@ -9,7 +9,7 @@ Tk::YADialog - Yet another dialog
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.04';
+$VERSION = '0.05';
 
 use Tk;
 use base qw(Tk::Derived Tk::Toplevel);
@@ -194,6 +194,7 @@ sub show {
 
 	shift if defined $grab && length $grab && ($grab =~ /global/);
 	$self->Popup(@_);
+	$self->raise;
 
 	Tk::catch {
 		if (defined $grab && length $grab && ($grab =~ /global/)) {

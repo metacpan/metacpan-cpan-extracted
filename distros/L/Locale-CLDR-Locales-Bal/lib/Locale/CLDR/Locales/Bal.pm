@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Bal - Package for language Baluchi
 
 package Locale::CLDR::Locales::Bal;
 # This file auto generated from Data\common\main\bal.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -79,7 +79,7 @@ has 'display_name_script' => (
  			'Cyrl' => 'روسی',
  			'Hans' => 'هان (ساده کرتگێن)',
  			'Hant' => 'هان (اسلیگێن)',
- 			'Latn' => 'لاتین',
+ 			'Latn' => 'لاتینی',
  			'Zxxx' => 'نبشته نبوتگێن سیاهگ',
  			'Zzzz' => 'کۆڈ نبوتگێن سیاهگ',
 
@@ -456,6 +456,10 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'gregorian' => {
+			yMMMd => q{d MMM y},
+			yMd => q{dd-MM-y},
+		},
 	} },
 );
 
@@ -472,6 +476,9 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'gregorian' => {
+			fallback => '{1} - {0}',
+		},
 	} },
 );
 
@@ -597,6 +604,11 @@ has 'time_zone_names' => (
 				'standard' => q#رۆنندی یورپئے گیشّتگێن ساهت#,
 			},
 		},
+		'GMT' => {
+			long => {
+				'standard' => q#گرین‌وِچ مین ٹائم#,
+			},
+		},
 		'Hawaii_Aleutian' => {
 			long => {
 				'daylight' => q#هئواییئے گرماگی ساهت#,
@@ -650,23 +662,11 @@ has 'time_zone_names' => (
 				'standard' => q#لۆرڈ هئو اُسترالیائے گیشّتگێن ساهت#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#ماکواریئے گیشّتگێن ساهت#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#مَگَدَنئے گرماگی ساهت#,
 				'generic' => q#مَگَدَنئے ساهت#,
 				'standard' => q#مَگَدَنئے گیشّتگێن ساهت#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#شمالی مِکسیکۆئے گرماگی ساهت#,
-				'generic' => q#شمالی مِکسیکۆئے ساهت#,
-				'standard' => q#شمالی مِکسیکۆئے گیشّتگێن ساهت#,
 			},
 		},
 		'Mexico_Pacific' => {

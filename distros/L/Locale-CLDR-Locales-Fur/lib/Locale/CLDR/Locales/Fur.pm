@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Fur - Package for language Friulian
 
 package Locale::CLDR::Locales::Fur;
 # This file auto generated from Data\common\main\fur.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -76,6 +76,7 @@ has 'display_name_language' => (
  				'es' => 'spagnûl',
  				'es_419' => 'spagnûl de Americhe Latine',
  				'es_ES' => 'spagnûl iberic',
+ 				'es_MX' => 'spagnûl messican',
  				'et' => 'eston',
  				'eu' => 'basc',
  				'fa' => 'persian',
@@ -255,7 +256,9 @@ has 'display_name_script' => (
  			'Gujr' => 'gujarati',
  			'Hani' => 'han',
  			'Hans' => 'Han semplificât',
+ 			'Hans@alt=stand-alone' => 'han semplificât',
  			'Hant' => 'Han tradizionâl',
+ 			'Hant@alt=stand-alone' => 'han tradizionâl',
  			'Hebr' => 'ebreu',
  			'Hrkt' => 'katakana o hiragana',
  			'Hung' => 'vieri ongjarês',
@@ -394,9 +397,11 @@ has 'display_name_region' => (
  			'CR' => 'Costa Rica',
  			'CU' => 'Cuba',
  			'CV' => 'Cjâf vert',
+ 			'CW' => 'Curaçao',
  			'CX' => 'Isule Christmas',
  			'CY' => 'Cipri',
  			'CZ' => 'Republiche ceche',
+ 			'CZ@alt=variant' => 'Republiche Ceche',
  			'DE' => 'Gjermanie',
  			'DG' => 'Diego Garcia',
  			'DJ' => 'Gibuti',
@@ -422,6 +427,7 @@ has 'display_name_region' => (
  			'FR' => 'France',
  			'GA' => 'Gabon',
  			'GB' => 'Ream unît',
+ 			'GB@alt=short' => 'Ream Unît',
  			'GD' => 'Grenada',
  			'GE' => 'Gjeorgjie',
  			'GF' => 'Guiana francês',
@@ -490,6 +496,7 @@ has 'display_name_region' => (
  			'MF' => 'Sant Martin',
  			'MG' => 'Madagascar',
  			'MH' => 'Isulis Marshall',
+ 			'MK' => 'Macedonie dal Nord',
  			'ML' => 'Mali',
  			'MM' => 'Birmanie',
  			'MN' => 'Mongolie',
@@ -557,6 +564,7 @@ has 'display_name_region' => (
  			'SR' => 'Suriname',
  			'ST' => 'Sao Tomè e Principe',
  			'SV' => 'El Salvador',
+ 			'SX' => 'Saint Marteen',
  			'SY' => 'Sirie',
  			'SZ' => 'Swaziland',
  			'TA' => 'Tristan da Cunha',
@@ -579,6 +587,7 @@ has 'display_name_region' => (
  			'UA' => 'Ucraine',
  			'UG' => 'Uganda',
  			'UM' => 'Isulis periferichis minôrs dai Stâts Unîts',
+ 			'UN' => 'Nazions Unidis',
  			'US' => 'Stâts Unîts',
  			'UY' => 'Uruguay',
  			'UZ' => 'Uzbechistan',
@@ -591,6 +600,8 @@ has 'display_name_region' => (
  			'VU' => 'Vanuatu',
  			'WF' => 'Wallis e Futuna',
  			'WS' => 'Samoa',
+ 			'XA' => 'Pseudoacents',
+ 			'XK' => 'Cossovo',
  			'YE' => 'Yemen',
  			'YT' => 'Mayotte',
  			'ZA' => 'Sud Afriche',
@@ -1014,6 +1025,8 @@ has 'currencies' => (
 		'CUP' => {
 			display_name => {
 				'currency' => q(Peso cuban),
+				'one' => q(peso cuban),
+				'other' => q(peso cuban),
 			},
 		},
 		'CZK' => {
@@ -1128,6 +1141,8 @@ has 'currencies' => (
 		'NIO' => {
 			display_name => {
 				'currency' => q(Córdoba oro nicaraguan),
+				'one' => q(córdoba oro nicaraguan),
+				'other' => q(córdoba oro nicaraguan),
 			},
 		},
 		'NOK' => {

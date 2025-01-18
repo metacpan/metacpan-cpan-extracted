@@ -9,7 +9,7 @@ Tk::FilePicker - Tk::FileBrowser based file dialog
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = 0.06;
+$VERSION = 0.09;
 
 use base qw(Tk::Derived Tk::YADialog);
 Construct Tk::Widget 'FilePicker';
@@ -106,6 +106,7 @@ sub confirmOverWrite {
 	return 1 unless -e $file;
 	my $dialog = $self->YAMessage(
 		-image => $self->cget('-warnimage'),
+		-justify => 'left',
 		-text => "File exists, overwrite it?\n$file",
 		-buttons => ['Ok', 'Cancel'],
 	);
@@ -179,7 +180,7 @@ even when you expect only one result you have to do:
 
 =over 4
 
-=item B<pick>
+=item B<pick>I<(%options)>
 
 The basic pick method. Besides the two options above you can give it many
 of the options of Tk::FilePicker and Tk::FileBrowser.
@@ -194,7 +195,9 @@ sub pick {
 	$initialdir = $self->lastfolder unless defined $initialdir;
 	my $initialfile = delete $args{'-initialfile'};
 
+	my %defaults = ();
 	for (keys %args) {
+		$defaults{$_} = $self->cget($_);
 		$self->configure($_, $args{$_})
 	}
 	my $folder = $self->folder;
@@ -224,12 +227,25 @@ sub pick {
 			}
 		}
 	}
+	for (keys %defaults) {
+		$self->configure($_, $defaults{$_})
+	}
 	return @res;
 }
 
-=item B<pickFileOpen>
+=item B<pickFileOpen>I<(%options)>
 
-Calls B<pick> configured to select one file for opening.
+Calls B<pick> configured to select one file for opening. Equivalent to:
+
+ my ($file) = $window->pick(
+    -checkoverwrite => 0,
+    -showfolders => 1,
+    -showfiles => 1,
+    -selectmode => 'single',
+    -selectstring => 'Open',
+    -title => 'Open file',
+ );
+
 
 =cut
 
@@ -247,9 +263,19 @@ sub pickFileOpen {
 	);
 }
 
-=item B<pickFileOpenMulti>
+=item B<pickFileOpenMulti>I<(%options)>
 
-Calls B<pick> configured to select multiple files for opening.
+Calls B<pick> configured to select multiple files for opening. Equivalent to:
+
+ my @files = $window->pick(
+    -checkoverwrite => 0,
+    -showfolders => 1,
+    -showfiles => 1,
+    -selectmode => 'extended',
+    -selectstring => 'Open',
+    -title => 'Open file',
+ );
+
 
 =cut
 
@@ -267,10 +293,20 @@ sub pickFileOpenMulti {
 	);
 }
 
-=item B<pickFileSave>
+=item B<pickFileSave>I<(%options)>
 
 Calls B<pick> configured to select one file for saving. Pops
-a dialog for overwrite if the selected file exists.
+a dialog for overwrite if the selected file exists. Equivalent to:
+
+ my ($file) = $window->pick(
+    -checkoverwrite => 1,
+    -showfolders => 1,
+    -showfiles => 1,
+    -selectmode => 'single',
+    -selectstring => 'Save',
+    -title => 'Save file',
+ );
+
 
 =cut
 
@@ -288,9 +324,19 @@ sub pickFileSave {
 	);
 }
 
-=item B<pickFolderSelect>
+=item B<pickFolderSelect>I<(%options)>
 
-Calls B<pick> configured to select one folder.
+Calls B<pick> configured to select one folder. Equivalent to:
+
+ my ($folder) = $window->pick(
+    -checkoverwrite => 0,
+    -showfolders => 1,
+    -showfiles => 0,
+    -selectmode => 'single',
+    -selectstring => 'Select',
+    -title => 'Select folder',
+ );
+
 
 =cut
 

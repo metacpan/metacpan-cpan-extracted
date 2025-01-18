@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Sr::Cyrl::Ba - Package for language Serbian
 
 package Locale::CLDR::Locales::Sr::Cyrl::Ba;
 # This file auto generated from Data\common\main\sr_Cyrl_BA.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -130,7 +130,6 @@ has 'display_name_type' => (
  				'dictionary' => q{редослијед сортирања у рјечнику},
  				'ducet' => q{подразумијевани Unicode редослијед сортирања},
  				'phonetic' => q{фонетски редослијед сортирања},
- 				'reformed' => q{реформисани редослијед сортирања},
  				'search' => q{претрага опште намјене},
  				'standard' => q{стандардни редослијед сортирања},
  				'unihan' => q{редослијед сортирања радикалних потеза},
@@ -192,6 +191,20 @@ has 'units' => (
 						'few' => q({0} G),
 						'one' => q({0} ге сила),
 						'other' => q({0} ге сила),
+					},
+					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'few' => q({0} дијела на милијарду),
+						'name' => q(дијелови на милијарду),
+						'one' => q({0} дио на милијарду),
+						'other' => q({0} дијелова на милијарду),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'few' => q({0} дијела на милијарду),
+						'name' => q(дијелови на милијарду),
+						'one' => q({0} дио на милијарду),
+						'other' => q({0} дијелова на милијарду),
 					},
 					# Long Unit Identifier
 					'duration-century' => {
@@ -338,6 +351,20 @@ has 'units' => (
 						'other' => q(B {0}),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'few' => q({0} свјетла),
+						'name' => q(свјетло),
+						'one' => q({0} свјетло),
+						'other' => q({0} свјетла),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'few' => q({0} свјетла),
+						'name' => q(свјетло),
+						'one' => q({0} свјетло),
+						'other' => q({0} свјетла),
+					},
+					# Long Unit Identifier
 					'volume-acre-foot' => {
 						'few' => q({0} акер стопе),
 						'one' => q({0} ac ft),
@@ -363,6 +390,14 @@ has 'units' => (
 					},
 				},
 				'narrow' => {
+					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(дијелови/милијарда),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(дијелови/милијарда),
+					},
 					# Long Unit Identifier
 					'duration-month' => {
 						'few' => q({0} мјес.),
@@ -438,6 +473,20 @@ has 'units' => (
 						'other' => q(B {0}),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'few' => q({0} свјетла),
+						'name' => q(свјетло),
+						'one' => q({0} свјетло),
+						'other' => q({0} свјетала),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'few' => q({0} свјетла),
+						'name' => q(свјетло),
+						'one' => q({0} свјетло),
+						'other' => q({0} свјетала),
+					},
+					# Long Unit Identifier
 					'volume-barrel' => {
 						'few' => q({0} bbl),
 						'one' => q({0}bbl),
@@ -492,6 +541,14 @@ has 'units' => (
 				},
 				'short' => {
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(дијелови/милијарда),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(дијелови/милијарда),
+					},
+					# Long Unit Identifier
 					'duration-month' => {
 						'few' => q({0} мјес.),
 						'name' => q(мјесеци),
@@ -539,6 +596,20 @@ has 'units' => (
 						'one' => q(B {0}),
 						'other' => q(Б {0}),
 					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'few' => q({0} свјетла),
+						'name' => q(свјетло),
+						'one' => q({0} свјетло),
+						'other' => q({0} свјетала),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'few' => q({0} свјетла),
+						'name' => q(свјетло),
+						'one' => q({0} свјетло),
+						'other' => q({0} свјетала),
+					},
 				},
 			} }
 );
@@ -551,9 +622,6 @@ has 'currencies' => (
 		'BAM' => {
 			display_name => {
 				'currency' => q(Босанскохерцеговачка конвертибилна марка),
-				'few' => q(босанскохерцеговачке конвертибилне маркe),
-				'one' => q(босанскохерцеговачка конвертибилна марка),
-				'other' => q(босанскохерцеговачких конвертибилних марака),
 			},
 		},
 		'BYN' => {
@@ -1045,13 +1113,6 @@ has 'time_zone_names' => (
 				'standard' => q#Кинеско стандардно вријеме#,
 			},
 		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Чојбалсан, љетње вријеме#,
-				'generic' => q#Чојбалсан вријеме#,
-				'standard' => q#Чојбалсан, стандардно вријеме#,
-			},
-		},
 		'Christmas' => {
 			long => {
 				'standard' => q#Божићно острво вријеме#,
@@ -1300,6 +1361,11 @@ has 'time_zone_names' => (
 				'standard' => q#Јапанско стандардно вријеме#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Казахстанско вријеме#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#Источно-казахстанско вријеме#,
@@ -1346,11 +1412,6 @@ has 'time_zone_names' => (
 				'standard' => q#Лорд Хов, стандардно вријеме#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#острво Маквори вријеме#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Магадан, љетње вријеме#,
@@ -1388,13 +1449,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Мосон вријеме#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Сјеверозападни Мексико, летње вријеме#,
-				'generic' => q#Сјеверозападни Мексико#,
-				'standard' => q#Сјеверозападни Мексико, стандардно вријеме#,
 			},
 		},
 		'Mexico_Pacific' => {

@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Kn - Package for language Kannada
 
 package Locale::CLDR::Locales::Kn;
 # This file auto generated from Data\common\main\kn.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -83,6 +83,7 @@ has 'display_name_language' => (
  				'bik' => 'ಬಿಕೊಲ್',
  				'bin' => 'ಬಿನಿ',
  				'bla' => 'ಸಿಕ್ಸಿಕಾ',
+ 				'blo' => 'ಅನೀ',
  				'bm' => 'ಬಂಬಾರಾ',
  				'bn' => 'ಬಾಂಗ್ಲಾ',
  				'bo' => 'ಟಿಬೇಟಿಯನ್',
@@ -244,7 +245,7 @@ has 'display_name_language' => (
  				'iba' => 'ಇಬಾನ್',
  				'ibb' => 'ಇಬಿಬಿಯೋ',
  				'id' => 'ಇಂಡೋನೇಶಿಯನ್',
- 				'ie' => 'ಇಂಟರ್ಲಿಂಗ್',
+ 				'ie' => 'ಇಂಟರ್‌ಲಿಂಗ್',
  				'ig' => 'ಇಗ್ಬೊ',
  				'ii' => 'ಸಿಚುಅನ್ ಯಿ',
  				'ik' => 'ಇನುಪಿಯಾಕ್',
@@ -307,6 +308,7 @@ has 'display_name_language' => (
  				'kv' => 'ಕೋಮಿ',
  				'kw' => 'ಕಾರ್ನಿಷ್',
  				'kwk' => 'ಕ್ವಾಕ್‌ವಾಲಾ',
+ 				'kxv' => 'ಕುವಿ',
  				'ky' => 'ಕಿರ್ಗಿಜ್',
  				'la' => 'ಲ್ಯಾಟಿನ್',
  				'lad' => 'ಲ್ಯಾಡಿನೋ',
@@ -317,8 +319,10 @@ has 'display_name_language' => (
  				'lez' => 'ಲೆಜ್ಘಿಯನ್',
  				'lg' => 'ಗಾಂಡಾ',
  				'li' => 'ಲಿಂಬರ್ಗಿಶ್',
+ 				'lij' => 'ಲಿಗುರಿಯನ್',
  				'lil' => 'ಲಿಲ್ಲೂವೆಟ್',
  				'lkt' => 'ಲಕೊಟ',
+ 				'lmo' => 'ಲೋಂಬರ್ಡ್',
  				'ln' => 'ಲಿಂಗಾಲ',
  				'lo' => 'ಲಾವೋ',
  				'lol' => 'ಮೊಂಗೋ',
@@ -509,6 +513,7 @@ has 'display_name_language' => (
  				'swb' => 'ಕೊಮೊರಿಯನ್',
  				'syc' => 'ಶಾಸ್ತ್ರೀಯ ಸಿರಿಯಕ್',
  				'syr' => 'ಸಿರಿಯಾಕ್',
+ 				'szl' => 'ಸಿಲೆಸಿಯನ್',
  				'ta' => 'ತಮಿಳು',
  				'tce' => 'ದಕ್ಷಿಣ ಟಚ್‌ವನ್',
  				'te' => 'ತೆಲುಗು',
@@ -558,7 +563,9 @@ has 'display_name_language' => (
  				'uz' => 'ಉಜ್ಬೇಕ್',
  				'vai' => 'ವಾಯಿ',
  				've' => 'ವೆಂಡಾ',
+ 				'vec' => 'ವೆನಿಶಿಯನ್',
  				'vi' => 'ವಿಯೆಟ್ನಾಮೀಸ್',
+ 				'vmw' => 'ಮಖುವಾ',
  				'vo' => 'ವೋಲಾಪುಕ್',
  				'vot' => 'ವೋಟಿಕ್',
  				'vun' => 'ವುಂಜೊ',
@@ -572,6 +579,7 @@ has 'display_name_language' => (
  				'wuu' => 'ವು ಚೈನೀಸ್',
  				'xal' => 'ಕಲ್ಮೈಕ್',
  				'xh' => 'ಕ್ಸೋಸ',
+ 				'xnr' => 'ಕಂಗ್ರಿ',
  				'xog' => 'ಸೊಗ',
  				'yao' => 'ಯಾವೊ',
  				'yap' => 'ಯಪೀಸೆ',
@@ -1047,7 +1055,6 @@ has 'display_name_region' => (
  			'TN' => 'ಟುನೀಶಿಯ',
  			'TO' => 'ಟೊಂಗಾ',
  			'TR' => 'ತುರ್ಕಿಯೆ',
- 			'TR@alt=variant' => 'ಟರ್ಕಿ',
  			'TT' => 'ಟ್ರಿನಿಡಾಡ್ ಮತ್ತು ಟೊಬಾಗೊ',
  			'TV' => 'ಟುವಾಲು',
  			'TW' => 'ತೈವಾನ್',
@@ -1182,7 +1189,6 @@ has 'display_name_type' => (
  				'phonebook' => q{ಫೋನ್‌ಬುಕ್ ವಿಂಗಡಣೆ ಕ್ರಮ},
  				'phonetic' => q{ಉಚ್ಛಾರಣಾನುರೂಪವಾಗಿ ವಿಂಗಡಣೆ ಕ್ರಮ},
  				'pinyin' => q{ಪಿನ್‌ಯಿನ್ ವಿಂಗಡಣೆ ಕ್ರಮ},
- 				'reformed' => q{ಪರಿಷ್ಕೃತ ಅನುಕ್ರಮ ವಿನ್ಯಾಸ},
  				'search' => q{ಸಾಮಾನ್ಯ- ಉದ್ದೇಶ ಹುಡುಕಾಟ},
  				'searchjl' => q{ಹಂಗುಲ್ ಆದ್ಯಕ್ಷರ ವ್ಯಂಜನದ ಮೂಲಕ ಹುಡುಕಿ},
  				'standard' => q{ಪ್ರಮಾಣೀಕೃತ ವಿಂಗಡಣೆ ಕ್ರಮ},
@@ -1320,9 +1326,9 @@ has 'characters' => (
 		return {
 			auxiliary => qr{[‌‍ ೞ]},
 			index => ['ಅ', 'ಆ', 'ಇ', 'ಈ', 'ಉ', 'ಊ', 'ಋ', 'ೠ', 'ಌ', 'ೡ', 'ಎ', 'ಏ', 'ಐ', 'ಒ', 'ಓ', 'ಔ', 'ಕ', 'ಖ', 'ಗ', 'ಘ', 'ಙ', 'ಚ', 'ಛ', 'ಜ', 'ಝ', 'ಞ', 'ಟ', 'ಠ', 'ಡ', 'ಢ', 'ಣ', 'ತ', 'ಥ', 'ದ', 'ಧ', 'ನ', 'ಪ', 'ಫ', 'ಬ', 'ಭ', 'ಮ', 'ಯ', 'ರ', 'ಱ', 'ಲ', 'ವ', 'ಶ', 'ಷ', 'ಸ', 'ಹ', 'ಳ', 'ೞ'],
-			main => qr{[಼ ೦ ೧ ೨ ೩ ೪ ೫ ೬ ೭ ೮ ೯ ಅ ಆ ಇ ಈ ಉ ಊ ಋ ೠ ಌ ೡ ಎ ಏ ಐ ಒ ಓ ಔ ಂ ಃ ಕ ಖ ಗ ಘ ಙ ಚ ಛ ಜ ಝ ಞ ಟ ಠ ಡ ಢ ಣ ತ ಥ ದ ಧ ನ ಪ ಫ ಬ ಭ ಮ ಯ ರ ಱ ಲ ವ ಶ ಷ ಸ ಹ ಳ ಽ ಾ ಿ ೀ ು ೂ ೃ ೄ ೆ ೇ ೈ ೊ ೋ ೌ ್ ೕ ೖ]},
+			main => qr{[಼ ಅ ಆ ಇ ಈ ಉ ಊ ಋ ೠ ಌ ೡ ಎ ಏ ಐ ಒ ಓ ಔ ಂ ಃ ಕ ಖ ಗ ಘ ಙ ಚ ಛ ಜ ಝ ಞ ಟ ಠ ಡ ಢ ಣ ತ ಥ ದ ಧ ನ ಪ ಫ ಬ ಭ ಮ ಯ ರ ಱ ಲ ವ ಶ ಷ ಸ ಹ ಳ ಽ ಾ ಿ ೀ ು ೂ ೃ ೄ ೆ ೇ ೈ ೊ ೋ ೌ ್ ೕ ೖ]},
 			numbers => qr{[\- ‑ , . % ‰ + 0೦ 1೧ 2೨ 3೩ 4೪ 5೫ 6೬ 7೭ 8೮ 9೯]},
-			punctuation => qr{[\- ‐‑ – — , ; \: ! ? . … '‘’ "“” ( ) \[ \] @ * / \& # ′ ″]},
+			punctuation => qr{[\- ‐‑ – — , ; \: ! ? . … '‘’ "“” ( ) \[ \] § @ * / \& # † ‡ ′ ″]},
 		};
 	},
 EOT
@@ -1850,12 +1856,14 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'concentr-milligram-ofglucose-per-deciliter' => {
+						'1' => q(neuter),
 						'name' => q(ಪ್ರತಿ ಡೆಸಿಲೀಟರ್‌ಗೆ ಮಿಲಿಗ್ರಾಂಗಳು),
 						'one' => q({0} ಪ್ರತಿ ಡೆಸಿಲೀಟರ್‌ಗೆ ಮಿಲಿಗ್ರಾಂ),
 						'other' => q({0} ಪ್ರತಿ ಡೆಸಿಲೀಟರ್‌ಗೆ ಮಿಲಿಗ್ರಾಂಗಳು),
 					},
 					# Core Unit Identifier
 					'milligram-ofglucose-per-deciliter' => {
+						'1' => q(neuter),
 						'name' => q(ಪ್ರತಿ ಡೆಸಿಲೀಟರ್‌ಗೆ ಮಿಲಿಗ್ರಾಂಗಳು),
 						'one' => q({0} ಪ್ರತಿ ಡೆಸಿಲೀಟರ್‌ಗೆ ಮಿಲಿಗ್ರಾಂ),
 						'other' => q({0} ಪ್ರತಿ ಡೆಸಿಲೀಟರ್‌ಗೆ ಮಿಲಿಗ್ರಾಂಗಳು),
@@ -1939,6 +1947,20 @@ has 'units' => (
 						'name' => q(ಪರ್‌ಮಿರಿಯಾಡ್),
 						'one' => q({0} ಪರ್‌ಮಿರಿಯಾಡ್),
 						'other' => q({0} ಪರ್‌ಮಿರಿಯಾಡ್‌),
+					},
+					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'1' => q(neuter),
+						'name' => q(ಪಾರ್ಟ್ಸ್ ಪರ್ ಬಿಲಿಯನ್),
+						'one' => q({0} ಪಾರ್ಟ್ಸ್ ಪರ್ ಬಿಲಿಯನ್),
+						'other' => q({0} ಪಾರ್ಟ್ಸ್ ಪರ್ ಬಿಲಿಯನ್),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'1' => q(neuter),
+						'name' => q(ಪಾರ್ಟ್ಸ್ ಪರ್ ಬಿಲಿಯನ್),
+						'one' => q({0} ಪಾರ್ಟ್ಸ್ ಪರ್ ಬಿಲಿಯನ್),
+						'other' => q({0} ಪಾರ್ಟ್ಸ್ ಪರ್ ಬಿಲಿಯನ್),
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
@@ -2285,6 +2307,22 @@ has 'units' => (
 						'other' => q({0} ನ್ಯಾನೊಸೆಕೆಂಡುಗಳು),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'1' => q(neuter),
+						'name' => q(ರಾತ್ರಿಗಳು),
+						'one' => q({0} ರಾತ್ರಿ),
+						'other' => q({0} ರಾತ್ರಿಗಳು),
+						'per' => q({0} ಪ್ರತಿ ರಾತ್ರಿಗೆ),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'1' => q(neuter),
+						'name' => q(ರಾತ್ರಿಗಳು),
+						'one' => q({0} ರಾತ್ರಿ),
+						'other' => q({0} ರಾತ್ರಿಗಳು),
+						'per' => q({0} ಪ್ರತಿ ರಾತ್ರಿಗೆ),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'1' => q(neuter),
 						'name' => q(ತ್ರೈಮಾಸಿಕಗಳು),
@@ -2460,12 +2498,14 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'energy-kilocalorie' => {
+						'1' => q(neuter),
 						'name' => q(ಕಿಲೋಕ್ಯಾಲೋರಿಗಳು),
 						'one' => q({0} ಕಿಲೋಕ್ಯಾಲೋರಿ),
 						'other' => q({0} ಕಿಲೋಕ್ಯಾಲೋರಿಗಳು),
 					},
 					# Core Unit Identifier
 					'kilocalorie' => {
+						'1' => q(neuter),
 						'name' => q(ಕಿಲೋಕ್ಯಾಲೋರಿಗಳು),
 						'one' => q({0} ಕಿಲೋಕ್ಯಾಲೋರಿ),
 						'other' => q({0} ಕಿಲೋಕ್ಯಾಲೋರಿಗಳು),
@@ -2502,14 +2542,14 @@ has 'units' => (
 					'force-kilowatt-hour-per-100-kilometer' => {
 						'1' => q(neuter),
 						'name' => q(ಕಿಲೋವ್ಯಾಟ್-ಗಂಟೆಗಳು ಪ್ರತಿ 100 ಕಿಲೋಮೀಟರ್‌ಗಳಿಗೆ),
-						'one' => q({0} ಪ್ರತಿ 100 ಕಿಲೋಮೀಟರ್‌ಗೆ ಕಿಲೋವ್ಯಾಟ್-ಗಂಟೆ),
+						'one' => q({0} ಕಿಲೋವ್ಯಾಟ್-ಗಂಟೆ ಪ್ರತಿ 100 ಕಿಲೋಮೀಟರ್‌ಗಳಿಗೆ),
 						'other' => q({0} ಕಿಲೋವ್ಯಾಟ್-ಗಂಟೆಗಳು ಪ್ರತಿ 100 ಕಿಲೋಮೀಟರ್‌ಗಳಿಗೆ),
 					},
 					# Core Unit Identifier
 					'kilowatt-hour-per-100-kilometer' => {
 						'1' => q(neuter),
 						'name' => q(ಕಿಲೋವ್ಯಾಟ್-ಗಂಟೆಗಳು ಪ್ರತಿ 100 ಕಿಲೋಮೀಟರ್‌ಗಳಿಗೆ),
-						'one' => q({0} ಪ್ರತಿ 100 ಕಿಲೋಮೀಟರ್‌ಗೆ ಕಿಲೋವ್ಯಾಟ್-ಗಂಟೆ),
+						'one' => q({0} ಕಿಲೋವ್ಯಾಟ್-ಗಂಟೆ ಪ್ರತಿ 100 ಕಿಲೋಮೀಟರ್‌ಗಳಿಗೆ),
 						'other' => q({0} ಕಿಲೋವ್ಯಾಟ್-ಗಂಟೆಗಳು ಪ್ರತಿ 100 ಕಿಲೋಮೀಟರ್‌ಗಳಿಗೆ),
 					},
 					# Long Unit Identifier
@@ -2934,13 +2974,13 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-point' => {
-						'name' => q(ಪಾಯಿಂಟ್ಸ್),
+						'1' => q(neuter),
 						'one' => q({0} ಪಾಯಿಂಟ್),
 						'other' => q({0} ಪಾಯಿಂಟ್‌ಗಳು),
 					},
 					# Core Unit Identifier
 					'point' => {
-						'name' => q(ಪಾಯಿಂಟ್ಸ್),
+						'1' => q(neuter),
 						'one' => q({0} ಪಾಯಿಂಟ್),
 						'other' => q({0} ಪಾಯಿಂಟ್‌ಗಳು),
 					},
@@ -3404,12 +3444,14 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'pressure-millimeter-ofhg' => {
+						'1' => q(neuter),
 						'name' => q(ಮರ್ಕ್ಯುರಿ ಮಿಲಿಮೀಟರ್‌ಗಳು),
 						'one' => q({0} ಮರ್ಕ್ಯುರಿ ಮಿಲಿಮೀಟರ್‌),
 						'other' => q({0} ಮರ್ಕ್ಯುರಿ ಮಿಲಿಮೀಟರ್‌ಗಳು),
 					},
 					# Core Unit Identifier
 					'millimeter-ofhg' => {
+						'1' => q(neuter),
 						'name' => q(ಮರ್ಕ್ಯುರಿ ಮಿಲಿಮೀಟರ್‌ಗಳು),
 						'one' => q({0} ಮರ್ಕ್ಯುರಿ ಮಿಲಿಮೀಟರ್‌),
 						'other' => q({0} ಮರ್ಕ್ಯುರಿ ಮಿಲಿಮೀಟರ್‌ಗಳು),
@@ -3477,6 +3519,20 @@ has 'units' => (
 						'name' => q(ನಾಟ್‌ಗಳು),
 						'one' => q({0} ನಾಟ್),
 						'other' => q({0} ನಾಟ್‌ಗಳು),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'1' => q(neuter),
+						'name' => q(ಲೈಟ್),
+						'one' => q({0} ಲೈಟ್),
+						'other' => q({0} ಲೈಟ್),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'1' => q(neuter),
+						'name' => q(ಲೈಟ್),
+						'one' => q({0} ಲೈಟ್),
+						'other' => q({0} ಲೈಟ್),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -4679,6 +4735,20 @@ has 'units' => (
 						'other' => q({0}ನ್ಯಾಸೆ),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(ರಾತ್ರಿಗಳು),
+						'one' => q({0} ರಾತ್ರಿಯು),
+						'other' => q({0} ರಾತ್ರಿಗಳು),
+						'per' => q({0}/ರಾತ್ರಿಗೆ),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(ರಾತ್ರಿಗಳು),
+						'one' => q({0} ರಾತ್ರಿಯು),
+						'other' => q({0} ರಾತ್ರಿಗಳು),
+						'per' => q({0}/ರಾತ್ರಿಗೆ),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'one' => q({0} ತ್ರೈ),
 						'other' => q({0}ತ್ರೈ),
@@ -4768,13 +4838,13 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'energy-british-thermal-unit' => {
-						'one' => q({0}ಬ್ರಿಉಯು),
-						'other' => q({0}ಬ್ರಿಉಯು),
+						'one' => q({0}Btu),
+						'other' => q({0}Btu),
 					},
 					# Core Unit Identifier
 					'british-thermal-unit' => {
-						'one' => q({0}ಬ್ರಿಉಯು),
-						'other' => q({0}ಬ್ರಿಉಯು),
+						'one' => q({0}Btu),
+						'other' => q({0}Btu),
 					},
 					# Long Unit Identifier
 					'energy-calorie' => {
@@ -4879,13 +4949,13 @@ has 'units' => (
 					# Long Unit Identifier
 					'frequency-gigahertz' => {
 						'name' => q(GHz),
-						'one' => q({0}ಗಿ.ಹ),
+						'one' => q({0}GHz),
 						'other' => q({0}GHz),
 					},
 					# Core Unit Identifier
 					'gigahertz' => {
 						'name' => q(GHz),
-						'one' => q({0}ಗಿ.ಹ),
+						'one' => q({0}GHz),
 						'other' => q({0}GHz),
 					},
 					# Long Unit Identifier
@@ -5235,12 +5305,12 @@ has 'units' => (
 					# Long Unit Identifier
 					'mass-dalton' => {
 						'one' => q({0}ಡಿಎ),
-						'other' => q({0} Da),
+						'other' => q({0} ಡಿಎ),
 					},
 					# Core Unit Identifier
 					'dalton' => {
 						'one' => q({0}ಡಿಎ),
-						'other' => q({0} Da),
+						'other' => q({0} ಡಿಎ),
 					},
 					# Long Unit Identifier
 					'mass-earth-mass' => {
@@ -5567,6 +5637,18 @@ has 'units' => (
 					'knot' => {
 						'one' => q({0}ನಾ),
 						'other' => q({0}ನಾ),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(ಲೈಟ್),
+						'one' => q({0} ಲೈಟ್),
+						'other' => q({0} ಲೈಟ್),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(ಲೈಟ್),
+						'one' => q({0} ಲೈಟ್),
+						'other' => q({0} ಲೈಟ್),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -6137,13 +6219,13 @@ has 'units' => (
 					# Long Unit Identifier
 					'angle-arc-second' => {
 						'name' => q(ಆರ್ಕ್‌ಸೆಕೆಂ),
-						'one' => q({0} ಆರ್ಕ್ಸ್‌ ಸೆಂ),
+						'one' => q({0} ಆರ್ಕ್‌ಸೆಕೆಂ),
 						'other' => q({0} ಆರ್ಕ್‌ಸೆಕೆಂ),
 					},
 					# Core Unit Identifier
 					'arc-second' => {
 						'name' => q(ಆರ್ಕ್‌ಸೆಕೆಂ),
-						'one' => q({0} ಆರ್ಕ್ಸ್‌ ಸೆಂ),
+						'one' => q({0} ಆರ್ಕ್‌ಸೆಕೆಂ),
 						'other' => q({0} ಆರ್ಕ್‌ಸೆಕೆಂ),
 					},
 					# Long Unit Identifier
@@ -6407,6 +6489,14 @@ has 'units' => (
 					# Core Unit Identifier
 					'permyriad' => {
 						'name' => q(ಪರ್ಮಿರೈಡ್),
+					},
+					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(ಪಾರ್ಟ್ಸ್/ಬಿಲಿಯನ್),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(ಪಾರ್ಟ್ಸ್/ಬಿಲಿಯನ್),
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
@@ -6715,6 +6805,20 @@ has 'units' => (
 						'other' => q({0} ನ್ಯಾ.ಸೆ),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(ರಾತ್ರಿ),
+						'one' => q({0} ರಾತ್ರಿಯು),
+						'other' => q({0} ರಾತ್ರಿಗಳು),
+						'per' => q({0}/ರಾತ್ರಿಗೆ),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(ರಾತ್ರಿ),
+						'one' => q({0} ರಾತ್ರಿಯು),
+						'other' => q({0} ರಾತ್ರಿಗಳು),
+						'per' => q({0}/ರಾತ್ರಿಗೆ),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'name' => q(ತ್ರೈಮಾಸಿಕ),
 						'one' => q({0} ತ್ರೈ),
@@ -6961,14 +7065,10 @@ has 'units' => (
 					# Long Unit Identifier
 					'frequency-gigahertz' => {
 						'name' => q(ಗಿ.ಹ),
-						'one' => q({0} ಗಿ.ಹ),
-						'other' => q({0} GHz),
 					},
 					# Core Unit Identifier
 					'gigahertz' => {
 						'name' => q(ಗಿ.ಹ),
-						'one' => q({0} ಗಿ.ಹ),
-						'other' => q({0} GHz),
 					},
 					# Long Unit Identifier
 					'frequency-hertz' => {
@@ -7097,6 +7197,14 @@ has 'units' => (
 						'other' => q({0} ಡೆಮೀ),
 					},
 					# Long Unit Identifier
+					'length-earth-radius' => {
+						'name' => q(ಭೂಮಿಯ ತ್ರಿಜ್ಯ),
+					},
+					# Core Unit Identifier
+					'earth-radius' => {
+						'name' => q(ಭೂಮಿಯ ತ್ರಿಜ್ಯ),
+					},
+					# Long Unit Identifier
 					'length-fathom' => {
 						'name' => q(ಫ್ಯಾಥಮ್ಸ್),
 					},
@@ -7207,14 +7315,14 @@ has 'units' => (
 					# Long Unit Identifier
 					'length-mile-scandinavian' => {
 						'name' => q(ಸ್ಕ್ಯಾಂ.ಮೈ),
-						'one' => q({0} ಸ್ಕ್ಯಾಂ.ಮೈ),
-						'other' => q({0} ಸ್ಕ್ಯಾಂ.ಮೈ),
+						'one' => q({0} smi),
+						'other' => q({0} smi),
 					},
 					# Core Unit Identifier
 					'mile-scandinavian' => {
 						'name' => q(ಸ್ಕ್ಯಾಂ.ಮೈ),
-						'one' => q({0} ಸ್ಕ್ಯಾಂ.ಮೈ),
-						'other' => q({0} ಸ್ಕ್ಯಾಂ.ಮೈ),
+						'one' => q({0} smi),
+						'other' => q({0} smi),
 					},
 					# Long Unit Identifier
 					'length-millimeter' => {
@@ -7368,13 +7476,13 @@ has 'units' => (
 					'mass-dalton' => {
 						'name' => q(ಡಿಎ),
 						'one' => q({0} ಡಿಎ),
-						'other' => q({0} Da),
+						'other' => q({0} ಡಿಎ),
 					},
 					# Core Unit Identifier
 					'dalton' => {
 						'name' => q(ಡಿಎ),
 						'one' => q({0} ಡಿಎ),
-						'other' => q({0} Da),
+						'other' => q({0} ಡಿಎ),
 					},
 					# Long Unit Identifier
 					'mass-earth-mass' => {
@@ -7767,6 +7875,18 @@ has 'units' => (
 						'name' => q(ನಾ),
 						'one' => q({0} ನಾ),
 						'other' => q({0} ನಾ),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(ಲೈಟ್),
+						'one' => q({0} ಲೈಟ್),
+						'other' => q({0} ಲೈಟ್),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(ಲೈಟ್),
+						'one' => q({0} ಲೈಟ್),
+						'other' => q({0} ಲೈಟ್),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -8764,9 +8884,9 @@ has 'currencies' => (
 		},
 		'GBP' => {
 			display_name => {
-				'currency' => q(ಬ್ರಿಟೀಷ್ ಪೌಂಡ್),
+				'currency' => q(ಬ್ರಿಟಿಷ್ ಪೌಂಡ್),
 				'one' => q(ಬ್ರಿಟಿಷ್ ಪೌಂಡ್),
-				'other' => q(ಬ್ರಿಟೀಷ್ ಪೌಂಡ್‍ಗಳು),
+				'other' => q(ಬ್ರಿಟಿಷ್ ಪೌಂಡ್‍ಗಳು),
 			},
 		},
 		'GEL' => {
@@ -9291,7 +9411,7 @@ has 'currencies' => (
 			display_name => {
 				'currency' => q(ಸ್ವೀಡಿಷ್ ಕ್ರೋನಾ),
 				'one' => q(ಸ್ವೀಡಿಷ್ ಕ್ರೋನಾ),
-				'other' => q(ಸ್ವೀಡಿಶ್ ಕ್ರೋನರ್),
+				'other' => q(ಸ್ವೀಡಿಷ್ ಕ್ರೋನರ್),
 			},
 		},
 		'SGD' => {
@@ -9613,14 +9733,14 @@ has 'calendar_months' => (
 				'format' => {
 					abbreviated => {
 						nonleap => [
-							'ಜನವರಿ',
-							'ಫೆಬ್ರವರಿ',
+							'ಜನ',
+							'ಫೆಬ್ರ',
 							'ಮಾರ್ಚ್',
 							'ಏಪ್ರಿ',
 							'ಮೇ',
 							'ಜೂನ್',
 							'ಜುಲೈ',
-							'ಆಗಸ್ಟ್',
+							'ಆಗ',
 							'ಸೆಪ್ಟೆಂ',
 							'ಅಕ್ಟೋ',
 							'ನವೆಂ',
@@ -10119,26 +10239,38 @@ has 'day_periods' => (
 			'format' => {
 				'abbreviated' => {
 					'afternoon1' => q{ಮಧ್ಯಾಹ್ನ},
-					'am' => q{ಪೂರ್ವಾಹ್ನ},
 					'evening1' => q{ಸಂಜೆ},
 					'midnight' => q{ಮಧ್ಯ ರಾತ್ರಿ},
 					'morning1' => q{ಬೆಳಗ್ಗೆ},
 					'night1' => q{ರಾತ್ರಿ},
-					'pm' => q{ಅಪರಾಹ್ನ},
 				},
 				'narrow' => {
 					'afternoon1' => q{ಮಧ್ಯಾಹ್ನ},
-					'am' => q{ಪೂ},
+					'am' => q{a},
 					'evening1' => q{ಸಂಜೆ},
 					'midnight' => q{ಮಧ್ಯರಾತ್ರಿ},
 					'morning1' => q{ಬೆಳಗ್ಗೆ},
 					'night1' => q{ರಾತ್ರಿ},
-					'pm' => q{ಅ},
+					'pm' => q{p},
+				},
+				'wide' => {
+					'am' => q{AM},
+					'pm' => q{PM},
 				},
 			},
 			'stand-alone' => {
 				'abbreviated' => {
+					'am' => q{AM},
 					'midnight' => q{ಮಧ್ಯರಾತ್ರಿ},
+					'pm' => q{PM},
+				},
+				'narrow' => {
+					'am' => q{AM},
+					'pm' => q{PM},
+				},
+				'wide' => {
+					'am' => q{AM},
+					'pm' => q{PM},
 				},
 			},
 		},
@@ -10305,6 +10437,7 @@ has 'datetime_formats_available_formats' => (
 			MEd => q{d/M, E},
 			MMMEd => q{E, d MMM},
 			MMMMd => q{d MMMM},
+			MMMd => q{d MMM},
 			MMdd => q{dd-MM},
 			Md => q{d/M},
 			yM => q{M/y},
@@ -10970,9 +11103,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#ನ್ಯೂಯಾರ್ಕ್#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#ನಿಪಿಗನ್#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#ನೋಮ್#,
 		},
@@ -10993,9 +11123,6 @@ has 'time_zone_names' => (
 		},
 		'America/Panama' => {
 			exemplarCity => q#ಪನಾಮಾ#,
-		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#ಪಂಗ್ನೀರ್‌ಟಂಗ್#,
 		},
 		'America/Paramaribo' => {
 			exemplarCity => q#ಪರಮಾರಿಬೋ#,
@@ -11018,9 +11145,6 @@ has 'time_zone_names' => (
 		'America/Punta_Arenas' => {
 			exemplarCity => q#ಪುಂತಾ ಅರೇನಾಸ್#,
 		},
-		'America/Rainy_River' => {
-			exemplarCity => q#ರೈನಿ ರಿವರ್#,
-		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#ರಾಂಕಿನ್ ಇನ್‌ಲೆಟ್#,
 		},
@@ -11035,9 +11159,6 @@ has 'time_zone_names' => (
 		},
 		'America/Rio_Branco' => {
 			exemplarCity => q#ರಿಯೋ ಬ್ರ್ಯಾಂಕೊ#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#ಸಾಂತಾ ಇಸಾಬೆಲ್#,
 		},
 		'America/Santarem' => {
 			exemplarCity => q#ಸಾಂಟರೆಮ್#,
@@ -11084,9 +11205,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#ಥೂಲೆ#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#ಥಂಡರ್ ಬೇ#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#ತಿಜ್ವಾನಾ#,
 		},
@@ -11107,9 +11225,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#ಯಾಕುಟಾಟ್#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#ಯೆಲ್ಲೋ‌ನೈಫ್#,
 		},
 		'America_Central' => {
 			long => {
@@ -11284,9 +11399,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#ಚಿಟ#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#ಚೊಯ್‍ಬಾಲ್ಸನ್#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#ಕೊಲಂಬೊ#,
@@ -11526,9 +11638,6 @@ has 'time_zone_names' => (
 		'Australia/Broken_Hill' => {
 			exemplarCity => q#ಬ್ರೊಕನ್ ಹಿಲ್#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#ಕರೀ#,
-		},
 		'Australia/Darwin' => {
 			exemplarCity => q#ಡಾರ್ವಿನ್#,
 		},
@@ -11655,13 +11764,6 @@ has 'time_zone_names' => (
 				'daylight' => q#ಚೀನಾ ಹಗಲು ಸಮಯ#,
 				'generic' => q#ಚೀನಾ ಸಮಯ#,
 				'standard' => q#ಚೀನಾ ಪ್ರಮಾಣಿತ ಸಮಯ#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#ಚೊಯ್‌ಬಲ್ಸಾನ್ ಬೇಸಿಗೆ ಸಮಯ#,
-				'generic' => q#ಚೊಯ್‌ಬಲ್ಸಾನ್ ಸಮಯ#,
-				'standard' => q#ಚೊಯ್‌‌ಬಲ್ಸಾನ್‌ ಪ್ರಮಾಣಿತ ಸಮಯ#,
 			},
 		},
 		'Christmas' => {
@@ -11886,9 +11988,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#ಉಲ್ಯಾನೊವಸ್ಕ್#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#ಉಜ್‌ಗೊರೊದ್#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#ವಡೂಜ್#,
 		},
@@ -11909,9 +12008,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#ಜಾಗ್ರೆಬ್‌#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#ಜಾಪರೀಝಿಯಾ#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#ಜ್ಯೂರಿಕ್#,
@@ -12144,14 +12240,19 @@ has 'time_zone_names' => (
 				'standard' => q#ಪೆತ್ರೋಪಾವ್ಲೋಸ್ಕ್‌‌-ಕಮ್ಚತ್ಸ್‌ಕೀ ಪ್ರಮಾಣಿತ ಸಮಯ#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#ಕಝಾಖ್‌ಸ್ತಾನ್ ಸಮಯ#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
-				'standard' => q#ಪೂರ್ವ ಕಜಕಿಸ್ತಾನ್ ಸಮಯ#,
+				'standard' => q#ಪೂರ್ವ ಕಝಾಖ್‌ಸ್ತಾನ್ ಸಮಯ#,
 			},
 		},
 		'Kazakhstan_Western' => {
 			long => {
-				'standard' => q#ಪಶ್ಚಿಮ ಕಜಕಿಸ್ತಾನ್ ಸಮಯ#,
+				'standard' => q#ಪಶ್ಚಿಮ ಕಝಾಖ್‌ಸ್ತಾನ್ ಸಮಯ#,
 			},
 		},
 		'Korea' => {
@@ -12202,11 +12303,6 @@ has 'time_zone_names' => (
 				'standard' => q#ಮಕಾವ್ ಪ್ರಮಾಣಿತ ಸಮಯ#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#ಮ್ಯಾಕ್‌ಕ್ಯುರೈ ದ್ವೀಪ ಸಮಯ#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#ಮಗಡಾನ್ ಬೇಸಿಗೆ ಸಮಯ#,
@@ -12244,13 +12340,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#ಮಾವ್‌ಸನ್ ಸಮಯ#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#ವಾಯವ್ಯ ಮೆಕ್ಸಿಕೊ ಹಗಲು ಸಮಯ#,
-				'generic' => q#ವಾಯವ್ಯ ಮೆಕ್ಸಿಕೊ ಸಮಯ#,
-				'standard' => q#ವಾಯವ್ಯ ಮೆಕ್ಸಿಕೊ ಪ್ರಮಾಣಿತ ಸಮಯ#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -12392,9 +12481,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Honolulu' => {
 			exemplarCity => q#ಹೊನಲುಲು#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#ಜಾನ್‌ಸ್ಟನ್#,
 		},
 		'Pacific/Kanton' => {
 			exemplarCity => q#ಕ್ಯಾಂಟನ್#,

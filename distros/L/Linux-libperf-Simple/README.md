@@ -59,3 +59,14 @@ my $results = $perf->results;
 use Data::Dumper;
 print Dumper($results);
 ```
+
+# Troubleshooting
+
+Unfortunately `libperf`'s reporting isn't very good, if libperf fails
+to initialize try using `strace` to see details on which system call
+actually failed, eg you might try:
+
+```
+strace -o trace.txt perl -MLinux::libperf::Simple=run -e 'run(sub {})'
+```
+and look over `trace.txt` to see why it failed.

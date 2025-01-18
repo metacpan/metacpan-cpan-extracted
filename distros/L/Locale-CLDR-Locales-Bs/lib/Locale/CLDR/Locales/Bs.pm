@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Bs - Package for language Bosnian
 
 package Locale::CLDR::Locales::Bs;
 # This file auto generated from Data\common\main\bs.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -671,6 +671,7 @@ has 'display_name_language' => (
  				'bin' => 'bini',
  				'bkm' => 'kom',
  				'bla' => 'siksika',
+ 				'blo' => 'anii',
  				'bm' => 'bambara',
  				'bn' => 'bengalski',
  				'bo' => 'tibetanski',
@@ -884,6 +885,7 @@ has 'display_name_language' => (
  				'kv' => 'komi',
  				'kw' => 'kornski',
  				'kwk' => 'kvakvala',
+ 				'kxv' => 'kuvi',
  				'ky' => 'kirgiški',
  				'la' => 'latinski',
  				'lad' => 'ladino',
@@ -910,7 +912,6 @@ has 'display_name_language' => (
  				'lua' => 'luba-lulua',
  				'lui' => 'luiseno',
  				'lun' => 'lunda',
- 				'luo' => 'luo',
  				'lus' => 'mizo',
  				'luy' => 'luhija',
  				'lv' => 'latvijski',
@@ -1089,6 +1090,7 @@ has 'display_name_language' => (
  				'swb' => 'komorski',
  				'syc' => 'klasični sirijski',
  				'syr' => 'sirijski',
+ 				'szl' => 'šleski',
  				'ta' => 'tamilski',
  				'tce' => 'južni tučoni',
  				'te' => 'telugu',
@@ -1135,10 +1137,10 @@ has 'display_name_language' => (
  				'und' => 'nepoznati jezik',
  				'ur' => 'urdu',
  				'uz' => 'uzbečki',
- 				'vai' => 'vai',
  				've' => 'venda',
  				'vec' => 'venecijanski',
  				'vi' => 'vijetnamski',
+ 				'vmw' => 'makua',
  				'vo' => 'volapuk',
  				'vot' => 'votski',
  				'vun' => 'vunjo',
@@ -1152,6 +1154,7 @@ has 'display_name_language' => (
  				'wuu' => 'Wu kineski',
  				'xal' => 'kalmik',
  				'xh' => 'hosa',
+ 				'xnr' => 'kangri',
  				'xog' => 'soga',
  				'yao' => 'jao',
  				'yap' => 'japeški',
@@ -1885,7 +1888,7 @@ has 'display_name_type' => (
 			'calendar' => {
  				'buddhist' => q{budistički kalendar},
  				'chinese' => q{kineski kalendar},
- 				'coptic' => q{Koptski kalendar},
+ 				'coptic' => q{koptski kalendar},
  				'dangi' => q{dangi kalendar},
  				'ethiopic' => q{etiopski kalendar},
  				'ethiopic-amete-alem' => q{etiopski kalendar "Amete Alem"},
@@ -1934,7 +1937,6 @@ has 'display_name_type' => (
  				'phonebook' => q{Sortiranje kao telefonski imenik},
  				'phonetic' => q{Fonetsko sortiranje},
  				'pinyin' => q{Pinjin sortiranje},
- 				'reformed' => q{Reformirano sortiranje},
  				'search' => q{općenito pretraživanje},
  				'searchjl' => q{Pretraživanje po početnom suglasniku hangula},
  				'standard' => q{standardno sortiranje},
@@ -2042,7 +2044,7 @@ has 'display_name_type' => (
  				'mymrshan' => q{mijanmarske šan cifre},
  				'mymrtlng' => q{mijanmarske tai laing cifre},
  				'nagm' => q{nag mundari cifre},
- 				'native' => q{Izvorne cifre},
+ 				'native' => q{izvorni brojevi},
  				'nkoo' => q{n’ko cifre},
  				'olck' => q{ol čiki cifre},
  				'orya' => q{orijski brojevi},
@@ -2331,12 +2333,14 @@ has 'units' => (
 					# Long Unit Identifier
 					'area-acre' => {
 						'few' => q({0} katastarska jutra),
+						'name' => q(akeri),
 						'one' => q({0} katastarsko jutro),
 						'other' => q({0} katastarskih jutara),
 					},
 					# Core Unit Identifier
 					'acre' => {
 						'few' => q({0} katastarska jutra),
+						'name' => q(akeri),
 						'one' => q({0} katastarsko jutro),
 						'other' => q({0} katastarskih jutara),
 					},
@@ -2909,6 +2913,22 @@ has 'units' => (
 						'other' => q({0} nanosekundi),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'few' => q({0} noći),
+						'name' => q(noći),
+						'one' => q({0} noć),
+						'other' => q({0} noći),
+						'per' => q({0} po noći),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'few' => q({0} noći),
+						'name' => q(noći),
+						'one' => q({0} noć),
+						'other' => q({0} noći),
+						'per' => q({0} po noći),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'few' => q({0} četvrtine),
 						'name' => q(četvrtine),
@@ -3210,28 +3230,28 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'graphics-dot-per-centimeter' => {
-						'few' => q({0} ppcm),
+						'few' => q({0} dpcm),
 						'name' => q(tačaka po centimetru),
 						'one' => q({0} tačka po centimetru),
 						'other' => q({0} tačaka po centimetru),
 					},
 					# Core Unit Identifier
 					'dot-per-centimeter' => {
-						'few' => q({0} ppcm),
+						'few' => q({0} dpcm),
 						'name' => q(tačaka po centimetru),
 						'one' => q({0} tačka po centimetru),
 						'other' => q({0} tačaka po centimetru),
 					},
 					# Long Unit Identifier
 					'graphics-dot-per-inch' => {
-						'few' => q({0} ppi),
+						'few' => q({0} dpi),
 						'name' => q(tačaka po inču),
 						'one' => q({0} tačka po inču),
 						'other' => q({0} tačaka po inču),
 					},
 					# Core Unit Identifier
 					'dot-per-inch' => {
-						'few' => q({0} ppi),
+						'few' => q({0} dpi),
 						'name' => q(tačaka po inču),
 						'one' => q({0} tačka po inču),
 						'other' => q({0} tačaka po inču),
@@ -3332,17 +3352,17 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-earth-radius' => {
-						'few' => q({0} radijusa zemlje),
-						'name' => q(radijus zemlje),
-						'one' => q({0} radijus zemlje),
-						'other' => q({0} radijus zemlje),
+						'few' => q({0} radijusa Zemlje),
+						'name' => q(radijus Zemlje),
+						'one' => q({0} radijus Zemlje),
+						'other' => q({0} radijusa Zemlje),
 					},
 					# Core Unit Identifier
 					'earth-radius' => {
-						'few' => q({0} radijusa zemlje),
-						'name' => q(radijus zemlje),
-						'one' => q({0} radijus zemlje),
-						'other' => q({0} radijus zemlje),
+						'few' => q({0} radijusa Zemlje),
+						'name' => q(radijus Zemlje),
+						'one' => q({0} radijus Zemlje),
+						'other' => q({0} radijusa Zemlje),
 					},
 					# Long Unit Identifier
 					'length-foot' => {
@@ -4641,6 +4661,20 @@ has 'units' => (
 				},
 				'narrow' => {
 					# Long Unit Identifier
+					'area-acre' => {
+						'few' => q({0} ac),
+						'name' => q(aker),
+						'one' => q({0} ac),
+						'other' => q({0} ac),
+					},
+					# Core Unit Identifier
+					'acre' => {
+						'few' => q({0} ac),
+						'name' => q(aker),
+						'one' => q({0} ac),
+						'other' => q({0} ac),
+					},
+					# Long Unit Identifier
 					'concentr-permillion' => {
 						'name' => q(ppm),
 					},
@@ -4757,6 +4791,22 @@ has 'units' => (
 						'name' => q(ns),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'few' => q({0} noći),
+						'name' => q(noći),
+						'one' => q({0} noć),
+						'other' => q({0} noći),
+						'per' => q({0}/noć),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'few' => q({0} noći),
+						'name' => q(noći),
+						'one' => q({0} noć),
+						'other' => q({0} noći),
+						'per' => q({0}/noć),
+					},
+					# Long Unit Identifier
 					'duration-second' => {
 						'few' => q({0} s),
 						'name' => q(sekunda),
@@ -4789,12 +4839,14 @@ has 'units' => (
 					# Long Unit Identifier
 					'energy-calorie' => {
 						'few' => q({0} kal.),
+						'name' => q(cal),
 						'one' => q({0} kal.),
 						'other' => q({0} cal),
 					},
 					# Core Unit Identifier
 					'calorie' => {
 						'few' => q({0} kal.),
+						'name' => q(cal),
 						'one' => q({0} kal.),
 						'other' => q({0} cal),
 					},
@@ -4828,25 +4880,25 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'graphics-dot-per-centimeter' => {
-						'few' => q({0} ppcm),
+						'few' => q({0} dpcm),
 						'one' => q({0}dpcm),
 						'other' => q({0} dpcm),
 					},
 					# Core Unit Identifier
 					'dot-per-centimeter' => {
-						'few' => q({0} ppcm),
+						'few' => q({0} dpcm),
 						'one' => q({0}dpcm),
 						'other' => q({0} dpcm),
 					},
 					# Long Unit Identifier
 					'graphics-dot-per-inch' => {
-						'few' => q({0} ppi),
+						'few' => q({0} dpi),
 						'one' => q({0}dpi),
 						'other' => q({0} dpi),
 					},
 					# Core Unit Identifier
 					'dot-per-inch' => {
-						'few' => q({0} ppi),
+						'few' => q({0} dpi),
 						'one' => q({0}dpi),
 						'other' => q({0} dpi),
 					},
@@ -4875,12 +4927,52 @@ has 'units' => (
 						'other' => q({0}ppi),
 					},
 					# Long Unit Identifier
+					'length-foot' => {
+						'name' => q(ft),
+					},
+					# Core Unit Identifier
+					'foot' => {
+						'name' => q(ft),
+					},
+					# Long Unit Identifier
+					'length-inch' => {
+						'name' => q(in),
+					},
+					# Core Unit Identifier
+					'inch' => {
+						'name' => q(in),
+					},
+					# Long Unit Identifier
+					'length-light-year' => {
+						'name' => q(sg),
+					},
+					# Core Unit Identifier
+					'light-year' => {
+						'name' => q(sg),
+					},
+					# Long Unit Identifier
 					'length-meter' => {
-						'name' => q(metar),
+						'name' => q(m),
 					},
 					# Core Unit Identifier
 					'meter' => {
-						'name' => q(metar),
+						'name' => q(m),
+					},
+					# Long Unit Identifier
+					'length-mile' => {
+						'name' => q(mi),
+					},
+					# Core Unit Identifier
+					'mile' => {
+						'name' => q(mi),
+					},
+					# Long Unit Identifier
+					'length-yard' => {
+						'name' => q(yd),
+					},
+					# Core Unit Identifier
+					'yard' => {
+						'name' => q(yd),
 					},
 					# Long Unit Identifier
 					'mass-carat' => {
@@ -4899,12 +4991,14 @@ has 'units' => (
 					# Long Unit Identifier
 					'mass-grain' => {
 						'few' => q({0} gr),
+						'name' => q(gr),
 						'one' => q({0} gr),
 						'other' => q({0} gr),
 					},
 					# Core Unit Identifier
 					'grain' => {
 						'few' => q({0} gr),
+						'name' => q(gr),
 						'one' => q({0} gr),
 						'other' => q({0} gr),
 					},
@@ -4965,6 +5059,42 @@ has 'units' => (
 						'other' => q({0}°F),
 					},
 					# Long Unit Identifier
+					'volume-centiliter' => {
+						'few' => q({0} cl),
+						'name' => q(cl),
+						'one' => q({0} cl),
+						'other' => q({0} cl),
+					},
+					# Core Unit Identifier
+					'centiliter' => {
+						'few' => q({0} cl),
+						'name' => q(cl),
+						'one' => q({0} cl),
+						'other' => q({0} cl),
+					},
+					# Long Unit Identifier
+					'volume-deciliter' => {
+						'few' => q({0} dl),
+						'name' => q(dl),
+						'one' => q({0} dl),
+						'other' => q({0} dl),
+					},
+					# Core Unit Identifier
+					'deciliter' => {
+						'few' => q({0} dl),
+						'name' => q(dl),
+						'one' => q({0} dl),
+						'other' => q({0} dl),
+					},
+					# Long Unit Identifier
+					'volume-hectoliter' => {
+						'name' => q(hl),
+					},
+					# Core Unit Identifier
+					'hectoliter' => {
+						'name' => q(hl),
+					},
+					# Long Unit Identifier
 					'volume-liter' => {
 						'few' => q({0}l),
 						'name' => q(litar),
@@ -4977,6 +5107,42 @@ has 'units' => (
 						'name' => q(litar),
 						'one' => q({0}l),
 						'other' => q({0}l),
+					},
+					# Long Unit Identifier
+					'volume-megaliter' => {
+						'name' => q(Ml),
+					},
+					# Core Unit Identifier
+					'megaliter' => {
+						'name' => q(Ml),
+					},
+					# Long Unit Identifier
+					'volume-milliliter' => {
+						'few' => q({0} ml),
+						'name' => q(ml),
+						'one' => q({0} ml),
+						'other' => q({0} ml),
+					},
+					# Core Unit Identifier
+					'milliliter' => {
+						'few' => q({0} ml),
+						'name' => q(ml),
+						'one' => q({0} ml),
+						'other' => q({0} ml),
+					},
+					# Long Unit Identifier
+					'volume-quart-imperial' => {
+						'few' => q({0} imp. kvarta),
+						'name' => q(imp. kvart),
+						'one' => q({0} imp. kvart),
+						'other' => q({0} imp. kvarata),
+					},
+					# Core Unit Identifier
+					'quart-imperial' => {
+						'few' => q({0} imp. kvarta),
+						'name' => q(imp. kvart),
+						'one' => q({0} imp. kvart),
+						'other' => q({0} imp. kvarata),
 					},
 					# Long Unit Identifier
 					'volume-tablespoon' => {
@@ -5072,17 +5238,17 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'area-acre' => {
-						'few' => q({0} kj),
+						'few' => q({0} ac),
 						'name' => q(katastarska jutra),
-						'one' => q({0} kj),
-						'other' => q({0} kj),
+						'one' => q({0} ac),
+						'other' => q({0} ac),
 					},
 					# Core Unit Identifier
 					'acre' => {
-						'few' => q({0} kj),
+						'few' => q({0} ac),
 						'name' => q(katastarska jutra),
-						'one' => q({0} kj),
-						'other' => q({0} kj),
+						'one' => q({0} ac),
+						'other' => q({0} ac),
 					},
 					# Long Unit Identifier
 					'area-dunam' => {
@@ -5323,6 +5489,22 @@ has 'units' => (
 						'name' => q(nanosekunde),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'few' => q({0} noći),
+						'name' => q(noći),
+						'one' => q({0} noć),
+						'other' => q({0} noći),
+						'per' => q({0}/noć),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'few' => q({0} noći),
+						'name' => q(noći),
+						'one' => q({0} noć),
+						'other' => q({0} noći),
+						'per' => q({0}/noć),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'few' => q({0} čet.),
 						'name' => q(čet.),
@@ -5490,28 +5672,28 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'graphics-dot-per-centimeter' => {
-						'few' => q({0} ppcm),
+						'few' => q({0} dpcm),
 						'name' => q(dpcm),
 						'one' => q({0} dpcm),
 						'other' => q({0} dpcm),
 					},
 					# Core Unit Identifier
 					'dot-per-centimeter' => {
-						'few' => q({0} ppcm),
+						'few' => q({0} dpcm),
 						'name' => q(dpcm),
 						'one' => q({0} dpcm),
 						'other' => q({0} dpcm),
 					},
 					# Long Unit Identifier
 					'graphics-dot-per-inch' => {
-						'few' => q({0} ppi),
+						'few' => q({0} dpi),
 						'name' => q(dpi),
 						'one' => q({0} dpi),
 						'other' => q({0} dpi),
 					},
 					# Core Unit Identifier
 					'dot-per-inch' => {
-						'few' => q({0} ppi),
+						'few' => q({0} dpi),
 						'name' => q(dpi),
 						'one' => q({0} dpi),
 						'other' => q({0} dpi),
@@ -5590,11 +5772,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-meter' => {
-						'name' => q(metri),
+						'name' => q(m),
 					},
 					# Core Unit Identifier
 					'meter' => {
-						'name' => q(metri),
+						'name' => q(m),
 					},
 					# Long Unit Identifier
 					'length-mile' => {
@@ -5773,12 +5955,40 @@ has 'units' => (
 						'other' => q({0} Nm),
 					},
 					# Long Unit Identifier
+					'volume-centiliter' => {
+						'few' => q({0} cl),
+						'name' => q(cl),
+						'one' => q({0} cl),
+						'other' => q({0} cl),
+					},
+					# Core Unit Identifier
+					'centiliter' => {
+						'few' => q({0} cl),
+						'name' => q(cl),
+						'one' => q({0} cl),
+						'other' => q({0} cl),
+					},
+					# Long Unit Identifier
 					'volume-cup' => {
 						'name' => q(šolje),
 					},
 					# Core Unit Identifier
 					'cup' => {
 						'name' => q(šolje),
+					},
+					# Long Unit Identifier
+					'volume-deciliter' => {
+						'few' => q({0} dl),
+						'name' => q(dl),
+						'one' => q({0} dl),
+						'other' => q({0} dl),
+					},
+					# Core Unit Identifier
+					'deciliter' => {
+						'few' => q({0} dl),
+						'name' => q(dl),
+						'one' => q({0} dl),
+						'other' => q({0} dl),
 					},
 					# Long Unit Identifier
 					'volume-dessert-spoon' => {
@@ -5897,6 +6107,20 @@ has 'units' => (
 						'per' => q({0}/b. gal),
 					},
 					# Long Unit Identifier
+					'volume-hectoliter' => {
+						'few' => q({0} hl),
+						'name' => q(hl),
+						'one' => q({0} hl),
+						'other' => q({0} hl),
+					},
+					# Core Unit Identifier
+					'hectoliter' => {
+						'few' => q({0} hl),
+						'name' => q(hl),
+						'one' => q({0} hl),
+						'other' => q({0} hl),
+					},
+					# Long Unit Identifier
 					'volume-jigger' => {
 						'few' => q({0} male čašice),
 						'name' => q(mala čašica),
@@ -5917,6 +6141,34 @@ has 'units' => (
 					# Core Unit Identifier
 					'liter' => {
 						'name' => q(litri),
+					},
+					# Long Unit Identifier
+					'volume-megaliter' => {
+						'few' => q({0} Ml),
+						'name' => q(Ml),
+						'one' => q({0} Ml),
+						'other' => q({0} Ml),
+					},
+					# Core Unit Identifier
+					'megaliter' => {
+						'few' => q({0} Ml),
+						'name' => q(Ml),
+						'one' => q({0} Ml),
+						'other' => q({0} Ml),
+					},
+					# Long Unit Identifier
+					'volume-milliliter' => {
+						'few' => q({0} ml),
+						'name' => q(ml),
+						'one' => q({0} ml),
+						'other' => q({0} ml),
+					},
+					# Core Unit Identifier
+					'milliliter' => {
+						'few' => q({0} ml),
+						'name' => q(ml),
+						'one' => q({0} ml),
+						'other' => q({0} ml),
 					},
 					# Long Unit Identifier
 					'volume-pinch' => {
@@ -5942,41 +6194,45 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'volume-quart-imperial' => {
-						'few' => q({0} imp. kvarca),
+						'few' => q({0} imp. kvarta),
 						'name' => q(imp. kvarc),
-						'one' => q({0} imp. kvarc),
-						'other' => q({0} imp. kvarca),
+						'one' => q({0} imp. kvart),
+						'other' => q({0} imp. kvarata),
 					},
 					# Core Unit Identifier
 					'quart-imperial' => {
-						'few' => q({0} imp. kvarca),
+						'few' => q({0} imp. kvarta),
 						'name' => q(imp. kvarc),
-						'one' => q({0} imp. kvarc),
-						'other' => q({0} imp. kvarca),
+						'one' => q({0} imp. kvart),
+						'other' => q({0} imp. kvarata),
 					},
 					# Long Unit Identifier
 					'volume-tablespoon' => {
 						'few' => q({0} kšk.),
+						'name' => q(kašike),
 						'one' => q({0} kšk.),
-						'other' => q({0} tbsp),
+						'other' => q({0} kšk.),
 					},
 					# Core Unit Identifier
 					'tablespoon' => {
 						'few' => q({0} kšk.),
+						'name' => q(kašike),
 						'one' => q({0} kšk.),
-						'other' => q({0} tbsp),
+						'other' => q({0} kšk.),
 					},
 					# Long Unit Identifier
 					'volume-teaspoon' => {
 						'few' => q({0} kšč.),
+						'name' => q(kšč.),
 						'one' => q({0} kšč.),
-						'other' => q({0} tsp),
+						'other' => q({0} kšč.),
 					},
 					# Core Unit Identifier
 					'teaspoon' => {
 						'few' => q({0} kšč.),
+						'name' => q(kšč.),
 						'one' => q({0} kšč.),
-						'other' => q({0} tsp),
+						'other' => q({0} kšč.),
 					},
 				},
 			} }
@@ -9043,15 +9299,17 @@ has 'day_periods' => (
 			'format' => {
 				'abbreviated' => {
 					'afternoon1' => q{poslijepodne},
+					'am' => q{a. m.},
 					'evening1' => q{navečer},
 					'midnight' => q{ponoć},
 					'morning1' => q{ujutro},
 					'night1' => q{po noći},
 					'noon' => q{podne},
+					'pm' => q{p. m.},
 				},
 				'narrow' => {
-					'am' => q{prijepodne},
-					'pm' => q{popodne},
+					'am' => q{a. m.},
+					'pm' => q{p. m.},
 				},
 				'wide' => {
 					'am' => q{prijepodne},
@@ -9059,6 +9317,10 @@ has 'day_periods' => (
 				},
 			},
 			'stand-alone' => {
+				'abbreviated' => {
+					'am' => q{a. m.},
+					'pm' => q{p. m.},
+				},
 				'narrow' => {
 					'am' => q{prijepodne},
 					'pm' => q{popodne},
@@ -9227,6 +9489,7 @@ has 'datetime_formats_available_formats' => (
 			GyMMM => q{MMM y. G},
 			GyMMMEd => q{E, d. MMM y. G},
 			GyMMMd => q{d. MMM y. G},
+			GyMd => q{d. M. y. GGGG},
 			H => q{H},
 			MEd => q{E, d.M.},
 			MMMEd => q{E, d. MMM},
@@ -9255,17 +9518,17 @@ has 'datetime_formats_available_formats' => (
 			GyMMM => q{MMM y. G},
 			GyMMMEd => q{E, d. MMM y. G},
 			GyMMMd => q{d. MMM y. G},
-			GyMd => q{d/M/y. G},
+			GyMd => q{d. M. y. G},
 			Hmsv => q{HH:mm:ss (v)},
 			Hmv => q{HH:mm (v)},
-			MEd => q{E, d.M.},
+			MEd => q{E, d. M.},
 			MMMEd => q{E, d. MMM},
 			MMMMEd => q{E, d. MMMM},
 			MMMMW => q{W. 'sedmica' 'mjesec' MMMM},
 			MMMMd => q{d. MMMM},
 			MMMd => q{d. MMM},
 			MMdd => q{d. M.},
-			Md => q{d.M.},
+			Md => q{d. M.},
 			d => q{d.},
 			h => q{h a},
 			hm => q{hh:mm a},
@@ -9274,13 +9537,13 @@ has 'datetime_formats_available_formats' => (
 			hmv => q{h:mm a (v)},
 			y => q{y.},
 			yM => q{MM/y},
-			yMEd => q{E, d.M.y.},
-			yMM => q{M/y},
+			yMEd => q{E, d. M. y.},
+			yMM => q{M. y.},
 			yMMM => q{MMM y.},
 			yMMMEd => q{E, d. MMM y.},
 			yMMMM => q{LLLL y.},
 			yMMMd => q{d. MMM y.},
-			yMd => q{d.M.y.},
+			yMd => q{d. M. y.},
 			yQQQ => q{QQQ y.},
 			yQQQQ => q{QQQQ y.},
 			yw => q{w. 'sedmica' 'u' Y.},
@@ -9542,7 +9805,7 @@ has 'datetime_formats_interval' => (
 			},
 			Gy => {
 				G => q{y. G – y. G},
-				y => q{y – y. G},
+				y => q{y–y. G},
 			},
 			GyM => {
 				G => q{M. y. G – M. y. G},
@@ -9569,7 +9832,7 @@ has 'datetime_formats_interval' => (
 			GyMMMd => {
 				G => q{d. MMM y. G – d. MMM y. G},
 				M => q{d. MMM – d. MMM y. G},
-				d => q{d – d. MMM y. G},
+				d => q{d–d. MMM y. G},
 				y => q{d. MMM y – d. MMM y. G},
 			},
 			GyMd => {
@@ -9596,16 +9859,16 @@ has 'datetime_formats_interval' => (
 				M => q{M–M.},
 			},
 			MEd => {
-				M => q{E, d.M. – E, d.M.},
-				d => q{E, d.M. – E, d.M.},
+				M => q{E, d. M – E, d. M.},
+				d => q{E, d. M – E, d. M.},
 			},
 			MMMEd => {
 				M => q{E, d. MMM – E, d. MMM},
-				d => q{E, d. – E, d. MMM},
+				d => q{E, d – E, d. MMM},
 			},
 			MMMd => {
 				M => q{d. MMM – d. MMM},
-				d => q{d.–d. MMM},
+				d => q{d–d. MMM},
 			},
 			Md => {
 				M => q{d. M – d. M.},
@@ -9616,7 +9879,6 @@ has 'datetime_formats_interval' => (
 			},
 			h => {
 				a => q{h a – h a},
-				h => q{h – h'h' a},
 			},
 			hm => {
 				a => q{h:mm a – h:mm a},
@@ -9633,36 +9895,36 @@ has 'datetime_formats_interval' => (
 				h => q{h – h 'h' a v},
 			},
 			yM => {
-				M => q{M/y – M/y},
-				y => q{M/y – M/y},
+				M => q{M. y – M. y.},
+				y => q{M. y – M. y.},
 			},
 			yMEd => {
-				M => q{E, d.M.y. – E, d.M.y.},
-				d => q{E, d.M.y. – E, d.M.y.},
-				y => q{E, d.M.y. – E, d.M.y.},
+				M => q{E, d. M. y – E, d. M. y.},
+				d => q{E, d. M. y – E, d. M. y.},
+				y => q{E, d. M. y – E, d. M. y.},
 			},
 			yMMM => {
 				M => q{LLL – LLL y.},
-				y => q{LLL y. – LLL y.},
+				y => q{LLL y – LLL y.},
 			},
 			yMMMEd => {
 				M => q{E, d. MMM – E, d. MMM y.},
-				d => q{E, d. – E, d. MMM y.},
-				y => q{E, d. MMM y. – E, d. MMM y.},
+				d => q{E, d – E, d. MMM y.},
+				y => q{E, d. MMM y – E, d. MMM y.},
 			},
 			yMMMM => {
 				M => q{LLLL – LLLL y.},
-				y => q{LLLL y. – LLLL y.},
+				y => q{LLLL y – LLLL y.},
 			},
 			yMMMd => {
 				M => q{d. MMM – d. MMM y.},
-				d => q{d. – d. MMM y.},
-				y => q{d. MMM y. – d. MMM y.},
+				d => q{d–d. MMM y.},
+				y => q{d. MMM y – d. MMM y.},
 			},
 			yMd => {
-				M => q{d.M.y. – d.M.y.},
+				M => q{d. M. y – d. M. y.},
 				d => q{d. M. y – d. M. y.},
-				y => q{d.M.y. – d.M.y.},
+				y => q{d. M. y – d. M. y.},
 			},
 		},
 	} },
@@ -9838,9 +10100,6 @@ has 'time_zone_names' => (
 		'America/Puerto_Rico' => {
 			exemplarCity => q#Portoriko#,
 		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#Santa Isabel#,
-		},
 		'America_Central' => {
 			long => {
 				'daylight' => q#Sjevernoameričko centralno ljetno vrijeme#,
@@ -9960,9 +10219,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Brunei' => {
 			exemplarCity => q#Bruneji#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#Čojbalsan#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#Kolombo#,
@@ -10109,9 +10365,6 @@ has 'time_zone_names' => (
 		'Atlantic/St_Helena' => {
 			exemplarCity => q#Sveta Helena#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#Currie#,
-		},
 		'Australia/Lord_Howe' => {
 			exemplarCity => q#Lord Hau#,
 		},
@@ -10226,13 +10479,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Kinesko ljetno vrijeme#,
 				'generic' => q#Kinesko vrijeme#,
 				'standard' => q#Kinesko standardno vrijeme#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Čojbalsansko ljetno vrijeme#,
-				'generic' => q#Čojbalsansko vrijeme#,
-				'standard' => q#Čojbalsansko standardno vrijeme#,
 			},
 		},
 		'Christmas' => {
@@ -10390,9 +10636,6 @@ has 'time_zone_names' => (
 		'Europe/Tirane' => {
 			exemplarCity => q#Tirana#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#Užgorod#,
-		},
 		'Europe/Vatican' => {
 			exemplarCity => q#Vatikan#,
 		},
@@ -10401,9 +10644,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Warsaw' => {
 			exemplarCity => q#Varšava#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#Zaporožje#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#Cirih#,
@@ -10630,14 +10870,19 @@ has 'time_zone_names' => (
 				'standard' => q#Petropavlovsk-Kamčatski standardno vreme#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#kazahstansko vrijeme#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
-				'standard' => q#Istočnokazahstansko vrijeme#,
+				'standard' => q#istočnokazahstansko vrijeme#,
 			},
 		},
 		'Kazakhstan_Western' => {
 			long => {
-				'standard' => q#Zapadnokazahstansko vrijeme#,
+				'standard' => q#zapadnokazahstansko vrijeme#,
 			},
 		},
 		'Korea' => {
@@ -10661,7 +10906,7 @@ has 'time_zone_names' => (
 		},
 		'Kyrgystan' => {
 			long => {
-				'standard' => q#Kirgistansko vrijeme#,
+				'standard' => q#kirgistansko vrijeme#,
 			},
 		},
 		'Lanka' => {
@@ -10686,11 +10931,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Makao letnje računanje vremena#,
 				'generic' => q#Makao vreme#,
 				'standard' => q#Makao standardno vreme#,
-			},
-		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Vrijeme na Ostrvu Makvori#,
 			},
 		},
 		'Magadan' => {
@@ -10730,13 +10970,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Vrijeme stanice Mawson#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Sjeverozapadno meksičko ljetno vrijeme#,
-				'generic' => q#Sjeverozapadno meksičko vrijeme#,
-				'standard' => q#Sjeverozapadno meksičko standardno vrijeme#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -10996,7 +11229,7 @@ has 'time_zone_names' => (
 		},
 		'Tajikistan' => {
 			long => {
-				'standard' => q#Tadžikistansko vrijeme#,
+				'standard' => q#tadžikistansko vrijeme#,
 			},
 		},
 		'Tokelau' => {
@@ -11018,9 +11251,9 @@ has 'time_zone_names' => (
 		},
 		'Turkmenistan' => {
 			long => {
-				'daylight' => q#Turkmenistansko ljetno vrijeme#,
-				'generic' => q#Turkmenistansko vrijeme#,
-				'standard' => q#Turkmenistansko standardno vrijeme#,
+				'daylight' => q#turkmenistansko ljetno vrijeme#,
+				'generic' => q#turkmenistansko vrijeme#,
+				'standard' => q#turkmenistansko standardno vrijeme#,
 			},
 		},
 		'Tuvalu' => {
@@ -11037,9 +11270,9 @@ has 'time_zone_names' => (
 		},
 		'Uzbekistan' => {
 			long => {
-				'daylight' => q#Uzbekistansko ljetno vrijeme#,
-				'generic' => q#Uzbekistansko vrijeme#,
-				'standard' => q#Uzbekistansko standardno vrijeme#,
+				'daylight' => q#uzbekistansko ljetno vrijeme#,
+				'generic' => q#uzbekistansko vrijeme#,
+				'standard' => q#uzbekistansko standardno vrijeme#,
 			},
 		},
 		'Vanuatu' => {

@@ -1,17 +1,27 @@
 use ExtUtils::MakeMaker;
 WriteMakefile(
-  NAME      => q{Geo::Ellipsoids},
-  VERSION_FROM => q{lib/Geo/Ellipsoids.pm},
+  NAME          => 'Geo::Ellipsoids',
+  VERSION_FROM  => 'lib/Geo/Ellipsoids.pm',
+  ABSTRACT_FROM => 'lib/Geo/Ellipsoids.pm',
+  LICENSE       => 'perl',
   PREREQ_PM => {
-                 strict         => 0,
-                 vars           => 0,
-                 constant       => 0,
-                 Geo::Functions => 0.03,
-                 Geo::Constants => 0.04,
+                 'Geo::Functions' => 0.03,
+                 'Geo::Constants' => 0.04,
                },
-               ($] >= 5.005 ? 
-                 (
-                   ABSTRACT_FROM => 'lib/Geo/Ellipsoids.pm',
-                 ) : ()
-               ),
-             );
+  'META_MERGE' => {
+    'resources' => {
+      'repository' => {
+        'web' => 'https://github.com/mrdvt92/perl-Geo-Ellipsoids.git',
+        'url' => 'git@github.com:mrdvt92/perl-Geo-Ellipsoids.git',
+        'type' => 'git'
+      },
+      'homepage' => 'https://github.com/mrdvt92/perl-Geo-Ellipsoids',
+      'bugtracker' => {
+        'web' => 'https://github.com/mrdvt92/perl-Geo-Ellipsoids/issues'
+      }
+    },
+    'meta-spec' => {
+      'version' => 2
+    }
+  },
+);

@@ -1,0 +1,52 @@
+Revision history for Perl module Geo::Ellipsoids
+
+0.17 2025-01-17
+  - Moved from private repo to GitHub
+
+0.16 2025-01-17
+  - Modernized package
+
+0.15 2006-03-01
+  - Added test
+
+0.14 2006-02-07
+  - Added second eccentricity, e' = ep methods
+
+0.13 2006-01-21
+  - Documentation
+
+0.12 2006-01-04
+  - Documentation
+
+0.11 2006-12-10
+  - Documentation
+
+0.10 2006-12-09
+  - Documentation
+
+0.09 2006-12-08
+  - Added n_rad method
+  - Changed prereq versions on Geo::* packages
+
+0.08 2006-12-05
+  - Added n method
+
+0.06 2006-11-28
+  - Added default for custom sphere case
+
+0.05 2006-11-26
+  - Added Documentation
+  - Changed indent of one if statement
+
+0.04 2006-11-26
+  - Added Documentation
+
+0.03 2006-11-26
+  - Added Documentation
+  - Added Example
+
+0.02 2006-11-25
+  - Fixed list method and example
+
+0.01 2006-11-25
+  - Original version

@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Sq - Package for language Albanian
 
 package Locale::CLDR::Locales::Sq;
 # This file auto generated from Data\common\main\sq.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -390,6 +390,7 @@ has 'display_name_language' => (
  				'bi' => 'bislamisht',
  				'bin' => 'binisht',
  				'bla' => 'siksikaisht',
+ 				'blo' => 'anisht',
  				'bm' => 'bambarisht',
  				'bn' => 'bengalisht',
  				'bo' => 'tibetisht',
@@ -497,6 +498,8 @@ has 'display_name_language' => (
  				'hax' => 'haidaishte jugore',
  				'he' => 'hebraisht',
  				'hi' => 'indisht',
+ 				'hi_Latn' => 'hindisht (latine)',
+ 				'hi_Latn@alt=variant' => 'hinglisht',
  				'hil' => 'hiligajnonisht',
  				'hmn' => 'hmongisht',
  				'hr' => 'kroatisht',
@@ -565,6 +568,7 @@ has 'display_name_language' => (
  				'kv' => 'komisht',
  				'kw' => 'kornisht',
  				'kwk' => 'kuakualaisht',
+ 				'kxv' => 'kuvisht',
  				'ky' => 'kirgizisht',
  				'la' => 'latinisht',
  				'lad' => 'ladinoisht',
@@ -733,6 +737,7 @@ has 'display_name_language' => (
  				'sw_CD' => 'suahilishte kongoleze',
  				'swb' => 'kamorianisht',
  				'syr' => 'siriakisht',
+ 				'szl' => 'silesisht',
  				'ta' => 'tamilisht',
  				'tce' => 'tatshonishte jugore',
  				'te' => 'teluguisht',
@@ -775,6 +780,7 @@ has 'display_name_language' => (
  				've' => 'vendaisht',
  				'vec' => 'venetisht',
  				'vi' => 'vietnamisht',
+ 				'vmw' => 'makuvaisht',
  				'vo' => 'volapykisht',
  				'vun' => 'vunxhoisht',
  				'wa' => 'ualunisht',
@@ -786,6 +792,7 @@ has 'display_name_language' => (
  				'wuu' => 'kinezishte vu',
  				'xal' => 'kalmikisht',
  				'xh' => 'xhosaisht',
+ 				'xnr' => 'kangrisht',
  				'xog' => 'sogisht',
  				'yav' => 'jangbenisht',
  				'ybb' => 'jembaisht',
@@ -794,6 +801,7 @@ has 'display_name_language' => (
  				'yrl' => 'nejengatuisht',
  				'yue' => 'kantonezisht',
  				'yue@alt=menu' => 'kinezishte kantoneze',
+ 				'za' => 'zhuangisht',
  				'zgh' => 'tamaziatishte standarde marokene',
  				'zh' => 'kinezisht',
  				'zh@alt=menu' => 'kinezishte mandarine',
@@ -1389,7 +1397,6 @@ has 'display_name_type' => (
  				'gb2312han' => q{Radhitje e kinezishtes së thjeshtësuar - GB2312},
  				'phonebook' => q{Radhitje libri telefonik},
  				'pinyin' => q{Radhitje pinini},
- 				'reformed' => q{Radhitje e reformuar},
  				'search' => q{kërkim i përgjithshëm},
  				'searchjl' => q{kërkim sipas bashkëtingëllores fillestare hangul},
  				'standard' => q{radhitje standarde},
@@ -2159,6 +2166,18 @@ has 'units' => (
 						'other' => q({0} përdhjetëmijë),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(pjesë për miliard),
+						'one' => q({0} pjesë për miliard),
+						'other' => q({0} pjesë për miliard),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(pjesë për miliard),
+						'one' => q({0} pjesë për miliard),
+						'other' => q({0} pjesë për miliard),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(litra për 100 kilometra),
 						'one' => q({0} litër për 100 kilometra),
@@ -2389,6 +2408,20 @@ has 'units' => (
 						'name' => q(nanosekonda),
 						'one' => q({0} nanosekondë),
 						'other' => q({0} nanosekonda),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(net),
+						'one' => q({0} natë),
+						'other' => q({0} net),
+						'per' => q({0}/natë),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(net),
+						'one' => q({0} natë),
+						'other' => q({0} net),
+						'per' => q({0}/natë),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -3430,15 +3463,15 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'pressure-pascal' => {
-						'name' => q(paskalë),
+						'name' => q(paskal),
 						'one' => q({0} paskal),
-						'other' => q({0} paskalë),
+						'other' => q({0} paskal),
 					},
 					# Core Unit Identifier
 					'pascal' => {
-						'name' => q(paskalë),
+						'name' => q(paskal),
 						'one' => q({0} paskal),
-						'other' => q({0} paskalë),
+						'other' => q({0} paskal),
 					},
 					# Long Unit Identifier
 					'pressure-pound-force-per-square-inch' => {
@@ -3945,13 +3978,13 @@ has 'units' => (
 					# Long Unit Identifier
 					'volume-quart-imperial' => {
 						'name' => q(çerekë imperialë),
-						'one' => q({0} çerek imperialë),
+						'one' => q({0} çerek imperial),
 						'other' => q({0} çerekë imperialë),
 					},
 					# Core Unit Identifier
 					'quart-imperial' => {
 						'name' => q(çerekë imperialë),
-						'one' => q({0} çerek imperialë),
+						'one' => q({0} çerek imperial),
 						'other' => q({0} çerekë imperialë),
 					},
 					# Long Unit Identifier
@@ -3992,25 +4025,21 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'angle-arc-minute' => {
-						'name' => q(hark-min),
 						'one' => q({0}′),
 						'other' => q({0}′),
 					},
 					# Core Unit Identifier
 					'arc-minute' => {
-						'name' => q(hark-min),
 						'one' => q({0}′),
 						'other' => q({0}′),
 					},
 					# Long Unit Identifier
 					'angle-arc-second' => {
-						'name' => q(hark-sek),
 						'one' => q({0}″),
 						'other' => q({0}″),
 					},
 					# Core Unit Identifier
 					'arc-second' => {
-						'name' => q(hark-sek),
 						'one' => q({0}″),
 						'other' => q({0}″),
 					},
@@ -4024,13 +4053,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'concentr-mole' => {
-						'name' => q(molë),
 						'one' => q({0} mol),
 						'other' => q({0} molë),
 					},
 					# Core Unit Identifier
 					'mole' => {
-						'name' => q(molë),
 						'one' => q({0} mol),
 						'other' => q({0} molë),
 					},
@@ -4159,6 +4186,20 @@ has 'units' => (
 						'per' => q({0}/min),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(net),
+						'one' => q({0} natë),
+						'other' => q({0} net),
+						'per' => q({0}/natë),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(net),
+						'one' => q({0} natë),
+						'other' => q({0} net),
+						'per' => q({0}/natë),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'one' => q({0} çer.),
 						'other' => q({0} çer.),
@@ -4188,13 +4229,13 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'graphics-dot' => {
-						'name' => q(pika),
+						'name' => q(pikë),
 						'one' => q({0} pikë),
 						'other' => q({0} pika),
 					},
 					# Core Unit Identifier
 					'dot' => {
-						'name' => q(pika),
+						'name' => q(pikë),
 						'one' => q({0} pikë),
 						'other' => q({0} pika),
 					},
@@ -4659,6 +4700,20 @@ has 'units' => (
 						'one' => q({0} muaj),
 						'other' => q({0} muaj),
 						'per' => q({0}/muaj),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(net),
+						'one' => q({0} natë),
+						'other' => q({0} net),
+						'per' => q({0}/natë),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(net),
+						'one' => q({0} natë),
+						'other' => q({0} net),
+						'per' => q({0}/natë),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -6152,16 +6207,16 @@ has 'currencies' => (
 		},
 		'SLE' => {
 			display_name => {
-				'currency' => q(Leoni i Sierra-Leones),
-				'one' => q(leon i Sierra-Leones),
-				'other' => q(leonë të Sierra-Leones),
+				'currency' => q(Leoni i Siera-Leones),
+				'one' => q(leon i Siera-Leones),
+				'other' => q(leonë të Siera-Leones),
 			},
 		},
 		'SLL' => {
 			display_name => {
-				'currency' => q(Leoni i Sierra-Leones \(1964—2022\)),
-				'one' => q(leon i Sierra-Leones \(1964—2022\)),
-				'other' => q(leonë të Sierra-Leones \(1964—2022\)),
+				'currency' => q(Leoni i Siera-Leones \(1964–2022\)),
+				'one' => q(leon i Siera-Leones \(1964–2022\)),
+				'other' => q(leonë të Siera-Leones \(1964–2022\)),
 			},
 		},
 		'SOS' => {
@@ -7676,9 +7731,6 @@ has 'time_zone_names' => (
 		'America/Punta_Arenas' => {
 			exemplarCity => q#Punta-Arenas#,
 		},
-		'America/Rainy_River' => {
-			exemplarCity => q#Lumi i Shirave#,
-		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#Gryka Inlet#,
 		},
@@ -7687,9 +7739,6 @@ has 'time_zone_names' => (
 		},
 		'America/Rio_Branco' => {
 			exemplarCity => q#Rio-Branko#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#Santa-Izabela#,
 		},
 		'America/Santo_Domingo' => {
 			exemplarCity => q#Santo-Domingo#,
@@ -7727,9 +7776,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#Dhule#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#Gjiri i Bubullimës#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#Tihuana#,
 		},
@@ -7747,9 +7793,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#Jakutat#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#Jellounajf#,
 		},
 		'America_Central' => {
 			long => {
@@ -7894,9 +7937,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#Çita#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#Çoibalsan#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#Kolombo#,
@@ -8067,9 +8107,6 @@ has 'time_zone_names' => (
 		'Australia/Broken_Hill' => {
 			exemplarCity => q#Brokën-Hill#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#Kuri#,
-		},
 		'Australia/Darwin' => {
 			exemplarCity => q#Darvin#,
 		},
@@ -8198,13 +8235,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Ora verore e Kinës#,
 				'generic' => q#Ora e Kinës#,
 				'standard' => q#Ora standarde e Kinës#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Ora verore e Çoibalsanit#,
-				'generic' => q#Ora e Çoibalsanit#,
-				'standard' => q#Ora standarde e Çoibalsanit#,
 			},
 		},
 		'Christmas' => {
@@ -8391,9 +8421,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Warsaw' => {
 			exemplarCity => q#Varshavë#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#Zaporozhje#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#Zyrih#,
@@ -8608,6 +8635,11 @@ has 'time_zone_names' => (
 				'standard' => q#Ora standarde e Petropavllovsk-Kamçatkës#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Ora e Kazakistanit#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#Ora e Kazakistanit Lindor#,
@@ -8666,11 +8698,6 @@ has 'time_zone_names' => (
 				'standard' => q#Ora standarde e Makaos#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Ora e Ishullit Makuari#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Ora verore e Magadanit#,
@@ -8708,13 +8735,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Ora e Mausonit#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Ora verore e Meksikës Veriperëndimore#,
-				'generic' => q#Ora e Meksikës Veriperëndimore#,
-				'standard' => q#Ora standarde e Meksikës Veriperëndimore#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -8835,9 +8855,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Honolulu' => {
 			exemplarCity => q#Honolulu#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#Xhonston#,
 		},
 		'Pacific/Kiritimati' => {
 			exemplarCity => q#Kiritimat#,

@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Fil - Package for language Filipino
 
 package Locale::CLDR::Locales::Fil;
 # This file auto generated from Data\common\main\fil.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -353,6 +353,7 @@ has 'display_name_language' => (
  				'bi' => 'Bislama',
  				'bin' => 'Bini',
  				'bla' => 'Siksika',
+ 				'blo' => 'Anii',
  				'bm' => 'Bambara',
  				'bn' => 'Bangla',
  				'bo' => 'Tibetan',
@@ -396,6 +397,7 @@ has 'display_name_language' => (
  				'dar' => 'Dargwa',
  				'dav' => 'Taita',
  				'de' => 'German',
+ 				'de_AT' => 'Austrian German',
  				'de_CH' => 'Swiss High German',
  				'dgr' => 'Dogrib',
  				'dje' => 'Zarma',
@@ -436,7 +438,7 @@ has 'display_name_language' => (
  				'frc' => 'Cajun French',
  				'frr' => 'Hilagang Frisian',
  				'fur' => 'Friulian',
- 				'fy' => 'Kanlurang Frisian',
+ 				'fy' => 'Western Frisian',
  				'ga' => 'Irish',
  				'gaa' => 'Ga',
  				'gag' => 'Gagauz',
@@ -527,6 +529,7 @@ has 'display_name_language' => (
  				'kv' => 'Komi',
  				'kw' => 'Cornish',
  				'kwk' => 'Kwakʼwala',
+ 				'kxv' => 'Kuvi',
  				'ky' => 'Kirghiz',
  				'la' => 'Latin',
  				'lad' => 'Ladino',
@@ -535,6 +538,7 @@ has 'display_name_language' => (
  				'lez' => 'Lezghian',
  				'lg' => 'Ganda',
  				'li' => 'Limburgish',
+ 				'lij' => 'Ligurian',
  				'lil' => 'Lillooet',
  				'lkt' => 'Lakota',
  				'lmo' => 'Lombard',
@@ -652,7 +656,7 @@ has 'display_name_language' => (
  				'rwk' => 'Rwa',
  				'sa' => 'Sanskrit',
  				'sad' => 'Sandawe',
- 				'sah' => 'Sakha',
+ 				'sah' => 'Yakut',
  				'saq' => 'Samburu',
  				'sat' => 'Santali',
  				'sba' => 'Ngambay',
@@ -695,6 +699,7 @@ has 'display_name_language' => (
  				'sw_CD' => 'Congo Swahili',
  				'swb' => 'Comorian',
  				'syr' => 'Syriac',
+ 				'szl' => 'Silesian',
  				'ta' => 'Tamil',
  				'tce' => 'Katimugang Tutchone',
  				'te' => 'Telugu',
@@ -737,7 +742,9 @@ has 'display_name_language' => (
  				'uz' => 'Uzbek',
  				'vai' => 'Vai',
  				've' => 'Venda',
+ 				'vec' => 'Venetian',
  				'vi' => 'Vietnamese',
+ 				'vmw' => 'Makhuwa',
  				'vo' => 'Volapük',
  				'vun' => 'Vunjo',
  				'wa' => 'Walloon',
@@ -749,6 +756,7 @@ has 'display_name_language' => (
  				'wuu' => 'Wu Chinese',
  				'xal' => 'Kalmyk',
  				'xh' => 'Xhosa',
+ 				'xnr' => 'Kangri',
  				'xog' => 'Soga',
  				'yav' => 'Yangben',
  				'ybb' => 'Yemba',
@@ -757,6 +765,7 @@ has 'display_name_language' => (
  				'yrl' => 'Nheengatu',
  				'yue' => 'Cantonese',
  				'yue@alt=menu' => 'Chinese, Cantonese',
+ 				'za' => 'Zhuang',
  				'zgh' => 'Standard Moroccan Tamazight',
  				'zh' => 'Chinese',
  				'zh@alt=menu' => 'Chinese, Mandarin',
@@ -813,7 +822,6 @@ has 'display_name_script' => (
  			'Hebr' => 'Hebrew',
  			'Hira' => 'Hiragana',
  			'Hrkt' => 'Japanese syllabaries',
- 			'Jamo' => 'Jamo',
  			'Jpan' => 'Japanese',
  			'Kana' => 'Katakana',
  			'Khmr' => 'Khmer',
@@ -836,7 +844,6 @@ has 'display_name_script' => (
  			'Telu' => 'Telugu',
  			'Tfng' => 'Tifinagh',
  			'Thaa' => 'Thaana',
- 			'Thai' => 'Thai',
  			'Tibt' => 'Tibetan',
  			'Vaii' => 'Vai',
  			'Yiii' => 'Yi',
@@ -1012,7 +1019,7 @@ has 'display_name_region' => (
  			'IL' => 'Israel',
  			'IM' => 'Isle of Man',
  			'IN' => 'India',
- 			'IO' => 'Teritoryo sa Karagatan ng British Indian',
+ 			'IO' => 'British Indian Ocean Territory',
  			'IO@alt=chagos' => 'Chagos Archipelago',
  			'IQ' => 'Iraq',
  			'IR' => 'Iran',
@@ -1275,7 +1282,6 @@ has 'display_name_type' => (
  				'phonebook' => q{Pagkakasunud-sunod ng Pag-uuri ng Phonebook},
  				'phonetic' => q{Phonetic na Ayos ng Pag-uuri-uri},
  				'pinyin' => q{Pagkakasunud-sunod ng Pag-uuri ng Pinyin},
- 				'reformed' => q{Pagkakasunud-sunod ng Pag-uuri ng Na-reform},
  				'search' => q{Pangkalahatang Paghahanap},
  				'searchjl' => q{Maghanap Ayon sa Unang Katinig ng Hangul},
  				'standard' => q{Karaniwang Pagkakasunud-sunod ng Ayos},
@@ -2004,6 +2010,18 @@ has 'units' => (
 						'other' => q({0} permyriad),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(parts per billion),
+						'one' => q({0} part per billion),
+						'other' => q({0} parts per billion),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(parts per billion),
+						'one' => q({0} part per billion),
+						'other' => q({0} parts per billion),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(litro kada 100 kilometro),
 						'one' => q({0} litro kada 100 kilometro),
@@ -2284,16 +2302,30 @@ has 'units' => (
 						'other' => q({0} nanosegundo),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(mga gabi),
+						'one' => q({0} gabi),
+						'other' => q({0} gabi),
+						'per' => q({0} kada gabi),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(mga gabi),
+						'one' => q({0} gabi),
+						'other' => q({0} gabi),
+						'per' => q({0} kada gabi),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'name' => q(mga quarter),
 						'one' => q({0} qtr),
-						'other' => q({0} qaurter),
+						'other' => q({0} quarter),
 					},
 					# Core Unit Identifier
 					'quarter' => {
 						'name' => q(mga quarter),
 						'one' => q({0} qtr),
-						'other' => q({0} qaurter),
+						'other' => q({0} quarter),
 					},
 					# Long Unit Identifier
 					'duration-second' => {
@@ -3407,13 +3439,13 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'torque-pound-force-foot' => {
-						'name' => q(pound-feet),
+						'name' => q(pound-force-feet),
 						'one' => q({0} pound-force-foot),
 						'other' => q({0} pound-feet),
 					},
 					# Core Unit Identifier
 					'pound-force-foot' => {
-						'name' => q(pound-feet),
+						'name' => q(pound-force-feet),
 						'one' => q({0} pound-force-foot),
 						'other' => q({0} pound-feet),
 					},
@@ -3962,6 +3994,16 @@ has 'units' => (
 						'name' => q(‱),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'one' => q({0}ppb),
+						'other' => q({0}ppb),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'one' => q({0}ppb),
+						'other' => q({0}ppb),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'one' => q({0}L/100km),
 						'other' => q({0}L/100km),
@@ -4100,6 +4142,20 @@ has 'units' => (
 					'month' => {
 						'one' => q({0}buwan),
 						'other' => q({0} buwan),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(mga gabi),
+						'one' => q({0}gabi),
+						'other' => q({0}gabi),
+						'per' => q({0}/gabi),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(mga gabi),
+						'one' => q({0}gabi),
+						'other' => q({0}gabi),
+						'per' => q({0}/gabi),
 					},
 					# Long Unit Identifier
 					'duration-second' => {
@@ -5042,6 +5098,14 @@ has 'units' => (
 						'name' => q(permyriad),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(parts/billion),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(parts/billion),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'one' => q({0} na L/100km),
 						'other' => q({0} na L/100km),
@@ -5254,6 +5318,20 @@ has 'units' => (
 					# Core Unit Identifier
 					'nanosecond' => {
 						'name' => q(nanoseg),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(mga gabi),
+						'one' => q({0} gabi),
+						'other' => q({0} gabi),
+						'per' => q({0}/gabi),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(mga gabi),
+						'one' => q({0} gabi),
+						'other' => q({0} gabi),
+						'per' => q({0}/gabi),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -7369,14 +7447,14 @@ has 'calendar_days' => (
 						sat => 'Sab',
 						sun => 'Lin'
 					},
-					short => {
-						mon => 'Lu',
-						tue => 'Ma',
-						wed => 'Mi',
-						thu => 'Hu',
-						fri => 'Bi',
-						sat => 'Sa',
-						sun => 'Li'
+					narrow => {
+						mon => 'Lun',
+						tue => 'Mar',
+						wed => 'Miy',
+						thu => 'Huw',
+						fri => 'Biy',
+						sat => 'Sab',
+						sun => 'Lin'
 					},
 					wide => {
 						mon => 'Lunes',
@@ -7390,6 +7468,15 @@ has 'calendar_days' => (
 				},
 				'stand-alone' => {
 					narrow => {
+						mon => 'Lun',
+						tue => 'Mar',
+						wed => 'Miy',
+						thu => 'Huw',
+						fri => 'Biy',
+						sat => 'Sab',
+						sun => 'Lin'
+					},
+					short => {
 						mon => 'Lun',
 						tue => 'Mar',
 						wed => 'Miy',
@@ -7568,35 +7655,37 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'afternoon1' => q{tanghali},
+					'afternoon1' => q{ng hapon},
 					'evening1' => q{ng gabi},
 					'midnight' => q{hatinggabi},
-					'morning1' => q{nang umaga},
+					'morning1' => q{ng umaga},
 					'morning2' => q{madaling-araw},
 					'night1' => q{ng gabi},
 					'noon' => q{tanghaling-tapat},
 				},
 				'narrow' => {
-					'afternoon1' => q{sa hapon},
+					'afternoon1' => q{ng hapon},
 					'am' => q{am},
-					'evening1' => q{sa gabi},
+					'evening1' => q{ng gabi},
 					'midnight' => q{hatinggabi},
-					'morning1' => q{umaga},
+					'morning1' => q{ng umaga},
 					'morning2' => q{madaling-araw},
 					'night1' => q{ng gabi},
 					'noon' => q{tanghaling-tapat},
 					'pm' => q{pm},
 				},
+				'wide' => {
+					'afternoon1' => q{ng hapon},
+					'evening1' => q{ng gabi},
+					'midnight' => q{hatinggabi},
+					'morning1' => q{ng umaga},
+					'morning2' => q{madaling-araw},
+					'night1' => q{ng gabi},
+					'noon' => q{tanghaling-tapat},
+				},
 			},
 			'stand-alone' => {
 				'abbreviated' => {
-					'afternoon1' => q{hapon},
-					'evening1' => q{gabi},
-					'morning1' => q{umaga},
-					'morning2' => q{madaling-araw},
-					'night1' => q{gabi},
-				},
-				'wide' => {
 					'afternoon1' => q{hapon},
 					'evening1' => q{gabi},
 					'morning1' => q{umaga},
@@ -8130,9 +8219,6 @@ has 'time_zone_names' => (
 				'standard' => q#Standard na Oras sa Amazon#,
 			},
 		},
-		'America/Asuncion' => {
-			exemplarCity => q#Asunción#,
-		},
 		'America/Bahia_Banderas' => {
 			exemplarCity => q#Bahia Banderas#,
 		},
@@ -8153,12 +8239,6 @@ has 'time_zone_names' => (
 		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#Makipot na Look ng Rankin#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#Santa Isabel#,
-		},
-		'America/St_Barthelemy' => {
-			exemplarCity => q#St. Barthélemy#,
 		},
 		'America_Central' => {
 			long => {
@@ -8236,9 +8316,6 @@ has 'time_zone_names' => (
 		'Asia/Qostanay' => {
 			exemplarCity => q#Kostanay#,
 		},
-		'Asia/Rangoon' => {
-			exemplarCity => q#Rangoon#,
-		},
 		'Asia/Saigon' => {
 			exemplarCity => q#Lungsod ng Ho Chi Minh#,
 		},
@@ -8249,9 +8326,6 @@ has 'time_zone_names' => (
 				'standard' => q#Standard na Oras sa Atlantiko#,
 			},
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#Currie#,
-		},
 		'Australia_Central' => {
 			long => {
 				'daylight' => q#Daylight Time sa Gitnang Australya#,
@@ -8261,23 +8335,23 @@ has 'time_zone_names' => (
 		},
 		'Australia_CentralWestern' => {
 			long => {
-				'daylight' => q#Daylight Time sa Gitnang Kanlurang Australya#,
-				'generic' => q#Oras ng Gitnang Kanluran ng Australya#,
-				'standard' => q#Standard Time ng Gitnang Kanluran ng Australya#,
+				'daylight' => q#Daylight Time sa Gitnang Kanlurang Australia#,
+				'generic' => q#Oras ng Gitnang Kanluran ng Australia#,
+				'standard' => q#Standard Time ng Gitnang Kanluran ng Australia#,
 			},
 		},
 		'Australia_Eastern' => {
 			long => {
-				'daylight' => q#Daylight Time sa Silangang Australya#,
-				'generic' => q#Oras sa Silangang Australya#,
-				'standard' => q#Standard na Oras sa Silangang Australya#,
+				'daylight' => q#Daylight Time sa Silangang Australia#,
+				'generic' => q#Oras sa Silangang Australia#,
+				'standard' => q#Standard na Oras sa Silangang Australia#,
 			},
 		},
 		'Australia_Western' => {
 			long => {
-				'daylight' => q#Daylight Time sa Kanlurang Australya#,
-				'generic' => q#Oras sa Kanlurang Australya#,
-				'standard' => q#Standard na Oras sa Kanlurang Australya#,
+				'daylight' => q#Daylight Time sa Kanlurang Australia#,
+				'generic' => q#Oras sa Kanlurang Australia#,
+				'standard' => q#Standard na Oras sa Kanlurang Australia#,
 			},
 		},
 		'Azerbaijan' => {
@@ -8354,13 +8428,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Daylight Time sa China#,
 				'generic' => q#Oras sa China#,
 				'standard' => q#Standard na Oras sa China#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Oras sa Tag-init ng Choibalsan#,
-				'generic' => q#Oras sa Choibalsan#,
-				'standard' => q#Standard na Oras sa Choibalsan#,
 			},
 		},
 		'Christmas' => {
@@ -8569,9 +8636,6 @@ has 'time_zone_names' => (
 				'standard' => q#Standard na Oras sa India#,
 			},
 		},
-		'Indian/Reunion' => {
-			exemplarCity => q#Réunion#,
-		},
 		'Indian_Ocean' => {
 			long => {
 				'standard' => q#Oras sa Indian Ocean#,
@@ -8632,6 +8696,11 @@ has 'time_zone_names' => (
 				'standard' => q#Standard Time sa Petropavlovsk-Kamchatski#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Oras ng Kazakhstan#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#Oras sa Silangang Kazakhstan#,
@@ -8678,11 +8747,6 @@ has 'time_zone_names' => (
 				'standard' => q#Standard na Oras sa Lord Howe#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Oras sa Macquarie Island#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Oras sa Tag-init ng Magadan#,
@@ -8720,13 +8784,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Oras sa Mawson#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Daylight na Oras sa Hilagang-kanlurang Mexico#,
-				'generic' => q#Oras sa Hilagang-kanlurang Mexico#,
-				'standard' => q#Standard na Oras sa Hilagang-kanlurang Mexico#,
 			},
 		},
 		'Mexico_Pacific' => {

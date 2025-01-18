@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Mai - Package for language Maithili
 
 package Locale::CLDR::Locales::Mai;
 # This file auto generated from Data\common\main\mai.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -174,6 +174,7 @@ has 'display_name_language' => (
  				'hax' => 'दक्षिणी हैदा',
  				'he' => 'हीब्रू',
  				'hi' => 'हिन्दी',
+ 				'hi_Latn' => 'हिन्दी (ल्याटिन)',
  				'hil' => 'हिलिगेनन',
  				'hmn' => 'मौंग',
  				'hr' => 'क्रोशियाई',
@@ -452,6 +453,7 @@ has 'display_name_language' => (
  				'yrl' => 'एनहींगाटु',
  				'yue' => 'केंटोनी',
  				'yue@alt=menu' => 'चीनी, केंटोनी',
+ 				'za' => 'जा',
  				'zgh' => 'मानक मोरोक्कन टेमेजिग्थ',
  				'zh' => 'चीनी',
  				'zh@alt=menu' => 'चीनी, मैंडेरिन',
@@ -1281,15 +1283,6 @@ has 'calendar_days' => (
 						sat => 'शनि',
 						sun => 'रवि'
 					},
-					short => {
-						mon => 'सोम',
-						tue => 'मंगल',
-						wed => 'बुध',
-						thu => 'बृहस्पति',
-						fri => 'शुक्र',
-						sat => 'शनि',
-						sun => 'रवि'
-					},
 					wide => {
 						mon => 'सोम दिन',
 						tue => 'मंगल दिन',
@@ -2003,9 +1996,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#न्यूयार्क#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#निपिगान#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#नोम#,
 		},
@@ -2027,9 +2017,6 @@ has 'time_zone_names' => (
 		'America/Panama' => {
 			exemplarCity => q#पनामा#,
 		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#पैंगनिरटंग#,
-		},
 		'America/Paramaribo' => {
 			exemplarCity => q#पारामारिबो#,
 		},
@@ -2050,9 +2037,6 @@ has 'time_zone_names' => (
 		},
 		'America/Punta_Arenas' => {
 			exemplarCity => q#पुंटा अरेनाज#,
-		},
-		'America/Rainy_River' => {
-			exemplarCity => q#रेनी रिवर#,
 		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#रेंकिन इनलेट#,
@@ -2114,9 +2098,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#तुले#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#थंडर बे#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#तिजुआना#,
 		},
@@ -2137,9 +2118,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#यकुटाट#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#येलोनाइफ#,
 		},
 		'America_Central' => {
 			long => {
@@ -2259,9 +2237,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#चिता#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#चोइबलसेन#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#कोलम्बो#,
@@ -2624,13 +2599,6 @@ has 'time_zone_names' => (
 				'standard' => q#चीनी मानत टाइम#,
 			},
 		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#चोइबलसेन समर टाइम#,
-				'generic' => q#चोइबलसेन टाइम#,
-				'standard' => q#चोइबलसेन मानक टाइम#,
-			},
-		},
 		'Christmas' => {
 			long => {
 				'standard' => q#क्रिसमस द्वीप टाइम#,
@@ -2830,9 +2798,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#उल्येनोबोस्क#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#उझोरोद#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#बेदुज#,
 		},
@@ -2853,9 +2818,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#जगरैब#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#जपोरोजाए#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#ज्यूरिख#,
@@ -3092,11 +3054,6 @@ has 'time_zone_names' => (
 				'standard' => q#लार्ड होबे मानक टाइम#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#मेक्वैरी द्वीप टाइम#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#मगादान समर टाइम#,
@@ -3119,13 +3076,6 @@ has 'time_zone_names' => (
 				'daylight' => q#मारीशस समर टाइम#,
 				'generic' => q#मारीशस टाइम#,
 				'standard' => q#मारीशस मानक टाइम#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#उत्तर-पश्चिमी मैक्सिको डेलाइट टाइम#,
-				'generic' => q#उत्तर-पश्चिमी मैक्सिको टाइम#,
-				'standard' => q#उत्तर-पश्चिमी मैक्सिको मानक टाइम#,
 			},
 		},
 		'Mexico_Pacific' => {

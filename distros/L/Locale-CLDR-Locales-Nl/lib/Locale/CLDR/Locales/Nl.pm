@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Nl - Package for language Dutch
 
 package Locale::CLDR::Locales::Nl;
 # This file auto generated from Data\common\main\nl.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -641,6 +641,7 @@ has 'display_name_language' => (
  				'bjn' => 'Banjar',
  				'bkm' => 'Kom',
  				'bla' => 'Siksika',
+ 				'blo' => 'Anii',
  				'bm' => 'Bambara',
  				'bn' => 'Bengaals',
  				'bo' => 'Tibetaans',
@@ -770,7 +771,6 @@ has 'display_name_language' => (
  				'gmh' => 'Middelhoogduits',
  				'gn' => 'Guaraní',
  				'goh' => 'Oudhoogduits',
- 				'gom' => 'Goa Konkani',
  				'gon' => 'Gondi',
  				'gor' => 'Gorontalo',
  				'got' => 'Gothisch',
@@ -881,6 +881,7 @@ has 'display_name_language' => (
  				'kv' => 'Komi',
  				'kw' => 'Cornish',
  				'kwk' => 'Kwakʼwala',
+ 				'kxv' => 'Kuvi',
  				'ky' => 'Kirgizisch',
  				'la' => 'Latijn',
  				'lad' => 'Ladino',
@@ -1174,6 +1175,7 @@ has 'display_name_language' => (
  				'vi' => 'Vietnamees',
  				'vls' => 'West-Vlaams',
  				'vmf' => 'Opperfrankisch',
+ 				'vmw' => 'Makhuwa',
  				'vo' => 'Volapük',
  				'vot' => 'Votisch',
  				'vro' => 'Võro',
@@ -1189,6 +1191,7 @@ has 'display_name_language' => (
  				'xal' => 'Kalmuks',
  				'xh' => 'Xhosa',
  				'xmf' => 'Mingreels',
+ 				'xnr' => 'Kangri',
  				'xog' => 'Soga',
  				'yao' => 'Yao',
  				'yap' => 'Yapees',
@@ -1232,7 +1235,6 @@ has 'display_name_script' => (
 			'Adlm' => 'Adlam',
  			'Afak' => 'Defaka',
  			'Aghb' => 'Kaukasisch Albanees',
- 			'Ahom' => 'Ahom',
  			'Arab' => 'Arabisch',
  			'Arab@alt=variant' => 'Perso-Arabisch',
  			'Aran' => 'Nastaliq',
@@ -1254,7 +1256,6 @@ has 'display_name_script' => (
  			'Cakm' => 'Chakma',
  			'Cans' => 'Verenigde Canadese Aboriginal-symbolen',
  			'Cari' => 'Carisch',
- 			'Cham' => 'Cham',
  			'Cher' => 'Cherokee',
  			'Chrs' => 'Chorasmisch',
  			'Cirt' => 'Cirth',
@@ -1302,7 +1303,6 @@ has 'display_name_script' => (
  			'Hung' => 'Oudhongaars',
  			'Inds' => 'Indus',
  			'Ital' => 'Oud-italisch',
- 			'Jamo' => 'Jamo',
  			'Java' => 'Javaans',
  			'Jpan' => 'Japans',
  			'Jurc' => 'Jurchen',
@@ -1341,7 +1341,6 @@ has 'display_name_script' => (
  			'Merc' => 'Meroitisch cursief',
  			'Mero' => 'Meroïtisch',
  			'Mlym' => 'Malayalam',
- 			'Modi' => 'Modi',
  			'Mong' => 'Mongools',
  			'Moon' => 'Moon',
  			'Mroo' => 'Mro',
@@ -1410,7 +1409,6 @@ has 'display_name_script' => (
  			'Tfng' => 'Tifinagh',
  			'Tglg' => 'Tagalog',
  			'Thaa' => 'Thaana',
- 			'Thai' => 'Thai',
  			'Tibt' => 'Tibetaans',
  			'Tirh' => 'Tirhuta',
  			'Tnsa' => 'Tangsa',
@@ -1974,7 +1972,6 @@ has 'display_name_type' => (
  				'phonebook' => q{Telefoonboeksorteervolgorde},
  				'phonetic' => q{Fonetische sorteervolgorde},
  				'pinyin' => q{Pinyinsorteervolgorde},
- 				'reformed' => q{Herziene sorteervolgorde},
  				'search' => q{algemeen zoeken},
  				'searchjl' => q{Zoeken op eerste Hangul-medeklinker},
  				'standard' => q{standaard sorteervolgorde},
@@ -2677,14 +2674,14 @@ has 'units' => (
 					'concentr-item' => {
 						'1' => q(neuter),
 						'name' => q(onderdelen),
-						'one' => q({0} onderdeel),
+						'one' => q({0} ond.),
 						'other' => q({0} onderdelen),
 					},
 					# Core Unit Identifier
 					'item' => {
 						'1' => q(neuter),
 						'name' => q(onderdelen),
-						'one' => q({0} onderdeel),
+						'one' => q({0} ond.),
 						'other' => q({0} onderdelen),
 					},
 					# Long Unit Identifier
@@ -2703,12 +2700,14 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'concentr-milligram-ofglucose-per-deciliter' => {
+						'1' => q(neuter),
 						'name' => q(milligram per deciliter),
 						'one' => q({0} milligram per deciliter),
 						'other' => q({0} milligram per deciliter),
 					},
 					# Core Unit Identifier
 					'milligram-ofglucose-per-deciliter' => {
+						'1' => q(neuter),
 						'name' => q(milligram per deciliter),
 						'one' => q({0} milligram per deciliter),
 						'other' => q({0} milligram per deciliter),
@@ -2780,6 +2779,14 @@ has 'units' => (
 						'name' => q(basispunt),
 						'one' => q({0} basispunt),
 						'other' => q({0} basispunten),
+					},
+					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'1' => q(common),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'1' => q(common),
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
@@ -3116,6 +3123,22 @@ has 'units' => (
 						'name' => q(nanoseconden),
 						'one' => q({0} nanoseconde),
 						'other' => q({0} nanoseconden),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'1' => q(common),
+						'name' => q(nachten),
+						'one' => q({0} nacht),
+						'other' => q({0} nachten),
+						'per' => q({0} per nacht),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'1' => q(common),
+						'name' => q(nachten),
+						'one' => q({0} nacht),
+						'other' => q({0} nachten),
+						'per' => q({0} per nacht),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -3799,11 +3822,13 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-point' => {
+						'1' => q(neuter),
 						'one' => q({0} punt),
 						'other' => q({0} punten),
 					},
 					# Core Unit Identifier
 					'point' => {
+						'1' => q(neuter),
 						'one' => q({0} punt),
 						'other' => q({0} punten),
 					},
@@ -4289,12 +4314,14 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'pressure-millimeter-ofhg' => {
+						'1' => q(neuter),
 						'name' => q(millimeter-kwikdruk),
 						'one' => q({0} millimeter-kwikdruk),
 						'other' => q({0} millimeter-kwikdruk),
 					},
 					# Core Unit Identifier
 					'millimeter-ofhg' => {
+						'1' => q(neuter),
 						'name' => q(millimeter-kwikdruk),
 						'one' => q({0} millimeter-kwikdruk),
 						'other' => q({0} millimeter-kwikdruk),
@@ -4312,6 +4339,14 @@ has 'units' => (
 						'name' => q(pascal),
 						'one' => q({0} pascal),
 						'other' => q({0} pascal),
+					},
+					# Long Unit Identifier
+					'speed-beaufort' => {
+						'1' => q(neuter),
+					},
+					# Core Unit Identifier
+					'beaufort' => {
+						'1' => q(neuter),
 					},
 					# Long Unit Identifier
 					'speed-kilometer-per-hour' => {
@@ -4338,6 +4373,20 @@ has 'units' => (
 						'name' => q(knoop),
 						'one' => q({0} knoop),
 						'other' => q({0} knopen),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'1' => q(neuter),
+						'name' => q(licht),
+						'one' => q({0} licht),
+						'other' => q({0} licht),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'1' => q(neuter),
+						'name' => q(licht),
+						'one' => q({0} licht),
+						'other' => q({0} licht),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -5026,6 +5075,20 @@ has 'units' => (
 						'per' => q({0}/m),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(nachten),
+						'one' => q({0} nacht),
+						'other' => q({0} nachten),
+						'per' => q({0}/nacht),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(nachten),
+						'one' => q({0} nacht),
+						'other' => q({0} nachten),
+						'per' => q({0}/nacht),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'name' => q(kw.),
 						'one' => q({0} kw.),
@@ -5144,14 +5207,24 @@ has 'units' => (
 						'other' => q({0} gr),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(licht),
+						'one' => q({0}licht),
+						'other' => q({0}licht),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(licht),
+						'one' => q({0}licht),
+						'other' => q({0}licht),
+					},
+					# Long Unit Identifier
 					'temperature-celsius' => {
-						'name' => q(°),
 						'one' => q({0}°),
 						'other' => q({0}°),
 					},
 					# Core Unit Identifier
 					'celsius' => {
-						'name' => q(°),
 						'one' => q({0}°),
 						'other' => q({0}°),
 					},
@@ -5358,13 +5431,13 @@ has 'units' => (
 					# Long Unit Identifier
 					'concentr-item' => {
 						'name' => q(onderdeel),
-						'one' => q({0} onderdeel),
+						'one' => q({0} ond.),
 						'other' => q({0} ond.),
 					},
 					# Core Unit Identifier
 					'item' => {
 						'name' => q(onderdeel),
-						'one' => q({0} onderdeel),
+						'one' => q({0} ond.),
 						'other' => q({0} ond.),
 					},
 					# Long Unit Identifier
@@ -5556,6 +5629,20 @@ has 'units' => (
 						'one' => q({0} mnd),
 						'other' => q({0} mnd),
 						'per' => q({0}/mnd),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(nachten),
+						'one' => q({0} nacht),
+						'other' => q({0} nachten),
+						'per' => q({0}/nacht),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(nachten),
+						'one' => q({0} nacht),
+						'other' => q({0} nachten),
+						'per' => q({0}/nacht),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -5860,12 +5947,16 @@ has 'units' => (
 						'other' => q({0} kt),
 					},
 					# Long Unit Identifier
-					'times' => {
-						'1' => q({0}{1}),
+					'speed-light-speed' => {
+						'name' => q(licht),
+						'one' => q({0} licht),
+						'other' => q({0} licht),
 					},
 					# Core Unit Identifier
-					'times' => {
-						'1' => q({0}{1}),
+					'light-speed' => {
+						'name' => q(licht),
+						'one' => q({0} licht),
+						'other' => q({0} licht),
 					},
 					# Long Unit Identifier
 					'torque-newton-meter' => {
@@ -7696,6 +7787,12 @@ has 'currencies' => (
 				'currency' => q(Oost-Caribische dollar),
 			},
 		},
+		'XCG' => {
+			symbol => 'Cg',
+			display_name => {
+				'currency' => q(Caribische gulden),
+			},
+		},
 		'XDR' => {
 			display_name => {
 				'currency' => q(Special Drawing Rights),
@@ -9490,9 +9587,9 @@ has 'time_zone_names' => (
 		},
 		'Alaska' => {
 			long => {
-				'daylight' => q#Alaska Daylight Time#,
-				'generic' => q#Alaska Time#,
-				'standard' => q#Alaska Standard Time#,
+				'daylight' => q#Alaska-zomertijd#,
+				'generic' => q#Alaska-tijd#,
+				'standard' => q#Alaska-standaardtijd#,
 			},
 			short => {
 				'daylight' => q#AKDT#,
@@ -9509,9 +9606,9 @@ has 'time_zone_names' => (
 		},
 		'Amazon' => {
 			long => {
-				'daylight' => q#Amazon Summer Time#,
-				'generic' => q#Amazon Time#,
-				'standard' => q#Amazon Standard Time#,
+				'daylight' => q#Amazone-zomertijd#,
+				'generic' => q#Amazone-tijd#,
+				'standard' => q#Amazone-standaardtijd#,
 			},
 		},
 		'America/Argentina/Rio_Gallegos' => {
@@ -9519,9 +9616,6 @@ has 'time_zone_names' => (
 		},
 		'America/Argentina/Tucuman' => {
 			exemplarCity => q#Tucumán#,
-		},
-		'America/Asuncion' => {
-			exemplarCity => q#Asunción#,
 		},
 		'America/Belem' => {
 			exemplarCity => q#Belém#,
@@ -9534,9 +9628,6 @@ has 'time_zone_names' => (
 		},
 		'America/Cuiaba' => {
 			exemplarCity => q#Cuiabá#,
-		},
-		'America/Curacao' => {
-			exemplarCity => q#Curaçao#,
 		},
 		'America/Lower_Princes' => {
 			exemplarCity => q#Beneden Prinsen Kwartier#,
@@ -9558,9 +9649,6 @@ has 'time_zone_names' => (
 		},
 		'America/North_Dakota/New_Salem' => {
 			exemplarCity => q#New Salem, Noord-Dakota#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#Santa Isabel#,
 		},
 		'America/Sao_Paulo' => {
 			exemplarCity => q#São Paulo#,
@@ -9585,9 +9673,9 @@ has 'time_zone_names' => (
 		},
 		'America_Central' => {
 			long => {
-				'daylight' => q#Central Daylight Time#,
-				'generic' => q#Central Time#,
-				'standard' => q#Central Standard Time#,
+				'daylight' => q#Central-zomertijd#,
+				'generic' => q#Central-tijd#,
+				'standard' => q#Central-standaardtijd#,
 			},
 			short => {
 				'daylight' => q#CDT#,
@@ -9597,9 +9685,9 @@ has 'time_zone_names' => (
 		},
 		'America_Eastern' => {
 			long => {
-				'daylight' => q#Eastern Daylight Time#,
-				'generic' => q#Eastern Time#,
-				'standard' => q#Eastern Standard Time#,
+				'daylight' => q#Eastern-zomertijd#,
+				'generic' => q#Eastern-tijd#,
+				'standard' => q#Eastern-standaardtijd#,
 			},
 			short => {
 				'daylight' => q#EDT#,
@@ -9609,9 +9697,9 @@ has 'time_zone_names' => (
 		},
 		'America_Mountain' => {
 			long => {
-				'daylight' => q#Mountain Daylight Time#,
-				'generic' => q#Mountain Time#,
-				'standard' => q#Mountain Standard Time#,
+				'daylight' => q#Mountain-zomertijd#,
+				'generic' => q#Mountain-tijd#,
+				'standard' => q#Mountain-standaardtijd#,
 			},
 			short => {
 				'daylight' => q#MDT#,
@@ -9621,9 +9709,9 @@ has 'time_zone_names' => (
 		},
 		'America_Pacific' => {
 			long => {
-				'daylight' => q#Pacific Daylight Time#,
-				'generic' => q#Pacific Time#,
-				'standard' => q#Pacific Standard Time#,
+				'daylight' => q#Pacific-zomertijd#,
+				'generic' => q#Pacific-tijd#,
+				'standard' => q#Pacific-standaardtijd#,
 			},
 			short => {
 				'daylight' => q#PDT#,
@@ -9668,16 +9756,16 @@ has 'time_zone_names' => (
 		},
 		'Argentina' => {
 			long => {
-				'daylight' => q#Argentina Summer Time#,
-				'generic' => q#Argentina Time#,
-				'standard' => q#Argentina Standard Time#,
+				'daylight' => q#Argentijnse zomertijd#,
+				'generic' => q#Argentijnse tijd#,
+				'standard' => q#Argentijnse standaardtijd#,
 			},
 		},
 		'Argentina_Western' => {
 			long => {
-				'daylight' => q#Western Argentina Summer Time#,
-				'generic' => q#Western Argentina Time#,
-				'standard' => q#Western Argentina Standard Time#,
+				'daylight' => q#West-Argentijnse zomertijd#,
+				'generic' => q#West-Argentijnse tijd#,
+				'standard' => q#West-Argentijnse standaardtijd#,
 			},
 		},
 		'Armenia' => {
@@ -9716,9 +9804,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Calcutta' => {
 			exemplarCity => q#Calcutta#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#Tsjojbalsan#,
 		},
 		'Asia/Dushanbe' => {
 			exemplarCity => q#Doesjanbe#,
@@ -9782,9 +9867,9 @@ has 'time_zone_names' => (
 		},
 		'Atlantic' => {
 			long => {
-				'daylight' => q#Atlantic Daylight Time#,
-				'generic' => q#Atlantic Time#,
-				'standard' => q#Atlantic Standard Time#,
+				'daylight' => q#Atlantic-zomertijd#,
+				'generic' => q#Atlantic-tijd#,
+				'standard' => q#Atlantic-standaardtijd#,
 			},
 			short => {
 				'daylight' => q#ADT#,
@@ -9809,9 +9894,6 @@ has 'time_zone_names' => (
 		},
 		'Atlantic/St_Helena' => {
 			exemplarCity => q#Sint-Helena#,
-		},
-		'Australia/Currie' => {
-			exemplarCity => q#Currie#,
 		},
 		'Australia_Central' => {
 			long => {
@@ -9869,14 +9951,14 @@ has 'time_zone_names' => (
 		},
 		'Bolivia' => {
 			long => {
-				'standard' => q#Bolivia Time#,
+				'standard' => q#Boliviaanse tijd#,
 			},
 		},
 		'Brasilia' => {
 			long => {
-				'daylight' => q#Brasilia Summer Time#,
-				'generic' => q#Brasilia Time#,
-				'standard' => q#Brasilia Standard Time#,
+				'daylight' => q#Braziliaanse zomertijd#,
+				'generic' => q#Braziliaanse tijd#,
+				'standard' => q#Braziliaanse standaardtijd#,
 			},
 		},
 		'Brunei' => {
@@ -9910,9 +9992,9 @@ has 'time_zone_names' => (
 		},
 		'Chile' => {
 			long => {
-				'daylight' => q#Chile Summer Time#,
-				'generic' => q#Chile Time#,
-				'standard' => q#Chile Standard Time#,
+				'daylight' => q#Chileense zomertijd#,
+				'generic' => q#Chileense tijd#,
+				'standard' => q#Chileense standaardtijd#,
 			},
 		},
 		'China' => {
@@ -9920,13 +10002,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Chinese zomertijd#,
 				'generic' => q#Chinese tijd#,
 				'standard' => q#Chinese standaardtijd#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Tsjojbalsan-zomertijd#,
-				'generic' => q#Tsjojbalsan-tijd#,
-				'standard' => q#Tsjojbalsan-standaardtijd#,
 			},
 		},
 		'Christmas' => {
@@ -9941,9 +10016,9 @@ has 'time_zone_names' => (
 		},
 		'Colombia' => {
 			long => {
-				'daylight' => q#Colombia Summer Time#,
-				'generic' => q#Colombia Time#,
-				'standard' => q#Colombia Standard Time#,
+				'daylight' => q#Colombiaanse zomertijd#,
+				'generic' => q#Colombiaanse tijd#,
+				'standard' => q#Colombiaanse standaardtijd#,
 			},
 		},
 		'Cook' => {
@@ -9955,9 +10030,9 @@ has 'time_zone_names' => (
 		},
 		'Cuba' => {
 			long => {
-				'daylight' => q#Cuba Daylight Time#,
-				'generic' => q#Cuba Time#,
-				'standard' => q#Cuba Standard Time#,
+				'daylight' => q#Cubaanse zomertijd#,
+				'generic' => q#Cubaanse tijd#,
+				'standard' => q#Cubaanse standaardtijd#,
 			},
 		},
 		'Davis' => {
@@ -9977,14 +10052,14 @@ has 'time_zone_names' => (
 		},
 		'Easter' => {
 			long => {
-				'daylight' => q#Easter Island Summer Time#,
-				'generic' => q#Easter Island Time#,
-				'standard' => q#Easter Island Standard Time#,
+				'daylight' => q#Paaseilandse zomertijd#,
+				'generic' => q#Paaseilandse tijd#,
+				'standard' => q#Paaseilandse standaardtijd#,
 			},
 		},
 		'Ecuador' => {
 			long => {
-				'standard' => q#Ecuador Time#,
+				'standard' => q#Ecuadoraanse tijd#,
 			},
 		},
 		'Etc/UTC' => {
@@ -10051,9 +10126,6 @@ has 'time_zone_names' => (
 		'Europe/Tirane' => {
 			exemplarCity => q#Tirana#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#Oezjhorod#,
-		},
 		'Europe/Vatican' => {
 			exemplarCity => q#Vaticaanstad#,
 		},
@@ -10065,9 +10137,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Warsaw' => {
 			exemplarCity => q#Warschau#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#Zaporizja#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#Zürich#,
@@ -10115,9 +10184,9 @@ has 'time_zone_names' => (
 		},
 		'Falkland' => {
 			long => {
-				'daylight' => q#Falkland Islands Summer Time#,
-				'generic' => q#Falkland Islands Time#,
-				'standard' => q#Falkland Islands Standard Time#,
+				'daylight' => q#Falklandeilandse zomertijd#,
+				'generic' => q#Falklandeilandse tijd#,
+				'standard' => q#Falklandeilandse standaardtijd#,
 			},
 		},
 		'Fiji' => {
@@ -10129,7 +10198,7 @@ has 'time_zone_names' => (
 		},
 		'French_Guiana' => {
 			long => {
-				'standard' => q#French Guiana Time#,
+				'standard' => q#Frans-Guyaanse tijd#,
 			},
 		},
 		'French_Southern' => {
@@ -10147,7 +10216,7 @@ has 'time_zone_names' => (
 		},
 		'Galapagos' => {
 			long => {
-				'standard' => q#Galapagos Time#,
+				'standard' => q#Galapagoseilandse tijd#,
 			},
 		},
 		'Gambier' => {
@@ -10169,16 +10238,16 @@ has 'time_zone_names' => (
 		},
 		'Greenland_Eastern' => {
 			long => {
-				'daylight' => q#East Greenland Summer Time#,
-				'generic' => q#East Greenland Time#,
-				'standard' => q#East Greenland Standard Time#,
+				'daylight' => q#Oost-Groenlandse zomertijd#,
+				'generic' => q#Oost-Groenlandse tijd#,
+				'standard' => q#Oost-Groenlandse standaardtijd#,
 			},
 		},
 		'Greenland_Western' => {
 			long => {
-				'daylight' => q#West Greenland Summer Time#,
-				'generic' => q#West Greenland Time#,
-				'standard' => q#West Greenland Standard Time#,
+				'daylight' => q#West-Groenlandse zomertijd#,
+				'generic' => q#West-Groenlandse tijd#,
+				'standard' => q#West-Groenlandse standaardtijd#,
 			},
 		},
 		'Guam' => {
@@ -10193,14 +10262,14 @@ has 'time_zone_names' => (
 		},
 		'Guyana' => {
 			long => {
-				'standard' => q#Guyana Time#,
+				'standard' => q#Guyaanse tijd#,
 			},
 		},
 		'Hawaii_Aleutian' => {
 			long => {
-				'daylight' => q#Hawaii-Aleutian Daylight Time#,
-				'generic' => q#Hawaii-Aleutian Time#,
-				'standard' => q#Hawaii-Aleutian Standard Time#,
+				'daylight' => q#Hawaii-Aleoetische zomertijd#,
+				'generic' => q#Hawaii-Aleoetische tijd#,
+				'standard' => q#Hawaii-Aleoetische standaardtijd#,
 			},
 			short => {
 				'daylight' => q#HADT#,
@@ -10241,9 +10310,6 @@ has 'time_zone_names' => (
 		},
 		'Indian/Maldives' => {
 			exemplarCity => q#Maldiven#,
-		},
-		'Indian/Reunion' => {
-			exemplarCity => q#Réunion#,
 		},
 		'Indian_Ocean' => {
 			long => {
@@ -10305,6 +10371,11 @@ has 'time_zone_names' => (
 				'standard' => q#Petropavlovsk-Kamtsjatski-standaardtijd#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Kazachse tijd#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#Oost-Kazachse tijd#,
@@ -10363,11 +10434,6 @@ has 'time_zone_names' => (
 				'standard' => q#Macause standaardtijd#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Macquarie-eilandse tijd#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Magadan-zomertijd#,
@@ -10407,18 +10473,11 @@ has 'time_zone_names' => (
 				'standard' => q#Mawson-tijd#,
 			},
 		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Northwest Mexico Daylight Time#,
-				'generic' => q#Northwest Mexico Time#,
-				'standard' => q#Northwest Mexico Standard Time#,
-			},
-		},
 		'Mexico_Pacific' => {
 			long => {
-				'daylight' => q#Mexican Pacific Daylight Time#,
-				'generic' => q#Mexican Pacific Time#,
-				'standard' => q#Mexican Pacific Standard Time#,
+				'daylight' => q#Mexicaanse Pacific-zomertijd#,
+				'generic' => q#Mexicaanse Pacific-tijd#,
+				'standard' => q#Mexicaanse Pacific-standaardtijd#,
 			},
 		},
 		'Mongolia' => {
@@ -10466,9 +10525,9 @@ has 'time_zone_names' => (
 		},
 		'Newfoundland' => {
 			long => {
-				'daylight' => q#Newfoundland Daylight Time#,
-				'generic' => q#Newfoundland Time#,
-				'standard' => q#Newfoundland Standard Time#,
+				'daylight' => q#Newfoundland-zomertijd#,
+				'generic' => q#Newfoundland-tijd#,
+				'standard' => q#Newfoundland-standaardtijd#,
 			},
 		},
 		'Niue' => {
@@ -10485,9 +10544,9 @@ has 'time_zone_names' => (
 		},
 		'Noronha' => {
 			long => {
-				'daylight' => q#Fernando de Noronha Summer Time#,
-				'generic' => q#Fernando de Noronha Time#,
-				'standard' => q#Fernando de Noronha Standard Time#,
+				'daylight' => q#Fernando de Noronha-zomertijd#,
+				'generic' => q#Fernando de Noronha-tijd#,
+				'standard' => q#Fernando de Noronha-standaardtijd#,
 			},
 		},
 		'North_Mariana' => {
@@ -10551,16 +10610,16 @@ has 'time_zone_names' => (
 		},
 		'Paraguay' => {
 			long => {
-				'daylight' => q#Paraguay Summer Time#,
-				'generic' => q#Paraguay Time#,
-				'standard' => q#Paraguay Standard Time#,
+				'daylight' => q#Paraguayaanse zomertijd#,
+				'generic' => q#Paraguayaanse tijd#,
+				'standard' => q#Paraguayaanse standaardtijd#,
 			},
 		},
 		'Peru' => {
 			long => {
-				'daylight' => q#Peru Summer Time#,
-				'generic' => q#Peru Time#,
-				'standard' => q#Peru Standard Time#,
+				'daylight' => q#Peruaanse zomertijd#,
+				'generic' => q#Peruaanse tijd#,
+				'standard' => q#Peruaanse standaardtijd#,
 			},
 		},
 		'Philippines' => {
@@ -10577,9 +10636,9 @@ has 'time_zone_names' => (
 		},
 		'Pierre_Miquelon' => {
 			long => {
-				'daylight' => q#St. Pierre & Miquelon Daylight Time#,
-				'generic' => q#St. Pierre & Miquelon Time#,
-				'standard' => q#St. Pierre & Miquelon Standard Time#,
+				'daylight' => q#Saint Pierre en Miquelon-zomertijd#,
+				'generic' => q#Saint Pierre en Miquelon-tijd#,
+				'standard' => q#Saint Pierre en Miquelon-standaardtijd#,
 			},
 		},
 		'Pitcairn' => {
@@ -10714,8 +10773,8 @@ has 'time_zone_names' => (
 		'Uruguay' => {
 			long => {
 				'daylight' => q#Uruguayaanse zomertijd#,
-				'generic' => q#Uruguay Time#,
-				'standard' => q#Uruguay Standard Time#,
+				'generic' => q#Uruguayaanse tijd#,
+				'standard' => q#Uruguayaanse standaardtijd#,
 			},
 		},
 		'Uzbekistan' => {
@@ -10782,7 +10841,7 @@ has 'time_zone_names' => (
 		},
 		'Yukon' => {
 			long => {
-				'standard' => q#Yukon Time#,
+				'standard' => q#Yukon-tijd#,
 			},
 		},
 	 } }

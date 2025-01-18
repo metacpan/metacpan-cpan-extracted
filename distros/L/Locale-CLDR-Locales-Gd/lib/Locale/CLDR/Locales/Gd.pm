@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Gd - Package for language Scottish Gaelic
 
 package Locale::CLDR::Locales::Gd;
 # This file auto generated from Data\common\main\gd.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -101,6 +101,8 @@ has 'display_name_language' => (
  				'bjn' => 'Banjar',
  				'bkm' => 'Kom',
  				'bla' => 'Siksika',
+ 				'blo' => 'Anii',
+ 				'blt' => 'Tai Dam',
  				'bm' => 'Bambara',
  				'bn' => 'Bangla',
  				'bo' => 'Tibeitis',
@@ -136,6 +138,7 @@ has 'display_name_language' => (
  				'chp' => 'Chipewyan',
  				'chr' => 'Cherokee',
  				'chy' => 'Cheyenne',
+ 				'cic' => 'Chickasaw',
  				'ckb' => 'Cùrdais Mheadhanach',
  				'ckb@alt=variant' => 'Cùrdais Sorani',
  				'clc' => 'Chilcotin',
@@ -241,7 +244,6 @@ has 'display_name_language' => (
  				'gmh' => 'Meadhan-Àrd-Gearmailtis',
  				'gn' => 'Guaraní',
  				'goh' => 'Seann-Àrd-Gearmailtis',
- 				'gom' => 'Konkani Goa',
  				'gon' => 'Gondi',
  				'gor' => 'Gorontalo',
  				'got' => 'Gotais',
@@ -266,6 +268,7 @@ has 'display_name_language' => (
  				'hil' => 'Hiligaynon',
  				'hit' => 'Cànan Het',
  				'hmn' => 'Hmong',
+ 				'hnj' => 'Hmong Njua',
  				'ho' => 'Hiri Motu',
  				'hr' => 'Cròthaisis',
  				'hsb' => 'Sòrbais Uachdarach',
@@ -349,6 +352,7 @@ has 'display_name_language' => (
  				'kv' => 'Komi',
  				'kw' => 'Còrnais',
  				'kwk' => 'Kwakʼwala',
+ 				'kxv' => 'Kuvi',
  				'ky' => 'Cìorgasais',
  				'la' => 'Laideann',
  				'lad' => 'Ladino',
@@ -363,6 +367,7 @@ has 'display_name_language' => (
  				'lij' => 'Liogùrais',
  				'lil' => 'Lillooet',
  				'lkt' => 'Lakhóta',
+ 				'lld' => 'Ladainis',
  				'lmo' => 'Lombardais',
  				'ln' => 'Lingala',
  				'lo' => 'Làtho',
@@ -372,6 +377,7 @@ has 'display_name_language' => (
  				'lrc' => 'Luri Thuathach',
  				'lsm' => 'Saamia',
  				'lt' => 'Liotuainis',
+ 				'ltg' => 'Latgailis',
  				'lu' => 'Luba-Katanga',
  				'lua' => 'Luba-Lulua',
  				'lui' => 'Luiseño',
@@ -400,6 +406,7 @@ has 'display_name_language' => (
  				'mgh' => 'Makhuwa-Meetto',
  				'mgo' => 'Meta’',
  				'mh' => 'Marshallais',
+ 				'mhn' => 'Mócheno',
  				'mi' => 'Māori',
  				'mic' => 'Mi’kmaq',
  				'min' => 'Minangkabau',
@@ -547,6 +554,7 @@ has 'display_name_language' => (
  				'si' => 'Sinhala',
  				'sid' => 'Sidamo',
  				'sk' => 'Slòbhacais',
+ 				'skr' => 'Saraiki',
  				'sl' => 'Slòbhainis',
  				'slh' => 'Lushootseed Dheasach',
  				'sly' => 'Selayar',
@@ -576,6 +584,7 @@ has 'display_name_language' => (
  				'swb' => 'Comorais',
  				'syc' => 'Suraidheac Chlasaigeach',
  				'syr' => 'Suraidheac',
+ 				'szl' => 'Sileisis',
  				'ta' => 'Taimilis',
  				'tce' => 'Tutchone Dheasach',
  				'tcy' => 'Tulu',
@@ -607,6 +616,7 @@ has 'display_name_language' => (
  				'tr' => 'Turcais',
  				'tru' => 'Turoyo',
  				'trv' => 'Taroko',
+ 				'trw' => 'Torwali',
  				'ts' => 'Tsonga',
  				'tsi' => 'Tsimshian',
  				'tt' => 'Tatarais',
@@ -632,6 +642,7 @@ has 'display_name_language' => (
  				'vep' => 'Veps',
  				'vi' => 'Bhiet-Namais',
  				'vls' => 'Flànrais Shiarach',
+ 				'vmw' => 'Makhuwa',
  				'vo' => 'Volapük',
  				'vro' => 'Võro',
  				'vun' => 'Vunjo',
@@ -645,6 +656,7 @@ has 'display_name_language' => (
  				'wuu' => 'Wu',
  				'xal' => 'Kalmyk',
  				'xh' => 'Xhosa',
+ 				'xnr' => 'Kangri',
  				'xog' => 'Soga',
  				'yao' => 'Yao',
  				'yap' => 'Cànan Yap',
@@ -691,13 +703,11 @@ has 'display_name_script' => (
 			'Adlm' => 'Adlam',
  			'Afak' => 'Afaka',
  			'Aghb' => 'Albàinis Chabhcasach',
- 			'Ahom' => 'Ahom',
  			'Arab' => 'Arabais',
  			'Aran' => 'Nastaliq',
  			'Armi' => 'Aramais impireil',
  			'Armn' => 'Airmeinis',
  			'Avst' => 'Avestanais',
- 			'Bali' => 'Bali',
  			'Bamu' => 'Bamum',
  			'Bass' => 'Bassa Vah',
  			'Batk' => 'Batak',
@@ -712,7 +722,6 @@ has 'display_name_script' => (
  			'Cakm' => 'Chakma',
  			'Cans' => 'Sgrìobhadh Lideach Aonaichte nan Tùsanach Canadach',
  			'Cari' => 'Carian',
- 			'Cham' => 'Cham',
  			'Cher' => 'Cherokee',
  			'Chrs' => 'Khwarazm',
  			'Cirt' => 'Cirth',
@@ -730,6 +739,7 @@ has 'display_name_script' => (
  			'Elba' => 'Elbasan',
  			'Elym' => 'Elymaidheach',
  			'Ethi' => 'Ge’ez',
+ 			'Gara' => 'Garay',
  			'Geor' => 'Cairtbheilis',
  			'Glag' => 'Glagoliticeach',
  			'Gong' => 'Gunjala Gondi',
@@ -738,6 +748,7 @@ has 'display_name_script' => (
  			'Gran' => 'Grantha',
  			'Grek' => 'Greugais',
  			'Gujr' => 'Gujarati',
+ 			'Gukh' => 'Gurung Khema',
  			'Guru' => 'Gurmukhi',
  			'Hanb' => 'Han le Bopomofo',
  			'Hang' => 'Hangul',
@@ -756,13 +767,12 @@ has 'display_name_script' => (
  			'Hrkt' => 'Katakana no Hiragana',
  			'Hung' => 'Seann-Ungarais',
  			'Ital' => 'Seann-Eadailtis',
- 			'Jamo' => 'Jamo',
  			'Java' => 'Deàbhanais',
  			'Jpan' => 'Seapanais',
  			'Jurc' => 'Jurchen',
  			'Kali' => 'Kayah Li',
  			'Kana' => 'Katakana',
- 			'Kawi' => 'Kawi',
+ 			'Kawi' => 'KAWI',
  			'Khar' => 'Kharoshthi',
  			'Khmr' => 'Cmèar',
  			'Khoj' => 'Khojki',
@@ -770,6 +780,7 @@ has 'display_name_script' => (
  			'Knda' => 'Kannada',
  			'Kore' => 'Coirèanais',
  			'Kpel' => 'Kpelle',
+ 			'Krai' => 'Kirat Rai',
  			'Kthi' => 'Kaithi',
  			'Lana' => 'Lanna',
  			'Laoo' => 'Làtho',
@@ -780,7 +791,7 @@ has 'display_name_script' => (
  			'Limb' => 'Limbu',
  			'Lina' => 'Linear A',
  			'Linb' => 'Linear B',
- 			'Lisu' => 'Lisu',
+ 			'Lisu' => 'Fraser',
  			'Loma' => 'Loma',
  			'Lyci' => 'Lycian',
  			'Lydi' => 'Lydian',
@@ -795,7 +806,6 @@ has 'display_name_script' => (
  			'Merc' => 'Meroiticeach ceangailte',
  			'Mero' => 'Meroiticeach',
  			'Mlym' => 'Malayalam',
- 			'Modi' => 'Modi',
  			'Mong' => 'Mongolais',
  			'Mroo' => 'Mro',
  			'Mtei' => 'Meitei Mayek',
@@ -805,12 +815,12 @@ has 'display_name_script' => (
  			'Nand' => 'Nandinagari',
  			'Narb' => 'Seann-Arabach Thuathach',
  			'Nbat' => 'Nabataean',
- 			'Newa' => 'Newa',
  			'Nkgb' => 'Naxi Geba',
  			'Nkoo' => 'N’ko',
  			'Nshu' => 'Nüshu',
  			'Ogam' => 'Ogham-chraobh',
  			'Olck' => 'Ol Chiki',
+ 			'Onao' => 'Ol Onal',
  			'Orkh' => 'Orkhon',
  			'Orya' => 'Oriya',
  			'Osge' => 'Osage',
@@ -845,8 +855,10 @@ has 'display_name_script' => (
  			'Sora' => 'Sora Sompeng',
  			'Soyo' => 'Soyombo',
  			'Sund' => 'Sunda',
+ 			'Sunu' => 'Sunuwar',
  			'Sylo' => 'Syloti Nagri',
  			'Syrc' => 'Suraidheac',
+ 			'Syre' => 'Suraidheac Estrangela',
  			'Syrj' => 'Suraidheac Siarach',
  			'Syrn' => 'Suraidheac Earach',
  			'Tagb' => 'Tagbanwa',
@@ -865,7 +877,8 @@ has 'display_name_script' => (
  			'Tibt' => 'Tibeitis',
  			'Tirh' => 'Tirhuta',
  			'Tnsa' => 'Tangsa',
- 			'Toto' => 'Toto',
+ 			'Todr' => 'Todhri',
+ 			'Tutg' => 'Tulu-Tigalari',
  			'Ugar' => 'Ugariticeach',
  			'Vaii' => 'Vai',
  			'Vith' => 'Vithkuqi',
@@ -1004,7 +1017,7 @@ has 'display_name_region' => (
  			'EA' => 'Ceuta agus Melilla',
  			'EC' => 'Eacuador',
  			'EE' => 'An Eastoin',
- 			'EG' => 'An Èiphit',
+ 			'EG' => 'An Èipheit',
  			'EH' => 'Sathara an Iar',
  			'ER' => 'Eartra',
  			'ES' => 'An Spàinnt',
@@ -1040,7 +1053,7 @@ has 'display_name_region' => (
  			'GY' => 'Guidheàna',
  			'HK' => 'Hong Kong SAR na Sìne',
  			'HK@alt=short' => 'Hong Kong',
- 			'HM' => 'Eilean Heard is MhicDhòmhnaill',
+ 			'HM' => 'Eilean Heard is Eileanan MhicDhòmhnaill',
  			'HN' => 'Hondùras',
  			'HR' => 'A’ Chròthais',
  			'HT' => 'Haidhti',
@@ -1396,7 +1409,6 @@ has 'display_name_type' => (
  				'gb2312han' => q{Òrdugh seòrsachaidh na Sìnise Simplichte - GB2312},
  				'phonebook' => q{Òrdugh seòrsachaidh nan leabhraichean-fòn},
  				'pinyin' => q{Òrdugh seòrsachaidh Pinyin},
- 				'reformed' => q{Òrdugh seòrsachaidh ath-leasaichte},
  				'search' => q{Lorg coitcheann},
  				'searchjl' => q{Lorg leis a’ chiad chonnrag Hangul},
  				'standard' => q{Òrdugh seòrsachaidh stannardach},
@@ -1446,12 +1458,14 @@ has 'display_name_type' => (
  				'diak' => q{Àireamhan Dives Akuru},
  				'ethi' => q{Àireamhan Itiopach},
  				'fullwide' => q{Àireamhan làn-leud},
+ 				'gara' => q{Àireamhan Garay},
  				'geor' => q{Àireamhan na Cairtbheilise},
  				'gong' => q{Àireamhan Gunjala Gondi},
  				'gonm' => q{Àireamhan Masaram Gondi},
  				'grek' => q{Àireamhan na Greugaise},
  				'greklow' => q{Àireamhan beaga na Greugaise},
  				'gujr' => q{Àireamhan Gujarati},
+ 				'gukh' => q{Àireamhan Gurung Khema},
  				'guru' => q{Àireamhan Gurmukhi},
  				'hanidec' => q{Àireamhan deicheach na Sìnise},
  				'hans' => q{Àireamhan na Sìnise Shimplichte},
@@ -1468,6 +1482,7 @@ has 'display_name_type' => (
  				'kawi' => q{Àireamhan Kawi},
  				'khmr' => q{Àireamhan Cmèar},
  				'knda' => q{Àireamhan Kannada},
+ 				'krai' => q{Àireamhan Kirat Rai},
  				'lana' => q{Àireamhan Tai Tham Hora},
  				'lanatham' => q{Àireamhan Tai Tham Tham},
  				'laoo' => q{Àireamhan Làtho},
@@ -1485,13 +1500,17 @@ has 'display_name_type' => (
  				'mroo' => q{Àireamhan Mro},
  				'mtei' => q{Àireamhan Meetei Mayek},
  				'mymr' => q{Àireamhan Miànmar},
+ 				'mymrepka' => q{Àireamhan Pwo Karen Miànmar an Ear},
+ 				'mymrpao' => q{Àireamhan Pao Miànmar},
  				'mymrshan' => q{Àireamhan Shan Miànmar},
  				'mymrtlng' => q{Àireamhan Tai Laing Miànmar},
  				'nagm' => q{Àireamhan Nag Mundari},
  				'nkoo' => q{Àireamhan N’Ko},
  				'olck' => q{Àireamhan Ol Chiki},
+ 				'onao' => q{Àireamhan Ol Onal},
  				'orya' => q{Àireamhan Odia},
  				'osma' => q{Àireamhan Osmanya},
+ 				'outlined' => q{Àireamhan oir-loidhnichte},
  				'rohg' => q{Àireamhan Hanifi Rohingya},
  				'roman' => q{Àireamhan Ròmanach},
  				'romanlow' => q{Àireamhan beaga Ròmanach},
@@ -1501,6 +1520,7 @@ has 'display_name_type' => (
  				'sinh' => q{Àireamhan Lith na Sinhala},
  				'sora' => q{Àireamhan Sora Sompeng},
  				'sund' => q{Àireamhan Sunda},
+ 				'sunu' => q{Àireamhan Sunuwar},
  				'takr' => q{Àireamhan Takri},
  				'talu' => q{Àireamhan Tai Lue Ùr},
  				'taml' => q{Àireamhan na Taimilise Tradaiseanta},
@@ -2210,6 +2230,22 @@ has 'units' => (
 						'two' => q({0} sna deich mìltean),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'few' => q({0} pàirtean sa bhillean),
+						'name' => q(pàirt sa bhillean),
+						'one' => q({0} phàirt sa bhillean),
+						'other' => q({0} pàirt sa bhillean),
+						'two' => q({0} phàirt sa bhillean),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'few' => q({0} pàirtean sa bhillean),
+						'name' => q(pàirt sa bhillean),
+						'one' => q({0} phàirt sa bhillean),
+						'other' => q({0} pàirt sa bhillean),
+						'two' => q({0} phàirt sa bhillean),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'few' => q({0} liotairean sa 100 chilemeatair),
 						'name' => q(liotair sa 100 chilemeatair),
@@ -2588,6 +2624,24 @@ has 'units' => (
 						'one' => q({0} nano-diog),
 						'other' => q({0} nano-diog),
 						'two' => q({0} nano-diog),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'few' => q({0} oidhcheannan),
+						'name' => q(oidhche),
+						'one' => q({0} oidhche),
+						'other' => q({0} oidhche),
+						'per' => q({0}/oidhche),
+						'two' => q({0} oidhche),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'few' => q({0} oidhcheannan),
+						'name' => q(oidhche),
+						'one' => q({0} oidhche),
+						'other' => q({0} oidhche),
+						'per' => q({0}/oidhche),
+						'two' => q({0} oidhche),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -4038,6 +4092,22 @@ has 'units' => (
 						'one' => q({0} mhìle mara san uair),
 						'other' => q({0} mìle mara san uair),
 						'two' => q({0} mhìle mara san uair),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'few' => q({0} solasan),
+						'name' => q(solas),
+						'one' => q({0} sholas),
+						'other' => q({0} solas),
+						'two' => q({0} sholas),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'few' => q({0} solasan),
+						'name' => q(solas),
+						'one' => q({0} sholas),
+						'other' => q({0} solas),
+						'two' => q({0} sholas),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -5018,6 +5088,20 @@ has 'units' => (
 						'name' => q(‱),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'few' => q({0}ppb),
+						'one' => q({0}ppb),
+						'other' => q({0}ppb),
+						'two' => q({0}ppb),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'few' => q({0}ppb),
+						'one' => q({0}ppb),
+						'other' => q({0}ppb),
+						'two' => q({0}ppb),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'few' => q({0}L/100km),
 						'one' => q({0}L/100km),
@@ -5368,6 +5452,24 @@ has 'units' => (
 						'one' => q({0}ns),
 						'other' => q({0}ns),
 						'two' => q({0}ns),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'few' => q({0}oidh.),
+						'name' => q(oidhche),
+						'one' => q({0}oidh.),
+						'other' => q({0}oidh.),
+						'per' => q({0}/oidh.),
+						'two' => q({0}oidh.),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'few' => q({0}oidh.),
+						'name' => q(oidhche),
+						'one' => q({0}oidh.),
+						'other' => q({0}oidh.),
+						'per' => q({0}/oidh.),
+						'two' => q({0}oidh.),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -6724,6 +6826,22 @@ has 'units' => (
 						'two' => q({0}kn),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'few' => q({0}solas.),
+						'name' => q(solas),
+						'one' => q({0}sholas),
+						'other' => q({0}solas),
+						'two' => q({0}sholas),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'few' => q({0}solas.),
+						'name' => q(solas),
+						'one' => q({0}sholas),
+						'other' => q({0}solas),
+						'two' => q({0}sholas),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'few' => q({0}m/s),
 						'name' => q(m/s),
@@ -7580,6 +7698,14 @@ has 'units' => (
 						'name' => q(sna deich mìltean),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(pàirt/billean),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(pàirt/billean),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-kilometer' => {
 						'name' => q(liotair/km),
 					},
@@ -7788,6 +7914,24 @@ has 'units' => (
 					# Core Unit Identifier
 					'nanosecond' => {
 						'name' => q(nano-diog),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'few' => q({0} oidhche.),
+						'name' => q(oidhche),
+						'one' => q({0} oidhche),
+						'other' => q({0} oidhche),
+						'per' => q({0}/oidhche),
+						'two' => q({0} oidhche),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'few' => q({0} oidhche.),
+						'name' => q(oidhche),
+						'one' => q({0} oidhche),
+						'other' => q({0} oidhche),
+						'per' => q({0}/oidhche),
+						'two' => q({0} oidhche),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -8344,6 +8488,22 @@ has 'units' => (
 					# Core Unit Identifier
 					'kilometer-per-hour' => {
 						'name' => q(km/uair),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'few' => q({0} solasan),
+						'name' => q(solas),
+						'one' => q({0} sholas),
+						'other' => q({0} solas),
+						'two' => q({0} sholas),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'few' => q({0} solasan),
+						'name' => q(solas),
+						'one' => q({0} sholas),
+						'other' => q({0} solas),
+						'two' => q({0} sholas),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -10010,20 +10170,20 @@ has 'currencies' => (
 		},
 		'ILR' => {
 			display_name => {
-				'currency' => q(Sheqel Iosraeleach \(1980–1985\)),
-				'few' => q(sheqel Iosraeleach \(1980–1985\)),
-				'one' => q(sheqel Iosraeleach \(1980–1985\)),
-				'other' => q(sheqel Iosraeleach \(1980–1985\)),
-				'two' => q(sheqel Iosraeleach \(1980–1985\)),
+				'currency' => q(Secel Iosraeleach \(1980–1985\)),
+				'few' => q(secelean Iosraeleach \(1980–1985\)),
+				'one' => q(shecel Iosraeleach \(1980–1985\)),
+				'other' => q(secel Iosraeleach \(1980–1985\)),
+				'two' => q(shecel Iosraeleach \(1980–1985\)),
 			},
 		},
 		'ILS' => {
 			display_name => {
-				'currency' => q(Sheqel ùr Iosraeleach),
-				'few' => q(sheqel ùr Iosraeleach),
-				'one' => q(sheqel ùr Iosraeleach),
-				'other' => q(sheqel ùr Iosraeleach),
-				'two' => q(sheqel ùr Iosraeleach),
+				'currency' => q(Secel ùr Iosraeleach),
+				'few' => q(secelean ùra Iosraeleach),
+				'one' => q(shecel ùr Iosraeleach),
+				'other' => q(secel ùr Iosraeleach),
+				'two' => q(shecel ùr Iosraeleach),
 			},
 		},
 		'INR' => {
@@ -11409,6 +11569,15 @@ has 'currencies' => (
 				'two' => q(dholar Caraibeach earach),
 			},
 		},
+		'XCG' => {
+			display_name => {
+				'currency' => q(Gulden Caraibeach),
+				'few' => q(gulden Caraibeach),
+				'one' => q(ghulden Caraibeach),
+				'other' => q(gulden Caraibeach),
+				'two' => q(ghulden Caraibeach),
+			},
+		},
 		'XDR' => {
 			display_name => {
 				'currency' => q(Còir tarraing shònraichte),
@@ -11962,7 +12131,7 @@ has 'date_formats' => (
 		'gregorian' => {
 			'full' => q{EEEE, d'mh' MMMM y},
 			'long' => q{d'mh' MMMM y},
-			'medium' => q{d MMM y},
+			'medium' => q{d'mh' MMM y},
 			'short' => q{dd/MM/y},
 		},
 		'roc' => {
@@ -12126,9 +12295,9 @@ has 'datetime_formats_available_formats' => (
 			yMEd => q{E, d/M/y},
 			yMM => q{LL/y},
 			yMMM => q{LLL Y},
-			yMMMEd => q{E, d'mh' MMM y},
+			yMMMEd => q{E, d MMM y},
 			yMMMM => q{LLLL y},
-			yMMMd => q{d'mh' MMM y},
+			yMMMd => q{d MMM y},
 			yMd => q{d/M/y},
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
@@ -12400,15 +12569,15 @@ has 'datetime_formats_interval' => (
 				y => q{y – y G},
 			},
 			GyM => {
-				G => q{L/y GGGGG – L/y GGGGG},
-				M => q{L/y – L/y GGGGG},
-				y => q{L/y – L/y GGGGG},
+				G => q{L/y G – L/y G},
+				M => q{L/y – L/y G},
+				y => q{L/y – L/y G},
 			},
 			GyMEd => {
-				G => q{E, d/M/y GGGGG – E, d/M/y GGGGG},
-				M => q{E, d/M/y – E, d/M/y GGGGG},
-				d => q{E, d/M/y – E, d/M/y GGGGG},
-				y => q{E, d/M/y – E, d/M/y GGGGG},
+				G => q{E, d/M/y G– E, d/M/y G},
+				M => q{E, d/M/y – E, d/M/y G},
+				d => q{E, d/M/y – E, d/M/y G},
+				y => q{E, d/M/y – E, d/M/y G},
 			},
 			GyMMM => {
 				G => q{LLL y G – LLL y G},
@@ -12428,10 +12597,10 @@ has 'datetime_formats_interval' => (
 				y => q{d MMM y – d MMM y G},
 			},
 			GyMd => {
-				G => q{d/M/y GGGGG – d/M/y GGGGG},
-				M => q{d/M/y – d/M/y GGGGG},
-				d => q{d/M/y – d/M/y GGGGG},
-				y => q{d/M/y – d/M/y GGGGG},
+				G => q{d/M/y G – d/M/y G},
+				M => q{d/M/y – d/M/y G},
+				d => q{d/M/y – d/M/y G},
+				y => q{d/M/y – d/M/y G},
 			},
 			H => {
 				H => q{HH – HH},
@@ -12459,7 +12628,7 @@ has 'datetime_formats_interval' => (
 			},
 			MMMEd => {
 				M => q{E, d MMM – E, d MMM},
-				d => q{E, d – E, d MMM},
+				d => q{E, d MMM – E, d MMM},
 			},
 			MMMd => {
 				M => q{d MMM – d MMM},
@@ -12508,7 +12677,7 @@ has 'datetime_formats_interval' => (
 			},
 			yMMMEd => {
 				M => q{E, d MMM – E, d MMM y},
-				d => q{E, d – E, d MMM y},
+				d => q{E, d MMM – E, d MMM y},
 				y => q{E, d MMM y – E, d MMM y},
 			},
 			yMMMM => {
@@ -12656,9 +12825,6 @@ has 'time_zone_names' => (
 		'Africa/Ndjamena' => {
 			exemplarCity => q#N’Djaména#,
 		},
-		'Africa/Sao_Tome' => {
-			exemplarCity => q#São Tomé#,
-		},
 		'Africa_Central' => {
 			long => {
 				'standard' => q#Àm Meadhan Afraga#,
@@ -12725,9 +12891,6 @@ has 'time_zone_names' => (
 		'America/Aruba' => {
 			exemplarCity => q#Arùba#,
 		},
-		'America/Asuncion' => {
-			exemplarCity => q#Asunción#,
-		},
 		'America/Belem' => {
 			exemplarCity => q#Belém#,
 		},
@@ -12748,9 +12911,6 @@ has 'time_zone_names' => (
 		},
 		'America/Cuiaba' => {
 			exemplarCity => q#Cuiabá#,
-		},
-		'America/Curacao' => {
-			exemplarCity => q#Curaçao#,
 		},
 		'America/Dominica' => {
 			exemplarCity => q#Doiminicea#,
@@ -12803,9 +12963,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#Nuadh Eabhrac#,
 		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#Pangniqtuuq#,
-		},
 		'America/Port_of_Spain' => {
 			exemplarCity => q#Port na Spàinne#,
 		},
@@ -12817,9 +12974,6 @@ has 'time_zone_names' => (
 		},
 		'America/Resolute' => {
 			exemplarCity => q#Qausuittuq#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#Santa Isabel#,
 		},
 		'America/Santarem' => {
 			exemplarCity => q#Santarém#,
@@ -12844,9 +12998,9 @@ has 'time_zone_names' => (
 		},
 		'America_Central' => {
 			long => {
-				'daylight' => q#Tìde samhraidh Meadhan Aimeireaga a Tuath#,
-				'generic' => q#Àm Meadhan Aimeireaga a Tuath#,
-				'standard' => q#Bun-àm Meadhan Aimeireaga a Tuath#,
+				'daylight' => q#Tìde samhraidh Meadhan Aimeireaga#,
+				'generic' => q#Àm Meadhan Aimeireaga#,
+				'standard' => q#Bun-àm Meadhan Aimeireaga#,
 			},
 			short => {
 				'daylight' => q#CDT#,
@@ -12856,9 +13010,9 @@ has 'time_zone_names' => (
 		},
 		'America_Eastern' => {
 			long => {
-				'daylight' => q#Tìde samhraidh Aimeireaga a Tuath an Ear#,
-				'generic' => q#Àm Aimeireaga a Tuath an Ear#,
-				'standard' => q#Bun-àm Aimeireaga a Tuath an Ear#,
+				'daylight' => q#Tìde samhraidh Aimeireaga an Ear#,
+				'generic' => q#Àm Aimeireaga an Ear#,
+				'standard' => q#Bun-àm Aimeireaga an Ear#,
 			},
 			short => {
 				'daylight' => q#EDT#,
@@ -12868,9 +13022,9 @@ has 'time_zone_names' => (
 		},
 		'America_Mountain' => {
 			long => {
-				'daylight' => q#Tìde samhraidh Monadh Aimeireaga a Tuath#,
-				'generic' => q#Àm Monadh Aimeireaga a Tuath#,
-				'standard' => q#Bun-àm Monadh Aimeireaga a Tuath#,
+				'daylight' => q#Tìde samhraidh Monadh Aimeireaga#,
+				'generic' => q#Àm Monadh Aimeireaga#,
+				'standard' => q#Bun-àm Monadh Aimeireaga#,
 			},
 			short => {
 				'daylight' => q#MDT#,
@@ -12880,9 +13034,9 @@ has 'time_zone_names' => (
 		},
 		'America_Pacific' => {
 			long => {
-				'daylight' => q#Tìde samhraidh a’ Chuain Sèimh#,
-				'generic' => q#Àm a’ Chuain Sèimh#,
-				'standard' => q#Bun-àm a’ Chuain Sèimh#,
+				'daylight' => q#Tìde samhraidh a’ Chuain Shèimh#,
+				'generic' => q#Àm a’ Chuain Shèimh#,
+				'standard' => q#Bun-àm a’ Chuain Shèimh#,
 			},
 			short => {
 				'daylight' => q#PDT#,
@@ -13032,9 +13186,9 @@ has 'time_zone_names' => (
 		},
 		'Atlantic' => {
 			long => {
-				'daylight' => q#Tìde samhraidh a’ Chuain Siar#,
-				'generic' => q#Àm a’ Chuain Siar#,
-				'standard' => q#Bun-àm a’ Chuain Siar#,
+				'daylight' => q#Tìde samhraidh a’ Chuain Shiar#,
+				'generic' => q#Àm a’ Chuain Shiar#,
+				'standard' => q#Bun-àm a’ Chuain Shiar#,
 			},
 			short => {
 				'daylight' => q#ADT#,
@@ -13065,9 +13219,6 @@ has 'time_zone_names' => (
 		},
 		'Atlantic/St_Helena' => {
 			exemplarCity => q#Eilean Naomh Eilidh#,
-		},
-		'Australia/Currie' => {
-			exemplarCity => q#Currie#,
 		},
 		'Australia/Sydney' => {
 			exemplarCity => q#Sidni#,
@@ -13179,13 +13330,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Tìde samhraidh na Sìne#,
 				'generic' => q#Àm na Sìne#,
 				'standard' => q#Bun-àm na Sìne#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Tìde samhraidh Choibalsan#,
-				'generic' => q#Àm Choibalsan#,
-				'standard' => q#Bun-àm Choibalsan#,
 			},
 		},
 		'Christmas' => {
@@ -13424,6 +13568,13 @@ has 'time_zone_names' => (
 				'standard' => q#Àm Eileanan Ghileabairt#,
 			},
 		},
+		'Greenland' => {
+			long => {
+				'daylight' => q#Tìde samhraidh na Graonlainne#,
+				'generic' => q#Àm na Graonlainne#,
+				'standard' => q#Bun-àm na Graonlainne#,
+			},
+		},
 		'Greenland_Eastern' => {
 			long => {
 				'daylight' => q#Tìde samhraidh na Graonlainn an Ear#,
@@ -13499,9 +13650,6 @@ has 'time_zone_names' => (
 		'Indian/Mauritius' => {
 			exemplarCity => q#Na h-Eileanan Mhoiriseas#,
 		},
-		'Indian/Reunion' => {
-			exemplarCity => q#Réunion#,
-		},
 		'Indian_Ocean' => {
 			long => {
 				'standard' => q#Àm Cuan nan Innseachan#,
@@ -13562,6 +13710,11 @@ has 'time_zone_names' => (
 				'standard' => q#Bun-àm Petropavlovsk-Kamchatsky#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Àm Casachstàin#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#Àm Casachstàin an Ear#,
@@ -13620,11 +13773,6 @@ has 'time_zone_names' => (
 				'standard' => q#Bun-àm Macàthu#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Àm Eilein MhicGuaire#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Tìde Samhraidh Magadan#,
@@ -13664,18 +13812,11 @@ has 'time_zone_names' => (
 				'standard' => q#Àm Mhawson#,
 			},
 		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Tìde samhraidh Mheagsago an Iar-thuath#,
-				'generic' => q#Àm Mheagsago an Iar-thuath#,
-				'standard' => q#Bun-àm Mheagsago an Iar-thuath#,
-			},
-		},
 		'Mexico_Pacific' => {
 			long => {
-				'daylight' => q#Tìde samhraidh a’ Chuain Sèimh Mheagsago#,
-				'generic' => q#Àm a’ Chuain Sèimh Mheagsago#,
-				'standard' => q#Bun-àm a’ Chuain Sèimh Mheagsago#,
+				'daylight' => q#Tìde samhraidh a’ Chuain Shèimh Mheagsago#,
+				'generic' => q#Àm a’ Chuain Shèimh Mheagsago#,
+				'standard' => q#Bun-àm a’ Chuain Shèimh Mheagsago#,
 			},
 		},
 		'Mongolia' => {

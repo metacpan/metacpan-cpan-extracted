@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Es::Latn::419 - Package for language Spanish
 
 package Locale::CLDR::Locales::Es::Latn::419;
 # This file auto generated from Data\common\main\es_419.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -209,7 +209,7 @@ has 'display_name_language' => (
  				'kbd' => 'cabardiano',
  				'krc' => 'karachái-bálkaro',
  				'ks' => 'cachemiro',
- 				'lo' => 'laosiano',
+ 				'lij' => 'genovés',
  				'ml' => 'malabar',
  				'mni' => 'manipuri',
  				'nr' => 'ndebele del sur',
@@ -228,6 +228,7 @@ has 'display_name_language' => (
  				'tet' => 'tetun',
  				'tyv' => 'tuvano',
  				'ug@alt=variant' => 'uighur',
+ 				'vec' => 'véneto',
  				'wal' => 'walamo',
  				'wuu' => 'wu',
  				'xal' => 'calmuco',
@@ -390,12 +391,16 @@ has 'units' => (
 						'other' => q({0} unidades de fuerza gravitacional),
 					},
 					# Long Unit Identifier
-					'concentr-milligram-ofglucose-per-deciliter' => {
-						'name' => q(mg/dL),
+					'concentr-portion-per-1e9' => {
+						'name' => q(partes por mil millones),
+						'one' => q({0} parte por mil millones),
+						'other' => q({0} partes por mil millones),
 					},
 					# Core Unit Identifier
-					'milligram-ofglucose-per-deciliter' => {
-						'name' => q(mg/dL),
+					'portion-per-1e9' => {
+						'name' => q(partes por mil millones),
+						'one' => q({0} parte por mil millones),
+						'other' => q({0} partes por mil millones),
 					},
 					# Long Unit Identifier
 					'electric-ampere' => {
@@ -510,6 +515,14 @@ has 'units' => (
 						'other' => q({0} caballos de fuerza),
 					},
 					# Long Unit Identifier
+					'speed-beaufort' => {
+						'1' => q(masculine),
+					},
+					# Core Unit Identifier
+					'beaufort' => {
+						'1' => q(masculine),
+					},
+					# Long Unit Identifier
 					'temperature-generic' => {
 						'one' => q({0}°),
 						'other' => q({0}°),
@@ -608,6 +621,16 @@ has 'units' => (
 						'per' => q({0}/m.),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'one' => q({0} noche),
+						'other' => q({0} noches),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'one' => q({0} noche),
+						'other' => q({0} noches),
+					},
+					# Long Unit Identifier
 					'duration-week' => {
 						'name' => q(sem.),
 						'one' => q({0}sem.),
@@ -632,16 +655,6 @@ has 'units' => (
 						'name' => q(a.),
 						'one' => q({0}a.),
 						'other' => q({0}aa.),
-					},
-					# Long Unit Identifier
-					'energy-calorie' => {
-						'one' => q({0} cal),
-						'other' => q({0}cal),
-					},
-					# Core Unit Identifier
-					'calorie' => {
-						'one' => q({0} cal),
-						'other' => q({0}cal),
 					},
 					# Long Unit Identifier
 					'energy-therm-us' => {
@@ -674,16 +687,26 @@ has 'units' => (
 						'other' => q({0}p),
 					},
 					# Long Unit Identifier
+					'length-astronomical-unit' => {
+						'one' => q({0}ua),
+						'other' => q({0}ua),
+					},
+					# Core Unit Identifier
+					'astronomical-unit' => {
+						'one' => q({0}ua),
+						'other' => q({0}ua),
+					},
+					# Long Unit Identifier
 					'length-light-year' => {
 						'name' => q(aa. l.),
 						'one' => q({0}a. l.),
-						'other' => q({0}a.a. l.),
+						'other' => q({0}aa. l.),
 					},
 					# Core Unit Identifier
 					'light-year' => {
 						'name' => q(aa. l.),
 						'one' => q({0}a. l.),
-						'other' => q({0}a.a. l.),
+						'other' => q({0}aa. l.),
 					},
 					# Long Unit Identifier
 					'length-mile-scandinavian' => {
@@ -714,16 +737,6 @@ has 'units' => (
 						'name' => q(parsec),
 					},
 					# Long Unit Identifier
-					'mass-ounce' => {
-						'one' => q({0} oz),
-						'other' => q({0}oz),
-					},
-					# Core Unit Identifier
-					'ounce' => {
-						'one' => q({0} oz),
-						'other' => q({0}oz),
-					},
-					# Long Unit Identifier
 					'mass-ounce-troy' => {
 						'one' => q({0}ozt),
 						'other' => q({0}ozt),
@@ -732,16 +745,6 @@ has 'units' => (
 					'ounce-troy' => {
 						'one' => q({0}ozt),
 						'other' => q({0}ozt),
-					},
-					# Long Unit Identifier
-					'mass-pound' => {
-						'one' => q({0} lb),
-						'other' => q({0}lb),
-					},
-					# Core Unit Identifier
-					'pound' => {
-						'one' => q({0} lb),
-						'other' => q({0}lb),
 					},
 					# Long Unit Identifier
 					'mass-ton' => {
@@ -772,6 +775,16 @@ has 'units' => (
 					'beaufort' => {
 						'one' => q(B {0}),
 						'other' => q(B {0}),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'one' => q({0} luz),
+						'other' => q({0} luz),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'one' => q({0} luz),
+						'other' => q({0} luz),
 					},
 					# Long Unit Identifier
 					'volume-acre-foot' => {
@@ -814,16 +827,6 @@ has 'units' => (
 						'name' => q(pt),
 						'one' => q({0}pt),
 						'other' => q({0}pt),
-					},
-					# Long Unit Identifier
-					'volume-quart-imperial' => {
-						'one' => q({0} qt imp.),
-						'other' => q({0}qt imp),
-					},
-					# Core Unit Identifier
-					'quart-imperial' => {
-						'one' => q({0} qt imp.),
-						'other' => q({0}qt imp),
 					},
 				},
 				'short' => {
@@ -1110,20 +1113,6 @@ has 'number_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		decimalFormat => {
-			'long' => {
-				'1000000000000' => {
-					'one' => '0 billón',
-					'other' => '0 billón',
-				},
-				'10000000000000' => {
-					'one' => '00 billones',
-					'other' => '00 billones',
-				},
-				'100000000000000' => {
-					'one' => '000 billones',
-					'other' => '000 billones',
-				},
-			},
 			'short' => {
 				'1000' => {
 					'one' => '0 K',
@@ -1220,6 +1209,20 @@ has 'currencies' => (
 				'currency' => q(córdoba nicaragüense),
 				'one' => q(córdoba nicaragüense),
 				'other' => q(córdobas nicaragüenses),
+			},
+		},
+		'SLE' => {
+			display_name => {
+				'currency' => q(leone),
+				'one' => q(leone),
+				'other' => q(leones),
+			},
+		},
+		'SLL' => {
+			display_name => {
+				'currency' => q(leones \(1964—2022\)),
+				'one' => q(leone \(1964—2022\)),
+				'other' => q(leones \(1964—2022\)),
 			},
 		},
 		'SSP' => {
@@ -2059,11 +2062,6 @@ has 'time_zone_names' => (
 		'India' => {
 			long => {
 				'standard' => q#hora de India#,
-			},
-		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#hora de la Isla Macquarie#,
 			},
 		},
 		'Marshall_Islands' => {

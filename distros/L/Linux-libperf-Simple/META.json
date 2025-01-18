@@ -54,6 +54,6 @@
          "web" : "https://github.com/tonycoz/perl5-linux-libperf-simple/"
       }
    },
-   "version" : "1.000",
+   "version" : "1.001",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

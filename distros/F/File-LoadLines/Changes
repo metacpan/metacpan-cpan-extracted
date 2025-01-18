@@ -1,5 +1,8 @@
 Revision history for File-LoadLines
 
+	Default fail to "hard" to prevent undefined warnings.
+	Accept data from IO::File handle.
+
 1.046	2024-02-17
 
 	Packaging changes. Nothing functional.

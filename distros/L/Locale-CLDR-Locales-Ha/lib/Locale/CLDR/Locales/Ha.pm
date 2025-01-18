@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Ha - Package for language Hausa
 
 package Locale::CLDR::Locales::Ha;
 # This file auto generated from Data\common\main\ha.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -71,6 +71,7 @@ has 'display_name_language' => (
  				'bi' => 'Bislama',
  				'bin' => 'Bini',
  				'bla' => 'Siksiká',
+ 				'blo' => 'Anii',
  				'bm' => 'Bambara',
  				'bn' => 'Bengali',
  				'bo' => 'Tibetan',
@@ -129,11 +130,8 @@ has 'display_name_language' => (
  				'el' => 'Girkanci',
  				'en' => 'Turanci',
  				'en_AU' => 'Turanci Ostareliya',
- 				'en_CA' => 'Turanci Kanada',
- 				'en_GB' => 'Turanci Biritaniya',
- 				'en_GB@alt=short' => 'Turancin Ingila',
- 				'en_US' => 'Turanci Amirka',
- 				'en_US@alt=short' => 'Turancin Amurka',
+ 				'en_GB@alt=short' => 'Turanci (Biritaniya)',
+ 				'en_US@alt=short' => 'Turanci (Amurka)',
  				'eo' => 'Esperanto',
  				'es' => 'Sifaniyanci',
  				'es_419' => 'Sifaniyancin Latin Amirka',
@@ -142,9 +140,9 @@ has 'display_name_language' => (
  				'et' => 'Istoniyanci',
  				'eu' => 'Basque',
  				'ewo' => 'Ewondo',
- 				'fa' => 'Farisa',
+ 				'fa' => 'Farisanci',
  				'fa_AF' => 'Farisanci na Afaganistan',
- 				'ff' => 'Fulah',
+ 				'ff' => 'Fula',
  				'fi' => 'Yaren mutanen Finland',
  				'fil' => 'Dan Filifin',
  				'fj' => 'Fijiyanci',
@@ -176,8 +174,7 @@ has 'display_name_language' => (
  				'hax' => 'Haida na Kudanci',
  				'he' => 'Ibrananci',
  				'hi' => 'Harshen Hindi',
- 				'hi_Latn' => 'Hindi (Latinanci)',
- 				'hi_Latn@alt=variant' => 'Hinglish',
+ 				'hi_Latn@alt=variant' => 'Harshen Hindi (Latin)',
  				'hil' => 'Hiligaynon',
  				'hmn' => 'Hmong',
  				'hr' => 'Kuroshiyan',
@@ -206,7 +203,7 @@ has 'display_name_language' => (
  				'jbo' => 'Lojban',
  				'jgo' => 'Ngomba',
  				'jmc' => 'Machame',
- 				'jv' => 'Jafananci',
+ 				'jv' => 'Javananci',
  				'ka' => 'Jojiyanci',
  				'kab' => 'Kabyle',
  				'kac' => 'Kachin',
@@ -229,7 +226,7 @@ has 'display_name_language' => (
  				'km' => 'Harshen Kimar',
  				'kmb' => 'Kimbundu',
  				'kn' => 'Kannada',
- 				'ko' => 'Harshen Koreya',
+ 				'ko' => 'Harshen Koriya',
  				'kok' => 'Konkananci',
  				'kpe' => 'Kpelle',
  				'kr' => 'Kanuri',
@@ -245,6 +242,7 @@ has 'display_name_language' => (
  				'kv' => 'Komi',
  				'kw' => 'Cornish',
  				'kwk' => 'Kwakʼwala',
+ 				'kxv' => 'Kavi',
  				'ky' => 'Kirgizanci',
  				'la' => 'Dan Kabilar Latin',
  				'lad' => 'Ladino',
@@ -253,8 +251,10 @@ has 'display_name_language' => (
  				'lez' => 'Lezghiniyanci',
  				'lg' => 'Ganda',
  				'li' => 'Limburgish',
+ 				'lij' => 'Liguriyanci',
  				'lil' => 'Lillooet',
  				'lkt' => 'Lakota',
+ 				'lmo' => 'Lombard',
  				'ln' => 'Lingala',
  				'lo' => 'Lao',
  				'lou' => 'Creole na Louisiana',
@@ -293,7 +293,7 @@ has 'display_name_language' => (
  				'moh' => 'Mohawk',
  				'mos' => 'Mossi',
  				'mr' => 'Maratinci',
- 				'ms' => 'Harshen Malai',
+ 				'ms' => 'Harshen Malay',
  				'mt' => 'Harshen Maltis',
  				'mua' => 'Mundang',
  				'mul' => 'Harsuna masu yawa',
@@ -364,7 +364,7 @@ has 'display_name_language' => (
  				'rwk' => 'Rwa',
  				'sa' => 'Sanskrit',
  				'sad' => 'Sandawe',
- 				'sah' => 'Sakha',
+ 				'sah' => 'Yakut',
  				'saq' => 'Samburu',
  				'sat' => 'Santali',
  				'sba' => 'Ngambay',
@@ -402,6 +402,7 @@ has 'display_name_language' => (
  				'sw' => 'Harshen Suwahili',
  				'swb' => 'Komoriyanci',
  				'syr' => 'Syriac',
+ 				'szl' => 'Silessiyanci',
  				'ta' => 'Tamil',
  				'tce' => 'Tutchone na Kudanci',
  				'te' => 'Telugu',
@@ -442,7 +443,9 @@ has 'display_name_language' => (
  				'uz' => 'Uzbek',
  				'vai' => 'Vai',
  				've' => 'Venda',
+ 				'vec' => 'Veneshiyanci',
  				'vi' => 'Harshen Biyetinam',
+ 				'vmw' => 'Makhuwa',
  				'vo' => 'Volapük',
  				'vun' => 'Vunjo',
  				'wa' => 'Walloon',
@@ -452,7 +455,8 @@ has 'display_name_language' => (
  				'wo' => 'Wolof',
  				'wuu' => 'Sinancin Wu',
  				'xal' => 'Kalmyk',
- 				'xh' => 'Bazosa',
+ 				'xh' => 'Xhosa',
+ 				'xnr' => 'Kangri',
  				'xog' => 'Soga',
  				'yav' => 'Yangben',
  				'ybb' => 'Yemba',
@@ -461,6 +465,7 @@ has 'display_name_language' => (
  				'yrl' => 'Nheengatu',
  				'yue' => 'Harshen Cantonese',
  				'yue@alt=menu' => 'Sinanci, Cantonese',
+ 				'za' => 'Zhuang',
  				'zgh' => 'Daidaitaccen Moroccan Tamazight',
  				'zh' => 'Harshen Sinanci',
  				'zh@alt=menu' => 'Harshen, Sinanci',
@@ -490,31 +495,30 @@ has 'display_name_script' => (
 			'Adlm' => 'Adlam',
  			'Arab' => 'Larabci',
  			'Aran' => 'Rubutun Nastaliq',
- 			'Armn' => 'Armeniyawa',
+ 			'Armn' => 'Armeniyanci',
  			'Beng' => 'Bangla',
  			'Bopo' => 'Bopomofo',
  			'Brai' => 'Rubutun Makafi',
  			'Cakm' => 'Chakma',
- 			'Cans' => 'Haɗaɗɗun Gaɓoɓin ʼYan Asali na Kanada',
+ 			'Cans' => 'Haɗaɗɗun Gaɓoɓin harshe na Asali na Kanada',
  			'Cher' => 'Cherokee',
  			'Cyrl' => 'Cyrillic',
  			'Deva' => 'Devanagari',
  			'Ethi' => 'Ethiopic',
  			'Geor' => 'Georgian',
- 			'Grek' => 'Girka',
+ 			'Grek' => 'Girkanci',
  			'Gujr' => 'Gujarati',
  			'Guru' => 'Gurmukhi',
  			'Hanb' => 'Han tare da Bopomofo',
  			'Hang' => 'Yaren Hangul',
  			'Hani' => 'Mutanen Han na ƙasar Sin',
- 			'Hans' => 'Sauƙaƙaƙƙen',
+ 			'Hans' => 'Sauƙaƙaƙƙe',
  			'Hans@alt=stand-alone' => 'Sauƙaƙaƙƙen Hans',
  			'Hant' => 'Na gargajiya',
  			'Hant@alt=stand-alone' => 'Han na gargajiya',
  			'Hebr' => 'Ibrananci',
  			'Hira' => 'Tsarin Rubutun Hiragana',
  			'Hrkt' => 'kalaman Jafananci',
- 			'Jamo' => 'Jamo',
  			'Jpan' => 'Jafanis',
  			'Kana' => 'Tsarin Rubutun Katakana',
  			'Khmr' => 'Yaren Khmer',
@@ -537,7 +541,6 @@ has 'display_name_script' => (
  			'Telu' => 'Yaren Telugu',
  			'Tfng' => 'Tifinagh',
  			'Thaa' => 'Yaren Thaana',
- 			'Thai' => 'Thai',
  			'Tibt' => 'Yaren Tibet',
  			'Vaii' => 'Vai',
  			'Yiii' => 'Yi',
@@ -581,7 +584,7 @@ has 'display_name_region' => (
  			'034' => 'Kudancin Asiya',
  			'035' => 'Kudu Maso Gabashin Asiya',
  			'039' => 'Kudancin Turai',
- 			'053' => 'Asturesiya',
+ 			'053' => 'Asturelasiya',
  			'054' => 'Melanesia',
  			'057' => 'Yankin Micronesiya',
  			'061' => 'Kasar Polynesia',
@@ -604,7 +607,7 @@ has 'display_name_region' => (
  			'AM' => 'Armeniya',
  			'AO' => 'Angola',
  			'AQ' => 'Antatika',
- 			'AR' => 'Arjantiniya',
+ 			'AR' => 'Ajentina',
  			'AS' => 'Samowa Ta Amurka',
  			'AT' => 'Ostiriya',
  			'AU' => 'Ostareliya',
@@ -613,11 +616,11 @@ has 'display_name_region' => (
  			'AZ' => 'Azarbaijan',
  			'BA' => 'Bosniya da Harzagobina',
  			'BB' => 'Barbadas',
- 			'BD' => 'Bangiladas',
+ 			'BD' => 'Bangladesh',
  			'BE' => 'Belgiyom',
  			'BF' => 'Burkina Faso',
  			'BG' => 'Bulgariya',
- 			'BH' => 'Baharan',
+ 			'BH' => 'Baharen',
  			'BI' => 'Burundi',
  			'BJ' => 'Binin',
  			'BL' => 'San Barthélemy',
@@ -641,19 +644,20 @@ has 'display_name_region' => (
  			'CG@alt=variant' => 'Jamhuriyar Kongo',
  			'CH' => 'Suwizalan',
  			'CI' => 'Aibari Kwas',
- 			'CK' => 'Tsibiran Kuku',
- 			'CL' => 'Cayile',
+ 			'CK' => 'Tsibiran Cook',
+ 			'CL' => 'Chile',
  			'CM' => 'Kamaru',
  			'CN' => 'Sin',
  			'CO' => 'Kolambiya',
  			'CP' => 'Tsibirin Clipperton',
  			'CR' => 'Kwasta Rika',
  			'CU' => 'Kyuba',
- 			'CV' => 'Tsibiran Kap Barde',
+ 			'CV' => 'Tsibiran Cape Verde',
  			'CW' => 'Ƙasar Curaçao',
  			'CX' => 'Tsibirin Kirsmati',
- 			'CY' => 'Sifurus',
- 			'CZ' => 'Jamhuriyar Cak',
+ 			'CY' => 'Saifurus',
+ 			'CZ' => 'Czechia',
+ 			'CZ@alt=variant' => 'Jamhuriyar Czech',
  			'DE' => 'Jamus',
  			'DG' => 'Tsibirn Diego Garcia',
  			'DJ' => 'Jibuti',
@@ -680,7 +684,7 @@ has 'display_name_region' => (
  			'GA' => 'Gabon',
  			'GB' => 'Biritaniya',
  			'GD' => 'Girnada',
- 			'GE' => 'Jiwarjiya',
+ 			'GE' => 'Jojiya',
  			'GF' => 'Gini Ta Faransa',
  			'GG' => 'Yankin Guernsey',
  			'GH' => 'Gana',
@@ -689,14 +693,15 @@ has 'display_name_region' => (
  			'GM' => 'Gambiya',
  			'GN' => 'Gini',
  			'GP' => 'Gwadaluf',
- 			'GQ' => 'Gini Ta Ikwaita',
+ 			'GQ' => 'Ikwatoriyal Gini',
  			'GR' => 'Girka',
  			'GS' => 'Kudancin Geogia da Kudancin Tsibirin Sandiwic',
  			'GT' => 'Gwatamala',
- 			'GU' => 'Gwam',
+ 			'GU' => 'Guam',
  			'GW' => 'Gini Bisau',
  			'GY' => 'Guyana',
  			'HK' => 'Babban Yankin Mulkin Hong Kong na Ƙasar Sin',
+ 			'HK@alt=short' => 'Hong Kong',
  			'HM' => 'Tsibirin Heard da McDonald',
  			'HN' => 'Yankin Honduras',
  			'HR' => 'Kurowaishiya',
@@ -706,7 +711,7 @@ has 'display_name_region' => (
  			'ID' => 'Indunusiya',
  			'IE' => 'Ayalan',
  			'IL' => 'Israʼila',
- 			'IM' => 'Isle na Mutum',
+ 			'IM' => 'Isle of Man',
  			'IN' => 'Indiya',
  			'IO' => 'Yankin Birtaniya Na Tekun Indiya',
  			'IQ' => 'Iraƙi',
@@ -725,10 +730,10 @@ has 'display_name_region' => (
  			'KN' => 'San Kiti Da Nebis',
  			'KP' => 'Koriya Ta Arewa',
  			'KR' => 'Koriya Ta Kudu',
- 			'KW' => 'Kwiyat',
+ 			'KW' => 'Kuwet',
  			'KY' => 'Tsibiran Kaiman',
  			'KZ' => 'Kazakistan',
- 			'LA' => 'Lawas',
+ 			'LA' => 'Lawos',
  			'LB' => 'Labanan',
  			'LC' => 'San Lusiya',
  			'LI' => 'Licansitan',
@@ -742,7 +747,7 @@ has 'display_name_region' => (
  			'MA' => 'Maroko',
  			'MC' => 'Monako',
  			'MD' => 'Maldoba',
- 			'ME' => 'Mantanegara',
+ 			'ME' => 'Manteneguro',
  			'MF' => 'San Martin',
  			'MG' => 'Madagaskar',
  			'MH' => 'Tsibiran Marshal',
@@ -751,6 +756,7 @@ has 'display_name_region' => (
  			'MM' => 'Burma, Miyamar',
  			'MN' => 'Mangoliya',
  			'MO' => 'Babban Yankin Mulkin Macao na Ƙasar Sin',
+ 			'MO@alt=short' => 'Macao',
  			'MP' => 'Tsibiran Mariyana Na Arewa',
  			'MQ' => 'Martinik',
  			'MR' => 'Moritaniya',
@@ -760,7 +766,7 @@ has 'display_name_region' => (
  			'MV' => 'Maldibi',
  			'MW' => 'Malawi',
  			'MX' => 'Mesiko',
- 			'MY' => 'Malaisiya',
+ 			'MY' => 'Malesiya',
  			'MZ' => 'Mozambik',
  			'NA' => 'Namibiya',
  			'NC' => 'Kaledoniya Sabuwa',
@@ -772,7 +778,7 @@ has 'display_name_region' => (
  			'NO' => 'Norwe',
  			'NP' => 'Nefal',
  			'NR' => 'Nauru',
- 			'NU' => 'Niyu',
+ 			'NU' => 'Niue',
  			'NZ' => 'Nuzilan',
  			'NZ@alt=variant' => 'Aotearoa Nuzilan',
  			'OM' => 'Oman',
@@ -784,7 +790,7 @@ has 'display_name_region' => (
  			'PK' => 'Pakistan',
  			'PL' => 'Polan',
  			'PM' => 'San Piyar da Mikelan',
- 			'PN' => 'Pitakarin',
+ 			'PN' => 'Tsibiran Pitcairn',
  			'PR' => 'Porto Riko',
  			'PS' => 'Yankunan Palasɗinu',
  			'PS@alt=short' => 'Palasɗinu',
@@ -828,7 +834,8 @@ has 'display_name_region' => (
  			'TH' => 'Tailan',
  			'TJ' => 'Tajikistan',
  			'TK' => 'Takelau',
- 			'TL' => 'Timor Ta Gabas',
+ 			'TL' => 'Timor-Leste',
+ 			'TL@alt=variant' => 'Timor ta Gabas',
  			'TM' => 'Turkumenistan',
  			'TN' => 'Tunisiya',
  			'TO' => 'Tonga',
@@ -844,7 +851,7 @@ has 'display_name_region' => (
  			'US' => 'Amurka',
  			'UY' => 'Yurigwai',
  			'UZ' => 'Uzubekistan',
- 			'VA' => 'Batikan',
+ 			'VA' => 'Birnin Batikan',
  			'VC' => 'San Binsan Da Girnadin',
  			'VE' => 'Benezuwela',
  			'VG' => 'Tsibirin Birjin Na Birtaniya',
@@ -853,10 +860,10 @@ has 'display_name_region' => (
  			'VU' => 'Banuwatu',
  			'WF' => 'Walis Da Futuna',
  			'WS' => 'Samoa',
- 			'XA' => 'Gogewar Kwalwa',
- 			'XB' => 'Gano wani abu ta hanyar amfani da fasaha',
+ 			'XA' => 'Gurɓataccen Karin harshe',
+ 			'XB' => 'Gurɓataccen Bidi',
  			'XK' => 'Kasar Kosovo',
- 			'YE' => 'Yamal',
+ 			'YE' => 'Yamen',
  			'YT' => 'Mayoti',
  			'ZA' => 'Afirka Ta Kudu',
  			'ZM' => 'Zambiya',
@@ -877,7 +884,7 @@ has 'display_name_key' => (
  			'cf' => 'Yanayin Kudi',
  			'collation' => 'Tsarin Rabewa',
  			'currency' => 'Kudin Kasa',
- 			'hc' => 'Zagayen Awowi',
+ 			'hc' => 'Zagayen Awowi (12 da 24)',
  			'lb' => 'Salo na Raba Layi',
  			'ms' => 'Tsarin Awo',
  			'numbers' => 'Lambobi',
@@ -920,7 +927,7 @@ has 'display_name_type' => (
  				'standard' => q{Daidaitaccen Kasawa},
  			},
  			'hc' => {
- 				'h11' => q{Tsarin Awowi 12(0–11)},
+ 				'h11' => q{Tsarin Awowi 12 (0–11)},
  				'h12' => q{Tsarin Awowi 12(1–12)},
  				'h23' => q{Tsarin Awowi 24(0–23)},
  				'h24' => q{Tsarin Awowi 24(1–24)},
@@ -989,8 +996,8 @@ has 'display_name_measurement_system' => (
 	default		=> sub {
 		{
 			'metric' => q{Tsarin awo},
- 			'UK' => q{Tsarin awo kasar Ingila},
- 			'US' => q{Amurka},
+ 			'UK' => q{Tsarin awon ƙasar Ingila},
+ 			'US' => q{Tsarin awon ƙasar Amurka},
 
 		}
 	},
@@ -1160,11 +1167,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'10p2' => {
-						'1' => q(hekta{0}),
+						'1' => q(hekto{0}),
 					},
 					# Core Unit Identifier
 					'10p2' => {
-						'1' => q(hekta{0}),
+						'1' => q(hekto{0}),
 					},
 					# Long Unit Identifier
 					'10p3' => {
@@ -1260,13 +1267,13 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'angle-revolution' => {
-						'name' => q(revolution),
+						'name' => q(revolutions),
 						'one' => q(revolution {0}),
 						'other' => q(revolutions {0}),
 					},
 					# Core Unit Identifier
 					'revolution' => {
-						'name' => q(revolution),
+						'name' => q(revolutions),
 						'one' => q(revolution {0}),
 						'other' => q(revolutions {0}),
 					},
@@ -1495,6 +1502,18 @@ has 'units' => (
 					'permyriad' => {
 						'one' => q(permyriad {0}),
 						'other' => q(permyriad {0}),
+					},
+					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(sashi a cikin biliyan),
+						'one' => q(sashi {0} a cikin biliyan),
+						'other' => q(sashi {0} a cikin biliyan),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(sashi a cikin biliyan),
+						'one' => q(sashi {0} a cikin biliyan),
+						'other' => q(sashi {0} a cikin biliyan),
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
@@ -1801,6 +1820,20 @@ has 'units' => (
 						'name' => q(nanosekan),
 						'one' => q(nanosekan {0}),
 						'other' => q(nanosekans {0}),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(darare),
+						'one' => q(dare {0}),
+						'other' => q(darare {0}),
+						'per' => q(dare {0}),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(darare),
+						'one' => q(dare {0}),
+						'other' => q(darare {0}),
+						'per' => q(dare {0}),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -2122,13 +2155,13 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'graphics-em' => {
-						'name' => q(typographic em),
+						'name' => q(typographic ems),
 						'one' => q(em {0}),
 						'other' => q({0} ems),
 					},
 					# Core Unit Identifier
 					'em' => {
-						'name' => q(typographic em),
+						'name' => q(typographic ems),
 						'one' => q(em {0}),
 						'other' => q({0} ems),
 					},
@@ -2338,13 +2371,13 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-mile-scandinavian' => {
-						'name' => q(mile-scandinavian),
+						'name' => q(miles-scandinavian),
 						'one' => q(mile-scandinavian {0}),
 						'other' => q(miles-scandinavian {0}),
 					},
 					# Core Unit Identifier
 					'mile-scandinavian' => {
-						'name' => q(mile-scandinavian),
+						'name' => q(miles-scandinavian),
 						'one' => q(mile-scandinavian {0}),
 						'other' => q(miles-scandinavian {0}),
 					},
@@ -2883,6 +2916,18 @@ has 'units' => (
 						'other' => q(knots {0}),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(haske),
+						'one' => q(haske {0}),
+						'other' => q(haske {0}),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(haske),
+						'one' => q(haske {0}),
+						'other' => q(haske {0}),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'name' => q(mitoci a daƙiƙa),
 						'one' => q(mita a daƙiƙa {0}),
@@ -2933,12 +2978,12 @@ has 'units' => (
 					# Long Unit Identifier
 					'temperature-generic' => {
 						'one' => q(Digirin yanayi {0}),
-						'other' => q(digiri-digiri {0}),
+						'other' => q(digiri-digirin yanayi {0}),
 					},
 					# Core Unit Identifier
 					'generic' => {
 						'one' => q(Digirin yanayi {0}),
-						'other' => q(digiri-digiri {0}),
+						'other' => q(digiri-digirin yanayi {0}),
 					},
 					# Long Unit Identifier
 					'temperature-kelvin' => {
@@ -2966,13 +3011,13 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'torque-pound-force-foot' => {
-						'name' => q(pound-feet),
+						'name' => q(pound-force-feet),
 						'one' => q(Pound-force-foot {0}),
 						'other' => q(pound-feet {0}),
 					},
 					# Core Unit Identifier
 					'pound-force-foot' => {
-						'name' => q(pound-feet),
+						'name' => q(pound-force-feet),
 						'one' => q(Pound-force-foot {0}),
 						'other' => q(pound-feet {0}),
 					},
@@ -3146,39 +3191,39 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'volume-dessert-spoon' => {
-						'name' => q(dessert spoon),
+						'name' => q(dessert spoons),
 						'one' => q(dessert spoon {0}),
-						'other' => q(dessert spoon {0}),
+						'other' => q(dessert spoons {0}),
 					},
 					# Core Unit Identifier
 					'dessert-spoon' => {
-						'name' => q(dessert spoon),
+						'name' => q(dessert spoons),
 						'one' => q(dessert spoon {0}),
-						'other' => q(dessert spoon {0}),
+						'other' => q(dessert spoons {0}),
 					},
 					# Long Unit Identifier
 					'volume-dessert-spoon-imperial' => {
-						'name' => q(Imp. dessert spoon),
+						'name' => q(Imp. dessert spoons),
 						'one' => q(Imp. dessert spoon {0}),
-						'other' => q(Imp. dessert spoon {0}),
+						'other' => q(Imp. dessert spoons {0}),
 					},
 					# Core Unit Identifier
 					'dessert-spoon-imperial' => {
-						'name' => q(Imp. dessert spoon),
+						'name' => q(Imp. dessert spoons),
 						'one' => q(Imp. dessert spoon {0}),
-						'other' => q(Imp. dessert spoon {0}),
+						'other' => q(Imp. dessert spoons {0}),
 					},
 					# Long Unit Identifier
 					'volume-dram' => {
-						'name' => q(dram),
+						'name' => q(drams),
 						'one' => q(dram {0}),
-						'other' => q({0} dram),
+						'other' => q(drams {0}),
 					},
 					# Core Unit Identifier
 					'dram' => {
-						'name' => q(dram),
+						'name' => q(drams),
 						'one' => q(dram {0}),
-						'other' => q({0} dram),
+						'other' => q(drams {0}),
 					},
 					# Long Unit Identifier
 					'volume-fluid-ounce' => {
@@ -3316,15 +3361,15 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'volume-quart-imperial' => {
-						'name' => q(Imp. quart),
+						'name' => q(Imp. quarts),
 						'one' => q(Imp. quart {0}),
-						'other' => q(Imp. quart {0}),
+						'other' => q(Imp. quarts {0}),
 					},
 					# Core Unit Identifier
 					'quart-imperial' => {
-						'name' => q(Imp. quart),
+						'name' => q(Imp. quarts),
 						'one' => q(Imp. quart {0}),
-						'other' => q(Imp. quart {0}),
+						'other' => q(Imp. quarts {0}),
 					},
 					# Long Unit Identifier
 					'volume-tablespoon' => {
@@ -3635,6 +3680,18 @@ has 'units' => (
 						'name' => q(‱),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(sashi/biliyan),
+						'one' => q(sashi {0} a cikin biliyan),
+						'other' => q(sashi {0} a cikin biliyan),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(sashi/biliyan),
+						'one' => q(sashi {0} a cikin biliyan),
+						'other' => q(sashi {0} a cikin biliyan),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'one' => q(L/100km{0}),
 						'other' => q(L/100km{0}),
@@ -3917,6 +3974,20 @@ has 'units' => (
 					'nanosecond' => {
 						'one' => q(ns{0}),
 						'other' => q(ns{0}),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(darare),
+						'one' => q(dare {0}),
+						'other' => q(darare {0}),
+						'per' => q(dare {0}),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(darare),
+						'one' => q(dare {0}),
+						'other' => q(darare {0}),
+						'per' => q(dare {0}),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -4869,6 +4940,18 @@ has 'units' => (
 					'knot' => {
 						'one' => q(kn{0}),
 						'other' => q(kn{0}),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(hsk),
+						'one' => q(hsk {0}),
+						'other' => q(hsk {0}),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(hsk),
+						'one' => q(hsk {0}),
+						'other' => q(hsk {0}),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -5609,6 +5692,18 @@ has 'units' => (
 						'other' => q(‱{0}),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(sashi/biliyan),
+						'one' => q(sashi {0} a cikin biliyan),
+						'other' => q(sashi {0} a cikin biliyan),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(sashi/biliyan),
+						'one' => q(sashi {0} a cikin biliyan),
+						'other' => q(sashi {0} a cikin biliyan),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'one' => q(L/100km {0}),
 						'other' => q(L/100km {0}),
@@ -5911,6 +6006,20 @@ has 'units' => (
 						'name' => q(nanoseks),
 						'one' => q(ns {0}),
 						'other' => q(ns {0}),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(darare),
+						'one' => q(dare {0}),
+						'other' => q(darare {0}),
+						'per' => q(dare {0}),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(darare),
+						'one' => q(dare {0}),
+						'other' => q(darare {0}),
+						'per' => q(dare {0}),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -6903,6 +7012,18 @@ has 'units' => (
 						'other' => q(kn {0}),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(hsk),
+						'one' => q(hsk {0}),
+						'other' => q(hsk {0}),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(hsk),
+						'one' => q(hsk {0}),
+						'other' => q(hsk {0}),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'name' => q(mitoci/daƙ),
 						'one' => q(m/s {0}),
@@ -7388,6 +7509,33 @@ has 'listPatterns' => (
 		} }
 );
 
+has 'number_symbols' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+		'arab' => {
+			'decimal' => q(.),
+			'exponential' => q(^),
+			'group' => q(,),
+			'minusSign' => q(-),
+			'perMille' => q(‰),
+			'percentSign' => q(%),
+			'plusSign' => q(+),
+			'superscriptingExponent' => q(x),
+		},
+		'arabext' => {
+			'decimal' => q(.),
+			'exponential' => q(^),
+			'minusSign' => q(-),
+			'perMille' => q(‰),
+			'percentSign' => q(%),
+			'plusSign' => q(+),
+			'superscriptingExponent' => q(x),
+		},
+	} }
+);
+
 has 'number_formats' => (
 	is			=> 'ro',
 	isa			=> HashRef,
@@ -7446,8 +7594,8 @@ has 'number_formats' => (
 			},
 			'short' => {
 				'1000' => {
-					'one' => '0D',
-					'other' => '0D',
+					'one' => '0K',
+					'other' => '0K',
 				},
 				'10000' => {
 					'one' => '00D',
@@ -7588,8 +7736,6 @@ has 'currencies' => (
 		'BOB' => {
 			display_name => {
 				'currency' => q(Boloviano na ƙasar Bolivia),
-				'one' => q(boliviano na ƙasar Bolivia),
-				'other' => q(Boloviano na ƙasar Bolivia),
 			},
 		},
 		'BRL' => {
@@ -7646,8 +7792,6 @@ has 'currencies' => (
 		'CLP' => {
 			display_name => {
 				'currency' => q(Peso na ƙasar Chile),
-				'one' => q(peso na ƙasar Chile),
-				'other' => q(Peso na ƙasar Chile),
 			},
 		},
 		'CNH' => {
@@ -7665,15 +7809,11 @@ has 'currencies' => (
 		'COP' => {
 			display_name => {
 				'currency' => q(Peso na ƙasar Columbia),
-				'one' => q(peso na ƙasar Columbia),
-				'other' => q(Peso na ƙasar Columbia),
 			},
 		},
 		'CRC' => {
 			display_name => {
 				'currency' => q(Colón na ƙasar Costa Rica),
-				'one' => q(colón na ƙasar Costa Rica),
-				'other' => q(colón na ƙasar Costa Rica),
 			},
 		},
 		'CUC' => {
@@ -7812,8 +7952,6 @@ has 'currencies' => (
 		'GYD' => {
 			display_name => {
 				'currency' => q(Dalar Guyana),
-				'one' => q(dalar Guyana),
-				'other' => q(Dalar Guyana),
 			},
 		},
 		'HKD' => {
@@ -8118,8 +8256,6 @@ has 'currencies' => (
 		'NIO' => {
 			display_name => {
 				'currency' => q(Córdoba na ƙasar Nicaragua),
-				'one' => q(córdoba na ƙasar Nicaragua),
-				'other' => q(Córdoba na ƙasar Nicaragua),
 			},
 		},
 		'NOK' => {
@@ -8151,15 +8287,11 @@ has 'currencies' => (
 		'PAB' => {
 			display_name => {
 				'currency' => q(Balboa na ƙasar Panama),
-				'one' => q(balboa na ƙasar Panama),
-				'other' => q(Balboa na ƙasar Panama),
 			},
 		},
 		'PEN' => {
 			display_name => {
 				'currency' => q(Sol na ƙasar Peru),
-				'one' => q(sol na ƙasar Peru),
-				'other' => q(Sol na ƙasar Peru),
 			},
 		},
 		'PGK' => {
@@ -8172,8 +8304,6 @@ has 'currencies' => (
 		'PHP' => {
 			display_name => {
 				'currency' => q(Kuɗin Philippine),
-				'one' => q(kuɗin Philippine),
-				'other' => q(Kuɗin Philippine),
 			},
 		},
 		'PKR' => {
@@ -8193,8 +8323,6 @@ has 'currencies' => (
 		'PYG' => {
 			display_name => {
 				'currency' => q(Guarani na ƙasar Paraguay),
-				'one' => q(guarani na ƙasar Paraguay),
-				'other' => q(Guarani na ƙasar Paraguay),
 			},
 		},
 		'QAR' => {
@@ -8293,8 +8421,6 @@ has 'currencies' => (
 		'SRD' => {
 			display_name => {
 				'currency' => q(Dalar ƙasar Suriname),
-				'one' => q(dalar ƙasar Suriname),
-				'other' => q(Dalar ƙasar Suriname),
 			},
 		},
 		'SSP' => {
@@ -8401,8 +8527,6 @@ has 'currencies' => (
 			symbol => '$',
 			display_name => {
 				'currency' => q(Dalar Amurka),
-				'one' => q(Dalar Amirka),
-				'other' => q(Dalar Amurka),
 			},
 		},
 		'UYU' => {
@@ -8422,8 +8546,6 @@ has 'currencies' => (
 		'VES' => {
 			display_name => {
 				'currency' => q(Bolívar na ƙasar Venezuela),
-				'one' => q(bolívar na ƙasar Venezuela),
-				'other' => q(Bolívar na ƙasar Venezuela),
 			},
 		},
 		'VND' => {
@@ -8863,6 +8985,14 @@ has 'datetime_formats_interval' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'gregorian' => {
+			GyM => {
+				G => q{M/y G – M/y G},
+			},
+			GyMEd => {
+				G => q{E, M/d/y G – E, M/d/y G},
+				M => q{E, M/d/y – E, M/d/y G},
+				y => q{E, M/d/y – E, M/d/y G},
+			},
 			MEd => {
 				d => q{E, dd/M – E, dd/M},
 			},
@@ -8925,7 +9055,7 @@ has 'time_zone_names' => (
 		},
 		'Africa_Southern' => {
 			long => {
-				'standard' => q#South Africa Standard Time#,
+				'standard' => q#Tsayayyen Lokacin Afirka ta Kudu#,
 			},
 		},
 		'Africa_Western' => {
@@ -8997,7 +9127,7 @@ has 'time_zone_names' => (
 			long => {
 				'daylight' => q#Lokacin Rana na Arebiya#,
 				'generic' => q#Lokacin Arebiya#,
-				'standard' => q#Arabian Standard Time#,
+				'standard' => q#Tsayayyen lokacin Arebiya#,
 			},
 		},
 		'Argentina' => {
@@ -9031,7 +9161,7 @@ has 'time_zone_names' => (
 		'Australia_Central' => {
 			long => {
 				'daylight' => q#Lokacin Rana na Tsakiyar Austiraliya#,
-				'generic' => q#Central Australia Time#,
+				'generic' => q#Lokacin Tsakiyar Australiya#,
 				'standard' => q#Tsayayyen Lokacin Tsakiyar Austiraliya#,
 			},
 		},
@@ -9046,7 +9176,7 @@ has 'time_zone_names' => (
 			long => {
 				'daylight' => q#Lokacin Rana na Gabashin Austiraliya#,
 				'generic' => q#Lokacin Gabashin Austiraliya#,
-				'standard' => q#Australian Eastern Standard Time#,
+				'standard' => q#Tsayayyen lokacin Gabashin Australia#,
 			},
 		},
 		'Australia_Western' => {
@@ -9079,7 +9209,7 @@ has 'time_zone_names' => (
 		},
 		'Bhutan' => {
 			long => {
-				'standard' => q#Bhutan Time#,
+				'standard' => q#Lokacin Bhutan#,
 			},
 		},
 		'Bolivia' => {
@@ -9103,7 +9233,7 @@ has 'time_zone_names' => (
 			long => {
 				'daylight' => q#Lokacin Bazara na Cape Verde#,
 				'generic' => q#Lokacin Cape Verde#,
-				'standard' => q#Cape Verde Standard Time#,
+				'standard' => q#Tsayayyen lokacin Cape Verde#,
 			},
 		},
 		'Chamorro' => {
@@ -9130,13 +9260,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Lokacin Rana na Sin#,
 				'generic' => q#Lokacin Sin#,
 				'standard' => q#Tsayayyen Lokacin Sin#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Lokacin Bazara na Choibalsan#,
-				'generic' => q#Lokacin Choibalsan#,
-				'standard' => q#Tsayayyen Lokacin Choibalsan#,
 			},
 		},
 		'Christmas' => {
@@ -9267,7 +9390,7 @@ has 'time_zone_names' => (
 		},
 		'GMT' => {
 			long => {
-				'standard' => q#Lokacin Greenwhich a London#,
+				'standard' => q#Lokacin Greenwich a Ingila#,
 			},
 		},
 		'Galapagos' => {
@@ -9282,7 +9405,7 @@ has 'time_zone_names' => (
 		},
 		'Georgia' => {
 			long => {
-				'daylight' => q#Georgia Summer Time#,
+				'daylight' => q#Lokacin Bazara na Georgia#,
 				'generic' => q#Lokacin Georgia#,
 				'standard' => q#Tsayayyen Lokacin Georgia#,
 			},
@@ -9308,7 +9431,7 @@ has 'time_zone_names' => (
 		},
 		'Gulf' => {
 			long => {
-				'standard' => q#Lokacin Golf#,
+				'standard' => q#Tsayayyen lokacin Gulf#,
 			},
 		},
 		'Guyana' => {
@@ -9339,7 +9462,7 @@ has 'time_zone_names' => (
 		},
 		'India' => {
 			long => {
-				'standard' => q#India Standard Time#,
+				'standard' => q#Tsayayyen lokacin Indiya#,
 			},
 		},
 		'Indian_Ocean' => {
@@ -9359,7 +9482,7 @@ has 'time_zone_names' => (
 		},
 		'Indonesia_Eastern' => {
 			long => {
-				'standard' => q#Eastern Indonesia Time#,
+				'standard' => q#Lokacin Gabashin Indonesia#,
 			},
 		},
 		'Indonesia_Western' => {
@@ -9383,16 +9506,21 @@ has 'time_zone_names' => (
 		},
 		'Israel' => {
 			long => {
-				'daylight' => q#Israel Daylight Time#,
+				'daylight' => q#Lokacin Hasken Rana na Israʼila#,
 				'generic' => q#Lokacin Israʼila#,
-				'standard' => q#Israel Standard Time#,
+				'standard' => q#Tsayayyen lokacin Israʼila#,
 			},
 		},
 		'Japan' => {
 			long => {
-				'daylight' => q#Japan Daylight Time#,
+				'daylight' => q#Lokacin Hasken Rana na Japan#,
 				'generic' => q#Lokacin Japan#,
-				'standard' => q#Japan Standard Time#,
+				'standard' => q#Tsayayyen lokacin Japan#,
+			},
+		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Lokacin Kazakhstan#,
 			},
 		},
 		'Kazakhstan_Eastern' => {
@@ -9426,7 +9554,7 @@ has 'time_zone_names' => (
 		},
 		'Kyrgystan' => {
 			long => {
-				'standard' => q#Lokacin Kazakhstan#,
+				'standard' => q#Lokacin Kyrgyzstan#,
 			},
 		},
 		'Line_Islands' => {
@@ -9439,11 +9567,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Lokacin Rana na Vote Lord Howe#,
 				'generic' => q#Lokacin Lord Howe#,
 				'standard' => q#Tsayayyen Lokacin Lord Howe#,
-			},
-		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Lokacin Macquarie Island#,
 			},
 		},
 		'Magadan' => {
@@ -9483,13 +9606,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Lokacin Mawson#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Lokacin Rana na Arewa Maso Yammacin Mekziko#,
-				'generic' => q#Lokacin Arewa Maso Yammacin Mekziko#,
-				'standard' => q#Tsayayyen Lokacin Arewa Maso Yammacin Mekziko#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -9720,7 +9836,7 @@ has 'time_zone_names' => (
 		},
 		'Tokelau' => {
 			long => {
-				'standard' => q#Tokelau Time#,
+				'standard' => q#Lokacin Tokelau#,
 			},
 		},
 		'Tonga' => {
@@ -9737,7 +9853,7 @@ has 'time_zone_names' => (
 		},
 		'Turkmenistan' => {
 			long => {
-				'daylight' => q#Turkmenistan Summer Time#,
+				'daylight' => q#Lokacin Bazara na Turkmenistan#,
 				'generic' => q#Lokacin Turkmenistan#,
 				'standard' => q#Tsayayyen Lokacin Turkmenistan#,
 			},

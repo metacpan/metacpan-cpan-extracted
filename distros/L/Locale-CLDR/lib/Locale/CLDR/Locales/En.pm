@@ -8,18 +8,18 @@ Locale::CLDR::Locales::En - Package for language English
 
 package Locale::CLDR::Locales::En;
 # This file auto generated from Data\common\main\en.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -196,6 +196,10 @@ has 'algorithmic_number_format_data' => (
 					base_value => q(0),
 					divisor => q(1),
 					rule => q(zero),
+				},
+				'x.x' => {
+					divisor => q(1),
+					rule => q(←← point →→),
 				},
 				'1' => {
 					base_value => q(1),
@@ -375,13 +379,9 @@ has 'algorithmic_number_format_data' => (
 					divisor => q(1),
 					rule => q(not a number),
 				},
-				'x.x' => {
-					divisor => q(1),
-					rule => q(←← point →→),
-				},
 				'max' => {
 					divisor => q(1),
-					rule => q(←← point →→),
+					rule => q(not a number),
 				},
 			},
 		},
@@ -395,6 +395,10 @@ has 'algorithmic_number_format_data' => (
 					base_value => q(0),
 					divisor => q(1),
 					rule => q(=%spellout-numbering=),
+				},
+				'x.x' => {
+					divisor => q(1),
+					rule => q(←← point →→),
 				},
 				'100' => {
 					base_value => q(100),
@@ -444,13 +448,9 @@ has 'algorithmic_number_format_data' => (
 					divisor => q(1),
 					rule => q(not a number),
 				},
-				'x.x' => {
-					divisor => q(1),
-					rule => q(←← point →→),
-				},
 				'max' => {
 					divisor => q(1),
-					rule => q(←← point →→),
+					rule => q(not a number),
 				},
 			},
 		},
@@ -957,7 +957,7 @@ has 'display_name_language' => (
 			 my %languages = (
 				'aa' => 'Afar',
  				'ab' => 'Abkhazian',
- 				'ace' => 'Achinese',
+ 				'ace' => 'Acehnese',
  				'ach' => 'Acoli',
  				'ada' => 'Adangme',
  				'ady' => 'Adyghe',
@@ -1172,7 +1172,6 @@ has 'display_name_language' => (
  				'gmh' => 'Middle High German',
  				'gn' => 'Guarani',
  				'goh' => 'Old High German',
- 				'gom' => 'Goan Konkani',
  				'gon' => 'Gondi',
  				'gor' => 'Gorontalo',
  				'got' => 'Gothic',
@@ -1360,6 +1359,7 @@ has 'display_name_language' => (
  				'mua' => 'Mundang',
  				'mul' => 'Multiple languages',
  				'mus' => 'Muscogee',
+ 				'mus@alt=official' => 'Mvskoke',
  				'mwl' => 'Mirandese',
  				'mwr' => 'Marwari',
  				'mwv' => 'Mentawai',
@@ -1703,6 +1703,7 @@ has 'display_name_script' => (
  			'Elba' => 'Elbasan',
  			'Elym' => 'Elymaic',
  			'Ethi' => 'Ethiopic',
+ 			'Gara' => 'Garay',
  			'Geok' => 'Georgian Khutsuri',
  			'Geor' => 'Georgian',
  			'Glag' => 'Glagolitic',
@@ -1712,6 +1713,7 @@ has 'display_name_script' => (
  			'Gran' => 'Grantha',
  			'Grek' => 'Greek',
  			'Gujr' => 'Gujarati',
+ 			'Gukh' => 'Gurung Khema',
  			'Guru' => 'Gurmukhi',
  			'Hanb' => 'Han with Bopomofo',
  			'Hang' => 'Hangul',
@@ -1745,6 +1747,7 @@ has 'display_name_script' => (
  			'Knda' => 'Kannada',
  			'Kore' => 'Korean',
  			'Kpel' => 'Kpelle',
+ 			'Krai' => 'Kirat Rai',
  			'Kthi' => 'Kaithi',
  			'Lana' => 'Lanna',
  			'Laoo' => 'Lao',
@@ -1787,6 +1790,7 @@ has 'display_name_script' => (
  			'Nshu' => 'Nüshu',
  			'Ogam' => 'Ogham',
  			'Olck' => 'Ol Chiki',
+ 			'Onao' => 'Ol Onal',
  			'Orkh' => 'Orkhon',
  			'Orya' => 'Odia',
  			'Osge' => 'Osage',
@@ -1823,6 +1827,7 @@ has 'display_name_script' => (
  			'Sora' => 'Sora Sompeng',
  			'Soyo' => 'Soyombo',
  			'Sund' => 'Sundanese',
+ 			'Sunu' => 'Sunuwar',
  			'Sylo' => 'Syloti Nagri',
  			'Syrc' => 'Syriac',
  			'Syre' => 'Estrangelo Syriac',
@@ -1844,7 +1849,9 @@ has 'display_name_script' => (
  			'Tibt' => 'Tibetan',
  			'Tirh' => 'Tirhuta',
  			'Tnsa' => 'Tangsa',
+ 			'Todr' => 'Todhri',
  			'Toto' => 'Toto',
+ 			'Tutg' => 'Tulu-Tigalari',
  			'Ugar' => 'Ugaritic',
  			'Vaii' => 'Vai',
  			'Visp' => 'Visible Speech',
@@ -2372,7 +2379,6 @@ has 'display_name_type' => (
  				'phonebook' => q{Phonebook Sort Order},
  				'phonetic' => q{Phonetic Sort Order},
  				'pinyin' => q{Pinyin Sort Order},
- 				'reformed' => q{Reformed Sort Order},
  				'search' => q{General-Purpose Search},
  				'searchjl' => q{Search By Hangul Initial Consonant},
  				'standard' => q{Standard Sort Order},
@@ -2568,12 +2574,14 @@ has 'display_name_type' => (
  				'ethi' => q{Ethiopic Numerals},
  				'finance' => q{Financial Numerals},
  				'fullwide' => q{Full-Width Digits},
+ 				'gara' => q{Garay Digits},
  				'geor' => q{Georgian Numerals},
  				'gong' => q{Gunjala Gondi digits},
  				'gonm' => q{Masaram Gondi digits},
  				'grek' => q{Greek Numerals},
  				'greklow' => q{Greek Lowercase Numerals},
  				'gujr' => q{Gujarati Digits},
+ 				'gukh' => q{Gurung Khema Digits},
  				'guru' => q{Gurmukhi Digits},
  				'hanidays' => q{Chinese Calendar Day-of-Month Numerals},
  				'hanidec' => q{Chinese Decimal Numerals},
@@ -2592,6 +2600,7 @@ has 'display_name_type' => (
  				'kawi' => q{Kawi Digits},
  				'khmr' => q{Khmer Digits},
  				'knda' => q{Kannada Digits},
+ 				'krai' => q{Kirat Rai Digits},
  				'lana' => q{Tai Tham Hora Digits},
  				'lanatham' => q{Tai Tham Tham Digits},
  				'laoo' => q{Lao Digits},
@@ -2609,6 +2618,8 @@ has 'display_name_type' => (
  				'mroo' => q{Mro Digits},
  				'mtei' => q{Meetei Mayek Digits},
  				'mymr' => q{Myanmar Digits},
+ 				'mymrepka' => q{Myanmar Eastern Pwo Karen Digits},
+ 				'mymrpao' => q{Myanmar Pao Digits},
  				'mymrshan' => q{Myanmar Shan Digits},
  				'mymrtlng' => q{Myanmar Tai Laing Digits},
  				'nagm' => q{Nag Mundari Digits},
@@ -2616,8 +2627,10 @@ has 'display_name_type' => (
  				'newa' => q{Newa Digits},
  				'nkoo' => q{N’Ko Digits},
  				'olck' => q{Ol Chiki Digits},
+ 				'onao' => q{Ol Onal Digits},
  				'orya' => q{Odia Digits},
  				'osma' => q{Osmanya Digits},
+ 				'outlined' => q{Outlined Digits},
  				'rohg' => q{Hanifi Rohingya digits},
  				'roman' => q{Roman Numerals},
  				'romanlow' => q{Roman Lowercase Numerals},
@@ -2628,6 +2641,7 @@ has 'display_name_type' => (
  				'sinh' => q{Sinhala Lith Digits},
  				'sora' => q{Sora Sompeng Digits},
  				'sund' => q{Sundanese Digits},
+ 				'sunu' => q{Sunuwar Digits},
  				'takr' => q{Takri Digits},
  				'talu' => q{New Tai Lue Digits},
  				'taml' => q{Traditional Tamil Numerals},
@@ -3338,6 +3352,18 @@ has 'units' => (
 						'other' => q({0} permyriad),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(parts per billion),
+						'one' => q({0} part per billion),
+						'other' => q({0} parts per billion),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(parts per billion),
+						'one' => q({0} part per billion),
+						'other' => q({0} parts per billion),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(liters per 100 kilometers),
 						'one' => q({0} liter per 100 kilometers),
@@ -3646,6 +3672,20 @@ has 'units' => (
 						'name' => q(nanoseconds),
 						'one' => q({0} nanosecond),
 						'other' => q({0} nanoseconds),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(nights),
+						'one' => q({0} night),
+						'other' => q({0} nights),
+						'per' => q({0} per night),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(nights),
+						'one' => q({0} night),
+						'other' => q({0} nights),
+						'per' => q({0} per night),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -4820,6 +4860,18 @@ has 'units' => (
 						'name' => q(knots),
 						'one' => q({0} knot),
 						'other' => q({0} knots),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(light),
+						'one' => q({0} light),
+						'other' => q({0} light),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(light),
+						'one' => q({0} light),
+						'other' => q({0} light),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -5932,6 +5984,18 @@ has 'units' => (
 						'other' => q({0}‱),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(ppb),
+						'one' => q({0}ppb),
+						'other' => q({0}ppb),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(ppb),
+						'one' => q({0}ppb),
+						'other' => q({0}ppb),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(L/100km),
 						'one' => q({0}L/100km),
@@ -6240,6 +6304,20 @@ has 'units' => (
 						'name' => q(ns),
 						'one' => q({0}ns),
 						'other' => q({0}ns),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(nights),
+						'one' => q({0}night),
+						'other' => q({0}nights),
+						'per' => q({0}/night),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(nights),
+						'one' => q({0}night),
+						'other' => q({0}nights),
+						'per' => q({0}/night),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -7410,6 +7488,18 @@ has 'units' => (
 						'name' => q(kn),
 						'one' => q({0}kn),
 						'other' => q({0}kn),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(light),
+						'one' => q({0}light),
+						'other' => q({0}light),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(light),
+						'one' => q({0}light),
+						'other' => q({0}light),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -8522,6 +8612,18 @@ has 'units' => (
 						'other' => q({0}‱),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(parts/billion),
+						'one' => q({0} ppb),
+						'other' => q({0} ppb),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(parts/billion),
+						'one' => q({0} ppb),
+						'other' => q({0} ppb),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(L/100 km),
 						'one' => q({0} L/100 km),
@@ -8830,6 +8932,20 @@ has 'units' => (
 						'name' => q(nanosecs),
 						'one' => q({0} ns),
 						'other' => q({0} ns),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(nights),
+						'one' => q({0} night),
+						'other' => q({0} nights),
+						'per' => q({0}/night),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(nights),
+						'one' => q({0} night),
+						'other' => q({0} nights),
+						'per' => q({0}/night),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -10004,6 +10120,18 @@ has 'units' => (
 						'name' => q(kn),
 						'one' => q({0} kn),
 						'other' => q({0} kn),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(light),
+						'one' => q({0} light),
+						'other' => q({0} light),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(light),
+						'one' => q({0} light),
+						'other' => q({0} light),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -12720,6 +12848,13 @@ has 'currencies' => (
 				'other' => q(East Caribbean dollars),
 			},
 		},
+		'XCG' => {
+			display_name => {
+				'currency' => q(Caribbean guilder),
+				'one' => q(Caribbean guilder),
+				'other' => q(Caribbean guilders),
+			},
+		},
 		'XDR' => {
 			display_name => {
 				'currency' => q(Special Drawing Rights),
@@ -12902,11 +13037,18 @@ has 'currencies' => (
 				'other' => q(Zimbabwean dollars \(1980–2008\)),
 			},
 		},
+		'ZWG' => {
+			display_name => {
+				'currency' => q(Zimbabwean Gold),
+				'one' => q(Zimbabwean gold),
+				'other' => q(Zimbabwean gold),
+			},
+		},
 		'ZWL' => {
 			display_name => {
-				'currency' => q(Zimbabwean Dollar \(2009\)),
-				'one' => q(Zimbabwean dollar \(2009\)),
-				'other' => q(Zimbabwean dollars \(2009\)),
+				'currency' => q(Zimbabwean Dollar \(2009–2024\)),
+				'one' => q(Zimbabwean dollar \(2009–2024\)),
+				'other' => q(Zimbabwean dollars \(2009–2024\)),
 			},
 		},
 		'ZWR' => {
@@ -15019,13 +15161,6 @@ has 'time_zone_names' => (
 				'standard' => q#China Standard Time#,
 			},
 		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Choibalsan Summer Time#,
-				'generic' => q#Choibalsan Time#,
-				'standard' => q#Choibalsan Standard Time#,
-			},
-		},
 		'Christmas' => {
 			long => {
 				'standard' => q#Christmas Island Time#,
@@ -15101,9 +15236,6 @@ has 'time_zone_names' => (
 			long => {
 				'daylight' => q#British Summer Time#,
 			},
-		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#Uzhhorod#,
 		},
 		'Europe_Central' => {
 			long => {
@@ -15183,6 +15315,13 @@ has 'time_zone_names' => (
 		'Gilbert_Islands' => {
 			long => {
 				'standard' => q#Gilbert Islands Time#,
+			},
+		},
+		'Greenland' => {
+			long => {
+				'daylight' => q#Greenland Summer Time#,
+				'generic' => q#Greenland Time#,
+				'standard' => q#Greenland Standard Time#,
 			},
 		},
 		'Greenland_Eastern' => {
@@ -15305,6 +15444,11 @@ has 'time_zone_names' => (
 				'standard' => q#Petropavlovsk-Kamchatski Standard Time#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Kazakhstan Time#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#East Kazakhstan Time#,
@@ -15363,11 +15507,6 @@ has 'time_zone_names' => (
 				'standard' => q#Macao Standard Time#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Macquarie Island Time#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Magadan Summer Time#,
@@ -15405,13 +15544,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Mawson Time#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Northwest Mexico Daylight Time#,
-				'generic' => q#Northwest Mexico Time#,
-				'standard' => q#Northwest Mexico Standard Time#,
 			},
 		},
 		'Mexico_Pacific' => {

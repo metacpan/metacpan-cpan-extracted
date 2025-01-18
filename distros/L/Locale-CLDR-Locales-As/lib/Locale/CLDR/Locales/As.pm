@@ -8,18 +8,18 @@ Locale::CLDR::Locales::As - Package for language Assamese
 
 package Locale::CLDR::Locales::As;
 # This file auto generated from Data\common\main\as.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -72,6 +72,7 @@ has 'display_name_language' => (
  				'bi' => 'বিছলামা',
  				'bin' => 'বিনি',
  				'bla' => 'ছিক্সিকা',
+ 				'blo' => 'আনি',
  				'bm' => 'বামবাৰা',
  				'bn' => 'বাংলা',
  				'bo' => 'তিব্বতী',
@@ -193,7 +194,7 @@ has 'display_name_language' => (
  				'iba' => 'ইবান',
  				'ibb' => 'ইবিবিও',
  				'id' => 'ইণ্ডোনেচিয়',
- 				'ie' => 'উপস্থাপন ভাষা',
+ 				'ie' => 'ইণ্টাৰলিংগুৱে',
  				'ig' => 'ইগ্বো',
  				'ii' => 'ছিচুৱান ই',
  				'ikt' => 'ৱেষ্টাৰ্ণ কানাডিয়ান ইনক্টিটুট',
@@ -246,6 +247,7 @@ has 'display_name_language' => (
  				'kv' => 'কোমি',
  				'kw' => 'কোৰ্নিচ',
  				'kwk' => 'ক্বাকৱালা',
+ 				'kxv' => 'কুভি',
  				'ky' => 'কিৰ্গিজ',
  				'la' => 'লেটিন',
  				'lad' => 'লাডিনো',
@@ -254,6 +256,7 @@ has 'display_name_language' => (
  				'lez' => 'লেজঘিয়ান',
  				'lg' => 'গান্দা',
  				'li' => 'লিম্বুৰ্গিচ',
+ 				'lij' => 'লিংগুৰিয়ান',
  				'lil' => 'লিল্লোৱেট',
  				'lkt' => 'লাকোটা',
  				'lmo' => 'ল’ম্বাৰ্ড',
@@ -410,6 +413,7 @@ has 'display_name_language' => (
  				'sw_CD' => 'কঙ্গো স্বাহিলি',
  				'swb' => 'কোমোৰিয়ান',
  				'syr' => 'চিৰিয়াক',
+ 				'szl' => 'ছাইলেছিয়ান',
  				'ta' => 'তামিল',
  				'tce' => 'দাক্ষিণাত্যৰ টুটচ’ন',
  				'te' => 'তেলুগু',
@@ -449,7 +453,9 @@ has 'display_name_language' => (
  				'uz' => 'উজবেক',
  				'vai' => 'ভাই',
  				've' => 'ভেণ্ডা',
+ 				'vec' => 'ভেনেছিয়ান',
  				'vi' => 'ভিয়েটনামী',
+ 				'vmw' => 'মাখুৱা',
  				'vo' => 'ভোলাপুক',
  				'vun' => 'ভুঞ্জু',
  				'wa' => 'ৱালুন',
@@ -460,6 +466,7 @@ has 'display_name_language' => (
  				'wuu' => 'ৱু চাইনিজ',
  				'xal' => 'কাল্মিক',
  				'xh' => 'হোছা',
+ 				'xnr' => 'কাংগৰি',
  				'xog' => 'ছোগা',
  				'yav' => 'য়াংবেন',
  				'ybb' => 'য়েম্বা',
@@ -468,6 +475,7 @@ has 'display_name_language' => (
  				'yrl' => 'হিংগাটো',
  				'yue' => 'কেণ্টোনীজ',
  				'yue@alt=menu' => 'চাইনিজ, কেণ্টোনীজ',
+ 				'za' => 'ঝুৱাং',
  				'zgh' => 'ষ্টেণ্ডাৰ্ড মোৰোক্কান তামাজাইট',
  				'zh' => 'চীনা',
  				'zh@alt=menu' => 'চীনা, মেণ্ডাৰিন',
@@ -1493,6 +1501,18 @@ has 'units' => (
 						'other' => q({0} পাৰমিৰেইড),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(প্ৰতি বিলিয়নত অংশ),
+						'one' => q({0} প্ৰতি বিলিয়নত অংশ),
+						'other' => q({0} প্ৰতি বিলিয়নত অংশ),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(প্ৰতি বিলিয়নত অংশ),
+						'one' => q({0} প্ৰতি বিলিয়নত অংশ),
+						'other' => q({0} প্ৰতি বিলিয়নত অংশ),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(প্ৰতি ১০০ কিলোমিটাৰত লিটাৰ),
 						'one' => q(প্ৰতি ১০০ কিলোমিটাৰত {0} লিটাৰ),
@@ -1731,6 +1751,20 @@ has 'units' => (
 					'nanosecond' => {
 						'one' => q({0} নেনোছেকেণ্ড),
 						'other' => q({0} নেনোছেকেণ্ড),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(নিশা),
+						'one' => q({0} নিশা),
+						'other' => q({0} নিশা),
+						'per' => q({0}/নিশা),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(নিশা),
+						'one' => q({0} নিশা),
+						'other' => q({0} নিশা),
+						'per' => q({0}/নিশা),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -2539,6 +2573,18 @@ has 'units' => (
 						'other' => q({0} ঘণ্টা প্ৰতি কিলোমিটাৰ),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(আলোক),
+						'one' => q({0} আলোক),
+						'other' => q({0} আলোক),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(আলোক),
+						'one' => q({0} আলোক),
+						'other' => q({0} আলোক),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'name' => q(মিটাৰ প্ৰতি ছেকেণ্ড),
 						'one' => q({0} মিটাৰ প্ৰতি ছেকেণ্ড),
@@ -3175,6 +3221,16 @@ has 'units' => (
 						'name' => q(‱),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'one' => q({0}ppb),
+						'other' => q({0}ppb),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'one' => q({0}ppb),
+						'other' => q({0}ppb),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(ল/১০০ ক.ম.),
 					},
@@ -3293,6 +3349,20 @@ has 'units' => (
 						'name' => q(টেঃ বাঃ),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(নিশা),
+						'one' => q({0} নিশা),
+						'other' => q({0} নিশা),
+						'per' => q({0}/নিশা),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(নিশা),
+						'one' => q({0} নিশা),
+						'other' => q({0} নিশা),
+						'per' => q({0}/নিশা),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'one' => q({0}কো),
 						'other' => q({0}কো),
@@ -3311,6 +3381,16 @@ has 'units' => (
 					'foodcalorie' => {
 						'one' => q({0}কেলৰি),
 						'other' => q({0}কেলৰি),
+					},
+					# Long Unit Identifier
+					'force-kilowatt-hour-per-100-kilometer' => {
+						'one' => q({0}kWh/100km),
+						'other' => q({0} kWh/100km),
+					},
+					# Core Unit Identifier
+					'kilowatt-hour-per-100-kilometer' => {
+						'one' => q({0}kWh/100km),
+						'other' => q({0} kWh/100km),
 					},
 					# Long Unit Identifier
 					'force-newton' => {
@@ -3449,6 +3529,18 @@ has 'units' => (
 					'kilometer-per-hour' => {
 						'one' => q({0} km/h),
 						'other' => q({0} km/h),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(আলোক),
+						'one' => q({0}আলোক),
+						'other' => q({0}আলোক),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(আলোক),
+						'one' => q({0}আলোক),
+						'other' => q({0}আলোক),
 					},
 					# Long Unit Identifier
 					'temperature-celsius' => {
@@ -4025,6 +4117,14 @@ has 'units' => (
 						'name' => q(পাৰমিৰেইড),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(অংশ/বিলিয়ন),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(অংশ/বিলিয়ন),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(লিঃ/১০০ কিঃ মিঃ),
 						'one' => q({0} ল/১০০ ক.ম.),
@@ -4325,6 +4425,20 @@ has 'units' => (
 						'name' => q(নেনোছেকেণ্ড),
 						'one' => q({0} নেঃ ছেঃ),
 						'other' => q({0} নেঃ ছেঃ),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(নিশা),
+						'one' => q({0} নিশা),
+						'other' => q({0} নিশা),
+						'per' => q({0}/নিশা),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(নিশা),
+						'one' => q({0} নিশা),
+						'other' => q({0} নিশা),
+						'per' => q({0}/নিশা),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -5311,6 +5425,18 @@ has 'units' => (
 						'name' => q(নট),
 						'one' => q({0} নট),
 						'other' => q({0} নট),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(আলোক),
+						'one' => q({0} আলোক),
+						'other' => q({0} আলোক),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(আলোক),
+						'one' => q({0} আলোক),
+						'other' => q({0} আলোক),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -6978,9 +7104,27 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
+				'narrow' => {
+					'am' => q{am},
+					'pm' => q{pm},
+				},
+				'wide' => {
+					'am' => q{AM},
+					'pm' => q{PM},
+				},
+			},
+			'stand-alone' => {
 				'abbreviated' => {
-					'am' => q{পূৰ্বাহ্ন},
-					'pm' => q{অপৰাহ্ন},
+					'am' => q{AM},
+					'pm' => q{PM},
+				},
+				'narrow' => {
+					'am' => q{AM},
+					'pm' => q{PM},
+				},
+				'wide' => {
+					'am' => q{AM},
+					'pm' => q{PM},
 				},
 			},
 		},
@@ -7826,9 +7970,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#নিউ ইয়ৰ্ক#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#নিপিগন#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#নোম#,
 		},
@@ -7850,9 +7991,6 @@ has 'time_zone_names' => (
 		'America/Panama' => {
 			exemplarCity => q#পানামা#,
 		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#পাংনিৰ্টুংগ#,
-		},
 		'America/Paramaribo' => {
 			exemplarCity => q#পাৰামাৰিবো#,
 		},
@@ -7873,9 +8011,6 @@ has 'time_zone_names' => (
 		},
 		'America/Punta_Arenas' => {
 			exemplarCity => q#পুণ্টা এৰিনাছ#,
-		},
-		'America/Rainy_River' => {
-			exemplarCity => q#ৰেইনী নদী#,
 		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#ৰেংকিন ইনলেট#,
@@ -7937,9 +8072,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#থ্যুলে#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#থাণ্ডাৰ উপসাগৰ#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#তিজুৱানা#,
 		},
@@ -7960,9 +8092,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#য়াকুটাট#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#য়েল্লোনাইফ#,
 		},
 		'America_Central' => {
 			long => {
@@ -8116,9 +8245,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#চিটা#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#কোইবাল্ছন#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#কলম্বো#,
@@ -8358,9 +8484,6 @@ has 'time_zone_names' => (
 		'Australia/Broken_Hill' => {
 			exemplarCity => q#ব্ৰোকেন হিল#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#ক্যুৰি#,
-		},
 		'Australia/Darwin' => {
 			exemplarCity => q#ডাৰউইন#,
 		},
@@ -8487,13 +8610,6 @@ has 'time_zone_names' => (
 				'daylight' => q#চীনৰ ডেলাইট সময়#,
 				'generic' => q#চীনৰ সময়#,
 				'standard' => q#চীনৰ মান সময়#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#কোইবাল্ছনৰ গ্ৰীষ্মকালীন সময়#,
-				'generic' => q#কোইবাল্ছনৰ সময়#,
-				'standard' => q#কোইবাল্ছনৰ মান সময়#,
 			},
 		},
 		'Christmas' => {
@@ -8718,9 +8834,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#উল্যানোভ্‌স্ক#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#উজ্গোৰোড#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#ভাদুজ#,
 		},
@@ -8741,9 +8854,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#জাগ্ৰেব#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#জাপোৰোজাই#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#জুৰিখ#,
@@ -8964,6 +9074,11 @@ has 'time_zone_names' => (
 				'standard' => q#জাপানৰ মান সময়#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#কাজাখস্তানৰ সময়#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#পূব কাজাখস্তানৰ সময়#,
@@ -9010,11 +9125,6 @@ has 'time_zone_names' => (
 				'standard' => q#লৰ্ড হাওৰ মান সময়#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#মেক্‌কুৱেৰী দ্বীপৰ সময়#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#মাগাদানৰ গ্ৰীষ্মকালীন সময়#,
@@ -9052,13 +9162,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#মাউছনৰ সময়#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#উত্তৰ-পশ্চিম মেক্সিকোৰ ডেলাইট সময়#,
-				'generic' => q#উত্তৰ-পশ্চিম মেক্সিকোৰ সময়#,
-				'standard' => q#উত্তৰ-পশ্চিম মেক্সিকোৰ মান সময়#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -9192,9 +9295,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Guam' => {
 			exemplarCity => q#গুৱাম#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#জনষ্টন#,
 		},
 		'Pacific/Kanton' => {
 			exemplarCity => q#কেণ্টন#,

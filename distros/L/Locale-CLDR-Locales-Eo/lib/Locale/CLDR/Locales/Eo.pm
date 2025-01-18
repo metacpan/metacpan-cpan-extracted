@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Eo - Package for language Esperanto
 
 package Locale::CLDR::Locales::Eo;
 # This file auto generated from Data\common\main\eo.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -254,7 +254,7 @@ has 'display_name_language' => (
  				'arp' => 'arapaha',
  				'ars' => 'araba naĝda',
  				'as' => 'asama',
- 				'ast' => 'asturia',
+ 				'ast' => 'astura',
  				'atj' => 'atikameka',
  				'av' => 'avara',
  				'awa' => 'avadhia',
@@ -273,6 +273,7 @@ has 'display_name_language' => (
  				'bi' => 'bislamo',
  				'bin' => 'edoa',
  				'bla' => 'siksika',
+ 				'blo' => 'aniia',
  				'bm' => 'bambara',
  				'bn' => 'bengala',
  				'bo' => 'tibeta',
@@ -447,8 +448,10 @@ has 'display_name_language' => (
  				'lez' => 'lezga',
  				'lg' => 'ganda',
  				'li' => 'limburga',
+ 				'lij' => 'ligura',
  				'lil' => 'lilueta',
  				'lkt' => 'lakota',
+ 				'lmo' => 'lombarda',
  				'ln' => 'lingala',
  				'lo' => 'laŭa',
  				'lou' => 'luiziana kreola',
@@ -533,6 +536,7 @@ has 'display_name_language' => (
  				'pis' => 'piĵina',
  				'pl' => 'pola',
  				'pqm' => 'malesita-pasamakvodja',
+ 				'prg' => 'prusa',
  				'ps' => 'paŝtua',
  				'pt' => 'portugala',
  				'pt_BR' => 'portugala brazila',
@@ -627,7 +631,9 @@ has 'display_name_language' => (
  				'uz' => 'uzbeka',
  				'vai' => 'vaja',
  				've' => 'vendaa',
+ 				'vec' => 'venecia',
  				'vi' => 'vjetnama',
+ 				'vmw' => 'makua',
  				'vo' => 'Volapuko',
  				'vun' => 'kivunja',
  				'wa' => 'valona',
@@ -637,6 +643,7 @@ has 'display_name_language' => (
  				'wuu' => 'vua',
  				'xal' => 'kalmuka',
  				'xh' => 'ksosa',
+ 				'xnr' => 'kangra',
  				'xog' => 'soga',
  				'yi' => 'jida',
  				'yo' => 'joruba',
@@ -795,7 +802,7 @@ has 'display_name_region' => (
  			'BM' => 'Bermudoj',
  			'BN' => 'Brunejo',
  			'BO' => 'Bolivio',
- 			'BQ' => 'Karibia Nederlando',
+ 			'BQ' => 'Kariba Nederlando',
  			'BR' => 'Brazilo',
  			'BS' => 'Bahamoj',
  			'BT' => 'Butano',
@@ -818,6 +825,7 @@ has 'display_name_region' => (
  			'CN' => 'Ĉinujo',
  			'CO' => 'Kolombio',
  			'CP' => 'Klipertono',
+ 			'CQ' => 'Sark',
  			'CR' => 'Kostariko',
  			'CU' => 'Kubo',
  			'CV' => 'Kaboverdo',
@@ -825,6 +833,7 @@ has 'display_name_region' => (
  			'CX' => 'Kristnaskinsulo',
  			'CY' => 'Kipro',
  			'CZ' => 'Ĉeĥujo',
+ 			'CZ@alt=variant' => 'Ĉeĥa Respubliko',
  			'DE' => 'Germanujo',
  			'DG' => 'Diego Garcia',
  			'DJ' => 'Ĝibutio',
@@ -1038,6 +1047,20 @@ has 'display_name_region' => (
 	},
 );
 
+has 'display_name_variant' => (
+	is			=> 'ro',
+	isa			=> HashRef[Str],
+	init_arg	=> undef,
+	default		=> sub {
+		{
+			'ARKAIKA' => 'Arkaika',
+ 			'HSISTEMO' => 'h-sistemo',
+ 			'XSISTEMO' => 'x-sistemo',
+
+		}
+	},
+);
+
 has 'display_name_key' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
@@ -1139,12 +1162,32 @@ EOT
 );
 
 
+has 'ellipsis' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub {
+		return {
+			'word-final' => '{0}…',
+			'word-initial' => '…{0}',
+		};
+	},
+);
+
 has 'units' => (
 	is			=> 'ro',
 	isa			=> HashRef[HashRef[HashRef[Str]]],
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					# Long Unit Identifier
+					'' => {
+						'name' => q(direkto),
+					},
+					# Core Unit Identifier
+					'' => {
+						'name' => q(direkto),
+					},
 					# Long Unit Identifier
 					'area-acre' => {
 						'name' => q(akreoj),
@@ -1252,6 +1295,20 @@ has 'units' => (
 						'name' => q(kvadrataj jardoj),
 						'one' => q({0} kvadrata jardo),
 						'other' => q({0} kvadrataj jardoj),
+					},
+					# Long Unit Identifier
+					'coordinate' => {
+						'east' => q({0} oriente),
+						'north' => q({0} norde),
+						'south' => q({0} sude),
+						'west' => q({0} okcidente),
+					},
+					# Core Unit Identifier
+					'coordinate' => {
+						'east' => q({0} oriente),
+						'north' => q({0} norde),
+						'south' => q({0} sude),
+						'west' => q({0} okcidente),
 					},
 					# Long Unit Identifier
 					'digital-bit' => {
@@ -1374,6 +1431,18 @@ has 'units' => (
 						'other' => q({0} terabajtoj),
 					},
 					# Long Unit Identifier
+					'duration-century' => {
+						'name' => q(jarcentoj),
+						'one' => q({0} jarcento),
+						'other' => q({0} jarcentoj),
+					},
+					# Core Unit Identifier
+					'century' => {
+						'name' => q(jarcentoj),
+						'one' => q({0} jarcento),
+						'other' => q({0} jarcentoj),
+					},
+					# Long Unit Identifier
 					'duration-day' => {
 						'name' => q(tagoj),
 						'one' => q({0} tago),
@@ -1388,10 +1457,14 @@ has 'units' => (
 					# Long Unit Identifier
 					'duration-decade' => {
 						'name' => q(jardekoj),
+						'one' => q({0} jardeko),
+						'other' => q({0} jardekoj),
 					},
 					# Core Unit Identifier
 					'decade' => {
 						'name' => q(jardekoj),
+						'one' => q({0} jardeko),
+						'other' => q({0} jardekoj),
 					},
 					# Long Unit Identifier
 					'duration-hour' => {
@@ -1444,6 +1517,20 @@ has 'units' => (
 						'other' => q({0} monatoj),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(noktoj),
+						'one' => q({0} nokto),
+						'other' => q({0} noktoj),
+						'per' => q(po {0} por nokto),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(noktoj),
+						'one' => q({0} nokto),
+						'other' => q({0} noktoj),
+						'per' => q(po {0} por nokto),
+					},
+					# Long Unit Identifier
 					'duration-second' => {
 						'name' => q(sekundoj),
 						'one' => q({0} sekundo),
@@ -1474,12 +1561,14 @@ has 'units' => (
 						'name' => q(jaroj),
 						'one' => q({0} jaro),
 						'other' => q({0} jaroj),
+						'per' => q(po {0} por jaro),
 					},
 					# Core Unit Identifier
 					'year' => {
 						'name' => q(jaroj),
 						'one' => q({0} jaro),
 						'other' => q({0} jaroj),
+						'per' => q(po {0} por jaro),
 					},
 					# Long Unit Identifier
 					'length-astronomical-unit' => {
@@ -1722,6 +1811,14 @@ has 'units' => (
 						'other' => q({0} kilogramoj),
 					},
 					# Long Unit Identifier
+					'per' => {
+						'1' => q(po {0} por {1}),
+					},
+					# Core Unit Identifier
+					'per' => {
+						'1' => q(po {0} por {1}),
+					},
+					# Long Unit Identifier
 					'speed-kilometer-per-hour' => {
 						'name' => q(kilometroj en horo),
 						'one' => q({0} kilometro en horo),
@@ -1746,6 +1843,14 @@ has 'units' => (
 						'other' => q({0} gradoj celsiaj),
 					},
 					# Long Unit Identifier
+					'times' => {
+						'1' => q({0} oble {1}),
+					},
+					# Core Unit Identifier
+					'times' => {
+						'1' => q({0} oble {1}),
+					},
+					# Long Unit Identifier
 					'volume-liter' => {
 						'name' => q(litroj),
 						'one' => q({0} litro),
@@ -1759,6 +1864,14 @@ has 'units' => (
 					},
 				},
 				'narrow' => {
+					# Long Unit Identifier
+					'' => {
+						'name' => q(direkto),
+					},
+					# Core Unit Identifier
+					'' => {
+						'name' => q(direkto),
+					},
 					# Long Unit Identifier
 					'area-hectare' => {
 						'one' => q({0}ha),
@@ -1800,6 +1913,18 @@ has 'units' => (
 						'other' => q({0}m²),
 					},
 					# Long Unit Identifier
+					'duration-century' => {
+						'name' => q(jc.),
+						'one' => q({0} jc.),
+						'other' => q({0} jc.),
+					},
+					# Core Unit Identifier
+					'century' => {
+						'name' => q(jc.),
+						'one' => q({0} jc.),
+						'other' => q({0} jc.),
+					},
+					# Long Unit Identifier
 					'duration-day' => {
 						'name' => q(t.),
 						'one' => q({0}t.),
@@ -1810,6 +1935,18 @@ has 'units' => (
 						'name' => q(t.),
 						'one' => q({0}t.),
 						'other' => q({0}t.),
+					},
+					# Long Unit Identifier
+					'duration-decade' => {
+						'name' => q(jd.),
+						'one' => q({0} jd.),
+						'other' => q({0} jd.),
+					},
+					# Core Unit Identifier
+					'decade' => {
+						'name' => q(jd.),
+						'one' => q({0} jd.),
+						'other' => q({0} jd.),
 					},
 					# Long Unit Identifier
 					'duration-hour' => {
@@ -1848,6 +1985,20 @@ has 'units' => (
 						'other' => q({0}m.),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(n.),
+						'one' => q({0} n.),
+						'other' => q({0} n.),
+						'per' => q({0}/n.),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(n.),
+						'one' => q({0} n.),
+						'other' => q({0} n.),
+						'per' => q({0}/n.),
+					},
+					# Long Unit Identifier
 					'duration-second' => {
 						'name' => q(s.),
 						'one' => q({0}s.),
@@ -1861,15 +2012,17 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'duration-year' => {
-						'name' => q(j.),
-						'one' => q({0}j.),
-						'other' => q({0}j.),
+						'name' => q(a),
+						'one' => q({0} a),
+						'other' => q({0} a),
+						'per' => q({0}/a),
 					},
 					# Core Unit Identifier
 					'year' => {
-						'name' => q(j.),
-						'one' => q({0}j.),
-						'other' => q({0}j.),
+						'name' => q(a),
+						'one' => q({0} a),
+						'other' => q({0} a),
+						'per' => q({0}/a),
 					},
 					# Long Unit Identifier
 					'length-astronomical-unit' => {
@@ -2034,12 +2187,46 @@ has 'units' => (
 				},
 				'short' => {
 					# Long Unit Identifier
+					'' => {
+						'name' => q(direkto),
+					},
+					# Core Unit Identifier
+					'' => {
+						'name' => q(direkto),
+					},
+					# Long Unit Identifier
 					'area-hectare' => {
 						'name' => q(ha),
 					},
 					# Core Unit Identifier
 					'hectare' => {
 						'name' => q(ha),
+					},
+					# Long Unit Identifier
+					'coordinate' => {
+						'east' => q({0} E),
+						'north' => q({0} N),
+						'south' => q({0} S),
+						'west' => q({0} W),
+					},
+					# Core Unit Identifier
+					'coordinate' => {
+						'east' => q({0} E),
+						'north' => q({0} N),
+						'south' => q({0} S),
+						'west' => q({0} W),
+					},
+					# Long Unit Identifier
+					'duration-century' => {
+						'name' => q(jarcent.),
+						'one' => q({0} jarcent.),
+						'other' => q({0} jarcent.),
+					},
+					# Core Unit Identifier
+					'century' => {
+						'name' => q(jarcent.),
+						'one' => q({0} jarcent.),
+						'other' => q({0} jarcent.),
 					},
 					# Long Unit Identifier
 					'duration-day' => {
@@ -2052,6 +2239,18 @@ has 'units' => (
 						'name' => q(tago),
 						'one' => q({0} t.),
 						'other' => q({0} t.),
+					},
+					# Long Unit Identifier
+					'duration-decade' => {
+						'name' => q(jardek.),
+						'one' => q({0} jardek.),
+						'other' => q({0} jardek.),
+					},
+					# Core Unit Identifier
+					'decade' => {
+						'name' => q(jardek.),
+						'one' => q({0} jardek.),
+						'other' => q({0} jardek.),
 					},
 					# Long Unit Identifier
 					'duration-hour' => {
@@ -2104,6 +2303,20 @@ has 'units' => (
 						'other' => q({0} mon.),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(nokt.),
+						'one' => q({0} nokt.),
+						'other' => q({0} nokt.),
+						'per' => q({0}/nokto),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(nokt.),
+						'one' => q({0} nokt.),
+						'other' => q({0} nokt.),
+						'per' => q({0}/nokto),
+					},
+					# Long Unit Identifier
 					'duration-second' => {
 						'name' => q(sekundo),
 						'one' => q({0} s.),
@@ -2127,15 +2340,17 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'duration-year' => {
-						'name' => q(jaro),
+						'name' => q(j.),
 						'one' => q({0} j.),
 						'other' => q({0} j.),
+						'per' => q({0}/j.),
 					},
 					# Core Unit Identifier
 					'year' => {
-						'name' => q(jaro),
+						'name' => q(j.),
 						'one' => q({0} j.),
 						'other' => q({0} j.),
+						'per' => q({0}/j.),
 					},
 					# Long Unit Identifier
 					'length-light-year' => {
@@ -2223,8 +2438,83 @@ has 'number_symbols' => (
 		'latn' => {
 			'decimal' => q(,),
 			'group' => q( ),
+			'superscriptingExponent' => q(⋅),
 		},
 	} }
+);
+
+has 'number_formats' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+		decimalFormat => {
+			'long' => {
+				'1000' => {
+					'one' => '0 mil',
+					'other' => '0 mil',
+				},
+				'10000' => {
+					'one' => '00 mil',
+					'other' => '00 mil',
+				},
+				'100000' => {
+					'one' => '000 mil',
+					'other' => '000 mil',
+				},
+				'1000000' => {
+					'one' => '0 miliono',
+					'other' => '0 milionoj',
+				},
+				'10000000' => {
+					'one' => '00 miliono',
+					'other' => '00 milionoj',
+				},
+				'100000000' => {
+					'one' => '000 miliono',
+					'other' => '000 milionoj',
+				},
+				'1000000000' => {
+					'one' => '0 miliardo',
+					'other' => '0 miliardoj',
+				},
+				'10000000000' => {
+					'one' => '00 miliardo',
+					'other' => '00 miliardoj',
+				},
+				'100000000000' => {
+					'one' => '000 miliardo',
+					'other' => '000 miliardoj',
+				},
+				'1000000000000' => {
+					'one' => '0 duiliono',
+					'other' => '0 duilionoj',
+				},
+				'10000000000000' => {
+					'one' => '00 duiliono',
+					'other' => '00 duilionoj',
+				},
+				'100000000000000' => {
+					'one' => '000 duiliono',
+					'other' => '000 duilionoj',
+				},
+			},
+			'short' => {
+				'1000' => {
+					'one' => '0k',
+					'other' => '0k',
+				},
+				'10000' => {
+					'one' => '00k',
+					'other' => '00k',
+				},
+				'100000' => {
+					'one' => '000k',
+					'other' => '000k',
+				},
+			},
+		},
+} },
 );
 
 has 'number_currency_formats' => (
@@ -2235,6 +2525,9 @@ has 'number_currency_formats' => (
 		'latn' => {
 			'pattern' => {
 				'default' => {
+					'accounting' => {
+						'positive' => '#,##0.00 ¤',
+					},
 					'standard' => {
 						'positive' => '#,##0.00 ¤',
 					},
@@ -2249,169 +2542,1082 @@ has 'currencies' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'AUD' => {
-			symbol => 'AU$',
+		'AED' => {
 			display_name => {
-				'currency' => q(Aŭstralia dolaro),
+				'currency' => q(dirhamo de Unuiĝintaj Arabaj Emirlandoj),
+				'one' => q(UAE-dirhamo),
+				'other' => q(UAE-dirhamoj),
+			},
+		},
+		'AFN' => {
+			display_name => {
+				'currency' => q(afgana afganio),
+				'one' => q(afgana afganio),
+				'other' => q(afganaj afganioj),
+			},
+		},
+		'ALL' => {
+			display_name => {
+				'currency' => q(albana leko),
+				'one' => q(albana leko),
+				'other' => q(albanaj lekoj),
+			},
+		},
+		'AMD' => {
+			display_name => {
+				'currency' => q(armena dramo),
+				'one' => q(armena dramo),
+				'other' => q(armenaj dramoj),
+			},
+		},
+		'ANG' => {
+			display_name => {
+				'currency' => q(nederlandantila guldeno),
+				'one' => q(nederlandantila guldeno),
+				'other' => q(nederlandantilaj guldenoj),
+			},
+		},
+		'AOA' => {
+			display_name => {
+				'currency' => q(angola kvanzo),
+				'one' => q(angola kvanzo),
+				'other' => q(angolaj kvanzoj),
+			},
+		},
+		'ARS' => {
+			display_name => {
+				'currency' => q(argentina peso),
+				'one' => q(argentina peso),
+				'other' => q(argentinaj pesoj),
+			},
+		},
+		'AUD' => {
+			symbol => 'AUD',
+			display_name => {
+				'currency' => q(aŭstralia dolaro),
 				'one' => q(aŭstralia dolaro),
 				'other' => q(aŭstraliaj dolaroj),
 			},
 		},
-		'BRL' => {
+		'AWG' => {
 			display_name => {
-				'currency' => q(Brazila realo),
+				'currency' => q(aruba guldeno),
+				'one' => q(aruba guldeno),
+				'other' => q(arubaj guldenoj),
+			},
+		},
+		'AZN' => {
+			display_name => {
+				'currency' => q(azerbajĝana manato),
+				'one' => q(azerbajĝana manato),
+				'other' => q(azerbajĝanaj manatoj),
+			},
+		},
+		'BAM' => {
+			display_name => {
+				'currency' => q(konvertebla marko de Bosnujo kaj Hercegovino),
+				'one' => q(konvertebla marko),
+				'other' => q(konverteblaj markoj),
+			},
+		},
+		'BBD' => {
+			display_name => {
+				'currency' => q(barbada dolaro),
+				'one' => q(barbada dolaro),
+				'other' => q(barbadaj dolaroj),
+			},
+		},
+		'BDT' => {
+			display_name => {
+				'currency' => q(bangladeŝa tako),
+				'one' => q(bangladeŝa tako),
+				'other' => q(bangladeŝaj takoj),
+			},
+		},
+		'BGN' => {
+			display_name => {
+				'currency' => q(bulgara levo),
+				'one' => q(bulgara levo),
+				'other' => q(bulgaraj levoj),
+			},
+		},
+		'BHD' => {
+			display_name => {
+				'currency' => q(barejna dinaro),
+				'one' => q(barejna dinaro),
+				'other' => q(barejnaj dinaroj),
+			},
+		},
+		'BIF' => {
+			display_name => {
+				'currency' => q(burunda franko),
+				'one' => q(burunda franko),
+				'other' => q(burundaj frankoj),
+			},
+		},
+		'BMD' => {
+			display_name => {
+				'currency' => q(bermuda dolaro),
+				'one' => q(bermuda dolaro),
+				'other' => q(bermudaj dolaroj),
+			},
+		},
+		'BND' => {
+			display_name => {
+				'currency' => q(bruneja dolaro),
+				'one' => q(bruneja dolaro),
+				'other' => q(brunejaj dolaroj),
+			},
+		},
+		'BOB' => {
+			display_name => {
+				'currency' => q(bolivia bolivjano),
+				'one' => q(bolivia bolivjano),
+				'other' => q(boliviaj bolivjanoj),
+			},
+		},
+		'BRL' => {
+			symbol => 'BRL',
+			display_name => {
+				'currency' => q(brazila realo),
 				'one' => q(brazila realo),
 				'other' => q(brazilaj realoj),
 			},
 		},
-		'CAD' => {
+		'BSD' => {
 			display_name => {
-				'currency' => q(Kanada dolaro),
+				'currency' => q(bahama dolaro),
+				'one' => q(bahama dolaro),
+				'other' => q(bahamaj dolaroj),
+			},
+		},
+		'BTN' => {
+			display_name => {
+				'currency' => q(butana ngultrumo),
+				'one' => q(butana ngultrumo),
+				'other' => q(butanaj ngultrumoj),
+			},
+		},
+		'BWP' => {
+			display_name => {
+				'currency' => q(bocvana pulao),
+				'one' => q(bocvana pulao),
+				'other' => q(bocvanaj pulaoj),
+			},
+		},
+		'BYN' => {
+			display_name => {
+				'currency' => q(belorusa rublo),
+				'one' => q(belorusa rublo),
+				'other' => q(belorusaj rubloj),
+			},
+		},
+		'BZD' => {
+			display_name => {
+				'currency' => q(beliza dolaro),
+				'one' => q(beliza dolaro),
+				'other' => q(belizaj dolaroj),
+			},
+		},
+		'CAD' => {
+			symbol => 'CAD',
+			display_name => {
+				'currency' => q(kanada dolaro),
 				'one' => q(kanada dolaro),
 				'other' => q(kanadaj dolaroj),
 			},
 		},
+		'CDF' => {
+			display_name => {
+				'currency' => q(konga franko),
+				'one' => q(konga franko),
+				'other' => q(kongaj frankoj),
+			},
+		},
 		'CHF' => {
 			display_name => {
-				'currency' => q(Svisa franko),
+				'currency' => q(svisa franko),
 				'one' => q(svisa franko),
 				'other' => q(svisaj frankoj),
 			},
 		},
-		'CNY' => {
+		'CLP' => {
 			display_name => {
-				'currency' => q(Ĉina juano),
+				'currency' => q(ĉilia peso),
+				'one' => q(ĉilia peso),
+				'other' => q(ĉiliaj pesoj),
+			},
+		},
+		'CNH' => {
+			display_name => {
+				'currency' => q(ĉina juano \(eksterlanda uzo\)),
+				'one' => q(ĉina juano \(eksterlande\)),
+				'other' => q(ĉinaj juanoj \(eksterlande\)),
+			},
+		},
+		'CNY' => {
+			symbol => 'CNY',
+			display_name => {
+				'currency' => q(ĉinaj juanoj),
 				'one' => q(ĉina juano),
 				'other' => q(ĉinaj juanoj),
 			},
 		},
+		'COP' => {
+			display_name => {
+				'currency' => q(kolombia peso),
+				'one' => q(kolombia peso),
+				'other' => q(kolombiaj pesoj),
+			},
+		},
+		'CRC' => {
+			display_name => {
+				'currency' => q(kostarika kolumbo),
+				'one' => q(kostarika kolumbo),
+				'other' => q(kostarikaj kolumboj),
+			},
+		},
+		'CUC' => {
+			display_name => {
+				'currency' => q(konvertebla kuba peso),
+				'one' => q(konvertebla kuba peso),
+				'other' => q(konverteblaj kubaj pesoj),
+			},
+		},
+		'CUP' => {
+			display_name => {
+				'currency' => q(kuba peso),
+				'one' => q(kuba peso),
+				'other' => q(kubaj pesoj),
+			},
+		},
+		'CVE' => {
+			display_name => {
+				'currency' => q(kaboverda eskudo),
+				'one' => q(kaboverda eskudo),
+				'other' => q(kaboverdaj eskudoj),
+			},
+		},
+		'CZK' => {
+			display_name => {
+				'currency' => q(ĉeĥa krono),
+				'one' => q(ĉeĥa krono),
+				'other' => q(ĉeĥaj kronoj),
+			},
+		},
+		'DJF' => {
+			display_name => {
+				'currency' => q(ĝibutia franko),
+				'one' => q(ĝibutia franko),
+				'other' => q(ĝibutiaj frankoj),
+			},
+		},
 		'DKK' => {
 			display_name => {
-				'currency' => q(Dana krono),
+				'currency' => q(dana krono),
 				'one' => q(dana krono),
 				'other' => q(danaj kronoj),
 			},
 		},
+		'DOP' => {
+			display_name => {
+				'currency' => q(dominika peso),
+				'one' => q(dominika peso),
+				'other' => q(dominikaj pesoj),
+			},
+		},
+		'DZD' => {
+			display_name => {
+				'currency' => q(alĝeria dinaro),
+				'one' => q(alĝeria dinaro),
+				'other' => q(alĝeriaj dinaroj),
+			},
+		},
+		'EGP' => {
+			display_name => {
+				'currency' => q(egipta pundo),
+				'one' => q(egipta pundo),
+				'other' => q(egiptaj pundoj),
+			},
+		},
+		'ERN' => {
+			display_name => {
+				'currency' => q(eritrea nakfo),
+				'one' => q(eritrea nakfo),
+				'other' => q(eritreaj nakfoj),
+			},
+		},
+		'ETB' => {
+			display_name => {
+				'currency' => q(etiopa birro),
+				'one' => q(etiopa birro),
+				'other' => q(etiopaj birroj),
+			},
+		},
 		'EUR' => {
 			display_name => {
-				'currency' => q(Eŭro),
+				'currency' => q(eŭro),
 				'one' => q(eŭro),
 				'other' => q(eŭroj),
 			},
 		},
-		'GBP' => {
+		'FJD' => {
 			display_name => {
-				'currency' => q(Brita pundo),
+				'currency' => q(fiĝia dolaro),
+				'one' => q(fiĝia dolaro),
+				'other' => q(fiĝiaj dolaroj),
+			},
+		},
+		'FKP' => {
+			display_name => {
+				'currency' => q(falklanda pundo),
+				'one' => q(falklanda pundo),
+				'other' => q(falklandaj pundoj),
+			},
+		},
+		'GBP' => {
+			symbol => 'GBP',
+			display_name => {
+				'currency' => q(brita pundo),
 				'one' => q(brita pundo),
 				'other' => q(britaj pundoj),
 			},
 		},
-		'HKD' => {
+		'GEL' => {
 			display_name => {
-				'currency' => q(Honkonga dolaro),
+				'currency' => q(kartvela lario),
+				'one' => q(kartvela lario),
+				'other' => q(kartvelaj larioj),
+			},
+		},
+		'GHS' => {
+			display_name => {
+				'currency' => q(ganaa cedio),
+				'one' => q(ganaa cedio),
+				'other' => q(ganaaj cedioj),
+			},
+		},
+		'GIP' => {
+			display_name => {
+				'currency' => q(ĝibraltara pundo),
+				'one' => q(ĝibraltara pundo),
+				'other' => q(ĝibraltaraj pundoj),
+			},
+		},
+		'GMD' => {
+			display_name => {
+				'currency' => q(gambia dalasio),
+				'one' => q(gambia dalasio),
+				'other' => q(gambiaj dalasioj),
+			},
+		},
+		'GNF' => {
+			display_name => {
+				'currency' => q(gvinea franko),
+				'one' => q(gvinea franko),
+				'other' => q(gvineaj frankoj),
+			},
+		},
+		'GTQ' => {
+			display_name => {
+				'currency' => q(gvatemala kecalo),
+				'one' => q(gvatemala kecalo),
+				'other' => q(gvatemalaj kecaloj),
+			},
+		},
+		'GYD' => {
+			display_name => {
+				'currency' => q(gujana dolaro),
+				'one' => q(gujana dolaro),
+				'other' => q(gujanaj dolaroj),
+			},
+		},
+		'HKD' => {
+			symbol => 'HKD',
+			display_name => {
+				'currency' => q(honkonga dolaro),
 				'one' => q(honkonga dolaro),
 				'other' => q(honkongaj dolaroj),
 			},
 		},
+		'HNL' => {
+			display_name => {
+				'currency' => q(hondura lempiro),
+				'one' => q(hondura lempiro),
+				'other' => q(honduraj lempiroj),
+			},
+		},
+		'HRK' => {
+			display_name => {
+				'currency' => q(kroata kunao),
+				'one' => q(kroata kunao),
+				'other' => q(kroataj kunaoj),
+			},
+		},
+		'HTG' => {
+			display_name => {
+				'currency' => q(haitia gurdo),
+				'one' => q(haitia gurdo),
+				'other' => q(haitiaj gurdoj),
+			},
+		},
+		'HUF' => {
+			display_name => {
+				'currency' => q(hungara forinto),
+				'one' => q(hungara forinto),
+				'other' => q(hungaraj forintoj),
+			},
+		},
 		'IDR' => {
 			display_name => {
-				'currency' => q(Indonezia rupio),
-				'one' => q(Indonezia rupio),
-				'other' => q(Indoneziaj rupioj),
+				'currency' => q(indonezia rupio),
+				'one' => q(indonezia rupio),
+				'other' => q(indoneziaj rupioj),
+			},
+		},
+		'ILS' => {
+			symbol => 'ILS',
+			display_name => {
+				'currency' => q(israela nova siklo),
+				'one' => q(israela nova siklo),
+				'other' => q(israelaj novaj sikloj),
 			},
 		},
 		'INR' => {
+			symbol => 'INR',
 			display_name => {
-				'currency' => q(Barata rupio),
-				'one' => q(barata rupio),
-				'other' => q(barataj rupioj),
+				'currency' => q(hinda rupio),
+				'one' => q(hinda rupio),
+				'other' => q(hindaj rupioj),
+			},
+		},
+		'IQD' => {
+			display_name => {
+				'currency' => q(iraka dinaro),
+				'one' => q(iraka dinaro),
+				'other' => q(irakaj dinaroj),
+			},
+		},
+		'IRR' => {
+			display_name => {
+				'currency' => q(irana rialo),
+				'one' => q(irana rialo),
+				'other' => q(iranaj rialoj),
+			},
+		},
+		'ISK' => {
+			display_name => {
+				'currency' => q(islanda krono),
+				'one' => q(islanda krono),
+				'other' => q(islandaj kronoj),
+			},
+		},
+		'JMD' => {
+			display_name => {
+				'currency' => q(jamajka dolaro),
+				'one' => q(jamajka dolaro),
+				'other' => q(jamajkaj dolaroj),
+			},
+		},
+		'JOD' => {
+			display_name => {
+				'currency' => q(jordania dinaro),
+				'one' => q(jordania dinaro),
+				'other' => q(jordaniaj dinaroj),
 			},
 		},
 		'JPY' => {
+			symbol => 'JPY',
 			display_name => {
-				'currency' => q(Japana eno),
+				'currency' => q(japana eno),
 				'one' => q(japana eno),
 				'other' => q(japanaj enoj),
 			},
 		},
-		'KRW' => {
+		'KES' => {
 			display_name => {
-				'currency' => q(Sud-korea ŭono),
-				'one' => q(sud-korea ŭono),
-				'other' => q(sud-koreaj ŭonoj),
+				'currency' => q(kenja ŝilingo),
+				'one' => q(kenja ŝilingo),
+				'other' => q(kenjaj ŝilingoj),
+			},
+		},
+		'KGS' => {
+			display_name => {
+				'currency' => q(kirgiza somo),
+				'one' => q(kirgiza somo),
+				'other' => q(kirgizaj somoj),
+			},
+		},
+		'KHR' => {
+			display_name => {
+				'currency' => q(kamboĝa rielo),
+				'one' => q(kamboĝa rielo),
+				'other' => q(kamboĝaj rieloj),
+			},
+		},
+		'KMF' => {
+			display_name => {
+				'currency' => q(komora franko),
+				'one' => q(komora franko),
+				'other' => q(komoraj frankoj),
+			},
+		},
+		'KPW' => {
+			display_name => {
+				'currency' => q(nordkorea vono),
+				'one' => q(nordkorea vono),
+				'other' => q(nordkoreaj vonoj),
+			},
+		},
+		'KRW' => {
+			symbol => 'KRW',
+			display_name => {
+				'currency' => q(sudkorea vono),
+				'one' => q(sudkorea vono),
+				'other' => q(sudkoreaj vonoj),
+			},
+		},
+		'KWD' => {
+			display_name => {
+				'currency' => q(kuvajta dinaro),
+				'one' => q(kuvajta dinaro),
+				'other' => q(kuvajtaj dinaroj),
+			},
+		},
+		'KYD' => {
+			display_name => {
+				'currency' => q(kajmana dolaro),
+				'one' => q(kajmana dolaro),
+				'other' => q(kajmanaj dolaroj),
+			},
+		},
+		'KZT' => {
+			display_name => {
+				'currency' => q(kazaĥa tengo),
+				'one' => q(kazaĥa tengo),
+				'other' => q(kazaĥaj tengoj),
+			},
+		},
+		'LAK' => {
+			display_name => {
+				'currency' => q(laosa kipo),
+				'one' => q(laosa kipo),
+				'other' => q(laosaj kipoj),
+			},
+		},
+		'LBP' => {
+			display_name => {
+				'currency' => q(libana liro),
+				'one' => q(libana liro),
+				'other' => q(libanaj liroj),
+			},
+		},
+		'LKR' => {
+			symbol => '₨',
+			display_name => {
+				'currency' => q(srilanka rupio),
+				'one' => q(srilanka rupio),
+				'other' => q(srilankaj rupioj),
+			},
+		},
+		'LRD' => {
+			display_name => {
+				'currency' => q(liberia dolaro),
+				'one' => q(liberia dolaro),
+				'other' => q(liberiaj dolaroj),
+			},
+		},
+		'LSL' => {
+			display_name => {
+				'currency' => q(lesota lotio),
+				'one' => q(lesota lotio),
+				'other' => q(lesotaj lotioj),
+			},
+		},
+		'LYD' => {
+			display_name => {
+				'currency' => q(libia dinaro),
+				'one' => q(libia dinaro),
+				'other' => q(libiaj dinaroj),
+			},
+		},
+		'MAD' => {
+			display_name => {
+				'currency' => q(maroka dirhamo),
+				'one' => q(maroka dirhamo),
+				'other' => q(marokaj dirhamoj),
+			},
+		},
+		'MDL' => {
+			display_name => {
+				'currency' => q(moldava leo),
+				'one' => q(moldava leo),
+				'other' => q(moldavaj leoj),
+			},
+		},
+		'MGA' => {
+			display_name => {
+				'currency' => q(madagaskara ariaro),
+				'one' => q(madagaskara ariaro),
+				'other' => q(madagaskaraj ariaroj),
+			},
+		},
+		'MKD' => {
+			display_name => {
+				'currency' => q(makedona denaro),
+				'one' => q(makedona denaro),
+				'other' => q(makedonaj denaroj),
+			},
+		},
+		'MMK' => {
+			display_name => {
+				'currency' => q(birma kjato),
+				'one' => q(birma kjato),
+				'other' => q(birmaj kjatoj),
+			},
+		},
+		'MNT' => {
+			display_name => {
+				'currency' => q(mongola tugriko),
+				'one' => q(mongola tugriko),
+				'other' => q(mongolaj tugrikoj),
+			},
+		},
+		'MOP' => {
+			display_name => {
+				'currency' => q(makaa patako),
+				'one' => q(makaa patako),
+				'other' => q(makaaj patakoj),
+			},
+		},
+		'MRU' => {
+			display_name => {
+				'currency' => q(maŭritania uguijao),
+				'one' => q(maŭritania uguijao),
+				'other' => q(maŭritaniaj uguijaoj),
+			},
+		},
+		'MUR' => {
+			symbol => '₨',
+			display_name => {
+				'currency' => q(maŭricia rupio),
+				'one' => q(maŭricia rupio),
+				'other' => q(maŭriciaj rupioj),
+			},
+		},
+		'MVR' => {
+			display_name => {
+				'currency' => q(maldiva rufijao),
+				'one' => q(maldiva rufijao),
+				'other' => q(maldivaj rufijaoj),
+			},
+		},
+		'MWK' => {
+			display_name => {
+				'currency' => q(malavia kvaĉo),
+				'one' => q(malavia kvaĉo),
+				'other' => q(malaviaj kvaĉoj),
 			},
 		},
 		'MXN' => {
+			symbol => 'MXN',
 			display_name => {
-				'currency' => q(Meksika peso),
+				'currency' => q(meksika peso),
 				'one' => q(meksika peso),
 				'other' => q(meksikaj pesoj),
 			},
 		},
+		'MYR' => {
+			display_name => {
+				'currency' => q(malajzia ringito),
+				'one' => q(malajzia ringito),
+				'other' => q(malajziaj ringitoj),
+			},
+		},
+		'MZN' => {
+			display_name => {
+				'currency' => q(mozambika metikalo),
+				'one' => q(mozambika metikalo),
+				'other' => q(mozambikaj metikaloj),
+			},
+		},
+		'NAD' => {
+			display_name => {
+				'currency' => q(namibia dolaro),
+				'one' => q(namibia dolaro),
+				'other' => q(namibiaj dolaroj),
+			},
+		},
+		'NGN' => {
+			display_name => {
+				'currency' => q(niĝeria najro),
+				'one' => q(niĝeria najro),
+				'other' => q(niĝeriaj najroj),
+			},
+		},
+		'NIO' => {
+			display_name => {
+				'currency' => q(nikaragva kordovo),
+				'one' => q(nikaragva kordovo),
+				'other' => q(nikaragvaj kordovoj),
+			},
+		},
 		'NOK' => {
 			display_name => {
-				'currency' => q(Norvega krono),
+				'currency' => q(norvega krono),
 				'one' => q(norvega krono),
 				'other' => q(norvegaj kronoj),
 			},
 		},
+		'NPR' => {
+			symbol => '₨',
+			display_name => {
+				'currency' => q(nepala rupio),
+				'one' => q(nepala rupio),
+				'other' => q(nepalaj rupioj),
+			},
+		},
+		'NZD' => {
+			symbol => 'NZD',
+			display_name => {
+				'currency' => q(novzelanda dolaro),
+				'one' => q(novzelanda dolaro),
+				'other' => q(novzelandaj dolaroj),
+			},
+		},
+		'OMR' => {
+			display_name => {
+				'currency' => q(omana rialo),
+				'one' => q(omana rialo),
+				'other' => q(omanaj rialoj),
+			},
+		},
+		'PAB' => {
+			display_name => {
+				'currency' => q(panama balboo),
+				'one' => q(panama balboo),
+				'other' => q(panamaj balbooj),
+			},
+		},
+		'PEN' => {
+			display_name => {
+				'currency' => q(perua suno),
+				'one' => q(perua suno),
+				'other' => q(peruaj sunoj),
+			},
+		},
+		'PGK' => {
+			display_name => {
+				'currency' => q(papuonovgvinea kinao),
+				'one' => q(papuonovgvinea kinao),
+				'other' => q(papuonovgvineaj kinaoj),
+			},
+		},
+		'PHP' => {
+			symbol => 'PHP',
+			display_name => {
+				'currency' => q(filipina peso),
+				'one' => q(filipina peso),
+				'other' => q(filipinaj pesoj),
+			},
+		},
+		'PKR' => {
+			symbol => '₨',
+			display_name => {
+				'currency' => q(pakistana rupio),
+				'one' => q(pakistana rupio),
+				'other' => q(pakistanaj rupioj),
+			},
+		},
 		'PLN' => {
 			display_name => {
-				'currency' => q(Pola zloto),
+				'currency' => q(pola zloto),
 				'one' => q(pola zloto),
 				'other' => q(polaj zlotoj),
 			},
 		},
+		'PYG' => {
+			display_name => {
+				'currency' => q(paragvaja gvaranio),
+				'one' => q(paragvaja gvaranio),
+				'other' => q(paragvajaj gvaranioj),
+			},
+		},
+		'QAR' => {
+			display_name => {
+				'currency' => q(katara rialo),
+				'one' => q(katara rialo),
+				'other' => q(kataraj rialoj),
+			},
+		},
+		'RON' => {
+			display_name => {
+				'currency' => q(rumana leo),
+				'one' => q(rumana leo),
+				'other' => q(rumanaj leoj),
+			},
+		},
+		'RSD' => {
+			display_name => {
+				'currency' => q(serba dinaro),
+				'one' => q(serba dinaro),
+				'other' => q(serbaj dinaroj),
+			},
+		},
 		'RUB' => {
 			display_name => {
-				'currency' => q(Rusa rublo),
+				'currency' => q(rusa rublo),
 				'one' => q(rusa rublo),
 				'other' => q(rusaj rubloj),
 			},
 		},
+		'RWF' => {
+			display_name => {
+				'currency' => q(ruanda franko),
+				'one' => q(ruanda franko),
+				'other' => q(ruandaj frankoj),
+			},
+		},
 		'SAR' => {
 			display_name => {
-				'currency' => q(Sauda rialo),
+				'currency' => q(sauda rialo),
 				'one' => q(sauda rialo),
 				'other' => q(saudaj rialoj),
 			},
 		},
+		'SBD' => {
+			display_name => {
+				'currency' => q(salomona dolaro),
+				'one' => q(salomona dolaro),
+				'other' => q(salomonaj dolaroj),
+			},
+		},
+		'SCR' => {
+			display_name => {
+				'currency' => q(sejŝela rupio),
+				'one' => q(sejŝela rupio),
+				'other' => q(sejŝelaj rupioj),
+			},
+		},
+		'SDG' => {
+			display_name => {
+				'currency' => q(sudana pundo),
+				'one' => q(sudana pundo),
+				'other' => q(sudanaj pundoj),
+			},
+		},
 		'SEK' => {
 			display_name => {
-				'currency' => q(Sveda krono),
+				'currency' => q(sveda krono),
 				'one' => q(sveda krono),
 				'other' => q(svedaj kronoj),
 			},
 		},
-		'THB' => {
-			symbol => '฿',
+		'SGD' => {
 			display_name => {
-				'currency' => q(Taja bahto),
+				'currency' => q(singapura dolaro),
+				'one' => q(singapura dolaro),
+				'other' => q(singapuraj dolaroj),
+			},
+		},
+		'SHP' => {
+			display_name => {
+				'currency' => q(sankthelena pundo),
+				'one' => q(sankthelena pundo),
+				'other' => q(sankthelenaj pundoj),
+			},
+		},
+		'SLE' => {
+			display_name => {
+				'currency' => q(sieraleona leono),
+				'one' => q(sieraleona leono),
+				'other' => q(sieraleonaj leonoj),
+			},
+		},
+		'SLL' => {
+			display_name => {
+				'currency' => q(sieraleona leono \(1964–2022\)),
+				'one' => q(sieraleona leono \(1964–2022\)),
+				'other' => q(sieraleonaj leonoj \(1964–2022\)),
+			},
+		},
+		'SOS' => {
+			display_name => {
+				'currency' => q(somala ŝilingo),
+				'one' => q(somala ŝilingo),
+				'other' => q(somalaj ŝilingoj),
+			},
+		},
+		'SRD' => {
+			display_name => {
+				'currency' => q(surinama dolaro),
+				'one' => q(surinama dolaro),
+				'other' => q(surinamaj dolaroj),
+			},
+		},
+		'SSP' => {
+			display_name => {
+				'currency' => q(sudsudana pundo),
+				'one' => q(sudsudana pundo),
+				'other' => q(sudsudanaj pundoj),
+			},
+		},
+		'STN' => {
+			display_name => {
+				'currency' => q(santomea dobro),
+				'one' => q(santomea dobro),
+				'other' => q(santomeaj dobroj),
+			},
+		},
+		'SYP' => {
+			display_name => {
+				'currency' => q(siria pundo),
+				'one' => q(siria pundo),
+				'other' => q(siriaj pundoj),
+			},
+		},
+		'SZL' => {
+			display_name => {
+				'currency' => q(svazilanda liliagenio),
+				'one' => q(svazia lilangenio),
+				'other' => q(svaziaj lilangenioj),
+			},
+		},
+		'THB' => {
+			display_name => {
+				'currency' => q(taja bahto),
 				'one' => q(taja bahto),
 				'other' => q(tajaj bahtoj),
 			},
 		},
-		'TRY' => {
-			symbol => '₺',
+		'TJS' => {
 			display_name => {
-				'currency' => q(Turka liro),
+				'currency' => q(taĝika somonio),
+				'one' => q(taĝika somonio),
+				'other' => q(taĝikaj somonioj),
+			},
+		},
+		'TMT' => {
+			display_name => {
+				'currency' => q(turkmena manato),
+				'one' => q(turkmena manato),
+				'other' => q(turkmenaj manatoj),
+			},
+		},
+		'TND' => {
+			display_name => {
+				'currency' => q(tunizia dinaro),
+				'one' => q(tunizia dinaro),
+				'other' => q(tuniziaj dinaroj),
+			},
+		},
+		'TOP' => {
+			display_name => {
+				'currency' => q(tonga paangao),
+				'one' => q(tonga paangao),
+				'other' => q(tongaj paangaoj),
+			},
+		},
+		'TRY' => {
+			display_name => {
+				'currency' => q(turka liro),
 				'one' => q(turka liro),
 				'other' => q(turkaj liroj),
 			},
 		},
-		'TWD' => {
-			symbol => 'NT$',
+		'TTD' => {
 			display_name => {
-				'currency' => q(Nova tajvana dolaro),
-				'one' => q(nova tajvana dolaro),
-				'other' => q(novaj tajvanaj dolaroj),
+				'currency' => q(trinidada dolaro),
+				'one' => q(trinidada dolaro),
+				'other' => q(trinidadaj dolaroj),
+			},
+		},
+		'TWD' => {
+			symbol => 'TWD',
+			display_name => {
+				'currency' => q(tajvana nova dolaro),
+				'one' => q(tajvana nova dolaro),
+				'other' => q(tajvanaj novaj dolaroj),
+			},
+		},
+		'TZS' => {
+			display_name => {
+				'currency' => q(tanzania ŝilingo),
+				'one' => q(tanzania ŝilingo),
+				'other' => q(tanzaniaj ŝilingoj),
+			},
+		},
+		'UAH' => {
+			display_name => {
+				'currency' => q(ukraina hrivno),
+				'one' => q(ukraina hrivno),
+				'other' => q(ukrainaj hrivnoj),
+			},
+		},
+		'UGX' => {
+			display_name => {
+				'currency' => q(uganda ŝilingo),
+				'one' => q(uganda ŝilingo),
+				'other' => q(ugandaj ŝilingoj),
 			},
 		},
 		'USD' => {
+			symbol => 'USD',
 			display_name => {
-				'currency' => q(Usona dolaro),
+				'currency' => q(usona dolaro),
 				'one' => q(usona dolaro),
 				'other' => q(usonaj dolaroj),
+			},
+		},
+		'UYU' => {
+			display_name => {
+				'currency' => q(urugvaja peso),
+				'one' => q(urugvaja peso),
+				'other' => q(urugvajaj pesoj),
+			},
+		},
+		'UZS' => {
+			display_name => {
+				'currency' => q(uzbeka somo),
+				'one' => q(uzbeka somo),
+				'other' => q(uzbekaj somoj),
+			},
+		},
+		'VES' => {
+			display_name => {
+				'currency' => q(venezuela bolivaro),
+				'one' => q(venezuela bolivaro),
+				'other' => q(venezuelaj bolivaroj),
+			},
+		},
+		'VND' => {
+			symbol => 'VND',
+			display_name => {
+				'currency' => q(vjetnama dongo),
+				'one' => q(vjetnama dongo),
+				'other' => q(vjetnamaj dongoj),
+			},
+		},
+		'VUV' => {
+			display_name => {
+				'currency' => q(vanuatua vatuo),
+				'one' => q(vanuatua vatuo),
+				'other' => q(vanuatuaj vatuoj),
+			},
+		},
+		'WST' => {
+			display_name => {
+				'currency' => q(samoa talao),
+				'one' => q(samoa talao),
+				'other' => q(samoaj talaoj),
+			},
+		},
+		'XAF' => {
+			symbol => 'XAF',
+			display_name => {
+				'currency' => q(ekvatorafrika franko),
+				'one' => q(ekvatorafrika franko),
+				'other' => q(ekvatorafrikaj frankoj),
 			},
 		},
 		'XAG' => {
@@ -2429,14 +3635,38 @@ has 'currencies' => (
 				'currency' => q(eŭropa monunuo),
 			},
 		},
+		'XCD' => {
+			symbol => 'XCD',
+			display_name => {
+				'currency' => q(orientkariba dolaro),
+				'one' => q(orientkariba dolaro),
+				'other' => q(orientkaribaj dolaroj),
+			},
+		},
 		'XFO' => {
 			display_name => {
 				'currency' => q(franca ora franko),
 			},
 		},
+		'XOF' => {
+			symbol => 'XOF',
+			display_name => {
+				'currency' => q(okcidentafrika franko),
+				'one' => q(okcidentafrika franko),
+				'other' => q(okcidentafrikaj frankoj),
+			},
+		},
 		'XPD' => {
 			display_name => {
 				'currency' => q(paladio),
+			},
+		},
+		'XPF' => {
+			symbol => 'XPF',
+			display_name => {
+				'currency' => q(pacifika franko),
+				'one' => q(pacifika franko),
+				'other' => q(pacifikaj frankoj),
 			},
 		},
 		'XPT' => {
@@ -2446,16 +3676,30 @@ has 'currencies' => (
 		},
 		'XXX' => {
 			display_name => {
-				'currency' => q(Nekonata valuto),
-				'one' => q(nekonata monunuo),
-				'other' => q(nekonataj monunuoj),
+				'currency' => q(nekonata monunuo),
+				'one' => q(\(nekunata monunuo\)),
+				'other' => q(\(nekonata monunuo\)),
+			},
+		},
+		'YER' => {
+			display_name => {
+				'currency' => q(jemena rialo),
+				'one' => q(jemena rialo),
+				'other' => q(jemenaj rialoj),
 			},
 		},
 		'ZAR' => {
 			display_name => {
-				'currency' => q(Sud-afrika rando),
-				'one' => q(sud-afrika rando),
-				'other' => q(sud-afrikaj randoj),
+				'currency' => q(sudafrika rando),
+				'one' => q(sudafrika rando),
+				'other' => q(sudafrikaj randoj),
+			},
+		},
+		'ZMW' => {
+			display_name => {
+				'currency' => q(zambia kvaĉo),
+				'one' => q(zambia kvaĉo),
+				'other' => q(zambiaj kvaĉoj),
 			},
 		},
 	} },
@@ -2509,25 +3753,6 @@ has 'calendar_months' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'Jan',
-							'Feb',
-							'Mar',
-							'Apr',
-							'Maj',
-							'Jun',
-							'Jul',
-							'Aŭg',
-							'Sep',
-							'Okt',
-							'Nov',
-							'Dec'
-						],
-						leap => [
-							
-						],
-					},
 					narrow => {
 						nonleap => [
 							'J',
@@ -3041,6 +4266,11 @@ has 'time_zone_names' => (
 		regionFormat => q(tempo de {0}),
 		regionFormat => q(somera tempo de {0}),
 		regionFormat => q(norma tempo de {0}),
+		'Afghanistan' => {
+			long => {
+				'standard' => q#afgana tempo#,
+			},
+		},
 		'Africa/Abidjan' => {
 			exemplarCity => q#Abiĝano#,
 		},
@@ -3048,7 +4278,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Akrao#,
 		},
 		'Africa/Addis_Ababa' => {
-			exemplarCity => q#Adis-Abebo#,
+			exemplarCity => q#Adisabebo#,
 		},
 		'Africa/Algiers' => {
 			exemplarCity => q#Alĝero#,
@@ -3170,6 +4400,9 @@ has 'time_zone_names' => (
 		'Africa/Ouagadougou' => {
 			exemplarCity => q#Vagaduguo#,
 		},
+		'Africa/Porto-Novo' => {
+			exemplarCity => q#Portonovo#,
+		},
 		'Africa/Sao_Tome' => {
 			exemplarCity => q#Santomeo#,
 		},
@@ -3234,13 +4467,16 @@ has 'time_zone_names' => (
 			exemplarCity => q#Saltaurbo#,
 		},
 		'America/Argentina/Tucuman' => {
-			exemplarCity => q#San Miguel de Tucumán#,
+			exemplarCity => q#Tucumán#,
 		},
 		'America/Aruba' => {
 			exemplarCity => q#Arubo#,
 		},
 		'America/Asuncion' => {
 			exemplarCity => q#Asunciono#,
+		},
+		'America/Bahia' => {
+			exemplarCity => q#Bahio#,
 		},
 		'America/Barbados' => {
 			exemplarCity => q#Barbado#,
@@ -3256,6 +4492,9 @@ has 'time_zone_names' => (
 		},
 		'America/Buenos_Aires' => {
 			exemplarCity => q#Bonaero#,
+		},
+		'America/Cambridge_Bay' => {
+			exemplarCity => q#Kembriĝa Golfo#,
 		},
 		'America/Cancun' => {
 			exemplarCity => q#Kankuno#,
@@ -3359,14 +4598,8 @@ has 'time_zone_names' => (
 		'America/Jamaica' => {
 			exemplarCity => q#Jamajko#,
 		},
-		'America/Jujuy' => {
-			exemplarCity => q#San Salvador de Jujuy#,
-		},
 		'America/Kentucky/Monticello' => {
 			exemplarCity => q#Monticello, Kentukio#,
-		},
-		'America/La_Paz' => {
-			exemplarCity => q#La-Pazo#,
 		},
 		'America/Lima' => {
 			exemplarCity => q#Limo#,
@@ -3450,7 +4683,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Sankta Domingo#,
 		},
 		'America/Sao_Paulo' => {
-			exemplarCity => q#San-Paŭlo#,
+			exemplarCity => q#Sanpaŭlo#,
 		},
 		'America/St_Barthelemy' => {
 			exemplarCity => q#Sankta Bartolomeo#,
@@ -3509,6 +4742,16 @@ has 'time_zone_names' => (
 		},
 		'Antarctica/Macquarie' => {
 			exemplarCity => q#Makvora insulo#,
+		},
+		'Antarctica/Syowa' => {
+			exemplarCity => q#Showa#,
+		},
+		'Apia' => {
+			long => {
+				'daylight' => q#Apio (somera tempo)#,
+				'generic' => q#tempo: Apio#,
+				'standard' => q#Apio (norma tempo)#,
+			},
 		},
 		'Arabian' => {
 			long => {
@@ -3586,14 +4829,20 @@ has 'time_zone_names' => (
 		'Asia/Brunei' => {
 			exemplarCity => q#Brunejo#,
 		},
+		'Asia/Calcutta' => {
+			exemplarCity => q#Kolkato#,
+		},
 		'Asia/Chita' => {
 			exemplarCity => q#Ĉita#,
 		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#Ĉoibalsan#,
+		'Asia/Colombo' => {
+			exemplarCity => q#Kolombo#,
 		},
 		'Asia/Damascus' => {
 			exemplarCity => q#Damasko#,
+		},
+		'Asia/Dhaka' => {
+			exemplarCity => q#Dako#,
 		},
 		'Asia/Dili' => {
 			exemplarCity => q#Dilo#,
@@ -3605,7 +4854,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Duŝanbeo#,
 		},
 		'Asia/Gaza' => {
-			exemplarCity => q#Gaza-urbo#,
+			exemplarCity => q#Gazao#,
 		},
 		'Asia/Hebron' => {
 			exemplarCity => q#Hebrono#,
@@ -3625,8 +4874,17 @@ has 'time_zone_names' => (
 		'Asia/Jerusalem' => {
 			exemplarCity => q#Jerusalemo#,
 		},
+		'Asia/Kabul' => {
+			exemplarCity => q#Kabulo#,
+		},
 		'Asia/Kamchatka' => {
 			exemplarCity => q#Kamĉatko#,
+		},
+		'Asia/Karachi' => {
+			exemplarCity => q#Karaĉio#,
+		},
+		'Asia/Katmandu' => {
+			exemplarCity => q#Katmanduo#,
 		},
 		'Asia/Khandyga' => {
 			exemplarCity => q#Ĥandiga#,
@@ -3635,7 +4893,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Krasnojarsko#,
 		},
 		'Asia/Kuala_Lumpur' => {
-			exemplarCity => q#Kuala-Lumpuro#,
+			exemplarCity => q#Kualalumpuro#,
 		},
 		'Asia/Kuwait' => {
 			exemplarCity => q#Kuvajto#,
@@ -3714,6 +4972,12 @@ has 'time_zone_names' => (
 		},
 		'Asia/Tbilisi' => {
 			exemplarCity => q#Tbiliso#,
+		},
+		'Asia/Tehran' => {
+			exemplarCity => q#Teherano#,
+		},
+		'Asia/Thimphu' => {
+			exemplarCity => q#Timbuo#,
 		},
 		'Asia/Tokyo' => {
 			exemplarCity => q#Tokio#,
@@ -3838,8 +5102,20 @@ has 'time_zone_names' => (
 		'Azores' => {
 			long => {
 				'daylight' => q#Acoroj (somera tempo)#,
-				'generic' => q#horzono Acoroj#,
+				'generic' => q#tempo: Acoroj#,
 				'standard' => q#Acoroj (norma tempo)#,
+			},
+		},
+		'Bangladesh' => {
+			long => {
+				'daylight' => q#bangladeŝa somera tempo#,
+				'generic' => q#bangladeŝa tempo#,
+				'standard' => q#bangladeŝa norma tempo#,
+			},
+		},
+		'Bhutan' => {
+			long => {
+				'standard' => q#butana tempo#,
 			},
 		},
 		'Bolivia' => {
@@ -3866,6 +5142,11 @@ has 'time_zone_names' => (
 				'standard' => q#kaboverda norma tempo#,
 			},
 		},
+		'Chamorro' => {
+			long => {
+				'standard' => q#ĉamora tempo#,
+			},
+		},
 		'Chatham' => {
 			long => {
 				'daylight' => q#ĉathama somera tempo#,
@@ -3887,13 +5168,6 @@ has 'time_zone_names' => (
 				'standard' => q#ĉina norma tempo#,
 			},
 		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Ĉoibalsan (somera tempo)#,
-				'generic' => q#horzono Ĉoibalsan#,
-				'standard' => q#Ĉoibalsan (norma tempo)#,
-			},
-		},
 		'Christmas' => {
 			long => {
 				'standard' => q#kristnaskinsula tempo#,
@@ -3911,26 +5185,33 @@ has 'time_zone_names' => (
 				'standard' => q#kolombia norma tempo#,
 			},
 		},
+		'Cook' => {
+			long => {
+				'daylight' => q#kukinsula somera tempo#,
+				'generic' => q#kukinsula tempo#,
+				'standard' => q#kukinsula norma tempo#,
+			},
+		},
 		'Cuba' => {
 			long => {
 				'daylight' => q#Kubo (somera tempo)#,
-				'generic' => q#horzono Kubo#,
+				'generic' => q#tempo: Kubo#,
 				'standard' => q#Kubo (norma tempo)#,
 			},
 		},
 		'Davis' => {
 			long => {
-				'standard' => q#horzono Davis#,
+				'standard' => q#tempo: Davis#,
 			},
 		},
 		'DumontDUrville' => {
 			long => {
-				'standard' => q#horzono Dumont-d’Urville#,
+				'standard' => q#tempo: Dumont d’Urville#,
 			},
 		},
 		'East_Timor' => {
 			long => {
-				'standard' => q#orienttimora tempo#,
+				'standard' => q#orient-timora tempo#,
 			},
 		},
 		'Easter' => {
@@ -3943,6 +5224,11 @@ has 'time_zone_names' => (
 		'Ecuador' => {
 			long => {
 				'standard' => q#ekvadora tempo#,
+			},
+		},
+		'Etc/UTC' => {
+			long => {
+				'standard' => q#universala tempo kunordigita#,
 			},
 		},
 		'Etc/Unknown' => {
@@ -3989,6 +5275,9 @@ has 'time_zone_names' => (
 		},
 		'Europe/Dublin' => {
 			exemplarCity => q#Dublino#,
+			long => {
+				'daylight' => q#irlanda norma tempo#,
+			},
 		},
 		'Europe/Gibraltar' => {
 			exemplarCity => q#Ĝibraltaro#,
@@ -4022,6 +5311,9 @@ has 'time_zone_names' => (
 		},
 		'Europe/London' => {
 			exemplarCity => q#Londono#,
+			long => {
+				'daylight' => q#brita somera tempo#,
+			},
 		},
 		'Europe/Luxembourg' => {
 			exemplarCity => q#Luksemburgo#,
@@ -4080,9 +5372,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#Uljanovsko#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#Uĵhorodo#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#Vaduzo#,
 		},
@@ -4103,9 +5392,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#Zagrebo#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#Zaporiĵo#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#Zuriko#,
@@ -4143,14 +5429,21 @@ has 'time_zone_names' => (
 				'standard' => q#falklanda norma tempo#,
 			},
 		},
+		'Fiji' => {
+			long => {
+				'daylight' => q#fiĝia somera tempo#,
+				'generic' => q#fiĝia tempo#,
+				'standard' => q#fiĝia norma tempo#,
+			},
+		},
 		'French_Guiana' => {
 			long => {
-				'standard' => q#horzono Franca Gviano#,
+				'standard' => q#tempo: Franca Gujano#,
 			},
 		},
 		'French_Southern' => {
 			long => {
-				'standard' => q#horzono Francaj Sudaj Teritorioj#,
+				'standard' => q#tempo: Francaj Sudaj Teritorioj#,
 			},
 		},
 		'GMT' => {
@@ -4163,11 +5456,21 @@ has 'time_zone_names' => (
 				'standard' => q#galapaga tempo#,
 			},
 		},
+		'Gambier' => {
+			long => {
+				'standard' => q#tempo: Gambier#,
+			},
+		},
 		'Georgia' => {
 			long => {
 				'daylight' => q#kartvela somera tempo#,
 				'generic' => q#kartvela tempo#,
 				'standard' => q#kartvela norma tempo#,
+			},
+		},
+		'Gilbert_Islands' => {
+			long => {
+				'standard' => q#gilbertinsula tempo#,
 			},
 		},
 		'Greenland_Eastern' => {
@@ -4186,7 +5489,7 @@ has 'time_zone_names' => (
 		},
 		'Gulf' => {
 			long => {
-				'standard' => q#golfa norma tempo#,
+				'standard' => q#arabgolfa norma tempo#,
 			},
 		},
 		'Guyana' => {
@@ -4197,7 +5500,7 @@ has 'time_zone_names' => (
 		'Hawaii_Aleutian' => {
 			long => {
 				'daylight' => q#Havajo-Aleutoj (somera tempo)#,
-				'generic' => q#horzono Havajo-Aleutoj#,
+				'generic' => q#tempo: Havajo-Aleutoj#,
 				'standard' => q#Havajo-Aleutoj (norma tempo)#,
 			},
 		},
@@ -4217,7 +5520,7 @@ has 'time_zone_names' => (
 		},
 		'India' => {
 			long => {
-				'standard' => q#barata tempo#,
+				'standard' => q#hinda norma tempo#,
 			},
 		},
 		'Indian/Chagos' => {
@@ -4237,6 +5540,9 @@ has 'time_zone_names' => (
 		},
 		'Indian/Mahe' => {
 			exemplarCity => q#Mahé#,
+		},
+		'Indian/Maldives' => {
+			exemplarCity => q#Maldivoj#,
 		},
 		'Indian/Mauritius' => {
 			exemplarCity => q#Maŭricio#,
@@ -4259,17 +5565,24 @@ has 'time_zone_names' => (
 		},
 		'Indonesia_Central' => {
 			long => {
-				'standard' => q#centra indonezia tempo#,
+				'standard' => q#centr-indonezia tempo#,
 			},
 		},
 		'Indonesia_Eastern' => {
 			long => {
-				'standard' => q#orienta indonezia tempo#,
+				'standard' => q#orient-indonezia tempo#,
 			},
 		},
 		'Indonesia_Western' => {
 			long => {
-				'standard' => q#okcidenta indonezia tempo#,
+				'standard' => q#okcident-indonezia tempo#,
+			},
+		},
+		'Iran' => {
+			long => {
+				'daylight' => q#irana somera tempo#,
+				'generic' => q#irana tempo#,
+				'standard' => q#irana norma tempo#,
 			},
 		},
 		'Irkutsk' => {
@@ -4293,14 +5606,19 @@ has 'time_zone_names' => (
 				'standard' => q#japana norma tempo#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#kazaĥa tempo#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
-				'standard' => q#orienta kazaĥa tempo#,
+				'standard' => q#orient-kazaĥa tempo#,
 			},
 		},
 		'Kazakhstan_Western' => {
 			long => {
-				'standard' => q#okcidenta kazaĥa tempo#,
+				'standard' => q#okcident-kazaĥa tempo#,
 			},
 		},
 		'Korea' => {
@@ -4308,6 +5626,11 @@ has 'time_zone_names' => (
 				'daylight' => q#korea somera tempo#,
 				'generic' => q#korea tempo#,
 				'standard' => q#korea norma tempo#,
+			},
+		},
+		'Kosrae' => {
+			long => {
+				'standard' => q#tempo: Kosrae#,
 			},
 		},
 		'Krasnoyarsk' => {
@@ -4322,16 +5645,16 @@ has 'time_zone_names' => (
 				'standard' => q#kirgiza tempo#,
 			},
 		},
+		'Line_Islands' => {
+			long => {
+				'standard' => q#tempo: Liniaj Insuloj#,
+			},
+		},
 		'Lord_Howe' => {
 			long => {
 				'daylight' => q#Lord Howe (somera tempo)#,
-				'generic' => q#horzono Lord Howe#,
+				'generic' => q#tempo: Lord Howe#,
 				'standard' => q#Lord Howe (norma tempo)#,
-			},
-		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#makvor-insula tempo#,
 			},
 		},
 		'Magadan' => {
@@ -4346,6 +5669,21 @@ has 'time_zone_names' => (
 				'standard' => q#malajzia tempo#,
 			},
 		},
+		'Maldives' => {
+			long => {
+				'standard' => q#maldiva tempo#,
+			},
+		},
+		'Marquesas' => {
+			long => {
+				'standard' => q#markizinsula tempo#,
+			},
+		},
+		'Marshall_Islands' => {
+			long => {
+				'standard' => q#marŝalinsula tempo#,
+			},
+		},
 		'Mauritius' => {
 			long => {
 				'daylight' => q#maŭricia somera tempo#,
@@ -4353,11 +5691,9 @@ has 'time_zone_names' => (
 				'standard' => q#maŭricia norma tempo#,
 			},
 		},
-		'Mexico_Northwest' => {
+		'Mawson' => {
 			long => {
-				'daylight' => q#nordokcidenta meksika somera tempo#,
-				'generic' => q#nordokcidenta meksika tempo#,
-				'standard' => q#nordokcidenta meksika norma tempo#,
+				'standard' => q#tempo: Mawson#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -4386,6 +5722,23 @@ has 'time_zone_names' => (
 				'standard' => q#birma tempo#,
 			},
 		},
+		'Nauru' => {
+			long => {
+				'standard' => q#naura tempo#,
+			},
+		},
+		'Nepal' => {
+			long => {
+				'standard' => q#nepala tempo#,
+			},
+		},
+		'New_Caledonia' => {
+			long => {
+				'daylight' => q#novkaledonia somera tempo#,
+				'generic' => q#novkaledonia tempo#,
+				'standard' => q#novkaledonia norma tempo#,
+			},
+		},
 		'New_Zealand' => {
 			long => {
 				'daylight' => q#novzelanda somera tempo#,
@@ -4396,8 +5749,13 @@ has 'time_zone_names' => (
 		'Newfoundland' => {
 			long => {
 				'daylight' => q#Novlando (somera tempo)#,
-				'generic' => q#horzono Novlando#,
+				'generic' => q#tempo: Novlando#,
 				'standard' => q#Novlando (norma tempo)#,
+			},
+		},
+		'Niue' => {
+			long => {
+				'standard' => q#niua tempo#,
 			},
 		},
 		'Norfolk' => {
@@ -4410,7 +5768,7 @@ has 'time_zone_names' => (
 		'Noronha' => {
 			long => {
 				'daylight' => q#Fernando de Noronha (somera tempo)#,
-				'generic' => q#horzono Fernando de Noronha#,
+				'generic' => q#tempo: Fernando de Noronha#,
 				'standard' => q#Fernando de Noronha (norma tempo)#,
 			},
 		},
@@ -4428,17 +5786,97 @@ has 'time_zone_names' => (
 				'standard' => q#omska norma tempo#,
 			},
 		},
+		'Pacific/Apia' => {
+			exemplarCity => q#Apio#,
+		},
+		'Pacific/Auckland' => {
+			exemplarCity => q#Aŭklando#,
+		},
 		'Pacific/Chatham' => {
 			exemplarCity => q#Ĉathamo#,
 		},
 		'Pacific/Easter' => {
 			exemplarCity => q#Paskinsulo#,
 		},
+		'Pacific/Fiji' => {
+			exemplarCity => q#Fiĝio#,
+		},
+		'Pacific/Funafuti' => {
+			exemplarCity => q#Funafutio#,
+		},
 		'Pacific/Galapagos' => {
 			exemplarCity => q#Galapagoj#,
 		},
+		'Pacific/Guam' => {
+			exemplarCity => q#Gvamo#,
+		},
+		'Pacific/Marquesas' => {
+			exemplarCity => q#Markizinsuloj#,
+		},
+		'Pacific/Midway' => {
+			exemplarCity => q#Midvejinsuloj#,
+		},
+		'Pacific/Nauru' => {
+			exemplarCity => q#Nauro#,
+		},
+		'Pacific/Niue' => {
+			exemplarCity => q#Niuo#,
+		},
 		'Pacific/Norfolk' => {
 			exemplarCity => q#Norfolkinsulo#,
+		},
+		'Pacific/Noumea' => {
+			exemplarCity => q#Numeo#,
+		},
+		'Pacific/Pago_Pago' => {
+			exemplarCity => q#Pagopago#,
+		},
+		'Pacific/Palau' => {
+			exemplarCity => q#Palaŭo#,
+		},
+		'Pacific/Pitcairn' => {
+			exemplarCity => q#Pitkarna Insulo#,
+		},
+		'Pacific/Ponape' => {
+			exemplarCity => q#Ponape#,
+		},
+		'Pacific/Rarotonga' => {
+			exemplarCity => q#Rarotongo#,
+		},
+		'Pacific/Saipan' => {
+			exemplarCity => q#Saipano#,
+		},
+		'Pacific/Tahiti' => {
+			exemplarCity => q#Tahitio#,
+		},
+		'Pacific/Tarawa' => {
+			exemplarCity => q#Taravo#,
+		},
+		'Pacific/Truk' => {
+			exemplarCity => q#Ĉuuk#,
+		},
+		'Pacific/Wake' => {
+			exemplarCity => q#Vejkinsulo#,
+		},
+		'Pacific/Wallis' => {
+			exemplarCity => q#Valiso#,
+		},
+		'Pakistan' => {
+			long => {
+				'daylight' => q#pakistana somera tempo#,
+				'generic' => q#pakistana tempo#,
+				'standard' => q#pakistana norma tempo#,
+			},
+		},
+		'Palau' => {
+			long => {
+				'standard' => q#palaŭa tempo#,
+			},
+		},
+		'Papua_New_Guinea' => {
+			long => {
+				'standard' => q#tempo: Papuo-Nov-Gvineo#,
+			},
 		},
 		'Paraguay' => {
 			long => {
@@ -4461,11 +5899,26 @@ has 'time_zone_names' => (
 				'standard' => q#filipina norma tempo#,
 			},
 		},
+		'Phoenix_Islands' => {
+			long => {
+				'standard' => q#feniksinsula tempo#,
+			},
+		},
 		'Pierre_Miquelon' => {
 			long => {
 				'daylight' => q#Sankta Piero kaj Mikelono (somera tempo)#,
-				'generic' => q#horzono Sankta Piero kaj Mikelono#,
+				'generic' => q#tempo: Sankta Piero kaj Mikelono#,
 				'standard' => q#Sankta Piero kaj Mikelono (norma tempo)#,
+			},
+		},
+		'Pitcairn' => {
+			long => {
+				'standard' => q#pitkarninsula tempo#,
+			},
+		},
+		'Ponape' => {
+			long => {
+				'standard' => q#tempo: Ponape#,
 			},
 		},
 		'Pyongyang' => {
@@ -4475,7 +5928,12 @@ has 'time_zone_names' => (
 		},
 		'Reunion' => {
 			long => {
-				'standard' => q#horzono Reunio#,
+				'standard' => q#tempo: Reunio#,
+			},
+		},
+		'Rothera' => {
+			long => {
+				'standard' => q#tempo: Rothera#,
 			},
 		},
 		'Sakhalin' => {
@@ -4483,6 +5941,13 @@ has 'time_zone_names' => (
 				'daylight' => q#saĥalena somera tempo#,
 				'generic' => q#saĥalena tempo#,
 				'standard' => q#saĥalena norma tempo#,
+			},
+		},
+		'Samoa' => {
+			long => {
+				'daylight' => q#samoa somera tempo#,
+				'generic' => q#samoa tempo#,
+				'standard' => q#samoa norma tempo#,
 			},
 		},
 		'Seychelles' => {
@@ -4495,14 +5960,29 @@ has 'time_zone_names' => (
 				'standard' => q#singapura norma tempo#,
 			},
 		},
+		'Solomon' => {
+			long => {
+				'standard' => q#tempo: Salomonoj#,
+			},
+		},
 		'South_Georgia' => {
 			long => {
-				'standard' => q#horzono Sud-Georgio#,
+				'standard' => q#tempo: Sud-Georgio#,
 			},
 		},
 		'Suriname' => {
 			long => {
 				'standard' => q#surinama tempo#,
+			},
+		},
+		'Syowa' => {
+			long => {
+				'standard' => q#tempo: Showa#,
+			},
+		},
+		'Tahiti' => {
+			long => {
+				'standard' => q#tahitia tempo#,
 			},
 		},
 		'Taipei' => {
@@ -4517,11 +5997,33 @@ has 'time_zone_names' => (
 				'standard' => q#taĝika tempo#,
 			},
 		},
+		'Tokelau' => {
+			long => {
+				'standard' => q#tokelaa tempo#,
+			},
+		},
+		'Tonga' => {
+			long => {
+				'daylight' => q#tonga somera tempo#,
+				'generic' => q#tonga tempo#,
+				'standard' => q#tonga norma tempo#,
+			},
+		},
+		'Truk' => {
+			long => {
+				'standard' => q#tempo: Ĉuuk#,
+			},
+		},
 		'Turkmenistan' => {
 			long => {
 				'daylight' => q#turkmena somera tempo#,
 				'generic' => q#turkmena tempo#,
 				'standard' => q#turkmena norma tempo#,
+			},
+		},
+		'Tuvalu' => {
+			long => {
+				'standard' => q#tuvala tempo#,
 			},
 		},
 		'Uruguay' => {
@@ -4536,6 +6038,13 @@ has 'time_zone_names' => (
 				'daylight' => q#uzbeka somera tempo#,
 				'generic' => q#uzbeka tempo#,
 				'standard' => q#uzbeka norma tempo#,
+			},
+		},
+		'Vanuatu' => {
+			long => {
+				'daylight' => q#vanuatua somera tempo#,
+				'generic' => q#vanuatua tempo#,
+				'standard' => q#vanuatua norma tempo#,
 			},
 		},
 		'Venezuela' => {
@@ -4555,6 +6064,21 @@ has 'time_zone_names' => (
 				'daylight' => q#volgograda somera tempo#,
 				'generic' => q#volgograda tempo#,
 				'standard' => q#volgograda norma tempo#,
+			},
+		},
+		'Vostok' => {
+			long => {
+				'standard' => q#tempo: Vostok#,
+			},
+		},
+		'Wake' => {
+			long => {
+				'standard' => q#vejkinsula tempo#,
+			},
+		},
+		'Wallis' => {
+			long => {
+				'standard' => q#tempo: Valiso kaj Futuno#,
 			},
 		},
 		'Yakutsk' => {

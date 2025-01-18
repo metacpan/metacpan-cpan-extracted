@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Fr::Latn::Ca - Package for language French
 
 package Locale::CLDR::Locales::Fr::Latn::Ca;
 # This file auto generated from Data\common\main\fr_CA.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -50,6 +50,7 @@ has 'display_name_language' => (
  				'den' => 'slave',
  				'dgr' => 'tlicho',
  				'ebu' => 'embou',
+ 				'en_GB@alt=short' => 'anglais (R.-U.)',
  				'en_US@alt=short' => 'anglais (É.-U.)',
  				'esu' => 'yupik central',
  				'ewo' => 'ewondo',
@@ -59,7 +60,6 @@ has 'display_name_language' => (
  				'gu' => 'gujarati',
  				'ii' => 'yi de Sichuan',
  				'ken' => 'kenyang',
- 				'kg' => 'kongo',
  				'kl' => 'kalaallisut',
  				'ks' => 'kashmiri',
  				'ksb' => 'chambala',
@@ -68,7 +68,6 @@ has 'display_name_language' => (
  				'lzh' => 'chinois classique',
  				'mgh' => 'makhuwa-meetto',
  				'mgo' => 'meta’',
- 				'mr' => 'marathe',
  				'mwr' => 'marwari',
  				'mwv' => 'mentawai',
  				'nds_NL' => 'bas saxon',
@@ -159,6 +158,7 @@ has 'display_name_region' => (
  			'BZ' => 'Bélize',
  			'CC' => 'îles Cocos (Keeling)',
  			'CK' => 'îles Cook',
+ 			'CP' => 'île Clipperton',
  			'CX' => 'île Christmas',
  			'FK' => 'îles Malouines',
  			'FK@alt=variant' => 'îles Falkland (Malouines)',
@@ -206,7 +206,6 @@ has 'display_name_type' => (
  				'gb2312han' => q{ordre de tri chinois simplifié - GB2312},
  				'phonebook' => q{ordre de tri de l’annuaire},
  				'pinyin' => q{ordre de tri pinyin},
- 				'reformed' => q{ordre de tri réformé},
  				'searchjl' => q{Rechercher par consonne initiale en hangeul},
  				'stroke' => q{ordre de tri des traits},
  				'traditional' => q{ordre de tri traditionnel},
@@ -443,6 +442,18 @@ has 'units' => (
 						'name' => q(parties par million),
 						'one' => q({0} partie par million),
 						'other' => q({0} parties par million),
+					},
+					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(parties par milliard),
+						'one' => q({0} partie par milliard),
+						'other' => q({0} parties par milliard),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(parties par milliard),
+						'one' => q({0} partie par milliard),
+						'other' => q({0} parties par milliard),
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
@@ -1501,6 +1512,18 @@ has 'units' => (
 						'other' => q({0}vg²),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(p.p. 10⁹),
+						'one' => q({0}pp10⁹),
+						'other' => q({0}pp10⁹),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(p.p. 10⁹),
+						'one' => q({0}pp10⁹),
+						'other' => q({0}pp10⁹),
+					},
+					# Long Unit Identifier
 					'digital-gigabit' => {
 						'one' => q({0}Gb),
 						'other' => q({0}Gb),
@@ -2187,6 +2210,18 @@ has 'units' => (
 						'other' => q({0} ‰),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(p.p. 10⁹),
+						'one' => q({0} p.p. 10⁹),
+						'other' => q({0} p.p. 10⁹),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(p.p. 10⁹),
+						'one' => q({0} p.p. 10⁹),
+						'other' => q({0} p.p. 10⁹),
+					},
+					# Long Unit Identifier
 					'consumption-mile-per-gallon' => {
 						'one' => q({0} mi/gal),
 						'other' => q({0} mi/gal),
@@ -2477,16 +2512,6 @@ has 'units' => (
 					'calorie' => {
 						'one' => q({0} cal),
 						'other' => q({0} cal),
-					},
-					# Long Unit Identifier
-					'energy-foodcalorie' => {
-						'one' => q({0} kcal),
-						'other' => q({0} kcal),
-					},
-					# Core Unit Identifier
-					'foodcalorie' => {
-						'one' => q({0} kcal),
-						'other' => q({0} kcal),
 					},
 					# Long Unit Identifier
 					'energy-joule' => {
@@ -3351,6 +3376,12 @@ has 'currencies' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'AFN' => {
+			display_name => {
+				'one' => q(afghani afghan),
+				'other' => q(afghanis afghans),
+			},
+		},
 		'ARS' => {
 			symbol => 'ARS',
 		},
@@ -4716,7 +4747,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Center [Dakota du Nord]#,
 		},
 		'America/North_Dakota/New_Salem' => {
-			exemplarCity => q#New Salem, Dakota du Nord#,
+			exemplarCity => q#New Salem [Dakota du Nord]#,
 		},
 		'America/St_Johns' => {
 			exemplarCity => q#St. John’s#,
@@ -4726,9 +4757,6 @@ has 'time_zone_names' => (
 		},
 		'America/St_Thomas' => {
 			exemplarCity => q#Saint Thomas#,
-		},
-		'America/Tegucigalpa' => {
-			exemplarCity => q#Tégucigalpa#,
 		},
 		'America_Central' => {
 			long => {
@@ -4850,6 +4878,9 @@ has 'time_zone_names' => (
 				'standard' => q#heure normale de l’Atlantique#,
 			},
 		},
+		'Atlantic/Canary' => {
+			exemplarCity => q#îles Canaries#,
+		},
 		'Atlantic/Faeroe' => {
 			exemplarCity => q#îles Féroé#,
 		},
@@ -4933,13 +4964,6 @@ has 'time_zone_names' => (
 				'daylight' => q#heure avancée de Chine#,
 				'generic' => q#heure de Chine#,
 				'standard' => q#heure normale de Chine#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#heure avancée de Choibalsan#,
-				'generic' => q#heure de Choibalsan#,
-				'standard' => q#heure normale de Choibalsan#,
 			},
 		},
 		'Colombia' => {
@@ -5068,6 +5092,11 @@ has 'time_zone_names' => (
 				'standard' => q#heure normale de Hovd#,
 			},
 		},
+		'Indian_Ocean' => {
+			long => {
+				'standard' => q#heure de l’océan Indien#,
+			},
+		},
 		'Iran' => {
 			long => {
 				'daylight' => q#heure avancée d’Iran#,
@@ -5143,13 +5172,6 @@ has 'time_zone_names' => (
 				'daylight' => q#heure avancée de Maurice#,
 				'generic' => q#heure de Maurice#,
 				'standard' => q#heure normale de Maurice#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#heure avancée du Nord-Ouest du Mexique#,
-				'generic' => q#heure du Nord-Ouest du Mexique#,
-				'standard' => q#heure normale du Nord-Ouest du Mexique#,
 			},
 		},
 		'Mexico_Pacific' => {

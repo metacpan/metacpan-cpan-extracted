@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Csw - Package for language Swampy Cree
 
 package Locale::CLDR::Locales::Csw;
 # This file auto generated from Data\common\main\csw.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -31,9 +31,19 @@ has 'display_name_language' => (
 	default		=> sub {
 		 sub {
 			 my %languages = (
-				'csw' => 'ᓀᐦᐃᓇᐍᐏᐣ',
- 				'en' => 'ᐊᑲᓇᓯᒧᐏᐣ',
- 				'en_CA' => 'ᒧᓀᐅ ᐏᓂᓀᐤ ᐋᑲᓇᓯᓄᒯᐣ',
+				'chr' => 'ᒉᕑᐅᑫᕀ',
+ 				'csw' => 'ᓀᐦᐃᓇᐍᐏᐣ',
+ 				'en' => 'ᐊᑲᓈᓰᒧᐏᐣ',
+ 				'en_AU' => 'ᐊᑲᓈᓰᒧᐏᐣ (AU)',
+ 				'en_CA' => 'ᐊᑲᓈᓰᒧᐏᐣ (ᑳᓇᑕ)',
+ 				'en_GB' => 'ᐊᑲᓈᓰᒧᐏᐣ (GB)',
+ 				'en_US' => 'ᐊᑲᓈᓰᒧᐏᐣ (US)',
+ 				'fr' => 'ᐹᕽᐘᔦᓰᒧᐏᐣ',
+ 				'fr_CA' => 'ᐹᕽᐘᔦᓰᒧᐏᐣ (ᑳᓇᑕ)',
+ 				'fr_CH' => 'ᐹᕽᐘᔦᓰᒧᐏᐣ (CH)',
+ 				'he' => 'ᐦᐄᑊᕑᐅᐤ',
+ 				'mul' => 'ᒥᐦᒉᐟ ᐊᔭᒧᐏᓇ',
+ 				'und' => 'ᓇᒨᓇ ᐃᐦᑕᐟᐘᐣ ᐊᔭᒧᐏᐣ',
 
 			);
 			if (@_) {
@@ -51,7 +61,9 @@ has 'display_name_script' => (
 	default		=> sub {
 		sub {
 			my %scripts = (
-			'Cans' => 'ᓀᐦᐃᔭᐊᐧᓯᓇᐦᐃᑳᑌᐤ',
+			'Cans' => 'ᓀᐦᐃᔭᐘᓯᓇᐦᐃᑳᑌᐤ',
+ 			'Cher' => 'ᒉᕑᐅᑫᕀ',
+ 			'Latn' => 'ᐋᑲᓈᓰᒨᐏᐣ',
 
 			);
 			if ( @_ ) {
@@ -68,7 +80,28 @@ has 'display_name_region' => (
 	init_arg	=> undef,
 	default		=> sub {
 		{
-			'CA' => 'ᑲᓇᑕ',
+			'001' => 'ᐊᐢᑭᕀ',
+ 			'003' => 'ᒥᐦᑭᓇᕽ ᒥᓂᐢᑎᐠ',
+ 			'005' => 'ᓵᐘᓄᕽ ᒥᐦᑭᓇᕽ ᒥᓂᐢᑎᐠ',
+ 			'013' => 'ᐋᐱᐦᑕᐤ ᒥᐦᑭᓇᕽ ᒥᓂᐢᑎᐠ',
+ 			'021' => 'ᑮᐍᑎᓄᕽ ᒥᐦᑭᓇᕽ ᒥᓂᐢᑎᐠ',
+ 			'CA' => 'ᑳᓇᑕ',
+ 			'EU' => 'ᐊᑳᒪᐢᑮᔭ',
+ 			'EZ' => 'ᐊᑳᒪᐢᑮᕽ',
+ 			'UN' => 'ᒫᒫᐏ ᐊᐢᑮᔭ',
+ 			'US' => 'ᑭᐦᒋ ᒨᑯᒫᓂᕽ',
+
+		}
+	},
+);
+
+has 'display_name_key' => (
+	is			=> 'ro',
+	isa			=> HashRef[Str],
+	init_arg	=> undef,
+	default		=> sub {
+		{
+			'calendar' => 'ᐲᓯᒧᐊᓯᓇᐦᐃᑲᐣ',
 
 		}
 	},
@@ -81,8 +114,8 @@ has 'display_name_code_patterns' => (
 	default		=> sub {
 		{
 			'language' => 'ᐊᔭᒥᐏᐣ: {0}',
- 			'script' => 'ᒪᓯᓇᐦᐃᑫᐃᐧᐣ: {0}',
- 			'region' => 'ᓀᐦᐃᔭᐊᐧᐢᑭᕀ: {0}',
+ 			'script' => 'ᒪᓯᓇᐦᐃᑫᐏᐣ: {0}',
+ 			'region' => 'ᓀᐦᐃᔭᐘᐣᑭᕀ: {0}',
 
 		}
 	},
@@ -97,13 +130,54 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			main => qr{[ᐁ ᐃ ᐄ ᐅ ᐆ ᐊ ᐋ ᐍ ᐏ ᐑ ᐓ ᐕ ᐘ ᐚ ᐟ ᐠ ᐢ ᐣ ᐤ ᐦ ᐨ ᐩ ᐯ ᐱ ᐲ ᐳ ᐴ ᐸ ᐹ ᐻ ᐽ ᐿ ᑁ ᑃ ᑅ ᑇ ᑊ ᑌ ᑎ ᑏ ᑐ ᑑ ᑕ ᑖ ᑘ ᑚ ᑜ ᑞ ᑠ ᑢ ᑤ ᑫ ᑭ ᑮ ᑯ ᑰ ᑲ ᑳ ᑵ ᑷ ᑹ ᑻ ᑽ ᑿ ᒁ ᒉ ᒋ ᒌ ᒍ ᒎ ᒐ ᒑ ᒓ ᒕ ᒗ ᒙ ᒛ ᒝ ᒟ ᒣ ᒥ ᒦ ᒧ ᒨ ᒪ ᒫ ᒭ ᒯ ᒱ ᒳ ᒵ ᒷ ᒹ ᒼ ᓀ ᓂ ᓃ ᓄ ᓅ ᓇ ᓈ ᓊ ᓌ ᓎ ᓭ ᓯ ᓰ ᓱ ᓲ ᓴ ᓵ ᓷ ᓹ ᓻ ᓽ ᓿ ᔁ ᔃ ᔦ ᔨ ᔩ ᔪ ᔫ ᔭ ᔮ ᔰ ᔲ ᔴ ᔶ ᔸ ᔺ ᔼ]},
+			auxiliary => qr{[ᔐ ᔑ ᔒ ᔓ ᔔ ᔕ ᔖ]},
+			main => qr{[ᐁ ᐃ ᐄ ᐅ ᐆ ᐊ ᐋ ᐍ ᐏ ᐑ ᐓ ᐕ ᐘ ᐚ ᐟ ᐠ ᐢ ᐣ ᐤ ᐦ ᐨ ᐯ ᐱ ᐲ ᐳ ᐴ ᐸ ᐹ ᑊ ᑌ ᑎ ᑏ ᑐ ᑑ ᑕ ᑖ ᑫ ᑭ ᑮ ᑯ ᑰ ᑲ ᑳ ᒉ ᒋ ᒌ ᒍ ᒎ ᒐ ᒑ ᒣ ᒥ ᒦ ᒧ ᒨ ᒪ ᒫ ᒼ ᓀ ᓂ ᓃ ᓄ ᓅ ᓇ ᓈ ᓓ ᓕ ᓖ ᓗ ᓘ ᓚ ᓛ ᓫ ᓭ ᓯ ᓰ ᓱ ᓲ ᓴ ᓵ ᔦ ᔨ ᔩ ᔪ ᔫ ᔭ ᔮ ᕀ ᕃ ᕆ ᕇ ᕈ ᕉ ᕋ ᕌ ᕑ ᕽ]},
+			punctuation => qr{[\- ‐‑ – — , ; \: ! ? . … ᙮ '‘’ "“” ( ) \[ \] § @ * / \& # † ‡ ′ ″]},
 		};
 	},
 EOT
 : sub {
 		return {};
 },
+);
+
+
+has 'yesstr' => (
+	is			=> 'ro',
+	isa			=> RegexpRef,
+	init_arg	=> undef,
+	default		=> sub { qr'^(?i:ᐁᐦᐁ|ᐁ|yes|y)$' }
+);
+
+has 'nostr' => (
+	is			=> 'ro',
+	isa			=> RegexpRef,
+	init_arg	=> undef,
+	default		=> sub { qr'^(?i:ᓇᒨᓇ|ᓇ|no|n)$' }
+);
+
+has 'listPatterns' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+				2 => q({0} ᐊᐠᐘ {1}),
+		} }
+);
+
+has 'currencies' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+		'CAD' => {
+			display_name => {
+				'currency' => q(ᑲᓀᑎᔭᐣ ᐯᔭᐠᐚᐱᐢᐠ),
+				'one' => q(ᑲᓀᑎᔭᐣ ᐯᔭᐠᐚᐱᐢᐠ),
+				'other' => q(ᑲᓀᑎᔭᐣ ᐯᔭᐠᐚᐱᐢᐠᐘᐠ),
+			},
+		},
+	} },
 );
 
 
@@ -114,20 +188,79 @@ has 'calendar_months' => (
 	default		=> sub { {
 			'gregorian' => {
 				'format' => {
+					abbreviated => {
+						nonleap => [
+							'ᐅᒉᒥᑮᓯᑳᐏᐲᓯᒼ',
+							'ᐸᐚᐦᒐᑭᓇᓰᐢ',
+							'ᒥᑭᓯᐏᐲᓯᒼ',
+							'ᓂᐢᑭᐲᓯᒼ',
+							'ᐊᓃᑭᐲᓯᒼ',
+							'ᐚᐏᐲᓯᒼ',
+							'ᐹᐢᑲᐦᐋᐏᐲᓯᒼ',
+							'ᐅᐸᐦᐅᐏᐲᓯᒼ',
+							'ᓄᒌᑐᐏᐲᓯᒼ',
+							'ᐱᓈᐢᑯᐏᐲᓯᒼ',
+							'ᐋᕽᐘᑎᓄᐏᐲᓯᒼ',
+							'ᒪᑯᓭᑮᓭᑳᐏᐲᓯᒼ'
+						],
+						leap => [
+							
+						],
+					},
 					wide => {
 						nonleap => [
-							'ᑭᓴᐱᓯᒼ',
-							'ᒥᑭᓯᐏᐱᓯᒼ',
-							'ᓂᐢᑭᐱᓯᒼ',
-							'ᐊᓂᑭᐱᓯᒼ',
-							'ᓴᑭᐸᑲᐏᐱᓯᒼ',
-							'ᐸᐢᑲᐍᐦᐅᐱᓯᒼ',
-							'ᐸᐢᑯᐏᐱᓯᒼ',
-							'ᐅᐸᐦᐅᐏᐱᓯᒼ',
-							'ᑕᐦᑿᑭᐱᓯᒼ',
-							'ᐱᒪᐦᐊᒧᐏᐱᓯᒼ',
-							'ᐊᑿᑎᓄᐏᐱᓯᒼ',
-							'ᐸᐘᐢᒐᑲᓂᓹᐱᓯᒼ'
+							'ᐅᒉᒥᑮᓯᑳᐏᐲᓯᒼ',
+							'ᐸᐚᐦᒐᑭᓇᓰᐢ',
+							'ᒥᑭᓯᐏᐲᓯᒼ',
+							'ᓂᐢᑭᐲᓯᒼ',
+							'ᐊᓃᑭᐲᓯᒼ',
+							'ᐚᐏᐲᓯᒼ',
+							'ᐹᐢᑲᐦᐋᐏᐲᓯᒼ',
+							'ᐅᐸᐦᐅᐏᐲᓯᒼ',
+							'ᓄᒌᑐᐏᐲᓯᒼ',
+							'ᐱᓈᐢᑯᐏᐲᓯᒼ',
+							'ᐋᕽᐘᑎᓄᐏᐲᓯᒼ',
+							'ᒪᑯᓭᑮᓭᑳᐏᐲᓯᒼ'
+						],
+						leap => [
+							
+						],
+					},
+				},
+				'stand-alone' => {
+					abbreviated => {
+						nonleap => [
+							'ᐅᒉᒥᑮᓯᑳᐏᐲᓯᒼ',
+							'ᐸᐚᐦᒐᑭᓇᓰᐢ',
+							'ᒥᑭᓯᐏᐲᓯᒼ',
+							'ᓂᐢᑭᐲᓯᒼ',
+							'ᐊᓃᑭᐲᓯᒼ',
+							'ᐚᐏᐲᓯᒼ',
+							'ᐹᐢᑲᐦᐋᐏᐲᓯᒼ',
+							'ᐅᐸᐦᐅᐏᐲᓯᒼ',
+							'ᓄᒌᑐᐏᐲᓯᒼ',
+							'ᐱᓈᐢᑯᐏᐲᓯᒼ',
+							'ᐋᕽᐘᑎᓄᐏᐲᓯᒼ',
+							'ᒪᑯᓭᑮᓭᑳᐏᐲᓯᒼ'
+						],
+						leap => [
+							
+						],
+					},
+					wide => {
+						nonleap => [
+							'ᐅᒉᒥᑮᓯᑳᐏᐲᓯᒼ',
+							'ᐸᐚᐦᒐᑭᓇᓰᐢ',
+							'ᒥᑭᓯᐏᐲᓯᒼ',
+							'ᓂᐢᑭᐲᓯᒼ',
+							'ᐊᓃᑭᐲᓯᒼ',
+							'ᐚᐏᐲᓯᒼ',
+							'ᐹᐢᑲᐦᐋᐏᐲᓯᒼ',
+							'ᐅᐸᐦᐅᐏᐲᓯᒼ',
+							'ᓄᒌᑐᐏᐲᓯᒼ',
+							'ᐱᓈᐢᑯᐏᐲᓯᒼ',
+							'ᐋᕽᐘᑎᓄᐏᐲᓯᒼ',
+							'ᒪᑯᓭᑮᓭᑳᐏᐲᓯᒼ'
 						],
 						leap => [
 							
@@ -145,17 +278,120 @@ has 'calendar_days' => (
 	default		=> sub { {
 			'gregorian' => {
 				'format' => {
+					abbreviated => {
+						mon => 'ᐴᓂ ᐊᔭᒥᐦᐁᑮᓯᑳᐤ',
+						tue => 'ᓃᓱᑮᓯᑳᐤ',
+						wed => 'ᐋᐱᐦᑕᐘᐣ',
+						thu => 'ᐴᓂᐋᐱᐦᑕᐘᐣ',
+						fri => 'ᑫᑳᐨ ᒫᑎᓇᐍᑮᓯᑳᐤ',
+						sat => 'ᒫᑎᓇᐍᑮᓯᑳᐤ',
+						sun => 'ᐊᔭᒥᐦᐁᑮᓯᑳᐤ'
+					},
+					narrow => {
+						mon => 'ᐴ',
+						tue => 'ᓃ',
+						wed => 'ᐋ',
+						thu => 'ᐴ',
+						fri => 'ᑫ',
+						sat => 'ᒫ',
+						sun => 'ᐊ'
+					},
+					short => {
+						mon => 'ᐴᓂ ᐊᔭᒥᐦᐁᑮᓯᑳᐤ',
+						tue => 'ᓃᓱᑮᓯᑳᐤ',
+						wed => 'ᐋᐱᐦᑕᐘᐣ',
+						thu => 'ᐴᓂᐋᐱᐦᑕᐘᐣ',
+						fri => 'ᑫᑳᐨ ᒫᑎᓇᐍᑮᓯᑳᐤ',
+						sat => 'ᒫᑎᓇᐍᑮᓯᑳᐤ',
+						sun => 'ᐊᔭᒥᐦᐁᑮᓯᑳᐤ'
+					},
 					wide => {
-						mon => 'ᐯᔭᐠᑭᓯᑲᐤ',
-						tue => 'ᓂᓱᑭᓯᑲᐤ',
-						wed => 'ᐊᐱᐦᑕᐘᐣ',
-						thu => 'ᓀᐓᑭᓯᑲᐤ',
-						fri => 'ᓂᔭᓇᓄᑭᓯᑲᐤ',
-						sat => 'ᒪᑎᓄᐏᑭᓯᑲᐤ',
-						sun => 'ᐊᔭᒥᐦᐁᐃ ᑭᓯᑲᐤ'
+						mon => 'ᐴᓂ ᐊᔭᒥᐦᐁᑮᓯᑳᐤ',
+						tue => 'ᓃᓱᑮᓯᑳᐤ',
+						wed => 'ᐋᐱᐦᑕᐘᐣ',
+						thu => 'ᐴᓂᐋᐱᐦᑕᐘᐣ',
+						fri => 'ᑫᑳᐨ ᒫᑎᓇᐍᑮᓯᑳᐤ',
+						sat => 'ᒫᑎᓇᐍᑮᓯᑳᐤ',
+						sun => 'ᐊᔭᒥᐦᐁᑮᓯᑳᐤ'
+					},
+				},
+				'stand-alone' => {
+					abbreviated => {
+						mon => 'ᐴᓂ ᐊᔭᒥᐦᐁᑮᓯᑳᐤ',
+						tue => 'ᓃᓱᑮᓯᑳᐤ',
+						wed => 'ᐋᐱᐦᑕᐘᐣ',
+						thu => 'ᐴᓂᐋᐱᐦᑕᐘᐣ',
+						fri => 'ᑫᑳᐨ ᒫᑎᓇᐍᑮᓯᑳᐤ',
+						sat => 'ᒫᑎᓇᐍᑮᓯᑳᐤ',
+						sun => 'ᐊᔭᒥᐦᐁᑮᓯᑳᐤ'
+					},
+					narrow => {
+						mon => 'ᐴ',
+						tue => 'ᓃ',
+						wed => 'ᐋ',
+						thu => 'ᐴ',
+						fri => 'ᑫ',
+						sat => 'ᒫ',
+						sun => 'ᐊ'
+					},
+					short => {
+						mon => 'ᐴᓂ ᐊᔭᒥᐦᐁᑮᓯᑳᐤ',
+						tue => 'ᓃᓱᑮᓯᑳᐤ',
+						wed => 'ᐋᐱᐦᑕᐘᐣ',
+						thu => 'ᐴᓂᐋᐱᐦᑕᐘᐣ',
+						fri => 'ᑫᑳᐨ ᒫᑎᓇᐍᑮᓯᑳᐤ',
+						sat => 'ᒫᑎᓇᐍᑮᓯᑳᐤ',
+						sun => 'ᐊᔭᒥᐦᐁᑮᓯᑳᐤ'
+					},
+					wide => {
+						mon => 'ᐴᓂ ᐊᔭᒥᐦᐁᑮᓯᑳᐤ',
+						tue => 'ᓃᓱᑮᓯᑳᐤ',
+						wed => 'ᐋᐱᐦᑕᐘᐣ',
+						thu => 'ᐴᓂᐋᐱᐦᑕᐘᐣ',
+						fri => 'ᑫᑳᐨ ᒫᑎᓇᐍᑮᓯᑳᐤ',
+						sat => 'ᒫᑎᓇᐍᑮᓯᑳᐤ',
+						sun => 'ᐊᔭᒥᐦᐁᑮᓯᑳᐤ'
 					},
 				},
 			},
+	} },
+);
+
+has 'day_periods' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+		'gregorian' => {
+			'format' => {
+				'abbreviated' => {
+					'am' => q{ᐊᒼ},
+					'pm' => q{ᐲᒼ},
+				},
+				'narrow' => {
+					'am' => q{ᐊᒼ},
+					'pm' => q{ᐲᒼ},
+				},
+				'wide' => {
+					'am' => q{ᐁᒼ},
+					'pm' => q{ᐲᒼ},
+				},
+			},
+			'stand-alone' => {
+				'abbreviated' => {
+					'am' => q{ᐊᒼ},
+					'pm' => q{ᐲᒼ},
+				},
+				'narrow' => {
+					'am' => q{ᐊᒼ},
+					'pm' => q{ᐲᒼ},
+				},
+				'wide' => {
+					'am' => q{ᐊᒼ},
+					'pm' => q{ᐲᒼ},
+				},
+			},
+		},
 	} },
 );
 
@@ -175,6 +411,10 @@ has 'date_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'gregorian' => {
+			'full' => q{y MMMM d, EEEE},
+			'long' => q{y MMMM d},
+			'medium' => q{y MMM d},
+			'short' => q{y-MM-dd},
 		},
 	} },
 );
@@ -185,6 +425,10 @@ has 'time_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'gregorian' => {
+			'full' => q{h:mm:ss a zzzz},
+			'long' => q{h:mm:ss a z},
+			'medium' => q{h:mm:ss a},
+			'short' => q{h:mm a},
 		},
 	} },
 );
@@ -195,6 +439,10 @@ has 'datetime_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'gregorian' => {
+			'full' => q{{1} {0}},
+			'long' => q{{1} {0}},
+			'medium' => q{{1} {0}},
+			'short' => q{{1} {0}},
 		},
 	} },
 );
@@ -228,12 +476,33 @@ has 'time_zone_names' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default	=> sub { {
-		regionFormat => q({0} ᐁᐃᐢᐸᓂᐟ),
-		regionFormat => q({0} ᑮᓯᑳᐤ ᐁᐃᐢᐸᓂᐟ),
-		regionFormat => q({0} ᐯᔭᑯᐦᑕᐃᐧᐣ ᐁᐃᐢᐸᓂᐟ),
+		regionFormat => q({0} ᐁᐃᐢᐸᓂᐠ),
+		regionFormat => q({0} ᑮᓯᑳᐤ ᐁᐃᐢᐸᓂᐠ),
+		regionFormat => q({0} ᐯᔭᑯᐦᑖᐏᐣ ᐁᐃᐢᐸᓂᐠ),
+		'America/Coral_Harbour' => {
+			exemplarCity => q#ᐊᑎᐦᑯᑲᐣ#,
+		},
+		'America/Edmonton' => {
+			exemplarCity => q#ᐁᐟᒪᐣᑐᐣ#,
+		},
+		'America/Inuvik' => {
+			exemplarCity => q#ᐃᓄᐱᐠ#,
+		},
+		'America/Iqaluit' => {
+			exemplarCity => q#ᐃᑳᓫᐅᐃᐟ#,
+		},
+		'America/Swift_Current' => {
+			exemplarCity => q#ᓴᐢᑳᐟᒉᐘᐣ#,
+		},
+		'America/Winnipeg' => {
+			exemplarCity => q#ᐑᓂᐯᐠ#,
+		},
+		'Etc/Unknown' => {
+			exemplarCity => q#ᓇᒨᓇ ᑭᐢᑫᓂᑖᑿᐣ ᐃᐦᑖᐏᐣ#,
+		},
 		'GMT' => {
 			long => {
-				'standard' => q#ᕒᐁᐁᐣᐤᐏᐨ ᒣᐊᐣ ᐁᐃᐢᐸᓂᐟ#,
+				'standard' => q#ᐠᕑᐁᓂᐨ ᐯᔭᑯᐦᑖᐏᐣ ᐁᐃᐢᐸᓂᐠ#,
 			},
 		},
 	 } }

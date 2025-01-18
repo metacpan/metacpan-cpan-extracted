@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Sw::Latn::Ke - Package for language Swahili
 
 package Locale::CLDR::Locales::Sw::Latn::Ke;
 # This file auto generated from Data\common\main\sw_KE.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -1620,13 +1620,6 @@ has 'time_zone_names' => (
 				'standard' => q#Saa za Wastani za Kepuvede#,
 			},
 		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Saa za Majira ya Joto za Choibalsan#,
-				'generic' => q#Saa za Choibalsan#,
-				'standard' => q#Saa za Wastani za Choibalsan#,
-			},
-		},
 		'Colombia' => {
 			long => {
 				'daylight' => q#Saa za Majira ya Joto za Kolombia#,
@@ -1763,11 +1756,6 @@ has 'time_zone_names' => (
 				'standard' => q#Saa za Wastani za Krasnoyask#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Saa za Makwuarie#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Saa za Majira ya Joto za Magadan#,
@@ -1790,13 +1778,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Saa za Majira ya Joto za Morisi#,
 				'generic' => q#Saa za Morisi#,
 				'standard' => q#Saa za Wastani za Morisi#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Saa za Mchana za Kaskazini Magharibi mwa Meksiko#,
-				'generic' => q#Saa za Kaskazini Magharibi mwa Meksiko#,
-				'standard' => q#Saa za Wastani za Kaskazini Magharibi mwa Meksiko#,
 			},
 		},
 		'Mongolia' => {

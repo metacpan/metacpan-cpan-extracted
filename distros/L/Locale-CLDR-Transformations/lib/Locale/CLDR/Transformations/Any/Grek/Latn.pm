@@ -1,17 +1,17 @@
 package Locale::CLDR::Transformations::Any::Grek::Latn;
 # This file auto generated from Data\common\transforms\Greek-Latin.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -89,7 +89,7 @@ has 'transforms' => (
 					revisit => 2,
 				},
 				{
-					before  => q((?:(?=[\p{Lu}])[\p{latin}\p{greek}])\p{M}*),
+					before  => q((?:(?=[\p{Lu}])[\p{Latin}\p{Greek}])\p{M}*),
 					after   => q(),
 					replace => q(ͅ),
 					result  => q(I),
@@ -104,49 +104,49 @@ has 'transforms' => (
 				},
 				{
 					before  => q(),
-					after   => q(\p{M} * (?:(?=[\p{Ll}])[\p{latin}\p{greek}])),
+					after   => q(\p{M} * (?:(?=[\p{Ll}])[\p{Latin}\p{Greek}])),
 					replace => q(Α(̄?)̔),
 					result  => q(H),
 					revisit => 3,
 				},
 				{
 					before  => q(),
-					after   => q(\p{M} * (?:(?=[\p{Ll}])[\p{latin}\p{greek}])),
+					after   => q(\p{M} * (?:(?=[\p{Ll}])[\p{Latin}\p{Greek}])),
 					replace => q(Ἑ),
 					result  => q(H),
 					revisit => 1,
 				},
 				{
 					before  => q(),
-					after   => q(\p{M} * (?:(?=[\p{Ll}])[\p{latin}\p{greek}])),
+					after   => q(\p{M} * (?:(?=[\p{Ll}])[\p{Latin}\p{Greek}])),
 					replace => q(Ἡ),
 					result  => q(H),
 					revisit => 1,
 				},
 				{
 					before  => q(),
-					after   => q(\p{M} * (?:(?=[\p{Ll}])[\p{latin}\p{greek}])),
+					after   => q(\p{M} * (?:(?=[\p{Ll}])[\p{Latin}\p{Greek}])),
 					replace => q(Ι(̈?)̔),
 					result  => q(H),
 					revisit => 3,
 				},
 				{
 					before  => q(),
-					after   => q(\p{M} * (?:(?=[\p{Ll}])[\p{latin}\p{greek}])),
+					after   => q(\p{M} * (?:(?=[\p{Ll}])[\p{Latin}\p{Greek}])),
 					replace => q(Ὁ),
 					result  => q(H),
 					revisit => 1,
 				},
 				{
 					before  => q(),
-					after   => q(\p{M} * (?:(?=[\p{Ll}])[\p{latin}\p{greek}])),
+					after   => q(\p{M} * (?:(?=[\p{Ll}])[\p{Latin}\p{Greek}])),
 					replace => q(Ὑ),
 					result  => q(H),
 					revisit => 1,
 				},
 				{
 					before  => q(),
-					after   => q(\p{M} * (?:(?=[\p{Ll}])[\p{latin}\p{greek}])),
+					after   => q(\p{M} * (?:(?=[\p{Ll}])[\p{Latin}\p{Greek}])),
 					replace => q(Ω(̈?)̔),
 					result  => q(H),
 					revisit => 3,
@@ -154,49 +154,49 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
-					replace => q(Α((?:(?=[\p{Ll}])[\p{greek}])̄?)̔),
+					replace => q(Α((?:(?=[\p{Ll}])[\p{Greek}])̄?)̔),
 					result  => q(H),
 					revisit => 3,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q(Ε((?:(?=[\p{Ll}])[\p{greek}]))̔),
+					replace => q(Ε((?:(?=[\p{Ll}])[\p{Greek}]))̔),
 					result  => q(H),
 					revisit => 3,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q(Η((?:(?=[\p{Ll}])[\p{greek}]))̔),
+					replace => q(Η((?:(?=[\p{Ll}])[\p{Greek}]))̔),
 					result  => q(H),
 					revisit => 3,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q(Ι((?:(?=[\p{Ll}])[\p{greek}])̈?)̔),
+					replace => q(Ι((?:(?=[\p{Ll}])[\p{Greek}])̈?)̔),
 					result  => q(H),
 					revisit => 3,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q(Ο((?:(?=[\p{Ll}])[\p{greek}]))̔),
+					replace => q(Ο((?:(?=[\p{Ll}])[\p{Greek}]))̔),
 					result  => q(H),
 					revisit => 3,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q(Υ((?:(?=[\p{Ll}])[\p{greek}]))̔),
+					replace => q(Υ((?:(?=[\p{Ll}])[\p{Greek}]))̔),
 					result  => q(H),
 					revisit => 3,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q(Ω((?:(?=[\p{Ll}])[\p{greek}])̈?)̔),
+					replace => q(Ω((?:(?=[\p{Ll}])[\p{Greek}])̈?)̔),
 					result  => q(H),
 					revisit => 3,
 				},
@@ -244,7 +244,7 @@ has 'transforms' => (
 				},
 				{
 					before  => q(),
-					after   => q(\p{M} * (?:(?=[\p{Ll}])[\p{latin}\p{greek}])),
+					after   => q(\p{M} * (?:(?=[\p{Ll}])[\p{Latin}\p{Greek}])),
 					replace => q(Ψ),
 					result  => q(Ps),
 					revisit => 0,
@@ -258,7 +258,7 @@ has 'transforms' => (
 				},
 				{
 					before  => q(),
-					after   => q(\p{M} * (?:(?=[\p{Ll}])[\p{latin}\p{greek}])),
+					after   => q(\p{M} * (?:(?=[\p{Ll}])[\p{Latin}\p{Greek}])),
 					replace => q(Φ),
 					result  => q(Ph),
 					revisit => 0,
@@ -398,7 +398,7 @@ has 'transforms' => (
 				},
 				{
 					before  => q(),
-					after   => q(\p{M} * (?:(?=[\p{Ll}])[\p{latin}\p{greek}])),
+					after   => q(\p{M} * (?:(?=[\p{Ll}])[\p{Latin}\p{Greek}])),
 					replace => q(Θ),
 					result  => q(Th),
 					revisit => 0,
@@ -545,7 +545,7 @@ has 'transforms' => (
 				},
 				{
 					before  => q(),
-					after   => q(\p{M} * (?:(?=[\p{Ll}])[\p{latin}\p{greek}])),
+					after   => q(\p{M} * (?:(?=[\p{Ll}])[\p{Latin}\p{Greek}])),
 					replace => q(Ῥ),
 					result  => q(Rh),
 					revisit => 0,
@@ -706,7 +706,7 @@ has 'transforms' => (
 				},
 				{
 					before  => q(),
-					after   => q(\p{M} * (?:(?=[\p{Ll}])[\p{latin}\p{greek}])),
+					after   => q(\p{M} * (?:(?=[\p{Ll}])[\p{Latin}\p{Greek}])),
 					replace => q(Χ),
 					result  => q(Ch),
 					revisit => 0,
@@ -720,13 +720,13 @@ has 'transforms' => (
 				},
 				{
 					before  => q(),
-					after   => q([\p{Mark} '] *\p{UppercaseLetter}),
+					after   => q([\p{Mark} '] *\p{Uppercase_Letter}),
 					replace => q(̔),
 					result  => q(H),
 					revisit => 0,
 				},
 				{
-					before  => q([\p{Mark} '] *\p{UppercaseLetter}),
+					before  => q([\p{Mark} '] *\p{Uppercase_Letter}),
 					after   => q(),
 					replace => q(̔),
 					result  => q(H),

@@ -18,6 +18,9 @@ WriteMakefile(
 				url  => 'git://github.com/haje61/Tk-YADialog.git',
 				web  => 'https://github.com/haje61/Tk-YADialog',
 			},
+			bugtracker => {
+				web  => 'https://github.com/haje61/Tk-YADialog/issues',
+			},
 		}}) : ()
 	),
 );

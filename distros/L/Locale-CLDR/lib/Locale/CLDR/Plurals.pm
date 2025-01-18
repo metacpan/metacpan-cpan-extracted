@@ -1,17 +1,17 @@
 package Locale::CLDR::Plurals;
 # This file auto generated from Data\common\supplemental\pluralRanges.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo::Role;
 
@@ -326,6 +326,13 @@ my %_plurals = (
 				my $number = shift;
 				my ( $n, $i, $v, $w, $f, $t, $c, $e ) = _parse_number_plurals( $number );
 				return  scalar (grep {$i == $_} (1)) &&  scalar (grep {$v == $_} (0)) ;
+			},
+		},
+		csw => {
+			one => sub {
+				my $number = shift;
+				my ( $n, $i, $v, $w, $f, $t, $c, $e ) = _parse_number_plurals( $number );
+				return  scalar (grep {$n == $_} (0..1)) ;
 			},
 		},
 		cy => {
@@ -914,6 +921,18 @@ my %_plurals = (
 				return  scalar (grep {$i == $_} (1)) &&  scalar (grep {$v == $_} (0)) ;
 			},
 		},
+		lld => {
+			many => sub {
+				my $number = shift;
+				my ( $n, $i, $v, $w, $f, $t, $c, $e ) = _parse_number_plurals( $number );
+				return  scalar (grep {$e == $_} (0)) && ! scalar (grep {$i == $_} (0)) &&  scalar (grep {$i % 1000000 == $_} (0)) &&  scalar (grep {$v == $_} (0)) || ! scalar (grep {$e == $_} (0..5)) ;
+			},
+			one => sub {
+				my $number = shift;
+				my ( $n, $i, $v, $w, $f, $t, $c, $e ) = _parse_number_plurals( $number );
+				return  scalar (grep {$i == $_} (1)) &&  scalar (grep {$v == $_} (0)) ;
+			},
+		},
 		ln => {
 			one => sub {
 				my $number = shift;
@@ -1308,6 +1327,11 @@ my %_plurals = (
 			},
 		},
 		scn => {
+			many => sub {
+				my $number = shift;
+				my ( $n, $i, $v, $w, $f, $t, $c, $e ) = _parse_number_plurals( $number );
+				return  scalar (grep {$e == $_} (0)) && ! scalar (grep {$i == $_} (0)) &&  scalar (grep {$i % 1000000 == $_} (0)) &&  scalar (grep {$v == $_} (0)) || ! scalar (grep {$e == $_} (0..5)) ;
+			},
 			one => sub {
 				my $number = shift;
 				my ( $n, $i, $v, $w, $f, $t, $c, $e ) = _parse_number_plurals( $number );
@@ -2031,6 +2055,13 @@ my %_plurals = (
 				my $number = shift;
 				my ( $n, $i, $v, $w, $f, $t, $c, $e ) = _parse_number_plurals( $number );
 				return  scalar (grep {$n == $_} (11,8,80..89,800..899)) ;
+			},
+		},
+		lld => {
+			many => sub {
+				my $number = shift;
+				my ( $n, $i, $v, $w, $f, $t, $c, $e ) = _parse_number_plurals( $number );
+				return  scalar (grep {$n == $_} (11,8,80,800)) ;
 			},
 		},
 		lo => {

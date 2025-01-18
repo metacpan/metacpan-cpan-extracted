@@ -1,23 +1,61 @@
 package Locale::CLDR::Collator;
 
 use version;
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 
-#line 6538
+#line 7012
 use Unicode::Normalize('NFD');
-use Unicode::UCD qw( charinfo );
-use List::MoreUtils qw(pairwise);
 use Moo;
 use Types::Standard qw(Str Int Maybe ArrayRef InstanceOf RegexpRef Bool);
 with 'Locale::CLDR::CollatorBase';
 
-my $NUMBER_SORT_TOP = "\x{FD00}\x{0034}";
-my $LEVEL_SEPARATOR = "\x{0001}";
+sub IsCLDREmpty {
+	return '';
+}
+
+# Test for missing Unicode properties
+BEGIN {
+    our %missing_unicode_properties = ();
+    my @properties = (qw(
+        Block=Tangut
+        Block=Tangut_Components
+        Block=Tangut_Supplement
+        Block=Nushu
+        Block=Khitan_Small_Script
+        Unified_Ideograph=True
+        Block=CJK_Unified_Ideograph
+        Block=CJK_Compatibility_Ideographs
+        ccc=0
+        ccc
+    ));
+
+    foreach my $missing (@properties) {
+        $missing_unicode_properties{$missing} = 1
+            unless eval "'a' =~ qr/\\p{$missing}|a/";
+    }
+}
+
+sub _fix_missing_unicode_properties {
+    my $self    = shift;
+    my $regex   = shift;
+	our %missing_unicode_properties;
+    
+	
+	return '' unless defined $regex;
+	
+    foreach my $missing (keys %missing_unicode_properties) {
+        $regex =~ s/\\(p)\{$missing\}/\\${1}{IsCLDREmpty}/ig
+            if $missing_unicode_properties{$missing};
+    }
+    
+    return qr/$regex/;
+}
+
 
 has 'type' => (
     is => 'ro',
@@ -81,177 +119,25 @@ has 'strength' => (
     default => 3,
 );
 
-has 'max_variable' => (
-    is => 'ro',
-    isa => Str,
-    default => chr(0x0397),
-);
-
-has _character_rx => (
-    is => 'ro',
-    isa => RegexpRef,
-    lazy => 1,
-    init_arg => undef,
-    default => sub {
-        my $self = shift;
-        my $list = join '|', @{$self->multi_rx()}, '.';
-        return qr/\G($list)/s;
-    },
-);
-
-has _in_variable_weigting => (
-    is => 'rw',
-    isa => Bool,
-    init_arg => undef,
-    default => 0,
-);
-
-# Set up the locale overrides
-sub BUILD {
-    my $self = shift;
-
-    my $overrides = [];
-    if ($self->has_locale) {
-        $overrides = $self->locale->_collation_overrides($self->type);
-    }
-
-    foreach my $override (@$overrides) {
-        $self->_set_ce(@$override);
-    }
-}
-
-# Get the collation element at the current strength
-sub get_collation_elements {
-    my ($self, $string) = @_;
-    my @ce;
-    if ($self->numeric eq 'true' && $string =~/^\p{Nd}^/) {
-        my $numeric_top = $self->collation_elements()->{$NUMBER_SORT_TOP};
-        my @numbers = $self->_convert_digits_to_numbers($string);
-        @ce = map { "$numeric_top${LEVEL_SEPARATOR}№$_" } @numbers;
-    }
-    else {
-        my $rx = $self->_character_rx;
-        my @characters = $string =~ /$rx/g;
-
-        foreach my $character (@characters) {
-            my @current_ce;
-            if (length $character > 1) {
-                # We have a collation element that dependeds on two or more codepoints
-                # Remove the code points that the collation element depends on and if
-                # there are still codepoints get the collation elements for them
-                my @multi_rx = @{$self->multi_rx};
-                my $multi;
-                for (my $count = 0; $count < @multi_rx; $count++) {
-                    if ($character =~ /$multi_rx[$count]/) {
-                        $multi = $self->multi_class()->[$count];
-                        last;
-                    }
-                }
-
-                my $match = $character;
-                eval "\$match =~ tr/$multi//cd;";
-                push @current_ce, $self->collation_elements()->{$match};
-                $character =~ s/$multi//g;
-                if (length $character) {
-                    foreach my $codepoint (split //, $character) {
-                        push @current_ce,
-                            $self->collation_elements()->{$codepoint}
-                            // $self->generate_ce($codepoint);
-                    }
-                }
-            }
-            else {
-                my $ce = $self->collation_elements()->{$character};
-                $ce //= $self->generate_ce($character);
-                push @current_ce, $ce;
-            }
-            push @ce, $self->_process_variable_weightings(@current_ce);
-        }
-    }
-    return @ce;
-}
-
-sub _process_variable_weightings {
-    my ($self, @ce) = @_;
-    return @ce if $self->alternate() eq 'noignore';
-
-    foreach my $ce (@ce) {
-        if ($ce->[0] le $self->max_variable) {
-            # Variable waighted codepoint
-            if ($self->alternate eq 'blanked') {
-                @$ce = map { chr() } qw(0 0 0);
-
-            }
-            if ($self->alternate eq 'shifted') {
-                my $l4;
-                if ($ce->[0] eq "\0" && $ce->[1] eq "\0" && $ce->[2] eq "\0") {
-                    $ce->[3] = "\0";
-                }
-                else {
-                    $ce->[3] = $ce->[1];
-                }
-                @$ce[0 .. 2] = map { chr() } qw (0 0 0);
-            }
-            $self->_in_variable_weigting(1);
-        }
-        else {
-            if ($self->_in_variable_weigting()) {
-                if( $ce->[0] eq "\0" && $self->alternate eq 'shifted' ) {
-                    $ce->[3] = "\0";
-                }
-                elsif($ce->[0] ne "\0") {
-                    $self->_in_variable_weigting(0);
-                    if ( $self->alternate eq 'shifted' ) {
-                        $ce->[3] = chr(0xFFFF)
-                    }
-                }
-            }
-        }
-    }
-}
-
-# Converts $string into a sort key. Two sort keys can be correctly sorted by cmp
-sub getSortKey {
-    my ($self, $string) = @_;
-
-    $string = NFD($string) if $self->normalization eq 'true';
-
-    my @sort_key;
-
-    my @ce = $self->get_collation_elements($string);
-
-    for (my $count = 0; $count < $self->strength(); $count++ ) {
-        foreach my $ce (@ce) {
-            $ce = [ split //, $ce] unless ref $ce;
-            if (defined $ce->[$count] && $ce->[$count] ne "\0") {
-                push @sort_key, $ce->[$count];
-            }
-        }
-    }
-
-    return join "\0", @sort_key;
-}
-
-sub generate_ce {
+sub _generate_derived_ce {
     my ($self, $character) = @_;
 
     my $aaaa;
     my $bbbb;
 
-    if ($^V ge v5.26 && eval q($character =~ /(?!\p{Cn})(?:\p{Block=Tangut}|\p{Block=Tangut_Components})/)) {
+    if ( $character =~ $self->_fix_missing_unicode_properties( '(?!\p{Cn})(?:\p{Block=Tangut}|\p{Block=Tangut_Components}|\p{Block=Tangut_Supplement})' )) {
         $aaaa = 0xFB00;
         $bbbb = (ord($character) - 0x17000) | 0x8000;
     }
-    # Block Nushu was added in Perl 5.28
-    elsif ($^V ge v5.28 && eval q($character =~ /(?!\p{Cn})\p{Block=Nushu}/)) {
+    elsif ($character =~ $self->_fix_missing_unicode_properties( '(?!\p{Cn})\p{Block=Nushu}' )) {
         $aaaa = 0xFB01;
         $bbbb = (ord($character) - 0x1B170) | 0x8000;
     }
-    elsif ($character =~ /(?=\p{Unified_Ideograph=True})(?:\p{Block=CJK_Unified_Ideographs}|\p{Block=CJK_Compatibility_Ideographs})/) {
+    elsif ($character =~ $self->_fix_missing_unicode_properties( '(?=\p{Unified_Ideograph=True})(?:\p{Block=CJK_Unified_Ideographs}|\p{Block=CJK_Compatibility_Ideographs})' )) {
         $aaaa = 0xFB40 + (ord($character) >> 15);
         $bbbb = (ord($character) & 0x7FFFF) | 0x8000;
     }
-    elsif ($character =~ /(?=\p{Unified_Ideograph=True})(?!\p{Block=CJK_Unified_Ideographs})(?!\p{Block=CJK_Compatibility_Ideographs})/) {
+    elsif ($character =~ $self->_fix_missing_unicode_properties( '(?=\p{Unified_Ideograph=True})(?!\p{Block=CJK_Unified_Ideographs})(?!\p{Block=CJK_Compatibility_Ideographs})' )) {
         $aaaa = 0xFB80 + (ord($character) >> 15);
         $bbbb = (ord($character) & 0x7FFFF) | 0x8000;
     }
@@ -259,90 +145,184 @@ sub generate_ce {
         $aaaa = 0xFBC0 + (ord($character) >> 15);
         $bbbb = (ord($character) & 0x7FFFF) | 0x8000;
     }
-    return join '', map {chr($_)} $aaaa, 0x0020, 0x0002, ord($LEVEL_SEPARATOR), $bbbb, 0, 0;
+    return [[$aaaa, 0x0020, 0x0002], [$bbbb, 0, 0]];
 }
 
-# sorts a list according to the locales collation rules
+sub _process_variable_weightings {
+    my ($self, $ces) = @_;
+    return $ces if $self->alternate() eq 'noignore';
+
+    foreach my $ce (@$ces) {
+        if ($ce->[0] <= $self->max_variable_weight && $ce->[0] >= $self->min_variable_weight) {
+            # Variable waighted codepoint
+            if ($self->alternate eq 'blanked') {
+                @$ce = qw(0 0 0);
+
+            }
+            if ($self->alternate eq 'shifted') {
+                my $l4;
+                if ($ce->[0] == 0 && $ce->[1] == 0 && $ce->[2] == 0) {
+                    $ce->[3] = 0;
+                }
+                else {
+                    $ce->[3] = $ce->[1];
+                }
+                @$ce[0 .. 2] = qw(0 0 0);
+            }
+            $self->_in_variable_weigting(1);
+        }
+        else {
+            if ($self->_in_variable_weigting()) {
+                if( $ce->[0] == 0 && $self->alternate eq 'shifted' ) {
+                    $ce->[3] = 0;
+                }
+                elsif($ce->[0] != 0) {
+                    $self->_in_variable_weigting(0);
+                    if ( $self->alternate eq 'shifted' ) {
+                        $ce->[3] = 0xFFFF;
+                    }
+                }
+            }
+        }
+    }
+    
+    return $ces;
+}
+
+sub get_collation_elements {
+    my $self = shift;
+    my $string = shift;
+    my $ces = [];
+    
+    
+    while ($string) {
+        my ($match3) = $string =~ /^(...)/;
+        my ($match2) = $string =~ /^(..)/;
+        my ($match1) = $string =~ /^(.)/;
+        my $ce;
+    
+        my $matched = '';
+        $match1 //= '';
+        $match2 //= '';
+        $match3 //= '';
+    
+        if ($self->collation_elements->{$match3}) {
+            $matched = $match3;
+            $string =~ s/^...//;
+            $ce = $self->collation_elements->{$match3};
+        }
+        elsif ($self->collation_elements->{$match2}) {
+            $matched = $match2;
+            $string =~ s/^..//;
+            $ce = $self->collation_elements->{$match2};
+        }
+        elsif ($self->collation_elements->{$match1}) {
+            $matched = $match1;
+            $string =~ s/^.//;
+            $ce = $self->collation_elements->{$match1};
+        }
+    
+        if ($matched) {
+            my $regex = '';
+            if (_fix_missing_unicode_properties('ccc=0') !~ /IsCLDREmpty/) {
+                $regex = eval 'qr/^(\\P{ccc=0}+)/';
+            }
+            elsif (_fix_missing_unicode_properties('ccc') !~ /IsCLDREmpty/) {
+                $regex = eval 'qr/^(\\p{ccc}+)/';
+            }
+            if ($regex && (my ($ccc) = $string =~ $regex)) {
+                foreach my $cp (split //, $ccc) {
+                    my $new_match = "$matched$cp";
+                    if ($self->collation_elements->{$new_match}) {
+                        $matched = $new_match;
+                        $string =~ s/^.*?\K$cp//;
+                        $ce = $self->collation_elements->{$new_match};
+                    }
+                }
+            }
+        }
+        
+        if (! @$ce) {
+            $ce = $self->_generate_derived_ce($match1);
+        }
+        
+        push @$ces, @{$self->_process_variable_weightings($ce)};
+    }
+    
+    return $ces;
+}
+
+# Converts $string into a sort key. Two sort keys can be correctly sorted by cmp
+sub get_sort_key {
+    my ($self, $string) = @_;
+
+    $string = NFD($string) if $self->normalization eq 'true';
+
+    my @sort_key;
+
+    my $ces = $self->get_collation_elements($string);
+
+    for (my $count = 0; $count < $self->strength(); $count++ ) {
+        if ($count == 1 && $self->backwards ne 'noignore') {
+            foreach my $ce (reverse @$ces) {
+                if ($ce->[$count]) {
+                    push @sort_key, $ce->[$count];
+                }
+            }
+        }
+        else {
+            foreach my $ce (@$ces) {
+                if ($ce->[$count]) {
+                    push @sort_key, $ce->[$count];
+                }
+            }
+        }
+        push @sort_key, 0;
+    }
+
+    return join '', map { chr $_ } @sort_key;
+}
+
 sub sort {
     my $self = shift;
-
-    return map { $_->[0]}
-        sort { $a->[1] cmp $b->[1] }
-        map { [$_, $self->getSortKey($_)] }
-        @_;
+    my @elements = @_;
+    
+    return sort { $self->cmp($a,$b) } @elements;
 }
 
 sub cmp {
-    my ($self, $a, $b) = @_;
-
-    return $self->getSortKey($a) cmp $self->getSortKey($b);
+    my $self = shift;
+    my $s1 = shift;
+    my $s2 = shift;
+    
+    my $sk1 = $self->get_sort_key($s1);
+    my $sk2 = $self->get_sort_key($s2);
+    
+    return $sk1 cmp $sk2;
 }
 
 sub eq {
-    my ($self, $a, $b) = @_;
-
-    return $self->getSortKey($a) eq $self->getSortKey($b);
+    my $self = shift;
+    
+    return $self->cmp(@_) == 0 ? 1 : 0;
 }
 
 sub ne {
-    my ($self, $a, $b) = @_;
-
-    return $self->getSortKey($a) ne $self->getSortKey($b);
+    my $self = shift;
+    
+    return $self->cmp(@_) == 0 ? 0 : 1;
 }
 
 sub lt {
-    my ($self, $a, $b) = @_;
-
-    return $self->getSortKey($a) lt $self->getSortKey($b);
+    my $self = shift;
+    
+    return $self->cmp(@_) == -1 ? 1 : 0;
 }
 
-sub le {
-    my ($self, $a, $b) = @_;
-
-    return $self->getSortKey($a) le $self->getSortKey($b);
-}
 sub gt {
-    my ($self, $a, $b) = @_;
-
-    return $self->getSortKey($a) gt $self->getSortKey($b);
-}
-
-sub ge {
-    my ($self, $a, $b) = @_;
-
-    return $self->getSortKey($a) ge $self->getSortKey($b);
-}
-
-# Get Human readable sort key
-sub viewSortKey {
-    my ($self, $sort_key) = @_;
-
-    my @levels = split/\x0/, $sort_key;
-
-    foreach my $level (@levels) {
-        $level = join ' ',  map { sprintf '%0.4X', ord } split //, $level;
-    }
-
-    return '[ ' . join (' | ', @levels) . ' ]';
-}
-
-sub _convert_digits_to_numbers {
-    my ($self, $digits) = @_;
-    my @numbers = ();
-    my $script = '';
-    foreach my $number (split //, $digits) {
-        my $char_info = charinfo(ord($number));
-        my ($decimal, $chr_script) = @{$char_info}{qw( decimal script )};
-        if ($chr_script eq $script) {
-            $numbers[-1] *= 10;
-            $numbers[-1] += $decimal;
-        }
-        else {
-            push @numbers, $decimal;
-            $script = $chr_script;
-        }
-    }
-    return @numbers;
+    my $self = shift;
+    
+    return $self->cmp(@_) == 1 ? 1 : 0;
 }
 
 no Moo;

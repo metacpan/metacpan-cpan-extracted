@@ -8,34 +8,22 @@ Locale::CLDR::Locales::Zh::Hant - Package for language Chinese
 
 package Locale::CLDR::Locales::Zh::Hant;
 # This file auto generated from Data\common\main\zh_Hant.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
 extends('Locale::CLDR::Locales::Root');
-has 'segmentation_parent' => (
-	is => 'ro',
-	isa => Str,
-	init_arg => undef,
-	default => sub {
-		my $self = shift;
-		my $mod_ref = ref $self;
-		return 'Locale::CLDR::Locales::Zh' if $mod_ref eq __PACKAGE__;
-		no strict 'refs';
-		return ${ "${mod_ref}::ISA" }[0];
-	}
-);
 has 'LineBreak_variables' => (
 	is => 'ro',
 	isa => ArrayRef,
@@ -1184,6 +1172,13 @@ has 'algorithmic_number_format_data' => (
     } },
 );
 
+has default_collation => (
+    is => 'ro',
+    isa => Str,
+    init_arg => undef,
+    default => sub { 'stroke' },
+);
+
 # Need to add code for Key type pattern
 sub display_name_pattern {
 	my ($self, $name, $region, $script, $variant) = @_;
@@ -1230,6 +1225,7 @@ has 'display_name_language' => (
  				'ang' => '古英文',
  				'ann' => '奧博洛語',
  				'anp' => '昂加文',
+ 				'apc' => '黎凡特阿拉伯文',
  				'ar' => '阿拉伯文',
  				'ar_001' => '現代標準阿拉伯文',
  				'arc' => '阿拉米文',
@@ -1277,6 +1273,8 @@ has 'display_name_language' => (
  				'bjn' => '班亞爾文',
  				'bkm' => '康姆文',
  				'bla' => '錫克錫卡文',
+ 				'blo' => '阿尼文',
+ 				'blt' => '黑傣語',
  				'bm' => '班巴拉文',
  				'bn' => '孟加拉文',
  				'bo' => '藏文',
@@ -1312,6 +1310,7 @@ has 'display_name_language' => (
  				'chp' => '奇佩瓦揚文',
  				'chr' => '柴羅基文',
  				'chy' => '沙伊安文',
+ 				'cic' => '契卡索文',
  				'ckb' => '中庫德文',
  				'ckb@alt=variant' => '庫德文（索拉尼）',
  				'clc' => '齊爾柯廷語',
@@ -1320,7 +1319,7 @@ has 'display_name_language' => (
  				'cps' => '卡皮茲文',
  				'cr' => '克里文',
  				'crg' => '米奇夫語',
- 				'crh' => '土耳其文（克里米亞半島）',
+ 				'crh' => '克里米亞韃靼文',
  				'crj' => '東南克里語',
  				'crk' => '平原克里語',
  				'crl' => '北部東克里語',
@@ -1405,7 +1404,6 @@ has 'display_name_language' => (
  				'gmh' => '中古高地德文',
  				'gn' => '瓜拉尼文',
  				'goh' => '古高地德文',
- 				'gom' => '孔卡尼文',
  				'gon' => '岡德文',
  				'gor' => '科隆達羅文',
  				'got' => '哥德文',
@@ -1426,11 +1424,12 @@ has 'display_name_language' => (
  				'he' => '希伯來文',
  				'hi' => '印地文',
  				'hi_Latn' => '印地語（拉丁文）',
- 				'hi_Latn@alt=variant' => '印地語',
+ 				'hi_Latn@alt=variant' => '印地英語',
  				'hif' => '斐濟印地文',
  				'hil' => '希利蓋農文',
  				'hit' => '赫梯文',
  				'hmn' => '苗語',
+ 				'hnj' => '青苗話',
  				'ho' => '西里莫圖土文',
  				'hr' => '克羅埃西亞文',
  				'hsb' => '上索布文',
@@ -1517,6 +1516,7 @@ has 'display_name_language' => (
  				'kv' => '科米文',
  				'kw' => '康瓦耳文',
  				'kwk' => '誇誇嘉誇語',
+ 				'kxv' => '庫維文',
  				'ky' => '吉爾吉斯文',
  				'la' => '拉丁文',
  				'lad' => '拉迪諾文',
@@ -1532,6 +1532,7 @@ has 'display_name_language' => (
  				'lil' => '利洛威特文',
  				'liv' => '利伏尼亞文',
  				'lkt' => '拉科塔文',
+ 				'lld' => '拉定文',
  				'lmo' => '倫巴底文',
  				'ln' => '林加拉文',
  				'lo' => '寮文',
@@ -1599,7 +1600,7 @@ has 'display_name_language' => (
  				'nan' => '閩南語',
  				'nap' => '拿波里文',
  				'naq' => '納馬文',
- 				'nb' => '巴克摩挪威文',
+ 				'nb' => '書面挪威文',
  				'nd' => '北地畢列文',
  				'nds' => '低地德文',
  				'nds_NL' => '低地薩克遜文',
@@ -1612,7 +1613,7 @@ has 'display_name_language' => (
  				'nl' => '荷蘭文',
  				'nl_BE' => '法蘭德斯文',
  				'nmg' => '夸西奧文',
- 				'nn' => '耐諾斯克挪威文',
+ 				'nn' => '新挪威文',
  				'nnh' => '恩甘澎文',
  				'no' => '挪威文',
  				'nog' => '諾蓋文',
@@ -1731,7 +1732,7 @@ has 'display_name_language' => (
  				'sn' => '紹納文',
  				'snk' => '索尼基文',
  				'so' => '索馬利文',
- 				'sog' => '索格底亞納文',
+ 				'sog' => '粟特文',
  				'sq' => '阿爾巴尼亞文',
  				'sr' => '塞爾維亞文',
  				'srn' => '蘇拉南東墎文',
@@ -1811,6 +1812,7 @@ has 'display_name_language' => (
  				'vi' => '越南文',
  				'vls' => '西佛蘭德文',
  				'vmf' => '美茵-法蘭克尼亞文',
+ 				'vmw' => '馬庫瓦文',
  				'vo' => '沃拉普克文',
  				'vot' => '沃提克文',
  				'vro' => '佛羅文',
@@ -1826,6 +1828,7 @@ has 'display_name_language' => (
  				'xal' => '卡爾梅克文',
  				'xh' => '科薩文',
  				'xmf' => '明格列爾文',
+ 				'xnr' => '康格里',
  				'xog' => '索加文',
  				'yao' => '瑤文',
  				'yap' => '雅浦文',
@@ -1902,7 +1905,7 @@ has 'display_name_script' => (
  			'Dupl' => '杜普洛伊速記',
  			'Egyd' => '古埃及世俗體',
  			'Egyh' => '古埃及僧侶體',
- 			'Egyp' => '古埃及象形文字',
+ 			'Egyp' => '古埃及聖書體',
  			'Elba' => '愛爾巴桑文',
  			'Ethi' => '衣索比亞文',
  			'Geok' => '喬治亞語系（阿索他路里和努斯克胡里文）',
@@ -1915,7 +1918,7 @@ has 'display_name_script' => (
  			'Gujr' => '古吉拉特文',
  			'Guru' => '古魯穆奇文',
  			'Hanb' => '標上注音符號的漢字',
- 			'Hang' => '韓文字',
+ 			'Hang' => '諺文',
  			'Hani' => '漢字',
  			'Hano' => '哈努諾文',
  			'Hans' => '簡體',
@@ -1927,6 +1930,7 @@ has 'display_name_script' => (
  			'Hira' => '平假名',
  			'Hluw' => '安那托利亞象形文字',
  			'Hmng' => '楊松錄苗文',
+ 			'Hmnp' => '創世紀苗文',
  			'Hrkt' => '片假名或平假名',
  			'Hung' => '古匈牙利文',
  			'Inds' => '印度河流域（哈拉帕文）',
@@ -1940,15 +1944,16 @@ has 'display_name_script' => (
  			'Khar' => '卡羅須提文',
  			'Khmr' => '高棉文',
  			'Khoj' => '克吉奇文字',
+ 			'Kits' => '契丹小字',
  			'Knda' => '坎那達文',
  			'Kore' => '韓文',
  			'Kpel' => '克培列文',
  			'Kthi' => '凱提文',
  			'Lana' => '藍拿文',
- 			'Laoo' => '寮國文',
+ 			'Laoo' => '寮文',
  			'Latf' => '拉丁文（尖角體活字變體）',
  			'Latg' => '拉丁文（蓋爾語變體）',
- 			'Latn' => '拉丁文',
+ 			'Latn' => '拉丁字母',
  			'Lepc' => '雷布查文',
  			'Limb' => '林佈文',
  			'Lina' => '線性文字（A）',
@@ -1960,7 +1965,7 @@ has 'display_name_script' => (
  			'Mahj' => '印地文',
  			'Mand' => '曼底安文',
  			'Mani' => '摩尼教文',
- 			'Marc' => '藏文',
+ 			'Marc' => '瑪欽文',
  			'Maya' => '瑪雅象形文字',
  			'Mend' => '門德文',
  			'Merc' => '麥羅埃文（曲線字體）',
@@ -1978,13 +1983,14 @@ has 'display_name_script' => (
  			'Newa' => 'Vote 尼瓦爾文',
  			'Nkgb' => '納西格巴文',
  			'Nkoo' => '西非書面語言 (N’Ko)',
- 			'Nshu' => '女書文字',
+ 			'Nshu' => '女書',
  			'Ogam' => '歐甘文',
  			'Olck' => '桑塔利文',
  			'Orkh' => '鄂爾渾文',
  			'Orya' => '歐迪亞文',
  			'Osge' => '歐塞奇文',
  			'Osma' => '歐斯曼亞文',
+ 			'Ougr' => '回鶻文',
  			'Palm' => '帕米瑞拉文字',
  			'Pauc' => '鮑欽豪文',
  			'Perm' => '古彼爾姆諸文',
@@ -2033,7 +2039,7 @@ has 'display_name_script' => (
  			'Tglg' => '塔加拉文',
  			'Thaa' => '塔安那文',
  			'Thai' => '泰文',
- 			'Tibt' => '西藏文',
+ 			'Tibt' => '藏文',
  			'Tirh' => '邁蒂利文',
  			'Ugar' => '烏加列文',
  			'Vaii' => '瓦依文',
@@ -2428,6 +2434,7 @@ has 'display_name_variant' => (
  			'OSOJS' => '雷西亞歐西亞柯方言',
  			'OXENDICT' => '牛津英文字典拼音',
  			'PAMAKA' => '蘇利南帕馬卡方言',
+ 			'PEHOEJI' => '白話字',
  			'PETR1708' => '俄羅斯文拼字（1708 年）',
  			'PINYIN' => '漢語拼音',
  			'POLYTON' => '希臘文多調正字法',
@@ -2445,7 +2452,9 @@ has 'display_name_variant' => (
  			'SURMIRAN' => '瑞士蘇邁拉方言',
  			'SURSILV' => '瑞士蘇瑟瓦方言',
  			'SUTSILV' => '瑞士蘇希瓦方言',
+ 			'TAILO' => '臺羅',
  			'TARASK' => '白俄羅斯文傳統拼字',
+ 			'TONGYONG' => '通用拼音',
  			'UCCOR' => '統一康沃爾文拼字',
  			'UCRCOR' => '統一康沃爾文修訂拼字',
  			'ULSTER' => '愛爾蘭阿爾斯特方言',
@@ -2545,9 +2554,8 @@ has 'display_name_type' => (
  				'phonebook' => q{電話簿排序},
  				'phonetic' => q{發音排序},
  				'pinyin' => q{拼音排序},
- 				'reformed' => q{改良排序},
  				'search' => q{一般用途搜尋},
- 				'searchjl' => q{韓文子音排序},
+ 				'searchjl' => q{依諺文聲母搜尋},
  				'standard' => q{標準排序},
  				'stroke' => q{筆畫排序},
  				'traditional' => q{傳統排序},
@@ -2646,6 +2654,8 @@ has 'display_name_type' => (
  				'mroo' => q{默文數字},
  				'mtei' => q{曼尼普爾數字},
  				'mymr' => q{緬甸數字},
+ 				'mymrepka' => q{緬甸東山地克倫數字},
+ 				'mymrpao' => q{緬甸勃歐數字},
  				'mymrshan' => q{緬甸撣文數字},
  				'mymrtlng' => q{緬甸傣族數字},
  				'native' => q{原始數字},
@@ -2667,7 +2677,7 @@ has 'display_name_type' => (
  				'tamldec' => q{坦米爾數字},
  				'telu' => q{泰盧固數字},
  				'thai' => q{泰文數字},
- 				'tibt' => q{西藏數字},
+ 				'tibt' => q{藏文數字},
  				'tirh' => q{提爾胡塔數字},
  				'traditional' => q{傳統數字},
  				'vaii' => q{瓦伊文數字},
@@ -2913,6 +2923,16 @@ has 'units' => (
 						'other' => q(每公升 {0} 毫莫耳),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(十億分點濃度),
+						'other' => q({0} 十億分點濃度),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(十億分點濃度),
+						'other' => q({0} 十億分點濃度),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(每 100 公里公升),
 						'other' => q(每 100 公里 {0} 公升),
@@ -2991,6 +3011,18 @@ has 'units' => (
 					# Core Unit Identifier
 					'month' => {
 						'per' => q(每月 {0}),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(夜),
+						'other' => q({0} 夜),
+						'per' => q({0}/夜),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(夜),
+						'other' => q({0} 夜),
+						'per' => q({0}/夜),
 					},
 					# Long Unit Identifier
 					'duration-second' => {
@@ -3159,6 +3191,16 @@ has 'units' => (
 					# Core Unit Identifier
 					'meter' => {
 						'per' => q(每公尺 {0}),
+					},
+					# Long Unit Identifier
+					'length-mile-scandinavian' => {
+						'name' => q(斯堪地那維亞里),
+						'other' => q({0} 斯堪地那維亞里),
+					},
+					# Core Unit Identifier
+					'mile-scandinavian' => {
+						'name' => q(斯堪地那維亞里),
+						'other' => q({0} 斯堪地那維亞里),
 					},
 					# Long Unit Identifier
 					'length-solar-radius' => {
@@ -3514,11 +3556,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'area-square-inch' => {
-						'other' => q({0}in²),
+						'other' => q({0}平方英寸),
 					},
 					# Core Unit Identifier
 					'square-inch' => {
-						'other' => q({0}in²),
+						'other' => q({0}平方英寸),
 					},
 					# Long Unit Identifier
 					'area-square-kilometer' => {
@@ -3599,6 +3641,14 @@ has 'units' => (
 					# Core Unit Identifier
 					'permillion' => {
 						'other' => q({0}百萬分率),
+					},
+					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'other' => q({0}ppb),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'other' => q({0}ppb),
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
@@ -3737,6 +3787,18 @@ has 'units' => (
 					# Core Unit Identifier
 					'nanosecond' => {
 						'other' => q({0}ns),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(夜),
+						'other' => q({0}夜),
+						'per' => q({0}/夜),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(夜),
+						'other' => q({0}夜),
+						'per' => q({0}/夜),
 					},
 					# Long Unit Identifier
 					'electric-ampere' => {
@@ -3964,11 +4026,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-astronomical-unit' => {
-						'other' => q({0}au),
+						'other' => q({0}天文單位),
 					},
 					# Core Unit Identifier
 					'astronomical-unit' => {
-						'other' => q({0}au),
+						'other' => q({0}天文單位),
 					},
 					# Long Unit Identifier
 					'length-centimeter' => {
@@ -3980,11 +4042,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-decimeter' => {
-						'other' => q({0}dm),
+						'other' => q({0}公寸),
 					},
 					# Core Unit Identifier
 					'decimeter' => {
-						'other' => q({0}dm),
+						'other' => q({0}公寸),
 					},
 					# Long Unit Identifier
 					'length-earth-radius' => {
@@ -4068,10 +4130,12 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-mile-scandinavian' => {
+						'name' => q(斯堪地那維亞里),
 						'other' => q({0}smi),
 					},
 					# Core Unit Identifier
 					'mile-scandinavian' => {
+						'name' => q(斯堪地那維亞里),
 						'other' => q({0}smi),
 					},
 					# Long Unit Identifier
@@ -4084,11 +4148,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-nanometer' => {
-						'other' => q({0}nm),
+						'other' => q({0}奈米),
 					},
 					# Core Unit Identifier
 					'nanometer' => {
-						'other' => q({0}nm),
+						'other' => q({0}奈米),
 					},
 					# Long Unit Identifier
 					'length-nautical-mile' => {
@@ -4100,11 +4164,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-parsec' => {
-						'other' => q({0}pc),
+						'other' => q({0}秒差距),
 					},
 					# Core Unit Identifier
 					'parsec' => {
-						'other' => q({0}pc),
+						'other' => q({0}秒差距),
 					},
 					# Long Unit Identifier
 					'length-picometer' => {
@@ -4649,22 +4713,18 @@ has 'units' => (
 					# Long Unit Identifier
 					'volume-gallon' => {
 						'other' => q({0}加侖),
-						'per' => q({0}/gal),
 					},
 					# Core Unit Identifier
 					'gallon' => {
 						'other' => q({0}加侖),
-						'per' => q({0}/gal),
 					},
 					# Long Unit Identifier
 					'volume-gallon-imperial' => {
 						'other' => q({0}英制加侖),
-						'per' => q({0}/galIm),
 					},
 					# Core Unit Identifier
 					'gallon-imperial' => {
 						'other' => q({0}英制加侖),
-						'per' => q({0}/galIm),
 					},
 					# Long Unit Identifier
 					'volume-hectoliter' => {
@@ -5223,6 +5283,14 @@ has 'units' => (
 						'other' => q({0} 百萬分率),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(濃度/十億),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(濃度/十億),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(升/100 公里),
 						'other' => q({0} 升/100 公里),
@@ -5373,6 +5441,18 @@ has 'units' => (
 					'nanosecond' => {
 						'name' => q(奈秒),
 						'other' => q({0} 奈秒),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(夜),
+						'other' => q({0} 夜),
+						'per' => q({0}/夜),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(夜),
+						'other' => q({0} 夜),
+						'per' => q({0}/夜),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -5744,13 +5824,13 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-mile-scandinavian' => {
-						'name' => q(斯堪地那維亞英里),
-						'other' => q({0} 斯堪地那維亞英里),
+						'name' => q(斯堪地那維亞里),
+						'other' => q({0} 斯堪地那維亞里),
 					},
 					# Core Unit Identifier
 					'mile-scandinavian' => {
-						'name' => q(斯堪地那維亞英里),
-						'other' => q({0} 斯堪地那維亞英里),
+						'name' => q(斯堪地那維亞里),
+						'other' => q({0} 斯堪地那維亞里),
 					},
 					# Long Unit Identifier
 					'length-millimeter' => {
@@ -10034,6 +10114,7 @@ has 'datetime_formats_available_formats' => (
 			GyMMM => q{Gy年M月},
 			GyMMMEd => q{Gy年M月d日E},
 			GyMMMd => q{Gy年M月d日},
+			GyMd => q{GGGGG y/M/d},
 			MMMEd => q{M月d日E},
 			y => q{Gy年},
 			yyyy => q{Gy年},
@@ -11138,9 +11219,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#紐約#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#尼皮岡#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#諾姆#,
 		},
@@ -11161,9 +11239,6 @@ has 'time_zone_names' => (
 		},
 		'America/Panama' => {
 			exemplarCity => q#巴拿馬#,
-		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#潘尼爾東#,
 		},
 		'America/Paramaribo' => {
 			exemplarCity => q#巴拉馬利波#,
@@ -11186,9 +11261,6 @@ has 'time_zone_names' => (
 		'America/Punta_Arenas' => {
 			exemplarCity => q#蓬塔阿雷納斯#,
 		},
-		'America/Rainy_River' => {
-			exemplarCity => q#雨河鎮#,
-		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#蘭今灣#,
 		},
@@ -11203,9 +11275,6 @@ has 'time_zone_names' => (
 		},
 		'America/Rio_Branco' => {
 			exemplarCity => q#里約布蘭#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#聖伊薩貝爾#,
 		},
 		'America/Santarem' => {
 			exemplarCity => q#聖塔倫#,
@@ -11252,9 +11321,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#杜里#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#珊德灣#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#提華納#,
 		},
@@ -11275,9 +11341,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#雅庫塔#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#耶洛奈夫#,
 		},
 		'America_Central' => {
 			long => {
@@ -11472,9 +11535,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#赤塔#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#喬巴山#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#可倫坡#,
@@ -11719,9 +11779,6 @@ has 'time_zone_names' => (
 		'Australia/Broken_Hill' => {
 			exemplarCity => q#布羅肯希爾#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#克黎#,
-		},
 		'Australia/Darwin' => {
 			exemplarCity => q#達爾文#,
 		},
@@ -11853,13 +11910,6 @@ has 'time_zone_names' => (
 				'daylight' => q#中國夏令時間#,
 				'generic' => q#中國時間#,
 				'standard' => q#中國標準時間#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#喬巴山夏令時間#,
-				'generic' => q#喬巴山時間#,
-				'standard' => q#喬巴山標準時間#,
 			},
 		},
 		'Christmas' => {
@@ -12084,9 +12134,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#烏里揚諾夫斯克#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#烏茲哥洛#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#瓦都茲#,
 		},
@@ -12107,9 +12154,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#札格瑞布#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#札波羅結#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#蘇黎世#,
@@ -12347,6 +12391,11 @@ has 'time_zone_names' => (
 				'standard' => q#彼得羅巴甫洛夫斯克標準時間#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#哈薩克時間#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#東哈薩克時間#,
@@ -12405,11 +12454,6 @@ has 'time_zone_names' => (
 				'standard' => q#澳門標準時間#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#麥覺理時間#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#馬加丹夏令時間#,
@@ -12447,13 +12491,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#莫森時間#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#墨西哥西北部夏令時間#,
-				'generic' => q#墨西哥西北部時間#,
-				'standard' => q#墨西哥西北部標準時間#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -12595,9 +12632,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Honolulu' => {
 			exemplarCity => q#檀香山#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#強斯頓#,
 		},
 		'Pacific/Kanton' => {
 			exemplarCity => q#坎頓島#,

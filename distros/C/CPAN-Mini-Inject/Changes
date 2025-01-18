@@ -1,5 +1,9 @@
 Revision history for CPAN-Mini-Inject
 
+1.008 2025-01-17T13:45:32Z
+	* Fix indexing problem while not hiding CPAN::Meta::Convertor
+	correctly.
+
 1.007 2025-01-16T21:09:23Z
 	
 	* pass CPAN::Mini config parameters to CPAN::Mini while calling

@@ -1,0 +1,13 @@
+LICENSE
+MANIFEST
+README
+Changes
+Makefile.PL
+example.pl
+lib/Crypt/Komihash.pm
+lib/Crypt/Komihash.xs
+lib/Crypt/komihash.h
+t/01-komihash.t
+t/02-komihash_hex.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

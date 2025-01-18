@@ -4,7 +4,7 @@
       "Leon Timmermans <leont@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -30,8 +30,9 @@
          "requires" : {
             "Carp" : "0",
             "Crypt::Argon2" : "0.017",
-            "Crypt::Passphrase" : "0.010",
+            "Crypt::Passphrase::Encoder" : "0",
             "MIME::Base64" : "0",
+            "parent" : "0",
             "perl" : "5.013002",
             "strict" : "0",
             "warnings" : "0"
@@ -39,12 +40,12 @@
       },
       "test" : {
          "requires" : {
+            "Crypt::Passphrase" : "0.010",
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Test::More" : "0",
             "lib" : "0",
-            "parent" : "0",
             "perl" : "5.013002"
          }
       }
@@ -52,11 +53,11 @@
    "provides" : {
       "Crypt::Passphrase::Argon2" : {
          "file" : "lib/Crypt/Passphrase/Argon2.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Crypt::Passphrase::Argon2::Encrypted" : {
          "file" : "lib/Crypt/Passphrase/Argon2/Encrypted.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       }
    },
    "release_status" : "stable",
@@ -70,9 +71,9 @@
          "web" : "https://github.com/Leont/crypt-passphrase-argon2"
       }
    },
-   "version" : "0.009",
-   "x_generated_by_perl" : "v5.36.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.29",
+   "version" : "0.010",
+   "x_generated_by_perl" : "v5.38.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

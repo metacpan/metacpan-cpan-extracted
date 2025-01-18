@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Xnr - Package for language Kangri
 
 package Locale::CLDR::Locales::Xnr;
 # This file auto generated from Data\common\main\xnr.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -31,7 +31,8 @@ has 'display_name_language' => (
 	default		=> sub {
 		 sub {
 			 my %languages = (
-				'ab' => 'अब्ख़ाज़ियन',
+				'aa' => 'अफ़ार',
+ 				'ab' => 'अब्ख़ाज़ियन',
  				'ace' => 'अचाइनीस',
  				'ada' => 'अदान्गमे',
  				'ady' => 'अदिघे',
@@ -64,6 +65,7 @@ has 'display_name_language' => (
  				'bem' => 'बेम्बा',
  				'bez' => 'बेना',
  				'bg' => 'बुल्गारियाई',
+ 				'bgn' => 'पश्चिमी बलोची',
  				'bho' => 'भोजपुरी',
  				'bi' => 'बिस्लामा',
  				'bin' => 'बिनी',
@@ -92,6 +94,7 @@ has 'display_name_language' => (
  				'ckb@alt=menu' => 'कुर्दी, सोरानी',
  				'co' => 'कोर्सीकन',
  				'cs' => 'चेक',
+ 				'cu' => 'चर्च साल्विक',
  				'cv' => 'चूवाश',
  				'cy' => 'वेल्श',
  				'da' => 'डेनिश',
@@ -162,7 +165,7 @@ has 'display_name_language' => (
  				'haw' => 'हवाई',
  				'he' => 'हिब्रू',
  				'hi' => 'हिन्दी',
- 				'hi_Latn@alt=variant' => 'हिंग्लिश',
+ 				'hi_Latn@alt=variant' => 'हिंग्लिस',
  				'hil' => 'हिलिगेनन',
  				'hmn' => 'ह्मॉंग',
  				'hr' => 'क्रोएशियाई',
@@ -176,6 +179,7 @@ has 'display_name_language' => (
  				'iba' => 'इबान',
  				'ibb' => 'इबिबियो',
  				'id' => 'इंडोनेशियाई',
+ 				'ie' => 'ईन्टरलिंगुइ',
  				'ig' => 'ईग्बो',
  				'ii' => 'सिचुआन यी',
  				'ilo' => 'इलोको',
@@ -190,6 +194,7 @@ has 'display_name_language' => (
  				'jmc' => 'मैकहैमे',
  				'jv' => 'जावानीज़',
  				'ka' => 'जॉर्जियाई',
+ 				'kaa' => 'कारा-कल्पक',
  				'kab' => 'कबाइल',
  				'kac' => 'काचिन',
  				'kaj' => 'ज्जु',
@@ -199,6 +204,7 @@ has 'display_name_language' => (
  				'kde' => 'मैकोंड',
  				'kea' => 'काबुवेर्दियानु',
  				'kfo' => 'कोरो',
+ 				'kgp' => 'कइंगंग',
  				'kha' => 'खासी',
  				'khq' => 'कोयरा चीनी',
  				'ki' => 'किकुयू',
@@ -308,6 +314,7 @@ has 'display_name_language' => (
  				'om' => 'ओरोमो',
  				'or' => 'उड़िया',
  				'os' => 'ओस्सेटिक',
+ 				'osa' => 'ओसेज',
  				'pa' => 'पंजाबी',
  				'pag' => 'पंगासीनान',
  				'pam' => 'पाम्पान्गा',
@@ -315,11 +322,13 @@ has 'display_name_language' => (
  				'pau' => 'पलोउआन',
  				'pcm' => 'नाइजीरियाई पिडगिन',
  				'pl' => 'पोलिश',
+ 				'prg' => 'प्रुशियाई',
  				'ps' => 'पश्तो',
  				'pt' => 'पुर्तगाली',
  				'pt_BR' => 'ब्राज़ीली पुर्तगाली',
  				'pt_PT' => 'यूरोपीय पुर्तगाली',
  				'qu' => 'क्वेचुआ',
+ 				'quc' => 'किश',
  				'raj' => 'राजस्थानी',
  				'rap' => 'रापानुई',
  				'rar' => 'रारोतोंगन',
@@ -342,7 +351,7 @@ has 'display_name_language' => (
  				'scn' => 'सिसिलियन',
  				'sco' => 'स्कॉट्स',
  				'sd' => 'सिंधी',
- 				'se' => 'नॉर्दन सामी',
+ 				'se' => 'उतरी सामी',
  				'seh' => 'सेना',
  				'ses' => 'कोयराबोरो सेन्नी',
  				'sg' => 'सांगो',
@@ -361,6 +370,7 @@ has 'display_name_language' => (
  				'sr' => 'सर्बियाई',
  				'srn' => 'स्रानान टॉन्गो',
  				'ss' => 'स्वाती',
+ 				'ssy' => 'साहो',
  				'st' => 'दखणे बखें सेसेथो',
  				'su' => 'सुंडानी',
  				'suk' => 'सुकुमा',
@@ -379,6 +389,7 @@ has 'display_name_language' => (
  				'tk' => 'तुर्कमेन',
  				'tlh' => 'क्लिंगन',
  				'tli' => 'त्लिंगित',
+ 				'tn' => 'सेत्स्वाना',
  				'to' => 'टोंगन',
  				'tpi' => 'टोक पिसिन',
  				'tr' => 'तुर्की',
@@ -400,11 +411,13 @@ has 'display_name_language' => (
  				'vai' => 'वाई',
  				've' => 'वेन्दा',
  				'vi' => 'वियतनामी',
+ 				'vo' => 'वोलापुक',
  				'vun' => 'वुंजो',
  				'wa' => 'वाल्लून',
  				'wae' => 'वाल्सर',
  				'wal' => 'वलामो',
  				'war' => 'वारै',
+ 				'wbp' => 'वॉल्पेरी',
  				'wo' => 'वोलोफ़',
  				'wuu' => 'वू चीनी',
  				'xal' => 'काल्मिक',
@@ -417,6 +430,7 @@ has 'display_name_language' => (
  				'yo' => 'योरूबा',
  				'yue' => 'कैंटोनीज़',
  				'yue@alt=menu' => 'चीनी, कैंटोनीज़',
+ 				'za' => 'ज़ुआंग',
  				'zgh' => 'मानक मोरक्कन तामाज़ाइट',
  				'zh' => 'चीनी',
  				'zh@alt=menu' => 'चीनी, मैंडेरिन',
@@ -446,56 +460,122 @@ has 'display_name_script' => (
 		sub {
 			my %scripts = (
 			'Arab' => 'अरबी',
+ 			'Armi' => 'इम्पिरियल आर्मेनिक',
  			'Armn' => 'आर्मेनियाई',
+ 			'Avst' => 'अवेस्तन',
+ 			'Bali' => 'बाली',
+ 			'Batk' => 'बटकी',
  			'Beng' => 'बंगाली',
  			'Bopo' => 'बोपोमोफ़ो',
+ 			'Brah' => 'ब्रह्मी',
  			'Brai' => 'ब्रेल',
+ 			'Bugi' => 'बगिनीस',
+ 			'Buhd' => 'बुहिद',
  			'Cakm' => 'चकमा',
  			'Cans' => 'युनिफाइड कैनेडियन एबोरिजनल सिलेबिक्स',
+ 			'Cari' => 'करैन',
+ 			'Cham' => 'चाम',
  			'Cher' => 'चेरोकी',
+ 			'Copt' => 'कॉप्टिक',
+ 			'Cprt' => 'काइप्रायट',
  			'Cyrl' => 'सिरिलिक',
+ 			'Cyrs' => 'ओल्ड चर्च स्लावोनिक सिरिलिक',
  			'Deva' => 'देवनागरी',
+ 			'Dsrt' => 'डेसरेट',
+ 			'Egyp' => 'इजिप्शियन हाइरोग्लिफ्स',
  			'Ethi' => 'इथियोपियाई',
  			'Geor' => 'जॉर्जियन',
+ 			'Glag' => 'ग्लेगोलिटिक',
+ 			'Goth' => 'गोथिक',
+ 			'Gran' => 'ग्रन्थ',
  			'Grek' => 'यूनानी',
  			'Gujr' => 'गुजराती',
  			'Guru' => 'गुरमुखी',
  			'Hanb' => 'हांब',
  			'Hang' => 'हंगुल',
  			'Hani' => 'हान',
+ 			'Hano' => 'हनुनू',
  			'Hans' => 'सादी',
  			'Hans@alt=stand-alone' => 'सादी हान',
  			'Hant' => 'पारंपरिक',
  			'Hant@alt=stand-alone' => 'पारंपरिक हान',
  			'Hebr' => 'हिब्रू',
  			'Hira' => 'हिरागाना',
+ 			'Hmng' => 'पाहो ह्मोन्ग',
  			'Hrkt' => 'जापानी सिलेबरीज़',
+ 			'Hung' => 'ऑल्ड हंगेरियन',
+ 			'Ital' => 'पराणी इटली',
  			'Jamo' => 'जामो',
+ 			'Java' => 'जावानीस',
  			'Jpan' => 'जापानी',
+ 			'Kali' => 'कायाह ली',
  			'Kana' => 'काताकाना',
+ 			'Khar' => 'खारोशथी',
  			'Khmr' => 'खमेर',
  			'Knda' => 'कन्नड़',
  			'Kore' => 'कोरियाई',
+ 			'Kthi' => 'कैथी',
+ 			'Lana' => 'लाना',
  			'Laoo' => 'लाओ',
+ 			'Latf' => 'फ़्रैक्टुर लातिनी',
+ 			'Latg' => 'गेली लातिनी',
  			'Latn' => 'लैटिन',
+ 			'Lepc' => 'लेपचा',
+ 			'Limb' => 'लिम्बू',
+ 			'Lina' => 'रेखा आली ए',
+ 			'Linb' => 'रेखा आली बी',
+ 			'Lyci' => 'लिशियन',
+ 			'Lydi' => 'लिडियन',
+ 			'Mand' => 'मनडेन',
+ 			'Mani' => 'मनीशीन',
+ 			'Mero' => 'मेरोइटिक',
  			'Mlym' => 'मलयालम',
  			'Mong' => 'मंगोलियाई',
  			'Mtei' => 'मेइतेइ मायेक',
  			'Mymr' => 'म्यांमार',
  			'Nkoo' => 'एन्‘को',
+ 			'Ogam' => 'ओगम',
  			'Olck' => 'ऑल चिकी',
+ 			'Orkh' => 'ओरखोन',
  			'Orya' => 'उड़िया',
+ 			'Osma' => 'ओस्मान्या',
+ 			'Perm' => 'ओल्ड परमिक',
+ 			'Phag' => 'फाग्स-पा',
+ 			'Phli' => 'इंस्क्रिपश्नल पाहलवी',
+ 			'Phlp' => 'सॉल्टर पाहलवी',
+ 			'Phnx' => 'फोनिशियन',
+ 			'Plrd' => 'पॉलार्ड फोनेटिक',
+ 			'Prti' => 'इंस्क्रिपश्नल पार्थियन',
+ 			'Rjng' => 'रीजांग',
+ 			'Runr' => 'रूनिक',
+ 			'Samr' => 'समरिटन',
+ 			'Saur' => 'सौरासटर',
+ 			'Sgnw' => 'सांकेतिक लेख',
+ 			'Shaw' => 'शावियान',
  			'Sinh' => 'सिंहली',
  			'Sund' => 'सूडानी',
+ 			'Sylo' => 'सिलोती नागरी',
  			'Syrc' => 'सिरियेक',
+ 			'Syre' => 'एस्त्रेन्जेलो सिरिएक',
+ 			'Syrj' => 'पश्चिम सिरिएक',
+ 			'Syrn' => 'पूर्व सिरिएक',
+ 			'Tagb' => 'तगबन्वा',
+ 			'Tale' => 'ताई ली',
+ 			'Talu' => 'नोआ ताई लु',
  			'Taml' => 'तमिल',
+ 			'Tavt' => 'ताई विएत',
  			'Telu' => 'तेलुगू',
  			'Tfng' => 'तिफिनाघ',
+ 			'Tglg' => 'टैगालोग',
  			'Thaa' => 'थाना',
  			'Thai' => 'थाई',
  			'Tibt' => 'तिब्बती',
+ 			'Ugar' => 'युगारिटिक',
  			'Vaii' => 'वाई',
+ 			'Xpeo' => 'पुरानी फारसी',
+ 			'Xsux' => 'सुमेरो अक्कादियन सुनिफॉर्म',
  			'Yiii' => 'यी',
+ 			'Zinh' => 'विरासत',
  			'Zmth' => 'गणिते आले संकेतन',
  			'Zsye' => 'ईमोजी',
  			'Zsym' => 'चिह्न',
@@ -529,7 +609,7 @@ has 'display_name_region' => (
  			'015' => 'उत्तरी अफ़्रीका',
  			'017' => 'बिचला अफ़्रीका',
  			'018' => 'दखणे बखें अफ़्रीका',
- 			'019' => 'अमरिके दा',
+ 			'019' => 'अमरिका दा',
  			'021' => 'उत्तरी अमरिका',
  			'029' => 'कैरिबियन',
  			'030' => 'पूर्वी एशिया',
@@ -551,7 +631,7 @@ has 'display_name_region' => (
  			'419' => 'लैटिन अमरिका',
  			'AC' => 'असेंशन द्वीप',
  			'AD' => 'एंडोरा',
- 			'AE' => 'कट्ठा अरब अमीरात',
+ 			'AE' => 'संयुक्त अरब अमीरात',
  			'AF' => 'अफ़गानिस्तान',
  			'AG' => 'एंटिगुआ कने बरबुडा',
  			'AI' => 'एंग्विला',
@@ -566,7 +646,7 @@ has 'display_name_region' => (
  			'AW' => 'अरूबा',
  			'AX' => 'एलैंड द्वीपां दा झुंड',
  			'AZ' => 'अज़रबैजान',
- 			'BA' => 'बोस्निया और हर्ज़ेगोविना',
+ 			'BA' => 'बोस्निया कने हर्ज़ेगोविना',
  			'BB' => 'बारबाडोस',
  			'BD' => 'बांग्लादेश',
  			'BE' => 'बेल्जियम',
@@ -618,7 +698,7 @@ has 'display_name_region' => (
  			'DM' => 'डोमिनिका',
  			'DO' => 'डोमिनिकन गणराज्य',
  			'DZ' => 'अल्जीरिया',
- 			'EA' => 'सेउटा और मेलिला',
+ 			'EA' => 'सेउटा कने मेलिला',
  			'EC' => 'इक्वाडोर',
  			'EE' => 'एस्टोनिया',
  			'EG' => 'मिस्र',
@@ -650,7 +730,7 @@ has 'display_name_region' => (
  			'GP' => 'ग्वाडेलूप',
  			'GQ' => 'इक्वेटोरियल गिनी',
  			'GR' => 'यूनान',
- 			'GS' => 'दखण जॉर्जिया और दखण सैंडविच द्वीपां दा झुंड',
+ 			'GS' => 'दखण जॉर्जिया कने दखण सैंडविच द्वीपां दा झुंड',
  			'GT' => 'ग्वाटेमाला',
  			'GU' => 'गुआम',
  			'GW' => 'गिनी-बिसाउ',
@@ -735,6 +815,7 @@ has 'display_name_region' => (
  			'NR' => 'नाउरु',
  			'NU' => 'नीयू',
  			'NZ' => 'न्यूज़ीलैंड',
+ 			'NZ@alt=variant' => 'औटेआरोआ न्यूज़ीलैंड',
  			'OM' => 'ओमान',
  			'PA' => 'पनामा',
  			'PE' => 'पेरू',
@@ -743,7 +824,7 @@ has 'display_name_region' => (
  			'PH' => 'फ़िलिपींस',
  			'PK' => 'पाकिस्तान',
  			'PL' => 'पोलैंड',
- 			'PM' => 'सेंट पिएरे और मिक्वेलान',
+ 			'PM' => 'सेंट पिएरे कने मिक्वेलान',
  			'PN' => 'पिटकैर्न द्वीपसमूह',
  			'PR' => 'पोर्टो रिको',
  			'PS' => 'फ़िलिस्तीनी लाका',
@@ -766,7 +847,7 @@ has 'display_name_region' => (
  			'SG' => 'सिंगापुर',
  			'SH' => 'सेंट हेलेना',
  			'SI' => 'स्लोवेनिया',
- 			'SJ' => 'स्वालबार्ड और जान मायेन',
+ 			'SJ' => 'स्वालबार्ड कने जान मायेन',
  			'SK' => 'स्लोवाकिया',
  			'SL' => 'सिएरा लियोन',
  			'SM' => 'सैन मेरीनो',
@@ -774,7 +855,7 @@ has 'display_name_region' => (
  			'SO' => 'सोमालिया',
  			'SR' => 'सूरीनाम',
  			'SS' => 'दखण सूडान',
- 			'ST' => 'साओ टोम और प्रिंसिपे',
+ 			'ST' => 'साओ टोम कने प्रिंसिपे',
  			'SV' => 'अल सल्वाडोर',
  			'SX' => 'सिंट मार्टिन',
  			'SY' => 'सीरिया',
@@ -794,7 +875,7 @@ has 'display_name_region' => (
  			'TN' => 'ट्यूनीशिया',
  			'TO' => 'टोंगा',
  			'TR' => 'तुर्की',
- 			'TT' => 'त्रिनिदाद और टोबैगो',
+ 			'TT' => 'त्रिनिदाद कने टोबैगो',
  			'TV' => 'तुवालू',
  			'TW' => 'ताइवान',
  			'TZ' => 'तंज़ानिया',
@@ -802,18 +883,18 @@ has 'display_name_region' => (
  			'UG' => 'युगांडा',
  			'UM' => 'यू॰एस॰ आउटलाइंग द्वीपां दा झुंड',
  			'UN' => 'संयुक्त रास्टर',
- 			'US' => 'कट्ठा राज्य',
+ 			'US' => 'संयुक्त राज्य',
  			'US@alt=short' => 'अमरिका',
  			'UY' => 'उरूग्वे',
  			'UZ' => 'उज़्बेकिस्तान',
  			'VA' => 'वेटिकन सिटी',
- 			'VC' => 'सेंट विंसेंट और ग्रेनाडाइंस',
+ 			'VC' => 'सेंट विंसेंट कने ग्रेनाडाइंस',
  			'VE' => 'वेनेज़ुएला',
  			'VG' => 'ब्रिटिश वर्जिन द्वीपां दा झुंड',
  			'VI' => 'यू॰एस॰ वर्जिन द्वीपां दा झुंड',
  			'VN' => 'वियतनाम',
  			'VU' => 'वनुआतू',
- 			'WF' => 'वालिस और फ़्यूचूना',
+ 			'WF' => 'वालिस कने फ़्यूचूना',
  			'WS' => 'समोआ',
  			'XA' => 'सूडो-एक्सेंट',
  			'XB' => 'सूडो-बायडायरेक्शनल',
@@ -824,6 +905,43 @@ has 'display_name_region' => (
  			'ZM' => 'ज़ाम्बिया',
  			'ZW' => 'ज़िम्बाब्वे',
  			'ZZ' => 'अणजाण लाका',
+
+		}
+	},
+);
+
+has 'display_name_variant' => (
+	is			=> 'ro',
+	isa			=> HashRef[Str],
+	init_arg	=> undef,
+	default		=> sub {
+		{
+			'1901' => 'पारम्पारिक जर्मन वर्तनी',
+ 			'1996' => 'जर्मेनी दी 1996 वर्तनी',
+ 			'MONOTON' => 'एकस्वरीय',
+ 			'NJIVA' => 'जनीवा बोली',
+ 			'POLYTON' => 'बड़े सारे स्वरां आली',
+ 			'POSIX' => 'कम्प्यूटर',
+ 			'REVISED' => 'संशोधित वर्तनी',
+
+		}
+	},
+);
+
+has 'display_name_key' => (
+	is			=> 'ro',
+	isa			=> HashRef[Str],
+	init_arg	=> undef,
+	default		=> sub {
+		{
+			'calendar' => 'कैलेंडर',
+ 			'cf' => 'मुद्रा प्रारूप',
+ 			'collation' => 'सॉर्ट क्रम',
+ 			'currency' => 'मुद्रा',
+ 			'hc' => 'घंटेयां दा चक्र (12 कने 24)',
+ 			'lb' => 'पंक्ति विच्छेद शैली',
+ 			'ms' => 'मापन प्रणाली',
+ 			'numbers' => 'संख्यां',
 
 		}
 	},
@@ -848,13 +966,75 @@ has 'display_name_type' => (
  				'iso8601' => q{आईएसओ-8601 कैलेंडर},
  				'japanese' => q{जापानी पंचांग},
  				'persian' => q{फ़ारसी कैलेंडर},
+ 				'roc' => q{चीनी गणतंत्र पंचांग},
+ 			},
+ 			'cf' => {
+ 				'account' => q{लेखांकन मुद्रा प्रारूप},
+ 				'standard' => q{मानक मुद्रा प्रारूप},
  			},
  			'collation' => {
+ 				'big5han' => q{पारम्पारिक चीनी वर्गीकरण},
+ 				'ducet' => q{डिफ़ॉल्ट यूनिकोड सॉर्ट क्रम},
+ 				'gb2312han' => q{सरलीकृत चीनी वर्गीकरण},
+ 				'phonebook' => q{फोनबुक छंटाई क्रम},
+ 				'pinyin' => q{पिनयीन वर्गीकरण},
+ 				'search' => q{सामान्य-उद्देश्य खोज},
  				'standard' => q{मानक सॉर्ट क्रम},
+ 				'stroke' => q{स्ट्रोक वर्गीकरण},
+ 				'traditional' => q{पारम्पारिक वर्गीकरण},
+ 			},
+ 			'hc' => {
+ 				'h11' => q{12 घंटेयां दी प्रणाली (0–11)},
+ 				'h12' => q{12 घंटेयां दी प्रणाली (1–12)},
+ 				'h23' => q{24 घंटेयां दी प्रणाली (0–23)},
+ 				'h24' => q{24 घंटेयां दी प्रणाली (1–24)},
+ 			},
+ 			'lb' => {
+ 				'loose' => q{ढीली लैंण विच्छेद शैली<},
+ 				'normal' => q{सामान्य लैंण विच्छेद शैली},
+ 				'strict' => q{सख्त लैंण विच्छेद शैली},
+ 			},
+ 			'ms' => {
+ 				'metric' => q{मेट्रिक प्रणाली},
+ 				'uksystem' => q{इम्पीरियल मापन प्रणाली},
+ 				'ussystem' => q{अमरिकी मापन प्रणाली},
  			},
  			'numbers' => {
+ 				'arab' => q{अरबी-भारतीय अंक},
+ 				'arabext' => q{बधायो अरबी-भारतीय अंक},
+ 				'armn' => q{आर्मेनियाई संख्याएँ},
+ 				'armnlow' => q{आर्मेनियाई लोअरकेस संख्यां},
+ 				'beng' => q{बंगाली अंक},
  				'deva' => q{देवनागरी अंक},
+ 				'ethi' => q{इथियोपियाई संख्यां},
+ 				'fullwide' => q{पूरी चौड़ाई अंक},
+ 				'geor' => q{जॉर्जियन संख्यां},
+ 				'grek' => q{यूनानी संख्यां},
+ 				'greklow' => q{यूनानी लोअरकेस संख्यां},
+ 				'gujr' => q{गुजराती अंक},
+ 				'guru' => q{गुरमुखी अंक},
+ 				'hanidec' => q{चीनी दशमलव संख्यां},
+ 				'hans' => q{सरलीकृत चीनी संख्यां},
+ 				'hansfin' => q{सरलीकृत चीनी वित्तीय संख्यां},
+ 				'hant' => q{पारंपरिक चीनी संख्यां},
+ 				'hantfin' => q{पारंपरिक चीनी वित्तीय संख्यां},
+ 				'hebr' => q{हिब्रू संख्यां},
+ 				'jpan' => q{जापानी संख्यां},
+ 				'jpanfin' => q{जापानी वित्तीय संख्यां},
+ 				'khmr' => q{खमेर अंक},
+ 				'knda' => q{कन्नड़ अंक},
+ 				'laoo' => q{लाओ अंक},
  				'latn' => q{पश्चिमी अंक},
+ 				'mlym' => q{मलयालम अंक},
+ 				'mymr' => q{म्यांमार अंक},
+ 				'orya' => q{उड़िया अंक},
+ 				'roman' => q{रोमन संख्यां},
+ 				'romanlow' => q{रोमन लोअरकेस संख्यां},
+ 				'taml' => q{पारंपरिक तमिल संख्यां},
+ 				'tamldec' => q{तमिल अंक},
+ 				'telu' => q{तेलुगू अंक},
+ 				'thai' => q{थाई अंक},
+ 				'tibt' => q{तिब्बती अंक},
  			},
 
 		}
@@ -926,6 +1106,20 @@ has 'units' => (
 						'name' => q(खास पास्सा),
 					},
 					# Long Unit Identifier
+					'coordinate' => {
+						'east' => q({0} पूरब),
+						'north' => q({0} उत्तर),
+						'south' => q({0} दखण),
+						'west' => q({0} पच्छम),
+					},
+					# Core Unit Identifier
+					'coordinate' => {
+						'east' => q({0} पूरब),
+						'north' => q({0} उत्तर),
+						'south' => q({0} दखण),
+						'west' => q({0} पच्छम),
+					},
+					# Long Unit Identifier
 					'per' => {
 						'1' => q({0} हर {1}),
 					},
@@ -993,8 +1187,120 @@ has 'number_formats' => (
 	default		=> sub { {
 		decimalFormat => {
 			'default' => {
+				'1000' => {
+					'other' => '0 हजार',
+				},
+				'10000' => {
+					'other' => '00 हजार',
+				},
+				'100000' => {
+					'other' => '0 लख',
+				},
+				'1000000' => {
+					'other' => '00 लख',
+				},
+				'10000000' => {
+					'other' => '0 क॰',
+				},
+				'100000000' => {
+					'other' => '00 क॰',
+				},
+				'1000000000' => {
+					'other' => '0 अ॰',
+				},
+				'10000000000' => {
+					'other' => '00 अ॰',
+				},
+				'100000000000' => {
+					'other' => '0 ख॰',
+				},
+				'1000000000000' => {
+					'other' => '00 ख॰',
+				},
+				'10000000000000' => {
+					'other' => '0 नील',
+				},
+				'100000000000000' => {
+					'other' => '00 नील',
+				},
 				'standard' => {
 					'default' => '#,##,##0.###',
+				},
+			},
+			'long' => {
+				'1000' => {
+					'other' => '0 हजार',
+				},
+				'10000' => {
+					'other' => '00 हजार',
+				},
+				'100000' => {
+					'other' => '0 लख',
+				},
+				'1000000' => {
+					'other' => '00 लख',
+				},
+				'10000000' => {
+					'other' => '0 करोड़',
+				},
+				'100000000' => {
+					'other' => '00 करोड़',
+				},
+				'1000000000' => {
+					'other' => '0 अरब',
+				},
+				'10000000000' => {
+					'other' => '00 अरब',
+				},
+				'100000000000' => {
+					'other' => '0 खरब',
+				},
+				'1000000000000' => {
+					'other' => '00 खरब',
+				},
+				'10000000000000' => {
+					'other' => '000 खरब',
+				},
+				'100000000000000' => {
+					'other' => '0000 खरब',
+				},
+			},
+			'short' => {
+				'1000' => {
+					'other' => '0 हजार',
+				},
+				'10000' => {
+					'other' => '00 हजार',
+				},
+				'100000' => {
+					'other' => '0 लख',
+				},
+				'1000000' => {
+					'other' => '00 लख',
+				},
+				'10000000' => {
+					'other' => '0 क॰',
+				},
+				'100000000' => {
+					'other' => '00 क॰',
+				},
+				'1000000000' => {
+					'other' => '0 अ॰',
+				},
+				'10000000000' => {
+					'other' => '00 अ॰',
+				},
+				'100000000000' => {
+					'other' => '0 ख॰',
+				},
+				'1000000000000' => {
+					'other' => '00 ख॰',
+				},
+				'10000000000000' => {
+					'other' => '0 नील',
+				},
+				'100000000000000' => {
+					'other' => '00 नील',
 				},
 			},
 		},
@@ -2154,6 +2460,9 @@ has 'eras' => (
 			},
 		},
 		'indian' => {
+			abbreviated => {
+				'0' => 'सक'
+			},
 		},
 	} },
 );
@@ -2164,7 +2473,7 @@ has 'date_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
-			'full' => q{EEEE, MMMM d, y G},
+			'full' => q{G EEEE, d MMMM y},
 			'long' => q{G d MMMM y},
 			'medium' => q{G d MMM y},
 			'short' => q{G d/M/y},
@@ -2210,8 +2519,8 @@ has 'datetime_formats' => (
 			'short' => q{{1}, {0}},
 		},
 		'gregorian' => {
-			'full' => q{{1} जो {0}},
-			'long' => q{{1} जो {0}},
+			'full' => q{{1}, {0}},
+			'long' => q{{1}, {0}},
 			'medium' => q{{1}, {0}},
 			'short' => q{{1}, {0}},
 		},
@@ -2422,6 +2731,162 @@ has 'time_zone_names' => (
 				'standard' => q#अफ़गानिस्ताने दा टैम#,
 			},
 		},
+		'Africa/Abidjan' => {
+			exemplarCity => q#अबिदजान#,
+		},
+		'Africa/Accra' => {
+			exemplarCity => q#एक्रा#,
+		},
+		'Africa/Addis_Ababa' => {
+			exemplarCity => q#अदीस अबाबा#,
+		},
+		'Africa/Algiers' => {
+			exemplarCity => q#अल्जीयर्स#,
+		},
+		'Africa/Asmera' => {
+			exemplarCity => q#अस्मारा#,
+		},
+		'Africa/Bamako' => {
+			exemplarCity => q#बमाको#,
+		},
+		'Africa/Bangui' => {
+			exemplarCity => q#बांगुइ#,
+		},
+		'Africa/Banjul' => {
+			exemplarCity => q#बैंजुल#,
+		},
+		'Africa/Bissau' => {
+			exemplarCity => q#बिसाऊ#,
+		},
+		'Africa/Blantyre' => {
+			exemplarCity => q#ब्लांटायर#,
+		},
+		'Africa/Brazzaville' => {
+			exemplarCity => q#ब्राज़ाविले#,
+		},
+		'Africa/Bujumbura' => {
+			exemplarCity => q#बुजुंबूरा#,
+		},
+		'Africa/Cairo' => {
+			exemplarCity => q#कायरो#,
+		},
+		'Africa/Casablanca' => {
+			exemplarCity => q#कासाब्लांका#,
+		},
+		'Africa/Ceuta' => {
+			exemplarCity => q#सेउटा#,
+		},
+		'Africa/Conakry' => {
+			exemplarCity => q#कोनाक्री#,
+		},
+		'Africa/Dakar' => {
+			exemplarCity => q#डकार#,
+		},
+		'Africa/Dar_es_Salaam' => {
+			exemplarCity => q#दार अस सलाम#,
+		},
+		'Africa/Djibouti' => {
+			exemplarCity => q#जिबूती#,
+		},
+		'Africa/Douala' => {
+			exemplarCity => q#डूआला#,
+		},
+		'Africa/El_Aaiun' => {
+			exemplarCity => q#अल आइयून<#,
+		},
+		'Africa/Freetown' => {
+			exemplarCity => q#फ़्रीटाउन#,
+		},
+		'Africa/Gaborone' => {
+			exemplarCity => q#गाबोरोन#,
+		},
+		'Africa/Harare' => {
+			exemplarCity => q#हरारे#,
+		},
+		'Africa/Johannesburg' => {
+			exemplarCity => q#जोहांसबर्ग#,
+		},
+		'Africa/Juba' => {
+			exemplarCity => q#जुबा#,
+		},
+		'Africa/Kampala' => {
+			exemplarCity => q#कंपाला#,
+		},
+		'Africa/Khartoum' => {
+			exemplarCity => q#खार्तूम#,
+		},
+		'Africa/Kigali' => {
+			exemplarCity => q#किगाली#,
+		},
+		'Africa/Kinshasa' => {
+			exemplarCity => q#किंशासा#,
+		},
+		'Africa/Lagos' => {
+			exemplarCity => q#लागोस#,
+		},
+		'Africa/Libreville' => {
+			exemplarCity => q#लिब्रेविले#,
+		},
+		'Africa/Lome' => {
+			exemplarCity => q#लोम#,
+		},
+		'Africa/Luanda' => {
+			exemplarCity => q#लुआंडा#,
+		},
+		'Africa/Lubumbashi' => {
+			exemplarCity => q#लुबुमबाशी#,
+		},
+		'Africa/Lusaka' => {
+			exemplarCity => q#लुसाका#,
+		},
+		'Africa/Malabo' => {
+			exemplarCity => q#मलाबो#,
+		},
+		'Africa/Maputo' => {
+			exemplarCity => q#मापुटो#,
+		},
+		'Africa/Maseru' => {
+			exemplarCity => q#मासेरू#,
+		},
+		'Africa/Mbabane' => {
+			exemplarCity => q#एमबाबेन#,
+		},
+		'Africa/Mogadishu' => {
+			exemplarCity => q#मोगादिशु#,
+		},
+		'Africa/Monrovia' => {
+			exemplarCity => q#मोनरोविया#,
+		},
+		'Africa/Nairobi' => {
+			exemplarCity => q#नैरोबी#,
+		},
+		'Africa/Ndjamena' => {
+			exemplarCity => q#नेद्जामीना#,
+		},
+		'Africa/Niamey' => {
+			exemplarCity => q#नियामी#,
+		},
+		'Africa/Nouakchott' => {
+			exemplarCity => q#नौआकशॉट#,
+		},
+		'Africa/Ouagadougou' => {
+			exemplarCity => q#औगाडोगू#,
+		},
+		'Africa/Porto-Novo' => {
+			exemplarCity => q#पोर्टो-नोवो#,
+		},
+		'Africa/Sao_Tome' => {
+			exemplarCity => q#साओ टोम#,
+		},
+		'Africa/Tripoli' => {
+			exemplarCity => q#त्रिपोली#,
+		},
+		'Africa/Tunis' => {
+			exemplarCity => q#ट्यूनिस#,
+		},
+		'Africa/Windhoek' => {
+			exemplarCity => q#विंडहोक#,
+		},
 		'Africa_Central' => {
 			long => {
 				'standard' => q#मध्य अफ़्रीका दा टैम#,
@@ -2458,6 +2923,432 @@ has 'time_zone_names' => (
 				'standard' => q#एमेज़ोन दा मानक टैम#,
 			},
 		},
+		'America/Adak' => {
+			exemplarCity => q#अडक#,
+		},
+		'America/Anchorage' => {
+			exemplarCity => q#एंकरेज#,
+		},
+		'America/Anguilla' => {
+			exemplarCity => q#एंग्विला#,
+		},
+		'America/Antigua' => {
+			exemplarCity => q#एंटीगुआ#,
+		},
+		'America/Araguaina' => {
+			exemplarCity => q#आराग्वेना#,
+		},
+		'America/Argentina/La_Rioja' => {
+			exemplarCity => q#ला रिओजा#,
+		},
+		'America/Argentina/Rio_Gallegos' => {
+			exemplarCity => q#रियो गालेगोस#,
+		},
+		'America/Argentina/Salta' => {
+			exemplarCity => q#साल्टा#,
+		},
+		'America/Argentina/San_Juan' => {
+			exemplarCity => q#सैन ह्वान#,
+		},
+		'America/Argentina/San_Luis' => {
+			exemplarCity => q#सैन लूई#,
+		},
+		'America/Argentina/Tucuman' => {
+			exemplarCity => q#टोकूमन#,
+		},
+		'America/Argentina/Ushuaia' => {
+			exemplarCity => q#उशुआइया#,
+		},
+		'America/Aruba' => {
+			exemplarCity => q#अरूबा#,
+		},
+		'America/Asuncion' => {
+			exemplarCity => q#एसनशियॉन#,
+		},
+		'America/Bahia' => {
+			exemplarCity => q#बहिया#,
+		},
+		'America/Bahia_Banderas' => {
+			exemplarCity => q#बेहिया बांडेरास#,
+		},
+		'America/Barbados' => {
+			exemplarCity => q#बारबाडोस#,
+		},
+		'America/Belem' => {
+			exemplarCity => q#बेलेम#,
+		},
+		'America/Belize' => {
+			exemplarCity => q#बेलीज़#,
+		},
+		'America/Blanc-Sablon' => {
+			exemplarCity => q#ब्लांक-सेबलोन#,
+		},
+		'America/Boa_Vista' => {
+			exemplarCity => q#बोआ विस्ता#,
+		},
+		'America/Bogota' => {
+			exemplarCity => q#बोगोटा#,
+		},
+		'America/Boise' => {
+			exemplarCity => q#बॉइसी#,
+		},
+		'America/Buenos_Aires' => {
+			exemplarCity => q#ब्यूनस आयरस#,
+		},
+		'America/Cambridge_Bay' => {
+			exemplarCity => q#कैम्ब्रिज खाड़ी#,
+		},
+		'America/Campo_Grande' => {
+			exemplarCity => q#कैंपो ग्रांडे#,
+		},
+		'America/Cancun' => {
+			exemplarCity => q#कैनकुन#,
+		},
+		'America/Caracas' => {
+			exemplarCity => q#काराकस#,
+		},
+		'America/Catamarca' => {
+			exemplarCity => q#काटामार्का#,
+		},
+		'America/Cayenne' => {
+			exemplarCity => q#कायेन#,
+		},
+		'America/Cayman' => {
+			exemplarCity => q#कैमेन#,
+		},
+		'America/Chicago' => {
+			exemplarCity => q#शिकागो#,
+		},
+		'America/Chihuahua' => {
+			exemplarCity => q#चिहुआहुआ#,
+		},
+		'America/Coral_Harbour' => {
+			exemplarCity => q#अटिकोकान#,
+		},
+		'America/Cordoba' => {
+			exemplarCity => q#कोर्डोबा#,
+		},
+		'America/Costa_Rica' => {
+			exemplarCity => q#कोस्टा रिका#,
+		},
+		'America/Creston' => {
+			exemplarCity => q#क्रेस्टन#,
+		},
+		'America/Cuiaba' => {
+			exemplarCity => q#क्यूआबा#,
+		},
+		'America/Curacao' => {
+			exemplarCity => q#कुराकाओ#,
+		},
+		'America/Danmarkshavn' => {
+			exemplarCity => q#डेनमार्कशॉन#,
+		},
+		'America/Dawson' => {
+			exemplarCity => q#डॉसन#,
+		},
+		'America/Dawson_Creek' => {
+			exemplarCity => q#डॉसन क्रीक#,
+		},
+		'America/Denver' => {
+			exemplarCity => q#डेनवर#,
+		},
+		'America/Detroit' => {
+			exemplarCity => q#डेट्रॉयट#,
+		},
+		'America/Dominica' => {
+			exemplarCity => q#डोमिनिका#,
+		},
+		'America/Edmonton' => {
+			exemplarCity => q#एडमंटन#,
+		},
+		'America/Eirunepe' => {
+			exemplarCity => q#ईरुनेपे#,
+		},
+		'America/El_Salvador' => {
+			exemplarCity => q#अल सल्वाडोर#,
+		},
+		'America/Fort_Nelson' => {
+			exemplarCity => q#फ़ोर्ट नेल्सन#,
+		},
+		'America/Fortaleza' => {
+			exemplarCity => q#फ़ोर्टालेज़ा#,
+		},
+		'America/Glace_Bay' => {
+			exemplarCity => q#ग्लेस खाड़ी#,
+		},
+		'America/Godthab' => {
+			exemplarCity => q#नुक#,
+		},
+		'America/Goose_Bay' => {
+			exemplarCity => q#गूस खाड़ी#,
+		},
+		'America/Grand_Turk' => {
+			exemplarCity => q#ग्रांड टर्क#,
+		},
+		'America/Grenada' => {
+			exemplarCity => q#ग्रेनाडा#,
+		},
+		'America/Guadeloupe' => {
+			exemplarCity => q#ग्वाडेलोप#,
+		},
+		'America/Guatemala' => {
+			exemplarCity => q#ग्वाटेमाला#,
+		},
+		'America/Guayaquil' => {
+			exemplarCity => q#ग्वायाकील#,
+		},
+		'America/Guyana' => {
+			exemplarCity => q#गुयाना#,
+		},
+		'America/Halifax' => {
+			exemplarCity => q#हेलिफ़ैक्स#,
+		},
+		'America/Havana' => {
+			exemplarCity => q#हवाना#,
+		},
+		'America/Hermosillo' => {
+			exemplarCity => q#हर्मोसिल्लो#,
+		},
+		'America/Indiana/Knox' => {
+			exemplarCity => q#नौक्स, इंडियाना#,
+		},
+		'America/Indiana/Marengo' => {
+			exemplarCity => q#मारेंगो, इंडियाना#,
+		},
+		'America/Indiana/Petersburg' => {
+			exemplarCity => q#पीटर्सबर्ग, इंडियाना#,
+		},
+		'America/Indiana/Tell_City' => {
+			exemplarCity => q#टेल सिटी, इंडियाना#,
+		},
+		'America/Indiana/Vevay' => {
+			exemplarCity => q#वेवे, इंडियाना#,
+		},
+		'America/Indiana/Vincennes' => {
+			exemplarCity => q#विंसेनेस, इंडियाना#,
+		},
+		'America/Indiana/Winamac' => {
+			exemplarCity => q#विनामेक, इंडियाना#,
+		},
+		'America/Indianapolis' => {
+			exemplarCity => q#इंडियानापोलिस#,
+		},
+		'America/Inuvik' => {
+			exemplarCity => q#इनूविक#,
+		},
+		'America/Iqaluit' => {
+			exemplarCity => q#इकालुईट#,
+		},
+		'America/Jamaica' => {
+			exemplarCity => q#जमैका#,
+		},
+		'America/Jujuy' => {
+			exemplarCity => q#जुजोए#,
+		},
+		'America/Juneau' => {
+			exemplarCity => q#ज्यूनाउ#,
+		},
+		'America/Kentucky/Monticello' => {
+			exemplarCity => q#मोंटीसेलो, केंटकी#,
+		},
+		'America/Kralendijk' => {
+			exemplarCity => q#क्रालैंडिजिक#,
+		},
+		'America/La_Paz' => {
+			exemplarCity => q#ला पाज़#,
+		},
+		'America/Lima' => {
+			exemplarCity => q#लीमा#,
+		},
+		'America/Los_Angeles' => {
+			exemplarCity => q#लॉस एंजिल्स#,
+		},
+		'America/Louisville' => {
+			exemplarCity => q#लुइसविले#,
+		},
+		'America/Lower_Princes' => {
+			exemplarCity => q#लोअर प्रिंसेस क्वार्टर#,
+		},
+		'America/Maceio' => {
+			exemplarCity => q#मेसीओ#,
+		},
+		'America/Managua' => {
+			exemplarCity => q#मानागुआ#,
+		},
+		'America/Manaus' => {
+			exemplarCity => q#मनौस#,
+		},
+		'America/Marigot' => {
+			exemplarCity => q#मैरीगोट#,
+		},
+		'America/Martinique' => {
+			exemplarCity => q#मार्टिनिक#,
+		},
+		'America/Matamoros' => {
+			exemplarCity => q#माटामोरोस#,
+		},
+		'America/Mazatlan' => {
+			exemplarCity => q#मज़ाटलान#,
+		},
+		'America/Mendoza' => {
+			exemplarCity => q#मेंडोज़ा#,
+		},
+		'America/Menominee' => {
+			exemplarCity => q#मेनोमिनी#,
+		},
+		'America/Merida' => {
+			exemplarCity => q#मेरिडा#,
+		},
+		'America/Metlakatla' => {
+			exemplarCity => q#मेट्लेकाट्ला#,
+		},
+		'America/Mexico_City' => {
+			exemplarCity => q#मेक्सिको सिटी#,
+		},
+		'America/Miquelon' => {
+			exemplarCity => q#मिकेलॉन#,
+		},
+		'America/Moncton' => {
+			exemplarCity => q#मोंकटन#,
+		},
+		'America/Monterrey' => {
+			exemplarCity => q#मोंटेरेरी#,
+		},
+		'America/Montevideo' => {
+			exemplarCity => q#मोंटेवीडियो#,
+		},
+		'America/Montserrat' => {
+			exemplarCity => q#मोंटसेरात#,
+		},
+		'America/Nassau' => {
+			exemplarCity => q#नासाउ#,
+		},
+		'America/New_York' => {
+			exemplarCity => q#न्यूयॉर्क#,
+		},
+		'America/Nome' => {
+			exemplarCity => q#नोम#,
+		},
+		'America/Noronha' => {
+			exemplarCity => q#नोरोन्हा#,
+		},
+		'America/North_Dakota/Beulah' => {
+			exemplarCity => q#ब्यूला, उत्तरी डकोटा#,
+		},
+		'America/North_Dakota/Center' => {
+			exemplarCity => q#मध्य, उत्तरी दाकोता#,
+		},
+		'America/North_Dakota/New_Salem' => {
+			exemplarCity => q#न्यू सालेम, उत्तरी डकोटा#,
+		},
+		'America/Ojinaga' => {
+			exemplarCity => q#ओखाजीनागा#,
+		},
+		'America/Panama' => {
+			exemplarCity => q#पनामा#,
+		},
+		'America/Paramaribo' => {
+			exemplarCity => q#पारामारिबो#,
+		},
+		'America/Phoenix' => {
+			exemplarCity => q#फ़ीनिक्स#,
+		},
+		'America/Port-au-Prince' => {
+			exemplarCity => q#पोर्ट-ऑ-प्रिंस#,
+		},
+		'America/Port_of_Spain' => {
+			exemplarCity => q#पोर्ट ऑफ़ स्पेन#,
+		},
+		'America/Porto_Velho' => {
+			exemplarCity => q#पोर्टो वेल्हो#,
+		},
+		'America/Puerto_Rico' => {
+			exemplarCity => q#पोर्टो रिको#,
+		},
+		'America/Punta_Arenas' => {
+			exemplarCity => q#पुंटा एरिनास#,
+		},
+		'America/Rankin_Inlet' => {
+			exemplarCity => q#रेंकिन इनलेट#,
+		},
+		'America/Recife' => {
+			exemplarCity => q#रेसाइफ़#,
+		},
+		'America/Regina' => {
+			exemplarCity => q#रेजिना#,
+		},
+		'America/Resolute' => {
+			exemplarCity => q#रिसोल्यूट#,
+		},
+		'America/Rio_Branco' => {
+			exemplarCity => q#रियो ब्रांको#,
+		},
+		'America/Santarem' => {
+			exemplarCity => q#सैंटारेम#,
+		},
+		'America/Santiago' => {
+			exemplarCity => q#सैंटियागो#,
+		},
+		'America/Santo_Domingo' => {
+			exemplarCity => q#सेंटो डोमिंगो#,
+		},
+		'America/Sao_Paulo' => {
+			exemplarCity => q#साओ पाउलो#,
+		},
+		'America/Scoresbysund' => {
+			exemplarCity => q#इटोकोर्टोरमिट#,
+		},
+		'America/Sitka' => {
+			exemplarCity => q#सिट्का#,
+		},
+		'America/St_Barthelemy' => {
+			exemplarCity => q#सेंट बार्थेलेमी#,
+		},
+		'America/St_Johns' => {
+			exemplarCity => q#सेंट जोंस#,
+		},
+		'America/St_Kitts' => {
+			exemplarCity => q#सेंट किट्स#,
+		},
+		'America/St_Lucia' => {
+			exemplarCity => q#सेंट लूसिया#,
+		},
+		'America/St_Thomas' => {
+			exemplarCity => q#सेंट थॉमस#,
+		},
+		'America/St_Vincent' => {
+			exemplarCity => q#सेंट विंसेंट#,
+		},
+		'America/Swift_Current' => {
+			exemplarCity => q#स्विफ़्ट करंट#,
+		},
+		'America/Tegucigalpa' => {
+			exemplarCity => q#टेगुसिगल्पा#,
+		},
+		'America/Thule' => {
+			exemplarCity => q#थ्यूले#,
+		},
+		'America/Tijuana' => {
+			exemplarCity => q#तिजुआना#,
+		},
+		'America/Toronto' => {
+			exemplarCity => q#टोरंटो#,
+		},
+		'America/Tortola' => {
+			exemplarCity => q#टोर्टोला#,
+		},
+		'America/Vancouver' => {
+			exemplarCity => q#वैंकूवर#,
+		},
+		'America/Whitehorse' => {
+			exemplarCity => q#व्हाइटहोर्स#,
+		},
+		'America/Winnipeg' => {
+			exemplarCity => q#विनीपेग#,
+		},
+		'America/Yakutat' => {
+			exemplarCity => q#याकूटाट#,
+		},
 		'America_Central' => {
 			long => {
 				'daylight' => q#उत्तरी अमरिकी केंद्रीय दे ध्याड़े दे उजाले दा टैम#,
@@ -2486,6 +3377,39 @@ has 'time_zone_names' => (
 				'standard' => q#उत्तरी अमेरिकी प्रशांते दा मानक टैम#,
 			},
 		},
+		'Antarctica/Casey' => {
+			exemplarCity => q#केसी#,
+		},
+		'Antarctica/Davis' => {
+			exemplarCity => q#डेविस#,
+		},
+		'Antarctica/DumontDUrville' => {
+			exemplarCity => q#ड्यूमोंट डी अर्विले#,
+		},
+		'Antarctica/Macquarie' => {
+			exemplarCity => q#मक्वारी#,
+		},
+		'Antarctica/Mawson' => {
+			exemplarCity => q#मॉसन#,
+		},
+		'Antarctica/McMurdo' => {
+			exemplarCity => q#मैकमुर्डो#,
+		},
+		'Antarctica/Palmer' => {
+			exemplarCity => q#पॉमर#,
+		},
+		'Antarctica/Rothera' => {
+			exemplarCity => q#रोथेरा#,
+		},
+		'Antarctica/Syowa' => {
+			exemplarCity => q#स्योवा#,
+		},
+		'Antarctica/Troll' => {
+			exemplarCity => q#ट्रोल#,
+		},
+		'Antarctica/Vostok' => {
+			exemplarCity => q#वोस्तोक#,
+		},
 		'Apia' => {
 			long => {
 				'daylight' => q#एपिआ दे ध्याड़े दे उजाले दा टैम#,
@@ -2499,6 +3423,9 @@ has 'time_zone_names' => (
 				'generic' => q#अरब दा टैम#,
 				'standard' => q#अरब दा मानक टैम#,
 			},
+		},
+		'Arctic/Longyearbyen' => {
+			exemplarCity => q#लॉन्गईयरबायेन#,
 		},
 		'Argentina' => {
 			long => {
@@ -2521,12 +3448,321 @@ has 'time_zone_names' => (
 				'standard' => q#आर्मेनिया दा मानक टैम#,
 			},
 		},
+		'Asia/Aden' => {
+			exemplarCity => q#अदन#,
+		},
+		'Asia/Almaty' => {
+			exemplarCity => q#अल्माटी#,
+		},
+		'Asia/Amman' => {
+			exemplarCity => q#अम्मान#,
+		},
+		'Asia/Anadyr' => {
+			exemplarCity => q#अनाडिर#,
+		},
+		'Asia/Aqtau' => {
+			exemplarCity => q#अक्ताउ#,
+		},
+		'Asia/Aqtobe' => {
+			exemplarCity => q#अक्तोब#,
+		},
+		'Asia/Ashgabat' => {
+			exemplarCity => q#अश्गाबात#,
+		},
+		'Asia/Atyrau' => {
+			exemplarCity => q#एतराउ#,
+		},
+		'Asia/Baghdad' => {
+			exemplarCity => q#बगदाद#,
+		},
+		'Asia/Bahrain' => {
+			exemplarCity => q#बहरीन#,
+		},
+		'Asia/Baku' => {
+			exemplarCity => q#बाकु#,
+		},
+		'Asia/Bangkok' => {
+			exemplarCity => q#बैंकॉक#,
+		},
+		'Asia/Barnaul' => {
+			exemplarCity => q#बर्नोल#,
+		},
+		'Asia/Beirut' => {
+			exemplarCity => q#बेरुत#,
+		},
+		'Asia/Bishkek' => {
+			exemplarCity => q#बिश्केक#,
+		},
+		'Asia/Brunei' => {
+			exemplarCity => q#ब्रूनेई#,
+		},
+		'Asia/Calcutta' => {
+			exemplarCity => q#कलकाता#,
+		},
+		'Asia/Chita' => {
+			exemplarCity => q#त्शिता#,
+		},
+		'Asia/Colombo' => {
+			exemplarCity => q#कोलंबो#,
+		},
+		'Asia/Damascus' => {
+			exemplarCity => q#दमास्कस#,
+		},
+		'Asia/Dhaka' => {
+			exemplarCity => q#ढाका#,
+		},
+		'Asia/Dili' => {
+			exemplarCity => q#डिलि#,
+		},
+		'Asia/Dubai' => {
+			exemplarCity => q#डबई#,
+		},
+		'Asia/Dushanbe' => {
+			exemplarCity => q#दुशांबे#,
+		},
+		'Asia/Famagusta' => {
+			exemplarCity => q#फ़ामागुस्ता#,
+		},
+		'Asia/Gaza' => {
+			exemplarCity => q#गाज़ा#,
+		},
+		'Asia/Hebron' => {
+			exemplarCity => q#हेब्रोन#,
+		},
+		'Asia/Hong_Kong' => {
+			exemplarCity => q#हाँग काँग#,
+		},
+		'Asia/Hovd' => {
+			exemplarCity => q#होव्ड#,
+		},
+		'Asia/Irkutsk' => {
+			exemplarCity => q#इर्कुत्स्क#,
+		},
+		'Asia/Jakarta' => {
+			exemplarCity => q#जकार्ता#,
+		},
+		'Asia/Jayapura' => {
+			exemplarCity => q#जयापुरा#,
+		},
+		'Asia/Jerusalem' => {
+			exemplarCity => q#यरूशलम#,
+		},
+		'Asia/Kabul' => {
+			exemplarCity => q#काबल#,
+		},
+		'Asia/Kamchatka' => {
+			exemplarCity => q#कमचत्का#,
+		},
+		'Asia/Karachi' => {
+			exemplarCity => q#कराची#,
+		},
+		'Asia/Katmandu' => {
+			exemplarCity => q#काठमांडू#,
+		},
+		'Asia/Khandyga' => {
+			exemplarCity => q#खांडिगा#,
+		},
+		'Asia/Krasnoyarsk' => {
+			exemplarCity => q#क्रास्नोयार्स्क#,
+		},
+		'Asia/Kuala_Lumpur' => {
+			exemplarCity => q#कुआलालंपुर#,
+		},
+		'Asia/Kuching' => {
+			exemplarCity => q#कूचिंग#,
+		},
+		'Asia/Kuwait' => {
+			exemplarCity => q#कुवैत#,
+		},
+		'Asia/Macau' => {
+			exemplarCity => q#मकाऊ#,
+		},
+		'Asia/Magadan' => {
+			exemplarCity => q#मागादान#,
+		},
+		'Asia/Makassar' => {
+			exemplarCity => q#मकस्सर#,
+		},
+		'Asia/Manila' => {
+			exemplarCity => q#मनीला#,
+		},
+		'Asia/Muscat' => {
+			exemplarCity => q#मस्कट#,
+		},
+		'Asia/Nicosia' => {
+			exemplarCity => q#निकोसिया#,
+		},
+		'Asia/Novokuznetsk' => {
+			exemplarCity => q#नोवोकुज़्नेत्स्क#,
+		},
+		'Asia/Novosibirsk' => {
+			exemplarCity => q#नोवोसिबिर्स्क#,
+		},
+		'Asia/Omsk' => {
+			exemplarCity => q#ओम्स्क#,
+		},
+		'Asia/Oral' => {
+			exemplarCity => q#ओरल#,
+		},
+		'Asia/Phnom_Penh' => {
+			exemplarCity => q#नोम पेन्ह#,
+		},
+		'Asia/Pontianak' => {
+			exemplarCity => q#पोंटीयांक#,
+		},
+		'Asia/Pyongyang' => {
+			exemplarCity => q#प्योंगयांग#,
+		},
+		'Asia/Qatar' => {
+			exemplarCity => q#कतर#,
+		},
+		'Asia/Qostanay' => {
+			exemplarCity => q#कोस्टाने#,
+		},
+		'Asia/Qyzylorda' => {
+			exemplarCity => q#केज़ेलोर्डा#,
+		},
+		'Asia/Rangoon' => {
+			exemplarCity => q#रंगून#,
+		},
+		'Asia/Riyadh' => {
+			exemplarCity => q#रियाद#,
+		},
+		'Asia/Saigon' => {
+			exemplarCity => q#हो ची मिन्ह शहर#,
+		},
+		'Asia/Sakhalin' => {
+			exemplarCity => q#सखालिन#,
+		},
+		'Asia/Samarkand' => {
+			exemplarCity => q#समरकंद#,
+		},
+		'Asia/Seoul' => {
+			exemplarCity => q#सिओल#,
+		},
+		'Asia/Shanghai' => {
+			exemplarCity => q#शंघाई#,
+		},
+		'Asia/Singapore' => {
+			exemplarCity => q#सिंगापुर#,
+		},
+		'Asia/Srednekolymsk' => {
+			exemplarCity => q#स्रेद्निकोलिमस्क#,
+		},
+		'Asia/Taipei' => {
+			exemplarCity => q#ताइपेई#,
+		},
+		'Asia/Tashkent' => {
+			exemplarCity => q#ताशकंद#,
+		},
+		'Asia/Tbilisi' => {
+			exemplarCity => q#टबिलिसी#,
+		},
+		'Asia/Tehran' => {
+			exemplarCity => q#तेहरान#,
+		},
+		'Asia/Thimphu' => {
+			exemplarCity => q#थिंपू#,
+		},
+		'Asia/Tokyo' => {
+			exemplarCity => q#टोक्यो#,
+		},
+		'Asia/Tomsk' => {
+			exemplarCity => q#तोम्स्क#,
+		},
+		'Asia/Ulaanbaatar' => {
+			exemplarCity => q#उलानबातर#,
+		},
+		'Asia/Urumqi' => {
+			exemplarCity => q#उरूम्की#,
+		},
+		'Asia/Ust-Nera' => {
+			exemplarCity => q#यूस्ट–नेरा#,
+		},
+		'Asia/Vientiane' => {
+			exemplarCity => q#विएनतियान#,
+		},
+		'Asia/Vladivostok' => {
+			exemplarCity => q#व्लादिवोस्तोक#,
+		},
+		'Asia/Yakutsk' => {
+			exemplarCity => q#याकूत्स्क#,
+		},
+		'Asia/Yekaterinburg' => {
+			exemplarCity => q#येकातेरिनबर्ग#,
+		},
+		'Asia/Yerevan' => {
+			exemplarCity => q#येरेवान#,
+		},
 		'Atlantic' => {
 			long => {
 				'daylight' => q#अटलांटिक दे ध्याड़े दे उजाले दा टैम#,
 				'generic' => q#अटलांटिक दा टैम#,
 				'standard' => q#अटलांटिक दा मानक टैम#,
 			},
+		},
+		'Atlantic/Azores' => {
+			exemplarCity => q#अज़ोरेस#,
+		},
+		'Atlantic/Bermuda' => {
+			exemplarCity => q#बरमूडा#,
+		},
+		'Atlantic/Canary' => {
+			exemplarCity => q#कैनेरी#,
+		},
+		'Atlantic/Cape_Verde' => {
+			exemplarCity => q#केप वर्ड#,
+		},
+		'Atlantic/Faeroe' => {
+			exemplarCity => q#फ़ैरो#,
+		},
+		'Atlantic/Madeira' => {
+			exemplarCity => q#मडेरा#,
+		},
+		'Atlantic/Reykjavik' => {
+			exemplarCity => q#रेक्याविक#,
+		},
+		'Atlantic/South_Georgia' => {
+			exemplarCity => q#दखणी जॉर्जिया#,
+		},
+		'Atlantic/St_Helena' => {
+			exemplarCity => q#सेंट हेलेना#,
+		},
+		'Atlantic/Stanley' => {
+			exemplarCity => q#स्टैनली#,
+		},
+		'Australia/Adelaide' => {
+			exemplarCity => q#एडिलेड#,
+		},
+		'Australia/Brisbane' => {
+			exemplarCity => q#ब्रिस्बन#,
+		},
+		'Australia/Broken_Hill' => {
+			exemplarCity => q#ब्रोकन हिल#,
+		},
+		'Australia/Darwin' => {
+			exemplarCity => q#डार्विन#,
+		},
+		'Australia/Eucla' => {
+			exemplarCity => q#यूक्ला#,
+		},
+		'Australia/Hobart' => {
+			exemplarCity => q#होबार्ट#,
+		},
+		'Australia/Lindeman' => {
+			exemplarCity => q#लिंडेमान#,
+		},
+		'Australia/Lord_Howe' => {
+			exemplarCity => q#लॉर्ड होवे#,
+		},
+		'Australia/Melbourne' => {
+			exemplarCity => q#मेलबोर्न#,
+		},
+		'Australia/Perth' => {
+			exemplarCity => q#पर्थ#,
+		},
+		'Australia/Sydney' => {
+			exemplarCity => q#सिडनी#,
 		},
 		'Australia_Central' => {
 			long => {
@@ -2632,13 +3868,6 @@ has 'time_zone_names' => (
 				'standard' => q#चीन दा मानक टैम#,
 			},
 		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#कॉइबाल्सन दी तोंदिया दा टैम#,
-				'generic' => q#कॉइबाल्सन दा टैम#,
-				'standard' => q#कॉइबाल्सन दा मानक टैम#,
-			},
-		},
 		'Christmas' => {
 			long => {
 				'standard' => q#क्रिसमस टापू दा टैम#,
@@ -2702,15 +3931,188 @@ has 'time_zone_names' => (
 				'standard' => q#समन्वित दुनिया दा टैम#,
 			},
 		},
+		'Etc/Unknown' => {
+			exemplarCity => q#अणजाण शहर#,
+		},
+		'Europe/Amsterdam' => {
+			exemplarCity => q#एम्स्टरडम#,
+		},
+		'Europe/Andorra' => {
+			exemplarCity => q#अंडोरा#,
+		},
+		'Europe/Astrakhan' => {
+			exemplarCity => q#आस्ट्राखान#,
+		},
+		'Europe/Athens' => {
+			exemplarCity => q#एथेंस#,
+		},
+		'Europe/Belgrade' => {
+			exemplarCity => q#बेलग्रेड#,
+		},
+		'Europe/Berlin' => {
+			exemplarCity => q#बर्लिन#,
+		},
+		'Europe/Bratislava' => {
+			exemplarCity => q#ब्रातिस्लावा#,
+		},
+		'Europe/Brussels' => {
+			exemplarCity => q#ब्रूसेल्स#,
+		},
+		'Europe/Bucharest' => {
+			exemplarCity => q#बुख़ारेस्ट#,
+		},
+		'Europe/Budapest' => {
+			exemplarCity => q#बुडापेस्ट#,
+		},
+		'Europe/Busingen' => {
+			exemplarCity => q#ब्यूसिनजेन#,
+		},
+		'Europe/Chisinau' => {
+			exemplarCity => q#चिसीनाउ#,
+		},
+		'Europe/Copenhagen' => {
+			exemplarCity => q#कोपेनहेगन#,
+		},
 		'Europe/Dublin' => {
+			exemplarCity => q#डबलिन#,
 			long => {
 				'daylight' => q#आइरिश दा मानक टैम#,
 			},
 		},
+		'Europe/Gibraltar' => {
+			exemplarCity => q#जिब्राल्टर#,
+		},
+		'Europe/Guernsey' => {
+			exemplarCity => q#गर्नसी#,
+		},
+		'Europe/Helsinki' => {
+			exemplarCity => q#हेलसिंकी#,
+		},
+		'Europe/Isle_of_Man' => {
+			exemplarCity => q#आइल ऑफ़ मैन#,
+		},
+		'Europe/Istanbul' => {
+			exemplarCity => q#इस्तांबुल#,
+		},
+		'Europe/Jersey' => {
+			exemplarCity => q#जर्सी#,
+		},
+		'Europe/Kaliningrad' => {
+			exemplarCity => q#कालीनिनग्राड#,
+		},
+		'Europe/Kiev' => {
+			exemplarCity => q#कीव#,
+		},
+		'Europe/Kirov' => {
+			exemplarCity => q#किरोव#,
+		},
+		'Europe/Lisbon' => {
+			exemplarCity => q#लिस्बन#,
+		},
+		'Europe/Ljubljana' => {
+			exemplarCity => q#ल्यूबेलजाना#,
+		},
 		'Europe/London' => {
+			exemplarCity => q#लंदन#,
 			long => {
 				'daylight' => q#ब्रिटिश दी तोंदिया दा टैम#,
 			},
+		},
+		'Europe/Luxembourg' => {
+			exemplarCity => q#लक्ज़मबर्ग#,
+		},
+		'Europe/Madrid' => {
+			exemplarCity => q#मैड्रिड#,
+		},
+		'Europe/Malta' => {
+			exemplarCity => q#माल्टा#,
+		},
+		'Europe/Mariehamn' => {
+			exemplarCity => q#मारियाहैम#,
+		},
+		'Europe/Minsk' => {
+			exemplarCity => q#मिंस्क#,
+		},
+		'Europe/Monaco' => {
+			exemplarCity => q#मोनाको#,
+		},
+		'Europe/Moscow' => {
+			exemplarCity => q#मॉस्को#,
+		},
+		'Europe/Oslo' => {
+			exemplarCity => q#ओस्लो#,
+		},
+		'Europe/Paris' => {
+			exemplarCity => q#पैरस#,
+		},
+		'Europe/Podgorica' => {
+			exemplarCity => q#पोड्गोरिका#,
+		},
+		'Europe/Prague' => {
+			exemplarCity => q#प्राग#,
+		},
+		'Europe/Riga' => {
+			exemplarCity => q#रीगा#,
+		},
+		'Europe/Rome' => {
+			exemplarCity => q#रोम#,
+		},
+		'Europe/Samara' => {
+			exemplarCity => q#समारा#,
+		},
+		'Europe/San_Marino' => {
+			exemplarCity => q#सैन मारीनो#,
+		},
+		'Europe/Sarajevo' => {
+			exemplarCity => q#साराजेवो#,
+		},
+		'Europe/Saratov' => {
+			exemplarCity => q#सारातोव#,
+		},
+		'Europe/Simferopol' => {
+			exemplarCity => q#सिम्फ़ेरोपोल#,
+		},
+		'Europe/Skopje' => {
+			exemplarCity => q#स्कोप्जे#,
+		},
+		'Europe/Sofia' => {
+			exemplarCity => q#सोफ़िया#,
+		},
+		'Europe/Stockholm' => {
+			exemplarCity => q#स्टॉकहोम#,
+		},
+		'Europe/Tallinn' => {
+			exemplarCity => q#तेलिन#,
+		},
+		'Europe/Tirane' => {
+			exemplarCity => q#टाइरेन#,
+		},
+		'Europe/Ulyanovsk' => {
+			exemplarCity => q#उल्यानोव्स्क#,
+		},
+		'Europe/Vaduz' => {
+			exemplarCity => q#वादुज़#,
+		},
+		'Europe/Vatican' => {
+			exemplarCity => q#वेटिकन#,
+		},
+		'Europe/Vienna' => {
+			exemplarCity => q#विएना#,
+		},
+		'Europe/Vilnius' => {
+			exemplarCity => q#विल्नियस#,
+		},
+		'Europe/Volgograd' => {
+			exemplarCity => q#वोल्गोग्राड#,
+		},
+		'Europe/Warsaw' => {
+			exemplarCity => q#वॉरसॉ#,
+		},
+		'Europe/Zagreb' => {
+			exemplarCity => q#ज़ाग्रेब#,
+		},
+		'Europe/Zurich' => {
+			exemplarCity => q#ज़्यूरिख़#,
 		},
 		'Europe_Central' => {
 			long => {
@@ -2839,6 +4241,39 @@ has 'time_zone_names' => (
 				'standard' => q#भारते दा मानक टैम#,
 			},
 		},
+		'Indian/Antananarivo' => {
+			exemplarCity => q#एंटानानरीवो#,
+		},
+		'Indian/Chagos' => {
+			exemplarCity => q#शागोस#,
+		},
+		'Indian/Christmas' => {
+			exemplarCity => q#क्रिसमिस#,
+		},
+		'Indian/Cocos' => {
+			exemplarCity => q#कोकोस#,
+		},
+		'Indian/Comoro' => {
+			exemplarCity => q#कोमोरो#,
+		},
+		'Indian/Kerguelen' => {
+			exemplarCity => q#करगुलेन#,
+		},
+		'Indian/Mahe' => {
+			exemplarCity => q#माहे#,
+		},
+		'Indian/Maldives' => {
+			exemplarCity => q#मालदीव#,
+		},
+		'Indian/Mauritius' => {
+			exemplarCity => q#मॉरीशस#,
+		},
+		'Indian/Mayotte' => {
+			exemplarCity => q#मायोत्ते#,
+		},
+		'Indian/Reunion' => {
+			exemplarCity => q#रीयूनियन#,
+		},
 		'Indian_Ocean' => {
 			long => {
 				'standard' => q#हिंद महासागर दा टैम#,
@@ -2938,11 +4373,6 @@ has 'time_zone_names' => (
 				'standard' => q#लॉर्ड होवे दा मानक टैम#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#मक्वारी टापू दा टैम#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#मागादान दी तोंदिया दा टैम#,
@@ -2980,13 +4410,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#माव्सन दा टैम#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#उत्तर पश्चिमी मेक्सिको दे ध्याड़े दे उजाले दा टैम#,
-				'generic' => q#उत्तर पश्चिमी मेक्सिको दा टैम#,
-				'standard' => q#उत्तर पश्चिमी मेक्सिको दा मानक टैम#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -3078,6 +4501,117 @@ has 'time_zone_names' => (
 				'generic' => q#ओम्स्क दा टैम#,
 				'standard' => q#ओम्स्क दा मानक टैम#,
 			},
+		},
+		'Pacific/Apia' => {
+			exemplarCity => q#एपिया#,
+		},
+		'Pacific/Auckland' => {
+			exemplarCity => q#ऑकलैंड#,
+		},
+		'Pacific/Bougainville' => {
+			exemplarCity => q#बोगनविले#,
+		},
+		'Pacific/Chatham' => {
+			exemplarCity => q#चैथम#,
+		},
+		'Pacific/Easter' => {
+			exemplarCity => q#ईस्टर#,
+		},
+		'Pacific/Efate' => {
+			exemplarCity => q#एफ़ेट#,
+		},
+		'Pacific/Fakaofo' => {
+			exemplarCity => q#फ़ाकाओफ़ो#,
+		},
+		'Pacific/Fiji' => {
+			exemplarCity => q#फ़िजी#,
+		},
+		'Pacific/Funafuti' => {
+			exemplarCity => q#फ़्यूनाफ़ुटी#,
+		},
+		'Pacific/Galapagos' => {
+			exemplarCity => q#गेलापागोस#,
+		},
+		'Pacific/Gambier' => {
+			exemplarCity => q#गैंबियर#,
+		},
+		'Pacific/Guadalcanal' => {
+			exemplarCity => q#ग्वाडलकनाल#,
+		},
+		'Pacific/Guam' => {
+			exemplarCity => q#गुआम#,
+		},
+		'Pacific/Kanton' => {
+			exemplarCity => q#कैंटन#,
+		},
+		'Pacific/Kiritimati' => {
+			exemplarCity => q#किरीतिमाति#,
+		},
+		'Pacific/Kosrae' => {
+			exemplarCity => q#कोसराए#,
+		},
+		'Pacific/Kwajalein' => {
+			exemplarCity => q#क्वाज़ालीन#,
+		},
+		'Pacific/Majuro' => {
+			exemplarCity => q#माजुरो#,
+		},
+		'Pacific/Marquesas' => {
+			exemplarCity => q#मार्केसस#,
+		},
+		'Pacific/Midway' => {
+			exemplarCity => q#मिडवे#,
+		},
+		'Pacific/Nauru' => {
+			exemplarCity => q#नौरु#,
+		},
+		'Pacific/Niue' => {
+			exemplarCity => q#नीयू#,
+		},
+		'Pacific/Norfolk' => {
+			exemplarCity => q#नॉरफ़ॉक#,
+		},
+		'Pacific/Noumea' => {
+			exemplarCity => q#नौमिया#,
+		},
+		'Pacific/Pago_Pago' => {
+			exemplarCity => q#पागो गंगो#,
+		},
+		'Pacific/Palau' => {
+			exemplarCity => q#पलाऊ#,
+		},
+		'Pacific/Pitcairn' => {
+			exemplarCity => q#पिटकैर्न#,
+		},
+		'Pacific/Ponape' => {
+			exemplarCity => q#पोनपेई#,
+		},
+		'Pacific/Port_Moresby' => {
+			exemplarCity => q#पोर्ट मोरेस्बी#,
+		},
+		'Pacific/Rarotonga' => {
+			exemplarCity => q#रारोटोंगा#,
+		},
+		'Pacific/Saipan' => {
+			exemplarCity => q#सायपान#,
+		},
+		'Pacific/Tahiti' => {
+			exemplarCity => q#ताहिती#,
+		},
+		'Pacific/Tarawa' => {
+			exemplarCity => q#टारावा#,
+		},
+		'Pacific/Tongatapu' => {
+			exemplarCity => q#टोंगाटापू#,
+		},
+		'Pacific/Truk' => {
+			exemplarCity => q#चक#,
+		},
+		'Pacific/Wake' => {
+			exemplarCity => q#वेक#,
+		},
+		'Pacific/Wallis' => {
+			exemplarCity => q#वालिस#,
 		},
 		'Pakistan' => {
 			long => {
@@ -3185,7 +4719,7 @@ has 'time_zone_names' => (
 		},
 		'South_Georgia' => {
 			long => {
-				'standard' => q#दखणे बखें जॉर्जिया दा टैम#,
+				'standard' => q#दखण जॉर्जिया दा टैम#,
 			},
 		},
 		'Suriname' => {
@@ -3311,6 +4845,11 @@ has 'time_zone_names' => (
 				'daylight' => q#येकातेरिनबर्ग दी तोंदिया दा टैम#,
 				'generic' => q#येकातेरिनबर्ग दा टैम#,
 				'standard' => q#येकातेरिनबर्ग दा मानक टैम#,
+			},
+		},
+		'Yukon' => {
+			long => {
+				'standard' => q#युकॉन टैम#,
 			},
 		},
 	 } }

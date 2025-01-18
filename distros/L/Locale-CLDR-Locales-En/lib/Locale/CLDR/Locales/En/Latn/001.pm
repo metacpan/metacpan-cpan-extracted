@@ -8,18 +8,18 @@ Locale::CLDR::Locales::En::Latn::001 - Package for language English
 
 package Locale::CLDR::Locales::En::Latn::001;
 # This file auto generated from Data\common\main\en_001.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -294,13 +294,13 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'force-kilowatt-hour-per-100-kilometer' => {
-						'name' => q(kilowatt-hour per 100 kilometres),
+						'name' => q(kilowatt-hours per 100 kilometres),
 						'one' => q({0} kilowatt-hour per 100 kilometres),
 						'other' => q({0} kilowatt-hours per 100 kilometres),
 					},
 					# Core Unit Identifier
 					'kilowatt-hour-per-100-kilometer' => {
-						'name' => q(kilowatt-hour per 100 kilometres),
+						'name' => q(kilowatt-hours per 100 kilometres),
 						'one' => q({0} kilowatt-hour per 100 kilometres),
 						'other' => q({0} kilowatt-hours per 100 kilometres),
 					},
@@ -344,13 +344,13 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-decimeter' => {
-						'name' => q(decimetre),
+						'name' => q(decimetres),
 						'one' => q({0} decimetre),
 						'other' => q({0} decimetres),
 					},
 					# Core Unit Identifier
 					'decimeter' => {
-						'name' => q(decimetre),
+						'name' => q(decimetres),
 						'one' => q({0} decimetre),
 						'other' => q({0} decimetres),
 					},
@@ -392,13 +392,13 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-micrometer' => {
-						'name' => q(micrometre),
+						'name' => q(micrometres),
 						'one' => q({0} micrometre),
 						'other' => q({0} micrometres),
 					},
 					# Core Unit Identifier
 					'micrometer' => {
-						'name' => q(micrometre),
+						'name' => q(micrometres),
 						'one' => q({0} micrometre),
 						'other' => q({0} micrometres),
 					},
@@ -528,11 +528,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'temperature-generic' => {
-						'name' => q(degree),
+						'name' => q(degrees),
 					},
 					# Core Unit Identifier
 					'generic' => {
-						'name' => q(degree),
+						'name' => q(degrees),
 					},
 					# Long Unit Identifier
 					'temperature-kelvin' => {
@@ -624,25 +624,25 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'volume-dessert-spoon' => {
-						'name' => q(US dessertspoon),
+						'name' => q(US dessertspoons),
 						'one' => q({0} US dessertspoon),
 						'other' => q({0} US dessertspoons),
 					},
 					# Core Unit Identifier
 					'dessert-spoon' => {
-						'name' => q(US dessertspoon),
+						'name' => q(US dessertspoons),
 						'one' => q({0} US dessertspoon),
 						'other' => q({0} US dessertspoons),
 					},
 					# Long Unit Identifier
 					'volume-dessert-spoon-imperial' => {
-						'name' => q(dessertspoon),
+						'name' => q(dessertspoons),
 						'one' => q({0} dessertspoon),
 						'other' => q({0} dessertspoons),
 					},
 					# Core Unit Identifier
 					'dessert-spoon-imperial' => {
-						'name' => q(dessertspoon),
+						'name' => q(dessertspoons),
 						'one' => q({0} dessertspoon),
 						'other' => q({0} dessertspoons),
 					},
@@ -762,25 +762,33 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'volume-quart-imperial' => {
-						'name' => q(quart),
+						'name' => q(quarts),
 						'one' => q({0} quart),
 						'other' => q({0} quarts),
 					},
 					# Core Unit Identifier
 					'quart-imperial' => {
-						'name' => q(quart),
+						'name' => q(quarts),
 						'one' => q({0} quart),
 						'other' => q({0} quarts),
 					},
 				},
 				'narrow' => {
 					# Long Unit Identifier
+					'acceleration-g-force' => {
+						'other' => q({0}G),
+					},
+					# Core Unit Identifier
+					'g-force' => {
+						'other' => q({0}G),
+					},
+					# Long Unit Identifier
 					'area-square-meter' => {
-						'name' => q(metres²),
+						'name' => q(m²),
 					},
 					# Core Unit Identifier
 					'square-meter' => {
-						'name' => q(metres²),
+						'name' => q(m²),
 					},
 					# Long Unit Identifier
 					'concentr-karat' => {
@@ -867,12 +875,14 @@ has 'units' => (
 						'other' => q({0}mpg),
 					},
 					# Long Unit Identifier
-					'length-meter' => {
-						'name' => q(metre),
+					'mass-carat' => {
+						'one' => q({0}ct),
+						'other' => q({0}ct),
 					},
 					# Core Unit Identifier
-					'meter' => {
-						'name' => q(metre),
+					'carat' => {
+						'one' => q({0}ct),
+						'other' => q({0}ct),
 					},
 					# Long Unit Identifier
 					'mass-pound' => {
@@ -899,16 +909,6 @@ has 'units' => (
 					# Core Unit Identifier
 					'mile-per-hour' => {
 						'name' => q(mph),
-					},
-					# Long Unit Identifier
-					'temperature-celsius' => {
-						'one' => q({0}°),
-						'other' => q({0}°),
-					},
-					# Core Unit Identifier
-					'celsius' => {
-						'one' => q({0}°),
-						'other' => q({0}°),
 					},
 					# Long Unit Identifier
 					'temperature-fahrenheit' => {
@@ -995,16 +995,16 @@ has 'units' => (
 					# Long Unit Identifier
 					'volume-gallon' => {
 						'name' => q(US gal),
-						'one' => q({0}galUS),
-						'other' => q({0}galUS),
-						'per' => q({0}/galUS),
+						'one' => q({0}USgal),
+						'other' => q({0}USgal),
+						'per' => q({0}/USgal),
 					},
 					# Core Unit Identifier
 					'gallon' => {
 						'name' => q(US gal),
-						'one' => q({0}galUS),
-						'other' => q({0}galUS),
-						'per' => q({0}/galUS),
+						'one' => q({0}USgal),
+						'other' => q({0}USgal),
+						'per' => q({0}/USgal),
 					},
 					# Long Unit Identifier
 					'volume-gallon-imperial' => {
@@ -1079,6 +1079,18 @@ has 'units' => (
 						'other' => q({0}ml),
 					},
 					# Long Unit Identifier
+					'volume-quart' => {
+						'name' => q(USqt),
+						'one' => q({0}USqt),
+						'other' => q({0}USqt),
+					},
+					# Core Unit Identifier
+					'quart' => {
+						'name' => q(USqt),
+						'one' => q({0}USqt),
+						'other' => q({0}USqt),
+					},
+					# Long Unit Identifier
 					'volume-quart-imperial' => {
 						'name' => q(qt),
 						'one' => q({0}qt),
@@ -1110,11 +1122,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'area-square-meter' => {
-						'name' => q(metres²),
+						'name' => q(m²),
 					},
 					# Core Unit Identifier
 					'square-meter' => {
-						'name' => q(metres²),
+						'name' => q(m²),
 					},
 					# Long Unit Identifier
 					'concentr-karat' => {
@@ -1247,14 +1259,6 @@ has 'units' => (
 						'other' => q({0} secs),
 					},
 					# Long Unit Identifier
-					'length-meter' => {
-						'name' => q(metres),
-					},
-					# Core Unit Identifier
-					'meter' => {
-						'name' => q(metres),
-					},
-					# Long Unit Identifier
 					'length-micrometer' => {
 						'name' => q(μmetres),
 					},
@@ -1271,16 +1275,6 @@ has 'units' => (
 					'carat' => {
 						'one' => q({0} ct),
 						'other' => q({0} ct),
-					},
-					# Long Unit Identifier
-					'mass-grain' => {
-						'one' => q({0} grains),
-						'other' => q({0} grains),
-					},
-					# Core Unit Identifier
-					'grain' => {
-						'one' => q({0} grains),
-						'other' => q({0} grains),
 					},
 					# Long Unit Identifier
 					'mass-stone' => {
@@ -1356,12 +1350,12 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'volume-drop' => {
-						'one' => q({0} drops),
+						'one' => q({0} drop),
 						'other' => q({0} drops),
 					},
 					# Core Unit Identifier
 					'drop' => {
-						'one' => q({0} drops),
+						'one' => q({0} drop),
 						'other' => q({0} drops),
 					},
 					# Long Unit Identifier
@@ -1468,12 +1462,12 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'volume-pinch' => {
-						'one' => q({0} pinches),
+						'one' => q({0} pinch),
 						'other' => q({0} pinches),
 					},
 					# Core Unit Identifier
 					'pinch' => {
-						'one' => q({0} pinches),
+						'one' => q({0} pinch),
 						'other' => q({0} pinches),
 					},
 					# Long Unit Identifier
@@ -1809,6 +1803,7 @@ has 'day_periods' => (
 					'pm' => q{pm},
 				},
 				'narrow' => {
+					'am' => q{am},
 					'pm' => q{pm},
 				},
 				'wide' => {
@@ -2279,9 +2274,6 @@ has 'time_zone_names' => (
 		},
 		'Atlantic/St_Helena' => {
 			exemplarCity => q#St Helena#,
-		},
-		'Australia/Currie' => {
-			exemplarCity => q#Currie#,
 		},
 		'Hawaii_Aleutian' => {
 			short => {

@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Ms - Package for language Malay
 
 package Locale::CLDR::Locales::Ms;
 # This file auto generated from Data\common\main\ms.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -330,6 +330,7 @@ has 'display_name_language' => (
  				'bin' => 'Bini',
  				'bkm' => 'Kom',
  				'bla' => 'Siksika',
+ 				'blo' => 'Anii',
  				'bm' => 'Bambara',
  				'bn' => 'Benggali',
  				'bo' => 'Tibet',
@@ -526,6 +527,7 @@ has 'display_name_language' => (
  				'kv' => 'Komi',
  				'kw' => 'Cornish',
  				'kwk' => 'Kwak’wala',
+ 				'kxv' => 'Kuvi',
  				'ky' => 'Kirghiz',
  				'la' => 'Latin',
  				'lad' => 'Ladino',
@@ -535,8 +537,10 @@ has 'display_name_language' => (
  				'lez' => 'Lezghian',
  				'lg' => 'Ganda',
  				'li' => 'Limburgish',
+ 				'lij' => 'Liguria',
  				'lil' => 'Lillooet',
  				'lkt' => 'Lakota',
+ 				'lmo' => 'Lombard',
  				'ln' => 'Lingala',
  				'lo' => 'Laos',
  				'lou' => 'Kreol Louisiana',
@@ -700,6 +704,7 @@ has 'display_name_language' => (
  				'sw_CD' => 'Congo Swahili',
  				'swb' => 'Comoria',
  				'syr' => 'Syriac',
+ 				'szl' => 'Silesia',
  				'ta' => 'Tamil',
  				'tce' => 'Tutchone Selatan',
  				'te' => 'Telugu',
@@ -742,7 +747,9 @@ has 'display_name_language' => (
  				'uz' => 'Uzbekistan',
  				'vai' => 'Vai',
  				've' => 'Venda',
+ 				'vec' => 'Venetia',
  				'vi' => 'Vietnam',
+ 				'vmw' => 'Makhuwa',
  				'vo' => 'Volapük',
  				'vun' => 'Vunjo',
  				'wa' => 'Walloon',
@@ -754,6 +761,7 @@ has 'display_name_language' => (
  				'wuu' => 'Cina Wu',
  				'xal' => 'Kalmyk',
  				'xh' => 'Xhosa',
+ 				'xnr' => 'Kangri',
  				'xog' => 'Soga',
  				'yav' => 'Yangben',
  				'ybb' => 'Yemba',
@@ -762,6 +770,7 @@ has 'display_name_language' => (
  				'yrl' => 'Nheengatu',
  				'yue' => 'Kantonis',
  				'yue@alt=menu' => 'Cina, Kantonis',
+ 				'za' => 'Zhuang',
  				'zgh' => 'Tamazight Maghribi Standard',
  				'zh' => 'Cina',
  				'zh@alt=menu' => 'Cina, Mandarin',
@@ -792,7 +801,6 @@ has 'display_name_script' => (
 			my %scripts = (
 			'Adlm' => 'Adlam',
  			'Aghb' => 'Kaukasia Albania',
- 			'Arab' => 'Arab',
  			'Arab@alt=variant' => 'Perso-Arab',
  			'Aran' => 'Nastaliq',
  			'Armi' => 'Aramia Imperial',
@@ -850,7 +858,6 @@ has 'display_name_script' => (
  			'Hrkt' => 'Ejaan sukuan Jepun',
  			'Hung' => 'Hungary Lama',
  			'Ital' => 'Italik Lama',
- 			'Jamo' => 'Jamo',
  			'Java' => 'Jawa',
  			'Jpan' => 'Jepun',
  			'Kali' => 'Kayah Li',
@@ -890,7 +897,6 @@ has 'display_name_script' => (
  			'Nand' => 'Nandinagari',
  			'Narb' => 'Arab Utara Lama',
  			'Nbat' => 'Nabataean',
- 			'Newa' => 'Newa',
  			'Nkoo' => 'N’ko',
  			'Nshu' => 'Nushu',
  			'Ogam' => 'Ogham',
@@ -939,7 +945,6 @@ has 'display_name_script' => (
  			'Tfng' => 'Tifinagh',
  			'Tglg' => 'Tagalog',
  			'Thaa' => 'Thaana',
- 			'Thai' => 'Thai',
  			'Tibt' => 'Tibet',
  			'Tirh' => 'Tirhuta',
  			'Ugar' => 'Ugaritic',
@@ -1301,51 +1306,99 @@ has 'display_name_variant' => (
  			'1694ACAD' => 'Awal Pertengahan Era Perancis',
  			'1959ACAD' => 'Akademik',
  			'ABL1943' => 'Perumusan sistem ejaan 1943',
+ 			'AKUAPEM' => 'AKUAPEM TWI',
  			'ALALC97' => 'Perumian ALA-LC, edisi 1997',
  			'ALUKU' => 'Dialek Aluku',
  			'AO1990' => 'Perjanjian Sistem Ejaan Bahasa Portugis 1990',
+ 			'ARANES' => 'ARAN',
+ 			'ASANTE' => 'ASANTE TWI',
+ 			'AUVERN' => 'AUVERGNAT',
  			'BAKU1926' => 'Abjad Latin Turki Disatukan',
  			'BALANKA' => 'Dialek Balanka Anii',
  			'BARLA' => 'Kumpulan dialek Barlavento Kabuverdianu',
+ 			'BASICENG' => 'ASAS INGGERIS',
+ 			'BAUDDHA' => 'BUDDHA',
+ 			'BISCAYAN' => 'BISCAYAN BISQUE',
  			'BISKE' => 'Dialek San Giorgio/Bila',
  			'BOHORIC' => 'Abjad Bohoric',
  			'BOONT' => 'Boontling',
+ 			'CISAUP' => 'CISALPINE',
  			'COLB1945' => 'Konvensyen Sistem Ejaan Portugis-Brazil 1945',
+ 			'CORNU' => 'INGGERIS CORNISH',
+ 			'CREISS' => 'OCCITAN CROISSANT',
  			'DAJNKO' => 'Abjad Dajnko',
  			'EKAVSK' => 'Serbia dengan sebutan Ekavia',
  			'EMODENG' => 'Inggeris Moden Awal',
  			'FONIPA' => 'Fonetik IPA',
+ 			'FONKIRSH' => 'ABJAD FONETIK ANTARABANGSA',
+ 			'FONNAPA' => 'ABJAD FONETIK AMERIKA UTARA',
  			'FONUPA' => 'Fonetik UPA',
+ 			'FONXSAMP' => 'TRANSKRIP X-SAMPA',
+ 			'GASCON' => 'OCCITAN GASCON',
+ 			'GRCLASS' => 'OCCITAN KLASIK',
+ 			'GRITAL' => 'ORTOGRAFI OCCITAN-ITALI',
+ 			'GRMISTR' => 'ORTOGRAFI MISTRALIA',
  			'HEPBURN' => 'Perumian Hepburn',
+ 			'HOGNORSK' => 'NORWAY TINGGI',
+ 			'HSISTEMO' => 'SERBIA IJEKAVIAN',
  			'IJEKAVSK' => 'Fon Serbia dengan sebutan Ijekavia',
+ 			'ITIHASA' => 'SANSKRIT EPIK',
+ 			'IVANCHOV' => 'ORTOGRAFI BULGARIA 1899',
+ 			'JAUER' => 'ROMANSH JAUER',
+ 			'JYUTPING' => 'KANTONIS ROMAN',
  			'KKCOR' => 'Sistem Ejaan Lazim',
+ 			'KOCIEWIE' => 'POLAND KOCIEWIE',
  			'KSCOR' => 'Sistem Ejaan Standard',
+ 			'LAUKIKA' => 'SANSKRIT KLASIK',
+ 			'LEMOSIN' => 'PERANCIS LIMOUSIN',
+ 			'LENGADOC' => 'OCCITAN LANGUEDOC',
  			'LIPAW' => 'Dialek Lipovaz Resia',
+ 			'LUNA1918' => 'ORTOGRAFI RUSIA SELEPAS 1917',
  			'METELKO' => 'Abjad Metelko',
  			'MONOTON' => 'Ekanada',
  			'NDYUKA' => 'Dialek Ndyuka',
  			'NEDIS' => 'Dialek Natisone',
+ 			'NEWFOUND' => 'INGGERIS NEWFOUNDLAND',
+ 			'NICARD' => 'OCCITAN NICARD',
  			'NJIVA' => 'Dialek Gniva/Njiva',
  			'NULIK' => 'Volapuk Moden',
  			'OSOJS' => 'Dialek Oseacco/Osojane',
  			'OXENDICT' => 'Ejaan Kamus Inggeris Oxford',
+ 			'PAHAWH2' => 'PAHAWH HMONG PERINGKAT KE-2',
+ 			'PAHAWH3' => 'PAHAWH HMONG PERINGKAT KE-3',
+ 			'PAHAWH4' => 'PAHAWH HMONG VERSI AKHIR',
  			'PAMAKA' => 'Dialek Pamaka',
+ 			'PETR1708' => 'ORTOGRAFI PETRINE',
  			'PINYIN' => 'Perumian Pinyin',
  			'POLYTON' => 'Banyak Nada',
  			'POSIX' => 'Komputer',
+ 			'PROVENC' => 'OCCITAN PROVENCE',
+ 			'PUTER' => 'ROMANSH PUTER',
  			'REVISED' => 'Sistem Ejaan Semakan',
  			'RIGIK' => 'Vopaluk Klasik',
  			'ROZAJ' => 'Resia',
+ 			'RUMGR' => 'RUMANTSCH GRISCHUN',
  			'SAAHO' => 'Saho',
  			'SCOTLAND' => 'Inggeris Standard Scotland',
+ 			'SCOUSE' => 'INGGERIS LIVERPOOL',
+ 			'SIMPLE' => 'RINGKAS',
  			'SOLBA' => 'Dialek Stolvizza/Solbica',
  			'SOTAV' => 'Kumpulan dialek Sotavento Kabuverdianu',
+ 			'SPANGLIS' => 'iNGGERIS SEPANYOL',
+ 			'SURMIRAN' => 'ROMANSH SURMIRAN',
+ 			'SURSILV' => 'ROMANSH SURSILVAN',
+ 			'SUTSILV' => 'ROMANSH SUTSILVAN',
  			'TARASK' => 'Sistem ejaan Taraskievica',
  			'UCCOR' => 'Sistem Ejaan Bersatu',
  			'UCRCOR' => 'Sistem Ejaan Semakan Bersatu',
+ 			'ULSTER' => 'SCOTS ULSTER',
  			'UNIFON' => 'Abjad fonetik Unifon',
+ 			'VAIDIKA' => 'VEDIC SANSKRIT',
  			'VALENCIA' => 'Valencia',
+ 			'VALLADER' => 'ROMANSH VALLADER',
+ 			'VIVARAUP' => 'VIVARO-ALPINE',
  			'WADEGILE' => 'Perumian Wade-Giles',
+ 			'XSISTEMO' => 'X-SISTEM ESPERANTO',
 
 		}
 	},
@@ -1438,7 +1491,6 @@ has 'display_name_type' => (
  				'phonebook' => q{Aturan Isih Buku Telefon},
  				'phonetic' => q{Urutan Isih Fonetik},
  				'pinyin' => q{Aturan Isih Pinyin},
- 				'reformed' => q{Aturan Isih Pembaharuan},
  				'search' => q{Carian Tujuan Umum},
  				'searchjl' => q{Cari Mengikut Konsonan Awal Hangul},
  				'standard' => q{Tertib Isih Standard},
@@ -2088,6 +2140,16 @@ has 'units' => (
 						'other' => q({0} permyriad),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(bahagian per bilion),
+						'other' => q({0} bahagian per bilion),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(bahagian per bilion),
+						'other' => q({0} bahagian per bilion),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(liter setiap 100 kilometer),
 						'other' => q({0} liter setiap 100 kilometer),
@@ -2304,6 +2366,18 @@ has 'units' => (
 					# Core Unit Identifier
 					'nanosecond' => {
 						'other' => q({0} nanosaat),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(malam),
+						'other' => q({0} malam),
+						'per' => q({0} setiap malam),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(malam),
+						'other' => q({0} malam),
+						'per' => q({0} setiap malam),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -3180,6 +3254,16 @@ has 'units' => (
 						'other' => q({0} knot),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(cahaya),
+						'other' => q({0} cahaya),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(cahaya),
+						'other' => q({0} cahaya),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'name' => q(meter sesaat),
 						'other' => q({0} meter sesaat),
@@ -3736,12 +3820,16 @@ has 'units' => (
 						'other' => q({0} h),
 					},
 					# Long Unit Identifier
-					'duration-quarter' => {
-						'other' => q({0}q),
+					'duration-night' => {
+						'name' => q(malam),
+						'other' => q({0} malam),
+						'per' => q({0}/malam),
 					},
 					# Core Unit Identifier
-					'quarter' => {
-						'other' => q({0}q),
+					'night' => {
+						'name' => q(malam),
+						'other' => q({0} malam),
+						'per' => q({0}/malam),
 					},
 					# Long Unit Identifier
 					'duration-second' => {
@@ -4106,6 +4194,16 @@ has 'units' => (
 						'name' => q(km/j),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(cahaya),
+						'other' => q({0} cahaya),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(cahaya),
+						'other' => q({0} cahaya),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'name' => q(m/s),
 					},
@@ -4358,6 +4456,14 @@ has 'units' => (
 						'name' => q(per seribu),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(bahagian/bilion),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(bahagian/bilion),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-kilometer' => {
 						'name' => q(liter/km),
 					},
@@ -4536,6 +4642,18 @@ has 'units' => (
 					# Core Unit Identifier
 					'nanosecond' => {
 						'name' => q(nanosaat),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(malam),
+						'other' => q({0} malam),
+						'per' => q({0}/malam),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(malam),
+						'other' => q({0} malam),
+						'per' => q({0}/malam),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -4864,6 +4982,16 @@ has 'units' => (
 					'kilometer-per-hour' => {
 						'name' => q(km/jam),
 						'other' => q({0} kmj),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(cahaya),
+						'other' => q({0} cahaya),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(cahaya),
+						'other' => q({0} cahaya),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -6564,10 +6692,6 @@ has 'day_periods' => (
 					'night1' => q{malam},
 					'pm' => q{PTG},
 				},
-				'narrow' => {
-					'am' => q{a},
-					'pm' => q{p},
-				},
 				'wide' => {
 					'afternoon1' => q{tengah hari},
 					'evening1' => q{petang},
@@ -6586,12 +6710,10 @@ has 'day_periods' => (
 				},
 				'narrow' => {
 					'afternoon1' => q{tengah hari},
-					'am' => q{a},
 					'evening1' => q{petang},
 					'morning1' => q{pagi},
 					'morning2' => q{pagi},
 					'night1' => q{malam},
-					'pm' => q{p},
 				},
 			},
 		},
@@ -6786,6 +6908,7 @@ has 'datetime_formats_available_formats' => (
 			GyMMMd => q{d MMM y G},
 			MEd => q{E, d-M},
 			MMMEd => q{E, d MMM},
+			MMMMW => q{'minggu' W 'daripada' MMMM},
 			MMMMd => q{d MMMM},
 			MMMd => q{d MMM},
 			MMdd => q{dd/MM},
@@ -6804,6 +6927,7 @@ has 'datetime_formats_available_formats' => (
 			yMd => q{d/M/y},
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
+			yw => q{'minggu' w 'daripada' Y},
 		},
 		'hebrew' => {
 			y => q{y},
@@ -7160,12 +7284,6 @@ has 'time_zone_names' => (
 		'America/Merida' => {
 			exemplarCity => q#Merida#,
 		},
-		'America/Rainy_River' => {
-			exemplarCity => q#Sungai Rainy#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#Santa Isabel#,
-		},
 		'America/St_Barthelemy' => {
 			exemplarCity => q#Saint Barthelemy#,
 		},
@@ -7275,9 +7393,6 @@ has 'time_zone_names' => (
 				'standard' => q#Waktu Piawai Atlantik#,
 			},
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#Currie#,
-		},
 		'Australia_Central' => {
 			long => {
 				'daylight' => q#Waktu Siang Australia Tengah#,
@@ -7380,13 +7495,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Waktu Siang China#,
 				'generic' => q#Waktu China#,
 				'standard' => q#Waktu Piawai China#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Waktu Musim Panas Choibalsan#,
-				'generic' => q#Waktu Choibalsan#,
-				'standard' => q#Waktu Piawai Choibalsan#,
 			},
 		},
 		'Christmas' => {
@@ -7658,6 +7766,11 @@ has 'time_zone_names' => (
 				'standard' => q#Waktu Piawai Petropavlovsk-Kamchatski#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Waktu Kazakhstan#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#Waktu Kazakhstan Timur#,
@@ -7711,11 +7824,6 @@ has 'time_zone_names' => (
 				'standard' => q#Waktu Piawai Macao#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Waktu Pulau Macquarie#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Waktu Musim Panas Magadan#,
@@ -7756,13 +7864,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Waktu Mawson#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Waktu Siang Barat Laut Mexico#,
-				'generic' => q#Waktu Barat Laut Mexico#,
-				'standard' => q#Waktu Piawai Barat Laut Mexico#,
 			},
 		},
 		'Mexico_Pacific' => {

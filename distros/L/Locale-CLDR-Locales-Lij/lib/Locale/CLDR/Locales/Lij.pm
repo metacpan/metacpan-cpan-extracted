@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Lij - Package for language Ligurian
 
 package Locale::CLDR::Locales::Lij;
 # This file auto generated from Data\common\main\lij.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -8029,13 +8029,6 @@ has 'time_zone_names' => (
 				'standard' => q#oa standard da Ciña#,
 			},
 		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#oa de stæ de Choibalsan#,
-				'generic' => q#oa de Choibalsan#,
-				'standard' => q#oa standard de Choibalsan#,
-			},
-		},
 		'Christmas' => {
 			long => {
 				'standard' => q#oa de l’isoa Christmas#,
@@ -8415,11 +8408,6 @@ has 'time_zone_names' => (
 				'standard' => q#oa standard de Lord Howe#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#oa de l’isoa Macquarie#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#oa de stæ de Magadan#,
@@ -8457,13 +8445,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#oa de Mawson#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#oa de stæ do Mescico do nòrd-ponente#,
-				'generic' => q#oa do Mescico do nòrd-ponente#,
-				'standard' => q#oa standard do Mescico do nòrd-ponente#,
 			},
 		},
 		'Mexico_Pacific' => {

@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::Test::CheckBreaks; # git description: v0.018-2-g6cc62e9
-# vim: set ts=8 sts=4 sw=4 tw=115 et :
+package Dist::Zilla::Plugin::Test::CheckBreaks; # git description: v0.019-11-g97ba44b
+# vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Generate a test that shows what modules you are breaking
 # KEYWORDS: distribution prerequisites upstream dependencies modules conflicts breaks breakages metadata
 
-our $VERSION = '0.019';
+our $VERSION = '0.020';
 
 use Moose;
 with (
@@ -30,8 +30,7 @@ has no_forced_deps => (
 
 sub filename { path('t', 'zzz-check-breaks.t') }
 
-around dump_config => sub
-{
+around dump_config => sub {
     my ($orig, $self) = @_;
     my $config = $self->$orig;
 
@@ -44,8 +43,7 @@ around dump_config => sub
     return $config;
 };
 
-sub gather_files
-{
+sub gather_files {
     my $self = shift;
 
     require Dist::Zilla::File::InMemory;
@@ -66,12 +64,12 @@ has conflicts_module => (
     default => sub {
         my $self = shift;
 
-        $self->log_debug('no conflicts_module provided; looking for one in the dist...');
+        $self->log_debug('no conflicts_module provided; looking for one in the distribution...');
 
         my $mmd = $self->module_metadata_for_file($self->zilla->main_module);
         my $module = ($mmd->packages_inside)[0] . '::Conflicts';
 
-        # check that the file exists in the dist (it should never be shipped
+        # check that the file exists in the distribution (it should never be shipped
         # separately!)
         my $conflicts_filename = module_notional_filename($module);
         if (any { $_->name eq path('lib', $conflicts_filename) } @{ $self->zilla->files })
@@ -87,15 +85,14 @@ has conflicts_module => (
 
 sub _cmc_prereq { '0.011' }
 
-sub munge_files
-{
+sub munge_files {
     my $self = shift;
 
     # module => filename
-    my $modules = { map {
-        require Module::Runtime;
-        $_ => Module::Runtime::module_notional_filename($_)
-    } $self->conflicts_module };
+    require Module::Runtime;
+    my $modules = +{ map
+        +($_ => Module::Runtime::module_notional_filename($_)),
+        $self->conflicts_module };
 
     my $breaks_data = $self->_x_breaks_data;
     $self->log_debug('no x_breaks metadata and no conflicts module found to check against: adding no-op test')
@@ -123,8 +120,7 @@ sub munge_files
     return;
 }
 
-sub register_prereqs
-{
+sub register_prereqs {
     my $self = shift;
 
     $self->zilla->register_prereqs(
@@ -272,7 +268,7 @@ Dist::Zilla::Plugin::Test::CheckBreaks - Generate a test that shows what modules
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 SYNOPSIS
 
@@ -385,7 +381,7 @@ L<http://dzil.org/#mailing-list>.
 There is also an irc channel available for users of this distribution, at
 L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
 
-I am also usually active on irc, as 'ether' at C<irc.perl.org>.
+I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
 
 =head1 AUTHOR
 
@@ -414,6 +410,7 @@ use warnings;
 # this test was generated with {{ ref $plugin }} {{ $plugin->VERSION }}
 
 use Test::More tests => {{ $test_count }};
+use Term::ANSIColor 'colored';
 
 SKIP: {
 {{
@@ -433,8 +430,7 @@ CHECK_CONFLICTS
 }}}
 
 {{
-    if (keys %$breaks)
-    {
+    if (keys %$breaks) {
         my $dumped = Data::Dumper->new([ $breaks ], [ 'breaks' ])
             ->Sortkeys(1)
             ->Indent(1)
@@ -464,14 +460,13 @@ $reqs->add_string_requirement($_, $breaks->{$_}) foreach keys %$breaks;
 
 our $result = CPAN::Meta::Check::check_requirements($reqs, 'conflicts');
 
-if (my @breaks = grep { defined $result->{$_} } keys %$result)
-{
+if (my @breaks = grep defined $result->{$_}, keys %$result) {
 CHECK_BREAKS_checks
 
-        $breaks_content .= "    diag 'Breakages found with $dist_name:';\n"
+        $breaks_content .= "    diag colored('Breakages found with $dist_name:', 'yellow');\n"
             . <<'CHECK_BREAKS_diag';
-    diag "$result->{$_}" for sort @breaks;
-    diag "\n", 'You should now update these modules!';
+    diag colored("$result->{$_}", 'yellow') for sort @breaks;
+    diag "\n", colored('You should now update these modules!', 'yellow');
 }
 
 pass 'checked x_breaks data';

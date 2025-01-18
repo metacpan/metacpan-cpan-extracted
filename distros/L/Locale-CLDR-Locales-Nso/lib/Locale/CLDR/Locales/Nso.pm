@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Nso - Package for language Northern Sotho
 
 package Locale::CLDR::Locales::Nso;
 # This file auto generated from Data\common\main\nso.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -31,7 +31,8 @@ has 'display_name_language' => (
 	default		=> sub {
 		 sub {
 			 my %languages = (
-				'nso' => 'Sesotho sa Leboa',
+				'en' => 'Seisimane',
+ 				'nso' => 'Sesotho sa Leboa',
 
 			);
 			if (@_) {
@@ -42,6 +43,24 @@ has 'display_name_language' => (
 	},
 );
 
+has 'display_name_script' => (
+	is			=> 'ro',
+	isa			=> CodeRef,
+	init_arg	=> undef,
+	default		=> sub {
+		sub {
+			my %scripts = (
+			'Latn' => 'SeLatina',
+
+			);
+			if ( @_ ) {
+				return $scripts{$_[0]};
+			}
+			return \%scripts;
+		}
+	}
+);
+
 has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
@@ -49,6 +68,32 @@ has 'display_name_region' => (
 	default		=> sub {
 		{
 			'ZA' => 'Afrika Borwa',
+
+		}
+	},
+);
+
+has 'display_name_measurement_system' => (
+	is			=> 'ro',
+	isa			=> HashRef[Str],
+	init_arg	=> undef,
+	default		=> sub {
+		{
+			'metric' => q{Metriki},
+
+		}
+	},
+);
+
+has 'display_name_code_patterns' => (
+	is			=> 'ro',
+	isa			=> HashRef[Str],
+	init_arg	=> undef,
+	default		=> sub {
+		{
+			'language' => 'Polelo: {0}',
+ 			'script' => 'Mongwalo: {0}',
+ 			'region' => 'Tikologo: {0}',
 
 		}
 	},
@@ -156,10 +201,10 @@ has 'calendar_months' => (
 							'Dibo',
 							'Hlak',
 							'Mora',
-							'Mopi',
-							'Phupu',
+							'Mei',
+							'June',
 							'Mose',
-							'Phato',
+							'Agosetose',
 							'Lewe',
 							'Dipha',
 							'Diba',
@@ -171,18 +216,18 @@ has 'calendar_months' => (
 					},
 					wide => {
 						nonleap => [
-							'Pherekgong',
-							'Dibokwane',
-							'Hlakola',
-							'Moranang',
-							'Mopitlo',
-							'Phupu',
-							'Mosegemanye',
-							'Phato',
-							'Lewedi',
-							'Diphalane',
-							'Dibatsela',
-							'Manthole'
+							'Janeware',
+							'Febereware',
+							'Matšhe',
+							'Aporele',
+							'Mei',
+							'June',
+							'Julae',
+							'Agosetose',
+							'Setemere',
+							'Oktobore',
+							'Nofemere',
+							'Disemere'
 						],
 						leap => [
 							
@@ -231,7 +276,7 @@ has 'calendar_days' => (
 						sun => 'Lam'
 					},
 					wide => {
-						mon => 'Musopologo',
+						mon => 'Mošupologo',
 						tue => 'Labobedi',
 						wed => 'Laboraro',
 						thu => 'Labone',
@@ -446,6 +491,18 @@ has 'datetime_formats_interval' => (
 	} },
 );
 
+has 'time_zone_names' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default	=> sub { {
+		'GMT' => {
+			long => {
+				'standard' => q#Nako Palogare ya Greenwich#,
+			},
+		},
+	 } }
+);
 no Moo;
 
 1;

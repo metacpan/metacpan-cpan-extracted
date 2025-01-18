@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Lt - Package for language Lithuanian
 
 package Locale::CLDR::Locales::Lt;
 # This file auto generated from Data\common\main\lt.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -641,6 +641,7 @@ has 'display_name_language' => (
  				'bjn' => 'bandžarų',
  				'bkm' => 'komų',
  				'bla' => 'siksikų',
+ 				'blo' => 'guanų',
  				'bm' => 'bambarų',
  				'bn' => 'bengalų',
  				'bo' => 'tibetiečių',
@@ -736,9 +737,6 @@ has 'display_name_language' => (
  				'enm' => 'Vidurio Anglijos',
  				'eo' => 'esperanto',
  				'es' => 'ispanų',
- 				'es_419' => 'Lotynų Amerikos ispanų',
- 				'es_ES' => 'Europos ispanų',
- 				'es_MX' => 'Meksikos ispanų',
  				'esu' => 'centrinės Aliaskos jupikų',
  				'et' => 'estų',
  				'eu' => 'baskų',
@@ -780,7 +778,6 @@ has 'display_name_language' => (
  				'gmh' => 'Vidurio Aukštosios Vokietijos',
  				'gn' => 'gvaranių',
  				'goh' => 'senoji Aukštosios Vokietijos',
- 				'gom' => 'Goa konkanių',
  				'gon' => 'gondi',
  				'gor' => 'gorontalo',
  				'got' => 'gotų',
@@ -890,6 +887,7 @@ has 'display_name_language' => (
  				'kv' => 'komi',
  				'kw' => 'kornų',
  				'kwk' => 'kvakvalų',
+ 				'kxv' => 'kuvi',
  				'ky' => 'kirgizų',
  				'la' => 'lotynų',
  				'lad' => 'ladino',
@@ -919,7 +917,6 @@ has 'display_name_language' => (
  				'lua' => 'luba lulua',
  				'lui' => 'luiseno',
  				'lun' => 'Lundos',
- 				'luo' => 'luo',
  				'lus' => 'mizo',
  				'luy' => 'luja',
  				'lv' => 'latvių',
@@ -1038,8 +1035,6 @@ has 'display_name_language' => (
  				'pro' => 'senovės provansalų',
  				'ps' => 'puštūnų',
  				'pt' => 'portugalų',
- 				'pt_BR' => 'Brazilijos portugalų',
- 				'pt_PT' => 'Europos portugalų',
  				'qu' => 'kečujų',
  				'quc' => 'kičių',
  				'qug' => 'Čimboraso aukštumų kečujų',
@@ -1179,13 +1174,13 @@ has 'display_name_language' => (
  				'und' => 'nežinoma kalba',
  				'ur' => 'urdų',
  				'uz' => 'uzbekų',
- 				'vai' => 'vai',
  				've' => 'vendų',
  				'vec' => 'venetų',
  				'vep' => 'vepsų',
  				'vi' => 'vietnamiečių',
  				'vls' => 'vakarų flamandų',
  				'vmf' => 'pagrindinė frankonų',
+ 				'vmw' => 'makua',
  				'vo' => 'volapiuko',
  				'vot' => 'Votik',
  				'vro' => 'veru',
@@ -1201,6 +1196,7 @@ has 'display_name_language' => (
  				'xal' => 'kalmukų',
  				'xh' => 'kosų',
  				'xmf' => 'megrelų',
+ 				'xnr' => 'kangri',
  				'xog' => 'sogų',
  				'yao' => 'jao',
  				'yap' => 'japezų',
@@ -1872,7 +1868,6 @@ has 'display_name_type' => (
  				'phonebook' => q{telefonų knygos rūšiavimo tvarka},
  				'phonetic' => q{Fonetinė rikiavimo tvarka},
  				'pinyin' => q{supaprastinta kiniškų hieroglifų rūšiavimo tvarka},
- 				'reformed' => q{reformuota rūšiavimo tvarka},
  				'search' => q{bendroji paieška},
  				'searchjl' => q{ieškoti pagal hangul pirmines priebalses},
  				'standard' => q{standartinis rikiavimas},
@@ -2657,6 +2652,7 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'concentr-milligram-ofglucose-per-deciliter' => {
+						'1' => q(masculine),
 						'few' => q({0} miligramai decilitre),
 						'many' => q({0} miligramo decilitre),
 						'name' => q(miligramai decilitre),
@@ -2665,6 +2661,7 @@ has 'units' => (
 					},
 					# Core Unit Identifier
 					'milligram-ofglucose-per-deciliter' => {
+						'1' => q(masculine),
 						'few' => q({0} miligramai decilitre),
 						'many' => q({0} miligramo decilitre),
 						'name' => q(miligramai decilitre),
@@ -2764,6 +2761,24 @@ has 'units' => (
 					# Core Unit Identifier
 					'permyriad' => {
 						'1' => q(masculine),
+					},
+					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'1' => q(feminine),
+						'few' => q({0} milijoninės dalelytės),
+						'many' => q({0} milijoninės dalelytės),
+						'name' => q(milijoninės dalelytės),
+						'one' => q({0} milijoninė dalelytė),
+						'other' => q({0} milijoninių dalelyčių),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'1' => q(feminine),
+						'few' => q({0} milijoninės dalelytės),
+						'many' => q({0} milijoninės dalelytės),
+						'name' => q(milijoninės dalelytės),
+						'one' => q({0} milijoninė dalelytė),
+						'other' => q({0} milijoninių dalelyčių),
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
@@ -3204,6 +3219,26 @@ has 'units' => (
 						'other' => q({0} nanosekundžių),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'1' => q(feminine),
+						'few' => q({0} naktys),
+						'many' => q({0} nakties),
+						'name' => q(naktis),
+						'one' => q({0} naktis),
+						'other' => q({0} naktų),
+						'per' => q({0}/nakt.),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'1' => q(feminine),
+						'few' => q({0} naktys),
+						'many' => q({0} nakties),
+						'name' => q(naktis),
+						'one' => q({0} naktis),
+						'other' => q({0} naktų),
+						'per' => q({0}/nakt.),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'1' => q(masculine),
 						'few' => q({0} ketvirčiai),
@@ -3425,6 +3460,7 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'energy-kilocalorie' => {
+						'1' => q(feminine),
 						'few' => q({0} kilokalorijos),
 						'many' => q({0} kilokalorijos),
 						'name' => q(kilokalorijos),
@@ -3433,6 +3469,7 @@ has 'units' => (
 					},
 					# Core Unit Identifier
 					'kilocalorie' => {
+						'1' => q(feminine),
 						'few' => q({0} kilokalorijos),
 						'many' => q({0} kilokalorijos),
 						'name' => q(kilokalorijos),
@@ -4049,19 +4086,21 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-point' => {
+						'1' => q(masculine),
 						'few' => q({0} punktai),
-						'many' => q({0} punktų),
+						'many' => q({0} punkto),
 						'name' => q(punktai),
 						'one' => q({0} punktas),
-						'other' => q({0} punkto),
+						'other' => q({0} punktų),
 					},
 					# Core Unit Identifier
 					'point' => {
+						'1' => q(masculine),
 						'few' => q({0} punktai),
-						'many' => q({0} punktų),
+						'many' => q({0} punkto),
 						'name' => q(punktai),
 						'one' => q({0} punktas),
-						'other' => q({0} punkto),
+						'other' => q({0} punktų),
 					},
 					# Long Unit Identifier
 					'length-solar-radius' => {
@@ -4627,6 +4666,7 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'pressure-millimeter-ofhg' => {
+						'1' => q(masculine),
 						'few' => q({0} gysidabrio stulpelio milimetrai),
 						'many' => q({0} gysidabrio stulpelio milimetro),
 						'name' => q(gysidabrio stulpelio milimetrai),
@@ -4635,6 +4675,7 @@ has 'units' => (
 					},
 					# Core Unit Identifier
 					'millimeter-ofhg' => {
+						'1' => q(masculine),
 						'few' => q({0} gysidabrio stulpelio milimetrai),
 						'many' => q({0} gysidabrio stulpelio milimetro),
 						'name' => q(gysidabrio stulpelio milimetrai),
@@ -5454,6 +5495,22 @@ has 'units' => (
 						'name' => q(%),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'few' => q({0} dalelytės/mln.),
+						'many' => q({0} dalelytės/mln.),
+						'name' => q(dalelytė/mln.),
+						'one' => q({0} dalelytė/mln.),
+						'other' => q({0} dalelyčių/mln.),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'few' => q({0} dalelytės/mln.),
+						'many' => q({0} dalelytės/mln.),
+						'name' => q(dalelytė/mln.),
+						'one' => q({0} dalelytė/mln.),
+						'other' => q({0} dalelyčių/mln.),
+					},
+					# Long Unit Identifier
 					'consumption-mile-per-gallon' => {
 						'few' => q({0} mi/gal),
 						'many' => q({0} mi/gal),
@@ -5498,6 +5555,24 @@ has 'units' => (
 					# Core Unit Identifier
 					'month' => {
 						'name' => q(mėnuo),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'few' => q({0} nakt.),
+						'many' => q({0} nakt.),
+						'name' => q(nakt.),
+						'one' => q({0} nakt.),
+						'other' => q({0} nakt.),
+						'per' => q({0}/nakt.),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'few' => q({0} nakt.),
+						'many' => q({0} nakt.),
+						'name' => q(nakt.),
+						'one' => q({0} nakt.),
+						'other' => q({0} nakt.),
+						'per' => q({0}/nakt.),
 					},
 					# Long Unit Identifier
 					'duration-second' => {
@@ -5834,6 +5909,22 @@ has 'units' => (
 						'other' => q({0} ‰),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'few' => q({0} dalelytės/mln.),
+						'many' => q({0} dalelytės/mln.),
+						'name' => q(dalelytė/mln.),
+						'one' => q({0} dalelytė/mln.),
+						'other' => q({0} dalelyčių/mln.),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'few' => q({0} dalelytės/mln.),
+						'many' => q({0} dalelytės/mln.),
+						'name' => q(dalelytė/mln.),
+						'one' => q({0} dalelytė/mln.),
+						'other' => q({0} dalelyčių/mln.),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'few' => q({0} l/100 km),
 						'many' => q({0} l/100 km),
@@ -6068,6 +6159,24 @@ has 'units' => (
 					# Core Unit Identifier
 					'nanosecond' => {
 						'name' => q(nanosek.),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'few' => q({0} nakt.),
+						'many' => q({0} nakt.),
+						'name' => q(nakt.),
+						'one' => q({0} nakt.),
+						'other' => q({0} nakt.),
+						'per' => q({0}/nakt.),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'few' => q({0} nakt.),
+						'many' => q({0} nakt.),
+						'name' => q(nakt.),
+						'one' => q({0} nakt.),
+						'other' => q({0} nakt.),
+						'per' => q({0}/nakt.),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -10892,21 +11001,9 @@ has 'datetime_formats_interval' => (
 			},
 			h => {
 				a => q{h a – h a},
-				h => q{hh–hh a},
-			},
-			hm => {
-				a => q{hh:mm a–hh:mm a},
-				h => q{hh:mm–hh:mm a},
-				m => q{hh:mm–hh:mm a},
-			},
-			hmv => {
-				a => q{hh:mm a–hh:mm a v},
-				h => q{hh:mm–hh:mm a v},
-				m => q{h:mm–h:mm a v},
 			},
 			hv => {
 				a => q{h a – h a v},
-				h => q{hh–hh a v},
 			},
 			yM => {
 				M => q{y-MM – y-MM},
@@ -11497,9 +11594,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#Niujorkas#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#Nipigonas#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#Nomas#,
 		},
@@ -11517,9 +11611,6 @@ has 'time_zone_names' => (
 		},
 		'America/Ojinaga' => {
 			exemplarCity => q#Ochinaga#,
-		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#Pangnirtungas#,
 		},
 		'America/Paramaribo' => {
 			exemplarCity => q#Paramaribas#,
@@ -11542,9 +11633,6 @@ has 'time_zone_names' => (
 		'America/Punta_Arenas' => {
 			exemplarCity => q#Punta Arenasas#,
 		},
-		'America/Rainy_River' => {
-			exemplarCity => q#Reini Riveris#,
-		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#Rankin Inletas#,
 		},
@@ -11559,9 +11647,6 @@ has 'time_zone_names' => (
 		},
 		'America/Rio_Branco' => {
 			exemplarCity => q#Rio Brankas#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#Santa Izabelė#,
 		},
 		'America/Santarem' => {
 			exemplarCity => q#Santarenas#,
@@ -11605,9 +11690,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#Kanakas#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#Tander Bėjus#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#Tichuana#,
 		},
@@ -11625,9 +11707,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#Jakutatas#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#Jelounaifas#,
 		},
 		'America_Central' => {
 			long => {
@@ -11793,9 +11872,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#Čita#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#Čoibalsanas#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#Kolombas#,
@@ -12023,9 +12099,6 @@ has 'time_zone_names' => (
 		'Australia/Broken_Hill' => {
 			exemplarCity => q#Broken Hilis#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#Karis#,
-		},
 		'Australia/Darwin' => {
 			exemplarCity => q#Darvinas#,
 		},
@@ -12157,13 +12230,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Kinijos vasaros laikas#,
 				'generic' => q#Kinijos laikas#,
 				'standard' => q#Kinijos žiemos laikas#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Čoibalsano vasaros laikas#,
-				'generic' => q#Čoibalsano laikas#,
-				'standard' => q#Čoibalsano žiemos laikas#,
 			},
 		},
 		'Christmas' => {
@@ -12376,9 +12442,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#Uljanovskas#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#Užhorodas#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#Vaducas#,
 		},
@@ -12396,9 +12459,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#Zagrebas#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#Zaporožė#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#Ciurichas#,
@@ -12628,6 +12688,11 @@ has 'time_zone_names' => (
 				'standard' => q#Kamčiatkos Petropavlovsko žiemos laikas#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Kazachstano laikas#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#Rytų Kazachstano laikas#,
@@ -12686,11 +12751,6 @@ has 'time_zone_names' => (
 				'standard' => q#Makau žiemos laikas#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Makvorio Salos laikas#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Magadano vasaros laikas#,
@@ -12728,13 +12788,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Mosono laikas#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Šiaurės Vakarų Meksikos vasaros laikas#,
-				'generic' => q#Šiaurės Vakarų Meksikos laikas#,
-				'standard' => q#Šiaurės Vakarų Meksikos žiemos laikas#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -12876,9 +12929,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Honolulu' => {
 			exemplarCity => q#Honolulu#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#Džonstonas#,
 		},
 		'Pacific/Kiritimati' => {
 			exemplarCity => q#Kiritimatis#,

@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Syr - Package for language Syriac
 
 package Locale::CLDR::Locales::Syr;
 # This file auto generated from Data\common\main\syr.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -3772,7 +3772,6 @@ has 'datetime_formats_interval' => (
 				M => q{d/M – d/M},
 				d => q{d/M – d/M},
 			},
-			fallback => '{0}  –  {1}',
 			yM => {
 				M => q{M/y – M/y},
 				y => q{M/y – M/y},
@@ -4334,9 +4333,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#ܢܝܘ ܝܘܪܟ#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#ܢܝܦܝܓܘܢ#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#ܢܘܡ#,
 		},
@@ -4358,9 +4354,6 @@ has 'time_zone_names' => (
 		'America/Panama' => {
 			exemplarCity => q#ܦܢܡܐ#,
 		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#ܦܐܢܓܢܝܪܬܘܢܓ#,
-		},
 		'America/Paramaribo' => {
 			exemplarCity => q#ܦܐܪܐܡܐܪܝܒܘ#,
 		},
@@ -4381,9 +4374,6 @@ has 'time_zone_names' => (
 		},
 		'America/Punta_Arenas' => {
 			exemplarCity => q#ܦܘܢܬܐ ܥܪܝܢܣ#,
-		},
-		'America/Rainy_River' => {
-			exemplarCity => q#ܢܗܪܐ ܕܪܥܢܝ#,
 		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#ܪܐܢܟܢ ܐܢܠܝܬ#,
@@ -4445,9 +4435,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#ܬܘܠ#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#ܬܐܢܕܐܪ ܒܐܝ#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#ܬܝܐܘܐܢܐ#,
 		},
@@ -4468,9 +4455,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#ܝܩܘܬܐܬ#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#ܝܠܘܢܝܦ#,
 		},
 		'America_Central' => {
 			long => {
@@ -4645,9 +4629,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#ܬܫܝܬܐ#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#ܟܘܝܒܠܣܢ#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#ܟܘܠܘܡܒܘ#,
@@ -5020,13 +5001,6 @@ has 'time_zone_names' => (
 				'standard' => q#ܥܕܢܐ ܡܫܘܚܬܢܝܬܐ ܕܨܝܢ#,
 			},
 		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#ܥܕܢܐ ܕܒܗܪ ܝܘܡܐ ܕܟܘܝܒܠܣܢ#,
-				'generic' => q#ܥܕܢܐ ܕܟܘܝܒܠܣܢ#,
-				'standard' => q#ܥܕܢܐ ܡܫܘܚܬܢܝܬܐ ܕܟܘܝܒܠܣܢ#,
-			},
-		},
 		'Christmas' => {
 			long => {
 				'standard' => q#ܥܕܢܐ ܕܓܙܪܬܐ ܕܟܪܝܣܬܡܣ#,
@@ -5249,9 +5223,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#ܐܘܠܝܢܘܒܣܟ#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#ܐܘܙܓܘܪܘܕ#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#ܒܕܘܙ#,
 		},
@@ -5272,9 +5243,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#ܙܐܓܪܒ#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#ܙܐܦܘܪܝܓܝ#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#ܙܝܘܪܚ#,
@@ -5562,11 +5530,6 @@ has 'time_zone_names' => (
 				'standard' => q#ܥܕܢܐ ܡܫܘܚܬܢܝܬܐ ܕܡܐܟܐܘ#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#ܥܕܢܐ ܕܓܙܪܬܐ ܡܐܟܐܘܪܝ#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#ܥܕܢܐ ܕܒܗܪ ܝܘܡܐ ܕܡܐܓܕܐܢ#,
@@ -5604,13 +5567,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#ܥܕܢܐ ܕܡܐܘܣܘܢ#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#ܥܕܢܐ ܕܒܗܪ ܝܘܡܐ ܓܪܒܝ ܡܥܪܒ ܡܟܣܝܩܘ#,
-				'generic' => q#ܥܕܢܐ ܓܪܒܝ ܡܥܪܒ ܡܟܣܝܩܘ#,
-				'standard' => q#ܥܕܢܐ ܡܫܘܚܬܢܝܬܐ ܓܪܒܝ ܡܥܪܒ ܡܟܣܝܩܘ#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -5746,9 +5702,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Guam' => {
 			exemplarCity => q#ܓܘܐܡ#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#ܓܘܢܣܬܘܢ#,
 		},
 		'Pacific/Kanton' => {
 			exemplarCity => q#ܟܐܢܬܘܢ#,

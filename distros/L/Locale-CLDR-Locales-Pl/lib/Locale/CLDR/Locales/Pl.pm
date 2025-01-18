@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Pl - Package for language Polish
 
 package Locale::CLDR::Locales::Pl;
 # This file auto generated from Data\common\main\pl.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -2157,6 +2157,7 @@ has 'display_name_language' => (
  				'bjn' => 'banjar',
  				'bkm' => 'kom',
  				'bla' => 'siksika',
+ 				'blo' => 'anii',
  				'bm' => 'bambara',
  				'bn' => 'bengalski',
  				'bo' => 'tybetański',
@@ -2298,7 +2299,6 @@ has 'display_name_language' => (
  				'gmh' => 'średnio-wysoko-niemiecki',
  				'gn' => 'guarani',
  				'goh' => 'staro-wysoko-niemiecki',
- 				'gom' => 'konkani (Goa)',
  				'gon' => 'gondi',
  				'gor' => 'gorontalo',
  				'got' => 'gocki',
@@ -2410,6 +2410,7 @@ has 'display_name_language' => (
  				'kv' => 'komi',
  				'kw' => 'kornijski',
  				'kwk' => 'kwakiutl',
+ 				'kxv' => 'kuvi',
  				'ky' => 'kirgiski',
  				'la' => 'łaciński',
  				'lad' => 'ladyński',
@@ -2439,7 +2440,6 @@ has 'display_name_language' => (
  				'lua' => 'luba-lulua',
  				'lui' => 'luiseno',
  				'lun' => 'lunda',
- 				'luo' => 'luo',
  				'lus' => 'mizo',
  				'luy' => 'luhya',
  				'lv' => 'łotewski',
@@ -2460,7 +2460,7 @@ has 'display_name_language' => (
  				'mfe' => 'kreolski Mauritiusa',
  				'mg' => 'malgaski',
  				'mga' => 'średnioirlandzki',
- 				'mgh' => 'makua',
+ 				'mgh' => 'makua-meetto',
  				'mgo' => 'meta',
  				'mh' => 'marszalski',
  				'mi' => 'maoryjski',
@@ -2707,6 +2707,7 @@ has 'display_name_language' => (
  				'vi' => 'wietnamski',
  				'vls' => 'zachodnioflamandzki',
  				'vmf' => 'meński frankoński',
+ 				'vmw' => 'makua',
  				'vo' => 'wolapik',
  				'vot' => 'wotiacki',
  				'vro' => 'võro',
@@ -2722,6 +2723,7 @@ has 'display_name_language' => (
  				'xal' => 'kałmucki',
  				'xh' => 'khosa',
  				'xmf' => 'megrelski',
+ 				'xnr' => 'kangri',
  				'xog' => 'soga',
  				'yao' => 'yao',
  				'yap' => 'japski',
@@ -3392,7 +3394,6 @@ has 'display_name_type' => (
  				'phonebook' => q{porządek sortowania książki telefonicznej},
  				'phonetic' => q{sortowanie fonetyczne},
  				'pinyin' => q{porządek sortowania pinyin},
- 				'reformed' => q{sortowanie zreformowane},
  				'search' => q{wyszukiwanie ogólnego zastosowania},
  				'searchjl' => q{Wyszukiwanie według początkowej spółgłoski hangul},
  				'standard' => q{standardowa kolejność sortowania},
@@ -3849,12 +3850,20 @@ has 'units' => (
 					# Long Unit Identifier
 					'acceleration-g-force' => {
 						'1' => q(neuter),
-						'name' => q(stała grawitacji),
+						'few' => q({0} przyspieszenia ziemskie),
+						'many' => q({0} przyspieszeń ziemskich),
+						'name' => q(przyspieszenie ziemskie),
+						'one' => q(przyspieszenie ziemskie),
+						'other' => q({0} przyspieszenia ziemskiego),
 					},
 					# Core Unit Identifier
 					'g-force' => {
 						'1' => q(neuter),
-						'name' => q(stała grawitacji),
+						'few' => q({0} przyspieszenia ziemskie),
+						'many' => q({0} przyspieszeń ziemskich),
+						'name' => q(przyspieszenie ziemskie),
+						'one' => q(przyspieszenie ziemskie),
+						'other' => q({0} przyspieszenia ziemskiego),
 					},
 					# Long Unit Identifier
 					'acceleration-meter-per-square-second' => {
@@ -4164,6 +4173,7 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'concentr-milligram-ofglucose-per-deciliter' => {
+						'1' => q(inanimate),
 						'few' => q({0} miligramy na decylitr),
 						'many' => q({0} miligramów na decylitr),
 						'name' => q(miligramy na decylitr),
@@ -4172,6 +4182,7 @@ has 'units' => (
 					},
 					# Core Unit Identifier
 					'milligram-ofglucose-per-deciliter' => {
+						'1' => q(inanimate),
 						'few' => q({0} miligramy na decylitr),
 						'many' => q({0} miligramów na decylitr),
 						'name' => q(miligramy na decylitr),
@@ -4283,6 +4294,24 @@ has 'units' => (
 						'name' => q(punkt bazowy),
 						'one' => q({0} punkt bazowy),
 						'other' => q({0} punktu bazowego),
+					},
+					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'1' => q(feminine),
+						'few' => q({0} części na miliard),
+						'many' => q({0} części na miliard),
+						'name' => q(części na miliard),
+						'one' => q({0} część na miliard),
+						'other' => q({0} części na miliard),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'1' => q(feminine),
+						'few' => q({0} części na miliard),
+						'many' => q({0} części na miliard),
+						'name' => q(części na miliard),
+						'one' => q({0} część na miliard),
+						'other' => q({0} części na miliard),
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
@@ -4588,37 +4617,37 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'duration-day' => {
-						'1' => q(feminine),
-						'few' => q({0} doby),
-						'many' => q({0} dób),
-						'one' => q({0} doba),
-						'other' => q({0} doby),
+						'1' => q(inanimate),
+						'few' => q({0} dni),
+						'many' => q({0} dni),
+						'one' => q({0} dzień),
+						'other' => q({0} dnia),
 						'per' => q({0} na dobę),
 					},
 					# Core Unit Identifier
 					'day' => {
-						'1' => q(feminine),
-						'few' => q({0} doby),
-						'many' => q({0} dób),
-						'one' => q({0} doba),
-						'other' => q({0} doby),
+						'1' => q(inanimate),
+						'few' => q({0} dni),
+						'many' => q({0} dni),
+						'one' => q({0} dzień),
+						'other' => q({0} dnia),
 						'per' => q({0} na dobę),
 					},
 					# Long Unit Identifier
 					'duration-day-person' => {
-						'1' => q(feminine),
-						'few' => q({0} doby),
-						'many' => q({0} dób),
-						'one' => q({0} doba),
-						'other' => q({0} doby),
+						'1' => q(inanimate),
+						'few' => q({0} dni),
+						'many' => q({0} dni),
+						'one' => q({0} dzień),
+						'other' => q({0} dnia),
 					},
 					# Core Unit Identifier
 					'day-person' => {
-						'1' => q(feminine),
-						'few' => q({0} doby),
-						'many' => q({0} dób),
-						'one' => q({0} doba),
-						'other' => q({0} doby),
+						'1' => q(inanimate),
+						'few' => q({0} dni),
+						'many' => q({0} dni),
+						'one' => q({0} dzień),
+						'other' => q({0} dnia),
 					},
 					# Long Unit Identifier
 					'duration-decade' => {
@@ -4749,6 +4778,26 @@ has 'units' => (
 						'name' => q(nanosekundy),
 						'one' => q({0} nanosekunda),
 						'other' => q({0} nanosekundy),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'1' => q(feminine),
+						'few' => q({0} noce),
+						'many' => q({0} nocy),
+						'name' => q(noce),
+						'one' => q({0} noc),
+						'other' => q({0} nocy),
+						'per' => q({0}/noc),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'1' => q(feminine),
+						'few' => q({0} noce),
+						'many' => q({0} nocy),
+						'name' => q(noce),
+						'one' => q({0} noc),
+						'other' => q({0} nocy),
+						'per' => q({0}/noc),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -5632,6 +5681,7 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-point' => {
+						'1' => q(inanimate),
 						'few' => q({0} punkty),
 						'many' => q({0} punktów),
 						'name' => q(punkty),
@@ -5640,6 +5690,7 @@ has 'units' => (
 					},
 					# Core Unit Identifier
 					'point' => {
+						'1' => q(inanimate),
 						'few' => q({0} punkty),
 						'many' => q({0} punktów),
 						'name' => q(punkty),
@@ -6259,23 +6310,24 @@ has 'units' => (
 					# Long Unit Identifier
 					'pressure-millibar' => {
 						'1' => q(inanimate),
-						'few' => q({0} millibary),
-						'many' => q({0} millibarów),
+						'few' => q({0} milibary),
+						'many' => q({0} milibarów),
 						'name' => q(milibary),
-						'one' => q({0} millibar),
-						'other' => q({0} millibara),
+						'one' => q({0} milibar),
+						'other' => q({0} milibara),
 					},
 					# Core Unit Identifier
 					'millibar' => {
 						'1' => q(inanimate),
-						'few' => q({0} millibary),
-						'many' => q({0} millibarów),
+						'few' => q({0} milibary),
+						'many' => q({0} milibarów),
 						'name' => q(milibary),
-						'one' => q({0} millibar),
-						'other' => q({0} millibara),
+						'one' => q({0} milibar),
+						'other' => q({0} milibara),
 					},
 					# Long Unit Identifier
 					'pressure-millimeter-ofhg' => {
+						'1' => q(inanimate),
 						'few' => q({0} milimetry słupa rtęci),
 						'many' => q({0} milimetrów słupa rtęci),
 						'name' => q(milimetry słupa rtęci),
@@ -6284,6 +6336,7 @@ has 'units' => (
 					},
 					# Core Unit Identifier
 					'millimeter-ofhg' => {
+						'1' => q(inanimate),
 						'few' => q({0} milimetry słupa rtęci),
 						'many' => q({0} milimetrów słupa rtęci),
 						'name' => q(milimetry słupa rtęci),
@@ -6373,6 +6426,24 @@ has 'units' => (
 						'name' => q(węzeł),
 						'one' => q({0} węzeł),
 						'other' => q({0} węzła),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'1' => q(neuter),
+						'few' => q({0} światła),
+						'many' => q({0} świateł),
+						'name' => q(światło),
+						'one' => q({0} światło),
+						'other' => q({0} światła),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'1' => q(neuter),
+						'few' => q({0} światła),
+						'many' => q({0} świateł),
+						'name' => q(światło),
+						'one' => q({0} światło),
+						'other' => q({0} światła),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -7176,7 +7247,6 @@ has 'units' => (
 					'duration-day' => {
 						'few' => q({0} d.),
 						'many' => q({0} d.),
-						'name' => q(doba),
 						'one' => q({0} d.),
 						'other' => q({0} d.),
 						'per' => q({0}/d.),
@@ -7185,7 +7255,6 @@ has 'units' => (
 					'day' => {
 						'few' => q({0} d.),
 						'many' => q({0} d.),
-						'name' => q(doba),
 						'one' => q({0} d.),
 						'other' => q({0} d.),
 						'per' => q({0}/d.),
@@ -7225,6 +7294,24 @@ has 'units' => (
 						'one' => q({0} m-c),
 						'other' => q({0} m-ca),
 						'per' => q({0}/m-c),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'few' => q({0} noce),
+						'many' => q({0} nocy),
+						'name' => q(noce),
+						'one' => q({0} noc),
+						'other' => q({0} nocy),
+						'per' => q({0}/noc),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'few' => q({0} noce),
+						'many' => q({0} nocy),
+						'name' => q(noce),
+						'one' => q({0} noc),
+						'other' => q({0} nocy),
+						'per' => q({0}/noc),
 					},
 					# Long Unit Identifier
 					'duration-second' => {
@@ -7348,6 +7435,7 @@ has 'units' => (
 					'speed-kilometer-per-hour' => {
 						'few' => q({0} km/h),
 						'many' => q({0} km/h),
+						'name' => q(km/h),
 						'one' => q({0} km/h),
 						'other' => q({0}km/h),
 					},
@@ -7355,8 +7443,25 @@ has 'units' => (
 					'kilometer-per-hour' => {
 						'few' => q({0} km/h),
 						'many' => q({0} km/h),
+						'name' => q(km/h),
 						'one' => q({0} km/h),
 						'other' => q({0}km/h),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'few' => q({0} św.),
+						'many' => q({0} św.),
+						'name' => q(św.),
+						'one' => q({0} św.),
+						'other' => q({0} św.),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'few' => q({0} św.),
+						'many' => q({0} św.),
+						'name' => q(św.),
+						'one' => q({0} św.),
+						'other' => q({0} św.),
 					},
 					# Long Unit Identifier
 					'speed-mile-per-hour' => {
@@ -7834,20 +7939,20 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'duration-day' => {
-						'few' => q({0} doby),
-						'many' => q({0} dób),
-						'name' => q(doby),
-						'one' => q({0} doba),
-						'other' => q({0} doby),
+						'few' => q({0} dni),
+						'many' => q({0} dni),
+						'name' => q(dzień),
+						'one' => q({0} dzień),
+						'other' => q({0} dnia),
 						'per' => q({0}/dobę),
 					},
 					# Core Unit Identifier
 					'day' => {
-						'few' => q({0} doby),
-						'many' => q({0} dób),
-						'name' => q(doby),
-						'one' => q({0} doba),
-						'other' => q({0} doby),
+						'few' => q({0} dni),
+						'many' => q({0} dni),
+						'name' => q(dzień),
+						'one' => q({0} dzień),
+						'other' => q({0} dnia),
 						'per' => q({0}/dobę),
 					},
 					# Long Unit Identifier
@@ -7901,6 +8006,24 @@ has 'units' => (
 						'one' => q({0} mies.),
 						'other' => q({0} mies.),
 						'per' => q({0}/mies.),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'few' => q({0} noce),
+						'many' => q({0} nocy),
+						'name' => q(noce),
+						'one' => q({0} noc),
+						'other' => q({0} nocy),
+						'per' => q({0}/noc),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'few' => q({0} noce),
+						'many' => q({0} nocy),
+						'name' => q(noce),
+						'one' => q({0} noc),
+						'other' => q({0} nocy),
+						'per' => q({0}/noc),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -8331,6 +8454,22 @@ has 'units' => (
 						'name' => q(w.),
 						'one' => q({0} w.),
 						'other' => q({0} w.),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'few' => q({0} św.),
+						'many' => q({0} św.),
+						'name' => q(św.),
+						'one' => q({0} św.),
+						'other' => q({0} św.),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'few' => q({0} św.),
+						'many' => q({0} św.),
+						'name' => q(św.),
+						'one' => q({0} św.),
+						'other' => q({0} św.),
 					},
 					# Long Unit Identifier
 					'speed-mile-per-hour' => {
@@ -10085,11 +10224,11 @@ has 'currencies' => (
 		},
 		'LSL' => {
 			display_name => {
-				'currency' => q(loti lesotyjskie),
-				'few' => q(loti lesotyjskie),
-				'many' => q(loti lesotyjskich),
-				'one' => q(loti lesotyjskie),
-				'other' => q(loti lesotyjskiego),
+				'currency' => q(loti sotyjskie),
+				'few' => q(loti sotyjskie),
+				'many' => q(loti sotyjskich),
+				'one' => q(loti sotyjskie),
+				'other' => q(loti sotyjskiego),
 			},
 		},
 		'LTL' => {
@@ -12415,9 +12554,6 @@ has 'time_zone_names' => (
 		'Africa/Porto-Novo' => {
 			exemplarCity => q#Porto Novo#,
 		},
-		'Africa/Sao_Tome' => {
-			exemplarCity => q#São Tomé#,
-		},
 		'Africa/Tripoli' => {
 			exemplarCity => q#Trypolis#,
 		},
@@ -12467,9 +12603,6 @@ has 'time_zone_names' => (
 				'standard' => q#czas amazoński standardowy#,
 			},
 		},
-		'America/Asuncion' => {
-			exemplarCity => q#Asunción#,
-		},
 		'America/Bahia' => {
 			exemplarCity => q#Salvador#,
 		},
@@ -12494,9 +12627,6 @@ has 'time_zone_names' => (
 		'America/Cuiaba' => {
 			exemplarCity => q#Cuiabá#,
 		},
-		'America/Curacao' => {
-			exemplarCity => q#Curaçao#,
-		},
 		'America/Dominica' => {
 			exemplarCity => q#Dominika#,
 		},
@@ -12517,9 +12647,6 @@ has 'time_zone_names' => (
 		},
 		'America/Jamaica' => {
 			exemplarCity => q#Jamajka#,
-		},
-		'America/Kentucky/Monticello' => {
-			exemplarCity => q#Monticello#,
 		},
 		'America/Maceio' => {
 			exemplarCity => q#Maceió#,
@@ -12550,9 +12677,6 @@ has 'time_zone_names' => (
 		},
 		'America/Puerto_Rico' => {
 			exemplarCity => q#Portoryko#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#Santa Isabel#,
 		},
 		'America/St_Barthelemy' => {
 			exemplarCity => q#Saint-Barthélemy#,
@@ -12691,9 +12815,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#Czyta#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#Czojbalsan#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#Kolombo#,
@@ -12861,9 +12982,6 @@ has 'time_zone_names' => (
 		'Atlantic/St_Helena' => {
 			exemplarCity => q#Święta Helena#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#Currie#,
-		},
 		'Australia_Central' => {
 			long => {
 				'daylight' => q#czas środkowoaustralijski letni#,
@@ -12966,13 +13084,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Chiny (czas letni)#,
 				'generic' => q#czas Chiny#,
 				'standard' => q#Chiny (czas standardowy)#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Czojbalsan (czas letni)#,
-				'generic' => q#czas Czojbalsan#,
-				'standard' => q#Czojbalsan (czas standardowy)#,
 			},
 		},
 		'Christmas' => {
@@ -13154,9 +13265,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#Uljanowsk#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#Użgorod#,
-		},
 		'Europe/Vatican' => {
 			exemplarCity => q#Watykan#,
 		},
@@ -13174,9 +13282,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#Zagrzeb#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#Zaporoże#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#Zurych#,
@@ -13350,9 +13455,6 @@ has 'time_zone_names' => (
 		'Indian/Mayotte' => {
 			exemplarCity => q#Majotta#,
 		},
-		'Indian/Reunion' => {
-			exemplarCity => q#Réunion#,
-		},
 		'Indian_Ocean' => {
 			long => {
 				'standard' => q#czas Ocean Indyjski#,
@@ -13413,6 +13515,11 @@ has 'time_zone_names' => (
 				'standard' => q#czas standardowy Pietropawłowsk Kamczacki#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#czas Kazachstan#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#czas Kazachstan Wschodni#,
@@ -13459,11 +13566,6 @@ has 'time_zone_names' => (
 				'standard' => q#Lord Howe (czas standardowy)#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#czas Macquarie#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Magadan (czas letni)#,
@@ -13501,13 +13603,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#czas Mawson#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Meksyk Północno-Zachodni (czas letni)#,
-				'generic' => q#czas Meksyk Północno-Zachodni#,
-				'standard' => q#Meksyk Północno-Zachodni (czas standardowy)#,
 			},
 		},
 		'Mexico_Pacific' => {

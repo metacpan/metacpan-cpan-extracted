@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Is - Package for language Icelandic
 
 package Locale::CLDR::Locales::Is;
 # This file auto generated from Data\common\main\is.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -642,6 +642,7 @@ has 'display_name_language' => (
  				'bik' => 'bíkol',
  				'bin' => 'bíní',
  				'bla' => 'siksika',
+ 				'blo' => 'anii',
  				'bm' => 'bambara',
  				'bn' => 'bengalska',
  				'bo' => 'tíbeska',
@@ -864,6 +865,7 @@ has 'display_name_language' => (
  				'kv' => 'komíska',
  				'kw' => 'kornbreska',
  				'kwk' => 'kwakʼwala',
+ 				'kxv' => 'kúví',
  				'ky' => 'kirgiska',
  				'la' => 'latína',
  				'lad' => 'ladínska',
@@ -874,8 +876,10 @@ has 'display_name_language' => (
  				'lez' => 'lesgíska',
  				'lg' => 'ganda',
  				'li' => 'limbúrgíska',
+ 				'lij' => 'lígúríska',
  				'lil' => 'lillooet',
  				'lkt' => 'lakóta',
+ 				'lmo' => 'lombardíska',
  				'ln' => 'lingala',
  				'lo' => 'laó',
  				'lol' => 'mongó',
@@ -1064,6 +1068,7 @@ has 'display_name_language' => (
  				'swb' => 'shimaoríska',
  				'syc' => 'klassísk sýrlenska',
  				'syr' => 'sýrlenska',
+ 				'szl' => 'slesíska',
  				'ta' => 'tamílska',
  				'tce' => 'suður-tutchone',
  				'te' => 'telúgú',
@@ -1112,7 +1117,9 @@ has 'display_name_language' => (
  				'uz' => 'úsbekska',
  				'vai' => 'vaí',
  				've' => 'venda',
+ 				'vec' => 'feneyska',
  				'vi' => 'víetnamska',
+ 				'vmw' => 'makúva',
  				'vo' => 'volapyk',
  				'vot' => 'votíska',
  				'vun' => 'vunjó',
@@ -1126,6 +1133,7 @@ has 'display_name_language' => (
  				'wuu' => 'wu-kínverska',
  				'xal' => 'kalmúkska',
  				'xh' => 'sósa',
+ 				'xnr' => 'kangrí',
  				'xog' => 'sóga',
  				'yao' => 'jaó',
  				'yap' => 'japíska',
@@ -1254,9 +1262,9 @@ has 'display_name_script' => (
  			'Saur' => 'saurashtra',
  			'Shaw' => 'shavíska',
  			'Sinh' => 'sinhala',
- 			'Sund' => 'sundanesíska',
+ 			'Sund' => 'sundanesískt',
  			'Sylo' => 'syloti nagri',
- 			'Syrc' => 'syriakíska',
+ 			'Syrc' => 'syriakískt',
  			'Tale' => 'tai le',
  			'Taml' => 'tamílskt',
  			'Tavt' => 'tai viet',
@@ -1552,7 +1560,7 @@ has 'display_name_region' => (
  			'SV' => 'El Salvador',
  			'SX' => 'Sint Maarten',
  			'SY' => 'Sýrland',
- 			'SZ' => 'Svasíland',
+ 			'SZ' => 'Esvatíní',
  			'TA' => 'Tristan da Cunha',
  			'TC' => 'Turks- og Caicoseyjar',
  			'TD' => 'Tsjad',
@@ -1702,7 +1710,6 @@ has 'display_name_type' => (
  				'phonebook' => q{Símaskráarröðun},
  				'phonetic' => q{Hljóðfræðileg röð},
  				'pinyin' => q{Pinyin-röðun},
- 				'reformed' => q{Endurbætt röð},
  				'search' => q{Almenn leit},
  				'searchjl' => q{Leita eftir upphafssamhljóða í Hangul},
  				'standard' => q{Stöðluð röðun},
@@ -2139,14 +2146,14 @@ has 'units' => (
 						'1' => q(feminine),
 						'name' => q(þyngdarhröðun),
 						'one' => q({0} þyngdarhröðun),
-						'other' => q({0} þyngdarhröðun),
+						'other' => q({0} þyngdarhraðanir),
 					},
 					# Core Unit Identifier
 					'g-force' => {
 						'1' => q(feminine),
 						'name' => q(þyngdarhröðun),
 						'one' => q({0} þyngdarhröðun),
-						'other' => q({0} þyngdarhröðun),
+						'other' => q({0} þyngdarhraðanir),
 					},
 					# Long Unit Identifier
 					'acceleration-meter-per-square-second' => {
@@ -2360,12 +2367,14 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'concentr-milligram-ofglucose-per-deciliter' => {
+						'1' => q(neuter),
 						'name' => q(milligrömm á desílítra),
 						'one' => q({0} milligramm á desílítra),
 						'other' => q({0} milligrömm á desílítra),
 					},
 					# Core Unit Identifier
 					'milligram-ofglucose-per-deciliter' => {
+						'1' => q(neuter),
 						'name' => q(milligrömm á desílítra),
 						'one' => q({0} milligramm á desílítra),
 						'other' => q({0} milligrömm á desílítra),
@@ -2443,6 +2452,20 @@ has 'units' => (
 						'1' => q(neuter),
 						'one' => q({0} permyriad),
 						'other' => q({0} permyriad),
+					},
+					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'1' => q(masculine),
+						'name' => q(hlutar á milljarð),
+						'one' => q({0} hluti á milljarð),
+						'other' => q({0} hlutar á milljarð),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'1' => q(masculine),
+						'name' => q(hlutar á milljarð),
+						'one' => q({0} hluti á milljarð),
+						'other' => q({0} hlutar á milljarð),
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
@@ -2803,6 +2826,22 @@ has 'units' => (
 						'other' => q({0} nanósekúndur),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'1' => q(feminine),
+						'name' => q(nætur),
+						'one' => q({0} nótt),
+						'other' => q({0} nætur),
+						'per' => q({0}/nótt),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'1' => q(feminine),
+						'name' => q(nætur),
+						'one' => q({0} nótt),
+						'other' => q({0} nætur),
+						'per' => q({0}/nótt),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'1' => q(masculine),
 						'name' => q(ársfjórðungar),
@@ -2976,12 +3015,14 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'energy-kilocalorie' => {
+						'1' => q(feminine),
 						'name' => q(kílókaloríur),
 						'one' => q({0} kílókaloría),
 						'other' => q({0} kílókaloríur),
 					},
 					# Core Unit Identifier
 					'kilocalorie' => {
+						'1' => q(feminine),
 						'name' => q(kílókaloríur),
 						'one' => q({0} kílókaloría),
 						'other' => q({0} kílókaloríur),
@@ -3118,13 +3159,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'graphics-dot' => {
-						'name' => q(pixlar),
 						'one' => q({0} pixill),
 						'other' => q({0} pixlar),
 					},
 					# Core Unit Identifier
 					'dot' => {
-						'name' => q(pixlar),
 						'one' => q({0} pixill),
 						'other' => q({0} pixlar),
 					},
@@ -3437,6 +3476,18 @@ has 'units' => (
 						'name' => q(píkómetrar),
 						'one' => q({0} píkómetri),
 						'other' => q({0} píkómetrar),
+					},
+					# Long Unit Identifier
+					'length-point' => {
+						'1' => q(neuter),
+						'one' => q({0} stig),
+						'other' => q({0} stig),
+					},
+					# Core Unit Identifier
+					'point' => {
+						'1' => q(neuter),
+						'one' => q({0} stig),
+						'other' => q({0} stig),
 					},
 					# Long Unit Identifier
 					'length-solar-radius' => {
@@ -3886,14 +3937,16 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'pressure-millimeter-ofhg' => {
+						'1' => q(masculine),
 						'name' => q(millimetrar af kvikasilfri),
-						'one' => q({0} millimetrar af kvikasilfri),
+						'one' => q({0} millimetri af kvikasilfri),
 						'other' => q({0} millimetrar af kvikasilfri),
 					},
 					# Core Unit Identifier
 					'millimeter-ofhg' => {
+						'1' => q(masculine),
 						'name' => q(millimetrar af kvikasilfri),
-						'one' => q({0} millimetrar af kvikasilfri),
+						'one' => q({0} millimetri af kvikasilfri),
 						'other' => q({0} millimetrar af kvikasilfri),
 					},
 					# Long Unit Identifier
@@ -4693,6 +4746,20 @@ has 'units' => (
 					# Core Unit Identifier
 					'month' => {
 						'name' => q(mánuður),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(n.),
+						'one' => q({0} n.),
+						'other' => q({0} n.),
+						'per' => q({0}/n.),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(n.),
+						'one' => q({0} n.),
+						'other' => q({0} n.),
+						'per' => q({0}/n.),
 					},
 					# Long Unit Identifier
 					'duration-week' => {
@@ -5537,6 +5604,20 @@ has 'units' => (
 					# Core Unit Identifier
 					'nanosecond' => {
 						'name' => q(nanósek.),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(næt.),
+						'one' => q({0} nótt),
+						'other' => q({0} næt.),
+						'per' => q({0}/nótt),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(næt.),
+						'one' => q({0} nótt),
+						'other' => q({0} næt.),
+						'per' => q({0}/nótt),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -6910,6 +6991,8 @@ has 'currencies' => (
 		'CLF' => {
 			display_name => {
 				'currency' => q(Chilean Unidades de Fomento),
+				'one' => q(síleskt Unidad de Fomento),
+				'other' => q(síleskt Unidad de Fomento),
 			},
 		},
 		'CLP' => {
@@ -9416,9 +9499,6 @@ has 'time_zone_names' => (
 		'America/Aruba' => {
 			exemplarCity => q#Arúba#,
 		},
-		'America/Asuncion' => {
-			exemplarCity => q#Asunción#,
-		},
 		'America/Bahia_Banderas' => {
 			exemplarCity => q#Bahia Banderas#,
 		},
@@ -9460,9 +9540,6 @@ has 'time_zone_names' => (
 		},
 		'America/Puerto_Rico' => {
 			exemplarCity => q#Púertó Ríkó#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#Santa Isabel#,
 		},
 		'America/St_Barthelemy' => {
 			exemplarCity => q#Sankti Bartólómeusareyjar#,
@@ -9642,6 +9719,9 @@ has 'time_zone_names' => (
 		'Asia/Ulaanbaatar' => {
 			exemplarCity => q#Úlan Bator#,
 		},
+		'Asia/Yerevan' => {
+			exemplarCity => q#Jerevan#,
+		},
 		'Atlantic' => {
 			long => {
 				'daylight' => q#Sumartími á Atlantshafssvæðinu#,
@@ -9672,9 +9752,6 @@ has 'time_zone_names' => (
 		},
 		'Atlantic/St_Helena' => {
 			exemplarCity => q#Sankti Helena#,
-		},
-		'Australia/Currie' => {
-			exemplarCity => q#Currie#,
 		},
 		'Australia_Central' => {
 			long => {
@@ -9778,13 +9855,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Sumartími í Kína#,
 				'generic' => q#Kínatími#,
 				'standard' => q#Staðaltími í Kína#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Sumartími í Choibalsan#,
-				'generic' => q#Tími í Choibalsan#,
-				'standard' => q#Staðaltími í Choibalsan#,
 			},
 		},
 		'Christmas' => {
@@ -10093,9 +10163,6 @@ has 'time_zone_names' => (
 		'Indian/Mauritius' => {
 			exemplarCity => q#Máritíus#,
 		},
-		'Indian/Reunion' => {
-			exemplarCity => q#Réunion#,
-		},
 		'Indian_Ocean' => {
 			long => {
 				'standard' => q#Indlandshafstími#,
@@ -10156,6 +10223,11 @@ has 'time_zone_names' => (
 				'standard' => q#Staðaltími í Petropavlovsk-Kamchatski#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Tími í Kasakstan#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#Tími í Austur-Kasakstan#,
@@ -10202,11 +10274,6 @@ has 'time_zone_names' => (
 				'standard' => q#Staðaltími á Lord Howe-eyju#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Macquarie-eyjartími#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Sumartími í Magadan#,
@@ -10244,13 +10311,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Mawson-tími#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Sumartími í Norðvestur-Mexíkó#,
-				'generic' => q#Tími í Norðvestur-Mexíkó#,
-				'standard' => q#Staðaltími í Norðvestur-Mexíkó#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -10447,9 +10507,9 @@ has 'time_zone_names' => (
 		},
 		'Sakhalin' => {
 			long => {
-				'daylight' => q#Sumartími í Sakhalin#,
-				'generic' => q#Tími í Sakhalin#,
-				'standard' => q#Staðaltími í Sakhalin#,
+				'daylight' => q#Sumartími á Sakhalin#,
+				'generic' => q#Tími á Sakhalin#,
+				'standard' => q#Staðaltími á Sakhalin#,
 			},
 		},
 		'Samara' => {

@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.25, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,15 +26,15 @@ no_index:
 provides:
   Text::Conceal:
     file: lib/Text/Conceal.pm
-    version: '1.03'
+    version: '1.04'
 requires:
-  Text::ANSI::Fold: '2.1301'
+  Text::ANSI::Fold: '2.2702'
   perl: v5.14.0
 resources:
   bugtracker: https://github.com/tecolicom/Text-Conceal/issues
   homepage: https://github.com/tecolicom/Text-Conceal
   repository: https://github.com/tecolicom/Text-Conceal.git
-version: '1.03'
+version: '1.04'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

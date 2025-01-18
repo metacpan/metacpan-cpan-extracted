@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Ta - Package for language Tamil
 
 package Locale::CLDR::Locales::Ta;
 # This file auto generated from Data\common\main\ta.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -500,6 +500,7 @@ has 'display_name_language' => (
  				'bik' => 'பிகோல்',
  				'bin' => 'பினி',
  				'bla' => 'சிக்சிகா',
+ 				'blo' => 'அனீ',
  				'bm' => 'பம்பாரா',
  				'bn' => 'வங்காளம்',
  				'bo' => 'திபெத்தியன்',
@@ -725,6 +726,7 @@ has 'display_name_language' => (
  				'kv' => 'கொமி',
  				'kw' => 'கார்னிஷ்',
  				'kwk' => 'குவாக்வாலா',
+ 				'kxv' => 'குவி',
  				'ky' => 'கிர்கிஸ்',
  				'la' => 'லத்தின்',
  				'lad' => 'லடினோ',
@@ -931,6 +933,7 @@ has 'display_name_language' => (
  				'swb' => 'கொமோரியன்',
  				'syc' => 'பாரம்பரிய சிரியாக்',
  				'syr' => 'சிரியாக்',
+ 				'szl' => 'சிலேசியன்',
  				'ta' => 'தமிழ்',
  				'tce' => 'தெற்கு டட்சோன்',
  				'te' => 'தெலுங்கு',
@@ -979,7 +982,9 @@ has 'display_name_language' => (
  				'uz' => 'உஸ்பெக்',
  				'vai' => 'வை',
  				've' => 'வென்டா',
+ 				'vec' => 'வினிசியன்',
  				'vi' => 'வியட்நாமீஸ்',
+ 				'vmw' => 'மகுவா',
  				'vo' => 'ஒலாபூக்',
  				'vot' => 'வோட்க்',
  				'vun' => 'வுன்ஜோ',
@@ -993,6 +998,7 @@ has 'display_name_language' => (
  				'wuu' => 'வூ சீனம்',
  				'xal' => 'கல்மிக்',
  				'xh' => 'ஹோசா',
+ 				'xnr' => 'காங்கிரி',
  				'xog' => 'சோகா',
  				'yao' => 'யாவ்',
  				'yap' => 'யாபேசே',
@@ -1601,7 +1607,6 @@ has 'display_name_type' => (
  				'phonebook' => q{தொலைபேசி புத்தக வரிசை முறை},
  				'phonetic' => q{ஒலியியல் வரிசைப்படுத்தல் முறை},
  				'pinyin' => q{பின்யின் வரிசை முறை},
- 				'reformed' => q{சீர்திருத்தப்பட்ட வரிசை முறை},
  				'search' => q{பொதுப்படையான தேடல்},
  				'searchjl' => q{ஹங்குல் முதன்மை மெய்யெழுத்தின்படி தேடு},
  				'standard' => q{நிலையான வரிசை முறை},
@@ -2276,6 +2281,18 @@ has 'units' => (
 						'other' => q({0} பெர்மிரியட்),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(பார்ட்ஸ்/பில்லியன்),
+						'one' => q({0} பார்ட்ஸ்/பில்லியன்),
+						'other' => q({0} பார்ட்ஸ்/பில்லியன்),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(பார்ட்ஸ்/பில்லியன்),
+						'one' => q({0} பார்ட்ஸ்/பில்லியன்),
+						'other' => q({0} பார்ட்ஸ்/பில்லியன்),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(லிட்டர்/100கி.மீ),
 						'one' => q({0} லிட்டர்/100கி.மீ),
@@ -2590,6 +2607,20 @@ has 'units' => (
 					'nanosecond' => {
 						'one' => q({0} நானோசெகண்டு),
 						'other' => q({0} நானோசெகண்டுகள்),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(இரவுகள்),
+						'one' => q({0} இரவு),
+						'other' => q({0} இரவுகள்),
+						'per' => q({0}/இரவு),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(இரவுகள்),
+						'one' => q({0} இரவு),
+						'other' => q({0} இரவுகள்),
+						'per' => q({0}/இரவு),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -3702,6 +3733,18 @@ has 'units' => (
 						'other' => q({0} நாட்),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(ஒளிவேகம்),
+						'one' => q({0} ஒளிவேகம்),
+						'other' => q({0} ஒளிவேகம்),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(ஒளிவேகம்),
+						'one' => q({0} ஒளிவேகம்),
+						'other' => q({0} ஒளிவேகம்),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'name' => q(மீட்டர்கள்/விநாடி),
 						'one' => q({0} மீட்டர்/விநாடி),
@@ -4448,6 +4491,18 @@ has 'units' => (
 						'name' => q(‱),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(பா/பி),
+						'one' => q({0} பா/பி),
+						'other' => q({0} பா/பி),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(பா/பி),
+						'one' => q({0} பா/பி),
+						'other' => q({0} பா/பி),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'one' => q({0}லி./100கி.மீ),
 						'other' => q({0}லி./100கி.மீ),
@@ -4718,6 +4773,20 @@ has 'units' => (
 						'name' => q(நா.செ.),
 						'one' => q({0}நா.செ.),
 						'other' => q({0}நா.செ.),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(இரவுகள்),
+						'one' => q({0} இ),
+						'other' => q({0} இ),
+						'per' => q({0}/இரவு),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(இரவுகள்),
+						'one' => q({0} இ),
+						'other' => q({0} இ),
+						'per' => q({0}/இரவு),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -5542,6 +5611,18 @@ has 'units' => (
 					'knot' => {
 						'one' => q({0}நா.),
 						'other' => q({0}நா.),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(ஒளிவேகம்),
+						'one' => q({0}ஒ.வே),
+						'other' => q({0}ஒ.வே),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(ஒளிவேகம்),
+						'one' => q({0}ஒ.வே),
+						'other' => q({0}ஒ.வே),
 					},
 					# Long Unit Identifier
 					'temperature-celsius' => {
@@ -6498,6 +6579,18 @@ has 'units' => (
 						'name' => q(பெர்மிரியட்),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(பார்ட்ஸ்/பில்லியன்),
+						'one' => q({0} பார்ட்ஸ்/பில்லியன்),
+						'other' => q({0} பார்ட்ஸ்/பில்லியன்),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(பார்ட்ஸ்/பில்லியன்),
+						'one' => q({0} பார்ட்ஸ்/பில்லியன்),
+						'other' => q({0} பார்ட்ஸ்/பில்லியன்),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(லி./100கி.மீ),
 						'one' => q({0} லி./100கி.மீ),
@@ -6750,6 +6843,20 @@ has 'units' => (
 						'name' => q(நானோசெகண்டுகள்),
 						'one' => q({0} நா.செ.),
 						'other' => q({0} நா.செ.),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(இரவுகள்),
+						'one' => q({0} இரவு),
+						'other' => q({0} இரவுகள்),
+						'per' => q({0}/இரவு),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(இரவுகள்),
+						'one' => q({0} இரவு),
+						'other' => q({0} இரவுகள்),
+						'per' => q({0}/இரவு),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -7820,6 +7927,18 @@ has 'units' => (
 						'name' => q(நா.),
 						'one' => q({0} நா.),
 						'other' => q({0} நா.),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(ஒளிவேகம்),
+						'one' => q({0} ஒளிவேகம்),
+						'other' => q({0} ஒளிவேகம்),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(ஒளிவேகம்),
+						'one' => q({0} ஒளிவேகம்),
+						'other' => q({0} ஒளிவேகம்),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -10165,12 +10284,24 @@ has 'calendar_quarters' => (
 	default		=> sub { {
 			'gregorian' => {
 				'format' => {
-					abbreviated => {0 => 'காலா.1',
-						1 => 'காலா.2',
-						2 => 'காலா.3',
-						3 => 'காலா.4'
+					abbreviated => {0 => 'கா.1',
+						1 => 'கா.2',
+						2 => 'கா.3',
+						3 => 'கா.4'
 					},
-					wide => {0 => 'ஒன்றாம் காலாண்டு',
+					wide => {0 => 'முதல் காலாண்டு',
+						1 => 'இரண்டாம் காலாண்டு',
+						2 => 'மூன்றாம் காலாண்டு',
+						3 => 'நான்காம் காலாண்டு'
+					},
+				},
+				'stand-alone' => {
+					abbreviated => {0 => 'கா.1',
+						1 => 'கா.2',
+						2 => 'கா.3',
+						3 => 'கா.4'
+					},
+					wide => {0 => 'முதல் காலாண்டு',
 						1 => 'இரண்டாம் காலாண்டு',
 						2 => 'மூன்றாம் காலாண்டு',
 						3 => 'நான்காம் காலாண்டு'
@@ -10579,7 +10710,6 @@ has 'day_periods' => (
 				'abbreviated' => {
 					'afternoon1' => q{மதியம்},
 					'afternoon2' => q{பிற்பகல்},
-					'am' => q{AM},
 					'evening1' => q{மாலை},
 					'evening2' => q{அந்தி மாலை},
 					'midnight' => q{நள்ளிரவு},
@@ -10587,12 +10717,10 @@ has 'day_periods' => (
 					'morning2' => q{காலை},
 					'night1' => q{இரவு},
 					'noon' => q{நண்பகல்},
-					'pm' => q{பிற்பகல்},
 				},
 				'narrow' => {
 					'afternoon1' => q{மதி.},
 					'afternoon2' => q{பிற்.},
-					'am' => q{மு.ப},
 					'evening1' => q{மா.},
 					'evening2' => q{அந்தி மா.},
 					'midnight' => q{நள்.},
@@ -10600,18 +10728,12 @@ has 'day_periods' => (
 					'morning2' => q{கா.},
 					'night1' => q{இர.},
 					'noon' => q{நண்.},
-					'pm' => q{பி.ப},
 				},
 			},
 			'stand-alone' => {
-				'abbreviated' => {
-					'am' => q{முற்பகல்},
-					'pm' => q{பிற்பகல்},
-				},
 				'narrow' => {
 					'afternoon1' => q{மதி.},
 					'afternoon2' => q{பிற்.},
-					'am' => q{மு.ப},
 					'evening1' => q{மா.},
 					'evening2' => q{அந்தி மா.},
 					'midnight' => q{நள்.},
@@ -10619,11 +10741,6 @@ has 'day_periods' => (
 					'morning2' => q{கா.},
 					'night1' => q{இ.},
 					'noon' => q{நண்.},
-					'pm' => q{பி.ப},
-				},
-				'wide' => {
-					'am' => q{முற்பகல்},
-					'pm' => q{பிற்பகல்},
 				},
 			},
 		},
@@ -10729,10 +10846,10 @@ has 'time_formats' => (
 		'generic' => {
 		},
 		'gregorian' => {
-			'full' => q{a h:mm:ss zzzz},
-			'long' => q{a h:mm:ss z},
-			'medium' => q{a h:mm:ss},
-			'short' => q{a h:mm},
+			'full' => q{h:mm:ss a zzzz},
+			'long' => q{h:mm:ss a z},
+			'medium' => q{h:mm:ss a},
+			'short' => q{h:mm a},
 		},
 		'hebrew' => {
 		},
@@ -10795,8 +10912,6 @@ has 'datetime_formats_available_formats' => (
 			EBhm => q{E B h:mm},
 			EBhms => q{E B h:mm:ss},
 			Ed => q{d E},
-			Ehm => q{E a h:mm},
-			Ehms => q{E a h:mm:ss},
 			Gy => q{y G},
 			GyMMM => q{MMM y G},
 			GyMMMEd => q{E, d MMM, y G},
@@ -10808,9 +10923,6 @@ has 'datetime_formats_available_formats' => (
 			MMMd => q{d MMM},
 			MMdd => q{dd-MM},
 			Md => q{d/M},
-			h => q{a h},
-			hm => q{a h:mm},
-			hms => q{a h:mm:ss},
 			y => q{y G},
 			yyyy => q{y G},
 			yyyyM => q{M/y G},
@@ -10831,19 +10943,13 @@ has 'datetime_formats_available_formats' => (
 			EBhm => q{E B h:mm},
 			EBhms => q{E B h:mm:ss},
 			Ed => q{d E},
-			Ehm => q{E a h:mm},
-			Ehms => q{E a h:mm:ss},
 			GyMd => q{d/M/y G},
 			MEd => q{dd-MM, E},
 			MMMMW => q{MMMM W -ஆம் வாரம்},
 			MMMMd => q{d MMMM},
+			MMMd => q{d MMM},
 			MMdd => q{dd-MM},
 			Md => q{d/M},
-			h => q{a h},
-			hm => q{a h:mm},
-			hms => q{a h:mm:ss},
-			hmsv => q{a h:mm:ss v},
-			hmv => q{a h:mm v},
 			yM => q{M/y},
 			yMEd => q{E, d/M/y},
 			yMM => q{MM-y},
@@ -10900,22 +11006,22 @@ has 'datetime_formats_interval' => (
 			},
 			fallback => '{0} – {1}',
 			h => {
-				a => q{a h – a h},
-				h => q{a h–h},
+				a => q{h a – h a},
+				h => q{h–h a},
 			},
 			hm => {
-				a => q{a h:mm – a h:mm},
-				h => q{a h:mm–h:mm},
-				m => q{a h:mm–h:mm},
+				a => q{h:mm a – h:mm a},
+				h => q{h:mm–h:mm a},
+				m => q{h:mm–h:mm a},
 			},
 			hmv => {
-				a => q{a h:mm – a h:mm v},
-				h => q{a h:mm–h:mm v},
-				m => q{a h:mm–h:mm v},
+				a => q{h:mm – h:mm a v},
+				h => q{h:mm–h:mm a v},
+				m => q{h:mm–h:mm a v},
 			},
 			hv => {
-				a => q{a h – a h v},
-				h => q{a h–h v},
+				a => q{h a – h a v},
+				h => q{h–h a v},
 			},
 			y => {
 				y => q{y – y G},
@@ -10991,23 +11097,12 @@ has 'datetime_formats_interval' => (
 				d => q{d/M – d/M},
 			},
 			fallback => '{0} – {1}',
-			h => {
-				a => q{a h – a h},
-				h => q{a h–h},
-			},
-			hm => {
-				a => q{a h:mm – a h:mm},
-				h => q{a h:mm–h:mm},
-				m => q{a h:mm–h:mm},
-			},
 			hmv => {
-				a => q{a h:mm – a h:mm v},
-				h => q{a h:mm – h:mm v},
-				m => q{a h:mm – h:mm v},
+				h => q{h:mm – h:mm a v},
+				m => q{h:mm – h:mm a v},
 			},
 			hv => {
-				a => q{a h – a h v},
-				h => q{a h – h v},
+				h => q{h – h a v},
 			},
 			y => {
 				y => q{y – y},
@@ -11573,9 +11668,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#நியூயார்க்#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#நிபிகான்#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#நோம்#,
 		},
@@ -11596,9 +11688,6 @@ has 'time_zone_names' => (
 		},
 		'America/Panama' => {
 			exemplarCity => q#பனாமா#,
-		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#பாங்னிர்துங்#,
 		},
 		'America/Paramaribo' => {
 			exemplarCity => q#பரமரிபோ#,
@@ -11621,9 +11710,6 @@ has 'time_zone_names' => (
 		'America/Punta_Arenas' => {
 			exemplarCity => q#புன்டா அரீனாஸ்#,
 		},
-		'America/Rainy_River' => {
-			exemplarCity => q#ரெய்னி ரிவர்#,
-		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#ரான்கின் இன்லெட்#,
 		},
@@ -11638,9 +11724,6 @@ has 'time_zone_names' => (
 		},
 		'America/Rio_Branco' => {
 			exemplarCity => q#ரியோ பிரான்கோ#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#சான்டா இசபெல்#,
 		},
 		'America/Santarem' => {
 			exemplarCity => q#சான்டரெம்#,
@@ -11687,9 +11770,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#துலே#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#தண்டர் பே#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#டிஜுவானா#,
 		},
@@ -11710,9 +11790,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#யகுடட்#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#யெல்லோநைஃப்#,
 		},
 		'America_Central' => {
 			long => {
@@ -11887,9 +11964,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#சிடா#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#சோய்பால்சான்#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#கொழும்பு#,
@@ -12129,9 +12203,6 @@ has 'time_zone_names' => (
 		'Australia/Broken_Hill' => {
 			exemplarCity => q#புரோக்கன் ஹில்#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#கியூரி#,
-		},
 		'Australia/Darwin' => {
 			exemplarCity => q#டார்வின்#,
 		},
@@ -12258,13 +12329,6 @@ has 'time_zone_names' => (
 				'daylight' => q#சீன பகலொளி நேரம்#,
 				'generic' => q#சீன நேரம்#,
 				'standard' => q#சீன நிலையான நேரம்#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#சோய்பால்சன் கோடை நேரம்#,
-				'generic' => q#சோய்பால்சன் நேரம்#,
-				'standard' => q#சோய்பால்சன் நிலையான நேரம்#,
 			},
 		},
 		'Christmas' => {
@@ -12489,9 +12553,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#உல்யானோஸ்க்#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#உஷோரோட்#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#வதுஸ்#,
 		},
@@ -12512,9 +12573,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#ஸக்ரெப்#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#ஜபோரோஸியே#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#ஜூரிச்#,
@@ -12747,6 +12805,11 @@ has 'time_zone_names' => (
 				'standard' => q#பெட்ரோபவ்லோவ்ஸ்க் கம்சட்ஸ்கி தர நேரம்#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#கஜகஸ்தான் நேரம்#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#கிழக்கு கஜகஸ்தான் நேரம்#,
@@ -12805,11 +12868,6 @@ has 'time_zone_names' => (
 				'standard' => q#மக்காவ் தர நேரம்#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#மாக்கியூரி தீவு நேரம்#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#மகதன் கோடை நேரம்#,
@@ -12847,13 +12905,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#மாசன் நேரம்#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#வடமேற்கு மெக்ஸிகோ பகலொளி நேரம்#,
-				'generic' => q#வடமேற்கு மெக்ஸிகோ நேரம்#,
-				'standard' => q#வடமேற்கு மெக்ஸிகோ நிலையான நேரம்#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -12995,9 +13046,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Honolulu' => {
 			exemplarCity => q#ஹோனோலூலூ#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#ஜோன்ஸ்டன்#,
 		},
 		'Pacific/Kanton' => {
 			exemplarCity => q#கேன்டன்#,

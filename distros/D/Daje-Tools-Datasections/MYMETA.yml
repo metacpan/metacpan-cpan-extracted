@@ -26,7 +26,7 @@ no_index:
 provides:
   Daje::Tools::Datasections:
     file: lib/Daje/Tools/Datasections.pm
-    version: '0.08'
+    version: '0.09'
 requires:
   Mojo::Base: '0'
   Mojo::Loader: '0'
@@ -34,7 +34,7 @@ resources:
   bugtracker: https://github.com/janeskil1525/Daje-Tools-Datasections/issues
   homepage: https://github.com/janeskil1525/Daje-Tools-Datasections
   repository: https://github.com/janeskil1525/Daje-Tools-Datasections.git
-version: '0.08'
+version: '0.09'
 x_contributors:
   - 'janeskil1525 <janeskil1525@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

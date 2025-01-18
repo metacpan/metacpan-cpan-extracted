@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Tn - Package for language Tswana
 
 package Locale::CLDR::Locales::Tn;
 # This file auto generated from Data\common\main\tn.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -120,13 +120,32 @@ has 'display_name_language' => (
 	},
 );
 
+has 'display_name_script' => (
+	is			=> 'ro',
+	isa			=> CodeRef,
+	init_arg	=> undef,
+	default		=> sub {
+		sub {
+			my %scripts = (
+			'Latn' => 'Selatine',
+
+			);
+			if ( @_ ) {
+				return $scripts{$_[0]};
+			}
+			return \%scripts;
+		}
+	}
+);
+
 has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
 	default		=> sub {
 		{
-			'ZA' => 'Aforika Borwa',
+			'BW' => 'Botswana',
+ 			'ZA' => 'Aforika Borwa',
 
 		}
 	},
@@ -144,6 +163,7 @@ has 'characters' => (
 			auxiliary => qr{[c q v x z]},
 			index => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
 			main => qr{[a b d e ê f g h i j k l m n o ô p r s t u w y]},
+			punctuation => qr{[\- ‐‑ – — , ; \: ! ? . … '‘’ "“” ( ) \[ \] § @ * / \& # † ‡ ′ ″]},
 		};
 	},
 EOT
@@ -187,7 +207,7 @@ has 'number_symbols' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'latn' => {
-			'group' => q( ),
+			'group' => q(’),
 		},
 	} }
 );
@@ -288,7 +308,7 @@ has 'calendar_days' => (
 						sun => 'Tsh'
 					},
 					wide => {
-						mon => 'Mosopulogo',
+						mon => 'Mosupologo',
 						tue => 'Labobedi',
 						wed => 'Laboraro',
 						thu => 'Labone',
@@ -494,6 +514,18 @@ has 'datetime_formats_interval' => (
 	} },
 );
 
+has 'time_zone_names' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default	=> sub { {
+		'GMT' => {
+			long => {
+				'standard' => q#Palogare ya nako ya ngwaga le ngwaga ya Greenwich#,
+			},
+		},
+	 } }
+);
 no Moo;
 
 1;

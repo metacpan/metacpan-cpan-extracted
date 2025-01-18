@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Be::Tarask - Package for language Belarusian
 
 package Locale::CLDR::Locales::Be::Tarask;
 # This file auto generated from Data\common\main\be_TARASK.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -4116,17 +4116,11 @@ has 'time_zone_names' => (
 		'America/Porto_Velho' => {
 			exemplarCity => q#Порту-Вэлью#,
 		},
-		'America/Rainy_River' => {
-			exemplarCity => q#Рэйні-Рывэр#,
-		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#Ранкін-Інлэт#,
 		},
 		'America/Rio_Branco' => {
 			exemplarCity => q#Рыў-Бранку#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#Санта-Ісабэль#,
 		},
 		'America/Santarem' => {
 			exemplarCity => q#Сантарэй#,
@@ -4318,9 +4312,6 @@ has 'time_zone_names' => (
 		'Australia/Broken_Hill' => {
 			exemplarCity => q#Брокэн-Хіл#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#Кэры#,
-		},
 		'Australia/Lord_Howe' => {
 			exemplarCity => q#Лорд-Гаў#,
 		},
@@ -4425,13 +4416,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Летні час Кітаю#,
 				'generic' => q#Час Кітая#,
 				'standard' => q#Змоўчны час Кітаю#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Летні час Чайбалсану#,
-				'generic' => q#Час Чайбалсану#,
-				'standard' => q#Змоўчны час Чайбалсану#,
 			},
 		},
 		'Christmas' => {
@@ -4735,13 +4719,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Час станцыі Мосан#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Паўночна-заходні Мэксыканскі летні час#,
-				'generic' => q#Паўночна-заходні Мэксыканскі час#,
-				'standard' => q#Паўночна-заходні Мэксыканскі змоўчны час#,
 			},
 		},
 		'Mexico_Pacific' => {

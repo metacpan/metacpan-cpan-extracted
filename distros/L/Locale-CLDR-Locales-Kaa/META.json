@@ -1,0 +1,80 @@
+{
+   "abstract" : "Locale::CLDR - Data Package ( Perl localization data for Kara-Kalpak )",
+   "author" : [
+      "John Imrie <john.imrie1@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4234",
+   "keywords" : [
+      "locale",
+      "CLDR",
+      "locale-data-pack"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Locale-CLDR-Locales-Kaa",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0.98",
+            "ok" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : "0.72",
+            "Locale::CLDR" : "v0.46.0",
+            "Moo" : "2",
+            "MooX::ClassAttribute" : "0.011",
+            "Type::Tiny" : "0",
+            "perl" : "v5.12.0",
+            "version" : "0.95"
+         }
+      }
+   },
+   "provides" : {
+      "Locale::CLDR::Locales::Kaa" : {
+         "file" : "lib/Locale/CLDR/Locales/Kaa.pm",
+         "version" : "v0.46.0"
+      },
+      "Locale::CLDR::Locales::Kaa::Cyrl" : {
+         "file" : "lib/Locale/CLDR/Locales/Kaa/Cyrl.pm",
+         "version" : "v0.46.0"
+      },
+      "Locale::CLDR::Locales::Kaa::Cyrl::Uz" : {
+         "file" : "lib/Locale/CLDR/Locales/Kaa/Cyrl/Uz.pm",
+         "version" : "v0.46.0"
+      },
+      "Locale::CLDR::Locales::Kaa::Latn" : {
+         "file" : "lib/Locale/CLDR/Locales/Kaa/Latn.pm",
+         "version" : "v0.46.0"
+      },
+      "Locale::CLDR::Locales::Kaa::Latn::Uz" : {
+         "file" : "lib/Locale/CLDR/Locales/Kaa/Latn/Uz.pm",
+         "version" : "v0.46.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ThePilgrim/perlcldr/issues"
+      },
+      "homepage" : "https://github.com/ThePilgrim/perlcldr",
+      "repository" : {
+         "url" : "https://github.com/ThePilgrim/perlcldr.git"
+      }
+   },
+   "version" : "v0.46.0",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

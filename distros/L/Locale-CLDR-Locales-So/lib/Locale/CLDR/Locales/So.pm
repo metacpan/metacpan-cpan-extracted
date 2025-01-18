@@ -8,18 +8,18 @@ Locale::CLDR::Locales::So - Package for language Somali
 
 package Locale::CLDR::Locales::So;
 # This file auto generated from Data\common\main\so.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -58,7 +58,6 @@ has 'display_name_language' => (
  				'awa' => 'Awa',
  				'ay' => 'U dhashay Aymar',
  				'az' => 'Asarbayjan',
- 				'az@alt=short' => 'Aseeri',
  				'ba' => 'Bashkir',
  				'ban' => 'U dhashay Baline',
  				'bas' => 'Basaa',
@@ -67,10 +66,11 @@ has 'display_name_language' => (
  				'bez' => 'Bena',
  				'bg' => 'Bulgeeriyaan',
  				'bgc' => 'Haryanvi',
- 				'bho' => 'U dhashay Bhohp',
+ 				'bho' => 'Bhojpuri',
  				'bi' => 'U dhashay Bislam',
  				'bin' => 'U dhashay Bin',
  				'bla' => 'Siksiká',
+ 				'blo' => 'Anii',
  				'bm' => 'Bambaara',
  				'bn' => 'Bangladesh',
  				'bo' => 'Tibeetaan',
@@ -138,7 +138,7 @@ has 'display_name_language' => (
  				'eo' => 'Isberaanto',
  				'es' => 'Isbaanish',
  				'es_419' => 'Isbaanishka Laatiin Ameerika',
- 				'es_ES' => 'Isbaanish (Isbayn)',
+ 				'es_ES' => 'Isbaanish Yurub',
  				'es_MX' => 'Isbaanishka Mexico',
  				'et' => 'Istooniyaan',
  				'eu' => 'Basquu',
@@ -246,6 +246,7 @@ has 'display_name_language' => (
  				'kv' => 'Komi',
  				'kw' => 'Kornish',
  				'kwk' => 'Kwakʼwala',
+ 				'kxv' => 'Kufi',
  				'ky' => 'Kirgiis',
  				'la' => 'Laatiin',
  				'lad' => 'Ladino',
@@ -254,8 +255,10 @@ has 'display_name_language' => (
  				'lez' => 'Lezghian',
  				'lg' => 'Gandha',
  				'li' => 'Limburgish',
+ 				'lij' => 'Liguuriyaan',
  				'lil' => 'Lillooet',
  				'lkt' => 'Laakoota',
+ 				'lmo' => 'Lombard',
  				'ln' => 'Lingala',
  				'lo' => 'Lao',
  				'lou' => 'Louisiana Creole',
@@ -272,7 +275,7 @@ has 'display_name_language' => (
  				'lv' => 'Laatfiyaan',
  				'mad' => 'Madurese',
  				'mag' => 'Magahi',
- 				'mai' => 'Dadka Maithili',
+ 				'mai' => 'Maithili',
  				'mak' => 'Makasar',
  				'mas' => 'Masaay',
  				'mdf' => 'Moksha',
@@ -280,7 +283,7 @@ has 'display_name_language' => (
  				'mer' => 'Meeru',
  				'mfe' => 'Moorisayn',
  				'mg' => 'Malagaasi',
- 				'mgh' => 'Makhuwa',
+ 				'mgh' => 'Luuqadda Makhuwa-Meetto',
  				'mgo' => 'Meetaa',
  				'mh' => 'Marshallese',
  				'mi' => 'Maaoori',
@@ -297,7 +300,7 @@ has 'display_name_language' => (
  				'ms' => 'Malaay',
  				'mt' => 'Maltiis',
  				'mua' => 'Miyundhaang',
- 				'mul' => 'Luuqado kala duwan',
+ 				'mul' => 'Luuqaddo badan',
  				'mus' => 'Muscogee',
  				'mwl' => 'Mirandese',
  				'my' => 'Burmese',
@@ -346,12 +349,12 @@ has 'display_name_language' => (
  				'pis' => 'Pijin',
  				'pl' => 'Boolish',
  				'pqm' => 'Maliseet-Passamaquoddy',
- 				'prg' => 'Brashiyaanki Hore',
+ 				'prg' => 'Brashiyaan',
  				'ps' => 'Bashtuu',
  				'pt' => 'Boortaqiis',
  				'pt_BR' => 'Boortaqiiska Baraasiil',
- 				'pt_PT' => 'Boortaqiis (Boortuqaal)',
- 				'qu' => 'Quwejuwa',
+ 				'pt_PT' => 'Boortaqiiska Yurub',
+ 				'qu' => 'Quechua',
  				'raj' => 'Rajasthani',
  				'rap' => 'Rapanui',
  				'rar' => 'Rarotongan',
@@ -366,7 +369,7 @@ has 'display_name_language' => (
  				'rwk' => 'Raawa',
  				'sa' => 'Sanskrit',
  				'sad' => 'Sandawe',
- 				'sah' => 'Saaqa',
+ 				'sah' => 'Yakut',
  				'saq' => 'Sambuuru',
  				'sat' => 'Santali',
  				'sba' => 'Ngambay',
@@ -382,7 +385,7 @@ has 'display_name_language' => (
  				'sh' => 'Serbiyaan',
  				'shi' => 'Shilha',
  				'shn' => 'Shan',
- 				'si' => 'Sinhaleys',
+ 				'si' => 'Sinhala',
  				'sk' => 'Isloofaak',
  				'sl' => 'Islofeeniyaan',
  				'slh' => 'Southern Lushootseed',
@@ -403,7 +406,8 @@ has 'display_name_language' => (
  				'sv' => 'Iswiidhish',
  				'sw' => 'Sawaaxili',
  				'swb' => 'Comorian',
- 				'syr' => 'Syria',
+ 				'syr' => 'Af-Siriyak',
+ 				'szl' => 'Sileshiyaan',
  				'ta' => 'Tamiil',
  				'tce' => 'Southern Tutchone',
  				'te' => 'Teluugu',
@@ -444,7 +448,9 @@ has 'display_name_language' => (
  				'uz' => 'Usbakis',
  				'vai' => 'Faayi',
  				've' => 'Venda',
+ 				'vec' => 'Dadka Fenaays',
  				'vi' => 'Fiitnaamays',
+ 				'vmw' => 'Af-Makhuwa',
  				'vo' => 'Folabuuk',
  				'vun' => 'Fuunjo',
  				'wa' => 'Walloon',
@@ -454,7 +460,8 @@ has 'display_name_language' => (
  				'wo' => 'Woolof',
  				'wuu' => 'Wu Chinese',
  				'xal' => 'Kalmyk',
- 				'xh' => 'Hoosta',
+ 				'xh' => 'Xhosa',
+ 				'xnr' => 'Kangri',
  				'xog' => 'Sooga',
  				'yav' => 'Yaangbeen',
  				'ybb' => 'Yemba',
@@ -463,10 +470,14 @@ has 'display_name_language' => (
  				'yrl' => 'Nheengatu',
  				'yue' => 'Kantoneese',
  				'yue@alt=menu' => 'Shiinays, Cantonese',
+ 				'za' => 'Zhuang',
  				'zgh' => 'Morokaanka Tamasayt Rasmiga',
- 				'zh' => 'Shiinaha Mandarin',
+ 				'zh' => 'Shinees',
+ 				'zh@alt=menu' => 'Af-Shiineeska Mandarin',
  				'zh_Hans' => 'Shiinaha Rasmiga ah',
- 				'zh_Hant' => 'Shiinahii Hore',
+ 				'zh_Hans@alt=long' => 'Shiineeska Mandarin ee Rasmiga ah',
+ 				'zh_Hant' => 'Af-Shiineeska Qadiimiga ah',
+ 				'zh_Hant@alt=long' => 'Af-Shiineeska Mandarin ee Qadiimiga ah',
  				'zu' => 'Zuulu',
  				'zun' => 'Zuni',
  				'zxx' => 'Luuqad Looma Hayo',
@@ -612,7 +623,7 @@ has 'display_name_script' => (
  			'Prti' => 'Qoraalka Parthian',
  			'Qaag' => 'Qoraalka Sawgiga',
  			'Rjng' => 'Dadka Rejan',
- 			'Rohg' => 'Hanifi Rohingya',
+ 			'Rohg' => 'Hanifi',
  			'Runr' => 'Dadka Rejang',
  			'Samr' => 'Dadka Samaritan',
  			'Sarb' => 'Crabiyaankii Hore ee Wuqooyi',
@@ -676,7 +687,7 @@ has 'display_name_region' => (
 	init_arg	=> undef,
 	default		=> sub {
 		{
-			'001' => 'Dunida',
+			'001' => 'dunida',
  			'002' => 'Afrika',
  			'003' => 'Waqooyi Ameerika',
  			'005' => 'Koonfur Ameerika',
@@ -945,7 +956,7 @@ has 'display_name_region' => (
  			'TH' => 'Taylaand',
  			'TJ' => 'Tajikistan',
  			'TK' => 'Tokelaaw',
- 			'TL' => 'Timoor',
+ 			'TL' => 'Timor-Leste',
  			'TL@alt=variant' => 'Bariga Timor',
  			'TM' => 'Turkmenistan',
  			'TN' => 'Tuniisiya',
@@ -962,7 +973,7 @@ has 'display_name_region' => (
  			'US' => 'Maraykanka',
  			'UY' => 'Uruguwaay',
  			'UZ' => 'Usbakistan',
- 			'VA' => 'Faatikaan',
+ 			'VA' => 'Magaalada Faatikaan',
  			'VC' => 'St. Finsent & Girenadiins',
  			'VE' => 'Fenisuweela',
  			'VG' => 'Biritish Farjin Island',
@@ -1102,7 +1113,6 @@ has 'display_name_type' => (
  				'gb2312han' => q{Isku hagaajinta Farta shiineeska},
  				'phonebook' => q{Isku hagaajinta foonbuuga},
  				'pinyin' => q{Isku hagaajinta Pinyin},
- 				'reformed' => q{Isku hagaajinta Reformed},
  				'search' => q{Raadinta Guud},
  				'searchjl' => q{Raadinta Shibanaha Hangul},
  				'standard' => q{Amarka Kala Soocidda Caadiga ah},
@@ -1278,12 +1288,68 @@ has 'units' => (
 						'name' => q(afarta Jiho),
 					},
 					# Long Unit Identifier
+					'1024p1' => {
+						'1' => q(kibi{0}),
+					},
+					# Core Unit Identifier
+					'1024p1' => {
+						'1' => q(kibi{0}),
+					},
+					# Long Unit Identifier
+					'1024p2' => {
+						'1' => q(mebi{0}),
+					},
+					# Core Unit Identifier
+					'1024p2' => {
+						'1' => q(mebi{0}),
+					},
+					# Long Unit Identifier
+					'1024p3' => {
+						'1' => q(gibi{0}),
+					},
+					# Core Unit Identifier
+					'1024p3' => {
+						'1' => q(gibi{0}),
+					},
+					# Long Unit Identifier
+					'1024p4' => {
+						'1' => q(tebi{0}),
+					},
+					# Core Unit Identifier
+					'1024p4' => {
+						'1' => q(tebi{0}),
+					},
+					# Long Unit Identifier
+					'1024p5' => {
+						'1' => q(pebi{0}),
+					},
+					# Core Unit Identifier
+					'1024p5' => {
+						'1' => q(pebi{0}),
+					},
+					# Long Unit Identifier
+					'1024p6' => {
+						'1' => q(exbi{0}),
+					},
+					# Core Unit Identifier
+					'1024p6' => {
+						'1' => q(exbi{0}),
+					},
+					# Long Unit Identifier
+					'1024p7' => {
+						'1' => q(zebi{0}),
+					},
+					# Core Unit Identifier
+					'1024p7' => {
+						'1' => q(zebi{0}),
+					},
+					# Long Unit Identifier
 					'1024p8' => {
-						'1' => q(dheer{0}),
+						'1' => q(yobi{0}),
 					},
 					# Core Unit Identifier
 					'1024p8' => {
-						'1' => q(dheer{0}),
+						'1' => q(yobi{0}),
 					},
 					# Long Unit Identifier
 					'10p-1' => {
@@ -1294,12 +1360,52 @@ has 'units' => (
 						'1' => q(deci{0}),
 					},
 					# Long Unit Identifier
+					'10p-12' => {
+						'1' => q(pico{0}),
+					},
+					# Core Unit Identifier
+					'12' => {
+						'1' => q(pico{0}),
+					},
+					# Long Unit Identifier
+					'10p-15' => {
+						'1' => q(femto{0}),
+					},
+					# Core Unit Identifier
+					'15' => {
+						'1' => q(femto{0}),
+					},
+					# Long Unit Identifier
+					'10p-18' => {
+						'1' => q(atto{0}),
+					},
+					# Core Unit Identifier
+					'18' => {
+						'1' => q(atto{0}),
+					},
+					# Long Unit Identifier
 					'10p-2' => {
 						'1' => q(senti{0}),
 					},
 					# Core Unit Identifier
 					'2' => {
 						'1' => q(senti{0}),
+					},
+					# Long Unit Identifier
+					'10p-21' => {
+						'1' => q(zepto{0}),
+					},
+					# Core Unit Identifier
+					'21' => {
+						'1' => q(zepto{0}),
+					},
+					# Long Unit Identifier
+					'10p-24' => {
+						'1' => q(yocto{0}),
+					},
+					# Core Unit Identifier
+					'24' => {
+						'1' => q(yocto{0}),
 					},
 					# Long Unit Identifier
 					'10p-27' => {
@@ -1310,6 +1416,14 @@ has 'units' => (
 						'1' => q(ronto{0}),
 					},
 					# Long Unit Identifier
+					'10p-3' => {
+						'1' => q(milli{0}),
+					},
+					# Core Unit Identifier
+					'3' => {
+						'1' => q(milli{0}),
+					},
+					# Long Unit Identifier
 					'10p-30' => {
 						'1' => q(quecto{0}),
 					},
@@ -1318,6 +1432,38 @@ has 'units' => (
 						'1' => q(quecto{0}),
 					},
 					# Long Unit Identifier
+					'10p-6' => {
+						'1' => q(mikro{0}),
+					},
+					# Core Unit Identifier
+					'6' => {
+						'1' => q(mikro{0}),
+					},
+					# Long Unit Identifier
+					'10p-9' => {
+						'1' => q(nano{0}),
+					},
+					# Core Unit Identifier
+					'9' => {
+						'1' => q(nano{0}),
+					},
+					# Long Unit Identifier
+					'10p1' => {
+						'1' => q(deka{0}),
+					},
+					# Core Unit Identifier
+					'10p1' => {
+						'1' => q(deka{0}),
+					},
+					# Long Unit Identifier
+					'10p12' => {
+						'1' => q(tera{0}),
+					},
+					# Core Unit Identifier
+					'10p12' => {
+						'1' => q(tera{0}),
+					},
+					# Long Unit Identifier
 					'10p15' => {
 						'1' => q(peta{0}),
 					},
@@ -1332,6 +1478,14 @@ has 'units' => (
 					# Core Unit Identifier
 					'10p18' => {
 						'1' => q(exa{0}),
+					},
+					# Long Unit Identifier
+					'10p2' => {
+						'1' => q(hecto{0}),
+					},
+					# Core Unit Identifier
+					'10p2' => {
+						'1' => q(hecto{0}),
 					},
 					# Long Unit Identifier
 					'10p21' => {
@@ -1358,12 +1512,36 @@ has 'units' => (
 						'1' => q(ronna{0}),
 					},
 					# Long Unit Identifier
+					'10p3' => {
+						'1' => q(kilo{0}),
+					},
+					# Core Unit Identifier
+					'10p3' => {
+						'1' => q(kilo{0}),
+					},
+					# Long Unit Identifier
 					'10p30' => {
 						'1' => q(quetta{0}),
 					},
 					# Core Unit Identifier
 					'10p30' => {
 						'1' => q(quetta{0}),
+					},
+					# Long Unit Identifier
+					'10p6' => {
+						'1' => q(mega{0}),
+					},
+					# Core Unit Identifier
+					'10p6' => {
+						'1' => q(mega{0}),
+					},
+					# Long Unit Identifier
+					'10p9' => {
+						'1' => q(giga{0}),
+					},
+					# Core Unit Identifier
+					'10p9' => {
+						'1' => q(giga{0}),
 					},
 					# Long Unit Identifier
 					'acceleration-g-force' => {
@@ -1628,6 +1806,18 @@ has 'units' => (
 						'other' => q({0} bermiraad),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(qeybaha bilyankiiba),
+						'one' => q({0} qeybaha bilyankiiba),
+						'other' => q({0} qeybaha bilyankiiba),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(qeybaha bilyankiiba),
+						'one' => q({0} qeybaha bilyankiiba),
+						'other' => q({0} qeybaha bilyankiiba),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(litar 100-kii kiilomitirba),
 						'one' => q({0} litar 100-kii kiilomitirba),
@@ -1815,13 +2005,13 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'duration-century' => {
-						'name' => q(qarni),
+						'name' => q(qarniyo),
 						'one' => q({0} qarni),
 						'other' => q({0} qarniyo),
 					},
 					# Core Unit Identifier
 					'century' => {
-						'name' => q(qarni),
+						'name' => q(qarniyo),
 						'one' => q({0} qarni),
 						'other' => q({0} qarniyo),
 					},
@@ -1924,6 +2114,20 @@ has 'units' => (
 						'name' => q(nanoseken),
 						'one' => q({0} nanoseken),
 						'other' => q({0} nanoseken),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(habeeno),
+						'one' => q({0} habeen),
+						'other' => q({0} habeeno),
+						'per' => q({0} halkii habeen),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(habeeno),
+						'one' => q({0} habeen),
+						'other' => q({0} habeeno),
+						'per' => q({0} halkii habeen),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -2272,6 +2476,18 @@ has 'units' => (
 						'other' => q({0} dsimitir),
 					},
 					# Long Unit Identifier
+					'length-fathom' => {
+						'name' => q(fathoms),
+						'one' => q({0} fathom),
+						'other' => q({0} fathoms),
+					},
+					# Core Unit Identifier
+					'fathom' => {
+						'name' => q(fathoms),
+						'one' => q({0} fathom),
+						'other' => q({0} fathoms),
+					},
+					# Long Unit Identifier
 					'length-foot' => {
 						'name' => q(fiit),
 						'one' => q(Fuudh),
@@ -2284,6 +2500,18 @@ has 'units' => (
 						'one' => q(Fuudh),
 						'other' => q({0} fiit),
 						'per' => q({0} fiitkiiba),
+					},
+					# Long Unit Identifier
+					'length-furlong' => {
+						'name' => q(furlongs),
+						'one' => q({0} furlong),
+						'other' => q({0} furlongs),
+					},
+					# Core Unit Identifier
+					'furlong' => {
+						'name' => q(furlongs),
+						'one' => q({0} furlong),
+						'other' => q({0} furlongs),
 					},
 					# Long Unit Identifier
 					'length-inch' => {
@@ -2468,6 +2696,30 @@ has 'units' => (
 						'other' => q({0} yaardi),
 					},
 					# Long Unit Identifier
+					'light-candela' => {
+						'name' => q(candela),
+						'one' => q({0} candela),
+						'other' => q({0} candela),
+					},
+					# Core Unit Identifier
+					'candela' => {
+						'name' => q(candela),
+						'one' => q({0} candela),
+						'other' => q({0} candela),
+					},
+					# Long Unit Identifier
+					'light-lumen' => {
+						'name' => q(lumen),
+						'one' => q({0} lumen),
+						'other' => q({0} lumen),
+					},
+					# Core Unit Identifier
+					'lumen' => {
+						'name' => q(lumen),
+						'one' => q({0} lumen),
+						'other' => q({0} lumen),
+					},
+					# Long Unit Identifier
 					'light-lux' => {
 						'one' => q({0} laks),
 						'other' => q({0} laks),
@@ -2624,6 +2876,18 @@ has 'units' => (
 						'other' => q({0} cufka qorraxda),
 					},
 					# Long Unit Identifier
+					'mass-stone' => {
+						'name' => q(dhagaxo),
+						'one' => q({0} dhagax),
+						'other' => q({0} dhagaxo),
+					},
+					# Core Unit Identifier
+					'stone' => {
+						'name' => q(dhagaxo),
+						'one' => q({0} dhagax),
+						'other' => q({0} dhagaxo),
+					},
+					# Long Unit Identifier
 					'mass-ton' => {
 						'one' => q({0} tan),
 						'other' => q({0} tan),
@@ -2644,6 +2908,14 @@ has 'units' => (
 						'name' => q(metrik tan),
 						'one' => q({0} metrik tan),
 						'other' => q({0} metrik tan),
+					},
+					# Long Unit Identifier
+					'per' => {
+						'1' => q({0} kiiba {1}),
+					},
+					# Core Unit Identifier
+					'per' => {
+						'1' => q({0} kiiba {1}),
 					},
 					# Long Unit Identifier
 					'power-gigawatt' => {
@@ -2868,6 +3140,18 @@ has 'units' => (
 						'name' => q(nott),
 						'one' => q({0} nott),
 						'other' => q({0} nott),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(nal),
+						'one' => q({0} nal),
+						'other' => q({0} nal),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(nal),
+						'one' => q({0} nal),
+						'other' => q({0} nal),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -3338,6 +3622,18 @@ has 'units' => (
 						'other' => q({0}ppm#),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(qb),
+						'one' => q({0}qb),
+						'other' => q({0}qb),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(qb),
+						'one' => q({0}qb),
+						'other' => q({0}qb),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(L/100km),
 						'one' => q({0}L/100km),
@@ -3434,6 +3730,20 @@ has 'units' => (
 						'name' => q(Bil),
 						'one' => q({0}b),
 						'other' => q({0}b),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(habeeno),
+						'one' => q({0}habeen),
+						'other' => q({0}habeeno),
+						'per' => q({0}/habeen),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(habeeno),
+						'one' => q({0}habeen),
+						'other' => q({0}habeeno),
+						'per' => q({0}/habeen),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -3552,6 +3862,22 @@ has 'units' => (
 						'other' => q({0}R⊕),
 					},
 					# Long Unit Identifier
+					'length-fathom' => {
+						'name' => q(fathom),
+					},
+					# Core Unit Identifier
+					'fathom' => {
+						'name' => q(fathom),
+					},
+					# Long Unit Identifier
+					'length-furlong' => {
+						'name' => q(furlong),
+					},
+					# Core Unit Identifier
+					'furlong' => {
+						'name' => q(furlong),
+					},
+					# Long Unit Identifier
 					'length-kilometer' => {
 						'one' => q({0}km),
 						'other' => q({0}km),
@@ -3593,11 +3919,13 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'light-lumen' => {
+						'name' => q(lumen),
 						'one' => q({0}lm),
 						'other' => q({0}lm),
 					},
 					# Core Unit Identifier
 					'lumen' => {
+						'name' => q(lumen),
 						'one' => q({0}lm),
 						'other' => q({0}lm),
 					},
@@ -3632,6 +3960,18 @@ has 'units' => (
 					'kilogram' => {
 						'one' => q({0}kg),
 						'other' => q({0}kg),
+					},
+					# Long Unit Identifier
+					'mass-stone' => {
+						'name' => q(dx),
+						'one' => q({0}dx),
+						'other' => q({0}dx),
+					},
+					# Core Unit Identifier
+					'stone' => {
+						'name' => q(dx),
+						'one' => q({0}dx),
+						'other' => q({0}dx),
 					},
 					# Long Unit Identifier
 					'pressure-inch-ofhg' => {
@@ -3672,6 +4012,28 @@ has 'units' => (
 					# Core Unit Identifier
 					'kilometer-per-hour' => {
 						'name' => q(km/s),
+					},
+					# Long Unit Identifier
+					'speed-knot' => {
+						'one' => q({0}nt),
+						'other' => q({0}nt),
+					},
+					# Core Unit Identifier
+					'knot' => {
+						'one' => q({0}nt),
+						'other' => q({0}nt),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(nal),
+						'one' => q({0}nal),
+						'other' => q({0}nal),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(nal),
+						'one' => q({0}nal),
+						'other' => q({0}nal),
 					},
 					# Long Unit Identifier
 					'temperature-celsius' => {
@@ -4034,6 +4396,18 @@ has 'units' => (
 						'name' => q(bermiraad),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(qeybaha/bilyan),
+						'one' => q({0} qb),
+						'other' => q({0} qb),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(qeybaha/bilyan),
+						'one' => q({0} qb),
+						'other' => q({0} qb),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(L/100 km),
 						'one' => q({0} L/100 km),
@@ -4270,6 +4644,20 @@ has 'units' => (
 					# Core Unit Identifier
 					'nanosecond' => {
 						'name' => q(nanosek),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(habeeno),
+						'one' => q({0} habeen),
+						'other' => q({0} habeeno),
+						'per' => q({0}/habeen),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(habeeno),
+						'one' => q({0} habeen),
+						'other' => q({0} habeeno),
+						'per' => q({0}/habeen),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -4518,6 +4906,22 @@ has 'units' => (
 						'other' => q({0}dm),
 					},
 					# Long Unit Identifier
+					'length-fathom' => {
+						'name' => q(fathoms),
+					},
+					# Core Unit Identifier
+					'fathom' => {
+						'name' => q(fathoms),
+					},
+					# Long Unit Identifier
+					'length-furlong' => {
+						'name' => q(furlongs),
+					},
+					# Core Unit Identifier
+					'furlong' => {
+						'name' => q(furlongs),
+					},
+					# Long Unit Identifier
 					'length-inch' => {
 						'name' => q(injis),
 					},
@@ -4642,6 +5046,22 @@ has 'units' => (
 						'name' => q(yaardi),
 					},
 					# Long Unit Identifier
+					'light-candela' => {
+						'name' => q(candela),
+					},
+					# Core Unit Identifier
+					'candela' => {
+						'name' => q(candela),
+					},
+					# Long Unit Identifier
+					'light-lumen' => {
+						'name' => q(lumen),
+					},
+					# Core Unit Identifier
+					'lumen' => {
+						'name' => q(lumen),
+					},
+					# Long Unit Identifier
 					'light-lux' => {
 						'name' => q(laks),
 					},
@@ -4748,6 +5168,18 @@ has 'units' => (
 						'name' => q(xufka qorraxda),
 						'one' => q({0} CQ),
 						'other' => q({0} CQ),
+					},
+					# Long Unit Identifier
+					'mass-stone' => {
+						'name' => q(dhagaxo),
+						'one' => q({0} dx),
+						'other' => q({0} dx),
+					},
+					# Core Unit Identifier
+					'stone' => {
+						'name' => q(dhagaxo),
+						'one' => q({0} dx),
+						'other' => q({0} dx),
 					},
 					# Long Unit Identifier
 					'mass-ton' => {
@@ -4860,6 +5292,18 @@ has 'units' => (
 						'name' => q(nt),
 						'one' => q({0} nt),
 						'other' => q({0} nt),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(nal),
+						'one' => q({0} nal),
+						'other' => q({0} nal),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(nal),
+						'one' => q({0} nal),
+						'other' => q({0} nal),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -6576,18 +7020,18 @@ has 'calendar_months' => (
 					},
 					wide => {
 						nonleap => [
-							'Bisha Koobaad',
-							'Bisha Labaad',
-							'Bisha Saddexaad',
-							'Bisha Afraad',
-							'Bisha Shanaad',
-							'Bisha Lixaad',
-							'Bisha Todobaad',
-							'Bisha Sideedaad',
-							'Bisha Sagaalaad',
-							'Bisha Tobnaad',
-							'Bisha Kow iyo Tobnaad',
-							'Bisha Laba iyo Tobnaad'
+							'Janaayo',
+							'Febraayo',
+							'Maarso',
+							'Abriil',
+							'Maayo',
+							'Juun',
+							'Luulyo',
+							'Agosto',
+							'Sebtembar',
+							'Oktoobar',
+							'Noofeembar',
+							'Diseembar'
 						],
 						leap => [
 							
@@ -6620,9 +7064,9 @@ has 'calendar_months' => (
 							'Febraayo',
 							'Maarso',
 							'Abriil',
-							'May',
+							'Maayo',
 							'Juun',
-							'Luuliyo',
+							'Luulyo',
 							'Ogosto',
 							'Sebteembar',
 							'Oktoobar',
@@ -6779,15 +7223,6 @@ has 'calendar_days' => (
 						sat => 'S',
 						sun => 'A'
 					},
-					short => {
-						mon => 'Isn',
-						tue => 'Tldo',
-						wed => 'Arbaco',
-						thu => 'Khms',
-						fri => 'Jmc',
-						sat => 'Sbti',
-						sun => 'Axd'
-					},
 				},
 			},
 	} },
@@ -6832,8 +7267,8 @@ has 'day_periods' => (
 				},
 			},
 			'stand-alone' => {
-				'abbreviated' => {
-					'am' => q{AM},
+				'narrow' => {
+					'am' => q{GH},
 					'pm' => q{GD},
 				},
 				'wide' => {
@@ -8020,9 +8455,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#Niyuu Yook#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#Nibiigoon#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#Noom#,
 		},
@@ -8041,9 +8473,6 @@ has 'time_zone_names' => (
 		'America/Panama' => {
 			exemplarCity => q#Banaama#,
 		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#Bangnirtuung#,
-		},
 		'America/Phoenix' => {
 			exemplarCity => q#Foonikis#,
 		},
@@ -8058,9 +8487,6 @@ has 'time_zone_names' => (
 		},
 		'America/Punta_Arenas' => {
 			exemplarCity => q#Bunta Arinaas#,
-		},
-		'America/Rainy_River' => {
-			exemplarCity => q#Reyni Rifer#,
 		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#Raankin Inleet#,
@@ -8122,9 +8548,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#Tuul#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#Tanda Baay#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#Tijuwaana#,
 		},
@@ -8142,9 +8565,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#Yakutaat#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#Yelowneyf#,
 		},
 		'America_Central' => {
 			long => {
@@ -8304,9 +8724,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#Jiita#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#Joybalsan#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#Kolombo#,
@@ -8504,9 +8921,6 @@ has 'time_zone_names' => (
 		'Australia/Broken_Hill' => {
 			exemplarCity => q#Boroken Hil#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#Kuriy#,
-		},
 		'Australia/Eucla' => {
 			exemplarCity => q#Yukla#,
 		},
@@ -8627,13 +9041,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Waqtiga Dharaarta ee Shiinaha#,
 				'generic' => q#Waqtiga Shiinaha#,
 				'standard' => q#Waqtiga Caadiga Ah ee Shiinaha#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Waqtiga Xagaaga ee Joybalsan#,
-				'generic' => q#Waqtiga Joybalsan#,
-				'standard' => q#Waqtiga Caadiga Ah ee Joybalsan#,
 			},
 		},
 		'Christmas' => {
@@ -8843,9 +9250,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#Ulyanofisk#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#Usgorod#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#Faduus#,
 		},
@@ -8863,9 +9267,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#Saqrib#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#Saborosey#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#Suurikh#,
@@ -9092,6 +9493,11 @@ has 'time_zone_names' => (
 				'standard' => q#Wakhtiga Caadiga ah ee Petropavlovsk-Kamchatski#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Wakhtiga Kazakhistan#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#Waqtiga Bariga Kasakhistaan#,
@@ -9138,11 +9544,6 @@ has 'time_zone_names' => (
 				'standard' => q#Waqtiga Caadiga Ah ee Lod How#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Waqtiga Makquwariy Aylaan#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Waqtiga Xagaaga ee Magedan#,
@@ -9180,13 +9581,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Waqtiga Mawson#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Waqtiga Dharaarta ee Waqooyi-Galbeed Meksiko#,
-				'generic' => q#Waqtiga Waqooyi-Galbeed Meksiko#,
-				'standard' => q#Waqtiga Caadiga Ah ee Waqooyi-Galbeed Meksiko#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -9311,9 +9705,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Guam' => {
 			exemplarCity => q#Guwam#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#Joonston#,
 		},
 		'Pacific/Kanton' => {
 			exemplarCity => q#Kantoon#,

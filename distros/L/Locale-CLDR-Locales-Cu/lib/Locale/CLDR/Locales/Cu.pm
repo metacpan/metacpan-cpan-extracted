@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Cu - Package for language Church Slavic
 
 package Locale::CLDR::Locales::Cu;
 # This file auto generated from Data\common\main\cu.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -809,14 +809,8 @@ has 'time_zone_names' => (
 		'Europe/Simferopol' => {
 			exemplarCity => q#сѷмферꙋ́поль#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#ᲂу҆́жградъ#,
-		},
 		'Europe/Volgograd' => {
 			exemplarCity => q#волгогра́дъ#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#запра́жїе#,
 		},
 		'Europe_Central' => {
 			long => {

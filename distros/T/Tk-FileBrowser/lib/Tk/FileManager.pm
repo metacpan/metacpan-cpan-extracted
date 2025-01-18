@@ -9,7 +9,7 @@ Tk::FileManager - Tk::FileBrowser based filemanager
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = 0.06;
+$VERSION = 0.09;
 
 use base qw(Tk::Derived Tk::FileBrowser);
 Construct Tk::Widget 'FileManager';
@@ -106,6 +106,7 @@ sub Populate {
 
 	my $deldialog = $self->YADialog(
 		-buttons => ['Ok', 'Cancel'],
+		-defaultbutton => 'Ok',
 	);
 	my @padding = (-padx => 2, -pady => 2);
 	my $df = $deldialog->Frame->pack(-fill => 'x');
@@ -316,7 +317,7 @@ sub popDialog {
 			$args{'-image'} = $image;
 		}
 	}
-	my $dialog = $self->YAMessage(%args);
+	my $dialog = $self->YAMessage(-justify => 'left', %args);
 	my $button = $dialog->Show(-popover => $self->toplevel);
 	$dialog->destroy;
 	return $button

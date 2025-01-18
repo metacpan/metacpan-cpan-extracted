@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Tr - Package for language Turkish
 
 package Locale::CLDR::Locales::Tr;
 # This file auto generated from Data\common\main\tr.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -559,6 +559,7 @@ has 'display_name_language' => (
  				'bjn' => 'Banjar Dili',
  				'bkm' => 'Kom',
  				'bla' => 'Karaayak dili',
+ 				'blo' => 'Aniice',
  				'bm' => 'Bambara',
  				'bn' => 'Bengalce',
  				'bo' => 'Tibetçe',
@@ -701,7 +702,6 @@ has 'display_name_language' => (
  				'gmh' => 'Ortaçağ Yüksek Almancası',
  				'gn' => 'Guarani dili',
  				'goh' => 'Eski Yüksek Almanca',
- 				'gom' => 'Goa Konkanicesi',
  				'gon' => 'Gondi dili',
  				'gor' => 'Gorontalo dili',
  				'got' => 'Gotça',
@@ -812,6 +812,7 @@ has 'display_name_language' => (
  				'kv' => 'Komi',
  				'kw' => 'Kernevekçe',
  				'kwk' => 'Kwakʼwala dili',
+ 				'kxv' => 'Kuvi',
  				'ky' => 'Kırgızca',
  				'la' => 'Latince',
  				'lad' => 'Ladino',
@@ -1108,6 +1109,7 @@ has 'display_name_language' => (
  				'vi' => 'Vietnamca',
  				'vls' => 'Batı Flamanca',
  				'vmf' => 'Main Frankonya Dili',
+ 				'vmw' => 'Makuaca',
  				'vo' => 'Volapük',
  				'vot' => 'Votça',
  				'vro' => 'Võro',
@@ -1123,6 +1125,7 @@ has 'display_name_language' => (
  				'xal' => 'Kalmıkça',
  				'xh' => 'Zosa dili',
  				'xmf' => 'Megrelce',
+ 				'xnr' => 'Kangrice',
  				'xog' => 'Soga',
  				'yao' => 'Yao',
  				'yap' => 'Yapça',
@@ -1189,7 +1192,6 @@ has 'display_name_script' => (
  			'Cakm' => 'Chakma',
  			'Cans' => 'UCAS',
  			'Cari' => 'Karya',
- 			'Cham' => 'Cham',
  			'Cher' => 'Çeroki',
  			'Cirt' => 'Cirth',
  			'Copt' => 'Kıpti',
@@ -1228,7 +1230,6 @@ has 'display_name_script' => (
  			'Hung' => 'Eski Macar',
  			'Inds' => 'Indus',
  			'Ital' => 'Eski İtalyan',
- 			'Jamo' => 'Jamo',
  			'Java' => 'Cava Dili',
  			'Jpan' => 'Japon',
  			'Jurc' => 'Jurchen',
@@ -1262,7 +1263,6 @@ has 'display_name_script' => (
  			'Merc' => 'Meroitik El Yazısı',
  			'Mero' => 'Meroitik',
  			'Mlym' => 'Malayalam',
- 			'Modi' => 'Modi',
  			'Mong' => 'Moğol',
  			'Moon' => 'Moon',
  			'Mroo' => 'Mro',
@@ -1801,7 +1801,6 @@ has 'display_name_type' => (
  				'phonebook' => q{Telefon Defteri Sıralama Düzeni},
  				'phonetic' => q{Fonetik Sıralama Düzeni},
  				'pinyin' => q{Pinyin Sıralama Düzeni},
- 				'reformed' => q{Yeni Sıralama Düzeni},
  				'search' => q{Genel Amaçlı Arama},
  				'searchjl' => q{Hangul İlk Sessiz Harfe Göre Arama},
  				'standard' => q{Standart Sıralama Düzeni},
@@ -2515,6 +2514,18 @@ has 'units' => (
 						'other' => q(onbinde {0}),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(parça/milyar),
+						'one' => q({0} parça/milyar),
+						'other' => q({0} parça/milyar),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(parça/milyar),
+						'one' => q({0} parça/milyar),
+						'other' => q({0} parça/milyar),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(litre/100 kilometre),
 						'one' => q({0} litre/100 kilometre),
@@ -2751,6 +2762,20 @@ has 'units' => (
 					'nanosecond' => {
 						'one' => q({0} nanosaniye),
 						'other' => q({0} nanosaniye),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(gece),
+						'one' => q({0} gece),
+						'other' => q({0} gece),
+						'per' => q({0}/gece),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(gece),
+						'one' => q({0} gece),
+						'other' => q({0} gece),
+						'per' => q({0}/gece),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -3731,6 +3756,18 @@ has 'units' => (
 						'other' => q({0} knot),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(ışık),
+						'one' => q({0} ışık),
+						'other' => q({0} ışık),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(ışık),
+						'one' => q({0} ışık),
+						'other' => q({0} ışık),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'name' => q(metre/saniye),
 						'one' => q({0} metre/saniye),
@@ -4261,6 +4298,20 @@ has 'units' => (
 						'name' => q(nsn),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(gece),
+						'one' => q({0} gece),
+						'other' => q({0} gece),
+						'per' => q({0}/gece),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(gece),
+						'one' => q({0} gece),
+						'other' => q({0} gece),
+						'per' => q({0}/gece),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'name' => q(çey.),
 						'per' => q({0}/çey.),
@@ -4443,6 +4494,18 @@ has 'units' => (
 					'millibar' => {
 						'one' => q({0} mb),
 						'other' => q({0} mb),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(ışık),
+						'one' => q({0} ışık),
+						'other' => q({0} ışık),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(ışık),
+						'one' => q({0} ışık),
+						'other' => q({0} ışık),
 					},
 					# Long Unit Identifier
 					'speed-mile-per-hour' => {
@@ -4725,6 +4788,14 @@ has 'units' => (
 						'other' => q(‱{0}),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(parça/milyar),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(parça/milyar),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(l/100 km),
 						'one' => q({0} l/100 km),
@@ -4945,6 +5016,20 @@ has 'units' => (
 						'name' => q(nanosaniye),
 						'one' => q({0} nsn),
 						'other' => q({0} nsn),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(gece),
+						'one' => q({0} gece),
+						'other' => q({0} gece),
+						'per' => q({0}/gece),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(gece),
+						'one' => q({0} gece),
+						'other' => q({0} gece),
+						'per' => q({0}/gece),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -5415,6 +5500,18 @@ has 'units' => (
 						'name' => q(km/sa),
 						'one' => q({0} km/sa),
 						'other' => q({0} km/sa),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(ışık),
+						'one' => q({0} ışık),
+						'other' => q({0} ışık),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(ışık),
+						'one' => q({0} ışık),
+						'other' => q({0} ışık),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -8411,7 +8508,7 @@ has 'datetime_formats_available_formats' => (
 			GyMMM => q{G MMM y},
 			GyMMMEd => q{G d MMM y E},
 			GyMMMd => q{G d MMM y},
-			GyMd => q{d/M/y GGGGG},
+			GyMd => q{GGGGG dd.MM.y},
 			MEd => q{d/MM E},
 			MMMEd => q{d MMM E},
 			MMMMEd => q{d MMMM E},
@@ -8799,9 +8896,6 @@ has 'time_zone_names' => (
 				'standard' => q#Amazon Standart Saati#,
 			},
 		},
-		'America/Asuncion' => {
-			exemplarCity => q#Asunción#,
-		},
 		'America/Bahia_Banderas' => {
 			exemplarCity => q#Bahia Banderas#,
 		},
@@ -8810,9 +8904,6 @@ has 'time_zone_names' => (
 		},
 		'America/Costa_Rica' => {
 			exemplarCity => q#Kosta Rika#,
-		},
-		'America/Curacao' => {
-			exemplarCity => q#Curaçao#,
 		},
 		'America/Dominica' => {
 			exemplarCity => q#Dominika#,
@@ -8834,9 +8925,6 @@ has 'time_zone_names' => (
 		},
 		'America/Puerto_Rico' => {
 			exemplarCity => q#Porto Riko#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#Santa Isabel#,
 		},
 		'America/St_Barthelemy' => {
 			exemplarCity => q#Saint Barthelemy#,
@@ -8967,9 +9055,6 @@ has 'time_zone_names' => (
 		'Asia/Chita' => {
 			exemplarCity => q#Çita#,
 		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#Çoybalsan#,
-		},
 		'Asia/Colombo' => {
 			exemplarCity => q#Kolombo#,
 		},
@@ -9097,9 +9182,6 @@ has 'time_zone_names' => (
 		'Atlantic/South_Georgia' => {
 			exemplarCity => q#Güney Georgia#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#Currie#,
-		},
 		'Australia/Sydney' => {
 			exemplarCity => q#Sidney#,
 		},
@@ -9210,13 +9292,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Çin Yaz Saati#,
 				'generic' => q#Çin Saati#,
 				'standard' => q#Çin Standart Saati#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Çoybalsan Yaz Saati#,
-				'generic' => q#Çoybalsan Saati#,
-				'standard' => q#Çoybalsan Standart Saati#,
 			},
 		},
 		'Christmas' => {
@@ -9368,9 +9443,6 @@ has 'time_zone_names' => (
 		'Europe/Tirane' => {
 			exemplarCity => q#Tiran#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#Ujgorod#,
-		},
 		'Europe/Vatican' => {
 			exemplarCity => q#Vatikan#,
 		},
@@ -9379,9 +9451,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Warsaw' => {
 			exemplarCity => q#Varşova#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#Zaporojye#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#Zürih#,
@@ -9584,6 +9653,11 @@ has 'time_zone_names' => (
 				'standard' => q#Petropavlovsk-Kamçatski Standart Saati#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Kazakistan Saati#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#Doğu Kazakistan Saati#,
@@ -9642,11 +9716,6 @@ has 'time_zone_names' => (
 				'standard' => q#Makao Standart Saati#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Macquarie Adası Saati#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Magadan Yaz Saati#,
@@ -9684,13 +9753,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Mawson Saati#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Kuzeybatı Meksika Yaz Saati#,
-				'generic' => q#Kuzeybatı Meksika Saati#,
-				'standard' => q#Kuzeybatı Meksika Standart Saati#,
 			},
 		},
 		'Mexico_Pacific' => {

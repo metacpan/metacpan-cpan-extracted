@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Af - Package for language Afrikaans
 
 package Locale::CLDR::Locales::Af;
 # This file auto generated from Data\common\main\af.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -527,6 +527,7 @@ has 'display_name_language' => (
  				'bi' => 'Bislama',
  				'bin' => 'Bini',
  				'bla' => 'Siksika',
+ 				'blo' => 'Anii',
  				'bm' => 'Bambara',
  				'bn' => 'Bengaals',
  				'bo' => 'Tibettaans',
@@ -573,7 +574,7 @@ has 'display_name_language' => (
  				'dgr' => 'Dogrib',
  				'dje' => 'Zarma',
  				'doi' => 'Dogri',
- 				'dsb' => 'Benedesorbies',
+ 				'dsb' => 'Nedersorbies',
  				'dua' => 'Duala',
  				'dv' => 'Divehi',
  				'dyo' => 'Jola-Fonyi',
@@ -630,6 +631,7 @@ has 'display_name_language' => (
  				'hax' => 'Suid-Haida',
  				'he' => 'Hebreeus',
  				'hi' => 'Hindi',
+ 				'hi_Latn@alt=variant' => 'Hingels',
  				'hil' => 'Hiligaynon',
  				'hit' => 'Hetities',
  				'hmn' => 'Hmong',
@@ -692,7 +694,7 @@ has 'display_name_language' => (
  				'krc' => 'Karachay-Balkar',
  				'krl' => 'Karelies',
  				'kru' => 'Kurukh',
- 				'ks' => 'Kasjmirs',
+ 				'ks' => 'Kasjmiri',
  				'ksb' => 'Shambala',
  				'ksf' => 'Bafia',
  				'ksh' => 'Keuls',
@@ -701,6 +703,7 @@ has 'display_name_language' => (
  				'kv' => 'Komi',
  				'kw' => 'Kornies',
  				'kwk' => 'Kwak’wala',
+ 				'kxv' => 'Kuvi',
  				'ky' => 'Kirgisies',
  				'la' => 'Latyn',
  				'lad' => 'Ladino',
@@ -709,8 +712,10 @@ has 'display_name_language' => (
  				'lez' => 'Lezghies',
  				'lg' => 'Ganda',
  				'li' => 'Limburgs',
+ 				'lij' => 'Liguries',
  				'lil' => 'Lillooet',
  				'lkt' => 'Lakota',
+ 				'lmo' => 'Lombardies',
  				'ln' => 'Lingaals',
  				'lo' => 'Lao',
  				'lou' => 'Louisiana Kreool',
@@ -823,7 +828,7 @@ has 'display_name_language' => (
  				'rwk' => 'Rwa',
  				'sa' => 'Sanskrit',
  				'sad' => 'Sandawees',
- 				'sah' => 'Sakhaans',
+ 				'sah' => 'Jakoeties',
  				'saq' => 'Samburu',
  				'sat' => 'Santalies',
  				'sba' => 'Ngambay',
@@ -865,6 +870,7 @@ has 'display_name_language' => (
  				'sw' => 'Swahili',
  				'swb' => 'Comoraans',
  				'syr' => 'Siries',
+ 				'szl' => 'Silesies',
  				'ta' => 'Tamil',
  				'tce' => 'Suid-Tutchone',
  				'te' => 'Teloegoe',
@@ -875,7 +881,7 @@ has 'display_name_language' => (
  				'tgx' => 'Tagish',
  				'th' => 'Thai',
  				'tht' => 'Tahltan',
- 				'ti' => 'Tigrinya',
+ 				'ti' => 'Tigrinja',
  				'tig' => 'Tigre',
  				'tk' => 'Turkmeens',
  				'tlh' => 'Klingon',
@@ -902,10 +908,12 @@ has 'display_name_language' => (
  				'umb' => 'Umbundu',
  				'und' => 'Onbekende taal',
  				'ur' => 'Oerdoe',
- 				'uz' => 'Oezbeeks',
+ 				'uz' => 'Oesbekies',
  				'vai' => 'Vai',
  				've' => 'Venda',
+ 				'vec' => 'Venesiaans',
  				'vi' => 'Viëtnamees',
+ 				'vmw' => 'Makhuwa',
  				'vo' => 'Volapük',
  				'vun' => 'Vunjo',
  				'wa' => 'Walloon',
@@ -917,18 +925,20 @@ has 'display_name_language' => (
  				'wuu' => 'Wu-Sjinees',
  				'xal' => 'Kalmyk',
  				'xh' => 'Xhosa',
+ 				'xnr' => 'Kangri',
  				'xog' => 'Soga',
  				'yav' => 'Yangben',
  				'ybb' => 'Yemba',
  				'yi' => 'Jiddisj',
- 				'yo' => 'Yoruba',
+ 				'yo' => 'Joroeba',
  				'yrl' => 'Nheengatu',
  				'yue' => 'Kantonees',
  				'yue@alt=menu' => 'Kantonese Chinees',
+ 				'za' => 'Zhuang',
  				'zgh' => 'Standaard Marokkaanse Tamazight',
  				'zh' => 'Chinees',
  				'zh@alt=menu' => 'Mandarynse Chinees',
- 				'zh_Hans@alt=long' => 'Mandarynse Chinees (Vereenvoudigd)',
+ 				'zh_Hans@alt=long' => 'Mandarynse Chinees (Vereenvoudig)',
  				'zh_Hant@alt=long' => 'Mandarynse Chinees (Tradisioneel)',
  				'zu' => 'Zoeloe',
  				'zun' => 'Zuni',
@@ -963,7 +973,7 @@ has 'display_name_script' => (
  			'Cans' => 'Verenigde Kanadese Inheemse Lettergreepskrif',
  			'Cher' => 'Cherokee',
  			'Copt' => 'Koptieses',
- 			'Cyrl' => 'Sirillies',
+ 			'Cyrl' => 'Cyrillies',
  			'Cyrs' => 'Ou Kerkslawiese Sirillieses',
  			'Deva' => 'Devanagari',
  			'Egyp' => 'Egiptieses hiërogliewe',
@@ -971,7 +981,7 @@ has 'display_name_script' => (
  			'Geor' => 'Georgies',
  			'Goth' => 'Gotieses',
  			'Grek' => 'Grieks',
- 			'Gujr' => 'Gudjarati',
+ 			'Gujr' => 'Goedjarati',
  			'Guru' => 'Gurmukhi',
  			'Hanb' => 'Han met Bopomofo',
  			'Hang' => 'Hangul',
@@ -983,7 +993,6 @@ has 'display_name_script' => (
  			'Hebr' => 'Hebreeus',
  			'Hira' => 'Hiragana',
  			'Hrkt' => 'Japannese lettergreepskrif',
- 			'Jamo' => 'Jamo',
  			'Jpan' => 'Japannees',
  			'Kana' => 'Katakana',
  			'Khmr' => 'Khmer',
@@ -1007,7 +1016,6 @@ has 'display_name_script' => (
  			'Telu' => 'Teloegoe',
  			'Tfng' => 'Tifinagh',
  			'Thaa' => 'Thaana',
- 			'Thai' => 'Thai',
  			'Tibt' => 'Tibettaans',
  			'Ugar' => 'Ugaritieses',
  			'Vaii' => 'Vai',
@@ -1017,7 +1025,7 @@ has 'display_name_script' => (
  			'Zsye' => 'Emoji',
  			'Zsym' => 'Simbole',
  			'Zxxx' => 'Ongeskrewe',
- 			'Zyyy' => 'Gemeenskaplik',
+ 			'Zyyy' => 'Algemeen',
  			'Zzzz' => 'Onbekende skryfstelsel',
 
 			);
@@ -1035,7 +1043,7 @@ has 'display_name_region' => (
 	init_arg	=> undef,
 	default		=> sub {
 		{
-			'001' => 'Wêreld',
+			'001' => 'wêreld',
  			'002' => 'Afrika',
  			'003' => 'Noord-Amerika',
  			'005' => 'Suid-Amerika',
@@ -1109,8 +1117,8 @@ has 'display_name_region' => (
  			'CD' => 'Demokratiese Republiek van die Kongo',
  			'CD@alt=variant' => 'Kongo (DRK)',
  			'CF' => 'Sentraal-Afrikaanse Republiek',
- 			'CG' => 'Kongo - Brazzaville',
- 			'CG@alt=variant' => 'Kongo (Republiek die)',
+ 			'CG' => 'Kongo-Brazzaville',
+ 			'CG@alt=variant' => 'Kongo (Republiek)',
  			'CH' => 'Switserland',
  			'CI' => 'Ivoorkus',
  			'CK' => 'Cookeilande',
@@ -1442,7 +1450,6 @@ has 'display_name_type' => (
  				'phonebook' => q{Foonboek-sorteervolgorde},
  				'phonetic' => q{Fonetiese sorteerorde},
  				'pinyin' => q{Pinyin-sorteervolgorde},
- 				'reformed' => q{Gereformeerde sorteervolgorde},
  				'search' => q{Algemenedoel-soektog},
  				'searchjl' => q{Soek volgens Hangul-beginkonsonant},
  				'standard' => q{Standaard rangskikvolgorde},
@@ -1506,11 +1513,11 @@ has 'display_name_type' => (
  				'greklow' => q{Griekse kleinletter-syfers},
  				'gujr' => q{Goedjarati-syfers},
  				'guru' => q{Gurmukhi-syfers},
- 				'hanidec' => q{Sjinese desimale syfers},
- 				'hans' => q{Vereenvoudigde Sjinese syfers},
- 				'hansfin' => q{Vereenvoudigde Sjinese finansiële syfers},
- 				'hant' => q{Tradisionele Sjinese syfers},
- 				'hantfin' => q{Tradisionele Sjinese finansiële syfers},
+ 				'hanidec' => q{Chinese desimale syfers},
+ 				'hans' => q{Vereenvoudigde Chinese syfers},
+ 				'hansfin' => q{Vereenvoudigde Chinese finansiële syfers},
+ 				'hant' => q{Tradisionele Chinese syfers},
+ 				'hantfin' => q{Tradisionele Chinese finansiële syfers},
  				'hebr' => q{Hebreeuse syfers},
  				'java' => q{Javaanse syfers},
  				'jpan' => q{Japannese syfers},
@@ -2086,6 +2093,18 @@ has 'units' => (
 						'other' => q({0} per tienduisend),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(deeltjies per miljard),
+						'one' => q({0} deeltjie per miljard),
+						'other' => q({0} deeltjies per miljard),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(deeltjies per miljard),
+						'one' => q({0} deeltjie per miljard),
+						'other' => q({0} deeltjies per miljard),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(liter per 100 kilometer),
 						'one' => q({0} liter per 100 kilometer),
@@ -2257,13 +2276,13 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'duration-century' => {
-						'name' => q(eeu),
+						'name' => q(eeue),
 						'one' => q({0} eeu),
 						'other' => q({0} eeue),
 					},
 					# Core Unit Identifier
 					'century' => {
-						'name' => q(eeu),
+						'name' => q(eeue),
 						'one' => q({0} eeu),
 						'other' => q({0} eeue),
 					},
@@ -2360,6 +2379,20 @@ has 'units' => (
 						'name' => q(nanosekondes),
 						'one' => q({0} nanosekonde),
 						'other' => q({0} nanosekondes),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(nagte),
+						'one' => q({0} nag),
+						'other' => q({0} nagte),
+						'per' => q({0} per nag),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(nagte),
+						'one' => q({0} nag),
+						'other' => q({0} nagte),
+						'per' => q({0} per nag),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -3394,6 +3427,18 @@ has 'units' => (
 						'other' => q({0} knope),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(lig),
+						'one' => q({0} lig),
+						'other' => q({0} lig),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(lig),
+						'one' => q({0} lig),
+						'other' => q({0} lig),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'name' => q(meter per sekonde),
 						'one' => q({0} meter per sekonde),
@@ -4122,6 +4167,18 @@ has 'units' => (
 						'name' => q(‱),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(deeltjies/miljard),
+						'one' => q({0}deeltjie/miljard),
+						'other' => q({0}deeltjies/miljard),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(deeltjies/miljard),
+						'one' => q({0}deeltjie/miljard),
+						'other' => q({0}deeltjies/miljard),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'one' => q({0}l/100 km),
 						'other' => q({0}l/100 km),
@@ -4348,6 +4405,20 @@ has 'units' => (
 					'nanosecond' => {
 						'one' => q({0}ns.),
 						'other' => q({0}ns.),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(nagte),
+						'one' => q({0} nag),
+						'other' => q({0} nagte),
+						'per' => q({0}/nag),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(nagte),
+						'one' => q({0} nag),
+						'other' => q({0} nagte),
+						'per' => q({0}/nag),
 					},
 					# Long Unit Identifier
 					'duration-week' => {
@@ -4605,13 +4676,13 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'graphics-megapixel' => {
-						'one' => q({0}Mpx),
-						'other' => q({0}Mpx),
+						'one' => q({0} MP),
+						'other' => q({0} MP),
 					},
 					# Core Unit Identifier
 					'megapixel' => {
-						'one' => q({0}Mpx),
-						'other' => q({0}Mpx),
+						'one' => q({0} MP),
+						'other' => q({0} MP),
 					},
 					# Long Unit Identifier
 					'graphics-pixel' => {
@@ -4687,11 +4758,13 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-foot' => {
+						'name' => q(vt.),
 						'one' => q({0}vt.),
 						'other' => q({0}vt.),
 					},
 					# Core Unit Identifier
 					'foot' => {
+						'name' => q(vt.),
 						'one' => q({0}vt.),
 						'other' => q({0}vt.),
 					},
@@ -5210,6 +5283,18 @@ has 'units' => (
 					'knot' => {
 						'one' => q({0}kn.),
 						'other' => q({0}kn.),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(lig),
+						'one' => q({0} lig),
+						'other' => q({0} lig),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(lig),
+						'one' => q({0} lig),
+						'other' => q({0} lig),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -5854,6 +5939,18 @@ has 'units' => (
 						'name' => q(per tienduisend),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(deeltjies/miljard),
+						'one' => q({0} deeltjie/miljard),
+						'other' => q({0} deeltjies/miljard),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(deeltjies/miljard),
+						'one' => q({0} deeltjie/miljard),
+						'other' => q({0} deeltjies/miljard),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(l/100 km),
 						'one' => q({0} l/100 km),
@@ -6054,6 +6151,20 @@ has 'units' => (
 						'other' => q({0} ns.),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(nagte),
+						'one' => q({0} nag),
+						'other' => q({0} nagte),
+						'per' => q({0}/nag),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(nagte),
+						'one' => q({0} nag),
+						'other' => q({0} nagte),
+						'per' => q({0}/nag),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'name' => q(kw.),
 						'one' => q({0} kw.),
@@ -6240,14 +6351,14 @@ has 'units' => (
 					# Long Unit Identifier
 					'graphics-megapixel' => {
 						'name' => q(megapieksels),
-						'one' => q({0} Mpx),
-						'other' => q({0} Mpx),
+						'one' => q({0} MP),
+						'other' => q({0} MP),
 					},
 					# Core Unit Identifier
 					'megapixel' => {
 						'name' => q(megapieksels),
-						'one' => q({0} Mpx),
-						'other' => q({0} Mpx),
+						'one' => q({0} MP),
+						'other' => q({0} MP),
 					},
 					# Long Unit Identifier
 					'graphics-pixel' => {
@@ -6600,6 +6711,18 @@ has 'units' => (
 						'name' => q(kn.),
 						'one' => q({0} kn.),
 						'other' => q({0} kn.),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(lig),
+						'one' => q({0} lig),
+						'other' => q({0} lig),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(lig),
+						'one' => q({0} lig),
+						'other' => q({0} lig),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -7495,7 +7618,9 @@ has 'currencies' => (
 		},
 		'GTQ' => {
 			display_name => {
-				'currency' => q(Guatemalaanse quetzal),
+				'currency' => q(Guatemalaanse kwetsal),
+				'one' => q(Guatemalaanse kwetsal),
+				'other' => q(Guatemalaanse kwetsal),
 			},
 		},
 		'GYD' => {
@@ -8355,7 +8480,7 @@ has 'eras' => (
 			},
 			wide => {
 				'0' => 'voor Christus',
-				'1' => 'na Christus'
+				'1' => 'ná Christus'
 			},
 		},
 	} },
@@ -8674,6 +8799,9 @@ has 'datetime_formats_interval' => (
 				d => q{y-M-d – y-M-d GGGGG},
 				y => q{y-M-d – y-M-d GGGGG},
 			},
+			H => {
+				H => q{HH – HH},
+			},
 			M => {
 				M => q{M–M},
 			},
@@ -8778,9 +8906,6 @@ has 'time_zone_names' => (
 		'Africa/Mogadishu' => {
 			exemplarCity => q#Mogadisjoe#,
 		},
-		'Africa/Sao_Tome' => {
-			exemplarCity => q#São Tomé#,
-		},
 		'Africa_Central' => {
 			long => {
 				'standard' => q#Sentraal-Afrika-tyd#,
@@ -8831,23 +8956,14 @@ has 'time_zone_names' => (
 				'standard' => q#Amasone-standaardtyd#,
 			},
 		},
-		'America/Asuncion' => {
-			exemplarCity => q#Asunción#,
-		},
 		'America/Bahia_Banderas' => {
 			exemplarCity => q#Bahia Banderas#,
 		},
 		'America/Cambridge_Bay' => {
 			exemplarCity => q#Cambridgebaai#,
 		},
-		'America/Cancun' => {
-			exemplarCity => q#Cancun#,
-		},
 		'America/Cayman' => {
 			exemplarCity => q#Kaaiman#,
-		},
-		'America/Curacao' => {
-			exemplarCity => q#Curaçao#,
 		},
 		'America/Glace_Bay' => {
 			exemplarCity => q#Glacebaai#,
@@ -8857,9 +8973,6 @@ has 'time_zone_names' => (
 		},
 		'America/Jamaica' => {
 			exemplarCity => q#Jamaika#,
-		},
-		'America/Merida' => {
-			exemplarCity => q#Merida#,
 		},
 		'America/Mexico_City' => {
 			exemplarCity => q#Meksikostad#,
@@ -8873,14 +8986,8 @@ has 'time_zone_names' => (
 		'America/North_Dakota/New_Salem' => {
 			exemplarCity => q#New Salem, Noord-Dakota#,
 		},
-		'America/Rainy_River' => {
-			exemplarCity => q#Rainyrivier#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#Santa Isabel#,
-		},
 		'America/St_Barthelemy' => {
-			exemplarCity => q#Sint Barthélemy#,
+			exemplarCity => q#Sint Bartholomeus#,
 		},
 		'America/St_Johns' => {
 			exemplarCity => q#Sint John’s#,
@@ -8896,9 +9003,6 @@ has 'time_zone_names' => (
 		},
 		'America/St_Vincent' => {
 			exemplarCity => q#Sint Vincent#,
-		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#Thunderbaai#,
 		},
 		'America_Central' => {
 			long => {
@@ -9088,9 +9192,6 @@ has 'time_zone_names' => (
 		'Atlantic/St_Helena' => {
 			exemplarCity => q#Sint Helena#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#Currie#,
-		},
 		'Australia_Central' => {
 			long => {
 				'daylight' => q#Sentraal-Australiese dagligtyd#,
@@ -9195,13 +9296,6 @@ has 'time_zone_names' => (
 				'standard' => q#China-standaardtyd#,
 			},
 		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Choibalsan-somertyd#,
-				'generic' => q#Choibalsan-tyd#,
-				'standard' => q#Choibalsan-standaardtyd#,
-			},
-		},
 		'Christmas' => {
 			long => {
 				'standard' => q#Christmaseiland-tyd#,
@@ -9214,7 +9308,7 @@ has 'time_zone_names' => (
 		},
 		'Colombia' => {
 			long => {
-				'daylight' => q#Colombia-somertyd#,
+				'daylight' => q#Colombië-somertyd#,
 				'generic' => q#Colombië-tyd#,
 				'standard' => q#Colombië-standaardtyd#,
 			},
@@ -9472,9 +9566,6 @@ has 'time_zone_names' => (
 		'Indian/Maldives' => {
 			exemplarCity => q#Maledive#,
 		},
-		'Indian/Reunion' => {
-			exemplarCity => q#Réunion#,
-		},
 		'Indian_Ocean' => {
 			long => {
 				'standard' => q#Indiese Oseaan-tyd#,
@@ -9535,6 +9626,11 @@ has 'time_zone_names' => (
 				'standard' => q#Petropavlovsk-Kamchatski-standaardtyd#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Kazakstan-tyd#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#Oos-Kazakstan-tyd#,
@@ -9581,11 +9677,6 @@ has 'time_zone_names' => (
 				'standard' => q#Lord Howe-standaardtyd#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Macquarie-eiland-tyd#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Magadan-somertyd#,
@@ -9623,13 +9714,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Mawson-tyd#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Noordwes-Meksiko-dagligtyd#,
-				'generic' => q#Noordwes-Meksiko-tyd#,
-				'standard' => q#Noordwes-Meksiko-standaardtyd#,
 			},
 		},
 		'Mexico_Pacific' => {

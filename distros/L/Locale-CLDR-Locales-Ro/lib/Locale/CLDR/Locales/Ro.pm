@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Ro - Package for language Romanian
 
 package Locale::CLDR::Locales::Ro;
 # This file auto generated from Data\common\main\ro.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -518,6 +518,7 @@ has 'display_name_language' => (
  				'bin' => 'bini',
  				'bkm' => 'kom',
  				'bla' => 'siksika',
+ 				'blo' => 'anii',
  				'bm' => 'bambara',
  				'bn' => 'bengaleză',
  				'bo' => 'tibetană',
@@ -737,6 +738,7 @@ has 'display_name_language' => (
  				'kv' => 'komi',
  				'kw' => 'cornică',
  				'kwk' => 'kwakʼwala',
+ 				'kxv' => 'kuvi',
  				'ky' => 'kârgâză',
  				'la' => 'latină',
  				'lad' => 'ladino',
@@ -750,6 +752,7 @@ has 'display_name_language' => (
  				'lij' => 'liguriană',
  				'lil' => 'lillooet',
  				'lkt' => 'lakota',
+ 				'lmo' => 'lombardă',
  				'ln' => 'lingala',
  				'lo' => 'laoțiană',
  				'lol' => 'mongo',
@@ -762,7 +765,6 @@ has 'display_name_language' => (
  				'lua' => 'luba-lulua',
  				'lui' => 'luiseno',
  				'lun' => 'lunda',
- 				'luo' => 'luo',
  				'lus' => 'mizo',
  				'luy' => 'luyia',
  				'lv' => 'letonă',
@@ -943,6 +945,7 @@ has 'display_name_language' => (
  				'swb' => 'comoreză',
  				'syc' => 'siriacă clasică',
  				'syr' => 'siriacă',
+ 				'szl' => 'sileziană',
  				'ta' => 'tamilă',
  				'tce' => 'tutchone de sud',
  				'te' => 'telugu',
@@ -989,10 +992,10 @@ has 'display_name_language' => (
  				'und' => 'limbă necunoscută',
  				'ur' => 'urdu',
  				'uz' => 'uzbecă',
- 				'vai' => 'vai',
  				've' => 'venda',
  				'vec' => 'venetă',
  				'vi' => 'vietnameză',
+ 				'vmw' => 'makhuwa',
  				'vo' => 'volapuk',
  				'vot' => 'votică',
  				'vun' => 'vunjo',
@@ -1006,6 +1009,7 @@ has 'display_name_language' => (
  				'wuu' => 'chineză wu',
  				'xal' => 'calmucă',
  				'xh' => 'xhosa',
+ 				'xnr' => 'kangri',
  				'xog' => 'soga',
  				'yao' => 'yao',
  				'yap' => 'yapeză',
@@ -1776,7 +1780,6 @@ has 'display_name_type' => (
  				'phonebook' => q{ordine de sortare după cartea de telefon},
  				'phonetic' => q{ordine de sortare fonetică},
  				'pinyin' => q{ordine de sortare pinyin},
- 				'reformed' => q{ordine de sortare reformată},
  				'search' => q{căutare cu scop general},
  				'searchjl' => q{Căutați în funcție de consoana inițială hangul},
  				'standard' => q{ordine de sortare standard},
@@ -2571,6 +2574,7 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'concentr-milligram-ofglucose-per-deciliter' => {
+						'1' => q(neuter),
 						'few' => q({0} miligrame pe decilitru),
 						'name' => q(miligrame pe decilitru),
 						'one' => q({0} miligram pe decilitru),
@@ -2578,6 +2582,7 @@ has 'units' => (
 					},
 					# Core Unit Identifier
 					'milligram-ofglucose-per-deciliter' => {
+						'1' => q(neuter),
 						'few' => q({0} miligrame pe decilitru),
 						'name' => q(miligrame pe decilitru),
 						'one' => q({0} miligram pe decilitru),
@@ -2676,6 +2681,22 @@ has 'units' => (
 						'few' => q({0} la zece mii),
 						'one' => q({0} la zece mii),
 						'other' => q({0} la zece mii),
+					},
+					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'1' => q(feminine),
+						'few' => q({0} părți pe miliard),
+						'name' => q(părți pe miliard),
+						'one' => q({0} parte pe miliard),
+						'other' => q({0} de părți pe miliard),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'1' => q(feminine),
+						'few' => q({0} părți pe miliard),
+						'name' => q(părți pe miliard),
+						'one' => q({0} parte pe miliard),
+						'other' => q({0} de părți pe miliard),
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
@@ -3074,6 +3095,24 @@ has 'units' => (
 						'other' => q({0} de nanosecunde),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'1' => q(feminine),
+						'few' => q({0} nopți),
+						'name' => q(noapte),
+						'one' => q({0}/noapte),
+						'other' => q({0} de nopți),
+						'per' => q({0}/noapte),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'1' => q(feminine),
+						'few' => q({0} nopți),
+						'name' => q(noapte),
+						'one' => q({0}/noapte),
+						'other' => q({0} de nopți),
+						'per' => q({0}/noapte),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'1' => q(neuter),
 						'few' => q({0} trimestre),
@@ -3279,6 +3318,7 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'energy-kilocalorie' => {
+						'1' => q(feminine),
 						'few' => q({0} kilocalorii),
 						'name' => q(kilocalorii),
 						'one' => q({0} kilocalorie),
@@ -3286,6 +3326,7 @@ has 'units' => (
 					},
 					# Core Unit Identifier
 					'kilocalorie' => {
+						'1' => q(feminine),
 						'few' => q({0} kilocalorii),
 						'name' => q(kilocalorii),
 						'one' => q({0} kilocalorie),
@@ -3492,12 +3533,18 @@ has 'units' => (
 					# Long Unit Identifier
 					'graphics-em' => {
 						'1' => q(masculine),
+						'few' => q({0} em),
 						'name' => q(em tipografic),
+						'one' => q({0} em),
+						'other' => q({0} de em),
 					},
 					# Core Unit Identifier
 					'em' => {
 						'1' => q(masculine),
+						'few' => q({0} em),
 						'name' => q(em tipografic),
+						'one' => q({0} em),
+						'other' => q({0} de em),
 					},
 					# Long Unit Identifier
 					'graphics-megapixel' => {
@@ -3847,6 +3894,7 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-point' => {
+						'1' => q(neuter),
 						'few' => q({0} puncte tipografice),
 						'name' => q(puncte),
 						'one' => q({0} punct tipografic),
@@ -3854,6 +3902,7 @@ has 'units' => (
 					},
 					# Core Unit Identifier
 					'point' => {
+						'1' => q(neuter),
 						'few' => q({0} puncte tipografice),
 						'name' => q(puncte),
 						'one' => q({0} punct tipografic),
@@ -4411,6 +4460,7 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'pressure-millimeter-ofhg' => {
+						'1' => q(masculine),
 						'few' => q({0} milimetri coloană de mercur),
 						'name' => q(milimetri coloană de mercur),
 						'one' => q({0} milimetru coloană de mercur),
@@ -4418,6 +4468,7 @@ has 'units' => (
 					},
 					# Core Unit Identifier
 					'millimeter-ofhg' => {
+						'1' => q(masculine),
 						'few' => q({0} milimetri coloană de mercur),
 						'name' => q(milimetri coloană de mercur),
 						'one' => q({0} milimetru coloană de mercur),
@@ -4494,6 +4545,22 @@ has 'units' => (
 						'name' => q(nod),
 						'one' => q({0} nod),
 						'other' => q({0} de noduri),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'1' => q(feminine),
+						'few' => q({0} lumină),
+						'name' => q(lumină),
+						'one' => q({0} lumină),
+						'other' => q({0} lumină),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'1' => q(feminine),
+						'few' => q({0} lumină),
+						'name' => q(lumină),
+						'one' => q({0} lumină),
+						'other' => q({0} lumină),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -5224,6 +5291,14 @@ has 'units' => (
 						'other' => q({0} ‱),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(părți/miliard),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(părți/miliard),
+					},
+					# Long Unit Identifier
 					'consumption-mile-per-gallon' => {
 						'few' => q({0} mi/gal),
 						'name' => q(mi/gal),
@@ -5292,6 +5367,22 @@ has 'units' => (
 						'name' => q(l),
 						'one' => q({0} l),
 						'other' => q({0} l),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'few' => q({0} nopți),
+						'name' => q(nopți),
+						'one' => q({0} noapte),
+						'other' => q({0} de nopți),
+						'per' => q({0}/noapte),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'few' => q({0} nopți),
+						'name' => q(nopți),
+						'one' => q({0} noapte),
+						'other' => q({0} de nopți),
+						'per' => q({0}/noapte),
 					},
 					# Long Unit Identifier
 					'duration-week' => {
@@ -5406,6 +5497,20 @@ has 'units' => (
 						'few' => q({0} mb),
 						'one' => q({0} mb),
 						'other' => q({0} mb),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'few' => q({0} lumină),
+						'name' => q(lumină),
+						'one' => q({0} lumină),
+						'other' => q({0} lumină),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'few' => q({0} lumină),
+						'name' => q(lumină),
+						'one' => q({0} lumină),
+						'other' => q({0} lumină),
 					},
 					# Long Unit Identifier
 					'torque-pound-force-foot' => {
@@ -5702,6 +5807,14 @@ has 'units' => (
 						'other' => q({0} moli),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(părți/miliard),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(părți/miliard),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'few' => q({0} l/100 km),
 						'name' => q(l/100 km),
@@ -5882,6 +5995,22 @@ has 'units' => (
 						'one' => q({0} lună),
 						'other' => q({0} luni),
 						'per' => q({0}/lună),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'few' => q({0} nopți),
+						'name' => q(nopți),
+						'one' => q({0} noapte),
+						'other' => q({0} de nopți),
+						'per' => q({0}/noapte),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'few' => q({0} nopți),
+						'name' => q(nopți),
+						'one' => q({0} noapte),
+						'other' => q({0} de nopți),
+						'per' => q({0}/noapte),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -6244,6 +6373,20 @@ has 'units' => (
 						'name' => q(in Hg),
 						'one' => q({0} in Hg),
 						'other' => q({0} in Hg),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'few' => q({0} lumină),
+						'name' => q(lumină),
+						'one' => q({0} lumină),
+						'other' => q({0} lumină),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'few' => q({0} lumină),
+						'name' => q(lumină),
+						'one' => q({0} lumină),
+						'other' => q({0} lumină),
 					},
 					# Long Unit Identifier
 					'temperature-celsius' => {
@@ -9864,17 +10007,11 @@ has 'time_zone_names' => (
 				'standard' => q#Ora standard a Amazonului#,
 			},
 		},
-		'America/Asuncion' => {
-			exemplarCity => q#Asunción#,
-		},
 		'America/Bahia_Banderas' => {
 			exemplarCity => q#Bahia Banderas#,
 		},
 		'America/Cancun' => {
 			exemplarCity => q#Cancun#,
-		},
-		'America/Curacao' => {
-			exemplarCity => q#Curaçao#,
 		},
 		'America/Guadeloupe' => {
 			exemplarCity => q#Guadelupa#,
@@ -9896,9 +10033,6 @@ has 'time_zone_names' => (
 		},
 		'America/North_Dakota/New_Salem' => {
 			exemplarCity => q#New Salem, Dakota de Nord#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#Santa Isabel#,
 		},
 		'America/St_Barthelemy' => {
 			exemplarCity => q#Saint Barthélemy#,
@@ -10114,9 +10248,6 @@ has 'time_zone_names' => (
 		'Atlantic/St_Helena' => {
 			exemplarCity => q#Sf. Elena#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#Currie#,
-		},
 		'Australia_Central' => {
 			long => {
 				'daylight' => q#Ora de vară a Australiei Centrale#,
@@ -10219,13 +10350,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Ora de vară a Chinei#,
 				'generic' => q#Ora Chinei#,
 				'standard' => q#Ora standard a Chinei#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Ora de vară din Choibalsan#,
-				'generic' => q#Ora din Choibalsan#,
-				'standard' => q#Ora standard din Choibalsan#,
 			},
 		},
 		'Christmas' => {
@@ -10359,17 +10483,11 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#Ulianovsk#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#Ujhorod#,
-		},
 		'Europe/Vienna' => {
 			exemplarCity => q#Viena#,
 		},
 		'Europe/Warsaw' => {
 			exemplarCity => q#Varșovia#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#Zaporoje#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#Zürich#,
@@ -10525,9 +10643,6 @@ has 'time_zone_names' => (
 		'Indian/Maldives' => {
 			exemplarCity => q#Maldive#,
 		},
-		'Indian/Reunion' => {
-			exemplarCity => q#Réunion#,
-		},
 		'Indian_Ocean' => {
 			long => {
 				'standard' => q#Ora Oceanului Indian#,
@@ -10588,6 +10703,11 @@ has 'time_zone_names' => (
 				'standard' => q#Ora standard din Petropavlovsk-Kamciațki#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Ora din Kazahstan#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#Ora din Kazahstanul de Est#,
@@ -10634,11 +10754,6 @@ has 'time_zone_names' => (
 				'standard' => q#Ora standard din Lord Howe#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Ora din Macquarie#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Ora de vară din Magadan#,
@@ -10676,13 +10791,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Ora din Mawson#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Ora de vară a Mexicului de nord-vest#,
-				'generic' => q#Ora Mexicului de nord-vest#,
-				'standard' => q#Ora standard a Mexicului de nord-vest#,
 			},
 		},
 		'Mexico_Pacific' => {

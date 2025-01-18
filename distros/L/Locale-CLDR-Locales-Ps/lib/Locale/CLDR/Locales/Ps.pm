@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Ps - Package for language Pashto
 
 package Locale::CLDR::Locales::Ps;
 # This file auto generated from Data\common\main\ps.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -73,6 +73,7 @@ has 'display_name_language' => (
  				'bi' => 'بسلاما',
  				'bin' => 'بینی',
  				'bla' => 'سکسيکا',
+ 				'blo' => 'انۍ',
  				'bm' => 'بمبارا',
  				'bn' => 'بنگالي',
  				'bo' => 'تبتي',
@@ -219,7 +220,7 @@ has 'display_name_language' => (
  				'kde' => 'ميکونډي',
  				'kea' => 'کابوورډیانو',
  				'kfo' => 'کورو',
- 				'kgp' => 'kgg',
+ 				'kgp' => 'کینګا',
  				'kha' => 'خاسې',
  				'khq' => 'کویرا چینی',
  				'ki' => 'ککوؤو',
@@ -247,6 +248,7 @@ has 'display_name_language' => (
  				'kv' => 'کومی',
  				'kw' => 'کورنيشي',
  				'kwk' => 'Vote kwk',
+ 				'kxv' => 'کووئ',
  				'ky' => 'کرغيزي',
  				'la' => 'لاتیني',
  				'lad' => 'لاډینو',
@@ -255,6 +257,7 @@ has 'display_name_language' => (
  				'lez' => 'لیګغیان',
  				'lg' => 'ګانده',
  				'li' => 'لمبرگیانی',
+ 				'lij' => 'لینګورین',
  				'lil' => 'lill',
  				'lkt' => 'لکوټا',
  				'lmo' => 'لومبارډ',
@@ -412,6 +415,7 @@ has 'display_name_language' => (
  				'sw_CD' => 'کانګو سواهلی',
  				'swb' => 'کومورياني',
  				'syr' => 'سوریاني',
+ 				'szl' => 'سیلیسیان',
  				'ta' => 'تامل',
  				'tce' => 'جنوبي توچون',
  				'te' => 'تېليګو',
@@ -452,7 +456,9 @@ has 'display_name_language' => (
  				'uz' => 'اوزبکي',
  				'vai' => 'وای',
  				've' => 'ویندا',
+ 				'vec' => 'وینټیان',
  				'vi' => 'وېتنامي',
+ 				'vmw' => 'مکوه',
  				'vo' => 'والاپوک',
  				'vun' => 'وونجو',
  				'wa' => 'والون',
@@ -463,6 +469,7 @@ has 'display_name_language' => (
  				'wuu' => 'وو چینایی',
  				'xal' => 'کالمک',
  				'xh' => 'خوسا',
+ 				'xnr' => 'کانګرو',
  				'xog' => 'سوګا',
  				'yav' => 'ینګبین',
  				'ybb' => 'یمبا',
@@ -471,6 +478,7 @@ has 'display_name_language' => (
  				'yrl' => 'نینګاتو',
  				'yue' => 'کانټوني',
  				'yue@alt=menu' => 'چايني، کانټونيز',
+ 				'za' => 'ژوانګ',
  				'zgh' => 'معياري مراکشي تمازيټ',
  				'zh' => 'چیني',
  				'zh@alt=menu' => 'چيني، ماندرين',
@@ -1857,12 +1865,36 @@ has 'units' => (
 						'other' => q({0} لسيزې),
 					},
 					# Long Unit Identifier
+					'duration-hour' => {
+						'one' => q({0} ساعت),
+						'other' => q({0} h),
+						'per' => q({0} په ساعت),
+					},
+					# Core Unit Identifier
+					'hour' => {
+						'one' => q({0} ساعت),
+						'other' => q({0} h),
+						'per' => q({0} په ساعت),
+					},
+					# Long Unit Identifier
 					'duration-microsecond' => {
 						'name' => q(مايکرو ثانيې),
 					},
 					# Core Unit Identifier
 					'microsecond' => {
 						'name' => q(مايکرو ثانيې),
+					},
+					# Long Unit Identifier
+					'duration-millisecond' => {
+						'name' => q(ملی ثانیې),
+						'one' => q({0} ملی ثانیه),
+						'other' => q({0} ملی ثانیې),
+					},
+					# Core Unit Identifier
+					'millisecond' => {
+						'name' => q(ملی ثانیې),
+						'one' => q({0} ملی ثانیه),
+						'other' => q({0} ملی ثانیې),
 					},
 					# Long Unit Identifier
 					'duration-minute' => {
@@ -1895,6 +1927,20 @@ has 'units' => (
 						'name' => q(نينو ثانيې),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(شپي),
+						'one' => q({0}/شپه),
+						'other' => q({0}/شپه),
+						'per' => q({0}/شپه),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(شپي),
+						'one' => q({0}/شپه),
+						'other' => q({0}/شپه),
+						'per' => q({0}/شپه),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'name' => q(ربعه),
 					},
@@ -1904,25 +1950,25 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'duration-second' => {
-						'one' => q({0} s),
+						'one' => q({0} ثانیه),
 						'other' => q({0} ثانیې),
 						'per' => q({0} هره ثانیه),
 					},
 					# Core Unit Identifier
 					'second' => {
-						'one' => q({0} s),
+						'one' => q({0} ثانیه),
 						'other' => q({0} ثانیې),
 						'per' => q({0} هره ثانیه),
 					},
 					# Long Unit Identifier
 					'duration-week' => {
-						'one' => q(اونۍ),
+						'one' => q({0} اونۍ),
 						'other' => q({0} اونۍ),
 						'per' => q({0} په هره اونۍ کې),
 					},
 					# Core Unit Identifier
 					'week' => {
-						'one' => q(اونۍ),
+						'one' => q({0} اونۍ),
 						'other' => q({0} اونۍ),
 						'per' => q({0} په هره اونۍ کې),
 					},
@@ -3317,6 +3363,14 @@ has 'units' => (
 				},
 				'narrow' => {
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(p/b),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(p/b),
+					},
+					# Long Unit Identifier
 					'consumption-mile-per-gallon-imperial' => {
 						'name' => q(mpg UK),
 					},
@@ -3351,22 +3405,20 @@ has 'units' => (
 						'other' => q({0}d),
 					},
 					# Long Unit Identifier
-					'duration-decade' => {
-						'one' => q({0} لسیز),
-						'other' => q({0} لسیز),
-					},
-					# Core Unit Identifier
-					'decade' => {
-						'one' => q({0} لسیز),
-						'other' => q({0} لسیز),
-					},
-					# Long Unit Identifier
 					'duration-hour' => {
-						'name' => q(hr),
+						'name' => q(ساعت),
 					},
 					# Core Unit Identifier
 					'hour' => {
-						'name' => q(hr),
+						'name' => q(ساعت),
+					},
+					# Long Unit Identifier
+					'duration-microsecond' => {
+						'name' => q(μsec),
+					},
+					# Core Unit Identifier
+					'microsecond' => {
+						'name' => q(μsec),
 					},
 					# Long Unit Identifier
 					'duration-minute' => {
@@ -3393,6 +3445,20 @@ has 'units' => (
 						'other' => q({0} m),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(شپي),
+						'one' => q({0}/شپه),
+						'other' => q({0}/شپه),
+						'per' => q({0}/شپه),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(شپي),
+						'one' => q({0}/شپه),
+						'other' => q({0}/شپه),
+						'per' => q({0}/شپه),
+					},
+					# Long Unit Identifier
 					'duration-second' => {
 						'one' => q({0} s),
 						'other' => q({0} s),
@@ -3414,13 +3480,13 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'duration-year' => {
-						'name' => q(yr),
+						'name' => q(کال),
 						'one' => q({0} y),
 						'other' => q({0} y),
 					},
 					# Core Unit Identifier
 					'year' => {
-						'name' => q(yr),
+						'name' => q(کال),
 						'one' => q({0} y),
 						'other' => q({0} y),
 					},
@@ -3835,6 +3901,14 @@ has 'units' => (
 						'name' => q(زرمه),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(p/b),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(p/b),
+					},
+					# Long Unit Identifier
 					'consumption-mile-per-gallon-imperial' => {
 						'name' => q(ميلز/ګيلن ايمپيريل),
 					},
@@ -3961,6 +4035,14 @@ has 'units' => (
 						'name' => q(ساعتونه),
 					},
 					# Long Unit Identifier
+					'duration-microsecond' => {
+						'name' => q(μsecs),
+					},
+					# Core Unit Identifier
+					'microsecond' => {
+						'name' => q(μsecs),
+					},
+					# Long Unit Identifier
 					'duration-minute' => {
 						'name' => q(دقيقې),
 						'one' => q({0} دقیقه),
@@ -3985,6 +4067,20 @@ has 'units' => (
 						'name' => q(مياشتې),
 						'one' => q({0} m),
 						'other' => q({0} mths),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(شپي),
+						'one' => q({0}/شپه),
+						'other' => q({0}/شپه),
+						'per' => q({0}/شپه),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(شپي),
+						'one' => q({0}/شپه),
+						'other' => q({0}/شپه),
+						'per' => q({0}/شپه),
 					},
 					# Long Unit Identifier
 					'duration-second' => {
@@ -4135,6 +4231,16 @@ has 'units' => (
 					# Core Unit Identifier
 					'dot-per-centimeter' => {
 						'name' => q(dpcm),
+					},
+					# Long Unit Identifier
+					'graphics-dot-per-inch' => {
+						'one' => q({0} ppi),
+						'other' => q({0} dpi),
+					},
+					# Core Unit Identifier
+					'dot-per-inch' => {
+						'one' => q({0} ppi),
+						'other' => q({0} dpi),
 					},
 					# Long Unit Identifier
 					'length-fathom' => {
@@ -4587,6 +4693,9 @@ has 'number_symbols' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'arab' => {
+			'exponential' => q(^),
+		},
 		'arabext' => {
 			'timeSeparator' => q(:),
 		},
@@ -5847,7 +5956,7 @@ has 'calendar_months' => (
 							'صفر',
 							'ربيع',
 							'ربيع II',
-							'جماد ۱',
+							'جماد',
 							'جماد ۲',
 							'رجب',
 							'شعبان',
@@ -5984,14 +6093,6 @@ has 'day_periods' => (
 			},
 			'stand-alone' => {
 				'abbreviated' => {
-					'am' => q{غ.م.},
-					'pm' => q{غ.و.},
-				},
-				'narrow' => {
-					'am' => q{غ.م.},
-					'pm' => q{غ.و.},
-				},
-				'wide' => {
 					'am' => q{غ.م.},
 					'pm' => q{غ.و.},
 				},
@@ -6709,9 +6810,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#نیویارک#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#نیپګون#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#نوم#,
 		},
@@ -6733,9 +6831,6 @@ has 'time_zone_names' => (
 		'America/Panama' => {
 			exemplarCity => q#پاناما#,
 		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#پينګنرچونګ#,
-		},
 		'America/Paramaribo' => {
 			exemplarCity => q#پاراماربو#,
 		},
@@ -6756,9 +6851,6 @@ has 'time_zone_names' => (
 		},
 		'America/Punta_Arenas' => {
 			exemplarCity => q#پنټا آریناس#,
-		},
-		'America/Rainy_River' => {
-			exemplarCity => q#د باران باران#,
 		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#رينکن انلټ#,
@@ -6820,9 +6912,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#تول#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#تنډر بی#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#تجوانا#,
 		},
@@ -6843,9 +6932,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#ياکوټټ#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#يلونايف#,
 		},
 		'America_Central' => {
 			long => {
@@ -6999,9 +7085,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#چيتا#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#چويبلسان#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#کولمبو#,
@@ -7241,9 +7324,6 @@ has 'time_zone_names' => (
 		'Australia/Broken_Hill' => {
 			exemplarCity => q#بروکن هل#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#کرري#,
-		},
 		'Australia/Darwin' => {
 			exemplarCity => q#ډارون#,
 		},
@@ -7370,13 +7450,6 @@ has 'time_zone_names' => (
 				'daylight' => q#د چين د رڼا ورځې وخت#,
 				'generic' => q#چين وخت#,
 				'standard' => q#چین معیاري وخت#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#چوئیبیلسن اوړي وخت#,
-				'generic' => q#چوئیبیلسن وخت#,
-				'standard' => q#چوئیبیلسن معیاری وخت#,
 			},
 		},
 		'Christmas' => {
@@ -7601,9 +7674,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#اليانوسک#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#یوژورډ#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#واډوز#,
 		},
@@ -7624,9 +7694,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#زګرب#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#زاپوروژی#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#زریچ#,
@@ -7844,6 +7911,11 @@ has 'time_zone_names' => (
 				'standard' => q#جاپان معياري وخت#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#قزاقستان وخت#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#ختيځ قازقستان وخت#,
@@ -7890,11 +7962,6 @@ has 'time_zone_names' => (
 				'standard' => q#لارډ هوي معياري وخت#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#مکواري ټاپو وخت#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#ميګډان اوړي وخت#,
@@ -7932,13 +7999,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#ماوسن وخت#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#د شمال لویدیځ مکسیکو رڼا ورځې وخت#,
-				'generic' => q#د شمال لویدیځ مکسیکو وخت#,
-				'standard' => q#د شمال لویدیځ مکسیکو معیاري وخت#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -8075,9 +8135,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Honolulu' => {
 			exemplarCity => q#هینولولو#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#جانسټن#,
 		},
 		'Pacific/Kiritimati' => {
 			exemplarCity => q#کيريټماټي#,

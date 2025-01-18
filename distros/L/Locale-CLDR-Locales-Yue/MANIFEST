@@ -3,6 +3,7 @@ lib/Locale/CLDR/Locales/Yue.pm
 lib/Locale/CLDR/Locales/Yue/Hans.pm
 lib/Locale/CLDR/Locales/Yue/Hans/Cn.pm
 lib/Locale/CLDR/Locales/Yue/Hant.pm
+lib/Locale/CLDR/Locales/Yue/Hant/Cn.pm
 lib/Locale/CLDR/Locales/Yue/Hant/Hk.pm
 MANIFEST			This list of files
 README

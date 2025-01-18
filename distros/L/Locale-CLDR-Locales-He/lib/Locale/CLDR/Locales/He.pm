@@ -8,18 +8,18 @@ Locale::CLDR::Locales::He - Package for language Hebrew
 
 package Locale::CLDR::Locales::He;
 # This file auto generated from Data\common\main\he.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -1697,6 +1697,7 @@ has 'display_name_language' => (
  				'bin' => 'ביני',
  				'bkm' => 'קום',
  				'bla' => 'סיקסיקה',
+ 				'blo' => 'אני',
  				'bm' => 'במבארה',
  				'bn' => 'בנגלית',
  				'bo' => 'טיבטית',
@@ -1753,7 +1754,6 @@ has 'display_name_language' => (
  				'dar' => 'דרגווה',
  				'dav' => 'טאיטה',
  				'de' => 'גרמנית',
- 				'de_CH' => 'גרמנית (שוויץ)',
  				'del' => 'דלאוור',
  				'den' => 'סלאבית',
  				'dgr' => 'דוגריב',
@@ -1793,7 +1793,6 @@ has 'display_name_language' => (
  				'fo' => 'פארואזית',
  				'fon' => 'פון',
  				'fr' => 'צרפתית',
- 				'fr_CH' => 'צרפתית (שוויץ)',
  				'frc' => 'צרפתית קייג׳ונית',
  				'frm' => 'צרפתית תיכונה',
  				'fro' => 'צרפתית עתיקה',
@@ -1913,6 +1912,7 @@ has 'display_name_language' => (
  				'kv' => 'קומי',
  				'kw' => 'קורנית',
  				'kwk' => 'קוואקוואלה',
+ 				'kxv' => 'קווי',
  				'ky' => 'קירגיזית',
  				'la' => 'לטינית',
  				'lad' => 'לדינו',
@@ -1926,6 +1926,7 @@ has 'display_name_language' => (
  				'lij' => 'ליגורית',
  				'lil' => 'לילואט',
  				'lkt' => 'לקוטה',
+ 				'lmo' => 'לומברדית',
  				'ln' => 'לינגלה',
  				'lo' => 'לאו',
  				'lol' => 'מונגו',
@@ -2119,6 +2120,7 @@ has 'display_name_language' => (
  				'swb' => 'קומורית',
  				'syc' => 'סירית קלאסית',
  				'syr' => 'סורית',
+ 				'szl' => 'שלזית',
  				'ta' => 'טמילית',
  				'tce' => 'טצ׳ון דרומית',
  				'te' => 'טלוגו',
@@ -2167,7 +2169,9 @@ has 'display_name_language' => (
  				'uz' => 'אוזבקית',
  				'vai' => 'וואי',
  				've' => 'וונדה',
+ 				'vec' => 'ונציאנית',
  				'vi' => 'וייטנאמית',
+ 				'vmw' => 'מאקואה',
  				'vo' => '‏וולאפיק',
  				'vot' => 'ווטיק',
  				'vun' => 'וונג׳ו',
@@ -2181,6 +2185,7 @@ has 'display_name_language' => (
  				'wuu' => 'סינית וו',
  				'xal' => 'קלמיקית',
  				'xh' => 'קוסה',
+ 				'xnr' => 'קאנגרי',
  				'xog' => 'סוגה',
  				'yao' => 'יאו',
  				'yap' => 'יאפזית',
@@ -2941,7 +2946,6 @@ has 'display_name_type' => (
  				'phonebook' => q{מיון ספר טלפונים},
  				'phonetic' => q{סדר מיון פונטי},
  				'pinyin' => q{מיון פיניין},
- 				'reformed' => q{סדר מיון מתוקן},
  				'search' => q{חיפוש למטרה כללית},
  				'searchjl' => q{חפש לפי העיצור הראשון באותיות הנגול},
  				'standard' => q{סדר מיון רגיל},
@@ -3304,7 +3308,7 @@ has 'units' => (
 						'1' => q(feminine),
 						'many' => q({0} דקות קשת),
 						'name' => q(דקות קשת),
-						'one' => q(דקת קשת {0}),
+						'one' => q({0} דקת קשת),
 						'other' => q({0} דקות קשת),
 						'two' => q({0} דקות קשת),
 					},
@@ -3313,7 +3317,7 @@ has 'units' => (
 						'1' => q(feminine),
 						'many' => q({0} דקות קשת),
 						'name' => q(דקות קשת),
-						'one' => q(דקת קשת {0}),
+						'one' => q({0} דקת קשת),
 						'other' => q({0} דקות קשת),
 						'two' => q({0} דקות קשת),
 					},
@@ -3322,7 +3326,7 @@ has 'units' => (
 						'1' => q(feminine),
 						'many' => q({0} שניות קשת),
 						'name' => q(שניות קשת),
-						'one' => q(שניית קשת {0}),
+						'one' => q({0} שניית קשת),
 						'other' => q({0} שניות קשת),
 						'two' => q({0} שניות קשת),
 					},
@@ -3331,7 +3335,7 @@ has 'units' => (
 						'1' => q(feminine),
 						'many' => q({0} שניות קשת),
 						'name' => q(שניות קשת),
-						'one' => q(שניית קשת {0}),
+						'one' => q({0} שניית קשת),
 						'other' => q({0} שניות קשת),
 						'two' => q({0} שניות קשת),
 					},
@@ -3388,14 +3392,14 @@ has 'units' => (
 					# Long Unit Identifier
 					'area-acre' => {
 						'many' => q({0} אקר),
-						'one' => q(אקר {0}),
+						'one' => q({0} אקר),
 						'other' => q({0} אקר),
 						'two' => q({0} אקר),
 					},
 					# Core Unit Identifier
 					'acre' => {
 						'many' => q({0} אקר),
-						'one' => q(אקר {0}),
+						'one' => q({0} אקר),
 						'other' => q({0} אקר),
 						'two' => q({0} אקר),
 					},
@@ -3403,7 +3407,7 @@ has 'units' => (
 					'area-hectare' => {
 						'1' => q(masculine),
 						'many' => q({0} הקטאר),
-						'one' => q(הקטאר {0}),
+						'one' => q({0} הקטאר),
 						'other' => q({0} הקטאר),
 						'two' => q({0} הקטאר),
 					},
@@ -3411,7 +3415,7 @@ has 'units' => (
 					'hectare' => {
 						'1' => q(masculine),
 						'many' => q({0} הקטאר),
-						'one' => q(הקטאר {0}),
+						'one' => q({0} הקטאר),
 						'other' => q({0} הקטאר),
 						'two' => q({0} הקטאר),
 					},
@@ -3420,7 +3424,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} סנטימטר רבוע),
 						'name' => q(סנטימטר רבוע),
-						'one' => q(סנטימטר רבוע {0}),
+						'one' => q({0} סנטימטר רבוע),
 						'other' => q({0} סנטימטר רבוע),
 						'per' => q({0} לסנטימטר רבוע),
 						'two' => q({0} סנטימטר רבוע),
@@ -3430,7 +3434,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} סנטימטר רבוע),
 						'name' => q(סנטימטר רבוע),
-						'one' => q(סנטימטר רבוע {0}),
+						'one' => q({0} סנטימטר רבוע),
 						'other' => q({0} סנטימטר רבוע),
 						'per' => q({0} לסנטימטר רבוע),
 						'two' => q({0} סנטימטר רבוע),
@@ -3439,7 +3443,7 @@ has 'units' => (
 					'area-square-foot' => {
 						'many' => q({0} רגל רבועה),
 						'name' => q(רגל רבועה),
-						'one' => q(רגל רבועה {0}),
+						'one' => q({0} רגל רבועה),
 						'other' => q({0} רגל רבועה),
 						'two' => q({0} רגל רבועה),
 					},
@@ -3447,7 +3451,7 @@ has 'units' => (
 					'square-foot' => {
 						'many' => q({0} רגל רבועה),
 						'name' => q(רגל רבועה),
-						'one' => q(רגל רבועה {0}),
+						'one' => q({0} רגל רבועה),
 						'other' => q({0} רגל רבועה),
 						'two' => q({0} רגל רבועה),
 					},
@@ -3455,7 +3459,7 @@ has 'units' => (
 					'area-square-inch' => {
 						'many' => q({0} אינץ׳ רבוע),
 						'name' => q(אינץ׳ רבוע),
-						'one' => q(אינץ׳ רבוע {0}),
+						'one' => q({0} אינץ׳ רבוע),
 						'other' => q({0} אינץ׳ רבוע),
 						'per' => q({0} לאינץ׳ רבוע),
 						'two' => q({0} אינץ׳ רבוע),
@@ -3464,7 +3468,7 @@ has 'units' => (
 					'square-inch' => {
 						'many' => q({0} אינץ׳ רבוע),
 						'name' => q(אינץ׳ רבוע),
-						'one' => q(אינץ׳ רבוע {0}),
+						'one' => q({0} אינץ׳ רבוע),
 						'other' => q({0} אינץ׳ רבוע),
 						'per' => q({0} לאינץ׳ רבוע),
 						'two' => q({0} אינץ׳ רבוע),
@@ -3474,7 +3478,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} קילומטר רבוע),
 						'name' => q(קילומטר רבוע),
-						'one' => q(קילומטר רבוע {0}),
+						'one' => q({0} קילומטר רבוע),
 						'other' => q({0} קילומטר רבוע),
 						'per' => q({0} לקילומטר רבוע),
 						'two' => q({0} קילומטר רבוע),
@@ -3484,7 +3488,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} קילומטר רבוע),
 						'name' => q(קילומטר רבוע),
-						'one' => q(קילומטר רבוע {0}),
+						'one' => q({0} קילומטר רבוע),
 						'other' => q({0} קילומטר רבוע),
 						'per' => q({0} לקילומטר רבוע),
 						'two' => q({0} קילומטר רבוע),
@@ -3494,7 +3498,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} מטר רבוע),
 						'name' => q(מטר רבוע),
-						'one' => q(מטר רבוע {0}),
+						'one' => q({0} מטר רבוע),
 						'other' => q({0} מטר רבוע),
 						'per' => q({0} למטר רבוע),
 						'two' => q({0} מטר רבוע),
@@ -3504,7 +3508,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} מטר רבוע),
 						'name' => q(מטר רבוע),
-						'one' => q(מטר רבוע {0}),
+						'one' => q({0} מטר רבוע),
 						'other' => q({0} מטר רבוע),
 						'per' => q({0} למטר רבוע),
 						'two' => q({0} מטר רבוע),
@@ -3512,7 +3516,7 @@ has 'units' => (
 					# Long Unit Identifier
 					'area-square-mile' => {
 						'many' => q({0} מייל רבוע),
-						'one' => q(מייל רבוע {0}),
+						'one' => q({0} מייל רבוע),
 						'other' => q({0} מייל רבוע),
 						'per' => q({0} למייל רבוע),
 						'two' => q({0} מייל רבוע),
@@ -3520,7 +3524,7 @@ has 'units' => (
 					# Core Unit Identifier
 					'square-mile' => {
 						'many' => q({0} מייל רבוע),
-						'one' => q(מייל רבוע {0}),
+						'one' => q({0} מייל רבוע),
 						'other' => q({0} מייל רבוע),
 						'per' => q({0} למייל רבוע),
 						'two' => q({0} מייל רבוע),
@@ -3529,7 +3533,7 @@ has 'units' => (
 					'area-square-yard' => {
 						'many' => q({0} יארד רבוע),
 						'name' => q(יארד רבוע),
-						'one' => q(יארד רבוע {0}),
+						'one' => q({0} יארד רבוע),
 						'other' => q({0} יארד רבוע),
 						'two' => q({0} יארד רבוע),
 					},
@@ -3537,7 +3541,7 @@ has 'units' => (
 					'square-yard' => {
 						'many' => q({0} יארד רבוע),
 						'name' => q(יארד רבוע),
-						'one' => q(יארד רבוע {0}),
+						'one' => q({0} יארד רבוע),
 						'other' => q({0} יארד רבוע),
 						'two' => q({0} יארד רבוע),
 					},
@@ -3556,7 +3560,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} קראט),
 						'name' => q(קראט),
-						'one' => q(קראט אחד),
+						'one' => q({0} קראט),
 						'other' => q({0} קראט),
 						'two' => q({0} קראט),
 					},
@@ -3565,12 +3569,13 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} קראט),
 						'name' => q(קראט),
-						'one' => q(קראט אחד),
+						'one' => q({0} קראט),
 						'other' => q({0} קראט),
 						'two' => q({0} קראט),
 					},
 					# Long Unit Identifier
 					'concentr-milligram-ofglucose-per-deciliter' => {
+						'1' => q(masculine),
 						'many' => q({0} מיליגרם/דציליטר),
 						'name' => q(מיליגרם/דציליטר),
 						'one' => q({0} מיליגרם/דציליטר),
@@ -3579,6 +3584,7 @@ has 'units' => (
 					},
 					# Core Unit Identifier
 					'milligram-ofglucose-per-deciliter' => {
+						'1' => q(masculine),
 						'many' => q({0} מיליגרם/דציליטר),
 						'name' => q(מיליגרם/דציליטר),
 						'one' => q({0} מיליגרם/דציליטר),
@@ -3680,7 +3686,7 @@ has 'units' => (
 						'1' => q(feminine),
 						'many' => q({0} רבביות),
 						'name' => q(רבבית),
-						'one' => q(רבבית {0}),
+						'one' => q({0} רבבית),
 						'other' => q({0} רבביות),
 						'two' => q({0} רבביות),
 					},
@@ -3689,9 +3695,25 @@ has 'units' => (
 						'1' => q(feminine),
 						'many' => q({0} רבביות),
 						'name' => q(רבבית),
-						'one' => q(רבבית {0}),
+						'one' => q({0} רבבית),
 						'other' => q({0} רבביות),
 						'two' => q({0} רבביות),
+					},
+					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'1' => q(masculine),
+						'name' => q(חלקים למיליארד),
+						'one' => q({0} חלקים למיליארד),
+						'other' => q({0} חלקים למיליארד),
+						'two' => q({0} חלקים למיליארד),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'1' => q(masculine),
+						'name' => q(חלקים למיליארד),
+						'one' => q({0} חלקים למיליארד),
+						'other' => q({0} חלקים למיליארד),
+						'two' => q({0} חלקים למיליארד),
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
@@ -3792,20 +3814,20 @@ has 'units' => (
 					# Long Unit Identifier
 					'digital-gigabit' => {
 						'1' => q(masculine),
-						'many' => q({0} ג'יגה-ביט),
+						'many' => q({0} ג׳יגה-ביט),
 						'name' => q(ג׳יגה-ביט),
-						'one' => q({0} ג'יגה-ביט),
-						'other' => q({0} ג'יגה-ביט),
-						'two' => q({0} ג'יגה-ביט),
+						'one' => q({0} ג׳יגה-ביט),
+						'other' => q({0} ג׳יגה-ביט),
+						'two' => q({0} ג׳יגה-ביט),
 					},
 					# Core Unit Identifier
 					'gigabit' => {
 						'1' => q(masculine),
-						'many' => q({0} ג'יגה-ביט),
+						'many' => q({0} ג׳יגה-ביט),
 						'name' => q(ג׳יגה-ביט),
-						'one' => q({0} ג'יגה-ביט),
-						'other' => q({0} ג'יגה-ביט),
-						'two' => q({0} ג'יגה-ביט),
+						'one' => q({0} ג׳יגה-ביט),
+						'other' => q({0} ג׳יגה-ביט),
+						'two' => q({0} ג׳יגה-ביט),
 					},
 					# Long Unit Identifier
 					'digital-gigabyte' => {
@@ -3884,7 +3906,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} מגה-בייט),
 						'name' => q(מגה-בייט),
-						'one' => q(מגה-בייט),
+						'one' => q({0} מגה-בייט),
 						'other' => q({0} מגה-בייט),
 						'two' => q({0} מגה-בייט),
 					},
@@ -3893,7 +3915,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} מגה-בייט),
 						'name' => q(מגה-בייט),
-						'one' => q(מגה-בייט),
+						'one' => q({0} מגה-בייט),
 						'other' => q({0} מגה-בייט),
 						'two' => q({0} מגה-בייט),
 					},
@@ -3936,20 +3958,20 @@ has 'units' => (
 					# Long Unit Identifier
 					'digital-terabyte' => {
 						'1' => q(masculine),
-						'many' => q(טרה-בייט {0}),
+						'many' => q({0} טרה-בייט),
 						'name' => q(טרה-בייט),
-						'one' => q(טרה-בייט {0}),
-						'other' => q(טרה-בייט {0}),
-						'two' => q(טרה-בייט {0}),
+						'one' => q({0} טרה-בייט),
+						'other' => q({0} טרה-בייט),
+						'two' => q({0} טרה-בייט),
 					},
 					# Core Unit Identifier
 					'terabyte' => {
 						'1' => q(masculine),
-						'many' => q(טרה-בייט {0}),
+						'many' => q({0} טרה-בייט),
 						'name' => q(טרה-בייט),
-						'one' => q(טרה-בייט {0}),
-						'other' => q(טרה-בייט {0}),
-						'two' => q(טרה-בייט {0}),
+						'one' => q({0} טרה-בייט),
+						'other' => q({0} טרה-בייט),
+						'two' => q({0} טרה-בייט),
 					},
 					# Long Unit Identifier
 					'duration-century' => {
@@ -3963,7 +3985,7 @@ has 'units' => (
 					'duration-day' => {
 						'1' => q(masculine),
 						'many' => q({0} יום),
-						'one' => q(יום {0}),
+						'one' => q({0} יום),
 						'other' => q({0} ימים),
 						'two' => q(יומיים),
 					},
@@ -3971,7 +3993,7 @@ has 'units' => (
 					'day' => {
 						'1' => q(masculine),
 						'many' => q({0} יום),
-						'one' => q(יום {0}),
+						'one' => q({0} יום),
 						'other' => q({0} ימים),
 						'two' => q(יומיים),
 					},
@@ -3998,7 +4020,7 @@ has 'units' => (
 						'1' => q(feminine),
 						'many' => q({0} שעות),
 						'name' => q(שעות),
-						'one' => q(שעה),
+						'one' => q({0} שעה),
 						'other' => q({0} שעות),
 						'per' => q({0} לשעה),
 						'two' => q(שעתיים),
@@ -4008,7 +4030,7 @@ has 'units' => (
 						'1' => q(feminine),
 						'many' => q({0} שעות),
 						'name' => q(שעות),
-						'one' => q(שעה),
+						'one' => q({0} שעה),
 						'other' => q({0} שעות),
 						'per' => q({0} לשעה),
 						'two' => q(שעתיים),
@@ -4036,7 +4058,7 @@ has 'units' => (
 						'1' => q(feminine),
 						'many' => q({0} אלפיות שנייה),
 						'name' => q(אלפיות השניה),
-						'one' => q(אלפית שנייה {0}),
+						'one' => q({0} אלפית שנייה),
 						'other' => q({0} אלפיות שנייה),
 						'two' => q({0} אלפיות שנייה),
 					},
@@ -4045,7 +4067,7 @@ has 'units' => (
 						'1' => q(feminine),
 						'many' => q({0} אלפיות שנייה),
 						'name' => q(אלפיות השניה),
-						'one' => q(אלפית שנייה {0}),
+						'one' => q({0} אלפית שנייה),
 						'other' => q({0} אלפיות שנייה),
 						'two' => q({0} אלפיות שנייה),
 					},
@@ -4054,7 +4076,7 @@ has 'units' => (
 						'1' => q(feminine),
 						'many' => q({0} דקות),
 						'name' => q(דקות),
-						'one' => q(דקה),
+						'one' => q({0} דקה),
 						'other' => q({0} דקות),
 						'per' => q({0}/דקה),
 						'two' => q(שתי דקות),
@@ -4064,7 +4086,7 @@ has 'units' => (
 						'1' => q(feminine),
 						'many' => q({0} דקות),
 						'name' => q(דקות),
-						'one' => q(דקה),
+						'one' => q({0} דקה),
 						'other' => q({0} דקות),
 						'per' => q({0}/דקה),
 						'two' => q(שתי דקות),
@@ -4073,18 +4095,18 @@ has 'units' => (
 					'duration-month' => {
 						'1' => q(masculine),
 						'many' => q({0} חודשים),
-						'one' => q(חודש),
+						'one' => q({0} חודש),
 						'other' => q({0} חודשים),
-						'per' => q(‏{0} לחודש),
+						'per' => q({0} לחודש),
 						'two' => q(חודשיים),
 					},
 					# Core Unit Identifier
 					'month' => {
 						'1' => q(masculine),
 						'many' => q({0} חודשים),
-						'one' => q(חודש),
+						'one' => q({0} חודש),
 						'other' => q({0} חודשים),
-						'per' => q(‏{0} לחודש),
+						'per' => q({0} לחודש),
 						'two' => q(חודשיים),
 					},
 					# Long Unit Identifier
@@ -4102,6 +4124,24 @@ has 'units' => (
 						'one' => q({0} ננו שנייה),
 						'other' => q({0} ננו שניות),
 						'two' => q({0} ננו שניות),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'1' => q(masculine),
+						'name' => q(לילות),
+						'one' => q({0} לילה),
+						'other' => q({0} לילות),
+						'per' => q({0}/לילה),
+						'two' => q({0} לילות),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'1' => q(masculine),
+						'name' => q(לילות),
+						'one' => q({0} לילה),
+						'other' => q({0} לילות),
+						'per' => q({0}/לילה),
+						'two' => q({0} לילות),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -4122,9 +4162,9 @@ has 'units' => (
 					# Long Unit Identifier
 					'duration-second' => {
 						'1' => q(feminine),
-						'many' => q(‏{0} שניות),
+						'many' => q({0} שניות),
 						'name' => q(שניות),
-						'one' => q(שניה),
+						'one' => q({0} שניה),
 						'other' => q({0} שניות),
 						'per' => q({0} לשניה),
 						'two' => q(שתי שניות),
@@ -4132,9 +4172,9 @@ has 'units' => (
 					# Core Unit Identifier
 					'second' => {
 						'1' => q(feminine),
-						'many' => q(‏{0} שניות),
+						'many' => q({0} שניות),
 						'name' => q(שניות),
-						'one' => q(שניה),
+						'one' => q({0} שניה),
 						'other' => q({0} שניות),
 						'per' => q({0} לשניה),
 						'two' => q(שתי שניות),
@@ -4142,39 +4182,27 @@ has 'units' => (
 					# Long Unit Identifier
 					'duration-week' => {
 						'1' => q(masculine),
-						'one' => q(שבוע),
-						'other' => q({0} שבועות),
-						'two' => q(שבועיים),
 					},
 					# Core Unit Identifier
 					'week' => {
 						'1' => q(masculine),
-						'one' => q(שבוע),
-						'other' => q({0} שבועות),
-						'two' => q(שבועיים),
 					},
 					# Long Unit Identifier
 					'duration-year' => {
 						'1' => q(feminine),
-						'one' => q(שנה),
-						'other' => q({0} שנים),
-						'per' => q(‏{0} לשנה),
-						'two' => q(שנתיים),
+						'per' => q({0} לשנה),
 					},
 					# Core Unit Identifier
 					'year' => {
 						'1' => q(feminine),
-						'one' => q(שנה),
-						'other' => q({0} שנים),
-						'per' => q(‏{0} לשנה),
-						'two' => q(שנתיים),
+						'per' => q({0} לשנה),
 					},
 					# Long Unit Identifier
 					'electric-ampere' => {
 						'1' => q(masculine),
 						'many' => q({0} אמפר),
 						'name' => q(אמפר),
-						'one' => q(אמפר {0}),
+						'one' => q({0} אמפר),
 						'other' => q({0} אמפר),
 						'two' => q({0} אמפר),
 					},
@@ -4183,7 +4211,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} אמפר),
 						'name' => q(אמפר),
-						'one' => q(אמפר {0}),
+						'one' => q({0} אמפר),
 						'other' => q({0} אמפר),
 						'two' => q({0} אמפר),
 					},
@@ -4192,7 +4220,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} מיליאמפר),
 						'name' => q(מיליאמפר),
-						'one' => q(מיליאמפר {0}),
+						'one' => q({0} מיליאמפר),
 						'other' => q({0} מיליאמפר),
 						'two' => q({0} מיליאמפר),
 					},
@@ -4201,7 +4229,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} מיליאמפר),
 						'name' => q(מיליאמפר),
-						'one' => q(מיליאמפר {0}),
+						'one' => q({0} מיליאמפר),
 						'other' => q({0} מיליאמפר),
 						'two' => q({0} מיליאמפר),
 					},
@@ -4225,7 +4253,7 @@ has 'units' => (
 					'electric-volt' => {
 						'1' => q(masculine),
 						'many' => q({0} וולט),
-						'one' => q(וולט {0}),
+						'one' => q({0} וולט),
 						'other' => q({0} וולט),
 						'two' => q({0} וולט),
 					},
@@ -4233,7 +4261,7 @@ has 'units' => (
 					'volt' => {
 						'1' => q(masculine),
 						'many' => q({0} וולט),
-						'one' => q(וולט {0}),
+						'one' => q({0} וולט),
 						'other' => q({0} וולט),
 						'two' => q({0} וולט),
 					},
@@ -4258,7 +4286,7 @@ has 'units' => (
 						'1' => q(feminine),
 						'many' => q({0} קלוריות),
 						'name' => q(קלוריות),
-						'one' => q(קלוריה {0}),
+						'one' => q({0} קלוריה),
 						'other' => q({0} קלוריות),
 						'two' => q({0} קלוריות),
 					},
@@ -4267,7 +4295,7 @@ has 'units' => (
 						'1' => q(feminine),
 						'many' => q({0} קלוריות),
 						'name' => q(קלוריות),
-						'one' => q(קלוריה {0}),
+						'one' => q({0} קלוריה),
 						'other' => q({0} קלוריות),
 						'two' => q({0} קלוריות),
 					},
@@ -4291,17 +4319,17 @@ has 'units' => (
 					'energy-foodcalorie' => {
 						'many' => q({0} קלוריות),
 						'name' => q(קלוריות),
-						'one' => q(קלוריה אחת),
+						'one' => q({0} קלוריה),
 						'other' => q({0} קלוריות),
-						'two' => q(שתי קלוריות),
+						'two' => q({0} קלוריות),
 					},
 					# Core Unit Identifier
 					'foodcalorie' => {
 						'many' => q({0} קלוריות),
 						'name' => q(קלוריות),
-						'one' => q(קלוריה אחת),
+						'one' => q({0} קלוריה),
 						'other' => q({0} קלוריות),
-						'two' => q(שתי קלוריות),
+						'two' => q({0} קלוריות),
 					},
 					# Long Unit Identifier
 					'energy-joule' => {
@@ -4321,17 +4349,19 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'energy-kilocalorie' => {
+						'1' => q(feminine),
 						'many' => q({0} קילו קלוריות),
 						'name' => q(קילו קלוריות),
-						'one' => q(קילו קלוריה {0}),
+						'one' => q({0} קילו קלוריה),
 						'other' => q({0} קילו קלוריות),
 						'two' => q({0} קילו קלוריות),
 					},
 					# Core Unit Identifier
 					'kilocalorie' => {
+						'1' => q(feminine),
 						'many' => q({0} קילו קלוריות),
 						'name' => q(קילו קלוריות),
-						'one' => q(קילו קלוריה {0}),
+						'one' => q({0} קילו קלוריה),
 						'other' => q({0} קילו קלוריות),
 						'two' => q({0} קילו קלוריות),
 					},
@@ -4339,7 +4369,7 @@ has 'units' => (
 					'energy-kilojoule' => {
 						'1' => q(masculine),
 						'many' => q({0} קילו ג׳אול),
-						'one' => q(קילו ג׳אול {0}),
+						'one' => q({0} קילו ג׳אול),
 						'other' => q({0} קילו ג׳אול),
 						'two' => q({0} קילו ג׳אול),
 					},
@@ -4347,7 +4377,7 @@ has 'units' => (
 					'kilojoule' => {
 						'1' => q(masculine),
 						'many' => q({0} קילו ג׳אול),
-						'one' => q(קילו ג׳אול {0}),
+						'one' => q({0} קילו ג׳אול),
 						'other' => q({0} קילו ג׳אול),
 						'two' => q({0} קילו ג׳אול),
 					},
@@ -4356,7 +4386,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} קילוואט-שעה),
 						'name' => q(קילוואט־שעה),
-						'one' => q(קילוואט־שעה {0}),
+						'one' => q({0} קילוואט־שעה),
 						'other' => q({0} קילוואט-שעה),
 						'two' => q({0} קילוואט-שעה),
 					},
@@ -4365,7 +4395,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} קילוואט-שעה),
 						'name' => q(קילוואט־שעה),
-						'one' => q(קילוואט־שעה {0}),
+						'one' => q({0} קילוואט־שעה),
 						'other' => q({0} קילוואט-שעה),
 						'two' => q({0} קילוואט-שעה),
 					},
@@ -4434,7 +4464,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} ג׳יגה-הרץ),
 						'name' => q(ג׳יגה-הרץ),
-						'one' => q(ג׳יגה-הרץ {0}),
+						'one' => q({0} ג׳יגה-הרץ),
 						'other' => q({0} ג׳יגה-הרץ),
 						'two' => q({0} ג׳יגה-הרץ),
 					},
@@ -4443,7 +4473,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} ג׳יגה-הרץ),
 						'name' => q(ג׳יגה-הרץ),
-						'one' => q(ג׳יגה-הרץ {0}),
+						'one' => q({0} ג׳יגה-הרץ),
 						'other' => q({0} ג׳יגה-הרץ),
 						'two' => q({0} ג׳יגה-הרץ),
 					},
@@ -4452,7 +4482,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} הרץ),
 						'name' => q(הרץ),
-						'one' => q(הרץ {0}),
+						'one' => q({0} הרץ),
 						'other' => q({0} הרץ),
 						'two' => q({0} הרץ),
 					},
@@ -4461,7 +4491,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} הרץ),
 						'name' => q(הרץ),
-						'one' => q(הרץ {0}),
+						'one' => q({0} הרץ),
 						'other' => q({0} הרץ),
 						'two' => q({0} הרץ),
 					},
@@ -4470,7 +4500,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} קילו-הרץ),
 						'name' => q(קילו-הרץ),
-						'one' => q(קילו-הרץ {0}),
+						'one' => q({0} קילו-הרץ),
 						'other' => q({0} קילו-הרץ),
 						'two' => q({0} קילו-הרץ),
 					},
@@ -4479,7 +4509,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} קילו-הרץ),
 						'name' => q(קילו-הרץ),
-						'one' => q(קילו-הרץ {0}),
+						'one' => q({0} קילו-הרץ),
 						'other' => q({0} קילו-הרץ),
 						'two' => q({0} קילו-הרץ),
 					},
@@ -4488,7 +4518,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} מגה-הרץ),
 						'name' => q(מגה-הרץ),
-						'one' => q(מגה-הרץ {0}),
+						'one' => q({0} מגה-הרץ),
 						'other' => q({0} מגה-הרץ),
 						'two' => q({0} מגה-הרץ),
 					},
@@ -4497,69 +4527,41 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} מגה-הרץ),
 						'name' => q(מגה-הרץ),
-						'one' => q(מגה-הרץ {0}),
+						'one' => q({0} מגה-הרץ),
 						'other' => q({0} מגה-הרץ),
 						'two' => q({0} מגה-הרץ),
 					},
 					# Long Unit Identifier
 					'graphics-dot' => {
 						'name' => q(נקודות קטנות),
-						'one' => q({0} נקודה),
-						'other' => q(‎{0} px ‎),
-						'two' => q(‎{0} px ‎),
 					},
 					# Core Unit Identifier
 					'dot' => {
 						'name' => q(נקודות קטנות),
-						'one' => q({0} נקודה),
-						'other' => q(‎{0} px ‎),
-						'two' => q(‎{0} px ‎),
 					},
 					# Long Unit Identifier
 					'graphics-dot-per-centimeter' => {
-						'many' => q(‎{0} נקודות לסנטימטר),
 						'name' => q(נקודות לסנטימטר),
-						'one' => q(נקודה {0} לסנטימטר),
-						'other' => q({0} נקודות לסנטימטר),
-						'two' => q(‎{0} נקודות לסנטימטר),
 					},
 					# Core Unit Identifier
 					'dot-per-centimeter' => {
-						'many' => q(‎{0} נקודות לסנטימטר),
 						'name' => q(נקודות לסנטימטר),
-						'one' => q(נקודה {0} לסנטימטר),
-						'other' => q({0} נקודות לסנטימטר),
-						'two' => q(‎{0} נקודות לסנטימטר),
-					},
-					# Long Unit Identifier
-					'graphics-dot-per-inch' => {
-						'many' => q({0} ppi),
-						'one' => q(נקודות לאינץ׳),
-						'other' => q(‎{0} dpi‎),
-						'two' => q({0} ppi),
-					},
-					# Core Unit Identifier
-					'dot-per-inch' => {
-						'many' => q({0} ppi),
-						'one' => q(נקודות לאינץ׳),
-						'other' => q(‎{0} dpi‎),
-						'two' => q({0} ppi),
 					},
 					# Long Unit Identifier
 					'graphics-em' => {
 						'1' => q(masculine),
 						'name' => q(קו מפריד מסוג em),
-						'one' => q(‎{0} em ‎),
-						'other' => q(‎{0} ems ‎),
-						'two' => q(‎{0} em ‎),
+						'one' => q({0} em),
+						'other' => q({0} ems),
+						'two' => q({0} em),
 					},
 					# Core Unit Identifier
 					'em' => {
 						'1' => q(masculine),
 						'name' => q(קו מפריד מסוג em),
-						'one' => q(‎{0} em ‎),
-						'other' => q(‎{0} ems ‎),
-						'two' => q(‎{0} em ‎),
+						'one' => q({0} em),
+						'other' => q({0} ems),
+						'two' => q({0} em),
 					},
 					# Long Unit Identifier
 					'graphics-megapixel' => {
@@ -4593,23 +4595,25 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'graphics-pixel-per-inch' => {
+						'many' => q({0} פיקסלים לאינץ'),
 						'name' => q(פיקסלים לאינץ׳),
 						'one' => q({0} פיקסל לאינץ'),
 						'other' => q({0} פיקסלים לאינץ'),
-						'two' => q(‎{0} ppi‎),
+						'two' => q({0} פיקסלים לאינץ'),
 					},
 					# Core Unit Identifier
 					'pixel-per-inch' => {
+						'many' => q({0} פיקסלים לאינץ'),
 						'name' => q(פיקסלים לאינץ׳),
 						'one' => q({0} פיקסל לאינץ'),
 						'other' => q({0} פיקסלים לאינץ'),
-						'two' => q(‎{0} ppi‎),
+						'two' => q({0} פיקסלים לאינץ'),
 					},
 					# Long Unit Identifier
 					'length-astronomical-unit' => {
 						'many' => q({0} יחידות אסטרונומיות),
 						'name' => q(יחידות אסטרונומיות),
-						'one' => q(יחידה אסטרונומית {0}),
+						'one' => q({0} יחידה אסטרונומית),
 						'other' => q({0} יחידות אסטרונומיות),
 						'two' => q({0} יחידות אסטרונומיות),
 					},
@@ -4617,7 +4621,7 @@ has 'units' => (
 					'astronomical-unit' => {
 						'many' => q({0} יחידות אסטרונומיות),
 						'name' => q(יחידות אסטרונומיות),
-						'one' => q(יחידה אסטרונומית {0}),
+						'one' => q({0} יחידה אסטרונומית),
 						'other' => q({0} יחידות אסטרונומיות),
 						'two' => q({0} יחידות אסטרונומיות),
 					},
@@ -4626,7 +4630,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} סנטימטרים),
 						'name' => q(סנטימטרים),
-						'one' => q(סנטימטר {0}),
+						'one' => q({0} סנטימטר),
 						'other' => q({0} סנטימטרים),
 						'per' => q({0} לסנטימטר),
 						'two' => q({0} סנטימטרים),
@@ -4636,7 +4640,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} סנטימטרים),
 						'name' => q(סנטימטרים),
-						'one' => q(סנטימטר {0}),
+						'one' => q({0} סנטימטר),
 						'other' => q({0} סנטימטרים),
 						'per' => q({0} לסנטימטר),
 						'two' => q({0} סנטימטרים),
@@ -4646,7 +4650,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} דצימטרים),
 						'name' => q(דצימטר),
-						'one' => q(דצימטר אחד),
+						'one' => q({0} דצימטר),
 						'other' => q({0} דצימטרים),
 						'two' => q({0} דצימטרים),
 					},
@@ -4655,7 +4659,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} דצימטרים),
 						'name' => q(דצימטר),
-						'one' => q(דצימטר אחד),
+						'one' => q({0} דצימטר),
 						'other' => q({0} דצימטרים),
 						'two' => q({0} דצימטרים),
 					},
@@ -4663,7 +4667,7 @@ has 'units' => (
 					'length-earth-radius' => {
 						'many' => q({0} רדיוס כדור-הארץ),
 						'name' => q(רדיוס כדור-הארץ),
-						'one' => q(רדיוס כדור-הארץ),
+						'one' => q({0} רדיוס כדור-הארץ),
 						'other' => q({0} רדיוס כדור-הארץ),
 						'two' => q({0} רדיוס כדור-הארץ),
 					},
@@ -4671,7 +4675,7 @@ has 'units' => (
 					'earth-radius' => {
 						'many' => q({0} רדיוס כדור-הארץ),
 						'name' => q(רדיוס כדור-הארץ),
-						'one' => q(רדיוס כדור-הארץ),
+						'one' => q({0} רדיוס כדור-הארץ),
 						'other' => q({0} רדיוס כדור-הארץ),
 						'two' => q({0} רדיוס כדור-הארץ),
 					},
@@ -4694,7 +4698,7 @@ has 'units' => (
 					# Long Unit Identifier
 					'length-foot' => {
 						'many' => q({0} רגל),
-						'one' => q(רגל {0}),
+						'one' => q({0} רגל),
 						'other' => q({0} רגל),
 						'per' => q({0} לרגל),
 						'two' => q({0} רגל),
@@ -4702,7 +4706,7 @@ has 'units' => (
 					# Core Unit Identifier
 					'foot' => {
 						'many' => q({0} רגל),
-						'one' => q(רגל {0}),
+						'one' => q({0} רגל),
 						'other' => q({0} רגל),
 						'per' => q({0} לרגל),
 						'two' => q({0} רגל),
@@ -4726,7 +4730,7 @@ has 'units' => (
 					# Long Unit Identifier
 					'length-inch' => {
 						'many' => q({0} אינץ׳),
-						'one' => q(אינץ׳ {0}),
+						'one' => q({0} אינץ׳),
 						'other' => q({0} אינץ׳),
 						'per' => q({0} לאינץ׳),
 						'two' => q({0} אינץ׳),
@@ -4734,7 +4738,7 @@ has 'units' => (
 					# Core Unit Identifier
 					'inch' => {
 						'many' => q({0} אינץ׳),
-						'one' => q(אינץ׳ {0}),
+						'one' => q({0} אינץ׳),
 						'other' => q({0} אינץ׳),
 						'per' => q({0} לאינץ׳),
 						'two' => q({0} אינץ׳),
@@ -4744,7 +4748,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} קילומטרים),
 						'name' => q(קילומטרים),
-						'one' => q(קילומטר {0}),
+						'one' => q({0} קילומטר),
 						'other' => q({0} קילומטרים),
 						'per' => q({0} לקילומטר),
 						'two' => q({0} קילומטרים),
@@ -4754,7 +4758,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} קילומטרים),
 						'name' => q(קילומטרים),
-						'one' => q(קילומטר {0}),
+						'one' => q({0} קילומטר),
 						'other' => q({0} קילומטרים),
 						'per' => q({0} לקילומטר),
 						'two' => q({0} קילומטרים),
@@ -4763,7 +4767,7 @@ has 'units' => (
 					'length-meter' => {
 						'1' => q(masculine),
 						'many' => q({0} מטרים),
-						'one' => q(מטר {0}),
+						'one' => q({0} מטר),
 						'other' => q({0} מטרים),
 						'per' => q({0} למטר),
 						'two' => q({0} מטרים),
@@ -4772,7 +4776,7 @@ has 'units' => (
 					'meter' => {
 						'1' => q(masculine),
 						'many' => q({0} מטרים),
-						'one' => q(מטר {0}),
+						'one' => q({0} מטר),
 						'other' => q({0} מטרים),
 						'per' => q({0} למטר),
 						'two' => q({0} מטרים),
@@ -4782,7 +4786,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} מיקרומטרים),
 						'name' => q(מיקרומטרים),
-						'one' => q(מיקרומטר {0}),
+						'one' => q({0} מיקרומטר),
 						'other' => q({0} מיקרומטרים),
 						'two' => q({0} מיקרומטרים),
 					},
@@ -4791,28 +4795,16 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} מיקרומטרים),
 						'name' => q(מיקרומטרים),
-						'one' => q(מיקרומטר {0}),
+						'one' => q({0} מיקרומטר),
 						'other' => q({0} מיקרומטרים),
 						'two' => q({0} מיקרומטרים),
-					},
-					# Long Unit Identifier
-					'length-mile' => {
-						'one' => q(מייל {0}),
-						'other' => q({0} מייל),
-						'two' => q({0} מייל),
-					},
-					# Core Unit Identifier
-					'mile' => {
-						'one' => q(מייל {0}),
-						'other' => q({0} מייל),
-						'two' => q({0} מייל),
 					},
 					# Long Unit Identifier
 					'length-mile-scandinavian' => {
 						'1' => q(masculine),
 						'many' => q({0} מייל-סקנדינביה),
 						'name' => q(מייל-סקנדינביה),
-						'one' => q(מייל-סקנדינביה {0}),
+						'one' => q({0} מייל-סקנדינביה),
 						'other' => q({0} מייל-סקנדינביה),
 						'two' => q({0} מייל-סקנדינביה),
 					},
@@ -4821,7 +4813,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} מייל-סקנדינביה),
 						'name' => q(מייל-סקנדינביה),
-						'one' => q(מייל-סקנדינביה {0}),
+						'one' => q({0} מייל-סקנדינביה),
 						'other' => q({0} מייל-סקנדינביה),
 						'two' => q({0} מייל-סקנדינביה),
 					},
@@ -4830,7 +4822,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} מילימטרים),
 						'name' => q(מילימטרים),
-						'one' => q(מילימטר {0}),
+						'one' => q({0} מילימטר),
 						'other' => q({0} מילימטרים),
 						'two' => q({0} מילימטרים),
 					},
@@ -4839,7 +4831,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} מילימטרים),
 						'name' => q(מילימטרים),
-						'one' => q(מילימטר {0}),
+						'one' => q({0} מילימטר),
 						'other' => q({0} מילימטרים),
 						'two' => q({0} מילימטרים),
 					},
@@ -4848,7 +4840,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} ננומטרים),
 						'name' => q(ננומטרים),
-						'one' => q(ננומטר {0}),
+						'one' => q({0} ננומטר),
 						'other' => q({0} ננומטרים),
 						'two' => q({0} ננומטרים),
 					},
@@ -4857,7 +4849,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} ננומטרים),
 						'name' => q(ננומטרים),
-						'one' => q(ננומטר {0}),
+						'one' => q({0} ננומטר),
 						'other' => q({0} ננומטרים),
 						'two' => q({0} ננומטרים),
 					},
@@ -4865,7 +4857,7 @@ has 'units' => (
 					'length-nautical-mile' => {
 						'many' => q({0} מייל ימי),
 						'name' => q(מייל ימי),
-						'one' => q(מייל ימי {0}),
+						'one' => q({0} מייל ימי),
 						'other' => q({0} מייל ימי),
 						'two' => q({0} מייל ימי),
 					},
@@ -4873,7 +4865,7 @@ has 'units' => (
 					'nautical-mile' => {
 						'many' => q({0} מייל ימי),
 						'name' => q(מייל ימי),
-						'one' => q(מייל ימי {0}),
+						'one' => q({0} מייל ימי),
 						'other' => q({0} מייל ימי),
 						'two' => q({0} מייל ימי),
 					},
@@ -4898,7 +4890,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} פיקומטרים),
 						'name' => q(פיקומטרים),
-						'one' => q(פיקומטר {0}),
+						'one' => q({0} פיקומטר),
 						'other' => q({0} פיקומטרים),
 						'two' => q({0} פיקומטרים),
 					},
@@ -4907,21 +4899,25 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} פיקומטרים),
 						'name' => q(פיקומטרים),
-						'one' => q(פיקומטר {0}),
+						'one' => q({0} פיקומטר),
 						'other' => q({0} פיקומטרים),
 						'two' => q({0} פיקומטרים),
 					},
 					# Long Unit Identifier
 					'length-point' => {
-						'one' => q(נקודה),
+						'1' => q(feminine),
+						'many' => q({0} נקודות),
+						'one' => q({0} נקודה),
 						'other' => q({0} נקודות),
-						'two' => q({0} נק'),
+						'two' => q({0} נקודות),
 					},
 					# Core Unit Identifier
 					'point' => {
-						'one' => q(נקודה),
+						'1' => q(feminine),
+						'many' => q({0} נקודות),
+						'one' => q({0} נקודה),
 						'other' => q({0} נקודות),
-						'two' => q({0} נק'),
+						'two' => q({0} נקודות),
 					},
 					# Long Unit Identifier
 					'length-solar-radius' => {
@@ -4944,7 +4940,7 @@ has 'units' => (
 						'1' => q(feminine),
 						'many' => q({0} קנדלה),
 						'name' => q(קנדלה),
-						'one' => q(קנדלה),
+						'one' => q({0} קנדלה),
 						'other' => q({0} קנדלה),
 						'two' => q({0} קנדלה),
 					},
@@ -4953,7 +4949,7 @@ has 'units' => (
 						'1' => q(feminine),
 						'many' => q({0} קנדלה),
 						'name' => q(קנדלה),
-						'one' => q(קנדלה),
+						'one' => q({0} קנדלה),
 						'other' => q({0} קנדלה),
 						'two' => q({0} קנדלה),
 					},
@@ -4962,7 +4958,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} לומן),
 						'name' => q(לומן),
-						'one' => q(לומן {0}),
+						'one' => q({0} לומן),
 						'other' => q({0} לומן),
 						'two' => q({0} לומן),
 					},
@@ -4971,7 +4967,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} לומן),
 						'name' => q(לומן),
-						'one' => q(לומן {0}),
+						'one' => q({0} לומן),
 						'other' => q({0} לומן),
 						'two' => q({0} לומן),
 					},
@@ -4980,7 +4976,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} לוקס),
 						'name' => q(לוקס),
-						'one' => q(לוקס אחד),
+						'one' => q({0} לוקס),
 						'other' => q({0} לוקס),
 						'two' => q({0} לוקס),
 					},
@@ -4989,7 +4985,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} לוקס),
 						'name' => q(לוקס),
-						'one' => q(לוקס אחד),
+						'one' => q({0} לוקס),
 						'other' => q({0} לוקס),
 						'two' => q({0} לוקס),
 					},
@@ -5005,17 +5001,17 @@ has 'units' => (
 					'mass-carat' => {
 						'1' => q(masculine),
 						'many' => q({0} קרט),
-						'one' => q(קרט אחד),
+						'one' => q({0} קרט),
 						'other' => q({0} קרט),
-						'two' => q(שני קרט),
+						'two' => q({0} קרט),
 					},
 					# Core Unit Identifier
 					'carat' => {
 						'1' => q(masculine),
 						'many' => q({0} קרט),
-						'one' => q(קרט אחד),
+						'one' => q({0} קרט),
 						'other' => q({0} קרט),
-						'two' => q(שני קרט),
+						'two' => q({0} קרט),
 					},
 					# Long Unit Identifier
 					'mass-dalton' => {
@@ -5038,7 +5034,7 @@ has 'units' => (
 						'many' => q({0} מסות כדור הארץ),
 						'name' => q(מסת כדור הארץ),
 						'one' => q({0} מסת כדור הארץ),
-						'other' => q({0} M⊕),
+						'other' => q({0} מסות כדור הארץ),
 						'two' => q({0} מסות כדור הארץ),
 					},
 					# Core Unit Identifier
@@ -5046,14 +5042,14 @@ has 'units' => (
 						'many' => q({0} מסות כדור הארץ),
 						'name' => q(מסת כדור הארץ),
 						'one' => q({0} מסת כדור הארץ),
-						'other' => q({0} M⊕),
+						'other' => q({0} מסות כדור הארץ),
 						'two' => q({0} מסות כדור הארץ),
 					},
 					# Long Unit Identifier
 					'mass-gram' => {
 						'1' => q(masculine),
 						'many' => q({0} גרם),
-						'one' => q(גרם {0}),
+						'one' => q({0} גרם),
 						'other' => q({0} גרם),
 						'per' => q({0}/גרם),
 						'two' => q({0} גרם),
@@ -5062,7 +5058,7 @@ has 'units' => (
 					'gram' => {
 						'1' => q(masculine),
 						'many' => q({0} גרם),
-						'one' => q(גרם {0}),
+						'one' => q({0} גרם),
 						'other' => q({0} גרם),
 						'per' => q({0}/גרם),
 						'two' => q({0} גרם),
@@ -5072,7 +5068,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} קילוגרם),
 						'name' => q(קילוגרם),
-						'one' => q(קילוגרם {0}),
+						'one' => q({0} קילוגרם),
 						'other' => q({0} קילוגרם),
 						'per' => q({0}/קילוגרם),
 						'two' => q({0} קילוגרם),
@@ -5082,7 +5078,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} קילוגרם),
 						'name' => q(קילוגרם),
-						'one' => q(קילוגרם {0}),
+						'one' => q({0} קילוגרם),
 						'other' => q({0} קילוגרם),
 						'per' => q({0}/קילוגרם),
 						'two' => q({0} קילוגרם),
@@ -5092,42 +5088,42 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} מיקרוגרם),
 						'name' => q(מיקרוגרם),
-						'one' => q(מיקרוגרם אחד),
+						'one' => q({0} מיקרוגרם),
 						'other' => q({0} מיקרוגרם),
-						'two' => q(שני מיקרוגרם),
+						'two' => q({0} מיקרוגרם),
 					},
 					# Core Unit Identifier
 					'microgram' => {
 						'1' => q(masculine),
 						'many' => q({0} מיקרוגרם),
 						'name' => q(מיקרוגרם),
-						'one' => q(מיקרוגרם אחד),
+						'one' => q({0} מיקרוגרם),
 						'other' => q({0} מיקרוגרם),
-						'two' => q(שני מיקרוגרם),
+						'two' => q({0} מיקרוגרם),
 					},
 					# Long Unit Identifier
 					'mass-milligram' => {
 						'1' => q(masculine),
 						'many' => q({0} מיליגרם),
 						'name' => q(מיליגרם),
-						'one' => q(מיליגרם אחד),
+						'one' => q({0} מיליגרם),
 						'other' => q({0} מיליגרם),
-						'two' => q(שני מיליגרם),
+						'two' => q({0} מיליגרם),
 					},
 					# Core Unit Identifier
 					'milligram' => {
 						'1' => q(masculine),
 						'many' => q({0} מיליגרם),
 						'name' => q(מיליגרם),
-						'one' => q(מיליגרם אחד),
+						'one' => q({0} מיליגרם),
 						'other' => q({0} מיליגרם),
-						'two' => q(שני מיליגרם),
+						'two' => q({0} מיליגרם),
 					},
 					# Long Unit Identifier
 					'mass-ounce' => {
 						'many' => q({0} אונקיות),
 						'name' => q(אונקיות),
-						'one' => q(אונקיה {0}),
+						'one' => q({0} אונקיה),
 						'other' => q({0} אונקיות),
 						'per' => q({0}/אונקיה),
 						'two' => q({0} אונקיות),
@@ -5136,7 +5132,7 @@ has 'units' => (
 					'ounce' => {
 						'many' => q({0} אונקיות),
 						'name' => q(אונקיות),
-						'one' => q(אונקיה {0}),
+						'one' => q({0} אונקיה),
 						'other' => q({0} אונקיות),
 						'per' => q({0}/אונקיה),
 						'two' => q({0} אונקיות),
@@ -5145,33 +5141,33 @@ has 'units' => (
 					'mass-ounce-troy' => {
 						'many' => q({0} אונקיות טרוי),
 						'name' => q(אונקיות טרוי),
-						'one' => q(אונקיית טרוי אחת),
+						'one' => q({0} אונקיית טרוי),
 						'other' => q({0} אונקיות טרוי),
-						'two' => q(שתי אונקיות טרוי),
+						'two' => q({0} אונקיות טרוי),
 					},
 					# Core Unit Identifier
 					'ounce-troy' => {
 						'many' => q({0} אונקיות טרוי),
 						'name' => q(אונקיות טרוי),
-						'one' => q(אונקיית טרוי אחת),
+						'one' => q({0} אונקיית טרוי),
 						'other' => q({0} אונקיות טרוי),
-						'two' => q(שתי אונקיות טרוי),
+						'two' => q({0} אונקיות טרוי),
 					},
 					# Long Unit Identifier
 					'mass-pound' => {
 						'many' => q({0} פאונד),
-						'one' => q(פאונד אחד),
+						'one' => q({0} פאונד),
 						'other' => q({0} פאונד),
 						'per' => q({0}/פאונד),
-						'two' => q(שני פאונד),
+						'two' => q({0} פאונד),
 					},
 					# Core Unit Identifier
 					'pound' => {
 						'many' => q({0} פאונד),
-						'one' => q(פאונד אחד),
+						'one' => q({0} פאונד),
 						'other' => q({0} פאונד),
 						'per' => q({0}/פאונד),
-						'two' => q(שני פאונד),
+						'two' => q({0} פאונד),
 					},
 					# Long Unit Identifier
 					'mass-solar-mass' => {
@@ -5193,35 +5189,35 @@ has 'units' => (
 					'mass-ton' => {
 						'many' => q({0} טונות),
 						'name' => q(טונות),
-						'one' => q(טונה אחת),
+						'one' => q({0} טונה),
 						'other' => q({0} טונות),
-						'two' => q(שתי טונות),
+						'two' => q({0} טונות),
 					},
 					# Core Unit Identifier
 					'ton' => {
 						'many' => q({0} טונות),
 						'name' => q(טונות),
-						'one' => q(טונה אחת),
+						'one' => q({0} טונה),
 						'other' => q({0} טונות),
-						'two' => q(שתי טונות),
+						'two' => q({0} טונות),
 					},
 					# Long Unit Identifier
 					'mass-tonne' => {
 						'1' => q(masculine),
 						'many' => q({0} טון מטרי),
 						'name' => q(טון מטרי),
-						'one' => q(טון מטרי אחד),
+						'one' => q({0} טון מטרי),
 						'other' => q({0} טון מטרי),
-						'two' => q(שני טון מטרי),
+						'two' => q({0} טון מטרי),
 					},
 					# Core Unit Identifier
 					'tonne' => {
 						'1' => q(masculine),
 						'many' => q({0} טון מטרי),
 						'name' => q(טון מטרי),
-						'one' => q(טון מטרי אחד),
+						'one' => q({0} טון מטרי),
 						'other' => q({0} טון מטרי),
-						'two' => q(שני טון מטרי),
+						'two' => q({0} טון מטרי),
 					},
 					# Long Unit Identifier
 					'per' => {
@@ -5236,7 +5232,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} ג׳יגה ואט),
 						'name' => q(ג׳יגה ואט),
-						'one' => q(ג׳יגה ואט {0}),
+						'one' => q({0} ג׳יגה ואט),
 						'other' => q({0} ג׳יגה ואט),
 						'two' => q({0} ג׳יגה ואט),
 					},
@@ -5245,7 +5241,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} ג׳יגה ואט),
 						'name' => q(ג׳יגה ואט),
-						'one' => q(ג׳יגה ואט {0}),
+						'one' => q({0} ג׳יגה ואט),
 						'other' => q({0} ג׳יגה ואט),
 						'two' => q({0} ג׳יגה ואט),
 					},
@@ -5253,7 +5249,7 @@ has 'units' => (
 					'power-horsepower' => {
 						'many' => q({0} כוח סוס),
 						'name' => q(כוח סוס),
-						'one' => q(כוח סוס {0}),
+						'one' => q({0} כוח סוס),
 						'other' => q({0} כוח סוס),
 						'two' => q({0} כוח סוס),
 					},
@@ -5261,7 +5257,7 @@ has 'units' => (
 					'horsepower' => {
 						'many' => q({0} כוח סוס),
 						'name' => q(כוח סוס),
-						'one' => q(כוח סוס {0}),
+						'one' => q({0} כוח סוס),
 						'other' => q({0} כוח סוס),
 						'two' => q({0} כוח סוס),
 					},
@@ -5270,7 +5266,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} קילוואט),
 						'name' => q(קילוואט),
-						'one' => q(קילוואט {0}),
+						'one' => q({0} קילוואט),
 						'other' => q({0} קילוואט),
 						'two' => q({0} קילוואט),
 					},
@@ -5279,7 +5275,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} קילוואט),
 						'name' => q(קילוואט),
-						'one' => q(קילוואט {0}),
+						'one' => q({0} קילוואט),
 						'other' => q({0} קילוואט),
 						'two' => q({0} קילוואט),
 					},
@@ -5288,7 +5284,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} מגה ואט),
 						'name' => q(מגה ואט),
-						'one' => q(מגה ואט {0}),
+						'one' => q({0} מגה ואט),
 						'other' => q({0} מגה ואט),
 						'two' => q({0} מגה ואט),
 					},
@@ -5297,7 +5293,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} מגה ואט),
 						'name' => q(מגה ואט),
-						'one' => q(מגה ואט {0}),
+						'one' => q({0} מגה ואט),
 						'other' => q({0} מגה ואט),
 						'two' => q({0} מגה ואט),
 					},
@@ -5306,7 +5302,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} מיליוואט),
 						'name' => q(מיליוואט),
-						'one' => q(מיליוואט {0}),
+						'one' => q({0} מיליוואט),
 						'other' => q({0} מיליוואט),
 						'two' => q({0} מיליוואט),
 					},
@@ -5315,7 +5311,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} מיליוואט),
 						'name' => q(מיליוואט),
-						'one' => q(מיליוואט {0}),
+						'one' => q({0} מיליוואט),
 						'other' => q({0} מיליוואט),
 						'two' => q({0} מיליוואט),
 					},
@@ -5323,7 +5319,7 @@ has 'units' => (
 					'power-watt' => {
 						'1' => q(masculine),
 						'many' => q({0} ואט),
-						'one' => q(ואט {0}),
+						'one' => q({0} ואט),
 						'other' => q({0} ואט),
 						'two' => q({0} ואט),
 					},
@@ -5331,7 +5327,7 @@ has 'units' => (
 					'watt' => {
 						'1' => q(masculine),
 						'many' => q({0} ואט),
-						'one' => q(ואט {0}),
+						'one' => q({0} ואט),
 						'other' => q({0} ואט),
 						'two' => q({0} ואט),
 					},
@@ -5394,7 +5390,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} הקטופסקל),
 						'name' => q(הקטופסקל),
-						'one' => q(הקטופסקל {0}),
+						'one' => q({0} הקטופסקל),
 						'other' => q({0} הקטופסקל),
 						'two' => q({0} הקטופסקל),
 					},
@@ -5403,7 +5399,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} הקטופסקל),
 						'name' => q(הקטופסקל),
-						'one' => q(הקטופסקל {0}),
+						'one' => q({0} הקטופסקל),
 						'other' => q({0} הקטופסקל),
 						'two' => q({0} הקטופסקל),
 					},
@@ -5411,7 +5407,7 @@ has 'units' => (
 					'pressure-inch-ofhg' => {
 						'many' => q({0} אינץ׳ כספית),
 						'name' => q(אינץ׳ כספית),
-						'one' => q(אינץ׳ כספית {0}),
+						'one' => q({0} אינץ׳ כספית),
 						'other' => q({0} אינץ׳ כספית),
 						'two' => q({0} אינץ׳ כספית),
 					},
@@ -5419,7 +5415,7 @@ has 'units' => (
 					'inch-ofhg' => {
 						'many' => q({0} אינץ׳ כספית),
 						'name' => q(אינץ׳ כספית),
-						'one' => q(אינץ׳ כספית {0}),
+						'one' => q({0} אינץ׳ כספית),
 						'other' => q({0} אינץ׳ כספית),
 						'two' => q({0} אינץ׳ כספית),
 					},
@@ -5479,19 +5475,21 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'pressure-millimeter-ofhg' => {
+						'1' => q(masculine),
 						'many' => q({0} מילימטר כספית),
 						'name' => q(מילימטר כספית),
-						'one' => q(מילימטר כספית אחד),
+						'one' => q({0} מילימטר כספית),
 						'other' => q({0} מילימטר כספית),
-						'two' => q(שני מילימטר כספית),
+						'two' => q({0} מילימטר כספית),
 					},
 					# Core Unit Identifier
 					'millimeter-ofhg' => {
+						'1' => q(masculine),
 						'many' => q({0} מילימטר כספית),
 						'name' => q(מילימטר כספית),
-						'one' => q(מילימטר כספית אחד),
+						'one' => q({0} מילימטר כספית),
 						'other' => q({0} מילימטר כספית),
-						'two' => q(שני מילימטר כספית),
+						'two' => q({0} מילימטר כספית),
 					},
 					# Long Unit Identifier
 					'pressure-pascal' => {
@@ -5515,31 +5513,31 @@ has 'units' => (
 					'pressure-pound-force-per-square-inch' => {
 						'many' => q({0} פאונד לאינץ׳ רבוע),
 						'name' => q(פאונד לאינץ׳ רבוע),
-						'one' => q(פאונד אחד לאינץ׳ רבוע),
+						'one' => q(פאונד {0} לאינץ׳ רבוע),
 						'other' => q({0} פאונד לאינץ׳ רבוע),
-						'two' => q(שני פאונד לאינץ׳ רבוע),
+						'two' => q({0} פאונד לאינץ׳ רבוע),
 					},
 					# Core Unit Identifier
 					'pound-force-per-square-inch' => {
 						'many' => q({0} פאונד לאינץ׳ רבוע),
 						'name' => q(פאונד לאינץ׳ רבוע),
-						'one' => q(פאונד אחד לאינץ׳ רבוע),
+						'one' => q(פאונד {0} לאינץ׳ רבוע),
 						'other' => q({0} פאונד לאינץ׳ רבוע),
-						'two' => q(שני פאונד לאינץ׳ רבוע),
+						'two' => q({0} פאונד לאינץ׳ רבוע),
 					},
 					# Long Unit Identifier
 					'speed-beaufort' => {
 						'name' => q(בופורט),
-						'one' => q(בופורט {0}),
-						'other' => q(בופורט {0}),
-						'two' => q(B {0}),
+						'one' => q({0} בופורט),
+						'other' => q({0} בופורט),
+						'two' => q({0} בופורט),
 					},
 					# Core Unit Identifier
 					'beaufort' => {
 						'name' => q(בופורט),
-						'one' => q(בופורט {0}),
-						'other' => q(בופורט {0}),
-						'two' => q(B {0}),
+						'one' => q({0} בופורט),
+						'other' => q({0} בופורט),
+						'two' => q({0} בופורט),
 					},
 					# Long Unit Identifier
 					'speed-kilometer-per-hour' => {
@@ -5563,17 +5561,33 @@ has 'units' => (
 					'speed-knot' => {
 						'many' => q({0} קשר),
 						'name' => q(קשר),
-						'one' => q(קשר אחד),
+						'one' => q({0} קשר),
 						'other' => q({0} קשר),
-						'two' => q(שני קשר),
+						'two' => q({0} קשר),
 					},
 					# Core Unit Identifier
 					'knot' => {
 						'many' => q({0} קשר),
 						'name' => q(קשר),
-						'one' => q(קשר אחד),
+						'one' => q({0} קשר),
 						'other' => q({0} קשר),
-						'two' => q(שני קשר),
+						'two' => q({0} קשר),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'1' => q(masculine),
+						'name' => q(אור),
+						'one' => q({0} אור),
+						'other' => q({0} אור),
+						'two' => q({0} אור),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'1' => q(masculine),
+						'name' => q(אור),
+						'one' => q({0} אור),
+						'other' => q({0} אור),
+						'two' => q({0} אור),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -5614,7 +5628,7 @@ has 'units' => (
 						'1' => q(feminine),
 						'many' => q({0} מעלות צלזיוס),
 						'name' => q(מעלות צלזיוס),
-						'one' => q(מעלת צלזיוס {0}),
+						'one' => q({0} מעלת צלזיוס),
 						'other' => q({0} מעלות צלזיוס),
 						'two' => q({0} מעלות צלזיוס),
 					},
@@ -5623,7 +5637,7 @@ has 'units' => (
 						'1' => q(feminine),
 						'many' => q({0} מעלות צלזיוס),
 						'name' => q(מעלות צלזיוס),
-						'one' => q(מעלת צלזיוס {0}),
+						'one' => q({0} מעלת צלזיוס),
 						'other' => q({0} מעלות צלזיוס),
 						'two' => q({0} מעלות צלזיוס),
 					},
@@ -5631,7 +5645,7 @@ has 'units' => (
 					'temperature-fahrenheit' => {
 						'many' => q({0} מעלות פרנהייט),
 						'name' => q(מעלות פרנהייט),
-						'one' => q(מעלת פרנהייט {0}),
+						'one' => q({0} מעלת פרנהייט),
 						'other' => q({0} מעלות פרנהייט),
 						'two' => q({0} מעלות פרנהייט),
 					},
@@ -5639,24 +5653,26 @@ has 'units' => (
 					'fahrenheit' => {
 						'many' => q({0} מעלות פרנהייט),
 						'name' => q(מעלות פרנהייט),
-						'one' => q(מעלת פרנהייט {0}),
+						'one' => q({0} מעלת פרנהייט),
 						'other' => q({0} מעלות פרנהייט),
 						'two' => q({0} מעלות פרנהייט),
 					},
 					# Long Unit Identifier
 					'temperature-generic' => {
 						'1' => q(feminine),
+						'name' => q(מעלת טמפרטורה),
 					},
 					# Core Unit Identifier
 					'generic' => {
 						'1' => q(feminine),
+						'name' => q(מעלת טמפרטורה),
 					},
 					# Long Unit Identifier
 					'temperature-kelvin' => {
 						'1' => q(feminine),
 						'many' => q({0} קלווין),
 						'name' => q(מעלות קלווין),
-						'one' => q(קלווין {0}),
+						'one' => q({0} קלווין),
 						'other' => q({0} קלווין),
 						'two' => q({0} קלווין),
 					},
@@ -5665,7 +5681,7 @@ has 'units' => (
 						'1' => q(feminine),
 						'many' => q({0} קלווין),
 						'name' => q(מעלות קלווין),
-						'one' => q(קלווין {0}),
+						'one' => q({0} קלווין),
 						'other' => q({0} קלווין),
 						'two' => q({0} קלווין),
 					},
@@ -5707,7 +5723,7 @@ has 'units' => (
 					'volume-acre-foot' => {
 						'many' => q({0} אקר-רגל),
 						'name' => q(אקר-רגל),
-						'one' => q(אקר-רגל {0}),
+						'one' => q({0} אקר-רגל),
 						'other' => q({0} אקר-רגל),
 						'two' => q({0} אקר-רגל),
 					},
@@ -5715,7 +5731,7 @@ has 'units' => (
 					'acre-foot' => {
 						'many' => q({0} אקר-רגל),
 						'name' => q(אקר-רגל),
-						'one' => q(אקר-רגל {0}),
+						'one' => q({0} אקר-רגל),
 						'other' => q({0} אקר-רגל),
 						'two' => q({0} אקר-רגל),
 					},
@@ -5756,7 +5772,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} סנטיליטר),
 						'name' => q(סנטיליטר),
-						'one' => q(סנטיליטר {0}),
+						'one' => q({0} סנטיליטר),
 						'other' => q({0} סנטיליטר),
 						'two' => q({0} סנטיליטר),
 					},
@@ -5765,7 +5781,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} סנטיליטר),
 						'name' => q(סנטיליטר),
-						'one' => q(סנטיליטר {0}),
+						'one' => q({0} סנטיליטר),
 						'other' => q({0} סנטיליטר),
 						'two' => q({0} סנטיליטר),
 					},
@@ -5774,7 +5790,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} סנטימטר מעוקב),
 						'name' => q(סנטימטר מעוקב),
-						'one' => q(סנטימטר מעוקב {0}),
+						'one' => q({0} סנטימטר מעוקב),
 						'other' => q({0} סנטימטר מעוקב),
 						'per' => q({0}/סנטימטר מעוקב),
 						'two' => q({0} סנטימטר מעוקב),
@@ -5784,7 +5800,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} סנטימטר מעוקב),
 						'name' => q(סנטימטר מעוקב),
-						'one' => q(סנטימטר מעוקב {0}),
+						'one' => q({0} סנטימטר מעוקב),
 						'other' => q({0} סנטימטר מעוקב),
 						'per' => q({0}/סנטימטר מעוקב),
 						'two' => q({0} סנטימטר מעוקב),
@@ -5793,7 +5809,7 @@ has 'units' => (
 					'volume-cubic-foot' => {
 						'many' => q({0} רגל מעוקב),
 						'name' => q(רגל מעוקב),
-						'one' => q(רגל מעוקב {0}),
+						'one' => q({0} רגל מעוקב),
 						'other' => q({0} רגל מעוקב),
 						'two' => q({0} רגל מעוקב),
 					},
@@ -5801,7 +5817,7 @@ has 'units' => (
 					'cubic-foot' => {
 						'many' => q({0} רגל מעוקב),
 						'name' => q(רגל מעוקב),
-						'one' => q(רגל מעוקב {0}),
+						'one' => q({0} רגל מעוקב),
 						'other' => q({0} רגל מעוקב),
 						'two' => q({0} רגל מעוקב),
 					},
@@ -5809,7 +5825,7 @@ has 'units' => (
 					'volume-cubic-inch' => {
 						'many' => q({0} אינץ׳ מעוקב),
 						'name' => q(אינץ׳ מעוקב),
-						'one' => q(אינץ׳ מעוקב {0}),
+						'one' => q({0} אינץ׳ מעוקב),
 						'other' => q({0} אינץ׳ מעוקב),
 						'two' => q({0} אינץ׳ מעוקב),
 					},
@@ -5817,7 +5833,7 @@ has 'units' => (
 					'cubic-inch' => {
 						'many' => q({0} אינץ׳ מעוקב),
 						'name' => q(אינץ׳ מעוקב),
-						'one' => q(אינץ׳ מעוקב {0}),
+						'one' => q({0} אינץ׳ מעוקב),
 						'other' => q({0} אינץ׳ מעוקב),
 						'two' => q({0} אינץ׳ מעוקב),
 					},
@@ -5826,7 +5842,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} קילומטר מעוקב),
 						'name' => q(קילומטר מעוקב),
-						'one' => q(קילומטר מעוקב {0}),
+						'one' => q({0} קילומטר מעוקב),
 						'other' => q({0} קילומטר מעוקב),
 						'two' => q({0} קילומטר מעוקב),
 					},
@@ -5835,7 +5851,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} קילומטר מעוקב),
 						'name' => q(קילומטר מעוקב),
-						'one' => q(קילומטר מעוקב {0}),
+						'one' => q({0} קילומטר מעוקב),
 						'other' => q({0} קילומטר מעוקב),
 						'two' => q({0} קילומטר מעוקב),
 					},
@@ -5844,7 +5860,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} מטר מעוקב),
 						'name' => q(מטר מעוקב),
-						'one' => q(מטר מעוקב {0}),
+						'one' => q({0} מטר מעוקב),
 						'other' => q({0} מטר מעוקב),
 						'per' => q({0}/מטר מעוקב),
 						'two' => q({0} מטר מעוקב),
@@ -5854,7 +5870,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} מטר מעוקב),
 						'name' => q(מטר מעוקב),
-						'one' => q(מטר מעוקב {0}),
+						'one' => q({0} מטר מעוקב),
 						'other' => q({0} מטר מעוקב),
 						'per' => q({0}/מטר מעוקב),
 						'two' => q({0} מטר מעוקב),
@@ -5863,7 +5879,7 @@ has 'units' => (
 					'volume-cubic-mile' => {
 						'many' => q({0} מייל מעוקב),
 						'name' => q(מייל מעוקב),
-						'one' => q(מייל מעוקב {0}),
+						'one' => q({0} מייל מעוקב),
 						'other' => q({0} מייל מעוקב),
 						'two' => q({0} מייל מעוקב),
 					},
@@ -5871,7 +5887,7 @@ has 'units' => (
 					'cubic-mile' => {
 						'many' => q({0} מייל מעוקב),
 						'name' => q(מייל מעוקב),
-						'one' => q(מייל מעוקב {0}),
+						'one' => q({0} מייל מעוקב),
 						'other' => q({0} מייל מעוקב),
 						'two' => q({0} מייל מעוקב),
 					},
@@ -5894,14 +5910,14 @@ has 'units' => (
 					# Long Unit Identifier
 					'volume-cup' => {
 						'many' => q({0} כוסות),
-						'one' => q(כוס {0}),
+						'one' => q({0} כוס),
 						'other' => q({0} כוסות),
 						'two' => q({0} כוסות),
 					},
 					# Core Unit Identifier
 					'cup' => {
 						'many' => q({0} כוסות),
-						'one' => q(כוס {0}),
+						'one' => q({0} כוס),
 						'other' => q({0} כוסות),
 						'two' => q({0} כוסות),
 					},
@@ -5910,7 +5926,7 @@ has 'units' => (
 						'1' => q(feminine),
 						'many' => q({0} כ׳ מידה מטרית),
 						'name' => q(כוס מידה מטרית),
-						'one' => q(כוס מידה מטרית {0}),
+						'one' => q({0} כוס מידה מטרית),
 						'other' => q({0} כ׳ מידה מטרית),
 						'two' => q({0} כ׳ מידה מטרית),
 					},
@@ -5919,7 +5935,7 @@ has 'units' => (
 						'1' => q(feminine),
 						'many' => q({0} כ׳ מידה מטרית),
 						'name' => q(כוס מידה מטרית),
-						'one' => q(כוס מידה מטרית {0}),
+						'one' => q({0} כוס מידה מטרית),
 						'other' => q({0} כ׳ מידה מטרית),
 						'two' => q({0} כ׳ מידה מטרית),
 					},
@@ -5928,7 +5944,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} דציליטר),
 						'name' => q(דציליטר),
-						'one' => q(דציליטר {0}),
+						'one' => q({0} דציליטר),
 						'other' => q({0} דציליטר),
 						'two' => q({0} דציליטר),
 					},
@@ -5937,7 +5953,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} דציליטר),
 						'name' => q(דציליטר),
-						'one' => q(דציליטר {0}),
+						'one' => q({0} דציליטר),
 						'other' => q({0} דציליטר),
 						'two' => q({0} דציליטר),
 					},
@@ -5945,7 +5961,7 @@ has 'units' => (
 					'volume-dessert-spoon' => {
 						'many' => q({0} כפיות קינוחים),
 						'name' => q(כפית קינוחים),
-						'one' => q(כפית קינוחים),
+						'one' => q({0} כפית קינוחים),
 						'other' => q({0} כפיות קינוחים),
 						'two' => q({0} כפיות קינוחים),
 					},
@@ -5953,7 +5969,7 @@ has 'units' => (
 					'dessert-spoon' => {
 						'many' => q({0} כפיות קינוחים),
 						'name' => q(כפית קינוחים),
-						'one' => q(כפית קינוחים),
+						'one' => q({0} כפית קינוחים),
 						'other' => q({0} כפיות קינוחים),
 						'two' => q({0} כפיות קינוחים),
 					},
@@ -5961,7 +5977,7 @@ has 'units' => (
 					'volume-dessert-spoon-imperial' => {
 						'many' => q({0} כפיות קינוחים בארה"ב),
 						'name' => q(כפית קינוחים בארה״ב),
-						'one' => q(כפית קינוחים בארה״ב),
+						'one' => q({0} כפית קינוחים בארה״ב),
 						'other' => q({0} כפיות קינוחים בארה"ב),
 						'two' => q({0} כפיות קינוחים בארה"ב),
 					},
@@ -5969,7 +5985,7 @@ has 'units' => (
 					'dessert-spoon-imperial' => {
 						'many' => q({0} כפיות קינוחים בארה"ב),
 						'name' => q(כפית קינוחים בארה״ב),
-						'one' => q(כפית קינוחים בארה״ב),
+						'one' => q({0} כפית קינוחים בארה״ב),
 						'other' => q({0} כפיות קינוחים בארה"ב),
 						'two' => q({0} כפיות קינוחים בארה"ב),
 					},
@@ -5977,7 +5993,7 @@ has 'units' => (
 					'volume-dram' => {
 						'many' => q({0} דראם אלכוהול),
 						'name' => q(דראם אלכוהול),
-						'one' => q(דראם אלכוהול {0}),
+						'one' => q({0} דראם אלכוהול),
 						'other' => q({0} דראם אלכוהול),
 						'two' => q({0} דראם אלכוהול),
 					},
@@ -5985,15 +6001,23 @@ has 'units' => (
 					'dram' => {
 						'many' => q({0} דראם אלכוהול),
 						'name' => q(דראם אלכוהול),
-						'one' => q(דראם אלכוהול {0}),
+						'one' => q({0} דראם אלכוהול),
 						'other' => q({0} דראם אלכוהול),
 						'two' => q({0} דראם אלכוהול),
+					},
+					# Long Unit Identifier
+					'volume-drop' => {
+						'name' => q(טיפות),
+					},
+					# Core Unit Identifier
+					'drop' => {
+						'name' => q(טיפות),
 					},
 					# Long Unit Identifier
 					'volume-fluid-ounce' => {
 						'many' => q({0} אונקיות נוזלים),
 						'name' => q(אונקיות נוזלים),
-						'one' => q(אונקיית נוזלים {0}),
+						'one' => q({0} אונקיית נוזלים),
 						'other' => q({0} אונקיות נוזלים),
 						'two' => q({0} אונקיות נוזלים),
 					},
@@ -6001,7 +6025,7 @@ has 'units' => (
 					'fluid-ounce' => {
 						'many' => q({0} אונקיות נוזלים),
 						'name' => q(אונקיות נוזלים),
-						'one' => q(אונקיית נוזלים {0}),
+						'one' => q({0} אונקיית נוזלים),
 						'other' => q({0} אונקיות נוזלים),
 						'two' => q({0} אונקיות נוזלים),
 					},
@@ -6024,7 +6048,7 @@ has 'units' => (
 					# Long Unit Identifier
 					'volume-gallon' => {
 						'many' => q({0} גלונים),
-						'one' => q(גלון {0}),
+						'one' => q({0} גלון),
 						'other' => q({0} גלונים),
 						'per' => q({0}/גלון),
 						'two' => q({0} גלונים),
@@ -6032,7 +6056,7 @@ has 'units' => (
 					# Core Unit Identifier
 					'gallon' => {
 						'many' => q({0} גלונים),
-						'one' => q(גלון {0}),
+						'one' => q({0} גלון),
 						'other' => q({0} גלונים),
 						'per' => q({0}/גלון),
 						'two' => q({0} גלונים),
@@ -6041,7 +6065,7 @@ has 'units' => (
 					'volume-gallon-imperial' => {
 						'many' => q({0} גלון אימפריאלי),
 						'name' => q(גלון אימפריאלי),
-						'one' => q(גלון אימפריאלי {0}),
+						'one' => q({0} גלון אימפריאלי),
 						'other' => q({0} גלון אימפריאלי),
 						'per' => q({0}/גלון אימפריאלי),
 						'two' => q({0} גלון אימפריאלי),
@@ -6050,7 +6074,7 @@ has 'units' => (
 					'gallon-imperial' => {
 						'many' => q({0} גלון אימפריאלי),
 						'name' => q(גלון אימפריאלי),
-						'one' => q(גלון אימפריאלי {0}),
+						'one' => q({0} גלון אימפריאלי),
 						'other' => q({0} גלון אימפריאלי),
 						'per' => q({0}/גלון אימפריאלי),
 						'two' => q({0} גלון אימפריאלי),
@@ -6060,7 +6084,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} הקטוליטר),
 						'name' => q(הקטוליטר),
-						'one' => q(הקטוליטר {0}),
+						'one' => q({0} הקטוליטר),
 						'other' => q({0} הקטוליטר),
 						'two' => q({0} הקטוליטר),
 					},
@@ -6069,7 +6093,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} הקטוליטר),
 						'name' => q(הקטוליטר),
-						'one' => q(הקטוליטר {0}),
+						'one' => q({0} הקטוליטר),
 						'other' => q({0} הקטוליטר),
 						'two' => q({0} הקטוליטר),
 					},
@@ -6077,7 +6101,7 @@ has 'units' => (
 					'volume-jigger' => {
 						'many' => q({0} ג'יגר),
 						'name' => q(ג׳יגר),
-						'one' => q(ג'יגר {0}),
+						'one' => q({0} ג׳יגר),
 						'other' => q({0} ג'יגר),
 						'two' => q({0} ג'יגר),
 					},
@@ -6085,7 +6109,7 @@ has 'units' => (
 					'jigger' => {
 						'many' => q({0} ג'יגר),
 						'name' => q(ג׳יגר),
-						'one' => q(ג'יגר {0}),
+						'one' => q({0} ג׳יגר),
 						'other' => q({0} ג'יגר),
 						'two' => q({0} ג'יגר),
 					},
@@ -6093,7 +6117,7 @@ has 'units' => (
 					'volume-liter' => {
 						'1' => q(masculine),
 						'many' => q({0} ליטר),
-						'one' => q(ליטר {0}),
+						'one' => q({0} ליטר),
 						'other' => q({0} ליטר),
 						'per' => q({0}/ליטר),
 						'two' => q({0} ליטר),
@@ -6102,7 +6126,7 @@ has 'units' => (
 					'liter' => {
 						'1' => q(masculine),
 						'many' => q({0} ליטר),
-						'one' => q(ליטר {0}),
+						'one' => q({0} ליטר),
 						'other' => q({0} ליטר),
 						'per' => q({0}/ליטר),
 						'two' => q({0} ליטר),
@@ -6112,7 +6136,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} מגה ליטר),
 						'name' => q(מגה ליטר),
-						'one' => q(מגה ליטר {0}),
+						'one' => q({0} מגה ליטר),
 						'other' => q({0} מגה ליטר),
 						'two' => q({0} מגה ליטר),
 					},
@@ -6121,7 +6145,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} מגה ליטר),
 						'name' => q(מגה ליטר),
-						'one' => q(מגה ליטר {0}),
+						'one' => q({0} מגה ליטר),
 						'other' => q({0} מגה ליטר),
 						'two' => q({0} מגה ליטר),
 					},
@@ -6130,7 +6154,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} מיליליטר),
 						'name' => q(מיליליטר),
-						'one' => q(מיליליטר {0}),
+						'one' => q({0} מיליליטר),
 						'other' => q({0} מיליליטר),
 						'two' => q({0} מיליליטר),
 					},
@@ -6139,33 +6163,33 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} מיליליטר),
 						'name' => q(מיליליטר),
-						'one' => q(מיליליטר {0}),
+						'one' => q({0} מיליליטר),
 						'other' => q({0} מיליליטר),
 						'two' => q({0} מיליליטר),
 					},
 					# Long Unit Identifier
 					'volume-pinch' => {
-						'one' => q(פינץ' {0}),
+						'one' => q({0} פינץ׳),
 						'other' => q({0} פינץ'),
 						'two' => q({0} פינץ'),
 					},
 					# Core Unit Identifier
 					'pinch' => {
-						'one' => q(פינץ' {0}),
+						'one' => q({0} פינץ׳),
 						'other' => q({0} פינץ'),
 						'two' => q({0} פינץ'),
 					},
 					# Long Unit Identifier
 					'volume-pint' => {
 						'many' => q({0} פינט),
-						'one' => q(פינט {0}),
+						'one' => q({0} פינט),
 						'other' => q({0} פינט),
 						'two' => q({0} פינט),
 					},
 					# Core Unit Identifier
 					'pint' => {
 						'many' => q({0} פינט),
-						'one' => q(פינט {0}),
+						'one' => q({0} פינט),
 						'other' => q({0} פינט),
 						'two' => q({0} פינט),
 					},
@@ -6174,7 +6198,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} פינט מטרי),
 						'name' => q(פינט מטרי),
-						'one' => q(פינט מטרי {0}),
+						'one' => q({0} פינט מטרי),
 						'other' => q({0} פינט מטרי),
 						'two' => q({0} פינט מטרי),
 					},
@@ -6183,7 +6207,7 @@ has 'units' => (
 						'1' => q(masculine),
 						'many' => q({0} פינט מטרי),
 						'name' => q(פינט מטרי),
-						'one' => q(פינט מטרי {0}),
+						'one' => q({0} פינט מטרי),
 						'other' => q({0} פינט מטרי),
 						'two' => q({0} פינט מטרי),
 					},
@@ -6191,7 +6215,7 @@ has 'units' => (
 					'volume-quart' => {
 						'many' => q({0} קווארטות),
 						'name' => q(קווארטות),
-						'one' => q(קווארטה {0}),
+						'one' => q({0} קווארטה),
 						'other' => q({0} קווארטות),
 						'two' => q({0} קווארטות),
 					},
@@ -6199,7 +6223,7 @@ has 'units' => (
 					'quart' => {
 						'many' => q({0} קווארטות),
 						'name' => q(קווארטות),
-						'one' => q(קווארטה {0}),
+						'one' => q({0} קווארטה),
 						'other' => q({0} קווארטות),
 						'two' => q({0} קווארטות),
 					},
@@ -6207,7 +6231,7 @@ has 'units' => (
 					'volume-quart-imperial' => {
 						'many' => q({0} קווארטות אימפריאליות),
 						'name' => q(קווארט אימפריאלי),
-						'one' => q(קווארט אימפריאלי {0}),
+						'one' => q({0} קווארט אימפריאלי),
 						'other' => q({0} קווארטות אימפריאליות),
 						'two' => q({0} קווארטות אימפריאליות),
 					},
@@ -6215,29 +6239,29 @@ has 'units' => (
 					'quart-imperial' => {
 						'many' => q({0} קווארטות אימפריאליות),
 						'name' => q(קווארט אימפריאלי),
-						'one' => q(קווארט אימפריאלי {0}),
+						'one' => q({0} קווארט אימפריאלי),
 						'other' => q({0} קווארטות אימפריאליות),
 						'two' => q({0} קווארטות אימפריאליות),
 					},
 					# Long Unit Identifier
 					'volume-tablespoon' => {
 						'many' => q({0} כפות),
-						'one' => q(כף אחת),
+						'one' => q({0} כפ׳),
 						'other' => q({0} כפות),
-						'two' => q(שתי כפות),
+						'two' => q({0} כפות),
 					},
 					# Core Unit Identifier
 					'tablespoon' => {
 						'many' => q({0} כפות),
-						'one' => q(כף אחת),
+						'one' => q({0} כפ׳),
 						'other' => q({0} כפות),
-						'two' => q(שתי כפות),
+						'two' => q({0} כפות),
 					},
 					# Long Unit Identifier
 					'volume-teaspoon' => {
 						'many' => q({0} כפיות),
 						'name' => q(כפיות),
-						'one' => q(כפית {0}),
+						'one' => q({0} כפית),
 						'other' => q({0} כפיות),
 						'two' => q({0} כפיות),
 					},
@@ -6245,7 +6269,7 @@ has 'units' => (
 					'teaspoon' => {
 						'many' => q({0} כפיות),
 						'name' => q(כפיות),
-						'one' => q(כפית {0}),
+						'one' => q({0} כפית),
 						'other' => q({0} כפיות),
 						'two' => q({0} כפיות),
 					},
@@ -6270,110 +6294,54 @@ has 'units' => (
 					# Long Unit Identifier
 					'angle-arc-minute' => {
 						'many' => q({0} דקות),
-						'one' => q(דקה {0}),
+						'one' => q({0} דקה),
 						'other' => q({0} דקות),
 						'two' => q({0} דקות),
 					},
 					# Core Unit Identifier
 					'arc-minute' => {
 						'many' => q({0} דקות),
-						'one' => q(דקה {0}),
+						'one' => q({0} דקה),
 						'other' => q({0} דקות),
 						'two' => q({0} דקות),
 					},
 					# Long Unit Identifier
 					'angle-arc-second' => {
 						'many' => q({0} שנ׳),
-						'one' => q(שנ׳ {0}),
+						'one' => q({0} שנ׳),
 						'other' => q({0} שנ׳),
 						'two' => q({0} שנ׳),
 					},
 					# Core Unit Identifier
 					'arc-second' => {
 						'many' => q({0} שנ׳),
-						'one' => q(שנ׳ {0}),
+						'one' => q({0} שנ׳),
 						'other' => q({0} שנ׳),
 						'two' => q({0} שנ׳),
 					},
 					# Long Unit Identifier
-					'area-acre' => {
-						'many' => q({0} אקר),
-						'one' => q(אקר {0}),
-						'other' => q({0} אקר),
-						'two' => q({0} אקר),
-					},
-					# Core Unit Identifier
-					'acre' => {
-						'many' => q({0} אקר),
-						'one' => q(אקר {0}),
-						'other' => q({0} אקר),
-						'two' => q({0} אקר),
-					},
-					# Long Unit Identifier
-					'area-hectare' => {
-						'many' => q({0} הקטאר),
-						'one' => q(הקטאר {0}),
-						'other' => q({0} הקטאר),
-						'two' => q({0} הקטאר),
-					},
-					# Core Unit Identifier
-					'hectare' => {
-						'many' => q({0} הקטאר),
-						'one' => q(הקטאר {0}),
-						'other' => q({0} הקטאר),
-						'two' => q({0} הקטאר),
-					},
-					# Long Unit Identifier
-					'area-square-foot' => {
-						'many' => q({0} רגל רבועה),
-						'one' => q(רגל רבועה {0}),
-						'other' => q({0} רגל רבועה),
-						'two' => q({0} רגל רבועה),
-					},
-					# Core Unit Identifier
-					'square-foot' => {
-						'many' => q({0} רגל רבועה),
-						'one' => q(רגל רבועה {0}),
-						'other' => q({0} רגל רבועה),
-						'two' => q({0} רגל רבועה),
-					},
-					# Long Unit Identifier
 					'area-square-kilometer' => {
-						'one' => q(קמ״ר {0}),
+						'one' => q({0} קמ״ר),
 						'other' => q({0} קמ״ר),
 						'two' => q({0} קמ״ר),
 					},
 					# Core Unit Identifier
 					'square-kilometer' => {
-						'one' => q(קמ״ר {0}),
+						'one' => q({0} קמ״ר),
 						'other' => q({0} קמ״ר),
 						'two' => q({0} קמ״ר),
 					},
 					# Long Unit Identifier
-					'area-square-mile' => {
-						'many' => q({0} מייל רבוע),
-						'one' => q(מייל רבוע {0}),
-						'other' => q({0} מייל רבוע),
-						'two' => q({0} מייל רבוע),
-					},
-					# Core Unit Identifier
-					'square-mile' => {
-						'many' => q({0} מייל רבוע),
-						'one' => q(מייל רבוע {0}),
-						'other' => q({0} מייל רבוע),
-						'two' => q({0} מייל רבוע),
-					},
-					# Long Unit Identifier
 					'concentr-item' => {
 						'many' => q({0} פר'),
-						'one' => q(פריט {0}),
+						'one' => q({0} פריט),
 						'other' => q({0} פר'),
 						'two' => q({0} פר'),
 					},
 					# Core Unit Identifier
 					'item' => {
 						'many' => q({0} פר'),
-						'one' => q(פריט {0}),
+						'one' => q({0} פריט),
 						'other' => q({0} פר'),
 						'two' => q({0} פר'),
 					},
@@ -6394,56 +6362,10 @@ has 'units' => (
 						'two' => q({0}ל׳/100ק״מ),
 					},
 					# Long Unit Identifier
-					'digital-gigabyte' => {
-						'many' => q({0} ג״ב),
-						'name' => q(ג״ב),
-						'one' => q({0} ג״ב),
-						'other' => q({0} ג״ב),
-						'two' => q({0} ג״ב),
-					},
-					# Core Unit Identifier
-					'gigabyte' => {
-						'many' => q({0} ג״ב),
-						'name' => q(ג״ב),
-						'one' => q({0} ג״ב),
-						'other' => q({0} ג״ב),
-						'two' => q({0} ג״ב),
-					},
-					# Long Unit Identifier
-					'digital-kilobyte' => {
-						'many' => q({0} ק״ב),
-						'name' => q(ק״ב),
-						'one' => q(ק״ב {0}),
-						'other' => q({0} ק״ב),
-						'two' => q({0} ק״ב),
-					},
-					# Core Unit Identifier
-					'kilobyte' => {
-						'many' => q({0} ק״ב),
-						'name' => q(ק״ב),
-						'one' => q(ק״ב {0}),
-						'other' => q({0} ק״ב),
-						'two' => q({0} ק״ב),
-					},
-					# Long Unit Identifier
-					'digital-megabyte' => {
-						'many' => q({0} מ״ב),
-						'one' => q({0} מ״ב),
-						'other' => q({0} מ״ב),
-						'two' => q({0} מ״ב),
-					},
-					# Core Unit Identifier
-					'megabyte' => {
-						'many' => q({0} מ״ב),
-						'one' => q({0} מ״ב),
-						'other' => q({0} מ״ב),
-						'two' => q({0} מ״ב),
-					},
-					# Long Unit Identifier
 					'duration-day' => {
 						'many' => q({0} י׳),
 						'name' => q(יום),
-						'one' => q(י׳),
+						'one' => q({0} י׳),
 						'other' => q({0} י׳),
 						'two' => q({0} י׳),
 					},
@@ -6451,69 +6373,63 @@ has 'units' => (
 					'day' => {
 						'many' => q({0} י׳),
 						'name' => q(יום),
-						'one' => q(י׳),
+						'one' => q({0} י׳),
 						'other' => q({0} י׳),
 						'two' => q({0} י׳),
 					},
 					# Long Unit Identifier
 					'duration-hour' => {
-						'one' => q(שעה {0}),
+						'one' => q({0} שע׳),
 						'other' => q({0} שע׳),
+						'per' => q({0}/שע׳),
 						'two' => q({0} שע׳),
 					},
 					# Core Unit Identifier
 					'hour' => {
-						'one' => q(שעה {0}),
+						'one' => q({0} שע׳),
 						'other' => q({0} שע׳),
+						'per' => q({0}/שע׳),
 						'two' => q({0} שע׳),
 					},
 					# Long Unit Identifier
 					'duration-month' => {
 						'name' => q(ח׳),
-						'one' => q(ח׳ {0}),
-						'other' => q({0} ח׳),
-						'two' => q({0} ח׳),
 					},
 					# Core Unit Identifier
 					'month' => {
 						'name' => q(ח׳),
-						'one' => q(ח׳ {0}),
-						'other' => q({0} ח׳),
-						'two' => q({0} ח׳),
 					},
 					# Long Unit Identifier
-					'duration-second' => {
-						'one' => q(שניה),
-						'other' => q({0} שנ׳),
-						'two' => q(שתי שנ׳),
+					'duration-nanosecond' => {
+						'name' => q(ns),
 					},
 					# Core Unit Identifier
-					'second' => {
-						'one' => q(שניה),
-						'other' => q({0} שנ׳),
-						'two' => q(שתי שנ׳),
+					'nanosecond' => {
+						'name' => q(ns),
 					},
 					# Long Unit Identifier
 					'duration-week' => {
 						'many' => q({0} ש′),
 						'name' => q(שבוע),
-						'one' => q(ש′ {0}),
+						'one' => q({0} ש′),
 						'other' => q({0} ש′),
+						'per' => q({0}/שב׳),
 						'two' => q({0} ש′),
 					},
 					# Core Unit Identifier
 					'week' => {
 						'many' => q({0} ש′),
 						'name' => q(שבוע),
-						'one' => q(ש′ {0}),
+						'one' => q({0} ש′),
 						'other' => q({0} ש′),
+						'per' => q({0}/שב׳),
 						'two' => q({0} ש′),
 					},
 					# Long Unit Identifier
 					'duration-year' => {
 						'many' => q({0} ש′),
 						'name' => q(ש׳),
-						'one' => q(ש′ {0}),
+						'one' => q({0} ש′),
 						'other' => q({0} ש′),
 						'two' => q({0} ש′),
 					},
@@ -6521,23 +6437,17 @@ has 'units' => (
 					'year' => {
 						'many' => q({0} ש′),
 						'name' => q(ש׳),
-						'one' => q(ש′ {0}),
+						'one' => q({0} ש′),
 						'other' => q({0} ש′),
 						'two' => q({0} ש′),
 					},
 					# Long Unit Identifier
 					'energy-foodcalorie' => {
 						'name' => q(קל׳),
-						'one' => q({0} קלו׳),
-						'other' => q({0} קלו׳),
-						'two' => q({0} קלו׳),
 					},
 					# Core Unit Identifier
 					'foodcalorie' => {
 						'name' => q(קל׳),
-						'one' => q({0} קלו׳),
-						'other' => q({0} קלו׳),
-						'two' => q({0} קלו׳),
 					},
 					# Long Unit Identifier
 					'force-kilowatt-hour-per-100-kilometer' => {
@@ -6545,7 +6455,7 @@ has 'units' => (
 						'name' => q(kWh/100km),
 						'one' => q({0} kWh/100km),
 						'other' => q({0} kWh),
-						'two' => q({0} קוט"ש/100 ק"מ),
+						'two' => q({0} kWh/100km),
 					},
 					# Core Unit Identifier
 					'kilowatt-hour-per-100-kilometer' => {
@@ -6553,7 +6463,7 @@ has 'units' => (
 						'name' => q(kWh/100km),
 						'one' => q({0} kWh/100km),
 						'other' => q({0} kWh),
-						'two' => q({0} קוט"ש/100 ק"מ),
+						'two' => q({0} kWh/100km),
 					},
 					# Long Unit Identifier
 					'graphics-dot' => {
@@ -6564,198 +6474,28 @@ has 'units' => (
 						'name' => q(נקודה),
 					},
 					# Long Unit Identifier
-					'graphics-dot-per-centimeter' => {
-						'one' => q(‎{0} ppcm‎),
-						'other' => q(‎{0} נק׳ ס״מ),
-						'two' => q(‎{0} ppcm‎),
-					},
-					# Core Unit Identifier
-					'dot-per-centimeter' => {
-						'one' => q(‎{0} ppcm‎),
-						'other' => q(‎{0} נק׳ ס״מ),
-						'two' => q(‎{0} ppcm‎),
-					},
-					# Long Unit Identifier
-					'graphics-dot-per-inch' => {
-						'many' => q({0} ppi),
-						'one' => q({0} dpi),
-						'other' => q(‎{0} dpi‎),
-						'two' => q({0} ppi),
-					},
-					# Core Unit Identifier
-					'dot-per-inch' => {
-						'many' => q({0} ppi),
-						'one' => q({0} dpi),
-						'other' => q(‎{0} dpi‎),
-						'two' => q({0} ppi),
-					},
-					# Long Unit Identifier
-					'length-astronomical-unit' => {
-						'many' => q({0} au),
-						'one' => q({0} au),
-						'other' => q({0} au),
-						'two' => q({0} au),
-					},
-					# Core Unit Identifier
-					'astronomical-unit' => {
-						'many' => q({0} au),
-						'one' => q({0} au),
-						'other' => q({0} au),
-						'two' => q({0} au),
-					},
-					# Long Unit Identifier
-					'length-centimeter' => {
-						'one' => q(ס"מ {0}),
-						'other' => q({0} ס״מ),
-						'two' => q({0} ס״מ),
-					},
-					# Core Unit Identifier
-					'centimeter' => {
-						'one' => q(ס"מ {0}),
-						'other' => q({0} ס״מ),
-						'two' => q({0} ס״מ),
-					},
-					# Long Unit Identifier
-					'length-foot' => {
-						'many' => q({0} רגל),
-						'one' => q(רגל {0}),
-						'other' => q({0} רגל),
-						'per' => q({0}/רגל),
-						'two' => q({0} רגל),
-					},
-					# Core Unit Identifier
-					'foot' => {
-						'many' => q({0} רגל),
-						'one' => q(רגל {0}),
-						'other' => q({0} רגל),
-						'per' => q({0}/רגל),
-						'two' => q({0} רגל),
-					},
-					# Long Unit Identifier
 					'length-inch' => {
-						'many' => q({0} אינץ׳),
-						'one' => q(אינץ׳ {0}),
-						'other' => q({0} אינץ׳),
-						'per' => q({0}/אינץ׳),
-						'two' => q({0} אינץ׳),
+						'name' => q(in),
 					},
 					# Core Unit Identifier
 					'inch' => {
-						'many' => q({0} אינץ׳),
-						'one' => q(אינץ׳ {0}),
-						'other' => q({0} אינץ׳),
-						'per' => q({0}/אינץ׳),
-						'two' => q({0} אינץ׳),
+						'name' => q(in),
 					},
 					# Long Unit Identifier
 					'length-meter' => {
 						'name' => q(מטר),
-						'one' => q({0} מ׳),
-						'other' => q({0} מ׳),
-						'two' => q({0} מ′),
 					},
 					# Core Unit Identifier
 					'meter' => {
 						'name' => q(מטר),
-						'one' => q({0} מ׳),
-						'other' => q({0} מ׳),
-						'two' => q({0} מ′),
-					},
-					# Long Unit Identifier
-					'length-micrometer' => {
-						'many' => q({0} μm),
-						'one' => q({0} μm),
-						'other' => q({0} μm),
-						'two' => q({0} μm),
-					},
-					# Core Unit Identifier
-					'micrometer' => {
-						'many' => q({0} μm),
-						'one' => q({0} μm),
-						'other' => q({0} μm),
-						'two' => q({0} μm),
-					},
-					# Long Unit Identifier
-					'length-mile' => {
-						'one' => q(מייל {0}),
-						'other' => q({0} מייל),
-						'two' => q({0} מייל),
-					},
-					# Core Unit Identifier
-					'mile' => {
-						'one' => q(מייל {0}),
-						'other' => q({0} מייל),
-						'two' => q({0} מייל),
-					},
-					# Long Unit Identifier
-					'length-millimeter' => {
-						'one' => q(מ״מ {0}),
-						'other' => q({0} מ״מ),
-						'two' => q({0} מ״מ),
-					},
-					# Core Unit Identifier
-					'millimeter' => {
-						'one' => q(מ״מ {0}),
-						'other' => q({0} מ״מ),
-						'two' => q({0} מ״מ),
-					},
-					# Long Unit Identifier
-					'length-nanometer' => {
-						'many' => q({0} nm),
-						'one' => q({0} nm),
-						'other' => q({0} nm),
-						'two' => q({0} nm),
-					},
-					# Core Unit Identifier
-					'nanometer' => {
-						'many' => q({0} nm),
-						'one' => q({0} nm),
-						'other' => q({0} nm),
-						'two' => q({0} nm),
-					},
-					# Long Unit Identifier
-					'length-parsec' => {
-						'many' => q({0} pc),
-						'one' => q({0} pc),
-						'other' => q({0} pc),
-						'two' => q({0} pc),
-					},
-					# Core Unit Identifier
-					'parsec' => {
-						'many' => q({0} pc),
-						'one' => q({0} pc),
-						'other' => q({0} pc),
-						'two' => q({0} pc),
-					},
-					# Long Unit Identifier
-					'length-picometer' => {
-						'many' => q({0} פיקומטר),
-						'one' => q(פיקומטר {0}),
-						'other' => q({0} פיקומטר),
-						'two' => q({0} פיקומטר),
-					},
-					# Core Unit Identifier
-					'picometer' => {
-						'many' => q({0} פיקומטר),
-						'one' => q(פיקומטר {0}),
-						'other' => q({0} פיקומטר),
-						'two' => q({0} פיקומטר),
 					},
 					# Long Unit Identifier
 					'length-point' => {
-						'many' => q({0} נק׳),
 						'name' => q(נק׳),
-						'one' => q(נק׳ {0}),
-						'other' => q({0} נק'),
-						'two' => q({0} נק׳),
 					},
 					# Core Unit Identifier
 					'point' => {
-						'many' => q({0} נק׳),
 						'name' => q(נק׳),
-						'one' => q(נק׳ {0}),
-						'other' => q({0} נק'),
-						'two' => q({0} נק׳),
 					},
 					# Long Unit Identifier
 					'mass-gram' => {
@@ -6786,18 +6526,6 @@ has 'units' => (
 						'two' => q({0}kg),
 					},
 					# Long Unit Identifier
-					'mass-microgram' => {
-						'one' => q(מק״ג {0}),
-						'other' => q({0} מק״ג),
-						'two' => q({0} מק״ג),
-					},
-					# Core Unit Identifier
-					'microgram' => {
-						'one' => q(מק״ג {0}),
-						'other' => q({0} מק״ג),
-						'two' => q({0} מק״ג),
-					},
-					# Long Unit Identifier
 					'mass-pound' => {
 						'name' => q(lb),
 					},
@@ -6821,82 +6549,42 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'pressure-millibar' => {
-						'many' => q({0} מיליבר),
+						'many' => q({0} מ″ב),
 						'name' => q(מ״ב),
-						'one' => q(מיליבר {0}),
-						'other' => q({0} מיליבר),
-						'two' => q({0} מיליבר),
+						'one' => q({0} מ″ב),
+						'other' => q({0} מ″ב),
+						'two' => q({0} מ″ב),
 					},
 					# Core Unit Identifier
 					'millibar' => {
-						'many' => q({0} מיליבר),
+						'many' => q({0} מ″ב),
 						'name' => q(מ״ב),
-						'one' => q(מיליבר {0}),
-						'other' => q({0} מיליבר),
-						'two' => q({0} מיליבר),
+						'one' => q({0} מ″ב),
+						'other' => q({0} מ″ב),
+						'two' => q({0} מ″ב),
 					},
 					# Long Unit Identifier
 					'speed-beaufort' => {
-						'one' => q(B{0}),
-						'other' => q(B{0}),
-						'two' => q(B {0}),
+						'one' => q({0} B),
+						'other' => q({0} B),
+						'two' => q({0} B),
 					},
 					# Core Unit Identifier
 					'beaufort' => {
-						'one' => q(B{0}),
-						'other' => q(B{0}),
-						'two' => q(B {0}),
-					},
-					# Long Unit Identifier
-					'speed-meter-per-second' => {
-						'many' => q({0} מ/ש),
-						'one' => q({0} מ/ש),
-						'other' => q({0} מ/ש),
-						'two' => q({0} מ/ש),
-					},
-					# Core Unit Identifier
-					'meter-per-second' => {
-						'many' => q({0} מ/ש),
-						'one' => q({0} מ/ש),
-						'other' => q({0} מ/ש),
-						'two' => q({0} מ/ש),
-					},
-					# Long Unit Identifier
-					'volume-cubic-kilometer' => {
-						'one' => q({0} קמ״ק),
-						'other' => q({0} קמ״ק),
-						'two' => q({0} קמ״ק),
-					},
-					# Core Unit Identifier
-					'cubic-kilometer' => {
-						'one' => q({0} קמ״ק),
-						'other' => q({0} קמ״ק),
-						'two' => q({0} קמ״ק),
-					},
-					# Long Unit Identifier
-					'volume-cubic-mile' => {
-						'many' => q({0} mi³),
-						'one' => q({0} mi³),
-						'other' => q({0} mi³),
-						'two' => q({0} mi³),
-					},
-					# Core Unit Identifier
-					'cubic-mile' => {
-						'many' => q({0} mi³),
-						'one' => q({0} mi³),
-						'other' => q({0} mi³),
-						'two' => q({0} mi³),
+						'one' => q({0} B),
+						'other' => q({0} B),
+						'two' => q({0} B),
 					},
 					# Long Unit Identifier
 					'volume-dessert-spoon-imperial' => {
-						'many' => q({0} dstspn),
+						'many' => q({0}dsp-Imp),
 						'one' => q({0}dsp-Imp),
 						'other' => q({0}dsp-Imp),
 						'two' => q({0}dsp-Imp),
 					},
 					# Core Unit Identifier
 					'dessert-spoon-imperial' => {
-						'many' => q({0} dstspn),
+						'many' => q({0}dsp-Imp),
 						'one' => q({0}dsp-Imp),
 						'other' => q({0}dsp-Imp),
 						'two' => q({0}dsp-Imp),
@@ -6916,18 +6604,6 @@ has 'units' => (
 						'other' => q({0}/galIm),
 						'per' => q({0}/galIm),
 						'two' => q({0}/galIm),
-					},
-					# Long Unit Identifier
-					'volume-liter' => {
-						'one' => q({0} ל׳),
-						'other' => q({0} ל׳),
-						'two' => q({0} ל׳),
-					},
-					# Core Unit Identifier
-					'liter' => {
-						'one' => q({0} ל׳),
-						'other' => q({0} ל׳),
-						'two' => q({0} ל׳),
 					},
 				},
 				'short' => {
@@ -7118,28 +6794,28 @@ has 'units' => (
 					# Long Unit Identifier
 					'angle-arc-minute' => {
 						'name' => q(דק׳ קשת),
-						'one' => q(ד׳ קשת {0}),
+						'one' => q({0} ד׳ קשת),
 						'other' => q({0} דק׳ קשת),
 						'two' => q({0} דק׳ קשת),
 					},
 					# Core Unit Identifier
 					'arc-minute' => {
 						'name' => q(דק׳ קשת),
-						'one' => q(ד׳ קשת {0}),
+						'one' => q({0} ד׳ קשת),
 						'other' => q({0} דק׳ קשת),
 						'two' => q({0} דק׳ קשת),
 					},
 					# Long Unit Identifier
 					'angle-arc-second' => {
 						'name' => q(שנ׳ קשת),
-						'one' => q(שנ׳ קשת {0}),
+						'one' => q({0} שנ׳ קשת),
 						'other' => q({0} שנ׳ קשת),
 						'two' => q({0} שנ׳ קשת),
 					},
 					# Core Unit Identifier
 					'arc-second' => {
 						'name' => q(שנ׳ קשת),
-						'one' => q(שנ׳ קשת {0}),
+						'one' => q({0} שנ׳ קשת),
 						'other' => q({0} שנ׳ קשת),
 						'two' => q({0} שנ׳ קשת),
 					},
@@ -7182,16 +6858,16 @@ has 'units' => (
 					# Long Unit Identifier
 					'area-acre' => {
 						'name' => q(אקר),
-						'one' => q(‎{0} ac),
-						'other' => q(‎{0} ac),
-						'two' => q({0} ac),
+						'one' => q({0} אקר),
+						'other' => q({0} אקר),
+						'two' => q({0} אקר),
 					},
 					# Core Unit Identifier
 					'acre' => {
 						'name' => q(אקר),
-						'one' => q(‎{0} ac),
-						'other' => q(‎{0} ac),
-						'two' => q({0} ac),
+						'one' => q({0} אקר),
+						'other' => q({0} אקר),
+						'two' => q({0} אקר),
 					},
 					# Long Unit Identifier
 					'area-dunam' => {
@@ -7210,16 +6886,16 @@ has 'units' => (
 					# Long Unit Identifier
 					'area-hectare' => {
 						'name' => q(הקטאר),
-						'one' => q(‎{0} ha),
-						'other' => q(‎{0} ha),
-						'two' => q(‎{0} ha),
+						'one' => q({0} ha),
+						'other' => q({0} ha),
+						'two' => q({0} ha),
 					},
 					# Core Unit Identifier
 					'hectare' => {
 						'name' => q(הקטאר),
-						'one' => q(‎{0} ha),
-						'other' => q(‎{0} ha),
-						'two' => q(‎{0} ha),
+						'one' => q({0} ha),
+						'other' => q({0} ha),
+						'two' => q({0} ha),
 					},
 					# Long Unit Identifier
 					'area-square-centimeter' => {
@@ -7239,29 +6915,29 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'area-square-foot' => {
-						'one' => q(‎{0} sq ft),
-						'other' => q(‎{0} sq ft),
-						'two' => q(‎{0} sq ft),
+						'one' => q({0} sq ft),
+						'other' => q({0} sq ft),
+						'two' => q({0} sq ft),
 					},
 					# Core Unit Identifier
 					'square-foot' => {
-						'one' => q(‎{0} sq ft),
-						'other' => q(‎{0} sq ft),
-						'two' => q(‎{0} sq ft),
+						'one' => q({0} sq ft),
+						'other' => q({0} sq ft),
+						'two' => q({0} sq ft),
 					},
 					# Long Unit Identifier
 					'area-square-inch' => {
-						'one' => q(‎{0} in²),
-						'other' => q(‎{0} in²),
-						'per' => q(‎{0}/in²),
-						'two' => q(‎{0} in²),
+						'one' => q({0} in²),
+						'other' => q({0} in²),
+						'per' => q({0}/in²),
+						'two' => q({0} in²),
 					},
 					# Core Unit Identifier
 					'square-inch' => {
-						'one' => q(‎{0} in²),
-						'other' => q(‎{0} in²),
-						'per' => q(‎{0}/in²),
-						'two' => q(‎{0} in²),
+						'one' => q({0} in²),
+						'other' => q({0} in²),
+						'per' => q({0}/in²),
+						'two' => q({0} in²),
 					},
 					# Long Unit Identifier
 					'area-square-kilometer' => {
@@ -7282,7 +6958,7 @@ has 'units' => (
 					# Long Unit Identifier
 					'area-square-meter' => {
 						'name' => q(מ״ר),
-						'one' => q(מ״ר {0}),
+						'one' => q({0} מ״ר),
 						'other' => q({0} מ״ר),
 						'per' => q({0}/מ״ר),
 						'two' => q({0} מ״ר),
@@ -7290,7 +6966,7 @@ has 'units' => (
 					# Core Unit Identifier
 					'square-meter' => {
 						'name' => q(מ״ר),
-						'one' => q(מ״ר {0}),
+						'one' => q({0} מ״ר),
 						'other' => q({0} מ״ר),
 						'per' => q({0}/מ״ר),
 						'two' => q({0} מ״ר),
@@ -7298,58 +6974,82 @@ has 'units' => (
 					# Long Unit Identifier
 					'area-square-mile' => {
 						'name' => q(מייל רבוע),
-						'one' => q(‎{0} sq mi),
-						'other' => q(‎{0} sq mi),
-						'per' => q(‎{0}/mi²),
-						'two' => q(‎{0} sq mi),
+						'one' => q({0} sq mi),
+						'other' => q({0} sq mi),
+						'per' => q({0}/mi²),
+						'two' => q({0} sq mi),
 					},
 					# Core Unit Identifier
 					'square-mile' => {
 						'name' => q(מייל רבוע),
-						'one' => q(‎{0} sq mi),
-						'other' => q(‎{0} sq mi),
-						'per' => q(‎{0}/mi²),
-						'two' => q(‎{0} sq mi),
+						'one' => q({0} sq mi),
+						'other' => q({0} sq mi),
+						'per' => q({0}/mi²),
+						'two' => q({0} sq mi),
 					},
 					# Long Unit Identifier
 					'area-square-yard' => {
 						'name' => q(yards²),
-						'one' => q(‎{0} yd²),
-						'other' => q(‎{0} yd²),
-						'two' => q(‎{0} yd²),
+						'one' => q({0} yd²),
+						'other' => q({0} yd²),
+						'two' => q({0} yd²),
 					},
 					# Core Unit Identifier
 					'square-yard' => {
 						'name' => q(yards²),
-						'one' => q(‎{0} yd²),
-						'other' => q(‎{0} yd²),
-						'two' => q(‎{0} yd²),
+						'one' => q({0} yd²),
+						'other' => q({0} yd²),
+						'two' => q({0} yd²),
 					},
 					# Long Unit Identifier
 					'concentr-item' => {
 						'name' => q(פריט),
-						'one' => q(פריט {0}),
+						'one' => q({0} פריט),
 						'other' => q({0} פריטים),
 						'two' => q({0} פריטים),
 					},
 					# Core Unit Identifier
 					'item' => {
 						'name' => q(פריט),
-						'one' => q(פריט {0}),
+						'one' => q({0} פריט),
 						'other' => q({0} פריטים),
 						'two' => q({0} פריטים),
 					},
 					# Long Unit Identifier
+					'concentr-karat' => {
+						'one' => q({0} kt),
+						'other' => q({0} kt),
+						'two' => q({0} kt),
+					},
+					# Core Unit Identifier
+					'karat' => {
+						'one' => q({0} kt),
+						'other' => q({0} kt),
+						'two' => q({0} kt),
+					},
+					# Long Unit Identifier
+					'concentr-milligram-ofglucose-per-deciliter' => {
+						'one' => q({0} mg/dL),
+						'other' => q({0} mg/dL),
+						'two' => q({0} mg/dL),
+					},
+					# Core Unit Identifier
+					'milligram-ofglucose-per-deciliter' => {
+						'one' => q({0} mg/dL),
+						'other' => q({0} mg/dL),
+						'two' => q({0} mg/dL),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(ל׳/100 ק״מ),
-						'one' => q(ל׳ {0}/100 ק״מ),
+						'one' => q({0} ל׳/100 ק״מ),
 						'other' => q({0} ל׳/100 ק״מ),
 						'two' => q({0} ל׳/100 ק״מ),
 					},
 					# Core Unit Identifier
 					'liter-per-100-kilometer' => {
 						'name' => q(ל׳/100 ק״מ),
-						'one' => q(ל׳ {0}/100 ק״מ),
+						'one' => q({0} ל׳/100 ק״מ),
 						'other' => q({0} ל׳/100 ק״מ),
 						'two' => q({0} ל׳/100 ק״מ),
 					},
@@ -7450,21 +7150,21 @@ has 'units' => (
 					# Long Unit Identifier
 					'duration-century' => {
 						'name' => q(מאות),
-						'one' => q(מאה {0}),
+						'one' => q({0} מאה),
 						'other' => q({0} מאות),
 						'two' => q({0} מאות),
 					},
 					# Core Unit Identifier
 					'century' => {
 						'name' => q(מאות),
-						'one' => q(מאה {0}),
+						'one' => q({0} מאה),
 						'other' => q({0} מאות),
 						'two' => q({0} מאות),
 					},
 					# Long Unit Identifier
 					'duration-day' => {
 						'name' => q(ימים),
-						'one' => q(יום),
+						'one' => q({0} יום),
 						'other' => q({0} ימ׳),
 						'per' => q({0}/יום),
 						'two' => q(יומיים),
@@ -7472,7 +7172,7 @@ has 'units' => (
 					# Core Unit Identifier
 					'day' => {
 						'name' => q(ימים),
-						'one' => q(יום),
+						'one' => q({0} יום),
 						'other' => q({0} ימ׳),
 						'per' => q({0}/יום),
 						'two' => q(יומיים),
@@ -7480,21 +7180,21 @@ has 'units' => (
 					# Long Unit Identifier
 					'duration-decade' => {
 						'name' => q(עשור),
-						'one' => q(עשור {0}),
+						'one' => q({0} עשור),
 						'other' => q({0} עשורים),
 						'two' => q({0} עשורים),
 					},
 					# Core Unit Identifier
 					'decade' => {
 						'name' => q(עשור),
-						'one' => q(עשור {0}),
+						'one' => q({0} עשור),
 						'other' => q({0} עשורים),
 						'two' => q({0} עשורים),
 					},
 					# Long Unit Identifier
 					'duration-hour' => {
 						'name' => q(שע׳),
-						'one' => q(שעה),
+						'one' => q({0} שעה),
 						'other' => q({0} שע׳),
 						'per' => q({0}/שעה),
 						'two' => q(שעתיים),
@@ -7502,7 +7202,7 @@ has 'units' => (
 					# Core Unit Identifier
 					'hour' => {
 						'name' => q(שע׳),
-						'one' => q(שעה),
+						'one' => q({0} שעה),
 						'other' => q({0} שע׳),
 						'per' => q({0}/שעה),
 						'two' => q(שעתיים),
@@ -7518,34 +7218,34 @@ has 'units' => (
 					# Long Unit Identifier
 					'duration-minute' => {
 						'name' => q(דק׳),
-						'one' => q(דקה),
+						'one' => q({0} דק׳),
 						'other' => q({0} דק׳),
 						'per' => q({0}/ד׳),
-						'two' => q(שתי דק׳),
+						'two' => q({0} דק׳),
 					},
 					# Core Unit Identifier
 					'minute' => {
 						'name' => q(דק׳),
-						'one' => q(דקה),
+						'one' => q({0} דק׳),
 						'other' => q({0} דק׳),
 						'per' => q({0}/ד׳),
-						'two' => q(שתי דק׳),
+						'two' => q({0} דק׳),
 					},
 					# Long Unit Identifier
 					'duration-month' => {
 						'name' => q(חודשים),
-						'one' => q(חודש),
+						'one' => q({0} ח׳),
 						'other' => q({0} ח׳),
 						'per' => q({0}/חודש),
-						'two' => q(חודשיים),
+						'two' => q({0} ח׳),
 					},
 					# Core Unit Identifier
 					'month' => {
 						'name' => q(חודשים),
-						'one' => q(חודש),
+						'one' => q({0} ח׳),
 						'other' => q({0} ח׳),
 						'per' => q({0}/חודש),
-						'two' => q(חודשיים),
+						'two' => q({0} ח׳),
 					},
 					# Long Unit Identifier
 					'duration-nanosecond' => {
@@ -7554,6 +7254,22 @@ has 'units' => (
 					# Core Unit Identifier
 					'nanosecond' => {
 						'name' => q(ננו שניות),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(לילות),
+						'one' => q({0} לילה),
+						'other' => q({0} לילות),
+						'per' => q({0}/לילה),
+						'two' => q({0} לילות),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(לילות),
+						'one' => q({0} לילה),
+						'other' => q({0} לילות),
+						'per' => q({0}/לילה),
+						'two' => q({0} לילות),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -7566,23 +7282,23 @@ has 'units' => (
 					# Long Unit Identifier
 					'duration-second' => {
 						'name' => q(שנ׳),
-						'one' => q(שנ׳),
+						'one' => q({0} שנ׳),
 						'other' => q({0} שנ׳),
 						'per' => q({0}/שנ׳),
-						'two' => q(שתי שנ׳),
+						'two' => q({0} שנ׳),
 					},
 					# Core Unit Identifier
 					'second' => {
 						'name' => q(שנ׳),
-						'one' => q(שנ׳),
+						'one' => q({0} שנ׳),
 						'other' => q({0} שנ׳),
 						'per' => q({0}/שנ׳),
-						'two' => q(שתי שנ׳),
+						'two' => q({0} שנ׳),
 					},
 					# Long Unit Identifier
 					'duration-week' => {
 						'name' => q(שבועות),
-						'one' => q(שבוע {0}),
+						'one' => q({0} שבוע),
 						'other' => q({0} שבועות),
 						'per' => q({0}/שבוע),
 						'two' => q(שבועיים),
@@ -7590,7 +7306,7 @@ has 'units' => (
 					# Core Unit Identifier
 					'week' => {
 						'name' => q(שבועות),
-						'one' => q(שבוע {0}),
+						'one' => q({0} שבוע),
 						'other' => q({0} שבועות),
 						'per' => q({0}/שבוע),
 						'two' => q(שבועיים),
@@ -7598,7 +7314,7 @@ has 'units' => (
 					# Long Unit Identifier
 					'duration-year' => {
 						'name' => q(שנים),
-						'one' => q(שנה {0}),
+						'one' => q({0} שנה),
 						'other' => q({0} שנים),
 						'per' => q({0}/שנה),
 						'two' => q({0} שנים),
@@ -7606,7 +7322,7 @@ has 'units' => (
 					# Core Unit Identifier
 					'year' => {
 						'name' => q(שנים),
-						'one' => q(שנה {0}),
+						'one' => q({0} שנה),
 						'other' => q({0} שנים),
 						'per' => q({0}/שנה),
 						'two' => q({0} שנים),
@@ -7647,17 +7363,17 @@ has 'units' => (
 					'energy-foodcalorie' => {
 						'many' => q({0} קלו׳),
 						'name' => q(קלו׳),
-						'one' => q(קלו׳ אחת),
+						'one' => q({0} קלו׳),
 						'other' => q({0} קלו׳),
-						'two' => q(שתי קלו׳),
+						'two' => q({0} קלו׳),
 					},
 					# Core Unit Identifier
 					'foodcalorie' => {
 						'many' => q({0} קלו׳),
 						'name' => q(קלו׳),
-						'one' => q(קלו׳ אחת),
+						'one' => q({0} קלו׳),
 						'other' => q({0} קלו׳),
-						'two' => q(שתי קלו׳),
+						'two' => q({0} קלו׳),
 					},
 					# Long Unit Identifier
 					'energy-joule' => {
@@ -7691,17 +7407,19 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'force-kilowatt-hour-per-100-kilometer' => {
+						'many' => q({0} קוט״ש/100 ק״מ),
 						'name' => q(קוט״ש/100 ק״מ),
-						'one' => q({0} קוט"ש/100 ק"מ),
-						'other' => q({0} קוט"ש/100 ק"מ),
-						'two' => q({0} קוט"ש/100 ק"מ),
+						'one' => q({0} קוט״ש/100 ק״מ),
+						'other' => q({0} קוט״ש/100 ק״מ),
+						'two' => q({0} קוט״ש/100 ק״מ),
 					},
 					# Core Unit Identifier
 					'kilowatt-hour-per-100-kilometer' => {
+						'many' => q({0} קוט״ש/100 ק״מ),
 						'name' => q(קוט״ש/100 ק״מ),
-						'one' => q({0} קוט"ש/100 ק"מ),
-						'other' => q({0} קוט"ש/100 ק"מ),
-						'two' => q({0} קוט"ש/100 ק"מ),
+						'one' => q({0} קוט״ש/100 ק״מ),
+						'other' => q({0} קוט״ש/100 ק״מ),
+						'two' => q({0} קוט״ש/100 ק״מ),
 					},
 					# Long Unit Identifier
 					'graphics-dot' => {
@@ -7713,89 +7431,89 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'graphics-dot-per-inch' => {
-						'name' => q(נקודות לאינץ׳),
-						'one' => q({0} dpi),
-						'other' => q(‎{0} dpi‎),
-						'two' => q(‎{0} ppi‎),
+						'name' => q(dpi),
+						'one' => q({0} ppi),
+						'other' => q({0} dpi),
+						'two' => q({0} ppi),
 					},
 					# Core Unit Identifier
 					'dot-per-inch' => {
-						'name' => q(נקודות לאינץ׳),
-						'one' => q({0} dpi),
-						'other' => q(‎{0} dpi‎),
-						'two' => q(‎{0} ppi‎),
+						'name' => q(dpi),
+						'one' => q({0} ppi),
+						'other' => q({0} dpi),
+						'two' => q({0} ppi),
 					},
 					# Long Unit Identifier
 					'graphics-em' => {
-						'one' => q(‎{0} em ‎),
-						'other' => q(‎{0} em ‎),
-						'two' => q(‎{0} em ‎),
+						'one' => q({0} em),
+						'other' => q({0} em),
+						'two' => q({0} em),
 					},
 					# Core Unit Identifier
 					'em' => {
-						'one' => q(‎{0} em ‎),
-						'other' => q(‎{0} em ‎),
-						'two' => q(‎{0} em ‎),
+						'one' => q({0} em),
+						'other' => q({0} em),
+						'two' => q({0} em),
 					},
 					# Long Unit Identifier
 					'graphics-megapixel' => {
-						'one' => q(‎{0} MP ‎),
-						'other' => q(‎{0} MP ‎),
-						'two' => q(‎{0} MP ‎),
+						'one' => q({0} MP),
+						'other' => q({0} MP),
+						'two' => q({0} MP),
 					},
 					# Core Unit Identifier
 					'megapixel' => {
-						'one' => q(‎{0} MP ‎),
-						'other' => q(‎{0} MP ‎),
-						'two' => q(‎{0} MP ‎),
+						'one' => q({0} MP),
+						'other' => q({0} MP),
+						'two' => q({0} MP),
 					},
 					# Long Unit Identifier
 					'graphics-pixel' => {
-						'one' => q(‎{0} px ‎),
-						'other' => q(‎{0} px ‎),
-						'two' => q(‎{0} px ‎),
+						'one' => q({0} px),
+						'other' => q({0} px),
+						'two' => q({0} px),
 					},
 					# Core Unit Identifier
 					'pixel' => {
-						'one' => q(‎{0} px ‎),
-						'other' => q(‎{0} px ‎),
-						'two' => q(‎{0} px ‎),
+						'one' => q({0} px),
+						'other' => q({0} px),
+						'two' => q({0} px),
 					},
 					# Long Unit Identifier
 					'graphics-pixel-per-centimeter' => {
-						'one' => q(‎{0} ppcm‎),
-						'other' => q(‎{0} ppcm‎),
-						'two' => q(‎{0} ppcm‎),
+						'one' => q({0} ppcm),
+						'other' => q({0} ppcm),
+						'two' => q({0} ppcm),
 					},
 					# Core Unit Identifier
 					'pixel-per-centimeter' => {
-						'one' => q(‎{0} ppcm‎),
-						'other' => q(‎{0} ppcm‎),
-						'two' => q(‎{0} ppcm‎),
+						'one' => q({0} ppcm),
+						'other' => q({0} ppcm),
+						'two' => q({0} ppcm),
 					},
 					# Long Unit Identifier
 					'graphics-pixel-per-inch' => {
-						'one' => q(‎{0} ppi‎),
-						'other' => q(‎{0} ppi‎),
-						'two' => q(‎{0} ppi‎),
+						'one' => q({0} ppi),
+						'other' => q({0} ppi),
+						'two' => q({0} ppi),
 					},
 					# Core Unit Identifier
 					'pixel-per-inch' => {
-						'one' => q(‎{0} ppi‎),
-						'other' => q(‎{0} ppi‎),
-						'two' => q(‎{0} ppi‎),
+						'one' => q({0} ppi),
+						'other' => q({0} ppi),
+						'two' => q({0} ppi),
 					},
 					# Long Unit Identifier
 					'length-astronomical-unit' => {
-						'one' => q(‎{0} au),
-						'other' => q(‎{0} au),
-						'two' => q(‎{0} au),
+						'one' => q({0} au),
+						'other' => q({0} au),
+						'two' => q({0} au),
 					},
 					# Core Unit Identifier
 					'astronomical-unit' => {
-						'one' => q(‎{0} au),
-						'other' => q(‎{0} au),
-						'two' => q(‎{0} au),
+						'one' => q({0} au),
+						'other' => q({0} au),
+						'two' => q({0} au),
 					},
 					# Long Unit Identifier
 					'length-centimeter' => {
@@ -7830,34 +7548,34 @@ has 'units' => (
 					# Long Unit Identifier
 					'length-foot' => {
 						'name' => q(רגל),
-						'one' => q(‎{0} ft),
-						'other' => q(‎{0} ft),
-						'per' => q(‎{0}/ft),
-						'two' => q(‎{0} ft),
+						'one' => q({0} ft),
+						'other' => q({0} ft),
+						'per' => q({0} ‎/ft),
+						'two' => q({0} ft),
 					},
 					# Core Unit Identifier
 					'foot' => {
 						'name' => q(רגל),
-						'one' => q(‎{0} ft),
-						'other' => q(‎{0} ft),
-						'per' => q(‎{0}/ft),
-						'two' => q(‎{0} ft),
+						'one' => q({0} ft),
+						'other' => q({0} ft),
+						'per' => q({0} ‎/ft),
+						'two' => q({0} ft),
 					},
 					# Long Unit Identifier
 					'length-inch' => {
 						'name' => q(אינץ׳),
-						'one' => q(‎{0} in),
-						'other' => q(‎{0} in),
-						'per' => q(‎{0}/in),
-						'two' => q(‎{0} in),
+						'one' => q({0} in),
+						'other' => q({0} in),
+						'per' => q({0} ‎/in),
+						'two' => q({0} in),
 					},
 					# Core Unit Identifier
 					'inch' => {
 						'name' => q(אינץ׳),
-						'one' => q(‎{0} in),
-						'other' => q(‎{0} in),
-						'per' => q(‎{0}/in),
-						'two' => q(‎{0} in),
+						'one' => q({0} in),
+						'other' => q({0} in),
+						'per' => q({0} ‎/in),
+						'two' => q({0} in),
 					},
 					# Long Unit Identifier
 					'length-kilometer' => {
@@ -7878,14 +7596,14 @@ has 'units' => (
 					# Long Unit Identifier
 					'length-light-year' => {
 						'name' => q(שנות אור),
-						'one' => q(שנת אור {0}),
+						'one' => q({0} שנת אור),
 						'other' => q({0} שנות אור),
 						'two' => q({0} שנות אור),
 					},
 					# Core Unit Identifier
 					'light-year' => {
 						'name' => q(שנות אור),
-						'one' => q(שנת אור {0}),
+						'one' => q({0} שנת אור),
 						'other' => q({0} שנות אור),
 						'two' => q({0} שנות אור),
 					},
@@ -7907,15 +7625,15 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-micrometer' => {
-						'one' => q(‎{0} μm‎),
-						'other' => q(‎{0} μm‎),
-						'two' => q(‎{0} μm‎),
+						'one' => q({0} μm),
+						'other' => q({0} μm),
+						'two' => q({0} μm),
 					},
 					# Core Unit Identifier
 					'micrometer' => {
-						'one' => q(‎{0} μm‎),
-						'other' => q(‎{0} μm‎),
-						'two' => q(‎{0} μm‎),
+						'one' => q({0} μm),
+						'other' => q({0} μm),
+						'two' => q({0} μm),
 					},
 					# Long Unit Identifier
 					'length-mile' => {
@@ -7934,28 +7652,28 @@ has 'units' => (
 					# Long Unit Identifier
 					'length-millimeter' => {
 						'name' => q(מ״מ),
-						'one' => q(מ″מ {0}),
+						'one' => q({0} מ″מ),
 						'other' => q({0} מ״מ),
 						'two' => q({0} מ״מ),
 					},
 					# Core Unit Identifier
 					'millimeter' => {
 						'name' => q(מ״מ),
-						'one' => q(מ″מ {0}),
+						'one' => q({0} מ″מ),
 						'other' => q({0} מ״מ),
 						'two' => q({0} מ״מ),
 					},
 					# Long Unit Identifier
 					'length-nanometer' => {
-						'one' => q(‎{0} nm),
-						'other' => q(‎{0} nm),
-						'two' => q(‎{0} nm),
+						'one' => q({0} nm),
+						'other' => q({0} nm),
+						'two' => q({0} nm),
 					},
 					# Core Unit Identifier
 					'nanometer' => {
-						'one' => q(‎{0} nm),
-						'other' => q(‎{0} nm),
-						'two' => q(‎{0} nm),
+						'one' => q({0} nm),
+						'other' => q({0} nm),
+						'two' => q({0} nm),
 					},
 					# Long Unit Identifier
 					'length-nautical-mile' => {
@@ -7973,67 +7691,67 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-parsec' => {
-						'one' => q(‎{0} pc),
-						'other' => q(‎{0} pc),
-						'two' => q(‎{0} pc),
+						'one' => q({0} pc),
+						'other' => q({0} pc),
+						'two' => q({0} pc),
 					},
 					# Core Unit Identifier
 					'parsec' => {
-						'one' => q(‎{0} pc),
-						'other' => q(‎{0} pc),
-						'two' => q(‎{0} pc),
+						'one' => q({0} pc),
+						'other' => q({0} pc),
+						'two' => q({0} pc),
 					},
 					# Long Unit Identifier
 					'length-picometer' => {
 						'name' => q(פ״מ),
-						'one' => q(פ“מ {0}),
+						'one' => q({0} פ“מ),
 						'other' => q({0} פ"מ),
-						'two' => q({0} פ"מ),
+						'two' => q({0} פ״מ),
 					},
 					# Core Unit Identifier
 					'picometer' => {
 						'name' => q(פ״מ),
-						'one' => q(פ“מ {0}),
+						'one' => q({0} פ“מ),
 						'other' => q({0} פ"מ),
-						'two' => q({0} פ"מ),
+						'two' => q({0} פ״מ),
 					},
 					# Long Unit Identifier
 					'length-point' => {
 						'name' => q(נקודות),
-						'one' => q({0} נק'),
+						'one' => q({0} נק׳),
 						'other' => q({0} נק'),
-						'two' => q({0} נק'),
+						'two' => q({0} נק׳),
 					},
 					# Core Unit Identifier
 					'point' => {
 						'name' => q(נקודות),
-						'one' => q({0} נק'),
+						'one' => q({0} נק׳),
 						'other' => q({0} נק'),
-						'two' => q({0} נק'),
+						'two' => q({0} נק׳),
 					},
 					# Long Unit Identifier
 					'length-solar-radius' => {
-						'one' => q(‎{0} R☉‎),
-						'other' => q(‎{0} R☉‎),
-						'two' => q(‎{0} R☉‎),
+						'one' => q({0} R☉‎),
+						'other' => q({0} R☉‎),
+						'two' => q({0} R☉‎),
 					},
 					# Core Unit Identifier
 					'solar-radius' => {
-						'one' => q(‎{0} R☉‎),
-						'other' => q(‎{0} R☉‎),
-						'two' => q(‎{0} R☉‎),
+						'one' => q({0} R☉‎),
+						'other' => q({0} R☉‎),
+						'two' => q({0} R☉‎),
 					},
 					# Long Unit Identifier
 					'length-yard' => {
 						'name' => q(יארד),
-						'one' => q(יארד {0}),
+						'one' => q({0} יארד),
 						'other' => q({0} יארד),
 						'two' => q({0} יארד),
 					},
 					# Core Unit Identifier
 					'yard' => {
 						'name' => q(יארד),
-						'one' => q(יארד {0}),
+						'one' => q({0} יארד),
 						'other' => q({0} יארד),
 						'two' => q({0} יארד),
 					},
@@ -8056,21 +7774,21 @@ has 'units' => (
 					# Long Unit Identifier
 					'mass-grain' => {
 						'name' => q(גרעין),
-						'one' => q(גרעין {0}),
+						'one' => q({0} גרעין),
 						'other' => q({0} גרעינים),
 						'two' => q({0} גרעינים),
 					},
 					# Core Unit Identifier
 					'grain' => {
 						'name' => q(גרעין),
-						'one' => q(גרעין {0}),
+						'one' => q({0} גרעין),
 						'other' => q({0} גרעינים),
 						'two' => q({0} גרעינים),
 					},
 					# Long Unit Identifier
 					'mass-gram' => {
 						'name' => q(גרם),
-						'one' => q(גר׳ {0}),
+						'one' => q({0} גר׳),
 						'other' => q({0} גר׳),
 						'per' => q({0}/גר׳),
 						'two' => q({0} גר׳),
@@ -8078,7 +7796,7 @@ has 'units' => (
 					# Core Unit Identifier
 					'gram' => {
 						'name' => q(גרם),
-						'one' => q(גר׳ {0}),
+						'one' => q({0} גר׳),
 						'other' => q({0} גר׳),
 						'per' => q({0}/גר׳),
 						'two' => q({0} גר׳),
@@ -8086,7 +7804,7 @@ has 'units' => (
 					# Long Unit Identifier
 					'mass-kilogram' => {
 						'name' => q(ק״ג),
-						'one' => q(ק״ג {0}),
+						'one' => q({0} ק״ג),
 						'other' => q({0} ק״ג),
 						'per' => q({0}/ק״ג),
 						'two' => q({0} ק״ג),
@@ -8094,7 +7812,7 @@ has 'units' => (
 					# Core Unit Identifier
 					'kilogram' => {
 						'name' => q(ק״ג),
-						'one' => q(ק״ג {0}),
+						'one' => q({0} ק״ג),
 						'other' => q({0} ק״ג),
 						'per' => q({0}/ק״ג),
 						'two' => q({0} ק״ג),
@@ -8144,39 +7862,41 @@ has 'units' => (
 					# Long Unit Identifier
 					'mass-stone' => {
 						'name' => q(סטון),
-						'one' => q(סטון {0}),
+						'one' => q({0} סטון),
 						'other' => q({0} סטון),
 						'two' => q({0} סטון),
 					},
 					# Core Unit Identifier
 					'stone' => {
 						'name' => q(סטון),
-						'one' => q(סטון {0}),
+						'one' => q({0} סטון),
 						'other' => q({0} סטון),
 						'two' => q({0} סטון),
 					},
 					# Long Unit Identifier
 					'mass-ton' => {
 						'name' => q(טונה),
-						'one' => q(ט׳ {0}),
+						'one' => q({0} ט׳),
 						'other' => q({0} ט׳),
 						'two' => q({0} ט׳),
 					},
 					# Core Unit Identifier
 					'ton' => {
 						'name' => q(טונה),
-						'one' => q(ט׳ {0}),
+						'one' => q({0} ט׳),
 						'other' => q({0} ט׳),
 						'two' => q({0} ט׳),
 					},
 					# Long Unit Identifier
 					'mass-tonne' => {
+						'name' => q(טון מ׳),
 						'one' => q({0} טון מ׳),
 						'other' => q({0} טון מ׳),
 						'two' => q({0} טון מ׳),
 					},
 					# Core Unit Identifier
 					'tonne' => {
+						'name' => q(טון מ׳),
 						'one' => q({0} טון מ׳),
 						'other' => q({0} טון מ׳),
 						'two' => q({0} טון מ׳),
@@ -8184,14 +7904,14 @@ has 'units' => (
 					# Long Unit Identifier
 					'power-horsepower' => {
 						'name' => q(כ״ס),
-						'one' => q(כ״ס {0}),
+						'one' => q({0} כ״ס),
 						'other' => q({0} כ״ס),
 						'two' => q({0} כ״ס),
 					},
 					# Core Unit Identifier
 					'horsepower' => {
 						'name' => q(כ״ס),
-						'one' => q(כ״ס {0}),
+						'one' => q({0} כ״ס),
 						'other' => q({0} כ״ס),
 						'two' => q({0} כ״ס),
 					},
@@ -8240,6 +7960,20 @@ has 'units' => (
 						'two' => q({0} קמ״ש),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(אור),
+						'one' => q({0} אור),
+						'other' => q({0} אור),
+						'two' => q({0} אור),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(אור),
+						'one' => q({0} אור),
+						'other' => q({0} אור),
+						'two' => q({0} אור),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'name' => q(מ׳/שנ׳),
 						'one' => q({0} מ׳/שנ׳),
@@ -8269,39 +8003,39 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'volume-acre-foot' => {
-						'one' => q(‎{0} ac ft),
-						'other' => q(‎{0} ac ft),
-						'two' => q(‎{0} ac ft),
+						'one' => q({0} ac ft),
+						'other' => q({0} ac ft),
+						'two' => q({0} ac ft),
 					},
 					# Core Unit Identifier
 					'acre-foot' => {
-						'one' => q(‎{0} ac ft),
-						'other' => q(‎{0} ac ft),
-						'two' => q(‎{0} ac ft),
+						'one' => q({0} ac ft),
+						'other' => q({0} ac ft),
+						'two' => q({0} ac ft),
 					},
 					# Long Unit Identifier
 					'volume-barrel' => {
-						'one' => q(‎{0} bbl),
-						'other' => q(‎{0} bbl),
-						'two' => q(‎{0} bbl),
+						'one' => q({0} bbl),
+						'other' => q({0} bbl),
+						'two' => q({0} bbl),
 					},
 					# Core Unit Identifier
 					'barrel' => {
-						'one' => q(‎{0} bbl),
-						'other' => q(‎{0} bbl),
-						'two' => q(‎{0} bbl),
+						'one' => q({0} bbl),
+						'other' => q({0} bbl),
+						'two' => q({0} bbl),
 					},
 					# Long Unit Identifier
 					'volume-centiliter' => {
-						'one' => q(‎{0} cL),
-						'other' => q(‎{0} cL),
-						'two' => q(‎{0} cL),
+						'one' => q({0} cL),
+						'other' => q({0} cL),
+						'two' => q({0} cL),
 					},
 					# Core Unit Identifier
 					'centiliter' => {
-						'one' => q(‎{0} cL),
-						'other' => q(‎{0} cL),
-						'two' => q(‎{0} cL),
+						'one' => q({0} cL),
+						'other' => q({0} cL),
+						'two' => q({0} cL),
 					},
 					# Long Unit Identifier
 					'volume-cubic-centimeter' => {
@@ -8322,104 +8056,104 @@ has 'units' => (
 					# Long Unit Identifier
 					'volume-cubic-foot' => {
 						'name' => q(feet³),
-						'one' => q(‎{0} ft³),
-						'other' => q(‎{0} ft³),
-						'two' => q(‎{0} ft³),
+						'one' => q({0} ft³),
+						'other' => q({0} ft³),
+						'two' => q({0} ft³),
 					},
 					# Core Unit Identifier
 					'cubic-foot' => {
 						'name' => q(feet³),
-						'one' => q(‎{0} ft³),
-						'other' => q(‎{0} ft³),
-						'two' => q(‎{0} ft³),
+						'one' => q({0} ft³),
+						'other' => q({0} ft³),
+						'two' => q({0} ft³),
 					},
 					# Long Unit Identifier
 					'volume-cubic-inch' => {
-						'one' => q(‎{0} in³),
-						'other' => q(‎{0} in³),
-						'two' => q(‎{0} in³),
+						'one' => q({0} in³),
+						'other' => q({0} in³),
+						'two' => q({0} in³),
 					},
 					# Core Unit Identifier
 					'cubic-inch' => {
-						'one' => q(‎{0} in³),
-						'other' => q(‎{0} in³),
-						'two' => q(‎{0} in³),
+						'one' => q({0} in³),
+						'other' => q({0} in³),
+						'two' => q({0} in³),
 					},
 					# Long Unit Identifier
 					'volume-cubic-kilometer' => {
 						'name' => q(קמ״ק),
-						'one' => q(קמ״ק {0}),
+						'one' => q({0} קמ״ק),
 						'other' => q({0} קמ״ק),
 						'two' => q({0} קמ״ק),
 					},
 					# Core Unit Identifier
 					'cubic-kilometer' => {
 						'name' => q(קמ״ק),
-						'one' => q(קמ״ק {0}),
+						'one' => q({0} קמ״ק),
 						'other' => q({0} קמ״ק),
 						'two' => q({0} קמ״ק),
 					},
 					# Long Unit Identifier
 					'volume-cubic-meter' => {
-						'one' => q(‎{0} m³),
-						'other' => q(‎{0} m³),
-						'two' => q(‎{0} m³),
+						'one' => q({0} m³),
+						'other' => q({0} m³),
+						'two' => q({0} m³),
 					},
 					# Core Unit Identifier
 					'cubic-meter' => {
-						'one' => q(‎{0} m³),
-						'other' => q(‎{0} m³),
-						'two' => q(‎{0} m³),
+						'one' => q({0} m³),
+						'other' => q({0} m³),
+						'two' => q({0} m³),
 					},
 					# Long Unit Identifier
 					'volume-cubic-mile' => {
-						'one' => q(‎{0} mi³),
-						'other' => q(‎{0} mi³),
-						'two' => q(‎{0} mi³),
+						'one' => q({0} mi³),
+						'other' => q({0} mi³),
+						'two' => q({0} mi³),
 					},
 					# Core Unit Identifier
 					'cubic-mile' => {
-						'one' => q(‎{0} mi³),
-						'other' => q(‎{0} mi³),
-						'two' => q(‎{0} mi³),
+						'one' => q({0} mi³),
+						'other' => q({0} mi³),
+						'two' => q({0} mi³),
 					},
 					# Long Unit Identifier
 					'volume-cubic-yard' => {
-						'one' => q(‎{0} yd³),
-						'other' => q(‎{0} yd³),
-						'two' => q(‎{0} yd³),
+						'one' => q({0} yd³),
+						'other' => q({0} yd³),
+						'two' => q({0} yd³),
 					},
 					# Core Unit Identifier
 					'cubic-yard' => {
-						'one' => q(‎{0} yd³),
-						'other' => q(‎{0} yd³),
-						'two' => q(‎{0} yd³),
+						'one' => q({0} yd³),
+						'other' => q({0} yd³),
+						'two' => q({0} yd³),
 					},
 					# Long Unit Identifier
 					'volume-cup' => {
 						'name' => q(כוסות),
-						'one' => q(כ׳ {0}),
+						'one' => q({0} כ׳),
 						'other' => q({0} כ׳),
 						'two' => q({0} כ׳),
 					},
 					# Core Unit Identifier
 					'cup' => {
 						'name' => q(כוסות),
-						'one' => q(כ׳ {0}),
+						'one' => q({0} כ׳),
 						'other' => q({0} כ׳),
 						'two' => q({0} כ׳),
 					},
 					# Long Unit Identifier
 					'volume-cup-metric' => {
-						'one' => q(‎{0} mc),
-						'other' => q(‎{0} mc),
-						'two' => q(‎{0} mc),
+						'one' => q({0} mc),
+						'other' => q({0} mc),
+						'two' => q({0} mc),
 					},
 					# Core Unit Identifier
 					'cup-metric' => {
-						'one' => q(‎{0} mc),
-						'other' => q(‎{0} mc),
-						'two' => q(‎{0} mc),
+						'one' => q({0} mc),
+						'other' => q({0} mc),
+						'two' => q({0} mc),
 					},
 					# Long Unit Identifier
 					'volume-deciliter' => {
@@ -8452,28 +8186,28 @@ has 'units' => (
 					# Long Unit Identifier
 					'volume-fluid-ounce' => {
 						'name' => q(fl oz),
-						'one' => q(‎{0} fl oz),
-						'other' => q(‎{0} fl oz),
-						'two' => q(‎{0} fl oz),
+						'one' => q({0} fl oz),
+						'other' => q({0} fl oz),
+						'two' => q({0} fl oz),
 					},
 					# Core Unit Identifier
 					'fluid-ounce' => {
 						'name' => q(fl oz),
-						'one' => q(‎{0} fl oz),
-						'other' => q(‎{0} fl oz),
-						'two' => q(‎{0} fl oz),
+						'one' => q({0} fl oz),
+						'other' => q({0} fl oz),
+						'two' => q({0} fl oz),
 					},
 					# Long Unit Identifier
 					'volume-fluid-ounce-imperial' => {
-						'one' => q(‎{0} fl oz Imp.‎),
-						'other' => q(‎{0} fl oz Imp.‎),
-						'two' => q(‎{0} fl oz Imp.‎),
+						'one' => q({0} fl oz Imp.),
+						'other' => q({0} fl oz Imp.),
+						'two' => q({0} fl oz Imp.),
 					},
 					# Core Unit Identifier
 					'fluid-ounce-imperial' => {
-						'one' => q(‎{0} fl oz Imp.‎),
-						'other' => q(‎{0} fl oz Imp.‎),
-						'two' => q(‎{0} fl oz Imp.‎),
+						'one' => q({0} fl oz Imp.),
+						'other' => q({0} fl oz Imp.),
+						'two' => q({0} fl oz Imp.),
 					},
 					# Long Unit Identifier
 					'volume-gallon' => {
@@ -8509,20 +8243,20 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'volume-hectoliter' => {
-						'one' => q(‎{0} hL),
-						'other' => q(‎{0} hL),
-						'two' => q(‎{0} hL),
+						'one' => q({0} hL),
+						'other' => q({0} hL),
+						'two' => q({0} hL),
 					},
 					# Core Unit Identifier
 					'hectoliter' => {
-						'one' => q(‎{0} hL),
-						'other' => q(‎{0} hL),
-						'two' => q(‎{0} hL),
+						'one' => q({0} hL),
+						'other' => q({0} hL),
+						'two' => q({0} hL),
 					},
 					# Long Unit Identifier
 					'volume-liter' => {
 						'name' => q(ליטר),
-						'one' => q(ל׳ {0}),
+						'one' => q({0} ל׳),
 						'other' => q({0} ל׳),
 						'per' => q({0}/ל׳),
 						'two' => q({0} ל׳),
@@ -8530,34 +8264,34 @@ has 'units' => (
 					# Core Unit Identifier
 					'liter' => {
 						'name' => q(ליטר),
-						'one' => q(ל׳ {0}),
+						'one' => q({0} ל׳),
 						'other' => q({0} ל׳),
 						'per' => q({0}/ל׳),
 						'two' => q({0} ל׳),
 					},
 					# Long Unit Identifier
 					'volume-megaliter' => {
-						'one' => q(‎{0} ML),
-						'other' => q(‎{0} ML),
-						'two' => q(‎{0} ML),
+						'one' => q({0} ML),
+						'other' => q({0} ML),
+						'two' => q({0} ML),
 					},
 					# Core Unit Identifier
 					'megaliter' => {
-						'one' => q(‎{0} ML),
-						'other' => q(‎{0} ML),
-						'two' => q(‎{0} ML),
+						'one' => q({0} ML),
+						'other' => q({0} ML),
+						'two' => q({0} ML),
 					},
 					# Long Unit Identifier
 					'volume-milliliter' => {
 						'name' => q(מ״ל),
-						'one' => q(מ״ל {0}),
+						'one' => q({0} מ״ל),
 						'other' => q({0} מ״ל),
 						'two' => q({0} מ״ל),
 					},
 					# Core Unit Identifier
 					'milliliter' => {
 						'name' => q(מ״ל),
-						'one' => q(מ״ל {0}),
+						'one' => q({0} מ״ל),
 						'other' => q({0} מ״ל),
 						'two' => q({0} מ״ל),
 					},
@@ -8578,42 +8312,42 @@ has 'units' => (
 					# Long Unit Identifier
 					'volume-pint' => {
 						'name' => q(פינט),
-						'one' => q(‎{0} pt),
-						'other' => q(‎{0} pt),
-						'two' => q(‎{0} pt),
+						'one' => q({0} pt),
+						'other' => q({0} pt),
+						'two' => q({0} pt),
 					},
 					# Core Unit Identifier
 					'pint' => {
 						'name' => q(פינט),
-						'one' => q(‎{0} pt),
-						'other' => q(‎{0} pt),
-						'two' => q(‎{0} pt),
+						'one' => q({0} pt),
+						'other' => q({0} pt),
+						'two' => q({0} pt),
 					},
 					# Long Unit Identifier
 					'volume-pint-metric' => {
-						'one' => q(‎{0} mpt),
-						'other' => q(‎{0} mpt),
-						'two' => q(‎{0} mpt),
+						'one' => q({0} mpt),
+						'other' => q({0} mpt),
+						'two' => q({0} mpt),
 					},
 					# Core Unit Identifier
 					'pint-metric' => {
-						'one' => q(‎{0} mpt),
-						'other' => q(‎{0} mpt),
-						'two' => q(‎{0} mpt),
+						'one' => q({0} mpt),
+						'other' => q({0} mpt),
+						'two' => q({0} mpt),
 					},
 					# Long Unit Identifier
 					'volume-quart' => {
 						'name' => q(qts),
-						'one' => q(‎{0} qt),
-						'other' => q(‎{0} qt),
-						'two' => q(‎{0} qt),
+						'one' => q({0} qt),
+						'other' => q({0} qt),
+						'two' => q({0} qt),
 					},
 					# Core Unit Identifier
 					'quart' => {
 						'name' => q(qts),
-						'one' => q(‎{0} qt),
-						'other' => q(‎{0} qt),
-						'two' => q(‎{0} qt),
+						'one' => q({0} qt),
+						'other' => q({0} qt),
+						'two' => q({0} qt),
 					},
 					# Long Unit Identifier
 					'volume-tablespoon' => {
@@ -9864,9 +9598,10 @@ has 'currencies' => (
 		'TRY' => {
 			display_name => {
 				'currency' => q(לירה טורקית חדשה),
+				'many' => q(לירות טורקיות),
 				'one' => q(לירה טורקית חדשה),
-				'other' => q(לירות טורקיות חדשות),
-				'two' => q(לירות טורקיות חדשות),
+				'other' => q(לירות טורקיות),
+				'two' => q(לירות טורקיות),
 			},
 		},
 		'TTD' => {
@@ -10836,31 +10571,33 @@ has 'day_periods' => (
 				'abbreviated' => {
 					'afternoon1' => q{צהריים},
 					'afternoon2' => q{אחר הצהריים},
-					'am' => q{לפנה״צ},
 					'evening1' => q{ערב},
 					'midnight' => q{חצות},
 					'morning1' => q{בוקר},
 					'night1' => q{לילה},
 					'night2' => q{לפנות בוקר},
-					'pm' => q{אחה״צ},
 				},
 				'narrow' => {
 					'afternoon1' => q{בצהריים},
 					'afternoon2' => q{אחה״צ},
+					'am' => q{AM},
 					'evening1' => q{בערב},
 					'midnight' => q{חצות},
 					'morning1' => q{בבוקר},
 					'night1' => q{בלילה},
 					'night2' => q{לפנות בוקר},
+					'pm' => q{PM},
 				},
 				'wide' => {
 					'afternoon1' => q{בצהריים},
 					'afternoon2' => q{אחר הצהריים},
+					'am' => q{AM},
 					'evening1' => q{בערב},
 					'midnight' => q{חצות},
 					'morning1' => q{בבוקר},
 					'night1' => q{בלילה},
 					'night2' => q{לפנות בוקר},
+					'pm' => q{PM},
 				},
 			},
 			'stand-alone' => {
@@ -11130,7 +10867,7 @@ has 'datetime_formats_available_formats' => (
 			GyMMM => q{MMM y G},
 			GyMMMEd => q{E, d בMMM y G},
 			GyMMMd => q{d בMMM y G},
-			GyMd => q{d/M/y GGGGG},
+			GyMd => q{d/M/y G},
 			H => q{H},
 			Hm => q{H:mm},
 			Hms => q{H:mm:ss},
@@ -11331,13 +11068,13 @@ has 'datetime_formats_interval' => (
 			},
 			GyM => {
 				G => q{M.y GGGGG – M.y GGGGG},
-				M => q{M.y – M.y GGGGG},
-				y => q{M.y – M.y GGGGG},
+				M => q{M.y – M.y G},
+				y => q{M.y – M.y G},
 			},
 			GyMEd => {
-				G => q{E, d.M.y GGGGG – E, d.M.y GGGGG},
-				M => q{E, d.M.y – E, d.M.y GGGGG},
-				d => q{E, d.M.y – E, d.M.y GGGGG},
+				G => q{E, d.M.y G – E, d.M.y G},
+				M => q{E, d.M.y – E, d.M.y G},
+				d => q{E, d.M.y – E, d.M.y G},
 				y => q{E, d.M.y – E, d.M.y GGGGG},
 			},
 			GyMMM => {
@@ -11358,10 +11095,10 @@ has 'datetime_formats_interval' => (
 				y => q{d בMMM y – d בMMM y G},
 			},
 			GyMd => {
-				G => q{d.M.y GGGGG – d.M.y GGGGG},
-				M => q{d.M.y – d.M.y GGGGG},
-				d => q{d.M.y – d.M.y GGGGG},
-				y => q{d.M.y – d.M.y GGGGG},
+				G => q{d.M.y G – d.M.y G},
+				M => q{d.M.y – d.M.y G},
+				d => q{d.M.y – d.M.y G},
+				y => q{d.M.y – d.M.y G},
 			},
 			H => {
 				H => q{H–H},
@@ -12032,9 +11769,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#ניו יורק#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#ניפיגון#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#נום#,
 		},
@@ -12055,9 +11789,6 @@ has 'time_zone_names' => (
 		},
 		'America/Panama' => {
 			exemplarCity => q#פנמה#,
-		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#פנגנירטונג#,
 		},
 		'America/Paramaribo' => {
 			exemplarCity => q#פרמריבו#,
@@ -12080,9 +11811,6 @@ has 'time_zone_names' => (
 		'America/Punta_Arenas' => {
 			exemplarCity => q#פונטה ארנס#,
 		},
-		'America/Rainy_River' => {
-			exemplarCity => q#רייני ריבר#,
-		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#רנקין אינלט#,
 		},
@@ -12097,9 +11825,6 @@ has 'time_zone_names' => (
 		},
 		'America/Rio_Branco' => {
 			exemplarCity => q#ריו ברנקו#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#סנטה איזבל#,
 		},
 		'America/Santarem' => {
 			exemplarCity => q#סנטרם#,
@@ -12146,9 +11871,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#תולה#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#ת׳אנדר ביי#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#טיחואנה#,
 		},
@@ -12169,9 +11891,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#יקוטאט#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#ילונייף#,
 		},
 		'America_Central' => {
 			long => {
@@ -12346,9 +12065,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#צ׳יטה#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#צ׳ויבלסן#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#קולומבו#,
@@ -12588,9 +12304,6 @@ has 'time_zone_names' => (
 		'Australia/Broken_Hill' => {
 			exemplarCity => q#ברוקן היל#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#קרי#,
-		},
 		'Australia/Darwin' => {
 			exemplarCity => q#דרווין#,
 		},
@@ -12717,13 +12430,6 @@ has 'time_zone_names' => (
 				'daylight' => q#שעון סין (קיץ)#,
 				'generic' => q#שעון סין#,
 				'standard' => q#שעון סין (חורף)#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#שעון צ׳ויבלסן (קיץ)#,
-				'generic' => q#שעון צ׳ויבלסן#,
-				'standard' => q#שעון צ׳ויבלסן (חורף)#,
 			},
 		},
 		'Christmas' => {
@@ -12948,9 +12654,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#אוליאנובסק#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#אוז׳הורוד#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#ואדוץ#,
 		},
@@ -12971,9 +12674,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#זאגרב#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#זפורוז׳יה#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#ציריך#,
@@ -13203,6 +12903,11 @@ has 'time_zone_names' => (
 				'standard' => q#שעון רגיל פטרופבלובסק-קמצ׳טסקי#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#שעון קזחסטן#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#שעון מזרח קזחסטן#,
@@ -13256,11 +12961,6 @@ has 'time_zone_names' => (
 				'standard' => q#שעון חורף מקאו#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#שעון מקווארי#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#שעון מגדן (קיץ)#,
@@ -13298,13 +12998,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#שעון מאוסון#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#שעון צפון-מערב מקסיקו (קיץ)#,
-				'generic' => q#שעון צפון-מערב מקסיקו#,
-				'standard' => q#שעון צפון-מערב מקסיקו (חורף)#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -13446,9 +13139,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Honolulu' => {
 			exemplarCity => q#הונולולו#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#ג׳ונסטון#,
 		},
 		'Pacific/Kanton' => {
 			exemplarCity => q#קנטון#,

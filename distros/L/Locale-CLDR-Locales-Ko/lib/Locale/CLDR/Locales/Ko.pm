@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Ko - Package for language Korean
 
 package Locale::CLDR::Locales::Ko;
 # This file auto generated from Data\common\main\ko.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -1370,6 +1370,7 @@ has 'display_name_language' => (
  				'bin' => '비니어',
  				'bkm' => '콤어',
  				'bla' => '식시카어',
+ 				'blo' => '아니이어',
  				'bm' => '밤바라어',
  				'bn' => '벵골어',
  				'bo' => '티베트어',
@@ -1492,7 +1493,6 @@ has 'display_name_language' => (
  				'gmh' => '중세 고지 독일어',
  				'gn' => '과라니어',
  				'goh' => '고대 고지 독일어',
- 				'gom' => '고아 콘칸어',
  				'gon' => '곤디어',
  				'gor' => '고론탈로어',
  				'got' => '고트어',
@@ -1594,6 +1594,7 @@ has 'display_name_language' => (
  				'kv' => '코미어',
  				'kw' => '콘월어',
  				'kwk' => '곽왈라어',
+ 				'kxv' => '쿠비어',
  				'ky' => '키르기스어',
  				'la' => '라틴어',
  				'lad' => '라디노어',
@@ -1605,8 +1606,10 @@ has 'display_name_language' => (
  				'lfn' => '링구아 프랑카 노바',
  				'lg' => '간다어',
  				'li' => '림버거어',
+ 				'lij' => '리구리아어',
  				'lil' => '릴루엣어',
  				'lkt' => '라코타어',
+ 				'lmo' => '롬바르드어',
  				'ln' => '링갈라어',
  				'lo' => '라오어',
  				'lol' => '몽고어',
@@ -1803,6 +1806,7 @@ has 'display_name_language' => (
  				'swb' => '코모로어',
  				'syc' => '고전 시리아어',
  				'syr' => '시리아어',
+ 				'szl' => '실레시아어',
  				'ta' => '타밀어',
  				'tce' => '남부 투톤어',
  				'te' => '텔루구어',
@@ -1830,7 +1834,7 @@ has 'display_name_language' => (
  				'tog' => '니아사 통가어',
  				'tok' => '도기 보나',
  				'tpi' => '토크 피신어',
- 				'tr' => '터키어',
+ 				'tr' => '튀르키예어',
  				'trv' => '타로코어',
  				'ts' => '총가어',
  				'tsi' => '트심시안어',
@@ -1853,7 +1857,9 @@ has 'display_name_language' => (
  				'uz' => '우즈베크어',
  				'vai' => '바이어',
  				've' => '벤다어',
+ 				'vec' => '베네치아어',
  				'vi' => '베트남어',
+ 				'vmw' => '마쿠와어',
  				'vo' => '볼라퓌크어',
  				'vot' => '보틱어',
  				'vun' => '분조어',
@@ -1867,6 +1873,7 @@ has 'display_name_language' => (
  				'wuu' => '우어',
  				'xal' => '칼미크어',
  				'xh' => '코사어',
+ 				'xnr' => '캉리어',
  				'xog' => '소가어',
  				'yao' => '야오족어',
  				'yap' => '얍페세어',
@@ -1978,6 +1985,7 @@ has 'display_name_script' => (
  			'Khar' => '카로슈티 문자',
  			'Khmr' => '크메르 문자',
  			'Khoj' => '코즈키 문자',
+ 			'Kits' => '거란 소자',
  			'Knda' => '칸나다 문자',
  			'Kore' => '한국 문자',
  			'Kpel' => '크펠레 문자',
@@ -2443,6 +2451,7 @@ has 'display_name_variant' => (
  			'NJIVA' => '니바 방언',
  			'OSOJS' => '오세아코/오소가네 방언',
  			'PAMAKA' => '파마카 방언',
+ 			'PEHOEJI' => '백화자',
  			'PINYIN' => '병음 로마자 표기법',
  			'POLYTON' => '복음',
  			'POSIX' => 'Computer',
@@ -2455,6 +2464,7 @@ has 'display_name_variant' => (
  			'SOLBA' => '스톨비자/솔비카 방언',
  			'SURMIRAN' => '서미안',
  			'TARASK' => '타라쉬키에비샤 표기법',
+ 			'TONGYONG' => '통용 병음',
  			'UCCOR' => '통합 표기법',
  			'UCRCOR' => '통합 개정 표기법',
  			'ULSTER' => '얼스터',
@@ -2551,7 +2561,6 @@ has 'display_name_type' => (
  				'phonebook' => q{전화번호부순},
  				'phonetic' => q{소리나는 대로 정렬 순서},
  				'pinyin' => q{병음순},
- 				'reformed' => q{개정 정렬순},
  				'search' => q{범용 검색},
  				'searchjl' => q{한글 자음으로 검색},
  				'standard' => q{표준 정렬 순서},
@@ -3195,6 +3204,14 @@ has 'units' => (
 						'other' => q({0}몰),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'other' => q({0}ppb),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'other' => q({0}ppb),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(100킬로미터당 리터),
 						'other' => q(100킬로미터당 {0}리터),
@@ -3427,6 +3444,18 @@ has 'units' => (
 					'nanosecond' => {
 						'name' => q(나노초),
 						'other' => q({0}나노초),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(박),
+						'other' => q({0}박),
+						'per' => q(1박당 {0}),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(박),
+						'other' => q({0}박),
+						'per' => q(1박당 {0}),
 					},
 					# Long Unit Identifier
 					'duration-second' => {
@@ -4697,6 +4726,14 @@ has 'units' => (
 				},
 				'narrow' => {
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'other' => q({0}ppb),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'other' => q({0}ppb),
+					},
+					# Long Unit Identifier
 					'digital-byte' => {
 						'name' => q(B),
 					},
@@ -4727,6 +4764,18 @@ has 'units' => (
 					# Core Unit Identifier
 					'minute' => {
 						'per' => q({0}/분),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(박),
+						'other' => q({0}박),
+						'per' => q({0}/박),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(박),
+						'other' => q({0}박),
+						'per' => q({0}/박),
 					},
 					# Long Unit Identifier
 					'duration-second' => {
@@ -4997,6 +5046,14 @@ has 'units' => (
 						'other' => q({0}ppm),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'other' => q({0}ppb),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'other' => q({0}ppb),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'other' => q({0}L/100km),
 					},
@@ -5205,6 +5262,18 @@ has 'units' => (
 					# Core Unit Identifier
 					'nanosecond' => {
 						'other' => q({0}ns),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(박),
+						'other' => q({0}박),
+						'per' => q({0}/박),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(박),
+						'other' => q({0}박),
+						'per' => q({0}/박),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -7605,7 +7674,8 @@ has 'currencies' => (
 		},
 		'TRY' => {
 			display_name => {
-				'currency' => q(터키 리라),
+				'currency' => q(튀르키예 리라),
+				'other' => q(튀르키예 리라),
 			},
 		},
 		'TTD' => {
@@ -8578,19 +8648,54 @@ has 'day_periods' => (
 					'afternoon1' => q{오후},
 					'evening1' => q{저녁},
 					'midnight' => q{자정},
-					'morning1' => q{새벽},
+					'morning1' => q{아침},
+					'morning2' => q{오전},
+					'night1' => q{밤},
+					'noon' => q{정오},
+				},
+				'narrow' => {
+					'afternoon1' => q{오후},
+					'evening1' => q{저녁},
+					'midnight' => q{자정},
+					'morning1' => q{아침},
 					'morning2' => q{오전},
 					'night1' => q{밤},
 					'noon' => q{정오},
 				},
 				'wide' => {
+					'afternoon1' => q{오후},
 					'am' => q{오전},
+					'evening1' => q{저녁},
+					'midnight' => q{자정},
+					'morning1' => q{아침},
+					'morning2' => q{오전},
+					'night1' => q{밤},
+					'noon' => q{정오},
 					'pm' => q{오후},
 				},
 			},
 			'stand-alone' => {
+				'abbreviated' => {
+					'afternoon1' => q{오후},
+					'evening1' => q{저녁},
+					'morning1' => q{아침},
+					'morning2' => q{오전},
+					'night1' => q{밤},
+				},
+				'narrow' => {
+					'afternoon1' => q{오후},
+					'evening1' => q{저녁},
+					'morning1' => q{아침},
+					'morning2' => q{오전},
+					'night1' => q{밤},
+				},
 				'wide' => {
+					'afternoon1' => q{오후},
 					'am' => q{오전},
+					'evening1' => q{저녁},
+					'morning1' => q{아침},
+					'morning2' => q{오전},
+					'night1' => q{밤},
 					'pm' => q{오후},
 				},
 			},
@@ -9469,8 +9574,8 @@ has 'datetime_formats_interval' => (
 				d => q{MMM d일~d일},
 			},
 			Md => {
-				M => q{M. d ~ M. d},
-				d => q{M. d ~ M. d},
+				M => q{M/d ~ M/d},
+				d => q{M/d ~ M/d},
 			},
 			d => {
 				d => q{d일~d일},
@@ -10265,9 +10370,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#뉴욕#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#니피곤#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#놈#,
 		},
@@ -10288,9 +10390,6 @@ has 'time_zone_names' => (
 		},
 		'America/Panama' => {
 			exemplarCity => q#파나마#,
-		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#팡니르퉁#,
 		},
 		'America/Paramaribo' => {
 			exemplarCity => q#파라마리보#,
@@ -10313,9 +10412,6 @@ has 'time_zone_names' => (
 		'America/Punta_Arenas' => {
 			exemplarCity => q#푼타아레나스#,
 		},
-		'America/Rainy_River' => {
-			exemplarCity => q#레이니강#,
-		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#랭킹 인렛#,
 		},
@@ -10330,9 +10426,6 @@ has 'time_zone_names' => (
 		},
 		'America/Rio_Branco' => {
 			exemplarCity => q#히우 브랑쿠#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#산타 이사벨#,
 		},
 		'America/Santarem' => {
 			exemplarCity => q#산타렘#,
@@ -10379,9 +10472,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#툴레#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#선더베이#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#티후아나#,
 		},
@@ -10402,9 +10492,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#야쿠타트#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#옐로나이프#,
 		},
 		'America_Central' => {
 			long => {
@@ -10579,9 +10666,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#치타#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#초이발산#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#콜롬보#,
@@ -10821,9 +10905,6 @@ has 'time_zone_names' => (
 		'Australia/Broken_Hill' => {
 			exemplarCity => q#브로컨힐#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#퀴리#,
-		},
 		'Australia/Darwin' => {
 			exemplarCity => q#다윈#,
 		},
@@ -10955,13 +11036,6 @@ has 'time_zone_names' => (
 				'daylight' => q#중국 하계 표준시#,
 				'generic' => q#중국 시간#,
 				'standard' => q#중국 표준시#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#초이발산 하계 표준시#,
-				'generic' => q#초이발산 시간#,
-				'standard' => q#초이발산 표준시#,
 			},
 		},
 		'Christmas' => {
@@ -11186,9 +11260,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#울리야노프스크#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#우주고로트#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#파두츠#,
 		},
@@ -11209,9 +11280,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#자그레브#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#자포로지예#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#취리히#,
@@ -11441,6 +11509,11 @@ has 'time_zone_names' => (
 				'standard' => q#페트로파블롭스크-캄차츠키 표준시#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#카자흐스탄 시간#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#동부 카자흐스탄 시간#,
@@ -11499,11 +11572,6 @@ has 'time_zone_names' => (
 				'standard' => q#마카오 표준 시간#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#매쿼리섬 시간#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#마가단 하계 표준시#,
@@ -11541,13 +11609,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#모슨 시간#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#멕시코 북서부 하계 표준시#,
-				'generic' => q#멕시코 북서부 시간#,
-				'standard' => q#멕시코 북서부 표준시#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -11689,9 +11750,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Honolulu' => {
 			exemplarCity => q#호놀룰루#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#존스톤#,
 		},
 		'Pacific/Kanton' => {
 			exemplarCity => q#칸톤#,

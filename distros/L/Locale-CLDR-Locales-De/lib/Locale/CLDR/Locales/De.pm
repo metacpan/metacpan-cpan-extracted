@@ -8,18 +8,18 @@ Locale::CLDR::Locales::De - Package for language German
 
 package Locale::CLDR::Locales::De;
 # This file auto generated from Data\common\main\de.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -1131,6 +1131,7 @@ has 'display_name_language' => (
  				'bjn' => 'Banjaresisch',
  				'bkm' => 'Kom',
  				'bla' => 'Blackfoot',
+ 				'blo' => 'Anii',
  				'bm' => 'Bambara',
  				'bn' => 'Bengalisch',
  				'bo' => 'Tibetisch',
@@ -1262,7 +1263,6 @@ has 'display_name_language' => (
  				'gmh' => 'Mittelhochdeutsch',
  				'gn' => 'Guaraní',
  				'goh' => 'Althochdeutsch',
- 				'gom' => 'Goa-Konkani',
  				'gon' => 'Gondi',
  				'gor' => 'Mongondou',
  				'got' => 'Gotisch',
@@ -1282,6 +1282,7 @@ has 'display_name_language' => (
  				'hax' => 'Süd-Haida',
  				'he' => 'Hebräisch',
  				'hi' => 'Hindi',
+ 				'hi_Latn' => 'Hindi (lateinisch)',
  				'hi_Latn@alt=variant' => 'Hinglish',
  				'hif' => 'Fidschi-Hindi',
  				'hil' => 'Hiligaynon',
@@ -1373,6 +1374,7 @@ has 'display_name_language' => (
  				'kv' => 'Komi',
  				'kw' => 'Kornisch',
  				'kwk' => 'Kwakʼwala',
+ 				'kxv' => 'Kuvi',
  				'ky' => 'Kirgisisch',
  				'la' => 'Latein',
  				'lad' => 'Ladino',
@@ -1667,6 +1669,7 @@ has 'display_name_language' => (
  				'vi' => 'Vietnamesisch',
  				'vls' => 'Westflämisch',
  				'vmf' => 'Mainfränkisch',
+ 				'vmw' => 'Makua',
  				'vo' => 'Volapük',
  				'vot' => 'Wotisch',
  				'vro' => 'Võro',
@@ -1682,6 +1685,7 @@ has 'display_name_language' => (
  				'xal' => 'Kalmückisch',
  				'xh' => 'Xhosa',
  				'xmf' => 'Mingrelisch',
+ 				'xnr' => 'Kangri',
  				'xog' => 'Soga',
  				'yao' => 'Yao',
  				'yap' => 'Yapesisch',
@@ -1731,6 +1735,7 @@ has 'display_name_script' => (
  			'Arab' => 'Arabisch',
  			'Arab@alt=variant' => 'Persisch',
  			'Aran' => 'Nastaliq',
+ 			'Armi' => 'Aramäisch',
  			'Armn' => 'Armenisch',
  			'Avst' => 'Avestisch',
  			'Bali' => 'Balinesisch',
@@ -1746,12 +1751,13 @@ has 'display_name_script' => (
  			'Bugi' => 'Buginesisch',
  			'Buhd' => 'Buhid',
  			'Cakm' => 'Chakma',
- 			'Cans' => 'UCAS',
+ 			'Cans' => 'Kanadische Aborigine-Silbenschrift',
  			'Cari' => 'Karisch',
- 			'Cham' => 'Cham',
  			'Cher' => 'Cherokee',
+ 			'Chrs' => 'Choresmisch',
  			'Cirt' => 'Cirth',
  			'Copt' => 'Koptisch',
+ 			'Cpmn' => 'Minoisch',
  			'Cprt' => 'Zypriotisch',
  			'Cyrl' => 'Kyrillisch',
  			'Cyrs' => 'Altkirchenslawisch',
@@ -1793,7 +1799,6 @@ has 'display_name_script' => (
  			'Hung' => 'Altungarisch',
  			'Inds' => 'Indus-Schrift',
  			'Ital' => 'Altitalisch',
- 			'Jamo' => 'Jamo',
  			'Java' => 'Javanesisch',
  			'Jpan' => 'Japanisch',
  			'Jurc' => 'Jurchen',
@@ -1802,6 +1807,7 @@ has 'display_name_script' => (
  			'Khar' => 'Kharoshthi',
  			'Khmr' => 'Khmer',
  			'Khoj' => 'Khojki',
+ 			'Kits' => 'Chitan',
  			'Knda' => 'Kannada',
  			'Kore' => 'Koreanisch',
  			'Kpel' => 'Kpelle',
@@ -1830,7 +1836,6 @@ has 'display_name_script' => (
  			'Merc' => 'Meroitisch kursiv',
  			'Mero' => 'Meroitisch',
  			'Mlym' => 'Malayalam',
- 			'Modi' => 'Modi',
  			'Mong' => 'Mongolisch',
  			'Moon' => 'Moon',
  			'Mroo' => 'Mro',
@@ -1849,6 +1854,7 @@ has 'display_name_script' => (
  			'Orya' => 'Oriya',
  			'Osge' => 'Osage',
  			'Osma' => 'Osmanisch',
+ 			'Ougr' => 'Altuigurisch',
  			'Palm' => 'Palmyrenisch',
  			'Pauc' => 'Pau Cin Hau',
  			'Perm' => 'Altpermisch',
@@ -1896,7 +1902,6 @@ has 'display_name_script' => (
  			'Tfng' => 'Tifinagh',
  			'Tglg' => 'Tagalog',
  			'Thaa' => 'Thaana',
- 			'Thai' => 'Thai',
  			'Tibt' => 'Tibetisch',
  			'Tirh' => 'Tirhuta',
  			'Ugar' => 'Ugaritisch',
@@ -1907,6 +1912,7 @@ has 'display_name_script' => (
  			'Wole' => 'Woleaianisch',
  			'Xpeo' => 'Altpersisch',
  			'Xsux' => 'Sumerisch-akkadische Keilschrift',
+ 			'Yezi' => 'Jesidisch',
  			'Yiii' => 'Yi',
  			'Zanb' => 'Dsanabadsar-Quadratschrift',
  			'Zinh' => 'Geerbter Schriftwert',
@@ -1914,7 +1920,7 @@ has 'display_name_script' => (
  			'Zsye' => 'Emoji',
  			'Zsym' => 'Symbole',
  			'Zxxx' => 'Schriftlos',
- 			'Zyyy' => 'Verbreitet',
+ 			'Zyyy' => 'Unbestimmt',
  			'Zzzz' => 'Unbekannte Schrift',
 
 			);
@@ -2283,6 +2289,7 @@ has 'display_name_variant' => (
  			'TARASK' => 'Taraskievica-Orthographie',
  			'UCCOR' => 'Vereinheitlichte Rechtschreibung',
  			'UCRCOR' => 'Vereinheitlichte überarbeitete Rechtschreibung',
+ 			'UNIFON' => 'Unifon (phonetisch)',
  			'VALENCIA' => 'Valencianisch',
  			'WADEGILE' => 'Wade-Giles',
 
@@ -2310,7 +2317,7 @@ has 'display_name_key' => (
  			'hc' => 'Stundenformat (12h/24h)',
  			'lb' => 'Zeilenumbruchstil',
  			'ms' => 'Maßsystem',
- 			'numbers' => 'Zahlen',
+ 			'numbers' => 'Ziffern',
  			'timezone' => 'Zeitzone',
  			'va' => 'Lokale Variante',
  			'x' => 'Privatnutzung',
@@ -2343,7 +2350,7 @@ has 'display_name_type' => (
  				'iso8601' => q{ISO-8601-Kalender},
  				'japanese' => q{Japanischer Kalender},
  				'persian' => q{Persischer Kalender},
- 				'roc' => q{Kalender der Republik China},
+ 				'roc' => q{Minguo-Kalender},
  			},
  			'cf' => {
  				'account' => q{Währungsformat (Buchhaltung)},
@@ -2377,7 +2384,6 @@ has 'display_name_type' => (
  				'phonebook' => q{Telefonbuch-Sortierung},
  				'phonetic' => q{Phonetische Sortierung},
  				'pinyin' => q{Pinyin-Sortierung},
- 				'reformed' => q{Reformierte Sortierreihenfolge},
  				'search' => q{Allgemeine Suche},
  				'searchjl' => q{Suche nach Anfangsbuchstaben des koreanischen Alphabets},
  				'standard' => q{Standard-Sortierung},
@@ -2402,12 +2408,12 @@ has 'display_name_type' => (
  				'tertiary' => q{Akzente/Fall/Breite sortieren},
  			},
  			'd0' => {
- 				'fwidth' => q{Breit},
- 				'hwidth' => q{Halbe Breite},
+ 				'fwidth' => q{Vollbreit},
+ 				'hwidth' => q{Halbbreit},
  				'npinyin' => q{Numerisch},
  			},
  			'hc' => {
- 				'h11' => q{12-Stunden-Format (0-11)},
+ 				'h11' => q{12-Stunden-Format (0–11)},
  				'h12' => q{12-Stunden-Format (1-12)},
  				'h23' => q{24-Stunden-Format (0-23)},
  				'h24' => q{24-Stunden-Format (1-24)},
@@ -2437,7 +2443,7 @@ has 'display_name_type' => (
  				'brah' => q{Brahmi-Ziffern},
  				'cakm' => q{Chakma-Ziffern},
  				'cham' => q{Cham-Ziffern},
- 				'cyrl' => q{Kyrillische Ziffern},
+ 				'cyrl' => q{Kyrillische Zahlzeichen},
  				'deva' => q{Devanagari-Ziffern},
  				'ethi' => q{Äthiopische Ziffern},
  				'finance' => q{Finanzzahlen},
@@ -3114,12 +3120,14 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'concentr-milligram-ofglucose-per-deciliter' => {
+						'1' => q(neuter),
 						'name' => q(Milligramm pro Deziliter),
 						'one' => q({0} Milligramm pro Deziliter),
 						'other' => q({0} Milligramm pro Deziliter),
 					},
 					# Core Unit Identifier
 					'milligram-ofglucose-per-deciliter' => {
+						'1' => q(neuter),
 						'name' => q(Milligramm pro Deziliter),
 						'one' => q({0} Milligramm pro Deziliter),
 						'other' => q({0} Milligramm pro Deziliter),
@@ -3207,6 +3215,20 @@ has 'units' => (
 						'name' => q(Pro-Zehntausend),
 						'one' => q({0} pro Zehntausend),
 						'other' => q({0} pro Zehntausend),
+					},
+					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'1' => q(neuter),
+						'name' => q(Milliardstel),
+						'one' => q({0} Milliardstel),
+						'other' => q({0} Milliardstel),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'1' => q(neuter),
+						'name' => q(Milliardstel),
+						'one' => q({0} Milliardstel),
+						'other' => q({0} Milliardstel),
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
@@ -3577,6 +3599,22 @@ has 'units' => (
 						'name' => q(Nanosekunden),
 						'one' => q({0} Nanosekunde),
 						'other' => q({0} Nanosekunden),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'1' => q(feminine),
+						'name' => q(Übernachtungen),
+						'one' => q({0} Übernachtung),
+						'other' => q({0} Übernachtungen),
+						'per' => q({0} pro Übernachtung),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'1' => q(feminine),
+						'name' => q(Übernachtungen),
+						'one' => q({0} Übernachtung),
+						'other' => q({0} Übernachtungen),
+						'per' => q({0} pro Übernachtung),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -4258,12 +4296,14 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-point' => {
+						'1' => q(masculine),
 						'name' => q(DTP-Punkte),
 						'one' => q({0} DTP-Punkt),
 						'other' => q({0} DTP-Punkte),
 					},
 					# Core Unit Identifier
 					'point' => {
+						'1' => q(masculine),
 						'name' => q(DTP-Punkte),
 						'one' => q({0} DTP-Punkt),
 						'other' => q({0} DTP-Punkte),
@@ -4762,12 +4802,14 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'pressure-millimeter-ofhg' => {
+						'1' => q(masculine),
 						'name' => q(Millimeter Quecksilbersäule),
 						'one' => q({0} Millimeter Quecksilbersäule),
 						'other' => q({0} Millimeter Quecksilbersäule),
 					},
 					# Core Unit Identifier
 					'millimeter-ofhg' => {
+						'1' => q(masculine),
 						'name' => q(Millimeter Quecksilbersäule),
 						'one' => q({0} Millimeter Quecksilbersäule),
 						'other' => q({0} Millimeter Quecksilbersäule),
@@ -4800,12 +4842,14 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'speed-beaufort' => {
+						'1' => q(neuter),
 						'name' => q(Beaufort),
 						'one' => q(Beaufort {0}),
 						'other' => q(Beaufort {0}),
 					},
 					# Core Unit Identifier
 					'beaufort' => {
+						'1' => q(neuter),
 						'name' => q(Beaufort),
 						'one' => q(Beaufort {0}),
 						'other' => q(Beaufort {0}),
@@ -5709,6 +5753,20 @@ has 'units' => (
 						'other' => q({0} M),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(Nächte),
+						'one' => q({0}Nacht),
+						'other' => q({0}Nächte),
+						'per' => q({0}/Nacht),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(Nächte),
+						'one' => q({0}Nacht),
+						'other' => q({0}Nächte),
+						'per' => q({0}/Nacht),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'name' => q(Q),
 						'one' => q({0} Q),
@@ -6383,6 +6441,18 @@ has 'units' => (
 						'other' => q({0} ‱),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(Milliardstel),
+						'one' => q({0} Milliardstel),
+						'other' => q({0} Milliardstel),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(Milliardstel),
+						'one' => q({0} Milliardstel),
+						'other' => q({0} Milliardstel),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(L/100 km),
 						'one' => q({0} L/100 km),
@@ -6593,6 +6663,20 @@ has 'units' => (
 						'one' => q({0} Mon.),
 						'other' => q({0} Mon.),
 						'per' => q({0}/M),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(Nächte),
+						'one' => q({0} Nacht),
+						'other' => q({0} Nächte),
+						'per' => q({0}/Nacht),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(Nächte),
+						'one' => q({0} Nacht),
+						'other' => q({0} Nächte),
+						'per' => q({0}/Nacht),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -8899,9 +8983,9 @@ has 'currencies' => (
 		},
 		'SLL' => {
 			display_name => {
-				'currency' => q(Sierra-leonischer Leone \(1964—2022\)),
-				'one' => q(Sierra-leonischer Leone \(1964—2022\)),
-				'other' => q(Sierra-leonische Leones \(1964—2022\)),
+				'currency' => q(Sierra-leonischer Leone \(1964–2022\)),
+				'one' => q(Sierra-leonischer Leone \(1964–2022\)),
+				'other' => q(Sierra-leonische Leones \(1964–2022\)),
 			},
 		},
 		'SOS' => {
@@ -9398,6 +9482,50 @@ has 'calendar_months' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+			'chinese' => {
+				'format' => {
+					wide => {
+						nonleap => [
+							'Erster',
+							'Zweiter',
+							'Dritter',
+							'Vierter',
+							'Fünfter',
+							'Sechster',
+							'Siebter',
+							'Achter',
+							'Neunter',
+							'Zehnter',
+							'Elfter',
+							'Zwölfter'
+						],
+						leap => [
+							
+						],
+					},
+				},
+				'stand-alone' => {
+					wide => {
+						nonleap => [
+							'Erster',
+							'Zweiter',
+							'Dritter',
+							'Vierter',
+							'Fünfter',
+							'Sechster',
+							'Siebter',
+							'Achter',
+							'Neunter',
+							'Zehnter',
+							'Elfter',
+							'Zwölfter'
+						],
+						leap => [
+							
+						],
+					},
+				},
+			},
 			'coptic' => {
 				'format' => {
 					wide => {
@@ -10251,6 +10379,10 @@ has 'datetime_formats' => (
 		'buddhist' => {
 		},
 		'chinese' => {
+			'full' => q{{1}, {0}},
+			'long' => q{{1} {0}},
+			'medium' => q{{1} {0}},
+			'short' => q{{1} {0}},
 		},
 		'coptic' => {
 		},
@@ -10318,6 +10450,7 @@ has 'datetime_formats_available_formats' => (
 			yyyyQQQQ => q{QQQQ U},
 		},
 		'generic' => {
+			Bh => q{h 'Uhr' B},
 			Ed => q{E, d.},
 			Ehm => q{E h:mm a},
 			Ehms => q{E h:mm:ss a},
@@ -10332,7 +10465,7 @@ has 'datetime_formats_available_formats' => (
 			MMMMd => q{d. MMMM},
 			MMMd => q{d. MMM},
 			Md => q{d.M.},
-			h => q{h a},
+			h => q{h 'Uhr' B},
 			hm => q{h:mm a},
 			hms => q{h:mm:ss a},
 			y => q{y G},
@@ -10638,6 +10771,429 @@ has 'cyclic_name_sets' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'chinese' => {
+			'dayParts' => {
+				'format' => {
+					'abbreviated' => {
+						0 => q(Mäusezeit),
+						1 => q(Büffelzeit),
+						2 => q(Tigerzeit),
+						3 => q(Katzenzeit),
+						4 => q(Drachenzeit),
+						5 => q(Schlangenzeit),
+						6 => q(Pferdezeit),
+						7 => q(Ziegenzeit),
+						8 => q(Affenzeit),
+						9 => q(Hühnerzeit),
+						10 => q(Hundezeit),
+						11 => q(Schweinezeit),
+					},
+					'narrow' => {
+						0 => q(🐭),
+						1 => q(🐮),
+						2 => q(🐯),
+						3 => q(🐱),
+						4 => q(🐲),
+						5 => q(🐍),
+						6 => q(🐴),
+						7 => q(🐏),
+						8 => q(🐵),
+						9 => q(🐔),
+						10 => q(🐶),
+						11 => q(🐷),
+					},
+					'wide' => {
+						1 => q(Büffelstunden),
+						2 => q(Tigerstunden),
+						3 => q(Katzenstunden),
+						4 => q(Drachenstunden),
+						5 => q(Schlangenstunden),
+						6 => q(Pferdestunden),
+						7 => q(Ziegenstunden),
+						8 => q(Affenstunden),
+						9 => q(Hühnerstunden),
+						10 => q(Hundestunden),
+						11 => q(Schweinestunden),
+					},
+				},
+			},
+			'days' => {
+				'format' => {
+					'abbreviated' => {
+						0 => q(Holzratte),
+						1 => q(Holzbüffel),
+						2 => q(Feuertiger),
+						3 => q(Feuerhase),
+						4 => q(Erddrache),
+						5 => q(Erdschlange),
+						6 => q(Metallpferd),
+						7 => q(Metallziege),
+						8 => q(Wasseraffe),
+						9 => q(Wasserhuhn),
+						10 => q(Holzhund),
+						11 => q(Holzschwein),
+						12 => q(Feuerratte),
+						13 => q(Feuerbüffel),
+						14 => q(Erdtiger),
+						15 => q(Erdhase),
+						16 => q(Metalldrache),
+						17 => q(Metallschlange),
+						18 => q(Wasserpferd),
+						19 => q(Wasserziege),
+						20 => q(Holzaffe),
+						21 => q(Holzhuhn),
+						22 => q(Feuerhund),
+						23 => q(Feuerschwein),
+						24 => q(Erdratte),
+						25 => q(Erdbüffel),
+						26 => q(Metalltiger),
+						27 => q(Metallhase),
+						28 => q(Wasserdrache),
+						29 => q(Wasserschlange),
+						30 => q(Holzpferd),
+						31 => q(Holzziege),
+						32 => q(Feueraffe),
+						33 => q(Feuerhuhn),
+						34 => q(Erdhund),
+						35 => q(Erdschwein),
+						36 => q(Metallratte),
+						37 => q(Metallbüffel),
+						38 => q(Wassertiger),
+						39 => q(Wasserhase),
+						40 => q(Holzdrache),
+						41 => q(Holzschlange),
+						42 => q(Feuerpferd),
+						43 => q(Feuerziege),
+						44 => q(Erdaffe),
+						45 => q(Erdhuhn),
+						46 => q(Metallhund),
+						47 => q(Metallschwein),
+						48 => q(Wasserratte),
+						49 => q(Wasserbüffel),
+						50 => q(Holztiger),
+						51 => q(Holzhase),
+						52 => q(Feuerdrache),
+						53 => q(Feuerschlange),
+						54 => q(Erdpferd),
+						55 => q(Erdziege),
+						56 => q(Metallaffe),
+						57 => q(Metallhuhn),
+						58 => q(Wasserhund),
+						59 => q(Wasserschwein),
+					},
+					'narrow' => {
+						0 => q(🌲🐭),
+						1 => q(🌲🐮),
+						2 => q(🔥🐯),
+						3 => q(🔥🐱),
+						4 => q(🌱🐲),
+						5 => q(🌱🐍),
+						6 => q(⚡🐴),
+						7 => q(⚡🐏),
+						8 => q(💧🐵),
+						9 => q(💧🐔),
+						10 => q(🌲🐶),
+						11 => q(🌲🐷),
+						12 => q(🔥🐭),
+						13 => q(🔥🐮),
+						14 => q(🌱🐯),
+						15 => q(🌱🐱),
+						16 => q(⚡🐲),
+						17 => q(⚡🐍),
+						18 => q(💧🐴),
+						19 => q(💧🐏),
+						20 => q(🌲🐵),
+						21 => q(🌲🐔),
+						22 => q(🔥🐶),
+						23 => q(🔥🐷),
+						24 => q(🌱🐭),
+						25 => q(🌱🐮),
+						26 => q(⚡🐯),
+						27 => q(⚡🐱),
+						28 => q(💧🐲),
+						29 => q(💧🐍),
+						30 => q(🌲🐴),
+						31 => q(🌲🐏),
+						32 => q(🔥🐵),
+						33 => q(🔥🐔),
+						34 => q(🌱🐶),
+						35 => q(🌱🐷),
+						36 => q(⚡🐭),
+						37 => q(⚡🐮),
+						38 => q(💧🐯),
+						39 => q(💧🐱),
+						40 => q(🌲🐲),
+						41 => q(🌲🐍),
+						42 => q(🔥🐴),
+						43 => q(🔥🐏),
+						44 => q(🌱🐵),
+						45 => q(🌱🐔),
+						46 => q(⚡🐶),
+						47 => q(⚡🐷),
+						48 => q(💧🐭),
+						49 => q(💧🐮),
+						50 => q(🌲🐯),
+						51 => q(🌲🐱),
+						52 => q(🔥🐲),
+						53 => q(🔥🐍),
+						54 => q(🌱🐴),
+						55 => q(🌱🐏),
+						56 => q(⚡🐵),
+						57 => q(⚡🐔),
+						58 => q(💧🐶),
+						59 => q(💧🐷),
+					},
+					'wide' => {
+						0 => q(Yang-Holzratte),
+						1 => q(Yin-Holzbüffel),
+						2 => q(Yang-Feuertiger),
+						3 => q(Yin-Feuerhase),
+						4 => q(Yang-Erddrache),
+						5 => q(Yin-Erdschlange),
+						6 => q(Yang-Metallpferd),
+						7 => q(Yin-Metallziege),
+						8 => q(Yang-Wasseraffe),
+						9 => q(Yin-Wasserhuhn),
+						10 => q(Yang-Holzhund),
+						11 => q(Yin-Holzschwein),
+						12 => q(Yang-Feuerratte),
+						13 => q(Yin-Feuerbüffel),
+						14 => q(Yang-Erdtiger),
+						15 => q(Yin-Erdhase),
+						16 => q(Yang-Metalldrache),
+						17 => q(Yin-Metallschlange),
+						18 => q(Yang-Wasserpferd),
+						19 => q(Yin-Wasserziege),
+						20 => q(Yang-Holzaffe),
+						21 => q(Yin-Holzhuhn),
+						22 => q(Yang-Feuerhund),
+						23 => q(Yin-Feuerschwein),
+						24 => q(Yang-Erdratte),
+						25 => q(Yin-Erdbüffel),
+						26 => q(Yang-Metalltiger),
+						27 => q(Yin-Metallhase),
+						28 => q(Yang-Wasserdrache),
+						29 => q(Yin-Wasserschlange),
+						30 => q(Yang-Holzpferd),
+						31 => q(Yin-Holzziege),
+						32 => q(Yang-Feueraffe),
+						33 => q(Yin-Feuerhuhn),
+						34 => q(Yang-Erdhund),
+						35 => q(Yin-Erdschwein),
+						36 => q(Yang-Metallratte),
+						37 => q(Yin-Metallbüffel),
+						38 => q(Yang-Wassertiger),
+						39 => q(Yin-Wasserhase),
+						40 => q(Yang-Holzdrache),
+						41 => q(Yin-Holzschlange),
+						42 => q(Yang-Feuerpferd),
+						43 => q(Yin-Feuerziege),
+						44 => q(Yang-Erdaffe),
+						45 => q(Yin-Erdhuhn),
+						46 => q(Yang-Metallhund),
+						47 => q(Yin-Metallschwein),
+						48 => q(Yang-Wasserratte),
+						49 => q(Yin-Wasserbüffel),
+						50 => q(Yang-Holztiger),
+						51 => q(Yin-Holzhase),
+						52 => q(Yang-Feuerdrache),
+						53 => q(Yin-Feuerschlange),
+						54 => q(Yang-Erdpferd),
+						55 => q(Yin-Erdziege),
+						56 => q(Yang-Metallaffe),
+						57 => q(Yin-Metallhuhn),
+						58 => q(Yang-Wasserhund),
+						59 => q(Yin-Wasserschwein),
+					},
+				},
+			},
+			'months' => {
+				'format' => {
+					'wide' => {
+						0 => q(Yang-Holzratte),
+						1 => q(Yin-Holzbüffel),
+						2 => q(Yang-Feuertiger),
+						3 => q(Yin-Feuerhase),
+						4 => q(Yang-Erddrache),
+						5 => q(Yin-Erdschlange),
+						6 => q(Yang-Metallpferd),
+						7 => q(Yin-Metallziege),
+						8 => q(Yang-Wasseraffe),
+						9 => q(Yin-Wasserhuhn),
+						10 => q(Yang-Holzhund),
+						11 => q(Yin-Holzschwein),
+						12 => q(Yang-Feuerratte),
+						13 => q(Yin-Feuerbüffel),
+						14 => q(Yang-Erdtiger),
+						15 => q(Yin-Erdhase),
+						16 => q(Yang-Metalldrache),
+						17 => q(Yin-Metallschlange),
+						18 => q(Yang-Wasserpferd),
+						19 => q(Yin-Wasserziege),
+						20 => q(Yang-Holzaffe),
+						21 => q(Yin-Holzhuhn),
+						22 => q(Yang-Feuerhund),
+						23 => q(Yin-Feuerschwein),
+						24 => q(Yang-Erdratte),
+						25 => q(Yin-Erdbüffel),
+						26 => q(Yang-Metalltiger),
+						27 => q(Yin-Metallhase),
+						28 => q(Yang-Wasserdrache),
+						29 => q(Yin-Wasserschlange),
+						30 => q(Yang-Holzpferd),
+						31 => q(Yin-Holzziege),
+						32 => q(Yang-Feueraffe),
+						33 => q(Yin-Feuerhuhn),
+						34 => q(Yang-Erdhund),
+						35 => q(Yin-Erdschwein),
+						36 => q(Yang-Metallratte),
+						37 => q(Yin-Metallbüffel),
+						38 => q(Yang-Wassertiger),
+						39 => q(Yin-Wasserhase),
+						40 => q(Yang-Holzdrache),
+						41 => q(Yin-Holzschlange),
+						42 => q(Yang-Feuerpferd),
+						43 => q(Yin-Feuerziege),
+						44 => q(Yang-Erdaffe),
+						45 => q(Yin-Erdhuhn),
+						46 => q(Yang-Metallhund),
+						47 => q(Yin-Metallschwein),
+						48 => q(Yang-Wasserratte),
+						49 => q(Yin-Wasserbüffel),
+						50 => q(Yang-Holztiger),
+						51 => q(Yin-Holzhase),
+						52 => q(Yang-Feuerdrache),
+						53 => q(Yin-Feuerschlange),
+						54 => q(Yang-Erdpferd),
+						55 => q(Yin-Erdziege),
+						56 => q(Yang-Metallaffe),
+						57 => q(Yin-Metallhuhn),
+						58 => q(Yang-Wasserhund),
+						59 => q(Yin-Wasserschwein),
+					},
+				},
+			},
+			'solarTerms' => {
+				'format' => {
+					'narrow' => {
+						0 => q(🐯♒),
+						1 => q(🐯♓),
+						2 => q(🐰♓),
+						3 => q(🐰♈),
+						4 => q(🐲♈),
+						5 => q(🐲♉),
+						6 => q(🐍♉),
+						7 => q(🐍♊),
+						8 => q(🐴♊),
+						9 => q(🐴♋),
+						10 => q(🐏♋),
+						11 => q(🐏♌),
+						12 => q(🐵♌),
+						13 => q(🐵♍),
+						14 => q(🐔♍),
+						15 => q(🐔♎),
+						16 => q(🐶♎),
+						17 => q(🐶♏),
+						18 => q(🐷♏),
+						19 => q(🐷♐),
+						20 => q(🐭♐),
+						21 => q(🐭♑),
+						22 => q(🐮♑),
+						23 => q(🐮♒),
+					},
+					'wide' => {
+						0 => q(Neufrühling),
+						1 => q(Wässer),
+						2 => q(Schlüpfen),
+						3 => q(Vollfrühling),
+						4 => q(Flügge),
+						5 => q(Sprosskorn),
+						6 => q(Neusommer),
+						7 => q(Halmkorn),
+						8 => q(Ährenkorn),
+						9 => q(Vollsommer),
+						10 => q(Vorhitze),
+						11 => q(Haupthitze),
+						12 => q(Neuherbst),
+						13 => q(Endhitze),
+						14 => q(Morgentau),
+						15 => q(Vollherbst),
+						16 => q(Morgenreif),
+						17 => q(Morgenfrost),
+						18 => q(Neuwinter),
+						19 => q(Vorschnee),
+						20 => q(Hauptschnee),
+						21 => q(Vollwinter),
+						22 => q(Vorkälte),
+						23 => q(Hauptkälte),
+					},
+				},
+			},
+			'years' => {
+				'format' => {
+					'wide' => {
+						0 => q(Yang-Holzratte),
+						1 => q(Yin-Holzbüffel),
+						2 => q(Yang-Feuertiger),
+						3 => q(Yin-Feuerhase),
+						4 => q(Yang-Erddrache),
+						5 => q(Yin-Erdschlange),
+						6 => q(Yang-Metallpferd),
+						7 => q(Yin-Metallziege),
+						8 => q(Yang-Wasseraffe),
+						9 => q(Yin-Wasserhuhn),
+						10 => q(Yang-Holzhund),
+						11 => q(Yin-Holzschwein),
+						12 => q(Yang-Feuerratte),
+						13 => q(Yin-Feuerbüffel),
+						14 => q(Yang-Erdtiger),
+						15 => q(Yin-Erdhase),
+						16 => q(Yang-Metalldrache),
+						17 => q(Yin-Metallschlange),
+						18 => q(Yang-Wasserpferd),
+						19 => q(Yin-Wasserziege),
+						20 => q(Yang-Holzaffe),
+						21 => q(Yin-Holzhuhn),
+						22 => q(Yang-Feuerhund),
+						23 => q(Yin-Feuerschwein),
+						24 => q(Yang-Erdratte),
+						25 => q(Yin-Erdbüffel),
+						26 => q(Yang-Metalltiger),
+						27 => q(Yin-Metallhase),
+						28 => q(Yang-Wasserdrache),
+						29 => q(Yin-Wasserschlange),
+						30 => q(Yang-Holzpferd),
+						31 => q(Yin-Holzziege),
+						32 => q(Yang-Feueraffe),
+						33 => q(Yin-Feuerhuhn),
+						34 => q(Yang-Erdhund),
+						35 => q(Yin-Erdschwein),
+						36 => q(Yang-Metallratte),
+						37 => q(Yin-Metallbüffel),
+						38 => q(Yang-Wassertiger),
+						39 => q(Yin-Wasserhase),
+						40 => q(Yang-Holzdrache),
+						41 => q(Yin-Holzschlange),
+						42 => q(Yang-Feuerpferd),
+						43 => q(Yin-Feuerziege),
+						44 => q(Yang-Erdaffe),
+						45 => q(Yin-Erdhuhn),
+						46 => q(Yang-Metallhund),
+						47 => q(Yin-Metallschwein),
+						48 => q(Yang-Wasserratte),
+						49 => q(Yin-Wasserbüffel),
+						50 => q(Yang-Holztiger),
+						51 => q(Yin-Holzhase),
+						52 => q(Yang-Feuerdrache),
+						53 => q(Yin-Feuerschlange),
+						54 => q(Yang-Erdpferd),
+						55 => q(Yin-Erdziege),
+						56 => q(Yang-Metallaffe),
+						57 => q(Yin-Metallhuhn),
+						58 => q(Yang-Wasserhund),
+						59 => q(Yin-Wasserschwein),
+					},
+				},
+			},
 			'zodiacs' => {
 				'format' => {
 					'abbreviated' => {
@@ -10653,6 +11209,20 @@ has 'cyclic_name_sets' => (
 						9 => q(Hahn),
 						10 => q(Hund),
 						11 => q(Schwein),
+					},
+					'narrow' => {
+						0 => q(🐭),
+						1 => q(🐮),
+						2 => q(🐯),
+						3 => q(🐰),
+						4 => q(🐲),
+						5 => q(🐍),
+						6 => q(🐴),
+						7 => q(🐏),
+						8 => q(🐵),
+						9 => q(🐔),
+						10 => q(🐶),
+						11 => q(🐷),
 					},
 				},
 			},
@@ -10713,9 +11283,6 @@ has 'time_zone_names' => (
 		'Africa/Porto-Novo' => {
 			exemplarCity => q#Porto Novo#,
 		},
-		'Africa/Sao_Tome' => {
-			exemplarCity => q#São Tomé#,
-		},
 		'Africa/Tripoli' => {
 			exemplarCity => q#Tripolis#,
 		},
@@ -10762,9 +11329,6 @@ has 'time_zone_names' => (
 				'standard' => q#Amazonas-Normalzeit#,
 			},
 		},
-		'America/Asuncion' => {
-			exemplarCity => q#Asunción#,
-		},
 		'America/Bahia_Banderas' => {
 			exemplarCity => q#Bahia Banderas#,
 		},
@@ -10777,9 +11341,6 @@ has 'time_zone_names' => (
 		'America/Cordoba' => {
 			exemplarCity => q#Córdoba#,
 		},
-		'America/Curacao' => {
-			exemplarCity => q#Curaçao#,
-		},
 		'America/Havana' => {
 			exemplarCity => q#Havanna#,
 		},
@@ -10791,9 +11352,6 @@ has 'time_zone_names' => (
 		},
 		'America/Mexico_City' => {
 			exemplarCity => q#Mexiko-Stadt#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#Santa Isabel#,
 		},
 		'America/Sao_Paulo' => {
 			exemplarCity => q#São Paulo#,
@@ -10817,9 +11375,9 @@ has 'time_zone_names' => (
 		},
 		'America_Mountain' => {
 			long => {
-				'daylight' => q#Rocky-Mountain-Sommerzeit#,
-				'generic' => q#Rocky-Mountain-Zeit#,
-				'standard' => q#Rocky-Mountain-Normalzeit#,
+				'daylight' => q#Rocky-Mountains-Sommerzeit#,
+				'generic' => q#Rocky-Mountains-Zeit#,
+				'standard' => q#Rocky-Mountains-Normalzeit#,
 			},
 		},
 		'America_Pacific' => {
@@ -10908,9 +11466,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#Tschita#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#Tschoibalsan#,
 		},
 		'Asia/Damascus' => {
 			exemplarCity => q#Damaskus#,
@@ -11033,9 +11588,6 @@ has 'time_zone_names' => (
 		'Atlantic/South_Georgia' => {
 			exemplarCity => q#Südgeorgien#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#Currie#,
-		},
 		'Australia_Central' => {
 			long => {
 				'daylight' => q#Zentralaustralische Sommerzeit#,
@@ -11143,13 +11695,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Chinesische Sommerzeit#,
 				'generic' => q#Chinesische Zeit#,
 				'standard' => q#Chinesische Normalzeit#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Tschoibalsan-Sommerzeit#,
-				'generic' => q#Tschoibalsan-Zeit#,
-				'standard' => q#Tschoibalsan-Normalzeit#,
 			},
 		},
 		'Christmas' => {
@@ -11279,9 +11824,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#Uljanowsk#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#Uschgorod#,
-		},
 		'Europe/Vatican' => {
 			exemplarCity => q#Vatikan#,
 		},
@@ -11293,9 +11835,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Warsaw' => {
 			exemplarCity => q#Warschau#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#Saporischschja#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#Zürich#,
@@ -11456,9 +11995,6 @@ has 'time_zone_names' => (
 		'Indian/Maldives' => {
 			exemplarCity => q#Malediven#,
 		},
-		'Indian/Reunion' => {
-			exemplarCity => q#Réunion#,
-		},
 		'Indian_Ocean' => {
 			long => {
 				'standard' => q#Indischer-Ozean-Zeit#,
@@ -11519,6 +12055,11 @@ has 'time_zone_names' => (
 				'standard' => q#Kamtschatka-Normalzeit#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Kasachische Zeit#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#Ostkasachische Zeit#,
@@ -11550,7 +12091,7 @@ has 'time_zone_names' => (
 		},
 		'Kyrgystan' => {
 			long => {
-				'standard' => q#Kirgisistan-Zeit#,
+				'standard' => q#Kirgisische Zeit#,
 			},
 		},
 		'Lanka' => {
@@ -11575,11 +12116,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Macau-Sommerzeit#,
 				'generic' => q#Macau-Zeit#,
 				'standard' => q#Macau-Normalzeit#,
-			},
-		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Macquarieinsel-Zeit#,
 			},
 		},
 		'Magadan' => {
@@ -11619,13 +12155,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Mawson-Zeit#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Nordwestmexiko-Sommerzeit#,
-				'generic' => q#Nordwestmexiko-Zeit#,
-				'standard' => q#Nordwestmexiko-Normalzeit#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -11882,7 +12411,7 @@ has 'time_zone_names' => (
 		},
 		'Tajikistan' => {
 			long => {
-				'standard' => q#Tadschikistan-Zeit#,
+				'standard' => q#Tadschikische Zeit#,
 			},
 		},
 		'Tokelau' => {
@@ -11904,9 +12433,9 @@ has 'time_zone_names' => (
 		},
 		'Turkmenistan' => {
 			long => {
-				'daylight' => q#Turkmenistan-Sommerzeit#,
+				'daylight' => q#Turkmenische Sommerzeit#,
 				'generic' => q#Turkmenistan-Zeit#,
-				'standard' => q#Turkmenistan-Normalzeit#,
+				'standard' => q#Turkmenische Normalzeit#,
 			},
 		},
 		'Tuvalu' => {
@@ -11923,9 +12452,9 @@ has 'time_zone_names' => (
 		},
 		'Uzbekistan' => {
 			long => {
-				'daylight' => q#Usbekistan-Sommerzeit#,
-				'generic' => q#Usbekistan-Zeit#,
-				'standard' => q#Usbekistan-Normalzeit#,
+				'daylight' => q#Usbekische Sommerzeit#,
+				'generic' => q#Usbekische Zeit#,
+				'standard' => q#Usbekische Normalzeit#,
 			},
 		},
 		'Vanuatu' => {

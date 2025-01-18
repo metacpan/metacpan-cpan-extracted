@@ -46,11 +46,9 @@ SRCS = s-bsdiff.c \
 	s-bspatch.c
 OBJS = $(SRCS:.c=.o)
 
-# XXX Paul Smith (GNU make): "$(<:.c=.o) is not a good idea since $@ will not match then".
-# (We yet keep it since that affects only libdivsufsort which is only upstream.)
 .SUFFIXES: .o .c .y
 .c.o:
-	$(CC) $(CFLAGS) -o $(<:.c=.o) -c $<
+	$(CC) $(CFLAGS) -c -o $@ -c $<
 
 all: $(LIB)
 $(CONFIGH):

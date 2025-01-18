@@ -1,17 +1,17 @@
 package Locale::CLDR::ValidCodes;
 # This file auto generated from Data\common\supplemental\supplementalMetadata.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo::Role;
 
@@ -209,7 +209,6 @@ has 'valid_languages' => (
  ajg
  aji
  ajn
- ajp
  ajs
  ajw
  ajz
@@ -1334,6 +1333,7 @@ has 'valid_languages' => (
  cll
  clm
  clo
+ cls
  clt
  clu
  clw
@@ -1499,6 +1499,7 @@ has 'valid_languages' => (
  cwe
  cwg
  cwt
+ cxh
  cy
  cya
  cyb
@@ -1731,6 +1732,7 @@ has 'valid_languages' => (
  dse
  dsh
  dsi
+ dsk
  dsl
  dsn
  dso
@@ -1792,10 +1794,12 @@ has 'valid_languages' => (
  dym
  dyn
  dyo
+ dyr
  dyu
  dyy
  dz
  dza
+ dzd
  dze
  dzg
  dzl
@@ -1918,6 +1922,7 @@ has 'valid_languages' => (
  etx
  etz
  eu
+ eud
  euq
  eve
  evh
@@ -2237,7 +2242,6 @@ has 'valid_languages' => (
  goj
  gok
  gol
- gom
  gon
  goo
  gop
@@ -2620,6 +2624,7 @@ has 'valid_languages' => (
  ijo
  ijs
  ik
+ ikh
  iki
  ikk
  ikl
@@ -2700,6 +2705,7 @@ has 'valid_languages' => (
  isr
  ist
  isu
+ isv
  it
  itb
  itc
@@ -2732,6 +2738,7 @@ has 'valid_languages' => (
  iyo
  iyx
  izh
+ izm
  izr
  izz
  ja
@@ -3030,7 +3037,6 @@ has 'valid_languages' => (
  kgj
  kgk
  kgl
- kgm
  kgn
  kgo
  kgp
@@ -3207,6 +3213,7 @@ has 'valid_languages' => (
  knk
  knl
  knm
+ knn
  kno
  knp
  knq
@@ -3315,7 +3322,6 @@ has 'valid_languages' => (
  kry
  krz
  ks
- ksa
  ksb
  ksc
  ksd
@@ -3624,6 +3630,7 @@ has 'valid_languages' => (
  lgo
  lgq
  lgr
+ lgs
  lgt
  lgu
  lgz
@@ -3840,6 +3847,7 @@ has 'valid_languages' => (
  lva
  lvi
  lvk
+ lvl
  lvu
  lwa
  lwe
@@ -4812,7 +4820,6 @@ has 'valid_languages' => (
  noj
  nok
  nol
- nom
  non
  nop
  noq
@@ -4987,6 +4994,7 @@ has 'valid_languages' => (
  nzi
  nzk
  nzm
+ nzr
  nzs
  nzu
  nzy
@@ -5326,7 +5334,6 @@ has 'valid_languages' => (
  plf
  plg
  plh
- plj
  plk
  pll
  pln
@@ -5347,7 +5354,6 @@ has 'valid_languages' => (
  pmh
  pmi
  pmj
- pmk
  pml
  pmm
  pmn
@@ -5432,7 +5438,6 @@ has 'valid_languages' => (
  prm
  prn
  pro
- prp
  prq
  prr
  prt
@@ -5510,6 +5515,7 @@ has 'valid_languages' => (
  pyu
  pyx
  pyy
+ pze
  pzh
  pzn
  qu
@@ -5693,6 +5699,7 @@ has 'valid_languages' => (
  rpn
  rpt
  rri
+ rrm
  rro
  rrt
  rsb
@@ -5700,6 +5707,7 @@ has 'valid_languages' => (
  rsl
  rsm
  rsn
+ rsw
  rtc
  rth
  rtm
@@ -5983,7 +5991,6 @@ has 'valid_languages' => (
  slm
  sln
  slp
- slq
  slr
  sls
  slt
@@ -6248,7 +6255,6 @@ has 'valid_languages' => (
  sza
  szb
  szc
- szd
  sze
  szg
  szl
@@ -6512,7 +6518,6 @@ has 'valid_languages' => (
  tmh
  tmi
  tmj
- tmk
  tml
  tmm
  tmn
@@ -6591,7 +6596,6 @@ has 'valid_languages' => (
  tpt
  tpu
  tpv
- tpw
  tpx
  tpy
  tpz
@@ -6709,6 +6713,7 @@ has 'valid_languages' => (
  tva
  tvd
  tve
+ tvi
  tvk
  tvl
  tvm
@@ -6841,6 +6846,7 @@ has 'valid_languages' => (
  uln
  ulu
  ulw
+ uly
  uma
  umb
  umc
@@ -6953,6 +6959,7 @@ has 'valid_languages' => (
  vis
  vit
  viv
+ vjk
  vka
  vkj
  vkk
@@ -7001,6 +7008,7 @@ has 'valid_languages' => (
  vrt
  vsi
  vsl
+ vsn
  vsv
  vto
  vum
@@ -7203,6 +7211,7 @@ has 'valid_languages' => (
  wss
  wsu
  wsv
+ wtb
  wtf
  wth
  wti
@@ -7479,7 +7488,6 @@ has 'valid_languages' => (
  xsp
  xsq
  xsr
- xss
  xsu
  xsv
  xsy
@@ -7593,6 +7601,7 @@ has 'valid_languages' => (
  ycl
  ycn
  ycp
+ ycr
  yda
  yde
  ydg
@@ -7644,6 +7653,7 @@ has 'valid_languages' => (
  yiz
  yka
  ykg
+ ykh
  yki
  ykk
  ykl
@@ -7825,6 +7835,7 @@ has 'valid_languages' => (
  zea
  zeg
  zeh
+ zem
  zen
  zga
  zgb
@@ -7848,7 +7859,6 @@ has 'valid_languages' => (
  ziw
  ziz
  zka
- zkb
  zkd
  zkg
  zkh
@@ -7868,6 +7878,7 @@ has 'valid_languages' => (
  zln
  zlq
  zls
+ zlu
  zlw
  zma
  zmb
@@ -7959,7 +7970,6 @@ has 'valid_languages' => (
  ztx
  zty
  zu
- zua
  zuh
  zum
  zun
@@ -8513,6 +8523,7 @@ has 'valid_scripts' => (
  Aghb
  Ahom
  Arab
+ Aran
  Armi
  Armn
  Avst
@@ -8537,6 +8548,7 @@ has 'valid_scripts' => (
  Cpmn
  Cprt
  Cyrl
+ Cyrs
  Deva
  Diak
  Dogr
@@ -8546,6 +8558,7 @@ has 'valid_scripts' => (
  Elba
  Elym
  Ethi
+ Gara
  Geor
  Glag
  Gong
@@ -8554,6 +8567,7 @@ has 'valid_scripts' => (
  Gran
  Grek
  Gujr
+ Gukh
  Guru
  Hanb
  Hang
@@ -8582,9 +8596,12 @@ has 'valid_scripts' => (
  Kits
  Knda
  Kore
+ Krai
  Kthi
  Lana
  Laoo
+ Latf
+ Latg
  Latn
  Lepc
  Limb
@@ -8618,6 +8635,7 @@ has 'valid_scripts' => (
  Nshu
  Ogam
  Olck
+ Onao
  Orkh
  Orya
  Osge
@@ -8649,8 +8667,12 @@ has 'valid_scripts' => (
  Sora
  Soyo
  Sund
+ Sunu
  Sylo
  Syrc
+ Syre
+ Syrj
+ Syrn
  Tagb
  Takr
  Tale
@@ -8666,7 +8688,9 @@ has 'valid_scripts' => (
  Tibt
  Tirh
  Tnsa
+ Todr
  Toto
+ Tutg
  Ugar
  Vaii
  Vith
@@ -8677,7 +8701,6 @@ has 'valid_scripts' => (
  Yezi
  Yiii
  Zanb
- Aran
  Qaag
  Zinh
  Zmth
@@ -9103,6 +9126,7 @@ has 'valid_variants' => (
  akuapem
  alalc97
  aluku
+ anpezo
  ao1990
  aranes
  arkaika
@@ -9113,8 +9137,11 @@ has 'valid_variants' => (
  barla
  basiceng
  bauddha
+ bciav
+ bcizbl
  biscayan
  biske
+ blasl
  bohoric
  boont
  bornholm
@@ -9125,6 +9152,8 @@ has 'valid_variants' => (
  dajnko
  ekavsk
  emodeng
+ fascia
+ fodom
  fonipa
  fonkirsh
  fonnapa
@@ -9132,6 +9161,7 @@ has 'valid_variants' => (
  fonxsamp
  gallo
  gascon
+ gherd
  grclass
  grital
  grmistr
@@ -9146,7 +9176,6 @@ has 'valid_variants' => (
  kkcor
  kociewie
  kscor
- laukika
  lemosin
  lengadoc
  lipaw
@@ -9168,6 +9197,7 @@ has 'valid_variants' => (
  pahawh4
  pamaka
  peano
+ pehoeji
  petr1708
  pinyin
  polyton
@@ -9186,6 +9216,7 @@ has 'valid_variants' => (
  sursilv
  sutsilv
  synnejyl
+ tailo
  tarask
  tongyong
  tunumiit
@@ -9193,7 +9224,7 @@ has 'valid_variants' => (
  ucrcor
  ulster
  unifon
- vaidika
+ valbadia
  valencia
  vallader
  vecdruka
@@ -9203,6 +9234,8 @@ has 'valid_variants' => (
  arevela
  arevmda
  heploc
+ laukika
+ vaidika
  	)]},
 );
 
@@ -9249,7 +9282,6 @@ has 'valid_currencies' => (
  CNY
  COP
  CRC
- CUC
  CUP
  CVE
  CZK
@@ -9366,11 +9398,13 @@ has 'valid_currencies' => (
  WST
  XAF
  XCD
+ XCG
  XOF
  XPF
  YER
  ZAR
  ZMW
+ ZWG
  XXX
  	)]},
 );
@@ -10416,6 +10450,16 @@ has 'valid_subdivisions' => (
  dz46
  dz47
  dz48
+ dz49
+ dz50
+ dz51
+ dz52
+ dz53
+ dz54
+ dz55
+ dz56
+ dz57
+ dz58
  eca
  ecb
  ecc
@@ -10647,6 +10691,7 @@ has 'valid_subdivisions' => (
  etsi
  etsn
  etso
+ etsw
  etti
  fi02
  fi03
@@ -10949,8 +10994,8 @@ has 'valid_subdivisions' => (
  gbnlk
  gbnln
  gbnmd
+ gbnnh
  gbnsm
- gbnth
  gbntl
  gbntt
  gbnty
@@ -11024,6 +11069,7 @@ has 'valid_subdivisions' => (
  gbwls
  gbwlv
  gbwnd
+ gbwnh
  gbwnm
  gbwok
  gbwor
@@ -11309,7 +11355,11 @@ has 'valid_subdivisions' => (
  idnu
  idpa
  idpb
+ idpd
+ idpe
  idpp
+ idps
+ idpt
  idri
  idsa
  idsb
@@ -11363,8 +11413,8 @@ has 'valid_subdivisions' => (
  inar
  inas
  inbr
+ incg
  inch
- inct
  indh
  indl
  inga
@@ -11383,16 +11433,16 @@ has 'valid_subdivisions' => (
  inmp
  inmz
  innl
- inor
+ inod
  inpb
  inpy
  inrj
  insk
- intg
  intn
  intr
+ ints
+ inuk
  inup
- inut
  inwb
  iqan
  iqar
@@ -11452,13 +11502,11 @@ has 'valid_subdivisions' => (
  is6
  is7
  is8
- isakh
  isakn
  isaku
  isarn
  isasa
  isbla
- isblo
  isbog
  isbol
  isdab
@@ -11475,10 +11523,9 @@ has 'valid_subdivisions' => (
  isgru
  isgry
  ishaf
- ishel
  ishrg
  ishru
- ishut
+ ishug
  ishuv
  ishva
  ishve
@@ -11496,7 +11543,6 @@ has 'valid_subdivisions' => (
  isrhh
  isrkn
  isrkv
- issbh
  issbt
  issdn
  issdv
@@ -11506,11 +11552,10 @@ has 'valid_subdivisions' => (
  isskf
  isskg
  issko
- issku
+ isskr
  issnf
  issog
  issol
- isssf
  issss
  isstr
  issty
@@ -11835,6 +11880,7 @@ has 'valid_subdivisions' => (
  kp10
  kp13
  kp14
+ kp15
  kr11
  kr26
  kr27
@@ -11858,23 +11904,26 @@ has 'valid_subdivisions' => (
  kwja
  kwku
  kwmu
- kzakm
- kzakt
- kzala
- kzalm
- kzast
- kzaty
- kzkar
- kzkus
- kzkzy
- kzman
- kzpav
- kzsev
- kzshy
- kzvos
- kzyuz
- kzzap
- kzzha
+ kz10
+ kz11
+ kz15
+ kz19
+ kz23
+ kz27
+ kz31
+ kz33
+ kz35
+ kz39
+ kz43
+ kz47
+ kz55
+ kz59
+ kz61
+ kz62
+ kz63
+ kz71
+ kz75
+ kz79
  laat
  labk
  labl
@@ -12293,6 +12342,7 @@ has 'valid_subdivisions' => (
  me22
  me23
  me24
+ me25
  mga
  mgd
  mgf
@@ -12763,22 +12813,6 @@ has 'valid_subdivisions' => (
  no46
  no50
  no54
- np1
- np2
- np3
- np4
- np5
- npba
- npbh
- npdh
- npga
- npja
- npka
- npko
- nplu
- npma
- npme
- npna
  npp1
  npp2
  npp3
@@ -12786,9 +12820,6 @@ has 'valid_subdivisions' => (
  npp5
  npp6
  npp7
- npra
- npsa
- npse
  nr01
  nr02
  nr03
@@ -12955,10 +12986,11 @@ has 'valid_subdivisions' => (
  phley
  phlun
  phmad
- phmag
  phmas
  phmdc
  phmdr
+ phmgn
+ phmgs
  phmou
  phmsc
  phmsr
@@ -14916,7 +14948,10 @@ has 'valid_units' => (
  volume-sai
  volume-to-jp
  volume-koku
+ concentr-portion-per-1e9
  mass-fun
+ duration-night
+ speed-light-speed
  acceleration-meter-per-second-squared
  consumption-liter-per-100kilometers
  concentr-part-per-million
@@ -15320,6 +15355,7 @@ has 'valid_keys' => (
 			'xbc',
 			'xbd',
 			'xcd',
+			'xcg',
 			'xdr',
 			'xeu',
 			'xfo',
@@ -15348,6 +15384,7 @@ has 'valid_keys' => (
 			'zwd',
 			'zwl',
 			'zwr',
+			'zwg',
 		],
 		d0	=> [
 			'ascii',
@@ -15589,12 +15626,14 @@ has 'valid_keys' => (
 			'ethi',
 			'finance',
 			'fullwide',
+			'gara',
 			'geor',
 			'gong',
 			'gonm',
 			'grek',
 			'greklow',
 			'gujr',
+			'gukh',
 			'guru',
 			'hanidays',
 			'hanidec',
@@ -15613,6 +15652,7 @@ has 'valid_keys' => (
 			'kawi',
 			'khmr',
 			'knda',
+			'krai',
 			'lana',
 			'lanatham',
 			'laoo',
@@ -15630,6 +15670,8 @@ has 'valid_keys' => (
 			'mroo',
 			'mtei',
 			'mymr',
+			'mymrepka',
+			'mymrpao',
 			'mymrshan',
 			'mymrtlng',
 			'nagm',
@@ -15637,8 +15679,10 @@ has 'valid_keys' => (
 			'newa',
 			'nkoo',
 			'olck',
+			'onao',
 			'orya',
 			'osma',
+			'outlined',
 			'rohg',
 			'roman',
 			'romanlow',
@@ -15649,6 +15693,7 @@ has 'valid_keys' => (
 			'sinh',
 			'sora',
 			'sund',
+			'sunu',
 			'takr',
 			'talu',
 			'taml',
@@ -15792,7 +15837,7 @@ has 'valid_keys' => (
 			'bddac',
 			'Asia/Dhaka Asia/Dacca',
 			'bebru',
-			'Europe/Brussels',
+			'Europe/Brussels CET MET',
 			'bfoua',
 			'Africa/Ouagadougou',
 			'bgsof',
@@ -15941,7 +15986,6 @@ has 'valid_keys' => (
 			'crsjo',
 			'America/Costa_Rica',
 			'cst6cdt',
-			'CST6CDT',
 			'cuhav',
 			'America/Havana Cuba',
 			'cvrai',
@@ -15987,7 +16031,6 @@ has 'valid_keys' => (
 			'esmad',
 			'Europe/Madrid',
 			'est5edt',
-			'EST5EDT',
 			'etadd',
 			'Africa/Addis_Ababa',
 			'fihel',
@@ -16050,7 +16093,7 @@ has 'valid_keys' => (
 			'gqssg',
 			'Africa/Malabo',
 			'grath',
-			'Europe/Athens',
+			'Europe/Athens EET',
 			'gsgrv',
 			'Atlantic/South_Georgia',
 			'gtgua',
@@ -16188,11 +16231,10 @@ has 'valid_keys' => (
 			'mmrgn',
 			'Asia/Rangoon Asia/Yangon',
 			'mncoq',
-			'Asia/Choibalsan',
 			'mnhvd',
 			'Asia/Hovd',
 			'mnuln',
-			'Asia/Ulaanbaatar Asia/Ulan_Bator',
+			'Asia/Ulaanbaatar Asia/Ulan_Bator Asia/Choibalsan',
 			'momfm',
 			'Asia/Macau Asia/Macao',
 			'mpspn',
@@ -16204,7 +16246,6 @@ has 'valid_keys' => (
 			'msmni',
 			'America/Montserrat',
 			'mst7mdt',
-			'MST7MDT',
 			'mtmla',
 			'Europe/Malta',
 			'muplu',
@@ -16273,7 +16314,7 @@ has 'valid_keys' => (
 			'ommct',
 			'Asia/Muscat',
 			'papty',
-			'America/Panama',
+			'America/Panama EST',
 			'pelim',
 			'America/Lima',
 			'pfgmr',
@@ -16299,11 +16340,10 @@ has 'valid_keys' => (
 			'prsju',
 			'America/Puerto_Rico',
 			'pst8pdt',
-			'PST8PDT',
 			'ptfnc',
 			'Atlantic/Madeira',
 			'ptlis',
-			'Europe/Lisbon Portugal',
+			'Europe/Lisbon Portugal WET',
 			'ptpdl',
 			'Atlantic/Azores',
 			'pwror',
@@ -16460,7 +16500,7 @@ has 'valid_keys' => (
 			'ummdy',
 			'Pacific/Midway',
 			'unk',
-			'Etc/Unknown',
+			'Etc/Unknown Factory',
 			'usadk',
 			'America/Adak America/Atka US/Aleutian',
 			'usaeg',
@@ -16470,13 +16510,13 @@ has 'valid_keys' => (
 			'usboi',
 			'America/Boise',
 			'uschi',
-			'America/Chicago US/Central',
+			'America/Chicago US/Central CST6CDT',
 			'usden',
-			'America/Denver America/Shiprock Navajo US/Mountain',
+			'America/Denver America/Shiprock Navajo US/Mountain MST7MDT',
 			'usdet',
 			'America/Detroit US/Michigan',
 			'ushnl',
-			'Pacific/Honolulu US/Hawaii Pacific/Johnston',
+			'Pacific/Honolulu US/Hawaii Pacific/Johnston HST',
 			'usind',
 			'America/Indianapolis America/Fort_Wayne America/Indiana/Indianapolis US/East-Indiana',
 			'usinvev',
@@ -16486,7 +16526,7 @@ has 'valid_keys' => (
 			'usknx',
 			'America/Indiana/Knox America/Knox_IN US/Indiana-Starke',
 			'uslax',
-			'America/Los_Angeles US/Pacific US/Pacific-New',
+			'America/Los_Angeles US/Pacific US/Pacific-New PST8PDT',
 			'uslui',
 			'America/Louisville America/Kentucky/Louisville',
 			'usmnm',
@@ -16501,13 +16541,13 @@ has 'valid_keys' => (
 			'usndnsl',
 			'America/North_Dakota/New_Salem',
 			'usnyc',
-			'America/New_York US/Eastern',
+			'America/New_York US/Eastern EST5EDT',
 			'usoea',
 			'America/Indiana/Vincennes',
 			'usome',
 			'America/Nome',
 			'usphx',
-			'America/Phoenix US/Arizona',
+			'America/Phoenix US/Arizona MST',
 			'ussit',
 			'America/Sitka',
 			'ustel',
@@ -16559,17 +16599,17 @@ has 'valid_keys' => (
 			'utcw04',
 			'Etc/GMT+4',
 			'utcw05',
-			'Etc/GMT+5 EST',
+			'Etc/GMT+5',
 			'utcw06',
 			'Etc/GMT+6',
 			'utcw07',
-			'Etc/GMT+7 MST',
+			'Etc/GMT+7',
 			'utcw08',
 			'Etc/GMT+8',
 			'utcw09',
 			'Etc/GMT+9',
 			'utcw10',
-			'Etc/GMT+10 HST',
+			'Etc/GMT+10',
 			'utcw11',
 			'Etc/GMT+11',
 			'utcw12',
@@ -16858,6 +16898,7 @@ has 'language_aliases' => (
 	'gaz' => 'om',
 	'gbo' => 'grb',
 	'gno' => 'gon',
+	'gom' => 'kok',
 	'gug' => 'gn',
 	'gya' => 'gba',
 	'hdn' => 'hai',
@@ -16866,7 +16907,6 @@ has 'language_aliases' => (
 	'kmr' => 'ku',
 	'knc' => 'kr',
 	'kng' => 'kg',
-	'knn' => 'kok',
 	'kpv' => 'kv',
 	'lvs' => 'lv',
 	'mhr' => 'chm',
@@ -17121,6 +17161,16 @@ has 'language_aliases' => (
 	'und_hakka' => 'und',
 	'und_xiang' => 'und',
 	'und_hepburn_heploc' => 'und_alalc97',
+	'ajp' => 'apc',
+	'kgm' => 'plu',
+	'nom' => 'cbr',
+	'pmk' => 'crr',
+	'prp' => 'gu',
+	'szd' => 'umi',
+	'tmk' => 'tdg',
+	'tpw' => 'tpn',
+	'xss' => 'zko',
+	'zkb' => 'kjh',
 	}},
 );
 has 'region_aliases' => (

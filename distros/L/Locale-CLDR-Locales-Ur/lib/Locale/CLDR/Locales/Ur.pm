@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Ur - Package for language Urdu
 
 package Locale::CLDR::Locales::Ur;
 # This file auto generated from Data\common\main\ur.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -75,6 +75,7 @@ has 'display_name_language' => (
  				'bi' => 'بسلاما',
  				'bin' => 'بینی',
  				'bla' => 'سکسیکا',
+ 				'blo' => 'عانی',
  				'bm' => 'بمبارا',
  				'bn' => 'بنگلہ',
  				'bo' => 'تبتی',
@@ -198,6 +199,7 @@ has 'display_name_language' => (
  				'iba' => 'ایبان',
  				'ibb' => 'ابی بیو',
  				'id' => 'انڈونیثیائی',
+ 				'ie' => 'غربی',
  				'ig' => 'اِگبو',
  				'ii' => 'سچوان ای',
  				'ikt' => 'مغربی کینیڈین اینُکٹیٹٹ',
@@ -252,6 +254,7 @@ has 'display_name_language' => (
  				'kv' => 'کومی',
  				'kw' => 'کورنش',
  				'kwk' => 'کیواکوالا',
+ 				'kxv' => 'کووی',
  				'ky' => 'کرغیزی',
  				'la' => 'لاطینی',
  				'lad' => 'لیڈینو',
@@ -260,6 +263,7 @@ has 'display_name_language' => (
  				'lez' => 'لیزگیان',
  				'lg' => 'گینڈا',
  				'li' => 'لیمبرگش',
+ 				'lij' => 'لیگوریائی',
  				'lil' => 'للوئیٹ',
  				'lkt' => 'لاکوٹا',
  				'lmo' => 'لومبارڈ',
@@ -300,7 +304,7 @@ has 'display_name_language' => (
  				'moe' => 'انو ایمن',
  				'moh' => 'موہاک',
  				'mos' => 'موسی',
- 				'mr' => 'مراٹهی',
+ 				'mr' => 'مراٹھی',
  				'ms' => 'مالے',
  				'mt' => 'مالٹی',
  				'mua' => 'منڈانگ',
@@ -419,6 +423,7 @@ has 'display_name_language' => (
  				'sw_CD' => 'کانگو سواحلی',
  				'swb' => 'کوموریائی',
  				'syr' => 'سریانی',
+ 				'szl' => 'سیلیزیائی',
  				'ta' => 'تمل',
  				'tce' => 'جنوبی ٹچون',
  				'te' => 'تیلگو',
@@ -460,7 +465,9 @@ has 'display_name_language' => (
  				'uz' => 'ازبیک',
  				'vai' => 'وائی',
  				've' => 'وینڈا',
+ 				'vec' => 'وینسی',
  				'vi' => 'ویتنامی',
+ 				'vmw' => 'ماکوائی',
  				'vo' => 'وولاپوک',
  				'vun' => 'ونجو',
  				'wa' => 'والون',
@@ -472,6 +479,7 @@ has 'display_name_language' => (
  				'wuu' => 'وو چائینیز',
  				'xal' => 'کالمیک',
  				'xh' => 'ژوسا',
+ 				'xnr' => 'کانگری',
  				'xog' => 'سوگا',
  				'yav' => 'یانگبین',
  				'ybb' => 'یمبا',
@@ -480,6 +488,7 @@ has 'display_name_language' => (
  				'yrl' => 'نینگاٹو',
  				'yue' => 'کینٹونیز',
  				'yue@alt=menu' => 'چینی، کینٹونیز',
+ 				'za' => 'ژوانگی',
  				'zgh' => 'اسٹینڈرڈ مراقشی تمازیقی',
  				'zh' => 'چینی',
  				'zh@alt=menu' => 'چینی، مندارن',
@@ -983,7 +992,6 @@ has 'display_name_type' => (
  				'phonebook' => q{فون بک کی چھٹنی کی ترتیب},
  				'phonetic' => q{صوتی چھٹائی کی ترتیب},
  				'pinyin' => q{پن ین کی چھٹنی کی ترتیب},
- 				'reformed' => q{دوبارہ تشکیل شدہ چھٹنی کی ترتیب},
  				'search' => q{عمومی تلاش},
  				'searchjl' => q{Hangul Initial Consonant کے لحاظ سے تلاش کریں},
  				'standard' => q{معیاری چھانٹی کی ترتیب},
@@ -1648,12 +1656,14 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'concentr-milligram-ofglucose-per-deciliter' => {
+						'1' => q(masculine),
 						'name' => q(ملی گرام فی ڈیسی لیٹر),
 						'one' => q({0} ملی گرام فی ڈیسی لیٹر),
 						'other' => q({0} ملی گرام فی ڈیسی لیٹر),
 					},
 					# Core Unit Identifier
 					'milligram-ofglucose-per-deciliter' => {
+						'1' => q(masculine),
 						'name' => q(ملی گرام فی ڈیسی لیٹر),
 						'one' => q({0} ملی گرام فی ڈیسی لیٹر),
 						'other' => q({0} ملی گرام فی ڈیسی لیٹر),
@@ -1735,6 +1745,20 @@ has 'units' => (
 						'1' => q(feminine),
 						'one' => q({0} پرمرئیڈ),
 						'other' => q({0} پرمرئیڈ),
+					},
+					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'1' => q(masculine),
+						'name' => q(اجزا فی بلین),
+						'one' => q({0} جزو فی بلین),
+						'other' => q({0} اجزا فی بلین),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'1' => q(masculine),
+						'name' => q(اجزا فی بلین),
+						'one' => q({0} جزو فی بلین),
+						'other' => q({0} اجزا فی بلین),
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
@@ -2053,6 +2077,22 @@ has 'units' => (
 						'1' => q(masculine),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'1' => q(feminine),
+						'name' => q(راتیں),
+						'one' => q({0} رات),
+						'other' => q({0} راتیں),
+						'per' => q({0} فی رات),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'1' => q(feminine),
+						'name' => q(راتیں),
+						'one' => q({0} رات),
+						'other' => q({0} راتیں),
+						'per' => q({0} فی رات),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'1' => q(masculine),
 						'name' => q(کوارٹرز),
@@ -2206,12 +2246,14 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'energy-kilocalorie' => {
+						'1' => q(feminine),
 						'name' => q(کلو کیلوریز),
 						'one' => q({0} کلو کیلوری),
 						'other' => q({0} کلو کیلوریز),
 					},
 					# Core Unit Identifier
 					'kilocalorie' => {
+						'1' => q(feminine),
 						'name' => q(کلو کیلوریز),
 						'one' => q({0} کلو کیلوری),
 						'other' => q({0} کلو کیلوریز),
@@ -2636,11 +2678,13 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-point' => {
+						'1' => q(masculine),
 						'one' => q({0} پوائنٹ),
 						'other' => q({0} پوائنٹس),
 					},
 					# Core Unit Identifier
 					'point' => {
+						'1' => q(masculine),
 						'one' => q({0} پوائنٹ),
 						'other' => q({0} پوائنٹس),
 					},
@@ -3076,12 +3120,14 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'pressure-millimeter-ofhg' => {
+						'1' => q(masculine),
 						'name' => q(ملی میٹر مرکری),
 						'one' => q({0} ملی میٹر مرکری),
 						'other' => q({0} ملی میٹر مرکری),
 					},
 					# Core Unit Identifier
 					'millimeter-ofhg' => {
+						'1' => q(masculine),
 						'name' => q(ملی میٹر مرکری),
 						'one' => q({0} ملی میٹر مرکری),
 						'other' => q({0} ملی میٹر مرکری),
@@ -3147,6 +3193,20 @@ has 'units' => (
 						'name' => q(ناٹس),
 						'one' => q({0} ناٹ),
 						'other' => q({0} ناٹس),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'1' => q(feminine),
+						'name' => q(روشنی),
+						'one' => q({0} روشنی),
+						'other' => q({0} روشنی),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'1' => q(feminine),
+						'name' => q(روشنی),
+						'one' => q({0} روشنی),
+						'other' => q({0} روشنی),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -3783,6 +3843,16 @@ has 'units' => (
 						'name' => q(‱),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'one' => q({0}ppb),
+						'other' => q({0}ppb),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'one' => q({0}ppb),
+						'other' => q({0}ppb),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'one' => q({0}L/100km),
 						'other' => q({0}L/100km),
@@ -3861,6 +3931,20 @@ has 'units' => (
 					'month' => {
 						'name' => q(مہینہ),
 						'per' => q({0}/مہینہ),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(راتیں),
+						'one' => q({0} رات),
+						'other' => q({0} راتیں),
+						'per' => q({0}/رات),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(راتیں),
+						'one' => q({0} رات),
+						'other' => q({0} راتیں),
+						'per' => q({0}/رات),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -4193,6 +4277,18 @@ has 'units' => (
 						'name' => q(km/hr),
 						'one' => q({0}kph),
 						'other' => q({0}kph),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(روشنی),
+						'one' => q({0} روشنی),
+						'other' => q({0} روشنی),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(روشنی),
+						'one' => q({0} روشنی),
+						'other' => q({0} روشنی),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -4669,6 +4765,14 @@ has 'units' => (
 						'name' => q(پرمرئیڈ),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(اجزا/بلین),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(اجزا/بلین),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(لیٹر/100 کلو میٹر),
 					},
@@ -4869,6 +4973,20 @@ has 'units' => (
 						'name' => q(نینو سیکنڈز),
 						'one' => q({0} نینو سیکنڈ),
 						'other' => q({0} نینو سیکنڈ),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(راتیں),
+						'one' => q({0} رات),
+						'other' => q({0} راتیں),
+						'per' => q({0}/رات),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(راتیں),
+						'one' => q({0} رات),
+						'other' => q({0} راتیں),
+						'per' => q({0}/رات),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -5377,6 +5495,18 @@ has 'units' => (
 						'other' => q({0} kph),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(روشنی),
+						'one' => q({0} روشنی),
+						'other' => q({0} روشنی),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(روشنی),
+						'one' => q({0} روشنی),
+						'other' => q({0} روشنی),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'name' => q(میٹر فی سیکنڈ),
 					},
@@ -5662,6 +5792,12 @@ has 'number_symbols' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'arab' => {
+			'decimal' => q(،),
+			'exponential' => q(E),
+			'group' => q(,),
+			'plusSign' => q(+),
+		},
 		'arabext' => {
 			'list' => q(;),
 			'perMille' => q(‰),
@@ -8262,9 +8398,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#نیو یارک#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#نپیگون#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#نوم#,
 		},
@@ -8285,9 +8418,6 @@ has 'time_zone_names' => (
 		},
 		'America/Panama' => {
 			exemplarCity => q#پنامہ#,
-		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#پینگنِرٹنگ#,
 		},
 		'America/Paramaribo' => {
 			exemplarCity => q#پراماریبو#,
@@ -8310,9 +8440,6 @@ has 'time_zone_names' => (
 		'America/Punta_Arenas' => {
 			exemplarCity => q#پنٹا اریناس#,
 		},
-		'America/Rainy_River' => {
-			exemplarCity => q#رینی ریور#,
-		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#رینکن انلیٹ#,
 		},
@@ -8327,9 +8454,6 @@ has 'time_zone_names' => (
 		},
 		'America/Rio_Branco' => {
 			exemplarCity => q#ریئو برینکو#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#سانتا ایزابیل#,
 		},
 		'America/Santarem' => {
 			exemplarCity => q#سنٹارین#,
@@ -8376,9 +8500,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#تھولو#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#تھنڈر بے#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#تیجوآنا#,
 		},
@@ -8399,9 +8520,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#یکوٹیٹ#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#ایلو نائف#,
 		},
 		'America_Central' => {
 			long => {
@@ -8562,9 +8680,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#چیتا#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#چوئبالسان#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#کولمبو#,
@@ -8804,9 +8919,6 @@ has 'time_zone_names' => (
 		'Australia/Broken_Hill' => {
 			exemplarCity => q#بروکن ہِل#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#کیوری#,
-		},
 		'Australia/Darwin' => {
 			exemplarCity => q#ڈارون#,
 		},
@@ -8933,13 +9045,6 @@ has 'time_zone_names' => (
 				'daylight' => q#چینی ڈے لائٹ ٹائم#,
 				'generic' => q#چین کا وقت#,
 				'standard' => q#چین سٹینڈرڈ ٹائم#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#کوائبلسان سمر ٹائم#,
-				'generic' => q#کوئبلسان ٹائم#,
-				'standard' => q#کوئبلسان سٹینڈرڈ ٹائم#,
 			},
 		},
 		'Christmas' => {
@@ -9164,9 +9269,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#الیانوسک#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#ازہوراڈ#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#ویڈوز#,
 		},
@@ -9187,9 +9289,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#زیگریب#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#زیپوروزائی#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#زیورخ#,
@@ -9414,6 +9513,11 @@ has 'time_zone_names' => (
 				'standard' => q#پیٹروپاؤلووسک-کیمچسکی اسٹینڈرڈ ٹائم#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#قازقستان کا وقت#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#مشرقی قزاخستان کا وقت#,
@@ -9460,11 +9564,6 @@ has 'time_zone_names' => (
 				'standard' => q#لارڈ ہووے اسٹینڈرڈ ٹائم#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#مکوآری آئلینڈ کا وقت#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#میگیدن سمر ٹائم#,
@@ -9502,13 +9601,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#ماؤسن ٹائم#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#شمال مغربی میکسیکو ڈے لائٹ ٹائم#,
-				'generic' => q#شمال مغربی میکسیکو ٹائم#,
-				'standard' => q#شمال مغربی میکسیکو اسٹینڈرڈ ٹائم#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -9645,9 +9737,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Honolulu' => {
 			exemplarCity => q#ہونولولو#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#جانسٹن#,
 		},
 		'Pacific/Kanton' => {
 			exemplarCity => q#کانٹن#,

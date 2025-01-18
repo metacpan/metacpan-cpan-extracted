@@ -54,7 +54,7 @@ The perl package only uses C<s_BSDIPA_32> mode (31-bit size limits).
 
 =over
 
-=item C<VERSION> (string, eg, '0.5.2')
+=item C<VERSION> (string, eg, '0.5.3')
 
 A version string.
 

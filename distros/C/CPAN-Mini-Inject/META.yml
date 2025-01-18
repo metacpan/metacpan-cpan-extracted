@@ -44,5 +44,5 @@ resources:
   bugtracker: https://github.com/briandfoy/cpan-mini-inject/issues
   homepage: https://github.com/briandfoy/cpan-mini-inject
   repository: https://github.com/briandfoy/cpan-mini-inject
-version: '1.007'
+version: '1.008'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

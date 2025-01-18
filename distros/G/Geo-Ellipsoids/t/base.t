@@ -1,10 +1,4 @@
-#!/usr/bin/perl -w
-# -*- perl -*-
-
-#
-# $Id: base.t,v 0.1 2006/02/21 eserte Exp $
-# Author: Michael R. Davis
-#
+#!/usr/bin/perl
 
 =head1 NAME
 
@@ -13,8 +7,7 @@ base.t - Good examples concerning how to use this module
 =cut
 
 use strict;
-use lib q{lib};
-use lib q{../lib};
+use warnings;
 use constant NEAR_DEFAULT => 7;
 
 sub near {

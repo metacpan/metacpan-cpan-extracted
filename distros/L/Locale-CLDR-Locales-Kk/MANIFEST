@@ -1,5 +1,7 @@
 Build.PL
 lib/Locale/CLDR/Locales/Kk.pm
+lib/Locale/CLDR/Locales/Kk/Arab.pm
+lib/Locale/CLDR/Locales/Kk/Arab/Cn.pm
 lib/Locale/CLDR/Locales/Kk/Cyrl.pm
 lib/Locale/CLDR/Locales/Kk/Cyrl/Kz.pm
 MANIFEST			This list of files

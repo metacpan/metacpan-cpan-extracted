@@ -8,7 +8,7 @@ Locale::CLDR - A Module to create locale objects with localisation data from the
 
 =head1 VERSION
 
-Version 0.44.1
+Version 0.46.0
 
 =head1 SYNOPSIS
 
@@ -37,14 +37,15 @@ or
  
 =cut
 
-use v5.10.1;
+use v5.12.0;
 use version;
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
 use open ':encoding(utf8)';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
 use if $^V le v5.16, charnames => 'full';
+
+no locale; # Make sure all code points are defined as Unicode expects
 
 use Moo;
 use MooX::ClassAttribute;
@@ -1464,44 +1465,47 @@ sub IsCLDREmpty {
 }
 
 # Test for missing Unicode properties
-my @properties = (qw(
-    emoji
-    Extended_Pictographic
-    Grapheme_Cluster_Break=E_Base
-    Grapheme_Cluster_Break=E_Base_GAZ
-    Grapheme_Cluster_Break=E_Modifier
-    Grapheme_Cluster_Break=ZWJ
-    Indic_Conjunct_Break=Consonant
-    Indic_Conjunct_Break=Extend
-    Indic_Conjunct_Break=Linker
-    Indic_Syllabic_Category=Consonant
-    Line_Break=Aksara
-    Line_Break=Aksara_Prebase
-    Line_Break=Aksara_Start
-    Line_Break=E_Base
-    Line_Break=E_Base_GAZ
-    Line_Break=E_Modifier
-    Line_Break=Virama
-    Line_Break=Virama_Final
-    Line_Break=ZWJ
-    Word_Break=E_Base
-    Word_Break=E_Base_GAZ
-    Word_Break=E_Modifier
-    Word_Break=Hebrew_Letter
-    Word_Break=Single_Quote
-    Word_Break=WSegSpace
-    Word_Break=ZWJ
-));
+BEGIN {
+    our %missing_unicode_properties = ();
+    my @properties = (qw(
+        emoji
+        Extended_Pictographic
+        Grapheme_Cluster_Break=E_Base
+        Grapheme_Cluster_Break=E_Base_GAZ
+        Grapheme_Cluster_Break=E_Modifier
+        Grapheme_Cluster_Break=ZWJ
+        Indic_Conjunct_Break=Consonant
+        Indic_Conjunct_Break=Extend
+        Indic_Conjunct_Break=Linker
+        Indic_Syllabic_Category=Consonant
+        Line_Break=Aksara
+        Line_Break=Aksara_Prebase
+        Line_Break=Aksara_Start
+        Line_Break=E_Base
+        Line_Break=E_Base_GAZ
+        Line_Break=E_Modifier
+        Line_Break=Virama
+        Line_Break=Virama_Final
+        Line_Break=ZWJ
+        Word_Break=E_Base
+        Word_Break=E_Base_GAZ
+        Word_Break=E_Modifier
+        Word_Break=Hebrew_Letter
+        Word_Break=Single_Quote
+        Word_Break=WSegSpace
+        Word_Break=ZWJ
+    ));
 
-my %missing_unicode_properties = ();
-
-foreach my $missing (@properties) {
-    $missing_unicode_properties{$missing} = 1
-        unless eval "1 !~ /\\p{$missing}/";
+    foreach my $missing (@properties) {
+        $missing_unicode_properties{$missing} = 1
+            unless eval "'a' =~ qr/\\p{$missing}|a/";
+    }
 }
 
 sub _fix_missing_unicode_properties {
 	my $regex = shift;
+    
+    our %missing_unicode_properties;
 	
 	return '' unless defined $regex;
 	
@@ -1529,18 +1533,19 @@ sub _build_break_rules {
 		# Test for deleted rules
 		next unless defined $rules{$rule_number};
 
-		$rules{$rule_number} =~ s{ ( \$ \p{ID_START} \p{ID_CONTINUE}* ) }{ _fix_missing_unicode_properties($vars->{$1}) }msxeg;
+		$rules{$rule_number} =~ s{ ( \$ \p{ID_START} \p{ID_CONTINUE}* ) }{ $vars->{$1} }msxeg;
 		my ($first, $opp, $second) = split /(×|÷)/, $rules{$rule_number};
 
 		foreach my $operand ($first, $second) {
 			if ($operand =~ m{ \S }msx) {
+                $operand = _fix_missing_unicode_properties($operand);
 				$operand = _unicode_to_perl($operand);
 			}
 			else {
 				$operand = '.';
 			}
 		}
-		
+
 		no warnings 'deprecated';
 		push @rules, [qr{$first}msx, qr{$second}msx, ($opp eq '×' ? 1 : 0)];
 	}
@@ -1551,7 +1556,8 @@ sub _build_break_rules {
 }
 
 sub _parse_string_extensions {
-    my ($self, $extensions) = @_;
+    my $self = shift;
+    my $extensions = shift // '';
     return '' unless length $extensions;
     my @extensions = split /[-_]/, $extensions;
     my $vo = ref $self ? $self : $self->new();
@@ -1803,7 +1809,7 @@ foreach my $default (qw( ca cf co cu dx em fw hc lb lw ms mu rg sd ss tz va)) {
 	*{"_test_default_$default"} = sub {
 		my $self = shift;
 		my $method = "_default_$default";
-		return length $self->$method;
+		return length ($self->$method // '');
 	};
 }
 
@@ -1811,6 +1817,7 @@ sub default_calendar {
 	my ($self, $region) = @_;
 
 	my $default = '';
+    
 	if ($self->_test_default_ca) {
 		$default = $self->_default_ca();
 	}
@@ -2040,7 +2047,7 @@ sub language_name {
 
 	$name //= $self;
 
-	my $code = ref $name ? $name->language_id : eval { Locale::CLDR->new(language_id => $name)->language_id };
+    my $code = ref $name ? $name->language_id : ($self->language_aliases->{$name} // $name);
 
 	my $language = undef;
 	my @bundles = $self->_find_bundle('display_name_language');
@@ -2552,11 +2559,11 @@ sub _split {
 		my $rule_number = 0;
 		my $first;
 		foreach my $rule (@$rules) {
-			unless( ($first) = $string =~ m{
+			unless( ($first) = $string =~ /
 				\G
 				($rule->[0])
 				$rule->[1]
-			}msx) {
+			/msx) {
 				$rule_number++;
 				next;
 			}

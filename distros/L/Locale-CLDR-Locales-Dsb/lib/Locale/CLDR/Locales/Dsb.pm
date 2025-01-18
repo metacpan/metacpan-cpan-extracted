@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Dsb - Package for language Lower Sorbian
 
 package Locale::CLDR::Locales::Dsb;
 # This file auto generated from Data\common\main\dsb.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -72,6 +72,7 @@ has 'display_name_language' => (
  				'bi' => 'bislamšćina',
  				'bin' => 'binišćina',
  				'bla' => 'siksikášćina',
+ 				'blo' => 'aniišćina',
  				'bm' => 'bambara',
  				'bn' => 'bengalšćina',
  				'bo' => 'tibetšćina',
@@ -195,6 +196,7 @@ has 'display_name_language' => (
  				'iba' => 'ibanšćina',
  				'ibb' => 'ibibiošćina',
  				'id' => 'indonešćina',
+ 				'ie' => 'interlinguešćina',
  				'ig' => 'igbo',
  				'ii' => 'sichuan yi',
  				'ik' => 'inupiak',
@@ -250,6 +252,7 @@ has 'display_name_language' => (
  				'kv' => 'komišćina',
  				'kw' => 'kornišćina',
  				'kwk' => 'kwakʼwalašćina',
+ 				'kxv' => 'kuvišćina',
  				'ky' => 'kirgišćina',
  				'la' => 'łatyńšćina',
  				'lad' => 'ladinšćina',
@@ -258,8 +261,10 @@ has 'display_name_language' => (
  				'lez' => 'lezgianšćina',
  				'lg' => 'gandšćina',
  				'li' => 'limburšćina',
+ 				'lij' => 'liguriańšćina',
  				'lil' => 'lillooetšćina',
  				'lkt' => 'lakotšćina',
+ 				'lmo' => 'lombardišćina',
  				'ln' => 'lingala',
  				'lo' => 'laošćina',
  				'lou' => 'Louisiana kreolšćina',
@@ -270,7 +275,6 @@ has 'display_name_language' => (
  				'lu' => 'luba-katanga',
  				'lua' => 'luba-luluašćina',
  				'lun' => 'lundašćina',
- 				'luo' => 'luo',
  				'lus' => 'mizošćina',
  				'luy' => 'luhya',
  				'lv' => 'letišćina',
@@ -414,6 +418,7 @@ has 'display_name_language' => (
  				'sw_CD' => 'kongojska swahilišćina',
  				'swb' => 'comorianšćina',
  				'syr' => 'syriacšćina',
+ 				'szl' => 'šlazyńšćina',
  				'ta' => 'tamilšćina',
  				'tce' => 'pódpołdnjowa tutchonšćina',
  				'te' => 'telugšćina',
@@ -453,9 +458,10 @@ has 'display_name_language' => (
  				'und' => 'njeznata rěc',
  				'ur' => 'urdušćina',
  				'uz' => 'usbekšćina',
- 				'vai' => 'vai',
  				've' => 'vendašćina',
+ 				'vec' => 'venetišćina',
  				'vi' => 'vietnamšćina',
+ 				'vmw' => 'makhuwašćina',
  				'vo' => 'volapük',
  				'vun' => 'vunjo',
  				'wa' => 'walonšćina',
@@ -466,6 +472,7 @@ has 'display_name_language' => (
  				'wuu' => 'wu chinšćina',
  				'xal' => 'kalmykšćina',
  				'xh' => 'xhosa',
+ 				'xnr' => 'kangrišćina',
  				'xog' => 'soga',
  				'yav' => 'yangben',
  				'ybb' => 'yembašćina',
@@ -1777,6 +1784,22 @@ has 'units' => (
 						'two' => q({0} źaseśinje promila),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'few' => q({0} miliardniny),
+						'name' => q(miliardnina),
+						'one' => q({0} miliardnina),
+						'other' => q({0} miliardninow),
+						'two' => q({0} miliardninje),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'few' => q({0} miliardniny),
+						'name' => q(miliardnina),
+						'one' => q({0} miliardnina),
+						'other' => q({0} miliardninow),
+						'two' => q({0} miliardninje),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'few' => q({0} litry na 100 kilometrow),
 						'name' => q(litry na 100 kilometrow),
@@ -2175,6 +2198,24 @@ has 'units' => (
 						'one' => q({0} nanosekunda),
 						'other' => q({0} nanosekundow),
 						'two' => q({0} nanosekunźe),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'few' => q({0} pśenocowanja),
+						'name' => q(pśenocowanja),
+						'one' => q({0} pśenocowanje),
+						'other' => q({0} pśenocowanjow),
+						'per' => q({0} na pśenocowanje),
+						'two' => q({0} pśenocowani),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'few' => q({0} pśenocowanja),
+						'name' => q(pśenocowanja),
+						'one' => q({0} pśenocowanje),
+						'other' => q({0} pśenocowanjow),
+						'per' => q({0} na pśenocowanje),
+						'two' => q({0} pśenocowani),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -3647,6 +3688,22 @@ has 'units' => (
 						'two' => q({0} suka),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'few' => q({0} spěšnosći swětła),
+						'name' => q(spěšnosć swětła),
+						'one' => q({0} spěšnosć swětła),
+						'other' => q({0} spěšnosćow swětła),
+						'two' => q({0} spěšnosći swětła),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'few' => q({0} spěšnosći swětła),
+						'name' => q(spěšnosć swětła),
+						'one' => q({0} spěšnosć swětła),
+						'other' => q({0} spěšnosćow swětła),
+						'two' => q({0} spěšnosći swětła),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'few' => q({0} metry na sekundu),
 						'name' => q(metry na sekundu),
@@ -4347,6 +4404,22 @@ has 'units' => (
 						'two' => q({0}°),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'few' => q({0} n),
+						'name' => q(n),
+						'one' => q({0} n),
+						'other' => q({0} n),
+						'two' => q({0} n),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'few' => q({0} n),
+						'name' => q(n),
+						'one' => q({0} n),
+						'other' => q({0} n),
+						'two' => q({0} n),
+					},
+					# Long Unit Identifier
 					'duration-day' => {
 						'few' => q({0} d),
 						'name' => q(d),
@@ -4427,6 +4500,22 @@ has 'units' => (
 						'one' => q({0} s),
 						'other' => q({0} s),
 						'two' => q({0} s),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'few' => q({0} c),
+						'name' => q(c),
+						'one' => q({0} c),
+						'other' => q({0} c),
+						'two' => q({0} c),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'few' => q({0} c),
+						'name' => q(c),
+						'one' => q({0} c),
+						'other' => q({0} c),
+						'two' => q({0} c),
 					},
 					# Long Unit Identifier
 					'volume-pinch' => {
@@ -4649,6 +4738,22 @@ has 'units' => (
 						'two' => q({0} ‱),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'few' => q({0} nano),
+						'name' => q(nano),
+						'one' => q({0} nano),
+						'other' => q({0} nano),
+						'two' => q({0} nano),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'few' => q({0} nano),
+						'name' => q(nano),
+						'one' => q({0} nano),
+						'other' => q({0} nano),
+						'two' => q({0} nano),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'few' => q({0} l/100km),
 						'name' => q(l/100km),
@@ -4827,6 +4932,24 @@ has 'units' => (
 						'other' => q({0} mjas.),
 						'per' => q({0} /mjas.),
 						'two' => q({0} mjas.),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'few' => q({0} nocy),
+						'name' => q(nocy),
+						'one' => q({0} noc),
+						'other' => q({0} nocow),
+						'per' => q({0} na noc),
+						'two' => q({0} nocy),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'few' => q({0} nocy),
+						'name' => q(nocy),
+						'one' => q({0} noc),
+						'other' => q({0} nocow),
+						'per' => q({0} na noc),
+						'two' => q({0} nocy),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -5083,6 +5206,22 @@ has 'units' => (
 						'one' => q({0} sk),
 						'other' => q({0} sk),
 						'two' => q({0} sk),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'few' => q({0} spěšnosći sw.),
+						'name' => q(spěšnosć sw.),
+						'one' => q({0} spěšnosć sw.),
+						'other' => q({0} spěšnosćow sw.),
+						'two' => q({0} spěšnosći sw.),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'few' => q({0} spěšnosći sw.),
+						'name' => q(spěšnosć sw.),
+						'one' => q({0} spěšnosć sw.),
+						'other' => q({0} spěšnosćow sw.),
+						'two' => q({0} spěšnosći sw.),
 					},
 					# Long Unit Identifier
 					'speed-mile-per-hour' => {
@@ -7994,9 +8133,6 @@ has 'time_zone_names' => (
 		'Africa/Porto-Novo' => {
 			exemplarCity => q#Porto Novo#,
 		},
-		'Africa/Sao_Tome' => {
-			exemplarCity => q#São Tomé#,
-		},
 		'Africa/Tripoli' => {
 			exemplarCity => q#Tripolis#,
 		},
@@ -8036,17 +8172,11 @@ has 'time_zone_names' => (
 				'standard' => q#Amaconaski standardny cas#,
 			},
 		},
-		'America/Asuncion' => {
-			exemplarCity => q#Asunción#,
-		},
 		'America/Bogota' => {
 			exemplarCity => q#Bogotá#,
 		},
 		'America/Cayman' => {
 			exemplarCity => q#Kaimaniske kupy#,
-		},
-		'America/Curacao' => {
-			exemplarCity => q#Curaçao#,
 		},
 		'America/Havana' => {
 			exemplarCity => q#Havanna#,
@@ -8357,13 +8487,6 @@ has 'time_zone_names' => (
 				'standard' => q#Chinski standardny cas#,
 			},
 		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Choibalsański lěśojski cas#,
-				'generic' => q#Choibalsański cas#,
-				'standard' => q#Choibalsański standardny cas#,
-			},
-		},
 		'Christmas' => {
 			long => {
 				'standard' => q#cas Gódownych kupow#,
@@ -8482,9 +8605,6 @@ has 'time_zone_names' => (
 		'Europe/Tirane' => {
 			exemplarCity => q#Tirana#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#Užgorod#,
-		},
 		'Europe/Vatican' => {
 			exemplarCity => q#Vatikan#,
 		},
@@ -8499,9 +8619,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Warsaw' => {
 			exemplarCity => q#Waršawa#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#Saporižja#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#Zürich#,
@@ -8657,9 +8774,6 @@ has 'time_zone_names' => (
 		'Indian/Maldives' => {
 			exemplarCity => q#Malediwy#,
 		},
-		'Indian/Reunion' => {
-			exemplarCity => q#Réunion#,
-		},
 		'Indian_Ocean' => {
 			long => {
 				'standard' => q#Indiskooceaniski cas#,
@@ -8713,6 +8827,11 @@ has 'time_zone_names' => (
 				'standard' => q#Japański standardny cas#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#kazachiski cas#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#Pódzajtšnokazachski cas#,
@@ -8759,11 +8878,6 @@ has 'time_zone_names' => (
 				'standard' => q#Standardny cas kupy Lord-Howe#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#cas kupy Macquarie#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Magadański lěśojski cas#,
@@ -8801,13 +8915,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Mawson cas#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Mexiski dłujkowjacorny lěśojski cas#,
-				'generic' => q#Mexiski dłujkowjacorny cas#,
-				'standard' => q#Mexiski dłujkowjacorny standardny cas#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -8902,6 +9009,9 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Easter' => {
 			exemplarCity => q#Jatšowne kupy#,
+		},
+		'Pacific/Enderbury' => {
+			exemplarCity => q#Enderbury#,
 		},
 		'Pacific/Fiji' => {
 			exemplarCity => q#Fidži#,

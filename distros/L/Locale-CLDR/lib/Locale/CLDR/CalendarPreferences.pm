@@ -1,17 +1,17 @@
 package Locale::CLDR::CalendarPreferences;
 # This file auto generated from Data.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo::Role;
 
@@ -69,7 +69,7 @@ has 'calendar_preferences' => (
 		'IN' => ['gregorian','indian'],
 		'JP' => ['gregorian','japanese'],
 		'KR' => ['gregorian','dangi'],
-		'SA' => ['islamic-umalqura','gregorian','islamic','islamic-rgsa'],
+		'SA' => ['gregorian','islamic-umalqura','islamic','islamic-rgsa'],
 		'TH' => ['buddhist','gregorian'],
 		'TW' => ['gregorian','roc','chinese'],
 	}},

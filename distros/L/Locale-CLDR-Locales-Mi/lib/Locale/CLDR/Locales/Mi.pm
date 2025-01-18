@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Mi - Package for language Māori
 
 package Locale::CLDR::Locales::Mi;
 # This file auto generated from Data\common\main\mi.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -46,7 +46,7 @@ has 'display_name_language' => (
  				'ann' => 'Ōporo',
  				'anp' => 'Anahika',
  				'ar' => 'Ārapi',
- 				'ar_001' => 'Ārapi Moroko',
+ 				'ar_001' => 'Ārapi Moroki',
  				'arn' => 'Mapūte',
  				'arp' => 'Arapaho',
  				'ars' => 'Arapika Nahāri',
@@ -177,6 +177,7 @@ has 'display_name_language' => (
  				'hax' => 'Haira ki te Tonga',
  				'he' => 'Hīperu',
  				'hi' => 'Hīni',
+ 				'hi_Latn@alt=variant' => 'Hīngarihi',
  				'hil' => 'Hirikaina',
  				'hmn' => 'Mōnga',
  				'hr' => 'Koroātiana',
@@ -569,7 +570,7 @@ has 'display_name_region' => (
  			'015' => 'Āwherika ki te Raki',
  			'017' => 'Te Pokapū o Āwherika',
  			'018' => 'Āwherika Whakatetonga',
- 			'019' => 'Amerika',
+ 			'019' => 'Ngā Amerika',
  			'021' => 'Te Raki o Amerika',
  			'029' => 'Karapīana',
  			'030' => 'Āhia ki te Rāwhiti',
@@ -2977,7 +2978,7 @@ has 'currencies' => (
 		'TWD' => {
 			display_name => {
 				'currency' => q(Tāra Taiwana Hou),
-				'other' => q(tāra Taiwana hou),
+				'other' => q(tāra Taiwana Hou),
 			},
 		},
 		'TZS' => {
@@ -3562,9 +3563,6 @@ has 'time_zone_names' => (
 		'America/St_Vincent' => {
 			exemplarCity => q#Hato Wēneti#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#Whaitiri Pei#,
-		},
 		'America/Toronto' => {
 			exemplarCity => q#Tāroto#,
 		},
@@ -3848,13 +3846,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Wā Haina Awatea#,
 				'generic' => q#Wā Haina#,
 				'standard' => q#Wā Haina Arowhānui#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Wā Choibalsan Raumati#,
-				'generic' => q#Wā Choibalsan#,
-				'standard' => q#Wā Choibalsan Arowhānui#,
 			},
 		},
 		'Christmas' => {
@@ -4205,6 +4196,11 @@ has 'time_zone_names' => (
 				'standard' => q#Wā Hapani Arowhānui#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Wā Katatānga#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#Wā Katatānga ki te Rāwhiti#,
@@ -4251,11 +4247,6 @@ has 'time_zone_names' => (
 				'standard' => q#Wā Lord Howe Arowhānui#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Wā o Te Moutere Makoare#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Wā Magadan Raumati#,
@@ -4293,13 +4284,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Wā Mawson#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Wā Awatea o Mēhiko ki te uru-mā-raki#,
-				'generic' => q#Wā Mēhiko ki te uru-mā-raki#,
-				'standard' => q#Wā Arowhānui o Mēhiko ki te uru-mā-raki#,
 			},
 		},
 		'Mexico_Pacific' => {

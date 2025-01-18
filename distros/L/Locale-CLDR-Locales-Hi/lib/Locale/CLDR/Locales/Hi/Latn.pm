@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Hi::Latn - Package for language Hindi
 
 package Locale::CLDR::Locales::Hi::Latn;
 # This file auto generated from Data\common\main\hi_Latn.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -90,6 +90,7 @@ has 'display_name_region' => (
  			'BL' => 'St. Barthelemy',
  			'CI' => 'Cote d’Ivoire',
  			'CW' => 'Curacao',
+ 			'IN' => 'Bharat',
  			'KN' => 'St. Kitts & Nevis',
  			'LC' => 'St. Lucia',
  			'MF' => 'St. Martin',
@@ -157,7 +158,6 @@ has 'display_name_type' => (
  			'collation' => {
  				'compat' => q{Compatibility ke liye, picchla sort order},
  				'dictionary' => q{Dictionary kaa sort order},
- 				'reformed' => q{Reform kiya gaya Sort Order},
  				'searchjl' => q{Hangul initial consonant se search karein},
  			},
  			'colnormalization' => {
@@ -387,14 +387,6 @@ has 'units' => (
 						'other' => q({0} dots per centimeter),
 					},
 					# Long Unit Identifier
-					'length-micrometer' => {
-						'name' => q(micrometres),
-					},
-					# Core Unit Identifier
-					'micrometer' => {
-						'name' => q(micrometres),
-					},
-					# Long Unit Identifier
 					'length-mile-scandinavian' => {
 						'name' => q(Scandinavian miles),
 					},
@@ -413,6 +405,26 @@ has 'units' => (
 						'name' => q(stones),
 						'one' => q({0} stone),
 						'other' => q({0} stones),
+					},
+					# Long Unit Identifier
+					'mass-ton' => {
+						'one' => q({0} tonne),
+						'other' => q({0} tons),
+					},
+					# Core Unit Identifier
+					'ton' => {
+						'one' => q({0} tonne),
+						'other' => q({0} tons),
+					},
+					# Long Unit Identifier
+					'mass-tonne' => {
+						'one' => q({0} metric ton),
+						'other' => q({0} tonnes),
+					},
+					# Core Unit Identifier
+					'tonne' => {
+						'one' => q({0} metric ton),
+						'other' => q({0} tonnes),
 					},
 					# Long Unit Identifier
 					'pressure-gasoline-energy-density' => {
@@ -1378,13 +1390,13 @@ has 'date_formats' => (
 		'chinese' => {
 		},
 		'generic' => {
-			'full' => q{EEEE d MMMM, y G},
+			'full' => q{EEEE, d MMMM y G},
 			'long' => q{d MMMM, y G},
 			'medium' => q{d MMM, y G},
 			'short' => q{d/M/y GGGGG},
 		},
 		'gregorian' => {
-			'full' => q{EEEE d MMMM, y},
+			'full' => q{EEEE, d MMMM y},
 			'long' => q{d MMMM, y},
 			'medium' => q{dd MMM, y},
 			'short' => q{dd/MM/y},
@@ -1457,6 +1469,7 @@ has 'datetime_formats_available_formats' => (
 		'gregorian' => {
 			Gy => q{G y},
 			GyMMM => q{G y MMM},
+			GyMMMEEEEd => q{G y, dd MMMM, E},
 			GyMMMEd => q{G y, dd MMM, E},
 			GyMMMd => q{G y, d MMM},
 			MMMMW => q{MMMM 'kaa' 'week' W},
@@ -1518,16 +1531,16 @@ has 'datetime_formats_interval' => (
 				y => q{G y MMM – y MMM},
 			},
 			GyMMMEd => {
-				G => q{G y MMM d, E –  G y MMM d, E},
-				M => q{G y MMM d, E –  MMM d, E},
+				G => q{G y MMM d, E – G y MMM d, E},
+				M => q{G y MMM d, E – MMM d, E},
 				d => q{G y MMM d, E – MMM d, E},
-				y => q{G y MMM d, E –  y MMM d, E},
+				y => q{G y MMM d, E – y MMM d, E},
 			},
 			GyMMMd => {
 				G => q{G y MMM d – G y MMM d},
-				M => q{G y MMM d  – MMM d},
+				M => q{G y MMM d – MMM d},
 				d => q{G y MMM d–d},
-				y => q{G y MMM d –  y d MMM},
+				y => q{G y MMM d – y d MMM},
 			},
 			H => {
 				H => q{HH – HH},
@@ -1643,9 +1656,6 @@ has 'time_zone_names' => (
 		},
 		'Atlantic/Faeroe' => {
 			exemplarCity => q#Faeroe#,
-		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#Uzhgorod#,
 		},
 		'Indian/Reunion' => {
 			exemplarCity => q#Reunion#,

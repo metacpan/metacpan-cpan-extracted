@@ -8,18 +8,18 @@ Locale::CLDR::Locales::En::Latn::Gb - Package for language English
 
 package Locale::CLDR::Locales::En::Latn::Gb;
 # This file auto generated from Data\common\main\en_GB.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -136,22 +136,6 @@ around day_period_data => sub {
     return $self->$orig;
 };
 
-has 'day_periods' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		'gregorian' => {
-			'stand-alone' => {
-				'narrow' => {
-					'am' => q{am},
-					'pm' => q{pm},
-				},
-			},
-		},
-	} },
-);
-
 has 'eras' => (
 	is			=> 'ro',
 	isa			=> HashRef,
@@ -172,13 +156,9 @@ has 'date_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
-			'full' => q{EEEE d MMMM y G},
-			'long' => q{d MMMM y G},
-			'medium' => q{d MMM y G},
-			'short' => q{dd/MM/y GGGGG},
 		},
 		'gregorian' => {
-			'full' => q{EEEE d MMMM y},
+			'full' => q{EEEE, d MMMM y},
 			'long' => q{d MMMM y},
 			'medium' => q{d MMM y},
 			'short' => q{dd/MM/y},
@@ -212,10 +192,6 @@ has 'datetime_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
-			'full' => q{{1}, {0}},
-			'long' => q{{1}, {0}},
-			'medium' => q{{1}, {0}},
-			'short' => q{{1}, {0}},
 		},
 		'gregorian' => {
 			'full' => q{{1}, {0}},
@@ -234,24 +210,31 @@ has 'datetime_formats_available_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
-			GyMMMEEEEd => q{EEEE d MMM y G},
+			GyMMMEEEEd => q{EEEE, d MMM y G},
+			MEd => q{E dd/MM},
 			MMMEEEEd => q{EEEE d MMM},
+			MMMEd => q{E d MMM},
 			MMMMEEEEd => q{EEEE d MMMM},
-			yyyyMMMEEEEd => q{EEEE d MMM y G},
-			yyyyMMMMEEEEd => q{EEEE d MMMM y G},
+			yyyyMMMEEEEd => q{EEEE, d MMM y G},
+			yyyyMMMMEEEEd => q{EEEE, d MMMM y G},
 		},
 		'gregorian' => {
-			GyMMMEEEEd => q{EEEE d MMM y G},
+			GyMMMEEEEd => q{EEEE, d MMM y G},
 			GyMd => q{dd/MM/y G},
+			MEd => q{E dd/MM},
 			MMMEEEEd => q{EEEE d MMM},
+			MMMEd => q{E d MMM},
 			MMMMEEEEd => q{EEEE d MMMM},
-			yMMMEEEEd => q{EEEE d MMM y},
-			yMMMMEEEEd => q{EEEE d MMMM y},
+			yMMMEEEEd => q{EEEE, d MMM y},
+			yMMMMEEEEd => q{EEEE, d MMMM y},
 		},
 		'islamic' => {
 			Ed => q{E d},
+			GyMMMEEEEd => q{EEEE, d MMM y G},
 			M => q{LL},
 			yyyyM => q{MM/y GGGGG},
+			yyyyMMMEEEEd => q{EEEE, d MMM y G},
+			yyyyMMMMEEEEd => q{EEEE, d MMMM y G},
 		},
 	} },
 );
@@ -358,6 +341,11 @@ has 'time_zone_names' => (
 				'daylight' => q#WEST#,
 				'generic' => q#WET#,
 				'standard' => q#WET#,
+			},
+		},
+		'Gulf' => {
+			short => {
+				'standard' => q#GST#,
 			},
 		},
 	 } }

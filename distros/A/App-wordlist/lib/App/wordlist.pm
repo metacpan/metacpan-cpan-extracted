@@ -10,9 +10,9 @@ use List::Util qw(shuffle);
 use Perinci::Sub::Util qw(gen_modified_sub);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-06-26'; # DATE
+our $DATE = '2025-01-18'; # DATE
 our $DIST = 'App-wordlist'; # DIST
-our $VERSION = '0.293'; # VERSION
+our $VERSION = '0.294'; # VERSION
 
 our %SPEC;
 
@@ -32,7 +32,6 @@ our %argspecopt_wordlists = (
             Complete::Util::complete_array_elem(
                 word  => $args{word},
                 array => [map {$_->{name}} @{ _list_installed() }],
-                ci    => 1,
             );
         },
         tags => ['category:module-selection'],
@@ -55,7 +54,6 @@ our %argspecsopt_exclude_wordlist = (
             Complete::Util::complete_array_elem(
                 word  => $args{word},
                 array => [map {$_->{name}} @{ _list_installed() }],
-                ci    => 1,
             );
         },
         cmdline_aliases => {X=>{}},
@@ -90,7 +88,6 @@ our %argspecopt_wordlist_bundles = (
             Complete::Util::complete_array_elem(
                 word  => $args{word},
                 array => [map {$_->{name}} @{ _list_installed_bundles() }],
-                ci    => 1,
             );
         },
         tags => ['category:module-selection'],
@@ -1029,7 +1026,7 @@ App::wordlist - Grep words from (or test them against) WordList::*
 
 =head1 VERSION
 
-This document describes version 0.293 of App::wordlist (from Perl distribution App-wordlist), released on 2024-06-26.
+This document describes version 0.294 of App::wordlist (from Perl distribution App-wordlist), released on 2025-01-18.
 
 =head1 SYNOPSIS
 
@@ -1485,7 +1482,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024, 2022, 2021, 2020, 2018, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

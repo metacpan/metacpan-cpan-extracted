@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Oc::Latn::Es - Package for language Occitan
 
 package Locale::CLDR::Locales::Oc::Latn::Es;
 # This file auto generated from Data\common\main\oc_ES.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -1471,7 +1471,7 @@ has 'date_formats' => (
 			'full' => q{EEEE, d 'de' MMMM 'de' y},
 			'long' => q{d 'de' MMMM 'de' y},
 			'medium' => q{d MMM y},
-			'short' => q{d/MM/yy},
+			'short' => q{dd/MM/yy},
 		},
 	} },
 );
@@ -2256,13 +2256,6 @@ has 'time_zone_names' => (
 				'standard' => q#ora estandard de China#,
 			},
 		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#ora d’estiu de Choibalsan#,
-				'generic' => q#ora de Choibalsan#,
-				'standard' => q#ora estandard de Choibalsan#,
-			},
-		},
 		'Christmas' => {
 			long => {
 				'standard' => q#ora dera isla de Nadau#,
@@ -2384,9 +2377,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Warsaw' => {
 			exemplarCity => q#Varsòvia#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#Zaporiyia#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#Zúrich#,
@@ -2590,11 +2580,6 @@ has 'time_zone_names' => (
 				'standard' => q#ora des Espòrades Equatorials#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#ora dera Isla Macquarie#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#ora d’estiu de Magadan#,
@@ -2617,13 +2602,6 @@ has 'time_zone_names' => (
 				'daylight' => q#ora d’estiu de Maurici#,
 				'generic' => q#ora de Maurici#,
 				'standard' => q#ora estandard de Maurici#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#ora d’estiu deth nòrd-èst de Mexic#,
-				'generic' => q#ora deth nòrd-èst de Mexic#,
-				'standard' => q#ora estandard deth nòrd-èst de Mexic#,
 			},
 		},
 		'Mexico_Pacific' => {

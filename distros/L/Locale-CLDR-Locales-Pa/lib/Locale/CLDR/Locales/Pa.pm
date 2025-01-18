@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Pa - Package for language Punjabi
 
 package Locale::CLDR::Locales::Pa;
 # This file auto generated from Data\common\main\pa.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -76,6 +76,7 @@ has 'display_name_language' => (
  				'bi' => 'ਬਿਸਲਾਮਾ',
  				'bin' => 'ਬਿਨੀ',
  				'bla' => 'ਸਿਕਸਿਕਾ',
+ 				'blo' => 'ਅਨੀ',
  				'bm' => 'ਬੰਬਾਰਾ',
  				'bn' => 'ਬੰਗਾਲੀ',
  				'bo' => 'ਤਿੱਬਤੀ',
@@ -202,6 +203,7 @@ has 'display_name_language' => (
  				'iba' => 'ਇਬਾਨ',
  				'ibb' => 'ਇਬੀਬੀਓ',
  				'id' => 'ਇੰਡੋਨੇਸ਼ੀਆਈ',
+ 				'ie' => 'ਇੰਟਰਲਿੰਗੁਈ',
  				'ig' => 'ਇਗਬੋ',
  				'ii' => 'ਸਿਚੁਆਨ ਯੀ',
  				'ikt' => 'ਪੱਛਮੀ ਕੈਨੇਡੀਅਨ ਇਨੂਕਟੀਟੂਟ',
@@ -255,6 +257,7 @@ has 'display_name_language' => (
  				'kv' => 'ਕੋਮੀ',
  				'kw' => 'ਕੋਰਨਿਸ਼',
  				'kwk' => 'ਕਵਾਕ’ਵਾਲਾ',
+ 				'kxv' => 'ਕੁਵੀ',
  				'ky' => 'ਕਿਰਗੀਜ਼',
  				'la' => 'ਲਾਤੀਨੀ',
  				'lad' => 'ਲੈਡੀਨੋ',
@@ -263,7 +266,7 @@ has 'display_name_language' => (
  				'lez' => 'ਲੈਜ਼ਗੀ',
  				'lg' => 'ਗਾਂਡਾ',
  				'li' => 'ਲਿਮਬੁਰਗੀ',
- 				'lij' => 'ਲਿਗੁਰੀ',
+ 				'lij' => 'ਲਿਗੂਰੀ',
  				'lil' => 'ਲਿਲੂਏਟ',
  				'lkt' => 'ਲਕੋਟਾ',
  				'lmo' => 'ਲੰਬਾਰਡ',
@@ -424,6 +427,7 @@ has 'display_name_language' => (
  				'sw_CD' => 'ਕਾਂਗੋ ਸਵਾਇਲੀ',
  				'swb' => 'ਕੋਮੋਰੀਅਨ',
  				'syr' => 'ਸੀਰੀਆਈ',
+ 				'szl' => 'ਸਿਲੇਸੀਅਨ',
  				'ta' => 'ਤਮਿਲ',
  				'tce' => 'ਦੱਖਣੀ ਟਚੋਨ',
  				'te' => 'ਤੇਲਗੂ',
@@ -464,7 +468,9 @@ has 'display_name_language' => (
  				'uz' => 'ਉਜ਼ਬੇਕ',
  				'vai' => 'ਵਾਈ',
  				've' => 'ਵੇਂਡਾ',
+ 				'vec' => 'ਵੇਨੇਸ਼ੀਅਨ',
  				'vi' => 'ਵੀਅਤਨਾਮੀ',
+ 				'vmw' => 'ਮਖੂਵਾ',
  				'vo' => 'ਵੋਲਾਪੂਕ',
  				'vun' => 'ਵੂੰਜੋ',
  				'wa' => 'ਵਲੂਨ',
@@ -476,6 +482,7 @@ has 'display_name_language' => (
  				'wuu' => 'ਚੀਨੀ ਵੂ',
  				'xal' => 'ਕਾਲਮਿਕ',
  				'xh' => 'ਖੋਸਾ',
+ 				'xnr' => 'ਕਾਂਗੜੀ',
  				'xog' => 'ਸੋਗਾ',
  				'yav' => 'ਯਾਂਗਬੇਨ',
  				'ybb' => 'ਯੇਂਬਾ',
@@ -484,6 +491,7 @@ has 'display_name_language' => (
  				'yrl' => 'ਨਹੀਂਗਾਤੂ',
  				'yue' => 'ਕੈਂਟੋਨੀਜ਼',
  				'yue@alt=menu' => 'ਚੀਨੀ, ਕੈਂਟੋਨੀਜ਼',
+ 				'za' => 'ਜ਼ੁਆਂਗ',
  				'zgh' => 'ਮਿਆਰੀ ਮੋਰੋਕੇਨ ਟਾਮਾਜ਼ਿਕ',
  				'zh' => 'ਚੀਨੀ',
  				'zh@alt=menu' => 'ਚੀਨੀ, ਮੈਂਡਰਿਨ',
@@ -685,7 +693,7 @@ has 'display_name_region' => (
  			'CZ@alt=variant' => 'ਚੈੱਕ ਗਣਰਾਜ',
  			'DE' => 'ਜਰਮਨੀ',
  			'DG' => 'ਡੀਇਗੋ ਗਾਰਸੀਆ',
- 			'DJ' => 'ਜ਼ੀਬੂਤੀ',
+ 			'DJ' => 'ਜਿਬੂਤੀ',
  			'DK' => 'ਡੈਨਮਾਰਕ',
  			'DM' => 'ਡੋਮੀਨਿਕਾ',
  			'DO' => 'ਡੋਮੀਨਿਕਾਈ ਗਣਰਾਜ',
@@ -1063,7 +1071,7 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{[‌‍ਃ ਂ ਁ {ਲ਼}]},
+			auxiliary => qr{[‌‍ਃ ਂ {ਲ਼}]},
 			index => ['ੳ', 'ਅ', 'ੲ', 'ਸ', 'ਹ', 'ਕ', 'ਖ', 'ਗ', 'ਘ', 'ਙ', 'ਚ', 'ਛ', 'ਜ', 'ਝ', 'ਞ', 'ਟ', 'ਠ', 'ਡ', 'ਢ', 'ਣ', 'ਤ', 'ਥ', 'ਦ', 'ਧ', 'ਨ', 'ਪ', 'ਫ', 'ਬ', 'ਭ', 'ਮ', 'ਯ', 'ਰ', 'ਲ', 'ਵ', 'ੜ'],
 			main => qr{[ੱ ੰ ਼ ੦ ੧ ੨ ੩ ੪ ੫ ੬ ੭ ੮ ੯ ੴ ੳ ਉ ਊ ਓ ਅ ਆ ਐ ਔ ੲ ਇ ਈ ਏ ਸ{ਸ਼} ਹ ਕ ਖ{ਖ਼} ਗ{ਗ਼} ਘ ਙ ਚ ਛ ਜ{ਜ਼} ਝ ਞ ਟ ਠ ਡ ਢ ਣ ਤ ਥ ਦ ਧ ਨ ਪ ਫ{ਫ਼} ਬ ਭ ਮ ਯ ਰ ਲ ਵ ੜ ੍ ਾ ਿ ੀ ੁ ੂ ੇ ੈ ੋ ੌ]},
 			numbers => qr{[\- ‑ , . % ‰ + 0੦ 1੧ 2੨ 3੩ 4੪ 5੫ 6੬ 7੭ 8੮ 9੯]},
@@ -1511,12 +1519,14 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'concentr-milligram-ofglucose-per-deciliter' => {
+						'1' => q(masculine),
 						'name' => q(ਮਿਲੀਗ੍ਰਾਮ ਪ੍ਰਤੀ ਡੈਸੀਲਿਟਰ),
 						'one' => q({0} ਮਿਲੀਗ੍ਰਾਮ ਪ੍ਰਤੀ ਡੈਸੀਲਿਟਰ),
 						'other' => q({0} ਮਿਲੀਗ੍ਰਾਮ ਪ੍ਰਤੀ ਡੈਸੀਲਿਟਰ),
 					},
 					# Core Unit Identifier
 					'milligram-ofglucose-per-deciliter' => {
+						'1' => q(masculine),
 						'name' => q(ਮਿਲੀਗ੍ਰਾਮ ਪ੍ਰਤੀ ਡੈਸੀਲਿਟਰ),
 						'one' => q({0} ਮਿਲੀਗ੍ਰਾਮ ਪ੍ਰਤੀ ਡੈਸੀਲਿਟਰ),
 						'other' => q({0} ਮਿਲੀਗ੍ਰਾਮ ਪ੍ਰਤੀ ਡੈਸੀਲਿਟਰ),
@@ -1592,6 +1602,20 @@ has 'units' => (
 						'1' => q(masculine),
 						'one' => q({0} ਪ੍ਰਤੀ ਦਸ ਹਜ਼ਾਰ),
 						'other' => q({0} ਪ੍ਰਤੀ ਦਸ ਹਜ਼ਾਰ),
+					},
+					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'1' => q(masculine),
+						'name' => q(ਹਿੱਸਾ ਪ੍ਰਤੀ ਅਰਬ),
+						'one' => q({0} ਹਿੱਸਾ ਪ੍ਰਤੀ ਅਰਬ),
+						'other' => q({0} ਹਿੱਸਾ ਪ੍ਰਤੀ ਅਰਬ),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'1' => q(masculine),
+						'name' => q(ਹਿੱਸਾ ਪ੍ਰਤੀ ਅਰਬ),
+						'one' => q({0} ਹਿੱਸਾ ਪ੍ਰਤੀ ਅਰਬ),
+						'other' => q({0} ਹਿੱਸਾ ਪ੍ਰਤੀ ਅਰਬ),
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
@@ -1898,6 +1922,22 @@ has 'units' => (
 						'other' => q({0} ਨੈਨੋਸਕਿੰਟ),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'1' => q(feminine),
+						'name' => q(ਰਾਤਾਂ),
+						'one' => q({0} ਰਾਤ),
+						'other' => q({0} ਰਾਤਾਂ),
+						'per' => q({0} ਪ੍ਰਤੀ ਰਾਤ),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'1' => q(feminine),
+						'name' => q(ਰਾਤਾਂ),
+						'one' => q({0} ਰਾਤ),
+						'other' => q({0} ਰਾਤਾਂ),
+						'per' => q({0} ਪ੍ਰਤੀ ਰਾਤ),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'1' => q(feminine),
 						'name' => q(ਤਿਮਾਹੀਆਂ),
@@ -2051,12 +2091,14 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'energy-kilocalorie' => {
+						'1' => q(feminine),
 						'name' => q(ਕਿਲੋਕੈਲੋਰੀਆਂ),
 						'one' => q({0} ਕਿਲੋਕੈਲੋਰੀ),
 						'other' => q({0} ਕਿਲੋਕੈਲੋਰੀਆਂ),
 					},
 					# Core Unit Identifier
 					'kilocalorie' => {
+						'1' => q(feminine),
 						'name' => q(ਕਿਲੋਕੈਲੋਰੀਆਂ),
 						'one' => q({0} ਕਿਲੋਕੈਲੋਰੀ),
 						'other' => q({0} ਕਿਲੋਕੈਲੋਰੀਆਂ),
@@ -2469,11 +2511,13 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-point' => {
+						'1' => q(masculine),
 						'one' => q({0} ਪੁਆਇੰਟ),
 						'other' => q({0} ਪੁਆਇੰਟ),
 					},
 					# Core Unit Identifier
 					'point' => {
+						'1' => q(masculine),
 						'one' => q({0} ਪੁਆਇੰਟ),
 						'other' => q({0} ਪੁਆਇੰਟ),
 					},
@@ -2843,12 +2887,14 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'pressure-millimeter-ofhg' => {
+						'1' => q(masculine),
 						'name' => q(ਮਿਲੀਮੀਟਰ ਪਾਰਾ),
 						'one' => q({0} ਮਿਲੀਮੀਟਰ ਪਾਰਾ),
 						'other' => q({0} ਮਿਲੀਮੀਟਰ ਪਾਰਾ),
 					},
 					# Core Unit Identifier
 					'millimeter-ofhg' => {
+						'1' => q(masculine),
 						'name' => q(ਮਿਲੀਮੀਟਰ ਪਾਰਾ),
 						'one' => q({0} ਮਿਲੀਮੀਟਰ ਪਾਰਾ),
 						'other' => q({0} ਮਿਲੀਮੀਟਰ ਪਾਰਾ),
@@ -2916,6 +2962,20 @@ has 'units' => (
 						'name' => q(ਨੌਟ),
 						'one' => q({0} ਨੌਟ),
 						'other' => q({0} ਨੌਟ),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'1' => q(masculine),
+						'name' => q(ਪ੍ਰਕਾਸ਼),
+						'one' => q({0} ਪ੍ਰਕਾਸ਼),
+						'other' => q({0} ਪ੍ਰਕਾਸ਼),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'1' => q(masculine),
+						'name' => q(ਪ੍ਰਕਾਸ਼),
+						'one' => q({0} ਪ੍ਰਕਾਸ਼),
+						'other' => q({0} ਪ੍ਰਕਾਸ਼),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -3532,6 +3592,20 @@ has 'units' => (
 						'per' => q({0}/ਮ),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(ਰਾਤਾਂ),
+						'one' => q({0} ਰਾਤ),
+						'other' => q({0} ਰਾਤਾਂ),
+						'per' => q({0}/ਰਾਤ),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(ਰਾਤਾਂ),
+						'one' => q({0} ਰਾਤ),
+						'other' => q({0} ਰਾਤਾਂ),
+						'per' => q({0}/ਰਾਤ),
+					},
+					# Long Unit Identifier
 					'duration-second' => {
 						'per' => q({0}/ਸਕਿੰ),
 					},
@@ -3848,6 +3922,28 @@ has 'units' => (
 						'other' => q({0} ਮਿ.ਬਾ.),
 					},
 					# Long Unit Identifier
+					'speed-kilometer-per-hour' => {
+						'one' => q({0} ਕਿ.ਮੀ./ਘੰ.),
+						'other' => q({0} ਕਿ.ਮੀ./ਘੰ.),
+					},
+					# Core Unit Identifier
+					'kilometer-per-hour' => {
+						'one' => q({0} ਕਿ.ਮੀ./ਘੰ.),
+						'other' => q({0} ਕਿ.ਮੀ./ਘੰ.),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(ਪ੍ਰਕਾਸ਼),
+						'one' => q({0} ਪ੍ਰਕਾਸ਼),
+						'other' => q({0} ਪ੍ਰਕਾਸ਼),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(ਪ੍ਰਕਾਸ਼),
+						'one' => q({0} ਪ੍ਰਕਾਸ਼),
+						'other' => q({0} ਪ੍ਰਕਾਸ਼),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'one' => q({0}ਮੀ/ਸ),
 						'other' => q({0}ਮੀ/ਸ),
@@ -3856,6 +3952,16 @@ has 'units' => (
 					'meter-per-second' => {
 						'one' => q({0}ਮੀ/ਸ),
 						'other' => q({0}ਮੀ/ਸ),
+					},
+					# Long Unit Identifier
+					'speed-mile-per-hour' => {
+						'one' => q({0} ਮੀਲ/ਘੰ.),
+						'other' => q({0} ਮੀਲ/ਘੰ.),
+					},
+					# Core Unit Identifier
+					'mile-per-hour' => {
+						'one' => q({0} ਮੀਲ/ਘੰ.),
+						'other' => q({0} ਮੀਲ/ਘੰ.),
 					},
 					# Long Unit Identifier
 					'temperature-celsius' => {
@@ -4628,6 +4734,14 @@ has 'units' => (
 						'name' => q(ਪ੍ਰਤੀ ਦਸ ਹਜ਼ਾਰ),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(ਹਿੱਸਾ/ਅਰਬ),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(ਹਿੱਸਾ/ਅਰਬ),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(ਲਿ./100ਕਿ.ਮੀ.),
 						'one' => q({0}ਲਿ/100 ਕਿਮੀ),
@@ -4892,6 +5006,20 @@ has 'units' => (
 					# Core Unit Identifier
 					'nanosecond' => {
 						'name' => q(ਨੈਨੋਸਕਿੰਟ),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(ਰਾਤਾਂ),
+						'one' => q({0} ਰਾਤ),
+						'other' => q({0} ਰਾਤਾਂ),
+						'per' => q({0}/ਰਾਤ),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(ਰਾਤਾਂ),
+						'one' => q({0} ਰਾਤ),
+						'other' => q({0} ਰਾਤਾਂ),
+						'per' => q({0}/ਰਾਤ),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -5750,14 +5878,26 @@ has 'units' => (
 					# Long Unit Identifier
 					'speed-kilometer-per-hour' => {
 						'name' => q(ਕਿ.ਮੀ./ਘੰਟਾ),
-						'one' => q({0} ਕਿ.ਪ੍ਰ.ਘੰ.),
-						'other' => q({0} ਕਿ.ਪ੍ਰ.ਘੰ.),
+						'one' => q({0} ਕਿ.ਮੀ./ਘੰ.),
+						'other' => q({0} ਕਿ.ਮੀ./ਘੰ.),
 					},
 					# Core Unit Identifier
 					'kilometer-per-hour' => {
 						'name' => q(ਕਿ.ਮੀ./ਘੰਟਾ),
-						'one' => q({0} ਕਿ.ਪ੍ਰ.ਘੰ.),
-						'other' => q({0} ਕਿ.ਪ੍ਰ.ਘੰ.),
+						'one' => q({0} ਕਿ.ਮੀ./ਘੰ.),
+						'other' => q({0} ਕਿ.ਮੀ./ਘੰ.),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(ਪ੍ਰਕਾਸ਼),
+						'one' => q({0} ਪ੍ਰਕਾਸ਼),
+						'other' => q({0} ਪ੍ਰਕਾਸ਼),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(ਪ੍ਰਕਾਸ਼),
+						'one' => q({0} ਪ੍ਰਕਾਸ਼),
+						'other' => q({0} ਪ੍ਰਕਾਸ਼),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -5774,14 +5914,14 @@ has 'units' => (
 					# Long Unit Identifier
 					'speed-mile-per-hour' => {
 						'name' => q(ਮੀਲ/ਘੰਟਾ),
-						'one' => q({0} ਮੀ.ਪ੍ਰ.ਘੰ.),
-						'other' => q({0} ਮੀ.ਪ੍ਰ.ਘੰ.),
+						'one' => q({0} ਮੀਲ/ਘੰ.),
+						'other' => q({0} ਮੀਲ/ਘੰ.),
 					},
 					# Core Unit Identifier
 					'mile-per-hour' => {
 						'name' => q(ਮੀਲ/ਘੰਟਾ),
-						'one' => q({0} ਮੀ.ਪ੍ਰ.ਘੰ.),
-						'other' => q({0} ਮੀ.ਪ੍ਰ.ਘੰ.),
+						'one' => q({0} ਮੀਲ/ਘੰ.),
+						'other' => q({0} ਮੀਲ/ਘੰ.),
 					},
 					# Long Unit Identifier
 					'temperature-celsius' => {
@@ -6269,6 +6409,15 @@ has 'number_symbols' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'arab' => {
+			'decimal' => q(.),
+			'exponential' => q(E),
+			'group' => q(,),
+			'minusSign' => q(-),
+			'perMille' => q(‰),
+			'percentSign' => q(%),
+			'plusSign' => q(+),
+		},
 		'arabext' => {
 			'group' => q(,),
 			'minusSign' => q(-),
@@ -6459,6 +6608,15 @@ has 'number_currency_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'arab' => {
+			'pattern' => {
+				'default' => {
+					'standard' => {
+						'positive' => '¤#,##,##0.00',
+					},
+				},
+			},
+		},
 		'arabext' => {
 			'pattern' => {
 				'default' => {
@@ -8284,6 +8442,7 @@ has 'datetime_formats_available_formats' => (
 			GyMd => q{d/M/GGGGG y},
 			MEd => q{E, d/M},
 			MMMEd => q{E, d MMM},
+			MMMMd => q{d MMMM},
 			MMMd => q{d MMM},
 			Md => q{d/M},
 			y => q{y G},
@@ -8529,7 +8688,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#ਦਾਰ ਏਸ ਸਲਾਮ#,
 		},
 		'Africa/Djibouti' => {
-			exemplarCity => q#ਜ਼ੀਬੂਤੀ#,
+			exemplarCity => q#ਜਿਬੂਤੀ#,
 		},
 		'Africa/Douala' => {
 			exemplarCity => q#ਡੌਆਲਾ#,
@@ -8979,9 +9138,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#ਨਿਊ ਯਾਰਕ#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#ਨਿਪਿਗੌਨ#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#ਨੋਮ#,
 		},
@@ -9002,9 +9158,6 @@ has 'time_zone_names' => (
 		},
 		'America/Panama' => {
 			exemplarCity => q#ਪਨਾਮਾ#,
-		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#ਪੈਂਗਨਿਰਟੰਗ#,
 		},
 		'America/Paramaribo' => {
 			exemplarCity => q#ਪੈਰਾਮਰੀਬੋ#,
@@ -9027,9 +9180,6 @@ has 'time_zone_names' => (
 		'America/Punta_Arenas' => {
 			exemplarCity => q#ਪੰਟਾ ਅਰੇਨਸ#,
 		},
-		'America/Rainy_River' => {
-			exemplarCity => q#ਰੇਨੀ ਰਿਵਰ#,
-		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#ਰੈਂਕਿਨ ਇਨਲੈਟ#,
 		},
@@ -9044,9 +9194,6 @@ has 'time_zone_names' => (
 		},
 		'America/Rio_Branco' => {
 			exemplarCity => q#ਰੀਓ ਬ੍ਰਾਂਕੋ#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#ਸੈਂਟਾ ਇਸਾਬੇਲ#,
 		},
 		'America/Santarem' => {
 			exemplarCity => q#ਸੇਂਟਾਰਮ#,
@@ -9093,9 +9240,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#ਥੁਲੇ#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#ਥੰਡਰ ਬੇ#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#ਟਿਜੂਆਨਾ#,
 		},
@@ -9116,9 +9260,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#ਯਕੁਤਤ#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#ਯੈਲੋਨਾਈਫ#,
 		},
 		'America_Central' => {
 			long => {
@@ -9286,9 +9427,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#ਚਿਤਾ#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#ਚੋਇਲਬਾਲਸਨ#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#ਕੋਲੰਬੋ#,
@@ -9528,9 +9666,6 @@ has 'time_zone_names' => (
 		'Australia/Broken_Hill' => {
 			exemplarCity => q#ਬ੍ਰੋਕਨ ਹਿਲ#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#ਕਰੀ#,
-		},
 		'Australia/Darwin' => {
 			exemplarCity => q#ਡਾਰਵਿਨ#,
 		},
@@ -9662,13 +9797,6 @@ has 'time_zone_names' => (
 				'daylight' => q#ਚੀਨ ਪ੍ਰਕਾਸ਼ ਵੇਲਾ#,
 				'generic' => q#ਚੀਨ ਵੇਲਾ#,
 				'standard' => q#ਚੀਨ ਮਿਆਰੀ ਵੇਲਾ#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#ਚੌਇਬਾਲਸਨ ਗਰਮੀਆਂ ਦਾ ਵੇਲਾ#,
-				'generic' => q#ਚੌਇਬਾਲਸਨ ਵੇਲਾ#,
-				'standard' => q#ਚੌਇਬਾਲਸਨ ਮਿਆਰੀ ਵੇਲਾ#,
 			},
 		},
 		'Christmas' => {
@@ -9893,9 +10021,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#ਯੁਲਿਆਨੋਸਕ#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#ਉਜ਼ਗੋਰੋਡ#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#ਵਾਡੁਜ਼#,
 		},
@@ -9916,9 +10041,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#ਜ਼ਗਰੇਬ#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#ਜਪੋਰੋਜ਼ਾਏ#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#ਜਿਊਰਿਖ#,
@@ -10144,6 +10266,11 @@ has 'time_zone_names' => (
 				'standard' => q#ਜਪਾਨ ਮਿਆਰੀ ਵੇਲਾ#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#ਕਜ਼ਾਖ਼ਸਤਾਨ ਵੇਲਾ#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#ਪੂਰਬੀ ਕਜ਼ਾਖ਼ਸਤਾਨ ਵੇਲਾ#,
@@ -10202,11 +10329,6 @@ has 'time_zone_names' => (
 				'standard' => q#ਮਕਾਉ ਮਿਆਰੀ ਸਮਾਂ#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#ਮੈਕਕਵੇਰੀ ਆਈਲੈਂਡ ਵੇਲਾ#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#ਮੈਗੇਡਨ ਗਰਮੀਆਂ ਦਾ ਵੇਲਾ#,
@@ -10244,13 +10366,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#ਮੌਸਨ ਵੇਲਾ#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#ਉੱਤਰ ਪੱਛਮੀ ਮੈਕਸੀਕੋ ਪ੍ਰਕਾਸ਼ ਵੇਲਾ#,
-				'generic' => q#ਉੱਤਰ ਪੱਛਮੀ ਮੈਕਸੀਕੋ ਵੇਲਾ#,
-				'standard' => q#ਉੱਤਰ ਪੱਛਮੀ ਮੈਕਸੀਕੋ ਮਿਆਰੀ ਵੇਲਾ#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -10392,9 +10507,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Honolulu' => {
 			exemplarCity => q#ਹੋਨੋਲੁਲੂ#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#ਜੋਨਸਟਨ#,
 		},
 		'Pacific/Kanton' => {
 			exemplarCity => q#ਕੈਂਟੋਨ#,

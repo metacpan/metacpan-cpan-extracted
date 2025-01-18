@@ -13,11 +13,11 @@ my $builder = Module::Build->new(
         'Moo'                       => '2',
         'MooX::ClassAttribute'      => '0.011',
         'Type::Tiny'                => 0,
-        'perl'                      => '5.10.1',
+        'perl'                      => '5.12.0',
         ,
     },
     dist_author         => q{John Imrie <john.imrie1@gmail.com>},
-    dist_version        => '0.44.1',
+    dist_version        => '0.46.0',
     build_requires => {
         'ok'                => 0,
         'Test::Exception'   => 0,

@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Bg - Package for language Bulgarian
 
 package Locale::CLDR::Locales::Bg;
 # This file auto generated from Data\common\main\bg.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -2487,6 +2487,7 @@ has 'display_name_language' => (
  				'bik' => 'биколски',
  				'bin' => 'бини',
  				'bla' => 'сиксика',
+ 				'blo' => 'ании',
  				'bm' => 'бамбара',
  				'bn' => 'бенгалски',
  				'bo' => 'тибетски',
@@ -2638,7 +2639,7 @@ has 'display_name_language' => (
  				'iba' => 'ибан',
  				'ibb' => 'ибибио',
  				'id' => 'индонезийски',
- 				'ie' => 'оксидентал',
+ 				'ie' => 'интерлингве',
  				'ig' => 'игбо',
  				'ii' => 'съчуански йи',
  				'ik' => 'инупиак',
@@ -2701,6 +2702,7 @@ has 'display_name_language' => (
  				'kv' => 'коми',
  				'kw' => 'корнуолски',
  				'kwk' => 'куак’уала',
+ 				'kxv' => 'кови',
  				'ky' => 'киргизки',
  				'la' => 'латински',
  				'lad' => 'ладино',
@@ -2711,6 +2713,7 @@ has 'display_name_language' => (
  				'lez' => 'лезгински',
  				'lg' => 'ганда',
  				'li' => 'лимбургски',
+ 				'lij' => 'лигурски',
  				'lil' => 'лилоует',
  				'lkt' => 'лакота',
  				'lmo' => 'ломбардски',
@@ -2901,6 +2904,7 @@ has 'display_name_language' => (
  				'swb' => 'коморски',
  				'syc' => 'класически сирийски',
  				'syr' => 'сирийски',
+ 				'szl' => 'силезийски',
  				'ta' => 'тамилски',
  				'tce' => 'южен тучоне',
  				'te' => 'телугу',
@@ -2949,7 +2953,9 @@ has 'display_name_language' => (
  				'uz' => 'узбекски',
  				'vai' => 'ваи',
  				've' => 'венда',
+ 				'vec' => 'венециански',
  				'vi' => 'виетнамски',
+ 				'vmw' => 'макува',
  				'vo' => 'волапюк',
  				'vot' => 'вотик',
  				'vun' => 'вунджо',
@@ -2963,6 +2969,7 @@ has 'display_name_language' => (
  				'wuu' => 'ву китайски',
  				'xal' => 'калмик',
  				'xh' => 'кхоса',
+ 				'xnr' => 'кангри',
  				'xog' => 'сога',
  				'yao' => 'яо',
  				'yap' => 'япезе',
@@ -3587,7 +3594,6 @@ has 'display_name_type' => (
  				'phonebook' => q{Азбучен ред},
  				'phonetic' => q{Фонетичен ред на сортиране},
  				'pinyin' => q{Сортиране Пинин},
- 				'reformed' => q{Следреформен ред на сортиране},
  				'search' => q{търсене с общо предназначение},
  				'searchjl' => q{Търсене по първоначални съгласни в хангул},
  				'standard' => q{стандартен ред на сортиране},
@@ -4333,6 +4339,18 @@ has 'units' => (
 						'other' => q({0} базисни пункта),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(части на милиард),
+						'one' => q({0} част на милиард),
+						'other' => q({0} части на милиард),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(части на милиард),
+						'one' => q({0} част на милиард),
+						'other' => q({0} части на милиард),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(литри на 100 километра),
 						'one' => q({0} литър на 100 километра),
@@ -4619,6 +4637,20 @@ has 'units' => (
 						'name' => q(наносекунди),
 						'one' => q({0} наносекунда),
 						'other' => q({0} наносекунди),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(нощи),
+						'one' => q({0} нощ),
+						'other' => q({0} нощи),
+						'per' => q({0} на нощ),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(нощи),
+						'one' => q({0} нощ),
+						'other' => q({0} нощи),
+						'per' => q({0} на нощ),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -5747,6 +5779,18 @@ has 'units' => (
 						'other' => q({0} възла),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(светлина),
+						'one' => q({0} светлина),
+						'other' => q({0} светлина),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(светлина),
+						'one' => q({0} светлина),
+						'other' => q({0} светлина),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'name' => q(метри за секунда),
 						'one' => q({0} метър за секунда),
@@ -6225,16 +6269,6 @@ has 'units' => (
 						'name' => q(дъг. сек.),
 					},
 					# Long Unit Identifier
-					'area-square-foot' => {
-						'one' => q({0} кв. фут),
-						'other' => q({0} кв. фута),
-					},
-					# Core Unit Identifier
-					'square-foot' => {
-						'one' => q({0} кв. фут),
-						'other' => q({0} кв. фута),
-					},
-					# Long Unit Identifier
 					'area-square-mile' => {
 						'one' => q({0} кв. миля),
 						'other' => q({0} кв. мили),
@@ -6251,6 +6285,22 @@ has 'units' => (
 					# Core Unit Identifier
 					'percent' => {
 						'name' => q(%),
+					},
+					# Long Unit Identifier
+					'concentr-permyriad' => {
+						'name' => q(‱),
+					},
+					# Core Unit Identifier
+					'permyriad' => {
+						'name' => q(‱),
+					},
+					# Long Unit Identifier
+					'digital-petabyte' => {
+						'name' => q(PB),
+					},
+					# Core Unit Identifier
+					'petabyte' => {
+						'name' => q(PB),
 					},
 					# Long Unit Identifier
 					'duration-day' => {
@@ -6285,6 +6335,20 @@ has 'units' => (
 					'month' => {
 						'name' => q(мес.),
 						'per' => q({0}/мес.),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(нощи),
+						'one' => q({0} нощ),
+						'other' => q({0} нощи),
+						'per' => q({0}/нощ),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(нощи),
+						'one' => q({0} нощ),
+						'other' => q({0} нощи),
+						'per' => q({0}/нощ),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -6341,16 +6405,6 @@ has 'units' => (
 						'name' => q(точка),
 					},
 					# Long Unit Identifier
-					'length-foot' => {
-						'one' => q({0} фут),
-						'other' => q({0} фута),
-					},
-					# Core Unit Identifier
-					'foot' => {
-						'one' => q({0} фут),
-						'other' => q({0} фута),
-					},
-					# Long Unit Identifier
 					'length-inch' => {
 						'one' => q({0}"),
 						'other' => q({0}"),
@@ -6361,52 +6415,12 @@ has 'units' => (
 						'other' => q({0}"),
 					},
 					# Long Unit Identifier
-					'length-mile' => {
-						'one' => q({0} миля),
-						'other' => q({0} мили),
-					},
-					# Core Unit Identifier
-					'mile' => {
-						'one' => q({0} миля),
-						'other' => q({0} мили),
-					},
-					# Long Unit Identifier
-					'length-yard' => {
-						'one' => q({0} ярд),
-						'other' => q({0} ярда),
-					},
-					# Core Unit Identifier
-					'yard' => {
-						'one' => q({0} ярд),
-						'other' => q({0} ярда),
-					},
-					# Long Unit Identifier
 					'mass-dalton' => {
 						'name' => q(Da),
 					},
 					# Core Unit Identifier
 					'dalton' => {
 						'name' => q(Da),
-					},
-					# Long Unit Identifier
-					'mass-ounce' => {
-						'one' => q({0} унц.),
-						'other' => q({0} унц.),
-					},
-					# Core Unit Identifier
-					'ounce' => {
-						'one' => q({0} унц.),
-						'other' => q({0} унц.),
-					},
-					# Long Unit Identifier
-					'mass-pound' => {
-						'one' => q({0} фунт),
-						'other' => q({0} фунта),
-					},
-					# Core Unit Identifier
-					'pound' => {
-						'one' => q({0} фунт),
-						'other' => q({0} фунта),
 					},
 					# Long Unit Identifier
 					'power-horsepower' => {
@@ -6429,6 +6443,18 @@ has 'units' => (
 						'other' => q({0} по Б),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(светлина),
+						'one' => q({0} светлина),
+						'other' => q({0} светлина),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(светлина),
+						'one' => q({0} светлина),
+						'other' => q({0} светлина),
+					},
+					# Long Unit Identifier
 					'speed-mile-per-hour' => {
 						'one' => q({0} миля/ч),
 						'other' => q({0} мили/ч),
@@ -6439,32 +6465,12 @@ has 'units' => (
 						'other' => q({0} мили/ч),
 					},
 					# Long Unit Identifier
-					'temperature-fahrenheit' => {
-						'one' => q({0} °F),
-						'other' => q({0} °F),
-					},
-					# Core Unit Identifier
-					'fahrenheit' => {
-						'one' => q({0} °F),
-						'other' => q({0} °F),
-					},
-					# Long Unit Identifier
 					'volume-barrel' => {
 						'name' => q(bbl),
 					},
 					# Core Unit Identifier
 					'barrel' => {
 						'name' => q(bbl),
-					},
-					# Long Unit Identifier
-					'volume-cubic-mile' => {
-						'one' => q({0} куб. миля),
-						'other' => q({0} куб. мили),
-					},
-					# Core Unit Identifier
-					'cubic-mile' => {
-						'one' => q({0} куб. миля),
-						'other' => q({0} куб. мили),
 					},
 					# Long Unit Identifier
 					'volume-dessert-spoon' => {
@@ -6485,6 +6491,14 @@ has 'units' => (
 					'dessert-spoon-imperial' => {
 						'one' => q({0} брит. дес. лъж.),
 						'other' => q({0} брит. дес. лъж.),
+					},
+					# Long Unit Identifier
+					'volume-pint-metric' => {
+						'name' => q(pt),
+					},
+					# Core Unit Identifier
+					'pint-metric' => {
+						'name' => q(pt),
 					},
 				},
 				'short' => {
@@ -6621,6 +6635,14 @@ has 'units' => (
 					# Core Unit Identifier
 					'permyriad' => {
 						'name' => q(базисен пункт),
+					},
+					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(части/милиард),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(части/милиард),
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
@@ -6803,6 +6825,20 @@ has 'units' => (
 						'one' => q({0} мес.),
 						'other' => q({0} мес.),
 						'per' => q({0}/месец),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(нощи),
+						'one' => q({0} нощ),
+						'other' => q({0} нощи),
+						'per' => q({0}/нощ),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(нощи),
+						'one' => q({0} нощ),
+						'other' => q({0} нощи),
+						'per' => q({0}/нощ),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -7117,6 +7153,18 @@ has 'units' => (
 					'beaufort' => {
 						'one' => q({0} по Bft),
 						'other' => q({0} по Bft),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(светлина),
+						'one' => q({0} светлина),
+						'other' => q({0} светлина),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(светлина),
+						'one' => q({0} светлина),
+						'other' => q({0} светлина),
 					},
 					# Long Unit Identifier
 					'speed-mile-per-hour' => {
@@ -8943,9 +8991,9 @@ has 'currencies' => (
 		},
 		'SLL' => {
 			display_name => {
-				'currency' => q(Сиералеонско леоне \(1964—2022\)),
-				'one' => q(сиералеонско леоне \(1964—2022\)),
-				'other' => q(сиералеонски леоне \(1964—2022\)),
+				'currency' => q(Сиералеонско леоне \(1964 – 2022\)),
+				'one' => q(сиералеонско леоне \(1964 – 2022\)),
+				'other' => q(сиералеонски леоне \(1964 – 2022\)),
 			},
 		},
 		'SOS' => {
@@ -10853,9 +10901,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#Ню Йорк#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#Нипигон#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#Ноум#,
 		},
@@ -10876,9 +10921,6 @@ has 'time_zone_names' => (
 		},
 		'America/Panama' => {
 			exemplarCity => q#Панама#,
-		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#Пангниртунг#,
 		},
 		'America/Paramaribo' => {
 			exemplarCity => q#Парамарибо#,
@@ -10901,9 +10943,6 @@ has 'time_zone_names' => (
 		'America/Punta_Arenas' => {
 			exemplarCity => q#Пунта Аренас#,
 		},
-		'America/Rainy_River' => {
-			exemplarCity => q#Рейни Ривър#,
-		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#Ранкин Инлет#,
 		},
@@ -10918,9 +10957,6 @@ has 'time_zone_names' => (
 		},
 		'America/Rio_Branco' => {
 			exemplarCity => q#Рио Бранко#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#Санта Исабел#,
 		},
 		'America/Santarem' => {
 			exemplarCity => q#Сантарем#,
@@ -10967,9 +11003,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#Туле#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#Тъндър Бей#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#Тихуана#,
 		},
@@ -10990,9 +11023,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#Якутат#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#Йелоунайф#,
 		},
 		'America_Central' => {
 			long => {
@@ -11153,9 +11183,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#Чита#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#Чойбалсан#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#Коломбо#,
@@ -11395,9 +11422,6 @@ has 'time_zone_names' => (
 		'Australia/Broken_Hill' => {
 			exemplarCity => q#Броукън Хил#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#Къри#,
-		},
 		'Australia/Darwin' => {
 			exemplarCity => q#Дарвин#,
 		},
@@ -11524,13 +11548,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Китайско лятно часово време#,
 				'generic' => q#Китайско време#,
 				'standard' => q#Китайско стандартно време#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Чойбалсанско лятно часово време#,
-				'generic' => q#Чойбалсанско време#,
-				'standard' => q#Чойбалсанско стандартно време#,
 			},
 		},
 		'Christmas' => {
@@ -11755,9 +11772,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#Уляновск#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#Ужгород#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#Вадуц#,
 		},
@@ -11778,9 +11792,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#Загреб#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#Запорожие#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#Цюрих#,
@@ -12005,6 +12016,11 @@ has 'time_zone_names' => (
 				'standard' => q#Петропавловск-Камчатски стандартно време#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Казахстанско време#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#Източноказахстанско време#,
@@ -12051,11 +12067,6 @@ has 'time_zone_names' => (
 				'standard' => q#Лорд Хау – стандартно време#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Маккуори#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Магаданско лятно часово време#,
@@ -12093,13 +12104,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Моусън#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Северозападно лятно часово мексиканско време#,
-				'generic' => q#Северозападно мексиканско време#,
-				'standard' => q#Северозападно стандартно мексиканско време#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -12236,9 +12240,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Honolulu' => {
 			exemplarCity => q#Хонолулу#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#Джонстън#,
 		},
 		'Pacific/Kanton' => {
 			exemplarCity => q#Кантон#,

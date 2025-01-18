@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Mgo - Package for language Metaʼ
 
 package Locale::CLDR::Locales::Mgo;
 # This file auto generated from Data\common\main\mgo.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -269,13 +269,13 @@ has 'calendar_days' => (
 			'gregorian' => {
 				'format' => {
 					short => {
-						mon => '2',
-						tue => '3',
-						wed => '4',
-						thu => '5',
-						fri => '6',
-						sat => '7',
-						sun => '1'
+						mon => 'A2',
+						tue => 'A3',
+						wed => 'A4',
+						thu => 'A5',
+						fri => 'A6',
+						sat => 'A7',
+						sun => 'A1'
 					},
 					wide => {
 						mon => 'Aneg 2',
@@ -289,13 +289,13 @@ has 'calendar_days' => (
 				},
 				'stand-alone' => {
 					narrow => {
-						mon => 'A2',
-						tue => 'A3',
-						wed => 'A4',
-						thu => 'A5',
-						fri => 'A6',
-						sat => 'A7',
-						sun => 'A1'
+						mon => '2',
+						tue => '3',
+						wed => '4',
+						thu => '5',
+						fri => '6',
+						sat => '7',
+						sun => '1'
 					},
 				},
 			},

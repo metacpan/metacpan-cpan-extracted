@@ -9,15 +9,15 @@ Bas::Latn - Package for language Bas
 package Locale::CLDR::Locales::Bas::Latn;
 
 # This file auto generated
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 
 use Moo;
 

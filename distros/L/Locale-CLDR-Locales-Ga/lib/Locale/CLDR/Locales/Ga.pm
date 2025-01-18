@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Ga - Package for language Irish
 
 package Locale::CLDR::Locales::Ga;
 # This file auto generated from Data\common\main\ga.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -1170,6 +1170,7 @@ has 'display_name_language' => (
  				'bi' => 'Bioslaimis',
  				'bin' => 'Binis',
  				'bla' => 'Sicsicis',
+ 				'blo' => 'Anii',
  				'bm' => 'Bambairis',
  				'bn' => 'Beangáilis',
  				'bo' => 'Tibéidis',
@@ -1367,6 +1368,7 @@ has 'display_name_language' => (
  				'kv' => 'Coimis',
  				'kw' => 'Coirnis',
  				'kwk' => 'Kwakʼwala',
+ 				'kxv' => 'Kuvi',
  				'ky' => 'Cirgisis',
  				'la' => 'Laidin',
  				'lad' => 'Laidínis',
@@ -1593,6 +1595,7 @@ has 'display_name_language' => (
  				'vec' => 'Veinéisis',
  				'vi' => 'Vítneaimis',
  				'vls' => 'Pléimeannais Iartharach',
+ 				'vmw' => 'Macuais',
  				'vo' => 'Volapük',
  				'vun' => 'Vunjo',
  				'wa' => 'Vallúnais',
@@ -1603,6 +1606,7 @@ has 'display_name_language' => (
  				'wuu' => 'Sínis Wu',
  				'xal' => 'Cailmícis',
  				'xh' => 'Cóisis',
+ 				'xnr' => 'Kangri',
  				'xog' => 'Soga',
  				'yav' => 'Yangben',
  				'ybb' => 'Yemba',
@@ -1643,34 +1647,42 @@ has 'display_name_script' => (
 			my %scripts = (
 			'Adlm' => 'Adlam',
  			'Aghb' => 'Albánach Cugasach',
- 			'Ahom' => 'Ahom',
  			'Arab' => 'Arabach',
  			'Aran' => 'Nastaliq',
  			'Armi' => 'Aramach Impiriúil',
  			'Armn' => 'Airméanach',
  			'Avst' => 'Aivéisteach',
  			'Bali' => 'Bailíoch',
+ 			'Bamu' => 'Bamum',
+ 			'Bass' => 'Bassa Vah',
  			'Batk' => 'Batacach',
  			'Beng' => 'Beangálach',
+ 			'Bhks' => 'Bhaiksuki',
  			'Bopo' => 'Bopomofo',
+ 			'Brah' => 'Brámais',
  			'Brai' => 'Braille',
  			'Bugi' => 'Buigineach',
  			'Buhd' => 'Buthaideach',
  			'Cakm' => 'Seácmais',
  			'Cans' => 'Siollach Bundúchasach Ceanadach Aontaithe',
+ 			'Cari' => 'Cló Cairiach',
  			'Cher' => 'Seiricíoch',
  			'Copt' => 'Coptach',
  			'Cprt' => 'Cipireach',
  			'Cyrl' => 'Coireallach',
  			'Deva' => 'Déiveanágrach',
+ 			'Dsrt' => 'Deseret',
  			'Dupl' => 'Gearrscríobh Duployan',
  			'Egyd' => 'Éigipteach coiteann',
  			'Egyh' => 'Éigipteach cliarúil',
  			'Egyp' => 'Iairiglifí Éigipteacha',
+ 			'Elba' => 'Elbasan',
  			'Ethi' => 'Aetóipic',
  			'Geor' => 'Seoirseach',
  			'Glag' => 'Glagalach',
+ 			'Gonm' => 'Masaram Gondi',
  			'Goth' => 'Gotach',
+ 			'Gran' => 'Grantha',
  			'Grek' => 'Gréagach',
  			'Gujr' => 'Gúisearátach',
  			'Guru' => 'Gurmúcach',
@@ -1682,22 +1694,30 @@ has 'display_name_script' => (
  			'Hans@alt=stand-alone' => 'Han Simplithe',
  			'Hant' => 'Traidisiúnta',
  			'Hant@alt=stand-alone' => 'Han Traidisiúnta',
+ 			'Hatr' => 'Hatran',
  			'Hebr' => 'Eabhrach',
  			'Hira' => 'Hireagánach',
  			'Hluw' => 'Iairiglifí Anatólacha',
+ 			'Hmng' => 'Pahawh Hmong',
  			'Hrkt' => 'Siollabraí Seapánacha',
  			'Hung' => 'Sean-Ungárach',
  			'Ital' => 'Sean-Iodáilic',
  			'Jamo' => 'Seamó',
  			'Java' => 'Iávach',
  			'Jpan' => 'Seapánach',
+ 			'Kali' => 'Kayah Li',
  			'Kana' => 'Catacánach',
+ 			'Khar' => 'Kharoshthi',
  			'Khmr' => 'Ciméarach',
+ 			'Khoj' => 'Khojki',
  			'Knda' => 'Cannadach',
  			'Kore' => 'Cóiréach',
+ 			'Kthi' => 'Kaithi',
+ 			'Lana' => 'Lanna',
  			'Laoo' => 'Laosach',
  			'Latg' => 'Cló Gaelach',
  			'Latn' => 'Laidineach',
+ 			'Lepc' => 'Lepcha',
  			'Limb' => 'Liombúch',
  			'Lina' => 'Líneach A',
  			'Linb' => 'Líneach B',
@@ -1705,48 +1725,76 @@ has 'display_name_script' => (
  			'Lyci' => 'Liciach',
  			'Lydi' => 'Lidiach',
  			'Mahj' => 'Mahasánach',
+ 			'Mand' => 'Mandaean',
  			'Mani' => 'Mainicéasach',
+ 			'Marc' => 'Marchen',
  			'Maya' => 'Iairiglifí Máigheacha',
  			'Mend' => 'Meindeach',
+ 			'Merc' => 'Meroitic Cursive',
+ 			'Mero' => 'Meroitic',
  			'Mlym' => 'Mailéalamach',
  			'Mong' => 'Mongólach',
+ 			'Mroo' => 'Mro',
  			'Mtei' => 'Meitei Mayek',
  			'Mult' => 'Multani',
  			'Mymr' => 'Maenmarach',
  			'Narb' => 'Sean-Arabach Thuaidh',
- 			'Newa' => 'Newa',
+ 			'Nbat' => 'Nabataean',
  			'Nkoo' => 'N-cóis',
+ 			'Nshu' => 'Nüshu',
  			'Ogam' => 'Ogham',
  			'Olck' => 'Ol Chiki',
+ 			'Orkh' => 'Orkhon',
  			'Orya' => 'Oiríseach',
  			'Osge' => 'Ósáis',
+ 			'Osma' => 'Osmanya',
+ 			'Palm' => 'Palmyrene',
+ 			'Pauc' => 'Pau Cin Hau',
  			'Perm' => 'Sean-Pheirmeach',
+ 			'Phag' => 'Phags-pa',
+ 			'Phli' => 'Pachlavais Inscríbhinne',
+ 			'Phlp' => 'Pachlavais Saltrach',
  			'Phnx' => 'Féiníceach',
  			'Plrd' => 'Pollard Foghrach',
  			'Prti' => 'Pairtiach Inscríbhinniúil',
+ 			'Rjng' => 'Rejang',
  			'Rohg' => 'Hanifi',
  			'Runr' => 'Rúnach',
  			'Samr' => 'Samárach',
  			'Sarb' => 'Sean-Arabach Theas',
+ 			'Saur' => 'Saurashtra',
  			'Sgnw' => 'Litritheoireacht Comharthaí',
  			'Shaw' => 'Shawach',
+ 			'Shrd' => 'Sharada',
+ 			'Sidd' => 'Siddham',
+ 			'Sind' => 'Khudawadi',
  			'Sinh' => 'Siolónach',
+ 			'Sora' => 'Sora Sompeng',
+ 			'Soyo' => 'Soyombo',
  			'Sund' => 'Sundainéis',
+ 			'Sylo' => 'Syloti Nagri',
  			'Syrc' => 'Siriceach',
+ 			'Tagb' => 'Tagbanwa',
+ 			'Takr' => 'Takri',
  			'Tale' => 'Deiheoingis',
  			'Talu' => 'Tai Lue Nua',
  			'Taml' => 'Tamalach',
+ 			'Tang' => 'Tangut',
+ 			'Tavt' => 'Tai Viet',
  			'Telu' => 'Teileagúch',
  			'Tfng' => 'Tifinagh',
  			'Tglg' => 'Tagálagach',
  			'Thaa' => 'Tánach',
  			'Thai' => 'Téalannach',
  			'Tibt' => 'Tibéadach',
+ 			'Tirh' => 'Tirhuta',
  			'Ugar' => 'Úgairíteach',
  			'Vaii' => 'Vadhais',
+ 			'Wara' => 'Varang Kshiti',
  			'Xpeo' => 'Sean-Pheirseach',
  			'Xsux' => 'Dingchruthach Suiméar-Acádach',
  			'Yiii' => 'Ís',
+ 			'Zanb' => 'Zanabazar Square',
  			'Zinh' => 'Oidhreacht',
  			'Zmth' => 'Nodaireacht Mhatamaiticiúil',
  			'Zsye' => 'Emoji',
@@ -2235,7 +2283,6 @@ has 'display_name_type' => (
  				'gb2312han' => q{Ord sórtála Síneach simplithe - GB 2312},
  				'phonebook' => q{Ord sórtála an eolaire teileafóin},
  				'pinyin' => q{Ord sórtála pinyin},
- 				'reformed' => q{Ord Sórtála Athfhoirmithe},
  				'search' => q{Cuardach Ilfhóinteach},
  				'searchjl' => q{Cuardach de réir Consan Tosaigh Hangul},
  				'standard' => q{Ord Sórtála Caighdeánach},
@@ -3279,8 +3326,8 @@ has 'units' => (
 					'duration-century' => {
 						'few' => q({0} chéad bliain),
 						'many' => q({0} gcéad bliain),
-						'name' => q(céadta bliain),
-						'one' => q({0} chéad bliain),
+						'name' => q(na céadta bliain),
+						'one' => q(céad bliain),
 						'other' => q({0} céad bliain),
 						'two' => q({0} chéad bliain),
 					},
@@ -3288,8 +3335,8 @@ has 'units' => (
 					'century' => {
 						'few' => q({0} chéad bliain),
 						'many' => q({0} gcéad bliain),
-						'name' => q(céadta bliain),
-						'one' => q({0} chéad bliain),
+						'name' => q(na céadta bliain),
+						'one' => q(céad bliain),
 						'other' => q({0} céad bliain),
 						'two' => q({0} chéad bliain),
 					},
@@ -3360,6 +3407,26 @@ has 'units' => (
 						'one' => q({0} nanashoicind),
 						'other' => q({0} nanashoicind),
 						'two' => q({0} nanashoicind),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'few' => q({0} oíche),
+						'many' => q({0} n-oíche),
+						'name' => q(oícheanta),
+						'one' => q({0} oíche amháin),
+						'other' => q({0} oíche),
+						'per' => q({0} san oíche),
+						'two' => q({0} oíche),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'few' => q({0} oíche),
+						'many' => q({0} n-oíche),
+						'name' => q(oícheanta),
+						'one' => q({0} oíche amháin),
+						'other' => q({0} oíche),
+						'per' => q({0} san oíche),
+						'two' => q({0} oíche),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -5734,6 +5801,26 @@ has 'units' => (
 						'two' => q({0}ns),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'few' => q({0}oí),
+						'many' => q({0}oí),
+						'name' => q(oí),
+						'one' => q({0}oí),
+						'other' => q({0}oí),
+						'per' => q({0}/oíche),
+						'two' => q({0}oí),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'few' => q({0}oí),
+						'many' => q({0}oí),
+						'name' => q(oí),
+						'one' => q({0}oí),
+						'other' => q({0}oí),
+						'per' => q({0}/oíche),
+						'two' => q({0}oí),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'few' => q({0} cna),
 						'many' => q({0} cna),
@@ -7156,6 +7243,14 @@ has 'units' => (
 						'name' => q(PBheart),
 					},
 					# Long Unit Identifier
+					'duration-century' => {
+						'name' => q(céadta bl),
+					},
+					# Core Unit Identifier
+					'century' => {
+						'name' => q(céadta bl),
+					},
+					# Long Unit Identifier
 					'duration-day' => {
 						'few' => q({0} lá),
 						'many' => q({0} lá),
@@ -7234,6 +7329,26 @@ has 'units' => (
 						'other' => q({0} m),
 						'per' => q({0}/mí),
 						'two' => q({0} mí),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'few' => q({0} oíche),
+						'many' => q({0} n-oíche),
+						'name' => q(oícheanta),
+						'one' => q({0} oíche),
+						'other' => q({0} oíche),
+						'per' => q({0}/oíche),
+						'two' => q({0} oíche),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'few' => q({0} oíche),
+						'many' => q({0} n-oíche),
+						'name' => q(oícheanta),
+						'one' => q({0} oíche),
+						'other' => q({0} oíche),
+						'per' => q({0}/oíche),
+						'two' => q({0} oíche),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -8725,6 +8840,11 @@ has 'currencies' => (
 				'currency' => q(Austral Airgintíneach),
 			},
 		},
+		'ARL' => {
+			display_name => {
+				'currency' => q(Peso Ley na hAirgintíne \(1970–1983\)),
+			},
+		},
 		'ARM' => {
 			display_name => {
 				'currency' => q(Peso na hAirgintíne \(1881–1970\)),
@@ -8873,6 +8993,15 @@ has 'currencies' => (
 				'one' => q(lev crua na Bulgáire),
 				'other' => q(lev crua na Bulgáire),
 				'two' => q(lev chrua na Bulgáire),
+			},
+		},
+		'BGM' => {
+			display_name => {
+				'few' => q(lev sóisialach na Bulgáire),
+				'many' => q(lev sóisialach na Bulgáire),
+				'one' => q(lev sóisialach na Bulgáire),
+				'other' => q(lev sóisialach na Bulgáire),
+				'two' => q(lev sóisialach na Bulgáire),
 			},
 		},
 		'BGN' => {
@@ -9135,6 +9264,16 @@ has 'currencies' => (
 				'two' => q(fhranc an Chongó),
 			},
 		},
+		'CHE' => {
+			display_name => {
+				'currency' => q(Euro WIR),
+				'few' => q(euro WIR),
+				'many' => q(euro WIR),
+				'one' => q(WIR euro),
+				'other' => q(euro WIR),
+				'two' => q(euro WIR),
+			},
+		},
 		'CHF' => {
 			display_name => {
 				'currency' => q(Franc na hEilvéise),
@@ -9143,6 +9282,16 @@ has 'currencies' => (
 				'one' => q(fhranc na hEilvéise),
 				'other' => q(franc na hEilvéise),
 				'two' => q(fhranc na hEilvéise),
+			},
+		},
+		'CHW' => {
+			display_name => {
+				'currency' => q(Franc WIR),
+				'few' => q(fhranc WIR),
+				'many' => q(bhfranc WIR),
+				'one' => q(fhranc WIR amháin),
+				'other' => q(franc WIR),
+				'two' => q(fhranc WIR),
 			},
 		},
 		'CLE' => {
@@ -11076,6 +11225,16 @@ has 'currencies' => (
 				'two' => q(Dínear Inathraithe Iúgslavach),
 			},
 		},
+		'YUR' => {
+			display_name => {
+				'currency' => q(Dinar Leasaithe na hIúgsláive \(1992–1993\)),
+				'few' => q(Dinar Leasaithe na hIúgsláive \(1992–1993\)),
+				'many' => q(Dinar Leasaithe na hIúgsláive \(1992–1993\)),
+				'one' => q(Dinar Leasaithe na hIúgsláive \(1992–1993\)),
+				'other' => q(Dinars Leasaithe na hIúgsláive \(1992–1993\)),
+				'two' => q(Dinar Leasaithe na hIúgsláive \(1992–1993\)),
+			},
+		},
 		'ZAL' => {
 			display_name => {
 				'currency' => q(Rand na hAfraice Theas \(airgeadúil\)),
@@ -11119,6 +11278,11 @@ has 'currencies' => (
 		'ZWD' => {
 			display_name => {
 				'currency' => q(Dollar Siombábach \(1980–2008\)),
+			},
+		},
+		'ZWL' => {
+			display_name => {
+				'currency' => q(Dollar na Siombáibe \(2009\)),
 			},
 		},
 	} },
@@ -11731,9 +11895,6 @@ has 'time_zone_names' => (
 		'Africa/Nouakchott' => {
 			exemplarCity => q#Nuacsat#,
 		},
-		'Africa/Sao_Tome' => {
-			exemplarCity => q#São Tomé#,
-		},
 		'Africa/Tripoli' => {
 			exemplarCity => q#Tripilí#,
 		},
@@ -11788,9 +11949,6 @@ has 'time_zone_names' => (
 		},
 		'America/Aruba' => {
 			exemplarCity => q#Arúba#,
-		},
-		'America/Asuncion' => {
-			exemplarCity => q#Asunción#,
 		},
 		'America/Bahia_Banderas' => {
 			exemplarCity => q#Bahia Banderas#,
@@ -11854,9 +12012,6 @@ has 'time_zone_names' => (
 		},
 		'America/Puerto_Rico' => {
 			exemplarCity => q#Pórtó Ríce#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#Santa Isabel#,
 		},
 		'America/Sao_Paulo' => {
 			exemplarCity => q#São Paulo#,
@@ -12083,9 +12238,6 @@ has 'time_zone_names' => (
 		'Atlantic/St_Helena' => {
 			exemplarCity => q#San Héilin#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#Currie#,
-		},
 		'Australia_Central' => {
 			long => {
 				'daylight' => q#Am Samhraidh Lár na hAstráile#,
@@ -12193,13 +12345,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Am Samhraidh na Síne#,
 				'generic' => q#Am na Síne#,
 				'standard' => q#Am Caighdeánach na Síne#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Am Samhraidh Choibalsan#,
-				'generic' => q#Am Choibalsan#,
-				'standard' => q#Am Caighdeánach Choibalsan#,
 			},
 		},
 		'Christmas' => {
@@ -12658,6 +12803,11 @@ has 'time_zone_names' => (
 				'standard' => q#Am Caighdeánach Phetropavlovsk-Kamchatski#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Am na Casacstáine#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#Am Oirthear na Casacstáine#,
@@ -12716,11 +12866,6 @@ has 'time_zone_names' => (
 				'standard' => q#Am Caighdeánach Mhacao#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Am Oileán Mhic Guaire#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Am Samhraidh Mhagadan#,
@@ -12758,13 +12903,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Am Mawson#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Am Samhraidh Iarthuaisceart Mheicsiceo#,
-				'generic' => q#Am Iarthuaisceart Mheicsiceo#,
-				'standard' => q#Am Caighdeánach Iarthuaisceart Mheicsiceo#,
 			},
 		},
 		'Mexico_Pacific' => {

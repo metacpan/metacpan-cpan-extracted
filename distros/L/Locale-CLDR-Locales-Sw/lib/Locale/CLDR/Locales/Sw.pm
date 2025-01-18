@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Sw - Package for language Swahili
 
 package Locale::CLDR::Locales::Sw;
 # This file auto generated from Data\common\main\sw.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -322,6 +322,7 @@ has 'display_name_language' => (
  				'bin' => 'Kibini',
  				'bkm' => 'Kikom',
  				'bla' => 'Kisiksika',
+ 				'blo' => 'Kianii',
  				'bm' => 'Kibambara',
  				'bn' => 'Kibengali',
  				'bo' => 'Kitibeti',
@@ -503,6 +504,7 @@ has 'display_name_language' => (
  				'kv' => 'Kikomi',
  				'kw' => 'Kikorni',
  				'kwk' => 'Kikwakʼwala',
+ 				'kxv' => 'Kikuvi',
  				'ky' => 'Kikyrgyz',
  				'la' => 'Kilatini',
  				'lad' => 'Kiladino',
@@ -512,8 +514,10 @@ has 'display_name_language' => (
  				'lez' => 'Kilezighian',
  				'lg' => 'Kiganda',
  				'li' => 'Limburgish',
+ 				'lij' => 'Kiliguria',
  				'lil' => 'Kilillooet',
  				'lkt' => 'Kilakota',
+ 				'lmo' => 'Kilongobardi',
  				'ln' => 'Kilingala',
  				'lo' => 'Kilaosi',
  				'lol' => 'Kimongo',
@@ -680,6 +684,7 @@ has 'display_name_language' => (
  				'sw' => 'Kiswahili',
  				'swb' => 'Shikomor',
  				'syr' => 'Lugha ya Syriac',
+ 				'szl' => 'Kisilesia',
  				'ta' => 'Kitamili',
  				'tce' => 'Kitutchone cha Kusini',
  				'te' => 'Kitelugu',
@@ -720,7 +725,9 @@ has 'display_name_language' => (
  				'uz' => 'Kiuzbeki',
  				'vai' => 'Kivai',
  				've' => 'Kivenda',
+ 				'vec' => 'Kivenisi',
  				'vi' => 'Kivietinamu',
+ 				'vmw' => 'Kimakhuwa',
  				'vo' => 'Kivolapuk',
  				'vun' => 'Kivunjo',
  				'wa' => 'Kiwaloon',
@@ -732,6 +739,7 @@ has 'display_name_language' => (
  				'wuu' => 'Kichina cha Wu',
  				'xal' => 'Kikalmyk',
  				'xh' => 'Kixhosa',
+ 				'xnr' => 'Kikangri',
  				'xog' => 'Kisoga',
  				'yao' => 'Kiyao',
  				'yav' => 'Kiyangben',
@@ -741,6 +749,7 @@ has 'display_name_language' => (
  				'yrl' => 'Kinheengatu',
  				'yue' => 'Kikantoni',
  				'yue@alt=menu' => 'Kichina, Kikantoni',
+ 				'za' => 'Kizhuang',
  				'zgh' => 'Kiberber Sanifu cha Moroko',
  				'zh' => 'Kichina',
  				'zh@alt=menu' => 'Kichina sanifu',
@@ -1238,7 +1247,6 @@ has 'display_name_type' => (
  				'phonebook' => q{Mpangilio wa Orodha za Nambari za Simu},
  				'phonetic' => q{Utaratibu wa Kupanga Fonetiki},
  				'pinyin' => q{Mpangilio wa Kipinyin},
- 				'reformed' => q{Mpangilio Uliorekebishwa},
  				'search' => q{Utafutaji wa Kijumla},
  				'searchjl' => q{Tafuta kwa Konsonanti Halisi ya Hangul},
  				'standard' => q{Mpangilio wa Kawaida},
@@ -1575,6 +1583,18 @@ has 'units' => (
 						'other' => q(permyriadi {0}),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(sehemu kwa kila bilioni),
+						'one' => q(sehemu {0} kwa kila bilioni),
+						'other' => q(sehemu {0} kwa kila bilioni),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(sehemu kwa kila bilioni),
+						'one' => q(sehemu {0} kwa kila bilioni),
+						'other' => q(sehemu {0} kwa kila bilioni),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'one' => q(lita {0} kwa kilomita 100),
 						'other' => q(lita {0} kwa kilomita 100),
@@ -1657,6 +1677,20 @@ has 'units' => (
 					'millisecond' => {
 						'one' => q(millisekunde {0}),
 						'other' => q(millisekunde {0}),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(usiku),
+						'one' => q(usiku {0}),
+						'other' => q(usiku {0}),
+						'per' => q({0} kila usiku),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(usiku),
+						'one' => q(usiku {0}),
+						'other' => q(usiku {0}),
+						'per' => q({0} kila usiku),
 					},
 					# Long Unit Identifier
 					'electric-milliampere' => {
@@ -2191,6 +2225,18 @@ has 'units' => (
 						'other' => q(kilomita {0} kwa saa),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(mwanga),
+						'one' => q(mwanga {0}),
+						'other' => q(mianga {0}),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(mwanga),
+						'one' => q(mwanga {0}),
+						'other' => q(mianga {0}),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'one' => q(mita {0} kwa sekunde),
 						'other' => q(mita {0} kwa sekunde),
@@ -2567,6 +2613,14 @@ has 'units' => (
 						'name' => q(ppm),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(sehemu kwa kila bilioni),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(sehemu kwa kila bilioni),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'one' => q(L/100km {0}),
 						'other' => q(L/100km {0}),
@@ -2601,6 +2655,20 @@ has 'units' => (
 					# Core Unit Identifier
 					'month' => {
 						'name' => q(mwezi),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(usiku),
+						'one' => q(usiku {0}),
+						'other' => q(usiku {0}),
+						'per' => q({0}/usiku),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(usiku),
+						'one' => q(usiku {0}),
+						'other' => q(usiku {0}),
+						'per' => q({0}/usiku),
 					},
 					# Long Unit Identifier
 					'duration-second' => {
@@ -2759,6 +2827,18 @@ has 'units' => (
 					'inch-ofhg' => {
 						'one' => q({0} inHg),
 						'other' => q({0} inHg),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(mwanga),
+						'one' => q(mwanga {0}),
+						'other' => q(mianga {0}),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(mwanga),
+						'one' => q(mwanga {0}),
+						'other' => q(mianga {0}),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -3319,6 +3399,14 @@ has 'units' => (
 						'name' => q(permyriadi),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(sehemu kwa bilioni),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(sehemu kwa bilioni),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(lita kwa kilomita 100),
 						'one' => q(lita {0}/km 100),
@@ -3619,6 +3707,20 @@ has 'units' => (
 						'name' => q(nanosekunde),
 						'one' => q(nanosekunde {0}),
 						'other' => q(nanosekunde {0}),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(usiku),
+						'one' => q(usiku {0}),
+						'other' => q(usiku {0}),
+						'per' => q({0}/usiku),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(usiku),
+						'one' => q(usiku {0}),
+						'other' => q(usiku {0}),
+						'per' => q({0}/usiku),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -4691,6 +4793,18 @@ has 'units' => (
 						'name' => q(noti),
 						'one' => q(noti {0}),
 						'other' => q(noti {0}),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(mwanga),
+						'one' => q(mwanga {0}),
+						'other' => q(mianga {0}),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(mwanga),
+						'one' => q(mwanga {0}),
+						'other' => q(mianga {0}),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -6880,6 +6994,7 @@ has 'datetime_formats_available_formats' => (
 			yMMMM => q{MMMM y},
 			yMMMd => q{d MMM y},
 			yMd => q{d/M/y},
+			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 			yw => q{'wiki' w 'ya' Y},
 		},
@@ -7225,9 +7340,6 @@ has 'time_zone_names' => (
 		'America/Mexico_City' => {
 			exemplarCity => q#Jiji la Mexico#,
 		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#Santa Isabel#,
-		},
 		'America_Central' => {
 			long => {
 				'daylight' => q#Saa za Mchana za Kati#,
@@ -7316,9 +7428,6 @@ has 'time_zone_names' => (
 		},
 		'Atlantic/South_Georgia' => {
 			exemplarCity => q#Georgia Kusini#,
-		},
-		'Australia/Currie' => {
-			exemplarCity => q#Currie#,
 		},
 		'Australia_Central' => {
 			long => {
@@ -7422,13 +7531,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Saa za Mchana za Uchina#,
 				'generic' => q#Saa za Uchina#,
 				'standard' => q#Saa za Wastani za Uchina#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Saa za Majira ya joto za Choibalsan#,
-				'generic' => q#Saa za Choibalsan#,
-				'standard' => q#Saa za Wastani za Choibalsan#,
 			},
 		},
 		'Christmas' => {
@@ -7697,6 +7799,11 @@ has 'time_zone_names' => (
 				'standard' => q#Saa za Wastani za Petropavlovsk-Kamchatski#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Saa za Kazakhstan#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#Saa za Kazakhstan Mashariki#,
@@ -7743,11 +7850,6 @@ has 'time_zone_names' => (
 				'standard' => q#Saa za Wastani za Lord Howe#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Saa za kisiwa cha Macquarie#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Saa za Majira ya joto za Magadan#,
@@ -7785,13 +7887,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Saa za Mawson#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Saa za mchana za Meksiko Kaskazini Magharibi#,
-				'generic' => q#Saa za Meksiko Kaskazini Magharibi#,
-				'standard' => q#Saa za Wastani za Meksiko Kaskazini Magharibi#,
 			},
 		},
 		'Mexico_Pacific' => {

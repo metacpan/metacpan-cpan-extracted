@@ -13,6 +13,7 @@ t/VPrintf/03_special.t
 t/VPrintf/04_combined.t
 t/VPrintf/05_filehandle.t
 t/VPrintf/07_backspace.t
+t/VPrintf/08_duplicate.t
 t/lib/Text/VPrintf.pm
 META.yml
 MANIFEST

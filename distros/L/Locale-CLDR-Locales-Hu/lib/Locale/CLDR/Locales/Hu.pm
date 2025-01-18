@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Hu - Package for language Hungarian
 
 package Locale::CLDR::Locales::Hu;
 # This file auto generated from Data\common\main\hu.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -732,6 +732,7 @@ has 'display_name_language' => (
  				'bin' => 'bini',
  				'bkm' => 'kom',
  				'bla' => 'siksika',
+ 				'blo' => 'anii',
  				'bm' => 'bambara',
  				'bn' => 'bangla',
  				'bo' => 'tibeti',
@@ -961,6 +962,7 @@ has 'display_name_language' => (
  				'kv' => 'komi',
  				'kw' => 'korni',
  				'kwk' => 'kwakʼwala',
+ 				'kxv' => 'kuvi',
  				'ky' => 'kirgiz',
  				'la' => 'latin',
  				'lad' => 'ladino',
@@ -987,7 +989,6 @@ has 'display_name_language' => (
  				'lua' => 'luba-lulua',
  				'lui' => 'luiseno',
  				'lun' => 'lunda',
- 				'luo' => 'luo',
  				'lus' => 'lushai',
  				'luy' => 'lujia',
  				'lv' => 'lett',
@@ -1216,10 +1217,10 @@ has 'display_name_language' => (
  				'und' => 'ismeretlen nyelv',
  				'ur' => 'urdu',
  				'uz' => 'üzbég',
- 				'vai' => 'vai',
  				've' => 'venda',
  				'vec' => 'velencei',
  				'vi' => 'vietnámi',
+ 				'vmw' => 'makua',
  				'vo' => 'volapük',
  				'vot' => 'votják',
  				'vun' => 'vunjo',
@@ -1233,6 +1234,7 @@ has 'display_name_language' => (
  				'wuu' => 'wu kínai',
  				'xal' => 'kalmük',
  				'xh' => 'xhosza',
+ 				'xnr' => 'kangri',
  				'xog' => 'szoga',
  				'yao' => 'jaó',
  				'yap' => 'japi',
@@ -1277,7 +1279,6 @@ has 'display_name_script' => (
 			my %scripts = (
 			'Adlm' => 'Adlam',
  			'Aghb' => 'Kaukázusi albaniai',
- 			'Arab' => 'Arab',
  			'Arab@alt=variant' => 'Perzsa-arab',
  			'Aran' => 'Nasztalik',
  			'Armi' => 'Birodalmi arámi',
@@ -1331,7 +1332,6 @@ has 'display_name_script' => (
  			'Hung' => 'Ómagyar',
  			'Inds' => 'Indus',
  			'Ital' => 'Régi olasz',
- 			'Jamo' => 'Jamo',
  			'Java' => 'Jávai',
  			'Jpan' => 'Japán',
  			'Kali' => 'Kajah li',
@@ -1406,7 +1406,6 @@ has 'display_name_script' => (
  			'Tfng' => 'Berber',
  			'Tglg' => 'Tagalog',
  			'Thaa' => 'Thaana',
- 			'Thai' => 'Thai',
  			'Tibt' => 'Tibeti',
  			'Ugar' => 'Ugari',
  			'Vaii' => 'Vai',
@@ -1903,7 +1902,6 @@ has 'display_name_type' => (
  				'phonebook' => q{Telefonkönyv sorrend},
  				'phonetic' => q{Fonetikus rendezési sorrend},
  				'pinyin' => q{Pinyin sorrend},
- 				'reformed' => q{Átalakított rendezési elv},
  				'search' => q{Általános célú keresés},
  				'searchjl' => q{Keresés hangul kezdő mássalhangzó szerint},
  				'standard' => q{Normál rendezési sorrend},
@@ -2942,6 +2940,20 @@ has 'units' => (
 						'name' => q(nanoszekundum),
 						'one' => q({0} nanoszekundum),
 						'other' => q({0} nanoszekundum),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(éjszakák),
+						'one' => q({0} éjszaka),
+						'other' => q({0} éjszaka),
+						'per' => q({0}/éjszaka),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(éjszakák),
+						'one' => q({0} éjszaka),
+						'other' => q({0} éjszaka),
+						'per' => q({0}/éjszaka),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -4526,6 +4538,20 @@ has 'units' => (
 						'other' => q({0} h.),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(éjszakák),
+						'one' => q({0} éjszaka),
+						'other' => q({0} éjszaka),
+						'per' => q({0}/éjszaka),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(éjszakák),
+						'one' => q({0} éjszaka),
+						'other' => q({0} éjszaka),
+						'per' => q({0}/éjszaka),
+					},
+					# Long Unit Identifier
 					'graphics-megapixel' => {
 						'name' => q(MP),
 					},
@@ -4906,6 +4932,20 @@ has 'units' => (
 						'one' => q({0} hónap),
 						'other' => q({0} hónap),
 						'per' => q({0}/hó),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(éjszakák),
+						'one' => q({0} éjszaka),
+						'other' => q({0} éjszaka),
+						'per' => q({0}/éjszaka),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(éjszakák),
+						'one' => q({0} éjszaka),
+						'other' => q({0} éjszaka),
+						'per' => q({0}/éjszaka),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -6090,7 +6130,7 @@ has 'currencies' => (
 		},
 		'CSD' => {
 			display_name => {
-				'currency' => q(szerb dinár),
+				'currency' => q(szerb dinár \(2002–2006\)),
 				'one' => q(szerb dinár \(2002–2006\)),
 				'other' => q(szerb dinár \(2002–2006\)),
 			},
@@ -6320,7 +6360,9 @@ has 'currencies' => (
 		},
 		'HNL' => {
 			display_name => {
-				'currency' => q(hodurasi lempira),
+				'currency' => q(hondurasi lempira),
+				'one' => q(hondurasi lempira),
+				'other' => q(hondurasi lempira),
 			},
 		},
 		'HRD' => {
@@ -6380,7 +6422,9 @@ has 'currencies' => (
 		},
 		'IRR' => {
 			display_name => {
-				'currency' => q(iráni rial),
+				'currency' => q(iráni riál),
+				'one' => q(iráni riál),
+				'other' => q(iráni riál),
 			},
 		},
 		'ISK' => {
@@ -6554,7 +6598,9 @@ has 'currencies' => (
 		},
 		'MKD' => {
 			display_name => {
-				'currency' => q(macedon dínár),
+				'currency' => q(macedón dénár),
+				'one' => q(macedón dénár),
+				'other' => q(macedón dénár),
 			},
 		},
 		'MKN' => {
@@ -6706,7 +6752,9 @@ has 'currencies' => (
 		},
 		'OMR' => {
 			display_name => {
-				'currency' => q(ománi rial),
+				'currency' => q(ománi riál),
+				'one' => q(ománi riál),
+				'other' => q(ománi riál),
 			},
 		},
 		'PAB' => {
@@ -6771,7 +6819,9 @@ has 'currencies' => (
 		},
 		'QAR' => {
 			display_name => {
-				'currency' => q(katari rial),
+				'currency' => q(katari riál),
+				'one' => q(katari riál),
+				'other' => q(katari riál),
 			},
 		},
 		'RHD' => {
@@ -6793,7 +6843,9 @@ has 'currencies' => (
 		},
 		'RSD' => {
 			display_name => {
-				'currency' => q(szerb dínár),
+				'currency' => q(szerb dinár),
+				'one' => q(szerb dinár),
+				'other' => q(szerb dinár),
 			},
 		},
 		'RUB' => {
@@ -6813,7 +6865,9 @@ has 'currencies' => (
 		},
 		'SAR' => {
 			display_name => {
-				'currency' => q(szaúdi riyal),
+				'currency' => q(szaúdi riál),
+				'one' => q(szaúdi riál),
+				'other' => q(szaúdi riál),
 			},
 		},
 		'SBD' => {
@@ -6877,7 +6931,9 @@ has 'currencies' => (
 		},
 		'SLL' => {
 			display_name => {
-				'currency' => q(Sierra Leone-i leone \(1964—2022\)),
+				'currency' => q(Sierra Leone-i leone \(1964–2022\)),
+				'one' => q(Sierra Leone-i leone \(1964–2022\)),
+				'other' => q(Sierra Leone-i leone \(1964–2022\)),
 			},
 		},
 		'SOS' => {
@@ -7058,14 +7114,16 @@ has 'currencies' => (
 		},
 		'UYU' => {
 			display_name => {
-				'currency' => q(uruguay-i peso),
+				'currency' => q(uruguayi peso),
 				'one' => q(uruguayi peso),
 				'other' => q(uruguayi peso),
 			},
 		},
 		'UZS' => {
 			display_name => {
-				'currency' => q(üzbegisztáni szum),
+				'currency' => q(üzbegisztáni szom),
+				'one' => q(üzbegisztáni szom),
+				'other' => q(üzbegisztáni szom),
 			},
 		},
 		'VEB' => {
@@ -7215,7 +7273,9 @@ has 'currencies' => (
 		},
 		'YER' => {
 			display_name => {
-				'currency' => q(jemeni rial),
+				'currency' => q(jemeni riál),
+				'one' => q(jemeni riál),
+				'other' => q(jemeni riál),
 			},
 		},
 		'YUD' => {
@@ -8520,7 +8580,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Algír#,
 		},
 		'Africa/Asmera' => {
-			exemplarCity => q#Asmera#,
+			exemplarCity => q#Aszmara#,
 		},
 		'Africa/Cairo' => {
 			exemplarCity => q#Kairó#,
@@ -8539,9 +8599,6 @@ has 'time_zone_names' => (
 		},
 		'Africa/Malabo' => {
 			exemplarCity => q#Malabó#,
-		},
-		'Africa/Sao_Tome' => {
-			exemplarCity => q#São Tomé#,
 		},
 		'Africa/Tunis' => {
 			exemplarCity => q#Tunisz#,
@@ -8598,9 +8655,6 @@ has 'time_zone_names' => (
 		'America/Argentina/Tucuman' => {
 			exemplarCity => q#Tucumán#,
 		},
-		'America/Asuncion' => {
-			exemplarCity => q#Asunción#,
-		},
 		'America/Bahia_Banderas' => {
 			exemplarCity => q#Bahia Banderas#,
 		},
@@ -8618,9 +8672,6 @@ has 'time_zone_names' => (
 		},
 		'America/Cuiaba' => {
 			exemplarCity => q#Cuiabá#,
-		},
-		'America/Curacao' => {
-			exemplarCity => q#Curaçao#,
 		},
 		'America/Dominica' => {
 			exemplarCity => q#Dominika#,
@@ -8654,9 +8705,6 @@ has 'time_zone_names' => (
 		},
 		'America/Rio_Branco' => {
 			exemplarCity => q#Río Branco#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#Santa Isabel#,
 		},
 		'America/Sao_Paulo' => {
 			exemplarCity => q#São Paulo#,
@@ -8792,9 +8840,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#Csita#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#Csojbalszan#,
 		},
 		'Asia/Damascus' => {
 			exemplarCity => q#Damaszkusz#,
@@ -8971,9 +9016,6 @@ has 'time_zone_names' => (
 		'Atlantic/St_Helena' => {
 			exemplarCity => q#Szent Ilona#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#Currie#,
-		},
 		'Australia_Central' => {
 			long => {
 				'daylight' => q#közép-ausztráliai nyári idő#,
@@ -9081,13 +9123,6 @@ has 'time_zone_names' => (
 				'daylight' => q#kínai nyári idő#,
 				'generic' => q#kínai idő#,
 				'standard' => q#kínai téli idő#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#csojbalszani nyári idő#,
-				'generic' => q#csojbalszani idő#,
-				'standard' => q#csojbalszani téli idő#,
 			},
 		},
 		'Christmas' => {
@@ -9259,9 +9294,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#Uljanovszk#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#Ungvár#,
-		},
 		'Europe/Vatican' => {
 			exemplarCity => q#Vatikán#,
 		},
@@ -9276,9 +9308,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#Zágráb#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#Zaporizzsja#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#Zürich#,
@@ -9445,9 +9474,6 @@ has 'time_zone_names' => (
 		'Indian/Maldives' => {
 			exemplarCity => q#Maldív-szigetek#,
 		},
-		'Indian/Reunion' => {
-			exemplarCity => q#Réunion#,
-		},
 		'Indian_Ocean' => {
 			long => {
 				'standard' => q#indiai-óceáni idő#,
@@ -9508,6 +9534,11 @@ has 'time_zone_names' => (
 				'standard' => q#Petropavlovszk-kamcsatkai zónaidő#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#kazahsztáni idő#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#kelet-kazahsztáni idő#,
@@ -9566,11 +9597,6 @@ has 'time_zone_names' => (
 				'standard' => q#Macaui zónaidő#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#macquarie-szigeti téli idő#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#magadáni nyári idő#,
@@ -9608,13 +9634,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#mawsoni idő#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#északnyugat-mexikói nyári idő#,
-				'generic' => q#északnyugat-mexikói idő#,
-				'standard' => q#északnyugat-mexikói zónaidő#,
 			},
 		},
 		'Mexico_Pacific' => {

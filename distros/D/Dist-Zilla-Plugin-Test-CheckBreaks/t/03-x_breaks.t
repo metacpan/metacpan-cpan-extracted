@@ -114,8 +114,7 @@ cmp_deeply(
     'correct test prereqs are injected; correct dumped configs',
 );
 
-subtest 'run the generated test' => sub
-{
+subtest 'run the generated test' => sub {
     my $wd = pushd $build_dir;
 
     # make diag act like note

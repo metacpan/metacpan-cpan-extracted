@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Bs::Cyrl - Package for language Bosnian
 
 package Locale::CLDR::Locales::Bs::Cyrl;
 # This file auto generated from Data\common\main\bs_Cyrl.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -6483,9 +6483,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#Њујорк#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#Нипигон#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#Ном#,
 		},
@@ -6507,9 +6504,6 @@ has 'time_zone_names' => (
 		'America/Panama' => {
 			exemplarCity => q#Панама#,
 		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#Пангниртунг#,
-		},
 		'America/Paramaribo' => {
 			exemplarCity => q#Парамарибо#,
 		},
@@ -6530,9 +6524,6 @@ has 'time_zone_names' => (
 		},
 		'America/Punta_Arenas' => {
 			exemplarCity => q#Пунта Аренас#,
-		},
-		'America/Rainy_River' => {
-			exemplarCity => q#Рејни Ривер#,
 		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#Ранкин Инлет#,
@@ -6594,9 +6585,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#Туле#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#Тандер Беј#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#Тихуана#,
 		},
@@ -6617,9 +6605,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#Јакутат#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#Јелоунајф#,
 		},
 		'America_Central' => {
 			long => {
@@ -6794,9 +6779,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#Чита#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#Чојбалсан#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#Коломбо#,
@@ -7036,9 +7018,6 @@ has 'time_zone_names' => (
 		'Australia/Broken_Hill' => {
 			exemplarCity => q#Брокен Хил#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#Курие#,
-		},
 		'Australia/Darwin' => {
 			exemplarCity => q#Дарвин#,
 		},
@@ -7165,13 +7144,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Кина љетње рачунање времена#,
 				'generic' => q#Кина вријеме#,
 				'standard' => q#Кина стандардно вријеме#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Чојбалсан љетње рачунање времена#,
-				'generic' => q#Чојбалсан вријеме#,
-				'standard' => q#Чојбалсан стандардно вријеме#,
 			},
 		},
 		'Christmas' => {
@@ -7396,9 +7368,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#Уљановск#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#Ужгород#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#Вадуз#,
 		},
@@ -7419,9 +7388,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#Загреб#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#Запорожје#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#Цирих#,
@@ -7651,6 +7617,11 @@ has 'time_zone_names' => (
 				'standard' => q#Петропавловско-камчатско стандардно време#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Kazakhstan Time#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#Источно-казахстанско вријеме#,
@@ -7709,11 +7680,6 @@ has 'time_zone_names' => (
 				'standard' => q#Макао стандардно време#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Макверијско вријеме#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Магадан љетње рачунање вемена#,
@@ -7751,13 +7717,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Мосон вријеме#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Сјеверномексичко љетње рачунање времена#,
-				'generic' => q#Сјеверномексичко вријеме#,
-				'standard' => q#Сјеверномексичко стандардно вријеме#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -7899,9 +7858,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Honolulu' => {
 			exemplarCity => q#Хонолулу#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#Џонстон#,
 		},
 		'Pacific/Kiritimati' => {
 			exemplarCity => q#Киритимати#,
@@ -8218,6 +8174,11 @@ has 'time_zone_names' => (
 				'daylight' => q#Јекатеринбург љетње рачунање времена#,
 				'generic' => q#Јекатеринбург вријеме#,
 				'standard' => q#Јекатеринбург стандардно вријеме#,
+			},
+		},
+		'Yukon' => {
+			long => {
+				'standard' => q#Yukon Time#,
 			},
 		},
 	 } }

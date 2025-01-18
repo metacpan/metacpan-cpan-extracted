@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Se::Latn::Fi - Package for language Northern Sami
 
 package Locale::CLDR::Locales::Se::Latn::Fi;
 # This file auto generated from Data\common\main\se_FI.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -939,13 +939,6 @@ has 'time_zone_names' => (
 				'standard' => q#Kiinná dálveáigi#,
 			},
 		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Choibolsana geasseáigi#,
-				'generic' => q#Choibolsana áigi#,
-				'standard' => q#Choibolsana dálveáigi#,
-			},
-		},
 		'Christmas' => {
 			long => {
 				'standard' => q#Juovlasullo áigi#,
@@ -1308,11 +1301,6 @@ has 'time_zone_names' => (
 				'standard' => q#Lord Howe dálveáigi#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#MacQuarie sullo áigi#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Magadana geasseáigi#,
@@ -1350,13 +1338,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Mawsona áigi#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Oarjedavvi-Meksiko geasseáigi#,
-				'generic' => q#Oarjedavvi-Meksiko áigi#,
-				'standard' => q#Oarjedavvi-Meksiko dálveáigi#,
 			},
 		},
 		'Mexico_Pacific' => {

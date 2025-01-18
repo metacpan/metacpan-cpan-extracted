@@ -12,8 +12,7 @@ does not expose any of your sensitive data, such as passwords, tokens,
 or other secrets.
 
 You do not need to have a solution or fix. Depending on the issue,
-CPANSec may be notified. Depending on the issue, CPANSec may be
-notified.
+CPANSec may be notified.
 
 You can also privately report issues to the CPAN Security Group
 (CPANSec) <cpan-security@security.metacpan.org>. This is especially

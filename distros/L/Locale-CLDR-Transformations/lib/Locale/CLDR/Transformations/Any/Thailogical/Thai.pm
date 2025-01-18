@@ -1,17 +1,17 @@
 package Locale::CLDR::Transformations::Any::Thailogical::Thai;
 # This file auto generated from Data\common\transforms\Thai-ThaiLogical.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -38,20 +38,20 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
-					replace => q(((?:(?!(?:(?=[\p{thai}ก-ฺเ-๛])[\p{Logical_Order_Exception}]))[\p{thai}ก-ฺเ-๛]))((?:(?=[\p{thai}ก-ฺเ-๛])[\p{Logical_Order_Exception}]))),
+					replace => q(((?:(?!(?:(?=[\p{Thai}ก-ฺเ-๛])[\p{Logical_Order_Exception}]))[\p{Thai}ก-ฺเ-๛]))((?:(?=[\p{Thai}ก-ฺเ-๛])[\p{Logical_Order_Exception}]))),
 					result  => q($2$1),
 					revisit => 0,
 				},
 				{
-					before  => q([\p{thai} ก-ฺเ-๛]),
-					after   => q([\p{thai} ก-ฺเ-๛]),
+					before  => q([\p{Thai} ก-ฺเ-๛]),
+					after   => q([\p{Thai} ก-ฺเ-๛]),
 					replace => q(\'),
 					result  => q(),
 					revisit => 0,
 				},
 				{
-					before  => q([\p{thai} ก-ฺเ-๛]),
-					after   => q([\p{thai} ก-ฺเ-๛]),
+					before  => q([\p{Thai} ก-ฺเ-๛]),
+					after   => q([\p{Thai} ก-ฺเ-๛]),
 					replace => q(\'),
 					result  => q(\'),
 					revisit => 0,

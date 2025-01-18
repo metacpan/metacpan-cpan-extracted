@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Pt - Package for language Portuguese
 
 package Locale::CLDR::Locales::Pt;
 # This file auto generated from Data\common\main\pt.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -1044,6 +1044,7 @@ has 'display_name_language' => (
  				'bin' => 'bini',
  				'bkm' => 'kom',
  				'bla' => 'siksika',
+ 				'blo' => 'anii',
  				'bm' => 'bambara',
  				'bn' => 'bengali',
  				'bo' => 'tibetano',
@@ -1179,6 +1180,7 @@ has 'display_name_language' => (
  				'hax' => 'haida do sul',
  				'he' => 'hebraico',
  				'hi' => 'híndi',
+ 				'hi_Latn@alt=variant' => 'hinglish',
  				'hil' => 'hiligaynon',
  				'hit' => 'hitita',
  				'hmn' => 'hmong',
@@ -1260,6 +1262,7 @@ has 'display_name_language' => (
  				'kv' => 'komi',
  				'kw' => 'córnico',
  				'kwk' => 'kwakʼwala',
+ 				'kxv' => 'kuvi',
  				'ky' => 'quirguiz',
  				'la' => 'latim',
  				'lad' => 'ladino',
@@ -1270,6 +1273,7 @@ has 'display_name_language' => (
  				'lez' => 'lezgui',
  				'lg' => 'luganda',
  				'li' => 'limburguês',
+ 				'lij' => 'ligure',
  				'lil' => 'lillooet',
  				'lkt' => 'lacota',
  				'lmo' => 'lombardo',
@@ -1285,7 +1289,6 @@ has 'display_name_language' => (
  				'lua' => 'luba-lulua',
  				'lui' => 'luiseno',
  				'lun' => 'lunda',
- 				'luo' => 'luo',
  				'lus' => 'lushai',
  				'luy' => 'luyia',
  				'lv' => 'letão',
@@ -1304,7 +1307,7 @@ has 'display_name_language' => (
  				'mfe' => 'morisyen',
  				'mg' => 'malgaxe',
  				'mga' => 'irlandês médio',
- 				'mgh' => 'macua',
+ 				'mgh' => 'macua-mêto',
  				'mgo' => 'meta’',
  				'mh' => 'marshalês',
  				'mi' => 'maori',
@@ -1466,6 +1469,7 @@ has 'display_name_language' => (
  				'swb' => 'comoriano',
  				'syc' => 'siríaco clássico',
  				'syr' => 'siríaco',
+ 				'szl' => 'silesiano',
  				'ta' => 'tâmil',
  				'tce' => 'tutchone do sul',
  				'te' => 'télugo',
@@ -1512,9 +1516,10 @@ has 'display_name_language' => (
  				'und' => 'idioma desconhecido',
  				'ur' => 'urdu',
  				'uz' => 'uzbeque',
- 				'vai' => 'vai',
  				've' => 'venda',
+ 				'vec' => 'vêneto',
  				'vi' => 'vietnamita',
+ 				'vmw' => 'macua',
  				'vo' => 'volapuque',
  				'vot' => 'vótico',
  				'vun' => 'vunjo',
@@ -1528,6 +1533,7 @@ has 'display_name_language' => (
  				'wuu' => 'wu',
  				'xal' => 'kalmyk',
  				'xh' => 'xhosa',
+ 				'xnr' => 'kandri',
  				'xog' => 'lusoga',
  				'yao' => 'yao',
  				'yap' => 'yapese',
@@ -1737,7 +1743,7 @@ has 'display_name_region' => (
  			'011' => 'África Ocidental',
  			'013' => 'América Central',
  			'014' => 'África Oriental',
- 			'015' => 'África do Norte',
+ 			'015' => 'África Setentrional',
  			'017' => 'África Central',
  			'018' => 'África Meridional',
  			'019' => 'Américas',
@@ -2178,7 +2184,6 @@ has 'display_name_type' => (
  				'phonebook' => q{Ordem de lista telefônica},
  				'phonetic' => q{Ordem de classificação fonética},
  				'pinyin' => q{Ordem Pin-yin},
- 				'reformed' => q{Ordem reformulada},
  				'search' => q{Pesquisa de uso geral},
  				'searchjl' => q{Pesquisar por consonante inicial hangul},
  				'standard' => q{Ordem padrão},
@@ -2854,12 +2859,14 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'concentr-milligram-ofglucose-per-deciliter' => {
+						'1' => q(masculine),
 						'name' => q(miligramas por decilitro),
 						'one' => q({0} miligrama por decilitro),
 						'other' => q({0} miligramas por decilitro),
 					},
 					# Core Unit Identifier
 					'milligram-ofglucose-per-deciliter' => {
+						'1' => q(masculine),
 						'name' => q(miligramas por decilitro),
 						'one' => q({0} miligrama por decilitro),
 						'other' => q({0} miligramas por decilitro),
@@ -2941,6 +2948,20 @@ has 'units' => (
 						'1' => q(masculine),
 						'one' => q({0} ponto base),
 						'other' => q({0} pontos base),
+					},
+					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'1' => q(feminine),
+						'name' => q(partes por bilhão),
+						'one' => q({0} parte por bilhão),
+						'other' => q({0} partes por bilhão),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'1' => q(feminine),
+						'name' => q(partes por bilhão),
+						'one' => q({0} parte por bilhão),
+						'other' => q({0} partes por bilhão),
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
@@ -3291,6 +3312,22 @@ has 'units' => (
 						'name' => q(nanossegundos),
 						'one' => q({0} nanossegundo),
 						'other' => q({0} nanossegundos),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'1' => q(feminine),
+						'name' => q(noites),
+						'one' => q({0} noite),
+						'other' => q({0} noites),
+						'per' => q({0} por noite),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'1' => q(feminine),
+						'name' => q(noites),
+						'one' => q({0} noite),
+						'other' => q({0} noites),
+						'per' => q({0} por noite),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -3954,12 +3991,14 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-point' => {
+						'1' => q(masculine),
 						'name' => q(pontos tipográficos),
 						'one' => q({0} ponto tipográfico),
 						'other' => q({0} pontos),
 					},
 					# Core Unit Identifier
 					'point' => {
+						'1' => q(masculine),
 						'name' => q(pontos tipográficos),
 						'one' => q({0} ponto tipográfico),
 						'other' => q({0} pontos),
@@ -4432,12 +4471,14 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'pressure-millimeter-ofhg' => {
+						'1' => q(masculine),
 						'name' => q(milímetros de mercúrio),
 						'one' => q({0} milímetro de mercúrio),
 						'other' => q({0} milímetros de mercúrio),
 					},
 					# Core Unit Identifier
 					'millimeter-ofhg' => {
+						'1' => q(masculine),
 						'name' => q(milímetros de mercúrio),
 						'one' => q({0} milímetro de mercúrio),
 						'other' => q({0} milímetros de mercúrio),
@@ -4470,12 +4511,14 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'speed-beaufort' => {
+						'1' => q(masculine),
 						'name' => q(Beaufort),
 						'one' => q({0} Beaufort),
 						'other' => q({0} Beaufort),
 					},
 					# Core Unit Identifier
 					'beaufort' => {
+						'1' => q(masculine),
 						'name' => q(Beaufort),
 						'one' => q({0} Beaufort),
 						'other' => q({0} Beaufort),
@@ -4501,6 +4544,20 @@ has 'units' => (
 					# Core Unit Identifier
 					'knot' => {
 						'name' => q(nós),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'1' => q(feminine),
+						'name' => q(luz),
+						'one' => q({0} luz),
+						'other' => q({0} luzes),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'1' => q(feminine),
+						'name' => q(luz),
+						'one' => q({0} luz),
+						'other' => q({0} luzes),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -5357,6 +5414,20 @@ has 'units' => (
 						'name' => q(mês),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(noites),
+						'one' => q({0} noite),
+						'other' => q({0} noites),
+						'per' => q({0}/noite),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(noites),
+						'one' => q({0} noite),
+						'other' => q({0} noites),
+						'per' => q({0}/noite),
+					},
+					# Long Unit Identifier
 					'duration-week' => {
 						'name' => q(sem.),
 					},
@@ -5683,6 +5754,18 @@ has 'units' => (
 					'kilometer-per-hour' => {
 						'one' => q({0}km/h),
 						'other' => q({0}km/h),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(luz),
+						'one' => q({0} luz),
+						'other' => q({0} luzes),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(luz),
+						'one' => q({0} luz),
+						'other' => q({0} luzes),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -6019,6 +6102,14 @@ has 'units' => (
 						'name' => q(ponto base),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(partes/bilhão),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(partes/bilhão),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(l/100 km),
 						'one' => q({0} l/100 km),
@@ -6239,6 +6330,20 @@ has 'units' => (
 						'one' => q({0} mês),
 						'other' => q({0} meses),
 						'per' => q({0}/mês),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(noites),
+						'one' => q({0} noite),
+						'other' => q({0} noites),
+						'per' => q({0}/noite),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(noites),
+						'one' => q({0} noite),
+						'other' => q({0} noites),
+						'per' => q({0}/noite),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -6739,6 +6844,18 @@ has 'units' => (
 						'name' => q(nó),
 						'one' => q({0} nó),
 						'other' => q({0} nós),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(luz),
+						'one' => q({0} luz),
+						'other' => q({0} luzes),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(luz),
+						'one' => q({0} luz),
+						'other' => q({0} luzes),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -10263,9 +10380,6 @@ has 'time_zone_names' => (
 		'Africa/Porto-Novo' => {
 			exemplarCity => q#Porto Novo#,
 		},
-		'Africa/Sao_Tome' => {
-			exemplarCity => q#São Tomé#,
-		},
 		'Africa/Tripoli' => {
 			exemplarCity => q#Trípoli#,
 		},
@@ -10353,9 +10467,6 @@ has 'time_zone_names' => (
 		'America/Cuiaba' => {
 			exemplarCity => q#Cuiabá#,
 		},
-		'America/Curacao' => {
-			exemplarCity => q#Curaçao#,
-		},
 		'America/Eirunepe' => {
 			exemplarCity => q#Eirunepé#,
 		},
@@ -10412,9 +10523,6 @@ has 'time_zone_names' => (
 		},
 		'America/Puerto_Rico' => {
 			exemplarCity => q#Porto Rico#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#Santa Isabel#,
 		},
 		'America/Santarem' => {
 			exemplarCity => q#Santarém#,
@@ -10651,9 +10759,6 @@ has 'time_zone_names' => (
 		'Atlantic/St_Helena' => {
 			exemplarCity => q#Santa Helena#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#Currie#,
-		},
 		'Australia_Central' => {
 			long => {
 				'daylight' => q#Horário de Verão da Austrália Central#,
@@ -10761,13 +10866,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Horário de Verão da China#,
 				'generic' => q#Horário da China#,
 				'standard' => q#Horário Padrão da China#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Horário de Verão de Choibalsan#,
-				'generic' => q#Horário de Choibalsan#,
-				'standard' => q#Horário Padrão de Choibalsan#,
 			},
 		},
 		'Christmas' => {
@@ -10939,9 +11037,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Warsaw' => {
 			exemplarCity => q#Varsóvia#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#Zaporizhia#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#Zurique#,
@@ -11153,14 +11248,19 @@ has 'time_zone_names' => (
 				'standard' => q#Horário Padrão de Petropavlovsk-Kamchatski#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Horário do Cazaquistão#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
-				'standard' => q#Horário do Casaquistão Oriental#,
+				'standard' => q#Horário do Cazaquistão Oriental#,
 			},
 		},
 		'Kazakhstan_Western' => {
 			long => {
-				'standard' => q#Horário do Casaquistão Ocidental#,
+				'standard' => q#Horário do Cazaquistão Ocidental#,
 			},
 		},
 		'Korea' => {
@@ -11211,11 +11311,6 @@ has 'time_zone_names' => (
 				'standard' => q#Horário Padrão de Macau#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Horário da Ilha Macquarie#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Horário de Verão de Magadan#,
@@ -11253,13 +11348,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Horário de Mawson#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Horário de Verão do Noroeste do México#,
-				'generic' => q#Horário do Noroeste do México#,
-				'standard' => q#Horário Padrão do Noroeste do México#,
 			},
 		},
 		'Mexico_Pacific' => {

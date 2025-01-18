@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Ka - Package for language Georgian
 
 package Locale::CLDR::Locales::Ka;
 # This file auto generated from Data\common\main\ka.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -404,6 +404,7 @@ has 'display_name_language' => (
  				'bi' => 'ბისლამა',
  				'bin' => 'ბინი',
  				'bla' => 'სიკსიკა',
+ 				'blo' => 'ანიი',
  				'bm' => 'ბამბარა',
  				'bn' => 'ბენგალური',
  				'bo' => 'ტიბეტური',
@@ -611,6 +612,7 @@ has 'display_name_language' => (
  				'kv' => 'კომი',
  				'kw' => 'კორნული',
  				'kwk' => 'კვაკვალა',
+ 				'kxv' => 'კუვი',
  				'ky' => 'ყირგიზული',
  				'la' => 'ლათინური',
  				'lad' => 'ლადინო',
@@ -621,8 +623,10 @@ has 'display_name_language' => (
  				'lez' => 'ლეზგიური',
  				'lg' => 'განდა',
  				'li' => 'ლიმბურგული',
+ 				'lij' => 'ლიგურიული',
  				'lil' => 'ლილიეტი',
  				'lkt' => 'ლაკოტა',
+ 				'lmo' => 'ლომბარდიული',
  				'ln' => 'ლინგალა',
  				'lo' => 'ლაოსური',
  				'lol' => 'მონგო',
@@ -806,6 +810,7 @@ has 'display_name_language' => (
  				'swb' => 'კომორული',
  				'syc' => 'კლასიკური სირიული',
  				'syr' => 'სირიული',
+ 				'szl' => 'სილესიური',
  				'ta' => 'ტამილური',
  				'tce' => 'სამხრეთ ტუჩონი',
  				'te' => 'ტელუგუ',
@@ -847,7 +852,9 @@ has 'display_name_language' => (
  				'uz' => 'უზბეკური',
  				'vai' => 'ვაი',
  				've' => 'ვენდა',
+ 				'vec' => 'ვენეციური',
  				'vi' => 'ვიეტნამური',
+ 				'vmw' => 'მაკჰუვა',
  				'vo' => 'ვოლაპუკი',
  				'vun' => 'ვუნჯო',
  				'wa' => 'ვალონური',
@@ -859,6 +866,7 @@ has 'display_name_language' => (
  				'wuu' => 'ვუ',
  				'xal' => 'ყალმუხური',
  				'xh' => 'ქჰოსა',
+ 				'xnr' => 'კანგრი',
  				'xog' => 'სოგა',
  				'yav' => 'იანგბენი',
  				'ybb' => 'იემბა',
@@ -867,6 +875,7 @@ has 'display_name_language' => (
  				'yrl' => 'ნენგატუ',
  				'yue' => 'კანტონური',
  				'yue@alt=menu' => 'ჩინური, კანტონური',
+ 				'za' => 'ზჰუანგი',
  				'zbl' => 'ბლისსიმბოლოები',
  				'zen' => 'ზენაგა',
  				'zgh' => 'სტანდარტული მაროკოული ტამაზიგხტი',
@@ -2150,6 +2159,18 @@ has 'units' => (
 						'other' => q({0} ნაწილი მილიონზე),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(ნაწილი მილიარდზე),
+						'one' => q({0} ნაწილი მილიარდზე),
+						'other' => q({0} ნაწილი მილიარდზე),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(ნაწილი მილიარდზე),
+						'one' => q({0} ნაწილი მილიარდზე),
+						'other' => q({0} ნაწილი მილიარდზე),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(ლიტრი 100 კილომეტრში),
 						'one' => q({0} ლიტრი 100 კილომეტრში),
@@ -2406,6 +2427,20 @@ has 'units' => (
 						'name' => q(ნანოწამი),
 						'one' => q({0} ნანოწამი),
 						'other' => q({0} ნანოწამი),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(ღამე),
+						'one' => q({0} ღამე),
+						'other' => q({0} ღამე),
+						'per' => q({0}/ღამე),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(ღამე),
+						'one' => q({0} ღამე),
+						'other' => q({0} ღამე),
+						'per' => q({0}/ღამე),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -3778,6 +3813,14 @@ has 'units' => (
 						'other' => q({0} წმ),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(ნ/მ),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(ნ/მ),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'one' => q({0}ლ/100კმ),
 						'other' => q({0}ლ/100კმ),
@@ -3816,6 +3859,20 @@ has 'units' => (
 					# Core Unit Identifier
 					'month' => {
 						'per' => q({0}/თ.),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(ღამე),
+						'one' => q({0} ღამე),
+						'other' => q({0} ღამე),
+						'per' => q({0}/ღამე),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(ღამე),
+						'one' => q({0} ღამე),
+						'other' => q({0} ღამე),
+						'per' => q({0}/ღამე),
 					},
 					# Long Unit Identifier
 					'duration-second' => {
@@ -4454,6 +4511,18 @@ has 'units' => (
 						'name' => q(ნაწილი/მილიონზე),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(ნაწილი/მილიარდზე),
+						'one' => q({0} ნ/მ),
+						'other' => q({0} ნ/მ),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(ნაწილი/მილიარდზე),
+						'one' => q({0} ნ/მ),
+						'other' => q({0} ნ/მ),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(ლ/100კმ),
 						'one' => q({0} ლ/100კმ),
@@ -4738,6 +4807,20 @@ has 'units' => (
 						'name' => q(ნწმ),
 						'one' => q({0} ნწმ),
 						'other' => q({0} ნწმ),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(ღამე),
+						'one' => q({0} ღამე),
+						'other' => q({0} ღამე),
+						'per' => q({0}/ღამე),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(ღამე),
+						'one' => q({0} ღამე),
+						'other' => q({0} ღამე),
+						'per' => q({0}/ღამე),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -8967,9 +9050,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#ნიუ-იორკი#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#ნიპიგონი#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#ნომი#,
 		},
@@ -8990,9 +9070,6 @@ has 'time_zone_names' => (
 		},
 		'America/Panama' => {
 			exemplarCity => q#პანამა#,
-		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#პანგნირტუნგი#,
 		},
 		'America/Paramaribo' => {
 			exemplarCity => q#პარამარიბო#,
@@ -9015,9 +9092,6 @@ has 'time_zone_names' => (
 		'America/Punta_Arenas' => {
 			exemplarCity => q#პუნტა-არენასი#,
 		},
-		'America/Rainy_River' => {
-			exemplarCity => q#რეინი რივერი#,
-		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#რენკინ ინლეტი#,
 		},
@@ -9032,9 +9106,6 @@ has 'time_zone_names' => (
 		},
 		'America/Rio_Branco' => {
 			exemplarCity => q#რიო ბრანკო#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#სანტა ისაბელი#,
 		},
 		'America/Santarem' => {
 			exemplarCity => q#სანტარემი#,
@@ -9081,9 +9152,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#თულე#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#თანდერ ბეი#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#ტიხუანა#,
 		},
@@ -9104,9 +9172,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#იაკუტატი#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#იელოუნაიფი#,
 		},
 		'America_Central' => {
 			long => {
@@ -9260,9 +9325,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#ჩიტა#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#ჩოიბალსანი#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#კოლომბო#,
@@ -9502,9 +9564,6 @@ has 'time_zone_names' => (
 		'Australia/Broken_Hill' => {
 			exemplarCity => q#ბროუკენ ჰილი#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#ქური#,
-		},
 		'Australia/Darwin' => {
 			exemplarCity => q#დარვინი#,
 		},
@@ -9631,13 +9690,6 @@ has 'time_zone_names' => (
 				'daylight' => q#ჩინეთის დროის სარტყელი#,
 				'generic' => q#ჩინეთის დრო#,
 				'standard' => q#ჩინეთის სტანდარტული დრო#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#ჩოიბალსანის ზაფხულის დრო#,
-				'generic' => q#ჩოიბალსანის დრო#,
-				'standard' => q#ჩოიბალსანის სტანდარტული დრო#,
 			},
 		},
 		'Christmas' => {
@@ -9862,9 +9914,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#ულიანოვსკი#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#უჟგოროდი#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#ვადუცი#,
 		},
@@ -9885,9 +9934,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#ზაგრები#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#ზაპოროჟიე#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#ციურიხი#,
@@ -10105,6 +10151,11 @@ has 'time_zone_names' => (
 				'standard' => q#იაპონიის სტანდარტული დრო#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#ყაზახეთის დრო#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#აღმოსავლეთ ყაზახეთის დრო#,
@@ -10151,11 +10202,6 @@ has 'time_zone_names' => (
 				'standard' => q#ლორდ-ჰაუს სტანდარტული დრო#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#მაქკუორის კუნძულის დრო#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#მაგადანის ზაფხულის დრო#,
@@ -10193,13 +10239,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#მოუსონის დრო#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#ჩრდილო-დასავლეთ მექსიკის ზაფხულის დრო#,
-				'generic' => q#ჩრდილო-აღმოსავლეთ მექსიკის დრო#,
-				'standard' => q#ჩრდილო-დასავლეთ მექსიკის დრო#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -10336,9 +10375,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Honolulu' => {
 			exemplarCity => q#ჰონოლულუ#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#ჯონსტონი#,
 		},
 		'Pacific/Kanton' => {
 			exemplarCity => q#კანტონი#,

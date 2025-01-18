@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Pt::Latn::Pt - Package for language Portuguese
 
 package Locale::CLDR::Locales::Pt::Latn::Pt;
 # This file auto generated from Data\common\main\pt_PT.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -988,7 +988,6 @@ has 'display_name_language' => (
  				'gsw' => 'alemão suíço',
  				'ha' => 'haúça',
  				'hi' => 'hindi',
- 				'hi_Latn@alt=variant' => 'hinglish',
  				'hy' => 'arménio',
  				'ikt' => 'inuktitut canadiano ocidental',
  				'kbd' => 'cabardiano',
@@ -1041,8 +1040,10 @@ has 'display_name_language' => (
  				'ttm' => 'tutchone do norte',
  				'tzm' => 'tamazigue do Atlas Central',
  				'uz' => 'usbeque',
+ 				'vec' => 'véneto',
  				'wo' => 'uólofe',
  				'xh' => 'xosa',
+ 				'xnr' => 'kangri',
  				'xog' => 'soga',
  				'yo' => 'ioruba',
  				'zgh' => 'tamazight marroquino padrão',
@@ -1666,6 +1667,18 @@ has 'units' => (
 						'other' => q({0} milimoles por litro),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(partes por mil milhões),
+						'one' => q({0} parte por mil milhões),
+						'other' => q({0} partes por mil milhões),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(partes por mil milhões),
+						'one' => q({0} parte por mil milhões),
+						'other' => q({0} partes por mil milhões),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(litros por 100 quilómetros),
 						'one' => q({0} litro por 100 quilómetros),
@@ -2066,6 +2079,18 @@ has 'units' => (
 						'name' => q(quilates),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(ppmm),
+						'one' => q({0} ppmm),
+						'other' => q({0} ppmm),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(ppmm),
+						'one' => q({0} ppmm),
+						'other' => q({0} ppmm),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'one' => q({0}l/100km),
 						'other' => q({0}l/100km),
@@ -2120,18 +2145,6 @@ has 'units' => (
 						'other' => q({0} pts),
 					},
 					# Long Unit Identifier
-					'graphics-dot-per-inch' => {
-						'name' => q(ppp),
-						'one' => q({0} ppp),
-						'other' => q({0} ppp),
-					},
-					# Core Unit Identifier
-					'dot-per-inch' => {
-						'name' => q(ppp),
-						'one' => q({0} ppp),
-						'other' => q({0} ppp),
-					},
-					# Long Unit Identifier
 					'length-foot' => {
 						'name' => q(pés),
 						'per' => q({0}/pé),
@@ -2140,6 +2153,14 @@ has 'units' => (
 					'foot' => {
 						'name' => q(pés),
 						'per' => q({0}/pé),
+					},
+					# Long Unit Identifier
+					'length-inch' => {
+						'name' => q(pol.),
+					},
+					# Core Unit Identifier
+					'inch' => {
+						'name' => q(pol.),
 					},
 					# Long Unit Identifier
 					'length-meter' => {
@@ -2151,11 +2172,13 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-mile' => {
-						'name' => q(milha),
+						'one' => q({0} mi),
+						'other' => q({0} mi),
 					},
 					# Core Unit Identifier
 					'mile' => {
-						'name' => q(milha),
+						'one' => q({0} mi),
+						'other' => q({0} mi),
 					},
 					# Long Unit Identifier
 					'length-parsec' => {
@@ -2206,16 +2229,6 @@ has 'units' => (
 						'name' => q(″ Hg),
 						'one' => q({0}″ Hg),
 						'other' => q({0}″ Hg),
-					},
-					# Long Unit Identifier
-					'speed-beaufort' => {
-						'one' => q({0} B),
-						'other' => q({0} B),
-					},
-					# Core Unit Identifier
-					'beaufort' => {
-						'one' => q({0} B),
-						'other' => q({0} B),
 					},
 					# Long Unit Identifier
 					'speed-kilometer-per-hour' => {
@@ -2418,6 +2431,18 @@ has 'units' => (
 					# Core Unit Identifier
 					'millimole-per-liter' => {
 						'name' => q(milimole/litro),
+					},
+					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(partes/mil milhões),
+						'one' => q({0} ppmm),
+						'other' => q({0} ppmm),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(partes/mil milhões),
+						'one' => q({0} ppmm),
+						'other' => q({0} ppmm),
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
@@ -4315,17 +4340,6 @@ has 'calendar_days' => (
 						sun => 'dom.'
 					},
 				},
-				'stand-alone' => {
-					short => {
-						mon => 'seg.',
-						tue => 'ter.',
-						wed => 'qua.',
-						thu => 'qui.',
-						fri => 'sex.',
-						sat => 'sáb.',
-						sun => 'dom.'
-					},
-				},
 			},
 	} },
 );
@@ -5256,13 +5270,6 @@ has 'time_zone_names' => (
 				'standard' => q#Hora padrão da China#,
 			},
 		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Hora de verão de Choibalsan#,
-				'generic' => q#Hora de Choibalsan#,
-				'standard' => q#Hora padrão de Choibalsan#,
-			},
-		},
 		'Christmas' => {
 			long => {
 				'standard' => q#Hora da Ilha do Natal#,
@@ -5585,6 +5592,11 @@ has 'time_zone_names' => (
 				'standard' => q#Hora padrão de Petropavlovsk-Kamchatski#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Hora do Cazaquistão#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#Hora do Cazaquistão Oriental#,
@@ -5643,11 +5655,6 @@ has 'time_zone_names' => (
 				'standard' => q#Hora padrão de Macau#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Hora da Ilha Macquarie#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Hora de verão de Magadan#,
@@ -5685,13 +5692,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Hora de Mawson#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Hora de verão do Noroeste do México#,
-				'generic' => q#Hora do Noroeste do México#,
-				'standard' => q#Hora padrão do Noroeste do México#,
 			},
 		},
 		'Mexico_Pacific' => {

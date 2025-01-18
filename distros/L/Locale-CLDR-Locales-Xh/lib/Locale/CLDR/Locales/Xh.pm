@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Xh - Package for language Xhosa
 
 package Locale::CLDR::Locales::Xh;
 # This file auto generated from Data\common\main\xh.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -31,8 +31,8 @@ has 'display_name_language' => (
 	default		=> sub {
 		 sub {
 			 my %languages = (
-				'af' => 'isiBhulu',
- 				'am' => 'Isi-Amharic',
+				'af' => 'IsiBhulu',
+ 				'am' => 'IsiAmharic',
  				'ar' => 'Isi-Arabhu',
  				'ar_001' => 'Isi-Arabhu (Sale mihla)',
  				'as' => 'isiAssamese',
@@ -130,7 +130,7 @@ has 'display_name_language' => (
  				'sk' => 'Isi-Slovak',
  				'sl' => 'Isi-Slovenian',
  				'so' => 'IsiSomaliya',
- 				'sq' => 'Isi-Albania',
+ 				'sq' => 'IsiAlbania',
  				'sr' => 'Isi-Serbia',
  				'st' => 'Sesotho',
  				'su' => 'Isi-Sudanese',
@@ -708,9 +708,9 @@ has 'currencies' => (
 		},
 		'AOA' => {
 			display_name => {
-				'currency' => q(I-Kwanza yase-Angola),
-				'one' => q(I-kwanza yase-Angola),
-				'other' => q(Ii-kwanza zase-Angola),
+				'currency' => q(IKwanza yaseAngola),
+				'one' => q(Ikwanza yaseAngola),
+				'other' => q(Iikwanza zaseAngola),
 			},
 		},
 		'ARS' => {
@@ -855,16 +855,16 @@ has 'currencies' => (
 		},
 		'CDF' => {
 			display_name => {
-				'currency' => q(I-Franc yaseCongo),
-				'one' => q(I-franc yaseCongo),
-				'other' => q(Ii-franc zaseCongo),
+				'currency' => q(IFranc yaseCongo),
+				'one' => q(Ifranc yaseCongo),
+				'other' => q(Iifranc zaseCongo),
 			},
 		},
 		'CHF' => {
 			display_name => {
-				'currency' => q(I-Franc yaseSwitzerland),
-				'one' => q(I-franc yaseSwitzerland),
-				'other' => q(Ii-francs zaseSitzerland),
+				'currency' => q(IFranc yaseSwirtzeland),
+				'one' => q(Ifranc yaseSwitzerland),
+				'other' => q(Iifranc zaseSwitzerland),
 			},
 		},
 		'CLP' => {
@@ -996,7 +996,7 @@ has 'currencies' => (
 		},
 		'FKP' => {
 			display_name => {
-				'currency' => q(Iponti yaseFalkland Islands),
+				'currency' => q(IPonti yaseFalkland Islands),
 				'one' => q(IPonti yaseFalkland Islands),
 				'other' => q(Iiponti zaseFalkland Islands),
 			},
@@ -1017,9 +1017,9 @@ has 'currencies' => (
 		},
 		'GHS' => {
 			display_name => {
-				'currency' => q(I-Cedi yaseGhana),
-				'one' => q(I-cedi yaseGhana),
-				'other' => q(Ii-cedi zaseGhana),
+				'currency' => q(ICedi yaseGhana),
+				'one' => q(Icedi yaseGhana),
+				'other' => q(Iicedi zaseGhana),
 			},
 		},
 		'GIP' => {
@@ -1031,16 +1031,16 @@ has 'currencies' => (
 		},
 		'GMD' => {
 			display_name => {
-				'currency' => q(I-Dalasi yaseGambia),
-				'one' => q(I-dalasi yaseGambia),
-				'other' => q(Ii-dalasi zaseGambia),
+				'currency' => q(IDalasi yaseGambia),
+				'one' => q(Idalasi yaseGambia),
+				'other' => q(Iidalasi zaseGambia),
 			},
 		},
 		'GNF' => {
 			display_name => {
-				'currency' => q(I-Franc yaseGuinea),
-				'one' => q(I-franc yaseGuinea),
-				'other' => q(Ii-franc zaseGuinea),
+				'currency' => q(IFranc yaseGuinea),
+				'one' => q(ifranc yaseGuinea),
+				'other' => q(Iifranc zaseGuinea),
 			},
 		},
 		'GTQ' => {
@@ -1129,9 +1129,9 @@ has 'currencies' => (
 		},
 		'ISK' => {
 			display_name => {
-				'currency' => q(I-Króna yase-Iceland),
-				'one' => q(I-króna yase-Iceland),
-				'other' => q(Ii-krónur zase-Iceland),
+				'currency' => q(IKróna yaseIceland),
+				'one' => q(Ikróna yaseIceland),
+				'other' => q(Iikrónur zaseIceland),
 			},
 		},
 		'JMD' => {
@@ -1368,9 +1368,9 @@ has 'currencies' => (
 		},
 		'NGN' => {
 			display_name => {
-				'currency' => q(I-Naira yaseNigeria),
-				'one' => q(I-naira yaseNigeria),
-				'other' => q(Ii-naira zaseNigeria),
+				'currency' => q(INaira yaseNigeria),
+				'one' => q(Inaira yaseNigeria),
+				'other' => q(Iinaira zaseNigeria),
 			},
 		},
 		'NIO' => {
@@ -1382,9 +1382,9 @@ has 'currencies' => (
 		},
 		'NOK' => {
 			display_name => {
-				'currency' => q(I-Krone yaseNorway),
-				'one' => q(I-krone yaseNorway),
-				'other' => q(Ii-kroner zaseNorway),
+				'currency' => q(IKrone yaseNorway),
+				'one' => q(Ikrone yaseNorway),
+				'other' => q(Iikroner zaseNorway),
 			},
 		},
 		'NPR' => {
@@ -1522,9 +1522,9 @@ has 'currencies' => (
 		},
 		'SEK' => {
 			display_name => {
-				'currency' => q(I-Krona yaseSweden),
-				'one' => q(I-krona yaseSweden),
-				'other' => q(Ii-kronor zaseSweden),
+				'currency' => q(IKrona yaseSweden),
+				'one' => q(Ikrona yaseSweden),
+				'other' => q(Iikronor zaseSweden),
 			},
 		},
 		'SGD' => {
@@ -1578,9 +1578,9 @@ has 'currencies' => (
 		},
 		'STN' => {
 			display_name => {
-				'currency' => q(I-Dobra yaseSão Tomé & Príncipe),
-				'one' => q(I-dobra yaseSão Tomé & Príncipe),
-				'other' => q(Ii-dobra zaseSão Tomé & Príncipe),
+				'currency' => q(IDobra yaseSão Tomé & Príncipe),
+				'one' => q(Idobra yaseSão Tomé & Príncipe),
+				'other' => q(Iidobra zaseSão Tomé & Príncipe),
 			},
 		},
 		'SYP' => {
@@ -1726,9 +1726,9 @@ has 'currencies' => (
 		},
 		'XAF' => {
 			display_name => {
-				'currency' => q(Central African CFA Franc),
-				'one' => q(I-CFA franc yaseCentral Africa),
-				'other' => q(Ii-CFA francs zaseCentral Africa),
+				'currency' => q(ICFA Franc yaseCentral Africa),
+				'one' => q(ICFA franc yaseCentral Africa),
+				'other' => q(IiCFA franc zaseCentral Africa),
 			},
 		},
 		'XCD' => {
@@ -1740,9 +1740,9 @@ has 'currencies' => (
 		},
 		'XOF' => {
 			display_name => {
-				'currency' => q(West African CFA Franc),
-				'one' => q(I-CFA franc yaseWest Africa),
-				'other' => q(Ii-CFA franc zaseWest Africa),
+				'currency' => q(ICFA Franc yaseWest Africa),
+				'one' => q(ICFA franc yaseWest Africa),
+				'other' => q(IiCFA franc zaseWest Africa),
 			},
 		},
 		'XPF' => {
@@ -1755,7 +1755,7 @@ has 'currencies' => (
 		'XXX' => {
 			display_name => {
 				'currency' => q(Ikharensi Engaziwayo),
-				'one' => q(\(ikharensi exabiso lingaziwayo\)),
+				'one' => q(ikharensi engaziwayo),
 				'other' => q(\(ikharensi engaziwayo\)),
 			},
 		},
@@ -1897,7 +1897,7 @@ has 'calendar_days' => (
 						wed => 'Tht',
 						thu => 'Sin',
 						fri => 'Hl',
-						sat => 'Mgq',
+						sat => 'Mg',
 						sun => 'C'
 					},
 					wide => {
@@ -1926,7 +1926,7 @@ has 'calendar_days' => (
 						wed => 'St',
 						thu => 'Sin',
 						fri => 'Hl',
-						sat => 'Mgq',
+						sat => 'Mg',
 						sun => 'C'
 					},
 				},
@@ -2334,9 +2334,6 @@ has 'time_zone_names' => (
 				'standard' => q#Afghanistan Time#,
 			},
 		},
-		'Africa/Sao_Tome' => {
-			exemplarCity => q#São Tomé#,
-		},
 		'Africa_Central' => {
 			long => {
 				'standard' => q#Central Africa Time#,
@@ -2373,23 +2370,14 @@ has 'time_zone_names' => (
 				'standard' => q#Amazon Standard Time#,
 			},
 		},
-		'America/Asuncion' => {
-			exemplarCity => q#Asunción#,
-		},
 		'America/Bahia_Banderas' => {
 			exemplarCity => q#Bahia Banderas#,
 		},
 		'America/Cancun' => {
 			exemplarCity => q#Cancun#,
 		},
-		'America/Curacao' => {
-			exemplarCity => q#Curaçao#,
-		},
 		'America/Merida' => {
 			exemplarCity => q#Merida#,
-		},
-		'America/St_Barthelemy' => {
-			exemplarCity => q#St. Barthélemy#,
 		},
 		'America_Central' => {
 			long => {
@@ -2571,13 +2559,6 @@ has 'time_zone_names' => (
 				'standard' => q#China Standard Time#,
 			},
 		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Choibalsan Summer Time#,
-				'generic' => q#Choibalsan Time#,
-				'standard' => q#Choibalsan Standard Time#,
-			},
-		},
 		'Christmas' => {
 			long => {
 				'standard' => q#Christmas Island Time#,
@@ -2653,9 +2634,6 @@ has 'time_zone_names' => (
 			long => {
 				'daylight' => q#British Summer Time#,
 			},
-		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#Uzhhorod#,
 		},
 		'Europe_Central' => {
 			long => {
@@ -2784,9 +2762,6 @@ has 'time_zone_names' => (
 				'standard' => q#India Standard Time#,
 			},
 		},
-		'Indian/Reunion' => {
-			exemplarCity => q#Réunion#,
-		},
 		'Indian_Ocean' => {
 			long => {
 				'standard' => q#Indian Ocean Time#,
@@ -2840,6 +2815,11 @@ has 'time_zone_names' => (
 				'standard' => q#Japan Standard Time#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Kazakhstan Time#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#East Kazakhstan Time#,
@@ -2886,11 +2866,6 @@ has 'time_zone_names' => (
 				'standard' => q#Lord Howe Standard Time#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Macquarie Island Time#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Magadan Summer Time#,
@@ -2928,13 +2903,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Mawson Time#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Northwest Mexico Daylight Time#,
-				'generic' => q#Northwest Mexico Time#,
-				'standard' => q#Northwest Mexico Standard Time#,
 			},
 		},
 		'Mexico_Pacific' => {

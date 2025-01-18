@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Br - Package for language Breton
 
 package Locale::CLDR::Locales::Br;
 # This file auto generated from Data\common\main\br.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -1227,7 +1227,6 @@ has 'display_name_type' => (
  				'gb2312han' => q{urzh rummañ sinaek eeunaet - GB2312},
  				'phonebook' => q{urzh rummañ al levr-pellgomz},
  				'pinyin' => q{urzh rummañ pinyin},
- 				'reformed' => q{urzh rummañ adreizhet},
  				'search' => q{enklask hollek},
  				'standard' => q{urzh rummañ standart},
  				'stroke' => q{urzh rummañ an tresoù},
@@ -13109,13 +13108,6 @@ has 'time_zone_names' => (
 				'standard' => q#eur cʼhoañv Sina#,
 			},
 		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#eur hañv Choibalsan#,
-				'generic' => q#eur Choibalsan#,
-				'standard' => q#eur cʼhoañv Choibalsan#,
-			},
-		},
 		'Christmas' => {
 			long => {
 				'standard' => q#eur Enez Christmas#,
@@ -13518,11 +13510,6 @@ has 'time_zone_names' => (
 				'standard' => q#eur cʼhoañv Macau#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#eur Enez Macquarie#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#eur hañv Magadan#,
@@ -13560,13 +13547,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#eur Mawson#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#eur hañv Gwalarn Mecʼhiko#,
-				'generic' => q#eur Gwalarn Mecʼhiko#,
-				'standard' => q#eur cʼhoañv Gwalarn Mecʼhiko#,
 			},
 		},
 		'Mexico_Pacific' => {

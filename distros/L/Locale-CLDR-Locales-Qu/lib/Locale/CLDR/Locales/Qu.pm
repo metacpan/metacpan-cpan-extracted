@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Qu - Package for language Quechua
 
 package Locale::CLDR::Locales::Qu;
 # This file auto generated from Data\common\main\qu.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -48,6 +48,10 @@ has 'algorithmic_number_format_data' => (
 					base_value => q(0),
 					divisor => q(1),
 					rule => q(chusaq),
+				},
+				'x.x' => {
+					divisor => q(1),
+					rule => q(←← comma →→),
 				},
 				'1' => {
 					base_value => q(1),
@@ -147,13 +151,9 @@ has 'algorithmic_number_format_data' => (
 					divisor => q(1),
 					rule => q(mana yupay),
 				},
-				'x.x' => {
-					divisor => q(1),
-					rule => q(←← comma →→),
-				},
 				'max' => {
 					divisor => q(1),
-					rule => q(←← comma →→),
+					rule => q(mana yupay),
 				},
 			},
 		},
@@ -258,6 +258,7 @@ has 'display_name_language' => (
  				'ann' => 'Obolo Simi',
  				'anp' => 'Angika',
  				'ar' => 'Arabe Simi',
+ 				'ar_001' => 'Musuq Estandar Arabe Simi',
  				'arn' => 'Mapuche Simi',
  				'arp' => 'Arapaho',
  				'ars' => 'Árabe Najdi Simi',
@@ -718,7 +719,6 @@ has 'display_name_script' => (
  			'Hebr' => 'Hebreo Simi',
  			'Hira' => 'Hiragana',
  			'Hrkt' => 'Japones silabico sananpakuna',
- 			'Jamo' => 'Jamo',
  			'Jpan' => 'Japones Simi',
  			'Kana' => 'Katakana',
  			'Khmr' => 'Khmer',
@@ -3524,14 +3524,14 @@ has 'currencies' => (
 		},
 		'SLE' => {
 			display_name => {
-				'currency' => q(Leone de Sierra Leona),
-				'other' => q(Leone de sierra leona),
+				'currency' => q(Leone qullqi de Sierra Leona),
+				'other' => q(Leone qullqi de Sierra Leona),
 			},
 		},
 		'SLL' => {
 			display_name => {
-				'currency' => q(Leone de Sierra Leona \(1964—2022\)),
-				'other' => q(Leone de sierra leona \(1964—2022\)),
+				'currency' => q(Leone qullqi de Sierra Leona \(1964–2022\)),
+				'other' => q(Leones qullqi de Sierra Leona \(1964–2022\)),
 			},
 		},
 		'SOS' => {
@@ -4475,9 +4475,6 @@ has 'time_zone_names' => (
 		'Australia/Adelaide' => {
 			exemplarCity => q#Adelaida#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#Currie#,
-		},
 		'Australia/Sydney' => {
 			exemplarCity => q#Sidney#,
 		},
@@ -4583,13 +4580,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Hora de Verano de China#,
 				'generic' => q#Hora de China#,
 				'standard' => q#Hora Estandar de China#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Hora de Verano de Choybalsan#,
-				'generic' => q#Hora de Choybalsan#,
-				'standard' => q#Hora Estandar de Choybalsan#,
 			},
 		},
 		'Christmas' => {
@@ -4909,6 +4899,11 @@ has 'time_zone_names' => (
 				'standard' => q#Hora Estandar de Japón#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Hora de Kazajistán#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#Hora de Kazajistán Oriental#,
@@ -4955,11 +4950,6 @@ has 'time_zone_names' => (
 				'standard' => q#Hora Estandar de Lord Howe#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Hora de Isla Macquarie#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Hora de Verano de Magadan#,
@@ -4997,13 +4987,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Hora de Mawson#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Hora de Verano del Noroeste de México#,
-				'generic' => q#Hora Estandar de Verano de México#,
-				'standard' => q#Hora Estandar del Noroeste de México#,
 			},
 		},
 		'Mexico_Pacific' => {

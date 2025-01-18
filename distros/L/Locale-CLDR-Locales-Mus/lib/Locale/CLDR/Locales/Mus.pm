@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Mus - Package for language Muscogee
 
 package Locale::CLDR::Locales::Mus;
 # This file auto generated from Data\common\main\mus.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -63,9 +63,9 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{[b d ē g j q z]},
+			auxiliary => qr{[b d g j q z]},
 			index => ['A', 'C', 'E', 'F', 'H', 'I', 'K', 'L', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'Y'],
-			main => qr{[a c e f h i k l m n o p r s t u v w y ʼ]},
+			main => qr{[a c eē f h i k l m n o p r s t u v w y ʼ]},
 			punctuation => qr{[\- ‐‑ – — , ; \: ! ? . … '‘’ "“” ( ) \[ \] § @ * / \& # † ‡ ′ ″]},
 		};
 	},
@@ -202,8 +202,8 @@ has 'calendar_days' => (
 						wed => 'Ennvrkvpv',
 						thu => 'Ennvrkvpv Enhvyvtke',
 						fri => 'Nak Okkoskv Nettv',
-						sat => 'Nettv Cakcuse',
-						sun => 'Nettv Cako'
+						sat => 'Nettv Cakʼcuse',
+						sun => 'Nettvʼcako'
 					},
 				},
 			},

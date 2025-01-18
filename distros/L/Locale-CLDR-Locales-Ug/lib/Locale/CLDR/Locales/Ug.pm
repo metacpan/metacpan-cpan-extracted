@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Ug - Package for language Uyghur
 
 package Locale::CLDR::Locales::Ug;
 # This file auto generated from Data\common\main\ug.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -1260,6 +1260,7 @@ has 'characters' => (
 			auxiliary => qr{[‎‏ ئ]},
 			index => ['{ئا}', '{ئه}', '{ئو}', '{ئۇ}', '{ئۆ}', '{ئۈ}', '{ئې}', '{ئى}', 'ا', 'ە', 'ب', 'پ', 'ت', 'ج', 'چ', 'خ', 'د', 'ر', 'ز', 'ژ', 'س', 'ش', 'غ', 'ف', 'ق', 'ك', 'گ', 'ڭ', 'ل', 'م', 'ن', 'ھ', 'و', 'ۇ', 'ۆ', 'ۈ', 'ۋ', 'ې', 'ى', 'ي'],
 			main => qr{[{ئا} {ئه} {ئو} {ئۇ} {ئۆ} {ئۈ} {ئې} {ئى} ا ە ب پ ت ج چ خ د ر ز ژ س ش غ ف ق ك گ ڭ ل م ن ھ و ۇ ۆ ۈ ۋ ې ى ي]},
+			punctuation => qr{[\- ‑ , ; \: ! ? . ‹ › « » ( ) \[ \] \{ \}]},
 		};
 	},
 EOT
@@ -4932,13 +4933,6 @@ has 'time_zone_names' => (
 				'standard' => q#جۇڭگو ئۆلچەملىك ۋاقتى#,
 			},
 		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#چويبالسان يازلىق ۋاقتى#,
-				'generic' => q#چويبالسان ۋاقتى#,
-				'standard' => q#چويبالسان ئۆلچەملىك ۋاقتى#,
-			},
-		},
 		'Christmas' => {
 			long => {
 				'standard' => q#روژدېستۋو ئارىلى ۋاقتى#,
@@ -5258,11 +5252,6 @@ has 'time_zone_names' => (
 				'standard' => q#ئاۋمېن ئۆلچەملىك ۋاقتى#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#ماككۇۋارى ئاراللىرى ۋاقتى#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#ماگادان يازلىق ۋاقتى#,
@@ -5300,13 +5289,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#ماۋسون ۋاقتى#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#مېكسىكا غەربىي شىمالىي قىسىم يازلىق ۋاقتى#,
-				'generic' => q#مېكسىكا غەربىي شىمالىي قىسىم ۋاقتى#,
-				'standard' => q#مېكسىكا غەربىي شىمالىي قىسىم ئۆلچەملىك ۋاقتى#,
 			},
 		},
 		'Mexico_Pacific' => {

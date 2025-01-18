@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Pcm - Package for language Nigerian Pidgin
 
 package Locale::CLDR::Locales::Pcm;
 # This file auto generated from Data\common\main\pcm.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -65,10 +65,12 @@ has 'display_name_language' => (
  				'bem' => 'Bẹ́mba Lángwej',
  				'bez' => 'Bẹ́na Lángwej',
  				'bg' => 'Bọlgériá Lángwej',
+ 				'bgc' => 'Haryanvi Lángwej',
  				'bho' => 'Bhojpúri',
  				'bi' => 'Bisláma',
  				'bin' => 'Biní',
  				'bla' => 'Siksíká Lángwej',
+ 				'blo' => 'Anii Lángwej',
  				'bm' => 'Bambára Lángwej',
  				'bn' => 'Bángla Lángwej',
  				'bo' => 'Tibẹ́tan',
@@ -115,7 +117,7 @@ has 'display_name_language' => (
  				'de_CH' => 'Swítzaland Haí Jámán',
  				'dgr' => 'Dọgríb Lángwej',
  				'dje' => 'Zármá',
- 				'doi' => 'Dogri',
+ 				'doi' => 'Dọgri',
  				'dsb' => 'Lówá Sorbiá',
  				'dua' => 'Duála Lángwej',
  				'dv' => 'Divẹhí',
@@ -192,6 +194,7 @@ has 'display_name_language' => (
  				'iba' => 'Iban Lángwej',
  				'ibb' => 'Ibibio Lángwej',
  				'id' => 'Indoníshia Lángwej',
+ 				'ie' => 'Intalíngwe Lángwej',
  				'ig' => 'Igbo Lángwej',
  				'ii' => 'Síchuan Yi',
  				'ikt' => 'Wẹ́stán Kánádá Inuktítut',
@@ -244,6 +247,7 @@ has 'display_name_language' => (
  				'kv' => 'Komi Lángwej',
  				'kw' => 'Kọ́nish Lángwej',
  				'kwk' => 'Kwakwála Lángwej',
+ 				'kxv' => 'Kuvi Lángwej',
  				'ky' => 'Kiẹ́gíz Lángwej',
  				'la' => 'Látín Lángwej',
  				'lad' => 'Ladíno Lángwej',
@@ -252,8 +256,10 @@ has 'display_name_language' => (
  				'lez' => 'Lẹzghián Lángwej',
  				'lg' => 'Gánda Lángwej',
  				'li' => 'Limbógísh Lángwej',
+ 				'lij' => 'Ligurián Lángwej',
  				'lil' => 'Lillooẹ́t Lángwej',
  				'lkt' => 'Lakótá Lángwej',
+ 				'lmo' => 'Lombárd Lángwej',
  				'ln' => 'Lingálá Lángwej',
  				'lo' => 'Láo Lángwej',
  				'lou' => 'Kriol fọ Luisiána',
@@ -350,6 +356,7 @@ has 'display_name_language' => (
  				'pt_BR' => 'Brazíl Pọtiugíz',
  				'pt_PT' => 'Yúróp Pọtiugíz',
  				'qu' => 'Kẹchuá',
+ 				'raj' => 'Rajástháni Lángwej',
  				'rap' => 'Rapánui Lángwej',
  				'rar' => 'Rarotóngan',
  				'rhg' => 'Rohínjia',
@@ -400,6 +407,7 @@ has 'display_name_language' => (
  				'sw' => 'Swahíli',
  				'swb' => 'Komória Lángwej',
  				'syr' => 'Síriák Lángwej',
+ 				'szl' => 'Silesián Lángwej',
  				'ta' => 'tàmil',
  				'tce' => 'Saútán Tutchónẹ Lángwej',
  				'te' => 'Tẹlugu',
@@ -439,7 +447,9 @@ has 'display_name_language' => (
  				'uz' => 'Úzbẹk',
  				'vai' => 'Vaí',
  				've' => 'Vẹ́nda Lángwej',
+ 				'vec' => 'Venetián Lángwej',
  				'vi' => 'Viẹ́tnám Lángwej',
+ 				'vmw' => 'Mákhuwá Lángwej',
  				'vo' => 'Vólapiuk',
  				'vun' => 'Vúnjo',
  				'wa' => 'Wálun Lángwej',
@@ -450,6 +460,7 @@ has 'display_name_language' => (
  				'wuu' => 'Wu Chainiz',
  				'xal' => 'Kalmik',
  				'xh' => 'Kọ́sa',
+ 				'xnr' => 'Kangri Lángwej',
  				'xog' => 'sóga',
  				'yav' => 'Yangbẹn',
  				'ybb' => 'Yẹmba Lángwej',
@@ -458,6 +469,7 @@ has 'display_name_language' => (
  				'yrl' => 'Nhiingátu Lángwej',
  				'yue' => 'Kántọn Lángwej',
  				'yue@alt=menu' => 'Chainiz Kántọniz',
+ 				'za' => 'Zhuáng Lángwej',
  				'zgh' => 'Gẹ́nárál Morókó Támazígt Lángwej',
  				'zh' => 'Mandarín Chainíz Lángwej',
  				'zh@alt=menu' => 'Chainiz, Mandarin',
@@ -516,14 +528,14 @@ has 'display_name_script' => (
  			'Khmr' => 'Kemẹẹ',
  			'Knda' => 'Kánnad Raítín Sístẹm',
  			'Kore' => 'Koria',
- 			'Laoo' => 'Lao',
+ 			'Laoo' => 'Láo',
  			'Latn' => 'Látin',
  			'Mlym' => 'Maléyálam',
  			'Mong' => 'Mọngólia',
  			'Mtei' => 'Mẹitẹí Mayẹk Lángwej',
  			'Mymr' => 'Miánmar',
  			'Nkoo' => 'N’Ko Lángwej',
- 			'Olck' => 'Ol Chiki',
+ 			'Olck' => 'Ol Chíkí',
  			'Orya' => 'Ódia',
  			'Rohg' => 'Hanífi Lángwej',
  			'Sinh' => 'Sinhála',
@@ -693,7 +705,7 @@ has 'display_name_region' => (
  			'GR' => 'Gris',
  			'GS' => 'Saút Jọ́jia an Saút Sándwích Aílands',
  			'GT' => 'Guátẹmála',
- 			'GU' => 'Guam',
+ 			'GU' => 'Guám',
  			'GW' => 'Gíní-Bisáu',
  			'GY' => 'Gayána',
  			'HK' => 'Họng Kọng SAR',
@@ -710,14 +722,15 @@ has 'display_name_region' => (
  			'IM' => 'Aíl ọf Man',
  			'IN' => 'Índia',
  			'IO' => 'Brítísh Índián Óshen Tẹ́rẹ́tri',
+ 			'IO@alt=chagos' => 'Chágos Archipelágo',
  			'IQ' => 'Irak',
- 			'IR' => 'Iran',
+ 			'IR' => 'Irán',
  			'IS' => 'Aísland',
  			'IT' => 'Ítáli',
  			'JE' => 'Jẹ́si',
  			'JM' => 'Jamaíka',
  			'JO' => 'Jọ́dan',
- 			'JP' => 'Japan',
+ 			'JP' => 'Japán',
  			'KE' => 'Kẹ́nya',
  			'KG' => 'Kẹjístan',
  			'KH' => 'Kambódia',
@@ -729,7 +742,7 @@ has 'display_name_region' => (
  			'KW' => 'Kuwét',
  			'KY' => 'Kéman Aílands',
  			'KZ' => 'Kazakstan',
- 			'LA' => 'Laos',
+ 			'LA' => 'Láos',
  			'LB' => 'Lẹ́bánọn',
  			'LC' => 'Sent Lúshia',
  			'LI' => 'Líktẹ́nstain',
@@ -776,7 +789,7 @@ has 'display_name_region' => (
  			'NR' => 'Náuru',
  			'NU' => 'Niúẹ',
  			'NZ' => 'Niú Zíland',
- 			'OM' => 'Oman',
+ 			'OM' => 'Omán',
  			'PA' => 'Pánáma',
  			'PE' => 'Pẹ́ru',
  			'PF' => 'Frẹ́nch Poliníshia',
@@ -790,7 +803,7 @@ has 'display_name_region' => (
  			'PS' => 'Pálẹ́staín Éria-dẹm',
  			'PS@alt=short' => 'Pálẹ́stain',
  			'PT' => 'Pọ́túgal',
- 			'PW' => 'Palau',
+ 			'PW' => 'Paláu',
  			'PY' => 'Párágwue',
  			'QA' => 'Kata',
  			'QO' => 'Rimót Pát ọf Oshẹ́nia',
@@ -802,7 +815,7 @@ has 'display_name_region' => (
  			'SA' => 'Saúdí Arébia',
  			'SB' => 'Sólómọ́n Aílands',
  			'SC' => 'Sẹ́chẹls',
- 			'SD' => 'Sudan',
+ 			'SD' => 'Sudán',
  			'SE' => 'Swídẹn',
  			'SG' => 'Singapọ',
  			'SH' => 'Sent Hẹlẹ́na',
@@ -823,7 +836,7 @@ has 'display_name_region' => (
  			'SZ@alt=variant' => 'Swáziland',
  			'TA' => 'Trístán da Kúna',
  			'TC' => 'Tọks an Kaíkọ́s Aílands',
- 			'TD' => 'Chad',
+ 			'TD' => 'Chád',
  			'TF' => 'Frẹ́nch Saútán Tẹ́rẹ́tris',
  			'TG' => 'Tógo',
  			'TH' => 'Taíland',
@@ -836,7 +849,7 @@ has 'display_name_region' => (
  			'TR' => 'Tọ́ki',
  			'TT' => 'Trínídad & Tobágo',
  			'TV' => 'Tuválu',
- 			'TW' => 'Taiwan',
+ 			'TW' => 'Taíwán',
  			'TZ' => 'Tanzánia',
  			'UA' => 'Yukrein',
  			'UG' => 'Yugánda',
@@ -905,7 +918,7 @@ has 'display_name_type' => (
  				'hebrew' => q{Híbrú Kalẹ́nda},
  				'islamic' => q{Íslám Kalẹ́nda},
  				'islamic-civil' => q{Íslám Kalẹ́nda (Tébúlá Taip an Sívúl Taip)},
- 				'islamic-umalqura' => q{Íslám Kalẹ́nda (Úmm al-Kúra)},
+ 				'islamic-umalqura' => q{Íslám Kalẹ́nda (Úmm al-Kúrá)},
  				'iso8601' => q{ISO-8601 Kalẹ́nda},
  				'japanese' => q{Japán Kalẹ́nda},
  				'persian' => q{Pẹ́shia Kalẹ́nda},
@@ -1539,6 +1552,18 @@ has 'units' => (
 						'other' => q({0} Fọ Ích Tẹ́n Taúzan),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(pat fọ ích bíliọn),
+						'one' => q({0} pat fọ ích bíliọn),
+						'other' => q({0} pat fọ ích bíliọn),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(pat fọ ích bíliọn),
+						'one' => q({0} pat fọ ích bíliọn),
+						'other' => q({0} pat fọ ích bíliọn),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(Líta-dẹm Fọ Ẹ́vrí 100 Kilómíta),
 						'one' => q({0} Líta Fọ Ẹ́vrí 100 Kilómíta),
@@ -1823,6 +1848,20 @@ has 'units' => (
 						'name' => q(Nánosẹ́kọn-dẹm),
 						'one' => q({0} Nánosẹ́kọn),
 						'other' => q({0} Nánosẹ́kọn),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(nait),
+						'one' => q({0} nait),
+						'other' => q({0} nait),
+						'per' => q({0}/nait),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(nait),
+						'one' => q({0} nait),
+						'other' => q({0} nait),
+						'per' => q({0}/nait),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -2927,6 +2966,18 @@ has 'units' => (
 						'name' => q(Nọt-dẹm),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(laít),
+						'one' => q({0} laít),
+						'other' => q({0} laít),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(laít),
+						'one' => q({0} laít),
+						'other' => q({0} laít),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'name' => q(Míta-dẹm Fọ Ẹ́vrí Sẹ́kọn),
 						'one' => q({0} Míta Fọ Ẹ́vrí Sẹ́kọn),
@@ -3479,6 +3530,18 @@ has 'units' => (
 						'name' => q(‱),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(pfib),
+						'one' => q({0}pfib),
+						'other' => q({0}pfib),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(pfib),
+						'one' => q({0}pfib),
+						'other' => q({0}pfib),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(L/100km),
 						'one' => q({0}L/100km),
@@ -3683,6 +3746,20 @@ has 'units' => (
 						'other' => q({0}Mọnt),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(nait),
+						'one' => q({0}nait),
+						'other' => q({0}nait),
+						'per' => q({0}/nait),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(nait),
+						'one' => q({0}nait),
+						'other' => q({0}nait),
+						'per' => q({0}/nait),
+					},
+					# Long Unit Identifier
 					'duration-second' => {
 						'name' => q(Sẹ́kọn),
 						'one' => q({0}Sẹ́kọn),
@@ -3829,6 +3906,18 @@ has 'units' => (
 					# Core Unit Identifier
 					'kilometer-per-hour' => {
 						'name' => q(km/áw),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(laít),
+						'one' => q({0}laít),
+						'other' => q({0}laít),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(laít),
+						'one' => q({0}laít),
+						'other' => q({0}laít),
 					},
 					# Long Unit Identifier
 					'temperature-celsius' => {
@@ -4267,6 +4356,18 @@ has 'units' => (
 						'name' => q(Fọ Ích Tẹ́n Taúzan),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(pat/bíliọn),
+						'one' => q({0} pfib),
+						'other' => q({0} pfib),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(pat/bíliọn),
+						'one' => q({0} pfib),
+						'other' => q({0} pfib),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(L/100 km),
 						'one' => q({0} L/100 km),
@@ -4531,6 +4632,20 @@ has 'units' => (
 						'name' => q(Nánosẹ́kọns),
 						'one' => q({0} Nansẹk),
 						'other' => q({0} Nansẹk),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(nait),
+						'one' => q({0} nait),
+						'other' => q({0} nait),
+						'per' => q({0}/nait),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(nait),
+						'one' => q({0} nait),
+						'other' => q({0} nait),
+						'per' => q({0}/nait),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -5181,6 +5296,18 @@ has 'units' => (
 						'name' => q(Nọt),
 						'one' => q({0} Nọt),
 						'other' => q({0} Nọt),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(laít),
+						'one' => q({0} laít),
+						'other' => q({0} laít),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(laít),
+						'one' => q({0} laít),
+						'other' => q({0} laít),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -7421,7 +7548,10 @@ has 'time_zone_names' => (
 			exemplarCity => q#Sálta#,
 		},
 		'America/Argentina/San_Juan' => {
-			exemplarCity => q#San Hwan#,
+			exemplarCity => q#Sán Hwán#,
+		},
+		'America/Argentina/San_Luis' => {
+			exemplarCity => q#Sán Luis#,
 		},
 		'America/Argentina/Tucuman' => {
 			exemplarCity => q#Túkúman#,
@@ -7687,9 +7817,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#Niú Yọk#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#Nípígọn#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#Noom#,
 		},
@@ -7711,9 +7838,6 @@ has 'time_zone_names' => (
 		'America/Panama' => {
 			exemplarCity => q#Pánáma#,
 		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#Pangnírtung#,
-		},
 		'America/Paramaribo' => {
 			exemplarCity => q#Párámaribo#,
 		},
@@ -7734,9 +7858,6 @@ has 'time_zone_names' => (
 		},
 		'America/Punta_Arenas' => {
 			exemplarCity => q#Púntá Arẹ́nas#,
-		},
-		'America/Rainy_River' => {
-			exemplarCity => q#Réní Ríva#,
 		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#Ránkín Ínlẹt#,
@@ -7795,9 +7916,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#Túli#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#Tọ́nda Bè#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#Tikhuána#,
 		},
@@ -7818,9 +7936,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#Yakútat#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#Yẹ́lónaif#,
 		},
 		'America_Central' => {
 			long => {
@@ -7951,6 +8066,9 @@ has 'time_zone_names' => (
 		'Asia/Bahrain' => {
 			exemplarCity => q#Bahrén#,
 		},
+		'Asia/Baku' => {
+			exemplarCity => q#Báku#,
+		},
 		'Asia/Bangkok' => {
 			exemplarCity => q#Bánkọk#,
 		},
@@ -7971,9 +8089,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#Chítá#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#Choibálsan#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#Kolómbo#,
@@ -8198,9 +8313,6 @@ has 'time_zone_names' => (
 		'Australia/Broken_Hill' => {
 			exemplarCity => q#Brókún Hil#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#Kọ́ri#,
-		},
 		'Australia/Darwin' => {
 			exemplarCity => q#Dárwin#,
 		},
@@ -8327,13 +8439,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Chaína Délaít Taim#,
 				'generic' => q#Chaína Taim#,
 				'standard' => q#Chaína Fíksd Taim#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Choibálsan Họ́t Sízin Taim#,
-				'generic' => q#Choibálsan Taim#,
-				'standard' => q#Choibálsan Fíksd Taim#,
 			},
 		},
 		'Christmas' => {
@@ -8552,9 +8657,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#Uliánọvsk#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#Ọ́zhọrọd#,
-		},
 		'Europe/Vatican' => {
 			exemplarCity => q#Vátíkan#,
 		},
@@ -8572,9 +8674,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#Zágrẹb#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#Zaporózhia#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#Zúrik#,
@@ -8792,6 +8891,11 @@ has 'time_zone_names' => (
 				'standard' => q#Japan Fíksd Taim#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Kazékstan Taim#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#Íst Kazékstan Taim#,
@@ -8838,11 +8942,6 @@ has 'time_zone_names' => (
 				'standard' => q#Lọd Haú Fíksd Taim#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Makwuéí Aíland Taim#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Mágádan Họ́t Sízin Taim#,
@@ -8880,13 +8979,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Mọ́sọn Taim#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Nọ́twẹ́st Mẹ́ksíko Délaít Taim#,
-				'generic' => q#Nọ́twẹ́st Mẹ́ksíko Taim#,
-				'standard' => q#Nọ́twẹ́st Mẹ́ksíko Fíksd Taim#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -9017,9 +9109,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Guadalcanal' => {
 			exemplarCity => q#Guádálkanal#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#Jọ́nstun#,
 		},
 		'Pacific/Kiritimati' => {
 			exemplarCity => q#Kritímáti#,

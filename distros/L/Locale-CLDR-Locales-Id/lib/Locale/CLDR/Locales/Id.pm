@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Id - Package for language Indonesian
 
 package Locale::CLDR::Locales::Id;
 # This file auto generated from Data\common\main\id.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -65,7 +65,11 @@ has 'algorithmic_number_format_data' => (
 				'0' => {
 					base_value => q(0),
 					divisor => q(1),
-					rule => q(kosong),
+					rule => q(nol),
+				},
+				'x,x' => {
+					divisor => q(1),
+					rule => q(←← koma →→),
 				},
 				'x.x' => {
 					divisor => q(1),
@@ -234,9 +238,20 @@ has 'algorithmic_number_format_data' => (
 					divisor => q(1),
 					rule => q(=#,##0.#=),
 				},
-				'max' => {
+				'1' => {
+					base_value => q(1),
 					divisor => q(1),
-					rule => q(=#,##0.#=),
+					rule => q(pertama),
+				},
+				'2' => {
+					base_value => q(2),
+					divisor => q(1),
+					rule => q(ke=%spellout-cardinal=),
+				},
+				'max' => {
+					base_value => q(2),
+					divisor => q(1),
+					rule => q(ke=%spellout-cardinal=),
 				},
 			},
 		},
@@ -316,6 +331,7 @@ has 'display_name_language' => (
  				'bjn' => 'Banjar',
  				'bkm' => 'Kom',
  				'bla' => 'Siksika',
+ 				'blo' => 'Anii',
  				'bm' => 'Bambara',
  				'bn' => 'Bengali',
  				'bo' => 'Tibet',
@@ -362,7 +378,7 @@ has 'display_name_language' => (
  				'crm' => 'Moose Cree',
  				'crr' => 'Carolina Algonquian',
  				'crs' => 'Seselwa Kreol Prancis',
- 				'cs' => 'Cheska',
+ 				'cs' => 'Ceko',
  				'csb' => 'Kashubia',
  				'csw' => 'Cree Rawa',
  				'cu' => 'Bahasa Gereja Slavonia',
@@ -402,7 +418,7 @@ has 'display_name_language' => (
  				'eo' => 'Esperanto',
  				'es' => 'Spanyol',
  				'es_ES' => 'Spanyol (Eropa)',
- 				'et' => 'Esti',
+ 				'et' => 'Estonia',
  				'eu' => 'Basque',
  				'ewo' => 'Ewondo',
  				'fa' => 'Persia',
@@ -537,6 +553,7 @@ has 'display_name_language' => (
  				'kv' => 'Komi',
  				'kw' => 'Kornish',
  				'kwk' => 'Kwakʼwala',
+ 				'kxv' => 'Kuvi',
  				'ky' => 'Kirgiz',
  				'la' => 'Latin',
  				'lad' => 'Ladino',
@@ -558,7 +575,7 @@ has 'display_name_language' => (
  				'loz' => 'Lozi',
  				'lrc' => 'Luri Utara',
  				'lsm' => 'Saamia',
- 				'lt' => 'Lituavi',
+ 				'lt' => 'Lituania',
  				'lu' => 'Luba-Katanga',
  				'lua' => 'Luba-Lulua',
  				'lui' => 'Luiseno',
@@ -566,7 +583,7 @@ has 'display_name_language' => (
  				'luo' => 'Luo',
  				'lus' => 'Mizo',
  				'luy' => 'Luyia',
- 				'lv' => 'Latvi',
+ 				'lv' => 'Latvia',
  				'lzz' => 'Laz',
  				'mad' => 'Madura',
  				'maf' => 'Mafa',
@@ -718,7 +735,7 @@ has 'display_name_language' => (
  				'si' => 'Sinhala',
  				'sid' => 'Sidamo',
  				'sk' => 'Slovak',
- 				'sl' => 'Sloven',
+ 				'sl' => 'Slovenia',
  				'slh' => 'Lushootseed Selatan',
  				'sli' => 'Silesia Rendah',
  				'sly' => 'Selayar',
@@ -804,6 +821,7 @@ has 'display_name_language' => (
  				've' => 'Venda',
  				'vec' => 'Venesia',
  				'vi' => 'Vietnam',
+ 				'vmw' => 'Makhuwa',
  				'vo' => 'Volapuk',
  				'vot' => 'Votia',
  				'vun' => 'Vunjo',
@@ -817,6 +835,7 @@ has 'display_name_language' => (
  				'wuu' => 'Wu Tionghoa',
  				'xal' => 'Kalmuk',
  				'xh' => 'Xhosa',
+ 				'xnr' => 'Kangri',
  				'xog' => 'Soga',
  				'yao' => 'Yao',
  				'yap' => 'Yapois',
@@ -860,7 +879,6 @@ has 'display_name_script' => (
 			'Adlm' => 'Adlam',
  			'Afak' => 'Afaka',
  			'Aghb' => 'Albania Kaukasia',
- 			'Arab' => 'Arab',
  			'Arab@alt=variant' => 'Arab Persia',
  			'Aran' => 'Nastaliq',
  			'Armi' => 'Aram Imperial',
@@ -927,7 +945,6 @@ has 'display_name_script' => (
  			'Hung' => 'Hungaria Kuno',
  			'Inds' => 'Indus',
  			'Ital' => 'Italia Lama',
- 			'Jamo' => 'Jamo',
  			'Java' => 'Jawa',
  			'Jpan' => 'Jepang',
  			'Jurc' => 'Jurchen',
@@ -1031,7 +1048,6 @@ has 'display_name_script' => (
  			'Tfng' => 'Tifinagh',
  			'Tglg' => 'Tagalog',
  			'Thaa' => 'Thaana',
- 			'Thai' => 'Thai',
  			'Tibt' => 'Tibet',
  			'Tirh' => 'Tirhuta',
  			'Tnsa' => 'Tangsa',
@@ -1542,7 +1558,6 @@ has 'display_name_type' => (
  				'phonebook' => q{Aturan Pengurutan Buku Telepon},
  				'phonetic' => q{Aturan Pengurutan Fonetik},
  				'pinyin' => q{Aturan Pengurutan Pinyin},
- 				'reformed' => q{Aturan Pengurutan yang Diubah Bentuknya},
  				'search' => q{Pencarian Tujuan Umum},
  				'searchjl' => q{Pencarian Menurut Konsonan Awal Hangul},
  				'standard' => q{Aturan Pengurutan Standar},
@@ -2229,6 +2244,16 @@ has 'units' => (
 						'other' => q({0} permyriad),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(bagian per miliar),
+						'other' => q({0} bagian per miliar),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(bagian per miliar),
+						'other' => q({0} bagian per miliar),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(liter per 100 kilometer),
 						'other' => q({0} liter per 100 kilometer),
@@ -2453,6 +2478,18 @@ has 'units' => (
 					'nanosecond' => {
 						'name' => q(nanodetik),
 						'other' => q({0} nanodetik),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(malam),
+						'other' => q({0} malam),
+						'per' => q({0} per malam),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(malam),
+						'other' => q({0} malam),
+						'per' => q({0} per malam),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -3325,6 +3362,16 @@ has 'units' => (
 						'other' => q({0} knot),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(cahaya),
+						'other' => q({0} cahaya),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(cahaya),
+						'other' => q({0} cahaya),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'name' => q(meter per detik),
 						'other' => q({0} meter per detik),
@@ -3943,6 +3990,18 @@ has 'units' => (
 						'name' => q(TB),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(malam),
+						'other' => q({0} malam),
+						'per' => q({0}/malam),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(malam),
+						'other' => q({0} malam),
+						'per' => q({0}/malam),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'other' => q({0}k),
 					},
@@ -4191,6 +4250,16 @@ has 'units' => (
 					# Core Unit Identifier
 					'kilometer-per-hour' => {
 						'other' => q({0}km/j),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(cahaya),
+						'other' => q({0} cahaya),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(cahaya),
+						'other' => q({0} cahaya),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -4465,6 +4534,14 @@ has 'units' => (
 						'name' => q(permyriad),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(bagian/miliar),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(bagian/miliar),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(L/100 km),
 						'other' => q({0} L/100 km),
@@ -4683,6 +4760,18 @@ has 'units' => (
 					'nanosecond' => {
 						'name' => q(nanodtk),
 						'other' => q({0} ndtk),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(malam),
+						'other' => q({0} malam),
+						'per' => q({0}/malam),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(malam),
+						'other' => q({0} malam),
+						'per' => q({0}/malam),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -5087,6 +5176,16 @@ has 'units' => (
 					'kilometer-per-hour' => {
 						'name' => q(km/jam),
 						'other' => q({0} km/j),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(cahaya),
+						'other' => q({0} cahaya),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(cahaya),
+						'other' => q({0} cahaya),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -8218,9 +8317,6 @@ has 'time_zone_names' => (
 		'America/North_Dakota/New_Salem' => {
 			exemplarCity => q#New Salem, Dakota Utara#,
 		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#Santa Isabel#,
-		},
 		'America_Central' => {
 			long => {
 				'daylight' => q#Waktu Musim Panas Tengah#,
@@ -8379,9 +8475,6 @@ has 'time_zone_names' => (
 		'Atlantic/South_Georgia' => {
 			exemplarCity => q#Georgia Selatan#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#Currie#,
-		},
 		'Australia_Central' => {
 			long => {
 				'daylight' => q#Waktu Musim Panas Tengah Australia#,
@@ -8489,13 +8582,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Waktu Musim Panas Tiongkok#,
 				'generic' => q#Waktu Tiongkok#,
 				'standard' => q#Waktu Standar Tiongkok#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Waktu Musim Panas Choibalsan#,
-				'generic' => q#Waktu Choibalsan#,
-				'standard' => q#Waktu Standar Choibalsan#,
 			},
 		},
 		'Christmas' => {
@@ -8612,9 +8698,6 @@ has 'time_zone_names' => (
 		'Europe/Rome' => {
 			exemplarCity => q#Roma#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#Uzhhorod#,
-		},
 		'Europe/Vatican' => {
 			exemplarCity => q#Vatikan#,
 		},
@@ -8623,9 +8706,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Warsaw' => {
 			exemplarCity => q#Warsawa#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#Zaporizhia#,
 		},
 		'Europe_Central' => {
 			long => {
@@ -8844,6 +8924,11 @@ has 'time_zone_names' => (
 				'standard' => q#Waktu Standar Petropavlovsk-Kamchatsky#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Waktu Kazakhstan#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#Waktu Kazakhstan Timur#,
@@ -8902,11 +8987,6 @@ has 'time_zone_names' => (
 				'standard' => q#Waktu Standar Makau#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Waktu Kepulauan Macquarie#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Waktu Musim Panas Magadan#,
@@ -8944,13 +9024,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Waktu Mawson#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Waktu Musim Panas Meksiko Barat Laut#,
-				'generic' => q#Waktu Meksiko Barat Laut#,
-				'standard' => q#Waktu Standar Meksiko Barat Laut#,
 			},
 		},
 		'Mexico_Pacific' => {

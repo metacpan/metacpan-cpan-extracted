@@ -1,17 +1,17 @@
 package Locale::CLDR::Locales::Root;
 # This file auto generated from Data\common\main\root.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -85,7 +85,7 @@ has 'WordBreak_variables' => (
 		'$Format' => '[\p{Word_Break=Format}]',
 		'$Katakana' => '\p{Word_Break=Katakana}',
 		'$ALetter' => '\p{Word_Break=ALetter}',
-		'$MidLetter' => '[\p{Word_Break = MidLetter} - [\: ﹕ ：]]',
+		'$MidLetter' => '\p{Word_Break=MidLetter}',
 		'$MidNum' => '\p{Word_Break=MidNum}',
 		'$MidNumLet' => '\p{Word_Break=MidNumLet}',
 		'$Numeric' => '\p{Word_Break=Numeric}',
@@ -256,7 +256,12 @@ has 'LineBreak_variables' => (
 		'$ZWJ' => '\p{Line_Break=ZWJ}',
 		'$QU_Pi' => '[$QU & \p{gc=Pi}]',
 		'$QU_Pf' => '[$QU & \p{gc=Pf}]',
+		'$QUmPi' => '[$QU - \p{gc=Pi}]',
+		'$QUmPf' => '[$QU - \p{gc=Pf}]',
+		'$NotEastAsian' => '[^\p{ea=F}\p{ea=W}\p{ea=H}]',
+		'$NonEastAsianBA' => '[$BA & $NotEastAsian]',
 		'$DottedCircle' => '◌',
+		'$Hyphen' => '[‐]',
 		'$CP30' => '[$CP-[\p{ea=F}\p{ea=W}\p{ea=H}]]',
 		'$OP30' => '[$OP-[\p{ea=F}\p{ea=W}\p{ea=H}]]',
 		'$ExtPictUnassigned' => '[\p{Extended_Pictographic}&\p{gc=Cn}]',
@@ -314,10 +319,16 @@ has 'LineBreak_variables' => (
 		'$ZWJ' => '($ZWJ $X)',
 		'$QU_Pi' => '($QU_Pi $X)',
 		'$QU_Pf' => '($QU_Pf $X)',
+		'$QUmPi' => '($QUmPi $X)',
+		'$QUmPf' => '($QUmPf $X)',
+		'$NotEastAsian' => '( $NotEastAsian | [$NotEastAsian - $Spec1_] $X)',
+		'$NonEastAsianBA' => '(NonEastAsianBA $X)',
 		'$DottedCircle' => '($DottedCircle $X)',
+		'$Hyphen' => '($Hyphen $X)',
 		'$CP30' => '($CP30 $X)',
 		'$OP30' => '($OP30 $X)',
 		'$AL' => '($AL | ^ $CM | (?<=$Spec1_) $CM)',
+		'$NotEastAsian' => '( $NotEastAsian | ^ $CM | (?<=$Spec1_) $CM )',
 	]}
 );
 
@@ -344,24 +355,31 @@ has 'LineBreak_rules' => (
 		'12.2' => ' $Spec3b_ $CM+ × $GL ',
 		'12.3' => ' ^ $CM+ × $GL ',
 		'13.01' => ' × $EX ',
-		'13.02' => ' $Spec4_ × ($CL | $CP | $IS | $SY) ',
-		'13.03' => ' $Spec4_ $CM+ × ($CL | $CP | $IS | $SY) ',
-		'13.04' => ' ^ $CM+ × ($CL | $CP | $IS | $SY) ',
+		'13.02' => ' × $CL ',
+		'13.03' => ' × $CP ',
+		'13.04' => ' × $SY ',
 		'14' => ' $OP $SP* × ',
 		'15.11' => ' ( $sot | $BK | $CR | $LF | $NL | $OP | $QU | $GL | $SP | $ZW ) $QU_Pi $SP* × ',
 		'15.21' => ' × $QU_Pf ( $SP | $GL | $WJ | $CL | $QU | $CP | $EX | $IS | $SY | $BK | $CR | $LF | $NL | $ZW | $eot ) ',
+		'15.3' => ' $SP ÷ $IS $NU ',
+		'15.4' => ' × $IS ',
 		'16' => ' ($CL | $CP) $SP* × $NS ',
 		'17' => ' $B2 $SP* × $B2 ',
 		'18' => ' $SP ÷ ',
-		'19.01' => ' × $QU ',
-		'19.02' => ' $QU × ',
+		'19.01' => ' × $QUmPi ',
+		'19.02' => ' $QUmPf × ',
+		'19.1' => ' $NotEastAsian × $QU ',
+		'19.11' => ' × $QU ( $NotEastAsian | $eot ) ',
+		'19.12' => ' $QU × $NotEastAsian ',
+		'19.13' => ' ( $sot | $NotEastAsian ) $QU × ',
 		'20.01' => ' ÷ $CB ',
 		'20.02' => ' $CB ÷ ',
+		'20.1' => ' ( $sot | $BK | $CR | $LF | $NL | $SP | $ZW | $CB | $GL ) ( $HY | $Hyphen ) × $AL ',
 		'21.01' => ' × $BA ',
 		'21.02' => ' × $HY ',
 		'21.03' => ' × $NS ',
 		'21.04' => ' $BB × ',
-		'21.1' => ' $HL ($HY | $BA) × ',
+		'21.1' => ' $HL ($HY | $NonEastAsianBA) × [^$HL] ',
 		'21.2' => ' $SY × $HL ',
 		'22' => ' × $IN ',
 		'23.02' => ' ($AL | $HL) × $NU ',
@@ -370,11 +388,21 @@ has 'LineBreak_rules' => (
 		'23.13' => ' ($ID | $EB | $EM) × $PO ',
 		'24.02' => ' ($PR | $PO) × ($AL | $HL) ',
 		'24.03' => ' ($AL | $HL) × ($PR | $PO) ',
-		'25.01' => ' ($PR | $PO) × ( $OP | $HY )? $NU ',
-		'25.02' => ' ( $OP | $HY ) × $NU ',
-		'25.03' => ' $NU × ($NU | $SY | $IS) ',
-		'25.04' => ' $NU ($NU | $SY | $IS)* × ($NU | $SY | $IS | $CL | $CP) ',
-		'25.05' => ' $NU ($NU | $SY | $IS)* ($CL | $CP)? × ($PO | $PR) ',
+		'25.01' => ' $NU ( $SY | $IS )* $CL × $PO ',
+		'25.02' => ' $NU ( $SY | $IS )* $CP × $PO ',
+		'25.03' => ' $NU ( $SY | $IS )* $CL × $PR ',
+		'25.04' => ' $NU ( $SY | $IS )* $CP × $PR ',
+		'25.05' => ' $NU ( $SY | $IS )* × $PO ',
+		'25.06' => ' $NU ( $SY | $IS )* × $PR ',
+		'25.07' => ' $PO × $OP $NU ',
+		'25.08' => ' $PO × $OP $IS $NU ',
+		'25.09' => ' $PO × $NU ',
+		'25.1' => ' $PR × $OP $NU ',
+		'25.11' => ' $PR × $OP $IS $NU ',
+		'25.12' => ' $PR × $NU ',
+		'25.13' => ' $HY × $NU ',
+		'25.14' => ' $IS × $NU ',
+		'25.15' => ' $NU ( $SY | $IS )* × $NU ',
 		'26.01' => ' $JL × $JL | $JV | $H2 | $H3 ',
 		'26.02' => ' $JV | $H2 × $JV | $JT ',
 		'26.03' => ' $JT | $H3 × $JT ',
@@ -3860,6 +3888,13 @@ has 'algorithmic_number_format_data' => (
     } },
 );
 
+has default_collation => (
+    is => 'ro',
+    isa => Str,
+    init_arg => undef,
+    default => sub { 'standard' },
+);
+
 # Need to add code for Key type pattern
 sub display_name_pattern {
 	my ($self, $name, $region, $script, $variant) = @_;
@@ -4557,6 +4592,16 @@ has 'units' => (
 						'other' => q({0}‱),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(ppb),
+						'other' => q({0} ppb),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(ppb),
+						'other' => q({0} ppb),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(L/100km),
 						'other' => q({0} L/100km),
@@ -4817,6 +4862,18 @@ has 'units' => (
 					'nanosecond' => {
 						'name' => q(ns),
 						'other' => q({0} ns),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(night),
+						'other' => q({0} night),
+						'per' => q({0}/night),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(night),
+						'other' => q({0} night),
+						'per' => q({0}/night),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -5753,6 +5810,16 @@ has 'units' => (
 						'other' => q({0} kn),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(light),
+						'other' => q({0} light),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(light),
+						'other' => q({0} light),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'name' => q(m/s),
 						'other' => q({0} m/s),
@@ -6285,9 +6352,11 @@ has 'number_symbols' => (
 		'deva' => { 'alias' => 'latn' },
 		'diak' => { 'alias' => 'latn' },
 		'fullwide' => { 'alias' => 'latn' },
+		'gara' => { 'alias' => 'latn' },
 		'gong' => { 'alias' => 'latn' },
 		'gonm' => { 'alias' => 'latn' },
 		'gujr' => { 'alias' => 'latn' },
+		'gukh' => { 'alias' => 'latn' },
 		'guru' => { 'alias' => 'latn' },
 		'hanidec' => { 'alias' => 'latn' },
 		'hmng' => { 'alias' => 'latn' },
@@ -6297,6 +6366,7 @@ has 'number_symbols' => (
 		'kawi' => { 'alias' => 'latn' },
 		'khmr' => { 'alias' => 'latn' },
 		'knda' => { 'alias' => 'latn' },
+		'krai' => { 'alias' => 'latn' },
 		'lana' => { 'alias' => 'latn' },
 		'lanatham' => { 'alias' => 'latn' },
 		'laoo' => { 'alias' => 'latn' },
@@ -6327,14 +6397,18 @@ has 'number_symbols' => (
 		'mroo' => { 'alias' => 'latn' },
 		'mtei' => { 'alias' => 'latn' },
 		'mymr' => { 'alias' => 'latn' },
+		'mymrepka' => { 'alias' => 'latn' },
+		'mymrpao' => { 'alias' => 'latn' },
 		'mymrshan' => { 'alias' => 'latn' },
 		'mymrtlng' => { 'alias' => 'latn' },
 		'nagm' => { 'alias' => 'latn' },
 		'newa' => { 'alias' => 'latn' },
 		'nkoo' => { 'alias' => 'latn' },
 		'olck' => { 'alias' => 'latn' },
+		'onao' => { 'alias' => 'latn' },
 		'orya' => { 'alias' => 'latn' },
 		'osma' => { 'alias' => 'latn' },
+		'outlined' => { 'alias' => 'latn' },
 		'rohg' => { 'alias' => 'latn' },
 		'saur' => { 'alias' => 'latn' },
 		'segment' => { 'alias' => 'latn' },
@@ -6343,6 +6417,7 @@ has 'number_symbols' => (
 		'sinh' => { 'alias' => 'latn' },
 		'sora' => { 'alias' => 'latn' },
 		'sund' => { 'alias' => 'latn' },
+		'sunu' => { 'alias' => 'latn' },
 		'takr' => { 'alias' => 'latn' },
 		'talu' => { 'alias' => 'latn' },
 		'tamldec' => { 'alias' => 'latn' },
@@ -6485,6 +6560,9 @@ has 'number_formats' => (
 		fullwide => {
 			'alias' => 'latn',
 		},
+		gara => {
+			'alias' => 'latn',
+		},
 		gong => {
 			'alias' => 'latn',
 		},
@@ -6492,6 +6570,9 @@ has 'number_formats' => (
 			'alias' => 'latn',
 		},
 		gujr => {
+			'alias' => 'latn',
+		},
+		gukh => {
 			'alias' => 'latn',
 		},
 		guru => {
@@ -6519,6 +6600,9 @@ has 'number_formats' => (
 			'alias' => 'latn',
 		},
 		knda => {
+			'alias' => 'latn',
+		},
+		krai => {
 			'alias' => 'latn',
 		},
 		lana => {
@@ -6569,6 +6653,12 @@ has 'number_formats' => (
 		mymr => {
 			'alias' => 'latn',
 		},
+		mymrepka => {
+			'alias' => 'latn',
+		},
+		mymrpao => {
+			'alias' => 'latn',
+		},
 		mymrshan => {
 			'alias' => 'latn',
 		},
@@ -6587,10 +6677,16 @@ has 'number_formats' => (
 		olck => {
 			'alias' => 'latn',
 		},
+		onao => {
+			'alias' => 'latn',
+		},
 		orya => {
 			'alias' => 'latn',
 		},
 		osma => {
+			'alias' => 'latn',
+		},
+		outlined => {
 			'alias' => 'latn',
 		},
 		percentFormat => {
@@ -6629,6 +6725,9 @@ has 'number_formats' => (
 			'alias' => 'latn',
 		},
 		sund => {
+			'alias' => 'latn',
+		},
+		sunu => {
 			'alias' => 'latn',
 		},
 		takr => {
@@ -6720,6 +6819,9 @@ has 'number_currency_formats' => (
 		'fullwide' => {
 			'alias' => 'latn',
 		},
+		'gara' => {
+			'alias' => 'latn',
+		},
 		'gong' => {
 			'alias' => 'latn',
 		},
@@ -6727,6 +6829,9 @@ has 'number_currency_formats' => (
 			'alias' => 'latn',
 		},
 		'gujr' => {
+			'alias' => 'latn',
+		},
+		'gukh' => {
 			'alias' => 'latn',
 		},
 		'guru' => {
@@ -6754,6 +6859,9 @@ has 'number_currency_formats' => (
 			'alias' => 'latn',
 		},
 		'knda' => {
+			'alias' => 'latn',
+		},
+		'krai' => {
 			'alias' => 'latn',
 		},
 		'lana' => {
@@ -6828,6 +6936,12 @@ has 'number_currency_formats' => (
 		'mymr' => {
 			'alias' => 'latn',
 		},
+		'mymrepka' => {
+			'alias' => 'latn',
+		},
+		'mymrpao' => {
+			'alias' => 'latn',
+		},
 		'mymrshan' => {
 			'alias' => 'latn',
 		},
@@ -6846,10 +6960,16 @@ has 'number_currency_formats' => (
 		'olck' => {
 			'alias' => 'latn',
 		},
+		'onao' => {
+			'alias' => 'latn',
+		},
 		'orya' => {
 			'alias' => 'latn',
 		},
 		'osma' => {
+			'alias' => 'latn',
+		},
+		'outlined' => {
 			'alias' => 'latn',
 		},
 		'rohg' => {
@@ -6874,6 +6994,9 @@ has 'number_currency_formats' => (
 			'alias' => 'latn',
 		},
 		'sund' => {
+			'alias' => 'latn',
+		},
+		'sunu' => {
 			'alias' => 'latn',
 		},
 		'takr' => {
@@ -7216,6 +7339,9 @@ has 'currencies' => (
 		},
 		'XCD' => {
 			symbol => 'EC$',
+		},
+		'XCG' => {
+			symbol => 'Cg.',
 		},
 		'XOF' => {
 			symbol => 'F CFA',
@@ -7837,6 +7963,9 @@ has 'calendar_months' => (
 			'islamic-umalqura' => {
 				'alias' => 'islamic',
 			},
+			'iso8601' => {
+				'alias' => 'gregorian',
+			},
 			'japanese' => {
 				'alias' => 'gregorian',
 			},
@@ -8021,6 +8150,9 @@ has 'calendar_days' => (
 			'islamic-umalqura' => {
 				'alias' => q{islamic},
 			},
+			'iso8601' => {
+				'alias' => q{gregorian},
+			},
 			'japanese' => {
 				'alias' => q{gregorian},
 			},
@@ -8119,6 +8251,9 @@ has 'calendar_quarters' => (
 			},
 			'islamic-umalqura' => {
 				'alias' => q{islamic},
+			},
+			'iso8601' => {
+				'alias' => q{gregorian},
 			},
 			'japanese' => {
 				'alias' => q{gregorian},
@@ -8367,6 +8502,21 @@ has 'day_period_data' => (
 				}
 				last SWITCH;
 				}
+			if ($_ eq 'iso8601') {
+				if($day_period_type eq 'default') {
+					return 'am' if $time >= 0
+						&& $time < 1200;
+					return 'pm' if $time >= 1200
+						&& $time < 2400;
+				}
+				if($day_period_type eq 'selection') {
+					return 'am' if $time >= 0
+						&& $time < 1200;
+					return 'pm' if $time >= 1200
+						&& $time < 2400;
+				}
+				last SWITCH;
+				}
 			if ($_ eq 'japanese') {
 				if($day_period_type eq 'default') {
 					return 'am' if $time >= 0
@@ -8508,6 +8658,9 @@ has 'day_periods' => (
 		'islamic-umalqura' => {
 			'alias' => 'islamic',
 		},
+		'iso8601' => {
+			'alias' => 'gregorian',
+		},
 		'japanese' => {
 			'alias' => 'gregorian',
 		},
@@ -8643,6 +8796,9 @@ has 'eras' => (
 		},
 		'islamic-umalqura' => {
 			'alias' => 'islamic',
+		},
+		'iso8601' => {
+			'alias' => 'gregorian',
 		},
 		'japanese' => {
 			abbreviated => {
@@ -9212,6 +9368,12 @@ has 'date_formats' => (
 		'islamic-umalqura' => {
 			'alias' => q{islamic},
 		},
+		'iso8601' => {
+			'full' => q{y MMMM d, EEEE},
+			'long' => q{y MMMM d},
+			'medium' => q{y MMM d},
+			'short' => q{y-MM-dd},
+		},
 		'japanese' => {
 			'alias' => q{generic},
 		},
@@ -9276,6 +9438,12 @@ has 'time_formats' => (
 		},
 		'islamic-umalqura' => {
 			'alias' => q{islamic},
+		},
+		'iso8601' => {
+			'full' => q{HH:mm:ss zzzz},
+			'long' => q{HH:mm:ss z},
+			'medium' => q{HH:mm:ss},
+			'short' => q{HH:mm},
 		},
 		'japanese' => {
 			'alias' => q{gregorian},
@@ -9348,6 +9516,12 @@ has 'datetime_formats' => (
 		'islamic-umalqura' => {
 			'alias' => q{islamic},
 		},
+		'iso8601' => {
+			'full' => q{{1} {0}},
+			'long' => q{{1} {0}},
+			'medium' => q{{1} {0}},
+			'short' => q{{1} {0}},
+		},
 		'japanese' => {
 			'alias' => q{generic},
 		},
@@ -9403,7 +9577,6 @@ has 'datetime_formats_available_formats' => (
 			hms => q{h:mm:ss a},
 			ms => q{mm:ss},
 			y => q{r(U)},
-			yMd => q{r-MM-dd},
 			yyyy => q{r(U)},
 			yyyyM => q{r-MM},
 			yyyyMEd => q{r-MM-dd, E},
@@ -9457,7 +9630,7 @@ has 'datetime_formats_available_formats' => (
 			MMMd => q{MMM d},
 			Md => q{MM-dd},
 			d => q{d},
-			h => q{h a},
+			h => q{h a},
 			hm => q{h:mm a},
 			hms => q{h:mm:ss a},
 			ms => q{mm:ss},
@@ -9504,7 +9677,7 @@ has 'datetime_formats_available_formats' => (
 			MMMd => q{MMM d},
 			Md => q{MM-dd},
 			d => q{d},
-			h => q{h a},
+			h => q{h a},
 			hm => q{h:mm a},
 			hms => q{h:mm:ss a},
 			hmsv => q{h:mm:ss a v},
@@ -9542,6 +9715,55 @@ has 'datetime_formats_available_formats' => (
 		},
 		'islamic-umalqura' => {
 			'alias' => q{islamic},
+		},
+		'iso8601' => {
+			Bh => q{h B},
+			Bhm => q{h:mm B},
+			Bhms => q{h:mm:ss B},
+			E => q{ccc},
+			EBhm => q{E h:mm B},
+			EBhms => q{E h:mm:ss B},
+			EHm => q{E HH:mm},
+			EHms => q{E HH:mm:ss},
+			Ed => q{d, E},
+			Ehm => q{E h:mm a},
+			Ehms => q{E h:mm:ss a},
+			Gy => q{G y},
+			GyMMM => q{G y MMM},
+			GyMMMEd => q{G y MMM d, E},
+			GyMMMd => q{G y MMM d},
+			GyMd => q{G y-MM-dd},
+			H => q{HH},
+			Hm => q{HH:mm},
+			Hms => q{HH:mm:ss},
+			Hmsv => q{HH:mm:ss v},
+			Hmv => q{HH:mm v},
+			M => q{L},
+			MEd => q{MM-dd, E},
+			MMM => q{LLL},
+			MMMEd => q{MMM d},
+			MMMMW => q{MMMM 'week' W},
+			MMMMd => q{MMMM d},
+			MMMd => q{MMM d},
+			Md => q{MM-dd},
+			d => q{d},
+			h => q{h a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
+			hmsv => q{h:mm:ss a v},
+			hmv => q{h:mm a v},
+			ms => q{mm:ss},
+			y => q{y},
+			yM => q{y-MM},
+			yMEd => q{y-MM-dd, E},
+			yMMM => q{y MMM},
+			yMMMEd => q{y MMM d, E},
+			yMMMM => q{y MMMM},
+			yMMMd => q{y MMM d},
+			yMd => q{y-MM-dd},
+			yQQQ => q{y QQQ},
+			yQQQQ => q{y QQQQ},
+			yw => q{Y 'week' w},
 		},
 		'japanese' => {
 			'alias' => q{generic},
@@ -9635,6 +9857,19 @@ has 'datetime_formats_append_item' => (
 		'islamic-umalqura' => {
 			'alias' => q{islamic},
 		},
+		'iso8601' => {
+			'Day' => '{0} ({2}: {1})',
+			'Day-Of-Week' => '{0} {1}',
+			'Era' => '{1} {0}',
+			'Hour' => '{0} ({2}: {1})',
+			'Minute' => '{0} ({2}: {1})',
+			'Month' => '{0} ({2}: {1})',
+			'Quarter' => '{0} ({2}: {1})',
+			'Second' => '{0} ({2}: {1})',
+			'Timezone' => '{0} {1}',
+			'Week' => '{0} ({2}: {1})',
+			'Year' => '{1} {0}',
+		},
 		'japanese' => {
 			'alias' => q{generic},
 		},
@@ -9657,11 +9892,11 @@ has 'datetime_formats_interval' => (
 		},
 		'chinese' => {
 			Bh => {
-				B => q{h B – h B},
+				B => q{h B – h B},
 				h => q{h–h B},
 			},
 			Bhm => {
-				B => q{h:mm B – h:mm B},
+				B => q{h:mm B – h:mm B},
 				h => q{h:mm–h:mm B},
 				m => q{h:mm–h:mm B},
 			},
@@ -9683,80 +9918,80 @@ has 'datetime_formats_interval' => (
 				M => q{MM–MM},
 			},
 			MEd => {
-				M => q{MM-dd, E – MM-dd, E},
-				d => q{MM-dd, E – MM-dd, E},
+				M => q{MM-dd, E – MM-dd, E},
+				d => q{MM-dd, E – MM-dd, E},
 			},
 			MMM => {
 				M => q{LLL–LLL},
 			},
 			MMMEd => {
-				M => q{MMM d, E – MMM d, E},
-				d => q{MMM d, E – MMM d, E},
+				M => q{MMM d, E – MMM d, E},
+				d => q{MMM d, E – MMM d, E},
 			},
 			MMMd => {
-				M => q{MMM d – MMM d},
+				M => q{MMM d – MMM d},
 				d => q{MMM d–d},
 			},
 			Md => {
-				M => q{MM-dd – MM-dd},
-				d => q{MM-dd – MM-dd},
+				M => q{MM-dd – MM-dd},
+				d => q{MM-dd – MM-dd},
 			},
 			d => {
 				d => q{d–d},
 			},
 			fallback => '{0} – {1}',
 			h => {
-				a => q{h a – h a},
-				h => q{h–h a},
+				a => q{h a – h a},
+				h => q{h–h a},
 			},
 			hm => {
-				a => q{h:mm a – h:mm a},
+				a => q{h:mm a – h:mm a},
 				h => q{h:mm–h:mm a},
 				m => q{h:mm–h:mm a},
 			},
 			hmv => {
-				a => q{h:mm a – h:mm a v},
+				a => q{h:mm a – h:mm a v},
 				h => q{h:mm–h:mm a v},
 				m => q{h:mm–h:mm a v},
 			},
 			hv => {
-				a => q{h a – h a v},
-				h => q{h–h a v},
+				a => q{h a – h a v},
+				h => q{h–h a v},
 			},
 			y => {
 				y => q{U–U},
 			},
 			yM => {
-				M => q{y-MM – y-MM},
-				y => q{y-MM – y-MM},
+				M => q{y-MM – y-MM},
+				y => q{y-MM – y-MM},
 			},
 			yMEd => {
-				M => q{y-MM-dd, E – y-MM-dd, E},
-				d => q{y-MM-dd, E – y-MM-dd, E},
-				y => q{y-MM-dd, E – y-MM-dd, E},
+				M => q{y-MM-dd, E – y-MM-dd, E},
+				d => q{y-MM-dd, E – y-MM-dd, E},
+				y => q{y-MM-dd, E – y-MM-dd, E},
 			},
 			yMMM => {
 				M => q{U MMM–MMM},
-				y => q{U MMM – U MMM},
+				y => q{U MMM – U MMM},
 			},
 			yMMMEd => {
-				M => q{U MMM d, E – MMM d, E},
-				d => q{U MMM d, E – MMM d, E},
-				y => q{U MMM d, E – U MMM d, E},
+				M => q{U MMM d, E – MMM d, E},
+				d => q{U MMM d, E – MMM d, E},
+				y => q{U MMM d, E – U MMM d, E},
 			},
 			yMMMM => {
 				M => q{U MMMM–MMMM},
-				y => q{U MMMM – U MMMM},
+				y => q{U MMMM – U MMMM},
 			},
 			yMMMd => {
-				M => q{U MMM d – MMM d},
+				M => q{U MMM d – MMM d},
 				d => q{U MMM d–d},
-				y => q{U MMM d – U MMM d},
+				y => q{U MMM d – U MMM d},
 			},
 			yMd => {
-				M => q{y-MM-dd – y-MM-dd},
-				d => q{y-MM-dd – y-MM-dd},
-				y => q{y-MM-dd – y-MM-dd},
+				M => q{y-MM-dd – y-MM-dd},
+				d => q{y-MM-dd – y-MM-dd},
+				y => q{y-MM-dd – y-MM-dd},
 			},
 		},
 		'coptic' => {
@@ -9773,51 +10008,51 @@ has 'datetime_formats_interval' => (
 		},
 		'generic' => {
 			Bh => {
-				B => q{h B – h B},
+				B => q{h B – h B},
 				h => q{h–h B},
 			},
 			Bhm => {
-				B => q{h:mm B – h:mm B},
+				B => q{h:mm B – h:mm B},
 				h => q{h:mm–h:mm B},
 				m => q{h:mm–h:mm B},
 			},
 			Gy => {
-				G => q{G y – G y},
+				G => q{G y – G y},
 				y => q{G y–y},
 			},
 			GyM => {
-				G => q{GGGGG y-MM – GGGGG y-MM},
-				M => q{GGGGG y-MM – y-MM},
-				y => q{GGGGG y-MM – y-MM},
+				G => q{GGGGG y-MM – GGGGG y-MM},
+				M => q{GGGGG y-MM – y-MM},
+				y => q{GGGGG y-MM – y-MM},
 			},
 			GyMEd => {
-				G => q{GGGGG y-MM-dd, E – GGGGG y-MM-dd, E},
-				M => q{GGGGG y-MM-dd, E – y-MM-dd, E},
-				d => q{GGGGG y-MM-dd, E – y-MM-dd, E},
-				y => q{GGGGG y-MM-dd, E – y-MM-dd, E},
+				G => q{GGGGG y-MM-dd, E – GGGGG y-MM-dd, E},
+				M => q{GGGGG y-MM-dd, E – y-MM-dd, E},
+				d => q{GGGGG y-MM-dd, E – y-MM-dd, E},
+				y => q{GGGGG y-MM-dd, E – y-MM-dd, E},
 			},
 			GyMMM => {
-				G => q{G y MMM – G y MMM},
+				G => q{G y MMM – G y MMM},
 				M => q{G y MMM–MMM},
-				y => q{G y MMM – y MMM},
+				y => q{G y MMM – y MMM},
 			},
 			GyMMMEd => {
-				G => q{G y MMM d, E – G y MMM d, E},
-				M => q{G y MMM d, E – MMM d, E},
-				d => q{G y MMM d, E – MMM d, E},
-				y => q{G y MMM d, E – y MMM d, E},
+				G => q{G y MMM d, E – G y MMM d, E},
+				M => q{G y MMM d, E – MMM d, E},
+				d => q{G y MMM d, E – MMM d, E},
+				y => q{G y MMM d, E – y MMM d, E},
 			},
 			GyMMMd => {
-				G => q{G y MMM d – G y MMM d},
-				M => q{G y MMM d – MMM d},
+				G => q{G y MMM d – G y MMM d},
+				M => q{G y MMM d – MMM d},
 				d => q{G y MMM d–d},
-				y => q{G y MMM d – y MMM d},
+				y => q{G y MMM d – y MMM d},
 			},
 			GyMd => {
-				G => q{GGGGG y-MM-dd – GGGGG y-MM-dd},
-				M => q{GGGGG y-MM-dd – y-MM-dd},
-				d => q{GGGGG y-MM-dd – y-MM-dd},
-				y => q{GGGGG y-MM-dd – y-MM-dd},
+				G => q{GGGGG y-MM-dd – GGGGG y-MM-dd},
+				M => q{GGGGG y-MM-dd – y-MM-dd},
+				d => q{GGGGG y-MM-dd – y-MM-dd},
+				y => q{GGGGG y-MM-dd – y-MM-dd},
 			},
 			H => {
 				H => q{HH–HH},
@@ -9837,129 +10072,129 @@ has 'datetime_formats_interval' => (
 				M => q{MM–MM},
 			},
 			MEd => {
-				M => q{MM-dd, E – MM-dd, E},
-				d => q{MM-dd, E – MM-dd, E},
+				M => q{MM-dd, E – MM-dd, E},
+				d => q{MM-dd, E – MM-dd, E},
 			},
 			MMM => {
 				M => q{LLL–LLL},
 			},
 			MMMEd => {
-				M => q{MMM d, E – MMM d, E},
-				d => q{MMM d, E – MMM d, E},
+				M => q{MMM d, E – MMM d, E},
+				d => q{MMM d, E – MMM d, E},
 			},
 			MMMd => {
-				M => q{MMM d – MMM d},
+				M => q{MMM d – MMM d},
 				d => q{MMM d–d},
 			},
 			Md => {
-				M => q{MM-dd – MM-dd},
-				d => q{MM-dd – MM-dd},
+				M => q{MM-dd – MM-dd},
+				d => q{MM-dd – MM-dd},
 			},
 			d => {
 				d => q{d–d},
 			},
 			fallback => '{0} – {1}',
 			h => {
-				a => q{h a – h a},
-				h => q{h–h a},
+				a => q{h a – h a},
+				h => q{h–h a},
 			},
 			hm => {
-				a => q{h:mm a – h:mm a},
+				a => q{h:mm a – h:mm a},
 				h => q{h:mm–h:mm a},
 				m => q{h:mm–h:mm a},
 			},
 			hmv => {
-				a => q{h:mm a – h:mm a v},
+				a => q{h:mm a – h:mm a v},
 				h => q{h:mm–h:mm a v},
 				m => q{h:mm–h:mm a v},
 			},
 			hv => {
-				a => q{h a – h a v},
-				h => q{h–h a v},
+				a => q{h a – h a v},
+				h => q{h–h a v},
 			},
 			y => {
 				y => q{G y–y},
 			},
 			yM => {
-				M => q{GGGGG y-MM – y-MM},
-				y => q{GGGGG y-MM – y-MM},
+				M => q{GGGGG y-MM – y-MM},
+				y => q{GGGGG y-MM – y-MM},
 			},
 			yMEd => {
-				M => q{GGGGG y-MM-dd, E – y-MM-dd, E},
-				d => q{GGGGG y-MM-dd, E – y-MM-dd, E},
-				y => q{GGGGG y-MM-dd, E – y-MM-dd, E},
+				M => q{GGGGG y-MM-dd, E – y-MM-dd, E},
+				d => q{GGGGG y-MM-dd, E – y-MM-dd, E},
+				y => q{GGGGG y-MM-dd, E – y-MM-dd, E},
 			},
 			yMMM => {
 				M => q{G y MMM–MMM},
-				y => q{G y MMM – y MMM},
+				y => q{G y MMM – y MMM},
 			},
 			yMMMEd => {
-				M => q{G y MMM d, E – MMM d, E},
-				d => q{G y MMM d, E – MMM d, E},
-				y => q{G y MMM d, E – y MMM d, E},
+				M => q{G y MMM d, E – MMM d, E},
+				d => q{G y MMM d, E – MMM d, E},
+				y => q{G y MMM d, E – y MMM d, E},
 			},
 			yMMMM => {
 				M => q{G y MMMM–MMMM},
-				y => q{G y MMMM – y MMMM},
+				y => q{G y MMMM – y MMMM},
 			},
 			yMMMd => {
-				M => q{G y MMM d – MMM d},
+				M => q{G y MMM d – MMM d},
 				d => q{G y MMM d–d},
-				y => q{G y MMM d – y MMM d},
+				y => q{G y MMM d – y MMM d},
 			},
 			yMd => {
-				M => q{GGGGG y-MM-dd – y-MM-dd},
-				d => q{GGGGG y-MM-dd – y-MM-dd},
-				y => q{GGGGG y-MM-dd – y-MM-dd},
+				M => q{GGGGG y-MM-dd – y-MM-dd},
+				d => q{GGGGG y-MM-dd – y-MM-dd},
+				y => q{GGGGG y-MM-dd – y-MM-dd},
 			},
 		},
 		'gregorian' => {
 			Bh => {
-				B => q{h B – h B},
+				B => q{h B – h B},
 				h => q{h–h B},
 			},
 			Bhm => {
-				B => q{h:mm B – h:mm B},
+				B => q{h:mm B – h:mm B},
 				h => q{h:mm–h:mm B},
 				m => q{h:mm–h:mm B},
 			},
 			Gy => {
-				G => q{G y – G y},
+				G => q{G y – G y},
 				y => q{G y–y},
 			},
 			GyM => {
-				G => q{GGGGG y-MM – GGGGG y-MM},
-				M => q{GGGGG y-MM – y-MM},
-				y => q{GGGGG y-MM – y-MM},
+				G => q{GGGGG y-MM – GGGGG y-MM},
+				M => q{GGGGG y-MM – y-MM},
+				y => q{GGGGG y-MM – y-MM},
 			},
 			GyMEd => {
-				G => q{GGGGG y-MM-dd, E – GGGGG y-MM-dd, E},
-				M => q{GGGGG y-MM-dd, E – y-MM-dd, E},
-				d => q{GGGGG y-MM-dd, E – y-MM-dd, E},
-				y => q{GGGGG y-MM-dd, E – y-MM-dd, E},
+				G => q{GGGGG y-MM-dd, E – GGGGG y-MM-dd, E},
+				M => q{GGGGG y-MM-dd, E – y-MM-dd, E},
+				d => q{GGGGG y-MM-dd, E – y-MM-dd, E},
+				y => q{GGGGG y-MM-dd, E – y-MM-dd, E},
 			},
 			GyMMM => {
-				G => q{G y MMM – G y MMM},
+				G => q{G y MMM – G y MMM},
 				M => q{G y MMM–MMM},
-				y => q{G y MMM – y MMM},
+				y => q{G y MMM – y MMM},
 			},
 			GyMMMEd => {
-				G => q{G y MMM d, E – G y MMM d, E},
-				M => q{G y MMM d, E – MMM d, E},
-				d => q{G y MMM d, E – MMM d, E},
-				y => q{G y MMM d, E – y MMM d, E},
+				G => q{G y MMM d, E – G y MMM d, E},
+				M => q{G y MMM d, E – MMM d, E},
+				d => q{G y MMM d, E – MMM d, E},
+				y => q{G y MMM d, E – y MMM d, E},
 			},
 			GyMMMd => {
-				G => q{G y MMM d – G y MMM d},
-				M => q{G y MMM d – MMM d},
+				G => q{G y MMM d – G y MMM d},
+				M => q{G y MMM d – MMM d},
 				d => q{G y MMM d–d},
-				y => q{G y MMM d – y MMM d},
+				y => q{G y MMM d – y MMM d},
 			},
 			GyMd => {
-				G => q{GGGGG y-MM-dd – GGGGG y-MM-dd},
-				M => q{GGGGG y-MM-dd – y-MM-dd},
-				d => q{GGGGG y-MM-dd – y-MM-dd},
-				y => q{GGGGG y-MM-dd – y-MM-dd},
+				G => q{GGGGG y-MM-dd – GGGGG y-MM-dd},
+				M => q{GGGGG y-MM-dd – y-MM-dd},
+				d => q{GGGGG y-MM-dd – y-MM-dd},
+				y => q{GGGGG y-MM-dd – y-MM-dd},
 			},
 			H => {
 				H => q{HH–HH},
@@ -9979,80 +10214,80 @@ has 'datetime_formats_interval' => (
 				M => q{MM–MM},
 			},
 			MEd => {
-				M => q{MM-dd, E – MM-dd, E},
-				d => q{MM-dd, E – MM-dd, E},
+				M => q{MM-dd, E – MM-dd, E},
+				d => q{MM-dd, E – MM-dd, E},
 			},
 			MMM => {
 				M => q{LLL–LLL},
 			},
 			MMMEd => {
-				M => q{MMM d, E – MMM d, E},
-				d => q{MMM d, E – MMM d, E},
+				M => q{MMM d, E – MMM d, E},
+				d => q{MMM d, E – MMM d, E},
 			},
 			MMMd => {
-				M => q{MMM d – MMM d},
+				M => q{MMM d – MMM d},
 				d => q{MMM d–d},
 			},
 			Md => {
-				M => q{MM-dd – MM-dd},
-				d => q{MM-dd – MM-dd},
+				M => q{MM-dd – MM-dd},
+				d => q{MM-dd – MM-dd},
 			},
 			d => {
 				d => q{d–d},
 			},
 			fallback => '{0} – {1}',
 			h => {
-				a => q{h a – h a},
-				h => q{h–h a},
+				a => q{h a – h a},
+				h => q{h–h a},
 			},
 			hm => {
-				a => q{h:mm a – h:mm a},
+				a => q{h:mm a – h:mm a},
 				h => q{h:mm–h:mm a},
 				m => q{h:mm–h:mm a},
 			},
 			hmv => {
-				a => q{h:mm a – h:mm a v},
+				a => q{h:mm a – h:mm a v},
 				h => q{h:mm–h:mm a v},
 				m => q{h:mm–h:mm a v},
 			},
 			hv => {
-				a => q{h a – h a v},
-				h => q{h–h a v},
+				a => q{h a – h a v},
+				h => q{h–h a v},
 			},
 			y => {
 				y => q{y–y},
 			},
 			yM => {
-				M => q{y-MM – y-MM},
-				y => q{y-MM – y-MM},
+				M => q{y-MM – y-MM},
+				y => q{y-MM – y-MM},
 			},
 			yMEd => {
-				M => q{y-MM-dd, E – y-MM-dd, E},
-				d => q{y-MM-dd, E – y-MM-dd, E},
-				y => q{y-MM-dd, E – y-MM-dd, E},
+				M => q{y-MM-dd, E – y-MM-dd, E},
+				d => q{y-MM-dd, E – y-MM-dd, E},
+				y => q{y-MM-dd, E – y-MM-dd, E},
 			},
 			yMMM => {
 				M => q{y MMM–MMM},
-				y => q{y MMM – y MMM},
+				y => q{y MMM – y MMM},
 			},
 			yMMMEd => {
-				M => q{y MMM d, E – MMM d, E},
-				d => q{y MMM d, E – MMM d, E},
-				y => q{y MMM d, E – y MMM d, E},
+				M => q{y MMM d, E – MMM d, E},
+				d => q{y MMM d, E – MMM d, E},
+				y => q{y MMM d, E – y MMM d, E},
 			},
 			yMMMM => {
 				M => q{y MMMM–MMMM},
-				y => q{y MMMM – y MMMM},
+				y => q{y MMMM – y MMMM},
 			},
 			yMMMd => {
-				M => q{y MMM d – MMM d},
+				M => q{y MMM d – MMM d},
 				d => q{y MMM d–d},
-				y => q{y MMM d – y MMM d},
+				y => q{y MMM d – y MMM d},
 			},
 			yMd => {
-				M => q{y-MM-dd – y-MM-dd},
-				d => q{y-MM-dd – y-MM-dd},
-				y => q{y-MM-dd – y-MM-dd},
+				M => q{y-MM-dd – y-MM-dd},
+				d => q{y-MM-dd – y-MM-dd},
+				y => q{y-MM-dd – y-MM-dd},
 			},
 		},
 		'hebrew' => {
@@ -10075,6 +10310,148 @@ has 'datetime_formats_interval' => (
 		},
 		'islamic-umalqura' => {
 			'alias' => q{islamic},
+		},
+		'iso8601' => {
+			Bh => {
+				B => q{h B – h B},
+				h => q{h–h B},
+			},
+			Bhm => {
+				B => q{h:mm B – h:mm B},
+				h => q{h:mm–h:mm B},
+				m => q{h:mm–h:mm B},
+			},
+			Gy => {
+				G => q{G y – G y},
+				y => q{y–y},
+			},
+			GyM => {
+				G => q{G y-MM – G y-MM},
+				M => q{G y-MM – y-MM},
+				y => q{G y-MM – y-MM},
+			},
+			GyMEd => {
+				G => q{G y-MM-dd, E – G y-MM-dd, E},
+				M => q{G y-MM-dd, E – y-MM-dd, E},
+				d => q{G y-MM-dd, E – y-MM-dd, E},
+				y => q{G y-MM-dd, E – y-MM-dd, E},
+			},
+			GyMMM => {
+				G => q{G y MMM – G y MMM},
+				M => q{G y MMM–MMM},
+				y => q{G y MMM – y MMM},
+			},
+			GyMMMEd => {
+				G => q{G y MMM d, E – G y MMM d, E},
+				M => q{G y MMM d, E – MMM d, E},
+				d => q{G y MMM d, E – MMM d, E},
+				y => q{G y MMM d, E – y MMM d, E},
+			},
+			GyMMMd => {
+				G => q{G y MMM d – G y MMM d},
+				M => q{G y MMM d – MMM d},
+				d => q{G y MMM d–d},
+				y => q{G y MMM d – y MMM d},
+			},
+			GyMd => {
+				G => q{G y-MM-dd – G y-MM-dd},
+				M => q{G y-MM-dd – y-MM-dd},
+				d => q{G y-MM-dd – y-MM-dd},
+				y => q{G y-MM-dd – y-MM-dd},
+			},
+			H => {
+				H => q{HH–HH},
+			},
+			Hm => {
+				H => q{HH:mm–HH:mm},
+				m => q{HH:mm–HH:mm},
+			},
+			Hmv => {
+				H => q{HH:mm–HH:mm v},
+				m => q{HH:mm–HH:mm v},
+			},
+			Hv => {
+				H => q{HH–HH v},
+			},
+			M => {
+				M => q{MM–MM},
+			},
+			MEd => {
+				M => q{MM-dd, E – MM-dd, E},
+				d => q{MM-dd, E – MM-dd, E},
+			},
+			MMM => {
+				M => q{LLL–LLL},
+			},
+			MMMEd => {
+				M => q{MMM d, E – MMM d, E},
+				d => q{MMM d, E – MMM d, E},
+			},
+			MMMd => {
+				M => q{MMM d – MMM d},
+				d => q{MMM d–d},
+			},
+			Md => {
+				M => q{MM-dd – MM-dd},
+				d => q{MM-dd – MM-dd},
+			},
+			d => {
+				d => q{d–d},
+			},
+			fallback => '{0} – {1}',
+			h => {
+				a => q{h a – h a},
+				h => q{h–h a},
+			},
+			hm => {
+				a => q{h:mm a – h:mm a},
+				h => q{h:mm–h:mm a},
+				m => q{h:mm–h:mm a},
+			},
+			hmv => {
+				a => q{h:mm a – h:mm a v},
+				h => q{h:mm–h:mm a v},
+				m => q{h:mm–h:mm a v},
+			},
+			hv => {
+				a => q{h a – h a v},
+				h => q{h–h a v},
+			},
+			y => {
+				y => q{y–y},
+			},
+			yM => {
+				M => q{y-MM – y-MM},
+				y => q{y-MM – y-MM},
+			},
+			yMEd => {
+				M => q{y-MM-dd, E – y-MM-dd, E},
+				d => q{y-MM-dd, E – y-MM-dd, E},
+				y => q{y-MM-dd, E – y-MM-dd, E},
+			},
+			yMMM => {
+				M => q{y MMM–MMM},
+				y => q{y MMM – y MMM},
+			},
+			yMMMEd => {
+				M => q{y MMM d, E – MMM d, E},
+				d => q{y MMM d, E – MMM d, E},
+				y => q{y MMM d, E – y MMM d, E},
+			},
+			yMMMM => {
+				M => q{y MMMM–MMMM},
+				y => q{y MMMM – y MMMM},
+			},
+			yMMMd => {
+				M => q{y MMM d – MMM d},
+				d => q{y MMM d–d},
+				y => q{y MMM d – y MMM d},
+			},
+			yMd => {
+				M => q{y-MM-dd – y-MM-dd},
+				d => q{y-MM-dd – y-MM-dd},
+				y => q{y-MM-dd – y-MM-dd},
+			},
 		},
 		'japanese' => {
 			'alias' => q{generic},

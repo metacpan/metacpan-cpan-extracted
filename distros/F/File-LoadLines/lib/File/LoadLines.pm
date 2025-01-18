@@ -17,7 +17,7 @@ File::LoadLines - Load lines from files and network
 
 =cut
 
-our $VERSION = '1.046';
+our $VERSION = '1.047';
 
 =head1 SYNOPSIS
 
@@ -133,13 +133,14 @@ sub loadlines {
     $options->{blob}  //= 0;
     $options->{split} //= !$options->{blob};
     $options->{chomp} //= !$options->{blob};
+    $options->{fail}  //= "hard";
 
     my $data;			# slurped file data
     my $encoded;		# already encoded
 
     # Gather data from the input.
     if ( ref($filename) ) {
-	if ( ref($filename) eq 'GLOB' ) {
+	if ( ref($filename) eq 'GLOB' || ref($filename) eq 'IO::File' ) {
 	    binmode( $filename, ':raw' );
 	    $data = do { local $/; <$filename> };
 	    $filename = "__GLOB__";
@@ -233,8 +234,9 @@ sub loadlines {
 	else {
 	    my $f;
 	    unless ( open( $f, '<:raw', $filename ) ) {
-		$options->{error} = "$!", return if $options->{fail} eq "soft";
-		croak("$filename: $!\n");
+		$options->{error} = "$!", return
+		  if $options->{fail} eq "soft";
+		croak("$name: $!\n");
 	    }
 	    $data = do { local $/; <$f> };
 	}

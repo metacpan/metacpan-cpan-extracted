@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Sl - Package for language Slovenian
 
 package Locale::CLDR::Locales::Sl;
 # This file auto generated from Data\common\main\sl.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -727,6 +727,7 @@ has 'display_name_language' => (
  				'bik' => 'bikolski jezik',
  				'bin' => 'edo',
  				'bla' => 'siksika',
+ 				'blo' => 'anii',
  				'bm' => 'bambarščina',
  				'bn' => 'bengalščina',
  				'bo' => 'tibetanščina',
@@ -947,6 +948,7 @@ has 'display_name_language' => (
  				'kv' => 'komijščina',
  				'kw' => 'kornijščina',
  				'kwk' => 'kvakvala',
+ 				'kxv' => 'kuvi',
  				'ky' => 'kirgiščina',
  				'la' => 'latinščina',
  				'lad' => 'ladinščina',
@@ -957,8 +959,10 @@ has 'display_name_language' => (
  				'lez' => 'lezginščina',
  				'lg' => 'ganda',
  				'li' => 'limburščina',
+ 				'lij' => 'ligurščina',
  				'lil' => 'lilovetščina',
  				'lkt' => 'lakotščina',
+ 				'lmo' => 'lombardščina',
  				'ln' => 'lingala',
  				'lo' => 'laoščina',
  				'lol' => 'mongo',
@@ -971,7 +975,6 @@ has 'display_name_language' => (
  				'lua' => 'luba-lulua',
  				'lui' => 'luisenščina',
  				'lun' => 'lunda',
- 				'luo' => 'luo',
  				'lus' => 'mizojščina',
  				'luy' => 'luhijščina',
  				'lv' => 'latvijščina',
@@ -1146,6 +1149,7 @@ has 'display_name_language' => (
  				'swb' => 'šikomor',
  				'syc' => 'klasična sirščina',
  				'syr' => 'sirščina',
+ 				'szl' => 'šlezijščina',
  				'ta' => 'tamilščina',
  				'tce' => 'južna tučonščina',
  				'te' => 'telugijščina',
@@ -1193,7 +1197,9 @@ has 'display_name_language' => (
  				'uz' => 'uzbeščina',
  				'vai' => 'vajščina',
  				've' => 'venda',
+ 				'vec' => 'beneščina',
  				'vi' => 'vietnamščina',
+ 				'vmw' => 'makuva',
  				'vo' => 'volapik',
  				'vot' => 'votjaščina',
  				'vun' => 'vunjo',
@@ -1207,6 +1213,7 @@ has 'display_name_language' => (
  				'wuu' => 'wu-kitajščina',
  				'xal' => 'kalmiščina',
  				'xh' => 'koščina',
+ 				'xnr' => 'kangri',
  				'xog' => 'sogščina',
  				'yao' => 'jaojščina',
  				'yap' => 'japščina',
@@ -1217,6 +1224,7 @@ has 'display_name_language' => (
  				'yrl' => 'nheengatu',
  				'yue' => 'kantonščina',
  				'yue@alt=menu' => 'kitajščina (kantonščina)',
+ 				'za' => 'džuangščina',
  				'zap' => 'zapoteščina',
  				'zbl' => 'znakovni jezik Bliss',
  				'zen' => 'zenaščina',
@@ -1841,7 +1849,6 @@ has 'display_name_type' => (
  				'phonebook' => q{razvrščanje po sistemu telefonskega imenika},
  				'phonetic' => q{fonetično razvrščanje},
  				'pinyin' => q{razvrščanje po sistemu pinjin},
- 				'reformed' => q{reformirano razvrščanje},
  				'search' => q{Splošno iskanje},
  				'searchjl' => q{Iskanje po začetnem soglasniku hangul},
  				'standard' => q{Standardno razvrščanje},
@@ -2051,17 +2058,6 @@ has 'alternate_quote_end' => (
 	isa			=> Str,
 	init_arg	=> undef,
 	default		=> qq{‘},
-);
-
-has 'duration_units' => (
-	is			=> 'ro',
-	isa			=> HashRef[Str],
-	init_arg	=> undef,
-	default		=> sub { {
-				hm => 'h.mm',
-				hms => 'h.mm.ss',
-				ms => 'm.ss',
-			} }
 );
 
 has 'units' => (
@@ -2656,6 +2652,7 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'concentr-milligram-ofglucose-per-deciliter' => {
+						'1' => q(masculine),
 						'few' => q({0} miligrami na deciliter),
 						'name' => q(miligrami na deciliter),
 						'one' => q({0} miligram na deciliter),
@@ -2664,6 +2661,7 @@ has 'units' => (
 					},
 					# Core Unit Identifier
 					'milligram-ofglucose-per-deciliter' => {
+						'1' => q(masculine),
 						'few' => q({0} miligrami na deciliter),
 						'name' => q(miligrami na deciliter),
 						'one' => q({0} miligram na deciliter),
@@ -2773,6 +2771,24 @@ has 'units' => (
 						'one' => q({0} desettisočina),
 						'other' => q({0} desettisočin),
 						'two' => q({0} desettisočini),
+					},
+					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'1' => q(masculine),
+						'few' => q({0} delci na milijardo),
+						'name' => q(delci na milijardo),
+						'one' => q({0} delec na milijardo),
+						'other' => q({0} delcev na milijardo),
+						'two' => q({0} delca na milijardo),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'1' => q(masculine),
+						'few' => q({0} delci na milijardo),
+						'name' => q(delci na milijardo),
+						'one' => q({0} delec na milijardo),
+						'other' => q({0} delcev na milijardo),
+						'two' => q({0} delca na milijardo),
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
@@ -3213,6 +3229,26 @@ has 'units' => (
 						'two' => q({0} nanosekundi),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'1' => q(feminine),
+						'few' => q({0} noči),
+						'name' => q(noči),
+						'one' => q({0} noč),
+						'other' => q({0} noči),
+						'per' => q({0} na noč),
+						'two' => q({0} noči),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'1' => q(feminine),
+						'few' => q({0} noči),
+						'name' => q(noči),
+						'one' => q({0} noč),
+						'other' => q({0} noči),
+						'per' => q({0} na noč),
+						'two' => q({0} noči),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'1' => q(neuter),
 						'few' => q({0} četrtletja),
@@ -3446,6 +3482,7 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'energy-kilocalorie' => {
+						'1' => q(feminine),
 						'few' => q({0} kilokalorije),
 						'name' => q(kilokalorije),
 						'one' => q({0} kilokalorija),
@@ -3454,6 +3491,7 @@ has 'units' => (
 					},
 					# Core Unit Identifier
 					'kilocalorie' => {
+						'1' => q(feminine),
 						'few' => q({0} kilokalorije),
 						'name' => q(kilokalorije),
 						'one' => q({0} kilokalorija),
@@ -3638,25 +3676,25 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'graphics-dot-per-inch' => {
-						'few' => q({0} dpi),
+						'few' => q({0} pike na palec),
 						'name' => q(pik na palec),
 						'one' => q({0} pika na palec),
 						'other' => q({0} pik na palec),
-						'two' => q({0} dpi),
+						'two' => q({0} piki na palec),
 					},
 					# Core Unit Identifier
 					'dot-per-inch' => {
-						'few' => q({0} dpi),
+						'few' => q({0} pike na palec),
 						'name' => q(pik na palec),
 						'one' => q({0} pika na palec),
 						'other' => q({0} pik na palec),
-						'two' => q({0} dpi),
+						'two' => q({0} piki na palec),
 					},
 					# Long Unit Identifier
 					'graphics-em' => {
 						'1' => q(masculine),
 						'few' => q({0} emi),
-						'one' => q({0} em),
+						'one' => q({0} emov),
 						'other' => q({0} emov),
 						'two' => q({0} ema),
 					},
@@ -3664,7 +3702,7 @@ has 'units' => (
 					'em' => {
 						'1' => q(masculine),
 						'few' => q({0} emi),
-						'one' => q({0} em),
+						'one' => q({0} emov),
 						'other' => q({0} emov),
 						'two' => q({0} ema),
 					},
@@ -4052,6 +4090,7 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-point' => {
+						'1' => q(feminine),
 						'few' => q({0} točke),
 						'name' => q(točke),
 						'one' => q({0} točka),
@@ -4060,6 +4099,7 @@ has 'units' => (
 					},
 					# Core Unit Identifier
 					'point' => {
+						'1' => q(feminine),
 						'few' => q({0} točke),
 						'name' => q(točke),
 						'one' => q({0} točka),
@@ -4670,6 +4710,7 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'pressure-millimeter-ofhg' => {
+						'1' => q(masculine),
 						'few' => q({0} milimetri živega srebra),
 						'name' => q(milimetri živega srebra),
 						'one' => q({0} milimeter živega srebra),
@@ -4678,6 +4719,7 @@ has 'units' => (
 					},
 					# Core Unit Identifier
 					'millimeter-ofhg' => {
+						'1' => q(masculine),
 						'few' => q({0} milimetri živega srebra),
 						'name' => q(milimetri živega srebra),
 						'one' => q({0} milimeter živega srebra),
@@ -4767,6 +4809,24 @@ has 'units' => (
 						'one' => q({0} vozel),
 						'other' => q({0} vozlov),
 						'two' => q({0} vozla),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'1' => q(feminine),
+						'few' => q({0} svetlobe),
+						'name' => q(svetloba),
+						'one' => q({0} svetloba),
+						'other' => q({0} svetlob),
+						'two' => q({0} svetlobi),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'1' => q(feminine),
+						'few' => q({0} svetlobe),
+						'name' => q(svetloba),
+						'one' => q({0} svetloba),
+						'other' => q({0} svetlob),
+						'two' => q({0} svetlobi),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -5456,19 +5516,37 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'duration-hour' => {
-						'name' => q(ur),
+						'name' => q(ura),
 					},
 					# Core Unit Identifier
 					'hour' => {
-						'name' => q(ur),
+						'name' => q(ura),
 					},
 					# Long Unit Identifier
 					'duration-month' => {
-						'name' => q(mesecev),
+						'name' => q(mesec),
 					},
 					# Core Unit Identifier
 					'month' => {
-						'name' => q(mesecev),
+						'name' => q(mesec),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'few' => q({0} n),
+						'name' => q(noči),
+						'one' => q({0} n),
+						'other' => q({0} n),
+						'per' => q({0}/noč),
+						'two' => q({0} n),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'few' => q({0} n),
+						'name' => q(noči),
+						'one' => q({0} n),
+						'other' => q({0} n),
+						'per' => q({0}/noč),
+						'two' => q({0} n),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -5502,11 +5580,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'duration-week' => {
-						'name' => q(tednov),
+						'name' => q(t),
 					},
 					# Core Unit Identifier
 					'week' => {
-						'name' => q(tednov),
+						'name' => q(t),
 					},
 					# Long Unit Identifier
 					'duration-year' => {
@@ -5525,6 +5603,20 @@ has 'units' => (
 						'name' => q(pika),
 					},
 					# Long Unit Identifier
+					'graphics-em' => {
+						'few' => q({0} emi),
+						'one' => q({0} emov),
+						'other' => q({0} emov),
+						'two' => q({0} ema),
+					},
+					# Core Unit Identifier
+					'em' => {
+						'few' => q({0} emi),
+						'one' => q({0} emov),
+						'other' => q({0} emov),
+						'two' => q({0} ema),
+					},
+					# Long Unit Identifier
 					'length-light-year' => {
 						'few' => q({0} sv. l.),
 						'one' => q({0} sv. l.),
@@ -5537,6 +5629,22 @@ has 'units' => (
 						'one' => q({0} sv. l.),
 						'other' => q({0} sv. l.),
 						'two' => q({0} sv. l.),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'few' => q({0} svetlobe),
+						'name' => q(svetloba),
+						'one' => q({0} svetloba),
+						'other' => q({0} svetlob),
+						'two' => q({0} svetlobi),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'few' => q({0} svetlobe),
+						'name' => q(svetloba),
+						'one' => q({0} svetloba),
+						'other' => q({0} svetlob),
+						'two' => q({0} svetlobi),
 					},
 					# Long Unit Identifier
 					'temperature-celsius' => {
@@ -5949,6 +6057,24 @@ has 'units' => (
 						'name' => q(meseci),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'few' => q({0} noči),
+						'name' => q(noči),
+						'one' => q({0} noč),
+						'other' => q({0} noči),
+						'per' => q({0}/noč),
+						'two' => q({0} noči),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'few' => q({0} noči),
+						'name' => q(noči),
+						'one' => q({0} noč),
+						'other' => q({0} noči),
+						'per' => q({0}/noč),
+						'two' => q({0} noči),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'few' => q({0} četrtl.),
 						'name' => q(četrt),
@@ -6107,6 +6233,20 @@ has 'units' => (
 						'two' => q({0} dpi),
 					},
 					# Long Unit Identifier
+					'graphics-em' => {
+						'few' => q({0} emi),
+						'one' => q({0} emov),
+						'other' => q({0} emov),
+						'two' => q({0} ema),
+					},
+					# Core Unit Identifier
+					'em' => {
+						'few' => q({0} emi),
+						'one' => q({0} emov),
+						'other' => q({0} emov),
+						'two' => q({0} ema),
+					},
+					# Long Unit Identifier
 					'length-astronomical-unit' => {
 						'few' => q({0} ae),
 						'name' => q(ae),
@@ -6161,6 +6301,14 @@ has 'units' => (
 					# Core Unit Identifier
 					'meter' => {
 						'name' => q(m),
+					},
+					# Long Unit Identifier
+					'length-point' => {
+						'name' => q(točke),
+					},
+					# Core Unit Identifier
+					'point' => {
+						'name' => q(točke),
 					},
 					# Long Unit Identifier
 					'mass-grain' => {
@@ -6265,6 +6413,22 @@ has 'units' => (
 						'one' => q({0} Bf),
 						'other' => q({0} Bf),
 						'two' => q({0} Bf),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'few' => q({0} svetlobe),
+						'name' => q(svetloba),
+						'one' => q({0} svetloba),
+						'other' => q({0} svetlob),
+						'two' => q({0} svetlobi),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'few' => q({0} svetlobe),
+						'name' => q(svetloba),
+						'one' => q({0} svetloba),
+						'other' => q({0} svetlob),
+						'two' => q({0} svetlobi),
 					},
 					# Long Unit Identifier
 					'temperature-celsius' => {
@@ -6654,6 +6818,13 @@ has 'listPatterns' => (
 		} }
 );
 
+has 'minimum_grouping_digits' => (
+	is			=>'ro',
+	isa			=> Int,
+	init_arg	=> undef,
+	default		=> 2,
+);
+
 has 'number_symbols' => (
 	is			=> 'ro',
 	isa			=> HashRef,
@@ -7038,11 +7209,11 @@ has 'currencies' => (
 		},
 		'BHD' => {
 			display_name => {
-				'currency' => q(bahranski dinar),
-				'few' => q(bahranski dinarji),
-				'one' => q(bahranski dinar),
-				'other' => q(bahranskih dinarjev),
-				'two' => q(bahranska dinarja),
+				'currency' => q(bahrajnski dinar),
+				'few' => q(bahrajnski dinarji),
+				'one' => q(bahrajnski dinar),
+				'other' => q(bahrajnskih dinarjev),
+				'two' => q(bahrajnska dinarja),
 			},
 		},
 		'BIF' => {
@@ -7497,7 +7668,7 @@ has 'currencies' => (
 		'GEL' => {
 			display_name => {
 				'currency' => q(gruzijski lari),
-				'few' => q(gruzijski lari),
+				'few' => q(gruzijski lariji),
 				'one' => q(gruzijski lari),
 				'other' => q(gruzijskih larijev),
 				'two' => q(gruzijska larija),
@@ -7621,11 +7792,11 @@ has 'currencies' => (
 		},
 		'HTG' => {
 			display_name => {
-				'currency' => q(haitski gurd),
-				'few' => q(haitski gurdi),
-				'one' => q(haitski gurd),
-				'other' => q(haitskih gurdov),
-				'two' => q(haitska gurda),
+				'currency' => q(haitijski gurd),
+				'few' => q(haitijski gurdi),
+				'one' => q(haitijski gurd),
+				'other' => q(haitijskih gurdov),
+				'two' => q(haitijska gurda),
 			},
 		},
 		'HUF' => {
@@ -7855,7 +8026,7 @@ has 'currencies' => (
 			display_name => {
 				'currency' => q(lesotski loti),
 				'few' => q(lesotski loti),
-				'one' => q(lesotski lot),
+				'one' => q(lesotski loti),
 				'other' => q(lesotskih lotov),
 				'two' => q(lesotska lota),
 			},
@@ -7920,20 +8091,20 @@ has 'currencies' => (
 		},
 		'MDL' => {
 			display_name => {
-				'currency' => q(moldavijski leu),
-				'few' => q(moldavijski leu),
-				'one' => q(moldavijski leu),
-				'other' => q(moldavijskih leuov),
-				'two' => q(moldavijska leua),
+				'currency' => q(moldavski lev),
+				'few' => q(moldavski levi),
+				'one' => q(moldavski lev),
+				'other' => q(moldavskih levov),
+				'two' => q(moldavska leva),
 			},
 		},
 		'MGA' => {
 			display_name => {
-				'currency' => q(malgaški ariarij),
-				'few' => q(malgaški ariariji),
-				'one' => q(malgaški ariarij),
-				'other' => q(malgaških ariarijev),
-				'two' => q(malgaška ariarija),
+				'currency' => q(madagaskarski ariari),
+				'few' => q(madagaskarski ariariji),
+				'one' => q(madagaskarski ariari),
+				'other' => q(madagaskarskih ariarijev),
+				'two' => q(madagaskarska ariarija),
 			},
 		},
 		'MGF' => {
@@ -7975,11 +8146,11 @@ has 'currencies' => (
 		},
 		'MOP' => {
 			display_name => {
-				'currency' => q(makavska pataka),
-				'few' => q(makavske patake),
-				'one' => q(makavska pataka),
-				'other' => q(makavskih patak),
-				'two' => q(makavski pataki),
+				'currency' => q(macajska pataka),
+				'few' => q(macajske patake),
+				'one' => q(macajska pataka),
+				'other' => q(macajskih patak),
+				'two' => q(macajski pataki),
 			},
 		},
 		'MRO' => {
@@ -8110,11 +8281,11 @@ has 'currencies' => (
 		},
 		'NIO' => {
 			display_name => {
-				'currency' => q(nikaraška zlata kordova),
-				'few' => q(nikaraške zlate kordove),
-				'one' => q(nikaraška zlata kordova),
-				'other' => q(nikaraških zlatih kordov),
-				'two' => q(nikaraški zlati kordovi),
+				'currency' => q(nikaragovska kordova),
+				'few' => q(nikaragovske kordove),
+				'one' => q(nikaragovska kordova),
+				'other' => q(nikaragovskih kordov),
+				'two' => q(nikaragovski kordovi),
 			},
 		},
 		'NLG' => {
@@ -8221,11 +8392,11 @@ has 'currencies' => (
 		},
 		'PLN' => {
 			display_name => {
-				'currency' => q(poljski novi zlot),
-				'few' => q(poljski novi zloti),
-				'one' => q(poljski novi zlot),
-				'other' => q(poljskih novih zlotov),
-				'two' => q(poljska nova zlota),
+				'currency' => q(poljski zlot),
+				'few' => q(poljski zloti),
+				'one' => q(poljski zlot),
+				'other' => q(poljskih zlotov),
+				'two' => q(poljska zlota),
 			},
 		},
 		'PLZ' => {
@@ -8268,11 +8439,11 @@ has 'currencies' => (
 		},
 		'RON' => {
 			display_name => {
-				'currency' => q(romunski leu),
-				'few' => q(romunski leu),
-				'one' => q(romunski leu),
-				'other' => q(romunskih leuov),
-				'two' => q(romunska leua),
+				'currency' => q(romunski lev),
+				'few' => q(romunski levi),
+				'one' => q(romunski lev),
+				'other' => q(romunskih levov),
+				'two' => q(romunska leva),
 			},
 		},
 		'RSD' => {
@@ -8400,20 +8571,20 @@ has 'currencies' => (
 		},
 		'SLE' => {
 			display_name => {
-				'currency' => q(sieraleonski leone),
-				'few' => q(sieraleonski leoni),
-				'one' => q(sieraleonski leone),
-				'other' => q(sieraleonskih leonov),
-				'two' => q(sieraleonska leona),
+				'currency' => q(sierraleonski leone),
+				'few' => q(sierraleonski leoni),
+				'one' => q(sierraleonski leone),
+				'other' => q(sierraleonskih leonov),
+				'two' => q(sierraleonska leona),
 			},
 		},
 		'SLL' => {
 			display_name => {
-				'currency' => q(sieraleonski leone \(1964—2022\)),
-				'few' => q(sieraleonski leoni \(1964—2022\)),
-				'one' => q(sieraleonski leone \(1964—2022\)),
-				'other' => q(sieraleonskih leonov \(1964—2022\)),
-				'two' => q(sieraleonska leona \(1964—2022\)),
+				'currency' => q(sierraleonski leone \(1964—2022\)),
+				'few' => q(sierraleonski leoni \(1964—2022\)),
+				'one' => q(sierraleonski leone \(1964—2022\)),
+				'other' => q(sierraleonskih leonov \(1964—2022\)),
+				'two' => q(sierraleonska leona \(1964—2022\)),
 			},
 		},
 		'SOS' => {
@@ -8459,11 +8630,11 @@ has 'currencies' => (
 		},
 		'STN' => {
 			display_name => {
-				'currency' => q(saotomejska dobra),
-				'few' => q(saotomejske dobre),
-				'one' => q(saotomejska dobra),
-				'other' => q(saotomejskih dober),
-				'two' => q(saotomejski dobri),
+				'currency' => q(dobra Svetega Tomaža in Princa),
+				'few' => q(dobre Svetega Tomaža in Princa),
+				'one' => q(dobra Svetega Tomaža in Princa),
+				'other' => q(dober Svetega Tomaža in Princa),
+				'two' => q(dobri Svetega Tomaža in Princa),
 			},
 		},
 		'SUR' => {
@@ -8487,11 +8658,11 @@ has 'currencies' => (
 		},
 		'SZL' => {
 			display_name => {
-				'currency' => q(svazijski lilangeni),
-				'few' => q(svazijski lilangeni),
-				'one' => q(svazijski lilangeni),
-				'other' => q(svazijskih lilangenijev),
-				'two' => q(svazijska lilangenija),
+				'currency' => q(esvatinski lilangeni),
+				'few' => q(esvatinski lilangeni),
+				'one' => q(esvatinski lilangeni),
+				'other' => q(esvatinskih lilangenijev),
+				'two' => q(esvatinska lilangenija),
 			},
 		},
 		'THB' => {
@@ -8524,11 +8695,11 @@ has 'currencies' => (
 		},
 		'TMT' => {
 			display_name => {
-				'currency' => q(turkmenistanski novi manat),
-				'few' => q(turkmenistanski novi manati),
-				'one' => q(turkmenistanski novi manat),
-				'other' => q(turkmenistanskih novih manatov),
-				'two' => q(turkmenistanska nova manata),
+				'currency' => q(turkmenistanski manat),
+				'few' => q(turkmenistanski manati),
+				'one' => q(turkmenistanski manat),
+				'other' => q(turkmenistanskih manatov),
+				'two' => q(turkmenistanska manata),
 			},
 		},
 		'TND' => {
@@ -8561,11 +8732,11 @@ has 'currencies' => (
 		},
 		'TRY' => {
 			display_name => {
-				'currency' => q(nova turška lira),
-				'few' => q(nove turške lire),
-				'one' => q(nova turška lira),
-				'other' => q(novih turških lir),
-				'two' => q(novi turški liri),
+				'currency' => q(turška lira),
+				'few' => q(turške lire),
+				'one' => q(turška lira),
+				'other' => q(turških lir),
+				'two' => q(turški liri),
 			},
 		},
 		'TTD' => {
@@ -9766,9 +9937,6 @@ has 'time_zone_names' => (
 		'Africa/Mogadishu' => {
 			exemplarCity => q#Mogadišu#,
 		},
-		'Africa/Sao_Tome' => {
-			exemplarCity => q#São Tomé#,
-		},
 		'Africa_Central' => {
 			long => {
 				'standard' => q#Centralnoafriški čas#,
@@ -9808,9 +9976,6 @@ has 'time_zone_names' => (
 		'America/Anguilla' => {
 			exemplarCity => q#Angvila#,
 		},
-		'America/Asuncion' => {
-			exemplarCity => q#Asunción#,
-		},
 		'America/Bahia_Banderas' => {
 			exemplarCity => q#Bahia de Banderas#,
 		},
@@ -9822,9 +9987,6 @@ has 'time_zone_names' => (
 		},
 		'America/Costa_Rica' => {
 			exemplarCity => q#Kostarika#,
-		},
-		'America/Curacao' => {
-			exemplarCity => q#Curaçao#,
 		},
 		'America/Dominica' => {
 			exemplarCity => q#Dominika#,
@@ -9861,9 +10023,6 @@ has 'time_zone_names' => (
 		},
 		'America/Puerto_Rico' => {
 			exemplarCity => q#Portoriko#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#Santa Isabel#,
 		},
 		'America/St_Barthelemy' => {
 			exemplarCity => q#Sv. Bartolomej#,
@@ -9988,9 +10147,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#Čita#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#Čojbalsan#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#Kolombo#,
@@ -10140,9 +10296,6 @@ has 'time_zone_names' => (
 		'Atlantic/St_Helena' => {
 			exemplarCity => q#Sv. Helena#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#Currie#,
-		},
 		'Australia_Central' => {
 			long => {
 				'daylight' => q#Avstralski centralni poletni čas#,
@@ -10247,13 +10400,6 @@ has 'time_zone_names' => (
 				'standard' => q#Kitajski standardni čas#,
 			},
 		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Čojbalsanski poletni čas#,
-				'generic' => q#Čojbalsanski čas#,
-				'standard' => q#Čojbalsanski standardni čas#,
-			},
-		},
 		'Christmas' => {
 			long => {
 				'standard' => q#Božičnootoški čas#,
@@ -10349,7 +10495,7 @@ has 'time_zone_names' => (
 		},
 		'Europe/Dublin' => {
 			long => {
-				'daylight' => q#irski standardni čas#,
+				'daylight' => q#Irski standardni čas#,
 			},
 		},
 		'Europe/Isle_of_Man' => {
@@ -10363,7 +10509,7 @@ has 'time_zone_names' => (
 		},
 		'Europe/London' => {
 			long => {
-				'daylight' => q#britanski poletni čas#,
+				'daylight' => q#Britanski poletni čas#,
 			},
 		},
 		'Europe/Luxembourg' => {
@@ -10396,9 +10542,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#Uljanovsk#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#Užgorod#,
-		},
 		'Europe/Vatican' => {
 			exemplarCity => q#Vatikan#,
 		},
@@ -10410,9 +10553,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Warsaw' => {
 			exemplarCity => q#Varšava#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#Zaporožje#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#Zürich#,
@@ -10616,6 +10756,11 @@ has 'time_zone_names' => (
 				'standard' => q#Petropavlovsk-Kamčatski standardni čas#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Kazahstanski čas#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#Vzhodni kazahstanski čas#,
@@ -10662,11 +10807,6 @@ has 'time_zone_names' => (
 				'standard' => q#Standardni čas otoka Lord Howe#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Macquarieski čas#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Magadanski poletni čas#,
@@ -10704,13 +10844,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Mawsonski čas#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Mehiški severozahodni poletni čas#,
-				'generic' => q#Mehiški severozahodni čas#,
-				'standard' => q#Mehiški severozahodni standardni čas#,
 			},
 		},
 		'Mexico_Pacific' => {

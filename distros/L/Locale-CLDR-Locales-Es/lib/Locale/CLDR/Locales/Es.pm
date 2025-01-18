@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Es - Package for language Spanish
 
 package Locale::CLDR::Locales::Es;
 # This file auto generated from Data\common\main\es.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -1581,6 +1581,7 @@ has 'display_name_language' => (
  				'bin' => 'bini',
  				'bkm' => 'kom',
  				'bla' => 'siksika',
+ 				'blo' => 'anii',
  				'bm' => 'bambara',
  				'bn' => 'bengalí',
  				'bo' => 'tibetano',
@@ -1809,6 +1810,7 @@ has 'display_name_language' => (
  				'kv' => 'komi',
  				'kw' => 'córnico',
  				'kwk' => 'kwakʼwala',
+ 				'kxv' => 'kuvi',
  				'ky' => 'kirguís',
  				'la' => 'latín',
  				'lad' => 'ladino',
@@ -1819,6 +1821,7 @@ has 'display_name_language' => (
  				'lez' => 'lezgiano',
  				'lg' => 'ganda',
  				'li' => 'limburgués',
+ 				'lij' => 'ligur',
  				'lil' => 'lillooet',
  				'lkt' => 'lakota',
  				'lmo' => 'lombardo',
@@ -1834,7 +1837,6 @@ has 'display_name_language' => (
  				'lua' => 'luba-lulua',
  				'lui' => 'luiseño',
  				'lun' => 'lunda',
- 				'luo' => 'luo',
  				'lus' => 'mizo',
  				'luy' => 'luyia',
  				'lv' => 'letón',
@@ -2017,6 +2019,7 @@ has 'display_name_language' => (
  				'swb' => 'comorense',
  				'syc' => 'siríaco clásico',
  				'syr' => 'siriaco',
+ 				'szl' => 'silesio',
  				'ta' => 'tamil',
  				'tce' => 'tutchone meridional',
  				'te' => 'telugu',
@@ -2064,9 +2067,10 @@ has 'display_name_language' => (
  				'und' => 'lengua desconocida',
  				'ur' => 'urdu',
  				'uz' => 'uzbeko',
- 				'vai' => 'vai',
  				've' => 'venda',
+ 				'vec' => 'veneciano',
  				'vi' => 'vietnamita',
+ 				'vmw' => 'makua',
  				'vo' => 'volapük',
  				'vot' => 'vótico',
  				'vun' => 'vunjo',
@@ -2080,6 +2084,7 @@ has 'display_name_language' => (
  				'wuu' => 'chino wu',
  				'xal' => 'kalmyk',
  				'xh' => 'xhosa',
+ 				'xnr' => 'kangri',
  				'xog' => 'soga',
  				'yao' => 'yao',
  				'yap' => 'yapés',
@@ -2712,7 +2717,6 @@ has 'display_name_type' => (
  				'phonebook' => q{orden de listín telefónico},
  				'phonetic' => q{orden fonético},
  				'pinyin' => q{orden pinyin},
- 				'reformed' => q{orden reformado},
  				'search' => q{búsqueda de uso general},
  				'searchjl' => q{Buscar por consonante inicial de hangul},
  				'standard' => q{orden estándar},
@@ -3400,12 +3404,14 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'concentr-milligram-ofglucose-per-deciliter' => {
+						'1' => q(masculine),
 						'name' => q(miligramos por decilitro),
 						'one' => q({0} miligramo por decilitro),
 						'other' => q({0} miligramos por decilitro),
 					},
 					# Core Unit Identifier
 					'milligram-ofglucose-per-deciliter' => {
+						'1' => q(masculine),
 						'name' => q(miligramos por decilitro),
 						'one' => q({0} miligramo por decilitro),
 						'other' => q({0} miligramos por decilitro),
@@ -3487,6 +3493,20 @@ has 'units' => (
 						'1' => q(masculine),
 						'one' => q({0} por diez mil),
 						'other' => q({0} por diez mil),
+					},
+					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'1' => q(feminine),
+						'name' => q(partes por millardo),
+						'one' => q({0} parte por millardo),
+						'other' => q({0} partes por millardo),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'1' => q(feminine),
+						'name' => q(partes por millardo),
+						'one' => q({0} parte por millardo),
+						'other' => q({0} partes por millardo),
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
@@ -3851,6 +3871,22 @@ has 'units' => (
 						'name' => q(nanosegundos),
 						'one' => q({0} nanosegundo),
 						'other' => q({0} nanosegundos),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'1' => q(feminine),
+						'name' => q(noches),
+						'one' => q({0} noche),
+						'other' => q({0} noches),
+						'per' => q({0} por noche),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'1' => q(feminine),
+						'name' => q(noches),
+						'one' => q({0} noche),
+						'other' => q({0} noches),
+						'per' => q({0} por noche),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -4558,12 +4594,14 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-point' => {
+						'1' => q(masculine),
 						'name' => q(puntos),
 						'one' => q({0} punto),
 						'other' => q({0} puntos),
 					},
 					# Core Unit Identifier
 					'point' => {
+						'1' => q(masculine),
 						'name' => q(puntos),
 						'one' => q({0} punto),
 						'other' => q({0} puntos),
@@ -5072,12 +5110,14 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'pressure-millimeter-ofhg' => {
+						'1' => q(masculine),
 						'name' => q(milímetros de mercurio),
 						'one' => q({0} milímetro de mercurio),
 						'other' => q({0} milímetros de mercurio),
 					},
 					# Core Unit Identifier
 					'millimeter-ofhg' => {
+						'1' => q(masculine),
 						'name' => q(milímetros de mercurio),
 						'one' => q({0} milímetro de mercurio),
 						'other' => q({0} milímetros de mercurio),
@@ -5110,12 +5150,14 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'speed-beaufort' => {
+						'1' => q(feminine),
 						'name' => q(Beaufort),
 						'one' => q(Beaufort {0}),
 						'other' => q(Beaufort {0}),
 					},
 					# Core Unit Identifier
 					'beaufort' => {
+						'1' => q(feminine),
 						'name' => q(Beaufort),
 						'one' => q(Beaufort {0}),
 						'other' => q(Beaufort {0}),
@@ -5145,6 +5187,20 @@ has 'units' => (
 						'name' => q(nudos),
 						'one' => q({0} nudo),
 						'other' => q({0} nudos),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'1' => q(feminine),
+						'name' => q(luz),
+						'one' => q({0} luz),
+						'other' => q({0} luz),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'1' => q(feminine),
+						'name' => q(luz),
+						'one' => q({0} luz),
+						'other' => q({0} luz),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -6003,6 +6059,16 @@ has 'units' => (
 						'other' => q({0}‱),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'one' => q({0}ppb),
+						'other' => q({0}ppb),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'one' => q({0}ppb),
+						'other' => q({0}ppb),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(l/100km),
 						'one' => q({0}l/100km),
@@ -6269,6 +6335,20 @@ has 'units' => (
 					'nanosecond' => {
 						'one' => q({0}ns),
 						'other' => q({0}ns),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(noches),
+						'one' => q({0}noche),
+						'other' => q({0}noches),
+						'per' => q({0}/noche),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(noches),
+						'one' => q({0}noche),
+						'other' => q({0}noches),
+						'per' => q({0}/noche),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -7205,6 +7285,18 @@ has 'units' => (
 						'other' => q({0}kn),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(luz),
+						'one' => q({0}luz),
+						'other' => q({0}luz),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(luz),
+						'one' => q({0}luz),
+						'other' => q({0}luz),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'one' => q({0}m/s),
 						'other' => q({0}m/s),
@@ -7747,6 +7839,14 @@ has 'units' => (
 						'other' => q({0} ‱),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(partes/millardo),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(partes/millardo),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(l/100 km),
 						'one' => q({0} l/100 km),
@@ -7885,6 +7985,20 @@ has 'units' => (
 						'one' => q({0} m.),
 						'other' => q({0} m.),
 						'per' => q({0}/m.),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(noches),
+						'one' => q({0} noche),
+						'other' => q({0} noches),
+						'per' => q({0}/noche),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(noches),
+						'one' => q({0} noche),
+						'other' => q({0} noches),
+						'per' => q({0}/noche),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -8219,6 +8333,18 @@ has 'units' => (
 						'name' => q(mmHg),
 						'one' => q({0} mmHg),
 						'other' => q({0} mmHg),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(luz),
+						'one' => q({0} luz),
+						'other' => q({0} luz),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(luz),
+						'one' => q({0} luz),
+						'other' => q({0} luz),
 					},
 					# Long Unit Identifier
 					'temperature-celsius' => {
@@ -8735,23 +8861,23 @@ has 'currencies' => (
 		},
 		'AFN' => {
 			display_name => {
-				'currency' => q(afgani),
-				'one' => q(afgani),
-				'other' => q(afganis),
+				'currency' => q(afgani afgano),
+				'one' => q(afgani afgano),
+				'other' => q(afganis afganos),
 			},
 		},
 		'ALL' => {
 			display_name => {
-				'currency' => q(lek),
-				'one' => q(lek),
-				'other' => q(leks),
+				'currency' => q(lek albanés),
+				'one' => q(lek albanés),
+				'other' => q(leks albaneses),
 			},
 		},
 		'AMD' => {
 			display_name => {
-				'currency' => q(dram),
-				'one' => q(dram),
-				'other' => q(drams),
+				'currency' => q(dram armenio),
+				'one' => q(dram armenio),
+				'other' => q(drams armenios),
 			},
 		},
 		'ANG' => {
@@ -8763,9 +8889,9 @@ has 'currencies' => (
 		},
 		'AOA' => {
 			display_name => {
-				'currency' => q(kuanza),
-				'one' => q(kuanza),
-				'other' => q(kuanzas),
+				'currency' => q(kuanza angoleño),
+				'one' => q(kuanza angoleño),
+				'other' => q(kuanzas angoleños),
 			},
 		},
 		'AOK' => {
@@ -8861,9 +8987,9 @@ has 'currencies' => (
 		},
 		'BDT' => {
 			display_name => {
-				'currency' => q(taka),
-				'one' => q(taka),
-				'other' => q(takas),
+				'currency' => q(taka bangladesí),
+				'one' => q(taka bangladesí),
+				'other' => q(takas bangladesíes),
 			},
 		},
 		'BEC' => {
@@ -9002,9 +9128,9 @@ has 'currencies' => (
 		},
 		'BTN' => {
 			display_name => {
-				'currency' => q(gultrum),
-				'one' => q(gultrum),
-				'other' => q(gultrums),
+				'currency' => q(gultrum butanés),
+				'one' => q(gultrum butanés),
+				'other' => q(gultrums butaneses),
 			},
 		},
 		'BUK' => {
@@ -9016,9 +9142,9 @@ has 'currencies' => (
 		},
 		'BWP' => {
 			display_name => {
-				'currency' => q(pula),
-				'one' => q(pula),
-				'other' => q(pulas),
+				'currency' => q(pula botsuano),
+				'one' => q(pula botsuano),
+				'other' => q(pulas botsuanos),
 			},
 		},
 		'BYB' => {
@@ -9110,9 +9236,9 @@ has 'currencies' => (
 		'CNY' => {
 			symbol => 'CNY',
 			display_name => {
-				'currency' => q(yuan),
-				'one' => q(yuan),
-				'other' => q(yuanes),
+				'currency' => q(yuan renminbi),
+				'one' => q(yuan renminbi),
+				'other' => q(yuanes renminbi),
 			},
 		},
 		'COP' => {
@@ -9258,9 +9384,9 @@ has 'currencies' => (
 		},
 		'ERN' => {
 			display_name => {
-				'currency' => q(nakfa),
-				'one' => q(nakfa),
-				'other' => q(nakfas),
+				'currency' => q(nakfa eritreo),
+				'one' => q(nakfa eritreo),
+				'other' => q(nakfas eritreos),
 			},
 		},
 		'ESA' => {
@@ -9287,9 +9413,9 @@ has 'currencies' => (
 		},
 		'ETB' => {
 			display_name => {
-				'currency' => q(bir),
-				'one' => q(bir),
-				'other' => q(bires),
+				'currency' => q(bir etíope),
+				'one' => q(bir etíope),
+				'other' => q(bires etíopes),
 			},
 		},
 		'EUR' => {
@@ -9342,9 +9468,9 @@ has 'currencies' => (
 		},
 		'GEL' => {
 			display_name => {
-				'currency' => q(lari),
-				'one' => q(lari),
-				'other' => q(laris),
+				'currency' => q(lari georgiano),
+				'one' => q(lari georgiano),
+				'other' => q(laris georgianos),
 			},
 		},
 		'GHC' => {
@@ -9354,9 +9480,9 @@ has 'currencies' => (
 		},
 		'GHS' => {
 			display_name => {
-				'currency' => q(cedi),
-				'one' => q(cedi),
-				'other' => q(cedis),
+				'currency' => q(cedi ghanés),
+				'one' => q(cedi ghanés),
+				'other' => q(cedis ghaneses),
 			},
 		},
 		'GIP' => {
@@ -9368,9 +9494,9 @@ has 'currencies' => (
 		},
 		'GMD' => {
 			display_name => {
-				'currency' => q(dalasi),
-				'one' => q(dalasi),
-				'other' => q(dalasis),
+				'currency' => q(dalasi gambiano),
+				'one' => q(dalasi gambiano),
+				'other' => q(dalasis gambianos),
 			},
 		},
 		'GNF' => {
@@ -9447,9 +9573,9 @@ has 'currencies' => (
 		},
 		'HRK' => {
 			display_name => {
-				'currency' => q(kuna),
-				'one' => q(kuna),
-				'other' => q(kunas),
+				'currency' => q(kuna croata),
+				'one' => q(kuna croata),
+				'other' => q(kunas croatas),
 			},
 		},
 		'HTG' => {
@@ -9548,9 +9674,9 @@ has 'currencies' => (
 		'JPY' => {
 			symbol => 'JPY',
 			display_name => {
-				'currency' => q(yen),
-				'one' => q(yen),
-				'other' => q(yenes),
+				'currency' => q(yen japonés),
+				'one' => q(yen japonés),
+				'other' => q(yenes japoneses),
 			},
 		},
 		'KES' => {
@@ -9562,16 +9688,16 @@ has 'currencies' => (
 		},
 		'KGS' => {
 			display_name => {
-				'currency' => q(som),
-				'one' => q(som),
-				'other' => q(soms),
+				'currency' => q(som kirguís),
+				'one' => q(som kirguís),
+				'other' => q(soms kirguises),
 			},
 		},
 		'KHR' => {
 			display_name => {
-				'currency' => q(riel),
-				'one' => q(riel),
-				'other' => q(rieles),
+				'currency' => q(riel camboyano),
+				'one' => q(riel camboyano),
+				'other' => q(rieles camboyanos),
 			},
 		},
 		'KMF' => {
@@ -9619,9 +9745,9 @@ has 'currencies' => (
 		},
 		'LAK' => {
 			display_name => {
-				'currency' => q(kip),
-				'one' => q(kip),
-				'other' => q(kips),
+				'currency' => q(kip laosiano),
+				'one' => q(kip laosiano),
+				'other' => q(kips laosianos),
 			},
 		},
 		'LBP' => {
@@ -9731,9 +9857,9 @@ has 'currencies' => (
 		},
 		'MGA' => {
 			display_name => {
-				'currency' => q(ariari),
-				'one' => q(ariari),
-				'other' => q(ariaris),
+				'currency' => q(ariari malgache),
+				'one' => q(ariari malgache),
+				'other' => q(ariaris malgaches),
 			},
 		},
 		'MGF' => {
@@ -9755,23 +9881,23 @@ has 'currencies' => (
 		},
 		'MMK' => {
 			display_name => {
-				'currency' => q(kiat),
-				'one' => q(kiat),
-				'other' => q(kiats),
+				'currency' => q(kiat de Myanmar),
+				'one' => q(kiat de Myanmar),
+				'other' => q(kiats de Myanmar),
 			},
 		},
 		'MNT' => {
 			display_name => {
-				'currency' => q(tugrik),
-				'one' => q(tugrik),
-				'other' => q(tugriks),
+				'currency' => q(tugrik mongol),
+				'one' => q(tugrik mongol),
+				'other' => q(tugriks mongoles),
 			},
 		},
 		'MOP' => {
 			display_name => {
-				'currency' => q(pataca de Macao),
-				'one' => q(pataca de Macao),
-				'other' => q(patacas de Macao),
+				'currency' => q(pataca macaense),
+				'one' => q(pataca macaense),
+				'other' => q(patacas macaenses),
 			},
 		},
 		'MRO' => {
@@ -9783,9 +9909,9 @@ has 'currencies' => (
 		},
 		'MRU' => {
 			display_name => {
-				'currency' => q(uguiya),
-				'one' => q(uguiya),
-				'other' => q(uguiyas),
+				'currency' => q(uguiya mauritano),
+				'one' => q(uguiya mauritano),
+				'other' => q(uguiyas mauritanos),
 			},
 		},
 		'MTL' => {
@@ -9811,9 +9937,9 @@ has 'currencies' => (
 		},
 		'MVR' => {
 			display_name => {
-				'currency' => q(rufiya),
-				'one' => q(rufiya),
-				'other' => q(rufiyas),
+				'currency' => q(rufiya maldiva),
+				'one' => q(rufiya maldiva),
+				'other' => q(rufiyas maldivas),
 			},
 		},
 		'MWK' => {
@@ -9847,9 +9973,9 @@ has 'currencies' => (
 		},
 		'MYR' => {
 			display_name => {
-				'currency' => q(ringit),
-				'one' => q(ringit),
-				'other' => q(ringits),
+				'currency' => q(ringit malasio),
+				'one' => q(ringit malasio),
+				'other' => q(ringits malasios),
 			},
 		},
 		'MZE' => {
@@ -9866,9 +9992,9 @@ has 'currencies' => (
 		},
 		'MZN' => {
 			display_name => {
-				'currency' => q(metical),
-				'one' => q(metical),
-				'other' => q(meticales),
+				'currency' => q(metical mozambiqueño),
+				'one' => q(metical mozambiqueño),
+				'other' => q(meticales mozambiqueños),
 			},
 		},
 		'NAD' => {
@@ -9880,9 +10006,9 @@ has 'currencies' => (
 		},
 		'NGN' => {
 			display_name => {
-				'currency' => q(naira),
-				'one' => q(naira),
-				'other' => q(nairas),
+				'currency' => q(naira nigeriano),
+				'one' => q(naira nigeriano),
+				'other' => q(nairas nigerianos),
 			},
 		},
 		'NIC' => {
@@ -9965,9 +10091,9 @@ has 'currencies' => (
 		},
 		'PGK' => {
 			display_name => {
-				'currency' => q(kina),
-				'one' => q(kina),
-				'other' => q(kinas),
+				'currency' => q(kina papú),
+				'one' => q(kina papú),
+				'other' => q(kinas papúes),
 			},
 		},
 		'PHP' => {
@@ -9987,9 +10113,9 @@ has 'currencies' => (
 		},
 		'PLN' => {
 			display_name => {
-				'currency' => q(esloti),
-				'one' => q(esloti),
-				'other' => q(eslotis),
+				'currency' => q(esloti polaco),
+				'one' => q(esloti polaco),
+				'other' => q(eslotis polacos),
 			},
 		},
 		'PLZ' => {
@@ -10147,16 +10273,16 @@ has 'currencies' => (
 		},
 		'SLE' => {
 			display_name => {
-				'currency' => q(leona),
-				'one' => q(leona),
-				'other' => q(leonas),
+				'currency' => q(leona sierraleonesa),
+				'one' => q(leona sierraleonesa),
+				'other' => q(leonas sierraleonesas),
 			},
 		},
 		'SLL' => {
 			display_name => {
-				'currency' => q(leona \(1964—2022\)),
-				'one' => q(leona \(1964—2022\)),
-				'other' => q(leonas \(1964—2022\)),
+				'currency' => q(leona sierraleonesa \(1964–2022\)),
+				'one' => q(leona sierraleonesa \(1964–2022\)),
+				'other' => q(leonas sierraleonesas \(1964–2022\)),
 			},
 		},
 		'SOS' => {
@@ -10194,9 +10320,9 @@ has 'currencies' => (
 		},
 		'STN' => {
 			display_name => {
-				'currency' => q(dobra),
-				'one' => q(dobra),
-				'other' => q(dobras),
+				'currency' => q(dobra santotomense),
+				'one' => q(dobra santotomense),
+				'other' => q(dobras santotomenses),
 			},
 		},
 		'SUR' => {
@@ -10222,17 +10348,17 @@ has 'currencies' => (
 		},
 		'SZL' => {
 			display_name => {
-				'currency' => q(lilangeni),
-				'one' => q(lilangeni),
-				'other' => q(lilangenis),
+				'currency' => q(lilangeni esuatiní),
+				'one' => q(lilangeni esuatiní),
+				'other' => q(lilangenis esuatiníes),
 			},
 		},
 		'THB' => {
 			symbol => '฿',
 			display_name => {
-				'currency' => q(bat),
-				'one' => q(bat),
-				'other' => q(bats),
+				'currency' => q(bat tailandés),
+				'one' => q(bat tailandés),
+				'other' => q(bats tailandeses),
 			},
 		},
 		'TJR' => {
@@ -10270,9 +10396,9 @@ has 'currencies' => (
 		},
 		'TOP' => {
 			display_name => {
-				'currency' => q(paanga),
-				'one' => q(paanga),
-				'other' => q(paangas),
+				'currency' => q(paanga tongano),
+				'one' => q(paanga tongano),
+				'other' => q(paangas tonganos),
 			},
 		},
 		'TPE' => {
@@ -10318,9 +10444,9 @@ has 'currencies' => (
 		},
 		'UAH' => {
 			display_name => {
-				'currency' => q(grivna),
-				'one' => q(grivna),
-				'other' => q(grivnas),
+				'currency' => q(grivna ucraniana),
+				'one' => q(grivna ucraniana),
+				'other' => q(grivnas ucranianas),
 			},
 		},
 		'UAK' => {
@@ -10393,9 +10519,9 @@ has 'currencies' => (
 		},
 		'UZS' => {
 			display_name => {
-				'currency' => q(sum),
-				'one' => q(sum),
-				'other' => q(sums),
+				'currency' => q(sum uzbeko),
+				'one' => q(sum uzbeko),
+				'other' => q(sums uzbekos),
 			},
 		},
 		'VEB' => {
@@ -10421,23 +10547,23 @@ has 'currencies' => (
 		},
 		'VND' => {
 			display_name => {
-				'currency' => q(dong),
-				'one' => q(dong),
-				'other' => q(dongs),
+				'currency' => q(dong vietnamita),
+				'one' => q(dong vietnamita),
+				'other' => q(dongs vietnamitas),
 			},
 		},
 		'VUV' => {
 			display_name => {
-				'currency' => q(vatu),
-				'one' => q(vatu),
-				'other' => q(vatus),
+				'currency' => q(vatu vanuatense),
+				'one' => q(vatu vanuatense),
+				'other' => q(vatus vanuatenses),
 			},
 		},
 		'WST' => {
 			display_name => {
-				'currency' => q(tala),
-				'one' => q(tala),
-				'other' => q(talas),
+				'currency' => q(tala samoano),
+				'one' => q(tala samoano),
+				'other' => q(talas samoanos),
 			},
 		},
 		'XAF' => {
@@ -10492,6 +10618,13 @@ has 'currencies' => (
 				'currency' => q(dólar del Caribe Oriental),
 				'one' => q(dólar del Caribe Oriental),
 				'other' => q(dólares del Caribe Oriental),
+			},
+		},
+		'XCG' => {
+			display_name => {
+				'currency' => q(florín caribeño),
+				'one' => q(florín caribeño),
+				'other' => q(florines caribeños),
 			},
 		},
 		'XDR' => {
@@ -10598,9 +10731,9 @@ has 'currencies' => (
 		},
 		'ZAR' => {
 			display_name => {
-				'currency' => q(rand),
-				'one' => q(rand),
-				'other' => q(rands),
+				'currency' => q(rand sudafricano),
+				'one' => q(rand sudafricano),
+				'other' => q(rands sudafricanos),
 			},
 		},
 		'ZMK' => {
@@ -11969,9 +12102,6 @@ has 'time_zone_names' => (
 		'America/Argentina/Tucuman' => {
 			exemplarCity => q#Tucumán#,
 		},
-		'America/Asuncion' => {
-			exemplarCity => q#Asunción#,
-		},
 		'America/Bahia' => {
 			exemplarCity => q#Bahía#,
 		},
@@ -12061,9 +12191,6 @@ has 'time_zone_names' => (
 		},
 		'America/Rio_Branco' => {
 			exemplarCity => q#Río Branco#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#Santa Isabel#,
 		},
 		'America/Santarem' => {
 			exemplarCity => q#Santarém#,
@@ -12351,9 +12478,6 @@ has 'time_zone_names' => (
 		'Australia/Adelaide' => {
 			exemplarCity => q#Adelaida#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#Currie#,
-		},
 		'Australia/Sydney' => {
 			exemplarCity => q#Sídney#,
 		},
@@ -12459,13 +12583,6 @@ has 'time_zone_names' => (
 				'daylight' => q#hora de verano de China#,
 				'generic' => q#hora de China#,
 				'standard' => q#hora estándar de China#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#hora de verano de Choibalsan#,
-				'generic' => q#hora de Choibalsan#,
-				'standard' => q#hora estándar de Choibalsan#,
 			},
 		},
 		'Christmas' => {
@@ -12639,9 +12756,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#Uliánovsk#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#Úzhgorod#,
-		},
 		'Europe/Vatican' => {
 			exemplarCity => q#El Vaticano#,
 		},
@@ -12656,9 +12770,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Warsaw' => {
 			exemplarCity => q#Varsovia#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#Zaporiyia#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#Zúrich#,
@@ -12891,6 +13002,11 @@ has 'time_zone_names' => (
 				'standard' => q#hora estándar de Kamchatka#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#hora de Kazajistán#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#hora de Kazajistán oriental#,
@@ -12949,11 +13065,6 @@ has 'time_zone_names' => (
 				'standard' => q#Hora estándar de Macao#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#hora de la isla Macquarie#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#hora de verano de Magadán#,
@@ -12991,13 +13102,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#hora de Mawson#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#hora de verano del noroeste de México#,
-				'generic' => q#hora del noroeste de México#,
-				'standard' => q#hora estándar del noroeste de México#,
 			},
 		},
 		'Mexico_Pacific' => {

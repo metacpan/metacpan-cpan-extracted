@@ -8,18 +8,18 @@ Locale::CLDR::Locales::En::Latn::Au - Package for language English
 
 package Locale::CLDR::Locales::En::Latn::Au;
 # This file auto generated from Data\common\main\en_AU.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -149,14 +149,6 @@ has 'units' => (
 						'name' => q(kilometre),
 					},
 					# Long Unit Identifier
-					'length-micrometer' => {
-						'name' => q(micrometres),
-					},
-					# Core Unit Identifier
-					'micrometer' => {
-						'name' => q(micrometres),
-					},
-					# Long Unit Identifier
 					'pressure-pound-force-per-square-inch' => {
 						'name' => q(pounds per square inch),
 						'one' => q({0} pound per square inch),
@@ -170,13 +162,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'temperature-generic' => {
-						'name' => q(degrees),
 						'one' => q({0} degree),
 						'other' => q({0} degrees),
 					},
 					# Core Unit Identifier
 					'generic' => {
-						'name' => q(degrees),
 						'one' => q({0} degree),
 						'other' => q({0} degrees),
 					},
@@ -244,45 +234,15 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'duration-century' => {
-						'name' => q(C.),
-						'one' => q({0}C.),
-						'other' => q({0}C.),
+						'name' => q(C),
+						'one' => q({0}C),
+						'other' => q({0}C),
 					},
 					# Core Unit Identifier
 					'century' => {
-						'name' => q(C.),
-						'one' => q({0}C.),
-						'other' => q({0}C.),
-					},
-					# Long Unit Identifier
-					'duration-microsecond' => {
-						'name' => q(μsec.),
-					},
-					# Core Unit Identifier
-					'microsecond' => {
-						'name' => q(μsec.),
-					},
-					# Long Unit Identifier
-					'duration-millisecond' => {
-						'name' => q(msec.),
-					},
-					# Core Unit Identifier
-					'millisecond' => {
-						'name' => q(msec.),
-					},
-					# Long Unit Identifier
-					'duration-second' => {
-						'name' => q(sec.),
-						'one' => q({0}s.),
-						'other' => q({0}s.),
-						'per' => q({0} ps.),
-					},
-					# Core Unit Identifier
-					'second' => {
-						'name' => q(sec.),
-						'one' => q({0}s.),
-						'other' => q({0}s.),
-						'per' => q({0} ps.),
+						'name' => q(C),
+						'one' => q({0}C),
+						'other' => q({0}C),
 					},
 					# Long Unit Identifier
 					'speed-kilometer-per-hour' => {
@@ -293,16 +253,6 @@ has 'units' => (
 					'kilometer-per-hour' => {
 						'one' => q({0} km/h),
 						'other' => q({0} km/h),
-					},
-					# Long Unit Identifier
-					'temperature-celsius' => {
-						'one' => q({0}°C),
-						'other' => q({0}°C),
-					},
-					# Core Unit Identifier
-					'celsius' => {
-						'one' => q({0}°C),
-						'other' => q({0}°C),
 					},
 					# Long Unit Identifier
 					'volume-bushel' => {
@@ -564,53 +514,15 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'duration-century' => {
-						'name' => q(C.),
-						'one' => q({0} C.),
-						'other' => q({0} C.),
+						'name' => q(C),
+						'one' => q({0} C),
+						'other' => q({0} C),
 					},
 					# Core Unit Identifier
 					'century' => {
-						'name' => q(C.),
-						'one' => q({0} C.),
-						'other' => q({0} C.),
-					},
-					# Long Unit Identifier
-					'duration-microsecond' => {
-						'name' => q(μsec.),
-					},
-					# Core Unit Identifier
-					'microsecond' => {
-						'name' => q(μsec.),
-					},
-					# Long Unit Identifier
-					'duration-millisecond' => {
-						'name' => q(millisec.),
-					},
-					# Core Unit Identifier
-					'millisecond' => {
-						'name' => q(millisec.),
-					},
-					# Long Unit Identifier
-					'duration-nanosecond' => {
-						'name' => q(nanosec.),
-					},
-					# Core Unit Identifier
-					'nanosecond' => {
-						'name' => q(nanosec.),
-					},
-					# Long Unit Identifier
-					'duration-second' => {
-						'name' => q(sec.),
-						'one' => q({0} sec.),
-						'other' => q({0} secs),
-						'per' => q({0} ps.),
-					},
-					# Core Unit Identifier
-					'second' => {
-						'name' => q(sec.),
-						'one' => q({0} sec.),
-						'other' => q({0} secs),
-						'per' => q({0} ps.),
+						'name' => q(C),
+						'one' => q({0} C),
+						'other' => q({0} C),
 					},
 					# Long Unit Identifier
 					'energy-kilocalorie' => {
@@ -1302,9 +1214,7 @@ has 'day_periods' => (
 					'noon' => q{midday},
 				},
 				'narrow' => {
-					'am' => q{am},
 					'noon' => q{midday},
-					'pm' => q{pm},
 				},
 				'wide' => {
 					'noon' => q{midday},
@@ -1340,7 +1250,7 @@ has 'date_formats' => (
 			'short' => q{dd/MM/y GGGGG},
 		},
 		'gregorian' => {
-			'full' => q{EEEE d MMMM y},
+			'full' => q{EEEE, d MMMM y},
 			'long' => q{d MMMM y},
 			'medium' => q{d MMM y},
 			'short' => q{d/M/yy},
@@ -1406,7 +1316,6 @@ has 'datetime_formats_available_formats' => (
 		},
 		'gregorian' => {
 			GyMMMEEEEd => q{EEEE d MMM y G},
-			GyMd => q{d/M/y GGGGG},
 			MEd => q{E, d/M},
 			MMMEEEEd => q{EEEE d MMM},
 			MMMMEEEEd => q{EEEE d MMMM},

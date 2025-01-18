@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Sr::Latn - Package for language Serbian
 
 package Locale::CLDR::Locales::Sr::Latn;
 # This file auto generated from Data\common\main\sr_Latn.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -813,6 +813,7 @@ has 'display_name_language' => (
  				'be' => 'beloruski',
  				'bej' => 'bedža',
  				'bem' => 'bemba',
+ 				'bew' => 'betavi',
  				'bez' => 'bena',
  				'bg' => 'bugarski',
  				'bgc' => 'harijanski',
@@ -822,6 +823,7 @@ has 'display_name_language' => (
  				'bik' => 'bikol',
  				'bin' => 'bini',
  				'bla' => 'sisika',
+ 				'blo' => 'anii',
  				'bm' => 'bambara',
  				'bn' => 'bengalski',
  				'bo' => 'tibetanski',
@@ -829,6 +831,7 @@ has 'display_name_language' => (
  				'bra' => 'braj',
  				'brx' => 'bodo',
  				'bs' => 'bosanski',
+ 				'bss' => 'akose',
  				'bua' => 'burjatski',
  				'bug' => 'bugijski',
  				'byn' => 'blinski',
@@ -851,6 +854,7 @@ has 'display_name_language' => (
  				'chp' => 'čipevjanski',
  				'chr' => 'čeroki',
  				'chy' => 'čejenski',
+ 				'cic' => 'čikaso',
  				'ckb' => 'centralni kurdski',
  				'clc' => 'čilkotin',
  				'co' => 'korzikanski',
@@ -960,6 +964,7 @@ has 'display_name_language' => (
  				'hil' => 'hiligajnonski',
  				'hit' => 'hetitski',
  				'hmn' => 'hmonški',
+ 				'hnj' => 'hmong ndžua',
  				'ho' => 'hiri motu',
  				'hr' => 'hrvatski',
  				'hsb' => 'gornjolužičkosrpski',
@@ -1037,6 +1042,7 @@ has 'display_name_language' => (
  				'kv' => 'komi',
  				'kw' => 'kornvolski',
  				'kwk' => 'kvakvala',
+ 				'kxv' => 'kuvi',
  				'ky' => 'kirgiski',
  				'la' => 'latinski',
  				'lad' => 'ladino',
@@ -1047,6 +1053,7 @@ has 'display_name_language' => (
  				'lez' => 'lezginski',
  				'lg' => 'ganda',
  				'li' => 'limburški',
+ 				'lij' => 'ligurski',
  				'lil' => 'lilut',
  				'lkt' => 'lakota',
  				'lmo' => 'lombard',
@@ -1228,7 +1235,7 @@ has 'display_name_language' => (
  				'ssy' => 'saho',
  				'st' => 'sesoto',
  				'str' => 'streicsališ',
- 				'su' => 'sundanski',
+ 				'su' => 'sundski',
  				'suk' => 'sukuma',
  				'sus' => 'susu',
  				'sux' => 'sumerski',
@@ -1238,6 +1245,7 @@ has 'display_name_language' => (
  				'swb' => 'komorski',
  				'syc' => 'sirijački',
  				'syr' => 'sirijski',
+ 				'szl' => 'siležanski',
  				'ta' => 'tamilski',
  				'tce' => 'južni tačon',
  				'te' => 'telugu',
@@ -1286,7 +1294,9 @@ has 'display_name_language' => (
  				'uz' => 'uzbečki',
  				'vai' => 'vai',
  				've' => 'venda',
+ 				'vec' => 'venecijanski',
  				'vi' => 'vijetnamski',
+ 				'vmw' => 'makuva',
  				'vo' => 'volapik',
  				'vot' => 'vodski',
  				'vun' => 'vundžo',
@@ -1300,6 +1310,7 @@ has 'display_name_language' => (
  				'wuu' => 'vu kineski',
  				'xal' => 'kalmički',
  				'xh' => 'kosa',
+ 				'xnr' => 'kangri',
  				'xog' => 'soga',
  				'yao' => 'jao',
  				'yap' => 'japski',
@@ -1555,7 +1566,7 @@ has 'display_name_region' => (
  			'BI' => 'Burundi',
  			'BJ' => 'Benin',
  			'BL' => 'Sveti Bartolomej',
- 			'BM' => 'Bermuda',
+ 			'BM' => 'Bermudi',
  			'BN' => 'Brunej',
  			'BO' => 'Bolivija',
  			'BQ' => 'Karipska Holandija',
@@ -1732,7 +1743,7 @@ has 'display_name_region' => (
  			'PW' => 'Palau',
  			'PY' => 'Paragvaj',
  			'QA' => 'Katar',
- 			'QO' => 'Okeanija (udaljena ostrva)',
+ 			'QO' => 'udaljena ostrva Okeanije',
  			'RE' => 'Reinion',
  			'RO' => 'Rumunija',
  			'RS' => 'Srbija',
@@ -1795,7 +1806,7 @@ has 'display_name_region' => (
  			'VU' => 'Vanuatu',
  			'WF' => 'Valis i Futuna',
  			'WS' => 'Samoa',
- 			'XA' => 'Pseudoakcenti',
+ 			'XA' => 'simulirane dijakritike',
  			'XB' => 'Pseudobidi',
  			'XK' => 'Kosovo',
  			'YE' => 'Jemen',
@@ -1803,7 +1814,7 @@ has 'display_name_region' => (
  			'ZA' => 'Južnoafrička Republika',
  			'ZM' => 'Zambija',
  			'ZW' => 'Zimbabve',
- 			'ZZ' => 'Nepoznat region',
+ 			'ZZ' => 'nepoznat region',
 
 		}
 	},
@@ -1936,7 +1947,6 @@ has 'display_name_type' => (
  				'phonebook' => q{sortiranje kao telefonski imenik},
  				'phonetic' => q{fonetski redosled sortiranja},
  				'pinyin' => q{pinjin sortiranje},
- 				'reformed' => q{reformisani redosled sortiranja},
  				'search' => q{pretraga opšte namene},
  				'searchjl' => q{Pretraga prema hangul početnom suglasniku},
  				'standard' => q{standardni redosled sortiranja},
@@ -2042,9 +2052,9 @@ has 'display_name_measurement_system' => (
 	init_arg	=> undef,
 	default		=> sub {
 		{
-			'metric' => q{Metrički},
- 			'UK' => q{UK},
- 			'US' => q{SAD},
+			'metric' => q{metrički},
+ 			'UK' => q{britanski},
+ 			'US' => q{američki},
 
 		}
 	},
@@ -2094,18 +2104,11 @@ has 'quote_start' => (
 	default		=> qq{„},
 );
 
-has 'quote_end' => (
+has 'alternate_quote_start' => (
 	is			=> 'ro',
 	isa			=> Str,
 	init_arg	=> undef,
-	default		=> qq{“},
-);
-
-has 'alternate_quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{‘},
+	default		=> qq{’},
 );
 
 has 'duration_units' => (
@@ -2127,11 +2130,11 @@ has 'units' => (
 				'long' => {
 					# Long Unit Identifier
 					'' => {
-						'name' => q(glavni pravac),
+						'name' => q(strana sveta),
 					},
 					# Core Unit Identifier
 					'' => {
-						'name' => q(glavni pravac),
+						'name' => q(strana sveta),
 					},
 					# Long Unit Identifier
 					'1024p1' => {
@@ -2653,6 +2656,7 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'concentr-milligram-ofglucose-per-deciliter' => {
+						'1' => q(inanimate),
 						'few' => q({0} miligrama po decilitru),
 						'name' => q(miligrami po decilitru),
 						'one' => q({0} miligram po decilitru),
@@ -2660,6 +2664,7 @@ has 'units' => (
 					},
 					# Core Unit Identifier
 					'milligram-ofglucose-per-deciliter' => {
+						'1' => q(inanimate),
 						'few' => q({0} miligrama po decilitru),
 						'name' => q(miligrami po decilitru),
 						'one' => q({0} miligram po decilitru),
@@ -2750,6 +2755,22 @@ has 'units' => (
 						'1' => q(inanimate),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'1' => q(inanimate),
+						'few' => q({0} dela na milijardu),
+						'name' => q(delovi na milijardu),
+						'one' => q({0} deo na milijardu),
+						'other' => q({0} delova na milijardu),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'1' => q(inanimate),
+						'few' => q({0} dela na milijardu),
+						'name' => q(delovi na milijardu),
+						'one' => q({0} deo na milijardu),
+						'other' => q({0} delova na milijardu),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'1' => q(inanimate),
 						'few' => q({0} litra na 100 kilometara),
@@ -2808,6 +2829,20 @@ has 'units' => (
 						'name' => q(milja po imperijalnom galonu),
 						'one' => q({0} milja po imperijalnom galonu),
 						'other' => q({0} milja po imperijalnom galonu),
+					},
+					# Long Unit Identifier
+					'coordinate' => {
+						'east' => q({0} E),
+						'north' => q({0} N),
+						'south' => q({0} S),
+						'west' => q({0} W),
+					},
+					# Core Unit Identifier
+					'coordinate' => {
+						'east' => q({0} E),
+						'north' => q({0} N),
+						'south' => q({0} S),
+						'west' => q({0} W),
 					},
 					# Long Unit Identifier
 					'digital-bit' => {
@@ -3122,6 +3157,24 @@ has 'units' => (
 						'other' => q({0} nanosekundi),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'1' => q(feminine),
+						'few' => q({0} noći),
+						'name' => q(noć),
+						'one' => q({0} noć),
+						'other' => q({0} noći),
+						'per' => q({0}/noć),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'1' => q(feminine),
+						'few' => q({0} noći),
+						'name' => q(noć),
+						'one' => q({0} noć),
+						'other' => q({0} noći),
+						'per' => q({0}/noć),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'1' => q(inanimate),
 						'few' => q({0} kvartala),
@@ -3325,6 +3378,7 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'energy-kilocalorie' => {
+						'1' => q(feminine),
 						'few' => q({0} kilokalorije),
 						'name' => q(kilokalorije),
 						'one' => q({0} kilokalorija),
@@ -3332,6 +3386,7 @@ has 'units' => (
 					},
 					# Core Unit Identifier
 					'kilocalorie' => {
+						'1' => q(feminine),
 						'few' => q({0} kilokalorije),
 						'name' => q(kilokalorije),
 						'one' => q({0} kilokalorija),
@@ -3380,10 +3435,18 @@ has 'units' => (
 					# Long Unit Identifier
 					'force-kilowatt-hour-per-100-kilometer' => {
 						'1' => q(inanimate),
+						'few' => q({0} kilovat-sata na 100 kilometara),
+						'name' => q(kilovat-sati na 100 kilometara),
+						'one' => q({0} kilovat-sat na 100 kilometara),
+						'other' => q({0} kilovat-sati na 100 kilometara),
 					},
 					# Core Unit Identifier
 					'kilowatt-hour-per-100-kilometer' => {
 						'1' => q(inanimate),
+						'few' => q({0} kilovat-sata na 100 kilometara),
+						'name' => q(kilovat-sati na 100 kilometara),
+						'one' => q({0} kilovat-sat na 100 kilometara),
+						'other' => q({0} kilovat-sati na 100 kilometara),
 					},
 					# Long Unit Identifier
 					'force-newton' => {
@@ -3846,6 +3909,22 @@ has 'units' => (
 						'few' => q({0} pikometra),
 						'one' => q({0} pikometar),
 						'other' => q({0} pikometara),
+					},
+					# Long Unit Identifier
+					'length-point' => {
+						'1' => q(feminine),
+						'few' => q({0} tipografske tačke),
+						'name' => q(tipografske tačke),
+						'one' => q({0} tipografska tačka),
+						'other' => q({0} tipografskih tačaka),
+					},
+					# Core Unit Identifier
+					'point' => {
+						'1' => q(feminine),
+						'few' => q({0} tipografske tačke),
+						'name' => q(tipografske tačke),
+						'one' => q({0} tipografska tačka),
+						'other' => q({0} tipografskih tačaka),
 					},
 					# Long Unit Identifier
 					'length-solar-radius' => {
@@ -4379,6 +4458,7 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'pressure-millimeter-ofhg' => {
+						'1' => q(inanimate),
 						'few' => q({0} milimetra živinog stuba),
 						'name' => q(milimetri živinog stuba),
 						'one' => q({0} milimetar živinog stuba),
@@ -4386,6 +4466,7 @@ has 'units' => (
 					},
 					# Core Unit Identifier
 					'millimeter-ofhg' => {
+						'1' => q(inanimate),
 						'few' => q({0} milimetra živinog stuba),
 						'name' => q(milimetri živinog stuba),
 						'one' => q({0} milimetar živinog stuba),
@@ -4464,6 +4545,22 @@ has 'units' => (
 						'name' => q(čvor),
 						'one' => q({0} čvor),
 						'other' => q({0} čvorova),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'1' => q(neuter),
+						'few' => q({0} svetla),
+						'name' => q(svetlo),
+						'one' => q({0} svetlo),
+						'other' => q({0} svetala),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'1' => q(neuter),
+						'few' => q({0} svetla),
+						'name' => q(svetlo),
+						'one' => q({0} svetlo),
+						'other' => q({0} svetala),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -5076,6 +5173,20 @@ has 'units' => (
 						'other' => q({0} mpg Imp),
 					},
 					# Long Unit Identifier
+					'coordinate' => {
+						'east' => q({0}E),
+						'north' => q({0}N),
+						'south' => q({0}S),
+						'west' => q({0}W),
+					},
+					# Core Unit Identifier
+					'coordinate' => {
+						'east' => q({0}E),
+						'north' => q({0}N),
+						'south' => q({0}S),
+						'west' => q({0}W),
+					},
+					# Long Unit Identifier
 					'duration-day' => {
 						'few' => q({0} d),
 						'name' => q(d),
@@ -5128,6 +5239,22 @@ has 'units' => (
 						'name' => q(m.),
 						'one' => q({0} m),
 						'other' => q({0} m),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'few' => q({0} noći),
+						'name' => q(noć),
+						'one' => q({0} noć),
+						'other' => q({0} noći),
+						'per' => q({0}/noć),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'few' => q({0} noći),
+						'name' => q(noć),
+						'one' => q({0} noć),
+						'other' => q({0} noći),
+						'per' => q({0}/noć),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -5282,6 +5409,20 @@ has 'units' => (
 						'few' => q({0} ks),
 						'one' => q({0} ks),
 						'other' => q({0} ks),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'few' => q({0} svetla),
+						'name' => q(svetlo),
+						'one' => q({0} svetlo),
+						'other' => q({0} svetala),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'few' => q({0} svetla),
+						'name' => q(svetlo),
+						'one' => q({0} svetlo),
+						'other' => q({0} svetala),
 					},
 					# Long Unit Identifier
 					'volume-fluid-ounce-imperial' => {
@@ -5484,6 +5625,14 @@ has 'units' => (
 						'name' => q(promil),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(delovi/milijarda),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(delovi/milijarda),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'few' => q({0} L/100 km),
 						'name' => q(L/100 km),
@@ -5513,17 +5662,17 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'coordinate' => {
-						'east' => q({0}I),
-						'north' => q({0}S),
-						'south' => q({0}J),
-						'west' => q({0}Z),
+						'east' => q({0} E),
+						'north' => q({0} N),
+						'south' => q({0} S),
+						'west' => q({0} W),
 					},
 					# Core Unit Identifier
 					'coordinate' => {
-						'east' => q({0}I),
-						'north' => q({0}S),
-						'south' => q({0}J),
-						'west' => q({0}Z),
+						'east' => q({0} E),
+						'north' => q({0} N),
+						'south' => q({0} S),
+						'west' => q({0} W),
 					},
 					# Long Unit Identifier
 					'digital-bit' => {
@@ -5644,6 +5793,22 @@ has 'units' => (
 						'one' => q({0} mes.),
 						'other' => q({0} mes.),
 						'per' => q({0}/m),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'few' => q({0} noći),
+						'name' => q(noć),
+						'one' => q({0} noć),
+						'other' => q({0} noći),
+						'per' => q({0}/noć),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'few' => q({0} noći),
+						'name' => q(noć),
+						'one' => q({0} noć),
+						'other' => q({0} noći),
+						'per' => q({0}/noć),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -5916,6 +6081,14 @@ has 'units' => (
 						'name' => q(pikometri),
 					},
 					# Long Unit Identifier
+					'length-point' => {
+						'name' => q(tipografske tačke),
+					},
+					# Core Unit Identifier
+					'point' => {
+						'name' => q(tipografske tačke),
+					},
+					# Long Unit Identifier
 					'length-yard' => {
 						'few' => q({0} jrd),
 						'name' => q(jardi),
@@ -5974,6 +6147,20 @@ has 'units' => (
 						'name' => q(Bf),
 						'one' => q(B {0}),
 						'other' => q(B {0}),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'few' => q({0} svetla),
+						'name' => q(svetlo),
+						'one' => q({0} svetlo),
+						'other' => q({0} svetala),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'few' => q({0} svetla),
+						'name' => q(svetlo),
+						'one' => q({0} svetlo),
+						'other' => q({0} svetala),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -6532,10 +6719,10 @@ has 'currencies' => (
 		'BAM' => {
 			symbol => 'KM',
 			display_name => {
-				'currency' => q(bosansko-hercegovačka konvertibilna marka),
-				'few' => q(bosansko-hercegovačke konvertibilne marke),
-				'one' => q(bosansko-hercegovačka konvertibilna marka),
-				'other' => q(bosansko-hercegovačkih konvertibilnih maraka),
+				'currency' => q(bosanskohercegovačka konvertibilna marka),
+				'few' => q(bosanskohercegovačke konvertibilne marke),
+				'one' => q(bosanskohercegovačka konvertibilna marka),
+				'other' => q(bosanskohercegovačkih konvertibilnih maraka),
 			},
 		},
 		'BAN' => {
@@ -7093,7 +7280,7 @@ has 'currencies' => (
 		},
 		'EUR' => {
 			display_name => {
-				'currency' => q(Evro),
+				'currency' => q(evro),
 				'few' => q(evra),
 				'one' => q(evro),
 				'other' => q(evra),
@@ -8314,10 +8501,10 @@ has 'currencies' => (
 		},
 		'TTD' => {
 			display_name => {
-				'currency' => q(Trinidad-tobagoški dolar),
-				'few' => q(trinidad-tobagoška dolara),
-				'one' => q(trinidad-tobagoški dolar),
-				'other' => q(trinidad-tobagoških dolara),
+				'currency' => q(trinidadskotobaški dolar),
+				'few' => q(trinidadskotobaška dolara),
+				'one' => q(trinidadskotobaški dolar),
+				'other' => q(trinidadskotobaških dolara),
 			},
 		},
 		'TWD' => {
@@ -8628,7 +8815,7 @@ has 'currencies' => (
 		},
 		'XXX' => {
 			display_name => {
-				'currency' => q(Nepoznata valuta),
+				'currency' => q(nepoznata valuta),
 				'few' => q(nepoznate valute),
 				'one' => q(nepoznata jedinica valute),
 				'other' => q(nepoznatih valuta),
@@ -9400,11 +9587,19 @@ has 'day_periods' => (
 					'afternoon1' => q{po podne},
 					'evening1' => q{uveče},
 					'midnight' => q{ponoć},
-					'morning1' => q{ujutro},
+					'morning1' => q{ujutru},
 					'night1' => q{noću},
 					'noon' => q{podne},
 				},
 				'narrow' => {
+					'afternoon1' => q{po podne},
+					'evening1' => q{uveče},
+					'midnight' => q{ponoć},
+					'morning1' => q{ujutru},
+					'night1' => q{noću},
+					'noon' => q{podne},
+				},
+				'wide' => {
 					'afternoon1' => q{po podne},
 					'evening1' => q{uveče},
 					'midnight' => q{ponoć},
@@ -9419,10 +9614,6 @@ has 'day_periods' => (
 					'evening1' => q{veče},
 					'morning1' => q{jutro},
 					'night1' => q{noć},
-				},
-				'narrow' => {
-					'am' => q{pre podne},
-					'pm' => q{po podne},
 				},
 			},
 		},
@@ -9747,7 +9938,7 @@ has 'date_formats' => (
 			'full' => q{EEEE, d. MMMM y.},
 			'long' => q{d. MMMM y.},
 			'medium' => q{d. M. y.},
-			'short' => q{d.M.yy.},
+			'short' => q{d. M. y.},
 		},
 		'hebrew' => {
 		},
@@ -9887,8 +10078,7 @@ has 'datetime_formats_available_formats' => (
 			Bhm => q{hh:mm B},
 			Bhms => q{hh:mm:ss B},
 			E => q{E},
-			EBhm => q{E hh:mm B},
-			EBhms => q{E hh:mm:ss B},
+			EBhms => q{E, hh:mm:ss B},
 			Ed => q{E d.},
 			Ehm => q{E h:mm a},
 			Ehms => q{E h:mm:ss a},
@@ -9900,7 +10090,7 @@ has 'datetime_formats_available_formats' => (
 			MEd => q{E, d. M.},
 			MMMEd => q{E d. MMM},
 			MMMMEd => q{E, d. MMMM},
-			MMMMW => q{W. 'sedmica' 'u' MMMM.},
+			MMMMW => q{MMMM: W. 'nedelja'},
 			MMMMd => q{d. MMMM},
 			MMMd => q{d. MMM},
 			MMMdd => q{dd.MMM},
@@ -9923,7 +10113,7 @@ has 'datetime_formats_available_formats' => (
 			yMd => q{d. M. y.},
 			yQQQ => q{QQQ y.},
 			yQQQQ => q{QQQQ y.},
-			yw => q{w. 'sedmica' 'u' Y.},
+			yw => q{w. 'nedelja' 'u' Y.},
 		},
 	} },
 );
@@ -10621,9 +10811,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#Njujork#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#Nipigon#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#Nom#,
 		},
@@ -10644,9 +10831,6 @@ has 'time_zone_names' => (
 		},
 		'America/Panama' => {
 			exemplarCity => q#Panama#,
-		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#Pangnirtung#,
 		},
 		'America/Paramaribo' => {
 			exemplarCity => q#Paramaribo#,
@@ -10669,9 +10853,6 @@ has 'time_zone_names' => (
 		'America/Punta_Arenas' => {
 			exemplarCity => q#Punta Arenas#,
 		},
-		'America/Rainy_River' => {
-			exemplarCity => q#Rejni River#,
-		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#Rankin Inlet#,
 		},
@@ -10686,9 +10867,6 @@ has 'time_zone_names' => (
 		},
 		'America/Rio_Branco' => {
 			exemplarCity => q#Rio Branko#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#Santa Izabel#,
 		},
 		'America/Santarem' => {
 			exemplarCity => q#Santarem#,
@@ -10735,9 +10913,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#Tul#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#Tander Bej#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#Tihuana#,
 		},
@@ -10758,9 +10933,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#Jakutat#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#Jelounajf#,
 		},
 		'America_Central' => {
 			long => {
@@ -10935,9 +11107,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#Čita#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#Čojbalsan#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#Kolombo#,
@@ -11177,9 +11346,6 @@ has 'time_zone_names' => (
 		'Australia/Broken_Hill' => {
 			exemplarCity => q#Broken Hil#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#Kari#,
-		},
 		'Australia/Darwin' => {
 			exemplarCity => q#Darvin#,
 		},
@@ -11306,13 +11472,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Kina, letnje vreme#,
 				'generic' => q#Kina vreme#,
 				'standard' => q#Kinesko standardno vreme#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Čojbalsan, letnje vreme#,
-				'generic' => q#Čojbalsan vreme#,
-				'standard' => q#Čojbalsan, standardno vreme#,
 			},
 		},
 		'Christmas' => {
@@ -11537,9 +11696,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#Uljanovsk#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#Užgorod#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#Vaduz#,
 		},
@@ -11560,9 +11716,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#Zagreb#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#Zaporožje#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#Cirih#,
@@ -11810,6 +11963,11 @@ has 'time_zone_names' => (
 				'standard' => q#Petropavlovsko-kamčatsko standardno vreme#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Kazahstansko vreme#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#Istočno-kazahstansko vreme#,
@@ -11868,11 +12026,6 @@ has 'time_zone_names' => (
 				'standard' => q#Makao standardno vreme#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Ostrvo Makveri vreme#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Magadan, letnje vreme#,
@@ -11910,13 +12063,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Moson vreme#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Severozapadni Meksiko, letnje vreme#,
-				'generic' => q#Severozapadni Meksiko#,
-				'standard' => q#Severozapadni Meksiko, standardno vreme#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -12058,9 +12204,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Honolulu' => {
 			exemplarCity => q#Honolulu#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#Džonston#,
 		},
 		'Pacific/Kanton' => {
 			exemplarCity => q#Kanton#,

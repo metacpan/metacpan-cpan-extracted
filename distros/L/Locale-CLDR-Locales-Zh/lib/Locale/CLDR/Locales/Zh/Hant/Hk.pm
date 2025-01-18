@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Zh::Hant::Hk - Package for language Chinese
 
 package Locale::CLDR::Locales::Zh::Hant::Hk;
 # This file auto generated from Data\common\main\zh_Hant_HK.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -39,7 +39,6 @@ has 'display_name_language' => (
  				'br' => '布里多尼文',
  				'bs' => '波斯尼亞文',
  				'ca' => '加泰隆尼亞文',
- 				'crh' => '克里米亞韃靼文',
  				'crs' => '塞舌爾克里奧爾法文',
  				'de_AT' => '奧地利德文',
  				'de_CH' => '瑞士德語',
@@ -121,7 +120,6 @@ has 'display_name_script' => (
  			'Hant' => '繁體字',
  			'Knda' => '坎納達文',
  			'Laoo' => '老撾文',
- 			'Latn' => '拉丁字母',
  			'Mlym' => '馬拉雅拉姆文',
  			'Newa' => '尼瓦爾文',
  			'Orya' => '奧里雅文',
@@ -285,7 +283,6 @@ has 'display_name_type' => (
  				'big5han' => q{繁體中文排序 (Big5)},
  				'dictionary' => q{詞典排序},
  				'gb2312han' => q{簡體中文排序 (GB2312)},
- 				'reformed' => q{改革版排序},
  			},
  			'ms' => {
  				'uksystem' => q{英制},
@@ -748,16 +745,6 @@ has 'units' => (
 						'other' => q({0} 磅/平方吋),
 					},
 					# Long Unit Identifier
-					'speed-beaufort' => {
-						'name' => q(蒲福氏風級),
-						'other' => q(蒲福氏風級 {0} 級),
-					},
-					# Core Unit Identifier
-					'beaufort' => {
-						'name' => q(蒲福氏風級),
-						'other' => q(蒲福氏風級 {0} 級),
-					},
-					# Long Unit Identifier
 					'speed-kilometer-per-hour' => {
 						'name' => q(公里每小時),
 					},
@@ -900,6 +887,14 @@ has 'units' => (
 					# Core Unit Identifier
 					'permillion' => {
 						'other' => q({0} ppm),
+					},
+					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(濃度/十億),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(濃度/十億),
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
@@ -1090,14 +1085,6 @@ has 'units' => (
 						'other' => q({0}格令),
 					},
 					# Long Unit Identifier
-					'mass-kilogram' => {
-						'other' => q({0} 公斤),
-					},
-					# Core Unit Identifier
-					'kilogram' => {
-						'other' => q({0} 公斤),
-					},
-					# Long Unit Identifier
 					'mass-ounce' => {
 						'other' => q({0} 安士),
 					},
@@ -1115,12 +1102,10 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'speed-beaufort' => {
-						'name' => q(蒲福氏風級),
 						'other' => q(蒲福氏風級 {0} 級),
 					},
 					# Core Unit Identifier
 					'beaufort' => {
-						'name' => q(蒲福氏風級),
 						'other' => q(蒲福氏風級 {0} 級),
 					},
 					# Long Unit Identifier
@@ -1130,6 +1115,14 @@ has 'units' => (
 					# Core Unit Identifier
 					'kilometer-per-hour' => {
 						'other' => q({0}kph),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'other' => q({0}夜),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'other' => q({0}夜),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -2296,7 +2289,6 @@ has 'currencies' => (
 		'STD' => {
 			display_name => {
 				'currency' => q(聖多美和普林西比多布拉 \(1977–2017\)),
-				'other' => q(聖多美和普林西比多布拉 \(1977–2017\)),
 			},
 		},
 		'STN' => {
@@ -2312,7 +2304,6 @@ has 'currencies' => (
 		'SZL' => {
 			display_name => {
 				'currency' => q(斯威士蘭里朗吉尼),
-				'other' => q(斯威士蘭里朗吉尼),
 			},
 		},
 		'TOP' => {
@@ -2516,102 +2507,6 @@ has 'day_period_data' => (
 				}
 				last SWITCH;
 				}
-			if ($_ eq 'coptic') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1900;
-					return 'evening1' if $time >= 1900
-						&& $time < 2400;
-					return 'morning1' if $time >= 500
-						&& $time < 800;
-					return 'morning2' if $time >= 800
-						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 500;
-				}
-				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1900;
-					return 'evening1' if $time >= 1900
-						&& $time < 2400;
-					return 'morning1' if $time >= 500
-						&& $time < 800;
-					return 'morning2' if $time >= 800
-						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 500;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'dangi') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1900;
-					return 'evening1' if $time >= 1900
-						&& $time < 2400;
-					return 'morning1' if $time >= 500
-						&& $time < 800;
-					return 'morning2' if $time >= 800
-						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 500;
-				}
-				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1900;
-					return 'evening1' if $time >= 1900
-						&& $time < 2400;
-					return 'morning1' if $time >= 500
-						&& $time < 800;
-					return 'morning2' if $time >= 800
-						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 500;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'ethiopic') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1900;
-					return 'evening1' if $time >= 1900
-						&& $time < 2400;
-					return 'morning1' if $time >= 500
-						&& $time < 800;
-					return 'morning2' if $time >= 800
-						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 500;
-				}
-				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1900;
-					return 'evening1' if $time >= 1900
-						&& $time < 2400;
-					return 'morning1' if $time >= 500
-						&& $time < 800;
-					return 'morning2' if $time >= 800
-						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 500;
-				}
-				last SWITCH;
-				}
 			if ($_ eq 'generic') {
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
@@ -2676,135 +2571,7 @@ has 'day_period_data' => (
 				}
 				last SWITCH;
 				}
-			if ($_ eq 'hebrew') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1900;
-					return 'evening1' if $time >= 1900
-						&& $time < 2400;
-					return 'morning1' if $time >= 500
-						&& $time < 800;
-					return 'morning2' if $time >= 800
-						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 500;
-				}
-				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1900;
-					return 'evening1' if $time >= 1900
-						&& $time < 2400;
-					return 'morning1' if $time >= 500
-						&& $time < 800;
-					return 'morning2' if $time >= 800
-						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 500;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'indian') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1900;
-					return 'evening1' if $time >= 1900
-						&& $time < 2400;
-					return 'morning1' if $time >= 500
-						&& $time < 800;
-					return 'morning2' if $time >= 800
-						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 500;
-				}
-				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1900;
-					return 'evening1' if $time >= 1900
-						&& $time < 2400;
-					return 'morning1' if $time >= 500
-						&& $time < 800;
-					return 'morning2' if $time >= 800
-						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 500;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'islamic') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1900;
-					return 'evening1' if $time >= 1900
-						&& $time < 2400;
-					return 'morning1' if $time >= 500
-						&& $time < 800;
-					return 'morning2' if $time >= 800
-						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 500;
-				}
-				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1900;
-					return 'evening1' if $time >= 1900
-						&& $time < 2400;
-					return 'morning1' if $time >= 500
-						&& $time < 800;
-					return 'morning2' if $time >= 800
-						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 500;
-				}
-				last SWITCH;
-				}
 			if ($_ eq 'japanese') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1900;
-					return 'evening1' if $time >= 1900
-						&& $time < 2400;
-					return 'morning1' if $time >= 500
-						&& $time < 800;
-					return 'morning2' if $time >= 800
-						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 500;
-				}
-				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1900;
-					return 'evening1' if $time >= 1900
-						&& $time < 2400;
-					return 'morning1' if $time >= 500
-						&& $time < 800;
-					return 'morning2' if $time >= 800
-						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 500;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'persian') {
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'afternoon1' if $time >= 1200
@@ -2907,12 +2674,6 @@ has 'eras' => (
 		},
 		'chinese' => {
 		},
-		'coptic' => {
-		},
-		'dangi' => {
-		},
-		'ethiopic' => {
-		},
 		'generic' => {
 		},
 		'gregorian' => {
@@ -2921,15 +2682,7 @@ has 'eras' => (
 				'1' => '公元'
 			},
 		},
-		'hebrew' => {
-		},
-		'indian' => {
-		},
-		'islamic' => {
-		},
 		'japanese' => {
-		},
-		'persian' => {
 		},
 		'roc' => {
 		},
@@ -2949,12 +2702,6 @@ has 'date_formats' => (
 			'medium' => q{U年MMMd},
 			'short' => q{U/M/d},
 		},
-		'coptic' => {
-		},
-		'dangi' => {
-		},
-		'ethiopic' => {
-		},
 		'generic' => {
 			'full' => q{Gy年M月d日EEEE},
 			'long' => q{Gy年M月d日},
@@ -2967,15 +2714,7 @@ has 'date_formats' => (
 			'medium' => q{y年M月d日},
 			'short' => q{d/M/y},
 		},
-		'hebrew' => {
-		},
-		'indian' => {
-		},
-		'islamic' => {
-		},
 		'japanese' => {
-		},
-		'persian' => {
 		},
 		'roc' => {
 		},
@@ -2991,12 +2730,6 @@ has 'time_formats' => (
 		},
 		'chinese' => {
 		},
-		'coptic' => {
-		},
-		'dangi' => {
-		},
-		'ethiopic' => {
-		},
 		'generic' => {
 		},
 		'gregorian' => {
@@ -3005,15 +2738,7 @@ has 'time_formats' => (
 			'medium' => q{ah:mm:ss},
 			'short' => q{ah:mm},
 		},
-		'hebrew' => {
-		},
-		'indian' => {
-		},
-		'islamic' => {
-		},
 		'japanese' => {
-		},
-		'persian' => {
 		},
 		'roc' => {
 		},
@@ -3033,12 +2758,6 @@ has 'datetime_formats' => (
 			'medium' => q{{1}, {0}},
 			'short' => q{{1}, {0}},
 		},
-		'coptic' => {
-		},
-		'dangi' => {
-		},
-		'ethiopic' => {
-		},
 		'generic' => {
 			'full' => q{{1} {0}},
 			'long' => q{{1} {0}},
@@ -3051,15 +2770,7 @@ has 'datetime_formats' => (
 			'medium' => q{{1} {0}},
 			'short' => q{{1} {0}},
 		},
-		'hebrew' => {
-		},
-		'indian' => {
-		},
-		'islamic' => {
-		},
 		'japanese' => {
-		},
-		'persian' => {
 		},
 		'roc' => {
 		},
@@ -3156,22 +2867,6 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'buddhist' => {
-			h => {
-				h => q{ah時至h時},
-			},
-			hm => {
-				h => q{ah:mm至h:mm},
-				m => q{ah:mm至h:mm},
-			},
-			hmv => {
-				h => q{ah:mm至h:mm [v]},
-				m => q{ah:mm至h:mm [v]},
-			},
-			hv => {
-				h => q{ah時至h時 [v]},
-			},
-		},
 		'chinese' => {
 			h => {
 				a => q{ah時至ah時},
@@ -3189,54 +2884,6 @@ has 'datetime_formats_interval' => (
 			},
 			hv => {
 				a => q{ah時至ah時 [v]},
-				h => q{ah時至h時 [v]},
-			},
-		},
-		'coptic' => {
-			h => {
-				h => q{ah時至h時},
-			},
-			hm => {
-				h => q{ah:mm至h:mm},
-				m => q{ah:mm至h:mm},
-			},
-			hmv => {
-				h => q{ah:mm至h:mm [v]},
-				m => q{ah:mm至h:mm [v]},
-			},
-			hv => {
-				h => q{ah時至h時 [v]},
-			},
-		},
-		'dangi' => {
-			h => {
-				h => q{ah時至h時},
-			},
-			hm => {
-				h => q{ah:mm至h:mm},
-				m => q{ah:mm至h:mm},
-			},
-			hmv => {
-				h => q{ah:mm至h:mm [v]},
-				m => q{ah:mm至h:mm [v]},
-			},
-			hv => {
-				h => q{ah時至h時 [v]},
-			},
-		},
-		'ethiopic' => {
-			h => {
-				h => q{ah時至h時},
-			},
-			hm => {
-				h => q{ah:mm至h:mm},
-				m => q{ah:mm至h:mm},
-			},
-			hmv => {
-				h => q{ah:mm至h:mm [v]},
-				m => q{ah:mm至h:mm [v]},
-			},
-			hv => {
 				h => q{ah時至h時 [v]},
 			},
 		},
@@ -3339,102 +2986,6 @@ has 'datetime_formats_interval' => (
 				M => q{d/M/y 至 d/M/y},
 				d => q{d/M/y 至 d/M/y},
 				y => q{d/M/y 至 d/M/y},
-			},
-		},
-		'hebrew' => {
-			h => {
-				h => q{ah時至h時},
-			},
-			hm => {
-				h => q{ah:mm至h:mm},
-				m => q{ah:mm至h:mm},
-			},
-			hmv => {
-				h => q{ah:mm至h:mm [v]},
-				m => q{ah:mm至h:mm [v]},
-			},
-			hv => {
-				h => q{ah時至h時 [v]},
-			},
-		},
-		'indian' => {
-			h => {
-				h => q{ah時至h時},
-			},
-			hm => {
-				h => q{ah:mm至h:mm},
-				m => q{ah:mm至h:mm},
-			},
-			hmv => {
-				h => q{ah:mm至h:mm [v]},
-				m => q{ah:mm至h:mm [v]},
-			},
-			hv => {
-				h => q{ah時至h時 [v]},
-			},
-		},
-		'islamic' => {
-			h => {
-				h => q{ah時至h時},
-			},
-			hm => {
-				h => q{ah:mm至h:mm},
-				m => q{ah:mm至h:mm},
-			},
-			hmv => {
-				h => q{ah:mm至h:mm [v]},
-				m => q{ah:mm至h:mm [v]},
-			},
-			hv => {
-				h => q{ah時至h時 [v]},
-			},
-		},
-		'japanese' => {
-			h => {
-				h => q{ah時至h時},
-			},
-			hm => {
-				h => q{ah:mm至h:mm},
-				m => q{ah:mm至h:mm},
-			},
-			hmv => {
-				h => q{ah:mm至h:mm [v]},
-				m => q{ah:mm至h:mm [v]},
-			},
-			hv => {
-				h => q{ah時至h時 [v]},
-			},
-		},
-		'persian' => {
-			h => {
-				h => q{ah時至h時},
-			},
-			hm => {
-				h => q{ah:mm至h:mm},
-				m => q{ah:mm至h:mm},
-			},
-			hmv => {
-				h => q{ah:mm至h:mm [v]},
-				m => q{ah:mm至h:mm [v]},
-			},
-			hv => {
-				h => q{ah時至h時 [v]},
-			},
-		},
-		'roc' => {
-			h => {
-				h => q{ah時至h時},
-			},
-			hm => {
-				h => q{ah:mm至h:mm},
-				m => q{ah:mm至h:mm},
-			},
-			hmv => {
-				h => q{ah:mm至h:mm [v]},
-				m => q{ah:mm至h:mm [v]},
-			},
-			hv => {
-				h => q{ah時至h時 [v]},
 			},
 		},
 	} },
@@ -3659,9 +3210,6 @@ has 'time_zone_names' => (
 		'America/Nassau' => {
 			exemplarCity => q#拿騷#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#尼皮貢#,
-		},
 		'America/Noronha' => {
 			exemplarCity => q#諾羅尼亞#,
 		},
@@ -3707,9 +3255,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#圖勒#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#雷灣#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#蒂華納#,
 		},
@@ -3718,9 +3263,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#亞庫塔特#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#黃刀鎮#,
 		},
 		'America_Central' => {
 			long => {
@@ -3858,9 +3400,6 @@ has 'time_zone_names' => (
 		'Australia/Brisbane' => {
 			exemplarCity => q#布里斯本#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#卡里#,
-		},
 		'Australia/Hobart' => {
 			exemplarCity => q#荷伯特#,
 		},
@@ -3928,9 +3467,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Skopje' => {
 			exemplarCity => q#斯科普里#,
-		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#烏日哥羅德#,
 		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#華杜茲#,
@@ -4004,11 +3540,6 @@ has 'time_zone_names' => (
 				'standard' => q#科斯雷時間#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#麥夸里群島時間#,
-			},
-		},
 		'Maldives' => {
 			long => {
 				'standard' => q#馬爾代夫時間#,
@@ -4062,9 +3593,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Guadalcanal' => {
 			exemplarCity => q#瓜達爾卡納爾島#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#約翰斯頓環礁#,
 		},
 		'Pacific/Kosrae' => {
 			exemplarCity => q#科斯雷#,

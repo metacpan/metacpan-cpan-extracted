@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Ccp - Package for language Chakma
 
 package Locale::CLDR::Locales::Ccp;
 # This file auto generated from Data\common\main\ccp.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -48,6 +48,10 @@ has 'algorithmic_number_format_data' => (
 					base_value => q(0),
 					divisor => q(1),
 					rule => q(𑄥𑄪𑄚𑄳𑄠𑄴𑄧),
+				},
+				'x.x' => {
+					divisor => q(1),
+					rule => q(←← 𑄜𑄪𑄘𑄮 →→),
 				},
 				'1' => {
 					base_value => q(1),
@@ -217,13 +221,9 @@ has 'algorithmic_number_format_data' => (
 					divisor => q(1),
 					rule => q(𑄚𑄘 𑄚𑄧𑄠𑄴),
 				},
-				'x.x' => {
-					divisor => q(1),
-					rule => q(←← 𑄜𑄪𑄘𑄮 →→),
-				},
 				'max' => {
 					divisor => q(1),
-					rule => q(←← 𑄜𑄪𑄘𑄮 →→),
+					rule => q(𑄚𑄘 𑄚𑄧𑄠𑄴),
 				},
 			},
 		},
@@ -1380,7 +1380,6 @@ has 'display_name_type' => (
  				'phonebook' => q{𑄜𑄮𑄚𑄴𑄝𑄪𑄇𑄴 𑄥𑄎𑄚},
  				'phonetic' => q{𑄢𑄳𑄦𑄧 𑄝𑄬𑄭𑄣𑄧𑄚},
  				'pinyin' => q{𑄛𑄨𑄚𑄨𑄚𑄴 𑄥𑄎𑄚},
- 				'reformed' => q{𑄢𑄨𑄜𑄧𑄟𑄴𑄓𑄨 𑄝𑄬𑄭𑄣𑄧𑄚},
  				'search' => q{𑄃𑄧𑄎𑄧𑄃𑄧𑄌𑄴-𑄅𑄪𑄘𑄨𑄌𑄴𑄥𑄳𑄠 𑄖𑄮𑄉𑄚},
  				'searchjl' => q{𑄦𑄋𑄴𑄉𑄪𑄣𑄴 𑄛𑄧𑄖𑄴𑄗𑄧𑄟𑄴 𑄝𑄧𑄣𑄬𑄟𑄖𑄳𑄠𑄬 𑄦𑄧𑄢𑄧𑄇𑄴 𑄘𑄨𑄚𑄬𑄭 𑄖𑄮𑄉𑄚},
  				'standard' => q{𑄉𑄧𑄟𑄴 𑄘𑄮𑄣𑄴 𑄝𑄬𑄭𑄣𑄧𑄚},
@@ -6433,9 +6432,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#𑄚𑄨𑄅𑄪𑄃𑄨𑄠𑄧𑄢𑄴𑄇𑄴#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#𑄚𑄨𑄛𑄨𑄉𑄮𑄚𑄴#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#𑄚𑄮𑄟𑄴#,
 		},
@@ -6457,9 +6453,6 @@ has 'time_zone_names' => (
 		'America/Panama' => {
 			exemplarCity => q#𑄛𑄚𑄟#,
 		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#𑄛𑄳𑄠𑄋𑄴𑄉𑄧𑄚𑄨𑄢𑄴𑄑𑄪𑄁#,
-		},
 		'America/Paramaribo' => {
 			exemplarCity => q#𑄛𑄳𑄠𑄢𑄟𑄬𑄢𑄨𑄝𑄮#,
 		},
@@ -6478,9 +6471,6 @@ has 'time_zone_names' => (
 		'America/Puerto_Rico' => {
 			exemplarCity => q#𑄛𑄪𑄠𑄬𑄢𑄴𑄖𑄮 𑄢𑄨𑄇𑄮#,
 		},
-		'America/Rainy_River' => {
-			exemplarCity => q#𑄣𑄬𑄭𑄚𑄨 𑄢𑄨𑄞𑄢𑄴#,
-		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#𑄢𑄳𑄠𑄋𑄴𑄇𑄨𑄚𑄴 𑄃𑄨𑄚𑄴𑄣𑄬𑄑𑄴#,
 		},
@@ -6495,9 +6485,6 @@ has 'time_zone_names' => (
 		},
 		'America/Rio_Branco' => {
 			exemplarCity => q#𑄢𑄨𑄃𑄮 𑄝𑄳𑄢𑄋𑄴𑄇𑄮#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#𑄥𑄚𑄴𑄖 𑄃𑄨𑄥𑄝𑄬𑄣𑄴#,
 		},
 		'America/Santarem' => {
 			exemplarCity => q#𑄥𑄬𑄚𑄴𑄑𑄪𑄢𑄬𑄟𑄴#,
@@ -6544,9 +6531,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#𑄗𑄪𑄣𑄨#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#𑄐𑄚𑄴𑄓𑄢𑄴 𑄝𑄬#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#𑄖𑄨𑄎𑄪𑄠𑄚#,
 		},
@@ -6567,9 +6551,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#𑄃𑄨𑄠𑄇𑄪𑄑𑄑𑄴#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#𑄃𑄨𑄠𑄬𑄣𑄮𑄚𑄭𑄜𑄴#,
 		},
 		'America_Central' => {
 			long => {
@@ -6741,9 +6722,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#𑄌𑄨𑄖#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#𑄌𑄰𑄱𑄝𑄣𑄴𑄥𑄳𑄠𑄚𑄴#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#𑄇𑄧𑄣𑄧𑄟𑄳𑄝𑄧𑄧𑄱𑄱#,
@@ -6977,9 +6955,6 @@ has 'time_zone_names' => (
 		'Australia/Broken_Hill' => {
 			exemplarCity => q#𑄝𑄳𑄢𑄮𑄇𑄬𑄚𑄴 𑄦𑄨𑄣𑄴#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#𑄇𑄨𑄃𑄪𑄢𑄨#,
-		},
 		'Australia/Darwin' => {
 			exemplarCity => q#𑄓𑄢𑄴𑄃𑄪𑄃𑄨𑄚𑄴#,
 		},
@@ -7099,13 +7074,6 @@ has 'time_zone_names' => (
 				'daylight' => q#𑄌𑄨𑄚𑄴 𑄘𑄨𑄚𑄮𑄃𑄣𑄮𑄢𑄴 𑄃𑄧𑄇𑄴𑄖𑄧#,
 				'generic' => q#𑄌𑄨𑄚𑄴 𑄃𑄧𑄇𑄴𑄖𑄧#,
 				'standard' => q#𑄌𑄨𑄚𑄴 𑄟𑄚𑄧𑄇𑄴 𑄃𑄧𑄇𑄴𑄖𑄧#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#𑄌𑄧𑄠𑄴𑄝𑄣𑄴𑄥𑄧𑄚𑄴 𑄉𑄧𑄢𑄧𑄟𑄴𑄇𑄣𑄧𑄢𑄴 𑄃𑄧𑄇𑄴𑄖𑄧#,
-				'generic' => q#𑄌𑄧𑄠𑄴𑄝𑄣𑄴𑄥𑄧𑄚𑄴 𑄃𑄧𑄇𑄴𑄖𑄧#,
-				'standard' => q#𑄌𑄧𑄠𑄴𑄝𑄣𑄴𑄥𑄧𑄚𑄴 𑄟𑄚𑄧𑄇𑄴 𑄃𑄧𑄇𑄴𑄖𑄧#,
 			},
 		},
 		'Christmas' => {
@@ -7327,9 +7295,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#𑄅𑄪𑄣𑄨𑄠𑄚𑄮𑄞𑄴𑄥𑄴𑄇𑄴#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#𑄅𑄪𑄏𑄴𑄉𑄮𑄢𑄮𑄓𑄴#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#𑄞𑄘𑄪𑄎𑄴#,
 		},
@@ -7350,9 +7315,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#𑄎𑄉𑄳𑄢𑄬𑄛𑄴#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#𑄎𑄬𑄛𑄮𑄢𑄮𑄎𑄭𑄠𑄭#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#𑄎𑄪𑄢𑄨𑄈𑄴#,
@@ -7643,11 +7605,6 @@ has 'time_zone_names' => (
 				'standard' => q#𑄟𑄇𑄃𑄮 𑄟𑄚𑄴 𑄃𑄧𑄇𑄴𑄖𑄧#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#𑄟𑄳𑄠𑄇𑄴𑄇𑄪𑄢𑄨 𑄉𑄭 𑄉𑄭 𑄞𑄬𑄘 𑄃𑄧𑄇𑄴𑄖𑄧#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#𑄟𑄳𑄠𑄉𑄓𑄚𑄴 𑄉𑄧𑄢𑄧𑄟𑄴𑄇𑄣𑄧𑄢𑄴 𑄃𑄧𑄇𑄴𑄖𑄧#,
@@ -7685,13 +7642,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#𑄟𑄧𑄥𑄳𑄦𑄧𑄚𑄴 𑄃𑄧𑄇𑄴𑄖𑄧#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#𑄃𑄪𑄖𑄴𑄖𑄮𑄢𑄴 𑄛𑄧𑄏𑄨𑄟𑄴 𑄟𑄬𑄇𑄴𑄥𑄨𑄇𑄮𑄢𑄴 𑄘𑄨𑄚𑄮𑄢𑄴 𑄃𑄧𑄇𑄴𑄖𑄧#,
-				'generic' => q#𑄃𑄪𑄖𑄴𑄖𑄮𑄢𑄴 𑄛𑄧𑄏𑄨𑄟𑄴 𑄟𑄬𑄇𑄴𑄥𑄨𑄇𑄮𑄢𑄴 𑄃𑄧𑄇𑄴𑄖𑄧#,
-				'standard' => q#𑄃𑄪𑄖𑄴𑄖𑄮𑄢𑄴 𑄛𑄧𑄏𑄨𑄟𑄴 𑄟𑄬𑄇𑄴𑄥𑄨𑄇𑄮𑄢𑄴 𑄟𑄚𑄧𑄇𑄴 𑄃𑄧𑄇𑄴𑄖𑄧#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -7833,9 +7783,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Honolulu' => {
 			exemplarCity => q#𑄦𑄧𑄚𑄮𑄣𑄪𑄣𑄪#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#𑄎𑄧𑄚𑄴𑄥𑄳𑄑𑄧𑄚𑄴#,
 		},
 		'Pacific/Kiritimati' => {
 			exemplarCity => q#𑄇𑄨𑄢𑄨𑄖𑄨𑄟𑄖𑄨#,

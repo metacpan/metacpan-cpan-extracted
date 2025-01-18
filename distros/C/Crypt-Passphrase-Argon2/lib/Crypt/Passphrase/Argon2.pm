@@ -1,9 +1,9 @@
 package Crypt::Passphrase::Argon2;
-$Crypt::Passphrase::Argon2::VERSION = '0.009';
+$Crypt::Passphrase::Argon2::VERSION = '0.010';
 use strict;
 use warnings;
 
-use Crypt::Passphrase 0.010 -encoder;
+use parent 'Crypt::Passphrase::Encoder';
 
 use Carp 'croak';
 use Crypt::Argon2 0.017 qw/argon2_pass argon2_needs_rehash argon2_verify argon2_types/;
@@ -49,6 +49,7 @@ sub new {
 sub hash_password {
 	my ($self, $password) = @_;
 	my $salt = $self->random_bytes($self->{salt_size});
+	local $SIG{__DIE__} = \&Carp::croak;
 	return argon2_pass($self->{subtype}, $password, $salt, @{$self}{qw/time_cost memory_cost parallelism output_size/});
 }
 
@@ -80,7 +81,7 @@ Crypt::Passphrase::Argon2 - An Argon2 encoder for Crypt::Passphrase
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 

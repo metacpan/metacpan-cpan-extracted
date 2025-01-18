@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Sd - Package for language Sindhi
 
 package Locale::CLDR::Locales::Sd;
 # This file auto generated from Data\common\main\sd.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -72,6 +72,7 @@ has 'display_name_language' => (
  				'bi' => 'بسلاما',
  				'bin' => 'بني',
  				'bla' => 'سڪسڪا',
+ 				'blo' => 'آنيائي',
  				'bm' => 'بمبارا',
  				'bn' => 'بنگلا',
  				'bo' => 'تبيتائي',
@@ -191,6 +192,7 @@ has 'display_name_language' => (
  				'iba' => 'ايبن',
  				'ibb' => 'ابيبيو',
  				'id' => 'انڊونيشي',
+ 				'ie' => 'انٽرلنگئي',
  				'ig' => 'اگبو',
  				'ii' => 'سچوان يي',
  				'ikt' => 'مغربي ڪينيڊين انوڪٽيٽ',
@@ -243,6 +245,7 @@ has 'display_name_language' => (
  				'kv' => 'ڪومي',
  				'kw' => 'ڪورنش',
  				'kwk' => 'ڪئاڪ ولا',
+ 				'kxv' => 'ڪووي',
  				'ky' => 'ڪرغيز',
  				'la' => 'لاطيني',
  				'lad' => 'لڊينو',
@@ -251,8 +254,10 @@ has 'display_name_language' => (
  				'lez' => 'ليزگهين',
  				'lg' => 'گاندا',
  				'li' => 'لمبرگش',
+ 				'lij' => 'لگيوريئن',
  				'lil' => 'ليلوئيٽ',
  				'lkt' => 'لڪوٽا',
+ 				'lmo' => 'لامبارڊ',
  				'ln' => 'لنگالا',
  				'lo' => 'لائو',
  				'lou' => 'لوئيزيانا ڪريئول',
@@ -406,6 +411,7 @@ has 'display_name_language' => (
  				'sw_CD' => 'ڪونگو سواحيلي',
  				'swb' => 'ڪمورين',
  				'syr' => 'شامي',
+ 				'szl' => 'سليسيئن',
  				'ta' => 'تامل',
  				'tce' => 'ڏاکڻي ٽچون',
  				'te' => 'تلگو',
@@ -425,7 +431,7 @@ has 'display_name_language' => (
  				'to' => 'تونگن',
  				'tok' => 'توڪي پونا',
  				'tpi' => 'تاڪ پسن',
- 				'tr' => 'ترڪش',
+ 				'tr' => 'ترڪي',
  				'trv' => 'تاروڪو',
  				'ts' => 'سونگا',
  				'tt' => 'تاتار',
@@ -445,7 +451,9 @@ has 'display_name_language' => (
  				'uz' => 'ازبڪ',
  				'vai' => 'يا',
  				've' => 'وينڊا',
+ 				'vec' => 'ونيشن',
  				'vi' => 'ويتنامي',
+ 				'vmw' => 'مکووا',
  				'vo' => 'والپڪ',
  				'vun' => 'ونجو',
  				'wa' => 'ولون',
@@ -456,6 +464,7 @@ has 'display_name_language' => (
  				'wuu' => 'وو چيني',
  				'xal' => 'ڪيلمڪ',
  				'xh' => 'زھوسا',
+ 				'xnr' => 'ڪينگري',
  				'xog' => 'سوگا',
  				'yav' => 'يانگ بين',
  				'ybb' => 'ييمبا',
@@ -464,6 +473,7 @@ has 'display_name_language' => (
  				'yrl' => 'نھين گاٽو',
  				'yue' => 'ڪينٽونيز',
  				'yue@alt=menu' => 'چيني، ڪينٽونيز',
+ 				'za' => 'جوئنگ',
  				'zgh' => 'معياري مراڪشي تامازائيٽ',
  				'zh' => 'چيني',
  				'zh@alt=menu' => 'چيني، مندارن',
@@ -497,7 +507,7 @@ has 'display_name_script' => (
  			'Armn' => 'عرماني',
  			'Beng' => 'بنگلا',
  			'Bopo' => 'بوپوموفو',
- 			'Brai' => 'بريلي',
+ 			'Brai' => 'بريل',
  			'Cakm' => 'چڪما',
  			'Cans' => 'يونيفائيڊ ڪينيڊيئن ابارجيني سليبڪس',
  			'Cher' => 'چيروڪي',
@@ -692,7 +702,7 @@ has 'display_name_region' => (
  			'GA' => 'گبون',
  			'GB' => 'برطانيہ',
  			'GB@alt=short' => 'برطانيه',
- 			'GD' => 'گرينڊا',
+ 			'GD' => 'گريناڊا',
  			'GE' => 'جارجيا',
  			'GF' => 'فرانسيسي گيانا',
  			'GG' => 'گورنسي',
@@ -930,10 +940,10 @@ has 'display_name_type' => (
  				'gregorian' => q{جارجيائي ڪئلينڊر},
  				'hebrew' => q{عبراني ڪئلينڊر},
  				'indian' => q{هندوستاني قومي ڪئلينڊر},
- 				'islamic' => q{اسلامي ڪئلينڊر},
- 				'islamic-civil' => q{اسلامي ڪئلينڊر (ٽيبلر، مدني دور)},
- 				'islamic-tbla' => q{اسلامي ڪئلينڊر (ٽيبلر، فلڪياتي دور)},
- 				'islamic-umalqura' => q{اسلامي ڪئلينڊر (اُم القرا)},
+ 				'islamic' => q{هجري ڪئلينڊر},
+ 				'islamic-civil' => q{هجري ڪئلينڊر (ٽيبل وارو، شهري دور)},
+ 				'islamic-tbla' => q{هجري ڪئلينڊر (ٽيبلر، فلڪياتي دور)},
+ 				'islamic-umalqura' => q{هجري ڪئلينڊر (اُم القرا)},
  				'iso8601' => q{ISO-8601 ڪئلينڊر},
  				'japanese' => q{جاپاني ڪئلينڊر},
  				'persian' => q{فارسي ڪئلينڊر},
@@ -1387,12 +1397,12 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'concentr-milligram-ofglucose-per-deciliter' => {
-						'one' => q({0} mg/dL),
+						'one' => q({0} مليگرام في ڊيسيليٽر),
 						'other' => q({0} ملي گرامز في ڊيسي ليٽر),
 					},
 					# Core Unit Identifier
 					'milligram-ofglucose-per-deciliter' => {
-						'one' => q({0} mg/dL),
+						'one' => q({0} مليگرام في ڊيسيليٽر),
 						'other' => q({0} ملي گرامز في ڊيسي ليٽر),
 					},
 					# Long Unit Identifier
@@ -1428,6 +1438,18 @@ has 'units' => (
 					'permyriad' => {
 						'one' => q({0} پيرمائيرڊ),
 						'other' => q({0} پيرمائيرڊ),
+					},
+					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(حصا في ارب),
+						'one' => q({0} حصو في ارب),
+						'other' => q({0} حصا في ارب),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(حصا في ارب),
+						'one' => q({0} حصو في ارب),
+						'other' => q({0} حصا في ارب),
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
@@ -1598,14 +1620,54 @@ has 'units' => (
 					# Long Unit Identifier
 					'duration-century' => {
 						'name' => q(صديون),
-						'one' => q({0} c),
+						'one' => q({0} صدي),
 						'other' => q({0} صديون),
 					},
 					# Core Unit Identifier
 					'century' => {
 						'name' => q(صديون),
-						'one' => q({0} c),
+						'one' => q({0} صدي),
 						'other' => q({0} صديون),
+					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'one' => q({0} مهينو),
+						'other' => q({0} مهينا),
+						'per' => q({0} في مهينو),
+					},
+					# Core Unit Identifier
+					'month' => {
+						'one' => q({0} مهينو),
+						'other' => q({0} مهينا),
+						'per' => q({0} في مهينو),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(راتيون),
+						'one' => q({0} رات),
+						'other' => q({0} راتيون),
+						'per' => q({0} في رات),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(راتيون),
+						'one' => q({0} رات),
+						'other' => q({0} راتيون),
+						'per' => q({0} في رات),
+					},
+					# Long Unit Identifier
+					'duration-quarter' => {
+						'name' => q(ٽه ماهيون),
+						'one' => q({0} ٽه ماهيون),
+						'other' => q({0} ٽه ماهيون),
+						'per' => q({0}/ٽه ماهي),
+					},
+					# Core Unit Identifier
+					'quarter' => {
+						'name' => q(ٽه ماهيون),
+						'one' => q({0} ٽه ماهيون),
+						'other' => q({0} ٽه ماهيون),
+						'per' => q({0}/ٽه ماهي),
 					},
 					# Long Unit Identifier
 					'duration-second' => {
@@ -1616,6 +1678,18 @@ has 'units' => (
 					'second' => {
 						'one' => q({0} في سيڪنڊ),
 						'other' => q({0} سيڪنڊ),
+					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'one' => q({0} هفتو),
+						'other' => q({0} هفتا),
+						'per' => q({0} في هفتو),
+					},
+					# Core Unit Identifier
+					'week' => {
+						'one' => q({0} هفتو),
+						'other' => q({0} هفتا),
+						'per' => q({0} في هفتو),
 					},
 					# Long Unit Identifier
 					'electric-milliampere' => {
@@ -2234,6 +2308,18 @@ has 'units' => (
 						'other' => q(بوفورٽ {0}),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(نوري),
+						'one' => q({0} نوري),
+						'other' => q({0} نوري),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(نوري),
+						'one' => q({0} نوري),
+						'other' => q({0} نوري),
+					},
+					# Long Unit Identifier
 					'temperature-celsius' => {
 						'name' => q(ڊگري سيلسيس),
 						'one' => q({0} ڊگري سيلسيس),
@@ -2380,6 +2466,62 @@ has 'units' => (
 						'other' => q({0}m²),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(ح ف ا),
+						'one' => q({0}ح ف ا),
+						'other' => q({0}ح ف ا),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(ح ف ا),
+						'one' => q({0}ح ف ا),
+						'other' => q({0}ح ف ا),
+					},
+					# Long Unit Identifier
+					'duration-century' => {
+						'name' => q(ص),
+						'one' => q({0}ص),
+						'other' => q({0}ص),
+					},
+					# Core Unit Identifier
+					'century' => {
+						'name' => q(ص),
+						'one' => q({0}ص),
+						'other' => q({0}ص),
+					},
+					# Long Unit Identifier
+					'duration-day' => {
+						'one' => q({0}ڏينهن),
+						'other' => q({0}ڏينهن),
+						'per' => q({0}/ڏينهن),
+					},
+					# Core Unit Identifier
+					'day' => {
+						'one' => q({0}ڏينهن),
+						'other' => q({0}ڏينهن),
+						'per' => q({0}/ڏينهن),
+					},
+					# Long Unit Identifier
+					'duration-decade' => {
+						'one' => q({0}ڏهاڪ),
+						'other' => q({0}ڏهاڪ),
+					},
+					# Core Unit Identifier
+					'decade' => {
+						'one' => q({0}ڏهاڪ),
+						'other' => q({0}ڏهاڪ),
+					},
+					# Long Unit Identifier
+					'duration-microsecond' => {
+						'one' => q({0}مائڪرو سيڪنڊ),
+						'other' => q({0}مائڪرو سيڪنڊ),
+					},
+					# Core Unit Identifier
+					'microsecond' => {
+						'one' => q({0}مائڪرو سيڪنڊ),
+						'other' => q({0}مائڪرو سيڪنڊ),
+					},
+					# Long Unit Identifier
 					'duration-millisecond' => {
 						'one' => q({0} ms),
 						'other' => q({0} ms),
@@ -2392,32 +2534,78 @@ has 'units' => (
 					# Long Unit Identifier
 					'duration-month' => {
 						'name' => q(مهينو),
+						'one' => q({0}مهينو),
+						'other' => q({0}مهينا),
+						'per' => q({0}/مهينو),
 					},
 					# Core Unit Identifier
 					'month' => {
 						'name' => q(مهينو),
+						'one' => q({0}مهينو),
+						'other' => q({0}مهينا),
+						'per' => q({0}/مهينو),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(راتيون),
+						'one' => q({0}رات),
+						'other' => q({0}راتيون),
+						'per' => q({0}/رات),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(راتيون),
+						'one' => q({0}رات),
+						'other' => q({0}راتيون),
+						'per' => q({0}/رات),
+					},
+					# Long Unit Identifier
+					'duration-quarter' => {
+						'one' => q({0}ٽه ماهي),
+						'other' => q({0}ٽه ماهي),
+						'per' => q({0}/ٽه ماهي),
+					},
+					# Core Unit Identifier
+					'quarter' => {
+						'one' => q({0}ٽه ماهي),
+						'other' => q({0}ٽه ماهي),
+						'per' => q({0}/ٽه ماهي),
 					},
 					# Long Unit Identifier
 					'duration-second' => {
-						'one' => q({0} s),
-						'other' => q({0} سيڪنڊ),
+						'one' => q({0}سيڪنڊ),
+						'other' => q({0}سيڪنڊ),
 					},
 					# Core Unit Identifier
 					'second' => {
-						'one' => q({0} s),
-						'other' => q({0} سيڪنڊ),
+						'one' => q({0}سيڪنڊ),
+						'other' => q({0}سيڪنڊ),
 					},
 					# Long Unit Identifier
 					'duration-week' => {
 						'name' => q(هفتو),
-						'one' => q({0} هفتا),
-						'other' => q({0} هفتي),
+						'one' => q({0}هفتو),
+						'other' => q({0}هفتا),
+						'per' => q({0}/هفتو),
 					},
 					# Core Unit Identifier
 					'week' => {
 						'name' => q(هفتو),
-						'one' => q({0} هفتا),
-						'other' => q({0} هفتي),
+						'one' => q({0}هفتو),
+						'other' => q({0}هفتا),
+						'per' => q({0}/هفتو),
+					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'one' => q({0}س),
+						'other' => q({0}س),
+						'per' => q({0}/س),
+					},
+					# Core Unit Identifier
+					'year' => {
+						'one' => q({0}س),
+						'other' => q({0}س),
+						'per' => q({0}/س),
 					},
 					# Long Unit Identifier
 					'force-kilowatt-hour-per-100-kilometer' => {
@@ -2618,6 +2806,18 @@ has 'units' => (
 					'kilometer-per-hour' => {
 						'one' => q({0} km/h),
 						'other' => q({0} km/h),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(نوري),
+						'one' => q({0}نوري),
+						'other' => q({0}نوري),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(نوري),
+						'one' => q({0}نوري),
+						'other' => q({0}نوري),
 					},
 				},
 				'short' => {
@@ -2900,6 +3100,18 @@ has 'units' => (
 						'name' => q(پيرمائيرڊ),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(حصا/ارب),
+						'one' => q({0} ح ف ا),
+						'other' => q({0} ح ف ا),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(حصا/ارب),
+						'one' => q({0} ح ف ا),
+						'other' => q({0} ح ف ا),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-kilometer' => {
 						'name' => q(ليٽرز في ڪلو ميٽر),
 					},
@@ -3002,30 +3214,42 @@ has 'units' => (
 						'other' => q({0} ميگا بٽز),
 					},
 					# Long Unit Identifier
+					'duration-century' => {
+						'name' => q(ص),
+						'one' => q({0} ص),
+						'other' => q({0} ص),
+					},
+					# Core Unit Identifier
+					'century' => {
+						'name' => q(ص),
+						'one' => q({0} ص),
+						'other' => q({0} ص),
+					},
+					# Long Unit Identifier
 					'duration-day' => {
 						'name' => q(ڏينهن),
 						'one' => q({0} ڏينهن),
 						'other' => q({0} ڏينهن),
-						'per' => q({0} في ڏينهن),
+						'per' => q({0}/ڏينهن),
 					},
 					# Core Unit Identifier
 					'day' => {
 						'name' => q(ڏينهن),
 						'one' => q({0} ڏينهن),
 						'other' => q({0} ڏينهن),
-						'per' => q({0} في ڏينهن),
+						'per' => q({0}/ڏينهن),
 					},
 					# Long Unit Identifier
 					'duration-decade' => {
 						'name' => q(ڏهاڪا),
 						'one' => q({0} ڏهاڪو),
-						'other' => q({0} ڏهاڪا),
+						'other' => q({0} ڏهاڪ),
 					},
 					# Core Unit Identifier
 					'decade' => {
 						'name' => q(ڏهاڪا),
 						'one' => q({0} ڏهاڪو),
-						'other' => q({0} ڏهاڪا),
+						'other' => q({0} ڏهاڪ),
 					},
 					# Long Unit Identifier
 					'duration-hour' => {
@@ -3082,16 +3306,16 @@ has 'units' => (
 					# Long Unit Identifier
 					'duration-month' => {
 						'name' => q(مهينا),
-						'one' => q({0} مهينا),
+						'one' => q({0} مهينو),
 						'other' => q({0} مهينا),
-						'per' => q({0} في مهيني),
+						'per' => q({0}/مهينو),
 					},
 					# Core Unit Identifier
 					'month' => {
 						'name' => q(مهينا),
-						'one' => q({0} مهينا),
+						'one' => q({0} مهينو),
 						'other' => q({0} مهينا),
-						'per' => q({0} في مهيني),
+						'per' => q({0}/مهينو),
 					},
 					# Long Unit Identifier
 					'duration-nanosecond' => {
@@ -3106,18 +3330,32 @@ has 'units' => (
 						'other' => q({0} نينو سيڪنڊ),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(راتيون),
+						'one' => q({0} رات),
+						'other' => q({0} راتيون),
+						'per' => q({0}/رات),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(راتيون),
+						'one' => q({0} رات),
+						'other' => q({0} راتيون),
+						'per' => q({0}/رات),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'name' => q(ٽه ماهي),
-						'one' => q({0} ٽه ماهي),
-						'other' => q({0} ٽه ماهي),
-						'per' => q({0} في ٽه ماهي),
+						'one' => q({0} ٽه ماهيون),
+						'other' => q({0} ٽه ماهيون),
+						'per' => q({0}/ٽه ماهي),
 					},
 					# Core Unit Identifier
 					'quarter' => {
 						'name' => q(ٽه ماهي),
-						'one' => q({0} ٽه ماهي),
-						'other' => q({0} ٽه ماهي),
-						'per' => q({0} في ٽه ماهي),
+						'one' => q({0} ٽه ماهيون),
+						'other' => q({0} ٽه ماهيون),
+						'per' => q({0}/ٽه ماهي),
 					},
 					# Long Unit Identifier
 					'duration-second' => {
@@ -3136,30 +3374,30 @@ has 'units' => (
 					# Long Unit Identifier
 					'duration-week' => {
 						'name' => q(هفتا),
-						'one' => q({0} هفتا),
+						'one' => q({0} هفتو),
 						'other' => q({0} هفتا),
-						'per' => q({0} في هفتي),
+						'per' => q({0}/هفتو),
 					},
 					# Core Unit Identifier
 					'week' => {
 						'name' => q(هفتا),
-						'one' => q({0} هفتا),
+						'one' => q({0} هفتو),
 						'other' => q({0} هفتا),
-						'per' => q({0} في هفتي),
+						'per' => q({0}/هفتو),
 					},
 					# Long Unit Identifier
 					'duration-year' => {
 						'name' => q(سال),
 						'one' => q({0} سال),
 						'other' => q({0} سال),
-						'per' => q({0} في سال),
+						'per' => q({0}/س),
 					},
 					# Core Unit Identifier
 					'year' => {
 						'name' => q(سال),
 						'one' => q({0} سال),
 						'other' => q({0} سال),
-						'per' => q({0} في سال),
+						'per' => q({0}/س),
 					},
 					# Long Unit Identifier
 					'electric-ampere' => {
@@ -3902,6 +4140,18 @@ has 'units' => (
 						'other' => q({0} ناٽ),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(نوري),
+						'one' => q({0} نوري),
+						'other' => q({0} نوري),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(نوري),
+						'one' => q({0} نوري),
+						'other' => q({0} نوري),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'name' => q(ميٽر في سيڪنڊ),
 						'one' => q({0} ميٽر في سيڪنڊ),
@@ -4254,6 +4504,8 @@ has 'listPatterns' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+				start => q({0}، {1}),
+				middle => q({0}، {1}),
 				end => q({0}، ۽ {1}),
 				2 => q({0} ۽ {1}),
 		} }
@@ -4271,6 +4523,24 @@ has native_numbering_system => (
 	isa			=> Str,
 	init_arg	=> undef,
 	default		=> 'arab',
+);
+
+has 'number_symbols' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+		'arab' => {
+			'decimal' => q(.),
+		},
+		'arabext' => {
+			'decimal' => q(.),
+			'group' => q(،),
+		},
+		'deva' => {
+			'group' => q(،),
+		},
+	} }
 );
 
 has 'number_formats' => (
@@ -5058,7 +5328,9 @@ has 'currencies' => (
 		},
 		'SLL' => {
 			display_name => {
-				'currency' => q(سیرا لیونيائي لیون - 1964-2022),
+				'currency' => q(سیرا لیونيائي لیون \(1964—2022\)),
+				'one' => q(سیرا لیونيائي لیون \(1964—2022\)),
+				'other' => q(سیرا لیونيائي لیون \(1964—2022\)),
 			},
 		},
 		'SOS' => {
@@ -5549,7 +5821,7 @@ has 'datetime_formats_available_formats' => (
 			GyMd => q{M/d/y GGGGG},
 		},
 		'gregorian' => {
-			GyMd => q{M/d/y GGGGG},
+			GyMd => q{M/d/y G},
 			MMMMW => q{ھفتو W جو MMMM},
 			yw => q{ھفتو w جو Y},
 		},
@@ -6141,9 +6413,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#نيويارڪ#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#نپيگان#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#نوم#,
 		},
@@ -6165,9 +6434,6 @@ has 'time_zone_names' => (
 		'America/Panama' => {
 			exemplarCity => q#پناما#,
 		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#پینگنرٽنگ#,
-		},
 		'America/Paramaribo' => {
 			exemplarCity => q#پيراميريبو#,
 		},
@@ -6188,9 +6454,6 @@ has 'time_zone_names' => (
 		},
 		'America/Punta_Arenas' => {
 			exemplarCity => q#پنٽا اريناس#,
-		},
-		'America/Rainy_River' => {
-			exemplarCity => q#ريني رور#,
 		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#رينڪن انليٽ#,
@@ -6252,9 +6515,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#ٿولي#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#ٿنڊر بي#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#تيجوانا#,
 		},
@@ -6275,9 +6535,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#ياڪوتات#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#ييلو نائيف#,
 		},
 		'America_Central' => {
 			long => {
@@ -6431,9 +6688,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#چيتا#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#چوئي بيلسن#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#ڪولمبو#,
@@ -6673,9 +6927,6 @@ has 'time_zone_names' => (
 		'Australia/Broken_Hill' => {
 			exemplarCity => q#بروڪن هل#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#ڪري#,
-		},
 		'Australia/Darwin' => {
 			exemplarCity => q#ڊارون#,
 		},
@@ -6802,13 +7053,6 @@ has 'time_zone_names' => (
 				'daylight' => q#چائنا جي ڏينهن جو وقت#,
 				'generic' => q#چين جو وقت#,
 				'standard' => q#چائنا جو معياري وقت#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#چوئي بيلسن جي اونهاري جو وقت#,
-				'generic' => q#چوئي بيلسن جو وقت#,
-				'standard' => q#چوئي بيلسن جو معياري وقت#,
 			},
 		},
 		'Christmas' => {
@@ -7036,9 +7280,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#اليانوسڪ#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#ازهارڊ#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#وڊوز#,
 		},
@@ -7059,9 +7300,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#زغرب#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#زيپروزهايا#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#زيورخ#,
@@ -7279,6 +7517,11 @@ has 'time_zone_names' => (
 				'standard' => q#جاپان جو معياري وقت#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#قزاقستان وقت#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#اوڀر قزاقستان جو وقت#,
@@ -7325,11 +7568,6 @@ has 'time_zone_names' => (
 				'standard' => q#لورڊ هووي جو معياري وقت#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#مڪوائري آئي لينڊ جو وقت#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#مگادان جي ڏينهن جي وقت#,
@@ -7367,13 +7605,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#مائوسن جو وقت#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#شمالي مغربي ميڪسيڪو جي ڏينهن جو وقت#,
-				'generic' => q#شمالي مغربي ميڪسيڪو جو وقت#,
-				'standard' => q#شمالي مغربي ميڪسيڪو جو معياري وقت#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -7510,9 +7741,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Honolulu' => {
 			exemplarCity => q#هونو لولو#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#جانسٹن#,
 		},
 		'Pacific/Kanton' => {
 			exemplarCity => q#ڪانٽن#,

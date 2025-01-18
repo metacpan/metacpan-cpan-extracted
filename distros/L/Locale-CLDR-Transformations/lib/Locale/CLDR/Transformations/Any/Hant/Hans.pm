@@ -1,17 +1,17 @@
 package Locale::CLDR::Transformations::Any::Hant::Hans;
 # This file auto generated from Data\common\transforms\Simplified-Traditional.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -73,8 +73,22 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(龑),
+					result  => q(䶮),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(龍),
 					result  => q(龙),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(齼),
+					result  => q(𬺓),
 					revisit => 0,
 				},
 				{
@@ -103,6 +117,20 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(齬),
 					result  => q(龉),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(齮),
+					result  => q(𬺈),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(齯),
+					result  => q(𫠜),
 					revisit => 0,
 				},
 				{
@@ -152,6 +180,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(齙),
 					result  => q(龅),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(齘),
+					result  => q(𬹼),
 					revisit => 0,
 				},
 				{
@@ -283,6 +318,13 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(麴),
+					result  => q(麹),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(麩),
 					result  => q(麸),
 					revisit => 0,
@@ -306,6 +348,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(鹽),
 					result  => q(盐),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(𥗽),
+					result  => q(𬒗),
 					revisit => 0,
 				},
 				{
@@ -409,6 +458,13 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(䴉),
+					result  => q(鹮),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(鷺),
 					result  => q(鹭),
 					revisit => 0,
@@ -418,6 +474,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(鷹),
 					result  => q(鹰),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(鷭),
+					result  => q(𬸪),
 					revisit => 0,
 				},
 				{
@@ -472,6 +535,13 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(鷟),
+					result  => q(𬸦),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(鷚),
 					result  => q(鹨),
 					revisit => 0,
@@ -509,6 +579,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(鷊),
 					result  => q(鹝),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(鶱),
+					result  => q(𬸣),
 					revisit => 0,
 				},
 				{
@@ -586,6 +663,20 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(鶬),
 					result  => q(鸧),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(鸑),
+					result  => q(𬸚),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(鶠),
+					result  => q(𬸘),
 					revisit => 0,
 				},
 				{
@@ -740,6 +831,20 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(鵝),
 					result  => q(鹅),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(鵏),
+					result  => q(𬷕),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(鵟),
+					result  => q(𫛭),
 					revisit => 0,
 				},
 				{
@@ -1025,6 +1130,20 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(鱲),
+					result  => q(𫚭),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(䲘),
+					result  => q(鳤),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(鱣),
 					result  => q(鳣),
 					revisit => 0,
@@ -1053,6 +1172,41 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(鮡),
+					result  => q(𬶐),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(鮠),
+					result  => q(𬶏),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(鮆),
+					result  => q(𫚖),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(鰤),
+					result  => q(𫚕),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(鮟),
+					result  => q(𩽾),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(鱘),
 					result  => q(鲟),
 					revisit => 0,
@@ -1076,6 +1230,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(鱔),
 					result  => q(鳝),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(鱚),
+					result  => q(𬶮),
 					revisit => 0,
 				},
 				{
@@ -1111,6 +1272,20 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(鰾),
 					result  => q(鳔),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(鰶),
+					result  => q(𬶭),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(鱇),
+					result  => q(𩾌),
 					revisit => 0,
 				},
 				{
@@ -1214,6 +1389,34 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(鱀),
+					result  => q(𬶨),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(鰊),
+					result  => q(𬶠),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(鯻),
+					result  => q(𬶟),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(鰆),
+					result  => q(䲠),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(鰠),
 					result  => q(鳋),
 					revisit => 0,
@@ -1223,6 +1426,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(鰟),
 					result  => q(鳑),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(鰧),
+					result  => q(䲢),
 					revisit => 0,
 				},
 				{
@@ -1417,6 +1627,13 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(鮸),
+					result  => q(𩾃),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(鯒),
 					result  => q(鲬),
 					revisit => 0,
@@ -1557,6 +1774,27 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(鮀),
+					result  => q(𬶍),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(鮈),
+					result  => q(𬶋),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(鮣),
+					result  => q(䲟),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(鮐),
 					result  => q(鲐),
 					revisit => 0,
@@ -1690,6 +1928,13 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(鬹),
+					result  => q(鬶),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(鬢),
 					result  => q(鬓),
 					revisit => 0,
@@ -1732,6 +1977,13 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(駪),
+					result  => q(𬳽),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(驫),
 					result  => q(骉),
 					revisit => 0,
@@ -1762,6 +2014,20 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(驤),
 					result  => q(骧),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(駃),
+					result  => q(𫘝),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(馼),
+					result  => q(𫘜),
 					revisit => 0,
 				},
 				{
@@ -1804,6 +2070,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(驕),
 					result  => q(骄),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(驎),
+					result  => q(𬴊),
 					revisit => 0,
 				},
 				{
@@ -1858,6 +2131,27 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(騑),
+					result  => q(𬴂),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(騄),
+					result  => q(𫘧),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(騊),
+					result  => q(𫘦),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(驂),
 					result  => q(骖),
 					revisit => 0,
@@ -1907,6 +2201,13 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(膢),
+					result  => q(𦝼),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(騰),
 					result  => q(腾),
 					revisit => 0,
@@ -1935,6 +2236,13 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(駼),
+					result  => q(𬳿),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(騧),
 					result  => q(䯄),
 					revisit => 0,
@@ -1951,6 +2259,20 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(騙),
 					result  => q(骗),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(騞),
+					result  => q(𬴃),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(騠),
+					result  => q(𫘨),
 					revisit => 0,
 				},
 				{
@@ -2077,6 +2399,27 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(駙),
 					result  => q(驸),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(駉),
+					result  => q(𬳶),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(駓),
+					result  => q(𬳵),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(䮄),
+					result  => q(𫠊),
 					revisit => 0,
 				},
 				{
@@ -2210,6 +2553,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(饒),
 					result  => q(饶),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(饘),
+					result  => q(𫗴),
 					revisit => 0,
 				},
 				{
@@ -2357,6 +2707,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(餖),
 					result  => q(饾),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(餗),
+					result  => q(𫗧),
 					revisit => 0,
 				},
 				{
@@ -2775,6 +3132,13 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(頔),
+					result  => q(𬱖),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(頸),
 					result  => q(颈),
 					revisit => 0,
@@ -2819,6 +3183,27 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(頭),
 					result  => q(头),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(頠),
+					result  => q(𬱟),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(頫),
+					result  => q(𫖯),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(顗),
+					result  => q(𫖮),
 					revisit => 0,
 				},
 				{
@@ -2882,6 +3267,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(頑),
 					result  => q(顽),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(頍),
+					result  => q(𫠆),
 					revisit => 0,
 				},
 				{
@@ -3001,6 +3393,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(韓),
 					result  => q(韩),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(韡),
+					result  => q(𮧵),
 					revisit => 0,
 				},
 				{
@@ -3195,6 +3594,13 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(隤),
+					result  => q(𬯎),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(隱),
 					result  => q(隐),
 					revisit => 0,
@@ -3286,6 +3692,20 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(隮),
+					result  => q(𬯀),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(隑),
+					result  => q(𬮿),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(陝),
 					result  => q(陕),
 					revisit => 0,
@@ -3349,6 +3769,13 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(闑),
+					result  => q(𫔶),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(闕),
 					result  => q(阙),
 					revisit => 0,
@@ -3393,6 +3820,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(闌),
 					result  => q(阑),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(闉),
+					result  => q(𬮱),
 					revisit => 0,
 				},
 				{
@@ -3741,6 +4175,27 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(鎓),
+					result  => q(𬭩),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(鎝),
+					result  => q(𨱏),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(鎶),
+					result  => q(鿔),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(鑌),
 					result  => q(镔),
 					revisit => 0,
@@ -3762,6 +4217,13 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(鐩),
+					result  => q(𬭼),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(鐿),
 					result  => q(镱),
 					revisit => 0,
@@ -3771,6 +4233,62 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(鐺),
 					result  => q(铛),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(鉧),
+					result  => q(𬭁),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(鉊),
+					result  => q(𬬿),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(鑪),
+					result  => q(𬬻),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(鉮),
+					result  => q(𬬹),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(鉥),
+					result  => q(𬬸),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(鉝),
+					result  => q(𫟷),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(鏺),
+					result  => q(䥽),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(鉨),
+					result  => q(鿭),
 					revisit => 0,
 				},
 				{
@@ -3841,6 +4359,62 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(鐠),
 					result  => q(镨),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(鏻),
+					result  => q(𬭸),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(𨭆),
+					result  => q(𬭶),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(𨭎),
+					result  => q(𬭳),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(鐍),
+					result  => q(𫔎),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(鐇),
+					result  => q(𫔍),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(鐏),
+					result  => q(𨱔),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(鐄),
+					result  => q(𨱑),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(鐯),
+					result  => q(䦃),
 					revisit => 0,
 				},
 				{
@@ -3988,6 +4562,20 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(鏑),
 					result  => q(镝),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(䥕),
+					result  => q(𬭯),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(鏏),
+					result  => q(𬭬),
 					revisit => 0,
 				},
 				{
@@ -4149,6 +4737,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(鎊),
 					result  => q(镑),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(鍭),
+					result  => q(𬭤),
 					revisit => 0,
 				},
 				{
@@ -4413,6 +5008,27 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(𨨏),
+					result  => q(𬭛),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(錞),
+					result  => q(𬭚),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(錤),
+					result  => q(𫓹),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(錙),
 					result  => q(锱),
 					revisit => 0,
@@ -4422,6 +5038,48 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(錕),
 					result  => q(锟),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(鋐),
+					result  => q(𬭎),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(𨧀),
+					result  => q(𬭊),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(鐽),
+					result  => q(𫟼),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(鋗),
+					result  => q(𫓶),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(銶),
+					result  => q(𨱇),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(䥑),
+					result  => q(鿏),
 					revisit => 0,
 				},
 				{
@@ -4702,6 +5360,20 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(銥),
 					result  => q(铱),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(鉷),
+					result  => q(𫟹),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(銈),
+					result  => q(𫓯),
 					revisit => 0,
 				},
 				{
@@ -5113,6 +5785,34 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(釿),
+					result  => q(𬬱),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(鋹),
+					result  => q(𬬮),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(錀),
+					result  => q(𬬭),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(鈇),
+					result  => q(𫓧),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(鈀),
 					result  => q(钯),
 					revisit => 0,
@@ -5136,6 +5836,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(釷),
 					result  => q(钍),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(釴),
+					result  => q(𬬩),
 					revisit => 0,
 				},
 				{
@@ -5281,6 +5988,13 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(醲),
+					result  => q(𬪩),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(醬),
 					result  => q(酱),
 					revisit => 0,
@@ -5325,6 +6039,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(鄴),
 					result  => q(邺),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(鄳),
+					result  => q(𫑡),
 					revisit => 0,
 				},
 				{
@@ -5381,6 +6102,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(鄉),
 					result  => q(乡),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(鄩),
+					result  => q(𬩽),
 					revisit => 0,
 				},
 				{
@@ -5617,6 +6345,20 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(輶),
+					result  => q(𬨎),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(輮),
+					result  => q(𫐓),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(轡),
 					result  => q(辔),
 					revisit => 0,
@@ -5624,8 +6366,22 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(軝),
+					result  => q(𬨂),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(轟),
 					result  => q(轰),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(䡵),
+					result  => q(𫟦),
 					revisit => 0,
 				},
 				{
@@ -5792,6 +6548,13 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(輗),
+					result  => q(𫐐),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(輜),
 					result  => q(辎),
 					revisit => 0,
@@ -5864,6 +6627,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(輅),
 					result  => q(辂),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(輄),
+					result  => q(𨐈),
 					revisit => 0,
 				},
 				{
@@ -5948,6 +6718,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(軛),
 					result  => q(轭),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(軏),
+					result  => q(𫐄),
 					revisit => 0,
 				},
 				{
@@ -6821,6 +7598,13 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(譞),
+					result  => q(𫍽),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(譫),
 					result  => q(谵),
 					revisit => 0,
@@ -6865,6 +7649,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(譏),
 					result  => q(讥),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(譓),
+					result  => q(𬤝),
 					revisit => 0,
 				},
 				{
@@ -7129,6 +7920,34 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(諟),
+					result  => q(𬤊),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(諲),
+					result  => q(𬤇),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(謏),
+					result  => q(𫍲),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(諴),
+					result  => q(𫍯),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(諝),
 					result  => q(谞),
 					revisit => 0,
@@ -7229,6 +8048,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(調),
 					result  => q(调),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(讋),
+					result  => q(詟),
 					revisit => 0,
 				},
 				{
@@ -7507,6 +8333,20 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(詪),
+					result  => q(𬣳),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(詷),
+					result  => q(𫍣),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(詡),
 					result  => q(诩),
 					revisit => 0,
@@ -7551,6 +8391,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(詔),
 					result  => q(诏),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(諓),
+					result  => q(𬣡),
 					revisit => 0,
 				},
 				{
@@ -7654,6 +8501,13 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(詝),
+					result  => q(𬣞),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(訢),
 					result  => q(䜣),
 					revisit => 0,
@@ -7705,6 +8559,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(訓),
 					result  => q(训),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(訏),
+					result  => q(𬣙),
 					revisit => 0,
 				},
 				{
@@ -7934,6 +8795,13 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(襴),
+					result  => q(襕),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(襬),
 					result  => q(䙓),
 					revisit => 0,
@@ -7971,6 +8839,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(襏),
 					result  => q(袯),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(襀),
+					result  => q(𫌀),
 					revisit => 0,
 				},
 				{
@@ -8118,6 +8993,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(蟻),
 					result  => q(蚁),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(蝀),
+					result  => q(𬟽),
 					revisit => 0,
 				},
 				{
@@ -8347,8 +9229,22 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(虉),
+					result  => q(𬟁),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(蘚),
 					result  => q(藓),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(蒍),
+					result  => q(𫇭),
 					revisit => 0,
 				},
 				{
@@ -8419,6 +9315,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(薺),
 					result  => q(荠),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(罃),
+					result  => q(䓨),
 					revisit => 0,
 				},
 				{
@@ -8669,6 +9572,13 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(蔄),
+					result  => q(𬜬),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(葤),
 					result  => q(荮),
 					revisit => 0,
@@ -8872,6 +9782,13 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(膕),
+					result  => q(腘),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(臉),
 					result  => q(脸),
 					revisit => 0,
@@ -9005,6 +9922,13 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(膞),
+					result  => q(䏝),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(脅),
 					result  => q(胁),
 					revisit => 0,
@@ -9117,6 +10041,20 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(翬),
+					result  => q(翚),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(翽),
+					result  => q(翙),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(翹),
 					result  => q(翘),
 					revisit => 0,
@@ -9201,6 +10139,13 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(纕),
+					result  => q(𬙋),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(纘),
 					result  => q(缵),
 					revisit => 0,
@@ -9273,6 +10218,34 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(繹),
 					result  => q(绎),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(纆),
+					result  => q(𬙊),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(纁),
+					result  => q(𫄸),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(繻),
+					result  => q(𦈡),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(繶),
+					result  => q(𫄷),
 					revisit => 0,
 				},
 				{
@@ -9376,6 +10349,13 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(縯),
+					result  => q(𬙂),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(繅),
 					result  => q(缫),
 					revisit => 0,
@@ -9413,6 +10393,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(縵),
 					result  => q(缦),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(紞),
+					result  => q(𬘘),
 					revisit => 0,
 				},
 				{
@@ -9691,6 +10678,34 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(綧),
+					result  => q(𬘯),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(綝),
+					result  => q(𬘭),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(綪),
+					result  => q(𬘬),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(綡),
+					result  => q(𫟅),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(緇),
 					result  => q(缁),
 					revisit => 0,
@@ -9833,6 +10848,34 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(經),
 					result  => q(经),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(綄),
+					result  => q(𬘫),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(綎),
+					result  => q(𬘩),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(絺),
+					result  => q(𫄨),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(綖),
+					result  => q(𫄧),
 					revisit => 0,
 				},
 				{
@@ -10363,6 +11406,13 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(籛),
+					result  => q(篯),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(籃),
 					result  => q(篮),
 					revisit => 0,
@@ -10393,6 +11443,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(簣),
 					result  => q(篑),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(篢),
+					result  => q(𬕂),
 					revisit => 0,
 				},
 				{
@@ -10636,6 +11693,13 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(頵),
+					result  => q(𫖳),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(穎),
 					result  => q(颖),
 					revisit => 0,
@@ -10645,6 +11709,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(積),
 					result  => q(积),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(穇),
+					result  => q(䅟),
 					revisit => 0,
 				},
 				{
@@ -10832,6 +11903,13 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(磾),
+					result  => q(䃅),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(磣),
 					result  => q(碜),
 					revisit => 0,
@@ -10841,6 +11919,20 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(磚),
 					result  => q(砖),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(䃮),
+					result  => q(鿎),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(礄),
+					result  => q(硚),
 					revisit => 0,
 				},
 				{
@@ -10904,6 +11996,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(硤),
 					result  => q(硖),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(礐),
+					result  => q(𬒈),
 					revisit => 0,
 				},
 				{
@@ -10974,6 +12073,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(瞜),
 					result  => q(䁖),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(睍),
+					result  => q(𪾢),
 					revisit => 0,
 				},
 				{
@@ -11294,8 +12400,36 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(瓛),
+					result  => q(𤩽),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(㼆),
+					result  => q(𬎆),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(璊),
+					result  => q(𫞩),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(瓔),
 					result  => q(璎),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(瓅),
+					result  => q(𬍛),
 					revisit => 0,
 				},
 				{
@@ -11331,6 +12465,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(璦),
 					result  => q(瑷),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(璵),
+					result  => q(玙),
 					revisit => 0,
 				},
 				{
@@ -11394,6 +12535,27 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(瑋),
 					result  => q(玮),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(璡),
+					result  => q(琎),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(璕),
+					result  => q(𬍤),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(璗),
+					result  => q(𬍡),
 					revisit => 0,
 				},
 				{
@@ -11665,6 +12827,13 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(燖),
+					result  => q(𬊈),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(燶),
 					result  => q(㶶),
 					revisit => 0,
@@ -11763,6 +12932,13 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(熰),
+					result  => q(𬉼),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(熗),
 					result  => q(炝),
 					revisit => 0,
@@ -11772,6 +12948,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(熅),
 					result  => q(煴),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(燀),
+					result  => q(𬊤),
 					revisit => 0,
 				},
 				{
@@ -11945,6 +13128,13 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(瀂),
+					result  => q(澛),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(瀦),
 					result  => q(潴),
 					revisit => 0,
@@ -11996,6 +13186,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(瀉),
 					result  => q(泻),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(澫),
+					result  => q(𬇕),
 					revisit => 0,
 				},
 				{
@@ -12183,6 +13380,13 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(濜),
+					result  => q(浕),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(潯),
 					result  => q(浔),
 					revisit => 0,
@@ -12234,6 +13438,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(漸),
 					result  => q(渐),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(漊),
+					result  => q(溇),
 					revisit => 0,
 				},
 				{
@@ -12316,6 +13527,13 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(漍),
+					result  => q(𬇹),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(滲),
 					result  => q(渗),
 					revisit => 0,
@@ -12323,8 +13541,43 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(濚),
+					result  => q(溁),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(濆),
+					result  => q(𣸣),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(滯),
 					result  => q(滞),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(浿),
+					result  => q(𬇙),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(潕),
+					result  => q(𣲘),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(湋),
+					result  => q(𣲗),
 					revisit => 0,
 				},
 				{
@@ -12358,6 +13611,13 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(渢),
+					result  => q(沨),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(滄),
 					result  => q(沧),
 					revisit => 0,
@@ -12386,6 +13646,13 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(溮),
+					result  => q(浉),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(湞),
 					result  => q(浈),
 					revisit => 0,
@@ -12409,6 +13676,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(測),
 					result  => q(测),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(溳),
+					result  => q(涢),
 					revisit => 0,
 				},
 				{
@@ -13072,6 +14346,13 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(彠),
+					result  => q(彟),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(歸),
 					result  => q(归),
 					revisit => 0,
@@ -13200,6 +14481,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(櫨),
 					result  => q(栌),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(欓),
+					result  => q(𣗋),
 					revisit => 0,
 				},
 				{
@@ -13345,6 +14633,13 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(櫍),
+					result  => q(𬃊),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(橢),
 					result  => q(椭),
 					revisit => 0,
@@ -13410,6 +14705,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(樂),
 					result  => q(乐),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(梜),
+					result  => q(𬂩),
 					revisit => 0,
 				},
 				{
@@ -13569,6 +14871,13 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(棡),
+					result  => q(㭎),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(梟),
 					result  => q(枭),
 					revisit => 0,
@@ -13662,6 +14971,20 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(曉),
 					result  => q(晓),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(晛),
+					result  => q(𬀪),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(暐),
+					result  => q(𬀩),
 					revisit => 0,
 				},
 				{
@@ -13767,6 +15090,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(數),
 					result  => q(数),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(斆),
+					result  => q(敩),
 					revisit => 0,
 				},
 				{
@@ -14339,6 +15669,13 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(憖),
+					result  => q(慭),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(懾),
 					result  => q(慑),
 					revisit => 0,
@@ -14411,6 +15748,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(懍),
 					result  => q(懔),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(㥮),
+					result  => q(㤘),
 					revisit => 0,
 				},
 				{
@@ -14738,6 +16082,13 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(彄),
+					result  => q(𫸩),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(張),
 					result  => q(张),
 					revisit => 0,
@@ -14782,6 +16133,20 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(廣),
 					result  => q(广),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(廞),
+					result  => q(𫷷),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(廎),
+					result  => q(庼),
 					revisit => 0,
 				},
 				{
@@ -14962,6 +16327,13 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(嶨),
+					result  => q(峃),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(巋),
 					result  => q(岿),
 					revisit => 0,
@@ -14992,6 +16364,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(嶴),
 					result  => q(岙),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(輋),
+					result  => q(𪨶),
 					revisit => 0,
 				},
 				{
@@ -15053,6 +16432,20 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(巘),
+					result  => q(𪩘),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(嵽),
+					result  => q(𫶇),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(嶁),
 					result  => q(嵝),
 					revisit => 0,
@@ -15097,6 +16490,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(峽),
 					result  => q(峡),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(㠣),
+					result  => q(𫵷),
 					revisit => 0,
 				},
 				{
@@ -15410,6 +16810,13 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(嬃),
+					result  => q(媭),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(媼),
 					result  => q(媪),
 					revisit => 0,
@@ -15447,6 +16854,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(娛),
 					result  => q(娱),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(娙),
+					result  => q(𫰛),
 					revisit => 0,
 				},
 				{
@@ -15634,8 +17048,36 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(塿),
+					result  => q(𪣻),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(壪),
+					result  => q(塆),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(墮),
 					result  => q(堕),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(埨),
+					result  => q(𫭢),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(塸),
+					result  => q(𫭟),
 					revisit => 0,
 				},
 				{
@@ -15650,6 +17092,20 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(墊),
 					result  => q(垫),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(墠),
+					result  => q(𫮃),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(𡑍),
+					result  => q(𫭼),
 					revisit => 0,
 				},
 				{
@@ -15718,6 +17174,13 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(㩳),
+					result  => q(㧐),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(報),
 					result  => q(报),
 					revisit => 0,
@@ -15762,6 +17225,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(執),
 					result  => q(执),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(墶),
+					result  => q(垯),
 					revisit => 0,
 				},
 				{
@@ -15846,6 +17316,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(囅),
 					result  => q(冁),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(㘚),
+					result  => q(㘎),
 					revisit => 0,
 				},
 				{
@@ -15958,6 +17435,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(噲),
 					result  => q(哙),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(噁),
+					result  => q(𫫇),
 					revisit => 0,
 				},
 				{
@@ -16257,6 +17741,20 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(靆),
+					result  => q(叇),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(靉),
+					result  => q(叆),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(參),
 					result  => q(参),
 					revisit => 0,
@@ -16357,6 +17855,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(勩),
 					result  => q(勚),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(勣),
+					result  => q(𪟝),
 					revisit => 0,
 				},
 				{
@@ -16621,6 +18126,13 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(僤),
+					result  => q(𫢸),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(儸),
 					result  => q(㑩),
 					revisit => 0,
@@ -16735,6 +18247,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(僑),
 					result  => q(侨),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(㑳),
+					result  => q(㑇),
 					revisit => 0,
 				},
 				{
@@ -16992,6 +18511,20 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(騱),
+					result  => q(𫘬),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(騵),
+					result  => q(𫘪),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(䯀),
 					result  => q(䯅),
 					revisit => 0,
@@ -17013,8 +18546,22 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(絪),
+					result  => q(𬘡),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(䋙),
 					result  => q(䌺),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(紃),
+					result  => q(𬘓),
 					revisit => 0,
 				},
 				{
@@ -17104,6 +18651,27 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(蘀),
+					result  => q(萚),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(䓣),
+					result  => q(𬜯),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(藭),
+					result  => q(䓖),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(蒓),
 					result  => q(莼),
 					revisit => 0,
@@ -17148,6 +18716,27 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(亙),
 					result  => q(亘),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(鑈),
+					result  => q(鿭),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(蔿),
+					result  => q(𫇭),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(澐),
+					result  => q(沄),
 					revisit => 0,
 				},
 				{

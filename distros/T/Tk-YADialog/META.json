@@ -39,12 +39,15 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/haje61/Tk-YADialog/issues"
+      },
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/haje61/Tk-YADialog.git",
          "web" : "https://github.com/haje61/Tk-YADialog"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

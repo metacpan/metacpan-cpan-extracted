@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Az - Package for language Azerbaijani
 
 package Locale::CLDR::Locales::Az;
 # This file auto generated from Data\common\main\az.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -553,6 +553,7 @@ has 'display_name_language' => (
  				'bik' => 'bikol',
  				'bin' => 'bini',
  				'bla' => 'siksikə',
+ 				'blo' => 'anii',
  				'bm' => 'bambara',
  				'bn' => 'benqal',
  				'bo' => 'tibet',
@@ -777,6 +778,7 @@ has 'display_name_language' => (
  				'kv' => 'komi',
  				'kw' => 'korn',
  				'kwk' => 'Kvakvala',
+ 				'kxv' => 'kuvi',
  				'ky' => 'qırğız',
  				'la' => 'latın',
  				'lad' => 'sefard',
@@ -787,8 +789,10 @@ has 'display_name_language' => (
  				'lez' => 'ləzgi',
  				'lg' => 'qanda',
  				'li' => 'limburq',
+ 				'lij' => 'liquriya dili',
  				'lil' => 'Liluet',
  				'lkt' => 'lakota',
+ 				'lmo' => 'lombard dili',
  				'ln' => 'linqala',
  				'lo' => 'laos',
  				'lol' => 'monqo',
@@ -801,7 +805,6 @@ has 'display_name_language' => (
  				'lua' => 'luba-lulua',
  				'lui' => 'luyseno',
  				'lun' => 'lunda',
- 				'luo' => 'luo',
  				'lus' => 'mizo',
  				'luy' => 'luyia',
  				'lv' => 'latış',
@@ -976,6 +979,7 @@ has 'display_name_language' => (
  				'sw_CD' => 'Konqo suahilicəsi',
  				'swb' => 'komor',
  				'syr' => 'suriya',
+ 				'szl' => 'silez dili',
  				'ta' => 'tamil',
  				'tce' => 'cənubi tuçon',
  				'te' => 'teluqu',
@@ -1022,9 +1026,10 @@ has 'display_name_language' => (
  				'und' => 'naməlum dil',
  				'ur' => 'urdu',
  				'uz' => 'özbək',
- 				'vai' => 'vai',
  				've' => 'venda',
+ 				'vec' => 'venet dili',
  				'vi' => 'vyetnam',
+ 				'vmw' => 'makua dili',
  				'vo' => 'volapük',
  				'vot' => 'votik',
  				'vun' => 'vunyo',
@@ -1038,6 +1043,7 @@ has 'display_name_language' => (
  				'wuu' => 'vu',
  				'xal' => 'kalmık',
  				'xh' => 'xosa',
+ 				'xnr' => 'kanqri',
  				'xog' => 'soqa',
  				'yao' => 'yao',
  				'yap' => 'yapiz',
@@ -2216,6 +2222,18 @@ has 'units' => (
 						'other' => q({0} permiriada),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(bir milyarda düşən hissə sayı),
+						'one' => q(bir milyarda düşən {0} hissə),
+						'other' => q(bir milyarda düşən {0} hissə),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(bir milyarda düşən hissə sayı),
+						'one' => q(bir milyarda düşən {0} hissə),
+						'other' => q(bir milyarda düşən {0} hissə),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(100 kilometrə litr),
 						'one' => q(100 kilometrə {0} litr),
@@ -2428,6 +2446,20 @@ has 'units' => (
 						'name' => q(nanosaniyə),
 						'one' => q({0} nanosaniyə),
 						'other' => q({0} nanosaniyə),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(gecə),
+						'one' => q({0} gecə),
+						'other' => q({0} gecə),
+						'per' => q({0}/gecə),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(gecə),
+						'one' => q({0} gecə),
+						'other' => q({0} gecə),
+						'per' => q({0}/gecə),
 					},
 					# Long Unit Identifier
 					'duration-second' => {
@@ -3282,6 +3314,18 @@ has 'units' => (
 						'other' => q({0} kilometr/saat),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(işıq),
+						'one' => q({0} işıq),
+						'other' => q({0} işıq),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(işıq),
+						'one' => q({0} işıq),
+						'other' => q({0} işıq),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'one' => q({0} metr/saniyə),
 						'other' => q({0} metr/saniyə),
@@ -3800,6 +3844,20 @@ has 'units' => (
 						'name' => q(dəq),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(gecə),
+						'one' => q({0}gecə),
+						'other' => q({0}gecə),
+						'per' => q({0}/gecə),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(gecə),
+						'one' => q({0}gecə),
+						'other' => q({0}gecə),
+						'per' => q({0}/gecə),
+					},
+					# Long Unit Identifier
 					'duration-second' => {
 						'name' => q(san),
 					},
@@ -4090,6 +4148,18 @@ has 'units' => (
 					'millibar' => {
 						'one' => q({0} mb),
 						'other' => q({0} mb),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(işıq),
+						'one' => q({0}işıq),
+						'other' => q({0}işıq),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(işıq),
+						'one' => q({0}işıq),
+						'other' => q({0}işıq),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -4608,6 +4678,14 @@ has 'units' => (
 						'name' => q(permiriada),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(hissə/milyard),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(hissə/milyard),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(l/100km),
 						'one' => q({0} l/100km),
@@ -4790,6 +4868,20 @@ has 'units' => (
 						'name' => q(nsan),
 						'one' => q({0} nsan),
 						'other' => q({0} nsan),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(gecə),
+						'one' => q({0} gecə),
+						'other' => q({0} gecə),
+						'per' => q({0}/gecə),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(gecə),
+						'one' => q({0} gecə),
+						'other' => q({0} gecə),
+						'per' => q({0}/gecə),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -5390,6 +5482,18 @@ has 'units' => (
 						'other' => q({0} km/saat),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(işıq),
+						'one' => q({0} işıq),
+						'other' => q({0} işıq),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(işıq),
+						'one' => q({0} işıq),
+						'other' => q({0} işıq),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'name' => q(metr/saniyə),
 					},
@@ -5676,6 +5780,18 @@ has 'number_symbols' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'arab' => {
+			'group' => q(,),
+			'minusSign' => q(-),
+			'percentSign' => q(٪),
+			'plusSign' => q(+),
+		},
+		'arabext' => {
+			'decimal' => q(,),
+			'minusSign' => q(-),
+			'percentSign' => q(~),
+			'plusSign' => q(+),
+		},
 		'latn' => {
 			'decimal' => q(,),
 			'group' => q(.),
@@ -5689,6 +5805,59 @@ has 'number_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		decimalFormat => {
+			'default' => {
+				'1000' => {
+					'one' => '0 min',
+					'other' => '0 min',
+				},
+				'10000' => {
+					'one' => '00 min',
+					'other' => '00 min',
+				},
+				'100000' => {
+					'one' => '000 min',
+					'other' => '000 min',
+				},
+				'1000000' => {
+					'one' => '0 mln',
+					'other' => '0 mln',
+				},
+				'10000000' => {
+					'one' => '00 mln',
+					'other' => '00 mln',
+				},
+				'100000000' => {
+					'one' => '000 mln',
+					'other' => '000 mln',
+				},
+				'1000000000' => {
+					'one' => '0 mlrd',
+					'other' => '0 mlrd',
+				},
+				'10000000000' => {
+					'one' => '00 mlrd',
+					'other' => '00 mlrd',
+				},
+				'100000000000' => {
+					'one' => '000 mlrd',
+					'other' => '000 mlrd',
+				},
+				'1000000000000' => {
+					'one' => '0 trln',
+					'other' => '0 trln',
+				},
+				'10000000000000' => {
+					'one' => '00 trln',
+					'other' => '00 trln',
+				},
+				'100000000000000' => {
+					'one' => '000 trln',
+					'other' => '000 trln',
+				},
+				'standard' => {
+					'default' => 'standart onluq kəsr0.###',
+				},
+			},
 			'long' => {
 				'1000' => {
 					'one' => '0 min',
@@ -5775,6 +5944,13 @@ has 'number_formats' => (
 				'100000000000000' => {
 					'one' => '000 trln',
 					'other' => '000 trln',
+				},
+			},
+		},
+		scientificFormat => {
+			'default' => {
+				'standard' => {
+					'default' => 'standart elmi#',
 				},
 			},
 		},
@@ -8811,9 +8987,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#Nyu York#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#Nipiqon#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#Nom#,
 		},
@@ -8832,9 +9005,6 @@ has 'time_zone_names' => (
 		'America/Ojinaga' => {
 			exemplarCity => q#Ocinaqa#,
 		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#Panqnirtanq#,
-		},
 		'America/Phoenix' => {
 			exemplarCity => q#Feniks#,
 		},
@@ -8850,9 +9020,6 @@ has 'time_zone_names' => (
 		'America/Puerto_Rico' => {
 			exemplarCity => q#Puerto Riko#,
 		},
-		'America/Rainy_River' => {
-			exemplarCity => q#Reyni Çayı#,
-		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#Rankin Girişi#,
 		},
@@ -8867,9 +9034,6 @@ has 'time_zone_names' => (
 		},
 		'America/Rio_Branco' => {
 			exemplarCity => q#Rio Branko#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#Santa İzabel#,
 		},
 		'America/Santiago' => {
 			exemplarCity => q#Santyaqo#,
@@ -8910,9 +9074,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#Tul#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#İldırım Körfəzi#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#Tixuana#,
 		},
@@ -8924,9 +9085,6 @@ has 'time_zone_names' => (
 		},
 		'America/Winnipeg' => {
 			exemplarCity => q#Vinnipeq#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#Yellounayf#,
 		},
 		'America_Central' => {
 			long => {
@@ -9056,9 +9214,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#Çita#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#Çoybalsan#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#Kolombo#,
@@ -9229,9 +9384,6 @@ has 'time_zone_names' => (
 		'Australia/Brisbane' => {
 			exemplarCity => q#Brisbeyn#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#Kuriye#,
-		},
 		'Australia/Darwin' => {
 			exemplarCity => q#Darvin#,
 		},
@@ -9352,13 +9504,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Çin Yay Vaxtı#,
 				'generic' => q#Çin Vaxtı#,
 				'standard' => q#Çin Standart Vaxtı#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Çoybalsan Yay Vaxtı#,
-				'generic' => q#Çoybalsan Vaxtı#,
-				'standard' => q#Çoybalsan Standart Vaxtı#,
 			},
 		},
 		'Christmas' => {
@@ -9530,9 +9675,6 @@ has 'time_zone_names' => (
 		'Europe/Tirane' => {
 			exemplarCity => q#Tirana#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#Ujqorod#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#Vaduts#,
 		},
@@ -9553,9 +9695,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#Zaqreb#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#Zaporojye#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#Sürix#,
@@ -9764,6 +9903,11 @@ has 'time_zone_names' => (
 				'standard' => q#Yaponiya Standart Vaxtı#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Qazaxıstan vaxtı#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#Şərqi Qazaxıstan Vaxtı#,
@@ -9810,11 +9954,6 @@ has 'time_zone_names' => (
 				'standard' => q#Lord Hau Standart Vaxtı#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Makari Adası Vaxtı#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Maqadan Yay Vaxtı#,
@@ -9852,13 +9991,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Mouson Vaxtı#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Şimal-Qərbi Meksika Yay Vaxtı#,
-				'generic' => q#Şimal-Qərbi Meksika Vaxtı#,
-				'standard' => q#Şimal-Qərbi Meksika Standart Vaxtı#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -9983,9 +10115,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Honolulu' => {
 			exemplarCity => q#Honolulu#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#Conston#,
 		},
 		'Pacific/Kiritimati' => {
 			exemplarCity => q#Kirimati#,

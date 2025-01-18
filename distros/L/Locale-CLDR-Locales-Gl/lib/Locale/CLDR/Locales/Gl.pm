@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Gl - Package for language Galician
 
 package Locale::CLDR::Locales::Gl;
 # This file auto generated from Data\common\main\gl.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -75,6 +75,7 @@ has 'display_name_language' => (
  				'bi' => 'bislama',
  				'bin' => 'bini',
  				'bla' => 'siksiká',
+ 				'blo' => 'anii',
  				'bm' => 'bambara',
  				'bn' => 'bengalí',
  				'bo' => 'tibetano',
@@ -201,6 +202,7 @@ has 'display_name_language' => (
  				'iba' => 'iban',
  				'ibb' => 'ibibio',
  				'id' => 'indonesio',
+ 				'ie' => 'occidental',
  				'ig' => 'igbo',
  				'ii' => 'yi sichuanés',
  				'ikt' => 'inuktitut canadense occidental',
@@ -255,6 +257,7 @@ has 'display_name_language' => (
  				'kv' => 'komi',
  				'kw' => 'córnico',
  				'kwk' => 'kwakiutl',
+ 				'kxv' => 'kuvi',
  				'ky' => 'kirguiz',
  				'la' => 'latín',
  				'lad' => 'ladino',
@@ -263,8 +266,10 @@ has 'display_name_language' => (
  				'lez' => 'lezguio',
  				'lg' => 'ganda',
  				'li' => 'limburgués',
+ 				'lij' => 'lígur',
  				'lil' => 'lillooet',
  				'lkt' => 'lakota',
+ 				'lmo' => 'lombardo',
  				'ln' => 'lingala',
  				'lo' => 'laosiano',
  				'lou' => 'crioulo de Luisiana',
@@ -275,7 +280,6 @@ has 'display_name_language' => (
  				'lu' => 'luba-katanga',
  				'lua' => 'luba-lulua',
  				'lun' => 'lunda',
- 				'luo' => 'luo',
  				'lus' => 'mizo',
  				'luy' => 'luyia',
  				'lv' => 'letón',
@@ -421,6 +425,7 @@ has 'display_name_language' => (
  				'sw_CD' => 'suahili congolés',
  				'swb' => 'comoriano',
  				'syr' => 'siríaco',
+ 				'szl' => 'silesiano',
  				'ta' => 'támil',
  				'tce' => 'tutchone do sur',
  				'te' => 'telugu',
@@ -460,9 +465,10 @@ has 'display_name_language' => (
  				'und' => 'lingua descoñecida',
  				'ur' => 'urdú',
  				'uz' => 'uzbeko',
- 				'vai' => 'vai',
  				've' => 'venda',
+ 				'vec' => 'véneto',
  				'vi' => 'vietnamita',
+ 				'vmw' => 'makua',
  				'vo' => 'volapuk',
  				'vun' => 'vunjo',
  				'wa' => 'valón',
@@ -474,6 +480,7 @@ has 'display_name_language' => (
  				'wuu' => 'chinés wu',
  				'xal' => 'calmuco',
  				'xh' => 'xhosa',
+ 				'xnr' => 'kangri',
  				'xog' => 'soga',
  				'yav' => 'yangben',
  				'ybb' => 'yemba',
@@ -482,6 +489,7 @@ has 'display_name_language' => (
  				'yrl' => 'nheengatu',
  				'yue' => 'cantonés',
  				'yue@alt=menu' => 'chinés cantonés',
+ 				'za' => 'zhuang',
  				'zgh' => 'tamazight marroquí estándar',
  				'zh' => 'chinés',
  				'zh@alt=menu' => 'chinés mandarín',
@@ -620,15 +628,15 @@ has 'display_name_region' => (
  			'419' => 'América Latina',
  			'AC' => 'Illa de Ascensión',
  			'AD' => 'Andorra',
- 			'AE' => 'Os Emiratos Árabes Unidos',
+ 			'AE' => 'Emiratos Árabes Unidos',
  			'AF' => 'Afganistán',
  			'AG' => 'Antigua e Barbuda',
  			'AI' => 'Anguila',
  			'AL' => 'Albania',
  			'AM' => 'Armenia',
  			'AO' => 'Angola',
- 			'AQ' => 'A Antártida',
- 			'AR' => 'A Arxentina',
+ 			'AQ' => 'Antártida',
+ 			'AR' => 'Arxentina',
  			'AS' => 'Samoa Americana',
  			'AT' => 'Austria',
  			'AU' => 'Australia',
@@ -649,14 +657,14 @@ has 'display_name_region' => (
  			'BN' => 'Brunei',
  			'BO' => 'Bolivia',
  			'BQ' => 'Caribe Neerlandés',
- 			'BR' => 'O Brasil',
+ 			'BR' => 'Brasil',
  			'BS' => 'Bahamas',
  			'BT' => 'Bután',
  			'BV' => 'Illa Bouvet',
  			'BW' => 'Botswana',
  			'BY' => 'Belarús',
  			'BZ' => 'Belize',
- 			'CA' => 'O Canadá',
+ 			'CA' => 'Canadá',
  			'CC' => 'Illas Cocos (Keeling)',
  			'CD' => 'República Democrática do Congo',
  			'CD@alt=variant' => 'Congo (RDC)',
@@ -669,7 +677,7 @@ has 'display_name_region' => (
  			'CK' => 'Illas Cook',
  			'CL' => 'Chile',
  			'CM' => 'Camerún',
- 			'CN' => 'A China',
+ 			'CN' => 'China',
  			'CO' => 'Colombia',
  			'CP' => 'Illa Clipperton',
  			'CR' => 'Costa Rica',
@@ -691,7 +699,7 @@ has 'display_name_region' => (
  			'EC' => 'Ecuador',
  			'EE' => 'Estonia',
  			'EG' => 'Exipto',
- 			'EH' => 'O Sáhara Occidental',
+ 			'EH' => 'Sáhara Occidental',
  			'ER' => 'Eritrea',
  			'ES' => 'España',
  			'ET' => 'Etiopía',
@@ -705,7 +713,7 @@ has 'display_name_region' => (
  			'FO' => 'Illas Feroe',
  			'FR' => 'Francia',
  			'GA' => 'Gabón',
- 			'GB' => 'O Reino Unido',
+ 			'GB' => 'Reino Unido',
  			'GB@alt=short' => 'RU',
  			'GD' => 'Granada',
  			'GE' => 'Xeorxia',
@@ -722,7 +730,7 @@ has 'display_name_region' => (
  			'GS' => 'Illas Xeorxia do Sur e Sandwich do Sur',
  			'GT' => 'Guatemala',
  			'GU' => 'Guam',
- 			'GW' => 'A Guinea Bissau',
+ 			'GW' => 'Guinea Bissau',
  			'GY' => 'Güiana',
  			'HK' => 'Hong Kong RAE da China',
  			'HK@alt=short' => 'Hong Kong',
@@ -736,7 +744,7 @@ has 'display_name_region' => (
  			'IE' => 'Irlanda',
  			'IL' => 'Israel',
  			'IM' => 'Illa de Man',
- 			'IN' => 'A India',
+ 			'IN' => 'India',
  			'IO' => 'Territorio Británico do Océano Índico',
  			'IO@alt=chagos' => 'Arquipélago de Chagos',
  			'IQ' => 'Iraq',
@@ -746,7 +754,7 @@ has 'display_name_region' => (
  			'JE' => 'Jersey',
  			'JM' => 'Xamaica',
  			'JO' => 'Xordania',
- 			'JP' => 'O Xapón',
+ 			'JP' => 'Xapón',
  			'KE' => 'Kenya',
  			'KG' => 'Kirguizistán',
  			'KH' => 'Camboxa',
@@ -759,7 +767,7 @@ has 'display_name_region' => (
  			'KY' => 'Illas Caimán',
  			'KZ' => 'Kazakistán',
  			'LA' => 'Laos',
- 			'LB' => 'O Líbano',
+ 			'LB' => 'Líbano',
  			'LC' => 'Santa Lucía',
  			'LI' => 'Liechtenstein',
  			'LK' => 'Sri Lanka',
@@ -808,8 +816,8 @@ has 'display_name_region' => (
  			'NZ@alt=variant' => 'Aotearoa (Nova Zelandia)',
  			'OM' => 'Omán',
  			'PA' => 'Panamá',
- 			'PE' => 'O Perú',
- 			'PF' => 'A Polinesia Francesa',
+ 			'PE' => 'Perú',
+ 			'PF' => 'Polinesia Francesa',
  			'PG' => 'Papúa-Nova Guinea',
  			'PH' => 'Filipinas',
  			'PK' => 'Paquistán',
@@ -821,7 +829,7 @@ has 'display_name_region' => (
  			'PS@alt=short' => 'Palestina',
  			'PT' => 'Portugal',
  			'PW' => 'Palau',
- 			'PY' => 'O Paraguai',
+ 			'PY' => 'Paraguai',
  			'QA' => 'Qatar',
  			'QO' => 'Territorios afastados de Oceanía',
  			'RE' => 'Reunión',
@@ -832,7 +840,7 @@ has 'display_name_region' => (
  			'SA' => 'Arabia Saudita',
  			'SB' => 'Illas Salomón',
  			'SC' => 'Seychelles',
- 			'SD' => 'O Sudán',
+ 			'SD' => 'Sudán',
  			'SE' => 'Suecia',
  			'SG' => 'Singapur',
  			'SH' => 'Santa Helena',
@@ -844,7 +852,7 @@ has 'display_name_region' => (
  			'SN' => 'Senegal',
  			'SO' => 'Somalia',
  			'SR' => 'Suriname',
- 			'SS' => 'O Sudán do Sur',
+ 			'SS' => 'Sudán do Sur',
  			'ST' => 'San Tomé e Príncipe',
  			'SV' => 'O Salvador',
  			'SX' => 'Sint Maarten',
@@ -873,9 +881,9 @@ has 'display_name_region' => (
  			'UM' => 'Illas Menores Distantes dos Estados Unidos',
  			'UN' => 'Nacións Unidas',
  			'UN@alt=short' => 'ONU',
- 			'US' => 'Os Estados Unidos',
+ 			'US' => 'Estados Unidos',
  			'US@alt=short' => 'EUA',
- 			'UY' => 'O Uruguai',
+ 			'UY' => 'Uruguai',
  			'UZ' => 'Uzbekistán',
  			'VA' => 'Cidade do Vaticano',
  			'VC' => 'San Vicente e as Granadinas',
@@ -889,7 +897,7 @@ has 'display_name_region' => (
  			'XA' => 'Pseudoacentos',
  			'XB' => 'Pseudobidireccional',
  			'XK' => 'Kosovo',
- 			'YE' => 'O Iemen',
+ 			'YE' => 'Iemen',
  			'YT' => 'Mayotte',
  			'ZA' => 'Suráfrica',
  			'ZM' => 'Zambia',
@@ -983,7 +991,6 @@ has 'display_name_type' => (
  				'phonebook' => q{orde de clasificación da guía telefónica},
  				'phonetic' => q{Orde de clasificación fonética},
  				'pinyin' => q{Orde de clasificación pinyin},
- 				'reformed' => q{Criterio de ordenación reformado},
  				'search' => q{busca de carácter xeral},
  				'searchjl' => q{Clasificar por consonante inicial hangul},
  				'standard' => q{criterio de ordenación estándar},
@@ -1692,6 +1699,18 @@ has 'units' => (
 						'name' => q(tanto por dez mil),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(partes por mil millóns),
+						'one' => q({0} parte por mil millóns),
+						'other' => q({0} partes por mil millóns),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(partes por mil millóns),
+						'one' => q({0} parte por mil millóns),
+						'other' => q({0} partes por mil millóns),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(litros por 100 quilómetros),
 						'one' => q({0} litro por 100 quilómetros),
@@ -1988,6 +2007,20 @@ has 'units' => (
 						'name' => q(nanosegundos),
 						'one' => q({0} nanosegundo),
 						'other' => q({0} nanosegundos),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(noites),
+						'one' => q({0} noite),
+						'other' => q({0} noites),
+						'per' => q({0} por noite),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(noites),
+						'one' => q({0} noite),
+						'other' => q({0} noites),
+						'per' => q({0} por noite),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -3092,6 +3125,18 @@ has 'units' => (
 						'other' => q({0} nós),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(luz),
+						'one' => q({0} luz),
+						'other' => q({0} luz),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(luz),
+						'one' => q({0} luz),
+						'other' => q({0} luz),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'name' => q(metros por segundo),
 						'one' => q({0} metro por segundo),
@@ -3652,6 +3697,18 @@ has 'units' => (
 						'name' => q(kt),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(ppmm),
+						'one' => q({0} ppmm),
+						'other' => q({0} ppmm),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(ppmm),
+						'one' => q({0} ppmm),
+						'other' => q({0} ppmm),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(l/100 km),
 					},
@@ -3710,6 +3767,20 @@ has 'units' => (
 						'one' => q({0} m.),
 						'other' => q({0} m.),
 						'per' => q({0}/m.),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(noites),
+						'one' => q({0} noite),
+						'other' => q({0} noites),
+						'per' => q({0}/noite),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(noites),
+						'one' => q({0} noite),
+						'other' => q({0} noites),
+						'per' => q({0}/noite),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -3950,6 +4021,18 @@ has 'units' => (
 					'knot' => {
 						'one' => q({0} nó),
 						'other' => q({0} nós),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(luz),
+						'one' => q({0} luz),
+						'other' => q({0} luz),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(luz),
+						'one' => q({0} luz),
+						'other' => q({0} luz),
 					},
 					# Long Unit Identifier
 					'speed-mile-per-hour' => {
@@ -4194,6 +4277,18 @@ has 'units' => (
 						'other' => q({0} ‱),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(partes/mil millóns),
+						'one' => q({0} ppmm),
+						'other' => q({0} ppmm),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(partes/mil millóns),
+						'one' => q({0} ppmm),
+						'other' => q({0} ppmm),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(litros/100 km),
 						'one' => q({0} l/100 km),
@@ -4338,6 +4433,20 @@ has 'units' => (
 						'one' => q({0} mes),
 						'other' => q({0} meses),
 						'per' => q({0}/mes),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(noites),
+						'one' => q({0} noite),
+						'other' => q({0} noites),
+						'per' => q({0}/noite),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(noites),
+						'one' => q({0} noite),
+						'other' => q({0} noites),
+						'per' => q({0}/noite),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -4806,6 +4915,18 @@ has 'units' => (
 						'name' => q(nós),
 						'one' => q({0} nós),
 						'other' => q({0} nós),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(luz),
+						'one' => q({0} luz),
+						'other' => q({0} luz),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(luz),
+						'one' => q({0} luz),
+						'other' => q({0} luz),
 					},
 					# Long Unit Identifier
 					'speed-mile-per-hour' => {
@@ -6444,9 +6565,9 @@ has 'currencies' => (
 		},
 		'SLL' => {
 			display_name => {
-				'currency' => q(leone de Serra Leoa \(1964—2022\)),
-				'one' => q(leone de Serra Leoa \(1964—2022\)),
-				'other' => q(leones de Serra Leoa \(1964—2022\)),
+				'currency' => q(leone de Serra Leoa \(1964–2022\)),
+				'one' => q(leone de Serra Leoa \(1964–2022\)),
+				'other' => q(leones de Serra Leoa \(1964–2022\)),
 			},
 		},
 		'SOS' => {
@@ -7459,6 +7580,11 @@ has 'time_zone_names' => (
 		regionFormat => q(hora de: {0}),
 		regionFormat => q(hora de verán de: {0}),
 		regionFormat => q(hora estándar de: {0}),
+		'Acre' => {
+			long => {
+				'generic' => q#hora de Acre#,
+			},
+		},
 		'Afghanistan' => {
 			long => {
 				'standard' => q#hora de Afganistán#,
@@ -7563,9 +7689,6 @@ has 'time_zone_names' => (
 		'America/Argentina/Tucuman' => {
 			exemplarCity => q#Tucumán#,
 		},
-		'America/Asuncion' => {
-			exemplarCity => q#Asunción#,
-		},
 		'America/Bahia' => {
 			exemplarCity => q#Baía#,
 		},
@@ -7586,9 +7709,6 @@ has 'time_zone_names' => (
 		},
 		'America/Cuiaba' => {
 			exemplarCity => q#Cuiabá#,
-		},
-		'America/Curacao' => {
-			exemplarCity => q#Curaçao#,
 		},
 		'America/Eirunepe' => {
 			exemplarCity => q#Eirunepé#,
@@ -7659,9 +7779,6 @@ has 'time_zone_names' => (
 		'America/Rio_Branco' => {
 			exemplarCity => q#Río Branco#,
 		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#Santa Isabel#,
-		},
 		'America/Santarem' => {
 			exemplarCity => q#Santarém#,
 		},
@@ -7720,7 +7837,7 @@ has 'time_zone_names' => (
 		'Anadyr' => {
 			long => {
 				'daylight' => q#Horario de verán de Anadir#,
-				'generic' => q#Horario de Anadir#,
+				'generic' => q#hora de Anadyr#,
 				'standard' => q#Horario estándar de Anadir#,
 			},
 		},
@@ -7892,9 +8009,6 @@ has 'time_zone_names' => (
 		'Australia/Adelaide' => {
 			exemplarCity => q#Adelaida#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#Currie#,
-		},
 		'Australia/Sydney' => {
 			exemplarCity => q#Sidney#,
 		},
@@ -8000,13 +8114,6 @@ has 'time_zone_names' => (
 				'daylight' => q#hora de verán da China#,
 				'generic' => q#hora da China#,
 				'standard' => q#hora estándar da China#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#hora de verán de Choibalsan#,
-				'generic' => q#hora de Choibalsan#,
-				'standard' => q#hora estándar de Choibalsan#,
 			},
 		},
 		'Christmas' => {
@@ -8168,9 +8275,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#Ulianovsk#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#Uzghorod#,
-		},
 		'Europe/Vatican' => {
 			exemplarCity => q#Vaticano#,
 		},
@@ -8182,9 +8286,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Warsaw' => {
 			exemplarCity => q#Varsovia#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#Zaporizhia#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#Zürich#,
@@ -8408,8 +8509,13 @@ has 'time_zone_names' => (
 		'Kamchatka' => {
 			long => {
 				'daylight' => q#Horario de verán de Petropávlovsk-Kamchatski#,
-				'generic' => q#Horario de Petropávlovsk-Kamchatski#,
+				'generic' => q#hora estándar de Petropavlovsk-Kamchatski#,
 				'standard' => q#Horario estándar de Petropávlovsk-Kamchatski#,
+			},
+		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#hora de Kazakistán#,
 			},
 		},
 		'Kazakhstan_Eastern' => {
@@ -8458,11 +8564,6 @@ has 'time_zone_names' => (
 				'standard' => q#hora estándar de Lord Howe#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#hora da Illa Macquarie#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#hora de verán de Magadan#,
@@ -8500,13 +8601,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#hora de Mawson#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#hora de verán do noroeste de México#,
-				'generic' => q#hora do noroeste de México#,
-				'standard' => q#hora estándar do noroeste de México#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -8702,7 +8796,7 @@ has 'time_zone_names' => (
 		'Samara' => {
 			long => {
 				'daylight' => q#Horario de verán de Samara#,
-				'generic' => q#Horario de Samara#,
+				'generic' => q#hora de Samara#,
 				'standard' => q#Horario estándar de Samara#,
 			},
 		},

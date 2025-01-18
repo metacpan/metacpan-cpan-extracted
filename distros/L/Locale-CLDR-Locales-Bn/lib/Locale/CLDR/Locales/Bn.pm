@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Bn - Package for language Bangla
 
 package Locale::CLDR::Locales::Bn;
 # This file auto generated from Data\common\main\bn.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -83,6 +83,7 @@ has 'display_name_language' => (
  				'bik' => 'বিকোল',
  				'bin' => 'বিনি',
  				'bla' => 'সিকসিকা',
+ 				'blo' => 'অ্যানি',
  				'bm' => 'বামবারা',
  				'bn' => 'বাংলা',
  				'bo' => 'তিব্বতি',
@@ -298,6 +299,7 @@ has 'display_name_language' => (
  				'kv' => 'কোমি',
  				'kw' => 'কর্ণিশ',
  				'kwk' => 'কোয়াক’ওয়ালা',
+ 				'kxv' => 'কুভি',
  				'ky' => 'কির্গিজ',
  				'la' => 'লাতিন',
  				'lad' => 'লাদিনো',
@@ -308,6 +310,7 @@ has 'display_name_language' => (
  				'lez' => 'লেজঘিয়ান',
  				'lg' => 'গান্ডা',
  				'li' => 'লিম্বুর্গিশ',
+ 				'lij' => 'লিগুরিয়ান',
  				'lil' => 'লিল্লুয়েট',
  				'lkt' => 'লাকোটা',
  				'lmo' => 'লম্বার্ড',
@@ -499,6 +502,7 @@ has 'display_name_language' => (
  				'swb' => 'কমোরিয়ান',
  				'syc' => 'প্রাচীন সিরিও',
  				'syr' => 'সিরিয়াক',
+ 				'szl' => 'সিলেশিয়ান',
  				'ta' => 'তামিল',
  				'tce' => 'দক্ষিণী টুচোন',
  				'te' => 'তেলুগু',
@@ -547,7 +551,9 @@ has 'display_name_language' => (
  				'uz' => 'উজবেক',
  				'vai' => 'ভাই',
  				've' => 'ভেন্ডা',
+ 				'vec' => 'ভেনেশিয়ান',
  				'vi' => 'ভিয়েতনামী',
+ 				'vmw' => 'মাখুওয়া',
  				'vo' => 'ভোলাপুক',
  				'vot' => 'ভোটিক',
  				'vun' => 'ভুঞ্জো',
@@ -561,6 +567,7 @@ has 'display_name_language' => (
  				'wuu' => 'উ চীনা',
  				'xal' => 'কাল্মাইক',
  				'xh' => 'জোসা',
+ 				'xnr' => 'কাংরি',
  				'xog' => 'সোগা',
  				'yao' => 'ইয়াও',
  				'yap' => 'ইয়াপেসে',
@@ -1827,6 +1834,18 @@ has 'units' => (
 						'other' => q({0} পারমিরিয়াড),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(পার্ট প্রতি বিলিয়ন),
+						'one' => q({0} পার্ট প্রতি বিলিয়ন),
+						'other' => q({0} পার্ট প্রতি বিলিয়ন),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(পার্ট প্রতি বিলিয়ন),
+						'one' => q({0} পার্ট প্রতি বিলিয়ন),
+						'other' => q({0} পার্ট প্রতি বিলিয়ন),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(লিটার, প্রতি ১০০ কিলোমিটারে),
 						'one' => q({0} লিটার, প্রতি ১০০ কিলোমিটারে),
@@ -2039,6 +2058,20 @@ has 'units' => (
 					'nanosecond' => {
 						'one' => q({0} ন্যানোসেকেন্ড),
 						'other' => q({0} ন্যানোসেকেন্ড),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(রাত্রি),
+						'one' => q({0} রাত্রি),
+						'other' => q({0} রাত্রি),
+						'per' => q({0}/রাত্রি),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(রাত্রি),
+						'one' => q({0} রাত্রি),
+						'other' => q({0} রাত্রি),
+						'per' => q({0}/রাত্রি),
 					},
 					# Long Unit Identifier
 					'electric-ampere' => {
@@ -3597,6 +3630,16 @@ has 'units' => (
 						'name' => q(‰),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'one' => q({0}ppb),
+						'other' => q({0} ppb),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'one' => q({0}ppb),
+						'other' => q({0} ppb),
+					},
+					# Long Unit Identifier
 					'consumption-mile-per-gallon-imperial' => {
 						'name' => q(mpg UK),
 						'one' => q({0}m/gUK),
@@ -3681,6 +3724,20 @@ has 'units' => (
 						'other' => q({0}ns),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(রাত্রি),
+						'one' => q({0}রাত্রি),
+						'other' => q({0}রাত্রি),
+						'per' => q({0}/রাত্রি),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(রাত্রি),
+						'one' => q({0}রাত্রি),
+						'other' => q({0}রাত্রি),
+						'per' => q({0}/রাত্রি),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'one' => q({0}ত্রৈমাসিক),
 						'other' => q({0}ত্রৈমাসিক),
@@ -3694,13 +3751,13 @@ has 'units' => (
 					'duration-second' => {
 						'one' => q({0} সেঃ),
 						'other' => q({0} সেঃ),
-						'per' => q({0}/সে:),
+						'per' => q({0}/সেঃ),
 					},
 					# Core Unit Identifier
 					'second' => {
 						'one' => q({0} সেঃ),
 						'other' => q({0} সেঃ),
-						'per' => q({0}/সে:),
+						'per' => q({0}/সেঃ),
 					},
 					# Long Unit Identifier
 					'duration-week' => {
@@ -4507,6 +4564,14 @@ has 'units' => (
 						'name' => q(পারমিরিয়াড),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(পার্ট/ বিলিয়ন),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(পার্ট/ বিলিয়ন),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(লি/100কিমি),
 						'one' => q({0} লি/100কিমি),
@@ -4625,14 +4690,14 @@ has 'units' => (
 						'name' => q(দিন),
 						'one' => q({0} দিন),
 						'other' => q({0} দিন),
-						'per' => q({0} প্রতি দিন),
+						'per' => q({0}/দিন),
 					},
 					# Core Unit Identifier
 					'day' => {
 						'name' => q(দিন),
 						'one' => q({0} দিন),
 						'other' => q({0} দিন),
-						'per' => q({0} প্রতি দিন),
+						'per' => q({0}/দিন),
 					},
 					# Long Unit Identifier
 					'duration-decade' => {
@@ -4711,6 +4776,20 @@ has 'units' => (
 					# Core Unit Identifier
 					'nanosecond' => {
 						'name' => q(ন্যানোসেকেন্ড),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(রাত্রি),
+						'one' => q({0} রাত্রি),
+						'other' => q({0} রাত্রি),
+						'per' => q({0}/রাত্রি),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(রাত্রি),
+						'one' => q({0} রাত্রি),
+						'other' => q({0} রাত্রি),
+						'per' => q({0}/রাত্রি),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -6134,6 +6213,8 @@ has 'currencies' => (
 		'INR' => {
 			display_name => {
 				'currency' => q(ভারতীয় রুপি),
+				'one' => q(ভারতীয় টাকা),
+				'other' => q(ভারতীয় টাকা),
 			},
 		},
 		'IQD' => {
@@ -6603,12 +6684,16 @@ has 'currencies' => (
 		},
 		'SLE' => {
 			display_name => {
-				'currency' => q(সিয়েরালিয়ন লিয়ন),
+				'currency' => q(সিয়েরা লিয়নের লিয়ন),
+				'one' => q(সিয়েরা লিয়নের লিয়ন),
+				'other' => q(সিয়েরা লিয়নের লিয়ন),
 			},
 		},
 		'SLL' => {
 			display_name => {
-				'currency' => q(সিয়েরালিয়ন লিয়ন \(1964—2022\)),
+				'currency' => q(সিয়েরা লিয়নের লিয়ন \(1964—2022\)),
+				'one' => q(সিয়েরা লিয়নের লিয়ন \(1964—2022\)),
+				'other' => q(সিয়েরা লিয়নের লিয়ন \(1964—2022\)),
 			},
 		},
 		'SOS' => {
@@ -7310,7 +7395,7 @@ has 'calendar_months' => (
 							'শাহরিবার',
 							'মেহের',
 							'আবান',
-							'আজার',
+							'সেপ্ট',
 							'দে',
 							'বাহমান',
 							'এসফ্যান্ড'
@@ -8715,9 +8800,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#নিউইয়র্ক#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#নিপিগোন#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#নোম#,
 		},
@@ -8738,9 +8820,6 @@ has 'time_zone_names' => (
 		},
 		'America/Panama' => {
 			exemplarCity => q#পানামা#,
-		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#প্যাঙ্গনির্টুং#,
 		},
 		'America/Paramaribo' => {
 			exemplarCity => q#প্যারামেরিবো#,
@@ -8763,9 +8842,6 @@ has 'time_zone_names' => (
 		'America/Punta_Arenas' => {
 			exemplarCity => q#পুন্টা আরেনাস#,
 		},
-		'America/Rainy_River' => {
-			exemplarCity => q#রেইনি রিভার#,
-		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#র‍্যাঙ্কিন ইনলেট#,
 		},
@@ -8780,9 +8856,6 @@ has 'time_zone_names' => (
 		},
 		'America/Rio_Branco' => {
 			exemplarCity => q#রিও ব্রাঙ্কো#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#সান্তা ইসাবেল#,
 		},
 		'America/Santarem' => {
 			exemplarCity => q#সেনটুরেম#,
@@ -8829,9 +8902,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#থুলি#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#থান্ডার বে#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#তিজুয়ানা#,
 		},
@@ -8852,9 +8922,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#ইয়াকুটাট#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#ইয়েলোনাইফ#,
 		},
 		'America_Central' => {
 			long => {
@@ -9029,9 +9096,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#চিতা#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#চোইবাল্‌স্যান#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#কলম্বো#,
@@ -9271,9 +9335,6 @@ has 'time_zone_names' => (
 		'Australia/Broken_Hill' => {
 			exemplarCity => q#ব্রোকেন হিল#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#কিউরি#,
-		},
 		'Australia/Darwin' => {
 			exemplarCity => q#ডারউইন#,
 		},
@@ -9400,13 +9461,6 @@ has 'time_zone_names' => (
 				'daylight' => q#চীন দিবালোক সময়#,
 				'generic' => q#চীন সময়#,
 				'standard' => q#চীন মানক সময়#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#চয়বালসন গ্রীষ্মকালীন সময়#,
-				'generic' => q#চয়বালসন সময়#,
-				'standard' => q#চয়বালসন মানক সময়#,
 			},
 		},
 		'Christmas' => {
@@ -9631,9 +9685,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#উলিয়ানোভস্ক#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#উঝগোরোড#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#ভাদুজ#,
 		},
@@ -9654,9 +9705,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#জাগ্রেব#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#জেপোরোজাইয়াই#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#জুরিখ#,
@@ -9889,6 +9937,11 @@ has 'time_zone_names' => (
 				'standard' => q#পিত্রেপ্যাভলস্ক- ক্যামচ্যাটস্কি মান সময়#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#কাজাখাস্তান সময়#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#পূর্ব কাজাখাস্তান সময়#,
@@ -9947,11 +10000,6 @@ has 'time_zone_names' => (
 				'standard' => q#মাকাও মান সময়#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#ম্যাককুরি দ্বীপ সময়#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#ম্যাগাডান গ্রীষ্মকালীন সময়#,
@@ -9989,13 +10037,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#মসন সময়#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#উত্তরপশ্চিম মেক্সিকোর দিনের সময়#,
-				'generic' => q#উত্তরপশ্চিম মেক্সিকোর সময়#,
-				'standard' => q#উত্তরপশ্চিম মেক্সিকোর মানক সময়#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -10137,9 +10178,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Honolulu' => {
 			exemplarCity => q#হনোলুলু#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#জনস্টন#,
 		},
 		'Pacific/Kanton' => {
 			exemplarCity => q#ক্যান্টন#,

@@ -16,8 +16,7 @@ use Mojo::Loader qw {data_section load_class};
 # Synopsis
 # =========
 #
-# use GenerateSQL::Tools::Datasections
-#
+#  use GenerateSQL::Tools::Datasections
 #
 #  my $data = GenerateSQL::Tools::Datasections->new(
 #
@@ -31,19 +30,19 @@ use Mojo::Loader qw {data_section load_class};
 # =======
 # Get one section of loaded data
 #
-# my $c1 = $data->get_data_section('c1');
+#  my $c1 = $data->get_data_section('c1');
 #
 # Add a section of data
 #
-# $data->set_data_section('new_section', 'section data');
+#  $data->set_data_section('new_section', 'section data');
 #
 # Set a new source
 #
-# $data->set_source('New::Source');
+#  $data->set_source('New::Source');
 #
 # Add a new section to load
 #
-# $data->add_data_section('test');
+#  $data->add_data_section('test');
 #
 #
 # LICENSE
@@ -59,11 +58,13 @@ use Mojo::Loader qw {data_section load_class};
 # Copyright (C) 2024 Jan Eskilsson.
 #
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
-has 'data_sections';
+
 has 'data_sec';
+has 'data_sections';
 has 'source';
+has 'error';
 
 # Load all data_sections
 sub load_data_sections($self) {
@@ -81,7 +82,7 @@ sub load_data_sections($self) {
             }
         }
     };
-    die ("Error loading templates: $@") if $@;
+    $self->error($@) if $@;
 
     return 1;
 }
@@ -104,6 +105,7 @@ sub add_data_section($self, $section) {
 1;
 
 __END__
+
 
 
 
@@ -134,19 +136,19 @@ L<Mojo::Base>
 
 Get one section of loaded data
 
-my $c1 = $data->get_data_section('c1');
+ my $c1 = $data->get_data_section('c1');
 
 Add a section of data
 
-$data->set_data_section('new_section', 'section data');
+ $data->set_data_section('new_section', 'section data');
 
 Set a new source
 
-$data->set_source('New::Source');
+ $data->set_source('New::Source');
 
 Add a new section to load
 
-$data->add_data_section('test');
+ $data->add_data_section('test');
 
 
 
@@ -154,8 +156,7 @@ $data->add_data_section('test');
 =head1 Synopsis
 
 
-use GenerateSQL::Tools::Datasections
-
+ use GenerateSQL::Tools::Datasections
 
  my $data = GenerateSQL::Tools::Datasections->new(
 

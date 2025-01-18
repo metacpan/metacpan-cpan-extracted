@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Te - Package for language Telugu
 
 package Locale::CLDR::Locales::Te;
 # This file auto generated from Data\common\main\te.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -85,6 +85,7 @@ has 'display_name_language' => (
  				'bik' => 'బికోల్',
  				'bin' => 'బిని',
  				'bla' => 'సిక్సికా',
+ 				'blo' => 'అని',
  				'bm' => 'బంబారా',
  				'bn' => 'బంగ్లా',
  				'bo' => 'టిబెటన్',
@@ -219,7 +220,7 @@ has 'display_name_language' => (
  				'grb' => 'గ్రేబో',
  				'grc' => 'ప్రాచీన గ్రీక్',
  				'gsw' => 'స్విస్ జర్మన్',
- 				'gu' => 'గుజరాతి',
+ 				'gu' => 'గుజరాతీ',
  				'guz' => 'గుస్సీ',
  				'gv' => 'మాంక్స్',
  				'gwi' => 'గ్విచిన్',
@@ -242,7 +243,7 @@ has 'display_name_language' => (
  				'hu' => 'హంగేరియన్',
  				'hup' => 'హుపా',
  				'hur' => 'హల్కోమెలెమ్',
- 				'hy' => 'ఆర్మేనియన్',
+ 				'hy' => 'ఆర్మీనియన్',
  				'hz' => 'హెరెరో',
  				'ia' => 'ఇంటర్లింగ్వా',
  				'iba' => 'ఐబాన్',
@@ -311,6 +312,7 @@ has 'display_name_language' => (
  				'kv' => 'కోమి',
  				'kw' => 'కోర్నిష్',
  				'kwk' => 'క్వాక్‌వాలా',
+ 				'kxv' => 'కువి',
  				'ky' => 'కిర్గిజ్',
  				'la' => 'లాటిన్',
  				'lad' => 'లాడినో',
@@ -321,8 +323,10 @@ has 'display_name_language' => (
  				'lez' => 'లేజ్ఘియన్',
  				'lg' => 'గాండా',
  				'li' => 'లిమ్బర్గిష్',
+ 				'lij' => 'లిగూరియన్',
  				'lil' => 'లిలూయెట్',
  				'lkt' => 'లకొటా',
+ 				'lmo' => 'లొంబార్ద్',
  				'ln' => 'లింగాల',
  				'lo' => 'లావో',
  				'lol' => 'మొంగో',
@@ -385,7 +389,7 @@ has 'display_name_language' => (
  				'nd' => 'ఉత్తర దెబెలె',
  				'nds' => 'లో జర్మన్',
  				'nds_NL' => 'లో సాక్సన్',
- 				'ne' => 'నేపాలి',
+ 				'ne' => 'నేపాలీ',
  				'new' => 'నెవారి',
  				'ng' => 'డోంగా',
  				'nia' => 'నియాస్',
@@ -427,7 +431,7 @@ has 'display_name_language' => (
  				'pam' => 'పంపన్గా',
  				'pap' => 'పపియమేంటో',
  				'pau' => 'పలావెన్',
- 				'pcm' => 'నైజీరియా పిడ్గిన్',
+ 				'pcm' => 'నైజీరియన్ పిడ్గిన్',
  				'peo' => 'ప్రాచీన పర్షియన్',
  				'phn' => 'ఫోనికన్',
  				'pi' => 'పాలీ',
@@ -450,7 +454,7 @@ has 'display_name_language' => (
  				'rhg' => 'రోహింగ్యా',
  				'rm' => 'రోమన్ష్',
  				'rn' => 'రుండి',
- 				'ro' => 'రోమేనియన్',
+ 				'ro' => 'రొమేనియన్',
  				'ro_MD' => 'మొల్డావియన్',
  				'rof' => 'రోంబో',
  				'rom' => 'రోమానీ',
@@ -513,7 +517,8 @@ has 'display_name_language' => (
  				'swb' => 'కొమొరియన్',
  				'syc' => 'సాంప్రదాయ సిరియాక్',
  				'syr' => 'సిరియాక్',
- 				'ta' => 'తమిళము',
+ 				'szl' => 'సైలీషియన్',
+ 				'ta' => 'తమిళం',
  				'tce' => 'దక్షిణ టుట్చోన్',
  				'tcy' => 'తుళు',
  				'te' => 'తెలుగు',
@@ -562,7 +567,9 @@ has 'display_name_language' => (
  				'uz' => 'ఉజ్బెక్',
  				'vai' => 'వాయి',
  				've' => 'వెండా',
+ 				'vec' => 'వెనీషియన్',
  				'vi' => 'వియత్నామీస్',
+ 				'vmw' => 'మఖువా',
  				'vo' => 'వోలాపుక్',
  				'vot' => 'వోటిక్',
  				'vun' => 'వుంజొ',
@@ -576,6 +583,7 @@ has 'display_name_language' => (
  				'wuu' => 'వు చైనీస్',
  				'xal' => 'కల్మిక్',
  				'xh' => 'షోసా',
+ 				'xnr' => 'కాంగ్‌డీ',
  				'xog' => 'సొగా',
  				'yao' => 'యాయే',
  				'yap' => 'యాపిస్',
@@ -631,14 +639,14 @@ has 'display_name_script' => (
  			'Blis' => 'బ్లిస్సింబల్స్',
  			'Bopo' => 'బోపోమోఫో',
  			'Brah' => 'బ్రాహ్మి',
- 			'Brai' => 'బ్రెయిల్',
+ 			'Brai' => 'బ్రెయిలీ',
  			'Bugi' => 'బ్యుగినీస్',
  			'Buhd' => 'బుహిడ్',
  			'Cakm' => 'చక్మా',
  			'Cans' => 'యునిఫైడ్ కెనెడియన్ అబొరిజినల్ సిలబిక్స్',
  			'Cari' => 'కారియన్',
  			'Cham' => 'చామ్',
- 			'Cher' => 'చిరోకి',
+ 			'Cher' => 'చెరకీ',
  			'Cirt' => 'సిర్థ్',
  			'Copt' => 'కోప్టిక్',
  			'Cprt' => 'సైప్రోట్',
@@ -665,7 +673,7 @@ has 'display_name_script' => (
  			'Hans@alt=stand-alone' => 'సరళీకృత హాన్',
  			'Hant' => 'సాంప్రదాయక',
  			'Hant@alt=stand-alone' => 'సాంప్రదాయక హాన్',
- 			'Hebr' => 'హీబ్రు',
+ 			'Hebr' => 'హీబ్రూ',
  			'Hira' => 'హిరాగాన',
  			'Hmng' => 'పాహవా హ్మోంగ్',
  			'Hrkt' => 'జపనీస్ సిలబెరీస్',
@@ -674,7 +682,7 @@ has 'display_name_script' => (
  			'Ital' => 'ప్రాచిన ఐటాలిక్',
  			'Jamo' => 'జమో',
  			'Java' => 'జావనీస్',
- 			'Jpan' => 'జాపనీస్',
+ 			'Jpan' => 'జపనీస్',
  			'Kali' => 'కాయాహ్ లి',
  			'Kana' => 'కాటాకాన',
  			'Khar' => 'ఖరోషథి',
@@ -701,7 +709,7 @@ has 'display_name_script' => (
  			'Mong' => 'మంగోలియన్',
  			'Moon' => 'మూన్',
  			'Mtei' => 'మీటి మయెక్',
- 			'Mymr' => 'మయాన్మార్',
+ 			'Mymr' => 'మయన్మార్',
  			'Nkoo' => 'న్కో',
  			'Ogam' => 'ఒఘమ్',
  			'Olck' => 'ఓల్ చికి',
@@ -752,7 +760,7 @@ has 'display_name_script' => (
  			'Yiii' => 'యి',
  			'Zinh' => 'వారసత్వం',
  			'Zmth' => 'గణిత సంకేతలిపి',
- 			'Zsye' => 'ఎమోజి',
+ 			'Zsye' => 'ఎమోజీ',
  			'Zsym' => 'చిహ్నాలు',
  			'Zxxx' => 'లిపి లేని',
  			'Zyyy' => 'సామాన్య',
@@ -777,28 +785,28 @@ has 'display_name_region' => (
  			'002' => 'ఆఫ్రికా',
  			'003' => 'ఉత్తర అమెరికా',
  			'005' => 'దక్షిణ అమెరికా',
- 			'009' => 'ఓషినియా',
+ 			'009' => 'ఓషియానియా',
  			'011' => 'పశ్చిమ ఆఫ్రికా భూభాగం',
- 			'013' => 'మధ్యమ అమెరికా',
+ 			'013' => 'మధ్య అమెరికా',
  			'014' => 'తూర్పు ఆఫ్రికా',
  			'015' => 'ఉత్తర ఆఫ్రికా',
- 			'017' => 'మధ్యమ ఆఫ్రికా',
+ 			'017' => 'మధ్య ఆఫ్రికా',
  			'018' => 'దక్షిణ ఆఫ్రికా భూభాగం',
  			'019' => 'అమెరికాస్',
  			'021' => 'ఉత్తర అమెరికా భూభాగం',
- 			'029' => 'కరిబ్బియన్',
+ 			'029' => 'కరీబియన్',
  			'030' => 'తూర్పు ఆసియా',
  			'034' => 'దక్షిణ ఆసియా',
  			'035' => 'ఆగ్నేయ ఆసియా',
  			'039' => 'దక్షిణ యూరోప్',
  			'053' => 'ఆస్ట్రేలేసియా',
  			'054' => 'మెలనేశియ',
- 			'057' => 'మైక్రోనేశియ ప్రాంతం',
+ 			'057' => 'మైక్రోనేసియన్ ప్రాంతం',
  			'061' => 'పాలినేషియా',
  			'142' => 'ఆసియా',
  			'143' => 'మధ్య ఆసియా',
  			'145' => 'పశ్చిమ ఆసియా',
- 			'150' => 'యూరోప్',
+ 			'150' => 'యూరప్',
  			'151' => 'తూర్పు యూరోప్',
  			'154' => 'ఉత్తర యూరోప్',
  			'155' => 'పశ్చిమ యూరోప్',
@@ -915,7 +923,7 @@ has 'display_name_region' => (
  			'HM' => 'హెర్డ్ దీవి మరియు మెక్‌డొనాల్డ్ దీవులు',
  			'HN' => 'హోండురాస్',
  			'HR' => 'క్రొయేషియా',
- 			'HT' => 'హైటి',
+ 			'HT' => 'హైతీ',
  			'HU' => 'హంగేరీ',
  			'IC' => 'కేనరీ దీవులు',
  			'ID' => 'ఇండోనేషియా',
@@ -969,7 +977,7 @@ has 'display_name_region' => (
  			'MO@alt=short' => 'మకావ్',
  			'MP' => 'ఉత్తర మరియానా దీవులు',
  			'MQ' => 'మార్టినీక్',
- 			'MR' => 'మౌరిటేనియా',
+ 			'MR' => 'మారిటేనియా',
  			'MS' => 'మాంట్సెరాట్',
  			'MT' => 'మాల్టా',
  			'MU' => 'మారిషస్',
@@ -1148,7 +1156,7 @@ has 'display_name_type' => (
  				'ethiopic' => q{ఎథియోపిక్ క్యాలెండర్},
  				'ethiopic-amete-alem' => q{ఎథోపిక్ అమేటే అలెమ్ క్యాలెండర్},
  				'gregorian' => q{గ్రేగోరియన్ క్యాలెండర్},
- 				'hebrew' => q{హిబ్రూ క్యాలెండర్},
+ 				'hebrew' => q{హీబ్రూ క్యాలెండర్},
  				'indian' => q{భారతీయ జాతీయ క్యాలెండర్},
  				'islamic' => q{ఇస్లామిక్ క్యాలెండర్},
  				'islamic-civil' => q{ఇస్లామిక్-సివిల్ క్యాలెండర్},
@@ -1191,7 +1199,6 @@ has 'display_name_type' => (
  				'phonebook' => q{ఫోన్‌బుక్ క్రమబద్ధీకరణ క్రమం},
  				'phonetic' => q{ధ్వని ఉచ్ఛారిత క్రమబద్ధీకరణ క్రమం},
  				'pinyin' => q{పిన్‌యిన్ క్రమబద్ధీకరణ క్రమం},
- 				'reformed' => q{మళ్ళీ ఆకృతీకరించబడిన క్రమబద్ధీకరణ క్రమం},
  				'search' => q{సాధారణ-ప్రయోజన శోధన},
  				'searchjl' => q{హాంగుల్ ప్రారంభ హల్లు ద్వారా శోధించు},
  				'standard' => q{ప్రామాణిక క్రమబద్ధీకరణ క్రమం},
@@ -1231,8 +1238,8 @@ has 'display_name_type' => (
  				'strict' => q{క్రమ లైన్ బ్రేక్ శైలి},
  			},
  			'm0' => {
- 				'bgn' => q{US BGN ట్రాన్స్‌లిట్రేషన్},
- 				'ungegn' => q{UN GEGN ట్రాన్స్‌లిట్రేషన్},
+ 				'bgn' => q{US BGN ట్రాన్స్‌లిటరేషన్},
+ 				'ungegn' => q{UN GEGN ట్రాన్స్‌లిటరేషన్},
  			},
  			'ms' => {
  				'metric' => q{మెట్రిక్ పద్ధతి},
@@ -1331,7 +1338,7 @@ has 'characters' => (
 			index => ['అ', 'ఆ', 'ఇ', 'ఈ', 'ఉ', 'ఊ', 'ఋ', 'ౠ', 'ఎ', 'ఏ', 'ఐ', 'ఒ', 'ఓ', 'ఔ', 'క', 'ఖ', 'గ', 'ఘ', 'ఙ', 'చ', 'ఛ', 'జ', 'ఝ', 'ఞ', 'ట', 'ఠ', 'డ', 'ఢ', 'ణ', 'త', 'థ', 'ద', 'ధ', 'న', 'ప', 'ఫ', 'బ', 'భ', 'మ', 'య', 'ర', 'ఱ', 'ల', 'వ', 'శ', 'ష', 'స', 'హ', 'ళ'],
 			main => qr{[అ ఆ ఇ ఈ ఉ ఊ ఋ ౠ ఌ ౡ ఎ ఏ ఐ ఒ ఓ ఔ ఁ ం ః క ఖ గ ఘ ఙ చ ఛ జ ఝ ఞ ట ఠ డ ఢ ణ త థ ద ధ న ప ఫ బ భ మ య ర ఱ ల వ శ ష స హ ళ ా ి ీ ు ూ ృ ౄ ె ే ై ొ ో ౌ ్ ౕ ౖ]},
 			numbers => qr{[\- ‑ , . % ‰ + 0౦ 1౧ 2౨ 3౩ 4౪ 5౫ 6౬ 7౭ 8౮ 9౯]},
-			punctuation => qr{[\- ‑ , ; \: ! ? . '‘’ "“” ( ) \[ \] \{ \}]},
+			punctuation => qr{[\- ‑ , ; \: ! ? . '‘’ "“” ( ) \[ \] \{ \} \& #]},
 		};
 	},
 EOT
@@ -1912,6 +1919,18 @@ has 'units' => (
 						'other' => q({0} పెర్మేరియాడ్),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(ప్రతి బిలియన్‌కి భాగాలు),
+						'one' => q(ప్రతి బిలియన్‌కి {0} భాగం),
+						'other' => q(ప్రతి బిలియన్‌కి {0} భాగాలు),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(ప్రతి బిలియన్‌కి భాగాలు),
+						'one' => q(ప్రతి బిలియన్‌కి {0} భాగం),
+						'other' => q(ప్రతి బిలియన్‌కి {0} భాగాలు),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(లీటర్లు/100 కీలోమీటర్లు),
 						'one' => q({0} లీటరు/100 కీలోమీటర్లు),
@@ -2210,6 +2229,20 @@ has 'units' => (
 						'name' => q(నానోసెకన్లు),
 						'one' => q({0} నానోసెకను),
 						'other' => q({0} నానోసెకన్లు),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(రాత్రి),
+						'one' => q({0} రాత్రి),
+						'other' => q({0} రాత్రులు),
+						'per' => q(ఒక రాత్రికి {0}),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(రాత్రి),
+						'one' => q({0} రాత్రి),
+						'other' => q({0} రాత్రులు),
+						'per' => q(ఒక రాత్రికి {0}),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -3270,6 +3303,18 @@ has 'units' => (
 						'other' => q({0} నాట్‌లు),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(లైట్),
+						'one' => q({0} లైట్),
+						'other' => q({0} లైట్),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(లైట్),
+						'one' => q({0} లైట్),
+						'other' => q({0} లైట్),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'name' => q(మీటర్లు/సెకను),
 						'one' => q(సెకనుకు {0} మీటరు),
@@ -4176,6 +4221,20 @@ has 'units' => (
 						'other' => q({0}నె),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(రాత్రులు),
+						'one' => q({0}రాత్రి),
+						'other' => q({0}రాత్రులు),
+						'per' => q(రాత్రికి {0}),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(రాత్రులు),
+						'one' => q({0}రాత్రి),
+						'other' => q({0}రాత్రులు),
+						'per' => q(రాత్రికి {0}),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'one' => q({0}క్వా),
 						'other' => q({0}క్వా),
@@ -4474,6 +4533,18 @@ has 'units' => (
 						'name' => q(కి.మీ/గం),
 						'one' => q({0}కి.మీ/గం),
 						'other' => q({0}కి.మీ/గం),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(లైట్),
+						'one' => q({0} లైట్),
+						'other' => q({0} లైట్),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(లైట్),
+						'one' => q({0} లైట్),
+						'other' => q({0} లైట్),
 					},
 					# Long Unit Identifier
 					'speed-mile-per-hour' => {
@@ -5160,6 +5231,14 @@ has 'units' => (
 						'name' => q(పెర్మేరియాడ్),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(భాగాలు/బిలియన్),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(భాగాలు/బిలియన్),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(లీ/100 కి.మీ.),
 						'one' => q({0} లీ/100 కి.మీ.),
@@ -5468,6 +5547,20 @@ has 'units' => (
 						'name' => q(నా.సె.),
 						'one' => q({0} నా.సె),
 						'other' => q({0} నా.సె),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(రాత్రులు),
+						'one' => q({0} రాత్రి),
+						'other' => q({0} రాత్రులు),
+						'per' => q(రాత్రికి {0}),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(రాత్రులు),
+						'one' => q({0} రాత్రి),
+						'other' => q({0} రాత్రులు),
+						'per' => q(రాత్రికి {0}),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -6486,6 +6579,18 @@ has 'units' => (
 						'name' => q(నా.),
 						'one' => q({0} నా.),
 						'other' => q({0} నా.),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(లైట్),
+						'one' => q({0} లైట్),
+						'other' => q({0} లైట్),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(లైట్),
+						'one' => q({0} లైట్),
+						'other' => q({0} లైట్),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -8088,9 +8193,9 @@ has 'currencies' => (
 		},
 		'SLE' => {
 			display_name => {
-				'currency' => q(సీయిరు లియోనియన్ లీయోన్),
-				'one' => q(సీయిరు లియోనియన్ లీయోన్),
-				'other' => q(సీయిరు లియోనియన్ లీయోన్‌లు),
+				'currency' => q(సియెరా లియోనియన్ లియోన్),
+				'one' => q(సియెరా లియోనియన్ లియోన్),
+				'other' => q(సియెరా లియోనియన్ లియోన్స్),
 			},
 		},
 		'SLL' => {
@@ -9829,9 +9934,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#న్యూయార్క్#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#నిపిగోన్#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#నోమ్#,
 		},
@@ -9852,9 +9954,6 @@ has 'time_zone_names' => (
 		},
 		'America/Panama' => {
 			exemplarCity => q#పనామా#,
-		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#పాంగ్‌నీర్‌టుంగ్#,
 		},
 		'America/Paramaribo' => {
 			exemplarCity => q#పరామారిబో#,
@@ -9877,9 +9976,6 @@ has 'time_zone_names' => (
 		'America/Punta_Arenas' => {
 			exemplarCity => q#పుంటా అరీనస్#,
 		},
-		'America/Rainy_River' => {
-			exemplarCity => q#రెయినీ రివర్#,
-		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#రన్‌కిన్ ఇన్‌లెట్#,
 		},
@@ -9894,9 +9990,6 @@ has 'time_zone_names' => (
 		},
 		'America/Rio_Branco' => {
 			exemplarCity => q#రియో బ్రాంకో#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#శాంటా ఇసబెల్#,
 		},
 		'America/Santarem' => {
 			exemplarCity => q#సాంటరెమ్#,
@@ -9943,9 +10036,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#థులే#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#థండర్ బే#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#టిజువానా#,
 		},
@@ -9966,9 +10056,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#యకుటాట్#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#ఎల్లోనైఫ్#,
 		},
 		'America_Central' => {
 			long => {
@@ -10143,9 +10230,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#చితా#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#చోయిబాల్సన్#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#కొలంబో#,
@@ -10385,9 +10469,6 @@ has 'time_zone_names' => (
 		'Australia/Broken_Hill' => {
 			exemplarCity => q#బ్రోకెన్ హిల్#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#కర్రీ#,
-		},
 		'Australia/Darwin' => {
 			exemplarCity => q#డార్విన్#,
 		},
@@ -10514,13 +10595,6 @@ has 'time_zone_names' => (
 				'daylight' => q#చైనా పగటి వెలుతురు సమయం#,
 				'generic' => q#చైనా సమయం#,
 				'standard' => q#చైనా ప్రామాణిక సమయం#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#చోయిబల్సాన్ వేసవి సమయం#,
-				'generic' => q#చోయిబల్సాన్ సమయం#,
-				'standard' => q#చోయిబల్సాన్ ప్రామాణిక సమయం#,
 			},
 		},
 		'Christmas' => {
@@ -10745,9 +10819,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#ఉల్యనోవ్స్క్#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#ఉజ్‌హోరోడ్#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#వాడుజ్#,
 		},
@@ -10768,9 +10839,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#జాగ్రెబ్#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#జపరోజై#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#జ్యూరిచ్#,
@@ -11003,6 +11071,11 @@ has 'time_zone_names' => (
 				'standard' => q#పెట్రోపావ్లోవ్స్క్-కామ్ఛాట్స్కి ప్రామాణిక సమయం#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#కజకిస్తాన్ సమయం#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#తూర్పు కజకి‌స్తాన్ సమయం#,
@@ -11061,11 +11134,6 @@ has 'time_zone_names' => (
 				'standard' => q#మకావ్ ప్రామాణిక సమయం#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#మాక్క్వారీ దీవి సమయం#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#మగడాన్ వేసవి సమయం#,
@@ -11103,13 +11171,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#మాసన్ సమయం#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#వాయువ్య మెక్సికో పగటి వెలుతురు సమయం#,
-				'generic' => q#వాయువ్య మెక్సికో సమయం#,
-				'standard' => q#వాయువ్య మెక్సికో ప్రామాణిక సమయం#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -11251,9 +11312,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Honolulu' => {
 			exemplarCity => q#హోనోలులు#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#జాన్సటన్#,
 		},
 		'Pacific/Kanton' => {
 			exemplarCity => q#కాంతోన్#,

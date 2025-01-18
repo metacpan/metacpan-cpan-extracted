@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.40'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 keywords:
   - locale
   - CLDR
@@ -22,42 +22,42 @@ name: Locale-CLDR-Locales-Az
 provides:
   Locale::CLDR::Locales::Az:
     file: lib/Locale/CLDR/Locales/Az.pm
-    version: v0.44.1
+    version: v0.46.0
   Locale::CLDR::Locales::Az::Arab:
     file: lib/Locale/CLDR/Locales/Az/Arab.pm
-    version: v0.44.1
+    version: v0.46.0
   Locale::CLDR::Locales::Az::Arab::Iq:
     file: lib/Locale/CLDR/Locales/Az/Arab/Iq.pm
-    version: v0.44.1
+    version: v0.46.0
   Locale::CLDR::Locales::Az::Arab::Ir:
     file: lib/Locale/CLDR/Locales/Az/Arab/Ir.pm
-    version: v0.44.1
+    version: v0.46.0
   Locale::CLDR::Locales::Az::Arab::Tr:
     file: lib/Locale/CLDR/Locales/Az/Arab/Tr.pm
-    version: v0.44.1
+    version: v0.46.0
   Locale::CLDR::Locales::Az::Cyrl:
     file: lib/Locale/CLDR/Locales/Az/Cyrl.pm
-    version: v0.44.1
+    version: v0.46.0
   Locale::CLDR::Locales::Az::Cyrl::Az:
     file: lib/Locale/CLDR/Locales/Az/Cyrl/Az.pm
-    version: v0.44.1
+    version: v0.46.0
   Locale::CLDR::Locales::Az::Latn:
     file: lib/Locale/CLDR/Locales/Az/Latn.pm
-    version: v0.44.1
+    version: v0.46.0
   Locale::CLDR::Locales::Az::Latn::Az:
     file: lib/Locale/CLDR/Locales/Az/Latn/Az.pm
-    version: v0.44.1
+    version: v0.46.0
 requires:
   DateTime: '0.72'
-  Locale::CLDR: v0.44.1
+  Locale::CLDR: v0.46.0
   Moo: '2'
   MooX::ClassAttribute: '0.011'
   Type::Tiny: '0'
-  perl: v5.10.1
+  perl: v5.12.0
   version: '0.95'
 resources:
   bugtracker: https://github.com/ThePilgrim/perlcldr/issues
   homepage: https://github.com/ThePilgrim/perlcldr
   repository: https://github.com/ThePilgrim/perlcldr.git
-version: v0.44.1
+version: v0.46.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Da - Package for language Danish
 
 package Locale::CLDR::Locales::Da;
 # This file auto generated from Data\common\main\da.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -964,6 +964,7 @@ has 'display_name_language' => (
  				'bin' => 'bini',
  				'bkm' => 'kom',
  				'bla' => 'siksika',
+ 				'blo' => 'anii',
  				'bm' => 'bambara',
  				'bn' => 'bengali',
  				'bo' => 'tibetansk',
@@ -1191,6 +1192,7 @@ has 'display_name_language' => (
  				'kv' => 'komi',
  				'kw' => 'cornisk',
  				'kwk' => 'kwakʼwala',
+ 				'kxv' => 'kuvi',
  				'ky' => 'kirgisisk',
  				'la' => 'latin',
  				'lad' => 'ladino',
@@ -1201,8 +1203,10 @@ has 'display_name_language' => (
  				'lez' => 'lezghian',
  				'lg' => 'ganda',
  				'li' => 'limburgsk',
+ 				'lij' => 'ligurisk',
  				'lil' => 'lillooet',
  				'lkt' => 'lakota',
+ 				'lmo' => 'lombardisk',
  				'ln' => 'lingala',
  				'lo' => 'lao',
  				'lol' => 'mongo',
@@ -1215,7 +1219,6 @@ has 'display_name_language' => (
  				'lua' => 'luba-Lulua',
  				'lui' => 'luiseno',
  				'lun' => 'lunda',
- 				'luo' => 'luo',
  				'lus' => 'lushai',
  				'luy' => 'luyana',
  				'lv' => 'lettisk',
@@ -1248,7 +1251,7 @@ has 'display_name_language' => (
  				'moe' => 'innu-aimun',
  				'moh' => 'mohawk',
  				'mos' => 'mossi',
- 				'mr' => 'marathisk',
+ 				'mr' => 'marathi',
  				'ms' => 'malajisk',
  				'mt' => 'maltesisk',
  				'mua' => 'mundang',
@@ -1304,7 +1307,7 @@ has 'display_name_language' => (
  				'os' => 'ossetisk',
  				'osa' => 'osage',
  				'ota' => 'osmannisk tyrkisk',
- 				'pa' => 'punjabisk',
+ 				'pa' => 'punjabi',
  				'pag' => 'pangasinan',
  				'pal' => 'pahlavi',
  				'pam' => 'pampanga',
@@ -1398,6 +1401,7 @@ has 'display_name_language' => (
  				'swb' => 'comorisk',
  				'syc' => 'klassisk syrisk',
  				'syr' => 'syrisk',
+ 				'szl' => 'schlesisk',
  				'ta' => 'tamil',
  				'tce' => 'sydtutchone',
  				'te' => 'telugu',
@@ -1445,9 +1449,10 @@ has 'display_name_language' => (
  				'und' => 'ukendt sprog',
  				'ur' => 'urdu',
  				'uz' => 'usbekisk',
- 				'vai' => 'vai',
  				've' => 'venda',
+ 				'vec' => 'venetiansk',
  				'vi' => 'vietnamesisk',
+ 				'vmw' => 'makhuwa',
  				'vo' => 'volapyk',
  				'vot' => 'votisk',
  				'vun' => 'vunjo',
@@ -1461,6 +1466,7 @@ has 'display_name_language' => (
  				'wuu' => 'wu-kinesisk',
  				'xal' => 'kalmyk',
  				'xh' => 'xhosa',
+ 				'xnr' => 'kangri',
  				'xog' => 'soga',
  				'yao' => 'yao',
  				'yap' => 'yapese',
@@ -2151,7 +2157,6 @@ has 'display_name_type' => (
  				'phonebook' => q{sorteringsrækkefølge i telefonbøger},
  				'phonetic' => q{fonetisk sorteringsrækkefølge},
  				'pinyin' => q{pinyin-baseret sorteringsrækkefølge},
- 				'reformed' => q{ny sorteringsrækkefølge},
  				'search' => q{generel søgning},
  				'searchjl' => q{sortér efter den første konsonant i hangul},
  				'standard' => q{standardsorteringsrækkefølge},
@@ -2839,12 +2844,14 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'concentr-milligram-ofglucose-per-deciliter' => {
+						'1' => q(neuter),
 						'name' => q(milligram pr. deciliter),
 						'one' => q({0} milligram pr. deciliter),
 						'other' => q({0} milligram pr. deciliter),
 					},
 					# Core Unit Identifier
 					'milligram-ofglucose-per-deciliter' => {
+						'1' => q(neuter),
 						'name' => q(milligram pr. deciliter),
 						'one' => q({0} milligram pr. deciliter),
 						'other' => q({0} milligram pr. deciliter),
@@ -2924,6 +2931,20 @@ has 'units' => (
 					# Core Unit Identifier
 					'permyriad' => {
 						'1' => q(common),
+					},
+					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'1' => q(common),
+						'name' => q(milliardtedele),
+						'one' => q({0} milliardtedel),
+						'other' => q({0} milliardtedele),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'1' => q(common),
+						'name' => q(milliardtedele),
+						'one' => q({0} milliardtedel),
+						'other' => q({0} milliardtedele),
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
@@ -3280,6 +3301,22 @@ has 'units' => (
 						'name' => q(nanosekunder),
 						'one' => q({0} nanosekund),
 						'other' => q({0} nanosekunder),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'1' => q(common),
+						'name' => q(nætter),
+						'one' => q({0} nat),
+						'other' => q({0} nætter),
+						'per' => q({0} pr. nat),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'1' => q(common),
+						'name' => q(nætter),
+						'one' => q({0} nat),
+						'other' => q({0} nætter),
+						'per' => q({0} pr. nat),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -3812,13 +3849,13 @@ has 'units' => (
 					# Long Unit Identifier
 					'length-mile' => {
 						'1' => q(common),
-						'one' => q({0} engelsk mil),
+						'one' => q({0} mile),
 						'other' => q({0} miles),
 					},
 					# Core Unit Identifier
 					'mile' => {
 						'1' => q(common),
-						'one' => q({0} engelsk mil),
+						'one' => q({0} mile),
 						'other' => q({0} miles),
 					},
 					# Long Unit Identifier
@@ -3903,12 +3940,14 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-point' => {
+						'1' => q(neuter),
 						'name' => q(punkt),
 						'one' => q({0} punkt),
 						'other' => q({0} punkt),
 					},
 					# Core Unit Identifier
 					'point' => {
+						'1' => q(neuter),
 						'name' => q(punkt),
 						'one' => q({0} punkt),
 						'other' => q({0} punkt),
@@ -4391,12 +4430,14 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'pressure-millimeter-ofhg' => {
+						'1' => q(common),
 						'name' => q(millimeter kviksølv),
 						'one' => q({0} millimeter kviksølv),
 						'other' => q({0} millimeter kviksølv),
 					},
 					# Core Unit Identifier
 					'millimeter-ofhg' => {
+						'1' => q(common),
 						'name' => q(millimeter kviksølv),
 						'one' => q({0} millimeter kviksølv),
 						'other' => q({0} millimeter kviksølv),
@@ -4534,14 +4575,6 @@ has 'units' => (
 						'name' => q(kelvin),
 						'one' => q({0} kelvin),
 						'other' => q({0} kelvin),
-					},
-					# Long Unit Identifier
-					'times' => {
-						'1' => q({0} gange {1}),
-					},
-					# Core Unit Identifier
-					'times' => {
-						'1' => q({0} gange {1}),
 					},
 					# Long Unit Identifier
 					'torque-newton-meter' => {
@@ -5238,6 +5271,20 @@ has 'units' => (
 						'other' => q({0}ns),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(nætter),
+						'one' => q({0}nat),
+						'other' => q({0}nætter),
+						'per' => q({0}/nat),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(nætter),
+						'one' => q({0}nat),
+						'other' => q({0}nætter),
+						'per' => q({0}/nat),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'name' => q(kvartal),
 						'per' => q({0}/kvt.),
@@ -5287,13 +5334,13 @@ has 'units' => (
 					'force-kilowatt-hour-per-100-kilometer' => {
 						'name' => q(kWh/100 km),
 						'one' => q({0}kWh/100km),
-						'other' => q({0}kWh/100km),
+						'other' => q({0} kWh/100 km),
 					},
 					# Core Unit Identifier
 					'kilowatt-hour-per-100-kilometer' => {
 						'name' => q(kWh/100 km),
 						'one' => q({0}kWh/100km),
-						'other' => q({0}kWh/100km),
+						'other' => q({0} kWh/100 km),
 					},
 					# Long Unit Identifier
 					'force-newton' => {
@@ -5483,13 +5530,13 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'pressure-inch-ofhg' => {
-						'one' => q({0}" Hg),
-						'other' => q({0}" Hg),
+						'one' => q({0}″ Hg),
+						'other' => q({0}″ Hg),
 					},
 					# Core Unit Identifier
 					'inch-ofhg' => {
-						'one' => q({0}" Hg),
-						'other' => q({0}" Hg),
+						'one' => q({0}″ Hg),
+						'other' => q({0}″ Hg),
 					},
 					# Long Unit Identifier
 					'pressure-millibar' => {
@@ -5520,14 +5567,6 @@ has 'units' => (
 					'meter-per-second' => {
 						'one' => q({0}m/s),
 						'other' => q({0}m/s),
-					},
-					# Long Unit Identifier
-					'times' => {
-						'1' => q({0}⋅{1}),
-					},
-					# Core Unit Identifier
-					'times' => {
-						'1' => q({0}⋅{1}),
 					},
 					# Long Unit Identifier
 					'volume-barrel' => {
@@ -5804,6 +5843,14 @@ has 'units' => (
 						'other' => q({0} ‱),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(dele/milliard),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(dele/milliard),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(l/100 km),
 						'one' => q({0} l/100 km),
@@ -6008,6 +6055,20 @@ has 'units' => (
 						'one' => q({0} md.),
 						'other' => q({0} mdr.),
 						'per' => q({0}/md.),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(nætter),
+						'one' => q({0} nat),
+						'other' => q({0} nætter),
+						'per' => q({0}/nat),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(nætter),
+						'one' => q({0} nat),
+						'other' => q({0} nætter),
+						'per' => q({0}/nat),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -6380,14 +6441,6 @@ has 'units' => (
 						'name' => q(engelske mil/timen),
 						'one' => q({0} mph),
 						'other' => q({0} mph),
-					},
-					# Long Unit Identifier
-					'times' => {
-						'1' => q({0} ⋅ {1}),
-					},
-					# Core Unit Identifier
-					'times' => {
-						'1' => q({0} ⋅ {1}),
 					},
 					# Long Unit Identifier
 					'torque-newton-meter' => {
@@ -10038,9 +10091,6 @@ has 'time_zone_names' => (
 		'Africa/Algiers' => {
 			exemplarCity => q#Algier#,
 		},
-		'Africa/Sao_Tome' => {
-			exemplarCity => q#São Tomé#,
-		},
 		'Africa_Central' => {
 			long => {
 				'standard' => q#Centralafrikansk tid#,
@@ -10084,9 +10134,6 @@ has 'time_zone_names' => (
 				'standard' => q#Amazonas-normaltid#,
 			},
 		},
-		'America/Asuncion' => {
-			exemplarCity => q#Asunción#,
-		},
 		'America/Bahia_Banderas' => {
 			exemplarCity => q#Bahia Banderas#,
 		},
@@ -10096,14 +10143,8 @@ has 'time_zone_names' => (
 		'America/Cayman' => {
 			exemplarCity => q#Caymanøerne#,
 		},
-		'America/Curacao' => {
-			exemplarCity => q#Curaçao#,
-		},
 		'America/Merida' => {
 			exemplarCity => q#Merida#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#Santa Isabel#,
 		},
 		'America/Sao_Paulo' => {
 			exemplarCity => q#São Paulo#,
@@ -10210,9 +10251,6 @@ has 'time_zone_names' => (
 		'Asia/Bishkek' => {
 			exemplarCity => q#Bisjkek#,
 		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#Tsjojbalsan#,
-		},
 		'Asia/Damascus' => {
 			exemplarCity => q#Damaskus#,
 		},
@@ -10285,9 +10323,6 @@ has 'time_zone_names' => (
 		},
 		'Atlantic/Faeroe' => {
 			exemplarCity => q#Færøerne#,
-		},
-		'Australia/Currie' => {
-			exemplarCity => q#Currie#,
 		},
 		'Australia_Central' => {
 			long => {
@@ -10391,13 +10426,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Kinesisk sommertid#,
 				'generic' => q#Kinesisk tid#,
 				'standard' => q#Kinesisk normaltid#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Tsjojbalsan-sommertid#,
-				'generic' => q#Tsjojbalsan-tid#,
-				'standard' => q#Tsjojbalsan-normaltid#,
 			},
 		},
 		'Christmas' => {
@@ -10512,9 +10540,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#Uljanovsk#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#Uzjhorod#,
-		},
 		'Europe/Vatican' => {
 			exemplarCity => q#Vatikanet#,
 		},
@@ -10523,9 +10548,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Warsaw' => {
 			exemplarCity => q#Warszawa#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#Zaporizjzja#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#Zürich#,
@@ -10686,9 +10708,6 @@ has 'time_zone_names' => (
 		'Indian/Maldives' => {
 			exemplarCity => q#Maldiverne#,
 		},
-		'Indian/Reunion' => {
-			exemplarCity => q#Réunion#,
-		},
 		'Indian_Ocean' => {
 			long => {
 				'standard' => q#Indiske Ocean-normaltid#,
@@ -10749,6 +10768,11 @@ has 'time_zone_names' => (
 				'standard' => q#Petropavlovsk-Kamchatski normaltid#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Kasakhstansk tid#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#Østkasakhstansk tid#,
@@ -10807,11 +10831,6 @@ has 'time_zone_names' => (
 				'standard' => q#Macao-normaltid#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Macquarie-tid#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Magadan-sommertid#,
@@ -10849,13 +10868,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Mawson-tid#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Nordvestmexicansk sommertid#,
-				'generic' => q#Nordvestmexicansk tid#,
-				'standard' => q#Nordvestmexicansk normaltid#,
 			},
 		},
 		'Mexico_Pacific' => {

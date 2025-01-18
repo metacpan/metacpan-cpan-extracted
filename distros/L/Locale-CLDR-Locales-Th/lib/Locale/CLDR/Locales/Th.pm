@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Th - Package for language Thai
 
 package Locale::CLDR::Locales::Th;
 # This file auto generated from Data\common\main\th.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -315,6 +315,7 @@ has 'display_name_language' => (
  				'bjn' => 'บันจาร์',
  				'bkm' => 'กม',
  				'bla' => 'สิกสิกา',
+ 				'blo' => 'อานี',
  				'bm' => 'บัมบารา',
  				'bn' => 'บังกลา',
  				'bo' => 'ทิเบต',
@@ -456,7 +457,6 @@ has 'display_name_language' => (
  				'gmh' => 'เยอรมันสูงกลาง',
  				'gn' => 'กัวรานี',
  				'goh' => 'เยอรมันสูงโบราณ',
- 				'gom' => 'กอนกานีของกัว',
  				'gon' => 'กอนดิ',
  				'gor' => 'กอรอนทาโล',
  				'got' => 'โกธิก',
@@ -567,6 +567,7 @@ has 'display_name_language' => (
  				'kv' => 'โกมิ',
  				'kw' => 'คอร์นิช',
  				'kwk' => 'ควักวาลา',
+ 				'kxv' => 'กูวี',
  				'ky' => 'คีร์กีซ',
  				'la' => 'ละติน',
  				'lad' => 'ลาดิโน',
@@ -864,6 +865,7 @@ has 'display_name_language' => (
  				'vi' => 'เวียดนาม',
  				'vls' => 'เฟลมิชตะวันตก',
  				'vmf' => 'เมน-ฟรานโกเนีย',
+ 				'vmw' => 'มากัววา',
  				'vo' => 'โวลาพึค',
  				'vot' => 'โวทิก',
  				'vro' => 'โวโร',
@@ -879,6 +881,7 @@ has 'display_name_language' => (
  				'xal' => 'คัลมืยค์',
  				'xh' => 'คะห์โอซา',
  				'xmf' => 'เมเกรเลีย',
+ 				'xnr' => 'กังกรี',
  				'xog' => 'โซกา',
  				'yao' => 'เย้า',
  				'yap' => 'ยัป',
@@ -1584,7 +1587,6 @@ has 'display_name_type' => (
  				'phonebook' => q{ลำดับการจัดเรียงตามสมุดโทรศัพท์},
  				'phonetic' => q{ลำดับการจัดเรียงตามการออกเสียง},
  				'pinyin' => q{ลำดับการจัดเรียงตามการถอดเสียงภาษาจีน},
- 				'reformed' => q{ลำดับการจัดเรียงตามลำดับล่าสุด},
  				'search' => q{การค้นหาทั่วไป},
  				'searchjl' => q{ค้นหาตามพยัญชนะขึ้นต้นที่เป็นฮันกึล},
  				'standard' => q{ลำดับการจัดเรียงแบบมาตรฐาน},
@@ -1925,6 +1927,16 @@ has 'units' => (
 						'other' => q({0} เปอร์มีเรียด),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(ส่วนต่อพันล้าน),
+						'other' => q({0} ส่วนต่อพันล้าน),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(ส่วนต่อพันล้าน),
+						'other' => q({0} ส่วนต่อพันล้าน),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(ลิตรต่อ 100 กิโลเมตร),
 						'other' => q({0} ลิตรต่อ 100 กิโลเมตร),
@@ -2115,6 +2127,18 @@ has 'units' => (
 					# Core Unit Identifier
 					'nanosecond' => {
 						'other' => q({0} นาโนวินาที),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(คืน),
+						'other' => q({0} คืน),
+						'per' => q({0}/คืน),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(คืน),
+						'other' => q({0} คืน),
+						'per' => q({0}/คืน),
 					},
 					# Long Unit Identifier
 					'duration-second' => {
@@ -2695,6 +2719,16 @@ has 'units' => (
 						'other' => q({0} กิโลเมตรต่อชั่วโมง),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(แสง),
+						'other' => q({0} แสง),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(แสง),
+						'other' => q({0} แสง),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'other' => q({0} เมตรต่อวินาที),
 					},
@@ -3201,6 +3235,16 @@ has 'units' => (
 						'name' => q(‱),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(สตพล.),
+						'other' => q({0}สตพล.),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(สตพล.),
+						'other' => q({0}สตพล.),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(ล./100กม.),
 						'other' => q({0} ล./100กม.),
@@ -3409,6 +3453,18 @@ has 'units' => (
 					'nanosecond' => {
 						'name' => q(นาโนวิ),
 						'other' => q({0}นาโนวิ),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(คืน),
+						'other' => q({0}คืน),
+						'per' => q({0}/คืน),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(คืน),
+						'other' => q({0}คืน),
+						'per' => q({0}/คืน),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -4171,6 +4227,16 @@ has 'units' => (
 					# Core Unit Identifier
 					'knot' => {
 						'other' => q({0}นอต),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(แสง),
+						'other' => q({0}แสง),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(แสง),
+						'other' => q({0}แสง),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -5041,6 +5107,16 @@ has 'units' => (
 						'name' => q(เปอร์มีเรียด),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(ส่วน/พันล้าน),
+						'other' => q({0} สตพล.),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(ส่วน/พันล้าน),
+						'other' => q({0} สตพล.),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(ล./100 กม.),
 						'other' => q({0} ล./100 กม.),
@@ -5211,6 +5287,18 @@ has 'units' => (
 					'nanosecond' => {
 						'name' => q(นาโนวินาที),
 						'other' => q({0} นาโนวิ),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(คืน),
+						'other' => q({0} คืน),
+						'per' => q({0}/คืน),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(คืน),
+						'other' => q({0} คืน),
+						'per' => q({0}/คืน),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -5967,6 +6055,16 @@ has 'units' => (
 					'knot' => {
 						'name' => q(นอต),
 						'other' => q({0} นอต),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(แสง),
+						'other' => q({0} แสง),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(แสง),
+						'other' => q({0} แสง),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -9586,6 +9684,7 @@ has 'datetime_formats_interval' => (
 			},
 			MMMd => {
 				M => q{d MMM – d MMM},
+				d => q{d–d MMM},
 			},
 			Md => {
 				M => q{d/M – d/M},
@@ -10301,9 +10400,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#นิวยอร์ก#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#นิปิกอน#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#นอม#,
 		},
@@ -10324,9 +10420,6 @@ has 'time_zone_names' => (
 		},
 		'America/Panama' => {
 			exemplarCity => q#ปานามา#,
-		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#พางนีทัง#,
 		},
 		'America/Paramaribo' => {
 			exemplarCity => q#ปารามาริโบ#,
@@ -10349,9 +10442,6 @@ has 'time_zone_names' => (
 		'America/Punta_Arenas' => {
 			exemplarCity => q#ปุนตาอาเรนัส#,
 		},
-		'America/Rainy_River' => {
-			exemplarCity => q#เรนนี่ริเวอร์#,
-		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#แรงกินอินเล็ต#,
 		},
@@ -10366,9 +10456,6 @@ has 'time_zone_names' => (
 		},
 		'America/Rio_Branco' => {
 			exemplarCity => q#รีโอบรังโก#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#ซานตาอิซาเบล#,
 		},
 		'America/Santarem' => {
 			exemplarCity => q#ซันตาเรม#,
@@ -10415,9 +10502,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#ทูเล#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#ทันเดอร์เบย์#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#ทิฮัวนา#,
 		},
@@ -10438,9 +10522,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#ยากูทัต#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#เยลโลว์ไนฟ์#,
 		},
 		'America_Central' => {
 			long => {
@@ -10615,9 +10696,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#ชิตา#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#ชอยบาลซาน#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#โคลัมโบ#,
@@ -10857,9 +10935,6 @@ has 'time_zone_names' => (
 		'Australia/Broken_Hill' => {
 			exemplarCity => q#โบรกเคนฮิลล์#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#คูร์รี#,
-		},
 		'Australia/Darwin' => {
 			exemplarCity => q#ดาร์วิน#,
 		},
@@ -10991,13 +11066,6 @@ has 'time_zone_names' => (
 				'daylight' => q#เวลาออมแสงจีน#,
 				'generic' => q#เวลาจีน#,
 				'standard' => q#เวลามาตรฐานจีน#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#เวลาฤดูร้อนชอยปาลชาน#,
-				'generic' => q#เวลาชอยปาลชาน#,
-				'standard' => q#เวลามาตรฐานชอยปาลชาน#,
 			},
 		},
 		'Christmas' => {
@@ -11222,9 +11290,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#อะลิยานอฟ#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#อัซโกร็อด#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#วาดุซ#,
 		},
@@ -11245,9 +11310,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#ซาเกร็บ#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#ซาโปโรซี#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#ซูริค#,
@@ -11477,6 +11539,11 @@ has 'time_zone_names' => (
 				'standard' => q#เวลาเปโตรปัฟลอฟสค์-คัมชัตสกี#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#เวลาคาซัคสถาน#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#เวลาคาซัคสถานตะวันออก#,
@@ -11535,11 +11602,6 @@ has 'time_zone_names' => (
 				'standard' => q#เวลามาตรฐานมาเก๊า#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#เวลาเกาะแมกควอรี#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#เวลาฤดูร้อนมากาดาน#,
@@ -11577,13 +11639,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#เวลามอว์สัน#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#เวลาออมแสงเม็กซิโกตะวันตกเฉียงเหนือ#,
-				'generic' => q#เวลาเม็กซิโกตะวันตกเฉียงเหนือ#,
-				'standard' => q#เวลามาตรฐานเม็กซิโกตะวันตกเฉียงเหนือ#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -11725,9 +11780,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Honolulu' => {
 			exemplarCity => q#โฮโนลูลู#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#จอห์นสตัน#,
 		},
 		'Pacific/Kanton' => {
 			exemplarCity => q#แคนทอน#,

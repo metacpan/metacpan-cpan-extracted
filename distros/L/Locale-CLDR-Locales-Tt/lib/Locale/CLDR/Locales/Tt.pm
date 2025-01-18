@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Tt - Package for language Tatar
 
 package Locale::CLDR::Locales::Tt;
 # This file auto generated from Data\common\main\tt.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -34,6 +34,7 @@ has 'display_name_language' => (
 				'af' => 'африкаанс',
  				'am' => 'амхар',
  				'ar' => 'гарәп',
+ 				'ar_001' => 'Заманча стандарт гарәп',
  				'arn' => 'мапуче',
  				'as' => 'ассам',
  				'az' => 'әзәрбайҗан',
@@ -87,6 +88,7 @@ has 'display_name_language' => (
  				'haw' => 'гавайи',
  				'he' => 'яһүд',
  				'hi' => 'һинд',
+ 				'hi_Latn@alt=variant' => 'Һинглиш',
  				'hil' => 'хилигайнон',
  				'hr' => 'хорват',
  				'hsb' => 'югары сорб',
@@ -132,6 +134,7 @@ has 'display_name_language' => (
  				'ne' => 'непали',
  				'niu' => 'ниуэ',
  				'nl' => 'голланд',
+ 				'nl_BE' => 'фламандча',
  				'ny' => 'ньянҗа',
  				'oc' => 'окситан',
  				'om' => 'оромо',
@@ -214,6 +217,8 @@ has 'display_name_script' => (
  			'Hans@alt=stand-alone' => 'гадиләштерелгән кытай',
  			'Hant' => 'традицион',
  			'Hant@alt=stand-alone' => 'традицион кытай',
+ 			'Jpan' => 'япон',
+ 			'Kore' => 'корея',
  			'Latn' => 'латин',
  			'Zxxx' => 'язусыз',
  			'Zzzz' => 'билгесез язу',
@@ -233,7 +238,39 @@ has 'display_name_region' => (
 	init_arg	=> undef,
 	default		=> sub {
 		{
-			'AD' => 'Андорра',
+			'001' => 'дөнья',
+ 			'002' => 'Африка',
+ 			'003' => 'Төньяк Америка',
+ 			'005' => 'Көньяк Америка',
+ 			'009' => 'Океания',
+ 			'011' => 'Көнбатыш Африка',
+ 			'013' => 'Үзәк Америка',
+ 			'014' => 'Көнчыгыш Африка',
+ 			'015' => 'Төньяк Африка',
+ 			'017' => 'Урта Африка',
+ 			'018' => 'Көньяктагы Африка',
+ 			'019' => 'Америка',
+ 			'021' => 'Төньяктагы Америка',
+ 			'029' => 'Кариб бассейны',
+ 			'030' => 'Көнчыгыш Азия',
+ 			'034' => 'Көньяк Азия',
+ 			'035' => 'Көньяк-Көнчыгыш Азия',
+ 			'039' => 'Көньяк Европа',
+ 			'053' => 'Австралазия',
+ 			'054' => 'Меланезия',
+ 			'057' => 'Микронезия төбәге',
+ 			'061' => 'Полинезия',
+ 			'142' => 'Азия',
+ 			'143' => 'Үзәк Азия',
+ 			'145' => 'Көнбатыш Азия',
+ 			'150' => 'Европа',
+ 			'151' => 'Көнчыгыш Европа',
+ 			'154' => 'Төньяк Европа',
+ 			'155' => 'Көнбатыш Европа',
+ 			'202' => 'Сахарадан көньякта Африка',
+ 			'419' => 'Латин Америка',
+ 			'AC' => 'Вознесение утравы',
+ 			'AD' => 'Андорра',
  			'AE' => 'Берләшкән Гарәп Әмирлекләре',
  			'AF' => 'Әфганстан',
  			'AG' => 'Антигуа һәм Барбуда',
@@ -262,6 +299,7 @@ has 'display_name_region' => (
  			'BM' => 'Бермуд утраулары',
  			'BN' => 'Бруней',
  			'BO' => 'Боливия',
+ 			'BQ' => 'Кариб Нидерландлары',
  			'BR' => 'Бразилия',
  			'BS' => 'Багам утраулары',
  			'BT' => 'Бутан',
@@ -273,6 +311,8 @@ has 'display_name_region' => (
  			'CC' => 'Кокос (Килинг) утраулары',
  			'CD' => 'Конго (КДР)',
  			'CF' => 'Үзәк Африка Республикасы',
+ 			'CG' => 'Конго - Браззавиль',
+ 			'CG@alt=variant' => 'Конго (Республика)',
  			'CH' => 'Швейцария',
  			'CI' => 'Кот-д’Ивуар',
  			'CK' => 'Кук утраулары',
@@ -280,6 +320,7 @@ has 'display_name_region' => (
  			'CM' => 'Камерун',
  			'CN' => 'Кытай',
  			'CO' => 'Колумбия',
+ 			'CP' => 'Клиппертон утравы',
  			'CR' => 'Коста-Рика',
  			'CU' => 'Куба',
  			'CV' => 'Кабо-Верде',
@@ -288,20 +329,26 @@ has 'display_name_region' => (
  			'CY' => 'Кипр',
  			'CZ' => 'Чехия Республикасы',
  			'DE' => 'Германия',
+ 			'DG' => 'Диего Гарсия',
  			'DJ' => 'Җибүти',
  			'DK' => 'Дания',
  			'DM' => 'Доминика',
  			'DO' => 'Доминикана Республикасы',
  			'DZ' => 'Алжир',
+ 			'EA' => 'Сеута һәм Мелилья',
  			'EC' => 'Эквадор',
  			'EE' => 'Эстония',
  			'EG' => 'Мисыр',
+ 			'EH' => 'Көнбатыш Сахара',
  			'ER' => 'Эритрея',
  			'ES' => 'Испания',
  			'ET' => 'Эфиопия',
+ 			'EU' => 'Европа Берлеге',
+ 			'EZ' => 'Еврозона',
  			'FI' => 'Финляндия',
  			'FJ' => 'Фиджи',
  			'FK' => 'Фолкленд утраулары',
+ 			'FK@alt=variant' => 'Фолкленд утраулары (Мальвин утраулары)',
  			'FM' => 'Микронезия',
  			'FO' => 'Фарер утраулары',
  			'FR' => 'Франция',
@@ -331,12 +378,14 @@ has 'display_name_region' => (
  			'HR' => 'Хорватия',
  			'HT' => 'Гаити',
  			'HU' => 'Венгрия',
+ 			'IC' => 'Канар утраулары',
  			'ID' => 'Индонезия',
  			'IE' => 'Ирландия',
  			'IL' => 'Израиль',
  			'IM' => 'Мэн утравы',
  			'IN' => 'Индия',
  			'IO' => 'Британиянең Һинд Океанындагы Территориясе',
+ 			'IO@alt=chagos' => 'Чагос архипелагы',
  			'IQ' => 'Гыйрак',
  			'IR' => 'Иран',
  			'IS' => 'Исландия',
@@ -352,6 +401,7 @@ has 'display_name_region' => (
  			'KM' => 'Комор утраулары',
  			'KN' => 'Сент-Китс һәм Невис',
  			'KP' => 'Төньяк Корея',
+ 			'KR' => 'Көньяк Корея',
  			'KW' => 'Күвәйт',
  			'KY' => 'Кайман утраулары',
  			'KZ' => 'Казахстан',
@@ -375,6 +425,7 @@ has 'display_name_region' => (
  			'MH' => 'Маршалл утраулары',
  			'MK' => 'Төньяк Македония',
  			'ML' => 'Мали',
+ 			'MM' => 'Мьянма (Бирма)',
  			'MN' => 'Монголия',
  			'MO' => 'Макао Махсус Идарәле Төбәге',
  			'MO@alt=short' => 'Макао',
@@ -401,6 +452,7 @@ has 'display_name_region' => (
  			'NR' => 'Науру',
  			'NU' => 'Ниуэ',
  			'NZ' => 'Яңа Зеландия',
+ 			'NZ@alt=variant' => 'Аотеароа Яңа Зеландия',
  			'OM' => 'Оман',
  			'PA' => 'Панама',
  			'PE' => 'Перу',
@@ -412,10 +464,13 @@ has 'display_name_region' => (
  			'PM' => 'Сен-Пьер һәм Микелон',
  			'PN' => 'Питкэрн утраулары',
  			'PR' => 'Пуэрто-Рико',
+ 			'PS' => 'Фәләстин территорияләре',
+ 			'PS@alt=short' => 'Фәләстин',
  			'PT' => 'Португалия',
  			'PW' => 'Палау',
  			'PY' => 'Парагвай',
  			'QA' => 'Катар',
+ 			'QO' => 'Ерак Океания',
  			'RE' => 'Реюньон',
  			'RO' => 'Румыния',
  			'RS' => 'Сербия',
@@ -427,6 +482,7 @@ has 'display_name_region' => (
  			'SD' => 'Судан',
  			'SE' => 'Швеция',
  			'SG' => 'Сингапур',
+ 			'SH' => 'Изге Елена утравы',
  			'SI' => 'Словения',
  			'SJ' => 'Шпицберген һәм Ян-Майен',
  			'SK' => 'Словакия',
@@ -441,6 +497,7 @@ has 'display_name_region' => (
  			'SX' => 'Синт-Мартен',
  			'SY' => 'Сүрия',
  			'SZ' => 'Свазиленд',
+ 			'TA' => 'Тристан-да-Кунья',
  			'TC' => 'Теркс һәм Кайкос утраулары',
  			'TD' => 'Чад',
  			'TF' => 'Франциянең Көньяк Территорияләре',
@@ -449,6 +506,7 @@ has 'display_name_region' => (
  			'TJ' => 'Таҗикстан',
  			'TK' => 'Токелау',
  			'TL' => 'Тимор-Лесте',
+ 			'TL@alt=variant' => 'Көнчыгыш Тимор',
  			'TM' => 'Төркмәнстан',
  			'TN' => 'Тунис',
  			'TO' => 'Тонга',
@@ -460,9 +518,11 @@ has 'display_name_region' => (
  			'UA' => 'Украина',
  			'UG' => 'Уганда',
  			'UM' => 'АКШ Кече Читтәге утраулары',
+ 			'UN' => 'Берләшкән Милләтләр',
  			'US' => 'АКШ',
  			'UY' => 'Уругвай',
  			'UZ' => 'Үзбәкстан',
+ 			'VA' => 'Ватикан',
  			'VC' => 'Сент-Винсент һәм Гренадин',
  			'VE' => 'Венесуэла',
  			'VG' => 'Британия Виргин утраулары',
@@ -471,6 +531,8 @@ has 'display_name_region' => (
  			'VU' => 'Вануату',
  			'WF' => 'Уоллис һәм Футуна',
  			'WS' => 'Самоа',
+ 			'XA' => 'Псевдоакцентлар',
+ 			'XB' => 'Псевдо-Биди',
  			'XK' => 'Косово',
  			'YE' => 'Йәмән',
  			'YT' => 'Майотта',
@@ -491,6 +553,7 @@ has 'display_name_type' => (
 		{
 			'calendar' => {
  				'gregorian' => q{григориан ел исәбе},
+ 				'iso8601' => q{ISO-8601 календаре},
  			},
  			'collation' => {
  				'standard' => q{гадәти тәртипләү ысулы},
@@ -553,6 +616,70 @@ EOT
 );
 
 
+has 'units' => (
+	is			=> 'ro',
+	isa			=> HashRef[HashRef[HashRef[Str]]],
+	init_arg	=> undef,
+	default		=> sub { {
+				'long' => {
+					# Long Unit Identifier
+					'' => {
+						'name' => q(кардиналь юнәлеш),
+					},
+					# Core Unit Identifier
+					'' => {
+						'name' => q(кардиналь юнәлеш),
+					},
+					# Long Unit Identifier
+					'coordinate' => {
+						'east' => q({0} көнчыгыш),
+						'north' => q({0} төньяк),
+						'south' => q({0} көньяк),
+						'west' => q({0} көнбатыш),
+					},
+					# Core Unit Identifier
+					'coordinate' => {
+						'east' => q({0} көнчыгыш),
+						'north' => q({0} төньяк),
+						'south' => q({0} көньяк),
+						'west' => q({0} көнбатыш),
+					},
+					# Long Unit Identifier
+					'per' => {
+						'1' => q({0} һәр {1}),
+					},
+					# Core Unit Identifier
+					'per' => {
+						'1' => q({0} һәр {1}),
+					},
+				},
+				'short' => {
+					# Long Unit Identifier
+					'' => {
+						'name' => q(юнәлеш),
+					},
+					# Core Unit Identifier
+					'' => {
+						'name' => q(юнәлеш),
+					},
+					# Long Unit Identifier
+					'coordinate' => {
+						'east' => q({0} көнчыгыш),
+						'north' => q({0} төньяк),
+						'south' => q({0} көньяк),
+						'west' => q({0} көнбатыш),
+					},
+					# Core Unit Identifier
+					'coordinate' => {
+						'east' => q({0} көнчыгыш),
+						'north' => q({0} төньяк),
+						'south' => q({0} көньяк),
+						'west' => q({0} көнбатыш),
+					},
+				},
+			} }
+);
+
 has 'yesstr' => (
 	is			=> 'ro',
 	isa			=> RegexpRef,
@@ -594,6 +721,84 @@ has 'number_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		decimalFormat => {
+			'long' => {
+				'1000' => {
+					'other' => '0 мең',
+				},
+				'10000' => {
+					'other' => '00 мең',
+				},
+				'100000' => {
+					'other' => '000 мең',
+				},
+				'1000000' => {
+					'other' => '0 миллион',
+				},
+				'10000000' => {
+					'other' => '00 миллион',
+				},
+				'100000000' => {
+					'other' => '000 миллион',
+				},
+				'1000000000' => {
+					'other' => '0 миллиард',
+				},
+				'10000000000' => {
+					'other' => '00 миллиард',
+				},
+				'100000000000' => {
+					'other' => '000 миллиард',
+				},
+				'1000000000000' => {
+					'other' => '0 триллион',
+				},
+				'10000000000000' => {
+					'other' => '00 триллион',
+				},
+				'100000000000000' => {
+					'other' => '000 триллион',
+				},
+			},
+			'short' => {
+				'1000' => {
+					'other' => '0 мең',
+				},
+				'10000' => {
+					'other' => '00 мең',
+				},
+				'100000' => {
+					'other' => '000 мең',
+				},
+				'1000000' => {
+					'other' => '0 млн',
+				},
+				'10000000' => {
+					'other' => '00 млн',
+				},
+				'100000000' => {
+					'other' => '000 млн',
+				},
+				'1000000000' => {
+					'other' => '0 млрд',
+				},
+				'10000000000' => {
+					'other' => '00 млрд',
+				},
+				'100000000000' => {
+					'other' => '000млрд',
+				},
+				'1000000000000' => {
+					'other' => '0 трлн',
+				},
+				'10000000000000' => {
+					'other' => '00 трлн',
+				},
+				'100000000000000' => {
+					'other' => '000 трлн',
+				},
+			},
+		},
 		percentFormat => {
 			'default' => {
 				'standard' => {
@@ -626,9 +831,183 @@ has 'currencies' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'AED' => {
+			display_name => {
+				'currency' => q(Берләшкән Гарәп Әмирлекләре дирхамы),
+				'other' => q(Берләшкән Гарәп Әмирлекләре дирхамнары),
+			},
+		},
+		'AFN' => {
+			display_name => {
+				'currency' => q(Әфган әфганы),
+				'other' => q(Әфган әфганлары),
+			},
+		},
+		'ALL' => {
+			display_name => {
+				'currency' => q(Албания Леке),
+				'other' => q(Албания леке),
+			},
+		},
+		'AMD' => {
+			display_name => {
+				'currency' => q(Армения драмы),
+				'other' => q(Армения драмнары),
+			},
+		},
+		'ANG' => {
+			display_name => {
+				'currency' => q(Нидерланд Антиль утраулары гульдены),
+				'other' => q(Нидерланд Антиль утраулары гульденнары),
+			},
+		},
+		'AOA' => {
+			display_name => {
+				'currency' => q(Ангола кванзасы),
+				'other' => q(Ангола кванзалары),
+			},
+		},
+		'ARS' => {
+			display_name => {
+				'currency' => q(Аргентина песосы),
+				'other' => q(Аргентина песолары),
+			},
+		},
+		'AUD' => {
+			display_name => {
+				'currency' => q(Австралия доллары),
+				'other' => q(Австралия долларлары),
+			},
+		},
+		'AWG' => {
+			display_name => {
+				'currency' => q(Арубан Флорины),
+				'other' => q(Арубан флорины),
+			},
+		},
+		'AZN' => {
+			display_name => {
+				'currency' => q(Әзербайҗан манаты),
+				'other' => q(Әзербайҗан манатлары),
+			},
+		},
+		'BAM' => {
+			display_name => {
+				'currency' => q(Босния һәм Герцеговинаның конвертацияләнә торган маркасы),
+				'other' => q(Босния һәм Герцеговинаның конвертацияләнә торган маркалары),
+			},
+		},
+		'BBD' => {
+			display_name => {
+				'currency' => q(Барбадос доллары),
+				'other' => q(Барбадос долларлары),
+			},
+		},
+		'BDT' => {
+			display_name => {
+				'currency' => q(Бангладеш такасы),
+				'other' => q(Бангладеш такалары),
+			},
+		},
+		'BGN' => {
+			display_name => {
+				'currency' => q(Болгар Левы),
+				'other' => q(Болгар левы),
+			},
+		},
+		'BHD' => {
+			display_name => {
+				'currency' => q(Бахрейн динары),
+				'other' => q(Бахрейн динарлары),
+			},
+		},
+		'BIF' => {
+			display_name => {
+				'currency' => q(Бурунди франкы),
+				'other' => q(Бурунди франклары),
+			},
+		},
+		'BMD' => {
+			display_name => {
+				'currency' => q(Бермуд доллары),
+				'other' => q(Бермуд долларлары),
+			},
+		},
+		'BND' => {
+			display_name => {
+				'currency' => q(Бруней доллары),
+				'other' => q(Бруней долларлары),
+			},
+		},
+		'BOB' => {
+			display_name => {
+				'currency' => q(Боливиа боливианосы),
+				'other' => q(Боливиа боливианолары),
+			},
+		},
 		'BRL' => {
 			display_name => {
 				'currency' => q(Бразилия реалы),
+			},
+		},
+		'BSD' => {
+			display_name => {
+				'currency' => q(Багам доллары),
+				'other' => q(Багам долларлары),
+			},
+		},
+		'BTN' => {
+			display_name => {
+				'currency' => q(Бутан нгултрумы),
+				'other' => q(Бутан нгултрумнары),
+			},
+		},
+		'BWP' => {
+			display_name => {
+				'currency' => q(Ботсвана пуласы),
+				'other' => q(Ботсвана пулалары),
+			},
+		},
+		'BYN' => {
+			display_name => {
+				'currency' => q(Беларус сумы),
+				'other' => q(Беларус сумнары),
+			},
+		},
+		'BZD' => {
+			display_name => {
+				'currency' => q(Белиз доллары),
+				'other' => q(Белиз долларлары),
+			},
+		},
+		'CAD' => {
+			display_name => {
+				'currency' => q(Канада доллары),
+				'other' => q(Канада долларлары),
+			},
+		},
+		'CDF' => {
+			display_name => {
+				'currency' => q(Конголез франкы),
+				'other' => q(Конголез франклары),
+			},
+		},
+		'CHF' => {
+			display_name => {
+				'currency' => q(Швейцария франкы),
+				'other' => q(Швейцария франклары),
+			},
+		},
+		'CLP' => {
+			display_name => {
+				'currency' => q(Чили песосы),
+				'other' => q(Чили песолары),
+			},
+		},
+		'CNH' => {
+			display_name => {
+				'currency' => q(Кытай Юане \(оффшор\)),
+				'other' => q(Кытай юане \(оффшор\)),
 			},
 		},
 		'CNY' => {
@@ -637,9 +1016,99 @@ has 'currencies' => (
 				'other' => q(юань),
 			},
 		},
+		'COP' => {
+			display_name => {
+				'currency' => q(Колумбия песосы),
+				'other' => q(Колумбия песолары),
+			},
+		},
+		'CRC' => {
+			display_name => {
+				'currency' => q(Коста-Рика колоны),
+				'other' => q(Коста-Рика колоннары),
+			},
+		},
+		'CUC' => {
+			display_name => {
+				'currency' => q(Куба конвертацияләнә торган песосы),
+				'other' => q(Куба конвертацияләнә торган песолары),
+			},
+		},
+		'CUP' => {
+			display_name => {
+				'currency' => q(Куба песосы),
+				'other' => q(Куба песолары),
+			},
+		},
+		'CVE' => {
+			display_name => {
+				'currency' => q(Кабо-Верде эскудосы),
+				'other' => q(Кабо-Верде эскудолары),
+			},
+		},
+		'CZK' => {
+			display_name => {
+				'currency' => q(Чех кронасы),
+				'other' => q(Чех кроналары),
+			},
+		},
+		'DJF' => {
+			display_name => {
+				'currency' => q(Җибути франкы),
+				'other' => q(Җибути франклары),
+			},
+		},
+		'DKK' => {
+			display_name => {
+				'currency' => q(Дания Кронасы),
+				'other' => q(Дания кронасы),
+			},
+		},
+		'DOP' => {
+			display_name => {
+				'currency' => q(Доминикана песосы),
+				'other' => q(Доминикана пеослары),
+			},
+		},
+		'DZD' => {
+			display_name => {
+				'currency' => q(Алжир динары),
+				'other' => q(Алжир динарлары),
+			},
+		},
+		'EGP' => {
+			display_name => {
+				'currency' => q(Мисыр фунты),
+				'other' => q(Мисыр фунтлары),
+			},
+		},
+		'ERN' => {
+			display_name => {
+				'currency' => q(Эритрея накфасы),
+				'other' => q(Эритрея накфалары),
+			},
+		},
+		'ETB' => {
+			display_name => {
+				'currency' => q(Эфиопия быры),
+				'other' => q(Эфиопия бырлары),
+			},
+		},
 		'EUR' => {
 			display_name => {
 				'currency' => q(евро),
+			},
+		},
+		'FJD' => {
+			display_name => {
+				'currency' => q(Фиджи доллары),
+				'other' => q(Фиджи долларлары),
+			},
+		},
+		'FKP' => {
+			display_name => {
+				'currency' => q(Фолкленд утраулары фунты),
+				'other' => q(Фолкленд утраулары фунтлары),
 			},
 		},
 		'GBP' => {
@@ -647,15 +1116,405 @@ has 'currencies' => (
 				'currency' => q(фунт стерлинг),
 			},
 		},
+		'GEL' => {
+			display_name => {
+				'currency' => q(Грузия ларие),
+				'other' => q(Грузия ларилары),
+			},
+		},
+		'GHS' => {
+			display_name => {
+				'currency' => q(Гана седие),
+				'other' => q(Гана седилары),
+			},
+		},
+		'GIP' => {
+			display_name => {
+				'currency' => q(Гибралтар фунты),
+				'other' => q(Гибралтар фунтлары),
+			},
+		},
+		'GMD' => {
+			display_name => {
+				'currency' => q(Гамбия даласие),
+				'other' => q(Гамбия даласилары),
+			},
+		},
+		'GNF' => {
+			display_name => {
+				'currency' => q(Гвинея франкы),
+				'other' => q(Гвинея франклары),
+			},
+		},
+		'GTQ' => {
+			display_name => {
+				'currency' => q(Гватемала кетсалы),
+				'other' => q(Гватемала кетсалилары),
+			},
+		},
+		'GYD' => {
+			display_name => {
+				'currency' => q(Гайана доллары),
+				'other' => q(Гайана долларлары),
+			},
+		},
+		'HKD' => {
+			display_name => {
+				'currency' => q(Гонконг доллары),
+				'other' => q(Гонконг долларлары),
+			},
+		},
+		'HNL' => {
+			display_name => {
+				'currency' => q(Гондурас лемпиры),
+				'other' => q(Гондурас лемпирлары),
+			},
+		},
+		'HRK' => {
+			display_name => {
+				'currency' => q(Хорватия кунасы),
+				'other' => q(Хорватия куннары),
+			},
+		},
+		'HTG' => {
+			display_name => {
+				'currency' => q(Гаити гурды),
+				'other' => q(Гаити гурдлары),
+			},
+		},
+		'HUF' => {
+			display_name => {
+				'currency' => q(Венгрия форинты),
+				'other' => q(Венгрия форинтлары),
+			},
+		},
+		'IDR' => {
+			display_name => {
+				'currency' => q(Индонезия рупиясе),
+				'other' => q(Индонезия рупияләре),
+			},
+		},
+		'ILS' => {
+			display_name => {
+				'currency' => q(Израиль яңа шекеле),
+				'other' => q(Израиль яңа шекельләре),
+			},
+		},
 		'INR' => {
 			display_name => {
 				'currency' => q(Индия рупиясе),
+			},
+		},
+		'IQD' => {
+			display_name => {
+				'currency' => q(Ирак динары),
+				'other' => q(Ирак динарлары),
+			},
+		},
+		'IRR' => {
+			display_name => {
+				'currency' => q(Иран риалы),
+				'other' => q(Иран риаллары),
+			},
+		},
+		'ISK' => {
+			display_name => {
+				'currency' => q(Исландия Кронасы),
+				'other' => q(Исландия кронасы),
+			},
+		},
+		'JMD' => {
+			display_name => {
+				'currency' => q(Ямайка доллары),
+				'other' => q(Ямайка долларлары),
+			},
+		},
+		'JOD' => {
+			display_name => {
+				'currency' => q(Иордания динары),
+				'other' => q(Иордания динарлары),
 			},
 		},
 		'JPY' => {
 			display_name => {
 				'currency' => q(япон иенасы),
 				'other' => q(иена),
+			},
+		},
+		'KES' => {
+			display_name => {
+				'currency' => q(Кения шиллингы),
+				'other' => q(Кения шиллинглары),
+			},
+		},
+		'KGS' => {
+			display_name => {
+				'currency' => q(Ккргызстан сомы),
+				'other' => q(Кыргызстан сомнары),
+			},
+		},
+		'KHR' => {
+			display_name => {
+				'currency' => q(Камбоджа риелы),
+				'other' => q(Камбоджа риеллары),
+			},
+		},
+		'KMF' => {
+			display_name => {
+				'currency' => q(Комор утраулары франкы),
+				'other' => q(Комор утраулары франклары),
+			},
+		},
+		'KPW' => {
+			display_name => {
+				'currency' => q(Төньяк Корея Вонасы),
+				'other' => q(Төньяк Корея вонасы),
+			},
+		},
+		'KRW' => {
+			display_name => {
+				'currency' => q(Көньяк Корея Вонасы),
+				'other' => q(Көньяк Корея вонасы),
+			},
+		},
+		'KWD' => {
+			display_name => {
+				'currency' => q(Кувейт динары),
+				'other' => q(Кувейт динарлары),
+			},
+		},
+		'KYD' => {
+			display_name => {
+				'currency' => q(Кайман утраулары доллары),
+				'other' => q(Кайман утраулары долларлары),
+			},
+		},
+		'KZT' => {
+			display_name => {
+				'currency' => q(Казахстан тәңкәсе),
+				'other' => q(Казахстан тәңкәләре),
+			},
+		},
+		'LAK' => {
+			display_name => {
+				'currency' => q(Лаос кипы),
+				'other' => q(Лаос киплары),
+			},
+		},
+		'LBP' => {
+			display_name => {
+				'currency' => q(Ливан фунты),
+				'other' => q(Ливан фунтлары),
+			},
+		},
+		'LKR' => {
+			display_name => {
+				'currency' => q(Шри-Ланка рупиясе),
+				'other' => q(Шри-Ланка рупияләре),
+			},
+		},
+		'LRD' => {
+			display_name => {
+				'currency' => q(Либерия доллары),
+				'other' => q(Либерия долларлары),
+			},
+		},
+		'LSL' => {
+			display_name => {
+				'currency' => q(Лесото лотисы),
+				'other' => q(Лесото лотислары),
+			},
+		},
+		'LYD' => {
+			display_name => {
+				'currency' => q(Ливия динары),
+				'other' => q(Ливия динарлары),
+			},
+		},
+		'MAD' => {
+			display_name => {
+				'currency' => q(Марокко дирхамы),
+				'other' => q(Марокко дирхамнары),
+			},
+		},
+		'MDL' => {
+			display_name => {
+				'currency' => q(Молдавия Лее),
+				'other' => q(Молдавия лее),
+			},
+		},
+		'MGA' => {
+			display_name => {
+				'currency' => q(Малагаси ариариясе),
+				'other' => q(Малагаси ариарияләре),
+			},
+		},
+		'MKD' => {
+			display_name => {
+				'currency' => q(Македония денары),
+				'other' => q(Македония денарлары),
+			},
+		},
+		'MMK' => {
+			display_name => {
+				'currency' => q(Мьянма кьяты),
+				'other' => q(Мьянма кьятлары),
+			},
+		},
+		'MNT' => {
+			display_name => {
+				'currency' => q(Монголия тугрикы),
+				'other' => q(Монголия тугриклары),
+			},
+		},
+		'MOP' => {
+			display_name => {
+				'currency' => q(Макао патакы),
+				'other' => q(Макао патаклары),
+			},
+		},
+		'MRU' => {
+			display_name => {
+				'currency' => q(Мавритан угиясы),
+				'other' => q(Мавритан угиялары),
+			},
+		},
+		'MUR' => {
+			display_name => {
+				'currency' => q(Маврикий рупие),
+				'other' => q(Маврикий рупиялары),
+			},
+		},
+		'MVR' => {
+			display_name => {
+				'currency' => q(Мальдив руфиясе),
+				'other' => q(Мальдив руфияләре),
+			},
+		},
+		'MWK' => {
+			display_name => {
+				'currency' => q(Малавия квачие),
+				'other' => q(Малавия квачилары),
+			},
+		},
+		'MXN' => {
+			display_name => {
+				'currency' => q(Мексика песосы),
+				'other' => q(Мексика песолары),
+			},
+		},
+		'MYR' => {
+			display_name => {
+				'currency' => q(Малайзия ринггиты),
+				'other' => q(Малайзия ринггитлары),
+			},
+		},
+		'MZN' => {
+			display_name => {
+				'currency' => q(Мозамбик метикалы),
+				'other' => q(Мозамбик метикаллары),
+			},
+		},
+		'NAD' => {
+			display_name => {
+				'currency' => q(Намибия доллары),
+				'other' => q(Намибия долларлары),
+			},
+		},
+		'NGN' => {
+			display_name => {
+				'currency' => q(Нигерия найрасы),
+				'other' => q(Нигерия найралары),
+			},
+		},
+		'NIO' => {
+			display_name => {
+				'currency' => q(Никарагуа кордовасы),
+				'other' => q(Никарагуа кордовалары),
+			},
+		},
+		'NOK' => {
+			display_name => {
+				'currency' => q(Норвегия Кронасы),
+				'other' => q(Норвегия кронасы),
+			},
+		},
+		'NPR' => {
+			display_name => {
+				'currency' => q(Непал рупиясе),
+				'other' => q(Непал рупияләре),
+			},
+		},
+		'NZD' => {
+			display_name => {
+				'currency' => q(Яңа Зеландия доллары),
+				'other' => q(Яңа Зеландия долларлары),
+			},
+		},
+		'OMR' => {
+			display_name => {
+				'currency' => q(Оман риалы),
+				'other' => q(Оман риаллары),
+			},
+		},
+		'PAB' => {
+			display_name => {
+				'currency' => q(Панама бальбоасы),
+				'other' => q(Панама бальбоалары),
+			},
+		},
+		'PEN' => {
+			display_name => {
+				'currency' => q(Перу солы),
+				'other' => q(Перу соллары),
+			},
+		},
+		'PGK' => {
+			display_name => {
+				'currency' => q(Папуа Яңа Гвинея Кинасы),
+				'other' => q(Папуа Яңа Гвинея кинасы),
+			},
+		},
+		'PHP' => {
+			display_name => {
+				'currency' => q(Филиппин песосы),
+				'other' => q(Филиппин песолары),
+			},
+		},
+		'PKR' => {
+			display_name => {
+				'currency' => q(Пакистан рупиясе),
+				'other' => q(Пакистан рупияләре),
+			},
+		},
+		'PLN' => {
+			display_name => {
+				'currency' => q(Польша злотые),
+				'other' => q(Польша злотыйлары),
+			},
+		},
+		'PYG' => {
+			display_name => {
+				'currency' => q(Парагвай гуаранисы),
+				'other' => q(Парагвай гуаранилары),
+			},
+		},
+		'QAR' => {
+			display_name => {
+				'currency' => q(Катар риалы),
+				'other' => q(Катар риаллары),
+			},
+		},
+		'RON' => {
+			display_name => {
+				'currency' => q(Румыния Лее),
+				'other' => q(Румыния лее),
+			},
+		},
+		'RSD' => {
+			display_name => {
+				'currency' => q(Сербия динары),
+				'other' => q(Сербия динарлары),
 			},
 		},
 		'RUB' => {
@@ -668,16 +1527,256 @@ has 'currencies' => (
 		'RUR' => {
 			symbol => 'р.',
 		},
+		'RWF' => {
+			display_name => {
+				'currency' => q(Руанда франкы),
+				'other' => q(Руанда франклары),
+			},
+		},
+		'SAR' => {
+			display_name => {
+				'currency' => q(Согуд Гарәбстаны риалы),
+				'other' => q(Согуд Гарәбстаны риаллары),
+			},
+		},
+		'SBD' => {
+			display_name => {
+				'currency' => q(Соломон утраулары доллары),
+				'other' => q(Соломон утраулары долларлары),
+			},
+		},
+		'SCR' => {
+			display_name => {
+				'currency' => q(Сейшел утраулары рупиясы),
+				'other' => q(Сейшел утраулары рупиялары),
+			},
+		},
+		'SDG' => {
+			display_name => {
+				'currency' => q(Судан фунты),
+				'other' => q(Судан фунтлары),
+			},
+		},
+		'SEK' => {
+			display_name => {
+				'currency' => q(Швеция Кронасы),
+				'other' => q(Швеция кронасы),
+			},
+		},
+		'SGD' => {
+			display_name => {
+				'currency' => q(Сингапур доллары),
+				'other' => q(Сингапур долларлары),
+			},
+		},
+		'SHP' => {
+			display_name => {
+				'currency' => q(Изге Елена утравы фунты),
+				'other' => q(Изге Елена утравы фунтлары),
+			},
+		},
+		'SLE' => {
+			display_name => {
+				'currency' => q(Сьерра-Леон леоны),
+				'other' => q(Сьерра-Леоне леоннары),
+			},
+		},
+		'SLL' => {
+			display_name => {
+				'currency' => q(Сьерра-Леоне леоны \(1964—2022\)),
+				'other' => q(Сьерра-Леоне леоннары \(1964—2022\)),
+			},
+		},
+		'SOS' => {
+			display_name => {
+				'currency' => q(Сомали шиллингы),
+				'other' => q(Сомали шиллинглары),
+			},
+		},
+		'SRD' => {
+			display_name => {
+				'currency' => q(Суринам доллары),
+				'other' => q(Суринам долларлары),
+			},
+		},
+		'SSP' => {
+			display_name => {
+				'currency' => q(Көньяк Судан фунты),
+				'other' => q(Көньяк Судан фунтлары),
+			},
+		},
+		'STN' => {
+			display_name => {
+				'currency' => q(Сан-Томе һәм Принсипи добрасы),
+				'other' => q(Сан-Томеһәм Принсипи добралары),
+			},
+		},
+		'SYP' => {
+			display_name => {
+				'currency' => q(Сурия фунты),
+				'other' => q(Сурия фунтлары),
+			},
+		},
+		'SZL' => {
+			display_name => {
+				'currency' => q(Свази эмалангенисы),
+				'other' => q(Свази эмалангенилары),
+			},
+		},
+		'THB' => {
+			display_name => {
+				'currency' => q(Тайвань Баты),
+				'other' => q(Тайвань баты),
+			},
+		},
+		'TJS' => {
+			display_name => {
+				'currency' => q(Таҗикстан сомонисы),
+				'other' => q(Таҗикстан сомонилары),
+			},
+		},
+		'TMT' => {
+			display_name => {
+				'currency' => q(Төркмәнстан Манаты),
+				'other' => q(Төркмәнстан манаты),
+			},
+		},
+		'TND' => {
+			display_name => {
+				'currency' => q(Тунис динары),
+				'other' => q(Тунис динарлары),
+			},
+		},
+		'TOP' => {
+			display_name => {
+				'currency' => q(Тонга Паангасы),
+				'other' => q(Тонга паангасы),
+			},
+		},
+		'TRY' => {
+			display_name => {
+				'currency' => q(Төркия Лирасы),
+				'other' => q(Төркия лирасы),
+			},
+		},
+		'TTD' => {
+			display_name => {
+				'currency' => q(Тринидад һәм Тобаго доллары),
+				'other' => q(Тринидад һәм Тобаго долларлары),
+			},
+		},
+		'TWD' => {
+			display_name => {
+				'currency' => q(Яңа Тайвань доллары),
+				'other' => q(Яңа Тайвань долларлары),
+			},
+		},
+		'TZS' => {
+			display_name => {
+				'currency' => q(Танзания шиллингы),
+				'other' => q(Танзания шиллинглары),
+			},
+		},
+		'UAH' => {
+			display_name => {
+				'currency' => q(Украина гривнасы),
+				'other' => q(Украина гривналары),
+			},
+		},
+		'UGX' => {
+			display_name => {
+				'currency' => q(Уганда шиллингы),
+				'other' => q(Уганда шиллинглары),
+			},
+		},
 		'USD' => {
 			symbol => '$',
 			display_name => {
 				'currency' => q(АКШ доллары),
 			},
 		},
+		'UYU' => {
+			display_name => {
+				'currency' => q(Уругвай песосы),
+				'other' => q(Уругвай песолары),
+			},
+		},
+		'UZS' => {
+			display_name => {
+				'currency' => q(Үзбәкстан Сомы),
+				'other' => q(Үзбәкстан сомы),
+			},
+		},
+		'VES' => {
+			display_name => {
+				'currency' => q(Венесуэла боливары),
+				'other' => q(Венесуэла боливарлары),
+			},
+		},
+		'VND' => {
+			display_name => {
+				'currency' => q(Вьетнам Донгы),
+				'other' => q(Вьетнам донгы),
+			},
+		},
+		'VUV' => {
+			display_name => {
+				'currency' => q(Вануату ваты),
+				'other' => q(Вануату ватлары),
+			},
+		},
+		'WST' => {
+			display_name => {
+				'currency' => q(Самоа Таласы),
+				'other' => q(Самоа таласы),
+			},
+		},
+		'XAF' => {
+			display_name => {
+				'currency' => q(Үзәк Африка франкы КФА),
+				'other' => q(Үзәк африка франклары КФА),
+			},
+		},
+		'XCD' => {
+			display_name => {
+				'currency' => q(Көнчыгыш Кариб доллары),
+				'other' => q(Көнчыгыш Кариб долларлары),
+			},
+		},
+		'XOF' => {
+			display_name => {
+				'currency' => q(Көнбатыш Африка КФА франкы),
+				'other' => q(Көнбатыш Африка КФА франклары),
+			},
+		},
+		'XPF' => {
+			display_name => {
+				'currency' => q(Франциянең диңгез аръягы җәмгыятьләре франкы),
+				'other' => q(Франциянең диңгез аръягы җәмгыятьләре франклары),
+			},
+		},
 		'XXX' => {
 			display_name => {
 				'currency' => q(билгесез валюта),
 				'other' => q(\(билгесез валюта\)),
+			},
+		},
+		'YER' => {
+			display_name => {
+				'currency' => q(Йәмән риалы),
+				'other' => q(Йәмән риаллары),
+			},
+		},
+		'ZAR' => {
+			display_name => {
+				'currency' => q(Көньяк Африка Рэнды),
+				'other' => q(Көньяк Африка рэнды),
+			},
+		},
+		'ZMW' => {
+			display_name => {
+				'currency' => q(Замбия квачасы),
+				'other' => q(Замбия квачалары),
 			},
 		},
 	} },
@@ -1159,8 +2258,633 @@ has 'time_zone_names' => (
 		regionFormat => q({0} гадәти вакыты),
 		'Acre' => {
 			long => {
+				'daylight' => q#Акр җәйге вакыты#,
 				'generic' => q#Акр вакыты#,
+				'standard' => q#Акр стандарт вакыты#,
 			},
+		},
+		'Afghanistan' => {
+			long => {
+				'standard' => q#Әфганстан вакыты#,
+			},
+		},
+		'Africa/Abidjan' => {
+			exemplarCity => q#Идиҗан#,
+		},
+		'Africa/Accra' => {
+			exemplarCity => q#Аккра#,
+		},
+		'Africa/Addis_Ababa' => {
+			exemplarCity => q#Аддис-Абеба#,
+		},
+		'Africa/Algiers' => {
+			exemplarCity => q#Алжир#,
+		},
+		'Africa/Asmera' => {
+			exemplarCity => q#Асмэра#,
+		},
+		'Africa/Bamako' => {
+			exemplarCity => q#Бамако#,
+		},
+		'Africa/Bangui' => {
+			exemplarCity => q#Банги#,
+		},
+		'Africa/Banjul' => {
+			exemplarCity => q#Банҗул#,
+		},
+		'Africa/Bissau' => {
+			exemplarCity => q#Биссау#,
+		},
+		'Africa/Blantyre' => {
+			exemplarCity => q#Блантайр#,
+		},
+		'Africa/Brazzaville' => {
+			exemplarCity => q#Браззавиль#,
+		},
+		'Africa/Bujumbura' => {
+			exemplarCity => q#Бөҗүмбура#,
+		},
+		'Africa/Cairo' => {
+			exemplarCity => q#Каһирә#,
+		},
+		'Africa/Casablanca' => {
+			exemplarCity => q#Касабланка#,
+		},
+		'Africa/Ceuta' => {
+			exemplarCity => q#Сеута#,
+		},
+		'Africa/Conakry' => {
+			exemplarCity => q#Конакри#,
+		},
+		'Africa/Dakar' => {
+			exemplarCity => q#Дакар#,
+		},
+		'Africa/Dar_es_Salaam' => {
+			exemplarCity => q#Дар-эс-Салам#,
+		},
+		'Africa/Djibouti' => {
+			exemplarCity => q#Джибути#,
+		},
+		'Africa/Douala' => {
+			exemplarCity => q#Дуала#,
+		},
+		'Africa/El_Aaiun' => {
+			exemplarCity => q#Эль-Аюн#,
+		},
+		'Africa/Freetown' => {
+			exemplarCity => q#Фритаун#,
+		},
+		'Africa/Gaborone' => {
+			exemplarCity => q#Габороне#,
+		},
+		'Africa/Harare' => {
+			exemplarCity => q#Хараре#,
+		},
+		'Africa/Johannesburg' => {
+			exemplarCity => q#Йоханнесбург#,
+		},
+		'Africa/Juba' => {
+			exemplarCity => q#Җуба#,
+		},
+		'Africa/Kampala' => {
+			exemplarCity => q#Кампала#,
+		},
+		'Africa/Khartoum' => {
+			exemplarCity => q#Һартум#,
+		},
+		'Africa/Kigali' => {
+			exemplarCity => q#Кигали#,
+		},
+		'Africa/Kinshasa' => {
+			exemplarCity => q#Киншаса#,
+		},
+		'Africa/Lagos' => {
+			exemplarCity => q#Лагос#,
+		},
+		'Africa/Libreville' => {
+			exemplarCity => q#Либревиль#,
+		},
+		'Africa/Lome' => {
+			exemplarCity => q#Ломе#,
+		},
+		'Africa/Luanda' => {
+			exemplarCity => q#Луанда#,
+		},
+		'Africa/Lubumbashi' => {
+			exemplarCity => q#Лубумбаши#,
+		},
+		'Africa/Lusaka' => {
+			exemplarCity => q#Лусака#,
+		},
+		'Africa/Malabo' => {
+			exemplarCity => q#Малабо#,
+		},
+		'Africa/Maputo' => {
+			exemplarCity => q#Мапуто#,
+		},
+		'Africa/Maseru' => {
+			exemplarCity => q#Масеру#,
+		},
+		'Africa/Mbabane' => {
+			exemplarCity => q#Мбабане#,
+		},
+		'Africa/Mogadishu' => {
+			exemplarCity => q#Могадишо#,
+		},
+		'Africa/Monrovia' => {
+			exemplarCity => q#Монровия#,
+		},
+		'Africa/Nairobi' => {
+			exemplarCity => q#Найроби#,
+		},
+		'Africa/Ndjamena' => {
+			exemplarCity => q#Нҗамен#,
+		},
+		'Africa/Niamey' => {
+			exemplarCity => q#Ниамей#,
+		},
+		'Africa/Nouakchott' => {
+			exemplarCity => q#Нуакшот#,
+		},
+		'Africa/Ouagadougou' => {
+			exemplarCity => q#Уагадугу#,
+		},
+		'Africa/Porto-Novo' => {
+			exemplarCity => q#Порто-Ново#,
+		},
+		'Africa/Sao_Tome' => {
+			exemplarCity => q#Сан-Томе#,
+		},
+		'Africa/Tripoli' => {
+			exemplarCity => q#Триполи#,
+		},
+		'Africa/Tunis' => {
+			exemplarCity => q#Тунис#,
+		},
+		'Africa/Windhoek' => {
+			exemplarCity => q#Виндхук#,
+		},
+		'Africa_Central' => {
+			long => {
+				'standard' => q#Үзәк Африка вакыты#,
+			},
+		},
+		'Africa_Eastern' => {
+			long => {
+				'standard' => q#Көнчыгыш Африка вакыты#,
+			},
+		},
+		'Africa_Southern' => {
+			long => {
+				'standard' => q#Көньяк Африка вакыты#,
+			},
+		},
+		'Africa_Western' => {
+			long => {
+				'daylight' => q#Көнбатыш Африка җәйге вакыты#,
+				'generic' => q#Көнбатыш Африка вакыты#,
+				'standard' => q#Көнбатыш Африка стандарт вакыты#,
+			},
+		},
+		'Alaska' => {
+			long => {
+				'daylight' => q#Аляска җәйге вакыты#,
+				'generic' => q#Аляска вакыты#,
+				'standard' => q#Аляска стандарт вакыты#,
+			},
+		},
+		'Amazon' => {
+			long => {
+				'daylight' => q#Амазонка җәйге вакыты#,
+				'generic' => q#Амазонка вакыты#,
+				'standard' => q#Амазонка стандарт вакыты#,
+			},
+		},
+		'America/Adak' => {
+			exemplarCity => q#Адак#,
+		},
+		'America/Anchorage' => {
+			exemplarCity => q#Анкоридж#,
+		},
+		'America/Anguilla' => {
+			exemplarCity => q#Ангилья#,
+		},
+		'America/Antigua' => {
+			exemplarCity => q#Антигуа#,
+		},
+		'America/Araguaina' => {
+			exemplarCity => q#Арагуайна#,
+		},
+		'America/Argentina/La_Rioja' => {
+			exemplarCity => q#Ла Риоха#,
+		},
+		'America/Argentina/Rio_Gallegos' => {
+			exemplarCity => q#Рио-Гальегос#,
+		},
+		'America/Argentina/Salta' => {
+			exemplarCity => q#Сальта#,
+		},
+		'America/Argentina/San_Juan' => {
+			exemplarCity => q#Сан-Хуан#,
+		},
+		'America/Argentina/San_Luis' => {
+			exemplarCity => q#Сан-Луис#,
+		},
+		'America/Argentina/Tucuman' => {
+			exemplarCity => q#Тукуман#,
+		},
+		'America/Argentina/Ushuaia' => {
+			exemplarCity => q#Ушуайя#,
+		},
+		'America/Aruba' => {
+			exemplarCity => q#Аруба#,
+		},
+		'America/Asuncion' => {
+			exemplarCity => q#Асунсьон#,
+		},
+		'America/Bahia' => {
+			exemplarCity => q#Баия#,
+		},
+		'America/Bahia_Banderas' => {
+			exemplarCity => q#Баия-де-Бандерас#,
+		},
+		'America/Barbados' => {
+			exemplarCity => q#Барбадос#,
+		},
+		'America/Belem' => {
+			exemplarCity => q#Белем#,
+		},
+		'America/Belize' => {
+			exemplarCity => q#Белиз#,
+		},
+		'America/Blanc-Sablon' => {
+			exemplarCity => q#Блан-Саблон#,
+		},
+		'America/Boa_Vista' => {
+			exemplarCity => q#Боа-Виста#,
+		},
+		'America/Bogota' => {
+			exemplarCity => q#Богота#,
+		},
+		'America/Boise' => {
+			exemplarCity => q#Бойсе#,
+		},
+		'America/Buenos_Aires' => {
+			exemplarCity => q#Буэнос-Айрес#,
+		},
+		'America/Cambridge_Bay' => {
+			exemplarCity => q#Кембридж Бэй#,
+		},
+		'America/Campo_Grande' => {
+			exemplarCity => q#Кампо-Гранде#,
+		},
+		'America/Cancun' => {
+			exemplarCity => q#Канкун#,
+		},
+		'America/Caracas' => {
+			exemplarCity => q#Каракас#,
+		},
+		'America/Catamarca' => {
+			exemplarCity => q#Катамарка#,
+		},
+		'America/Cayenne' => {
+			exemplarCity => q#Кайенна#,
+		},
+		'America/Cayman' => {
+			exemplarCity => q#Кайман утраулары#,
+		},
+		'America/Chicago' => {
+			exemplarCity => q#Чикаго#,
+		},
+		'America/Chihuahua' => {
+			exemplarCity => q#Чихуахуа#,
+		},
+		'America/Ciudad_Juarez' => {
+			exemplarCity => q#Сьюдад-Хуарес#,
+		},
+		'America/Coral_Harbour' => {
+			exemplarCity => q#Атикокан#,
+		},
+		'America/Cordoba' => {
+			exemplarCity => q#Кордоба#,
+		},
+		'America/Costa_Rica' => {
+			exemplarCity => q#Коста-Рика#,
+		},
+		'America/Creston' => {
+			exemplarCity => q#Крестон#,
+		},
+		'America/Cuiaba' => {
+			exemplarCity => q#Куяба#,
+		},
+		'America/Curacao' => {
+			exemplarCity => q#Кюрасао#,
+		},
+		'America/Danmarkshavn' => {
+			exemplarCity => q#Данмарксхавн#,
+		},
+		'America/Dawson' => {
+			exemplarCity => q#Доусон#,
+		},
+		'America/Dawson_Creek' => {
+			exemplarCity => q#Доусон-Крик#,
+		},
+		'America/Denver' => {
+			exemplarCity => q#Денвер#,
+		},
+		'America/Detroit' => {
+			exemplarCity => q#Детройт#,
+		},
+		'America/Dominica' => {
+			exemplarCity => q#Доминика#,
+		},
+		'America/Edmonton' => {
+			exemplarCity => q#Эдмонтон#,
+		},
+		'America/Eirunepe' => {
+			exemplarCity => q#Эйрунепе#,
+		},
+		'America/El_Salvador' => {
+			exemplarCity => q#Сальвадор#,
+		},
+		'America/Fort_Nelson' => {
+			exemplarCity => q#Форт Нельсон#,
+		},
+		'America/Fortaleza' => {
+			exemplarCity => q#Форталеза#,
+		},
+		'America/Glace_Bay' => {
+			exemplarCity => q#Глейс Бэй#,
+		},
+		'America/Godthab' => {
+			exemplarCity => q#Нуук#,
+		},
+		'America/Goose_Bay' => {
+			exemplarCity => q#Каз бухтасы#,
+		},
+		'America/Grand_Turk' => {
+			exemplarCity => q#Гранд Терк#,
+		},
+		'America/Grenada' => {
+			exemplarCity => q#Гренада#,
+		},
+		'America/Guadeloupe' => {
+			exemplarCity => q#Гваделупа#,
+		},
+		'America/Guatemala' => {
+			exemplarCity => q#Гватемала#,
+		},
+		'America/Guayaquil' => {
+			exemplarCity => q#Гуаякиль#,
+		},
+		'America/Guyana' => {
+			exemplarCity => q#Гайана#,
+		},
+		'America/Halifax' => {
+			exemplarCity => q#Галифакс#,
+		},
+		'America/Havana' => {
+			exemplarCity => q#Гавана#,
+		},
+		'America/Hermosillo' => {
+			exemplarCity => q#Эрмосильо#,
+		},
+		'America/Indiana/Knox' => {
+			exemplarCity => q#Нокс, Индиана#,
+		},
+		'America/Indiana/Marengo' => {
+			exemplarCity => q#Маренго, Индиана#,
+		},
+		'America/Indiana/Petersburg' => {
+			exemplarCity => q#Петербург, Индиана#,
+		},
+		'America/Indiana/Tell_City' => {
+			exemplarCity => q#Телль-Сити, Индиана#,
+		},
+		'America/Indiana/Vevay' => {
+			exemplarCity => q#Вевей, Индиана#,
+		},
+		'America/Indiana/Vincennes' => {
+			exemplarCity => q#Винсеннес, Индиана#,
+		},
+		'America/Indiana/Winamac' => {
+			exemplarCity => q#Уинамак, Индиана#,
+		},
+		'America/Indianapolis' => {
+			exemplarCity => q#Индианаполис#,
+		},
+		'America/Inuvik' => {
+			exemplarCity => q#Инувик#,
+		},
+		'America/Iqaluit' => {
+			exemplarCity => q#Икалуит#,
+		},
+		'America/Jamaica' => {
+			exemplarCity => q#Ямайка#,
+		},
+		'America/Jujuy' => {
+			exemplarCity => q#Жужуй#,
+		},
+		'America/Juneau' => {
+			exemplarCity => q#Джуно#,
+		},
+		'America/Kentucky/Monticello' => {
+			exemplarCity => q#Монтичелло, Кентукки#,
+		},
+		'America/Kralendijk' => {
+			exemplarCity => q#Кралендейк#,
+		},
+		'America/La_Paz' => {
+			exemplarCity => q#Ла-Пас#,
+		},
+		'America/Lima' => {
+			exemplarCity => q#Лима#,
+		},
+		'America/Los_Angeles' => {
+			exemplarCity => q#Лос-Анджелес#,
+		},
+		'America/Louisville' => {
+			exemplarCity => q#Луисвиль#,
+		},
+		'America/Lower_Princes' => {
+			exemplarCity => q#Түбәнге Кенәз кварталы#,
+		},
+		'America/Maceio' => {
+			exemplarCity => q#Масейо#,
+		},
+		'America/Managua' => {
+			exemplarCity => q#Манагуа#,
+		},
+		'America/Manaus' => {
+			exemplarCity => q#Манаус#,
+		},
+		'America/Marigot' => {
+			exemplarCity => q#Мариго#,
+		},
+		'America/Martinique' => {
+			exemplarCity => q#Мартиника#,
+		},
+		'America/Matamoros' => {
+			exemplarCity => q#Матаморос#,
+		},
+		'America/Mazatlan' => {
+			exemplarCity => q#Масатлан#,
+		},
+		'America/Mendoza' => {
+			exemplarCity => q#Мендоса#,
+		},
+		'America/Menominee' => {
+			exemplarCity => q#Меномини#,
+		},
+		'America/Merida' => {
+			exemplarCity => q#Мерида#,
+		},
+		'America/Metlakatla' => {
+			exemplarCity => q#Метлакатла#,
+		},
+		'America/Mexico_City' => {
+			exemplarCity => q#Мехико#,
+		},
+		'America/Miquelon' => {
+			exemplarCity => q#Микелон#,
+		},
+		'America/Moncton' => {
+			exemplarCity => q#Монктон#,
+		},
+		'America/Monterrey' => {
+			exemplarCity => q#Монтеррей#,
+		},
+		'America/Montevideo' => {
+			exemplarCity => q#Монтевидео#,
+		},
+		'America/Montserrat' => {
+			exemplarCity => q#Монсеррат#,
+		},
+		'America/Nassau' => {
+			exemplarCity => q#Нассау#,
+		},
+		'America/New_York' => {
+			exemplarCity => q#Нью-Йорк#,
+		},
+		'America/Nome' => {
+			exemplarCity => q#Номе#,
+		},
+		'America/Noronha' => {
+			exemplarCity => q#Норонья#,
+		},
+		'America/North_Dakota/Beulah' => {
+			exemplarCity => q#Бьюла, Төньяк Дакота#,
+		},
+		'America/North_Dakota/Center' => {
+			exemplarCity => q#Үзәк, Төньяк Дакота#,
+		},
+		'America/North_Dakota/New_Salem' => {
+			exemplarCity => q#Нью-Салем, Төньяк Дакота#,
+		},
+		'America/Ojinaga' => {
+			exemplarCity => q#Охинага#,
+		},
+		'America/Panama' => {
+			exemplarCity => q#Панама#,
+		},
+		'America/Paramaribo' => {
+			exemplarCity => q#Парамарибо#,
+		},
+		'America/Phoenix' => {
+			exemplarCity => q#Феникс#,
+		},
+		'America/Port-au-Prince' => {
+			exemplarCity => q#Порт-о-Пренс#,
+		},
+		'America/Port_of_Spain' => {
+			exemplarCity => q#Порт-оф-Спейн#,
+		},
+		'America/Porto_Velho' => {
+			exemplarCity => q#Порту-Велью#,
+		},
+		'America/Puerto_Rico' => {
+			exemplarCity => q#Пуэрто-Рико#,
+		},
+		'America/Punta_Arenas' => {
+			exemplarCity => q#Пунта-Аренас#,
+		},
+		'America/Rankin_Inlet' => {
+			exemplarCity => q#Ранкин-Инлет#,
+		},
+		'America/Recife' => {
+			exemplarCity => q#Ресифи#,
+		},
+		'America/Regina' => {
+			exemplarCity => q#Регина#,
+		},
+		'America/Resolute' => {
+			exemplarCity => q#Резолют#,
+		},
+		'America/Rio_Branco' => {
+			exemplarCity => q#Рио-Бранко#,
+		},
+		'America/Santarem' => {
+			exemplarCity => q#Сантарем#,
+		},
+		'America/Santiago' => {
+			exemplarCity => q#Сантьяго#,
+		},
+		'America/Santo_Domingo' => {
+			exemplarCity => q#Санто-Доминго#,
+		},
+		'America/Sao_Paulo' => {
+			exemplarCity => q#Сан-Паулу#,
+		},
+		'America/Scoresbysund' => {
+			exemplarCity => q#Иттоккортоормиит#,
+		},
+		'America/Sitka' => {
+			exemplarCity => q#Ситка#,
+		},
+		'America/St_Barthelemy' => {
+			exemplarCity => q#Изге Варфоломей#,
+		},
+		'America/St_Johns' => {
+			exemplarCity => q#Сент-Джонс#,
+		},
+		'America/St_Kitts' => {
+			exemplarCity => q#Сент-Китс#,
+		},
+		'America/St_Lucia' => {
+			exemplarCity => q#Изге Люсия#,
+		},
+		'America/St_Thomas' => {
+			exemplarCity => q#Сент-Томас#,
+		},
+		'America/St_Vincent' => {
+			exemplarCity => q#Сент-Винсент#,
+		},
+		'America/Tegucigalpa' => {
+			exemplarCity => q#Тегусигальпа#,
+		},
+		'America/Thule' => {
+			exemplarCity => q#Туле#,
+		},
+		'America/Tijuana' => {
+			exemplarCity => q#Тихуана#,
+		},
+		'America/Toronto' => {
+			exemplarCity => q#Торонто#,
+		},
+		'America/Tortola' => {
+			exemplarCity => q#Тортола#,
+		},
+		'America/Vancouver' => {
+			exemplarCity => q#Ванкувер#,
+		},
+		'America/Whitehorse' => {
+			exemplarCity => q#Уайтхорс#,
+		},
+		'America/Winnipeg' => {
+			exemplarCity => q#Виннипег#,
+		},
+		'America/Yakutat' => {
+			exemplarCity => q#Якутат#,
 		},
 		'America_Central' => {
 			long => {
@@ -1192,14 +2916,558 @@ has 'time_zone_names' => (
 		},
 		'Anadyr' => {
 			long => {
+				'daylight' => q#Анадырь җәйге вакыты#,
 				'generic' => q#Анадырь вакыты#,
+				'standard' => q#Анадырь стандарт вакыты#,
 			},
+		},
+		'Antarctica/Casey' => {
+			exemplarCity => q#Кейси#,
+		},
+		'Antarctica/Davis' => {
+			exemplarCity => q#Дэвис#,
+		},
+		'Antarctica/DumontDUrville' => {
+			exemplarCity => q#Дюмон д’Юрвиль#,
+		},
+		'Antarctica/Macquarie' => {
+			exemplarCity => q#Маккуори#,
+		},
+		'Antarctica/Mawson' => {
+			exemplarCity => q#Моусон#,
+		},
+		'Antarctica/McMurdo' => {
+			exemplarCity => q#МакМёрдо#,
+		},
+		'Antarctica/Palmer' => {
+			exemplarCity => q#Палмер#,
+		},
+		'Antarctica/Rothera' => {
+			exemplarCity => q#Ротера#,
+		},
+		'Antarctica/Syowa' => {
+			exemplarCity => q#Сёва#,
+		},
+		'Antarctica/Troll' => {
+			exemplarCity => q#Тролль#,
+		},
+		'Antarctica/Vostok' => {
+			exemplarCity => q#Восток#,
+		},
+		'Apia' => {
+			long => {
+				'daylight' => q#Апиа җәйге вакыты#,
+				'generic' => q#Апиа вакыты#,
+				'standard' => q#Апиа стандарт вакыты#,
+			},
+		},
+		'Arabian' => {
+			long => {
+				'daylight' => q#Гарәп җәйге вакыты#,
+				'generic' => q#Гарәп вакыты#,
+				'standard' => q#Гарәп стандарт вакыты#,
+			},
+		},
+		'Arctic/Longyearbyen' => {
+			exemplarCity => q#Лонгиербиен#,
+		},
+		'Argentina' => {
+			long => {
+				'daylight' => q#Аргентина җәйге вакыты#,
+				'generic' => q#Аргентина вакыты#,
+				'standard' => q#Аргентина Стандарт вакыты#,
+			},
+		},
+		'Argentina_Western' => {
+			long => {
+				'daylight' => q#Көнбатыш Аргентина җәйге вакыты#,
+				'generic' => q#Көнбатыш Аргентина вакыты#,
+				'standard' => q#Көнбатыш Аргентина стандарт вакыты#,
+			},
+		},
+		'Armenia' => {
+			long => {
+				'daylight' => q#Армения җәйге вакыты#,
+				'generic' => q#Армения вакыты#,
+				'standard' => q#Армения стандарт вакыты#,
+			},
+		},
+		'Asia/Aden' => {
+			exemplarCity => q#Аден#,
+		},
+		'Asia/Almaty' => {
+			exemplarCity => q#Алма-Ата#,
+		},
+		'Asia/Amman' => {
+			exemplarCity => q#Әмман#,
+		},
+		'Asia/Anadyr' => {
+			exemplarCity => q#Анадырь#,
+		},
+		'Asia/Aqtau' => {
+			exemplarCity => q#Актау#,
+		},
+		'Asia/Aqtobe' => {
+			exemplarCity => q#Актобе#,
+		},
+		'Asia/Ashgabat' => {
+			exemplarCity => q#Ашхабад#,
+		},
+		'Asia/Atyrau' => {
+			exemplarCity => q#Атырау#,
+		},
+		'Asia/Baghdad' => {
+			exemplarCity => q#Багдад#,
+		},
+		'Asia/Bahrain' => {
+			exemplarCity => q#Бахрейн#,
+		},
+		'Asia/Baku' => {
+			exemplarCity => q#Баку#,
+		},
+		'Asia/Bangkok' => {
+			exemplarCity => q#Бангкок#,
+		},
+		'Asia/Barnaul' => {
+			exemplarCity => q#Барнаул#,
+		},
+		'Asia/Beirut' => {
+			exemplarCity => q#Бәйрүт#,
+		},
+		'Asia/Bishkek' => {
+			exemplarCity => q#Бишкек#,
+		},
+		'Asia/Brunei' => {
+			exemplarCity => q#Бруней#,
+		},
+		'Asia/Calcutta' => {
+			exemplarCity => q#Калькутта#,
+		},
+		'Asia/Chita' => {
+			exemplarCity => q#Чита#,
+		},
+		'Asia/Colombo' => {
+			exemplarCity => q#Коломбо#,
+		},
+		'Asia/Damascus' => {
+			exemplarCity => q#Дәмәшкъ#,
+		},
+		'Asia/Dhaka' => {
+			exemplarCity => q#Дакка#,
+		},
+		'Asia/Dili' => {
+			exemplarCity => q#Дили#,
+		},
+		'Asia/Dubai' => {
+			exemplarCity => q#Дубай#,
+		},
+		'Asia/Dushanbe' => {
+			exemplarCity => q#Душанбе#,
+		},
+		'Asia/Famagusta' => {
+			exemplarCity => q#Фамагуста#,
+		},
+		'Asia/Gaza' => {
+			exemplarCity => q#Газа#,
+		},
+		'Asia/Hebron' => {
+			exemplarCity => q#Һеврон#,
+		},
+		'Asia/Hong_Kong' => {
+			exemplarCity => q#Гонконг#,
+		},
+		'Asia/Hovd' => {
+			exemplarCity => q#Ховд#,
+		},
+		'Asia/Irkutsk' => {
+			exemplarCity => q#Иркутск#,
+		},
+		'Asia/Jakarta' => {
+			exemplarCity => q#Җакарта#,
+		},
+		'Asia/Jayapura' => {
+			exemplarCity => q#Җәяпура#,
+		},
+		'Asia/Jerusalem' => {
+			exemplarCity => q#Иерусалим#,
+		},
+		'Asia/Kabul' => {
+			exemplarCity => q#Кабул#,
+		},
+		'Asia/Kamchatka' => {
+			exemplarCity => q#Камчатка#,
+		},
+		'Asia/Karachi' => {
+			exemplarCity => q#Карачи#,
+		},
+		'Asia/Katmandu' => {
+			exemplarCity => q#Катманду#,
+		},
+		'Asia/Khandyga' => {
+			exemplarCity => q#Хандыга#,
+		},
+		'Asia/Krasnoyarsk' => {
+			exemplarCity => q#Красноярск#,
+		},
+		'Asia/Kuala_Lumpur' => {
+			exemplarCity => q#Куала-Лумпур#,
+		},
+		'Asia/Kuching' => {
+			exemplarCity => q#Кучинг#,
+		},
+		'Asia/Kuwait' => {
+			exemplarCity => q#Кувейт#,
+		},
+		'Asia/Macau' => {
+			exemplarCity => q#Макао#,
+		},
+		'Asia/Magadan' => {
+			exemplarCity => q#Магадан#,
+		},
+		'Asia/Makassar' => {
+			exemplarCity => q#Макассар#,
+		},
+		'Asia/Manila' => {
+			exemplarCity => q#Манила#,
+		},
+		'Asia/Muscat' => {
+			exemplarCity => q#Маскат#,
+		},
+		'Asia/Nicosia' => {
+			exemplarCity => q#Никосия#,
+		},
+		'Asia/Novokuznetsk' => {
+			exemplarCity => q#Новокузнецк#,
+		},
+		'Asia/Novosibirsk' => {
+			exemplarCity => q#Новосибирск#,
+		},
+		'Asia/Omsk' => {
+			exemplarCity => q#Омск#,
+		},
+		'Asia/Oral' => {
+			exemplarCity => q#Орал#,
+		},
+		'Asia/Phnom_Penh' => {
+			exemplarCity => q#Пномпень#,
+		},
+		'Asia/Pontianak' => {
+			exemplarCity => q#Понтианак#,
+		},
+		'Asia/Pyongyang' => {
+			exemplarCity => q#Пхеньян#,
+		},
+		'Asia/Qatar' => {
+			exemplarCity => q#Катар#,
+		},
+		'Asia/Qostanay' => {
+			exemplarCity => q#Костанай#,
+		},
+		'Asia/Qyzylorda' => {
+			exemplarCity => q#Кызылорда#,
+		},
+		'Asia/Rangoon' => {
+			exemplarCity => q#Янгон#,
+		},
+		'Asia/Riyadh' => {
+			exemplarCity => q#Эр-Рияд#,
+		},
+		'Asia/Saigon' => {
+			exemplarCity => q#Хо Ши Мин#,
+		},
+		'Asia/Sakhalin' => {
+			exemplarCity => q#Сахалин#,
+		},
+		'Asia/Samarkand' => {
+			exemplarCity => q#Сәмәрканд#,
+		},
+		'Asia/Seoul' => {
+			exemplarCity => q#Сеул#,
+		},
+		'Asia/Shanghai' => {
+			exemplarCity => q#Шанхай#,
+		},
+		'Asia/Singapore' => {
+			exemplarCity => q#Сингапур#,
+		},
+		'Asia/Srednekolymsk' => {
+			exemplarCity => q#Среднеколымск#,
+		},
+		'Asia/Taipei' => {
+			exemplarCity => q#Тайпей#,
+		},
+		'Asia/Tashkent' => {
+			exemplarCity => q#Ташкент#,
+		},
+		'Asia/Tbilisi' => {
+			exemplarCity => q#Тбилиси#,
+		},
+		'Asia/Tehran' => {
+			exemplarCity => q#Тәһран#,
+		},
+		'Asia/Thimphu' => {
+			exemplarCity => q#Тхимпху#,
+		},
+		'Asia/Tokyo' => {
+			exemplarCity => q#Токио#,
+		},
+		'Asia/Tomsk' => {
+			exemplarCity => q#Томск#,
+		},
+		'Asia/Ulaanbaatar' => {
+			exemplarCity => q#Улан-Батор#,
+		},
+		'Asia/Urumqi' => {
+			exemplarCity => q#Урумчи#,
+		},
+		'Asia/Ust-Nera' => {
+			exemplarCity => q#Усть-Нера#,
+		},
+		'Asia/Vientiane' => {
+			exemplarCity => q#Вьентьян#,
+		},
+		'Asia/Vladivostok' => {
+			exemplarCity => q#Владивосток#,
+		},
+		'Asia/Yakutsk' => {
+			exemplarCity => q#Якутск#,
+		},
+		'Asia/Yekaterinburg' => {
+			exemplarCity => q#Екатеринбург#,
+		},
+		'Asia/Yerevan' => {
+			exemplarCity => q#Ереван#,
 		},
 		'Atlantic' => {
 			long => {
 				'daylight' => q#Төньяк Америка җәйге атлантик вакыты#,
 				'generic' => q#Төньяк Америка атлантик вакыты#,
 				'standard' => q#Төньяк Америка гадәти атлантик вакыты#,
+			},
+		},
+		'Atlantic/Azores' => {
+			exemplarCity => q#Азор утраулары#,
+		},
+		'Atlantic/Bermuda' => {
+			exemplarCity => q#Бермуд утраулары#,
+		},
+		'Atlantic/Canary' => {
+			exemplarCity => q#Канар утраулары#,
+		},
+		'Atlantic/Cape_Verde' => {
+			exemplarCity => q#Кабо-Верде#,
+		},
+		'Atlantic/Faeroe' => {
+			exemplarCity => q#Фарер утраулары#,
+		},
+		'Atlantic/Madeira' => {
+			exemplarCity => q#Мадейра#,
+		},
+		'Atlantic/Reykjavik' => {
+			exemplarCity => q#Рейкьявик#,
+		},
+		'Atlantic/South_Georgia' => {
+			exemplarCity => q#Көньяк Джорджия#,
+		},
+		'Atlantic/St_Helena' => {
+			exemplarCity => q#Изге Елена#,
+		},
+		'Atlantic/Stanley' => {
+			exemplarCity => q#Стэнли#,
+		},
+		'Australia/Adelaide' => {
+			exemplarCity => q#Аделаида#,
+		},
+		'Australia/Brisbane' => {
+			exemplarCity => q#Брисбен#,
+		},
+		'Australia/Broken_Hill' => {
+			exemplarCity => q#Брокен-Хилл#,
+		},
+		'Australia/Darwin' => {
+			exemplarCity => q#Дарвин#,
+		},
+		'Australia/Eucla' => {
+			exemplarCity => q#Юкла#,
+		},
+		'Australia/Hobart' => {
+			exemplarCity => q#Хобарт#,
+		},
+		'Australia/Lindeman' => {
+			exemplarCity => q#Линдеман#,
+		},
+		'Australia/Lord_Howe' => {
+			exemplarCity => q#Лорд Хау#,
+		},
+		'Australia/Melbourne' => {
+			exemplarCity => q#Мельбурн#,
+		},
+		'Australia/Perth' => {
+			exemplarCity => q#Перт#,
+		},
+		'Australia/Sydney' => {
+			exemplarCity => q#Сидней#,
+		},
+		'Australia_Central' => {
+			long => {
+				'daylight' => q#Австралия үзәк җәйге вакыты#,
+				'generic' => q#Үзәк Австралия вакыты#,
+				'standard' => q#Австралия үзәк стандарт вакыты#,
+			},
+		},
+		'Australia_CentralWestern' => {
+			long => {
+				'daylight' => q#Австралия үзәк көнбатыш җәйге вакыты#,
+				'generic' => q#Австралия үзәк көнбатыш вакыты#,
+				'standard' => q#Австралия үзәк көнбатыш стандарт вакыты#,
+			},
+		},
+		'Australia_Eastern' => {
+			long => {
+				'daylight' => q#Көнчыгыш Австралия җәйге вакыты#,
+				'generic' => q#Көнчыгыш Австралия вакыты#,
+				'standard' => q#Көнчыгыш Австралия стандарт вакыты#,
+			},
+		},
+		'Australia_Western' => {
+			long => {
+				'daylight' => q#Көнбатыш Австралия җәйге вакыты#,
+				'generic' => q#Көнбатыш Австралия вакыты#,
+				'standard' => q#Көнбатыш Австралия стандарт вакыты#,
+			},
+		},
+		'Azerbaijan' => {
+			long => {
+				'daylight' => q#Әзербайҗан җәйге вакыты#,
+				'generic' => q#Әзербайҗан вакыты#,
+				'standard' => q#Әзербайҗан стандарт вакыты#,
+			},
+		},
+		'Azores' => {
+			long => {
+				'daylight' => q#Азоу утраулары җәйге вакыты#,
+				'generic' => q#Азор утраулары вакыты#,
+				'standard' => q#Азор утраулары стандарт вакыты#,
+			},
+		},
+		'Bangladesh' => {
+			long => {
+				'daylight' => q#Бангладеш җәйге вакыты#,
+				'generic' => q#Бангладеш вакыты#,
+				'standard' => q#Бангладеш стандарт вакыты#,
+			},
+		},
+		'Bhutan' => {
+			long => {
+				'standard' => q#Бутан вакыты#,
+			},
+		},
+		'Bolivia' => {
+			long => {
+				'standard' => q#Боливия вакыты#,
+			},
+		},
+		'Brasilia' => {
+			long => {
+				'daylight' => q#Бразилиа җәйге вакыты#,
+				'generic' => q#Бразилиа вакыты#,
+				'standard' => q#Бразилиа стандарт вакыты#,
+			},
+		},
+		'Brunei' => {
+			long => {
+				'standard' => q#Бруней-Даруссалам вакыты#,
+			},
+		},
+		'Cape_Verde' => {
+			long => {
+				'daylight' => q#Кабо-Верде җәйге вакыты#,
+				'generic' => q#Кабо-Верде вакыты#,
+				'standard' => q#Кабо-Верде стандарт вакыты#,
+			},
+		},
+		'Chamorro' => {
+			long => {
+				'standard' => q#Чаморро стандарт вакыты#,
+			},
+		},
+		'Chatham' => {
+			long => {
+				'daylight' => q#Чатем җәйге вакыты#,
+				'generic' => q#Чатем вакыты#,
+				'standard' => q#Чатем стандарт вакыты#,
+			},
+		},
+		'Chile' => {
+			long => {
+				'daylight' => q#Чили җәйге вакыты#,
+				'generic' => q#Чили вакыты#,
+				'standard' => q#Чили стандарт вакыты#,
+			},
+		},
+		'China' => {
+			long => {
+				'daylight' => q#Кытай җәйге вакыты#,
+				'generic' => q#Кытай вакыты#,
+				'standard' => q#Кытай стандарт вакыты#,
+			},
+		},
+		'Christmas' => {
+			long => {
+				'standard' => q#Раштуа утравы вакыты#,
+			},
+		},
+		'Cocos' => {
+			long => {
+				'standard' => q#Кокос утраулары вакыты#,
+			},
+		},
+		'Colombia' => {
+			long => {
+				'daylight' => q#Колумбия җәйге вакыты#,
+				'generic' => q#Колумбия вакыты#,
+				'standard' => q#Колумбия стандарт вакыты#,
+			},
+		},
+		'Cook' => {
+			long => {
+				'daylight' => q#Кук утраулары уртача җәйге вакыты#,
+				'generic' => q#Кук утраулары вакыты#,
+				'standard' => q#Кук утраулары стандарт вакыты#,
+			},
+		},
+		'Cuba' => {
+			long => {
+				'daylight' => q#Куба җәйге вакыты#,
+				'generic' => q#Куба вакыты#,
+				'standard' => q#Куба стандарт вакыты#,
+			},
+		},
+		'Davis' => {
+			long => {
+				'standard' => q#Дэвис вакыты#,
+			},
+		},
+		'DumontDUrville' => {
+			long => {
+				'standard' => q#Дюмон д’Юрвиль вакыты#,
+			},
+		},
+		'East_Timor' => {
+			long => {
+				'standard' => q#Көнчыгыш Тимор вакыты#,
+			},
+		},
+		'Easter' => {
+			long => {
+				'daylight' => q#Пасха утравы җәйге вакыты#,
+				'generic' => q#Пасха утравы вакыты#,
+				'standard' => q#Пасха утравы стандарт вакыты#,
+			},
+		},
+		'Ecuador' => {
+			long => {
+				'standard' => q#Эквадор вакыты#,
 			},
 		},
 		'Etc/UTC' => {
@@ -1209,6 +3477,186 @@ has 'time_zone_names' => (
 		},
 		'Etc/Unknown' => {
 			exemplarCity => q#билгесез шәһәр#,
+		},
+		'Europe/Amsterdam' => {
+			exemplarCity => q#Амстердам#,
+		},
+		'Europe/Andorra' => {
+			exemplarCity => q#Андорра#,
+		},
+		'Europe/Astrakhan' => {
+			exemplarCity => q#Әстерхан#,
+		},
+		'Europe/Athens' => {
+			exemplarCity => q#Афин#,
+		},
+		'Europe/Belgrade' => {
+			exemplarCity => q#Белград#,
+		},
+		'Europe/Berlin' => {
+			exemplarCity => q#Берлин#,
+		},
+		'Europe/Bratislava' => {
+			exemplarCity => q#Братислава#,
+		},
+		'Europe/Brussels' => {
+			exemplarCity => q#Брюссель#,
+		},
+		'Europe/Bucharest' => {
+			exemplarCity => q#Бухарест#,
+		},
+		'Europe/Budapest' => {
+			exemplarCity => q#Будапешт#,
+		},
+		'Europe/Busingen' => {
+			exemplarCity => q#Бюзинген#,
+		},
+		'Europe/Chisinau' => {
+			exemplarCity => q#Кишинев#,
+		},
+		'Europe/Copenhagen' => {
+			exemplarCity => q#Копенгаген#,
+		},
+		'Europe/Dublin' => {
+			exemplarCity => q#Дублин#,
+			long => {
+				'daylight' => q#Ирландия стандарт вакыты#,
+			},
+		},
+		'Europe/Gibraltar' => {
+			exemplarCity => q#Гибралтар#,
+		},
+		'Europe/Guernsey' => {
+			exemplarCity => q#Гернси#,
+		},
+		'Europe/Helsinki' => {
+			exemplarCity => q#Хельсинки#,
+		},
+		'Europe/Isle_of_Man' => {
+			exemplarCity => q#Мэн утравы#,
+		},
+		'Europe/Istanbul' => {
+			exemplarCity => q#Истанбул#,
+		},
+		'Europe/Jersey' => {
+			exemplarCity => q#Джерси#,
+		},
+		'Europe/Kaliningrad' => {
+			exemplarCity => q#Калининград#,
+		},
+		'Europe/Kiev' => {
+			exemplarCity => q#Киев#,
+		},
+		'Europe/Kirov' => {
+			exemplarCity => q#Киров#,
+		},
+		'Europe/Lisbon' => {
+			exemplarCity => q#Лиссабон#,
+		},
+		'Europe/Ljubljana' => {
+			exemplarCity => q#Любляна#,
+		},
+		'Europe/London' => {
+			exemplarCity => q#Лондон#,
+			long => {
+				'daylight' => q#Британия җәйге вакыты#,
+			},
+		},
+		'Europe/Luxembourg' => {
+			exemplarCity => q#Люксембург#,
+		},
+		'Europe/Madrid' => {
+			exemplarCity => q#Мадрид#,
+		},
+		'Europe/Malta' => {
+			exemplarCity => q#Мальта#,
+		},
+		'Europe/Mariehamn' => {
+			exemplarCity => q#Мариехамн#,
+		},
+		'Europe/Minsk' => {
+			exemplarCity => q#Минск#,
+		},
+		'Europe/Monaco' => {
+			exemplarCity => q#Монако#,
+		},
+		'Europe/Moscow' => {
+			exemplarCity => q#Мәскәү#,
+		},
+		'Europe/Oslo' => {
+			exemplarCity => q#Осло#,
+		},
+		'Europe/Paris' => {
+			exemplarCity => q#Париж#,
+		},
+		'Europe/Podgorica' => {
+			exemplarCity => q#Подгорица#,
+		},
+		'Europe/Prague' => {
+			exemplarCity => q#Прага#,
+		},
+		'Europe/Riga' => {
+			exemplarCity => q#Рига#,
+		},
+		'Europe/Rome' => {
+			exemplarCity => q#Рим#,
+		},
+		'Europe/Samara' => {
+			exemplarCity => q#Самара#,
+		},
+		'Europe/San_Marino' => {
+			exemplarCity => q#Сан-Марино#,
+		},
+		'Europe/Sarajevo' => {
+			exemplarCity => q#Сараево#,
+		},
+		'Europe/Saratov' => {
+			exemplarCity => q#Саратов#,
+		},
+		'Europe/Simferopol' => {
+			exemplarCity => q#Симферополь#,
+		},
+		'Europe/Skopje' => {
+			exemplarCity => q#Скопье#,
+		},
+		'Europe/Sofia' => {
+			exemplarCity => q#София#,
+		},
+		'Europe/Stockholm' => {
+			exemplarCity => q#Стокгольм#,
+		},
+		'Europe/Tallinn' => {
+			exemplarCity => q#Таллин#,
+		},
+		'Europe/Tirane' => {
+			exemplarCity => q#Тиран#,
+		},
+		'Europe/Ulyanovsk' => {
+			exemplarCity => q#Ульяновск#,
+		},
+		'Europe/Vaduz' => {
+			exemplarCity => q#Вадуц#,
+		},
+		'Europe/Vatican' => {
+			exemplarCity => q#Ватикан#,
+		},
+		'Europe/Vienna' => {
+			exemplarCity => q#Вена#,
+		},
+		'Europe/Vilnius' => {
+			exemplarCity => q#Вильнюс#,
+		},
+		'Europe/Volgograd' => {
+			exemplarCity => q#Волгоград#,
+		},
+		'Europe/Warsaw' => {
+			exemplarCity => q#Варшава#,
+		},
+		'Europe/Zagreb' => {
+			exemplarCity => q#Загреб#,
+		},
+		'Europe/Zurich' => {
+			exemplarCity => q#Цюрих#,
 		},
 		'Europe_Central' => {
 			long => {
@@ -1224,6 +3672,11 @@ has 'time_zone_names' => (
 				'standard' => q#гадәти Көнчыгыш Европа вакыты#,
 			},
 		},
+		'Europe_Further_Eastern' => {
+			long => {
+				'standard' => q#Ерак Көнчыгыш Европа вакыты#,
+			},
+		},
 		'Europe_Western' => {
 			long => {
 				'daylight' => q#җәйге Көнбатыш Европа вакыты#,
@@ -1231,19 +3684,735 @@ has 'time_zone_names' => (
 				'standard' => q#гадәти Көнбатыш Европа вакыты#,
 			},
 		},
+		'Falkland' => {
+			long => {
+				'daylight' => q#Фолкленд утраулары җәйге вакыты#,
+				'generic' => q#Фолкленд утраулары вакыты#,
+				'standard' => q#Фолкленд утраулары стандарт вакыты#,
+			},
+		},
+		'Fiji' => {
+			long => {
+				'daylight' => q#Фиджи җәйге вакыты#,
+				'generic' => q#Фиджи вакыты#,
+				'standard' => q#Фиджи стандарт вакыты#,
+			},
+		},
+		'French_Guiana' => {
+			long => {
+				'standard' => q#Француз Гвиана вакыты#,
+			},
+		},
+		'French_Southern' => {
+			long => {
+				'standard' => q#Француз көньяк һәм Антарктика вакыты#,
+			},
+		},
 		'GMT' => {
 			long => {
 				'standard' => q#Гринвич уртача вакыты#,
 			},
 		},
+		'Galapagos' => {
+			long => {
+				'standard' => q#Галапагос утраулары вакыты#,
+			},
+		},
+		'Gambier' => {
+			long => {
+				'standard' => q#Гамбье вакыты#,
+			},
+		},
+		'Georgia' => {
+			long => {
+				'daylight' => q#Грузия җәйге вакыты#,
+				'generic' => q#Грузия вакыты#,
+				'standard' => q#Грузия стандарт вакыты#,
+			},
+		},
+		'Gilbert_Islands' => {
+			long => {
+				'standard' => q#Гилберт утраулары вакыты#,
+			},
+		},
+		'Greenland_Eastern' => {
+			long => {
+				'daylight' => q#Көнчыгыш Гренландия җәйге вакыты#,
+				'generic' => q#Көнчыгыш Гренландия вакыты#,
+				'standard' => q#Көнчыгыш Гренландия стандарт вакыты#,
+			},
+		},
+		'Greenland_Western' => {
+			long => {
+				'daylight' => q#Көнбатыш Гренландия җәйге вакыты#,
+				'generic' => q#Көнбатыш Гренландия вакыты#,
+				'standard' => q#Көнбатыш Гренландия стандарт вакыты#,
+			},
+		},
+		'Gulf' => {
+			long => {
+				'standard' => q#Фарсы култыгының стандарт вакыты#,
+			},
+		},
+		'Guyana' => {
+			long => {
+				'standard' => q#Гайана вакыты#,
+			},
+		},
+		'Hawaii_Aleutian' => {
+			long => {
+				'daylight' => q#Гавай-Алеут җәйге вакыты#,
+				'generic' => q#Гавай-Алеут вакыты#,
+				'standard' => q#Гавай-Алеут стандарт вакыты#,
+			},
+		},
+		'Hong_Kong' => {
+			long => {
+				'daylight' => q#Гонконг җәйге вакыты#,
+				'generic' => q#Гонконг вакыты#,
+				'standard' => q#Гонконг стандарт вакыты#,
+			},
+		},
+		'Hovd' => {
+			long => {
+				'daylight' => q#Ховд җәйге вакыты#,
+				'generic' => q#Ховд вакыты#,
+				'standard' => q#Ховд стандарт вакыты#,
+			},
+		},
+		'India' => {
+			long => {
+				'standard' => q#Һинд стандарт вакыты#,
+			},
+		},
+		'Indian/Antananarivo' => {
+			exemplarCity => q#Антананариву#,
+		},
+		'Indian/Chagos' => {
+			exemplarCity => q#Чагос#,
+		},
+		'Indian/Christmas' => {
+			exemplarCity => q#Раштуа#,
+		},
+		'Indian/Cocos' => {
+			exemplarCity => q#Кокос#,
+		},
+		'Indian/Comoro' => {
+			exemplarCity => q#Коморо#,
+		},
+		'Indian/Kerguelen' => {
+			exemplarCity => q#Кергелен#,
+		},
+		'Indian/Mahe' => {
+			exemplarCity => q#Маэ#,
+		},
+		'Indian/Maldives' => {
+			exemplarCity => q#Мальдив утраулары#,
+		},
+		'Indian/Mauritius' => {
+			exemplarCity => q#Маврикий#,
+		},
+		'Indian/Mayotte' => {
+			exemplarCity => q#Майотта#,
+		},
+		'Indian/Reunion' => {
+			exemplarCity => q#Реюньон#,
+		},
+		'Indian_Ocean' => {
+			long => {
+				'standard' => q#Һинд океаны вакыты#,
+			},
+		},
+		'Indochina' => {
+			long => {
+				'standard' => q#Һинд-кытай вакыты#,
+			},
+		},
+		'Indonesia_Central' => {
+			long => {
+				'standard' => q#Үзәк Индонезия вакыты#,
+			},
+		},
+		'Indonesia_Eastern' => {
+			long => {
+				'standard' => q#Көнчыгыш Индонезия вакыты#,
+			},
+		},
+		'Indonesia_Western' => {
+			long => {
+				'standard' => q#Көнбатыш Индонезия вакыты#,
+			},
+		},
+		'Iran' => {
+			long => {
+				'daylight' => q#Иран җәйге вакыты#,
+				'generic' => q#Иран вакыты#,
+				'standard' => q#Иран стандарт вакыты#,
+			},
+		},
+		'Irkutsk' => {
+			long => {
+				'daylight' => q#Иркутск җәйге вакыты#,
+				'generic' => q#Иркутск вакыты#,
+				'standard' => q#Иркутск стандарт вакыты#,
+			},
+		},
+		'Israel' => {
+			long => {
+				'daylight' => q#Исраил җәйге вакыты#,
+				'generic' => q#Исраил вакыты#,
+				'standard' => q#Исраил стандарт вакыты#,
+			},
+		},
+		'Japan' => {
+			long => {
+				'daylight' => q#Япон җәйге вакыты#,
+				'generic' => q#Япон вакыты#,
+				'standard' => q#Япон стандарт вакыты#,
+			},
+		},
 		'Kamchatka' => {
 			long => {
+				'daylight' => q#Петропавловск-Камчатский җәйге вакыты#,
 				'generic' => q#Петропавловск-Камчатский вакыты#,
+				'standard' => q#Петропавловск-Камчатский стандарт вакыты#,
+			},
+		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Казахстан вакыты#,
+			},
+		},
+		'Kazakhstan_Eastern' => {
+			long => {
+				'standard' => q#Көнчыгыш Казахстан вакыты#,
+			},
+		},
+		'Kazakhstan_Western' => {
+			long => {
+				'standard' => q#Көнбатыш Казахстан вакыты#,
+			},
+		},
+		'Korea' => {
+			long => {
+				'daylight' => q#Корея җәйге вакыты#,
+				'generic' => q#Корея вакыты#,
+				'standard' => q#Корея стандарт вакыты#,
+			},
+		},
+		'Kosrae' => {
+			long => {
+				'standard' => q#Косраэ вакыты#,
+			},
+		},
+		'Krasnoyarsk' => {
+			long => {
+				'daylight' => q#Красноярск җәйге вакыты#,
+				'generic' => q#Красноярск вакыты#,
+				'standard' => q#Красноярск стандарт вакыты#,
+			},
+		},
+		'Kyrgystan' => {
+			long => {
+				'standard' => q#Кыргызстан вакыты#,
+			},
+		},
+		'Line_Islands' => {
+			long => {
+				'standard' => q#Лайн утраулары вакыты#,
+			},
+		},
+		'Lord_Howe' => {
+			long => {
+				'daylight' => q#Лорд Хау җәйге вакыты#,
+				'generic' => q#Лорд Хау вакыты#,
+				'standard' => q#Лорд Хау стандарт вакыты#,
+			},
+		},
+		'Magadan' => {
+			long => {
+				'daylight' => q#Магадан җәйге вакыты#,
+				'generic' => q#Магадан вакыты#,
+				'standard' => q#Магадан стандарт вакыты#,
+			},
+		},
+		'Malaysia' => {
+			long => {
+				'standard' => q#Малайзия вакыты#,
+			},
+		},
+		'Maldives' => {
+			long => {
+				'standard' => q#Мальдив утраулары вакыты#,
+			},
+		},
+		'Marquesas' => {
+			long => {
+				'standard' => q#Маркиз утраулары вакыты#,
+			},
+		},
+		'Marshall_Islands' => {
+			long => {
+				'standard' => q#Маршалл утраулары вакыты#,
+			},
+		},
+		'Mauritius' => {
+			long => {
+				'daylight' => q#Маврикий җәйге вакыты#,
+				'generic' => q#Маврикий вакыты#,
+				'standard' => q#Маврикий стандарт вакыты#,
+			},
+		},
+		'Mawson' => {
+			long => {
+				'standard' => q#Моусон вакыты#,
+			},
+		},
+		'Mexico_Pacific' => {
+			long => {
+				'daylight' => q#Мексика Тыныч океан җәйге вакыты#,
+				'generic' => q#Мексика Тыныч океан вакыты#,
+				'standard' => q#Мексика Тыныч океан стандартвакыты#,
+			},
+		},
+		'Mongolia' => {
+			long => {
+				'daylight' => q#Улан-Батор җәйге вакыты#,
+				'generic' => q#Улан-Батор вакыты#,
+				'standard' => q#Улан-Батор стандарт вакыты#,
+			},
+		},
+		'Moscow' => {
+			long => {
+				'daylight' => q#Мәскәү җәйге вакыты#,
+				'generic' => q#Мәскәү вакыты#,
+				'standard' => q#Мәскәү стандарт вакыты#,
+			},
+		},
+		'Myanmar' => {
+			long => {
+				'standard' => q#Мьянма вакыты#,
+			},
+		},
+		'Nauru' => {
+			long => {
+				'standard' => q#Науру вакыты#,
+			},
+		},
+		'Nepal' => {
+			long => {
+				'standard' => q#Непал вакыты#,
+			},
+		},
+		'New_Caledonia' => {
+			long => {
+				'daylight' => q#Яңа Каледония җәйге вакыты#,
+				'generic' => q#Яңа Каледония вакыты#,
+				'standard' => q#Яңа Каледония стандарт вакыты#,
+			},
+		},
+		'New_Zealand' => {
+			long => {
+				'daylight' => q#Яңа Зеландия җәйге вакыты#,
+				'generic' => q#Яңа Зеландия вакыты#,
+				'standard' => q#Яңа Зеландия стандарт вакыты#,
+			},
+		},
+		'Newfoundland' => {
+			long => {
+				'daylight' => q#Ньюфаундленд җәйге вакыты#,
+				'generic' => q#Ньюфаундленд вакыты#,
+				'standard' => q#Ньюфаундленд стандарт вакыты#,
+			},
+		},
+		'Niue' => {
+			long => {
+				'standard' => q#Ниуэ вакыты#,
+			},
+		},
+		'Norfolk' => {
+			long => {
+				'daylight' => q#Норфолк утравы җәйге вакыты#,
+				'generic' => q#Норфолк утравы вакыты#,
+				'standard' => q#Норфолк утравы стандарт вакыты#,
+			},
+		},
+		'Noronha' => {
+			long => {
+				'daylight' => q#Фернанду-ди-Норонья җәйге вакыты#,
+				'generic' => q#Фернанду-ди-Норонья вакыты#,
+				'standard' => q#Фернанду-ди-Норонья стандарт вакыты#,
+			},
+		},
+		'Novosibirsk' => {
+			long => {
+				'daylight' => q#Новосибирск җәйге вакыты#,
+				'generic' => q#Новосибирск вакыты#,
+				'standard' => q#Новосибирск стандарт вакыты#,
+			},
+		},
+		'Omsk' => {
+			long => {
+				'daylight' => q#Омск җәйге вакыты#,
+				'generic' => q#Омск вакыты#,
+				'standard' => q#Омск стандарт вакыты#,
+			},
+		},
+		'Pacific/Apia' => {
+			exemplarCity => q#Апиа#,
+		},
+		'Pacific/Auckland' => {
+			exemplarCity => q#Окленд#,
+		},
+		'Pacific/Bougainville' => {
+			exemplarCity => q#Бугенвиль#,
+		},
+		'Pacific/Chatham' => {
+			exemplarCity => q#Чатем#,
+		},
+		'Pacific/Easter' => {
+			exemplarCity => q#Пасха утравы#,
+		},
+		'Pacific/Efate' => {
+			exemplarCity => q#Эфате#,
+		},
+		'Pacific/Fakaofo' => {
+			exemplarCity => q#Факаофо#,
+		},
+		'Pacific/Fiji' => {
+			exemplarCity => q#Фиджи#,
+		},
+		'Pacific/Funafuti' => {
+			exemplarCity => q#Фунафути#,
+		},
+		'Pacific/Galapagos' => {
+			exemplarCity => q#Галапагос утраулары#,
+		},
+		'Pacific/Gambier' => {
+			exemplarCity => q#Гамбье#,
+		},
+		'Pacific/Guadalcanal' => {
+			exemplarCity => q#Гуадалканал#,
+		},
+		'Pacific/Guam' => {
+			exemplarCity => q#Гуам#,
+		},
+		'Pacific/Kanton' => {
+			exemplarCity => q#Кантон#,
+		},
+		'Pacific/Kiritimati' => {
+			exemplarCity => q#Киритимати#,
+		},
+		'Pacific/Kosrae' => {
+			exemplarCity => q#Косраэ#,
+		},
+		'Pacific/Kwajalein' => {
+			exemplarCity => q#Кваджалейн#,
+		},
+		'Pacific/Majuro' => {
+			exemplarCity => q#Маджуро#,
+		},
+		'Pacific/Marquesas' => {
+			exemplarCity => q#Маркиз утраулары#,
+		},
+		'Pacific/Midway' => {
+			exemplarCity => q#Мидуэй#,
+		},
+		'Pacific/Nauru' => {
+			exemplarCity => q#Науру#,
+		},
+		'Pacific/Niue' => {
+			exemplarCity => q#Ниуэ#,
+		},
+		'Pacific/Norfolk' => {
+			exemplarCity => q#Норфолк#,
+		},
+		'Pacific/Noumea' => {
+			exemplarCity => q#Нумеа#,
+		},
+		'Pacific/Pago_Pago' => {
+			exemplarCity => q#Паго Паго#,
+		},
+		'Pacific/Palau' => {
+			exemplarCity => q#Палау#,
+		},
+		'Pacific/Pitcairn' => {
+			exemplarCity => q#Питкэрн#,
+		},
+		'Pacific/Ponape' => {
+			exemplarCity => q#Понпеи#,
+		},
+		'Pacific/Port_Moresby' => {
+			exemplarCity => q#Порт-Морсби#,
+		},
+		'Pacific/Rarotonga' => {
+			exemplarCity => q#Раротонга#,
+		},
+		'Pacific/Saipan' => {
+			exemplarCity => q#Сайпан#,
+		},
+		'Pacific/Tahiti' => {
+			exemplarCity => q#Таити#,
+		},
+		'Pacific/Tarawa' => {
+			exemplarCity => q#Тарава#,
+		},
+		'Pacific/Tongatapu' => {
+			exemplarCity => q#Тонгатапу#,
+		},
+		'Pacific/Truk' => {
+			exemplarCity => q#Чуук#,
+		},
+		'Pacific/Wake' => {
+			exemplarCity => q#Вейк#,
+		},
+		'Pacific/Wallis' => {
+			exemplarCity => q#Уоллис#,
+		},
+		'Pakistan' => {
+			long => {
+				'daylight' => q#Пакистан җәйге вакыты#,
+				'generic' => q#Пакистан вакыты#,
+				'standard' => q#Пакистан стандарт вакыты#,
+			},
+		},
+		'Palau' => {
+			long => {
+				'standard' => q#Палау вакыты#,
+			},
+		},
+		'Papua_New_Guinea' => {
+			long => {
+				'standard' => q#Папуа Яңа Гвинея вакыты#,
+			},
+		},
+		'Paraguay' => {
+			long => {
+				'daylight' => q#Парагвай җәйге вакыты#,
+				'generic' => q#Парагвай вакыты#,
+				'standard' => q#Парагвай стандарт вакыты#,
+			},
+		},
+		'Peru' => {
+			long => {
+				'daylight' => q#Перу җәйге вакыты#,
+				'generic' => q#Перу вакыты#,
+				'standard' => q#Перу стандарт вакыты#,
+			},
+		},
+		'Philippines' => {
+			long => {
+				'daylight' => q#Филиппин җәйге вакыты#,
+				'generic' => q#Филиппин вакыты#,
+				'standard' => q#Филиппин стандарт вакыты#,
+			},
+		},
+		'Phoenix_Islands' => {
+			long => {
+				'standard' => q#Феникс утраулары вакыты#,
+			},
+		},
+		'Pierre_Miquelon' => {
+			long => {
+				'daylight' => q#Сен-Пьер һәм Микелон җәйге вакыты#,
+				'generic' => q#Сен-Пьер һәм Микелон вакыты#,
+				'standard' => q#Сен-Пьер һәм Микелон стандарт вакыты#,
+			},
+		},
+		'Pitcairn' => {
+			long => {
+				'standard' => q#Питкэрн вакыты#,
+			},
+		},
+		'Ponape' => {
+			long => {
+				'standard' => q#Понапе вакыты#,
+			},
+		},
+		'Pyongyang' => {
+			long => {
+				'standard' => q#Пхеньян вакыты#,
+			},
+		},
+		'Reunion' => {
+			long => {
+				'standard' => q#Реюньон вакыты#,
+			},
+		},
+		'Rothera' => {
+			long => {
+				'standard' => q#Ротера вакыты#,
+			},
+		},
+		'Sakhalin' => {
+			long => {
+				'daylight' => q#Сахалин җәйге вакыты#,
+				'generic' => q#Сахалин вакыты#,
+				'standard' => q#Сахалин стандарт вакыты#,
 			},
 		},
 		'Samara' => {
 			long => {
+				'daylight' => q#Самара җәйге вакыты#,
 				'generic' => q#Самара вакыты#,
+				'standard' => q#Самара стандарт вакыты#,
+			},
+		},
+		'Samoa' => {
+			long => {
+				'daylight' => q#Самоа җәйге вакыты#,
+				'generic' => q#Самоа вакыты#,
+				'standard' => q#Самоа стандарт вакыты#,
+			},
+		},
+		'Seychelles' => {
+			long => {
+				'standard' => q#Сейшел утраулары вакыты#,
+			},
+		},
+		'Singapore' => {
+			long => {
+				'standard' => q#Сингапур стандарт вакыты#,
+			},
+		},
+		'Solomon' => {
+			long => {
+				'standard' => q#Соломон утраулары вакыты#,
+			},
+		},
+		'South_Georgia' => {
+			long => {
+				'standard' => q#Көньяк Джорджия вакыты#,
+			},
+		},
+		'Suriname' => {
+			long => {
+				'standard' => q#Суринам вакыты#,
+			},
+		},
+		'Syowa' => {
+			long => {
+				'standard' => q#Сёва вакыты#,
+			},
+		},
+		'Tahiti' => {
+			long => {
+				'standard' => q#Таити вакыты#,
+			},
+		},
+		'Taipei' => {
+			long => {
+				'daylight' => q#Тайпей җәйге вакыты#,
+				'generic' => q#Тайпей вакыты#,
+				'standard' => q#Тайпей стандарт вакыты#,
+			},
+		},
+		'Tajikistan' => {
+			long => {
+				'standard' => q#Таҗикстан вакыты#,
+			},
+		},
+		'Tokelau' => {
+			long => {
+				'standard' => q#Токелау вакыты#,
+			},
+		},
+		'Tonga' => {
+			long => {
+				'daylight' => q#Тонга җәйге вакыты#,
+				'generic' => q#Тонга вакыты#,
+				'standard' => q#Тонга стандарт вакыты#,
+			},
+		},
+		'Truk' => {
+			long => {
+				'standard' => q#Чуук вакыты#,
+			},
+		},
+		'Turkmenistan' => {
+			long => {
+				'daylight' => q#Төркмәнстан җәйге вакыты#,
+				'generic' => q#Төркмәнстан вакыты#,
+				'standard' => q#Төркмәнстан стандарт вакыты#,
+			},
+		},
+		'Tuvalu' => {
+			long => {
+				'standard' => q#Тувалу вакыты#,
+			},
+		},
+		'Uruguay' => {
+			long => {
+				'daylight' => q#Уругвай җәйге вакыты#,
+				'generic' => q#Уругвай вакыты#,
+				'standard' => q#Уругвай стандарт вакыты#,
+			},
+		},
+		'Uzbekistan' => {
+			long => {
+				'daylight' => q#Үзбәкстан җәйге вакыты#,
+				'generic' => q#Үзбәкстан вакыты#,
+				'standard' => q#Үзбәкстан стандарт вакыты#,
+			},
+		},
+		'Vanuatu' => {
+			long => {
+				'daylight' => q#Вануату җәйге вакыты#,
+				'generic' => q#Вануату вакыты#,
+				'standard' => q#Вануату стандарт вакыты#,
+			},
+		},
+		'Venezuela' => {
+			long => {
+				'standard' => q#Венесуэла вакыты#,
+			},
+		},
+		'Vladivostok' => {
+			long => {
+				'daylight' => q#Владивосток җәйге вакыты#,
+				'generic' => q#Владивосток вакыты#,
+				'standard' => q#Владивосток стандарт вакыты#,
+			},
+		},
+		'Volgograd' => {
+			long => {
+				'daylight' => q#Волгоград җәйге вакыты#,
+				'generic' => q#Волгоград вакыты#,
+				'standard' => q#Волгоград стандарт вакыты#,
+			},
+		},
+		'Vostok' => {
+			long => {
+				'standard' => q#Восток вакыты#,
+			},
+		},
+		'Wake' => {
+			long => {
+				'standard' => q#Уэйк утравы вакыты#,
+			},
+		},
+		'Wallis' => {
+			long => {
+				'standard' => q#Уоллис һәм Футуна вакыты#,
+			},
+		},
+		'Yakutsk' => {
+			long => {
+				'daylight' => q#Якутск җәйге вакыты#,
+				'generic' => q#Якутск вакыты#,
+				'standard' => q#Якутск стандарт вакыты#,
+			},
+		},
+		'Yekaterinburg' => {
+			long => {
+				'daylight' => q#Екатеринбург җәйге вакыты#,
+				'generic' => q#Екатеринбург вакыты#,
+				'standard' => q#Екатеринбург стандарт вакыты#,
+			},
+		},
+		'Yukon' => {
+			long => {
+				'standard' => q#Юкон вакыты#,
 			},
 		},
 	 } }

@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Et - Package for language Estonian
 
 package Locale::CLDR::Locales::Et;
 # This file auto generated from Data\common\main\et.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -431,7 +431,6 @@ has 'display_name_language' => (
  				'fur' => 'friuuli',
  				'fy' => 'läänefriisi',
  				'ga' => 'iiri',
- 				'gaa' => 'gaa',
  				'gag' => 'gagauusi',
  				'gan' => 'kani',
  				'gay' => 'gajo',
@@ -568,6 +567,7 @@ has 'display_name_language' => (
  				'lil' => 'lillueti',
  				'liv' => 'liivi',
  				'lkt' => 'lakota',
+ 				'lld' => 'ladiini',
  				'lmo' => 'lombardi',
  				'ln' => 'lingala',
  				'lo' => 'lao',
@@ -582,7 +582,6 @@ has 'display_name_language' => (
  				'lua' => 'lulua',
  				'lui' => 'luisenjo',
  				'lun' => 'lunda',
- 				'luo' => 'luo',
  				'lus' => 'lušei',
  				'luy' => 'luhja',
  				'lv' => 'läti',
@@ -606,6 +605,7 @@ has 'display_name_language' => (
  				'mgh' => 'makhuwa-meetto',
  				'mgo' => 'meta',
  				'mh' => 'maršalli',
+ 				'mhn' => 'mohheni',
  				'mi' => 'maoori',
  				'mic' => 'mikmaki',
  				'min' => 'minangkabau',
@@ -842,7 +842,6 @@ has 'display_name_language' => (
  				'und' => 'määramata keel',
  				'ur' => 'urdu',
  				'uz' => 'usbeki',
- 				'vai' => 'vai',
  				've' => 'venda',
  				'vec' => 'veneti',
  				'vep' => 'vepsa',
@@ -865,6 +864,7 @@ has 'display_name_language' => (
  				'xal' => 'kalmõki',
  				'xh' => 'koosa',
  				'xmf' => 'megreli',
+ 				'xnr' => 'kangri',
  				'xog' => 'soga',
  				'yao' => 'jao',
  				'yap' => 'japi',
@@ -951,6 +951,7 @@ has 'display_name_script' => (
  			'Elba' => 'Elbasani',
  			'Elym' => 'elümi',
  			'Ethi' => 'etioopia',
+ 			'Gara' => 'garai',
  			'Geok' => 'hutsuri',
  			'Geor' => 'gruusia',
  			'Glag' => 'glagoolitsa',
@@ -1064,6 +1065,7 @@ has 'display_name_script' => (
  			'Sora' => 'sora',
  			'Soyo' => 'sojombo',
  			'Sund' => 'sunda',
+ 			'Sunu' => 'sunvari',
  			'Sylo' => 'siloti',
  			'Syrc' => 'süüria',
  			'Syre' => 'süüria estrangelo',
@@ -1572,7 +1574,6 @@ has 'display_name_type' => (
  				'phonebook' => q{telefoniraamatu sortimisjärjestus},
  				'phonetic' => q{foneetiline sortimisjärjestus},
  				'pinyin' => q{pinyin’i sortimisjärjestus},
- 				'reformed' => q{reformitud sortimisjärjestus},
  				'search' => q{üldeesmärgiline otsing},
  				'searchjl' => q{otsing korea alguskonsonandi järgi},
  				'standard' => q{standardne järjestus},
@@ -2348,6 +2349,18 @@ has 'units' => (
 						'other' => q({0} promüriaadi),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(miljardikosa),
+						'one' => q({0} miljardikosa),
+						'other' => q({0} miljardikosa),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(miljardikosa),
+						'one' => q({0} miljardikosa),
+						'other' => q({0} miljardikosa),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(liitrid 100 kilomeetri kohta),
 						'one' => q({0} liiter 100 kilomeetri kohta),
@@ -2646,6 +2659,20 @@ has 'units' => (
 						'name' => q(nanosekundid),
 						'one' => q({0} nanosekund),
 						'other' => q({0} nanosekundit),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(ööd),
+						'one' => q({0} öö),
+						'other' => q({0} ööd),
+						'per' => q({0} öö kohta),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(ööd),
+						'one' => q({0} öö),
+						'other' => q({0} ööd),
+						'per' => q({0} öö kohta),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -4296,6 +4323,20 @@ has 'units' => (
 						'other' => q({0} k),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(ööd),
+						'one' => q({0} öö),
+						'other' => q({0} ööd),
+						'per' => q({0}/öö),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(ööd),
+						'one' => q({0} öö),
+						'other' => q({0} ööd),
+						'per' => q({0}/öö),
+					},
+					# Long Unit Identifier
 					'duration-second' => {
 						'name' => q(s),
 						'one' => q({0} s),
@@ -4678,6 +4719,18 @@ has 'units' => (
 						'name' => q(promüriaad),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(osakesed/miljard),
+						'one' => q({0} miljardikosa),
+						'other' => q({0} miljardikosa),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(osakesed/miljard),
+						'one' => q({0} miljardikosa),
+						'other' => q({0} miljardikosa),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(l/100 km),
 						'one' => q({0} l/100 km),
@@ -4828,6 +4881,20 @@ has 'units' => (
 						'one' => q({0} kuu),
 						'other' => q({0} kuud),
 						'per' => q({0}/k),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(ööd),
+						'one' => q({0} öö),
+						'other' => q({0} ööd),
+						'per' => q({0}/öö),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(ööd),
+						'one' => q({0} öö),
+						'other' => q({0} ööd),
+						'per' => q({0}/öö),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -5967,6 +6034,8 @@ has 'currencies' => (
 		'BGL' => {
 			display_name => {
 				'currency' => q(Bulgaaria püsiv leev),
+				'one' => q(Bulgaaria kõva leev),
+				'other' => q(Bulgaaria kõva leevi),
 			},
 		},
 		'BGN' => {
@@ -6192,6 +6261,13 @@ has 'currencies' => (
 				'currency' => q(Serbia dinaar \(2002–2006\)),
 				'one' => q(Serbia dinaar \(2002–2006\)),
 				'other' => q(Serbia dinaari \(2002–2006\)),
+			},
+		},
+		'CSK' => {
+			display_name => {
+				'currency' => q(Tšehhoslovakkia kõva kroon),
+				'one' => q(Tšehhoslovakkia kõva kroon),
+				'other' => q(Tšehhoslovakkia kõva krooni),
 			},
 		},
 		'CUC' => {
@@ -7353,6 +7429,8 @@ has 'currencies' => (
 		'UAK' => {
 			display_name => {
 				'currency' => q(Ukraina karbovanets),
+				'one' => q(Ukraina karbovanetsi),
+				'other' => q(Ukraina karbovanetsi),
 			},
 		},
 		'UGS' => {
@@ -7583,6 +7661,13 @@ has 'currencies' => (
 				'other' => q(Jeemeni riaali),
 			},
 		},
+		'YUD' => {
+			display_name => {
+				'currency' => q(Jugoslaavia kõva dinaar \(1966–1990\)),
+				'one' => q(Jugoslaavia kõva dinaar \(1966–1990\)),
+				'other' => q(Jugoslaavia kõva dinaar \(1966–1990\)),
+			},
+		},
 		'YUM' => {
 			display_name => {
 				'currency' => q(Jugoslaavia uus dinaar \(1994–2002\)),
@@ -7595,6 +7680,13 @@ has 'currencies' => (
 				'currency' => q(Jugoslaavia konverteeritav dinaar \(1990–1992\)),
 				'one' => q(Jugoslaavia konverteeritav dinaar \(1990–1992\)),
 				'other' => q(Jugoslaavia konverteeritavat dinaari \(1990–1992\)),
+			},
+		},
+		'YUR' => {
+			display_name => {
+				'currency' => q(Jugoslaavia reformitud dinaar \(1992–1993\)),
+				'one' => q(Jugoslaavia reformitud dinaar \(1992–1993\)),
+				'other' => q(Jugoslaavia reformitud dinaari \(1992–1993\)),
 			},
 		},
 		'ZAR' => {
@@ -8433,14 +8525,20 @@ has 'time_zone_names' => (
 		'Africa/Cairo' => {
 			exemplarCity => q#Kairo#,
 		},
+		'Africa/El_Aaiun' => {
+			exemplarCity => q#El Aaiún#,
+		},
 		'Africa/Khartoum' => {
 			exemplarCity => q#Hartum#,
 		},
+		'Africa/Lome' => {
+			exemplarCity => q#Lomé#,
+		},
+		'Africa/Mogadishu' => {
+			exemplarCity => q#Muqdisho#,
+		},
 		'Africa/Ndjamena' => {
 			exemplarCity => q#N’Djamena#,
-		},
-		'Africa/Sao_Tome' => {
-			exemplarCity => q#São Tomé#,
 		},
 		'Africa_Central' => {
 			long => {
@@ -8494,9 +8592,6 @@ has 'time_zone_names' => (
 		'America/Argentina/Tucuman' => {
 			exemplarCity => q#Tucumán#,
 		},
-		'America/Asuncion' => {
-			exemplarCity => q#Asunción#,
-		},
 		'America/Bahia_Banderas' => {
 			exemplarCity => q#Bahia Banderas#,
 		},
@@ -8511,9 +8606,6 @@ has 'time_zone_names' => (
 		},
 		'America/Cuiaba' => {
 			exemplarCity => q#Cuiabá#,
-		},
-		'America/Curacao' => {
-			exemplarCity => q#Curaçao#,
 		},
 		'America/Eirunepe' => {
 			exemplarCity => q#Eirunepé#,
@@ -8538,9 +8630,6 @@ has 'time_zone_names' => (
 		},
 		'America/North_Dakota/New_Salem' => {
 			exemplarCity => q#New Salem, Põhja-Dakota#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#Santa Isabel#,
 		},
 		'America/Santarem' => {
 			exemplarCity => q#Santarém#,
@@ -8683,9 +8772,6 @@ has 'time_zone_names' => (
 		'Asia/Chita' => {
 			exemplarCity => q#Tšita#,
 		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#Tšojbalsan#,
-		},
 		'Asia/Damascus' => {
 			exemplarCity => q#Damaskus#,
 		},
@@ -8733,6 +8819,9 @@ has 'time_zone_names' => (
 		},
 		'Asia/Riyadh' => {
 			exemplarCity => q#Ar-Riyāḑ#,
+		},
+		'Asia/Saigon' => {
+			exemplarCity => q#Hô Chi Minh#,
 		},
 		'Asia/Sakhalin' => {
 			exemplarCity => q#Sahhalin#,
@@ -8797,9 +8886,6 @@ has 'time_zone_names' => (
 		},
 		'Atlantic/St_Helena' => {
 			exemplarCity => q#Saint Helena#,
-		},
-		'Australia/Currie' => {
-			exemplarCity => q#Currie#,
 		},
 		'Australia_Central' => {
 			long => {
@@ -8910,13 +8996,6 @@ has 'time_zone_names' => (
 				'standard' => q#Hiina standardaeg#,
 			},
 		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Tšojbalsani suveaeg#,
-				'generic' => q#Tšojbalsani aeg#,
-				'standard' => q#Tšojbalsani standardaeg#,
-			},
-		},
 		'Christmas' => {
 			long => {
 				'standard' => q#Jõulusaare aeg#,
@@ -8955,7 +9034,7 @@ has 'time_zone_names' => (
 		},
 		'DumontDUrville' => {
 			long => {
-				'standard' => q#Dumont-d’Urville’i aeg#,
+				'standard' => q#Dumont d’Urville’i aeg#,
 			},
 		},
 		'East_Timor' => {
@@ -9059,9 +9138,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#Uljanovsk#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#Užgorod#,
-		},
 		'Europe/Vatican' => {
 			exemplarCity => q#Vatikan#,
 		},
@@ -9070,9 +9146,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Warsaw' => {
 			exemplarCity => q#Varssavi#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#Zaporožje#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#Zürich#,
@@ -9154,6 +9227,13 @@ has 'time_zone_names' => (
 				'standard' => q#Gilberti saarte aeg#,
 			},
 		},
+		'Greenland' => {
+			long => {
+				'daylight' => q#Gröönimaa suveaeg#,
+				'generic' => q#Gröönimaa aeg#,
+				'standard' => q#Gröönimaa standardaeg#,
+			},
+		},
 		'Greenland_Eastern' => {
 			long => {
 				'daylight' => q#Ida-Gröönimaa suveaeg#,
@@ -9215,11 +9295,11 @@ has 'time_zone_names' => (
 		'Indian/Cocos' => {
 			exemplarCity => q#Kookossaared#,
 		},
+		'Indian/Mahe' => {
+			exemplarCity => q#Mahé#,
+		},
 		'Indian/Maldives' => {
 			exemplarCity => q#Maldiivid#,
-		},
-		'Indian/Reunion' => {
-			exemplarCity => q#Réunion#,
 		},
 		'Indian_Ocean' => {
 			long => {
@@ -9281,6 +9361,11 @@ has 'time_zone_names' => (
 				'standard' => q#Kamtšatka standardaeg#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Kasahstani aeg#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#Ida-Kasahstani aeg#,
@@ -9339,11 +9424,6 @@ has 'time_zone_names' => (
 				'standard' => q#Macau standardaeg#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Macquarie saare aeg#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Magadani suveaeg#,
@@ -9381,13 +9461,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Mawsoni aeg#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Loode-Mehhiko suveaeg#,
-				'generic' => q#Loode-Mehhiko aeg#,
-				'standard' => q#Loode-Mehhiko standardaeg#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -9500,8 +9573,14 @@ has 'time_zone_names' => (
 		'Pacific/Honolulu' => {
 			exemplarCity => q#Honolulu#,
 		},
+		'Pacific/Kanton' => {
+			exemplarCity => q#Abariringa#,
+		},
 		'Pacific/Marquesas' => {
 			exemplarCity => q#Markiisaared#,
+		},
+		'Pacific/Noumea' => {
+			exemplarCity => q#Nouméa#,
 		},
 		'Pacific/Palau' => {
 			exemplarCity => q#Belau#,

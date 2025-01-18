@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.40'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 keywords:
   - locale
   - CLDR
@@ -22,39 +22,39 @@ name: Locale-CLDR-Locales-Ha
 provides:
   Locale::CLDR::Locales::Ha:
     file: lib/Locale/CLDR/Locales/Ha.pm
-    version: v0.44.1
+    version: v0.46.0
   Locale::CLDR::Locales::Ha::Arab:
     file: lib/Locale/CLDR/Locales/Ha/Arab.pm
-    version: v0.44.1
+    version: v0.46.0
   Locale::CLDR::Locales::Ha::Arab::Ng:
     file: lib/Locale/CLDR/Locales/Ha/Arab/Ng.pm
-    version: v0.44.1
+    version: v0.46.0
   Locale::CLDR::Locales::Ha::Arab::Sd:
     file: lib/Locale/CLDR/Locales/Ha/Arab/Sd.pm
-    version: v0.44.1
+    version: v0.46.0
   Locale::CLDR::Locales::Ha::Latn:
     file: lib/Locale/CLDR/Locales/Ha/Latn.pm
-    version: v0.44.1
+    version: v0.46.0
   Locale::CLDR::Locales::Ha::Latn::Gh:
     file: lib/Locale/CLDR/Locales/Ha/Latn/Gh.pm
-    version: v0.44.1
+    version: v0.46.0
   Locale::CLDR::Locales::Ha::Latn::Ne:
     file: lib/Locale/CLDR/Locales/Ha/Latn/Ne.pm
-    version: v0.44.1
+    version: v0.46.0
   Locale::CLDR::Locales::Ha::Latn::Ng:
     file: lib/Locale/CLDR/Locales/Ha/Latn/Ng.pm
-    version: v0.44.1
+    version: v0.46.0
 requires:
   DateTime: '0.72'
-  Locale::CLDR: v0.44.1
+  Locale::CLDR: v0.46.0
   Moo: '2'
   MooX::ClassAttribute: '0.011'
   Type::Tiny: '0'
-  perl: v5.10.1
+  perl: v5.12.0
   version: '0.95'
 resources:
   bugtracker: https://github.com/ThePilgrim/perlcldr/issues
   homepage: https://github.com/ThePilgrim/perlcldr
   repository: https://github.com/ThePilgrim/perlcldr.git
-version: v0.44.1
+version: v0.46.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

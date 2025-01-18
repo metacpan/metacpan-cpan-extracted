@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Ast - Package for language Asturian
 
 package Locale::CLDR::Locales::Ast;
 # This file auto generated from Data\common\main\ast.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -227,7 +227,6 @@ has 'display_name_language' => (
  				'gmh' => 'altualemán mediu',
  				'gn' => 'guaraní',
  				'goh' => 'altualemán antiguu',
- 				'gom' => 'goan konkani',
  				'gon' => 'gondi',
  				'gor' => 'gorontalo',
  				'got' => 'góticu',
@@ -1288,7 +1287,6 @@ has 'display_name_type' => (
  				'gb2312han' => q{orde de clasificación chinu simplificáu - GB2312},
  				'phonebook' => q{orde de clasificación de llista telefónica},
  				'pinyin' => q{orde de clasificación pinyin},
- 				'reformed' => q{orde de clasificación reformáu},
  				'search' => q{gueta xeneral},
  				'searchjl' => q{gueta por consonante Hangul d’aniciu},
  				'standard' => q{orde de clasificación estándar},
@@ -9254,9 +9252,6 @@ has 'time_zone_names' => (
 		'America/Puerto_Rico' => {
 			exemplarCity => q#Puertu Ricu#,
 		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#Santa Isabel#,
-		},
 		'America/Santo_Domingo' => {
 			exemplarCity => q#Santu Domingu#,
 		},
@@ -9493,9 +9488,6 @@ has 'time_zone_names' => (
 		'Australia/Adelaide' => {
 			exemplarCity => q#Adelaida#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#Currie#,
-		},
 		'Australia_Central' => {
 			long => {
 				'daylight' => q#Hora braniega d’Australia central#,
@@ -9603,13 +9595,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Hora braniega de China#,
 				'generic' => q#Hora de China#,
 				'standard' => q#Hora estándar de China#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Hora braniega de Choibalsan#,
-				'generic' => q#Hora de Choibalsan#,
-				'standard' => q#Hora estándar de Choibalsan#,
 			},
 		},
 		'Christmas' => {
@@ -10053,11 +10038,6 @@ has 'time_zone_names' => (
 				'standard' => q#Hora estándar de Macáu#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Hora de la Islla Macquarie#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Hora braniega de Magadán#,
@@ -10095,13 +10075,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Hora de Mawson#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Hora braniega del noroeste de Méxicu#,
-				'generic' => q#Hora del noroeste de Méxicu#,
-				'standard' => q#Hora estándar del noroeste de Méxicu#,
 			},
 		},
 		'Mexico_Pacific' => {

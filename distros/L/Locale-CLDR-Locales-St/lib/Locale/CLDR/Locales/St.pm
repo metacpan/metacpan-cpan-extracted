@@ -8,18 +8,18 @@ Locale::CLDR::Locales::St - Package for language Southern Sotho
 
 package Locale::CLDR::Locales::St;
 # This file auto generated from Data\common\main\st.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -133,6 +133,51 @@ has 'display_name_language' => (
 	},
 );
 
+has 'display_name_script' => (
+	is			=> 'ro',
+	isa			=> CodeRef,
+	init_arg	=> undef,
+	default		=> sub {
+		sub {
+			my %scripts = (
+			'Latn' => 'Selatine',
+
+			);
+			if ( @_ ) {
+				return $scripts{$_[0]};
+			}
+			return \%scripts;
+		}
+	}
+);
+
+has 'display_name_region' => (
+	is			=> 'ro',
+	isa			=> HashRef[Str],
+	init_arg	=> undef,
+	default		=> sub {
+		{
+			'LS' => 'Lesotho',
+ 			'ZA' => 'Afrika Borwa',
+
+		}
+	},
+);
+
+has 'display_name_code_patterns' => (
+	is			=> 'ro',
+	isa			=> HashRef[Str],
+	init_arg	=> undef,
+	default		=> sub {
+		{
+			'language' => 'Puo: {0}',
+ 			'script' => 'Skripte: {0}',
+ 			'region' => 'Tikoloho: {0}',
+
+		}
+	},
+);
+
 has 'characters' => (
 	is			=> 'ro',
 	isa			=> HashRef,
@@ -145,6 +190,7 @@ has 'characters' => (
 			auxiliary => qr{[c v x z]},
 			index => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
 			main => qr{[a b d e f g h i j k l m n o p q r s t u w y]},
+			punctuation => qr{[\- ‐‑ – — , ; \: ! ? . … '‘’ "“” ( ) \[ \] § @ * / \& # † ‡ ′ ″]},
 		};
 	},
 EOT
@@ -153,13 +199,6 @@ EOT
 },
 );
 
-
-has 'quote_start' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{‘},
-);
 
 has 'quote_end' => (
 	is			=> 'ro',
@@ -180,18 +219,6 @@ has 'alternate_quote_end' => (
 	isa			=> Str,
 	init_arg	=> undef,
 	default		=> qq{”},
-);
-
-has 'number_symbols' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		'latn' => {
-			'decimal' => q(,),
-			'group' => q( ),
-		},
-	} }
 );
 
 has 'number_currency_formats' => (
@@ -251,17 +278,17 @@ has 'calendar_months' => (
 					},
 					wide => {
 						nonleap => [
-							'Phesekgong',
+							'Pherekgong',
 							'Hlakola',
 							'Hlakubele',
-							'Mmese',
+							'Mmesa',
 							'Motsheanong',
 							'Phupjane',
 							'Phupu',
-							'Phata',
-							'Leotshe',
+							'Phato',
+							'Lwetse',
 							'Mphalane',
-							'Pundungwane',
+							'Pudungwana',
 							'Tshitwe'
 						],
 						leap => [
@@ -290,16 +317,32 @@ has 'calendar_days' => (
 						sun => 'Son'
 					},
 					wide => {
-						mon => 'Mmantaha',
+						mon => 'Mantaha',
 						tue => 'Labobedi',
-						wed => 'Laboraru',
+						wed => 'Laboraro',
 						thu => 'Labone',
-						fri => 'Labohlane',
+						fri => 'Labohlano',
 						sat => 'Moqebelo',
 						sun => 'Sontaha'
 					},
 				},
 			},
+	} },
+);
+
+has 'day_periods' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+		'gregorian' => {
+			'format' => {
+				'wide' => {
+					'am' => q{Hoseng},
+					'pm' => q{Thapama},
+				},
+			},
+		},
 	} },
 );
 
@@ -441,6 +484,21 @@ has 'datetime_formats_interval' => (
 	} },
 );
 
+has 'time_zone_names' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default	=> sub { {
+		regionFormat => q({0} Nako),
+		regionFormat => q({0} Nako ya Motshehare),
+		regionFormat => q({0} Nako ya Tlwaelo),
+		'GMT' => {
+			long => {
+				'standard' => q#Greenwich Mean Time#,
+			},
+		},
+	 } }
+);
 no Moo;
 
 1;

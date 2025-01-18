@@ -4,11 +4,15 @@ lib/Locale/CLDR/Locales/Zh/Hans.pm
 lib/Locale/CLDR/Locales/Zh/Hans/Cn.pm
 lib/Locale/CLDR/Locales/Zh/Hans/Hk.pm
 lib/Locale/CLDR/Locales/Zh/Hans/Mo.pm
+lib/Locale/CLDR/Locales/Zh/Hans/My.pm
 lib/Locale/CLDR/Locales/Zh/Hans/Sg.pm
 lib/Locale/CLDR/Locales/Zh/Hant.pm
 lib/Locale/CLDR/Locales/Zh/Hant/Hk.pm
 lib/Locale/CLDR/Locales/Zh/Hant/Mo.pm
+lib/Locale/CLDR/Locales/Zh/Hant/My.pm
 lib/Locale/CLDR/Locales/Zh/Hant/Tw.pm
+lib/Locale/CLDR/Locales/Zh/Latn.pm
+lib/Locale/CLDR/Locales/Zh/Latn/Cn.pm
 MANIFEST			This list of files
 README
 t/00-load.t

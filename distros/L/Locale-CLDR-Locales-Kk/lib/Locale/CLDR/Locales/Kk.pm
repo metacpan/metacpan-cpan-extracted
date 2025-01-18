@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Kk - Package for language Kazakh
 
 package Locale::CLDR::Locales::Kk;
 # This file auto generated from Data\common\main\kk.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -580,6 +580,7 @@ has 'display_name_language' => (
  				'an' => 'арагон тілі',
  				'ann' => 'оболо тілі',
  				'anp' => 'ангика тілі',
+ 				'apc' => 'араб тілі (леватин)',
  				'ar' => 'араб тілі',
  				'ar_001' => 'қазіргі стандартты араб тілі',
  				'arn' => 'мапуче тілі',
@@ -594,10 +595,12 @@ has 'display_name_language' => (
  				'ay' => 'аймара тілі',
  				'az' => 'әзірбайжан тілі',
  				'ba' => 'башқұрт тілі',
+ 				'bal' => 'балучи тілі',
  				'ban' => 'бали тілі',
  				'bas' => 'баса тілі',
  				'be' => 'беларусь тілі',
  				'bem' => 'бемба тілі',
+ 				'bew' => 'бетауи тілі',
  				'bez' => 'бена тілі',
  				'bg' => 'болгар тілі',
  				'bgc' => 'хариани тілі',
@@ -606,16 +609,21 @@ has 'display_name_language' => (
  				'bi' => 'бислама тілі',
  				'bin' => 'бини тілі',
  				'bla' => 'сиксика тілі',
+ 				'blo' => 'ании тілі',
+ 				'blt' => 'тай дам тілі',
  				'bm' => 'бамбара тілі',
  				'bn' => 'бенгал тілі',
  				'bo' => 'тибет тілі',
  				'br' => 'бретон тілі',
  				'brx' => 'бодо тілі',
  				'bs' => 'босния тілі',
+ 				'bss' => 'акусе тілі',
  				'bug' => 'бугис тілі',
  				'byn' => 'блин тілі',
  				'ca' => 'каталан тілі',
+ 				'cad' => 'каддо тілі',
  				'cay' => 'кайюга тілі',
+ 				'cch' => 'атсам тілі',
  				'ccp' => 'чакма тілі',
  				'ce' => 'шешен тілі',
  				'ceb' => 'себуано тілі',
@@ -627,6 +635,7 @@ has 'display_name_language' => (
  				'chp' => 'чипевайан тілі',
  				'chr' => 'чероки тілі',
  				'chy' => 'шайен тілі',
+ 				'cic' => 'чикасау тілі',
  				'ckb' => 'сорани тілі',
  				'clc' => 'чилкотин тілі',
  				'co' => 'корсика тілі',
@@ -704,6 +713,7 @@ has 'display_name_language' => (
  				'hi_Latn@alt=variant' => 'хинглиш',
  				'hil' => 'хилигайнон тілі',
  				'hmn' => 'хмонг тілі',
+ 				'hnj' => 'хмоң ниуа тілі',
  				'hr' => 'хорват тілі',
  				'hsb' => 'жоғарғы лужица тілі',
  				'ht' => 'гаити тілі',
@@ -732,6 +742,7 @@ has 'display_name_language' => (
  				'jmc' => 'мачаме тілі',
  				'jv' => 'ява тілі',
  				'ka' => 'грузин тілі',
+ 				'kaa' => 'қарақалпақ тілі',
  				'kab' => 'кабил тілі',
  				'kac' => 'качин тілі',
  				'kaj' => 'каджи тілі',
@@ -740,6 +751,7 @@ has 'display_name_language' => (
  				'kcg' => 'тьяп тілі',
  				'kde' => 'маконде тілі',
  				'kea' => 'кабувердьяну тілі',
+ 				'ken' => 'кеняң тілі',
  				'kfo' => 'коро тілі',
  				'kgp' => 'кайнганг тілі',
  				'kha' => 'кхаси тілі',
@@ -770,6 +782,7 @@ has 'display_name_language' => (
  				'kv' => 'коми тілі',
  				'kw' => 'корн тілі',
  				'kwk' => 'квакиутль тілі',
+ 				'kxv' => 'куви тілі',
  				'ky' => 'қырғыз тілі',
  				'la' => 'латын тілі',
  				'lad' => 'ладино тілі',
@@ -781,7 +794,8 @@ has 'display_name_language' => (
  				'lij' => 'лигур тілі',
  				'lil' => 'лиллуэт тілі',
  				'lkt' => 'лакота тілі',
- 				'lmo' => 'Ломбард',
+ 				'lld' => 'ладин тілі',
+ 				'lmo' => 'ломбард тілі',
  				'ln' => 'лингала тілі',
  				'lo' => 'лаос тілі',
  				'lou' => 'креоль тілі (Луизиана)',
@@ -789,6 +803,7 @@ has 'display_name_language' => (
  				'lrc' => 'солтүстік люри тілі',
  				'lsm' => 'самия тілі',
  				'lt' => 'литва тілі',
+ 				'ltg' => 'латгалиан тілі',
  				'lu' => 'луба-катанга тілі',
  				'lua' => 'луба-лулуа тілі',
  				'lun' => 'лунда тілі',
@@ -809,6 +824,7 @@ has 'display_name_language' => (
  				'mgh' => 'макуа-меетто тілі',
  				'mgo' => 'мета тілі',
  				'mh' => 'маршалл тілі',
+ 				'mhn' => 'мокено тілі',
  				'mi' => 'маори тілі',
  				'mic' => 'микмак тілі',
  				'min' => 'минангкабау тілі',
@@ -885,6 +901,7 @@ has 'display_name_language' => (
  				'rap' => 'рапануй тілі',
  				'rar' => 'раротонган тілі',
  				'rhg' => 'рохинджа',
+ 				'rif' => 'риффиан тілі',
  				'rm' => 'романш тілі',
  				'rn' => 'рунди тілі',
  				'ro' => 'румын тілі',
@@ -914,7 +931,9 @@ has 'display_name_language' => (
  				'shi' => 'ташелхит тілі',
  				'shn' => 'шан тілі',
  				'si' => 'сингал тілі',
+ 				'sid' => 'сидамо тілі',
  				'sk' => 'словак тілі',
+ 				'skr' => 'сарайки тілі',
  				'sl' => 'словен тілі',
  				'slh' => 'оңтүстік лушуцид тілі',
  				'sm' => 'самоа тілі',
@@ -939,6 +958,7 @@ has 'display_name_language' => (
  				'sw_CD' => 'конго суахили тілі',
  				'swb' => 'комор тілі',
  				'syr' => 'сирия тілі',
+ 				'szl' => 'силез тілі',
  				'ta' => 'тамил тілі',
  				'tce' => 'оңтүстік тутчоне тілі',
  				'te' => 'телугу тілі',
@@ -960,6 +980,7 @@ has 'display_name_language' => (
  				'tpi' => 'ток-писин тілі',
  				'tr' => 'түрік тілі',
  				'trv' => 'тароко тілі',
+ 				'trw' => 'торуали тілі',
  				'ts' => 'тсонга тілі',
  				'tt' => 'татар тілі',
  				'ttm' => 'солтүстік тутчоне тілі',
@@ -981,6 +1002,7 @@ has 'display_name_language' => (
  				've' => 'венда тілі',
  				'vec' => 'венеция тілі',
  				'vi' => 'вьетнам тілі',
+ 				'vmw' => 'макуа тілі',
  				'vo' => 'волапюк тілі',
  				'vun' => 'вунджо тілі',
  				'wa' => 'валлон тілі',
@@ -992,6 +1014,7 @@ has 'display_name_language' => (
  				'wuu' => 'қытай тілі (У)',
  				'xal' => 'қалмақ тілі',
  				'xh' => 'кхоса тілі',
+ 				'xnr' => 'кангри тілі',
  				'xog' => 'сога тілі',
  				'yav' => 'янгбен тілі',
  				'ybb' => 'йемба тілі',
@@ -1000,6 +1023,7 @@ has 'display_name_language' => (
  				'yrl' => 'ньенгату тілі',
  				'yue' => 'кантон тілі',
  				'yue@alt=menu' => 'қытай тілі (кантон)',
+ 				'za' => 'чжуан тілі',
  				'zgh' => 'марокколық стандартты тамазигхт тілі',
  				'zh' => 'қытай тілі',
  				'zh@alt=menu' => 'қытай тілі (мандарин)',
@@ -2422,6 +2446,18 @@ has 'units' => (
 						'other' => q({0} промириад),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(миллиардтағы бөлік),
+						'one' => q({0} б/млрд),
+						'other' => q({0} б/млрд),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(миллиардтағы бөлік),
+						'one' => q({0} б/млрд),
+						'other' => q({0} б/млрд),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(литр/100 километр),
 						'one' => q({0} литр/100 километр),
@@ -2678,6 +2714,20 @@ has 'units' => (
 						'name' => q(наносекунд),
 						'one' => q({0} наносекунд),
 						'other' => q({0} наносекунд),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(түн),
+						'one' => q({0} түн),
+						'other' => q({0} түн),
+						'per' => q({0}/түн),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(түн),
+						'one' => q({0} түн),
+						'other' => q({0} түн),
+						'per' => q({0}/түн),
 					},
 					# Long Unit Identifier
 					'duration-second' => {
@@ -3556,6 +3606,18 @@ has 'units' => (
 						'name' => q(түйін),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(жарық),
+						'one' => q({0} жарық),
+						'other' => q({0} жарық),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(жарық),
+						'one' => q({0} жарық),
+						'other' => q({0} жарық),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'one' => q({0} метр/секунд),
 						'other' => q({0} метр/секунд),
@@ -4064,6 +4126,18 @@ has 'units' => (
 						'name' => q(‰),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(б/млрд),
+						'one' => q({0} б/млрд),
+						'other' => q({0} б/млрд),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(б/млрд),
+						'one' => q({0} б/млрд),
+						'other' => q({0} б/млрд),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-kilometer' => {
 						'name' => q(л/км),
 					},
@@ -4160,6 +4234,20 @@ has 'units' => (
 					# Core Unit Identifier
 					'hour' => {
 						'name' => q(сағ),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(түн),
+						'one' => q({0}түн),
+						'other' => q({0}түн),
+						'per' => q({0}/түн),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(түн),
+						'one' => q({0}түн),
+						'other' => q({0}түн),
+						'per' => q({0}/түн),
 					},
 					# Long Unit Identifier
 					'duration-week' => {
@@ -4272,6 +4360,18 @@ has 'units' => (
 					# Core Unit Identifier
 					'knot' => {
 						'name' => q(түйін),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(жарық),
+						'one' => q({0} жарық),
+						'other' => q({0} жарық),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(жарық),
+						'one' => q({0} жарық),
+						'other' => q({0} жарық),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -4882,6 +4982,18 @@ has 'units' => (
 						'name' => q(промириад),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(бөлік/миллиард),
+						'one' => q({0} б/млрд),
+						'other' => q({0} б/млрд),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(бөлік/миллиард),
+						'one' => q({0} б/млрд),
+						'other' => q({0} б/млрд),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(л/100 км),
 						'one' => q({0} л/100 км),
@@ -5190,6 +5302,20 @@ has 'units' => (
 						'name' => q(нс),
 						'one' => q({0} нс),
 						'other' => q({0} нс),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(түн),
+						'one' => q({0} түн),
+						'other' => q({0} түн),
+						'per' => q({0}/түн),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(түн),
+						'one' => q({0} түн),
+						'other' => q({0} түн),
+						'per' => q({0}/түн),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -6236,6 +6362,18 @@ has 'units' => (
 						'name' => q(тн),
 						'one' => q({0} түйін),
 						'other' => q({0} түйін),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(жарық),
+						'one' => q({0} жарық),
+						'other' => q({0} жарық),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(жарық),
+						'one' => q({0} жарық),
+						'other' => q({0} жарық),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -7743,6 +7881,88 @@ has 'calendar_months' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+			'chinese' => {
+				'format' => {
+					abbreviated => {
+						nonleap => [
+							'1-ай',
+							'2-ай',
+							'3-ай',
+							'4-ай',
+							'5-ай',
+							'6-ай',
+							'7-ай',
+							'8-ай',
+							'9-ай',
+							'10-ай',
+							'11-ай',
+							'12-ай'
+						],
+						leap => [
+							
+						],
+					},
+					wide => {
+						nonleap => [
+							'Бірінші ай',
+							'Екінші ай',
+							'Үшінші ай',
+							'Төртінші ай',
+							'Бесінші ай',
+							'Алтыншы ай',
+							'Жетінші ай',
+							'Сегізінші ай',
+							'Тоғызыншы ай',
+							'Оныншы ай',
+							'Он бірінші ай',
+							'Он екінші ай'
+						],
+						leap => [
+							
+						],
+					},
+				},
+				'stand-alone' => {
+					abbreviated => {
+						nonleap => [
+							'1-ай',
+							'2-ай',
+							'3-ай',
+							'4-ай',
+							'5-ай',
+							'6-ай',
+							'7-ай',
+							'8-ай',
+							'9-ай',
+							'10-ай',
+							'11-ай',
+							'12-ай'
+						],
+						leap => [
+							
+						],
+					},
+					wide => {
+						nonleap => [
+							'Бірінші ай',
+							'Екінші ай',
+							'Үшінші ай',
+							'Төртінші ай',
+							'Бесінші ай',
+							'Алтыншы ай',
+							'Жетінші ай',
+							'Сегізінші ай',
+							'Тоғызыншы ай',
+							'Оныншы ай',
+							'Он бірінші ай',
+							'Он екінші ай'
+						],
+						leap => [
+							
+						],
+					},
+				},
+			},
 			'coptic' => {
 				'format' => {
 					wide => {
@@ -7906,18 +8126,18 @@ has 'calendar_months' => (
 				'format' => {
 					abbreviated => {
 						nonleap => [
-							'Қаң.',
-							'Ақп.',
-							'Нау.',
-							'Сәу.',
-							'Мам.',
-							'Jum. II',
-							'шіл.',
-							'там.',
-							'Қыр.',
-							'Қаз.',
-							'Қар.',
-							'Жел.'
+							'Мұх.',
+							'Саф.',
+							'Раб. I',
+							'Раб. II',
+							'Жұм. I',
+							'Жұм. II',
+							'Ереж.',
+							'Шағ.',
+							'Рам.',
+							'Шәу.',
+							'Зұлқ.',
+							'Зұлх.'
 						],
 						leap => [
 							
@@ -7927,16 +8147,16 @@ has 'calendar_months' => (
 						nonleap => [
 							'Мұхаррам',
 							'Сафар',
-							'Рабиғ әл-әууәл',
-							'Рабиғ әс-сәни',
-							'Джумада әл-әууәл',
-							'Жумад ас-сәни',
-							'Раджаб',
+							'Рабиғул әууәл',
+							'Рабиғул ахир',
+							'Жұмадәл аууәл',
+							'Жұмадәл ахир',
+							'Ережеп',
 							'Шағбан',
-							'Рамадан',
-							'Шәууәл',
-							'Зул-Қағда',
-							'Зул-Хиджа'
+							'Рамазан',
+							'Шәууал',
+							'Зұлқағда',
+							'Зұлхижжа'
 						],
 						leap => [
 							
@@ -7950,14 +8170,33 @@ has 'calendar_months' => (
 							'Саф.',
 							'Раб. І',
 							'Раб. ІІ',
-							'Жум. І',
-							'Жум. ІІ',
-							'Радж.',
+							'Жұм. I',
+							'Жұм. II',
+							'Ереж.',
 							'Шағ.',
 							'Рам.',
 							'Шәу.',
-							'Зул-Қ.',
-							'Зул-Х.'
+							'Зұлқ.',
+							'Зұлх.'
+						],
+						leap => [
+							
+						],
+					},
+					wide => {
+						nonleap => [
+							'Мұхаррам',
+							'Сафар',
+							'Рабиғул әууәл',
+							'Рабиғул ахир',
+							'Жұмадәл аууәл',
+							'Жұмадәл ахир',
+							'Ережеп',
+							'Шағбан',
+							'Рамазан',
+							'Шәууал',
+							'Зұлқағда',
+							'Зұлхижжа'
 						],
 						leap => [
 							
@@ -8071,6 +8310,31 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
+			if ($_ eq 'chinese') {
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+				}
+				if($day_period_type eq 'selection') {
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+				}
+				last SWITCH;
+				}
 			if ($_ eq 'coptic') {
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
@@ -8297,6 +8561,8 @@ has 'eras' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'chinese' => {
+		},
 		'coptic' => {
 		},
 		'generic' => {
@@ -8316,6 +8582,15 @@ has 'eras' => (
 		'indian' => {
 		},
 		'islamic' => {
+			abbreviated => {
+				'0' => 'ХЖ'
+			},
+			narrow => {
+				'0' => 'ХЖ'
+			},
+			wide => {
+				'0' => 'ХЖ'
+			},
 		},
 		'persian' => {
 		},
@@ -8327,6 +8602,12 @@ has 'date_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'chinese' => {
+			'full' => q{EEEE, MMMM d, r(U)},
+			'long' => q{MMMM d, r(U)},
+			'medium' => q{MMM d, r},
+			'short' => q{M/d/r},
+		},
 		'coptic' => {
 		},
 		'generic' => {
@@ -8357,6 +8638,8 @@ has 'time_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'chinese' => {
+		},
 		'coptic' => {
 		},
 		'generic' => {
@@ -8383,6 +8666,8 @@ has 'datetime_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'chinese' => {
+		},
 		'coptic' => {
 		},
 		'generic' => {
@@ -9198,9 +9483,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#Нью-Йорк#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#Нипигон#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#Ном#,
 		},
@@ -9221,9 +9503,6 @@ has 'time_zone_names' => (
 		},
 		'America/Panama' => {
 			exemplarCity => q#Панама#,
-		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#Пангниртанг#,
 		},
 		'America/Paramaribo' => {
 			exemplarCity => q#Парамарибо#,
@@ -9246,9 +9525,6 @@ has 'time_zone_names' => (
 		'America/Punta_Arenas' => {
 			exemplarCity => q#Пунта-Аренас#,
 		},
-		'America/Rainy_River' => {
-			exemplarCity => q#Рейни-Ривер#,
-		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#Ранкин-Инлет#,
 		},
@@ -9263,9 +9539,6 @@ has 'time_zone_names' => (
 		},
 		'America/Rio_Branco' => {
 			exemplarCity => q#Риу-Бранку#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#Санта-Исабель#,
 		},
 		'America/Santarem' => {
 			exemplarCity => q#Сантарен#,
@@ -9312,9 +9585,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#Туле#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#Тандер-Бей#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#Тихуана#,
 		},
@@ -9335,9 +9605,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#Якутат#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#Йеллоунайф#,
 		},
 		'America_Central' => {
 			long => {
@@ -9491,9 +9758,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#Чита#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#Чойбалсан#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#Коломбо#,
@@ -9733,9 +9997,6 @@ has 'time_zone_names' => (
 		'Australia/Broken_Hill' => {
 			exemplarCity => q#Брокен-Хилл#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#Керри#,
-		},
 		'Australia/Darwin' => {
 			exemplarCity => q#Дарвин#,
 		},
@@ -9862,13 +10123,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Қытай жазғы уақыты#,
 				'generic' => q#Қытай уақыты#,
 				'standard' => q#Қытай стандартты уақыты#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Чойбалсан жазғы уақыты#,
-				'generic' => q#Чойбалсан уақыты#,
-				'standard' => q#Чойбалсан стандартты уақыты#,
 			},
 		},
 		'Christmas' => {
@@ -10093,9 +10347,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#Ульяновск#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#Ужгород#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#Вадуц#,
 		},
@@ -10116,9 +10367,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#Загреб#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#Запорожье#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#Цюрих#,
@@ -10341,6 +10589,11 @@ has 'time_zone_names' => (
 				'standard' => q#Жапония стандартты уақыты#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Қазақстан уақыты#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#Шығыс Қазақстан уақыты#,
@@ -10387,11 +10640,6 @@ has 'time_zone_names' => (
 				'standard' => q#Лорд-Хау стандартты уақыты#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Маккуори аралы уақыты#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Магадан жазғы уақыты#,
@@ -10429,13 +10677,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Моусон уақыты#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Солтүстік-батыс Мексика жазғы уақыты#,
-				'generic' => q#Солтүстік-батыс Мексика уақыты#,
-				'standard' => q#Солтүстік-батыс Мексика стандартты уақыты#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -10572,9 +10813,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Honolulu' => {
 			exemplarCity => q#Гонолулу#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#Джонстон#,
 		},
 		'Pacific/Kanton' => {
 			exemplarCity => q#Кантон#,

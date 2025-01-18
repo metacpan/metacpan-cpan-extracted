@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Ie - Package for language Interlingue
 
 package Locale::CLDR::Locales::Ie;
 # This file auto generated from Data\common\main\ie.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -149,6 +149,7 @@ has 'display_name_language' => (
  				'la' => 'latin',
  				'lad' => 'ladino',
  				'lb' => 'luxemburgic',
+ 				'lij' => 'ligurian',
  				'lkt' => 'lakota',
  				'lou' => 'creol de Louisiana',
  				'lrc' => 'nord-lurian',
@@ -191,6 +192,7 @@ has 'display_name_language' => (
  				'pau' => 'palauan',
  				'pcm' => 'pidgin-nigerian',
  				'pl' => 'polonesi',
+ 				'prg' => 'prussian',
  				'ps' => 'pashto',
  				'pt' => 'portugalesi',
  				'pt_BR' => 'brasilian portugalesi',
@@ -4674,9 +4676,6 @@ has 'time_zone_names' => (
 		'America/Punta_Arenas' => {
 			exemplarCity => q#Punta-Arenas#,
 		},
-		'America/Rainy_River' => {
-			exemplarCity => q#Rainy-River#,
-		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#Rankin-Inlet#,
 		},
@@ -4709,9 +4708,6 @@ has 'time_zone_names' => (
 		},
 		'America/Swift_Current' => {
 			exemplarCity => q#Swift-Current#,
-		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#Thunder-Bay#,
 		},
 		'America_Central' => {
 			long => {
@@ -4994,11 +4990,6 @@ has 'time_zone_names' => (
 				'standard' => q#témpor standard del Insul Lord-Howe#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#témpor del Insul Macquarie#,
-			},
-		},
 		'Marquesas' => {
 			long => {
 				'standard' => q#témpor del Marquesas#,
@@ -5007,13 +4998,6 @@ has 'time_zone_names' => (
 		'Marshall_Islands' => {
 			long => {
 				'standard' => q#témpor del Insules Marshall#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#mexican nordwest estival témpor#,
-				'generic' => q#mexican nordwest témpor#,
-				'standard' => q#mexican nordwest standard témpor#,
 			},
 		},
 		'Mexico_Pacific' => {

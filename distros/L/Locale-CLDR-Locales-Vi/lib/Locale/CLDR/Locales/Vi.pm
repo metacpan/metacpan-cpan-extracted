@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Vi - Package for language Vietnamese
 
 package Locale::CLDR::Locales::Vi;
 # This file auto generated from Data\common\main\vi.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -345,7 +345,7 @@ has 'display_name_language' => (
  				'ada' => 'Tiếng Adangme',
  				'ady' => 'Tiếng Adyghe',
  				'ae' => 'Tiếng Avestan',
- 				'af' => 'Tiếng Afrikaans',
+ 				'af' => 'Tiếng Hà Lan (Nam Phi)',
  				'afh' => 'Tiếng Afrihili',
  				'agq' => 'Tiếng Aghem',
  				'ain' => 'Tiếng Ainu',
@@ -405,6 +405,7 @@ has 'display_name_language' => (
  				'bjn' => 'Tiếng Banjar',
  				'bkm' => 'Tiếng Kom',
  				'bla' => 'Tiếng Siksika',
+ 				'blo' => 'Anii',
  				'bm' => 'Tiếng Bambara',
  				'bn' => 'Tiếng Bangla',
  				'bo' => 'Tiếng Tây Tạng',
@@ -536,7 +537,6 @@ has 'display_name_language' => (
  				'gmh' => 'Tiếng Thượng Giéc-man Trung cổ',
  				'gn' => 'Tiếng Guarani',
  				'goh' => 'Tiếng Thượng Giéc-man cổ',
- 				'gom' => 'Tiếng Goan Konkani',
  				'gon' => 'Tiếng Gondi',
  				'gor' => 'Tiếng Gorontalo',
  				'got' => 'Tiếng Gô-tích',
@@ -641,6 +641,7 @@ has 'display_name_language' => (
  				'kv' => 'Tiếng Komi',
  				'kw' => 'Tiếng Cornwall',
  				'kwk' => 'Tiếng Kwakʼwala',
+ 				'kxv' => 'Tiếng Kuvi',
  				'ky' => 'Tiếng Kyrgyz',
  				'la' => 'Tiếng La-tinh',
  				'lad' => 'Tiếng Ladino',
@@ -651,6 +652,7 @@ has 'display_name_language' => (
  				'lez' => 'Tiếng Lezghian',
  				'lg' => 'Tiếng Ganda',
  				'li' => 'Tiếng Limburg',
+ 				'lij' => 'Tiếng Liguria',
  				'lil' => 'Tiếng Lillooet',
  				'lkt' => 'Tiếng Lakota',
  				'lmo' => 'Tiếng Lombard',
@@ -703,7 +705,7 @@ has 'display_name_language' => (
  				'ms' => 'Tiếng Mã Lai',
  				'mt' => 'Tiếng Malta',
  				'mua' => 'Tiếng Mundang',
- 				'mul' => 'Nhiều Ngôn ngữ',
+ 				'mul' => 'Nhiều ngôn ngữ',
  				'mus' => 'Tiếng Creek',
  				'mwl' => 'Tiếng Miranda',
  				'mwr' => 'Tiếng Marwari',
@@ -717,7 +719,7 @@ has 'display_name_language' => (
  				'naq' => 'Tiếng Nama',
  				'nb' => 'Tiếng Na Uy (Bokmål)',
  				'nd' => 'Tiếng Ndebele Miền Bắc',
- 				'nds' => 'Tiếng Hạ Giéc-man',
+ 				'nds' => 'Tiếng Hạ Đức',
  				'nds_NL' => 'Tiếng Hạ Saxon',
  				'ne' => 'Tiếng Nepal',
  				'new' => 'Tiếng Newari',
@@ -726,7 +728,6 @@ has 'display_name_language' => (
  				'niu' => 'Tiếng Niuean',
  				'njo' => 'Tiếng Ao Naga',
  				'nl' => 'Tiếng Hà Lan',
- 				'nl_BE' => 'Tiếng Flemish',
  				'nmg' => 'Tiếng Kwasio',
  				'nn' => 'Tiếng Na Uy (Nynorsk)',
  				'nnh' => 'Tiếng Ngiemboon',
@@ -762,7 +763,7 @@ has 'display_name_language' => (
  				'pam' => 'Tiếng Pampanga',
  				'pap' => 'Tiếng Papiamento',
  				'pau' => 'Tiếng Palauan',
- 				'pcm' => 'Tiếng Nigeria Pidgin',
+ 				'pcm' => 'Pidgin Nigeria',
  				'peo' => 'Tiếng Ba Tư cổ',
  				'phn' => 'Tiếng Phoenicia',
  				'pi' => 'Tiếng Pali',
@@ -850,6 +851,7 @@ has 'display_name_language' => (
  				'swb' => 'Tiếng Cômo',
  				'syc' => 'Tiếng Syriac cổ',
  				'syr' => 'Tiếng Syriac',
+ 				'szl' => 'Tiếng Silesia',
  				'ta' => 'Tiếng Tamil',
  				'tce' => 'Tiếng Tutchone miền Nam',
  				'te' => 'Tiếng Telugu',
@@ -898,7 +900,9 @@ has 'display_name_language' => (
  				'uz' => 'Tiếng Uzbek',
  				'vai' => 'Tiếng Vai',
  				've' => 'Tiếng Venda',
+ 				'vec' => 'Tiếng Veneto',
  				'vi' => 'Tiếng Việt',
+ 				'vmw' => 'Tiếng Makhuwa',
  				'vo' => 'Tiếng Volapük',
  				'vot' => 'Tiếng Votic',
  				'vun' => 'Tiếng Vunjo',
@@ -912,6 +916,7 @@ has 'display_name_language' => (
  				'wuu' => 'Tiếng Ngô',
  				'xal' => 'Tiếng Kalmyk',
  				'xh' => 'Tiếng Xhosa',
+ 				'xnr' => 'Tiếng Kangri',
  				'xog' => 'Tiếng Soga',
  				'yao' => 'Tiếng Yao',
  				'yap' => 'Tiếng Yap',
@@ -1021,6 +1026,7 @@ has 'display_name_script' => (
  			'Khar' => 'Chữ Kharoshthi',
  			'Khmr' => 'Chữ Khơ-me',
  			'Khoj' => 'Chữ Khojki',
+ 			'Kits' => 'Chữ Tiểu Khiết Đan',
  			'Knda' => 'Chữ Kannada',
  			'Kore' => 'Chữ Hàn Quốc',
  			'Kpel' => 'Chữ Kpelle',
@@ -1115,8 +1121,8 @@ has 'display_name_script' => (
  			'Yiii' => 'Chữ Di',
  			'Zinh' => 'Chữ Kế thừa',
  			'Zmth' => 'Ký hiệu Toán học',
- 			'Zsye' => 'Biểu tượng',
- 			'Zsym' => 'Ký hiệu',
+ 			'Zsye' => 'Biểu tượng cảm xúc',
+ 			'Zsym' => 'Biểu tượng | Ký hiệu',
  			'Zxxx' => 'Chưa có chữ viết',
  			'Zyyy' => 'Chung',
  			'Zzzz' => 'Chữ viết không xác định',
@@ -1420,8 +1426,10 @@ has 'display_name_region' => (
  			'UA' => 'Ukraina',
  			'UG' => 'Uganda',
  			'UM' => 'Các tiểu đảo xa của Hoa Kỳ',
- 			'UN' => 'Liên hiệp quốc',
+ 			'UN' => 'Liên hợp quốc',
+ 			'UN@alt=short' => 'LHQ',
  			'US' => 'Hoa Kỳ',
+ 			'US@alt=short' => 'Mỹ',
  			'UY' => 'Uruguay',
  			'UZ' => 'Uzbekistan',
  			'VA' => 'Thành Vatican',
@@ -1459,6 +1467,8 @@ has 'display_name_variant' => (
  			'1606NICT' => 'Tiếng Pháp từ Cuối thời Trung cổ đến 1606',
  			'1694ACAD' => 'Tiếng Pháp Hiện đại Thời kỳ đầu',
  			'1959ACAD' => 'Hàn lâm',
+ 			'ABL1943' => 'Orthographic formulation of 1943',
+ 			'AKUAPEM' => 'TIẾNG AKUAPEM',
  			'ALALC97' => 'La Mã hóa ALA-LC, ấn bản năm 1997',
  			'ALUKU' => 'Phương ngữ Aluku',
  			'AREVELA' => 'Tiếng Armenia Miền Đông',
@@ -1483,6 +1493,7 @@ has 'display_name_variant' => (
  			'NULIK' => 'Tiếng Volapük Hiện đại',
  			'OSOJS' => 'Phương ngữ Oseacco/Osojane',
  			'PAMAKA' => 'Phương ngữ Pamaka',
+ 			'PEHOEJI' => 'Bạch thoại tự',
  			'PINYIN' => 'La Mã hóa Bính âm',
  			'POLYTON' => 'Đa âm',
  			'POSIX' => 'Máy tính',
@@ -1494,6 +1505,7 @@ has 'display_name_variant' => (
  			'SCOUSE' => 'Phương ngữ Liverpool',
  			'SOLBA' => 'Phương ngữ Stolvizza/Solbica',
  			'TARASK' => 'Phép chính tả Taraskievica',
+ 			'TONGYONG' => 'Bính âm Thông dụng',
  			'UCCOR' => 'Phép chính tả Hợp nhất',
  			'UCRCOR' => 'Phép chính tả Sửa đổi Hợp nhất',
  			'VALENCIA' => 'Tiếng Valencia',
@@ -1590,7 +1602,6 @@ has 'display_name_type' => (
  				'phonebook' => q{Thứ tự sắp xếp theo danh bạ điện thoại},
  				'phonetic' => q{Thứ tự sắp xếp theo ngữ âm},
  				'pinyin' => q{Thứ tự sắp xếp theo bính âm},
- 				'reformed' => q{Thứ tự sắp xếp đã sửa đổi},
  				'search' => q{Tìm kiếm mục đích chung},
  				'searchjl' => q{Tìm kiếm theo Phụ âm Đầu Hangul},
  				'standard' => q{Thứ tự sắp xếp chuẩn},
@@ -2198,6 +2209,16 @@ has 'units' => (
 						'other' => q({0} phần vạn),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(phần tỷ),
+						'other' => q({0} phần tỷ),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(phần tỷ),
+						'other' => q({0} phần tỷ),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(lít/100km),
 					},
@@ -2336,6 +2357,18 @@ has 'units' => (
 					'terabyte' => {
 						'name' => q(terabyte),
 						'other' => q({0} terabyte),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(đêm),
+						'other' => q({0} đêm),
+						'per' => q({0}/đêm),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(đêm),
+						'other' => q({0} đêm),
+						'per' => q({0}/đêm),
 					},
 					# Long Unit Identifier
 					'electric-ampere' => {
@@ -3414,6 +3447,14 @@ has 'units' => (
 						'name' => q(‱),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'other' => q({0}ppb),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'other' => q({0}ppb),
+					},
+					# Long Unit Identifier
 					'digital-byte' => {
 						'name' => q(B),
 						'other' => q({0} B),
@@ -3438,6 +3479,18 @@ has 'units' => (
 					# Core Unit Identifier
 					'millisecond' => {
 						'other' => q({0}miligiây),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(đêm),
+						'other' => q({0} đêm),
+						'per' => q({0}/đêm),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(đêm),
+						'other' => q({0} đêm),
+						'per' => q({0}/đêm),
 					},
 					# Long Unit Identifier
 					'energy-electronvolt' => {
@@ -3756,6 +3809,14 @@ has 'units' => (
 						'name' => q(phần vạn),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(phần tỷ),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(phần tỷ),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(l/100km),
 						'other' => q({0} l/100km),
@@ -3904,6 +3965,18 @@ has 'units' => (
 					'nanosecond' => {
 						'name' => q(nano giây),
 						'other' => q({0} nano giây),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(đêm),
+						'other' => q({0} đêm),
+						'per' => q({0}/đêm),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(đêm),
+						'other' => q({0} đêm),
+						'per' => q({0}/đêm),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -4570,7 +4643,6 @@ has 'currencies' => (
 		'AFN' => {
 			display_name => {
 				'currency' => q(Afghani Afghanistan),
-				'other' => q(afghani Afghanistan),
 			},
 		},
 		'ALL' => {
@@ -4690,7 +4762,6 @@ has 'currencies' => (
 		'BDT' => {
 			display_name => {
 				'currency' => q(Taka Bangladesh),
-				'other' => q(taka Bangladesh),
 			},
 		},
 		'BEC' => {
@@ -4819,7 +4890,6 @@ has 'currencies' => (
 		'BTN' => {
 			display_name => {
 				'currency' => q(Ngultrum Bhutan),
-				'other' => q(ngultrum Bhutan),
 			},
 		},
 		'BUK' => {
@@ -5221,7 +5291,6 @@ has 'currencies' => (
 		'INR' => {
 			display_name => {
 				'currency' => q(Rupee Ấn Độ),
-				'other' => q(rupee Ấn Độ),
 			},
 		},
 		'IQD' => {
@@ -5233,7 +5302,6 @@ has 'currencies' => (
 		'IRR' => {
 			display_name => {
 				'currency' => q(Rial Iran),
-				'other' => q(rial Iran),
 			},
 		},
 		'ISK' => {
@@ -5345,7 +5413,6 @@ has 'currencies' => (
 		'LKR' => {
 			display_name => {
 				'currency' => q(Rupee Sri Lanka),
-				'other' => q(rupee Sri Lanka),
 			},
 		},
 		'LRD' => {
@@ -5501,10 +5568,15 @@ has 'currencies' => (
 				'other' => q(rupee Mauritius),
 			},
 		},
+		'MVP' => {
+			display_name => {
+				'currency' => q(Rupee Maldives \(1947–1981\)),
+				'other' => q(Rupee Maldives \(1947–1981\)),
+			},
+		},
 		'MVR' => {
 			display_name => {
 				'currency' => q(Rufiyaa Maldives),
-				'other' => q(rufiyaa Maldives),
 			},
 		},
 		'MWK' => {
@@ -5588,7 +5660,6 @@ has 'currencies' => (
 		'NPR' => {
 			display_name => {
 				'currency' => q(Rupee Nepal),
-				'other' => q(rupee Nepal),
 			},
 		},
 		'NZD' => {
@@ -5641,7 +5712,6 @@ has 'currencies' => (
 		'PKR' => {
 			display_name => {
 				'currency' => q(Rupee Pakistan),
-				'other' => q(rupee Pakistan),
 			},
 		},
 		'PLN' => {
@@ -5776,13 +5846,11 @@ has 'currencies' => (
 		'SLE' => {
 			display_name => {
 				'currency' => q(Leone Sierra Leone),
-				'other' => q(leone Sierra Leone),
 			},
 		},
 		'SLL' => {
 			display_name => {
 				'currency' => q(Leone Sierra Leone \(1964—2022\)),
-				'other' => q(leone Sierra Leone \(1964—2022\)),
 			},
 		},
 		'SOS' => {
@@ -7302,10 +7370,10 @@ has 'datetime_formats_interval' => (
 				y => q{M/y – M/y GGGGG},
 			},
 			GyMEd => {
-				G => q{E, d/M/y GGGGG  –  E, d/M/y GGGGG},
-				M => q{E, d/M/y  –  E, d/M/y GGGGG},
-				d => q{E, d/M/y  –  E, d/M/y GGGGG},
-				y => q{E, d/M/y  –  E, d/M/y GGGGG},
+				G => q{E, d/M/y GGGGG – E, d/M/y GGGGG},
+				M => q{E, d/M/y – E, d/M/y GGGGG},
+				d => q{E, d/M/y – E, d/M/y GGGGG},
+				y => q{E, d/M/y – E, d/M/y GGGGG},
 			},
 			GyMMM => {
 				G => q{MMM y G – MMM y G},
@@ -7325,7 +7393,7 @@ has 'datetime_formats_interval' => (
 				y => q{d MMM y – d MMM y G},
 			},
 			GyMd => {
-				G => q{d/M/y GGGGG  –  d/M/y GGGGG},
+				G => q{d/M/y GGGGG – d/M/y GGGGG},
 				M => q{d/M/y – d/M/y GGGGG},
 				d => q{d/M/y – d/M/y GGGGG},
 				y => q{d/M/y – d/M/y GGGGG},
@@ -7340,18 +7408,18 @@ has 'datetime_formats_interval' => (
 				M => q{M – M},
 			},
 			MEd => {
-				M => q{E, d/M  –  E, d/M},
-				d => q{E, d/M  –  E, d/M},
+				M => q{E, d/M – E, d/M},
+				d => q{E, d/M – E, d/M},
 			},
 			MMM => {
-				M => q{MMM  –  MMM},
+				M => q{MMM – MMM},
 			},
 			MMMEd => {
-				M => q{E, d MMM  –  E, d MMM},
-				d => q{E, d MMM  –  E, d MMM},
+				M => q{E, d MMM – E, d MMM},
+				d => q{E, d MMM – E, d MMM},
 			},
 			MMMd => {
-				M => q{d MMM  –  d MMM},
+				M => q{d MMM – d MMM},
 				d => q{d – d MMM},
 			},
 			Md => {
@@ -7384,27 +7452,27 @@ has 'datetime_formats_interval' => (
 				y => q{M/y – M/y GGGGG},
 			},
 			yMEd => {
-				M => q{E, d/M/y  –  E, d/M/y GGGGG},
-				d => q{E, d/M/y  –  E, d/M/y GGGGG},
-				y => q{E, d/M/y  –  E, d/M/y GGGGG},
+				M => q{E, d/M/y – E, d/M/y GGGGG},
+				d => q{E, d/M/y – E, d/M/y GGGGG},
+				y => q{E, d/M/y – E, d/M/y GGGGG},
 			},
 			yMMM => {
-				M => q{MMM  –  MMM y G},
-				y => q{MMM y  –  MMM y G},
+				M => q{MMM – MMM y G},
+				y => q{MMM y – MMM y G},
 			},
 			yMMMEd => {
-				M => q{E, d MMM  –  E, d MMM, y G},
-				d => q{E, d MMM  –  E, d MMM, y G},
-				y => q{E, d MMM, y  –  E, d MMM, y G},
+				M => q{E, d MMM – E, d MMM, y G},
+				d => q{E, d MMM – E, d MMM, y G},
+				y => q{E, d MMM, y – E, d MMM, y G},
 			},
 			yMMMM => {
-				M => q{MMMM  –  MMMM y G},
+				M => q{MMMM – MMMM y G},
 				y => q{MMMM y – MMMM y G},
 			},
 			yMMMd => {
-				M => q{d MMM  –  d MMM, y G},
+				M => q{d MMM – d MMM, y G},
 				d => q{d – d MMM, y G},
-				y => q{d MMM, y  –  d MMM, y G},
+				y => q{d MMM, y – d MMM, y G},
 			},
 			yMd => {
 				M => q{d/M/y – d/M/y GGGGG},
@@ -7414,7 +7482,7 @@ has 'datetime_formats_interval' => (
 		},
 		'gregorian' => {
 			Bh => {
-				B => q{h 'giờ' B  –  h 'giờ' B},
+				B => q{h 'giờ' B – h 'giờ' B},
 				h => q{h – h 'giờ' B},
 			},
 			Bhm => {
@@ -7426,18 +7494,18 @@ has 'datetime_formats_interval' => (
 				y => q{y – y G},
 			},
 			GyM => {
-				G => q{M/y G  –  M/y G},
+				G => q{M/y G – M/y G},
 				M => q{M/y– M/y G},
 				y => q{M/y – M/y G},
 			},
 			GyMEd => {
-				G => q{E, d/M/y G  –  E, d/M/y G},
-				M => q{E, d/M/y  –  E, d/M/y G},
-				d => q{E, d/M/y  –  E, d/M/y G},
-				y => q{E, d/M/y  –  E, d/M/y G},
+				G => q{E, d/M/y G – E, d/M/y G},
+				M => q{E, d/M/y – E, d/M/y G},
+				d => q{E, d/M/y – E, d/M/y G},
+				y => q{E, d/M/y – E, d/M/y G},
 			},
 			GyMMM => {
-				G => q{MMM y G  –  MMM y G},
+				G => q{MMM y G – MMM y G},
 				M => q{MMM – MMM y G},
 				y => q{MMM y – MMM y G},
 			},
@@ -7454,7 +7522,7 @@ has 'datetime_formats_interval' => (
 				y => q{d MMM y – d MMM y G},
 			},
 			GyMd => {
-				G => q{d/M/y G  –  d/M/y G},
+				G => q{d/M/y G – d/M/y G},
 				M => q{d/M/y – d/M/y G},
 				d => q{d/M/y – d/M/y G},
 				y => q{d/M/y – d/M/y G},
@@ -7463,8 +7531,8 @@ has 'datetime_formats_interval' => (
 				M => q{'Tháng' M – M},
 			},
 			MEd => {
-				M => q{E, d/M  –  E, d/M},
-				d => q{E, d/M  –  E, d/M},
+				M => q{E, d/M – E, d/M},
+				d => q{E, d/M – E, d/M},
 			},
 			MMM => {
 				M => q{MMM – MMM},
@@ -7474,7 +7542,7 @@ has 'datetime_formats_interval' => (
 				d => q{E, d MMM – E, d MMM},
 			},
 			MMMd => {
-				M => q{d MMM  –  d MMM},
+				M => q{d MMM – d MMM},
 				d => q{d – d MMM},
 			},
 			Md => {
@@ -7507,27 +7575,27 @@ has 'datetime_formats_interval' => (
 				y => q{M/y – M/y},
 			},
 			yMEd => {
-				M => q{E, d/M/y  –  E, d/M/y},
-				d => q{E, d/M/y  –  E, d/M/y},
-				y => q{E, d/M/y  –  E, d/M/y},
+				M => q{E, d/M/y – E, d/M/y},
+				d => q{E, d/M/y – E, d/M/y},
+				y => q{E, d/M/y – E, d/M/y},
 			},
 			yMMM => {
-				M => q{MMM  –  MMM y},
-				y => q{MMM y  –  MMM y},
+				M => q{MMM – MMM y},
+				y => q{MMM y – MMM y},
 			},
 			yMMMEd => {
-				M => q{E, d MMM  –  E, d MMM, y},
-				d => q{E, d MMM  –  E, d MMM, y},
-				y => q{E, d MMM, y  –  E, d MMM, y},
+				M => q{E, d MMM – E, d MMM, y},
+				d => q{E, d MMM – E, d MMM, y},
+				y => q{E, d MMM, y – E, d MMM, y},
 			},
 			yMMMM => {
-				M => q{MMMM  –  MMMM 'năm' y},
-				y => q{MMMM 'năm' y  –  MMMM 'năm' y},
+				M => q{MMMM – MMMM 'năm' y},
+				y => q{MMMM 'năm' y – MMMM 'năm' y},
 			},
 			yMMMd => {
-				M => q{d MMM  –  d MMM, y},
+				M => q{d MMM – d MMM, y},
 				d => q{d – d MMM, y},
-				y => q{d MMM, y  –  d MMM, y},
+				y => q{d MMM, y – d MMM, y},
 			},
 			yMd => {
 				M => q{d/M/y – d/M/y},
@@ -7815,9 +7883,6 @@ has 'time_zone_names' => (
 				'standard' => q#Giờ Afghanistan#,
 			},
 		},
-		'Africa/Sao_Tome' => {
-			exemplarCity => q#São Tomé#,
-		},
 		'Africa_Central' => {
 			long => {
 				'standard' => q#Giờ Trung Phi#,
@@ -7866,17 +7931,11 @@ has 'time_zone_names' => (
 				'standard' => q#Giờ Chuẩn Amazon#,
 			},
 		},
-		'America/Asuncion' => {
-			exemplarCity => q#Asunción#,
-		},
 		'America/Bahia_Banderas' => {
 			exemplarCity => q#Bahia Banderas#,
 		},
 		'America/Cancun' => {
 			exemplarCity => q#Cancun#,
-		},
-		'America/Curacao' => {
-			exemplarCity => q#Curaçao#,
 		},
 		'America/Merida' => {
 			exemplarCity => q#Merida#,
@@ -7889,12 +7948,6 @@ has 'time_zone_names' => (
 		},
 		'America/North_Dakota/New_Salem' => {
 			exemplarCity => q#New Salem, Bắc Dakota#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#Santa Isabel#,
-		},
-		'America/St_Barthelemy' => {
-			exemplarCity => q#St. Barthélemy#,
 		},
 		'America_Central' => {
 			long => {
@@ -8045,9 +8098,6 @@ has 'time_zone_names' => (
 		'Atlantic/South_Georgia' => {
 			exemplarCity => q#Nam Georgia#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#Currie#,
-		},
 		'Australia_Central' => {
 			long => {
 				'daylight' => q#Giờ Mùa Hè Miền Trung Australia#,
@@ -8157,13 +8207,6 @@ has 'time_zone_names' => (
 				'standard' => q#Giờ Chuẩn Trung Quốc#,
 			},
 		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Giờ Mùa Hè Choibalsan#,
-				'generic' => q#Giờ Choibalsan#,
-				'standard' => q#Giờ Chuẩn Choibalsan#,
-			},
-		},
 		'Christmas' => {
 			long => {
 				'standard' => q#Giờ Đảo Christmas#,
@@ -8251,9 +8294,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Prague' => {
 			exemplarCity => q#Praha#,
-		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#Uzhhorod#,
 		},
 		'Europe_Central' => {
 			long => {
@@ -8392,9 +8432,6 @@ has 'time_zone_names' => (
 				'standard' => q#Giờ Chuẩn Ấn Độ#,
 			},
 		},
-		'Indian/Reunion' => {
-			exemplarCity => q#Réunion#,
-		},
 		'Indian_Ocean' => {
 			long => {
 				'standard' => q#Giờ Ấn Độ Dương#,
@@ -8455,6 +8492,11 @@ has 'time_zone_names' => (
 				'standard' => q#Giờ chuẩn Petropavlovsk-Kamchatski#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Giờ Kazakhstan#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#Giờ Miền Đông Kazakhstan#,
@@ -8513,11 +8555,6 @@ has 'time_zone_names' => (
 				'standard' => q#Giờ Chuẩn Ma Cao#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Giờ đảo Macquarie#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Giờ mùa hè Magadan#,
@@ -8555,13 +8592,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Giờ Mawson#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Giờ Mùa Hè Tây Bắc Mexico#,
-				'generic' => q#Giờ Tây Bắc Mexico#,
-				'standard' => q#Giờ Chuẩn Tây Bắc Mexico#,
 			},
 		},
 		'Mexico_Pacific' => {

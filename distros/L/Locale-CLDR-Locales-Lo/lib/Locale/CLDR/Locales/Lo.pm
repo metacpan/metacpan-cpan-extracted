@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Lo - Package for language Lao
 
 package Locale::CLDR::Locales::Lo;
 # This file auto generated from Data\common\main\lo.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -301,6 +301,7 @@ has 'display_name_language' => (
  				'bin' => 'ບີນີ',
  				'bkm' => 'ກົມ',
  				'bla' => 'ຊິກຊິກາ',
+ 				'blo' => 'ອານີ',
  				'bm' => 'ບາມບາຣາ',
  				'bn' => 'ເບັງກາລີ',
  				'bo' => 'ທິເບທັນ',
@@ -522,6 +523,7 @@ has 'display_name_language' => (
  				'kv' => 'ໂຄມິ',
  				'kw' => 'ຄໍນິຊ',
  				'kwk' => 'ຄວາກຄວາກລາ',
+ 				'kxv' => 'ຄູວີ',
  				'ky' => 'ເກຍກີສ',
  				'la' => 'ລາຕິນ',
  				'lad' => 'ລາດີໂນ',
@@ -532,8 +534,10 @@ has 'display_name_language' => (
  				'lez' => 'ລີຊຽນ',
  				'lg' => 'ແກນດາ',
  				'li' => 'ລິມເບີກີຊ',
+ 				'lij' => 'ລີກູຣຽນ',
  				'lil' => 'ລິນລູເອັດ',
  				'lkt' => 'ລາໂກຕາ',
+ 				'lmo' => 'ລອມບາດ',
  				'ln' => 'ລິງກາລາ',
  				'lo' => 'ລາວ',
  				'lol' => 'ແມັງໂກ້',
@@ -726,6 +730,7 @@ has 'display_name_language' => (
  				'swb' => 'ໂຄໂນຣຽນ',
  				'syc' => 'ຊີເລຍແບບດັ້ງເດີມ',
  				'syr' => 'ຊີເລຍ',
+ 				'szl' => 'ຊີເລສຊຽນ',
  				'ta' => 'ທາມິລ',
  				'tce' => 'ທຸດຊອນໃຕ້',
  				'te' => 'ເຕລູກູ',
@@ -774,7 +779,9 @@ has 'display_name_language' => (
  				'uz' => 'ອຸສເບກ',
  				'vai' => 'ໄວ',
  				've' => 'ເວນດາ',
+ 				'vec' => 'ເວເນຊຽນ',
  				'vi' => 'ຫວຽດນາມ',
+ 				'vmw' => 'ມາຄູວາ',
  				'vo' => 'ໂວລາພັກ',
  				'vot' => 'ໂວຕິກ',
  				'vun' => 'ວັນໂຈ',
@@ -788,6 +795,7 @@ has 'display_name_language' => (
  				'wuu' => 'ຈີນອູ',
  				'xal' => 'ການມິກ',
  				'xh' => 'ໂຮຊາ',
+ 				'xnr' => 'ຄັງຣີ',
  				'xog' => 'ໂຊກາ',
  				'yao' => 'ເຢົ້າ',
  				'yap' => 'ຢັບ',
@@ -1309,8 +1317,8 @@ has 'display_name_region' => (
  			'VU' => 'ວານົວຕູ',
  			'WF' => 'ວາລລິສ ແລະ ຟູຕູນາ',
  			'WS' => 'ຊາມົວ',
- 			'XA' => 'Pseudo-Accents',
- 			'XB' => 'Pseudo-Bidi',
+ 			'XA' => 'ສຳນຽງຊູໂດ',
+ 			'XB' => 'ຊູໂດບີດີ',
  			'XK' => 'ໂຄໂຊໂວ',
  			'YE' => 'ເຢເມນ',
  			'YT' => 'ມາຢັອດ',
@@ -1444,7 +1452,6 @@ has 'display_name_type' => (
  				'gb2312han' => q{ລຽງຕາມອັກສອນຈີນປະຍຸກ},
  				'phonebook' => q{ລຽງຕາມສະໝຸດໂທລະສັບ},
  				'pinyin' => q{ລຽງຕາມການອອກສຽງພາສາຈີນ},
- 				'reformed' => q{ລຽງຕາມລຳດັບສຸດທ້າຍ},
  				'search' => q{ການຊອກຫາທົ່ວໄປ},
  				'searchjl' => q{ຄົ້ນຫາຕາມພະຍັນຊະນະຂຶ້ນຕົ້ນທີ່ເປັນຮັງກີຣ},
  				'standard' => q{ຮຽງຕາມມາດຕະຖານ},
@@ -2031,6 +2038,16 @@ has 'units' => (
 						'other' => q({0} ເປີ​ມີ​ຣຽດ),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(ສ່ວນໃນພັນລ້ານສ່ວນ),
+						'other' => q({0} ສ່ວນໃນພັນລ້ານສ່ວນ),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(ສ່ວນໃນພັນລ້ານສ່ວນ),
+						'other' => q({0} ສ່ວນໃນພັນລ້ານສ່ວນ),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(ລິດ ຕໍ່ 100 ກິໂລເເມັດ),
 						'other' => q({0} ລິດຕໍ່ 100 ກີໂລແມັດ),
@@ -2155,6 +2172,18 @@ has 'units' => (
 					'nanosecond' => {
 						'name' => q(ນາ​ໂນ​ວິ​ນາ​ທີ),
 						'other' => q({0} ນາ​ໂນ​ວິ​ນາ​ທີ),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(ຄືນ),
+						'other' => q({0} ຄືນ),
+						'per' => q({0}/ຄືນ),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(ຄືນ),
+						'other' => q({0} ຄືນ),
+						'per' => q({0}/ຄືນ),
 					},
 					# Long Unit Identifier
 					'duration-second' => {
@@ -2731,6 +2760,16 @@ has 'units' => (
 						'other' => q({0} ນ໋ອດ),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(ແສງ),
+						'other' => q({0} ແສງ),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(ແສງ),
+						'other' => q({0} ແສງ),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'name' => q(ແມັດຕໍ່ວິນາທີ),
 						'other' => q({0} ແມັດຕໍ່ວິນາທີ),
@@ -2971,6 +3010,24 @@ has 'units' => (
 						'name' => q(%),
 					},
 					# Long Unit Identifier
+					'concentr-permille' => {
+						'name' => q(‰),
+					},
+					# Core Unit Identifier
+					'permille' => {
+						'name' => q(‰),
+					},
+					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(ສ່ວນ/ພັນລ້ານສ່ວນ),
+						'other' => q({0}ppb),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(ສ່ວນ/ພັນລ້ານສ່ວນ),
+						'other' => q({0}ppb),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'other' => q({0} ລ / 100 ກມ),
 					},
@@ -2989,6 +3046,16 @@ has 'units' => (
 						'other' => q({0} m/gUK),
 					},
 					# Long Unit Identifier
+					'duration-century' => {
+						'name' => q(ສຕວ),
+						'other' => q({0} ສຕວ),
+					},
+					# Core Unit Identifier
+					'century' => {
+						'name' => q(ສຕວ),
+						'other' => q({0} ສຕວ),
+					},
+					# Long Unit Identifier
 					'duration-day' => {
 						'other' => q({0} ມ.),
 					},
@@ -2999,12 +3066,22 @@ has 'units' => (
 					# Long Unit Identifier
 					'duration-millisecond' => {
 						'name' => q(ມລວ),
-						'other' => q({0} ມລ. ວິ.),
 					},
 					# Core Unit Identifier
 					'millisecond' => {
 						'name' => q(ມລວ),
-						'other' => q({0} ມລ. ວິ.),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(ຄືນ),
+						'other' => q({0} ຄືນ),
+						'per' => q({0}/ຄືນ),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(ຄືນ),
+						'other' => q({0} ຄືນ),
+						'per' => q({0}/ຄືນ),
 					},
 					# Long Unit Identifier
 					'duration-week' => {
@@ -3093,6 +3170,16 @@ has 'units' => (
 					# Core Unit Identifier
 					'kilowatt' => {
 						'other' => q({0} kW),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(ແສງ),
+						'other' => q({0} ແສງ),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(ແສງ),
+						'other' => q({0} ແສງ),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -3571,6 +3658,14 @@ has 'units' => (
 						'name' => q(ພາດ/ລ້ານ),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(ສ່ວນ/ພັນລ້ານສ່ວນ),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(ສ່ວນ/ພັນລ້ານສ່ວນ),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(ລ/ 100 ກມ),
 					},
@@ -3613,6 +3708,16 @@ has 'units' => (
 					# Core Unit Identifier
 					'petabyte' => {
 						'name' => q(PByte),
+					},
+					# Long Unit Identifier
+					'duration-century' => {
+						'name' => q(ສຕວ),
+						'other' => q({0} ສຕວ),
+					},
+					# Core Unit Identifier
+					'century' => {
+						'name' => q(ສຕວ),
+						'other' => q({0} ສຕວ),
 					},
 					# Long Unit Identifier
 					'duration-day' => {
@@ -3701,6 +3806,18 @@ has 'units' => (
 					'nanosecond' => {
 						'name' => q(ນາ​ໂນ​ວິ​),
 						'other' => q({0} ນນ​ວິ),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(ຄືນ),
+						'other' => q({0} ຄືນ),
+						'per' => q({0}/ຄືນ),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(ຄືນ),
+						'other' => q({0} ຄືນ),
+						'per' => q({0}/ຄືນ),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -4125,6 +4242,16 @@ has 'units' => (
 						'other' => q({0} ກມ/ຊມ),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(ແສງ),
+						'other' => q({0} ແສງ),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(ແສງ),
+						'other' => q({0} ແສງ),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'name' => q(ແມັດ/ວິ),
 						'other' => q({0} ມ/ວ),
@@ -4343,7 +4470,7 @@ has 'number_formats' => (
 					'other' => '00 ພັນ',
 				},
 				'100000' => {
-					'other' => '000 ກີບ',
+					'other' => '000 ພັນ',
 				},
 				'1000000' => {
 					'other' => '0 ລ້ານ',
@@ -6740,7 +6867,7 @@ has 'day_periods' => (
 			},
 			'stand-alone' => {
 				'abbreviated' => {
-					'afternoon1' => q{ສວຍ},
+					'afternoon1' => q{ສວາຍ},
 					'evening1' => q{ແລງ},
 					'midnight' => q{ທ່ຽງ​ຄືນ},
 					'morning1' => q{​ເຊົ້າ},
@@ -6752,7 +6879,6 @@ has 'day_periods' => (
 					'evening1' => q{ແລງ},
 					'morning1' => q{​ເຊົ້າ},
 					'night1' => q{​ກາງ​ຄືນ},
-					'noon' => q{ຕອນທ່ຽງ},
 				},
 				'wide' => {
 					'midnight' => q{ທ່ຽງຄືນ},
@@ -7077,7 +7203,7 @@ has 'date_formats' => (
 			'short' => q{d/M/y GGGGG},
 		},
 		'gregorian' => {
-			'full' => q{EEEE ທີ d MMMM G y},
+			'full' => q{EEEE, d MMMM y},
 			'long' => q{d MMMM y},
 			'medium' => q{d MMM y},
 			'short' => q{d/M/y},
@@ -7342,38 +7468,38 @@ has 'datetime_formats_interval' => (
 		},
 		'gregorian' => {
 			GyM => {
-				G => q{GGGGG MM/y – GGGGG MM/y},
-				M => q{GGGGG MM/y – MM/y},
-				y => q{GGGGG MM/y – MM/y},
+				G => q{M/G y – M/G y},
+				M => q{M/y – M/G y},
+				y => q{M/y – M/G y},
 			},
 			GyMEd => {
-				G => q{GGGGG E, dd/MM/y – GGGGG E, dd/MM/y},
-				M => q{GGGGG E, dd/MM/y – E, dd/MM/y},
-				d => q{GGGGG E, dd/MM/y – E, dd/MM/y},
-				y => q{GGGGG E, dd/MM/y – E, dd/MM/y},
+				G => q{E, d/M/G y – E, d/M/G y},
+				M => q{E, d/M/y – E, d/M/G y},
+				d => q{E, d/M/G y – E, d/M/G y},
+				y => q{E, d/M/G y – E, d/M/G y},
 			},
 			GyMMM => {
-				G => q{G MM/y – G MM/y},
-				M => q{G MM – MM/y},
-				y => q{G MM/y – MM/y},
+				G => q{MMM G y – MMM G y},
+				M => q{MMM – MMM G y},
+				y => q{MMM G y– MMM G y},
 			},
 			GyMMMEd => {
-				G => q{G E, dd/MM/y – G E, dd/MM/y},
-				M => q{G E, dd/MM/y – E, dd/MM/y},
-				d => q{G E, dd/MM/y – E, dd/MM/y},
-				y => q{G E, dd/MM/y – E, dd/MM/y},
+				G => q{E, d MMM G y – E, d MMM G y},
+				M => q{E, d MMM – E, d MMM G y},
+				d => q{E, d MMM – E, d MMM G y},
+				y => q{E, d MMM G y – E, d MMM G y},
 			},
 			GyMMMd => {
-				G => q{G dd/MM/y– G dd/MM/y},
-				M => q{G dd/MM/y – dd/MM},
-				d => q{G d–d/MM/y},
-				y => q{G dd/MM/y – dd/MM/y},
+				G => q{d MMM G y – d MMM G y},
+				M => q{d MMM – d MMM G y},
+				d => q{d–d MMM G y},
+				y => q{d MMM G y – d MMM G y},
 			},
 			GyMd => {
-				G => q{GGGGG dd/MM/y – GGGGG dd/MM/y},
-				M => q{GGGGG dd/MM/y – dd/MM/y},
-				d => q{GGGGG dd/MM/y – dd/MM/y},
-				y => q{GGGGG dd/MM/y – dd/MM/y},
+				G => q{d/M/G y – d/M/G y},
+				M => q{d/M/y – d/M/G y},
+				d => q{d/M/y – d/M/G y},
+				y => q{d/M/y – d/M/G y},
 			},
 			M => {
 				M => q{M–M},
@@ -8068,9 +8194,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#ນິວຢອກ#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#ນີປີກອນ#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#ນອມ#,
 		},
@@ -8091,9 +8214,6 @@ has 'time_zone_names' => (
 		},
 		'America/Panama' => {
 			exemplarCity => q#ພານາມາ#,
-		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#ແພງເນີດທັງ#,
 		},
 		'America/Paramaribo' => {
 			exemplarCity => q#ພາຣາມາຣິໂບ#,
@@ -8116,9 +8236,6 @@ has 'time_zone_names' => (
 		'America/Punta_Arenas' => {
 			exemplarCity => q#ພຸນທາ ອະຣີນາສ໌#,
 		},
-		'America/Rainy_River' => {
-			exemplarCity => q#ເຣນນີ ຣິເວີ#,
-		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#ແຣນກິນ ອິນເລັດ#,
 		},
@@ -8133,9 +8250,6 @@ has 'time_zone_names' => (
 		},
 		'America/Rio_Branco' => {
 			exemplarCity => q#ຣິໂອ ບຣັນໂກ#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#ຊານຕາ ອິດຊາເບວ#,
 		},
 		'America/Santarem' => {
 			exemplarCity => q#ຊັນຕາເຣມ#,
@@ -8182,9 +8296,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#ທູເລ#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#ທັນເດີເບ#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#ທີຈົວນາ#,
 		},
@@ -8205,9 +8316,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#ຢາຄູຕັດ#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#ເຢໂລໄນຟ໌#,
 		},
 		'America_Central' => {
 			long => {
@@ -8375,9 +8483,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#ຊີຕ່າ#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#ຊອຍບອລຊານ#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#ໂຄລຳໂບ#,
@@ -8579,7 +8684,7 @@ has 'time_zone_names' => (
 			},
 		},
 		'Atlantic/Azores' => {
-			exemplarCity => q#ອາຊໍເຣສ#,
+			exemplarCity => q#ອາ​ໂຊ​ເຣ​ສ#,
 		},
 		'Atlantic/Bermuda' => {
 			exemplarCity => q#ເບີມິວດາ#,
@@ -8616,9 +8721,6 @@ has 'time_zone_names' => (
 		},
 		'Australia/Broken_Hill' => {
 			exemplarCity => q#ໂບຣກເຄນ ຮິວ#,
-		},
-		'Australia/Currie' => {
-			exemplarCity => q#ກູຣີ#,
 		},
 		'Australia/Darwin' => {
 			exemplarCity => q#ດາວິນ#,
@@ -8751,13 +8853,6 @@ has 'time_zone_names' => (
 				'daylight' => q#​ເວ​ລາ​ຕອນ​ທ່ຽງ​ຈີນ#,
 				'generic' => q#ເວ​ລາ​ຈີນ#,
 				'standard' => q#ເວລາມາດຕະຖານຈີນ#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#ເວລາລະ​ດູ​ຮ້ອນໂຊຍບາຊັນ#,
-				'generic' => q#ເວ​ລາ​ໂຊຍ​ບາ​ຊັນ#,
-				'standard' => q#ເວລາມາດຕະຖານໂຊຍບາຊັນ#,
 			},
 		},
 		'Christmas' => {
@@ -8982,9 +9077,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#ອູລີອານອບສຄ໌#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#ອັສຊ໌ກໍໂຣດ#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#ວາດາຊ#,
 		},
@@ -9005,9 +9097,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#ຊາເກຣບ#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#ຊາໂປໂຣຊີ#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#ຊູຣິກ#,
@@ -9179,7 +9268,7 @@ has 'time_zone_names' => (
 		},
 		'Indian_Ocean' => {
 			long => {
-				'standard' => q#ເວລາຫມະຫາສະຫມຸດອິນເດຍ#,
+				'standard' => q#ເວລາມະຫາສະຫມຸດອິນເດຍ#,
 			},
 		},
 		'Indochina' => {
@@ -9228,6 +9317,11 @@ has 'time_zone_names' => (
 				'daylight' => q#ເວ​ລາ​ຕອນ​ທ່ຽງ​ຍີ່​ປຸ່ນ#,
 				'generic' => q#ເວ​ລາ​ຍີ່​ປຸ່ນ#,
 				'standard' => q#ເວ​ລາ​ມາດ​ຕະ​ຖານ​ຍີ່​ປຸ່ນ#,
+			},
+		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#ເວລາຄາຊັກສຖານ#,
 			},
 		},
 		'Kazakhstan_Eastern' => {
@@ -9288,11 +9382,6 @@ has 'time_zone_names' => (
 				'standard' => q#ເວລາມາດຕະຖານມາເກົາ#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#ເວ​ລາ​ເກາະ​ແມັກ​ຄົວ​ຣີ#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#ເວລາລະດູຮ້ອນເມັກກາເດນ#,
@@ -9330,13 +9419,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#ເວລາມໍສັນ#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#ເວລາກາງເວັນເມັກຊິກັນນອດເວສ#,
-				'generic' => q#​ເວ​ລາ​ນອດ​ເວ​ສ​ເມັກ​ຊິ​ໂກ#,
-				'standard' => q#​ເວ​ລາ​ມາດ​ຕະ​ຖານນອດ​ເວ​ສ​ເມັກ​ຊິ​ໂກ#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -9478,9 +9560,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Honolulu' => {
 			exemplarCity => q#ໂຮໂນລູລູ#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#ຈອນສະໂຕນ#,
 		},
 		'Pacific/Kanton' => {
 			exemplarCity => q#ແຄນຕອນ#,

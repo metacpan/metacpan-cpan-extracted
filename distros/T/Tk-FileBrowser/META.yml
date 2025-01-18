@@ -25,9 +25,9 @@ requires:
   Tk: '804.032'
   Tk::ITree: '0.03'
   Tk::ListEntry: '0.02'
-  Tk::YADialog: '0.04'
+  Tk::YADialog: '0.05'
 resources:
   bugtracker: https://github.com/haje61/Tk-FileBrowser/issues
   repository: git://github.com/haje61/Tk-FileBrowser.git
-version: 0.08
+version: 0.09
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

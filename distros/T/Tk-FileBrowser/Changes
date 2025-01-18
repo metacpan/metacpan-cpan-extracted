@@ -1,5 +1,11 @@
 Revision history for Perl extension Tk::FileBrowser.
 
+0.09  Fri Jan 17 2025
+	- Made 'Ok' button default button in file delete dialog.
+	- pick method of Tk::FilePicker saves default settings.
+	- Extended documentation in Tk::FilePicker.
+	- Text in popDialog is justified left by default.
+
 0.08  Wed Dec 18 2024
 	- load can be called with a '~' at the start of the folder name. does not work on Windows.
 	- fixed filter pop up.

@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Sat - Package for language Santali
 
 package Locale::CLDR::Locales::Sat;
 # This file auto generated from Data\common\main\sat.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -31,7 +31,8 @@ has 'display_name_language' => (
 	default		=> sub {
 		 sub {
 			 my %languages = (
-				'ab' => 'ᱟᱹᱵᱠᱷᱟᱡᱤᱭᱟᱹᱱ',
+				'aa' => 'ᱚᱯᱷᱚᱨ',
+ 				'ab' => 'ᱟᱹᱵᱠᱷᱟᱡᱤᱭᱟᱹᱱ',
  				'ace' => 'ᱟᱠᱷᱤᱱᱤᱡᱽ',
  				'ada' => 'ᱟᱹᱰᱟᱱᱜᱽᱢᱮ',
  				'ady' => 'ᱟᱹᱰᱭᱜᱷᱮ',
@@ -72,12 +73,14 @@ has 'display_name_language' => (
  				'bi' => 'ᱵᱤᱥᱞᱟᱢᱟ',
  				'bin' => 'ᱵᱤᱱᱤ',
  				'bla' => 'ᱥᱤᱠᱥᱤᱠᱟ',
+ 				'blo' => 'ᱟᱱᱤ',
  				'bm' => 'ᱵᱟᱢᱵᱟᱨᱟ',
  				'bn' => 'ᱵᱟᱝᱞᱟ',
  				'bo' => 'ᱛᱤᱵᱮᱛᱟᱱ',
  				'br' => 'ᱵᱽᱨᱚᱴᱚᱱ',
  				'brx' => 'ᱵᱳᱰᱳ',
  				'bs' => 'ᱵᱚᱥᱱᱤᱭᱟᱹᱱ',
+ 				'bss' => 'ᱟᱠᱩᱥ',
  				'bug' => 'ᱵᱩᱜᱤᱱᱤᱡᱽ',
  				'byn' => 'ᱵᱞᱤᱱ',
  				'ca' => 'ᱠᱟᱴᱟᱞᱟᱱ',
@@ -1563,7 +1566,7 @@ has 'eras' => (
 	default		=> sub { {
 		'gregorian' => {
 			abbreviated => {
-				'0' => 'ᱥᱮᱨᱢᱟ ᱞᱟᱦᱟ',
+				'0' => 'ᱵᱤ ᱥᱤ',
 				'1' => 'ᱤᱥᱣᱤ'
 			},
 			narrow => {
@@ -1892,9 +1895,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#ᱱᱤᱣ ᱭᱚᱨᱠ#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#ᱱᱤᱯᱤᱜᱚᱱ#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#ᱱᱚᱢᱮ#,
 		},
@@ -1913,9 +1913,6 @@ has 'time_zone_names' => (
 		'America/Panama' => {
 			exemplarCity => q#ᱯᱟᱱᱟᱢᱟ#,
 		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#ᱯᱟᱝᱱᱤᱨᱛᱩᱝ#,
-		},
 		'America/Phoenix' => {
 			exemplarCity => q#ᱯᱷᱤᱱᱤᱠᱥ#,
 		},
@@ -1927,9 +1924,6 @@ has 'time_zone_names' => (
 		},
 		'America/Puerto_Rico' => {
 			exemplarCity => q#ᱯᱭᱩᱨᱴᱚ ᱨᱤᱠᱚ#,
-		},
-		'America/Rainy_River' => {
-			exemplarCity => q#ᱨᱚᱱᱤ ᱜᱟᱰᱟ#,
 		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#ᱨᱟᱱᱠᱤᱱ ᱤᱱᱞᱮᱴ#,
@@ -1976,9 +1970,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#ᱛᱷᱩᱞᱮ#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#ᱛᱷᱚᱱᱰᱚᱨ ᱵᱮ#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#ᱴᱤᱡᱩᱣᱟᱱᱟ#,
 		},
@@ -1999,9 +1990,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#ᱭᱟᱠᱩᱛᱟᱛ#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#ᱭᱮᱞᱚᱱᱟᱭᱤᱯᱷ#,
 		},
 		'America_Central' => {
 			long => {
@@ -2115,13 +2103,6 @@ has 'time_zone_names' => (
 				'daylight' => q#ᱦᱟᱣᱟᱭᱤᱼᱟᱞᱮᱣᱴᱤᱭᱟᱱ ᱥᱤᱧᱟᱜ ᱚᱠᱛᱚ#,
 				'generic' => q#ᱦᱟᱣᱟᱭᱤᱼᱟᱞᱮᱣᱴᱤᱭᱟᱱ ᱚᱠᱛᱚ#,
 				'standard' => q#ᱦᱟᱣᱟᱭᱤᱼᱟᱞᱮᱣᱴᱤᱭᱟᱱ ᱢᱟᱱᱚᱠ ᱚᱠᱛᱚ#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#ᱮᱛᱚᱢᱯᱟᱪᱮ ᱢᱚᱠᱥᱤᱠᱚ ᱥᱤᱧᱟᱜ ᱚᱠᱛᱚ#,
-				'generic' => q#ᱮᱛᱚᱢᱯᱟᱪᱮ ᱢᱚᱠᱥᱤᱠᱚ ᱚᱠᱛᱚ#,
-				'standard' => q#ᱮᱛᱚᱢᱯᱟᱪᱮ ᱢᱚᱠᱥᱤᱠᱚ ᱢᱟᱱᱚᱠ ᱚᱠᱛᱚ#,
 			},
 		},
 		'Mexico_Pacific' => {

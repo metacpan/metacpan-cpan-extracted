@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Lv - Package for language Latvian
 
 package Locale::CLDR::Locales::Lv;
 # This file auto generated from Data\common\main\lv.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -498,6 +498,7 @@ has 'display_name_language' => (
  				'bin' => 'binu',
  				'bkm' => 'komu',
  				'bla' => 'siksiku',
+ 				'blo' => 'anī',
  				'bm' => 'bambaru',
  				'bn' => 'bengāļu',
  				'bo' => 'tibetiešu',
@@ -712,6 +713,7 @@ has 'display_name_language' => (
  				'kv' => 'komiešu',
  				'kw' => 'korniešu',
  				'kwk' => 'kvakvala',
+ 				'kxv' => 'kuvi',
  				'ky' => 'kirgīzu',
  				'la' => 'latīņu',
  				'lad' => 'ladino',
@@ -722,8 +724,10 @@ has 'display_name_language' => (
  				'lez' => 'lezgīnu',
  				'lg' => 'gandu',
  				'li' => 'limburgiešu',
+ 				'lij' => 'ligūriešu',
  				'lil' => 'lilluetu',
  				'lkt' => 'lakotu',
+ 				'lmo' => 'lombardiešu',
  				'ln' => 'lingala',
  				'lo' => 'laosiešu',
  				'lol' => 'mongu',
@@ -736,7 +740,6 @@ has 'display_name_language' => (
  				'lua' => 'lubalulva',
  				'lui' => 'luisenu',
  				'lun' => 'lundu',
- 				'luo' => 'luo',
  				'lus' => 'lušeju',
  				'luy' => 'luhju',
  				'lv' => 'latviešu',
@@ -755,7 +758,7 @@ has 'display_name_language' => (
  				'mfe' => 'Maurīcijas kreolu',
  				'mg' => 'malagasu',
  				'mga' => 'vidusīru',
- 				'mgh' => 'makua',
+ 				'mgh' => 'makua-mīto',
  				'mgo' => 'metu',
  				'mh' => 'māršaliešu',
  				'mi' => 'maoru',
@@ -915,6 +918,7 @@ has 'display_name_language' => (
  				'swb' => 'komoru',
  				'syc' => 'klasiskā sīriešu',
  				'syr' => 'sīriešu',
+ 				'szl' => 'silēziešu',
  				'ta' => 'tamilu',
  				'tce' => 'dienvidtutčonu',
  				'te' => 'telugu',
@@ -963,7 +967,9 @@ has 'display_name_language' => (
  				'uz' => 'uzbeku',
  				'vai' => 'vaju',
  				've' => 'vendu',
+ 				'vec' => 'venēciešu',
  				'vi' => 'vjetnamiešu',
+ 				'vmw' => 'makua',
  				'vo' => 'volapiks',
  				'vot' => 'votu',
  				'vun' => 'vundžo',
@@ -977,6 +983,7 @@ has 'display_name_language' => (
  				'wuu' => 'vu ķīniešu',
  				'xal' => 'kalmiku',
  				'xh' => 'khosu',
+ 				'xnr' => 'kangri',
  				'xog' => 'sogu',
  				'yao' => 'jao',
  				'yap' => 'japiešu',
@@ -1550,7 +1557,6 @@ has 'display_name_type' => (
  				'phonebook' => q{tālruņu grāmatas kārtošanas secība},
  				'phonetic' => q{Fonētiskā kārtošanas secība},
  				'pinyin' => q{piņjiņa kārtošanas secība},
- 				'reformed' => q{Reformētā kārtošanas secība},
  				'search' => q{vispārīga meklēšana},
  				'searchjl' => q{Meklēt pēc Hangul sākuma līdzskaņa},
  				'standard' => q{standarta kārtošanas secība},
@@ -1687,15 +1693,15 @@ has 'characters' => (
 		no warnings 'experimental::regex_sets';
 		return {
 			auxiliary => qr{[y ō q ŗ w x]},
-			index => ['AĀ', 'B', 'C', 'Č', 'D', 'EĒ', 'F', 'G', 'Ģ', 'H', 'IĪY', 'J', 'K', 'Ķ', 'L', 'Ļ', 'M', 'N', 'Ņ', 'O', 'P', 'Q', 'R', 'S', 'Š', 'T', 'UŪ', 'V', 'W', 'X', 'Z', 'Ž'],
-			main => qr{[aā b c č d eē f g ģ h iī j k ķ l ļ m n ņ o p r s š t uū v z ž]},
+			index => ['A', 'Ā', 'B', 'C', 'Č', 'D', 'E', 'Ē', 'F', 'G', 'Ģ', 'H', 'I', 'Y', 'Ī', 'J', 'K', 'Ķ', 'L', 'Ļ', 'M', 'N', 'Ņ', 'O', 'P', 'Q', 'R', 'S', 'Š', 'T', 'U', 'Ū', 'V', 'W', 'X', 'Z', 'Ž'],
+			main => qr{[a ā b c č d e ē f g ģ h i ī j k ķ l ļ m n ņ o p r s š t u ū v z ž]},
 			numbers => qr{[  \- ‑ , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 			punctuation => qr{[\- ‐‑ – — , ; \: ! ? . … '‘’‚ "“”„ ( ) \[ \] § @ * / \& # † ‡ ′ ″]},
 		};
 	},
 EOT
 : sub {
-		return { index => ['AĀ', 'B', 'C', 'Č', 'D', 'EĒ', 'F', 'G', 'Ģ', 'H', 'IĪY', 'J', 'K', 'Ķ', 'L', 'Ļ', 'M', 'N', 'Ņ', 'O', 'P', 'Q', 'R', 'S', 'Š', 'T', 'UŪ', 'V', 'W', 'X', 'Z', 'Ž'], };
+		return { index => ['A', 'Ā', 'B', 'C', 'Č', 'D', 'E', 'Ē', 'F', 'G', 'Ģ', 'H', 'I', 'Y', 'Ī', 'J', 'K', 'Ķ', 'L', 'Ļ', 'M', 'N', 'Ņ', 'O', 'P', 'Q', 'R', 'S', 'Š', 'T', 'U', 'Ū', 'V', 'W', 'X', 'Z', 'Ž'], };
 },
 );
 
@@ -2253,6 +2259,7 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'concentr-milligram-ofglucose-per-deciliter' => {
+						'1' => q(masculine),
 						'name' => q(miligrami uz decilitru),
 						'one' => q({0} miligrams uz decilitru),
 						'other' => q({0} miligrami uz decilitru),
@@ -2260,6 +2267,7 @@ has 'units' => (
 					},
 					# Core Unit Identifier
 					'milligram-ofglucose-per-deciliter' => {
+						'1' => q(masculine),
 						'name' => q(miligrami uz decilitru),
 						'one' => q({0} miligrams uz decilitru),
 						'other' => q({0} miligrami uz decilitru),
@@ -2352,6 +2360,22 @@ has 'units' => (
 						'one' => q({0} promiriāde),
 						'other' => q({0} promiriādes),
 						'zero' => q({0}‱),
+					},
+					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'1' => q(feminine),
+						'name' => q(miljarddaļas),
+						'one' => q({0} miljarddaļa),
+						'other' => q({0} miljarddaļas),
+						'zero' => q({0} miljarddaļu),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'1' => q(feminine),
+						'name' => q(miljarddaļas),
+						'one' => q({0} miljarddaļa),
+						'other' => q({0} miljarddaļas),
+						'zero' => q({0} miljarddaļu),
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
@@ -2738,6 +2762,24 @@ has 'units' => (
 						'zero' => q({0} nanosekunžu),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'1' => q(feminine),
+						'name' => q(naktis),
+						'one' => q({0} nakts),
+						'other' => q({0} naktis),
+						'per' => q({0}/nakts),
+						'zero' => q({0} nakšu),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'1' => q(feminine),
+						'name' => q(naktis),
+						'one' => q({0} nakts),
+						'other' => q({0} naktis),
+						'per' => q({0}/nakts),
+						'zero' => q({0} nakšu),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'1' => q(masculine),
 						'name' => q(ceturkšņi),
@@ -2941,6 +2983,7 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'energy-kilocalorie' => {
+						'1' => q(feminine),
 						'name' => q(kilokalorijas),
 						'one' => q({0} kilokalorija),
 						'other' => q({0} kilokalorijas),
@@ -2948,6 +2991,7 @@ has 'units' => (
 					},
 					# Core Unit Identifier
 					'kilocalorie' => {
+						'1' => q(feminine),
 						'name' => q(kilokalorijas),
 						'one' => q({0} kilokalorija),
 						'other' => q({0} kilokalorijas),
@@ -3021,7 +3065,7 @@ has 'units' => (
 						'name' => q(ņūtoni),
 						'one' => q({0} ņūtons),
 						'other' => q({0} ņūtoni),
-						'zero' => q({0} N),
+						'zero' => q({0} ņūtonu),
 					},
 					# Core Unit Identifier
 					'newton' => {
@@ -3029,7 +3073,7 @@ has 'units' => (
 						'name' => q(ņūtoni),
 						'one' => q({0} ņūtons),
 						'other' => q({0} ņūtoni),
-						'zero' => q({0} N),
+						'zero' => q({0} ņūtonu),
 					},
 					# Long Unit Identifier
 					'force-pound-force' => {
@@ -3150,28 +3194,28 @@ has 'units' => (
 						'1' => q(masculine),
 						'one' => q({0} megapikselis),
 						'other' => q({0} megapikseļi),
-						'zero' => q({0} MP),
+						'zero' => q({0} megapikseļu),
 					},
 					# Core Unit Identifier
 					'megapixel' => {
 						'1' => q(masculine),
 						'one' => q({0} megapikselis),
 						'other' => q({0} megapikseļi),
-						'zero' => q({0} MP),
+						'zero' => q({0} megapikseļu),
 					},
 					# Long Unit Identifier
 					'graphics-pixel' => {
 						'1' => q(masculine),
 						'one' => q({0} pikselis),
 						'other' => q({0} pikseļi),
-						'zero' => q({0} px),
+						'zero' => q({0} pikseļu),
 					},
 					# Core Unit Identifier
 					'pixel' => {
 						'1' => q(masculine),
 						'one' => q({0} pikselis),
 						'other' => q({0} pikseļi),
-						'zero' => q({0} px),
+						'zero' => q({0} pikseļu),
 					},
 					# Long Unit Identifier
 					'graphics-pixel-per-centimeter' => {
@@ -3179,7 +3223,7 @@ has 'units' => (
 						'name' => q(pikseļi centimetrā),
 						'one' => q({0} pikselis centimetrā),
 						'other' => q({0} pikseļi centimetrā),
-						'zero' => q({0} ppcm),
+						'zero' => q({0} pikseļu centimetrā),
 					},
 					# Core Unit Identifier
 					'pixel-per-centimeter' => {
@@ -3187,7 +3231,7 @@ has 'units' => (
 						'name' => q(pikseļi centimetrā),
 						'one' => q({0} pikselis centimetrā),
 						'other' => q({0} pikseļi centimetrā),
-						'zero' => q({0} ppcm),
+						'zero' => q({0} pikseļu centimetrā),
 					},
 					# Long Unit Identifier
 					'graphics-pixel-per-inch' => {
@@ -3473,12 +3517,14 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-point' => {
+						'1' => q(masculine),
 						'one' => q({0} punkts),
 						'other' => q({0} punkti),
 						'zero' => q({0} punktu),
 					},
 					# Core Unit Identifier
 					'point' => {
+						'1' => q(masculine),
 						'one' => q({0} punkts),
 						'other' => q({0} punkti),
 						'zero' => q({0} punktu),
@@ -3955,7 +4001,7 @@ has 'units' => (
 						'name' => q(kilopaskāli),
 						'one' => q({0} kilopaskāls),
 						'other' => q({0} kilopaskāli),
-						'zero' => q({0} kPa),
+						'zero' => q({0} kilopaskālu),
 					},
 					# Core Unit Identifier
 					'kilopascal' => {
@@ -3963,7 +4009,7 @@ has 'units' => (
 						'name' => q(kilopaskāli),
 						'one' => q({0} kilopaskāls),
 						'other' => q({0} kilopaskāli),
-						'zero' => q({0} kPa),
+						'zero' => q({0} kilopaskālu),
 					},
 					# Long Unit Identifier
 					'pressure-megapascal' => {
@@ -3999,6 +4045,7 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'pressure-millimeter-ofhg' => {
+						'1' => q(masculine),
 						'name' => q(dzīvsudraba stabiņa milimetri),
 						'one' => q({0} dzīvsudraba stabiņa milimetrs),
 						'other' => q({0} dzīvsudraba stabiņa milimetri),
@@ -4006,6 +4053,7 @@ has 'units' => (
 					},
 					# Core Unit Identifier
 					'millimeter-ofhg' => {
+						'1' => q(masculine),
 						'name' => q(dzīvsudraba stabiņa milimetri),
 						'one' => q({0} dzīvsudraba stabiņa milimetrs),
 						'other' => q({0} dzīvsudraba stabiņa milimetri),
@@ -4082,6 +4130,22 @@ has 'units' => (
 						'one' => q({0} mezgls),
 						'other' => q({0} mezgli),
 						'zero' => q({0} mezglu),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'1' => q(feminine),
+						'name' => q(gaisma),
+						'one' => q({0} gaisma),
+						'other' => q({0} gaismas),
+						'zero' => q({0} gaismas),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'1' => q(feminine),
+						'name' => q(gaisma),
+						'one' => q({0} gaisma),
+						'other' => q({0} gaismas),
+						'zero' => q({0} gaismas),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -4699,14 +4763,12 @@ has 'units' => (
 				'narrow' => {
 					# Long Unit Identifier
 					'acceleration-g-force' => {
-						'name' => q(Brīvās krišanas paātrinājums:),
 						'one' => q({0}G),
 						'other' => q({0}G),
 						'zero' => q({0}G),
 					},
 					# Core Unit Identifier
 					'g-force' => {
-						'name' => q(Brīvās krišanas paātrinājums:),
 						'one' => q({0}G),
 						'other' => q({0}G),
 						'zero' => q({0}G),
@@ -4794,6 +4856,14 @@ has 'units' => (
 						'zero' => q({0}mi²),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(miljarddaļas),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(miljarddaļas),
+					},
+					# Long Unit Identifier
 					'duration-hour' => {
 						'name' => q(h),
 						'one' => q({0} h),
@@ -4822,6 +4892,22 @@ has 'units' => (
 						'other' => q({0} m.),
 						'per' => q({0}/m.),
 						'zero' => q({0} m.),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(naktis),
+						'one' => q({0} nakts),
+						'other' => q({0} naktis),
+						'per' => q({0}/nakts),
+						'zero' => q({0} nakšu),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(naktis),
+						'one' => q({0} nakts),
+						'other' => q({0} naktis),
+						'per' => q({0}/nakts),
+						'zero' => q({0} nakšu),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -4966,18 +5052,6 @@ has 'units' => (
 						'one' => q({0} sk.j.),
 						'other' => q({0} sk.j.),
 						'zero' => q({0} sk.j.),
-					},
-					# Long Unit Identifier
-					'length-millimeter' => {
-						'one' => q({0}mm),
-						'other' => q({0} mm),
-						'zero' => q({0} mm),
-					},
-					# Core Unit Identifier
-					'millimeter' => {
-						'one' => q({0}mm),
-						'other' => q({0} mm),
-						'zero' => q({0} mm),
 					},
 					# Long Unit Identifier
 					'length-nautical-mile' => {
@@ -5202,6 +5276,20 @@ has 'units' => (
 						'one' => q({0} mezgls),
 						'other' => q({0} mezgli),
 						'zero' => q({0} mezgli),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(gaisma),
+						'one' => q({0} gaisma),
+						'other' => q({0} gaismas),
+						'zero' => q({0} gaismu),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(gaisma),
+						'one' => q({0} gaisma),
+						'other' => q({0} gaismas),
+						'zero' => q({0} gaismu),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -5466,6 +5554,14 @@ has 'units' => (
 						'name' => q(promiriāde),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(miljarddaļas),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(miljarddaļas),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(l/100 km),
 						'one' => q({0} l/100 km),
@@ -5622,6 +5718,22 @@ has 'units' => (
 						'other' => q({0} mēn.),
 						'per' => q({0}/mēn.),
 						'zero' => q({0} mēn.),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(naktis),
+						'one' => q({0} nakts),
+						'other' => q({0} naktis),
+						'per' => q({0}/nakts),
+						'zero' => q({0} nakšu),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(naktis),
+						'one' => q({0} nakts),
+						'other' => q({0} naktis),
+						'per' => q({0}/nakts),
+						'zero' => q({0} nakšu),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -6168,6 +6280,20 @@ has 'units' => (
 					# Core Unit Identifier
 					'knot' => {
 						'name' => q(mezgls),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(gaisma),
+						'one' => q({0} gaisma),
+						'other' => q({0} gaismas),
+						'zero' => q({0} gaismu),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(gaisma),
+						'one' => q({0} gaisma),
+						'other' => q({0} gaismas),
+						'zero' => q({0} gaismu),
 					},
 					# Long Unit Identifier
 					'temperature-celsius' => {
@@ -9790,9 +9916,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#Ņujorka#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#Nipigona#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#Noma#,
 		},
@@ -9810,9 +9933,6 @@ has 'time_zone_names' => (
 		},
 		'America/Ojinaga' => {
 			exemplarCity => q#Ohinaga#,
-		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#Pannirtuna#,
 		},
 		'America/Phoenix' => {
 			exemplarCity => q#Fīniksa#,
@@ -9832,9 +9952,6 @@ has 'time_zone_names' => (
 		'America/Punta_Arenas' => {
 			exemplarCity => q#Puntaarenasa#,
 		},
-		'America/Rainy_River' => {
-			exemplarCity => q#Reinirivera#,
-		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#Rankininleta#,
 		},
@@ -9849,9 +9966,6 @@ has 'time_zone_names' => (
 		},
 		'America/Rio_Branco' => {
 			exemplarCity => q#Riobranko#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#Santaisabela#,
 		},
 		'America/Santarem' => {
 			exemplarCity => q#Santarena#,
@@ -9895,9 +10009,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#Tule#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#Tanderbeja#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#Tihuana#,
 		},
@@ -9912,9 +10023,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#Jakutata#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#Jelounaifa#,
 		},
 		'America_Central' => {
 			long => {
@@ -10072,9 +10180,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#Čita#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#Čoibalsana#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#Kolombo#,
@@ -10290,9 +10395,6 @@ has 'time_zone_names' => (
 		'Australia/Broken_Hill' => {
 			exemplarCity => q#Brokenhila#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#Kari#,
-		},
 		'Australia/Darwin' => {
 			exemplarCity => q#Dārvina#,
 		},
@@ -10419,13 +10521,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Ķīnas vasaras laiks#,
 				'generic' => q#Ķīnas laiks#,
 				'standard' => q#Ķīnas ziemas laiks#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Čoibalsanas vasaras laiks#,
-				'generic' => q#Čoibalsanas laiks#,
-				'standard' => q#Čoibalsanas ziemas laiks#,
 			},
 		},
 		'Christmas' => {
@@ -10629,9 +10724,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#Uļjanovska#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#Užhoroda#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#Vaduca#,
 		},
@@ -10652,9 +10744,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#Zagreba#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#Zaporožje#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#Cīrihe#,
@@ -10894,6 +10983,11 @@ has 'time_zone_names' => (
 				'standard' => q#Petropavlovskas-Kamčatskas ziemas laiks#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Kazahstānas laiks#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#Austrumkazahstānas laiks#,
@@ -10940,11 +11034,6 @@ has 'time_zone_names' => (
 				'standard' => q#Lorda Hava salas ziemas laiks#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Makvorija salas laiks#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Magadanas vasaras laiks#,
@@ -10982,13 +11071,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Mosonas laiks#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Ziemeļrietumu Meksikas vasaras laiks#,
-				'generic' => q#Ziemeļrietumu Meksikas laiks#,
-				'standard' => q#Ziemeļrietumu Meksikas ziemas laiks#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -11116,9 +11198,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Honolulu' => {
 			exemplarCity => q#Honolulu#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#Džonstona atols#,
 		},
 		'Pacific/Kanton' => {
 			exemplarCity => q#Kantona#,

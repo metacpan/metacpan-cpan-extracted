@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Km - Package for language Khmer
 
 package Locale::CLDR::Locales::Km;
 # This file auto generated from Data\common\main\km.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -286,7 +286,7 @@ has 'display_name_language' => (
  				'ann' => 'អូបូឡូ',
  				'anp' => 'អាហ្គីកា',
  				'ar' => 'អារ៉ាប់',
- 				'ar_001' => 'អារ៉ាប់ (ស្តង់ដារ)',
+ 				'ar_001' => 'អារ៉ាប់ស្តង់ដារទំនើប',
  				'arn' => 'ម៉ាពូឈី',
  				'arp' => 'អារ៉ាប៉ាហូ',
  				'ars' => 'អារ៉ាប់ណាឌី',
@@ -298,7 +298,7 @@ has 'display_name_language' => (
  				'awa' => 'អាវ៉ាឌី',
  				'ay' => 'អីម៉ារ៉ា',
  				'az' => 'អាស៊ែបៃហ្សង់',
- 				'az@alt=short' => 'អាហ្សេរី',
+ 				'az@alt=short' => 'អាហ្ស៊ែរី',
  				'ba' => 'បាស្គៀ',
  				'ban' => 'បាលី',
  				'bas' => 'បាសា',
@@ -312,12 +312,13 @@ has 'display_name_language' => (
  				'bi' => 'ប៊ីស្លាម៉ា',
  				'bin' => 'ប៊ីនី',
  				'bla' => 'ស៊ីកស៊ីកា',
+ 				'blo' => 'អានី',
  				'bm' => 'បាម្បារា',
  				'bn' => 'បង់ក្លាដែស',
  				'bo' => 'ទីបេ',
  				'br' => 'ប្រ៊ីស្តុន',
  				'brx' => 'បូដូ',
- 				'bs' => 'បូស្នី',
+ 				'bs' => 'បូស្ន៊ី',
  				'bug' => 'ប៊ុកហ្គី',
  				'byn' => 'ប្ល៊ីន',
  				'ca' => 'កាតាឡាន',
@@ -423,6 +424,7 @@ has 'display_name_language' => (
  				'iba' => 'អ៊ីបាន',
  				'ibb' => 'អាយប៊ីប៊ីអូ',
  				'id' => 'ឥណ្ឌូណេស៊ី',
+ 				'ie' => 'អ៊ីនធើលីងវេ',
  				'ig' => 'អ៊ីកបូ',
  				'ii' => 'ស៊ីឈាន់យី',
  				'ikt' => 'អ៊ីនុកទីទុត​កាណាដា​ប៉ែកខាងលិច',
@@ -476,6 +478,7 @@ has 'display_name_language' => (
  				'kv' => 'កូមី',
  				'kw' => 'កូនីស',
  				'kwk' => 'ក្វាក់វ៉ាឡា',
+ 				'kxv' => 'គូវី',
  				'ky' => '​កៀហ្ស៊ីស',
  				'la' => 'ឡាតំាង',
  				'lad' => 'ឡាឌីណូ',
@@ -487,6 +490,7 @@ has 'display_name_language' => (
  				'lij' => 'លីគូរី',
  				'lil' => 'លីលលូអេត',
  				'lkt' => 'ឡាកូតា',
+ 				'lmo' => 'ឡំបាត',
  				'ln' => 'លីនកាឡា',
  				'lo' => 'ឡាវ',
  				'lou' => 'ក្រេអូល លូអ៊ីស៊ីអាណា',
@@ -600,7 +604,7 @@ has 'display_name_language' => (
  				'rwk' => 'រ៉្វា',
  				'sa' => 'សំស្ក្រឹត',
  				'sad' => 'សានដាវី',
- 				'sah' => 'សាខា',
+ 				'sah' => 'យ៉ាឃុត',
  				'saq' => 'សាមបូរូ',
  				'sat' => 'សាន់តាលី',
  				'sba' => 'ងាំបេយ',
@@ -643,6 +647,7 @@ has 'display_name_language' => (
  				'sw_CD' => 'កុងហ្គោស្វាហ៊ីលី',
  				'swb' => 'កូម៉ូរី',
  				'syr' => 'ស៊ីរី',
+ 				'szl' => 'ស៊ីឡេស៊ី',
  				'ta' => 'តាមីល',
  				'tce' => 'ថុចឆុនខាងត្បូង',
  				'te' => 'តេលុគុ',
@@ -685,6 +690,7 @@ has 'display_name_language' => (
  				've' => 'វេនដា',
  				'vec' => 'វេណេតូ',
  				'vi' => 'វៀតណាម',
+ 				'vmw' => 'ម៉ាឃូវ៉ា',
  				'vo' => 'វូឡាពូក',
  				'vun' => 'វុនចូ',
  				'wa' => 'វ៉ាលូន',
@@ -696,6 +702,7 @@ has 'display_name_language' => (
  				'wuu' => 'អ៊ូចិន',
  				'xal' => 'កាលមីគ',
  				'xh' => 'ឃសា',
+ 				'xnr' => 'ខែងគ្រី',
  				'xog' => 'សូហ្គា',
  				'yav' => 'យ៉ាងបេន',
  				'ybb' => 'យេមបា',
@@ -1122,7 +1129,6 @@ has 'display_name_region' => (
  			'TN' => 'ទុយនីស៊ី',
  			'TO' => 'តុងហ្គា',
  			'TR' => 'តួកគី',
- 			'TR@alt=variant' => 'តួកគីយេ',
  			'TT' => 'ទ្រីនីដាត និង​តូបាហ្គោ',
  			'TV' => 'ទូវ៉ាលូ',
  			'TW' => 'តៃវ៉ាន់',
@@ -1682,6 +1688,16 @@ has 'units' => (
 						'other' => q({0} ផ្នែកក្នុងមួយលាន),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(ផ្នែកក្នុងមួយប៊ីលាន),
+						'other' => q({0} ផ្នែកក្នុងមួយប៊ីលាន),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(ផ្នែកក្នុងមួយប៊ីលាន),
+						'other' => q({0} ផ្នែកក្នុងមួយប៊ីលាន),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(លីត្រក្នុង 100 គីឡូម៉ែត្រ),
 						'other' => q({0} លីត្រក្នុង 100 គីឡូម៉ែត្រ),
@@ -1898,6 +1914,18 @@ has 'units' => (
 					# Core Unit Identifier
 					'nanosecond' => {
 						'other' => q({0} ណាណូវិនាទី),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(យប់),
+						'other' => q({0} យប់),
+						'per' => q({0} ក្នុងមួយយប់),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(យប់),
+						'other' => q({0} យប់),
+						'per' => q({0} ក្នុងមួយយប់),
 					},
 					# Long Unit Identifier
 					'duration-second' => {
@@ -2668,6 +2696,16 @@ has 'units' => (
 						'other' => q({0} ណត់),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(ពន្លឺ),
+						'other' => q({0} ពន្លឺ),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(ពន្លឺ),
+						'other' => q({0} ពន្លឺ),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'name' => q(ម៉ែត្រ​ក្នុង​មួយ​វិនាទី),
 						'other' => q({0} ម៉ែត្រ​ក្នុង​មួយ​វិនាទី),
@@ -3080,6 +3118,14 @@ has 'units' => (
 						'name' => q(%),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'other' => q({0}ppb),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'other' => q({0}ppb),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'other' => q({0}L/100km),
 					},
@@ -3096,12 +3142,16 @@ has 'units' => (
 						'name' => q(លី/គម),
 					},
 					# Long Unit Identifier
-					'duration-decade' => {
-						'other' => q({0} ទ.វ.),
+					'duration-night' => {
+						'name' => q(យប់),
+						'other' => q({0} យប់),
+						'per' => q({0}/យប់),
 					},
 					# Core Unit Identifier
-					'decade' => {
-						'other' => q({0} ទ.វ.),
+					'night' => {
+						'name' => q(យប់),
+						'other' => q({0} យប់),
+						'per' => q({0}/យប់),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -3262,6 +3312,16 @@ has 'units' => (
 					'millimeter-ofhg' => {
 						'name' => q(mmHg),
 						'other' => q({0}mmHg),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(ពន្លឺ),
+						'other' => q({0} ពន្លឺ),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(ពន្លឺ),
+						'other' => q({0} ពន្លឺ),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -3444,6 +3504,14 @@ has 'units' => (
 						'name' => q(ភាគរយ),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(ផ្នែក/ប៊ីលាន),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(ផ្នែក/ប៊ីលាន),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-kilometer' => {
 						'name' => q(លីត្រ/គម),
 						'other' => q({0} លី/គម),
@@ -3578,6 +3646,18 @@ has 'units' => (
 					# Core Unit Identifier
 					'nanosecond' => {
 						'name' => q(ណាណូវិនាទី),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(យប់),
+						'other' => q({0} យប់),
+						'per' => q({0}/យប់),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(យប់),
+						'other' => q({0} យប់),
+						'per' => q({0}/យប់),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -3914,6 +3994,16 @@ has 'units' => (
 					# Core Unit Identifier
 					'kilometer-per-hour' => {
 						'other' => q({0} kph),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(ពន្លឺ),
+						'other' => q({0} ពន្លឺ),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(ពន្លឺ),
+						'other' => q({0} ពន្លឺ),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -4826,7 +4916,8 @@ has 'currencies' => (
 		},
 		'QAR' => {
 			display_name => {
-				'currency' => q(រៀល​កាតា),
+				'currency' => q(រីយ៉ាលកាតា),
+				'other' => q(រីយ៉ាលកាតា),
 			},
 		},
 		'RON' => {
@@ -5455,6 +5546,7 @@ has 'datetime_formats_available_formats' => (
 			MEd => q{E d/M},
 			MMMEd => q{E d MMM},
 			MMMMW => q{សប្តាហ៍ទី W នៃខែ MMMM},
+			MMMMd => q{d MMMM},
 			MMMd => q{d MMM},
 			Md => q{d/M},
 			yM => q{M/y},
@@ -6258,9 +6350,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#ញូវយ៉ក#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#នីពីកុន#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#ណូម#,
 		},
@@ -6281,9 +6370,6 @@ has 'time_zone_names' => (
 		},
 		'America/Panama' => {
 			exemplarCity => q#ប៉ាណាម៉ា#,
-		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#ប៉ាងនីទុង#,
 		},
 		'America/Paramaribo' => {
 			exemplarCity => q#ប៉ារ៉ាម៉ារីបូ#,
@@ -6306,9 +6392,6 @@ has 'time_zone_names' => (
 		'America/Punta_Arenas' => {
 			exemplarCity => q#ពុនតា អារ៉េណា#,
 		},
-		'America/Rainy_River' => {
-			exemplarCity => q#រ៉េនីរីវើ#,
-		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#រ៉ាន់ឃីន​អ៊ីនឡិត#,
 		},
@@ -6323,9 +6406,6 @@ has 'time_zone_names' => (
 		},
 		'America/Rio_Branco' => {
 			exemplarCity => q#រីយ៉ូប្រានកូ#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#សាន់តាអ៊ីសាប៊ែល#,
 		},
 		'America/Santarem' => {
 			exemplarCity => q#សាន់តារឹម#,
@@ -6372,9 +6452,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#ធុឡេ#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#សាន់ដឺ​បេ#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#ទីយ្យូអាណា#,
 		},
@@ -6395,9 +6472,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#យ៉ាគូតាត#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#យេឡូណៃ#,
 		},
 		'America_Central' => {
 			long => {
@@ -6551,9 +6625,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#ឈីតា#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#ឈូបាល់សាន#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#កូឡុំបូ#,
@@ -6793,9 +6864,6 @@ has 'time_zone_names' => (
 		'Australia/Broken_Hill' => {
 			exemplarCity => q#ប្រូកខិនហីល#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#ខូរៀ#,
-		},
 		'Australia/Darwin' => {
 			exemplarCity => q#ដាវីន#,
 		},
@@ -6922,13 +6990,6 @@ has 'time_zone_names' => (
 				'daylight' => q#ម៉ោង​ពេល​ថ្ងៃ​នៅ​ចិន#,
 				'generic' => q#ម៉ោង​នៅ​ចិន#,
 				'standard' => q#ម៉ោង​ស្តង់ដារ​នៅ​ចិន#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#ម៉ោង​នៅ​ឆូបាល់សាននារដូវ​ក្ដៅ​#,
-				'generic' => q#ម៉ោង​នៅ​ឆូបាល់សាន#,
-				'standard' => q#ម៉ោង​ស្តង់ដារ​នៅ​ឆូបាល់សាន#,
 			},
 		},
 		'Christmas' => {
@@ -7153,9 +7214,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#អុលយ៉ាណូវស្កិ៍#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#អ៊ុយហ្គោរ៉ូដ#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#វ៉ាឌូស#,
 		},
@@ -7176,9 +7234,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#សាគ្រែប#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#ហ្សាប៉ូរ៉ូហ្ស៊ីយ៉េ#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#ហ៊្សូរីច#,
@@ -7396,6 +7451,11 @@ has 'time_zone_names' => (
 				'standard' => q#ម៉ោង​ស្តង់ដារ​នៅ​ជប៉ុន#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#ពេលវេលានៅកាហ្សាក់ស្ថាន#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#ម៉ោង​កាហ្សាក់ស្ថាន​​ខាង​កើត#,
@@ -7442,11 +7502,6 @@ has 'time_zone_names' => (
 				'standard' => q#ម៉ោង​ស្តង់ដារ​នៅ​ឡត​ហៅ#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#ម៉ោង​នៅ​កោះ​ម៉ាកគែរី#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#ម៉ោង​នៅ​ម៉ាហ្កាដាន​នារដូវ​ក្ដៅ#,
@@ -7484,13 +7539,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#ម៉ោង​នៅ​ម៉ៅ​សាន់#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#ម៉ោង​ពេល​ថ្ងៃ​នៅ​ម៉ិកស៊ិកភាគពាយព្យ#,
-				'generic' => q#ម៉ោង​នៅ​ម៉ិកស៊ិកភាគពាយព្យ#,
-				'standard' => q#ម៉ោង​ស្តង់ដារនៅ​ម៉ិកស៊ិកភាគពាយព្យ#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -7627,9 +7675,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Honolulu' => {
 			exemplarCity => q#ហូណូលូលូ#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#ចនស្តុន#,
 		},
 		'Pacific/Kanton' => {
 			exemplarCity => q#កាន់តុន#,

@@ -8,18 +8,18 @@ Locale::CLDR::Locales::My - Package for language Burmese
 
 package Locale::CLDR::Locales::My;
 # This file auto generated from Data\common\main\my.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -331,6 +331,7 @@ has 'display_name_language' => (
  				'bi' => 'ဘစ်စ်လာမာ',
  				'bin' => 'ဘီနီ',
  				'bla' => 'စစ္စီကာ',
+ 				'blo' => 'အန်နီ',
  				'bm' => 'ဘန်ဘာရာ',
  				'bn' => 'ဘင်္ဂါလီ',
  				'bo' => 'တိဘက်',
@@ -448,7 +449,8 @@ has 'display_name_language' => (
  				'haw' => 'ဟာဝိုင်ယီ',
  				'hax' => 'တောင် ဟိုင်ဒါ',
  				'he' => 'ဟီဘရူး',
- 				'hi' => 'ဟိန်ဒူ',
+ 				'hi' => 'ဟိန္ဒီ',
+ 				'hi_Latn' => 'ဟိန္ဒီ (လက်တင်)',
  				'hil' => 'ဟီလီဂေနွန်',
  				'hmn' => 'မုံ',
  				'hr' => 'ခရိုအေးရှား',
@@ -463,6 +465,7 @@ has 'display_name_language' => (
  				'iba' => 'အီဗန်',
  				'ibb' => 'အီဘီဘီယို',
  				'id' => 'အင်ဒိုနီးရှား',
+ 				'ie' => 'အင်တာလင်း',
  				'ig' => 'အစ္ဂဘို',
  				'ii' => 'စီချွမ် ရီ',
  				'ikt' => 'အနောက် ကနေဒီယန် အီနုတီတွတ်',
@@ -519,6 +522,7 @@ has 'display_name_language' => (
  				'kv' => 'ကိုမီ',
  				'kw' => 'ခိုနီရှ်',
  				'kwk' => 'ကွပ်ခ်ဝါလာ',
+ 				'kxv' => 'ကူဗီ',
  				'ky' => 'ကာဂျစ်',
  				'la' => 'လက်တင်',
  				'lad' => 'လာဒီနို',
@@ -527,8 +531,10 @@ has 'display_name_language' => (
  				'lez' => 'လက်ဇ်ဂီးယား',
  				'lg' => 'ဂန်ဒါ',
  				'li' => 'လင်ဘာဂစ်ရှ်',
+ 				'lij' => 'လက်ဂါးရီရန်',
  				'lil' => 'လာလူးဝစ်တ်',
  				'lkt' => 'လာကိုတာ',
+ 				'lmo' => 'လန်းဘတ်',
  				'ln' => 'လင်ဂါလာ',
  				'lo' => 'လာအို',
  				'lou' => 'လူဝီဇီယားနား ခရီးယို',
@@ -688,6 +694,7 @@ has 'display_name_language' => (
  				'sw_CD' => 'ကွန်ဂို ဆွာဟီလီ',
  				'swb' => 'ကိုမိုရီးယန်း',
  				'syr' => 'ဆီးရီးယား',
+ 				'szl' => 'စလီရှန်',
  				'ta' => 'တမီးလ်',
  				'tce' => 'တောင် တပ်ချွန်',
  				'te' => 'တီလီဂူ',
@@ -727,7 +734,9 @@ has 'display_name_language' => (
  				'uz' => 'ဥဇဘတ်',
  				'vai' => 'ဗိုင်',
  				've' => 'ဗင်န်ဒါ',
+ 				'vec' => 'ဗနီးရှန်',
  				'vi' => 'ဗီယက်နမ်',
+ 				'vmw' => 'မတ်ကူးဝါး',
  				'vo' => 'ဗိုလာပိုက်',
  				'vun' => 'ဗွန်ဂျို',
  				'wa' => 'ဝါလူးန်',
@@ -739,6 +748,7 @@ has 'display_name_language' => (
  				'wuu' => 'ဝူ တရုတ်',
  				'xal' => 'ကာလ်မိုက်',
  				'xh' => 'ဇိုစာ',
+ 				'xnr' => 'ခန်းဂရီ',
  				'xog' => 'ဆိုဂါ',
  				'yav' => 'ရန်ဘဲန်',
  				'ybb' => 'ရမ်ဘာ',
@@ -747,6 +757,7 @@ has 'display_name_language' => (
  				'yrl' => 'အန်ဟင်းဂတူ',
  				'yue' => 'ကွမ်းတုံ',
  				'yue@alt=menu' => 'တရုတ်/ ကွမ်းတုံ',
+ 				'za' => 'ဂျွမ်',
  				'zgh' => 'မိုရိုကို တမဇိုက်',
  				'zh' => 'တရုတ်',
  				'zh@alt=menu' => 'ပြည်ကြီးတရုတ်',
@@ -1832,6 +1843,16 @@ has 'units' => (
 						'other' => q({0} ပါမီရိတ်),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(သန်းတစ်ထောင်ပုံ တစ်ပုံ),
+						'other' => q(သန်းတစ်ထောင်ပုံ {0} ပုံ),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(သန်းတစ်ထောင်ပုံ တစ်ပုံ),
+						'other' => q(သန်းတစ်ထောင်ပုံ {0} ပုံ),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'other' => q(တစ်ရာကီလိုမီတာရှိ {0} လီတာ),
 					},
@@ -2038,6 +2059,18 @@ has 'units' => (
 					# Core Unit Identifier
 					'nanosecond' => {
 						'other' => q({0} နာနိုစက္ကန့်),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(ည),
+						'other' => q({0} ည),
+						'per' => q({0}/ည),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(ည),
+						'other' => q({0} ည),
+						'per' => q({0}/ည),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -2305,13 +2338,13 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-astronomical-unit' => {
-						'name' => q(နက်ခတ်တဗဒေယူနဈ),
-						'other' => q({0} နက်ခတ်တဗဒေယူနဈ),
+						'name' => q(နက္ခတဗေဒ ယူနစ်),
+						'other' => q({0} နက္ခတဗေဒ ယူနစ်),
 					},
 					# Core Unit Identifier
 					'astronomical-unit' => {
-						'name' => q(နက်ခတ်တဗဒေယူနဈ),
-						'other' => q({0} နက်ခတ်တဗဒေယူနဈ),
+						'name' => q(နက္ခတဗေဒ ယူနစ်),
+						'other' => q({0} နက္ခတဗေဒ ယူနစ်),
 					},
 					# Long Unit Identifier
 					'length-centimeter' => {
@@ -2818,6 +2851,16 @@ has 'units' => (
 						'other' => q({0} နော့တီကယ်မိုင်),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(အလင်း),
+						'other' => q({0} အလင်း),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(အလင်း),
+						'other' => q({0} အလင်း),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'other' => q(တစ်စက္ကန့်လျှင် {0} မီတာ),
 					},
@@ -3116,6 +3159,22 @@ has 'units' => (
 						'other' => q({0}°),
 					},
 					# Long Unit Identifier
+					'area-square-centimeter' => {
+						'name' => q(cm²),
+					},
+					# Core Unit Identifier
+					'square-centimeter' => {
+						'name' => q(cm²),
+					},
+					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'other' => q({0}ppb),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'other' => q({0}ppb),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(L/100km),
 						'other' => q({0} L/100km),
@@ -3180,6 +3239,18 @@ has 'units' => (
 					# Core Unit Identifier
 					'millisecond' => {
 						'other' => q({0} ms),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(ည),
+						'other' => q({0} ည),
+						'per' => q({0}/ည),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(ည),
+						'other' => q({0} ည),
+						'per' => q({0}/ည),
 					},
 					# Long Unit Identifier
 					'duration-second' => {
@@ -3370,6 +3441,16 @@ has 'units' => (
 						'name' => q(psi),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(အလင်း),
+						'other' => q({0}အလင်း),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(အလင်း),
+						'other' => q({0}အလင်း),
+					},
+					# Long Unit Identifier
 					'volume-barrel' => {
 						'name' => q(စည်),
 					},
@@ -3532,14 +3613,6 @@ has 'units' => (
 						'name' => q(ဟက်တာ),
 					},
 					# Long Unit Identifier
-					'area-square-centimeter' => {
-						'name' => q(စတုရန်းစင်တီမီတာ),
-					},
-					# Core Unit Identifier
-					'square-centimeter' => {
-						'name' => q(စတုရန်းစင်တီမီတာ),
-					},
-					# Long Unit Identifier
 					'area-square-foot' => {
 						'name' => q(စတုရန်းပေ),
 					},
@@ -3610,6 +3683,14 @@ has 'units' => (
 					# Core Unit Identifier
 					'permyriad' => {
 						'name' => q(ပါမီရိတ်),
+					},
+					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(သန်းတစ်ထောင်ပုံ တစ်ပုံ),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(သန်းတစ်ထောင်ပုံ တစ်ပုံ),
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
@@ -3834,6 +3915,18 @@ has 'units' => (
 					# Core Unit Identifier
 					'nanosecond' => {
 						'name' => q(နာနိုစက္ကန့်),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(ည),
+						'other' => q({0} ည),
+						'per' => q({0}/ည),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(ည),
+						'other' => q({0} ည),
+						'per' => q({0}/ည),
 					},
 					# Long Unit Identifier
 					'duration-second' => {
@@ -4366,6 +4459,16 @@ has 'units' => (
 						'name' => q(ကီလိုမီတာ/နာရီ),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(အလင်း),
+						'other' => q({0} အလင်း),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(အလင်း),
+						'other' => q({0} အလင်း),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'name' => q(မီတာ/စက္ကန့်),
 					},
@@ -4787,13 +4890,13 @@ has 'number_formats' => (
 					'other' => '00 ကုဋေ',
 				},
 				'1000000000' => {
-					'other' => '000 ကုဋေ',
+					'other' => '000 ဋေ',
 				},
 				'10000000000' => {
-					'other' => 'ကုဋေ 0 ထ',
+					'other' => 'ဋေ 0 ထ',
 				},
 				'100000000000' => {
-					'other' => 'ကုဋေ 0 သ',
+					'other' => 'ဋေ 0 သ',
 				},
 				'1000000000000' => {
 					'other' => 'ဋေ 0 သိန်း',
@@ -5455,7 +5558,6 @@ has 'currencies' => (
 			},
 		},
 		'PHP' => {
-			symbol => 'PHP',
 			display_name => {
 				'currency' => q(ဖိလစ်ပိုင် ပီဆို),
 			},
@@ -5552,7 +5654,8 @@ has 'currencies' => (
 		},
 		'SLL' => {
 			display_name => {
-				'currency' => q(ဆီယာရာလီယွန်း လီအိုနီ \(1964—2022\)),
+				'currency' => q(ဆီယာရာလီယွန်း လီအိုနီ \(၁၉၆၄—၂၀၂၂\)),
+				'other' => q(ဆီယာရာလီယွန်း လီအိုနီ \(၁၉၆၄—၂၀၂၂\)),
 			},
 		},
 		'SOS' => {
@@ -5867,6 +5970,15 @@ has 'calendar_days' => (
 	default		=> sub { {
 			'gregorian' => {
 				'format' => {
+					short => {
+						mon => 'လာ',
+						tue => 'ဂါ',
+						wed => 'ဟူး',
+						thu => 'တေး',
+						fri => 'ကြာ',
+						sat => 'နေ',
+						sun => 'နွေ'
+					},
 					wide => {
 						mon => 'တနင်္လာ',
 						tue => 'အင်္ဂါ',
@@ -5908,6 +6020,11 @@ has 'calendar_quarters' => (
 	default		=> sub { {
 			'gregorian' => {
 				'format' => {
+					abbreviated => {0 => 'Q1',
+						1 => 'Q2',
+						2 => 'Q3',
+						3 => 'Q4'
+					},
 					wide => {0 => 'ပထမ သုံးလပတ်',
 						1 => 'ဒုတိယ သုံးလပတ်',
 						2 => 'တတိယ သုံးလပတ်',
@@ -5915,6 +6032,11 @@ has 'calendar_quarters' => (
 					},
 				},
 				'stand-alone' => {
+					abbreviated => {0 => 'Q1',
+						1 => 'Q2',
+						2 => 'Q3',
+						3 => 'Q4'
+					},
 					narrow => {0 => 'ပ',
 						1 => 'ဒု',
 						2 => 'တ',
@@ -6048,9 +6170,9 @@ has 'date_formats' => (
 			'short' => q{GGGGG d/M/y},
 		},
 		'gregorian' => {
-			'full' => q{y၊ MMMM d၊ EEEE},
-			'long' => q{y၊ MMMM d},
-			'medium' => q{y၊ MMM d},
+			'full' => q{y MMMM d EEEE},
+			'long' => q{y MMMM d},
+			'medium' => q{y MMM d},
 			'short' => q{d/M/yy},
 		},
 	} },
@@ -6108,7 +6230,7 @@ has 'datetime_formats_available_formats' => (
 			Ehms => q{E a h:mm:ss},
 			GyMMMd => q{G d MMM y},
 			GyMd => q{GGGGG y/M/d},
-			MMMEd => q{MMM d၊ E},
+			MMMEd => q{MMM d E},
 			MMMMEd => q{MMMM d Eနေ့},
 			Md => q{d/M},
 			h => q{a h},
@@ -6125,29 +6247,24 @@ has 'datetime_formats_available_formats' => (
 			EBhm => q{E B h:mm},
 			EBhms => q{E B h:mm:ss},
 			Ed => q{d ရက် E},
-			Ehm => q{E B h:mm},
-			Ehms => q{E B h:mm:ss},
-			GyMMMEd => q{G y၊ MMM d၊ E},
-			GyMMMd => q{G y၊ MMM d},
+			Ehm => q{E a h:mm},
+			Ehms => q{E a h:mm:ss},
+			GyMMMEd => q{G y/ MMM d/ E},
 			GyMd => q{G y/M/d},
 			Hmsv => q{v HH:mm:ss},
 			Hmv => q{v HH:mm},
-			MEd => q{d/M၊ E},
-			MMMEd => q{MMM d၊ E},
-			MMMMEd => q{MMMM d ရက် E},
+			MEd => q{d/M E},
+			MMMEd => q{MMM d E},
+			MMMMEd => q{MMMM d E},
 			MMMMW => q{MMMM လ W ပတ်မြောက်},
-			MMMd => q{d MMM},
 			Md => q{d/M},
-			h => q{B h},
-			hm => q{B h:mm},
-			hms => q{B h:mm:ss},
+			h => q{a h},
+			hm => q{a h:mm},
+			hms => q{a h:mm:ss},
 			hmsv => q{v a h:mm:ss},
 			hmv => q{v a h:mm},
-			yM => q{M/y},
-			yMEd => q{d/M/y၊ E},
-			yMMM => q{MMM y},
-			yMMMEd => q{y၊ MMM d၊ E},
-			yMMMd => q{y၊ MMM d},
+			yMEd => q{d/M/y E},
+			yMMMEd => q{y MMM d E},
 			yMd => q{d/M/y},
 			yw => q{Y ခု w ပတ်မြောက်},
 		},
@@ -6260,16 +6377,16 @@ has 'datetime_formats_interval' => (
 				y => q{G y/M – y/M},
 			},
 			GyMEd => {
-				G => q{G y/M/d၊ E – G y/M/d၊ E},
-				M => q{G y/M/d၊ E – y/M/d၊ E},
-				d => q{G y/M/d၊ E – y/M/d၊ E},
-				y => q{G y/M/d၊ E – y/M/d၊ E},
+				G => q{G y/M/d E – G y/M/d E},
+				M => q{G y/M/d E – y/M/d E},
+				d => q{G y/M/d E – y/M/d E},
+				y => q{G y/M/d E – y/M/d E},
 			},
 			GyMMMEd => {
-				G => q{G y MMM d၊ E – G y MMM d၊ E},
-				M => q{G y MMM d၊ E – MMM d၊ E},
-				d => q{G y MMM d၊ E – MMM d၊ E},
-				y => q{G y MMM d၊ E – y MMM d၊ E},
+				G => q{G y MMM d E – G y MMM d E},
+				M => q{G y MMM d E – MMM d E},
+				d => q{G y MMM d E – MMM d E},
+				y => q{G y MMM d E – y MMM d E},
 			},
 			GyMMMd => {
 				d => q{G y MMM d – d},
@@ -6299,14 +6416,14 @@ has 'datetime_formats_interval' => (
 			},
 			MEd => {
 				M => q{d/M- EEEE – d/M- EEEE},
-				d => q{d/M၊ EEEE – d/M၊ EEEE},
+				d => q{d/M EEEE – d/M EEEE},
 			},
 			MMM => {
 				M => q{MMM – MMM},
 			},
 			MMMEd => {
-				M => q{MMM d၊ E – MMM d၊ E},
-				d => q{MMM d၊ E – MMM d၊ E},
+				M => q{MMM d E – MMM d E},
+				d => q{MMM d E – MMM d E},
 			},
 			MMMd => {
 				d => q{MMM d – d},
@@ -6345,25 +6462,23 @@ has 'datetime_formats_interval' => (
 				y => q{M/y – M/y},
 			},
 			yMEd => {
-				M => q{d/M/y၊ EEEE – d/M/y၊ EEEE},
-				d => q{d/M/y၊ EEEE – d/M/y၊ EEEE},
-				y => q{d/M/y၊ EEEE – d/M/y၊ EEEE},
+				M => q{d/M/y EEEE – d/M/y EEEE},
+				d => q{d/M/y EEE – d/M/y EEEE},
+				y => q{d/M/y EEEE – d/M/y EEEE},
 			},
 			yMMM => {
 				M => q{y MMM – MMM},
 			},
 			yMMMEd => {
-				M => q{y၊ MMM d၊ EEEE – MMM d၊ EEEE},
-				d => q{y၊ MMM d၊ EEEE – MMM d၊ EEEE},
-				y => q{y၊ MMM d၊ EEEE – y၊ MMM d၊ EEEE},
+				M => q{y MMM d EEEE – MMM d EEEE},
+				d => q{y MMM d EEEE – MMM d EEEE},
+				y => q{y MMM d EEEE – y MMM d EEEE},
 			},
 			yMMMM => {
 				M => q{y MMMM – MMMM},
 			},
 			yMMMd => {
-				M => q{y၊ MMM d – MMM d},
-				d => q{y၊ MMM d – d},
-				y => q{y၊ MMM d – y၊ MMM d},
+				d => q{y MMM d – d},
 			},
 			yMd => {
 				M => q{d/M/y – d/M/y},
@@ -6885,9 +7000,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#နယူးယောက်#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#နီပီဂွန်#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#နိုမီ#,
 		},
@@ -6908,9 +7020,6 @@ has 'time_zone_names' => (
 		},
 		'America/Panama' => {
 			exemplarCity => q#ပနားမား#,
-		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#ဖန်ဂ်နသ်တံ#,
 		},
 		'America/Paramaribo' => {
 			exemplarCity => q#ပါရာမာရီဘို#,
@@ -6933,9 +7042,6 @@ has 'time_zone_names' => (
 		'America/Punta_Arenas' => {
 			exemplarCity => q#ပွန်တာ အရီနာစ်#,
 		},
-		'America/Rainy_River' => {
-			exemplarCity => q#ရိမ်းနီး ရီဗာ#,
-		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#ရန်ကင် အင်းလက်#,
 		},
@@ -6950,9 +7056,6 @@ has 'time_zone_names' => (
 		},
 		'America/Rio_Branco' => {
 			exemplarCity => q#ရီယို ဘရန်ကို#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#ဆန်တာ အစ္ဇဘဲလ်#,
 		},
 		'America/Santarem' => {
 			exemplarCity => q#ဆန်တာရမ်#,
@@ -6999,9 +7102,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#သုလီ#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#သန်းန်ဒါး ဘေး#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#တီဂွါနာ#,
 		},
@@ -7022,9 +7122,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#ရာကုတတ်#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#ရဲလိုနိုက်ဖ်#,
 		},
 		'America_Central' => {
 			long => {
@@ -7179,9 +7276,6 @@ has 'time_zone_names' => (
 		'Asia/Chita' => {
 			exemplarCity => q#ချီတာ#,
 		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#ချွဲဘောဆန်#,
-		},
 		'Asia/Colombo' => {
 			exemplarCity => q#ကိုလံဘို#,
 		},
@@ -7228,7 +7322,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#ဂျေရုဆလင်#,
 		},
 		'Asia/Kabul' => {
-			exemplarCity => q#ကဘူးလျ#,
+			exemplarCity => q#ကာဘူးလ်#,
 		},
 		'Asia/Kamchatka' => {
 			exemplarCity => q#ခမ်ချာ့ခါ#,
@@ -7420,9 +7514,6 @@ has 'time_zone_names' => (
 		'Australia/Broken_Hill' => {
 			exemplarCity => q#ဘရိုကင်ဟီးလ်#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#ကာရီ#,
-		},
 		'Australia/Darwin' => {
 			exemplarCity => q#ဒါဝင်#,
 		},
@@ -7549,13 +7640,6 @@ has 'time_zone_names' => (
 				'daylight' => q#တရုတ် နွေရာသီ အချိန်#,
 				'generic' => q#တရုတ် အချိန်#,
 				'standard' => q#တရုတ် စံတော်ချိန်#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#ချွဲဘော်ဆန်း နွေရာသီ အချိန်#,
-				'generic' => q#ချွဲဘော်ဆန်း အချိန်#,
-				'standard' => q#ချွဲဘော်ဆန်း စံတော်ချိန်#,
 			},
 		},
 		'Christmas' => {
@@ -7780,9 +7864,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#အူလီယာနိုစကစ်ဖ်#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#ဥဇ်ဂိုရို့တ်#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#ဗာဒူးစ်#,
 		},
@@ -7803,9 +7884,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#ဇာဂ်ဂရက်ဘ်#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#ဇာဖိုရိုးစ်ဂျာ#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#ဇူးရစ်ချ်#,
@@ -8023,6 +8101,11 @@ has 'time_zone_names' => (
 				'standard' => q#ဂျပန် စံတော်ချိန်#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#ကာဇက်စတန် အချိန်#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#အရှေ့ကာဇက်စတန် အချိန်#,
@@ -8081,11 +8164,6 @@ has 'time_zone_names' => (
 				'standard' => q#မကာအို စံတော်ချိန်#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#မက်ကွယ်ရီကျွန်း အချိန်#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#မာဂါဒန်း နွေရာသီ အချိန်#,
@@ -8123,13 +8201,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#မော်စွန် အချိန်#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#အနောက်တောင် မက္ကစီကို နွေရာသီ စံတော်ချိန်#,
-				'generic' => q#အနောက်တောင် မက္ကဆီကို အချိန်#,
-				'standard' => q#အနောက်တောင် မက္ကဆီကို စံတော်ချိန်#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -8266,9 +8337,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Honolulu' => {
 			exemplarCity => q#ဟိုနိုလူလူ#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#ဂျွန်စတန်#,
 		},
 		'Pacific/Kanton' => {
 			exemplarCity => q#ကန်တွန်#,

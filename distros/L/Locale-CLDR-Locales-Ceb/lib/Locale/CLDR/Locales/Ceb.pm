@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Ceb - Package for language Cebuano
 
 package Locale::CLDR::Locales::Ceb;
 # This file auto generated from Data\common\main\ceb.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -36,40 +36,33 @@ has 'display_name_language' => (
  				'bn' => 'Bangla',
  				'ceb' => 'Cebuano',
  				'de' => 'German',
- 				'de_AT' => 'Austrian German',
  				'de_CH' => 'Swiss High German',
  				'en' => 'English',
- 				'en_AU' => 'English sa Australia',
- 				'en_CA' => 'English sa Canada',
  				'en_GB' => 'Britanikong English',
- 				'en_GB@alt=short' => 'English sa UK',
- 				'en_US' => 'English sa America',
- 				'en_US@alt=short' => 'English sa US',
+ 				'en_GB@alt=short' => 'English (UK)',
+ 				'en_US' => 'English (America)',
+ 				'en_US@alt=short' => 'English (US)',
  				'es' => 'Espanyol',
  				'es_ES' => 'Espanyol (Europa)',
  				'fr' => 'Pranses',
- 				'fr_CA' => 'Pranses sa Canada',
- 				'fr_CH' => 'Pranses sa Switzerland',
  				'hi' => 'Hindi',
  				'hi_Latn@alt=variant' => 'Hinglish',
  				'id' => 'Indonesian',
- 				'it' => 'Italiano',
+ 				'it' => 'Italyano',
  				'ja' => 'Hinapon',
  				'ko' => 'Korean',
  				'nl' => 'Dutch',
  				'nl_BE' => 'Flemish',
  				'pl' => 'Polish',
  				'pt' => 'Portuguese',
- 				'pt_BR' => 'Brazilyanong Portuguese',
- 				'pt_PT' => 'Portuguese sa Europe',
  				'ru' => 'Russian',
  				'th' => 'Thai',
  				'tr' => 'Turkish',
  				'und' => 'Wala Mailhing Pinulongan',
  				'zh' => 'Inintsik',
  				'zh@alt=menu' => 'Chinese, Mandarin',
- 				'zh_Hans' => 'Pinasimpleng Chinese',
- 				'zh_Hans@alt=long' => 'Pinasimpleng Mandarin Chinese',
+ 				'zh_Hans' => 'Pinasimple nga Chinese',
+ 				'zh_Hans@alt=long' => 'Pinasimple nga Mandarin Chinese',
  				'zh_Hant' => 'Tradisyonal nga Chinese',
  				'zh_Hant@alt=long' => 'Tradisyonal nga Mandarin Chinese',
 
@@ -89,10 +82,10 @@ has 'display_name_script' => (
 	default		=> sub {
 		sub {
 			my %scripts = (
-			'Arab' => 'Arabo',
- 			'Cyrl' => 'Sirilisko',
+			'Arab' => 'Arabiko',
+ 			'Cyrl' => 'Cyrillic',
  			'Hans' => 'Pinasimple',
- 			'Hans@alt=stand-alone' => 'Pinasimpleng Han',
+ 			'Hans@alt=stand-alone' => 'Pinasimple nga Han',
  			'Hant' => 'Tradisyonal',
  			'Hant@alt=stand-alone' => 'Tradisyonal nga Han',
  			'Jpan' => 'Japanese',
@@ -393,7 +386,7 @@ has 'display_name_region' => (
  			'TM' => 'Turkmenistan',
  			'TN' => 'Tunisia',
  			'TO' => 'Tonga',
- 			'TR' => 'Turkey',
+ 			'TR' => 'Turkiye',
  			'TT' => 'Trinidad & Tobago',
  			'TV' => 'Tuvalu',
  			'TW' => 'Taiwan',
@@ -4072,7 +4065,7 @@ has 'currencies' => (
 			display_name => {
 				'currency' => q(Netherlands Antillean Guilder),
 				'one' => q(Netherlands Antillean guilder),
-				'other' => q(Mga Netherlands Antillean guilder),
+				'other' => q(Netherlands Antillean guilders),
 			},
 		},
 		'AOA' => {
@@ -4121,7 +4114,7 @@ has 'currencies' => (
 			display_name => {
 				'currency' => q(Barbadian Dollar),
 				'one' => q(Barbadian dollar),
-				'other' => q(Mga Barbadian dollar),
+				'other' => q(Barbadian dollars),
 			},
 		},
 		'BDT' => {
@@ -4156,7 +4149,7 @@ has 'currencies' => (
 			display_name => {
 				'currency' => q(Bermudan Dollar),
 				'one' => q(Bermudan dollar),
-				'other' => q(Mga Bermudan dollar),
+				'other' => q(Bermudan dollars),
 			},
 		},
 		'BND' => {
@@ -4184,7 +4177,7 @@ has 'currencies' => (
 			display_name => {
 				'currency' => q(Bahamian Dollar),
 				'one' => q(Bahamian dollar),
-				'other' => q(Mga Bahamian dollar),
+				'other' => q(Bahamian dollars),
 			},
 		},
 		'BTN' => {
@@ -4212,14 +4205,14 @@ has 'currencies' => (
 			display_name => {
 				'currency' => q(Belize Dollar),
 				'one' => q(Belize dollar),
-				'other' => q(Mga Belize dollar),
+				'other' => q(Belize dollars),
 			},
 		},
 		'CAD' => {
 			display_name => {
 				'currency' => q(Canadian Dollar),
 				'one' => q(Canadian dollar),
-				'other' => q(Mga Canadian dollar),
+				'other' => q(Canadian dollars),
 			},
 		},
 		'CDF' => {
@@ -4268,21 +4261,21 @@ has 'currencies' => (
 			display_name => {
 				'currency' => q(Costa Rican Colon),
 				'one' => q(Costa Rican colon),
-				'other' => q(Mga Costa Rican colon),
+				'other' => q(Costa Rican colóns),
 			},
 		},
 		'CUC' => {
 			display_name => {
 				'currency' => q(Cuban Convertible Peso),
 				'one' => q(Cuban convertible peso),
-				'other' => q(Mga Cuban convertible peso),
+				'other' => q(Cuban convertible pesos),
 			},
 		},
 		'CUP' => {
 			display_name => {
 				'currency' => q(Cuban Peso),
 				'one' => q(Cuban peso),
-				'other' => q(Mga Cuban peso),
+				'other' => q(Cuban pesos),
 			},
 		},
 		'CVE' => {
@@ -4317,7 +4310,7 @@ has 'currencies' => (
 			display_name => {
 				'currency' => q(Dominican Peso),
 				'one' => q(Dominican peso),
-				'other' => q(Mga Dominican peso),
+				'other' => q(Dominican pesos),
 			},
 		},
 		'DZD' => {
@@ -4415,7 +4408,7 @@ has 'currencies' => (
 			display_name => {
 				'currency' => q(Guatemalan Quetzal),
 				'one' => q(Guatemalan quetzal),
-				'other' => q(Mga Guatemalan quetzal),
+				'other' => q(Guatemalan quetzals),
 			},
 		},
 		'GYD' => {
@@ -4436,7 +4429,7 @@ has 'currencies' => (
 			display_name => {
 				'currency' => q(Honduran Lempira),
 				'one' => q(Honduran lempira),
-				'other' => q(Mga Honduran lempira),
+				'other' => q(Honduran lempiras),
 			},
 		},
 		'HRK' => {
@@ -4450,7 +4443,7 @@ has 'currencies' => (
 			display_name => {
 				'currency' => q(Haitian Gourde),
 				'one' => q(Haitian gourde),
-				'other' => q(Mga Haitian gourde),
+				'other' => q(Haitian gourdes),
 			},
 		},
 		'HUF' => {
@@ -4506,7 +4499,7 @@ has 'currencies' => (
 			display_name => {
 				'currency' => q(Jamaican Dollar),
 				'one' => q(Jamaican dollar),
-				'other' => q(Mga Jamaican dollar),
+				'other' => q(Jamaican dollars),
 			},
 		},
 		'JOD' => {
@@ -4576,7 +4569,7 @@ has 'currencies' => (
 			display_name => {
 				'currency' => q(Cayman Islands Dollar),
 				'one' => q(Cayman Islands dollar),
-				'other' => q(Mga Cayman Islands dollar),
+				'other' => q(Cayman Islands dollars),
 			},
 		},
 		'KZT' => {
@@ -4709,7 +4702,7 @@ has 'currencies' => (
 			display_name => {
 				'currency' => q(Mexican Peso),
 				'one' => q(Mexican peso),
-				'other' => q(Mga Mexican peso),
+				'other' => q(Mexican pesos),
 			},
 		},
 		'MYR' => {
@@ -4744,7 +4737,7 @@ has 'currencies' => (
 			display_name => {
 				'currency' => q(Nicaraguan Cordoba),
 				'one' => q(Nicaraguan cordoba),
-				'other' => q(Mga Nicaraguan cordoba),
+				'other' => q(Nicaraguan córdobas),
 			},
 		},
 		'NOK' => {
@@ -4779,7 +4772,7 @@ has 'currencies' => (
 			display_name => {
 				'currency' => q(Panamanian Balboa),
 				'one' => q(Panamanian balboa),
-				'other' => q(Mga Panamanian balboa),
+				'other' => q(Panamanian balboas),
 			},
 		},
 		'PEN' => {
@@ -5010,7 +5003,7 @@ has 'currencies' => (
 			display_name => {
 				'currency' => q(Trinidad & Tobago Dollar),
 				'one' => q(Trinidad & Tobago dollar),
-				'other' => q(Mga Trinidad & Tobago dollar),
+				'other' => q(Trinidad & Tobago dollars),
 			},
 		},
 		'TWD' => {
@@ -5046,7 +5039,7 @@ has 'currencies' => (
 			display_name => {
 				'currency' => q(US Dollar),
 				'one' => q(US dollar),
-				'other' => q(Mga US dollar),
+				'other' => q(US dollars),
 			},
 		},
 		'UYU' => {
@@ -5102,7 +5095,7 @@ has 'currencies' => (
 			display_name => {
 				'currency' => q(East Caribbean Dollar),
 				'one' => q(East Caribbean dollar),
-				'other' => q(Mga East Caribbean dollar),
+				'other' => q(East Caribbean dollars),
 			},
 		},
 		'XOF' => {
@@ -5187,7 +5180,7 @@ has 'calendar_months' => (
 							'Hunyo',
 							'Hulyo',
 							'Agosto',
-							'Septiyembre',
+							'Septyembre',
 							'Oktubre',
 							'Nobyembre',
 							'Disyembre'
@@ -5212,6 +5205,25 @@ has 'calendar_months' => (
 							'O',
 							'N',
 							'D'
+						],
+						leap => [
+							
+						],
+					},
+					wide => {
+						nonleap => [
+							'Enero',
+							'Pebrero',
+							'Marso',
+							'Abril',
+							'Mayo',
+							'Hunyo',
+							'Hulyo',
+							'Agosto',
+							'Septyembre',
+							'Oktubre',
+							'Nobyembre',
+							'Disyembre'
 						],
 						leap => [
 							
@@ -5686,8 +5698,8 @@ has 'time_zone_names' => (
 	default	=> sub { {
 		gmtFormat => q(GMT {0}),
 		regionFormat => q(Oras sa {0}),
-		regionFormat => q(Daylight Time sa {0}),
-		regionFormat => q(Tamdanang Oras sa {0}),
+		regionFormat => q(Daylight nga Oras sa {0}),
+		regionFormat => q(Standard nga Oras sa {0}),
 		fallbackFormat => q({1} {0}),
 		'Afghanistan' => {
 			long => {
@@ -5706,28 +5718,28 @@ has 'time_zone_names' => (
 		},
 		'Africa_Southern' => {
 			long => {
-				'standard' => q#Tamdanang Oras sa South Africa#,
+				'standard' => q#Standard nga Oras sa South Africa#,
 			},
 		},
 		'Africa_Western' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa West Africa#,
+				'daylight' => q#Oras sa Ting-init sa West Africa#,
 				'generic' => q#Oras sa West Africa#,
-				'standard' => q#Tamdanang Oras sa West Africa#,
+				'standard' => q#Standard nga Oras sa West Africa#,
 			},
 		},
 		'Alaska' => {
 			long => {
-				'daylight' => q#Daylight Time sa Alaska#,
+				'daylight' => q#Daylight nga Oras sa Alaska#,
 				'generic' => q#Oras sa Alaska#,
-				'standard' => q#Tamdanang Oras sa Alaska#,
+				'standard' => q#Standard nga Oras sa Alaska#,
 			},
 		},
 		'Amazon' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Amazon#,
+				'daylight' => q#Oras sa Ting-init sa Amazon#,
 				'generic' => q#Oras sa Amazon#,
-				'standard' => q#Tamdanang Oras sa Amazon#,
+				'standard' => q#Standard nga Oras sa Amazon#,
 			},
 		},
 		'America_Central' => {
@@ -5753,44 +5765,44 @@ has 'time_zone_names' => (
 		},
 		'America_Pacific' => {
 			long => {
-				'daylight' => q#Pacific Daylight Time#,
-				'generic' => q#Pacific Time#,
-				'standard' => q#Pacific Standard Time#,
+				'daylight' => q#Daylight nga Oras sa Pasipiko#,
+				'generic' => q#Oras sa Pasipiko#,
+				'standard' => q#Standard nga Oras sa Pasipiko#,
 			},
 		},
 		'Apia' => {
 			long => {
-				'daylight' => q#Daylight Time sa Apia#,
+				'daylight' => q#Daylight nga Oras sa Apia#,
 				'generic' => q#Oras sa Apia#,
-				'standard' => q#Tamdanang Oras sa Apia#,
+				'standard' => q#Standard nga Oras sa Apia#,
 			},
 		},
 		'Arabian' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Arabia#,
+				'daylight' => q#Daylight nga Oras sa Arabia#,
 				'generic' => q#Oras sa Arabia#,
-				'standard' => q#Tamdanang Oras sa Arabia#,
+				'standard' => q#Standard nga Oras sa Arabia#,
 			},
 		},
 		'Argentina' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Argentina#,
+				'daylight' => q#Oras sa Ting-init sa Argentina#,
 				'generic' => q#Oras sa Argentina#,
-				'standard' => q#Tamdanang Oras sa Argentina#,
+				'standard' => q#Standard nga Oras sa Argentina#,
 			},
 		},
 		'Argentina_Western' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Western Argentina#,
+				'daylight' => q#Oras sa Ting-init sa Western Argentina#,
 				'generic' => q#Oras sa Western Argentina#,
-				'standard' => q#Tamdanang Oras sa Western Argentina#,
+				'standard' => q#Standard nga Oras sa Western Argentina#,
 			},
 		},
 		'Armenia' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Armenia#,
+				'daylight' => q#Oras sa Ting-init sa Armenia#,
 				'generic' => q#Oras sa Armenia#,
-				'standard' => q#Tamdanang Oras sa Armenia#,
+				'standard' => q#Standard nga Oras sa Armenia#,
 			},
 		},
 		'Asia/Saigon' => {
@@ -5798,58 +5810,58 @@ has 'time_zone_names' => (
 		},
 		'Atlantic' => {
 			long => {
-				'daylight' => q#Atlantic Daylight Time#,
-				'generic' => q#Atlantic Time#,
-				'standard' => q#Atlantic Standard Time#,
+				'daylight' => q#Daylight nga Oras sa Atlantic#,
+				'generic' => q#Oras sa Atlantic#,
+				'standard' => q#Standard nga Oras sa Atlantic#,
 			},
 		},
 		'Australia_Central' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Central Australia#,
+				'daylight' => q#Daylight nga Oras sa Central Australia#,
 				'generic' => q#Oras sa Central Australia#,
-				'standard' => q#Tamdanang Oras sa Central Australia#,
+				'standard' => q#Standard nga Oras sa Central Australia#,
 			},
 		},
 		'Australia_CentralWestern' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Central Western Australia#,
+				'daylight' => q#Daylight nga Oras sa Central Western Australia#,
 				'generic' => q#Oras sa Central Western Australia#,
-				'standard' => q#Tamdanang Oras sa Central Western Australia#,
+				'standard' => q#Standard nga Oras sa Central Western Australia#,
 			},
 		},
 		'Australia_Eastern' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Eastern Australia#,
+				'daylight' => q#Daylight nga Oras sa Eastern Australia#,
 				'generic' => q#Oras sa Eastern Australia#,
-				'standard' => q#Tamdanang Oras sa Eastern Australia#,
+				'standard' => q#Standard nga Oras sa Eastern Australia#,
 			},
 		},
 		'Australia_Western' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Western Australia#,
+				'daylight' => q#Daylight nga Oras sa Western Australia#,
 				'generic' => q#Oras sa Western Australia#,
-				'standard' => q#Tamdanang Oras sa Western Australia#,
+				'standard' => q#Standard nga Oras sa Western Australia#,
 			},
 		},
 		'Azerbaijan' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Azerbaijan#,
+				'daylight' => q#Oras sa Ting-init sa Azerbaijan#,
 				'generic' => q#Oras sa Azerbaijan#,
-				'standard' => q#Tamdanang Oras sa Azerbaijan#,
+				'standard' => q#Standard nga Oras sa Azerbaijan#,
 			},
 		},
 		'Azores' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Azores#,
+				'daylight' => q#Oras sa Ting-init sa Azores#,
 				'generic' => q#Oras sa Azores#,
-				'standard' => q#Tamdanang Oras sa Azores#,
+				'standard' => q#Standard nga Oras sa Azores#,
 			},
 		},
 		'Bangladesh' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Bangladesh#,
+				'daylight' => q#Oras sa Ting-init sa Bangladesh#,
 				'generic' => q#Oras sa Bangladesh#,
-				'standard' => q#Tamdanang Oras sa Bangladesh#,
+				'standard' => q#Standard nga Oras sa Bangladesh#,
 			},
 		},
 		'Bhutan' => {
@@ -5864,9 +5876,9 @@ has 'time_zone_names' => (
 		},
 		'Brasilia' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Brasilia#,
+				'daylight' => q#Oras sa Ting-init sa Brasilia#,
 				'generic' => q#Oras sa Brasilia#,
-				'standard' => q#Tamdanang Oras sa Brasilia#,
+				'standard' => q#Standard nga Oras sa Brasilia#,
 			},
 		},
 		'Brunei' => {
@@ -5876,42 +5888,35 @@ has 'time_zone_names' => (
 		},
 		'Cape_Verde' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Cape Verde#,
+				'daylight' => q#Oras sa Ting-init sa Cape Verde#,
 				'generic' => q#Oras sa Cape Verde#,
-				'standard' => q#Tamdanang Oras sa Cape Verde#,
+				'standard' => q#Standard nga Oras sa Cape Verde#,
 			},
 		},
 		'Chamorro' => {
 			long => {
-				'standard' => q#Tamdanang Oras sa Chamorro#,
+				'standard' => q#Standard nga Oras sa Chamorro#,
 			},
 		},
 		'Chatham' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Chatham#,
+				'daylight' => q#Daylight nga Oras sa Chatham#,
 				'generic' => q#Oras sa Chatham#,
-				'standard' => q#Tamdanang Oras sa Chatham#,
+				'standard' => q#Standard nga Oras sa Chatham#,
 			},
 		},
 		'Chile' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Chile#,
+				'daylight' => q#Oras sa Ting-init sa Chile#,
 				'generic' => q#Oras sa Chile#,
-				'standard' => q#Tamdanang Oras sa Chile#,
+				'standard' => q#Standard nga Oras sa Chile#,
 			},
 		},
 		'China' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Tsina#,
-				'generic' => q#Oras sa Tsina#,
-				'standard' => q#Tamdanang Oras sa Tsina#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Oras sa Tag-init sa Choibalsan#,
-				'generic' => q#Oras sa Choibalsan#,
-				'standard' => q#Tamdanang Oras sa Choibalsan#,
+				'daylight' => q#Daylight nga Oras sa China#,
+				'generic' => q#Oras sa China#,
+				'standard' => q#Standard nga Oras sa China#,
 			},
 		},
 		'Christmas' => {
@@ -5926,23 +5931,23 @@ has 'time_zone_names' => (
 		},
 		'Colombia' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Colombia#,
+				'daylight' => q#Oras sa Ting-init sa Colombia#,
 				'generic' => q#Oras sa Colombia#,
-				'standard' => q#Tamdanang Oras sa Colombia#,
+				'standard' => q#Standard nga Oras sa Colombia#,
 			},
 		},
 		'Cook' => {
 			long => {
-				'daylight' => q#Katungang Oras sa Tag-init sa Cook Islands#,
+				'daylight' => q#Katungang Oras sa Ting-init sa Cook Islands#,
 				'generic' => q#Oras sa Cook Islands#,
-				'standard' => q#Tamdanang Oras sa Cook Islands#,
+				'standard' => q#Standard nga Oras sa Cook Islands#,
 			},
 		},
 		'Cuba' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Cuba#,
+				'daylight' => q#Daylight nga Oras sa Cuba#,
 				'generic' => q#Oras sa Cuba#,
-				'standard' => q#Tamdanang Oras sa Cuba#,
+				'standard' => q#Standard nga Oras sa Cuba#,
 			},
 		},
 		'Davis' => {
@@ -5962,9 +5967,9 @@ has 'time_zone_names' => (
 		},
 		'Easter' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Easter Island#,
+				'daylight' => q#Oras sa Ting-init sa Easter Island#,
 				'generic' => q#Oras sa Easter Island#,
-				'standard' => q#Tamdanang Oras sa Easter Island#,
+				'standard' => q#Standard nga Oras sa Easter Island#,
 			},
 		},
 		'Ecuador' => {
@@ -5974,7 +5979,7 @@ has 'time_zone_names' => (
 		},
 		'Etc/UTC' => {
 			long => {
-				'standard' => q#Gikoordinar nga Kinatibuk-ang Oras#,
+				'standard' => q#Coordinated Universal Time#,
 			},
 		},
 		'Etc/Unknown' => {
@@ -5982,26 +5987,26 @@ has 'time_zone_names' => (
 		},
 		'Europe/Dublin' => {
 			long => {
-				'daylight' => q#Tamdanang Oras sa Irish#,
+				'daylight' => q#Irish Standard Time#,
 			},
 		},
 		'Europe/London' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa British#,
+				'daylight' => q#British Summer Time#,
 			},
 		},
 		'Europe_Central' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Central Europe#,
+				'daylight' => q#Oras sa Ting-init sa Central Europe#,
 				'generic' => q#Oras sa Central Europe#,
-				'standard' => q#Tamdanang Oras sa Central Europe#,
+				'standard' => q#Standard nga Oras sa Central Europe#,
 			},
 		},
 		'Europe_Eastern' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Eastern Europe#,
+				'daylight' => q#Oras sa Ting-init sa Eastern Europe#,
 				'generic' => q#Oras sa Eastern Europe#,
-				'standard' => q#Tamdanang Oras sa Eastern Europe#,
+				'standard' => q#Standard nga Oras sa Eastern Europe#,
 			},
 		},
 		'Europe_Further_Eastern' => {
@@ -6011,23 +6016,23 @@ has 'time_zone_names' => (
 		},
 		'Europe_Western' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Western Europe#,
+				'daylight' => q#Oras sa Ting-init sa Western Europe#,
 				'generic' => q#Oras sa Western Europe#,
-				'standard' => q#Tamdanang Oras sa Western Europe#,
+				'standard' => q#Standard nga Oras sa Western Europe#,
 			},
 		},
 		'Falkland' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Falkland Islands#,
+				'daylight' => q#Oras sa Ting-init sa Falkland Islands#,
 				'generic' => q#Oras sa Falkland Islands#,
-				'standard' => q#Tamdanang Oras sa Falkland Islands#,
+				'standard' => q#Standard nga Oras sa Falkland Islands#,
 			},
 		},
 		'Fiji' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Fiji#,
+				'daylight' => q#Oras sa Ting-init sa Fiji#,
 				'generic' => q#Oras sa Fiji#,
-				'standard' => q#Tamdanang Oras sa Fiji#,
+				'standard' => q#Standard nga Oras sa Fiji#,
 			},
 		},
 		'French_Guiana' => {
@@ -6057,9 +6062,9 @@ has 'time_zone_names' => (
 		},
 		'Georgia' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Georgia#,
+				'daylight' => q#Oras sa Ting-init sa Georgia#,
 				'generic' => q#Oras sa Georgia#,
-				'standard' => q#Tamdanang Oras sa Georgia#,
+				'standard' => q#Standard nga Oras sa Georgia#,
 			},
 		},
 		'Gilbert_Islands' => {
@@ -6069,21 +6074,21 @@ has 'time_zone_names' => (
 		},
 		'Greenland_Eastern' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa East Greenland#,
+				'daylight' => q#Oras sa Ting-init sa East Greenland#,
 				'generic' => q#Oras sa East Greenland#,
-				'standard' => q#Tamdanang Oras sa East Greenland#,
+				'standard' => q#Standard nga Oras sa East Greenland#,
 			},
 		},
 		'Greenland_Western' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa West Greenland#,
+				'daylight' => q#Oras sa Ting-init sa West Greenland#,
 				'generic' => q#Oras sa West Greenland#,
-				'standard' => q#Tamdanang Oras sa West Greenland#,
+				'standard' => q#Standard nga Oras sa West Greenland#,
 			},
 		},
 		'Gulf' => {
 			long => {
-				'standard' => q#Tamdanang Oras sa Gulf#,
+				'standard' => q#Standard nga Oras sa Gulf#,
 			},
 		},
 		'Guyana' => {
@@ -6093,28 +6098,28 @@ has 'time_zone_names' => (
 		},
 		'Hawaii_Aleutian' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Hawaii-Aleutian#,
+				'daylight' => q#Daylight nga Oras sa Hawaii-Aleutian#,
 				'generic' => q#Oras sa Hawaii-Aleutian#,
-				'standard' => q#Tamdanang Oras sa Hawaii-Aleutian#,
+				'standard' => q#Standard nga Oras sa Hawaii-Aleutian#,
 			},
 		},
 		'Hong_Kong' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Hong Kong#,
+				'daylight' => q#Oras sa Ting-init sa Hong Kong#,
 				'generic' => q#Oras sa Hong Kong#,
-				'standard' => q#Tamdanang Oras sa Hong Kong#,
+				'standard' => q#Standard nga Oras sa Hong Kong#,
 			},
 		},
 		'Hovd' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Hovd#,
+				'daylight' => q#Oras sa Ting-init sa Hovd#,
 				'generic' => q#Oras sa Hovd#,
-				'standard' => q#Tamdanang Oras sa Hovd#,
+				'standard' => q#Standard nga Oras sa Hovd#,
 			},
 		},
 		'India' => {
 			long => {
-				'standard' => q#Tamdanang Oras sa India#,
+				'standard' => q#Standard nga Oras sa India#,
 			},
 		},
 		'Indian_Ocean' => {
@@ -6144,30 +6149,35 @@ has 'time_zone_names' => (
 		},
 		'Iran' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Iran#,
+				'daylight' => q#Daylight nga Oras sa Iran#,
 				'generic' => q#Oras sa Iran#,
-				'standard' => q#Tamdanang Oras sa Iran#,
+				'standard' => q#Standard nga Oras sa Iran#,
 			},
 		},
 		'Irkutsk' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Irkutsk#,
+				'daylight' => q#Oras sa Ting-init sa Irkutsk#,
 				'generic' => q#Oras sa Irkutsk#,
-				'standard' => q#Tamdanang Oras sa Irkutsk#,
+				'standard' => q#Standard nga Oras sa Irkutsk#,
 			},
 		},
 		'Israel' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Israel#,
+				'daylight' => q#Daylight nga Oras sa Israel#,
 				'generic' => q#Oras sa Israel#,
-				'standard' => q#Tamdanang Oras sa Israel#,
+				'standard' => q#Standard nga Oras sa Israel#,
 			},
 		},
 		'Japan' => {
 			long => {
-				'daylight' => q#Oras sa Adlawan sa Japan#,
+				'daylight' => q#Daylight nga Oras sa Japan#,
 				'generic' => q#Oras sa Japan#,
-				'standard' => q#Tamdanang Oras sa Japan#,
+				'standard' => q#Standard nga Oras sa Japan#,
+			},
+		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Oras sa Kazakhstan#,
 			},
 		},
 		'Kazakhstan_Eastern' => {
@@ -6182,9 +6192,9 @@ has 'time_zone_names' => (
 		},
 		'Korea' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Korea#,
+				'daylight' => q#Daylight nga Oras sa Korea#,
 				'generic' => q#Oras sa Korea#,
-				'standard' => q#Tamdanang Oras sa Korea#,
+				'standard' => q#Standard nga Oras sa Korea#,
 			},
 		},
 		'Kosrae' => {
@@ -6194,9 +6204,9 @@ has 'time_zone_names' => (
 		},
 		'Krasnoyarsk' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Krasnoyarsk#,
+				'daylight' => q#Oras sa Ting-init sa Krasnoyarsk#,
 				'generic' => q#Oras sa Krasnoyarsk#,
-				'standard' => q#Tamdanang Oras sa Krasnoyarsk#,
+				'standard' => q#Standard nga Oras sa Krasnoyarsk#,
 			},
 		},
 		'Kyrgystan' => {
@@ -6211,21 +6221,16 @@ has 'time_zone_names' => (
 		},
 		'Lord_Howe' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Lord Howe#,
+				'daylight' => q#Daylight nga Oras sa Lord Howe#,
 				'generic' => q#Oras sa Lord Howe#,
-				'standard' => q#Tamdanang Oras sa Lord Howe#,
-			},
-		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Oras sa Macquarie Island#,
+				'standard' => q#Standard nga Oras sa Lord Howe#,
 			},
 		},
 		'Magadan' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Magadan#,
+				'daylight' => q#Oras sa Ting-init sa Magadan#,
 				'generic' => q#Oras sa Magadan#,
-				'standard' => q#Tamdanang Oras sa Magadan#,
+				'standard' => q#Standard nga Oras sa Magadan#,
 			},
 		},
 		'Malaysia' => {
@@ -6250,9 +6255,9 @@ has 'time_zone_names' => (
 		},
 		'Mauritius' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Mauritius#,
+				'daylight' => q#Oras sa Ting-init sa Mauritius#,
 				'generic' => q#Oras sa Mauritius#,
-				'standard' => q#Tamdanang Oras sa Mauritius#,
+				'standard' => q#Standard nga Oras sa Mauritius#,
 			},
 		},
 		'Mawson' => {
@@ -6260,32 +6265,25 @@ has 'time_zone_names' => (
 				'standard' => q#Oras sa Mawson#,
 			},
 		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Oras sa Tag-init sa Northwest Mexico#,
-				'generic' => q#Oras sa Northwest Mexico#,
-				'standard' => q#Tamdanang Oras sa Northwest Mexico#,
-			},
-		},
 		'Mexico_Pacific' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Mexican Pacific#,
+				'daylight' => q#Daylight nga Oras sa Mexican Pacific#,
 				'generic' => q#Oras sa Mexican Pacific#,
-				'standard' => q#Tamdanang Oras sa Mexican Pacific#,
+				'standard' => q#Standard nga Oras sa Mexican Pacific#,
 			},
 		},
 		'Mongolia' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Ulaanbaatar#,
+				'daylight' => q#Oras sa Ting-init sa Ulaanbaatar#,
 				'generic' => q#Oras sa Ulaanbaatar#,
-				'standard' => q#Tamdanang Oras sa Ulaanbaatar#,
+				'standard' => q#Standard nga Oras sa Ulaanbaatar#,
 			},
 		},
 		'Moscow' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Moscow#,
+				'daylight' => q#Oras sa Ting-init sa Moscow#,
 				'generic' => q#Oras sa Moscow#,
-				'standard' => q#Tamdanang Oras sa Moscow#,
+				'standard' => q#Standard nga Oras sa Moscow#,
 			},
 		},
 		'Myanmar' => {
@@ -6305,23 +6303,23 @@ has 'time_zone_names' => (
 		},
 		'New_Caledonia' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa New Caledonia#,
+				'daylight' => q#Oras sa Ting-init sa New Caledonia#,
 				'generic' => q#Oras sa New Caledonia#,
-				'standard' => q#Tamdanang Oras sa New Caledonia#,
+				'standard' => q#Standard nga Oras sa New Caledonia#,
 			},
 		},
 		'New_Zealand' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa New Zealand#,
+				'daylight' => q#Daylight nga Oras sa New Zealand#,
 				'generic' => q#Oras sa New Zealand#,
-				'standard' => q#Tamdanang Oras sa New Zealand#,
+				'standard' => q#Standard nga Oras sa New Zealand#,
 			},
 		},
 		'Newfoundland' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Newfoundland#,
+				'daylight' => q#Daylight nga Oras sa Newfoundland#,
 				'generic' => q#Oras sa Newfoundland#,
-				'standard' => q#Tamdanang Oras sa Newfoundland#,
+				'standard' => q#Standard nga Oras sa Newfoundland#,
 			},
 		},
 		'Niue' => {
@@ -6331,37 +6329,40 @@ has 'time_zone_names' => (
 		},
 		'Norfolk' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Norfolk Island#,
+				'daylight' => q#Daylight nga Oras sa Norfolk Island#,
 				'generic' => q#Oras sa Norfolk Island#,
-				'standard' => q#Tamdanang Oras sa Norfolk Island#,
+				'standard' => q#Standard nga Oras sa Norfolk Island#,
 			},
 		},
 		'Noronha' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Fernando de Noronha#,
+				'daylight' => q#Oras sa Ting-init sa Fernando de Noronha#,
 				'generic' => q#Oras sa Fernando de Noronha#,
-				'standard' => q#Tamdanang Oras sa Fernando de Noronha#,
+				'standard' => q#Standard nga Oras sa Fernando de Noronha#,
 			},
 		},
 		'Novosibirsk' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Novosibirsk#,
+				'daylight' => q#Oras sa Ting-init sa Novosibirsk#,
 				'generic' => q#Oras sa Novosibirsk#,
-				'standard' => q#Tamdanang Oras sa Novosibirsk#,
+				'standard' => q#Standard nga Oras sa Novosibirsk#,
 			},
 		},
 		'Omsk' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Omsk#,
+				'daylight' => q#Oras sa Ting-init sa Omsk#,
 				'generic' => q#Oras sa Omsk#,
-				'standard' => q#Tamdanang Oras sa Omsk#,
+				'standard' => q#Standard nga Oras sa Omsk#,
 			},
+		},
+		'Pacific/Enderbury' => {
+			exemplarCity => q#Enderbury#,
 		},
 		'Pakistan' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Pakistan#,
+				'daylight' => q#Oras sa Ting-init sa Pakistan#,
 				'generic' => q#Oras sa Pakistan#,
-				'standard' => q#Tamdanang Oras sa Pakistan#,
+				'standard' => q#Standard nga Oras sa Pakistan#,
 			},
 		},
 		'Palau' => {
@@ -6376,23 +6377,23 @@ has 'time_zone_names' => (
 		},
 		'Paraguay' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Paraguay#,
+				'daylight' => q#Oras sa Ting-init sa Paraguay#,
 				'generic' => q#Oras sa Paraguay#,
-				'standard' => q#Tamdanang Oras sa Paraguay#,
+				'standard' => q#Standard nga Oras sa Paraguay#,
 			},
 		},
 		'Peru' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Peru#,
+				'daylight' => q#Oras sa Ting-init sa Peru#,
 				'generic' => q#Oras sa Peru#,
-				'standard' => q#Tamdanang Oras sa Peru#,
+				'standard' => q#Standard nga Oras sa Peru#,
 			},
 		},
 		'Philippines' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Pilipinas#,
+				'daylight' => q#Oras sa Ting-init sa Pilipinas#,
 				'generic' => q#Oras sa Pilipinas#,
-				'standard' => q#Tamdanang Oras sa Pilipinas#,
+				'standard' => q#Standard nga Oras sa Pilipinas#,
 			},
 		},
 		'Phoenix_Islands' => {
@@ -6402,9 +6403,9 @@ has 'time_zone_names' => (
 		},
 		'Pierre_Miquelon' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa St.Pierre & Miquelon#,
+				'daylight' => q#Daylight nga Oras sa St. Pierre & Miquelon#,
 				'generic' => q#Oras sa St. Pierre & Miquelon#,
-				'standard' => q#Tamdanang Oras sa St. Pierre & Miquelon#,
+				'standard' => q#Standard nga Oras sa St. Pierre & Miquelon#,
 			},
 		},
 		'Pitcairn' => {
@@ -6434,16 +6435,16 @@ has 'time_zone_names' => (
 		},
 		'Sakhalin' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Sakhalin#,
+				'daylight' => q#Oras sa Ting-init sa Sakhalin#,
 				'generic' => q#Oras sa Sakhalin#,
-				'standard' => q#Tamdanang Oras sa Sakhalin#,
+				'standard' => q#Standard nga Oras sa Sakhalin#,
 			},
 		},
 		'Samoa' => {
 			long => {
-				'daylight' => q#Daylight Time sa Samoa#,
+				'daylight' => q#Daylight nga Oras sa Samoa#,
 				'generic' => q#Oras sa Samoa#,
-				'standard' => q#Tamdanang Oras sa Samoa#,
+				'standard' => q#Standard nga Oras sa Samoa#,
 			},
 		},
 		'Seychelles' => {
@@ -6453,7 +6454,7 @@ has 'time_zone_names' => (
 		},
 		'Singapore' => {
 			long => {
-				'standard' => q#Tamdanang Oras sa Singapore#,
+				'standard' => q#Standard nga Oras sa Singapore#,
 			},
 		},
 		'Solomon' => {
@@ -6483,9 +6484,9 @@ has 'time_zone_names' => (
 		},
 		'Taipei' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Taipei#,
+				'daylight' => q#Daylight nga Oras sa Taipei#,
 				'generic' => q#Oras sa Taipei#,
-				'standard' => q#Tamdanang Oras sa Taipei#,
+				'standard' => q#Standard nga Oras sa Taipei#,
 			},
 		},
 		'Tajikistan' => {
@@ -6500,9 +6501,9 @@ has 'time_zone_names' => (
 		},
 		'Tonga' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Tonga#,
+				'daylight' => q#Oras sa Ting-init sa Tonga#,
 				'generic' => q#Oras sa Tonga#,
-				'standard' => q#Tamdanang Oras sa Tonga#,
+				'standard' => q#Standard nga Oras sa Tonga#,
 			},
 		},
 		'Truk' => {
@@ -6512,9 +6513,9 @@ has 'time_zone_names' => (
 		},
 		'Turkmenistan' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Turkmenistan#,
+				'daylight' => q#Oras sa Ting-init sa Turkmenistan#,
 				'generic' => q#Oras sa Turkmenistan#,
-				'standard' => q#Tamdanang Oras sa Turkmenistan#,
+				'standard' => q#Standard nga Oras sa Turkmenistan#,
 			},
 		},
 		'Tuvalu' => {
@@ -6524,23 +6525,23 @@ has 'time_zone_names' => (
 		},
 		'Uruguay' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Uruguay#,
+				'daylight' => q#Oras sa Ting-init sa Uruguay#,
 				'generic' => q#Oras sa Uruguay#,
-				'standard' => q#Tamdanang Oras sa Uruguay#,
+				'standard' => q#Standard nga Oras sa Uruguay#,
 			},
 		},
 		'Uzbekistan' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Uzbekistan#,
+				'daylight' => q#Oras sa Ting-init sa Uzbekistan#,
 				'generic' => q#Oras sa Uzbekistan#,
-				'standard' => q#Tamdanang Oras sa Uzbekistan#,
+				'standard' => q#Standard nga Oras sa Uzbekistan#,
 			},
 		},
 		'Vanuatu' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Vanuatu#,
+				'daylight' => q#Oras sa Ting-init sa Vanuatu#,
 				'generic' => q#Oras sa Vanuatu#,
-				'standard' => q#Tamdanang Oras sa Vanuatu#,
+				'standard' => q#Standard nga Oras sa Vanuatu#,
 			},
 		},
 		'Venezuela' => {
@@ -6550,16 +6551,16 @@ has 'time_zone_names' => (
 		},
 		'Vladivostok' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Vladivostok#,
+				'daylight' => q#Oras sa Ting-init sa Vladivostok#,
 				'generic' => q#Oras sa Vladivostok#,
-				'standard' => q#Tamdanang Oras sa Vladivostok#,
+				'standard' => q#Standard nga Oras sa Vladivostok#,
 			},
 		},
 		'Volgograd' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Volgograd#,
+				'daylight' => q#Oras sa Ting-init sa Volgograd#,
 				'generic' => q#Oras sa Volgograd#,
-				'standard' => q#Tamdanang Oras sa Volgograd#,
+				'standard' => q#Standard nga Oras sa Volgograd#,
 			},
 		},
 		'Vostok' => {
@@ -6579,16 +6580,16 @@ has 'time_zone_names' => (
 		},
 		'Yakutsk' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Yakutsk#,
+				'daylight' => q#Oras sa Ting-init sa Yakutsk#,
 				'generic' => q#Oras sa Yakutsk#,
-				'standard' => q#Tamdanang Oras sa Yakutsk#,
+				'standard' => q#Standard nga Oras sa Yakutsk#,
 			},
 		},
 		'Yekaterinburg' => {
 			long => {
-				'daylight' => q#Oras sa Tag-init sa Yekaterinburg#,
+				'daylight' => q#Oras sa Ting-init sa Yekaterinburg#,
 				'generic' => q#Oras sa Yekaterinburg#,
-				'standard' => q#Tamdanang Oras sa Yekaterinburg#,
+				'standard' => q#Standard nga Oras sa Yekaterinburg#,
 			},
 		},
 		'Yukon' => {

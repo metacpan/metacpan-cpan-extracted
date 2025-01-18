@@ -1,6 +1,6 @@
 package Text::Conceal;
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 use v5.14;
 use warnings;
@@ -85,7 +85,8 @@ sub decode {
     my @replace = @{$obj->{replace}} or return @_;
   ARGS:
     for (@_) {
-	for my $i (0 .. $#replace) {
+	# do not use "each @replace" here
+	for my $i (keys @replace) {
 	    my($regex, $orig, $len) = @{$replace[$i]};
 	    if (s/$regex/_replace(${^MATCH}, $orig, $len)/pe) {
 		if ($obj->{duplicate}) {
@@ -184,7 +185,7 @@ Text::Conceal - conceal and recover interface for text processing
 
 =head1 VERSION
 
-Version 1.03
+Version 1.04
 
 =head1 DESCRIPTION
 
@@ -368,7 +369,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2020-2023 Kazumasa Utashiro.
+Copyright 2020-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

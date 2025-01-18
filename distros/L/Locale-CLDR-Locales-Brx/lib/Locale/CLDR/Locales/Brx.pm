@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Brx - Package for language Bodo
 
 package Locale::CLDR::Locales::Brx;
 # This file auto generated from Data\common\main\brx.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -3064,7 +3064,6 @@ has 'currencies' => (
 			},
 		},
 		'XOF' => {
-			symbol => 'एफ सि.एफ.ए',
 			display_name => {
 				'currency' => q(सोनाब आफ्रिकानि सि.एफ.ए फ्रांक),
 			},
@@ -3489,6 +3488,7 @@ has 'datetime_formats_available_formats' => (
 			MEd => q{E, M/d},
 			MMMEd => q{E, MMM d},
 			MMMMEd => q{E, MMMM d},
+			MMMMd => q{MMMM d},
 			MMMd => q{d-MMM},
 			Md => q{M/d},
 			h => q{a नि h},
@@ -4271,9 +4271,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#निउ यर्क#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#निपिग’न#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#न’म#,
 		},
@@ -4295,9 +4292,6 @@ has 'time_zone_names' => (
 		'America/Panama' => {
 			exemplarCity => q#पानामा#,
 		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#पांग्नीरटुं#,
-		},
 		'America/Paramaribo' => {
 			exemplarCity => q#पारामारिब’#,
 		},
@@ -4318,9 +4312,6 @@ has 'time_zone_names' => (
 		},
 		'America/Punta_Arenas' => {
 			exemplarCity => q#पुन्टा आरेनास#,
-		},
-		'America/Rainy_River' => {
-			exemplarCity => q#रैनी रिभार#,
 		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#रेनकिन इनलेट#,
@@ -4382,9 +4373,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#थ्यूल#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#थान्डार गाथोन#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#टिहुआना#,
 		},
@@ -4405,9 +4393,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#याकुतात#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#येल्ल’नाईफ#,
 		},
 		'America_Central' => {
 			long => {
@@ -4582,9 +4567,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#चीता#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#च’इबालसान#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#कलम्ब’#,
@@ -4824,9 +4806,6 @@ has 'time_zone_names' => (
 		'Australia/Broken_Hill' => {
 			exemplarCity => q#ब्र’केन हिल#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#करी#,
-		},
 		'Australia/Darwin' => {
 			exemplarCity => q#डार्वीन#,
 		},
@@ -4953,13 +4932,6 @@ has 'time_zone_names' => (
 				'daylight' => q#चाईना सानारि सम#,
 				'generic' => q#चाईना सम#,
 				'standard' => q#चाईना थाखोआरि सम#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#च’इबालसान दैज्लां सम#,
-				'generic' => q#च’इबालसान सम#,
-				'standard' => q#च’इबालसान थाखोआरि सम#,
 			},
 		},
 		'Christmas' => {
@@ -5184,9 +5156,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#ऊल्यान’भ्स्क#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#ऊज्ह’र’ड#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#भाडुज#,
 		},
@@ -5207,9 +5176,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#जाग्रेब#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#झाप’र’झ्ये#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#जुरिख#,
@@ -5500,11 +5466,6 @@ has 'time_zone_names' => (
 				'standard' => q#माकाऊ स्टैंडर्ड टाईम#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#माक्वारी द्वीप सम#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#मागादान दैज्लां सम#,
@@ -5542,13 +5503,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#मौसन सम#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#साहा-सोनाब मेक्सिक’ सानारि सम#,
-				'generic' => q#साहा-सोनाब मेक्सिक’ सम#,
-				'standard' => q#साहा-सोनाब मेक्सिक’ थाखोआरि सम#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -5690,9 +5644,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Honolulu' => {
 			exemplarCity => q#हनलुलु#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#ज’नस्ट’न#,
 		},
 		'Pacific/Kanton' => {
 			exemplarCity => q#केन्ट’न#,

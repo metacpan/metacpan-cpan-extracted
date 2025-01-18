@@ -8,18 +8,18 @@ Locale::CLDR::Locales::De::Latn::Ch - Package for language German
 
 package Locale::CLDR::Locales::De::Latn::Ch;
 # This file auto generated from Data\common\main\de_CH.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -1261,13 +1261,13 @@ has 'units' => (
 					# Long Unit Identifier
 					'volume-jigger' => {
 						'name' => q(Schuss),
-						'one' => q(Schuss),
+						'one' => q({0} Schuss),
 						'other' => q({0} Schuss),
 					},
 					# Core Unit Identifier
 					'jigger' => {
 						'name' => q(Schuss),
-						'one' => q(Schuss),
+						'one' => q({0} Schuss),
 						'other' => q({0} Schuss),
 					},
 					# Long Unit Identifier

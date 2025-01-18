@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Om::Latn::Ke - Package for language Oromo
 
 package Locale::CLDR::Locales::Om::Latn::Ke;
 # This file auto generated from Data\common\main\om_KE.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -36,37 +36,6 @@ has 'currencies' => (
 );
 
 
-has 'calendar_months' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-			'gregorian' => {
-				'stand-alone' => {
-					narrow => {
-						nonleap => [
-							'A',
-							'G',
-							'B',
-							'E',
-							'C',
-							'W',
-							'A',
-							'H',
-							'F',
-							'O',
-							'S',
-							'M'
-						],
-						leap => [
-							
-						],
-					},
-				},
-			},
-	} },
-);
-
 has 'calendar_days' => (
 	is			=> 'ro',
 	isa			=> HashRef,
@@ -82,23 +51,6 @@ has 'calendar_days' => (
 						fri => 'J',
 						sat => 'S',
 						sun => 'D'
-					},
-				},
-			},
-	} },
-);
-
-has 'calendar_quarters' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-			'gregorian' => {
-				'format' => {
-					abbreviated => {0 => 'K1',
-						1 => 'K2',
-						2 => 'K3',
-						3 => 'K4'
 					},
 				},
 			},

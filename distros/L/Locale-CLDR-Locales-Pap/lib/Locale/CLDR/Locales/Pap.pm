@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Pap - Package for language Papiamento
 
 package Locale::CLDR::Locales::Pap;
 # This file auto generated from Data\common\main\pap.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -31,21 +31,13 @@ has 'display_name_language' => (
 	default		=> sub {
 		 sub {
 			 my %languages = (
-				'de' => 'alemán',
- 				'de_AT' => 'alemán (AT)',
- 				'de_CH' => 'alemán (CH)',
+				'ar' => 'arabir',
+ 				'ar_001' => 'arabir (mundu)',
+ 				'de' => 'alemán',
  				'en' => 'ingles',
- 				'en_AU' => 'ingles (AU)',
- 				'en_CA' => 'ingles (CA)',
- 				'en_GB' => 'ingles (GB)',
- 				'en_US' => 'ingles (US)',
  				'es' => 'spañó',
  				'es_419' => 'spañó di latino amérika',
- 				'es_ES' => 'spañó (ES)',
- 				'es_MX' => 'spañó (MX)',
  				'fr' => 'franses',
- 				'fr_CA' => 'franses (CA)',
- 				'fr_CH' => 'franses (CH)',
  				'he' => 'hebreo',
  				'hi' => 'hindi',
  				'hmn' => 'hmong',
@@ -57,12 +49,13 @@ has 'display_name_language' => (
  				'ko' => 'koreano',
  				'la' => 'latin',
  				'nl' => 'hulandes',
- 				'nl_BE' => 'hulandes (BE)',
  				'pap' => 'Papiamentu',
  				'pl' => 'polaco',
  				'pt' => 'portugues',
- 				'pt_BR' => 'portugues (BR)',
- 				'pt_PT' => 'portugues (PT)',
+ 				'ru' => 'ruso',
+ 				'th' => 'tailandes',
+ 				'tr' => 'turko',
+ 				'und' => 'idioma deskonosí',
  				'zh' => 'chines',
 
 			);
@@ -81,10 +74,13 @@ has 'display_name_script' => (
 	default		=> sub {
 		sub {
 			my %scripts = (
-			'Brai' => 'braille',
+			'Arab' => 'Arabir',
+ 			'Brai' => 'braille',
  			'Jpan' => 'hapones',
  			'Kore' => 'koreano',
  			'Latn' => 'Latin',
+ 			'Zxxx' => 'No Tin Ortografia',
+ 			'Zzzz' => 'Ortografia Deskonosí',
 
 			);
 			if ( @_ ) {
@@ -102,7 +98,7 @@ has 'display_name_region' => (
 	default		=> sub {
 		{
 			'001' => 'mundu',
- 			'002' => 'Afrika',
+ 			'002' => 'Áfrika',
  			'003' => 'Nort Amérika',
  			'005' => 'Zùit Amérika',
  			'011' => 'Wèst Afrika',
@@ -130,20 +126,26 @@ has 'display_name_region' => (
  			'154' => 'Nort Europa',
  			'155' => 'Wèst Europa',
  			'419' => 'Latino Amérika',
+ 			'AF' => 'Afghanistan',
+ 			'AG' => 'Antigua & Barbuda',
  			'AI' => 'Anguilla',
+ 			'AL' => 'Albania',
  			'AO' => 'Angola',
  			'AR' => 'Argentina',
  			'AT' => 'Austria',
  			'AU' => 'Australia',
  			'AW' => 'Aruba',
+ 			'BA' => 'Bosnia i Herzegowina',
  			'BB' => 'Barbados',
  			'BE' => 'Bèlgika',
  			'BG' => 'Bulgaria',
+ 			'BL' => 'Saint Bathélemy',
  			'BM' => 'Bermuda',
  			'BO' => 'Bolivia',
- 			'BQ' => 'Antilla Hulandes',
+ 			'BQ' => 'Antia Hulandes',
  			'BR' => 'Brazil',
  			'BS' => 'Bahamas',
+ 			'BV' => 'Isla Bouvet',
  			'BW' => 'Botswana',
  			'BY' => 'Belarus',
  			'BZ' => 'Belize',
@@ -160,35 +162,46 @@ has 'display_name_region' => (
  			'CO' => 'Colombia',
  			'CR' => 'Costa Rica',
  			'CU' => 'Cuba',
- 			'CV' => 'Cape Verde',
+ 			'CV' => 'Kabo Verde',
  			'CW' => 'Kòrsou',
+ 			'CZ' => 'Cheko',
+ 			'CZ@alt=variant' => 'Repúblika di Cheko',
  			'DE' => 'Alemania',
  			'DK' => 'Dinamarka',
  			'DM' => 'Dominica',
  			'DO' => 'Repúblika Dominikano',
+ 			'DZ' => 'Algeria',
  			'EC' => 'Ecuador',
  			'EE' => 'Estonia',
  			'EG' => 'Egipto',
+ 			'EH' => 'Western Sahara',
  			'ER' => 'Eritrea',
  			'ES' => 'Spaña',
  			'ET' => 'Etiopia',
  			'EU' => 'Union Europeo',
  			'FI' => 'Finlandia',
  			'FJ' => 'Fiji',
+ 			'FK' => 'Islanan Falkland',
+ 			'FK@alt=variant' => 'Islanan Falkland (Islas Malvinas)',
  			'FM' => 'Micronesia',
  			'FR' => 'Fransia',
  			'GB' => 'Gran Bretaña',
  			'GD' => 'Grenada',
+ 			'GF' => 'Guyana Franses',
  			'GH' => 'Ghana',
  			'GL' => 'Grunlandia',
  			'GM' => 'Gambia',
  			'GN' => 'Guinea',
  			'GP' => 'Guadeloupe',
+ 			'GQ' => 'Guinea Ekuatorial',
  			'GR' => 'Gresia',
  			'GT' => 'Guatemala',
  			'GU' => 'Guam',
+ 			'GW' => 'Guinea-Bissau',
+ 			'GY' => 'Guyana',
  			'HK' => 'Hong Kong',
  			'HN' => 'Honduras',
+ 			'HR' => 'Kroasia',
  			'HT' => 'Haiti',
  			'HU' => 'Hungria',
  			'ID' => 'Indonesia',
@@ -204,16 +217,28 @@ has 'display_name_region' => (
  			'KE' => 'Kenya',
  			'KH' => 'Cambodia',
  			'KM' => 'Comóros',
+ 			'KN' => 'St. Kitts i Nevis',
  			'KP' => 'Nort Korea',
  			'KR' => 'Surkorea',
+ 			'KY' => 'Islanan Caiman',
+ 			'LC' => 'Sint Lucia',
+ 			'LI' => 'Liechtenstein',
  			'LK' => 'Sri Lanka',
  			'LR' => 'Liberia',
  			'LU' => 'Luxemburg',
  			'MA' => 'Morocco',
+ 			'MC' => 'Monaco',
  			'MD' => 'Moldavia',
+ 			'ME' => 'Montenegro',
+ 			'MF' => 'Saint Martin',
  			'MG' => 'Madagascar',
  			'ML' => 'Mali',
+ 			'MN' => 'Mongolia',
+ 			'MO' => 'Macao',
+ 			'MQ' => 'Martinique',
+ 			'MS' => 'Montserrat',
  			'MT' => 'Malta',
+ 			'MV' => 'Maldives',
  			'MW' => 'Malawi',
  			'MX' => 'México',
  			'MZ' => 'Mozambique',
@@ -228,21 +253,32 @@ has 'display_name_region' => (
  			'PF' => 'Polinesia Franses',
  			'PH' => 'Filipinas',
  			'PL' => 'Polonia',
+ 			'PM' => 'St. Pierre & Miquelon',
  			'PR' => 'Puerto Rico',
  			'PT' => 'Portugal',
  			'PY' => 'Paraguay',
  			'QA' => 'Qatar',
+ 			'RO' => 'Romania',
+ 			'RS' => 'Servia',
  			'RU' => 'Rusia',
  			'RW' => 'Rwanda',
+ 			'SC' => 'Seychelles',
  			'SD' => 'Sudan',
  			'SE' => 'Suesia',
+ 			'SG' => 'Singapore',
+ 			'SH' => 'Sint Helena',
+ 			'SI' => 'Slovenia',
  			'SK' => 'Slovakia',
  			'SL' => 'Sierra Leone',
+ 			'SM' => 'San Marino',
  			'SN' => 'Senegal',
  			'SO' => 'Somalia',
  			'SR' => 'Surinam',
  			'SV' => 'El Salvador',
  			'SX' => 'Sint Maarten',
+ 			'TC' => 'Turks i Caicos',
+ 			'TD' => 'Chad',
+ 			'TH' => 'Tailandia',
  			'TR' => 'Turkia',
  			'TT' => 'Trinidad i Tobago',
  			'TW' => 'Taiwan',
@@ -251,7 +287,10 @@ has 'display_name_region' => (
  			'UN' => 'Nashonnan Uní',
  			'US' => 'Merka',
  			'UY' => 'Uruguay',
+ 			'VC' => 'Sint Vicent i Grenadines',
  			'VE' => 'Venezuela',
+ 			'VG' => 'Virgin Islands (Britániko)',
+ 			'VI' => 'Virgin Islands (Merikano)',
  			'VN' => 'Vietnam',
  			'ZA' => 'Suráfrika',
  			'ZM' => 'Zambia',
@@ -316,6 +355,54 @@ has 'units' => (
 	isa			=> HashRef[HashRef[HashRef[Str]]],
 	init_arg	=> undef,
 	default		=> sub { {
+				'long' => {
+					# Long Unit Identifier
+					'coordinate' => {
+						'east' => q({0} ost),
+						'north' => q({0} nort),
+						'south' => q({0} suit),
+						'west' => q({0} wèst),
+					},
+					# Core Unit Identifier
+					'coordinate' => {
+						'east' => q({0} ost),
+						'north' => q({0} nort),
+						'south' => q({0} suit),
+						'west' => q({0} wèst),
+					},
+					# Long Unit Identifier
+					'per' => {
+						'1' => q({0} pa {1}),
+					},
+					# Core Unit Identifier
+					'per' => {
+						'1' => q({0} pa {1}),
+					},
+					# Long Unit Identifier
+					'times' => {
+						'1' => q({0}-{1}),
+					},
+					# Core Unit Identifier
+					'times' => {
+						'1' => q({0}-{1}),
+					},
+				},
+				'narrow' => {
+					# Long Unit Identifier
+					'coordinate' => {
+						'east' => q({0} ost),
+						'north' => q({0} nort),
+						'south' => q({0} suit),
+						'west' => q({0} wèst),
+					},
+					# Core Unit Identifier
+					'coordinate' => {
+						'east' => q({0} ost),
+						'north' => q({0} nort),
+						'south' => q({0} suit),
+						'west' => q({0} wèst),
+					},
+				},
 				'short' => {
 					# Long Unit Identifier
 					'' => {
@@ -324,6 +411,20 @@ has 'units' => (
 					# Core Unit Identifier
 					'' => {
 						'name' => q(direkshon),
+					},
+					# Long Unit Identifier
+					'coordinate' => {
+						'east' => q({0} ost),
+						'north' => q({0} nort),
+						'south' => q({0} suit),
+						'west' => q({0} wèst),
+					},
+					# Core Unit Identifier
+					'coordinate' => {
+						'east' => q({0} ost),
+						'north' => q({0} nort),
+						'south' => q({0} suit),
+						'west' => q({0} wèst),
 					},
 				},
 			} }
@@ -334,8 +435,119 @@ has 'listPatterns' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-				end => q({0} i {1}),
+				end => q({0}, i {1}),
+				2 => q({0} i {1}),
 		} }
+);
+
+has 'number_formats' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+		decimalFormat => {
+			'long' => {
+				'1000' => {
+					'one' => '0 mil',
+					'other' => '0 mil',
+				},
+				'10000' => {
+					'one' => '00 mil',
+					'other' => '00 mil',
+				},
+				'100000' => {
+					'one' => '000 mil',
+					'other' => '000 mil',
+				},
+				'1000000' => {
+					'one' => '0 mion',
+					'other' => '0 mion',
+				},
+				'10000000' => {
+					'one' => '00 mion',
+					'other' => '00 mion',
+				},
+				'100000000' => {
+					'one' => '000 mion',
+					'other' => '000 mion',
+				},
+				'1000000000' => {
+					'one' => '0 bion',
+					'other' => '0 bion',
+				},
+				'10000000000' => {
+					'one' => '00 bion',
+					'other' => '00 bion',
+				},
+				'100000000000' => {
+					'one' => '000 bion',
+					'other' => '000 bion',
+				},
+				'1000000000000' => {
+					'one' => '0 trion',
+					'other' => '0 trion',
+				},
+				'10000000000000' => {
+					'one' => '00 trion',
+					'other' => '00 trion',
+				},
+				'100000000000000' => {
+					'one' => '000 trion',
+					'other' => '000 trion',
+				},
+			},
+			'short' => {
+				'1000' => {
+					'one' => '0mil',
+					'other' => '0mil',
+				},
+				'10000' => {
+					'one' => '00mil',
+					'other' => '00mil',
+				},
+				'100000' => {
+					'one' => '000mil',
+					'other' => '000mil',
+				},
+				'1000000' => {
+					'one' => '0mion',
+					'other' => '0mion',
+				},
+				'10000000' => {
+					'one' => '00mion',
+					'other' => '00mion',
+				},
+				'100000000' => {
+					'one' => '000mion',
+					'other' => '000mion',
+				},
+				'1000000000' => {
+					'one' => '0bion',
+					'other' => '0bion',
+				},
+				'10000000000' => {
+					'one' => '00bion',
+					'other' => '00bion',
+				},
+				'100000000000' => {
+					'one' => '000bion',
+					'other' => '000bion',
+				},
+				'1000000000000' => {
+					'one' => '0trion',
+					'other' => '0trion',
+				},
+				'10000000000000' => {
+					'one' => '00trion',
+					'other' => '00trion',
+				},
+				'100000000000000' => {
+					'one' => '000trion',
+					'other' => '000trion',
+				},
+			},
+		},
+} },
 );
 
 has 'currencies' => (
@@ -426,7 +638,7 @@ has 'calendar_months' => (
 				'stand-alone' => {
 					abbreviated => {
 						nonleap => [
-							'jan',
+							'yan',
 							'feb',
 							'mar',
 							'apr',
@@ -474,6 +686,40 @@ has 'calendar_days' => (
 						fri => 'db',
 						sat => 'ds',
 						sun => 'dd'
+					},
+				},
+			},
+	} },
+);
+
+has 'calendar_quarters' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+			'gregorian' => {
+				'format' => {
+					abbreviated => {0 => '1 kuartal',
+						1 => '2 kuartal',
+						2 => '3 kuartal',
+						3 => '4 kuartal'
+					},
+					wide => {0 => 'di promé kuartal',
+						1 => 'di dos kuartal',
+						2 => 'di tres kuartal',
+						3 => 'di kuanter kuartal'
+					},
+				},
+				'stand-alone' => {
+					abbreviated => {0 => '1 kuartal',
+						1 => '2 kuartal',
+						2 => '3 kuartal',
+						3 => '4 kuartal'
+					},
+					wide => {0 => 'di promé kuartal',
+						1 => 'di dos kuartal',
+						2 => 'di tres kuartal',
+						3 => 'di kuanter kuartal'
 					},
 				},
 			},
@@ -647,7 +893,7 @@ has 'datetime_formats_interval' => (
 				y => q{MMM y – MMM y G},
 			},
 			GyMMMEd => {
-				G => q{E, d MMM y G  – E, d MMM y G},
+				G => q{E, d MMM y G – E, d MMM y G},
 				M => q{E, d MMM – E, d MMM y G},
 				d => q{E, d MMM – d MMM y G},
 				y => q{E, d MMM y – E, d MMM y G},
@@ -764,7 +1010,7 @@ has 'datetime_formats_interval' => (
 				d => q{E, d MMM – E, d MMM},
 			},
 			MMMd => {
-				M => q{d MMM  – d MMM},
+				M => q{d MMM – d MMM},
 				d => q{d–d MMM},
 			},
 			Md => {
@@ -813,6 +1059,16 @@ has 'time_zone_names' => (
 	init_arg	=> undef,
 	default	=> sub { {
 		regionFormat => q(ora di {0}),
+		'Africa_Central' => {
+			long => {
+				'standard' => q#Ora di Áfrika Sentral#,
+			},
+		},
+		'Africa_Eastern' => {
+			long => {
+				'standard' => q#Ora di Ost Áfrika#,
+			},
+		},
 		'America/Curacao' => {
 			exemplarCity => q#Kòrsou#,
 		},
@@ -840,11 +1096,51 @@ has 'time_zone_names' => (
 		'Asia/Jerusalem' => {
 			exemplarCity => q#Herúsalèm#,
 		},
+		'Atlantic/Azores' => {
+			exemplarCity => q#Azóres#,
+		},
+		'Atlantic/Cape_Verde' => {
+			exemplarCity => q#Kabo Verde#,
+		},
+		'Azores' => {
+			long => {
+				'daylight' => q#Ora di Azóres Temporada di Zomer#,
+				'generic' => q#Ora di Azóres#,
+				'standard' => q#Ora Normal di Azóres#,
+			},
+		},
 		'Etc/Unknown' => {
 			exemplarCity => q#Deskonosí#,
 		},
+		'Europe/Athens' => {
+			exemplarCity => q#Aténas#,
+		},
+		'Europe/London' => {
+			exemplarCity => q#Lònden#,
+		},
 		'Europe/Rome' => {
 			exemplarCity => q#Roma#,
+		},
+		'Europe_Central' => {
+			long => {
+				'daylight' => q#Ora di Europa Sentral Temporada di Zomer#,
+				'generic' => q#Ora di Europa Sentral#,
+				'standard' => q#Ora Normal di Europa Sentral#,
+			},
+		},
+		'Europe_Eastern' => {
+			long => {
+				'daylight' => q#Ora di Ost Europa Temporada di Zomer#,
+				'generic' => q#Ora di Ost Europa#,
+				'standard' => q#Ora Normal di Ost Europa#,
+			},
+		},
+		'Europe_Western' => {
+			long => {
+				'daylight' => q#Ora di Wèst Europa Temporada di Zomer#,
+				'generic' => q#Ora di Wèst Europa#,
+				'standard' => q#Ora Normal di Wèst Europa#,
+			},
 		},
 		'GMT' => {
 			long => {

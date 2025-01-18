@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Cs - Package for language Czech
 
 package Locale::CLDR::Locales::Cs;
 # This file auto generated from Data\common\main\cs.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -730,6 +730,7 @@ has 'display_name_language' => (
  				'bjn' => 'bandžarština',
  				'bkm' => 'kom',
  				'bla' => 'siksika',
+ 				'blo' => 'aniiština',
  				'bm' => 'bambarština',
  				'bn' => 'bengálština',
  				'bo' => 'tibetština',
@@ -863,7 +864,6 @@ has 'display_name_language' => (
  				'gmh' => 'hornoněmčina (středověká)',
  				'gn' => 'guaranština',
  				'goh' => 'hornoněmčina (stará)',
- 				'gom' => 'konkánština (Goa)',
  				'gon' => 'góndština',
  				'gor' => 'gorontalo',
  				'got' => 'gótština',
@@ -974,6 +974,7 @@ has 'display_name_language' => (
  				'kv' => 'komijština',
  				'kw' => 'kornština',
  				'kwk' => 'kvakiutština',
+ 				'kxv' => 'kúvi',
  				'ky' => 'kyrgyzština',
  				'la' => 'latina',
  				'lad' => 'ladinština',
@@ -1262,13 +1263,13 @@ has 'display_name_language' => (
  				'und' => 'neznámý jazyk',
  				'ur' => 'urdština',
  				'uz' => 'uzbečtina',
- 				'vai' => 'vai',
  				've' => 'venda',
  				'vec' => 'benátština',
  				'vep' => 'vepština',
  				'vi' => 'vietnamština',
  				'vls' => 'vlámština (západní)',
  				'vmf' => 'němčina (mohansko-franské dialekty)',
+ 				'vmw' => 'makhuwština',
  				'vo' => 'volapük',
  				'vot' => 'votština',
  				'vro' => 'võruština',
@@ -1284,6 +1285,7 @@ has 'display_name_language' => (
  				'xal' => 'kalmyčtina',
  				'xh' => 'xhoština',
  				'xmf' => 'mingrelština',
+ 				'xnr' => 'kángrí',
  				'xog' => 'sogština',
  				'yao' => 'jaoština',
  				'yap' => 'japština',
@@ -1930,7 +1932,6 @@ has 'display_name_type' => (
  				'phonebook' => q{Řazení telefonního seznamu},
  				'phonetic' => q{Fonetické řazení},
  				'pinyin' => q{Řazení podle pchin-jinu},
- 				'reformed' => q{Reformované řazení},
  				'search' => q{Obecné hledání},
  				'searchjl' => q{Vyhledávat podle počáteční souhlásky písma hangul},
  				'standard' => q{Standardní řazení},
@@ -2737,6 +2738,7 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'concentr-milligram-ofglucose-per-deciliter' => {
+						'1' => q(inanimate),
 						'few' => q({0} miligramy na decilitr),
 						'many' => q({0} miligramu na decilitr),
 						'name' => q(miligramy na decilitr),
@@ -2745,6 +2747,7 @@ has 'units' => (
 					},
 					# Core Unit Identifier
 					'milligram-ofglucose-per-deciliter' => {
+						'1' => q(inanimate),
 						'few' => q({0} miligramy na decilitr),
 						'many' => q({0} miligramu na decilitr),
 						'name' => q(miligramy na decilitr),
@@ -2858,6 +2861,24 @@ has 'units' => (
 						'name' => q(desetiny promile),
 						'one' => q({0} desetina promile),
 						'other' => q({0} desetin promile),
+					},
+					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'1' => q(feminine),
+						'few' => q({0} částice na miliardu),
+						'many' => q({0} částice na miliardu),
+						'name' => q(částice na miliardu),
+						'one' => q({0} částice na miliardu),
+						'other' => q({0} částic na miliardu),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'1' => q(feminine),
+						'few' => q({0} částice na miliardu),
+						'many' => q({0} částice na miliardu),
+						'name' => q(částice na miliardu),
+						'one' => q({0} částice na miliardu),
+						'other' => q({0} částic na miliardu),
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
@@ -3324,6 +3345,26 @@ has 'units' => (
 						'other' => q({0} nanosekund),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'1' => q(feminine),
+						'few' => q({0} noci),
+						'many' => q({0} noci),
+						'name' => q(noci),
+						'one' => q({0} noc),
+						'other' => q({0} nocí),
+						'per' => q({0} za noc),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'1' => q(feminine),
+						'few' => q({0} noci),
+						'many' => q({0} noci),
+						'name' => q(noci),
+						'one' => q({0} noc),
+						'other' => q({0} nocí),
+						'per' => q({0} za noc),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'1' => q(neuter),
 						'few' => q({0} čtvrtletí),
@@ -3559,6 +3600,7 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'energy-kilocalorie' => {
+						'1' => q(feminine),
 						'few' => q({0} kilokalorie),
 						'many' => q({0} kilokalorie),
 						'name' => q(kilokalorie),
@@ -3567,6 +3609,7 @@ has 'units' => (
 					},
 					# Core Unit Identifier
 					'kilocalorie' => {
+						'1' => q(feminine),
 						'few' => q({0} kilokalorie),
 						'many' => q({0} kilokalorie),
 						'name' => q(kilokalorie),
@@ -4219,6 +4262,7 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-point' => {
+						'1' => q(inanimate),
 						'few' => q({0} body),
 						'many' => q({0} bodu),
 						'name' => q(body),
@@ -4227,6 +4271,7 @@ has 'units' => (
 					},
 					# Core Unit Identifier
 					'point' => {
+						'1' => q(inanimate),
 						'few' => q({0} body),
 						'many' => q({0} bodu),
 						'name' => q(body),
@@ -4855,6 +4900,7 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'pressure-millimeter-ofhg' => {
+						'1' => q(inanimate),
 						'few' => q({0} milimetry rtuťového sloupce),
 						'many' => q({0} milimetru rtuťového sloupce),
 						'name' => q(milimetry rtuťového sloupce),
@@ -4863,6 +4909,7 @@ has 'units' => (
 					},
 					# Core Unit Identifier
 					'millimeter-ofhg' => {
+						'1' => q(inanimate),
 						'few' => q({0} milimetry rtuťového sloupce),
 						'many' => q({0} milimetru rtuťového sloupce),
 						'name' => q(milimetry rtuťového sloupce),
@@ -4952,6 +4999,24 @@ has 'units' => (
 						'name' => q(uzly),
 						'one' => q({0} uzel),
 						'other' => q({0} uzlů),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'1' => q(neuter),
+						'few' => q({0} světla),
+						'many' => q({0} světla),
+						'name' => q(světlo),
+						'one' => q({0} světlo),
+						'other' => q({0} světel),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'1' => q(neuter),
+						'few' => q({0} světla),
+						'many' => q({0} světla),
+						'name' => q(světlo),
+						'one' => q({0} světlo),
+						'other' => q({0} světel),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -5770,6 +5835,24 @@ has 'units' => (
 						'per' => q({0}/m.),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'few' => q({0} noci),
+						'many' => q({0} noci),
+						'name' => q(noci),
+						'one' => q({0} noc),
+						'other' => q({0} nocí),
+						'per' => q({0}/noc),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'few' => q({0} noci),
+						'many' => q({0} noci),
+						'name' => q(noci),
+						'one' => q({0} noc),
+						'other' => q({0} nocí),
+						'per' => q({0}/noc),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'few' => q({0} kv.),
 						'many' => q({0} kv.),
@@ -5860,6 +5943,14 @@ has 'units' => (
 						'other' => q({0}″),
 					},
 					# Long Unit Identifier
+					'length-point' => {
+						'name' => q(b.),
+					},
+					# Core Unit Identifier
+					'point' => {
+						'name' => q(b.),
+					},
+					# Long Unit Identifier
 					'pressure-inch-ofhg' => {
 						'few' => q({0}″ Hg),
 						'many' => q({0}″ Hg),
@@ -5890,6 +5981,22 @@ has 'units' => (
 						'name' => q(mmHg),
 						'one' => q({0} mmHg),
 						'other' => q({0} mmHg),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'few' => q({0} sv.),
+						'many' => q({0} sv.),
+						'name' => q(světlo),
+						'one' => q({0} sv.),
+						'other' => q({0} sv.),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'few' => q({0} sv.),
+						'many' => q({0} sv.),
+						'name' => q(světlo),
+						'one' => q({0} sv.),
+						'other' => q({0} sv.),
 					},
 					# Long Unit Identifier
 					'volume-dessert-spoon-imperial' => {
@@ -6154,6 +6261,22 @@ has 'units' => (
 						'other' => q({0} ‱),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'few' => q({0} částice na mld),
+						'many' => q({0} částic na mld),
+						'name' => q(částic/mld.),
+						'one' => q({0} částice na mld),
+						'other' => q({0} částic na mld),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'few' => q({0} částice na mld),
+						'many' => q({0} částic na mld),
+						'name' => q(částic/mld.),
+						'one' => q({0} částice na mld),
+						'other' => q({0} částic na mld),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'few' => q({0} l/100 km),
 						'many' => q({0} l/100 km),
@@ -6322,6 +6445,24 @@ has 'units' => (
 						'one' => q({0} měs.),
 						'other' => q({0} měs.),
 						'per' => q({0}/měs.),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'few' => q({0} noci),
+						'many' => q({0} noci),
+						'name' => q(noci),
+						'one' => q({0} noc),
+						'other' => q({0} nocí),
+						'per' => q({0}/noc),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'few' => q({0} noci),
+						'many' => q({0} noci),
+						'name' => q(noci),
+						'one' => q({0} noc),
+						'other' => q({0} nocí),
+						'per' => q({0}/noc),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -6546,6 +6687,14 @@ has 'units' => (
 						'name' => q(m),
 					},
 					# Long Unit Identifier
+					'length-point' => {
+						'name' => q(body),
+					},
+					# Core Unit Identifier
+					'point' => {
+						'name' => q(body),
+					},
+					# Long Unit Identifier
 					'mass-grain' => {
 						'few' => q({0} gr),
 						'many' => q({0} gr),
@@ -6624,6 +6773,22 @@ has 'units' => (
 						'other' => q({0} Bft),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'few' => q({0} světla),
+						'many' => q({0} světla),
+						'name' => q(světlo),
+						'one' => q({0} světlo),
+						'other' => q({0} světel),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'few' => q({0} světla),
+						'many' => q({0} světla),
+						'name' => q(světlo),
+						'one' => q({0} světlo),
+						'other' => q({0} světel),
+					},
+					# Long Unit Identifier
 					'temperature-celsius' => {
 						'few' => q({0} °C),
 						'many' => q({0} °C),
@@ -6650,14 +6815,6 @@ has 'units' => (
 						'many' => q({0} °F),
 						'one' => q({0} °F),
 						'other' => q({0} °F),
-					},
-					# Long Unit Identifier
-					'times' => {
-						'1' => q({0}{1}),
-					},
-					# Core Unit Identifier
-					'times' => {
-						'1' => q({0}{1}),
 					},
 					# Long Unit Identifier
 					'torque-newton-meter' => {
@@ -9139,20 +9296,20 @@ has 'currencies' => (
 		},
 		'SLE' => {
 			display_name => {
-				'currency' => q(sierro-leonský leone),
-				'few' => q(sierro-leonské leone),
-				'many' => q(sierro-leonského leone),
-				'one' => q(sierro-leonský leone),
-				'other' => q(sierro-leonských leone),
+				'currency' => q(sierraleonský leone),
+				'few' => q(sierraleonské leone),
+				'many' => q(sierraleonského leone),
+				'one' => q(sierraleonský leone),
+				'other' => q(sierraleonských leone),
 			},
 		},
 		'SLL' => {
 			display_name => {
-				'currency' => q(sierro-leonský leone \(1964—2022\)),
-				'few' => q(sierro-leonské leone \(1964—2022\)),
-				'many' => q(sierro-leonského leone \(1964—2022\)),
-				'one' => q(sierro-leonský leone \(1964—2022\)),
-				'other' => q(sierro-leonských leone \(1964—2022\)),
+				'currency' => q(sierraleonský leone \(1964—2022\)),
+				'few' => q(sierraleonské leone \(1964—2022\)),
+				'many' => q(sierraleonského leone \(1964—2022\)),
+				'one' => q(sierraleonský leone \(1964—2022\)),
+				'other' => q(sierraleonských leone \(1964—2022\)),
 			},
 		},
 		'SOS' => {
@@ -11395,9 +11552,6 @@ has 'time_zone_names' => (
 				'standard' => q#amazonský standardní čas#,
 			},
 		},
-		'America/Asuncion' => {
-			exemplarCity => q#Asunción#,
-		},
 		'America/Bahia' => {
 			exemplarCity => q#Bahía#,
 		},
@@ -11418,9 +11572,6 @@ has 'time_zone_names' => (
 		},
 		'America/Costa_Rica' => {
 			exemplarCity => q#Kostarika#,
-		},
-		'America/Curacao' => {
-			exemplarCity => q#Curaçao#,
 		},
 		'America/Dominica' => {
 			exemplarCity => q#Dominika#,
@@ -11454,9 +11605,6 @@ has 'time_zone_names' => (
 		},
 		'America/Puerto_Rico' => {
 			exemplarCity => q#Portoriko#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#Santa Isabel#,
 		},
 		'America/Santarem' => {
 			exemplarCity => q#Santarém#,
@@ -11615,9 +11763,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#Čita#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#Čojbalsan#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#Kolombo#,
@@ -11781,9 +11926,6 @@ has 'time_zone_names' => (
 		'Atlantic/St_Helena' => {
 			exemplarCity => q#Svatá Helena#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#Currie#,
-		},
 		'Australia_Central' => {
 			long => {
 				'daylight' => q#středoaustralský letní čas#,
@@ -11891,13 +12033,6 @@ has 'time_zone_names' => (
 				'daylight' => q#čínský letní čas#,
 				'generic' => q#čínský čas#,
 				'standard' => q#čínský standardní čas#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#čojbalsanský letní čas#,
-				'generic' => q#čojbalsanský čas#,
-				'standard' => q#čojbalsanský standardní čas#,
 			},
 		},
 		'Christmas' => {
@@ -12046,9 +12181,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#Uljanovsk#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#Užhorod#,
-		},
 		'Europe/Vatican' => {
 			exemplarCity => q#Vatikán#,
 		},
@@ -12060,9 +12192,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#Záhřeb#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#Záporoží#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#Curych#,
@@ -12225,9 +12354,6 @@ has 'time_zone_names' => (
 		'Indian/Mauritius' => {
 			exemplarCity => q#Mauricius#,
 		},
-		'Indian/Reunion' => {
-			exemplarCity => q#Réunion#,
-		},
 		'Indian_Ocean' => {
 			long => {
 				'standard' => q#indickooceánský čas#,
@@ -12288,6 +12414,11 @@ has 'time_zone_names' => (
 				'standard' => q#petropavlovsko-kamčatský standardní čas#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#kazachstánský čas#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#východokazachstánský čas#,
@@ -12346,11 +12477,6 @@ has 'time_zone_names' => (
 				'standard' => q#Macajský standardní čas#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#čas ostrova Macquarie#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#magadanský letní čas#,
@@ -12388,13 +12514,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#čas Mawsonovy stanice#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#severozápadní mexický letní čas#,
-				'generic' => q#severozápadní mexický čas#,
-				'standard' => q#severozápadní mexický standardní čas#,
 			},
 		},
 		'Mexico_Pacific' => {

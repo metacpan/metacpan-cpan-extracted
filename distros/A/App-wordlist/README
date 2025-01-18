@@ -2,8 +2,8 @@ NAME
     App::wordlist - Grep words from (or test them against) WordList::*
 
 VERSION
-    This document describes version 0.293 of App::wordlist (from Perl
-    distribution App-wordlist), released on 2024-06-26.
+    This document describes version 0.294 of App::wordlist (from Perl
+    distribution App-wordlist), released on 2025-01-18.
 
 SYNOPSIS
     See the included script wordlist.
@@ -447,8 +447,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2024, 2022, 2021, 2020, 2018, 2017, 2016,
-    2015, 2014 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

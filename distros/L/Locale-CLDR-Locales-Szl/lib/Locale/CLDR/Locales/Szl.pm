@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Szl - Package for language Silesian
 
 package Locale::CLDR::Locales::Szl;
 # This file auto generated from Data\common\main\szl.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -4468,9 +4468,6 @@ has 'time_zone_names' => (
 		'Asia/Chita' => {
 			exemplarCity => q#Czyta#,
 		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#Czojbalsan#,
-		},
 		'Asia/Colombo' => {
 			exemplarCity => q#Kolōmbo#,
 		},
@@ -4646,9 +4643,6 @@ has 'time_zone_names' => (
 		'Atlantic/St_Helena' => {
 			exemplarCity => q#Świynto Helyna#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#Currie#,
-		},
 		'Australia_Central' => {
 			long => {
 				'daylight' => q#postrzodkowoaustralijski latowy czas#,
@@ -4734,13 +4728,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Chiny (latowy czas)#,
 				'generic' => q#Chiny#,
 				'standard' => q#Chiny (sztandardowy czas)#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Czojbalsan (latowy czas)#,
-				'generic' => q#Czojbalsan#,
-				'standard' => q#Czojbalsan (sztandardowy czas)#,
 			},
 		},
 		'Christmas' => {
@@ -4920,9 +4907,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#Uljanowsk#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#Użgorod#,
-		},
 		'Europe/Vatican' => {
 			exemplarCity => q#Watykan#,
 		},
@@ -4940,9 +4924,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#Zagrzeb#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#Zaporoże#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#Zurych#,
@@ -5224,13 +5205,6 @@ has 'time_zone_names' => (
 		'Marshall_Islands' => {
 			long => {
 				'standard' => q#Wyspy Marshalla#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Meksyk Pōłnocno-Zachodni (latowy czas)#,
-				'generic' => q#Meksyk Pōłnocno-Zachodni#,
-				'standard' => q#Meksyk Pōłnocno-Zachodni (sztandardowy czas)#,
 			},
 		},
 		'Mexico_Pacific' => {

@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Ja - Package for language Japanese
 
 package Locale::CLDR::Locales::Ja;
 # This file auto generated from Data\common\main\ja.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -527,6 +527,7 @@ has 'display_name_language' => (
  				'bjn' => 'バンジャル語',
  				'bkm' => 'コム語',
  				'bla' => 'シクシカ語',
+ 				'blo' => 'アニ語 (blo)',
  				'bm' => 'バンバラ語',
  				'bn' => 'ベンガル語',
  				'bo' => 'チベット語',
@@ -664,7 +665,6 @@ has 'display_name_language' => (
  				'gmh' => '中高ドイツ語',
  				'gn' => 'グアラニー語',
  				'goh' => '古高ドイツ語',
- 				'gom' => 'ゴア・コンカニ語',
  				'gon' => 'ゴーンディー語',
  				'gor' => 'ゴロンタロ語',
  				'got' => 'ゴート語',
@@ -775,6 +775,7 @@ has 'display_name_language' => (
  				'kv' => 'コミ語',
  				'kw' => 'コーンウォール語',
  				'kwk' => 'クヮキゥワラ語',
+ 				'kxv' => 'クーヴィンガ語',
  				'ky' => 'キルギス語',
  				'la' => 'ラテン語',
  				'lad' => 'ラディノ語',
@@ -1071,6 +1072,7 @@ has 'display_name_language' => (
  				'vi' => 'ベトナム語',
  				'vls' => '西フラマン語',
  				'vmf' => 'マインフランク語',
+ 				'vmw' => 'マクア語',
  				'vo' => 'ヴォラピュク語',
  				'vot' => 'ヴォート語',
  				'vro' => 'ヴォロ語',
@@ -1086,6 +1088,7 @@ has 'display_name_language' => (
  				'xal' => 'カルムイク語',
  				'xh' => 'コサ語',
  				'xmf' => 'メグレル語',
+ 				'xnr' => 'カーングリー語',
  				'xog' => 'ソガ語',
  				'yao' => 'ヤオ語',
  				'yap' => 'ヤップ語',
@@ -1790,7 +1793,6 @@ has 'display_name_type' => (
  				'phonebook' => q{電話帳順},
  				'phonetic' => q{音声順による並べ替え},
  				'pinyin' => q{ピンイン順},
- 				'reformed' => q{リフォーム},
  				'search' => q{汎用検索},
  				'searchjl' => q{ハングル語頭子音による並べ替え},
  				'standard' => q{標準並べ替え順序},
@@ -2574,6 +2576,18 @@ has 'units' => (
 						'other' => q({0} ナノ秒),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(泊),
+						'other' => q({0} 泊),
+						'per' => q({0}/泊),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(泊),
+						'other' => q({0} 泊),
+						'per' => q({0}/泊),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'other' => q({0} 四半期),
 					},
@@ -3338,6 +3352,16 @@ has 'units' => (
 						'other' => q({0} ノット),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(光),
+						'other' => q({0} 光),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(光),
+						'other' => q({0} 光),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'name' => q(メートル毎秒),
 						'other' => q(秒速 {0} メートル),
@@ -3898,6 +3922,14 @@ has 'units' => (
 						'name' => q(‱),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'other' => q({0}ppb),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'other' => q({0}ppb),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'other' => q({0}L/100km),
 					},
@@ -4126,6 +4158,18 @@ has 'units' => (
 					'nanosecond' => {
 						'name' => q(ns),
 						'other' => q({0}ns),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(泊),
+						'other' => q({0}泊),
+						'per' => q({0}/泊),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(泊),
+						'other' => q({0}泊),
+						'per' => q({0}/泊),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -4964,6 +5008,16 @@ has 'units' => (
 					# Core Unit Identifier
 					'knot' => {
 						'other' => q({0}kn),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(光),
+						'other' => q({0}光),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(光),
+						'other' => q({0}光),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -5800,6 +5854,18 @@ has 'units' => (
 						'name' => q(ナノ秒),
 					},
 					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(泊),
+						'other' => q({0} 泊),
+						'per' => q({0}/泊),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(泊),
+						'other' => q({0} 泊),
+						'per' => q({0}/泊),
+					},
+					# Long Unit Identifier
 					'duration-quarter' => {
 						'name' => q(四半期),
 						'other' => q({0}四半期),
@@ -6472,6 +6538,16 @@ has 'units' => (
 					# Core Unit Identifier
 					'knot' => {
 						'name' => q(ノット),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(光),
+						'other' => q({0} 光),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(光),
+						'other' => q({0} 光),
 					},
 					# Long Unit Identifier
 					'speed-mile-per-hour' => {
@@ -8032,7 +8108,8 @@ has 'currencies' => (
 		},
 		'RSD' => {
 			display_name => {
-				'currency' => q(ディナール \(セルビア\)),
+				'currency' => q(セルビア ディナール),
+				'other' => q(セルビア ディナール),
 			},
 		},
 		'RUB' => {
@@ -8232,7 +8309,8 @@ has 'currencies' => (
 		},
 		'UAH' => {
 			display_name => {
-				'currency' => q(ウクライナ グリブナ),
+				'currency' => q(ウクライナ フリヴニャ),
+				'other' => q(ウクライナ フリヴニャ),
 			},
 		},
 		'UAK' => {
@@ -11176,9 +11254,6 @@ has 'time_zone_names' => (
 		'America/New_York' => {
 			exemplarCity => q#ニューヨーク#,
 		},
-		'America/Nipigon' => {
-			exemplarCity => q#ニピゴン#,
-		},
 		'America/Nome' => {
 			exemplarCity => q#ノーム#,
 		},
@@ -11199,9 +11274,6 @@ has 'time_zone_names' => (
 		},
 		'America/Panama' => {
 			exemplarCity => q#パナマ#,
-		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#パンナータング#,
 		},
 		'America/Paramaribo' => {
 			exemplarCity => q#パラマリボ#,
@@ -11224,9 +11296,6 @@ has 'time_zone_names' => (
 		'America/Punta_Arenas' => {
 			exemplarCity => q#プンタアレナス#,
 		},
-		'America/Rainy_River' => {
-			exemplarCity => q#レイニーリバー#,
-		},
 		'America/Rankin_Inlet' => {
 			exemplarCity => q#ランキンインレット#,
 		},
@@ -11241,9 +11310,6 @@ has 'time_zone_names' => (
 		},
 		'America/Rio_Branco' => {
 			exemplarCity => q#リオブランコ#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#サンタイサベル#,
 		},
 		'America/Santarem' => {
 			exemplarCity => q#サンタレム#,
@@ -11290,9 +11356,6 @@ has 'time_zone_names' => (
 		'America/Thule' => {
 			exemplarCity => q#チューレ#,
 		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#サンダーベイ#,
-		},
 		'America/Tijuana' => {
 			exemplarCity => q#ティフアナ#,
 		},
@@ -11313,9 +11376,6 @@ has 'time_zone_names' => (
 		},
 		'America/Yakutat' => {
 			exemplarCity => q#ヤクタット#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#イエローナイフ#,
 		},
 		'America_Central' => {
 			long => {
@@ -11490,9 +11550,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Chita' => {
 			exemplarCity => q#チタ#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#チョイバルサン#,
 		},
 		'Asia/Colombo' => {
 			exemplarCity => q#コロンボ#,
@@ -11732,9 +11789,6 @@ has 'time_zone_names' => (
 		'Australia/Broken_Hill' => {
 			exemplarCity => q#ブロークンヒル#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#カリー#,
-		},
 		'Australia/Darwin' => {
 			exemplarCity => q#ダーウィン#,
 		},
@@ -11866,13 +11920,6 @@ has 'time_zone_names' => (
 				'daylight' => q#中国夏時間#,
 				'generic' => q#中国時間#,
 				'standard' => q#中国標準時#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#チョイバルサン夏時間#,
-				'generic' => q#チョイバルサン時間#,
-				'standard' => q#チョイバルサン標準時#,
 			},
 		},
 		'Christmas' => {
@@ -12097,9 +12144,6 @@ has 'time_zone_names' => (
 		'Europe/Ulyanovsk' => {
 			exemplarCity => q#ウリヤノフスク#,
 		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#ウージュホロド#,
-		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#ファドゥーツ#,
 		},
@@ -12120,9 +12164,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Zagreb' => {
 			exemplarCity => q#ザグレブ#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#ザポリージャ#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#チューリッヒ#,
@@ -12357,6 +12398,11 @@ has 'time_zone_names' => (
 				'standard' => q#ペトロパブロフスク・カムチャツキー標準時#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#カザフスタン時間#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#東カザフスタン時間#,
@@ -12415,11 +12461,6 @@ has 'time_zone_names' => (
 				'standard' => q#マカオ標準時#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#マッコーリー島時間#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#マガダン夏時間#,
@@ -12457,13 +12498,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#モーソン基地時間#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#メキシコ北西部夏時間#,
-				'generic' => q#メキシコ北西部時間#,
-				'standard' => q#メキシコ北西部標準時#,
 			},
 		},
 		'Mexico_Pacific' => {
@@ -12605,9 +12639,6 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Honolulu' => {
 			exemplarCity => q#ホノルル#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#ジョンストン島#,
 		},
 		'Pacific/Kanton' => {
 			exemplarCity => q#カントン島#,

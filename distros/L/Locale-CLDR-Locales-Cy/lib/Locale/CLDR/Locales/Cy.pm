@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Cy - Package for language Welsh
 
 package Locale::CLDR::Locales::Cy;
 # This file auto generated from Data\common\main\cy.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -590,7 +590,6 @@ has 'display_name_language' => (
  				'awa' => 'Awadhi',
  				'ay' => 'Aymareg',
  				'az' => 'Aserbaijaneg',
- 				'az@alt=short' => 'Aseri',
  				'az_Arab' => 'Aserbaijaneg Deheuol',
  				'ba' => 'Bashcorteg',
  				'bal' => 'Balwtsi',
@@ -611,6 +610,7 @@ has 'display_name_language' => (
  				'bin' => 'Bini',
  				'bkm' => 'Comeg',
  				'bla' => 'Siksika',
+ 				'blo' => 'Anii',
  				'bm' => 'Bambareg',
  				'bn' => 'Bengaleg',
  				'bo' => 'Tibeteg',
@@ -823,6 +823,7 @@ has 'display_name_language' => (
  				'kv' => 'Comi',
  				'kw' => 'Cernyweg',
  				'kwk' => 'Kwakʼwala',
+ 				'kxv' => 'Kuvi',
  				'ky' => 'Cirgiseg',
  				'la' => 'Lladin',
  				'lad' => 'Iddew-Sbaeneg',
@@ -833,6 +834,7 @@ has 'display_name_language' => (
  				'lez' => 'Lezgheg',
  				'lg' => 'Ganda',
  				'li' => 'Limbwrgeg',
+ 				'lij' => 'Ligwreg',
  				'lil' => 'Lillooet',
  				'lkt' => 'Lakota',
  				'lmo' => 'Lombardeg',
@@ -1094,6 +1096,7 @@ has 'display_name_language' => (
  				'vep' => 'Feps',
  				'vi' => 'Fietnameg',
  				'vls' => 'Fflemeg Gorllewinol',
+ 				'vmw' => 'Macua',
  				'vo' => 'Folapük',
  				'vot' => 'Foteg',
  				'vun' => 'Funjo',
@@ -1107,6 +1110,7 @@ has 'display_name_language' => (
  				'wuu' => 'Wu Tsieineaidd',
  				'xal' => 'Calmyceg',
  				'xh' => 'Xhosa',
+ 				'xnr' => 'Kangri',
  				'xog' => 'Soga',
  				'yav' => 'Iangben',
  				'ybb' => 'Iembaeg',
@@ -1115,6 +1119,7 @@ has 'display_name_language' => (
  				'yrl' => 'Nheengatu',
  				'yue' => 'Cantoneeg',
  				'yue@alt=menu' => 'Tsieinëeg, Cantoneg',
+ 				'za' => 'Zhuang',
  				'zap' => 'Zapoteceg',
  				'zbl' => 'Blisssymbols',
  				'zea' => 'Zêlandeg',
@@ -1173,7 +1178,6 @@ has 'display_name_script' => (
  			'Hebr' => 'Hebreig',
  			'Hira' => 'Hiragana',
  			'Hrkt' => 'Syllwyddor Japaneaidd',
- 			'Jamo' => 'Jamo',
  			'Jpan' => 'Japaneaidd',
  			'Kana' => 'Catacana',
  			'Khmr' => 'Chmeraidd',
@@ -1625,7 +1629,6 @@ has 'display_name_type' => (
  				'gb2312han' => q{Trefn Symledig Tsieina - GB2312},
  				'phonebook' => q{Trefn Llyfr Ffôn},
  				'pinyin' => q{Trefn Pinyin},
- 				'reformed' => q{Trefn Diwygiedig},
  				'search' => q{Chwilio at Ddibenion Cyffredinol},
  				'standard' => q{Trefn Safonol},
  				'traditional' => q{Trefn Traddodiadol},
@@ -2437,6 +2440,26 @@ has 'units' => (
 						'zero' => q({0}‱),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'few' => q({0} rhan fesul biliwn),
+						'many' => q({0} rhan fesul biliwn),
+						'name' => q(rhannau fesul biliwn),
+						'one' => q({0} rhan fesul biliwn),
+						'other' => q({0} rhan fesul biliwn),
+						'two' => q({0} rhan fesul biliwn),
+						'zero' => q(ppb),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'few' => q({0} rhan fesul biliwn),
+						'many' => q({0} rhan fesul biliwn),
+						'name' => q(rhannau fesul biliwn),
+						'one' => q({0} rhan fesul biliwn),
+						'other' => q({0} rhan fesul biliwn),
+						'two' => q({0} rhan fesul biliwn),
+						'zero' => q(ppb),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'few' => q({0} L/100km),
 						'many' => q({0} L/100km),
@@ -2869,6 +2892,28 @@ has 'units' => (
 						'other' => q({0} nanoeiliadau),
 						'two' => q({0} nanoeiliadau),
 						'zero' => q({0} nanoeiliadau),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'few' => q({0} noson),
+						'many' => q({0} noson),
+						'name' => q(nosau),
+						'one' => q({0} noson),
+						'other' => q({0} noson),
+						'per' => q({0}/noson),
+						'two' => q({0} noson),
+						'zero' => q({0} noson),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'few' => q({0} noson),
+						'many' => q({0} noson),
+						'name' => q(nosau),
+						'one' => q({0} noson),
+						'other' => q({0} noson),
+						'per' => q({0}/noson),
+						'two' => q({0} noson),
+						'zero' => q({0} noson),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -4513,6 +4558,26 @@ has 'units' => (
 						'zero' => q({0} cilometr yr awr),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'few' => q(golau),
+						'many' => q(golau),
+						'name' => q(golau),
+						'one' => q(golau),
+						'other' => q({0} golau),
+						'two' => q(golau),
+						'zero' => q(golau),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'few' => q(golau),
+						'many' => q(golau),
+						'name' => q(golau),
+						'one' => q(golau),
+						'other' => q({0} golau),
+						'two' => q(golau),
+						'zero' => q(golau),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'few' => q({0} metr yr eiliad),
 						'many' => q({0} metr yr eiliad),
@@ -5529,6 +5594,24 @@ has 'units' => (
 						'name' => q(%),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'few' => q({0} ppb),
+						'many' => q({0} ppb),
+						'one' => q({0}ppb),
+						'other' => q({0}ppb),
+						'two' => q({0} ppb),
+						'zero' => q({0} ppb),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'few' => q({0} ppb),
+						'many' => q({0} ppb),
+						'one' => q({0}ppb),
+						'other' => q({0}ppb),
+						'two' => q({0} ppb),
+						'zero' => q({0} ppb),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'few' => q({0}L/100km),
 						'many' => q({0}L/100km),
@@ -5855,6 +5938,28 @@ has 'units' => (
 						'per' => q({0}/m),
 						'two' => q({0}m),
 						'zero' => q({0}m),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'few' => q({0}noson),
+						'many' => q({0}noson),
+						'name' => q(nosau),
+						'one' => q({0}noson),
+						'other' => q({0}noson),
+						'per' => q({0}/noson),
+						'two' => q({0}noson),
+						'zero' => q({0} noson),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'few' => q({0}noson),
+						'many' => q({0}noson),
+						'name' => q(nosau),
+						'one' => q({0}noson),
+						'other' => q({0}noson),
+						'per' => q({0}/noson),
+						'two' => q({0}noson),
+						'zero' => q({0} noson),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -7139,6 +7244,26 @@ has 'units' => (
 						'zero' => q({0}not),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'few' => q({0} golau),
+						'many' => q({0} golau),
+						'name' => q(golau),
+						'one' => q({0} golau),
+						'other' => q({0} golau),
+						'two' => q({0} golau),
+						'zero' => q({0} golau),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'few' => q({0} golau),
+						'many' => q({0} golau),
+						'name' => q(golau),
+						'one' => q({0} golau),
+						'other' => q({0} golau),
+						'two' => q({0} golau),
+						'zero' => q({0} golau),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'few' => q({0}m/s),
 						'many' => q({0}m/s),
@@ -8029,6 +8154,14 @@ has 'units' => (
 						'name' => q(permyriad),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(rhannau/biliwn),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(rhannau/biliwn),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-kilometer' => {
 						'name' => q(litrau/km),
 					},
@@ -8307,6 +8440,28 @@ has 'units' => (
 						'per' => q({0}/mis),
 						'two' => q({0} fis),
 						'zero' => q({0} mis),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'few' => q({0} noson),
+						'many' => q({0} noson),
+						'name' => q(nosau),
+						'one' => q({0} noson),
+						'other' => q({0} noson),
+						'per' => q({0}/noson),
+						'two' => q({0} noson),
+						'zero' => q({0} noson),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'few' => q({0} noson),
+						'many' => q({0} noson),
+						'name' => q(nosau),
+						'one' => q({0} noson),
+						'other' => q({0} noson),
+						'per' => q({0}/noson),
+						'two' => q({0} noson),
+						'zero' => q({0} noson),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -8979,6 +9134,26 @@ has 'units' => (
 						'other' => q({0} not),
 						'two' => q({0} not),
 						'zero' => q({0} not),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'few' => q({0} golau),
+						'many' => q({0} golau),
+						'name' => q(golau),
+						'one' => q({0} golau),
+						'other' => q({0} golau),
+						'two' => q({0} golau),
+						'zero' => q(golau),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'few' => q({0} golau),
+						'many' => q({0} golau),
+						'name' => q(golau),
+						'one' => q({0} golau),
+						'other' => q({0} golau),
+						'two' => q({0} golau),
+						'zero' => q(golau),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -12689,6 +12864,7 @@ has 'datetime_formats_available_formats' => (
 			GyMd => q{M/d/y GGGGG},
 			MEd => q{E, d/M},
 			MMMEd => q{E, d MMM},
+			MMMMd => q{d MMMM},
 			MMMd => q{d MMM},
 			Md => q{d/M},
 			h => q{h a},
@@ -12957,9 +13133,6 @@ has 'time_zone_names' => (
 		'Africa/Algiers' => {
 			exemplarCity => q#Alger#,
 		},
-		'Africa/Sao_Tome' => {
-			exemplarCity => q#São Tomé#,
-		},
 		'Africa_Central' => {
 			long => {
 				'standard' => q#Amser Canolbarth Affrica#,
@@ -12999,9 +13172,6 @@ has 'time_zone_names' => (
 		'America/Argentina/Tucuman' => {
 			exemplarCity => q#Tucumán#,
 		},
-		'America/Asuncion' => {
-			exemplarCity => q#Asunción#,
-		},
 		'America/Bahia_Banderas' => {
 			exemplarCity => q#Bae Banderas#,
 		},
@@ -13016,9 +13186,6 @@ has 'time_zone_names' => (
 		},
 		'America/Cuiaba' => {
 			exemplarCity => q#Cuiabá#,
-		},
-		'America/Curacao' => {
-			exemplarCity => q#Curaçao#,
 		},
 		'America/Eirunepe' => {
 			exemplarCity => q#Eirunepé#,
@@ -13043,12 +13210,6 @@ has 'time_zone_names' => (
 		},
 		'America/North_Dakota/New_Salem' => {
 			exemplarCity => q#New Salem, Gogledd Dakota#,
-		},
-		'America/Santa_Isabel' => {
-			exemplarCity => q#Santa Isabel#,
-		},
-		'America/St_Barthelemy' => {
-			exemplarCity => q#St. Barthélemy#,
 		},
 		'America_Central' => {
 			long => {
@@ -13153,9 +13314,6 @@ has 'time_zone_names' => (
 		'Atlantic/South_Georgia' => {
 			exemplarCity => q#De Georgia#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#Currie#,
-		},
 		'Australia_Central' => {
 			long => {
 				'daylight' => q#Amser Haf Canolbarth Awstralia#,
@@ -13258,13 +13416,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Amser Haf Tsieina#,
 				'generic' => q#Amser Tsieina#,
 				'standard' => q#Amser Safonol Tsieina#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Amser Haf Choibalsan#,
-				'generic' => q#Amser Choibalsan#,
-				'standard' => q#Amser Safonol Choibalsan#,
 			},
 		},
 		'Christmas' => {
@@ -13371,9 +13522,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Rome' => {
 			exemplarCity => q#Rhufain#,
-		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#Uzhhorod#,
 		},
 		'Europe/Vatican' => {
 			exemplarCity => q#Y Fatican#,
@@ -13529,9 +13677,6 @@ has 'time_zone_names' => (
 		'Indian/Christmas' => {
 			exemplarCity => q#Ynys y Nadolig#,
 		},
-		'Indian/Reunion' => {
-			exemplarCity => q#Réunion#,
-		},
 		'Indian_Ocean' => {
 			long => {
 				'standard' => q#Amser Cefnfor India#,
@@ -13585,6 +13730,11 @@ has 'time_zone_names' => (
 				'standard' => q#Amser Safonol Japan#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Amser Kazakhstan#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#Amser Dwyrain Kazakhstan#,
@@ -13631,11 +13781,6 @@ has 'time_zone_names' => (
 				'standard' => q#Amser Safonol yr Arglwydd Howe#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Amser Ynys Macquarie#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Amser Haf Magadan#,
@@ -13673,13 +13818,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Amser Mawson#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Amser Haf Gogledd Orllewin Mecsico#,
-				'generic' => q#Amser Gogledd Orllewin Mecsico#,
-				'standard' => q#Amser Safonol Gogledd Orllewin Mecsico#,
 			},
 		},
 		'Mexico_Pacific' => {

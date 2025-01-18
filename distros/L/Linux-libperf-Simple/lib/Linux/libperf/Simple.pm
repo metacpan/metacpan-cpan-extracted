@@ -8,7 +8,7 @@ our @EXPORT_OK = qw(run report);
 
 our $VERSION;
 BEGIN {
-  $VERSION = "1.000";
+  $VERSION = "1.001";
   use XSLoader;
   XSLoader::load("Linux::libperf::Simple" => $VERSION);
 }
@@ -142,6 +142,16 @@ hashref as per results() above.
 Run CODEREF and produces a simple report to standard output.
 
 =back
+
+=head1 TROUBLESHOOTING
+
+Unfortunately C<libperf>'s reporting isn't very good, if libperf fails
+to initialize try using F<strace> to see details on which system call
+actually failed, eg you might try:
+
+  strace -o trace.txt perl -MLinux::libperf::Simple=run -e 'run(sub {})'
+
+and look over F<trace.txt> to see why it failed.
 
 =head1 BUGS
 

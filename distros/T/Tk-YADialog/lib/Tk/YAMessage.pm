@@ -9,7 +9,7 @@ Tk::YAMessage - Yet another message box
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.01';
+$VERSION = '0.05';
 
 use Tk;
 use base qw(Tk::Derived Tk::YADialog);
@@ -32,15 +32,47 @@ Inherits L<Tk::YADialog>.
 
 =over 4
 
+=item Switch: B<-anchor>
+
+Transferred to the text label.
+
+=item Switch: B<-background>
+
+Transferred to the text label.
+
+=item Switch: B<-foreground>
+
+Transferred to the text label.
+
 =item Switch: B<-image>
 
 Default value none.
 Specify the image to be shown. Must be a Tk::Image object.
 
+=item Switch: B<-font>
+
+Transferred to the text label.
+
+=item Switch: B<-justify>
+
+Transferred to the text label.
+
 =item Switch: B<-text>
 
-Default value none.
-Specify the text to be shown.
+Transferred to the text label.
+
+=item Switch: B<-textvariable>
+
+Transferred to the text label.
+
+=item Switch: B<-width>
+
+Transferred to the text label.
+
+=item Switch: B<-wraplength>
+
+Transferred to the text label.
+
 
 =back
 
@@ -58,9 +90,17 @@ sub Populate {
 	my $i = $self->Label->pack(-side => 'left', -padx => 10, -pady =>10);
 	my $t = $self->Label()->pack(-side => 'left', -padx => 10, -pady =>10);
 	$self->ConfigSpecs(
+		-anchor => [$t],
+		-background => [$t],
+		-font => [$t],
+		-foreground => [$t],
+		-justify => [$t],
 		-image => [$i],
 		-text => [$t],
-		DEFAULT => ['SELF'],
+		-textvariable => [$t],
+		-width => [$t],
+		-wraplength => [$t],
+		DEFAULT => [$self],
 	);
 }
 
@@ -81,6 +121,8 @@ Unknown. If you find any, please contact the author.
 =over 4
 
 =item L<Tk::YADialog>
+
+=item L<Tk::Label>
 
 =back
 

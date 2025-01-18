@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Rw - Package for language Kinyarwanda
 
 package Locale::CLDR::Locales::Rw;
 # This file auto generated from Data\common\main\rw.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -106,7 +106,7 @@ has 'display_name_language' => (
  				'pt_PT' => 'Inyeporutigali (Igiporutigali)',
  				'ro' => 'Ikinyarumaniya',
  				'ru' => 'Ikirusiya',
- 				'rw' => 'Kinyarwanda',
+ 				'rw' => 'Ikinyarwanda',
  				'sa' => 'Igisansikiri',
  				'sd' => 'Igisindi',
  				'sh' => 'Inyeseribiya na Korowasiya',
@@ -144,6 +144,24 @@ has 'display_name_language' => (
 			return \%languages;
 		}
 	},
+);
+
+has 'display_name_script' => (
+	is			=> 'ro',
+	isa			=> CodeRef,
+	init_arg	=> undef,
+	default		=> sub {
+		sub {
+			my %scripts = (
+			'Latn' => 'Latin',
+
+			);
+			if ( @_ ) {
+				return $scripts{$_[0]};
+			}
+			return \%scripts;
+		}
+	}
 );
 
 has 'display_name_region' => (
@@ -254,7 +272,7 @@ has 'calendar_months' => (
 							'Kamena',
 							'Nyakanga',
 							'Kanama',
-							'Nzeli',
+							'Nzeri',
 							'Ukwakira',
 							'Ugushyingo',
 							'Ukuboza'
@@ -385,6 +403,8 @@ has 'datetime_formats_available_formats' => (
 			hms => q{h:mm:ss a},
 			hmsv => q{h:mm:ss a v},
 			hmv => q{h:mm a v},
+			yMMMd => q{d MMMM y},
+			yMd => q{dd-MM-y},
 		},
 	} },
 );
@@ -469,6 +489,18 @@ has 'datetime_formats_interval' => (
 	} },
 );
 
+has 'time_zone_names' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default	=> sub { {
+		'GMT' => {
+			long => {
+				'standard' => q#Greenwich Mean Time#,
+			},
+		},
+	 } }
+);
 no Moo;
 
 1;

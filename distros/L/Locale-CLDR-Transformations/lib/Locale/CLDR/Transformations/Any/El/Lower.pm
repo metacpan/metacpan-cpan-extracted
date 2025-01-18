@@ -1,17 +1,17 @@
 package Locale::CLDR::Transformations::Any::El::Lower;
 # This file auto generated from Data\common\transforms\el-Lower.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -41,13 +41,13 @@ has 'transforms' => (
 			data => [
 				{
 					before  => q(),
-					after   => q(\p{case-ignorable}*\p{cased}),
+					after   => q(\p{Case_Ignorable}*\p{Cased}),
 					replace => q(Σ),
 					result  => q(σ),
 					revisit => 0,
 				},
 				{
-					before  => q(\p{cased}\p{case-ignorable}*),
+					before  => q(\p{Cased}\p{Case_Ignorable}*),
 					after   => q(),
 					replace => q(Σ),
 					result  => q(ς),

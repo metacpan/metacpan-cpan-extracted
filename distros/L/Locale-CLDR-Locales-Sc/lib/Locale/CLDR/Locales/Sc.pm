@@ -8,18 +8,18 @@ Locale::CLDR::Locales::Sc - Package for language Sardinian
 
 package Locale::CLDR::Locales::Sc;
 # This file auto generated from Data\common\main\sc.xml
-#	on Thu 29 Feb  5:43:51 pm GMT
+#	on Fri 17 Jan 12:03:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.1');
+our $VERSION = version->declare('v0.46.0');
 
-use v5.10.1;
+use v5.12.0;
 use mro 'c3';
 use utf8;
-use if $^V ge v5.12.0, feature => 'unicode_strings';
+use feature 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
@@ -72,6 +72,7 @@ has 'display_name_language' => (
  				'bi' => 'bislama',
  				'bin' => 'bini',
  				'bla' => 'pees nieddos',
+ 				'blo' => 'anii',
  				'bm' => 'bambara',
  				'bn' => 'bengalesu',
  				'bo' => 'tibetanu',
@@ -195,6 +196,7 @@ has 'display_name_language' => (
  				'iba' => 'iban',
  				'ibb' => 'ibibio',
  				'id' => 'indonesianu',
+ 				'ie' => 'interlìngue',
  				'ig' => 'igbo',
  				'ii' => 'sichuan yi',
  				'ikt' => 'inuktitut canadesu otzidentale',
@@ -247,6 +249,7 @@ has 'display_name_language' => (
  				'kv' => 'komi',
  				'kw' => 'còrnicu',
  				'kwk' => 'kwakʼwala',
+ 				'kxv' => 'kuvi',
  				'ky' => 'chirghisu',
  				'la' => 'latinu',
  				'lad' => 'giudeu-ispagnolu',
@@ -269,7 +272,6 @@ has 'display_name_language' => (
  				'lu' => 'luba-katanga',
  				'lua' => 'tshiluba',
  				'lun' => 'lunda',
- 				'luo' => 'luo',
  				'lus' => 'mizo',
  				'luy' => 'luyia',
  				'lv' => 'lètone',
@@ -410,6 +412,7 @@ has 'display_name_language' => (
  				'sw_CD' => 'swahili de su Congo',
  				'swb' => 'comorianu',
  				'syr' => 'sirìacu',
+ 				'szl' => 'silesianu',
  				'ta' => 'tamil',
  				'tce' => 'tutchone meridionale',
  				'te' => 'telugu',
@@ -447,10 +450,10 @@ has 'display_name_language' => (
  				'und' => 'limba disconnota',
  				'ur' => 'urdu',
  				'uz' => 'uzbecu',
- 				'vai' => 'vai',
  				've' => 'venda',
  				'vec' => 'vènetu',
  				'vi' => 'vietnamita',
+ 				'vmw' => 'macua',
  				'vo' => 'volapük',
  				'vun' => 'vunjo',
  				'wa' => 'vallonu',
@@ -461,6 +464,7 @@ has 'display_name_language' => (
  				'wuu' => 'wu',
  				'xal' => 'calmucu',
  				'xh' => 'xhosa',
+ 				'xnr' => 'kangri',
  				'xog' => 'soga',
  				'yav' => 'yangben',
  				'ybb' => 'yemba',
@@ -469,6 +473,7 @@ has 'display_name_language' => (
  				'yrl' => 'nheengatu',
  				'yue' => 'cantonesu',
  				'yue@alt=menu' => 'tzinesu, cantonesu',
+ 				'za' => 'zhuang',
  				'zgh' => 'tamazight istandard marochinu',
  				'zh' => 'tzinesu',
  				'zh@alt=menu' => 'tzinesu, mandarinu',
@@ -1186,7 +1191,6 @@ has 'display_name_type' => (
  				'gb2312han' => q{ordinamentu de su tzinesu semplificadu - GB2312},
  				'phonebook' => q{ordinamentu de s’elencu telefònicu},
  				'pinyin' => q{ordinamentu pinyin},
- 				'reformed' => q{ordinamentu riformadu},
  				'search' => q{chirca genèrica},
  				'searchjl' => q{chirca pro consonante hangul initziale},
  				'standard' => q{ordinamentu istandard},
@@ -1963,6 +1967,18 @@ has 'units' => (
 						'other' => q({0} pro deghemìgia),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(partes pro milliardu),
+						'one' => q({0} parte pro milliardu),
+						'other' => q({0} partes pro milliardu),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(partes pro milliardu),
+						'one' => q({0} parte pro milliardu),
+						'other' => q({0} partes pro milliardu),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(litros pro 100 chilòmetros),
 						'one' => q({0} litru pro 100 chilòmetros),
@@ -2253,6 +2269,20 @@ has 'units' => (
 						'name' => q(nanosegundos),
 						'one' => q({0} nanosegundu),
 						'other' => q({0} nanosegundos),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(notes),
+						'one' => q({0} note),
+						'other' => q({0} notes),
+						'per' => q({0} pro note),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(notes),
+						'one' => q({0} note),
+						'other' => q({0} notes),
+						'per' => q({0} pro note),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -3383,6 +3413,18 @@ has 'units' => (
 						'other' => q({0} nodos),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(lughe),
+						'one' => q({0} a sa velotzidade de sa lughe),
+						'other' => q({0} a sa velotzidade de sa lughe),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(lughe),
+						'one' => q({0} a sa velotzidade de sa lughe),
+						'other' => q({0} a sa velotzidade de sa lughe),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'name' => q(metros a su segundu),
 						'one' => q({0} metru a su segundu),
@@ -4065,6 +4107,16 @@ has 'units' => (
 						'other' => q({0}ppm),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'one' => q({0}ppb),
+						'other' => q({0}ppb),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'one' => q({0}ppb),
+						'other' => q({0}ppb),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'one' => q({0}l/100km),
 						'other' => q({0}l/100km),
@@ -4303,6 +4355,20 @@ has 'units' => (
 						'one' => q({0}me.),
 						'other' => q({0}me.),
 						'per' => q({0}/me.),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(notes),
+						'one' => q({0} note),
+						'other' => q({0} notes),
+						'per' => q({0}/note),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(notes),
+						'one' => q({0} note),
+						'other' => q({0} notes),
+						'per' => q({0}/note),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -5229,6 +5295,18 @@ has 'units' => (
 						'other' => q({0}kn),
 					},
 					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(lughe),
+						'one' => q({0}l),
+						'other' => q({0}l),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(lughe),
+						'one' => q({0}l),
+						'other' => q({0}l),
+					},
+					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'one' => q({0}m/s),
 						'other' => q({0}m/s),
@@ -5757,6 +5835,14 @@ has 'units' => (
 						'other' => q({0} mmol/l),
 					},
 					# Long Unit Identifier
+					'concentr-portion-per-1e9' => {
+						'name' => q(partes/milliardu),
+					},
+					# Core Unit Identifier
+					'portion-per-1e9' => {
+						'name' => q(partes/milliardu),
+					},
+					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(l/100km),
 						'one' => q({0} l/100km),
@@ -5911,6 +5997,20 @@ has 'units' => (
 					'nanosecond' => {
 						'one' => q({0}ns),
 						'other' => q({0}ns),
+					},
+					# Long Unit Identifier
+					'duration-night' => {
+						'name' => q(notes),
+						'one' => q({0} note),
+						'other' => q({0} notes),
+						'per' => q({0}/note),
+					},
+					# Core Unit Identifier
+					'night' => {
+						'name' => q(notes),
+						'one' => q({0} note),
+						'other' => q({0} notes),
+						'per' => q({0}/note),
 					},
 					# Long Unit Identifier
 					'duration-quarter' => {
@@ -6169,6 +6269,18 @@ has 'units' => (
 						'name' => q(mmHg),
 						'one' => q({0} mmHg),
 						'other' => q({0} mmHg),
+					},
+					# Long Unit Identifier
+					'speed-light-speed' => {
+						'name' => q(lughe),
+						'one' => q({0} lughe),
+						'other' => q({0} lughe),
+					},
+					# Core Unit Identifier
+					'light-speed' => {
+						'name' => q(lughe),
+						'one' => q({0} lughe),
+						'other' => q({0} lughe),
 					},
 					# Long Unit Identifier
 					'temperature-celsius' => {
@@ -10185,9 +10297,6 @@ has 'time_zone_names' => (
 		'Africa/Porto-Novo' => {
 			exemplarCity => q#Portu-Nou#,
 		},
-		'Africa/Sao_Tome' => {
-			exemplarCity => q#São Tomé#,
-		},
 		'Africa/Tripoli' => {
 			exemplarCity => q#Trìpoli#,
 		},
@@ -10244,9 +10353,6 @@ has 'time_zone_names' => (
 		},
 		'America/Argentina/Tucuman' => {
 			exemplarCity => q#Tucumán#,
-		},
-		'America/Curacao' => {
-			exemplarCity => q#Curaçao#,
 		},
 		'America/Havana' => {
 			exemplarCity => q#S’Avana#,
@@ -10484,9 +10590,6 @@ has 'time_zone_names' => (
 		'Atlantic/St_Helena' => {
 			exemplarCity => q#Sant’Elene#,
 		},
-		'Australia/Currie' => {
-			exemplarCity => q#Currie#,
-		},
 		'Australia_Central' => {
 			long => {
 				'daylight' => q#Ora legale de s’Austràlia tzentrale#,
@@ -10594,13 +10697,6 @@ has 'time_zone_names' => (
 				'daylight' => q#Ora legale de sa Tzina#,
 				'generic' => q#Ora de sa Tzina#,
 				'standard' => q#Ora istandard de sa Tzina#,
-			},
-		},
-		'Choibalsan' => {
-			long => {
-				'daylight' => q#Ora legale de Choibalsan#,
-				'generic' => q#Ora de Choibalsan#,
-				'standard' => q#Ora istandard de Choibalsan#,
 			},
 		},
 		'Christmas' => {
@@ -10966,6 +11062,11 @@ has 'time_zone_names' => (
 				'standard' => q#Ora istandard de Petropavlovsk-Kamchatski#,
 			},
 		},
+		'Kazakhstan' => {
+			long => {
+				'standard' => q#Ora de su Kazàkistan#,
+			},
+		},
 		'Kazakhstan_Eastern' => {
 			long => {
 				'standard' => q#Ora de su Kazàkistan orientale#,
@@ -11024,11 +11125,6 @@ has 'time_zone_names' => (
 				'standard' => q#Ora istandard de Macao#,
 			},
 		},
-		'Macquarie' => {
-			long => {
-				'standard' => q#Ora de s’Ìsula Macquarie#,
-			},
-		},
 		'Magadan' => {
 			long => {
 				'daylight' => q#Ora legale de Magadan#,
@@ -11066,13 +11162,6 @@ has 'time_zone_names' => (
 		'Mawson' => {
 			long => {
 				'standard' => q#Ora de Mawson#,
-			},
-		},
-		'Mexico_Northwest' => {
-			long => {
-				'daylight' => q#Ora legale de su Mèssicu nord-otzidentale#,
-				'generic' => q#Ora de su Mèssicu nord-otzidentale#,
-				'standard' => q#Ora istandard de su Mèssicu nord-otzidentale#,
 			},
 		},
 		'Mexico_Pacific' => {
