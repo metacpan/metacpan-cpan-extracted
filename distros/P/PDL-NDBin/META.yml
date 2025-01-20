@@ -8,7 +8,7 @@ build_requires:
   IO::Handle: '0'
   IPC::Open3: '0'
   Module::Pluggable: '3.1'
-  PDL: '2.057'
+  PDL: '2.088'
   PDL::Basic: '0'
   PDL::Core: '0'
   Test::Deep: '0'
@@ -21,7 +21,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   PDL::Core::Dev: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -41,6 +41,7 @@ requires:
   List::Util: '0'
   Log::Any: '0'
   Math::Round: '0'
+  PDL: '2.088'
   PDL::Lite: '0'
   PDL::Types: '0'
   POSIX: '0'
@@ -54,7 +55,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=PDL-NDBin
   homepage: https://metacpan.org/release/PDL-NDBin
   repository: git://github.com/ebaudrez/pdl-ndbin.git
-version: '0.028'
+version: '0.029'
 x_generated_by_perl: v5.32.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

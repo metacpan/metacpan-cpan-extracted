@@ -1,6 +1,6 @@
 package PDL::NDBin;
 # ABSTRACT: Multidimensional binning & histogramming
-$PDL::NDBin::VERSION = '0.028';
+$PDL::NDBin::VERSION = '0.029';
 use strict;
 use warnings;
 use Exporter;
@@ -605,7 +605,7 @@ PDL::NDBin - Multidimensional binning & histogramming
 
 =head1 VERSION
 
-version 0.028
+version 0.029
 
 =head1 SYNOPSIS
 
@@ -1744,10 +1744,10 @@ PDL::NDBin and related distributions on CPAN:
 	| Has overflow and underflow bins by default        | -       | X      | X      | -         | -        |
 	| Interface style                                   | Proc.   | OO     | OO     | Proc.     | OO+Proc. |
 	| Maximum number of dimensions                      | 2       | N      | 1      | 2         | N        |
-	| Native data type                                  | Scalars | Arrays | Arrays | Piddles   | Piddles  |
+	| Native data type                                  | Scalars | Arrays | Arrays | NDArrays  | NDArrays |
 	| Performance                                       | Low     | Medium | High   | Very high | High     |
 	| Support for weighted histograms                   | X       | X      | X      | X         | -        |
-	| Uses PDL threading                                | -       | -      | -      | X         | -        |
+	| Uses PDL broadcasting                             | -       | -      | -      | X         | -        |
 	| Variable-width bins                               | X       | X      | X      | -         | X        |
 	+---------------------------------------------------+---------+--------+--------+-----------+----------+
 
@@ -1936,18 +1936,18 @@ In a weighted histogram, data points contribute by a fractional amount (or
 weight) between 0 and 1. All libraries, except PDL::NDBin, support weighted
 histograms. In PDL::NDBin, the weight of all data points is fixed at 1.
 
-=item Uses PDL threading
+=item Uses PDL broadcasting
 
-In PDL, threading is a technique to automatically loop certain operations over
+In PDL, broadcasting is a technique to automatically loop certain operations over
 an arbitrary number of dimensions. An example is the sumover() operation, which
 calculates the row sum. It is defined over the first dimension only (i.e., the
 rows in PDL), but it will be looped automatically over all remaining
 dimensions. If the ndarray is three-dimensional, for instance, sumover() will
 calculate the sum in every row of every matrix.
 
-Threading is supported by the PDL functions histogram(), whistogram(), and
+Broadcasting is supported by the PDL functions histogram(), whistogram(), and
 their two-dimensional counterparts, but not by hist() or whist(). PDL::NDBin
-does not (yet) support threading.
+does not (yet) support broadcasting.
 
 =item Variable-width bins
 
@@ -2238,7 +2238,7 @@ Edward Baudrez <ebaudrez@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Edward Baudrez.
+This software is copyright (c) 2025 by Edward Baudrez.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -36,12 +36,16 @@
             "Config::Simple" : "4.0",
             "File::HomeDir" : "1.0",
             "Getopt::Long" : "2.0",
-            "Test::Deep" : "0",
-            "Test::More" : "0",
-            "Test::Warn" : "0",
             "perl" : "5.010000",
             "strict" : "0",
             "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Deep" : "0",
+            "Test::More" : "0",
+            "Test::Warn" : "0"
          }
       }
    },
@@ -53,6 +57,6 @@
          "web" : "https://gitlab.com/as_pushkin/mysqlhi"
       }
    },
-   "version" : "1.00",
+   "version" : "1.01",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

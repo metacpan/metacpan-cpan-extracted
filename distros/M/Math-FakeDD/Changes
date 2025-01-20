@@ -1,5 +1,11 @@
 Revision history for Perl module Math::FakeDD
 
+1.01
+ - Add new function dd_dump().
+ - Rework the internals. (Details in pod.)
+ - Fix (intermittently) failing test in t/next.t. See
+   http://www.cpantesters.org/cpan/report/797cfc22-6cfd-1014-a069-bac4e3396204
+
 0.08
  - Change the spec of dd_numify() to return an accurate Math::MPFR object
    rather than the sum of the 2 doubles (which is often less precise).

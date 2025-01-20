@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: One JSON Schema document
 
-our $VERSION = '0.597';
+our $VERSION = '0.598';
 
 use 5.020;
 use Moo;
@@ -210,7 +210,7 @@ sub traverse ($self, $evaluator) {
   my $state = $evaluator->traverse($self->schema,
     {
       initial_schema_uri => $self->canonical_uri->clone,
-      $self->metaschema_uri ? ( metaschema_uri => $self->metaschema_uri) : (),
+      $self->metaschema_uri ? ( metaschema_uri => $self->metaschema_uri ) : (),
     }
   );
 
@@ -257,7 +257,7 @@ JSON::Schema::Modern::Document - One JSON Schema document
 
 =head1 VERSION
 
-version 0.597
+version 0.598
 
 =head1 SYNOPSIS
 

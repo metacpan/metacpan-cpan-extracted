@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::FormatAnnotation;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Format-Annotation vocabulary
 
-our $VERSION = '0.597';
+our $VERSION = '0.598';
 
 use 5.020;
 use Moo;
@@ -46,7 +46,8 @@ sub _eval_keyword_format ($class, $data, $schema, $state) {
   return 1 if not $state->{validate_formats};
 
   # { type => .., sub => .. }
-  my $spec = JSON::Schema::Modern::Vocabulary::FormatAssertion->_get_format_definition($schema, $state);
+  my $spec = $state->{evaluator}->_get_format_validation($schema->{format})
+    // JSON::Schema::Modern::Vocabulary::FormatAssertion->_get_default_format_validation($state, $schema->{format});
 
   # §7.2.1 (draft2020-12) "Specifying the Format-Annotation vocabulary and enabling validation in an
   # implementation should not be viewed as being equivalent to specifying the Format-Assertion
@@ -83,7 +84,7 @@ JSON::Schema::Modern::Vocabulary::FormatAnnotation - Implementation of the JSON 
 
 =head1 VERSION
 
-version 0.597
+version 0.598
 
 =head1 DESCRIPTION
 
@@ -123,6 +124,13 @@ generate errors; this differs from the more strict behaviour in
 LJSON::Schema::Modern::Vocabulary::FormatAssertion> which requires all formats used in the schema to
 be supported and defined.
 
+When this vocabulary (the Format-Annotation vocabulary) is specified (which is the default for the
+draft2020-12 metaschema) and combined with the C<validate_formats> option set to true, unimplemented
+formats will silently validate, but implemented formats will validate completely. Note that some
+formats require optional module dependencies, and the lack of these modules will generate an error.
+
+When the Format-Assertion vocabulary is specified, unimplemented formats will generate an error on use.
+
 =head1 SEE ALSO
 
 =over 4
@@ -130,6 +138,10 @@ be supported and defined.
 =item *
 
 L<JSON::Schema::Modern/Format Validation>
+
+=item *
+
+L<JSON::Schema::Modern::Vocabulary::FormatAssertion>
 
 =back
 

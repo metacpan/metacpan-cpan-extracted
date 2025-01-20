@@ -1,5 +1,19 @@
 Revision history for Perl extension App::Codit.
 
+0.16 Sun Jan 19 2025
+	- Corrected bug in pod
+	- Plugin PodViewer has sytem link color
+	- Fixed bug in plugin SearchReplace
+	- App::Codit::CodeTextManager differentiates between different kinds of log calls.
+	- Added documentation App::Codit::Commands and App:Codit::ConfigVariables.
+	- Removed -contentinsertbg option. The insert background is automatically set to the foreground color.
+	- Changed the -P command line argument of the codit executable to -np. Windows handles them case insensitive.
+	- Updated documentation and manual.
+	- Context menu of FileBrowser plugin has a Properties entry.
+	- CoditTagsEditor uses the new file dialogs.
+	- Fixed bug in plugin Sessions. method sessionSaveAs.
+	- Moved code for upper and lower case module to Tk::CodeText.
+
 0.15 Sun Jan 05 2025
 	- Moved autocomplete code from plugin WordCompletion to module Tk::CodeText.
 	- Integrated the new Tk::CodeText in Codit.

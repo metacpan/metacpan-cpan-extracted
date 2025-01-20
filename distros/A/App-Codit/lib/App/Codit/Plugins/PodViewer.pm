@@ -9,7 +9,7 @@ App::Codit::Plugins::PodViewer - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.14;
+$VERSION = 0.16;
 
 use base qw( App::Codit::BaseClasses::TextModPlugin );
 
@@ -74,6 +74,7 @@ sub new {
 	}
 	my $pod = $page->PodViewerFull(@vopt,
 		-font => $font,
+		-linkcolor => $self->configGet('-linkcolor'),
 	)->pack(-expand => 1, -fill => 'both');
 	my $sb = $self->sidebars;
 	$sb->pageSelectCall('Pod', sub { $self->after(100, ['Refresh', $self]) });
@@ -95,6 +96,14 @@ sub docBefore {
 		$self->{DOCNAME} = $name;
 	}
 	return @_;
+}
+
+sub ReConfigure {
+	my $self = shift;
+	my $pod = $self->{PODWIDGET};
+	$pod->configure(-linkcolor => $self->configGet('-linkcolor'));
+	$pod->configureTags;
+	return 1
 }
 
 sub Refresh {

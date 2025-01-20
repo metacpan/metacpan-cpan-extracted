@@ -1,11 +1,11 @@
 package Crypt::Credentials;
-$Crypt::Credentials::VERSION = '0.003';
+$Crypt::Credentials::VERSION = '0.004';
 use strict;
 use warnings;
 
 use Carp 'croak';
 use Crypt::AuthEnc::GCM qw/gcm_encrypt_authenticate gcm_decrypt_verify/;
-use Crypt::URandom 0.37 'urandom_ub';
+use Crypt::PRNG 'random_bytes';
 use File::Basename 'dirname';
 use File::Path 'make_path';
 use File::Slurper qw/read_binary write_binary/;
@@ -50,7 +50,7 @@ my $format = 'a16 a16 a*';
 
 sub _put {
 	my ($self, $filename, $key, $plaintext) = @_;
-	my $iv = urandom_ub(16);
+	my $iv = random_bytes(16);
 	my ($ciphertext, $tag) = gcm_encrypt_authenticate('AES', $key, $iv, '', $plaintext);
 	my $payload = pack $format, $iv, $tag, $ciphertext;
 	write_binary($filename, $payload);
@@ -179,7 +179,7 @@ Crypt::Credentials - Manage credential files
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

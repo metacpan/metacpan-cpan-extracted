@@ -84,9 +84,9 @@ static ps_node *ps_handle_bool(struct ps_parser_state *state, int *pos)
     return result;
 }
 
-static ps_node * _ps_object_or_array(struct ps_parser_state *state, int *pos, int len, struct array *where)
+static ps_node * _ps_object_or_array(struct ps_parser_state *state, int *pos, int len, struct ps_array *where)
 {
-    struct arrayval *pairs = malloc(len * sizeof *pairs);
+    struct ps_arrayval *pairs = malloc(len * sizeof *pairs);
     for (int i = 0; i < len; i++) {
         pairs[i].key = ps_dispatch(state, pos);
         if (!pairs[i].key || pairs[i].key == PS_PARSE_FAILURE)
@@ -321,10 +321,10 @@ static int _ps_dump_recurse(FILE *f, const ps_node *node, int level, int flags)
     memset(less, ' ', sizeof less - 1);
     less[sizeof less - 1] = 0;
 
-    const union nodeval *v = &node->val;
+    const union ps_nodeval *v = &node->val;
     bool pretty = flags & PS_PRINT_PRETTY;
 
-    const struct array *what = NULL;
+    const struct ps_array *what = NULL;
     switch (node->type) {
         case NODE_STRING: fprintf(f, "s:%ld:\"%s\"", v->s.len, v->s.val); break;
         case NODE_BOOL  : fprintf(f, "b:%u"        , v->b);               break;
@@ -420,7 +420,7 @@ int ps_dump(FILE *f, const ps_node *node, int flags)
 
 void ps_free(ps_node* node)
 {
-    struct array *what = NULL;
+    struct ps_array *what = NULL;
 
     switch (node->type) {
         case NODE_BOOL   : 

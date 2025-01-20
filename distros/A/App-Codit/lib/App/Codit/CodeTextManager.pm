@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION='0.14';
+$VERSION='0.16';
 use Tk;
 require Tk::CodeText;
 
@@ -27,7 +27,7 @@ sub Populate {
 		-contextmenu => $ext->ContextMenu,
 		-height => 8,
 		-keyreleasecall => ['KeyReleased', $self],
-		-logcall => ['log', $ext],
+		-logcall => ['log', $self],
 		-modifiedcall => ['Modified', $self],
 		-saveimage => $ext->getArt('document-save', 16),
 		-scrollbars => 'osoe',
@@ -51,7 +51,6 @@ sub Populate {
 		-contentbookmarkcolor => [{-bookmarkcolor => $text}],
 		-contentfindbg => ['PASSIVE'],
 		-contentfindfg => ['PASSIVE'],
-		-contentinsertbg => ['PASSIVE', undef, undef, '#000000'],
 		-contentmatchbg => ['PASSIVE'],
 		-contentmatchfg => ['PASSIVE'],
 		-contentforeground => [{-foreground => $xt}],
@@ -129,8 +128,7 @@ sub configureTags {
 	$widg->configure('-matchoptions', \@matchoptions) if @matchoptions;
 	
 	#configuring insert background
-	my $ib = $self->cget('-contentinsertbg');
-	$widg->configure('-insertbackground', $ib) if defined $ib;
+	$widg->configure('-insertbackground', $widg->cget('-foreground'));
 }
 
 sub doClear {
@@ -162,6 +160,19 @@ sub KeyReleased {
 	my ($self, $key) = @_;
 	$self->Extension->cmdExecute('key_released', $self->Name, $key);
 	$self->CWidg->Subwidget('XText')->matchCheck;
+}
+
+sub log {
+	my ($self, $message, $type) = @_;
+	$type = 'message' unless defined $type;
+	my $ext = $self->Extension;
+	if ($type eq 'message') {
+		$ext->log($message)
+	} elsif ($type eq 'error') {
+		$ext->logError($message)
+	} elsif ($type eq 'warning') {
+		$ext->logWarning($message)
+	}
 }
 
 sub Modified {

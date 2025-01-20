@@ -1,7 +1,6 @@
 package Daje::Workflow::GenerateSQL::Activity;
 use Mojo::Base 'Daje::Workflow::Common::Activity::Base', -base, -signatures;
 
-
 # NAME
 # ====
 ##
@@ -41,33 +40,37 @@ use Mojo::Base 'Daje::Workflow::Common::Activity::Base', -base, -signatures;
 # janeskil1525 E<lt>janeskil1525@gmail.comE<gt>
 #
 
-our $VERSION = "0.03";
+our $VERSION = "1.00";
 
-# use Daje::Generate::Input::Sql::ConfigManager;
-
+use Mojo::File;
 use Daje::Workflow::GenerateSQL::Manager::Sql;
-# use Daje::Generate::Output::Sql::Table;
 use Daje::Tools::Datasections;
-use Config::Tiny;
-
-has 'config_manager';
+use Daje::Config;
 
 sub process ($self) {
 
+    my @data;
     my $files_list = $self->context->{context}->{changed_files};
     my $length = scalar @{$files_list};
     for (my $i = 0; $i < $length; $i++) {
-        if ($self->_process_sql(@{$files_list}[$i])) {
-            #$self->config_manager->save_new_hash(@{$files_list}[$i]);
+        if ($self->error->has_error() == 0) {
+            if (my $sql = $self->_process_sql(@{$files_list}[$i])) {
+                my $data->{data} = $sql;
+                $data->{file} = Mojo::File->new(@{$files_list}[$i])->basename;
+                $data->{file} =~ s/.json//g;
+                push(@data, $data);
+                $self->model->insert_history(@{$files_list}[$i], "Daje::Workflow::GenerateSQL::Activity;");
+            }
         }
     }
-    $self->error->add_error('test error');
+    $self->context->{context}->{sql} = \@data;
+
     return;
 }
 
 sub _process_sql($self, $file) {
     my $sql = "";
-    try {
+    eval {
         my $table = $self->_load_table($file);
         $table->generate_table();
         $sql = $table->sql();
@@ -75,47 +78,50 @@ sub _process_sql($self, $file) {
     $self->error->add_error($@) if defined $@;
 
 
-#     try {
-#         Daje::Generate::Output::Sql::SqlManager->new(
-#             config => $self->config,
-#             file   => $file,
-#             sql    => $sql,
-#         )->save_file();
-#     } catch ($e) {
-#         die "Could not create output '$e'";
-#     };
-#
-     return 1;
+
+     # try {
+     #     Daje::Generate::Output::Sql::SqlManager->new(
+     #        config => $self->config,
+     #        file   => $file,
+     #         sql    => $sql,
+     #     )->save_file();
+     # } catch ($e) {
+     #     die "Could not create output '$e'";
+     # };
+
+     return $sql;
 }
 
 sub _load_table($self, $file) {
 
-    my $json = $self->config_manager->load_json($file);
-    my $template = $self->_load_templates();
+    my $json = Daje::Config->new()->load_json($file);
+    my $templates = $self->_load_templates();
     my $table;
 
-    # try {
-    #     $table = Daje::Workflow::GenerateSQL::Manager::Sql::SqlManager->new(
-    #         template => $template,
-    #         json     => $json,
-    #     );
-    # } catch ($e) {
-    #     die "process_sql failed '$e";
-    # };
-    #
-    # return $table;
+    eval {
+        $table = Daje::Workflow::GenerateSQL::Manager::Sql->new(
+            templates => $templates,
+            json     => $json,
+            error    => $self->error,
+        );
+    };
+    $self->error->add_error($@) if defined $@ and length($@) > 0;
+
+    return $table;
 }
 
-sub _load_templates($self, $source, $datasections) {
+sub _load_templates($self) {
     my $template;
     eval {
         $template = Daje::Tools::Datasections->new(
             data_sections => $self->activity_data->{template}->{data_sections},
             source        => $self->activity_data->{template}->{source},
         );
-        $template->load_data_sections();
     };
     $self->error->add_error($@) if defined $@;
+
+    $template->load_data_sections();
+    $self->error->add_error($template->error());
 
     return $template;
 }
@@ -124,6 +130,7 @@ sub _load_templates($self, $source, $datasections) {
 
 1;
 __END__
+
 
 
 

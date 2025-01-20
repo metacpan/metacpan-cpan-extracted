@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use File::Basename;
 use Config;
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use Exporter;
 our @ISA = qw(Exporter);
@@ -158,7 +158,6 @@ my @contentwidgets = qw(
 	Entry
 	FloatEntry
 	Spinbox
-	PodText
 	Text
 	TextUndo
 	TextEditor
@@ -183,11 +182,14 @@ my %mainoptions = qw(
 	font                 gtk-font-name
 	activeBackground     tk-active-background
 	activeForeground     theme_fg_color
+	disabledBackground   tk-disabled-bg
+	disabledForeground   tk-disabled-fg
 	backPageColor        tk-through-color
 	highlightBackground  theme_bg_color
 	highlightColor			    theme_selected_bg_color
 	inactiveBackground   tk-through-color
 	insertBackground     theme_fg_color
+	linkColor            link_color
 	selectBackground     theme_selected_bg_color
 	selectForeground     theme_selected_fg_color
 	troughColor          tk-through-color
@@ -282,8 +284,6 @@ If the channel value is greater than 127 it will substract, otherwise it will ad
  alterColor('#000000', 1) returns #010101
  alterColor('#FFFFFF', 1) returns #FEFEFE
 
-=back
-
 =cut
 
 sub alterColor {
@@ -306,13 +306,9 @@ sub alterColor {
 
 =item B<applyGtkSettings>
 
-=over 4
-
 Just making life easy. Call this one and your done, unless you require adjustments.
 It calls B<initDefaults> and exports the whole bunch to xrdb.
 Exported by default.
-
-=back
 
 =cut
 
@@ -324,13 +320,9 @@ sub applyGtkSettings {
 
 =item B<appName>(I<$name>)
 
-=over 4
-
 Sets and returns your application name. By default it is set to the basename of what is in B<$0>. Your Gtk settings
 will only be applied to your application in xrdb. You can set it to an empty string. Then it will 
 apply your Gtk settings to all your perl/Tk applications.
-
-=back
 
 =cut
 
@@ -346,12 +338,8 @@ sub appName {
 
 =item B<convertColorCode>(I<'rgb(255, 0, 0)'>)
 
-=over 4
-
 Some color settings in the Gtk configuration files are in the format 'rgb(255, 255, 255)'.
 B<convertColorCode> converts these to a hex color string.
-
-=back
 
 =cut
 
@@ -367,11 +355,7 @@ sub convertColorCode {
 
 =item B<decodeFont>(I<$gtkfontstring>)
 
-=over 4
-
 Converts the font string in gtk to something Tk can handle
-
-=back
 
 =cut
 
@@ -399,14 +383,10 @@ sub decodeFont {
 
 =item B<export2file>(I<$file>, ?I<$removeflag>?)
 
-=over 4
-
 Exports your Gtk settings to $file in a format recognized by xrdb. It looks for a section
 in the file marked by appName . "Tk::GtkSettings section\n". If it finds it it will replace this section.
 Otherwise it will append your Gtk settings to the end of the file. If $file does not yet exist it
 will create it. if $removeflag is true it will not export but remove the section from $file.
-
-=back
 
 =cut
 
@@ -451,11 +431,7 @@ sub export2file {
 
 =item B<export2Xdefaults>(?I<$removeflag>?)
 
-=over 4
-
 Same as B<export2file>, however the file is always '~/.Xdefaults'.
-
-=back
 
 =cut
 
@@ -465,11 +441,7 @@ sub export2Xdefaults {
 
 =item B<export2Xresources>(?I<$removeflag>?)
 
-=over 4
-
 Same as B<export2file>, however the file is always '~/.Xresources'.
-
-=back
 
 =cut
 
@@ -479,11 +451,7 @@ sub export2Xresources {
 
 =item B<export2xrdb>
 
-=over 4
-
 exports your Gtk settings directly to the xrdb database.
-
-=back
 
 =cut
 
@@ -500,11 +468,7 @@ sub export2xrdb {
 
 =item B<generateOutput>
 
-=over 4
-
 Generates the output used by the export functions. Returns a string.
-
-=back
 
 =cut
 
@@ -540,12 +504,8 @@ sub generateOutput {
 
 =item B<groupAdd>(I<$groupname>, I<\@members>, I<\%options>)
 
-=over 4
-
 Adds $groupname to the groups hash. If @members or %options are not specified, 
 it will leave them empty.
-
-=back
 
 =cut
 
@@ -566,11 +526,7 @@ sub groupAdd {
 
 =item B<groupAll>
 
-=over 4
-
 Returns a list of all available groups.
-
-=back
 
 =cut
 
@@ -580,11 +536,7 @@ sub groupAll {
 
 =item B<groupDelete>(I<$groupname>)
 
-=over 4
-
 Removes $groupsname from the groups hash. You cannot delete the 'main' group.
-
-=back
 
 =cut
 
@@ -602,11 +554,7 @@ sub groupDelete {
 
 =item B<groupExists>(I<$groupname>)
 
-=over 4
-
 Returns true if $groupname is available.
-
-=back
 
 =cut
 
@@ -625,12 +573,8 @@ sub groupExists {
 
 =item B<groupMembers>(I<$groupname>)
 
-=over 4
-
 Returns the list of existing members of $groupname. It will return an empty list
 if $groupname equals 'main'.
-
-=back
 
 =cut
 
@@ -648,11 +592,7 @@ sub groupMembers {
 
 =item B<groupMembersAdd>(I<$groupname>, I<@newmembers>)
 
-=over 4
-
 Adds new members to $groupname. You cannot add members to the 'main' group.
-
-=back
 
 =cut
 
@@ -670,11 +610,7 @@ sub groupMembersAdd {
 
 =item B<groupMembersReplace>(I<$groupname>, I<@members>)
 
-=over 4
-
 Replaces the list of members in $groupsname by @members. You cannot modify the members list of the 'main' group.
-
-=back
 
 =cut
 
@@ -692,12 +628,8 @@ sub groupMembersReplace {
 
 =item B<groupOption>(I<$groupname>, I<$option>, ?I<$value>?)
 
-=over 4
-
 Sets and returns the value of $option in $groupname. $value should be a corresponding key from
 the Gtk hash. If that key is not found, it assumes a direct value.
-
-=back
 
 =cut
 
@@ -719,11 +651,7 @@ sub groupOption {
 
 =item B<groupOptionAll>(I<$groupname>)
 
-=over 4
-
 Returns a list of all available options in $groupname.
-
-=back
 
 =cut
 
@@ -737,11 +665,7 @@ sub groupOptionAll {
 
 =item B<groupOptionDelete>(I<$groupname>, I<$option>)
 
-=over 4
-
 Removes $option from $groupname
-
-=back
 
 =cut
 
@@ -759,11 +683,7 @@ sub groupOptionDelete {
 
 =item B<gtkKey>(I<$key>, ?I<$value>?)
 
-=over 4
-
 Sets and returns the value of $key in the Gtk hash
-
-=back
 
 =cut
 
@@ -781,11 +701,7 @@ sub gtkKey {
 
 =item B<gtkKeyAll>
 
-=over 4
-
 Returns a list of all available keys in the Gtk hash.
-
-=back
 
 =cut
 
@@ -796,11 +712,7 @@ sub gtkKeyAll {
 
 =item B<gtkKeyDelete>(I<$key>)
 
-=over 4
-
 Delets $key from the Gtk hash.
-
-=back
 
 =cut
 
@@ -816,11 +728,7 @@ sub gtkKeyDelete {
 
 =item B<hex2rgb>(I<$hex_color>)
 
-=over 4
-
 Returns and array with the decimal values of red, green and blue.
-
-=back
 
 =cut
 
@@ -838,11 +746,7 @@ sub hex2rgb {
 
 =item B<hexstring>(I<$num>)
 
-=over 4
-
 Return the hexadecimal representation of $num in a two character string.
-
-=back
 
 =cut
 
@@ -855,11 +759,7 @@ sub hexstring {
 
 =item B<initDefaults>
 
-=over 4
-
 Initializes some sensible defaults. Also does a full reset and loads Gtk configuration files.
-
-=back
 
 =cut
 
@@ -869,6 +769,8 @@ sub initDefaults {
 	loadGtkInfo;
 	gtkKey('tk-active-background', alterColor(gtkKey('theme_bg_color'), 30));
 	gtkKey('tk-through-color', alterColor(gtkKey('theme_bg_color'), 30));
+	gtkKey('tk-disabled-bg', alterColor(gtkKey('theme_bg_color'), 30));
+	gtkKey('tk-disabled-fg', alterColor(gtkKey('theme_fg_color'), 90));
 
 	for (keys %mainoptions) {
 		groupOption('main', $_, $mainoptions{$_})
@@ -888,11 +790,7 @@ sub initDefaults {
 
 =item B<loadGtkInfo>
 
-=over 4
-
 Empties the Gtk hash and (re)loads the Gtk configuration files.
-
-=back
 
 =cut
 
@@ -939,11 +837,7 @@ sub loadGtkInfo {
 
 =item B<platformPermitted>
 
-=over 4
-
 Returns true if you are not on Windows or Mac.
-
-=back
 
 =cut
 
@@ -955,11 +849,7 @@ sub platformPermitted {
 
 =item B<removeFromfile>(I<$file>)
 
-=over 4
-
 Same as export2file($file, 1)
-
-=back
 
 =cut
 
@@ -970,11 +860,7 @@ sub removeFromfile {
 
 =item B<removeFromXdefaults>
 
-=over 4
-
 Same as export2Xdefaults(1)
-
-=back
 
 =cut
 
@@ -984,11 +870,7 @@ sub removeFromXdefaults {
 
 =item B<removeFromXresources>
 
-=over 4
-
 Same as export2Xresources(1)
-
-=back
 
 =cut
 
@@ -998,11 +880,7 @@ sub removeFromXresources {
 
 =item B<removeFromxrdb>
 
-=over 4
-
 Removes all the settings previously defined from the xrdb database
-
-=back
 
 =cut
 
@@ -1019,12 +897,8 @@ sub removeFromxrdb {
 
 =item B<resetAll>
 
-=over 4
-
 Removes all groups and options. The group 'main' will remain, but all its options are also deleted.
 This does not affect the Gtk hash.
-
-=back
 
 =cut
 
@@ -1036,11 +910,7 @@ sub resetAll {
 
 =item B<rgb2hex>(I<$red>, I<$green>, I<$blue>)
 
-=over 4
-
 Converts the decimval values $red, $green and $blue into a hex color string.
-
-=back
 
 =cut
 
@@ -1070,7 +940,7 @@ sub _truncate {
 
 Copyright 2022 - 2023 by Hans Jeuken
 
-Same as Perl, in your option.
+Same as Perl
 
 =head1 AUTHOR
 

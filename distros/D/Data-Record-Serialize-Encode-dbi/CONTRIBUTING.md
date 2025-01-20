@@ -125,10 +125,10 @@ or via email to:
 Idiosyncracies
 --------------
 
-  * Some files are generated during the build and copied from the
-    release (see the [CopyFilesFromRelease] section in `dist.ini`]
+* Some files are generated during the build and copied from the
+  release (see the [CopyFilesFromRelease] section in `dist.ini`]
 
-  * Modify `templates/CONTRIBUTING.md` to change `CONTRIBUTING.md`
+* Modify `templates/CONTRIBUTING.md` to change `CONTRIBUTING.md`
 
 
 References

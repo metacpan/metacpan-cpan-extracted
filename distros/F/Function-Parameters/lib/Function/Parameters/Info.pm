@@ -1,12 +1,10 @@
-package Function::Parameters::Info;
+package Function::Parameters::Info 2.002005;
 
 use v5.14.0;
 use warnings;
 
 use Function::Parameters;
 use Carp ();
-
-our $VERSION = '2.002004';
 
 {
     package Function::Parameters::Param;

@@ -13,7 +13,7 @@ examples/callback.pl
 examples/drum-circle
 examples/dumpevents.pl
 examples/lfo.pl
-examples/panic.pl
+examples/list_devices.pl
 examples/simple_callback.pl
 lib/MIDI/RtMidi/FFI.pm
 lib/MIDI/RtMidi/FFI/Device.pm
@@ -27,6 +27,7 @@ t/06-roundtrip.t
 t/07-cc-14bit-decode.t
 t/08-cc-14bit-send.t
 t/09-rpn-nrpn.t
+t/10-errors.t
 t/author-critic.t
 t/author-pod-syntax.t
 t/author-synopsis.t

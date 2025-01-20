@@ -1,0 +1,447 @@
+#!perl
+use strict;
+use warnings;
+use 5.020;
+
+our $VERSION = '0.01';
+
+use utf8;
+use DateTime;
+use Encode qw(decode);
+use JSON;
+use Getopt::Long qw(:config no_ignore_case);
+use List::Util   qw(max);
+use Travel::Status::DE::DBRIS;
+use Travel::Routing::DE::DBRIS;
+
+my ( $date, $time, $from, $to, $language );
+my $mots;
+my $discounts;
+my $developer_mode;
+my ( $json_output, $raw_json_output );
+my $use_cache = 1;
+my $show_full_route;
+my $cache;
+
+my @output;
+
+binmode( STDOUT, ':encoding(utf-8)' );
+for my $arg (@ARGV) {
+	$arg = decode( 'UTF-8', $arg );
+}
+
+my $output_bold  = -t STDOUT ? "\033[1m" : q{};
+my $output_reset = -t STDOUT ? "\033[0m" : q{};
+
+GetOptions(
+	'd|date=s'             => \$date,
+	'D|discounts=s'        => \$discounts,
+	'h|help'               => sub { show_help(0) },
+	'f|full-route'         => \$show_full_route,
+	'm|modes-of-transit=s' => \$mots,
+	'l|language=s'         => \$language,
+	't|time=s'             => \$time,
+	'V|version'            => \&show_version,
+	'cache!'               => \$use_cache,
+	'devmode'              => \$developer_mode,
+	'json'                 => \$json_output,
+	'raw-json'             => \$raw_json_output,
+
+) or show_help(1);
+
+if ($use_cache) {
+	my $cache_path = ( $ENV{XDG_CACHE_HOME} // "$ENV{HOME}/.cache" )
+	  . '/Travel-Routing-DE-DBRIS';
+	eval {
+		require Cache::File;
+		$cache = Cache::File->new(
+			cache_root      => $cache_path,
+			default_expires => '90 seconds',
+			lock_level      => Cache::File::LOCK_LOCAL(),
+		);
+	};
+	if ($@) {
+		$cache = undef;
+	}
+}
+
+my ( $from_raw, $to_raw ) = @ARGV;
+
+if ( not( $from_raw and $to_raw ) ) {
+	show_help(1);
+}
+
+sub get_stop {
+	my ($stop) = @_;
+	my $ris = Travel::Status::DE::DBRIS->new(
+		cache          => $cache,
+		locationSearch => $stop,
+		developer_mode => $developer_mode,
+	);
+	if ( my $err = $ris->errstr ) {
+		say STDERR "Request error while looking up '${stop}': ${err}";
+		exit 2;
+	}
+	my $found;
+	for my $result ( $ris->results ) {
+		if ( defined $result->eva ) {
+			return $result;
+		}
+	}
+	say "Could not find stop '${stop}'";
+	exit 1;
+}
+
+my %opt = (
+	from           => get_stop($from_raw),
+	to             => get_stop($to_raw),
+	language       => $language,
+	cache          => $cache,
+	developer_mode => $developer_mode,
+);
+
+if ( $date or $time ) {
+	my $dt = DateTime->now( time_zone => 'Europe/Berlin' );
+	if ($date) {
+		if ( $date
+			=~ m{ ^ (?<day> \d{1,2} ) [.] (?<month> \d{1,2} ) [.] (?<year> \d{4})? $ }x
+		  )
+		{
+			$dt->set(
+				day   => $+{day},
+				month => $+{month}
+			);
+			if ( $+{year} ) {
+				$dt->set( year => $+{year} );
+			}
+		}
+		else {
+			say '--date must be specified as DD.MM.[YYYY]';
+			exit 1;
+		}
+	}
+	if ($time) {
+		if ( $time =~ m{ ^ (?<hour> \d{1,2} ) : (?<minute> \d{1,2} ) $ }x ) {
+			$dt->set(
+				hour   => $+{hour},
+				minute => $+{minute},
+				second => 0,
+			);
+		}
+		else {
+			say '--time must be specified as HH:MM';
+			exit 1;
+		}
+	}
+	$opt{datetime} = $dt;
+}
+
+if ($mots) {
+	$opt{modes_of_transit} = [ split( qr{, *}, $mots ) ];
+}
+
+if ($discounts) {
+	$opt{discounts} = [ split( qr{, *}, $discounts ) ];
+}
+
+sub show_help {
+	my ($code) = @_;
+
+	print "Usage: dbris [-d dd.mm.yyyy] [-t hh:mm] <from> <to>\n"
+	  . "See also: man dbris-m\n";
+
+	exit $code;
+}
+
+sub show_version {
+	say "dbris version ${VERSION}";
+
+	exit 0;
+}
+
+sub display_occupancy {
+	my ($occupancy) = @_;
+
+	if ( not $occupancy ) {
+		return q{ };
+	}
+	if ( $occupancy == 1 ) {
+		return q{.};
+	}
+	if ( $occupancy == 2 ) {
+		return q{o};
+	}
+	if ( $occupancy == 3 ) {
+		return q{*};
+	}
+	if ( $occupancy == 4 or $occupancy == 99 ) {
+		return q{!};
+	}
+	return q{?};
+}
+
+sub format_occupancy {
+	my ($stop) = @_;
+
+	return display_occupancy( $stop->occupancy_first )
+	  . display_occupancy( $stop->occupancy_second );
+}
+
+sub format_delay {
+	my ( $delay, $len ) = @_;
+	$len += 1;
+	if ( $delay and $len ) {
+		return sprintf( "(%+${len}d)", $delay );
+	}
+	elsif ($len) {
+		return q{ } x ( $len + 2 );
+	}
+	return q{};
+}
+
+my $ris = Travel::Routing::DE::DBRIS->new(%opt);
+
+if ( my $err = $ris->errstr ) {
+	say STDERR "Request error: ${err}";
+	exit 2;
+}
+
+if ($raw_json_output) {
+	say JSON->new->convert_blessed->encode( $ris->{raw_json} );
+	exit 0;
+}
+
+if ($json_output) {
+	say JSON->new->convert_blessed->encode( [ $ris->connections ] );
+	exit 0;
+}
+
+for my $connection ( $ris->connections ) {
+
+	my $header = q{};
+	for my $segment ( $connection->segments ) {
+		if ( $segment->train_short ) {
+			$header .= sprintf( '  %s', $segment->train_short );
+		}
+		elsif ( $segment->is_transfer ) {
+			$header .= sprintf( '  %.1fkm', $segment->distance_m / 1e3 );
+		}
+		elsif ( $segment->is_walk ) {
+
+			# not shown in header
+		}
+		else {
+			$header .= q{  ??};
+		}
+	}
+
+	my $max_delay_digits = max
+	  map { length( $_->dep_delay || q{} ), length( $_->arr_delay || q{} ) }
+	  $connection->segments;
+	if ($show_full_route) {
+		my $max_route_delay_digits = max map {
+			map { length( $_->arr_delay || q{} ) }
+			  $_->route
+		} $connection->segments;
+		if ( $max_route_delay_digits > $max_delay_digits ) {
+			$max_delay_digits = $max_route_delay_digits;
+		}
+	}
+
+	say q{};
+	printf(
+		"%s  (%02d:%02d)  %s  %s%s%s\n\n",
+		$connection->dep ? $connection->dep->strftime('%d.%m. %H:%M')
+		: q{??.??. ??:??},
+		$connection->duration->in_units( 'hours', 'minutes' ),
+		$connection->arr ? $connection->arr->strftime('%H:%M') : q{??:??},
+		format_occupancy($connection),
+		defined $connection->price
+		? sprintf( '  %s %s', $connection->price, $connection->price_unit )
+		: q{},
+		$header,
+	);
+	for my $segment ( $connection->segments ) {
+		if ( $segment->is_transfer ) {
+			for my $note ( $segment->transfer_notes ) {
+				say $note;
+			}
+		}
+		elsif ( $segment->is_walk ) {
+			if ( $segment->distance_m ) {
+				printf( "${output_bold}%s${output_reset} %dm  (≈ %d min.)\n",
+					$segment->walk_name, $segment->distance_m,
+					$segment->duration->in_units('minutes') );
+			}
+			elsif ( $segment->duration->in_units('minutes') ) {
+				printf( "${output_bold}%s${output_reset} ≈ %d min.\n",
+					$segment->walk_name,
+					$segment->duration->in_units('minutes') );
+			}
+			else {
+				printf( "${output_bold}%s${output_reset}\n",
+					$segment->walk_name );
+			}
+			next;
+		}
+		elsif ( $segment->direction ) {
+			printf( "${output_bold}%s${output_reset} → %s  %s\n",
+				$segment->train_mid, $segment->direction,
+				format_occupancy($segment) );
+		}
+		else {
+			printf( "${output_bold}%s${output_reset}\n", $segment->train_long );
+		}
+
+		printf(
+			"%s%s  ab  %s%s\n",
+			$segment->dep->strftime('%H:%M'),
+			$max_delay_digits
+			? q{ } . format_delay( $segment->dep_delay, $max_delay_digits )
+			: q{},
+			$segment->dep_name,
+			$segment->dep_platform ? q{  } . $segment->dep_platform : q{},
+		);
+
+		if ($show_full_route) {
+			for my $stop ( $segment->route ) {
+				printf(
+					"%s%s  %s  %s%s\n",
+					$stop->arr ? $stop->arr->strftime('%H:%M') : q{     },
+					$max_delay_digits
+					? q{ } . format_delay( $stop->arr_delay, $max_delay_digits )
+					: q{},
+					format_occupancy($stop),
+					$stop->name,
+					$stop->platform ? q{  } . $stop->platform : q{},
+				);
+			}
+		}
+
+		printf(
+			"%s%s  an  %s%s\n",
+			$segment->arr->strftime('%H:%M'),
+			$max_delay_digits
+			? q{ } . format_delay( $segment->arr_delay, $max_delay_digits )
+			: q{},
+			$segment->arr_name,
+			$segment->arr_platform ? q{  } . $segment->arr_platform : q{},
+		);
+		say q{};
+	}
+	say q{---------------------------------------};
+}
+
+__END__
+
+=head1 NAME
+
+dbris - Interface to bahn.de public transit routing service
+
+=head1 SYNOPSIS
+
+B<dbris> [B<-d> I<DD.MM.YYYY>] [B<-t> I<HH:MM>] [...] I<from-stop> I<to-stop>
+
+=head1 VERSION
+
+version 0.01
+
+=head1 DESCRIPTION
+
+B<dbris> is an interface to the public transport routing service available on
+bahn.de. It requests connections between two stops and prints the results.
+
+=head1 OPTIONS
+
+=over
+
+=item B<-d>, B<--date> I<dd.mm.>[I<yyyy>]
+
+Request connections for a specific day.
+Default: today.
+
+=item B<-f>, B<--full-route>
+
+Show intermediate stops rather than just start/end of connection legs.
+
+=item B<--json>
+
+Print result(s) as JSON and exit. This is a dump of internal data structures
+and not guaranteed to remain stable between minor versions. Please use the
+Travel::Routing::DE::DBRIS(3pm) module if you need a proper API.
+
+=item B<-l>, B<--language> I<lang>
+
+Tell bahn.de to provide messages in I<lang> (ISO 639-1 language code).
+Known supported languages are: cs da de en es fr it nl pl.
+Default: de.
+
+=item B<-m>, B<--modes-of-transit> I<mot1>[,I<mot2>,...]
+
+Only show connections with the specified modes of transit.
+Supported modes of transit are:
+ICE, EC_IC, IR, REGIONAL, SBAHN, BUS, SCHIFF, UBAHN, TRAM, ANRUFPFLICHTIG.
+Default: all modes.
+
+=item B<--no-cache>
+
+By default, if the Cache::File module is available, server replies are cached
+for 90 seconds in F<~/.cache/Travel-Routing-DE-DBRIS> (or a path relative to
+C<$XDG_CACHE_HOME>, if set). Use this option to disable caching. You can use
+B<--cache> to re-enable it.
+
+=item B<--raw-json>
+
+Print unprocessed API response as JSON and exit.
+Useful for debugging and development purposes.
+
+=item B<-t>, B<--time> I<HH:MM>
+
+Request connections on or after I<HH:MM>.
+Default: now.
+
+=item B<-V>, B<--version>
+
+Show version information and exit.
+
+=back
+
+=head1 EXIT STATUS
+
+0 upon success, 1 upon internal error, 2 upon backend error.
+
+=head1 CONFIGURATION
+
+None.
+
+=head1 DEPENDENCIES
+
+=over
+
+=item * Class::Accessor(3pm)
+
+=item * DateTime(3pm)
+
+=item * LWP::UserAgent(3pm)
+
+=item * Travel::Routing::DE::DBRIS(3pm)
+
+=item * Travel::Status::DE::DBRIS(3pm)
+
+=back
+
+=head1 BUGS AND LIMITATIONS
+
+=over
+
+=item * This module is very much work-in-progress
+
+=back
+
+=head1 AUTHOR
+
+Copyright (C) 2025 Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
+
+=head1 LICENSE
+
+This program is licensed under the same terms as Perl itself.

@@ -1,0 +1,143 @@
+0.022   2024-11-15  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename dist Sah-Schemas-* -> Sah-SchemaBundle-* for consistency
+          with others.
+
+
+0.021   2022-09-08  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Add completion and prefilter for conversion between uid/gid
+          <-> user/group for all schemas, not just the ::exists variants.
+
+
+0.020   2022-07-24  Released-By: PERLANCAR; Urgency: medium
+
+        - Fix error message in Sah filter.
+
+
+0.019   2022-07-24  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+        - [incompatible change] Rename unix::local_{gid,groupname,uid,username}
+          to unix::{gid,groupname,uid,username}::exists, for more consistency
+          naming with perl::modname::exists. This also lets us create
+          unix::uid::not_exists etc when needed in the future.
+
+
+0.018   2021-07-22  Released-By: PERLANCAR; Urgency: medium
+
+        - [build] Rebuild to refresh Sah::SchemaR::*.
+
+
+0.017   2021-07-22  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Fix examples.
+
+
+0.016   2021-07-20  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+	- [build] Rebuild with fixed Pod::Weaver plugin [-Sah::Schemas]
+          (0.066) to correctly show non-defhash examples.
+
+
+0.015   2021-07-20  Released-By: PERLANCAR; Urgency: medium
+
+	- Re-add valid examples in unix::signal schema.
+
+
+0.014   2021-07-19  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+	- [build] Rebuild with updated Pod::Weaver plugin [-Sah::Schemas] to
+          correctly show examples.
+
+
+0.013   2020-10-16  Released-By: PERLANCAR; Urgency: medium
+
+	- [schema unix::signal] Change x.examples attribute to examples
+	  property.
+
+
+0.012   2020-06-13  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Do not use 'return' in coerce/prefilter generated code
+	  because it causes early exit in Perinci::Sub::Wrapper-generated
+	  code.
+
+
+0.011   2020-05-27  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Make PID a posint not uint (0 is not allowed).
+
+	- Add examples (tests) in the schema and remove the tests in t/.
+
+
+0.010   2020-02-11  Released-By: PERLANCAR; Urgency: medium
+
+	- Reimplement coercion rules as filter rules because filters are
+	  more appropriate here.
+
+
+0.009   2019-12-09  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] For better error message, coercion rules that convert UID/GID <->
+	  username/groupname now die/fail when they cannot convert; the
+	  leave-as-is-when-cannot-convert variants are now moved to
+	  try_convert_*.
+
+
+0.008   2019-11-28  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename coerce rule modules again, revert to using lower_case
+	  notation for the description part, because CamelCase is really,
+	  REALLY ugly when we have many words.
+
+
+0.007   2019-11-28  Released-By: PERLANCAR; Urgency: medium
+
+        - [build] Rebuild with updated dzil plugin [Sah::Schemas] (0.016) which
+          now adds dependencies to the updated Data::Sah::Coerce::perl::To_*
+          coercion rule modules.
+
+
+0.006   2019-11-28  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename coerce rule module to use new naming scheme
+	  (Data::Sah::Coerce 0.034+).
+
+
+0.005   2019-09-11  Released-By: PERLANCAR; Urgency: medium
+
+	- Add schema: unix::signal.
+
+
+0.004   2019-07-12  Released-By: PERLANCAR; Urgency: medium
+
+        - UPDATE: This release is broken due to non-existing coerce rule
+          dependencies added by [Sah::Schemas].
+
+	- [ux] Add aliases for {file,dir,path}name::unix ->
+	  unix::{file,dir,path}name.
+
+
+0.003   2019-05-07  Released-By: PERLANCAR
+
+	- [ux] Add description to some of the schemas.
+
+	- Base unix::local_gid on unix::gid, not uint. Base unix::local_uid on
+          unix::uid, not uint.
+
+
+0.002   2019-05-07  Released-By: PERLANCAR
+
+        - [bugfix] [build] Rebuild to fix dependencies to non-existing coercion
+          rule modules.
+
+
+0.001   2019-05-07  Released-By: PERLANCAR
+
+        - First release.

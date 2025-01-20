@@ -1,9 +1,13 @@
 package DateTime::Format::Text;
 
+# TODO: Add localization
+
 use strict;
 use warnings;
-use DateTime;
+
 use Carp;
+use DateTime;
+use Scalar::Util;
 
 =head1 NAME
 
@@ -11,11 +15,11 @@ DateTime::Format::Text - Find a Date in Text
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =cut
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 our @month_names = (
 	'january',
@@ -52,13 +56,14 @@ our $o = join('|', @ordinal_number);
 our $m = join('|', @month_names);
 our $sm = join('|', @short_month_names);
 
+# Helper routine: Shorten strings to their first three characters
 sub _shorten {
 	return substr(shift, 0, 3);
 };
 
 =head1 SYNOPSIS
 
-Find a date in any text.
+Extract and parse date strings from arbitrary text.
 
     use DateTime::Format::Text;
     my $dft = DateTime::Format::Text->new();
@@ -76,6 +81,7 @@ Takes no arguments
 sub new {
 	my $class = shift;
 
+	# If the class is undefined, fallback to the current package name
 	if(!defined($class)) {
 		# Using DateTime::Format::Text::new(), not DateTime::Format::Text->new()
 		# carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
@@ -83,8 +89,8 @@ sub new {
 
 		# FIXME: this only works when no arguments are given
 		return bless { }, __PACKAGE__;
-	} elsif(ref($class)) {
-		# clone the given object
+	} elsif(Scalar::Util::blessed($class)) {
+		# If $class is an object, clone it with new arguments
 		return bless { }, ref($class);
 	}
 	return bless { }, $class;
@@ -92,7 +98,7 @@ sub new {
 
 =head2 parse_datetime
 
-Synonym for parse().
+A synonym for parse().
 
 =cut
 
@@ -115,8 +121,26 @@ sub parse_datetime {
 
 =head2 parse
 
-Returns a L<DateTime> object constructed from a date/time string embedded in
-arbitrary text.
+Core function for extracting and parsing dates from text returning a L<DateTime> object.
+It handles various date formats, such as:
+
+=over 4
+
+=item *
+
+dd/mm/yyyy, dd-mm-yy, d m yyyy
+
+=item *
+
+Sunday, 1 March 2015
+
+=item *
+
+1st March 2015
+
+=back
+
+If direct parsing fails, attempt to use the L<DateTime::Format::Flexible> module as a last resort.
 
 Can be called as a class or object method.
 
@@ -246,7 +270,7 @@ sub parse {
 			# Match "Sunday 1st"
 			if($string =~ /($d|$sd)[,\s\-\/]+(\d?\d)[,\-\/]*($o)\s+$year/i) {
 				$day = $1;
-			} elsif($string =~ /[\s\(](\d{1,2})\s+($m|$sm)/i) {
+			} elsif($string =~ /[\s\(:,](\d{1,2})\s+($m|$sm)/i) {	# Allow '(', ',' or ':' before the date
 				$day = $1;
 			} elsif($string =~ /^(\d{1,2})\s+($m|$sm)\s/i) {
 				$day = $1;
@@ -319,6 +343,7 @@ version  0.2.0
 
 =head1 SEE ALSO
 
+L<DateTime::Format::Flexible>,
 L<DateTime::Format::Natural>
 
 =head1 SUPPORT
@@ -343,7 +368,7 @@ L<http://search.cpan.org/dist/DateTime-Format-Text/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2019-2024 Nigel Horne.
+Copyright 2019-2025 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

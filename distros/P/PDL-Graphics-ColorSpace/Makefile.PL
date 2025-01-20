@@ -16,13 +16,13 @@ WriteMakefile( %hash,
       'ColorSpace/RGBSpace.pm'  => '$(INST_LIBDIR)/ColorSpace/RGBSpace.pm',
     },
     CONFIGURE_REQUIRES => {
-        'PDL'        => '2.074', # multi-C etc
+        'PDL'        => '2.094', # Test::PDL
     },
     TEST_REQUIRES => {
         'Test::More' => '0.88',
     },
     PREREQ_PM => {
-        'PDL'        => '2.074', # multi-C etc
+        'PDL'        => '2.094',
     },
     META_MERGE => {
        "meta-spec" => { version => 2 },

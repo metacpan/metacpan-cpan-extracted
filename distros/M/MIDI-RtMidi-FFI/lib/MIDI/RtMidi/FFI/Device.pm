@@ -10,7 +10,7 @@ use MIDI::Event;
 use Time::HiRes qw/ time /;
 use Carp qw/ carp croak /;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 my $rtmidi_api_names = {
     unspecified => [ "Unknown",            RTMIDI_API_UNSPECIFIED ],
@@ -200,7 +200,7 @@ sub new {
 }
 
 
-sub ok   { $_[0]->{device}->ok }
+sub ok   { shift->{device}->ok( @_ ) }
 sub msg  { $_[0]->{device}->msg }
 sub data { $_[0]->{device}->data }
 sub ptr  { $_[0]->{device}->ptr }
@@ -208,14 +208,30 @@ sub ptr  { $_[0]->{device}->ptr }
 
 sub open_virtual_port {
     my ( $self, $port_name ) = @_;
+    croak "Virtual ports unsupported on this platform"
+        if $self->get_current_api == RTMIDI_API_WINDOWS_MM;
+    $self->ok(1);
+
     rtmidi_open_virtual_port( $self->{device}, $port_name );
+
+    return 1 if $self->ok;
+
+    croak "Error opening virtual port: " . $self->msg;
 }
 
 
 sub open_port {
     my ( $self, $port_number, $port_name ) = @_;
+    croak "Invalid port number ($port_number)"
+        if ($port_number < 0 || $port_number >= $self->get_port_count);
+    $self->ok(1);
+
     $self->{port_name} = $port_name;
     rtmidi_open_port( $self->{device}, $port_number, $port_name );
+
+    return 1 if $self->ok;
+
+    croak("Error opening port: " . $self->msg);
 }
 
 
@@ -236,13 +252,13 @@ sub open_port_by_name {
     $portname //= $self->{type} . '-' . time();
     if ( ref $name eq 'ARRAY' ) {
         for ( @{ $name } ) {
-            return if $self->open_port_by_name( $_ );
+            return 1 if $self->open_port_by_name( $_ );
         }
     }
     else {
         my @ports = $self->get_ports_by_name( $name );
         return 0 unless @ports;
-        return !$self->open_port( $ports[0], $portname );
+        return $self->open_port( $ports[0], $portname );
     }
 }
 
@@ -264,9 +280,25 @@ sub get_all_port_names {
 }
 
 
+sub print_ports {
+    my ( $self, $handle ) = @_;
+    $handle //= *STDOUT;
+    my $ports = $self->get_all_port_nums;
+    for my $port_num ( sort { $a <=> $b } keys %{ $ports } ) {
+        print $handle "$port_num: $ports->{ $port_num }\n";
+    }
+}
+
+
 sub close_port {
     my ( $self ) = @_;
+    $self->ok(1);
+
     rtmidi_close_port( $self->{device} );
+
+    return 1 if $self->ok;
+
+    croak "Error closing port: " . $self->msg;
 }
 
 
@@ -469,6 +501,7 @@ return_msg:
 
 sub send_message_encoded {
     my ( $self, @event ) = @_;
+    @event = @{ $event[ 0 ] } if ( @event == 1 && ref $event[ 0 ] eq 'ARRAY' );
     if ( $event[0] eq 'control_change' ) {
         my $rpn = $self->get_rpn( $event[1] );
         my $nrpn = $self->get_nrpn( $event[1] );
@@ -617,6 +650,10 @@ sub _create_device {
     $self->{api} //= $api_by_name->[1] if $api_by_name;
     $self->{api} //= $rtmidi_api_names->{ unspecified }->[1];
     $self->{device} = $create_dispatch->{ $fn }->( $self->{api}, $self->{name}, $self->{queue_size_limit} );
+
+    croak "Unable to create MIDI $self->{type} device"
+        unless $self->{device}->ok;
+
     $self->{type} eq 'in' && $self->ignore_types(
         $self->{ignore_sysex},
         $self->{ignore_timing},
@@ -729,16 +766,20 @@ sub disable_nrpn_14bit_mode {
 *disable_nrpn_14bit_callback = \&disable_nrpn_14bit_mode;
 
 
-*note_off = sub { shift->send_event( note_off => @_ ) };
-*note_on = sub { shift->send_event( note_on => @_ ) };
-*control_change = sub { shift->send_event( control_change => @_ ) };
-*patch_change = sub { shift->send_event( patch_change => @_ ) };
-*key_after_touch = sub { shift->send_event( key_after_touch => @_ ) };
-*channel_after_touch = sub { shift->send_event( channel_after_touch => @_ ) };
-*pitch_wheel_change = sub { shift->send_event( pitch_wheel_change => @_ ) };
-*sysex_f0 = sub { shift->send_event( sysex_f0 => @_ ) };
-*sysex_f7 = sub { shift->send_event( sysex_f7 => @_ ) };
-*sysex = sub { shift->send_event( sysex => @_ ) };
+sub note_off { shift->send_event( note_off => @_ ) };
+sub note_on { shift->send_event( note_on => @_ ) };
+sub control_change { shift->send_event( control_change => @_ ) };
+sub patch_change { shift->send_event( patch_change => @_ ) };
+sub key_after_touch { shift->send_event( key_after_touch => @_ ) };
+sub channel_after_touch { shift->send_event( channel_after_touch => @_ ) };
+sub pitch_wheel_change { shift->send_event( pitch_wheel_change => @_ ) };
+sub sysex_f0 { shift->send_event( sysex_f0 => @_ ) };
+sub sysex_f7 { shift->send_event( sysex_f7 => @_ ) };
+sub sysex { shift->send_event( sysex => @_ ) };
+sub clock { shift->send_event( clock => @_ ) };
+sub start { shift->send_event( start => @_ ) };
+sub stop { shift->send_event( stop => @_ ) };
+sub continue { shift->send_event( continue => @_ ) };
 
 
 *cc = \&control_change;
@@ -795,7 +836,7 @@ MIDI::RtMidi::FFI::Device - OO interface for MIDI::RtMidi::FFI
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -974,18 +1015,26 @@ Returns a list of port numbers matching the supplied name criteria.
     $device->open_port_by_name( [ $name, $othername, qr/anothername/ ] );
 
 Opens the first port found matching the supplied name criteria.
+Returns 1 if a matching port was found and connected to successfully, otherwise 0.
 
 =head2 get_all_port_nums
 
     $device->get_all_port_nums();
 
-Return a hashref of available devices the form { port number => port name }
+Return a hashref of ports visible to the device, of the form { port number => port name }
 
 =head2 get_all_port_names
 
     $device->get_all_port_names();
 
-Return a hashref of available devices of the form { port name => port number }
+Return a hashref of ports visible to the device, of the form { port name => port number }
+
+=head2 print_ports
+
+    $device->print_ports();
+    $device->print_ports( $handle );
+
+Prints the port number and name of all ports visible to the device.
 
 =head2 close_port
 
@@ -1096,7 +1145,7 @@ Type 'in' only. Set whether or not to ignore active sensing messages.
 
 Type 'in' only. Gets the next message from the queue, if available.
 
-=head2 get_event
+=head2 get_message_decoded
 
     $device->get_message_decoded();
 
@@ -1250,7 +1299,7 @@ or decoding mode - it probably shouldn't be used mid performance or
 playback unless you seek odd side effects.
 
 If a RPN or NRPN is active, this 14 bit mode will not have an effect on CC6.
-See </set_set_rpn_14bit_mode> and </set_nrpn_14bit_mode>
+See L</set_set_rpn_14bit_mode> and L</set_nrpn_14bit_mode>
 
 =head2 disable_14bit_mode
 
@@ -1431,7 +1480,7 @@ Disables the RPN 14 bit mode. See L</14-bit Control Change Modes>.
 
 Disables the NRPN 14 bit mode. See L</14-bit Control Change Modes>.
 
-=head2 note_off, note_on, control_change, patch_change, key_after_touch, channel_after_touch, pitch_wheel_change, sysex_f0, sysex_f7, sysex
+=head2 note_off, note_on, control_change, patch_change, key_after_touch, channel_after_touch, pitch_wheel_change, sysex_f0, sysex_f7, sysex, clock, start, stop, continue
 
 Wrapper methods for L</send_message_encoded>, e.g.
 
@@ -1635,7 +1684,7 @@ MIDI standard:
 Callbacks should not call the send_message_encoded, send_event, control_change
 or cc methods as these may invoke further 14 bit message handling, potentially
 causing an
-infinite loop. The </send_message_encoded_cb> method exists for sending
+infinite loop. The L</send_message_encoded_cb> method exists for sending
 messages within 14 bit CC callbacks.
 
 =head2 For Input (Decoding)
@@ -1933,6 +1982,11 @@ MacOS might be:
 
 =head1 KNOWN ISSUES
 
+The callback interface does not currently work on threaded perls. Most, if not
+all, perls currently built for Windows are threaded. I have been working around
+this with a non-threaded Perl built within the cygwin environment with
+perlbrew.
+
 Use of L<MIDI::Event> is a bit of a hack for convenience, exploiting the
 similarity of realtime MIDI messages and MIDI song file messages. It may break
 in unexpected ways if used for large SysEx messages or other "non-music"
@@ -1960,6 +2014,8 @@ L<Currently open MIDI::RtMidi::FFI issues on GitHub|https://github.com/jbarrett/
 L<RtMidi|https://www.music.mcgill.ca/~gary/rtmidi/>
 
 L<MIDI CC & NRPN database|https://midi.guide/>
+
+L<Sound on Sound's MIDI Basics series|https://www.soundonsound.com/series/midi-basics>
 
 L<Phil Rees Music Tech page on NRPN/RPN|http://www.philrees.co.uk/nrpnq.htm>
 
@@ -1993,7 +2049,7 @@ John Barrett <john@jbrt.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by John Barrett.
+This software is copyright (c) 2025 by John Barrett.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

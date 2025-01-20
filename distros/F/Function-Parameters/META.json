@@ -68,12 +68,15 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://codeberg.org/mauke/Function-Parameters/issues"
+      },
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/mauke/Function-Parameters",
-         "web" : "https://github.com/mauke/Function-Parameters"
+         "url" : "https://codeberg.org/mauke/Function-Parameters.git",
+         "web" : "https://codeberg.org/mauke/Function-Parameters"
       }
    },
-   "version" : "2.002004",
+   "version" : "2.002005",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

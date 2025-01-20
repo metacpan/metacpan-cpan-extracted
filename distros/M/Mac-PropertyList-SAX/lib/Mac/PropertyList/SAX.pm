@@ -63,7 +63,7 @@ our %EXPORT_TAGS = (
     parse  => [ qw(parse_plist parse_plist_fh parse_plist_file parse_plist_string) ],
 );
 
-our $VERSION = '1.001';
+our $VERSION = '1.002';
 
 
 
@@ -523,7 +523,7 @@ Please contact the author with bug reports or feature requests.
 
 =head1 AUTHOR
 
-Darren M. Kulp, C<< <kulp @ cpan.org> >>
+Darren M. Kulp, C<< <darren@kulp.ch> >>
 
 =head1 THANKS
 

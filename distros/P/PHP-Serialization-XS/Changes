@@ -34,3 +34,7 @@ Revision history for Perl extension PHP::Serialization::XS.
 
 0.10  Fri Jun 23 21:00:53 2017
     - Mended bad MANIFEST
+
+0.11  Sun Jan 19 20:55:33 EST 2025
+    - Point to new phpserialize that compiles under modern Perl without
+      `struct object` compilation failure

@@ -9,7 +9,7 @@ Tk::QuickForm::CBaseClass - Base class for items in Tk::QuickForm.
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.06';
+$VERSION = '0.07';
 
 use base qw(Tk::Derived Tk::Frame);
 Construct Tk::Widget 'CBaseClass';
@@ -33,7 +33,7 @@ Provides a base class for you to inherit. Helps making items for L<Tk::QuickForm
 You should never create an instance directly like above. This should
 be handled by L<Tk::QuickForm>.
 
-=head1 B<CONFIG VARIABLES>
+=head1 OPTIONS
 
 =over 4
 

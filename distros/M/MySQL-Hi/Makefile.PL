@@ -23,12 +23,14 @@ WriteMakefile
         'Config::Simple' => '4.0',
         'File::HomeDir'  => '1.0',
         'Getopt::Long'   => '2.0',
-        'Test::More'     => 0,
-        'Test::Deep'     => 0,
-        'Test::Warn'     => 0,
 
     },
-    META_MERGE       => {
+    TEST_REQUIRES    => {
+        'Test::More' => 0,
+        'Test::Deep' => 0,
+        'Test::Warn' => 0,
+    },
+    (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         resources   => {
             repository => {
@@ -36,11 +38,9 @@ WriteMakefile
                 url  => 'https://gitlab.com/as_pushkin/mysqlhi.git',
                 web  => 'https://gitlab.com/as_pushkin/mysqlhi',
             },
-        },
-    },
-    dist => {
-        DIST_CP          => 'ln',
-    },
+        }})
+     : ()
+    ),
 );
 
 1;

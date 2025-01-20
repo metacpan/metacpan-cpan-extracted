@@ -4,7 +4,7 @@
 ## Header Administrivia
 ##======================================================================
 
-our $VERSION = '0.06009';
+our $VERSION = '0.06010';
 pp_setversion($VERSION);
 
 ##-- accomodate typo-fix in PDL-2.008 API
@@ -188,10 +188,7 @@ EOPM
 pp_def('logzero',
        Pars => '[o]a()',
        GenericTypes => $FLOAT_TYPES,
-       Code => '$a() = LOG_ZERO;',
-       CopyBadStatusCode =>
-	  (" if ( \$ISPDLSTATEBAD(a) ) PDL->${propagate_badflag}(a,0);"
-	   .'  $SETPDLSTATEGOOD(a);'),
+       Code => 'broadcastloop %{ $a() = LOG_ZERO; %} $PDLSTATESETGOOD(a);',
        HandleBad=>1,
        Doc => 'Approximates $a() = log(0), avoids nan.',
        BadDoc => 'logzero() handles bad values.  The state of the output PDL is always good.',

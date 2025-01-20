@@ -16,6 +16,7 @@ createapp(
 my $editor;
 if (defined $app) {
 	$editor = $app->CoditTagsEditor(
+		-extension => $app,
 		-defaultbackground => '#FFFFFF',
 		-defaultforeground => '#000000',
 		-defaultfont => $app->Font(-family => 'Hack', -size => 12),

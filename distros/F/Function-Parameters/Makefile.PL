@@ -103,7 +103,11 @@ my %settings = %{do "./$settings_file" or die "Internal error: can't do $setting
     if (my $repo = delete $settings{REPOSITORY}) {
         if (ref($repo) eq 'ARRAY') {
             my ($type, @args) = @$repo;
-            if ($type eq 'github') {
+            my %sites = (
+                github   => 'github.com',
+                codeberg => 'codeberg.org',
+            );
+            if (defined(my $site = $sites{$type})) {
                 my ($account, $project) = @args;
                 $project ||= '%d';
                 $project =~ s{%(L?)(.)}{
@@ -114,10 +118,10 @@ my %settings = %{do "./$settings_file" or die "Internal error: can't do $setting
                         die "Internal error: unknown placeholder %$1$2";
                     $1 ? lc($x) : $x
                 }seg;
-                my $addr = "github.com/$account/$project";
+                my $addr = "$site/$account/$project";
                 $repo = {
                     type => 'git',
-                    url  => "git://$addr",
+                    url  => "https://$addr.git",
                     web  => "https://$addr",
                 };
             } else {
@@ -126,6 +130,10 @@ my %settings = %{do "./$settings_file" or die "Internal error: can't do $setting
         }
         ref($repo) eq 'HASH' or die "Internal error: REPOSITORY must be a hashref, not $repo";
         @{$settings{META_MERGE}{resources}{repository}}{keys %$repo} = values %$repo;
+    }
+
+    if (my $bugtracker = delete $settings{BUGTRACKER}) {
+        $settings{META_MERGE}{resources}{bugtracker}{web} = $bugtracker;
     }
 
     if (my $harness_options = delete $settings{HARNESS_OPTIONS}) {

@@ -9,7 +9,7 @@ Tk::QuickForm - Quickly set up a form.
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.06';
+$VERSION = '0.07';
 
 use Tk;
 use base qw(Tk::Frame);
@@ -25,12 +25,12 @@ use Tk::PNG;
 =head1 SYNOPSIS
 
  require Tk::QuickForm;
- my $form= $window->QuickForm(@options
+ my $form= $window->QuickForm(@options,
     -structure => [
        '*page' => 'Page name', #Adds a new page to the notebook. Creates the notebook if needed.
        '*section' => 'Section name', #Adds a new section.
        some_list => ['radio', 'My values', -values => \@listvalues], #Adds an array of radio buttons.
-       '*end', #Ends a section.
+       '*end', #Ends a section or frame.
        '*column', #Starts a new column of fields
        '*expand', #Expand the next entry in height.
     ]
@@ -47,7 +47,7 @@ fields the user can modify as well as its layout.
 
 With the B<put> and B<get> methods you can set or retrieve values as a hash.
 
-=head1 CONFIG VARIABLES
+=head1 OPTIONS
 
 =over 4
 
@@ -143,7 +143,7 @@ Only available at create time. See below.
 
 =back
 
-=head1 FILE DIALOG VARIABLES
+=head1 FILE DIALOG OPTIONS
 
 A number of config variables are forwarded to the file dialog widget used
 in this module. Look in L<Tk::FilePicker> and L<Tk::FileBrowser> for their meaning.
@@ -343,6 +343,8 @@ sub Populate {
 
 	$self->SUPER::Populate($args);
 
+	$self->{LABELS} = {};
+	$self->{OPTIONS} = {};
 	$self->{TYPES} = {
 		boolean => ['Tk::QuickForm::CBooleanItem', -onvalue => 1, -offvalue => 0],
 		color => ['Tk::QuickForm::CColorItem'],
@@ -442,6 +444,7 @@ sub createForm {
 	}
 
 	my %options = ();
+	my %labels = ();
 	my @padding = (-padx => 2, -pady => 2);
 
 	@options = @$structure;
@@ -559,7 +562,7 @@ sub createForm {
 			if ($type eq 'ext1') {
 				my $label = shift @opt;
 				my $class = shift @opt;
-				$holder->Label(
+				my $l = $holder->Label(
 					-width => $labelwidth, 
 					-text => $label, 
 					-anchor => 'e'
@@ -577,6 +580,7 @@ sub createForm {
 					-pady => 2
 				);
 				$options{$key} = $w;
+				$labels{$key} = $l;
 			} elsif ($type eq 'ext2') {
 					# $label is now actually the reference to the external object
 					# $values is now actually a boolean scalar to instruct the widget to expand
@@ -593,7 +597,7 @@ sub createForm {
 				$options{$key} = $w;
 			} else {
 				my $label = shift @opt;
-				$holder->Label(
+				my $l = $holder->Label(
 					-width => $labelwidth,
 					-text => $label,
 					-anchor => 'e'
@@ -631,11 +635,14 @@ sub createForm {
 					-padx => 2, -pady => 2
 				);
 				$options{$key} = $widg;
+				$labels{$key} = $l;
 				$holderstack[0]->{row} ++;
 			}
 		}
 	}
 	$self->{OPTIONS} = \%options;
+	$self->{LABELS} = \%labels;
+	$self->{NOTEBOOK} = $notebook;
 	$self->after(10, ['validate', $self]);
 	return $notebook;
 }
@@ -690,6 +697,18 @@ sub getKeys {
 	my $self = shift;
 	my $opt = $self->{OPTIONS};
 	return sort keys %$opt;
+}
+
+sub getLabel {
+	my ($self, $name) = @_;
+	return $self->{LABELS}->{$name};
+}
+
+sub getNotebook {	return $_[0]->{NOTEBOOK} }
+
+sub getWidget {
+	my ($self, $name) = @_;
+	return $self->{OPTIONS}->{$name};
 }
 
 sub pick {

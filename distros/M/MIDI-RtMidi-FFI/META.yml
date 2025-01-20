@@ -29,16 +29,16 @@ no_index:
 provides:
   MIDI::RtMidi::FFI:
     file: lib/MIDI/RtMidi/FFI.pm
-    version: '0.06'
+    version: '0.07'
   MIDI::RtMidi::FFI::Device:
     file: lib/MIDI/RtMidi/FFI/Device.pm
-    version: '0.06'
+    version: '0.07'
   RtMidiIn:
     file: lib/MIDI/RtMidi/FFI/Device.pm
-    version: '0.06'
+    version: '0.07'
   RtMidiOut:
     file: lib/MIDI/RtMidi/FFI/Device.pm
-    version: '0.06'
+    version: '0.07'
 requires:
   Alien::RtMidi: '0.04'
   FFI::CheckLib: '0.25'
@@ -53,7 +53,7 @@ resources:
   bugtracker: https://github.com/jbarrett/MIDI-RtMidi-FFI/issues
   homepage: https://github.com/jbarrett/MIDI-RtMidi-FFI
   repository: https://github.com/jbarrett/MIDI-RtMidi-FFI.git
-version: '0.06'
+version: '0.07'
 x_generated_by_perl: v5.40.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

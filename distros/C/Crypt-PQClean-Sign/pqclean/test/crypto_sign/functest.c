@@ -5,6 +5,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef PQCLEAN_USE_VALGRIND
+#include <valgrind/memcheck.h>
+#endif
+
+#ifdef PQCLEAN_FALCON_TEST_INTEROP
+// workaround to include the proper header in both
+// pytest and manual testing
+
+// https://stackoverflow.com/a/40063340
+#define STR(x) #x
+#define STRINGIFY(x) STR(x)
+#define EXPAND(x) x
+#define CONCAT(x, y) STRINGIFY(EXPAND(x)EXPAND(y))
+
+#include CONCAT(PQCLEAN_INTEROP_INCLUDE,/api.h)
+#endif
 
 #ifndef NTESTS
 #define NTESTS 5
@@ -35,7 +51,7 @@ static int check_canary(const uint8_t *d) {
 }
 
 /** Safe malloc */
-inline static void* malloc_s(size_t size) {
+inline static void *malloc_s(size_t size) {
     void *ptr = malloc(size);
     if (ptr == NULL) {
         perror("Malloc failed!");
@@ -60,6 +76,14 @@ inline static void* malloc_s(size_t size) {
 #define crypto_sign_signature NAMESPACE(crypto_sign_signature)
 #define crypto_sign_verify NAMESPACE(crypto_sign_verify)
 
+#ifdef PQCLEAN_FALCON_TEST_INTEROP
+// workaround since crypto_sign_verify is already tokenized
+#define INTEROP_PASTER(x, y, z) x##_##y##_##z
+#define INTEROP_EVALUATOR(x, y, z) INTEROP_PASTER(x, y, z)
+#define INTEROP_NAMESPACE(y, z) INTEROP_EVALUATOR(PQCLEAN_INTEROP_NAMESPACE, y, z)
+#define crypto_sign_verify_interop INTEROP_NAMESPACE(crypto, sign_verify)
+#endif
+
 #define RETURNS_ZERO(f)                           \
     if ((f) != 0) {                               \
         puts("(f) returned non-zero returncode"); \
@@ -77,8 +101,16 @@ inline static void* malloc_s(size_t size) {
 #error "namespace not properly defined for header guard"
 #endif
 
-
 static int test_sign(void) {
+    /*
+     * In order to properly test variable-length signatures, we need to check
+     * that the implementation does not modify the provided buffer beyond the
+     * reported signature length. We do this by filling the buffer with random
+     * bytes before the call to sign and checking afterward that the tail has
+     * not been modified.
+    */
+    uint8_t sm_random_cmp[MLEN + CRYPTO_BYTES];
+
     /*
      * This is most likely going to be aligned by the compiler.
      * 16 extra bytes for canary
@@ -95,10 +127,10 @@ static int test_sign(void) {
      * data alignment. For example this would catch if an implementation
      * directly uses these pointers to load into vector registers using movdqa.
      */
-    uint8_t *pk = (uint8_t *) ((uintptr_t) pk_aligned|(uintptr_t) 1);
-    uint8_t *sk = (uint8_t *) ((uintptr_t) sk_aligned|(uintptr_t) 1);
-    uint8_t *sm = (uint8_t *) ((uintptr_t) sm_aligned|(uintptr_t) 1);
-    uint8_t *m  = (uint8_t *) ((uintptr_t) m_aligned|(uintptr_t) 1);
+    uint8_t *pk = (uint8_t *) ((uintptr_t) pk_aligned | (uintptr_t) 1);
+    uint8_t *sk = (uint8_t *) ((uintptr_t) sk_aligned | (uintptr_t) 1);
+    uint8_t *sm = (uint8_t *) ((uintptr_t) sm_aligned | (uintptr_t) 1);
+    uint8_t *m  = (uint8_t *) ((uintptr_t) m_aligned | (uintptr_t) 1);
 
     size_t mlen;
     size_t smlen;
@@ -125,12 +157,33 @@ static int test_sign(void) {
         RETURNS_ZERO(crypto_sign_keypair(pk + 8, sk + 8));
 
         randombytes(m + 8, MLEN);
+        // Fill the sm buffer with random bytes
+        randombytes(sm_random_cmp, MLEN + CRYPTO_BYTES);
+        memcpy(sm + 8, sm_random_cmp, MLEN + CRYPTO_BYTES);
+
+#ifdef PQCLEAN_USE_VALGRIND
+        /*
+         * With this buffer marked as undefined, valgrind will detect
+         * cases where the signing code depends on the value of the tail
+         * of the buffer.
+         */
+        VALGRIND_MAKE_MEM_UNDEFINED(sm + 8, MLEN + CRYPTO_BYTES);
+#endif
+
         RETURNS_ZERO(crypto_sign(sm + 8, &smlen, m + 8, MLEN, sk + 8));
+
+#ifdef PQCLEAN_USE_VALGRIND
+        // We have to mark the tail as defined before doing the memcmp.
+        VALGRIND_MAKE_MEM_DEFINED(sm + 8 + smlen, MLEN + CRYPTO_BYTES - smlen);
+#endif
+
+        // check that the tail has not been modified
+        RETURNS_ZERO(memcmp(sm + 8 + smlen, sm_random_cmp + smlen, MLEN + CRYPTO_BYTES - smlen));
 
         // By relying on m == sm we prevent having to allocate CRYPTO_BYTES
         // twice
         if ((returncode =
-                 crypto_sign_open(sm + 8, &mlen, sm + 8, smlen, pk + 8)) != 0) {
+                    crypto_sign_open(sm + 8, &mlen, sm + 8, smlen, pk + 8)) != 0) {
             fprintf(stderr, "ERROR Signature did not verify correctly!\n");
             if (returncode > 0) {
                 fprintf(stderr, "ERROR return code should be < 0 on failure");
@@ -140,9 +193,9 @@ static int test_sign(void) {
         }
         // Validate that the implementation did not touch the canary
         if (check_canary(pk) || check_canary(pk + CRYPTO_PUBLICKEYBYTES + 8) ||
-            check_canary(sk) || check_canary(sk + CRYPTO_SECRETKEYBYTES + 8) ||
-            check_canary(sm) || check_canary(sm + MLEN + CRYPTO_BYTES + 8) ||
-            check_canary(m) || check_canary(m + MLEN + 8)) {
+                check_canary(sk) || check_canary(sk + CRYPTO_SECRETKEYBYTES + 8) ||
+                check_canary(sm) || check_canary(sm + MLEN + CRYPTO_BYTES + 8) ||
+                check_canary(m) || check_canary(m + MLEN + 8)) {
             fprintf(stderr, "ERROR canary overwritten\n");
             res = 1;
             goto end;
@@ -159,6 +212,15 @@ end:
 
 static int test_sign_detached(void) {
     /*
+     * In order to properly test variable-length signatures, we need to check
+     * that the implementation does not modify the provided buffer beyond the
+     * reported signature length. We do this by filling the buffer with random
+     * bytes before the call to sign and checking afterward that the tail has
+     * not been modified.
+    */
+    uint8_t sig_random_cmp[CRYPTO_BYTES];
+
+    /*
      * This is most likely going to be aligned by the compiler.
      * 16 extra bytes for canary
      * 1 extra byte for unalignment
@@ -174,10 +236,10 @@ static int test_sign_detached(void) {
      * data alignment. For example this would catch if an implementation
      * directly uses these pointers to load into vector registers using movdqa.
      */
-    uint8_t *pk = (uint8_t *) ((uintptr_t) pk_aligned|(uintptr_t) 1);
-    uint8_t *sk = (uint8_t *) ((uintptr_t) sk_aligned|(uintptr_t) 1);
-    uint8_t *sig = (uint8_t *) ((uintptr_t) sig_aligned|(uintptr_t) 1);
-    uint8_t *m  = (uint8_t *) ((uintptr_t) m_aligned|(uintptr_t) 1);
+    uint8_t *pk = (uint8_t *) ((uintptr_t) pk_aligned | (uintptr_t) 1);
+    uint8_t *sk = (uint8_t *) ((uintptr_t) sk_aligned | (uintptr_t) 1);
+    uint8_t *sig = (uint8_t *) ((uintptr_t) sig_aligned | (uintptr_t) 1);
+    uint8_t *m  = (uint8_t *) ((uintptr_t) m_aligned | (uintptr_t) 1);
 
     size_t siglen;
     int returncode;
@@ -203,10 +265,32 @@ static int test_sign_detached(void) {
         RETURNS_ZERO(crypto_sign_keypair(pk + 8, sk + 8));
 
         randombytes(m + 8, MLEN);
+
+        // Fill the sig buffer with random bytes
+        randombytes(sig_random_cmp, CRYPTO_BYTES);
+        memcpy(sig + 8, sig_random_cmp, CRYPTO_BYTES);
+
+#ifdef PQCLEAN_USE_VALGRIND
+        /*
+         * With this buffer marked as undefined, valgrind will detect
+         * cases where the signing code depends on the value of the tail
+         * of the buffer.
+         */
+        VALGRIND_MAKE_MEM_UNDEFINED(sig + 8, CRYPTO_BYTES);
+#endif
+
         RETURNS_ZERO(crypto_sign_signature(sig + 8, &siglen, m + 8, MLEN, sk + 8));
 
+#ifdef PQCLEAN_USE_VALGRIND
+        // We have to mark the tail as defined before doing the memcmp.
+        VALGRIND_MAKE_MEM_DEFINED(sig + 8 + siglen, CRYPTO_BYTES - siglen);
+#endif
+
+        // check that the tail has not been modified
+        RETURNS_ZERO(memcmp(sig + 8 + siglen, sig_random_cmp + siglen, CRYPTO_BYTES - siglen));
+
         if ((returncode =
-                crypto_sign_verify(sig + 8, siglen, m + 8, MLEN, pk + 8)) != 0) {
+                    crypto_sign_verify(sig + 8, siglen, m + 8, MLEN, pk + 8)) != 0) {
             fprintf(stderr, "ERROR Signature did not verify correctly!\n");
             if (returncode > 0) {
                 fprintf(stderr, "ERROR return code should be < 0 on failure");
@@ -214,11 +298,25 @@ static int test_sign_detached(void) {
             res = 1;
             goto end;
         }
+
+#ifdef PQCLEAN_FALCON_TEST_INTEROP
+        // test verification with the "-padded" or non "-padded" code as appropriate
+        if ((returncode =
+                    crypto_sign_verify_interop(sig + 8, siglen, m + 8, MLEN, pk + 8)) != 0) {
+            fprintf(stderr, "ERROR Signature did not verify correctly on interop check!\n");
+            if (returncode > 0) {
+                fprintf(stderr, "ERROR return code should be < 0 on failure");
+            }
+            res = 1;
+            goto end;
+        }
+#endif
+
         // Validate that the implementation did not touch the canary
         if (check_canary(pk) || check_canary(pk + CRYPTO_PUBLICKEYBYTES + 8) ||
-            check_canary(sk) || check_canary(sk + CRYPTO_SECRETKEYBYTES + 8) ||
-            check_canary(sig) || check_canary(sig + CRYPTO_BYTES + 8) ||
-            check_canary(m) || check_canary(m + MLEN + 8)) {
+                check_canary(sk) || check_canary(sk + CRYPTO_SECRETKEYBYTES + 8) ||
+                check_canary(sig) || check_canary(sig + CRYPTO_BYTES + 8) ||
+                check_canary(m) || check_canary(m + MLEN + 8)) {
             fprintf(stderr, "ERROR canary overwritten\n");
             res = 1;
             goto end;

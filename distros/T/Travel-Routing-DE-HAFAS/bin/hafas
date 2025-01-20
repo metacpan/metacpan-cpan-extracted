@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.014;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use utf8;
 use DateTime;
@@ -72,6 +72,9 @@ GetOptions(
 if ($list_services) {
 	printf( "%-40s %-14s %s\n\n", 'operator', 'abbr. (-s)', 'languages (-l)' );
 	for my $service ( Travel::Routing::DE::HAFAS::get_services() ) {
+		if ( $service->{shortname} eq 'DB' ) {
+			next;
+		}
 		printf(
 			"%-40s %-14s %s\n",
 			@{$service}{qw(name shortname)},
@@ -80,6 +83,8 @@ if ($list_services) {
 	}
 	exit 0;
 }
+
+$service //= 'VRN';
 
 parse_mot_options();
 
@@ -164,7 +169,7 @@ sub parse_mot_options {
 
 	for my $type ( split( qr{,}, $types ) ) {
 		if ( $type eq 'help' or $type eq 'list' or $type eq q{?} ) {
-			$service //= 'DB';
+			$service //= 'VRN';
 			my $desc = Travel::Routing::DE::HAFAS::get_service($service);
 			if ($desc) {
 				my @mots = @{ $desc->{productbits} };
@@ -489,7 +494,7 @@ __END__
 
 =head1 NAME
 
-hafas - Interface to HAFAS (e.g. Deutsche Bahn) itinerary services
+hafas - Interface to HAFAS-based itinerary services
 
 =head1 SYNOPSIS
 
@@ -498,13 +503,12 @@ B<hafas> [B<-d> I<date>] [B<-t> I<time>] [B<-m> I<motlist>]
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 DESCRIPTION
 
 B<hafas> is a command line client for HAFAS-based public transit itinerary
-services, e.g. the one operated by Deutsche Bahn. It requests connections
-between two stops and prints the results.
+services. It requests connections between two stops and prints the results.
 
 =head1 OPTIONS
 
@@ -563,8 +567,8 @@ The I<mot> types depend on the used service. Use C<< -m help >> to list them.
 
 =item B<-s>, B<--service> I<service>
 
-Use the API provided by I<service> for routing; defaults to DB (Deutsche Bahn).
-See B<--list> for a list of known services.
+Use the API provided by I<service> for routing; defaults to VRN
+(Verkehrsverbund Rhein-Neckar).  See B<--list> for a list of known services.
 
 =item B<-t>, B<--time>, B<--depart> I<hh>:I<mm>
 
@@ -618,7 +622,7 @@ None.
 
 =head1 BUGS AND LIMITATIONS
 
-The non-default services (anything other than DB) are not well-tested.
+Some services are not well-tested.
 
 =head1 AUTHOR
 

@@ -65,6 +65,7 @@ t/inits.t
 t/lngamma_bug.t
 t/LongDouble.t
 t/mpfrtoa.t
+t/mpfrtoa_precisions.t
 t/MPFR_RND.t
 t/nan_cmp.t
 t/native_float128.t
@@ -125,6 +126,7 @@ t/test4.t
 t/tls.t
 t/tls_flags.t
 t/trig.t
+t/trigamma.t
 t/TRmpfr_out_str.t
 t/underflow.t
 t/use64bitint.t

@@ -20,9 +20,9 @@ no_index:
     - inc
 requires:
   ExtUtils::MakeMaker: '7.12'
-  perl: '5.012'
+  perl: '5.016'
 resources:
-  bugtracker: https://github.com/scottchiefbaker/perl-Random-Simple/issues
-  repository: https://github.com/scottchiefbaker/perl-Random-Simple.git
-version: '0.01'
+  bugtracker: https://github.com/scottchiefbaker/perl-Crypt-Komihash/issues
+  repository: https://github.com/scottchiefbaker/perl-Crypt-Komihash.git
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -10,18 +10,30 @@
   This module needs Math::MPFR, which in turn requires the GMP and MPFR
   C libraries.
 
-  The GMP library is available from  : https://gmplib.org
-  The MPFR library is available from : https://www.mpfr.org
+  The GMP library is available from  : L<https://gmplib.org>
+  The MPFR library is available from : L<https://www.mpfr.org>
 
   See the introductory explanation of "DoubleDouble" arithmetic in the
   "Double-double arithmetic" section of:
-  https://en.wikipedia.org/wiki/Quadruple-precision_floating-point_format
+  L<https://en.wikipedia.org/wiki/Quadruple-precision_floating-point_format>
 
 =head1 DESCRIPTION
 
   Perform DoubleDouble arithmetic operations on all architectures and
   perl configurations.
   See ARITMETIC IMPLEMENTATION section below.
+
+  As of version 1.01, the internals of this module have changed, and many
+  of the functions have been rewritten.
+  However, the user interface remains unchanged.
+  I'm hoping that, over time, these changes will help me to reduce the
+  insaneness of the path that dd_repro() takes.
+  In earlier versions, the Math::FakeDD objects carried with them only
+  the more significant double ($obj->{msd}) and the less significant
+  double ($obj->{lsd}).
+  They now also hold the 2098 bit value ($obj->{mpfr}), in the form of
+  a Math::MPFR object which holds an exact 2098-bit representation of
+  the value stored by the pair of doubles.
 
 =head1 SYNOPSIS
 
@@ -45,7 +57,7 @@
   you should familiarise yourself with the difference if it is not
   already clear to you.)
 
-  printx($obj); # Same as for print() execept that values are in hex.
+  printx($obj); # Same as for print() except that values are in hex.
   print sprintx($obj);  # Same as 'printx($obj)'.
   print dd_repro($obj); # $obj in scientific notation (in decimal).
 
@@ -74,6 +86,8 @@
    or zero if no argument is provided.
    $arg must be one of PV (string), IV (integer), UV (unsigned integer),
    or NV (perl floating point type).
+   A warning that Rmpfr_set_str contains non-numeric characters will be
+   issued when assigning a PV that contains non-numeric characters.
 
   dd_assign($obj, $arg);
 
@@ -196,8 +210,8 @@
 
    If (respectively) $arg1 == $arg2, $arg1 != $arg2,
    $arg1 > $arg2, $arg1 >= $arg2, $arg1 < $arg2, $arg1 <= $arg2,
-   then $integer is set to 1.
-   Else $integer is set to 0.
+   then $iv is set to 1.
+   Else $iv is set to 0.
 
   $iv = dd_streq($obj, $arg);
    We need this function only because Test::More can pull
@@ -241,7 +255,7 @@
    this $str is assigned to a new Math::FakeDD object, then the
    new Math::FakeDD object will be identical to (ie a reproduction
    of) the Math::FakeDD object from which $str was derived.
-   Also set $Math::FakeDD::RETRO_PREC to the bit-precision value
+   Also set $Math::FakeDD::REPRO_PREC to the bit-precision value
    that was used in determining $str.
    If $Math::FakeDD::REPRO_PREC begins with ">", then the value that
    dd_repro() returned was altered slightly (away from zero) from
@@ -256,35 +270,63 @@
     undef: perl's nvtype is DoubleDouble, so dd_repro() simply used
            Math::MPFR::nvtoa().
 
-  $iv = dd_repro_test(dd_repro($obj), $obj, $debug); # 3rd arg is optional
+  $iv = dd_repro_test(dd_repro($obj), $obj [, $opt1[, $opt2]] );
 
-   Check that the representation of dd_repro($obj) returned by
-   dd_repro() is accurate, and that it uses the fewest significant
-   decimal mantissa digits possible.
-   Some debugging output is provided if the third (optional) arg
-   is true.
+   Test that dd_repro($obj) returns the correct string. Be careful
+   that the string provided as 1st arg is as returned by dd_repro($obj).
+
+   $opt1 and $opt2 are optional, and will have no effect if they don't
+   match either /debug/i or /examine/i.
+
+   If $obj is either zero, or an inifinity or a NaN, then we check
+   that the string matches the expected form. Upon success, return 15;
+   upon failure, 0 is returned. No other checks are done though, if
+  /examine/i was matched, then $Math::FakeDD::examine{repro} will
+   be set to the string that was tested and the other
+   %Math::FakeDD::examine keys will be set to the empty string.
+
+   For non zero/inf/nan objects, we check that the representation
+   returned by dd_repro($obj) is accurate, and that it uses the fewest
+   significant decimal mantissa digits possible.
+   Some debugging output is provided if an optional arg matches /debug/i.
+   If an arg instead matches /examine/i then the %Math::FakeDD::examine
+   keys will be populated with the values that this function has used
+   for its testing (as indicated below) .
+
    The function assigns its first arg, dd_repro($obj), to a
    string - let's call it $str.
 
-   4 tests are conducted:
+   The following 2 tests are conducted:
 
-   1) that Math::FakeDD->new($str) == $obj.
-      $iv & 1 will be true if and only if this test passes.
+   1) check that Math::FakeDD->new($str) == $obj.
+      Set $iv to 1 if and only if this test passes.
+      $Math::FakeDD::examine{repro} will be set to $str if the third
+      arg matches /examine/i.
+      $str will be displayed if the third arg matches /debug/i.
 
-   2) that if we were to round $str *down* to 1 less significant decimal
-      digit then Math::FakeDD->new($str) < $obj.
-      $iv & 2 will be true if and only if this test passes.
+   2) check that there are no trailing zeroes in the mantissa part of $str.
+      Set $iv += 8 if and only if this test passes.
 
-   3) that if we were round $str *up* to 1 less significant decimal
-      digit then Math::FakeDD->new($str) > $obj.
-      $iv & 4 will be true if and only if this test passes.
+   If the mantissa part of $str consists of only 1 digit, then $iv is
+   incremented by 6, and returned. The following two tests (3 and 4)
+   are omitted because they are irrelevant:
 
-   4) that there are no errant trailing zeroes in the mantissa portion
-      of $str.
-      $iv & 8 will be true if and only if this test passes.
+   3) chop($str) and check that Math::FakeDD->new($str) < $obj.
+      Set $iv += 2 if and only if this test passes.
+      $Math::FakeDD::examine{chop} will be set to $str if the 3rd
+      or 4th arg matches /examine/i.
+      $str will be displayed if the 3rd or 4th arg matches /debug/i.
 
-   If all four tests pass (in which case the returned $iv == 15) then
-   we know that dd_repro($obj) has functioned correctly and as intended.
+   4) increment (the chopped)  $str; eg $str would change from '1992'
+      to 1993, or from '1999' to '2000'.
+      Then test that Math::FakeDD->new($str) > $obj.
+      Set $iv += 4 if and only if this test passes.
+      $Math::FakeDD::examine{inc} will be set to $str if the 3rd
+      or 4th arg matches /examine/i.
+      $str will be displayed if the 3rd or 4th arg matches /debug/i.
+
+   If $iv == 15 then we know that dd_repro($obj) has functioned
+   correctly and as intended.
    Else, dd_repro() has not functioned correctly and we can determine
    which test(s) failed by examining the 4 lowest bits of $iv.
 
@@ -296,13 +338,16 @@
    less significant double. Both doubles  will be shown in as few
    digits as possible, while not losing any information.
    The overloading of interpolation uses this function.
+   The returned string is NOT suitable as an argument to new(), or
+   to dd_assign(), or to mpfr2098().
 
-  $nv = dd_numify($obj); # Mainly for '0+' overloading.
+  $mpfr = dd_numify($obj); # Mainly for '0+' overloading.
 
-   Beginning in version 0.08, this function now converts $obj to a
-   2098-bit precision Math::MPFR object.
-   (Previously it converted $obj to an NV, as accurately as the
-   precision of the NV allowed.)
+   Beginning in version 1.01, this function returns $_[0]->{mpfr},
+   which is identical to what was returned in the previous version
+   (0.08) of Math::FakeDD .
+   Prior to 0.08 it returned an NV that held the value of $obj
+   (as accurately as the precision of the NV allowed.)
 
   printx($obj);
 
@@ -314,12 +359,30 @@
    Same as dd_stringify($obj), except that the 2 doubles are
    presented in hex ("%a") format, instead of decimal format.
 
+   NOTE: If perl's nvtype is the 80-bit extended precision
+         long double then the "%a" formatting will be different
+         (albeit numerically equivalent) to that which is
+         presented on perls that have a different nvtype; eg:
+         $Math::FakeDD::DD_MAX will be stringified to
+           [0xf.ffffffffffff8p+1020 0xf.ffffffffffff8p+966]
+         instead of
+           [0x1.fffffffffffffp+1023 0x1.fffffffffffffp+969]
+
   $str = unpackx($obj);
 
    Same as dd_stringify($obj), except that the 2 doubles have
    each been unpacked into hex format by doing:
 
      unpack "H*", pack "d>", $double;
+
+  $str = dd_dump($obj);
+   Returns a string containing the following information:
+    1) a decimal representation of $obj,same as print($obj),
+       except that the values are shown in "%.17g" format;
+    2) a hex representation of $obj, same as printx($obj);
+    3) a base 2 representation of $obj->{mpfr}, same as
+       Math::MPFR::Rmpfr_dump($obj->{mpfr}), except that
+       trailing zeroes in the mantissa have been removed.
 
 =head1 OPERATOR OVERLOADING
 

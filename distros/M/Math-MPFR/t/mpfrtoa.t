@@ -35,8 +35,8 @@ for(@in) {
   my $s2 = nvtoa(atonv($_));
 
   cmp_ok($s1, 'eq', $s2, "mpfrtoa() and nvtoa() agree for $_");
-  ok(nvtoa_test($s1, $rop) == 15, "$_");
-  ok(nvtoa_test($s2, $nv ) == 15, "$_");
+  ok(dragon_test( $rop) == 15, "$_ passes dragontest (MPFR)"); # $s1
+  ok(dragon_test( $nv ) == 15, "$_ passes dragon test (NV)");   # $s2
 }
 
 ##############################################################################
@@ -77,8 +77,8 @@ for(1 .. 100) {
   my $s2 = nvtoa($nv);
 
   cmp_ok($s1, 'eq', $s2, "mpfrtoa() and nvtoa() agree for $s");
-  ok(nvtoa_test($s1, $f ) == 15, "$s");
-  ok(nvtoa_test($s2, $nv) == 15, "$s");
+  ok(dragon_test( $f ) == 15, "$s passes dragon test (MPFR)"); # $s1
+  ok(dragon_test( $nv) == 15, "$s passes dragon test (NV)");   # $s2
 
   if($have_ryu) {
     my $s3 = Math::Ryu::nv2s($nv);
@@ -115,7 +115,7 @@ for my $prec( 20000, 2000, 200, 96, 21, 5 ) {
     my $f = Math::MPFR->new( $s );
     my $dec = mpfrtoa( $f );
 
-    ok(nvtoa_test($dec, $f) == 15, "$s");
+    ok(dragon_test($f) == 15, "$s passes dragon test (NV)");
   }
 }
 

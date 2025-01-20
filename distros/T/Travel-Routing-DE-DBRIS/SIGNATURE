@@ -1,0 +1,38 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.89.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 e5223a4dddb67ee82d434c68c998caa799f5b89bd382c4793807dd2c53606f09 Build.PL
+SHA256 3743b948b910742d843e73bc7aaca26fcf7ead221b2a230d844efbfd590f9077 Changelog
+SHA256 2a9d3e8367371ab3330c4ffaac0b7f6dbc00af7b545629de10c9807ddd1748f8 MANIFEST
+SHA256 046429b717b53920a99edfae0e20d0bd511d74e240d053a72ce6142075b352e1 META.json
+SHA256 aed7d59105668b96402b24639fd6d209503c7592632073ddd4c42a6d31c71316 META.yml
+SHA256 0e30a734e6a0e26560ab09f5d9c60d519a6e1fee405aa61df43c8e33a80261f0 README.md
+SHA256 fdd9e8ab390f3366c8e7b63217988f2b8ec8d21132095c130a2119cda03a3e19 bin/dbris
+SHA256 1dbbe4d5b82a24a109f309d2bcc68bd0206fd614a2f3cfd7bd458892b3f6363c lib/Travel/Routing/DE/DBRIS.pm
+SHA256 7a62a80c3b20b31f1de0b9b045a5ccc8bde375a216ff8ef4ed526729b3b71bf3 lib/Travel/Routing/DE/DBRIS/Connection.pm
+SHA256 5a9aa2255f0dd0ada938e941a3d1835177576e2b738ad72ecef8a46f881728cf lib/Travel/Routing/DE/DBRIS/Connection/Segment.pm
+SHA256 b7deb1cbefe309472a52b1644db0a6be379e8ab660b12ee0a51c428a7a6d5773 scripts/makedeb-docker
+SHA256 56545ce63b756803fe72fb4994836bbc1157f0600645f3935a70748028f5738f scripts/makedeb-docker-helper
+SHA256 588a60b456403a9f2a901b11646918be3f2fe413d4b1b792dccd18a80bb264e9 xt/00-compile-pm.t
+SHA256 32c2f94b5292bcf6ef1994151a5d84b4581c5cf920418841c551d6f5489621cd xt/01-compile-pl.t
+SHA256 574e3508c4f991d21b61f06a070d71f04f4403b094f55423150cb5dbb18194a9 xt/10-pod-coverage.t
+-----BEGIN PGP SIGNATURE-----
+
+iHQEARYDAB0WIQRk/m7AVVYPnvE6MEQZ5uUk67F3ugUCZ40AwgAKCRAZ5uUk67F3
+umsIAPMES0cPnaNIxQAh193weLyrdyDnBG2tq29xepdDfYevAP9HX35Ryt7tU80Q
+DEQNht3b7fIQlrz4tqHZnPkoyzc+DQ==
+=lplH
+-----END PGP SIGNATURE-----

@@ -35,6 +35,8 @@
             "Carp" : "0",
             "DateTime" : "0",
             "DateTime::Format::Flexible" : "0",
+            "ExtUtils::MakeMaker" : "6.64",
+            "Scalar::Util" : "0",
             "perl" : "5.006002"
          }
       },
@@ -68,6 +70,6 @@
          "web" : "https://github.com/nigelhorne/DateTime-Format-Text"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

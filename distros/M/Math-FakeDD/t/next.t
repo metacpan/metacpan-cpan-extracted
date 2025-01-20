@@ -31,17 +31,18 @@ cmp_ok(is_subnormal(2**-1022 + 2**-1023), '==', 0, "is_subnormal(2**-1022 + 2**-
 cmp_ok(is_subnormal(2**-1022 - 2**-1074), '==', 1, "is_subnormal(2**-1022 - 2**-1074) returns 1");
 
 my $nu = dd_nextup($nan);
-cmp_ok(dd_is_nan($nu), '!=', 0, "nextup from NaN is NaN");
+cmp_ok(dd_is_nan($nu), '==', 1, "nextup from NaN is NaN");
 
 my $nd= dd_nextdown($nan);
-cmp_ok(dd_is_nan($nd), '!=', 0, "nextdown from NaN is NaN");
+cmp_ok(dd_is_nan($nd), '==', 1, "nextdown from NaN is NaN");
 
 $nu = dd_nextup($pinf);
 cmp_ok($nu, '>', 0, "nextup from +Inf is greater than 0");
-cmp_ok(dd_is_inf($nu), '!=', 0, "nextup from +Inf is Inf");
+cmp_ok(dd_is_inf($nu), '==', 1, "nextup from +Inf is Inf");
 
 $nd = dd_nextdown($pinf);
 cmp_ok($nd, '==', $Math::FakeDD::DD_MAX, "nextdown from +Inf is " . $Math::FakeDD::DD_MAX);
+cmp_ok(dd_is_inf(dd_nextup($nd)), '==', 1, 'nextup from $Math::FakeDD::DD_MAX is inf');
 
 $nu = dd_nextup($ninf);
 cmp_ok($nu, '==', -$Math::FakeDD::DD_MAX, "nextup from -Inf is " . -$Math::FakeDD::DD_MAX);
@@ -49,6 +50,12 @@ cmp_ok($nu, '==', -$Math::FakeDD::DD_MAX, "nextup from -Inf is " . -$Math::FakeD
 $nd = dd_nextdown($ninf);
 cmp_ok($nd, '<', 0, "nextdown from -Inf is less than 0");
 cmp_ok(dd_is_inf($nd), '!=', 0, "nextdown from -Inf is Inf");
+
+if(4 > Math::MPFR::MPFR_VERSION_MAJOR ) {
+  warn "Skipping tests that rely on mpfr library being at version 4 or later\n";
+  done_testing();
+  exit 0;
+}
 
 $nu = dd_nextup($pzero);
 cmp_ok($nu, '==', Math::FakeDD::DBL_DENORM_MIN, "nextup from +0 is $dd_denorm_min");
@@ -161,10 +168,20 @@ for(1 .. 100) {
   my $second = 2 ** $p2;
 
   $dd = Math::FakeDD->new($first) + $second;
+
+  if(dd_is_inf($dd)) {
+     # AFAICT, this will happen only when int(rand(1024)) returns
+     # 1023 && int(rand(52) returns 0. But this has happened:
+     # http://www.cpantesters.org/cpan/report/797cfc22-6cfd-1014-a069-bac4e3396204
+
+     cmp_ok(dd_nextup($dd), '==', dd_inf(), "nextup(inf) is inf");
+     next; # remaining tests don't cater for Inf.
+  }
+
   $nu = dd_nextup($dd);
   cmp_ok($nu, '==', Math::FakeDD->new($first) + ($second) + Math::FakeDD::DBL_DENORM_MIN,
                    "dd_nextup(2**$p1) + (2**$p2)) == (2**$p1) + (2**$p2) + (2 ** -1074)");
-  cmp_ok($nu - $dd, '==', Math::FakeDD->new(2 ** ulp_exponent($dd)), "$nu - $dd ok");
+  cmp_ok($nu - $dd, '==', Math::FakeDD->new(2 ** ulp_exponent($dd)), "$nu - $dd ok");  ## line 167
   $nd = dd_nextdown($dd);
   cmp_ok($nd, '==', Math::FakeDD->new($first) + ($second) - Math::FakeDD::DBL_DENORM_MIN,
                    "dd_nextdown(2**$p1) + (2**$p2)) == (2**$p1) + (2**$p2) -(2 ** -1074)");

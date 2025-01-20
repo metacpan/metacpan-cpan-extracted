@@ -1,5 +1,12 @@
 Revision history for Algorithm-Graphs-Reachable-Tiny
 
+
+0.10  2025/01/19
+    - Corrected Changelog.
+
+0.09  2025/01/19
+    - Corrected POD.
+
 0.08  2024/10/02
     - Reformatted changelog.
     - Makefile.PL: License corrected to 'perl', added META_MERGE and all dependencies.

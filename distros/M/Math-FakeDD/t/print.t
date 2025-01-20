@@ -56,6 +56,8 @@ for(1 .. 1000) {
   my $str = $sign . $s0 . $e . $pow;
 
   my $n = Math::FakeDD->new($str);
+  cmp_ok(dd_repro_test(dd_repro($n), $n), '==', 15, "dd_repro_test passes for $str");
+
   my $hex = dd_hex($n);
 
   cmp_ok(dd_hex(Math::FakeDD->new($hex)), '==', $n, "dd_hex() ok with '$str'");

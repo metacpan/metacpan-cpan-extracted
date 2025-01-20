@@ -1,5 +1,5 @@
 {
-   "abstract" : "Compute rechable nodes in a graph.",
+   "abstract" : "Calculate the reachable nodes in a graph.",
    "author" : [
       "Abdul al Hazred <451@gmx.eu>"
    ],
@@ -52,6 +52,6 @@
          "web" : "https://github.com/AAHAZRED/perl-Algorithm-Graphs-Reachable-Tiny"
       }
    },
-   "version" : "0.08",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -10,7 +10,7 @@ use warnings;
 use Math::FakeDD qw(:all);
 use Test::More;
 
-cmp_ok($Math::FakeDD::VERSION, '==', 0.08, "Version number is correct");
+cmp_ok($Math::FakeDD::VERSION, '==', 1.01, "Version number is correct");
 
 my $obj = Math::FakeDD->new();
 
@@ -94,7 +94,6 @@ cmp_ok(dd_cmp($fudd2, $fudd1), '>', 0, "(2 ** 100) + (2 **-100) > (2 ** 100)");
 
 cmp_ok(dd_cmp($fudd1, -$fudd2), '>', 0, "(2 ** 100) < -(2 ** 100) - (2 **-100)");
 cmp_ok(dd_cmp($fudd1, abs(-$fudd2)), '<', 0, "(2 ** 100) < abs(-(2 ** 100) + -(2 **-100))");
-
 cmp_ok($fudd1, '==', int($fudd2), "(2 ** 100) < int((2 ** 100) + (2 **-100))");
 
 my %oload = Math::FakeDD::oload();

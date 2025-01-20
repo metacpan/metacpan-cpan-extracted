@@ -1,4 +1,4 @@
-package Daje::Workflow::GeneratSQL::Script::Fields;
+package Daje::Workflow::GenerateSQL::Script::Fields;
 use Mojo::Base 'Daje::Workflow::GenerateSQL::Base::Common', -base, -signatures;
 
 use Syntax::Keyword::Match qw(match);
@@ -78,6 +78,7 @@ sub get_defaults($self, $datatype) {
 }
 
 1;
+
 
 
 

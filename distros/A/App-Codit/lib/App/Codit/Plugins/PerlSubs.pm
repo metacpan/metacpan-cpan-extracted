@@ -39,7 +39,7 @@ sub new {
 	my $self = $class->SUPER::new(@_);
 	return undef unless defined $self;
 	
-	my $page = $self->ToolNavigPageAdd('PerlSubs', 'code-context', undef, 'Find your Perl subs');
+	my $page = $self->ToolLeftPageAdd('PerlSubs', 'code-context', undef, 'Find your Perl subs');
 
 	$self->{CURRENT} = [];
 	$self->{SORTON} = 'Line';
@@ -211,7 +211,7 @@ sub SortOrder {
 
 sub Unload {
 	my $self = shift;
-	$self->ToolNavigPageRemove('PerlSubs');
+	$self->ToolLeftPageRemove('PerlSubs');
 	return $self->SUPER::Unload
 }
 

@@ -483,7 +483,7 @@ void Rmpfr_init_set_str(pTHX_ SV * q, SV * base, SV * round) {
   ret = mpfr_init_set_str(*mpfr_t_obj, SvPV_nolen(q), (int)SvIV(base), (mpfr_rnd_t)SvUV(round));
 #endif
 
-  NON_NUMERIC_CHAR_CHECK, "Rmpfr_init_set_str");}
+  NON_NUMERIC_CHAR_CHECK(q), "Rmpfr_init_set_str");}
   RETURN_STACK_2  /*defined in math_mpfr_include.h */
 }
 
@@ -637,7 +637,7 @@ void Rmpfr_init_set_str_nobless(pTHX_ SV * q, SV * base, SV * round) {
   OBJ_READONLY_ON /*defined in math_mpfr_include.h */
   ret = mpfr_init_set_str(*mpfr_t_obj, SvPV_nolen(q), (int)SvIV(base), (mpfr_rnd_t)SvUV(round));
 
-  NON_NUMERIC_CHAR_CHECK, "Rmpfr_init_set_str_nobless");}
+  NON_NUMERIC_CHAR_CHECK(q), "Rmpfr_init_set_str_nobless");}
   RETURN_STACK_2  /*defined in math_mpfr_include.h */
 }
 
@@ -949,7 +949,7 @@ int Rmpfr_set_str(pTHX_ mpfr_t * p, SV * num, SV * base, SV * round) {
   ret = mpfr_set_str(*p, SvPV_nolen(num), (int)SvIV(base), (mpfr_rnd_t)SvUV(round));
 #endif
 
-  NON_NUMERIC_CHAR_CHECK, "Rmpfr_set_str");}
+  NON_NUMERIC_CHAR_CHECK(num), "Rmpfr_set_str");}
 
   return ret;
 }
@@ -3269,7 +3269,7 @@ SV * overload_mul(pTHX_ SV * a, SV * b, SV * third) {
     ret = mpfr_set_str(*mpfr_t_obj, SvPV_nolen(b), 0, __gmpfr_default_rounding_mode);
 #endif
 
-    NON_NUMERIC_CHAR_CHECK, "overload_mul subroutine");}
+    NON_NUMERIC_CHAR_CHECK(b), "overload_mul subroutine");}
 
     mpfr_mul(*mpfr_t_obj, *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), *mpfr_t_obj, __gmpfr_default_rounding_mode);
     return obj_ref;
@@ -3393,7 +3393,7 @@ SV * overload_add(pTHX_ SV * a, SV * b, SV * third) {
     ret = mpfr_set_str(*mpfr_t_obj, SvPV_nolen(b), 0, __gmpfr_default_rounding_mode);
 #endif
 
-    NON_NUMERIC_CHAR_CHECK, "overload_add subroutine");}
+    NON_NUMERIC_CHAR_CHECK(b), "overload_add subroutine");}
 
     mpfr_add(*mpfr_t_obj, *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), *mpfr_t_obj, __gmpfr_default_rounding_mode);
     return obj_ref;
@@ -3516,7 +3516,7 @@ SV * overload_sub(pTHX_ SV * a, SV * b, SV * third) {
 #else
     ret = mpfr_set_str(*mpfr_t_obj, SvPV_nolen(b), 0, __gmpfr_default_rounding_mode);
 #endif
-    NON_NUMERIC_CHAR_CHECK, "overload_sub subroutine");}
+    NON_NUMERIC_CHAR_CHECK(b), "overload_sub subroutine");}
 
     if(SWITCH_ARGS) mpfr_sub(*mpfr_t_obj, *mpfr_t_obj, *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), __gmpfr_default_rounding_mode);
     else mpfr_sub(*mpfr_t_obj, *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), *mpfr_t_obj, __gmpfr_default_rounding_mode);
@@ -3649,7 +3649,7 @@ SV * overload_div(pTHX_ SV * a, SV * b, SV * third) {
 #else
     ret = mpfr_set_str(*mpfr_t_obj, SvPV_nolen(b), 0, __gmpfr_default_rounding_mode);
 #endif
-    NON_NUMERIC_CHAR_CHECK, "overload_div subroutine");}
+    NON_NUMERIC_CHAR_CHECK(b), "overload_div subroutine");}
 
     if(SWITCH_ARGS) mpfr_div(*mpfr_t_obj, *mpfr_t_obj, *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), __gmpfr_default_rounding_mode);
     else mpfr_div(*mpfr_t_obj, *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), *mpfr_t_obj, __gmpfr_default_rounding_mode);
@@ -3800,7 +3800,7 @@ SV * overload_gt(pTHX_ mpfr_t * a, SV * b, SV * third) {
     else {
       ret = mpfr_init_set_str(t, (char *)SvPV_nolen(b), 0, __gmpfr_default_rounding_mode);
 
-      NON_NUMERIC_CHAR_CHECK, "overload_gt subroutine");}
+      NON_NUMERIC_CHAR_CHECK(b), "overload_gt subroutine");}
 
       if(mpfr_nan_p(t)) {
         mpfr_clear(t);
@@ -3811,7 +3811,7 @@ SV * overload_gt(pTHX_ mpfr_t * a, SV * b, SV * third) {
 #else
     ret = mpfr_init_set_str(t, SvPV_nolen(b), 0, __gmpfr_default_rounding_mode);
 
-    NON_NUMERIC_CHAR_CHECK, "overload_gt subroutine");}
+    NON_NUMERIC_CHAR_CHECK(b), "overload_gt subroutine");}
 
     if(mpfr_nan_p(t)) {
       mpfr_clear(t);
@@ -3903,7 +3903,7 @@ SV * overload_gte(pTHX_ mpfr_t * a, SV * b, SV * third) {
     else {
       ret = mpfr_init_set_str(t, (char *)SvPV_nolen(b), 0, __gmpfr_default_rounding_mode);
 
-      NON_NUMERIC_CHAR_CHECK, "overload_gte subroutine");}
+      NON_NUMERIC_CHAR_CHECK(b), "overload_gte subroutine");}
 
       if(mpfr_nan_p(t)) {
         mpfr_clear(t);
@@ -3914,7 +3914,7 @@ SV * overload_gte(pTHX_ mpfr_t * a, SV * b, SV * third) {
 #else
     ret = mpfr_init_set_str(t, SvPV_nolen(b), 0, __gmpfr_default_rounding_mode);
 
-    NON_NUMERIC_CHAR_CHECK, "overload_gte subroutine");}
+    NON_NUMERIC_CHAR_CHECK(b), "overload_gte subroutine");}
 
     if(mpfr_nan_p(t)) {
       mpfr_clear(t);
@@ -4008,7 +4008,7 @@ SV * overload_lt(pTHX_ mpfr_t * a, SV * b, SV * third) {
     else {
       ret = mpfr_init_set_str(t, (char *)SvPV_nolen(b), 0, __gmpfr_default_rounding_mode);
 
-      NON_NUMERIC_CHAR_CHECK, "overload_lt subroutine");}
+      NON_NUMERIC_CHAR_CHECK(b), "overload_lt subroutine");}
 
       if(mpfr_nan_p(t)) {
         mpfr_clear(t);
@@ -4019,7 +4019,7 @@ SV * overload_lt(pTHX_ mpfr_t * a, SV * b, SV * third) {
 #else
     ret = mpfr_init_set_str(t, SvPV_nolen(b), 0, __gmpfr_default_rounding_mode);
 
-    NON_NUMERIC_CHAR_CHECK, "overload_lt subroutine");}
+    NON_NUMERIC_CHAR_CHECK(b), "overload_lt subroutine");}
 
     if(mpfr_nan_p(t)) {
       mpfr_clear(t);
@@ -4113,7 +4113,7 @@ SV * overload_lte(pTHX_ mpfr_t * a, SV * b, SV * third) {
     }
     else {
       ret = mpfr_init_set_str(t, (char *)SvPV_nolen(b), 0, __gmpfr_default_rounding_mode);
-       NON_NUMERIC_CHAR_CHECK, "overload_lte subroutine");}
+       NON_NUMERIC_CHAR_CHECK(b), "overload_lte subroutine");}
        if(mpfr_nan_p(t)) {
         mpfr_clear(t);
         mpfr_set_erangeflag();
@@ -4123,7 +4123,7 @@ SV * overload_lte(pTHX_ mpfr_t * a, SV * b, SV * third) {
 #else
     ret = mpfr_init_set_str(t, SvPV_nolen(b), 0, __gmpfr_default_rounding_mode);
 
-    NON_NUMERIC_CHAR_CHECK, "overload_lte subroutine");}
+    NON_NUMERIC_CHAR_CHECK(b), "overload_lte subroutine");}
 
     if(mpfr_nan_p(t)) {
       mpfr_clear(t);
@@ -4218,7 +4218,7 @@ SV * overload_spaceship(pTHX_ mpfr_t * a, SV * b, SV * third) {
     else {
       ret = mpfr_init_set_str(t, (char *)SvPV_nolen(b), 0, __gmpfr_default_rounding_mode);
 
-      NON_NUMERIC_CHAR_CHECK, "overload_spaceship subroutine");}
+      NON_NUMERIC_CHAR_CHECK(b), "overload_spaceship subroutine");}
 
       if(mpfr_nan_p(t)) {
         mpfr_clear(t);
@@ -4229,7 +4229,7 @@ SV * overload_spaceship(pTHX_ mpfr_t * a, SV * b, SV * third) {
 #else
     ret = mpfr_init_set_str(t, SvPV_nolen(b), 0, __gmpfr_default_rounding_mode);
 
-    NON_NUMERIC_CHAR_CHECK, "overload_spaceship subroutine");}
+    NON_NUMERIC_CHAR_CHECK(b), "overload_spaceship subroutine");}
 
     if(mpfr_nan_p(t)) {
       mpfr_clear(t);
@@ -4325,7 +4325,7 @@ SV * overload_equiv(pTHX_ mpfr_t * a, SV * b, SV * third) {
     else {
       ret = mpfr_init_set_str(t, (char *)SvPV_nolen(b), 0, __gmpfr_default_rounding_mode);
 
-      NON_NUMERIC_CHAR_CHECK, "overload_equiv subroutine");}
+      NON_NUMERIC_CHAR_CHECK(b), "overload_equiv subroutine");}
 
       if(mpfr_nan_p(t)) {
         mpfr_clear(t);
@@ -4336,7 +4336,7 @@ SV * overload_equiv(pTHX_ mpfr_t * a, SV * b, SV * third) {
 #else
     ret = mpfr_init_set_str(t, (char *)SvPV_nolen(b), 0, __gmpfr_default_rounding_mode);
 
-    NON_NUMERIC_CHAR_CHECK, "overload_equiv subroutine");}
+    NON_NUMERIC_CHAR_CHECK(b), "overload_equiv subroutine");}
 
     if(mpfr_nan_p(t)) {
       mpfr_clear(t);
@@ -4426,7 +4426,7 @@ SV * overload_not_equiv(pTHX_ mpfr_t * a, SV * b, SV * third) {
     else {
       ret = mpfr_init_set_str(t, (char *)SvPV_nolen(b), 0, __gmpfr_default_rounding_mode);
 
-      NON_NUMERIC_CHAR_CHECK, "overload_not_equiv subroutine");}
+      NON_NUMERIC_CHAR_CHECK(b), "overload_not_equiv subroutine");}
 
       if(mpfr_nan_p(t)) {
         mpfr_clear(t);
@@ -4437,7 +4437,7 @@ SV * overload_not_equiv(pTHX_ mpfr_t * a, SV * b, SV * third) {
 #else
     ret = mpfr_init_set_str(t, (char *)SvPV_nolen(b), 0, __gmpfr_default_rounding_mode);
 
-    NON_NUMERIC_CHAR_CHECK, "overload_not_equiv subroutine");}
+    NON_NUMERIC_CHAR_CHECK(b), "overload_not_equiv subroutine");}
 
     if(mpfr_nan_p(t)) {
       mpfr_clear(t);
@@ -4583,7 +4583,7 @@ SV * overload_pow(pTHX_ SV * p, SV * b, SV * third) {
 #else
     ret = mpfr_set_str(*mpfr_t_obj, SvPV_nolen(b), 0, __gmpfr_default_rounding_mode);
 #endif
-    NON_NUMERIC_CHAR_CHECK, "overload_pow subroutine");}
+    NON_NUMERIC_CHAR_CHECK(b), "overload_pow subroutine");}
 
     if(SWITCH_ARGS) mpfr_pow(*mpfr_t_obj, *mpfr_t_obj, *(INT2PTR(mpfr_t *, SvIVX(SvRV(p)))), __gmpfr_default_rounding_mode);
     else mpfr_pow(*mpfr_t_obj, *(INT2PTR(mpfr_t *, SvIVX(SvRV(p)))), *mpfr_t_obj, __gmpfr_default_rounding_mode);
@@ -4877,7 +4877,7 @@ SV * overload_atan2(pTHX_ mpfr_t * a, SV * b, SV * third) {
 #else
     ret = mpfr_set_str(*mpfr_t_obj, SvPV_nolen(b), 0, __gmpfr_default_rounding_mode);
 #endif
-    NON_NUMERIC_CHAR_CHECK, "overload_atan2");}
+    NON_NUMERIC_CHAR_CHECK(b), "overload_atan2");}
 
     if(SWITCH_ARGS){
       mpfr_atan2(*mpfr_t_obj, *mpfr_t_obj, *a, __gmpfr_default_rounding_mode);
@@ -5106,7 +5106,7 @@ SV * overload_pow_eq(pTHX_ SV * p, SV * b, SV * third) {
 #else
     ret = mpfr_init_set_str(t, SvPV_nolen(b), 0, __gmpfr_default_rounding_mode);
 #endif
-    NON_NUMERIC_CHAR_CHECK, "overload_pow_eq subroutine");}
+    NON_NUMERIC_CHAR_CHECK(b), "overload_pow_eq subroutine");}
 
     mpfr_pow(*(INT2PTR(mpfr_t *, SvIVX(SvRV(p)))), *(INT2PTR(mpfr_t *, SvIVX(SvRV(p)))), t, __gmpfr_default_rounding_mode);
     mpfr_clear(t);
@@ -5216,7 +5216,7 @@ SV * overload_div_eq(pTHX_ SV * a, SV * b, SV * third) {
 #else
     ret = mpfr_init_set_str(t, SvPV_nolen(b), 0, __gmpfr_default_rounding_mode);
 #endif
-    NON_NUMERIC_CHAR_CHECK, "overload_div_eq subroutine");}
+    NON_NUMERIC_CHAR_CHECK(b), "overload_div_eq subroutine");}
 
     mpfr_div(*(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), t, __gmpfr_default_rounding_mode);
     mpfr_clear(t);
@@ -5330,7 +5330,7 @@ SV * overload_sub_eq(pTHX_ SV * a, SV * b, SV * third) {
 #else
     ret = mpfr_init_set_str(t, SvPV_nolen(b), 0, __gmpfr_default_rounding_mode);
 #endif
-    NON_NUMERIC_CHAR_CHECK, "overload_sub_eq subroutine");}
+    NON_NUMERIC_CHAR_CHECK(b), "overload_sub_eq subroutine");}
 
     mpfr_sub(*(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), t, __gmpfr_default_rounding_mode);
     mpfr_clear(t);
@@ -5438,7 +5438,7 @@ SV * overload_add_eq(pTHX_ SV * a, SV * b, SV * third) {
 #else
     ret = mpfr_init_set_str(t, SvPV_nolen(b), 0, __gmpfr_default_rounding_mode);
 #endif
-    NON_NUMERIC_CHAR_CHECK, "overload_add_eq subroutine");}
+    NON_NUMERIC_CHAR_CHECK(b), "overload_add_eq subroutine");}
 
     mpfr_add(*(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), t, __gmpfr_default_rounding_mode);
     mpfr_clear(t);
@@ -5545,7 +5545,7 @@ SV * overload_mul_eq(pTHX_ SV * a, SV * b, SV * third) {
 #else
    ret = mpfr_init_set_str(t, SvPV_nolen(b), 0, __gmpfr_default_rounding_mode);
 #endif
-   NON_NUMERIC_CHAR_CHECK, "overload_mul_eq subroutine");}
+   NON_NUMERIC_CHAR_CHECK(b), "overload_mul_eq subroutine");}
 
    mpfr_mul(*(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), t, __gmpfr_default_rounding_mode);
    mpfr_clear(t);
@@ -6041,6 +6041,16 @@ void Rmpfr_set_zero(pTHX_ mpfr_t * a, SV * sign) {
 
 SV * Rmpfr_digamma(pTHX_ mpfr_t * rop, mpfr_t * op, SV * round) {
   return newSViv(mpfr_digamma(*rop, *op, (mpfr_rnd_t)SvIV(round)));
+}
+
+SV * Rmpfr_trigamma(pTHX_ mpfr_t * rop, mpfr_t * op, SV * round) {
+#if MPFR_VERSION >= 262912
+  return newSViv(mpfr_trigamma(*rop, *op, (mpfr_rnd_t)SvIV(round)));
+#else
+  PERL_UNUSED_ARG3(rop, op, round);
+  croak("Rmpfr_trigamma function not implemented until mpfr-4.3.0. (You have only version %s) ", MPFR_VERSION_STRING);
+#endif
+
 }
 
 SV * Rmpfr_ai(pTHX_ mpfr_t * rop, mpfr_t * op, SV * round) {
@@ -8494,15 +8504,13 @@ SV * _nvtoa(pTHX_ NV pnv) {
  * BEGIN _mpfrtoa            *
  ****************************/
 
-/* _mpfrtoa is, like _nvtoa, adapted from p120 of     *
- * "How to Print Floating-Point Numbers Accurately" *
- * by Guy L. Steele Jr and Jon L. White             */
+/* _mpfrtoa is, like _nvtoa, adapted from p120 of    *
+ * "How to Print Floating-Point Numbers Accurately"  *
+ * by Guy L. Steele Jr and Jon L. White              */
 
 SV * _mpfrtoa(pTHX_ mpfr_t * pnv, int min_normal_prec) {
 
-  /* is_subnormal was added in 4.24 when   *
-   * the need for it was finally detected. */
-  int k = 0, k_index, lsb, skip = 0, sign = 0, is_subnormal = 0;
+  int k = 0, k_index, lsb, skip = 0, sign = 0;
   int bits, shift1, shift2, low, high, cmp, u;
   mpfr_exp_t e;
   mpz_t R, S, M_plus, M_minus, LHS, TMP;
@@ -8554,11 +8562,6 @@ SV * _mpfrtoa(pTHX_ mpfr_t * pnv, int min_normal_prec) {
    warn(" f is %s\n exponent is %d\n precision is %d\n", f, (int)e, bits);
 #endif
 
- /* is_subnormal was added in 4.24, when it *       *
-  *  became apparent that this was needed.  */
-
-  if(bits < min_normal_prec) is_subnormal = 1; /* min_normal_prec is provided as an argument. *
-                                                * See mpfrtoa() documentation for details.    */
   if(sign) f++;
 
   mpz_set_str(R, f, 2);
@@ -8586,7 +8589,15 @@ SV * _mpfrtoa(pTHX_ mpfr_t * pnv, int min_normal_prec) {
 
   /*************** start simple fixup **************/
 
-  if(!is_subnormal) { /* This condition added in 4.24 */
+  if(bits >= min_normal_prec) {
+    /***********************************************
+     AFAIK, the only time this block is entered is in
+     Math::FakeDD:dd_repro(). If I can recollect why
+     it's needed and/or work around it in dd_repro()
+     then this block of code && the min_normal_prec
+     argument will be removed. Math::MPFR::mpfrtoa()
+     will thus revert to accepting only one argument.
+    ***********************************************/
     mpz_set_ui(LHS, 1);
     mpz_mul_2exp(LHS, LHS, bits - 1);
     if(!mpz_cmp(LHS, TMP)) {
@@ -8765,7 +8776,7 @@ SV * _mpfrtoa(pTHX_ mpfr_t * pnv, int min_normal_prec) {
 }
 
 /****************************
- * END _mpfrtoa              *
+ * END _mpfrtoa             *
  ****************************/
 
 /****************************
@@ -9059,6 +9070,17 @@ int _has_bizarre_infnan(void) {
   return 0;
 #endif
 }
+
+SV * _gmp_cflags(pTHX) {
+  return newSVpv(__GMP_CFLAGS, 0);
+}
+
+SV * _gmp_cc(pTHX) {
+  return newSVpv(__GMP_CC, 0);
+}
+
+
+
 
 
 MODULE = Math::MPFR  PACKAGE = Math::MPFR
@@ -12453,6 +12475,15 @@ CODE:
 OUTPUT:  RETVAL
 
 SV *
+Rmpfr_trigamma (rop, op, round)
+	mpfr_t *	rop
+	mpfr_t *	op
+	SV *	round
+CODE:
+  RETVAL = Rmpfr_trigamma (aTHX_ rop, op, round);
+OUTPUT:  RETVAL
+
+SV *
 Rmpfr_ai (rop, op, round)
 	mpfr_t *	rop
 	mpfr_t *	op
@@ -13258,5 +13289,19 @@ _sizeof_prec ()
 
 int
 _has_bizarre_infnan ()
+
+
+SV *
+_gmp_cflags ()
+CODE:
+  RETVAL = _gmp_cflags (aTHX);
+OUTPUT:  RETVAL
+
+
+SV *
+_gmp_cc ()
+CODE:
+  RETVAL = _gmp_cc (aTHX);
+OUTPUT:  RETVAL
 
 

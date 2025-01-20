@@ -1,5 +1,8 @@
 Revision history for Crypt-Credentials
 
+0.004     2025-01-20 00:34:34+01:00 Europe/Brussels
+          - Use CryptX's built-in randomness source
+
 0.003     2024-02-02 22:12:28+01:00 Europe/Brussels
           - Croak when no key is valid
           - Allow for nested directories of credential files

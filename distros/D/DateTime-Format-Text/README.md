@@ -4,11 +4,11 @@ DateTime::Format::Text - Find a Date in Text
 
 # VERSION
 
-Version 0.09
+Version 0.10
 
 # SYNOPSIS
 
-Find a date in any text.
+Extract and parse date strings from arbitrary text.
 
     use DateTime::Format::Text;
     my $dft = DateTime::Format::Text->new();
@@ -23,12 +23,18 @@ Takes no arguments
 
 ## parse\_datetime
 
-Synonym for parse().
+A synonym for parse().
 
 ## parse
 
-Returns a [DateTime](https://metacpan.org/pod/DateTime) object constructed from a date/time string embedded in
-arbitrary text.
+Core function for extracting and parsing dates from text returning a [DateTime](https://metacpan.org/pod/DateTime) object.
+It handles various date formats, such as:
+
+- dd/mm/yyyy, dd-mm-yy, d m yyyy
+- Sunday, 1 March 2015
+- 1st March 2015
+
+If direct parsing fails, attempt to use the [DateTime::Format::Flexible](https://metacpan.org/pod/DateTime%3A%3AFormat%3A%3AFlexible) module as a last resort.
 
 Can be called as a class or object method.
 
@@ -61,6 +67,7 @@ version  0.2.0
 
 # SEE ALSO
 
+[DateTime::Format::Flexible](https://metacpan.org/pod/DateTime%3A%3AFormat%3A%3AFlexible),
 [DateTime::Format::Natural](https://metacpan.org/pod/DateTime%3A%3AFormat%3A%3ANatural)
 
 # SUPPORT
@@ -81,6 +88,6 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2019-2024 Nigel Horne.
+Copyright 2019-2025 Nigel Horne.
 
 This program is released under the following licence: GPL2

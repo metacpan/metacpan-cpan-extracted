@@ -7,7 +7,7 @@ use warnings;
 use Carp;
 use Exporter 'import';
 
-our $VERSION = '0.08';
+our $VERSION = '0.10';
 
 our @EXPORT_OK = qw(all_reachable);
 
@@ -63,11 +63,11 @@ __END__
 
 =head1 NAME
 
-Algorithm::Graphs::Reachable::Tiny - Compute rechable nodes in a graph.
+Algorithm::Graphs::Reachable::Tiny - Calculate the reachable nodes in a graph.
 
 =head1 VERSION
 
-Version 0.08
+Version 0.10
 
 
 =head1 SYNOPSIS
@@ -135,8 +135,9 @@ or by C<undef>.
 
 =head3 all_reachable(GRAPH, NODES)
 
-I<C<GRAPH>> must be a reference to a hash or a hash. It represents the graph
-as described above.  I<C<NODES>> must be a reference to a hash or an array.
+I<C<GRAPH>> must be a reference to a hash of hashes or to an array of
+hashes. It represents the graph as described above.  I<C<NODES>> must be a
+reference to a hash or an array.
 
 The function determines the set of all nodes in I<C<GRAPH>> that are reachable
 from one of the nodes in I<C<NODES>>. It returns a reference to a hash
@@ -158,8 +159,8 @@ I<C<NODES>>.
 If I<C<NODES>> contains elements that are not in I<C<GRAPH>>, then those
 elements are still in the result set.
 
-Note: If I<C<GRAPH>> is an array reference, then I<C<NODES>> must contain
-integers only.
+Note: If I<C<GRAPH>> is an array reference value, then I<C<NODES>> may only
+contain integers.
 
 =back
 

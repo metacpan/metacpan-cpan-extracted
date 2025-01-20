@@ -1,0 +1,74 @@
+{
+   "abstract" : "Interface to the bahn.de itinerary service",
+   "author" : [
+      "Copyright (C) 2025 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4234",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Travel-Routing-DE-DBRIS",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Compile" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Cache::File" : "0"
+         },
+         "requires" : {
+            "Class::Accessor" : "0.16",
+            "DateTime" : "0",
+            "DateTime::Duration" : "0",
+            "DateTime::Format::Strptime" : "0",
+            "Getopt::Long" : "0",
+            "JSON" : "0",
+            "LWP::Protocol::https" : "0",
+            "LWP::UserAgent" : "0",
+            "List::Util" : "0",
+            "Travel::Status::DE::DBRIS" : "0.01",
+            "Travel::Status::DE::DBRIS::Location" : "0.01",
+            "perl" : "v5.20.0"
+         }
+      }
+   },
+   "provides" : {
+      "Travel::Routing::DE::DBRIS" : {
+         "file" : "lib/Travel/Routing/DE/DBRIS.pm",
+         "version" : "0.01"
+      },
+      "Travel::Routing::DE::DBRIS::Connection" : {
+         "file" : "lib/Travel/Routing/DE/DBRIS/Connection.pm",
+         "version" : "0.01"
+      },
+      "Travel::Routing::DE::DBRIS::Connection::Segment" : {
+         "file" : "lib/Travel/Routing/DE/DBRIS/Connection/Segment.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/derf/Travel-Routing-DE-DBRIS"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

@@ -7,7 +7,7 @@ Tk::XText - Extended Text widget
 =cut
 
 use vars qw($VERSION);
-$VERSION = '0.61';
+$VERSION = '0.62';
 use strict;
 use warnings;
 use Carp;
@@ -165,17 +165,19 @@ The start string of a single line comment.
 =head1 EVENTS AND KEYBINDINGS
 
 Besides the events of l<Tk::Text>, this module responds to
-the following events and bindings:
+the following events and key bindings:
 
  Event:         Key:
- <<Find>>       F8
- <<Replace>>    F9
+ <<Find>>       CONTROL+F
+ <<Replace>>    CONTROL+R
  <<Indent>>     CONTROL+J
  <<UnIndent>>   CONTROL+SHIFT+J or CONTROL+TAB
  <<Comment>>    CONTROL+G
  <<UnComment>>  CONTROL+SHIFT+G
  <<Undo>>       CONTROL+Z
  <<Redo>>       CONTROL+SHIFT+Z
+ <<UpperCase>>  CONTROL+U
+ <<LowerCase>>  ALT+U
 
 Further more, CONTROL+A selects all text.
 
@@ -269,6 +271,8 @@ sub Populate {
 	$self->eventAdd('<<UnComment>>', '<Control-G>');
 	$self->eventAdd('<<Undo>>', '<Control-z>');
 	$self->eventAdd('<<Redo>>', '<Control-Z>');
+	$self->eventAdd('<<UpperCase>>', '<Control-u>');
+	$self->eventAdd('<<LowerCase>>', '<Alt-u>');
 	$self->bind('<KeyRelease>', [$self, 'KeyReleased', Ev('A')]);
 	$self->bind('<ButtonRelease-1>', 'matchCheck');
 	$self->bind('<Control-a>', 'selectAll');
@@ -773,6 +777,30 @@ sub canRedo {
 	return (@$stack > 0)
 }
 
+sub caseChange {
+	my ($self, $upper) = @_;
+	$upper = 1 unless defined $upper;
+	my @sel = $self->tagRanges('sel');
+	my $begin;
+	my $end;
+	if (@sel) {
+		$begin = shift @sel;
+		$end = shift @sel;
+	} else {
+		$begin = $self->index('insert');
+		$end = $self->index("$begin + 1c");
+	}
+	my $text = $self->get($begin, $end);
+	if ($text ne '') {
+		if ($upper) {
+			$text = uc($text)
+		} else {
+			$text = lc($text)
+		}
+		$self->replace($begin, $end, $text);
+	}
+}
+
 sub ClassInit {
 	my ($class,$mw) = @_;
 	$class->bindRdOnly($mw);
@@ -794,6 +822,8 @@ sub ClassInit {
 	$mw->bind($class, '<<UnIndent>>', 'unindent');
 	$mw->bind($class, '<<Undo>>', 'undo');
 	$mw->bind($class, '<<Redo>>', 'redo');
+	$mw->bind($class, '<<UpperCase>>', ['caseChange', 1]);
+	$mw->bind($class, '<<LowerCase>>', ['caseChange', 0]);
 	return $class
 }
 
@@ -967,6 +997,15 @@ sub EditMenuItems {
 			-accelerator => 'CTRL+SHIFT+J',
 			-command => [$self => 'unindent']
 		],
+		"-",
+		["command"=>'U~pper case', 
+			-accelerator => 'CTRL+U',
+			-command => [$self => 'caseChange', 1]
+		],
+		["command"=>'~Lower case', 
+			-accelerator => 'ALT+U',
+			-command => [$self => 'caseChange', 0]
+		],
 	);
 }
 
@@ -1045,7 +1084,6 @@ sub FindandReplaceAll {
 sub findandreplacepopup {
 	my $self = shift;
 	my $val = $_[0];
-	print "findandreplacepopup $val\n";
 	my $call = $self->cget('-findandreplacecall');
 	if (defined $call) {
 		&$call(@_);
@@ -1718,9 +1756,10 @@ sub RedoStack {
 sub replace {
 	my ($self, $begin, $end, $replace) = @_;
 	my $orig = $self->get($begin, $end);
+	my $modified = $self->editModified;
 	$self->SUPER::delete($begin, $end);
 	$self->SUPER::insert($begin, $replace);
-	$self->RecordUndo('replace', $self->editModified, $begin, $orig, $replace);
+	$self->RecordUndo('replace', $modified, $begin, $orig, $replace);
 	$self->modifiedCall($begin);
 }
 

@@ -12,11 +12,11 @@ $hash{AUTHOR} = 'Bryan Jurish';
 $hash{ABSTRACT} = 'Perl interface to the C Clustering Library with PDL support';
 $hash{VERSION_FROM} = 'Cluster.pd';
 $hash{PREREQ_PM} = {
-		    'PDL' => 0,
+		    'PDL' => '2.081',
 		    'Test::More' => 0,
 		   };
 $hash{CONFIGURE_REQUIRES} = {
-			     'PDL'=>0,
+			     'PDL'=>'2.081',
 			     'ExtUtils::MakeMaker'=>0,
 			    };
 push(@{$hash{LIBS}}, '-lm');
@@ -39,8 +39,7 @@ $hash{META_MERGE} = {
 WriteMakefile(%hash);
 
 sub MY::postamble {
-  pdlpp_postamble($package)
-  .qq(
+  return q(
 
 ##-- readme
 readme: README.txt

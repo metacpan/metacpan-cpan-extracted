@@ -1,0 +1,110 @@
+#!/usr/bin/env perl
+
+use 5.036;
+use strict;
+use warnings;
+use utf8;
+
+use lib '/usr/local/lib/perl5';  # To be used together with the cpanm command given in the README.md file.
+
+use English;
+use Music::Harmonica::TabsCreator 'tune_to_tab_rendered';
+
+our $VERSION = $Music::Harmonica::TabsCreator::VERSION; ## no critic (ProhibitComplexVersion,RequireConstantVersion)
+
+BEGIN {
+  my $has_locale = eval { require Encode::Locale; Encode::Locale->import(); 1 };
+  if (-t STDIN && $has_locale) {
+    binmode STDIN, ':encoding(console_in)';  # console_in is set by the Encode::Locale module.
+  } else {
+    binmode STDIN, ':encoding(UTF-8)';
+  }
+  if (-t STDOUT && $has_locale) {
+    binmode STDOUT, ':encoding(console_out)';  # console_out is set by the Encode::Locale module.
+  } else {
+    binmode STDOUT, ':encoding(UTF-8)';
+  }
+  if (-t STDERR && $has_locale) {
+    binmode STDERR, ':encoding(console_out)';  # console_out is set by the Encode::Locale module.
+  } else {
+    binmode STDOUT, ':encoding(UTF-8)';
+  }
+}
+
+my $sheet;
+{
+  local $INPUT_RECORD_SEPARATOR = undef;
+  $sheet = <>;
+}
+
+say tune_to_tab_rendered($sheet);
+
+exit 0;
+
+__END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+harmonica-tabs-creator – Convert tunes into harmonica tabs.
+
+=head1 SYNOPSIS
+
+  harmonica-tabs-creator < input-tune.txt > output-tab.txt
+
+=head1 DESCRIPTION
+
+Simple program to generate harmonica tabs from a textual representation of a
+tune, using the L<Music::Harmonica::TabsCreator> library.
+
+Currently C<harmonica-tabs-creator> can only read a single input from its
+standard input and will write its output on the standard output.
+
+See the
+L<GitHub page|https://github.com/mkende/harmonica_tabs_creator> for details on
+the input format.
+
+=head1 AUTHOR
+
+This program has been written by L<Mathias Kende|mailto:mathias@cpan.org>.
+
+=head1 LICENCE
+
+Copyright 2025 Mathias Kende
+
+This program is distributed under the MIT (X11) License:
+L<http://www.opensource.org/licenses/mit-license.php>
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<Music::Harmonica::TabsCreator>
+
+=back
+
+=cut

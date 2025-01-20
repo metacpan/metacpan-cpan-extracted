@@ -1,6 +1,6 @@
 ^Build$
 ^Makefile$
-^Data-Record-Serialize
+^Data-Record-Serialize-Encode-dbi
 ~$
 ^blib/
 ^pm_to_blib

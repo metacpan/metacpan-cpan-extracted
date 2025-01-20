@@ -17,7 +17,7 @@ sub _defined_or { defined $_[0] ? $_[0] : $_[1] }
 sub debug_action
 {
 	my $iter = shift;
-	# Piddle operations can be dangerous: when applying them to the result
+	# NDArray operations can be dangerous: when applying them to the result
 	# of an index operation on an empty ndarray, they may throw an
 	# exception. Empty ndarrays are used, among others, when an ordinary
 	# histogram is required. So, just to be safe, we wrap all potentially

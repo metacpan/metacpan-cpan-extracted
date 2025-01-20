@@ -1,0 +1,71 @@
+
+[![Windows](https://github.com/Corion/Text-HTML-Turndown/workflows/windows/badge.svg)](https://github.com/Corion/Text-HTML-Turndown/actions?query=workflow%3Awindows)
+[![MacOS](https://github.com/Corion/Text-HTML-Turndown/workflows/macos/badge.svg)](https://github.com/Corion/Text-HTML-Turndown/actions?query=workflow%3Amacos)
+[![Linux](https://github.com/Corion/Text-HTML-Turndown/workflows/linux/badge.svg)](https://github.com/Corion/Text-HTML-Turndown/actions?query=workflow%3Alinux)
+
+# NAME
+
+Text::HTML::Turndown - convert HTML to Markdown
+
+# SYNOPSIS
+
+    use Text::HTML::Turndown;
+    my $convert = Text::HTML::Turndown->new();
+    my $markdown = $convert->turndown(<<'HTML');
+      <h1>Hello world!</h1>
+    HTML
+    # Hello world!
+    # ------------
+
+This is an adapation of the `turndown` libraries.
+
+# MARKDOWN FLAVOURS / FEATURES
+
+# COMPATIBILITY
+
+This port aims to be compatible with the Javascript code and uses the same
+test suite. But the original library does not pass its tests and the Joplin
+part does not use the original tests.
+
+- Table headers
+
+    For Github flavoured markdown, Joplin aims to always force table headers in
+    markdown. This libary does not (yet).
+
+# SEE ALSO
+
+The original library (unmaintained):
+
+[https://github.com/mixmark-io/turndown/](https://github.com/mixmark-io/turndown/)
+
+The Joplin library (maintained):
+
+[https://github.com/laurent22/joplin/tree/dev/packages/turndown](https://github.com/laurent22/joplin/tree/dev/packages/turndown)
+
+[https://github.com/laurent22/joplin/tree/dev/packages/turndown-plugin-gfm](https://github.com/laurent22/joplin/tree/dev/packages/turndown-plugin-gfm)
+
+# REPOSITORY
+
+The public repository of this module is
+[https://github.com/Corion/Text-HTML-Turndown](https://github.com/Corion/Text-HTML-Turndown).
+
+# SUPPORT
+
+The public support forum of this module is [https://perlmonks.org/](https://perlmonks.org/).
+
+# BUG TRACKER
+
+Please report bugs in this module via the Github bug queue at
+[https://github.com/Corion/Text-HTML-Turndown/issues](https://github.com/Corion/Text-HTML-Turndown/issues)
+
+# AUTHOR
+
+Max Maischein `corion@cpan.org`
+
+# COPYRIGHT (c)
+
+Copyright 2025- by Max Maischein `corion@cpan.org`.
+
+# LICENSE
+
+This module is released under the Artistic License 2.0.

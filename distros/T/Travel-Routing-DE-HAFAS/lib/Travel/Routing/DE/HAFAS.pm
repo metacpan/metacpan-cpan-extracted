@@ -19,7 +19,7 @@ use Travel::Status::DE::HAFAS;
 use Travel::Status::DE::HAFAS::Location;
 use Travel::Status::DE::HAFAS::Message;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 # {{{ Endpoint Definition
 
@@ -46,7 +46,7 @@ sub new {
 	}
 
 	if ( not defined $service ) {
-		$service = $conf{service} = 'DB';
+		confess("The service option is mandatory");
 	}
 
 	if ( defined $service and not exists $hafas_instance{$service} ) {
@@ -527,6 +527,7 @@ Travel::Routing::DE::HAFAS - Interface to HAFAS itinerary services
 	use Travel::Routing::DE::HAFAS;
 
 	my $hafas = Travel::Routing::DE::HAFAS->new(
+		service => 'VRN',
 		from_stop => 'Eichlinghofen H-Bahn, Dortmund',
 		to_stop => 'Essen-Kupferdreh',
 	);
@@ -553,13 +554,12 @@ Travel::Routing::DE::HAFAS - Interface to HAFAS itinerary services
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 DESCRIPTION
 
 Travel::Routing::DE::HAFAS is an interface to HAFAS itinerary services
-using the mgate.exe interface. It works best with the legacy instance of
-Deutsche Bahn, but supports other transit services as well.
+using the mgate.exe interface.
 
 =head1 METHODS
 
@@ -573,6 +573,12 @@ I<%opt> were passed. I<%opt> must contain B<from_stop> and B<to_stop> and
 supports the following additional flags:
 
 =over
+
+=item B<service> => I<service> (mandatory)
+
+Request results from I<service>.
+See B<get_services> (and C<< hafas-m --list >>) for a list of supported
+services.
 
 =item B<from_stop> => I<stop> (mandatory)
 
@@ -638,12 +644,6 @@ Request connections with no more than I<count> changeovers.
 Request connections with scheduled changeover durations of at least I<minutes>.
 Note that this does not account for real-time data: the backend may return
 delayed connections that violate the specified changeover duration.
-
-=item B<service> => I<service>
-
-Request results from I<service>, defaults to "DB".
-See B<get_services> (and C<< hafas-m --list >>) for a list of supported
-services.
 
 =back
 
@@ -737,7 +737,7 @@ None.
 
 =head1 BUGS AND LIMITATIONS
 
-The non-default services (anything other than DB) are not well tested.
+Some HAFAS services are not well-tested.
 
 =head1 SEE ALSO
 

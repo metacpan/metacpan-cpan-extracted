@@ -3307,7 +3307,7 @@ Perl_utf8n_to_uvchr_msgs(const U8 *s,
         UV state = PL_strict_utf8_dfa_tab[256 + type];
         uv = (0xff >> type) & NATIVE_UTF8_TO_I8(*s);
 
-        while (++s < send) {
+        while (LIKELY(state != 1) && ++s < send) {
             type  = PL_strict_utf8_dfa_tab[*s];
             state = PL_strict_utf8_dfa_tab[256 + state + type];
 
@@ -3318,10 +3318,6 @@ Perl_utf8n_to_uvchr_msgs(const U8 *s,
                 uv = UNI_TO_NATIVE(uv);
 #endif
                 goto success;
-            }
-
-            if (UNLIKELY(state == 1)) {
-                break;
             }
         }
 

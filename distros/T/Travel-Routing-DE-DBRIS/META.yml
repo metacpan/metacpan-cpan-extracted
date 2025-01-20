@@ -1,0 +1,47 @@
+---
+abstract: 'Interface to the bahn.de itinerary service'
+author:
+  - 'Copyright (C) 2025 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>'
+build_requires:
+  Test::Compile: '0'
+  Test::More: '0'
+  Test::Pod: '0'
+configure_requires:
+  Module::Build: '0.4'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Travel-Routing-DE-DBRIS
+provides:
+  Travel::Routing::DE::DBRIS:
+    file: lib/Travel/Routing/DE/DBRIS.pm
+    version: '0.01'
+  Travel::Routing::DE::DBRIS::Connection:
+    file: lib/Travel/Routing/DE/DBRIS/Connection.pm
+    version: '0.01'
+  Travel::Routing::DE::DBRIS::Connection::Segment:
+    file: lib/Travel/Routing/DE/DBRIS/Connection/Segment.pm
+    version: '0.01'
+recommends:
+  Cache::File: '0'
+requires:
+  Class::Accessor: '0.16'
+  DateTime: '0'
+  DateTime::Duration: '0'
+  DateTime::Format::Strptime: '0'
+  Getopt::Long: '0'
+  JSON: '0'
+  LWP::Protocol::https: '0'
+  LWP::UserAgent: '0'
+  List::Util: '0'
+  Travel::Status::DE::DBRIS: '0.01'
+  Travel::Status::DE::DBRIS::Location: '0.01'
+  perl: v5.20.0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/derf/Travel-Routing-DE-DBRIS
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

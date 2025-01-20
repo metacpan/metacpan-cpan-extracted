@@ -6,7 +6,7 @@ pp_add_exported(
   'add_rgb_space',
 );
 
-$PDL::Graphics::ColorSpace::VERSION = '0.205';
+$PDL::Graphics::ColorSpace::VERSION = '0.206';
 
 pp_setversion("'$PDL::Graphics::ColorSpace::VERSION'");
 

@@ -5,9 +5,13 @@ etc/mysqlhi.conf
 etc/README.pod
 lib/MySQL/Hi.pm
 LICENSE
+Makefile
 Makefile.PL
-MANIFEST			This list of files
-META.json			Module JSON meta-data (added by MakeMaker)
-META.yml			Module YAML meta-data (added by MakeMaker)
+MANIFEST
+MANIFEST.SKIP
+MYMETA.json
+MYMETA.yml
 README.md
 t/010_main_params.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

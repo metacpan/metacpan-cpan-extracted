@@ -11,6 +11,7 @@ t/cmp.t
 t/constants.t
 t/dd_repro_basics.t
 t/div.t
+t/dump.t
 t/log_exp.t
 t/mul.t
 t/mpfr2dd.t
@@ -22,6 +23,7 @@ t/sparse.t
 t/sqrt.t
 t/stringify.t
 t/sub.t
+t/test_check.t
 t/validate.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

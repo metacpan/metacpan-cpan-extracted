@@ -1,6 +1,6 @@
 package PDL::NDBin::Action::Avg;
 # ABSTRACT: Action for PDL::NDBin that computes average
-$PDL::NDBin::Action::Avg::VERSION = '0.028';
+$PDL::NDBin::Action::Avg::VERSION = '0.029';
 
 use strict;
 use warnings;
@@ -58,7 +58,7 @@ PDL::NDBin::Action::Avg - Action for PDL::NDBin that computes average
 
 =head1 VERSION
 
-version 0.028
+version 0.029
 
 =head1 DESCRIPTION
 
@@ -96,7 +96,7 @@ Edward Baudrez <ebaudrez@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Edward Baudrez.
+This software is copyright (c) 2025 by Edward Baudrez.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

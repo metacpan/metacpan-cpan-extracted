@@ -22,6 +22,7 @@ requires:
   File::Copy: '0'
   Test::More: '0'
 resources:
+  bugtracker: https://github.com/haje61/Tk-GktSettings/issues
   repository: git://github.com/haje61/Tk-GtkSettings.git
-version: '0.08'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

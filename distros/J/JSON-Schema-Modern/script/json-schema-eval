@@ -142,7 +142,7 @@ json-schema-eval - A command-line interface to JSON::Schema::Modern::evaluate()
 
 =head1 VERSION
 
-version 0.597
+version 0.598
 
 =head1 SYNOPSIS
 
@@ -232,6 +232,11 @@ keyword within that schema that matches the value you use in the C<$ref>. This o
 more than once.
 
 =for stopwords OpenAPI
+
+=head1 AVAILABILITY
+
+This executable is available on modern Debian versions (via C<apt-get>) as the
+C<libjson-schema-modern-perl> package.
 
 =head1 SUPPORT
 

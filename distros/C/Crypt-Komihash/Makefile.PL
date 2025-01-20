@@ -1,4 +1,13 @@
 use ExtUtils::MakeMaker;
+use Config;
+
+#my $is_64bit = ($Config{use64bitint} || $Config{use64bitall});
+my $is_64bit  = $Config{uvsize} >= 8;
+
+# Cannot build if we don't have 64bit UVs
+if (!$is_64bit) {
+	die "This module requires a 64-bit platform.\n";
+}
 
 WriteMakefile(
 	NAME             => 'Crypt::Komihash',
@@ -7,7 +16,7 @@ WriteMakefile(
 	XSMULTI          => 1,
 	AUTHOR           => 'Scott Baker <bakerscot@cpan.org>',
 	LICENSE          => 'mit',
-	MIN_PERL_VERSION => '5.012',
+	MIN_PERL_VERSION => '5.016',
 	LIBS             => [''],                   # e.g., '-lm'
     DEFINE           => '',                     # e.g., '-DHAVE_SOMETHING'
     INC              => '-Ilib',                # path to 'Crypt/Komihash.h'
@@ -21,12 +30,12 @@ WriteMakefile(
 		'meta-spec' => { version => 2 },
 		resources => {
 			repository => {
-				url => 'https://github.com/scottchiefbaker/perl-Random-Simple.git',
-				web => 'https://github.com/scottchiefbaker/perl-Random-Simple',
+				url => 'https://github.com/scottchiefbaker/perl-Crypt-Komihash.git',
+				web => 'https://github.com/scottchiefbaker/perl-Crypt-Komihash',
 				type => 'git'
 			},
 			bugtracker => {
-				"web" => "https://github.com/scottchiefbaker/perl-Random-Simple/issues"
+				"web" => "https://github.com/scottchiefbaker/perl-Crypt-Komihash/issues"
 			},
 		}
 	},

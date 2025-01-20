@@ -12,8 +12,8 @@ static SV *
 _convert_struct(const ps_node *node, enum type_preference prefer, const char *prefix)
 {
     SV *result = NULL;
-    const union nodeval *v = &node->val;
-    const struct array *what =
+    const union ps_nodeval *v = &node->val;
+    const struct ps_array *what =
         node->type == NODE_OBJECT
             ? &node->val.o.val
             : &node->val.a;
@@ -43,11 +43,8 @@ _convert_struct(const ps_node *node, enum type_preference prefer, const char *pr
         if (node->type == NODE_OBJECT) {
             char *typename = v->o.type;
             if (prefix) {
-                size_t size = strlen(prefix) + sizeof "::" + strlen(typename) + sizeof "\0";
-                char *built = malloc(size);;
-                snprintf(built, size, "%s::%s", prefix, typename);
-                sv_bless(result, gv_stashpv(built, true));
-                free(built);
+                SV *built = sv_2mortal(newSVpvf("%s::%s", prefix, typename));
+                sv_bless(result, gv_stashsv(built, true));
             } else {
                 sv_bless(result, gv_stashpv(typename, true));
             }
@@ -62,7 +59,7 @@ _convert_recurse(const ps_node *node, enum type_preference prefer, const char *p
 {
     SV *result = NULL;
 
-    const union nodeval *v = &node->val;
+    const union ps_nodeval *v = &node->val;
     switch (node->type) {
         case NODE_STRING: result = newSVpv(v->s.val, v->s.len);            break;
         case NODE_INT:    result = newSViv(v->i);                          break;

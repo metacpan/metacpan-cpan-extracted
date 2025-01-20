@@ -1,3 +1,9 @@
+1.06      2025-01-18 22:26:18-05:00 America/New_York
+
+  [ENHANCEMENTS]
+
+    * expose SQL::Translator's quote_identifiers support via encoder option
+
 1.05      2023-09-24 00:09:17-04:00 America/New_York
 
   [DISTRIBUTION]

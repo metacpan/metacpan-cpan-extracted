@@ -7,14 +7,6 @@ build_requires:
   Test::Simple: '0.90'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-conflicts:
-  DBD::Amazon: '0.10'
-  DBD::AnyData: '0.110'
-  DBD::CSV: '0.36'
-  DBD::Google: '0.51'
-  DBD::PO: '2.10'
-  DBD::RAM: '0.072'
-  SQL::Statement: '1.33'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -35,7 +27,7 @@ resources:
   homepage: http://dbi.perl.org/
   license: http://dev.perl.org/licenses/
   repository: https://github.com/perl5-dbi/dbi
-version: '1.646'
+version: '1.647'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
 x_suggests:
   Clone: 0.47

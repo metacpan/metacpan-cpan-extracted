@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.596-7-g0c84676c
+package JSON::Schema::Modern; # git description: v0.597-16-gd392946c
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema using a JSON Schema
 # KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.597';
+our $VERSION = '0.598';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -297,27 +297,15 @@ sub traverse ($self, $schema_reference, $config_override = {}) {
       $config_override->{metaschema_uri} // $self->METASCHEMA_URIS->{$spec_version},
       $for_canonical_uri,
     );
+
+    $self->_traverse_subschema($schema_reference, $state);
   }
   catch ($e) {
     if ($e->$_isa('JSON::Schema::Modern::Result')) {
       push $state->{errors}->@*, $e->errors;
     }
     elsif ($e->$_isa('JSON::Schema::Modern::Error')) {
-      push $state->{errors}->@*, $e;
-    }
-    else {
-      ()= E({ %$state, exception => 1 }, 'EXCEPTION: '.$e);
-    }
-
-    return $state;
-  }
-
-  try {
-    $self->_traverse_subschema($schema_reference, $state);
-  }
-  catch ($e) {
-    if ($e->$_isa('JSON::Schema::Modern::Error')) {
-      # note: we should never be here, since traversal subs are no longer be fatal
+      # note: we should never be here, since traversal subs are no longer fatal
       push $state->{errors}->@*, $e;
     }
     else {
@@ -378,9 +366,9 @@ sub evaluate ($self, $data, $schema_reference, $config_override = {}) {
     abort($state, 'EXCEPTION: collect_annotations cannot be used with specification_version '.$schema_info->{specification_version})
       if $config_override->{collect_annotations} and $schema_info->{specification_version} =~ /^draft[467]$/;
 
-    abort($state, 'EXCEPTION: unable to find resource %s', $schema_reference)
+    abort($state, 'EXCEPTION: unable to find resource "%s"', $schema_reference)
       if not $schema_info;
-    abort($state, 'EXCEPTION: %s is not a schema', $schema_reference)
+    abort($state, 'EXCEPTION: "%s" is not a schema', $schema_reference)
       if not $schema_info->{document}->get_entity_at_location($schema_info->{document_path});
 
     $state = +{
@@ -689,13 +677,19 @@ sub _eval_subschema ($self, $data, $schema, $state) {
         my $old_spec_version = $state->{spec_version};
         my $error_count = $state->{errors}->@*;
 
-        if (not $sub->($vocabulary, $data, $schema, $state)) {
-          warn 'evaluation result is false but there are no errors (keyword: '.$keyword.')'
-            if $error_count == $state->{errors}->@*;
-          $valid = 0;
+        try {
+          if (not $sub->($vocabulary, $data, $schema, $state)) {
+            warn 'evaluation result is false but there are no errors (keyword: '.$keyword.')'
+              if $error_count == $state->{errors}->@*;
+            $valid = 0;
 
-          last ALL_KEYWORDS if $state->{short_circuit};
-          next;
+            last ALL_KEYWORDS if $state->{short_circuit};
+            next;
+          }
+        }
+        catch ($e) {
+          die $e if $e->$_isa('JSON::Schema::Modern::Error');
+          abort($state, 'EXCEPTION: '.$e);
         }
 
         # a keyword changed the keyword list for this vocabulary; re-fetch the list before continuing
@@ -1203,7 +1197,7 @@ JSON::Schema::Modern - Validate data against a schema using a JSON Schema
 
 =head1 VERSION
 
-version 0.597
+version 0.598
 
 =head1 SYNOPSIS
 
@@ -1416,7 +1410,7 @@ Defaults to false.
 =head2 evaluate_json_string
 
   $result = $js->evaluate_json_string($data_as_json_string, $schema);
-  $result = $js->evaluate_json_string($data_as_json_string, $schema, { collect_annotations => 1});
+  $result = $js->evaluate_json_string($data_as_json_string, $schema, { collect_annotations => 1 });
 
 Evaluates the provided instance data against the known schema document.
 
@@ -2054,6 +2048,11 @@ L<Mojolicious::Plugin::OpenAPI::Modern>: a Mojolicious plugin providing OpenAPI 
 L<Test::Mojo::Role::OpenAPI::Modern>: test your Mojolicious application's OpenAPI compliance
 
 =back
+
+=head1 AVAILABILITY
+
+This distribution and executable is available on modern Debian versions (via C<apt-get>) as the
+C<libjson-schema-modern-perl> package.
 
 =head1 SUPPORT
 

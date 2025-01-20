@@ -1,5 +1,6 @@
 sync:
   defaults:
+    mode: "one-way-safe"
     flushOnCreate: true
     ignore:
       vcs: false
@@ -13,5 +14,4 @@ sync:
         - "devel"
         - ".tidyall.d"
         - ".plx"
-        - "mutagen.yml"
         - "mutagen.yml.lock"

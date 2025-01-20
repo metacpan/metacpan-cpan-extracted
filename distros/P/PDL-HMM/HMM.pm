@@ -11,7 +11,7 @@ use PDL::Exporter;
 use DynaLoader;
 
 
-   our $VERSION = '0.06009';
+   our $VERSION = '0.06010';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::HMM $VERSION;
@@ -245,7 +245,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 237 "HMM.pd"
+#line 234 "HMM.pd"
 
 =pod
 
@@ -300,7 +300,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 328 "HMM.pd"
+#line 325 "HMM.pd"
 
 *hmmalpha = \&hmmfw;
 #line 307 "HMM.pm"
@@ -357,7 +357,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 426 "HMM.pd"
+#line 423 "HMM.pd"
 
 *hmmalphaq = \&hmmfwq;
 #line 364 "HMM.pm"
@@ -408,7 +408,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 500 "HMM.pd"
+#line 497 "HMM.pd"
 
 *hmmbeta = \&hmmbw;
 #line 415 "HMM.pm"
@@ -465,14 +465,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 574 "HMM.pd"
+#line 571 "HMM.pd"
 
 *hmmbetaq = \&hmmbwq;
 #line 472 "HMM.pm"
 
 
 
-#line 583 "HMM.pd"
+#line 580 "HMM.pd"
 
 =pod
 
@@ -586,7 +586,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 792 "HMM.pd"
+#line 789 "HMM.pd"
 
 =pod
 
@@ -624,7 +624,7 @@ sub hmmmaximize {
 
 
 
-#line 833 "HMM.pd"
+#line 830 "HMM.pd"
 
 =pod
 
@@ -827,7 +827,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1135 "HMM.pd"
+#line 1132 "HMM.pd"
 
 
 

@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use ExtUtils::MakeMaker 6.64;	# 6.64 for TEST_REQUIRES
+use ExtUtils::MakeMaker 6.64;
 
 my $dist = {
 	COMPRESS => 'gzip -9f',
@@ -39,7 +39,9 @@ WriteMakefile(
 	PREREQ_PM => {
 		'Carp' => 0,
 		'DateTime' => 0,
-		'DateTime::Format::Flexible' => 0
+		'DateTime::Format::Flexible' => 0,
+		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
+		'Scalar::Util' => 0
 	}, dist => $dist,
 	clean		=> { FILES => 'DateTime-Format-Text-*' },
 	# META_ADD => {

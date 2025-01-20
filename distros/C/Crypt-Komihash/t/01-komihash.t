@@ -2,8 +2,9 @@ use strict;
 use warnings;
 use Test::More;
 use Crypt::Komihash qw(komihash_hex komihash);
+use Config;
 
-no warnings 'portable';
+my $is_64bit = ($Config{use64bitint} || $Config{use64bitall});
 
 cmp_ok(komihash("9999"           , 464811255086396864) , 'eq', '1724033458080874576');
 cmp_ok(komihash("%%%%%%%%%%%%"   , 6973412667780447232), 'eq', '5298088715392171192');

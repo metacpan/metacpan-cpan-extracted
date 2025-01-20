@@ -1,6 +1,8 @@
 Revision history for Perl extension Daje-Workflow-GenerateSQL-Activity
 
-0.03 2025-01-14T16:44:57Z
+1.00 2025-01-19T13:42:51Z
 
+    - template bug fixed
+    - bug fix
     - original version
 

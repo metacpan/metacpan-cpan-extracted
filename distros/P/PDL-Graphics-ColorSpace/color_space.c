@@ -1,5 +1,9 @@
 #include <stdio.h>
 #include <math.h>
+/* Needed this to compile on strawberry-perl-5.40.0.1-64bit-PDL */
+#ifndef M_PI
+    #define M_PI 3.14159265358979323846
+#endif
 
 #define epsilon   0.008856
 #define kappa   903.3

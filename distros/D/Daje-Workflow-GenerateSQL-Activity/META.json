@@ -42,8 +42,10 @@
       },
       "runtime" : {
          "requires" : {
+            "Daje::Config" : "0",
             "Daje::Workflow::Common::Activity::Base" : "0",
             "Mojo::Base" : "0",
+            "Mojo::File" : "0",
             "Syntax::Keyword::Match" : "0",
             "perl" : "5.008001"
          }
@@ -55,12 +57,9 @@
       }
    },
    "provides" : {
-      "Daje::Workflow::GeneratSQL::Script::Fields" : {
-         "file" : "lib/Daje/Workflow/GenerateSQL/Script/Fields.pm"
-      },
       "Daje::Workflow::GenerateSQL::Activity" : {
          "file" : "lib/Daje/Workflow/GenerateSQL/Activity.pm",
-         "version" : "0.03"
+         "version" : "1.00"
       },
       "Daje::Workflow::GenerateSQL::Base::Common" : {
          "file" : "lib/Daje/Workflow/GenerateSQL/Base/Common.pm"
@@ -68,6 +67,9 @@
       "Daje::Workflow::GenerateSQL::Manager::Sql" : {
          "file" : "lib/Daje/Workflow/GenerateSQL/Manager/Sql.pm",
          "version" : "0.01"
+      },
+      "Daje::Workflow::GenerateSQL::Script::Fields" : {
+         "file" : "lib/Daje/Workflow/GenerateSQL/Script/Fields.pm"
       },
       "Daje::Workflow::GenerateSQL::Script::ForeignKey" : {
          "file" : "lib/Daje/Workflow/GenerateSQL/Script/ForeignKey.pm"
@@ -91,7 +93,7 @@
          "web" : "https://github.com/janeskil1525/Daje-Workflow-GenerateSQL-Activity"
       }
    },
-   "version" : "0.03",
+   "version" : "1.00",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

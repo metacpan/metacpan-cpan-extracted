@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.14";
+$VERSION="0.16";
 
 use base qw( Tk::AppWindow::Ext::MDI );
 
@@ -44,23 +44,23 @@ This is a specially crafted multiple document interface for l<App::Codit>.
 
 =over 4
 
-=item B<-doc_autoindent>
+=item B<-doc_autoindent> I<hookable>
 
 Sets and returns the autoindent option of the currently selected document.
 
-=item B<-doc_wrap>
+=item B<-doc_wrap> I<hookable>
 
-Sets and returns the autoindent option of the currently selected document.
+Sets and returns the wrap option of the currently selected document.
 
-=item B<-doc_view_folds>
+=item B<-doc_view_folds> I<hookable>
 
 Sets and returns the showfolds option of the currently selected document.
 
-=item B<-doc_view_numbers>
+=item B<-doc_view_numbers> I<hookable>
 
 Sets and returns the shownumbers option of the currently selected document.
 
-=item B<-doc_view_status>
+=item B<-doc_view_status> I<hookable>
 
 Sets and returns the showstatus option of the currently selected document.
 
@@ -159,7 +159,7 @@ Replaces text in the currently selected document. It takes two indices and a tex
 =item B<key_released>, I<$doc>, I<$key>
 
 Dummy command only meant for hooking on by plugins. Called every time a visible character
-key was pressed. The plugin WordCompletion hooks on to this.
+key was pressed.
 
 =item B<modified>, I<$doc>, I<$index>
 
@@ -396,29 +396,9 @@ sub docAutoIndent {
 sub docCase {
 	my ($self, $upper) = @_;
 	$upper = 1 unless defined $upper;
-	my $name = $self->docSelected;
-	return unless defined $name;
-	my $widg = $self->docGet($name)->CWidg;
-	my @sel = $widg->tagRanges('sel');
-	my $begin;
-	my $end;
-	if (@sel) {
-		$begin = shift @sel;
-		$end = shift @sel;
-	} else {
-		$begin = $widg->index('insert');
-		$end = $widg->index("$begin + 1c");
-	}
-	my $text = $widg->get($begin, $end);
-	if ($text ne '') {
-		if ($upper) {
-			$text = uc($text)
-		} else {
-			$text = lc($text)
-		}
-		$widg->delete($begin, $end);
-		$widg->insert($begin, $text);
-	}
+	my $widg = $self->docWidget;
+	return unless defined $widg;
+	$widg->caseChange($upper);
 }
 
 sub docCaseLower { $_[0]->docCase(0) }
@@ -831,8 +811,8 @@ sub MenuItems {
 		[ 'menu_normal',    'Edit::',          '~Indent',            '<Control-j>',       'format-indent-more','*CTRL+J'],
 		[ 'menu_normal',    'Edit::',          'Unin~dent',          '<Control-J>',       'format-indent-less','*CTRL+SHIFT+J'],
 		[ 'menu_separator', 'Edit::',          'e4' ],
-		[ 'menu_normal',    'Edit::',          'U~pper case',        'doc_case_upper',    'format-text-uppercase','CTRL+U'],
-		[ 'menu_normal',    'Edit::',          '~Lower case',        'doc_case_lower',    'format-text-lowercase','ALT+U'],
+		[ 'menu_normal',    'Edit::',          'U~pper case',        'doc_case_upper',    'format-text-uppercase','*CTRL+U'],
+		[ 'menu_normal',    'Edit::',          '~Lower case',        'doc_case_lower',    'format-text-lowercase','*ALT+U'],
 		[ 'menu_separator', 'Edit::',          'e5' ],
 		[ 'menu_normal',    'Edit::',          '~Select all',        '<Control-a>',       'edit-select-all','*CTRL+A'],
 
@@ -910,6 +890,7 @@ sub SettingsPage {
 		-defaultforeground => $doc->cget('-contentforeground'),
 		-defaultfont => $doc->cget('-contentfont'),
 		-historyfile => $historyfile,
+		-extension => $self,
 		-themefile => $themefile,
 	);
 	return (

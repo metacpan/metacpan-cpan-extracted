@@ -94,7 +94,7 @@ SKIP: {
 
 	groupMembersAdd(qw[content Member1 Member2]);
 	my $groupsize1 = groupMembers('content');
-	ok (($groupsize1 eq 11), 'Adding members');
+	ok (($groupsize1 eq 10), 'Adding members');
 
 	groupMembersReplace(qw[content Member1 Member2]);
 	my $groupsize2 = groupMembers('content');

@@ -8178,6 +8178,9 @@ S_sv_strftime_common(pTHX_ SV * fmt,
 {   /* Documented above */
     PERL_ARGS_ASSERT_SV_STRFTIME_COMMON;
 
+    STRLEN fmt_cur;
+    const char *fmt_str = SvPV_const(fmt, fmt_cur);
+
     utf8ness_t fmt_utf8ness = (SvUTF8(fmt) && LIKELY(! IN_BYTES))
                               ? UTF8NESS_YES
                               : UTF8NESS_UNKNOWN;
@@ -8188,8 +8191,8 @@ S_sv_strftime_common(pTHX_ SV * fmt,
      * to get almost all the typical returns to fit without the called function
      * having to realloc; this is a somewhat educated guess, but feel free to
      * tweak it. */
-    SV* sv = newSV(MAX(SvCUR(fmt) * 2, 64));
-    if (! strftime8(SvPV_nolen(fmt),
+    SV* sv = newSV(MAX(fmt_cur * 2, 64));
+    if (! strftime8(fmt_str,
                     sv,
                     locale,
                     mytm,
@@ -8808,6 +8811,7 @@ Perl_init_i18nl10n(pTHX_ int printwarn)
      * categories into our internal indices. */
     if (map_LC_ALL_position_to_index[0] == LC_ALL_INDEX_) {
 
+#    ifdef PERL_LC_ALL_CATEGORY_POSITIONS_INIT
         /* Use this array, initialized by a config.h constant */
         int lc_all_category_positions[] = PERL_LC_ALL_CATEGORY_POSITIONS_INIT;
         STATIC_ASSERT_STMT(   C_ARRAY_LENGTH(lc_all_category_positions)
@@ -8820,6 +8824,21 @@ Perl_init_i18nl10n(pTHX_ int printwarn)
             map_LC_ALL_position_to_index[i] =
                               get_category_index(lc_all_category_positions[i]);
         }
+#    else
+        /* It is possible for both PERL_LC_ALL_USES_NAME_VALUE_PAIRS and
+         * PERL_LC_ALL_CATEGORY_POSITIONS_INIT not to be defined, e.g. on
+         * systems with only a C locale during ./Configure.  Assume that this
+         * can only happen as part of some sort of bootstrapping so allow
+         * compilation to succeed by ignoring correctness.
+         */
+        for (unsigned int i = 0;
+             i < C_ARRAY_LENGTH(map_LC_ALL_position_to_index);
+             i++)
+        {
+            map_LC_ALL_position_to_index[i] = 0;
+        }
+#    endif
+
     }
 
     LOCALE_UNLOCK;

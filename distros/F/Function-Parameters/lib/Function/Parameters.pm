@@ -1,4 +1,4 @@
-package Function::Parameters;
+package Function::Parameters 2.002005;
 
 use v5.14.0;
 use warnings;
@@ -14,8 +14,6 @@ sub _croak {
 
 use XSLoader;
 BEGIN {
-    our $VERSION = '2.002004';
-    #$VERSION =~ s/-TRIAL[0-9]*\z//;
     XSLoader::load;
 }
 

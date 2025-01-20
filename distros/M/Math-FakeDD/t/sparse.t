@@ -39,10 +39,14 @@ for(0..19) {
   my $vl = int(rand(20));
 
   my $x = Math::FakeDD->new( $big[$xb] ) + Math::FakeDD->new( $little[$xl] );
+  cmp_ok(dd_repro_test(dd_repro($x), $x), '==', 15, "dd_repro_test 1 passes");
   my $y = Math::FakeDD->new( $big[$yb] ) + Math::FakeDD->new( $little[$yl] );
+  cmp_ok(dd_repro_test(dd_repro($y), $y), '==', 15, "dd_repro_test 2 passes");
 
   my $u = Math::FakeDD->new( $big[$ub] ) - Math::FakeDD->new( $little[$ul] );
+  cmp_ok(dd_repro_test(dd_repro($u), $u), '==', 15, "dd_repro_test 3 passes");
   my $v = Math::FakeDD->new( $big[$vb] ) - Math::FakeDD->new( $little[$vl] );
+  cmp_ok(dd_repro_test(dd_repro($v), $v), '==', 15, "dd_repro_test 4 passes");
 
 sparse_test($x, $y);
 sparse_test($u, $v);
@@ -53,7 +57,9 @@ sparse_test($y, $v);
 }
 
 my $op1 = Math::FakeDD->new('0x1p-550');
+cmp_ok(dd_repro_test(dd_repro($op1), $op1), '==', 15, "dd_repro_test 5 passes");
 my $op2 = Math::FakeDD->new('0x1p-1050');
+cmp_ok(dd_repro_test(dd_repro($op2), $op2), '==', 15, "dd_repro_test 6 passes");
 
 my $sub = $op1 - $op2;
 my $repro = dd_repro($sub);
@@ -234,7 +240,7 @@ sub sparse_test {
   $repro = dd_repro($add);
   #ok(Math::FakeDD::tz_test($repro) == 1, sprintx($add));
   chop_inc_test($repro, $add);
-    cmp_ok($add, '==', dd_add_4196($op1, $op2), "$op1 + $op2 ok");
+  cmp_ok($add, '==', dd_add_4196($op1, $op2), "$op1 + $op2 ok");
 
   my $div = $op1 / $op2;
   $repro = dd_repro($div);

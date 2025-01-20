@@ -19,7 +19,7 @@ require Exporter;
 require DynaLoader;
 
 @ISA = qw(Exporter DynaLoader);
-$VERSION = '1.38';
+$VERSION = '1.39';
 
 bootstrap DBD::Firebird $VERSION;
 
@@ -1566,7 +1566,7 @@ DBI(3).
 
 =item Copyright (c) 2011- 2012  Stefan Suciu <stefbv70@gmail.com>
 
-=item Copyright (c) 2011, 2017  Damyan Ivanov <dmn@debian.org>
+=item Copyright (c) 2011-2015, 2017, 2024, 2025  Damyan Ivanov <dmn@debian.org>
 
 =item Copyright (c) 2011  Alexandr Ciornii <alexchorny@gmail.com>
 

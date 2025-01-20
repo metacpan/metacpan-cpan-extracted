@@ -40,12 +40,31 @@ def test_valgrind(implementation: pqclean.Implementation, impl_path, test_dir,
 
     dest_dir = os.path.join(test_dir, 'bin')
 
-    helpers.make(TYPE=implementation.scheme.type,
+    # handle Falcon PADDED and COMPACT interop testing
+    if implementation.scheme.name.startswith("falcon-"):
+        if implementation.scheme.name.startswith("falcon-padded-"):
+            # delete "-padded" to get interop scheme name
+            interop_src = pqclean.Implementation.by_name(implementation.scheme.name.replace('-padded', '', 1), implementation.name).path()
+        else:
+            # add "-padded" to get interop scheme name
+            interop_src = pqclean.Implementation.by_name(implementation.scheme.name.replace('falcon-', 'falcon-padded-', 1), implementation.name).path()
+        interop_dir = helpers.add_interop_files(interop_src, os.path.join(impl_path, '..'))
+        helpers.make(TYPE=implementation.scheme.type,
+                 SCHEME=implementation.scheme.name,
+                 SCHEME_DIR=os.path.abspath(impl_path),
+                 IMPLEMENTATION=implementation.name,
+                 INTEROP_DIR=interop_dir,
+                 DEST_DIR=dest_dir,
+                 EXTRAFLAGS="-gdwarf-4 -DPQCLEAN_USE_VALGRIND",
+                 NTESTS=1,
+                 working_dir=os.path.join(test_dir, 'test'))
+    else:
+        helpers.make(TYPE=implementation.scheme.type,
                  SCHEME=implementation.scheme.name,
                  SCHEME_DIR=os.path.abspath(impl_path),
                  IMPLEMENTATION=implementation.name,
                  DEST_DIR=dest_dir,
-                 EXTRAFLAGS="-g3",
+                 EXTRAFLAGS="-gdwarf-4 -DPQCLEAN_USE_VALGRIND",
                  NTESTS=1,
                  working_dir=os.path.join(test_dir, 'test'))
     functest_name = './functest_{}_{}'.format(implementation.scheme.name,

@@ -8,6 +8,9 @@ Tk::QuickForm::CScaleItem - Scale widget for Tk::QuickForm.
 
 use strict;
 use warnings;
+use vars qw($VERSION);
+$VERSION = '0.07';
+
 use Tk;
 use base qw(Tk::Derived Tk::QuickForm::CBaseClass);
 Construct Tk::Widget 'CScaleItem';
@@ -25,7 +28,7 @@ Inherits L<Tk::QuickForm::CBaseClass>.  Provides a Scale widget for L<Tk::QuickF
 You should never create an instance directly like above. This should
 be handled by L<Tk::QuickForm>.
 
-=head1 CONFIG VARIABLES
+=head1 OPTIONS
 
 All options, except I<-variable>, of L<Tk::Scale> are available.
 

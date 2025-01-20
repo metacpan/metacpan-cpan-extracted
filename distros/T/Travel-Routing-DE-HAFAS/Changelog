@@ -1,3 +1,9 @@
+Travel::Routing::DE::HAFAS 0.10 - Sun Jan 19 2024
+
+    * DB HAFAS is dead.
+    * hafas: Use VRN by default and adjust documentation.
+    * HAFAS: The service option is now mandatory; adjust documentation.
+
 Travel::Routing::DE::HAFAS 0.09 - Wed Nov 20 2024
 
     * Improve handling of backend messages and errors

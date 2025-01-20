@@ -33,7 +33,7 @@
       "runtime" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "7.12",
-            "perl" : "5.012"
+            "perl" : "5.016"
          }
       },
       "test" : {
@@ -45,14 +45,14 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/scottchiefbaker/perl-Random-Simple/issues"
+         "web" : "https://github.com/scottchiefbaker/perl-Crypt-Komihash/issues"
       },
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/scottchiefbaker/perl-Random-Simple.git",
-         "web" : "https://github.com/scottchiefbaker/perl-Random-Simple"
+         "url" : "https://github.com/scottchiefbaker/perl-Crypt-Komihash.git",
+         "web" : "https://github.com/scottchiefbaker/perl-Crypt-Komihash"
       }
    },
-   "version" : "0.01",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

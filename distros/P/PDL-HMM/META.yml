@@ -27,5 +27,5 @@ resources:
   bugtracker: https://github.com/moocow-the-bovine/PDL-HMM/issues
   homepage: http://pdl.perl.org/
   repository: git://github.com/moocow-the-bovine/PDL-HMM.git
-version: '0.06009'
+version: '0.06010'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

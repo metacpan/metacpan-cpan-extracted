@@ -17,6 +17,87 @@ Consult your favorite dictionary for details.
 
 =head1 EPIGRAPHS
 
+=head2 v5.41.7 - Martha Wells
+
+L<Announced on 2024-12-20 by Max Maischein|https://www.nntp.perl.org/group/perl.perl5.porters/2024/12/msg269316.html>
+
+   Indah glared at me, but it was more wry than angry. "Is that what you think?
+   Because you keep insisting it's a mysterious ultra-hacker."
+   Okay, that one stung. "I didn't use the words 'mysteriious' or 'ultra.'"
+   Aylen watched like it was one of those human games where they threw
+   balls at each other.
+
+=head2 v5.41.6 - Jon Postel
+
+L<Announced on 2024-11-20 by Thibault Duponchelle|https://www.nntp.perl.org/group/perl.perl5.porters/2024/11/msg269167.html>
+
+  Be conservative in what you do, and liberal in what you accept.
+
+=head2 v5.41.5 - Great P.I. of the Universe, Under A Killing Moon
+
+L<Announced on 2024-10-20 by Richard Leach|https://www.nntp.perl.org/group/perl.perl5.porters/2024/10/msg268977.html>
+
+  PI: So, they've found it again, have they? I thought we'd taken care of it.
+  A:  The forces of evil are persistent, Sir.
+  PI: I'm getting too old for this....
+  PI: Who have we got lined up to deal with this problem?
+  A:  Murphy, sir.
+  PI: Oh no! Not Murphy!
+
+=head2 v5.41.4 - Theodor Seuss Geisel
+
+L<Announced on 2024-09-20 by Thibault Duponchelle|https://www.nntp.perl.org/group/perl.perl5.porters/2024/09/msg268800.html>
+
+  Sometimes you will never know the value of a moment
+  until it becomes a memory.
+
+=head2 v5.41.3 - Jasper Fforde, The Constant Rabbit
+
+L<Announced on 2024-08-29 by Philippe Bruhat (BooK)|https://www.nntp.perl.org/group/perl.perl5.porters/2024/08/msg268756.html>
+
+  Somebody once said that the library is actually the dominant life
+  form on the planet. Humans simply exist as the reproductive means to
+  achieve more libraries.
+
+=head2 v5.41.2 - John Dryden
+
+L<Announced on 2024-07-20 by Karen Etheridge (Ether)|https://www.nntp.perl.org/group/perl.perl5.porters/2024/07/msg268542.html>
+
+  Errors, like straws, upon the surface flow; He who would search for
+  pearls must dive down below.
+
+=head2 v5.41.1 - Charles F. Kettering
+
+L<Announced on 2024-07-02 by Philippe Bruhat (BooK)|https://www.nntp.perl.org/group/perl.perl5.porters/2024/07/msg268328.html>
+
+  We find that in research a certain amount of intelligent ignorance
+  is essential to progress; for, if you know too much, you won't try
+  the thing.
+
+=head2 v5.40.1-RC1 - E. H. Gombrich, trans. Caroline Mustill, "A Little History of the World"
+
+L<Announced on 2025-01-05 by Steve Hay|https://www.nntp.perl.org/group/perl.perl5.porters/2025/01/msg269400.html>
+
+Unlike Egypt, Mesopotamia was rarely ruled by just one king.  Nor did
+any single empire survive long within firm frontiers.  Many tribes and
+many kings held power at different times.  The most important of these
+were the Sumerians, the Babylonians and the Assyrians.  For a long time
+it was thought that the Egyptians were the first people to have
+everything that goes to make up what we call a culture: towns and
+tradesmen, noblemen and kings, temples and priests, administrators and
+artists, writing and technical skills.  Yet we now know that, in some
+respects, the Sumerians were ahead of the Egyptians.
+
+=head2 v5.40.0 - Neil Gaiman, Coraline
+
+L<Announced on 2024-06-09 by Graham Knop|https://www.nntp.perl.org/group/perl.perl5.porters/2024/06/msg268252.html>
+
+  “What’s your name,” Coraline asked the cat. “Look, I’m Coraline. Okay?”
+  “Cats don’t have names,” it said.
+  “No?” said Coraline.
+  “No,” said the cat. “Now you people have names. That’s because you
+  don’t know who you are. We know who we are, so we don’t need names.”
+
 =head2 v5.39.10 - Fernando Pessoa
 
 L<Announced on 2024-04-28 by Paul Evans|https://www.nntp.perl.org/group/perl.perl5.porters/2024/04/msg268159.html>
@@ -131,6 +212,18 @@ counterparts across the Atlantic were busy blowing each other to pieces
 in a Civil War, they embarked on the construction of the Metropolitan
 Line knowing only one thing for certain - there was no way they were
 going to be able to run steam trains through it.
+
+=head2 v5.38.3-RC1 - E. H. Gombrich, trans. Caroline Mustill, "A Little History of the World"
+
+L<Announced on 2025-01-05 by Steve Hay|https://www.nntp.perl.org/group/perl.perl5.porters/2025/01/msg269399.html>
+
+Because the Egyptians were so wise and so powerful their empire lasted
+for a very long time.  Longer than any empire the world has ever known:
+nearly three thousand years.  And they took just as much care as they
+did with their corpses, when they preserved them from rotting away, in
+preserving all their ancient traditions over the centuries.  Their
+priests made quite sure that no son did anything his father had not
+done before him.  To them, everything old was sacred.
 
 =head2 v5.38.2 - Kim Stanley Robinson
 

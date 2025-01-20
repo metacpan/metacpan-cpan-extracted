@@ -66,7 +66,6 @@ do { my $x = {
                                       'Test::Pod::Coverage' => '1.08',
                                       'Test::Spelling' => '0.12',
                                       'Test::TrailingSpace' => '0.0203',
-                                      'Test::Vars' => '0.015',
                                       'Test::Version' => '1'
                                     }
                     },

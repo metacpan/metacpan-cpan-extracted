@@ -28,12 +28,12 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "PDL" : "0"
+            "PDL" : "2.081"
          }
       },
       "runtime" : {
          "requires" : {
-            "PDL" : "0",
+            "PDL" : "2.081",
             "Test::More" : "0"
          }
       }
@@ -46,6 +46,6 @@
          "web" : "https://github.com/moocow-the-bovine/PDL-Cluster"
       }
    },
-   "version" : "v1.54.003",
+   "version" : "v1.54.004",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -3,6 +3,7 @@ package Math::FakeDD;
 use strict;
 use warnings;
 use Math::MPFR qw(:mpfr);
+
 use Config;
 
 use 5.022; # for $Config{longdblkind}
@@ -70,10 +71,22 @@ use overload
 require Exporter;
 *import = \&Exporter::import;
 
+my $v = MPFR_VERSION_MAJOR;
+if($v < 4) {
+  warn "
+  This module requires that Math::MPFR was built against version 4
+  of the mpfr C library. You have only ", Rmpfr_get_version, ".\n",
+  "  As a result, you will experience a fatal assertion error whenever
+  the mpfr library needs to use a 1-bit precision value.
+  Some test suite tests are skipped to avoid such an error.
+  The need to use a 1-bit precision value is fairly limited, so
+  we'll go ahead anyway. You have been warned !!\n";
+}
+
 my @tags = qw(
   NV_IS_DOUBLE NV_IS_DOUBLEDOUBLE NV_IS_QUAD NV_IS_80BIT_LD MPFR_LIB_VERSION
   dd_abs dd_add dd_add_eq dd_assign dd_atan2 dd_catalan dd_cmp dd_clone dd_copy dd_cos dd_dec
-  dd_div dd_div_eq dd_eq dd_euler dd_exp dd_exp2 dd_exp10
+  dd_div dd_div_eq dd_dump dd_eq dd_euler dd_exp dd_exp2 dd_exp10
   dd_gt dd_gte dd_hex dd_inf dd_is_inf dd_is_nan dd_int dd_log dd_log2 dd_log10 dd_lt dd_lte
   dd_mul dd_mul_eq dd_nan dd_neq
   dd_nextup dd_nextdown dd_numify dd_pi dd_pow dd_pow_eq dd_repro dd_repro_test
@@ -88,7 +101,7 @@ my @tags = qw(
 
 %Math::FakeDD::EXPORT_TAGS = (all => [@tags]);
 
-$Math::FakeDD::VERSION =  '0.08';
+$Math::FakeDD::VERSION =  '1.01';
 
 # Whenever dd_repro($obj) returns its string representation of
 # the value of $obj, $Math::FakeDD::REPRO_PREC is set to the
@@ -105,13 +118,19 @@ $Math::FakeDD::DD_MAX = Math::FakeDD->new(Rmpfr_get_d(Math::MPFR->new('1.fffffff
 
 sub new {
 
-  my %h = ('msd' => 0.0, 'lsd' => 0.0);
-  return bless(\%h) unless @_;
+  my %h = ('msd' => 0.0, 'lsd' => 0.0, 'mpfr' => Rmpfr_init2(2098));
+  unless(@_) {
+    Rmpfr_set_zero($h{mpfr}, 1);
+    return bless(\%h);
+  }
 
   if(!ref($_[0]) && $_[0] eq "Math::FakeDD") {
     # 'new' has been called as a method
     shift;
-    return bless(\%h) unless @_;
+    unless(@_) {
+      Rmpfr_set_zero($h{mpfr}, 1);
+      return bless(\%h);
+    }
   }
 
   die "Too many args given to new()" if @_ > 1;
@@ -133,7 +152,7 @@ sub dd_repro {
     die "Please update Math::MPFR if you wish to call dd_repro()";
   }
 
-  my $arg = shift;
+  my $arg = mpfr2dd($_[0]->{mpfr});
   my $prec = 0;
   if(dd_is_nan($arg)) {
     $Math::FakeDD::REPRO_PREC = 0;
@@ -152,12 +171,19 @@ sub dd_repro {
   }
 
   if(NV_IS_DOUBLEDOUBLE) {
+    # A correction was made here in Math-FakeDD-0.09.
+    # However, it relies on nvtoa() being correct, and
+    # I don't have a machine on which I can verfiy that.
+    # (The replaced code also relied on correctness of nvtoa.)
     $Math::FakeDD::REPRO_PREC = undef; # nvtoa() doesn't tell us the precision.
-    return nvtoa($arg->{msd} + $arg->{lsd});
+    my $ret = dd2mpfr($arg->{msd});
+    Rmpfr_add($ret, $ret, dd2mpfr($arg->{lsd}), MPFR_RNDN);
+    return nvtoa(dd2mpfr(Rmpfr_get_NV($ret, MPFR_RNDN)));
   }
 
   my $neg = 0;
-  my $mpfr = dd2mpfr($arg);
+  # my $mpfr = dd2mpfr($arg); # old code
+  my $mpfr = $arg->{mpfr};
 
   if($mpfr < 0) {
     Rmpfr_neg($mpfr, $mpfr, MPFR_RNDN);
@@ -184,10 +210,16 @@ sub dd_repro {
     $prec = $addon + $exp;
     Rmpfr_prec_round($mpfr, $prec, MPFR_RNDN);
     $Math::FakeDD::REPRO_PREC = $prec;
-    # Provide 2nd arg of 728 to mpfrtoa().
-    # 2 ** -348 (prec = 727) needs this.
-    return '-' . mpfrtoa($mpfr, 728) if $neg;
-    return mpfrtoa($mpfr, 728);
+
+    if(abs($arg->{msd}) <= 2 ** -348 && abs($arg->{msd}) >= 2 ** -1067) {
+      # Provide 2nd arg of 728 to mpfrtoa().
+      # 2 ** -348 (prec = 727) needs this.
+      return '-' . mpfrtoa($mpfr, 728) if $neg;
+      return mpfrtoa($mpfr, 728);
+    }
+
+    return '-' . mpfrtoa($mpfr) if $neg;
+    return mpfrtoa($mpfr);
 
   } # close $arg->{lsd} == 0
 
@@ -245,7 +277,7 @@ sub dd_repro {
   Rmpfr_prec_round($mpfr, $prec, MPFR_RNDN);
 
   if($different_signs) {
-    my $candidate = mpfrtoa($mpfr, 53);
+    my $candidate = mpfrtoa($mpfr); # was mpfrtoa($mpfr, 53) - apparently unnecessary
 
     # Might fail either the "chop" test or
     # the "round trip" test, but not both.
@@ -269,8 +301,8 @@ sub dd_repro {
       $prec++;
       Rmpfr_prec_round($mpfr_orig, $prec, MPFR_RNDN);
       $Math::FakeDD::REPRO_PREC = $prec;
-      return '-' . mpfrtoa($mpfr_orig, 53) if $neg;
-      return mpfrtoa($mpfr_orig, 53);
+      return '-' . mpfrtoa($mpfr_orig) if $neg; # was mpfrtoa($mpfr_orig, 53) - apparently unnecessary
+      return mpfrtoa($mpfr_orig);               # was mpfrtoa($mpfr_orig, 53) - apparently unnecessary
     }
 
     my $ret = _chop_test($candidate, $arg, 0);
@@ -295,7 +327,7 @@ sub dd_repro {
   # We need to detect the (rare) case that a chopped and
   # then incremented mantissa passes the round trip.
 
-  my $can = mpfrtoa($mpfr, 53);
+  my $can = mpfrtoa($mpfr); # was mpfrtoa($mpfr, 53) - apparently unnecessary
   my $ret = _chop_test($can, $arg, 1);
 
   if($ret eq 'ok') {
@@ -414,28 +446,56 @@ sub _chop_test {
   return 'ok';
 }
 
+############################
+############################
+
 sub dd_repro_test {
   my ($repro, $op) = (shift, shift);
   my $ret = 0;
 
-  my $debug = defined $_[0] ? $_[0] : 0;
-  $debug = $debug =~ /debug/i ? 1 : 0;
+  my($debug, $examine) = (0, 0);
+
+  if(defined $_[0]) {
+    die "Too many args passed to dd_repro_test()"
+      if @_ > 2;
+
+    for(@_) {
+      $debug   = 1 if $_ =~ /debug/i;
+      $examine = 1 if $_ =~ /examine/i;
+    }
+  }
 
   print "OP: $op\nREPRO: $repro\n" if $debug;
+  $Math::FakeDD::examine{repro} = $repro if $examine;
 
   # Handle Infs, Nan, and Zero.
   if(dd_is_nan($op)) {
+    if($examine) {
+      # Clear unset %Math::FakeDD::examine keys
+      $Math::FakeDD::examine{chop} = '';
+      $Math::FakeDD::examine{inc}  = '';
+    }
     return 15 if $repro eq 'NaN';
     return 0;
   }
 
   if(dd_is_inf($op)) {
+    if($examine) {
+      # Clear unset %Math::FakeDD::examine keys
+      $Math::FakeDD::examine{chop} = '';
+      $Math::FakeDD::examine{inc}  = '';
+    }
     return 15 if ($op > 0 && $repro eq 'Inf');
     return 15 if ($op < 0 && $repro eq '-Inf');
     return 0;
   }
 
   if($op == 0) {
+    if($examine) {
+      # Clear unset %Math::FakeDD::examine keys
+      $Math::FakeDD::examine{chop} = '';
+      $Math::FakeDD::examine{inc}  = '';
+    }
     return 15 if ($repro eq '0.0' || $repro eq '-0.0');
     return 0;
   }
@@ -446,12 +506,6 @@ sub dd_repro_test {
   $ret++ if Math::FakeDD->new($repro) == $op; # round trip ok
 
   my @r = split /e/i, $repro;
-
-  if($debug) {
-    print "SPLIT:\n$r[0]";
-    if(defined($r[1])) { print " $r[1]\n" }
-    else { print " no exponent\n" }
-  }
 
   # Increment $ret by 8 if and only if there are no errant trailing
   # zeroes in $r[0] .
@@ -467,7 +521,7 @@ sub dd_repro_test {
   # We remove from $repro any trailing mantissa zeroes, and then
   # replace the least significant digit with zero.
   # IOW, we effectively chop off the least siginificant digit, thereby
-  # rounding it down to the next lowest decimal precision.)
+  # rounding it down to the next lowest decimal precision.
   # This altered string should assign to a DoubleDouble value that is
   # less than the given $op.
 
@@ -478,7 +532,13 @@ sub dd_repro_test {
     $r[1]++;
   }
 
-  return $ret + 6 if length($r[0]) < 2; # chop test and increment test inapplicable.
+  if(length($r[0]) < 2) { # chop test and increment test inapplicable.
+    if($examine) {
+      $Math::FakeDD::examine{chop} = '';
+      $Math::FakeDD::examine{inc}  = '';
+    }
+    return $ret + 6;
+  }
 
   substr($r[0], -1, 1, '0');
 
@@ -487,6 +547,7 @@ sub dd_repro_test {
                       : $r[0];
 
   print "CHOPPED:\n$chopped\n\n" if $debug;
+  $Math::FakeDD::examine{chop} = $chopped if $examine;
 
   $ret += 2 if Math::FakeDD->new($chopped) < abs($op); # chop test ok.
 
@@ -509,39 +570,42 @@ sub dd_repro_test {
     $r[0]++ for 1..10;
   }
 
-  my $substitute = substr($r[0], -1, 1) + 1;
-  substr($r[0], -1, 1, "$substitute");
+  unless ($r[0] gt $chopped) {
+    print "OP: $op\n" if $debug;
+    my $substitute = substr($r[0], -1, 1) + 1;
+    substr($r[0], -1, 1, "$substitute");
+  }
 
   my $incremented = defined($r[1]) ? $r[0] . 'e' . $r[1]
                                    : $r[0];
 
   print "INCREMENTED:\n$incremented\n" if $debug;
+  $Math::FakeDD::examine{inc} = $incremented if $examine;
 
   $ret += 4 if Math::FakeDD->new($incremented) > abs($op); # increment test ok
   return $ret;
 }
 
+############################
+############################
+
 sub dd_abs {
   my $obj;
-  my $ret = Math::FakeDD->new();
-
+  my $mpfr = Rmpfr_init2(2098);
   if(ref($_[0]) eq 'Math::FakeDD') {
-    $obj = shift;
+    $obj = dd_copy($_[0]);
   }
   else {
-    $obj = Math::FakeDD->new(shift);
+    $obj = mpfr2dd(mpfr2098($_[0]));
   }
 
   if($obj->{msd} < 0) {
-    $ret->{msd} = -$obj->{msd};
-    $ret->{lsd} = -$obj->{lsd};
-  }
-  else {
-    $ret->{msd} = $obj->{msd};
-    $ret->{lsd} = $obj->{lsd};
+    $obj->{msd} *= -1;
+    $obj->{lsd} *= -1;
+    $obj->{mpfr} *= -1;
   }
 
-  return $ret;
+  return $obj;
 }
 
 sub dd_add {
@@ -550,25 +614,24 @@ sub dd_add {
   die "Wrong number of arguments given to dd_add()"
     if @_ > 3;
 
-  my ($rop1, $rop2);
+  my ($rop1, $rop2) = (Rmpfr_init2(2098), Rmpfr_init2(2098));
 
   if(ref($_[0]) eq 'Math::FakeDD') {
-    $rop1 = dd2mpfr(shift);
+    Rmpfr_set($rop1, shift->{mpfr}, MPFR_RNDN);
   }
   else {
-    $rop1 = mpfr2098(shift);
+    Rmpfr_set($rop1, mpfr2098(shift), MPFR_RNDN);
   }
 
   if(ref($_[0]) eq 'Math::FakeDD') {
-    $rop2 = dd2mpfr(shift);
+    Rmpfr_set($rop2, shift->{mpfr}, MPFR_RNDN);
   }
   else {
-    $rop2 = mpfr2098(shift);
+    Rmpfr_set($rop2, mpfr2098(shift), MPFR_RNDN);
   }
 
   Rmpfr_add($rop1, $rop1, $rop2, MPFR_RNDN);
   return mpfr2dd($rop1);
-
 }
 
 sub dd_add_4196 {
@@ -576,20 +639,20 @@ sub dd_add_4196 {
   die "Wrong number of arguments given to dd_add()"
     if @_ > 2;
 
-  my ($rop1, $rop2);
+  my ($rop1, $rop2) = (Rmpfr_init2(2098), Rmpfr_init2(2098));
 
   if(ref($_[0]) eq 'Math::FakeDD') {
-    $rop1 = dd2mpfr(shift);
+    Rmpfr_set($rop1, shift->{mpfr}, MPFR_RNDN);
   }
   else {
-    $rop1 = mpfr2098(shift);
+    Rmpfr_set($rop1, mpfr2098(shift), MPFR_RNDN);
   }
 
   if(ref($_[0]) eq 'Math::FakeDD') {
-    $rop2 = dd2mpfr(shift);
+    Rmpfr_set($rop2, shift->{mpfr}, MPFR_RNDN);
   }
   else {
-    $rop2 = mpfr2098(shift);
+    Rmpfr_set($rop2, mpfr2098(shift), MPFR_RNDN);
   }
 
   my $ret = Rmpfr_init2(4196);
@@ -605,20 +668,20 @@ sub dd_add_eq {
   die "Wrong number of arguments given to dd_add_eq()"
     if @_ > 3;
 
-  my ($rop1, $rop2);
+  my ($rop1, $rop2) = (Rmpfr_init2(2098), Rmpfr_init2(2098));
 
   if(ref($_[0]) eq 'Math::FakeDD') {
-    $rop1 = dd2mpfr($_[0]);
+    Rmpfr_set($rop1, $_[0]->{mpfr}, MPFR_RNDN);
   }
   else {
     die "First arg to dd_add_eq must be a Math::FakeDD object";
   }
 
   if(ref($_[1]) eq 'Math::FakeDD') {
-    $rop2 = dd2mpfr($_[1]);
+    Rmpfr_set($rop2, $_[1]->{mpfr}, MPFR_RNDN);
   }
   else {
-    $rop2 = mpfr2098($_[1]);
+    Rmpfr_set($rop2, mpfr2098($_[1]), MPFR_RNDN);
   }
 
   Rmpfr_add($rop1, $rop1, $rop2, MPFR_RNDN);
@@ -643,19 +706,24 @@ sub dd_assign {
   if(ref($val) eq 'Math::FakeDD') {
     $_[0]->{msd} = $val->{msd};
     $_[0]->{lsd} = $val->{lsd};
+    Rmpfr_set($_[0]->{mpfr}, $val->{mpfr}, MPFR_RNDN);
   }
   else {
     my $obj = mpfr2dd(mpfr2098($val));
     $_[0]->{msd} = $obj->{msd};
     $_[0]->{lsd} = $obj->{lsd};
+    Rmpfr_set($_[0]->{mpfr}, $obj->{mpfr}, MPFR_RNDN);
   }
+
+  Rmpfr_set_d($_[0]->{mpfr}, $_[0]->{msd}, MPFR_RNDN);
+  Rmpfr_add_d($_[0]->{mpfr}, $_[0]->{mpfr}, $_[0]->{lsd}, MPFR_RNDN);
 }
 
 sub dd_atan2 {
 
   # When dd_atan2 is called via overloading of 'atan2' a
   # third argument (which we cannot ignore) will be provided
-  die "Wrong number of arguments given to dd_add()"
+  die "Wrong number of arguments given to dd_atan2()"
     if @_ > 3;
 
   my ($rop1, $rop2);
@@ -695,20 +763,20 @@ sub dd_cmp {
   die "Wrong number of arguments given to dd_cmp()"
     unless @_ == 2;
 
-  my ($rop1, $rop2);
+  my ($rop1, $rop2) = (Rmpfr_init2(2098), Rmpfr_init2(2098));
 
   if(ref($_[0]) eq 'Math::FakeDD') {
-    $rop1 = dd2mpfr(shift);
+    Rmpfr_set($rop1, shift->{mpfr}, MPFR_RNDN);
   }
   else {
-    $rop1 = dd2mpfr(Math::FakeDD->new(shift));
+    Rmpfr_set($rop1, mpfr2098(shift), MPFR_RNDN);
   }
 
   if(ref($_[0]) eq 'Math::FakeDD') {
-    $rop2 = dd2mpfr(shift);
+    Rmpfr_set($rop2, shift->{mpfr}, MPFR_RNDN);
   }
   else {
-    $rop2 = dd2mpfr(Math::FakeDD->new(shift));
+    Rmpfr_set($rop2, mpfr2098(shift), MPFR_RNDN);
   }
 
   return $rop1 <=> $rop2; # "<=>" is "Math::MPFR::overload_spaceship"
@@ -726,17 +794,18 @@ sub dd_copy {
 }
 
 sub dd_cos {
-  my $obj;
-  if(ref($_[0]) eq 'Math::FakeDD') { $obj = shift }
-  else {
-    $obj = Math::FakeDD->new(shift);
-  }
-  my $ret = Math::FakeDD->new();
   my $mpfr = Rmpfr_init2(2098);
-  Rmpfr_cos($mpfr, dd2mpfr($obj), MPFR_RNDN);
-  $obj = mpfr2dd($mpfr);
-  $ret->{msd} = $obj->{msd};
-  $ret->{lsd} = $obj->{lsd};
+
+  if(ref($_[0]) eq 'Math::FakeDD') {
+    Rmpfr_set($mpfr, $_[0]->{mpfr}, MPFR_RNDN);
+  }
+  else {
+    my $new_obj = mpfr2dd(mpfr2098($_[0]));
+    Rmpfr_set($mpfr, $new_obj->{mpfr}, MPFR_RNDN);
+  }
+
+  Rmpfr_cos($mpfr, $mpfr, MPFR_RNDN);
+  my $ret = mpfr2dd($mpfr);
   return $ret;
 }
 
@@ -763,20 +832,20 @@ sub dd_div {
   die "Wrong number of arguments given to dd_div()"
     if @_ > 3;
 
-  my ($rop1, $rop2);
+  my ($rop1, $rop2) = (Rmpfr_init2(2098), Rmpfr_init2(2098));
 
   if(ref($_[0]) eq 'Math::FakeDD') {
-    $rop1 = dd2mpfr(shift);
+    Rmpfr_set($rop1, shift->{mpfr}, MPFR_RNDN);
   }
   else {
-    $rop1 = mpfr2098(shift);
+    Rmpfr_set($rop1,mpfr2098(shift), MPFR_RNDN);
   }
 
   if(ref($_[0]) eq 'Math::FakeDD') {
-    $rop2 = dd2mpfr(shift);
+    Rmpfr_set($rop2, shift->{mpfr}, MPFR_RNDN);
   }
   else {
-    $rop2 = mpfr2098(shift);
+    Rmpfr_set($rop2,mpfr2098(shift), MPFR_RNDN);
   }
 
   if(@_ && $_[0]) { # switch args
@@ -849,6 +918,17 @@ sub dd_div_eq {
 
 }
 
+sub dd_dump {
+  my $s1 = "[" . sprintf("%.17g", $_[0]->{msd}) . " " . sprintf("%.17g", $_[0]->{lsd}) . "]";
+  my $s2 = sprintx($_[0]);
+  my ($s3, $exp) = Rmpfr_deref2($_[0]->{mpfr}, 2, 0, MPFR_RNDN);
+  if($s3 =~ /^1/)  {
+    $s3 =~ s/0+$//;
+    $s3 = "0." .  $s3 . "E$exp";
+  }
+  return "$s1\n$s2\n$s3\n";
+}
+
 sub dd_eq {
 
   # When dd_eq is called via overloading of '==' a
@@ -867,47 +947,50 @@ sub dd_euler {
 }
 
 sub dd_exp {
-  my $obj;
-  if(ref($_[0]) eq 'Math::FakeDD') { $obj = shift }
-  else {
-    $obj = Math::FakeDD->new(shift);
-  }
-  my $ret = Math::FakeDD->new();
   my $mpfr = Rmpfr_init2(2098);
-  Rmpfr_exp($mpfr, dd2mpfr($obj), MPFR_RNDN);
-  $obj = mpfr2dd($mpfr);
-  $ret->{msd} = $obj->{msd};
-  $ret->{lsd} = $obj->{lsd};
+
+  if(ref($_[0]) eq 'Math::FakeDD') {
+    Rmpfr_set($mpfr, $_[0]->{mpfr}, MPFR_RNDN);
+  }
+  else {
+    my $new_obj = mpfr2dd(mpfr2098($_[0]));
+    Rmpfr_set($mpfr, $new_obj->{mpfr}, MPFR_RNDN);
+  }
+
+  Rmpfr_exp($mpfr, $mpfr, MPFR_RNDN);
+  my $ret = mpfr2dd($mpfr);
   return $ret;
 }
 
 sub dd_exp2 {
-  my $obj;
-  if(ref($_[0]) eq 'Math::FakeDD') { $obj = shift }
-  else {
-    $obj = Math::FakeDD->new(shift);
-  }
-  my $ret = Math::FakeDD->new();
   my $mpfr = Rmpfr_init2(2098);
-  Rmpfr_exp2($mpfr, dd2mpfr($obj), MPFR_RNDN);
-  $obj = mpfr2dd($mpfr);
-  $ret->{msd} = $obj->{msd};
-  $ret->{lsd} = $obj->{lsd};
+
+  if(ref($_[0]) eq 'Math::FakeDD') {
+    Rmpfr_set($mpfr, $_[0]->{mpfr}, MPFR_RNDN);
+  }
+  else {
+    my $new_obj = mpfr2dd(mpfr2098($_[0]));
+    Rmpfr_set($mpfr, $new_obj->{mpfr}, MPFR_RNDN);
+  }
+
+  Rmpfr_exp2($mpfr, $mpfr, MPFR_RNDN);
+  my $ret = mpfr2dd($mpfr);
   return $ret;
 }
 
 sub dd_exp10 {
-  my $obj;
-  if(ref($_[0]) eq 'Math::FakeDD') { $obj = shift }
-  else {
-    $obj = Math::FakeDD->new(shift);
-  }
-  my $ret = Math::FakeDD->new();
   my $mpfr = Rmpfr_init2(2098);
-  Rmpfr_exp10($mpfr, dd2mpfr($obj), MPFR_RNDN);
-  $obj = mpfr2dd($mpfr);
-  $ret->{msd} = $obj->{msd};
-  $ret->{lsd} = $obj->{lsd};
+
+  if(ref($_[0]) eq 'Math::FakeDD') {
+    Rmpfr_set($mpfr, $_[0]->{mpfr}, MPFR_RNDN);
+  }
+  else {
+    my $new_obj = mpfr2dd(mpfr2098($_[0]));
+    Rmpfr_set($mpfr, $new_obj->{mpfr}, MPFR_RNDN);
+  }
+
+  Rmpfr_exp10($mpfr, $mpfr, MPFR_RNDN);
+  my $ret = mpfr2dd($mpfr);
   return $ret;
 }
 
@@ -963,67 +1046,62 @@ sub dd_hex {
 }
 
 sub dd_int {
-  # Don't fall for the idea that we can just do int(msd), int(lsd)
-  # when $_[0] is a Math::FakeDD object. I tried that and it doesn't
-  # work when, eg, the Math::FakeDD object has been assigned a (string)
-  # value of "0.59943243884210417e16".
-
-  my $obj;
-  if(ref($_[0]) eq 'Math::FakeDD') { $obj = shift }
-  else {
-    $obj = Math::FakeDD->new(shift);
-  }
-  my $ret = Math::FakeDD->new();
   my $mpfr = Rmpfr_init2(2098);
-  Rmpfr_trunc($mpfr, dd2mpfr($obj));
-  $obj = mpfr2dd($mpfr);
-  $ret->{msd} = $obj->{msd};
-  $ret->{lsd} = $obj->{lsd};
+  if(ref($_[0]) eq 'Math::FakeDD') { Rmpfr_set($mpfr, $_[0]->{mpfr}, MPFR_RNDN) }
+  else {
+    Rmpfr_set($mpfr, mpfr2098($_[0]));
+  }
+
+  Rmpfr_trunc($mpfr, $mpfr);
+  my $ret = mpfr2dd($mpfr);
   return $ret;
 }
 
 sub dd_log {
-  my $obj;
-  if(ref($_[0]) eq 'Math::FakeDD') { $obj = shift }
-  else {
-    $obj = Math::FakeDD->new(shift);
-  }
-  my $ret = Math::FakeDD->new();
   my $mpfr = Rmpfr_init2(2098);
-  Rmpfr_log($mpfr, dd2mpfr($obj), MPFR_RNDN);
-  $obj = mpfr2dd($mpfr);
-  $ret->{msd} = $obj->{msd};
-  $ret->{lsd} = $obj->{lsd};
+
+  if(ref($_[0]) eq 'Math::FakeDD') {
+    Rmpfr_set($mpfr, $_[0]->{mpfr}, MPFR_RNDN);
+  }
+  else {
+    my $new_obj = mpfr2dd(mpfr2098($_[0]));
+    Rmpfr_set($mpfr, $new_obj->{mpfr}, MPFR_RNDN);
+  }
+
+  Rmpfr_log($mpfr, $mpfr, MPFR_RNDN);
+  my $ret = mpfr2dd($mpfr);
   return $ret;
 }
 
 sub dd_log2 {
-  my $obj;
-  if(ref($_[0]) eq 'Math::FakeDD') { $obj = shift }
-  else {
-    $obj = Math::FakeDD->new(shift);
-  }
-  my $ret = Math::FakeDD->new();
   my $mpfr = Rmpfr_init2(2098);
-  Rmpfr_log2($mpfr, dd2mpfr($obj), MPFR_RNDN);
-  $obj = mpfr2dd($mpfr);
-  $ret->{msd} = $obj->{msd};
-  $ret->{lsd} = $obj->{lsd};
+
+  if(ref($_[0]) eq 'Math::FakeDD') {
+    Rmpfr_set($mpfr, $_[0]->{mpfr}, MPFR_RNDN);
+  }
+  else {
+    my $new_obj = mpfr2dd(mpfr2098($_[0]));
+    Rmpfr_set($mpfr, $new_obj->{mpfr}, MPFR_RNDN);
+  }
+
+  Rmpfr_log2($mpfr, $mpfr, MPFR_RNDN);
+  my $ret = mpfr2dd($mpfr);
   return $ret;
 }
 
 sub dd_log10 {
-  my $obj;
-  if(ref($_[0]) eq 'Math::FakeDD') { $obj = shift }
-  else {
-    $obj = Math::FakeDD->new(shift);
-  }
-  my $ret = Math::FakeDD->new();
   my $mpfr = Rmpfr_init2(2098);
-  Rmpfr_log10($mpfr, dd2mpfr($obj), MPFR_RNDN);
-  $obj = mpfr2dd($mpfr);
-  $ret->{msd} = $obj->{msd};
-  $ret->{lsd} = $obj->{lsd};
+
+  if(ref($_[0]) eq 'Math::FakeDD') {
+    Rmpfr_set($mpfr, $_[0]->{mpfr}, MPFR_RNDN);
+  }
+  else {
+    my $new_obj = mpfr2dd(mpfr2098($_[0]));
+    Rmpfr_set($mpfr, $new_obj->{mpfr}, MPFR_RNDN);
+  }
+
+  Rmpfr_log10($mpfr, $mpfr, MPFR_RNDN);
+  my $ret = mpfr2dd($mpfr);
   return $ret;
 }
 
@@ -1063,20 +1141,20 @@ sub dd_mul {
   die "Wrong number of arguments given to dd_mul()"
     if @_ > 3;
 
-  my ($rop1, $rop2);
+  my ($rop1, $rop2) = (Rmpfr_init2(2098), Rmpfr_init2(2098));
 
   if(ref($_[0]) eq 'Math::FakeDD') {
-    $rop1 = dd2mpfr(shift);
+    Rmpfr_set($rop1, shift->{mpfr}, MPFR_RNDN);
   }
   else {
-    $rop1 = mpfr2098(shift);
+    Rmpfr_set($rop1, mpfr2098(shift), MPFR_RNDN);
   }
 
   if(ref($_[0]) eq 'Math::FakeDD') {
-    $rop2 = dd2mpfr(shift);
+    Rmpfr_set($rop2, shift->{mpfr}, MPFR_RNDN);
   }
   else {
-    $rop2 = mpfr2098(shift);
+    Rmpfr_set($rop2, mpfr2098(shift), MPFR_RNDN);
   }
 
   Rmpfr_mul($rop1, $rop1, $rop2, MPFR_RNDN);
@@ -1089,20 +1167,20 @@ sub dd_mul_4196 {
   die "Wrong number of arguments given to dd_mul()"
     if @_ > 2;
 
-  my ($rop1, $rop2);
+  my ($rop1, $rop2) = (Rmpfr_init2(2098), Rmpfr_init2(2098));
 
   if(ref($_[0]) eq 'Math::FakeDD') {
-    $rop1 = dd2mpfr(shift);
+    Rmpfr_set($rop1, shift->{mpfr}, MPFR_RNDN);
   }
   else {
-    $rop1 = mpfr2098(shift);
+    Rmpfr_set($rop1, mpfr2098(shift), MPFR_RNDN);
   }
 
   if(ref($_[0]) eq 'Math::FakeDD') {
-    $rop2 = dd2mpfr(shift);
+    Rmpfr_set($rop2, shift->{mpfr}, MPFR_RNDN);
   }
   else {
-    $rop2 = mpfr2098(shift);
+    Rmpfr_set($rop2, mpfr2098(shift), MPFR_RNDN);
   }
 
   my $ret = Rmpfr_init2(4196);
@@ -1118,17 +1196,17 @@ sub dd_mul_eq {
   die "Wrong number of arguments given to dd_mul_eq()"
     if @_ > 3;
 
-  my ($rop1, $rop2);
+  my ($rop1, $rop2) = (Rmpfr_init2(2098), Rmpfr_init2(2098));
 
   if(ref($_[0]) eq 'Math::FakeDD') {
-    $rop1 = dd2mpfr($_[0]);
+    Rmpfr_set($rop1, $_[0]->{mpfr}, MPFR_RNDN);
   }
   else {
     die "First arg to dd_mul_eq must be a Math::FakeDD object";
   }
 
   if(ref($_[1]) eq 'Math::FakeDD') {
-    $rop2 = dd2mpfr($_[1]);
+    Rmpfr_set($rop2, $_[1]->{mpfr}, MPFR_RNDN);
   }
   else {
     $rop2 = mpfr2098($_[1]);
@@ -1162,15 +1240,12 @@ sub dd_numify {
   # by Test::More if (and only if) a test performing a
   # comparisons that involved a Math::FakeDD object failed.
 
-  die "Argument passed to dd_numify must ge a Math::FakeDD object"
+  die "Argument passed to dd_numify must be a Math::FakeDD object"
     unless ref($_[0]) eq 'Math::FakeDD';
 
-  my $arg = shift;
-  #return $arg->{msd} + $arg->{lsd}; # Information might be lost if
-                                    # NV type is not DoubleDouble.
-  #print "### dd_numify called ###\n";
-
-  return dd2mpfr($arg); # A better choice ??
+  my $ret = Rmpfr_init2(2098);
+  Rmpfr_set($ret, $_[0]->{mpfr}, MPFR_RNDN);
+  return $ret;
 }
 
 sub dd_pi {
@@ -1185,20 +1260,20 @@ sub dd_pow {
   die "Wrong number of arguments given to dd_pow()"
     if @_ > 3;
 
-  my ($rop1, $rop2);
+  my ($rop1, $rop2) = (Rmpfr_init2(2098), Rmpfr_init2(2098));
 
   if(ref($_[0]) eq 'Math::FakeDD') {
-    $rop1 = dd2mpfr(shift);
+    Rmpfr_set($rop1, shift->{mpfr}, MPFR_RNDN);
   }
   else {
-    $rop1 = mpfr2098(shift);
+    Rmpfr_set($rop1, mpfr2098(shift), MPFR_RNDN);
   }
 
   if(ref($_[0]) eq 'Math::FakeDD') {
-    $rop2 = dd2mpfr(shift);
+    Rmpfr_set($rop2, shift->{mpfr}, MPFR_RNDN);
   }
   else {
-    $rop2 = mpfr2098(shift);
+    Rmpfr_set($rop2, mpfr2098(shift), MPFR_RNDN);
   }
 
   if(@_ && $_[0]) { # switch args
@@ -1216,20 +1291,20 @@ sub dd_pow_eq {
   die "Wrong number of arguments given to dd_pow_eq()"
     if @_ > 3;
 
-  my ($rop1, $rop2);
+  my ($rop1, $rop2) = (Rmpfr_init2(2098), Rmpfr_init2(2098));
 
   if(ref($_[0]) eq 'Math::FakeDD') {
-    $rop1 = dd2mpfr($_[0]);
+    Rmpfr_set($rop1, $_[0]->{mpfr}, MPFR_RNDN);
   }
   else {
     die "First arg to dd_pow_eq must be a Math::FakeDD object";
   }
 
   if(ref($_[1]) eq 'Math::FakeDD') {
-    $rop2 = dd2mpfr($_[1]);
+    Rmpfr_set($rop2, $_[1]->{mpfr}, MPFR_RNDN);
   }
   else {
-    $rop2 = mpfr2098($_[1]);
+    Rmpfr_set($rop2, mpfr2098($_[1]), MPFR_RNDN);
   }
 
   Rmpfr_pow($rop1, $rop1, $rop2, MPFR_RNDN);
@@ -1244,17 +1319,18 @@ sub dd_pow_eq {
 }
 
 sub dd_sin {
-  my $obj;
-  if(ref($_[0]) eq 'Math::FakeDD') { $obj = shift }
-  else {
-    $obj = Math::FakeDD->new(shift);
-  }
-  my $ret = Math::FakeDD->new();
   my $mpfr = Rmpfr_init2(2098);
-  Rmpfr_sin($mpfr, dd2mpfr($obj), MPFR_RNDN);
-  $obj = mpfr2dd($mpfr);
-  $ret->{msd} = $obj->{msd};
-  $ret->{lsd} = $obj->{lsd};
+
+  if(ref($_[0]) eq 'Math::FakeDD') {
+    Rmpfr_set($mpfr, $_[0]->{mpfr}, MPFR_RNDN);
+  }
+  else {
+    my $new_obj = mpfr2dd(mpfr2098($_[0]));
+    Rmpfr_set($mpfr, $new_obj->{mpfr}, MPFR_RNDN);
+  }
+
+  Rmpfr_sin($mpfr, $mpfr, MPFR_RNDN);
+  my $ret = mpfr2dd($mpfr);
   return $ret;
 }
 
@@ -1283,18 +1359,16 @@ sub dd_spaceship {
 }
 
 sub dd_sqrt {
-  my $obj;
-  if(ref($_[0]) eq 'Math::FakeDD') { $obj = shift }
-  else {
-    $obj = Math::FakeDD->new(shift);
+my $mpfr = Rmpfr_init2(2098);
+  if(ref($_[0]) eq 'Math::FakeDD') {
+    Rmpfr_set($mpfr, $_[0]->{mpfr}, MPFR_RNDN);
   }
-  my $ret = Math::FakeDD->new();
-  my $mpfr = Rmpfr_init2(2098);
-  Rmpfr_sqrt($mpfr, dd2mpfr($obj), MPFR_RNDN);
+  else {
+    Rmpfr_set($mpfr, mpfr2098(shift), MPFR_RNDN);
+  }
 
-  $obj = mpfr2dd($mpfr);
-  $ret->{msd} = $obj->{msd};
-  $ret->{lsd} = $obj->{lsd};
+  Rmpfr_sqrt($mpfr, $mpfr, MPFR_RNDN);
+  my $ret = mpfr2dd($mpfr);
   return $ret;
 }
 
@@ -1338,13 +1412,20 @@ sub dd_stringify {
 
   # Deal with the possibility that the absolute value of one (and only
   # one) of the 2 doubles could be subnormal - ie less that 2 ** -1022.
-  if($expm < -1021) { Rmpfr_prec_round($mpfrm, 1074 + $expm, MPFR_RNDN) }   # msd is subnormal
 
-  elsif($self->{lsd}) { # Avoid the case that lsd is 0 !!!
-    my $expl = Rmpfr_get_exp($mpfrl);
-    if($expl < -1021) { Rmpfr_prec_round($mpfrl, 1074 + $expl, MPFR_RNDN) } # lsd is subnormal
+  if($expm < -1021) {   # msd is subnormal
+    Rmpfr_prec_round($mpfrm, 1074 + $expm, MPFR_RNDN);
+    return "[" . mpfrtoa($mpfrm, 53) . " " . '0.0' . "]";
   }
-  return "[" . mpfrtoa($mpfrm, 53) . " " . mpfrtoa($mpfrl, 53) . "]";
+
+  if($self->{lsd}) { # Avoid the case that lsd is 0 !!!
+    my $expl = Rmpfr_get_exp($mpfrl);
+    if($expl < -1021) { # lsd is subnormal
+      Rmpfr_prec_round($mpfrl, 1074 + $expl, MPFR_RNDN);
+      return "[" . mpfrtoa($mpfrm) . " " . mpfrtoa($mpfrl, 53) . "]";
+    }
+  }
+  return "[" . mpfrtoa($mpfrm) . " " . mpfrtoa($mpfrl) . "]";
 }
 
 sub dd_sub {
@@ -1353,20 +1434,20 @@ sub dd_sub {
   die "Wrong number of arguments given to dd_sub()"
     if @_ > 3;
 
-  my ($rop1, $rop2);
+  my ($rop1, $rop2) = (Rmpfr_init2(2098), Rmpfr_init2(2098));
 
   if(ref($_[0]) eq 'Math::FakeDD') {
-    $rop1 = dd2mpfr(shift);
+    Rmpfr_set($rop1, shift->{mpfr}, MPFR_RNDN);
   }
   else {
-    $rop1 = mpfr2098(shift);
+    Rmpfr_set($rop1, mpfr2098(shift), MPFR_RNDN);
   }
 
   if(ref($_[0]) eq 'Math::FakeDD') {
-    $rop2 = dd2mpfr(shift);
+    Rmpfr_set($rop2, shift->{mpfr}, MPFR_RNDN);
   }
   else {
-    $rop2 = mpfr2098(shift);
+    Rmpfr_set($rop2, mpfr2098(shift), MPFR_RNDN);
   }
 
   if(@_ && $_[0]) { # switch args
@@ -1383,20 +1464,20 @@ sub dd_sub_4196 {
   die "Wrong number of arguments given to dd_sub()"
     if @_ > 2;
 
-  my ($rop1, $rop2);
+  my ($rop1, $rop2) = (Rmpfr_init2(2098), Rmpfr_init2(2098));
 
   if(ref($_[0]) eq 'Math::FakeDD') {
-    $rop1 = dd2mpfr(shift);
+    Rmpfr_set($rop1, shift->{mpfr}, MPFR_RNDN);
   }
   else {
-    $rop1 = mpfr2098(shift);
+    Rmpfr_set($rop1, mpfr2098(shift), MPFR_RNDN);
   }
 
   if(ref($_[0]) eq 'Math::FakeDD') {
-    $rop2 = dd2mpfr(shift);
+    Rmpfr_set($rop2, shift->{mpfr}, MPFR_RNDN);
   }
   else {
-    $rop2 = mpfr2098(shift);
+    Rmpfr_set($rop1, mpfr2098(shift), MPFR_RNDN);
   }
 
   my $ret = Rmpfr_init2(4196);
@@ -1411,20 +1492,20 @@ sub dd_sub_eq {
   die "Wrong number of arguments given to dd_sub_eq()"
     if @_ > 3;
 
-  my ($rop1, $rop2);
+  my ($rop1, $rop2) = (Rmpfr_init2(2098), Rmpfr_init2(2098));
 
   if(ref($_[0]) eq 'Math::FakeDD') {
-    $rop1 = dd2mpfr($_[0]);
+    Rmpfr_set($rop1, $_[0]->{mpfr}, MPFR_RNDN);
   }
   else {
     die "First arg to dd_sub_eq must be a Math::FakeDD object";
   }
 
   if(ref($_[1]) eq 'Math::FakeDD') {
-    $rop2 = dd2mpfr($_[1]);
+    Rmpfr_set($rop2, $_[1]->{mpfr}, MPFR_RNDN);
   }
   else {
-    $rop2 = mpfr2098($_[1]);
+    Rmpfr_set($rop2, mpfr2098($_[1]), MPFR_RNDN);
   }
 
   Rmpfr_sub($rop1, $rop1, $rop2, MPFR_RNDN);
@@ -1441,9 +1522,10 @@ sub dd_sub_eq {
 
 sub dd2mpfr {
   my $self = shift;
-  my $ret = Rmpfr_init2(2098);
-  Rmpfr_add($ret, mpfr2098($self->{msd}), mpfr2098($self->{lsd}), MPFR_RNDN);
-  return $ret;
+  #my $ret = Rmpfr_init2(2098);
+  #Rmpfr_add($ret, mpfr2098($self->{msd}), mpfr2098($self->{lsd}), MPFR_RNDN);
+  #return $ret;
+  return $self->{mpfr};
 }
 
 sub mpfr2dd {
@@ -1469,6 +1551,8 @@ sub mpfr2dd {
   if(!$msd || _is_nan($msd) || _is_inf($msd)) { # $msd is zero, nan, or inf.
     $h{msd} = $msd;
     $h{lsd} = 0.0;
+    $h{mpfr} = Rmpfr_init2(2098);
+    Rmpfr_set_d($h{mpfr}, $h{msd}, MPFR_RNDN);
     return bless(\%h);
   }
 
@@ -1487,6 +1571,9 @@ sub mpfr2dd {
 
   $h{msd} = $msd;
   $h{lsd} = $lsd;
+  $h{mpfr} = Rmpfr_init2(2098);
+  Rmpfr_set_d($h{mpfr}, $h{msd}, MPFR_RNDN);
+  Rmpfr_add_d($h{mpfr}, $h{mpfr}, $h{lsd}, MPFR_RNDN);
   return bless(\%h);
 }
 
@@ -1508,6 +1595,8 @@ sub mpfr_any_prec2dd {
   if($msd == 0 || $msd != $msd || $msd / $msd != 1) { # $msd is zero, nan, or inf.
     $h{msd} = $msd;
     $h{lsd} = 0;
+    $h{mpfr} = Rmpfr_init2(2098);
+    Rmpfr_set_d($h{mpfr}, $h{msd}, MPFR_RNDN);
     return bless(\%h);
   }
 
@@ -1515,6 +1604,9 @@ sub mpfr_any_prec2dd {
   my $lsd = Rmpfr_get_d($mpfr, MPFR_RNDN);
   $h{msd} = $msd;
   $h{lsd} = $lsd;
+  $h{mpfr} = Rmpfr_init2(2098);
+  Rmpfr_set_d($h{mpfr}, $h{msd}, MPFR_RNDN);
+  Rmpfr_add_d($h{mpfr}, $h{mpfr}, $h{lsd}, MPFR_RNDN);
   return bless(\%h);
 }
 
@@ -1527,12 +1619,23 @@ sub mpfr2098 {
   # NV (perl floating point type) or Math::MPFR object.
 
   die "Invalid arg ($itsa) passed internally to mpfr2098()"
-    unless ($itsa > 0 && $itsa <= 4);
+    unless ($itsa > 0 && $itsa <= 5);
+
+  if($itsa == 5) {                           # Math::MPFR object
+    Rmpfr_set($ret, $_[0], MPFR_RNDN);
+    return $ret;
+  }
 
   my $arg = shift;
 
   if($itsa == 4) {                           # PV
+    my $turnoff = 0;
+    if(!$Math::MPFR::NNW) {
+      $Math::MPFR::NNW = 1;  # warn if $arg contains non-numeric character(s).
+      $turnoff = 1;
+    }
     Rmpfr_set_str($ret, $arg, 0, MPFR_RNDN);
+    $Math::MPFR::NNW = 0 if $turnoff;  # $Math::MPFR::NNW retains initial setting.
     return $ret;
   }
 
@@ -1648,11 +1751,14 @@ sub dd_inf {
   my $inf = Math::MPFR->new();
   Rmpfr_set_inf($inf, defined($_[0]) ?  shift : 0); # Will be -Inf only if $_[0] < 0
   my %h = (msd => Rmpfr_get_d($inf, MPFR_RNDN), lsd => 0.0);
+  $h{mpfr} = Rmpfr_init2(2098);
+  Rmpfr_set_d($h{mpfr}, $h{msd}, MPFR_RNDN);
   return bless \%h;
 }
 
 sub dd_nan {
   my %h = (msd => Rmpfr_get_d(Math::MPFR->new(), MPFR_RNDN), lsd => 0.0);
+  $h{mpfr} = Rmpfr_init2(2098);
   return bless \%h;
 }
 
@@ -1702,6 +1808,8 @@ sub unpackx {
 #}
 
 sub dd_nextup {
+  die "Arg given to dd_nextup() must be a Math::FakeDD object"
+    unless ref($_[0]) eq 'Math::FakeDD';
   my $dd = shift;
   return Math::FakeDD->new(2 ** -1074) if $dd == 0;
   return dd_nan() if dd_is_nan($dd);
@@ -1742,6 +1850,8 @@ return $dd + $keep;
 }
 
 sub dd_nextdown {
+  die "Arg given to dd_nextdown() must be a Math::FakeDD object"
+    unless ref($_[0]) eq 'Math::FakeDD';
   my $dd = shift;
   return Math::FakeDD->new(-(2 ** -1074)) if $dd == 0;
   return dd_nan() if dd_is_nan($dd);

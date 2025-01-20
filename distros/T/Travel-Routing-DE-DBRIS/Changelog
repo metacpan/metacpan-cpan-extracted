@@ -1,0 +1,7 @@
+Travel::Routing::DE::DBRIS 0.01 - Sun Jan 19 2025
+
+    * Initial release
+    * Supports requesting itineraries from bahn.de with user-specified
+      departure date/time and modes of transport
+    * Features that are not implemented yet include proper pricing / passenger
+      specification, Deutschlandticket, bike carriage, and reservation only

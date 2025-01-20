@@ -41,7 +41,7 @@ __[config]__
 	piecewise      Allows piecewise data processing
 	resampling     Allows resampling the histogram
 	serialization  Facilities for data structure serialization
-	threading      Uses PDL threading
+	broadcasting   Uses PDL broadcasting
 	variable       Variable-width bins
 	weight         Support for weighted histograms
 </features>
@@ -62,7 +62,7 @@ __[config]__
 	piecewise      -
 	resampling     -
 	serialization  X
-	threading      -
+	broadcasting   -
 	variable       X
 	weight         X
 </module>
@@ -83,7 +83,7 @@ __[config]__
 	piecewise      -
 	resampling     -
 	serialization  X
-	threading      -
+	broadcasting   -
 	variable       X
 	weight         X
 </module>
@@ -104,7 +104,7 @@ __[config]__
 	piecewise      -
 	resampling     X
 	serialization  X
-	threading      -
+	broadcasting   -
 	variable       X
 	weight         X
 </module>
@@ -115,7 +115,7 @@ __[config]__
 	auto           X
 	bad            X
 	callbacks      -
-	data           Piddles
+	data           NDArrays
 	dims           2
 	implementation C
 	interface      Proc.
@@ -125,7 +125,7 @@ __[config]__
 	piecewise      -
 	resampling     X
 	serialization  X
-	threading      X
+	broadcasting   X
 	variable       -
 	weight         X
 </module>
@@ -136,7 +136,7 @@ __[config]__
 	auto           X
 	bad            X
 	callbacks      Perl+C
-	data           Piddles
+	data           NDArrays
 	dims           N
 	implementation C/Perl
 	interface      OO+Proc.
@@ -146,7 +146,7 @@ __[config]__
 	piecewise      X
 	resampling     -
 	serialization  -
-	threading      -
+	broadcasting   -
 	variable       X
 	weight         -
 </module>

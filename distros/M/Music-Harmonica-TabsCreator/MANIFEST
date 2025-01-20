@@ -1,0 +1,16 @@
+Changes
+cpanfile
+lib/Music/Harmonica/TabsCreator.pm
+lib/Music/Harmonica/TabsCreator/NoteToToneConverter.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+script/harmonica-tabs-creator
+t/000-load.t
+t/001-cpanfile.t
+t/001-podsyntax.t
+t/100-note-to-tone-converter.t
+t/200-tune-to-tab.t
+t/300-rendered.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

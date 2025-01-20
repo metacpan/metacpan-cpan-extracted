@@ -21,16 +21,18 @@ Construct Tk::Widget 'CoditTagsEditor';
 sub Populate {
 	my ($self,$args) = @_;
 	
-	my $themefile = delete $args->{'-themefile'};
-	die 'You must specify the -themefile option' unless defined $themefile;
 	my $dbackground = delete $args->{'-defaultbackground'};
 	die 'You must specify the -defaultbackground option' unless defined $dbackground;
 	my $dforeground = delete $args->{'-defaultforeground'};
 	die 'You must specify the -defaultforeground option' unless defined $dforeground;
 	my $dfont = delete $args->{'-defaultfont'};
 	die 'You must specify the -defaultfont option' unless defined $dfont;
+	my $ext = delete	$args->{'-extension'};
+	die 'You must specify the -extension option' unless defined $ext;
 	my $hist = delete	$args->{'-historyfile'};
 	die 'You must specify the -historyfile option' unless defined $hist;
+	my $themefile = delete $args->{'-themefile'};
+	die 'You must specify the -themefile option' unless defined $themefile;
 	
 	$self->SUPER::Populate($args);
 	my $te = $self->TagsEditor(
@@ -45,10 +47,8 @@ sub Populate {
 	)->pack(-fill => 'x');
 	$toolframe->Button(
 		-command => sub {
-			my $file = $self->getSaveFile(
-				-filetypes => [
-					['Highlight Theme' => '.ctt'],
-				],
+			my ($file) = $ext->pickFileSave(
+				-loadfilter => '.ctt',
 			);
 			$te->save($file) if defined $file;
 		},
@@ -57,10 +57,8 @@ sub Populate {
 	$toolframe->Button(
 		-text => 'Load',
 		-command => sub {
-			my $file = $self->getOpenFile(
-				-filetypes => [
-					['Highlight Theme' => '.ctt'],
-				],
+			my ($file) = $ext->pickFileOpen(
+				-loadfilter => '.ctt',
 			);
 			if (defined $file) {
 				my $obj = Tk::CodeText::Theme->new;

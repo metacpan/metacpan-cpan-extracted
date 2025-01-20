@@ -1,5 +1,9 @@
 Revision history for Perl extension Tk::QuickForm.
 
+0.07  Sat Jan 18 2025
+	- Added options -enables and -disables to the boolean and radio types.
+	- Updated and revised documentation.
+
 0.06  Sun Dec 15 2024
 	- Changed bug tracker
 	- Added switch '*frame'

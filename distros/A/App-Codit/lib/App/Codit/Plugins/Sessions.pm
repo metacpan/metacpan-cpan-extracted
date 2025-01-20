@@ -9,7 +9,7 @@ App::Codit::Plugins::Sessions - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.11;
+$VERSION = 0.16;
 
 use base qw( Tk::AppWindow::BaseClasses::Plugin );
 
@@ -35,10 +35,53 @@ Manage your sessions. Saves your named session on exit and reloads it on start.
 
 The sessions plugin allows you to save a collection of documents as a session.
 When re-opening the session the documents are loaded in the exact order as they
-were when the session was closed. Also the syntax option, tab size, indent style
-and insert cursor position are saved.
+were when the session was closed. Also the syntax option, tab size, indent style,
+bookmarks and insert cursor position are saved. The only thing that is lost is your
+undo stack.
+
+The sessions plugin also saves the following from plugins if they are loaded:
+
+=over 4
+
+=item The working folder from the Console plugin
+
+=item The working folder from the FileBrowser plugin
+
+=item The project name of the currently loaded project in the Git plugin
+
+=back
 
 The session manager allows you to keep your sessions orderly.
+
+=head1 COMMANDS
+
+=over 4
+
+=item B<session_dialog>
+
+Pops the dialog for managing sessions.
+
+=item B<session_fill_menu>
+
+Called when the Session menu in the menu bar is opened.
+
+=item B<session_new>
+
+Closes current session and creates a new, unnamed, one.
+
+=item B<session_open>
+
+Takes a session name as parameter. Closes current session and opens the new one.
+
+=item B<session_save>
+
+Save current session. If the session was not saved before, a dialog will pop to enter a name.
+
+=item B<session_save_as>
+
+Save current session under a new name.
+
+=back
 
 =cut
 
@@ -58,7 +101,7 @@ sub new {
 		session_new => ['sessionNew', $self],
 		session_open => ['sessionOpen', $self],
 		session_save => ['sessionSave', $self],
-		session_save_as => ['sessionSave', $self],
+		session_save_as => ['sessionSaveAs', $self],
 	);
 	$self->cmdHookAfter('set_title', 'AdjustTitle', $self);
 	return $self;

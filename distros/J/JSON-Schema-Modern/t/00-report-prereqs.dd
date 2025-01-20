@@ -105,6 +105,7 @@ do { my $x = {
                                    'File::Spec' => '0',
                                    'Math::BigInt' => '1.999701',
                                    'Module::Metadata' => '0',
+                                   'Term::ANSIColor' => '0',
                                    'Test2::API' => '0',
                                    'Test::Deep' => '0',
                                    'Test::Deep::UnorderedPairs' => '0',

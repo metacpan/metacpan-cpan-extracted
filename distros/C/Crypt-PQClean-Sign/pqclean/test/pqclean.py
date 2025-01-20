@@ -20,13 +20,21 @@ class Scheme:
     def namespace_prefix(self):
         return 'PQCLEAN_{}_'.format(self.name.upper()).replace('-', '')
 
+    # only useful for Falcon
+    def padded_namespace_prefix(self):
+        if self.name.startswith('falcon-'):
+            return 'PQCLEAN_{}PADDED{}_'.format(*self.name.upper().split('-'))
+        else: # return a dummy value
+            return self.namespace_prefix()
+            
+
     @staticmethod
     @lru_cache(maxsize=None)
     def by_name(scheme_name):
         for scheme in Scheme.all_schemes():
             if scheme.name == scheme_name:
                 return scheme
-        raise KeyError()
+        raise KeyError(f"No scheme for {scheme_name}")
 
     @staticmethod
     @lru_cache(maxsize=1)
@@ -118,7 +126,7 @@ class Implementation:
         for implementation in scheme.implementations:
             if implementation.name == implementation_name:
                 return implementation
-        raise KeyError()
+        raise KeyError(f"No implementation for {scheme_name} - {implementation_name}")
 
     @staticmethod
     @lru_cache(maxsize=None)
@@ -136,6 +144,11 @@ class Implementation:
 
     def namespace_prefix(self):
         return '{}{}_'.format(self.scheme.namespace_prefix(),
+                              self.name.upper()).replace('-', '')
+
+    # only useful for Falcon
+    def padded_namespace_prefix(self):
+        return '{}{}_'.format(self.scheme.padded_namespace_prefix(),
                               self.name.upper()).replace('-', '')
 
     def supported_on_os(self, os: Optional[str] = None) -> bool:
@@ -169,11 +182,14 @@ class Implementation:
         for platform_ in self.metadata()['supported_platforms']:
             if platform_['architecture'] == cpuinfo['arch'].lower():
                 # Detect actually running on emulated i386
-                if (platform_['architecture'] == 'x86_64' and
-                        platform.architecture()[0] == '32bit'):
-                    continue
-                if all([flag in cpuinfo['flags']
-                        for flag in platform_['required_flags']]):
+                if platform_['architecture'] == 'x86_64':
+                    if platform.architecture()[0] == '32bit':
+                        continue
+                    if (platform.system() == "Windows"
+                            and os.environ.get("PLATFORM") == "x86"):
+                        continue
+                if all(flag in cpuinfo['flags']
+                       for flag in platform_['required_flags']):
                     return True
         return False
 

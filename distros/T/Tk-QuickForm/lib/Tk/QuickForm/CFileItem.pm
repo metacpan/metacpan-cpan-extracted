@@ -9,7 +9,7 @@ Tk::QuickForm::CFileItem - File select entry widget for Tk::QuickForm.
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.06';
+$VERSION = '0.07';
 
 use base qw(Tk::Derived Tk::QuickForm::CTextItem);
 Construct Tk::Widget 'CFileItem';
@@ -28,9 +28,7 @@ Inherits L<Tk::QuickForm::CTextItem>. Provides a file entry with dialog for L<Tk
 You should never create an instance directly like above. This should
 be handled by L<Tk::QuickForm>.
 
-=head1 CONFIG VARIABLES
-
-=head1 CONFIG VARIABLES
+=head1 OPTIONS
 
 All options, except I<-textvariable>, of L<Tk::Entry> are available.
 
@@ -50,6 +48,7 @@ sub Populate {
 	$self->ConfigSpecs(
 		-image => [$self->Subwidget('Select')],
 		-background => ['SELF', 'DESCENDANTS'],
+		-state => [[$self->Subwidget('Entry'), $self->Subwidget('Select')]],
 		DEFAULT => [$self->Subwidget('Entry')],
 	);
 }

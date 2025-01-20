@@ -52,7 +52,8 @@ return {
         '$(OBJECT)' => join(' ', glob 'hax/*.c.inc'),
     },
 
-    REPOSITORY => [ github => 'mauke' ],
+    REPOSITORY => [ codeberg => 'mauke' ],
+    BUGTRACKER => 'https://codeberg.org/mauke/Function-Parameters/issues',
 
     HARNESS_OPTIONS => ['j4'],
 };

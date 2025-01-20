@@ -118,11 +118,11 @@ package B::Op_private;
 our %bits;
 
 
-our $VERSION = "5.040000";
+our $VERSION = "5.040001";
 
 $bits{$_}{3} = 'OPpENTERSUB_AMPER' for qw(entersub rv2cv);
 $bits{$_}{6} = 'OPpENTERSUB_DB' for qw(entersub rv2cv);
-$bits{$_}{2} = 'OPpENTERSUB_HASTARG' for qw(entersub rv2cv);
+$bits{$_}{2} = 'OPpENTERSUB_HASTARG' for qw(ceil entersub floor goto refaddr reftype rv2cv);
 $bits{$_}{6} = 'OPpFLIP_LINENUM' for qw(flip flop);
 $bits{$_}{1} = 'OPpFT_ACCESS' for qw(fteexec fteread ftewrite ftrexec ftrread ftrwrite);
 $bits{$_}{4} = 'OPpFT_AFTER_t' for qw(ftatime ftbinary ftblk ftchr ftctime ftdir fteexec fteowned fteread ftewrite ftfile ftis ftlink ftmtime ftpipe ftrexec ftrowned ftrread ftrwrite ftsgid ftsize ftsock ftsuid ftsvtx fttext fttty ftzero);
@@ -866,6 +866,7 @@ our %ops_using = (
     OPpEARLY_CV              => [qw(gv)],
     OPpEMPTYAVHV_IS_HV       => [qw(emptyavhv)],
     OPpENTERSUB_AMPER        => [qw(entersub rv2cv)],
+    OPpENTERSUB_HASTARG      => [qw(ceil entersub floor goto refaddr reftype rv2cv)],
     OPpENTERSUB_INARGS       => [qw(entersub)],
     OPpENTERSUB_NOPAREN      => [qw(rv2cv)],
     OPpEVAL_BYTES            => [qw(entereval)],
@@ -927,7 +928,6 @@ $ops_using{OPpCOREARGS_PUSHMARK} = $ops_using{OPpCOREARGS_DEREF1};
 $ops_using{OPpCOREARGS_SCALARMOD} = $ops_using{OPpCOREARGS_DEREF1};
 $ops_using{OPpDONT_INIT_GV} = $ops_using{OPpALLOW_FAKE};
 $ops_using{OPpENTERSUB_DB} = $ops_using{OPpENTERSUB_AMPER};
-$ops_using{OPpENTERSUB_HASTARG} = $ops_using{OPpENTERSUB_AMPER};
 $ops_using{OPpEVAL_COPHH} = $ops_using{OPpEVAL_BYTES};
 $ops_using{OPpEVAL_EVALSV} = $ops_using{OPpEVAL_BYTES};
 $ops_using{OPpEVAL_HAS_HH} = $ops_using{OPpEVAL_BYTES};

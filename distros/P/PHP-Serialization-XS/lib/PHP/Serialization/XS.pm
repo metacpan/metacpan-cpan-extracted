@@ -13,7 +13,7 @@ our @ISA = qw(PHP::Serialization Exporter);
 our %EXPORT_TAGS = (all => [ qw(serialize unserialize) ]);
 our @EXPORT_OK = @{ $EXPORT_TAGS{all} };
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 require XSLoader;
 XSLoader::load('PHP::Serialization::XS', $VERSION);
@@ -131,7 +131,7 @@ L<PHP::Serialization>
 
 =head1 AUTHOR
 
-Darren Kulp, E<lt>kulp@cpan.orgE<gt>
+Darren Kulp, E<lt>darren@kulp.chE<gt>
 
 Tests stolen shamelessly from Tomas Doran's L<PHP::Serialization> package.
 

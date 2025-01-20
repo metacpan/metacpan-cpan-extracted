@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.014;
 
-our $VERSION = '6.16';
+our $VERSION = '6.17';
 
 use utf8;
 use DateTime;
@@ -708,7 +708,7 @@ __END__
 
 =head1 NAME
 
-hafas-m - Interface to the DeutscheBahn/HAFAS online departure monitor
+hafas-m - Interface to the HAFAS-based online departure monitors
 
 =head1 SYNOPSIS
 
@@ -721,16 +721,14 @@ B<hafas-m> [B<-s> I<service>] [B<-l> I<language>] B<!>I<query>|I<journeyID>
 
 =head1 VERSION
 
-version 6.16
+version 6.17
 
 =head1 DESCRIPTION
 
-hafas-m is an interface to HAFAS public transport services such as the one
-operated by Deutsche Bahn.
-
-It can serve as an arrival/departure monitor, request details about a specific
-trip/journey, and look up public transport stops by name or geolocation.
-The operating mode depends on the contents of its non-option argument.
+hafas-m is an interface to HAFAS public transport services. It can serve as an
+arrival/departure monitor, request details about a specific trip/journey, and
+look up public transport stops by name or geolocation.  The operating mode
+depends on the contents of its non-option argument.
 
 =head2 Arrival/Departure Monitor (I<station>)
 
@@ -892,9 +890,6 @@ None.
 =head1 BUGS AND LIMITATIONS
 
 =over
-
-=item * DB HAFAS is no more. At this point, there is no suitable HAFAS instance
-that covers local and regional / long-distance transit in Germany.
 
 =item * HAFAS does not provide real-time data for routes of stationboard
 entries.  Hence, B<--via> estimates the arrival time from scheduled

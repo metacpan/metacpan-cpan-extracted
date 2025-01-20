@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.15";
+$VERSION="0.16";
 use Tk;
 use App::Codit::CodeTextManager;
 
@@ -40,7 +40,7 @@ It does auto indent, bookmarks, comment, uncomment, indent and unindent. Tab siz
 fully user configurable.
 
 An online manual can be found here:
-L<http://www.perlgui.org/wp-content/uploads/2024/12/manual-0.14.pdf>
+L<http://www.perlgui.org/wp-content/uploads/2025/01/manual-0.16.pdf>
 
 =head1 RUNNING CODIT
 
@@ -68,7 +68,7 @@ Point to the folders where your icon libraries are located.*
 
 Icon theme to load.
 
-=item I<-P> or I<-noplugins>
+=item I<-np> or I<-noplugins>
 
 Launch without any plugins loaded. This supersedes the -plugins option.
 
@@ -169,13 +169,11 @@ Codit uses the following extensions from L<Tk::AppWindow>:
 
 =item B<MenuBar> see L<Tk::AppWindow::Ext::MenuBar>
 
-=item B<Navigator> see L<Tk::AppWindow::Ext::Navigator>
-
-=item B<NavigatorPanel> see L<Tk::AppWindow::Ext::NavigatorPanel>
-
 =item B<Panels> see L<Tk::AppWindow::Ext::Panels>
 
 =item B<Plugins> see L<Tk::AppWindow::Ext::Plugins>
+
+=item B<Selector> see L<Tk::AppWindow::Ext::Selector>
 
 =item B<Settings> see L<Tk::AppWindow::Ext::Settings>
 
@@ -224,8 +222,6 @@ Codit comes with these plugins:
 =item B<Sessions> see L<App::Codit::Plugins::Sessions>
 
 =item B<Snippets> see L<App::Codit::Plugins::Snippets>
-
-=item B<WordCompletion> see L<App::Codit::Plugins::WordCompletion>
 
 =back
 
@@ -355,9 +351,9 @@ sub Populate {
 				'Tk::YADialog',
 				'Tk::YANoteBook',
 			],
-			http => 'https://github.com/haje61/App-Codit',
+			http => 'https://www.perlgui.org/appcodit/',
 		},
-		-helpfile => 'http://www.perlgui.org/wp-content/uploads/2024/12/manual-0.14.pdf',
+		-helpfile => 'http://www.perlgui.org/wp-content/uploads/2025/01/manual-0.16.pdf',
 
 		#configure content manager
 		-contentmanagerclass => 'CodeTextManager',
@@ -376,7 +372,6 @@ sub Populate {
 			'-contentfont',
 			'-contentforeground',
 			'-contentindent',
-			'-contentinsertbg',
 			'-contentmatchbg',
 			'-contentmatchfg',
 			'-contentsyntax',
@@ -409,7 +404,7 @@ sub Populate {
 			-showstatus => ['boolean', 'Doc status'],
 			'*end',
 			'*section' => 'Auto complete',
-			-contentautocomplete => ['boolean', 'Enabled'],
+			-contentautocomplete => ['boolean', 'Enabled', -enables => ['-contentactivedelay', '-contentacpopsize', '-contentacscansize']],
 			-contentactivedelay => ['spin', 'Pop delay', -width => 4],
 			'*column',
 			-contentacpopsize => ['spin', 'Pop size', -width => 4],
@@ -419,9 +414,8 @@ sub Populate {
 			'*page' => 'Colors',
 			'*section' => 'Editing',
 			-contentforeground => ['color', 'Foreground', -width => 8],
-			-contentbackground => ['color', 'Background', -width => 8],
 			'*column',
-			-contentinsertbg => ['color', 'Insert bg', -width => 8],
+			-contentbackground => ['color', 'Background', -width => 8],
 			'*end',
 			'*section' => 'Find',
 			-contentfindfg => ['color', 'Foreground', -width => 8],
@@ -460,11 +454,14 @@ sub Populate {
 			'*column',
 			'-navigator panelvisible' => ['boolean', 'Navigator panel'],
 			'*end',
+			'*frame',
 			'*section' => 'Geometry',
 			-savegeometry => ['boolean', 'Save on exit',],
 			'*end',
+			'*column',
 			'*section' => 'Unique instance',
-			-uniqueinstance => ['boolean', 'Unique', -onvalue => 1, -offvalue => 0],
+			-uniqueinstance => ['boolean', 'Enabled', -onvalue => 1, -offvalue => 0],
+			'*end',
 			'*end',
 			'*section' => 'Tool bar',
 			-tooltextposition => ['radio', 'Text position', -values => [qw[none left right top bottom]]],
@@ -679,26 +676,26 @@ sub ToolBottomPageRemove {
 	$self->ToolBottomBookRemove unless $sb->pageCount('tool panel bottom');
 }
 
-=item B<ToolNavigPageAdd>I<($name, $image, $text, $statustext, $initialsize)>
+=item B<ToolLeftPageAdd>I<($name, $image, $text, $statustext, $initialsize)>
 
 See also the B<pageAdd> method in L<Tk::AppWindow::Ext::SideBars>.
 Adds a new page to the navigator panel at the left.
 
 =cut
 
-sub ToolNavigPageAdd {
+sub ToolLeftPageAdd {
 	my $self = shift;
 	return $self->sidebars->pageAdd('navigator panel', @_);
 }
 
-=item B<ToolNavigPageRemove>I<($name)>
+=item B<ToolLeftPageRemove>I<($name)>
 
 See also the B<pageDelete> method in L<Tk::AppWindow::Ext::SideBars>.
 Removes page $name from the navigator panel at the left.
 
 =cut
 
-sub ToolNavigPageRemove {
+sub ToolLeftPageRemove {
 	my ($self, $page) = @_;
 	my $sb = $self->sidebars;
 	$self->sidebars->pageDelete('navigator panel', $page);
@@ -788,6 +785,7 @@ Same as Perl.
 =head1 AUTHOR
 
 Hans Jeuken (hanje at cpan dot org)
+
 =head1 BUGS AND CAVEATS
 
 If you find any bugs, please contact the author.
@@ -807,6 +805,10 @@ If you find any bugs, please contact the author.
 =item L<Tk::AppWindow::Ext::Plugins>
 
 =item L<App::Codit::Ext::CoditMDI>
+
+=item L<App::Codit::Commands>
+
+=item L<App::Codit::ConfigVariables>
 
 =back
 

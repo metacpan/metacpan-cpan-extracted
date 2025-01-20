@@ -4,7 +4,7 @@
 ## Header Administrivia
 ##======================================================================
 
-our $VERSION = '1.54.003';
+our $VERSION = '1.54.004';
 pp_setversion("'$VERSION'");
 
 use PDL::Bad; ##-- for $PDL::Bad::Status
@@ -1071,6 +1071,7 @@ Computes the size (number of elements) of each cluster in $clusterids().
 Useful for allocating less than maximmal space for $clusterelements().
 ',
  Code => '
+broadcastloop %{
  int cid, csize;
  loop (k) %{ $clustersizes() = 0; %}
  loop (n) %{
@@ -1080,12 +1081,11 @@ Useful for allocating less than maximmal space for $clusterelements().
     .') continue; /*-- sanity check --*/
    $clustersizes(k=>cid)++;
  %}
+%}
+$PDLSTATESETGOOD(clustersizes); /* always make sure the output is "good" */
 ',
  HandleBad => 1,
  BadDoc => 'The output piddle should never be marked BAD.',
- ($PDL::Bad::Status ?
-  (CopyBadStatusCode =>'$SETPDLSTATEGOOD(clustersizes); /* always make sure the output is "good" */')
-  : qw()),
 );
 
 

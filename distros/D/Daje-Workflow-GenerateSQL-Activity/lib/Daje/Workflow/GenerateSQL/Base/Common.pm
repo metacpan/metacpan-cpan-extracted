@@ -2,13 +2,13 @@ package Daje::Workflow::GenerateSQL::Base::Common;
 use Mojo::Base -base, -signatures;
 
 has 'json' ;
-has 'template' ;
+has 'templates' ;
 has 'sql' ;
 has 'index' => 0;
 has 'version' ;
 has 'error';
 
-sub shift_section ($array) {
+sub shift_section ($self, $array) {
     my $result = {};
     my $test = ref $array;
     if (ref $array eq 'ARRAY') {
@@ -16,12 +16,14 @@ sub shift_section ($array) {
     }
     return $result;
 }
+
 sub set_sql($self, $sqlin) {
     $self->sql($sqlin);
 }
 
 
 1;
+
 
 
 

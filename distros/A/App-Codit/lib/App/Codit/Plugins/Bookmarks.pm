@@ -29,6 +29,20 @@ to the previously and next selected bookmarks.
 
 The sessions plugin restores all bookmarks in the Bookmarks plugin if it is loaded.
 
+=head1 COMMANDS
+
+=over 4
+
+=item B<bm_plug_next>
+
+Jumps to the next selected bookmark.
+
+=item B<bm_plug_previous>
+
+Jumps to the previous selected bookmark.
+
+=back
+
 =cut
 
 sub new {
@@ -36,7 +50,7 @@ sub new {
 	my $self = $class->SUPER::new(@_);
 	return undef unless defined $self;
 
-	my $page = $self->ToolNavigPageAdd('Bookmarks', 'bookmarks', undef, 'Manage your bookmarks');
+	my $page = $self->ToolLeftPageAdd('Bookmarks', 'bookmarks', undef, 'Manage your bookmarks');
 
 	$self->cmdConfig(
 		bm_plug_next => ['bmNext', $self],
@@ -325,7 +339,7 @@ sub Unload {
 	}
 	$self->cmdUnhookAfter('bookmark_add', 'RefreshSelected', $self);
 	$self->cmdUnhookAfter('bookmark_remove', 'RefreshSelected', $self);
-	$self->ToolNavigPageRemove('Bookmarks');
+	$self->ToolLeftPageRemove('Bookmarks');
 	return $self->SUPER::Unload;
 }
 

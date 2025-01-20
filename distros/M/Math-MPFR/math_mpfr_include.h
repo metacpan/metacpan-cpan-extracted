@@ -261,11 +261,11 @@ typedef _Decimal128 D128;
 /* Don't use NON_NUMERIC_CHAR_CHECK macro with Rmpfr_inp_str as this *
  * function requires a different condition (!ret vs ret).            */
 
-#define NON_NUMERIC_CHAR_CHECK \
+#define NON_NUMERIC_CHAR_CHECK(inputstr) \
        if(ret) { \
          nnum++; \
          if(SvIV(get_sv("Math::MPFR::NNW", 0))) \
-           warn("string used in %s contains non-numeric characters"
+           warn("string used (%s) in %s contains non-numeric characters", SvPV_nolen(inputstr)
 
 #define BITSEARCH_4 \
           if(tmp & 8) {				\

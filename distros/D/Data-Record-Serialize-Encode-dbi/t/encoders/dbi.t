@@ -37,7 +37,7 @@ my @DBDs;
 
 my $DBD_SQLite_VERSION = 1.31;
 
-use constant TABLE     => 'drststtbl';
+use constant TABLE     => 'drst-sttbl';
 use constant SQLITE_DB => 'test.db';
 
 my @dsn_fields = qw(
@@ -113,8 +113,9 @@ for my $dbinfo ( @DBDs ) {
 
     my $dsn              = mk_dsn( $dbd, %dbinfo );
     my %constructor_args = (
-        encode       => 'dbi',
-        create_table => !!1,
+        encode            => 'dbi',
+        create_table      => !!1,
+        quote_identifiers => !!1,
     );
     @constructor_args{ 'dsn', 'db_user', 'db_pass', 'schema', 'table' }
       = ( [ $dbd, \%dbinfo ], $user, $password, $schema, $table );

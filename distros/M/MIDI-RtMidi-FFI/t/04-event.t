@@ -27,7 +27,7 @@ subtest event => sub {
     connect_devices( $in, $out );
 
     for my $event ( @events ) {
-        $out->send_event( @{ $event } );
+        $out->send_event( $event );
         usleep 1000;
         my $inevent = $in->get_event;
         is( $event, $inevent, 'Event round-trip ok for ' . $event->[0] );

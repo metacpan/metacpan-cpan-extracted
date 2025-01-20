@@ -3,7 +3,6 @@ use Mojo::Base 'Daje::Workflow::GenerateSQL::Base::Common', -base, -signatures;
 
 
 has 'tablename'  => "";
-has 'templates';
 has 'created'  => 0;
 
 sub create_foreign_keys($self) {
@@ -18,7 +17,7 @@ sub create_foreign_keys($self) {
                 my $referenced_table = substr($key,0,index($key,'_fkey'));
                 $self->templates->{template_fkey} .= ",  " . $template_fkey;
                 $self->templates->{template_ind} .= "  " . $template_ind;
-                $self->created = 1;
+                $self->created(1);
             }
         }
     };
@@ -29,9 +28,9 @@ sub create_foreign_keys($self) {
 
 sub get_templates($self, $key) {
     my $referenced_table = substr($key,0,index($key,'_fkey'));
-    my $template_fkey = $self->template->get_data_section('foreign_key');
+    my $template_fkey = $self->templates->get_data_section('foreign_key');
     $template_fkey =~ s/<<referenced_table>>/$referenced_table/ig;
-    my $template_ind = $self->template->get_data_section('index');
+    my $template_ind = $self->templates->get_data_section('index');
     $template_ind =~ s/<<type>>//ig;
     $template_ind =~ s/<<table>>/$self->tablename/ig;
     $template_ind =~ s/<<field_names>>/$key/ig;
@@ -42,6 +41,7 @@ sub get_templates($self, $key) {
 }
 
 1;
+
 
 
 

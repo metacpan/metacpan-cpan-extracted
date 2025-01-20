@@ -1,2 +1,10 @@
+v0.02 - 2025-01-18
+	- Minimum Perl version v5.16
+	- Update links to Github
+	- Require 64bit ints to build
+	- Fix hex hashes on Windows
+	- Add an `:all` option
+	- Add rdtsc_rand behind the scenes
+
 v0.01 2025-01-17
 	- First release

@@ -22,7 +22,7 @@ use Travel::Status::DE::HAFAS::Product;
 use Travel::Status::DE::HAFAS::Services;
 use Travel::Status::DE::HAFAS::StopFinder;
 
-our $VERSION = '6.16';
+our $VERSION = '6.17';
 
 # {{{ Endpoint Definition
 
@@ -881,7 +881,7 @@ monitors
 
 =head1 VERSION
 
-version 6.16
+version 6.17
 
 =head1 DESCRIPTION
 
@@ -902,7 +902,19 @@ Requests item(s) as specified by I<opt> and returns a new
 Travel::Status::DE::HAFAS element with the results.  Dies if the wrong
 I<opt> were passed.
 
-I<opt> must contain either a B<station>, B<geoSearch>, B<locationSearch>, B<journey>, or B<journeyMatch> flag:
+I<opt> must contain a HAFAS service identifier:
+
+=over
+
+=item B<service> => I<service> (mandatory)
+
+Request results from I<service>. See B<get_services> (and C<< hafas-m --list
+>>) for a list of supported services.
+
+=back
+
+Additionally, I<opt> must contain either a B<station>, B<geoSearch>,
+B<locationSearch>, B<journey>, or B<journeyMatch> flag:
 
 =over
 
@@ -937,6 +949,8 @@ of information: trip ID, train/line identifier, and first and last stop.  There
 is no real-time data.
 
 =back
+
+
 
 The following optional flags may be set.
 Values in brackets indicate flags that are only relevant in certain request
@@ -992,12 +1006,6 @@ pass an empty hashref to call the LWP::UserAgent constructor without arguments.
 
 Request up to I<count> results.
 Default: 30.
-
-=item B<service> => I<service>
-
-Request results from I<service>, defaults to "DB".
-See B<get_services> (and C<< hafas-m --list >>) for a list of supported
-services.
 
 =item B<with_polyline> => I<bool> (journey)
 
@@ -1135,7 +1143,7 @@ Languages supported by the backend; see the constructor's B<language> argument.
 
 =item B<name> => I<string>
 
-Service name, e.g. Bay Area Rapid Transit or Deutsche Bahn.
+Service name, e.g. Bay Area Rapid Transit or E<Ouml>sterreichische Bundesbahnen.
 
 =item B<mgate> => I<string>
 
@@ -1160,7 +1168,7 @@ not present, it is safe to assume that it uses Europe/Berlin.
 Returns an array containing all supported HAFAS services. Each element is a
 hashref and contains all keys mentioned in B<get_active_service>.
 It also contains a B<shortname> key, which is the service name used by
-the constructor's B<service> parameter, e.g. BART or DB.
+the constructor's B<service> parameter, e.g. BART or VRN.
 
 =item Travel::Status::DE::HAFAS::get_service(I<$service>)
 
@@ -1189,16 +1197,19 @@ None.
 
 =head1 BUGS AND LIMITATIONS
 
-The non-default services (anything other than DB) are not well tested.
+Some services are not well-tested.
 
 =head1 SEE ALSO
 
 =over
 
-=item * L<https://dbf.finalrewind.org?hafas=1> provides a web frontend to most
-of this module's features. Set B<hafas=>I<service> to use a specific service.
+=item * L<https://dbf.finalrewind.org?hafas=VRN> provides a web frontend to
+most of this module's features. Set B<hafas=>I<service> to use a specific
+service.
 
 =item * Travel::Routing::DE::HAFAS(3pm) for itineraries.
+
+=item * Travel::Status::DE::DBRIS(3pm) for Deutsche Bahn services.
 
 =back
 

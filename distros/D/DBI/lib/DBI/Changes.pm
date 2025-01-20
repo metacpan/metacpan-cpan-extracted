@@ -12,6 +12,28 @@ DBI::Changes - List of significant changes to the DBI
 
 =encoding UTF-8
 
+=head2 Changes in DBI 1.647 - 20 Jan 2025
+
+=over 2
+
+=item *
+
+Spellcheck
+
+=item *
+
+Fix Makefile rules for Changes (Windows case issue)
+
+=item *
+
+Another example to bind columns (issue#159)
+
+=item *
+
+Fix fetchall_arrayref for undefined NAME (issue#156)
+
+=back
+
 =head2 Changes in DBI 1.646 - 11 Jan 2025
 
 =over 2

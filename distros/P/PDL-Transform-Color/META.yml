@@ -19,14 +19,12 @@ no_index:
     - t
     - inc
 requires:
-  PDL: '0'
+  PDL: '2.094'
   PDL::Graphics::ColorSpace: '0.203'
-  PDL::MatrixOps: '0'
-  PDL::Transform: '0'
   perl: '5.010'
 resources:
   bugtracker: http://github.com/PDLPorters/PDL-Transform-Color/issues
   homepage: http://github.com/PDLPorters/PDL-Transform-Color
   repository: git://github.com/PDLPorters/PDL-Transform-Color.git
-version: '1.008'
+version: '1.009'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

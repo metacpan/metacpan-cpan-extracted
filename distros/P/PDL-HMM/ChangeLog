@@ -1,3 +1,6 @@
+v0.06010 Fri, 20 Dec 2024 11:40:10 +0100 mohawk2
+	* PR#6 replace unnecessary CopyBadStatusCode
+
 v0.06009 Fri, 20 Dec 2024 11:40:10 +0100 mohawk2
 	* PR#5 fixups for https://github.com/PDLPorters/pdl/issues/511
 

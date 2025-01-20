@@ -9,7 +9,7 @@ App::Codit::Plugins::FileBrowser - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.15;
+$VERSION = 0.16;
 
 use base qw( Tk::AppWindow::BaseClasses::Plugin );
 
@@ -54,6 +54,8 @@ my @contextmenu = (
 	[ 'menu_normal', undef, 'Paste', 'fb_paste',	'edit-paste', '*CTRL+V'],
 	[ 'menu_separator', undef, 'f2'],
 	[ 'menu_normal', undef, 'Delete', 'fb_delete',	'edit-delete', '*SHIFT+DELETE'],
+	[ 'menu_separator', undef, 'f3'],
+	[ 'menu_normal', undef, 'Properties', 'fb_properties',	'document-properties', '*CTRL+P'],
 );
 
 sub new {
@@ -62,7 +64,7 @@ sub new {
 	return undef unless defined $self;
 
 
-	my $page = $self->ToolNavigPageAdd('FileBrowser', 'folder', undef, 'Browse your file system', 400);
+	my $page = $self->ToolLeftPageAdd('FileBrowser', 'folder', undef, 'Browse your file system', 400);
 	my @images = (
 		['-msgimage', 'dialog-information', 32],
 		['-newfolderimage', 'folder-new', 16],
@@ -90,6 +92,7 @@ sub new {
 		'fb_delete' => ['delete', $b],
 		'fb_open' => ['fbOpen', $self],
 		'fb_paste' => ['clipboardPaste', $b],
+		'fb_properties' => ['propertiesPop', $b],
 	);
 	$self->after(1000, ['load', $b]);
 	$self->{BROWSER} = $b;
@@ -132,7 +135,8 @@ sub Unload {
 	$self->cmdRemove('fb_delete');
 	$self->cmdRemove('fb_open');
 	$self->cmdRemove('fb_paste');
-	$self->ToolNavigPageRemove('FileBrowser');
+	$self->cmdRemove('fb_properties');
+	$self->ToolLeftPageRemove('FileBrowser');
 	return $self->SUPER::Unload
 }
 

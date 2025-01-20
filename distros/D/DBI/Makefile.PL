@@ -26,7 +26,7 @@ my $os = $^O;
 my $osvers = $Config{osvers};
 $osvers =~ s/^\s*(\d+\.\d+).*/$1/;  # drop sub-sub-version: 2.5.1 -> 2.5
 my $ext_pl = $^O eq "VMS" ? ".pl" : "";
-my $is_developer = ((-d ".svn" || -d ".git") && -f "MANIFEST.SKIP");
+my $is_developer = (-d ".git" && -f "MANIFEST.SKIP");
 
 $::opt_v = 0;
 $::opt_thread = $Config{useithreads};	# thread if we can, use "-nothread" to disable
@@ -81,15 +81,6 @@ my %opts = (
 	    "MLDBM"           => 0,
 	    "DB_File"         => 0,
 	    },
-	},
-    CONFLICTS                 => {
-	"SQL::Statement"      => "1.33",
-	"DBD::AnyData"        => "0.110",
-	"DBD::CSV"            => "0.36",
-	"DBD::RAM"            => "0.072",
-	"DBD::PO"             => "2.10",
-	"DBD::Google"         => "0.51",
-	"DBD::Amazon"         => "0.10",
 	},
     LICENSE                   => "perl",
     EXE_FILES                 => [ "dbiproxy$ext_pl", "dbiprof$ext_pl", "dbilogstrip$ext_pl" ],
@@ -278,8 +269,8 @@ EOT
     } # postamble
 
 sub libscan {
-    my($self, $path) = @_;
-    ($path =~ /\~$|\B\.(svn|git)\b/) ? undef : $path;
+    my ($self, $path) = @_;
+    ($path =~ /\~$|\B\.git\b/) ? undef : $path;
     } # libscan
 
 sub const_cccmd {
@@ -360,39 +351,35 @@ changes_pm2 = ' . File::Spec->catfile ($self->{INST_LIB}, 'DBI', 'Changes.pm') .
 config :: $(changes_pm1)
 	$(NOECHO) $(NOOP)
 
-$(changes_pm2) $(changes_pm1): Changes
+$(changes_pm1): ChangeLog
 	$(MKPATH) $(inst_libdbi)
 	$(RM_F) $(changes_pm1) $(changes_pm2)
 	perl changes2pm.pl
+$(changes_pm2): $(changes_pm1)
 	$(CP)   $(changes_pm1) $(changes_pm2)
 
 ptest:  all
 	prove --blib --jobs 8 --shuffle
 
-faq:
-	: checkin any local changes not already checked in before overwriting
-	svn commit --message "dbi.tiddlyspot.com FAQ update" dbi.tiddlyspot.com.html
-	wget --ignore-length --output-document=dbi.tiddlyspot.com.html --timestamping http://dbi.tiddlyspot.com/download
-	svn commit --message "dbi.tiddlyspot.com FAQ update" dbi.tiddlyspot.com.html
-
-checkkeywords:
-	$(RM_RF) blib
-	find . -type f \( -name .svn -prune -o -name \*.pm -o -name \*.PL -o -name \*.pl \) \
-            -exec bash -c '[ -z "$$(svn pg svn:keywords {})" ] && echo svn propset svn:keywords \"Id Revision\" {}' \;
-
-.PHONY:	doc change changes
+.PHONY:	doc change changes spellcheck checkpod newdist
 changes:	$(changes_pm1)
 doc:
-	perl doc/make-doc.pl
+	perl doc/make-doc.pl --pod
+spellcheck checkpod:	doc
+	pod-spell-check -i -a doc/*.pod
+
 dbipport:
 	perl sandbox/genPPPort_h.pl
 ppport:		dbipport.h
-	perl dbipport.h --compat-version=5.8.0 DBI.xs
+	perl dbipport.h --compat-version=5.8.1 DBI.xs
 
-checkpod:
-	$(RM_RF) blib
-	find . -type f \( -name .svn -prune -o -name \*.pm -o -name \*.PL -o -name \*.pl \) \
-            -exec podchecker {} \; 2>&1 | grep -v 'pod syntax OK'
+# make dist does not remove existing .tar.gz causing questions
+newdist:
+	-@rm -f $(DISTVNAME).tar.gz $(DISTVNAME).tgz
+tgzdist:	changes spellcheck newdist dist
+	-@mv -f $(DISTVNAME).tar.gz $(DISTVNAME).tgz
+	-@cpants_lint.pl $(DISTVNAME).tgz
+	-@rm -f Debian_CPANTS.txt
 };
 
     return $xst;

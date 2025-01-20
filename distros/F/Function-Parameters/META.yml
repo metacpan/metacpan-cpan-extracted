@@ -35,6 +35,7 @@ requires:
   perl: '5.014000'
   warnings: '0'
 resources:
-  repository: git://github.com/mauke/Function-Parameters
-version: '2.002004'
+  bugtracker: https://codeberg.org/mauke/Function-Parameters/issues
+  repository: https://codeberg.org/mauke/Function-Parameters.git
+version: '2.002005'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

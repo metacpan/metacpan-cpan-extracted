@@ -8,6 +8,9 @@ Tk::QuickForm::CTextItem - Entry widget for Tk::QuickForm.
 
 use strict;
 use warnings;
+use vars qw($VERSION);
+$VERSION = '0.07';
+
 use base qw(Tk::Derived Tk::QuickForm::CBaseClass);
 use Tie::Watch;
 Construct Tk::Widget 'CTextItem';
@@ -26,7 +29,7 @@ Provides a text entry widget for L<Tk::QuickForm>.
 You should never create an instance directly like above. This should
 be handled by L<Tk::QuickForm>.
 
-=head1 CONFIG VARIABLES
+=head1 OPTIONS
 
 All options, except I<-textvariable>, of L<Tk::Entry> are available.
 

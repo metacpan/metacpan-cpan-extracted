@@ -25,8 +25,8 @@ unless(Math::MPFR::MPFR_3_1_6_OR_LATER) {
 
 for(-1075..1024) {
   my $nv = 2 ** $_;
-  cmp_ok(nvtoa_test(nvtoa($nv), $nv), '==', 15, "2 ** $_");
-  cmp_ok(nvtoa_test(nvtoa(-$nv), -$nv), '==', 15, "-(2 ** $_)");
+  cmp_ok(dragon_test($nv), '==', 15, "2 ** $_");     # nvtoa($nv)
+  cmp_ok(dragon_test(-$nv), '==', 15, "-(2 ** $_)"); # nvtoa(-$nv)
 }
 
 my @pows = (50, 100, 150, 200, 250, 300, 350, 400, 450, 500,
@@ -35,16 +35,16 @@ my @pows = (50, 100, 150, 200, 250, 300, 350, 400, 450, 500,
   die "wrong sized array" unless @pows == 20;
 
 my $ret = (2** -1020) + (2 ** -1021);
-cmp_ok(nvtoa_test(nvtoa($ret), $ret), '==', 15, "(2** -1020) + (2 ** -1021)");
+cmp_ok(dragon_test($ret), '==', 15, "(2** -1020) + (2 ** -1021)");
 
 $ret = (2** -1021) + (2 ** -1064);
-cmp_ok(nvtoa_test(nvtoa($ret), $ret), '==', 15, "(2** -1021) + (2 ** -1064)");
+cmp_ok(dragon_test($ret), '==', 15, "(2** -1021) + (2 ** -1064)");
 
 $ret = (2** -1020) - (2 ** -1021);
-cmp_ok(nvtoa_test(nvtoa($ret), $ret), '==', 15, "(2** -1020) - (2 ** -1021)");
+cmp_ok(dragon_test($ret), '==', 15, "(2** -1020) - (2 ** -1021)");
 
 $ret = (2** -1021) - (2 ** -1064);
-cmp_ok(nvtoa_test(nvtoa($ret), $ret), '==', 15, "(2** -1021) - (2 ** -1064)");
+cmp_ok(dragon_test($ret), '==', 15, "(2** -1021) - (2 ** -1064)");
 
 #   Failed test '[2 11] / [12 9] repro ok'
 #   at t/sparse.t line 64.
@@ -54,12 +54,12 @@ cmp_ok(nvtoa_test(nvtoa($ret), $ret), '==', 15, "(2** -1021) - (2 ** -1064)");
 my @in0 = qw(2 11);
 my @in1 = qw(12 9);
 $ret = my_assign(\@in0, \@in1, '/');
-cmp_ok(nvtoa_test(nvtoa($ret), $ret), '==', 15, "@in0 / @in1");
+cmp_ok(dragon_test($ret), '==', 15, "@in0 / @in1");
 
 @in0 = qw(2 -17);
 @in1 = qw(9 -17);
 $ret = my_assign(\@in0, \@in1, '/');
-cmp_ok(nvtoa_test(nvtoa($ret), $ret), '==', 15, "@in0 / @in1");
+cmp_ok(dragon_test($ret), '==', 15, "@in0 / @in1");
 
 #   Failed test '[3 3] - [3 10] repro ok'
 #   at t/sparse.t line 69.
@@ -69,7 +69,7 @@ cmp_ok(nvtoa_test(nvtoa($ret), $ret), '==', 15, "@in0 / @in1");
 @in0 = qw(3 3);
 @in1 = qw(3 10);
 $ret = my_assign(\@in0, \@in1, '-');
-cmp_ok(nvtoa_test(nvtoa($ret), $ret), '==', 15, "@in0 - @in1");
+cmp_ok(dragon_test($ret), '==', 15, "@in0 - @in1");
 
 #   Failed test '[13 -1] * [1 -7] repro ok'
 #   at t/sparse.t line 54.
@@ -79,7 +79,7 @@ cmp_ok(nvtoa_test(nvtoa($ret), $ret), '==', 15, "@in0 - @in1");
 @in0 = qw(13 -1);
 @in1 = qw(1 -7);
 $ret = my_assign(\@in0, \@in1, '*');
-cmp_ok(nvtoa_test(nvtoa($ret), $ret), '==', 15, "@in0 * @in1");
+cmp_ok(dragon_test($ret), '==', 15, "@in0 * @in1");
 
 #   Failed test '[14 1] - [11 4] repro ok'
 #   at t/sparse.t line 69.
@@ -89,7 +89,7 @@ cmp_ok(nvtoa_test(nvtoa($ret), $ret), '==', 15, "@in0 * @in1");
 @in0 = qw(14 1);
 @in1 = qw(11 4);
 $ret = my_assign(\@in0, \@in1, '-');
-cmp_ok(nvtoa_test(nvtoa($ret), $ret), '==', 15, "@in0 - @in1");
+cmp_ok(dragon_test($ret), '==', 15, "@in0 - @in1");
 
 #   Failed test '[17 -16] + [11 -2] repro ok'
 #   at t/sparse.t line 59.
@@ -99,7 +99,7 @@ cmp_ok(nvtoa_test(nvtoa($ret), $ret), '==', 15, "@in0 - @in1");
 @in0 = qw(17 -16);
 @in1 = qw(11 -2);
 $ret = my_assign(\@in0, \@in1, '+');
-cmp_ok(nvtoa_test(nvtoa($ret), $ret), '==', 15, "@in0 + @in1");
+cmp_ok(dragon_test($ret), '==', 15, "@in0 + @in1");
 
 #   Failed test '[1 8] * [0 11] repro ok'
 #   at t/sparse.t line 54.
@@ -109,7 +109,7 @@ cmp_ok(nvtoa_test(nvtoa($ret), $ret), '==', 15, "@in0 + @in1");
 @in0 = qw(1 8);
 @in1 = qw(0 11);
 $ret = my_assign(\@in0, \@in1, '*');
-cmp_ok(nvtoa_test(nvtoa($ret), $ret), '==', 15, "@in0 * @in1");
+cmp_ok(dragon_test($ret), '==', 15, "@in0 * @in1");
 
 #   Failed test '[8 -18] / [13 -1] repro ok'
 #   at t/sparse.t line 64.
@@ -119,29 +119,29 @@ cmp_ok(nvtoa_test(nvtoa($ret), $ret), '==', 15, "@in0 * @in1");
 @in0 = qw(8 -18);
 @in1 = qw(13 -1);
 $ret = my_assign(\@in0, \@in1, '/');
-cmp_ok(nvtoa_test(nvtoa($ret), $ret), '==', 15, "@in0 / @in1");
+cmp_ok(dragon_test($ret), '==', 15, "@in0 / @in1");
 
 # [3 13] / [14 9]
 
 @in0 = qw(3 13);
 @in1 = qw(14 9);
 $ret = my_assign(\@in0, \@in1, '/');
-cmp_ok(nvtoa_test(nvtoa($ret), $ret), '==', 15, "@in0 / @in1");
+cmp_ok(dragon_test($ret), '==', 15, "@in0 / @in1");
 
 # [13 -8] + [12 -6]
 
 @in0 = qw(13 -8);
 @in1 = qw(12 -6);
 $ret = my_assign(\@in0, \@in1, '+');
-cmp_ok(nvtoa_test(nvtoa($ret), $ret), '==', 15, "@in0 + @in1");
+cmp_ok(dragon_test($ret), '==', 15, "@in0 + @in1");
 
 # 0.66029111258694e-111 fails chop test.
 $ret = atonv('0.66029111258694e-111');
-cmp_ok(nvtoa_test(nvtoa($ret), $ret), '==', 15, "0.66029111258694e-111");
+cmp_ok(dragon_test($ret), '==', 15, "0.66029111258694e-111");
 
 # 0.876771194648327e219 fails chop test
 $ret = atonv('0.876771194648327e219');
-cmp_ok(nvtoa_test(nvtoa($ret), $ret), '==', 15, "0.876771194648327e219");
+cmp_ok(dragon_test($ret), '==', 15, "0.876771194648327e219");
 
 #   Failed test 'chop test ok for [11 -14]'
 #   at t/sparse.t line 90.
@@ -151,49 +151,49 @@ cmp_ok(nvtoa_test(nvtoa($ret), $ret), '==', 15, "0.876771194648327e219");
 
 @in0 = qw(11 -14);
 $ret = (2 ** $pows[11]) - (2 ** -$pows[14]);
-cmp_ok(nvtoa_test(nvtoa($ret), $ret), '==', 15, "(2 ** $pows[11]) - (2 ** -$pows[14])");
+cmp_ok(dragon_test($ret), '==', 15, "(2 ** $pows[11]) - (2 ** -$pows[14])");
 
 $ret = atonv(2 ** 550) + nvtoa(2 ** -300);
-cmp_ok(nvtoa_test(nvtoa($ret), $ret), '==', 15, "(2 ** 550) + (2 ** -300)");
+cmp_ok(dragon_test($ret), '==', 15, "(2 ** 550) + (2 ** -300)");
 
 $ret = atonv(2 ** 1000);
-cmp_ok(nvtoa_test(nvtoa($ret), $ret), '==', 15, "(2 ** 1000)");
+cmp_ok(dragon_test($ret), '==', 15, "(2 ** 1000)");
 
 $ret = atonv(2 ** -550) + nvtoa(2 ** -552) + nvtoa(2 ** -600);
-cmp_ok(nvtoa_test(nvtoa($ret), $ret), '==', 15, "(2 ** -550) + (2 ** -552)");
+cmp_ok(dragon_test($ret), '==', 15, "(2 ** -550) + (2 ** -552)");
 
 $ret = atonv(2 ** 550) - nvtoa(2 ** -300);
-cmp_ok(nvtoa_test(nvtoa($ret), $ret), '==', 15, "(2 ** 550) - (2 ** -300)");
+cmp_ok(dragon_test($ret), '==', 15, "(2 ** 550) - (2 ** -300)");
 
 $ret = atonv(2 ** -550);
-cmp_ok(nvtoa_test(nvtoa($ret), $ret), '==', 15, "(2 ** -550)");
+cmp_ok(dragon_test($ret), '==', 15, "(2 ** -550)");
 
 # [0x1p+950 -0x1p+800]
 $ret = atonv(2 ** 950) - nvtoa(2 ** 800);
-cmp_ok(nvtoa_test(nvtoa($ret), $ret), '==', 15, "(2 ** 950) - (2 ** 800)");
+cmp_ok(dragon_test($ret), '==', 15, "(2 ** 950) - (2 ** 800)");
 
 # [0x1p+900 -0x1p+750]
 $ret = atonv(2 ** 900) - nvtoa(2 ** 750);
-cmp_ok(nvtoa_test(nvtoa($ret), $ret), '==', 15, "(2**900) - (2** 50)");
+cmp_ok(dragon_test($ret), '==', 15, "(2**900) - (2** 50)");
 
 #[0x1p-550 -0x1p-1050]
 $ret = atonv(2 ** -550) - nvtoa(2 ** -1050);
-cmp_ok(nvtoa_test(nvtoa($ret), $ret), '==', 15, "(2**-550) - (2**-1050)");
+cmp_ok(dragon_test($ret), '==', 15, "(2**-550) - (2**-1050)");
 
 #[-0x1p+950 0x1p+800]
 $ret = atonv(-(2 ** 950)) + nvtoa(2 ** 800);
-cmp_ok(nvtoa_test(nvtoa($ret), $ret), '==', 15, "-(2**950) + (2**800)");
+cmp_ok(dragon_test($ret), '==', 15, "-(2**950) + (2**800)");
 
 $ret = atonv(2 ** 700) + nvtoa(2 ** 650) - nvtoa(2 **-350);
-cmp_ok(nvtoa_test(nvtoa($ret), $ret), '==', 15, "(2**700) + (2**650) - (2**-350)");
+cmp_ok(dragon_test($ret), '==', 15, "(2**700) + (2**650) - (2**-350)");
 
 # [-0x1.ffffffffffff8p+849 0x1p-350]
 $ret = atonv(2 ** 800) - nvtoa(2 ** 850) - nvtoa(2 **-350);
-cmp_ok(nvtoa_test(nvtoa($ret), $ret), '==', 15, "(2**800) - (2**850) - (2**-350)");
+cmp_ok(dragon_test($ret), '==', 15, "(2**800) - (2**850) - (2**-350)");
 
 #[0x1p+200 0x1p-549]
 $ret = atonv(2 ** 200) + nvtoa(2 ** -549);
-cmp_ok(nvtoa_test(nvtoa($ret), $ret), '==', 15, "(2 ** 950) - (2 ** 800)");
+cmp_ok(dragon_test($ret), '==', 15, "(2 ** 950) - (2 ** 800)");
 
 my(@big, @little);
 my @p = @pows;
@@ -267,18 +267,18 @@ my @p = (50, 100, 150, 200, 250, 300, 350, 400, 450, 500,
 sub sparse_test {
   my ($op1, $op2)     = (shift, shift);
 
-  cmp_ok(nvtoa_test(nvtoa($op1), $op1), '==', 15, "X" . unpack("H*", pack("F>", $op1)));
-  cmp_ok(nvtoa_test(nvtoa($op2), $op2), '==', 15, "X" . unpack("H*", pack("F>", $op2)));
+  cmp_ok(dragon_test($op1), '==', 15, "X" . unpack("H*", pack("F>", $op1)));
+  cmp_ok(dragon_test($op2), '==', 15, "X" . unpack("H*", pack("F>", $op2)));
 
   my $mul = $op1 * $op2;
-  cmp_ok(nvtoa_test(nvtoa($mul), $mul), '==', 15, "X" . unpack("H*", pack("F>", $mul)));
+  cmp_ok(dragon_test($mul), '==', 15, "X" . unpack("H*", pack("F>", $mul)));
 
   my $add = $op1 + $op2;
-  cmp_ok(nvtoa_test(nvtoa($add), $add), '==', 15, "X" . unpack("H*", pack("F>", $add)));
+  cmp_ok(dragon_test($add), '==', 15, "X" . unpack("H*", pack("F>", $add)));
 
   my $div = $op1 / $op2;
-  cmp_ok(nvtoa_test(nvtoa($div), $div), '==', 15, "X" . unpack("H*", pack("F>", $div)));
+  cmp_ok(dragon_test($div), '==', 15, "X" . unpack("H*", pack("F>", $div)));
 
   my $sub = $op1 - $op2;
-  cmp_ok(nvtoa_test(nvtoa($sub), $sub), '==', 15, "X" . unpack("H*", pack("F>", $sub)));
+  cmp_ok(dragon_test($sub), '==', 15, "X" . unpack("H*", pack("F>", $sub)));
 }

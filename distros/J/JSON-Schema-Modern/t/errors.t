@@ -786,7 +786,7 @@ subtest 'unresolvable $ref to a local resource' => sub {
           instanceLocation => '',
           keywordLocation => '/$ref/$ref',
           absoluteKeywordLocation => '#/$defs/myint/$ref',
-          error => 'EXCEPTION: unable to find resource #/$defs/does-not-exist',
+          error => 'EXCEPTION: unable to find resource "#/$defs/does-not-exist"',
         },
       ],
     },
@@ -821,7 +821,7 @@ subtest 'unresolvable $ref to a remote resource' => sub {
           instanceLocation => '',
           keywordLocation => '/$ref/$ref',
           absoluteKeywordLocation => 'http://localhost:4242/baz/myint.json#/$ref',
-          error => 'EXCEPTION: unable to find resource http://localhost:4242/baz/does-not-exist.json',
+          error => 'EXCEPTION: unable to find resource "http://localhost:4242/baz/does-not-exist.json"',
         },
       ],
     },
@@ -839,7 +839,7 @@ subtest 'unresolvable $ref to plain-name fragment' => sub {
         {
           instanceLocation => '',
           keywordLocation => '/$ref',
-          error => 'EXCEPTION: unable to find resource #nowhere',
+          error => 'EXCEPTION: unable to find resource "#nowhere"',
         },
       ],
     },
@@ -982,8 +982,8 @@ subtest 'bad regex in schema' => sub {
       valid => false,
       errors => [
         {
-          instanceLocation => '',
-          keywordLocation => '/properties',
+          instanceLocation => '/my_runtime_pattern',
+          keywordLocation => '/properties/my_runtime_pattern/pattern',
           # in 5.28 and earlier: Can't find Unicode property definition "IsFoo"
           # in 5.30 and later:   Unknown user-defined property name \p{main::IsFoo}
           error => re(qr/^EXCEPTION: .*property.*IsFoo/),
@@ -1168,7 +1168,7 @@ subtest 'absoluteKeywordLocation' => sub {
         {
           instanceLocation => '',
           keywordLocation => '/$ref',
-          error => 'EXCEPTION: unable to find resource #does_not_exist',
+          error => 'EXCEPTION: unable to find resource "#does_not_exist"',
         },
       ],
     },
@@ -1349,7 +1349,7 @@ subtest 'evaluate in the middle of a document' => sub {
           instanceLocation => '/request/body',
           keywordLocation => '/some/other/thing/$ref/foo/$ref',
           absoluteKeywordLocation => 'https://somewhere/else#/foo',
-          error => 'EXCEPTION: unable to find resource https://myschema#/properties/foo/allOf/1',
+          error => 'EXCEPTION: unable to find resource "https://myschema#/properties/foo/allOf/1"',
         },
       ],
     },

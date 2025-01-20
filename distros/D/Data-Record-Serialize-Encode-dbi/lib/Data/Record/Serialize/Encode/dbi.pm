@@ -18,7 +18,7 @@ use Data::Record::Serialize::Error {
   },
   -all;
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 use Data::Record::Serialize::Types -types;
 
@@ -238,6 +238,18 @@ has queue => (
     default  => sub { [] },
 );
 
+
+
+
+
+
+
+has quote_identifiers => (
+    is      => 'ro',
+    isa     => Bool,
+    default => !!0,
+);
+
 around '_build__nullified' => sub {
     my $orig = shift;
     my $self = $_[0];
@@ -381,10 +393,11 @@ sub setup {
 
                 1;
             },
-            to             => $self->_producer,
-            producer_args  => { no_transaction => 1 },
-            add_drop_table => $self->drop_table && $table_exists,
-            no_comments    => 1,
+            to                => $self->_producer,
+            producer_args     => { no_transaction => 1 },
+            add_drop_table    => $self->drop_table && $table_exists,
+            quote_identifiers => $self->quote_identifiers,
+            no_comments       => 1,
         );
 
         my @sql = $tr->translate;
@@ -717,7 +730,7 @@ Data::Record::Serialize::Encode::dbi - store a record in a database
 
 =head1 VERSION
 
-version 1.05
+version 1.06
 
 =head1 SYNOPSIS
 
@@ -818,6 +831,10 @@ The value passed to the constructor.
 The value passed to the constructor.
 
 =head2 C<dbitrace>
+
+The value passed to the constructor.
+
+=head2 C<quote_identifier>
 
 The value passed to the constructor.
 
@@ -988,6 +1005,13 @@ If true, a table will be created if it does not exist.
 A single output column name or an array of output column names which
 should be the primary key(s).  If not specified, no primary keys are
 defined.
+
+=item C<quote_identifiers>
+
+If true, identifiers (table and column names) will be quoted. Note that the
+DDL is created by L<SQL::Translator>, and not all databases supported by
+it pay attention to this flag.  In particular, Sybase does not support this flag.
+Instead, the L<DBD::Sybase> C<syb_quoted_identifier> attribute is I<always> set.
 
 =item C<db_user>
 

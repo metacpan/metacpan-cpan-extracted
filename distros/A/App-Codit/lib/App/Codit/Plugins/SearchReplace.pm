@@ -9,7 +9,7 @@ App::Codit::Plugins::SearchReplace - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.15;
+$VERSION = 0.16;
 
 use base qw( Tk::AppWindow::BaseClasses::Plugin );
 use Tk;
@@ -317,7 +317,7 @@ sub Find {
 	} elsif ($$mode eq $srchres) {
 		$self->FindInResults;
 	}
-	$self->ShowResults;
+	$self->ShowResults(1);
 }
 
 sub FindInDoc {
@@ -626,7 +626,8 @@ sub SelectLast {
 }
 
 sub ShowResults {
-	my $self = shift;
+	my ($self, $log) = @_;
+	$log = 0 unless defined $log;
 	my $mdi = $self->mdi;
 	my $name = $mdi->docSelected;
 	return @_ unless defined $name;
@@ -641,10 +642,12 @@ sub ShowResults {
 	}
 	$self->after(500, sub { $widg->tagRaise('Find') }); #make sure syntax highlighting does not overwrite the tags
 	$self->after(3000, sub { $widg->tagRaise('Find') if Exists $widg }); #make sure syntax highlighting does not overwrite the tags
-	my $nhits = @hits;
-	my @e = $list->infoChildren('');
-	my $ndocs = @e;
-	$self->log("$nhits hits in $ndocs documents");
+	if ($log) {
+		my $nhits = @hits;
+		my @e = $list->infoChildren('');
+		my $ndocs = @e;
+		$self->log("$nhits hits in $ndocs documents");
+	}
 	return @_;
 }
 

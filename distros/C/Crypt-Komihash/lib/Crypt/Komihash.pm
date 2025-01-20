@@ -5,11 +5,12 @@ use warnings;
 use base qw(Exporter);
 require XSLoader;
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 XSLoader::load('Crypt::Komihash', $VERSION);
 
-our @EXPORT_OK = qw(komihash komihash_hex komirand_seed komirand64);
+our @EXPORT_OK   = qw(komihash komihash_hex komirand_seed komirand64 get_rdtsc rdtsc_rand64);
+our %EXPORT_TAGS = ( all => [ @EXPORT_OK ] );
 
 1;
 

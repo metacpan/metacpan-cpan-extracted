@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION="0.14";
+$VERSION="0.16";
 
 use App::Codit;
 use Getopt::Long;
@@ -37,7 +37,7 @@ Options:
   -t or -icontheme:
   icon library to load.
 
-  -P or -noplugins:
+  -np or -noplugins:
   Launch without any plugins loaded.
 
   -p or -plugins
@@ -73,7 +73,7 @@ GetOptions(
 	'icontheme' => \$icontheme,
 	't=s' => \$icontheme,
 	#noplugins
-	'P' => \$noplugins,
+	'np' => \$noplugins,
 	'noplugins' => \$noplugins,
 	#plugins
 	'plugins=s' => \$plugins,

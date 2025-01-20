@@ -5,6 +5,8 @@ lib/App/Codit/BaseClasses/TextModPlugin.pm
 lib/App/Codit/CodeTextManager.pm
 lib/App/Codit/codit_logo.png
 lib/App/Codit/CoditTagsEditor.pm
+lib/App/Codit/Commands.pod
+lib/App/Codit/ConfigVariables.png
 lib/App/Codit/Ext/CoditMDI.pm
 lib/App/Codit/highlight_theme.ctt
 lib/App/Codit/Icons/bookmark_delete.png

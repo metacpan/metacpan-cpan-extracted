@@ -172,7 +172,7 @@ subtest 'evaluate a uri' => sub {
         {
           instanceLocation => '',
           keywordLocation => '',
-          error => 'EXCEPTION: unable to find resource '.METASCHEMA.'#/does/not/exist',
+          error => 'EXCEPTION: unable to find resource "'.METASCHEMA.'#/does/not/exist"',
         },
       ],
     },
@@ -190,7 +190,7 @@ subtest 'evaluate a uri' => sub {
         {
           instanceLocation => '',
           keywordLocation => '',
-          error => 'EXCEPTION: unable to find resource '.METASCHEMA.'#does_not_exist',
+          error => 'EXCEPTION: unable to find resource "'.METASCHEMA.'#does_not_exist"',
         },
       ],
     },
@@ -237,7 +237,7 @@ subtest 'add a schema associated with a uri' => sub {
     'cannot use a uri with a fragment',
   );
 
-  cmp_result(
+  cmp_deeply(
     my $document = $js->add_schema(
       'https://foo.com',
       { '$id' => 'https://bar.com', allOf => [ false, true ] },
@@ -350,7 +350,7 @@ subtest 'add a schema associated with a uri' => sub {
 subtest 'add a document without associating it with a uri' => sub {
   my $js = JSON::Schema::Modern->new;
 
-  cmp_result(
+  cmp_deeply(
     $js->add_document(
       my $document = JSON::Schema::Modern::Document->new(
         schema => { '$id' => 'https://bar.com', allOf => [ false, true ] },
@@ -392,7 +392,7 @@ subtest 'add a document without associating it with a uri' => sub {
 subtest 'add a schema without a uri' => sub {
   my $js = JSON::Schema::Modern->new;
 
-  cmp_result(
+  cmp_deeply(
     my $document = $js->add_schema(
       { '$id' => 'https://bar.com', allOf => [ false, true ] },
     ),
@@ -482,7 +482,7 @@ subtest '$ref to non-canonical uri' => sub {
         {
           instanceLocation => '',
           keywordLocation => '',
-          error => 'EXCEPTION: unable to find resource http://otherhost:4242/beta',
+          error => 'EXCEPTION: unable to find resource "http://otherhost:4242/beta"',
         },
       ],
     },

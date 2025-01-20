@@ -9,7 +9,7 @@ Tk::CodeText - Programmer's Swiss army knife Text widget.
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.61';
+$VERSION = '0.62';
 
 use base qw(Tk::Derived Tk::Frame);
 
@@ -851,7 +851,6 @@ sub contentCheck {
 
 sub FindAndOrReplace {
 	my ($self, $flag) = @_;
-	print "flag $flag\n";
 	my $geosave = $self->toplevel->geometry;
 	my $sandr = $self->Subwidget('SandR');
 	if ($flag) {

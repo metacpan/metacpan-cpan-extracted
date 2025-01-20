@@ -1,5 +1,9 @@
 Revision history for PDL::NDBin
 
+0.029     2025-01-18 18:01:55+00:00 Europe/London
+
+ - replace unnecessary CopyBadStatusCode
+
 0.028     2024-03-27 15:55:32+00:00 Europe/London
 
  - update requirement to Test::PDL 0.20 which handles badvals correctly

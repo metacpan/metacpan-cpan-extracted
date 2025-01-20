@@ -1,4 +1,9 @@
 do { my $x = {
+       'build' => {
+                    'requires' => {
+                                    'PDL' => '2.088'
+                                  }
+                  },
        'configure' => {
                         'requires' => {
                                         'ExtUtils::MakeMaker' => '0',
@@ -25,6 +30,7 @@ do { my $x = {
                                       'List::Util' => '0',
                                       'Log::Any' => '0',
                                       'Math::Round' => '0',
+                                      'PDL' => '2.088',
                                       'PDL::Lite' => '0',
                                       'PDL::Types' => '0',
                                       'POSIX' => '0',
@@ -46,7 +52,7 @@ do { my $x = {
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
                                    'Module::Pluggable' => '3.1',
-                                   'PDL' => '2.057',
+                                   'PDL' => '2.088',
                                    'PDL::Basic' => '0',
                                    'PDL::Core' => '0',
                                    'Test::Deep' => '0',

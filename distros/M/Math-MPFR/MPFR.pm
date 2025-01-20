@@ -185,20 +185,20 @@ Rmpfr_snprintf Rmpfr_sprintf Rmpfr_sqr Rmpfr_sqrt Rmpfr_sqrt_ui Rmpfr_strtofr
 Rmpfr_sub Rmpfr_sub_d Rmpfr_sub_q Rmpfr_sub_si Rmpfr_sub_ui Rmpfr_sub_z Rmpfr_subnormalize
 Rmpfr_sum Rmpfr_swap
 Rmpfr_tan Rmpfr_tanh Rmpfr_tanpi Rmpfr_tanu
-Rmpfr_total_order_p Rmpfr_trunc
+Rmpfr_total_order_p Rmpfr_trigamma Rmpfr_trunc
 Rmpfr_ui_div Rmpfr_ui_pow Rmpfr_ui_pow_ui Rmpfr_ui_sub Rmpfr_underflow_p Rmpfr_unordered_p
 Rmpfr_urandom Rmpfr_urandomb Rmpfr_y0 Rmpfr_y1 Rmpfr_yn
 Rmpfr_z_div Rmpfr_z_sub Rmpfr_zero_p Rmpfr_zeta Rmpfr_zeta_ui
 TRmpfr_inp_str TRmpfr_out_str
 anytoa atodouble atonum atonv
-check_exact_decimal decimalize doubletoa
+check_exact_decimal decimalize doubletoa dragon_test
 fr_cmp_q_rounded mpfr_max_orig_len mpfr_min_inter_prec mpfrtoa numtoa nvtoa nvtoa_test
 prec_cast q_add_fr q_cmp_fr q_div_fr q_mul_fr q_sub_fr rndna
 );
 
     @Math::MPFR::EXPORT_OK = (@tags, 'bytes');
 
-    our $VERSION = '4.32';
+    our $VERSION = '4.33';
     #$VERSION = eval $VERSION;
 
     Math::MPFR->DynaLoader::bootstrap($VERSION);
@@ -912,18 +912,11 @@ sub anytoa {
     unless Math::MPFR::_itsa($_[0]) == 5;
 
   my $v = shift;
-  my $bits;
+  die "anytoa() now takes only one argument" if defined($_[0]) ;
 
-  if($_[0]) {
-    $bits = shift;
-    die "2nd argument given to anytoa() must be 0 or 53 or 64 or 113 or 2098"
-    unless ($bits == 53 || $bits == 64 || $bits == 113 || $bits == 2098);
-  }
-  else {
-    $bits = Rmpfr_get_prec($v);
-    die "Precision of arg given to anytoa() must be 53 or 64 or 113 or 2098"
-    unless ($bits == 53 || $bits == 64 || $bits == 113 || $bits == 2098);
-  }
+  my $bits = Rmpfr_get_prec($v);
+  die "Precision of arg given to anytoa() must be 53 or 64 or 113 or 2098"
+  unless ($bits == 53 || $bits == 64 || $bits == 113 || $bits == 2098);
 
   my $emax = Rmpfr_get_emax();                # Save original value
   my $emin = Rmpfr_get_emin();                # Save original value
@@ -960,7 +953,7 @@ sub anytoa {
       Rmpfr_set_d($f, $msd, MPFR_RNDN);
       Rmpfr_set_emax($emax);                  # Revert to original value
       Rmpfr_set_emin($emin);                  # Revert to original value
-      return anytoa($f, 53);
+      return anytoa($f);
     }
 
     # Determine the no. of implied (intermediate)
@@ -1010,15 +1003,14 @@ sub anytoa {
   return mpfrtoa($f_init);
 }
 
-
-
-
 ###########################
 ###########################
 
 sub nvtoa_test {
   # 1st arg must be a string (POK);
   # 2nd arg must be either an NV (NOK) or a Math::MPFR object
+
+  warn "nvtoa_test() is DEPRECATED. Please use dragon_test() instead";
 
   die "nvtoa_test() requires at least version 3.1.6 of the MPFR library"
     if 196870 > MPFR_VERSION;
@@ -1036,7 +1028,8 @@ sub nvtoa_test {
 
   if(ref($n) eq 'Math::MPFR') {
     $check = Rmpfr_init2(Rmpfr_get_prec($n));
-    Rmpfr_set($check, abs($n), MPFR_RNDN);
+    Rmpfr_set_str($check, $s, 10, MPFR_RNDN);
+    Rmpfr_abs($check, $check, MPFR_RNDN);
   }
   else {
     die "2nd arg to nvtoa_test() must be either an NV or a Math::MPFR object"
@@ -1168,6 +1161,177 @@ sub nvtoa_test {
   else {
     Rmpfr_set_str($check, $incremented, 10, MPFR_RNDN);
     $ret += 4 if $check > $n;              # chop test ok.
+  }
+
+  return $ret;
+}
+
+#############################
+#############################
+#############################
+#############################
+
+sub dragon_test {
+
+  # 1st arg must be either an NV (NOK) or an IV(IOK) or a Math::MPFR object
+  # If there's a 2nd arg (optional) and it matches /debug/i, then $debug
+  # is set to 1, and some debug info is output during the running of the test.
+
+  die "dragon_test() requires at least version 3.1.6 of the MPFR library"
+    if 196870 > MPFR_VERSION;
+
+  my ($repro, $op, $reco, $is_nv, $ret, $debug);
+  $debug = 1 if(@_ == 2 && $_[1] =~ /debug/i);
+
+  if(ref($_[0]) eq 'Math::MPFR') {
+    $repro = mpfrtoa($_[0]);
+  }
+  else {
+    unless (_SvNOK($_[0]) || _itsa($_[0]) < 3) { # $_[0] needs to be IV/UV/NV
+      die "1st arg to dragon_test() must be either an IV or an NV or a Math::MPFR object"
+    }
+    $is_nv = 1;
+    $repro = nvtoa($_[0]);
+  }
+
+  # Check that signs match:
+  if($repro =~ s/^\-//) {
+    die "In dragon_test(): signs do not match"
+      if $_[0] > 0;
+  }
+  else {
+    die "In dragon_test():mismatch of signs"
+      if($_[0] < 0);
+  }
+
+  # Deal only with the +ve form for simplicity.
+  if($is_nv) {
+    $op = abs($_[0]); # Can change $_[0] from NV to IV
+                      # but that doesn't matter.
+    $reco = atonv($repro);
+  }
+  else {
+    $op = Rmpfr_init2(Rmpfr_get_prec($_[0]));
+    my $inex = Rmpfr_abs($op, $_[0], MPFR_RNDN);
+    die "Copying of argument in dragon_test() failed"
+      if $inex;
+    $reco = Rmpfr_init2(Rmpfr_get_prec($_[0]));
+    Rmpfr_set_str($reco, $repro, 10, MPFR_RNDN);
+  }
+
+  print "OP: $op\nREPRO: $repro\n" if $debug;
+
+  # Handle inf, nan and zero - test that both $n and $check
+  # are the same. No further testing required.
+
+  if($op == 0) {
+    return 15 if $reco == 0;
+    return 0;
+  }
+
+  if($is_nv) {
+    if(Rmpfr_nan_p(Math::MPFR->new($op))) {
+      return 15 if $repro =~ /^nan/i;
+      return 0;
+    }
+    if(Rmpfr_inf_p(Math::MPFR->new($op))) {
+      return 15 if $repro =~ /^inf/i;
+      return 0;
+    }
+  }
+  else {
+    if(Rmpfr_nan_p($op)) {
+      return 15 if $repro =~ /^nan/i;
+      return 0;
+    }
+    if(Rmpfr_inf_p($op)) {
+      return 15 if $repro =~ /^inf/i;
+      return 0;
+    }
+  }
+
+  $ret++ if $reco == $op; # round trip successful
+
+  my @r = split /e/i, $repro;
+
+  if($debug) {
+    print "SPLIT:\n$r[0]";
+    if(defined($r[1])) { print " $r[1]\n" }
+    else { print " no exponent\n" }
+  }
+
+  # Increment $ret by 8 if and only if there are no errant trailing
+  # zeroes in $r[0] .
+
+  if(!defined($r[1])) {
+    $ret += 8 if ($r[0] =~ /\.0$/ || $r[0] !~ /0$/);
+    $r[1] = 0;       # define $r[1] by setting it to zero.
+  }
+  else {
+   $ret += 8 unless $r[0] =~ /0$/;
+  }
+
+  # We remove from $repro any trailing mantissa zeroes, and then
+  # replace the least significant digit with zero.
+  # IOW, we effectively chop off the least siginificant digit, thereby
+  # rounding it down to the next lowest decimal precision.)
+  # This altered string should assign to a value less than $op.
+
+  chop($r[0]) while $r[0] =~ /0$/;
+  $r[0] =~ s/\.$//;
+  while($r[0] =~ /0$/) {
+    chop $r[0];
+    $r[1]++;
+  }
+
+  return $ret + 6 if length($r[0]) < 2; # chop test and increment test inapplicable.
+
+  substr($r[0], -1, 1, '0');
+
+
+  my $chopped = $r[1] ? $r[0] . 'e' . $r[1]
+                      : $r[0];
+
+  print "CHOPPED:\n$chopped\n\n" if $debug;
+
+  if($is_nv) {
+    $ret += 2 if atonv($chopped) < $op; # chop test ok.
+  }
+  else {
+    Rmpfr_set_str($reco, $chopped, 10, MPFR_RNDN);
+    $ret += 2 if $reco < $op;          # chop test ok.
+  }
+
+  # Now we derive a value that is $chopped rounded up to the next lowest
+  # decimal representation.
+  # This new string should assign to a value that is greater
+  # than the given $op.
+
+  if($r[0] =~ /\./) {
+    # We must remove the '.', do the string increment,
+    # and then reinsert the '.' in the appropriate place.
+    my @mantissa = split /\./, $r[0];
+    my $point_pos = -(length($mantissa[1]));
+    my $t = $mantissa[0] . $mantissa[1];
+    $t++ for 1..10;
+    substr($t, $point_pos, 0, '.');
+    $r[0] = $t;
+  }
+  else {
+    $r[0]++ for 1..10;
+  }
+
+  my $incremented = defined($r[1]) ? $r[0] . 'e' . $r[1]
+                                   : $r[0];
+
+  print "INCREMENTED:\n$incremented\n" if $debug;
+
+  if($is_nv) {
+    $ret += 4 if atonv($incremented) > $op; # increment test ok.
+  }
+  else {
+    Rmpfr_set_str($reco, $incremented, 10, MPFR_RNDN);
+    $ret += 4 if $reco > $op;              # increment test ok.
   }
 
   return $ret;

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use Class::Simple;
-use Test::Most tests => 99;
+use Test::Most tests => 113;
 use Test::Deep;
 use Test::NoWarnings;
 
@@ -121,6 +121,12 @@ my @test_cases = (
 # Run tests
 foreach my $test (@test_cases) {
 	my $parsed_date = $parser->parse($test->{input});
+	is_deeply($parsed_date, $test->{output}, "Parsed: $test->{input}");
+
+	$parsed_date = $parser->parse(string => $test->{input});
+	is_deeply($parsed_date, $test->{output}, "Parsed: $test->{input}");
+
+	$parsed_date = $parser->parse({ string => $test->{input} });
 	is_deeply($parsed_date, $test->{output}, "Parsed: $test->{input}");
 }
 

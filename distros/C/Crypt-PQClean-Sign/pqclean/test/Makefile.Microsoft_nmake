@@ -4,10 +4,11 @@
 # override as desired, use /E
 # vim: set ts=4 sw=4 et:
 TYPE=kem
-SCHEME=kyber768
-SCHEME_UPPERCASE=KYBER768
+SCHEME=ml-kem-768
+SCHEME_UPPERCASE=MLKEM768
 IMPLEMENTATION=clean
 IMPLEMENTATION_UPPERCASE=CLEAN
+KAT_RNG=nist
 
 SCHEME_DIR=..\crypto_$(TYPE)\$(SCHEME)\$(IMPLEMENTATION)
 
@@ -17,6 +18,24 @@ COMMON_OBJECTS=$(COMMON_DIR)\aes.obj $(COMMON_DIR)\fips202.obj $(COMMON_DIR)\sha
 COMMON_OBJECTS_NOPATH=aes.obj fips202.obj sha2.obj sp800-185.obj nistseedexpander.obj
 
 DEST_DIR=..\bin
+
+!IF "$(SCHEME)" == "falcon-512"
+INTEROP=falcon-padded-512
+INTEROP_UPPERCASE=FALCONPADDED512
+!ELSEIF "$(SCHEME)" == "falcon-1024"
+INTEROP=falcon-padded-1024
+INTEROP_UPPERCASE=FALCONPADDED1024
+!ELSEIF "$(SCHEME)" == "falcon-padded-512"
+INTEROP=falcon-512
+INTEROP_UPPERCASE=FALCON512
+!ELSEIF "$(SCHEME)" == "falcon-padded-1024"
+INTEROP=falcon-1024
+INTEROP_UPPERCASE=FALCON1024
+!ENDIF
+
+!IFDEF INTEROP
+INTEROP_DIR=..\crypto_$(TYPE)\$(INTEROP)\$(IMPLEMENTATION)
+!ENDIF
 
 CFLAGS=/nologo /O2 /I $(COMMON_DIR) /W4 /WX
 
@@ -32,6 +51,18 @@ clean-scheme:
     nmake /f Makefile.Microsoft_nmake clean
     cd ..\..\..\test
 
+!IFDEF INTEROP
+build-interop:
+    cd $(INTEROP_DIR)
+    nmake /f Makefile.Microsoft_nmake
+    cd ..\..\..\test
+
+clean-interop:
+    cd $(INTEROP_DIR)
+    nmake /f Makefile.Microsoft_nmake clean
+    cd ..\..\..\test
+!ENDIF
+
 functest: $(DEST_DIR)\functest_$(SCHEME)_$(IMPLEMENTATION).exe
 
 testvectors: $(DEST_DIR)\testvectors_$(SCHEME)_$(IMPLEMENTATION).exe
@@ -40,11 +71,19 @@ printparams: $(DEST_DIR)\printparams_$(SCHEME)_$(IMPLEMENTATION).exe
 
 nistkat: $(DEST_DIR)\nistkat_$(SCHEME)_$(IMPLEMENTATION).exe
 
+!IFDEF INTEROP
+$(DEST_DIR)\functest_$(SCHEME)_$(IMPLEMENTATION).exe: build-scheme build-interop $(COMMON_OBJECTS) $(COMMON_DIR)\randombytes.obj
+    -MKDIR $(DEST_DIR)
+    -DEL functest.obj
+    $(CC) /c crypto_$(TYPE)\functest.c $(CFLAGS) /I $(SCHEME_DIR) /DPQCLEAN_NAMESPACE=PQCLEAN_$(SCHEME_UPPERCASE)_$(IMPLEMENTATION_UPPERCASE) /DPQCLEAN_FALCON_TEST_INTEROP /DPQCLEAN_INTEROP_NAMESPACE=PQCLEAN_$(INTEROP_UPPERCASE)_$(IMPLEMENTATION_UPPERCASE) /DPQCLEAN_INTEROP_INCLUDE=$(INTEROP_DIR)
+    LINK.EXE /STACK:8192000 /OUT:$@ functest.obj $(COMMON_OBJECTS_NOPATH) randombytes.obj $(SCHEME_DIR)\lib$(SCHEME)_$(IMPLEMENTATION).lib $(INTEROP_DIR)\lib$(INTEROP)_$(IMPLEMENTATION).lib Advapi32.lib
+!ELSE
 $(DEST_DIR)\functest_$(SCHEME)_$(IMPLEMENTATION).exe: build-scheme $(COMMON_OBJECTS) $(COMMON_DIR)\randombytes.obj
     -MKDIR $(DEST_DIR)
     -DEL functest.obj
     $(CC) /c crypto_$(TYPE)\functest.c $(CFLAGS) /I $(SCHEME_DIR) /DPQCLEAN_NAMESPACE=PQCLEAN_$(SCHEME_UPPERCASE)_$(IMPLEMENTATION_UPPERCASE)
     LINK.EXE /STACK:8192000 /OUT:$@ functest.obj $(COMMON_OBJECTS_NOPATH) randombytes.obj $(SCHEME_DIR)\lib$(SCHEME)_$(IMPLEMENTATION).lib Advapi32.lib
+!ENDIF
 
 $(DEST_DIR)\testvectors_$(SCHEME)_$(IMPLEMENTATION).exe: build-scheme $(COMMON_OBJECTS) $(TEST_COMMON_DIR)\notrandombytes.obj
     -MKDIR $(DEST_DIR)
@@ -58,14 +97,14 @@ $(DEST_DIR)\printparams_$(SCHEME)_$(IMPLEMENTATION).exe: crypto_$(TYPE)\printpar
     $(CC) /c crypto_$(TYPE)\printparams.c $(CFLAGS) /I $(SCHEME_DIR) /DPQCLEAN_NAMESPACE=PQCLEAN_$(SCHEME_UPPERCASE)_$(IMPLEMENTATION_UPPERCASE)
     LINK.EXE /OUT:$@ printparams.obj
 
-$(DEST_DIR)\nistkat_$(SCHEME)_$(IMPLEMENTATION).exe: build-scheme $(COMMON_OBJECTS) $(TEST_COMMON_DIR)\nistkatrng.obj
+$(DEST_DIR)\nistkat_$(SCHEME)_$(IMPLEMENTATION).exe: build-scheme $(COMMON_OBJECTS) $(TEST_COMMON_DIR)\$(KAT_RNG)katrng.obj
     -MKDIR $(DEST_DIR)
-    -DEL nistkat.obj
-    $(CC) /c crypto_$(TYPE)\nistkat.c $(CFLAGS) /I $(SCHEME_DIR) /DPQCLEAN_NAMESPACE=PQCLEAN_$(SCHEME_UPPERCASE)_$(IMPLEMENTATION_UPPERCASE)
-    LINK.EXE /STACK:8192000 /OUT:$@ nistkat.obj $(COMMON_OBJECTS_NOPATH) nistkatrng.obj $(SCHEME_DIR)\lib$(SCHEME)_$(IMPLEMENTATION).lib
+    -DEL $(KAT_RNG)kat.obj
+    $(CC) /c crypto_$(TYPE)\$(KAT_RNG)kat.c $(CFLAGS) /I $(SCHEME_DIR) /DPQCLEAN_NAMESPACE=PQCLEAN_$(SCHEME_UPPERCASE)_$(IMPLEMENTATION_UPPERCASE)
+    LINK.EXE /STACK:8192000 /OUT:$@ $(KAT_RNG)kat.obj $(COMMON_OBJECTS_NOPATH) $(KAT_RNG)katrng.obj $(SCHEME_DIR)\lib$(SCHEME)_$(IMPLEMENTATION).lib
 
 clean:
-    -DEL functest.obj testvectors.obj printparams.obj nistkat.obj
+    -DEL functest.obj testvectors.obj printparams.obj $(KAT_RNG)kat.obj
     -DEL $(COMMON_OBJECTS_NOPATH) randombytes.obj notrandombytes.obj
     -DEL $(DEST_DIR)\functest_$(SCHEME)_$(IMPLEMENTATION).exe
     -DEL $(DEST_DIR)\testvectors_$(SCHEME)_$(IMPLEMENTATION).exe

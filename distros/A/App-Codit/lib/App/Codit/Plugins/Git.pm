@@ -114,7 +114,7 @@ sub new {
 
 	$self->{PROJECTS} = {};
 
-	my $page = $self->ToolNavigPageAdd('Git', 'git-icon', undef, 'Manage your projects', 250);
+	my $page = $self->ToolLeftPageAdd('Git', 'git-icon', undef, 'Manage your projects', 250);
 	
 	my $pframe = $page->Frame->pack(-fill => 'x');
 	$pframe->Label(-text => 'Project:')->pack(-side => 'left');
@@ -455,7 +455,7 @@ sub selectInternal {
 
 sub Unload {
 	my $self = shift;
-	$self->ToolNavigPageRemove('Git');
+	$self->ToolLeftPageRemove('Git');
 	for (
 		'git_add',
 		'git_collapse',

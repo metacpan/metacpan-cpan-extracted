@@ -38,9 +38,7 @@ WriteMakefile(
         'Test::More' => '0.88',
     },
     PREREQ_PM => { 
-        'PDL'                 => 0,
-        'PDL::MatrixOps'      => 0,
-	'PDL::Transform'      => 0,
+	'PDL' => '2.094', # Test::PDL
 	'PDL::Graphics::ColorSpace' => '0.203',
     },
     META_ADD => {

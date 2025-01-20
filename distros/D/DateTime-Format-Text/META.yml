@@ -34,9 +34,11 @@ requires:
   Carp: '0'
   DateTime: '0'
   DateTime::Format::Flexible: '0'
+  ExtUtils::MakeMaker: '6.64'
+  Scalar::Util: '0'
   perl: '5.006002'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=DateTime-Format-Text
   repository: git://github.com/nigelhorne/DateTime-Format-Text.git
-version: '0.09'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '0.10'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

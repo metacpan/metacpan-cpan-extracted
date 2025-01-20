@@ -127,9 +127,9 @@ for my $class ( __PACKAGE__->actions ) {
 }
 
 #
-# OUTPUT PIDDLE RETURN TYPE
+# OUTPUT NDARRAY RETURN TYPE
 #
-note 'OUTPUT PIDDLE RETURN TYPE';
+note 'OUTPUT NDARRAY RETURN TYPE';
 
 #
 $N = 4;

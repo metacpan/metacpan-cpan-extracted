@@ -1,5 +1,10 @@
 Tk::CodeText module changes log
 
+0.62 19 Jan 2025
+	- Removed unneccessary print statements.
+	- Added events <<LowerCase>> and <<UpperCase>>, their key bindings and method caseChange.
+	- Fixed method replace. Wrong undo recording of editModified.
+
 0.61 05 Jan 2025
 	- Auto complete pops list down on focus out and on no matching words.
 	- Auto complete list adjusts position on <Configure> and scroll events.

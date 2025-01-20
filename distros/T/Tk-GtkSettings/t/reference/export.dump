@@ -11,6 +11,8 @@ Some other section
 *activeForeground: #000000
 *backPageColor: #C0AB8B
 *background: #dec9a9
+*disabledBackground: #C0AB8B
+*disabledForeground: #5A5A5A
 *font: {Noto Sans} 10 
 *foreground: #000000
 *highlightBackground: #dec9a9
@@ -18,6 +20,7 @@ Some other section
 *iconTheme: oxygen
 *inactiveBackground: #C0AB8B
 *insertBackground: #000000
+*linkColor: #296fbe
 *selectBackground: #8f6b32
 *selectForeground: #ffffff
 *troughColor: #C0AB8B

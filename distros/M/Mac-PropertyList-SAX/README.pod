@@ -219,7 +219,7 @@ Please contact the author with bug reports or feature requests.
 
 =head1 AUTHOR
 
-Darren M. Kulp, C<< <kulp @ cpan.org> >>
+Darren M. Kulp, C<< <darren@kulp.ch> >>
 
 =head1 THANKS
 

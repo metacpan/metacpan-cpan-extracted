@@ -67,7 +67,7 @@ is( $dict->count, 0, "Empty object has right number of keys" );
 ########################################################################
 my $dict =<<"HERE";
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
 	<key>Mimi</key>
@@ -105,7 +105,7 @@ note 'Try non-canonical layout';
 
 $plist = &{$parse_fqname}( <<"HERE" );
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict><key>Clayton</key><string>John</string><key>Napier</key><string>Carson</string><key>Gridley</key><string>Jason</string></dict>
 </plist>

@@ -12,7 +12,7 @@ use Test::More;
 # The exponent will be in the range -$MAX_POW..$MAX_POW
 # Exponents will alternate between -ve and +ve
 # Every third mantissa will be negative.
-# We call nvtoa_test() to check that nvtoa() has returned the correct value.
+# We call dragon_test() to check that nvtoa() has returned the correct value.
 #
 # In this script we test the correctness of nvtoa() differently, depending upon
 # whether perl is prone to mis-assignment of values, or not.
@@ -131,21 +131,8 @@ while(1) {
   $mantissa .= 1 +int(rand(9)) if $len;
 
   my $str = $mantissa_sign . $mantissa . 'e' . $exponent;
-  my $s_copy = $mantissa_sign . $mantissa . 'e' . $exponent;
 
-  my $nv;
-
-  if($reliable && !$subnormal_issue) {
-    $nv = $str * 1.0;
-  }
-  else {
-    $nv = atonv($str);
-  }
-
-  my $nvtoa = nvtoa($nv);
-
-  ok(nvtoa_test($nvtoa, $nv) == 15, "$str");
-
+  ok(dragon_test(atonv($str)) == 15, "$str passes dragon test (NV)");
 }
 
 done_testing();

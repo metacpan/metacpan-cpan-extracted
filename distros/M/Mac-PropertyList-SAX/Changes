@@ -131,3 +131,6 @@ Revision history for Mac-PropertyList-SAX
 
 1.001	2022-08-10T17:12-05:00
         Fix up MANIFEST problems that prevented Makefile.PL from being packed.
+
+1.002	2025-01-19T20:07-05:00
+        Use updated XML files in tests, via trwyant.

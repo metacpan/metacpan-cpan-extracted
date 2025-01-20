@@ -9,111 +9,66 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    This module needs the MPFR and GMP C libraries. (Install the
    GMP library first as it is a pre-requisite for MPFR.)
 
-   The GMP library is available from https://gmplib.org
-   The MPFR library is available from https://www.mpfr.org/
+   The GMP library is available from https://gmplib.org .
+   The MPFR library is available from https://www.mpfr.org .
 
    Documentation for current mpfr functions can be found at:
-   www.mpfr.org/mpfr-current/mpfr.html#Function-and-Type-Index
+   www.mpfr.org/mpfr-current/mpfr.html#Function-and-Type-Index .
 
 =head1 DESCRIPTION
 
-   A bigfloat module utilising the MPFR library. Basically
-   this module simply wraps the 'mpfr' floating point functions
-   provided by that library.
-   Operator overloading is also available.
-   The following documentation heavily plagiarises the mpfr
-   documentation.
-   See also the Math::MPFR test suite for some examples of usage.
+   A bigfloat module utilising the MPFR library. The main aim of
+   this module is to wrap the floating point functions provided
+   by that library. We also access many of those functions via
+   operator overloading. (A small number of customised functions,
+   not found in the MPFR library, are also available.)
 
 =head1 SYNOPSIS
 
+   # This synopsis is very brief. My attempts at providing a
+   # reasonable coverage in this section always result in
+   # something that is ridiculously complex :-(
+
    use Math::MPFR qw(:mpfr);
 
-   # '@' can be used to separate mantissa from exponent. For bases
-   # that are <= 10, 'e' or 'E' can also be used.
-   # Use single quotes for string assignment if you're using '@' as
-   # the separator. If you must use double quotes, you'll have to
-   # escape the '@'.
+   # Create a Math::MPFR object with an assigned value. The
+   # returned object will have current default precision, and
+   # the value will be rounded according to current dwfault
+   # rounding mode. In this example, we provide a string as the
+   # argument, but non-string arguments are also permitted.
 
-   my $str = '.123542@2'; # mantissa = (.)123452
-                         # exponent = 2
-   #Alternatively:
-   # my $str = ".123542\@2";
-   # or:
-   # my $str = '12.3542';
-   # or:
-   # my $str = '1.23542e1';
-   # or:
-   # my $str = '1.23542E1';
+   my $rop = Math::MPFR->new('1.2e-10');
 
-   my $base = 10;
-   my $rnd = MPFR_RNDZ; # See 'ROUNDING MODE'
+   # Other ways of assigning a string using new() to create an
+   # equivalent Math::MPFR object include:
+   # my $rop = Math::MPFR->new('1.2@-10');
+   # my $rop = Math::MPFR->new("1.2\@-10");
+   # Octal (base 8):
+   # my $rop = Math::MPFR->new('1.0176077644330267e-11', 8);
+   # my $rop = Math::MPFR->new('0x1.07e1fe91b0b7p-33');
+   # Specify base (16) if '0x' prefix is not provided:
+   # my $rop = Math::MPFR->new('1.07e1fe91b0b7p-33', 16);
 
-   # Create an Math::MPFR object that holds an initial
-   # value of $str (in base $base) and has the default
-   # precision. $bn1 is the number. $nok will either be 0
-   # indicating that the string was a valid number string, or
-   # -1, indicating that the string contained at least one
-   # invalid numeric character.
-   # See 'COMBINED INITIALISATION AND ASSIGNMENT', below.
-   my ($bn1, $nok) = Rmpfr_init_set_str($str, $base, $rnd);
+   # Display the value held by $rop.
+   print $rop;                  # 1.2e-10
 
-   # Or use the new() constructor - also documented below
-   # in 'COMBINED INITIALISATION AND ASSIGNMENT'.
-   # my $bn1 = Math::MPFR->new($str);
-
-   # Create another Math::MPFR object with precision
-   # of 100 bits and an initial value of NaN.
-   my $bn2 = Rmpfr_init2(100);
-
-   # Assign the value -2314.451 to $bn1.
-   Rmpfr_set_d($bn2, -2314.451, MPFR_RNDN);
-
-   # Create another Math::MPFR object that holds
-   # an initial value of NaN and has the default precision.
-   my $bn3 = Rmpfr_init();
-
-   # Or using instead the new() constructor:
-   # my $bn3 = Math::MPFR->new();
-
-   # Perform some operations ... see 'FUNCTIONS' below.
-   # see 'OPERATOR OVERLOADING' below for docs re
-   # operator overloading
-
-   .
-   .
-
-   # print out the value held by $bn1 (in octal):
-   print Rmpfr_get_str($bn1, 8, 0, $rnd), "\n";
-
-   # print out the value held by $bn1 (in decimal):
-   print Rmpfr_get_str($bn1, 10, 0, $rnd), "\n";
-   # or just make use of overloading :
-   print $bn1, "\n"; # is base 10, and uses 'e' rather than '@'.
-
-   # print out the value held by $bn1 (in base 16) using the
-   # 'TRmpfr_out_str' function. (No newline is printed - unless
-   # it's supplied as the optional fifth arg. See the
-   # 'TRmpfr_out_str' documentation below.)
-   TRmpfr_out_str(*stdout, 16, 0, $bn1, $rnd);
+   # Other ways of printing out the value include:
+   # print mpfrtoa($rop);       # 1.2e-10
+   # Rmpfr_printf("%Rg", $rop); # 1.2e-10
 
 =head1 ROUNDING MODE
 
-
-   One of 4 values:
-    GMP_RNDN (numeric value = 0): Round to nearest.
-    GMP_RNDZ (numeric value = 1): Round towards zero.
-    GMP_RNDU (numeric value = 2): Round towards +infinity.
-    GMP_RNDD (numeric value = 3): Round towards -infinity.
-
-   With the release of mpfr-3.0.0, the same rounding values
-   are renamed to:
+   As of mpfr-3.0.0, the rounding values are:
     MPFR_RNDN (numeric value = 0): Round to nearest.
     MPFR_RNDZ (numeric value = 1): Round towards zero.
     MPFR_RNDU (numeric value = 2): Round towards +infinity.
     MPFR_RNDD (numeric value = 3): Round towards -infinity.
 
-   You can use either the "GMP_*" or the "MPFR_*" renditions.
+   Previously they were named (respectively) GMP_RNDN,
+    GMP_RNDZ, GMP_RNDU and GMP_RNDD.
+
+   You can use either the "GMP_*" or the "MPFR_*" renditions,
+   but the former is discouraged.
 
    Also available are:
     mpfr-3.0.0 and later:
@@ -147,9 +102,9 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     lies exactly in the middle of two representable
     numbers, it is rounded to the one with the least
     significant bit set to zero.  For example, the
-    number 5, which is represented by (101) in binary,
-    is rounded to (100)=4 with a precision of two bits,
-    and not to (110)=6.  This rule avoids the "drift"
+    number 5, which is represented by '101' in binary,
+    is rounded to '10p1' (4) with a precision of two bits,
+    and not to '11p1' (6).  This rule avoids the "drift"
     phenomenon mentioned by Knuth in volume 2 of
     The Art of Computer Programming (section 4.2.2,
     pages 221-222).
@@ -210,11 +165,6 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
    2) Math::GMPz (for mpz types), Math::GMPq (for mpq types)
       and Math::GMPf (for mpf types).
-
-   You may also be able to use objects from the GMP module
-   that ships with the GMP sources. I get occasional
-   segfaults when I try to do that, so I've stopped
-   recommending it - and don't support the practice.
 
 =head1 PASSING __float128 VALUES
 
@@ -305,40 +255,11 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
 =head1 FUNCTIONS
 
-   These next 3 functions are demonstrated above (in SYNOPSIS):
-   $rop = Rmpfr_init();
-   $rop = Rmpfr_init2($p);
-   $str = Rmpfr_get_str($op, $base, $digits, $rnd); # mpfr version >= 4.1.0 ? 1 < $base < 63
-                                                                                    ||
-                                                                              -37 < $base < -1
-                                                    #                       : 1 < $base < 63
-   The third argument to Rmpfr_get_str() specifies the number of digits
-   required to be output in the mantissa. (Trailing zeroes are removed.)
-   If $digits is 0, the number of digits of the mantissa is chosen
-   large enough so that re-reading the printed value with the same
-   precision, assuming both output and input use rounding to nearest,
-   will recover the original value of $op.
-
    The following functions are generally wrappers around an mpfr
    function of the same name. eg. Rmpfr_swap() is a wrapper around
    mpfr_swap().
 
-   "$rop", "$op1", "$op2", etc. are Math::MPFR objects - the
-   return value of one of the Rmpfr_init* functions. They are in fact
-   references to mpfr structures. The "$op" variables are the operands
-   and "$rop" is the variable that stores the result of the operation.
-   Generally, $rop, $op1, $op2, etc. can be the same perl variable
-   referencing the same mpfr structure, though often they will be
-   distinct perl variables referencing distinct mpfr structures.
-   Eg something like Rmpfr_add($r1, $r1, $r1, $rnd),
-   where $r1 *is* the same reference to the same mpfr structure,
-   would add $r1 to itself and store the result in $r1. Alternatively,
-   you could (courtesy of operator overloading) simply code it
-   as $r1 += $r1 (or even as $r *= 2).
-   Otoh, Rmpfr_add($r1, $r2, $r3, $rnd), where each of the arguments
-   is a different reference to a different mpfr structure would add
-   $r2 to $r3 and store the result in $r1. Alternatively it could be
-   coded as $r1 = $r2 + $r3.
+   "$rop", "$op1", "$op2", etc. are Math::MPFR objects.
 
    "$inex" is a signed integer value (IV) returned by many of the
    mpfr functions.
@@ -378,7 +299,10 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    eg '1234567890987654321234567E7' or 'zsa34760sdfgq123r5@11'.
    Valid bases for MPFR numbers are 2 to 62.
 
-   "$rnd" is simply one of the 5 rounding mode values (discussed above).
+   "$rnd" is simply one of the 5 rounding mode values (discussed above)
+    that many of the functions require as their rounding arg. In my
+    code, rather than providing them as a perl scalar, I usually write
+    them in their bareword form - MPFR_RNDN or MPFR_RNDU or ..., etc.
 
    "$p" is the (signed int) value for precision.
 
@@ -475,6 +399,10 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     Initialize $rop, and set its value to NaN. The precision
     of $rop is the default precision, which can be changed
     by a call to 'Rmpfr_set_default_prec'.
+    NOTE: The new() sub can accept an argument - in which case
+          $rop is initialized and the given value assigned to it.
+          See COMBINED INITIALIZATION AND ASSIGNMENT below for
+          more details.
 
    $rop = Rmpfr_init2($p);
    $rop = Rmpfr_init2_nobless($p);
@@ -595,8 +523,8 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     power $exp, rounded towards the given direction $rnd.  Note that
     the input 0 is converted to +0. ($z is a GMP mpz object.)
 
-   $inex = Rmpfr_set_str($rop, $str, $base, $rnd);
-    Set $rop to the value of $str in base $base (0,2..36 or, if
+   $iv = Rmpfr_set_str($rop, $str, $base, $rnd);
+    Set $rop to the value of $str in base $base (0,2..36) or, if
     Math::MPFR has been built against mpfr-3.0.0 or later, (0,2..62),
     rounded in direction $rnd to the precision of $rop.
     The exponent is read in decimal.  This function returns 0 if
@@ -633,6 +561,8 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
      Rmpfr_set_str($rop, ".1234@-5", 10, GMP_RNDN);
 
    $inex = Rmpfr_strtofr($rop, $str, $base, $rnd);
+    This function differs from Rmpfr_set_str() mainly in that it
+    returns the usual "exactness" ternary value ($inex).
     Read a floating point number from a string $str in base $base,
     rounded in the direction $rnd. If successful, the result is
     stored in $rop. If $str doesn't start with a valid number then
@@ -682,18 +612,6 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     only digits, Latin letters and the underscore (0, 1, 2, ..., 9, a,
     b, ..., z, A, B, ..., Z, _). Note: one has an optional sign for
     all data, even NaN.
-    The function returns a usual ternary value.
-
-   Rmpfr_set_str_binary($rop, $str);
-    Removed in Math-MPFR-3.30. Should have been removed long ago.
-    Set $rop to the value of the binary number in $str, which has to
-    be of the form +/-xxxx.xxxxxxEyy. The exponent is read in decimal,
-    but is interpreted as the power of two to be multiplied by the
-    mantissa.  The mantissa length of $str has to be less or equal to
-    the precision of $rop, otherwise an error occurs.  If $str starts
-    with 'N', it is interpreted as NaN (Not-a-Number); if it starts
-    with 'I' after the sign, it is interpreted as infinity, with the
-    corresponding sign.
 
    Rmpfr_set_inf($rop, $si);
    Rmpfr_set_nan($rop);
@@ -732,7 +650,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     and 2 to 62. If $arg is a string and no additional argument is
     supplied, the base will be deduced.
     See 'Rmpfr_set_str' above for an explanation of how that
-    deduction is done.
+    deduction is made, and for rules regarding the string format.
 
     NOTE: If $arg is *both* an NV (floating point value) and PV
     (string), then the value specified by the PV (string) will be
@@ -755,10 +673,10 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    ($rop, $inex) = Rmpfr_init_set_si_nobless($si, $rnd);
    ($rop, $inex) = Rmpfr_init_set_d        ($double, $rnd);
    ($rop, $inex) = Rmpfr_init_set_d_nobless($double, $rnd);
-   ($rop, $inex) = Rmpfr_init_set_ld        ($longdouble, $rnd);
-   ($rop, $inex) = Rmpfr_init_set_ld_nobless($longdouble, $rnd);
-   ($rop, $inex) = Rmpfr_init_set_float128        ($float128, $rnd);
-   ($rop, $inex) = Rmpfr_init_set_float128_nobless($float128, $rnd);
+   ($rop, $inex) = Rmpfr_init_set_ld        ($ld, $rnd);
+   ($rop, $inex) = Rmpfr_init_set_ld_nobless($ld, $rnd);
+   ($rop, $inex) = Rmpfr_init_set_float128        ($f128, $rnd);
+   ($rop, $inex) = Rmpfr_init_set_float128_nobless($f128, $rnd);
    ($rop, $inex) = Rmpfr_init_set_f        ($f, $rnd);# $f is a mpf object
    ($rop, $inex) = Rmpfr_init_set_f_nobless($f, $rnd);# $f is a mpf object
    ($rop, $inex) = Rmpfr_init_set_z        ($z, $rnd);# $z is a mpz object
@@ -1150,7 +1068,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    $si = Rmpfr_cmp_si($op, $si);
    $si = Rmpfr_cmp_d($op, $double);
    $si = Rmpfr_cmp_ld($op, $ld); # long double
-   $si = Rmpfr_cmp_float128($op, $float128); # __float128
+   $si = Rmpfr_cmp_float128($op, $f128); # __float128
    $si = Rmpfr_cmp_z($op, $z); # $z is a mpz object
    $si = Rmpfr_cmp_q($op, $q); # $q is a mpq object
    $si = Rmpfr_cmp_f($op, $f); # $f is a mpf object
@@ -1573,16 +1491,17 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
    ($signp, $si) = Rmpfr_lgamma ($rop, $op, $rnd);
     Set $rop to the value of the logarithm of the absolute value
-    of the Gamma function on $op, rounded in the direction $rnd.
-    The sign (1 or -1) of Gamma($op) is returned in $signp.
+    of the gamma function on $op, rounded in the direction $rnd.
+    The sign (1 or -1) of gamma($op) is returned in $signp.
     When $op is an infinity or a non-positive integer, +Inf is
     returned. When $op is NaN, -Inf or a negative integer, $signp
     is undefined, and when $op is 0, $signp is the sign of the zero.
 
-   $inex = Rmpfr_digamma ($rop, $op, $rnd); # mpfr-3.0.0 and later only
-    Set $rop to the value of the Digamma (sometimes also called Psi)
-    function on $op, rounded in the direction $rnd.  When $op is a
-    negative integer, set $rop to NaN.
+   $inex = Rmpfr_digamma($rop, $op, $rnd); # mpfr-3.0.0 and later only
+    Set $rop to digammma($op), rounded according to $rnd.
+
+   $inex = Rmpfr_trigamma ($rop, $op, $rnd); # mpfr-4.3.0 and later only
+    Set $rop to trigammma($op), rounded according to $rnd.
 
    $inex = Rmpfr_zeta($rop, $op, $rnd);
    $inex = Rmpfr_zeta_ui($rop, $ul, $rnd);
@@ -1913,56 +1832,48 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
             With double-double NVs, nvtoa() currently requires
             mpfr-4.0.0 or later.
 
-   $str = mpfrtoa($op, $uv); # $uv is optional (new in 4.24), and will
-                             # be set to zero if not provided.
+   $str = mpfrtoa($op [, $uv]); # $uv is optional, but mysterious
+                                # and discouraged !!!
     As for nvtoa(), except that mpfrtoa() instead takes a Math::MPFR
     object as its argument.
     Sets $str to the value of $op.
     $str will appear in standard decimal format, containing the
-    *minimum* number of digits such that the condition ($str == $op)
-    is true.
-    If provided, $uv sets the minimum precision below which the value
-    will be deemed subnormal. For example, if $uv is given as 53, then
-    any Math::MPFR object ($op) with precision less than 53 bits will
-    be treated as subnormal. (This can have an effect on the no. of
-    significant mantissa digits returned.)
-    If $uv is not provided, it is assigned a value of 0 - ie no
-    Math::MPFR objects will be treated as subnormal (because
-    precision is never less than 0).
+    *minimum* number of significant digits such that the condition
+    ($str == $op) is true when the current default precision equals
+    the precision of $op.
+    (The overloaded '==' operator evaluates $str according to the
+    current default precision, so that condition might be untrue
+    whenever the default precision != the precision of $op.)
 
-   $str = anytoa($op [, $bits]);
+    The second (optional) arg became available with Math-MPFR-4.24 and
+    it can alter the behaviour of mpfrtoa when the value of $uv is
+    greater than the precision of $op. AFAIK, it is used only (and
+    arcanely in Math:FakeDD::dd_repro(), and the option will be removed
+    as soon as Math::FakeDD::dd_repro() can be adapted to that removal.
+
+$str = anytoa($op); # $op precision must be 53 or 64 or 113 or 2098
     For example, you want to know what nvtoa(sqrt 3) would return
     on a perl whose nvtype is the 113-bit precision __float128 (or
     IEEE-754 128-bit long double) but you don't have access to such
     a perl. You can do:
 
       my $bits = 113;
-      my $op = Rmpfr_init2($bits);
-      Rmpfr_set_ui($op, 3, MPFR_RNDN);
-      $op = sqrt($op);
-      print anytoa($op);
-    # alternatively:
-    # print anytoa($op, $bits);
+      Rmpfr_set_default_prec($bits);
+      $op = sqrt(Math::MPFR->new('3'));
+      my $s = anytoa($op);
+      print "$s\n"; # 1.7320508075688772935274463415058723
 
-    We allow the second arg solely for back-compatibility.
-    This also allows one to provide a second arg to anytoa()
-    that differs in value to the precision of $op, though it's
-    not clear to me that this is in any way useful.
-
-    Similarly, changing $bits to 53, or 64, or 2098 will provide
+    Similarly, changing $bits to 53, or 64, or 2098 would provide
     the same as nvtoa(sqrt 3) for (respectively) the 53-bit
-    precision double , the 64-bit extended precision long double,
-    and the double-double.
-    $bits must be either 53, 64, 113 or 2098 (and the same goes
-    for the precision of $op).
+    precision double nvtype , the 64-bit extended precision long
+    double nvtype, and the double-double nvtype.
 
-    When anytoa() is called with only the one argument ($op), or
-    with a 2nd argument that is equivalent to the precision of $op,
-    then the value returned will be the same as returned by
-    mpfrtoa($op) unless:
+    The value returned will be the same as returned by mpfrtoa($op)
+    unless:
 
      1) $op holds a finite value that is of such magnitude that
-        the specified nvtype will turn it into (+ or -) Inf;
+        it will become (+ or -) Inf when converted to the
+        specified nvtype;
 
      or
 
@@ -1974,33 +1885,47 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
      3) the precision of $op is 2098 bits.
 
-   $mask = nvtoa_test($str, $arg, $debug); # $debug can be omitted.
-    $arg can be either an NV or a Math::MPFR object.
-    If $arg is an NV, then $str is the string returned by nvtoa($arg).
-    Else $str is the string returned by mpfrtoa($arg).
-    The nvtoa_test function checks that $str is the correct string
-    for the given $arg.
+   $mask = nvtoa_test($str, $arg [, $debug]);
+    DEPRECATED - dragon_test (see below) is recommended instead.
+    If $arg is a Math::MPFR object, then $str must be the string
+    returned by mpfrtoa($arg). Else it must be the string returned
+    by nvtoa($arg).
+    Otherwise, nvtoa_test is essentially the same as dragon_test.
+    If you want to back yourself to provide the appropriate $str/$arg
+    combination, then please feel free to keep using nvtoa_test until
+    such time as it is removed.
+
+   $mask = dragon_test($arg [, $debug]);
+    If $debug is provided and matches /debug/i, then some debug info is
+    output during the running of this function.
+    $arg can be either an IV or an NV or a Math::MPFR object.
+    For an IV or NV we test the string returned by nvtoa($arg) for
+    correctness.
+    For a Math::MPFR object we test the string returned by mpfrtoa($arg)
+    for correctness.
+    In both cases we establish that the string will assign to $arg, and
+    that the mantissa portion of the string also contains the minimum
+    number of significant decimal digits required for that round trip to
+    succeed.
     $mask is initially set to zero.
-    If $str assigns to $arg (as it should) then $mask set to 1.
-    Also, we chop the least significant digit off the mantissa of
-    a copy of $str, and add 2 to $mask if this chopped $str assigns to
-    a value less than $arg.
-    Also, we increment the least significant mantissa digit of this
-    chopped copy of $str, and add 4 to $mask if this chopped-and-incremented
-    $str assigns to a value greater than $arg.
+    If the string assigns to $arg (as it should) then $mask is set to 1.
+    Also, we chop the least significant digit off the mantissa portion of
+    the string, and add 2 to $mask if this chopped string assigns to a
+    value less than $arg.
+    Then we increment the least significant mantissa digit of this chopped
+    string - and add 4 to $mask if this chopped-and-incremented string
+    assigns to a value greater than $arg.
     Also, we check that the mantissa portion of $str contains no
-    unwelcome trailing zeroes.
+    unwelcome trailing zeroes - and add 8 to $mask if this check passes.
     $mask is then returned. If all is correct, it's value will be 15.
     If the value of the returned $mask is not 15, then we can determine
-    which part(s) of the test has failed by examining $mask's four
-    lowest bits.
+    which part(s) of the test failed by examining $mask's 4 lowest bits.
+    In the event of a failure, re-running the test with 'debug' will
+    provide some clarifying info.
 
-    If a third (debug) arg is provided and is TRUE, then some debug
-    info is provided during the running of nvtoa_test().
-
-    For inf, nan, and zero, we do only the initial test and return 15 if
-    that test has passed, or 0 if that test has failed. (The other 3
-    tests don't really apply.)
+    For inf, nan, and single-digit mantissas, we do only the initial test
+    and return 15 if that test has passed, or 0 if that test has failed.
+    (The other 3 tests don't really apply to these cases.)
 
    $str = numtoa($sv);
     As for nvtoa() but prints out UVs and IVs in integer format.

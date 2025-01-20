@@ -97,6 +97,17 @@ else {
    ok($exp2->{msd} == 4294967295 && $exp2->{lsd} < 4e-23, "dd_exp2($log2) approximates $t_0"); # 20
 }
 
+for(0.2, 0.3, 0.4, 0.50, 0.6, 0.8, 1, 2, 100000.0001) {
+  cmp_ok(log(Math::FakeDD->new($_)), '==', dd_log($_), "dd_log($_) ok");
+  cmp_ok(exp(Math::FakeDD->new($_)), '==', dd_exp($_), "dd_exp($_) ok");
+
+  cmp_ok(dd_log2(Math::FakeDD->new($_)), '==', dd_log2($_), "dd_log2($_) ok");
+  cmp_ok(dd_exp2(Math::FakeDD->new($_)), '==', dd_exp2($_), "dd_exp2($_) ok");
+
+  cmp_ok(dd_log10(Math::FakeDD->new($_)), '==', dd_log10($_), "dd_log10($_) ok");
+  cmp_ok(dd_exp10(Math::FakeDD->new($_)), '==', dd_exp10($_), "dd_exp10($_) ok");
+}
+
 done_testing();
 
 __END__

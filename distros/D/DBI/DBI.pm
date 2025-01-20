@@ -16,7 +16,7 @@ use warnings;
 
 our ($XS_VERSION, $VERSION);
 BEGIN {
-$VERSION = "1.646"; # ==> ALSO update the version in the pod text below!
+$VERSION = "1.647"; # ==> ALSO update the version in the pod text below!
 $XS_VERSION = $VERSION;
 $VERSION =~ tr/_//d;
 }
@@ -148,7 +148,7 @@ sure that your issue isn't related to the driver you're using.
 
 =head2 NOTES
 
-This is the DBI specification that corresponds to DBI version 1.646
+This is the DBI specification that corresponds to DBI version 1.647
 (see L<DBI::Changes> for details).
 
 The DBI is evolving at a steady pace, so it's good to check that
@@ -2078,7 +2078,7 @@ sub _new_sth {	# called by DBD::<drivername>::db::prepare)
                 }
 	    }
 	    else {
-		my @column_names = @{ $sth->FETCH($sth->FETCH('FetchHashKeyName')) };
+		my @column_names = @{ $sth->FETCH($sth->FETCH('FetchHashKeyName')) || [] };
 		return [] if !@column_names;
 
 		$sth->bind_columns( \( @row{@column_names} ) );
@@ -6894,11 +6894,28 @@ a hash (thanks to H.Merijn Brand):
 
   $sth->execute;
   my %row;
-  $sth->bind_columns( \( @row{ @{$sth->{NAME_lc} } } ));
+  $sth->bind_columns (\( @row{ @{$sth->{NAME_lc} }} ));
   while ($sth->fetch) {
       print "$row{region}: $row{sales}\n";
   }
 
+but has a small drawback: If data already fetched call to L</bind_columns>
+will flush current values.  If you want to bind_columns after you have fetched
+you can use:
+
+  use feature "refaliasing";
+  no warnings "experimental::refaliasing";
+  while (my $row = $sth->fetchrow_arrayref) {
+      \(@$data{ $sth->{NAME_lc}->@* }) =  \(@$row);
+  }
+
+or, with older perl versions:
+
+  use Data::Alias;
+  alias @$data{ $sth->{NAME_lc}->@* } =  @$row;
+
+This is useful in situations when you have many left joins, but wanna to join
+your %$data hash to only subset of fetched values.
 
 =head3 C<dump_results>
 

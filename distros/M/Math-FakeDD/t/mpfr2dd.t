@@ -7,8 +7,13 @@ use Math::FakeDD qw(:all);
 use Test::More;
 
 for(1..2000) {
-  my $s1 = rand() . 'e' .  int(rand(10));
-  my $s2 = rand() . 'e-' . int(rand(100));
+  my $s1 = rand();
+  $s1 =~ s/[e\-]//gi;
+  $s1 .= 'e' .  int(rand(10));
+
+  my $s2 = rand();
+  $s2 =~ s/[e\-]//gi;
+  $s2 .= 'e-' . int(rand(100));
 
   my $fudd1 = Math::FakeDD->new($s1);
   my $fudd2 = Math::FakeDD->new($s2);

@@ -34,6 +34,7 @@ for(my $i = -300; $i <= 300; $i++) {
 
     while(length($input) > 19) { chop $input }
     while($input =~ /0$/) { chop $input }
+    $input =~ s/[e\-]//gi;
 
     my $str = "$input" . "e" . $i;
     $str = '-' . $str if $run & 1;

@@ -19,10 +19,10 @@ struct ps_node {
         NODE_OBJECT = 'O',
         NODE_STRING = 's',
     } type;
-    union nodeval {
-        struct array {
+    union ps_nodeval {
+        struct ps_array {
             long len;
-            struct arrayval {
+            struct ps_arrayval {
                 ps_node *key;
                 ps_node *val;
             } *pairs;
@@ -31,9 +31,9 @@ struct ps_node {
         bool b;
         long double d;
         long long i;
-        struct object {
+        struct ps_object {
             char *type;
-            struct array val;
+            struct ps_array val;
         } o;
         struct {
             long  len;

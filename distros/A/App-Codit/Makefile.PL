@@ -1,6 +1,12 @@
 use ExtUtils::MakeMaker;
 
 use strict;
+use warnings;
+
+my $name = 'App::Codit';
+my $pm = 'lib/App/Codit.pm';
+my $git = 'App-Codit';
+
 my %prereq = (
 	'Data::Compare'       => '1.29',
 	'File::Path'          => '2.18',
@@ -8,18 +14,19 @@ my %prereq = (
 	'Getopt::Long'        => '2.54',
 	'Test::Tk'            => '3.04',
 	'Tk'                  => '804.032',
-	'Tk::AppWindow'       => '0.19',
-	'Tk::CodeText'        => '0.60',
-	'Tk::FileBrowser'     =>	'0.07',
-	'Tk::PodViewer'       =>	'0.05',
+	'Tk::AppWindow'       => '0.20',
+	'Tk::CodeText'        => '0.62',
+	'Tk::FileBrowser'     =>	'0.09',
+	'Tk::PodViewer'       =>	'0.06',
+	'Tk::QuickForm'       =>	'0.07',
 	'Tk::Terminal'        =>	'0.03',
 );
 
 WriteMakefile(
-	NAME					=> 'App::Codit',
-	VERSION_FROM		=> 'lib/App/Codit.pm',
+	NAME					=> $name,
+	VERSION_FROM		=> $pm,
 	PREREQ_PM			=> \%prereq,
-	ABSTRACT_FROM		=> 'lib/App/Codit.pm',
+	ABSTRACT_FROM		=> $pm,
 	AUTHOR				=> 'Hans Jeuken <hanje at cpan dot org>',
 	EXE_FILES => ['bin/codit'],
 	LICENSE				=> 'perl',
@@ -28,11 +35,11 @@ WriteMakefile(
       resources => {
          repository => {
             type => 'git',
-            url  => 'git://github.com/haje61/App-Codit.git',
-            web  => 'https://github.com/haje61/App-Codit',
+            url  => "git://github.com/haje61/$git.git",
+            web  => "https://github.com/haje61/$git",
          },
          bugtracker => {
-            web  => "https://github.com/haje61/App-Codit/issues",
+            web  => "https://github.com/haje61/$git/issues",
          },
       }}
     ) : () ),

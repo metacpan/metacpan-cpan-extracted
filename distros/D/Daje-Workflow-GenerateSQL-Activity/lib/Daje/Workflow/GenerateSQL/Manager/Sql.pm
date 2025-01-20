@@ -1,5 +1,5 @@
 package Daje::Workflow::GenerateSQL::Manager::Sql;
-use Mojo::Base  -base, -signatures;
+use Mojo::Base 'Daje::Workflow::GenerateSQL::Base::Common', -base, -signatures;
 
 # Daje::Generate::Sql::SqlManager  Generatee Database and table related SQL scripts from JSON file
 #
@@ -35,6 +35,7 @@ use Mojo::Base  -base, -signatures;
 our $VERSION = '0.01';
 
 has 'context';
+
 
 use Daje::Workflow::GenerateSQL::Script::Fields;
 use Daje::Workflow::GenerateSQL::Script::Index;
@@ -74,7 +75,7 @@ sub _version($self, $version) {
 }
 
 sub create_file($self, $sections) {
-    my $file = $self->template->get_data_section('file');
+    my $file = $self->templates->get_data_section('file');
     my $date = localtime();
     $file =~ s/<<date>>/$date/ig;
     $file =~ s/<<sections>>/$sections/ig;
@@ -83,7 +84,7 @@ sub create_file($self, $sections) {
 }
 
 sub create_section($self, $sql, $number) {
-    my $section = $self->template->get_data_section('section');
+    my $section = $self->templates->get_data_section('section');
     $section =~ s/<<version>>/$number/ig;
     $section =~ s/<<table>>/$sql/ig;
     return $section;
@@ -119,7 +120,7 @@ sub create_table_sql($self, $table) {
 sub create_sql($self, $json, $tablename) {
     my $sql_stmt = Daje::Workflow::GenerateSQL::Manager::Sql->new(
         json      => $json,
-        template  => $self->template,
+        templates  => $self->templates,
         tablename => $tablename,
     );
     my $result = $sql_stmt->create_sql();
@@ -127,7 +128,7 @@ sub create_sql($self, $json, $tablename) {
 }
 
 sub fill_template($self, $name, $fields, $foreignkeys, $indexes, $sql) {
-    my $template = $self->template->get_data_section('table');
+    my $template = $self->templates->get_data_section('table');
     $template =~ s/<<fields>>/$fields/ig;
     $template =~ s/<<tablename>>/$name/ig;
     if(exists($foreignkeys->{template_fkey})) {
@@ -148,7 +149,8 @@ sub fill_template($self, $name, $fields, $foreignkeys, $indexes, $sql) {
 sub create_fields($self, $json) {
     my $fields = Daje::Workflow::GenerateSQL::Script::Fields->new(
         json     => $json,
-        template => $self->template,
+        templates => $self->templates,
+        error    => $self->error,
     );
 
     $fields->create_fields();
@@ -159,11 +161,12 @@ sub create_fields($self, $json) {
 
 sub create_index($self, $json) {
     my $test = 1;
-    my $template = $self->template;
+    my $templates= $self->templates;
     my $index = Daje::Workflow::GenerateSQL::Script::Index->new(
         json      => $json,
-        template  => $template,
+        templates  => $templates,
         tablename => $json->{name},
+        error    => $self->error,
     );
 
     $index->create_index();
@@ -175,8 +178,9 @@ sub create_fkeys($self, $json, $table_name) {
     my $foreignkeys = {};
     my $foreign_key = Daje::Workflow::GenerateSQL::Script::ForeignKey->new(
         json      => $json,
-        template  => $self->template,
+        templates  => $self->templates,
         tablename => $table_name,
+        error    => $self->error,
     );
     $foreign_key->create_foreign_keys();
     if ($foreign_key->created() == 1) {
@@ -189,6 +193,7 @@ sub create_fkeys($self, $json, $table_name) {
 
 
 1;
+
 
 
 

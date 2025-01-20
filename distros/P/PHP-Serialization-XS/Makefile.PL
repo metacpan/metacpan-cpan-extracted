@@ -9,7 +9,7 @@ WriteMakefile(
     PREREQ_PM         => { 'PHP::Serialization' => '0.33' }, # e.g., Module::Name => 1.1
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/PHP/Serialization/XS.pm', # retrieve abstract from module
-       AUTHOR         => 'Darren Kulp <kulp@cpan.org>') : ()),
+       AUTHOR         => 'Darren Kulp <darren@kulp.ch>') : ()),
     LIBS              => [ ],
     DEFINE            => '', # e.g., '-DHAVE_SOMETHING'
     INC               => '-I. -Iphpserialize/parser', # e.g., '-I. -I/usr/include/other'

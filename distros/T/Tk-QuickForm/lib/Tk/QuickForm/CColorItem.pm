@@ -10,7 +10,7 @@ Tk::QuickForm::CColorItem - ColorEntry widget for Tk::QuickForm.
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.06';
+$VERSION = '0.07';
 
 use base qw(Tk::Derived Tk::QuickForm::CTextItem);
 Construct Tk::Widget 'CColorItem';
@@ -28,7 +28,7 @@ Inherits L<Tk::QuickForm::CTextItem>. Provides a ColorEntry field for L<Tk::Quic
 You should never create an instance directly like above. This should
 be handled by L<Tk::QuickForm>.
 
-=head1 CONFIG VARIABLES
+=head1 OPTIONS
 
 All options, except I<-variable>, of L<Tk::Checkbutton> are available.
 
