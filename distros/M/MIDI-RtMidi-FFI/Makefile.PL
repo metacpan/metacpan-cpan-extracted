@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010",
   "NAME" => "MIDI::RtMidi::FFI",
   "PREREQ_PM" => {
-    "Alien::RtMidi" => "0.04",
+    "Alien::RtMidi" => "0.08",
     "FFI::CheckLib" => "0.25",
     "FFI::Platypus" => "2.00",
     "FFI::Platypus::Buffer" => 0,
@@ -33,7 +33,7 @@ my %WriteMakefileArgs = (
     "Test::Lib" => 0,
     "ok" => 0
   },
-  "VERSION" => "0.07",
+  "VERSION" => "0.08",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,7 +41,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Alien::RtMidi" => "0.04",
+  "Alien::RtMidi" => "0.08",
   "FFI::CheckLib" => "0.25",
   "FFI::Platypus" => "2.00",
   "FFI::Platypus::Buffer" => 0,

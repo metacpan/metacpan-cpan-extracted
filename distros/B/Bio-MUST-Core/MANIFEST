@@ -303,6 +303,9 @@ test/long-leaf-tree.tre
 test/map_coords.ali
 test/mask.ali
 test/misleading.idl
+test/missify-miss.ali
+test/missify.ali
+test/missify_ref.ali
 test/mullidae-unrooted.tpl
 test/mullidae-unrooted.tre
 test/mullidae-well-rooted.tre

@@ -121,7 +121,7 @@ static inline unsigned int hash(register const char *str)
 
 static struct state* state_for_parser(SV *expat)
 {
-    HE *p = hv_fetch_ent(statehash, expat, false, 0);
+    HE *p = hv_fetch_ent(statehash, expat, 0/*false*/, 0);
     if (p == NULL)
         croak("Failed to look up state object by parser argument");
     struct state *st = INT2PTR(struct state *, SvUV(HeVAL(p)));

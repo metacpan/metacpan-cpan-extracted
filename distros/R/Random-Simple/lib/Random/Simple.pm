@@ -6,7 +6,7 @@ use Time::HiRes;
 use Carp qw(croak);
 
 # https://pause.perl.org/pause/query?ACTION=pause_operating_model#3_5_factors_considering_in_the_indexing_phase
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 our $debug   = 0;
 
 #############################################################
@@ -16,7 +16,7 @@ require XSLoader;
 XSLoader::load();
 
 use Exporter 'import';
-our @EXPORT = qw(random_int random_bytes random_float rand);
+our @EXPORT = qw(random_int random_bytes random_float random_elem rand srand);
 
 #############################################################
 
@@ -37,7 +37,7 @@ sub seed {
 	my ($seed1, $seed2) = @_;
 
 	if ($debug) {
-		print "SEEDING MANUALLY\n";
+		print "SEEDING MANUALLY ($seed1, $seed2)\n";
 	}
 
 	Random::Simple::_seed($seed1, $seed2); # C API
@@ -222,6 +222,45 @@ sub random_float {
 	return $ret;
 }
 
+# Pick a random element from an array
+sub random_elem {
+	if (!$has_been_seeded) { seed_with_os_random(); }
+
+	my @arr = @_;
+
+	my $elem_count = scalar(@arr) - 1;
+	my $idx        = random_int(0, $elem_count);
+	my $ret        = $arr[$idx];
+
+	return $ret;
+}
+
+sub perl_rand64 {
+	my $high = rand() * 4294967295;
+	my $low  = rand() * 4294967295;
+
+	my $ret = ($high << 32) | $low;
+
+	return $ret;
+}
+
+# Our srand() overrides CORE::srand()
+sub srand {
+	my $seed = int($_[0] || 0);
+
+	if ($seed == 0) {
+		$seed = int(rand() * 4294967295); # Random 32bit int
+	}
+
+	# Convert the one 32bit seed into 2x 64bit seeds
+	my $seed1 = _hash64($seed , 64); # C API
+	my $seed2 = _hash64($seed1, 64); # C API
+
+	Random::Simple::seed($seed1, $seed2);
+
+	return $seed;
+}
+
 # Our rand() overrides CORE::rand()
 # This is slightly different than random_float because it returns
 # a number where: 0 <= x < 1
@@ -258,8 +297,8 @@ Random::Simple - Generate good random numbers in a user consumable way.
     my $random_percent = random_float() * 100;
     my $buffer         = random_bytes(8);
 
-    my @arr        = ('red', 'green', 'blue');
-    my $rand_item  = $arr[random_int(0, @arr - 1)]; # Random array item
+    my @arr            = ('red', 'green', 'blue');
+    my $rand_item      = random_elem(@arr);
 
 =head1 DESCRIPTION
 
@@ -271,8 +310,11 @@ better PRNG.
 
 C<Random::Simple> is automatically seeded with entropy directly
 from your OS. On Linux this is C</dev/urandom> and on Windows it uses
-CryptGenRandom. You will get statistically unique random numbers
-automatically.
+CryptGenRandom.
+
+When you `use Random::Simple` we automatically upgrade `rand()` and `srand()`
+to use a modern PRNG with better statistical properties. As a bonus you also
+get a handful of other useful random related methods.
 
 =head1 METHODS
 
@@ -290,11 +332,38 @@ returns a random floating point value between 0 and 1 (inclusive).
 
 returns a string of random bytes with length of C<$number>.
 
+=item B<random_elem(@array)>
+
+returns a random element from C<@array>.
+
+=item B<srand()>
+
+emulates C<CORE::srand()> using a better PRNG.
+
 =item B<rand()>
 
 emulates C<CORE::rand()> using a better PRNG.
 
+=item B<Random::Simple::seed($seed1, $seed2)>
+
+Seed the PRNG with two unsigned 64bit integers for predictable and repeatable
+random numbers. C<Random::Simple> will automatically seed itself from your
+operating system's randomness if not manually seeded. Manual seeding should
+only be used in specific cases where you need repeatable or testable
+randomness.
+
 =back
+
+=head1 CAVEATS
+
+PCG uses two 64bit unsigned integers for seeding. High quality seeds are needed
+to generate good random numbers. C<Random::Simple> automatically generates high
+quality seeds by reading random bytes from your operating system and converting
+appropriately.
+
+If you manually seed C<Random::Simple>, then make sure you use good seeds that
+are mostly non-zero. The larger the number the better seed it will make. A good
+seed is a decimal number with 18 or 19 digits.
 
 =head1 BUGS
 

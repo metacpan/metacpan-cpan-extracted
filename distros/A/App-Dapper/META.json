@@ -1,16 +1,16 @@
 {
    "abstract" : "A publishing tool for static websites.",
    "author" : [
-      "Mark Benson <markbenson@vanilladraft.com>"
+      "Mark Benson <mark@jayber.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.88, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "App-Dapper",
    "no_index" : {
@@ -32,9 +32,9 @@
       },
       "runtime" : {
          "requires" : {
-            "CGI" : "0",
             "Data::Dumper" : "0",
-            "DateTime" : "0",
+            "Data::Dumper::HTML" : "0",
+            "DateTime" : "1.52",
             "DateTime::Format::XSD" : "0",
             "Exporter" : "0",
             "ExtUtils::MakeMaker" : "0",
@@ -44,9 +44,9 @@
             "File::Spec::Functions" : "0",
             "FindBin" : "0",
             "Getopt::Mixed" : "0",
-            "HTTP::Server::Brick" : "0",
             "IO::Dir" : "0",
             "JSON" : "0",
+            "Net::HTTPServer" : "0",
             "POSIX" : "0",
             "Pod::Usage" : "0",
             "Template::Alloy" : "0",
@@ -56,7 +56,7 @@
             "Text::Markdown" : "0",
             "Text::MultiMarkdown" : "0",
             "Unicode::Normalize" : "0",
-            "YAML::Tiny" : "0",
+            "YAML::PP" : "0",
             "perl" : "5.008000"
          }
       }
@@ -67,5 +67,6 @@
          "url" : "https://github.com/markdbenson/dapper"
       }
    },
-   "version" : "0.18"
+   "version" : "0.19",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

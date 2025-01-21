@@ -9,6 +9,7 @@ README
 alienfile
 dist.ini
 lib/Alien/RtMidi.pm
+patch/0001-Add-a-method-to-reset-the-ok-flag-and-clear-the-erro.patch
 t/alien_rtmidi.t
 t/author-critic.t
 t/author-pod-syntax.t

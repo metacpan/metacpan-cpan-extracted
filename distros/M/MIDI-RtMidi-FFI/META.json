@@ -43,7 +43,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Alien::RtMidi" : "0.04",
+            "Alien::RtMidi" : "0.08",
             "FFI::CheckLib" : "0.25",
             "FFI::Platypus" : "2.00",
             "FFI::Platypus::Buffer" : "0",
@@ -68,19 +68,19 @@
    "provides" : {
       "MIDI::RtMidi::FFI" : {
          "file" : "lib/MIDI/RtMidi/FFI.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "MIDI::RtMidi::FFI::Device" : {
          "file" : "lib/MIDI/RtMidi/FFI/Device.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "RtMidiIn" : {
          "file" : "lib/MIDI/RtMidi/FFI/Device.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "RtMidiOut" : {
          "file" : "lib/MIDI/RtMidi/FFI/Device.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
@@ -95,7 +95,7 @@
          "web" : "https://github.com/jbarrett/MIDI-RtMidi-FFI"
       }
    },
-   "version" : "0.07",
+   "version" : "0.08",
    "x_generated_by_perl" : "v5.40.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

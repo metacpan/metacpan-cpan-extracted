@@ -15,3 +15,6 @@ Revision history for Perl extension Mac::PropertyList::XS.
 
 0.05    Mon Apr 25 20:38:56 EDT 2022
     - address assertion failure in debugging Perls
+
+0.06    Sun Jan 19 20:40:19 EST 2025
+    - update XML files to match Mac::PropertyList::SAX 1.002 and Mac::PropertyList 1.601.

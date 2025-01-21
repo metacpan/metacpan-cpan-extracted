@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test2::Bundle::Extended;
+use Test2::V0 '!float';
 
 use MooX::PDL2;
 
@@ -68,7 +68,6 @@ our @Constructors = qw[ new new_from_specification ];
 
 subtest "PDL constructor logging" => sub {
 
-    use Safe::Isa;
     require PDL;
 
     for my $method ( @::Constructors ) {
@@ -76,9 +75,7 @@ subtest "PDL constructor logging" => sub {
         subtest $method => sub {
             @::log = ();
             my $pdl = PDL->$method();
-            # Test2::Tools::Class::isa_ok == 0.000061 doesn't handle
-            # classes with overloaded bool operators correctly
-            ok( $pdl->isa( 'PDL' ), 'class is correct' );
+            isa_ok( $pdl, 'PDL' );
             is( \@log, ["PDL::$method"], "logged" );
         };
     }

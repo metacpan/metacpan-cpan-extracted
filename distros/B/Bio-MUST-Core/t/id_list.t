@@ -216,7 +216,7 @@ my @exp_lists = (
 
     my $infile = file('test', 'long-leaf-tree.tre');
     my $tree = Bio::MUST::Core::Tree->load($infile);
-    my ($list, $got_lens) = $tree->long_branch_list(1.5);
+    my ($list, $got_lens) = $tree->long_branch_list( { iqr_fact => 1.5 } );
 
     cmp_store(
         obj  => $list, method => 'store',

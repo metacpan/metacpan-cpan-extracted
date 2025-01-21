@@ -1,5 +1,9 @@
 Revision history for perl module Alien::RtMidi
 
+0.08 2025-01-20
+
+  - Pull in patch from https://github.com/thestk/rtmidi/pull/322 to fix $device->msg
+
 0.07 2025-01-10
 
   - Fix build on Cygwin by specifying WinMM API

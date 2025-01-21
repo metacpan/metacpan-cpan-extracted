@@ -58,7 +58,7 @@ content. Since then, Dapper has been used to create websites for speakers,
 artists, authors, illusionists, web designers, piano tuners,
 photographers, entertainment agencies, and API documentation for
 industrial sensing equipment. In addition, it is the tool that powers
-[Vanilla Draft](http://vanilladraft.com/).
+[markbenson.io](http://markbenson.io/).
 
 In 2014, Dapper was submitted as a Perl module (App::Dapper) to
 [CPAN](http://cpan.org/) under the MIT license for anyone to use for any
@@ -114,7 +114,7 @@ You can compare this with the latest version from CPAN like this:
     Installed: 0.12
     CPAN:      0.13  Not up to date
     Mark Benson (MDB)
-    markbenson@vanilladraft.com
+    mark@markbenson.io
 
 In this example, you can see there is a newer version available. Upgrade
 like this:
@@ -375,24 +375,23 @@ pairs or arrays, arranged hierarchically:
 
     # Dapper config file
     ---
-    name: Vanilla Draft
-    url: http://vanilladraft.com/
+    name: Mark Benson Portfolio
+    url: http://markbenson.io/
     source : _source/
     output : _output/
     layout : _layout/
     links :
         Preface : /preface/
-        Feed : http://feeds.feedburner.com/vanilladraft
         Amazon : http://amazon.com/author/markbenson
         Github : http://github.com/markdbenson
         LinkedIn : http://linkedin.com/in/markbenson
         Twitter : https://twitter.com/markbenson
     ignore :
-        - "^\."
-        - "^_"
-        - "^design$"
-        - "^README.md$"
-        - "^Makefile$"
+        - ^\.
+        - ^_
+        - ^design$
+        - ^README.md$
+        - ^Makefile$
 
 Any variable specified in `_config.yml` can be used in a template. In the
 example above, name can be used like this:
@@ -418,7 +417,7 @@ All of the items in the `ignore` array can be shown like this:
     </ul>
 
 See the official [YAML](http://yaml.org/) specification, or the
-[YAML::Tiny](http://search.cpan.org/~ether/YAML-Tiny/) Perl module
+[YAML::PP](https://metacpan.org/pod/YAML::PP) Perl module
 documentation (Dapper's YAML parsing engine) for more information.
 
 # Source
@@ -589,14 +588,14 @@ This text is also `__bold__.`           | This text is also **bold**.
 This text is `*italicized*.`            | This text is *italicized*.
 This text is also `_italicized_.`       | This text is also _italicized_.
 `` `This is some code.` ``              | `This is some code.`
-Link to `[Vanilla Draft](http://vanilladraft.com).` | Link to [Vanilla Draft](http://vanilladraft.com).
-Link to `[Vanilla Draft][ln1].`         | Link to [Vanilla Draft][ln1].
-Link to `<http://vanilladraft.com>.`    | Link to http://vanilladraft.com.
+Link to `[Mark Benson Portfolio](http://markbenson.io).` | Link to [Mark Benson Portfolio](http://markbenson.io/).
+Link to `[Mark Benson Portfolio][ln1].`         | Link to [Mark Benson][ln1].
+Link to `<http://markbenson.io>.`       | Link to http://markbenson.io.
 `> This is the first level of quoting.` | The first level of quoting.
 `>> This is a nested blockquote.`       | A nested blockquote.
 
-`[ln1]: http://vanilladraft.com "Vanilla Draft"`
-[ln1]: http://vanilladraft.com "Vanilla Draft"
+`[ln1]: http://markbenson.io "Mark Benson Portfolio"`
+[ln1]: http://markbenson.io "Mark Benson Portfolio"
 
 Code is placed in `backticks` (see [above](#text)), or as a "fenced code block" 
 by surrounding an entire block of text with three backticks in a row.
@@ -753,7 +752,7 @@ layouts as `[% page.* %]`.
 Example `_config.yml`:
 
 ```
-name: Vanilla Draft
+name: Mark Benson Portfolio
 ```
 
 Example `_source/index.md`:
@@ -785,7 +784,7 @@ This would produce the following:
 ```
 <html>
 <head>
-    <title>The title of my post - Vanilla Draft</title>
+    <title>The title of my post - Mark Benson Portfolio</title>
 </head>
 <body>
     <h1>The title of my post</h1>
@@ -826,14 +825,14 @@ Result:
 And associative arrays (hashes):
 
 ```
-[% link = {name => 'Vanilla Draft', 'url' => 'http://vanilladraft.com/'} %]
+[% link = {name => 'Mark Benson Portfolio', 'url' => 'http://markbenson.io/'} %]
 <a href="[% link.url %]">[% link.name %]</a>
 ```
 
 Result:
 
 ```
-<a href="http://vanilladraft.com/">Vanilla Draft</a>
+<a href="http://markbenson.io/">Mark Benson Portfolio</a>
 ```
 
 *Literals*
@@ -887,7 +886,7 @@ as an input, along with zero or more optional parameters, and returns a
 string as a result. Filters can be chained together. Examples:
 
 ```
-[% site.name = " Vanilla Draft    " %]
+[% site.name = " Mark Benson Portfolio    " %]
 [% site.name | upper | trim %]
 [% page.title = "My very long page title that should be truncated" %]
 [% page.title | truncate(26) %]
@@ -896,7 +895,7 @@ string as a result. Filters can be chained together. Examples:
 Results:
 
 ```
-VANILLA DRAFT
+MARK BENSON PORTFOLIO
 My very long page title...
 ```
 
@@ -1198,6 +1197,39 @@ Anonymous `block` definitions can be used for capturing chunks of text:
 
     [% a = block %]Some text[% end %]
     [% a %]
+
+## Perl code
+
+You can execute perl code inside templates as of v0.19. In order to enable it,
+make sure that `EVAL_PERL` is defined in your environmeht. For instance:
+
+    $ export EVAL_PERL=true
+
+Then, you can use `perl` or `rawperl` to include perl code in your templates.
+For instance:
+
+    [% a = "Apple" %]
+    [%~ PERL %]
+        my $a = "[% a %]";
+        print "The variable \$a is \"$a\"";
+        $stash->set('b', "Banana");
+    [% END %]
+    [% b %]
+
+This would print the following:
+
+    The variable $a is "Apple"
+    Banana
+
+During execution, anything printed to STDOUT will be inserted into the
+template. Also, the $stash and $context variables are set and are references
+to objects that mimic the interface provided by Template::Context and
+Template::Stash. These are provided for compatibility only. $self contains
+the current Template::Alloy object.
+
+The `rawperl` block can be used as well. It operates the same as the `perl`
+block does except that you will need to append to the $output variable rather
+than just calling `print`.
 
 ## Includes
 
@@ -1535,13 +1567,13 @@ To do this, follow these steps:
 
 To make it easy to publish to Amazon S3, one option is to create a Makefile
 that encodes the publishing instructions. Here is a Makefile that I use for
-[Vanilla Draft](http://vanilladraft.com/):
+[Mark Benson Portfolio](http://markbenson.io/):
 
     BASEDIR=$(CURDIR)
     INPUTDIR=$(BASEDIR)/_source
     OUTPUTDIR=$(BASEDIR)/_output
 
-    S3_BUCKET=vanilladraft.com
+    S3_BUCKET=markbenson.io
 
     build:
     	dapper build
@@ -1596,7 +1628,7 @@ You can look for more information here:
 
 * [Continuous Integration Status](https://travis-ci.org/markdbenson/dapper)
 
-# Appendix B: Extending
+# Appendix A: Extending
 
 Dapper may be used as a perl module directly from a script. Examples:
 
@@ -1696,9 +1728,9 @@ site.ignore list. By default, the following ignore list is used:
 
 ```
 ignore :
-    - "^\."
-    - "^_"
-    - "^dapper$"
+    - ^\.
+    - ^_
+    - ^dapper$
 ```
 
 More files and regular expression patterns may be specified in the project
@@ -1709,19 +1741,24 @@ to your `_config.yml` file:
 
 ```
 ignore :
-    - "^design$"
+    - ^design$
 ```
+
+# Appendix D: Meta
+
+Dapper development environment:
+* perlbrew on osx to isolate and test against different versions of Perl
 
 # Author
 
 Dapper was written by Mark Benson
-[markbenson@vanilladraft.com](mailto:markbenson@vanilladraft.com).
+[mark@markbenson.io](mailto:mark@markbenson.io).
 
 # License and Copyright
 
 The MIT License (MIT)
 
-Copyright (c) 2002-2014 Mark Benson
+Copyright (c) 2002-2025 Mark Benson
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),

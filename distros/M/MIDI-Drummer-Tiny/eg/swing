@@ -7,12 +7,13 @@ use MIDI::Drummer::Tiny;
 my $d = MIDI::Drummer::Tiny->new(
     file => $0 . '.mid',
     bpm  => 90,
-    bars => 9,
+    bars => 4,
 );
 
 $d->count_in(1);
 
-$d->metronome44swing;
+$d->metronome44swing($d->bars, $d->closed_hh, $d->eighth, 50);
+$d->metronome44swing($d->bars, $d->ride2, $d->eighth, 67);
 
 $d->note( $d->quarter, $d->ride1, $d->kick );
 

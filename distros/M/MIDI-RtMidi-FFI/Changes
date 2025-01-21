@@ -1,12 +1,17 @@
 Revision history for perl module MIDI::RtMidi::FFI
 
+0.08 2025-01-20
+
+  - Method open_port_by_name now croaks if an error was detected
+  - Require Alien::RtMidi 0.08
+
 0.07 2025-01-19
 
-    - Docs fixes and minor updates
-    - Removed panic example, added list_devices example
-    - Allow array ref param in send_event / send_message_encoded
-    - ::Device should now croak if creating a device or opening a port fails
-    - New convenience methods: clock, start, stop, continue
+  - Docs fixes and minor updates
+  - Removed panic example, added list_devices example
+  - Allow array ref param in send_event / send_message_encoded
+  - ::Device should now croak if creating a device or opening a port fails
+  - New convenience methods: clock, start, stop, continue
 
 0.06 2024-07-02
 

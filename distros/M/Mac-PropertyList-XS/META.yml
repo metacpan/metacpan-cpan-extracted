@@ -1,7 +1,7 @@
 ---
 abstract: 'work with Mac plists at a low level, really fast'
 author:
-  - 'Darren M. Kulp, C<< <kulp @ cpan.org> >>'
+  - 'Darren M. Kulp, C<< <darren@kulp.ch> >>'
 build_requires:
   Digest::MD5: 2
   ExtUtils::MakeMaker: 6.59
@@ -25,8 +25,8 @@ requires:
   Encode: 0
   HTML::Entities: 0
   HTML::Entities::Numbered: 0.04
-  Mac::PropertyList: 1.29
-  Mac::PropertyList::SAX: 0.9
+  Mac::PropertyList: 1.601
+  Mac::PropertyList::SAX: 1.002
   Object::MultiType: 0.02
   XML::Parser: 0
   constant: 1.06
@@ -34,4 +34,4 @@ requires:
   perl: 5.8.8
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.05'
+version: '0.06'

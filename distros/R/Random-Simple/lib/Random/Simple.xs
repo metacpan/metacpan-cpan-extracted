@@ -4,7 +4,7 @@
 #include "XSUB.h"            // xsubpp functions and macros
 #include <stdlib.h>          // rand()
 #include <stdint.h>          // uint64_t
-#include "time-common.h"     // for nanos()
+#include "rand-common.h"
 
 #include "pcg.h"
 
@@ -15,8 +15,6 @@
 //
 // Other PRGNs just need three functions _seed(S1,S2), _rand32(),
 // and _rand64()
-
-#include "rand-common.h"
 
 ///////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////
@@ -32,6 +30,8 @@ PROTOTYPES: ENABLE
 U32 _rand32()
 
 UV _rand64()
+
+UV _hash64(UV seed1, I8 bits)
 
 void _seed(UV seed1, UV seed2)
 

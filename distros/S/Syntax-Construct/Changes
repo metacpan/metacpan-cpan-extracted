@@ -1,5 +1,11 @@
 Revision history for Syntax-Construct
 
+1.040   2025-01-20
+        - Documentation link fixed (wrong letter case)
+
+1.039   2025-01-20
+        - Perl 5.40.1 released
+
 1.038   2024-10-01
         - Add "split-space"
 

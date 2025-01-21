@@ -65,7 +65,7 @@ SUPPORT
     Please contact the author with bug reports or feature requests.
 
 AUTHOR
-    Darren M. Kulp, "<kulp @ cpan.org>"
+    Darren M. Kulp, "<darren@kulp.ch>"
 
 THANKS
     brian d foy, who created the Mac::PropertyList module whose tests were

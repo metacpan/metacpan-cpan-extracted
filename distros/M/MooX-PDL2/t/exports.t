@@ -3,16 +3,10 @@
 use strict;
 use warnings;
 
-use Test2::Bundle::More;
-use Test::API;
-
+use Test2::V0 '!float';
 use MooX::PDL2;
 
-class_api_ok(
-    'MooX::PDL2',
-    qw[
-    new
-      ] );
+can_ok( 'MooX::PDL2', 'new' );
 
 done_testing;
 

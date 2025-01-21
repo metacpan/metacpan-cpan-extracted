@@ -1,7 +1,7 @@
 package Bio::MUST::Core::SeqId;
 # ABSTRACT: Modern and legacy MUST-compliant sequence id
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::SeqId::VERSION = '0.243430';
+$Bio::MUST::Core::SeqId::VERSION = '0.250200';
 use Moose;
 use namespace::autoclean;
 
@@ -643,9 +643,9 @@ const my @GENERA  => qw(
     acetamiprid-degrading
     Activation-tagging
     AD8-1
-    Adeno-Associated
     adeno-associated
     Adeno-associated
+    Adeno-Associated
     AE-B3A
     AE-B3B
     AEGEAN-183
@@ -693,8 +693,8 @@ const my @GENERA  => qw(
     Aksy-Durug
     AKYH767-A
     AL-N1
-    alfalfa-associated
     Alfalfa-associated
+    alfalfa-associated
     Alg239-R122
     Alg240-R148
     alk-system
@@ -944,8 +944,8 @@ const my @GENERA  => qw(
     biocide-degrading
     biphenthrin-degrading
     biphenyl-degrading
-    Birds-foot
     birds-foot
+    Birds-foot
     BK-30
     Black-and-white
     Black-eyed
@@ -954,8 +954,8 @@ const my @GENERA  => qw(
     Blackcurrant-associated
     Bo-Circo-like
     Bog-105
-    BOG-1112
     Bog-1112
+    BOG-1112
     Bog-113
     BOG-1155
     Bog-1181
@@ -1551,8 +1551,8 @@ const my @GENERA  => qw(
     DC-out156
     DC-out160
     DCM-degrading
-    Deep-sea
     deep-sea
+    Deep-sea
     Deinococcus-like
     Deinococcus-Thermus
     Delta-02
@@ -1777,8 +1777,8 @@ const my @GENERA  => qw(
     FEN-1073
     Fen-1077
     Fen-1087
-    FEN-1088
     Fen-1088
+    FEN-1088
     FEN-1099
     Fen-1118
     Fen-1135
@@ -1832,8 +1832,8 @@ const my @GENERA  => qw(
     FEN-299
     FEN-33
     Fen-330
-    FEN-336
     Fen-336
+    FEN-336
     FEN-413
     Fen-455
     Fen-549
@@ -1842,8 +1842,8 @@ const my @GENERA  => qw(
     FEN-672
     FEN-680
     Fen-7
-    FEN-727
     Fen-727
+    FEN-727
     FEN-943
     FEN-979
     FEN-987
@@ -2895,8 +2895,8 @@ const my @GENERA  => qw(
     MMGLQ5-1
     MMTV-luciferase
     MnB-11
-    mongoose-associated
     Mongoose-associated
+    mongoose-associated
     monochloroacetic-acid-degrading
     Mononegavirus-like
     mosquito-borne
@@ -2934,8 +2934,8 @@ const my @GENERA  => qw(
     NBRC-107688
     NEAU-GS5
     Nebraska-like
-    Nege-like
     nege-like
+    Nege-like
     Negelike-virus
     Negev-like
     Negeviridae-like
@@ -3049,16 +3049,16 @@ const my @GENERA  => qw(
     Palsa-1032
     Palsa-1033
     PALSA-1081
-    PALSA-1104
     Palsa-1104
+    PALSA-1104
     Palsa-1150
     PALSA-1152
     PALSA-1153
     PALSA-1176
     PALSA-1178
     Palsa-1178
-    PALSA-1180
     Palsa-1180
+    PALSA-1180
     Palsa-1188
     PALSA-1196
     Palsa-1233
@@ -3113,8 +3113,8 @@ const my @GENERA  => qw(
     PALSA-647
     PALSA-660
     Palsa-661
-    Palsa-688
     PALSA-688
+    Palsa-688
     PALSA-693
     Palsa-739
     PALSA-743
@@ -3165,8 +3165,8 @@ const my @GENERA  => qw(
     PCC-9228
     PCC-9333
     PD-1
-    peach-associated
     Peach-associated
+    peach-associated
     Pechuel-loeschea
     Peixe-Boi
     Pepper-associated
@@ -4151,8 +4151,8 @@ const my @GENERA  => qw(
     White-tailed
     white-throated
     White-tufted-ear
-    Whitefly-associated
     whitefly-associated
+    Whitefly-associated
     Whitefly-transmitted
     WM-009
     WM-3-3
@@ -4247,8 +4247,8 @@ const my @GENERA  => qw(
     Yaba-7
     Yaba-like
     YAC-BAC
-    yado-kari
     Yado-kari
+    yado-kari
     Yado-nushi
     Yaounde-like
     YB1-3
@@ -13927,12 +13927,37 @@ sub clean_strain {
 }
 
 
+sub tag_filter {
+    my $self = shift;
+    my $list = shift;
+
+    return Filter->new( _specs => $list, component => 'tag' );
+}
+
+
 sub family_filter {
     my $self = shift;
     my $list = shift;
 
-    return Filter->new( tax => $self, _specs => $list );
+    return Filter->new( _specs => $list, component => 'family' );
 }
+
+
+sub genus_filter {
+    my $self = shift;
+    my $list = shift;
+
+    return Filter->new( _specs => $list, component => 'genus' );
+}
+
+
+sub species_filter {
+    my $self = shift;
+    my $list = shift;
+
+    return Filter->new( _specs => $list, component => 'species' );
+}
+
 
 __PACKAGE__->meta->make_immutable;
 1;
@@ -13947,7 +13972,7 @@ Bio::MUST::Core::SeqId - Modern and legacy MUST-compliant sequence id
 
 =head1 VERSION
 
-version 0.243430
+version 0.250200
 
 =head1 SYNOPSIS
 
@@ -13989,7 +14014,13 @@ version 0.243430
 
 =head2 clean_strain
 
+=head2 tag_filter
+
 =head2 family_filter
+
+=head2 genus_filter
+
+=head2 species_filter
 
 =head1 AUTHOR
 

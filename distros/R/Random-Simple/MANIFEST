@@ -5,11 +5,15 @@ lib/Random/pcg.h
 lib/Random/xorshiro.h
 lib/Random/xoroshiro128starstar.h
 lib/Random/rand-common.h
-lib/Random/time-common.h
+lib/Random/drand48.h
+lib/Random/random_os_bytes.h
+lib/Random/splitmix64.h
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
 README
+README.md
+release-notes.md
 example.pl
 Changes
 t/00-seeding.t
@@ -18,5 +22,7 @@ t/02-random_int.t
 t/03-rand.t
 t/04-randx.t
 t/05-random_float.t
+t/06-srand.t
+t/07-random_elem.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

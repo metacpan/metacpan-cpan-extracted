@@ -1,5 +1,5 @@
 package Net::Checkpoint::Management::v1;
-$Net::Checkpoint::Management::v1::VERSION = '0.003000';
+$Net::Checkpoint::Management::v1::VERSION = '0.004000';
 # ABSTRACT: Checkpoint Management API version 1.x client library
 
 use 5.024;
@@ -16,11 +16,20 @@ no warnings "experimental::signatures";
 
 has 'user' => (
     isa => Str,
-    is  => 'rw',
+    is  => 'ro',
 );
+
+
 has 'passwd' => (
     isa => Str,
-    is  => 'rw',
+    is  => 'ro',
+);
+
+
+has 'api_key' => (
+    isa         => Str,
+    is          => 'ro',
+    predicate   => '_has_api_key',
 );
 
 
@@ -339,11 +348,27 @@ Net::Checkpoint::Management::v1::Role::ObjectMethods->apply([
 ]);
 
 
-sub login($self) {
-    my $res = $self->post('/web_api/v1/login', {
-        user     => $self->user,
-        password => $self->passwd,
-    });
+sub login($self, $params = undef) {
+    my %login_params;
+
+    %login_params = (%login_params, $params->%*)
+        if $params;
+
+    if ($self->_has_api_key) {
+        %login_params = (
+            %login_params,
+            'api-key' => $self->api_key,
+        );
+    }
+    else {
+        %login_params = (
+            %login_params,
+            user     => $self->user,
+            password => $self->passwd,
+        );
+    }
+
+    my $res = $self->post('/web_api/v1/login', \%login_params);
     if ($res->code == 200) {
         my $api_version = $res->data->{'api-server-version'};
         $self->api_version($api_version);
@@ -480,7 +505,7 @@ Net::Checkpoint::Management::v1 - Checkpoint Management API version 1.x client l
 
 =head1 VERSION
 
-version 0.003000
+version 0.004000
 
 =head1 SYNOPSIS
 
@@ -497,12 +522,37 @@ version 0.003000
 
     $cpmgmt->login;
 
+    # OR
+
+    $cpmgmt = Net::Checkpoint::Management::v1->new(
+        server      => 'https://cpmgmt.example.com',
+        api_key     => '$api-key',
+        clientattrs => { timeout => 30 },
+    );
+
+    $cpmgmt->login;
+
 =head1 DESCRIPTION
 
 This module is a client library for the Checkpoint Management API version 1.x.
-Currently it is developed and tested against version R80.40.
+Currently it is developed and tested against version R81.20.
 
 =head1 ATTRIBUTES
+
+This module is using L<Role::REST::Client> under the hood and all its
+L<attributes|Role::REST::Client/ATTRIBUTES> can be set too.
+
+=head2 user
+
+Sets the username used by the L</login> method.
+
+=head2 passwd
+
+Sets the password used by the L</login> method.
+
+=head2 api_key
+
+Sets the API key used by the L</login> method.
 
 =head2 api_versions
 
@@ -520,6 +570,10 @@ version available by the L</login> method.
 =head2 login
 
 Logs into the Checkpoint Manager API using version 1.
+
+If both the L</api_key>, L</user> and L</passwd> are set, the L</api_key> is used.
+
+Takes an optional hashref of login parameters like read-only or domain.
 
 =head2 logout
 
@@ -576,7 +630,7 @@ Alexander Hartmaier <abraxxa@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Alexander Hartmaier.
+This software is copyright (c) 2025 by Alexander Hartmaier.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

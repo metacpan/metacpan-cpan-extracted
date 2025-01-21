@@ -5,7 +5,7 @@ package MooX::PDL2;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Scalar::Util qw[ blessed weaken ];
 use PDL::Lite;
@@ -30,42 +30,42 @@ use namespace::clean;
 
 extends 'Moo::Object', 'PDLx::DetachedObject';
 
-#pod =attr _PDL
-#pod
-#pod The actual piddle associated with an object.  B<PDL> routines
-#pod will transparently uses this when passed an object.
-#pod
-#pod This attribute is
-#pod
-#pod =over
-#pod
-#pod =item *
-#pod
-#pod lazy
-#pod
-#pod =item *
-#pod
-#pod has a builder which returns C<< PDL->null >>
-#pod
-#pod =item *
-#pod
-#pod will coerce its argument to be a piddle
-#pod
-#pod =item *
-#pod
-#pod has a clearer
-#pod
-#pod =back
-#pod
-#pod See L</EXAMPLES> for fun ways of combining it with Moo's facilities.
-#pod
-#pod =cut
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 protected_has _PDL => (
     is  => 'lazy',
     isa => sub {
         blessed $_[0] && blessed $_[0] eq 'PDL'
-          or croak( "_PDL attribute must be of class 'PDL'" );
+          or croak( q{_PDL attribute must be of class 'PDL'} );
     },
     coerce  => sub { PDL->topdl( $_[0] ) },
     builder => sub { PDL->null },
@@ -84,13 +84,13 @@ protected_has PDL => (
 
 namespace::clean->clean_subroutines( __PACKAGE__, 'PDL' );
 
-#pod =method new
-#pod
-#pod   # null value
-#pod   $pdl = MooX::PDL2->new;
-#pod
-#pod
-#pod =cut
+
+
+
+
+
+
+
 
 1;
 
@@ -104,7 +104,11 @@ namespace::clean->clean_subroutines( __PACKAGE__, 'PDL' );
 #   The GNU General Public License, Version 3, June 2007
 #
 
+__END__
+
 =pod
+
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory PDL
 
 =head1 NAME
 
@@ -112,7 +116,7 @@ MooX::PDL2 - A Moo based PDL 2.X object
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -158,7 +162,7 @@ methods, e.g.:
   extends 'MooX::PDL2';
   use overload::reify;
 
-=head1 ATTRIBUTES
+=head1 OBJECT ATTRIBUTES
 
 =head2 _PDL
 
@@ -236,9 +240,9 @@ Here's the definition:
      my $pdl = $x->ones;
      $pdl *= $coeff->[0];
  
-     for ( my $exp = 1 ; $exp < @$coeff + 1 ; ++$exp ) {
-         $pdl += $coeff->[$exp] * $x**$exp;
-     }
+     $pdl += $coeff->[$_] * $x**$_
+       for 1..@$coeff-1;
+ 
      $pdl;
  }
  
@@ -268,11 +272,21 @@ With sample output:
  [6 14 22 30 38 46 54 62 70 78]
  [3 7 11 15 19]
 
+=head1 SUPPORT
 
-=head1 BUGS AND LIMITATIONS
+=head2 Bugs
 
-You can make new bug reports, and view existing ones, through the
-web interface at L<https://rt.cpan.org/Public/Dist/Display.html?Name=MooX-PDL2>.
+Please report any bugs or feature requests to bug-moox-pdl2@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=MooX-PDL2>
+
+=head2 Source
+
+Source is available at
+
+  https://gitlab.com/djerius/moox-pdl2
+
+and may be cloned from
+
+  https://gitlab.com/djerius/moox-pdl2.git
 
 =head1 SEE ALSO
 
@@ -299,80 +313,3 @@ This is free software, licensed under:
   The GNU General Public License, Version 3, June 2007
 
 =cut
-
-__END__
-
-
-#pod =head1 SYNOPSIS
-#pod
-#pod   use Moo;
-#pod   extends 'MooX::PDL2';
-#pod
-#pod =head1 DESCRIPTION
-#pod
-#pod This class provides the thinnest possible layer required to create a
-#pod L<Moo> object which is recognized by L<PDL>.
-#pod
-#pod L<PDL> will treat a non-L<PDL> blessed hash as a L<PDL> object if it
-#pod has a hash element with a key of C<PDL>.  That element may be a
-#pod C<PDL> piddle or a I<subroutine> which returns a piddle.
-#pod
-#pod This class provides a C<PDL> method (which must not be overridden!) which
-#pod returns the contents of the C<_PDL> attribute.  That attribute is yours
-#pod to manipulate.
-#pod
-#pod
-#pod =head2 Classes without required constructor parameters
-#pod
-#pod B<PDL> does not pass any parameters to a class' B<initialize> method
-#pod when constructing a new object.  Because of this, the default
-#pod implementation of B<MooX::PDL2::initialize()> returns a bare piddle,
-#pod not an instance of B<MooX::PDL2>, as it cannot know whether your class
-#pod requires parameters during construction.
-#pod
-#pod If your class does I<not> require parameters be passed to the constructor,
-#pod it is safe to overload the C<initialize> method to return a fully fledged
-#pod instance of your class:
-#pod
-#pod  sub initialize { shift->new() }
-#pod
-#pod =head2 Overloaded operators
-#pod
-#pod L<PDL> overloads a number of the standard Perl operators.  For the most part it
-#pod does this using subroutines rather than methods, which makes it difficult to
-#pod manipulate them.  Consider using L<overload::reify> to wrap the overloads in
-#pod methods, e.g.:
-#pod
-#pod   package MyPDL;
-#pod   use Moo;
-#pod   extends 'MooX::PDL2';
-#pod   use overload::reify;
-#pod
-#pod
-#pod =head1 EXAMPLES
-#pod
-#pod =head2 A class representing an evaluated polynomial
-#pod
-#pod This class represents an evaluated polynomial.  The polynomial coefficients and
-#pod the values at which it is evaluated are attributes of the class.  When they are
-#pod changed they trigger a change in the underlying piddle.
-#pod
-#pod Here's the definition:
-#pod
-#pod # EXAMPLE: examples/PolyNomial.pm
-#pod
-#pod Note that the attributes use triggers to clear C<_PDL> so that it will
-#pod be recalculated when it is next accessed through the C<_PDL> attribute
-#pod accessor.
-#pod
-#pod And here's how to use it
-#pod
-#pod # EXAMPLE: examples/poly.pl
-#pod
-#pod With sample output:
-#pod
-#pod # COMMAND: perl -Ilib -Iexamples examples/poly.pl
-#pod
-#pod =head1 SEE ALSO
-#pod
-#pod L<PDLx::DetachedObject>

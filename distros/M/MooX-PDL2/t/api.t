@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test2::Bundle::Extended;
+use Test2::V0;
 
 use PDL::Lite;
 

@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Roles::Listable;
 # ABSTRACT: Listable Moose role for objects with implied id lists
-$Bio::MUST::Core::Roles::Listable::VERSION = '0.243430';
+$Bio::MUST::Core::Roles::Listable::VERSION = '0.250200';
 use Moose::Role;
 
 use autodie;
@@ -141,8 +141,8 @@ around qw(long_branch_list) => sub {
 
 sub asc_br_len_list {
     my $self = shift;
-    return $self->long_branch_list(0);      # explicit 0 for clarity
-}
+    return $self->long_branch_list( { %{ shift // {} }, iqr_fact => 0 } );
+}       # explicitly disable list truncation but leave other args "as is"
 
 # Note: very naive approach and not applicable in practice.
 # Should probably use the derivative of branch length increase in log space.
@@ -151,31 +151,43 @@ sub asc_br_len_list {
 
 sub long_branch_list {
     my $self = shift;
-    my $fact = shift;
+    my $args = shift // {};             # HashRef (should not be empty...)
+
+    my $iqr_fact = $args->{iqr_fact};
+    my $to_root  = $args->{to_root};
+
+    # TODO: consider caching lengths if too slow with calc_path_to_root
+    my $method = 'get_branch_length';
+    if ($to_root) {
+        $method = 'calc_path_to_root';
+        carp '[BMC] Warning: tree should be rooted for distances to root!'
+            unless $self->tree->is_rooted;
+    }
 
     # sort tips in desc order according to their branch length
     # Note: accessor call is optimized
-    my @tips = nsort_by { $_->get_branch_length }
+    my @tips = nsort_by { $_->$method }
         @{ $self->tree->get_terminals };
 
     # optionally truncate list
-    if ($fact) {
+    # TODO: check if this makes sense with calc_path_to_root
+    if ($iqr_fact) {
 
-        # define threshold using 1.5 x IQR over Q3
+        # define threshold using `iqr_fact` x IQR beyond Q3
         my $stat = Statistics::Descriptive::Full->new;
-           $stat->add_data( [ map { $_->get_branch_length } @tips ] );
+           $stat->add_data( [ map { $_->$method } @tips ] );
         my ($q1, $q3) = ( $stat->quantile(1), $stat->quantile(3) );
         #### $q1
         #### $q3
         #### iqr: $q3-$q1
-        #### $fact
-        my $threshold = $q3 + $fact * ($q3 - $q1);
+        #### $iqr_fact
+        my $threshold = $q3 + $iqr_fact * ($q3 - $q1);
         #### $threshold
 
         # filter out tips with branch length over the threshold
         # Note: this might seem inefficient but results in clearer code
         @tips = List::AllUtils::after_incl {
-            $_->get_branch_length > $threshold
+            $_->$method > $threshold
         } @tips;
     }
 
@@ -190,7 +202,7 @@ sub long_branch_list {
 
     # in list context further return the corresponding branch lengths
     # Note: consider recycling old code below for efficiency
-    my @lens = map { $_->get_branch_length } @tips;
+    my @lens = map { $_->$method } @tips;
     return ($list, \@lens);
 }
 
@@ -375,7 +387,7 @@ Bio::MUST::Core::Roles::Listable - Listable Moose role for objects with implied 
 
 =head1 VERSION
 
-version 0.243430
+version 0.250200
 
 =head1 SYNOPSIS
 

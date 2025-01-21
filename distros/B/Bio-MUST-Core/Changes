@@ -1,3 +1,10 @@
+0.250200  2025-01-20 17:13:21+01:00 Europe/Brussels
+    - Additions
+      - SeqId and SeqId::Filter: refactored and expanded filters based on SeqId components
+      - binaries: added new strategies (tag, genus, species) for automated rooting to format-tree.pl
+    - Fixes
+      - Tree: fixed bug preventing to root a tree without bootstrap support
+
 0.243430  2024-12-08 23:10:32+01:00 Europe/Brussels
     - Additions
       - binaries: new script tseq2ali.pl (for TinySeq files)

@@ -22,8 +22,10 @@ use Template::Alloy;
 use Template::Constants qw( :debug );
 
 use Text::MultiMarkdown 'markdown';
-use HTTP::Server::Brick;
-use YAML::Tiny qw(LoadFile Load Dump);
+
+use Net::HTTPServer;
+
+use YAML::PP qw/ Load Dump LoadFile DumpFile /;
 use File::Spec::Functions qw/ canonpath /;
 use File::Path qw(make_path);
 
@@ -32,7 +34,9 @@ $Data::Dumper::Indent = 1;
 $Data::Dumper::Sortkeys = 1;
 
 use DateTime;
+use DateTime::Format::XSD;
 
+use App::Dapper::Serve;
 use App::Dapper::Init;
 use App::Dapper::Utils;
 use App::Dapper::Defaults;
@@ -43,11 +47,11 @@ my $ID = 0;
 
 =head1 VERSION
 
-Version 0.18
+Version 0.19
 
 =cut
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 our @EXPORT = qw($VERSION);
 
@@ -398,6 +402,8 @@ sub render {
             'smart' => \&App::Dapper::Filters::smart,
             'json' => \&App::Dapper::Filters::json,
         },
+        #ERROR => 'alloy_errors.html', 
+        EVAL_PERL => $ENV{EVAL_PERL} || 0,
         #DEBUG => DEBUG_ALL,
     }) || die "$Template::ERROR\n";        
 
@@ -405,7 +411,10 @@ sub render {
 
         #print Dump $page->{content};
 
-        if (not $page->{layout}) { $page->{layout} = "index"; }
+        if (not $page->{layout}) {
+            $page->{layout} = "index";
+            #print "WARNING: $page->{filename} does not have a page layout assigned: $page->{layout}.\n";
+        }
 
         my $layout = $self->{layout_content}->{$page->{layout}};
 
@@ -417,14 +426,19 @@ sub render {
         my $destination1;
 
         $tt->process(\$layout, \%tags, \$destination1)
-            || die $tt->error(), "\n";
+            || die "Error processing $tags{page}->{filename} with $page->{layout}:" . $tt->error() . "\n";
+
+        #if ($page->{layout} ne "index" and $layout =~ m/circuits/) {
+        #    print "DANGER WILL ROBINSON ";
+        #    print "PROCESSED: $tags{page}->{filename} with $page->{layout}\n\n$layout\n\n\n";
+        #}
 
         # Parse and render once more to make sure that any liquid statments
         # In the source file also gets rendered
         my $destination;
 
         $tt->process(\$destination1, \%tags, \$destination)
-            || die $tt->error(), "\n";
+            || die "Error processing (2nd pass) $tags{page}->{filename} with $page->{layout}:" . $tt->error() . "\n";
 
         if ($page->{filename}) {
             make_path($page->{dirname}, { verbose => 1 });
@@ -433,7 +447,6 @@ sub render {
             close(DESTINATION) or die "error: could not close $page->{filename}: $!\n";
 
             print "Wrote $page->{filename}\n";
-            #print Dumper $page;
         }
         else {
             print Dumper "No filename specified\n";
@@ -463,11 +476,18 @@ sub serve {
 
     $port = $DEFAULT_PORT unless $port;
 
-    my $s = HTTP::Server::Brick->new(port=>$port);
-    $s->add_type('text/html' => qw(^[^\.]+$));
-    $s->mount("/"=>{ path => $self->{output} });
+    print "Starting webserver at http://localhost:$port\n";
 
-    $s->start
+    my $s = new Net::HTTPServer(
+                    port=>$port,
+                    docroot=>$self->{output},
+                    type=>"forking",
+                    log=>"STDOUT",
+                    #debug=>"ALL"
+                    );
+    $s->Start();
+    $s->Process();
+    
 }
 
 # sub read_project - Read the project file.
@@ -500,8 +520,6 @@ sub read_templates {
         my $stem = App::Dapper::Utils::filter_stem($file);
         $file = $self->{layout} . "/" . $file;
         $self->{layout_content}->{$stem} = App::Dapper::Utils::read_file($file);
-        #print "$stem layout content:\n";
-        #print $self->{layout_content}->{$stem};
     }
 
     # Expand sub layouts
@@ -515,7 +533,7 @@ sub read_templates {
         if (not defined $1) { next; }
         if (not defined $2) { next; }
 
-        $frontmatter = Load($1);
+        $frontmatter = Load($1) or die "error: could not load \"$1\": $!\n";
         $content  = $2;
 
         if (not defined $frontmatter->{layout}) { next; }
@@ -583,12 +601,16 @@ sub build_inventory {
     my ($self, $source_file_name, $destination_file_name) = @_;
 
     my %page = ();
+    my $frontmatter;
+
+    print "Processing $source_file_name\n";
 
     my $source_content = App::Dapper::Utils::read_file($source_file_name);
 
     $source_content =~ /(---.*?)---(.*)/s;
 
-    my ($frontmatter) = Load($1);
+    $frontmatter = Load($1) or die "error parsing \"$source_file_name\": $!\n";
+
     $page{content} = $2;
 
     for my $key (keys %{$frontmatter}) {
@@ -597,36 +619,31 @@ sub build_inventory {
 
     $page{slug} = App::Dapper::Utils::slugify($page{title});
 
+    my $date;
     if (not $page{date}) {
-        my $date = App::Dapper::Utils::get_modified_time($source_file_name);
-        #print "Didn't find date for $source_file_name. Setting to file modified date of $date\n";
+        $date = DateTime::Format::XSD->parse_datetime(App::Dapper::Utils::get_modified_time($source_file_name));
+        # print "Didn't find date for $source_file_name. Setting to file modified date of $date\n";
         $page{date} = $date;
+    } else {
+        $date = DateTime::Format::XSD->parse_datetime($page{date});
     }
-   
-    if($page{date} =~ /^(\d\d\d\d)-(\d\d)-(\d\d) (\d\d)\:(\d\d)\:(\d\d)$/) {
-        $page{year} = $1;
-        $page{month} = $2;
-        $page{day} = $3;
-        $page{hour} = $4;
-        $page{minute} = $5;
-        $page{second} = $6;
-        $page{nanosecond} = 0;
-    }
+
+    $page{date}   = $date;
+    $page{year}   = $date->year();
+    $page{month}  = $date->month();
+    $page{day}    = $date->day();
+    $page{hour}   = $date->hour();
+    $page{minute} = $date->minute();
+    $page{second} = $date->second();
+      
+    # Insert zero to beginning if year, month, day,
+    # hour, minute or second is less than 10
+    $page{$_} < 10 and $page{$_} = '0' . $page{$_}
+      for ('year', 'month', 'day', 'hour', 'minute', 'second');
 
     if(not $page{timezone}) {
         $page{timezone} = DateTime::TimeZone->new( name => 'local' );
     }
-
-    $page{date} = DateTime->new(
-        year       => $page{year},
-        month      => $page{month},
-        day        => $page{day},
-        hour       => $page{hour},
-        minute     => $page{minute},
-        second     => $page{second},
-        nanosecond => $page{nanosecond},
-        time_zone  => $page{timezone},
-    );
 
     $page{url} = defined $page{urlpattern} ? $page{urlpattern} : $self->{site}->{urlpattern};
     $page{url} =~ s/\:category/$page{categories}/g unless not defined $page{categories};
@@ -637,8 +654,6 @@ sub build_inventory {
     $page{url} =~ s/\:minute/$page{minute}/g unless not defined $page{minute};
     $page{url} =~ s/\:second/$page{second}/g unless not defined $page{second};
     $page{url} =~ s/\:slug/$page{slug}/g unless not defined $page{slug};
-
-    $page{id} = $page{url};
 
     $page{id} = ++$ID; #$page{url};
 
@@ -673,6 +688,9 @@ sub build_inventory {
     
     if ($page{categories}) {
         push @{$self->{site}->{categories}->{$page{categories}}}, \%page;
+
+        # Keep the array sorted
+        @{$self->{site}->{categories}->{$page{categories}}} = sort { $a->{date} <=> $b->{date} } @{$self->{site}->{categories}->{$page{categories}}};
     }
 
     push @{$self->{site}->{pages}}, \%page;

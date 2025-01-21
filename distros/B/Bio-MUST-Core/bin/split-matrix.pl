@@ -64,7 +64,7 @@ split-matrix.pl - Extract individual gene ALIs from a SCaFoS supermatrix
 
 =head1 VERSION
 
-version 0.243430
+version 0.250200
 
 =head1 USAGE
 
@@ -83,7 +83,7 @@ Path to input SCaFoS LEN files [repeatable argument].
 
 =item --alifile=<file>
 
-Path to the ALI file containing the sequence alignement.
+Path to the ALI file containing the sequence alignment.
 
 =for Euclid: file.type: readable
 

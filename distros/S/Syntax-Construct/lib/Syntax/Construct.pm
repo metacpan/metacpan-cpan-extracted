@@ -4,7 +4,7 @@ use 5.006002;
 use strict;
 use warnings;
 
-our $VERSION = '1.038';
+our $VERSION = '1.040';
 
 my %introduces = do { no warnings 'qw';
                  ( '5.040' => [qw[
@@ -302,7 +302,7 @@ Syntax::Construct - Explicitly state which non-feature constructs are used in th
 
 =head1 VERSION
 
-Version 1.038
+Version 1.040
 
 =head1 SYNOPSIS
 
@@ -964,17 +964,17 @@ L<perl5380delta/New regexp variable ${^LAST_SUCCESSFUL_PATTERN}>
 
 =head3 ^^
 
-L<perldelta/New ^^ logical xor operator>
+L<perl5400delta/New ^^ logical xor operator>
 
 Alias: logical-xor
 
 =head3 __CLASS__
 
-L<perldelta/New __CLASS__ keyword>.
+L<perl5400delta/New __CLASS__ Keyword>.
 
 =head3 :reader
 
-L<perldelta/:reader attribute for field variables>
+L<perl5400delta/:reader attribute for field variables>
 
 =for completeness
 =head2 old
@@ -1069,7 +1069,7 @@ L<Perl::MinimumVersion>, L<Perl::MinimumVersion::Fast>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2013 - 2024 E. Choroba.
+Copyright 2013 - 2025 E. Choroba.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

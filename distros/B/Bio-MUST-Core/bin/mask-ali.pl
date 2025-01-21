@@ -41,7 +41,7 @@ mask-ali.pl - Mask an ALI file according to BLOCKS file(s)
 
 =head1 VERSION
 
-version 0.243430
+version 0.250200
 
 =head1 USAGE
 
@@ -60,7 +60,7 @@ Path to input BLOCKS files [repeatable argument].
 
 =item --alifile=<file>
 
-Path to the ALI file containing the sequence alignement.
+Path to the ALI file containing the sequence alignment.
 
 =for Euclid: file.type: readable
 

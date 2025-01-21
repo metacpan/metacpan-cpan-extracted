@@ -28,9 +28,9 @@ sub _build__PDL {
     my $pdl = $x->ones;
     $pdl *= $coeff->[0];
 
-    for ( my $exp = 1 ; $exp < @$coeff + 1 ; ++$exp ) {
-        $pdl += $coeff->[$exp] * $x**$exp;
-    }
+    $pdl += $coeff->[$_] * $x**$_
+      for 1..@$coeff-1;
+
     $pdl;
 }
 

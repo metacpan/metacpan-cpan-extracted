@@ -56,7 +56,7 @@ our %EXPORT_TAGS = (
     parse  => [ qw(parse_plist parse_plist_fh parse_plist_file parse_plist_string) ],
 );
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 our $XS_VERSION = $VERSION;
 $VERSION = eval $VERSION;  # see L<perlmodstyle>
 
@@ -221,7 +221,7 @@ Please contact the author with bug reports or feature requests.
 
 =head1 AUTHOR
 
-Darren M. Kulp, C<< <kulp @ cpan.org> >>
+Darren M. Kulp, C<< <darren@kulp.ch> >>
 
 =head1 THANKS
 

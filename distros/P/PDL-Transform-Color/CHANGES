@@ -1,4 +1,7 @@
-1.008 2025-01-19
+1.010 2025-01-20
+- make t_brgb *not* divide by zero
+
+1.009 2025-01-19
 - more tolerant t_brgb test with better failure-reporting with Test::PDL
 
 1.008 2025-01-16

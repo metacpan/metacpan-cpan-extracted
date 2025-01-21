@@ -1,5 +1,5 @@
 package Net::Checkpoint::Management::v1::Role::REST::Client;
-$Net::Checkpoint::Management::v1::Role::REST::Client::VERSION = '0.003000';
+$Net::Checkpoint::Management::v1::Role::REST::Client::VERSION = '0.004000';
 # ABSTRACT: Checkpoint Management API version 1.x client
 use Moo::Role;
 
@@ -19,7 +19,7 @@ Net::Checkpoint::Management::v1::Role::REST::Client - Checkpoint Management API 
 
 =head1 VERSION
 
-version 0.003000
+version 0.004000
 
 =head1 AUTHOR
 
@@ -27,7 +27,7 @@ Alexander Hartmaier <abraxxa@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Alexander Hartmaier.
+This software is copyright (c) 2025 by Alexander Hartmaier.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,7 +1,7 @@
 package Bio::MUST::Core::Tree;
 # ABSTRACT: Thin wrapper around Bio::Phylo trees
 # CONTRIBUTOR: Valerian LUPO <valerian.lupo@doct.uliege.be>
-$Bio::MUST::Core::Tree::VERSION = '0.243430';
+$Bio::MUST::Core::Tree::VERSION = '0.250200';
 use Moose;
 # use MooseX::SemiAffordanceAccessor;
 use namespace::autoclean;
@@ -269,13 +269,13 @@ sub get_node_that_maximizes {
 
 sub root_tree {                             ## no critic (RequireArgUnpacking)
     my $self = shift;
-    my $node = shift;
+    my $node = shift;           # can be a filter rather than a specific node
 
     my $tree = $self->tree;
     my $splits;
 
-    # TODO: check that get_internals is enough
-    if ( List::AllUtils::any { $_->get_name } @{ $tree->get_internals } ) {
+    if ( $node->can('score')    # splits are always needed when passed a filter
+        || List::AllUtils::any { $_->get_name } @{ $tree->get_internals } ) {
         #### Saving splits metadata before rooting...
         $splits = Splits->new_from_tree($tree);
         #### s: $splits->_bp_for
@@ -624,7 +624,7 @@ Bio::MUST::Core::Tree - Thin wrapper around Bio::Phylo trees
 
 =head1 VERSION
 
-version 0.243430
+version 0.250200
 
 =head1 SYNOPSIS
 

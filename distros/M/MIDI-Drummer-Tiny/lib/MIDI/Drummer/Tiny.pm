@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Glorified metronome
 
-our $VERSION = '0.4307';
+our $VERSION = '0.4308';
 
 use Moo;
 use strictures 2;
@@ -15,7 +15,8 @@ use Music::Duration ();
 use Music::RhythmSet::Util qw(upsize);
 use namespace::clean;
 
-use constant TICKS => 96; # Per quarter note
+use constant TICKS    => 96; # Per quarter note
+use constant STRAIGHT => 50; # Swing percent
 
 
 sub BUILD {
@@ -142,7 +143,8 @@ has double_dotted_onetwentyeighth => (is => 'ro', default => sub { 'ddzn' });
 sub note {
     my ($self, @spec) = @_;
     my $size = $spec[0] =~ /^d(\d+)$/ ? $1 / TICKS : dura_size($spec[0]);
-    #warn __PACKAGE__,' L',__LINE__,' ',,"$spec[0] => $size\n";
+    # warn __PACKAGE__,' L',__LINE__,' ',,"$spec[0]\n";
+    # warn __PACKAGE__,' L',__LINE__,' ',,"$size\n";
     $self->counter( $self->counter + $size );
     return $self->score->n(@spec);
 }
@@ -260,19 +262,31 @@ sub metronome44 {
 
 
 sub metronome44swing {
-    my $self = shift;
-    my $bars = shift || $self->bars;
+    my $self   = shift;
+    my $bars   = shift || $self->bars;
     my $cymbal = shift || $self->ride1;
-
+    my $tempo  = shift || $self->quarter;
+    my $swing  = shift || 67; # percent
+    my $x = dura_size($tempo) * TICKS;
+    my $y = sprintf '%0.f', ($swing / 100) * $x;
+    my $z = $x - $y;
     for my $n ( 1 .. $bars ) {
-        $self->note( $self->quarter,          $cymbal, $self->kick );
-        $self->note( $self->triplet_eighth,   $cymbal );
-        $self->rest( $self->triplet_eighth );
-        $self->note( $self->triplet_eighth,   $cymbal, $self->kick );
-        $self->note( $self->quarter,          $cymbal, $self->snare );
-        $self->note( $self->triplet_eighth,   $cymbal, $self->kick );
-        $self->rest( $self->triplet_eighth );
-        $self->note( $self->triplet_eighth,   $cymbal );
+        $self->note( "d$x", $cymbal, $self->kick );
+        if ( $swing > STRAIGHT ) {
+            $self->note( "d$y", $cymbal );
+            $self->note( "d$z", $cymbal );
+        }
+        else {
+            $self->note( "d$x", $cymbal );
+        }
+        $self->note( "d$x", $cymbal, $self->snare );
+        if ( $swing > STRAIGHT ) {
+            $self->note( "d$y", $cymbal );
+            $self->note( "d$z", $cymbal );
+        }
+        else {
+            $self->note( "d$x", $cymbal );
+        }
     }
 }
 
@@ -673,7 +687,7 @@ MIDI::Drummer::Tiny - Glorified metronome
 
 =head1 VERSION
 
-version 0.4307
+version 0.4308
 
 =head1 SYNOPSIS
 
@@ -700,6 +714,8 @@ version 0.4307
   $d->set_time_sig('4/4');
 
   $d->metronome44(3);  # 4/4 time for 3 bars
+
+  $d->metronome44swing(3, $d->ride2, $d->eighth, 60);
 
   $d->flam($d->quarter, $d->snare);
   $d->crescendo_roll([50, 127, 1], $d->eighth, $d->thirtysecond);
@@ -952,11 +968,16 @@ eighth-note kicks.
 
 =head2 metronome44swing
 
-  $d->metronome44swing;
-  $d->metronome44swing($bars);
-  $d->metronome44swing($bars, $cymbal);
+  $d->metronome44swing($bars, $cymbal, $tempo, $swing);
 
 Add a steady 4/4 swing beat to the score.
+
+Defaults:
+
+  bars: The object B<bars>
+  cymbal: B<ride1>
+  tempo: B<quarter-note>
+  swing: 67 (percent)
 
 =head2 metronome54
 

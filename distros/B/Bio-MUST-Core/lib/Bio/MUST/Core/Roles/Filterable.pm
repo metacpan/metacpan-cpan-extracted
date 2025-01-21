@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Roles::Filterable;
 # ABSTRACT: Filterable Moose role for objects that behave as filters
-$Bio::MUST::Core::Roles::Filterable::VERSION = '0.243430';
+$Bio::MUST::Core::Roles::Filterable::VERSION = '0.250200';
 use Moose::Role;
 
 use autodie;
@@ -15,6 +15,7 @@ use Bio::MUST::Core::Types;
 use Bio::MUST::Core::Constants qw(:seqids);
 
 requires 'is_allowed';
+
 
 has '_specs' => (
     is       => 'ro',
@@ -117,7 +118,7 @@ Bio::MUST::Core::Roles::Filterable - Filterable Moose role for objects that beha
 
 =head1 VERSION
 
-version 0.243430
+version 0.250200
 
 =head1 SYNOPSIS
 

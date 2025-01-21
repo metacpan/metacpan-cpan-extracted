@@ -1,8 +1,13 @@
 Revision history for MIDI-Drummer
 
+0.4308 2025-01-20 18:43:56
+    - Replace triplet swing with percentage swing.
+
 0.4307 2025-01-16 22:23:50
     - Lose local author lib line in eg/.
     - Allow a cymbal to be specified to use by the metronome routines.
+
+- 0.4306 ... Whoops!
 
 0.4305 2023-11-22 11:30:36
     - Remove the accidental leftover dependency on CreatingRhythms.

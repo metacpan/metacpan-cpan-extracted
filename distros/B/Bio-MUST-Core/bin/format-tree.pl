@@ -7,6 +7,7 @@ use Modern::Perl '2011';
 use autodie;
 
 use Getopt::Euclid qw(:vars);
+use List::AllUtils qw(pairfirst);
 use Smart::Comments;
 use Try::Tiny;
 
@@ -40,8 +41,19 @@ if ($ARGV_org_mapper) {
 # optionally build taxonomy object
 my $tax;
 if ($ARGV_taxdir) {
-    ### Annotating tree using: $ARGV_taxdir
+    ### Annotating trees using: $ARGV_taxdir
     $tax = Taxonomy->new_from_cache( tax_dir => $ARGV_taxdir );
+}
+
+# setup potential rooting strategy
+my $filter;
+my ($component, $target) = pairfirst { $b }
+    map { $_ => $ARGV{"--root-on-$_"} } qw(taxon genus species family tag);
+if ($component) {
+    ### Rooting strategy: "$component = $target"
+    $filter = $component eq 'taxon' ? $tax->tax_filter(     ["+$target"] )
+            :        SeqId->${\ ($component . '_filter') }( ["+$target"] )
+    ;
 }
 
 # setup collapsing and group naming
@@ -97,14 +109,10 @@ for my $infile (@ARGV_infiles) {
         $tree->tree->chronompl;
     }
 
-    # Note: rerooting must occur before propagating taxonomy to nodes
-    if ($ARGV_root_on_family || $ARGV_root_on_taxon) {
-        ### Rooting tree on: $ARGV_root_on_family // $ARGV_root_on_taxon
-        my $filter = $ARGV_root_on_family
-            ? SeqId->family_filter( [ '+' . $ARGV_root_on_family ] )
-            :  $tax->tax_filter(    [ '+' . $ARGV_root_on_taxon  ] )
-        ;
+    if ($filter) {
+        ### Rooting on: $target
         $tree->root_tree($filter, -1, 1);
+        # Note: rerooting must occur before propagating taxonomy to nodes
     }
 
     if ($ARGV_ladderize) {
@@ -180,6 +188,8 @@ for my $infile (@ARGV_infiles) {
     }
 }
 
+# TODO: include iqtree2mapper?
+
 __END__
 
 =pod
@@ -190,7 +200,7 @@ format-tree.pl - Format (and annotate) trees for printing
 
 =head1 VERSION
 
-version 0.243430
+version 0.250200
 
 =head1 USAGE
 
@@ -272,21 +282,47 @@ and should thus be displayed as a cladogram.
 When specified, the tree is made ultrametric using the method of Britton et
 al. (2002), as implemented in C<Bio::Phylo>.
 
-=item --root-on-family=<family>
-
-When specified, the tree is rooted on the branch best separating the outgroup
-family from the other families of the tree [default: none].
-
-=for Euclid: family.type: string
-
 =item --root-on-taxon=<taxon>
 
 When specified, the tree is rooted on the branch best separating the outgroup
 taxon from the remaining of the tree [default: none]. This requires a local
 mirror of the NCBI Taxonomy database but not necessarily enabling taxonomic
-annotation.
+annotation. Other rooting options are available below. These are mutually
+exclusive and enabled in decreasing listing order in this documentation.
 
 =for Euclid: taxon.type: string
+
+=item --root-on-genus=<genus>
+
+When specified, the tree is rooted on the branch best separating the outgroup
+genus from the other genera of the tree [default: none]. This does not rely on
+a full taxonomic analysis but only on L<Bio::MUST::Core::SeqId> methods
+
+=for Euclid: genus.type: string
+
+=item --root-on-species=<species>
+
+When specified, the tree is rooted on the branch best separating the outgroup
+species from the other species of the tree [default: none]. This does not rely
+on a full taxonomic analysis but only on L<Bio::MUST::Core::SeqId> methods
+
+=for Euclid: species.type: string
+
+=item --root-on-family=<family>
+
+When specified, the tree is rooted on the branch best separating the outgroup
+family from the other families of the tree [default: none]. This works better
+when family information is available for most sequences.
+
+=for Euclid: family.type: string
+
+=item --root-on-tag=<tag>
+
+When specified, the tree is rooted on the branch best separating the outgroup
+tag from the other tags of the tree [default: none]. This works better when
+tag information is available for most sequences.
+
+=for Euclid: tag.type: string
 
 =item --ladderize=<dir>
 

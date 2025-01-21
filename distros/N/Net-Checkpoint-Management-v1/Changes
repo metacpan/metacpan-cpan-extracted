@@ -1,4 +1,12 @@
-Revision history for Net-Checkpoint-Management-v1: 0.003000
+Revision history for Net-Checkpoint-Management-v1: 0.004000
+
+0.004000  2025-01-20 14:34:40+01:00 Europe/Vienna
+    - the module is now developed and tested against version R81.20
+    - add API key login support
+      since Checkpoint R80.40, API version 1.6
+    - make user and passwd attributes read-only
+    - add support for passing optional parameters to the login method
+      like read-only or domain
 
 0.003000  2023-01-10 19:04:01+01:00 Europe/Vienna
     - add where_used method

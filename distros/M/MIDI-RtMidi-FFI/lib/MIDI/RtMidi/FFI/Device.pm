@@ -10,7 +10,7 @@ use MIDI::Event;
 use Time::HiRes qw/ time /;
 use Carp qw/ carp croak /;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 my $rtmidi_api_names = {
     unspecified => [ "Unknown",            RTMIDI_API_UNSPECIFIED ],
@@ -237,29 +237,30 @@ sub open_port {
 
 sub get_ports_by_name {
     my ( $self, $name ) = @_;
-    my @ports = grep {
-        my $pn = $self->get_port_name( $_ );
-        ref $name eq 'Regexp'
-            ? $pn =~ $name
-            : $pn eq $name
-    } 0..($self->get_port_count-1);
-    return @ports;
+    my @ports;
+    if ( ref $name eq 'ARRAY' ) {
+        for ( @{ $name } ) {
+            push @ports, $self->get_ports_by_name( $_ );
+        }
+    }
+    else {
+        push @ports, grep {
+            my $pn = $self->get_port_name( $_ );
+            ref $name eq 'Regexp'
+                ? $pn =~ $name
+                : $pn eq $name
+        } 0..($self->get_port_count-1);
+    }
+    @ports;
 }
 
 
 sub open_port_by_name {
     my ( $self, $name, $portname ) = @_;
     $portname //= $self->{type} . '-' . time();
-    if ( ref $name eq 'ARRAY' ) {
-        for ( @{ $name } ) {
-            return 1 if $self->open_port_by_name( $_ );
-        }
-    }
-    else {
-        my @ports = $self->get_ports_by_name( $name );
-        return 0 unless @ports;
-        return $self->open_port( $ports[0], $portname );
-    }
+    my @ports = $self->get_ports_by_name( $name );
+    croak "No available device found matching supplied criteria" unless @ports;
+    $self->open_port( $ports[0], $portname );
 }
 
 
@@ -836,7 +837,7 @@ MIDI::RtMidi::FFI::Device - OO interface for MIDI::RtMidi::FFI
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -1005,6 +1006,7 @@ See L</open_port_by_name> for a potentially more flexible option.
 
     $device->get_ports_by_name( $name );
     $device->get_ports_by_name( qr/name/ );
+    $device->open_port_by_name( [ $name, $othername, qr/anothername/ ] );
 
 Returns a list of port numbers matching the supplied name criteria.
 
@@ -1015,7 +1017,6 @@ Returns a list of port numbers matching the supplied name criteria.
     $device->open_port_by_name( [ $name, $othername, qr/anothername/ ] );
 
 Opens the first port found matching the supplied name criteria.
-Returns 1 if a matching port was found and connected to successfully, otherwise 0.
 
 =head2 get_all_port_nums
 

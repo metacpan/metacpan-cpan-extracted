@@ -9,7 +9,7 @@ use FFI::Platypus::Buffer qw/ scalar_to_buffer buffer_to_scalar /;
 use FFI::CheckLib 0.25 qw/ find_lib_or_exit /;
 use Carp;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 # ABSTRACT: Bindings for librtmidi - Realtime MIDI library
 
@@ -246,7 +246,7 @@ MIDI::RtMidi::FFI - Bindings for librtmidi - Realtime MIDI library
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 

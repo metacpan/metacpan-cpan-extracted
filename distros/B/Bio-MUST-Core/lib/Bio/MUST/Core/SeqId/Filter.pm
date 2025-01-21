@@ -1,6 +1,6 @@
 package Bio::MUST::Core::SeqId::Filter;
 # ABSTRACT: Helper class for filtering seqs according to SeqId components
-$Bio::MUST::Core::SeqId::Filter::VERSION = '0.243430';
+$Bio::MUST::Core::SeqId::Filter::VERSION = '0.250200';
 use Moose;
 use namespace::autoclean;
 
@@ -13,15 +13,25 @@ use Bio::MUST::Core::Types;
 with 'Bio::MUST::Core::Roles::Filterable';
 
 
+has 'component' => (
+    is       => 'ro',
+    isa      => 'Str',
+    required => 1,
+);
+
+
+
 sub is_allowed {
     my $self   = shift;
     my $seq_id = shift;
 
-    my $family = $seq_id->family;
-    return undef unless $family;    ## no critic (ProhibitExplicitReturnUndef)
+    # fetch the right SeqId component (e.g., family)
+    # Note: the trick here is to take a reference then dereference it at once
+    my $component = $seq_id->${\ $self->component };
+    return undef unless $component; ## no critic (ProhibitExplicitReturnUndef)
 
-    return 0 unless $self->is_wanted(  $family);
-    return 0     if $self->is_unwanted($family);
+    return 0 unless $self->is_wanted(  $component);
+    return 0     if $self->is_unwanted($component);
     return 1;
 }
 
@@ -38,7 +48,7 @@ Bio::MUST::Core::SeqId::Filter - Helper class for filtering seqs according to Se
 
 =head1 VERSION
 
-version 0.243430
+version 0.250200
 
 =head1 SYNOPSIS
 
