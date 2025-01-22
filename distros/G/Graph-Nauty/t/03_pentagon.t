@@ -8,6 +8,8 @@ use Graph::Nauty qw(
 use Graph::Undirected;
 use Test::More tests => 9;
 
+$Graph::Nauty::warn_deprecated = '';
+
 my $g1 = Graph::Undirected->new;
 my $g2 = Graph::Undirected->new;
 

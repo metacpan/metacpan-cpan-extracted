@@ -1,5 +1,8 @@
 Revision history for Net-DAVTalk
 
+0.23    Wed 22 Jan 15:55 2025
+  - pass SSL_options through to HTTP::Tiny
+
 0.22    Mon 14 Mar 12:33 2022
   - set the useragent to the module version rather than always 0.01
 

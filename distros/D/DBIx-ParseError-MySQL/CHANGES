@@ -1,6 +1,16 @@
 Changelog for DBIx-ParseError-MySQL
 
-v1.0.3 2023-02-07T16:21:45
+v1.0.4 2025-01-21T22:53:15
+ - Update README / LICENSE (dmueller)
+ - Update Makefile from upstream (dmueller)
+ - Pull request #5: SM-4878 Allow max_execution_time errors to not be
+   considered transient, so the query does not get retried (Samuel Ng)
+ - Add comment explaining reason for filtering out matches on `maximum
+   statement execution time exceeded` (Samuel Ng)
+ - Allow max_execution_time errors to not be considered transient, so the
+   query does not get retried (Samuel Ng)
+
+v1.0.3 2023-02-07T16:21:17
  - Update README / LICENSE / Makefile (Brendan Byrd)
  - POD fixes (Brendan Byrd)
  - Pull request #4: SM-4041 (Tom Christiansen)

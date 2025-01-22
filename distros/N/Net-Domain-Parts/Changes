@@ -1,0 +1,15 @@
+Revision history for Net-Domain-Parts
+
+0.04    2025-01-21
+    - Add 'Net' to 'Domain::Parts' in use statement in SYNOPSIS
+
+0.03    2025-01-21
+    - Re-order functions in POD
+
+0.02    2025-01-21
+    - Added updated perl versions to Github Actions
+    - Add '=pod' section so hopefully MetaCPAN can see it without the __END__
+      block
+
+0.01    2025-01-21
+    - Auto generated distribution with Dist::Mgr

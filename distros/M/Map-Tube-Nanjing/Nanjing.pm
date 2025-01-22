@@ -1,17 +1,14 @@
 package Map::Tube::Nanjing;
 
-# Pragmas.
 use strict;
 use warnings;
 use 5.006;
 
-# Modules.
 use File::Share ':all';
 use Moo;
 use namespace::clean;
 
-# Version.
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Get XML.
 has xml => (
@@ -117,11 +114,9 @@ For more information about Nanjing Map, click L<here|https://en.wikipedia.org/wi
 
 =head1 EXAMPLE1
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Encode qw(decode_utf8 encode_utf8);
  use Map::Tube::Nanjing;
 
@@ -139,11 +134,9 @@ For more information about Nanjing Map, click L<here|https://en.wikipedia.org/wi
 
 =head1 EXAMPLE2
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Map::Tube::Nanjing;
 
  # Object.
@@ -160,11 +153,9 @@ For more information about Nanjing Map, click L<here|https://en.wikipedia.org/wi
 
 =head1 EXAMPLE3
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Map::Tube::GraphViz;
  use Map::Tube::GraphViz::Utils qw(node_color_without_label);
  use Map::Tube::Nanjing;
@@ -186,23 +177,21 @@ For more information about Nanjing Map, click L<here|https://en.wikipedia.org/wi
  system "ls -l Nanjing.png";
 
  # Output like:
- # -rw-r--r-- 1 skim skim 394246 Oct 16 11:25 Nanjing.png
+ # -rw-r--r-- 1 skim skim 336513 21. led 21.02 Nanjing.png
 
 =begin html
 
-<a href="https://raw.githubusercontent.com/tupinek/Map-Tube-Nanjing/master/images/ex3.png">
-  <img src="https://raw.githubusercontent.com/tupinek/Map-Tube-Nanjing/master/images/ex3.png" alt="南京地铁" width="300px" height="300px" />
+<a href="https://raw.githubusercontent.com/tupinek/Map-Tube-Nanjing/master/images/Nanjing.png">
+  <img src="https://raw.githubusercontent.com/tupinek/Map-Tube-Nanjing/master/images/Nanjing.png" alt="南京地铁" width="300px" height="300px" />
 </a>
 
 =end html
 
 =head1 EXAMPLE4
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Encode qw(encode_utf8);
  use Map::Tube::Nanjing;
 
@@ -222,6 +211,65 @@ For more information about Nanjing Map, click L<here|https://en.wikipedia.org/wi
  # 南京地铁3号线
  # 宁天城际轨道交通
  # 宁高城际轨道交通
+
+=head1 EXAMPLE5
+
+ use strict;
+ use warnings;
+
+ use Encode qw(decode_utf8 encode_utf8);
+ use Map::Tube::Nanjing;
+
+ # Arguments.
+ if (@ARGV < 1) {
+         print STDERR "Usage: $0 line\n";
+         exit 1;
+ }
+ my $line = decode_utf8($ARGV[0]);
+
+ # Object.
+ my $obj = Map::Tube::Nanjing->new;
+
+ # Get stations for line.
+ my $stations_ar = $obj->get_stations($line);
+
+ # Print out.
+ map { print encode_utf8($_->name)."\n"; } @{$stations_ar};
+
+ # Output:
+ # Usage: __PROG__ line
+
+ # Output with 'foo' argument.
+ # Map::Tube::get_stations(): ERROR: Invalid Line Name [foo]. (status: 105) file __PROG__ on line __LINE__
+
+ # Output with '南京地铁1号线' argument.
+ # 迈皋桥
+ # 红山动物园
+ # 南京站
+ # 新模范马路
+ # 玄武门
+ # 鼓楼
+ # 珠江路
+ # 新街口
+ # 张府园
+ # 三山街
+ # 中华门
+ # 安德门
+ # 天隆寺
+ # 软件大道
+ # 花神庙
+ # 南京南站
+ # 双龙大道
+ # 河定桥
+ # 胜太路
+ # 百家湖
+ # 小龙湾
+ # 竹山路
+ # 天印大道
+ # 龙眠大道
+ # 南医大·江苏经贸学院
+ # 南京交院
+ # 中国药科大学
 
 =head1 DEPENDENCIES
 
@@ -254,18 +302,18 @@ L<https://github.com/tupinek/Map-Tube-Nanjing>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2014-2015 Michal Špaček
+ © 2014-2025 Michal Josef Špaček
  Artistic License
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

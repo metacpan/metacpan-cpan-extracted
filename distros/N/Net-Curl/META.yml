@@ -32,7 +32,7 @@ resources:
   bugtracker: https://github.com/sparky/perl-Net-Curl/issues
   homepage: https://github.com/sparky/perl-Net-Curl
   repository: git://github.com/sparky/perl-Net-Curl.git
-version: '0.56'
+version: '0.57'
 x_contributors:
   - 'Bálint Szilakszi'
   - 'David Geiger'
@@ -51,4 +51,4 @@ x_contributors:
   - 'Slaven Rezić'
   - 'Yuni Kim'
   - 'Todd Rinaldo'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

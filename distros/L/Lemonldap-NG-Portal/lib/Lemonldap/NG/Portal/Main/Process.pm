@@ -161,21 +161,10 @@ sub controlUrl {
         }
         $req->{urldc} = URI->new( $req->{urldc} )->as_string;
 
-        # For logout request, test if Referer comes from an authorized site
-        my $tmp = (
-              $req->param('logout')
-            ? $req->referer
-            : $req->{urldc}
-        );
+        my $tmp = $req->urldc;
 
         # XSS attack
-        if (
-            $self->checkXSSAttack(
-                $req->param('logout') ? 'HTTP Referer' : 'urldc',
-                $req->{urldc}
-            )
-          )
-        {
+        if ( $self->checkXSSAttack( 'urldc', $req->{urldc} ) ) {
             delete $req->{urldc};
             return PE_BADURL;
         }
@@ -204,8 +193,7 @@ sub controlUrl {
         # Try to resolve alias
         my $originalVhost = $self->HANDLER->resolveAlias($vhost);
         $vhost = "$proto://$originalVhost";
-        $self->logger->debug( 'Required URL (param: '
-              . ( $req->param('logout') ? 'HTTP Referer'   : 'urldc' )
+        $self->logger->debug( 'Required URL (param: urldc'
               . ( $tmp ? " | value: $tmp | alias: $vhost)" : ')' ) );
 
         # If the target URL has an authLevel set in config, remember it.
@@ -224,8 +212,7 @@ sub controlUrl {
             $self->auditLog(
                 $req,
                 message => (
-                        "URL contains an unprotected host (param: "
-                      . ( $req->param('logout') ? 'HTTP Referer' : 'urldc' )
+                        "URL contains an unprotected host (param: urldc"
                       . " | value: $tmp | alias: $vhost)"
                 ),
                 code => "UNAUTHORIZED_REDIRECT",

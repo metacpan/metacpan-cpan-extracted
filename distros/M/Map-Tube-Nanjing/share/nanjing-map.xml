@@ -7,138 +7,147 @@
     <line id="3" name="南京地铁3号线" color="green"/>
     <line id="10" name="南京地铁10号线" color="beige"/>
     <line id="S1" name="宁高城际轨道交通" color="cyan"/>
-    <line id="S2" name="宁天城际轨道交通" color="orange"/>
+    <line id="S8" name="宁天城际轨道交通" color="orange"/>
   </lines>
   <stations>
-    <!-- Junctions -->
-    <station id="新街口" name="新街口" line="南京地铁1号线,南京地铁2号线" link="1-07,1-09,2-10,2-12"/>
-    <station id="安德门" name="安德门" line="南京地铁1号线,南京地铁10号线" link="1-11,1-13,10-02"/>
-    <station id="元通" name="元通" line="南京地铁2号线,南京地铁10号线" link="2-02,2-04,10-03,10-05"/>
-    <station id="南京南站" name="南京南站" line="南京地铁1号线,宁高城际轨道交通" link="1-15,1-17,S1-02"/>
+    <!-- Stations on multiple lines -->
+    <station id="1-03" name="南京站" line="1:3,3:10" link="1-02,1-04,3-09,3-11"/>
+    <station id="1-08" name="新街口" line="1:8,2:11" link="1-07,1-09,2-10,2-12"/>
+    <station id="1-12" name="安德门" line="1:12,10:1" link="1-11,1-13,10-02"/>
+    <station id="1-16" name="南京南站" line="1:16,3:22,S1:1" link="1-15,1-17,3-21,3-23,S1-02"/>
+    <station id="2-03" name="元通" line="2:3,10:4" link="2-02,2-04,10-03,10-05"/>
 
     <!-- https://zh.wikipedia.org/wiki/南京地铁1号线 -->
-    <station id="1-01" name="迈皋桥" line="南京地铁1号线" link="1-02"/>
-    <station id="1-02" name="红山动物园" line="南京地铁1号线" link="1-01,1-03"/>
-    <station id="1-03" name="南京站" line="南京地铁1号线" link="1-02,1-04"/>
-    <station id="1-04" name="新模范马路" line="南京地铁1号线" link="1-03,1-05"/>
-    <station id="1-05" name="玄武门" line="南京地铁1号线" link="1-04,1-06"/>
-    <station id="1-06" name="鼓楼" line="南京地铁1号线" link="1-05,1-07"/>
-    <station id="1-07" name="珠江路" line="南京地铁1号线" link="1-06,新街口"/>
-    <station id="1-09" name="张府园" line="南京地铁1号线" link="新街口,1-10"/>
-    <station id="1-10" name="三山街" line="南京地铁1号线" link="1-09,1-11"/>
-    <station id="1-11" name="中华门" line="南京地铁1号线" link="1-10,安德门"/>
-    <station id="1-13" name="天隆寺" line="南京地铁1号线" link="安德门,1-14"/>
-    <station id="1-14" name="软件大道" line="南京地铁1号线" link="1-13,1-15"/>
-    <station id="1-15" name="花神庙" line="南京地铁1号线" link="1-14,南京南站"/>
-    <station id="1-17" name="双龙大道" line="南京地铁1号线" link="南京南站,1-18"/>
-    <station id="1-18" name="河定桥" line="南京地铁1号线" link="1-17,1-19"/>
-    <station id="1-19" name="胜太路" line="南京地铁1号线" link="1-18,1-20"/>
-    <station id="1-20" name="百家湖" line="南京地铁1号线" link="1-19,1-21"/>
-    <station id="1-21" name="小龙湾" line="南京地铁1号线" link="1-20,1-22"/>
-    <station id="1-22" name="竹山路" line="南京地铁1号线" link="1-21,1-23"/>
-    <station id="1-23" name="天印大道" line="南京地铁1号线" link="1-22,1-24"/>
-    <station id="1-24" name="龙眠大道" line="南京地铁1号线" link="1-23,1-25"/>
-    <station id="1-25" name="南医大·江苏经贸学院" line="南京地铁1号线" link="1-24,1-26"/>
-    <station id="1-26" name="南京交院" line="南京地铁1号线" link="1-25,1-27"/>
-    <station id="1-27" name="中国药科大学" line="南京地铁1号线" link="1-26"/>
+    <station id="1-01" name="迈皋桥" line="1:1" link="1-02"/>
+    <station id="1-02" name="红山动物园" line="1:2" link="1-01,1-03"/>
+    <!-- 南京站 -->
+    <station id="1-04" name="新模范马路" line="1:4" link="1-03,1-05"/>
+    <station id="1-05" name="玄武门" line="1:5" link="1-04,1-06"/>
+    <station id="1-06" name="鼓楼" line="1:6" link="1-05,1-07"/>
+    <station id="1-07" name="珠江路" line="1:7" link="1-06,1-08"/>
+    <!-- 新街口 -->
+    <station id="1-09" name="张府园" line="1:9" link="1-08,1-10"/>
+    <station id="1-10" name="三山街" line="1:10" link="1-09,1-11"/>
+    <station id="1-11" name="中华门" line="1:11" link="1-10,1-12"/>
+    <!-- 安德门 -->
+    <station id="1-13" name="天隆寺" line="1:13" link="1-12,1-14"/>
+    <station id="1-14" name="软件大道" line="1:14" link="1-13,1-15"/>
+    <station id="1-15" name="花神庙" line="1:15" link="1-14,1-16"/>
+    <!-- 南京南站 -->
+    <station id="1-17" name="双龙大道" line="1:17" link="1-16,1-18"/>
+    <station id="1-18" name="河定桥" line="1:18" link="1-17,1-19"/>
+    <station id="1-19" name="胜太路" line="1:19" link="1-18,1-20"/>
+    <station id="1-20" name="百家湖" line="1:20" link="1-19,1-21"/>
+    <station id="1-21" name="小龙湾" line="1:21" link="1-20,1-22"/>
+    <station id="1-22" name="竹山路" line="1:22" link="1-21,1-23"/>
+    <station id="1-23" name="天印大道" line="1:23" link="1-22,1-24"/>
+    <station id="1-24" name="龙眠大道" line="1:24" link="1-23,1-25"/>
+    <station id="1-25" name="南医大·江苏经贸学院" line="1:25" link="1-24,1-26"/>
+    <station id="1-26" name="南京交院" line="1:26" link="1-25,1-27"/>
+    <station id="1-27" name="中国药科大学" line="1:27" link="1-26"/>
 
     <!-- https://zh.wikipedia.org/wiki/南京地铁2号线 -->
-    <station id="2-01" name="油坊桥" line="南京地铁2号线" link="2-02"/>
-    <station id="2-02" name="雨润大街" line="南京地铁2号线" link="2-01,元通"/>
-    <station id="2-04" name="奥体东" line="南京地铁2号线" link="元通,2-05"/>
-    <station id="2-05" name="兴隆大街" line="南京地铁2号线" link="2-04,2-06"/>
-    <station id="2-06" name="集庆门大街" line="南京地铁2号线" link="2-05,2-07"/>
-    <station id="2-07" name="云锦路" line="南京地铁2号线" link="2-06,2-08"/>
-    <station id="2-08" name="莫愁湖" line="南京地铁2号线" link="2-07,2-09"/>
-    <station id="2-09" name="汉中门" line="南京地铁2号线" link="2-08,2-10"/>
-    <station id="2-10" name="上海路" line="南京地铁2号线" link="2-09,新街口"/>
-    <station id="2-12" name="大行宫" line="南京地铁2号线" link="新街口,2-13"/>
-    <station id="2-13" name="西安门" line="南京地铁2号线" link="2-12,2-14"/>
-    <station id="2-14" name="明故宫" line="南京地铁2号线" link="2-13,2-15"/>
-    <station id="2-15" name="苜蓿园" line="南京地铁2号线" link="2-14,2-16"/>
-    <station id="2-16" name="下马坊" line="南京地铁2号线" link="2-15,2-17"/>
-    <station id="2-17" name="孝陵卫" line="南京地铁2号线" link="2-16,2-18"/>
-    <station id="2-18" name="钟灵街" line="南京地铁2号线" link="2-17,2-19"/>
-    <station id="2-19" name="马群" line="南京地铁2号线" link="2-18,2-20"/>
-    <station id="2-20" name="金马路" line="南京地铁2号线" link="2-19,2-21"/>
-    <station id="2-21" name="仙鹤门" line="南京地铁2号线" link="2-20,2-22"/>
-    <station id="2-22" name="学则路" line="南京地铁2号线" link="2-21,2-23"/>
-    <station id="2-23" name="仙林中心" line="南京地铁2号线" link="2-22,2-24"/>
-    <station id="2-24" name="羊山公园" line="南京地铁2号线" link="2-23,2-25"/>
-    <station id="2-25" name="南大仙林校区" line="南京地铁2号线" link="2-24,2-26"/>
-    <station id="2-26" name="经天路" line="南京地铁2号线" link="2-25"/>
+    <station id="2-01" name="油坊桥" line="2:1" link="2-02"/>
+    <station id="2-02" name="雨润大街" line="2:2" link="2-01,2-03"/>
+    <!-- 元通 -->
+    <station id="2-04" name="奥体东" line="2:4" link="2-03,2-05"/>
+    <station id="2-05" name="兴隆大街" line="2:5" link="2-04,2-06"/>
+    <station id="2-06" name="集庆门大街" line="2:6" link="2-05,2-07"/>
+    <station id="2-07" name="云锦路" line="2:7" link="2-06,2-08"/>
+    <station id="2-08" name="莫愁湖" line="2:8" link="2-07,2-09"/>
+    <station id="2-09" name="汉中门" line="2:9" link="2-08,2-10"/>
+    <station id="2-10" name="上海路" line="2:10" link="1-08,2-09"/>
+    <!-- 新街口 -->
+    <station id="2-12" name="大行宫" line="2:12" link="1-08,2-13"/>
+    <station id="2-13" name="西安门" line="2:13" link="2-12,2-14"/>
+    <station id="2-14" name="明故宫" line="2:14" link="2-13,2-15"/>
+    <station id="2-15" name="苜蓿园" line="2:15" link="2-14,2-16"/>
+    <station id="2-16" name="下马坊" line="2:16" link="2-15,2-17"/>
+    <station id="2-17" name="孝陵卫" line="2:17" link="2-16,2-18"/>
+    <station id="2-18" name="钟灵街" line="2:18" link="2-17,2-19"/>
+    <station id="2-19" name="马群" line="2:19" link="2-18,2-20"/>
+    <station id="2-20" name="金马路" line="2:20" link="2-19,2-21"/>
+    <station id="2-21" name="仙鹤门" line="2:21" link="2-20,2-22"/>
+    <station id="2-22" name="学则路" line="2:22" link="2-21,2-23"/>
+    <station id="2-23" name="仙林中心" line="2:23" link="2-22,2-24"/>
+    <station id="2-24" name="羊山公园" line="2:24" link="2-23,2-25"/>
+    <station id="2-25" name="南大仙林校区" line="2:25" link="2-24,2-26"/>
+    <station id="2-26" name="经天路" line="2:26" link="2-25"/>
 
     <!-- https://zh.wikipedia.org/wiki/南京地铁3号线 -->
-    <station id="3-01" name="林场站" line="南京地铁3号线" link="3-02"/>
-    <station id="3-02" name="星火路站" line="南京地铁3号线" link="3-01,3-03"/>
-    <station id="3-03" name="东大成贤学院站" line="南京地铁3号线" link="3-02,3-04"/>
-    <station id="3-04" name="泰冯路站" line="南京地铁3号线" link="3-03,3-05"/>
-    <station id="3-05" name="天润城站" line="南京地铁3号线" link="3-04,3-06"/>
-    <station id="3-06" name="柳洲东路站" line="南京地铁3号线" link="3-05,3-08"/>
-    <!-- <station id="3-07" name="上元门站" line="南京地铁3号线" link="3-06,3-08"/> -->
-    <station id="3-08" name="五塘广场站" line="南京地铁3号线" link="3-06,3-09"/>
-    <station id="3-09" name="小市站" line="南京地铁3号线" link="3-08,3-10"/>
-    <station id="3-10" name="南京站" line="南京地铁3号线" link="3-09,3-11"/>
-    <station id="3-11" name="南京林业大学·新庄站" line="南京地铁3号线" link="3-10,3-12"/>
-    <station id="3-12" name="鸡鸣寺站" line="南京地铁3号线" link="3-11,3-13"/>
-    <station id="3-13" name="浮桥站" line="南京地铁3号线" link="3-12,3-14"/>
-    <station id="3-14" name="大行宫站" line="南京地铁3号线" link="3-13,3-15"/>
-    <station id="3-15" name="常府街站" line="南京地铁3号线" link="3-14,3-16"/>
-    <station id="3-16" name="夫子庙站" line="南京地铁3号线" link="3-15,3-17"/>
-    <station id="3-17" name="武定门站" line="南京地铁3号线" link="3-16,3-18"/>
-    <station id="3-18" name="雨花门站" line="南京地铁3号线" link="3-17,3-19"/>
-    <station id="3-19" name="卡子门站" line="南京地铁3号线" link="3-18,3-20"/>
-    <station id="3-20" name="大明路站" line="南京地铁3号线" link="3-19,3-21"/>
-    <station id="3-21" name="明发广场站" line="南京地铁3号线" link="3-20,3-22"/>
-    <station id="3-22" name="南京南站" line="南京地铁3号线" link="3-21,3-23"/>
-    <station id="3-23" name="宏运大道站" line="南京地铁3号线" link="3-22,3-24"/>
-    <station id="3-24" name="胜太西路站" line="南京地铁3号线" link="3-23,3-25"/>
-    <station id="3-25" name="天元西路站" line="南京地铁3号线" link="3-24,3-26"/>
-    <station id="3-26" name="九龙湖站" line="南京地铁3号线" link="3-25,3-27"/>
-    <station id="3-27" name="诚信大道站" line="南京地铁3号线" link="3-26,3-28"/>
-    <station id="3-28" name="东大九龙湖校区站" line="南京地铁3号线" link="3-27,3-29"/>
-    <station id="3-29" name="秣周东路站" line="南京地铁3号线" link="3-28"/>
+    <station id="3-01" name="林场站" line="3:1" link="3-02"/>
+    <station id="3-02" name="星火路站" line="3:2" link="3-01,3-03"/>
+    <station id="3-03" name="东大成贤学院站" line="3:3" link="3-02,3-04"/>
+    <station id="3-04" name="泰冯路站" line="3:4" link="3-03,3-05"/>
+    <station id="3-05" name="天润城站" line="3:5" link="3-04,3-06"/>
+    <station id="3-06" name="柳洲东路站" line="3:6" link="3-05,3-08"/>
+    <!-- <station id="3-07" name="上元门站" line="3:7" link="3-06,3-08"/> -->
+    <station id="3-08" name="五塘广场站" line="3:8" link="3-06,3-09"/>
+    <station id="3-09" name="小市站" line="3:9" link="1-03,3-08"/>
+    <!-- 南京站 -->
+    <station id="3-11" name="南京林业大学·新庄站" line="3:11" link="1-03,3-12"/>
+    <station id="3-12" name="鸡鸣寺站" line="3:12" link="3-11,3-13"/>
+    <station id="3-13" name="浮桥站" line="3:13" link="3-12,3-14"/>
+    <station id="3-14" name="大行宫站" line="3:14" link="3-13,3-15"/>
+    <station id="3-15" name="常府街站" line="3:15" link="3-14,3-16"/>
+    <station id="3-16" name="夫子庙站" line="3:16" link="3-15,3-17"/>
+    <station id="3-17" name="武定门站" line="3:17" link="3-16,3-18"/>
+    <station id="3-18" name="雨花门站" line="3:18" link="3-17,3-19"/>
+    <station id="3-19" name="卡子门站" line="3:19" link="3-18,3-20"/>
+    <station id="3-20" name="大明路站" line="3:20" link="3-19,3-21"/>
+    <station id="3-21" name="明发广场站" line="3:21" link="1-16,3-20"/>
+    <!-- 南京南站 -->
+    <station id="3-23" name="宏运大道站" line="3:23" link="1-16,3-24"/>
+    <station id="3-24" name="胜太西路站" line="3:24" link="3-23,3-25"/>
+    <station id="3-25" name="天元西路站" line="3:25" link="3-24,3-26"/>
+    <station id="3-26" name="九龙湖站" line="3:26" link="3-25,3-27"/>
+    <station id="3-27" name="诚信大道站" line="3:27" link="3-26,3-28"/>
+    <station id="3-28" name="东大九龙湖校区站" line="3:28" link="3-27,3-29"/>
+    <station id="3-29" name="秣周东路站" line="3:29" link="3-28"/>
 
     <!-- https://zh.wikipedia.org/wiki/南京地铁10号线 -->
-    <station id="10-02" name="小行" line="南京地铁10号线" link="安德门,10-03"/>
-    <station id="10-03" name="中胜" line="南京地铁10号线" link="10-02,元通"/>
-    <station id="10-05" name="奥体中心" line="南京地铁10号线" link="元通,10-06"/>
-    <station id="10-06" name="梦都大街" line="南京地铁10号线" link="10-05,10-07"/>
-    <station id="10-07" name="绿博园" line="南京地铁10号线" link="10-06,10-08"/>
-    <station id="10-08" name="江心洲" line="南京地铁10号线" link="10-07,10-09"/>
-    <station id="10-09" name="临江" line="南京地铁10号线" link="10-08,10-10"/>
-    <station id="10-10" name="浦口万汇城" line="南京地铁10号线" link="10-09,10-11"/>
-    <station id="10-11" name="南京工业大学" line="南京地铁10号线" link="10-10,10-12"/>
-    <station id="10-12" name="龙华路" line="南京地铁10号线" link="10-11,10-13"/>
-    <station id="10-13" name="文德路" line="南京地铁10号线" link="10-12,10-14"/>
-    <station id="10-14" name="雨山路" line="南京地铁10号线" link="10-13"/>
+    <!-- 安德门 -->
+    <station id="10-02" name="小行" line="10:2" link="1-12,10-03"/>
+    <station id="10-03" name="中胜" line="10:3" link="2-03,10-02"/>
+    <!-- 元通 -->
+    <station id="10-05" name="奥体中心" line="10:5" link="2-03,10-06"/>
+    <station id="10-06" name="梦都大街" line="10:6" link="10-05,10-07"/>
+    <station id="10-07" name="绿博园" line="10:7" link="10-06,10-08"/>
+    <station id="10-08" name="江心洲" line="10:8" link="10-07,10-09"/>
+    <station id="10-09" name="临江" line="10:9" link="10-08,10-10"/>
+    <station id="10-10" name="浦口万汇城" line="10:10" link="10-09,10-11"/>
+    <station id="10-11" name="南京工业大学" line="10:11" link="10-10,10-12"/>
+    <station id="10-12" name="龙华路" line="10:12" link="10-11,10-13"/>
+    <station id="10-13" name="文德路" line="10:13" link="10-12,10-14"/>
+    <station id="10-14" name="雨山路" line="10:14" link="10-13"/>
 
     <!-- https://zh.wikipedia.org/wiki/宁高城际轨道交通 -->
-    <station id="S1-02" name="翠屏山" line="宁高城际轨道交通" link="南京南站,S1-03"/>
-    <station id="S1-03" name="河海大学·佛城西路" line="宁高城际轨道交通" link="S1-02,S1-04"/>
-    <station id="S1-04" name="吉印大道" line="宁高城际轨道交通" link="S1-03,S1-05"/>
-    <station id="S1-05" name="正方中路" line="宁高城际轨道交通" link="S1-04,S1-06"/>
-    <station id="S1-06" name="翔宇路北" line="宁高城际轨道交通" link="S1-05,S1-07"/>
-    <station id="S1-07" name="翔宇路南" line="宁高城际轨道交通" link="S1-06,S1-08"/>
-    <station id="S1-08" name="禄口机场" line="宁高城际轨道交通" link="S1-07"/>
+    <!-- 南京南站 -->
+    <station id="S1-02" name="翠屏山" line="S1:2" link="1-16,S1-03"/>
+    <station id="S1-03" name="河海大学·佛城西路" line="S1:3" link="S1-02,S1-04"/>
+    <station id="S1-04" name="吉印大道" line="S1:4" link="S1-03,S1-05"/>
+    <station id="S1-05" name="正方中路" line="S1:5" link="S1-04,S1-06"/>
+    <station id="S1-06" name="翔宇路北" line="S1:6" link="S1-05,S1-07"/>
+    <station id="S1-07" name="翔宇路南" line="S1:7" link="S1-06,S1-08"/>
+    <station id="S1-08" name="禄口机场" line="S1:8" link="S1-07"/>
 
     <!-- https://zh.wikipedia.org/wiki/宁天城际轨道交通 -->
-    <station id="S8-01" name="泰山新村" line="宁天城际轨道交通" link="S8-02"/>
-    <station id="S8-02" name="泰冯路" line="宁天城际轨道交通" link="S8-01,S8-03"/>
-    <station id="S8-03" name="高新开发区" line="宁天城际轨道交通" link="S8-02,S8-04"/>
-    <station id="S8-04" name="信息工程大学" line="宁天城际轨道交通" link="S8-03,S8-05"/>
-    <station id="S8-05" name="卸甲甸" line="宁天城际轨道交通" link="S8-04,S8-06"/>
-    <station id="S8-06" name="大厂" line="宁天城际轨道交通" link="S8-05,S8-07"/>
-    <station id="S8-07" name="葛塘" line="宁天城际轨道交通" link="S8-06,S8-08"/>
-    <station id="S8-08" name="长芦" line="宁天城际轨道交通" link="S8-07,S8-09"/>
-    <station id="S8-09" name="化工园" line="宁天城际轨道交通" link="S8-08,S8-10"/>
-    <station id="S8-10" name="六合开发区" line="宁天城际轨道交通" link="S8-09,S8-11"/>
-    <station id="S8-11" name="龙池" line="宁天城际轨道交通" link="S8-10,S8-12"/>
-    <station id="S8-12" name="雄州" line="宁天城际轨道交通" link="S8-11,S8-13"/>
-    <station id="S8-13" name="凤凰山公园" line="宁天城际轨道交通" link="S8-12,S8-14"/>
-    <station id="S8-14" name="方州广场" line="宁天城际轨道交通" link="S8-13,S8-15"/>
-    <station id="S8-15" name="沈桥" line="宁天城际轨道交通" link="S8-14,S8-16"/>
-    <station id="S8-16" name="八百桥" line="宁天城际轨道交通" link="S8-15,S8-17"/>
-    <station id="S8-17" name="金牛湖" line="宁天城际轨道交通" link="S8-16"/>
+    <station id="S8-01" name="泰山新村" line="S8:1" link="S8-02"/>
+    <station id="S8-02" name="泰冯路" line="S8:2" link="S8-01,S8-03"/>
+    <station id="S8-03" name="高新开发区" line="S8:3" link="S8-02,S8-04"/>
+    <station id="S8-04" name="信息工程大学" line="S8:4" link="S8-03,S8-05"/>
+    <station id="S8-05" name="卸甲甸" line="S8:5" link="S8-04,S8-06"/>
+    <station id="S8-06" name="大厂" line="S8:6" link="S8-05,S8-07"/>
+    <station id="S8-07" name="葛塘" line="S8:7" link="S8-06,S8-08"/>
+    <station id="S8-08" name="长芦" line="S8:8" link="S8-07,S8-09"/>
+    <station id="S8-09" name="化工园" line="S8:9" link="S8-08,S8-10"/>
+    <station id="S8-10" name="六合开发区" line="S8:10" link="S8-09,S8-11"/>
+    <station id="S8-11" name="龙池" line="S8:11" link="S8-10,S8-12"/>
+    <station id="S8-12" name="雄州" line="S8:12" link="S8-11,S8-13"/>
+    <station id="S8-13" name="凤凰山公园" line="S8:13" link="S8-12,S8-14"/>
+    <station id="S8-14" name="方州广场" line="S8:14" link="S8-13,S8-15"/>
+    <station id="S8-15" name="沈桥" line="S8:15" link="S8-14,S8-16"/>
+    <station id="S8-16" name="八百桥" line="S8:16" link="S8-15,S8-17"/>
+    <station id="S8-17" name="金牛湖" line="S8:17" link="S8-16"/>
   </stations>
 </tube>

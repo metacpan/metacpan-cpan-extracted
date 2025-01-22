@@ -3,6 +3,7 @@ NAME
 
 SYNOPSIS
      use Map::Tube::Sofia;
+
      my $obj = Map::Tube::Sofia->new;
      my $routes_ar = $obj->get_all_routes($from, $to);
      my $line = $obj->get_line_by_id($line_id);
@@ -67,11 +68,9 @@ METHODS
              Returns string with XML.
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Encode qw(decode_utf8 encode_utf8);
      use Map::Tube::Sofia;
 
@@ -88,11 +87,9 @@ EXAMPLE1
      # Route: Люлин (Първи метродиаметър), Западен парк (Първи метродиаметър), Вардар (Първи метродиаметър)
 
 EXAMPLE2
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Map::Tube::Sofia;
 
      # Object.
@@ -108,11 +105,9 @@ EXAMPLE2
      # XML file: .*/sofia-map.xml
 
 EXAMPLE3
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Map::Tube::GraphViz;
      use Map::Tube::GraphViz::Utils qw(node_color_without_label);
      use Map::Tube::Sofia;
@@ -136,11 +131,9 @@ EXAMPLE3
      # -rw-r--r-- 1 skim skim 78091 Jan 25 20:04 Sofia.png
 
 EXAMPLE4
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Encode qw(encode_utf8);
      use Map::Tube::Sofia;
 
@@ -158,11 +151,9 @@ EXAMPLE4
      # Първи метродиаметър
 
 EXAMPLE5
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Encode qw(decode_utf8 encode_utf8);
      use Map::Tube::Sofia;
 
@@ -224,10 +215,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2014-2017 Michal Josef Špaček
+     © 2014-2025 Michal Josef Špaček
      Artistic License
      BSD 2-Clause License
 
 VERSION
-    0.08
+    0.10
 

@@ -1,3 +1,18 @@
+0.07 2025-01-22T11:14:38+01:00
+ - Add test for ok_map_functions().
+ - Change author github username.
+ - Fix Makefile.PL for new version of Perl and no default »use lib '.'«.
+ - Fix stations on multiple lines.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Move bugtracker to github.
+ - Rename examples to better names.
+ - Update Module::Install to 1.21 version.
+ - Update autor name.
+ - Update copyright years.
+ - Update dependency to Map::Tube version 3.62.
+ - Update to Map::Tube 3.41.
+
 0.06 2015-11-05T11:30:11+01:00
  - Add EXAMPLE5 section to doc.
  - Implement station order.

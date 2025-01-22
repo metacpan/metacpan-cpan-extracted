@@ -1,3 +1,16 @@
+0.05 2025-01-21T21:04:36+01:00
+ - Add EXAMPLE5 section to doc.
+ - Fix Makefile.PL for new version of Perl and no default »use lib '.'«.
+ - Fix stations on multiple lines (RT#158041).
+ - Implement station order.
+ - Rename example image to better name.
+ - Rewrite XML map to new version with line IDs.
+ - Rewrite XML map to new version without junctions.
+ - Update .travis.yml to reality.
+ - Update Module::Install to 1.21 version.
+ - Update author name.
+ - Update copyright years.
+
 0.04 2015-10-16T11:32:20+02:00
  - Add 3号线 line.
  - Add lines to XML document.

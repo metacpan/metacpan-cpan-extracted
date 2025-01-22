@@ -158,7 +158,7 @@
 "contextSwitching_ON":"模擬其他使用者",
 "continue":"繼續",
 "createAccount":"建立帳號",
-"csrfToken":"Security token is invalid. Page will refresh automatically. Please try again.",
+"csrfError":"CSRF check failed",
 "current":"目前",
 "currentPwd":"目前的密碼",
 "date":"日期",

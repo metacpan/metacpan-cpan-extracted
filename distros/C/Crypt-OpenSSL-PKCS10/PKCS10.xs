@@ -10,6 +10,7 @@
 #include <openssl/x509v3.h>
 #include <openssl/err.h>
 #include <openssl/rand.h>
+#include <openssl/evp.h>
 
 #include "ppport.h"
 
@@ -44,6 +45,9 @@ typedef struct
 #define CHECK_NEW(p_var, p_size, p_type) \
   if (New(0, p_var, p_size, p_type) == NULL) \
     { PACKAGE_CROAK("unable to alloc buffer"); }
+
+#define FORMAT_ASN1     1
+#define FORMAT_PEM      3
 
 //int add_ext_raw(STACK_OF(X509_REQUEST) *sk, int nid, unsigned char *value, int length);
 //int add_ext(STACK_OF(X509_REQUEST) *sk, int nid, char *value);
@@ -309,6 +313,40 @@ static int build_subject(X509_REQ *req, char *subject, unsigned long chtype, int
 	return 1;
 }
 
+const EVP_MD *fetch_digest(char *hash) {
+	const EVP_MD *md;
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+	md = EVP_MD_fetch(NULL, hash, NULL);
+#else
+	OpenSSL_add_all_digests();
+	md = EVP_get_digestbyname(hash);
+#endif
+	return md;
+}
+
+int get_ec_curve_by_name(char * curve) {
+    int nid = 0;
+	/*
+	 * workaround for the SECG curve names secp192r1 and secp256r1 (which
+	 * are the same as the curves prime192v1 and prime256v1 defined in
+	 * X9.62)
+	*/
+	if (!strcmp(curve, "secp192r1")) {
+		printf("using curve name prime192v1 instead of secp192r1\n");
+		nid = NID_X9_62_prime192v1;
+	} else if (!strcmp(curve, "secp256r1")) {
+		printf("using curve name prime256v1 instead of secp256r1\n");
+		nid = NID_X9_62_prime256v1;
+	} else
+		nid = OBJ_sn2nid(curve);
+		if (nid == 0)
+			nid = EC_curve_nist2nid(curve);
+		if (nid == 0) {
+			croak("unknown curve name (%s)\n", curve);
+	}
+	return nid;
+}
+
 MODULE = Crypt::OpenSSL::PKCS10		PACKAGE = Crypt::OpenSSL::PKCS10
 
 PROTOTYPES: DISABLE
@@ -334,6 +372,8 @@ BOOT:
 	{"NID_netscape_comment", NID_netscape_comment},
 	{"NID_ext_key_usage", NID_ext_key_usage},
 	{"NID_subject_key_identifier", NID_subject_key_identifier},
+	{"FORMAT_ASN1", FORMAT_ASN1},
+	{"FORMAT_PEM", FORMAT_PEM},
 	{Nullch,0}};
 
 	char *name;
@@ -345,16 +385,48 @@ BOOT:
 }
 
 SV*
-new(class, keylen = 1024)
+_new(class, keylen, options )
 	SV	*class
 	int keylen
+	HV *options
 
 	PREINIT:
 	X509_REQ *x;
-	EVP_PKEY *pk;
+	EVP_PKEY *pk = NULL;
     char *classname = SvPVutf8_nolen(class);
+	SV **svp;
+	char *type;
+	char *curve;
+	char *hash;
+	EVP_PKEY_CTX *pkctx;
+	const EVP_MD *md;
 
 	CODE:
+
+	if (options && hv_exists(options, "type", strlen("type"))) {
+		svp = hv_fetch(options, "type", strlen("type"), 0);
+		type = SvPV_nolen(*svp);
+	} else {
+		type = "rsa";
+	}
+
+	if (options && hv_exists(options, "curve", strlen("curve"))) {
+		svp = hv_fetch(options, "curve", strlen("curve"), 0);
+		curve = SvPV_nolen(*svp);
+	} else {
+		curve = "secp384r1";
+	} 
+
+	if (options && hv_exists(options, "hash", strlen("hash"))) {
+		svp = hv_fetch(options, "hash", strlen("hash"), 0);
+		hash = SvPV_nolen(*svp);
+	} else {
+		hash = "SHA256";
+	} 
+
+	md = fetch_digest(hash);
+	if (md == NULL)
+		croak("%s->new: EVP_MD_fetch for %s failed", classname, hash);
 	//CRYPTO_mem_ctrl(CRYPTO_MEM_CHECK_ON);
     if (!RAND_status())
         printf("Warning: generating random key material may take a long time\n"
@@ -363,38 +435,79 @@ new(class, keylen = 1024)
 	if ((x=X509_REQ_new()) == NULL)
 		croak ("%s - can't create req", classname);
 #if OPENSSL_VERSION_NUMBER >= 0x30000000L
-    pk = EVP_RSA_gen(keylen);
+	if (strncmp (type, "rsa", strlen("rsa")) == 0) {
+		pk = EVP_RSA_gen(keylen);
+	} else { 
+		pk = EVP_EC_gen(curve);
+	}
+	if (pk == NULL)
+		croak ("%s: Unable to generate a %s key for %s", classname,
+            type, ((strncmp(type, "rsa", strlen("rsa")) == 0) ? hash : curve) );
 #elif OPENSSL_VERSION_NUMBER <= 0x10000000L
+	if (strncmp (type, "ec", strlen("ec")) == 0)
+		croak("EC unsupported for your version of OpenSSL");
     RSA *rsa;
 	if ((pk=EVP_PKEY_new()) == NULL)
-		croak ("%s - can't create PKEY", classname);
+		croak ("%s - EVP_PKEY_new failed", classname);
 
 	rsa=RSA_generate_key(keylen, RSA_F4, NULL, NULL);
 	if (!EVP_PKEY_assign_RSA(pk,rsa))
-		croak ("%s - EVP_PKEY_assign_RSA", classname);
+		croak ("%s: Unable to generate a %s key for %s", classname,
+            type, ((strncmp(type, "rsa", strlen("rsa")) == 0) ? hash : curve) );
 #else
-    RSA *rsa = RSA_new();
-    BIGNUM *bne = BN_new();
-    if (bne == NULL)
-		croak ("%s - BN_new failed", classname);
+	if (RAND_status() == 0)
+		croak("%s: Insufficient Randomness", classname);
+	if (strncmp (type, "rsa", strlen("rsa")) == 0) {
+		pkctx = EVP_PKEY_CTX_new_id(EVP_PKEY_RSA, NULL);
+		if (EVP_PKEY_keygen_init(pkctx) <= 0)
+			croak ("%s: EVP_PKEY_keygen_int failed", classname);
+		if (EVP_PKEY_CTX_set_rsa_keygen_bits(pkctx, keylen) <= 0)
+			croak ("%s: EVP_PKEY_CTX_set_rsa_keygen_bits failed for keylen: %i", classname, keylen);
+	} else {
+		int nid = get_ec_curve_by_name(curve);
 
-    if (BN_set_word(bne, RSA_F4) != 1)
-		croak ("%s - BN_set_word failed", classname);
-
-	if ((pk=EVP_PKEY_new()) == NULL)
-		croak ("%s - can't create PKEY", classname);
-
-    if (!RSA_generate_key_ex(rsa, keylen, bne, NULL))
-		croak ("%s - RSA_generate_key_ex failed", classname);
-
-	if (!EVP_PKEY_assign_RSA(pk,rsa))
-		croak ("%s - EVP_PKEY_assign_RSA", classname);
+		pkctx = EVP_PKEY_CTX_new_id(EVP_PKEY_EC, NULL);
+		if (pkctx == NULL)
+			croak("%s: EVP_PKEY_CTX_new_id failed", classname);
+		if (EVP_PKEY_keygen_init(pkctx) <= 0)
+			croak("%s: EVP_PKEY_keygen_init failed", classname);
+		if (EVP_PKEY_CTX_set_ec_paramgen_curve_nid(pkctx, nid) <= 0)
+			croak("%s: EVP_PKEY_CTX_set_ec_paramgen_curve_nid failed", classname);
+		if (EVP_PKEY_CTX_set_ec_param_enc(pkctx, OPENSSL_EC_NAMED_CURVE) <= 0)
+			croak("%s: EVP_PKEY_CTX_set_ec_param_enc failed", classname);
+	}
+	if (EVP_PKEY_keygen(pkctx, &pk) <= 0)
+		croak ("%s: Unable to generate a %s key for %s", classname,
+			type, ((strncmp(type, "rsa", strlen("rsa")) == 0) ? hash : curve) );
 #endif
-	X509_REQ_set_pubkey(x,pk);
-	X509_REQ_set_version(x,0L);
-	if (!X509_REQ_sign(x,pk,EVP_sha256()))
-		croak ("%s - X509_REQ_sign failed", classname);
-	
+	if(!X509_REQ_set_version(x,0L))
+		croak("%s: X509_REQ_set_version failed", classname);
+	if (!X509_REQ_set_pubkey(x,pk))
+		croak("%s: X509_REQ_set_pubkey failed", classname);
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+	EVP_MD_CTX *mctx = EVP_MD_CTX_new();
+
+	char def_md[80];
+   
+	if (mctx == NULL)
+		croak ("%s - EVP_MD_CTX_new failed", classname);
+	if (EVP_PKEY_get_default_digest_name(pk, def_md, sizeof(def_md)) == 2
+		&& strcmp(def_md, "UNDEF") == 0) {
+		/* The signing algorithm requires there to be no digest */
+		md = NULL;
+	}
+	EVP_DigestSignInit_ex(mctx, &pkctx, hash, NULL,
+		NULL, pk, NULL);
+			//&& do_pkey_ctx_init(pkctx, sigopts);
+
+	if(!X509_REQ_sign_ctx(x, mctx))
+		croak ("%s - X509_REQ_sign_ctx failed", classname);
+	EVP_MD_CTX_free(mctx);
+#else
+		if (!X509_REQ_sign(x, pk, md))
+			croak ("%s - X509_REQ_sign failed", classname);
+#endif
+
 	RETVAL = make_pkcs10_obj(class, x, pk, NULL, NULL);
   
 	OUTPUT:
@@ -418,10 +531,11 @@ DESTROY(pkcs10)
 	BIO_free(bio_err);*/
 
 SV*
-_new_from_rsa(class, p_rsa, priv)
+_new_from_rsa(class, p_rsa, priv, options)
 	SV	*class
 	SV	*p_rsa
 	SV  *priv
+	HV  *options
 
 	PREINIT:
 	Crypt__OpenSSL__RSA	*rsa;
@@ -431,8 +545,22 @@ _new_from_rsa(class, p_rsa, priv)
 	X509_REQ *x;
 	EVP_PKEY *pk;
 	char *classname = SvPVutf8_nolen(class);
+	const EVP_MD *md;
+	SV **svp;
+	char *hash;
 	
 	CODE:
+
+	if (options && hv_exists(options, "hash", strlen("hash"))) {
+		svp = hv_fetch(options, "hash", strlen("hash"), 0);
+		hash = SvPV_nolen(*svp);
+	} else {
+		hash = "SHA256";
+	} 
+
+	md = fetch_digest(hash);
+	if (md == NULL)
+		croak("%s->sign: fetch_digest() for %s failed", classname, hash);
 
 	// Get the private key and save it in memory
 	keyString = SvPV(priv, keylen);
@@ -453,7 +581,7 @@ _new_from_rsa(class, p_rsa, priv)
 	rsa = (Crypt__OpenSSL__RSA	*) SvIV(SvRV(p_rsa));
 	X509_REQ_set_pubkey(x,pk);
 	X509_REQ_set_version(x,0L);
-	if (!X509_REQ_sign(x,pk,EVP_sha256()))
+	if (!X509_REQ_sign(x, pk, md))
 		croak ("%s - X509_REQ_sign", classname);
 	
 	RETVAL = make_pkcs10_obj(class, x, pk, NULL, &rsa->rsa);
@@ -462,14 +590,17 @@ _new_from_rsa(class, p_rsa, priv)
         RETVAL
 
 int
-sign(pkcs10)
+sign(pkcs10, hash = "SHA256")
 	pkcs10Data *pkcs10;
+	char *hash;
 
 	PREINIT:
 
 	CODE:
-
-	RETVAL = X509_REQ_sign(pkcs10->req,pkcs10->pk,EVP_sha256());
+	const EVP_MD *md = fetch_digest(hash);
+	if (md == NULL)
+		croak("Crypt::OpenSSL::PKCS10->sign: fetch_digest() for %s failed", hash);
+	RETVAL = X509_REQ_sign(pkcs10->req, pkcs10->pk, md);
 	if (!RETVAL)
 		croak ("X509_REQ_sign");
 
@@ -736,9 +867,10 @@ add_ext_final(pkcs10)
 	RETVAL
 
 SV*
-new_from_file(class, filename_SV)
+new_from_file(class, filename_SV, format = FORMAT_PEM)
   SV* class;
   SV* filename_SV;
+  int format;
 
   PREINIT:
   char* filename;
@@ -752,7 +884,11 @@ new_from_file(class, filename_SV)
   if (fp == NULL) {
           croak ("Cannot open file '%s'", filename);
   }
-  req = PEM_read_X509_REQ (fp, NULL, NULL, NULL);
+  if (format == FORMAT_ASN1)
+    req = d2i_X509_REQ_fp (fp, NULL);
+  else 
+    req = PEM_read_X509_REQ (fp, NULL, NULL, NULL);
+
   fclose(fp);
 
   RETVAL = make_pkcs10_obj(class, req, NULL, NULL, NULL);
@@ -797,3 +933,4 @@ accessor(pkcs10)
 
   OUTPUT:
         RETVAL
+

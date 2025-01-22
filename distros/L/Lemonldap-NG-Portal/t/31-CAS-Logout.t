@@ -202,6 +202,63 @@ sub relaySpFromInfo {
     }
 }
 
+sub checkUrlAllowed {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    my ( $issuer, $url, $is_allowed ) = @_;
+    my $title =
+      ( "Test if $url is " . ( $is_allowed ? "" : "not " ) . "allowed" );
+    subtest "$title - 2.0" => sub {
+        my $id = $issuer->login("dwho");
+        ok(
+            $res = $issuer->_get(
+                '/cas/logout',
+                query  => { url => $url, },
+                cookie => "lemonldap=$id",
+                accept => 'text/html',
+            ),
+            'Initiate logout'
+        );
+        if ($is_allowed) {
+            expectCookie($res);
+            ok( $res->[2]->[0] =~ /trspan="back2CasUrl"/, 'CAS message found' );
+            expectXpath( $res, "//form[\@action=\"$url\"]",
+                'Redirect URL found' );
+            count(2);
+        }
+        else {
+            expectPortalError( $res, 109 );
+        }
+    };
+    subtest "$title - 3.0" => sub {
+        my $id = $issuer->login("dwho");
+        ok(
+            $res = $issuer->_get(
+                '/cas/logout',
+                query  => { service => $url },
+                cookie => "lemonldap=$id",
+                accept => 'text/html',
+            ),
+            'Initiate logout'
+        );
+        if ($is_allowed) {
+            expectCookie($res);
+            expectRedirection( $res, $url );
+        }
+        else {
+            expectPortalError( $res, 108 );
+        }
+    };
+}
+
+subtest "Test redirect URL filtering" => sub {
+    ok( $issuer = issuer(), 'Issuer portal' );
+
+    checkUrlAllowed( $issuer, "http://test1.example.com/",  1 );
+    checkUrlAllowed( $issuer, "http://test1.example2.com/", 1 );
+    checkUrlAllowed( $issuer, "http://test1.example3.com/", 0 );
+    checkUrlAllowed( $issuer, "http://attack.com/",         0 );
+};
+
 clean_sessions();
 done_testing();
 
@@ -210,6 +267,7 @@ sub issuer {
             ini => {
                 logLevel                   => $debug,
                 issuerDBCASActivation      => 1,
+                trustedDomains             => 'example3.com *.example2.com',
                 casBackChannelSingleLogout => 0,
                 casAppMetaDataOptions      => {
                     sp1 => {

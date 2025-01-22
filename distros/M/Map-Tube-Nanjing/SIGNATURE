@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.88.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,52 +12,56 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 3643cbaf125317628e48f354634e5ccc6c7a47b5 Changes
-SHA1 882221895a73bad18eb9f16a0ce523a968a932c1 LICENSE.artistic_2
-SHA1 507a10efa92555ddddfbe72be27964d9e3eef80f LICENSE.bsd
-SHA1 8f4b94b0b5ef7565c1f3ee8c9b8eb0f2dda21ec1 MANIFEST
-SHA1 e0a7af625fbbf9b7ef09a165505c53957d79b0cd META.yml
-SHA1 044330d1a8c3f44bdbb45a46d161ab07ac00ebe9 Makefile.PL
-SHA1 e5ea397d52720a0f600c58289afd32033e17e852 Nanjing.pm
-SHA1 87c7f635aeb5881f0e04fb5976cb9fe87069a11e README
-SHA1 8e44c7eab99179f6b3b9c6907d8a4a52383734f5 examples/ex1.pl
-SHA1 e1401d6b001570f52bcb54332020f094bffc8280 examples/ex2.pl
-SHA1 c6afd908ca3cbfe467d424f8507edc55445aaecf examples/ex3.pl
-SHA1 991959d5cac7b35024eb7cdb51cecbf86cb6faf8 examples/ex4.pl
-SHA1 b17bf7761864d79381446d4fdf3df65163c54a55 images/ex3.png
-SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
-SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
-SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
-SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
-SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
-SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
-SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 42de62df31eaf796d8bfd49a11fdc9cff1b50b74 inc/Module/Install/Share.pm
-SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
-SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
-SHA1 86940ec0ccd069fb95deaa98b12ac1cf6d93ffa9 share/nanjing-map.xml
-SHA1 ee2f13eabf10142d160c96cea277e93fad84f7aa t/Map-Tube-Nanjing/01-use.t
-SHA1 e22e9ac6a1bd0ca0a329a7f75c67b5000373ec9e t/Map-Tube-Nanjing/02-version.t
-SHA1 e05d3413a198733125d08958cc8b59b59a620b30 t/Map-Tube-Nanjing/03-map.t
-SHA1 0892f8ee3d598c4ea7b644a52e42fa2aa24e945f t/Map-Tube-Nanjing/04-get_node_by_id.t
-SHA1 0205fe851316051e6e26e3bda2f5e7efd487ed3c t/Map-Tube-Nanjing/05-get_node_by_name.t
-SHA1 95b22dbb25119583d35128be198b6cf43df37461 t/Map-Tube-Nanjing/06-get_shortest_route.t
-SHA1 c756f6ec4067b088c54f891ed207544819b7e1fd t/Map-Tube-Nanjing/07-name.t
-SHA1 dfba495dd3b211a12875def13407fe885b8ab9b7 t/Map-Tube-Nanjing/08-xml.t
-SHA1 21a558273bc155425944b60799f7a9bc24c2df27 xt/Map-Tube-Nanjing/01-pod_coverage.t
-SHA1 f12636a952cfec2e1d47dc022640a9397e3cdcb8 xt/Map-Tube-Nanjing/02-pod.t
+SHA256 e021463a9e04facefd9d23f26feff519cd6550847c3e12c77dbe621a425129ca Changes
+SHA256 e719d80a7394e04689960b0431b59ec426900cdeb006c4b358fe1b2753cf5e01 LICENSE.artistic_2
+SHA256 bdd620b53478fe70c32e397f3230430c299f0a6432617d69d8890f3266bb891b LICENSE.bsd
+SHA256 1f05c6cf0dcfa38744e41f0d7820fd9f470865aeb30cd2dbc3ade8ea82d5f35d MANIFEST
+SHA256 e0fa9a017f5d76643c0df3cc4f8c70b9e8f4c1c88e7e4b94a2d2008fae1a0d90 META.yml
+SHA256 d0040178aa80a3f316254bbe610c795e247c64fc028a2dd303996d43569986ae Makefile.PL
+SHA256 f0b884d066d6b535cdcaffd0d181de187bcbad990568cf4cc628739ca02d5cd2 Nanjing.pm
+SHA256 d1f8f46d1a59074f4d50923e78e1947884667505dbaead1044de1cd94cbe267b README
+SHA256 66af11ede81fa0a69c79447247755e66dffe5a6adfd4497fb866522c8216f55e examples/ex1.pl
+SHA256 c5797ef09bc7c772bf637f87baf52f4c2b62553e043ce48af70f91d487fb2ccd examples/ex2.pl
+SHA256 55ba95e96778a1c8f09dd5e6eb998f281eef0a66141114c61ceede4a18398c22 examples/ex3.pl
+SHA256 1fab495f36c0457ff2f205de4035ee6169f49d8e2e199d3b4b79477cd6662742 examples/ex4.pl
+SHA256 00dfa5cf74c118744932c44ec94e9193326d0367784e75718515d5074f97024f examples/ex5.pl
+SHA256 c520e82fbea30ab1ebd705a21ef9124e6e78726f149970bd1e58b1e5b21e4ea7 images/Nanjing.png
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 b986592700675e11c2c62cb41fa24d9f4d15e077a0d317f372efcaa78d68a1d9 inc/Module/Install/Share.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 26a938ca407499e35b3477d7a11053b439ba4ae8fd3808c8e4389a099c28c3ee share/nanjing-map.xml
+SHA256 9c8c9b877e435d96df962adfd0e2d61628650b26fef46f2008b1fdc58a407318 t/Map-Tube-Nanjing/01-use.t
+SHA256 b672e69e5fe400a14941e31864254c749322c1bc9dda1b05ac5948d47e8bd35a t/Map-Tube-Nanjing/02-version.t
+SHA256 dd126aa858eab0dcd360360fd3ef6c59be97542c199cd97c2d97012ee0aa357c t/Map-Tube-Nanjing/03-map.t
+SHA256 5d1da87b6e82c49659c68bba70990a469337cf158ed593578f9132e6ba78ad3d t/Map-Tube-Nanjing/04-get_node_by_id.t
+SHA256 86a31e417a32ddd03ae85adc32a89204d2a72e38a52ab5a8273f178ef696ea1b t/Map-Tube-Nanjing/05-get_node_by_name.t
+SHA256 8581006052fceb706bf0c463543de2e53181c30318273e80c2eeb78cb790810f t/Map-Tube-Nanjing/06-get_shortest_route.t
+SHA256 d7db54e80d98bd525ef2b0a278127c602e50bf8159c997d9d776e466b81f0d56 t/Map-Tube-Nanjing/07-name.t
+SHA256 677a42a64390bb4a639e590f97d37c541ae68cc616041eb1067d70645e6160a3 t/Map-Tube-Nanjing/08-xml.t
+SHA256 832994a31f79095f27be00370ba792263c40592da3a7b7fa0471646943782a4b xt/Map-Tube-Nanjing/01-pod_coverage.t
+SHA256 cb14617359bc1ea7478cbb6feab76e86ec8fcc9e137c0944692140a34062394f xt/Map-Tube-Nanjing/02-pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJWIMQpAAoJEJe+XXKaIuTliNEIAJmgmmvwqC53lv341XVX4GYp
-fsTj+WS16s/EOyaJpFy22ThRWOyzd1Zpq9PMosSVhprvVjmcdHsp6F7pkRk8j296
-xJXiFqPMCau98Or1p7NMiTwv4DJmT0pazmQC1vlC0ZuMHUE+o9JwCjGGbvnDUq+a
-xhdV5quJ7SgsIlSg3sBqxiVDQyiF3/yBTUc93Ifj23CNLtGTnL27ui/ElL8tNmcR
-6cBFFIS//9qmHbp6Vxufn0uhGynluSEzJjDXsholOwb7/Yk6kA6Vgq4kgz84Rfak
-KCdR15AELgdR3sSvrNE0oGoAwiJT2mFq+TkuyVQV1KcjYWOUKQbfQ6dOR0MVqow=
-=kSAn
+iQGzBAEBAwAdFiEE7CqvgROezncwcOKionze/HtIOPAFAmeP/dUACgkQonze/HtI
+OPDc1gv/f5j6UZGlRSdqsnyr8lZ5s61J8PjYI4x/LfSpYa06PxA1wPbeiex0ED6X
+tUQyyGHNVvybswuSD4eIaJl8kXAZ6jT1GFJ86e5gJGt5w/CY4QuILgkU9R+TDJl4
+ReY+Nhb0uxrm7YiyhxjGD7moOcYZaiQV2mi/OF3FlCPrykjcKnmCAO4dmJC5TKnH
+FlWdjJ7xZoeGps5FhurmSPonagbMgOW6e8DqMVD54RoPEACLv2R7UD9rtQBK/ux+
+x5wcmKY/HWqd0YqfGAYPtshwTZodRI7bCmcTWo7mkY0G6+qivmLIRZsIJgzz3N1m
+/Ge+O2GT1S0DAxNwtSfFBRlElhO5CMmAycQtH8CA54rXNTy4KAi/hSahgRSUueLs
+Js1V9W9naP4JCMJGJb1tqz5VodbIR5DcTIK1giR8vBaN6zm1BkMGA6L4yHAbqeRv
+6uMTgtlvThwB3iA31gEXxSA85CaIIo72vjmitvKXPTE2lBRdolmxPCHtixa6XV1N
+9SNJGC+Y
+=XRtG
 -----END PGP SIGNATURE-----

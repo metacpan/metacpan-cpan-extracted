@@ -30,9 +30,9 @@ $res = $ua->get(q(ftp://ftp.cpan.org/pub/CPAN/README));
 ok($res->is_success, q(FTP is_success()));
 like($res->content, qr(^CPAN:\s+Comprehensive\s+Perl\s+Archive\s+Network\b)x, q(FTP content() start));
 
-$res = $ua->get(q(gopher://gopher.docfile.org/1/world/monitoring/uptime));
+$res = $ua->get(q(gopher://gopher.floodgap.com/1/world));
 ok($res->is_success, q(gopher is_success()));
-like($res->content, qr(\bUptime\s+known\s+gopher\s+servers\b)x, q(gopher content() start));
+like($res->content, qr(\b1Floodgap\s+Systems\b)x, q(gopher content() start));
 
 # known to have a long redir chain
 $ua->max_redirect(1);

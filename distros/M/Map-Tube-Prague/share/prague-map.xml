@@ -6,6 +6,11 @@
     <line id="C" name="Linka C" color="red"/>
   </lines>
   <stations>
+    <!-- Stations on multiple lines -->
+    <station id="A09" name="Můstek" line="A:9,B:13" link="A08,A10,B12,B14"/>
+    <station id="B15" name="Florenc" line="B:15,C:8" link="B14,B16,C07,C09"/>
+    <station id="A10" name="Muzeum" line="A:10,C:10" link="A09,A11,C09,C11"/>
+
     <!-- https://cs.wikipedia.org/wiki/A_(linka_metra_v_Praze) -->
     <station id="A01" name="Nemocnice Motol" line="A:1" link="A02"/>
     <station id="A02" name="Petřiny" line="A:2" link="A01,A03"/>
@@ -15,8 +20,8 @@
     <station id="A06" name="Hradčanská" line="A:6" link="A05,A07"/>
     <station id="A07" name="Malostranská" line="A:7" link="A06,A08"/>
     <station id="A08" name="Staroměstská" line="A:8" link="A07,A09"/>
-    <station id="A09" name="Můstek" line="A:9" link="A08,A10" other_link="Tunnel:B13"/>
-    <station id="A10" name="Muzeum" line="A:10" link="A09,A11" other_link="Tunnel:C10"/>
+    <!-- Můstek -->
+    <!-- Muzeum -->
     <station id="A11" name="Náměstí Míru" line="A:11" link="A10,A12"/>
     <station id="A12" name="Jiřího z Poděbrad" line="A:12" link="A11,A13"/>
     <station id="A13" name="Flora" line="A:13" link="A12,A14"/>
@@ -37,10 +42,10 @@
     <station id="B09" name="Smíchovské nádraží" line="B:9" link="B08,B10"/>
     <station id="B10" name="Anděl" line="B:10" link="B09,B11"/>
     <station id="B11" name="Karlovo náměstí" line="B:11" link="B10,B12"/>
-    <station id="B12" name="Národní třída" line="B:12" link="B11,B13"/>
-    <station id="B13" name="Můstek" line="B:13" link="B12,B14" other_link="Tunnel:A05"/>
-    <station id="B14" name="Náměstí Republiky" line="B:14" link="B13,B15"/>
-    <station id="B15" name="Florenc" line="B:15" link="B14,B16" other_link="Tunnel:C08"/>
+    <station id="B12" name="Národní třída" line="B:12" link="A09,B11"/>
+    <!-- Můstek -->
+    <station id="B14" name="Náměstí Republiky" line="B:14" link="A09,B15"/>
+    <!-- Florenc -->
     <station id="B16" name="Křižíkova" line="B:16" link="B15,B17"/>
     <station id="B17" name="Invalidovna" line="B:17" link="B16,B18"/>
     <station id="B18" name="Palmovka" line="B:18" link="B17,B19"/>
@@ -58,11 +63,11 @@
     <station id="C04" name="Ládví" line="C:4" link="C03,C05"/>
     <station id="C05" name="Kobylisy" line="C:5" link="C04,C06"/>
     <station id="C06" name="Nádraží Holešovice" line="C:6" link="C05,C07"/>
-    <station id="C07" name="Vltavská" line="C:7" link="C06,C08"/>
-    <station id="C08" name="Florenc" line="C:8" link="C07,C09" other_link="Tunnel:B15"/>
-    <station id="C09" name="Hlavní nádraží" line="C:9" link="C08,C10"/>
-    <station id="C10" name="Muzeum" line="C:10" link="C09,C11" other_link="Tunnel:A06"/>
-    <station id="C11" name="I. P. Pavlova" line="C:11" link="C10,C12"/>
+    <station id="C07" name="Vltavská" line="C:7" link="B15,C06"/>
+    <!-- Florenc -->
+    <station id="C09" name="Hlavní nádraží" line="C:9" link="A10,B15"/>
+    <!-- Muzeum -->
+    <station id="C11" name="I. P. Pavlova" line="C:11" link="A10,C12"/>
     <station id="C12" name="Vyšehrad" line="C:12" link="C11,C13"/>
     <station id="C13" name="Pražského povstání" line="C:13" link="C12,C14"/>
     <station id="C14" name="Pankrác" line="C:14" link="C13,C15"/>

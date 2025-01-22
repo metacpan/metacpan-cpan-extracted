@@ -9,6 +9,8 @@
     <line id="M5" name="Фрунзенско-Приморская линия" color="magenta"/>
   </lines>
   <stations>
+    <!-- Stations on multiple lines -->
+    <station id="M1-13" name="Технологический институт" line="M1:13,M2:11" link="M1-12,M1-14,M2-10,M2-12"/>
 
     <!-- https://ru.wikipedia.org/wiki/Кировско-Выборгская_линия -->
     <station id="M1-01" name="Девяткино" line="M1:1" link="M1-02"/>
@@ -23,7 +25,7 @@
     <station id="M1-10" name="Площадь Восстания" line="M1:10" link="M1-09,M1-11" other_link="Tunnel:M3-04"/>
     <station id="M1-11" name="Владимирская" line="M1:11" link="M1-10,M1-12" other_link="Tunnel:M4-02"/>
     <station id="M1-12" name="Пушкинская" line="M1:12" link="M1-11,M1-13" other_link="Tunnel:M5-08"/>
-    <station id="M1-13" name="Технологический институт" line="M1:13" link="M1-12,M1-14" other_link="Tunnel:M2-11"/>
+    <!-- Технологический институт -->
     <station id="M1-14" name="Балтийская" line="M1:14" link="M1-13,M1-15"/>
     <station id="M1-15" name="Нарвская" line="M1:15" link="M1-14,M1-16"/>
     <station id="M1-16" name="Кировский завод" line="M1:16" link="M1-15,M1-17"/>
@@ -41,9 +43,9 @@
     <station id="M2-07" name="Петроградская" line="M2:7" link="M2-06,M2-08"/>
     <station id="M2-08" name="Горьковская" line="M2:8" link="M2-07,M2-09"/>
     <station id="M2-09" name="Невский проспект" line="M2:9" link="M2-08,M2-10" other_link="Tunnel:M3-03"/>
-    <station id="M2-10" name="Сенная площадь" line="M2:10" link="M2-09,M2-11" other_link="Tunnel:M4-01,Tunnel:M5-07"/>
-    <station id="M2-11" name="Технологический институт" line="M2:11" link="M2-10,M2-12" other_link="Tunnel:M1-13"/>
-    <station id="M2-12" name="Фрунзенская" line="M2:12" link="M2-11,M2-13"/>
+    <station id="M2-10" name="Сенная площадь" line="M2:10" link="M1-13,M2-09" other_link="Tunnel:M4-01,Tunnel:M5-07"/>
+    <!-- Технологический институт -->
+    <station id="M2-12" name="Фрунзенская" line="M2:12" link="M1-13,M2-13"/>
     <station id="M2-13" name="Московские ворота" line="M2:13" link="M2-12,M2-14"/>
     <station id="M2-14" name="Электросила" line="M2:14" link="M2-13,M2-15"/>
     <station id="M2-15" name="Парк Победы" line="M2:15" link="M2-14,M2-16"/>

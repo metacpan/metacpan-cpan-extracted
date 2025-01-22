@@ -158,7 +158,7 @@
 "contextSwitching_ON":"התחזות למשתמש אחר",
 "continue":"להמשיך",
 "createAccount":"יצירת חשבון",
-"csrfToken":"אסימון האבטחה שגויה. העמוד יתרענן אוטומטית. נא לנסות שוב.",
+"csrfError":"CSRF check failed",
 "current":"נוכחית",
 "currentPwd":"סיסמה נוכחית",
 "date":"תאריך",

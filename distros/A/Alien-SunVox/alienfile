@@ -48,6 +48,7 @@ share {
     require Path::Tiny; Path::Tiny->import;
 
     before build => sub {
+        chdir 'sunvox_lib' if  path('sunvox_lib')->is_dir;
         my $path = path( $os, "lib_$arch" );
         die "SunVox library not available for $os-$arch" unless $path->is_dir;
         my $libdir = path( 'dynamic' )->mkdir;

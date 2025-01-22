@@ -4,7 +4,7 @@
       "Grant Street Group <developers@grantstreet.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -51,7 +51,7 @@
    "provides" : {
       "DBIx::ParseError::MySQL" : {
          "file" : "lib/DBIx/ParseError/MySQL.pm",
-         "version" : "v1.0.3"
+         "version" : "v1.0.4"
       }
    },
    "release_status" : "stable",
@@ -65,8 +65,8 @@
          "web" : "https://github.com/GrantStreetGroup/DBIx-ParseError-MySQL"
       }
    },
-   "version" : "v1.0.3",
-   "x_generated_by_perl" : "v5.20.1",
+   "version" : "v1.0.4",
+   "x_generated_by_perl" : "v5.36.0",
    "x_serialization_backend" : "JSON::XS version 4.03",
    "x_spdx_expression" : "Artistic-2.0",
    "x_static_install" : 1

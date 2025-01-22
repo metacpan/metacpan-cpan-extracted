@@ -17,8 +17,7 @@ SKIP: {
     use_ok('Lemonldap::NG::Common::FormEncode');
 
     my $res;
-    my $client = LLNG::Manager::Test->new(
-        {
+    my $client = LLNG::Manager::Test->new( {
             ini => {
                 logLevel               => 'error',
                 authentication         => 'Demo',
@@ -74,9 +73,13 @@ SKIP: {
     # JS query
     ok(
         $res = $client->_post(
-            '/2fregisters/totp/getkey', IO::String->new(''),
+            '/2fregisters/totp/getkey',
+            IO::String->new(''),
             cookie => "lemonldap=$id",
             length => 0,
+            custom => {
+                HTTP_X_CSRF_CHECK => 1,
+            },
         ),
         'Get new key'
     );
@@ -102,6 +105,9 @@ SKIP: {
             IO::String->new($s),
             length => length($s),
             cookie => "lemonldap=$id",
+            custom => {
+                HTTP_X_CSRF_CHECK => 1,
+            },
         ),
         'Post code'
     );
@@ -130,7 +136,8 @@ SKIP: {
         ),
         'Auth query'
     );
-    ( $host, $url, $query ) = expectForm( $res, undef, '/totp2fcheck', 'token' );
+    ( $host, $url, $query ) =
+      expectForm( $res, undef, '/totp2fcheck', 'token' );
     $query .= '&sf=totp';
     ok(
         $res = $client->_post(
@@ -199,9 +206,13 @@ SKIP: {
     # JS query
     ok(
         $res = $client->_post(
-            '/2fregisters/totp/getkey', IO::String->new(''),
+            '/2fregisters/totp/getkey',
+            IO::String->new(''),
             cookie => "lemonldap=$id",
             length => 0,
+            custom => {
+                HTTP_X_CSRF_CHECK => 1,
+            },
         ),
         'Get new key'
     );
@@ -218,6 +229,9 @@ SKIP: {
             IO::String->new("epoch=1234567890"),
             length => 16,
             cookie => "lemonldap=$id",
+            custom => {
+                HTTP_X_CSRF_CHECK => 1,
+            },
         ),
         'Delete TOTP query'
     );
@@ -238,6 +252,9 @@ SKIP: {
             IO::String->new($s),
             length => length($s),
             cookie => "lemonldap=$id",
+            custom => {
+                HTTP_X_CSRF_CHECK => 1,
+            },
         ),
         'Post code'
     );

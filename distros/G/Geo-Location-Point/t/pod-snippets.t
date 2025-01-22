@@ -1,22 +1,14 @@
-#!perl -wT
+#!perl -w
 
 use strict;
 use warnings;
-use File::Spec;
+
+use Test::DescribeMe qw(author);
 use Test::Most;
+use Test::Needs 'Test::Pod::Snippets';
 
-if($ENV{AUTHOR_TESTING}) {
-	eval 'use Test::Pod::Snippets';
+my @modules = qw/ Geo::Location::Point /;
+Test::Pod::Snippets->import();
+Test::Pod::Snippets->new()->runtest(module => $_, testgroup => 1) for @modules;
 
-	if($@) {
-		plan(skip_all => 'Test::Pod::Snippets required for testing POD code snippets');
-	} else {
-		my @modules = qw/ Geo::Location::Point /;
-
-		Test::Pod::Snippets->new()->runtest(module => $_, testgroup => 1) for @modules;
-
-		done_testing();
-	}
-} else {
-	plan(skip_all => 'Author tests not required for installation');
-}
+done_testing();

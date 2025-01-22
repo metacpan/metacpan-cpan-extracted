@@ -32,7 +32,7 @@ no_index:
 provides:
   Alien::SunVox:
     file: lib/Alien/SunVox.pm
-    version: '0.01'
+    version: '0.03'
 requires:
   Alien::Base: '1.00'
   perl: '5.006'
@@ -40,15 +40,15 @@ resources:
   bugtracker: https://github.com/jbarrett/Alien-SunVox/issues
   homepage: https://github.com/jbarrett/Alien-SunVox
   repository: https://github.com/jbarrett/Alien-SunVox.git
-version: '0.01'
+version: '0.03'
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
   requires:
     share:
       Archive::Zip: '0'
+      HTML::LinkExtor: '0'
       HTTP::Tiny: '0.044'
       IO::Socket::SSL: '1.56'
-      Mojo::DOM58: '1.00'
       Mozilla::CA: '0'
       Net::SSLeay: '1.49'
       Path::Tiny: '0'

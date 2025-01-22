@@ -213,6 +213,7 @@ ok(
 $payload = expectJSON($res);
 like( $payload->{scope}, qr/\bread\b/,   "Scope read found" );
 like( $payload->{scope}, qr/\balways\b/, "Rule-enforced scope found" );
+like( $payload->{scope}, qr/\bcc_hooked\b/, "Hook-enforced scope found" );
 is( $token_res_scope, $payload->{scope},
     "Token response scope match token scope" );
 

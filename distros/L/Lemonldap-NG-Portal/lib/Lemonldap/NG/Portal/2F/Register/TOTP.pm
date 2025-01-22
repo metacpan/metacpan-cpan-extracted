@@ -43,6 +43,9 @@ sub verify {
     my ( $self, $req ) = @_;
     my $user = $req->userData->{ $self->conf->{whatToTrace} };
 
+    return $self->failResponse( $req, 'csrfError', 400 )
+      unless $self->checkCsrf($req);
+
     # Get form token
     my $token = $req->param('token');
     unless ($token) {
@@ -112,6 +115,9 @@ sub getkey {
     my ( $self, $req ) = @_;
     my $user = $req->userData->{ $self->conf->{whatToTrace} };
     my ( $nk, $secret, $issuer ) = ( 0, '' );
+
+    return $self->failResponse( $req, 'csrfError', 400 )
+      unless $self->checkCsrf($req);
 
     $secret = $self->newSecret;
     $self->logger->debug( $self->prefix . "2f: generate new secret ($secret)" );

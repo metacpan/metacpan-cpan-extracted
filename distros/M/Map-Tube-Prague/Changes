@@ -1,3 +1,10 @@
+0.16 2025-01-22T09:15:33+01:00
+ - Fix stations on multiple lines.
+ - Rename and regen image in doc.
+ - Rename example files to better names.
+ - Update Module::Install to 1.21 version.
+ - Update copyright years.
+
 0.15 2020-08-19T18:07:59+02:00
  - Fix use lib in Makefile.PL.
  - Update author github username.

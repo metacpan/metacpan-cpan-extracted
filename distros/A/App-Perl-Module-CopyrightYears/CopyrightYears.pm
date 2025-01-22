@@ -12,7 +12,7 @@ use Pod::CopyrightYears;
 use Perl6::Slurp qw(slurp);
 use String::UpdateYears qw(update_years);
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Constructor.
 sub new {
@@ -39,7 +39,7 @@ sub run {
 		's' => 'LICENSE AND COPYRIGHT',
 		'y' => undef,
 	};
-	if (! getopts('dhy:', $self->{'_opts'})
+	if (! getopts('dhs:y:', $self->{'_opts'})
 		|| $self->{'_opts'}->{'h'}) {
 
 		print STDERR "Usage: $0 [-d] [-h] [-s section(s)] [-y last_year] [--version]\n";
@@ -71,23 +71,25 @@ sub run {
 	}
 
 	# Change copyright years in LICENSE file.
-	my ($license) = $self->_files('.', 'LICENSE');
-	if (defined $license && -r $license) {
-		my @license = slurp($license);
-		my $opts_hr = {
-			'prefix_glob' => '.*\(c\)\s+',
-		};
-		my $update_file = 0;
-		foreach (my $i = 0; $i < @license; $i++) {
-			my $updated = update_years($license[$i], $opts_hr,
-				$self->{'_opts'}->{'y'});
-			if ($updated) {
-				$license[$i] = $updated;
-				$update_file = 1;
+	my @licenses = $self->_files('.', 'LICENSE*');
+	foreach my $license (@licenses) {
+		if (defined $license && -r $license) {
+			my @license = slurp($license);
+			my $opts_hr = {
+				'prefix_glob' => '.*\(c\)\s+',
+			};
+			my $update_file = 0;
+			foreach (my $i = 0; $i < @license; $i++) {
+				my $updated = update_years($license[$i], $opts_hr,
+					$self->{'_opts'}->{'y'});
+				if ($updated) {
+					$license[$i] = $updated;
+					$update_file = 1;
+				}
 			}
-		}
-		if ($update_file) {
-			barf($license, (join '', @license));
+			if ($update_file) {
+				barf($license, (join '', @license));
+			}
 		}
 	}
 
@@ -230,12 +232,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2023 Michal Josef Špaček
+© 2023-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

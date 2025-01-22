@@ -19,9 +19,9 @@ $d->count_in(1);
 
 for my $i (1 .. 4) {
     $d->set_bpm($bpm);
-    $d->metronome44swing;
+    $d->metronome4($d->bars, $d->ride2, $d->quarter, 67);
     $d->set_bpm($bpm * $lengths->{thn});
-    $d->metronome44swing;
+    $d->metronome4($d->bars, $d->ride2, $d->quarter, 67);
 }
 
 $d->write;

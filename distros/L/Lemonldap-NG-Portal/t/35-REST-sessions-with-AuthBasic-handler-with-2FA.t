@@ -78,9 +78,13 @@ SKIP: {
         # JS query
         ok(
             $res = $p->_post(
-                '/2fregisters/totp/getkey', IO::String->new(''),
+                '/2fregisters/totp/getkey',
+                IO::String->new(''),
                 cookie => "lemonldap=$id",
                 length => 0,
+                custom => {
+                    HTTP_X_CSRF_CHECK => 1,
+                },
             ),
             'Get new key'
         );
@@ -105,6 +109,9 @@ SKIP: {
                 IO::String->new($s),
                 length => length($s),
                 cookie => "lemonldap=$id",
+                custom => {
+                    HTTP_X_CSRF_CHECK => 1,
+                },
             ),
             'Post code'
         );
@@ -112,22 +119,22 @@ SKIP: {
         ok( not($@), 'Content is JSON' )
           or explain( $res->[2]->[0], 'JSON content' );
         ok( $res->{result} == 1, 'Key is registered' );
-    ok( $res = $p->_get( '/', accept => 'text/html' ), 'Get Menu', );
-    ( $host, $url, $query ) =
-      expectForm( $res, '#', undef, 'user', 'password' );
+        ok( $res = $p->_get( '/', accept => 'text/html' ), 'Get Menu', );
+        ( $host, $url, $query ) =
+          expectForm( $res, '#', undef, 'user', 'password' );
 
-    $query =~ s/user=/user=dwho/;
-    $query =~ s/password=/password=dwho/;
-    ok(
-        $res = $p->_post(
-            '/',
-            IO::String->new($query),
-            length => length($query),
-            accept => 'text/html',
-        ),
-        'Auth query'
-    );
-    ( $host, $url, $query ) = expectForm( $res, undef, '/totp2fcheck' );
+        $query =~ s/user=/user=dwho/;
+        $query =~ s/password=/password=dwho/;
+        ok(
+            $res = $p->_post(
+                '/',
+                IO::String->new($query),
+                length => length($query),
+                accept => 'text/html',
+            ),
+            'Auth query'
+        );
+        ( $host, $url, $query ) = expectForm( $res, undef, '/totp2fcheck' );
 
         ok(
             $res = handler(
@@ -160,12 +167,11 @@ SKIP: {
             ),
             'AuthBasic request'
         );
-        ok( $res->[0] == 401, "Authentication rejected");
+        ok( $res->[0] == 401, "Authentication rejected" );
     }
     ok( $subtest == 1, 'REST requests were done by handler' );
 
-
-    $subtest=0;
+    $subtest = 0;
     foreach my $user (qw(dwho)) {
         ok(
             $res = handler(
@@ -198,8 +204,8 @@ SKIP: {
             ),
             'New AuthBasic request'
         );
-        ok( $subtest == 1, 'Handler used its local cache' );
-        ok( $res->[0] == 401, 'Authentication rejected a second time');
+        ok( $subtest == 1,    'Handler used its local cache' );
+        ok( $res->[0] == 401, 'Authentication rejected a second time' );
     }
 
     foreach my $user (qw(rtyler)) {

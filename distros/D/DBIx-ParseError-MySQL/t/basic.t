@@ -43,6 +43,7 @@ our %ERRORS = (
         'MySQL client ran out of memory',
         "Can't read record in system table",
         'File name is too long',
+        'Query execution was interrupted, maximum statement execution time exceeded',
     ],
 );
 

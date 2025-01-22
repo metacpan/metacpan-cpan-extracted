@@ -3,14 +3,17 @@
 # but updated with information from Transport Canada AIM.
 # These changes may cause the module to fail with European data.
 # Copyright (c) 2025 Peter Carter
-# Version	Date	  Description
-# -------    ----------   --------------------------------------
-#  1.00      2025-01-03   First version
-#  1.01      2025-01-12   Fixed issue when decoding 11th, 12th,
-#                         and 13th (they were displayed as 11st,
-#                         12nd, and 13rd)
-#  1.02      2025-01-13   Fixed two issues: error code display
-#                         and vicinity (VC) phenomena display
+# Version     Date      Description
+# -------  ----------   --------------------------------------
+#  1.00    2025-01-03   First version
+#  1.01    2025-01-12   Fixed issue when decoding 11th, 12th,
+#                       and 13th (they were displayed as 11st,
+#                       12nd, and 13rd).
+#  1.02    2025-01-13   Fixed two issues: error code display
+#                       and vicinity (VC) phenomena display.
+#  1.03    2025-01-21   Fixed an issue with decoding certain RVR
+#                       data and resolved the errors generated in
+#                       the Apache log when used by a CGI script.
 
 package Geo::METARTAF;
 
@@ -18,7 +21,7 @@ use 5.005;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 my %err = (
    '0' => "",
@@ -195,6 +198,8 @@ sub decode
 	my $self = shift;
 	my $l = uc shift;
 
+   $self->{amendedOrCorrected} = '';
+
 	$l =~ s/=$//;
 
    unless (length $l > 15)  {
@@ -210,10 +215,10 @@ sub decode
 	my $t = shift @tok;
 	if ($t eq 'TAF') {
 		$self->{taf} = 1;
-      $report_type = $t;
+      $self->{report} = $t;
 	} elsif ($t eq 'METAR' || $t eq 'SPECI') {
 		$self->{taf} = 0;
-      $report_type = $t;
+      $self->{report} = $t;
 	} else {
 	   $self->{error_code} = 4;
 		return;
@@ -276,7 +281,7 @@ sub decode
    my $ceiling = 100000;
 
 	my @section = (
-	   $self->_section('HEAD', $report_type, $self->{icao}, $self->{day}, $self->{time}, $self->{amendedOrCorrected})
+	   $self->_section('HEAD', $self->{report}, $self->{icao}, $self->{day}, $self->{time}, $self->{amendedOrCorrected})
 	);
 	
 	push @section, $self->_section('VALID', $self->{valid_from_day}, $self->{valid_from_hour}, $self->{valid_to_day}, $self->{valid_to_hour}) if $self->{valid_from_day};
@@ -448,23 +453,23 @@ sub decode
 			
 		# Visibility group in miles (either in miles or under a mile)
 		} elsif (my ($lt, $mvisibility) = $t =~ m!^([MP])?(\d+(:?/\d)?)SM$!) {
-			$mvisibility = 'Less than ' . $mvisibility if $lt eq 'M';
-         $mvisibility = 'Greater than ' . $mvisibility if $lt eq 'P';
+			$mvisibility = 'Less than ' . $mvisibility if (defined($lt) && $lt eq 'M');
+         $mvisibility = 'Greater than ' . $mvisibility if (defined($lt) && $lt eq 'P');
 			$self->{visibility_dist} ||= $mvisibility;
 			$self->{visibility_units} ||= 'Statute Miles';
          my $units = 'miles';
-         $units = 'mile' if ($mvisibility == 1 || $mvisibility =~ /M|\//);
+         $units = 'mile' if ($mvisibility =~ /M|\// || $mvisibility =~ /^1$/);
 			push @section, $self->_section('VISIBILITY', $mvisibility, $units);
 			
 		# Runway Visual Range
-		} elsif (my ($rw, $rlt, $range, $vlt, $var, $runit, $tend) = $t =~ m!^R(\d\d[LRC]?)/([MP])?(\d\d\d\d)(?:([VMP])(\d\d\d\d))?(?:(FT)/?)?([UND])?$!) {
+		} elsif (my ($rw, $rlt, $range, $vlt, $var, $runit, $tend) = $t =~ m!^R(\d\d[LRC]?)/([MP])?(\d\d\d\d)(?:([VMP]+)(\d\d\d\d))?(?:(FT)/?)?([UND])?$!) {
 			$runit = 'm' unless $runit;
 			$runit = lc $runit;
          $runit = 'feet' if $runit eq 'ft';
 			$range = "<$range" if $rlt && $rlt eq 'M';
 			$range = ">$range" if $rlt && $rlt eq 'P';
-			$var = "<$var" if $vlt && $vlt eq 'M';
-			$var = ">$var" if $vlt && $vlt eq 'P';
+			$var = "<$var" if $vlt && $vlt =~ /M/;
+			$var = ">$var" if $vlt && $vlt =~ /P/;
 			push @section, $self->_section('RVR', $rw, $range, $var, $runit, $tend);
 		
 		# Weather
@@ -472,12 +477,15 @@ sub decode
       # hyphen and an en dash.
 		} elsif (my ($deg, $w) = $t =~ /^(−|-|\+|VC)?((?:SH)?\S{0,4})$/) {
          # Replace +FC (tornado) with module specific 'ZZ' code
-         if ("$deg$w" eq '+FC')  {
+         if (defined($deg) && "$deg$w" eq '+FC')  {
             $deg = '';
             $w = 'ZZ';
          } elsif ($w eq '+FC')  {
             $w = 'ZZ';
          }
+         # Differentiate between VC in TAF and METAR/SPECI; use VT for TAF
+         $deg = 'VT' if (defined($deg) && $deg eq 'VC' && $self->{taf});
+
 			push @section, $self->_section('WEATHER', $deg, $w =~ /([A-Z][A-Z])/g);
 
       # Sky conditions
@@ -604,7 +612,7 @@ sub as_string
 {
 	my $self = shift;
 	my $out = "~Wind Conditions: ";
-   if ($self->[0] == 0 && $self->[1] == 0)  {
+   if ($self->[0] ne 'VRB' && $self->[0] == 0 && $self->[1] == 0)  {
       $out .= 'Calm';
    }
    else  {
@@ -729,7 +737,8 @@ my %wt = (
 	'+'  => "Heavy",
    '−'  => "Light",
    '-'  => "Light",
-   'VC' => "",
+   'VC' => "within 5 SM of the aerodrome (but not at the aerodrome)",
+   'VT' => "within 5-10 NM of the aerodrome (but not at the aerodrome)",
 
 	MI => "Shallow",
 	PR => "Partial",
@@ -776,6 +785,7 @@ sub as_string
 {
 	my $self = shift;
 	my @out;
+   my $report_vic = '';
 
 	my ($vic, $shower);
 	my @in;
@@ -786,15 +796,8 @@ sub as_string
 
 		if (!defined $t) {
 			next;
-		} elsif ($t eq 'VC') {
-         # VC is within 5-10 NM of an aerodrome, but not at the aerodrome, in a TAF
-         if ($report_type eq 'TAF')  {
-            $wt{'VC'} = 'within 5-10 NM of the aerodrome (but not at the aerodrome)';
-         }
-         # But in a METAR/SPECI, it is within 5 SM of an aerodrome (but not at the aerodrome)
-         else  {
-            $wt{'VC'} = 'within 5 SM of the aerodrome (but not at the aerodrome)';
-         }
+		} elsif ($t eq 'VC' || $t eq 'VT') {
+         $report_vic = $t;
 			$vic++;
 			next;
 		} elsif ($t eq 'SH') {
@@ -820,7 +823,7 @@ sub as_string
 		$shower = 0;
 		push @out, $wt{'SH'};
 	}
-	push @out, $wt{'VC'} if $vic;
+	push @out, $wt{$report_vic} if $vic;
 
 	return "~Weather Phenomena: " . join ' ', @out;
 }

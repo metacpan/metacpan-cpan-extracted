@@ -21,11 +21,11 @@ Net::DAVTalk - Interface to talk to DAV servers
 
 =head1 VERSION
 
-Version 0.22
+Version 0.23
 
 =cut
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 =head1 SYNOPSIS
 
@@ -86,6 +86,8 @@ Options:
 
     headers: a hashref of additional headers to add to every request
 
+    SSL_options: a hashref of SSL options to pass down to the default
+    user agent
 =cut
 
 # General methods
@@ -141,6 +143,7 @@ sub ua {
   else {
     $Self->{ua} ||= HTTP::Tiny->new(
       agent => "Net-DAVTalk/$VERSION",
+      SSL_options => $Self->{SSL_options},
     );
   }
   return $Self->{ua};

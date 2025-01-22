@@ -3,12 +3,8 @@
 use strict;
 use warnings;
 
-eval 'use Test::Compile';
+use Test::Needs 'Test::Compile';
 
-if($@) {
-	plan(skip_all => 'Test::Compile needed to verify module compiles');
-} else {
-	my $test = Test::Compile->new();
-	$test->all_files_ok();
-	$test->done_testing();
-}
+my $test = Test::Compile->new();
+$test->all_files_ok();
+$test->done_testing();

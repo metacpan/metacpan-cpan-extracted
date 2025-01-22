@@ -220,24 +220,9 @@ SKIP: {
             cookie => "lemonldap=$id",
         );
         my $json = expectBadRequest($res);
-        ok( $res->[2]->[0] =~ 'csrfToken',
+        ok( $res->[2]->[0] =~ 'csrfError',
             "Deletion expects valid CSRF token" );
-    	count(1);
-    }
-
-    {
-        my $delete_query =
-          buildForm( { epoch => $epoch, csrf_token => "1234566" } );
-        $res = $client->_post(
-            "/2fregisters/yubikey/delete",
-            $delete_query,
-            length => length($delete_query),
-            cookie => "lemonldap=$id",
-        );
-        my $json = expectBadRequest($res);
-        ok( $res->[2]->[0] =~ 'csrfToken',
-            "Deletion expects valid CSRF token" );
-    	count(1);
+        count(1);
     }
 
     # Deletion
@@ -246,13 +231,16 @@ SKIP: {
         cookie => "lemonldap=$id",
         accept => 'text/html',
     );
-    my $delete_query = buildForm( { epoch => $epoch, csrf_token => getJsVars($res)->{csrf_token} } );
+    my $delete_query = buildForm( { epoch => $epoch } );
     ok(
         $res = $client->_post(
             "/2fregisters/yubikey/delete",
-			$delete_query,
-			length => length($delete_query),
+            $delete_query,
+            length => length($delete_query),
             cookie => "lemonldap=$id",
+            custom => {
+                HTTP_X_CSRF_CHECK => 1,
+            },
         ),
         'Post deletion'
     );

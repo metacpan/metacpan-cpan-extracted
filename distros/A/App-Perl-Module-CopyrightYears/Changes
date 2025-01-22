@@ -1,3 +1,9 @@
+0.05 2025-01-21T18:26:35+01:00
+ - Add test.
+ - Add support for all files with LICENSE prefix.
+ - Fix parsing of -s option.
+ - Update copyright years.
+
 0.04 2023-12-04T16:54:47+01:00
  - Add Pod::CopyrightYears debug support.
  - Rewrite debug mode to simple print.

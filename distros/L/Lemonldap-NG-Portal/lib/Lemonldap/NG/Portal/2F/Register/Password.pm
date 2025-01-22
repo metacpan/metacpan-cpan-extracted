@@ -58,6 +58,9 @@ sub verify {
     my ( $self, $req ) = @_;
     my $user = $req->userData->{ $self->conf->{whatToTrace} };
 
+    return $self->failResponse( $req, 'csrfError', 400 )
+      unless $self->checkCsrf($req);
+
     # Check Password
     my $password       = $req->param('password');
     my $passwordverify = $req->param('passwordverify');

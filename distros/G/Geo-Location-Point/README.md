@@ -4,11 +4,14 @@ Geo::Location::Point - Location information
 
 # VERSION
 
-Version 0.12
+Version 0.13
 
 # SYNOPSIS
 
-Geo::Location::Point stores a place/location by latitude and longitude
+Geo::Location::Point encapsulates geographical point data with latitude and longitude.
+It supports distance calculations,
+comparison between points,
+and provides various convenience methods for attributes like latitude, longitude, and related string representations
 
     use Geo::Location::Point;
 
@@ -18,9 +21,10 @@ Geo::Location::Point stores a place/location by latitude and longitude
 
 ## new
 
-    $location = Geo::Location::Point->new({ latitude => 0.01, longitude => -71 });
-
+Initialise a new object, accepting latitude and longitude via a hash or hash reference.
 Takes one optional argument 'key' which is an API key for [https://timezonedb.com](https://timezonedb.com) for looking up timezone data.
+
+    $location = Geo::Location::Point->new({ latitude => 0.01, longitude => -71 });
 
 ## lat
 
@@ -46,12 +50,12 @@ Synonym for long().
 
 ## distance
 
-Determine the distance between two locations,
+Determine the distance between two geographical points,
 returns a [Class::Measure::Length](https://metacpan.org/pod/Class%3A%3AMeasure%3A%3ALength) object.
 
 ## equal
 
-Are two points the same?
+Check if two points are identical within a small tolerance.
 
     my $loc1 = Geo::Location::Point->new(lat => 2, long => 2);
     my $loc2 = Geo::Location::Point->new(lat => 2, long => 2);
@@ -76,17 +80,18 @@ Synonym for tz().
 
 ## as\_string
 
-Prints the object in human-readable format.
+Generate a human-readable string describing the point,
+incorporating additional attributes like city or country if available.
 
 ## as\_uri
 
-Prints the object as a URI string.
+Convert the point to a Geo URI scheme string (geo:latitude,longitude).
 See [https://en.wikipedia.org/wiki/Geo\_URI\_scheme](https://en.wikipedia.org/wiki/Geo_URI_scheme).
 Arguably it should return a [URI](https://metacpan.org/pod/URI) object instead.
 
 ## attr
 
-Get/set location attributes, e.g. city
+Get or set arbitrary attributes, such as city or country.
 
     $location->city('London');
     $location->country('UK');
@@ -102,6 +107,9 @@ it under the same terms as Perl itself.
 
 # BUGS
 
+There is no validation on the attribute in the AUTOLOAD method,
+so typos such as "citty" will not be caught.
+
 # SEE ALSO
 
 [GIS::Distance](https://metacpan.org/pod/GIS%3A%3ADistance),
@@ -110,7 +118,7 @@ it under the same terms as Perl itself.
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2019-2024 Nigel Horne.
+Copyright 2019-2025 Nigel Horne.
 
 The program code is released under the following licence: GPL2 for personal use on a single computer.
 All other users (including Commercial, Charity, Educational, Government)

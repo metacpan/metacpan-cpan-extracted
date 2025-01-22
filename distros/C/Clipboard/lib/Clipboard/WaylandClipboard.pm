@@ -1,5 +1,5 @@
 package Clipboard::WaylandClipboard;
-$Clipboard::WaylandClipboard::VERSION = '0.30';
+$Clipboard::WaylandClipboard::VERSION = '0.31';
 # First written 04/11/2024 by Lester Hightower (PAUSE ID hightowe)
 
 use strict;
@@ -99,7 +99,7 @@ __END__
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
@@ -193,7 +193,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Ryan King <rking@panoptic.com>.
+This software is copyright (c) 2025 by Ryan King <rking@panoptic.com>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

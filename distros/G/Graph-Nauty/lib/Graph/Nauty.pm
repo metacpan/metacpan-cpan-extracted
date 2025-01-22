@@ -13,9 +13,10 @@ our @EXPORT_OK = qw(
     orbits_are_same
 );
 
-our $VERSION = '0.5.1'; # VERSION
+our $VERSION = '0.5.2'; # VERSION
 
 our $worksize = 0;
+our $warn_deprecated = 1;
 
 require XSLoader;
 XSLoader::load('Graph::Nauty', $VERSION);
@@ -71,14 +72,14 @@ sub _nauty_graph
     };
 
     my $n = 0;
-    my $vertices = { map { $_ => { index => $n++, vertice => $_ } }
+    my $vertices = { map { $_ => { index => $n++, vertex => $_ } }
                      sort { _cmp( $a, $b, $color_sub ) ||
                             _cmp( $a, $b, $order_sub ) }
                          $graph->vertices };
 
     my @breaks;
     my $prev;
-    for my $v (map { $vertices->{$_}{vertice} }
+    for my $v (map  { $vertices->{$_}{vertex} }
                sort { $vertices->{$a}{index} <=>
                       $vertices->{$b}{index} } keys %$vertices) {
         # scalar $graph->neighbours( $v ) cannot be used to get the
@@ -151,23 +152,19 @@ sub orbits
     my $statsblk = sparsenauty( $nauty_graph,
                                 $labels,
                                 $breaks,
-                                { getcanon => 1 },
+                                undef,
                                 $worksize );
 
-    my $orbits = [];
-    for my $i (@{$statsblk->{lab}}) {
-        next if blessed $nauty_graph->{original}[$i] &&
-             $nauty_graph->{original}[$i]->isa( Graph::Nauty::EdgeVertex:: );
-        if( !@$orbits || $statsblk->{orbits}[$i] !=
-            $statsblk->{orbits}[$orbits->[-1][0]] ) {
-            push @$orbits, [ $i ];
-        } else {
-            push @{$orbits->[-1]}, $i;
-        }
+    my %orbits;
+    for my $i (0..$nauty_graph->{nv}-1) {
+        my $vertex = $nauty_graph->{original}[$i];
+        next if blessed $vertex && $vertex->isa( Graph::Nauty::EdgeVertex:: );
+
+        my $orbit = $statsblk->{orbits}[$i];
+        push @{$orbits{$orbit}}, $vertex;
     }
 
-    return map { [ map { $nauty_graph->{original}[$_] } @$_ ] }
-               @$orbits;
+    return map { $orbits{$_} } sort keys %orbits;
 }
 
 sub are_isomorphic
@@ -218,6 +215,7 @@ sub canonical_order
                     @{$statsblk->{lab}};
 }
 
+# DEPRECATED: order of orbits may be different even in isomorphic graphs
 sub orbits_are_same
 {
     my( $graph1, $graph2, $color_sub ) = @_;
@@ -225,6 +223,9 @@ sub orbits_are_same
     $color_sub = sub { "$_[0]" } unless $color_sub;
 
     return 0 if !$graph1->could_be_isomorphic( $graph2 );
+
+    warn 'orbits_are_same() is deprecated, as order of orbits may be different ' .
+         'even in isomorphic graphs' . "\n" if $warn_deprecated;
 
     my @orbits1 = orbits( $graph1, $color_sub );
     my @orbits2 = orbits( $graph2, $color_sub );

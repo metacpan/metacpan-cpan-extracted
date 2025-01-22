@@ -3,7 +3,7 @@ package Lemonldap::NG::Handler;
 # Use the appropriate handler
 # For Apache, use Lemonldap::NG::Handler::ApacheMP2
 
-our $VERSION = '2.20.1';
+our $VERSION = '2.20.2';
 
 1;
 

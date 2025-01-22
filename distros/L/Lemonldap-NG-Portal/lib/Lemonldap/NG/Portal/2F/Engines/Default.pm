@@ -742,8 +742,6 @@ sub _displayRegister {
                 $self->p->buildUrl( $req->portal, '2fregisters' ), ''
             ),
             %tplParams,
-            CSRF_TOKEN => $self->ott->createToken()
-
         }
     );
 }
@@ -1067,7 +1065,7 @@ sub _verify {
     $self->auditLog(
         $req,
         message => (
-                "Second factor ${prefix}2f verification succeeded for abarnes"
+                "Second factor ${prefix}2f verification succeeded for $user"
               . ( $device     ? ( " with device " . display2F($device) ) : "" )
               . ( $logInfoStr ? " ($logInfoStr)"                         : "" )
         ),

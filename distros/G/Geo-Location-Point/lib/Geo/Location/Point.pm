@@ -6,6 +6,7 @@ use warnings;
 
 use Carp;
 use GIS::Distance;
+use Scalar::Util;
 
 use overload (
 	'==' => \&equal,
@@ -21,15 +22,18 @@ Geo::Location::Point - Location information
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =cut
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 =head1 SYNOPSIS
 
-Geo::Location::Point stores a place/location by latitude and longitude
+Geo::Location::Point encapsulates geographical point data with latitude and longitude.
+It supports distance calculations,
+comparison between points,
+and provides various convenience methods for attributes like latitude, longitude, and related string representations
 
     use Geo::Location::Point;
 
@@ -39,16 +43,15 @@ Geo::Location::Point stores a place/location by latitude and longitude
 
 =head2 new
 
-    $location = Geo::Location::Point->new({ latitude => 0.01, longitude => -71 });
-
+Initialise a new object, accepting latitude and longitude via a hash or hash reference.
 Takes one optional argument 'key' which is an API key for L<https://timezonedb.com> for looking up timezone data.
+
+    $location = Geo::Location::Point->new({ latitude => 0.01, longitude => -71 });
 
 =cut
 
 sub new {
-	my $class = $_[0];
-
-	shift;
+	my $class = shift;
 
 	my %args;
 	if(ref($_[0]) eq 'HASH') {
@@ -56,15 +59,15 @@ sub new {
 	} elsif(ref($_[0])) {
 		Carp::carp('Usage: ', __PACKAGE__, '->new(cache => $cache [, object => $object ], %args)');
 		return;
-	} elsif(@_ % 2 == 0) {
+	} elsif((@_ % 2) == 0) {
 		%args = @_;
 	}
 
 	if(!defined($class)) {
 		carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
 		return;
-	} elsif(ref($class)) {
-		# clone the given object
+	} elsif(Scalar::Util::blessed($class)) {
+		# If $class is an object, clone it with new arguments
 		return bless { %{$class}, %args }, ref($class);
 	}
 
@@ -89,6 +92,7 @@ sub new {
 	}
 	$args{'lng'} = $args{'long'};
 
+	# Return the blessed object
 	return bless \%args, $class;
 }
 
@@ -156,7 +160,7 @@ sub longitude {
 
 =head2	distance
 
-Determine the distance between two locations,
+Determine the distance between two geographical points,
 returns a L<Class::Measure::Length> object.
 
 =cut
@@ -176,7 +180,7 @@ sub distance {
 
 =head2	equal
 
-Are two points the same?
+Check if two points are identical within a small tolerance.
 
     my $loc1 = Geo::Location::Point->new(lat => 2, long => 2);
     my $loc2 = Geo::Location::Point->new(lat => 2, long => 2);
@@ -222,8 +226,10 @@ sub tz {
 		return $self->{'tz'} if(defined($self->{'tz'}));
 
 		if(!defined($self->{'timezonedb'})) {
-			require TimeZone::TimeZoneDB;
-			TimeZone::TimeZoneDB->import();
+			unless(TimeZone::TimeZoneDB->can('get_time_zone')) {
+				require TimeZone::TimeZoneDB;
+				TimeZone::TimeZoneDB->import();
+			}
 
 			$self->{'timezonedb'} = TimeZone::TimeZoneDB->new(key => $self->{'key'});
 		}
@@ -247,7 +253,8 @@ sub timezone {
 
 =head2	as_string
 
-Prints the object in human-readable format.
+Generate a human-readable string describing the point,
+incorporating additional attributes like city or country if available.
 
 =cut
 
@@ -315,25 +322,18 @@ sub as_string {
 	return $self->{'location'} = $rc;
 }
 
-sub _sortoutcase {
-	# my $self = shift;
-	# my $field = lc(shift);
-	my $field = $_[1];
-	my $rc;
-
-	foreach (split(/ /, $field)) {
-		if($rc) {
-			$rc .= ' ';
-		}
-		$rc .= ucfirst($_);
-	}
-
-	return $rc;
+sub _sortoutcase
+{
+	# Use lc to ensure the input string is in lowercase before capitalisation,
+	#	split to break the string into words,
+	#	map to capitalise each word and
+	#	join to concatenate the capitalised words back into a single string with spaces
+	return join ' ', map { ucfirst } split ' ', lc($_[1]);
 }
 
 =head2	as_uri
 
-Prints the object as a URI string.
+Convert the point to a Geo URI scheme string (geo:latitude,longitude).
 See L<https://en.wikipedia.org/wiki/Geo_URI_scheme>.
 Arguably it should return a L<URI> object instead.
 
@@ -348,7 +348,7 @@ sub as_uri
 
 =head2	attr
 
-Get/set location attributes, e.g. city
+Get or set arbitrary attributes, such as city or country.
 
     $location->city('London');
     $location->country('UK');
@@ -384,6 +384,9 @@ it under the same terms as Perl itself.
 
 =head1 BUGS
 
+There is no validation on the attribute in the AUTOLOAD method,
+so typos such as "citty" will not be caught.
+
 =head1 SEE ALSO
 
 L<GIS::Distance>,
@@ -392,7 +395,7 @@ L<TimeZone::TimeZoneDB>.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2019-2024 Nigel Horne.
+Copyright 2019-2025 Nigel Horne.
 
 The program code is released under the following licence: GPL2 for personal use on a single computer.
 All other users (including Commercial, Charity, Educational, Government)

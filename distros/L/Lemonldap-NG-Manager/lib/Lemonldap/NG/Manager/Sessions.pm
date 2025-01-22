@@ -337,6 +337,7 @@ qq{Use of an uninitialized attribute "$group" to group sessions},
         }
 
         # Build result
+        $total = 0;
         $res = [
             sort {
                 my @a = ( $a->{value} =~ /^(\d+)(?:\.(\d+))*$/ );
@@ -348,7 +349,7 @@ qq{Use of an uninitialized attribute "$group" to group sessions},
                       or $a[3] <=> $b[3] )
                   : $a->{value} cmp $b->{value}
               }
-              map { { value => $_, count => $r->{$_} } } keys %$r
+              map { $total += $r->{$_}; { value => $_, count => $r->{$_} } } keys %$r
         ];
     }
 

@@ -1,17 +1,15 @@
 package Map::Tube::SaintPetersburg;
 
-# Pragmas.
 use strict;
 use warnings;
 use 5.006;
 
-# Modules.
 use File::Share ':all';
 use Moo;
 use namespace::clean;
 
 # Version.
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 # Get XML.
 has xml => (
@@ -36,6 +34,7 @@ Map::Tube::SaintPetersburg - Interface to the Saint Petersburg Metro Map.
 =head1 SYNOPSIS
 
  use Map::Tube::SaintPetersburg;
+
  my $obj = Map::Tube::SaintPetersburg->new;
  my $routes_ar = $obj->get_all_routes($from, $to);
  my $line = $obj->get_line_by_id($line_id);
@@ -117,11 +116,11 @@ For more information about Saint Petersburg Map, click L<here|https://en.wikiped
 
 =head1 EXAMPLE1
 
- # Pragmas.
+=for comment filename=print_saint_petersburg_route.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Encode qw(decode_utf8 encode_utf8);
  use Map::Tube::SaintPetersburg;
 
@@ -139,11 +138,11 @@ For more information about Saint Petersburg Map, click L<here|https://en.wikiped
 
 =head1 EXAMPLE2
 
- # Pragmas.
+=for comment filename=print_saint_petersburg_def_xml_file.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Map::Tube::SaintPetersburg;
 
  # Object.
@@ -160,11 +159,11 @@ For more information about Saint Petersburg Map, click L<here|https://en.wikiped
 
 =head1 EXAMPLE3
 
- # Pragmas.
+=for comment filename=print_saint_petersburg_image.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Map::Tube::GraphViz;
  use Map::Tube::GraphViz::Utils qw(node_color_without_label);
  use Map::Tube::SaintPetersburg;
@@ -197,11 +196,11 @@ For more information about Saint Petersburg Map, click L<here|https://en.wikiped
 
 =head1 EXAMPLE4
 
- # Pragmas.
+=for comment filename=print_saint_petersburg_lines.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Encode qw(encode_utf8);
  use Map::Tube::SaintPetersburg;
 
@@ -223,11 +222,11 @@ For more information about Saint Petersburg Map, click L<here|https://en.wikiped
 
 =head1 EXAMPLE5
 
- # Pragmas.
+=for comment filename=print_saint_petersburg_line_stations.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Encode qw(decode_utf8 encode_utf8);
  use Map::Tube::SaintPetersburg;
 
@@ -294,18 +293,20 @@ L<https://github.com/tupinek/Map-Tube-SaintPetersburg>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2014-2015 Michal Špaček
- Artistic License
- BSD 2-Clause License
+© 2014-2025 Michal Josef Špaček
+
+Artistic License
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

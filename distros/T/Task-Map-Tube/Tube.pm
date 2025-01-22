@@ -3,7 +3,7 @@ package Task::Map::Tube;
 use strict;
 use warnings;
 
-our $VERSION = 0.47;
+our $VERSION = 0.48;
 
 1;
 
@@ -91,7 +91,7 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2014-2023 Michal Josef Špaček
+© 2014-2025 Michal Josef Špaček
 
 Artistic License
 
@@ -99,6 +99,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.47
+0.48
 
 =cut

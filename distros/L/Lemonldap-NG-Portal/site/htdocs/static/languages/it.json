@@ -158,7 +158,7 @@
 "contextSwitching_ON":"Impersonate another user",
 "continue":"Procedi",
 "createAccount":"Crea un account",
-"csrfToken":"Security token is invalid. Page will refresh automatically. Please try again.",
+"csrfError":"CSRF check failed",
 "current":"Current",
 "currentPwd":"Password attuale",
 "date":"Data",

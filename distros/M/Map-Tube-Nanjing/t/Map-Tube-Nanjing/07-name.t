@@ -1,8 +1,6 @@
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Encode qw(decode_utf8);
 use Map::Tube::Nanjing;
 use Test::More tests => 2;

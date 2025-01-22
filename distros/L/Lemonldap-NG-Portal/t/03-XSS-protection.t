@@ -108,24 +108,43 @@ my @tests = (
     # LOGOUT TESTS
     'LOGOUT',
 
-    # 18 url=http://www.toto.com/, bad referer
-    'aHR0cDovL3d3dy50b3RvLmNvbS8=',
-    'http://bad.com/' => 0,
-    'Logout required by bad site',
+    encodeUrl('http://www.toto.com/'),
+    0,
+    'Unauthorized URL',
+
+    encodeUrl('http://test1.example.com/'),
+    'http://test1.example.com/',
+    'Authorized URL (protected vhost)',
+
+    encodeUrl('http://test1.example.com/?<script>'),
+    0,
+    'Blocked malicious URL',
+
+    encodeUrl('http://test.example2.com/'),
+    'http://test.example2.com/',
+    'Authorized URL (wildcard in trustedDomain)',
+
+    encodeUrl('http://example3.com/'),
+    'http://example3.com/',
+    'Authorized URL (trustedDomain)',
+
+    encodeUrl('http://test.example3.com/'),
+    0,
+    'Unauthorized URL (trustedDomain but no wildcard)',
 
     # 19 url=http://www.toto.com/, good referer
     'aHR0cDovL3d3dy50b3RvLmNvbS8=',
-    'http://test1.example.com/' => 'http://www.toto.com/',
+    0,
     'Logout required by good site',
 
     # 20 url=http://www?<script>, good referer
     'aHR0cDovL3d3dz88c2NyaXB0Pg==',
-    'http://test1.example.com/' => 0,
+    0,
     'script with logout',
 
     # 21 url=http://www.toto.com/, no referer
     'aHR0cDovL3d3dy50b3RvLmNvbS8=',
-    '' => 'http://www.toto.com/',
+    0,
     'Logout required by good site, empty referer',
 );
 
@@ -165,17 +184,15 @@ while ( defined( my $url = shift(@tests) ) ) {
 }
 
 while ( defined( my $url = shift(@tests) ) ) {
-    my $referer = shift @tests;
-    my $redir   = shift @tests;
-    my $detail  = shift @tests;
+    my $redir  = shift @tests;
+    my $detail = shift @tests;
     ok(
         $res = $client->_get(
             '/',
             query  => "url=$url&logout=1",
             cookie => "lemonldap=$id",
 
-            accept  => 'text/html',
-            referer => $referer,
+            accept => 'text/html',
         ),
         $detail
     );

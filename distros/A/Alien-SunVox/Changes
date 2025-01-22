@@ -1,3 +1,8 @@
+0.03 2025-01-21
+
+  - Fix build for sunvox lib 2.1.2b
+  - Remembered to include the Changelog 😳
+
 0.01 2024-06-19
 
   - Initial release

@@ -158,7 +158,7 @@
 "contextSwitching_ON":"Impersonate another user",
 "continue":"استمر",
 "createAccount":"انشئ حساب",
-"csrfToken":"Security token is invalid. Page will refresh automatically. Please try again.",
+"csrfError":"CSRF check failed",
 "current":"الحالي",
 "currentPwd":"كلمة المرور الحالية",
 "date":"تاريخ",

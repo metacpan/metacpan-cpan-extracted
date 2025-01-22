@@ -1,17 +1,15 @@
 package Map::Tube::Sofia;
 
-# Pragmas.
 use strict;
 use warnings;
 use 5.006;
 
-# Modules.
 use File::Share ':all';
 use Moo;
 use namespace::clean;
 
 # Version.
-our $VERSION = 0.08;
+our $VERSION = 0.10;
 
 # Get XML.
 has xml => (
@@ -36,6 +34,7 @@ Map::Tube::Sofia - Interface to the Sofia Metro Map.
 =head1 SYNOPSIS
 
  use Map::Tube::Sofia;
+
  my $obj = Map::Tube::Sofia->new;
  my $routes_ar = $obj->get_all_routes($from, $to);
  my $line = $obj->get_line_by_id($line_id);
@@ -117,11 +116,11 @@ For more information about Sofia Map, click L<here|https://en.wikipedia.org/wiki
 
 =head1 EXAMPLE1
 
- # Pragmas.
+=for comment filename=print_sofia_route.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Encode qw(decode_utf8 encode_utf8);
  use Map::Tube::Sofia;
 
@@ -139,11 +138,11 @@ For more information about Sofia Map, click L<here|https://en.wikipedia.org/wiki
 
 =head1 EXAMPLE2
 
- # Pragmas.
+=for comment filename=print_sofia_def_xml_file.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Map::Tube::Sofia;
 
  # Object.
@@ -160,11 +159,11 @@ For more information about Sofia Map, click L<here|https://en.wikipedia.org/wiki
 
 =head1 EXAMPLE3
 
- # Pragmas.
+=for comment filename=print_sofia_image.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Map::Tube::GraphViz;
  use Map::Tube::GraphViz::Utils qw(node_color_without_label);
  use Map::Tube::Sofia;
@@ -189,19 +188,19 @@ For more information about Sofia Map, click L<here|https://en.wikipedia.org/wiki
 
 =begin html
 
-<a href="https://raw.githubusercontent.com/tupinek/Map-Tube-Sofia/master/images/ex3.png">
-  <img src="https://raw.githubusercontent.com/tupinek/Map-Tube-Sofia/master/images/ex3.png" alt="Софийско метро" width="300px" height="300px" />
+<a href="https://raw.githubusercontent.com/tupinek/Map-Tube-Sofia/master/images/Sofia.png">
+  <img src="https://raw.githubusercontent.com/tupinek/Map-Tube-Sofia/master/images/Sofia.png" alt="Софийско метро" width="300px" height="300px" />
 </a>
 
 =end html
 
 =head1 EXAMPLE4
 
- # Pragmas.
+=for comment filename=print_sofia_lines.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Encode qw(encode_utf8);
  use Map::Tube::Sofia;
 
@@ -220,11 +219,11 @@ For more information about Sofia Map, click L<here|https://en.wikipedia.org/wiki
 
 =head1 EXAMPLE5
 
- # Pragmas.
+=for comment filename=print_sofia_line_stations.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Encode qw(decode_utf8 encode_utf8);
  use Map::Tube::Sofia;
 
@@ -301,12 +300,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2014-2017 Michal Josef Špaček
+ © 2014-2025 Michal Josef Špaček
  Artistic License
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.10
 
 =cut

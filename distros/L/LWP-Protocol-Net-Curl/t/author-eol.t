@@ -27,6 +27,7 @@ my @files = (
     't/07-min-libcurl.t',
     't/08-curlopt-fwd.t',
     't/author-critic.t',
+    't/author-distmeta.t',
     't/author-eol.t',
     't/author-minimum-version.t',
     't/author-mojibake.t',
@@ -39,7 +40,6 @@ my @files = (
     't/author-test-version.t',
     't/release-cpan-changes.t',
     't/release-dist-manifest.t',
-    't/release-distmeta.t',
     't/release-kwalitee.t',
     't/release-meta-json.t',
     't/release-unused-vars.t'

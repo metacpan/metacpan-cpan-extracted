@@ -4,7 +4,7 @@ use Graph::Nauty;
 use Test::More tests => 4;
 
 my $n = 5;
-my @e = ( 0 ) x $n;
+my @e;
 for (0..$n-1) {
     $e[2*$_]   = ($_ + $n - 1) % $n; # edge i->i-1
     $e[2*$_+1] = ($_ + $n + 1) % $n; # edge i->i+1

@@ -1,6 +1,6 @@
+bidon
 bower.json
 Changes
-eg/index.cgi
 eg/index.fcgi
 eg/index.psgi
 lib/Lemonldap/NG/Portal.pm
@@ -53,6 +53,7 @@ lib/Lemonldap/NG/Portal/Auth/WebAuthn.pm
 lib/Lemonldap/NG/Portal/Auth/WebID.pm
 lib/Lemonldap/NG/Portal/Captcha.pod
 lib/Lemonldap/NG/Portal/Captcha/ReCaptcha.pm
+lib/Lemonldap/NG/Portal/Captcha/ReCaptcha3.pm
 lib/Lemonldap/NG/Portal/Captcha/SecurityImage.pm
 lib/Lemonldap/NG/Portal/CDC.pm
 lib/Lemonldap/NG/Portal/CertificateResetByMail/Custom.pm
@@ -109,6 +110,8 @@ lib/Lemonldap/NG/Portal/Main/Request.pm
 lib/Lemonldap/NG/Portal/Main/Run.pm
 lib/Lemonldap/NG/Portal/Main/SecondFactor.pm
 lib/Lemonldap/NG/Portal/Main/UserDB.pm
+lib/Lemonldap/NG/Portal/MenuTab.pm
+lib/Lemonldap/NG/Portal/MenuTab.pod
 lib/Lemonldap/NG/Portal/Password.pod
 lib/Lemonldap/NG/Portal/Password/AD.pm
 lib/Lemonldap/NG/Portal/Password/Base.pm
@@ -382,6 +385,9 @@ site/htdocs/static/common/js/portal.min.js.map
 site/htdocs/static/common/js/ppolicy.js
 site/htdocs/static/common/js/ppolicy.min.js
 site/htdocs/static/common/js/ppolicy.min.js.map
+site/htdocs/static/common/js/recaptchav3.js
+site/htdocs/static/common/js/recaptchav3.min.js
+site/htdocs/static/common/js/recaptchav3.min.js.map
 site/htdocs/static/common/js/redirect.js
 site/htdocs/static/common/js/redirect.min.js
 site/htdocs/static/common/js/redirect.min.js.map
@@ -409,6 +415,7 @@ site/htdocs/static/common/js/webauthnregistration.min.js
 site/htdocs/static/common/js/webauthnregistration.min.js.map
 site/htdocs/static/common/logos/logo_llng_400px.png
 site/htdocs/static/common/logos/logo_llng_old.png
+site/htdocs/static/common/mfe.png
 site/htdocs/static/common/modules/Apache.png
 site/htdocs/static/common/modules/CAS.png
 site/htdocs/static/common/modules/CustomAuth.png
@@ -442,6 +449,7 @@ site/htdocs/static/languages/fi.json
 site/htdocs/static/languages/fr.json
 site/htdocs/static/languages/he.json
 site/htdocs/static/languages/it.json
+site/htdocs/static/languages/mfe.json
 site/htdocs/static/languages/pl.json
 site/htdocs/static/languages/pt.json
 site/htdocs/static/languages/pt_BR.json
@@ -561,13 +569,15 @@ t/01-BuildRule.t
 t/01-BuildUrl.t
 t/01-Cookie-Domain.t
 t/01-CSP-and-CORS-headers.t
-t/01-Custom2fa.pm
+t/01-Custom2fa.t
+t/01-CustomMenu.pm
 t/01-downloadSamlMetadata.t
 t/01-Dynamic-Portal-Url.t
 t/01-EnablePasswordDisplay.t
 t/01-Handler-redirection-and-URL-check-by-portal.t
 t/01-Mail-Tpl.t
 t/01-pdata.t
+t/01-PluginEntrypoints.t
 t/01-Reject-Hashes-in-URL.t
 t/01-Unauth-Logout.t
 t/01-WebAuthn-Registration.t
@@ -592,6 +602,7 @@ t/11-MessageBroker-Pg.t
 t/11-MessageBroker-Redis.t
 t/12-EventStatus.t
 t/19-Auth-Null.t
+t/20-Auth-and-password-DBI-custom-hash.t
 t/20-Auth-and-password-DBI-dynamic-hash.t
 t/20-Auth-and-password-DBI-encrypt.t
 t/20-Auth-and-password-DBI.t
@@ -908,6 +919,7 @@ t/68-Impersonation-with-UnrestrictedUser.t
 t/68-Impersonation.t
 t/68-InitializePasswordReset.t
 t/70-2F-Password.t
+t/70-2F-targetAuthnLevel.t
 t/70-2F-TOTP-8-with-global-storage.t
 t/70-2F-TOTP-encryption.t
 t/70-2F-TOTP-Hook.t
@@ -944,6 +956,7 @@ t/78-2F-UpgradeOnly.t
 t/79-2F-Yubikey-from-Session.t
 t/79-2F-Yubikey.t
 t/80-2F-Okta.t
+t/81-MostViewedApplications.t
 t/90-Translations.t
 t/91-Handler-cache-cleaned.t
 t/91-Memory-Leak.t
@@ -958,7 +971,10 @@ t/AfterDataCustomPlugin.pm
 t/CaptchaOldApi.pm
 t/cas-lib.pm
 t/CasHookPlugin.pm
+t/ChoiceHookPlugin.pm
 t/Custom.pm
+t/CustomMenu.pm
+t/DbiCustomHash.pm
 t/geoip/test.mmdb
 t/gpghome/key.asc
 t/gpghome/openpgp-revocs.d/9482CEFB055809CBAFE6D71AAB2D5542891D1677.rev
@@ -982,6 +998,9 @@ t/OidcHookPlugin.pm
 t/parse-dir.pm
 t/PasswordHookPlugin.pm
 t/pdata.pm
+t/PluginEntryPoints/Consumer.pm
+t/PluginEntryPoints/ListeningService.pm
+t/PluginEntryPoints/Target.pm
 t/postgres/init.sql
 t/postgres/pg.pm
 t/README.md
@@ -999,6 +1018,8 @@ t/sessions2/6e30af4ffa5689b3e49a104d1b160d316db2b2161a0f45776994eed19dbdc101
 t/sessions2/lock/Apache-Session-6e30af4ffa5689b3e49a104d1b160d316db2b2161a0f45776994eed19dbdc101.lock
 t/sfHookPlugin.pm
 t/smtp.pm
+t/templates/bootstrap/custommenu.tpl
+t/templates/bootstrap/test_mail.tpl
 t/templates/mailtplskin/all.json
 t/templates/mailtplskin/fr.json
 t/templates/mailtplskin/mail_header.tpl

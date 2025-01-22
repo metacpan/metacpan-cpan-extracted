@@ -1,7 +1,7 @@
 ---
 abstract: 'Interface to the NizhnyNovgorod Metro Map.'
 author:
-  - 'Michal Spacek <skim@cpan.org>'
+  - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
   Encode: 0
   English: 0
@@ -13,7 +13,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.36
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.16'
+generated_by: 'Module::Install version 1.21'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,13 +28,13 @@ no_index:
     - xt
 requires:
   File::Share: 0
-  Map::Tube: '3.06'
+  Map::Tube: '3.62'
   Moo: 0
   namespace::clean: 0
   perl: 5.8.0
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Map-Tube-NizhnyNovgorod
-  homepage: https://github.com/tupinek/Map-Tube-NizhnyNovgorod
+  bugtracker: https://github.com/michal-josef-spacek/Map-Tube-NizhnyNovgorod/issues
+  homepage: https://github.com/michal-josef-spacek/Map-Tube-NizhnyNovgorod
   license: http://opensource.org/licenses/artistic-license-2.0.php
-  repository: git://github.com/tupinek/Map-Tube-NizhnyNovgorod
-version: '0.03'
+  repository: git://github.com/michal-josef-spacek/Map-Tube-NizhnyNovgorod
+version: '0.04'

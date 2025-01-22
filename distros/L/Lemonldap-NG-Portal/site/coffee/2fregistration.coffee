@@ -43,7 +43,8 @@ delete2F = (device, epoch, prefix) ->
 			url: "#{portal}2fregisters/#{prefix}/delete"
 			data:
 				epoch: epoch
-				csrf_token: datas.csrf_token
+			headers:
+				"X-CSRF-Check": 1
 			dataType: 'json'
 			error: displayError
 			success: (resp) ->

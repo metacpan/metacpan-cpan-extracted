@@ -50,8 +50,7 @@
  "dontStorePassword":<TMPL_VAR NAME="DONT_STORE_PASSWORD" DEFAULT="0">,
  "scrollTop":<TMPL_VAR NAME="SCROLL_TOP" DEFAULT="0">,
  "sameSite":"<TMPL_VAR NAME="SAMESITE">",
- "cookieSecure":<TMPL_VAR NAME="COOKIESECURE">,
- "csrf_token":"<TMPL_VAR NAME="CSRF_TOKEN">"
+ "cookieSecure":<TMPL_VAR NAME="COOKIESECURE">
  }
  </script>
 

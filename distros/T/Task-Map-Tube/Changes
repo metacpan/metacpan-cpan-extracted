@@ -1,3 +1,17 @@
+0.48 2025-01-22T08:41:44+01:00
+ - Remove Map::Tube::Cookbook, is part of Map::Tube.
+ - Remove Test::Map::Tube, is part of Map::Tube.
+ - Update Map::Tube to 3.92 version.
+ - Update Map::Tube::API to 0.08 version.
+ - Update Map::Tube::CLI to 0.80 version.
+ - Update Map::Tube::Exception to 3.24 version.
+ - Update Map::Tube::Plugin::FuzzyFind to 0.81.1 version.
+ - Update Map::Tube::Plugin::Graph to 0.45 version.
+ - Update Map::Tube::Server to 0.06 version.
+ - Update Map::Tube::Text::Shortest to 0.02 version.
+ - Update Map::Tube::Text::Table to 0.05 version.
+ - Update copyright years.
+
 0.47 2023-12-08T17:00:11+01:00
  - Add Map::Tube::API 0.05 version.
  - Add Map::Tube::Server 0.01 version.

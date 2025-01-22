@@ -158,7 +158,7 @@
 "contextSwitching_ON":"Endosser l'identité d'un autre utilisateur",
 "continue":"Continuer",
 "createAccount":"Créer un compte",
-"csrfToken":"Le jeton de sécurité est invalide. La page va se recharger automatiquement. Veuillez réessayer.",
+"csrfError":"CSRF check failed",
 "current":"Courante",
 "currentPwd":"Mot de passe actuel",
 "date":"Date",

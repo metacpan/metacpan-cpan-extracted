@@ -1,3 +1,9 @@
+0.31    2025-01-21
+
+    - Make problematic t/drivers.t tests author only.
+        - https://github.com/shlomif/Clipboard/pull/16
+        - Thanks to @trwyant
+
 0.30    2024-06-16
 
     - Add Wayland detection and support

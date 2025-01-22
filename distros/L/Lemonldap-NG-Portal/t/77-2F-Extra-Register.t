@@ -142,6 +142,9 @@ subtest "Register and use mail based custom SF as dwho" => sub {
         length => length $query,
         cookie => "lemonldap=$id",
         accept => 'application/json',
+        custom => {
+            HTTP_X_CSRF_CHECK => 1,
+        },
     );
 
     $res = expectJSON($res);
@@ -166,6 +169,9 @@ subtest "Register and use mail based custom SF as dwho" => sub {
         length => length $query,
         cookie => "lemonldap=$id",
         accept => 'application/json',
+        custom => {
+            HTTP_X_CSRF_CHECK => 1,
+        },
     );
 
     $res = expectJSON($res);
@@ -253,6 +259,9 @@ subtest "Register a 2F that is not always available on login" => sub {
         length => length $query,
         cookie => "lemonldap=$id",
         accept => 'application/json',
+        custom => {
+            HTTP_X_CSRF_CHECK => 1,
+        },
     );
 
     $res = expectJSON($res);
@@ -277,6 +286,9 @@ subtest "Register a 2F that is not always available on login" => sub {
         length => length $query,
         cookie => "lemonldap=$id",
         accept => 'application/json',
+        custom => {
+            HTTP_X_CSRF_CHECK => 1,
+        },
     );
 
     $res = expectJSON($res);
@@ -379,6 +391,9 @@ subtest "Fail to register mail based custom SF as dwho" => sub {
         length => length $query,
         cookie => "lemonldap=$id",
         accept => 'application/json',
+        custom => {
+            HTTP_X_CSRF_CHECK => 1,
+        },
     );
 
     $res = expectJSON($res);
@@ -403,6 +418,9 @@ subtest "Fail to register mail based custom SF as dwho" => sub {
         length => length $query,
         cookie => "lemonldap=$id",
         accept => 'application/json',
+        custom => {
+            HTTP_X_CSRF_CHECK => 1,
+        },
     );
     expectReject( $res, 400, 'PE96' );
     ok( !getPSession('dwho')->data->{_2fDevices},
@@ -438,6 +456,9 @@ subtest "Fail regex filter validation" => sub {
         length => length $query,
         cookie => "lemonldap=$id",
         accept => 'application/json',
+        custom => {
+            HTTP_X_CSRF_CHECK => 1,
+        },
     );
 
     $res = expectJSON($res);
@@ -475,6 +496,9 @@ subtest "Register and use rest based custom SF as dwho" => sub {
         length => length $query,
         cookie => "lemonldap=$id",
         accept => 'application/json',
+        custom => {
+            HTTP_X_CSRF_CHECK => 1,
+        },
     );
 
     $res = expectJSON($res);
@@ -496,6 +520,9 @@ subtest "Register and use rest based custom SF as dwho" => sub {
         length => length $query,
         cookie => "lemonldap=$id",
         accept => 'application/json',
+        custom => {
+            HTTP_X_CSRF_CHECK => 1,
+        },
     );
 
     $res = expectJSON($res);
@@ -586,21 +613,7 @@ subtest "Register and use rest based custom SF as dwho" => sub {
             cookie => "lemonldap=$id",
         );
         my $json = expectBadRequest($res);
-        ok( $res->[2]->[0] =~ 'csrfToken',
-            "Deletion expects valid CSRF token" );
-    }
-
-    {
-        my $delete_query =
-          buildForm( { epoch => $epoch, csrf_token => "1234566" } );
-        $res = $client->_post(
-            "/2fregisters/$prefix/delete",
-            $delete_query,
-            length => length($delete_query),
-            cookie => "lemonldap=$id",
-        );
-        my $json = expectBadRequest($res);
-        ok( $res->[2]->[0] =~ 'csrfToken',
+        ok( $res->[2]->[0] =~ 'csrfError',
             "Deletion expects valid CSRF token" );
     }
 
@@ -610,13 +623,16 @@ subtest "Register and use rest based custom SF as dwho" => sub {
         accept => "test/html",
     );
 
-    $query = buildForm( { epoch => $epoch, csrf_token => getJsVars($res)->{csrf_token} } );
+    $query = buildForm( { epoch => $epoch } );
     ok(
         $res = $client->_post(
             "/2fregisters/$prefix/delete",
             IO::String->new($query),
             cookie => "lemonldap=$id",
             length => length($query),
+            custom => {
+                HTTP_X_CSRF_CHECK => 1,
+            },
         ),
         'Post deletion'
     );

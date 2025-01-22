@@ -1,10 +1,8 @@
 #!/usr/bin/env perl
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Encode qw(decode_utf8 encode_utf8);
 use Map::Tube::Nanjing;
 

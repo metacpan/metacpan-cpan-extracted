@@ -22,22 +22,22 @@ name: Clipboard
 provides:
   Clipboard:
     file: lib/Clipboard.pm
-    version: '0.30'
+    version: '0.31'
   Clipboard::MacPasteboard:
     file: lib/Clipboard/MacPasteboard.pm
-    version: '0.30'
+    version: '0.31'
   Clipboard::WaylandClipboard:
     file: lib/Clipboard/WaylandClipboard.pm
-    version: '0.30'
+    version: '0.31'
   Clipboard::Win32:
     file: lib/Clipboard/Win32.pm
-    version: '0.30'
+    version: '0.31'
   Clipboard::Xclip:
     file: lib/Clipboard/Xclip.pm
-    version: '0.30'
+    version: '0.31'
   Clipboard::Xsel:
     file: lib/Clipboard/Xsel.pm
-    version: '0.30'
+    version: '0.31'
 requires:
   CGI: '0'
   File::Spec: '0'
@@ -50,10 +50,10 @@ resources:
   bugtracker: https://github.com/shlomif/Clipboard/issues
   homepage: http://metacpan.org/release/Clipboard
   repository: git://github.com/shlomif/Clipboard.git
-version: '0.30'
+version: '0.31'
 x_Dist_Zilla:
   perl:
-    version: '5.038002'
+    version: '5.040000'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -167,8 +167,9 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::Test::CPAN::Changes:
           changelog: Changes
+          filename: xt/release/cpan-changes.t
       name: '@Filter/Test::CPAN::Changes'
-      version: '0.012'
+      version: '0.013'
     -
       class: Dist::Zilla::Plugin::Test::EOL
       config:
@@ -409,6 +410,6 @@ x_Dist_Zilla:
     config:
       is_trial: 0
     version: '6.032'
-x_generated_by_perl: v5.38.2
+x_generated_by_perl: v5.40.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

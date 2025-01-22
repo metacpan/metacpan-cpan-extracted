@@ -13,8 +13,7 @@ SKIP: {
     }
     require Lemonldap::NG::Common::TOTP;
     my $res;
-    my $client = LLNG::Manager::Test->new(
-        {
+    my $client = LLNG::Manager::Test->new( {
             ini => {
                 logLevel            => 'error',
                 authentication      => 'Demo',
@@ -25,7 +24,7 @@ SKIP: {
                 requireToken        => 0,
                 checkUser           => 1,
                 impersonationRule   => 1,
-                impersonationHiddenAttributes => 'toto',
+                impersonationHiddenAttributes   => 'toto',
                 checkUserDisplayPersistentInfo  => 0,
                 checkUserDisplayEmptyValues     => 0,
                 checkUserDisplayComputedSession => 1,
@@ -107,9 +106,13 @@ SKIP: {
     # JS query
     ok(
         $res = $client->_post(
-            '/2fregisters/totp/getkey', IO::String->new(''),
+            '/2fregisters/totp/getkey',
+            IO::String->new(''),
             cookie => "lemonldap=$id",
             length => 0,
+            custom => {
+                HTTP_X_CSRF_CHECK => 1,
+            },
         ),
         'Get new key'
     );
@@ -134,6 +137,9 @@ SKIP: {
             IO::String->new($s),
             length => length($s),
             cookie => "lemonldap=$id",
+            custom => {
+                HTTP_X_CSRF_CHECK => 1,
+            },
         ),
         'Post code'
     );

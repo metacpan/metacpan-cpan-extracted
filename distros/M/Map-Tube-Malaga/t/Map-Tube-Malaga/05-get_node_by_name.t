@@ -27,7 +27,6 @@ is_deeply(
 	\@ret,
 	[
 		'L1-01',
-		'L2-01',
 	],
 	"Get all nodes for 'El Perchel'.",
 );

@@ -60,27 +60,27 @@
    "provides" : {
       "Clipboard" : {
          "file" : "lib/Clipboard.pm",
-         "version" : "0.30"
+         "version" : "0.31"
       },
       "Clipboard::MacPasteboard" : {
          "file" : "lib/Clipboard/MacPasteboard.pm",
-         "version" : "0.30"
+         "version" : "0.31"
       },
       "Clipboard::WaylandClipboard" : {
          "file" : "lib/Clipboard/WaylandClipboard.pm",
-         "version" : "0.30"
+         "version" : "0.31"
       },
       "Clipboard::Win32" : {
          "file" : "lib/Clipboard/Win32.pm",
-         "version" : "0.30"
+         "version" : "0.31"
       },
       "Clipboard::Xclip" : {
          "file" : "lib/Clipboard/Xclip.pm",
-         "version" : "0.30"
+         "version" : "0.31"
       },
       "Clipboard::Xsel" : {
          "file" : "lib/Clipboard/Xsel.pm",
-         "version" : "0.30"
+         "version" : "0.31"
       }
    },
    "release_status" : "stable",
@@ -95,10 +95,10 @@
          "web" : "https://github.com/shlomif/Clipboard"
       }
    },
-   "version" : "0.30",
+   "version" : "0.31",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.038002"
+         "version" : "5.040000"
       },
       "plugins" : [
          {
@@ -244,11 +244,12 @@
             "class" : "Dist::Zilla::Plugin::Test::CPAN::Changes",
             "config" : {
                "Dist::Zilla::Plugin::Test::CPAN::Changes" : {
-                  "changelog" : "Changes"
+                  "changelog" : "Changes",
+                  "filename" : "xt/release/cpan-changes.t"
                }
             },
             "name" : "@Filter/Test::CPAN::Changes",
-            "version" : "0.012"
+            "version" : "0.013"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::EOL",
@@ -564,8 +565,8 @@
          "version" : "6.032"
       }
    },
-   "x_generated_by_perl" : "v5.38.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_generated_by_perl" : "v5.40.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

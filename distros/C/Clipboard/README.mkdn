@@ -4,7 +4,7 @@ Clipboard - Copy and paste with any OS
 
 # VERSION
 
-version 0.30
+version 0.31
 
 # SYNOPSIS
 
@@ -125,7 +125,7 @@ feature.
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Ryan King <rking@panoptic.com>.
+This software is copyright (c) 2025 by Ryan King <rking@panoptic.com>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

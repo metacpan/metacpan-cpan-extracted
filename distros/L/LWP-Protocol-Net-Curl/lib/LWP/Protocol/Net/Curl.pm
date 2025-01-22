@@ -19,7 +19,7 @@ use Net::Curl::Share qw(:constants);
 use Scalar::Util qw(looks_like_number);
 use URI;
 
-our $VERSION = '0.026'; # VERSION
+our $VERSION = '0.027'; # VERSION
 
 my %curlopt;
 my $share;
@@ -396,7 +396,7 @@ LWP::Protocol::Net::Curl - the power of libcurl in the palm of your hands!
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 SYNOPSIS
 
@@ -570,7 +570,7 @@ Stanislaw Pusep <stas@sysd.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Stanislaw Pusep.
+This software is copyright (c) 2025 by Stanislaw Pusep.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

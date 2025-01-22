@@ -33,6 +33,8 @@ register = ->
 			data:
 				password: password
 				passwordverify: passwordverify
+			headers:
+				"X-CSRF-Check": 1
 			error: displayError
 			success: (data) ->
 				if data.error

@@ -1,17 +1,15 @@
 package Map::Tube::NizhnyNovgorod;
 
-# Pragmas.
 use strict;
 use warnings;
 use 5.006;
 
-# Modules.
 use File::Share ':all';
 use Moo;
 use namespace::clean;
 
 # Version.
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Get XML.
 has xml => (
@@ -36,6 +34,7 @@ Map::Tube::NizhnyNovgorod - Interface to the NizhnyNovgorod Metro Map.
 =head1 SYNOPSIS
 
  use Map::Tube::NizhnyNovgorod;
+
  my $obj = Map::Tube::NizhnyNovgorod->new;
  my $routes_ar = $obj->get_all_routes($from, $to);
  my $line = $obj->get_line_by_id($line_id);
@@ -117,11 +116,11 @@ For more information about NizhnyNovgorod Map, click L<here|https://en.wikipedia
 
 =head1 EXAMPLE1
 
- # Pragmas.
+=for comment filename=print_nizhny_novgorod_route.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Encode qw(decode_utf8 encode_utf8);
  use Map::Tube::NizhnyNovgorod;
 
@@ -139,11 +138,11 @@ For more information about NizhnyNovgorod Map, click L<here|https://en.wikipedia
 
 =head1 EXAMPLE2
 
- # Pragmas.
+=for comment filename=print_nizhny_novgorod_def_xml_file.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Map::Tube::NizhnyNovgorod;
 
  # Object.
@@ -160,11 +159,11 @@ For more information about NizhnyNovgorod Map, click L<here|https://en.wikipedia
 
 =head1 EXAMPLE3
 
- # Pragmas.
+=for comment filename=print_nizhny_novgorod_image.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Map::Tube::GraphViz;
  use Map::Tube::GraphViz::Utils qw(node_color_without_label);
  use Map::Tube::NizhnyNovgorod;
@@ -186,23 +185,23 @@ For more information about NizhnyNovgorod Map, click L<here|https://en.wikipedia
  system "ls -l NizhnyNovgorod.png";
 
  # Output like:
- # -rw-r--r-- 1 skim skim 292500 Dec 21 17:25 NizhnyNovgorod.png
+ # -rw-r--r-- 1 skim skim 38058 22. led 11.37 NizhnyNovgorod.png
 
 =begin html
 
-<a href="https://raw.githubusercontent.com/tupinek/Map-Tube-NizhnyNovgorod/master/images/ex3.png">
-  <img src="https://raw.githubusercontent.com/tupinek/Map-Tube-NizhnyNovgorod/master/images/ex3.png" alt="Нижегородский метрополитен" width="300px" height="300px" />
+<a href="https://raw.githubusercontent.com/michal-josef-spacek/Map-Tube-NizhnyNovgorod/master/images/NizhnyNovgorod.png">
+  <img src="https://raw.githubusercontent.com/michal-josef-spacek/Map-Tube-NizhnyNovgorod/master/images/NizhnyNovgorod.png" alt="Нижегородский метрополитен" width="300px" height="300px" />
 </a>
 
 =end html
 
 =head1 EXAMPLE4
 
- # Pragmas.
+=for comment filename=print_nizhny_novgorod_lines.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Encode qw(encode_utf8);
  use Map::Tube::NizhnyNovgorod;
 
@@ -218,6 +217,44 @@ For more information about NizhnyNovgorod Map, click L<here|https://en.wikipedia
  # Output:
  # Автозаводская линия
  # Сормовская линия
+
+=head1 EXAMPLE5
+
+=for comment filename=print_nizhny_novgorod_line_stations.pl
+
+ use strict;
+ use warnings;
+
+ use Encode qw(decode_utf8 encode_utf8);
+ use Map::Tube::NizhnyNovgorod;
+
+ # Arguments.
+ if (@ARGV < 1) {
+         print STDERR "Usage: $0 line\n";
+         exit 1;
+ }
+ my $line = decode_utf8($ARGV[0]);
+
+ # Object.
+ my $obj = Map::Tube::NizhnyNovgorod->new;
+
+ # Get stations for line.
+ my $stations_ar = $obj->get_stations($line);
+
+ # Print out.
+ map { print encode_utf8($_->name)."\n"; } @{$stations_ar};
+
+ # Output:
+ # Usage: __PROG__ line
+
+ # Output with 'foo' argument.
+ # Map::Tube::get_stations(): ERROR: Invalid Line Name [foo]. (status: 105) file __PROG__ on line __LINE__
+
+ # Output with 'Сормовская линия' argument.
+ # Московская
+ # Канавинская
+ # Бурнаковская
+ # Буревестник
 
 =head1 DEPENDENCIES
 
@@ -246,22 +283,24 @@ Install the Map::Tube concrete metro modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Map-Tube-NizhnyNovgorod>
+L<https://github.com/michal-josef-spacek/Map-Tube-NizhnyNovgorod>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2014-2015 Michal Špaček
- Artistic License
- BSD 2-Clause License
+© 2014-2025 Michal Josef Špaček
+
+Artistic License
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

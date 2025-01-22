@@ -35,3 +35,5 @@ map { print encode_utf8($_->name)."\n"; } @{$stations_ar};
 # 1 Mai
 # Jiului
 # Parc Bazilescu
+# Laminorului
+# Străulești

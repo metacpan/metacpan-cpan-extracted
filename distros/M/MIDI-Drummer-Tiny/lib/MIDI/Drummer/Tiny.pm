@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Glorified metronome
 
-our $VERSION = '0.4308';
+our $VERSION = '0.5004';
 
 use Moo;
 use strictures 2;
@@ -198,75 +198,35 @@ sub count_in {
 }
 
 
-sub metronome38 {
-    my $self = shift;
-    my $bars = shift || $self->bars;
-    my $cymbal = shift || $self->closed_hh;
-
-    for ( 1 .. $bars ) {
-        $self->note( $self->eighth, $cymbal, $self->kick );
-        $self->note( $self->eighth, $cymbal);
-        $self->note( $self->eighth, $cymbal, $self->snare );
-    }
-}
-
-
-sub metronome34 {
-    my $self = shift;
-    my $bars = shift || $self->bars;
-    my $cymbal = shift || $self->closed_hh;
-
-    for ( 1 .. $bars ) {
-        $self->note( $self->quarter, $cymbal, $self->kick );
-        $self->note( $self->quarter, $cymbal );
-        $self->note( $self->quarter, $cymbal, $self->snare );
-    }
-}
-
-
-sub metronome44 {
-    my $self = shift;
-    my $bars = shift || $self->bars;
-    my $flag = shift // 0;
-    my $cymbal = shift || $self->closed_hh;
-
-    my $i = 0;
-
-    for my $n ( 1 .. $self->beats * $bars ) {
-        if ( $n % 2 == 0 )
-        {
-            $self->note( $self->quarter, $cymbal, $self->snare );
-        }
-        else {
-            if ( $flag == 0 )
-            {
-                $self->note( $self->quarter, $cymbal, $self->kick );
-            }
-            else
-            {
-                if ( $i % 2 == 0 )
-                {
-                    $self->note( $self->quarter, $cymbal, $self->kick );
-                }
-                else
-                {
-                    $self->note( $self->eighth, $cymbal, $self->kick );
-                    $self->note( $self->eighth, $self->kick );
-                }
-            }
-
-            $i++;
-        }
-    }
-}
-
-
-sub metronome44swing {
+sub metronome3 {
     my $self   = shift;
     my $bars   = shift || $self->bars;
-    my $cymbal = shift || $self->ride1;
+    my $cymbal = shift || $self->closed_hh;
     my $tempo  = shift || $self->quarter;
-    my $swing  = shift || 67; # percent
+    my $swing  = shift || 50; # percent
+    my $x = dura_size($tempo) * TICKS;
+    my $y = sprintf '%0.f', ($swing / 100) * $x;
+    my $z = $x - $y;
+    for ( 1 .. $bars ) {
+        $self->note( "d$x", $cymbal, $self->kick );
+        if ( $swing > STRAIGHT ) {
+            $self->note( "d$y", $cymbal );
+            $self->note( "d$z", $cymbal );
+        }
+        else {
+            $self->note( "d$x", $cymbal );
+        }
+        $self->note( "d$x", $cymbal, $self->snare );
+    }
+}
+
+
+sub metronome4 {
+    my $self   = shift;
+    my $bars   = shift || $self->bars;
+    my $cymbal = shift || $self->closed_hh;
+    my $tempo  = shift || $self->quarter;
+    my $swing  = shift || 50; # percent
     my $x = dura_size($tempo) * TICKS;
     my $y = sprintf '%0.f', ($swing / 100) * $x;
     my $z = $x - $y;
@@ -291,89 +251,145 @@ sub metronome44swing {
 }
 
 
-sub metronome54 {
-    my $self = shift;
-    my $bars = shift || $self->bars;
+sub metronome5 {
+    my $self   = shift;
+    my $bars   = shift || $self->bars;
     my $cymbal = shift || $self->closed_hh;
-
+    my $tempo  = shift || $self->quarter;
+    my $swing  = shift || 50; # percent
+    my $x = dura_size($tempo) * TICKS;
+    my $half = $x / 2;
+    my $y = sprintf '%0.f', ($swing / 100) * $x;
+    my $z = $x - $y;
     for my $n (1 .. $bars) {
-        $self->note($self->quarter, $cymbal, $self->kick);
-        $self->note($self->quarter, $cymbal);
-        $self->note($self->quarter, $cymbal, $self->snare);
-        $self->note($self->quarter, $cymbal);
-        if ($n % 2) {
-            $self->note($self->quarter, $cymbal);
+        $self->note( "d$x", $cymbal, $self->kick );
+        if ( $swing > STRAIGHT ) {
+            $self->note( "d$y", $cymbal );
+            $self->note( "d$z", $cymbal );
         }
         else {
-            $self->note($self->eighth, $cymbal);
-            $self->note($self->eighth, $self->kick);
+            $self->note( "d$x", $cymbal );
+        }
+        $self->note( "d$x", $cymbal, $self->snare );
+        if ( $swing > STRAIGHT ) {
+            $self->note( "d$y", $cymbal );
+            $self->note( "d$z", $cymbal );
+        }
+        else {
+            $self->note( "d$x", $cymbal );
+        }
+        if ($n % 2) {
+            $self->note("d$x", $cymbal);
+        }
+        else {
+            $self->note("d$half", $cymbal);
+            $self->note("d$half", $self->kick);
         }
     }
 }
 
 
-sub metronome58 {
-    my $self = shift;
-    my $bars = shift || $self->bars;
+sub metronome6 {
+    my $self   = shift;
+    my $bars   = shift || $self->bars;
     my $cymbal = shift || $self->closed_hh;
-
+    my $tempo  = shift || $self->quarter;
+    my $swing  = shift || 50; # percent
+    my $x = dura_size($tempo) * TICKS;
+    my $y = sprintf '%0.f', ($swing / 100) * $x;
+    my $z = $x - $y;
     for my $n (1 .. $bars) {
-        $self->note($self->eighth, $cymbal, $self->kick);
-        $self->note($self->eighth, $cymbal);
-        $self->note($self->eighth, $cymbal, $self->snare);
-        $self->note($self->eighth, $cymbal);
-        $self->note($self->eighth, $cymbal);
+        $self->note( "d$x", $cymbal, $self->kick );
+        if ( $swing > STRAIGHT ) {
+            $self->note( "d$y", $cymbal );
+            $self->note( "d$z", $cymbal );
+        }
+        else {
+            $self->note( "d$x", $cymbal );
+        }
+        $self->note( "d$x", $cymbal );
+        $self->note( "d$x", $cymbal, $self->snare );
+        if ( $swing > STRAIGHT ) {
+            $self->note( "d$y", $cymbal );
+            $self->note( "d$z", $cymbal );
+        }
+        else {
+            $self->note( "d$x", $cymbal );
+        }
+        $self->note( "d$x", $cymbal );
     }
 }
 
 
-sub metronome68 {
+sub metronome7 {
     my $self = shift;
     my $bars = shift || $self->bars;
     my $cymbal = shift || $self->closed_hh;
-
+    my $tempo  = shift || $self->quarter;
+    my $swing  = shift || 50; # percent
+    my $x = dura_size($tempo) * TICKS;
+    my $y = sprintf '%0.f', ($swing / 100) * $x;
+    my $z = $x - $y;
     for my $n (1 .. $bars) {
-        $self->note($self->eighth, $cymbal, $self->kick);
-        $self->note($self->eighth, $cymbal);
-        $self->note($self->eighth, $cymbal);
-        $self->note($self->eighth, $cymbal, $self->snare);
-        $self->note($self->eighth, $cymbal);
-        $self->note($self->eighth, $cymbal);
+        $self->note( "d$x", $cymbal, $self->kick );
+        if ( $swing > STRAIGHT ) {
+            $self->note( "d$y", $cymbal );
+            $self->note( "d$z", $cymbal );
+        }
+        else {
+            $self->note( "d$x", $cymbal );
+        }
+        $self->note( "d$x", $cymbal );
+        if ( $swing > STRAIGHT ) {
+            $self->note( "d$y", $cymbal, $self->kick );
+            $self->note( "d$z", $cymbal );
+        }
+        else {
+            $self->note( "d$x", $cymbal, $self->kick );
+        }
+        $self->note( "d$x", $cymbal, $self->snare );
+        if ( $swing > STRAIGHT ) {
+            $self->note( "d$y", $cymbal );
+            $self->note( "d$z", $cymbal );
+        }
+        else {
+            $self->note( "d$x", $cymbal );
+        }
+        $self->note( "d$x", $cymbal );
     }
 }
 
 
-sub metronome74 {
+sub metronome44 {
     my $self = shift;
     my $bars = shift || $self->bars;
+    my $flag = shift // 0;
     my $cymbal = shift || $self->closed_hh;
-
-    for my $n (1 .. $bars) {
-        $self->note($self->quarter, $cymbal, $self->kick);
-        $self->note($self->quarter, $cymbal);
-        $self->note($self->quarter, $cymbal, $self->snare);
-        $self->note($self->eighth, $cymbal);
-        $self->note($self->eighth, $self->kick);
-        $self->note($self->quarter, $cymbal, $self->kick);
-        $self->note($self->quarter, $cymbal, $self->snare);
-        $self->note($self->quarter, $cymbal);
-    }
-}
-
-
-sub metronome78 {
-    my $self = shift;
-    my $bars = shift || $self->bars;
-    my $cymbal = shift || $self->closed_hh;
-
-    for my $n (1 .. $bars) {
-        $self->note($self->eighth, $cymbal, $self->kick);
-        $self->note($self->eighth, $cymbal);
-        $self->note($self->eighth, $cymbal);
-        $self->note($self->eighth, $cymbal, $self->kick);
-        $self->note($self->eighth, $cymbal, $self->snare);
-        $self->note($self->eighth, $cymbal);
-        $self->note($self->eighth, $cymbal);
+    my $i = 0;
+    for my $n ( 1 .. $self->beats * $bars ) {
+        if ( $n % 2 == 0 )
+        {
+            $self->note( $self->quarter, $cymbal, $self->snare );
+        }
+        else {
+            if ( $flag == 0 )
+            {
+                $self->note( $self->quarter, $cymbal, $self->kick );
+            }
+            else
+            {
+                if ( $i % 2 == 0 )
+                {
+                    $self->note( $self->quarter, $cymbal, $self->kick );
+                }
+                else
+                {
+                    $self->note( $self->eighth, $cymbal, $self->kick );
+                    $self->note( $self->eighth, $self->kick );
+                }
+            }
+            $i++;
+        }
     }
 }
 
@@ -687,7 +703,7 @@ MIDI::Drummer::Tiny - Glorified metronome
 
 =head1 VERSION
 
-version 0.4308
+version 0.5004
 
 =head1 SYNOPSIS
 
@@ -705,25 +721,20 @@ version 0.4308
     #snare => 40, # "
   );
 
-  $d->count_in(1);  # Closed hi-hat for 1 bar
-
-  $d->metronome54;  # 5/4 time for the number of bars
-
-  $d->rest($d->whole);
+  $d->metronome5($d->bars, $d->ride2, $d->quarter, 50);
 
   $d->set_time_sig('4/4');
 
-  $d->metronome44(3);  # 4/4 time for 3 bars
+  $d->count_in(1);  # Closed hi-hat for 1 bar
 
-  $d->metronome44swing(3, $d->ride2, $d->eighth, 60);
+  $d->metronome4($d->bars, $d->closed_hh, $d->eighth, 60);
+
+  $d->rest($d->whole);
 
   $d->flam($d->quarter, $d->snare);
   $d->crescendo_roll([50, 127, 1], $d->eighth, $d->thirtysecond);
   $d->note($d->sixteenth, $d->crash1);
   $d->accent_note(127, $d->sixteenth, $d->crash2);
-
-  my $patterns = [ your_function(5, 16), your_function(7, 16) ];
-  $d->pattern( instrument => $d->kick, patterns => $patterns );
 
   # Alternate kick and snare
   $d->note($d->quarter, $d->open_hh, $_ % 2 ? $d->kick : $d->snare)
@@ -737,6 +748,12 @@ version 0.4308
   ) for 1 .. $d->bars;
 
   $d->add_fill('...'); # see doc...
+
+  my $patterns = [
+    your_function(5, 16), # e.g. a euclidean function
+    your_function(7, 16), # ...
+  ];
+  $d->pattern( instrument => $d->kick, patterns => $patterns ); # see doc...
 
   print 'Count: ', $d->counter, "\n";
 
@@ -938,21 +955,62 @@ Play a patch for the number of beats times the number of bars.
 If no bars are given, the object setting is used.  If no patch is
 given, the closed hihat is used.
 
-=head2 metronome38
+=head2 metronome3
 
-  $d->metronome38;
-  $d->metronome38($bars);
-  $d->metronome38($bars, $cymbal);
+  $d->metronome3;
+  $d->metronome3($bars);
+  $d->metronome3($bars, $cymbal);
+  $d->metronome3($bars, $cymbal, $tempo);
+  $d->metronome3($bars, $cymbal, $tempo, $swing);
 
-Add a steady 3/8 beat to the score.
+Add a steady 3/x beat to the score.
 
-=head2 metronome34
+Defaults for all metronome methods:
 
-  $d->metronome34;
-  $d->metronome34($bars);
-  $d->metronome34($bars, $cymbal);
+  bars: The object B<bars>
+  cymbal: B<closed_hh>
+  tempo: B<quarter-note>
+  swing: 50 percent = straight-time
 
-Add a steady 3/4 beat to the score.
+=head2 metronome4
+
+  $d->metronome4;
+  $d->metronome4($bars);
+  $d->metronome4($bars, $cymbal);
+  $d->metronome4($bars, $cymbal, $tempo);
+  $d->metronome4($bars, $cymbal, $tempo, $swing);
+
+Add a steady 4/x beat to the score.
+
+=head2 metronome5
+
+  $d->metronome5;
+  $d->metronome5($bars);
+  $d->metronome5($bars, $cymbal);
+  $d->metronome5($bars, $cymbal, $tempo);
+  $d->metronome5($bars, $cymbal, $tempo, $swing);
+
+Add a 5/x beat to the score.
+
+=head2 metronome6
+
+  $d->metronome6;
+  $d->metronome6($bars);
+  $d->metronome6($bars, $cymbal);
+  $d->metronome6($bars, $cymbal, $tempo);
+  $d->metronome6($bars, $cymbal, $tempo, $swing);
+
+Add a 6/x beat to the score.
+
+=head2 metronome7
+
+  $d->metronome7;
+  $d->metronome7($bars);
+  $d->metronome7($bars, $cymbal);
+  $d->metronome7($bars, $cymbal, $tempo);
+  $d->metronome7($bars, $cymbal, $tempo, $swing);
+
+Add a 7/x beat to the score.
 
 =head2 metronome44
 
@@ -961,63 +1019,10 @@ Add a steady 3/4 beat to the score.
   $d->metronome44($bars, $flag);
   $d->metronome44($bars, $flag, $cymbal);
 
-Add a steady 4/4 beat to the score.
+Add a steady quarter-note based 4/4 beat to the score.
 
 If a B<flag> is provided the beat is modified to include alternating
 eighth-note kicks.
-
-=head2 metronome44swing
-
-  $d->metronome44swing($bars, $cymbal, $tempo, $swing);
-
-Add a steady 4/4 swing beat to the score.
-
-Defaults:
-
-  bars: The object B<bars>
-  cymbal: B<ride1>
-  tempo: B<quarter-note>
-  swing: 67 (percent)
-
-=head2 metronome54
-
-  $d->metronome54;
-  $d->metronome54($bars);
-  $d->metronome54($bars, $cymbal);
-
-Add a 5/4 beat to the score.
-
-=head2 metronome58
-
-  $d->metronome58;
-  $d->metronome58($bars);
-  $d->metronome58($bars, $cymbal);
-
-Add a 5/8 beat to the score.
-
-=head2 metronome68
-
-  $d->metronome68;
-  $d->metronome68($bars);
-  $d->metronome68($bars, $cymbal);
-
-Add a 6/8 beat to the score.
-
-=head2 metronome74
-
-  $d->metronome74;
-  $d->metronome74($bars);
-  $d->metronome74($bars, $cymbal);
-
-Add a 7/4 beat to the score.
-
-=head2 metronome78
-
-  $d->metronome78;
-  $d->metronome78($bars);
-  $d->metronome78($bars, $cymbal);
-
-Add a 7/8 beat to the score.
 
 =head2 flam
 
@@ -1089,6 +1094,10 @@ The B<vary> option is a hashref of coderefs, keyed by single character
 tokens, like the digits 0-9.  Each coderef duration should add up to
 the given B<duration> option.  The single argument to the coderefs is
 the object itself and may be used as: C<my $self = shift;> in yours.
+
+These patterns can be generated with any custom function, as in the
+L</SYNOPSIS>. For instance, you could use the L<Creating::Rhythms>
+module to generate Euclidean patterns.
 
 Defaults:
 

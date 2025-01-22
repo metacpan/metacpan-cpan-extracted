@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
     "Algorithm::Combinatorics" => 0,
     "Data::Dumper::Compact" => 0,
     "List::Util" => 0,
-    "MIDI::Util" => "0.1201",
+    "MIDI::Util" => "0.1302",
     "Math::Bezier" => 0,
     "Moo" => 2,
     "Music::Duration" => "0.0900",
@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.4308",
+  "VERSION" => "0.5004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -51,7 +51,7 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "List::Util" => 0,
-  "MIDI::Util" => "0.1201",
+  "MIDI::Util" => "0.1302",
   "Math::Bezier" => 0,
   "Moo" => 2,
   "Music::Duration" => "0.0900",

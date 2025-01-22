@@ -8,7 +8,7 @@ use File::Share ':all';
 use Moo;
 use namespace::clean;
 
-our $VERSION = 0.15;
+our $VERSION = 0.16;
 
 # Get XML.
 has xml => (
@@ -115,6 +115,8 @@ For more information about Prague Map, click L<here|https://en.wikipedia.org/wik
 
 =head1 EXAMPLE1
 
+=for comment filename=print_prague_route.pl
+
  use strict;
  use warnings;
 
@@ -135,6 +137,8 @@ For more information about Prague Map, click L<here|https://en.wikipedia.org/wik
 
 =head1 EXAMPLE2
 
+=for comment filename=print_prague_def_xml_file.pl
+
  use strict;
  use warnings;
 
@@ -153,6 +157,8 @@ For more information about Prague Map, click L<here|https://en.wikipedia.org/wik
  # XML file: .*/prague-map.xml
 
 =head1 EXAMPLE3
+
+=for comment filename=print_prague_image.pl
 
  use strict;
  use warnings;
@@ -177,17 +183,19 @@ For more information about Prague Map, click L<here|https://en.wikipedia.org/wik
  system "ls -l Prague.png";
 
  # Output like:
- # -rw-r--r-- 1 skim skim 166110 Apr  6 23:12 Prague.png
+ # -rw-r--r-- 1 skim skim 188225 22. led 09.13 Prague.png
 
 =begin html
 
-<a href="https://raw.githubusercontent.com/michal-josef-spacek/Map-Tube-Prague/master/images/ex3.png">
-  <img src="https://raw.githubusercontent.com/michal-josef-spacek/Map-Tube-Prague/master/images/ex3.png" alt="Pražské metro" width="300px" height="300px" />
+<a href="https://raw.githubusercontent.com/michal-josef-spacek/Map-Tube-Prague/master/images/Prague.png">
+  <img src="https://raw.githubusercontent.com/michal-josef-spacek/Map-Tube-Prague/master/images/Prague.png" alt="Pražské metro" width="300px" height="300px" />
 </a>
 
 =end html
 
 =head1 EXAMPLE4
+
+=for comment filename=print_prague_lines.pl
 
  use strict;
  use warnings;
@@ -209,6 +217,8 @@ For more information about Prague Map, click L<here|https://en.wikipedia.org/wik
  # Linka C
 
 =head1 EXAMPLE5
+
+=for comment filename=print_prague_line_stations.pl
 
  use strict;
  use warnings;
@@ -294,7 +304,7 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2014-2020 Michal Josef Špaček
+© 2014-2025 Michal Josef Špaček
 
 Artistic License
 
@@ -302,6 +312,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.15
+0.16
 
 =cut

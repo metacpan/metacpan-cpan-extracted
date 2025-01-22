@@ -32,6 +32,8 @@ verify = ->
 			dataType: 'json'
 			data:
 				generic: generic
+			headers:
+				"X-CSRF-Check": 1
 			error: displayError
 			success: (data) ->
 				if data.error
@@ -62,6 +64,8 @@ register = ->
 				genericname: genericname
 				genericcode: genericcode
 				token: token
+			headers:
+				"X-CSRF-Check": 1
 			error: displayError
 			success: (data) ->
 				if data.error

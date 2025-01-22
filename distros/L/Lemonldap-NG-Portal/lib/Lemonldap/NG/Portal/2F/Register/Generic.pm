@@ -56,6 +56,9 @@ sub sendcode {
         return $self->failResponse( $req, 'PE79', 200 );
     }
 
+    return $self->failResponse( $req, 'csrfError', 400 )
+      unless $self->checkCsrf($req);
+
     # Validate format
     unless ( $self->validateFormat($generic) ) {
         my $error_label = $self->conf->{generic2fFormatErrorLabel}
@@ -84,6 +87,10 @@ sub sendcode {
 sub verify {
 
     my ( $self, $req ) = @_;
+
+    return $self->failResponse( $req, 'csrfError', 400 )
+      unless $self->checkCsrf($req);
+
     my $user        = $req->userData->{ $self->conf->{whatToTrace} };
     my $generic     = $req->param('generic');
     my $tokenid     = $req->param("token");

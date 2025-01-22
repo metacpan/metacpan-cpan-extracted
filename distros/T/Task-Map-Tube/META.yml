@@ -22,25 +22,23 @@ no_index:
     - t
     - xt
 requires:
-  Map::Tube: 3.68
-  Map::Tube::API: 0.05
-  Map::Tube::CLI: 0.67
-  Map::Tube::Cookbook: 0.08
-  Map::Tube::Exception: 3.21
+  Map::Tube: 3.92
+  Map::Tube::API: 0.08
+  Map::Tube::CLI: 0.8
+  Map::Tube::Exception: 3.24
   Map::Tube::Graph: 0.06
   Map::Tube::GraphViz: 0.07
   Map::Tube::Plugin::Formatter: 0.17
-  Map::Tube::Plugin::FuzzyFind: 0.08
-  Map::Tube::Plugin::Graph: 0.42
-  Map::Tube::Server: 0.01
-  Map::Tube::Text::Shortest: 0.01
-  Map::Tube::Text::Table: 0.04
+  Map::Tube::Plugin::FuzzyFind: "\0Q\x01"
+  Map::Tube::Plugin::Graph: 0.45
+  Map::Tube::Server: 0.06
+  Map::Tube::Text::Shortest: 0.02
+  Map::Tube::Text::Table: 0.05
   Task::Map::Tube::Metro: 0.13
-  Test::Map::Tube: 0.57
   perl: 5.6.0
 resources:
   bugtracker: https://github.com/michal-josef-spacek/Task-Map-Tube/issues
   homepage: https://github.com/michal-josef-spacek/Task-Map-Tube
   license: http://opensource.org/licenses/artistic-license-2.0.php
   repository: git://github.com/michal-josef-spacek/Task-Map-Tube
-version: '0.47'
+version: '0.48'

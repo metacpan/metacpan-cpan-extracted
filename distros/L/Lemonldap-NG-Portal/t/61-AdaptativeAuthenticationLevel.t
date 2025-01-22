@@ -42,20 +42,23 @@ ok(
 count(1);
 $id = expectCookie($res);
 
+my $session = getSession($id)->data;
+is( $session->{uid}, 'dwho', 'uid found' ) or explain( $json, "uid='dwho'" );
+is( $session->{authenticationLevel}, 3, 'Authentication level upgraded' );
+count(2);
+
 ok(
     $res = $client->_get(
-        '/session/my/global', cookie => "lemonldap=$id"
+        '/refresh', cookie => "lemonldap=$id"
     ),
     'Get session'
 );
 count(1);
-$json = expectJSON($res);
 
-ok( $json->{uid} eq 'dwho', 'uid found' ) or explain( $json, "uid='dwho'" );
-ok( $json->{authenticationLevel} == 3, 'Authentication level upgraded' );
-ok( scalar keys %$json == 10,          'Ten exported attributes found' )
-  or explain( scalar keys %$json, Dumper $json );
-count(3);
+$session = getSession($id)->data;
+is( $session->{uid}, 'dwho', 'uid found' ) or explain( $json, "uid='dwho'" );
+is( $session->{authenticationLevel}, 3, 'Authentication level upgraded' );
+count(2);
 
 ok( $client->logout($id), 'Logout' );
 count(1);
@@ -72,16 +75,8 @@ ok(
 count(1);
 $id = expectCookie($res);
 
-ok(
-    $res = $client->_get(
-        '/session/my/global', cookie => "lemonldap=$id"
-    ),
-    'Get session'
-);
-count(1);
-$json = expectJSON($res);
-
-ok( $json->{authenticationLevel} == 5, 'Authentication level upgraded' );
+$session = getSession($id)->data;
+ok( $session->{authenticationLevel} == 5, 'Authentication level upgraded' );
 count(1);
 
 ok( $client->logout($id), 'Logout' );

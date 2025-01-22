@@ -18,6 +18,25 @@ SYNOPSIS
       print $req->pubkey_type();
       print $req->get_pem_req();
 
+      Crypt::OpenSSL::PKCS10->new()     # Defaults to a 1024-bit RSA private key
+
+      Crypt::OpenSSL::PKCS10->new(2048) # Specify a 2048-bit RSA private key
+
+      # With 2 arguements the keysize must be first
+      Crypt::OpenSSL::PKCS10->new(
+                                    2048,   # 2048-bit RSA keysize 
+                                    {
+                                        type    => 'rsa',      # Private key type ('rsa' or 'ec')
+                                        hash    => 'SHA256',   # Hash Algorithm name 
+                                    });
+
+      Crypt::OpenSSL::PKCS10->new(
+                                    {
+                                        type    => 'ec',        # Private key type ('rsa' or 'ec')
+                                        curve   => 'secp384r1', # Eliptic Curve type (secp384r1 default)
+                                        hash    => 'SHA256',    # Hash Algorithm name   
+                                    });
+
 ABSTRACT
       Crypt::OpenSSL::PKCS10 - Perl extension to OpenSSL's PKCS10 API.
 
@@ -26,9 +45,29 @@ DESCRIPTION
     requests using RSA key pairs.
 
 Class Methods
-    new Create a new Crypt::OpenSSL::PKCS10 object by generating a new RSA
-        key pair. There is one optional argument, the key size, which has
-        the default value of 1024 if omitted.
+    new Create a new Crypt::OpenSSL::PKCS10 object by generating a new key
+        pair. There are two optional arguments, the key size which defaults
+        to 1024, and a hash of options which can be used to customize
+        options.
+
+          Crypt::OpenSSL::PKCS10->new()     # Defaults to a 1024-bit RSA private key
+
+          Crypt::OpenSSL::PKCS10->new(2048) # Specify a 2048-bit RSA private key
+
+          # With 2 arguements the keysize must be first
+          Crypt::OpenSSL::PKCS10->new(
+                                        2048,   # 2048-bit RSA keysize 
+                                        {
+                                            type    => 'rsa',      # Private key type ('rsa' or 'ec')
+                                            hash    => 'SHA256',   # Hash Algorithm name 
+                                        });
+
+          Crypt::OpenSSL::PKCS10->new(
+                                        {
+                                            type    => 'ec',        # Private key type ('rsa' or 'ec')
+                                            curve   => 'secp384r1', # Eliptic Curve type (secp384r1 default)
+                                            hash    => 'SHA256',    # Hash Algorithm name   
+                                        });
 
     new_from_rsa( $rsa_object )
         Create a new Crypt::OpenSSL::PKCS10 object by using key information
@@ -36,6 +75,9 @@ Class Methods
 
           my $rsa = Crypt::OpenSSL::RSA->generate_key(512);
           my $req = Crypt::OpenSSL::PKCS10->new_from_rsa($rsa);
+
+          my $rsa = Crypt::OpenSSL::RSA->generate_key(1024);
+          my $req = Crypt::OpenSSL::PKCS10->new_from_rsa($rsa, {type => 'rsa', hash => 'SHA384'});
 
         OpenSSL 3.0 has deprecated the RSA object which Crypt::OpenSSL::RSA
         creates. new_from_rsa() is now a perl sub which obtains the private
@@ -47,6 +89,13 @@ Class Methods
         and key information from a PEM formatted file. Here is an example:
 
           my $req = Crypt::OpenSSL::PKCS10->new_from_file("CSR.csr");
+
+        You can also specify the format of the PKCS10 file, either DER or
+        PEM format. Here are some examples:
+
+          my $req = Crypt::OpenSSL::PKCS10->new_from_file("CSR.csr", Crypt::OpenSSL::PKCS10::FORMAT_PEM());
+
+          my $req = Crypt::OpenSSL::PKCS10->new_from_file("CSR.der", Crypt::OpenSSL::PKCS10::FORMAT_ASN1());
 
 Instance Methods
     set_subject($subject, [ $utf8 ])
@@ -89,6 +138,8 @@ Instance Methods
       This adds the signature to the PKCS10 request.
 
         $req->sign();
+
+        $req->sign("SHA256");     # Set the hash to use for the signature
 
     pubkey_type()
       Returns the type of the PKCS10 public key - one of (rsa|dsa|ec).

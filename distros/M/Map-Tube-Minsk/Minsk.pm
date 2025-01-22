@@ -8,7 +8,7 @@ use File::Share ':all';
 use Moo;
 use namespace::clean;
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 # Get XML.
 has xml => (
@@ -214,7 +214,7 @@ Returns string with XML.
  system "ls -l Minsk.png";
 
  # Output like:
- # -rw-r--r-- 1 skim skim 85988 Jan  4 11:32 Minsk.png
+ # -rw-r--r-- 1 skim skim 94891 21. led 18.04 Minsk.png
 
 =begin html
 
@@ -333,7 +333,7 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2014-2023 Michal Josef Špaček
+© 2014-2025 Michal Josef Špaček
 
 Artistic License
 
@@ -341,6 +341,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

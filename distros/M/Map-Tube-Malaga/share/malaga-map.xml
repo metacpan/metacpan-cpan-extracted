@@ -6,8 +6,11 @@
     <line id="L2" name="Línea 2" color="blue"/>
   </lines>
   <stations>
+    <!-- Stations on multiple lines -->
+    <station id="L1-01" name="El Perchel" line="L1:1" link="L1-02,L2-02"/>
+
     <!-- https://es.wikipedia.org/wiki/Línea_1_(Metro_de_Málaga)  -->
-    <station id="L1-01" name="El Perchel" line="L1:1" link="L1-02,L2-01"/>
+    <!-- El Perchel -->
     <station id="L1-02" name="La Unión" line="L1:2" link="L1-01,L1-03"/>
     <station id="L1-03" name="Barbarela" line="L1:3" link="L1-02,L1-04"/>
     <station id="L1-04" name="Carranque" line="L1:4" link="L1-03,L1-05"/>
@@ -20,8 +23,8 @@
     <station id="L1-11" name="Andalucía Tech" line="L1:11" link="L1-10"/>
 
     <!-- https://es.wikipedia.org/wiki/Línea_2_(Metro_de_Málaga) -->
-    <station id="L2-01" name="El Perchel" line="L2:1" link="L2-02,L1-01"/>
-    <station id="L2-02" name="La Isla" line="L2:2" link="L2-01,L2-03"/>
+    <!-- El Perchel -->
+    <station id="L2-02" name="La Isla" line="L2:2" link="L1-01,L2-03"/>
     <station id="L2-03" name="Princesa-Huelin" line="L2:3" link="L2-02,L2-04"/>
     <station id="L2-04" name="El Torcal" line="L2:4" link="L2-03,L2-05"/>
     <station id="L2-05" name="La Luz-La Paz" line="L2:5" link="L2-04,L2-06"/>

@@ -1,3 +1,11 @@
+0.5.2 2025-01-21
+
+    - Fixed a bug in orbits() which caused incorrect extraction of orbits
+      from Nauty's output.
+    - No need for canonical order in orbits().
+    - Deprecated orbits_are_same() as it has been implemented too naively
+      and due to that emits false negatives in certain situations.
+
 0.5.1 2022-08-06
 
     - Set default color subroutines in are_isomorphic() and

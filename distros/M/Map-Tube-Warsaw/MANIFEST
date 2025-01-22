@@ -4,7 +4,7 @@ examples/ex2.pl
 examples/ex3.pl
 examples/ex4.pl
 examples/ex5.pl
-images/ex3.png
+images/Warsaw.png
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm

@@ -1,5 +1,21 @@
 Revision history for MIDI-Drummer
 
+0.5004 2025-01-21 12:04:23
+    - Fix incorrect documentation! Argh
+
+0.5003 2025-01-21 11:50:53
+    - Fix metronome in the eg/metric-modulation program.
+    - Fix synopsis and pattern() description.
+
+0.5002 2025-01-21 09:23:36
+    - Fix synopsis and prereq version.
+
+0.5001 2025-01-21 08:59:30
+    - WTF?
+
+0.5000 2025-01-21 08:48:36
+    - Breaking change: Now all metronome methods are named differently and use percentage swing.
+
 0.4308 2025-01-20 18:43:56
     - Replace triplet swing with percentage swing.
 

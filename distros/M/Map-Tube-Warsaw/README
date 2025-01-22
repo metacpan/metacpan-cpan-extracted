@@ -119,7 +119,7 @@ EXAMPLE1
      print "Route: ".encode_utf8($route)."\n";
 
      # Output:
-     # Route: Imielin (Linia M1), Stokłosy (Linia M1), Ursynów (Linia M1), Służew (Linia M1), Wilanowska (Linia M1), Wierzbno (Linia M1), Racławicka (Linia M1), Pole Mokotowskie (Linia M1), Politechnika (Linia M1), Centrum (Linia M1), Świętokrzyska (Linia M1)
+     # Route: Imielin (Linia M1), Stokłosy (Linia M1), Ursynów (Linia M1), Służew (Linia M1), Wilanowska (Linia M1), Wierzbno (Linia M1), Racławicka (Linia M1), Pole Mokotowskie (Linia M1), Politechnika (Linia M1), Centrum (Linia M1), Świętokrzyska (Linia M1, Linia M2)
 
 EXAMPLE2
      use strict;
@@ -259,12 +259,12 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2014-2021 Michal Josef Špaček
+    © 2014-2025 Michal Josef Špaček
 
     Artistic License
 
     BSD 2-Clause License
 
 VERSION
-    0.08
+    0.09
 

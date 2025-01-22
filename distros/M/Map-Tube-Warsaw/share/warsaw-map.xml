@@ -6,6 +6,9 @@
     <line id="M2" name="Linia M2" color="red"/>
   </lines>
   <stations>
+    <!-- Stations on multiple lines -->
+    <station id="A14" name="Świętokrzyska" line="M1:13,M2:11" link="A13,A15,C10,C12"/>
+
     <!-- https://pl.wikipedia.org/wiki/Linia_M1_metra_w_Warszawie -->
     <station id="A1" name="Kabaty" line="M1:1" link="A2"/>
     <station id="A2" name="Natolin" line="M1:2" link="A1,A3"/>
@@ -19,7 +22,7 @@
     <station id="A10" name="Pole Mokotowskie" line="M1:10" link="A9,A11"/>
     <station id="A11" name="Politechnika" line="M1:11" link="A10,A13"/>
     <station id="A13" name="Centrum" line="M1:12" link="A11,A14"/>
-    <station id="A14" name="Świętokrzyska" line="M1:13" link="A13,A15" other_link="Tunnel:C11"/>
+    <!-- Świętokrzyska -->
     <station id="A15" name="Ratusz Arsenał" line="M1:14" link="A14,A17"/>
     <station id="A17" name="Dworzec Gdański" line="M1:15" link="A15,A18"/>
     <station id="A18" name="Plac Wilsona" line="M1:16" link="A17,A19"/>
@@ -34,9 +37,9 @@
     <station id="C7" name="Młynów" line="M2:7" link="C6,C8"/>
     <station id="C8" name="Płocka" line="M2:8" link="C7,C9"/>
     <station id="C9" name="Rondo Daszyńskiego" line="M2:9" link="C8,C10"/>
-    <station id="C10" name="Rondo ONZ" line="M2:10" link="C9,C11"/>
-    <station id="C11" name="Świętokrzyska" line="M2:11" link="C10,C12" other_link="Tunnel:A14"/>
-    <station id="C12" name="Nowy Świat-Uniwersytet" line="M2:12" link="C11,C13"/>
+    <station id="C10" name="Rondo ONZ" line="M2:10" link="C9,A14"/>
+    <!-- Świętokrzyska -->
+    <station id="C12" name="Nowy Świat-Uniwersytet" line="M2:12" link="A14,C13"/>
     <station id="C13" name="Centrum Nauki Kopernik" line="M2:13" link="C12,C14"/>
     <station id="C14" name="Stadion Narodowy" line="M2:14" link="C13,C15"/>
     <station id="C15" name="Dworzec Wileński" line="M2:15" link="C14"/>

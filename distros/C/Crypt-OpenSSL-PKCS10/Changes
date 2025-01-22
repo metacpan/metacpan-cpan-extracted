@@ -1,5 +1,93 @@
 Revision history for Perl extension Crypt::OpenSSL::PKCS10.
 
+0.31 -- Wed Jan 22 06:40:39 AST 2025
+
+    [Significant updates since 0.26]
+    - Merge RT#106313 from DDICK (Sorry its been 10 years)
+    - RT#106313 allows you to import PEM or DER based CSRs from a file
+    - Closes RT#133121 added support for Elliptic Curve based Certificate Requests
+    - This release allow you to choose specify the hash algorithm for RSA
+    - the sign() function supports specifying the hash algorithm
+    - For EC you can specify the hash algorithm and curve
+    - Added a Security Policy in SECURITY.md 
+
+    [Change Log]
+    - e76ac87 Increment repo version
+    - 0ed8116 v0.30
+
+0.30 -- Tue Jan 21 18:51:58 AST 2025
+
+    [Significant updates since 0.26]
+    - Merge RT#106313 from DDICK (Sorry its been 10 years)
+    - RT#106313 allows you to import PEM or DER based CSRs from a file
+    - Closes RT#133121 added support for Elliptic Curve based Certificate Requests
+    - This release allow you to choose specify the hash algorithm for RSA
+    - the sign() function supports specifying the hash algorithm
+    - For EC you can specify the hash algorithm and curve
+    - Added a Security Policy in SECURITY.md 
+
+    [Change Log]
+    - 61dcaf2 Increment repo version
+    - 88e84aa Add Environment variable for OPENSSL_CONF
+    - d4d5d39 Makefile.PL updates
+    - 944a42d Fixes for openssl 1.x
+    - 0174839 0.29
+    - a0ddf9a Increment repo version
+
+0.29 -- Sun Jan 19 10:55:51 AST 2025
+
+    [Significant updates since 0.26]
+    - Merge RT#106313 from DDICK (Sorry its been 10 years)
+    - RT#106313 allows you to import PEM or DER based CSRs from a file
+    - Closes RT#133121 added support for Elliptic Curve based Certificate Requests
+    - This release allow you to choose specify the hash algorithm for RSA
+    - the sign() function supports specifying the hash algorithm
+    - For EC you can specify the hash algorithm and curve
+    - Added a Security Policy in SECURITY.md 
+
+    [Change Log]
+    - 2f829b5 Add test to display openssl version
+
+0.28 -- Fri Jan 17 21:11:48 AST 2025
+
+    [Significant updates since 0.26]
+    - Merge RT#106313 from DDICK (Sorry its been 10 years)
+    - RT#106313 allows you to import PEM or DER based CSRs from a file
+    - Closes RT#133121 added support for Elliptic Curve based Certificate Requests
+    - This release allow you to choose specify the hash algorithm for RSA
+    - the sign() function supports specifying the hash algorithm
+    - For EC you can specify the hash algorithm and curve
+    - Added a Security Policy in SECURITY.md 
+
+    [Change Log]
+    - a78a1f0 Increment repo version
+    - 29f9e7e Check if openssl.cnf exists and provide if it does not exist
+    - df3e599 v0.27
+
+0.27 -- Thu Jan 16 21:44:42 AST 2025
+
+    [Significant updates since 0.26]
+    - Merge RT#106313 from DDICK (Sorry its been 10 years)
+    - RT#106313 allows you to import PEM or DER based CSRs from a file
+    - Closes RT#133121 added support for Elliptic Curve based Certificate Requests
+    - This release allow you to choose specify the hash algorithm for RSA
+    - the sign() function supports specifying the hash algorithm
+    - For EC you can specify the hash algorithm and curve
+    - Added a Security Policy in SECURITY.md 
+
+    [Change Log]
+    - adf69a9 Remove META files from repo
+    - 36b04f4 update .gitignore
+    - 58b42f3 Update Copyright and email address
+    - 6609e8d Increment repo version
+    - d39015b Add a security policy
+    - 58793a2 Add support for creating Elliptic Curve based Certificate Requests
+    - cea2a82 Move CSR files to a sub dir in test dir as the Encoding may be binary
+    - e472ca2 Make regex explicitly multiline match
+    - 3d143f3 Merge RT#106313: PATCH: Support for reading a PKCS10 file in DER format
+    - 4d4c129 libz needs to be linked explicitly on AIX
+    - d58e83e v0.26
+
 0.26 -- Sun Jun 09 12:18:15 ADT 2024
 
         [Significant updates since 0.25]

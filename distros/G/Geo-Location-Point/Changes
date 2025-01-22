@@ -1,5 +1,14 @@
 Revision history for Geo::Location::Point
 
+0.13	Tue Jan 21 10:33:46 EST 2025
+	Use gtar to create a distribution on Macs
+	Use Test::DescribeMe to simplify tests
+	More new() testing
+	Added codecov.io support
+	Refactor _sortoutcase
+	Don't install TimeZone::TimeZoneDB if it's already installed
+	Use Test::Needs
+
 0.12	Tue Jul  2 21:30:04 EDT 2024
 	Better argument validation
 	Added as_uri() method

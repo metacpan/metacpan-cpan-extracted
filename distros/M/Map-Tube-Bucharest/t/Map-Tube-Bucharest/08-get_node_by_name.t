@@ -27,7 +27,6 @@ is_deeply(
 	\@ret,
 	[
 		'M1-12',
-		'M3-06',
 	],
 	"Get all nodes for 'Eroilor'.",
 );

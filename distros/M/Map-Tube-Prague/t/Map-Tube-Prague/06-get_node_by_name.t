@@ -28,7 +28,6 @@ is_deeply(
 	\@ret,
 	[
 		'A09',
-		'B13',
 	],
 	"Get all nodes for 'Můstek'.",
 );

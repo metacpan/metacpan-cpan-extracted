@@ -12,8 +12,20 @@ my $d = MIDI::Drummer::Tiny->new(
 
 $d->count_in(1);
 
-$d->metronome44swing($d->bars, $d->closed_hh, $d->eighth, 50);
-$d->metronome44swing($d->bars, $d->ride2, $d->eighth, 67);
+$d->metronome3($d->bars, $d->closed_hh, $d->eighth, 50);
+$d->metronome3($d->bars, $d->ride2, $d->quarter, 67);
+
+$d->metronome4($d->bars, $d->closed_hh, $d->eighth, 50);
+$d->metronome4($d->bars, $d->ride2, $d->eighth, 67);
+
+$d->metronome5($d->bars, $d->closed_hh, $d->quarter, 50);
+$d->metronome5($d->bars, $d->ride2, $d->eighth, 67);
+
+$d->metronome6($d->bars, $d->closed_hh, $d->quarter, 50);
+$d->metronome6($d->bars, $d->ride2, $d->eighth, 67);
+
+$d->metronome7($d->bars, $d->closed_hh, $d->quarter, 50);
+$d->metronome7($d->bars, $d->ride2, $d->eighth, 67);
 
 $d->note( $d->quarter, $d->ride1, $d->kick );
 

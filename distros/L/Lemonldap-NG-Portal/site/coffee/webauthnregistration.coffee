@@ -31,6 +31,8 @@ register = ->
 		url: "#{portal}2fregisters/webauthn/registrationchallenge"
 		data: {}
 		dataType: 'json'
+		headers:
+			"X-CSRF-Check": 1
 		error: displayError
 		success: (ch) ->
 			# 2 build response
@@ -52,6 +54,8 @@ register = ->
 								state_id: ch.state_id
 								credential: JSON.stringify response
 								keyName: $('#keyName').val()
+							headers:
+								"X-CSRF-Check": 1
 							dataType: 'json'
 							success: (resp) ->
 								if resp.error
@@ -82,6 +86,8 @@ verify = ->
 		url: "#{portal}2fregisters/webauthn/verificationchallenge"
 		data: {}
 		dataType: 'json'
+		headers:
+			"X-CSRF-Check": 1
 		error: displayError
 		success: (ch) ->
 			# 2 build response
@@ -96,6 +102,8 @@ verify = ->
 						state_id: ch.state_id
 						credential: JSON.stringify response
 					dataType: 'json'
+					headers:
+						"X-CSRF-Check": 1
 					success: (resp) ->
 						if resp.error
 							setMsg 'webAuthnFailed', 'danger'

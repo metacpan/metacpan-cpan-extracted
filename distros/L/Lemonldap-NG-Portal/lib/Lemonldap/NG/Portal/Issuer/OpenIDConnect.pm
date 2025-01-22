@@ -1479,6 +1479,9 @@ sub _handleClientCredentialsGrant {
         $infos, $rp );
     return $self->sendOIDCError( $req, 'server_error', 500 ) if ( $h != PE_OK );
 
+    # Update scope in case hook changed it
+    $scope = $infos->{_scope};
+
     # Run rule against session info
     if ( my $rule = $self->rpRules->{$rp} ) {
         my $ruleVariables =
@@ -1499,7 +1502,7 @@ sub _handleClientCredentialsGrant {
     }
 
     my $access_token = $self->newAccessToken(
-        $req, $rp, $scope, $infos,
+        $req, $rp, $scope, $session->data,
         {
             scope           => $scope,
             rp              => $rp,

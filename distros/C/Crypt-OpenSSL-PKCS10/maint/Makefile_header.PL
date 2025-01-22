@@ -1,16 +1,18 @@
 use Config;
-use File::Spec;
-use Crypt::OpenSSL::Guess qw(openssl_version openssl_inc_paths openssl_lib_paths);
+use Crypt::OpenSSL::Guess qw(openssl_inc_paths openssl_lib_paths);
 
-my %args;
+my $libs = ' -lssl -lcrypto';
+if ($Config{osname} eq 'aix') {
+  $libs = $libs . ' -lz';
+}
 
-my ($major, $minor, $patch) = openssl_version();
-print "Installed OpenSSL: $major.$minor.$patch\n";
+my %args = (
+  LIBS => [openssl_lib_paths(). $libs],
+  INC => openssl_inc_paths(),
+);
 
-$args{INC} =  openssl_inc_paths();
-$args{LIBS} = [openssl_lib_paths() . ' -lssl -lcrypto'];
-
-my $cc_option_flags;
+my $cc_option_flags = " -O2 -g";
+my $cc_defines      = '';
 
 if ($Config::Config{cc} =~ /gcc/i) {
   $cc_option_flags .= $ENV{AUTHOR_TESTING} ? ' -Wall -Werror' : ' -Wall';
@@ -28,10 +30,6 @@ if ($Config{gccversion} =~ /llvm/i) {
     $cc_option_flags .= ' -Wno-deprecated-declarations';
   }
 
-  if ($Config{gccversion} =~ /llvm 13/i) {
-      $cc_option_flags .= ' -Wno-compound-token-split-by-macro';
-  }
-
   if ($Config{PERL_VERSION} <= 20) {
     $cc_option_flags .= ' -Wno-error=pointer-bool-conversion';
   }
@@ -43,9 +41,11 @@ if ($Config{myuname} =~ /sunos|solaris/i) {
   if ($Config{PERL_VERSION} <= 24) {
     $args{LIBS} = [openssl_lib_paths() . ' -leay32'];
   }
+  $cc_defines .= ' -DOPENSSL_NO_SCRYPT';
+  $args{DEFINE} = $cc_defines;
 } elsif ($Config{myuname} =~ /darwin/ ) {
-  $args{LDDLFLAGS} = openssl_lib_paths() . " " . $Config{lddlflags};
+  $args{LDDLFLAGS} = openssl_lib_paths() . ' ' . $Config{lddlflags};
 } else {
-  $args{LDDLFLAGS} = openssl_lib_paths() . " " . $Config{lddlflags};
+  $args{LDDLFLAGS} = openssl_lib_paths() . ' ' . $Config{lddlflags};
   $args{OPTIMIZE} = $cc_option_flags;
 }

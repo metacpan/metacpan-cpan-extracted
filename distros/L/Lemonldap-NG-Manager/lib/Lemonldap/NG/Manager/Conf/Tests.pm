@@ -119,14 +119,18 @@ sub tests {
         },
 
         vhostNotAnAlias => sub {
-            my ( @pb, $aliases );
+            my ( @pb, @aliases, @all_aliases );
 
-            $aliases = join ' ',
+            @aliases =
               map { $conf->{vhostOptions}->{$_}->{vhostAliases} }
               keys %{ $conf->{vhostOptions} };
 
+            foreach my $alias (@aliases) {
+                    push @all_aliases, split(/\s+/, $alias);
+            }
+
             foreach my $vh ( keys %{ $conf->{locationRules} } ) {
-                push @pb, $vh if $aliases =~ /\Q$vh\E/;
+                push @pb, $vh if ( grep /^$vh$/, @all_aliases );
             }
             return @pb
               ? ( 0, 'Virtual hosts ' . join( ', ', @pb ) . ' match an alias' )

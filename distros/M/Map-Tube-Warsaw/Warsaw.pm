@@ -8,7 +8,7 @@ use File::Share ':all';
 use Moo;
 use namespace::clean;
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 # Get XML.
 has xml => (
@@ -69,7 +69,7 @@ Returns instance of object.
 
 Get all routes from station to station.
 
-Returns reference to array with Map::Tube::Route objects.
+Returns reference to array with L<Map::Tube::Route> objects.
 
 =head2 C<get_line_by_id>
 
@@ -77,7 +77,7 @@ Returns reference to array with Map::Tube::Route objects.
 
 Get line object defined by id.
 
-Returns Map::Tube::Line object.
+Returns L<Map::Tube::Line> object.
 
 =head2 C<get_line_by_name>
 
@@ -85,7 +85,7 @@ Returns Map::Tube::Line object.
 
 Get line object defined by name.
 
-Returns Map::Tube::Line object.
+Returns L<Map::Tube::Line> object.
 
 =head2 C<get_lines>
 
@@ -93,7 +93,7 @@ Returns Map::Tube::Line object.
 
 Get lines in metro map.
 
-Returns reference to unsorted array with Map::Tube::Line objects.
+Returns reference to unsorted array with L<Map::Tube::Line> objects.
 
 =head2 C<get_node_by_id>
 
@@ -101,7 +101,7 @@ Returns reference to unsorted array with Map::Tube::Line objects.
 
 Get station node by id.
 
-Returns Map::Tube::Node object.
+Returns L<Map::Tube::Node> object.
 
 =head2 C<get_node_by_name>
 
@@ -109,13 +109,13 @@ Returns Map::Tube::Node object.
 
 Get station node by name.
 
-Returns Map::Tube::Node object.
+Returns L<Map::Tube::Node> object.
 
 =head2 C<get_shortest_route>
 
  my $route = $obj->get_shortest_route($from, $to);
 
-Get shortest route between $from and $to node names. Node names in $from and $to are case insensitive.
+Get shortest route between C<$from> and C<$to> node names. Node names in C<$from> and C<$to> are case insensitive.
 
 Returns Map::Tube::Route object.
 
@@ -125,7 +125,7 @@ Returns Map::Tube::Route object.
 
 Get list of stations for concrete metro line.
 
-Returns reference to array with Map::Tube::Node objects.
+Returns reference to array with L<Map::Tube::Node> objects.
 
 =head2 C<name>
 
@@ -161,7 +161,7 @@ Returns string with XML.
  print "Route: ".encode_utf8($route)."\n";
 
  # Output:
- # Route: Imielin (Linia M1), Stokłosy (Linia M1), Ursynów (Linia M1), Służew (Linia M1), Wilanowska (Linia M1), Wierzbno (Linia M1), Racławicka (Linia M1), Pole Mokotowskie (Linia M1), Politechnika (Linia M1), Centrum (Linia M1), Świętokrzyska (Linia M1)
+ # Route: Imielin (Linia M1), Stokłosy (Linia M1), Ursynów (Linia M1), Służew (Linia M1), Wilanowska (Linia M1), Wierzbno (Linia M1), Racławicka (Linia M1), Pole Mokotowskie (Linia M1), Politechnika (Linia M1), Centrum (Linia M1), Świętokrzyska (Linia M1, Linia M2)
 
 =head1 EXAMPLE2
 
@@ -211,8 +211,8 @@ Returns string with XML.
 
 =begin html
 
-<a href="https://raw.githubusercontent.com/michal-josef-spacek/Map-Tube-Warsaw/master/images/ex3.png">
-  <img src="https://raw.githubusercontent.com/michal-josef-spacek/Map-Tube-Warsaw/master/images/ex3.png" alt="Metro w Warszawie" width="300px" height="300px" />
+<a href="https://raw.githubusercontent.com/michal-josef-spacek/Map-Tube-Warsaw/master/images/Warsaw.png">
+  <img src="https://raw.githubusercontent.com/michal-josef-spacek/Map-Tube-Warsaw/master/images/Warsaw.png" alt="Metro w Warszawie" width="300px" height="300px" />
 </a>
 
 =end html
@@ -328,7 +328,7 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2014-2021 Michal Josef Špaček
+© 2014-2025 Michal Josef Špaček
 
 Artistic License
 
@@ -336,6 +336,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.09
 
 =cut

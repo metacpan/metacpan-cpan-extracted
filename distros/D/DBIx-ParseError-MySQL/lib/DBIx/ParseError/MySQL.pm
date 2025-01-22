@@ -11,7 +11,7 @@ use Types::Standard qw( Str Bool Object );
 
 # ABSTRACT: Error parser for MySQL
 use version;
-our $VERSION = 'v1.0.3'; # VERSION
+our $VERSION = 'v1.0.4'; # VERSION
 
 #pod =head1 SYNOPSIS
 #pod
@@ -114,7 +114,9 @@ sub _build_error_type {
         # Connection dropped/interrupted
         (?-x:MySQL server has gone away)|
         (?-x:Lost connection to MySQL server)|
-        (?-x:Query execution was interrupted)|
+        # NOTE: Exclude max_execution_time interruptions, since these are not connection
+        # failures, and retrying them would just produce the same results
+        (?-x:Query execution was interrupted(?!, maximum statement execution time exceeded))|
 
         # Initial connection failure
         (?-x:Bad handshake)|
@@ -221,7 +223,7 @@ DBIx::ParseError::MySQL - Error parser for MySQL
 
 =head1 VERSION
 
-version v1.0.3
+version v1.0.4
 
 =head1 SYNOPSIS
 
@@ -290,7 +292,7 @@ Grant Street Group <developers@grantstreet.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 - 2023 by Grant Street Group.
+This software is Copyright (c) 2020 - 2025 by Grant Street Group.
 
 This is free software, licensed under:
 

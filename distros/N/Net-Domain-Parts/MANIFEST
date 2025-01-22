@@ -1,0 +1,20 @@
+.DS_Store
+bin/generate-tld-json.pl
+Changes
+data/tld.json
+data/tld.txt
+lib/.DS_Store
+lib/Net/.DS_Store
+lib/Net/Domain/Parts.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+t/00-load.t
+t/05-struct_list.t
+t/10-version.t
+t/15-domain_parts.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

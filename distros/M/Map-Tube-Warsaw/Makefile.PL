@@ -20,7 +20,7 @@ name 'Map-Tube-Warsaw';
 readme_from 'Warsaw.pm';
 recursive_author_tests('xt');
 requires 'File::Share' => 0;
-requires 'Map::Tube' => '3.41';
+requires 'Map::Tube' => '3.62';
 requires 'Moo' => 0;
 requires 'namespace::clean' => 0;
 requires 'perl' => '5.8.0';
@@ -33,7 +33,7 @@ test_requires 'Test::Map::Tube' => 0.35;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.08';
+version '0.09';
 
 # Run.
 WriteAll();

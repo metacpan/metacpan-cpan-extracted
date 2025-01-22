@@ -25,7 +25,13 @@ LWP::Protocol::PSGI->register(
 );
 
 SKIP: {
-    eval "use Lasso";
+    unless (
+        eval
+'use Lasso; (Lasso::check_version( 2, 6, 0, Lasso::Constants::CHECK_VERSION_NUMERIC) )? 1 : 0'
+      )
+    {
+        skip 'Lasso not found or too old';
+    }
     if ($@) {
         skip 'Lasso not found';
     }
@@ -148,6 +154,22 @@ SKIP: {
         },
         "IDP attributes from configuration override"
     );
+
+    # Tests for getIssuer
+    # Redirect binding
+    my $msg =
+"SAMLRequest=fVHJasMwEP0Vo3tqRXY2YRvcOIFAl9CUHnopwpkkAllyNeMuf1%2FZaSG95PrmLfNmMlSNaWXZ0ck%2BwXsHSNFXYyzKYZCzzlvpFGqUVjWAkmq5K%2B%2FvpLjhsvWOXO0Mu5BcVyhE8KSdZdGmytnbNEmTBV%2Bli9ulKMt5KlbVfDkbizWfcVEmUxa9gMfAz1mQBxFiBxuLpCwFiIvxiE9H48mz4FJMZJq8sqgKHbRVNKhORK2MY71vJzFqezSw00f7GPLXztcw9M7ZQRmE3n0bFtQf8IcUWV9JDqm%2B%2BPXCYNUAqb0ilcWXhOx8zIdQe1NtndH1dx%2FTKLp%2BlR7R%2B9FhoMq2b4wEllhUGuM%2Blx4UhZ3Id8Di4pz5%2F2fFDw%3D%3D&RelayState=fake";
+    is( $saml->getIssuer($msg), "http://sp5/metadata", "getIssuer" );
+
+ # Check that Lasso bug https://dev.entrouvert.org/issues/97575 is worked around
+    $msg =
+"SAMLRequest=fVHJasMwEP0Vo3tqRXY2YRvcOIFAl9CUHnopwpkkAllyNeMuf1%2FZaSG95PrmLfNmMlSNaWXZ0ck%2BwXsHSNFXYyzKYZCzzlvpFGqUVjWAkmq5K%2B%2FvpLjhsvWOXO0Mu5BcVyhE8KSdZdGmytnbNEmTBV%2Bli9ulKMt5KlbVfDkbizWfcVEmUxa9gMfAz1mQBxFiBxuLpCwFiIvxiE9H48mz4FJMZJq8sqgKHbRVNKhORK2MY71vJzFqezSw00f7GPLXztcw9M7ZQRmE3n0bFtQf8IcUWV9JDqm%2B%2BPXCYNUAqb0ilcWXhOx8zIdQe1NtndH1dx%2FTKLp%2BlR7R%2B9FhoMq2b4wEllhUGuM%2Blx4UhZ3Id8Di4pz5%2F2fFDw%3D%3D&RelayState=";
+    is( $saml->getIssuer($msg), "http://sp5/metadata", "getIssuer" );
+
+    # POST
+    $msg =
+"PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHNhbWxwOkF1dGhuUmVxdWVzdCB4bWxuczpzYW1scD0idXJuOm9hc2lzOm5hbWVzOnRjOlNBTUw6Mi4wOnByb3RvY29sIgpJRD0ibGZub2VoY2ZnYWdmYmVmaWFpamFlZmRwbmRlcHBnbWZsbGVuZWxpayIgVmVyc2lvbj0iMi4wIgpJc3N1ZUluc3RhbnQ9IjIwMTAtMDktMjdUMTI6NTU6MjlaIgpQcm90b2NvbEJpbmRpbmc9InVybjpvYXNpczpuYW1lczp0YzpTQU1MOjIuMDpiaW5kaW5nczpIVFRQLVBPU1QiClByb3ZpZGVyTmFtZT0iZ29vZ2xlLmNvbSIgSXNQYXNzaXZlPSJmYWxzZSIKQXNzZXJ0aW9uQ29uc3VtZXJTZXJ2aWNlVVJMPSJodHRwczovL3d3dy5nb29nbGUuY29tL2EvbGluaWQub3JnL2FjcyI+PHNhbWw6SXNzdWVyCnhtbG5zOnNhbWw9InVybjpvYXNpczpuYW1lczp0YzpTQU1MOjIuMDphc3NlcnRpb24iPmdvb2dsZS5jb208L3NhbWw6SXNzdWVyPjxzYW1scDpOYW1lSURQb2xpY3kKQWxsb3dDcmVhdGU9InRydWUiCkZvcm1hdD0idXJuOm9hc2lzOm5hbWVzOnRjOlNBTUw6MS4xOm5hbWVpZC1mb3JtYXQ6dW5zcGVjaWZpZWQiCi8+PC9zYW1scDpBdXRoblJlcXVlc3Q+Cg==";
+    is( $saml->getIssuer($msg), "google.com", "getIssuer" );
 
 }
 clean_sessions();

@@ -11,6 +11,7 @@ build_requires:
   Test::More: 0
   Test::NoWarnings: 0
   Test::Output: 0
+  Test::Warn: 0
 configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
@@ -42,4 +43,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/App-Perl-Module-CopyrightYears
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/App-Perl-Module-CopyrightYears
-version: '0.04'
+version: '0.05'

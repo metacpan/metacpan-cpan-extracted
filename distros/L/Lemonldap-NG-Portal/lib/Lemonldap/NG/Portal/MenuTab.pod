@@ -1,0 +1,177 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Lemonldap:NG::Portal::MenuTab - Writing custom menu tabs for LemonLDAP::NG
+
+=head1 SYNOPSIS
+
+  package Lemonldap::NG::Portal::Plugins::CustomMenuTab;
+
+  use strict;
+  use Mouse;
+
+  our $VERSION = '0.1';
+
+  extends 'Lemonldap::NG::Portal::Main::Plugin';
+  with 'Lemonldap::NG::Portal::MenuTab';
+
+  use constant name => "CustomMenuTab";
+
+  has rule => (
+      is      => "ro",
+      lazy    => 1,
+      builder => sub { $_[0]->conf->{customPluginsParams}->{customMenuRule} },
+  );
+
+  sub display {
+      my ( $self, $req ) = @_;
+      return {
+          logo => "wrench",
+          name => "myplugin",
+          id   => "myplugin",
+          html => $self->loadTemplate($req, "mytemplate"),
+      };
+  }
+
+  sub init {
+      my $self = shift;
+
+      # [your initialization stuff]
+
+      return 1;
+  }
+
+  1;
+
+=head1 DESCRIPTION
+
+A MenuTab module handles displaying an additional tab to authenticated users.
+
+=head2 Methods that must be provided by a MenuTab module
+
+=head3 rule
+
+This method must return the text of a rule that decides whether or not the tab
+is displayed to a user.
+
+Rules can be simple expressions such as C<$uid eq "dwho">. If you want the tab
+to always be displayed, simply return a non-zero integer
+
+    use constant rule => 1;
+
+=head3 name
+
+This method must return a name for the plugin. This name is used for ordering
+the tab in the C<portalDisplayOrder> variable. It is not displayed to the user.
+
+=head3 display($req)
+
+This method is called by the portal in order to display the tab. It takes the
+current request object as a parameters, and must return a hash with the
+following subkeys:
+
+
+=over
+
+=item C<logo>: name of a fontawesome icon for the tab
+
+=item C<name>: user-displayed name of the tab, which should be translated in I<lang>.json files.
+
+=item C<id>: HTML element id for the tab, must be unique
+
+=item C<html>: HTML content of the tab
+
+=back
+
+The C<display> method can call helper functions such as C<loadTemplate> to render a template
+
+=head2 Ordering of portal tabs
+
+You can use the C<portalDisplayOrder> variable to change the order of portal tabs.
+
+Use the C<name> of your plugin in this list, or use the special C<_unknown>
+keyword to specify an order for all plugin-managed tabs. If multiple modules
+are loaded, they will be displayed in the order they were loaded.
+
+    portalDisplayOrder = Appslist ChangePassword CustomMenuTab LoginHistory \
+        OidcConsents _unknown Logout
+
+=head1 METHODS
+
+=head2 Accessors and methods provided by Lemonldap::NG::Portal::Main::Plugin
+
+=over
+
+=item p: portal object
+
+=item conf: configuration hash (as reference)
+
+=item logger alias for p->logger accessor
+
+=item userLogger alias for p->userLogger accessor
+
+=item error: alias for p->error method
+
+=item loadTemplate: render a HTML template from a .tpl file
+
+=back
+
+=head2 "Routes" management
+
+Like each module that inherits from Lemonldap::NG::Portal::Plugin,
+you can define dedicated routes in a MenuTab plugin.
+
+=over
+
+=item addAuthRoute: wrapper to L<Lemonldap::NG::Handler::PSGI::Try>
+addAuthRoute() method
+
+=item addUnauthRoute: wrapper to L<Lemonldap::NG::Handler::PSGI::Try>
+addUnauthRoute() method
+
+=back
+
+=head1 LOGGING
+
+Logging is provided by C<$self-E<gt>logger> and C<$self-E<gt>userLogger>. See
+L<Lemonldap::NG::Portal::Main::Plugin> for a detailed description of logging levels.
+
+=head1 AUTHORS
+
+=over
+
+=item LemonLDAP::NG team L<http://lemonldap-ng.org/team>
+
+=back
+
+=head1 BUG REPORT
+
+Use OW2 system to report bug or ask for features:
+L<https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues>
+
+=head1 DOWNLOAD
+
+Lemonldap::NG is available at
+L<https://lemonldap-ng.org/download>
+
+=head1 COPYRIGHT AND LICENSE
+
+See COPYING file for details.
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2, or (at your option)
+any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see L<http://www.gnu.org/licenses/>.
+
+=cut

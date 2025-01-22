@@ -1,8 +1,6 @@
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Map::Tube::Nanjing;
 use Test::Map::Tube 'tests' => 2;
 use Test::NoWarnings;

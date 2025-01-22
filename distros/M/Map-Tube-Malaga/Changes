@@ -1,3 +1,7 @@
+0.17 2025-01-21T21:15:39+01:00
+ - Fix stations on multiple lines (GH#2).
+ - Update copyright years.
+
 0.16 2023-12-09T10:57:12+01:00
  - Add EXAMPLE5 section to doc.
  - Add link to Wikipedia page to XML file.

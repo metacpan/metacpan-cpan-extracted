@@ -158,7 +158,7 @@
 "contextSwitching_ON":"Esiinny toisena käyttäjänä",
 "continue":"Jatka",
 "createAccount":"Luo käyttäjätili",
-"csrfToken":"Security token is invalid. Page will refresh automatically. Please try again.",
+"csrfError":"CSRF check failed",
 "current":"Nykyinen",
 "currentPwd":"Nykyinen salasana",
 "date":"Päivämäärä",

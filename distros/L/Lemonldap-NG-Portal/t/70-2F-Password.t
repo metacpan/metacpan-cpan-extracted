@@ -5,8 +5,7 @@ use IO::String;
 
 require 't/test-lib.pm';
 
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel                   => 'error',
             password2fSelfRegistration => 1,
@@ -72,6 +71,9 @@ subtest 'Register Password 2FA' => sub {
                 IO::String->new($s),
                 length => length($s),
                 cookie => "lemonldap=$id",
+                custom => {
+                    HTTP_X_CSRF_CHECK => 1,
+                },
             )
         ),
         'Post registration (mismatched)'
@@ -86,6 +88,9 @@ subtest 'Register Password 2FA' => sub {
                 IO::String->new($s),
                 length => length($s),
                 cookie => "lemonldap=$id",
+                custom => {
+                    HTTP_X_CSRF_CHECK => 1,
+                },
             )
         ),
         'Post registration (mismatched)'
@@ -100,6 +105,9 @@ subtest 'Register Password 2FA' => sub {
                 IO::String->new($s),
                 length => length($s),
                 cookie => "lemonldap=$id",
+                custom => {
+                    HTTP_X_CSRF_CHECK => 1,
+                },
             )
         ),
         'Post registration (mismatched)'

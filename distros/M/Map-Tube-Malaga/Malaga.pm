@@ -8,7 +8,7 @@ use File::Share ':all';
 use Moo;
 use namespace::clean;
 
-our $VERSION = 0.16;
+our $VERSION = 0.17;
 
 # Get XML.
 has xml => (
@@ -332,7 +332,7 @@ I dedicate this module to my visit in Málaga.
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2015-2023 Michal Josef Špaček
+© 2015-2025 Michal Josef Špaček
 
 Artistic License
 
@@ -340,6 +340,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.16
+0.17
 
 =cut

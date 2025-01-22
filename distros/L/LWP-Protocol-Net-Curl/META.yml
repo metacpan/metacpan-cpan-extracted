@@ -9,7 +9,7 @@ build_requires:
   Test::HTTP::Server: '0'
   perl: '5.008'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,7 +18,7 @@ name: LWP-Protocol-Net-Curl
 provides:
   LWP::Protocol::Net::Curl:
     file: lib/LWP/Protocol/Net/Curl.pm
-    version: '0.026'
+    version: '0.027'
 requires:
   HTTP::Date: '0'
   LWP::Protocol: '0'
@@ -30,10 +30,11 @@ resources:
   bugtracker: https://github.com/creaktive/LWP-Protocol-Net-Curl/issues
   homepage: https://github.com/creaktive/LWP-Protocol-Net-Curl
   repository: git://github.com/creaktive/LWP-Protocol-Net-Curl.git
-version: '0.026'
+version: '0.027'
 x_contributors:
   - 'José Joaquín Atria <jjatria@gmail.com>'
   - 'Nick Kostyria <kostirya@gmail.com>'
   - 'Peter Williams <pjwilliams@gmail.com>'
-x_generated_by_perl: v5.30.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+x_generated_by_perl: v5.36.3
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

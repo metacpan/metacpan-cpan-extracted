@@ -28,7 +28,6 @@ is_deeply(
 	\@ret,
 	[
 		'A14',
-		'C11',
 	],
 	"Get all nodes for 'Świętokrzyska'.",
 );

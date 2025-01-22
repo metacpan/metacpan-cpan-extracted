@@ -51,7 +51,9 @@ sub init {
     );
 
     return 0 unless $self->captcha;
-    unless ( $self->{conf}->{captcha_login_enabled} ) {
+    unless ($self->{conf}->{captcha_login_enabled}
+        and $self->{conf}->{captcha_login_enabled} eq '0' )
+    {
         $self->ott( $self->p->loadModule('::Lib::OneTimeToken') ) or return 0;
         $self->ott->timeout( $self->conf->{formTimeout} );
     }

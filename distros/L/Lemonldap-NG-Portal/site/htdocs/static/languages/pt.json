@@ -158,7 +158,7 @@
 "contextSwitching_ON":"Personifique outro usuário",
 "continue":"Continue",
 "createAccount":"Criar uma conta",
-"csrfToken":"Security token is invalid. Page will refresh automatically. Please try again.",
+"csrfError":"CSRF check failed",
 "current":"Atual",
 "currentPwd":"Senha atual",
 "date":"Data",

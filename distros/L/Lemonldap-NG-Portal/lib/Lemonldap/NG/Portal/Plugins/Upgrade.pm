@@ -79,6 +79,9 @@ sub ask {
     $self->logger->debug(" -> Skip confirmation is enabled")
       if $self->conf->{"skip${action}Confirmation"};
 
+    $url = '' if $self->p->checkXSSAttack('url', $url);
+    $forceUpgrade = '' if $self->p->checkXSSAttack('forceUpgrade', $forceUpgrade);
+
     # Display form
     return $self->p->sendHtml(
         $req,

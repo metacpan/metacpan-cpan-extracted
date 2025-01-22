@@ -263,8 +263,7 @@ sub expectRedirection {
         return @match;
     }
     else {
-        ok( getRedirection($res) eq $location, " Location is $location" )
-          or explain( $res->[1], "Location => $location" );
+        is( getRedirection($res), $location, " Location is $location" );
         count(1);
     }
 }

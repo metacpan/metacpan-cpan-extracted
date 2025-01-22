@@ -14,8 +14,7 @@ SKIP: {
     }
     my $res;
 
-    my $client = LLNG::Manager::Test->new(
-        {
+    my $client = LLNG::Manager::Test->new( {
             ini => {
                 logLevel                             => 'error',
                 authentication                       => 'Demo',
@@ -50,9 +49,13 @@ SKIP: {
     # JS query
     ok(
         $res = $client->_post(
-            '/2fregisters/totp/getkey', IO::String->new(''),
+            '/2fregisters/totp/getkey',
+            IO::String->new(''),
             cookie => "lemonldap=$id",
             length => 0,
+            custom => {
+                HTTP_X_CSRF_CHECK => 1,
+            },
         ),
         'Get new key'
     );
@@ -77,6 +80,9 @@ SKIP: {
             IO::String->new($s),
             length => length($s),
             cookie => "lemonldap=$id",
+            custom => {
+                HTTP_X_CSRF_CHECK => 1,
+            },
         ),
         'Post code'
     );
