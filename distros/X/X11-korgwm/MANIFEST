@@ -12,6 +12,7 @@ lib/X11/korgwm/Expose.pm
 lib/X11/korgwm/Hotkeys.pm
 lib/X11/korgwm/Layout.pm
 lib/X11/korgwm/Mouse.pm
+lib/X11/korgwm/Notifications.pm
 lib/X11/korgwm/Panel.pm
 lib/X11/korgwm/Panel/Battery.pm
 lib/X11/korgwm/Panel/Clock.pm

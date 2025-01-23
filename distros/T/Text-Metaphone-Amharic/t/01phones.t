@@ -6,6 +6,7 @@
 use Test::More qw(no_plan);
 use strict;
 use utf8;
+binmode(STDOUT, ":utf8");
 
 require Text::Metaphone::Amharic;
 

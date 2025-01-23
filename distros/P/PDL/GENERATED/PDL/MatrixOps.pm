@@ -22,6 +22,7 @@ use DynaLoader;
 
 
 
+
 #line 14 "lib/PDL/MatrixOps.pd"
 
 =encoding utf8
@@ -49,8 +50,8 @@ contains utilities for many common matrix operations: inversion,
 determinant finding, eigenvalue/vector finding, singular value
 decomposition, etc.  PDL::MatrixOps routines are written in a mixture
 of Perl and C, so that they are reliably present even when there is no
-FORTRAN compiler or external library available (e.g.
-L<PDL::Slatec> or any of the PDL::GSL family of modules).
+external library available (e.g.
+L<PDL::LinearAlgebra> or any of the PDL::GSL family of modules).
 
 Matrix manipulation, particularly with large matrices, is a
 challenging field and no one algorithm is suitable in all cases.  The
@@ -132,7 +133,7 @@ document it!
 
 use Carp;
 use strict;
-#line 136 "lib/PDL/MatrixOps.pm"
+#line 137 "lib/PDL/MatrixOps.pm"
 
 
 =head1 FUNCTIONS
@@ -431,14 +432,15 @@ sub determinant {
 
   return $sum;
 }
-#line 435 "lib/PDL/MatrixOps.pm"
+#line 436 "lib/PDL/MatrixOps.pm"
 
 
 =head2 eigens_sym
 
 =for sig
 
-  Signature: ([phys]a(m); [o,phys]ev(n,n); [o,phys]e(n))
+ Signature: ([phys]a(m); [o,phys]ev(n,n); [o,phys]e(n))
+ Types: (double)
 
 =for ref
 
@@ -489,9 +491,13 @@ To compare with L<PDL::LinearAlgebra>:
     ($ev, $e) = eigens_sym($x); # e-vects & e-values
     $e = eigens_sym($x);        # just eigenvalues
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-eigens_sym ignores the bad-value flag of the input ndarrays.
+C<eigens_sym> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -528,7 +534,8 @@ sub PDL::eigens_sym {
 
 =for sig
 
-  Signature: ([phys]a(n,n); complex [o,phys]ev(n,n); complex [o,phys]e(n))
+ Signature: ([phys]a(n,n); complex [o,phys]ev(n,n); complex [o,phys]e(n))
+ Types: (double)
 
 =for ref
 
@@ -585,9 +592,13 @@ To compare with L<PDL::LinearAlgebra>:
   ($ev, $e) = eigens($x); # e'vects & e'vals
   $e = eigens($x);        # just eigenvalues
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-eigens ignores the bad-value flag of the input ndarrays.
+C<eigens> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -625,11 +636,15 @@ sub PDL::eigens {
 
 =for sig
 
-  Signature: (a(n,m); [t]w(wsize=CALC($SIZE(n) * ($SIZE(m) + $SIZE(n)))); [o]u(n,m); [o,phys]z(n); [o]v(n,n))
+ Signature: (a(n,m); [t]w(wsize=CALC($SIZE(n) * ($SIZE(m) + $SIZE(n)))); [o]u(n,m); [o,phys]z(n); [o]v(n,n))
+ Types: (double)
 
 =for usage
 
- ($u, $s, $v) = svd($x);
+ ($u, $z, $v) = svd($a);
+ svd($a, $u, $z, $v);    # all arguments given
+ ($u, $z, $v) = $a->svd; # method call
+ $a->svd($u, $z, $v);
 
 =for ref
 
@@ -675,9 +690,13 @@ orientation of the ellipsoid of transformation:
       $x .= $r2 x $r1;  # a gets r2 x ess x r1
     }
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-svd ignores the bad-value flag of the input ndarrays.
+C<svd> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -691,7 +710,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 694 "lib/PDL/MatrixOps.pd"
+#line 690 "lib/PDL/MatrixOps.pd"
 
 =head2 lu_decomp
 
@@ -864,7 +883,7 @@ sub lu_decomp {
    wantarray ? ($out,$permute,$parity) : $out;
 }
 
-#line 871 "lib/PDL/MatrixOps.pd"
+#line 867 "lib/PDL/MatrixOps.pd"
 
 =head2 lu_decomp2
 
@@ -980,7 +999,7 @@ sub lu_decomp2 {
   wantarray ? ($out,$perm,$par) : $out;
 }
 
-#line 992 "lib/PDL/MatrixOps.pd"
+#line 988 "lib/PDL/MatrixOps.pd"
 
 =head2 lu_backsub
 
@@ -1023,13 +1042,6 @@ Solve A x = B for matrix A, by back substitution into A's LU decomposition.
   @broadcast = PDL::Core::dims_filled(\@A_dims, \@B_dims);
   # simq modifies A, so need 1 copy per broadcast else non-first run has wrong A
   ($x) = simq($A->dupN(1,1,map +($A_dims[$_]//1)==1?$broadcast[$_]:1, 0..$#broadcast)->copy, $B->transpose, 0);
-  $x = $x->inplace->transpose;
-
-  # or with Slatec LINPACK
-  use PDL::Slatec;
-  gefa($lu=$A->copy, $ipiv=null, $info=null);
-  # 1 = do transpose because Fortran's idea of rows vs columns
-  gesl($lu, $ipiv, $x=$B->transpose->copy, 1);
   $x = $x->inplace->transpose;
 
   # or with PDL::LinearAlgebra wrappers of LAPACK
@@ -1200,14 +1212,15 @@ BROADCAST_OK:
    }
    $out;
 }
-#line 1204 "lib/PDL/MatrixOps.pm"
+#line 1216 "lib/PDL/MatrixOps.pm"
 
 
 =head2 simq
 
 =for sig
 
-  Signature: ([io,phys]a(n,n); [phys]b(n); [o,phys]x(n); int [o,phys]ips(n); int flag)
+ Signature: ([io,phys]a(n,n); [phys]b(n); [o,phys]x(n); int [o,phys]ips(n); int flag)
+ Types: (double)
 
 =for ref
 
@@ -1246,9 +1259,13 @@ would be written to.
 See also L</lu_backsub>, which does the same thing with a slightly
 less opaque interface.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-simq ignores the bad-value flag of the input ndarrays.
+C<simq> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1267,16 +1284,29 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n,n); [o]b(m=CALC(($SIZE(n) * ($SIZE(n)+1))/2)))
+ Signature: (a(n,n); [o]b(m=CALC(($SIZE(n) * ($SIZE(n)+1))/2)))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $b = squaretotri($a);
+ squaretotri($a, $b);  # all arguments given
+ $b = $a->squaretotri; # method call
+ $a->squaretotri($b);
 
 =for ref
 
 Convert a lower-triangular square matrix to triangular vector storage.
 Ignores upper half of input.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-squaretotri does not process bad values.
+C<squaretotri> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1295,16 +1325,29 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(m); [o]b(n,n))
+ Signature: (a(m); [o]b(n,n))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $b = tritosquare($a);
+ tritosquare($a, $b);  # all arguments given
+ $b = $a->tritosquare; # method call
+ $a->tritosquare($b);
 
 =for ref
 
 Convert a triangular vector to lower-triangular square matrix storage.
 Does not touch upper half of output.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-tritosquare does not process bad values.
+C<tritosquare> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1323,20 +1366,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (A(m,n);[o] C(m,n); int uplo)
+ Signature: (A(m,n);[o] C(m,n); int uplo)
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
 
 =for usage
 
-tricpy(PDL(A), int(uplo), PDL(C))
-
-=for example
-
-  $c = $a->tricpy($uplo); # explicit uplo
-  $c = $a->tricpy;        # default upper
-
-or
-
-  tricpy($a, $uplo, $c);  # modify c
+ $C = tricpy($A);            # using default of uplo=0
+ $C = tricpy($A, $uplo);
+ $C = tricpy($A, $uplo, $C); # all arguments given
+ $C = $A->tricpy;            # method call
+ $C = $A->tricpy($uplo);
+ $C = $A->tricpy($uplo, $C);
 
 =for ref
 
@@ -1345,9 +1386,13 @@ part.
 
 Originally by Grégory Vanuxem.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-tricpy does not process bad values.
+C<tricpy> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1366,7 +1411,16 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(n,m);y(n,p);[o]out(n,q=CALC($SIZE(m)+$SIZE(p))))
+ Signature: (x(n,m);y(n,p);[o]out(n,q=CALC($SIZE(m)+$SIZE(p))))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $out = mstack($x, $y);
+ mstack($x, $y, $out);  # all arguments given
+ $out = $x->mstack($y); # method call
+ $x->mstack($y, $out);
 
 =for ref
 
@@ -1376,9 +1430,14 @@ This routine does backward and forward dataflow automatically.
 
 Originally by Grégory Vanuxem.
 
+=pod
+
+Broadcasts over its inputs.
+Creates data-flow back and forth by default.
+
 =for bad
 
-mstack does not process bad values.
+C<mstack> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1397,7 +1456,16 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(n); y(p);[o]out(q=CALC($SIZE(n)+$SIZE(p))))
+ Signature: (x(n); y(p);[o]out(q=CALC($SIZE(n)+$SIZE(p))))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $out = augment($x, $y);
+ augment($x, $y, $out);  # all arguments given
+ $out = $x->augment($y); # method call
+ $x->augment($y, $out);
 
 =for ref
 
@@ -1406,9 +1474,14 @@ This routine does backward and forward dataflow automatically.
 
 Originally by Grégory Vanuxem.
 
+=pod
+
+Broadcasts over its inputs.
+Creates data-flow back and forth by default.
+
 =for bad
 
-augment does not process bad values.
+C<augment> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1424,7 +1497,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1395 "lib/PDL/MatrixOps.pd"
+#line 1371 "lib/PDL/MatrixOps.pd"
 
 =head1 AUTHOR
 
@@ -1436,7 +1509,7 @@ itself.  If this file is separated from the PDL distribution, then the
 PDL copyright notice should be included in this file.
 
 =cut
-#line 1440 "lib/PDL/MatrixOps.pm"
+#line 1513 "lib/PDL/MatrixOps.pm"
 
 # Exit with OK status
 

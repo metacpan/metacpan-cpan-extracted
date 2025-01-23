@@ -22,6 +22,7 @@ use DynaLoader;
 
 
 
+
 #line 11 "lib/PDL/IO/Pnm.pd"
 
 use strict;
@@ -58,7 +59,7 @@ sub dmax {
     $sz-- if !PDL::Type->new($type)->unsigned;
     return ((1 << $sz)-1);
 }
-#line 62 "lib/PDL/IO/Pnm.pm"
+#line 63 "lib/PDL/IO/Pnm.pm"
 
 
 =head1 FUNCTIONS
@@ -74,8 +75,16 @@ sub dmax {
 
 =for sig
 
-  Signature: (type(); byte+ [o] im(m,n); byte [t] buf(llen); IV ms => m; IV ns => n;
+ Signature: (type(); byte+ [o] im(m,n); byte [t] buf(llen); IV ms => m; IV ns => n;
 			int isbin; PerlIO *fp)
+ Types: (byte ushort long)
+
+=for usage
+
+ $im = pnminraw($type, $ms, $ns, $isbin, $fp);
+ pnminraw($type, $im, $ms, $ns, $isbin, $fp);  # all arguments given
+ $im = $type->pnminraw($ms, $ns, $isbin, $fp); # method call
+ $type->pnminraw($im, $ms, $ns, $isbin, $fp);
 
 =for ref
 
@@ -86,9 +95,13 @@ determine the type of the operation when creating C<im> or trigger
 the appropriate type conversion (maybe we want a byte+ here so that
 C<im> follows I<strictly> the type of C<type>).
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-pnminraw does not process bad values.
+C<pnminraw> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -107,16 +120,28 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (type(); byte+ [o] im(m,n); IV ms => m; IV ns => n;
+ Signature: (type(); byte+ [o] im(m,n); IV ms => m; IV ns => n;
 			int format; PerlIO *fp)
+ Types: (byte ushort short long)
+
+=for usage
+
+ $im = pnminascii($type, $ms, $ns, $format, $fp);
+ pnminascii($type, $im, $ms, $ns, $format, $fp);  # all arguments given
+ $im = $type->pnminascii($ms, $ns, $format, $fp); # method call
+ $type->pnminascii($im, $ms, $ns, $format, $fp);
 
 =for ref
 
 Read in an ascii pnm file.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-pnminascii does not process bad values.
+C<pnminascii> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -135,7 +160,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(m); int israw; int isbin; PerlIO *fp)
+ Signature: (a(m); int israw; int isbin; PerlIO *fp)
+ Types: (byte ushort short long)
+
+=for usage
+
+ pnmout($a, $israw, $isbin, $fp); # all arguments given
+ $a->pnmout($israw, $isbin, $fp); # method call
 
 =for ref
 
@@ -144,9 +175,14 @@ Write a line of pnm data.
 This function is implemented this way so that broadcasting works
 naturally.
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-pnmout does not process bad values.
+C<pnmout> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -388,7 +424,7 @@ the copyright notice should be included in the file.
 =cut
 
 ############################## END PM CODE ################################
-#line 392 "lib/PDL/IO/Pnm.pm"
+#line 428 "lib/PDL/IO/Pnm.pm"
 
 # Exit with OK status
 

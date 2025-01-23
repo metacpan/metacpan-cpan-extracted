@@ -7,7 +7,7 @@ BEGIN
 use strict;
 use vars qw($VERSION @EXPORT_OK %EXPORT_TAGS %CherokeeClasses %CherokeeEquivalence $pseudoMatrix);
 
-	$VERSION = "0.03";
+	$VERSION = "0.04";
 	
 	@EXPORT_OK = qw(%CherokeeClasses %CherokeeEquivalence &getForm &setForm &subForm &formatForms);
 	%EXPORT_TAGS = ( utils => [qw(&getForm &setForm &subForm &formatForms)] );
@@ -303,6 +303,7 @@ $_ = ($#_) ? $_[1] : $_[0];
 
 __END__
 
+=encoding utf8
 
 =head1 NAME
 

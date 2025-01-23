@@ -15,6 +15,7 @@ t/pp.t
 t/rand.t
 t/export.t
 t/core_fork.t
+t/core_fork_pp.t
 t/core_partial_read.t
 t/core_read.t
 t/core_sysopen.t

@@ -1,3 +1,4 @@
+.gitattributes
 .github/workflows/linux-ubuntu-latest-32bit.yml
 .github/workflows/linux-ubuntu-latest-perl-5.8.9.yml
 .github/workflows/linux-ubuntu-latest.yml
@@ -6,8 +7,6 @@
 .github/workflows/windows-latest.yml
 .gitignore
 Changes
-lib/SPVM/Encode.c
-lib/SPVM/Encode.config
 lib/SPVM/Encode.pm
 lib/SPVM/Encode.spvm
 LICENSE

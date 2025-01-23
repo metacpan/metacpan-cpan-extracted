@@ -47,11 +47,11 @@ Provides a geocoding functionality to a local SQLite database containing geo-cod
 
 =head1 VERSION
 
-Version 0.37
+Version 0.38
 
 =cut
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 
 =head1 SYNOPSIS
 
@@ -89,7 +89,7 @@ This process will take some time.
 
     $geocoder = Geo::Coder::Free::OpenAddresses->new(openaddr => $ENV{'OPENADDR_HOME'});
 
-Takes an optional parameter directory, which is the directory of the file
+Takes an optional parameter "openaddr", which is the directory of the file
 openaddresses.sql.
 
 Takes an optional parameter cache, which points to an object that understands get() and set() messages to store data in
@@ -104,11 +104,11 @@ sub new {
 	return unless($class);
 
 	if(my $openaddr = $param{'openaddr'}) {
-		Carp::croak("Can't find the directory $openaddr")
+		Carp::croak(__PACKAGE__, ": Can't find the directory $openaddr")
 			if((!-d $openaddr) || (!-r $openaddr));
 		return bless { openaddr => $openaddr, cache => $param{'cache'} }, $class;
 	}
-	Carp::croak(__PACKAGE__, ": usage: new(openaddr => '/path/to/openaddresses')");
+	Carp::croak(__PACKAGE__, ": Usage: new(openaddr => '/path/to/openaddresses')");
 }
 
 =head2 geocode
@@ -121,6 +121,8 @@ sub new {
     # TODO:
     # @locations = $geocoder->geocode('Portland, USA');
     # diag 'There are Portlands in ', join (', ', map { $_->{'state'} } @locations);
+
+    @locations = $geo_coder->geocode(scantext => 'arbitrary text', region => 'US', ignore_words => [ 'foo', 'bar' ]);
 
 When looking for a house number in a street, if that address isn't found but that
 street is found, a place in the street is given.
@@ -147,6 +149,11 @@ sub geocode
 		$param{location} = shift;
 	}
 
+	my %ignore_words;
+	if($param{'ignore_words'}) {
+		%ignore_words = map { lc($_) => 1 } @{$param{'ignore_words'}};
+	}
+
 	if(my $scantext = $param{'scantext'}) {
 		return if(length($scantext) < 6);
 		# FIXME:  wow this is inefficient
@@ -155,8 +162,16 @@ sub geocode
 		my $count = scalar(@words);
 		my $offset = 0;
 		my @rc;
+		my $region = $param{'region'};
+		if($region) {
+			$region = uc($region);
+		}
 		while($offset < $count) {
 			if(length($words[$offset]) < 2) {
+				$offset++;
+				next;
+			}
+			if(exists($ignore_words{lc($words[$offset])})) {
 				$offset++;
 				next;
 			}
@@ -172,39 +187,52 @@ sub geocode
 				# https://stackoverflow.com/questions/11160192/how-to-parse-freeform-street-postal-address-out-of-text-and-into-components
 				# TODO: Support longer addresses
 				if($addr =~ /\s+(\d{2,5}\s+)(?![a|p]m\b)(([a-zA-Z|\s+]{1,5}){1,2})?([\s|\,|.]+)?(([a-zA-Z|\s+]{1,30}){1,4})(court|ct|street|st|drive|dr|lane|ln|road|rd|blvd)([\s|\,|.|\;]+)?(([a-zA-Z|\s+]{1,30}){1,2})([\s|\,|.]+)?\b(AK|AL|AR|AZ|CA|CO|CT|DC|DE|FL|GA|GU|HI|IA|ID|IL|IN|KS|KY|LA|MA|MD|ME|MI|MN|MO|MS|MT|NC|ND|NE|NH|NJ|NM|NV|NY|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VA|VI|VT|WA|WI|WV|WY)([\s|\,|.]+)?(\s+\d{5})?([\s|\,|.]+)/i) {
-					if(($l = $self->geocode(location => "$addr, US")) && ref($l)) {
-						$l->confidence(0.8);
-						$l->country('US');
-						$l->location("$addr, USA");
-						push @rc, $l;
+					unless($region && ($region ne 'US')) {
+						if(($l = $self->geocode(location => "$addr, US")) && ref($l)) {
+							$l->confidence(0.8);
+							$l->country('US');
+							$l->location("$addr, USA");
+							push @rc, $l;
+						}
 					}
 				} elsif($addr =~ /\s+(\d{2,5}\s+)(?![a|p]m\b)(([a-zA-Z|\s+]{1,5}){1,2})?([\s|\,|.]+)?(([a-zA-Z|\s+]{1,30}){1,4})(court|ct|street|st|drive|dr|lane|ln|road|rd|blvd)([\s|\,|.|\;]+)?(([a-zA-Z|\s+]{1,30}){1,2})([\s|\,|.]+)?\b(AB|BC|MB|NB|NL|NT|NS|ON|PE|QC|SK|YT)([\s|\,|.]+)?(\s+\d{5})?([\s|\,|.]+)/i) {
-					if(($l = $self->geocode(location => "$addr, Canada")) && ref($l)) {
-						$l->confidence(0.8);
-						$l->country('CA');
-						$l->location("$addr, Canada");
-						push @rc, $l;
+					unless($region && ($region ne 'CA')) {
+						if(($l = $self->geocode(location => "$addr, Canada")) && ref($l)) {
+							$l->confidence(0.8);
+							$l->country('CA');
+							$l->location("$addr, Canada");
+							push @rc, $l;
+						}
 					}
 				} elsif($addr =~ /([a-zA-Z|\s+]{1,30}){1,2}([\s|\,|.]+)?\b(AK|AL|AR|AZ|CA|CO|CT|DC|DE|FL|GA|GU|HI|IA|ID|IL|IN|KS|KY|LA|MA|MD|ME|MI|MN|MO|MS|MT|NC|ND|NE|NH|NJ|NM|NV|NY|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VA|VI|VT|WA|WI|WV|WY)/i) {
-					if(($l = $self->geocode(location => "$addr, US")) && ref($l)) {
-						$l->confidence(0.6);
-						$l->city(uc($1));
-						$l->state(uc($3));
-						$l->country('US');
-						$l->location(uc("$addr, USA"));
-						push @rc, $l;
+					unless($region && ($region ne 'US')) {
+						if(($l = $self->geocode(location => "$addr, US")) && ref($l)) {
+							$l->confidence(0.6);
+							$l->city(uc($1));
+							$l->state(uc($3));
+							$l->country('US');
+							$l->location(uc("$addr, USA"));
+							push @rc, $l;
+						}
 					}
 				} elsif($addr =~ /([a-zA-Z|\s+]{1,30}){1,2}([\s|\,|.]+)?\b(AB|BC|MB|NB|NL|NT|NS|ON|PE|QC|SK|YT)/i) {
-					if(($l = $self->geocode(location => "$addr, Canada")) && ref($l)) {
-						$l->confidence(0.6);
-						$l->city(uc($1));
-						$l->state(uc($3));
-						$l->country('Canada');
-						$l->location(uc("$addr, Canada"));
-						push @rc, $l;
+					unless($region && ($region ne 'CA')) {
+						if(($l = $self->geocode(location => "$addr, Canada")) && ref($l)) {
+							$l->confidence(0.6);
+							$l->city(uc($1));
+							$l->state(uc($3));
+							$l->country('Canada');
+							$l->location(uc("$addr, Canada"));
+							push @rc, $l;
+						}
 					}
 				}
-				if(($l = $self->geocode(location => $addr)) && ref($l)) {
+				if($region && (($l = $self->geocode(location => "$addr, $region")) && ref($l))) {
+					$l->confidence(0.2);
+					$l->location("$addr, $region");
+					# ::diag(__LINE__, ": $addr, $region");
+					push @rc, $l;
+				} elsif((!$region) && (($l = $self->geocode(location => $addr)) && ref($l))) {
 					$l->confidence(0.1);
 					$l->location($addr);
 					# ::diag(__LINE__, ": $addr");
@@ -242,6 +270,13 @@ sub geocode
 	if($location =~ /^,\s*(.+)/) {
 		$location = $1;
 	}
+
+	# Fail when the input is just a set of numbers
+	if($location !~ /\D/) {
+		# Carp::croak('Usage: ', __PACKAGE__, ": invalid input to geocode(), $location");
+		return;
+	}
+	return if(length($location) <= 1);
 
 	if($location =~ /^(.+),?\s*Washington\s*DC$/i) {
 		$location = "$1, Washington, DC, USA";
@@ -1011,7 +1046,13 @@ When I added the WhosOnFirst data I should have renamed this as it contains
 data from both sources.
 
 The database shouldn't be called $OPENADDR_HOME/openaddresses.sql,
-since the datbase now also includes data from WhosOnFirst.
+since the database now also includes data from WhosOnFirst.
+
+The name openaddresses.sql shouldn't be hardcoded,
+add support to "new" for the parameter "dbname".
+
+The argument "openaddr",
+would be less confusing if it were called "directory",
 
 =head1 SEE ALSO
 
@@ -1019,7 +1060,7 @@ VWF, openaddresses.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2023 Nigel Horne.
+Copyright 2017-2025 Nigel Horne.
 
 The program code is released under the following licence: GPL for personal use on a single computer.
 All other users (including Commercial, Charity, Educational, Government)

@@ -22,6 +22,7 @@ use DynaLoader;
 
 
 
+
 #line 11 "lib/PDL/Image2D.pd"
 
 use strict;
@@ -47,7 +48,7 @@ use PDL::Math;
 use Carp;
 
 my %boundary2value = (Reflect=>1, Truncate=>2, Replicate=>3);
-#line 51 "lib/PDL/Image2D.pm"
+#line 52 "lib/PDL/Image2D.pm"
 
 
 =head1 FUNCTIONS
@@ -75,7 +76,9 @@ my %boundary2value = (Reflect=>1, Truncate=>2, Replicate=>3);
 
 =for sig
 
-  Signature: (a(m,n); kern(p,q); [o]b(m,n); indx [t]mapi(isize=CALC($SIZE(p) + $SIZE(m))); indx [t]mapj(jsize=CALC($SIZE(q) + $SIZE(n))); int opt)
+ Signature: (a(m,n); kern(p,q); [o]b(m,n); indx [t]mapi(isize=CALC($SIZE(p) + $SIZE(m))); indx [t]mapj(jsize=CALC($SIZE(q) + $SIZE(n))); int opt)
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
 
 =for ref
 
@@ -102,6 +105,10 @@ will be quicker.
  	    => Reflect   - reflect at boundary
  	    => Truncate  - truncate at boundary
  	    => Replicate - repeat boundary pixel values
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
@@ -138,7 +145,9 @@ sub PDL::conv2d {
 
 =for sig
 
-  Signature: (a(m,n); kern(p,q); [o]b(m,n); double+ [t]tmp(pq=CALC($SIZE(p)*$SIZE(q))); indx [t]mapi(isize=CALC($SIZE(p) + $SIZE(m))); indx [t]mapj(jsize=CALC($SIZE(q) + $SIZE(n))); int opt)
+ Signature: (a(m,n); kern(p,q); [o]b(m,n); double+ [t]tmp(pq=CALC($SIZE(p)*$SIZE(q))); indx [t]mapi(isize=CALC($SIZE(p) + $SIZE(m))); indx [t]mapj(jsize=CALC($SIZE(q) + $SIZE(n))); int opt)
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
 
 =for ref
 
@@ -165,6 +174,10 @@ is rather pointless)
  	    => Truncate  - truncate at boundary
  	    => Replicate - repeat boundary pixel values
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
 Bad values are ignored in the calculation. If all elements within the
@@ -190,7 +203,7 @@ sub PDL::med2d {
    );
    return $c;
 }
-#line 194 "lib/PDL/Image2D.pm"
+#line 207 "lib/PDL/Image2D.pm"
 
 *med2d = \&PDL::med2d;
 
@@ -203,7 +216,9 @@ sub PDL::med2d {
 
 =for sig
 
-  Signature: (a(m,n); [o]b(m,n); indx [t]mapi(isize=CALC($SIZE(p) + $SIZE(m))); indx [t]mapj(jsize=CALC($SIZE(q) + $SIZE(n))); IV p_size=>p; IV q_size=>q; int opt)
+ Signature: (a(m,n); [o]b(m,n); indx [t]mapi(isize=CALC($SIZE(p) + $SIZE(m))); indx [t]mapj(jsize=CALC($SIZE(q) + $SIZE(n))); IV p_size=>p; IV q_size=>q; int opt)
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
 
 =for ref
 
@@ -230,9 +245,13 @@ Note: this routine does the median over all points in a rectangular
  	    => Truncate  - truncate at boundary
  	    => Replicate - repeat boundary pixel values
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-med2df does not process bad values.
+C<med2df> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -267,7 +286,16 @@ sub PDL::med2df {
 
 =for sig
 
-  Signature: (a(n,m); [o] b(n,m); int wx; int wy; int edgezero)
+ Signature: (a(n,m); [o] b(n,m); int wx; int wy; int edgezero)
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $b = box2d($a, $wx, $wy, $edgezero);
+ box2d($a, $b, $wx, $wy, $edgezero);  # all arguments given
+ $b = $a->box2d($wx, $wy, $edgezero); # method call
+ $a->box2d($b, $wx, $wy, $edgezero);
 
 =for ref
 
@@ -288,9 +316,13 @@ better filters are around (e.g., use L</conv2d> with the appropriate
 kernel). On the other hand it is fast and computational cost grows only
 approximately linearly with window size.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-box2d does not process bad values.
+C<box2d> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -309,20 +341,29 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(m,n); int bad(m,n); [o]b(m,n))
+ Signature: (a(m,n); int bad(m,n); [o]b(m,n))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $b = patch2d($a, $bad);
+ patch2d($a, $bad, $b);  # all arguments given
+ $b = $a->patch2d($bad); # method call
+ $a->patch2d($bad, $b);
 
 =for ref
 
 patch bad pixels out of 2D images using a mask
 
-=for usage
-
- $patched = patch2d $data, $bad;
-
 C<$bad> is a 2D mask array where 1=bad pixel 0=good pixel.
 Pixels are replaced by the average of their non-bad neighbours;
 if all neighbours are bad, the original data value is
 copied across.
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
@@ -344,20 +385,29 @@ This routine does not handle bad values - use L</patchbad2d> instead
 
 =for sig
 
-  Signature: (a(m,n); [o]b(m,n))
+ Signature: (a(m,n); [o]b(m,n))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $b = patchbad2d($a);
+ patchbad2d($a, $b);  # all arguments given
+ $b = $a->patchbad2d; # method call
+ $a->patchbad2d($b);
 
 =for ref
 
 patch bad pixels out of 2D images containing bad values
 
-=for usage
-
- $patched = patchbad2d $data;
-
 Pixels are replaced by the average of their non-bad neighbours;
 if all neighbours are bad, the output is set bad.
 If the input ndarray contains I<no> bad values, then a straight copy
 is performed (see L</patch2d>).
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
@@ -380,13 +430,26 @@ bad values, depending on the pattern of bad values in the input ndarray.
 
 =for sig
 
-  Signature: (a(m,n); [o]val(); int [o]x(); int[o]y())
+ Signature: (a(m,n); [o]val(); int [o]x(); int[o]y())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ ($val, $x, $y) = max2d_ind($a);
+ max2d_ind($a, $val, $x, $y);    # all arguments given
+ ($val, $x, $y) = $a->max2d_ind; # method call
+ $a->max2d_ind($val, $x, $y);
 
 =for ref
 
 Return value/position of maximum value in 2D image
 
 Contributed by Tim Jenness
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
@@ -409,7 +472,16 @@ are bad then the output is set bad.
 
 =for sig
 
-  Signature: (im(m,n); x(); y(); box(); [o]xcen(); [o]ycen())
+ Signature: (im(m,n); x(); y(); box(); [o]xcen(); [o]ycen())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ ($xcen, $ycen) = centroid2d($im, $x, $y, $box);
+ centroid2d($im, $x, $y, $box, $xcen, $ycen);    # all arguments given
+ ($xcen, $ycen) = $im->centroid2d($x, $y, $box); # method call
+ $im->centroid2d($x, $y, $box, $xcen, $ycen);
 
 =for ref
 
@@ -417,6 +489,10 @@ Refine a list of object positions in 2D image by centroiding in a box
 
 C<$box> is the full-width of the box, i.e. the window
 is C<+/- $box/2>.
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
@@ -435,7 +511,7 @@ something with negatives in...) then the output values are set bad.
 
 
 
-#line 716 "lib/PDL/Image2D.pd"
+#line 708 "lib/PDL/Image2D.pd"
 
 =head2 crop
 
@@ -464,7 +540,7 @@ sub PDL::crop {
   $x1->cat($x2, $y1, $y2)->mv(-1,0);
 }
 
-#line 746 "lib/PDL/Image2D.pd"
+#line 738 "lib/PDL/Image2D.pd"
 
 =head2 cc8compt
 
@@ -507,14 +583,23 @@ sub PDL::cc4compt{
 return ccNcompt(shift,4);
 }
 *cc4compt = \&PDL::cc4compt;
-#line 511 "lib/PDL/Image2D.pm"
+#line 587 "lib/PDL/Image2D.pm"
 
 
 =head2 ccNcompt
 
 =for sig
 
-  Signature: (a(m,n); int+ [o]b(m,n); int con)
+ Signature: (a(m,n); int+ [o]b(m,n); int con)
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $b = ccNcompt($a, $con);
+ ccNcompt($a, $b, $con);  # all arguments given
+ $b = $a->ccNcompt($con); # method call
+ $a->ccNcompt($b, $con);
 
 =for ref
 
@@ -534,9 +619,13 @@ The connectivity parameter must be 4 or 8.
 
 where the second parameter specifies the connectivity (4 or 8) of the labeling.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ccNcompt ignores the bad-value flag of the input ndarrays.
+C<ccNcompt> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -550,7 +639,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 913 "lib/PDL/Image2D.pd"
+#line 905 "lib/PDL/Image2D.pd"
 
 =head2 polyfill
 
@@ -605,7 +694,7 @@ sub PDL::polyfill {
 
 *polyfill = \&PDL::polyfill;
 
-#line 970 "lib/PDL/Image2D.pd"
+#line 962 "lib/PDL/Image2D.pd"
 
 =head2 pnpoly
 
@@ -685,7 +774,7 @@ sub PDL::pnpoly {
 
 *pnpoly = \&PDL::pnpoly;
 
-#line 1053 "lib/PDL/Image2D.pd"
+#line 1045 "lib/PDL/Image2D.pd"
 
 =head2 polyfillv
 
@@ -736,14 +825,22 @@ sub PDL::polyfillv :lvalue {
 	return $im->where($msk);
 }
 *polyfillv = \&PDL::polyfillv;
-#line 740 "lib/PDL/Image2D.pm"
+#line 829 "lib/PDL/Image2D.pm"
 
 
 =head2 rot2d
 
 =for sig
 
-  Signature: (im(m,n); float angle(); bg(); int aa(); [o] om(p,q))
+ Signature: (im(m,n); float angle(); bg(); int aa(); [o] om(p,q))
+ Types: (byte)
+
+=for usage
+
+ $om = rot2d($im, $angle, $bg, $aa);
+ rot2d($im, $angle, $bg, $aa, $om);  # all arguments given
+ $om = $im->rot2d($angle, $bg, $aa); # method call
+ $im->rot2d($angle, $bg, $aa, $om);
 
 =for ref
 
@@ -771,9 +868,13 @@ L<PDL::Transform> offers a more general interface to
 distortions, including rotation, with various types of sampling; but
 rot2d is faster.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-rot2d ignores the bad-value flag of the input ndarrays.
+C<rot2d> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -792,7 +893,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (Int(n,m); [io] O(q,p))
+ Signature: (Int(n,m); [io] O(q,p))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ bilin2d($Int, $O); # all arguments given
+ $Int->bilin2d($O); # method call
 
 =for ref
 
@@ -800,9 +908,13 @@ Bilinearly maps the first ndarray in the second. The
 interpolated values are actually added to the second
 ndarray which is supposed to be larger than the first one.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-bilin2d ignores the bad-value flag of the input ndarrays.
+C<bilin2d> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -821,7 +933,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (Int(m,n); [io] O(p,q))
+ Signature: (Int(m,n); [io] O(p,q))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ rescale2d($Int, $O); # all arguments given
+ $Int->rescale2d($O); # method call
 
 =for ref
 
@@ -834,9 +953,13 @@ tracking, consider using L<PDL::Transform::map|PDL::Transform/map>
 instead: it does these things, at some speed penalty compared to
 rescale2d.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-rescale2d ignores the bad-value flag of the input ndarrays.
+C<rescale2d> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -850,7 +973,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1339 "lib/PDL/Image2D.pd"
+#line 1331 "lib/PDL/Image2D.pd"
 
 =head2 fitwarp2d
 
@@ -1263,14 +1386,15 @@ sub PDL::applywarp2d {
 } # sub: applywarp2d
 
 *applywarp2d = \&PDL::applywarp2d;
-#line 1267 "lib/PDL/Image2D.pm"
+#line 1390 "lib/PDL/Image2D.pm"
 
 
 =head2 warp2d
 
 =for sig
 
-  Signature: (img(m,n); ldouble px(np,np); ldouble py(np,np); [o] warp(m,n); ldouble [t] poly(np); ldouble [t] kernel(ns); char *kernel_type; double noval; IV nsamples => ns)
+ Signature: (img(m,n); ldouble px(np,np); ldouble py(np,np); [o] warp(m,n); ldouble [t] poly(np); ldouble [t] kernel(ns); char *kernel_type; double noval; IV nsamples => ns)
+ Types: (float double ldouble)
 
 =for ref
 
@@ -1380,9 +1504,13 @@ C<a = 0.54>.
 C<NOVAL> gives the value used to indicate that a pixel in the
 output image does not map onto one in the input image.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-warp2d ignores the bad-value flag of the input ndarrays.
+C<warp2d> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1433,7 +1561,8 @@ sub PDL::warp2d {
 
 =for sig
 
-  Signature: ([o] x(n); [o] k(n); ldouble [t] kernel(n); char *name; PDL_Indx nsize => n)
+ Signature: ([o] x(n); [o] k(n); ldouble [t] kernel(n); char *name; PDL_Indx nsize => n)
+ Types: (float double ldouble)
 
 =for ref
 
@@ -1450,9 +1579,13 @@ of L</warp2d>.
 
   line warp2d_kernel( "hamming" );
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-warp2d_kernel ignores the bad-value flag of the input ndarrays.
+C<warp2d_kernel> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1492,7 +1625,7 @@ distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
 =cut
-#line 1496 "lib/PDL/Image2D.pm"
+#line 1629 "lib/PDL/Image2D.pm"
 
 # Exit with OK status
 

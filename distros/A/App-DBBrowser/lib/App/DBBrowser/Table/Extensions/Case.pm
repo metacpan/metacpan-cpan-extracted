@@ -9,8 +9,8 @@ use Term::Choose         qw();
 use Term::Form::ReadLine qw();
 
 use App::DBBrowser::Auxil;
-use App::DBBrowser::Subqueries;
-use App::DBBrowser::Table::Extensions::ScalarFunctions;
+use App::DBBrowser::Table::Extensions;
+use App::DBBrowser::Table::Substatements;
 
 
 sub new {

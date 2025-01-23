@@ -1,8 +1,8 @@
 package String::Diff;
-# git description: v0.09-1-g58a3f48
+# git description: v0.10-1-gbcee628
 
 our $AUTHORITY = 'cpan:SCHWIGON';
-
+$String::Diff::VERSION = '0.11';
 use strict;
 use warnings;
 use base qw(Exporter);
@@ -20,8 +20,6 @@ BEGIN {
         die $@ if $@;
     }
 }
-
-our $VERSION = '0.08';
 
 our %DEFAULT_MARKS = (
     remove_open  => '[',
@@ -395,7 +393,7 @@ Kazuhiro Osawa <yappo {@} shibuya {dot} pl>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Kazuhiro Osawa <yappo {@} shibuya {dot} pl>.
+This software is copyright (c) 2025 by Kazuhiro Osawa <yappo {@} shibuya {dot} pl>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

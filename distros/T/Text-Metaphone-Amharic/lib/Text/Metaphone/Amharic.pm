@@ -11,7 +11,7 @@ BEGIN
 	use strict;
 	use vars qw( $VERSION %IMExpected %IMError %plosives $GRANULARITY $STYLE );
 
-	$VERSION = "0.11";
+	$VERSION = "0.12";
 
 	%plosives = (
 		ቅ => 'k',
@@ -333,7 +333,7 @@ my $self = shift;
 
 __END__
 
-
+=encoding utf8
 
 =head1 NAME
 
@@ -476,14 +476,17 @@ Daniel Yacob,  L<dyacob@cpan.org|mailto:dyacob@cpan.org>
 
 =head1 SEE ALSO
 
-=item L<http://daniel.yacob.name/papers/DanielYacob-ICESXV.pdf>
+=over
 
-=item L<Text::TransMetaphone>
+=item * L<https://www.academia.edu/83626025/Application_of_the_Double_Metaphone_Algorithm_to_Amharic_Orthography>
 
-=item Included with this package:
+=item * L<Text::TransMetaphone>
+
+=item * Included with this package:
 
   examples/amphone.pl         examples/ipa-phone.pl
   examples/amphone-high.pl    examples/ipa-phone-high.pl
   examples/granularity.pl     examples/matchtest.pl
 
+=back
 =cut

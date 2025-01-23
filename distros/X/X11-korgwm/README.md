@@ -31,6 +31,7 @@ It uses several X11 extensions: RandR, Xinerama, Composite, Xkb, and maybe more.
 
 - Tiling and floating windows
 - Dynamic layout that could be resized and reconfigured using hotkeys
+- Vimish marks for windows: use them to instantly switch between them
 - EWMH support: full screen, gentle exit, urgency, title, size hints, ...
 - Always ON &mdash; floating windows that are displayed on each tag
 - TCP API to control over the network &mdash; see [API.md](API.md)
@@ -43,6 +44,7 @@ It uses several X11 extensions: RandR, Xinerama, Composite, Xkb, and maybe more.
 - Expose mode to show all windows from all tags and quickly switch between them
 - YAML config &mdash; see [korgwm.conf.sample](korgwm.conf.sample)
 - Display rules for certain windows: screen & tag affinity, floating by default, ...
+- D-Bus notifications handling and relevant windows urgency
 - ... and many more.
 
 ## Screenshots
@@ -101,6 +103,7 @@ Supported environment variables:
 
 |    Variable name    |         Description                                                                         |
 | ------------------- | ------------------------------------------------------------------------------------------- |
+| `KORGWM_DEBUG`      | Alternative way to set the `debug` option                                                   |
 | `KORGWM_DEBUG_API`  | If defined, `debug_*()` calls will be enabled in [API](API.md) regardless `debug` option    |
 | `KORGWM_DEBUG_PORT` | Port number [API](API.md) binds to. Useful to avoid EADDRINUSE running several `korgwm`s    |
 

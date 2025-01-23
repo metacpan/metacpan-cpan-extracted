@@ -1,0 +1,21 @@
+Changes
+corpus/our.pm
+corpus/semantic.pm
+corpus/vars.pm
+INSTALL.SKIP
+lib/PPI/App/ppi_version/BRIANDFOY.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.pod
+script/ppi_version
+SECURITY.md
+t/get_version.t
+t/load.t
+t/pod.t
+t/pod_coverage.t
+t/test_manifest
+xt/changes.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

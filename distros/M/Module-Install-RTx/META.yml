@@ -8,7 +8,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.19'
+generated_by: 'Module::Install version 1.21'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,7 +21,7 @@ no_index:
 provides:
   Module::Install::RTx:
     file: lib/Module/Install/RTx.pm
-    version: '0.43'
+    version: '0.44'
   Module::Install::RTx::Remove:
     file: lib/Module/Install/RTx/Remove.pm
   Module::Install::RTx::Runtime:
@@ -32,4 +32,4 @@ requires:
   perl: 5.8.0
 resources:
   license: http://opensource.org/licenses/mit-license.php
-version: '0.43'
+version: '0.44'

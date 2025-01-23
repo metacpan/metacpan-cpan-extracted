@@ -22,7 +22,7 @@ name: String-Diff
 provides:
   String::Diff:
     file: lib/String/Diff.pm
-    version: '0.10'
+    version: '0.11'
 requires:
   Algorithm::Diff: '0'
   Exporter: '0'
@@ -35,7 +35,7 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=String-Diff
   homepage: http://metacpan.org/release/String-Diff
   repository: git://github.com/renormalist/p5-String-Diff.git
-version: '0.10'
+version: '0.11'
 x_Dist_Zilla:
   perl:
     version: '5.040000'
@@ -346,7 +346,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.10
+          tag: v0.11
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

@@ -1,6 +1,13 @@
 Revision history for App-DBBrowser
 
 
+2.422  2025-01-23
+        - Extension 'Column': it is now possible to use a column from a chosen table.
+        - A new way to create subqueries: build the subquery using the sql menu.
+        - Update input filter Range_Rows
+        - Added the exists and not exists operator.
+        - Update and delete statement: do not remove the table alias.
+
 2.421  2025-01-09
         - Update join condition.
         - Update join menu and union menu.
@@ -30,9 +37,9 @@ Revision history for App-DBBrowser
         Extended argument 'column': use horizontal format.
 
 2.414  2024-06-13
-        Bugfix Informix 'not matches'.
-        Bugfix in 'replace' function: allow empty replacement string.
-        Bugfix Informix 'day_of_week'.
+        - Bugfix Informix 'not matches'.
+        - Bugfix in 'replace' function: allow empty replacement string.
+        - Bugfix Informix 'day_of_week'.
 
 2.413  2024-05-23
         Bugfix import: don't check for emptiness of the first row if the file is a text file.

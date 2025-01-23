@@ -7,6 +7,10 @@ use lib "$FindBin::Bin/lib";
 
 use SPVM 'TestCase::Encode';
 
+use SPVM 'Encode';
+use SPVM::Encode;
+use SPVM 'Fn';
+
 my $api = SPVM::api();
 
 # Start objects count
@@ -26,6 +30,13 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count();
   ok(SPVM::TestCase::Encode->encode_utf32);
   
 }
+
+# Version
+{
+  is($SPVM::Encode::VERSION, SPVM::Fn->get_version_string('Encode'));
+}
+
+SPVM::Fn->destroy_runtime_permanent_vars;
 
 # All object is freed
 my $end_memory_blocks_count = $api->get_memory_blocks_count();

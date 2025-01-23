@@ -9,6 +9,8 @@ pp_addpm({At=>'Top'},<<'EOD');
 use strict;
 use warnings;
 
+=encoding utf8
+
 =head1 NAME
 
 PDL::Ufunc - primitive ufunc operations for pdl
@@ -53,18 +55,7 @@ by one by taking the $name along the 1st dimension.
 By using L<xchg|PDL::Slices/xchg> etc. it is possible to use
 I<any> dimension.
 
-=for usage
-
- \$y = $op(\$x);
-
-=for example
-
- \$spectrum = $op \$image->transpose
-
 $extras
-
-=cut
-
 EOD
 
 } # sub: projectdocs()
@@ -88,18 +79,7 @@ I<any> dimension.
 The sum is started so that the first element in the cumulative $name
 is the first element of the parameter.
 
-=for usage
-
- \$y = $op(\$x);
-
-=for example
-
- \$spectrum = $op \$image->transpose
-
 $extras
-
-=cut
-
 EOD
 
 } # sub: cumuprojectdocs()
@@ -204,7 +184,7 @@ as it will not contain any bad values.',
 	   );
 } # foreach: $func
 
-pp_def('diffover',
+pp_def('numdiff',
   Pars  => 'x(t); [o]dx(t)',
   Inplace   => 1,
   GenericTypes => [ppdefs_all],
@@ -217,14 +197,120 @@ EOF
   Doc => <<'EOF',
 =for ref
 
-Differencing. DX(t) = X(t) - X(t-1), DX(0) = X(0). Can be done inplace.
+Numerical differencing. DX(t) = X(t) - X(t-1), DX(0) = X(0).
+Combined with C<slice('-1:0')>, can be used for backward differencing.
 
 Unlike L</diff2>, output vector is same length.
 Originally by Maggie J. Xiong.
 
 Compare to L</cumusumover>, which acts as the converse of this.
+See also L</diff2>, L</diffcentred>, L</partial>, L<PDL::Primitive/pchip_chim>.
 EOF
 );
+
+pp_def('diffcentred',
+  HandleBad => 1,
+  Pars => 'a(n); [o]o(n)',
+  GenericTypes => [ppdefs_all],
+  Code => <<'EOF',
+loop(n) %{
+  PDL_Indx left = n-1, right = n+1;
+  if (left < 0) left = $SIZE(n)-1;
+  if (right >= $SIZE(n)) right = 0;
+  PDL_IF_BAD(if ($ISBAD($a(n=>left)) || $ISBAD($a(n=>right))) {
+    $SETBAD(o()); continue;
+  },)
+  $o() = ($a(n=>right) - $a(n=>left))/2;
+%}
+EOF
+  Doc => <<'EOF',
+=for ref
+
+Calculates centred differences along a vector's 0th dimension.
+Always periodic on boundaries; currently to change this, you must
+pad your data, and/or trim afterwards. This is so that when using
+with L</partial>, the size of data stays the same and therefore
+compatible if differentiated along different dimensions, e.g.
+calculating "curl".
+
+By using L<PDL::Slices/xchg> etc. it is possible to use I<any> dimension.
+
+See also L</diff2>, L</partial>, L</numdiff>, L<PDL::Primitive/pchip_chim>.
+EOF
+  BadDoc => <<'EOF',
+A bad value at C<n> means the affected output values at C<n-2>,C<n>
+(if in boounds) are set bad.
+EOF
+);
+
+pp_add_exported('partial');
+pp_addpm(<<'EOF');
+=head2 partial
+
+=for ref
+
+Take a numerical partial derivative along a given dimension, either
+forward, backward, or centred.
+
+See also L</numdiff>, L</diffcentred>,
+L<PDL::Primitive/pchip_chim>, L<PDL::Primitive/pchip_chsp>,
+and L<PDL::Slices/mv>, which are currently used to implement this.
+
+Can be used to implement divergence and curl calculations (adapted
+from Luis Mochán's work at
+https://sourceforge.net/p/pdl/mailman/message/58843767/):
+
+  use v5.36;
+  use PDL;
+  sub curl ($f) {
+    my ($f0, $f1, $f2) = $f->using(0..2);
+    my $o = {dir=>'c'};
+    pdl(
+      $f2->partial(1,$o) - $f1->partial(2,$o),
+      $f0->partial(2,$o) - $f2->partial(0,$o),
+      $f1->partial(0,$o) - $f0->partial(1,$o),
+    )->mv(-1,0);
+  }
+  sub div ($f) {
+    my ($f0, $f1, $f2) = $f->using(0..2);
+    my $o = {dir=>'c'};
+    $f0->partial(0,$o) + $f1->partial(1,$o) + $f2->partial(2,$o);
+  }
+  sub trim3d ($f) { $f->slice(':,1:-2,1:-2,1:-2') } # adjust if change "dir"
+  my $z=zeroes(5,5,5);
+  my $v=pdl(-$z->yvals, $z->xvals, $z->zvals)->mv(-1,0);
+  say trim3d(curl($v));
+  say div($v);
+
+=for usage
+
+  $pdl->partial(2);           # along dim 2, centred
+  $pdl->partial(2, {d=>'c'}); # along dim 2, centred
+  $pdl->partial(2, {d=>'f'}); # along dim 2, forward
+  $pdl->partial(2, {d=>'b'}); # along dim 2, backward
+  $pdl->partial(2, {d=>'p'}); # along dim 2, piecewise cubic Hermite
+  $pdl->partial(2, {d=>'s'}); # along dim 2, cubic spline
+
+=cut
+
+my %dirtype2func = (
+  f => \&numdiff,
+  b => sub { $_[0]->slice('-1:0')->numdiff },
+  c => \&diffcentred,
+  p => sub {(PDL::Primitive::pchip_chim($_[0]->xvals, $_[0]))[0]},
+  s => sub {(PDL::Primitive::pchip_chsp([0,0], [0,0], $_[0]->xvals, $_[0]))[0]},
+);
+*partial = \&PDL::partial;
+sub PDL::partial {
+  my ($f, $dim, $opts) = @_;
+  $opts ||= {};
+  my $difftype = $opts->{dir} || $opts->{d} || 'c';
+  my $func = $dirtype2func{$difftype} || barf "partial: unknown 'dir' option '$difftype', only know (@{[sort keys %dirtype2func]})";
+  $f = $f->mv($dim, 0) if $dim;
+  my $ret = $f->$func;
+  $dim ? $ret->mv(0, $dim) : $ret;
+}
+EOF
 
 pp_def('diff2',
   HandleBad => 1,
@@ -243,12 +329,15 @@ EOF
   Doc => <<'EOF',
 =for ref
 
-Numerically differentiates a vector along 0th dimension.
+Numerically forward differentiates a vector along 0th dimension.
 
 By using L<PDL::Slices/xchg> etc. it is possible to use I<any> dimension.
-Unlike L</diffover>, output vector is one shorter.
+Unlike L</numdiff>, output vector is one shorter.
+Combined with C<slice('-1:0')>, can be used for backward differencing.
 
-=for usage
+See also L</numdiff>, L</diffcentred>, L</partial>, L<PDL::Primitive/pchip_chim>.
+
+=for example
 
   print pdl(q[3 4 2 3 2 3 1])->diff2;
   # [1 -2 1 -1 1 -2]
@@ -262,8 +351,7 @@ EOF
 # this would need a lot of work to support bad values
 # plus it gives me a chance to check out HandleBad => 0 ;)
 #
-pp_def(
-       'intover',
+pp_def('intover',
        HandleBad => 0,
        Pars => 'a(n); float+ [o]b();',
        Code =>
@@ -331,8 +419,7 @@ sub synonym {
 
 sub make_average {
   my ($prefix, $outpar_type, $extra) = @_;
-  pp_def(
-	"${prefix}average",
+  pp_def("${prefix}average",
 	HandleBad => 1,
 	Pars => "a(n); $outpar_type [o]b();",
         Code => <<'EOF',
@@ -369,8 +456,7 @@ for my $which (
 	       ) {
     my ($name, $op, $synonym) = @$which;
 
-    pp_def(
-	    $name,
+    pp_def($name,
 	    HandleBad => 1,
 	    Pars => 'a(n); [o]c();',
 	    Code =>
@@ -395,8 +481,7 @@ for ways of masking NaNs.
 	    );
     synonym($name, $synonym);
 
-    pp_def(
-	    "${name}_ind",
+    pp_def("${name}_ind",
 	    HandleBad => 1,
 	    Pars => 'a(n); indx [o] c();',
 	    Code =>
@@ -421,8 +506,7 @@ for ways of masking NaNs.
 	    );
     synonym("${name}_ind", "${synonym}_ind");
 
-    pp_def(
-	    "${name}_n_ind",
+    pp_def("${name}_n_ind",
 	    HandleBad => 1,
 	    Pars => 'a(n); indx [o]c(m);',
 	    OtherPars => 'PDL_Indx m_size => m;',
@@ -483,8 +567,7 @@ for ways of masking NaNs.
     synonym("${name}_n_ind", "${synonym}_n_ind");
 } # foreach: $which
 
-pp_def(
-	'minmaximum',
+pp_def('minmaximum',
 	HandleBad => 1,
 	Pars => 'a(n); [o]cmin(); [o] cmax(); indx [o]cmin_ind(); indx [o]cmax_ind();',
 	Code => <<'EOF',
@@ -517,7 +600,7 @@ EOF
 
 Find minimum and maximum and their indices for a given ndarray;
 
-=for usage
+=for example
 
  pdl> $x=pdl [[-2,3,4],[1,0,3]]
  pdl> ($min, $max, $min_ind, $max_ind)=minmaximum($x)
@@ -797,8 +880,7 @@ my $find_median_average = '
            else {
 	      $b() = 0.5*( $tmp(n => nn1) + $tmp(n => nn2)  );
            }';
-pp_def(
-       'medover',
+pp_def('medover',
        HandleBad => 1,
        Pars => 'a(n); [o]b(); [t]tmp(n);',
        Doc => projectdocs('median','medover',''),
@@ -809,8 +891,7 @@ pp_def(
 my $find_median_lower = '
         PDL_Indx nn1 = nn/2;
 	$b() = $tmp(n => nn1);';
-pp_def(
-       'oddmedover',
+pp_def('oddmedover',
        HandleBad => 1,
        Pars => 'a(n); [o]b(); [t]tmp(n);',
        Doc => projectdocs('oddmedian','oddmedover','
@@ -988,17 +1069,7 @@ if (!is_inplace) loop(n) %{ $b() = $a(); %}
 )
 if ( nn == 0 ) continue; nn -= 1;
 qsort_$PPSYM() ($P(b), 0, nn);',
-    Doc => '
-=for ref
-
-Quicksort a vector into ascending order.
-
-=for example
-
- print qsort random(10);
-
-=cut
-',
+    Doc => 'Quicksort a vector into ascending order.',
     BadDoc =>
 '
 Bad values are moved to the end of the array:
@@ -1041,8 +1112,6 @@ Quicksort a vector and return index of elements in ascending order.
 
  $ix = qsorti $x;
  print $x->index($ix); # Sorted list
-
-=cut
 '
 );
 

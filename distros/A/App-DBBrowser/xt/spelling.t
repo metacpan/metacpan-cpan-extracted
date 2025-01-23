@@ -24,7 +24,6 @@ Concat
 CTE
 Cte
 CTEs
-ctes
 Ctrl
 DB2
 Dir

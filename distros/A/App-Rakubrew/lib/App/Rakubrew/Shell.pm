@@ -37,8 +37,7 @@ sub detect_shell {
     if ($^O =~ /win32/i) {
         # https://stackoverflow.com/a/8547234
         my $psmodpath = $ENV{PSMODULEPATH};
-        my $userprofile = $ENV{USERPROFILE};
-        if (index($psmodpath, $userprofile) >= 0) {
+        if ($psmodpath =~ /\\Documents\\WindowsPowerShell\\Modules(?:;|$)/) {
             return 'PowerShell';
         }
         else {
@@ -68,6 +67,10 @@ sub detect_shell {
 sub get {
     my $self = shift;
     return $shell_hook;
+}
+
+sub available_shells {
+    <Bash Zsh Fish Tcsh Sh PowerShell Cmd>
 }
 
 sub shell_exists {

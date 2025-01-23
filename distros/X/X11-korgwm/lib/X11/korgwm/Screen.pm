@@ -6,7 +6,6 @@ use strict;
 use warnings;
 use feature 'signatures';
 
-use Carp;
 use X11::XCB ':all';
 use X11::korgwm::Tag;
 use X11::korgwm::Common;
@@ -21,7 +20,9 @@ sub new($class, $x, $y, $w, $h) {
     $self->{tag_prev} = 0;
     $self->{tags} = [ map { X11::korgwm::Tag->new($self) } @{ $cfg->{ws_names} } ];
     $_->{idx} = $idx++ for @{ $self->{tags} };
-    $self->{panel} = X11::korgwm::Panel->new(0, $w, $x, sub ($btn, $ws) { $self->tag_set_active($ws - 1) });
+    $self->{panel} = X11::korgwm::Panel->new(0, $w, $x,
+        sub ($btn, $ws) { $self->tag_set_active($ws - 1, noselect => 1) }
+    );
     $self->{x} = $x;
     $self->{y} = $y;
     $self->{w} = $w;
@@ -47,8 +48,14 @@ sub destroy($self, $new_screen) {
     %{ $self } = ();
 }
 
-sub tag_set_active($self, $tag_new_id, $rotate = 1) {
-    $tag_new_id = $self->{tag_prev} if $rotate and $tag_new_id == $self->{tag_curr};
+# Set $tag_new_id visible for $self screen
+# Options:
+# - rotate => switch to previously selected tag if $tag_new_id is already active
+# Options are also passed to $tag->show() as-is
+sub tag_set_active($self, $tag_new_id, %opts) {
+    $opts{rotate} //= 1;
+
+    $tag_new_id = $self->{tag_prev} if $opts{rotate} and $tag_new_id == $self->{tag_curr};
     return if $tag_new_id == $self->{tag_curr};
 
     # Remember previous tag
@@ -61,7 +68,7 @@ sub tag_set_active($self, $tag_new_id, $rotate = 1) {
 
     # Show new tag and hide the old one
     my $tag_new = $self->current_tag();
-    $tag_new->show() if defined $tag_new;
+    $tag_new->show(%opts) if defined $tag_new;
     $tag_old->hide() if defined $tag_old;
 
     # Update panel view

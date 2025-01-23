@@ -35,8 +35,8 @@ SKIP: {
 		ok(!$generated && $@ =~ /$required_error_message/smx, "Correct exception thrown when Win32::API->new() is overridden:$@");
 	} else {
 		no warnings;
-		*CORE::GLOBAL::read = sub { $! = POSIX::EACCES(); return };
-		*CORE::GLOBAL::sysread = sub { $! = POSIX::EACCES(); return };
+		*CORE::GLOBAL::read = sub { $! = POSIX::EACCES(); return -1 };
+		*CORE::GLOBAL::sysread = sub { $! = POSIX::EACCES(); return -1 };
 		use warnings;
 		my $required_error_message = q[(?:] . (quotemeta POSIX::strerror(POSIX::EACCES())) . q[|Permission[ ]denied)];
 		require FileHandle;

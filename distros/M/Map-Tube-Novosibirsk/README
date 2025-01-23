@@ -159,6 +159,47 @@ EXAMPLE4
      # Дзержинская линия
      # Ленинская линия
 
+EXAMPLE5
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Encode qw(decode_utf8 encode_utf8);
+     use Map::Tube::Novosibirsk;
+
+     # Arguments.
+     if (@ARGV < 1) {
+             print STDERR "Usage: $0 line\n";
+             exit 1;
+     }
+     my $line = decode_utf8($ARGV[0]);
+
+     # Object.
+     my $obj = Map::Tube::Novosibirsk->new;
+
+     # Get stations for line.
+     my $stations_ar = $obj->get_stations($line);
+
+     # Print out.
+     map { print encode_utf8($_->name)."\n"; } @{$stations_ar};
+
+     # Output:
+     # Usage: __PROG__ line
+
+     # Output with 'foo' argument.
+     # Map::Tube::get_stations(): ERROR: Invalid Line Name [foo]. (status: 105) file __PROG__ on line __LINE__
+
+     # Output with 'Ленинская линия' argument.
+     # Заельцовская
+     # Гагаринская
+     # Красный проспект
+     # Площадь Ленина
+     # Октябрьская
+     # Речной вокзал
+     # Студенческая
+     # Площадь Маркса
+
 DEPENDENCIES
     File::Share, Map::Tube, Moo, namespace::clean.
 
@@ -173,18 +214,18 @@ SEE ALSO
         Install the Map::Tube concrete metro modules.
 
 REPOSITORY
-    <https://github.com/tupinek/Map-Tube-Novosibirsk>
+    <https://github.com/michal-josef-spacek/Map-Tube-Novosibirsk>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2014-2015 Michal Špaček
+     © 2014-2025 Michal Josef Špaček
      Artistic License
      BSD 2-Clause License
 
 VERSION
-    0.03
+    0.04
 

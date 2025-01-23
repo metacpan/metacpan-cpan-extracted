@@ -24,6 +24,7 @@ use Log::Log4perl qw(:levels);	# Put first to cleanup last
 use CGI::Carp qw(fatalsToBrowser);
 use CGI::Info;
 use CGI::Lingua;
+use Class::Simple;
 use Database::Abstraction;
 use File::Basename;
 # use CGI::Alert $ENV{'SERVER_ADMIN'} || 'you@example.com';
@@ -125,19 +126,25 @@ $SIG{TERM} = \&sig_handler;
 $SIG{PIPE} = 'IGNORE';
 $ENV{'PATH'} = '/usr/local/bin:/bin:/usr/bin';	# For insecurity
 
-$SIG{__WARN__} = sub {
+# my ($stdin, $stdout, $stderr) = (IO::Handle->new(), IO::Handle->new(), IO::Handle->new());
+# https://stackoverflow.com/questions/14563686/how-do-i-get-errors-in-from-a-perl-script-running-fcgi-pm-to-appear-in-the-apach
+$SIG{__DIE__} = $SIG{__WARN__} = sub {
 	if(open(my $fout, '>>', File::Spec->catfile($tmpdir, "$script_name.stderr"))) {
-		print $fout @_;
+		print $fout $info->domain_name(), ": @_";
+	# } else {
+		# print $stderr @_;
 	}
 	Log::WarnDie->dispatcher(undef);
 	CORE::die @_
 };
 
+# my $request = FCGI::Request($stdin, $stdout, $stderr);
 my $request = FCGI::Request();
 
 # It would be really good to send 429 to search engines when there are more than, say, 5 requests being handled.
 # But I don't think that's possible with the FCGI module
 
+# Main request loop
 while($handling_request = ($request->Accept() >= 0)) {
 	unless($ENV{'REMOTE_ADDR'}) {
 		# debugging from the command line
@@ -238,6 +245,8 @@ sub doit
 	}
 
 	$linguacache ||= create_memory_cache(config => $config, logger => $logger, namespace => 'CGI::Lingua');
+
+	# Language negotiation
 	my $lingua = CGI::Lingua->new({
 		supported => [ 'en-gb' ],
 		cache => $linguacache,
@@ -247,19 +256,15 @@ sub doit
 		syslog => $syslog,
 	});
 
-	$vwflog ||= ($config->vwflog() || File::Spec->catfile($info->logdir(), 'vwf.log'));
-	if($vwflog && open(my $fout, '>>', $vwflog)) {
-		print $fout
-			'"', $info->domain_name(), '",',
-			'"', strftime('%F %T', localtime), '",',
-			'"', ($ENV{REMOTE_ADDR} ? $ENV{REMOTE_ADDR} : ''), '",',
-			'"', $lingua->country(), '",',
-			'"', $info->browser_type(), '",',
-			'"', $lingua->language(), '",',
-			'"', $info->as_string(), "\"\n";
-		close($fout);
+	$vwflog ||= $config->vwflog() || File::Spec->catfile($info->logdir(), 'vwf.log');
+
+	my $warnings = '';
+	if(my $w = $info->warnings()) {
+		my @warnings = map { $_->{'warning'} } @{$w};
+		$warnings = join(';', @warnings);
 	}
 
+	# Access control checks
 	if($ENV{'REMOTE_ADDR'} && $acl->all_denied(lingua => $lingua)) {
 		print "Status: 403 Forbidden\n",
 			"Content-type: text/plain\n",
@@ -269,6 +274,22 @@ sub doit
 			print "Access Denied\n";
 		}
 		$logger->info($ENV{'REMOTE_ADDR'}, ': access denied');
+		$info->status(403);
+		if($vwflog && open(my $fout, '>>', $vwflog)) {
+			print $fout
+				'"', $info->domain_name(), '",',
+				'"', strftime('%F %T', localtime), '",',
+				'"', ($ENV{REMOTE_ADDR} ? $ENV{REMOTE_ADDR} : ''), '",',
+				'"', $lingua->country(), '",',
+				'"', $info->browser_type(), '",',
+				'"', $lingua->language(), '",',
+				'403,',
+				'"",',
+				'"', $info->as_string(), '",',
+				'"', $warnings, '"',
+				"\n";
+			close($fout);
+		}
 		return;
 	}
 
@@ -304,33 +325,34 @@ sub doit
 		}
 	}
 
-	$geocoder ||= Geo::Coder::Free->new(
-		openaddr => $config->OPENADDR_HOME(),
-		cache => create_memory_cache(config => $config, logger => $logger, namespace => $script_name, root_dir => $cachedir)
-	);
-
 	my $display;
 	my $invalidpage;
+	my $log = Class::Simple->new();
+
 	$args = {
 		cachedir => $cachedir,
 		info => $info,
 		logger => $logger,
 		lingua => $lingua,
 		config => $config,
+		log => $log
 	};
 
+	# Display the requested page
 	eval {
 		my $page = $info->param('page');
 		$page =~ s/#.*$//;
-		# $display = Geo::Coder::Free::Display::$page->new($args);
 
-		if($page eq 'index') {
-			$display = Geo::Coder::Free::Display::index->new($args);
-		} elsif($page eq 'query') {
-			$display = Geo::Coder::Free::Display::query->new($args);
-		} else {
+		$display = do {
+			my $class = "Geo::Coder::Free::Display::$page";
+			eval { $class->new($args) };
+		};
+		if(!defined($display)) {
 			$logger->info("Unknown page $page");
 			$invalidpage = 1;
+		} elsif(!$display->can('as_string')) {
+			$logger->warn("Problem understanding $page");
+			undef $display;
 		}
 	};
 
@@ -342,18 +364,56 @@ sub doit
 
 	if(defined($display)) {
 		# Pass in handles to the databases
+		$geocoder ||= Geo::Coder::Free->new(
+			openaddr => $config->OPENADDR_HOME(),
+			cache => create_memory_cache(config => $config, logger => $logger, namespace => $script_name, root_dir => $cachedir)
+		);
+
 		print $display->as_string({
+			cachedir => $cachedir,
+			databasedir => $database_dir,
+			database_dir => $database_dir,
 			geocoder => $geocoder,
-			cachedir => $cachedir
 		});
+		if($vwflog && open(my $fout, '>>', $vwflog)) {
+			print $fout
+				'"', $info->domain_name(), '",',
+				'"', strftime('%F %T', localtime), '",',
+				'"', ($ENV{REMOTE_ADDR} ? $ENV{REMOTE_ADDR} : ''), '",',
+				'"', $lingua->country(), '",',
+				'"', $info->browser_type(), '",',
+				'"', $lingua->language(), '",',
+				$info->status(), ',',
+				'"', ($log->template() ? $log->template() : ''), '",',
+				'"', $info->as_string(), '",',
+				'"', $warnings, '"',
+				"\n";
+			close($fout);
+		}
 	} elsif($invalidpage) {
 		choose();
+		if($vwflog && open(my $fout, '>>', $vwflog)) {
+			print $fout
+				'"', $info->domain_name(), '",',
+				'"', strftime('%F %T', localtime), '",',
+				'"', ($ENV{REMOTE_ADDR} ? $ENV{REMOTE_ADDR} : ''), '",',
+				'"', $lingua->country(), '",',
+				'"', $info->browser_type(), '",',
+				'"', $lingua->language(), '",',
+				$info->status(), ',',
+				'"",',
+				'"', $info->as_string(), '",',
+				'"', $warnings, '"',
+				"\n";
+			close($fout);
+		}
 		return;
 	} else {
 		$logger->debug('disabling cache');
 		$fb->init(
 			cache => undef,
 		);
+		# Handle errors gracefully
 		if($error eq 'Unknown page to display') {
 			print "Status: 400 Bad Request\n",
 				"Content-type: text/plain\n",
@@ -362,6 +422,8 @@ sub doit
 			unless($ENV{'REQUEST_METHOD'} && ($ENV{'REQUEST_METHOD'} eq 'HEAD')) {
 				print "I don't know what you want me to display.\n";
 			}
+			$info->status(400);
+			$log->status(400);
 		} elsif($error =~ /Can\'t locate .* in \@INC/) {
 			$logger->error($error);
 			print "Status: 500 Internal Server Error\n",
@@ -372,6 +434,8 @@ sub doit
 				print "Software error - contact the webmaster\n",
 					"$error\n";
 			}
+			$info->status(500);
+			$log->status(500);
 		} else {
 			# No permission to show this page
 			print "Status: 403 Forbidden\n",
@@ -381,6 +445,23 @@ sub doit
 			unless($ENV{'REQUEST_METHOD'} && ($ENV{'REQUEST_METHOD'} eq 'HEAD')) {
 				print "Access Denied\n";
 			}
+			$info->status(403);
+			$log->status(403);
+		}
+		if($vwflog && open(my $fout, '>>', $vwflog)) {
+			print $fout
+				'"', $info->domain_name(), '",',
+				'"', strftime('%F %T', localtime), '",',
+				'"', ($ENV{REMOTE_ADDR} ? $ENV{REMOTE_ADDR} : ''), '",',
+				'"', $lingua->country(), '",',
+				'"', $info->browser_type(), '",',
+				'"', $lingua->language(), '",',
+				$info->status(), ',',
+				'"",',
+				'"', $info->as_string(), '",',
+				'"', $warnings, '"',
+				"\n";
+			close($fout);
 		}
 		throw Error::Simple($error ? $error : $info->as_string());
 	}
@@ -405,15 +486,21 @@ sub choose
 	print "Status: 300 Multiple Choices\n",
 		"Content-type: text/plain\n";
 
-	my $path = $info->script_path();
-	if(defined($path)) {
+	$info->status(300);
+
+	# Print last modified date if path is defined
+	if(my $path = $info->script_path()) {
+		require HTTP::Date;
+		HTTP::Date->import();
+
 		my @statb = stat($path);
 		my $mtime = $statb[9];
-		print "Last-Modified: ", HTTP::Date::time2str($mtime), "\n";
+		print 'Last-Modified: ', HTTP::Date::time2str($mtime), "\n";
 	}
 
 	print "\n";
 
+	# Print available pages unless it's a HEAD request
 	unless($ENV{'REQUEST_METHOD'} && ($ENV{'REQUEST_METHOD'} eq 'HEAD')) {
 		print "/cgi-bin/page.fcgi?page=index\n",
 			"/cgi-bin/page.fcgi?page=query\n";
@@ -421,10 +508,13 @@ sub choose
 }
 
 # False positives we don't need in the logs
-sub filter {
-	return 0 if($_[0] =~ /Can't locate Net\/OAuth\/V1_0A\/ProtectedResourceRequest.pm in /);
-	return 0 if($_[0] =~ /Can't locate auto\/NetAddr\/IP\/InetBase\/AF_INET6.al in /);
-	return 0 if($_[0] =~ /S_IFFIFO is not a valid Fcntl macro at /);
+sub filter
+{
+	# return 0 if($_[0] =~ /Can't locate Net\/OAuth\/V1_0A\/ProtectedResourceRequest.pm in /);
+	# return 0 if($_[0] =~ /Can't locate auto\/NetAddr\/IP\/InetBase\/AF_INET6.al in /);
+	# return 0 if($_[0] =~ /S_IFFIFO is not a valid Fcntl macro at /);
 
+	return 0 if $_[0] =~ /Can't locate (Net\/OAuth\/V1_0A\/ProtectedResourceRequest\.pm|auto\/NetAddr\/IP\/InetBase\/AF_INET6\.al) in |
+		   S_IFFIFO is not a valid Fcntl macro at /x;
 	return 1;
 }

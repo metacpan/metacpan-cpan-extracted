@@ -1,17 +1,15 @@
 package Map::Tube::Tbilisi;
 
-# Pragmas.
 use strict;
 use warnings;
 use 5.006;
 
-# Modules.
 use File::Share ':all';
 use Moo;
 use namespace::clean;
 
 # Version.
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Get XML.
 has xml => (
@@ -117,11 +115,11 @@ For more information about Tbilisi Map, click L<here|https://en.wikipedia.org/wi
 
 =head1 EXAMPLE1
 
- # Pragmas.
+=for comment filename=print_tbilisi_route.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Encode qw(decode_utf8 encode_utf8);
  use Map::Tube::Tbilisi;
 
@@ -139,12 +137,12 @@ For more information about Tbilisi Map, click L<here|https://en.wikipedia.org/wi
 
 =head1 EXAMPLE2
 
- # Pragmas.
+=for comment filename=print_tbilisi_def_xml_file.pl
+
  use strict;
  use utf8;
  use warnings;
 
- # Modules.
  use Map::Tube::Tbilisi;
 
  # Object.
@@ -161,11 +159,11 @@ For more information about Tbilisi Map, click L<here|https://en.wikipedia.org/wi
 
 =head1 EXAMPLE3
 
- # Pragmas.
+=for comment filename=print_tbilisi_image.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Map::Tube::GraphViz;
  use Map::Tube::GraphViz::Utils qw(node_color_without_label);
  use Map::Tube::Tbilisi;
@@ -191,19 +189,19 @@ For more information about Tbilisi Map, click L<here|https://en.wikipedia.org/wi
 
 =begin html
 
-<a href="https://raw.githubusercontent.com/tupinek/Map-Tube-Tbilisi/master/images/ex3.png">
-  <img src="https://raw.githubusercontent.com/tupinek/Map-Tube-Tbilisi/master/images/ex3.png" alt="Pražské metro" width="300px" height="300px" />
+<a href="https://raw.githubusercontent.com/michal-josef-spacek/Map-Tube-Tbilisi/master/images/ex3.png">
+  <img src="https://raw.githubusercontent.com/michal-josef-spacek/Map-Tube-Tbilisi/master/images/ex3.png" alt="Pražské metro" width="300px" height="300px" />
 </a>
 
 =end html
 
 =head1 EXAMPLE4
 
- # Pragmas.
+=for comment filename=print_tbilisi_lines.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Encode qw(encode_utf8);
  use Map::Tube::Tbilisi;
 
@@ -219,6 +217,46 @@ For more information about Tbilisi Map, click L<here|https://en.wikipedia.org/wi
  # Output:
  # ახმეტელი-ვარკეთილის ხაზი
  # საბურთალოს ხაზი
+
+=head1 EXAMPLE5
+
+=for comment filename=print_tbilisi_line_stations.pl
+
+ use strict;
+ use warnings;
+
+ use Encode qw(decode_utf8 encode_utf8);
+ use Map::Tube::Tbilisi;
+
+ # Arguments.
+ if (@ARGV < 1) {
+         print STDERR "Usage: $0 line\n";
+         exit 1;
+ }
+ my $line = decode_utf8($ARGV[0]);
+
+ # Object.
+ my $obj = Map::Tube::Tbilisi->new;
+
+ # Get stations for line.
+ my $stations_ar = $obj->get_stations($line);
+
+ # Print out.
+ map { print encode_utf8($_->name)."\n"; } @{$stations_ar};
+
+ # Output:
+ # Usage: __PROG__ line
+
+ # Output with 'foo' argument.
+ # Map::Tube::get_stations(): ERROR: Invalid Line Name [foo]. (status: 105) file __PROG__ on line __LINE__
+
+ # Output with 'საბურთალოს ხაზი' argument.
+ # სადგურის მოედანი
+ # წერეთელი
+ # ტექნიკური უნივერსიტეტი
+ # სამედიცინო უნივერსიტეტი
+ # დელისი
+ # ვაჟა-ფშაველა
 
 =head1 DEPENDENCIES
 
@@ -247,22 +285,22 @@ Install the Map::Tube concrete metro modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Map-Tube-Tbilisi>
+L<https://github.com/michal-josef-spacek/Map-Tube-Tbilisi>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2014-2015 Michal Špaček
+ © 2014-2025 Michal Josef Špaček
  Artistic License
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

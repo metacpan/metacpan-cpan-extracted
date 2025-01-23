@@ -35,6 +35,7 @@
       "runtime" : {
          "requires" : {
             "AnyEvent" : "0",
+            "AnyEvent::DBus" : "0",
             "AnyEvent::Handle" : "0",
             "AnyEvent::Socket" : "0",
             "Carp" : "0",
@@ -44,6 +45,7 @@
             "Glib::Object::Introspection" : "0",
             "Gtk3" : "0",
             "List::Util" : "0",
+            "Net::DBus" : "0",
             "POSIX" : "0",
             "Scalar::Util" : "0",
             "Storable" : "0",
@@ -71,7 +73,7 @@
          "web" : "https://github.com/zhmylove/korgwm"
       }
    },
-   "version" : "4.0",
+   "version" : "5.0",
    "x_authority" : "cpan:ZHMYLOVE",
    "x_contributors" : [],
    "x_serialization_backend" : "JSON::PP version 4.07"

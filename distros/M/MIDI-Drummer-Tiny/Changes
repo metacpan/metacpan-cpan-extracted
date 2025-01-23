@@ -1,5 +1,8 @@
 Revision history for MIDI-Drummer
 
+0.5005 2025-01-22 20:06:15
+    - Fix synopsis again.
+
 0.5004 2025-01-21 12:04:23
     - Fix incorrect documentation! Argh
 

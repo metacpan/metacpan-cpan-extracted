@@ -4,7 +4,7 @@ Crypt::URandom - Provide non blocking randomness
 
 # VERSION
 
-This document describes Crypt::URandom version 0.50
+This document describes Crypt::URandom version 0.52
 
 # SYNOPSIS
 
@@ -136,8 +136,8 @@ David Dick  `<ddick@cpan.org>`
 
 # ACKNOWLEDGEMENTS
 
-The Win32::API code for interacting with Microsoft's CryptoAPI was stolen with extreme
-gratitude from Crypt::Random::Source::Strong::Win32 by Max Kanat-Alexander
+The Win32::API code for interacting with Microsoft's [CryptoAPI](https://en.wikipedia.org/wiki/Microsoft_CryptoAPI) was copied with extreme
+gratitude from [Crypt::Random::Source::Strong::Win32](https://metacpan.org/pod/Crypt%3A%3ARandom%3A%3ASource%3A%3AStrong%3A%3AWin32) by [Max Kanat-Alexander](https://metacpan.org/author/MKANAT)
 
 # LICENSE AND COPYRIGHT
 

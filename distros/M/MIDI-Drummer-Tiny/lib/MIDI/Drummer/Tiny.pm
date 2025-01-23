@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Glorified metronome
 
-our $VERSION = '0.5004';
+our $VERSION = '0.5005';
 
 use Moo;
 use strictures 2;
@@ -703,7 +703,7 @@ MIDI::Drummer::Tiny - Glorified metronome
 
 =head1 VERSION
 
-version 0.5004
+version 0.5005
 
 =head1 SYNOPSIS
 
@@ -721,13 +721,11 @@ version 0.5004
     #snare => 40, # "
   );
 
-  $d->metronome5($d->bars, $d->ride2, $d->quarter, 50);
+  $d->metronome5;
 
   $d->set_time_sig('4/4');
-
   $d->count_in(1);  # Closed hi-hat for 1 bar
-
-  $d->metronome4($d->bars, $d->closed_hh, $d->eighth, 60);
+  $d->metronome4($d->bars, $d->closed_hh, $d->eighth, 60); # swing!
 
   $d->rest($d->whole);
 

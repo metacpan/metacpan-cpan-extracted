@@ -5,7 +5,7 @@ use warnings;
 use 5.010;
 use utf8;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use Moose::Role;
 requires qw(get_routes service_name);
@@ -105,71 +105,68 @@ sub plack_handler {
             if ($sub_path_info =~ qr{^/static(/.+)$});
 
         # dispatch request
-        state $path_dispatch = {
-            '/' => sub {
-                $this_req->static('index.html', sub {$self->_update_openapi_html(@_)});
-            },
-            '/edit' => sub {
-                $this_req->static('edit.html', sub {$self->_update_openapi_html(@_)});
-            },
-            '/hcheck' => sub {
-                $this_req->text_plain(
-                    'Service-Name: ' . $self->service_name,
-                    "API-Version: " . $self->api_version,
-                    'Uptime: ' . (time() - $start_time),
-                    'Request-Count: ' . $req_count,
-                    'Pending-Requests: ' . Async::MicroserviceReq->get_pending_req,
-                );
-            },
-            '' => sub {
-                if (my $match = $self->router->match($sub_path_info)) {
-                    my $func = $match->{mapping}->{$this_req->method};
-                    if ($func && (my $misc_fn = $self->can($func))) {
-                        %{$this_req->params} = (
-                            %{$this_req->params},
-                            %{$match->{mapping}}
-                        );
-                        my $resp = $misc_fn->($self, $this_req, $match);
-                        if (blessed($resp) && $resp->isa('Future')) {
-                            $resp->retain;
-                            $resp->on_done(
-                                sub {
-                                    my ($resp_data) = @_;
-                                    if ( ref($resp_data) eq 'ARRAY' ) {
-                                        $this_req->respond(@$resp_data);
-                                    }
-                                    else {
-                                        $this_req->respond( 200,
-                                            [], $resp_data );
-                                    }
-                                }
-                            );
-                            $resp->on_fail(sub {
-                                my ($err_msg) = @_;
-                                $err_msg ||= 'unknown';
-                                $log->errorf('exception while calling "%s": %s', $plack_req->path_info, $err_msg);
-                                $this_req->respond(
-                                    503, [], 'internal server error calling '.$func.': ' . $err_msg
-                                );
-                            });
-                            $resp->on_cancel(sub {
-                                $this_req->respond(
-                                    429, [], 'request for '.$func.' canceled'
-                                );
-                            });
-                        }
-                        elsif (ref($resp) eq 'ARRAY') {
-                            $this_req->respond(@$resp);
-                        }
-                        return;
-                    }
-                }
-                return $this_req->respond(404, [], 'not found');
-            },
-        };
-        my $dispatch_fn = $path_dispatch->{$sub_path_info} // $path_dispatch->{''};
+        if ( $sub_path_info eq '/' ) {
+            return $this_req->static( 'index.html',
+                sub { $self->_update_openapi_html(@_) } );
+        }
+        elsif ( $sub_path_info eq '/edit' ) {
+            return $this_req->static('edit.html', sub {$self->_update_openapi_html(@_)});
+        }
+        elsif ( $sub_path_info eq '/hcheck' ) {
+            return $this_req->text_plain(
+                'Service-Name: ' . $self->service_name,
+                "API-Version: " . $self->api_version,
+                'Uptime: ' . ( time() - $start_time ),
+                'Request-Count: ' . $req_count,
+                'Pending-Requests: '
+                    . Async::MicroserviceReq->get_pending_req,
+            );
+        }
 
-        return $dispatch_fn->();
+        if (my $match = $self->router->match($sub_path_info)) {
+            my $func = $match->{mapping}->{$this_req->method};
+            if ($func && (my $misc_fn = $self->can($func))) {
+                %{$this_req->params} = (
+                    %{$this_req->params},
+                    %{$match->{mapping}}
+                );
+                my $resp = $misc_fn->($self, $this_req, $match);
+                if (blessed($resp) && $resp->isa('Future')) {
+                    $resp->retain;
+                    $resp->on_done(
+                        sub {
+                            my ($resp_data) = @_;
+                            if ( ref($resp_data) eq 'ARRAY' ) {
+                                $this_req->respond(@$resp_data);
+                            }
+                            else {
+                                $this_req->respond( 200,
+                                    [], $resp_data );
+                            }
+                        }
+                    );
+                    $resp->on_fail(sub {
+                        my ($err_msg) = @_;
+                        $err_msg ||= 'unknown';
+                        $log->errorf('exception while calling "%s": %s', $plack_req->path_info, $err_msg);
+                        $this_req->respond(
+                            503, [], 'internal server error calling '.$func.': ' . $err_msg
+                        );
+                    });
+                    $resp->on_cancel(sub {
+                        $this_req->respond(
+                            429, [], 'request for '.$func.' canceled'
+                        );
+                    });
+                    return $resp;
+                }
+                elsif (ref($resp) eq 'ARRAY') {
+                    $this_req->respond(@$resp);
+                }
+                return;
+            }
+        }
+        return $this_req->respond(404, [], 'not found');
     };
 
     return sub {
@@ -178,8 +175,14 @@ sub plack_handler {
             $plack_handler_sub->($respond);
         }
         catch {
-            $this_req->respond(503, [], 'internal server error: ' . $_);
+            $this_req->respond( 503, [], 'internal server error: ' . $_ );
         };
+        if ( blessed($response) && $response->isa('Future') ) {
+            $response->on_done( sub { $this_req->clear_plack_respond } );
+        }
+        else {
+            $this_req->clear_plack_respond;
+        }
         return $response;
     };
 }

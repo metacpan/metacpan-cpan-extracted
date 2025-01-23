@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 use vars qw( $VERSION $NO_EXIT );
-$VERSION  = "0.21";
+$VERSION  = "0.22";
 
 $NO_EXIT ||= 0; # prevent import() from exit()ing and fall of the edge
 
@@ -269,6 +269,7 @@ sub all_installed {
     } # all_installed
 
 # Once thieved from ExtUtils::MM_Unix 1.12603
+# Stealing from Module::Extract::VERSION is an option for the future
 sub version {
     my $self = shift;
 
@@ -283,8 +284,7 @@ sub version {
     $eval{$cur_pkg} = { ord => $cur_ord };
     while (<$mod>) {
 	$inpod = m/^=(?!cut)/ ? 1 : m/^=cut/ ? 0 : $inpod;
-	$inpod || m/^\s*#/	and next;
-	m/^\s*#/		and next;
+	$inpod || m/^\s*#/ and next;
 
 	chomp;
 	if (m/^\s* (?:package|class) \s+ (\w+(?:::\w+)*) /x) {
@@ -300,6 +300,7 @@ sub version {
 	    my ($sigil, $name) = ($1, $2);
 	    m/\$$name\s*=\s*eval.+\$$name/	and next;
 	    m/my\s*\$VERSION\s*=/		and next;
+	    m/^[^']*'[^']*\$$name[^']*'/	and next;
 	    $eval{$cur_pkg}{prg} = qq{
                 package V::Module::Info::_version_var;
                 # $cur_pkg

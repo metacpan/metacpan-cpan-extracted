@@ -8,7 +8,7 @@ no warnings 'once';
 use Term::ANSIColor qw(:constants);
 use Module::Install::Base;
 use base 'Module::Install::Base';
-our $VERSION = '0.43';
+our $VERSION = '0.44';
 
 use FindBin;
 use File::Glob     ();
@@ -53,7 +53,7 @@ sub RTx {
         my @look = @INC;
         unshift @look, grep {defined and -d $_} @try;
         push @look, grep {defined and -d $_}
-            map { ( "$_/rt5/lib", "$_/lib/rt5", "$_/rt4/lib", "$_/lib/rt4", "$_/lib" ) } @prefixes;
+            map { ( "$_/rt6/lib", "$_/lib/rt6", "$_/rt5/lib", "$_/lib/rt5", "$_/rt4/lib", "$_/lib/rt4", "$_/lib" ) } @prefixes;
         last if eval {local @INC = @look; require RT; $RT::LocalLibPath};
 
         warn
@@ -323,8 +323,8 @@ In the F<Makefile.PL> of the C<RT-Extension-Example> module:
     use inc::Module::Install;
     RTx 'RT-Extension-Example';
 
-    requires_rt '4.2.0';
-    rt_too_new  '4.4.0';
+    requires_rt '5.0.0';
+    rt_too_new  '6.0.0';
 
     WriteAll();
 
@@ -429,14 +429,14 @@ Path to the RT installation that contains a valid F<lib/RT.pm>.
 
 To install an extension which makes use of this installer:
 
-    perl Makefile.PL RTHOME=/opt/rt5
+    perl Makefile.PL RTHOME=/opt/rt6
 
 This will install all subdirs into the $RT::LocalPluginPath dir
 as configured in RT::Generated.
 
 To install an extension into the (vendor) plugin path:
 
-    perl Makefile.PL RTHOME=/opt/rt5 INSTALLDIRS=vendor
+    perl Makefile.PL RTHOME=/opt/rt6 INSTALLDIRS=vendor
 
 This will install all subdirs into the $RT::PluginPath which is specifically
 meant for plugins that are installed through other packaging utils like
@@ -457,7 +457,7 @@ Best Practical Solutions
 =head1 COPYRIGHT
 
 Copyright 2003, 2004, 2007 by Audrey Tang E<lt>cpan@audreyt.orgE<gt>.
-Copyright 2008-2020 Best Practical Solutions
+Copyright 2008-2025 Best Practical Solutions
 
 This software is released under the MIT license cited below.
 

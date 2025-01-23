@@ -22,6 +22,7 @@ use DynaLoader;
 
 
 
+
 #line 20 "lib/PDL/Bad.pd"
 
 =head1 NAME
@@ -62,7 +63,7 @@ Set to 1 as of PDL 2.035 as always available.
 =back
 
 =cut
-#line 66 "lib/PDL/Bad.pm"
+#line 67 "lib/PDL/Bad.pm"
 
 
 =head1 FUNCTIONS
@@ -263,14 +264,23 @@ sub PDL::check_badflag {
     $pdl->badflag(0) if $pdl->badflag and $pdl->nbad == 0;
     return $pdl->badflag;
 } # sub: check_badflag()
-#line 267 "lib/PDL/Bad.pm"
+#line 268 "lib/PDL/Bad.pm"
 
 
 =head2 isbad
 
 =for sig
 
-  Signature: (a(); int [o]b())
+ Signature: (a(); int [o]b())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $b = isbad($a);
+ isbad($a, $b);  # all arguments given
+ $b = $a->isbad; # method call
+ $a->isbad($b);
 
 =for ref
 
@@ -288,6 +298,10 @@ Similar to L<isfinite|PDL::Math/isfinite>.
  $y = isbad($x);
  print $y, "\n";
  [0 1 0]
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
@@ -311,7 +325,16 @@ same as the input ndarray's flag.
 
 =for sig
 
-  Signature: (a(); int [o]b())
+ Signature: (a(); int [o]b())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $b = isgood($a);
+ isgood($a, $b);  # all arguments given
+ $b = $a->isgood; # method call
+ $a->isgood($b);
 
 =for ref
 
@@ -328,6 +351,10 @@ Also see L<isfinite|PDL::Math/isfinite>.
  $y = isgood($x);
  print $y, "\n";
  [1 0 1]
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
@@ -351,7 +378,16 @@ same as the input ndarray's flag.
 
 =for sig
 
-  Signature: (a(n); indx [o] b())
+ Signature: (a(n); indx [o] b())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $b = nbadover($a);
+ nbadover($a, $b);  # all arguments given
+ $b = $a->nbadover; # method call
+ $a->nbadover($b);
 
 =for ref
 
@@ -363,13 +399,9 @@ much in common with the functions defined in L<PDL::Ufunc>. In particular,
 by using L<xchg|PDL::Slices/xchg> and similar dimension rearranging methods,
 it is possible to perform this calculation over I<any> dimension.
 
-=for usage
+=pod
 
- $x = nbadover($y);
-
-=for example
-
- $spectrum = nbadover $image->transpose
+Broadcasts over its inputs.
 
 =for bad
 
@@ -393,7 +425,16 @@ flag set.
 
 =for sig
 
-  Signature: (a(n); indx [o] b())
+ Signature: (a(n); indx [o] b())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $b = ngoodover($a);
+ ngoodover($a, $b);  # all arguments given
+ $b = $a->ngoodover; # method call
+ $a->ngoodover($b);
 
 =for ref
 
@@ -406,13 +447,9 @@ along the 1st dimension.
 By using L<xchg|PDL::Slices/xchg> etc. it is possible to use
 I<any> dimension.
 
-=for usage
+=pod
 
- $x = ngoodover($y);
-
-=for example
-
- $spectrum = ngoodover $image->transpose
+Broadcasts over its inputs.
 
 =for bad
 
@@ -431,7 +468,7 @@ flag set.
 
 
 
-#line 516 "lib/PDL/Bad.pd"
+#line 463 "lib/PDL/Bad.pd"
 
 *nbad = \&PDL::nbad;
 sub PDL::nbad {
@@ -440,7 +477,7 @@ sub PDL::nbad {
 	return $tmp;
 }
 
-#line 516 "lib/PDL/Bad.pd"
+#line 463 "lib/PDL/Bad.pd"
 *ngood = \&PDL::ngood;
 sub PDL::ngood {
 	my($x) = @_; my $tmp;
@@ -448,17 +485,13 @@ sub PDL::ngood {
 	return $tmp;
 }
 
-#line 528 "lib/PDL/Bad.pd"
+#line 475 "lib/PDL/Bad.pd"
 
 =head2 nbad
 
 =for ref
 
 Returns the number of bad values in an ndarray
-
-=for usage
-
- $x = nbad($data);
 
 =for bad
 
@@ -524,14 +557,23 @@ sub PDL::setbadat {
     $self->badflag(1);
     return $self;
 }
-#line 528 "lib/PDL/Bad.pm"
+#line 561 "lib/PDL/Bad.pm"
 
 
 =head2 setbadif
 
 =for sig
 
-  Signature: (a(); int mask(); [o]b())
+ Signature: (a(); int mask(); [o]b())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $b = setbadif($a, $mask);
+ setbadif($a, $mask, $b);  # all arguments given
+ $b = $a->setbadif($mask); # method call
+ $a->setbadif($mask, $b);
 
 =for ref
 
@@ -557,6 +599,10 @@ Unfortunately, this routine can I<not> be run inplace, since the
 current implementation can not handle the same ndarray used as
 C<a> and C<mask> (eg C<< $x->inplace->setbadif($x%2) >> fails).
 Even more unfortunate: we can't catch this error and tell you.
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
@@ -584,7 +630,18 @@ Also see L</setvaltobad> and L</setnantobad>.
 
 =for sig
 
-  Signature: (a(); [o]b(); double value)
+ Signature: (a(); [o]b(); double value)
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $b = setvaltobad($a, $value);
+ setvaltobad($a, $b, $value);      # all arguments given
+ $b = $a->setvaltobad($value);     # method call
+ $a->setvaltobad($b, $value);
+ $a->inplace->setvaltobad($value); # can be used inplace
+ setvaltobad($a->inplace,$value);
 
 =for ref
 
@@ -600,6 +657,10 @@ Set bad all those elements which equal the supplied value.
 This is a simpler version of L</setbadif>, but this
 function can be done inplace.  See L</setnantobad>
 if you want to convert NaN to the bad value.
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
@@ -624,18 +685,26 @@ Any bad values in the input ndarrays are copied across to the output ndarray.
 
 =for sig
 
-  Signature: (a(); [o]b())
+ Signature: (a(); [o]b())
+ Types: (float ldouble cfloat cdouble cldouble double)
+
+=for usage
+
+ $b = setnantobad($a);
+ setnantobad($a, $b);      # all arguments given
+ $b = $a->setnantobad;     # method call
+ $a->setnantobad($b);
+ $a->inplace->setnantobad; # can be used inplace
+ setnantobad($a->inplace);
 
 =for ref
 
 Sets NaN values (for complex, where either is NaN) in the input ndarray bad
 (only relevant for floating-point ndarrays).
-Can be done inplace.
 
-=for usage
+=pod
 
- $y = $x->setnantobad;
- $x->inplace->setnantobad;
+Broadcasts over its inputs.
 
 =for bad
 
@@ -662,18 +731,26 @@ bad flag set.
 
 =for sig
 
-  Signature: (a(); [o]b())
+ Signature: (a(); [o]b())
+ Types: (float ldouble cfloat cdouble cldouble double)
+
+=for usage
+
+ $b = setinftobad($a);
+ setinftobad($a, $b);      # all arguments given
+ $b = $a->setinftobad;     # method call
+ $a->setinftobad($b);
+ $a->inplace->setinftobad; # can be used inplace
+ setinftobad($a->inplace);
 
 =for ref
 
 Sets non-finite values (for complex, where either is non-finite) in
 the input ndarray bad (only relevant for floating-point ndarrays).
-Can be done inplace.
 
-=for usage
+=pod
 
- $y = $x->setinftobad;
- $x->inplace->setinftobad;
+Broadcasts over its inputs.
 
 =for bad
 
@@ -699,18 +776,26 @@ bad flag set.
 
 =for sig
 
-  Signature: (a(); [o]b())
+ Signature: (a(); [o]b())
+ Types: (float ldouble cfloat cdouble cldouble double)
+
+=for usage
+
+ $b = setnonfinitetobad($a);
+ setnonfinitetobad($a, $b);      # all arguments given
+ $b = $a->setnonfinitetobad;     # method call
+ $a->setnonfinitetobad($b);
+ $a->inplace->setnonfinitetobad; # can be used inplace
+ setnonfinitetobad($a->inplace);
 
 =for ref
 
 Sets non-finite values (for complex, where either is non-finite) in
 the input ndarray bad (only relevant for floating-point ndarrays).
-Can be done inplace.
 
-=for usage
+=pod
 
- $y = $x->setnonfinitetobad;
- $x->inplace->setnonfinitetobad;
+Broadcasts over its inputs.
 
 =for bad
 
@@ -736,7 +821,17 @@ bad flag set.
 
 =for sig
 
-  Signature: (a(); [o] b();)
+ Signature: (a(); [o] b())
+ Types: (float ldouble cfloat cdouble cldouble double)
+
+=for usage
+
+ $b = setbadtonan($a);
+ setbadtonan($a, $b);      # all arguments given
+ $b = $a->setbadtonan;     # method call
+ $a->setbadtonan($b);
+ $a->inplace->setbadtonan; # can be used inplace
+ setbadtonan($a->inplace);
 
 =for ref
 
@@ -745,10 +840,9 @@ Sets Bad values to NaN
 This is only relevant for floating-point ndarrays. The input ndarray can be
 of any type, but if done inplace, the input must be floating point.
 
-=for usage
+=pod
 
- $y = $x->setbadtonan;
- $x->inplace->setbadtonan;
+Broadcasts over its inputs.
 
 =for bad
 
@@ -768,24 +862,39 @@ operation, it clears the bad flag.
 
 
 
+
 =head2 setbadtoval
 
 =for sig
 
-  Signature: (a(); [o]b(); double newval)
+ Signature: (a(); [o]b(); double newval)
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $b = setbadtoval($a, $newval);
+ setbadtoval($a, $b, $newval);      # all arguments given
+ $b = $a->setbadtoval($newval);     # method call
+ $a->setbadtoval($b, $newval);
+ $a->inplace->setbadtoval($newval); # can be used inplace
+ setbadtoval($a->inplace,$newval);
 
 =for ref
 
 Replace any bad values by a (non-bad) value. 
 
-Can be done inplace. Also see
-L</badmask>.
+Also see L</badmask>.
 
 =for example
 
  $x->inplace->setbadtoval(23);
  print "a badflag: ", $x->badflag, "\n";
  a badflag: 0
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
@@ -809,16 +918,26 @@ values are copied with no replacement.
 
 =for sig
 
-  Signature: (a(); b(); [o]c())
+ Signature: (a(); b(); [o]c())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $c = badmask($a, $b);
+ badmask($a, $b, $c);      # all arguments given
+ $c = $a->badmask($b);     # method call
+ $a->badmask($b, $c);
+ $a->inplace->badmask($b); # can be used inplace
+ badmask($a->inplace,$b);
 
 =for ref
 
 Clears all C<infs> and C<nans> in C<$a> to the corresponding value in C<$b>.
 
-badmask can be run with C<$x> inplace:
+=pod
 
-  badmask($x->inplace,0);
-  $x->inplace->badmask(0);
+Broadcasts over its inputs.
 
 =for bad
 
@@ -840,14 +959,23 @@ If bad values are present, these are also cleared.
 
 =for sig
 
-  Signature: (a(); mask(); [o]b())
+ Signature: (a(); mask(); [o]b())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $b = copybad($a, $mask);
+ copybad($a, $mask, $b);      # all arguments given
+ $b = $a->copybad($mask);     # method call
+ $a->copybad($mask, $b);
+ $a->inplace->copybad($mask); # can be used inplace
+ copybad($a->inplace,$mask);
 
 =for ref
 
 Copies values from one ndarray to another, setting them
 bad if they are bad in the supplied mask.
-
-Can be done inplace.
 
 =for example
 
@@ -862,6 +990,10 @@ Can be done inplace.
 It is equivalent to:
 
  $c = $x + $mask * 0
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
@@ -886,7 +1018,16 @@ its bad value flag set to true.
 
 =for sig
 
-  Signature: (a(n); [o]b(n))
+ Signature: (a(n); [o]b(n))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $b = locf($a);
+ locf($a, $b);  # all arguments given
+ $b = $a->locf; # method call
+ $a->locf($b);
 
 =for ref
 
@@ -894,9 +1035,13 @@ Last Observation Carried Forward - replace
 every BAD value with the most recent non-BAD value prior to it.
 Any leading BADs will be set to 0.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-locf processes bad values.
+C<locf> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -912,7 +1057,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1069 "lib/PDL/Bad.pd"
+#line 915 "lib/PDL/Bad.pd"
 
 =head1 AUTHOR
 
@@ -929,7 +1074,7 @@ separated from the PDL distribution, the copyright notice should be
 included in the file.
 
 =cut
-#line 933 "lib/PDL/Bad.pm"
+#line 1078 "lib/PDL/Bad.pm"
 
 # Exit with OK status
 

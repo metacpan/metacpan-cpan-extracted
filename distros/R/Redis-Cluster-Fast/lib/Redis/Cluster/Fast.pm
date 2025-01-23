@@ -4,17 +4,23 @@ use strict;
 use warnings;
 use Carp 'croak';
 
-our $VERSION = "0.092";
+our $VERSION = "0.093";
 
 use constant {
     DEFAULT_COMMAND_TIMEOUT => 1.0,
     DEFAULT_CONNECT_TIMEOUT => 1.0,
+    DEFAULT_CLUSTER_DISCOVERY_RETRY_TIMEOUT => 1.0,
     DEFAULT_MAX_RETRY_COUNT => 5,
     DEBUG_REDIS_CLUSTER_FAST => $ENV{DEBUG_PERL_REDIS_CLUSTER_FAST} ? 1 : 0,
 };
 
 use XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);
+
+sub srandom {
+    my $seed = shift;
+    __PACKAGE__->__srandom($seed);
+}
 
 sub new {
     my ($class, %args) = @_;
@@ -35,15 +41,46 @@ sub new {
     $command_timeout = DEFAULT_COMMAND_TIMEOUT unless defined $command_timeout;
     $self->__set_command_timeout($command_timeout);
 
+    my $discovery_timeout = $args{cluster_discovery_retry_timeout};
+    $discovery_timeout = DEFAULT_CLUSTER_DISCOVERY_RETRY_TIMEOUT unless defined $discovery_timeout;
+    $self->__set_cluster_discovery_retry_timeout($discovery_timeout);
+
     my $max_retry = $args{max_retry_count};
     $max_retry = DEFAULT_MAX_RETRY_COUNT unless defined $max_retry;
     $self->__set_max_retry($max_retry);
 
     $self->__set_route_use_slots($args{route_use_slots} ? 1 : 0);
 
+    $self->connect();
+    return $self;
+}
+
+sub wait_one_response {
+    my $self = shift;
+    my $result = $self->__wait_one_response();
+    return undef if $result == -1;
+    return $result;
+}
+
+sub wait_all_responses {
+    my $self = shift;
+    my $result = $self->__wait_all_responses();
+    return undef if $result == -1;
+    return $result;
+}
+
+sub disconnect {
+    my $self = shift;
+    my $error = $self->__disconnect();
+    croak $error if $error;
+}
+
+sub connect {
+    my $self = shift;
     my $error = $self->__connect();
     croak $error if $error;
-    return $self;
+    $error = $self->__wait_until_event_ready();
+    croak $error if $error;
 }
 
 ### Deal with common, general case, Redis commands
@@ -58,6 +95,8 @@ sub AUTOLOAD {
         my $self = shift;
         my @arguments = @_;
         for my $index (0 .. $#arguments) {
+            next if ref $arguments[$index] eq 'CODE';
+
             utf8::downgrade($arguments[$index], 1)
                 or croak 'command sent is not an octet sequence in the native encoding (Latin-1).';
         }
@@ -94,6 +133,8 @@ Redis::Cluster::Fast - A fast perl binding for Redis Cluster
 =head1 SYNOPSIS
 
     use Redis::Cluster::Fast;
+
+    Redis::Cluster::Fast::srandom(100);
 
     my $redis = Redis::Cluster::Fast->new(
         startup_nodes => [
@@ -166,6 +207,16 @@ The benchmark script used can be found under examples directory.
 
 =head1 METHODS
 
+=head2 srandom($seed)
+
+hiredis-cluster uses L<random()|https://linux.die.net/man/3/random> to select a node used for requesting cluster topology.
+
+C<$seed> is expected to be an unsigned integer value,
+and is used as an argument for L<srandom()|https://linux.die.net/man/3/srandom>.
+
+These are different implementations of Perl's rand and srand.
+In this client, Perl's Drand01 is also used to determine the destination node for executing a command that is not a cluster command.
+
 =head2 new(%args)
 
 Following arguments are available.
@@ -195,6 +246,13 @@ MOVED, ASK, TRYAGAIN, CLUSTERDOWN.
 
 C<max_retry_count> is the maximum number of retries and must be 1 or above.
 
+=head3 cluster_discovery_retry_timeout
+
+A fractional value. (default: 1.0)
+
+Specify the number of seconds to treat a series of cluster topology requests as timed out without retrying the operation.
+At least one operation will be attempted, and the time taken for the initial operation will also be measured.
+
 =head3 route_use_slots
 
 A value used as boolean. (default: undef)
@@ -210,6 +268,54 @@ The command can also be expressed by concatenating the subcommands with undersco
     e.g. cluster_info
 
 It does not support (Sharded) Pub/Sub family of commands and should not be run.
+
+It is recommended to issue C<disconnect> in advance just to be safe when executing fork() after issuing the command.
+
+=head2 <command>(@args, sub {})
+
+To run a Redis command in pipeline with arguments and a callback.
+
+The command can also be expressed by concatenating the subcommands with underscores.
+
+Commands issued to the same node are sent and received in pipeline mode.
+In pipeline mode, commands are not sent to Redis until C<wait_one_response> or C<wait_all_responses> is issued.
+
+The callback is executed with two arguments.
+The first is the result of the command, and the second is the error message.
+C<$result> will be a scalar value or an array reference, and C<$error> will be an undefined value if no errors occur.
+Also, C<$error> may contain an error returned from Redis or an error that occurred on the client (e.g. Timeout).
+
+You cannot call any client methods inside the callback.
+
+After issuing a command in pipeline mode,
+do not execute fork() without issuing C<disconnect> if all callbacks are not executed completely.
+
+    $redis->get('test', sub {
+        my ($result, $error) = @_;
+        # some operations...
+    });
+
+=head2 wait_one_response()
+
+If there are any unexcuted callbacks, it will block until at least one is executed.
+The return value can be either 1 for success, 0 for no callbacks remained, or undef for other errors.
+
+=head2 wait_all_responses()
+
+If there are any unexcuted callbacks, it will block until all of them are executed.
+The return value can be either 1 for success, 0 for no callbacks remained, or undef for other errors.
+
+=head2 disconnect()
+
+Normally you should not call C<disconnect> manually.
+If you want to call fork(), C<disconnect> should be call before fork().
+
+It will be blocked until all unexecuted commands are executed, and then it will disconnect.
+
+=head2 connect()
+
+Normally you should not call C<connect> manually.
+If you want to call fork(), C<connect> should be call after fork().
 
 =head1 LICENSE
 

@@ -2,7 +2,7 @@
 use warnings;
 use strict;
 use 5.014;
-our $VERSION = '2.421';
+our $VERSION = '2.422';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -46,7 +46,7 @@ C<db-browser> - Browse SQL databases and their tables interactively.
 
 =head1 VERSION
 
-Version 2.421
+Version 2.422
 
 =head1 SYNOPSIS
 
@@ -234,54 +234,68 @@ For DB Settings, see L</DB Settings>.
 
 Choosing one of the tables leads to the I<SQL Menu>.
 
-=head3 Derived
+=head3 Subquery
 
-I<Derived> is available if enabled in L</Extensions>.
+I<Subquery> is available if enabled in L</Extensions>.
 
 Enter a subquery and use it as a table.
 
-By selecting the I<Read-Line> menu entry, the user is asked for the query.
+The query can be created in different ways:
 
-If stored statements are available, it is also possible to select one of those statements instead of entering a query.
+=over
 
-Previously entered queries and the last statements printed with I<Print TABLE> are stored temporarily.
+=item SQL Menu
 
-Statements can be saved permanently in the submenu, which opens by selecting the prompt line in the I<Subquery> menu
-(I<Choose:>).
+Build the query with the SQL Menu.
 
-=head3 Cte
+Before returning the subquery, the result of the subquery can be displayed by selecting the prompt line of the menu.
+This does not work if the subquery is a correlated subquery.
+
+=item Readline
+
+Write the query in the prompt.
+
+=item Stored Queries
+
+If stored queries are available, it is possible to select one of those queries.
+
+There are three different types of stored queries:
+
+- permanently saved queries
+
+- previously entered queries
+
+- queries printed with I<Print TABLE>
+
+Queries can be saved permanently by selecting the prompt line (I<Choose:>) in the I<Subquery> menu.
+
+=back
+
+=head3 CTE
 
 Common table expression, available if enabled in L</Extensions>.
 
 =over
 
-=item New Cte
+=item New CTE
 
-The user is asked for the CTE query and the CTE name. The syntax of the CTE name is:
+The user is asked for the CTE query and the CTE name.
+
+The syntax of the CTE name is:
 
     [RECURSIVE] cte_name [(col_name [, col_name] ...)]
 
-Some database types build recursive CTEs without the C<RECURSIVE> keyword.
+L<Subquery> above describes how to build/enter the query.
 
-By selecting the I<Read-Line> menu entry, the user can enter the query.
+=item Available CTEs
 
-If stored statements are available, it is also possible to select one of those statements instead of entering a query.
-
-Previously entered queries and the last statements printed with I<Print TABLE> are stored temporarily.
-
-Statements can be saved permanently in the submenu, which opens by selecting the prompt line in the I<CTE> menu
-(I<Choose:>).
-
-=item Available Ctes
-
-Select from the available ctes.
+Select from the built CTEs.
 
 =item Reset
 
-Removes ctes. In Join and Union: ctes that are used directly or indirectly are retained when I<Reset> pressed.
+Removes CTEs. In Join and Union: CTEs that are used directly or indirectly are retained when I<Reset> pressed.
 
-Don't use the I<Reset> button when in a CTE special tables such as subqueries or functions are joined with an implicit
-join.
+Do not use the I<Reset> button if implicit joins (joins without the JOIN key word) have been entered with I<Readline>.
 
 =back
 
@@ -718,9 +732,9 @@ Add menu entries to menus:
 
 =over
 
-=item Derived Table
+=item Subquery
 
-=item Cte
+=item CTE
 
 =item Join
 
@@ -734,9 +748,9 @@ Add menu entries to menus:
 
 =over
 
-=item Derived Table
+=item Subquery
 
-=item Cte
+=item CTE
 
 =back
 
@@ -744,9 +758,9 @@ Add menu entries to menus:
 
 =over
 
-=item Derived Table
+=item Subquery
 
-=item Cte
+=item CTE
 
 =item Where
 
@@ -794,22 +808,20 @@ Not all of these extensions are available everywhere.
 
 =over
 
+=item Value
+
+Enter a constant value.
+
+If the data type is numeric or unknown and the literal looks like a number, the literal is not enclosed in quotation
+marks. In all other cases, the entered literal is enclosed in quotation marks.
+
 =item Subqueries
 
 Selecting C<SQ> opens the subqueries menu.
 
-By selecting the I<Read-Line> menu entry, one can enter a subquery or an expression.
+See L<Subquery> for the different possibilities to enter a subquery.
 
-If stored subqueries are available, it is also possible to select one of those subqueries instead of entering a
-subquery.
-
-The last subqueries entered in the subquery menu and the last statements printed with I<Print TABLE> are stored
-temporarily.
-
-A subquery can be saved permanently in the submenu, which opens by selecting the prompt line of a subquery menu
-(I<Choose SQ:>).
-
-Entries matching C</^\s*(?:SELECT|WITH)\s/i> are automatically enclosed in parentheses.
+Entries beginning with SELECT or WITH followed by a space are automatically enclosed in parentheses.
 
 =item Scalar Functions
 
@@ -838,13 +850,23 @@ Selecting C<case> opens the menu, where the user can build a C<CASE> expression.
 
 Selecting C<math()> opens the menu, where the user can combine expressions with arithmetic operators.
 
-=item Columns
+=item Column
 
-Selecting C<col> opens the menu, where the user can choose a column.
+Selecting C<Column> opens the menu, where the user can choose a column.
+
+By selecting C<%%> one can choose a column from a different table.
 
 =item Set to C<NULL>
 
 Available after the C<SET> in an C<UPDATE> statement.
+
+=item )end
+
+Close the IN operator parentheses.
+
+=item skip
+
+C<WHERE>: skip the column and use the EXISTS or the NOT EXISTS operator.
 
 =item Parentheses
 
@@ -852,7 +874,7 @@ C<WHERE>, C<WHEN> and C<HAVING>: in the C<%%> menu are also available parenthese
 
 =item Column Aliases
 
-Selecting C<as> allows one to add, change or remove aliases for the selected columns.
+Selecting C<alias> allows one to add, change or remove aliases for the selected columns.
 
 =back
 

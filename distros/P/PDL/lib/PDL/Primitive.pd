@@ -15,16 +15,6 @@ use warnings;
 use PDL::Slices;
 use Carp;
 
-{ package # hide from MetaCPAN
-    PDL;
-  use overload (
-    'x' => sub {
-      PDL::Primitive::matmult(@_[0,1], my $foo=$_[0]->null());
-      $foo;
-    },
-  );
-}
-
 =head1 NAME
 
 PDL::Primitive - primitive operations for pdl
@@ -79,8 +69,6 @@ Inner product over one dimension
 See also L</norm>, L<PDL::Ufunc/magnover>.
 ',
        BadDoc => '
-=for bad
-
 If C<a() * b()> contains only bad data,
 C<c()> is set bad. Otherwise C<c()> will have its bad flag cleared,
 as it will not contain any bad values.
@@ -204,6 +192,7 @@ pp_def('matmult',
 	HandleBad=>1,
 	Pars => 'a(t,h); b(w,t); [o]c(w,h);',
 	GenericTypes => [ppdefs_all],
+	Overload => 'x',
 	PMCode => pp_line_numbers(__LINE__, <<'EOPM'),
 sub PDL::matmult {
     my ($x,$y,$c) = @_;
@@ -295,9 +284,6 @@ EOF
 Weighted (i.e. triple) inner product
 
  d = sum_i a(i) b(i) c(i)
-
-=cut
-
 '
        );
 
@@ -342,7 +328,6 @@ PDL_IF_BAD(if (!flag) { $SETBAD(c()); }
 else,)                { $c() = tmp; }
 EOF
        Doc => '
-
 =for ref
 
 Inner product over 2 dimensions.
@@ -350,9 +335,6 @@ Inner product over 2 dimensions.
 Equivalent to
 
  $c = inner($x->clump(2), $y->clump(2))
-
-=cut
-
 '
        );
 
@@ -397,9 +379,7 @@ which in case of large numbers of matrices makes this much more
 memory-efficient.
 
 It is hoped that things like this could be taken care of as a kind of
-closures at some point.
-
-=cut
+closure at some point.
 '
        ); # pp_def inner2t()
 
@@ -411,7 +391,6 @@ sub crassgn {
 
 pp_def('crossp',
        Doc => <<'EOD',
-
 =for ref
 
 Cross product of two 3D vectors
@@ -424,9 +403,6 @@ After
 
 the inner product C<$c*$x> and C<$c*$y> will be zero, i.e. C<$c> is
 orthogonal to C<$x> and C<$y>
-
-=cut
-
 EOD
        Pars => 'a(tri=3); b(tri); [o] c(tri)',
        GenericTypes => [ppdefs_all],
@@ -488,20 +464,15 @@ pp_def(
     Code => <<'EOF',
 loop(n) %{
   register PDL_Indx this_ind = $ind();
-  if ( PDL_IF_BAD($ISBADVAR(this_ind,ind) ||,) this_ind<0 || this_ind>=$SIZE(m) )
-    $CROAK("invalid index %"IND_FLAG"; range 0..%"IND_FLAG, this_ind, $SIZE(m));
   PDL_IF_BAD(
-  if ( $ISBAD(input()) ) { $SETBAD(sum(m => this_ind)); }
-  else,)                 { $sum(m => this_ind) += $input(); }
+    if ($ISBADVAR(this_ind,ind)) $CROAK("bad index %"IND_FLAG, n);
+    if ($ISBAD(input())) { $SETBAD(sum(m => this_ind)); continue; },)
+  if (this_ind<0 || this_ind>=$SIZE(m))
+    $CROAK("invalid index %"IND_FLAG"; range 0..%"IND_FLAG, this_ind, $SIZE(m));
+  $sum(m => this_ind) += $input();
 %}
 EOF
-    BadDoc => '
-=for bad
-
-The routine barfs on bad indices, and bad inputs set target outputs bad.
-
-=cut
-',
+    BadDoc => 'The routine barfs on bad indices, and bad inputs set target outputs bad.',
     Doc=>'
 =for ref
 
@@ -588,9 +559,6 @@ WARNING: C<conv1d> processes bad values in its inputs as
 the numeric value of C<< $pdl->badvalue >> so it is not
 recommended for processing pdls with bad values in them
 unless special care is taken.
-
-=cut
-
 EOD
         Pars => 'a(m); kern(p); [o]b(m);',
         GenericTypes => [ppdefs_all],
@@ -661,9 +629,6 @@ construct like
 
 However, C<in> doesn't create a (potentially large) intermediate
 and is generally faster.
-
-=cut
-
 EOD
 );
 
@@ -902,30 +867,7 @@ EOD
 
 } # for: my $opt
 
-pp_add_exported('', 'clip');
-pp_addpm(<<'EOD');
-=head2 clip
-
-=for ref
-
-Clip (threshold) an ndarray by (optional) upper or lower bounds.
-
-=for usage
-
- $y = $x->clip(0,3);
- $c = $x->clip(undef, $x);
-
-=for bad
-
-clip handles bad values since it is just a
-wrapper around L</hclip> and
-L</lclip>.
-
-=cut
-EOD
-
-pp_def(
-	'clip',
+pp_def('clip',
 	HandleBad => 1,
 	Pars => 'a(); l(); h(); [o] c()',
 	Code => <<'EOBC',
@@ -936,6 +878,16 @@ pp_def(
            $c() = PDLMIN($h(), PDLMAX($l(), $a()));
          }
 EOBC
+	Doc => <<'EOD',
+=for ref
+
+Clip (threshold) an ndarray by (optional) upper or lower bounds.
+
+=for usage
+
+ $y = $x->clip(0,3);
+ $c = $x->clip(undef, $x);
+EOD
        PMCode=>pp_line_numbers(__LINE__, <<'EOPM'),
 *clip = \&PDL::clip;
 sub PDL::clip {
@@ -1009,8 +961,6 @@ The formula is
  b() = (sum_i wt_i * (a_i ** degree - avg)) / (sum_i wt_i)
 ',
        BadDoc => '
-=for bad
-
 Bad values are ignored in any calculation; C<$b> will only
 have its bad flag set if the output contains any bad data.
 ',
@@ -1134,16 +1084,10 @@ will take place over the final dimension. Thus if the input
 is N-dimensional each returned value will be N-1 dimensional,
 to calculate the statistics for the entire ndarray either
 use C<clump(-1)> directly on the ndarray or call C<stats>.
-
-=cut
 ',
      BadDoc =>'
-=for bad
-
 Bad values are simply ignored in the calculation, effectively reducing
 the sample size.  If all data are bad then the output data are marked bad.
-
-=cut
 ',
 );
 
@@ -1623,11 +1567,7 @@ pp_def(
      %}
      PDL_IF_BAD(if (anybad) $PDLSTATESETBAD(c);,)
     ',
-    Doc => '
-=for ref
-
-Compare two vectors, returning 1 if equal, 0 if not equal.
-',
+    Doc => 'Compare two vectors, returning 1 if equal, 0 if not equal.',
     BadDoc => 'The output is bad if any input values are bad.',
 );
 
@@ -1669,7 +1609,6 @@ If you need global keys, see enumvecg().
 
 Contributed by Bryan Jurish E<lt>moocow@cpan.orgE<gt>.
 EOD
-
 );
 
 ##------------------------------------------------------
@@ -1745,7 +1684,7 @@ broadcastloop %{
 
 Routine for searching N-dimensional values - akin to vsearch() for vectors.
 
-=for usage
+=for example
 
  $found   = vsearchvec($find, $which);
  $nearest = $which->dice_axis(1,$found);
@@ -2127,6 +2066,7 @@ pp_def('vcos',
   GenericTypes => [ppdefs_all],
   HandleBad => 1,
   Code => pp_line_numbers(__LINE__, <<'EOF'),
+broadcastloop %{
 $GENERIC(vcos) bnorm = 0;
 loop(M) %{
   PDL_IF_BAD(if ($ISBAD(b())) continue;,)
@@ -2158,12 +2098,10 @@ loop (N) %{
     $vcos() = NAN;
   }
 %}
+%}
+if ( $PDLSTATEISBAD(a) || $PDLSTATEISBAD(b) )
+  $PDLSTATESETBAD(vcos);
 EOF
-  CopyBadStatusCode => q{
-   if ( $ISPDLSTATEBAD(a) || $ISPDLSTATEBAD(b) ) {
-     $SETPDLSTATEBAD(vcos);
-   }
-},
   Doc => q{
 Computes the vector cosine similarity of a dense vector $b() with respect
 to each row $a(*,i) of a dense PDL $a().  This is basically the same
@@ -3022,10 +2960,6 @@ EOF
 
 routine for 1D linear interpolation
 
-=for usage
-
- ( $yi, $err ) = interpolate($xi, $x, $y)
-
 Given a set of points C<($x,$y)>, use linear interpolation
 to find the values C<$yi> at a set of points C<$xi>.
 
@@ -3046,9 +2980,6 @@ is printed rather than returning an error ndarray.
 
 Note that C<interpolate> can use complex values for C<$y> and C<$yi> but
 C<$x> and C<$xi> must be real.
-
-=cut
-
 EOD
 );
 
@@ -3373,7 +3304,7 @@ will not give the answer you expect.
 
 *one2nd = \&PDL::one2nd;
 sub PDL::one2nd {
-  barf "Usage: one2nd \$array \$indices\n" if @_ != 2;
+  barf "Usage: one2nd \$array, \$indices\n" if @_ != 2;
   my ($x, $ind)=@_;
   my @dimension=$x->dims;
   $ind = indx($ind);
@@ -3457,6 +3388,8 @@ C<$c_i>.
  [5 6 7 8 9]
  [0 1 2 3 4]
 
+See also L</whichND_both> for the n-dimensional version.
+
 =cut
 
 EOD
@@ -3534,12 +3467,11 @@ EOF
 =for ref
 
 Collects the coordinates of non-zero, non-bad values in each 1D mask in
-ndarray at the start of the output, and fills the rest with -1. Works
-inplace.
+ndarray at the start of the output, and fills the rest with -1.
 
 By using L<PDL::Slices/xchg> etc. it is possible to use I<any> dimension.
 
-=for usage
+=for example
 
   my $a = pdl q[3 4 2 3 2 3 1];
   my $b = $a->uniq;
@@ -3644,7 +3576,7 @@ While C<where> works OK for most N-dimensional cases, it does not
 broadcast properly over (for example) the (N+1)th dimension in data
 that is compared to an N-dimensional mask.  Use C<whereND> for that.
 
-=for usage
+=for example
 
  $i = $x->where($x+5 > 0); # $i contains those elements of $x
                            # where mask ($x+5 > 0) is 1
@@ -3712,7 +3644,7 @@ sub PDL::where_both {
 *where_both = \&PDL::where_both;
 EOD
 
-pp_add_exported("", 'whereND');
+pp_add_exported("", 'whereND whereND_both');
 pp_addpm(<<'EOD');
 =head2 whereND
 
@@ -3738,7 +3670,7 @@ to the original data PDLs, for the purpose of dataflow.
   $sdata = whereND $data, $mask
   ($s1, $s2, ..., $sn) = whereND $d1, $d2, ..., $dn, $mask
 
-  where
+where
 
     $data is M dimensional
     $mask is N < M dimensional
@@ -3795,9 +3727,38 @@ sub PDL::whereND :lvalue {
 }
 *whereND = \&PDL::whereND;
 
+=head2 whereND_both
+
+=for ref
+
+C<where_both> with support for ND masks and broadcasting
+
+This works like L</whichND_both>, but data-flowing slices
+rather than index-sets are returned.
+
+C<whereND_both> differs from C<where_both> in that the mask
+dimensionality is preserved which allows for
+proper broadcasting of the selection operation over
+higher dimensions.
+
+As with C<where_both> the output PDLs are still connected
+to the original data PDLs, for the purpose of dataflow.
+
+=for usage
+
+ ($match_vals, $non_match_vals) = whereND_both($pdl, $mask);
+
+=cut
+
+sub PDL::whereND_both :lvalue {
+  barf "Usage: whereND_both(\$pdl, \$mask)\n" if @_ != 2;
+  my ($arr, $mask) = @_;  # $mask has 0==false, 1==true
+  map $arr->indexND($_), PDL::whichND_both($mask);
+}
+*whereND_both = \&PDL::whereND_both;
 EOD
 
-pp_add_exported("", 'whichND');
+pp_add_exported("", 'whichND whichND_both');
 pp_addpm(<<'EOD');
 =head2 whichND
 
@@ -3859,6 +3820,21 @@ L<PDL::Slices/indexND> can be fed the coordinates to return the values.
 
 =cut
 
+sub _one2nd {
+  my ($mask, $ind) = @_;
+  my $ndims = my @mdims = $mask->dims;
+  # In the empty case, explicitly return the correct type of structured empty
+  return PDL->new_from_specification(indx, $ndims, 0) if !$ind->nelem;
+  my $mult = ones(indx, $ndims);
+  $mult->index($_+1) .= $mult->index($_) * $mdims[$_] for 0..$#mdims-1;
+  for my $i (0..$#mdims) {
+    my $s = $ind->index($i);
+    $s /= $mult->index($i);
+    $s %= $mdims[$i];
+  }
+  $ind;
+}
+
 *whichND = \&PDL::whichND;
 sub PDL::whichND {
   my $mask = PDL->topdl(shift);
@@ -3875,29 +3851,57 @@ sub PDL::whichND {
   }
 
   # Scalar context: generate an N-D index ndarray
-  return PDL->new_from_specification(indx,$mask->ndims,0) if !$mask->nelem;
-  return $mask ? pdl(indx,0) : PDL->new_from_specification(indx,0)
-    if !$mask->getndims;
+  my $ndims = $mask->getndims;
+  return PDL->new_from_specification(indx,$ndims,0) if !$mask->nelem;
+  return $mask ? pdl(indx,0) : PDL->new_from_specification(indx,0) if !$ndims;
+  _one2nd($mask, $mask->flat->which->dummy(0,$ndims)->sever);
+}
 
-  my $ind = $mask->flat->which->dummy(0,$mask->getndims)->make_physical;
-  # In the empty case, explicitly return the correct type of structured empty
-  return PDL->new_from_specification(indx,$mask->ndims, 0) if !$ind->nelem;
+=head2 whichND_both
 
-  my $mult = ones(indx, $mask->getndims);
-  my @mdims = $mask->dims;
+=for ref
 
-  for my $i (0..$#mdims-1) {
-   # use $tmp for 5.005_03 compatibility
-   (my $tmp = $mult->index($i+1)) .= $mult->index($i)*$mdims[$i];
+Return the coordinates of non-zero values in a mask.
+
+=for usage
+
+Like L</which_both>, but returns the N-dimensional coordinates (like
+L</whichND>) of the nonzero, zero values in the mask PDL. The
+returned values arrive as an array-of-vectors suitable for use in
+L<indexND|PDL::Slices/indexND> or L<range|PDL::Slices/range>.
+Added in 2.099.
+
+ ($nonzero_coords, $zero_coords) = whichND_both($mask);
+
+SEE ALSO:
+
+L</which> finds coordinates of nonzero values in a 1-D mask.
+
+L</where> extracts values from a data PDL that are associated
+with nonzero values in a mask PDL.
+
+L<PDL::Slices/indexND> can be fed the coordinates to return the values.
+
+=for example
+
+ pdl> $s=sequence(10,10,3,4)
+ pdl> ($x, $y, $z, $w)=whichND($s == 203); p $x, $y, $z, $w
+ [3] [0] [2] [0]
+ pdl> print $s->at(list(cat($x,$y,$z,$w)))
+ 203
+
+=cut
+
+*whichND_both = \&PDL::whichND_both;
+sub PDL::whichND_both {
+  my $mask = PDL->topdl(shift);
+  return ((PDL->new_from_specification(indx,$mask->ndims,0))x2) if !$mask->nelem;
+  my $ndims = $mask->getndims;
+  if (!$ndims) {
+    my ($t, $f) = (pdl(indx,0), PDL->new_from_specification(indx,0));
+    return $mask ? ($t,$f) : ($f,$t);
   }
-
-  for my $i (0..$#mdims) {
-   my($s) = $ind->index($i);
-   $s /= $mult->index($i);
-   $s %= $mdims[$i];
-  }
-
-  return $ind;
+  map _one2nd($mask, $_->dummy(0,$ndims)->sever), $mask->flat->which_both;
 }
 EOD
 
@@ -4483,38 +4487,25 @@ if ($PCHST($d(n=>n-1), del2) <= 0.) {
   }
 }
 EOF
-  Doc => <<'EOF',
-=for ref
-
-Calculate the derivatives of (x,f(x)) using cubic Hermite interpolation.
-
-Calculate the derivatives needed to determine a monotone piecewise
-cubic Hermite interpolant to the given set of points (C<$x,$f>,
-where C<$x> is strictly increasing).
-The resulting set of points - C<$x,$f,$d>, referred to
-as the cubic Hermite representation - can then be used in
-other functions, such as L</pchip_chfe>, L</pchip_chfd>,
-and L</pchip_chia>.
-
-The boundary conditions are compatible with monotonicity,
-and if the data are only piecewise monotonic, the interpolant
-will have an extremum at the switch points; for more control
-over these issues use L</pchip_chic>.
-
-F -- (input) array of dependent variable values to be
+  ParamDesc => {
+    x => 'ordinate data',
+    f => <<'EOF',
+array of dependent variable values to be
 interpolated. F(I) is value corresponding to
 X(I). C<pchip_chim> is designed for monotonic data, but it will
 work for any F-array.  It will force extrema at points where
 monotonicity switches direction. If some other treatment of
 switch points is desired, DPCHIC should be used instead.
-
-D -- (output) array of derivative values at the data
+EOF
+    d => <<'EOF',
+array of derivative values at the data
 points.  If the data are monotonic, these values will
 determine a monotone cubic Hermite function.
+EOF
+    ierr => <<'EOF',
+Error status:
 
-Error status returned by C<$ierr>:
-
-=over 4
+=over
 
 =item *
 
@@ -4538,6 +4529,25 @@ monotonicity (data still valid).
 (The D-array has not been changed in any of these cases.)
 NOTE: The above errors are checked in the order listed,
 and following arguments have B<NOT> been validated.
+EOF
+  },
+  Doc => <<'EOF',
+=for ref
+
+Calculate the derivatives of (x,f(x)) using cubic Hermite interpolation.
+
+Calculate the derivatives needed to determine a monotone piecewise
+cubic Hermite interpolant to the given set of points (C<$x,$f>,
+where C<$x> is strictly increasing).
+The resulting set of points - C<$x,$f,$d>, referred to
+as the cubic Hermite representation - can then be used in
+other functions, such as L</pchip_chfe>, L</pchip_chfd>,
+and L</pchip_chia>.
+
+The boundary conditions are compatible with monotonicity,
+and if the data are only piecewise monotonic, the interpolant
+will have an extremum at the switch points; for more control
+over these issues use L</pchip_chic>.
 
 References:
 
@@ -4980,25 +4990,8 @@ do { /* inline dpchce */
 } while (0); /* end inlined dpchce */
 /*   ------------------------------------------------------- */
 EOF
-  Doc => <<'EOF',
-=for ref
-
-Set derivatives needed to determine a piecewise monotone piecewise
-cubic Hermite interpolant to given data. User control is available
-over boundary conditions and/or treatment of points where monotonicity
-switches direction.
-
-Calculate the derivatives needed to determine a piecewise monotone piecewise
-cubic interpolant to the data given in (C<$x,$f>,
-where C<$x> is strictly increasing).
-Control over the boundary conditions is given by the
-C<$ic> and C<$vc> ndarrays, and the value of C<$mflag> determines
-the treatment of points where monotonicity switches
-direction. A simpler, more restricted, interface is available
-using L</pchip_chim>.
-The resulting piecewise cubic Hermite function may be evaluated
-by L</pchip_chfe> or L</pchip_chfd>.
-
+  ParamDesc => {
+    ic => <<'EOF',
 The first and second elements of C<$ic> determine the boundary
 conditions at the start and end of the data respectively.
 If the value is 0, then the default condition, as used by
@@ -5007,7 +5000,7 @@ If greater than zero, no adjustment for monotonicity is made,
 otherwise if less than zero the derivative will be adjusted.
 The allowed magnitudes for C<ic(0)> are:
 
-=over 4
+=over
 
 =item *
 
@@ -5065,12 +5058,12 @@ set to 0 at all switch points. NOTES:
 
 =over
 
-item *
+=item *
 
 This will cause D to be set to zero at all switch points, thus
 forcing extrema there.
 
-item *
+=item *
 
 The result of using this option with the default boundary conditions
 will be identical to using DPCHIM, but will generally cost more
@@ -5078,35 +5071,41 @@ compute time. This option is provided only to facilitate comparison
 of different switch and/or boundary conditions.
 
 =back
-
-Set C<$mflag> to be non-zero to
+EOF
+    vc => 'See ic for details',
+    mflag => <<'EOF',
+Set to non-zero to
 use a formula based on the 3-point difference formula at switch
 points. If C<$mflag E<gt> 0>, then the interpolant at switch points
 is forced to not deviate from the data by more than C<$mflag*dfloc>,
 where C<dfloc> is the maximum of the change of C<$f> on this interval
 and its two immediate neighbours.
 If C<$mflag E<lt> 0>, no such control is to be imposed.
-
-X -- (input) array of independent variable values.  The
+EOF
+    x => <<'EOF',
+array of independent variable values.  The
 elements of X must be strictly increasing:
 
            X(I-1) .LT. X(I),  I = 2(1)N.
 
 (Error return if not.)
-
-F -- (input) array of dependent variable values to be
+EOF
+    f => <<'EOF',
+array of dependent variable values to be
 interpolated. F(I) is value corresponding to X(I).
-
-D -- (output) array of derivative values at the data
+EOF
+    d => <<'EOF',
+array of derivative values at the data
 points. These values will determine a monotone cubic
 Hermite function on each subinterval on which the data
 are monotonic, except possibly adjacent to switches in
 monotonicity. The value corresponding to X(I) is stored in D(I).
 No other entries in D are changed.
+EOF
+    ierr => <<'EOF',
+Error status:
 
-Error status returned by C<$ierr>:
-
-=over 4
+=over
 
 =item *
 
@@ -5155,6 +5154,26 @@ for monotonicity.
 (The D-array has not been changed in any of these cases.)
 NOTE:  The above errors are checked in the order listed,
 and following arguments have B<NOT> been validated.
+EOF
+  },
+  Doc => <<'EOF',
+=for ref
+
+Set derivatives needed to determine a piecewise monotone piecewise
+cubic Hermite interpolant to given data. User control is available
+over boundary conditions and/or treatment of points where monotonicity
+switches direction.
+
+Calculate the derivatives needed to determine a piecewise monotone piecewise
+cubic interpolant to the data given in (C<$x,$f>,
+where C<$x> is strictly increasing).
+Control over the boundary conditions is given by the
+C<$ic> and C<$vc> ndarrays, and the value of C<$mflag> determines
+the treatment of points where monotonicity switches
+direction. A simpler, more restricted, interface is available
+using L</pchip_chim>.
+The resulting piecewise cubic Hermite function may be evaluated
+by L</pchip_chfe> or L</pchip_chfd>.
 
 References:
 
@@ -5362,24 +5381,13 @@ loop (n=nm1-1::-1) %{
 /* --------------------(  END  CODING FROM CUBSPL )-------------------- */
 #undef dpchsp_singular
 EOF
-  Doc => <<'EOF',
-=for ref
-
-Calculate the derivatives of (x,f(x)) using cubic spline interpolation.
-
-Computes the Hermite representation of the cubic spline interpolant
-to the data given in (C<$x,$f>), with the specified boundary conditions.
-Control over the boundary conditions is given by the
-C<$ic> and C<$vc> ndarrays.
-The resulting values - C<$x,$f,$d> - can
-be used in all the functions which expect a cubic
-Hermite function, including L</pchip_bvalu>.
-
-The first and second elements of C<$ic> determine the boundary
+  ParamDesc => {
+    ic => <<'EOF',
+The first and second elements determine the boundary
 conditions at the start and end of the data respectively.
 The allowed values for C<ic(0)> are:
 
-=over 4
+=over
 
 =item *
 
@@ -5412,10 +5420,12 @@ The values of C<$vc> need only be set if options 1 or 2 are chosen
 for C<$ic>.
 
 NOTES: For the "natural" boundary condition, use IC(n)=2 and VC(n)=0.
+EOF
+    vc => 'See ic for details',
+    ierr => <<'EOF',
+Error status:
 
-Error status returned by C<$ierr>:
-
-=over 4
+=over
 
 =item *
 
@@ -5456,6 +5466,20 @@ for the interior derivative values.
 (The D-array may have been changed in this case. Do B<NOT> use it!)
 
 =back
+EOF
+  },
+  Doc => <<'EOF',
+=for ref
+
+Calculate the derivatives of (x,f(x)) using cubic spline interpolation.
+
+Computes the Hermite representation of the cubic spline interpolant
+to the data given in (C<$x,$f>), with the specified boundary conditions.
+Control over the boundary conditions is given by the
+C<$ic> and C<$vc> ndarrays.
+The resulting values - C<$x,$f,$d> - can
+be used in all the functions which expect a cubic
+Hermite function, including L</pchip_bvalu>.
 
 References: Carl de Boor, A Practical Guide to Splines, Springer-Verlag,
 New York, 1978, pp. 53-59.
@@ -5473,43 +5497,45 @@ EOF
 $CHFD(1);
 EOF
   GenericTypes => $F,
-  Doc => <<'EOF',
-=for ref
-
-Evaluate a piecewise cubic Hermite function and its first derivative
-at an array of points. May be used by itself for Hermite interpolation,
-or as an evaluator for DPCHIM or DPCHIC.
-
-Given a piecewise cubic Hermite function - such as from
-L</pchip_chim> - evaluate the function (C<$fe>) and
-derivative (C<$de>) at a set of points (C<$xe>).
-If function values alone are required, use L</pchip_chfe>.
-
-Set C<skip> to 1 to skip checks on the input data.
+  ParamDesc => {
+    skip => <<'EOF',
+Set to 1 to skip checks on the input data.
 This will save time in case these checks have already
 been performed (say, in L</pchip_chim> or L</pchip_chic>).
 Will be set to TRUE on normal return.
-
-XE -- (input) array of points at which the functions are to
+EOF
+    xe => <<'EOF',
+array of points at which the functions are to
 be evaluated. NOTES:
 
-  1. The evaluation will be most efficient if the elements
-     of XE are increasing relative to X;
-     that is,   XE(J) .GE. X(I)
-     implies    XE(K) .GE. X(I),  all K.GE.J .
-  2. If any of the XE are outside the interval [X(1),X(N)],
-     values are extrapolated from the nearest extreme cubic,
-     and a warning error is returned.
+=over
 
-FE -- (output) array of values of the cubic Hermite
+=item 1
+
+The evaluation will be most efficient if the elements
+of XE are increasing relative to X;
+that is,   XE(J) .GE. X(I)
+implies    XE(K) .GE. X(I),  all K.GE.J .
+
+=item 2
+
+If any of the XE are outside the interval [X(1),X(N)],
+values are extrapolated from the nearest extreme cubic,
+and a warning error is returned.
+
+=back
+EOF
+    fe => <<'EOF',
+array of values of the cubic Hermite
 function defined by  N, X, F, D  at the points  XE.
+EOF
+    de => <<'EOF',
+array of values of the first derivative of the same function at the points  XE.
+EOF
+    ierr => <<'EOF',
+Error status:
 
-DE -- (output) array of values of the first derivative of
-the same function at the points  XE.
-
-Error status returned by C<$ierr>:
-
-=over 4
+=over
 
 =item *
 
@@ -5539,6 +5565,19 @@ which should never happen.
 
 =back
 EOF
+  },
+  Doc => <<'EOF',
+=for ref
+
+Evaluate a piecewise cubic Hermite function and its first derivative
+at an array of points. May be used by itself for Hermite interpolation,
+or as an evaluator for DPCHIM or DPCHIC.
+
+Given a piecewise cubic Hermite function - such as from
+L</pchip_chim> - evaluate the function (C<$fe>) and
+derivative (C<$de>) at a set of points (C<$xe>).
+If function values alone are required, use L</pchip_chfe>.
+EOF
 );
 
 pp_def('pchip_chfe',
@@ -5552,54 +5591,55 @@ EOF
 $CHFD(0);
 EOF
   GenericTypes => $F,
-  Doc => <<'EOF',
-=for ref
-
-Evaluate a piecewise cubic Hermite function at an array of points.
-May be used by itself for Hermite interpolation, or as an evaluator
-for L</pchip_chim> or L</pchip_chic>.
-
-Given a piecewise cubic Hermite function - such as from
-L</pchip_chim> - evaluate the function (C<$fe>) at
-a set of points (C<$xe>).
-If derivative values are also required, use L</pchip_chfd>.
-
-X -- (input) array of independent variable values.  The
+  ParamDesc => {
+    x => <<'EOF',
+array of independent variable values.  The
 elements of X must be strictly increasing:
 
            X(I-1) .LT. X(I),  I = 2(1)N.
 
 (Error return if not.)
-
-F -- (input) array of function values.  F(I) is
-the value corresponding to X(I).
-
-D -- (input) array of derivative values.  D(I)
-is the value corresponding to X(I).
-
-Set C<skip> to 1 to skip checks on the input data.
+EOF
+    f => <<'EOF',
+array of function values.  F(I) is the value corresponding to X(I).
+EOF
+    d => <<'EOF',
+array of derivative values.  D(I) is the value corresponding to X(I).
+EOF
+    skip => <<'EOF',
+Set to 1 to skip checks on the input data.
 This will save time in case these checks have already
 been performed (say, in L</pchip_chim> or L</pchip_chic>).
 Will be set to TRUE on normal return.
+EOF
+    xe => <<'EOF',
+array of points at which the function is to be evaluated. NOTES:
 
-XE -- (input) array of points at which the function is to
-      be evaluated.
+=over
 
- NOTES:
-  1. The evaluation will be most efficient if the elements
-     of XE are increasing relative to X;
-     that is,   XE(J) .GE. X(I)
-     implies    XE(K) .GE. X(I),  all K.GE.J .
-  2. If any of the XE are outside the interval [X(1),X(N)],
-     values are extrapolated from the nearest extreme cubic,
-     and a warning error is returned.
+=item 1
 
-FE -- (output) array of values of the cubic Hermite
+The evaluation will be most efficient if the elements
+of XE are increasing relative to X;
+that is,   XE(J) .GE. X(I)
+implies    XE(K) .GE. X(I),  all K.GE.J .
+
+=item 2
+
+If any of the XE are outside the interval [X(1),X(N)],
+values are extrapolated from the nearest extreme cubic,
+and a warning error is returned.
+
+=back
+EOF
+    fe => <<'EOF',
+array of values of the cubic Hermite
 function defined by  N, X, F, D  at the points  XE.
+EOF
+    ierr => <<'EOF',
+Error status returned by C<$>:
 
-Error status returned by C<$ierr>:
-
-=over 4
+=over
 
 =item *
 
@@ -5627,6 +5667,19 @@ E<gt>0 if extrapolation was performed at C<ierr> points
 (The FE-array has not been changed in any of these cases.)
 NOTE:  The above errors are checked in the order listed,
 and following arguments have B<NOT> been validated.
+EOF
+  },
+  Doc => <<'EOF',
+=for ref
+
+Evaluate a piecewise cubic Hermite function at an array of points.
+May be used by itself for Hermite interpolation, or as an evaluator
+for L</pchip_chim> or L</pchip_chic>.
+
+Given a piecewise cubic Hermite function - such as from
+L</pchip_chim> - evaluate the function (C<$fe>) at
+a set of points (C<$xe>).
+If derivative values are also required, use L</pchip_chfd>.
 EOF
 );
 
@@ -5739,40 +5792,38 @@ if (a != b) {
 }
 $ans() = value;
 EOF
-  Doc => <<'EOF',
-=for ref
-
-Integrate (x,f(x)) over arbitrary limits.
-
-Evaluate the definite integral of a piecewise
-cubic Hermite function over an arbitrary interval,
-given by C<[$la,$lb]>.
-
-X -- (input) array of independent variable values.  The elements
+  ParamDesc => {
+    x => <<'EOF',
+array of independent variable values.  The elements
 of X must be strictly increasing (error return if not):
 
            X(I-1) .LT. X(I),  I = 2(1)N.
-
-F -- (input) array of function values. F(I) is the value
-corresponding to X(I).
-
-C<$d> should contain the derivative values,
-computed by L</pchip_chim>.
-See L</pchip_chid> if the integration limits are
-data points.
-
-Set C<skip> to 1 to skip checks on the input data.
+EOF
+    f => <<'EOF',
+array of function values. F(I) is the value corresponding to X(I).
+EOF
+    d => <<'EOF',
+should contain the derivative values, computed by L</pchip_chim>.
+See L</pchip_chid> if the integration limits are data points.
+EOF
+    skip => <<'EOF',
+Set to 1 to skip checks on the input data.
 This will save time in case these checks have already
 been performed (say, in L</pchip_chim> or L</pchip_chic>).
 Will be set to TRUE on return with IERR E<gt>= 0.
-
+EOF
+    la => <<'EOF',
 The values of C<$la> and C<$lb> do not have
 to lie within C<$x>, although the resulting integral
 value will be highly suspect if they are not.
+EOF
+    lb => <<'EOF',
+See la
+EOF
+    ierr => <<'EOF',
+Error status:
 
-Error status returned by C<$ierr>:
-
-=over 4
+=over
 
 =item *
 
@@ -5806,6 +5857,15 @@ which should never happen.
 
 =back
 EOF
+  },
+  Doc => <<'EOF',
+=for ref
+
+Integrate (x,f(x)) over arbitrary limits.
+
+Evaluate the definite integral of a piecewise
+cubic Hermite function over an arbitrary interval, given by C<[$la,$lb]>.
+EOF
 );
 
 pp_def('pchip_chid',
@@ -5826,48 +5886,39 @@ if (!$skip()) {
 $PCHID($ia(), $ib(), $ans());
 EOF
   GenericTypes => $F,
-  Doc => <<'EOF',
-=for ref
-
-Evaluate the definite integral of a piecewise cubic Hermite function
-over an interval whose endpoints are data points.
-
-=for usage
-
-Evaluate the definite integral of a a piecewise cubic Hermite
-function between C<x($ia)> and C<x($ib)>.
-
-See L</pchip_chia> for integration between arbitrary
-limits.
-
-X -- (input) array of independent variable values.  The
+  ParamDesc => {
+    x => <<'EOF',
+array of independent variable values.  The
 elements of X must be strictly increasing:
 
            X(I-1) .LT. X(I),  I = 2(1)N.
 
 (Error return if not.)
 
+It is a fatal error to pass in data with C<N> E<lt> 2.
+EOF
+    ia => <<'EOF',
 IA,IB -- (input) indices in X-array for the limits of integration.
 both must be in the range [0,N-1] (this is different from the Fortran
 version) - error return if not. No restrictions on their relative
 values.
-
-F -- (input) array of function values.  F(I) is
-the value corresponding to X(I).
-
-C<$d> should contain the derivative values, computed by L</pchip_chim>.
-
-Set C<skip> to 1 to skip checks on the input data.
+EOF
+    ib => 'See ia for details',
+    f => 'array of function values.  F(I) is the value corresponding to X(I).',
+    skip => <<'EOF',
+Set to 1 to skip checks on the input data.
 This will save time in case these checks have already
 been performed (say, in L</pchip_chim> or L</pchip_chic>).
 Will be set to TRUE on return with IERR of 0 or -4.
-
-It is a fatal error to pass in data with C<N> E<lt> 2.
-
-Error status returned by C<$ierr> - this will be set, but an exception
+EOF
+    d => <<'EOF',
+should contain the derivative values, computed by L</pchip_chim>.
+EOF
+    ierr => <<'EOF',
+Error status - this will be set, but an exception
 will also be thrown:
 
-=over 4
+=over
 
 =item *
 
@@ -5886,6 +5937,19 @@ will also be thrown:
 (VALUE will be zero in any of these cases.)
 NOTE: The above errors are checked in the order listed, and following
 arguments have B<NOT> been validated.
+EOF
+  },
+  Doc => <<'EOF',
+=for ref
+
+Evaluate the definite integral of a piecewise cubic Hermite function
+over an interval whose endpoints are data points.
+
+Evaluate the definite integral of a a piecewise cubic Hermite
+function between C<x($ia)> and C<x($ib)>.
+
+See L</pchip_chia> for integration between arbitrary
+limits.
 EOF
 );
 
@@ -5946,41 +6010,17 @@ loop (n) %{
   $bcoef(ndim=>2*n+1) = $f() + hnew * dov3;
 %}
 EOF
-  Doc => <<'EOF',
-=for ref
-
-Piecewise Cubic Hermite function to B-Spline converter.
-
-Computes the B-spline representation of the PCH function
-determined by N,X,F,D. The output is the B-representation for the
-function:  NKNOTS, T, BCOEF, NDIM, KORD.
-
-L</pchip_chic>, L</pchip_chim>, or L</pchip_chsp> can be used to
-determine an interpolating PCH function from a set of data. The
-B-spline routine L</pchip_bvalu> can be used to evaluate the
-resulting B-spline representation of the data
-(i.e. C<nknots>, C<t>, C<bcoeff>, C<ndim>, and
-C<kord>).
-
-Caution: Since it is assumed that the input PCH function has been
-computed by one of the other routines in the package PCHIP,
-input arguments N, X are B<not> checked for validity.
-
-Restrictions/assumptions:
-
-   1. N.GE.2 .  (not checked)
-   2. X(i).LT.X(i+1), i=1,...,N .  (not checked)
-   4. KNOTYP.LE.2 .  (error return if not)
-  *6. T(2*k+1) = T(2*k) = X(k), k=1,...,N .  (not checked)
-     * Indicates this applies only if KNOTYP.LT.0 .
-
-C<f> is the array of dependent variable values.
+  ParamDesc => {
+    f => <<'EOF',
+the array of dependent variable values.
 C<f(I)> is the value corresponding to C<x(I)>.
-
-C<d> is the array of derivative values at the data points.
+EOF
+    d => <<'EOF',
+the array of derivative values at the data points.
 C<d(I)> is the value corresponding to C<x(I)>.
-
-C<knotyp> is a flag which controls the knot sequence.
+EOF
+    knotyp => <<'EOF',
+flag which controls the knot sequence.
 The knot sequence C<t> is normally computed from C<$x>
 by putting a double knot at each C<x> and setting the end knot pairs
 according to the value of C<knotyp> (where C<m = ndim = 2*n>):
@@ -6010,13 +6050,9 @@ This option is provided for improved efficiency when used
 in a parametric setting.
 
 =back
-
-C<nknots> is the number of knots and may be changed by the routine.
-If C<knotyp E<gt>= 0>, C<nknots> will be set to C<ndim+4>,
-otherwise it is an input variable, and an error will occur if its
-value is not equal to C<ndim+4>.
-
-C<t> is the array of C<2*n+4> knots for the B-representation
+EOF
+    t => <<'EOF',
+the array of C<2*n+4> knots for the B-representation
 and may be changed by the routine.
 If C<knotyp E<gt>= 0>, C<t> will be changed so that the
 interior double knots are equal to the x-values and the
@@ -6024,14 +6060,12 @@ boundary knots set as indicated above,
 otherwise it is assumed that C<t> was set by a
 previous call (no check is made to verify that the data
 forms a legitimate knot sequence).
+EOF
+    bcoef => 'the array of 2*N B-spline coefficients.',
+    ierr => <<'EOF',
+Error status:
 
-C<BCOEF:OUT> is the array of 2*N B-spline coefficients.
-C<NDIM:OUT> is the dimension of the B-spline space.  (Set to 2*N.)
-C<KORD:OUT> is the order of the B-spline.  (Set to 4.)
-
-Error status returned by C<$ierr>:
-
-=over 4
+=over
 
 =item *
 
@@ -6044,6 +6078,51 @@ Error status returned by C<$ierr>:
 =item *
 
 -5 if C<knotyp E<lt> 0> and C<nknots != 2*n + 4>. (recoverable)
+
+=back
+EOF
+  },
+  Doc => <<'EOF',
+=for ref
+
+Piecewise Cubic Hermite function to B-Spline converter.
+
+Computes the B-spline representation of the PCH function
+determined by N,X,F,D. The output is the B-representation for the
+function:  NKNOTS, T, BCOEF, NDIM, KORD.
+
+L</pchip_chic>, L</pchip_chim>, or L</pchip_chsp> can be used to
+determine an interpolating PCH function from a set of data. The
+B-spline routine L</pchip_bvalu> can be used to evaluate the
+resulting B-spline representation of the data
+(i.e. C<nknots>, C<t>, C<bcoeff>, C<ndim>, and
+C<kord>).
+
+Caution: Since it is assumed that the input PCH function has been
+computed by one of the other routines in the package PCHIP,
+input arguments N, X are B<not> checked for validity.
+
+Restrictions/assumptions:
+
+=over
+
+=item C<1>
+
+N.GE.2 .  (not checked)
+
+=item C<2>
+
+X(i).LT.X(i+1), i=1,...,N .  (not checked)
+
+=item C<4>
+
+KNOTYP.LE.2 .  (error return if not)
+
+=item C<6>
+
+T(2*k+1) = T(2*k) = X(k), k=1,...,N .  (not checked)
+
+* Indicates this applies only if KNOTYP.LT.0 .
 
 =back
 
@@ -6199,13 +6278,36 @@ if ($ideriv() != km1) {
 }
 $ans() = $work(k3=>0);
 EOF
+  ParamDesc => {
+    t => <<'EOF',
+knot vector of length N+K
+EOF
+    a => <<'EOF',
+B-spline coefficient vector of length N,
+the number of B-spline coefficients; N = sum of knot multiplicities-K
+EOF
+    ideriv => <<'EOF',
+order of the derivative, 0 .LE. IDERIV .LE. K-1
+
+IDERIV=0 returns the B-spline value
+EOF
+    x => <<'EOF',
+      T(K) .LE. X .LE. T(N+1)
+EOF
+    inbv => <<'EOF',
+contains information for efficient processing after the initial
+call and INBV must not
+be changed by the user.  Distinct splines require distinct INBV parameters.
+EOF
+    ans => <<'EOF',
+value of the IDERIV-th derivative at X
+EOF
+  },
   Doc => <<'EOF',
 =for ref
 
 Evaluate the B-representation of a B-spline at X for the
 function value or any of its derivatives.
-
-=for usage
 
 Evaluates the B-representation C<(T,A,N,K)> of a B-spline
 at C<X> for the function value on C<IDERIV = 0> or any of its
@@ -6217,35 +6319,6 @@ a fatal error message when C<X> is outside of this interval.
 
 To compute left derivatives or left limiting values at a
 knot C<T(I)>, replace C<N> by C<I-1> and set C<X=T(I)>, C<I=K+1,N+1>.
-
-=head3 Description of Arguments
-
-=head4 Input
-
-     T       - knot vector of length N+K
-     A       - B-spline coefficient vector of length N
-     N       - number of B-spline coefficients
-               N = sum of knot multiplicities-K
-     K       - order of the B-spline, K .GE. 1
-     IDERIV  - order of the derivative, 0 .LE. IDERIV .LE. K-1
-               IDERIV=0 returns the B-spline value
-     X       - argument, T(K) .LE. X .LE. T(N+1)
-     INBV    - an initialization parameter which must be set
-               to 0 (different from Fortran) the first time BVALU is called.
-               (PDL sets to 0 for you)
-
-=head4 Output
-
-     INBV    - INBV contains information for efficient process-
-               ing after the initial call and INBV must not
-               be changed by the user.  Distinct splines require
-               distinct INBV parameters.
-     WORK    - work vector of length 3*K.
-     BVALU   - value of the IDERIV-th derivative at X
-
-=head4 Error Conditions
-
-An improper input is a fatal error
 
 References: Carl de Boor, Package for calculating with B-splines,
 SIAM Journal on Numerical Analysis 14, 3 (June 1977), pp. 441-472.

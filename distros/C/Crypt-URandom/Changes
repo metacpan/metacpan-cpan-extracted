@@ -1,5 +1,14 @@
 Revision history for Crypt-URandom
 
+0.52  Thu Jan 23 06:33:51 2025
+     - Fixes to test suite.  Thanks to Petr Pisar for GH#17
+
+0.51  Wed Jan 22 22:18:19 2025
+     - Improvements to handling SIGINT.  Thanks to Leon Timmermans for GH#14
+     - Memory leak fix.  Thanks to Leon Timmermans for GH#15
+     - Using arc4random_buf for OpenBSD/OSX.  Thanks to Leon Timmermans for GH#16
+     - Documentation fixes
+
 0.50  Thu Jan 09 08:50:18 2025
      - Adding explicit requirements for tests.  Thanks to Leon Timmermans for GH#13
 

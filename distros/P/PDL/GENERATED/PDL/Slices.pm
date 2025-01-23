@@ -22,6 +22,7 @@ use DynaLoader;
 
 
 
+
 #line 5 "lib/PDL/Slices.pd"
 
 =head1 NAME
@@ -88,7 +89,7 @@ use strict;
 use warnings;
 use PDL::Core ':Internal';
 use Scalar::Util 'blessed';
-#line 92 "lib/PDL/Slices.pm"
+#line 93 "lib/PDL/Slices.pm"
 
 
 =head1 FUNCTIONS
@@ -104,7 +105,15 @@ use Scalar::Util 'blessed';
 
 =for sig
 
-  Signature: (a(n); indx ind(); [oca] c())
+ Signature: (a(n); indx ind(); [oca] c())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $c = index($a, $ind);
+ $c = $a->index($ind);     # method call
+ $a->index($ind) .= $data; # usable as lvalue
 
 =for ref
 
@@ -167,6 +176,11 @@ puts a single column from C<$x> into C<$y>, and puts a single element
 from each column of C<$x> into C<$c>.  If you want to extract multiple
 columns from an array in one operation, see L</dice> or
 L</indexND>.
+
+=pod
+
+Broadcasts over its inputs.
+Creates data-flow back and forth by default.
 
 =for bad
 
@@ -188,7 +202,15 @@ index barfs if any of the index values are bad.
 
 =for sig
 
-  Signature: (a(n); indx ind(m); [oca] c(m))
+ Signature: (a(n); indx ind(m); [oca] c(m))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $c = index1d($a, $ind);
+ $c = $a->index1d($ind);     # method call
+ $a->index1d($ind) .= $data; # usable as lvalue
 
 =for ref
 
@@ -251,6 +273,11 @@ puts a single column from C<$x> into C<$y>, and puts a single element
 from each column of C<$x> into C<$c>.  If you want to extract multiple
 columns from an array in one operation, see L</dice> or
 L</indexND>.
+
+=pod
+
+Broadcasts over its inputs.
+Creates data-flow back and forth by default.
 
 =for bad
 
@@ -272,7 +299,15 @@ index1d propagates BAD index elements to the output variable.
 
 =for sig
 
-  Signature: (a(na,nb); indx inda(); indx indb(); [oca] c())
+ Signature: (a(na,nb); indx inda(); indx indb(); [oca] c())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $c = index2d($a, $inda, $indb);
+ $c = $a->index2d($inda, $indb);     # method call
+ $a->index2d($inda, $indb) .= $data; # usable as lvalue
 
 =for ref
 
@@ -335,6 +370,11 @@ puts a single column from C<$x> into C<$y>, and puts a single element
 from each column of C<$x> into C<$c>.  If you want to extract multiple
 columns from an array in one operation, see L</dice> or
 L</indexND>.
+
+=pod
+
+Broadcasts over its inputs.
+Creates data-flow back and forth by default.
 
 =for bad
 
@@ -687,14 +727,22 @@ makes it easier to loop over the index array but a little more brain-bending
 to tease out the algorithm.
 
 =cut
-#line 691 "lib/PDL/Slices.pm"
+#line 731 "lib/PDL/Slices.pm"
 
 
 =head2 rangeb
 
 =for sig
 
-  Signature: (P(); C(); pdl *ind_pdl; SV *size_sv; SV *boundary_sv)
+ Signature: (PARENT(); [oca]CHILD(); pdl *ind_pdl; SV *size_sv; SV *boundary_sv)
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $CHILD = rangeb($PARENT, $ind_pdl, $size_sv, $boundary_sv);
+ $CHILD = $PARENT->rangeb($ind_pdl, $size_sv, $boundary_sv); # method call
+ $PARENT->rangeb($ind_pdl, $size_sv, $boundary_sv) .= $data; # usable as lvalue
 
 =for ref
 
@@ -706,9 +754,14 @@ Same calling convention as L</range>, but you must supply all
 parameters.  C<rangeb> is marginally faster as it makes a direct PP call,
 avoiding the perl argument-parsing step.
 
+=pod
+
+Does not broadcast.
+Creates data-flow back and forth by default.
+
 =for bad
 
-rangeb processes bad values.
+C<rangeb> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -727,7 +780,16 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (indx a(n); b(n); [o]c(m); IV sumover_max => m)
+ Signature: (indx a(n); b(n); [o]c(m); IV sumover_max => m)
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $c = rld($a, $b, $sumover_max);
+ rld($a, $b, $c, $sumover_max);  # all arguments given
+ $c = $a->rld($b, $sumover_max); # method call
+ $a->rld($b, $c, $sumover_max);
 
 =for ref
 
@@ -736,13 +798,13 @@ Run-length decode a vector
 Given a vector C<$x> of the numbers of instances of values C<$y>, run-length
 decode to C<$c>.
 
-=for example
+=pod
 
- rld($x,$y,$c=null);
+Broadcasts over its inputs.
 
 =for bad
 
-rld does not process bad values.
+C<rld> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -758,7 +820,7 @@ sub PDL::rld {
   PDL::_rld_int($x,$y,$c,$sm);
   $c;
 }
-#line 762 "lib/PDL/Slices.pm"
+#line 824 "lib/PDL/Slices.pm"
 
 *rld = \&PDL::rld;
 
@@ -771,7 +833,16 @@ sub PDL::rld {
 
 =for sig
 
-  Signature: (c(n); indx [o]a(m=CALC($SIZE(n))); [o]b(m))
+ Signature: (c(n); indx [o]a(m=CALC($SIZE(n))); [o]b(m))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ ($a, $b) = rle($c);
+ rle($c, $a, $b);    # all arguments given
+ ($a, $b) = $c->rle; # method call
+ $c->rle($a, $b);
 
 =for ref
 
@@ -810,9 +881,13 @@ first instance of C<0> in each row of C<$x> should be considered.
  $yprob1x = $y->slice('-1:0')->double / $y->slice('(-1)');
  $z = cat($x1, 1 / $yprob1x**$nrolls)->transpose;
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-rle does not process bad values.
+C<rle> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -821,7 +896,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1067 "lib/PDL/Slices.pd"
+#line 1060 "lib/PDL/Slices.pd"
 sub PDL::rle {
   my $c = shift;
   my ($x,$y) = @_==2 ? @_ : (null,null);
@@ -830,7 +905,7 @@ sub PDL::rle {
                                 ($x!=0)->clump(1..$x->ndims-1)->sumover->max->sclr-1;
   return ($x->slice("0:$max_ind"),$y->slice("0:$max_ind"));
 }
-#line 834 "lib/PDL/Slices.pm"
+#line 909 "lib/PDL/Slices.pm"
 
 *rle = \&PDL::rle;
 
@@ -843,7 +918,16 @@ sub PDL::rle {
 
 =for sig
 
-  Signature: (c(M,N); indx [o]a(N); [o]b(M,N))
+ Signature: (c(M,N); indx [o]a(N); [o]b(M,N))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ ($a, $b) = rlevec($c);
+ rlevec($c, $a, $b);    # all arguments given
+ ($a, $b) = $c->rlevec; # method call
+ $c->rlevec($a, $b);
 
 =for ref
 
@@ -863,9 +947,13 @@ over a 1d PDL.
 See also: L</rle>, L<PDL::Ufunc/qsortvec>, L<PDL::Primitive/uniqvec>
 Contributed by Bryan Jurish E<lt>moocow@cpan.orgE<gt>.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-rlevec does not process bad values.
+C<rlevec> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -884,7 +972,16 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (indx a(uniqvals); b(M,uniqvals); [o]c(M,decodedvals); IV sumover_max => decodedvals)
+ Signature: (indx a(uniqvals); b(M,uniqvals); [o]c(M,decodedvals); IV sumover_max => decodedvals)
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $c = rldvec($a, $b, $sumover_max);
+ rldvec($a, $b, $c, $sumover_max);  # all arguments given
+ $c = $a->rldvec($b, $sumover_max); # method call
+ $a->rldvec($b, $c, $sumover_max);
 
 =for ref
 
@@ -898,9 +995,13 @@ Can be used together with clump() to run-length decode "values" of arbitrary dim
 See also: L</rld>.
 Contributed by Bryan Jurish E<lt>moocow@cpan.orgE<gt>.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-rldvec does not process bad values.
+C<rldvec> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -909,14 +1010,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1192 "lib/PDL/Slices.pd"
+#line 1185 "lib/PDL/Slices.pd"
 sub PDL::rldvec {
   my ($a,$b,$c) = @_;
   ($c,my $sm) = defined($c) ? ($c,$c->dim(1)) : (PDL->null,$a->sumover->max->sclr);
   PDL::_rldvec_int($a,$b,$c,$sm);
   return $c;
 }
-#line 920 "lib/PDL/Slices.pm"
+#line 1021 "lib/PDL/Slices.pm"
 
 *rldvec = \&PDL::rldvec;
 
@@ -929,7 +1030,16 @@ sub PDL::rldvec {
 
 =for sig
 
-  Signature: (c(N); indx [o]a(N); [o]b(N))
+ Signature: (c(N); indx [o]a(N); [o]b(N))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ ($a, $b) = rleseq($c);
+ rleseq($c, $a, $b);    # all arguments given
+ ($a, $b) = $c->rleseq; # method call
+ $c->rleseq($a, $b);
 
 =for ref
 
@@ -943,9 +1053,13 @@ As for rle(), only the elements up to the first instance of 0 in $a should be co
 See also L</rle>.
 Contributed by Bryan Jurish E<lt>moocow@cpan.orgE<gt>.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-rleseq does not process bad values.
+C<rleseq> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -964,7 +1078,16 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (indx a(N); b(N); [o]c(M); IV sumover_max => M)
+ Signature: (indx a(N); b(N); [o]c(M); IV sumover_max => M)
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $c = rldseq($a, $b, $sumover_max);
+ rldseq($a, $b, $c, $sumover_max);  # all arguments given
+ $c = $a->rldseq($b, $sumover_max); # method call
+ $a->rldseq($b, $c, $sumover_max);
 
 =for ref
 
@@ -981,9 +1104,13 @@ as for:
 See also: L</rld>.
 Contributed by Bryan Jurish E<lt>moocow@cpan.orgE<gt>.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-rldseq does not process bad values.
+C<rldseq> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -992,14 +1119,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1263 "lib/PDL/Slices.pd"
+#line 1256 "lib/PDL/Slices.pd"
 sub PDL::rldseq {
   my ($a,$b,$c) = @_;
   ($c,my $sm) = defined($c) ? ($c,$c->dim(1)) : (PDL->null,$a->sumover->max->sclr);
   PDL::_rldseq_int($a,$b,$c,$sm);
   return $c;
 }
-#line 1003 "lib/PDL/Slices.pm"
+#line 1130 "lib/PDL/Slices.pm"
 
 *rldseq = \&PDL::rldseq;
 
@@ -1007,7 +1134,7 @@ sub PDL::rldseq {
 
 
 
-#line 1297 "lib/PDL/Slices.pd"
+#line 1290 "lib/PDL/Slices.pd"
 
 =head2 rleND
 
@@ -1086,7 +1213,7 @@ sub rldND {
 
   return $data;
 }
-#line 1090 "lib/PDL/Slices.pm"
+#line 1217 "lib/PDL/Slices.pm"
 
 *_clump_int = \&PDL::_clump_int;
 
@@ -1099,7 +1226,15 @@ sub rldND {
 
 =for sig
 
-  Signature: (P(); C(); PDL_Indx n1; PDL_Indx n2)
+ Signature: (PARENT(); [oca]CHILD(); PDL_Indx n1; PDL_Indx n2)
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $CHILD = xchg($PARENT, $n1, $n2);
+ $CHILD = $PARENT->xchg($n1, $n2); # method call
+ $PARENT->xchg($n1, $n2) .= $data; # usable as lvalue
 
 =for ref
 
@@ -1118,9 +1253,15 @@ are exchanged with each other i.e.
 
  $y->at(5,3,2,8) == $x->at(5,3,8,2)
 
+=pod
+
+Does not broadcast.
+Makes L<virtual affine|PDL::Indexing> ndarrays.
+Creates data-flow back and forth by default.
+
 =for bad
 
-xchg does not process bad values.
+C<xchg> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1134,7 +1275,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1453 "lib/PDL/Slices.pd"
+#line 1446 "lib/PDL/Slices.pd"
 
 =head2 reorder
 
@@ -1254,14 +1395,22 @@ sub PDL::reorder :lvalue {
         # a quicker way to do the reorder
         return $pdl->broadcast(@newDimOrder)->unbroadcast(0);
 }
-#line 1258 "lib/PDL/Slices.pm"
+#line 1399 "lib/PDL/Slices.pm"
 
 
 =head2 mv
 
 =for sig
 
-  Signature: (P(); C(); PDL_Indx n1; PDL_Indx n2)
+ Signature: (PARENT(); [oca]CHILD(); PDL_Indx n1; PDL_Indx n2)
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $CHILD = mv($PARENT, $n1, $n2);
+ $CHILD = $PARENT->mv($n1, $n2); # method call
+ $PARENT->mv($n1, $n2) .= $data; # usable as lvalue
 
 =for ref
 
@@ -1281,9 +1430,15 @@ place 1, so:
 The other dimensions are moved accordingly.
 Negative dimension indices count from the end.
 
+=pod
+
+Does not broadcast.
+Makes L<virtual affine|PDL::Indexing> ndarrays.
+Creates data-flow back and forth by default.
+
 =for bad
 
-mv does not process bad values.
+C<mv> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1297,7 +1452,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1626 "lib/PDL/Slices.pd"
+#line 1619 "lib/PDL/Slices.pd"
 
 =head2 using
 
@@ -1357,24 +1512,27 @@ sub PDL::meshgrid {
   }
   @out;
 }
-#line 1361 "lib/PDL/Slices.pm"
+#line 1516 "lib/PDL/Slices.pm"
 
 
 =head2 lags
 
 =for sig
 
-  Signature: (P(); C(); PDL_Indx nthdim;PDL_Indx step;PDL_Indx n)
+ Signature: (PARENT(); [oca]CHILD(); PDL_Indx nthdim;PDL_Indx step;PDL_Indx nlags)
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $CHILD = lags($PARENT, $nthdim, $step, $nlags);
+ $CHILD = $PARENT->lags($nthdim, $step, $nlags); # method call
 
 =for ref
 
 Returns an ndarray of lags to parent.
 
 Usage:
-
-=for usage
-
-  $lags = $x->lags($nthdim,$step,$nlags);
 
 I.e. if C<$x> contains
 
@@ -1398,9 +1556,15 @@ C<$step> and C<$nlags> must be positive. C<$nthdim> can be
 negative and will then be counted from the last dim backwards
 in the usual way (-1 = last dim).
 
+=pod
+
+Does not broadcast.
+Makes L<virtual affine|PDL::Indexing> ndarrays.
+Creates data-flow back and forth by default.
+
 =for bad
 
-lags does not process bad values.
+C<lags> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1419,7 +1583,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (P(); C(); PDL_Indx nthdim;PDL_Indx nsp)
+ Signature: (PARENT(); [oca]CHILD(); PDL_Indx nthdim;PDL_Indx nsp)
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $CHILD = splitdim($PARENT, $nthdim, $nsp);
+ $CHILD = $PARENT->splitdim($nthdim, $nsp); # method call
 
 =for ref
 
@@ -1439,9 +1610,15 @@ the expression
 
 is always true (C<m> has to be less than 3).
 
+=pod
+
+Does not broadcast.
+Makes L<virtual affine|PDL::Indexing> ndarrays.
+Creates data-flow back and forth by default.
+
 =for bad
 
-splitdim does not process bad values.
+C<splitdim> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1460,15 +1637,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(n); indx shift(); [oca]y(n))
+ Signature: (x(n); indx shift(); [oca]y(n))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $y = rotate($x, $shift);
+ $y = $x->rotate($shift); # method call
 
 =for ref
 
-Shift vector elements along with wrap. Flows data back&forth.
+Shift vector elements along with wrap.
+
+=pod
+
+Broadcasts over its inputs.
+Creates data-flow back and forth by default.
 
 =for bad
 
-rotate does not process bad values.
+C<rotate> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1487,7 +1676,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (P(); C(); PDL_Indx id; PDL_Indx whichdims[])
+ Signature: (PARENT(); [oca]CHILD(); PDL_Indx id; PDL_Indx whichdims[])
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $CHILD = broadcastI($PARENT, $id, $whichdims);
+ $CHILD = $PARENT->broadcastI($id, $whichdims); # method call
+ $PARENT->broadcastI($id, $whichdims) .= $data; # usable as lvalue
 
 =for ref
 
@@ -1499,9 +1696,15 @@ Put some dimensions to a broadcastid.
 
  $y = $x->broadcastI(0,1,5); # broadcast over dims 1,5 in id 1
 
+=pod
+
+Does not broadcast.
+Makes L<virtual affine|PDL::Indexing> ndarrays.
+Creates data-flow back and forth by default.
+
 =for bad
 
-broadcastI does not process bad values.
+C<broadcastI> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1520,7 +1723,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (P(); C(); PDL_Indx atind)
+ Signature: (PARENT(); [oca]CHILD(); PDL_Indx atind)
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $CHILD = unbroadcast($PARENT, $atind);
+ $CHILD = $PARENT->unbroadcast($atind); # method call
+ $PARENT->unbroadcast($atind) .= $data; # usable as lvalue
 
 =for ref
 
@@ -1528,9 +1739,15 @@ All broadcasted dimensions are made real again.
 
 See [TBD Doc] for details and examples.
 
+=pod
+
+Does not broadcast.
+Makes L<virtual affine|PDL::Indexing> ndarrays.
+Creates data-flow back and forth by default.
+
 =for bad
 
-unbroadcast does not process bad values.
+C<unbroadcast> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1544,7 +1761,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1974 "lib/PDL/Slices.pd"
+#line 1955 "lib/PDL/Slices.pd"
 
 =head2 dice
 
@@ -1694,16 +1911,23 @@ sub PDL::dice_axis :lvalue {
   return $self->mv($axis,0)->index1d($ix)->mv(0,$axis);
 }
 *dice_axis = \&PDL::dice_axis;
-#line 1698 "lib/PDL/Slices.pm"
+#line 1915 "lib/PDL/Slices.pm"
 
 
 =head2 slice
 
 =for sig
 
-  Signature: (P(); C(); pdl_slice_args *arglist)
+ Signature: (PARENT(); [oca]CHILD(); pdl_slice_args *arglist)
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
 
 =for usage
+
+ $CHILD = slice($PARENT, $arglist);
+ $CHILD = $PARENT->slice($arglist); # method call
+
+=for example
 
   $slice = $data->slice([2,3],'x',[2,2,0],"-1:1:-1", "*3");
 
@@ -1858,9 +2082,15 @@ direct slicing even though the syntax is convenient.
  $x->slice([3,1]);
  $x->slice([-2,1]);
 
+=pod
+
+Does not broadcast.
+Makes L<virtual affine|PDL::Indexing> ndarrays.
+Creates data-flow back and forth by default.
+
 =for bad
 
-slice does not process bad values.
+C<slice> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1869,7 +2099,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 2292 "lib/PDL/Slices.pd"
+#line 2273 "lib/PDL/Slices.pd"
 sub PDL::slice :lvalue {
     my ($source, @others) = @_;
     for my $i(0..$#others) {
@@ -1905,7 +2135,7 @@ sub PDL::slice :lvalue {
     PDL::_slice_int($source,my $o=$source->initialize,\@others);
     $o;
 }
-#line 1909 "lib/PDL/Slices.pm"
+#line 2139 "lib/PDL/Slices.pm"
 
 *slice = \&PDL::slice;
 
@@ -1918,7 +2148,9 @@ sub PDL::slice :lvalue {
 
 =for sig
 
-  Signature: (P(); C(); PDL_Indx whichdims[])
+ Signature: (PARENT(); [oca]CHILD(); PDL_Indx whichdims[])
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
 
 =for ref
 
@@ -1964,9 +2196,15 @@ NOTE: diagonal doesn't handle broadcastids correctly. XXX FIX
   ]
  ]
 
+=pod
+
+Does not broadcast.
+Makes L<virtual affine|PDL::Indexing> ndarrays.
+Creates data-flow back and forth by default.
+
 =for bad
 
-diagonal does not process bad values.
+C<diagonal> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1975,9 +2213,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 2507 "lib/PDL/Slices.pd"
+#line 2488 "lib/PDL/Slices.pd"
 sub PDL::diagonal :lvalue { shift->_diagonal_int(my $o=PDL->null, \@_); $o }
-#line 1981 "lib/PDL/Slices.pm"
+#line 2219 "lib/PDL/Slices.pm"
 
 *diagonal = \&PDL::diagonal;
 
@@ -1987,7 +2225,7 @@ sub PDL::diagonal :lvalue { shift->_diagonal_int(my $o=PDL->null, \@_); $o }
 
 
 
-#line 2557 "lib/PDL/Slices.pd"
+#line 2538 "lib/PDL/Slices.pd"
 
 =head1 BUGS
 
@@ -2012,7 +2250,7 @@ distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
 =cut
-#line 2016 "lib/PDL/Slices.pm"
+#line 2254 "lib/PDL/Slices.pm"
 
 # Exit with OK status
 

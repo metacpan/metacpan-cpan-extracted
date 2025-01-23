@@ -23,6 +23,12 @@ subtest 'where' => sub {
           'dataflow affected orig';
     };
 
+    subtest 'whereND_both' => sub {
+      my ( $t, $f ) = whereND_both(sequence(2,2,2), pdl(0,1));
+      is_pdl $t, pdl('[1;3] [5;7]'), 'nonzero vals';
+      is_pdl $f, pdl('[0;2] [4;6]'), 'zero vals';
+    };
+
     subtest 'whereND' => sub {
         is_deeply( [ zeroes( 2, 3, 1 )->whereND( pdl '0 0' )->dims ], [ 0, 3, 1 ] );
 
@@ -58,10 +64,9 @@ subtest 'where' => sub {
         subtest 'lvalue' => sub {
 
             # Make sure whereND functions as an lvalue:
-            my $x = sequence( 4, 3 );
-            my $y = pdl( 0, 1, 1, 1 );
-            lives_ok { $x->whereND($y) *= -1 } 'lvalue multiply';
-            ok( all( $x->slice("1:-1") < 0 ),    'works' );
+            my $x = sequence( 2, 3 );
+            lives_ok { $x->whereND(pdl( 0, 1 )) *= -1 } 'lvalue multiply';
+            is_pdl $x, pdl('0 -1;2 -3;4 -5'), 'works';
         };
 
         subtest 'sf.net bug 3415115' => sub {
@@ -106,6 +111,12 @@ subtest 'which' => sub {
     is_pdl $zero, pdl(indx, 3, 5), 'zero indices';
   };
 
+  subtest 'whichND_both' => sub {
+    my ( $nonzero, $zero ) = whichND_both(PDL::MatrixOps::identity(2));
+    is_pdl $nonzero, indx('0 0; 1 1'), 'nonzero indices';
+    is_pdl $zero, indx('1 0; 0 1'), 'zero indices';
+  };
+
   subtest 'whichover' => sub {
     my $a = pdl q[3 4 6 3 2 3 5 6 1 7];
     my $b = $a->uniq;
@@ -130,14 +141,15 @@ subtest 'which' => sub {
       my $r = xvals( 10, 10 ) + 10 * yvals( 10, 10 );
       my $x = whichND( $r % 12 == 0 );
 
+      my $got;
       is_deeply(
-        $x->unpdl,
+        $got = $x->unpdl,
         [
           [ 0, 0 ], [ 2, 1 ], [ 4, 2 ], [ 6, 3 ],
           [ 8, 4 ], [ 0, 6 ], [ 2, 7 ], [ 4, 8 ],
           [ 6, 9 ]
         ]
-      );
+      ) or diag 'got: ', explain $got;
       is $x->type, 'indx', 'returns indx-type';
     };
 
@@ -204,9 +216,7 @@ subtest 'uniqind' => sub {
 
     subtest 'SF bug 3076570' => sub {
         my $y = pdl( 1, 1, 1, 1, 1 )->uniqind;    # SF bug 3076570
-        ok( !$y->isempty );
-        ok all( $y == pdl( [0] ) ), 'uniqind';
-        is $y->ndims, 1, 'ndims';
+        is_pdl $y, indx( [0] ), 'uniqind';
     };
 
 };

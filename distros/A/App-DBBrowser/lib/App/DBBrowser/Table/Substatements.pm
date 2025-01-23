@@ -103,9 +103,9 @@ sub select {
                 $sql->{alias} = $complex_col;
             }
             else {
-                my $alias = $ax->alias( $sql, 'complex_cols_select', $complex_col );
-                if ( length $alias ) {
-                    $sql->{alias}{$complex_col} = $ax->quote_alias( $alias );
+                my $qt_alias = $ax->alias( $sql, 'complex_cols_select', $complex_col );
+                if ( length $qt_alias ) {
+                    $sql->{alias}{$complex_col} = $qt_alias;
                 }
                 push @{$sql->{selected_cols}}, $complex_col;
             }
@@ -203,9 +203,9 @@ sub aggregate {
             next AGGREGATE;
         }
         push @{$sql->{aggr_cols}}, $prepared_aggr;
-        my $alias = $ax->alias( $sql, 'complex_cols_select', $prepared_aggr );
-        if ( length $alias ) {
-            $sql->{alias}{$prepared_aggr} = $ax->quote_alias( $alias );
+        my $qt_alias = $ax->alias( $sql, 'complex_cols_select', $prepared_aggr );
+        if ( length $qt_alias ) {
+            $sql->{alias}{$prepared_aggr} = $qt_alias;
         }
     }
 }
@@ -340,10 +340,10 @@ sub group_by {
             my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
             my $complex_col = $ext->column( $sql, $clause );
             if ( defined $complex_col ) {
-                my $alias = $ax->alias( $sql, 'complex_cols_select', $complex_col );
+                my $qt_alias = $ax->alias( $sql, 'complex_cols_select', $complex_col );
                 # this alias is used in select
-                if ( length $alias ) {
-                    $sql->{alias}{$complex_col} = $ax->quote_alias( $alias );
+                if ( length $qt_alias ) {
+                    $sql->{alias}{$complex_col} = $qt_alias;
                 }
                 push @{$sql->{group_by_cols}}, $complex_col;
             }
@@ -437,7 +437,7 @@ sub order_by {
         }
         push @bu, $sql->{order_by_stmt};
         $sql->{order_by_stmt} .= ( @bu == 1 ? ' ' : ', ' ) . $qt_col;
-        $info = $ax->get_sql_info( $sql ); # ???
+        $info = $ax->get_sql_info( $sql );
         # Choose
         my $direction = $tc->choose(
             [ undef, "ASC", "DESC" ],
@@ -448,7 +448,9 @@ sub order_by {
             $sql->{order_by_stmt} = pop @bu;
             next ORDER_BY;
         }
-        $sql->{order_by_stmt} .= ' ' . $direction;
+        else {
+            $sql->{order_by_stmt} .= ' ' . $direction;
+        }
     }
 }
 
@@ -772,9 +774,13 @@ sub __opt_goup_concat {
     if ( ! defined $is_distinct ) {
         return;
     }
-    $prepared_aggr .= "DISTINCT " if $is_distinct;
+    if ( $is_distinct ) {
+        $prepared_aggr .= "DISTINCT ";
+    }
     $prepared_aggr .= $qt_col;
-    $prepared_aggr .= "::text" if $sf->{i}{driver} eq 'Pg';
+    if ( $sf->{i}{driver} eq 'Pg' && ! $ax->is_char_datatype( $tmp_sql, $qt_col ) ) {
+        $prepared_aggr .= "::text" ;
+    }
     my $sep = ',';
     my $order_by_stmt; # ##
     $sf->__update_tmp_sql( $sql, $tmp_sql, $clause, $prepared_aggr );
@@ -782,15 +788,17 @@ sub __opt_goup_concat {
          || ( $sf->{i}{driver} =~ /^(?:DB2|Oracle)\z/ && ! $is_distinct )
     ) {
         my ( $no_ordering, $read ) = ( 'Default', ':Read' );
-        my $cast = $sf->{i}{driver} eq 'Pg' && $is_distinct ? '::text' : '';
+        my $cast = '';
+        if ( $sf->{i}{driver} eq 'Pg' && ! $ax->is_char_datatype( $sql, $qt_col ) && $is_distinct ) {
+            $cast = '::text';
+        }
         my @choices = (
             $no_ordering,
             "${qt_col}${cast} ASC",
             "${qt_col}${cast} DESC",
             $read,
         );
-        my @pre = ( undef );
-        my $menu = [ @pre, @choices ];
+        my $menu = [ undef, @choices ];
         my $info = $ax->get_sql_info( $tmp_sql );
         # Choose
         my $choice = $tc->choose(

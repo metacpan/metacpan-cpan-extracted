@@ -322,7 +322,7 @@ sub col_function {
                 if ( $func eq $concat ) {
                     if ( $driver eq 'Pg' ) {
                         for my $chosen_col ( @$chosen_cols ) {
-                            if ( $sql->{data_types}{$chosen_col} != 1 && $sql->{data_types}{$chosen_col} != 12 ) {
+                            if ( ! $ax->is_char_datatype( $sql, $chosen_col ) ) {
                                 $chosen_col .= "::text";
                             }
                         }
@@ -344,8 +344,7 @@ sub col_function {
                     return;
                 }
                 if ( $driver eq 'Pg' && $type eq 'string' ) {
-                    if ( $sql->{data_types}{$chosen_col} != 1 && $sql->{data_types}{$chosen_col} != 12 ) {
-                        # 1 -> CHAR, 12 -> VARCHAR
+                    if ( ! $ax->is_char_datatype( $sql, $chosen_col ) ) {
                         $chosen_col .= "::text";
                     }
                 }

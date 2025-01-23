@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use MARC::Convert::Wikidata::Utils qw(clean_edition_number);
-use Test::More 'tests' => 56;
+use Test::More 'tests' => 57;
 use Test::NoWarnings;
 use Unicode::UTF8 qw(decode_utf8 encode_utf8);
 
@@ -279,3 +279,8 @@ is($ret, 1, encode_utf8("Edition number '$input_edition_number' after cleanup.")
 $input_edition_number = decode_utf8('V tomto souboru vyd. 1.');
 $ret = clean_edition_number($input_edition_number);
 is($ret, 1, encode_utf8("Edition number '$input_edition_number' after cleanup."));
+
+# Test.
+$input_edition_number = decode_utf8('5., část. přeprac. vyd.');
+$ret = clean_edition_number($input_edition_number);
+is($ret, 5, encode_utf8("Edition number '$input_edition_number' after cleanup."));

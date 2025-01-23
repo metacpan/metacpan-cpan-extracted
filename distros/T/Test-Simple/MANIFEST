@@ -193,6 +193,7 @@ lib/Test2/Util/Guard.pm
 lib/Test2/Util/HashBase.pm
 lib/Test2/Util/Importer.pm
 lib/Test2/Util/Ref.pm
+lib/Test2/Util/Sig.pm
 lib/Test2/Util/Stash.pm
 lib/Test2/Util/Sub.pm
 lib/Test2/Util/Table.pm

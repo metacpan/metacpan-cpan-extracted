@@ -37,8 +37,8 @@ contains utilities for many common matrix operations: inversion,
 determinant finding, eigenvalue/vector finding, singular value
 decomposition, etc.  PDL::MatrixOps routines are written in a mixture
 of Perl and C, so that they are reliably present even when there is no
-FORTRAN compiler or external library available (e.g.
-L<PDL::Slatec> or any of the PDL::GSL family of modules).
+external library available (e.g.
+L<PDL::LinearAlgebra> or any of the PDL::GSL family of modules).
 
 Matrix manipulation, particularly with large matrices, is a
 challenging field and no one algorithm is suitable in all cases.  The
@@ -640,10 +640,6 @@ pp_def(
               %}
 ',
       , Doc => q{
-=for usage
-
- ($u, $s, $v) = svd($x);
-
 =for ref
 
 Singular value decomposition of a matrix.
@@ -1034,13 +1030,6 @@ Solve A x = B for matrix A, by back substitution into A's LU decomposition.
   ($x) = simq($A->dupN(1,1,map +($A_dims[$_]//1)==1?$broadcast[$_]:1, 0..$#broadcast)->copy, $B->transpose, 0);
   $x = $x->inplace->transpose;
 
-  # or with Slatec LINPACK
-  use PDL::Slatec;
-  gefa($lu=$A->copy, $ipiv=null, $info=null);
-  # 1 = do transpose because Fortran's idea of rows vs columns
-  gesl($lu, $ipiv, $x=$B->transpose->copy, 1);
-  $x = $x->inplace->transpose;
-
   # or with PDL::LinearAlgebra wrappers of LAPACK
   $x = msolve($A, $B);
 
@@ -1323,19 +1312,6 @@ if ($COMP(uplo)) { /* lower */
 }
 ',
   Doc => <<'EOT',
-=for usage
-
-tricpy(PDL(A), int(uplo), PDL(C))
-
-=for example
-
-  $c = $a->tricpy($uplo); # explicit uplo
-  $c = $a->tricpy;        # default upper
-
-or
-
-  tricpy($a, $uplo, $c);  # modify c
-
 =for ref
 
 Copy triangular part to another matrix. If uplo == 0 copy upper triangular

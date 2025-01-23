@@ -22,6 +22,7 @@ use DynaLoader;
 
 
 
+
 #line 9 "lib/PDL/Compression.pd"
 
 =head1 NAME
@@ -49,7 +50,7 @@ RICE_1 algorithm used in internal FITS-file compression (see PDL::IO::FITS).
 
 use strict;
 use warnings;
-#line 53 "lib/PDL/Compression.pm"
+#line 54 "lib/PDL/Compression.pm"
 
 
 =head1 FUNCTIONS
@@ -65,14 +66,22 @@ use warnings;
 =head1 METHODS
 
 =cut
-#line 69 "lib/PDL/Compression.pm"
+#line 70 "lib/PDL/Compression.pm"
 
 
 =head2 rice_compress
 
 =for sig
 
-  Signature: (in(n); [o]out(m=CALC(ceil($SIZE(n) * 1.01))); indx[o]len(); int blocksize)
+ Signature: (in(n); [o]out(m=CALC(ceil($SIZE(n) * 1.01))); indx[o]len(); int blocksize)
+ Types: (byte short ushort long)
+
+=for usage
+
+ ($out, $len) = rice_compress($in, $blocksize);
+ rice_compress($in, $out, $len, $blocksize);    # all arguments given
+ ($out, $len) = $in->rice_compress($blocksize); # method call
+ $in->rice_compress($out, $len, $blocksize);
 
 =for ref
 
@@ -114,16 +123,13 @@ give rise to ludicrously large bins in a plain Golomb code; such large jumps
 Working on astronomical or solar image data, typical compression ratios of 
 2-3 are achieved.
 
-=for usage
+=pod
 
-  $out = $pdl->rice_compress($blocksize);
-  ($out, $len, $blocksize, $dim0) = $pdl->rice_compress;
-
-  $new = $out->rice_expand;
+Broadcasts over its inputs.
 
 =for bad
 
-rice_compress ignores the bad-value flag of the input ndarrays.
+C<rice_compress> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -161,20 +167,29 @@ sub PDL::rice_compress {
 
 =for sig
 
-  Signature: (in(n); indx len(); [o]out(m); IV dim0 => m; int blocksize)
+ Signature: (in(n); indx len(); [o]out(m); IV dim0 => m; int blocksize)
+ Types: (byte short ushort long)
+
+=for usage
+
+ $out = rice_expand($in, $len, $dim0);             # using default value of blocksize=32
+ $out = rice_expand($in, $len, $dim0, $blocksize); # overriding default
+ rice_expand($in, $len, $out, $dim0, $blocksize);  # all arguments given
+ $out = $in->rice_expand($len, $dim0);             # method call
+ $out = $in->rice_expand($len, $dim0, $blocksize);
+ $in->rice_expand($len, $out, $dim0, $blocksize);
 
 =for ref
 
 Unsquishes a PDL that has been squished by rice_compress.
 
-=for usage
+=pod
 
-     ($out, $len, $blocksize, $dim0) = $pdl->rice_compress;
-     $copy = $out->rice_expand($dim0, $blocksize);
+Broadcasts over its inputs.
 
 =for bad
 
-rice_expand ignores the bad-value flag of the input ndarrays.
+C<rice_expand> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -226,7 +241,7 @@ terms than PDL itself; that notice is present in the file "ricecomp.c".
 =back
 
 =cut
-#line 230 "lib/PDL/Compression.pm"
+#line 245 "lib/PDL/Compression.pm"
 
 # Exit with OK status
 

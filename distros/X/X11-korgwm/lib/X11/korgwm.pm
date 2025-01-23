@@ -6,14 +6,13 @@ use strict;
 use warnings;
 use feature 'signatures';
 
-our $VERSION = "4.0";
+our $VERSION = "5.0";
 
 # Third-party includes
 use X11::XCB 0.23 ':all';
 use X11::XCB::Connection;
-use Carp;
 use AnyEvent;
-use List::Util qw( any first min max );
+use List::Util qw( any first min max none );
 
 # Those two should be included prior any DEBUG stuf
 use X11::korgwm::Common;
@@ -21,9 +20,7 @@ use X11::korgwm::Config;
 
 # Early initialize debug output, if needed. Should run after Common & Config
 BEGIN {
-    DEBUG and do {
-        require Devel::SimpleTrace;
-        Devel::SimpleTrace->import();
+    DEBUG1 and do {
         require Data::Dumper;
         Data::Dumper->import();
         $Data::Dumper::Sortkeys = 1;
@@ -44,6 +41,7 @@ use X11::korgwm::Expose;
 use X11::korgwm::API;
 use X11::korgwm::Mouse;
 use X11::korgwm::Hotkeys;
+use X11::korgwm::Notifications;
 
 # Should you want understand this, first read carefully:
 # - libxcb source code
@@ -53,12 +51,22 @@ use X11::korgwm::Hotkeys;
 # ... though this code is written once to read never.
 
 ## Define internal variables
+# Ignore CHLD
 $SIG{CHLD} = "IGNORE";
+# Aliases for event masks
 my %evt_masks = (x => CONFIG_WINDOW_X, y => CONFIG_WINDOW_Y, w => CONFIG_WINDOW_WIDTH, h => CONFIG_WINDOW_HEIGHT);
-my ($ROOT, $atom_wmstate);
-our $exit_trigger = 0;
+# Default event mask for new windows
 my $new_window_event_mask = EVENT_MASK_ENTER_WINDOW | EVENT_MASK_PROPERTY_CHANGE | EVENT_MASK_FOCUS_CHANGE;
+# Caching variable for $X->root
+my $ROOT;
+# Caching variable for WM_STATE atom
+my $atom_wmstate;
+# Flag shows that we want to ignore errors with type "Window"
 my $prevent_window_errors;
+# Set to True whenever we want to exit
+our $exit_trigger;
+# Array for selecting preferred tag during screen change event
+my @preferred_tags = ();
 
 ## Define functions
 # Handles any screen change
@@ -77,7 +85,7 @@ sub handle_screens {
         my ($x, $y, $w, $h) = map { $s->rect->$_ } qw( x y width height );
         $curr_screens{"$x,$y,$w,$h"} = undef;
 
-        # Collect new information about visible area
+        # Update visible area information
         $visible_min_x = defined $visible_min_x ? min($visible_min_x, $x)      : $x;
         $visible_min_y = defined $visible_min_y ? min($visible_min_y, $y)      : $y;
         $visible_max_x = defined $visible_max_x ? max($visible_max_x, $x + $w) : $x + $w;
@@ -100,7 +108,7 @@ sub handle_screens {
     $screen_for_abandoned_windows = $screens{$screen_for_abandoned_windows};
     croak "Unable to get the screen for abandoned windows" unless defined $screen_for_abandoned_windows;
 
-    DEBUG and warn "Moving stale windows to screen: $screen_for_abandoned_windows";
+    DEBUG1 and carp "Moving stale windows to screen: $screen_for_abandoned_windows";
 
     # Unfortunately, in case we have to change screen configuration, we must save preferred position for all windows
     # Now iterate over the screens we're not going to delete (the latter will be processed inside destroy() below)
@@ -113,6 +121,9 @@ sub handle_screens {
         }
     }
 
+    # Save preferred_tags
+    $preferred_tags[@screens] = [ map { $_->{tag_curr} } @screens ];
+
     # Call destroy on old screens and remove them saving pref_position for all their windows
     for my $s (@del_screens) {
         $screens{$s}->destroy($screen_for_abandoned_windows);
@@ -120,9 +131,9 @@ sub handle_screens {
     }
 
     # Sort screens based on X axis and store them in @screens
-    DEBUG and warn "Old screens: (@screens)";
+    DEBUG1 and carp "Old screens: (@screens)";
     @screens = map { $screens{$_} } sort { (split /,/, $a)[0] <=> (split /,/, $b)[0] or $a <=> $b } keys %screens;
-    DEBUG and warn "New screens: (@screens)";
+    DEBUG1 and carp "New screens: (@screens)";
 
     # Assign indexes to use them during possible next handle_screens events
     $screens[$_]->{idx} = $_ for 0..$#screens;
@@ -133,8 +144,18 @@ sub handle_screens {
         next if $win->{always_on};
 
         # Try to get preferred position for the window
-        my $pref_position = $win->{pref_position}->[@screens];
-        next unless $pref_position;
+        my $pref_position = $win->{pref_position}->[ @screens ];
+        unless ($pref_position) {
+            # Here is the last chance for windows having no preferred position. We're almost ready to skip them
+            my $rules = $cfg->{rules}->{ $win->{cached_class} } or next;
+            ref(my $placement = $rules->{ placement }) eq 'ARRAY' or next;
+
+            my ($pref_screen, $pref_tag) = map { max($_ - 1, 0) } @{ $placement->[ @screens ] // next };
+            next if $pref_screen >= @screens or $pref_tag >= @{ $cfg->{ws_names} };
+
+            # I solemnly swear that I am up to no good
+            $pref_position = [ $pref_screen, $pref_tag ];
+        }
 
         my @win_screens = $win->screens();
         my @win_tags = $win->tags();
@@ -149,13 +170,21 @@ sub handle_screens {
         # Below we consider the window belongs to a single screen and tag, so just check if they're preferred
         next if $old_screen->{idx} == $pref_position->[0];
 
-        my $new_screen = $screens[$pref_position->[0]] or croak "Impossible screen in pref_position";
-        my $new_tag = $new_screen->{tags}->[$pref_position->[1]] or croak "Impossible tag in pref_position";
+        my $new_screen = $screens[$pref_position->[0]] or croak "Invalid screen in pref_position";
+        my $new_tag = $new_screen->{tags}->[$pref_position->[1]] or croak "Invalid tag in pref_position";
 
         $new_tag->win_add($win);
         $old_tag->win_remove($win);
         $win->floating_move_screen($old_screen, $new_screen);
         $win->hide() unless $new_tag == $new_screen->current_tag();
+    }
+
+    # Select preferred tags, if possible
+    if (my $preferred_tags = $preferred_tags[@screens]) {
+        for my $screen (@screens) {
+            my $pref_tag = $preferred_tags->[ $screen->{idx} ] // croak "Invalid tag in preferred_tags";
+            $screen->tag_set_active($pref_tag, rotate => 0);
+        }
     }
 
     # Refresh all the screens as we could've moved some windows around
@@ -183,7 +212,7 @@ sub handle_existing_windows {
     for my $wid (keys %transients) {
         my $win = ($windows->{$wid} = X11::korgwm::Window->new($wid));
         $win->{transient_for} = $windows->{$transients{$wid}};
-        $windows->{$transients{$wid}}->{siblings}->{$wid} = undef;
+        $windows->{$transients{$wid}}->{children}->{$wid} = undef;
     }
 
     # Set proper window information
@@ -206,6 +235,12 @@ sub handle_existing_windows {
 
         @{ $win }{qw( x y w h )} = ($x, $y, $w, $h);
 
+        my $class = $win->class();
+        if (defined $class) {
+            push @{ $cached_classes->{ lc $class } }, $win;
+            $win->{cached_class} = lc $class;
+        }
+
         $win->resize_and_move($x, $y, $w + 2 * $bw, $h + 2 * $bw);
         $screen->win_add($win)
     }
@@ -213,18 +248,16 @@ sub handle_existing_windows {
 }
 
 # Destroy and Unmap events handler
-sub hide_window($wid, $delete=undef) {
-    my $win = $delete ? delete $windows->{$wid} : $windows->{$wid};
+sub annihilate_window($wid) {
+    my $win = delete $windows->{$wid};
     return unless $win;
     $win->{_hidden} = 1;
 
     # Ignore Window errors [code=3] closing multiple window at a time
-    if ($delete) {
-        $prevent_window_errors = AE::timer 0.1, 0, sub { $prevent_window_errors = undef };
-    }
+    $prevent_window_errors = AE::timer 0.1, 0, sub { $prevent_window_errors = undef };
 
-    if ($delete and $win->{transient_for}) {
-        delete $win->{transient_for}->{siblings}->{$wid};
+    if ($win->{transient_for}) {
+        delete $win->{transient_for}->{children}->{$wid};
     }
 
     for my $tag ($win->tags()) {
@@ -261,7 +294,15 @@ sub hide_window($wid, $delete=undef) {
         $focus->{screen}->focus();
     }
 
-    focus_prev_remove($win) if $delete;
+    focus_prev_remove($win);
+
+    # Clean-up cached classes index
+    if (my $class = $win->{cached_class}) {
+        @{ $cached_classes->{ $class } } = grep { $win != $_ } @{ $cached_classes->{ $class } };
+    }
+
+    # Delete $win reference from %marked_windows
+    delete $marked_windows{$_} for grep { $win == $marked_windows{$_} } keys %marked_windows;
 }
 
 # Main routine
@@ -274,7 +315,7 @@ sub FireInTheHole {
     $ROOT = $X->root;
 
     # Preload some atoms, create non-existent ones
-    $atom_wmstate = $X->intern_atom_reply($X->intern_atom(0, length("WM_STATE"), "WM_STATE")->{sequence})->{atom};
+    $atom_wmstate = atom("WM_STATE");
 
     # Check for another WM
     my $wm = $X->change_window_attributes_checked($ROOT->id, CW_EVENT_MASK,
@@ -283,6 +324,8 @@ sub FireInTheHole {
         EVENT_MASK_POINTER_MOTION
     );
     die "Looks like another WM is in use" if $X->request_check($wm->{sequence});
+
+    DEBUG1 and carp "It's time to chew bubble gum with debug level=$cfg->{debug}";
 
     # Set root color
     if ($cfg->{set_root_color}) {
@@ -304,6 +347,9 @@ sub FireInTheHole {
     # Process existing screens
     handle_screens();
     die "No screens found" unless keys %screens;
+
+    # Update EWMH supported declaration
+    &X11::korgwm::EWMH::declare_support();
 
     # Initial fill of focus structure
     $focus = {
@@ -328,7 +374,7 @@ sub FireInTheHole {
         my $class = X11::korgwm::Window::_class($wid);
         unless (defined $class) {
             my $wmname = X11::korgwm::Window::_title($wid) // return;
-            return unless $cfg->{noclass_whitelist}->{$wmname};
+            return S_DEBUG(1, "Ignored window $wmname with no class") unless $cfg->{noclass_whitelist}->{$wmname};
         }
 
         # Create a window if needed
@@ -366,14 +412,22 @@ sub FireInTheHole {
             }
         }
 
-        # Apply rules
+        # Apply rules.  At this point both $screen and $tag are not defined
         my $rule = $cfg->{rules}->{$class // ""};
         if ($rule) {
-            # XXX awaiting bugs with idx 0
-            defined $rule->{screen} and $screen = $screens[$rule->{screen} - 1] // $screens[0];
-            defined $rule->{tag} and $tag = $screen->{tags}->[$rule->{tag} - 1];
             defined $rule->{follow} and $follow = $rule->{follow};
             defined $rule->{floating} and $floating = $rule->{floating};
+
+            # XXX awaiting bugs with idx 0
+            defined $rule->{screen} and $screen = $screens[ $rule->{screen} - 1 ] // $screens[0];
+            defined $rule->{tag} and $tag = $screen->{tags}->[ $rule->{tag} - 1 ];
+
+            # Process preferred position rules with optional fallback to previous $screen & $tag
+            my $preferred;
+            if (ref $rule->{placement} eq 'ARRAY' && ref($preferred = $rule->{placement}->[ @screens ]) eq 'ARRAY') {
+                $screen = $screens[ $preferred->[0] - 1 ] // $screen // $focus->{screen};
+                $tag = $screen->{tags}->[ $preferred->[1] - 1 ] // $tag // $screen->current_tag();
+            }
         }
 
         # Process transients
@@ -386,7 +440,7 @@ sub FireInTheHole {
             $win->{floating} = 1;
             $rule->{follow} //= $cfg->{mouse_follow};
             $win->{transient_for} = $parent;
-            $parent->{siblings}->{$wid} = undef;
+            $parent->{children}->{$wid} = undef;
 
             $tag = ($parent->tags_visible())[0] // ($parent->tags())[0];
             $screen = $tag->{screen};
@@ -405,7 +459,13 @@ sub FireInTheHole {
             $win->{x} += $screen->{x};
         }
 
-        DEBUG and warn "Mapping $win [$class] (@{ $win }{qw( x y w h )}) screen($screen->{id}) tag($tag->{idx})";
+        # Make index by initial value of WM_CLASS, save the value to Window as well for proper garbage collection
+        if (defined $class) {
+            push @{ $cached_classes->{ lc $class } }, $win;
+            $win->{cached_class} = lc $class;
+        }
+
+        DEBUG3 and carp "Mapping $win [$class] (@{ $win }{qw( x y w h )}) screen($screen->{id}) tag($tag->{idx})";
 
         # Just add win to a proper tag. win->show() will be called from tag->show() during screen->refresh()
         $tag->win_add($win);
@@ -425,8 +485,13 @@ sub FireInTheHole {
         # The reason of floating does not matter here so checking the object directly
         prevent_enter_notify() if $win->{floating};
 
-        if ($follow) {
-            $screen->tag_set_active($tag->{idx}, 0);
+        if ($tag->{max_window} and not $win->relative_for($tag->{max_window})) {
+            # There is some maximized window on the tag and $win is not transient for it or its children
+            # TODO consider if we want to respect $follow here
+            DEBUG2 and carp "Window $win is starting _hidden() behind some maximized one";
+            $win->show_hidden();
+        } elsif ($follow) {
+            $screen->tag_set_active($tag->{idx}, rotate => 0);
             $screen->refresh();
             $win->focus();
             $win->warp_pointer() if $rule->{follow};
@@ -443,76 +508,77 @@ sub FireInTheHole {
     });
 
     add_event_cb(DESTROY_NOTIFY(), sub($evt) {
-        hide_window($evt->{window}, 1);
+        annihilate_window($evt->{window});
     });
 
     add_event_cb(UNMAP_NOTIFY(), sub($evt) {
-        # Handle only client unmap requests as we do not call unmap anymore. So we're fine to delete win here as well
-        hide_window($evt->{window}, 1);
+        # We do not call unmap(), so delete any window that is being unmapped by client
+        annihilate_window($evt->{window});
     });
 
     add_event_cb(CONFIGURE_REQUEST(), sub($evt) {
         # Configure window on the server
         my $win_id = $evt->{window};
 
-        if (my $win = $windows->{$win_id}) {
-            # This ugly code is an answer to bad apps like Google Chrome
-            my %geom;
-            my $bw = $cfg->{border_width};
-
-            # Parse masked fields from $evt
-            $evt->{value_mask} & $evt_masks{$_} and $geom{$_} = $evt->{$_} for qw( x y w h );
-
-            # Try to extract missing fields
-            $geom{$_} //= $win->{$_} // $win->{"real_$_"} for qw( x y w h );
-
-            # Ignore events for not fully configured windows. We've done our best.
-            return unless 4 == grep defined, values %geom;
-
-            # Save desired x y w h
-            $win->{$_} = $geom{$_} for keys %geom;
-
-            # Fix y
-            $geom{y} = $cfg->{panel_height} if $geom{y} < $cfg->{panel_height};
-
-            # Handle floating windows properly
-            if ($win->{floating}) {
-                # Prevent ConfigureRequest moving the window out of already assigned screen (if real_* set)
-                # Otherwise: set new_screen using required win geometry if possible, or use currently focused screen.
-                my $new_screen = screen_by_xy(@{ $win }{qw( real_x real_y )}) //
-                    screen_by_xy(@geom{qw( x y )}) // $focus->{screen};
-
-                # Fix window position if it asked to place it outside of selected screen
-                unless ($new_screen->contains_xy(@geom{qw( x y )})) {
-                    $geom{x} = $new_screen->{x} + int(($new_screen->{w} - $geom{w}) / 2);
-                    $geom{y} = $new_screen->{y} + int(($new_screen->{h} - $geom{h}) / 2);
-
-                    # Certainly save new position
-                    @{ $win }{qw( x y )} = @geom{qw( x y )};
-                }
-
-                # For floating we need fixup border
-                $win->resize_and_move($geom{x}, $geom{y}, $geom{w} + 2 * $bw, $geom{h} + 2 * $bw);
-            } else {
-                # If window is tiled or maximized, tell it it's real size
-                @geom{qw( x y w h )} = @{ $win }{qw( real_x real_y real_w real_h )};
-
-                # Two reasons: 1. some windows prefer not to know about their border; 2. $Layout::hide_border
-                $bw = 0 if 0 == ($win->{real_bw} // $cfg->{border_width});
-                $geom{x} += $bw;
-                $geom{y} += $bw;
-                $geom{w} -= 2 * $bw;
-                $geom{h} -= 2 * $bw;
-            }
-
-            # Send notification to the client and return
-            $win->configure_notify($evt->{sequence}, @geom{qw( x y w h )}, 0, 0, $bw);
+        my $win = $windows->{$win_id};
+        unless ($win) {
+            # Send xcb_configure_notify_event_t to the window's client
+            X11::korgwm::Window::_configure_notify($win_id, @{ $evt }{qw( sequence x y w h )});
             $X->flush();
             return;
         }
 
-        # Send xcb_configure_notify_event_t to the window's client
-        X11::korgwm::Window::_configure_notify($win_id, @{ $evt }{qw( sequence x y w h )});
+        # This ugly code is an answer to bad apps like Google Chrome
+        my %geom;
+        my $bw = $cfg->{border_width};
+
+        # Parse masked fields from $evt
+        $evt->{value_mask} & $evt_masks{$_} and $geom{$_} = $evt->{$_} for qw( x y w h );
+
+        # Try to extract missing fields
+        $geom{$_} //= $win->{$_} // $win->{"real_$_"} for qw( x y w h );
+
+        # Ignore events for not fully configured windows. We've done our best.
+        return unless 4 == grep defined, values %geom;
+
+        # Save desired x y w h
+        $win->{$_} = $geom{$_} for keys %geom;
+
+        # Fix y
+        $geom{y} = $cfg->{panel_height} if $geom{y} < $cfg->{panel_height};
+
+        # Handle floating windows properly
+        if ($win->{floating}) {
+            # Prevent ConfigureRequest moving the window out of already assigned screen (if real_* set)
+            # Otherwise: set new_screen using required win geometry if possible, or use currently focused screen.
+            my $new_screen = screen_by_xy(@{ $win }{qw( real_x real_y )}) //
+                screen_by_xy(@geom{qw( x y )}) // $focus->{screen};
+
+            # Fix window position if it asked to place it outside of selected screen
+            unless ($new_screen->contains_xy(@geom{qw( x y )})) {
+                $geom{x} = $new_screen->{x} + int(($new_screen->{w} - $geom{w}) / 2);
+                $geom{y} = $new_screen->{y} + int(($new_screen->{h} - $geom{h}) / 2);
+
+                # Certainly save new position
+                @{ $win }{qw( x y )} = @geom{qw( x y )};
+            }
+
+            # For floating we need fixup border
+            $win->resize_and_move($geom{x}, $geom{y}, $geom{w} + 2 * $bw, $geom{h} + 2 * $bw);
+        } else {
+            # If window is tiled or maximized, tell it it's real size
+            @geom{qw( x y w h )} = @{ $win }{qw( real_x real_y real_w real_h )};
+
+            # Two reasons: 1. some windows prefer not to know about their border; 2. $Layout::hide_border
+            $bw = 0 if 0 == ($win->{real_bw} // $cfg->{border_width});
+            $geom{x} += $bw;
+            $geom{y} += $bw;
+            $geom{w} -= 2 * $bw;
+            $geom{h} -= 2 * $bw;
+        }
+
+        # Send notification to the client and return
+        $win->configure_notify($evt->{sequence}, @geom{qw( x y w h )}, 0, 0, $bw);
         $X->flush();
     });
 
@@ -528,23 +594,7 @@ sub FireInTheHole {
         my $win = $windows->{$evt->{event}} or return;
         return if $focus->{window} == $win;
 
-        # Switch to a proper tag
-        if ($win->{_hidden}) {
-            my @tags = $win->tags();
-            return carp "Do not know how to focus hidden window $win on several tags @tags" if @tags > 1;
-
-            # Silently skip the situation with no tags (likely always_on window), just try to warp pointer there
-            for my $tag (@tags) {
-                # Right now we're pretty sure that the window we're gonna focus exists on that tag so to avoid
-                # focus_prev garbaging not only do we make the tag active, but also replace focus window for the
-                # corresponding screen in advance. This results in $win->focus() inside tag->show() as in focus_prev()
-                $tag->{screen}->{focus} = $win;
-                $tag->{screen}->tag_set_active($tag->{idx}, 0);
-                $tag->{screen}->refresh();
-            }
-        }
-
-        $win->warp_pointer();
+        $win->select();
     });
 
     # This will handle RandR screen change event
@@ -561,7 +611,7 @@ sub FireInTheHole {
         return if 3 == ($evt->{error_code} || 0) and $prevent_window_errors;
 
         # Log unexpected errors
-        warn sprintf "X11 Error: code=%s seq=%s res=%s %s/%s", @{ $evt }{qw( error_code sequence
+        carp sprintf "X11 Error: code=%s seq=%s res=%s %s/%s", @{ $evt }{qw( error_code sequence
             resource_id major_code minor_code )};
     });
 
@@ -599,7 +649,7 @@ sub FireInTheHole {
             last unless $evt;
 
             # MotionNotifies(6) are ignored anyways. No room for error
-            DEBUG and $evt->{response_type} != 6 and warn Dumper $evt;
+            DEBUG9 and $evt->{response_type} != 6 and warn Dumper $evt;
 
             # Highest bit indicates that the source is another client
             my $type = $evt->{response_type} & 0x7F;
@@ -607,9 +657,9 @@ sub FireInTheHole {
             if (defined(my $evt_cb = $xcb_events{$type})) {
                 $evt_cb->($evt);
             } elsif (exists $xcb_events_ignore{$type}) {
-                DEBUG and warn "Manually ignored event type: $type";
+                DEBUG9 and carp "Manually ignored event type: $type";
             } else {
-                warn "Warning: missing handler for event $type";
+                carp "Warning: missing handler for event $type";
             }
         }
 
@@ -646,7 +696,8 @@ Firstly, it has pretty good config defaults.
 Then it reads several files during startup and merges the configuration.
 Note that it merges configs pretty silly.
 So it is recommended to completely specify rules or hotkeys if you want to change their parts.
-The files are being read in such an order: C</etc/korgwm/korgwm.conf>, C<$HOME/.korgwmrc>, C<$HOME/.config/korgwm/korgwm.conf>.
+The files are being read in such an order: C</etc/korgwm/korgwm.conf>, C</usr/local/etc/korgwm/korgwm.conf>,
+C<$HOME/.korgwmrc>, C<$HOME/.config/korgwm/korgwm.conf>.
 
 Please see bundled korgwm.conf.sample to get the full listing of available configuration parameters.
 
@@ -671,7 +722,7 @@ And these for Archlinux:
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2023--2024 Sergei Zhmylev E<lt>zhmylove@narod.ru<gt>
+Copyright (c) 2023--2025 Sergei Zhmylev E<lt>zhmylove@narod.ru<gt>
 
 MIT License.  Full text is in LICENSE.
 

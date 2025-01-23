@@ -19,7 +19,7 @@ unless ($meta) {
 }
 
 my %configure_and_runtime_requires = (
-  'SPVM' => '0.989063',
+  'SPVM' => '0.990042',
 );
 WriteMakefile(
   NAME              => 'SPVM::Encode',
@@ -58,7 +58,6 @@ sub MY::postamble {
   
   unless ($no_build_spvm_modules) {
     require SPVM::Builder::Util::API;
-    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Encode');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_precompile('Encode');
   }
   

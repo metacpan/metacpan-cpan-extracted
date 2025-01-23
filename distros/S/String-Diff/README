@@ -1,9 +1,9 @@
 This archive contains the distribution String-Diff,
-version 0.10:
+version 0.11:
 
   Simple diff to String
 
-This software is copyright (c) 2024 by Kazuhiro Osawa <yappo {@} shibuya {dot} pl>.
+This software is copyright (c) 2025 by Kazuhiro Osawa <yappo {@} shibuya {dot} pl>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

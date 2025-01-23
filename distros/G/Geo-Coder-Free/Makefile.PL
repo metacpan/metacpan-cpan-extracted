@@ -264,6 +264,7 @@ my $build_requires = {
 	'JSON::MaybeXS' => 0,
 	'LWP::UserAgent::Throttled' => 0,
 	'LWP::Protocol::https' => 0,
+	'Scalar::Util' => 0,
 	'Try::Tiny' => 0
 };
 
@@ -281,6 +282,7 @@ if($ENV{'REDIS_SERVER'}) {
 my $test_requires = {
 	'CGI::IDS' => 0,
 	'CGI::Lingua' => 0,
+	'CHI::Driver::Null' => 0,
 	'Data::Throttler' => 0,
 	'Test::Carp' => 0,
 	'Test::Deep' => 0,
@@ -294,6 +296,7 @@ my $test_requires = {
 if($ENV{'AUTHOR_TESTING'}) {
 	$test_requires->{'CGI::ACL'} = 0;
 	$test_requires->{'CGI::Carp'} = 0;
+	$test_requires->{'Class::Simple'} = 0;
 	$test_requires->{'FCGI'} = 0;
 	$test_requires->{'FCGI::Buffer'} = 0;
 	$test_requires->{'HTML::SocialMedia'} = 0;
@@ -329,6 +332,9 @@ WriteMakefile(
 	PREREQ_PM => {
 		'Carp' => 0,
 		# 'BerkeleyDB' => 0,
+		'Cwd' => 0,
+		'Data::Dumper' => 0,
+		'Data::Validate::URI' => 0,
 		'DB_File' => 0,
 		'DBI' => 0,
 		'Digest::MD5' => 0,
@@ -349,6 +355,7 @@ WriteMakefile(
 		'Module::Info' => 0,
 		'File::Spec' => 0,
 		'CHI' => 0,
+		'Scalar::Util' => 0,
 		'Storable' => 0,
 		'Text::CSV' => 0,
 		'Text::xSV::Slurp' => 0,

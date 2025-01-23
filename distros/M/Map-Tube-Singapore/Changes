@@ -1,3 +1,15 @@
+0.05 2025-01-22T19:14:09+01:00
+ - Fix Makefile.PL and use lib.
+ - Fix stations on multiple lines.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Rename and regen image.
+ - Rename examples to better names.
+ - Update Module::Install to 1.21 version.
+ - Update author github username.
+ - Update copyright years.
+ - Update dependency to Map::Tube version 3.62.
+
 0.04 2017-11-22T08:53:42+01:00
  - Add test for ok_map_functions().
  - Fix Makefile.PL for new version of Perl and no default »use lib '.'«.

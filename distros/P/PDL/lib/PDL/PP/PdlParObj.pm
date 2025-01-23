@@ -1,4 +1,5 @@
-package PDL::PP::PdlParObj;
+package # hide from PAUSE/MetaCPAN
+  PDL::PP::PdlParObj;
 
 use strict;
 use warnings;
@@ -10,7 +11,7 @@ our %INVALID_PAR = map +($_=>1), qw(
 );
 
 my $typeregex = join '|', map $_->ppforcetype, types;
-my $complex_regex = join '|', qw(real complex !complex);
+my $complex_regex = join '|', qw(real complex !real !complex);
 our $sqbr_re = qr/\[([^]]*)\]/x;
 our $pars_re = qr/^
 	\s*(?:($complex_regex|$typeregex)\b([+]*)|)\s*	# $1,2: first option then plus
@@ -27,12 +28,14 @@ my %flag2info = (
   phys => [[qw(FlagPhys)]],
   real => [[qw(FlagTypeOverride FlagReal)]],
   complex => [[qw(FlagTypeOverride FlagComplex)]],
+  '!real' => [[qw(FlagTypeOverride FlagNotReal)]],
   '!complex' => [[qw(FlagTypeOverride FlagNotComplex)]],
   (map +($_->ppforcetype => [[qw(FlagTypeOverride FlagTyped)], 'Type']), types),
 );
 my %flag2c = qw(
   FlagReal PDL_PARAM_ISREAL
   FlagComplex PDL_PARAM_ISCOMPLEX
+  FlagNotReal PDL_PARAM_ISNOTREAL
   FlagNotComplex PDL_PARAM_ISNOTCOMPLEX
   FlagTyped PDL_PARAM_ISTYPED
   FlagTplus PDL_PARAM_ISTPLUS
@@ -60,19 +63,18 @@ my $calc_re = qr{
   )
 }xo;
 sub new {
-  my ($type,$string,$badflag,$sig) = @_;
-  $badflag ||= 0;
-  my $this = bless {Number => "PDL_UNDEF_NUMBER", BadFlag => $badflag, Sig => $sig},$type;
-  $string =~ $pars_re or croak "pp_def($this->{Sig}{OpName}): Invalid pdl def $string (regex $pars_re)\n";
+  my ($type,$string,$opname) = @_;
+  $string =~ $pars_re or croak "pp_def($opname): Invalid pdl def $string (regex $pars_re)\n";
+  my $this = bless {Number => "PDL_UNDEF_NUMBER", OpName=>$opname},$type;
   my($opt1,$opt_plus,$sqbr_opt,$name,$inds) = map $_ // '', $1,$2,$3,$4,$5;
   print "PDL: '$opt1$opt_plus', '$sqbr_opt', '$name', '$inds'\n"
     if $::PP_VERBOSE;
-  croak "pp_def($this->{Sig}{OpName}): Invalid Pars name: $name" if $INVALID_PAR{$name};
+  croak "pp_def($opname): Invalid Pars name: $name" if $INVALID_PAR{$name};
 # Set my internal variables
   $this->{Name} = $name;
   $this->{Flags} = [(split ',',$sqbr_opt),($opt1?$opt1:())];
   for(@{$this->{Flags}}) {
-    croak("pp_def($this->{Sig}{OpName}): Invalid flag $_ given for $string\n")
+    croak("pp_def($opname): Invalid flag $_ given for $string\n")
       unless my ($set, $store) = @{ $flag2info{$_} || [] };
     $this->{$store} = $_ if $store;
     $this->{$_} = 1 for @$set;
@@ -138,7 +140,7 @@ sub finalcheck {
 sub getcreatedims {
   my $this = shift;
   return map
-    { croak "pp_def($this->{Sig}{OpName}): can't create: index size ".$_->name." not initialised"
+    { croak "pp_def($this->{OpName}): can't create: index size ".$_->name." not initialised"
 	if !defined($_->{Value}) || $_->{Value} < 1;
       $_->{Value} } @{$this->{IndObjs}};
 }
@@ -190,7 +192,7 @@ sub do_access {
       $msg .= " no '=>' seen" if !/=>/;
       $msg .= " invalid dim name '$1'" if /^\s*([^\w]*?)\s*=>/;
       $msg .= " (no spaces in => value)" if /=>\s*\S\s*\S/;
-      croak "pp_def($this->{Sig}{OpName}): $msg\n";
+      croak "pp_def($this->{OpName}): $msg\n";
     }
     ($1,$2)
   } PDL::PP::Rule::Substitute::split_cpp($inds);
@@ -198,7 +200,7 @@ sub do_access {
     join('+','0', map $this->do_indterm($pdl,$_,\%subst,$context), 0..$#{$this->{IndObjs}})
   . "]";
   # If not all substitutions made, the user probably made a spelling error
-  croak "pp_def($this->{Sig}{OpName}): Substitutions left for \$$pdl($inds): ".(join ',',sort keys %subst)."\n"
+  croak "pp_def($this->{OpName}): Substitutions left for \$$pdl($inds): ".(join ',',sort keys %subst)."\n"
     if keys(%subst) != 0;
   $text;
 }
@@ -220,18 +222,18 @@ sub do_indterm { my($this,$pdl,$ind,$subst,$context) = @_;
 # No => get the one from the nearest context.
     (grep $_ eq $substname, map $_->[1], reverse @$context)[0];
   if (!defined $index) {
-    croak "pp_def($this->{Sig}{OpName}): no value given for ndarray '$pdl' index '$substname'
+    croak "pp_def($this->{OpName}): no value given for ndarray '$pdl' index '$substname'
           You supplied (@{[sort keys %$subst]})
           On stack: ".(join ' ',map {"($_->[0],$_->[1])"} @$context)."\n"
   }
   "(".($this->get_incname($ind,1))."*($index))";
 }
 
-sub get_xsdatapdecl { 
-    my($this,$ctype,$nulldatacheck,$ppsym) = @_;
+sub get_xsdatapdecl {
+    my ($this,$ctype,$nulldatacheck,$ppsym,$badflag) = @_;
     my $pdl = $this->get_nname;
     my $name = $this->{Name};
-    my $macro = "PDL_DECLARE_PARAMETER".($this->{BadFlag} ? "_BADVAL" : "");
+    my $macro = "PDL_DECLARE_PARAMETER".($badflag ? "_BADVAL" : "");
     "$macro($ctype, $name, $pdl, $nulldatacheck, $ppsym)";
 }
 

@@ -24,6 +24,7 @@ use Locale::CA;
 use Locale::US;
 use CHI;
 use Locale::Country;
+use Scalar::Util;
 
 our %admin1cache;
 our %admin2cache;	# e.g. maps 'Kent' => 'P5'
@@ -45,11 +46,11 @@ Geo::Coder::Free::MaxMind - Provides a geocoding functionality using the MaxMind
 
 =head1 VERSION
 
-Version 0.37
+Version 0.38
 
 =cut
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 
 =head1 SYNOPSIS
 
@@ -87,16 +88,16 @@ Here's the method to find the location of Sittingbourne, Kent, England:
 1) admin1.db contains admin areas such as counties, states and provinces
    A typical line is:
      US.MD	Maryland	Maryland	4361885
-   So a look up of 'Maryland' will get the concatenated code 'US.MD'
+   So a look-up of 'Maryland' will get the concatenated code 'US.MD'
    Note that GB has England, Scotland and Wales at this level, not the counties
      GB.ENG	England	England	6269131
-   So a look up of England will give the concatenated code of GB.ENG for use in admin2.db
+   So a look-up of England will give the concatenated code of GB.ENG for use in admin2.db
 2) admin2.db contains admin areas drilled down from the admin1 database such as US counties
    Note that GB has counties
    A typical line is:
     GB.ENG.G5	Kent	Kent	3333158
-   So a look up of 'Kent' with a concatenated code to start with 'GB.ENG' will code the region G5 for use in cities.sql
-3) cities.sql contains the latitude and longitude of the place we want, so a search for 'sittingbourne' in
+   So a look-up of 'Kent' with a concatenated code to start with 'GB.ENG' will code the region G5 for use in cities.sql
+3) cities.sql contains the latitude and longitude of the place we want, so a search for 'sittingbourne' in the
    region 'g5' will give
      gb,sittingbourne,Sittingbourne,G5,41148,51.333333,.75
 
@@ -107,6 +108,8 @@ The admin2.db is far from comprehensive, see Makefile.PL for some entries that a
 sub new
 {
 	my $class = shift;
+
+	# Handle hash or hashref arguments
 	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
 	if(!defined($class)) {
@@ -116,22 +119,29 @@ sub new
 
 		# FIXME: this only works when no arguments are given
 		$class = __PACKAGE__;
-	} elsif(ref($class)) {
-		# clone the given object
+	} elsif(Scalar::Util::blessed($class)) {
+		# If $class is an object, clone it with new arguments
 		return bless { %{$class}, %args }, ref($class);
 	}
 
 	my $directory = $args{'directory'} || Module::Info->new_from_loaded(__PACKAGE__)->file();
 	$directory =~ s/\.pm$//;
 
+	if(!-d $directory) {
+		Carp::croak(ref($class), ": directory $directory doesn't exist");
+	}
+
 	Database::Abstraction::init({
 		cache_duration => '1 day',
 		%args,
 		directory => File::Spec->catfile($directory, 'databases'),
-		cache => $args{cache} || CHI->new(driver => 'Memory', datastore => {}),
+		cache => $args{cache} || CHI->new(driver => 'Memory', global => 1)
 	});
 
-	return bless { }, $class;
+	# Return the blessed object
+	return bless {
+		cache => $args{cache} || CHI->new(driver => 'Memory', global => 1),
+	}, $class;
 }
 
 =head2 geocode
@@ -183,6 +193,12 @@ sub geocode {
 	my $location = $params{location}
 		or Carp::croak('Usage: geocode(location => $location)');
 
+	# Fail when the input is just a set of numbers
+	if($location !~ /\D/) {
+		Carp::croak('Usage: ', __PACKAGE__, ": invalid input to geocode(), $location");
+		return;
+	}
+
 	if($location =~ /^(.+),\s*Washington\s*DC,(.+)$/) {
 		$location = "$1, Washington, DC, $2";
 	}
@@ -200,6 +216,10 @@ sub geocode {
 
 	# ::diag(__LINE__, ": $location");
 	return unless(($location =~ /,/) || $params{'region'});	# Not well formed, or an attempt to find the location of an entire country
+
+	# Check cache first
+	my $cached_result = $self->{'cache'}->get($location);
+	return $cached_result if($cached_result);
 
 	my $county;
 	my $state;
@@ -573,10 +593,15 @@ sub geocode {
 
 	# ::diag(__LINE__, ': ', Data::Dumper->new([$city])->Dump());
 	if(defined($city) && defined($city->{'Latitude'})) {
-		return Geo::Location::Point->new({
+		# Cache and return result
+		delete $city->{'Region'} if(defined($city->{'Region'}) && ($city->{'Region'} =~ /^[A-Z]\d$/));	# E.g. Region = G5
+		delete $city->{'Population'} if(defined($city->{'Population'}) && (length($city->{'Population'}) == 0));
+		my $rc = Geo::Location::Point->new({
 			%{$city},
 			('database' => 'MaxMind', 'confidence' => $confidence)
 		});
+		$self->{cache}->set($location, $rc);
+		return $rc;
 	}
 	# return $city;
 	return;
@@ -666,6 +691,8 @@ sub _prepare($$) {
 
 	if(my $region = $loc->{'Region'}) {
 		my $county;
+
+		# Check if region is already cached in admin2cache
 		while(my ($key, $value) = each %admin2cache) {
 			if($value eq $region) {
 				$county = $key;
@@ -675,9 +702,14 @@ sub _prepare($$) {
 		if($county) {
 			$loc->{'Region'} = $county;
 		} else {
+			# Initialize admin2 object if not already initialized
 			$self->{'admin2'} //= Geo::Coder::Free::DB::MaxMind::admin2->new(no_entry => 1) or die "Can't open the admin2 database";
+
+			# Prepare and execute SQL query
+
 			my $row = $self->{'admin2'}->execute("SELECT name FROM admin2 WHERE concatenated_codes LIKE '" . uc($loc->{'Country'}) . '.%.' . uc($region) . "' LIMIT 1");
 			if(ref($row) && $row->{'name'}) {
+				# Cache the result for future calls and update the location's region
 				$admin2cache{$row->{'name'}} = $region;
 				$loc->{'Region'} = $row->{'name'};
 			}
@@ -721,7 +753,7 @@ and are inconsistent with the Geonames database.
 If you search for something like "Sheppy, Kent, England" in list context,
 it returns them all.
 That's a lot!
-It should limit to,
+It should be limited to,
 say 10 results (that number should be tuneable, and be a LIMIT in DB.pm),
 and as the correct spelling in Sheppey, arguably it should return nothing.
 
@@ -731,7 +763,7 @@ VWF, MaxMind and geonames.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2023 Nigel Horne.
+Copyright 2017-2025 Nigel Horne.
 
 The program code is released under the following licence: GPL for personal use on a single computer.
 All other users (including Commercial, Charity, Educational, Government)

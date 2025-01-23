@@ -3,7 +3,7 @@
 #
 package PDL::Primitive;
 
-our @EXPORT_OK = qw(inner outer matmult innerwt inner2 inner2d inner2t crossp norm indadd conv1d in uniq uniqind uniqvec hclip lclip clip clip wtstat statsover stats histogram whistogram histogram2d whistogram2d fibonacci append axisvalues cmpvec eqvec enumvec enumvecg vsearchvec unionvec intersectvec setdiffvec union_sorted intersect_sorted setdiff_sorted vcos srandom random randsym grandom vsearch vsearch_sample vsearch_insert_leftmost vsearch_insert_rightmost vsearch_match vsearch_bin_inclusive vsearch_bin_exclusive interpolate interpol interpND one2nd which which_both whichover approx_artol where where_both whereND whichND setops intersect pchip_chim pchip_chic pchip_chsp pchip_chfd pchip_chfe pchip_chia pchip_chid pchip_chbs pchip_bvalu );
+our @EXPORT_OK = qw(inner outer matmult innerwt inner2 inner2d inner2t crossp norm indadd conv1d in uniq uniqind uniqvec hclip lclip clip wtstat statsover stats histogram whistogram histogram2d whistogram2d fibonacci append axisvalues cmpvec eqvec enumvec enumvecg vsearchvec unionvec intersectvec setdiffvec union_sorted intersect_sorted setdiff_sorted vcos srandom random randsym grandom vsearch vsearch_sample vsearch_insert_leftmost vsearch_insert_rightmost vsearch_match vsearch_bin_inclusive vsearch_bin_exclusive interpolate interpol interpND one2nd which which_both whichover approx_artol where where_both whereND whereND_both whichND whichND_both setops intersect pchip_chim pchip_chic pchip_chsp pchip_chfd pchip_chfe pchip_chia pchip_chid pchip_chbs pchip_bvalu );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
@@ -15,6 +15,25 @@ use DynaLoader;
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Primitive ;
+
+{ package # hide from MetaCPAN
+ PDL;
+
+#line 1437 "/home/osboxes/pdl-code/lib/PDL/PP.pm"
+{
+  my ($foo, $overload_sub);
+  use overload 'x' => $overload_sub = sub {
+    Carp::confess("PDL::matmult: overloaded 'x' given undef")
+      if grep !defined, @_[0,1];
+    return PDL::matmult(@_) unless ref $_[1]
+            && (ref $_[1] ne 'PDL')
+            && defined($foo = overload::Method($_[1], 'x'))
+            && $foo != $overload_sub; # recursion guard
+    goto &$foo;
+  };
+}
+#line 36 "lib/PDL/Primitive.pm"
+}
 
 
 
@@ -28,16 +47,6 @@ use strict;
 use warnings;
 use PDL::Slices;
 use Carp;
-
-{ package # hide from MetaCPAN
-    PDL;
-  use overload (
-    'x' => sub {
-      PDL::Primitive::matmult(@_[0,1], my $foo=$_[0]->null());
-      $foo;
-    },
-  );
-}
 
 =head1 NAME
 
@@ -60,7 +69,7 @@ For explanation of the signature format, see L<PDL::PP>.
  use PDL::Primitive;
 
 =cut
-#line 64 "lib/PDL/Primitive.pm"
+#line 73 "lib/PDL/Primitive.pm"
 
 
 =head1 FUNCTIONS
@@ -76,7 +85,16 @@ For explanation of the signature format, see L<PDL::PP>.
 
 =for sig
 
-  Signature: (a(n); b(n); [o]c())
+ Signature: (a(n); b(n); [o]c())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $c = inner($a, $b);
+ inner($a, $b, $c);  # all arguments given
+ $c = $a->inner($b); # method call
+ $a->inner($b, $c);
 
 =for ref
 
@@ -86,7 +104,9 @@ Inner product over one dimension
 
 See also L</norm>, L<PDL::Ufunc/magnover>.
 
-=for bad
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
@@ -110,7 +130,16 @@ as it will not contain any bad values.
 
 =for sig
 
-  Signature: (a(n); b(m); [o]c(n,m))
+ Signature: (a(n); b(m); [o]c(n,m))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $c = outer($a, $b);
+ outer($a, $b, $c);  # all arguments given
+ $c = $a->outer($b); # method call
+ $a->outer($b, $c);
 
 =for ref
 
@@ -120,9 +149,13 @@ Naturally, it is possible to achieve the effects of outer
 product simply by broadcasting over the "C<*>"
 operator but this function is provided for convenience.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-outer processes bad values.
+C<outer> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -136,7 +169,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 110 "lib/PDL/Primitive.pd"
+#line 98 "lib/PDL/Primitive.pd"
 
 =head2 x
 
@@ -227,14 +260,24 @@ The mechanics of the multiplication are carried out by the
 L</matmult> method.
 
 =cut
-#line 231 "lib/PDL/Primitive.pm"
+#line 264 "lib/PDL/Primitive.pm"
 
 
 =head2 matmult
 
 =for sig
 
-  Signature: (a(t,h); b(w,t); [o]c(w,h))
+ Signature: (a(t,h); b(w,t); [o]c(w,h))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $c = $a x $b;         # overloads the Perl 'x' operator
+ $c = matmult($a, $b);
+ matmult($a, $b, $c);  # all arguments given
+ $c = $a->matmult($b); # method call
+ $a->matmult($b, $c);
 
 =for ref
 
@@ -251,9 +294,13 @@ footprint within cache as long as possible on most modern CPUs.
 
 For usage, see L</x>, a description of the overloaded 'x' operator
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-matmult processes bad values.
+C<matmult> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -262,7 +309,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 208 "lib/PDL/Primitive.pd"
+#line 197 "lib/PDL/Primitive.pd"
 sub PDL::matmult {
     my ($x,$y,$c) = @_;
     $y = PDL->topdl($y);
@@ -276,7 +323,7 @@ sub PDL::matmult {
     PDL::_matmult_int($x,$y,$c);
     $c;
 }
-#line 280 "lib/PDL/Primitive.pm"
+#line 327 "lib/PDL/Primitive.pm"
 
 *matmult = \&PDL::matmult;
 
@@ -289,7 +336,16 @@ sub PDL::matmult {
 
 =for sig
 
-  Signature: (a(n); b(n); c(n); [o]d())
+ Signature: (a(n); b(n); c(n); [o]d())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $d = innerwt($a, $b, $c);
+ innerwt($a, $b, $c, $d);  # all arguments given
+ $d = $a->innerwt($b, $c); # method call
+ $a->innerwt($b, $c, $d);
 
 =for ref
 
@@ -297,9 +353,13 @@ Weighted (i.e. triple) inner product
 
  d = sum_i a(i) b(i) c(i)
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-innerwt processes bad values.
+C<innerwt> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -318,7 +378,16 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); b(n,m); c(m); [o]d())
+ Signature: (a(n); b(n,m); c(m); [o]d())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $d = inner2($a, $b, $c);
+ inner2($a, $b, $c, $d);  # all arguments given
+ $d = $a->inner2($b, $c); # method call
+ $a->inner2($b, $c, $d);
 
 =for ref
 
@@ -329,9 +398,13 @@ Inner product of two vectors and a matrix
 Note that you should probably not broadcast over C<a> and C<c> since that would be
 very wasteful. Instead, you should use a temporary for C<b*c>.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-inner2 processes bad values.
+C<inner2> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -350,7 +423,16 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n,m); b(n,m); [o]c())
+ Signature: (a(n,m); b(n,m); [o]c())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $c = inner2d($a, $b);
+ inner2d($a, $b, $c);  # all arguments given
+ $c = $a->inner2d($b); # method call
+ $a->inner2d($b, $c);
 
 =for ref
 
@@ -360,9 +442,13 @@ Equivalent to
 
  $c = inner($x->clump(2), $y->clump(2))
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-inner2d processes bad values.
+C<inner2d> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -381,7 +467,16 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(j,n); b(n,m); c(m,k); [t]tmp(n,k); [o]d(j,k))
+ Signature: (a(j,n); b(n,m); c(m,k); [t]tmp(n,k); [o]d(j,k))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $d = inner2t($a, $b, $c);
+ inner2t($a, $b, $c, $d);  # all arguments given
+ $d = $a->inner2t($b, $c); # method call
+ $a->inner2t($b, $c, $d);
 
 =for ref
 
@@ -397,11 +492,15 @@ which in case of large numbers of matrices makes this much more
 memory-efficient.
 
 It is hoped that things like this could be taken care of as a kind of
-closures at some point.
+closure at some point.
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
-inner2t processes bad values.
+C<inner2t> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -420,7 +519,16 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(tri=3); b(tri); [o] c(tri))
+ Signature: (a(tri=3); b(tri); [o] c(tri))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $c = crossp($a, $b);
+ crossp($a, $b, $c);  # all arguments given
+ $c = $a->crossp($b); # method call
+ $a->crossp($b, $c);
 
 =for ref
 
@@ -435,9 +543,13 @@ After
 the inner product C<$c*$x> and C<$c*$y> will be zero, i.e. C<$c> is
 orthogonal to C<$x> and C<$y>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-crossp does not process bad values.
+C<crossp> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -456,15 +568,28 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (vec(n); [o] norm(n))
+ Signature: (vec(n); [o] norm(n))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $norm = norm($vec);
+ norm($vec, $norm);  # all arguments given
+ $norm = $vec->norm; # method call
+ $vec->norm($norm);
 
 Normalises a vector to unit Euclidean length
 
 See also L</inner>, L<PDL::Ufunc/magnover>.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-norm processes bad values.
+C<norm> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -483,7 +608,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (input(n); indx ind(n); [io] sum(m))
+ Signature: (input(n); indx ind(n); [io] sum(m))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ indadd($input, $ind, $sum); # all arguments given
+ $input->indadd($ind, $sum); # method call
 
 =for ref
 
@@ -513,7 +645,9 @@ Broadcasting example:
   #Result: ( 1, 2, and 3 added to elements 1,4,6 $sum)
   # [0 1 0 0 2 0 3 0 0 0]
 
-=for bad
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
@@ -535,7 +669,16 @@ The routine barfs on bad indices, and bad inputs set target outputs bad.
 
 =for sig
 
-  Signature: (a(m); kern(p); [o]b(m); int reflect)
+ Signature: (a(m); kern(p); [o]b(m); int reflect)
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $b = conv1d($a, $kern, $reflect);
+ conv1d($a, $kern, $b, $reflect);  # all arguments given
+ $b = $a->conv1d($kern, $reflect); # method call
+ $a->conv1d($kern, $b, $reflect);
 
 =for ref
 
@@ -586,9 +729,13 @@ the numeric value of C<< $pdl->badvalue >> so it is not
 recommended for processing pdls with bad values in them
 unless special care is taken.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-conv1d ignores the bad-value flag of the input ndarrays.
+C<conv1d> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -597,7 +744,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 600 "lib/PDL/Primitive.pd"
+#line 568 "lib/PDL/Primitive.pd"
 sub PDL::conv1d {
    my $opt = pop @_ if ref($_[-1]) eq 'HASH';
    die 'Usage: conv1d( a(m), kern(p), [o]b(m), {Options} )'
@@ -609,7 +756,7 @@ sub PDL::conv1d {
 		     lc $$opt{Boundary} eq "reflect");
    return $c;
 }
-#line 613 "lib/PDL/Primitive.pm"
+#line 760 "lib/PDL/Primitive.pm"
 
 *conv1d = \&PDL::conv1d;
 
@@ -622,7 +769,16 @@ sub PDL::conv1d {
 
 =for sig
 
-  Signature: (a(); b(n); [o] c())
+ Signature: (a(); b(n); [o] c())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $c = in($a, $b);
+ in($a, $b, $c);  # all arguments given
+ $c = $a->in($b); # method call
+ $a->in($b, $c);
 
 =for ref
 
@@ -643,9 +799,13 @@ construct like
 However, C<in> doesn't create a (potentially large) intermediate
 and is generally faster.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-in does not process bad values.
+C<in> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -659,7 +819,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 671 "lib/PDL/Primitive.pd"
+#line 636 "lib/PDL/Primitive.pd"
 
 =head2 uniq
 
@@ -717,7 +877,7 @@ sub PDL::uniq {
    )->append($nans);
 }
 
-#line 730 "lib/PDL/Primitive.pd"
+#line 695 "lib/PDL/Primitive.pd"
 
 =head2 uniqind
 
@@ -780,7 +940,7 @@ sub PDL::uniqind {
   return $ansind;
 }
 
-#line 796 "lib/PDL/Primitive.pd"
+#line 761 "lib/PDL/Primitive.pd"
 
 =head2 uniqvec
 
@@ -849,22 +1009,35 @@ sub PDL::uniqvec {
       $srtdice;
    return $ans->append($somebad)->append($nanvec->mv(0,-1))->mv(0,-1);
 }
-#line 853 "lib/PDL/Primitive.pm"
+#line 1013 "lib/PDL/Primitive.pm"
 
 
 =head2 hclip
 
 =for sig
 
-  Signature: (a(); b(); [o] c())
+ Signature: (a(); b(); [o] c())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $c = hclip($a, $b);
+ hclip($a, $b, $c);  # all arguments given
+ $c = $a->hclip($b); # method call
+ $a->hclip($b, $c);
 
 =for ref
 
 clip (threshold) C<$a> by C<$b> (C<$b> is upper bound)
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-hclip processes bad values.
+C<hclip> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -873,7 +1046,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 891 "lib/PDL/Primitive.pd"
+#line 856 "lib/PDL/Primitive.pd"
 sub PDL::hclip {
    my ($x,$y) = @_;
    my $c;
@@ -883,7 +1056,7 @@ sub PDL::hclip {
    PDL::_hclip_int($x,$y,$c);
    return $c;
 }
-#line 887 "lib/PDL/Primitive.pm"
+#line 1060 "lib/PDL/Primitive.pm"
 
 *hclip = \&PDL::hclip;
 
@@ -896,15 +1069,28 @@ sub PDL::hclip {
 
 =for sig
 
-  Signature: (a(); b(); [o] c())
+ Signature: (a(); b(); [o] c())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $c = lclip($a, $b);
+ lclip($a, $b, $c);  # all arguments given
+ $c = $a->lclip($b); # method call
+ $a->lclip($b, $c);
 
 =for ref
 
 clip (threshold) C<$a> by C<$b> (C<$b> is lower bound)
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-lclip processes bad values.
+C<lclip> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -913,7 +1099,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 891 "lib/PDL/Primitive.pd"
+#line 856 "lib/PDL/Primitive.pd"
 sub PDL::lclip {
    my ($x,$y) = @_;
    my $c;
@@ -923,7 +1109,7 @@ sub PDL::lclip {
    PDL::_lclip_int($x,$y,$c);
    return $c;
 }
-#line 927 "lib/PDL/Primitive.pm"
+#line 1113 "lib/PDL/Primitive.pm"
 
 *lclip = \&PDL::lclip;
 
@@ -931,9 +1117,14 @@ sub PDL::lclip {
 
 
 
-#line 906 "lib/PDL/Primitive.pd"
 
 =head2 clip
+
+=for sig
+
+ Signature: (a(); l(); h(); [o] c())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
 
 =for ref
 
@@ -944,29 +1135,13 @@ Clip (threshold) an ndarray by (optional) upper or lower bounds.
  $y = $x->clip(0,3);
  $c = $x->clip(undef, $x);
 
-=for bad
+=pod
 
-clip handles bad values since it is just a
-wrapper around L</hclip> and
-L</lclip>.
-
-=cut
-#line 955 "lib/PDL/Primitive.pm"
-
-
-=head2 clip
-
-=for sig
-
-  Signature: (a(); l(); h(); [o] c())
-
-=for ref
-
-info not available
+Broadcasts over its inputs.
 
 =for bad
 
-clip processes bad values.
+C<clip> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -975,7 +1150,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 940 "lib/PDL/Primitive.pd"
+#line 892 "lib/PDL/Primitive.pd"
 *clip = \&PDL::clip;
 sub PDL::clip {
   my($x, $l, $h) = @_;
@@ -1009,7 +1184,7 @@ sub PDL::clip {
 
   return $d;
 }
-#line 1013 "lib/PDL/Primitive.pm"
+#line 1188 "lib/PDL/Primitive.pm"
 
 *clip = \&PDL::clip;
 
@@ -1022,7 +1197,16 @@ sub PDL::clip {
 
 =for sig
 
-  Signature: (a(n); wt(n); avg(); [o]b(); int deg)
+ Signature: (a(n); wt(n); avg(); [o]b(); int deg)
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $b = wtstat($a, $wt, $avg, $deg);
+ wtstat($a, $wt, $avg, $b, $deg);  # all arguments given
+ $b = $a->wtstat($wt, $avg, $deg); # method call
+ $a->wtstat($wt, $avg, $b, $deg);
 
 =for ref
 
@@ -1033,7 +1217,9 @@ The formula is
 
  b() = (sum_i wt_i * (a_i ** degree - avg)) / (sum_i wt_i)
 
-=for bad
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
@@ -1056,7 +1242,9 @@ have its bad flag set if the output contains any bad data.
 
 =for sig
 
-  Signature: (a(n); w(n); float+ [o]avg(); float+ [o]prms(); int+ [o]min(); int+ [o]max(); float+ [o]adev(); float+ [o]rms())
+ Signature: (a(n); w(n); float+ [o]avg(); float+ [o]prms(); int+ [o]min(); int+ [o]max(); float+ [o]adev(); float+ [o]rms())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
 
 =for ref
 
@@ -1112,7 +1300,9 @@ is N-dimensional each returned value will be N-1 dimensional,
 to calculate the statistics for the entire ndarray either
 use C<clump(-1)> directly on the ndarray or call C<stats>.
 
-=for bad
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
@@ -1125,7 +1315,7 @@ the sample size.  If all data are bad then the output data are marked bad.
 
 
 
-#line 1068 "lib/PDL/Primitive.pd"
+#line 1018 "lib/PDL/Primitive.pd"
 sub PDL::statsover {
    barf('Usage: ($mean,[$prms, $median, $min, $max, $adev, $rms]) = statsover($data,[$weights])') if @_>2;
    my ($data, $weights) = @_;
@@ -1140,7 +1330,7 @@ sub PDL::statsover {
    PDL::_statsover_int($data, $weights, $mean, $prms, $min, $max, $adev, $rms);
    wantarray ? ($mean, $prms, $median, $min, $max, $adev, $rms) : $mean;
 }
-#line 1144 "lib/PDL/Primitive.pm"
+#line 1334 "lib/PDL/Primitive.pm"
 
 *statsover = \&PDL::statsover;
 
@@ -1148,7 +1338,7 @@ sub PDL::statsover {
 
 
 
-#line 1151 "lib/PDL/Primitive.pd"
+#line 1095 "lib/PDL/Primitive.pd"
 
 =head2 stats
 
@@ -1192,14 +1382,16 @@ sub PDL::stats {
 
     return PDL::statsover($data->flat,$weights);
 }
-#line 1196 "lib/PDL/Primitive.pm"
+#line 1386 "lib/PDL/Primitive.pm"
 
 
 =head2 histogram
 
 =for sig
 
-  Signature: (in(n); int+[o] hist(m); double step; double min; IV msize => m)
+ Signature: (in(n); int+[o] hist(m); double step; double min; IV msize => m)
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
 
 =for ref
 
@@ -1229,9 +1421,13 @@ For a higher-level interface, see L<hist|PDL::Basic/hist>.
  pdl> p histogram(pdl(1,1,2),1,0,3)
  [0 2 1]
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-histogram processes bad values.
+C<histogram> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1250,7 +1446,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (in(n); float+ wt(n);float+[o] hist(m); double step; double min; IV msize => m)
+ Signature: (in(n); float+ wt(n);float+[o] hist(m); double step; double min; IV msize => m)
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
 
 =for ref
 
@@ -1278,9 +1476,13 @@ you want.
  pdl> p whistogram(pdl(1,1,2), pdl(0.1,0.1,0.5), 1, 0, 4)
  [0 0.2 0.5 0]
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-whistogram processes bad values.
+C<whistogram> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1299,8 +1501,10 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (ina(n); inb(n); int+[o] hist(ma,mb); double stepa; double mina; IV masize => ma;
+ Signature: (ina(n); inb(n); int+[o] hist(ma,mb); double stepa; double mina; IV masize => ma;
 	             double stepb; double minb; IV mbsize => mb;)
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
 
 =for ref
 
@@ -1332,9 +1536,13 @@ upper limit is put in the last bin.
   [0 1 0]
  ]
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-histogram2d processes bad values.
+C<histogram2d> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1353,8 +1561,10 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (ina(n); inb(n); float+ wt(n);float+[o] hist(ma,mb); double stepa; double mina; IV masize => ma;
+ Signature: (ina(n); inb(n); float+ wt(n);float+[o] hist(ma,mb); double stepa; double mina; IV masize => ma;
 	             double stepb; double minb; IV mbsize => mb;)
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
 
 =for ref
 
@@ -1386,9 +1596,13 @@ upper limit is put in the last bin.
   [  0 0.1   0]
  ]
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-whistogram2d processes bad values.
+C<whistogram2d> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1407,15 +1621,30 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (i(n); [o]x(n))
+ Signature: (i(n); [o]x(n))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $x = fibonacci($i);
+ fibonacci($i, $x);      # all arguments given
+ $x = $i->fibonacci;     # method call
+ $i->fibonacci($x);
+ $i->inplace->fibonacci; # can be used inplace
+ fibonacci($i->inplace);
 
 =for ref
 
 Constructor - a vector with Fibonacci's sequence
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-fibonacci does not process bad values.
+C<fibonacci> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1424,7 +1653,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1419 "lib/PDL/Primitive.pd"
+#line 1363 "lib/PDL/Primitive.pd"
 sub fibonacci { ref($_[0]) && ref($_[0]) ne 'PDL::Type' ? $_[0]->fibonacci : PDL->fibonacci(@_) }
 sub PDL::fibonacci{
    my $x = &PDL::Core::_construct;
@@ -1434,14 +1663,23 @@ sub PDL::fibonacci{
    PDL::_fibonacci_int($in, $out);
    $out;
 }
-#line 1438 "lib/PDL/Primitive.pm"
+#line 1667 "lib/PDL/Primitive.pm"
 
 
 =head2 append
 
 =for sig
 
-  Signature: (a(n); b(m); [o] c(mn=CALC($SIZE(n)+$SIZE(m))))
+ Signature: (a(n); b(m); [o] c(mn=CALC($SIZE(n)+$SIZE(m))))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $c = append($a, $b);
+ append($a, $b, $c);  # all arguments given
+ $c = $a->append($b); # method call
+ $a->append($b, $c);
 
 =for ref
 
@@ -1463,9 +1701,13 @@ than two ndarrays along an arbitrary dimension, and
 L<cat|PDL::Core/cat>, which can append more than two ndarrays that all
 have the same sized dimensions.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-append does not process bad values.
+C<append> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1474,7 +1716,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1445 "lib/PDL/Primitive.pd"
+#line 1389 "lib/PDL/Primitive.pd"
 
 sub PDL::append {
   my ($i1, $i2, $o) = map PDL->topdl($_), @_;
@@ -1491,7 +1733,7 @@ sub PDL::append {
   $o;
 }
         
-#line 1495 "lib/PDL/Primitive.pm"
+#line 1737 "lib/PDL/Primitive.pm"
 
 *append = \&PDL::append;
 
@@ -1499,7 +1741,7 @@ sub PDL::append {
 
 
 
-#line 1489 "lib/PDL/Primitive.pd"
+#line 1433 "lib/PDL/Primitive.pd"
 
 =head2 glue
 
@@ -1573,7 +1815,7 @@ sub PDL::glue{
     }
     0 == $dim ? $x : $x->xchg(0,$dim);
 }
-#line 1577 "lib/PDL/Primitive.pm"
+#line 1819 "lib/PDL/Primitive.pm"
 
 *axisvalues = \&PDL::axisvalues;
 
@@ -1586,13 +1828,26 @@ sub PDL::glue{
 
 =for sig
 
-  Signature: (a(n); b(n); sbyte [o]c())
+ Signature: (a(n); b(n); sbyte [o]c())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $c = cmpvec($a, $b);
+ cmpvec($a, $b, $c);  # all arguments given
+ $c = $a->cmpvec($b); # method call
+ $a->cmpvec($b, $c);
 
 =for ref
 
 Compare two vectors lexicographically.
 
 Returns -1 if a is less, 1 if greater, 0 if equal.
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
@@ -1615,11 +1870,24 @@ bad - any after are ignored.
 
 =for sig
 
-  Signature: (a(n); b(n); sbyte [o]c())
+ Signature: (a(n); b(n); sbyte [o]c())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $c = eqvec($a, $b);
+ eqvec($a, $b, $c);  # all arguments given
+ $c = $a->eqvec($b); # method call
+ $a->eqvec($b, $c);
 
 =for ref
 
 Compare two vectors, returning 1 if equal, 0 if not equal.
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
@@ -1641,7 +1909,16 @@ The output is bad if any input values are bad.
 
 =for sig
 
-  Signature: (v(M,N); indx [o]k(N))
+ Signature: (v(M,N); indx [o]k(N))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $k = enumvec($v);
+ enumvec($v, $k);  # all arguments given
+ $k = $v->enumvec; # method call
+ $v->enumvec($k);
 
 =for ref
 
@@ -1656,9 +1933,13 @@ If you need global keys, see enumvecg().
 
 Contributed by Bryan Jurish E<lt>moocow@cpan.orgE<gt>.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-enumvec does not process bad values.
+C<enumvec> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1677,7 +1958,16 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (v(M,N); indx [o]k(N))
+ Signature: (v(M,N); indx [o]k(N))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $k = enumvecg($v);
+ enumvecg($v, $k);  # all arguments given
+ $k = $v->enumvecg; # method call
+ $v->enumvecg($k);
 
 =for ref
 
@@ -1693,9 +1983,13 @@ Basically does the same thing as:
 
 Contributed by Bryan Jurish E<lt>moocow@cpan.orgE<gt>.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-enumvecg does not process bad values.
+C<enumvecg> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1714,13 +2008,22 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (find(M); which(M,N); indx [o]found())
+ Signature: (find(M); which(M,N); indx [o]found())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $found = vsearchvec($find, $which);
+ vsearchvec($find, $which, $found);  # all arguments given
+ $found = $find->vsearchvec($which); # method call
+ $find->vsearchvec($which, $found);
 
 =for ref
 
 Routine for searching N-dimensional values - akin to vsearch() for vectors.
 
-=for usage
+=for example
 
  $found   = vsearchvec($find, $which);
  $nearest = $which->dice_axis(1,$found);
@@ -1736,9 +2039,13 @@ returned.
 See also: L</vsearch>.
 Contributed by Bryan Jurish E<lt>moocow@cpan.orgE<gt>.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-vsearchvec does not process bad values.
+C<vsearchvec> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1757,7 +2064,16 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(M,NA); b(M,NB); [o]c(M,NC=CALC($SIZE(NA) + $SIZE(NB))); indx [o]nc())
+ Signature: (a(M,NA); b(M,NB); [o]c(M,NC=CALC($SIZE(NA) + $SIZE(NB))); indx [o]nc())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ ($c, $nc) = unionvec($a, $b);
+ unionvec($a, $b, $c, $nc);    # all arguments given
+ ($c, $nc) = $a->unionvec($b); # method call
+ $a->unionvec($b, $c, $nc);
 
 =for ref
 
@@ -1771,9 +2087,13 @@ and returns the sliced PDL.
 
 Contributed by Bryan Jurish E<lt>moocow@cpan.orgE<gt>.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-unionvec does not process bad values.
+C<unionvec> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1782,7 +2102,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1769 "lib/PDL/Primitive.pd"
+#line 1708 "lib/PDL/Primitive.pd"
  sub PDL::unionvec {
    my ($a,$b,$c,$nc) = @_;
    $c = PDL->null if (!defined($nc));
@@ -1791,7 +2111,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
    return ($c,$nc) if (wantarray);
    return $c->slice(",0:".($nc->max-1));
  }
-#line 1795 "lib/PDL/Primitive.pm"
+#line 2115 "lib/PDL/Primitive.pm"
 
 *unionvec = \&PDL::unionvec;
 
@@ -1804,7 +2124,16 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(M,NA); b(M,NB); [o]c(M,NC=CALC(PDLMIN($SIZE(NA),$SIZE(NB)))); indx [o]nc())
+ Signature: (a(M,NA); b(M,NB); [o]c(M,NC=CALC(PDLMIN($SIZE(NA),$SIZE(NB)))); indx [o]nc())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ ($c, $nc) = intersectvec($a, $b);
+ intersectvec($a, $b, $c, $nc);    # all arguments given
+ ($c, $nc) = $a->intersectvec($b); # method call
+ $a->intersectvec($b, $c, $nc);
 
 =for ref
 
@@ -1817,9 +2146,13 @@ and returns the sliced PDL.
 
 Contributed by Bryan Jurish E<lt>moocow@cpan.orgE<gt>.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-intersectvec does not process bad values.
+C<intersectvec> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1828,7 +2161,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1828 "lib/PDL/Primitive.pd"
+#line 1767 "lib/PDL/Primitive.pd"
  sub PDL::intersectvec {
    my ($a,$b,$c,$nc) = @_;
    $c = PDL->null if (!defined($c));
@@ -1840,7 +2173,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 	   ? $c->slice(",0:".($nc_max-1))
 	   : $c->reshape($c->dim(0), 0, ($c->dims)[2..($c->ndims-1)]));
  }
-#line 1844 "lib/PDL/Primitive.pm"
+#line 2177 "lib/PDL/Primitive.pm"
 
 *intersectvec = \&PDL::intersectvec;
 
@@ -1853,7 +2186,16 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(M,NA); b(M,NB); [o]c(M,NC=CALC($SIZE(NA))); indx [o]nc())
+ Signature: (a(M,NA); b(M,NB); [o]c(M,NC=CALC($SIZE(NA))); indx [o]nc())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ ($c, $nc) = setdiffvec($a, $b);
+ setdiffvec($a, $b, $c, $nc);    # all arguments given
+ ($c, $nc) = $a->setdiffvec($b); # method call
+ $a->setdiffvec($b, $c, $nc);
 
 =for ref
 
@@ -1867,9 +2209,13 @@ and returns the sliced PDL.
 
 Contributed by Bryan Jurish E<lt>moocow@cpan.orgE<gt>.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-setdiffvec does not process bad values.
+C<setdiffvec> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1878,7 +2224,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1883 "lib/PDL/Primitive.pd"
+#line 1822 "lib/PDL/Primitive.pd"
  sub PDL::setdiffvec {
   my ($a,$b,$c,$nc) = @_;
   $c = PDL->null if (!defined($c));
@@ -1890,7 +2236,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 	  ? $c->slice(",0:".($nc_max-1))
 	  : $c->reshape($c->dim(0), 0, ($c->dims)[2..($c->ndims-1)]));
  }
-#line 1894 "lib/PDL/Primitive.pm"
+#line 2240 "lib/PDL/Primitive.pm"
 
 *setdiffvec = \&PDL::setdiffvec;
 
@@ -1903,7 +2249,16 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(NA); b(NB); [o]c(NC=CALC($SIZE(NA) + $SIZE(NB))); indx [o]nc())
+ Signature: (a(NA); b(NB); [o]c(NC=CALC($SIZE(NA) + $SIZE(NB))); indx [o]nc())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ ($c, $nc) = union_sorted($a, $b);
+ union_sorted($a, $b, $c, $nc);    # all arguments given
+ ($c, $nc) = $a->union_sorted($b); # method call
+ $a->union_sorted($b, $c, $nc);
 
 =for ref
 
@@ -1915,9 +2270,13 @@ In scalar context, reshapes $c() to the actual number of elements in the union a
 
 Contributed by Bryan Jurish E<lt>moocow@cpan.orgE<gt>.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-union_sorted does not process bad values.
+C<union_sorted> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1926,7 +2285,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1949 "lib/PDL/Primitive.pd"
+#line 1888 "lib/PDL/Primitive.pd"
  sub PDL::union_sorted {
    my ($a,$b,$c,$nc) = @_;
    $c = PDL->null if (!defined($c));
@@ -1935,7 +2294,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
    return ($c,$nc) if (wantarray);
    return $c->slice("0:".($nc->max-1));
  }
-#line 1939 "lib/PDL/Primitive.pm"
+#line 2298 "lib/PDL/Primitive.pm"
 
 *union_sorted = \&PDL::union_sorted;
 
@@ -1948,7 +2307,16 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(NA); b(NB); [o]c(NC=CALC(PDLMIN($SIZE(NA),$SIZE(NB)))); indx [o]nc())
+ Signature: (a(NA); b(NB); [o]c(NC=CALC(PDLMIN($SIZE(NA),$SIZE(NB)))); indx [o]nc())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ ($c, $nc) = intersect_sorted($a, $b);
+ intersect_sorted($a, $b, $c, $nc);    # all arguments given
+ ($c, $nc) = $a->intersect_sorted($b); # method call
+ $a->intersect_sorted($b, $c, $nc);
 
 =for ref
 
@@ -1960,9 +2328,13 @@ In scalar context, reshapes $c() to the actual number of elements in the interse
 
 Contributed by Bryan Jurish E<lt>moocow@cpan.orgE<gt>.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-intersect_sorted does not process bad values.
+C<intersect_sorted> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1971,7 +2343,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 2008 "lib/PDL/Primitive.pd"
+#line 1947 "lib/PDL/Primitive.pd"
  sub PDL::intersect_sorted {
    my ($a,$b,$c,$nc) = @_;
    $c = PDL->null if (!defined($c));
@@ -1983,7 +2355,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 	   ? $c->slice("0:".($nc_max-1))
 	   : $c->reshape(0, ($c->dims)[1..($c->ndims-1)]));
  }
-#line 1987 "lib/PDL/Primitive.pm"
+#line 2359 "lib/PDL/Primitive.pm"
 
 *intersect_sorted = \&PDL::intersect_sorted;
 
@@ -1996,7 +2368,16 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(NA); b(NB); [o]c(NC=CALC($SIZE(NA))); indx [o]nc())
+ Signature: (a(NA); b(NB); [o]c(NC=CALC($SIZE(NA))); indx [o]nc())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ ($c, $nc) = setdiff_sorted($a, $b);
+ setdiff_sorted($a, $b, $c, $nc);    # all arguments given
+ ($c, $nc) = $a->setdiff_sorted($b); # method call
+ $a->setdiff_sorted($b, $c, $nc);
 
 =for ref
 
@@ -2009,9 +2390,13 @@ In scalar context, reshapes $c() to the actual number of elements in the differe
 
 Contributed by Bryan Jurish E<lt>moocow@cpan.orgE<gt>.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-setdiff_sorted does not process bad values.
+C<setdiff_sorted> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2020,7 +2405,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 2064 "lib/PDL/Primitive.pd"
+#line 2003 "lib/PDL/Primitive.pd"
  sub PDL::setdiff_sorted {
    my ($a,$b,$c,$nc) = @_;
    $c = PDL->null if (!defined($c));
@@ -2032,7 +2417,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 	   ? $c->slice("0:".($nc_max-1))
 	   : $c->reshape(0, ($c->dims)[1..($c->ndims-1)]));
  }
-#line 2036 "lib/PDL/Primitive.pm"
+#line 2421 "lib/PDL/Primitive.pm"
 
 *setdiff_sorted = \&PDL::setdiff_sorted;
 
@@ -2045,7 +2430,16 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(M,N);b(M);float+ [o]vcos(N))
+ Signature: (a(M,N);b(M);float+ [o]vcos(N))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $vcos = vcos($a, $b);
+ vcos($a, $b, $vcos);  # all arguments given
+ $vcos = $a->vcos($b); # method call
+ $a->vcos($b, $vcos);
 
 Computes the vector cosine similarity of a dense vector $b() with respect
 to each row $a(*,i) of a dense PDL $a().  This is basically the same
@@ -2065,6 +2459,10 @@ vectors simultaneously:
   $vcos = vcos($a,$bx);   ##-- $vcos(i,j) ~ sim($a(,i),$b(,j))
 
 Contributed by Bryan Jurish E<lt>moocow@cpan.orgE<gt>.
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
@@ -2088,7 +2486,8 @@ will otherwise be ignored for computing the cosine similarity.
 
 =for sig
 
-  Signature: (a())
+ Signature: (a())
+ Types: (longlong)
 
 =for ref
 
@@ -2105,9 +2504,14 @@ clashing with Perl's built-in.
  srandom(); # uses current time
  srandom(5); # fixed number e.g. for testing
 
+=pod
+
+Does not broadcast.
+Can't use POSIX threads.
+
 =for bad
 
-srandom does not process bad values.
+C<srandom> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2116,10 +2520,10 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 2241 "lib/PDL/Primitive.pd"
+#line 2179 "lib/PDL/Primitive.pd"
 *srandom = \&PDL::srandom;
 sub PDL::srandom { PDL::_srandom_int($_[0] // PDL::Core::seed()) }
-#line 2123 "lib/PDL/Primitive.pm"
+#line 2527 "lib/PDL/Primitive.pm"
 
 *srandom = \&PDL::srandom;
 
@@ -2132,7 +2536,9 @@ sub PDL::srandom { PDL::_srandom_int($_[0] // PDL::Core::seed()) }
 
 =for sig
 
-  Signature: ([o] a())
+ Signature: ([o] a())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
 
 =for ref
 
@@ -2155,9 +2561,13 @@ If it has not been called yet, it will be with the current time.
 As of 2.062, the generator changed from Perl's generator to xoshiro256++
 (see L<https://prng.di.unimi.it/>).
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-random does not process bad values.
+C<random> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2166,7 +2576,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 2281 "lib/PDL/Primitive.pd"
+#line 2219 "lib/PDL/Primitive.pd"
 sub random { ref($_[0]) && ref($_[0]) ne 'PDL::Type' ? $_[0]->random : PDL->random(@_) }
 sub PDL::random {
    splice @_, 1, 0, double() if !ref($_[0]) and @_<=1;
@@ -2174,14 +2584,16 @@ sub PDL::random {
    PDL::_random_int($x);
    return $x;
 }
-#line 2178 "lib/PDL/Primitive.pm"
+#line 2588 "lib/PDL/Primitive.pm"
 
 
 =head2 randsym
 
 =for sig
 
-  Signature: ([o] a())
+ Signature: ([o] a())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
 
 =for ref
 
@@ -2201,9 +2613,13 @@ i.e. one can specify dimensions, types or give a template.
 You can use the PDL function L</srandom> to seed the random generator.
 If it has not been called yet, it will be with the current time.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-randsym does not process bad values.
+C<randsym> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2212,7 +2628,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 2325 "lib/PDL/Primitive.pd"
+#line 2263 "lib/PDL/Primitive.pd"
 sub randsym { ref($_[0]) && ref($_[0]) ne 'PDL::Type' ? $_[0]->randsym : PDL->randsym(@_) }
 sub PDL::randsym {
    splice @_, 1, 0, double() if !ref($_[0]) and @_<=1;
@@ -2221,7 +2637,7 @@ sub PDL::randsym {
    return $x;
 }
 
-#line 2336 "lib/PDL/Primitive.pd"
+#line 2274 "lib/PDL/Primitive.pd"
 
 =head2 grandom
 
@@ -2253,7 +2669,7 @@ sub PDL::grandom {
    return $x;
 }
 
-#line 2375 "lib/PDL/Primitive.pd"
+#line 2313 "lib/PDL/Primitive.pd"
 
 =head2 vsearch
 
@@ -2399,14 +2815,15 @@ sub vsearch {
 }
 
 *PDL::vsearch = \&vsearch;
-#line 2403 "lib/PDL/Primitive.pm"
+#line 2819 "lib/PDL/Primitive.pm"
 
 
 =head2 vsearch_sample
 
 =for sig
 
-  Signature: (vals(); x(n); indx [o]idx())
+ Signature: (vals(); x(n); indx [o]idx())
+ Types: (float double ldouble)
 
 =for ref
 
@@ -2464,6 +2881,10 @@ for events and want to generate indices to events:
 It is possible to use the L<cumusumover|PDL::Ufunc/cumusumover>
 function to obtain cumulative probabilities from absolute probabilities.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
 bad values in vals() result in bad values in idx()
@@ -2484,7 +2905,8 @@ bad values in vals() result in bad values in idx()
 
 =for sig
 
-  Signature: (vals(); x(n); indx [o]idx())
+ Signature: (vals(); x(n); indx [o]idx())
+ Types: (float double ldouble)
 
 =for ref
 
@@ -2538,6 +2960,10 @@ If all elements of C<$x> are equal,
 If C<$x> contains duplicated elements, I<I> is the index of the
 leftmost (by index in array) duplicate if I<V> matches.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
 bad values in vals() result in bad values in idx()
@@ -2558,7 +2984,8 @@ bad values in vals() result in bad values in idx()
 
 =for sig
 
-  Signature: (vals(); x(n); indx [o]idx())
+ Signature: (vals(); x(n); indx [o]idx())
+ Types: (float double ldouble)
 
 =for ref
 
@@ -2612,6 +3039,10 @@ If all elements of C<$x> are equal,
 If C<$x> contains duplicated elements, I<I> is the index of the
 leftmost (by index in array) duplicate if I<V> matches.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
 bad values in vals() result in bad values in idx()
@@ -2632,7 +3063,8 @@ bad values in vals() result in bad values in idx()
 
 =for sig
 
-  Signature: (vals(); x(n); indx [o]idx())
+ Signature: (vals(); x(n); indx [o]idx())
+ Types: (float double ldouble)
 
 =for ref
 
@@ -2655,6 +3087,10 @@ duplicated values, I<I> may refer to any of them.
 
                    
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
 bad values in vals() result in bad values in idx()
@@ -2675,7 +3111,8 @@ bad values in vals() result in bad values in idx()
 
 =for sig
 
-  Signature: (vals(); x(n); indx [o]idx())
+ Signature: (vals(); x(n); indx [o]idx())
+ Types: (float double ldouble)
 
 =for ref
 
@@ -2727,6 +3164,10 @@ If all elements of C<$x> are equal,
 If C<$x> contains duplicated elements, I<I> is the index of the
 righmost (by index in array) duplicate if I<V> matches.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
 bad values in vals() result in bad values in idx()
@@ -2747,7 +3188,8 @@ bad values in vals() result in bad values in idx()
 
 =for sig
 
-  Signature: (vals(); x(n); indx [o]idx())
+ Signature: (vals(); x(n); indx [o]idx())
+ Types: (float double ldouble)
 
 =for ref
 
@@ -2799,6 +3241,10 @@ If all elements of C<$x> are equal,
 If C<$x> contains duplicated elements, I<I> is the index of the
 righmost (by index in array) duplicate if I<V> matches.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
 bad values in vals() result in bad values in idx()
@@ -2819,15 +3265,19 @@ bad values in vals() result in bad values in idx()
 
 =for sig
 
-  Signature: (!complex xi(); !complex x(n); y(n); [o] yi(); int [o] err())
+ Signature: (!complex xi(); !complex x(n); y(n); [o] yi(); int [o] err())
+ Types: (float ldouble cfloat cdouble cldouble double)
+
+=for usage
+
+ ($yi, $err) = interpolate($xi, $x, $y);
+ interpolate($xi, $x, $y, $yi, $err);    # all arguments given
+ ($yi, $err) = $xi->interpolate($x, $y); # method call
+ $xi->interpolate($x, $y, $yi, $err);
 
 =for ref
 
 routine for 1D linear interpolation
-
-=for usage
-
- ( $yi, $err ) = interpolate($xi, $x, $y)
 
 Given a set of points C<($x,$y)>, use linear interpolation
 to find the values C<$yi> at a set of points C<$xi>.
@@ -2850,6 +3300,10 @@ is printed rather than returning an error ndarray.
 Note that C<interpolate> can use complex values for C<$y> and C<$yi> but
 C<$x> and C<$xi> must be real.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
 needs major (?) work to handles bad values
@@ -2865,7 +3319,7 @@ needs major (?) work to handles bad values
 
 
 
-#line 3056 "lib/PDL/Primitive.pd"
+#line 2987 "lib/PDL/Primitive.pd"
 
 =head2 interpol
 
@@ -2901,7 +3355,7 @@ sub interpol ($$$;$) {
 } # sub: interpol()
 *PDL::interpol = \&interpol;
 
-#line 3094 "lib/PDL/Primitive.pd"
+#line 3025 "lib/PDL/Primitive.pd"
 
 =head2 interpND
 
@@ -3142,7 +3596,7 @@ sub PDL::interpND {
  }
 }
 
-#line 3341 "lib/PDL/Primitive.pd"
+#line 3272 "lib/PDL/Primitive.pd"
 
 =head2 one2nd
 
@@ -3178,7 +3632,7 @@ will not give the answer you expect.
 
 *one2nd = \&PDL::one2nd;
 sub PDL::one2nd {
-  barf "Usage: one2nd \$array \$indices\n" if @_ != 2;
+  barf "Usage: one2nd \$array, \$indices\n" if @_ != 2;
   my ($x, $ind)=@_;
   my @dimension=$x->dims;
   $ind = indx($ind);
@@ -3190,14 +3644,16 @@ sub PDL::one2nd {
   }
   return @index;
 }
-#line 3194 "lib/PDL/Primitive.pm"
+#line 3648 "lib/PDL/Primitive.pm"
 
 
 =head2 which
 
 =for sig
 
-  Signature: (mask(n); indx [o] inds(n); indx [o]lastout())
+ Signature: (mask(n); indx [o] inds(n); indx [o]lastout())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
 
 =for ref
 
@@ -3241,9 +3697,13 @@ L</whichND> returns N-D indices into a multidimensional PDL.
  pdl> $indx = which($x>6); p $indx
  [7 8 9]
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-which processes bad values.
+C<which> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3252,7 +3712,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 3472 "lib/PDL/Primitive.pd"
+#line 3405 "lib/PDL/Primitive.pd"
    sub which { my ($this,$out) = @_;
 		$this = $this->flat;
 		$out //= $this->nullcreate;
@@ -3261,7 +3721,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 		$lastoutmax ? $out->slice('0:'.($lastoutmax-1))->sever : empty(indx);
    }
    *PDL::which = \&which;
-#line 3265 "lib/PDL/Primitive.pm"
+#line 3725 "lib/PDL/Primitive.pm"
 
 *which = \&PDL::which;
 
@@ -3274,7 +3734,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (mask(n); indx [o] inds(n); indx [o]notinds(n); indx [o]lastout(); indx [o]lastoutn())
+ Signature: (mask(n); indx [o] inds(n); indx [o]notinds(n); indx [o]lastout(); indx [o]lastoutn())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
 
 =for ref
 
@@ -3295,9 +3757,15 @@ C<$c_i>.
  [5 6 7 8 9]
  [0 1 2 3 4]
 
+See also L</whichND_both> for the n-dimensional version.
+
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-which_both processes bad values.
+C<which_both> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3306,7 +3774,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 3489 "lib/PDL/Primitive.pd"
+#line 3422 "lib/PDL/Primitive.pd"
    sub which_both { my ($this,$outi,$outni) = @_;
 		$this = $this->flat;
 		$outi //= $this->nullcreate;
@@ -3319,7 +3787,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 		($outi, $lastoutnmax ? $outni->slice('0:'.($lastoutnmax-1))->sever : empty(indx));
    }
    *PDL::which_both = \&which_both;
-#line 3323 "lib/PDL/Primitive.pm"
+#line 3791 "lib/PDL/Primitive.pm"
 
 *which_both = \&PDL::which_both;
 
@@ -3332,17 +3800,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); [o]o(n))
+ Signature: (a(n); [o]o(n))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $o = whichover($a);
+ whichover($a, $o);      # all arguments given
+ $o = $a->whichover;     # method call
+ $a->whichover($o);
+ $a->inplace->whichover; # can be used inplace
+ whichover($a->inplace);
 
 =for ref
 
 Collects the coordinates of non-zero, non-bad values in each 1D mask in
-ndarray at the start of the output, and fills the rest with -1. Works
-inplace.
+ndarray at the start of the output, and fills the rest with -1.
 
 By using L<PDL::Slices/xchg> etc. it is possible to use I<any> dimension.
 
-=for usage
+=for example
 
   my $a = pdl q[3 4 2 3 2 3 1];
   my $b = $a->uniq;
@@ -3361,9 +3839,13 @@ By using L<PDL::Slices/xchg> etc. it is possible to use I<any> dimension.
   #  [ 1 -1 -1 -1 -1 -1 -1]
   # ]
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-whichover processes bad values.
+C<whichover> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3382,7 +3864,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (got(); expected(); sbyte [o] result(); double atol; double rtol)
+ Signature: (got(); expected(); sbyte [o] result(); double atol; double rtol)
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $result = approx_artol($got, $expected);                        # using defaults of atol=1e-06, rtol=0
+ $result = approx_artol($got, $expected, $atol);
+ $result = approx_artol($got, $expected, $atol, $rtol);
+ $result = approx_artol($got, $expected, $atol, $rtol, $result); # all arguments given
+ $result = $got->approx_artol($expected);                        # method call
+ $result = $got->approx_artol($expected, $atol);
+ $result = $got->approx_artol($expected, $atol, $rtol);
+ $result = $got->approx_artol($expected, $atol, $rtol, $result);
 
 =for ref
 
@@ -3401,6 +3896,10 @@ output) if both values are C<NaN>, and not otherwise.
 
 Adapted from code by Edward Baudrez, test changed from C<< < >> to C<< <= >>.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
 Handles bad values similarly to C<NaN>s, above. This includes if only
@@ -3417,7 +3916,7 @@ one of the two input ndarrays has their badflag true.
 
 
 
-#line 3622 "lib/PDL/Primitive.pd"
+#line 3554 "lib/PDL/Primitive.pd"
 
 =head2 where
 
@@ -3443,7 +3942,7 @@ While C<where> works OK for most N-dimensional cases, it does not
 broadcast properly over (for example) the (N+1)th dimension in data
 that is compared to an N-dimensional mask.  Use C<whereND> for that.
 
-=for usage
+=for example
 
  $i = $x->where($x+5 > 0); # $i contains those elements of $x
                            # where mask ($x+5 > 0) is 1
@@ -3471,7 +3970,7 @@ sub PDL::where :lvalue {
 }
 *where = \&PDL::where;
 
-#line 3678 "lib/PDL/Primitive.pd"
+#line 3610 "lib/PDL/Primitive.pd"
 
 =head2 where_both
 
@@ -3508,7 +4007,7 @@ sub PDL::where_both {
 }
 *where_both = \&PDL::where_both;
 
-#line 3716 "lib/PDL/Primitive.pd"
+#line 3648 "lib/PDL/Primitive.pd"
 
 =head2 whereND
 
@@ -3534,7 +4033,7 @@ to the original data PDLs, for the purpose of dataflow.
   $sdata = whereND $data, $mask
   ($s1, $s2, ..., $sn) = whereND $d1, $d2, ..., $dn, $mask
 
-  where
+where
 
     $data is M dimensional
     $mask is N < M dimensional
@@ -3591,7 +4090,37 @@ sub PDL::whereND :lvalue {
 }
 *whereND = \&PDL::whereND;
 
-#line 3801 "lib/PDL/Primitive.pd"
+=head2 whereND_both
+
+=for ref
+
+C<where_both> with support for ND masks and broadcasting
+
+This works like L</whichND_both>, but data-flowing slices
+rather than index-sets are returned.
+
+C<whereND_both> differs from C<where_both> in that the mask
+dimensionality is preserved which allows for
+proper broadcasting of the selection operation over
+higher dimensions.
+
+As with C<where_both> the output PDLs are still connected
+to the original data PDLs, for the purpose of dataflow.
+
+=for usage
+
+ ($match_vals, $non_match_vals) = whereND_both($pdl, $mask);
+
+=cut
+
+sub PDL::whereND_both :lvalue {
+  barf "Usage: whereND_both(\$pdl, \$mask)\n" if @_ != 2;
+  my ($arr, $mask) = @_;  # $mask has 0==false, 1==true
+  map $arr->indexND($_), PDL::whichND_both($mask);
+}
+*whereND_both = \&PDL::whereND_both;
+
+#line 3762 "lib/PDL/Primitive.pd"
 
 =head2 whichND
 
@@ -3653,6 +4182,21 @@ L<PDL::Slices/indexND> can be fed the coordinates to return the values.
 
 =cut
 
+sub _one2nd {
+  my ($mask, $ind) = @_;
+  my $ndims = my @mdims = $mask->dims;
+  # In the empty case, explicitly return the correct type of structured empty
+  return PDL->new_from_specification(indx, $ndims, 0) if !$ind->nelem;
+  my $mult = ones(indx, $ndims);
+  $mult->index($_+1) .= $mult->index($_) * $mdims[$_] for 0..$#mdims-1;
+  for my $i (0..$#mdims) {
+    my $s = $ind->index($i);
+    $s /= $mult->index($i);
+    $s %= $mdims[$i];
+  }
+  $ind;
+}
+
 *whichND = \&PDL::whichND;
 sub PDL::whichND {
   my $mask = PDL->topdl(shift);
@@ -3669,32 +4213,60 @@ sub PDL::whichND {
   }
 
   # Scalar context: generate an N-D index ndarray
-  return PDL->new_from_specification(indx,$mask->ndims,0) if !$mask->nelem;
-  return $mask ? pdl(indx,0) : PDL->new_from_specification(indx,0)
-    if !$mask->getndims;
-
-  my $ind = $mask->flat->which->dummy(0,$mask->getndims)->make_physical;
-  # In the empty case, explicitly return the correct type of structured empty
-  return PDL->new_from_specification(indx,$mask->ndims, 0) if !$ind->nelem;
-
-  my $mult = ones(indx, $mask->getndims);
-  my @mdims = $mask->dims;
-
-  for my $i (0..$#mdims-1) {
-   # use $tmp for 5.005_03 compatibility
-   (my $tmp = $mult->index($i+1)) .= $mult->index($i)*$mdims[$i];
-  }
-
-  for my $i (0..$#mdims) {
-   my($s) = $ind->index($i);
-   $s /= $mult->index($i);
-   $s %= $mdims[$i];
-  }
-
-  return $ind;
+  my $ndims = $mask->getndims;
+  return PDL->new_from_specification(indx,$ndims,0) if !$mask->nelem;
+  return $mask ? pdl(indx,0) : PDL->new_from_specification(indx,0) if !$ndims;
+  _one2nd($mask, $mask->flat->which->dummy(0,$ndims)->sever);
 }
 
-#line 3909 "lib/PDL/Primitive.pd"
+=head2 whichND_both
+
+=for ref
+
+Return the coordinates of non-zero values in a mask.
+
+=for usage
+
+Like L</which_both>, but returns the N-dimensional coordinates (like
+L</whichND>) of the nonzero, zero values in the mask PDL. The
+returned values arrive as an array-of-vectors suitable for use in
+L<indexND|PDL::Slices/indexND> or L<range|PDL::Slices/range>.
+Added in 2.099.
+
+ ($nonzero_coords, $zero_coords) = whichND_both($mask);
+
+SEE ALSO:
+
+L</which> finds coordinates of nonzero values in a 1-D mask.
+
+L</where> extracts values from a data PDL that are associated
+with nonzero values in a mask PDL.
+
+L<PDL::Slices/indexND> can be fed the coordinates to return the values.
+
+=for example
+
+ pdl> $s=sequence(10,10,3,4)
+ pdl> ($x, $y, $z, $w)=whichND($s == 203); p $x, $y, $z, $w
+ [3] [0] [2] [0]
+ pdl> print $s->at(list(cat($x,$y,$z,$w)))
+ 203
+
+=cut
+
+*whichND_both = \&PDL::whichND_both;
+sub PDL::whichND_both {
+  my $mask = PDL->topdl(shift);
+  return ((PDL->new_from_specification(indx,$mask->ndims,0))x2) if !$mask->nelem;
+  my $ndims = $mask->getndims;
+  if (!$ndims) {
+    my ($t, $f) = (pdl(indx,0), PDL->new_from_specification(indx,0));
+    return $mask ? ($t,$f) : ($f,$t);
+  }
+  map _one2nd($mask, $_->dummy(0,$ndims)->sever), $mask->flat->which_both;
+}
+
+#line 3913 "lib/PDL/Primitive.pd"
 
 =head2 setops
 
@@ -3875,7 +4447,7 @@ sub PDL::setops {
 
 }
 
-#line 4092 "lib/PDL/Primitive.pd"
+#line 4096 "lib/PDL/Primitive.pd"
 
 =head2 intersect
 
@@ -3906,14 +4478,23 @@ Find all numbers less that 100 that are of the form 2*y and 3*x
 *intersect = \&PDL::intersect;
 
 sub PDL::intersect { setops($_[0], 'AND', $_[1]) }
-#line 3910 "lib/PDL/Primitive.pm"
+#line 4482 "lib/PDL/Primitive.pm"
 
 
 =head2 pchip_chim
 
 =for sig
 
-  Signature: (x(n); f(n); [o]d(n); indx [o]ierr())
+ Signature: (x(n); f(n); [o]d(n); indx [o]ierr())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ ($d, $ierr) = pchip_chim($x, $f);
+ pchip_chim($x, $f, $d, $ierr);    # all arguments given
+ ($d, $ierr) = $x->pchip_chim($f); # method call
+ $x->pchip_chim($f, $d, $ierr);
 
 =for ref
 
@@ -3932,20 +4513,47 @@ and if the data are only piecewise monotonic, the interpolant
 will have an extremum at the switch points; for more control
 over these issues use L</pchip_chic>.
 
-F -- (input) array of dependent variable values to be
+References:
+
+1. F. N. Fritsch and J. Butland, A method for constructing
+local monotone piecewise cubic interpolants, SIAM
+Journal on Scientific and Statistical Computing 5, 2
+(June 1984), pp. 300-304.
+
+F. N. Fritsch and R. E. Carlson, Monotone piecewise
+cubic interpolation, SIAM Journal on Numerical Analysis
+17, 2 (April 1980), pp. 238-246.
+
+=pod
+
+=head3 Parameters
+
+=over
+
+=item x
+
+ordinate data
+
+=item f
+
+array of dependent variable values to be
 interpolated. F(I) is value corresponding to
 X(I). C<pchip_chim> is designed for monotonic data, but it will
 work for any F-array.  It will force extrema at points where
 monotonicity switches direction. If some other treatment of
 switch points is desired, DPCHIC should be used instead.
 
-D -- (output) array of derivative values at the data
+=item d
+
+array of derivative values at the data
 points.  If the data are monotonic, these values will
 determine a monotone cubic Hermite function.
 
-Error status returned by C<$ierr>:
+=item ierr
 
-=over 4
+Error status:
+
+=over
 
 =item *
 
@@ -3970,20 +4578,13 @@ monotonicity (data still valid).
 NOTE: The above errors are checked in the order listed,
 and following arguments have B<NOT> been validated.
 
-References:
+=back
 
-1. F. N. Fritsch and J. Butland, A method for constructing
-local monotone piecewise cubic interpolants, SIAM
-Journal on Scientific and Statistical Computing 5, 2
-(June 1984), pp. 300-304.
-
-F. N. Fritsch and R. E. Carlson, Monotone piecewise
-cubic interpolation, SIAM Journal on Numerical Analysis
-17, 2 (April 1980), pp. 238-246.
+Broadcasts over its inputs.
 
 =for bad
 
-pchip_chim does not process bad values.
+C<pchip_chim> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4002,9 +4603,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (sbyte ic(two=2); vc(two=2); mflag(); x(n); f(n);
+ Signature: (sbyte ic(two=2); vc(two=2); mflag(); x(n); f(n);
     [o]d(n); indx [o]ierr();
     [t]h(nless1=CALC($SIZE(n)-1)); [t]slope(nless1);)
+ Types: (float double ldouble)
+
+=for usage
+
+ ($d, $ierr) = pchip_chic($ic, $vc, $mflag, $x, $f);
+ pchip_chic($ic, $vc, $mflag, $x, $f, $d, $ierr);    # all arguments given
+ ($d, $ierr) = $ic->pchip_chic($vc, $mflag, $x, $f); # method call
+ $ic->pchip_chic($vc, $mflag, $x, $f, $d, $ierr);
 
 =for ref
 
@@ -4024,6 +4633,30 @@ using L</pchip_chim>.
 The resulting piecewise cubic Hermite function may be evaluated
 by L</pchip_chfe> or L</pchip_chfd>.
 
+References:
+
+1. F. N. Fritsch, Piecewise Cubic Hermite Interpolation
+Package, Report UCRL-87285, Lawrence Livermore National
+Laboratory, July 1982.  [Poster presented at the
+SIAM 30th Anniversary Meeting, 19-23 July 1982.]
+
+2. F. N. Fritsch and J. Butland, A method for constructing
+local monotone piecewise cubic interpolants, SIAM
+Journal on Scientific and Statistical Computing 5, 2
+(June 1984), pp. 300-304.
+
+3. F. N. Fritsch and R. E. Carlson, Monotone piecewise
+cubic interpolation, SIAM Journal on Numerical
+Analysis 17, 2 (April 1980), pp. 238-246.
+
+=pod
+
+=head3 Parameters
+
+=over
+
+=item ic
+
 The first and second elements of C<$ic> determine the boundary
 conditions at the start and end of the data respectively.
 If the value is 0, then the default condition, as used by
@@ -4032,7 +4665,7 @@ If greater than zero, no adjustment for monotonicity is made,
 otherwise if less than zero the derivative will be adjusted.
 The allowed magnitudes for C<ic(0)> are:
 
-=over 4
+=over
 
 =item *
 
@@ -4090,12 +4723,12 @@ set to 0 at all switch points. NOTES:
 
 =over
 
-item *
+=item *
 
 This will cause D to be set to zero at all switch points, thus
 forcing extrema there.
 
-item *
+=item *
 
 The result of using this option with the default boundary conditions
 will be identical to using DPCHIM, but will generally cost more
@@ -4104,7 +4737,13 @@ of different switch and/or boundary conditions.
 
 =back
 
-Set C<$mflag> to be non-zero to
+=item vc
+
+See ic for details
+
+=item mflag
+
+Set to non-zero to
 use a formula based on the 3-point difference formula at switch
 points. If C<$mflag E<gt> 0>, then the interpolant at switch points
 is forced to not deviate from the data by more than C<$mflag*dfloc>,
@@ -4112,26 +4751,34 @@ where C<dfloc> is the maximum of the change of C<$f> on this interval
 and its two immediate neighbours.
 If C<$mflag E<lt> 0>, no such control is to be imposed.
 
-X -- (input) array of independent variable values.  The
+=item x
+
+array of independent variable values.  The
 elements of X must be strictly increasing:
 
            X(I-1) .LT. X(I),  I = 2(1)N.
 
 (Error return if not.)
 
-F -- (input) array of dependent variable values to be
+=item f
+
+array of dependent variable values to be
 interpolated. F(I) is value corresponding to X(I).
 
-D -- (output) array of derivative values at the data
+=item d
+
+array of derivative values at the data
 points. These values will determine a monotone cubic
 Hermite function on each subinterval on which the data
 are monotonic, except possibly adjacent to switches in
 monotonicity. The value corresponding to X(I) is stored in D(I).
 No other entries in D are changed.
 
-Error status returned by C<$ierr>:
+=item ierr
 
-=over 4
+Error status:
+
+=over
 
 =item *
 
@@ -4181,25 +4828,13 @@ for monotonicity.
 NOTE:  The above errors are checked in the order listed,
 and following arguments have B<NOT> been validated.
 
-References:
+=back
 
-1. F. N. Fritsch, Piecewise Cubic Hermite Interpolation
-Package, Report UCRL-87285, Lawrence Livermore National
-Laboratory, July 1982.  [Poster presented at the
-SIAM 30th Anniversary Meeting, 19-23 July 1982.]
-
-2. F. N. Fritsch and J. Butland, A method for constructing
-local monotone piecewise cubic interpolants, SIAM
-Journal on Scientific and Statistical Computing 5, 2
-(June 1984), pp. 300-304.
-
-3. F. N. Fritsch and R. E. Carlson, Monotone piecewise
-cubic interpolation, SIAM Journal on Numerical
-Analysis 17, 2 (April 1980), pp. 238-246.
+Broadcasts over its inputs.
 
 =for bad
 
-pchip_chic does not process bad values.
+C<pchip_chic> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4218,10 +4853,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (sbyte ic(two=2); vc(two=2); x(n); f(n);
+ Signature: (sbyte ic(two=2); vc(two=2); x(n); f(n);
     [o]d(n); indx [o]ierr();
     [t]dx(n); [t]dy_dx(n);
   )
+ Types: (float double ldouble)
+
+=for usage
+
+ ($d, $ierr) = pchip_chsp($ic, $vc, $x, $f);
+ pchip_chsp($ic, $vc, $x, $f, $d, $ierr);    # all arguments given
+ ($d, $ierr) = $ic->pchip_chsp($vc, $x, $f); # method call
+ $ic->pchip_chsp($vc, $x, $f, $d, $ierr);
 
 =for ref
 
@@ -4235,11 +4878,22 @@ The resulting values - C<$x,$f,$d> - can
 be used in all the functions which expect a cubic
 Hermite function, including L</pchip_bvalu>.
 
-The first and second elements of C<$ic> determine the boundary
+References: Carl de Boor, A Practical Guide to Splines, Springer-Verlag,
+New York, 1978, pp. 53-59.
+
+=pod
+
+=head3 Parameters
+
+=over
+
+=item ic
+
+The first and second elements determine the boundary
 conditions at the start and end of the data respectively.
 The allowed values for C<ic(0)> are:
 
-=over 4
+=over
 
 =item *
 
@@ -4273,9 +4927,15 @@ for C<$ic>.
 
 NOTES: For the "natural" boundary condition, use IC(n)=2 and VC(n)=0.
 
-Error status returned by C<$ierr>:
+=item vc
 
-=over 4
+See ic for details
+
+=item ierr
+
+Error status:
+
+=over
 
 =item *
 
@@ -4317,12 +4977,13 @@ for the interior derivative values.
 
 =back
 
-References: Carl de Boor, A Practical Guide to Splines, Springer-Verlag,
-New York, 1978, pp. 53-59.
+=back
+
+Broadcasts over its inputs.
 
 =for bad
 
-pchip_chsp does not process bad values.
+C<pchip_chsp> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4341,8 +5002,16 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(n); f(n); d(n); xe(ne);
+ Signature: (x(n); f(n); d(n); xe(ne);
     [o] fe(ne); [o] de(ne); indx [o] ierr(); int [o] skip())
+ Types: (float double ldouble)
+
+=for usage
+
+ ($fe, $de, $ierr, $skip) = pchip_chfd($x, $f, $d, $xe);
+ pchip_chfd($x, $f, $d, $xe, $fe, $de, $ierr, $skip);    # all arguments given
+ ($fe, $de, $ierr, $skip) = $x->pchip_chfd($f, $d, $xe); # method call
+ $x->pchip_chfd($f, $d, $xe, $fe, $de, $ierr, $skip);
 
 =for ref
 
@@ -4355,31 +5024,48 @@ L</pchip_chim> - evaluate the function (C<$fe>) and
 derivative (C<$de>) at a set of points (C<$xe>).
 If function values alone are required, use L</pchip_chfe>.
 
-Set C<skip> to 1 to skip checks on the input data.
-This will save time in case these checks have already
-been performed (say, in L</pchip_chim> or L</pchip_chic>).
-Will be set to TRUE on normal return.
+=pod
 
-XE -- (input) array of points at which the functions are to
+=head3 Parameters
+
+=over
+
+=item xe
+
+array of points at which the functions are to
 be evaluated. NOTES:
 
-  1. The evaluation will be most efficient if the elements
-     of XE are increasing relative to X;
-     that is,   XE(J) .GE. X(I)
-     implies    XE(K) .GE. X(I),  all K.GE.J .
-  2. If any of the XE are outside the interval [X(1),X(N)],
-     values are extrapolated from the nearest extreme cubic,
-     and a warning error is returned.
+=over
 
-FE -- (output) array of values of the cubic Hermite
+=item 1
+
+The evaluation will be most efficient if the elements
+of XE are increasing relative to X;
+that is,   XE(J) .GE. X(I)
+implies    XE(K) .GE. X(I),  all K.GE.J .
+
+=item 2
+
+If any of the XE are outside the interval [X(1),X(N)],
+values are extrapolated from the nearest extreme cubic,
+and a warning error is returned.
+
+=back
+
+=item fe
+
+array of values of the cubic Hermite
 function defined by  N, X, F, D  at the points  XE.
 
-DE -- (output) array of values of the first derivative of
-the same function at the points  XE.
+=item de
 
-Error status returned by C<$ierr>:
+array of values of the first derivative of the same function at the points  XE.
 
-=over 4
+=item ierr
+
+Error status:
+
+=over
 
 =item *
 
@@ -4409,9 +5095,20 @@ which should never happen.
 
 =back
 
+=item skip
+
+Set to 1 to skip checks on the input data.
+This will save time in case these checks have already
+been performed (say, in L</pchip_chim> or L</pchip_chic>).
+Will be set to TRUE on normal return.
+
+=back
+
+Broadcasts over its inputs.
+
 =for bad
 
-pchip_chfd does not process bad values.
+C<pchip_chfd> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4430,8 +5127,16 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(n); f(n); d(n); xe(ne);
+ Signature: (x(n); f(n); d(n); xe(ne);
     [o] fe(ne); indx [o] ierr(); int [o] skip())
+ Types: (float double ldouble)
+
+=for usage
+
+ ($fe, $ierr, $skip) = pchip_chfe($x, $f, $d, $xe);
+ pchip_chfe($x, $f, $d, $xe, $fe, $ierr, $skip);    # all arguments given
+ ($fe, $ierr, $skip) = $x->pchip_chfe($f, $d, $xe); # method call
+ $x->pchip_chfe($f, $d, $xe, $fe, $ierr, $skip);
 
 =for ref
 
@@ -4444,42 +5149,60 @@ L</pchip_chim> - evaluate the function (C<$fe>) at
 a set of points (C<$xe>).
 If derivative values are also required, use L</pchip_chfd>.
 
-X -- (input) array of independent variable values.  The
+=pod
+
+=head3 Parameters
+
+=over
+
+=item x
+
+array of independent variable values.  The
 elements of X must be strictly increasing:
 
            X(I-1) .LT. X(I),  I = 2(1)N.
 
 (Error return if not.)
 
-F -- (input) array of function values.  F(I) is
-the value corresponding to X(I).
+=item f
 
-D -- (input) array of derivative values.  D(I)
-is the value corresponding to X(I).
+array of function values.  F(I) is the value corresponding to X(I).
 
-Set C<skip> to 1 to skip checks on the input data.
-This will save time in case these checks have already
-been performed (say, in L</pchip_chim> or L</pchip_chic>).
-Will be set to TRUE on normal return.
+=item d
 
-XE -- (input) array of points at which the function is to
-      be evaluated.
+array of derivative values.  D(I) is the value corresponding to X(I).
 
- NOTES:
-  1. The evaluation will be most efficient if the elements
-     of XE are increasing relative to X;
-     that is,   XE(J) .GE. X(I)
-     implies    XE(K) .GE. X(I),  all K.GE.J .
-  2. If any of the XE are outside the interval [X(1),X(N)],
-     values are extrapolated from the nearest extreme cubic,
-     and a warning error is returned.
+=item xe
 
-FE -- (output) array of values of the cubic Hermite
+array of points at which the function is to be evaluated. NOTES:
+
+=over
+
+=item 1
+
+The evaluation will be most efficient if the elements
+of XE are increasing relative to X;
+that is,   XE(J) .GE. X(I)
+implies    XE(K) .GE. X(I),  all K.GE.J .
+
+=item 2
+
+If any of the XE are outside the interval [X(1),X(N)],
+values are extrapolated from the nearest extreme cubic,
+and a warning error is returned.
+
+=back
+
+=item fe
+
+array of values of the cubic Hermite
 function defined by  N, X, F, D  at the points  XE.
 
-Error status returned by C<$ierr>:
+=item ierr
 
-=over 4
+Error status returned by C<$>:
+
+=over
 
 =item *
 
@@ -4508,9 +5231,20 @@ E<gt>0 if extrapolation was performed at C<ierr> points
 NOTE:  The above errors are checked in the order listed,
 and following arguments have B<NOT> been validated.
 
+=item skip
+
+Set to 1 to skip checks on the input data.
+This will save time in case these checks have already
+been performed (say, in L</pchip_chim> or L</pchip_chic>).
+Will be set to TRUE on normal return.
+
+=back
+
+Broadcasts over its inputs.
+
 =for bad
 
-pchip_chfe does not process bad values.
+C<pchip_chfe> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4529,42 +5263,61 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(n); f(n); d(n); la(); lb();
+ Signature: (x(n); f(n); d(n); la(); lb();
     [o]ans(); indx [o]ierr(); int [o]skip())
+ Types: (float double ldouble)
+
+=for usage
+
+ ($ans, $ierr, $skip) = pchip_chia($x, $f, $d, $la, $lb);
+ pchip_chia($x, $f, $d, $la, $lb, $ans, $ierr, $skip);    # all arguments given
+ ($ans, $ierr, $skip) = $x->pchip_chia($f, $d, $la, $lb); # method call
+ $x->pchip_chia($f, $d, $la, $lb, $ans, $ierr, $skip);
 
 =for ref
 
 Integrate (x,f(x)) over arbitrary limits.
 
 Evaluate the definite integral of a piecewise
-cubic Hermite function over an arbitrary interval,
-given by C<[$la,$lb]>.
+cubic Hermite function over an arbitrary interval, given by C<[$la,$lb]>.
 
-X -- (input) array of independent variable values.  The elements
+=pod
+
+=head3 Parameters
+
+=over
+
+=item x
+
+array of independent variable values.  The elements
 of X must be strictly increasing (error return if not):
 
            X(I-1) .LT. X(I),  I = 2(1)N.
 
-F -- (input) array of function values. F(I) is the value
-corresponding to X(I).
+=item f
 
-C<$d> should contain the derivative values,
-computed by L</pchip_chim>.
-See L</pchip_chid> if the integration limits are
-data points.
+array of function values. F(I) is the value corresponding to X(I).
 
-Set C<skip> to 1 to skip checks on the input data.
-This will save time in case these checks have already
-been performed (say, in L</pchip_chim> or L</pchip_chic>).
-Will be set to TRUE on return with IERR E<gt>= 0.
+=item d
+
+should contain the derivative values, computed by L</pchip_chim>.
+See L</pchip_chid> if the integration limits are data points.
+
+=item la
 
 The values of C<$la> and C<$lb> do not have
 to lie within C<$x>, although the resulting integral
 value will be highly suspect if they are not.
 
-Error status returned by C<$ierr>:
+=item lb
 
-=over 4
+See la
+
+=item ierr
+
+Error status:
+
+=over
 
 =item *
 
@@ -4598,9 +5351,20 @@ which should never happen.
 
 =back
 
+=item skip
+
+Set to 1 to skip checks on the input data.
+This will save time in case these checks have already
+been performed (say, in L</pchip_chim> or L</pchip_chic>).
+Will be set to TRUE on return with IERR E<gt>= 0.
+
+=back
+
+Broadcasts over its inputs.
+
 =for bad
 
-pchip_chia does not process bad values.
+C<pchip_chia> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4619,16 +5383,22 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(n); f(n); d(n);
+ Signature: (x(n); f(n); d(n);
     indx ia(); indx ib();
     [o]ans(); indx [o]ierr(); int [o]skip())
+ Types: (float double ldouble)
+
+=for usage
+
+ ($ans, $ierr, $skip) = pchip_chid($x, $f, $d, $ia, $ib);
+ pchip_chid($x, $f, $d, $ia, $ib, $ans, $ierr, $skip);    # all arguments given
+ ($ans, $ierr, $skip) = $x->pchip_chid($f, $d, $ia, $ib); # method call
+ $x->pchip_chid($f, $d, $ia, $ib, $ans, $ierr, $skip);
 
 =for ref
 
 Evaluate the definite integral of a piecewise cubic Hermite function
 over an interval whose endpoints are data points.
-
-=for usage
 
 Evaluate the definite integral of a a piecewise cubic Hermite
 function between C<x($ia)> and C<x($ib)>.
@@ -4636,34 +5406,48 @@ function between C<x($ia)> and C<x($ib)>.
 See L</pchip_chia> for integration between arbitrary
 limits.
 
-X -- (input) array of independent variable values.  The
+=pod
+
+=head3 Parameters
+
+=over
+
+=item x
+
+array of independent variable values.  The
 elements of X must be strictly increasing:
 
            X(I-1) .LT. X(I),  I = 2(1)N.
 
 (Error return if not.)
 
+It is a fatal error to pass in data with C<N> E<lt> 2.
+
+=item f
+
+array of function values.  F(I) is the value corresponding to X(I).
+
+=item d
+
+should contain the derivative values, computed by L</pchip_chim>.
+
+=item ia
+
 IA,IB -- (input) indices in X-array for the limits of integration.
 both must be in the range [0,N-1] (this is different from the Fortran
 version) - error return if not. No restrictions on their relative
 values.
 
-F -- (input) array of function values.  F(I) is
-the value corresponding to X(I).
+=item ib
 
-C<$d> should contain the derivative values, computed by L</pchip_chim>.
+See ia for details
 
-Set C<skip> to 1 to skip checks on the input data.
-This will save time in case these checks have already
-been performed (say, in L</pchip_chim> or L</pchip_chic>).
-Will be set to TRUE on return with IERR of 0 or -4.
+=item ierr
 
-It is a fatal error to pass in data with C<N> E<lt> 2.
-
-Error status returned by C<$ierr> - this will be set, but an exception
+Error status - this will be set, but an exception
 will also be thrown:
 
-=over 4
+=over
 
 =item *
 
@@ -4683,9 +5467,20 @@ will also be thrown:
 NOTE: The above errors are checked in the order listed, and following
 arguments have B<NOT> been validated.
 
+=item skip
+
+Set to 1 to skip checks on the input data.
+This will save time in case these checks have already
+been performed (say, in L</pchip_chim> or L</pchip_chic>).
+Will be set to TRUE on return with IERR of 0 or -4.
+
+=back
+
+Broadcasts over its inputs.
+
 =for bad
 
-pchip_chid does not process bad values.
+C<pchip_chid> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4704,9 +5499,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(n); f(n); d(n); sbyte knotyp();
+ Signature: (x(n); f(n); d(n); sbyte knotyp();
     [o]t(nknots=CALC(2*$SIZE(n)+4));
     [o]bcoef(ndim=CALC(2*$SIZE(n))); indx [o]ierr())
+ Types: (float double ldouble)
+
+=for usage
+
+ ($t, $bcoef, $ierr) = pchip_chbs($x, $f, $d, $knotyp);
+ pchip_chbs($x, $f, $d, $knotyp, $t, $bcoef, $ierr);    # all arguments given
+ ($t, $bcoef, $ierr) = $x->pchip_chbs($f, $d, $knotyp); # method call
+ $x->pchip_chbs($f, $d, $knotyp, $t, $bcoef, $ierr);
 
 =for ref
 
@@ -4729,19 +5532,50 @@ input arguments N, X are B<not> checked for validity.
 
 Restrictions/assumptions:
 
-   1. N.GE.2 .  (not checked)
-   2. X(i).LT.X(i+1), i=1,...,N .  (not checked)
-   4. KNOTYP.LE.2 .  (error return if not)
-  *6. T(2*k+1) = T(2*k) = X(k), k=1,...,N .  (not checked)
-     * Indicates this applies only if KNOTYP.LT.0 .
+=over
 
-C<f> is the array of dependent variable values.
+=item C<1>
+
+N.GE.2 .  (not checked)
+
+=item C<2>
+
+X(i).LT.X(i+1), i=1,...,N .  (not checked)
+
+=item C<4>
+
+KNOTYP.LE.2 .  (error return if not)
+
+=item C<6>
+
+T(2*k+1) = T(2*k) = X(k), k=1,...,N .  (not checked)
+
+* Indicates this applies only if KNOTYP.LT.0 .
+
+=back
+
+References: F. N. Fritsch, "Representations for parametric cubic
+splines," Computer Aided Geometric Design 6 (1989), pp.79-82.
+
+=pod
+
+=head3 Parameters
+
+=over
+
+=item f
+
+the array of dependent variable values.
 C<f(I)> is the value corresponding to C<x(I)>.
 
-C<d> is the array of derivative values at the data points.
+=item d
+
+the array of derivative values at the data points.
 C<d(I)> is the value corresponding to C<x(I)>.
 
-C<knotyp> is a flag which controls the knot sequence.
+=item knotyp
+
+flag which controls the knot sequence.
 The knot sequence C<t> is normally computed from C<$x>
 by putting a double knot at each C<x> and setting the end knot pairs
 according to the value of C<knotyp> (where C<m = ndim = 2*n>):
@@ -4772,12 +5606,9 @@ in a parametric setting.
 
 =back
 
-C<nknots> is the number of knots and may be changed by the routine.
-If C<knotyp E<gt>= 0>, C<nknots> will be set to C<ndim+4>,
-otherwise it is an input variable, and an error will occur if its
-value is not equal to C<ndim+4>.
+=item t
 
-C<t> is the array of C<2*n+4> knots for the B-representation
+the array of C<2*n+4> knots for the B-representation
 and may be changed by the routine.
 If C<knotyp E<gt>= 0>, C<t> will be changed so that the
 interior double knots are equal to the x-values and the
@@ -4786,13 +5617,15 @@ otherwise it is assumed that C<t> was set by a
 previous call (no check is made to verify that the data
 forms a legitimate knot sequence).
 
-C<BCOEF:OUT> is the array of 2*N B-spline coefficients.
-C<NDIM:OUT> is the dimension of the B-spline space.  (Set to 2*N.)
-C<KORD:OUT> is the order of the B-spline.  (Set to 4.)
+=item bcoef
 
-Error status returned by C<$ierr>:
+the array of 2*N B-spline coefficients.
 
-=over 4
+=item ierr
+
+Error status:
+
+=over
 
 =item *
 
@@ -4808,12 +5641,13 @@ Error status returned by C<$ierr>:
 
 =back
 
-References: F. N. Fritsch, "Representations for parametric cubic
-splines," Computer Aided Geometric Design 6 (1989), pp.79-82.
+=back
+
+Broadcasts over its inputs.
 
 =for bad
 
-pchip_chbs does not process bad values.
+C<pchip_chbs> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4832,16 +5666,22 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (t(nplusk); a(n); indx ideriv(); x();
+ Signature: (t(nplusk); a(n); indx ideriv(); x();
     [o]ans(); indx [o] inbv();
     [t] work(k3=CALC(3*($SIZE(nplusk)-$SIZE(n))));)
+ Types: (float double ldouble)
+
+=for usage
+
+ ($ans, $inbv) = pchip_bvalu($t, $a, $ideriv, $x);
+ pchip_bvalu($t, $a, $ideriv, $x, $ans, $inbv);    # all arguments given
+ ($ans, $inbv) = $t->pchip_bvalu($a, $ideriv, $x); # method call
+ $t->pchip_bvalu($a, $ideriv, $x, $ans, $inbv);
 
 =for ref
 
 Evaluate the B-representation of a B-spline at X for the
 function value or any of its derivatives.
-
-=for usage
 
 Evaluates the B-representation C<(T,A,N,K)> of a B-spline
 at C<X> for the function value on C<IDERIV = 0> or any of its
@@ -4854,41 +5694,51 @@ a fatal error message when C<X> is outside of this interval.
 To compute left derivatives or left limiting values at a
 knot C<T(I)>, replace C<N> by C<I-1> and set C<X=T(I)>, C<I=K+1,N+1>.
 
-=head3 Description of Arguments
-
-=head4 Input
-
-     T       - knot vector of length N+K
-     A       - B-spline coefficient vector of length N
-     N       - number of B-spline coefficients
-               N = sum of knot multiplicities-K
-     K       - order of the B-spline, K .GE. 1
-     IDERIV  - order of the derivative, 0 .LE. IDERIV .LE. K-1
-               IDERIV=0 returns the B-spline value
-     X       - argument, T(K) .LE. X .LE. T(N+1)
-     INBV    - an initialization parameter which must be set
-               to 0 (different from Fortran) the first time BVALU is called.
-               (PDL sets to 0 for you)
-
-=head4 Output
-
-     INBV    - INBV contains information for efficient process-
-               ing after the initial call and INBV must not
-               be changed by the user.  Distinct splines require
-               distinct INBV parameters.
-     WORK    - work vector of length 3*K.
-     BVALU   - value of the IDERIV-th derivative at X
-
-=head4 Error Conditions
-
-An improper input is a fatal error
-
 References: Carl de Boor, Package for calculating with B-splines,
 SIAM Journal on Numerical Analysis 14, 3 (June 1977), pp. 441-472.
 
+=pod
+
+=head3 Parameters
+
+=over
+
+=item t
+
+knot vector of length N+K
+
+=item a
+
+B-spline coefficient vector of length N,
+the number of B-spline coefficients; N = sum of knot multiplicities-K
+
+=item ideriv
+
+order of the derivative, 0 .LE. IDERIV .LE. K-1
+
+IDERIV=0 returns the B-spline value
+
+=item x
+
+      T(K) .LE. X .LE. T(N+1)
+
+=item ans
+
+value of the IDERIV-th derivative at X
+
+=item inbv
+
+contains information for efficient processing after the initial
+call and INBV must not
+be changed by the user.  Distinct splines require distinct INBV parameters.
+
+=back
+
+Broadcasts over its inputs.
+
 =for bad
 
-pchip_bvalu does not process bad values.
+C<pchip_bvalu> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4904,7 +5754,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 6255 "lib/PDL/Primitive.pd"
+#line 6328 "lib/PDL/Primitive.pd"
 
 =head1 AUTHOR
 
@@ -4921,7 +5771,7 @@ the copyright notice should be included in the file.
 Updated for CPAN viewing compatibility by David Mertens.
 
 =cut
-#line 4925 "lib/PDL/Primitive.pm"
+#line 5775 "lib/PDL/Primitive.pm"
 
 # Exit with OK status
 

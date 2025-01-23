@@ -6,17 +6,17 @@ use strict;
 use warnings;
 use feature 'signatures';
 
-use Carp;
-use List::Util qw( any first sum0 );
+use List::Util qw( any first sum0 uniq );
 use Encode qw( encode decode );
 use X11::XCB ':all';
 use X11::korgwm::Common;
 
 # Simplify object usage
 use Scalar::Util qw( refaddr );
-use overload '""' => sub {sprintf "%s [id:%d]", overload::StrVal($_[0]), $_[0]->{id} // "undef"};
+use overload '""' => sub { sprintf "%s[id:%d]", overload::StrVal($_[0]), $_[0]->{id} // "undef" };
 use overload '==' => sub { (refaddr($_[0]) // 0) == (refaddr($_[1]) // 0) };
 use overload '!=' => sub { (refaddr($_[0]) // 0) != (refaddr($_[1]) // 0) };
+use overload cmp => sub { (refaddr($_[0]) // 0) cmp (refaddr($_[1]) // 0) };
 
 # Internal class variables
 my $sid = 1;
@@ -30,19 +30,23 @@ sub new($class, $id) {
 }
 
 sub DESTROY($self) {
-    # Wanna free some resources? Do it inside Destroy handler: korgwm.pm/hide_window()
+    # Wanna free some resources? Do it inside Destroy handler: korgwm.pm/annihilate_window()
     1;
 }
 
 sub _get_property($wid, $prop_name, $prop_type='UTF8_STRING', $ret_length=8) {
-    my $aname = $X->atom(name => $prop_name)->id;
-    my $atype = $X->atom(name => $prop_type)->id;
+    my $aname = atom($prop_name);
+    my $atype = atom($prop_type);
     my $cookie = $X->get_property(0, $wid, $aname, $atype, 0, $ret_length);
+
     my $prop;
     eval { $prop = $X->get_property_reply($cookie->{sequence}); 1} or return undef;
     my $value = $prop ? $prop->{value} : undef;
+
+    # Convert to internal format
     $value = decode('UTF-8', $value) if defined $value and $prop_type eq 'UTF8_STRING';
     ($value) = unpack('L', $value) if defined $value and $prop_type eq 'WINDOW';
+
     return wantarray ? ($value, $prop) : $value;
 }
 
@@ -80,8 +84,9 @@ sub _class($wid) {
 }
 
 sub _title($wid) {
-    my $title = _get_property($wid, "_NET_WM_NAME", "UTF8_STRING", int($cfg->{title_max_len} / 4));
-    $title = _get_property($wid, "WM_NAME", "STRING", int($cfg->{title_max_len} / 4)) unless length $title;
+    # long_length is a 32-bit multiplies of data; UTF8 usually encodes a char up to 8 bytes, so multipler is 2:
+    my $title = _get_property($wid, "_NET_WM_NAME", "UTF8_STRING", 2 * $cfg->{title_max_len});
+    $title = _get_property($wid, "WM_NAME", "STRING", $cfg->{title_max_len}) unless length $title;
     $title;
 }
 
@@ -101,9 +106,9 @@ UNITCHECK {
         class
         configure_notify
         get_property
+        query_geometry
         title
         transient_for
-        query_geometry
         )) {
         *{__PACKAGE__ . "::$func"} = sub {
             my $self = shift;
@@ -115,6 +120,7 @@ UNITCHECK {
 
 sub resize_and_move($self, $x, $y, $w, $h, $bw=$cfg->{border_width}) {
     croak "Undefined window" unless $self->{id};
+    DEBUG8 and carp "resize_and_move($self, $x, $y, $w, $h, $bw)";
     @{ $self }{qw( real_x real_y real_w real_h real_bw )} = ($x, $y, $w, $h, $bw);
     _resize_and_move($self->{id}, $x, $y, $w, $h, $bw);
 }
@@ -173,6 +179,7 @@ sub _stack_place(@stack) {
     }
 }
 
+# NOTE most likely you want $self->select() instead of focus().  This one just restack windows and process focus
 sub focus($self) {
     croak "Undefined window" unless $self->{id};
 
@@ -189,7 +196,7 @@ sub focus($self) {
 
     # XXX Currently it's not supported, so croak
     if (@focus_screens != 1) {
-        warn "Bad window: $self tags: " . join " ", map { "$_->{screen}: tag #$_->{idx}" } $self->tags();
+        carp "Bad window: $self tags: " . join " ", map { "$_->{screen}: tag #$_->{idx}" } $self->tags();
         croak "Unimplemented focus for multiple screens (@focus_screens)" . join " ", map { $_->{id} } @focus_screens;
     }
 
@@ -273,7 +280,7 @@ sub reset_border($self) {
 
 sub update_title($self) {
     for my $screen ($self->screens) {
-        $screen->{panel}->title($self->title // "") if ($screen->{focus} // 0) == $self;
+        $screen->{panel}->title($self->title // "") if $self == $screen->{focus};
     }
 }
 
@@ -282,7 +289,7 @@ sub _hide($self) {
     # We do not actually unmap them anymore, just move out of screen and mark as '_hidden'.
     $self->{_hidden} = 1;
 
-    # Ask X11 to move it
+    # Ask X11 to move it left real_* intact
     $X->configure_window($self->{id}, CONFIG_WINDOW_X | CONFIG_WINDOW_Y, $self->{sid} * 4096, $visible_max_y * 2);
 }
 
@@ -291,10 +298,10 @@ sub hide($self) {
     $self->_hide();
 
     # Drop panel title
-    $_->{panel}->title() for grep { ($_->{focus} // 0) == $self } $self->screens();
+    $_->{panel}->title() for grep { $self == $_->{focus} } $self->screens();
 
     # Drop focus saving $self to $focus_prev
-    if ($self == ($focus->{window} // 0)) {
+    if ($self == $focus->{window}) {
         focus_prev_push($focus->{window});
         $focus->{window} = undef;
     }
@@ -303,7 +310,7 @@ sub hide($self) {
 sub show($self) {
     # Not using $self->move() to avoid garbage in real_*
     $X->configure_window($self->{id}, CONFIG_WINDOW_X | CONFIG_WINDOW_Y, @{ $self }{qw( x y )})
-        if $self->{floating} and $self->{_hidden};
+        if $self->{floating} and $self->{_hidden} and not $self->{maximized};
 
     # Map anyways as client could've unmapped on their own
     $X->map_window($self->{id});
@@ -341,15 +348,24 @@ sub screens($self) {
 
 # Recursively return all transient windows
 sub transients($self) {
-    my @siblings_xid = keys %{ $self->{siblings} };
-    return () unless @siblings_xid;
-    map { ($windows->{$_}->transients(), $windows->{$_}) } sort @siblings_xid;
+    my @children_xid = keys %{ $self->{children} };
+    return () unless @children_xid;
+    map { ($windows->{$_}->transients(), $windows->{$_}) } sort @children_xid;
+}
+
+# Returns true if $self is a transient for $grandparent with any nesting depth
+sub relative_for($self, $grandparent) {
+    return unless $grandparent and $self->{transient_for};
+    any { $self == $_ } $grandparent->transients();
 }
 
 # Toggles or sets a particular floating
 sub toggle_floating($self, $set_floating = undef) {
     # There is no way to disable floating for transient windows
     return if $self->{transient_for};
+
+    # Bypass maximized
+    return if $self->{maximized};
 
     return if defined $set_floating and $set_floating == ($self->{floating} // 0);
     $self->{floating} = defined $set_floating ? 1 : ! $self->{floating};
@@ -398,28 +414,69 @@ sub toggle_floating($self, $set_floating = undef) {
 
     @{ $self }{qw( x y w h )} = ($x, $y, $w, $h);
 
+    prevent_enter_notify();
+
     $self->resize_and_move($x, $y, $w, $h);
     $_->win_float($self, $self->{floating}) for $self->tags();
 }
 
-sub toggle_maximize($self, $action = undef) {
-    # Parse action: 0 => normal, 1 => fullscreen, undef => toggle
-    $action = $self->{maximized} ? 0 : 1 unless defined $action;
+# Set, unset or toggle 'maximize' for a window
+# Actions:
+# - 0 => set normal
+# - 1 => set fullscreen
+# - 2 => toggle them
+# Options:
+# - allow_invisible => do not skip windows on hidden tags
+sub toggle_maximize($self, $action, %opts) {
+    # Parse action: 0 => normal, 1 => fullscreen, 2 => toggle
+    $action = ! $self->{maximized} if $action == 2;
+
+    # Tag to operate with
+    my $tag;
+
+    # Flag if the window is actually invisible
+    my $invisible_win;
+
+    DEBUG5 and carp "toggle_maximize($self, $action, @{[%opts]})";
+
+    # Firstly we'll try to process toggle for visible window
+    my @visible_tags = $self->tags_visible();
+    croak "Maximizing a window on several visible tags is not implemented" if @visible_tags > 1;
+
+    if (@visible_tags == 1) {
+        # Got it, keep going
+        $tag = $visible_tags[0];
+    } else {
+        # No visible tags for the window found
+        # Give it another try if we allow invisible windows
+        if ($opts{allow_invisible}) {
+            # But this make sence only when $self has exactly one tag
+            my @tags = $self->tags();
+            if (@tags == 1) {
+                $tag = $tags[0];
+                $invisible_win = 1;
+            }
+        }
+
+        # Return if no tag found
+        return S_DEBUG(3, "Ignoring toggle_maximize($self, $action) for invisible window") unless $tag;
+        DEBUG4 and carp "Executing toggle_maximize($self, $action) for invisible window";
+    }
 
     # Set self property
     $self->{maximized} = !! $action;
 
-    # Check condition and get the tag
-    my @visible_tags = $self->tags_visible();
-    croak "Maximizing a window on several visible tags is not implemented" if @visible_tags > 1;
-    return unless @visible_tags; # ignore maximize requests for invisibe windows
-    my $tag = $visible_tags[0];
-
     # There is race condition creating new maximized windows like starting evince in a fullscreen mode
     # To avoid that we want to ignore FocusIn and EnterNotify for a short time
     # I also want to prevent EnterNotify unmaximizing a window to avoid focus switch, so calling it unconditionally
-    prevent_focus_in();
-    prevent_enter_notify();
+    unless ($invisible_win) {
+        prevent_focus_in();
+        prevent_enter_notify();
+    }
+
+    # Reflect the change to the client for ugly applications like Mozilla Firefox
+    $X->change_property(PROP_MODE_REPLACE, $self->{id}, atom("_NET_WM_STATE"), atom("ATOM"), 32,
+        $action ? (1, pack L => atom("_NET_WM_STATE_FULLSCREEN")) : (0, 0));
 
     # Execute toggle
     if ($action) {
@@ -430,9 +487,10 @@ sub toggle_maximize($self, $action = undef) {
         $_->_hide() for $tag->windows();
     } else {
         $tag->{max_window} = undef;
-        $self->resize_and_move(@{ $self }{qw( x y w h )});
+        $self->resize_and_move(@{ $self }{qw( x y w h )}) unless $invisible_win;
     }
-    $tag->show();
+
+    $tag->show() unless $invisible_win;
 }
 
 sub toggle_always_on($self) {
@@ -452,14 +510,14 @@ sub toggle_always_on($self) {
 }
 
 sub close($self) {
-    my $icccm_del_win = $X->atom(name => 'WM_DELETE_WINDOW')->id;
+    my $icccm_del_win = atom("WM_DELETE_WINDOW");
     my ($value, $prop) = _get_property($self->{id}, "WM_PROTOCOLS", "ATOM", 16);
     my $len = $prop->{value_len};
 
     # Use ICCCM to gently ask client to close the window
     if ($len and first { $_ == $icccm_del_win } unpack "L" x $len, $value) {
-        my $packed = pack('CCSLLLL', CLIENT_MESSAGE, 32, 0, $self->{id}, $X->atom(name => 'WM_PROTOCOLS')->id,
-            $X->atom(name => 'WM_DELETE_WINDOW')->id, TIME_CURRENT_TIME);
+        my $packed = pack('CCSLLLL', CLIENT_MESSAGE, 32, 0, $self->{id}, atom("WM_PROTOCOLS"),
+            atom("WM_DELETE_WINDOW"), TIME_CURRENT_TIME);
         $X->send_event(0, $self->{id}, EVENT_MASK_STRUCTURE_NOTIFY, $packed);
     } else {
         # XXX xcb_destroy_window() instead of kill?
@@ -503,15 +561,18 @@ sub urgency_set($self, $urgency = 1) {
 # High-level wrapper
 sub urgency_clear($self) {
     $self->urgency_set(0);
+
     for my $tag ($self->tags()) {
         delete $tag->{urgent_windows}->{$self};
         $tag->{screen}->{panel}->ws_set_urgent($tag->{idx} + 1, 0) unless keys %{ $tag->{urgent_windows} };
     }
+
+    $self->{urgent} = undef;
 }
 
 # High-level wrapper
 sub urgency_raise($self, $set_hint = undef) {
-    if (($focus->{window} // 0) == $self) {
+    if ($self == $focus->{window}) {
         return $self->urgency_clear();
     }
 
@@ -520,6 +581,20 @@ sub urgency_raise($self, $set_hint = undef) {
         $tag->{urgent_windows}->{$self} = undef;
         $tag->{screen}->{panel}->ws_set_urgent($tag->{idx} + 1, 1);
     }
+
+    $self->{urgent} = 1;
+}
+
+# Look up for a window by a list of possible classes and make it urgent
+sub urgent_by_class(@classes) {
+    my @found = uniq sort map { @$_ } grep defined, map { $cached_classes->{$_} }
+        uniq sort map lc, grep defined, @classes;
+
+    # We can surely call urgency_raise() only when there is a single window found
+    $found[0]->urgency_raise(1) if @found == 1;
+
+    # Returns found windows
+    @found;
 }
 
 sub warp_pointer($self) {
@@ -616,13 +691,46 @@ sub swap($self, $new) {
 sub size_hints_get($self) {
     my $hints = { flags => 0 };
 
-    my $req = $X->get_property(0, $self->{id}, ATOM_WM_NORMAL_HINTS, ATOM_WM_SIZE_HINTS, 0, 64);
+    my $req = $X->get_property(0, $self->{id}, atom("WM_NORMAL_HINTS"), atom("WM_SIZE_HINTS"), 0, 64);
     my $data = $X->get_property_reply($req->{sequence});
 
     return $hints unless defined $data->{value};
 
     @{ $hints }{ @wm_size_hints } = unpack($wm_size_hints, $data->{value});
     return $hints;
+}
+
+# Switch from anywhere to this window. See expose(), focus_prev() and mark_switch_window()
+# Returns:
+# 0 - no errors
+# 1 - some warnings
+# 2 - decided to silently skip
+# Options:
+# - bypass_prevent_enter_notify
+# - bypass_prevent_focus_in
+sub select($self, %opts) {
+    my @tags = $self->tags();
+    my $tag = shift @tags // ($self->{always_on} && $self->{always_on}->current_tag());
+    return carp "Window $self is visible on multiple tags, do not know how to select() it" if @tags;
+    return carp "Previous window $self has no tags and is not always_on" unless $tag;
+
+    # Do nothing if there is _another_ maximized window on that tag
+    return 2 if $self != ($tag->{max_window} // $self);
+
+    prevent_enter_notify() unless $opts{bypass_prevent_enter_notify};
+    prevent_focus_in() unless $opts{bypass_prevent_focus_in};
+
+    # Switch to a proper tag unless it is already active
+    unless (any { $tag == ($_->current_tag() // 0) } @screens) {
+        $tag->{screen}->{focus} = $self;
+        $tag->{screen}->tag_set_active($tag->{idx});
+        $tag->{screen}->refresh();
+    }
+
+    $self->focus();
+    $self->warp_pointer();
+
+    return 0;
 }
 
 1;

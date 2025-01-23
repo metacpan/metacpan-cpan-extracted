@@ -22,6 +22,7 @@ use DynaLoader;
 
 
 
+
 #line 7 "lib/PDL/IO/Misc.pd"
 
 use strict;
@@ -40,7 +41,7 @@ Some basic I/O functionality: tables, byte-swapping
  use PDL::IO::Misc;
 
 =cut
-#line 44 "lib/PDL/IO/Misc.pm"
+#line 45 "lib/PDL/IO/Misc.pm"
 
 
 =head1 FUNCTIONS
@@ -60,22 +61,33 @@ use PDL::Bad;
 use Carp;
 use Symbol qw/ gensym /;
 use List::Util;
-#line 64 "lib/PDL/IO/Misc.pm"
+#line 65 "lib/PDL/IO/Misc.pm"
 
 
 =head2 bswap2
 
 =for sig
 
-  Signature: ([io] x())
+ Signature: ([io] x())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ bswap2($x); # all arguments given
+ $x->bswap2; # method call
 
 =for ref
 
 Swaps pairs of bytes in argument x()
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-bswap2 does not process bad values.
+C<bswap2> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -94,15 +106,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io] x())
+ Signature: ([io] x())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ bswap4($x); # all arguments given
+ $x->bswap4; # method call
 
 =for ref
 
 Swaps quads of bytes in argument x()
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-bswap4 does not process bad values.
+C<bswap4> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -121,15 +144,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io] x())
+ Signature: ([io] x())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ bswap8($x); # all arguments given
+ $x->bswap8; # method call
 
 =for ref
 
 Swaps octets of bytes in argument x()
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-bswap8 does not process bad values.
+C<bswap8> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -148,15 +182,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io] x())
+ Signature: ([io] x())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ bswap12($x); # all arguments given
+ $x->bswap12; # method call
 
 =for ref
 
 Swaps 12s of bytes in argument x()
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-bswap12 does not process bad values.
+C<bswap12> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -175,15 +220,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io] x())
+ Signature: ([io] x())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ bswap16($x); # all arguments given
+ $x->bswap16; # method call
 
 =for ref
 
 Swaps 16s of bytes in argument x()
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-bswap16 does not process bad values.
+C<bswap16> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -202,15 +258,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io] x())
+ Signature: ([io] x())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ bswap24($x); # all arguments given
+ $x->bswap24; # method call
 
 =for ref
 
 Swaps 24s of bytes in argument x()
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-bswap24 does not process bad values.
+C<bswap24> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -229,15 +296,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io] x())
+ Signature: ([io] x())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ bswap32($x); # all arguments given
+ $x->bswap32; # method call
 
 =for ref
 
 Swaps 32s of bytes in argument x()
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-bswap32 does not process bad values.
+C<bswap32> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1351,14 +1429,15 @@ sub rcube {
 
       return $cube;
 }
-#line 1355 "lib/PDL/IO/Misc.pm"
+#line 1433 "lib/PDL/IO/Misc.pm"
 
 
 =head2 rasc
 
 =for sig
 
-  Signature: ([o] nums(n); int [o] ierr(n); PerlIO *fp; IV num => n)
+ Signature: ([o] nums(n); int [o] ierr(n); PerlIO *fp; IV num => n)
+ Types: (float double)
 
 =for ref
 
@@ -1384,9 +1463,13 @@ sub rcube {
   $imm = zeroes(float,20,2);
   $imm->rasc('test.num');
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-rasc does not process bad values.
+C<rasc> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1434,7 +1517,7 @@ separated from the PDL distribution, the copyright notice
 should be included in the file.
 
 =cut
-#line 1438 "lib/PDL/IO/Misc.pm"
+#line 1521 "lib/PDL/IO/Misc.pm"
 
 # Exit with OK status
 

@@ -14,7 +14,9 @@ use Text::xSV::Slurp;
 =head1 NAME
 
 Geo::Coder::Free::Local -
-Provides an interface to locations that you know yourself.
+Provides an interface to locations that you know yourself,
+based on locally known data,
+thereby giving a way to geocode locations using self-curated data instead of relying on external APIs.
 For example, I have found locations by using GPS apps on a smartphone and by
 inspecting GeoTagged photographs using
 L<https://github.com/nigelhorne/NJH-Snippets/blob/master/bin/geotag>
@@ -22,17 +24,18 @@ or by using the app GPSCF which are included here.
 
 =head1 VERSION
 
-Version 0.37
+Version 0.38
 
 =cut
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 
 use constant	LIBPOSTAL_UNKNOWN => 0;
 use constant	LIBPOSTAL_INSTALLED => 1;
 use constant	LIBPOSTAL_NOT_INSTALLED => -1;
 our $libpostal_is_installed = LIBPOSTAL_UNKNOWN;
 
+# Alternative mappings for ambiguous or inconsistent place names
 # See also lib/Geo/Coder/Free.pm
 our %alternatives = (
 	'ST LAWRENCE, THANET, KENT' => 'RAMSGATE, KENT',
@@ -55,6 +58,8 @@ Geo::Coder::Free::Local provides an interface to your own location data.
 =head1 METHODS
 
 =head2 new
+
+Initializes a geocoder object, loading the local data.
 
     $geocoder = Geo::Coder::Free::Local->new();
 
@@ -80,7 +85,7 @@ sub new
 	# TODO: since 'hoh' doesn't allow a CODEREF as a key,
 	#	I could build an hoh manually from this aoh,
 	#	it would make searching much quicker
-	return bless {
+	my $self = bless {
 		data => xsv_slurp(
 			shape => 'aoh',
 			text_csv => {
@@ -93,9 +98,33 @@ sub new
 			string => \join('', grep(!/^\s*(#|$)/, <DATA>))
 		)
 	}, $class;
+
+	# Build the hash-based index
+	foreach my $row (@{ $self->{data} }) {
+		my $key = lc(Geo::Location::Point->new($row)->as_string());
+		$self->{index}{$key} = $row;
+	}
+
+	# TODO:  Perhaps the cache can be prepopulated, or stored in less volitile location?
+	# The cache attribute stores normalized location strings as keys and Geo::Location::Point objects as values
+	return $self;
+}
+
+# Helper function to normalize location strings
+sub _normalize_location {
+    my $location = shift;
+    $location = lc($location);                 # Convert to lowercase
+    $location =~ s/^\s+|\s+$//g;               # Trim leading and trailing whitespace
+    $location =~ s/\s+/ /g;                    # Collapse multiple spaces
+    return $location;
 }
 
 =head2 geocode
+
+Performs the geocoding operation by matching an input location against the local data and attempting different strategies for parsing and resolving the address.
+
+Handles parsing of addresses based on location-specific rules, e.g., U.S., U.K., or Canada.
+Uses various parsers for country-specific address normalization.
 
     $location = $geocoder->geocode(location => $location);
 
@@ -146,37 +175,55 @@ sub geocode {
 
 	# Look for a quick match, we may get lucky
 	my $lc = lc($location);
-	if($lc =~ /(.+), usa$/) {
-		$lc = "$1, us";
-	}
-	foreach my $row(@{$self->{'data'}}) {
-		my $rc = Geo::Location::Point->new($row);
-		my $str = lc($rc->as_string());
+	$lc =~ s/,\susa$/, us/i;
 
-		# ::diag("Compare $str->$lc") if(($location =~ /MINSTER CEME/i) && ($str =~ /MINSTER CEME/i));
-		# ::diag("Compare $str->$lc");
-		# print "Compare $str->$lc\n";
-		if($str eq $lc) {
-			# This looks pointless and I can't recall why I put it in
-			# foreach my $column ('name', 'state_district') {
-				# if((!defined($rc->{$column})) && exists($rc->{$column})) {
-					# delete $rc->{$column};
-				# }
-			# }
-			# ::diag("$location: linear search suceeded");
-			return $rc;
-		}
-		if($str =~ /, us$/) {
-			if("${str}a" eq $lc) {
-				return $rc;
-			}
-		} elsif($lc =~ /(.+), (England|UK)$/i) {
-			if($str eq "$1, gb") {
-				return $rc;
-			}
-		}
+	# Check the cache first
+	if(exists $self->{cache}{$lc}) {
+		# ::diag("Found $lc in the cache");
+		return $self->{cache}{$lc};
 	}
-	# ::diag("$location: linear search failed");
+
+	# Use the hash-based index for a quick lookup
+	if(exists $self->{index}{$lc}) {
+		my $rc = Geo::Location::Point->new($self->{index}{$lc});
+
+		# Store the result in the cache for future requests
+		$self->{cache}{$lc} = $rc;
+
+		return $rc;
+	}
+	# ::diag("$location: hash search failed");
+
+	if(0) {
+		# Old linear search mode, now replaced by the hash-based index
+		foreach my $row(@{$self->{'data'}}) {
+			my $rc = Geo::Location::Point->new($row);
+			my $str = lc($rc->as_string());
+
+			# ::diag("Compare $str->$lc") if(($location =~ /MINSTER CEME/i) && ($str =~ /MINSTER CEME/i));
+			# ::diag("Compare $str->$lc");
+			# print "Compare $str->$lc\n";
+			if($str eq $lc) {
+				# This looks pointless and I can't recall why I put it in
+				# foreach my $column ('name', 'state_district') {
+					# if((!defined($rc->{$column})) && exists($rc->{$column})) {
+						# delete $rc->{$column};
+					# }
+				# }
+				# ::diag("$location: linear search suceeded");
+				return $rc;
+			}
+
+			if(($str =~ /, us$/) && ("${str}a" eq $lc)) {
+				return $rc;
+			}
+
+			if(($lc =~ /(.+), (England|UK)$/i) && ($str eq "$1, gb")) {
+				return $rc;
+			}
+		}
+		# ::diag("$location: linear search failed");
+	}
 
 	# ::diag(__PACKAGE__, ': ', __LINE__, ': ', $location);
 
@@ -252,10 +299,16 @@ sub geocode {
 			# ::diag(Data::Dumper->new([\%addr])->Dump());
 			# print Data::Dumper->new([\%addr])->Dump(), "\n";
 			if(my $rc = $self->_search(\%addr, ('number', 'road', 'city', 'state', 'country'))) {
+			        # Store the result in the cache for future requests
+				$self->{cache}{$lc} = $rc;
+
 				return $rc;
 			}
 			if($addr{'number'}) {
 				if(my $rc = $self->_search(\%addr, ('road', 'city', 'state', 'country'))) {
+					# Store the result in the cache for future requests
+					$self->{cache}{$lc} = $rc;
+
 					return $rc;
 				}
 			}
@@ -319,11 +372,19 @@ sub geocode {
 					if($href->{'number'}) {
 						if(my $rc = $self->_search(\%addr, ('number', 'road', 'city', 'state', 'country'))) {
 							$rc->{'country'} = 'US';
+
+							# Store the result in the cache for future requests
+							$self->{cache}{$lc} = $rc;
+
 							return $rc;
 						}
 					}
 					if(my $rc = $self->_search(\%addr, ('road', 'city', 'state', 'country'))) {
 						$rc->{'country'} = 'US';
+
+						# Store the result in the cache for future requests
+						$self->{cache}{$lc} = $rc;
+
 						return $rc;
 					}
 					# ::diag(__PACKAGE__, ': ', __LINE__, ": $location");
@@ -337,6 +398,10 @@ sub geocode {
 
 						if(my $rc = $self->_search(\%addr, ('name', 'city', 'state', 'country'))) {
 							$rc->{'country'} = 'US';
+
+							# Store the result in the cache for future requests
+							$self->{cache}{$lc} = $rc;
+
 							return $rc;
 						}
 					}
@@ -373,6 +438,10 @@ sub geocode {
 						if(my $rc = $self->_search(\%addr, ('name', 'number', 'road', 'city', 'state', 'country'))) {
 							# ::diag(Data::Dumper->new([$rc])->Dump());
 							$rc->{'country'} = 'US';
+
+							# Store the result in the cache for future requests
+							$self->{cache}{$lc} = $rc;
+
 							return $rc;
 						}
 					} else {
@@ -380,6 +449,10 @@ sub geocode {
 						if(my $rc = $self->_search(\%addr, ('name', 'road', 'city', 'state', 'country'))) {
 							# ::diag(Data::Dumper->new([$rc])->Dump());
 							$rc->{'country'} = 'US';
+
+							# Store the result in the cache for future requests
+							$self->{cache}{$lc} = $rc;
+
 							return $rc;
 						}
 					}
@@ -389,6 +462,10 @@ sub geocode {
 					if(my $rc = $self->_search(\%addr, ('number', 'road', 'city', 'state', 'country'))) {
 						# ::diag(Data::Dumper->new([$rc])->Dump());
 						$rc->{'country'} = 'US';
+
+						# Store the result in the cache for future requests
+						$self->{cache}{$lc} = $rc;
+
 						return $rc;
 					}
 				}
@@ -454,26 +531,46 @@ sub geocode {
 			if($addr{'state_district'}) {
 				$addr{'state_district'} =~ s/^(.+)\s+COUNTY/$1/i;
 				if(my $rc = $self->_search(\%addr, ('number', 'road', 'city', 'state_district', 'state', 'country'))) {
+
+					# Store the result in the cache for future requests
+					$self->{cache}{$lc} = $rc;
+
 					return $rc;
 				}
 			}
 			if(my $rc = $self->_search(\%addr, ('number', 'road', 'city', 'state', 'country'))) {
 				# ::diag(__PACKAGE__, ': ', __LINE__, ': ', Data::Dumper->new([$rc])->Dump());
+
+				# Store the result in the cache for future requests
+				$self->{cache}{$lc} = $rc;
+
 				return $rc;
 			}
 			if($addr{'number'}) {
 				if(my $rc = $self->_search(\%addr, ('road', 'city', 'state', 'country'))) {
+
+					# Store the result in the cache for future requests
+					$self->{cache}{$lc} = $rc;
+
 					return $rc;
 				}
 			}
 		}
 	}
 	if($location =~ /^(.+?),\s*([\s\w]+),\s*([\s\w]+),\s*([\w\s]+)$/) {
-		my %addr;
-		$addr{'road'} = $1;
-		$addr{'city'} = $2;
-		$addr{'state'} = $3;
-		$addr{'country'} = $4;
+		# >= 5.14 could say:
+		# my %addr = (
+		#	road => $1,
+		#	city => $2,
+		#	state => $3 =~ s/\s+$//r,
+		#	country => $4 =~ s/\s+$//r
+		# );
+		my %addr = (
+			road => $1,
+			city => $2,
+			state => $3,
+			country => $4,
+		);
 		$addr{'state'} =~ s/\s$//g;
 		$addr{'country'} =~ s/\s$//g;
 		if($addr{'road'} =~ /([\w\s]+),*\s+(.+)/) {
@@ -485,9 +582,17 @@ sub geocode {
 			$addr{'road'} = $2;
 			# ::diag(__LINE__, ': ', Data::Dumper->new([\%addr])->Dump());
 			if(my $rc = $self->_search(\%addr, ('name', 'number', 'road', 'city', 'state', 'country'))) {
+
+				# Store the result in the cache for future requests
+				$self->{cache}{$lc} = $rc;
+
 				return $rc;
 			}
 		} elsif(my $rc = $self->_search(\%addr, ('name', 'road', 'city', 'state', 'country'))) {
+
+			# Store the result in the cache for future requests
+			$self->{cache}{$lc} = $rc;
+
 			return $rc;
 		}
 		if($addr{'name'} && !defined($addr{'number'})) {
@@ -495,6 +600,10 @@ sub geocode {
 			# ::diag(__LINE__, ': ', $addr{'name'});
 			if(my $rc = $self->_search(\%addr, ('name', 'road', 'city', 'state', 'country'))) {
 				# ::diag(__PACKAGE__, ': ', __LINE__);
+
+				# Store the result in the cache for future requests
+				$self->{cache}{$lc} = $rc;
+
 				return $rc;
 			}
 		}
@@ -510,12 +619,20 @@ sub geocode {
 			# ::diag(__LINE__, ": found alternative '$location'");
 			if(my $rc = $self->geocode(\%params)) {
 				# ::diag(__LINE__, ": $location");
+
+				# Store the result in the cache for future requests
+				$self->{cache}{$lc} = $rc;
+
 				return $rc;
 			}
 			if($location =~ /(.+), (England|UK)$/i) {
 				$params{'location'} = "$1, GB";
 				if(my $rc = $self->geocode(\%params)) {
 					# ::diag(__LINE__, ": $location");
+
+					# Store the result in the cache for future requests
+					$self->{cache}{$lc} = $rc;
+
 					return $rc;
 				}
 			}
@@ -523,6 +640,8 @@ sub geocode {
 	}
 	return;
 }
+
+# Match parsed address components against the locally loaded dataset.
 
 # $data is a hashref to data such as returned by Geo::libpostal::parse_address
 # @columns is the key names to use in $data
@@ -793,6 +912,7 @@ __DATA__
 "SHENANDOAH COOL SPRINGS BATTLEFIELD",,"","BLUEMONT","CLARKE","VA","US",39.142146,-77.866468
 "",14900,"CONFERENCE CENTER DR","CHANTILLY","FAIRFAX","VA","US",38.873934,-77.461939
 "THE PURE PASTY COMPANY",128C,"MAPLE AVE W","VIENNA","FAIRFAX","VA","US",44.40662476,-68.59610059
+"DIRT FARM BREWERY",18701,"FOGGY BOTTOM RD","BLUEMONT","LOUDON","VA","US",39.099655,-77.836975
 "",818,"FERNDALE TERRACE NE","LEESBURG","LOUDOUN","VA","US",39.124843,-77.535445
 "",,"OATLANDS PLANTATION LN","OATLANDS","LOUDOUN","VA","US",39.04071,-77.61682
 "",,"PURCELLVILLE GATEWAY DR","PURCELLVILLE","LOUDOUN","VA","US",39.136193,-77.693198

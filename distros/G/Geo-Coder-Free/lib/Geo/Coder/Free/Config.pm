@@ -6,11 +6,11 @@ Geo::Coder::Free::Config - Site independent configuration file
 
 =head1 VERSION
 
-Version 0.37
+Version 0.38
 
 =cut
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 
 # VWF is licensed under GPL2.0 for personal use only
 # njh@bandsman.co.uk
@@ -179,13 +179,17 @@ sub new
 	return bless $config, $class;
 }
 
-sub AUTOLOAD {
+sub AUTOLOAD
+{
 	our $AUTOLOAD;
-	my $key = $AUTOLOAD;
+	my $self = shift;
 
-	$key =~ s{.*::}{};
+	return undef unless($self);
 
-	my $self = shift or return undef;
+	# Extract the method name from the AUTOLOAD variable
+	(my $key = $AUTOLOAD) =~ s/.*:://;
+
+	# Return the value of the corresponding hash key
 	return $self->{$key};
 }
 

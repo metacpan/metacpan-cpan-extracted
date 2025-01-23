@@ -2,6 +2,7 @@
 
 use warnings;
 use strict;
+
 use Test::Most tests => 103;
 use Test::Carp;
 use Test::Deep;
@@ -20,7 +21,7 @@ BEGIN {
 
 MAXMIND: {
 	SKIP: {
-		if($ENV{AUTHOR_TESTING}) {
+		if(!$ENV{'AUTOMATED_TESTING'}) {
 			if(-f DATABASE) {
 				delete $ENV{'OPENADDR_HOME'};
 				delete $ENV{'WHOSONFIRST_HOME'};
@@ -240,8 +241,7 @@ MAXMIND: {
 				skip(DATABASE . ' is missing', 102);
 			}
 		} else {
-			diag('Author tests not required for installation');
-			skip('Author tests not required for installation', 102);
+			skip('Not testing on smokers', 102);
 		}
 	}
 }

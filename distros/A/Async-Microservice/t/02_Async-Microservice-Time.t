@@ -132,4 +132,11 @@ subtest '/datetime/span/:s_date (expired)' => sub {
     #~ note(Data::Dumper::Dumper($weeks_data));
 };
 
+subtest '/hcheck' => sub {
+    $mech->get_ok($service_url . 'hcheck', 'get hcheck')
+        or diag($mech->content);
+    $mech->content_like(qr/Pending-Requests: 1\b/, 'check pending requests')
+        or diag($mech->content);
+};
+
 done_testing();

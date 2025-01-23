@@ -12,7 +12,7 @@ Geo::Coder::Free - Provides a Geo-Coding functionality using free databases
 
 # VERSION
 
-Version 0.37
+Version 0.38
 
 # SYNOPSIS
 
@@ -33,7 +33,9 @@ Version 0.37
 
 # DESCRIPTION
 
-Geo::Coder::Free provides an interface to free databases by acting as a front-end to
+Geo::Coder::Free provides an interface
+to translate addresses into latitude and longitude
+by using to free databases such as
 [Geo::Coder::Free::MaxMind](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AFree%3A%3AMaxMind) and [Geo::Coder::Free::OpenAddresses](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AFree%3A%3AOpenAddresses).
 
 The cgi-bin directory contains a simple DIY Geo-Coding website.
@@ -44,6 +46,8 @@ The sample website is down at the moment while I look for a new host.
 When it's back up you will be able to use this to test it.
 
     curl 'https://geocode.nigelhorne.com/cgi-bin/page.fcgi?page=query&q=1600+Pennsylvania+Avenue+NW+Washington+DC+USA'
+
+Includes functionality for running the module via the command line for testing or ad-hoc geocoding tasks.
 
 # METHODS
 
@@ -75,6 +79,8 @@ but that can't be guaranteed to work.
 
     # Note that this yields many false positives and isn't useable yet
     my @matches = $geo_coder->geocode(scantext => 'arbitrary text', region => 'US');
+
+    @matches = $geo_coder->geocode(scantext => 'arbitrary text', region => 'GB', ignore_words => [ 'foo', 'bar' ]);
 
 ## reverse\_geocode
 
@@ -121,21 +127,24 @@ This will take a long time and use a lot of disc space, be clear that this is wh
 In the bin directory there are some helper scripts to do this.
 You will need to tailor them to your set up, but that's not that hard as the
 scripts are trivial.
-1\. mkdir $WHOSONFIRST\_HOME, cd $WHOSONFIRST\_HOME, run wof-clone from NJH-Snippets.
-This can take a long time because it contains lots of directories which filesystem drivers
-seem to take a long time to navigate (at least my EXT4 and ZFS systems do).
-2\. Install [https://github.com/dr5hn/countries-states-cities-database.git](https://github.com/dr5hn/countries-states-cities-database.git) into $DR5HN\_HOME.
+
+1. `mkdir $WHOSONFIRST_HOME; cd $WHOSONFIRST_HOME` run wof-clone from NJH-Snippets.
+
+    This can take a long time because it contains lots of directories which filesystem drivers
+    seem to take a long time to navigate (at least my EXT4 and ZFS systems do).
+
+2. Install [https://github.com/dr5hn/countries-states-cities-database.git](https://github.com/dr5hn/countries-states-cities-database.git) into $DR5HN\_HOME.
 This data contains cities only,
 so it's not used if OSM\_HOME is set,
 since the latter is much more comprehensive.
 Also, only Australia, Canada and the US is imported, as the UK data is difficult to parse.
-3\. Run bin/download\_databases - this will download the WhosOnFirst, Openaddr,
+3. Run bin/download\_databases - this will download the WhosOnFirst, Openaddr,
 Open Street Map and dr5hn databases.
 Check the values of OSM\_HOME, OPENADDR\_HOME,
 DR5HN\_HOME and WHOSONFIRST\_HOME within that script,
 you may wish to change them.
 The Makefile.PL file will download the MaxMind database for you, as that is not optional.
-4\. Run bin/create\_db - this creates the database used by G:C:F using the data you've just downloaded
+4. Run bin/create\_db - this creates the database used by G:C:F using the data you've just downloaded
 The database is called openaddr.sql,
 even though it does include all of the above data.
 That's historical before I added the WhosOnFirst database.
@@ -159,7 +168,7 @@ Unfortunately all of the on-line services have one problem or another - most eit
 Even my modest tree, just over 2000 people, reaches those limits.
 
 There are, however, a number of free databases that can be used, including MaxMind, GeoNames, OpenAddresses and WhosOnFirst.
-The objective of Geo::Coder::Free ([https://github.com/nigelhorne/Geo-Coder-Free](https://github.com/nigelhorne/Geo-Coder-Free))
+The objective of [Geo::Coder::Free](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AFree) ([https://github.com/nigelhorne/Geo-Coder-Free](https://github.com/nigelhorne/Geo-Coder-Free))
 is to create a database of those databases and to create a search engine either through a local copy of the database or through an on-line website.
 Both are in their early days, but I have examples which do surprisingly well.
 
@@ -183,6 +192,8 @@ The MaxMind data only contains cities.
 The OpenAddresses data doesn't cover the globe.
 
 Can't parse and handle "London, England".
+
+It would be great to have a set-up wizard to create the database.
 
 The various scripts in NJH-Snippets ought to be in this module.
 
@@ -243,7 +254,7 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2017-2024 Nigel Horne.
+Copyright 2017-2025 Nigel Horne.
 
 The program code is released under the following licence: GPL for personal use on a single computer.
 All other users (including Commercial, Charity, Educational, Government)

@@ -9,11 +9,15 @@
 #ifdef HAVE_CRYPT_URANDOM_SYSCALL_GETRANDOM
 #include <sys/syscall.h>
 #else
-#ifdef HAVE_CRYPT_URANDOM_NATIVE_GETENTROPY
+#ifdef HAVE_CRYPT_URANDOM_NATIVE_ARC4RANDOM_BUF
 #include <sys/random.h>
 #else
-#ifdef HAVE_CRYPT_URANDOM_UNISTD_GETENTROPY
+#ifdef HAVE_CRYPT_URANDOM_UNISTD_ARC4RANDOM_BUF
 #include <unistd.h>
+#else
+#ifdef HAVE_CRYPT_URANDOM_STDLIB_ARC4RANDOM_BUF
+#include <stdlib.h>
+#endif
 #endif
 #endif
 #endif
@@ -34,28 +38,42 @@ crypt_urandom_getrandom(length)
         char *data;
         int result;
     CODE:
-	Newx(data, length + 1u, char);
+        Newx(data, length + 1u, char);
+      GETRANDOM:
 #ifdef HAVE_CRYPT_URANDOM_NATIVE_GETRANDOM
         result = getrandom(data, length, GRND_NONBLOCK);
 #else
 #ifdef HAVE_CRYPT_URANDOM_SYSCALL_GETRANDOM
-	result = syscall(SYS_getrandom, data, length, GRND_NONBLOCK);
+        result = syscall(SYS_getrandom, data, length, GRND_NONBLOCK);
 #else
-#ifdef HAVE_CRYPT_URANDOM_NATIVE_GETENTROPY
-        result = getentropy(data, length);
+#ifdef HAVE_CRYPT_URANDOM_NATIVE_ARC4RANDOM_BUF
+        arc4random_buf(data, length);
+        result = length;
 #else
-#ifdef HAVE_CRYPT_URANDOM_UNISTD_GETENTROPY
-        result = getentropy(data, length);
+#ifdef HAVE_CRYPT_URANDOM_UNISTD_ARC4RANDOM_BUF
+        arc4random_buf(data, length);
+        result = length;
+#else
+#ifdef HAVE_CRYPT_URANDOM_STDLIB_ARC4RANDOM_BUF
+        arc4random_buf(data, length);
+        result = length;
 #else
         croak("Unable to find getrandom or an alternative");
 #endif
 #endif
 #endif
 #endif
+#endif
         if (result != length) {
-            croak("Only read %d bytes from getrandom:%s", result, strerror(errno));
+            if (errno == EINTR) {
+                goto GETRANDOM;
+            } else {
+                Safefree(data);
+                croak("Failed to getrandom:%s", strerror(errno));
+            }
         }
         data[result] = '\0';
         RETVAL = newSVpv(data, result);
+        Safefree(data);
     OUTPUT:
         RETVAL

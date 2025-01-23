@@ -11,7 +11,7 @@ use Moo;
 use namespace::clean;
 
 # Version.
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Get XML.
 has xml => (
@@ -191,8 +191,8 @@ For more information about Novosibirsk Map, click L<here|https://en.wikipedia.or
 
 =begin html
 
-<a href="https://raw.githubusercontent.com/tupinek/Map-Tube-Novosibirsk/master/images/ex3.png">
-  <img src="https://raw.githubusercontent.com/tupinek/Map-Tube-Novosibirsk/master/images/ex3.png" alt="Новосибирский метрополитен" width="300px" height="300px" />
+<a href="https://raw.githubusercontent.com/michal-josef-spacek/Map-Tube-Novosibirsk/master/images/ex3.png">
+  <img src="https://raw.githubusercontent.com/michal-josef-spacek/Map-Tube-Novosibirsk/master/images/ex3.png" alt="Новосибирский метрополитен" width="300px" height="300px" />
 </a>
 
 =end html
@@ -219,6 +219,48 @@ For more information about Novosibirsk Map, click L<here|https://en.wikipedia.or
  # Output:
  # Дзержинская линия
  # Ленинская линия
+
+=head1 EXAMPLE5
+
+ # Pragmas.
+ use strict;
+ use warnings;
+
+ # Modules.
+ use Encode qw(decode_utf8 encode_utf8);
+ use Map::Tube::Novosibirsk;
+
+ # Arguments.
+ if (@ARGV < 1) {
+         print STDERR "Usage: $0 line\n";
+         exit 1;
+ }
+ my $line = decode_utf8($ARGV[0]);
+
+ # Object.
+ my $obj = Map::Tube::Novosibirsk->new;
+
+ # Get stations for line.
+ my $stations_ar = $obj->get_stations($line);
+
+ # Print out.
+ map { print encode_utf8($_->name)."\n"; } @{$stations_ar};
+
+ # Output:
+ # Usage: __PROG__ line
+
+ # Output with 'foo' argument.
+ # Map::Tube::get_stations(): ERROR: Invalid Line Name [foo]. (status: 105) file __PROG__ on line __LINE__
+
+ # Output with 'Ленинская линия' argument.
+ # Заельцовская
+ # Гагаринская
+ # Красный проспект
+ # Площадь Ленина
+ # Октябрьская
+ # Речной вокзал
+ # Студенческая
+ # Площадь Маркса
 
 =head1 DEPENDENCIES
 
@@ -247,22 +289,22 @@ Install the Map::Tube concrete metro modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Map-Tube-Novosibirsk>
+L<https://github.com/michal-josef-spacek/Map-Tube-Novosibirsk>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2014-2015 Michal Špaček
+ © 2014-2025 Michal Josef Špaček
  Artistic License
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

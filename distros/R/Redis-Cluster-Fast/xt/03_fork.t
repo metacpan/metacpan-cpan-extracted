@@ -21,8 +21,7 @@ if ($pid == 0) {
     is_deeply $res, [ 'test1', 'test2' ];
     $redis->incr('test-fork');
     exit 0;
-}
-else {
+} else {
     # parent
     my $res = $redis->mget('{my}foo', '{my}bar');
     is_deeply $res, [ 'FOO', 'BAR' ];
@@ -31,5 +30,39 @@ else {
 }
 
 is $redis->get('test-fork'), 2;
+
+my $res;
+$redis->mget('{my}hoge', '{my}fuga', sub {
+    my ($result, $error) = @_;
+    $res = $result;
+});
+ok $redis->wait_all_responses;
+is_deeply $res, [ 'test1', 'test2' ];
+$redis->disconnect;
+
+$pid = fork;
+if ($pid == 0) {
+    # child
+    $redis->connect;
+    my $res;
+    $redis->mget('{my}hoge', '{my}fuga', sub {
+        my ($result, $error) = @_;
+        $res = $result;
+    });
+    ok $redis->wait_all_responses;
+    is_deeply $res, [ 'test1', 'test2' ];
+    exit 0;
+} else {
+    # parent
+    $redis->connect;
+    my $res;
+    $redis->mget('{my}foo', '{my}bar', sub {
+        my ($result, $error) = @_;
+        $res = $result;
+    });
+    ok $redis->wait_all_responses;
+    is_deeply $res, [ 'FOO', 'BAR' ];
+    waitpid($pid, 0);
+}
 
 done_testing;

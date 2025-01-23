@@ -1,5 +1,14 @@
 Revision history for Geo-Coder-Free
 
+0.38	Wed Jan 22 08:37:22 EST 2025
+	Latest as_string return code and Utils.pm from VWF
+	Added t/30-basics, t/config.t, t/utils.t and t/display.t
+	geocode(): croak when input is just a set of numbers
+	Local: Replace linear search wish a hash search
+	Local: Create a cache
+	Maxmind: Create a cache
+	scantext: set the location field to the string that was matched
+
 0.37	Wed Oct 23 10:09:54 EDT 2024
 	Allow new() to take HASH ref
 	Slight speed improvements in Local.pm

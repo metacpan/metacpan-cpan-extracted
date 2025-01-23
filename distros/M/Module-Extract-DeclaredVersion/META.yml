@@ -33,5 +33,5 @@ resources:
   bugtracker: https://github.com/briandfoy/module-extract-declaredversion/issues
   homepage: https://github.com/briandfoy/module-extract-declaredversion
   repository: https://github.com/briandfoy/module-extract-declaredversion
-version: '1.025'
+version: '1.026'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

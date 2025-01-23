@@ -47,7 +47,8 @@
 #   PDL::PP::Rule::Substitute->new($target,$condition)
 # $target and $condition must be scalars.
 
-package PDL::PP::Rule;
+package # hide from PAUSE/MetaCPAN
+  PDL::PP::Rule;
 
 use strict;
 use warnings;
@@ -197,7 +198,8 @@ sub apply {
 }
 
 
-package PDL::PP::Rule::Croak;
+package # hide from PAUSE/MetaCPAN
+  PDL::PP::Rule::Croak;
 
 # Croaks if all of the input variables are defined. Use this to identify
 # incompatible arguments.
@@ -216,7 +218,8 @@ sub apply {
     croak($self->{doc}) if $self->should_apply($pars);
 }
 
-package PDL::PP::Rule::Returns;
+package # hide from PAUSE/MetaCPAN
+  PDL::PP::Rule::Returns;
 use strict;
 use Carp;
 
@@ -255,7 +258,8 @@ sub apply {
     $pars->{$target} = $self->{"returns.value"};
 }
 
-package PDL::PP::Rule::Returns::Zero;
+package # hide from PAUSE/MetaCPAN
+  PDL::PP::Rule::Returns::Zero;
 
 use strict;
 
@@ -265,7 +269,8 @@ sub new {
     shift->SUPER::new(@_,0);
 }
 
-package PDL::PP::Rule::Returns::One;
+package # hide from PAUSE/MetaCPAN
+  PDL::PP::Rule::Returns::One;
 
 use strict;
 
@@ -275,7 +280,8 @@ sub new {
     shift->SUPER::new(@_,1);
 }
 
-package PDL::PP::Rule::Returns::EmptyString;
+package # hide from PAUSE/MetaCPAN
+  PDL::PP::Rule::Returns::EmptyString;
 
 use strict;
 
@@ -285,7 +291,8 @@ sub new {
     shift->SUPER::new(@_,"");
 }
 
-package PDL::PP::Rule::Returns::NULL;
+package # hide from PAUSE/MetaCPAN
+  PDL::PP::Rule::Returns::NULL;
 
 use strict;
 
@@ -295,7 +302,8 @@ sub new {
     shift->SUPER::new(@_,"NULL");
 }
 
-package PDL::PP::Rule::InsertName;
+package # hide from PAUSE/MetaCPAN
+  PDL::PP::Rule::InsertName;
 
 use strict;
 use Carp;
@@ -333,7 +341,8 @@ sub apply {
 
 # PDL::PP::Rule::Substitute->new($target,$condition)
 #   $target and $condition must be scalars.
-package PDL::PP::Rule::Substitute;
+package # hide from PAUSE/MetaCPAN
+  PDL::PP::Rule::Substitute;
 
 use strict;
 use Carp;
@@ -362,11 +371,6 @@ sub dosubst_private {
       CROAK => sub {"return PDL->make_error(PDL_EUSERERROR, \"Error in $name:\" @{[join ',', @_]})"},
       NAME => sub {return $name},
       MODULE => sub {return $::PDLMOD},
-      SETPDLSTATEBAD  => sub { "$_[0]\->state |= PDL_BADVAL" },
-      SETPDLSTATEGOOD => sub { "$_[0]\->state &= ~PDL_BADVAL" },
-      ISPDLSTATEBAD   => \&badflag_isset,
-      ISPDLSTATEGOOD  => sub {"!".badflag_isset($_[0])},
-      BADFLAGCACHE    => sub { "badflag_cache" },
       PDLSTATESETBAD => sub { ($sig->objs->{$_[0]}//confess "Can't get PDLSTATESETBAD for unknown ndarray '$_[0]'")->do_pdlaccess."->state |= PDL_BADVAL" },
       PDLSTATESETGOOD => sub { ($sig->objs->{$_[0]}->do_pdlaccess//confess "Can't get PDLSTATESETGOOD for unknown ndarray '$_[0]'")."->state &= ~PDL_BADVAL" },
       PDLSTATEISBAD => sub {badflag_isset(($sig->objs->{$_[0]}//confess "Can't get PDLSTATEISBAD for unknown ndarray '$_[0]'")->do_pdlaccess)},
@@ -513,6 +517,7 @@ sub import {
   $::PDLMULTI_C_PREFIX = $deep ? "$base-" : "";
   $::PDLOBJ = "PDL"; # define pp-funcs in this package
   $::PDLXS="";
+  $::PDLOVERLOAD="";
   $::PDLBEGIN="";
   $::PDLPMROUT="";
   for ('Top','Bot','Middle') { $::PDLPM{$_}="" }
@@ -797,6 +802,7 @@ $::PDL_IFBEGINWRAP[0]
    push \@PDL::Core::PP, __PACKAGE__;
    bootstrap $::PDLMOD $::PDLMODVERSION;
 $::PDL_IFBEGINWRAP[-1]
+$::PDLOVERLOAD
 EOF
 } # end pp_done
 
@@ -1010,15 +1016,6 @@ sub callTypemap {
   $ret;
 }
 
-sub reorder_args {
-  my ($sig, $otherdefaults) = @_;
-  my %optionals = map +($_=>1), keys(%$otherdefaults);
-  my @other_mand = grep !$optionals{$_} && !$sig->other_is_out($_),
-    my @other = @{$sig->othernames(1, 1)};
-  my @other_opt = grep $optionals{$_}, @other;
-  ($sig->names_in, @other_mand, @other_opt, $sig->names_out, $sig->other_out);
-}
-
 ###########################################################
 # Name       : extract_signature_from_fulldoc
 # Usage      : $sig = extract_signature_from_fulldoc($fulldoc)
@@ -1178,90 +1175,25 @@ $PDL::PP::deftbl =
    PDL::PP::Rule::Returns->new("Doc", [], 'Sets the default doc string',
     "\n=for ref\n\ninfo not available\n"),
 
-   # try and automate the docs
-   # could be really clever and include the sig to see about
-   # input/output params, for instance
-
-   PDL::PP::Rule->new("BadDoc", [qw(BadFlag Name CopyBadStatusCode?)],
+   PDL::PP::Rule->new("BadDoc", [qw(BadFlag Name)],
               'Sets the default documentation for handling of bad values',
       sub {
-         my ($bf, $name, $code) = @_;
+         my ($bf, $name) = @_;
          my $str;
          if ( not defined($bf) ) {
-            $str = "$name does not process bad values.\n";
+            $str = "C<$name> does not process bad values.\n";
          } elsif ( $bf ) {
-            $str = "$name processes bad values.\n";
+            $str = "C<$name> processes bad values.\n";
          } else {
-            $str = "$name ignores the bad-value flag of the input ndarrays.\n";
+            $str = "C<$name> ignores the bad-value flag of the input ndarrays.\n";
          }
-         if ( not defined($code) ) {
-            $str .= "It will set the bad-value flag of all output ndarrays if " .
-            "the flag is set for any of the input ndarrays.\n";
-         } elsif (  $code eq '' ) {
-            $str .= "The output ndarrays will NOT have their bad-value flag set.\n";
-         } else {
-            $str .= "The state of the bad-value flag of the output ndarrays is unknown.\n";
-         }
+         $str .= "It will set the bad-value flag of all output ndarrays if " .
+           "the flag is set for any of the input ndarrays.\n";
       }
    ),
 
    # Default: no otherpars
    PDL::PP::Rule::Returns::EmptyString->new("OtherPars"),
-
-   # the docs
-   PDL::PP::Rule->new("PdlDoc", "FullDoc", sub {
-         my $fulldoc = shift;
-         # Append a final cut if it doesn't exist due to heredoc shinanigans
-         $fulldoc .= "\n\n=cut\n" unless $fulldoc =~ /\n=cut\n*$/;
-         # Make sure the =head1 FUNCTIONS section gets added
-         $::DOCUMENTED++;
-         return $fulldoc;
-      }
-   ),
-   PDL::PP::Rule->new("PdlDoc", [qw(Name Pars? OtherPars Doc BadDoc?)],
-      sub {
-        my ($name,$pars,$otherpars,$doc,$baddoc) = @_;
-        return '' if !defined $doc # Allow explicit non-doc using Doc=>undef
-            or $doc =~ /^\s*internal\s*$/i;
-        # If the doc string is one line let's have two for the
-        # reference card information as well
-        $doc = "=for ref\n\n".$doc if $doc !~ /\n/;
-        $::DOCUMENTED++;
-        $pars = "P(); C()" unless $pars;
-        # Strip leading whitespace and trailing semicolons and whitespace
-        $pars =~ s/^\s*(.+[^;])[;\s]*$/$1/;
-        $otherpars =~ s/^\s*(.+[^;])[;\s]*$/$1/ if $otherpars;
-        my $sig = "$pars".( $otherpars ? "; $otherpars" : "");
-        $doc =~ s/\n(=cut\s*\n)+(\s*\n)*$/\n/m; # Strip extra =cut's
-        if ( defined $baddoc ) {
-                # Strip leading newlines and any =cut markings
-            $baddoc =~ s/\n(=cut\s*\n)+(\s*\n)*$/\n/m;
-            $baddoc =~ s/^\n+//;
-            $baddoc = "=for bad\n\n$baddoc";
-        }
-        my $baddoc_function_pod = <<"EOD" ;
-
-XXX=head2 $name
-
-XXX=for sig
-
-  Signature: ($sig)
-
-$doc
-
-$baddoc
-
-XXX=cut
-
-EOD
-        $baddoc_function_pod =~ s/^XXX=/=/gms;
-        return $baddoc_function_pod;
-      }
-   ),
-
-   ##################
-   # Done with Docs #
-   ##################
 
    # Notes
    # Suffix 'NS' means, "Needs Substitution". In other words, the string
@@ -1375,13 +1307,13 @@ EOD
    PDL::PP::Rule::Returns::One->new("HaveBroadcasting"),
 
    PDL::PP::Rule::Returns::EmptyString->new("Priv"),
-   PDL::PP::Rule->new("PrivObj", [qw(Name BadFlag Priv)],
+   PDL::PP::Rule->new("PrivObj", [qw(Name Priv)],
       sub { PDL::PP::Signature->new('', @_) }),
 
 # Parameters in the 'a(x,y); [o]b(y)' format, with
 # fixed nos of real, unbroadcast-over dims.
 # Also "Other pars", the parameters which are usually not pdls.
-   PDL::PP::Rule->new("SignatureObj", [qw(Pars Name BadFlag OtherPars)],
+   PDL::PP::Rule->new("SignatureObj", [qw(Pars Name OtherPars OtherParsDefaults? ArgOrder?)],
       sub { PDL::PP::Signature->new(@_) }),
 
 # Compiled representations i.e. what the RunFunc function leaves
@@ -1390,8 +1322,8 @@ EOD
 # by parsing the string in that function.
 # If the user wishes to specify their own MakeComp code and Comp content,
 # The next definitions allow this.
-   PDL::PP::Rule->new("CompObj", [qw(Name BadFlag OtherPars Comp?)],
-      sub { PDL::PP::Signature->new('', @_[0,1], join(';', grep defined() && /[^\s;]/, @_[2..$#_])) }),
+   PDL::PP::Rule->new("CompObj", [qw(Name OtherPars Comp?)],
+      sub { PDL::PP::Signature->new('', $_[0], join(';', grep defined() && /[^\s;]/, @_[1..$#_])) }),
    PDL::PP::Rule->new("CompStruct", ["CompObj"], sub {$_[0]->getcomp}),
 
    PDL::PP::Rule->new("InplaceNormalised", [qw(Name SignatureObj Inplace)],
@@ -1419,11 +1351,11 @@ EOD
           $in = $$arg[0];
           $out = $$arg[1] if @$arg > 1;
         }
-        confess "ERROR in pp_def($name): Inplace does not know name of input ndarray"
+        confess "ERROR in pp_def($name): Inplace does not know name of input ndarray, options were (@in)"
             unless defined $in;
         confess "ERROR in pp_def($name): Inplace input ndarray '$in' is actually output"
             if $is_out{$in};
-        confess "ERROR in pp_def($name): Inplace does not know name of output ndarray"
+        confess "ERROR in pp_def($name): Inplace does not know name of output ndarray, options were (@out)"
             unless defined $out;
         my ($in_obj, $out_obj) = map $sig->objs->{$_}, $in, $out;
         confess "ERROR in pp_def($name): Inplace output arg $out not [o]\n" if !$$out_obj{FlagW};
@@ -1456,49 +1388,253 @@ EOD
         "  PDL_XS_INPLACE($in, $out)\n";
       }),
    PDL::PP::Rule::Returns::EmptyString->new("InplaceCode", []),
+   PDL::PP::Rule->new("InplaceDocValues",
+     [qw(Name SignatureObj InplaceNormalised)],
+     'doc describing usage inplace',
+     sub {
+       my ($name, $sig, $inplace) = @_;
+       my @args = @{ $sig->args_callorder };
+       my %inplace_involved = map +($_=>1), my ($in, $out) = @$inplace;
+       my $meth_call = $args[0] eq $in;
+       @args = grep !$inplace_involved{$_}, @args;
+       my @vals = !$meth_call ? () : [
+        "\$$in->inplace->$name".(
+           !@args ? '' : "(@{[join ',', map qq{\$$_}, @args]})"
+         ).";", []
+       ];
+       push @vals, [ "$name(\$$in->inplace".(
+           !@args ? '' : ",@{[join ',', map qq{\$$_}, @args]}"
+         ).");", []];
+       $vals[0][1] = ["can be used inplace"];
+       \@vals;
+     }),
+   PDL::PP::Rule::Returns->new("InplaceDocValues", []),
+
+   PDL::PP::Rule->new("OverloadDocValues",
+     [qw(Name SignatureObj Overload Inplace?)],
+     'implement and doc Perl overloaded operators',
+     sub {
+       my ($name, $sig, $ovl, $inplace) = @_;
+       confess "$name Overload given false value" if !$ovl;
+       $ovl = [$ovl] if !ref $ovl;
+       my ($op, $mutator, $bitwise) = @$ovl;
+       confess "$name Overload trying to define mutator but no inplace"
+         if $mutator && !$inplace;
+       my $one_arg = $sig->names_in == 1;
+       my $ret = "{ package # hide from MetaCPAN\n $::PDLOBJ;\n";
+       my $bitwise_passon = $bitwise ? '$_[2]?@_[1,0]:@_[0,1]' : '@_';
+       my $fullname = $::PDLOBJ."::$name";
+       if ($one_arg) {
+         $ret .= pp_line_numbers(__LINE__, <<EOF);
+use overload '$op' => sub {
+  Carp::confess("$fullname: overloaded '$op' given undef")
+    if grep !defined, \$_[0];
+  $fullname(\$_[0]);
+};
+EOF
+       } else {
+         $ret .= pp_line_numbers(__LINE__, <<EOF);
+{
+  my (\$foo, \$overload_sub);
+  use overload '$op' => \$overload_sub = sub {
+    Carp::confess("$fullname: overloaded '$op' given undef")
+      if grep !defined, \@_[0,1];
+    return $fullname($bitwise_passon) unless ref \$_[1]
+            && (ref \$_[1] ne '$::PDLOBJ')
+            && defined(\$foo = overload::Method(\$_[1], '$op'))
+            && \$foo != \$overload_sub; # recursion guard
+    goto &\$foo;
+  };
+}
+EOF
+       }
+       $ret .= pp_line_numbers(__LINE__, <<EOF) if $mutator;
+# in1, in2, out, swap if true
+use overload '$op=' => sub {
+  Carp::confess("$fullname: overloaded '$op=' given undef")
+    if grep !defined, \@_[0,1];
+  $fullname(\$_[0]->inplace, \$_[1]); \$_[0]
+};
+EOF
+       $::PDLOVERLOAD .= "$ret}\n";
+       my @args = @{ $sig->args_callorder };
+       my @outs = $sig->names_out;
+       confess "$name error in Overload doc: !=1 output (@outs)" if @outs != 1;
+       my @ins = $sig->names_in;
+       my @vals = ["\$$outs[0] = ".(
+         !$one_arg ? "\$$ins[0] $op \$$ins[1]" :
+         $op.($op =~ /[^a-z]/ ? '' : ' ')."\$$ins[0]"
+       ).";", 
+       ["overloads the Perl '$op' operator"]
+       ];
+       push @vals, ["\$$ins[0] $op= \$$ins[1];", []] if $mutator;
+       \@vals;
+     }),
+   PDL::PP::Rule::Returns->new("OverloadDocValues", []),
+
+   PDL::PP::Rule->new([qw(UsageDoc ParamDoc)],
+     [qw(Name Doc? SignatureObj OtherParsDefaults? ArgOrder?
+       OverloadDocValues InplaceDocValues ParamDesc? Lvalue?
+     )],
+     'generate "usage" section of doc',
+     sub {
+       my ($name, $doc, $sig, $otherdefaults, $argorder,
+         $overloadvals, $inplacevals, $paramdesc, $lvalue,
+       ) = @_;
+       $otherdefaults ||= {};
+       $paramdesc ||= {};
+       confess "pp_def($name): non-ref ParamDesc given" if !ref $paramdesc;
+       my @args = @{ $sig->args_callorder };
+       my $paramdoc = !keys(%$paramdesc) ? '' : join('',
+         "=head3 Parameters\n\n=over\n\n", (
+         map "=item $_\n\n$paramdesc->{$_}\n\n", grep $paramdesc->{$_}, @args,
+         ), "=back\n\n");
+       return ('',$paramdoc) if $doc && $doc =~ /^=for usage/m;
+       my %any_out = map +($_=>1), $sig->names_out_nca, $sig->other_out;
+       my %outca = map +($_=>1), $sig->names_oca;
+       my @inargs = grep !$outca{$_}, @args;
+       my $noptional = grep $any_out{$_} ||
+         exists $otherdefaults->{$_}, @inargs;
+       my @argsets;
+       my $plural = keys(%$otherdefaults) > 1 ? "s" : "";
+       my $override = !keys(%$otherdefaults) ? '' : " of ".join(", ", map "$_=$otherdefaults->{$_}", grep exists $otherdefaults->{$_}, @args);
+       if (keys %outca) {
+         push @argsets, [\@inargs, [ grep $outca{$_}, @args ], []];
+       } elsif ($argorder) {
+         my @allouts = grep $any_out{$_} || $outca{$_}, @args;
+         push @argsets, map [[ @inargs[0..$_] ], \@allouts, []],
+           ($#inargs-$noptional)..$#inargs;
+         push @{$argsets[-1][2]}, 'all arguments given';
+         unshift @{$argsets[0][2]}, "using default$plural$override" if $override;
+       } else {
+         push @argsets, [
+           [grep !($any_out{$_} || exists $otherdefaults->{$_}), @args],
+           [grep $any_out{$_}, @args],
+           ["using default value$plural$override"],
+         ]
+           if keys %any_out && keys %$otherdefaults;
+         push @argsets, [
+           [grep !$any_out{$_},@args],
+           [grep $any_out{$_},@args],
+           [keys %$otherdefaults ? "overriding default$plural" : ()],
+         ]
+           if keys %any_out;
+         push @argsets, [\@args, [], ['all arguments given']];
+       }
+       my @invocs = @$overloadvals;
+       push @invocs, map [(!@{$_->[1]} ? '' :
+           @{$_->[1]} == 1 ? "\$$_->[1][0] = " :
+           "(".join(", ", map "\$$_", @{$_->[1]}).") = "
+         )."$name(".join(", ", map "\$$_", @{$_->[0]}).");",
+         [@{$_->[2]}]], @argsets;
+       $argsets[0][2] = ['method call'];
+       $argsets[$_][2] = [] for 1..$#argsets; # they get the idea
+       push @invocs, map [(!@{$_->[1]} ? '' :
+           @{$_->[1]} == 1 ? "\$$_->[1][0] = " :
+           "(".join(", ", map "\$$_", @{$_->[1]}).") = "
+         )."\$$_->[0][0]->$name".(
+           @{$_->[0]} <= 1 ? '' :
+           "(".join(", ", map "\$$_", @{$_->[0]}[1..$#{$_->[0]}]).")"
+         ).";",
+         [@{$_->[2]}]], grep @{$_->[0]}, @argsets;
+       push @invocs, @$inplacevals;
+       if ($lvalue) {
+         my ($first_meth) = grep @{$_->[1]} == 1, @argsets;
+         push @invocs, [
+           "\$$first_meth->[0][0]->$name".(
+             @{$first_meth->[0]} <= 1 ? '' :
+             "(".join(", ", map "\$$_", @{$first_meth->[0]}[1..$#{$first_meth->[0]}]).")"
+           )." .= \$data;",
+           ['usable as lvalue']] if $first_meth;
+       }
+       require List::Util;
+       my $maxlen = List::Util::max(map length($_->[0]), @invocs);
+       (join('', "\n=for usage\n\n",
+         (map !@{$_->[1]} ? " $_->[0]\n" : sprintf(" %-${maxlen}s%s\n", $_->[0], " # ".join ", ", @{$_->[1]}), @invocs), "\n\n"),
+         $paramdoc,
+       );
+     }),
+   PDL::PP::Rule::Returns::EmptyString->new("UsageDoc", []),
+
+   # the docs
+   PDL::PP::Rule->new("PdlDoc", "FullDoc", sub {
+         my $fulldoc = shift;
+         # Append a final cut if it doesn't exist due to heredoc shenanigans
+         $fulldoc .= "\n\n=cut\n" unless $fulldoc =~ /\n=cut\n*$/;
+         # Make sure the =head1 FUNCTIONS section gets added
+         $::DOCUMENTED++;
+         return $fulldoc;
+      }
+   ),
+   PDL::PP::Rule::Returns::Zero->new("NoPthread"), # assume we can pthread, unless indicated otherwise
+   PDL::PP::Rule->new("PdlDoc", [qw(
+      Name Pars OtherPars GenericTypes Doc UsageDoc BadDoc?
+      HaveBroadcasting NoPthread IsAffineFlag TwoWayFlag DefaultFlowFlag
+      ParamDoc
+      )],
+      sub {
+        my ($name,$pars,$otherpars,$gentypes,$doc,$usagedoc,$baddoc,
+          $havebroadcasting, $noPthreadFlag, $affflag, $revflag, $flowflag,
+          $paramdoc,
+        ) = @_;
+        return '' if !defined $doc # Allow explicit non-doc using Doc=>undef
+            or $doc =~ /^\s*internal\s*$/i;
+        # If the doc string is one line let's have two for the
+        # reference card information as well
+        $doc = "=for ref\n\n".$doc if $doc !~ /\n/;
+        $::DOCUMENTED++;
+        # Strip leading whitespace and trailing semicolons and whitespace
+        $pars =~ s/^\s*(.+[^;])[;\s]*$/$1/;
+        $otherpars =~ s/^\s*(.+[^;])[;\s]*$/$1/ if $otherpars;
+        my $sig = "$pars".( $otherpars ? "; $otherpars" : "");
+        my @typenames = map PDL::Type->new($_)->ioname, @$gentypes;
+        my @typesigparts = '';
+        while (@typenames) {
+          push @typesigparts, '' if length $typesigparts[-1] > 50;
+          $typesigparts[-1] .= ($typesigparts[-1]&&' ') . shift @typenames;
+        }
+        my $typesig = join "\n   ", @typesigparts;
+        $doc =~ s/\n(=cut\s*\n)+(\s*\n)*$/\n/m; # Strip extra =cut's
+        if ( defined $baddoc ) {
+                # Strip leading newlines and any =cut markings
+            $baddoc =~ s/\n(=cut\s*\n)+(\s*\n)*$/\n/m;
+            $baddoc =~ s/^\n+//;
+            $baddoc = "\n=for bad\n\n$baddoc";
+        }
+        my @misc = $havebroadcasting ? "Broadcasts over its inputs.\n" : "Does not broadcast.\n";
+        push @misc, "Can't use POSIX threads.\n" if $noPthreadFlag;
+        push @misc, "Makes L<virtual affine|PDL::Indexing> ndarrays.\n" if $affflag;
+        push @misc, "Creates data-flow".(!$revflag ? "" : " back and forth").
+          " by default.\n" if $flowflag;
+        my $miscdocs = join '', grep $_, $paramdoc, @misc, $baddoc;
+        my $baddoc_function_pod = <<"EOD" ;
+
+XXX=head2 $name
+
+XXX=for sig
+
+ Signature: ($sig)
+ Types: ($typesig)
+$usagedoc
+$doc
+
+=pod
+
+$miscdocs
+
+XXX=cut
+
+EOD
+        $baddoc_function_pod =~ s/^XXX=/=/gms;
+        $baddoc_function_pod;
+      }
+   ),
 
    PDL::PP::Rule::Returns::EmptyString->new("HdrCode", [],
     'Code that will be inserted before the call to the RunFunc'),
    PDL::PP::Rule::Returns::EmptyString->new("FtrCode", [],
     'Code that will be inserted after the call to the RunFunc'),
 
-   PDL::PP::Rule->new([], [qw(Name SignatureObj ArgOrder OtherParsDefaults?)],
-      "Check for ArgOrder errors",
-      sub {
-        my ($name, $sig, $argorder, $otherdefaults) = @_;
-        return if $argorder and !ref $argorder;
-        confess "$name ArgOrder given false value" if !ref $argorder;
-        my @names = @{ $sig->allnames(1, 1) };
-        my %namehash = map +($_=>1), @names;
-        delete @namehash{@$argorder};
-        confess "$name ArgOrder missed params: ".join(' ', keys %namehash) if keys %namehash;
-        my %orderhash = map +($_=>1), @$argorder;
-        delete @orderhash{@names};
-        confess "$name ArgOrder too many params: ".join(' ', keys %orderhash) if keys %orderhash;
-        my %optionals = map +($_=>1), keys(%$otherdefaults), $sig->names_out, $sig->other_out;
-        my $optional = '';
-        for (@$argorder) {
-          $optional = $_, next if exists $optionals{$_};
-          confess "$name got mandatory argument '$_' after optional argument '$optional'"
-            if $optional and !exists $optionals{$_};
-        }
-        ();
-      }),
-
-   PDL::PP::Rule->new([], [qw(Name SignatureObj OtherParsDefaults)],
-      "Check the OtherPars defaults aren't for ones after ones without",
-      sub {
-        my ($name,$sig,$otherdefaults) = @_;
-        my @other_args = @{ $sig->othernames(1, 1) };
-        return if keys %$otherdefaults == @other_args;
-        my $default_seen = '';
-        for (@other_args) {
-          $default_seen = $_ if exists $otherdefaults->{$_};
-          confess "$name got default-less arg '$_' after default-ful arg '$default_seen'"
-            if $default_seen and !exists $otherdefaults->{$_};
-        }
-        ();
-      }),
    PDL::PP::Rule->new("VarArgsXSHdr",
       [qw(Name SignatureObj
        OtherParsDefaults? ArgOrder? InplaceNormalised?)],
@@ -1506,12 +1642,11 @@ EOD
       sub {
         my($name,$sig,
            $otherdefaults,$argorder,$inplace) = @_;
-        $argorder = [reorder_args($sig, $otherdefaults)] if $argorder and !ref $argorder;
-        my $optypes = $sig->otherobjs;
-        my @args = @{ $argorder || $sig->allnames(1, 1) };
+        my @args = @{ $sig->args_callorder };
         my %other = map +($_=>1), @{$sig->othernames(1, 1)};
         $otherdefaults ||= {};
         my $ci = 2;  # current indenting
+        my $optypes = $sig->otherobjs;
         my %ptypes = map +($_=>$$optypes{$_} ? $$optypes{$_}->get_decl('', {VarArrays2Ptrs=>1}) : 'pdl *'), @args;
         my %out = map +($_=>1), $sig->names_out_nca;
         my %outca = map +($_=>1), $sig->names_oca;
@@ -1584,7 +1719,7 @@ EOD
         join ",", map exists $otherdefaults->{$_} ? "$_=$otherdefaults->{$_}" :
              $out{$_} || $other_out{$_} ? "[$_]" : $_, @inargs
     ]}) (you may leave [outputs] and values with =defaults out of list)");}
-          unless $only_one || $argorder || ($nmaxonstack - ($xs_arg_cnt+1) == keys(%valid_itemcounts)-1);
+          unless $only_one || $argorder || ($nmaxonstack == keys(%valid_itemcounts) + $xs_arg_cnt);
         my $preamble = @preinit ? qq[\n PREINIT:@{[join "\n  ", "", @preinit]}\n INPUT:\n] : '';
         join '', qq[
 \nNO_OUTPUT pdl_error
@@ -1679,8 +1814,6 @@ END
           "pdl_error $func_name($longpars)");
       }),
 
-   PDL::PP::Rule->new("NewXSMakeNow", ["SignatureObj"],
-      sub { join '', map "$_ = PDL->make_now($_);\n", @{ $_[0]->names } }),
    PDL::PP::Rule->new("IgnoreTypesOf", ["FTypes","SignatureObj"], sub {
       my ($ftypes, $sig) = @_;
       my ($pnames, $pobjs) = ($sig->names_sorted, $sig->objs);
@@ -1813,43 +1946,6 @@ sub make_vfn_args {
    PDL::PP::Rule::Returns::EmptyString->new("NewXSCoerceMustNS"),
    PDL::PP::Rule::Substitute->new("NewXSCoerceMustCompSubd", "NewXSCoerceMustNS"),
 
-   PDL::PP::Rule->new("NewXSFindBadStatusNS", [qw(StructName SignatureObj)],
-      "Rule to find the bad value status of the input ndarrays",
-      sub {
-        my $str = "PDL_RETERROR(PDL_err, PDL->trans_check_pdls($_[0]));\n";
-        $str .= "char \$BADFLAGCACHE() = PDL->trans_badflag_from_inputs($_[0]); (void)\$BADFLAGCACHE();\n" if $_[1]->names_out;
-        indent(2, $str);
-      }),
-
-   PDL::PP::Rule->new("NewXSCopyBadStatusNS",
-      ["CopyBadStatusCode"],
-      "Use CopyBadStatusCode if given",
-      sub {
-        my ($badcode) = @_;
-        confess "PDL::PP ERROR: CopyBadStatusCode contains '\$PRIV(bvalflag)'; replace with \$BADFLAGCACHE()"
-          if $badcode =~ m/\$PRIV(bvalflag)/;
-        $badcode;
-      }),
-   PDL::PP::Rule->new("NewXSCopyBadStatusNS",
-      ["SignatureObj"],
-      "Rule to copy the bad value status to the output ndarrays",
-      # note: this is executed before the trans_mutual call
-      # is made, since the state may be changed by the
-      # Code section
-      sub {
-        my ( $sig ) = @_;
-        return '' if @{$sig->names} == (my @outs = $sig->names_out); # no input pdls, no badflag copying needed
-        !@outs ? '' : PDL::PP::indent(2, join '', # no outs, ditto
-          "if (\$BADFLAGCACHE()) {\n",
-          (map "  \$SETPDLSTATEBAD($_);\n", @outs),
-          "}\n");
-      }),
-
- # expand macros in ...BadStatusCode
- #
-   PDL::PP::Rule::Substitute->new("NewXSFindBadStatusSubd", "NewXSFindBadStatusNS"),
-   PDL::PP::Rule::Substitute->new("NewXSCopyBadStatusSubd", "NewXSCopyBadStatusNS"),
-
    PDL::PP::Rule->new("NewXSStructInit0",
 		      ["StructName","VTableName","ParamStructName","ParamStructType"],
 		      "Rule to create and initialise the private trans structure",
@@ -1866,14 +1962,11 @@ EOF
       ["RunFuncHdr",
         "NewXSStructInit0",
         "NewXSSetTransPDLs",
-        "NewXSFindBadStatusSubd",
-        #     NewXSMakeNow, # this is unnecessary since families never got implemented
         "NewXSTypeCoerceSubd",
         "NewXSExtractTransPDLs",
         "MakeCompiledReprSubd",
         "NewXSCoerceMustCompSubd",
         "NewXSRunTrans",
-        "NewXSCopyBadStatusSubd",
       ],
       "Generate C function with idiomatic arg list to maybe call from XS",
       sub {
@@ -1898,7 +1991,6 @@ EOF
       "Rule to print out XS code when variable argument list XS processing is enabled",
       sub {make_xs_code('','',@_)}),
 
-   PDL::PP::Rule::Returns::Zero->new("NoPthread"), # assume we can pthread, unless indicated otherwise
    PDL::PP::Rule->new("VTableDef",
       ["VTableName","ParamStructType","RedoDimsFuncName","ReadDataFuncName",
        "WriteBackDataFuncName","FreeFuncName",

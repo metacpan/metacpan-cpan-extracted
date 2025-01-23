@@ -76,12 +76,12 @@ sub _options {
             { name => '_e_write_access', text => "- Write access",       section => 'enable' },
         ],
         group_sql_settings => [
-            { name => '_meta',               text => "- System data",        section => 'G'      },
-            { name => 'operators',           text => "- Operators",          section => 'G'      },
-            { name => '_add_aliases',        text => "- Add aliases",        section => 'alias'  },
-            { name => '_aliases_in_clauses', text => "- Aliases in clauses", section => 'alias'  },
-            { name => '_sql_identifiers',    text => "- Identifiers",        section => 'G'      },
-            { name => '_view_name_prefix',   text => "- View prefix",        section => 'create' }, ##
+            { name => '_meta',               text => "- System data",          section => 'G'      },
+            { name => 'operators',           text => "- Operators",            section => 'G'      },
+            { name => '_add_aliases',        text => "- Add aliases",          section => 'alias'  },
+            { name => '_aliases_in_clauses', text => "- Alias use in clauses", section => 'alias'  },
+            { name => '_sql_identifiers',    text => "- Identifiers",          section => 'G'      },
+            { name => '_view_name_prefix',   text => "- View prefix",          section => 'create' }, ##
         ],
         group_create => [
             { name => '_enable_ct_opt',          text => "- Enable options",                     section => 'create' },
@@ -282,8 +282,8 @@ sub set_options {
             elsif ( $opt eq '_e_table' ) {
                 my $prompt = 'Extend Tables Menu:';
                 my $sub_menu = [
-                    [ 'm_derived',   "- Add Derived",     [ $no, $yes ] ],
-                    [ 'm_cte',       "- Add CTE",         [ $no, $yes ] ],
+                    [ 'm_derived',   "- Add Subquery",      [ $no, $yes ] ],
+                    [ 'm_cte',       "- Add Cte",         [ $no, $yes ] ],
                     [ 'join',        "- Add Join",        [ $no, $yes ] ],
                     [ 'union',       "- Add Union",       [ $no, $yes ] ],
                     [ 'db_settings', "- Add DB settings", [ $no, $yes ] ],
@@ -293,18 +293,18 @@ sub set_options {
             elsif ( $opt eq '_e_join' ) {
                 my $prompt = 'Extend Join Menu:';
                 my $sub_menu = [
-                    [ 'j_derived', "- Add Derived", [ $no, $yes ] ],
-                    [ 'j_cte',     "- Add CTE",     [ $no, $yes ] ],
+                    [ 'j_derived', "- Add Subquery", [ $no, $yes ] ],
+                    [ 'j_cte',     "- Add Cte",      [ $no, $yes ] ],
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             elsif ( $opt eq '_e_union' ) {
                 my $prompt = 'Extend Union Menu:';
                 my $sub_menu = [
-                    [ 'u_derived',     "- Add Derived", [ $no, $yes ] ],
-                    [ 'u_cte',         "- Add CTE",     [ $no, $yes ] ],
-                    [ 'u_where',       "- Where",       [ $no, $yes ] ],
-                    [ 'u_parentheses', "- Parentheses", [ $no, $yes ] ],
+                    [ 'u_derived',     "- Add Subquery", [ $no, $yes ] ],
+                    [ 'u_cte',         "- Add Cte",      [ $no, $yes ] ],
+                    [ 'u_where',       "- Where",        [ $no, $yes ] ],
+                    [ 'u_parentheses', "- Parentheses",  [ $no, $yes ] ],
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }

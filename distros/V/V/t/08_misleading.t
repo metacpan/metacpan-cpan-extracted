@@ -14,4 +14,8 @@ require_ok ("V");
     is ($version, 0.42, "Another misleading version");
     }
 
+{   my $version = V::get_version ("ModExtVSN");
+    is ($version, 1.25, "Ignored eval");
+    }
+
 abeltje_done_testing ();

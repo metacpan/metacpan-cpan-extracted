@@ -2,6 +2,8 @@
 
 use strict;
 use utf8;
+binmode(STDOUT, ":utf8");
+
 require Text::Metaphone::Amharic;
 
 
@@ -111,6 +113,8 @@ print "$counter words matched $matches of $errors error words.\n";
 
 }
 
+
+__END__
 
 =head1 NAME
 

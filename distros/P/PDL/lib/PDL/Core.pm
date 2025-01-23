@@ -666,6 +666,23 @@ below for usage).
  $y = topdl $ndarray;       # fall through
  $x = topdl (1,2,3,4);      # Convert 1D array
 
+=head2 tocomplex
+
+=for ref
+
+Return a complex-typed ndarray, either as a no-op or a conversion.
+
+  $cplx = $pdl->tocomplex;
+
+Not exported. Added in 2.099.
+
+=cut
+
+sub PDL::tocomplex {
+  my $pdl = PDL->topdl(@_);
+  $pdl->type->real ? $pdl->r2C : $pdl;
+}
+
 =head2 set_datatype
 
 =for ref
@@ -720,7 +737,22 @@ NOTE: NOT a method! This is because get_datatype returns
 
 =for ref
 
+Update an ndarray's internal data for from packed data.
+
+  $data = read_from_datasource();
+  $pdl->update_data_from($data);
+
+Throws an exception if the argument is the wrong size for that ndarray.
+
+=head2 get_dataref
+
+=for ref
+
 Return the internal data for an ndarray, as a perl SCALAR ref.
+
+If you are using this in order to manipulate the SV, then call
+L</upd_data>, then as of 2.099 you are recommended instead to just
+use L</update_data_from> to streamline the process.
 
 Most ndarrays hold their internal data in a packed perl string, to take
 advantage of perl's memory management.  This gives you direct access
@@ -749,6 +781,9 @@ Update the data pointer in an ndarray to match its perl SV.
 This is useful if you've been monkeying with the packed string
 representation of the PDL, which you probably shouldn't be doing
 anyway.  (see L</get_dataref>.)
+
+As of 2.099 you are recommended instead to just use
+L</update_data_from> to streamline the process.
 
 =cut
 
@@ -818,6 +853,39 @@ below for usage).
 sub piddle {PDL->pdl(@_)}
 sub pdl {PDL->pdl(@_)}
 sub PDL::pdl { shift->new(@_) }
+
+=head2 readonly
+
+=for ref
+
+Make an ndarray read-only, returning the ndarray argument.
+This means any future transformation (a.k.a. PDL
+operation) applied to this ndarray I<as an output> will cause an exception:
+
+  $x = sequence(3)->readonly; # also works: $x = sequence(3); $x->readonly;
+  $y = $x + 1; # fine
+  $x .= 5; # error
+  $x += 5; # also error
+
+Not exported.
+
+=for usage
+
+ $x->readonly;
+
+=head2 is_readonly
+
+=for ref
+
+Test whether an ndarray is read-only.
+
+  $bool = $x->is_readonly;
+
+Not exported.
+
+=for usage
+
+ $x->is_readonly;
 
 =head2 flowing
 
@@ -1209,8 +1277,7 @@ sub PDL::new {
       } else {
          $new->setdims([]);
          if ($value) {
-           ${$new->get_dataref} = pack( $pack[$new->get_datatype], $value );
-           $new->upd_data;
+           $new->update_data_from( pack $pack[$new->get_datatype], $value );
          } else { # do nothing if 0 - allocdata already memsets to 0
            $new->make_physical;
          }
@@ -2197,6 +2264,7 @@ sub pdump_trans {
   my $vtable = $trans->vtable;
   my @lines = (
     "State: ${\join '|', $trans->flags}",
+    "bvalflag: ${\$trans->bvalflag}",
     "vtable flags: ${\join '|', $vtable->flags}",
   );
   my @ins = $trans->parents;
@@ -2209,6 +2277,7 @@ sub pdump_trans {
   push @lines,
     "ind_sizes: (@{[$trans->ind_sizes]})",
     "inc_sizes: (@{[$trans->inc_sizes]})",
+    "trans_children_indices: (@{[$trans->trans_children_indices]})",
     "INPUTS: (@{[map sprintf('0x%x', $_->address), @ins]})  OUTPUTS: (@{[map sprintf('0x%x', $_->address), @outs]})",
     ;
   join '', "PDUMPTRANS 0x${\sprintf '%x', $trans->address} (${\$vtable->name})\n", map "  $_\n", @lines;

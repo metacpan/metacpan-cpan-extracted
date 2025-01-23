@@ -3,7 +3,7 @@
 #
 package PDL::Ufunc;
 
-our @EXPORT_OK = qw(prodover dprodover cumuprodover dcumuprodover sumover dsumover cumusumover dcumusumover andover bandover borover firstnonzeroover orover zcover diffover diff2 intover average avgover caverage cavgover daverage davgover minimum minover minimum_ind minover_ind minimum_n_ind minover_n_ind maximum maxover maximum_ind maxover_ind maximum_n_ind maxover_n_ind minmaximum minmaxover avg sum prod davg dsum dprod zcheck and band or bor min max median mode oddmedian any all minmax medover oddmedover modeover pctover oddpctover pct oddpct qsort qsorti qsortvec qsortveci magnover );
+our @EXPORT_OK = qw(prodover dprodover cumuprodover dcumuprodover sumover dsumover cumusumover dcumusumover andover bandover borover firstnonzeroover orover zcover numdiff diffcentred partial diff2 intover average avgover caverage cavgover daverage davgover minimum minover minimum_ind minover_ind minimum_n_ind minover_n_ind maximum maxover maximum_ind maxover_ind maximum_n_ind maxover_n_ind minmaximum minmaxover avg sum prod davg dsum dprod zcheck and band or bor min max median mode oddmedian any all minmax medover oddmedover modeover pctover oddpctover pct oddpct qsort qsorti qsortvec qsortveci magnover );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
@@ -22,10 +22,13 @@ use DynaLoader;
 
 
 
+
 #line 8 "lib/PDL/Ufunc.pd"
 
 use strict;
 use warnings;
+
+=encoding utf8
 
 =head1 NAME
 
@@ -52,7 +55,7 @@ to many of the functions in this module.
 
 use PDL::Slices;
 use Carp;
-#line 56 "lib/PDL/Ufunc.pm"
+#line 59 "lib/PDL/Ufunc.pm"
 
 
 =head1 FUNCTIONS
@@ -68,7 +71,16 @@ use Carp;
 
 =for sig
 
-  Signature: (a(n); int+ [o]b())
+ Signature: (a(n); int+ [o]b())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $b = prodover($a);
+ prodover($a, $b);  # all arguments given
+ $b = $a->prodover; # method call
+ $a->prodover($b);
 
 =for ref
 
@@ -80,17 +92,13 @@ by one by taking the product along the 1st dimension.
 By using L<xchg|PDL::Slices/xchg> etc. it is possible to use
 I<any> dimension.
 
-=for usage
+=pod
 
- $y = prodover($x);
-
-=for example
-
- $spectrum = prodover $image->transpose
+Broadcasts over its inputs.
 
 =for bad
 
-prodover processes bad values.
+C<prodover> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -109,7 +117,16 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); double [o]b())
+ Signature: (a(n); double [o]b())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $b = dprodover($a);
+ dprodover($a, $b);  # all arguments given
+ $b = $a->dprodover; # method call
+ $a->dprodover($b);
 
 =for ref
 
@@ -121,19 +138,15 @@ by one by taking the product along the 1st dimension.
 By using L<xchg|PDL::Slices/xchg> etc. it is possible to use
 I<any> dimension.
 
-=for usage
-
- $y = dprodover($x);
-
-=for example
-
- $spectrum = dprodover $image->transpose
-
 Unlike L</prodover>, the calculations are performed in double precision.
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
-dprodover processes bad values.
+C<dprodover> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -152,7 +165,16 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); int+ [o]b(n))
+ Signature: (a(n); int+ [o]b(n))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $b = cumuprodover($a);
+ cumuprodover($a, $b);  # all arguments given
+ $b = $a->cumuprodover; # method call
+ $a->cumuprodover($b);
 
 =for ref
 
@@ -167,17 +189,13 @@ I<any> dimension.
 The sum is started so that the first element in the cumulative product
 is the first element of the parameter.
 
-=for usage
+=pod
 
- $y = cumuprodover($x);
-
-=for example
-
- $spectrum = cumuprodover $image->transpose
+Broadcasts over its inputs.
 
 =for bad
 
-cumuprodover processes bad values.
+C<cumuprodover> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -196,7 +214,16 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); double [o]b(n))
+ Signature: (a(n); double [o]b(n))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $b = dcumuprodover($a);
+ dcumuprodover($a, $b);  # all arguments given
+ $b = $a->dcumuprodover; # method call
+ $a->dcumuprodover($b);
 
 =for ref
 
@@ -211,19 +238,15 @@ I<any> dimension.
 The sum is started so that the first element in the cumulative product
 is the first element of the parameter.
 
-=for usage
-
- $y = dcumuprodover($x);
-
-=for example
-
- $spectrum = dcumuprodover $image->transpose
-
 Unlike L</cumuprodover>, the calculations are performed in double precision.
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
-dcumuprodover processes bad values.
+C<dcumuprodover> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -242,7 +265,16 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); int+ [o]b())
+ Signature: (a(n); int+ [o]b())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $b = sumover($a);
+ sumover($a, $b);  # all arguments given
+ $b = $a->sumover; # method call
+ $a->sumover($b);
 
 =for ref
 
@@ -254,17 +286,13 @@ by one by taking the sum along the 1st dimension.
 By using L<xchg|PDL::Slices/xchg> etc. it is possible to use
 I<any> dimension.
 
-=for usage
+=pod
 
- $y = sumover($x);
-
-=for example
-
- $spectrum = sumover $image->transpose
+Broadcasts over its inputs.
 
 =for bad
 
-sumover processes bad values.
+C<sumover> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -283,7 +311,16 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); double [o]b())
+ Signature: (a(n); double [o]b())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $b = dsumover($a);
+ dsumover($a, $b);  # all arguments given
+ $b = $a->dsumover; # method call
+ $a->dsumover($b);
 
 =for ref
 
@@ -295,19 +332,15 @@ by one by taking the sum along the 1st dimension.
 By using L<xchg|PDL::Slices/xchg> etc. it is possible to use
 I<any> dimension.
 
-=for usage
-
- $y = dsumover($x);
-
-=for example
-
- $spectrum = dsumover $image->transpose
-
 Unlike L</sumover>, the calculations are performed in double precision.
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
-dsumover processes bad values.
+C<dsumover> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -326,7 +359,16 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); int+ [o]b(n))
+ Signature: (a(n); int+ [o]b(n))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $b = cumusumover($a);
+ cumusumover($a, $b);  # all arguments given
+ $b = $a->cumusumover; # method call
+ $a->cumusumover($b);
 
 =for ref
 
@@ -341,17 +383,13 @@ I<any> dimension.
 The sum is started so that the first element in the cumulative sum
 is the first element of the parameter.
 
-=for usage
+=pod
 
- $y = cumusumover($x);
-
-=for example
-
- $spectrum = cumusumover $image->transpose
+Broadcasts over its inputs.
 
 =for bad
 
-cumusumover processes bad values.
+C<cumusumover> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -370,7 +408,16 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); double [o]b(n))
+ Signature: (a(n); double [o]b(n))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $b = dcumusumover($a);
+ dcumusumover($a, $b);  # all arguments given
+ $b = $a->dcumusumover; # method call
+ $a->dcumusumover($b);
 
 =for ref
 
@@ -385,19 +432,15 @@ I<any> dimension.
 The sum is started so that the first element in the cumulative sum
 is the first element of the parameter.
 
-=for usage
-
- $y = dcumusumover($x);
-
-=for example
-
- $spectrum = dcumusumover $image->transpose
-
 Unlike L</cumusumover>, the calculations are performed in double precision.
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
-dcumusumover processes bad values.
+C<dcumusumover> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -416,7 +459,16 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); int+ [o]b())
+ Signature: (a(n); int+ [o]b())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $b = andover($a);
+ andover($a, $b);  # all arguments given
+ $b = $a->andover; # method call
+ $a->andover($b);
 
 =for ref
 
@@ -428,13 +480,9 @@ by one by taking the and along the 1st dimension.
 By using L<xchg|PDL::Slices/xchg> etc. it is possible to use
 I<any> dimension.
 
-=for usage
+=pod
 
- $y = andover($x);
-
-=for example
-
- $spectrum = andover $image->transpose
+Broadcasts over its inputs.
 
 =for bad
 
@@ -458,7 +506,15 @@ as it will not contain any bad values.
 
 =for sig
 
-  Signature: (a(n);  [o]b())
+ Signature: (a(n);  [o]b())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong)
+
+=for usage
+
+ $b = bandover($a);
+ bandover($a, $b);  # all arguments given
+ $b = $a->bandover; # method call
+ $a->bandover($b);
 
 =for ref
 
@@ -470,13 +526,9 @@ by one by taking the bitwise and along the 1st dimension.
 By using L<xchg|PDL::Slices/xchg> etc. it is possible to use
 I<any> dimension.
 
-=for usage
+=pod
 
- $y = bandover($x);
-
-=for example
-
- $spectrum = bandover $image->transpose
+Broadcasts over its inputs.
 
 =for bad
 
@@ -500,7 +552,15 @@ as it will not contain any bad values.
 
 =for sig
 
-  Signature: (a(n);  [o]b())
+ Signature: (a(n);  [o]b())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong)
+
+=for usage
+
+ $b = borover($a);
+ borover($a, $b);  # all arguments given
+ $b = $a->borover; # method call
+ $a->borover($b);
 
 =for ref
 
@@ -512,13 +572,9 @@ by one by taking the bitwise or along the 1st dimension.
 By using L<xchg|PDL::Slices/xchg> etc. it is possible to use
 I<any> dimension.
 
-=for usage
+=pod
 
- $y = borover($x);
-
-=for example
-
- $spectrum = borover $image->transpose
+Broadcasts over its inputs.
 
 =for bad
 
@@ -542,7 +598,16 @@ as it will not contain any bad values.
 
 =for sig
 
-  Signature: (a(n);  [o]b())
+ Signature: (a(n);  [o]b())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $b = firstnonzeroover($a);
+ firstnonzeroover($a, $b);  # all arguments given
+ $b = $a->firstnonzeroover; # method call
+ $a->firstnonzeroover($b);
 
 =for ref
 
@@ -554,13 +619,9 @@ by one by taking the first non-zero value along the 1st dimension.
 By using L<xchg|PDL::Slices/xchg> etc. it is possible to use
 I<any> dimension.
 
-=for usage
+=pod
 
- $y = firstnonzeroover($x);
-
-=for example
-
- $spectrum = firstnonzeroover $image->transpose
+Broadcasts over its inputs.
 
 =for bad
 
@@ -584,7 +645,16 @@ as it will not contain any bad values.
 
 =for sig
 
-  Signature: (a(n); int+ [o]b())
+ Signature: (a(n); int+ [o]b())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $b = orover($a);
+ orover($a, $b);  # all arguments given
+ $b = $a->orover; # method call
+ $a->orover($b);
 
 =for ref
 
@@ -596,13 +666,9 @@ by one by taking the or along the 1st dimension.
 By using L<xchg|PDL::Slices/xchg> etc. it is possible to use
 I<any> dimension.
 
-=for usage
+=pod
 
- $y = orover($x);
-
-=for example
-
- $spectrum = orover $image->transpose
+Broadcasts over its inputs.
 
 =for bad
 
@@ -626,7 +692,16 @@ as it will not contain any bad values.
 
 =for sig
 
-  Signature: (a(n); int+ [o]b())
+ Signature: (a(n); int+ [o]b())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $b = zcover($a);
+ zcover($a, $b);  # all arguments given
+ $b = $a->zcover; # method call
+ $a->zcover($b);
 
 =for ref
 
@@ -638,13 +713,9 @@ by one by taking the == 0 along the 1st dimension.
 By using L<xchg|PDL::Slices/xchg> etc. it is possible to use
 I<any> dimension.
 
-=for usage
+=pod
 
- $y = zcover($x);
-
-=for example
-
- $spectrum = zcover $image->transpose
+Broadcasts over its inputs.
 
 =for bad
 
@@ -664,24 +735,41 @@ as it will not contain any bad values.
 
 
 
-=head2 diffover
+=head2 numdiff
 
 =for sig
 
-  Signature: (x(t); [o]dx(t))
+ Signature: (x(t); [o]dx(t))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $dx = numdiff($x);
+ numdiff($x, $dx);     # all arguments given
+ $dx = $x->numdiff;    # method call
+ $x->numdiff($dx);
+ $x->inplace->numdiff; # can be used inplace
+ numdiff($x->inplace);
 
 =for ref
 
-Differencing. DX(t) = X(t) - X(t-1), DX(0) = X(0). Can be done inplace.
+Numerical differencing. DX(t) = X(t) - X(t-1), DX(0) = X(0).
+Combined with C<slice('-1:0')>, can be used for backward differencing.
 
 Unlike L</diff2>, output vector is same length.
 Originally by Maggie J. Xiong.
 
 Compare to L</cumusumover>, which acts as the converse of this.
+See also L</diff2>, L</diffcentred>, L</partial>, L<PDL::Primitive/pchip_chim>.
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
-diffover does not process bad values.
+C<numdiff> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -689,30 +777,164 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-*diffover = \&PDL::diffover;
+*numdiff = \&PDL::numdiff;
 
 
 
 
+
+
+=head2 diffcentred
+
+=for sig
+
+ Signature: (a(n); [o]o(n))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $o = diffcentred($a);
+ diffcentred($a, $o);  # all arguments given
+ $o = $a->diffcentred; # method call
+ $a->diffcentred($o);
+
+=for ref
+
+Calculates centred differences along a vector's 0th dimension.
+Always periodic on boundaries; currently to change this, you must
+pad your data, and/or trim afterwards. This is so that when using
+with L</partial>, the size of data stays the same and therefore
+compatible if differentiated along different dimensions, e.g.
+calculating "curl".
+
+By using L<PDL::Slices/xchg> etc. it is possible to use I<any> dimension.
+
+See also L</diff2>, L</partial>, L</numdiff>, L<PDL::Primitive/pchip_chim>.
+
+=pod
+
+Broadcasts over its inputs.
+
+=for bad
+
+A bad value at C<n> means the affected output values at C<n-2>,C<n>
+(if in boounds) are set bad.
+
+=cut
+
+
+
+
+*diffcentred = \&PDL::diffcentred;
+
+
+
+
+
+#line 247 "lib/PDL/Ufunc.pd"
+
+=head2 partial
+
+=for ref
+
+Take a numerical partial derivative along a given dimension, either
+forward, backward, or centred.
+
+See also L</numdiff>, L</diffcentred>,
+L<PDL::Primitive/pchip_chim>, L<PDL::Primitive/pchip_chsp>,
+and L<PDL::Slices/mv>, which are currently used to implement this.
+
+Can be used to implement divergence and curl calculations (adapted
+from Luis Mochán's work at
+https://sourceforge.net/p/pdl/mailman/message/58843767/):
+
+  use v5.36;
+  use PDL;
+  sub curl ($f) {
+    my ($f0, $f1, $f2) = $f->using(0..2);
+    my $o = {dir=>'c'};
+    pdl(
+      $f2->partial(1,$o) - $f1->partial(2,$o),
+      $f0->partial(2,$o) - $f2->partial(0,$o),
+      $f1->partial(0,$o) - $f0->partial(1,$o),
+    )->mv(-1,0);
+  }
+  sub div ($f) {
+    my ($f0, $f1, $f2) = $f->using(0..2);
+    my $o = {dir=>'c'};
+    $f0->partial(0,$o) + $f1->partial(1,$o) + $f2->partial(2,$o);
+  }
+  sub trim3d ($f) { $f->slice(':,1:-2,1:-2,1:-2') } # adjust if change "dir"
+  my $z=zeroes(5,5,5);
+  my $v=pdl(-$z->yvals, $z->xvals, $z->zvals)->mv(-1,0);
+  say trim3d(curl($v));
+  say div($v);
+
+=for usage
+
+  $pdl->partial(2);           # along dim 2, centred
+  $pdl->partial(2, {d=>'c'}); # along dim 2, centred
+  $pdl->partial(2, {d=>'f'}); # along dim 2, forward
+  $pdl->partial(2, {d=>'b'}); # along dim 2, backward
+  $pdl->partial(2, {d=>'p'}); # along dim 2, piecewise cubic Hermite
+  $pdl->partial(2, {d=>'s'}); # along dim 2, cubic spline
+
+=cut
+
+my %dirtype2func = (
+  f => \&numdiff,
+  b => sub { $_[0]->slice('-1:0')->numdiff },
+  c => \&diffcentred,
+  p => sub {(PDL::Primitive::pchip_chim($_[0]->xvals, $_[0]))[0]},
+  s => sub {(PDL::Primitive::pchip_chsp([0,0], [0,0], $_[0]->xvals, $_[0]))[0]},
+);
+*partial = \&PDL::partial;
+sub PDL::partial {
+  my ($f, $dim, $opts) = @_;
+  $opts ||= {};
+  my $difftype = $opts->{dir} || $opts->{d} || 'c';
+  my $func = $dirtype2func{$difftype} || barf "partial: unknown 'dir' option '$difftype', only know (@{[sort keys %dirtype2func]})";
+  $f = $f->mv($dim, 0) if $dim;
+  my $ret = $f->$func;
+  $dim ? $ret->mv(0, $dim) : $ret;
+}
+#line 903 "lib/PDL/Ufunc.pm"
 
 
 =head2 diff2
 
 =for sig
 
-  Signature: (a(n); [o]o(nminus1=CALC($SIZE(n) - 1)))
-
-=for ref
-
-Numerically differentiates a vector along 0th dimension.
-
-By using L<PDL::Slices/xchg> etc. it is possible to use I<any> dimension.
-Unlike L</diffover>, output vector is one shorter.
+ Signature: (a(n); [o]o(nminus1=CALC($SIZE(n) - 1)))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
 
 =for usage
 
+ $o = diff2($a);
+ diff2($a, $o);  # all arguments given
+ $o = $a->diff2; # method call
+ $a->diff2($o);
+
+=for ref
+
+Numerically forward differentiates a vector along 0th dimension.
+
+By using L<PDL::Slices/xchg> etc. it is possible to use I<any> dimension.
+Unlike L</numdiff>, output vector is one shorter.
+Combined with C<slice('-1:0')>, can be used for backward differencing.
+
+See also L</numdiff>, L</diffcentred>, L</partial>, L<PDL::Primitive/pchip_chim>.
+
+=for example
+
   print pdl(q[3 4 2 3 2 3 1])->diff2;
   # [1 -2 1 -1 1 -2]
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
@@ -735,7 +957,16 @@ is difference between that and last good value.
 
 =for sig
 
-  Signature: (a(n); float+ [o]b())
+ Signature: (a(n); float+ [o]b())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $b = intover($a);
+ intover($a, $b);  # all arguments given
+ $b = $a->intover; # method call
+ $a->intover($b);
 
 =for ref
 
@@ -747,14 +978,6 @@ by one by taking the integral along the 1st dimension.
 By using L<xchg|PDL::Slices/xchg> etc. it is possible to use
 I<any> dimension.
 
-=for usage
-
- $y = intover($x);
-
-=for example
-
- $spectrum = intover $image->transpose
-
 Notes:
 
 C<intover> uses a point spacing of one (i.e., delta-h==1). You will
@@ -765,9 +988,13 @@ integrals between the end points assuming the pdl gives values just at
 these centres: for such `functions', sumover is correct to C<O(h)>, but
 is the natural (and correct) choice for binned data, of course.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-intover ignores the bad-value flag of the input ndarrays.
+C<intover> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -786,7 +1013,16 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); int+ [o]b())
+ Signature: (a(n); int+ [o]b())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $b = average($a);
+ average($a, $b);  # all arguments given
+ $b = $a->average; # method call
+ $a->average($b);
 
 =for ref
 
@@ -798,17 +1034,13 @@ by one by taking the average along the 1st dimension.
 By using L<xchg|PDL::Slices/xchg> etc. it is possible to use
 I<any> dimension.
 
-=for usage
+=pod
 
- $y = average($x);
-
-=for example
-
- $spectrum = average $image->transpose
+Broadcasts over its inputs.
 
 =for bad
 
-average processes bad values.
+C<average> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -822,7 +1054,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 326 "lib/PDL/Ufunc.pd"
+#line 414 "lib/PDL/Ufunc.pd"
 
 =head2 avgover
 
@@ -833,14 +1065,23 @@ Synonym for L</average>.
 =cut
 
 *PDL::avgover = *avgover = \&PDL::average;
-#line 837 "lib/PDL/Ufunc.pm"
+#line 1069 "lib/PDL/Ufunc.pm"
 
 
 =head2 caverage
 
 =for sig
 
-  Signature: (a(n); cdouble [o]b())
+ Signature: (a(n); cdouble [o]b())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $b = caverage($a);
+ caverage($a, $b);  # all arguments given
+ $b = $a->caverage; # method call
+ $a->caverage($b);
 
 =for ref
 
@@ -852,20 +1093,16 @@ by one by taking the average along the 1st dimension.
 By using L<xchg|PDL::Slices/xchg> etc. it is possible to use
 I<any> dimension.
 
-=for usage
-
- $y = caverage($x);
-
-=for example
-
- $spectrum = caverage $image->transpose
-
 Unlike L<average|/average>, the calculation is performed in complex double
 precision.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-caverage processes bad values.
+C<caverage> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -879,7 +1116,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 326 "lib/PDL/Ufunc.pd"
+#line 414 "lib/PDL/Ufunc.pd"
 
 =head2 cavgover
 
@@ -890,14 +1127,23 @@ Synonym for L</caverage>.
 =cut
 
 *PDL::cavgover = *cavgover = \&PDL::caverage;
-#line 894 "lib/PDL/Ufunc.pm"
+#line 1131 "lib/PDL/Ufunc.pm"
 
 
 =head2 daverage
 
 =for sig
 
-  Signature: (a(n); double [o]b())
+ Signature: (a(n); double [o]b())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $b = daverage($a);
+ daverage($a, $b);  # all arguments given
+ $b = $a->daverage; # method call
+ $a->daverage($b);
 
 =for ref
 
@@ -909,20 +1155,16 @@ by one by taking the average along the 1st dimension.
 By using L<xchg|PDL::Slices/xchg> etc. it is possible to use
 I<any> dimension.
 
-=for usage
-
- $y = daverage($x);
-
-=for example
-
- $spectrum = daverage $image->transpose
-
 Unlike L<average|/average>, the calculation is performed in double
 precision.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-daverage processes bad values.
+C<daverage> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -936,7 +1178,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 326 "lib/PDL/Ufunc.pd"
+#line 414 "lib/PDL/Ufunc.pd"
 
 =head2 davgover
 
@@ -947,14 +1189,23 @@ Synonym for L</daverage>.
 =cut
 
 *PDL::davgover = *davgover = \&PDL::daverage;
-#line 951 "lib/PDL/Ufunc.pm"
+#line 1193 "lib/PDL/Ufunc.pm"
 
 
 =head2 minimum
 
 =for sig
 
-  Signature: (a(n); [o]c())
+ Signature: (a(n); [o]c())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $c = minimum($a);
+ minimum($a, $c);  # all arguments given
+ $c = $a->minimum; # method call
+ $a->minimum($c);
 
 =for ref
 
@@ -966,13 +1217,9 @@ by one by taking the minimum along the 1st dimension.
 By using L<xchg|PDL::Slices/xchg> etc. it is possible to use
 I<any> dimension.
 
-=for usage
+=pod
 
- $y = minimum($x);
-
-=for example
-
- $spectrum = minimum $image->transpose
+Broadcasts over its inputs.
 
 =for bad
 
@@ -994,7 +1241,7 @@ for ways of masking NaNs.
 
 
 
-#line 326 "lib/PDL/Ufunc.pd"
+#line 414 "lib/PDL/Ufunc.pd"
 
 =head2 minover
 
@@ -1005,18 +1252,31 @@ Synonym for L</minimum>.
 =cut
 
 *PDL::minover = *minover = \&PDL::minimum;
-#line 1009 "lib/PDL/Ufunc.pm"
+#line 1256 "lib/PDL/Ufunc.pm"
 
 
 =head2 minimum_ind
 
 =for sig
 
-  Signature: (a(n); indx [o] c())
+ Signature: (a(n); indx [o] c())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $c = minimum_ind($a);
+ minimum_ind($a, $c);  # all arguments given
+ $c = $a->minimum_ind; # method call
+ $a->minimum_ind($c);
 
 =for ref
 
 Like minimum but returns the first matching index rather than the value
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
@@ -1038,7 +1298,7 @@ for ways of masking NaNs.
 
 
 
-#line 326 "lib/PDL/Ufunc.pd"
+#line 414 "lib/PDL/Ufunc.pd"
 
 =head2 minover_ind
 
@@ -1049,14 +1309,16 @@ Synonym for L</minimum_ind>.
 =cut
 
 *PDL::minover_ind = *minover_ind = \&PDL::minimum_ind;
-#line 1053 "lib/PDL/Ufunc.pm"
+#line 1313 "lib/PDL/Ufunc.pm"
 
 
 =head2 minimum_n_ind
 
 =for sig
 
-  Signature: (a(n); indx [o]c(m); PDL_Indx m_size => m)
+ Signature: (a(n); indx [o]c(m); PDL_Indx m_size => m)
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
 
 =for ref
 
@@ -1070,6 +1332,10 @@ be set to that), or just the size, or a null and the size.
   minimum_n_ind($pdl, $out = zeroes(5)); # DEPRECATED
   $out = minimum_n_ind($pdl, 5);
   minimum_n_ind($pdl, $out = null, 5);
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
@@ -1086,7 +1352,7 @@ for ways of masking NaNs.
 
 
 
-#line 430 "lib/PDL/Ufunc.pd"
+#line 514 "lib/PDL/Ufunc.pd"
 sub PDL::minimum_n_ind {
   my ($a, $c, $m_size) = @_;
   $m_size //= ref($c) ? $c->dim(0) : $c; # back-compat with pre-2.077
@@ -1096,7 +1362,7 @@ sub PDL::minimum_n_ind {
   PDL::_minimum_n_ind_int($a, $c, $m_size);
   $set_out ? $_[1] = $c : $c;
 }
-#line 1100 "lib/PDL/Ufunc.pm"
+#line 1366 "lib/PDL/Ufunc.pm"
 
 *minimum_n_ind = \&PDL::minimum_n_ind;
 
@@ -1104,7 +1370,7 @@ sub PDL::minimum_n_ind {
 
 
 
-#line 326 "lib/PDL/Ufunc.pd"
+#line 414 "lib/PDL/Ufunc.pd"
 
 =head2 minover_n_ind
 
@@ -1115,14 +1381,23 @@ Synonym for L</minimum_n_ind>.
 =cut
 
 *PDL::minover_n_ind = *minover_n_ind = \&PDL::minimum_n_ind;
-#line 1119 "lib/PDL/Ufunc.pm"
+#line 1385 "lib/PDL/Ufunc.pm"
 
 
 =head2 maximum
 
 =for sig
 
-  Signature: (a(n); [o]c())
+ Signature: (a(n); [o]c())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $c = maximum($a);
+ maximum($a, $c);  # all arguments given
+ $c = $a->maximum; # method call
+ $a->maximum($c);
 
 =for ref
 
@@ -1134,13 +1409,9 @@ by one by taking the maximum along the 1st dimension.
 By using L<xchg|PDL::Slices/xchg> etc. it is possible to use
 I<any> dimension.
 
-=for usage
+=pod
 
- $y = maximum($x);
-
-=for example
-
- $spectrum = maximum $image->transpose
+Broadcasts over its inputs.
 
 =for bad
 
@@ -1162,7 +1433,7 @@ for ways of masking NaNs.
 
 
 
-#line 326 "lib/PDL/Ufunc.pd"
+#line 414 "lib/PDL/Ufunc.pd"
 
 =head2 maxover
 
@@ -1173,18 +1444,31 @@ Synonym for L</maximum>.
 =cut
 
 *PDL::maxover = *maxover = \&PDL::maximum;
-#line 1177 "lib/PDL/Ufunc.pm"
+#line 1448 "lib/PDL/Ufunc.pm"
 
 
 =head2 maximum_ind
 
 =for sig
 
-  Signature: (a(n); indx [o] c())
+ Signature: (a(n); indx [o] c())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $c = maximum_ind($a);
+ maximum_ind($a, $c);  # all arguments given
+ $c = $a->maximum_ind; # method call
+ $a->maximum_ind($c);
 
 =for ref
 
 Like maximum but returns the first matching index rather than the value
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
@@ -1206,7 +1490,7 @@ for ways of masking NaNs.
 
 
 
-#line 326 "lib/PDL/Ufunc.pd"
+#line 414 "lib/PDL/Ufunc.pd"
 
 =head2 maxover_ind
 
@@ -1217,14 +1501,16 @@ Synonym for L</maximum_ind>.
 =cut
 
 *PDL::maxover_ind = *maxover_ind = \&PDL::maximum_ind;
-#line 1221 "lib/PDL/Ufunc.pm"
+#line 1505 "lib/PDL/Ufunc.pm"
 
 
 =head2 maximum_n_ind
 
 =for sig
 
-  Signature: (a(n); indx [o]c(m); PDL_Indx m_size => m)
+ Signature: (a(n); indx [o]c(m); PDL_Indx m_size => m)
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
 
 =for ref
 
@@ -1238,6 +1524,10 @@ be set to that), or just the size, or a null and the size.
   maximum_n_ind($pdl, $out = zeroes(5)); # DEPRECATED
   $out = maximum_n_ind($pdl, 5);
   maximum_n_ind($pdl, $out = null, 5);
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
@@ -1254,7 +1544,7 @@ for ways of masking NaNs.
 
 
 
-#line 430 "lib/PDL/Ufunc.pd"
+#line 514 "lib/PDL/Ufunc.pd"
 sub PDL::maximum_n_ind {
   my ($a, $c, $m_size) = @_;
   $m_size //= ref($c) ? $c->dim(0) : $c; # back-compat with pre-2.077
@@ -1264,7 +1554,7 @@ sub PDL::maximum_n_ind {
   PDL::_maximum_n_ind_int($a, $c, $m_size);
   $set_out ? $_[1] = $c : $c;
 }
-#line 1268 "lib/PDL/Ufunc.pm"
+#line 1558 "lib/PDL/Ufunc.pm"
 
 *maximum_n_ind = \&PDL::maximum_n_ind;
 
@@ -1272,7 +1562,7 @@ sub PDL::maximum_n_ind {
 
 
 
-#line 326 "lib/PDL/Ufunc.pd"
+#line 414 "lib/PDL/Ufunc.pd"
 
 =head2 maxover_n_ind
 
@@ -1283,20 +1573,29 @@ Synonym for L</maximum_n_ind>.
 =cut
 
 *PDL::maxover_n_ind = *maxover_n_ind = \&PDL::maximum_n_ind;
-#line 1287 "lib/PDL/Ufunc.pm"
+#line 1577 "lib/PDL/Ufunc.pm"
 
 
 =head2 minmaximum
 
 =for sig
 
-  Signature: (a(n); [o]cmin(); [o] cmax(); indx [o]cmin_ind(); indx [o]cmax_ind())
+ Signature: (a(n); [o]cmin(); [o] cmax(); indx [o]cmin_ind(); indx [o]cmax_ind())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ ($cmin, $cmax, $cmin_ind, $cmax_ind) = minmaximum($a);
+ minmaximum($a, $cmin, $cmax, $cmin_ind, $cmax_ind);    # all arguments given
+ ($cmin, $cmax, $cmin_ind, $cmax_ind) = $a->minmaximum; # method call
+ $a->minmaximum($cmin, $cmax, $cmin_ind, $cmax_ind);
 
 =for ref
 
 Find minimum and maximum and their indices for a given ndarray;
 
-=for usage
+=for example
 
  pdl> $x=pdl [[-2,3,4],[1,0,3]]
  pdl> ($min, $max, $min_ind, $max_ind)=minmaximum($x)
@@ -1304,6 +1603,10 @@ Find minimum and maximum and their indices for a given ndarray;
  [-2 0] [4 3] [0 1] [2 2]
 
 See also L</minmax>, which clumps the ndarray together.
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
@@ -1323,7 +1626,7 @@ since they will not contain any bad values.
 
 
 
-#line 326 "lib/PDL/Ufunc.pd"
+#line 414 "lib/PDL/Ufunc.pd"
 
 =head2 minmaxover
 
@@ -1335,7 +1638,7 @@ Synonym for L</minmaximum>.
 
 *PDL::minmaxover = *minmaxover = \&PDL::minmaximum;
 
-#line 562 "lib/PDL/Ufunc.pd"
+#line 645 "lib/PDL/Ufunc.pd"
 
 =head2 avg
 
@@ -1358,7 +1661,7 @@ This routine handles bad values.
 *avg = \&PDL::avg;
 sub PDL::avg { $_[0]->flat->average }
 
-#line 562 "lib/PDL/Ufunc.pd"
+#line 645 "lib/PDL/Ufunc.pd"
 
 =head2 sum
 
@@ -1381,7 +1684,7 @@ This routine handles bad values.
 *sum = \&PDL::sum;
 sub PDL::sum { $_[0]->flat->sumover }
 
-#line 562 "lib/PDL/Ufunc.pd"
+#line 645 "lib/PDL/Ufunc.pd"
 
 =head2 prod
 
@@ -1404,7 +1707,7 @@ This routine handles bad values.
 *prod = \&PDL::prod;
 sub PDL::prod { $_[0]->flat->prodover }
 
-#line 562 "lib/PDL/Ufunc.pd"
+#line 645 "lib/PDL/Ufunc.pd"
 
 =head2 davg
 
@@ -1427,7 +1730,7 @@ This routine handles bad values.
 *davg = \&PDL::davg;
 sub PDL::davg { $_[0]->flat->daverage }
 
-#line 562 "lib/PDL/Ufunc.pd"
+#line 645 "lib/PDL/Ufunc.pd"
 
 =head2 dsum
 
@@ -1450,7 +1753,7 @@ This routine handles bad values.
 *dsum = \&PDL::dsum;
 sub PDL::dsum { $_[0]->flat->dsumover }
 
-#line 562 "lib/PDL/Ufunc.pd"
+#line 645 "lib/PDL/Ufunc.pd"
 
 =head2 dprod
 
@@ -1473,7 +1776,7 @@ This routine handles bad values.
 *dprod = \&PDL::dprod;
 sub PDL::dprod { $_[0]->flat->dprodover }
 
-#line 562 "lib/PDL/Ufunc.pd"
+#line 645 "lib/PDL/Ufunc.pd"
 
 =head2 zcheck
 
@@ -1496,7 +1799,7 @@ This routine handles bad values.
 *zcheck = \&PDL::zcheck;
 sub PDL::zcheck { $_[0]->flat->zcover }
 
-#line 562 "lib/PDL/Ufunc.pd"
+#line 645 "lib/PDL/Ufunc.pd"
 
 =head2 and
 
@@ -1519,7 +1822,7 @@ This routine handles bad values.
 *and = \&PDL::and;
 sub PDL::and { $_[0]->flat->andover }
 
-#line 562 "lib/PDL/Ufunc.pd"
+#line 645 "lib/PDL/Ufunc.pd"
 
 =head2 band
 
@@ -1542,7 +1845,7 @@ This routine handles bad values.
 *band = \&PDL::band;
 sub PDL::band { $_[0]->flat->bandover }
 
-#line 562 "lib/PDL/Ufunc.pd"
+#line 645 "lib/PDL/Ufunc.pd"
 
 =head2 or
 
@@ -1565,7 +1868,7 @@ This routine handles bad values.
 *or = \&PDL::or;
 sub PDL::or { $_[0]->flat->orover }
 
-#line 562 "lib/PDL/Ufunc.pd"
+#line 645 "lib/PDL/Ufunc.pd"
 
 =head2 bor
 
@@ -1588,7 +1891,7 @@ This routine handles bad values.
 *bor = \&PDL::bor;
 sub PDL::bor { $_[0]->flat->borover }
 
-#line 562 "lib/PDL/Ufunc.pd"
+#line 645 "lib/PDL/Ufunc.pd"
 
 =head2 min
 
@@ -1611,7 +1914,7 @@ This routine handles bad values.
 *min = \&PDL::min;
 sub PDL::min { $_[0]->flat->minimum }
 
-#line 562 "lib/PDL/Ufunc.pd"
+#line 645 "lib/PDL/Ufunc.pd"
 
 =head2 max
 
@@ -1634,7 +1937,7 @@ This routine handles bad values.
 *max = \&PDL::max;
 sub PDL::max { $_[0]->flat->maximum }
 
-#line 562 "lib/PDL/Ufunc.pd"
+#line 645 "lib/PDL/Ufunc.pd"
 
 =head2 median
 
@@ -1657,7 +1960,7 @@ This routine handles bad values.
 *median = \&PDL::median;
 sub PDL::median { $_[0]->flat->medover }
 
-#line 562 "lib/PDL/Ufunc.pd"
+#line 645 "lib/PDL/Ufunc.pd"
 
 =head2 mode
 
@@ -1680,7 +1983,7 @@ This routine handles bad values.
 *mode = \&PDL::mode;
 sub PDL::mode { $_[0]->flat->modeover }
 
-#line 562 "lib/PDL/Ufunc.pd"
+#line 645 "lib/PDL/Ufunc.pd"
 
 =head2 oddmedian
 
@@ -1703,7 +2006,7 @@ This routine handles bad values.
 *oddmedian = \&PDL::oddmedian;
 sub PDL::oddmedian { $_[0]->flat->oddmedover }
 
-#line 588 "lib/PDL/Ufunc.pd"
+#line 671 "lib/PDL/Ufunc.pd"
 
 =head2 any
 
@@ -1776,14 +2079,23 @@ and therefore ignore whether the values are bad.
 
 *minmax = \&PDL::minmax;
 sub PDL::minmax { map $_->sclr, ($_[0]->flat->minmaximum)[0,1] }
-#line 1780 "lib/PDL/Ufunc.pm"
+#line 2083 "lib/PDL/Ufunc.pm"
 
 
 =head2 medover
 
 =for sig
 
-  Signature: (a(n); [o]b(); [t]tmp(n))
+ Signature: (a(n); [o]b(); [t]tmp(n))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $b = medover($a);
+ medover($a, $b);  # all arguments given
+ $b = $a->medover; # method call
+ $a->medover($b);
 
 =for ref
 
@@ -1795,17 +2107,13 @@ by one by taking the median along the 1st dimension.
 By using L<xchg|PDL::Slices/xchg> etc. it is possible to use
 I<any> dimension.
 
-=for usage
+=pod
 
- $y = medover($x);
-
-=for example
-
- $spectrum = medover $image->transpose
+Broadcasts over its inputs.
 
 =for bad
 
-medover processes bad values.
+C<medover> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1824,7 +2132,16 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); [o]b(); [t]tmp(n))
+ Signature: (a(n); [o]b(); [t]tmp(n))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $b = oddmedover($a);
+ oddmedover($a, $b);  # all arguments given
+ $b = $a->oddmedover; # method call
+ $a->oddmedover($b);
 
 =for ref
 
@@ -1836,14 +2153,6 @@ by one by taking the oddmedian along the 1st dimension.
 By using L<xchg|PDL::Slices/xchg> etc. it is possible to use
 I<any> dimension.
 
-=for usage
-
- $y = oddmedover($x);
-
-=for example
-
- $spectrum = oddmedover $image->transpose
-
 The median is sometimes not a good choice as if the array has
 an even number of elements it lies half-way between the two
 middle values - thus it does not always correspond to a data
@@ -1852,9 +2161,13 @@ and so it ALWAYS sits on an actual data value which is useful in
 some circumstances.
 	
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-oddmedover processes bad values.
+C<oddmedover> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1873,7 +2186,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (data(n); [o]out(); [t]sorted(n))
+ Signature: (data(n); [o]out(); [t]sorted(n))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong)
+
+=for usage
+
+ $out = modeover($data);
+ modeover($data, $out);  # all arguments given
+ $out = $data->modeover; # method call
+ $data->modeover($out);
 
 =for ref
 
@@ -1885,14 +2206,6 @@ by one by taking the mode along the 1st dimension.
 By using L<xchg|PDL::Slices/xchg> etc. it is possible to use
 I<any> dimension.
 
-=for usage
-
- $y = modeover($x);
-
-=for example
-
- $spectrum = modeover $image->transpose
-
 The mode is the single element most frequently found in a
 discrete data set.
 
@@ -1903,9 +2216,13 @@ mode is calculated.
 C<modeover> treats BAD the same as any other value:  if
 BAD is the most common element, the returned value is also BAD.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-modeover does not process bad values.
+C<modeover> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1924,7 +2241,16 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); p(); [o]b(); [t]tmp(n))
+ Signature: (a(n); p(); [o]b(); [t]tmp(n))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $b = pctover($a, $p);
+ pctover($a, $p, $b);  # all arguments given
+ $b = $a->pctover($p); # method call
+ $a->pctover($p, $b);
 
 =for ref
 
@@ -1936,14 +2262,6 @@ by one by taking the specified percentile along the 1st dimension.
 By using L<xchg|PDL::Slices/xchg> etc. it is possible to use
 I<any> dimension.
 
-=for usage
-
- $y = pctover($x);
-
-=for example
-
- $spectrum = pctover $image->transpose
-
 The specified
 percentile must be between 0.0 and 1.0.  When the specified percentile
 falls between data points, the result is interpolated.  Values outside
@@ -1952,9 +2270,13 @@ implemented here is based on the interpolation variant described at
 L<http://en.wikipedia.org/wiki/Percentile> as used by Microsoft Excel
 and recommended by NIST.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-pctover processes bad values.
+C<pctover> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1973,7 +2295,16 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); p(); [o]b(); [t]tmp(n))
+ Signature: (a(n); p(); [o]b(); [t]tmp(n))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $b = oddpctover($a, $p);
+ oddpctover($a, $p, $b);  # all arguments given
+ $b = $a->oddpctover($p); # method call
+ $a->oddpctover($p, $b);
 
 =for ref
 
@@ -1985,23 +2316,19 @@ by one by taking the specified percentile along the 1st dimension.
 By using L<xchg|PDL::Slices/xchg> etc. it is possible to use
 I<any> dimension.
 
-=for usage
-
- $y = oddpctover($x);
-
-=for example
-
- $spectrum = oddpctover $image->transpose
-
 The specified
 percentile must be between 0.0 and 1.0.  When the specified percentile
 falls between two values, the nearest data value is the result.
 The algorithm implemented is from the textbook version described
 first at L<http://en.wikipedia.org/wiki/Percentile>.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-oddpctover processes bad values.
+C<oddpctover> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2015,7 +2342,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 938 "lib/PDL/Ufunc.pd"
+#line 1019 "lib/PDL/Ufunc.pd"
 
 =head2 pct
 
@@ -2038,7 +2365,7 @@ sub PDL::pct {
 	$tmp;
 }
 
-#line 938 "lib/PDL/Ufunc.pd"
+#line 1019 "lib/PDL/Ufunc.pd"
 
 =head2 oddpct
 
@@ -2060,22 +2387,33 @@ sub PDL::oddpct {
 	$x->flat->oddpctover($p, my $tmp=PDL->nullcreate($x));
 	$tmp;
 }
-#line 2064 "lib/PDL/Ufunc.pm"
+#line 2391 "lib/PDL/Ufunc.pm"
 
 
 =head2 qsort
 
 =for sig
 
-  Signature: (a(n); [o]b(n))
+ Signature: (a(n); [o]b(n))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $b = qsort($a);
+ qsort($a, $b);      # all arguments given
+ $b = $a->qsort;     # method call
+ $a->qsort($b);
+ $a->inplace->qsort; # can be used inplace
+ qsort($a->inplace);
 
 =for ref
 
 Quicksort a vector into ascending order.
 
-=for example
+=pod
 
- print qsort random(10);
+Broadcasts over its inputs.
 
 =for bad
 
@@ -2102,7 +2440,16 @@ Bad values are moved to the end of the array:
 
 =for sig
 
-  Signature: (a(n); indx [o]indx(n))
+ Signature: (a(n); indx [o]indx(n))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $indx = qsorti($a);
+ qsorti($a, $indx);  # all arguments given
+ $indx = $a->qsorti; # method call
+ $a->qsorti($indx);
 
 =for ref
 
@@ -2112,6 +2459,10 @@ Quicksort a vector and return index of elements in ascending order.
 
  $ix = qsorti $x;
  print $x->index($ix); # Sorted list
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
@@ -2138,7 +2489,18 @@ Bad elements are moved to the end of the array:
 
 =for sig
 
-  Signature: (a(n,m); [o]b(n,m))
+ Signature: (a(n,m); [o]b(n,m))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $b = qsortvec($a);
+ qsortvec($a, $b);      # all arguments given
+ $b = $a->qsortvec;     # method call
+ $a->qsortvec($b);
+ $a->inplace->qsortvec; # can be used inplace
+ qsortvec($a->inplace);
 
 =for ref
 
@@ -2158,6 +2520,10 @@ the 1st dimension is list order.  Higher dimensions are broadcasted over.
   [  3   5]
   [  4   2]
  ]
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
@@ -2188,7 +2554,16 @@ Vectors with bad components are moved to the end of the array:
 
 =for sig
 
-  Signature: (a(n,m); indx [o]indx(m))
+ Signature: (a(n,m); indx [o]indx(m))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $indx = qsortveci($a);
+ qsortveci($a, $indx);  # all arguments given
+ $indx = $a->qsortveci; # method call
+ $a->qsortveci($indx);
 
 =for ref
 
@@ -2204,6 +2579,10 @@ sorted list.
 
 Additional dimensions are broadcasted over: each plane is sorted separately,
 so qsortveci may be thought of as a collapse operator of sorts (groan).
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
@@ -2226,7 +2605,16 @@ for L</qsortvec>.
 
 =for sig
 
-  Signature: (a(n); float+ [o]b())
+ Signature: (a(n); float+ [o]b())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
+
+=for usage
+
+ $b = magnover($a);
+ magnover($a, $b);  # all arguments given
+ $b = $a->magnover; # method call
+ $a->magnover($b);
 
 =for ref
 
@@ -2238,20 +2626,16 @@ by one by taking the Euclidean (aka Pythagorean) distance along the 1st dimensio
 By using L<xchg|PDL::Slices/xchg> etc. it is possible to use
 I<any> dimension.
 
-=for usage
-
- $y = magnover($x);
-
-=for example
-
- $spectrum = magnover $image->transpose
-
 Minimum C<float> precision output.
 See also L<PDL::Primitive/inner>, L<PDL::Primitive/norm>.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-magnover processes bad values.
+C<magnover> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2267,7 +2651,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1194 "lib/PDL/Ufunc.pd"
+#line 1263 "lib/PDL/Ufunc.pd"
 
 =head1 AUTHOR
 
@@ -2281,7 +2665,7 @@ from the PDL distribution, the copyright notice should be included in
 the file.
 
 =cut
-#line 2285 "lib/PDL/Ufunc.pm"
+#line 2669 "lib/PDL/Ufunc.pm"
 
 # Exit with OK status
 

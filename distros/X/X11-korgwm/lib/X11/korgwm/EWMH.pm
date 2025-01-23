@@ -6,10 +6,9 @@ use strict;
 use warnings;
 use feature 'signatures';
 
-use Carp;
 use X11::XCB ':all';
-use X11::XCB::Event::PropertyNotify;
 use X11::XCB::Event::ClientMessage;
+use X11::XCB::Event::PropertyNotify;
 
 use X11::korgwm::Common;
 use X11::korgwm::Window;
@@ -48,11 +47,11 @@ sub icccm_update_maximize($evt) {
 
     # Ok, now we're sure we were requested to change the fullscreen hint
     if ($action == _NET_WM_STATE_ADD) {
-        $win->toggle_maximize(1);
+        $win->toggle_maximize(1, allow_invisible => 1);
     } elsif ($action == _NET_WM_STATE_REMOVE) {
-        $win->toggle_maximize(0);
+        $win->toggle_maximize(0, allow_invisible => 1);
     } elsif ($action == _NET_WM_STATE_TOGGLE) {
-        $win->toggle_maximize();
+        $win->toggle_maximize(2, allow_invisible => 1);
     } else {
         croak "Unknown action specified in _NET_WM_STATE EWMH";
     }
@@ -64,12 +63,39 @@ our $icccm_handlers = {
     "WM_NAME" => \&icccm_update_title,
     "_NET_WM_NAME" => \&icccm_update_title,
     "_NET_WM_STATE" => \&icccm_update_maximize,
+    "_NET_SUPPORTED" => undef,
+    "_NET_SUPPORTING_WM_CHECK" => undef,
+    "_NET_WM_STATE_FULLSCREEN" => undef,
 };
+
+sub fill_icccm_atoms {
+    $icccm_atoms->{atom($_)} = $_ for keys %{ $icccm_handlers };
+}
+
+# Set EWMH support declaration
+sub declare_support {
+    fill_icccm_atoms unless keys %{ $icccm_atoms };
+    my @atoms = keys %{ $icccm_atoms };
+
+    # Create a child window
+    my $wid = $X->generate_id();
+    $X->create_window(0, $wid, $X->root->id, 0, 0, 1, 1, 0, WINDOW_CLASS_INPUT_OUTPUT, 0, CW_OVERRIDE_REDIRECT, 1);
+
+    # Define EWMH atoms we support
+    $X->change_property(PROP_MODE_REPLACE, $X->root->id, atom("_NET_SUPPORTED"),
+        atom("ATOM"), 32, 0+@atoms, pack "L" x @atoms => @atoms);
+
+    # Watchdog for siblings
+    for my $id ($wid, $X->root->id) {
+        $X->change_property(PROP_MODE_REPLACE, $id, atom("_NET_SUPPORTING_WM_CHECK"),
+            atom("WINDOW"), 32, 1, pack L => $wid);
+    }
+}
 
 sub init {
     # Populate current atom ids
-    $icccm_atoms->{$X->atom(name => $_)->id()} = $_ for keys %{ $icccm_handlers };
-    $atom_fullscreen = $X->atom(name => "_NET_WM_STATE_FULLSCREEN")->id();
+    fill_icccm_atoms unless keys %{ $icccm_atoms };
+    $atom_fullscreen = atom("_NET_WM_STATE_FULLSCREEN");
 
     # Set up event handlers
     add_event_cb(CLIENT_MESSAGE(), sub ($evt) {

@@ -3,7 +3,7 @@
 use warnings;
 use strict;
 use Data::Dumper;
-use Test::Most tests => 21;
+use Test::Most tests => 24;
 use Test::Number::Delta;
 use Test::Carp;
 use Test::Deep;
@@ -111,6 +111,22 @@ SCANTEXT: {
 			ok($found{'NOBLESVILLE'});
 			# ok($found{'INDIANAPOLIS'});
 
+			@locations = $geo_coder->geocode(scantext => 'Nigel Horne was here', region => 'gb');
+			cmp_ok(scalar(@locations), '==', 1, 'Found one match for Horne in GB');
+			diag(Data::Dumper->new([\@locations])->Dump()) if($ENV{'TEST_VERBOSE'});
+			cmp_ok(lc($locations[0]->{'city'}), 'eq', 'horne', 'There is a place near Gatwick called Horne');
+
+			@locations = $geo_coder->geocode(scantext => 'Nigel Horne was here', region => 'gb', ignore_words => [ 'horne' ]);
+			# cmp_ok(scalar(@locations), '==', 0, 'ignore_words are ignored');
+			cmp_ok($locations[0], 'eq', '', 'Empty string');	# FIXME: should be undef
+			diag(__LINE__, ': ', Data::Dumper->new([\@locations])->Dump()) if($ENV{'TEST_VERBOSE'});
+
+			@locations = $geo_coder->geocode({
+				scantext => 'Send it to 123 Main Street, Springfield, IL 62704 or to 456 Elm St., Denver, CO. Other options: 789 Pine Blvd, Austin, TX.',
+				region => 'us'
+			});
+			diag(Data::Dumper->new([\@locations])->Dump()) if($ENV{'TEST_VERBOSE'});
+
 			eval 'use Test::Memory::Cycle';
 			if($@) {
 				skip('Test::Memory::Cycle required to check for cicular memory references', 1);
@@ -119,10 +135,10 @@ SCANTEXT: {
 			}
 		} elsif(!defined($ENV{'AUTHOR_TESTING'})) {
 			diag('Author tests not required for installation');
-			skip('Author tests not required for installation', 20);
+			skip('Author tests not required for installation', 23);
 		} else {
 			diag('Set OPENADDR_HOME to enable openaddresses.io testing');
-			skip('Set OPENADDR_HOME to enable openaddresses.io testing', 20);
+			skip('Set OPENADDR_HOME to enable openaddresses.io testing', 23);
 		}
 	}
 }

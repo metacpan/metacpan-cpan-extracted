@@ -2,10 +2,9 @@
 
 use Regexp::Ethiopic::Amharic qw(:utils :forms overload);
 
-binmode(STDOUT, ":utf8");  # works fine w/o this on linux
-use utf8;
 use strict;
-use encoding 'utf8';
+use utf8;
+binmode(STDOUT, ":utf8");  # works fine w/o this on linux
 
 main:
 {

@@ -22,6 +22,7 @@ no_index:
     - resources
 requires:
   AnyEvent: '0'
+  AnyEvent::DBus: '0'
   AnyEvent::Handle: '0'
   AnyEvent::Socket: '0'
   Carp: '0'
@@ -31,6 +32,7 @@ requires:
   Glib::Object::Introspection: '0'
   Gtk3: '0'
   List::Util: '0'
+  Net::DBus: '0'
   POSIX: '0'
   Scalar::Util: '0'
   Storable: '0'
@@ -40,7 +42,7 @@ resources:
   bugtracker: https://github.com/zhmylove/korgwm/issues
   license: https://mit-license.org/
   repository: https://github.com/zhmylove/korgwm.git
-version: '4.0'
+version: '5.0'
 x_authority: cpan:ZHMYLOVE
 x_contributors: []
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

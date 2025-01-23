@@ -1,3 +1,13 @@
+0.09 2025-01-23T11:00:36+01:00
+ - Fix stations on multiple lines.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Rename examples to better names.
+ - Update Module::Install to 1.21 version.
+ - Update linie U1.
+ - Update author github username.
+ - Update copyright years.
+
 0.08 2017-11-22T09:02:59+01:00
  - Add test for ok_map_functions().
  - Fix Makefile.PL for new version of Perl and no default »use lib '.'«.

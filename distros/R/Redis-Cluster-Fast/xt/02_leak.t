@@ -54,4 +54,42 @@ no_leaks_ok {
     $redis->get('test-leak');
 } "No Memory leak - fork";
 
+no_leaks_ok {
+    my $redis = Redis::Cluster::Fast->new(
+        startup_nodes => get_startup_nodes,
+    );
+    $redis->del('pipeline');
+
+    $redis->set('pipeline', 12345, sub {
+        my ($result, $error) = @_;
+    });
+    $redis->get('pipeline', sub {
+        my ($result, $error) = @_;
+    });
+    $redis->get('pipeline', sub {
+        my ($result, $error) = @_;
+    });
+    $redis->wait_all_responses;
+    $redis->wait_all_responses;
+} "No Memory leak - pipeline wait_all_responses";
+
+no_leaks_ok {
+    my $redis = Redis::Cluster::Fast->new(
+        startup_nodes => get_startup_nodes,
+    );
+    $redis->del('pipeline');
+
+    $redis->set('pipeline', 12345, sub {
+        my ($result, $error) = @_;
+    });
+    $redis->get('pipeline', sub {
+        my ($result, $error) = @_;
+    });
+    $redis->get('pipeline', sub {
+        my ($result, $error) = @_;
+    });
+    $redis->wait_one_response;
+    $redis->wait_one_response;
+} "No Memory leak - pipeline wait_one_response";
+
 done_testing;

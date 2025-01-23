@@ -6,7 +6,6 @@ use strict;
 use warnings;
 use feature 'signatures';
 
-use Carp;
 use POSIX qw( setsid );
 use List::Util qw( any );
 use X11::XCB ':all';
@@ -24,7 +23,7 @@ our @parser = (
         return if $pid;
         close $_ for *STDOUT, *STDERR, *STDIN;
 
-        # No need to 'or die' here as we do not care
+        # Intentionally ignoring open(2) errors
         open STDIN, "+<", "/dev/null";
         open STDOUT, ">&STDIN";
         open STDERR, ">&STDIN";
@@ -35,10 +34,38 @@ our @parser = (
         die "Cannot execute $arg";
     }}],
 
+    # Switch to a marked window
+    [qr/mark_switch_window\(\)/, sub ($arg) { return sub {
+        &X11::korgwm::Hotkeys::grab_key(sub ($data) {
+                # $mask is ignored for now, but it is still available
+                my ($key, $mask) = @$data;
+                return unless defined $key;
+
+                my $win = $marked_windows{$key};
+                return S_DEBUG(5, "Cannot find any window with mark " . chr($key)) unless defined $win;
+
+                DEBUG5 and carp "Switching to a window $win with key " . chr($key);
+                $win->select();
+            });
+    }}],
+
+    # Mark a focused window with some character
+    [qr/mark_window\(\)/, sub ($arg) { return sub {
+        &X11::korgwm::Hotkeys::grab_key(sub ($data) {
+                # $mask is ignored for now, but it is still available
+                my ($key, $mask) = @$data;
+                return unless defined $key and defined $focus->{window};
+
+                DEBUG4 and carp "Marking window $focus->{window} with key " . chr($key);
+                $marked_windows{$key} = $focus->{window};
+            });
+    }}],
+
     # Set active tag
     [qr/tag_select\((\d+)\)/, sub ($arg) { return sub {
-        # Prevent FocusIn events
+        # Prevent pointer events
         prevent_focus_in();
+        prevent_enter_notify();
 
         $focus->{screen}->tag_set_active($arg - 1);
         $focus->{screen}->refresh();
@@ -64,7 +91,7 @@ our @parser = (
         # Call relevant function
         $arg eq "close"             ? $win->close()             :
         $arg eq "toggle_floating"   ? $win->toggle_floating()   :
-        $arg eq "toggle_maximize"   ? $win->toggle_maximize()   :
+        $arg eq "toggle_maximize"   ? $win->toggle_maximize(2)  :
         $arg eq "toggle_always_on"  ? $win->toggle_always_on()  :
         croak "Unknown win_toggle_$arg function called"         ;
 
@@ -98,7 +125,7 @@ our @parser = (
             prevent_focus_in();
 
             $screen->{focus} = $win;
-            $screen->tag_set_active($new_tag->{idx}, 0);
+            $screen->tag_set_active($new_tag->{idx}, rotate => 0);
         }
 
         $screen->refresh();
@@ -153,28 +180,7 @@ our @parser = (
         my $win = focus_prev_get();
         return unless defined $win;
 
-        my @tags = $win->tags();
-        my $tag = shift @tags // ($win->{always_on} && $win->{always_on}->current_tag());
-        return carp "Window $win is visible on multiple tags, do not know how to focus_prev() to it" if @tags;
-        return carp "Previous window $win has no tags and is not always_on" unless $tag;
-
-        # Do nothing if there is _another_ maximized window on that tag
-        return if $win != ($tag->{max_window} // $win);
-
-        # We need to move the pointer out of the screen in order to avoid ENTER_NOTIFY from improper window
-        # resulting into garbaged $focus_prev
-        $X->warp_pointer(0, $X->root->id, 0, 0, 0, 0, 0, 0);
-        $X->flush();
-
-        # Switch to proper tag unless it is already active
-        unless (any { $tag == ($_->current_tag() // 0) } @screens) {
-            $tag->{screen}->{focus} = $win;
-            $tag->{screen}->tag_set_active($tag->{idx});
-            $tag->{screen}->refresh();
-        }
-
-        $win->focus();
-        $win->warp_pointer();
+        $win->select();
     }}],
 
     # Cycle focus
@@ -235,6 +241,11 @@ our @parser = (
         &X11::korgwm::Expose::expose();
     }}],
 
+    # Make some window urgent by class
+    [qr/urgent_by_class\((.+)\)/, sub ($arg) { return sub {
+        &X11::korgwm::Window::urgent_by_class($arg);
+    }}],
+
     # Resize the layout from API
     [qr/layout_resize\((\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*-?0\.\d+\s*,\s*-?0\.\d+)\)/, sub ($arg) { return sub {
         my ($arg_screen, $arg_tag, $arg_i, $arg_j, $arg_delta_x, $arg_delta_y) = split /\s*,\s*/, $arg;
@@ -246,7 +257,7 @@ our @parser = (
 
     # Exit from WM
     [qr/exit\(\)/, sub ($arg) { return sub {
-        $X11::korgwm::exit_trigger = 1;
+        $X11::korgwm::exit_trigger = "I can see, friends, we're in for a fabulous evening's apocalypse!";
     }}],
 );
 
@@ -300,8 +311,6 @@ sub parse($cmd) {
         return $known->[1]->($1) if $cmd =~ m{^$known->[0]$}s;
     }
     croak "Don't know how to parse $cmd";
-    # In case I decide to move back to carp here
-    # sub { warn "Unimplemented cmd for key pressed: $cmd" };
 }
 
 1;

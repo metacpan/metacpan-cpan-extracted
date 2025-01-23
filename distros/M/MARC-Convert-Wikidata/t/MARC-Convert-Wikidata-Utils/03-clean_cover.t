@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use MARC::Convert::Wikidata::Utils qw(clean_cover);
-use Test::More 'tests' => 15;
+use Test::More 'tests' => 16;
 use Test::NoWarnings;
 use Unicode::UTF8 qw(decode_utf8 encode_utf8);
 
@@ -72,5 +72,10 @@ is($ret, 'collective', encode_utf8("Cover '$input_cover' after cleanup."));
 
 # Test.
 $input_cover = decode_utf8('(soubor 5 svazků) :');
+$ret = clean_cover($input_cover);
+is($ret, 'collective', encode_utf8("Cover '$input_cover' after cleanup."));
+
+# Test.
+$input_cover = decode_utf8('(soubor ;');
 $ret = clean_cover($input_cover);
 is($ret, 'collective', encode_utf8("Cover '$input_cover' after cleanup."));

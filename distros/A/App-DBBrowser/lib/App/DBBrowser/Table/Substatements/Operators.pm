@@ -34,6 +34,10 @@ sub add_operator_and_value {
     if ( $clause eq 'on' ) {
         @operators = ( " = ", " $not_equal ", " < ", " > ", " >= ", " <= ", "LIKE", "NOT LIKE" );
     }
+    elsif ( ! length $qt_col ) {
+        $sql->{$stmt} =~ s/\s\z//;
+        @operators = ( "EXISTS", "NOT EXISTS" );
+    }
     elsif ( $sf->{i}{driver} eq 'SQLite' ) {
         @operators = grep { ! /^(?:ANY|ALL)\z/ } @operators;
     }
@@ -50,10 +54,10 @@ sub add_operator_and_value {
 
     OPERATOR: while( 1 ) {
         my $operator;
-        if ( @operators == 1 ) {
-            $operator = $operators[0];
-        }
-        else {
+        #if ( @operators == 1 ) { ##
+        #    $operator = $operators[0];
+        #}
+        #else {
             my @pre = ( undef );
             my $info = $ax->get_sql_info( $sql );
             # Choose
@@ -66,7 +70,7 @@ sub add_operator_and_value {
                 $sql->{$stmt} = $bu_stmt;
                 return;
             }
-        }
+        #}
         $operator =~ s/^\s+|\s+\z//g;
         $ax->print_sql_info( $ax->get_sql_info( $sql ) );
         if ( $operator =~ /(?:REGEXP(?:_i)?|SIMILAR\sTO)\z/ ) {
@@ -98,6 +102,14 @@ sub add_operator_and_value {
                 return;
             }
             $sql->{$stmt} .= ' ' . $operator;
+        }
+        elsif ( $operator =~ /^(?:NOT )?EXISTS\z/ ) {
+            if ( $sql->{$stmt} =~ /\(\z/ ) {
+                $sql->{$stmt} .= $operator;
+            }
+            else {
+                $sql->{$stmt} .= ' ' . $operator;
+            }
         }
         else {
             $sql->{$stmt} .= ' ' . $operator;
@@ -158,13 +170,11 @@ sub choose_and_add_column {
 }
 
 
-
-
 sub read_and_add_value {
     my ( $sf, $sql, $clause, $stmt, $qt_col, $operator ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $is_numeric = $ax->column_type_is_numeric( $sql, $qt_col );
+    my $is_numeric = $ax->is_numeric_datatype( $sql, $qt_col );
     if ( $operator =~ /^IS\s(?:NOT\s)?NULL\z/ ) {
         return 1;
     }

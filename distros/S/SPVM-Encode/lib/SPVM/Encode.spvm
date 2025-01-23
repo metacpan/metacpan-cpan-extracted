@@ -2,7 +2,7 @@
 # MIT License
 
 class Encode : precompile {
-  version "0.003";
+  version "0.004";
   
   use IntList;
   use Fn;

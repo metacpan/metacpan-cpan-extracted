@@ -1,3 +1,6 @@
+0.04    2024-11-19
+    - fix memory leak with perl 5.40+
+
 0.03    2024-11-19
     - add logging of internal server error
     - allow for jsonp style callback

@@ -15,7 +15,7 @@ Readonly::Array our @EXPORT_OK => qw(clean_cover clean_date clean_issn clean_edi
 	clean_title look_for_external_id);
 Readonly::Array our @COVERS => qw(hardback paperback);
 
-our $VERSION = 0.21;
+our $VERSION = 0.22;
 our $DEBUG = 0;
 
 sub clean_cover {
@@ -27,6 +27,7 @@ sub clean_cover {
 
 	my $ret_cover = $cover;
 	$ret_cover =~ s/\s*:\s*$//ms;
+	$ret_cover =~ s/\s*;\s*$//ms;
 	$ret_cover =~ s/^\s*//ms;
 	$ret_cover =~ s/^\(\s*//ms;
 	$ret_cover =~ s/\s*\)$//ms;
@@ -187,6 +188,8 @@ sub clean_edition_number {
 	$ret_edition_number =~ s/\s*V\stomto\ssouboru//ms;
 	$re = decode_utf8('podobě');
 	$ret_edition_number =~ s/\s*$re//ms;
+	$re = decode_utf8('část');
+	$ret_edition_number =~ s/\s*$re\.?//ms;
 
 	# Czech.
 	$re = decode_utf8('(v|V) českém jazyce');
@@ -425,6 +428,7 @@ sub clean_publisher_place {
 		decode_utf8('Přelouči') => decode_utf8('Přelouč'),
 		decode_utf8('Přerově') => decode_utf8('Přerov'),
 		decode_utf8('Řevnicích') => decode_utf8('Řevnice'),
+		decode_utf8('Stříbře') => decode_utf8('Stříbro'),
 		decode_utf8('Telči') => decode_utf8('Telč'),
 		decode_utf8('Třebíč na Moravě') => decode_utf8('Třebíč'),
 		decode_utf8('Třebíči') => decode_utf8('Třebíč'),
@@ -860,12 +864,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2021-2024 Michal Josef Špaček
+© 2021-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.21
+0.22
 
 =cut

@@ -6,13 +6,13 @@ use strict;
 use warnings;
 use feature 'signatures';
 
-use Carp;
 use List::Util qw( any );
 use POSIX qw( ceil );
 use X11::XCB ':all';
 use X11::korgwm::Common;
 use Glib::Object::Introspection;
 use Gtk3;
+use Time::HiRes qw( usleep );
 
 unless ($X11::korgwm::gtk_init) {
     Gtk3::disable_setlocale();
@@ -90,29 +90,19 @@ sub expose {
     my $nwindows = keys %{ $windows };
     return unless $nwindows;
 
-    # If there is only one window we just want to focus it.
-    # Sorry for this ugly code. The logic is mostly copied from focus_prev() of Executor
-    if ($nwindows == 1) {{
+    # If there is only one window we just want to switch to it
+    if ($nwindows == 1) {
         my $win = (values %{ $windows })[0];
+
+        # Strange situation when $windows->{only} = undef, but double check to avoid bugs
         return carp "Unable to find single existing window to focus" unless $win;
 
-        my @tags = $win->tags();
-        my $tag = shift @tags // ($win->{always_on} && $win->{always_on}->current_tag());
+        $win->select();
 
-        # "Window $win is visible on multiple tags, do not know how to focus_prev() to it" so return to main routine
-        last if @tags;
-
-        return carp "Window $win has no tags and is not always_on" unless $tag;
-
-        # Switch to proper tag unless it is already active
-        unless (any { $tag == ($_->current_tag() // 0) } @screens) {
-            $tag->{screen}->{focus} = $win;
-            $tag->{screen}->tag_set_active($tag->{idx});
-            $tag->{screen}->refresh();
-        }
-
-        $win->warp_pointer();
-    }}
+        # Unconditionally return, even on errors in select()
+        # At this point there is only one window exist and Expose is useless
+        return;
+    }
 
     # Select current screen
     my $screen_curr = $focus->{screen};
@@ -161,11 +151,11 @@ sub expose {
             for my $win ($tag->windows()) {
                 # Event-independent callback
                 my $cb = sub {
-                    $screen->tag_set_active($tag->{idx}, 0);
-                    $screen->set_active($win);
+                    prevent_focus_in();
+                    prevent_enter_notify();
                     $win_expose->destroy();
                     $win_expose = undef;
-                    $screen->refresh();
+                    $win->select();
                 };
 
                 # Count them for quick path
@@ -226,15 +216,18 @@ sub expose {
     # Grab keyboard
     my $grab_status;
     my $grab_tries = 2**10;
+
     do {
         $grab_status = $display->get_default_seat()->grab($win_expose->get_window(), "keyboard", 0, (undef) x 4);
-    } while ($grab_tries-- and $grab_status eq 'already-grabbed');
+    } while ($grab_tries-- and $grab_status eq 'already-grabbed' and usleep(1000) >= 0);
+
+    carp "Expose was unable to grab keyboard for ~1 second, rc=$grab_status" if $grab_status ne 'success';
 }
 
 # TODO consider adding this right into Window.pm (if Expose will work good)
 # Inverse approach is used in order to simplify Expose deletion / re-implementation
 BEGIN {
-    # Insert some pixbuf-specific methods 
+    # Insert some pixbuf-specific methods
     sub X11::korgwm::Window::_get_pixbuf($self) {
         # If the window was not mapped, draw it in black
         return Gtk3::GdkPixbuf::Pixbuf->new_from_xpm_data(['1 1 1 1', 'a c #262729', 'a'])
@@ -260,7 +253,6 @@ BEGIN {
 
 sub init {
     # Set up extension
-    Glib::Object::Introspection->setup(basename => "GdkX11", version  => "3.0", package  => "Gtk3::Gdk");
     Glib::Object::Introspection->setup(basename => "GdkPixbuf", version  => "2.0", package  => "Gtk3::GdkPixbuf");
     $display = Gtk3::Gdk::Display::get_default();
     $font = Pango::FontDescription::from_string($cfg->{font});

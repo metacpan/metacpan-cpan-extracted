@@ -1,3 +1,11 @@
+0.22 2025-01-23T08:37:25+01:00
+ - Add cover cleanup use case.
+ - Add edition number cleanup use case.
+ - Add publication place cleanup use case.
+ - Add support for 'translated edition' in P31.
+ - Add tests for three ISBNs in book edition.
+ - Update copyright years.
+
 0.21 2024-11-25T23:55:13+01:00
  - Add clean_issn() helper subroutine.
  - Add detection of ISSN in series.

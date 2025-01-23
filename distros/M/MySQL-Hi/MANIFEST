@@ -8,9 +8,6 @@ LICENSE
 Makefile
 Makefile.PL
 MANIFEST
-MANIFEST.SKIP
-MYMETA.json
-MYMETA.yml
 README.md
 t/010_main_params.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

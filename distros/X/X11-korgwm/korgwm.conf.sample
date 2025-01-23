@@ -1,9 +1,10 @@
 # Default configuration is as follows.
-# Korgwm tries to find the config in such an order:
+# korgwm tries to find the config in such an order:
 #   /etc/korgwm/korgwm.conf
 #   /usr/local/etc/korgwm/korgwm.conf
 #   $HOME/.korgwmrc
 #   $HOME/.config/korgwm/korgwm.conf
+# For each file found it tries to alter the configuration with its content
 ---
 ## API parameters
 # Set api_port = 0 to disable API server
@@ -26,11 +27,13 @@ initial_pointer_position: center
 mouse_follow: 1
 # If set: tag will be switched together with a window during win_move_tag(). Stay on current tag otherwise
 move_follow: 1
+# Start own notifications server to improve urgency experience. Disable if you want to use another one
+notification_server: 1
 # Command which is used to set relevant screen positions on each RandR event
 randr_cmd: 'xrandr --output HDMI-A-0 --left-of eDP --auto --output DisplayPort-0 --right-of eDP --auto'
 # Enable/disable setting the colour for root window
 set_root_color: 0
-# Enable debug output
+# Debug level 1--9. Levels >= 7 MAY LEAK SENSITIVE INFORMATION
 debug: 0
 
 ## Bar settings
@@ -47,8 +50,8 @@ panel_end:
   - lang
 # Hide tags with no windows on the panel
 hide_empty_tags: 1
-battery_format: '%s'
 # Format strings for bar widgets
+battery_format: '%s'
 clock_format: ' %a, %e %B %H:%M'
 lang_format: ' %s '
 # Mapping of the languages to strings on the panel
@@ -141,6 +144,7 @@ hotkeys:
   mod_l: 'focus_move(l)'
   mod_m: 'win_toggle_maximize()'
   mod_r: 'exec(xkb-switch -s us; rofi -show drun)'
+  mod_s: 'mark_window()'
   mod_ctrl_1: 'tag_append(1)'
   mod_ctrl_2: 'tag_append(2)'
   mod_ctrl_3: 'tag_append(3)'
@@ -176,25 +180,38 @@ hotkeys:
   mod_shift_j: 'focus_swap(j)'
   mod_shift_k: 'focus_swap(k)'
   mod_shift_l: 'focus_swap(l)'
+  mod_shift_s: 'mark_switch_window()'
   mod_shift_w: 'exec(firefox --new-instance)'
   mod_w: 'exec(firefox --new-instance --private-window)'
 
 ## Rules applied to new windows by WM_CLASS
 # floating  -- should the window be tiled (by default for non-transient) or floating
-# follow    -- focus new window and switch to it's screen&tag
+# follow    -- focus new window and switch to it's screen & tag
 # screen    -- preferred screen to attach the window to (starts with 1)
 # tag       -- preferred tag to attach the window to (starts with 1)
+# placement -- takes precedence over screen & tag (see description and example below)
+#
+# Placement is an array indexed over number of screens.
+# Value should be an undef (~) or an array of [ screen, tag ] (both starts with 1).
+# There is no any validation, so take care using 'placement'.
+# Either you connect more screens than specified, or the placement is undef; the default screen and tag will be used.
 rules:
   evolution:
     follow: 0
-    screen: 1
-    tag: 3
+    tag: 3      # place it on the first screen, tag #3
+  org.gnome.Evolution:
+    follow: 0
+    screen: 1   # place it on the first screen
+    tag: 3      # place it on the tag #3
   galculator:
     floating: 1
   mattermost:
+    placement:
+      - ~       # 0 screens: we don't care
+      - [1, 4]  # 1 screens: place it on the only screen, tag #4
+      - [2, 4]  # 2 screens: place it on the second screen, tag #4
+      - [3, 4]  # 3 screens: place it on the third screen, tag #4
     follow: 1
-    screen: 3
-    tag: 4
   urxvt-float:
     floating: 1
   xeyes:
@@ -206,9 +223,10 @@ rules:
 ## List of WM_NAME of windows which we want to see despite unset WM_CLASS
 noclass_whitelist:
   - Event Tester
+  - glxgears
 
 ## List of commands to execute during startup
 autostart:
   - 'exec(setxkbmap -layout us,ru -option grp:alt_shift_toggle,compose:ralt)'
 
-# vim: ft=yaml ts=2 sw=2 :
+# vim: ft=yaml ts=2 sw=2 cc=119 :

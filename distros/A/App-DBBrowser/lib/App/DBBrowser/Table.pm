@@ -34,35 +34,12 @@ sub new {
 
 
 sub browse_the_table {
-    my ( $sf, $sql ) = @_;
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    $sf->{d}{stmt_types} = [ 'Select' ];
-    my $changed = {};
-    $ax->print_sql_info( $ax->get_sql_info( $sql ) );
-
-    PRINT_TABLE: while ( 1 ) {
-        ( my $all_arrayref, $sql ) = $sf->__on_table( $sql, $changed );
-        if ( ! defined $all_arrayref ) {
-            last PRINT_TABLE;
-        }
-
-        my $tp = Term::TablePrint->new( $sf->{o}{table} );
-        if ( ! $sf->{o}{G}{warnings_table_print} ) {
-            local $SIG{__WARN__} = sub {};
-            $tp->print_table( $all_arrayref, { footer => $sf->{d}{table_footer} } );
-        }
-        else {
-            $tp->print_table( $all_arrayref, { footer => $sf->{d}{table_footer} } );
-        }
-    }
-}
-
-
-sub __on_table {
-    my ( $sf, $sql, $changed ) = @_;
+    my ( $sf, $sql, $build_SQ ) = @_; ##
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $sb = App::DBBrowser::Table::Substatements->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    $sf->{d}{stmt_types} = [ 'Select' ];
+    my $changed = {};
     my $hidden = 'Customize:';
     my ( $print_table, $select, $aggregate, $distinct, $where, $group_by, $having, $order_by, $limit, $export ) =
        ( 'Print TABLE',
@@ -76,8 +53,15 @@ sub __on_table {
          '- LIMIT',
          '  Export',
     );
-    my @pre = ( $hidden, undef );
     my @choices = ( $print_table, $select, $aggregate, $distinct, $where, $group_by, $having, $order_by, $limit, $export );
+    my @pre = ( $hidden, undef );
+    my ( $return_statement, $hidden_print ) = ( 'Return the subquery', 'Your choice:' );
+    if ( $build_SQ ) {
+        $choices[0] = $return_statement;
+        @pre = ( $hidden_print, undef );
+    }
+    my $footer = $sf->{d}{table_origin} eq 'ordinary' ? $sf->{d}{table_key} : ucfirst $sf->{d}{table_origin};
+    $sf->{d}{table_footer} = "     '$footer'     ";
     my $old_idx = 1;
 
     CUSTOMIZE: while ( 1 ) {
@@ -97,9 +81,8 @@ sub __on_table {
                     next CUSTOMIZE;
                 }
             }
-            last CUSTOMIZE;
+            return;
         }
-        my $sub_stmt = $menu->[$idx];
         if ( $sf->{o}{G}{menu_memory} ) {
             if ( $old_idx == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
                 $old_idx = 1;
@@ -107,6 +90,7 @@ sub __on_table {
             }
             $old_idx = $idx;
         }
+        my $sub_stmt = $menu->[$idx];
         if ( $sub_stmt eq $select ) {
             my $ret = $sb->select( $sql );
             $changed->{$sub_stmt} = $ret;
@@ -153,41 +137,19 @@ sub __on_table {
             $sf->{d}{stmt_types} = [ 'Select' ];
             $old_idx = 1;
         }
-        elsif ( $sub_stmt eq $export ) {
-            my $file_fs = $sf->__get_filename_fs( $sql );
-            if ( ! length $file_fs ) {
-                next CUSTOMIZE;
-            }
-            if ( ! eval {
-                print 'Working ...' . "\r" if $sf->{o}{table}{progress_bar};
-                my $all_arrayref = $sf->__selected_statement_result( $sql );
-                my $open_mode;
-                if ( length $sf->{o}{export}{file_encoding} ) {
-                    $open_mode = '>:encoding(' . $sf->{o}{export}{file_encoding} . ')';
-                }
-                else {
-                    $open_mode = '>';
-                }
-                open my $fh, $open_mode, $file_fs or die $!;
-                require String::Unescape;
-                my $options = {
-                    map { $_ => String::Unescape::unescape( $sf->{o}{csv_out}{$_} ) }
-                    grep { length $sf->{o}{csv_out}{$_} } # keep the default value if the option is set to ''
-                    keys %{$sf->{o}{csv_out}}
-                };
-                if ( ! length $options->{eol} ) {
-                    $options->{eol} = $/; # for `eol` use `$/` as the default value
-                }
-                require Text::CSV_XS;
-                my $csv = Text::CSV_XS->new( $options ) or die Text::CSV_XS->error_diag();
-                $csv->print( $fh, $_ ) for @$all_arrayref;
-                close $fh;
-                1 }
-            ) {
-                $ax->print_error_message( $@ );
-            }
+        elsif ( $sub_stmt eq $return_statement ) {
+            my $bu_cte_history = [ @{$sf->{d}{cte_history}} ];
+            $sf->{d}{cte_history} = [];
+            # empty the cte_history else every substatemnt
+            # would contain the cte clauses.
+            my $statement = $ax->get_stmt( $sql, 'Select', 'prepare' );
+            $sf->{d}{cte_history} = $bu_cte_history;
+            return $statement;
         }
-        elsif ( $sub_stmt eq $print_table ) {
+        elsif ( $sub_stmt eq $export ) {
+            $sf->__export( $sql );
+        }
+        elsif ( $sub_stmt eq $print_table || $sub_stmt eq $hidden_print ) {
             local $| = 1;
             print hide_cursor(); # safety
             print clear_screen();
@@ -200,8 +162,14 @@ sub __on_table {
                 $ax->print_error_message( $@ );
                 next CUSTOMIZE;
             }
-            # return $sql explicitly since after a restore-backup $sql refers to a different hash.
-            return $all_arrayref, $sql;
+            my $tp = Term::TablePrint->new( $sf->{o}{table} );
+            if ( ! $sf->{o}{G}{warnings_table_print} ) {
+                local $SIG{__WARN__} = sub {};
+                $tp->print_table( $all_arrayref, { footer => $sf->{d}{table_footer} } );
+            }
+            else {
+                $tp->print_table( $all_arrayref, { footer => $sf->{d}{table_footer} } );
+            }
         }
     }
 }
@@ -232,6 +200,46 @@ sub __selected_statement_result {
         }
     }
     return $all_arrayref;
+}
+
+
+sub __export {
+    my ( $sf, $sql ) = @_;
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $file_fs = $sf->__get_filename_fs( $sql );
+    if ( ! length $file_fs ) {
+        return;
+    }
+    if ( ! eval {
+        print 'Working ...' . "\r" if $sf->{o}{table}{progress_bar};
+        my $all_arrayref = $sf->__selected_statement_result( $sql );
+        my $open_mode;
+        if ( length $sf->{o}{export}{file_encoding} ) {
+            $open_mode = '>:encoding(' . $sf->{o}{export}{file_encoding} . ')';
+        }
+        else {
+            $open_mode = '>';
+        }
+        open my $fh, $open_mode, $file_fs or die $!;
+        require String::Unescape;
+        my $options = {
+            map { $_ => String::Unescape::unescape( $sf->{o}{csv_out}{$_} ) }
+            grep { length $sf->{o}{csv_out}{$_} } # keep the default value if the option is set to ''
+            keys %{$sf->{o}{csv_out}}
+        };
+        if ( ! length $options->{eol} ) {
+            $options->{eol} = $/; # for `eol` use `$/` as the default value
+        }
+        require Text::CSV_XS;
+        my $csv = Text::CSV_XS->new( $options ) or die Text::CSV_XS->error_diag();
+        $csv->print( $fh, $_ ) for @$all_arrayref;
+        close $fh;
+        1 }
+    ) {
+        $ax->print_error_message( $@ );
+        return;
+    }
+    return 1;
 }
 
 

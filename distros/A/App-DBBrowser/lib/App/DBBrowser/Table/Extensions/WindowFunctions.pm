@@ -167,7 +167,7 @@ sub window_function {
                     $win_func_data->{args} = $args;
                     $tmp_info = $info . "\n" . $sf->__get_win_func_stmt( $win_func_data );
                     if ( $func =~ /^(?:$rx_func_with_offset_and_default)\z/i ) {
-                        my $is_numeric = $ax->column_type_is_numeric( $sql, $qt_col );
+                        my $is_numeric = $ax->is_numeric_datatype( $sql, $qt_col );
                         # Readline
                         my $default_value = $ext->argument( $sql, $clause, { info => $tmp_info, history => undef, prompt => 'default: ', is_numeric => $is_numeric } );
                         #if ( ! defined $default_value) {
@@ -362,7 +362,9 @@ sub __add_order_by {
             ( $order_by_stmt, $col_sep ) = @{pop @bu};
             next ORDER_BY;
         }
-        $order_by_stmt .= ' ' . $direction;
+        else {
+            $order_by_stmt .= ' ' . $direction;
+        }
         $col_sep = ', ';
     }
 }

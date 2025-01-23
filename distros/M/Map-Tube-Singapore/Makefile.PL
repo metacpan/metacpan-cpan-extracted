@@ -1,9 +1,7 @@
-# Pragmas.
-use lib 'inc';
+use lib '.';
 use strict;
 use warnings;
 
-# Modules.
 use inc::Module::Install;
 
 # Definition.
@@ -22,20 +20,20 @@ name 'Map-Tube-Singapore';
 readme_from 'Singapore.pm';
 recursive_author_tests('xt');
 requires 'File::Share' => 0;
-requires 'Map::Tube' => '3.41';
+requires 'Map::Tube' => '3.62';
 requires 'Moo' => 0;
 requires 'namespace::clean' => 0;
 requires 'perl' => '5.6.0';
 resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
 	'?Name=Map-Tube-Singapore';
-resources 'homepage' => 'https://github.com/tupinek/Map-Tube-Singapore';
-resources 'repository' => 'git://github.com/tupinek/Map-Tube-Singapore';
+resources 'homepage' => 'https://github.com/michal-josef-spacek/Map-Tube-Singapore';
+resources 'repository' => 'git://github.com/michal-josef-spacek/Map-Tube-Singapore';
 test_requires 'English' => 0;
 test_requires 'Test::Map::Tube' => 0.35;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.04';
+version '0.05';
 
 # Run.
 WriteAll();

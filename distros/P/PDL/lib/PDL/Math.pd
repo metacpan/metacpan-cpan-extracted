@@ -38,6 +38,8 @@ my $F = [map $_->ppsym, grep $_->real && !$_->integer, types()];
 my $C = [ppdefs_complex()];
 my @Rtypes = grep $_->real, types();
 my @Ctypes = grep !$_->real, types();
+my $AF = [map $_->ppsym, grep !$_->integer, types];
+$AF = [(grep $_ ne 'D', @$AF), 'D']; # so defaults to D if non-float given
 
 pp_addpm({At=>'Top'},<<'EOD');
 use strict;
@@ -197,11 +199,6 @@ PDL_IF_BAD(if ( \$ISBAD($x()) || \$ISBAD($y()) ) { \$SETBAD($c()); } else,)
 EOF
 }
 
-sub inplace_doc {
-    my $func = shift;
-    return "$doco{$func} Works inplace.";
-}
-
 foreach my $func (@ufuncs1) {
     my $got_complex = PDL::Core::Dev::got_complex_version($func, 1);
     pp_def($func,
@@ -210,7 +207,7 @@ foreach my $func (@ufuncs1) {
 	   GenericTypes => [($got_complex ? @$C : ()), @$F],
 	   Pars => 'a(); [o]b();',
 	   Inplace => 1,
-	   Doc => inplace_doc( $func ),
+	   Doc => $doco{$func},
 	   Code => code_ufunc($func),
 	   );
 }
@@ -221,7 +218,7 @@ foreach my $func (@ufuncs1g) {
 	   NoBadifNaN => 1,
 	   Pars => 'a(); [o]b();',
 	   Inplace => 1,
-	   Doc => inplace_doc( $func ),
+	   Doc => $doco{$func},
 	   Code => code_ufunc($func),
 	   );
 }
@@ -234,7 +231,7 @@ foreach my $func (@bifuncs1) {
 	   Pars => 'a(); b(); [o]c();',
 	   Inplace => [ 'a' ],
 	   GenericTypes => [($got_complex ? @$C : ()), @$R],
-	   Doc => inplace_doc( $func ),
+	   Doc => $doco{$func},
 	   Code => code_bifunc($func),
 	   );
 }
@@ -247,7 +244,7 @@ foreach my $func (@ufuncs2) {
 	   GenericTypes => $F,
 	   Pars => 'a(); [o]b();',
 	   Inplace => 1,
-	   Doc => inplace_doc( $func ),
+	   Doc => $doco{$func},
 	   Code => code_ufunc($func),
 	   );
 }
@@ -260,7 +257,7 @@ foreach my $func (@besufuncs) {
 	   GenericTypes => $F,
 	   Pars => 'a(); [o]b();',
 	   Inplace => 1,
-	   Doc => inplace_doc( $fname ),
+	   Doc => $doco{$fname},
 	   Code => code_ufunc($func),
 	   );
 }
@@ -273,7 +270,7 @@ foreach my $func (@besbifuncs) {
 	   GenericTypes => $F,
 	   Pars => 'a(); int n(); [o]b();',
 	   Inplace => [ 'a' ],
-	   Doc => inplace_doc( $fname ),
+	   Doc => $doco{$fname},
 	   Code => code_bifunc($func,'n','a','b'),
 	   );
 }
@@ -317,7 +314,7 @@ broadcastloop %{
 $PDLSTATESETGOOD(mask);
 EOF
   Doc =>
-'Sets C<$mask> true if C<$a> is not a C<NaN> or C<inf> (either positive or negative). Works inplace.',
+'Sets C<$mask> true if C<$a> is not a C<NaN> or C<inf> (either positive or negative).',
   BadDoc =>
 'Bad values are treated as C<NaN> or C<inf>.',
 );
@@ -329,7 +326,7 @@ pp_def("erfi",
        GenericTypes => $F,
        Pars => 'a(); [o]b()',
        Inplace => 1,
-       Doc => inplace_doc( "erfi" ),
+       Doc => "erfi",
        Code =>
        'extern double SQRTH;
         PDL_IF_BAD(if ( $ISBAD(a()) ) { $SETBAD(b()); }
@@ -342,7 +339,7 @@ pp_def("ndtri",
        GenericTypes => $F,
        Pars => 'a(); [o]b()',
        Inplace => 1,
-       Doc => inplace_doc( "ndtri" ),
+       Doc => "ndtri",
        Code =>
        'PDL_IF_BAD(if ( $ISBAD(a()) ) { $SETBAD(b()); }
 	else,) { $b() = ndtri((double)$a()); }',
@@ -360,11 +357,20 @@ EOF
 sub PDL::polyroots {
   my @args = map PDL->topdl($_), @_;
   my $natcplx = !$args[0]->type->real;
-  barf "need array context" if !$natcplx and !(wantarray//1);
+  barf "need array context if give real data and no outputs"
+    if !$natcplx and @_ < 3 and !(wantarray//1);
   splice @args, 0, 1, map $args[0]->$_, qw(re im) if $natcplx;
-  $_ //= PDL->null for @args[2,3];
-  PDL::_polyroots_int(@args);
-  $natcplx ? $args[2]->czip($args[3]) : @args[2,3];
+  my @ins = splice @args, 0, 2;
+  my $explicit_out = my @outs = @args;
+  if ($natcplx) {
+    $_ //= PDL->null for $outs[0];
+  } else {
+    $_ //= PDL->null for @outs[0,1];
+  }
+  my @args_out = $natcplx ? (map PDL->null, 1..2) : @outs; # opposite from polyfromroots
+  PDL::_polyroots_int(@ins, @args_out);
+  return @args_out if !$natcplx;
+  $outs[0] .= PDL::czip(@args_out[0,1]);
 }
 EOF
       Doc => '
@@ -379,17 +385,15 @@ As of 2.086, works with native-complex data.
 =for usage
 
  $roots = polyroots($coeffs); # native complex
+ polyroots($coeffs, $roots=null); # native complex
  ($rr, $ri) = polyroots($cr, $ci);
+ polyroots($cr, $ci, $rr, $ri);
 ',);
 
 pp_def("polyfromroots",
       Pars => 'r(m); [o]c(n=CALC($SIZE(m)+1));',
       GenericTypes => ['CD'],
       Code => <<'EOF',
-/*
-algorithm from octave poly.m, O(n^2)
-per https://cs.stackexchange.com/questions/116643/what-is-the-most-efficient-algorithm-to-compute-polynomial-coefficients-from-its, FFT allows O(n*log(n)^2)
-*/
 $c(n=>0) = 1.0;
 loop(m) %{ $c(n=>m+1) = 0.0; %}
 PDL_Indx k;
@@ -427,7 +431,11 @@ EOF
 
 Calculates the complex coefficients of a polynomial from its complex
 roots, in order of decreasing powers. Added in 2.086, works with
-native-complex data. Currently C<O(n^2)>.
+native-complex data.
+
+Algorithm is from Octave poly.m, O(n^2), per
+L<https://cs.stackexchange.com/questions/116643/what-is-the-most-efficient-algorithm-to-compute-polynomial-coefficients-from-its>;
+using an FFT would allow O(n*log(n)^2).
 
 =for usage
 
@@ -481,13 +489,44 @@ works with native-complex data.
  ($yr, $yi) = polyval($cr, $ci, $xr, $xi);
 ',);
 
+sub cequiv {
+  my ($func, $ref) = @_;
+  pp_def("c$func",
+      GenericTypes => $AF,
+      Pars => 'i(); complex [o] o()',
+      Doc => <<EOF,
+=for ref\n
+Takes real or complex data, returns the complex C<$func>.\n
+Added in 2.099.
+EOF
+      Code => pp_line_numbers(__LINE__, <<EOF),
+\$TFDEGCH(PDL_CFloat,PDL_CDouble,PDL_CLDouble,PDL_CFloat,PDL_CDouble,PDL_CLDouble) tmp = \$i();
+tmp = c$func(tmp);
+\$o() = tmp;
+EOF
+  );
+}
+
+cequiv($_) for qw(sqrt log acos asin acosh atanh);
+
+pp_def('csqrt_up',
+    GenericTypes => $AF,
+    Pars => 'i(); complex [o] o()',
+    Doc => <<'EOF',
+Take the complex square root of a number choosing that whose imaginary
+part is not negative, i.e., it is a square root with a branch cut
+'infinitesimally' below the positive real axis.
+EOF
+    Code => pp_line_numbers(__LINE__, <<'EOF'),
+        $TFDEGCH(PDL_CFloat,PDL_CDouble,PDL_CLDouble,PDL_CFloat,PDL_CDouble,PDL_CLDouble) tmp = $i();
+tmp = csqrt(tmp);
+if (cimag(tmp)<0)
+  tmp = -tmp;
+$o() = tmp;
+EOF
+);
+
 pp_addpm({At=>'Bot'},<<'EOD');
-
-=head1 BUGS
-
-Hasn't been tested on all platforms to ensure Cephes
-versions are picked up automatically and used correctly.
-
 =head1 AUTHOR
 
 Copyright (C) R.J.R. Williams 1997 (rjrw@ast.leeds.ac.uk), Karl Glazebrook

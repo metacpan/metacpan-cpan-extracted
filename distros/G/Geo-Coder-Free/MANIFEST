@@ -37,12 +37,15 @@ MANIFEST.SKIP
 README.md
 t/00-load.t
 t/10-new.t
+t/30-basics.t
 t/admin1.t
 t/admin2.t
 t/bin.t
 t/cities.t
 t/comment-spelling.t
+t/config.t
 t/critic.t
+t/display.t
 t/dr5hn.t
 t/eof.t
 t/eol.t
@@ -72,6 +75,7 @@ t/prereq.t
 t/scantext.t
 t/strict.t
 t/unused.t
+t/utils.t
 t/vars.t
 t/version.t
 t/whosonfirst.t

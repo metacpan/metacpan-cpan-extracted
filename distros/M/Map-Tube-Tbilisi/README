@@ -67,11 +67,9 @@ METHODS
              Returns string with XML.
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Encode qw(decode_utf8 encode_utf8);
      use Map::Tube::Tbilisi;
 
@@ -88,12 +86,10 @@ EXAMPLE1
      # Route: სარაჯიშვილი (ახმეტელი-ვარკეთილის ხაზი), გურამიშვილი (ახმეტელი-ვარკეთილის ხაზი), ღრმაღელე (ახმეტელი-ვარკეთილის ხაზი), დიდუბე (ახმეტელი-ვარკეთილის ხაზი), გოცირიძე (ახმეტელი-ვარკეთილის ხაზი), ნაძალადევი (ახმეტელი-ვარკეთილის ხაზი), სადგურის მოედანი (საბურთალოს ხაზი), წერეთელი (საბურთალოს ხაზი), ტექნიკური უნივერსიტეტი (საბურთალოს ხაზი), სამედიცინო უნივერსიტეტი (საბურთალოს ხაზი), დელისი (საბურთალოს ხაზი)
 
 EXAMPLE2
-     # Pragmas.
      use strict;
      use utf8;
      use warnings;
 
-     # Modules.
      use Map::Tube::Tbilisi;
 
      # Object.
@@ -109,11 +105,9 @@ EXAMPLE2
      # XML file: .*/tbilisi-map.xml
 
 EXAMPLE3
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Map::Tube::GraphViz;
      use Map::Tube::GraphViz::Utils qw(node_color_without_label);
      use Map::Tube::Tbilisi;
@@ -138,11 +132,9 @@ EXAMPLE3
      # -rw-r--r-- 1 skim skim 68209 Jan  3 11:56 Tbilisi.png
 
 EXAMPLE4
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Encode qw(encode_utf8);
      use Map::Tube::Tbilisi;
 
@@ -159,6 +151,43 @@ EXAMPLE4
      # ახმეტელი-ვარკეთილის ხაზი
      # საბურთალოს ხაზი
 
+EXAMPLE5
+     use strict;
+     use warnings;
+
+     use Encode qw(decode_utf8 encode_utf8);
+     use Map::Tube::Tbilisi;
+
+     # Arguments.
+     if (@ARGV < 1) {
+             print STDERR "Usage: $0 line\n";
+             exit 1;
+     }
+     my $line = decode_utf8($ARGV[0]);
+
+     # Object.
+     my $obj = Map::Tube::Tbilisi->new;
+
+     # Get stations for line.
+     my $stations_ar = $obj->get_stations($line);
+
+     # Print out.
+     map { print encode_utf8($_->name)."\n"; } @{$stations_ar};
+
+     # Output:
+     # Usage: __PROG__ line
+
+     # Output with 'foo' argument.
+     # Map::Tube::get_stations(): ERROR: Invalid Line Name [foo]. (status: 105) file __PROG__ on line __LINE__
+
+     # Output with 'საბურთალოს ხაზი' argument.
+     # სადგურის მოედანი
+     # წერეთელი
+     # ტექნიკური უნივერსიტეტი
+     # სამედიცინო უნივერსიტეტი
+     # დელისი
+     # ვაჟა-ფშაველა
+
 DEPENDENCIES
     File::Share, Map::Tube, Moo, namespace::clean.
 
@@ -173,18 +202,18 @@ SEE ALSO
         Install the Map::Tube concrete metro modules.
 
 REPOSITORY
-    <https://github.com/tupinek/Map-Tube-Tbilisi>
+    <https://github.com/michal-josef-spacek/Map-Tube-Tbilisi>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2014-2015 Michal Špaček
+     © 2014-2025 Michal Josef Špaček
      Artistic License
      BSD 2-Clause License
 
 VERSION
-    0.04
+    0.05
 

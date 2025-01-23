@@ -1,7 +1,10 @@
 #!/usr/bin/perl -w
+
+use Regexp::Cherokee 'overload';
+
 use strict;
 use utf8;
-use Regexp::Cherokee 'overload';
+binmode(STDOUT, ":utf8");  # works fine w/o this on linux
 
 my $hello = "ᎣᏏᏲ";
 

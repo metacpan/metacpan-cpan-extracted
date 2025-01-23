@@ -1,0 +1,31 @@
+Revision history for Perl module PPI::App::ppi_version::BDFOY
+
+1.004 2025-01-22T16:43:12Z
+	* need to bump the version past that for the old ::BDFOY version
+
+1.003 2025-01-22T16:39:52Z
+	* move PPI::App::ppi_version::BDFOY to PPI::App::ppi_version::BRIANDFOY.
+	The legacy BDFOY namespace is still in the package, so it should still
+	workout with the old name. Eventually the BDFOY one will disappear.
+
+1.003 2024-01-18T18:07:33Z
+	* add docs to ppi_version
+	* refresh distro, update email address
+
+1.001 2021-02-07T06:32:15Z
+	* Don't warn if the version is a semantic version like 'v1.2.3'
+	(Github #1)
+
+0.142 2021-01-28T22:49:08Z
+	* Freshen the distro, remove Travis CI, add Github Actions
+
+0.141 2018-05-23T14:57:36Z
+	* Change to Artistic License 2.0
+	* Several minor meta fixes to the distro
+
+0.14 - 2013-12-17
+	* Handle `our $VERSION`
+
+0.12 - 2009-06-10
+	* Initial release of my own version of ppi_version. Mostly
+	the same thing, but with output that pleases me.

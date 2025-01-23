@@ -21,6 +21,13 @@ my $p = sequence(100); # big enough to not fit in "value" field
 my $ref = $p->get_dataref;
 $p->reshape(3); # small enough now
 $p->upd_data;
+is_pdl $p, pdl('0 1 2');
+my $other_numbers = (sequence(3)+6)->get_dataref;
+$p->update_data_from($$other_numbers);
+is_pdl $p, pdl('6 7 8');
+$other_numbers = sequence(4)->get_dataref;
+eval {$p->update_data_from($$other_numbers)};
+like $@, qr/but sv length/, 'error if update_data_from wrong size';
 }
 
 {
@@ -60,21 +67,50 @@ is $p3->datasv_refcount, $refcount - 1;
 }
 
 {
+eval {PDL->new_around_pointer(0, 10)};
+like $@, qr/NULL pointer/;
+my $p1 = sequence(5); # too big for value
+my $p2 = PDL->new_around_pointer($p1->address_data, $p1->nbytes);
+$p2->set_datatype($p1->type->enum);
+$p2->setdims([5]);
+is_pdl $p2, sequence(5), 'new_around_pointer worked';
+undef $p2; # make very sure this goes first
+}
+
+{
   my $pa = pdl 2,3,4;
   $pa->flowing;
   my $pb = $pa + $pa;
-  is "$pb", '[4 6 8]';
+  is_pdl $pb, pdl '[4 6 8]';
   $pa->set(0,50);
-  is "$pb", '[100 6 8]';
+  is_pdl $pb, pdl '[100 6 8]';
+  ${$pa->get_dataref} = ${pdl(51,3,4)->get_dataref};
+  $pa->upd_data;
+  is_pdl $pb, pdl('[102 6 8]'), 'after upd_data, change reflected';
+  $pa->update_data_from(${pdl(50,3,4)->get_dataref});
+  is_pdl $pb, pdl('[100 6 8]'), 'after update_data_from, change reflected';
   eval {$pa->set_datatype(PDL::float()->enum)};
   like $@, qr/ndarray has child/, 'set_datatype if has child dies';
   $pb->set_datatype(PDL::float()->enum);
   $pa->set(0,60);
-  is "$pb", '[100 6 8]', 'dataflow broken by set_datatype';
+  is_pdl $pb, float('[100 6 8]'), 'dataflow broken by set_datatype';
 }
 
 eval {PDL->inplace};
 like $@, qr/called object method/, 'error on PDL->obj_method';
+
+{
+  isa_ok sequence(3)->readonly, 'PDL', 'returns object';
+  my $x = sequence(3);
+  ok !$x->is_readonly, 'not readonly';
+  $x->readonly;
+  ok $x->is_readonly, 'now is readonly';
+  is_pdl $x + 1, pdl '1 2 3';
+  eval {$x .= 5};
+  like $@, qr/is read-only/, 'assgn causes error';
+  eval {$x += 5};
+  like $@, qr/is read-only/, 'inplace causes error';
+}
 
 {
 my $p = sequence(3);
@@ -272,6 +308,11 @@ eval {PDL->topdl({})};
 isnt $@, '', 'topdl({}) no segfault';
 }
 
+is_pdl pdl(1)->tocomplex, cdouble(1), 'tocomplex';
+is_pdl cdouble(1)->tocomplex, cdouble(1), 'tocomplex already complex';
+is_pdl float(1)->tocomplex, cfloat(1), 'tocomplex float';
+is_pdl cfloat(1)->tocomplex, cfloat(1), 'tocomplex float already complex';
+
 # stringification
 {
 my $x = pdl( -3..2 ) + 1e7;
@@ -460,6 +501,8 @@ for ([[], qr/at least/], [[5]], [[4,5]]) {
 @list = pdl('[3;0;2;0]')->mv(0,-1)->dog;
 is 0+@list, 1, "dog on pure-vaff works";
 }
+
+zeroes(1,1000)->dog; # no segfault please
 
 {
 my $x = sequence(byte,5);
@@ -851,7 +894,7 @@ $double_mask   &= double('1 1 1 1 1 0 0');
 is_pdl $double_mask, double('0 0 1 1 1 0 0');
 
 eval {PDL::eqvec(double([1,2]), double([1,2]), float(0)->slice(''))};
-like $@, qr/cannot convert/, "error when flowing output to xform, out forcetype != supplied out type";
+like $@, qr/cannot convert/, "error when flowing xform given non-available-typed output with parent";
 
 PDL::eqvec(double([1,2])->flowing, double([1,2]), $o_float = float(0));
 is 0+$o_float->trans_children, 0, 'converted output of flowing xform has no trans_children';
@@ -864,14 +907,18 @@ is $o_byte->trans_parent->vtable->name, 'converttypei_new', 'converted output of
 is_pdl $o_byte, byte([1,1,0]), 'converted output of flowing xform has right value';
 
 {
-  my $in = sequence(byte, 10);
+  my $in = byte('1 2 3 4 5 6 7 8 9 10');
   my $got = $in->zeroes;
   my $exp = $in->copy;
   my $tmp = $exp->where( ! ($in % 2) );
   $tmp .= 0;
   PDL::acosh( $in, $got );
-  is_pdl $got, byte('0 0 1 1 2 2 2 2 2 2'), "convert of thing with trans_children no NULL data";
+  is_pdl $got, byte('0 1 1 2 2 2 2 2 2 2'), "convert of thing with trans_children no NULL data";
 }
+
+is_pdl PDL::and2(byte(3), byte(1)), byte(1), 'both input available-typed';
+is_pdl PDL::and2(double(3), double(1)), longlong(1), 'both input non-available-typed';
+is_pdl PDL::and2(byte(3), double(1)), longlong(1), 'inputs one avail, one non-available-typed -> last-given type';
 
 for ([\&float,\&cfloat,\&cdouble], [\&double,\&cdouble,\&cfloat], [\&ldouble,\&cldouble]) {
   my ($rt, $ct, $other_ct) = @$_;
@@ -884,7 +931,7 @@ for ([\&float,\&cfloat,\&cdouble], [\&double,\&cdouble,\&cfloat], [\&ldouble,\&c
   czip($rt->(3)->flowing, $rt->(2), $o_cmplx = $ct->(0));
   is_pdl $o_cmplx, $ct->('3+2i'), 'right answer from flowing, supplied output '.$rt->();
   eval {czip($rt->(3)->flowing, $rt->(2), $ct->(0)->slice(''))};
-  is $@, '', 'current wrongly no error when supply output with parent to flowing '.$rt->();
+  is $@, '', 'no error when supply right-typed output with parent to flowing '.$rt->();
   next if !$other_ct;
   czip($rt->(3)->flowing, $rt->(2), $o_cmplx = $other_ct->(0));
   is_pdl $o_cmplx, $other_ct->('3+2i'), 'right answer from flowing, input '.$rt->().', supplied output '.$other_ct->();

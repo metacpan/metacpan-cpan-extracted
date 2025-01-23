@@ -22,6 +22,7 @@ use DynaLoader;
 
 
 
+
 #line 2 "lib/PDL/Transform.pd"
 
 =head1 NAME
@@ -261,7 +262,7 @@ are both Transform methods and PDL methods.
 
 use strict;
 use warnings;
-#line 265 "lib/PDL/Transform.pm"
+#line 266 "lib/PDL/Transform.pm"
 
 
 =head1 FUNCTIONS
@@ -363,15 +364,17 @@ sub invert {
   $result->is_inplace(0);  # make sure inplace flag is clear.
   return $result;
 }
-#line 367 "lib/PDL/Transform.pm"
+#line 368 "lib/PDL/Transform.pm"
 
 
 =head2 map
 
 =for sig
 
-  Signature: (k0(); pdl *in; pdl *out; pdl *map; SV *boundary; SV *method;
+ Signature: (k0(); pdl *in; pdl *out; pdl *map; SV *boundary; SV *method;
                     long big; double blur; double sv_min; char flux; SV *bv)
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
 
 =head2 match
 
@@ -700,9 +703,13 @@ do some smoothing over bad values:  if more than 1/3 of the weighted
 input-array footprint of a given output pixel is bad, then the output
 pixel gets marked bad.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-map does not process bad values.
+C<map> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1096,7 +1103,7 @@ sub map {
   }
   return $out;
 }
-#line 1100 "lib/PDL/Transform.pm"
+#line 1107 "lib/PDL/Transform.pm"
 
 *map = \&PDL::map;
 
@@ -3183,7 +3190,7 @@ sub stringify {
   $out .= "fwd ". ((defined ($me->{func})) ? ( (ref($me->{func}) eq 'CODE') ? "ok" : "non-CODE(!!)" ): "missing")."; ";
   $out .= "inv ". ((defined ($me->{inv})) ?  ( (ref($me->{inv}) eq 'CODE') ? "ok" : "non-CODE(!!)" ):"missing").".\n";
 }
-#line 3187 "lib/PDL/Transform.pm"
+#line 3194 "lib/PDL/Transform.pm"
 
 # Exit with OK status
 

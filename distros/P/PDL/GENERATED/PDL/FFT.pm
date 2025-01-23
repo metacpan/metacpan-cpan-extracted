@@ -22,6 +22,7 @@ use DynaLoader;
 
 
 
+
 #line 12 "lib/PDL/FFT.pd"
 
 =head1 NAME
@@ -99,7 +100,7 @@ However, unlike PDL::FFT, these modules are optional,
 and so may not be installed.
 
 =cut
-#line 103 "lib/PDL/FFT.pm"
+#line 104 "lib/PDL/FFT.pm"
 
 
 =head1 FUNCTIONS
@@ -115,21 +116,26 @@ and so may not be installed.
 
 =for sig
 
-  Signature: ([io]real(n); [io]imag(n))
+ Signature: ([io]real(n); [io]imag(n))
+ Types: (float double ldouble)
+
+=for usage
+
+ fft($real, $imag); # all arguments given
+ $real->fft($imag); # method call
 
 =for ref
 
 Complex 1-D FFT of the "real" and "imag" arrays [inplace]. A single
 cfloat/cdouble input ndarray can also be used.
 
-=for usage
+=pod
 
-  fft($real,$imag);
-  fft($complex);
+Broadcasts over its inputs.
 
 =for bad
 
-fft does not process bad values.
+C<fft> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -179,21 +185,26 @@ sub PDL::fft {
 
 =for sig
 
-  Signature: ([io]real(n); [io]imag(n))
+ Signature: ([io]real(n); [io]imag(n))
+ Types: (float double ldouble)
+
+=for usage
+
+ ifft($real, $imag); # all arguments given
+ $real->ifft($imag); # method call
 
 =for ref
 
 Complex inverse 1-D FFT of the "real" and "imag" arrays [inplace]. A single
 cfloat/cdouble input ndarray can also be used.
 
-=for usage
+=pod
 
-  ifft($real,$imag);
-  ifft($complex);
+Broadcasts over its inputs.
 
 =for bad
 
-ifft does not process bad values.
+C<ifft> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -238,7 +249,7 @@ sub PDL::ifft {
 
 
 
-#line 190 "lib/PDL/FFT.pd"
+#line 180 "lib/PDL/FFT.pd"
 
 use Carp;
 use PDL::Core qw/:Func/;
@@ -441,7 +452,7 @@ sub PDL::fftconvolve {
     @_;
 }
 
-#line 393 "lib/PDL/FFT.pd"
+#line 383 "lib/PDL/FFT.pd"
 
 =head1 BUGS
 
@@ -460,7 +471,7 @@ COPYING in the PDL distribution. If this file is separated from the
 PDL distribution, the copyright notice should be included in the file.
 
 =cut
-#line 464 "lib/PDL/FFT.pm"
+#line 475 "lib/PDL/FFT.pm"
 
 # Exit with OK status
 

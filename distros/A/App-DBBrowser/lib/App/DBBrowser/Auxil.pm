@@ -7,7 +7,8 @@ use 5.014;
 
 use Scalar::Util qw( looks_like_number );
 
-use JSON::MaybeXS qw( decode_json );
+use JSON::MaybeXS   qw( decode_json );
+use List::MoreUtils qw( none );
 
 use Term::Choose            qw();
 use Term::Choose::Constants qw( WIDTH_CURSOR );
@@ -34,7 +35,6 @@ sub reset_sql {
         table => $sql->{table} // '',
         columns => $sql->{columns} // [],
         data_types => $sql->{data_types} // {},
-        ctes => $sql->{ctes} // [],
     };
     # reset/initialize:
     delete @{$sql}{ keys %$sql }; # not "$sql = {}" so $sql is still pointing to the outer $sql
@@ -70,10 +70,11 @@ sub __stmt_fold {
 
 
 sub __cte_stmts {
-    my ( $sf, $ctes, $used_for, $indent1 ) = @_;
-    #if ( ! $ctes || ! @$ctes ) {
+    my ( $sf, $used_for, $indent1 ) = @_;
+    #if ( ! @{$sf->{d}{cte_history}//[]} ) {
     #    return wantarray ? () : '';
     #}
+    my $ctes = $sf->{d}{cte_history};
     my $with = "WITH";
     for my $cte ( @$ctes ) {
         $with .= " RECURSIVE" and last if $cte->{is_recursive};
@@ -96,8 +97,8 @@ sub get_stmt {
     my $indent2 = 2;
     my $qt_table = $sql->{table};
     my @tmp;
-    if ( @{$sql->{ctes}} ) {
-        push @tmp, $sf->__cte_stmts( $sql->{ctes}, $used_for, $indent1 );
+    if ( @{$sf->{d}{cte_history}} ) {
+        push @tmp, $sf->__cte_stmts( $used_for, $indent1 );
     }
     if ( $sql->{case_stmt} ) {
         @tmp = ();
@@ -192,25 +193,46 @@ sub get_stmt {
     elsif ( $stmt_type eq 'Union' ) {
         if ( $used_for eq 'prepare' ) {
             @tmp = ();
-            # prepare: this stmt is used as table in the select stmt
-            # no ctes, they are added in the select stmt
-            push @tmp, $sf->__stmt_fold( $used_for, "(", $indent0 ); ##
+            # prepare: this stmt is used as a table in the select stmt
+            # @tmp = (): no ctes, they are added in the select stmt
+            push @tmp, "(";
+            if ( @{$sql->{subselect_stmts}//[]} ) {
+                my $extra = 0;
+                for my $stmt ( @{$sql->{subselect_stmts}} ) {
+                    $extra-- if $stmt eq ")" && $extra;
+                    my $indent = $in x ( 1 + $extra );
+                    push @tmp, $indent . $stmt;
+                    $extra++ if $stmt eq "(";
+                }
+            }
+            push @tmp, ")";
         }
         else {
-            push @tmp, $sf->__stmt_fold( $used_for, "SELECT * FROM (", $indent0 ); ##
-        }
-        if ( @{$sql->{subselect_stmts}//[]} ) {
-            my $extra = 0;
-            for my $stmt ( @{$sql->{subselect_stmts}} ) {
-                $extra-- if $stmt eq ")" && $extra;
-                push @tmp, $sf->__stmt_fold( $used_for, $stmt, $indent1 + $extra );
-                $extra++ if $stmt eq "(";
+            push @tmp, $sf->__stmt_fold( $used_for, "SELECT *", $indent0 ); ##
+            push @tmp, $sf->__stmt_fold( $used_for, "FROM ()", $indent1 ); ##
+            if ( @{$sql->{subselect_stmts}//[]} ) {
+                push @tmp, ' ';
+                my $extra = 0;
+                for my $stmt ( @{$sql->{subselect_stmts}} ) {
+                    $extra-- if $stmt eq ")" && $extra;
+                    push @tmp, $sf->__stmt_fold( $used_for, $stmt, $indent0 + $extra );
+                    $extra++ if $stmt eq "(";
+                }
             }
         }
-        push @tmp, $sf->__stmt_fold( $used_for, ")", $indent0 );
     }
     my $stmt = join( "\n", @tmp );
     if ( $used_for eq 'print' ) {
+        if ( length $sf->{d}{main_info} ) {
+            my $sq_indent = $in;
+            $stmt =~ s/(^|\n)/$1$sq_indent/gs;
+            # if ( $sf->{d}{nested_subqueries} == 1 ) {
+            #     $stmt = $sf->{d}{main_info} . "\n\n" . $stmt;
+            # }
+            # else {
+                $stmt = $sf->{d}{main_info} . "\n" . $stmt;
+            #}
+        }
         $stmt .= "\n" ;
     }
     return $stmt;
@@ -360,15 +382,15 @@ sub sql_limit {
 
 
 sub column_names_and_types {
-    my ( $sf, $qt_table, $ctes ) = @_;
+    my ( $sf, $qt_table ) = @_;
     # without `LIMIT 0` slower with big tables: mysql, MariaDB and Pg
     # no difference with SQLite, Firebird, DB2 and Informix
     my $column_names = [];
     my $column_types = [];
     if ( ! eval {
         my $stmt = '';
-        if ( defined $ctes && @$ctes ) {
-            $stmt = $sf->__cte_stmts( $ctes, 'prepare', 0 );
+        if ( @{$sf->{d}{cte_history}} ) {
+            $stmt = $sf->__cte_stmts( 'prepare', 0 );
         }
         $stmt .= "SELECT * FROM " . $qt_table . $sf->sql_limit( 0 );
         my $sth = $sf->{d}{dbh}->prepare( $stmt );
@@ -391,7 +413,7 @@ sub column_names_and_types {
 }
 
 
-sub column_type_is_numeric {
+sub is_numeric_datatype {
     my ( $sf, $sql, $qt_col ) = @_;
     my $is_numeric = 0;
     if ( ! length $sql->{data_types}{$qt_col} || ( $sql->{data_types}{$qt_col} >= 2 && $sql->{data_types}{$qt_col} <= 8 ) ) {
@@ -401,122 +423,163 @@ sub column_type_is_numeric {
 }
 
 
-sub alias {
+sub is_char_datatype {
+    my ( $sf, $sql, $qt_col ) = @_;
+    my $is_char = 0;
+    # 1 -> CHAR, 12 -> VARCHAR
+    if ( $sql->{data_types}{$qt_col} == 1 || $sql->{data_types}{$qt_col} == 12 ) {
+        $is_char = 1;
+    }
+    return $is_char;
+}
+
+
+sub table_alias {
+    my ( $sf, $sql, $type, $qt_table, $default ) = @_;
+    #
     # Aliases mandatory:
     # JOIN talbes
     # Derived Tables: mysql, MariaDB, Pg
     #
+    my $bu_default_table_alias_count = $sf->{d}{default_table_alias_count};
+    my $auto_default = 't' . ++$sf->{d}{default_table_alias_count};
+    $default //= $auto_default;
+    my $qt_alias = $sf->alias( $sql, $type, $qt_table, $default );
+    if ( ! length $qt_alias ) {
+        $sf->{d}{default_table_alias_count} = $bu_default_table_alias_count;
+        return;
+    }
+    if ( $qt_alias ne $sf->quote_alias( $auto_default ) ) {
+        $sf->{d}{default_table_alias_count} = $bu_default_table_alias_count;
+    }
+    if ( none { $_ eq $qt_alias } @{$sf->{d}{table_aliases}{$qt_table}} ) {
+        push @{$sf->{d}{table_aliases}{$qt_table}}, $qt_alias;
+    }
+    return $qt_alias;
+}
+
+
+sub alias {
     my ( $sf, $sql, $type, $identifier, $default ) = @_;
-    my $prompt = 'as ';
-    my $alias;
     # 0 = NO
     # 1 = AUTO
     # 2 = ASK
     # 3 = ASK/AUTO
+    my $alias;
     if ( $sf->{o}{alias}{$type} == 0 ) {
         return;
     }
     elsif ( $sf->{o}{alias}{$type} == 1 ) {
-        return $default;
+        $alias = $default;
     }
     elsif ( $sf->{o}{alias}{$type} == 2 || $sf->{o}{alias}{$type} == 3 ) {
         my $tr = Term::Form::ReadLine->new( $sf->{i}{tr_default} );
         my $info = $sf->get_sql_info( $sql );
-        if ( length $identifier ) {
-            if ( $identifier =~ /^\n/ ) {
-                $info .= $identifier;
-            }
-            else {
-                $info .= "\n" . $identifier;
-            }
-        }
+        $info .= $identifier =~ /^\n/ ? $identifier : "\n$identifier"; # case
         # Readline
         $alias = $tr->readline(
-            $prompt,
+            'as ',
             { info => $info, history => [ 'a' .. 'z' ] }
         );
         $sf->print_sql_info( $info );
         if ( $sf->{o}{alias}{$type} == 3 && ! length $alias ) {
             $alias = $default;
         }
+    }
+    if ( length $alias ) {
+        $alias = $sf->quote_alias( $alias );
         return $alias;
     }
+    return;
 }
 
 
-sub __qualify_identifier {
+sub qualified_identifier {
     my ( $sf, @id ) = @_;
 #    my $catalog = ( @id >= 3 ) ? shift @id : undef;        # catalog not used (if used, uncomment also catalog_location and catalog_name_sep)
-    my $quoted_id = join '.', grep { defined } @id;
+    my $qualified_id = join '.', grep { defined } @id;
 #    if ( $catalog ) {
-#        if ( $quoted_id ) {
-#            $quoted_id = ( $sf->{d}{catalog_location} == 2 )
-#                ? $quoted_id . $sf->{d}{catalog_name_sep} . $catalog
-#                : $catalog   . $sf->{d}{catalog_name_sep} . $quoted_id;
+#        if ( $qualified_id ) {
+#            $qualified_id = ( $sf->{d}{catalog_location} == 2 )
+#                ? $qualified_id . $sf->{d}{catalog_name_sep} . $catalog
+#                : $catalog   . $sf->{d}{catalog_name_sep} . $qualified_id;
 #        } else {
-#            $quoted_id = $catalog;
+#            $qualified_id = $catalog;
 #        }
 #    }
-    return $quoted_id;
+    return $qualified_id;
 }
 
 
-sub __quote_identifier {
-    my ( $sf, $type, @id ) = @_;
-    if ( $sf->{o}{G}{'quote_' . $type} ) {
-        my $quote = $sf->{d}{identifier_quote_char};
-        for ( @id ) {
-            if ( ! defined ) {
-                next;
-            }
-            s/$quote/$quote$quote/g;
-            $_ = qq{$quote$_$quote};
+sub __quote_identifiers {
+    my ( $sf, @identifier ) = @_;
+    my $quote = $sf->{d}{identifier_quote_char};
+    for ( @identifier ) {
+        if ( ! defined ) {
+            next;
         }
+        $_ =~ s/$quote/$quote$quote/g;
+        $_ = qq{$quote$_$quote};
     }
-    return @id;
+    return @identifier;
 }
 
 
-sub quote_table {
+sub qq_table {
     my ( $sf, $table_info ) = @_;
     my @idx;
-    # 0 = catalog, 1 = schema, 2 = table_name, 3 = table_type
     if ( $sf->{o}{G}{qualified_table_name} || ( $sf->{d}{db_attached} && ! defined $sf->{d}{schema} ) ) {
         # If a SQLite database has databases attached, the fully qualified table name is used in SQL code regardless of
         # the setting of the option 'qualified_table_name' because attached databases could have tables with the same
         # name.
         @idx = ( 1, 2 );
-        #@idx = ( 0, 1, 2 ); with catalog
+        # 0 = catalog, 1 = schema, 2 = table_name, 3 = table_type
     }
     else {
         @idx = ( 2 );
     }
-    return $sf->__qualify_identifier( $sf->__quote_identifier( 'tables', @{$table_info}[@idx] ) );
+    if ( $sf->{o}{G}{quote_tables} ) {
+        return $sf->qualified_identifier( $sf->__quote_identifiers( @{$table_info}[ @idx ] ) );
+    }
+    else {
+        return $sf->qualified_identifier( @{$table_info}[@idx] );
+    }
+}
+
+
+sub quote_table {
+    my ( $sf, $table ) = @_;
+    if ( $sf->{o}{G}{quote_tables} ) {
+        ( $table ) = $sf->__quote_identifiers( $table );
+    }
+    return $table;
 }
 
 
 sub quote_column {
-    my ( $sf, @id ) = @_;
-    if ( @id == 2 ) { # join: table_alias.column_name
-        return $sf->__qualify_identifier(
-            $sf->__quote_identifier( 'aliases', shift @id ), $sf->__quote_identifier( 'columns', shift @id ) ##
-        );
+    my ( $sf, $column ) = @_;
+    if ( $sf->{o}{G}{quote_columns} ) {
+        ( $column ) = $sf->__quote_identifiers( $column );
     }
-    else {
-        return $sf->__qualify_identifier( $sf->__quote_identifier( 'columns', @id ) );
-    }
+    return $column;
 }
 
 
 sub quote_cols {
     my ( $sf, $cols ) = @_;
-    return [ map { $sf->__qualify_identifier( $sf->__quote_identifier( 'columns', $_ ) ) } @$cols ];
+    if ( $sf->{o}{G}{quote_columns} ) {
+        $cols = [ $sf->__quote_identifiers( @$cols ) ];
+    }
+    return $cols;
 }
 
 
 sub quote_alias {
-    my ( $sf, @id ) = @_;
-    return $sf->__qualify_identifier( $sf->__quote_identifier( 'aliases', @id ) );
+    my ( $sf, $alias ) = @_;
+    if ( $sf->{o}{G}{quote_aliases} ) {
+        ( $alias ) = $sf->__quote_identifiers( $alias );
+    }
+    return $alias;
 }
 
 

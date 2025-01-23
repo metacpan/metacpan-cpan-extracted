@@ -24,7 +24,7 @@ if($@) {
 
 	# $Devel::FIXME::REPAIR_INC = 1;
 
-	use_ok('CGI::Info');
+	use_ok('Geo::Coder::Free');
 
 	# ok($messages[0] !~ /lib\/Geo\/Coder\/Free.pm/);
 	cmp_ok(scalar(@messages), '==', 0, 'No FIXMEs found');

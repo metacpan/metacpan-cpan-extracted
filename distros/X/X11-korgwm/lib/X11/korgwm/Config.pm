@@ -19,7 +19,7 @@ BEGIN {
     $cfg->{api_timeout} = 5;
     $cfg->{battery_format} = "%s";
     $cfg->{border_width} = 1;
-    $cfg->{clock_format} = " %a, %e %B %H:%M";
+    $cfg->{clock_format} = " %a %e %B %H:%M";
     $cfg->{color_battery_low} = '0xFF0000';
     $cfg->{color_bg} = '0x262729';
     $cfg->{color_border_focus} = '0xA3BABF';
@@ -39,6 +39,7 @@ BEGIN {
     $cfg->{lang_names} = { 0 => chr(0x00a3), 1 => chr(0x20bd) };
     $cfg->{mouse_follow} = 1;
     $cfg->{move_follow} = 1;
+    $cfg->{notification_server} = 1;
     $cfg->{panel_end} = [qw( battery clock lang )];
     $cfg->{panel_height} = 20;
     $cfg->{panel_hide} = undef;
@@ -69,6 +70,8 @@ BEGIN {
                 "mod_a"                 => "win_toggle_always_on()",
                 "mod_shift_ctrl_l"      => "exec(lock)",
                 "mod_e"                 => "expose()",
+                "mod_shift_s"           => "mark_window()",
+                "mod_s"                 => "mark_switch_window()",
                 "mod_f"                 => "win_toggle_floating()",
                 "mod_g"                 => "exec(google-chrome --simulate-outdated-no-au --new-window --incognito)",
                 "mod_shift_g"           => "exec(google-chrome --simulate-outdated-no-au --new-window)",
@@ -93,15 +96,16 @@ BEGIN {
     };
 
     $cfg->{rules} = {
-        "mattermost"    => { screen => 3, tag => 4, follow => 1, },
-        "evolution"     => { screen => 1, tag => 3, follow => 0, },
-        "galculator"    => { floating => 1 },
-        "urxvt-float"   => { floating => 1 },
-        "xeyes"         => { floating => 1 },
-        "evolution-alarm-notify" => { floating => 1, urgent => 1 },
+        "mattermost"                    => { placement => [undef, [1, 4], [2, 4], [3, 4]], follow => 1 },
+        "evolution"                     => { tag => 3, follow => 0 },
+        "org.gnome.Evolution"           => { screen => 1, tag => 3, follow => 0 },
+        "galculator"                    => { floating => 1 },
+        "urxvt-float"                   => { floating => 1 },
+        "xeyes"                         => { floating => 1 },
+        "evolution-alarm-notify"        => { floating => 1, urgent => 1 },
     };
 
-    $cfg->{noclass_whitelist} = ["Event Tester"];
+    $cfg->{noclass_whitelist} = ["Event Tester", "glxgears"];
 
     $cfg->{autostart} = ["exec(setxkbmap -layout us,ru -option grp:alt_shift_toggle,compose:ralt)"];
 
@@ -126,9 +130,24 @@ BEGIN {
     # Normalize numeric values
     $_ = hexnum for @{ $cfg }{grep /^color_/, keys %{ $cfg }};
 
-    # Set the DEBUG
-    *X11::korgwm::Common::DEBUG = $cfg->{debug} ? sub() { 1 } : sub() { undef };
-    *X11::korgwm::Common::DEBUG_API = (DEBUG or defined $ENV{KORGWM_DEBUG_API}) ? sub() { 1 } : sub() { undef };
+    # Setup the DEBUG
+    ## Allow override via environment and create a closure
+    $cfg->{debug} = $1 if ($ENV{KORGWM_DEBUG} // "") =~ /^(\d+)$/ and $1 > 0;
+    my $dbglvl = $cfg->{debug};
+
+    ## Append backtrace for higher levels
+    $Carp::Verbose = 1 if $dbglvl >= 3;
+
+    ## Export common functions
+    *X11::korgwm::Common::DEBUG_API = ($dbglvl or defined $ENV{KORGWM_DEBUG_API}) ? sub() {1} : sub() {undef};
+
+    ## Create per-level constant functions
+    ## Create slow S_DEBUG function that can be used within return clause
+    {
+        no strict 'refs';
+        *{"X11::korgwm::Common::DEBUG$_"} = $dbglvl >= $_ ? sub() {1} : sub() {undef} for 1..9;
+        *{"X11::korgwm::Common::S_DEBUG"} = sub($lvl, $msg) { $dbglvl >= $lvl and carp $msg; $dbglvl >= $lvl };
+    }
 }
 
 1;

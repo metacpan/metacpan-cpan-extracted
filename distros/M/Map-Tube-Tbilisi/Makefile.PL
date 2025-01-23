@@ -1,13 +1,12 @@
-# Pragmas.
+use lib '.';
 use strict;
 use warnings;
 
-# Modules.
 use inc::Module::Install;
 
 # Definition.
 abstract 'Interface to the Tbilisi Metro Map.';
-author 'Michal Spacek <skim@cpan.org>';
+author 'Michal Josef Spacek <skim@cpan.org>';
 author_requires 'English' => 0;
 author_requires 'File::Object' => 0.08;
 author_requires 'Test::More' => 0;
@@ -21,21 +20,21 @@ name 'Map-Tube-Tbilisi';
 readme_from 'Tbilisi.pm';
 recursive_author_tests('xt');
 requires 'File::Share' => 0;
-requires 'Map::Tube' => '3.06';
+requires 'Map::Tube' => '3.62';
 requires 'Moo' => 0;
 requires 'namespace::clean' => 0;
 requires 'perl' => '5.8.0';
 resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
 	'?Name=Map-Tube-Tbilisi';
-resources 'homepage' => 'https://github.com/tupinek/Map-Tube-Tbilisi';
-resources 'repository' => 'git://github.com/tupinek/Map-Tube-Tbilisi';
+resources 'homepage' => 'https://github.com/michal-josef-spacek/Map-Tube-Tbilisi';
+resources 'repository' => 'git://github.com/michal-josef-spacek/Map-Tube-Tbilisi';
 test_requires 'Encode' => 0;
 test_requires 'English' => 0;
-test_requires 'Test::Map::Tube' => 0.06;
+test_requires 'Test::Map::Tube' => 0.35;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.04';
+version '0.05';
 
 # Run.
 WriteAll();

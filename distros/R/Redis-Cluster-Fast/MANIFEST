@@ -17,6 +17,11 @@ xt/03_fork.t
 xt/04_timeout.t
 xt/05_valgrind.t
 xt/06_route_use_slots.t
+xt/07_simple_srandom.t
+xt/08_leak_srandom.t
+xt/09_valgrind_srandom.t
+xt/10_timeout_srandom.t
+xt/11_fork_srandom.t
 xt/lib/Test/Docker/RedisCluster.pm
 xt/lib/memcheck-extra.supp
 deps/hiredis/CHANGELOG.md

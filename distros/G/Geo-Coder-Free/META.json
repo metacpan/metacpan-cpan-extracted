@@ -43,6 +43,7 @@
             "LWP::Protocol::https" : "0",
             "LWP::UserAgent::Throttled" : "0",
             "Redis" : "0",
+            "Scalar::Util" : "0",
             "Try::Tiny" : "0",
             "autodie" : "0"
          }
@@ -56,10 +57,13 @@
          "requires" : {
             "CHI" : "0",
             "Carp" : "0",
+            "Cwd" : "0",
             "DBD::CSV" : "0",
             "DBD::SQLite" : "0",
             "DBI" : "0",
             "DB_File" : "0",
+            "Data::Dumper" : "0",
+            "Data::Validate::URI" : "0",
             "Digest::MD5" : "0",
             "Encode" : "0",
             "File::Spec" : "0",
@@ -75,6 +79,7 @@
             "Locale::SubCountry" : "0",
             "Locale::US" : "0",
             "Module::Info" : "0",
+            "Scalar::Util" : "0",
             "Storable" : "0",
             "Text::CSV" : "0",
             "Text::xSV::Slurp" : "0",
@@ -85,6 +90,7 @@
          "requires" : {
             "CGI::IDS" : "0",
             "CGI::Lingua" : "0",
+            "CHI::Driver::Null" : "0",
             "Data::Throttler" : "0",
             "Test::Carp" : "0",
             "Test::Deep" : "0",
@@ -109,6 +115,6 @@
          "web" : "https://github.com/nigelhorne/Geo-Coder-Free"
       }
    },
-   "version" : "0.37",
+   "version" : "0.38",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

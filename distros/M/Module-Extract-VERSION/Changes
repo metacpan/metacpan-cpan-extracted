@@ -1,5 +1,8 @@
 Revision history for Perl module Module::Extract::Version
 
+1.118 2025-01-22T14:18:12Z
+	* refresh dist
+
 1.117 2024-02-11T07:18:52Z
 	* refresh distro, update email address, move to BRIANDFOY
 

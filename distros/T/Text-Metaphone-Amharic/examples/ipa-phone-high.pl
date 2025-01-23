@@ -2,6 +2,8 @@
 
 use strict;
 use utf8;
+binmode(STDOUT, ":utf8");
+
 use Text::Metaphone::Amharic ( style => "ipa" );
 
 my $am = new Text::Metaphone::Amharic; # or w/ ( granularity => high );

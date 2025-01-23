@@ -19,7 +19,7 @@ use Term::Form::ReadLine qw();
 use App::DBBrowser::Auxil;
 use App::DBBrowser::GetContent;
 use App::DBBrowser::Opt::Set;
-use App::DBBrowser::Subqueries;
+use App::DBBrowser::Subquery;
 use App::DBBrowser::Table::CommitWriteSQL;
 
 
@@ -36,7 +36,7 @@ sub new {
 sub create_view {
     my ( $sf ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $sq = App::DBBrowser::Subqueries->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $sq = App::DBBrowser::Subquery->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $tr = Term::Form::ReadLine->new( $sf->{i}{tr_default} );
     my $sql = {};
@@ -66,8 +66,8 @@ sub create_view {
                 next SELECT_STMT;
             }
             $view = $sf->{o}{create}{view_name_prefix} . $view;
-            $sql->{table} = $ax->quote_table( [ undef, $sf->{d}{schema}, $view, 'VIEW' ] );
-            if ( none { $sql->{table} eq $ax->quote_table( $sf->{d}{tables_info}{$_} ) } keys %{$sf->{d}{tables_info}} ) {
+            $sql->{table} = $ax->qq_table( [ undef, $sf->{d}{schema}, $view, 'VIEW' ] );
+            if ( none { $sql->{table} eq $ax->qq_table( $sf->{d}{tables_info}{$_} ) } keys %{$sf->{d}{tables_info}} ) {
                 my $ok_create_view = $sf->__create( $sql, 'view' );
                 if ( ! defined $ok_create_view ) {
                     next SELECT_STMT;
@@ -259,8 +259,8 @@ sub __set_table_name {
         if ( ! length $table_name ) {
             return;
         }
-        $sql->{table} = $ax->quote_table( [ undef, $sf->{d}{schema}, $table_name ] );
-        if ( none { $sql->{table} eq $ax->quote_table( $sf->{d}{tables_info}{$_} ) } keys %{$sf->{d}{tables_info}} ) {
+        $sql->{table} = $ax->qq_table( [ undef, $sf->{d}{schema}, $table_name ] );
+        if ( none { $sql->{table} eq $ax->qq_table( $sf->{d}{tables_info}{$_} ) } keys %{$sf->{d}{tables_info}} ) {
             return $table_name;
         }
         my $prompt = "Table $sql->{table} already exists.";

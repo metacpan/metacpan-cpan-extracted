@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.88.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,52 +12,56 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 f7a235423291758a0c297569b55923aafe03b679 Changes
-SHA1 882221895a73bad18eb9f16a0ce523a968a932c1 LICENSE.artistic_2
-SHA1 507a10efa92555ddddfbe72be27964d9e3eef80f LICENSE.bsd
-SHA1 18da245f789da679b40ad4cd1c2bc4df41d9c1d9 MANIFEST
-SHA1 afb3b6bf40df8a0aebbb1efda3d03ee5528b3324 META.yml
-SHA1 903dd23c946e1c4a28c8a5bdcb31448a7960e47a Makefile.PL
-SHA1 dbd6fb7146efab4b992066e883e8e33ce9511c79 README
-SHA1 5a34b178c04e589f8027e7ce3b17457a216d8b66 Tbilisi.pm
-SHA1 2c1fee78cddd51863a5056c401ceb66c66c26249 examples/ex1.pl
-SHA1 ba9eca4bf103c6c499ee06bfc42a414d1bcf8953 examples/ex2.pl
-SHA1 c31589ec17d1cb35d62c8956a07f20bf362f2e57 examples/ex3.pl
-SHA1 c366d6209419479e940081d91012a50cb55a96d0 examples/ex4.pl
-SHA1 34cf08548f9873e1931a85507e3140436c1bcf2d images/ex3.png
-SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
-SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
-SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
-SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
-SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
-SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
-SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 42de62df31eaf796d8bfd49a11fdc9cff1b50b74 inc/Module/Install/Share.pm
-SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
-SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
-SHA1 4d7c384f55295c44e14d91df9b32314134c3d56e share/tbilisi-map.xml
-SHA1 846954c33fcacd8c8d92fa55b27fe0b4348f4332 t/Map-Tube-Tbilisi/01-use.t
-SHA1 55cdb111504c6ca80f369c0a717da378648a970f t/Map-Tube-Tbilisi/02-version.t
-SHA1 855ba54ff15ce7a1562f9755f7372b04d96c04a6 t/Map-Tube-Tbilisi/03-map.t
-SHA1 fb732cfdbe0282879c1018c140f75ebf6759a598 t/Map-Tube-Tbilisi/04-get_node_by_id.t
-SHA1 38959894b2421c539898a9a9ca37ffe7fffe0d99 t/Map-Tube-Tbilisi/05-get_node_by_name.t
-SHA1 055b815a2e47a80b1ad9d65832c9c867e14bc89f t/Map-Tube-Tbilisi/06-get_shortest_route.t
-SHA1 c4ff7e72e83b31d61104cafb3914fe99ab4fdb5a t/Map-Tube-Tbilisi/07-name.t
-SHA1 e89373474364415a298d572b6ef883d93d68e28f t/Map-Tube-Tbilisi/08-xml.t
-SHA1 05edeec779cd9bcae886f8ce06f9552ab264a9c4 xt/Map-Tube-Tbilisi/01-pod_coverage.t
-SHA1 9f7d75e1dbe72a431cbcd2a1eacdfe36589afcf5 xt/Map-Tube-Tbilisi/02-pod.t
+SHA256 de80e291a9b1a9fb632c4f288ce27a1249b2e9c0309a72c15889a357f75918cf Changes
+SHA256 2bf445f42323cc7186f5e4eea501a630e19b040cd8434d1fb3d8b6ca6bf7acb6 LICENSE.artistic_2
+SHA256 bdd620b53478fe70c32e397f3230430c299f0a6432617d69d8890f3266bb891b LICENSE.bsd
+SHA256 a4832319e961c15cbd3bb0b98549c37a39104e1bc65d48be25a46c736d6a532c MANIFEST
+SHA256 ea8eded8e92ff64fb4b2ede316aff905ecc4d7af1142280b14b12cb56e433e47 META.yml
+SHA256 4d194261afa91d93fda37156bb2d9630663578659ebffe4b1e9900aff29f581c Makefile.PL
+SHA256 6b47bc43bba831b0d859d146e7e7ec60db72414ec3323c6df11676009bd5ada1 README
+SHA256 3161d15cce60a329bfef8c37d7c67d21ce55a702895d523a7d714d4b96f51744 Tbilisi.pm
+SHA256 d649b4400398971fd9d7f46bd9a38ac6116b42a11d7ea590f7244d84fd405b62 examples/print_tbilisi_def_xml_file.pl
+SHA256 98cda2eaf468a69206706c2c9dcdf59db352a697054cfffd3ab453ef6d9b0a4a examples/print_tbilisi_image.pl
+SHA256 d8e837bf474989ab52a201e3d59becd0f7b57876211f50da93944d3950818712 examples/print_tbilisi_line_stations.pl
+SHA256 2a44515f1ec2466113880dddfcde0e15f3d09f08907fe612d92fd97da5580f50 examples/print_tbilisi_lines.pl
+SHA256 4f1e267ec895e18b3721201849d7edb9eb962cec125659b6bf14a9b604f7bfff examples/print_tbilisi_route.pl
+SHA256 bde5a91fe5495f81c5ee47106c5e30ecc6d8614fca318638e9ebccd571f68c42 images/ex3.png
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 b986592700675e11c2c62cb41fa24d9f4d15e077a0d317f372efcaa78d68a1d9 inc/Module/Install/Share.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 907938cca6df6e6fe84837885261845e474bcd823086eff3903dbc11f43e133e share/tbilisi-map.xml
+SHA256 191225d9503778e8c4e934ffc4650df9f83418d8ff950b4f659f14de7297c360 t/Map-Tube-Tbilisi/01-use.t
+SHA256 d8e93ef2116a95221e0244cf0577b5060f81833be1d65d5146482832966da4ce t/Map-Tube-Tbilisi/02-version.t
+SHA256 209565387eeac11e347989ddd25fd686a3e3034fb8b8132ad7095c61223ab29f t/Map-Tube-Tbilisi/03-map.t
+SHA256 3fcced60f2202fadb1530cc51b3b93c633ef60abaaeb484d5382a6a8b88902ba t/Map-Tube-Tbilisi/04-get_node_by_id.t
+SHA256 93f31bcd23ca7083ff4447a3ce95c1ac5654f8321fcfcbc2cfbee2af0a0d3c66 t/Map-Tube-Tbilisi/05-get_node_by_name.t
+SHA256 e793a14049d2168881ba4d9430cb8b58d7be4a8e0ed1c74df17cf66516dfb773 t/Map-Tube-Tbilisi/06-get_shortest_route.t
+SHA256 e8bbf78fde56d1db2c37e259d18b85587fcd75f7425982bb2d4c4381f729de1b t/Map-Tube-Tbilisi/07-name.t
+SHA256 1bf7fbc6e112d91930c14c9308b277632cb6350fc4a1b40a017c5f292b5cf8d0 t/Map-Tube-Tbilisi/08-xml.t
+SHA256 a677d7ec045a165978aca13e975e66eb6c9e137284eb2329357f1aaaad898894 xt/Map-Tube-Tbilisi/01-pod_coverage.t
+SHA256 3e632f83780cb1e2371b40a87c5524b1fd16b7ba7d684eb3521071bb19042727 xt/Map-Tube-Tbilisi/02-pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJWIMk5AAoJEJe+XXKaIuTl4EwH/25vzmK/dMTDtBUFO2rQy+UF
-p7pbMBjJuPW4cQheKwBm2P1r9IuoHWsdtJpRAwCsjbSFXVQctfG6LGpU8HR+GJfY
-NjGjhQTwA853EZH0ZSlZYA0c2xzNuiLZ4+gSzP8JVMegLyd9p+zIZ0pd/E7dZ+zr
-ld7lS2dPOjhqkivrKopYASoKp0dGVF9/JLU+bEMLXbclxAaoNtBvU3tEikyaeBY6
-D/jCfVSDYhCL2gRHHWKB9EzbyLrD3mGHTHAbZiJyPB3fh7014XhFHZ+n2xW2HlR0
-fqBZvAB4S+OhWBXwETiPMXhuGbnoUxLyr0TRtp2bj4xwnpHZNvxivFHgl8jF1Ew=
-=cMrc
+iQGzBAEBAwAdFiEE7CqvgROezncwcOKionze/HtIOPAFAmeSFMEACgkQonze/HtI
+OPCUcgwAgFMD97Ns9xkG4mFnNw4FR7IU50VjpwxT6/HwHonY9FLyupk3kSI8MP7f
+AdHZ453sWoxdYV3XaM4NqpkaEmdNIHLFU67e+RMi0gFWcvJ8HKfakjPU6NGCW1L6
+yQBZscvZOU9Ja24VRf/Ea01cuNBlR9dGmqw2J//w4tKf6lUMVZF/grpI6w6tqGye
+WVIccCKeBPqTzt7tWIa+N6Qs5rbaaEkJSmVLbHyMoNFqkbwMzhgthMb1xSjuRFlg
+XPj4nE3HBN+UfUHQau4Y14w/qxxfsRu7/pzsW5X1AbTik1AdS1VaeUo5T0+o70cx
+rNjvY8mPmOaQB0hxyVr8YHle+d1oqmbtVjUPcuTypqfMsswBTPBUkdguUqwDYpHS
+qFJVvM8Fi6b0GV/YB88Tzlk/Fv7a9OXYeRgAYhEwCCk+kXXduYGzqhVAbfmcIshY
+xM5fu8gI/O0k7VoDeBAdHN+EHSO5b154nJaJBCWE6f2LotrpX5zkUJB3Ii5NLBA7
+8bUGOOUC
+=PaGS
 -----END PGP SIGNATURE-----

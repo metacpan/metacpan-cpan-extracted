@@ -12,6 +12,8 @@ my $redis = Redis::Cluster::Fast->new(
     route_use_slots => 1,
 );
 my $prefix = '{06_route_use_slots}';
+$redis->del("${prefix}foo");
+$redis->del("${prefix}bar");
 
 {
     my @res = $redis->mget("${prefix}foo", "${prefix}bar");

@@ -1,3 +1,15 @@
+0.04 2025-01-23T11:27:31+01:00
+ - Add EXAMPLE5 section to doc.
+ - Add test for ok_map_functions().
+ - Fix Makefile.PL for new version of Perl and no default »use lib '.'«.
+ - Implement station order.
+ - Rewrite XML map to new version with line IDs.
+ - Update Module::Install to 1.21 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years.
+ - Update to Map::Tube 3.62.
+
 0.03 2015-10-16T11:41:32+02:00
  - Add lines to XML document.
  - Improve description for get_lines() in doc.

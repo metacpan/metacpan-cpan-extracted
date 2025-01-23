@@ -1,3 +1,6 @@
+0.44 2025-01-22
+ - Search /opt/rt6 for RT.pm
+
 0.43 2022-02-09
  - Fix "require" remove_files for perl 5.26+
 

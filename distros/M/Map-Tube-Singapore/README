@@ -3,6 +3,7 @@ NAME
 
 SYNOPSIS
      use Map::Tube::Singapore;
+
      my $obj = Map::Tube::Singapore->new;
      my $routes_ar = $obj->get_all_routes($from, $to);
      my $line = $obj->get_line_by_id($line_id);
@@ -67,11 +68,9 @@ METHODS
              Returns string with XML.
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Map::Tube::Singapore;
 
      # Object.
@@ -87,11 +86,9 @@ EXAMPLE1
      # Route: Admiralty (North South MRT Line), Sembawang (North South MRT Line), Canberra (North South MRT Line), Yishun (North South MRT Line), Khatib (North South MRT Line), Yio Chu Kang (North South MRT Line), Ang Mo Kio (North South MRT Line), Bishan (North South MRT Line), Bishan (Circle MRT Line), Lorong Chuan (Circle MRT Line), Serangoon (Circle MRT Line), Bartley (Circle MRT Line), Tai Seng (Circle MRT Line), MacPherson (Circle MRT Line), Paya Lebar (Circle MRT Line), Paya Lebar (East West MRT Line), Eunos (East West MRT Line), Kembangan (East West MRT Line), Bedok (East West MRT Line), Tanah Merah (East West MRT Line), Simei (East West MRT Line), Tampines (East West MRT Line)
 
 EXAMPLE2
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Map::Tube::Singapore;
 
      # Object.
@@ -107,11 +104,9 @@ EXAMPLE2
      # XML file: .*/singapore-map.xml
 
 EXAMPLE3
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Map::Tube::GraphViz;
      use Map::Tube::GraphViz::Utils qw(node_color_without_label);
      use Map::Tube::Singapore;
@@ -132,14 +127,12 @@ EXAMPLE3
      system "ls -l Singapore.png";
 
      # Output like:
-     # -rw-r--r-- 1 skim skim 341912 Oct 16 10:06 Singapore.png
+     # -rw-r--r-- 1 skim skim 294531 22. led 18.13 Singapore.png
 
 EXAMPLE4
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Encode qw(encode_utf8);
      use Map::Tube::Singapore;
 
@@ -160,11 +153,9 @@ EXAMPLE4
      # North South MRT Line
 
 EXAMPLE5
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Encode qw(encode_utf8);
      use Map::Tube::Singapore;
 
@@ -233,7 +224,7 @@ SEE ALSO
         Install the Map::Tube concrete metro modules.
 
 REPOSITORY
-    <https://github.com/tupinek/Map-Tube-Singapore>
+    <https://github.com/michal-josef-spacek/Map-Tube-Singapore>
 
 AUTHOR
     Michal Josef Špaček <mailto:skim@cpan.org>
@@ -241,10 +232,12 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2014-2017 Michal Josef Špaček
-     Artistic License
-     BSD 2-Clause License
+    © 2014-2025 Michal Josef Špaček
+
+    Artistic License
+
+    BSD 2-Clause License
 
 VERSION
-    0.04
+    0.05
 

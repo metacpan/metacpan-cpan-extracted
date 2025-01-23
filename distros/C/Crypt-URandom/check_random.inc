@@ -63,18 +63,18 @@ int main(void)
 {
         char buf[5];
         int l = 5;
-        int r = getentropy(buf, l);
-        return 0;
+        arc4random_buf(buf, l);
+        return l;
 }
 _OUT_
 		close FOO or die "Failed to close $test_file_name:$!";
 		$output .= `$Config{cc} -o $binary_name $test_file_name 2>&1`;
 		if ($? == 0) {
-			warn_or_diag "getentropy from sys/random is AVAILABLE\n";
+			warn_or_diag "arc4random_buf from sys/random is AVAILABLE\n";
 			unlink $binary_name or die "Failed to unlink $binary_name:$!";
-			$optional{DEFINE} = '-DHAVE_CRYPT_URANDOM_NATIVE_GETENTROPY';
+			$optional{DEFINE} = '-DHAVE_CRYPT_URANDOM_NATIVE_ARC4RANDOM_BUF';
 		} else {
-			warn_or_diag "getentropy from sys/random is unavailable\n";
+			warn_or_diag "arc4random_buf from sys/random is unavailable\n";
 			open FOO, ">$test_file_name" or die "Failed to open $test_file_name for writing:$!";
 			print FOO <<'_OUT_';
 #include <unistd.h>
@@ -83,37 +83,58 @@ int main(void)
 {
         char buf[5];
         int l = 5;
-        int r = getentropy(buf, l);
-        return 0;
+        arc4random_buf(buf, l);
+        return l;
 }
 _OUT_
 			close FOO or die "Failed to close $test_file_name:$!";
 			$output .= `$Config{cc} -o $binary_name $test_file_name 2>&1`;
 			if ($? == 0) {
-				warn_or_diag "getentropy from unistd is AVAILABLE\n";
+				warn_or_diag "arc4random_buf from unistd is AVAILABLE\n";
 				unlink $binary_name or die "Failed to unlink $binary_name:$!";
-				$optional{DEFINE} = '-DHAVE_CRYPT_URANDOM_UNISTD_GETENTROPY';
+				$optional{DEFINE} = '-DHAVE_CRYPT_URANDOM_UNISTD_ARC4RANDOM_BUF';
 			} else {
-				warn_or_diag "getentropy from unistd is unavailable\n";
+				warn_or_diag "arc4random_buf from unistd is unavailable\n";
 				open FOO, ">$test_file_name" or die "Failed to open $test_file_name for writing:$!";
 				print FOO <<'_OUT_';
+#include <stdlib.h>
+
 int main(void)
 {
-        return 0;
+        char buf[5];
+        int l = 5;
+        arc4random_buf(buf, l);
+        return l;
 }
 _OUT_
 				close FOO or die "Failed to close $test_file_name:$!";
 				$output .= `$Config{cc} -o $binary_name $test_file_name 2>&1`;
 				if ($? == 0) {
-					warn_or_diag "C compiler is AVAILABLE\n";
-					if ($ENV{CRYPT_URANDOM_BUILD_DEBUG}) {
-						warn_or_diag $output;
-					}
+					warn_or_diag "arc4random_buf from stdlib is AVAILABLE\n";
 					unlink $binary_name or die "Failed to unlink $binary_name:$!";
-					$optional{DEFINE} = '-DUNKNOWN_ENVIRONMENT';
+					$optional{DEFINE} = '-DHAVE_CRYPT_URANDOM_STDLIB_ARC4RANDOM_BUF';
 				} else {
-					warn_or_diag "C compiler is unavailable\n";
-					$optional{DEFINE} = '-DNO_COMPILER_FOUND';
+					warn_or_diag "arc4random_buf from unistd is unavailable\n";
+					open FOO, ">$test_file_name" or die "Failed to open $test_file_name for writing:$!";
+					print FOO <<'_OUT_';
+int main(void)
+{
+        return 0;
+}
+_OUT_
+					close FOO or die "Failed to close $test_file_name:$!";
+					$output .= `$Config{cc} -o $binary_name $test_file_name 2>&1`;
+					if ($? == 0) {
+						warn_or_diag "C compiler is AVAILABLE\n";
+						if ($ENV{CRYPT_URANDOM_BUILD_DEBUG}) {
+							warn_or_diag $output;
+						}
+						unlink $binary_name or die "Failed to unlink $binary_name:$!";
+						$optional{DEFINE} = '-DUNKNOWN_ENVIRONMENT';
+					} else {
+						warn_or_diag "C compiler is unavailable\n";
+						$optional{DEFINE} = '-DNO_COMPILER_FOUND';
+					}
 				}
 			}
 		}

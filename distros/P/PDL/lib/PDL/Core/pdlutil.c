@@ -383,6 +383,7 @@ void pdl_dump_trans_fixspace (pdl_trans *it, int nspac) {
 	SET_SPACE(spaces, nspac);
 	printf("%sDUMPTRANS %p (%s)\n%s   Flags: ",spaces,it,it->vtable->name,spaces);
 	pdl_dump_flags_fixspace(it->flags,nspac+3, PDL_FLAGS_TRANS);
+	printf("%s   bvalflag: %d\n",spaces,it->bvalflag);
 	printf("%s   vtable flags ",spaces);
 	pdl_dump_flags_fixspace(it->vtable->flags,nspac+3,PDL_FLAGS_VTABLE);
 	if(it->flags & PDL_ITRANS_ISAFFINE) {
@@ -402,6 +403,8 @@ void pdl_dump_trans_fixspace (pdl_trans *it, int nspac) {
 	pdl_print_iarr(it->ind_sizes, it->vtable->ninds); printf("\n");
 	printf("%s   inc_sizes: ",spaces);
 	pdl_print_iarr(it->inc_sizes, it->vtable->nind_ids); printf("\n");
+	printf("%s   input trans_children_indices: ",spaces); /* CORE21 hook up to own data */
+	pdl_print_iarr(it->ind_sizes+it->vtable->ninds, it->vtable->nparents); printf("\n");
 	printf("%s   INPUTS: (",spaces);
 	for(i=0; i<it->vtable->nparents; i++)
 		printf("%s%p",(i?" ":""),(it->pdls[i]));
@@ -412,7 +415,6 @@ void pdl_dump_trans_fixspace (pdl_trans *it, int nspac) {
 }
 
 void pdl_dump_fixspace(pdl *it,int nspac) {
-  PDL_DECL_CHILDLOOP(it)
   PDL_Indx i;
   SET_SPACE(spaces, nspac);
   printf("%sDUMPING %p     datatype: %d\n%s   State: ",spaces,it,it->datatype,spaces);
@@ -472,9 +474,11 @@ void pdl_dump_fixspace(pdl *it,int nspac) {
   }
   if (it->ntrans_children) {
     printf("%s   CHILDREN:\n",spaces);
-    PDL_START_CHILDLOOP(it)
-      pdl_dump_trans_fixspace(PDL_CHILDLOOP_THISCHILD(it),nspac+4);
-    PDL_END_CHILDLOOP(it)
+    for (i = 0; i < it->ntrans_children_allocated; i++) {
+      pdl_trans *t = it->trans_children[i];
+      if (!t) continue;
+      pdl_dump_trans_fixspace(t, nspac+4);
+    }
   }
 }
 

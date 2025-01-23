@@ -22,6 +22,7 @@ use DynaLoader;
 
 
 
+
 #line 4 "lib/PDL/ImageND.pd"
 
 =head1 NAME
@@ -49,7 +50,7 @@ loaded.
 
 use strict;
 use warnings;
-#line 53 "lib/PDL/ImageND.pm"
+#line 54 "lib/PDL/ImageND.pm"
 
 
 =head1 FUNCTIONS
@@ -63,14 +64,16 @@ use warnings;
 #line 50 "lib/PDL/ImageND.pd"
 
 use Carp;
-#line 67 "lib/PDL/ImageND.pm"
+#line 68 "lib/PDL/ImageND.pm"
 
 
 =head2 convolve
 
 =for sig
 
-  Signature: (a(m); b(n); indx adims(p); indx bdims(q); [o]c(m))
+ Signature: (a(m); b(n); indx adims(p); indx bdims(q); [o]c(m))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
 
 =for ref
 
@@ -89,9 +92,13 @@ This routine is kept for backwards compatibility with earlier scripts;
 for most purposes you want L<convolveND|PDL::ImageND/convolveND> instead:
 it runs faster and handles a variety of boundary conditions.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-convolve does not process bad values.
+C<convolve> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -167,14 +174,16 @@ sub PDL::ninterpol {
     for (list ($p-$ip)) { $y = interpol($_,$y->xvals,$y); }
     $y;
 }
-#line 171 "lib/PDL/ImageND.pm"
+#line 178 "lib/PDL/ImageND.pm"
 
 
 =head2 rebin
 
 =for sig
 
-  Signature: (a(m); [o]b(n); int ns => n)
+ Signature: (a(m); [o]b(n); int ns => n)
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
 
 =for ref
 
@@ -200,9 +209,13 @@ Expansion is performed by sampling; reduction is performed by averaging.
 If you want different behavior, use L<PDL::Transform::map|PDL::Transform/map>
 instead.  PDL::Transform::map runs slower but is more flexible.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-rebin does not process bad values.
+C<rebin> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -259,7 +272,7 @@ sub PDL::rebin {
       return $x -> copy;
     }
 }
-#line 263 "lib/PDL/ImageND.pm"
+#line 276 "lib/PDL/ImageND.pm"
 
 *rebin = \&PDL::rebin;
 
@@ -394,14 +407,16 @@ sub PDL::kernctr {
     }
     $newk;
 }
-#line 398 "lib/PDL/ImageND.pm"
+#line 411 "lib/PDL/ImageND.pm"
 
 
 =head2 convolveND
 
 =for sig
 
-  Signature: (k0(); pdl *k; pdl *aa; pdl *a)
+ Signature: (k0(); pdl *k; pdl *aa; pdl *a)
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
 
 =for ref
 
@@ -484,9 +499,13 @@ than a dedicated broadcastloop.
 The direct copying code uses PP primarily for the generic typing: it includes
 its own broadcastloops.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-convolveND does not process bad values.
+C<convolveND> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -606,8 +625,16 @@ sub PDL::convolveND {
 
 =for sig
 
-  Signature: (c(); data(m,n); points(d,m,n);
+ Signature: (c(); data(m,n); points(d,m,n);
     [o] segs(d,q=CALC(($SIZE(m)-1)*($SIZE(n)-1)*4)); indx [o] cnt();)
+ Types: (float)
+
+=for usage
+
+ ($segs, $cnt) = contour_segments($c, $data, $points);
+ contour_segments($c, $data, $points, $segs, $cnt);    # all arguments given
+ ($segs, $cnt) = $c->contour_segments($data, $points); # method call
+ $c->contour_segments($data, $points, $segs, $cnt);
 
 =for ref
 
@@ -628,9 +655,13 @@ The data array represents samples of some field observed on the surface
 described by points. This uses a variant of the Marching Squares
 algorithm, though without being data-driven.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-contour_segments does not process bad values.
+C<contour_segments> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -649,9 +680,10 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (c(); data(m,n); points(d,m,n);
+ Signature: (c(); data(m,n); points(d,m,n);
     indx [o] pathendindex(q=CALC(($SIZE(m)-1)*($SIZE(n)-1)*5)); [o] paths(d,q);
     byte [t] seenmap(m,n))
+ Types: (float)
 
 =for ref
 
@@ -748,9 +780,13 @@ point-counter into C<polyendindex>.
   }
   print "ret> "; <>;
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-contour_polylines does not process bad values.
+C<contour_polylines> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -769,11 +805,22 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (e(v=2,n);
+ Signature: (e(v=2,n);
     indx [o] pathendindex(n); indx [o] paths(nout=CALC($SIZE(n)*2));
     indx [t] highestoutedge(d); indx [t] outedges(d,d); byte [t] hasinward(d);
     indx [t] sourceids(d);
   ; PDL_Indx d => d; int directed)
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ ($pathendindex, $paths) = path_join($e, $d);            # using default value of directed=1
+ ($pathendindex, $paths) = path_join($e, $d, $directed); # overriding default
+ path_join($e, $pathendindex, $paths, $d, $directed);    # all arguments given
+ ($pathendindex, $paths) = $e->path_join($d);            # method call
+ ($pathendindex, $paths) = $e->path_join($d, $directed);
+ $e->path_join($pathendindex, $paths, $d, $directed);
 
 =for ref
 
@@ -782,9 +829,13 @@ Links a (by default directed) graph's edges into paths.
 The outputs are the indices into C<paths> ending each path. Past the last
 path, the indices are set to -1.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-path_join does not process bad values.
+C<path_join> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -854,15 +905,23 @@ sub PDL::path_segs {
   }
   @out;
 }
-#line 858 "lib/PDL/ImageND.pm"
+#line 909 "lib/PDL/ImageND.pm"
 
 
 =head2 combcoords
 
 =for sig
 
-  Signature: (x(); y(); z();
+ Signature: (x(); y(); z();
 		float [o]coords(tri=3);)
+ Types: (float double)
+
+=for usage
+
+ $coords = combcoords($x, $y, $z);
+ combcoords($x, $y, $z, $coords);  # all arguments given
+ $coords = $x->combcoords($y, $z); # method call
+ $x->combcoords($y, $z, $coords);
 
 =for ref
 
@@ -871,9 +930,14 @@ Combine three coordinates into a single ndarray.
 Combine x, y and z to a single ndarray the first dimension
 of which is 3. This routine does dataflow automatically.
 
+=pod
+
+Broadcasts over its inputs.
+Creates data-flow by default.
+
 =for bad
 
-combcoords does not process bad values.
+C<combcoords> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -892,7 +956,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (coords(nc,np); [o]vecs(nc,np); int [t]links(np); 
+ Signature: (coords(nc,np); [o]vecs(nc,np); int [t]links(np); 
     double boxsize;
     int dmult;
     double a;
@@ -900,6 +964,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
     double c;
     double d;
   )
+ Types: (float double)
+
+=for usage
+
+ $vecs = repulse($coords, $boxsize, $dmult, $a, $b, $c, $d);
+ repulse($coords, $vecs, $boxsize, $dmult, $a, $b, $c, $d);  # all arguments given
+ $vecs = $coords->repulse($boxsize, $dmult, $a, $b, $c, $d); # method call
+ $coords->repulse($vecs, $boxsize, $dmult, $a, $b, $c, $d);
 
 =for ref
 
@@ -912,9 +984,13 @@ Checks all neighbouring boxes. The formula is:
 
   (r = |dist|+d) a*r^-2 + b*r^-1 + c*r^-0.5
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-repulse does not process bad values.
+C<repulse> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -933,7 +1009,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (coords(nc,np);
+ Signature: (coords(nc,np);
           int from(nl);
           int to(nl);
           strength(nl);
@@ -941,6 +1017,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
           double m;
           double ms;
   )
+ Types: (float double)
+
+=for usage
+
+ $vecs = attract($coords, $from, $to, $strength, $m, $ms);
+ attract($coords, $from, $to, $strength, $vecs, $m, $ms);  # all arguments given
+ $vecs = $coords->attract($from, $to, $strength, $m, $ms); # method call
+ $coords->attract($from, $to, $strength, $vecs, $m, $ms);
 
 =for ref
 
@@ -953,9 +1037,13 @@ like molecular bonds).
 For use by the module L<PDL::Graphics::TriD::MathGraph>.
 For definition of the potential, see the actual function.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-attract does not process bad values.
+C<attract> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -983,7 +1071,7 @@ distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
 =cut
-#line 987 "lib/PDL/ImageND.pm"
+#line 1075 "lib/PDL/ImageND.pm"
 
 # Exit with OK status
 

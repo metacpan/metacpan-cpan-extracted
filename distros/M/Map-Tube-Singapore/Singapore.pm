@@ -1,17 +1,15 @@
 package Map::Tube::Singapore;
 
-# Pragmas.
 use strict;
 use warnings;
 use 5.006;
 
-# Modules.
 use File::Share ':all';
 use Moo;
 use namespace::clean;
 
 # Version.
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Get XML.
 has xml => (
@@ -36,6 +34,7 @@ Map::Tube::Singapore - Interface to the Singapore Metro Map.
 =head1 SYNOPSIS
 
  use Map::Tube::Singapore;
+
  my $obj = Map::Tube::Singapore->new;
  my $routes_ar = $obj->get_all_routes($from, $to);
  my $line = $obj->get_line_by_id($line_id);
@@ -117,11 +116,11 @@ For more information about Singapore Map, click L<here|https://en.wikipedia.org/
 
 =head1 EXAMPLE1
 
- # Pragmas.
+=for comment filename=print_singapore_route.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Map::Tube::Singapore;
 
  # Object.
@@ -138,11 +137,11 @@ For more information about Singapore Map, click L<here|https://en.wikipedia.org/
 
 =head1 EXAMPLE2
 
- # Pragmas.
+=for comment filename=print_singapore_def_xml_file.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Map::Tube::Singapore;
 
  # Object.
@@ -159,11 +158,11 @@ For more information about Singapore Map, click L<here|https://en.wikipedia.org/
 
 =head1 EXAMPLE3
 
- # Pragmas.
+=for comment filename=print_singapore_image.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Map::Tube::GraphViz;
  use Map::Tube::GraphViz::Utils qw(node_color_without_label);
  use Map::Tube::Singapore;
@@ -184,23 +183,23 @@ For more information about Singapore Map, click L<here|https://en.wikipedia.org/
  system "ls -l Singapore.png";
 
  # Output like:
- # -rw-r--r-- 1 skim skim 341912 Oct 16 10:06 Singapore.png
+ # -rw-r--r-- 1 skim skim 294531 22. led 18.13 Singapore.png
 
 =begin html
 
-<a href="https://raw.githubusercontent.com/tupinek/Map-Tube-Singapore/master/images/ex3.png">
-  <img src="https://raw.githubusercontent.com/tupinek/Map-Tube-Singapore/master/images/ex3.png" alt="Mass Rapid Transit" width="300px" height="300px" />
+<a href="https://raw.githubusercontent.com/michal-josef-spacek/Map-Tube-Singapore/master/images/Singapore.png">
+  <img src="https://raw.githubusercontent.com/michal-josef-spacek/Map-Tube-Singapore/master/images/Singapore.png" alt="Mass Rapid Transit" width="300px" height="300px" />
 </a>
 
 =end html
 
 =head1 EXAMPLE4
 
- # Pragmas.
+=for comment filename=print_singapore_lines.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Encode qw(encode_utf8);
  use Map::Tube::Singapore;
 
@@ -222,11 +221,11 @@ For more information about Singapore Map, click L<here|https://en.wikipedia.org/
 
 =head1 EXAMPLE5
 
- # Pragmas.
+=for comment filename=print_singapore_line_stations.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Encode qw(encode_utf8);
  use Map::Tube::Singapore;
 
@@ -308,7 +307,7 @@ Install the Map::Tube concrete metro modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Map-Tube-Singapore>
+L<https://github.com/michal-josef-spacek/Map-Tube-Singapore>
 
 =head1 AUTHOR
 
@@ -318,12 +317,14 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2014-2017 Michal Josef Špaček
- Artistic License
- BSD 2-Clause License
+© 2014-2025 Michal Josef Špaček
+
+Artistic License
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

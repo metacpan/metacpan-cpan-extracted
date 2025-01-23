@@ -294,6 +294,19 @@ inplace(self, ...)
     RETVAL
 
 SV *
+readonly(self)
+  SV *self
+  CODE:
+    pdl *p = pdl_SvPDLV(self);
+    if (!p) barf("Failed to get PDL from arg");
+    if (p->state & PDL_NOMYDIMS)
+      barf("Tried to set readonly on a null");
+    p->state |= PDL_READONLY;
+    SvREFCNT_inc(RETVAL = self);
+  OUTPUT:
+    RETVAL
+
+SV *
 flowing(self)
   SV *self
   CODE:
@@ -361,14 +374,14 @@ trans_children(self)
       mXPUSHu(self->ntrans_children);
     else if (gimme == G_ARRAY) {
       EXTEND(SP, self->ntrans_children);
-      PDL_DECL_CHILDLOOP(self);
-      PDL_START_CHILDLOOP(self)
-        pdl_trans *t = PDL_CHILDLOOP_THISCHILD(self);
+      PDL_Indx i;
+      for (i = 0; i < self->ntrans_children_allocated; i++) {
+        pdl_trans *t = self->trans_children[i];
         if (!t) continue;
         SV *sv = sv_newmortal();
         sv_setref_pv(sv, "PDL::Trans", (void*)t);
         PUSHs(sv);
-      PDL_END_CHILDLOOP(self)
+      }
     }
 
 INCLUDE_COMMAND: $^X -e "require q{./Core/Dev.pm}; PDL::Core::Dev::generate_core_flags()"
@@ -494,12 +507,13 @@ datasv_refcount(p)
 
 PDL_Indx
 nelem(x)
-	pdl *x
-	CODE:
-		PDLDEBUG_f(printf("Core::nelem calling ")); pdl_barf_if_error(pdl_make_physdims(x));
-		RETVAL = x->nvals;
-	OUTPUT:
-		RETVAL
+  pdl *x
+ CODE:
+  pdl_barf_if_error(pdl_make_physvaffine( x ));
+  PDLDEBUG_f(printf("Core::nelem calling ")); pdl_barf_if_error(pdl_make_physdims(x));
+  RETVAL = x->nvals;
+ OUTPUT:
+  RETVAL
 
 
 # Call my howbig function
@@ -597,6 +611,14 @@ address(self)
   OUTPUT:
     RETVAL
 
+IV
+bvalflag(x)
+  pdl_trans *x
+  CODE:
+    RETVAL = x->bvalflag;
+  OUTPUT:
+    RETVAL
+
 void
 flags(x)
   pdl_trans *x
@@ -636,6 +658,15 @@ incs(x)
     PDL_Indx i, max = x->incs ? x->pdls[1]->ndims : 0;
     EXTEND(SP, max);
     for(i=0; i<max; i++) mPUSHi(x->incs[i]);
+
+# CORE21 hook up to own data
+void
+trans_children_indices(x)
+  pdl_trans *x;
+  PPCODE:
+    PDL_Indx i, max = x->vtable->ninds + x->vtable->nparents;
+    EXTEND(SP, max);
+    for(i=x->vtable->ninds; i<max; i++) mPUSHi(x->ind_sizes[i]);
 
 void
 ind_sizes(x)
@@ -801,28 +832,27 @@ listref_c(x)
 
 void
 set_c(x,pos,value)
-    pdl*	x
-    PDL_Indx pos_count=0;
-    PDL_Indx *pos
-    PDL_Anyval	value
-   PREINIT:
-    PDL_Indx ipos;
-   CODE:
-    pdl_barf_if_error(pdl_make_physvaffine( x ));
-    if (pos == NULL || pos_count < x->ndims)
+  pdl*	x
+  PDL_Indx pos_count=0;
+  PDL_Indx *pos
+  PDL_Anyval	value
+CODE:
+  pdl_barf_if_error(pdl_make_physvaffine( x ));
+  if (pos == NULL || pos_count < x->ndims)
+     croak("Invalid position");
+  /*  allow additional trailing indices
+   *  which must be all zero, i.e. a
+   *  [3,1,5] ndarray is treated as an [3,1,5,1,1,1,....]
+   *  infinite dim ndarray
+   */
+  PDL_Indx ipos;
+  for (ipos=x->ndims; ipos<pos_count; ipos++)
+    if (pos[ipos] != 0)
        croak("Invalid position");
-    /*  allow additional trailing indices
-     *  which must be all zero, i.e. a
-     *  [3,1,5] ndarray is treated as an [3,1,5,1,1,1,....]
-     *  infinite dim ndarray
-     */
-    for (ipos=x->ndims; ipos<pos_count; ipos++)
-      if (pos[ipos] != 0)
-         croak("Invalid position");
-    pdl_barf_if_error(pdl_set(PDL_REPRP(x), x->datatype, pos, x->dims,
-        PDL_REPRINCS(x), PDL_REPROFFS(x),
-	x->ndims,value));
-    pdl_barf_if_error(pdl_changed(PDL_VAFFOK(x)?x->vafftrans->from:x, PDL_PARENTDATACHANGED, 0));
+  pdl_barf_if_error(pdl_set(PDL_REPRP(x), x->datatype, pos, x->dims,
+      PDL_REPRINCS(x), PDL_REPROFFS(x),
+      x->ndims,value));
+  pdl_barf_if_error(pdl_changed(x, PDL_PARENTDATACHANGED, 0));
 
 BOOT:
   /* Initialize structure of pointers to core C routines */
@@ -1081,6 +1111,32 @@ CODE:
 OUTPUT:
   RETVAL
 
+# undocumented for present. returns PDL still needing dims and datatype
+SV *
+new_around_pointer(class, ptr, nbytes)
+  SV *class
+  IV ptr
+  IV nbytes
+CODE:
+  if (nbytes < 0)
+    pdl_pdl_barf("Tried to new_around_pointer with negative nbytes=%" IVdf, nbytes);
+  if (!ptr)
+    pdl_pdl_barf("Tried to new_around_pointer with NULL pointer");
+  HV *bless_stash = SvROK(class)
+    ? SvSTASH(SvRV(class)) /* a reference to a class */
+    : gv_stashsv(class, 0); /* a class name */
+  pdl *n = pdl_pdlnew();
+  if (!n) pdl_pdl_barf("Error making null pdl");
+  RETVAL = newSV(0);
+  pdl_SetSV_PDL(RETVAL,n);   /* set a null PDL to this SV * */
+  RETVAL = sv_bless(RETVAL, bless_stash); /* bless appropriately  */
+  /* set the datasv to what was supplied */
+  n->data = (void*)ptr;
+  n->nbytes = nbytes;
+  n->state |= PDL_DONTTOUCHDATA | PDL_ALLOCATED;
+OUTPUT:
+  RETVAL
+
 SV *
 get_dataref(self)
 	pdl *self
@@ -1101,31 +1157,52 @@ get_dataref(self)
 
 void
 upd_data(self, keep_datasv=0)
-	pdl *self
-	IV keep_datasv
-	CODE:
-	if(self->state & PDL_DONTTOUCHDATA)
-	  croak("Trying to touch dataref of magical (mmaped?) pdl");
-	PDLDEBUG_f(printf("upd_data: "); pdl_dump(self));
-	if (keep_datasv || !PDL_USESTRUCTVALUE(self)) {
-	  self->data = SvPV_nolen((SV*)self->datasv);
-	} else if (self->datasv) {
-	  PDLDEBUG_f(printf("upd_data zap datasv\n"));
-	  memmove(self->data, SvPV_nolen((SV*)self->datasv), self->nbytes);
-	  SvREFCNT_dec(self->datasv);
-	  self->datasv = NULL;
-	} else {
-	  PDLDEBUG_f(printf("upd_data datasv gone, maybe reshaped\n"));
-	}
-	PDLDEBUG_f(printf("upd_data end: "); pdl_dump(self));
+  pdl *self
+  IV keep_datasv
+CODE:
+  if(self->state & PDL_DONTTOUCHDATA)
+    croak("Trying to touch dataref of magical (mmaped?) pdl");
+  PDLDEBUG_f(printf("upd_data: "); pdl_dump(self));
+  if (keep_datasv || !PDL_USESTRUCTVALUE(self)) {
+    self->data = SvPV_nolen((SV*)self->datasv);
+  } else if (self->datasv) {
+    PDLDEBUG_f(printf("upd_data zap datasv\n"));
+    Size_t svsize = SvCUR((SV*)self->datasv);
+    if (svsize != self->nbytes)
+      croak("Trying to upd_data but datasv now length %zu instead of %td", svsize, self->nbytes);
+    memmove(self->data, SvPV_nolen((SV*)self->datasv), self->nbytes);
+    SvREFCNT_dec(self->datasv);
+    self->datasv = NULL;
+  } else {
+    PDLDEBUG_f(printf("upd_data datasv gone, maybe reshaped\n"));
+  }
+  pdl_barf_if_error(pdl_changed(self, PDL_PARENTDATACHANGED, 0));
+  PDLDEBUG_f(printf("upd_data end: "); pdl_dump(self));
+
+void
+update_data_from(self, sv)
+  pdl *self
+  SV *sv
+CODE:
+  PDLDEBUG_f(printf("update_data_from: "); pdl_dump(self));
+  pdl_barf_if_error(pdl_make_physvaffine(self));
+  Size_t svsize = SvCUR(sv);
+  if (svsize != self->nbytes)
+    croak("Trying to update_data_from but sv length %zu instead of %td", svsize, self->nbytes);
+  memmove(self->data, SvPV_nolen(sv), self->nbytes);
+  pdl_barf_if_error(pdl_changed(self, PDL_PARENTDATACHANGED, 0));
+  PDLDEBUG_f(printf("update_data_from end: "); pdl_dump(self));
 
 int
 badflag(x,newval=0)
     pdl *x
     int newval
   CODE:
-    if (items>1)
-	pdl_propagate_badflag( x, newval );
+    if (items>1) {
+      if (x->trans_parent)
+        pdl_propagate_badflag_dir(x, newval, 0, 1);
+      pdl_propagate_badflag_dir(x, newval, 1, 1);
+    }
     RETVAL = ((x->state & PDL_BADVAL) > 0);
   OUTPUT:
     RETVAL
@@ -1287,6 +1364,7 @@ SV *
 unpdl(x)
   pdl *x
 CODE:
+  pdl_barf_if_error(pdl_make_physvaffine( x ));
   RETVAL = pdl2avref(x, 0);
 OUTPUT:
   RETVAL
@@ -1306,6 +1384,7 @@ PPCODE:
   PDL_Indx *thesedims = x->dims, *theseincs = PDL_REPRINCS(x), ndimsm1 = x->ndims-1;
   PDL_Indx i, howmany = x->dims[ndimsm1], thisoffs = 0, topinc = x->dimincs[ndimsm1];
   EXTEND(SP, howmany);
+  pdl_barf_if_error(pdl_prealloc_trans_children(x, x->ntrans_children_allocated + howmany));
   for (i = 0; i < howmany; i++, thisoffs += topinc) {
     pdl *childpdl = pdl_pdlnew();
     if (!childpdl) pdl_pdl_barf("Error making null pdl");

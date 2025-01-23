@@ -1,3 +1,6 @@
+0.16 Mon Jan 20 22:11:24 EST 2025
+	- fixes for modern Perl.
+
 0.15 Sun Jul  2 23:37:37 EDT 2006
 	- added "use encoding 'utf8';" to test script to avoid warns.
 	- added Regexp::Ethiopic::isFamilyOf method to check if to chars are in the same family.

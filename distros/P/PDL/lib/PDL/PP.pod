@@ -912,6 +912,9 @@ and C<Doc> omitted):
 As of 2.096, there is also a C<!complex> type, which means if a
 complex-valued ndarray is supplied to the operation, an error will
 be thrown. In the normal case, its type will be as if C<real> were given.
+As of 2.099, there is further a C<!real> type, which is the opposite
+of the above; the idea is to protect a user who e.g. through a bug
+supplied a real ndarray to L<PDL::Ops/im>.
 
 Finally, there are the C<type+> qualifiers. Let's illustrate the C<int+>
 qualifier with the actual definition of sumover:
@@ -1172,22 +1175,7 @@ I<TODO:> mention C<$PISBAD()> etc macros.
 =head2 PDL STATE macros
 
 If you want access to the value of the badflag for a given
-ndarray, you can use the PDL STATE macros,
-for use in L</CopyBadStatusCode>.
-
-=over 4
-
-=item $ISPDLSTATEBAD(pdl)
-
-=item $ISPDLSTATEGOOD(pdl)
-
-=item $SETPDLSTATEBAD(pdl)
-
-=item $SETPDLSTATEGOOD(pdl)
-
-=back
-
-And for use in C<Code> sections:
+ndarray, you can use the PDL STATE macros.
 
 =over 4
 
@@ -1313,8 +1301,8 @@ further. Perl can help you again(!) in doing this. In many libraries
 you have certain calling conventions. This can be exploited. In short,
 you can write a little parser (which is really not difficult in Perl) that
 then generates the calls to C<pp_def> from parsed descriptions of the
-functions in that library. For an example, please check the I<Slatec>
-interface in the C<Lib> tree of the PDL distribution. If you want to check
+functions in that library. For an example, please check the L<PDL::OpenCV>
+interface on CPAN. If you want to check
 (during debugging) which calls to PP functions your Perl code generated
 then set C<$::PP_VERBOSE> to a true value just before the relevant
 C<pp_def> call, or at the top of the file.
@@ -1868,28 +1856,47 @@ completeness.
 
 =back
 
-If bad values are being used, care must be taken to ensure the
-propagation of the badflag when inplace is being used;
-consider this excerpt from F<lib/PDL/Bad.pd>:
-
-  pp_def('setbadtoval',HandleBad => 1,
-    Pars => 'a(); [o]b();',
-    OtherPars => 'double newval',
-    Inplace => 1,
-    CopyBadStatusCode => 'PDL->propagate_badflag( b, 0 );',
-    ...
-
-Since this routine removes all bad values, the output ndarray had
-its bad flag cleared. This is then propagated to both parents and children.
-
-NOTE: one idea is that the documentation for the routine could be 
+The documentation for the routine is now (as of 2.099)
 automatically flagged to indicate that it can be executed inplace,
-ie something similar to how C<HandleBad> sets C<BadDoc> if it's not 
-supplied (it's not an ideal solution).
+similar to how C<HandleBad> sets C<BadDoc> if it's not
+supplied. This can be overridden by supplying C<InplaceDoc>.
+
+=head3 Overload
+
+  # in Ops.pd
+  Overload => '>',
+  Overload => ['+', 1],    # mutator
+  Overload => ['|', 1, 1], # bitwise
+
+Implements overloading of Perl operators. Documented automatically.
+Added in PDL 2.099. Will overload in the current C<pp_bless> package,
+which defaults to C<PDL>.
+
+=head3 ParamDesc
+
+  # in Primitive.pd
+  ParamDesc => {
+    x => 'ordinate data',
+    f => <<'EOF',
+  array of dependent variable values to be
+  interpolated. F(I) is value corresponding to
+  X(I). C<pchip_chim> is designed for monotonic data, but it will
+  work for any F-array.  It will force extrema at points where
+  monotonicity switches direction. If some other treatment of
+  switch points is desired, DPCHIC should be used instead.
+  EOF
+    # ...
+  },
+
+Hash-ref of parameter name to POD description of that parameter.
+Ensure the case of the parameter name is correct, as any missing
+parameters (docs are generated in order of the parameter list) will
+be omitted. Intended to take care of the surrounding POD markup,
+for easy, consistent-looking documentation with no effort.
+Added in PDL 2.099.
 
 =head3 FTypes
 
-  # in slices.pd
   FTypes => {CHILD => '$COMP(totype)'},
 
 The value is a hash-ref mapping parameter-names to an expression giving
@@ -2424,20 +2431,6 @@ If C<HandleBad> is true and C<BadCode> is not supplied, the C<Code>
 section will be reused, on the assumption it will use
 C<#ifdef PDL_BAD_CODE> to handle bad values.
 As of 2.073, you can, and are recommended to, use C<PDL_IF_BAD(iftrue,iffalse)>.
-
-=head3 CopyBadStatusCode
-
-As of 2.079, this is deprecated due to being largely unnecessary;
-instead, just use C<$PDLSTATESETBAD(pdlname)> in your C<Code> section
-and the badflag setting will be propagated to all its parents and
-children.
-
-The default code here sets the bad flag of the output ndarrays if
-C<$BADFLAGCACHE()> is true after the code has been
-evaluated.  Sometimes C<CopyBadStatusCode> is set to an empty string,
-with the responsibility of setting the badflag of the output ndarray
-left to the C<BadCode> section (e.g. the C<xxxover> routines
-in F<lib/PDL/Ufunc.pd>).
 
 =head3 GenericTypes
 

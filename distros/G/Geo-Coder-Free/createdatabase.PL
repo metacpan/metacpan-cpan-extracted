@@ -901,6 +901,17 @@ my %known_places = (	# Places I've checked with my GPS
 			'COUNTRY' => 'US',
 			'POSTCODE' => 22180
 		}, {
+			'LAT' => 39.099655,
+			'LON' => -77.836975,
+			'NAME' => 'DIRT FARM BREWERY',
+			'NUMBER' => 18701,
+			'STREET' => 'FOGGY BOTTOM RD',
+			'CITY' => 'BLUEMONT',
+			'COUNTY' => 'LOUDON',
+			'STATE' => 'VA',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 20135
+		}, {
 			'LAT' => 39.124843,
 			'LON' => -77.535445,
 			'NUMBER' => 818,
@@ -4760,21 +4771,22 @@ sub country
 {
 	my($file, $state) = @_;
 
+	# Ensure the file argument is provided
 	die if(!defined($file));
 
-	if($file =~ /north-america/) {
-		return 'US'
-	}
-	if($file =~ /australia/) {
-		return 'Australia'
+	# Check for file patterns and return corresponding country
+	return 'US' if $file =~ /north-america/;
+	return 'Australia' if $file =~ /australia/;
+
+	# Ensure the state argument is provided if needed
+	die "State argument is missing" if not defined $state;
+
+	# Handle European cases with specific state codes
+	if ($file =~ /europe/) {
+		my %valid_states = map { $_ => 1 } ('Georgia', 'GA', 'DE', 'VI');
+		return $state if $valid_states{$state} || $valid_states{uc($state)};
 	}
 
-	die if(!defined($state));
-
-	if($file =~ /europe/) {
-		if(($state eq 'Georgia') || ($state eq 'GA') || (uc($state) eq 'DE') || ($state eq 'VI')) {
-			return $state
-		}
-	}
-	die "$file/$state"
+	# Default case: Raise error with both file and state information
+	die "$file/$state";
 }

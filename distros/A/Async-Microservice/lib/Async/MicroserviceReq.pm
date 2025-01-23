@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use Moose;
 use namespace::autoclean;
@@ -26,7 +26,7 @@ has 'content' => (is => 'ro', isa => 'Str',    required => 1);
 has 'json_content' =>
     (is => 'ro', isa => 'Ref', required => 0, lazy => 1, builder => '_build_json_content');
 has 'params'        => (is => 'ro', isa => 'Object',           required => 1);
-has 'plack_respond' => (is => 'rw', isa => 'CodeRef',          required => 0);
+has 'plack_respond' => (is => 'rw', isa => 'CodeRef',          required => 0, clearer => 'clear_plack_respond');
 has 'static_dir'    => (is => 'ro', isa => 'Path::Class::Dir', required => 1, coerce => 1);
 
 has 'base_url' => (

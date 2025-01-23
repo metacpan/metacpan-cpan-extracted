@@ -22,6 +22,7 @@ use DynaLoader;
 
 
 
+
 #line 14 "lib/PDL/ImageRGB.pd"
 
 use strict;
@@ -252,7 +253,7 @@ distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
 =cut
-#line 256 "lib/PDL/ImageRGB.pm"
+#line 257 "lib/PDL/ImageRGB.pm"
 
 *cquant_c = \&PDL::cquant_c;
 
