@@ -22,13 +22,13 @@ meta-spec:
   version: '1.4'
 name: Music-Drummer
 requires:
-  MIDI::Drummer::Tiny: '0.5005'
+  MIDI::Drummer::Tiny: '0.5006'
   parent: '0'
   perl: '5.006'
 resources:
   homepage: https://github.com/ology/Music-Drummer
   repository: https://github.com/ology/Music-Drummer.git
-version: '0.0106'
+version: '0.0107'
 x_Dist_Zilla:
   perl:
     version: '5.040000'

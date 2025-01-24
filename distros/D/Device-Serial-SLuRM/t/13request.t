@@ -40,6 +40,7 @@ sub with_crc8
    # Auto-reset
    $controller->expect_syswrite( "DummyFH", "\x55" . with_crc8( with_crc8( "\x01\x01" ) . "\x00" ) )
       ->will_write_sysread_buffer_later( "DummyFH", "\x55" . with_crc8( with_crc8( "\x02\x01" ) . "\x00" ) );
+   $controller->expect_sleep( Test::Deep::num( 0.0017, 1E-4 ) );
    $controller->expect_syswrite( "DummyFH", "\x55" . with_crc8( with_crc8( "\x01\x01" ) . "\x00" ) );
    $controller->expect_sleep( 0.05 * 3 )
       ->remains_pending;
@@ -53,6 +54,7 @@ sub with_crc8
    # ACK is sent twice
    $controller->expect_syswrite( "DummyFH",
       "\x55" . with_crc8( with_crc8( "\xC1\x00" ) ) );
+   $controller->expect_sleep( Test::Deep::num( 0.0017, 1E-4 ) );
    $controller->expect_syswrite( "DummyFH",
       "\x55" . with_crc8( with_crc8( "\xC1\x00" ) ) );
 
@@ -89,6 +91,7 @@ sub with_crc8
       ->remains_pending;
    $controller->expect_syswrite( "DummyFH",
       "\x55" . with_crc8( with_crc8( "\xC2\x00" ) ) );
+   $controller->expect_sleep( Test::Deep::num( 0.0017, 1E-4 ) );
    $controller->expect_syswrite( "DummyFH",
       "\x55" . with_crc8( with_crc8( "\xC2\x00" ) ) );
 
@@ -118,6 +121,7 @@ sub with_crc8
       ->remains_pending;
    $controller->expect_syswrite( "DummyFH",
       "\x55" . with_crc8( with_crc8( "\xC3\x00" ) ) );
+   $controller->expect_sleep( Test::Deep::num( 0.0017, 1E-4 ) );
    $controller->expect_syswrite( "DummyFH",
       "\x55" . with_crc8( with_crc8( "\xC3\x00" ) ) );
 
@@ -186,10 +190,12 @@ sub with_crc8
          "\x55" . with_crc8( with_crc8( "\xB5\x02" ) . "A1" ) );
    $controller->expect_syswrite( "DummyFH",
       "\x55" . with_crc8( with_crc8( "\xC6\x00" ) ) );
+   $controller->expect_sleep( Test::Deep::num( 0.0017, 1E-4 ) );
    $controller->expect_syswrite( "DummyFH",
       "\x55" . with_crc8( with_crc8( "\xC6\x00" ) ) );
    $controller->expect_syswrite( "DummyFH",
       "\x55" . with_crc8( with_crc8( "\xC5\x00" ) ) );
+   $controller->expect_sleep( Test::Deep::num( 0.0017, 1E-4 ) );
    $controller->expect_syswrite( "DummyFH",
       "\x55" . with_crc8( with_crc8( "\xC5\x00" ) ) );
 

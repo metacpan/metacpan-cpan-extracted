@@ -1,17 +1,15 @@
 package Map::Tube::Novosibirsk;
 
-# Pragmas.
 use strict;
 use warnings;
 use 5.006;
 
-# Modules.
 use File::Share ':all';
 use Moo;
 use namespace::clean;
 
 # Version.
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Get XML.
 has xml => (
@@ -36,6 +34,7 @@ Map::Tube::Novosibirsk - Interface to the Novosibirsk Metro Map.
 =head1 SYNOPSIS
 
  use Map::Tube::Novosibirsk;
+
  my $obj = Map::Tube::Novosibirsk->new;
  my $routes_ar = $obj->get_all_routes($from, $to);
  my $line = $obj->get_line_by_id($line_id);
@@ -117,11 +116,11 @@ For more information about Novosibirsk Map, click L<here|https://en.wikipedia.or
 
 =head1 EXAMPLE1
 
- # Pragmas.
+=for comment filename=print_novosibirsk_route.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Encode qw(decode_utf8 encode_utf8);
  use Map::Tube::Novosibirsk;
 
@@ -139,12 +138,12 @@ For more information about Novosibirsk Map, click L<here|https://en.wikipedia.or
 
 =head1 EXAMPLE2
 
- # Pragmas.
+=for comment filename=print_novosibirsk_def_xml_file.pl
+
  use strict;
  use utf8;
  use warnings;
 
- # Modules.
  use Map::Tube::Novosibirsk;
 
  # Object.
@@ -161,11 +160,11 @@ For more information about Novosibirsk Map, click L<here|https://en.wikipedia.or
 
 =head1 EXAMPLE3
 
- # Pragmas.
+=for comment filename=print_novosibirsk_image.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Map::Tube::GraphViz;
  use Map::Tube::GraphViz::Utils qw(node_color_without_label);
  use Map::Tube::Novosibirsk;
@@ -187,23 +186,23 @@ For more information about Novosibirsk Map, click L<here|https://en.wikipedia.or
  system "ls -l Novosibirsk.png";
 
  # Output like:
- # -rw-r--r-- 1 skim skim 36609 Jan  1 00:34 Novosibirsk.png
+ # -rw-r--r-- 1 skim skim 34058 23. led 12.45 Novosibirsk.png
 
 =begin html
 
-<a href="https://raw.githubusercontent.com/michal-josef-spacek/Map-Tube-Novosibirsk/master/images/ex3.png">
-  <img src="https://raw.githubusercontent.com/michal-josef-spacek/Map-Tube-Novosibirsk/master/images/ex3.png" alt="Новосибирский метрополитен" width="300px" height="300px" />
+<a href="https://raw.githubusercontent.com/michal-josef-spacek/Map-Tube-Novosibirsk/master/images/Novosibirsk.png">
+  <img src="https://raw.githubusercontent.com/michal-josef-spacek/Map-Tube-Novosibirsk/master/images/Novosibirsk.png" alt="Новосибирский метрополитен" width="300px" height="300px" />
 </a>
 
 =end html
 
 =head1 EXAMPLE4
 
- # Pragmas.
+=for comment filename=print_novosibirsk_lines.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Encode qw(encode_utf8);
  use Map::Tube::Novosibirsk;
 
@@ -222,11 +221,11 @@ For more information about Novosibirsk Map, click L<here|https://en.wikipedia.or
 
 =head1 EXAMPLE5
 
- # Pragmas.
+=for comment filename=print_novosibirsk_line_stations.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Encode qw(decode_utf8 encode_utf8);
  use Map::Tube::Novosibirsk;
 
@@ -299,12 +298,14 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2014-2025 Michal Josef Špaček
- Artistic License
- BSD 2-Clause License
+© 2014-2025 Michal Josef Špaček
+
+Artistic License
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

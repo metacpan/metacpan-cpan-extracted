@@ -1,5 +1,19 @@
 Revision history for Device-Serial-SLuRM
 
+0.08    2025-01-23
+        [CHANGES]
+         * Dynamically calculate retransmission timeout based on serial line
+           baud rate, to account for transmission time on slow links
+         * Add actual delay between the two attempts of `->send_twice`
+         * Added libsigrokdecode decoder for wire format
+         * contrib/slurm.[ch]
+            + Mark data arguments for transmission as `const`
+            + Compile-time configurable max packet size and number of command
+              slots
+
+        [BUGFIXES]
+         * Requires perl version 5.28 because use of delete on kvslices
+
 0.07    2024-07-11
         [CHANGES]
          * Use new `Future::Selector` for neater code logic

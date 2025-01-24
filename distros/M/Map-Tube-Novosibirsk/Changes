@@ -1,3 +1,11 @@
+0.05 2025-01-23T12:47:32+01:00
+ - Fix connection between 'Красный проспект' and 'Сибирская'.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Rename examples to better names.
+ - Rename image to better name. Regen.
+ - Update bugtracker to github.
+
 0.04 2025-01-23T11:27:31+01:00
  - Add EXAMPLE5 section to doc.
  - Add test for ok_map_functions().

@@ -7,7 +7,7 @@
   </lines>
   <stations>
     <!-- Stations on multiple lines -->
-    <station id="L1-01" name="El Perchel" line="L1:1" link="L1-02,L2-02"/>
+    <station id="L1-01" name="El Perchel" line="L1:1,L2:1" link="L1-02,L2-02"/>
 
     <!-- https://es.wikipedia.org/wiki/Línea_1_(Metro_de_Málaga)  -->
     <!-- El Perchel -->

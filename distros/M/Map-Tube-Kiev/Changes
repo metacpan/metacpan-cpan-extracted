@@ -1,3 +1,9 @@
+0.07 2025-01-23T20:28:50+01:00
+ - Add tunnel between Театральна and 'Золоті ворота' (GH#2).
+ - Fix junctions.
+ - Regen image.
+ - Update copyright years.
+
 0.06 2023-12-06T22:12:28+01:00
  - Add EXAMPLE5 section to doc.
  - Add constructed lines to XML file.

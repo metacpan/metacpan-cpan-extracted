@@ -21,7 +21,6 @@ build_requires:
   stable: '0.031'
   utf8: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
   Module::Build::Tiny: '0.034'
   perl: '5.020'
 dynamic_config: 0
@@ -48,7 +47,7 @@ no_index:
 provides:
   Test::Mojo::Role::OpenAPI::Modern:
     file: lib/Test/Mojo/Role/OpenAPI/Modern.pm
-    version: '0.006'
+    version: '0.007'
 recommends:
   Mojolicious::Plugin::OpenAPI::Modern: '0.007'
 requires:
@@ -69,10 +68,10 @@ resources:
   bugtracker: https://github.com/karenetheridge/Test-Mojo-Role-OpenAPI-Modern/issues
   homepage: https://github.com/karenetheridge/Test-Mojo-Role-OpenAPI-Modern
   repository: https://github.com/karenetheridge/Test-Mojo-Role-OpenAPI-Modern.git
-version: '0.006'
+version: '0.007'
 x_Dist_Zilla:
   perl:
-    version: '5.041003'
+    version: '5.041007'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -231,7 +230,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Test::MinimumVersion:
           max_target_perl: '5.020'
       name: '@Author::ETHER/Test::MinimumVersion'
-      version: '2.000010'
+      version: '2.000011'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::ETHER/PodSyntaxTests'
@@ -255,7 +254,7 @@ x_Dist_Zilla:
             - irc
           wordlist: Pod::Wordlist
       name: '@Author::ETHER/Test::PodSpelling'
-      version: '2.007005'
+      version: '2.007006'
     -
       class: Dist::Zilla::Plugin::Test::Kwalitee
       config:
@@ -278,7 +277,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Test::Portability:
           options: ''
       name: '@Author::ETHER/Test::Portability'
-      version: '2.001001'
+      version: '2.001003'
     -
       class: Dist::Zilla::Plugin::Test::CleanNamespaces
       config:
@@ -477,49 +476,17 @@ x_Dist_Zilla:
       name: '@Author::ETHER/MinimumPerl'
       version: '1.006'
     -
-      class: Dist::Zilla::Plugin::MakeMaker::Fallback
+      class: Dist::Zilla::Plugin::ModuleBuildTiny
       config:
-        Dist::Zilla::Plugin::MakeMaker:
-          make_path: make
-          version: '6.032'
-        Dist::Zilla::Plugin::MakeMaker::Awesome:
-          version: '0.49'
-        Dist::Zilla::Plugin::MakeMaker::Fallback:
-          skip_release_testing: 0
         Dist::Zilla::Role::TestRunner:
           default_jobs: 9
-          version: '6.032'
-      name: '@Author::ETHER/MakeMaker::Fallback'
-      version: '0.032'
-    -
-      class: Dist::Zilla::Plugin::ModuleBuildTiny::Fallback
-      config:
-        Dist::Zilla::Plugin::ModuleBuildTiny::Fallback:
-          mb_version: '0.28'
-          plugins:
-            -
-              class: Dist::Zilla::Plugin::ModuleBuild
-              config:
-                Dist::Zilla::Role::TestRunner:
-                  default_jobs: 9
-              name: 'ModuleBuild, via ModuleBuildTiny::Fallback'
-              version: '6.032'
-            -
-              class: Dist::Zilla::Plugin::ModuleBuildTiny
-              config:
-                Dist::Zilla::Role::TestRunner:
-                  default_jobs: 9
-              name: 'ModuleBuildTiny, via ModuleBuildTiny::Fallback'
-              version: '0.017'
-        Dist::Zilla::Role::TestRunner:
-          default_jobs: 9
-      name: '@Author::ETHER/ModuleBuildTiny::Fallback'
-      version: '0.027'
+      name: '@Author::ETHER/ModuleBuildTiny'
+      version: '0.017'
     -
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.45.2
+          git_version: 2.47.1
           include_authors: 0
           include_releaser: 1
           order_by: commits
@@ -586,7 +553,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20240829'
+          Module::CoreList: '5.20241220'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.010'
     -
@@ -611,7 +578,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.45.2
+          git_version: 2.47.1
           repo_root: .
       name: '@Author::ETHER/initial check'
       version: '2.051'
@@ -619,7 +586,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.45.2
+          git_version: 2.47.1
           repo_root: .
       name: '@Author::ETHER/Git::CheckFor::MergeConflicts'
       version: '0.014'
@@ -627,7 +594,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.45.2
+          git_version: 2.47.1
           repo_root: .
       name: '@Author::ETHER/Git::CheckFor::CorrectBranch'
       version: '0.014'
@@ -653,7 +620,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.45.2
+          git_version: 2.47.1
           repo_root: .
       name: '@Author::ETHER/after tests'
       version: '2.051'
@@ -737,7 +704,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.45.2
+          git_version: 2.47.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -750,11 +717,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.006
+          tag: v0.007
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.45.2
+          git_version: 2.47.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -791,7 +758,7 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.45.2
+          git_version: 2.47.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -813,7 +780,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.45.2
+          git_version: 2.47.1
           repo_root: .
       name: '@Author::ETHER/Git::Push'
       version: '2.051'
@@ -936,8 +903,8 @@ x_Dist_Zilla:
       is_trial: 0
     version: '6.032'
 x_authority: cpan:ETHER
-x_generated_by_perl: v5.41.3
-x_serialization_backend: 'YAML::Tiny version 1.74'
+x_generated_by_perl: v5.41.7
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 1
 x_use_unsafe_inc: 0

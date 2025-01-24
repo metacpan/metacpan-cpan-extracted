@@ -8,7 +8,7 @@ use File::Spec::Functions;
 
 my $isNetCDF = PDL::NetCDF::isNetcdf4();
 isnt $isNetCDF, undef, "isNetcdf4 function defined";
-plan skip_all => "no netcdf4 support" unless PDL::NetCDF::isNetcdf4;
+done_testing, exit if !$isNetCDF;
 
 my $dir = tempdir(CLEANUP=>1);
 is(PDL::NetCDF::defaultFormat(), PDL::NetCDF::NC_FORMAT_CLASSIC, "classic format is default");

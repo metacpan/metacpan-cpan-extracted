@@ -33,14 +33,13 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
             "Module::Build::Tiny" : "0.034",
             "perl" : "5.020"
          }
       },
       "develop" : {
          "recommends" : {
-            "Dist::Zilla::PluginBundle::Author::ETHER" : "0.163",
+            "Dist::Zilla::PluginBundle::Author::ETHER" : "0.164",
             "Dist::Zilla::PluginBundle::Git::VersionManager" : "0.007"
          },
          "requires" : {
@@ -62,7 +61,7 @@
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
             "Test::Portability::Files" : "0",
-            "Test::Spelling" : "0.12",
+            "Test::Spelling" : "0.17",
             "Test::Warnings" : "0"
          }
       },
@@ -141,7 +140,6 @@
             "Dist::Zilla::Plugin::InstallGuide" : "1.200005",
             "Dist::Zilla::Plugin::Keywords" : "0.004",
             "Dist::Zilla::Plugin::License" : "5.038",
-            "Dist::Zilla::Plugin::MakeMaker::Fallback" : "0.029",
             "Dist::Zilla::Plugin::Manifest" : "0",
             "Dist::Zilla::Plugin::MetaConfig" : "0",
             "Dist::Zilla::Plugin::MetaJSON" : "0",
@@ -151,7 +149,7 @@
             "Dist::Zilla::Plugin::MetaTests" : "0",
             "Dist::Zilla::Plugin::MetaYAML" : "0",
             "Dist::Zilla::Plugin::MinimumPerl" : "1.006",
-            "Dist::Zilla::Plugin::ModuleBuildTiny::Fallback" : "0.018",
+            "Dist::Zilla::Plugin::ModuleBuildTiny" : "0.012",
             "Dist::Zilla::Plugin::MojibakeTests" : "0.8",
             "Dist::Zilla::Plugin::NextRelease" : "5.033",
             "Dist::Zilla::Plugin::PodCoverageTests" : "5.040",
@@ -190,7 +188,7 @@
    "provides" : {
       "Test::Mojo::Role::OpenAPI::Modern" : {
          "file" : "lib/Test/Mojo/Role/OpenAPI/Modern.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       }
    },
    "release_status" : "stable",
@@ -206,10 +204,10 @@
       },
       "x_IRC" : "irc://irc.libera.chat/#mojo"
    },
-   "version" : "0.006",
+   "version" : "0.007",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.041003"
+         "version" : "5.041007"
       },
       "plugins" : [
          {
@@ -414,7 +412,7 @@
                }
             },
             "name" : "@Author::ETHER/Test::MinimumVersion",
-            "version" : "2.000010"
+            "version" : "2.000011"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
@@ -445,7 +443,7 @@
                }
             },
             "name" : "@Author::ETHER/Test::PodSpelling",
-            "version" : "2.007005"
+            "version" : "2.007006"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Kwalitee",
@@ -476,7 +474,7 @@
                }
             },
             "name" : "@Author::ETHER/Test::Portability",
-            "version" : "2.001001"
+            "version" : "2.001003"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::CleanNamespaces",
@@ -733,66 +731,20 @@
             "version" : "1.006"
          },
          {
-            "class" : "Dist::Zilla::Plugin::MakeMaker::Fallback",
+            "class" : "Dist::Zilla::Plugin::ModuleBuildTiny",
             "config" : {
-               "Dist::Zilla::Plugin::MakeMaker" : {
-                  "make_path" : "make",
-                  "version" : "6.032"
-               },
-               "Dist::Zilla::Plugin::MakeMaker::Awesome" : {
-                  "version" : "0.49"
-               },
-               "Dist::Zilla::Plugin::MakeMaker::Fallback" : {
-                  "skip_release_testing" : 0
-               },
-               "Dist::Zilla::Role::TestRunner" : {
-                  "default_jobs" : 9,
-                  "version" : "6.032"
-               }
-            },
-            "name" : "@Author::ETHER/MakeMaker::Fallback",
-            "version" : "0.032"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::ModuleBuildTiny::Fallback",
-            "config" : {
-               "Dist::Zilla::Plugin::ModuleBuildTiny::Fallback" : {
-                  "mb_version" : "0.28",
-                  "plugins" : [
-                     {
-                        "class" : "Dist::Zilla::Plugin::ModuleBuild",
-                        "config" : {
-                           "Dist::Zilla::Role::TestRunner" : {
-                              "default_jobs" : 9
-                           }
-                        },
-                        "name" : "ModuleBuild, via ModuleBuildTiny::Fallback",
-                        "version" : "6.032"
-                     },
-                     {
-                        "class" : "Dist::Zilla::Plugin::ModuleBuildTiny",
-                        "config" : {
-                           "Dist::Zilla::Role::TestRunner" : {
-                              "default_jobs" : 9
-                           }
-                        },
-                        "name" : "ModuleBuildTiny, via ModuleBuildTiny::Fallback",
-                        "version" : "0.017"
-                     }
-                  ]
-               },
                "Dist::Zilla::Role::TestRunner" : {
                   "default_jobs" : 9
                }
             },
-            "name" : "@Author::ETHER/ModuleBuildTiny::Fallback",
-            "version" : "0.027"
+            "name" : "@Author::ETHER/ModuleBuildTiny",
+            "version" : "0.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.45.2",
+                  "git_version" : "2.47.1",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "commits",
@@ -883,7 +835,7 @@
             "class" : "Dist::Zilla::Plugin::EnsureLatestPerl",
             "config" : {
                "Dist::Zilla::Plugin::EnsureLatestPerl" : {
-                  "Module::CoreList" : "5.20240829"
+                  "Module::CoreList" : "5.20241220"
                }
             },
             "name" : "@Author::ETHER/EnsureLatestPerl",
@@ -916,7 +868,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.45.2",
+                  "git_version" : "2.47.1",
                   "repo_root" : "."
                }
             },
@@ -927,7 +879,7 @@
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.45.2",
+                  "git_version" : "2.47.1",
                   "repo_root" : "."
                }
             },
@@ -938,7 +890,7 @@
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.45.2",
+                  "git_version" : "2.47.1",
                   "repo_root" : "."
                }
             },
@@ -972,7 +924,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.45.2",
+                  "git_version" : "2.47.1",
                   "repo_root" : "."
                }
             },
@@ -1084,7 +1036,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.45.2",
+                  "git_version" : "2.47.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1101,12 +1053,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.006",
+                  "tag" : "v0.007",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.45.2",
+                  "git_version" : "2.47.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1156,7 +1108,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.45.2",
+                  "git_version" : "2.47.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1187,7 +1139,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.45.2",
+                  "git_version" : "2.47.1",
                   "repo_root" : "."
                }
             },
@@ -1353,8 +1305,8 @@
       }
    },
    "x_authority" : "cpan:ETHER",
-   "x_generated_by_perl" : "v5.41.3",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
+   "x_generated_by_perl" : "v5.41.7",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 1,
    "x_use_unsafe_inc" : 0

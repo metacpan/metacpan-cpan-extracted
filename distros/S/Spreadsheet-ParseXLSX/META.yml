@@ -12,7 +12,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,22 +21,22 @@ name: Spreadsheet-ParseXLSX
 provides:
   Spreadsheet::ParseXLSX:
     file: lib/Spreadsheet/ParseXLSX.pm
-    version: '0.35'
+    version: '0.36'
   Spreadsheet::ParseXLSX::Cell:
     file: lib/Spreadsheet/ParseXLSX/Cell.pm
-    version: '0.35'
+    version: '0.36'
   Spreadsheet::ParseXLSX::Decryptor:
     file: lib/Spreadsheet/ParseXLSX/Decryptor.pm
-    version: '0.35'
+    version: '0.36'
   Spreadsheet::ParseXLSX::Decryptor::Agile:
     file: lib/Spreadsheet/ParseXLSX/Decryptor/Agile.pm
-    version: '0.35'
+    version: '0.36'
   Spreadsheet::ParseXLSX::Decryptor::Standard:
     file: lib/Spreadsheet/ParseXLSX/Decryptor/Standard.pm
-    version: '0.35'
+    version: '0.36'
   Spreadsheet::ParseXLSX::Worksheet:
     file: lib/Spreadsheet/ParseXLSX/Worksheet.pm
-    version: '0.35'
+    version: '0.36'
 requires:
   Archive::Zip: '1.34'
   Crypt::Mode::CBC: '0'
@@ -56,15 +56,11 @@ requires:
 resources:
   bugtracker: https://github.com/MichaelDaum/spreadsheet-parsexlsx/issues
   repository: https://github.com/MichaelDaum/spreadsheet-parsexlsx
-version: '0.35'
+version: '0.36'
 x_Dist_Zilla:
   perl:
-    version: '5.038002'
+    version: '5.040000'
   plugins:
-    -
-      class: Dist::Zilla::Plugin::FileFinder::Filter
-      name: NonBinaryScriptFiles
-      version: '6.031'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -72,83 +68,86 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: TestMoreDoneTesting
-      version: '6.031'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::GatherDir
       config:
         Dist::Zilla::Plugin::GatherDir:
-          exclude_filename: []
+          exclude_filename:
+            - t/ahihi.t
+            - t/data/ahihi.xlsx
           exclude_match: []
           follow_symlinks: 0
           include_dotfiles: 0
           prefix: ''
-          prune_directory: []
+          prune_directory:
+            - nytprof
           root: .
       name: GatherDir
-      version: '6.031'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: PruneCruft
-      version: '6.031'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: ManifestSkip
-      version: '6.031'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: MetaYAML
-      version: '6.031'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::License
       name: License
-      version: '6.031'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::Readme
       name: Readme
-      version: '6.031'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: ExtraTests
-      version: '6.031'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: ExecDir
-      version: '6.031'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: ShareDir
-      version: '6.031'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
-          default_jobs: 1
+          default_jobs: '12'
       name: MakeMaker
-      version: '6.031'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: Manifest
-      version: '6.031'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: TestRelease
-      version: '6.031'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: ConfirmRelease
-      version: '6.031'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: MetaConfig
-      version: '6.031'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: MetaJSON
-      version: '6.031'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: NextRelease
-      version: '6.031'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::CheckChangesHasContent
       name: CheckChangesHasContent
@@ -201,15 +200,15 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PodCoverageTests
       name: PodCoverageTests
-      version: '6.031'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: PodSyntaxTests
-      version: '6.031'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: MetaResources
-      version: '6.031'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::Git::Check
       config:
@@ -225,7 +224,7 @@ x_Dist_Zilla:
           git_version: 2.34.1
           repo_root: .
       name: Git::Check
-      version: '2.049'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -245,7 +244,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: Git::Commit
-      version: '2.049'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -253,7 +252,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.35'
+          tag: '0.36'
           tag_format: '%v'
           tag_message: ''
         Dist::Zilla::Role::Git::Repo:
@@ -262,7 +261,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: Git::Tag
-      version: '2.049'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::Git::NextVersion
       config:
@@ -274,7 +273,7 @@ x_Dist_Zilla:
           git_version: 2.34.1
           repo_root: .
       name: Git::NextVersion
-      version: '2.049'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
@@ -301,63 +300,63 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::EnsurePod5
               name: '@CorePrep/EnsurePod5'
-              version: '4.019'
+              version: '4.020'
             -
               class: Pod::Weaver::Plugin::H1Nester
               name: '@CorePrep/H1Nester'
-              version: '4.019'
+              version: '4.020'
             -
               class: Pod::Weaver::Plugin::SingleEncoding
               name: -SingleEncoding
-              version: '4.019'
+              version: '4.020'
             -
               class: Pod::Weaver::Section::Name
               name: Name
-              version: '4.019'
+              version: '4.020'
             -
               class: Pod::Weaver::Section::Version
               name: Version
-              version: '4.019'
+              version: '4.020'
             -
               class: Pod::Weaver::Section::Region
               name: prelude
-              version: '4.019'
+              version: '4.020'
             -
               class: Pod::Weaver::Section::Generic
               name: SYNOPSIS
-              version: '4.019'
+              version: '4.020'
             -
               class: Pod::Weaver::Section::Generic
               name: DESCRIPTION
-              version: '4.019'
+              version: '4.020'
             -
               class: Pod::Weaver::Section::Generic
               name: OVERVIEW
-              version: '4.019'
+              version: '4.020'
             -
               class: Pod::Weaver::Section::Collect
               name: ATTRIBUTES
-              version: '4.019'
+              version: '4.020'
             -
               class: Pod::Weaver::Section::Collect
               name: METHODS
-              version: '4.019'
+              version: '4.020'
             -
               class: Pod::Weaver::Section::Collect
               name: FUNCTIONS
-              version: '4.019'
+              version: '4.020'
             -
               class: Pod::Weaver::Section::Leftovers
               name: Leftovers
-              version: '4.019'
+              version: '4.020'
             -
               class: Pod::Weaver::Section::Region
               name: postlude
-              version: '4.019'
+              version: '4.020'
             -
               class: Pod::Weaver::Section::Authors
               name: Authors
-              version: '4.019'
+              version: '4.020'
             -
               class: Pod::Weaver::Section::Contributors
               name: Contributors
@@ -365,7 +364,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::Legal
               name: Legal
-              version: '4.019'
+              version: '4.020'
       name: PodWeaver
       version: '4.010'
     -
@@ -378,7 +377,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: UploadToCPAN
-      version: '6.031'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::MetaProvides::Package
       config:
@@ -387,7 +386,7 @@ x_Dist_Zilla:
             -
               class: Dist::Zilla::Plugin::FinderCode
               name: MetaProvides::Package/AUTOVIV/:InstallModulesPM
-              version: '6.031'
+              version: '6.032'
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
           $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
@@ -402,61 +401,62 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: AutoPrereqs
-      version: '6.031'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::Encoding
       name: Encoding
-      version: '6.031'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.031'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.031'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.031'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.031'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.031'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.031'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.031'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.031'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.031'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.031'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: MetaProvides::Package/AUTOVIV/:InstallModulesPM
-      version: '6.031'
+      version: '6.032'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: 0
-    version: '6.031'
+    version: '6.032'
 x_contributors:
+  - 'Alex <asb@cpan.org>'
   - 'Alexey Mazurin <mazurin.alexey@gmail.com>'
   - 'Daryl Anderman <daryl@273kelvin.ca>'
   - 'Dave Clarke <david_clarke@verizon.net>'
@@ -475,6 +475,6 @@ x_contributors:
   - 'Stuart Watt <stuart@morungos.com>'
   - 'theevilapplepie <theevilapplepie@gmail.com>'
   - 'zhouzhen1 <zhouzhen1@gmail.com>'
-x_generated_by_perl: v5.38.2
+x_generated_by_perl: v5.40.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: MIT

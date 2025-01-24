@@ -2,7 +2,6 @@ package Test::Attean::SPARQLStarSuite;
 
 use v5.14;
 use warnings;
-use Test::Roo::Role;
 
 use Attean;
 use Attean::RDF;
@@ -19,8 +18,9 @@ use Encode qw(encode encode_utf8);
 use Getopt::Long;
 use Regexp::Common qw /URI/;
 use Scalar::Util qw(blessed reftype);
-use List::MoreUtils qw(all);
-use Test::Modern;
+use List::Util qw(all);
+use Test::More;
+use Test::Roo::Role;
 use Text::CSV;
 use Try::Tiny;
 use URI::file;

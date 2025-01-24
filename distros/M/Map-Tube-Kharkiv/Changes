@@ -1,3 +1,10 @@
+0.08 2025-01-23T18:48:37+01:00
+ - Fix junctions (GH#2).
+ - Update line 1 to new names.
+ - Update line 2 to new names.
+ - Update line 3 to new names.
+ - Update copyright years.
+
 0.07 2023-12-05T15:57:03+01:00
  - Fix use lib '.' in Makefile.PL.
  - Improve LICENSE AND COPYRIGHT section in doc.

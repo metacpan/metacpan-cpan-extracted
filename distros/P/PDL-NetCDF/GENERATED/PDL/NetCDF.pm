@@ -1,5 +1,5 @@
 #
-# GENERATED WITH PDL::PP! Don't modify!
+# GENERATED WITH PDL::PP from netcdf.pd! Don't modify!
 #
 package PDL::NetCDF;
 
@@ -11,10 +11,12 @@ use PDL::Exporter;
 use DynaLoader;
 
 
-   our $VERSION = '4.24';
+   our $VERSION = '4.25';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::NetCDF $VERSION;
+
+
 
 
 
@@ -56,7 +58,6 @@ binary gridded files via PDL objects.
   $obj->puttext('textvar', ['n_station', 'n_string'], [3,10], $str);
   my $outstr = $obj->gettext('textvar');
   # $outstr = "Station1  Station2  Station3  "
-
 
   # Now textual NetCDF arrays can be stored with PDL::Char style PDLs.  This is much
   # more natural and flexible than the above method.
@@ -237,7 +238,6 @@ Arguments: none
 Returns: 
 @ integer equal to one of the PDL::NetCDF::NC_FORMAT_* constants.
 
-
 =head2 put
 
 =for ref
@@ -357,7 +357,6 @@ nothing. Barfs on error.
 =for example
 
   $ncobj->sync
-
 
 =head2 get
 
@@ -494,7 +493,6 @@ PDL::type or undef, when variable not defined
 
   # Get a type
   my $type = $ncobj->getvariabletype ('var1');
-
 
 =head2 puttext
 
@@ -764,37 +762,16 @@ Ed J (mohawk2), etj@cpan.org
 perl(1), PDL(1), netcdf(3).
 
 =cut
-#line 768 "NetCDF.pm"
-
-
-
-
-
-
 
 #line 1020 "netcdf.pd"
-
-
 use Carp;
 use Fcntl; # importing constants O_CREAT,O_RDONLY,O_RDWR
 use constant DEBUG => 0;
-#line 782 "NetCDF.pm"
-
-
 
 #line 1030 "netcdf.pd"
-
-
 use constant PACKTYPE => "Q*";
-#line 790 "NetCDF.pm"
-
-
-
-#line 1042 "netcdf.pd"
-
 
 #line 1043 "netcdf.pd"
-
 # These defines are taken from netcdf.h  I deemed this cleaner than using
 # h2xs and the autoload stuff, which mixes awkwardly with PP.
 sub NC_FILL_BYTE () { return -127; }
@@ -923,7 +900,6 @@ my %typemap2 = (
 		PDL::ushort->[0]  => sub { return PDL::NetCDF::nc_put_var_ushort  (@_); },
 		PDL::longlong->[0]   => sub { return PDL::NetCDF::nc_put_var_longlong (@_); },
 		);
-
 
 # Used for mapping a PDL type to a netCDF type
 my %typemap3 = (
@@ -1185,7 +1161,6 @@ sub new {
         $rc = PDL::NetCDF::nc_inq_attlen ($self->{NCID}, $i, $attname, my $attlen=-999);
         barf ("new:  Cannot get attribute length -- " . PDL::NetCDF::nc_strerror ($rc)) if $rc;
 
-
         $self->{ATTTYPE}{$name}{$attname}=$datatype;
         $self->{ATTLEN}{$name}{$attname}=$attlen;
       }
@@ -1198,7 +1173,6 @@ sub new {
                                        my $attname='x' x NC_MAX_NAME()); # Preallocate strings
       barf ("new:  Cannot inquire global att name -- " . PDL::NetCDF::nc_strerror ($rc)) if $rc;	
 
-
         # Determine the type and length of this attribute
         $rc = PDL::NetCDF::nc_inq_atttype ($self->{NCID}, $self->{VARIDS}{GLOBAL}, $attname, my $datatype=-999);
         barf ("new:  Cannot get attribute type -- " . PDL::NetCDF::nc_strerror ($rc)) if $rc;
@@ -1206,12 +1180,10 @@ sub new {
         $rc = PDL::NetCDF::nc_inq_attlen ($self->{NCID}, $self->{VARIDS}{GLOBAL}, $attname, my $attlen=-999);
         barf ("new:  Cannot get attribute length -- " . PDL::NetCDF::nc_strerror ($rc)) if $rc;
 
-
         $self->{ATTTYPE}{GLOBAL}{$attname}=$datatype;
         $self->{ATTLEN}{GLOBAL}{$attname}=$attlen;
     } 
   
-
 
     # Specify that this file is out of define mode
     $self->{DEFINE} = 0;
@@ -1276,7 +1248,6 @@ sub getDeflateShuffle {
     return ($deflate, $shuffle);	
 }
 
-
 # Get the names and order of dimensions in a variable, otherwise
 # get the names of all dimensions
 sub getdimensionnames {
@@ -1284,9 +1255,6 @@ sub getdimensionnames {
   my $varnm = shift;
   my $dimnames = [];
   my $dimids = [values %{$self->{DIMIDS}}];
-#line 1535 "netcdf.pd"
-#line 1535 "netcdf.pd"
-#line 1537 "netcdf.pd"
 #line 1533 "netcdf.pd"
   if (defined $varnm) {
     my ($ndims, $rc);
@@ -1309,9 +1277,6 @@ sub getdimensionnames {
   }
   foreach my $id (@$dimids) {
     foreach(keys %{$self->{DIMIDS}}){
-#line 1560 "netcdf.pd"
-#line 1558 "netcdf.pd"
-#line 1562 "netcdf.pd"
 #line 1554 "netcdf.pd"
       push(@$dimnames,$_) if $self->{DIMIDS}{$_} == $id;
     }
@@ -1330,9 +1295,6 @@ sub getvariablenames {
   my @varnames = ();
   return [()] unless (exists $self->{VARIDS});
   for my $varn (keys %{$self->{VARIDS}}){
-#line 1581 "netcdf.pd"
-#line 1577 "netcdf.pd"
-#line 1583 "netcdf.pd"
 #line 1571 "netcdf.pd"
     next if($self->{VARIDS}{$varn} == NC_GLOBAL());
     push (@varnames, $varn);
@@ -1349,9 +1311,6 @@ sub getattributenames {
   $varname = 'GLOBAL' unless(defined $varname);
   my $attnames = [];
   foreach(keys %{$self->{ATTTYPE}{$varname}}){
-#line 1600 "netcdf.pd"
-#line 1594 "netcdf.pd"
-#line 1602 "netcdf.pd"
 #line 1586 "netcdf.pd"
         push(@$attnames,$_);
   }
@@ -1377,9 +1336,6 @@ sub put {
   my $shuffle = delete $opt->{SHUFFLE} || 0;
   my $fillValue = delete $opt->{_FillValue};
   barf ("Unknown options to put: ". join(",", keys %{$opt})) if (keys %{$opt});
-#line 1628 "netcdf.pd"
-#line 1620 "netcdf.pd"
-#line 1630 "netcdf.pd"
 #line 1610 "netcdf.pd"
   
   if ($self->{REVERSE_DIMS}) {
@@ -1403,7 +1359,6 @@ sub put {
 	barf ("Cannot put file into define mode") if $rc;
 	$self->{DEFINE} = 1;
       }
-
 
       my $rc = PDL::NetCDF::nc_def_dim ($self->{NCID}, $$dims[$i], $dimlens[$i], 
 				$self->{DIMIDS}{$$dims[$i]}=-999);
@@ -1539,9 +1494,6 @@ sub putslice {
   my $shuffle = delete $opt->{SHUFFLE} || 0;
   my $fillValue = delete $opt->{_FillValue};
   barf ("Unknown options to putslice: ". join(",", keys %{$opt})) if (keys %{$opt});
-#line 1790 "netcdf.pd"
-#line 1780 "netcdf.pd"
-#line 1792 "netcdf.pd"
 #line 1768 "netcdf.pd"
 
   if ($self->{REVERSE_DIMS}) {
@@ -1567,7 +1519,6 @@ sub putslice {
 	barf ("Cannot put file into define mode") if $rc;
 	$self->{DEFINE} = 1;
       }
-
 
       my $rc = PDL::NetCDF::nc_def_dim ($self->{NCID}, $$dims[$i], $dimlens[$i], 
 				$self->{DIMIDS}{$$dims[$i]}=-999);
@@ -1857,7 +1808,6 @@ sub dimsize {
   return $dimsz;
 }
 
-
 # Put a netCDF attribute from a PDL or string
 sub putatt {
   my $self  = shift;  # name of object
@@ -1945,7 +1895,6 @@ sub putatt {
   return 0;
 }
 
-
 # Get an attribute value into a pdl
 sub getatt {
   my $self  = shift;
@@ -2026,9 +1975,6 @@ sub puttext {
   my $deflate = delete $opt->{DEFLATE} || 0;
   my $shuffle = delete $opt->{SHUFFLE} || 0;
   barf ("Unknown options to puttext: ". join(",", keys %{$opt})) if (keys %{$opt});
-#line 2277 "netcdf.pd"
-#line 2265 "netcdf.pd"
-#line 2279 "netcdf.pd"
 #line 2251 "netcdf.pd"
   
   my $ndims = scalar(@$dimlens);
@@ -2091,7 +2037,6 @@ sub puttext {
     $self->{DEFINE} = 0;
   }
 
-
   my $st = pack (PACKTYPE, ((0) x $ndims));
   my $ct = pack (PACKTYPE, @$dimlens);
 
@@ -2100,8 +2045,6 @@ sub puttext {
   barf ("put:  Cannot write file -- " . PDL::NetCDF::nc_strerror ($rc)) if $rc;
   return 0;
 }
-
-
 
 # Get an entire text variable into one big string.  Multiple dimensions are concatenated.
 sub gettext {
@@ -2218,13 +2161,7 @@ sub getrec {
                                   $self->{RECS}{$rec}{STRLEN}, $idx);
 
 }
-#line 2469 "netcdf.pd"
-#line 2223 "NetCDF.pm"
-
-
-
-
-
+#line 2165 "NetCDF.pm"
 
 # Exit with OK status
 

@@ -8,7 +8,7 @@ use File::Share ':all';
 use Moo;
 use namespace::clean;
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 # Get XML.
 has xml => (
@@ -341,6 +341,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

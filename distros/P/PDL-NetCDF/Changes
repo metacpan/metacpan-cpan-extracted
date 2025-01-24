@@ -1,3 +1,6 @@
+4.25 2025-01-23
+- also use nc-config to find NetCDF (#8,#9) - thanks @wwlwpd
+
 4.24 2022-04-27
 - change required PDL version to 2.019
 - use INC and LIBS environment variables in checking for NetCDF 4 - thanks @doughunt

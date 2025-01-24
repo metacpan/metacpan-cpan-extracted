@@ -4,7 +4,7 @@ AtteanX::Serializer::SPARQL - SPARQL Serializer
 
 =head1 VERSION
 
-This document describes AtteanX::Serializer::SPARQL version 0.034
+This document describes AtteanX::Serializer::SPARQL version 0.035
 
 =head1 SYNOPSIS
 
@@ -39,13 +39,13 @@ This document describes AtteanX::Serializer::SPARQL version 0.034
 use v5.14;
 use warnings;
 
-package AtteanX::Serializer::SPARQL 0.034 {
+package AtteanX::Serializer::SPARQL 0.035 {
 	use Moo;
 	use Data::Dumper;
 	use Encode qw(encode);
 	use Attean::ListIterator;
 	use Scalar::Util qw(blessed);
-	use List::MoreUtils qw(any);
+	use List::Util qw(any);
 	use AtteanX::SPARQL::Constants;
 	use namespace::clean;
 	with 'Attean::API::AbbreviatingSerializer';

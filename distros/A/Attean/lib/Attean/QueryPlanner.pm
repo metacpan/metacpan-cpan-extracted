@@ -7,7 +7,7 @@ Attean::QueryPlanner - Query planner
 
 =head1 VERSION
 
-This document describes Attean::QueryPlanner version 0.034
+This document describes Attean::QueryPlanner version 0.035
 
 =head1 SYNOPSIS
 
@@ -41,13 +41,13 @@ use Attean::Algebra;
 use Attean::Plan;
 use Attean::Expression;
 
-package Attean::QueryPlanner 0.034 {
+package Attean::QueryPlanner 0.035 {
 	use Moo;
 	use Encode qw(encode);
 	use Attean::RDF;
 	use Scalar::Util qw(blessed reftype);
 	use List::Util qw(reduce);
-	use List::MoreUtils qw(all any);
+	use List::Util qw(all any);
 	use Types::Standard qw(Int ConsumerOf InstanceOf);
 	use URI::Escape;
 	use Algorithm::Combinatorics qw(subsets);

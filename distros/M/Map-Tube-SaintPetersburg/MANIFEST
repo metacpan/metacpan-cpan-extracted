@@ -4,7 +4,7 @@ examples/print_saint_petersburg_image.pl
 examples/print_saint_petersburg_line_stations.pl
 examples/print_saint_petersburg_lines.pl
 examples/print_saint_petersburg_route.pl
-images/ex3.png
+images/SaintPetersburg.png
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm

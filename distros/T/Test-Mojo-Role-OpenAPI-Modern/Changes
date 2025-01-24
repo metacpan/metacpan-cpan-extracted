@@ -1,5 +1,10 @@
 Revision history for Test-Mojo-Role-OpenAPI-Modern
 
+0.007     2025-01-24 02:16:36Z
+          - adjust tests for changes in JSON::Schema::Modern 0.598
+          - fix usage of JSON::Schema::Modern::Result objects, in preparation
+            for an upcoming deprecation of boolean overloads
+
 0.006     2024-09-15 17:40:23Z
           - new interfaces dump_request_validation_result,
             dump_request_validation_result which dump validation results, and

@@ -1,9 +1,7 @@
-# Pragmas.
 use lib '.';
 use strict;
 use warnings;
 
-# Modules.
 use inc::Module::Install;
 
 # Definition.
@@ -26,8 +24,7 @@ requires 'Map::Tube' => '3.62';
 requires 'Moo' => 0;
 requires 'namespace::clean' => 0;
 requires 'perl' => '5.8.0';
-resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
-	'?Name=Map-Tube-Novosibirsk';
+resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Map-Tube-Novosibirsk/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Map-Tube-Novosibirsk';
 resources 'repository' => 'git://github.com/michal-josef-spacek/Map-Tube-Novosibirsk';
 test_requires 'Encode' => 0;
@@ -36,7 +33,7 @@ test_requires 'Test::Map::Tube' => 0.35;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.04';
+version '0.05';
 
 # Run.
 WriteAll();

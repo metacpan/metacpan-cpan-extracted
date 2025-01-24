@@ -1,7 +1,7 @@
 # -*- Perl -*-
 use Config;
 use Devel::CheckLib qw(check_lib);
-our $VERSION = '4.24';
+our $VERSION = '4.25';
 pp_setversion($VERSION);
 
 my $ncversion = {nc_inq_var_deflate => check_lib(

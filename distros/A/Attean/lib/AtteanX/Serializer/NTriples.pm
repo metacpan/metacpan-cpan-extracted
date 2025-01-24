@@ -4,7 +4,7 @@ AtteanX::Serializer::NTriples - N-Triples Serializer
 
 =head1 VERSION
 
-This document describes AtteanX::Serializer::NTriples version 0.034
+This document describes AtteanX::Serializer::NTriples version 0.035
 
 =head1 SYNOPSIS
 
@@ -39,12 +39,12 @@ Serializes triples into the RDF 1.1 N-Triples format.
 use v5.14;
 use warnings;
 
-package AtteanX::Serializer::NTriples 0.034 {
+package AtteanX::Serializer::NTriples 0.035 {
 	use Moo;
 	use Types::Standard qw(Str ArrayRef);
 	use Encode qw(encode);
 	use Attean::ListIterator;
-	use List::MoreUtils qw(any);
+	use List::Util qw(any);
 	use namespace::clean;
 
 	extends 'AtteanX::Serializer::NTuples';

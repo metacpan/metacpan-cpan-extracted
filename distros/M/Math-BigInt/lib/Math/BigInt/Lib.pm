@@ -4,7 +4,7 @@ use 5.006001;
 use strict;
 use warnings;
 
-our $VERSION = '2.003003';
+our $VERSION = '2.003004';
 $VERSION =~ tr/_//d;
 
 use Carp;
@@ -1906,17 +1906,19 @@ sub _modpow {
                                         : $class -> _zero();
     }
 
-    #  $num = $class -> _mod($num, $mod);   # this does not make it faster
+    # We could do the following, but it doesn't actually save any time. The
+    # _copy() is needed in case $num and $mod are the same object.
+
+    $num = $class -> _mod($class -> _copy($num), $mod);
 
     my $acc = $class -> _copy($num);
     my $t   = $class -> _one();
 
-    my $expbin = $class -> _as_bin($exp);
-    $expbin =~ s/^0b//;
+    my $expbin = $class -> _to_bin($exp);
     my $len = length($expbin);
 
-    while (--$len >= 0) {
-        if (substr($expbin, $len, 1) eq '1') {
+    while ($len--) {
+        if (substr($expbin, $len, 1) eq '1') {  # if odd
             $t = $class -> _mul($t, $acc);
             $t = $class -> _mod($t, $mod);
         }

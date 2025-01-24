@@ -1,6 +1,8 @@
 .editorconfig
 Build.PL
 Changes
+contrib/sigrok/__init__.py
+contrib/sigrok/pd.py
 contrib/slurm.c
 contrib/slurm.h
 doc/protocol.md

@@ -24,7 +24,7 @@ use warnings;
 use Carp          qw< carp croak >;
 use Scalar::Util  qw< blessed refaddr >;
 
-our $VERSION = '2.003003';
+our $VERSION = '2.003004';
 $VERSION =~ tr/_//d;
 
 require Exporter;
@@ -2339,10 +2339,33 @@ sub bdiv {
     # At this point, both the numerator and denominator are finite numbers, and
     # the denominator (divisor) is non-zero.
 
-    # Division might return a non-integer result, so upgrade unconditionally, if
-    # upgrading is enabled.
+    # Division in scalar context might return a non-integer result, so upgrade
+    # if upgrading is enabled. In list context, we return the quotient and the
+    # remainder, which are both integers, so upgrading is not necessary.
 
-    return $upgrade -> bdiv($x, $y, @r) if defined $upgrade;
+    if ($upgrade && !$wantarray) {
+        my ($quo, $rem);
+
+        if ($wantarray) {
+            ($quo, $rem) = $upgrade -> bdiv($x, $y, @r);
+        } else {
+            $quo = $upgrade -> bdiv($x, $y, @r);
+        }
+
+        if ($quo -> is_int()) {
+            $quo = $quo -> as_int();
+            %$x = %$quo;
+        } else {
+            %$x = %$quo;
+            bless $x, $upgrade;
+        }
+
+        if ($wantarray && $rem -> is_int()) {
+            $rem = $rem -> as_int();
+        }
+
+        return $wantarray ? ($x, $rem) : $x;
+    }
 
     $r[3] = $y;                                   # no push!
 
@@ -3214,69 +3237,13 @@ sub bnok {
 }
 
 sub buparrow {
-    my $a = shift;
-    my $y = $a -> uparrow(@_);
-    $a -> {value} = $y -> {value};
-    return $a;
+    my ($class, $a, $n, $b, @r) = objectify(3, @_);
+    $a -> bhyperop($n + 2, $b, @r);
 }
 
 sub uparrow {
-    # Knuth's up-arrow notation buparrow(a, n, b)
-    #
-    # The following is a simple, recursive implementation of the up-arrow
-    # notation, just to show the idea. Such implementations cause "Deep
-    # recursion on subroutine ..." warnings, so we use a faster, non-recursive
-    # algorithm below with @_ as a stack.
-    #
-    #   sub buparrow {
-    #       my ($a, $n, $b) = @_;
-    #       return $a ** $b if $n == 1;
-    #       return $a * $b  if $n == 0;
-    #       return 1        if $b == 0;
-    #       return buparrow($a, $n - 1, buparrow($a, $n, $b - 1));
-    #   }
-
-    my ($a, $b, $n) = @_;
-    my $class = ref $a;
-    croak("a must be non-negative") if $a < 0;
-    croak("n must be non-negative") if $n < 0;
-    croak("b must be non-negative") if $b < 0;
-
-    while (@_ >= 3) {
-
-        # return $a ** $b if $n == 1;
-
-        if ($_[-2] == 1) {
-            my ($a, $n, $b) = splice @_, -3;
-            push @_, $a ** $b;
-            next;
-        }
-
-        # return $a * $b if $n == 0;
-
-        if ($_[-2] == 0) {
-            my ($a, $n, $b) = splice @_, -3;
-            push @_, $a * $b;
-            next;
-        }
-
-        # return 1 if $b == 0;
-
-        if ($_[-1] == 0) {
-            splice @_, -3;
-            push @_, $class -> bone();
-            next;
-        }
-
-        # return buparrow($a, $n - 1, buparrow($a, $n, $b - 1));
-
-        my ($a, $n, $b) = splice @_, -3;
-        push @_, ($a, $n - 1,
-                      $a, $n, $b - 1);
-
-    }
-
-    pop @_;
+    my ($class, $a, $n, $b, @r) = objectify(3, @_);
+    $a -> hyperop($n + 2, $b, @r);
 }
 
 sub backermann {
@@ -3331,6 +3298,140 @@ sub ackermann {
         }
     }
     $n;
+}
+
+sub bhyperop {
+    my ($class, $a, $n, $b, @r) = objectify(3, @_);
+
+    my $tmp = $a -> hyperop($n, $b);
+    $a -> {value} = $tmp -> {value};
+    return $a -> round(@r);
+}
+
+sub hyperop {
+    my ($class, $a, $n, $b, @r) = objectify(3, @_);
+
+    croak("a must be non-negative") if $a < 0;
+    croak("n must be non-negative") if $n < 0;
+    croak("b must be non-negative") if $b < 0;
+
+    # The following is a non-recursive implementation of the hyperoperator,
+    # with special cases handled for speed.
+
+    my @stack = ($a, $n, $b);
+    while (@stack > 1) {
+        my ($a, $n, $b) = splice @stack, -3;
+
+        # Special cases for $b
+
+        if ($b == 2 && $a == 2) {
+            push @stack, $n == 0 ? Math::BigInt -> new("3")
+                                 : Math::BigInt -> new("4");
+            next;
+        }
+
+        if ($b == 1) {
+            if ($n == 0) {
+                push @stack, Math::BigInt -> new("2");
+                next;
+            }
+            if ($n == 1) {
+                push @stack, $a + 1;
+                next;
+            }
+            push @stack, $a;
+            next;
+        }
+
+        if ($b == 0) {
+            if ($n == 1) {
+                push @stack, $a;
+                next;
+            }
+            if ($n == 2) {
+                push @stack, Math::BigInt -> bzero();
+                next;
+            }
+            push @stack, Math::BigInt -> bone();
+            next;
+        }
+
+        # Special cases for $a
+
+        if ($a == 0) {
+            if ($n == 0) {
+                push @stack, $b + 1;
+                next;
+            }
+            if ($n == 1) {
+                push @stack, $b;
+                next;
+            }
+            if ($n == 2) {
+                push @stack, Math::BigInt -> bzero();
+                next;
+            }
+            if ($n == 3) {
+                push @stack, $b == 0 ? Math::BigInt -> bone()
+                                     : Math::BigInt -> bzero();
+                next;
+            }
+            push @stack, $b -> is_odd() ? Math::BigInt -> bzero()
+                                        : Math::BigInt -> bone();
+            next;
+        }
+
+        if ($a == 1) {
+            if ($n == 0 || $n == 1) {
+                push @stack, $b + 1;
+                next;
+            }
+            if ($n == 2) {
+                push @stack, $b;
+                next;
+            }
+            push @stack, Math::BigInt -> bone();
+            next;
+        }
+
+        # Special cases for $n
+
+        if ($n == 4) {          # tetration
+            if ($b == 0) {
+                push @stack, Math::BigInt -> bone();
+                next;
+            }
+            my $y = $a;
+            $y = $a ** $y for 2 .. $b;
+            push @stack, $y;
+            next;
+        }
+
+        if ($n == 3) {          # exponentiation
+            push @stack, $a ** $b;
+            next;
+        }
+
+        if ($n == 2) {          # multiplication
+            push @stack, $a * $b;
+            next;
+        }
+
+        if ($n == 1) {          # addition
+            push @stack, $a + $b;
+            next;
+        }
+
+        if ($n == 0) {          # succession
+            push @stack, $b + 1;
+            next;
+        }
+
+        push @stack, $a, $n - 1, $a, $n, $b - 1;
+    }
+
+    $a = pop @stack;
+    return $a -> round(@r);
 }
 
 sub bsin {
@@ -6613,6 +6714,7 @@ Math::BigInt - arbitrary size integer math package
   $x->bclog10();          # log19($x) rounded up to nearest int
   $x->bnok($y);           # x over y (binomial coefficient n over k)
   $x->buparrow($n, $y);   # Knuth's up-arrow notation
+  $x->bhyperop($n, $y);   # n'th hyperoprator
   $x->backermann($y);     # the Ackermann function
   $x->bsin();             # sine
   $x->bcos();             # cosine
@@ -7634,7 +7736,43 @@ integer representing the number of up-arrows. $n = 0 gives multiplication, $n =
 1 gives exponentiation, $n = 2 gives tetration, $n = 3 gives hexation etc. The
 following illustrates the relation between the first values of $n.
 
-See L<https://en.wikipedia.org/wiki/Knuth%27s_up-arrow_notation>.
+The buparrow() method is equivalent to the L<bhyperop()> method with an offset
+of two. The following two give the same result:
+
+    $x -> buparrow($n, $b);
+    $x -> bhyperop($n + 2, $b);
+
+See also L</bhyperop()>,
+L<https://en.wikipedia.org/wiki/Knuth%27s_up-arrow_notation>.
+
+=item bhyperop()
+
+=item hyperop()
+
+    $a -> bhyperop($n, $b);         # modifies $a
+    $x = $a -> hyperop($n, $b);     # does not modify $a
+
+H_n(a, b) = a[n]b is the I<n>th hyperoperator,
+
+    n = 0 : succession (b + 1)
+    n = 1 : addition (a + b)
+    n = 2 : multiplication (a * b)
+    n = 3 : exponentiation (a ** b)
+    n = 4 : tetration (a ** a ** ... ** a) (b occurrences of a)
+    ...
+
+                        / b+1                     if n = 0
+                        | a                       if n = 1 and b = 0
+    H_n(a, b) = a[n]b = | 0                       if n = 2 and b = 0
+                        | 1                       if n >= 3 and b = 0
+                        \ H_(n-1)(a, H_n(a, b-1)) otherwise
+
+Note that the result can be a very large number, even for small operands. Also
+note that the backend library C<Math::BigInt::GMP> silently returns the
+incorrect result when the numbers are larger than it can handle. It is better
+to use C<Math::BigInt::GMPz> or C<Math::BigInt::Pari>.
+
+See also L</buparrow()>, L<https://en.wikipedia.org/wiki/Hyperoperation>.
 
 =item backermann()
 

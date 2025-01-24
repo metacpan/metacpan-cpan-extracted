@@ -142,11 +142,11 @@ Support only UTF-8.
 
 # SEE ALSO
 
-- [Getopt::EX](https://metacpan.org/pod/Getopt::EX)
+- [Getopt::EX](https://metacpan.org/pod/Getopt%3A%3AEX)
 
     [https://github.com/kaz-utashiro/Getopt-EX](https://github.com/kaz-utashiro/Getopt-EX)
 
-- [optex](https://metacpan.org/pod/App::optex)
+- [optex](https://metacpan.org/pod/App%3A%3Aoptex)
 
     You can execute arbitrary command on the system getting the benefit of
     **Getopt::EX** using **optex**.
@@ -159,11 +159,11 @@ Support only UTF-8.
 
 # LICENSE
 
-Copyright (C) 2020 Kazumasa Utashiro.
+Copyright (C) 2020-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 # AUTHOR
 
-Kazumasa Utashiro <kaz@utashiro.com>
+Kazumasa Utashiro

@@ -129,7 +129,7 @@ EXAMPLE3
      system "ls -l SaintPetersburg.png";
 
      # Output like:
-     # -rw-r--r-- 1 skim skim 207926 Feb 18 07:13 SaintPetersburg.png
+     # -rw-r--r-- 1 skim skim 200586 23. led 11.50 SaintPetersburg.png
 
 EXAMPLE4
      use strict;
@@ -207,7 +207,7 @@ SEE ALSO
         Install the Map::Tube concrete metro modules.
 
 REPOSITORY
-    <https://github.com/tupinek/Map-Tube-SaintPetersburg>
+    <https://github.com/michal-josef-spacek/Map-Tube-SaintPetersburg>
 
 AUTHOR
     Michal Josef Špaček <mailto:skim@cpan.org>
@@ -222,5 +222,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.07
+    0.08
 

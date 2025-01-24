@@ -7,7 +7,7 @@ Attean::API - Utility package for loading all Attean role packages.
 
 =head1 VERSION
 
-This document describes Attean::API version 0.034
+This document describes Attean::API version 0.035
 
 =head1 SYNOPSIS
 
@@ -25,24 +25,24 @@ in the Attean::API namespace.
 
 =cut
 
-package Attean::API::ResultOrTerm 0.034 {
+package Attean::API::ResultOrTerm 0.035 {
 	use Moo::Role;
 }
 
-package Attean::API::BlankOrIRI 0.034 {
+package Attean::API::BlankOrIRI 0.035 {
 	use Moo::Role;
 	with 'Attean::API::Term', 'Attean::API::BlankOrIRIOrTriple';
 }
 
-package Attean::API::BlankOrIRIOrTriple 0.034 {
+package Attean::API::BlankOrIRIOrTriple 0.035 {
 	use Moo::Role;
 }
 
-package Attean::API::TermOrTriple 0.034 {
+package Attean::API::TermOrTriple 0.035 {
 	use Moo::Role;
 }
 
-package Attean::API::TermOrVariable 0.034 {
+package Attean::API::TermOrVariable 0.035 {
 	use Scalar::Util qw(blessed);
 	use Sub::Install;
 	use Sub::Util qw(set_subname);
@@ -97,7 +97,7 @@ package Attean::API::TermOrVariable 0.034 {
 	}
 }
 
-package Attean::API::TermOrVariableOrTriplePattern 0.034 {
+package Attean::API::TermOrVariableOrTriplePattern 0.035 {
 	use Scalar::Util qw(blessed);
 	use Sub::Install;
 	use Sub::Util qw(set_subname);
@@ -148,12 +148,12 @@ package Attean::API::TermOrVariableOrTriplePattern 0.034 {
 	}
 }
 
-package Attean::Mapper 0.034 {
+package Attean::Mapper 0.035 {
 	use Moo::Role;
 	requires 'map'; # my $that = $object->map($this)
 }
 
-package Attean::API::Variable 0.034 {
+package Attean::API::Variable 0.035 {
 	use AtteanX::SPARQL::Constants;
 	use AtteanX::SPARQL::Token;
 
@@ -180,10 +180,11 @@ Returns a string representation of the variable.'
 	
 }
 
-package Attean::API::CanonicalizingBindingSet 0.034 {
+package Attean::API::CanonicalizingBindingSet 0.035 {
 	use Attean::RDF;
 
 	use Moo::Role;
+	use Scalar::Util qw(blessed);
 	use namespace::clean;
 
 	with 'MooX::Log::Any';
@@ -270,14 +271,38 @@ package Attean::API::CanonicalizingBindingSet 0.034 {
 				}
 			}
 		}
-
+		
+		my $parse_id	= '1';
+		my %bnode_map	= map { $_ => Attean::Blank->new( value => $mapping{"_:$_"}{'id'} ) }
+							map { substr($_,2) } # remove the leading _:
+								grep { /^_:/ }
+									(keys %mapping);
+		foreach my $p (@tuples) {
+			my ($str, $t)	= @$p;
+			my $item_class	= ref($t);
+			foreach my $pos (reverse $t->variables) {
+				my $term	= $t->$pos();
+				if (blessed($term) and $term->does('Attean::API::Literal')) {
+					my $dt 		= $term->datatype();
+					if (blessed($dt) and ($dt->value eq 'http://w3id.org/awslabs/neptune/SPARQL-CDTs/Map' or $dt->value eq 'http://w3id.org/awslabs/neptune/SPARQL-CDTs/List')) {
+						my %t	= $p->[1]->mapping;
+						my $newterm	= AtteanX::Functions::CompositeLists::rewrite_lexical($term, \%bnode_map, $parse_id);
+						$t{ $pos }	= $newterm;
+						my $newt	= $item_class->new( %t );
+						$t			= $newt;
+						$p->[1]	= $t;
+					}
+				}
+			}
+		}
+		
 		@tuples	= sort { $a->[0] cmp $b->[0] } @tuples;
 		my $elements	= [ map { $_->[1] } @tuples ];
 		return ($elements, \%mapping);
 	}
 }
 
-package Attean::API 0.034 {
+package Attean::API 0.035 {
 	use Attean::API::Term;
 	use Attean::API::Store;
 	use Attean::API::Model;

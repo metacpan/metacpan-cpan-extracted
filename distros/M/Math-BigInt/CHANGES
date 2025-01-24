@@ -1,3 +1,11 @@
+2.003004 2025-01-23
+
+* Fix CPAN RT #150252 regarding bdiv() not modifying the invocand object when
+  upgrading/downgrading is enabled.
+
+* Add hyperoperator method bhyperop(). This method implements succession,
+  addition, multiplication, exponentiation, tetration, pentation ...).
+
 2.003003 2024-05-27
 
 * Fix CPAN RT #153736 regarding bnok() with large input values.

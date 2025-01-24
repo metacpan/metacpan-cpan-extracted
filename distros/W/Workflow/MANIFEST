@@ -146,6 +146,7 @@ t/release-kwalitee.t
 t/release-meta-json.t
 t/state.t
 t/state_perl.t
+t/strict-booleans.t
 t/uncached_conditions.t
 t/validator.t
 t/validator_has_required_field.t

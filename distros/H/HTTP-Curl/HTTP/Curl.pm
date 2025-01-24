@@ -2,9 +2,9 @@ package HTTP::Curl;
 
 use strict;
 use warnings;
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
-use Net::Curl::Easy qw(/^CURLOPT_/ CURLE_OK CURLINFO_EFFECTIVE_URL CURLE_WRITE_ERROR CURLE_OPERATION_TIMEDOUT CURLE_RECV_ERROR);
+use Net::Curl::Easy qw(/^CURLOPT_/ CURLE_OK CURLINFO_EFFECTIVE_URL /^CURLE_/ CURLAUTH_ANY);
 
 
 BEGIN {
@@ -16,6 +16,7 @@ sub _prepare {
 	my ($easy, $url, $opt) = @_;
 
 	$easy->setopt(CURLOPT_URL, $url);
+	$easy->setopt(CURLOPT_VERBOSE, 1) if $$opt{verbose};
 
 	my @headers = ();
 	@headers = map { $_ . ": " . $$opt{headers}{$_} } keys %{$$opt{headers}} if $$opt{headers};
@@ -77,6 +78,10 @@ sub _prepare {
 	if (my $proxy = $$opt{proxy}) {
 		$proxy =~ s!^socks://!socks5://!;
 		$easy->setopt(CURLOPT_PROXY, $proxy);
+		if (my $proxy_auth = $$opt{proxy_auth}) {
+			$easy->setopt(CURLOPT_PROXYAUTH, CURLAUTH_ANY);
+			$easy->setopt(CURLOPT_PROXYUSERPWD, join ":", @$proxy_auth);
+		}
 	}
 
 	$easy->setopt(CURLOPT_ACCEPT_ENCODING, "") if $$opt{compressed} or $$opt{gzip};
@@ -132,8 +137,10 @@ sub _prepare {
 				$$headers{"Reason"} = "Timeout";
 			} elsif ($result == CURLE_RECV_ERROR) {
 				$is_success = 0;
-				$$headers{"Status"} = 599;
-				$$headers{"Reason"} = "$result";
+				unless ($$headers{"Status"} == 407) {
+					$$headers{"Status"} = 599;
+					$$headers{"Reason"} = "$result";
+				}
 			}
 			$easy = undef;
 			return ($is_success, $body, $headers, $redirects);
@@ -357,6 +364,8 @@ http and socks proxy
  proxy => "$scheme://$host:$port"
  where scheme can be one of the: http, socks (socks5), socks5, socks4.
 
+ proxy_auth => [user, password]
+
 =item max_size
 
 The size limit for response content, bytes.
@@ -380,6 +389,10 @@ String or CODE ref to return strings (return undef is end of body data).
 =item method
 
 When method parameter is "POST", the POST request is used with body parameter on data and 'Content-Type' header is added with 'application/x-www-form-urlencoded' value.
+
+=item verbose
+
+ verbose => 1
 
 =back
 

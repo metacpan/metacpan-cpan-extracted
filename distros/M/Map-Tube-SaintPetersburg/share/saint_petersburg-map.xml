@@ -66,7 +66,7 @@
     <station id="M3-10" name="Рыбацкое" line="M3:10" link="M3-09"/>
 
     <!-- https://ru.wikipedia.org/wiki/Правобережная_линия -->
-    <station id="M4-01" name="Спасская" line="M4:1" link="M4-02" other_linke="Tunnel:M2-10,Tunnel:M5-07"/>
+    <station id="M4-01" name="Спасская" line="M4:1" link="M4-02" other_link="Tunnel:M2-10,Tunnel:M5-07"/>
     <station id="M4-02" name="Достоевская" line="M4:2" link="M4-01,M4-03" other_link="Tunnel:M1-11"/>
     <station id="M4-03" name="Лиговский проспект" line="M4:3" link="M4-02,M4-04"/>
     <station id="M4-04" name="Площадь Александра Невского-2" line="M4:4" link="M4-03,M4-05" other_link="Tunnel:M3-05"/>

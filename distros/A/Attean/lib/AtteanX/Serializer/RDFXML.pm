@@ -4,7 +4,7 @@ AtteanX::Serializer::RDFXML - RDF/XML Serializer
 
 =head1 VERSION
 
-This document describes AtteanX::Serializer::RDFXML version 0.034
+This document describes AtteanX::Serializer::RDFXML version 0.035
 
 =head1 SYNOPSIS
 
@@ -28,6 +28,8 @@ This document describes AtteanX::Serializer::RDFXML version 0.034
 
 =item C<< file_extensions >>
 
+=item C<< blank_nodes >>
+
 =back
 
 =head1 METHODS
@@ -39,18 +41,20 @@ This document describes AtteanX::Serializer::RDFXML version 0.034
 use v5.14;
 use warnings;
 
-package AtteanX::Serializer::RDFXML 0.034 {
+package AtteanX::Serializer::RDFXML 0.035 {
 	use Moo;
-	use Types::Standard qw(Str ArrayRef HashRef);
+	use Types::Standard qw(Bool HashRef ArrayRef HashRef Str Maybe InstanceOf ConsumerOf);
 	use Encode qw(encode);
 	use Scalar::Util qw(blessed);
+	use Attean::API::Iterator;
 	use Attean::ListIterator;
-	use List::MoreUtils qw(any);
+	use List::Util qw(any);
 	use namespace::clean;
 
 	has 'canonical_media_type' => (is => 'ro', isa => Str, init_arg => undef, default => 'application/rdf+xml');
 	has '_rev' => (is => 'rw', isa => HashRef, init_arg => undef, default => sub { +{} });
 	has 'scoped_namespaces' => (is => 'rw', init_arg => undef);
+	has 'blank_nodes'	=> (is => 'ro', isa => HashRef[ConsumerOf['Attean::API::Blank']], default => sub { +{} });
 
 =item C<< file_extensions >>
 
@@ -137,7 +141,15 @@ and returns the serialization as a UTF-8 encoded byte string.
 	
 		my $id;
 		if ($s->does('Attean::API::Blank')) {
-			my $b	= 'b' . $s->value;
+			my $b;
+			if (my $bb = $self->blank_nodes->{$s->value}) {
+				$b	= $bb->value;
+			} else {
+				my $label	= 'b' . $s->value;
+				$self->blank_nodes->{$s->value}	= Attean::Blank->new( value => $label );
+				$b			= $label;
+			}
+# 			my $b	= 'b' . $s->value;
 			$id	= qq[rdf:nodeID="$b"];
 		} else {
 			my $i	= $s->abs;
@@ -174,6 +186,14 @@ and returns the serialization as a UTF-8 encoded byte string.
 				$nsdecl	= qq[ xmlns:$prefix="$ns"];
 			}
 			if ($o->does('Attean::API::Literal')) {
+				{
+					my $dt	= $o->datatype();
+					if (blessed($dt) and ($dt->value eq 'http://w3id.org/awslabs/neptune/SPARQL-CDTs/Map' or $dt->value eq 'http://w3id.org/awslabs/neptune/SPARQL-CDTs/List')) {
+						my $parse_id	= '1';
+						$o    = AtteanX::Functions::CompositeLists::rewrite_lexical($o, $self->blank_nodes, $parse_id);
+					}
+				}
+				
 				my $lv		= $o->value;
 				for ($lv) {
 					s/&/&amp;/g;
@@ -196,7 +216,15 @@ and returns the serialization as a UTF-8 encoded byte string.
 					$string	.= qq[\t<${tag}${nsdecl}>${lv}</${tag}>\n];
 				}
 			} elsif ($o->does('Attean::API::Blank')) {
-				my $b	= 'b' . $o->value;
+				my $b;
+				if (my $bb = $self->blank_nodes->{$s->value}) {
+					$b	= $bb->value;
+				} else {
+					my $label	= 'b' . $s->value;
+					$self->blank_nodes->{$s->value}	= Attean::Blank->new( value => $label );
+					$b			= $label;
+				}
+# 				my $b	= 'b' . $o->value;
 				for ($b) {
 					s/&/&amp;/g;
 					s/</&lt;/g;

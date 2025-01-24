@@ -1,7 +1,7 @@
 use v5.14;
 package Getopt::EX::i18n;
 
-our $VERSION = '0.09';
+our $VERSION = '1.00';
 
 use warnings;
 use Data::Dumper;
@@ -183,14 +183,14 @@ L<https://qiita.com/kaz-utashiro/items/2df8c7fbd2fcb880cee6>
 
 =head1 LICENSE
 
-Copyright (C) 2020 Kazumasa Utashiro.
+Copyright (C) 2020-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =head1 AUTHOR
 
-Kazumasa Utashiro E<lt>kaz@utashiro.comE<gt>
+Kazumasa Utashiro
 
 =cut
 
@@ -223,7 +223,7 @@ my %lang;
 my %cc;
 my %opthash;
 
-package LocaleObj {
+package Local::LocaleObj {
     sub new {
 	my($class, %hash) = @_;
 	bless \%hash, $class;
@@ -263,7 +263,7 @@ sub finalize {
 	    push @list,    $cc if $opt{territory_lc} and !$lang{$cc};
 	}
 	for (@list) {
-	    $opthash{$_} = LocaleObj->create($locale);
+	    $opthash{$_} = Local::LocaleObj->create($locale);
 	}
     }
 
@@ -337,7 +337,7 @@ sub setenv {
     while (@_ >= 2) {
 	my($key, $value) = splice @_, 0, 2;
 	if ($opt{verbose}) {
-	    my $l = LocaleObj->create($value);
+	    my $l = Local::LocaleObj->create($value);
 	    warn sprintf("%s=%s (%s / %s)\n",
 			 $key, $value, $l->lang_name, $l->cc_name);
 	}

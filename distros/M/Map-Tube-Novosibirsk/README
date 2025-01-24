@@ -3,6 +3,7 @@ NAME
 
 SYNOPSIS
      use Map::Tube::Novosibirsk;
+
      my $obj = Map::Tube::Novosibirsk->new;
      my $routes_ar = $obj->get_all_routes($from, $to);
      my $line = $obj->get_line_by_id($line_id);
@@ -67,11 +68,9 @@ METHODS
              Returns string with XML.
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Encode qw(decode_utf8 encode_utf8);
      use Map::Tube::Novosibirsk;
 
@@ -88,12 +87,10 @@ EXAMPLE1
      # Route: Сибирская (Дзержинская линия), Гагаринская (Ленинская линия)
 
 EXAMPLE2
-     # Pragmas.
      use strict;
      use utf8;
      use warnings;
 
-     # Modules.
      use Map::Tube::Novosibirsk;
 
      # Object.
@@ -109,11 +106,9 @@ EXAMPLE2
      # XML file: .*/novosibirsk-map.xml
 
 EXAMPLE3
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Map::Tube::GraphViz;
      use Map::Tube::GraphViz::Utils qw(node_color_without_label);
      use Map::Tube::Novosibirsk;
@@ -135,14 +130,12 @@ EXAMPLE3
      system "ls -l Novosibirsk.png";
 
      # Output like:
-     # -rw-r--r-- 1 skim skim 36609 Jan  1 00:34 Novosibirsk.png
+     # -rw-r--r-- 1 skim skim 34058 23. led 12.45 Novosibirsk.png
 
 EXAMPLE4
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Encode qw(encode_utf8);
      use Map::Tube::Novosibirsk;
 
@@ -160,11 +153,9 @@ EXAMPLE4
      # Ленинская линия
 
 EXAMPLE5
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Encode qw(decode_utf8 encode_utf8);
      use Map::Tube::Novosibirsk;
 
@@ -222,10 +213,12 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2014-2025 Michal Josef Špaček
-     Artistic License
-     BSD 2-Clause License
+    © 2014-2025 Michal Josef Špaček
+
+    Artistic License
+
+    BSD 2-Clause License
 
 VERSION
-    0.04
+    0.05
 

@@ -3,7 +3,7 @@ package Spreadsheet::ParseXLSX::Cell;
 use strict;
 use warnings;
 
-our $VERSION = '0.35'; # VERSION
+our $VERSION = '0.36'; # VERSION
 
 # ABSTRACT: wrapper class around L<Spreadsheet::ParseExcel::Cell>
 
@@ -40,7 +40,7 @@ Spreadsheet::ParseXLSX::Cell - wrapper class around L<Spreadsheet::ParseExcel::C
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =head1 SYNOPSIS
 
@@ -74,7 +74,7 @@ Jesse Luehrs <doy@tozt.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024 by Jesse Luehrs.
+This software is Copyright (c) 2025 by Jesse Luehrs.
 
 This is free software, licensed under:
 

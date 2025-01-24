@@ -19,9 +19,9 @@ void slurm_configure(uint8_t node_id);
 
 void slurm_reset(void);
 
-void slurm_notify(uint8_t b[], uint8_t len);
-void slurm_respond(uint8_t seqno, uint8_t b[], uint8_t len);
-void slurm_responderr(uint8_t seqno, uint8_t b[], uint8_t len);
+void slurm_notify(const uint8_t b[], uint8_t len);
+void slurm_respond(uint8_t seqno, const uint8_t b[], uint8_t len);
+void slurm_responderr(uint8_t seqno, const uint8_t b[], uint8_t len);
 
 /* Event handlers:
  * User code may provide implementations of either of these, to be informed

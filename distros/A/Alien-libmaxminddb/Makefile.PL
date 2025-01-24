@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
     "Test::Alien" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.015",
+  "VERSION" => "1.016",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -79,7 +79,7 @@ if ($^O eq 'MSWin32' && !eval { require Alien::MSYS }) {
   die "OS unsupported\n";
 }
 
-# BEGIN code inserted by Dist::Zilla::Plugin::AlienBuild
+# BEGIN postamble code inserted by Dist::Zilla::Plugin::AlienBuild
 { package
     MY;
   sub postamble {
@@ -91,4 +91,4 @@ if ($^O eq 'MSWin32' && !eval { require Alien::MSYS }) {
       : shift->SUPER::install(@_);
   }
 }
-# END code inserted by Dist::Zilla::Plugin::AlienBuild
+# END postamble code inserted by Dist::Zilla::Plugin::AlienBuild

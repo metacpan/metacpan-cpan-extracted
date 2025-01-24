@@ -8,7 +8,7 @@ use File::Share ':all';
 use Moo;
 use namespace::clean;
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 # Get XML.
 has xml => (
@@ -328,7 +328,7 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2014-2023 Michal Josef Špaček
+© 2014-2025 Michal Josef Špaček
 
 Artistic License
 
@@ -336,6 +336,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

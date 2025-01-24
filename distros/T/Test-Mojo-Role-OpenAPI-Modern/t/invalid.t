@@ -60,9 +60,9 @@ subtest 'request or response not valid' => sub {
 
   $t->post_ok('/foo/123', json => { kaboom => 'oh noes' })
     ->status_is(200)
-    ->request_not_valid(q{'/request/body/kaboom': EXCEPTION: unable to find resource https://example.com/api#/$defs/i_do_not_exist})
+    ->request_not_valid(q{'/request/body/kaboom': EXCEPTION: unable to find resource "https://example.com/api#/$defs/i_do_not_exist"})
     ->request_not_valid('Internal Server Error')
-    ->response_not_valid(q{'/response/body/kaboom': EXCEPTION: unable to find resource https://example.com/api#/$defs/i_do_not_exist});
+    ->response_not_valid(q{'/response/body/kaboom': EXCEPTION: unable to find resource "https://example.com/api#/$defs/i_do_not_exist"});
 
   cmp_deeply(
     $t->request_validation_result->recommended_response,

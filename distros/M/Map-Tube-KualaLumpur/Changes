@@ -1,3 +1,15 @@
+0.07 2025-01-23T19:00:11+01:00
+ - Fix Makefile.PL lib pragma.
+ - Fix duplicit Sentul station.
+ - Fix stations on multiple lines.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Move bugtracker to github.
+ - Rename examples to better names.
+ - Rename image to better name.
+ - Update Module::Install to 1.21 version.
+ - Update copyright years.
+ - Update links in XML file.
+
 0.06 2020-01-18T12:04:54+01:00
  - Add EXAMPLE5 section to doc.
  - Add new stations to Sri Petaling Line.

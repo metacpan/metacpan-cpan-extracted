@@ -10,7 +10,7 @@ AtteanX::Parser::Turtle - Turtle RDF Parser
 
 =head1 VERSION
 
-This document describes AtteanX::Parser::Turtle version 0.034
+This document describes AtteanX::Parser::Turtle version 0.035
 
 =head1 SYNOPSIS
 
@@ -49,6 +49,10 @@ This class consumes L<Attean::API::Parser>, L<Attean::API::PushParser>,
 
 A boolean indicating whether term values should be canonicalized during parsing.
 
+=item C<< blank_nodes >>
+
+=item C<< has_blank_nodes_map >>
+
 =back
 
 =head1 METHODS
@@ -57,7 +61,7 @@ A boolean indicating whether term values should be canonicalized during parsing.
 
 =cut
 
-package AtteanX::Parser::Turtle 0.034 {
+package AtteanX::Parser::Turtle 0.035 {
 	use Moo;
 	use Types::Standard qw(Bool HashRef ArrayRef HashRef Str Maybe InstanceOf ConsumerOf);
 	use Types::Namespace qw( NamespaceMap );

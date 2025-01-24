@@ -22,7 +22,6 @@ my @files = (
     'lib/Spreadsheet/ParseXLSX/Decryptor/Standard.pm',
     'lib/Spreadsheet/ParseXLSX/Worksheet.pm',
     't/00-compile.t',
-    't/ahihi.t',
     't/author-critic.t',
     't/author-eol.t',
     't/author-no-tabs.t',

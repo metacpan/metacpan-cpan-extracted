@@ -1,0 +1,61 @@
+---
+abstract: 'DBIx::Class::Schema::Loader::DBI MariaDB Implementation.'
+author:
+  - 'Dave Lambley <dave@lambley.me.uk>'
+build_requires:
+  Class::Unload: '0'
+  DBD::MariaDB: '0'
+  DBI: '0'
+  File::Basename: '0'
+  File::Copy: '0'
+  File::Find: '0'
+  File::Path: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::File: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Lingua::EN::Inflect::Number: '0'
+  Moose::Role: '0'
+  Test::Deep: '0'
+  Test::Differences: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::Warn: '0'
+  curry: '0'
+  namespace::clean: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Class-Schema-Loader-DBI-MariaDB
+requires:
+  Carp::Clan: '0'
+  DBIx::Class::Schema::Loader::DBI: '0.07052'
+  DBIx::Class::Schema::Loader::Table: '0'
+  DBIx::Class::Storage::DBI::MariaDB: '0'
+  List::Util: '0'
+  Scalar::Util: '0'
+  Try::Tiny: '0'
+  mro: '0'
+  namespace::clean: '0'
+  perl: '5.008'
+resources:
+  repository: git://github.com/davel/DBIx-Class-Schema-Loader-DBI-MariaDB
+version: 1.0.0
+x_contributors:
+  - 'Ben Tilly <btilly@gmail.com>'
+  - 'Brandon Black <blblack@gmail.com>'
+  - 'Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>'
+  - 'John SJ Anderson <genehack@genehack.org>'
+  - 'Martin Renvoize <martin.renvoize@ptfs-europe.com>'
+  - 'Peter Rabbitson <ribasushi@cpan.org>'
+  - 'Rafael Kitover <rkitover@cpan.org>'
+  - 'Veesh Goldman <rabbiveesh@gmail.com>'
+x_generated_by_perl: v5.34.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

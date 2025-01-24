@@ -1,8 +1,6 @@
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Map::Tube::Samara;
 use Test::Map::Tube 'tests' => 3;
 use Test::NoWarnings;

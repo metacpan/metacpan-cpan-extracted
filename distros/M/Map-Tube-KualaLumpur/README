@@ -130,7 +130,7 @@ EXAMPLE3
      system "ls -l KualaLumpur.png";
 
      # Output like:
-     # -rw-r--r-- 1 skim skim 379962 Sep 28 12:11 KualaLumpur.png
+     # -rw-r--r-- 1 skim skim 374739 23. led 18.57 KualaLumpur.png
 
 EXAMPLE4
      use strict;
@@ -229,10 +229,12 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2014-2020 Michal Josef Špaček
-     Artistic License
-     BSD 2-Clause License
+    © 2014-2025 Michal Josef Špaček
+
+    Artistic License
+
+    BSD 2-Clause License
 
 VERSION
-    0.06
+    0.07
 

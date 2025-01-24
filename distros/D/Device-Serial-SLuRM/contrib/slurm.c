@@ -2,6 +2,10 @@
 
 #include <stdbool.h>
 
+// Configurable size limits
+#define MAX_PACKET_LEN 16
+#define N_CMDSLOTS     4
+
 enum {
   SLURM_SYNC = 0x55,
 };
@@ -49,9 +53,9 @@ static struct {
     CMDSTATE_ERRORED,
   } state : 4;
   unsigned int seqno : 4;
-  uint8_t resp[16];
+  uint8_t resp[MAX_PACKET_LEN];
   uint8_t resplen;
-} cmdslots[4];   // TODO: Make 4 configurable somehow
+} cmdslots[N_CMDSLOTS];
 
 static int8_t alloc_cmdslot(void)
 {
@@ -79,7 +83,7 @@ static struct {
   uint8_t need_retx_cmdslot;
 } tx;
 
-static void transmit(uint8_t pktctrl, uint8_t b[], uint8_t len)
+static void transmit(uint8_t pktctrl, const uint8_t b[], uint8_t len)
 {
   do_slurm_tx_start();
 
@@ -106,7 +110,7 @@ static void transmit(uint8_t pktctrl, uint8_t b[], uint8_t len)
 __attribute__((weak)) void do_slurm_tx_start(void) { }
 __attribute__((weak)) void do_slurm_tx_stop (void) { }
 
-void slurm_notify(uint8_t b[], uint8_t len)
+void slurm_notify(const uint8_t b[], uint8_t len)
 {
   tx.seqno++; tx.seqno &= 0x0F;
 
@@ -117,7 +121,7 @@ void slurm_notify(uint8_t b[], uint8_t len)
   transmit(pktctrl, b, len);
 }
 
-void slurm_respond(uint8_t seqno, uint8_t b[], uint8_t len)
+void slurm_respond(uint8_t seqno, const uint8_t b[], uint8_t len)
 {
   uint8_t pktctrl = SLURM_PKT_RESPONSE | seqno; // not tx.seqno
 
@@ -132,7 +136,7 @@ void slurm_respond(uint8_t seqno, uint8_t b[], uint8_t len)
   transmit(pktctrl, b, len);
 }
 
-void slurm_responderr(uint8_t seqno, uint8_t b[], uint8_t len)
+void slurm_responderr(uint8_t seqno, const uint8_t b[], uint8_t len)
 {
   uint8_t pktctrl = SLURM_PKT_ERR | seqno; // not tx.seqno
 
@@ -164,9 +168,9 @@ static struct {
     STATE_RECV_PAYLOAD,
   } state;
 
-  /* Big enough for header+crc+16 byte payload+crc */
+  /* Big enough for header+crc+N byte payload+crc */
   uint8_t len;
-  uint8_t buf[HEADERLEN+16+1];
+  uint8_t buf[HEADERLEN+MAX_PACKET_LEN+1];
   uint8_t crc;
 
   uint8_t seqno;

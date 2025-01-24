@@ -12,7 +12,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.36
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.19'
+generated_by: 'Module::Install version 1.21'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,8 +32,8 @@ requires:
   namespace::clean: 0
   perl: 5.8.0
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Map-Tube-KualaLumpur
+  bugtracker: https://github.com/michal-josef-spacek/Map-Tube-KualaLumpur/issues
   homepage: https://github.com/michal-josef-spacek/Map-Tube-KualaLumpur
   license: http://opensource.org/licenses/artistic-license-2.0.php
   repository: git://github.com/michal-josef-spacek/Map-Tube-KualaLumpur
-version: '0.06'
+version: '0.07'

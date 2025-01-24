@@ -7,7 +7,7 @@ Attean::SimpleQueryEvaluator - Simple query evaluator
 
 =head1 VERSION
 
-This document describes Attean::SimpleQueryEvaluator version 0.034
+This document describes Attean::SimpleQueryEvaluator version 0.035
 
 =head1 SYNOPSIS
 
@@ -34,7 +34,7 @@ model, and returns a query result.
 use Attean::Algebra;
 use Attean::Expression;
 
-package Attean::SimpleQueryEvaluator 0.034 {
+package Attean::SimpleQueryEvaluator 0.035 {
 	use Moo;
 	use Encode qw(encode);
 	use Attean::RDF;
@@ -284,12 +284,7 @@ supplied C<< $active_graph >>.
 			my ($pattern)	= @{ $algebra->children };
 			my $sparql		= Attean::Algebra::Project->new( variables => [ map { variable($_) } $pattern->in_scope_variables ], children => [ $pattern ] )->as_sparql;
 			my $silent		= $algebra->silent;
-			my $client		= Attean::SPARQLClient->new(
-				endpoint => $endpoint,
-				silent => $silent,
-				user_agent => $self->user_agent,
-				request_signer => $self->request_signer,
-			);
+			my $client		= $self->new_service_client($endpoint, $silent);
 			return $client->query($sparql);
 		} elsif ($algebra->isa('Attean::Algebra::Graph')) {
 			my $graph	= $algebra->graph;
@@ -665,9 +660,29 @@ appended to C<< @new_vars >> as it is created.
 			);
 		}
 	}
+	
+=item C<< new_service_client( $endpoint, $silent ) >>
+
+Returns a new Attean::SPARQLClient for use in evaluating queries using
+the SPARQL Protocol against the given endpoint.
+
+=cut
+
+	sub new_service_client {
+		my $self		= shift;
+		my $endpoint	= shift;
+		my $silent		= shift;
+		my $client		= Attean::SPARQLClient->new(
+			endpoint => $endpoint,
+			silent => $silent,
+			user_agent => $self->user_agent,
+			request_signer => $self->request_signer,
+		);
+		return $client;
+	}
 }
 
-package Attean::SimpleQueryEvaluator::ExpressionEvaluator 0.034 {
+package Attean::SimpleQueryEvaluator::ExpressionEvaluator 0.035 {
 	use Moo;
 	use Attean::RDF;
 	use Scalar::Util qw(blessed);
@@ -677,7 +692,6 @@ package Attean::SimpleQueryEvaluator::ExpressionEvaluator 0.034 {
 	use POSIX qw(ceil floor);
 	use Digest;
 	use UUID::Tiny ':std';
-	use List::MoreUtils qw(zip);
 	use DateTime::Format::W3CDTF;
 	use I18N::LangTags;
 	use namespace::clean;

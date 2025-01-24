@@ -139,8 +139,12 @@ PARAMETERS
        retransmit_delay => NUM
 
     Optional delay in seconds to wait after a non-response of a REQUEST
-    packet before sending it again. A default of 50msec (0.05) will apply
-    if not specified.
+    packet before sending it again.
+
+    A default value will be calculated if not specified. This is based on
+    the serial link baud rate. At the default 115.2k baud it will be 50msec
+    (0.05); the delay will be scaled appropriately for other baud rates, to
+    maintain a timeout of the time it would take to send 576 bytes.
 
     Applications that transfer large amounts of data over slow links, or
     for which responding to a command may take a long time, should increase

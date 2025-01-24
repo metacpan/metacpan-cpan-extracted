@@ -7,7 +7,7 @@ AtteanX::Parser::SPARQL - SPARQL 1.1 Parser.
 
 =head1 VERSION
 
-This document describes AtteanX::Parser::SPARQL version 0.034.
+This document describes AtteanX::Parser::SPARQL version 0.035.
 
 =head1 SYNOPSIS
 
@@ -62,6 +62,10 @@ L<Attean::API::AbbreviatingParser>.
 
 =item C<< filters >>
 
+=item C<< blank_nodes >>
+
+=item C<< has_blank_nodes_map >>
+
 =back
 
 =head1 METHODS
@@ -70,7 +74,7 @@ L<Attean::API::AbbreviatingParser>.
 
 =cut
 
-package AtteanX::Parser::SPARQL 0.034;
+package AtteanX::Parser::SPARQL 0.035;
 
 use strict;
 use warnings;
@@ -80,7 +84,7 @@ use Carp qw(cluck confess croak);
 use Attean;
 use Data::Dumper;
 use URI::NamespaceMap;
-use List::MoreUtils qw(zip);
+use List::Util qw(mesh);
 use AtteanX::Parser::SPARQLLex;
 use AtteanX::SPARQL::Constants;
 use Types::Standard qw(ConsumerOf InstanceOf HashRef ArrayRef Bool Str Int);
@@ -560,7 +564,7 @@ sub _statements_with_fresh_bnodes {
 					push(@terms, $term);
 				}
 			}
-			push(@triples_with_fresh_bnodes, ref($t)->new(zip @pos, @terms));
+			push(@triples_with_fresh_bnodes, ref($t)->new(mesh \@pos, \@terms));
 		} else {
 			push(@triples_with_fresh_bnodes, $t);
 		}
@@ -3939,7 +3943,7 @@ sub _token_error {
 	croak $message;
 }
 
-package AtteanX::Parser::SPARQL::ObjectWrapper 0.034;
+package AtteanX::Parser::SPARQL::ObjectWrapper 0.035;
 
 use strict;
 use warnings;

@@ -196,4 +196,3 @@ xt/eval-sparql-star-memory-simpleeval.t
 xt/eval-sparql-star-memory.t
 xt/pod-coverage.t
 xt/pod.t
-SIGNATURE                                Public-key signature (added by MakeMaker)

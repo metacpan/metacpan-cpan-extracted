@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+images/ka-ko.png
+lib/App/Greple/charcode.pm
+minil.toml
+t/00_compile.t
+t/ainu.txt
+t/ka-ko.out
+t/ka-ko.txt
+META.yml
+MANIFEST

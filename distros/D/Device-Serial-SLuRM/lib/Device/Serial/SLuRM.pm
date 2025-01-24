@@ -1,13 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2022-2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2022-2024 -- leonerd@leonerd.org.uk
 
-use v5.26;
+use v5.28;  # delete %hash{@slice}
 use warnings;
 use Object::Pad 0.800 ':experimental(adjust_params)';
 
-package Device::Serial::SLuRM 0.07;
+package Device::Serial::SLuRM 0.08;
 class Device::Serial::SLuRM;
 
 use Carp;
@@ -185,8 +185,12 @@ Either C<dev> or C<fh> are required.
    retransmit_delay => NUM
 
 Optional delay in seconds to wait after a non-response of a REQUEST packet
-before sending it again. A default of 50msec (0.05) will apply if not
-specified.
+before sending it again. 
+
+A default value will be calculated if not specified. This is based on the
+serial link baud rate. At the default 115.2k baud it will be 50msec (0.05);
+the delay will be scaled appropriately for other baud rates, to maintain a
+timeout of the time it would take to send 576 bytes.
 
 Applications that transfer large amounts of data over slow links, or for which
 responding to a command may take a long time, should increase this value.
@@ -212,8 +216,18 @@ ADJUST :params ( %params )
    );
 }
 
-field $_retransmit_delay :param //= 0.05;
+field $_retransmit_delay :param = undef;
 field $_retransmit_count :param //= 2;
+
+ADJUST
+{
+   if( !defined $_retransmit_delay ) {
+      # At 115200baud (being 11520 bytes/sec presuming 1 start, no parity,
+      # 1 stop) we should get 0.05 sec delay; this is the time taken to
+      # transmit 576 bytes.
+      $_retransmit_delay = 576 / $_protocol->bps;
+   }
+}
 
 field $_on_notify;
 
@@ -269,19 +283,21 @@ async method _run
       my $nodestate = $_nodestate[ $node_id ] //= Device::Serial::SLuRM::_NodeState->new;
 
       if( $pktctrl == SLURM_PKTCTRL_META ) {
-         if( $seqno == SLURM_PKTCTRL_META_RESET or
-               $seqno == SLURM_PKTCTRL_META_RESETACK ) {
-            ( $nodestate->seqno_rx ) = unpack "C", $payload;
+         match( $seqno : == ) {
+            case( SLURM_PKTCTRL_META_RESET ),
+            case( SLURM_PKTCTRL_META_RESETACK ) {
+               ( $nodestate->seqno_rx ) = unpack "C", $payload;
 
-            if( $seqno == SLURM_PKTCTRL_META_RESET ) {
-               await $self->send_packet( SLURM_PKTCTRL_META_RESETACK, pack "C", $nodestate->seqno_tx );
+               if( $seqno == SLURM_PKTCTRL_META_RESET ) {
+                  await $self->send_packet( SLURM_PKTCTRL_META_RESETACK, pack "C", $nodestate->seqno_tx );
+               }
+               else {
+                  $_next_resetack_f->done if $_next_resetack_f;
+               }
             }
-            else {
-               $_next_resetack_f->done if $_next_resetack_f;
+            default {
+               warn sprintf "No idea what to do with pktctrl(meta) = %02X\n", $seqno;
             }
-         }
-         else {
-            warn sprintf "No idea what to do with pktctrl(meta) = %02X\n", $seqno;
          }
 
          next;

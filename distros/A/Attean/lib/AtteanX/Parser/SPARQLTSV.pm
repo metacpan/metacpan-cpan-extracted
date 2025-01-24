@@ -7,7 +7,7 @@ AtteanX::Parser::SPARQLTSV - SPARQL Results TSV Parser
 
 =head1 VERSION
 
-This document describes AtteanX::Parser::SPARQLTSV version 0.034
+This document describes AtteanX::Parser::SPARQLTSV version 0.035
 
 =head1 SYNOPSIS
 
@@ -35,13 +35,12 @@ This document describes AtteanX::Parser::SPARQLTSV version 0.034
 
 =cut
 
-package AtteanX::Parser::SPARQLTSV 0.034 {
+package AtteanX::Parser::SPARQLTSV 0.035 {
 	use utf8;
 	use Moo;
 	use Attean;
 	use Encode;
 	use Encode qw(decode);
-	use List::MoreUtils qw(zip);
 	use namespace::clean;
 
 	sub canonical_media_type { return "text/tab-separated-values" }

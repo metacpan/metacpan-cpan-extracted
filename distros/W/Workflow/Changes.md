@@ -1,5 +1,14 @@
 # Revision history for the Workflow Perl Distribution
 
+## TO BE RELEASED
+
+## 2.03 2025-01-24 BUg fix release, update recommended
+
+### Fixed
+
+- Instances of Workflow::Condition::IsFalse interpreted as `true` return values
+  under `$Workflow::Condition::STRICT_BOOLEANS = 0`
+
 ## 2.02 2025-01-11 Major release, update recommended
 
 ### Added

@@ -4,7 +4,7 @@ Attean::RDF - Utility package for exporting shorthand functions for constructing
 
 =head1 VERSION
 
-This document describes Attean::RDF version 0.034
+This document describes Attean::RDF version 0.035
 
 =head1 SYNOPSIS
 
@@ -31,7 +31,7 @@ by default).
 
 =cut
 
-package Attean::RDF 0.034 {
+package Attean::RDF 0.035 {
 	use v5.14;
 	use warnings;
 
@@ -40,7 +40,7 @@ package Attean::RDF 0.034 {
 	our @EXPORT	= qw(iri blank literal dtliteral langliteral variable triple quad triplepattern quadpattern bgp);
 
 	require Attean;
-	use List::MoreUtils qw(zip);
+	use List::Util qw(mesh);
 	use namespace::clean;
 
 =item C<< variable( $value ) >>
@@ -91,7 +91,7 @@ C<< Attean::Literal->new( value => $value, datatype => $dt ) >>
 
 	sub dtliteral {
 		my @k	= qw(value datatype);
-		return Attean::Literal->new(zip @k, @_);
+		return Attean::Literal->new(mesh \@k, \@_);
 	}
 
 =item C<< langliteral( $value, $lang ) >>
@@ -102,7 +102,8 @@ C<< Attean::Literal->new( value => $value, language => $lang ) >>
 
 	sub langliteral {
 		my @k	= qw(value language);
-		return Attean::Literal->new(zip @k, @_);
+		$DB::single = 1;
+		return Attean::Literal->new(mesh \@k, \@_);
 	}
 	
 =item C<< triple( @terms ) >>

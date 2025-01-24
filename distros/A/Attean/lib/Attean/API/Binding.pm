@@ -7,7 +7,7 @@ Attean::API::Binding - Name to term bindings
 
 =head1 VERSION
 
-This document describes Attean::API::Binding version 0.034
+This document describes Attean::API::Binding version 0.035
 
 =head1 DESCRIPTION
 
@@ -71,9 +71,9 @@ otherwise.
 
 use Type::Tiny::Role;
 
-package Attean::API::Binding 0.034 {
+package Attean::API::Binding 0.035 {
 	use Scalar::Util qw(blessed);
-	use List::MoreUtils qw(zip);
+	use List::Util qw(mesh);
 
 	use Moo::Role;
 	
@@ -85,7 +85,7 @@ package Attean::API::Binding 0.034 {
 		my $self	= shift;
 		my @k		= $self->variables;
 		my @v		= $self->values;
-		return zip @k, @v;
+		return mesh \@k, \@v;
 	}
 	
 	sub values {
@@ -285,9 +285,9 @@ C<< $binding >>.
 	}
 }
 
-package Attean::API::TripleOrQuadPattern 0.034 {
+package Attean::API::TripleOrQuadPattern 0.035 {
 	use Encode qw(encode);
-	use List::MoreUtils qw(zip);
+	use List::Util qw(mesh);
 	use Scalar::Util qw(blessed);
 	use Attean::RDF;
 	use Attean::API::Query;
@@ -461,12 +461,12 @@ parsed from C<< $string >> in SPARQL syntax.
 		unless ($e == $f) {
 			die "${class}->parse found wrong number of nodes (found $f but expecting $e)";
 		}
-		return $self->new(zip @keys, @values);
+		return $self->new(mesh \@keys, \@values);
 	}
 }
 
-package Attean::API::TripleOrQuad 0.034 {
-	use List::MoreUtils qw(any);
+package Attean::API::TripleOrQuad 0.035 {
+	use List::Util qw(any);
 	use Carp;
 
 	use Moo::Role;
@@ -481,8 +481,8 @@ package Attean::API::TripleOrQuad 0.034 {
 	}
 }
 
-package Attean::API::TriplePattern 0.034 {
-	use List::MoreUtils qw(zip);
+package Attean::API::TriplePattern 0.035 {
+	use List::Util qw(mesh);
 	use Scalar::Util qw(blessed);
 
 	use Moo::Role;
@@ -501,7 +501,7 @@ package Attean::API::TriplePattern 0.034 {
 		my $graph	= shift;
 		my @keys	= Attean::API::Quad->variables;
 		my @values	= ($self->values, $graph);
-		return Attean::QuadPattern->new(zip @keys, @values);
+		return Attean::QuadPattern->new(mesh \@keys, \@values);
 	}
 	
 	sub as_triple {
@@ -540,7 +540,7 @@ package Attean::API::TriplePattern 0.034 {
 	with 'Attean::API::TripleOrQuadPattern', 'Attean::API::Binding', 'Attean::API::TermOrVariableOrTriplePattern';
 }
 
-package Attean::API::Triple 0.034 {
+package Attean::API::Triple 0.035 {
 	use Scalar::Util qw(blessed);
 	use Moo::Role;
 	
@@ -631,9 +631,9 @@ package Attean::API::Triple 0.034 {
 	with 'Attean::API::TermOrTriple';
 }
 
-package Attean::API::QuadPattern 0.034 {
+package Attean::API::QuadPattern 0.035 {
 	use Scalar::Util qw(blessed);
-	use List::MoreUtils qw(zip);
+	use List::Util qw(mesh);
 
 	use Moo::Role;
 	
@@ -663,7 +663,7 @@ package Attean::API::QuadPattern 0.034 {
 		my @keys	= Attean::API::Triple->variables;
 		my @values	= $self->values;
 		@values		= @values[0 .. scalar(@keys)-1];
-		return Attean::TriplePattern->new(zip @keys, @values);
+		return Attean::TriplePattern->new(mesh \@keys, \@values);
 	}
 
 	sub sparql_tokens {
@@ -688,7 +688,7 @@ package Attean::API::QuadPattern 0.034 {
 	with 'Attean::API::TripleOrQuadPattern', 'Attean::API::Binding';
 }
 
-package Attean::API::Quad 0.034 {
+package Attean::API::Quad 0.035 {
 	use Moo::Role;
 	
 	if ($ENV{ATTEAN_TYPECHECK}) {
@@ -715,7 +715,7 @@ package Attean::API::Quad 0.034 {
 }
 
 
-package Attean::API::Result 0.034 {
+package Attean::API::Result 0.035 {
 	use Scalar::Util qw(refaddr);
 	use Types::Standard qw(HashRef);
 

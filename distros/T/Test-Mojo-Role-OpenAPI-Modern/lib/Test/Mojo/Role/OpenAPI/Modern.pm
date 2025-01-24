@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Test::Mojo::Role::OpenAPI::Modern; # git description: v0.005-4-gf41234f
+package Test::Mojo::Role::OpenAPI::Modern; # git description: v0.006-4-g641c108
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Test::Mojo role providing access to an OpenAPI document and parser
 # KEYWORDS: validation evaluation JSON Schema OpenAPI Swagger HTTP request response
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 use 5.020;  # for fc, unicode_strings features
 use strictures 2;
@@ -20,7 +20,7 @@ use namespace::clean;
 
 use Mojo::Base -role, -signatures;
 
-has 'openapi' => sub ($self) {
+has openapi => sub ($self) {
   # use the plugin's object, if the plugin is being used
   # FIXME: we should be calling $self->app->$_call_if_can, but can() isn't behaving
   my $openapi = eval { $self->app->openapi };
@@ -55,13 +55,13 @@ after _request_ok => sub ($self, @args) {
 };
 
 sub request_valid ($self, $desc = 'request is valid') {
-  $self->test('ok', $self->request_validation_result, $desc);
+  $self->test('ok', $self->request_validation_result->valid, $desc);
   $self->dump_request_validation_result if not $self->success and $self->test_openapi_verbose;
   return $self;
 }
 
 sub response_valid ($self, $desc = 'response is valid') {
-  $self->test('ok', $self->response_validation_result, $desc);
+  $self->test('ok', $self->response_validation_result->valid, $desc);
   $self->dump_response_validation_result if not $self->success and $self->test_openapi_verbose;
   return $self;
 }
@@ -69,7 +69,7 @@ sub response_valid ($self, $desc = 'response is valid') {
 # expected_error can either be the 'recommended_response' or any error string in the result.
 sub request_not_valid ($self, $expected_error = undef, $desc = undef) {
   my $result = $self->request_validation_result;
-  if ($expected_error and not $result) {
+  if ($expected_error and not $result->valid) {
     $desc //= 'request validation error matches';
     if ($expected_error eq $result->recommended_response->[1]) {
       $self->test('pass', $desc);
@@ -79,7 +79,7 @@ sub request_not_valid ($self, $expected_error = undef, $desc = undef) {
     }
   }
   else {
-    $self->test('ok', !$self->request_validation_result, $desc // 'request is not valid');
+    $self->test('ok', !$self->request_validation_result->valid, $desc // 'request is not valid');
   }
 
   $self->dump_request_validation_result if not $self->success and $self->test_openapi_verbose;
@@ -89,12 +89,12 @@ sub request_not_valid ($self, $expected_error = undef, $desc = undef) {
 # expected_error must match an error string in the result.
 sub response_not_valid ($self, $expected_error = undef, $desc = undef) {
   my $result = $self->response_validation_result;
-  if ($expected_error and not $result) {
+  if ($expected_error and not $result->valid) {
     $self->test('ok', (any { $expected_error eq $_ } $result->errors),
       $desc // 'response validation error matches');
   }
   else {
-    $self->test('ok', !$self->response_validation_result, $desc // 'response is not valid');
+    $self->test('ok', !$self->response_validation_result->valid, $desc // 'response is not valid');
   }
 
   $self->dump_response_validation_result if not $self->success and $self->test_openapi_verbose;
@@ -168,7 +168,7 @@ Test::Mojo::Role::OpenAPI::Modern - Test::Mojo role providing access to an OpenA
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 

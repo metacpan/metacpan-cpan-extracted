@@ -68,6 +68,7 @@ sub notifications_received_for
    # Reset
    $controller->expect_syswrite( "DummyFH", "\x55" . with_crc8( with_crc8( "\x01\x87\x01" ) . "\x00" ) )
       ->will_write_sysread_buffer_later( "DummyFH", "\x55" . with_crc8( with_crc8( "\x02\x07\x01" ) . "\x00" ) );
+   $controller->expect_sleep( Test::Deep::num( 0.0017, 1E-4 ) );
    $controller->expect_syswrite( "DummyFH", "\x55" . with_crc8( with_crc8( "\x01\x87\x01" ) . "\x00" ) );
    $controller->expect_sleep( 0.05 * 3 )
       ->remains_pending;
@@ -76,6 +77,7 @@ sub notifications_received_for
    await $slurm->_reset( 7 );
 
    $controller->expect_syswrite( "DummyFH", "\x55" . with_crc8( with_crc8( "\x11\x87\x02" ) . "A1" ) );
+   $controller->expect_sleep( Test::Deep::num( 0.0017, 1E-4 ) );
    $controller->expect_syswrite( "DummyFH", "\x55" . with_crc8( with_crc8( "\x11\x87\x02" ) . "A1" ) );
 
    await $slurm->send_notify( 7, "A1" );
@@ -89,6 +91,7 @@ sub notifications_received_for
    $controller->check_and_clear( '->send_notify' );
 
    $controller->expect_syswrite( "DummyFH", "\x55" . with_crc8( with_crc8( "\x12\x87\x02" ) . "B2" ) );
+   $controller->expect_sleep( Test::Deep::num( 0.0017, 1E-4 ) );
    $controller->expect_syswrite( "DummyFH", "\x55" . with_crc8( with_crc8( "\x12\x87\x02" ) . "B2" ) );
 
    await $slurm->send_notify( 7, "B2" );

@@ -3,7 +3,7 @@ package Spreadsheet::ParseXLSX::Decryptor;
 use strict;
 use warnings;
 
-our $VERSION = '0.35'; # VERSION
+our $VERSION = '0.36'; # VERSION
 
 # ABSTRACT: helper class to open password protected files
 
@@ -226,7 +226,7 @@ Spreadsheet::ParseXLSX::Decryptor - helper class to open password protected file
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =for Pod::Coverage   new
   open
@@ -237,7 +237,7 @@ Jesse Luehrs <doy@tozt.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024 by Jesse Luehrs.
+This software is Copyright (c) 2025 by Jesse Luehrs.
 
 This is free software, licensed under:
 

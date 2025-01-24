@@ -1,6 +1,18 @@
+0.08 2025-01-23T21:25:20+01:00
+ - Fix Changelog file.
+ - Fix Makefile.PL and use lib.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Move bugtracker to github.
+ - Rename examples to better names.
+ - Update Module::Install to 1.21 version.
+ - Update author github username.
+ - Update copyright years.
+ - Update dependency of Map::Tube to 3.62.
+
 0.07 2017-11-22T08:40:52+01:00
  - Add test for ok_map_functions().
- - Fix Makefile.PL for new version of Perl and no default »use lib '.'«.
+ - Fix Makefile.PL for new version of Perl and no default Â»use lib '.'Â«.
  - Remove bad test.
  - Update Module::Install to 1.18 version.
  - Update author name.

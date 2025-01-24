@@ -9,7 +9,7 @@ use Moo;
 use namespace::clean;
 
 # Version.
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 # Get XML.
 has xml => (
@@ -184,12 +184,12 @@ For more information about Saint Petersburg Map, click L<here|https://en.wikiped
  system "ls -l SaintPetersburg.png";
 
  # Output like:
- # -rw-r--r-- 1 skim skim 207926 Feb 18 07:13 SaintPetersburg.png
+ # -rw-r--r-- 1 skim skim 200586 23. led 11.50 SaintPetersburg.png
 
 =begin html
 
-<a href="https://raw.githubusercontent.com/tupinek/Map-Tube-SaintPetersburg/master/images/ex3.png">
-  <img src="https://raw.githubusercontent.com/tupinek/Map-Tube-SaintPetersburg/master/images/ex3.png" alt="Петербургский метрополитен" width="300px" height="300px" />
+<a href="https://raw.githubusercontent.com/michal-josef-spacek/Map-Tube-SaintPetersburg/master/images/SaintPetersburg.png">
+  <img src="https://raw.githubusercontent.com/michal-josef-spacek/Map-Tube-SaintPetersburg/master/images/SaintPetersburg.png" alt="Петербургский метрополитен" width="300px" height="300px" />
 </a>
 
 =end html
@@ -289,7 +289,7 @@ Install the Map::Tube concrete metro modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Map-Tube-SaintPetersburg>
+L<https://github.com/michal-josef-spacek/Map-Tube-SaintPetersburg>
 
 =head1 AUTHOR
 
@@ -307,6 +307,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

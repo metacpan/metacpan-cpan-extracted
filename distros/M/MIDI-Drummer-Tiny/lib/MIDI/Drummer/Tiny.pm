@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Glorified metronome
 
-our $VERSION = '0.5005';
+our $VERSION = '0.5006';
 
 use Moo;
 use strictures 2;
@@ -703,7 +703,7 @@ MIDI::Drummer::Tiny - Glorified metronome
 
 =head1 VERSION
 
-version 0.5005
+version 0.5006
 
 =head1 SYNOPSIS
 
@@ -745,13 +745,13 @@ version 0.5005
     $d->kick    => [ '1010' ],
   ) for 1 .. $d->bars;
 
-  $d->add_fill('...'); # see doc...
-
   my $patterns = [
     your_function(5, 16), # e.g. a euclidean function
     your_function(7, 16), # ...
   ];
   $d->pattern( instrument => $d->kick, patterns => $patterns ); # see doc...
+
+  $d->add_fill('...'); # see doc...
 
   print 'Count: ', $d->counter, "\n";
 

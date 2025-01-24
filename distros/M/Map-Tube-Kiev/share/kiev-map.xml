@@ -22,8 +22,8 @@
     <station id="1-07" name="Політехнічний інститут" line="1:7" link="1-06,1-08"/>
     <station id="1-08" name="Вокзальна" line="1:8" link="1-07,1-09"/>
     <station id="1-09" name="Університет" line="1:9" link="1-08,1-10"/>
-    <station id="1-10" name="Театральна" line="1:10" link="1-09,1-11,3-03,3-05"/>
-    <station id="1-11" name="Хрещатик" line="1:11" link="1-10,1-12,2-07,2-09"/>
+    <station id="1-10" name="Театральна" line="1:10" link="1-09,1-11" other_link="tunnel:3-04"/>
+    <station id="1-11" name="Хрещатик" line="1:11" link="1-10,1-12" other_link="tunnel:2-08"/>
     <station id="1-12" name="Арсенальна" line="1:12" link="1-11,1-13"/>
     <station id="1-13" name="Дніпро" line="1:13" link="1-12,1-14"/>
     <station id="1-14" name="Гідропарк" line="1:14" link="1-13,1-15"/>
@@ -40,8 +40,8 @@
     <station id="2-05" name="Тараса Шевченка" line="2:5" link="2-04,2-06"/>
     <station id="2-06" name="Контрактова площа" line="2:6" link="2-05,2-07"/>
     <station id="2-07" name="Поштова площа" line="2:7" link="2-06,2-08"/>
-    <station id="2-08" name="Майдан Незалежності" line="2:8" link="2-07,2-09,1-10,1-11"/>
-    <station id="2-09" name="Площа Льва Толстого" line="2:9" link="2-08,2-10,3-04,3-06"/>
+    <station id="2-08" name="Майдан Незалежності" line="2:8" link="2-07,2-09" other_link="tunnel:1-11"/>
+    <station id="2-09" name="Площа Льва Толстого" line="2:9" link="2-08,2-10" other_link="tunnel:3-05"/>
     <station id="2-10" name="Олімпійська" line="2:10" link="2-09,2-11"/>
     <station id="2-11" name="Палац «Україна»" line="2:11" link="2-10,2-12"/>
     <station id="2-12" name="Либідська" line="2:12" link="2-11,2-13"/>
@@ -56,8 +56,8 @@
     <station id="3-01" name="Сирець" line="3:1" link="3-02"/>
     <station id="3-02" name="Дорогожичі" line="3:2" link="3-01,3-03"/>
     <station id="3-03" name="Лук'янівська" line="3:3" link="3-02,3-04"/>
-    <station id="3-04" name="Золоті ворота" line="3:4" link="1-09,1-11,3-03,3-05"/>
-    <station id="3-05" name="Палац спорту" line="3:5" link="2-08,2-10,3-04,3-06"/>
+    <station id="3-04" name="Золоті ворота" line="3:4" link="3-03,3-05"  other_link="tunnel:1-10"/>
+    <station id="3-05" name="Палац спорту" line="3:5" link="3-04,3-06" other_link="tunnel:2-09"/>
     <station id="3-06" name="Кловська" line="3:6" link="3-05,3-07"/>
     <station id="3-07" name="Печерська" line="3:7" link="3-06,3-08"/>
     <station id="3-08" name="Дружби народів" line="3:8" link="3-07,3-09"/>

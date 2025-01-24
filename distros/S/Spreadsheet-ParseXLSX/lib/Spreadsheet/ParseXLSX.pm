@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.35'; # VERSION
+our $VERSION = '0.36'; # VERSION
 
 # ABSTRACT: parse XLSX files
 
@@ -1170,7 +1170,7 @@ Spreadsheet::ParseXLSX - parse XLSX files
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =head1 SYNOPSIS
 
@@ -1327,9 +1327,13 @@ Jesse Luehrs <doy@tozt.net>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alexey Mazurin Daryl Anderman Dave Clarke Fitz Elliott FL Gareth Tunley Meredith Howard Michael Conrad Daum Nick Moore oharakouhei rdboisvert Ricardo Signes Robert Boisvert Steve Simms Stuart Watt theevilapplepie zhouzhen1
+=for stopwords Alex Alexey Mazurin Daryl Anderman Dave Clarke Fitz Elliott FL Gareth Tunley Meredith Howard Michael Conrad Daum Nick Moore oharakouhei rdboisvert Ricardo Signes Robert Boisvert Steve Simms Stuart Watt theevilapplepie zhouzhen1
 
 =over 4
+
+=item *
+
+Alex <asb@cpan.org>
 
 =item *
 
@@ -1407,7 +1411,7 @@ zhouzhen1 <zhouzhen1@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024 by Jesse Luehrs.
+This software is Copyright (c) 2025 by Jesse Luehrs.
 
 This is free software, licensed under:
 

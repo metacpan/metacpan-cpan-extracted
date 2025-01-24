@@ -7,7 +7,7 @@ AtteanX::Parser::Turtle::Token - Token objects used for parsing of Turtle
 
 =head1 VERSION
 
-This document describes AtteanX::Parser::Turtle::Token version 0.034
+This document describes AtteanX::Parser::Turtle::Token version 0.035
 
 =head1 SYNOPSIS
 
@@ -61,13 +61,13 @@ package AtteanX::Parser::Turtle::Token;
 
 use Moo;
 use Types::Standard qw(ArrayRef Str);
-use List::MoreUtils qw(zip);
+use List::Util qw(mesh);
 use Sub::Util qw(set_subname);
 use AtteanX::Parser::Turtle::Constants;
 use Sub::Install;
 use namespace::clean;
 
-our $VERSION	= 0.034;
+our $VERSION	= 0.035;
 
 has type => ( is => 'ro', );
 has start_line => ( is => 'ro', );
@@ -98,7 +98,7 @@ my @KEYS	= qw(type start_line start_column line column args);
 sub fast_constructor {
 	my $class = shift;
 	return $class->new(
-		zip @KEYS, @_
+		mesh \@KEYS, \@_
 	);
 }
 

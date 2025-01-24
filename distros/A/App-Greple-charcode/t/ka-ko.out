@@ -1,0 +1,23 @@
+┌─────────   0 \x{30ab} \N{KATAKANA LETTER KA}
+│ ┌───────   2 \x{30ad} \N{KATAKANA LETTER KI}
+│ │ ┌─────   4 \x{30af} \N{KATAKANA LETTER KU}
+│ │ │ ┌───   6 \x{30b1} \N{KATAKANA LETTER KE}
+│ │ │ │ ┌─   8 \x{30b3} \N{KATAKANA LETTER KO}
+カキクケコ
+┌─────────   0 \x{30ac} \N{KATAKANA LETTER GA}
+│ ┌───────   2 \x{30ae} \N{KATAKANA LETTER GI}
+│ │ ┌─────   4 \x{30b0} \N{KATAKANA LETTER GU}
+│ │ │ ┌───   6 \x{30b2} \N{KATAKANA LETTER GE}
+│ │ │ │ ┌─   8 \x{30b4} \N{KATAKANA LETTER GO}
+ガギグゲゴ
+┌─────────   0 \x{30ab} \N{KATAKANA LETTER KA}
+├─────────   0 \x{309a} \N{COMBINING KATAKANA-HIRAGANA SEMI-VOICED SOUND MARK}
+│ ┌───────   2 \x{30ad} \N{KATAKANA LETTER KI}
+│ ├───────   2 \x{309a} \N{COMBINING KATAKANA-HIRAGANA SEMI-VOICED SOUND MARK}
+│ │ ┌─────   4 \x{30af} \N{KATAKANA LETTER KU}
+│ │ ├─────   4 \x{309a} \N{COMBINING KATAKANA-HIRAGANA SEMI-VOICED SOUND MARK}
+│ │ │ ┌───   6 \x{30b1} \N{KATAKANA LETTER KE}
+│ │ │ ├───   6 \x{309a} \N{COMBINING KATAKANA-HIRAGANA SEMI-VOICED SOUND MARK}
+│ │ │ │ ┌─   8 \x{30b3} \N{KATAKANA LETTER KO}
+│ │ │ │ ├─   8 \x{309a} \N{COMBINING KATAKANA-HIRAGANA SEMI-VOICED SOUND MARK}
+カ゚キ゚ク゚ケ゚コ゚

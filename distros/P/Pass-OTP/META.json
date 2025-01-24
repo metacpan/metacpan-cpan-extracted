@@ -48,11 +48,11 @@
    "provides" : {
       "Pass::OTP" : {
          "file" : "lib/Pass/OTP.pm",
-         "version" : "1.800"
+         "version" : "1.801"
       },
       "Pass::OTP::URI" : {
          "file" : "lib/Pass/OTP/URI.pm",
-         "version" : "1.800"
+         "version" : "1.801"
       }
    },
    "release_status" : "stable",
@@ -63,6 +63,6 @@
          "web" : "https://github.com/baierjan/Pass-OTP-perl"
       }
    },
-   "version" : "1.800",
+   "version" : "1.801",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

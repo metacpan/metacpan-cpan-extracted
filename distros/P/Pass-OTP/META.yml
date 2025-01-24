@@ -21,10 +21,10 @@ no_index:
 provides:
   Pass::OTP:
     file: lib/Pass/OTP.pm
-    version: '1.800'
+    version: '1.801'
   Pass::OTP::URI:
     file: lib/Pass/OTP/URI.pm
-    version: '1.800'
+    version: '1.801'
 requires:
   Digest::HMAC: '0'
   Digest::SHA: '0'
@@ -33,5 +33,5 @@ requires:
   perl: '5.014'
 resources:
   repository: git://github.com/baierjan/Pass-OTP-perl.git
-version: '1.800'
+version: '1.801'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

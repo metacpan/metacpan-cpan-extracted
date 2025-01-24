@@ -7,7 +7,7 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'Device::Serial::SLuRM',
    requires => {
-      'perl' => '5.026',
+      'perl' => '5.028',
       'Future::AsyncAwait' => 0,
       'Object::Pad' => '0.800',
       'Syntax::Keyword::Match' => 0,

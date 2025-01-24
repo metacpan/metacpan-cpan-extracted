@@ -1,13 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2023-2025 -- leonerd@leonerd.org.uk
 
 use v5.26;
 use warnings;
 use Object::Pad 0.800 ':experimental(adjust_params)';
 
-package Device::Serial::SLuRM::Protocol 0.07;
+package Device::Serial::SLuRM::Protocol 0.08;
 class Device::Serial::SLuRM::Protocol;
 
 use Carp;
@@ -107,12 +107,17 @@ field $_fh :param = undef;
 
 field $_multidrop :param = 0;
 
+# To calculate baud-independent timeout values we need a rough estimate of the
+# time to send each byte
+field $_bps :reader;
+
 ADJUST :params (
    :$dev    = undef,
    :$baud //= 115200,
 ) {
    if( defined $_fh ) {
       # fine
+      $_bps = $baud / 10;
    }
    elsif( defined $dev ) {
       require IO::Termios;
@@ -121,6 +126,8 @@ ADJUST :params (
          croak "Cannot open device $dev - $!";
 
       $_fh->cfmakeraw;
+
+      $_bps = $_fh->getobaud / 10;
    }
    else {
       croak "Require either a 'dev' or 'fh' parameter";
@@ -212,7 +219,10 @@ async method send ( $pktctrl, $addr, $payload )
 async method send_twice ( $pktctrl, $node_id, $payload )
 {
    await $self->send( $pktctrl, $node_id | 0x80, $payload );
-   # TODO: Send again after a short delay
+
+   # wait 20-ish byte times before sending again
+   await Future::IO->sleep( 20 / $_bps );
+
    await $self->send( $pktctrl, $node_id | 0x80, $payload );
 }
 

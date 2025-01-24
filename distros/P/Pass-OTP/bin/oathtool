@@ -41,7 +41,7 @@ pod2usage(2) if @ARGV == 0;
 my %options;
 $options{secret} = pop if $ARGV[-1] !~ /^-/;
 
-Getopt::Long::Configure(qw(auto_version));
+Getopt::Long::Configure(qw(auto_version no_ignore_case));
 GetOptions(\%options,
     'help|h|?' => sub { pod2usage(-verbose => 2) },
     'algorithm|a=s',

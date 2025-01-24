@@ -4,7 +4,7 @@ AtteanX::Serializer::Turtle - Turtle Serializer
 
 =head1 VERSION
 
-This document describes AtteanX::Serializer::Turtle version 0.034
+This document describes AtteanX::Serializer::Turtle version 0.035
 
 =head1 SYNOPSIS
 
@@ -39,12 +39,12 @@ This document describes AtteanX::Serializer::Turtle version 0.034
 use v5.14;
 use warnings;
 
-package AtteanX::Serializer::Turtle 0.034 {
+package AtteanX::Serializer::Turtle 0.035 {
 	use Moo;
 	use Data::Dumper;
 	use Encode qw(encode);
 	use Attean::ListIterator;
-	use List::MoreUtils qw(any);
+	use List::Util qw(any);
 	use AtteanX::Parser::Turtle::Constants;
 	use AtteanX::Parser::Turtle::Token;
 	use AtteanX::Serializer::TurtleTokens;

@@ -126,6 +126,8 @@ xt/author/bcos-mbi.t
 xt/author/bdec-mbf.t
 xt/author/bdec-mbi.t
 xt/author/bdigitsum-mbi.t
+xt/author/bdiv-mbi-mbf.t
+xt/author/bdiv-mbi-mbr.t
 xt/author/bdstr-mbf.t
 xt/author/bdstr-mbi.t
 xt/author/beq-mbf.t
@@ -137,6 +139,7 @@ xt/author/bfib-mbi.t
 xt/author/bfstr-mbf.t
 xt/author/bfstr-mbi.t
 xt/author/bfstr-mbr.t
+xt/author/bhyperop-mbi.t
 xt/author/bilog10-mbi.t
 xt/author/bilog2-mbi.t
 xt/author/binc-mbf.t

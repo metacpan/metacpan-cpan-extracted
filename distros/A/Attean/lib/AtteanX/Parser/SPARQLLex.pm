@@ -7,7 +7,7 @@ AtteanX::Parser::SPARQLLex - SPARQL Lexer
 
 =head1 VERSION
 
-This document describes AtteanX::Parser::SPARQLLex version 0.034
+This document describes AtteanX::Parser::SPARQLLex version 0.035
 
 =head1 SYNOPSIS
 
@@ -39,13 +39,12 @@ This document describes AtteanX::Parser::SPARQLLex version 0.034
 
 =cut
 
-package AtteanX::Parser::SPARQLLex 0.034 {
+package AtteanX::Parser::SPARQLLex 0.035 {
 	use utf8;
 	use Moo;
 	use Attean;
 	use Encode;
 	use Encode qw(decode);
-	use List::MoreUtils qw(zip);
 	use Types::Standard qw(ArrayRef);
 	use namespace::clean;
 
@@ -104,13 +103,12 @@ the SPARQL query/update read from the L<IO::Handle> object C<< $fh >>.
 	}
 }
 
-package AtteanX::Parser::SPARQLLex::Iterator 0.034 {
+package AtteanX::Parser::SPARQLLex::Iterator 0.035 {
 	use utf8;
 	use Moo;
 	use Attean;
 	use Encode;
 	use Encode qw(decode);
-	use List::MoreUtils qw(zip);
 	use AtteanX::SPARQL::Token;
 	use AtteanX::SPARQL::Constants;
 	use Types::Standard qw(FileHandle Ref Str Int ArrayRef HashRef ConsumerOf InstanceOf);

@@ -9,7 +9,7 @@
     <!-- https://ru.wikipedia.org/wiki/Ленинская_линия -->
     <station id="1-01" name="Заельцовская" line="1:1" link="1-02"/>
     <station id="1-02" name="Гагаринская" line="1:2" link="1-01,1-03"/>
-    <station id="1-03" name="Красный проспект" line="1:3" link="1-02,1-04,2-01,2-03"/>
+    <station id="1-03" name="Красный проспект" line="1:3" link="1-02,1-04" other_link="tunnel:2-02"/>
     <station id="1-04" name="Площадь Ленина" line="1:4" link="1-03,1-05"/>
     <station id="1-05" name="Октябрьская" line="1:5" link="1-04,1-06"/>
     <station id="1-06" name="Речной вокзал" line="1:6" link="1-05,1-07"/>
@@ -18,7 +18,7 @@
 
     <!-- https://ru.wikipedia.org/wiki/Дзержинская_линия -->
     <station id="2-01" name="Площадь Гарина-Михайловского" line="2:1" link="2-02"/>
-    <station id="2-02" name="Сибирская" line="2:2" link="1-02,1-04,2-01,2-03"/>
+    <station id="2-02" name="Сибирская" line="2:2" link="2-01,2-03" other_link="tunnel:1-03"/>
     <station id="2-03" name="Маршала Покрышкина" line="2:3" link="2-02,2-04"/>
     <station id="2-04" name="Берёзовая роща" line="2:4" link="2-03,2-05"/>
     <station id="2-05" name="Золотая Нива" line="2:5" link="2-04"/>
