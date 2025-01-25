@@ -18,7 +18,7 @@ unless ($meta) {
   # Do something such as environment check.
 }
 
-my %configure_and_runtime_requires = ('SPVM' => '0.986');
+my %configure_and_runtime_requires = ('SPVM' => '0.990042');
 WriteMakefile(
   NAME              => 'SPVM::File::Copy',
   VERSION_FROM      => 'lib/SPVM/File/Copy.pm',
@@ -47,8 +47,8 @@ WriteMakefile(
   },
   PREREQ_PM         => {
     %configure_and_runtime_requires,
-    'SPVM::Sys' => '0.38',
-    'SPVM::IO' => '0.16',
+    'SPVM::Sys' => '0.531',
+    'SPVM::IO' => '0.232',
   },
   TEST_REQUIRES => {
     

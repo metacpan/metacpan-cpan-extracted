@@ -1,5 +1,11 @@
 Revision history for CGI-Untaint-CountyStateProvince-GB
 
+0.13	Fri Jan 24 08:13:26 EST 2025
+	Use Test::DescribeMe to simplify tests
+	Use gtar to create a distribution on Macs
+	Use Test::Needs
+	Added t/30-basics.t
+
 0.12	Tue Dec 10 21:16:53 EST 2019
 	Don't allow 'west berkshire'
 	Added some Gloucestershire abbreviations

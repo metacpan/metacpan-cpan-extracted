@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2024 Aspose.Cells Cloud
+Copyright (c) 2025 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -32,7 +32,7 @@ use utf8;
 use Log::Any qw($log);
 use Carp;
 
-use constant VERSION => '24.12';
+use constant VERSION => '25.1';
 
 =head1 Name
 
@@ -111,7 +111,7 @@ sub new {
 
 	# class/static variables
 	$p{http_timeout} //= 180;
-	$p{http_user_agent} //= 'Apose.Cells.Cloud.SDK/24.12/perl';
+	$p{http_user_agent} //= 'Apose.Cells.Cloud.SDK/25.1/perl';
 
 	# authentication setting
 	$p{api_key} //= {};

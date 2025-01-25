@@ -15,11 +15,13 @@ GetOptions(
     'help|h' => \my $help,
     'boolean=s' => \my $boolean,
     'cyclic' => \my $cyclic,
+    'duplicate-keys' => \my $duplicate_keys,
     'indent=i' => \my $indent,
     'width=i' => \my $width,
     'header!' => \my $header,
     'footer!' => \my $footer,
     'merge' => \my $merge,
+    'catchall' => \my $catchall,
     'perl' => \my $perl,
     'preserve|P=s' => \my $preserve,
     'module|M=s' => \my $module,
@@ -48,6 +50,9 @@ if ($merge) {
 }
 if ($perl) {
     push @schema, 'Perl';
+}
+if ($catchall) {
+    push @schema, 'Catchall';
 }
 
 my $preserve_order = 1;
@@ -131,6 +136,7 @@ sub _yamlpp {
         schema => \@schema,
         boolean => $boolean,
         cyclic_refs => $cyclic ? 'allow' : 'fatal',
+        duplicate_keys => $duplicate_keys ? 1 : 0,
         preserve => $preserve,
         indent => $indent,
         width => $width,
@@ -279,11 +285,13 @@ Usage:
 Options:
     --boolean=            'perl', 'JSON::PP', 'boolean'
     --cyclic              Allow cyclic references
+    --duplicate-keys      Allow duplicate keys
     --indent=             Number of spaces for indentation
     --width=              Maximum column width (only used in flow style for now)
     --[no-]header         Print '---' (default)
     --[no-]footer         Print '...'
     --merge               Enable loading merge keys '<<'
+    --catchall            Ignore any unknown tags
     --perl                Enable loading perl types and objects (use only
                           on trusted input!)
     --preserve, -P        Comma separated: 'order', 'scalar', 'flow', 'alias'.

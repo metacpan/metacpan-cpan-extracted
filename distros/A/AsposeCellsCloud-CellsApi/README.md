@@ -19,13 +19,12 @@ Enhance your Perl applications with the [Aspose.Cells Cloud](https://products.as
 - Import/Export: Facilitates importing data from various sources into spreadsheets and exporting spreadsheet data to other formats.
 - Security Management: Offers a range of security features like data encryption, access control, and permission management to safeguard the security and integrity of spreadsheet data.
 
-## Feature & Enhancements in Version 24.12
+## Feature & Enhancements in Version 25.1
 
 Full list of issues covering all changes in this release:
 
--  Add the new remove duplicates api.
--  Add the new extract text API.
--  The pivot filter could not be created successfully.
+- Add the new API for splitting text in the cell.
+- Optimize pivot table filter-related APIs.
 
 ## Support file format
 

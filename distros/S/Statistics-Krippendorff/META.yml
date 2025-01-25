@@ -1,0 +1,37 @@
+---
+abstract: "Calculate Krippendorff's alpha"
+author:
+  - 'E. Choroba <choroba@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  FindBin: '0'
+  Test2::V0: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Statistics-Krippendorff
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Statistics::Krippendorff:
+    file: lib/Statistics/Krippendorff.pm
+    version: '0.01'
+requires:
+  List::Util: '0'
+  Moo: '0'
+  experimental: '0'
+  namespace::clean: '0'
+  perl: '5.026'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/choroba/statistics-krippendorff.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

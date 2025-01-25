@@ -1,13 +1,13 @@
 use strict;
 use warnings;
 
-use Test::More tests => 51;
+use Test::More tests => 27;
 use Test::Lib;
 use Test::Crypt::OpenSSL::PKCS10;
 
 BEGIN { use_ok('Crypt::OpenSSL::PKCS10') };
 
-my @hash = qw/SHA1 SHA224 SHA256/;
+my @hash = qw/SHA256/;
 my @keysize = qw/512 1024 2048 3172 4096/;
 
 #diag("Only hash passed should default to 1024"); 

@@ -14,6 +14,8 @@ is($converter->convert('A4'), [9]);
 
 is($converter->convert('Cb4'), [-1]);
 is($converter->convert('C#4'), [1]);
+is($converter->convert('C##4'), [2]);
+is($converter->convert('C###4'), [3]);
 
 sub convert {
   my $converter = Music::Harmonica::TabsCreator::NoteToToneConverter->new;

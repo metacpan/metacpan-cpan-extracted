@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2024 Aspose.Cells Cloud
+Copyright (c) 2025 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# PostDigitalSignatureRequest.name : The file name.  ,
-# PostDigitalSignatureRequest.digitalsignaturefile : The digital signature file path should include both the folder and the file name, along with the extension.  ,
-# PostDigitalSignatureRequest.password : The password needed to open an Excel file.  ,
-# PostDigitalSignatureRequest.folder : The folder where the file is situated.  ,
-# PostDigitalSignatureRequest.storageName : The storage name where the file is situated.   
+# PostDigitalSignatureRequest.name :   ,
+# PostDigitalSignatureRequest.digitalsignaturefile :   ,
+# PostDigitalSignatureRequest.password :   ,
+# PostDigitalSignatureRequest.folder :   ,
+# PostDigitalSignatureRequest.storageName :    
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_digital_signature' } = { 
-    	summary => 'Excel file digital signature.',
+    	summary => '',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -133,35 +133,35 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The file name.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'digitalsignaturefile' => {
      	datatype => 'string',
      	base_name => 'digitalsignaturefile',
-     	description => 'The digital signature file path should include both the folder and the file name, along with the extension.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'password' => {
      	datatype => 'string',
      	base_name => 'password',
-     	description => 'The password needed to open an Excel file.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'The folder where the file is situated.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'The storage name where the file is situated.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},    

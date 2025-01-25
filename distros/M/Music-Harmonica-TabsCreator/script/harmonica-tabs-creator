@@ -7,13 +7,19 @@ use utf8;
 
 use lib '/usr/local/lib/perl5';  # To be used together with the cpanm command given in the README.md file.
 
+use Encode;
 use English;
-use Music::Harmonica::TabsCreator 'tune_to_tab_rendered';
+use Getopt::Long qw(VersionMessage :config no_ignore_case bundling);
+use Music::Harmonica::TabsCreator qw(tune_to_tab_rendered transpose_tab_rendered list_tunings);
+use Pod::Usage;
 
 our $VERSION = $Music::Harmonica::TabsCreator::VERSION; ## no critic (ProhibitComplexVersion,RequireConstantVersion)
 
 BEGIN {
   my $has_locale = eval { require Encode::Locale; Encode::Locale->import(); 1 };
+  if ($has_locale) {
+    Encode::Locale::decode_argv(Encode::FB_WARN);
+  }
   if (-t STDIN && $has_locale) {
     binmode STDIN, ':encoding(console_in)';  # console_in is set by the Encode::Locale module.
   } else {
@@ -31,13 +37,41 @@ BEGIN {
   }
 }
 
-my $sheet;
-{
-  local $INPUT_RECORD_SEPARATOR = undef;
-  $sheet = <>;
+my $transpose;
+my $max_bends = 0;
+my $list_tunings = 0;
+
+GetOptions(
+  'help|h' => sub { pod2usage(-verbose => 1, -exitval => 0) },
+  'helpfull|help-full|man' => sub { pod2usage(-verbose => 2, -exitval => 0) },
+  'version|v' => sub { VersionMessage(-exitval => 0) },
+  'transpose|transpose-from|t=s' => \$transpose,
+  'max-bends|b=i' => \$max_bends,
+  'list-tunings|l' => sub { $list_tunings = 1 },
+) or pod2usage(-verbose => 0, -exitval => 2);
+
+if ($list_tunings) {
+  print "Supported tunings (id: description (tags)):\n";
+  for my $t (list_tunings()) {
+    printf "- %s: %s tuning (%s)\n", $t->{id}, $t->{name}, join(', ', @{$t->{tags}});
+  }
+  exit 0;
 }
 
-say tune_to_tab_rendered($sheet);
+my $input;
+{
+  local $INPUT_RECORD_SEPARATOR = undef;
+  $input = <>;
+}
+
+if (defined $transpose) {
+  $transpose =~ m/^(.*?)(:?:.*)?$/
+      or die "Invalid argument for the --transpose option: ${transpose}\n";
+  my ($tuning, $key) = ($1, $2 // 'C');
+  say transpose_tab_rendered($input, $tuning, $key, max_bends => $max_bends);
+} else {
+  say tune_to_tab_rendered($input, max_bends => $max_bends);
+}
 
 exit 0;
 
@@ -53,7 +87,9 @@ harmonica-tabs-creator – Convert tunes into harmonica tabs.
 
 =head1 SYNOPSIS
 
-  harmonica-tabs-creator < input-tune.txt > output-tab.txt
+  harmonica-tabs-creator < input-tune.txt
+
+  harmonica-tabs-creator --transpose-from=richter:C < input-tab.txt
 
 =head1 DESCRIPTION
 
@@ -66,6 +102,29 @@ standard input and will write its output on the standard output.
 See the
 L<GitHub page|https://github.com/mkende/harmonica_tabs_creator> for details on
 the input format.
+
+=head1 OPTIONS
+
+=over
+
+=item --transpose-from=RICHTER:KEY, -t
+
+Transpose from an input tab, rather than from sheet music. The tab syntax must
+match the syntax used in the output of this program. The arguments to this
+option are the ID of an harmonica tuning and the key of the input tab. The list
+of supported IDs can be found with the C<--list-tunings> option. If the key is
+omitted, the key of C is assumed for the input.
+
+=item --max-bends=NUMBER, -b
+
+Maximum number of half-step of bending allowed to use in the generated tabs.
+Default to 0.
+
+=item --list-tunings, -l
+
+List the supported harmonica tunings.
+
+=back
 
 =head1 AUTHOR
 

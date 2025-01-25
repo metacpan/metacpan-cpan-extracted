@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2024 Aspose.Cells Cloud
+Copyright (c) 2025 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,12 +59,12 @@ sub new {
 
 
 # Run Operation Request
-# GetWorksheetColumnsRequest.name : The file name.  ,
-# GetWorksheetColumnsRequest.sheetName : The worksheet name.  ,
-# GetWorksheetColumnsRequest.offset : The workdook folder.  ,
+# GetWorksheetColumnsRequest.name :   ,
+# GetWorksheetColumnsRequest.sheetName :   ,
+# GetWorksheetColumnsRequest.offset :   ,
 # GetWorksheetColumnsRequest.count :   ,
-# GetWorksheetColumnsRequest.folder : The folder where the file is situated.  ,
-# GetWorksheetColumnsRequest.storageName : The storage name where the file is situated.   
+# GetWorksheetColumnsRequest.folder :   ,
+# GetWorksheetColumnsRequest.storageName :    
 
 {
     my $params = {
@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_columns' } = { 
-    	summary => 'Retrieve descriptions of worksheet columns.',
+    	summary => '',
         params => $params,
         returns => 'ColumnsResponse',
     };
@@ -140,21 +140,21 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The file name.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => 'The worksheet name.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'offset' => {
      	datatype => 'int',
      	base_name => 'offset',
-     	description => 'The workdook folder.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
@@ -168,14 +168,14 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'The folder where the file is situated.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'The storage name where the file is situated.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},    

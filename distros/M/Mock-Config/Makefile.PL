@@ -56,5 +56,14 @@ sub depend {
   "
 README : \$(VERSION_FROM)
 	pod2text \$(VERSION_FROM) > README
+
+release : xtest dist
+	-git tag -f \$(VERSION)
+	cpan-upload \$(DISTVNAME).tar\$(SUFFIX)
+	git push
+	git push --tags
+
+xtest :
+	\$(MAKE) test RELEASE_TESTING=1
 "
 }

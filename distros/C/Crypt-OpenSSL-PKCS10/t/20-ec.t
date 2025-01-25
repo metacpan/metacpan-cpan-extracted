@@ -41,7 +41,7 @@ like($output, qr/email:timlegge\@gmail.com/, "email matched");
 
 
 {
-my $req_new_ecc_pem = Crypt::OpenSSL::PKCS10->new({ type => "ec", curve => 'secp112r1', hash => 'SHA256' });
+my $req_new_ecc_pem = Crypt::OpenSSL::PKCS10->new({ type => "ec", curve => 'secp384r1', hash => 'SHA256' });
 $req_new_ecc_pem->set_subject("/C=CA/O=Crypt::OpenSSL::PKCS10/OU=Perl module");
 $req_new_ecc_pem->add_ext(Crypt::OpenSSL::PKCS10::NID_key_usage,"critical,digitalSignature,keyEncipherment");
 $req_new_ecc_pem->add_ext(Crypt::OpenSSL::PKCS10::NID_ext_key_usage,"serverAuth, nsSGC, msSGC, 1.3.4");
@@ -53,7 +53,7 @@ ok ($req_new_ecc_pem, "Successfully created EC based CSR");
 
 my $output = get_openssl_output($req_new_ecc_pem->get_pem_req());
 
-like($output, qr/ASN1 OID: secp112r1/, "ASN1 OID: secp112r1");
+like($output, qr/ASN1 OID: secp384r1/, "ASN1 OID: secp384r1");
 like($output, qr/X509v3 Key Usage: critical/, "X509v3 Key Usage: critical");
 like($output, qr/Digital Signature, Key Encipherment/, "Digital Signature, Key Encipherment");
 like($output, qr/Subject.*Crypt::OpenSSL::PKCS10.*Perl module/, "Subject matched");

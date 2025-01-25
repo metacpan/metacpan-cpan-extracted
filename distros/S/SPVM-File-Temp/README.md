@@ -1,4 +1,4 @@
 # SPVM::File::Temp
 
-SPVM::File::Temp is a SPVM module.
+<a href="https://metacpan.org/pod/SPVM::File::Temp">SPVM::File::Temp - CPAN</a>
 

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Exception;
 
-our $VERSION = 'v0.38.0'; # VERSION
+our $VERSION = 'v0.38.1'; # VERSION
 
 use overload '""' => \&to_string;
 

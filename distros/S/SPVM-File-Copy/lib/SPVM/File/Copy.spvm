@@ -2,7 +2,7 @@
 # MIT License
 
 class File::Copy {
-  version "0.021";
+  version "0.022";
   
   use Sys::IO::Stat;
   use Sys::IO;
@@ -32,11 +32,11 @@ class File::Copy {
     my $offset = 0;
     
     while (1) {
-      my $read_length = $from_io_file->sysread($buffer, $size);
+      my $read_length = $from_io_file->read($buffer, $size);
       if ($read_length == 0) {
         last;
       }
-      $to_io_file->syswrite($buffer, $read_length);
+      $to_io_file->write($buffer, $read_length);
     }
     
     $from_io_file->close;

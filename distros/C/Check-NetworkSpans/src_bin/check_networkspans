@@ -1,0 +1,344 @@
+#!perl
+
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+use Getopt::Long qw(:config no_ignore_case);
+use Pod::Usage;
+use Check::NetworkSpans;
+
+=head1 NAME
+
+check_networkspans - Check interfaces to see if we are getting span traffic.
+
+=head1 SYNOPSIS
+
+check_networkspans B<-s> <span ports> [B<-s> <span ports>] [B<-i> <ignore IP>] [B<-a> <0/1>]
+[B<-S> <seconds>] [B<-p> <packets>] [B<-P> <port>] [B<-A> <port>] [--debug]
+
+check_networkspans -h/--help
+
+check_networkspans -v/--version
+
+=head1 DESCRIPTION
+
+A nagios style check to see if a the specified spans are seeing traffic or not.
+
+=head1 FLAGS, GENERAL
+
+=head2 -a <0/1>
+
+If the first IP on each interface, for all interfaces on the machine not
+just spans, should be ignored.
+
+Default :: 1
+
+=head2 -A <port>
+
+Additional ports to look for. Will be appended to -P if used or other wise will be appended
+to the defaults.
+
+=head2 -S <seconds>
+
+Max time the test should run for in seconds.
+
+Default :: 120
+
+=head2 -i <ignore IP>
+
+A IPv4 or IPv6 address to ignore.
+
+May be used more than once.
+
+=head2 -p <packets>
+
+Number of packets to capture for the test. This is the number of total packets to capture
+across all interfaces of a span.
+
+Default :: 5000
+
+=head2 -P <port>
+
+A port to check for. To specify more than one poart use -P mulitple times.
+
+Default :: 22, 53, 80, 88, 135, 389, 443, 445, 3389, 3306, 5432
+
+=head2 -s <span ports>
+
+A comma seperated list of ports to look for traffic on.
+
+May be used more than once.
+
+If one of the items in the list starts with %, that will be used as the
+name of the span. It will not be used as a interface.
+
+Starting and leading spaces and tabs for each interface is removed.
+
+=head2 --debug
+
+Enable debugging.
+
+=head1 FLAGS, ALERT CONTROL
+
+Levels are as below.
+
+    - 0 :: OK
+    - 1 :: WARNING
+    - 2 :: ALERT
+    - 3 :: ERROR
+
+If you want to ignore a alert type entirely, set the level to 0.
+
+=head2 -n <level>
+
+No packets.
+
+Default :: 2
+
+=head2 -N <interface>
+
+A interface to ignore for no packets.
+
+My be specified multiple times for more than one.
+
+Default :: undef
+
+=head2 -l <level>
+
+Low packets.
+
+Default :: 1
+
+=head2 -L <span>
+
+A span or span name to ignore for low packets.
+
+My be specified multiple times for more than one.
+
+Default :: undef
+
+=head2 -d <level>
+
+No streams, meaning no bi directional traffic TCP/UDP
+between IPs found.
+
+Default :: 2
+
+=head -D <span>
+
+A span name or span to ignore for no streams.
+
+My be specified multiple times for more than one.
+
+Default :: undef
+
+=head2 -m <level>
+
+Missing interface.
+
+Default :: 2
+
+=head -M <interface>
+
+A interface to ignore for missing interface.
+
+My be specified multiple times for more than one.
+
+Default :: undef
+
+=head -c <level>
+
+Port check.
+
+Default :: 1
+
+=head2 -C <span>
+
+A span or span name to ignore for port checks..
+
+My be specified multiple times for more than one.
+
+Default :: undef
+
+=cut
+
+sub version {
+	print 'check_networkspans v. ' . $Check::NetworkSpans::VERSION . "\n";
+}
+
+sub help {
+	pod2usage( -exitval => 255, -verbose => 2, -output => \*STDOUT );
+}
+
+my $help;
+my $version;
+my $auto_ignore = 1;
+my $duration;
+my @ignore_IPs;
+my $packets;
+my @opt_spans;
+my @ports;
+my @additional_ports;
+my $no_packets;
+my @no_packets_to_ignore;
+my $low_packets;
+my @low_packets_to_ignore;
+my $no_streams;
+my @no_streams_to_ignore;
+my $missing_interface;
+my @missing_interface_to_ignore;
+my $port_check;
+my @port_check_to_ignore;
+my $debug = 0;
+GetOptions(
+	'version' => \$version,
+	'v'       => \$version,
+	'help'    => \$help,
+	'h'       => \$help,
+	'a=s'     => \$auto_ignore,
+	'A=s'     => \@additional_ports,
+	'S=s'     => \$duration,
+	'i=s'     => \@ignore_IPs,
+	'p=s'     => \$packets,
+	'P=s'     => \@ports,
+	'n=s'     => \$no_packets,
+	'N=s'     => \@no_packets_to_ignore,
+	'l=s'     => \$low_packets,
+	'L=s'     => \@low_packets_to_ignore,
+	'd=s'     => \$no_streams,
+	'D=s'     => \@no_streams_to_ignore,
+	'm=s'     => \$missing_interface,
+	'M=s'     => \@missing_interface_to_ignore,
+	'c=s'     => \$port_check,
+	'C=s'     => \@port_check_to_ignore,
+	's=s'     => \@opt_spans,
+	'debug'   => \$debug,
+);
+
+if ($help) {
+	&help;
+	exit 255;
+}
+if ($version) {
+	&version;
+	exit 255;
+}
+
+if ($debug) {
+	$ENV{CHECK_NETWORKSPANS_DEBUG} = 1;
+}
+
+if ( !defined( $opt_spans[0] ) ) {
+	die('No spans specified via -s');
+}
+
+# put together the span
+my @spans;
+my @span_names;
+my $span_int  = 0;
+foreach my $span (@opt_spans) {
+	my @span_split = split( /,/, $span );
+
+	my @span_set;
+	my $span_name = undef;
+	foreach my $interface (@span_split) {
+		$interface =~ s/^[\ \t]*//;
+		$interface =~ s/[\ \t]*$//;
+
+		if ( $interface =~ /^\%/ ) {
+			$interface =~ s/^\%//;
+			$span_names[$span_int] = $interface;
+			$span_name = $interface;
+		} else {
+			push( @span_set, $interface );
+		}
+
+	} ## end foreach my $interface (@span_split)
+
+	if ($debug) {
+		print 'DEBUG: span=' . join( ',', @span_set ) . ' span_name=' . $span_name . "\n";
+	}
+
+	push( @spans, \@span_set );
+	$span_int++;
+} ## end foreach my $span (@opt_spans)
+
+if ($debug) {
+	print "DEBUG: calling Check::NetworkSpans->new ...";
+}
+my $span_checker = Check::NetworkSpans->new(
+	debug                       => $debug,
+	spans                       => \@spans,
+	ignore_IPs                  => \@ignore_IPs,
+	auto_ignore                 => $auto_ignore,
+	packets                     => $packets,
+	duration                    => $duration,
+	ports                       => \@ports,
+	additional_ports            => \@additional_ports,
+	span_names                  => \@span_names,
+	no_packets                  => $no_packets,
+	no_packets_to_ignore        => \@no_packets_to_ignore,
+	low_packets                 => $low_packets,
+	low_packets_to_ignore       => \@low_packets_to_ignore,
+	no_streams                  => $no_streams,
+	no_streams_to_ignore        => \@no_streams_to_ignore,
+	missing_interface           => $missing_interface,
+	missing_interface_to_ignore => \@missing_interface_to_ignore,
+	port_check                  => $port_check,
+	port_check_to_ignore        => \@port_check_to_ignore,
+);
+if ($debug) {
+	print "DEBUG: Check::NetworkSpans initiated... Dumping...\n";
+	eval 'use Data::Dumper; print Dumper($span_checker);';
+	print "DEBUG: Dumping finished.\n";
+}
+
+my $results;
+if ($debug) {
+	print "DEBUG: calling Check::NetworkSpans->check ...\n";
+}
+eval { $results = $span_checker->check; };
+if ($@) {
+	warn( '$span_checker->check died ... ' . $@ );
+	exit 3;
+}
+if ($debug) {
+	print "DEBUG: Check::NetworkSpans->check finished... Dumping results...";
+	eval 'use Data::Dumper; print Dumper($results);';
+	print "DEBUG: Dumping finished.\n";
+}
+if ( !defined($results) ) {
+	warn('undef returned by $span_checker->check');
+	exit 3;
+}
+
+my $exit_val = 0;
+my $oks      = '';
+my $status   = '';
+if ( defined( $results->{oks}[0] ) ) {
+	$status = 'OK - ' . join( "\nOK - ", @{ $results->{oks} } ) . "\n";
+}
+if ( defined( $results->{warnings}[0] ) ) {
+	$status   = $status . 'WARNING - ' . join( "\nWARNING - ", @{ $results->{warnings} } ) . "\n";
+	$exit_val = 1;
+}
+if ( defined( $results->{criticals}[0] ) ) {
+	$status   = $status . 'CRITICAL - ' . join( "\nALERT - ", @{ $results->{criticals} } ) . "\n";
+	$exit_val = 2;
+}
+if ( defined( $results->{errors}[0] ) ) {
+	$status   = $status . 'ERROR - ' . join( "\nERROR - ", @{ $results->{errors} } ) . "\n";
+	$exit_val = 3;
+}
+if ( defined( $results->{ignored}[0] ) ) {
+	$status = $status . 'IGNORED - ' . join( "\nIGNORED - ", @{ $results->{errors} } ) . "\n";
+}
+
+if ( $status eq '' ) {
+	$status = "OK\n";
+}
+
+print $status;
+
+exit $exit_val;

@@ -20,7 +20,7 @@ provides:
     file: lib/AsposeCellsCloud/ApiFactory.pm
   AsposeCellsCloud::CellsApi:
     file: lib/AsposeCellsCloud/CellsApi.pm
-    version: 24.12
+    version: 25.1
   AsposeCellsCloud::Configuration:
     file: lib/AsposeCellsCloud/Configuration.pm
   AsposeCellsCloud::Role:
@@ -681,6 +681,8 @@ provides:
     file: lib/AsposeCellsCloud/Object/ScopeItem.pm
   AsposeCellsCloud::Object::ScopeOptions:
     file: lib/AsposeCellsCloud/Object/ScopeOptions.pm
+  AsposeCellsCloud::Object::SplitTextOptions:
+    file: lib/AsposeCellsCloud/Object/SplitTextOptions.pm
   AsposeCellsCloud::Object::TrimContentOptions:
     file: lib/AsposeCellsCloud/Object/TrimContentOptions.pm
   AsposeCellsCloud::Object::WordCaseOptions:
@@ -1391,6 +1393,8 @@ provides:
     file: lib/AsposeCellsCloud/Request/PostRemoveDuplicatesRequest.pm
   AsposeCellsCloud::Request::PostExtractTextRequest:
     file: lib/AsposeCellsCloud/Request/PostExtractTextRequest.pm
+  AsposeCellsCloud::Request::PostSplitTextRequest:
+    file: lib/AsposeCellsCloud/Request/PostSplitTextRequest.pm
   AsposeCellsCloud::Request::GetWorkbookDefaultStyleRequest:
     file: lib/AsposeCellsCloud/Request/GetWorkbookDefaultStyleRequest.pm
   AsposeCellsCloud::Request::GetWorkbookTextItemsRequest:
@@ -1582,5 +1586,5 @@ requires:
   strict: '0'
   utf8: '0'
   warnings: '0'
-version: 24.12
+version: 25.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

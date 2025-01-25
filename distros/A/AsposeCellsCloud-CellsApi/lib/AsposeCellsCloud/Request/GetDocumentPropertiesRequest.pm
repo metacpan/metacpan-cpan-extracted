@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2024 Aspose.Cells Cloud
+Copyright (c) 2025 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,10 +59,10 @@ sub new {
 
 
 # Run Operation Request
-# GetDocumentPropertiesRequest.name : The workbook name.  ,
-# GetDocumentPropertiesRequest.type : Excel property type.  ,
-# GetDocumentPropertiesRequest.folder : The folder where the file is situated.  ,
-# GetDocumentPropertiesRequest.storageName : The storage name where the file is situated.   
+# GetDocumentPropertiesRequest.name :   ,
+# GetDocumentPropertiesRequest.type :   ,
+# GetDocumentPropertiesRequest.folder :   ,
+# GetDocumentPropertiesRequest.storageName :    
 
 {
     my $params = {
@@ -73,7 +73,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_document_properties' } = { 
-    	summary => 'Retrieve descriptions of Excel file properties.',
+    	summary => '',
         params => $params,
         returns => 'CellsDocumentPropertiesResponse',
     };
@@ -128,28 +128,28 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'type' => {
      	datatype => 'string',
      	base_name => 'type',
-     	description => 'Excel property type.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'The folder where the file is situated.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'The storage name where the file is situated.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},    

@@ -24,14 +24,17 @@ no_index:
     - author
     - builder
 provides:
+  App::Greple::annotate:
+    file: lib/App/Greple/annotate.pm
+    version: '0.9901'
   App::Greple::charcode:
     file: lib/App/Greple/charcode.pm
-    version: '0.99'
+    version: '0.9901'
   Local::Annon:
-    file: lib/App/Greple/charcode.pm
+    file: lib/App/Greple/annotate.pm
 requires:
   App::Greple: '9.20'
-  Getopt::EX::Config: '0.99'
+  Getopt::EX::Config: '0.9901'
   Hash::Util: '0'
   Text::ANSI::Fold::Util: '0'
   Unicode::UCD: '0'
@@ -40,7 +43,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/greple-charcode/issues
   homepage: https://github.com/kaz-utashiro/greple-charcode
   repository: https://github.com/kaz-utashiro/greple-charcode.git
-version: '0.99'
+version: '0.9901'
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

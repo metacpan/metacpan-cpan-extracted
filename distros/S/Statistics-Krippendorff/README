@@ -1,0 +1,45 @@
+Statistics-Krippendorff
+
+A Perl distribution to calculate Krippendorff's alpha coefficient to
+measure inter-coder agreement.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Statistics::Krippendorff
+
+You can also look for information at:
+
+    GitHub (report bugs here)
+        https://github.com/choroba/statistics-krippendorff
+
+    Search CPAN
+        https://metacpan.org/release/Statistics-Krippendorff
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Statistics-Krippendorff
+
+    RT, CPAN's request tracker (bugs could be reported here, too)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Statistics-Krippendorff
+
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2025 by E. Choroba.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

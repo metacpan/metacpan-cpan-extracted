@@ -2,6 +2,8 @@
 # MIT License
 
 class File::Temp::Dir {
+  version_from File::Temp;
+  
   use File::Path;
   
   allow File::Temp;

@@ -4,7 +4,7 @@ use 5.024;
 use warnings;
 use utf8;
 
-our $VERSION = "0.99";
+our $VERSION = "0.9901";
 
 =encoding utf-8
 
@@ -19,18 +19,18 @@ B<greple> B<-Mcharcode> ...
 B<greple> B<-Mcharcode> [ I<module option> ] -- [ I<greple option> ] ...
 
   MODULE OPTIONS
-    --[no-]col    display column number
+    --[no-]column display column number
     --[no-]char   display character itself
     --[no-]width  display width
     --[no-]code   display character code
     --[no-]name   display character name
-    --[no-]align  align annotation
+    --align=#     align annotation
 
-    --config KEY[=VALUE],... (KEY: col, char, width, code, name, align)
+    --config KEY[=VALUE],... (KEY: column, char, width, code, name, align)
 
 =head1 VERSION
 
-Version 0.99
+Version 0.9901
 
 =head1 DESCRIPTION
 
@@ -78,6 +78,43 @@ character.  This module allows you to see how it is done.
 
 =end html
 
+=head1 MODULE OPTIONS
+
+=over 7
+
+=item B<-->[B<no->]B<column>
+
+Show column number.
+Default B<true>.
+
+=item B<-->[B<no->]B<char>
+
+Show the character itself.
+Default B<false>.
+
+=item B<-->[B<no->]B<width>
+
+Show the width.
+Default B<false>.
+
+=item B<-->[B<no->]B<code>
+
+Show the character code in hex.
+Default B<true>.
+
+=item B<-->[B<no->]B<name>
+
+Show the Unicode name of the character.
+Default B<true>.
+
+=item B<--align>=I<column>
+
+Align annotation messages.  Defaults to C<1>, which aligns to the
+rightmost column; C<0> means no align; if a value of C<2> or greater
+is given, it aligns to that numbered column.
+
+=back
+
 =head1 CONFIGURATION
 
 Configuration parameters can be set in several ways.
@@ -91,27 +128,17 @@ the module declaration.
 
     greple -Mcharcode::config=width,name=0
 
-=head2 MODULE PRIVATE OPTION
+=head2 PRIVATE MODULE OPTION
 
 Module-specific options are specified between C<-Mcharcode> and C<-->.
 
     greple -Mcharcode --config width,name=0 -- ...
 
-=head2 COMMAND LINE OPTION
-
-Command line option C<--charcode::config> and C<--config> can be used.
-The long option is to avoid option name conflicts when multiple
-modules are used.
-
-    greple -Mcharcode --charcode::config width,name=0
-
-    greple -Mcharcode --config width,name=0
-
 =head1 CONFIGURATION PARAMETERS
 
 =over 7
 
-=item B<col>
+=item B<column>
 
 (default 1)
 Show column number.
@@ -136,42 +163,24 @@ Show the character code in hex.
 (default 1)
 Show the Unicode name of the character.
 
-=item B<align>
+=item B<align>=I<column>
 
 (default 1)
 Align the description on the same column.
 
 =back
 
-=head1 MODULE OPTIONS
-
-The configuration parameters above have corresponding module options.
-For example, the name parameter can be switched by the C<--name> and
-C<--no-name> options.
-
-=over 7
-
-=item B<--col>, B<--no-col>
-
-=item B<--char>, B<--no-char>
-
-=item B<--width>, B<--no-width>
-
-=item B<--code>, B<--no-code>
-
-=item B<--name>, B<--no-name>
-
-=item B<--align>, B<--no-align>
-
-=back
-
 =head1 INSTALL
 
-cpanm -n B<App::Greple::charcode>
+    cpanm -n App::Greple::charcode
 
 =head1 SEE ALSO
 
 L<App::Greple>
+
+L<App::Greple::charcode>
+
+L<App::Greple::annotate>
 
 =head1 LICENSE
 
@@ -189,27 +198,33 @@ Kazumasa Utashiro
 use Getopt::EX::Config qw(config);
 use Hash::Util qw(lock_keys);
 
+use App::Greple::annotate;
+
 my $config = Getopt::EX::Config->new(
-    col   => 1,
-    char  => 0,
-    width => 0,
-    code  => 1,
-    name  => 1,
-    align => 1,
+    column => 1,
+    char   => 0,
+    width  => 0,
+    code   => 1,
+    name   => 1,
+    align  => \$App::Greple::annotate::config->{align},
 );
+my %type = ( align => '=i', '*' => '!' );
 lock_keys %{$config};
 
 sub finalize {
     our($mod, $argv) = @_;
     $config->deal_with(
 	$argv,
-	map { ( "$_!" => \$config->{$_} ) } keys %{$config}
+	(
+	    map {
+		my $type = $type{$_} // $type{'*'};
+		( $_.$type => ref $config->{$_} ? $config->{$_} : \$config->{$_} ) ;
+	    }
+	    keys %{$config}
+	),
     );
 }
 
-use Text::ANSI::Fold::Util qw(ansi_width);
-Text::ANSI::Fold->configure(expand => 1);
-*vwidth = \&ansi_width;
 use Unicode::UCD qw(charinfo);
 use Data::Dumper;
 
@@ -245,85 +260,18 @@ sub describe {
     join "\N{NBSP}", @s;
 }
 
-package Local::Annon {
-    sub new {
-	my $class = shift;
-	@_ == 3 or die;
-	bless [ @_ ], $class;
-    }
-    sub start         { shift->[0] }
-    sub end           { shift->[1] }
-    sub annon :lvalue { shift->[2] }
-}
-
-sub prepare {
-    our @annotation;
-    my $grep = shift;
-    for my $r ($grep->result) {
-	my($b, @match) = @$r;
-	my @slice = $grep->slice_result($r);
-	my $start = 0;
-	my $progress = '';
-	my $indent = '';
-	my @annon;
-	while (my($i, $slice) = each @slice) {
-	    my $end = $slice eq '' ? $start : vwidth($progress . $slice);
-	    my $gap = $end - $start;
-	    my $indent_mark = '';
-	    if ($i % 2) {
-		$indent_mark = '│';
-		my $head = '┌';
-		if ($gap == 0) {
-		    if (@annon > 0 and $annon[-1]->end == $start) {
-			$head = '├';
-			$start = $annon[-1]->start;
-			substr($indent, $start) = '';
-		    } elsif ($start > 0) {
-			$start = vwidth($progress =~ s/\X\z//r);
-			substr($indent, $start) = '';
-		    }
-		}
-		my $column = $config->{col} ? sprintf("%3d ", $start) : '';
-		my $out = sprintf("%s%s─ %s%s",
-				  $indent,
-				  $head,
-				  $column,
-				  describe($slice));
-		push @annon, Local::Annon->new($start, $end, $out);
-	    }
-	    $indent .= sprintf("%-*s", $end - $start, $indent_mark);
-	    $progress .= $slice;
-	    $start = $end;
-	}
-	@annon or next;
-	if ($config->{align} and (my $max_pos = $annon[-1][0])) {
-	    for (@annon) {
-		if ((my $extend = $max_pos - $_->[0]) > 0) {
-		    $_->annon =~ s/(?=([─]))/$1 x $extend/e;
-		}
-	    }
-	}
-	push @annotation, map $_->annon, @annon;
-    }
-}
-
 sub annotate {
-    our @annotation;
-    say shift(@annotation) if @annotation > 0;
-    undef;
+    my %param = @_;
+    my $annon = '';
+    $annon .= sprintf("%3d ", $param{column}) if $config->{column};
+    $annon .= describe($param{match});
+    $annon;
 }
+
+$App::Greple::annotate::ANNOTATE = \&annotate;
 
 1;
 
 __DATA__
 
-option default --separate --annotate --uniqcolor
-
-option --annotate \
-    --postgrep '&__PACKAGE__::prepare' \
-    --callback '&__PACKAGE__::annotate'
-
-option --charcode::config \
-    --prologue &__PACKAGE__::config($<shift>)
-
-option --config --charcode::config
+option default -Mannotate --separate --uniqcolor

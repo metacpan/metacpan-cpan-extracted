@@ -2,7 +2,7 @@
 # MIT License
 
 class File::Temp {
-  version "0.022";
+  version "0.023";
   
   use File::Temp::Dir;
   use Fn;

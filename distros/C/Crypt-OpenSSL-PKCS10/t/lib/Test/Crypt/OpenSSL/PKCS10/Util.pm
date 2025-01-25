@@ -9,7 +9,7 @@ use Test::More;
 use File::Slurper qw/ write_text /;
 use File::Temp qw/ tempfile /;
 use File::Spec::Functions;
-use Crypt::OpenSSL::Guess qw/find_openssl_prefix find_openssl_exec/;
+use Crypt::OpenSSL::Guess qw/openssl_version find_openssl_prefix find_openssl_exec/;
 
 use Crypt::OpenSSL::PKCS10;
 
@@ -25,7 +25,7 @@ my $configfile = catfile($1, 'openssl.cnf');
 
 if (! -e "$configfile") {
 	$configfile = ' -config t\\openssl.cnf';
-	$ENV{'OPENSSL_CONF'} = 't\openssl.cnf';
+    $ENV{'OPENSSL_CONF'} = 't\\openssl.cnf';
 } else {
     $configfile = '';
 }
@@ -33,6 +33,7 @@ if (! -e "$configfile") {
 our @ISA    = qw(Exporter);
 our @EXPORT = qw(
     get_openssl_output
+    openssl_version
  );
 
 our @EXPORT_OK;

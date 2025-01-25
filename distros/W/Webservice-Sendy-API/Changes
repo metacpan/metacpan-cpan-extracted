@@ -12,12 +12,12 @@
 0.3	Mon Dec 30 07:00:33 PM UTC 2024
 	- POD tweaks
 
-0.4	Thu Jan 2 07:00:33 PM UTC 2024
+0.4	Thu Jan 02 07:00:33 PM UTC 2025
 	- completed "create" support, which was
 	  lacking a final message on success
 	- POD tweaks
 
-0.5	Thu Jan 2 08:00:33 PM UTC 2024
+0.5	Thu Jan 02 08:00:33 PM UTC 2025
 	- made "track_opens" and "track_clicks"
 	  enabled by default; added option params
 	  "no_track_opens" and "no_track_clicks"
@@ -28,3 +28,16 @@
 	  send, only sending immediately via the
 	  "send_campaign" parameter (and cli flag,
 	  "--send_campaign".
+
+0.6	Fri Jan 24 09:00:00 PM UTC 2025
+	- added "--html_file" to the sendy client
+	  for passing in body content that is to
+	  large for the shell's argument length
+	  limit
+	- if "--html_file" and "--html_text" are
+	  both passed, there is a warning via STDERR
+	  and the file contents override the text
+	  sent via "--html_text"
+
+0.7	Fri Jan 24 10:00:00 PM UTC 2025
+	- fixed minor issue

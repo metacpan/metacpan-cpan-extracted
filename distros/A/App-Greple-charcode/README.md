@@ -10,18 +10,18 @@ App::Greple::charcode - greple module to annotate unicode character data
 **greple** **-Mcharcode** \[ _module option_ \] -- \[ _greple option_ \] ...
 
     MODULE OPTIONS
-      --[no-]col    display column number
+      --[no-]column display column number
       --[no-]char   display character itself
       --[no-]width  display width
       --[no-]code   display character code
       --[no-]name   display character name
-      --[no-]align  align annotation
+      --align=#     align annotation
 
-      --config KEY[=VALUE],... (KEY: col, char, width, code, name, align)
+      --config KEY[=VALUE],... (KEY: column, char, width, code, name, align)
 
 # VERSION
 
-Version 0.99
+Version 0.9901
 
 # DESCRIPTION
 
@@ -67,6 +67,39 @@ character.  This module allows you to see how it is done.
     </p>
 </div>
 
+# MODULE OPTIONS
+
+- **--**\[**no-**\]**column**
+
+    Show column number.
+    Default **true**.
+
+- **--**\[**no-**\]**char**
+
+    Show the character itself.
+    Default **false**.
+
+- **--**\[**no-**\]**width**
+
+    Show the width.
+    Default **false**.
+
+- **--**\[**no-**\]**code**
+
+    Show the character code in hex.
+    Default **true**.
+
+- **--**\[**no-**\]**name**
+
+    Show the Unicode name of the character.
+    Default **true**.
+
+- **--align**=_column_
+
+    Align annotation messages.  Defaults to `1`, which aligns to the
+    rightmost column; `0` means no align; if a value of `2` or greater
+    is given, it aligns to that numbered column.
+
 # CONFIGURATION
 
 Configuration parameters can be set in several ways.
@@ -80,25 +113,15 @@ the module declaration.
 
     greple -Mcharcode::config=width,name=0
 
-## MODULE PRIVATE OPTION
+## PRIVATE MODULE OPTION
 
 Module-specific options are specified between `-Mcharcode` and `--`.
 
     greple -Mcharcode --config width,name=0 -- ...
 
-## COMMAND LINE OPTION
-
-Command line option `--charcode::config` and `--config` can be used.
-The long option is to avoid option name conflicts when multiple
-modules are used.
-
-    greple -Mcharcode --charcode::config width,name=0
-
-    greple -Mcharcode --config width,name=0
-
 # CONFIGURATION PARAMETERS
 
-- **col**
+- **column**
 
     (default 1)
     Show column number.
@@ -123,31 +146,22 @@ modules are used.
     (default 1)
     Show the Unicode name of the character.
 
-- **align**
+- **align**=_column_
 
     (default 1)
     Align the description on the same column.
 
-# MODULE OPTIONS
-
-The configuration parameters above have corresponding module options.
-For example, the name parameter can be switched by the `--name` and
-`--no-name` options.
-
-- **--col**, **--no-col**
-- **--char**, **--no-char**
-- **--width**, **--no-width**
-- **--code**, **--no-code**
-- **--name**, **--no-name**
-- **--align**, **--no-align**
-
 # INSTALL
 
-cpanm -n **App::Greple::charcode**
+    cpanm -n App::Greple::charcode
 
 # SEE ALSO
 
 [App::Greple](https://metacpan.org/pod/App%3A%3AGreple)
+
+[App::Greple::charcode](https://metacpan.org/pod/App%3A%3AGreple%3A%3Acharcode)
+
+[App::Greple::annotate](https://metacpan.org/pod/App%3A%3AGreple%3A%3Aannotate)
 
 # LICENSE
 

@@ -18,11 +18,9 @@ Daje::Workflow::Database::Model - is the data models used by Daje-Workflow
 
      my $context = $self->context();
 
+     $data->insert_history("History");
+
 # REQUIRES
-
-Daje::Workflow::Database::Model::Context
-
-Daje::Workflow::Database::Model::Workflow
 
 Mojo::Base
 
@@ -37,6 +35,8 @@ Mojo::Base
     save_context($self)
 
     save_workflow($self, $workflow)
+
+    insert_history($self, $history_text, $class = " ", $internal =  1)
 
 # AUTHOR
 

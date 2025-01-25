@@ -8,15 +8,15 @@ use AsposeCellsCloud::Request::PostClearContents;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**name** | **string** | The file name. |
-**sheet_name** | **string** | The worksheet name. |
-**range** | **string** | Represents the range to which the specified cells applies. |
-**start_row** | **int** | The start row index. |
-**start_column** | **int** | The start column index. |
-**end_row** | **int** | The end row index. |
-**end_column** | **int** | The end column index. |
-**folder** | **string** | The folder where the file is situated. |
-**storage_name** | **string** | The storage name where the file is situated. |  
+**name** | **string** |  |
+**sheet_name** | **string** |  |
+**range** | **string** |  |
+**start_row** | **int** |  |
+**start_column** | **int** |  |
+**end_row** | **int** |  |
+**end_column** | **int** |  |
+**folder** | **string** |  |
+**storage_name** | **string** |  |  
 
 [[Back to Model list]](../README.md#documentation-for-requests) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

@@ -1,9 +1,9 @@
 This archive contains the distribution Crypt-PostgreSQL,
-version 0.01:
+version 0.02:
 
   generate PostgreSQl password hashes
 
-This software is copyright (c) 2025 by Guido Brugnara <brugnara@cpan.org>.
+This software is copyright (c) 2025 by Guido Brugnara <gdo@leader.it>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

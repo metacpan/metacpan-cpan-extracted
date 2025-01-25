@@ -11,11 +11,11 @@ CGI::Untaint::CountyStateProvince::GB - Add British counties to CGI::Untaint::Co
 
 # VERSION
 
-Version 0.12
+Version 0.13
 
 # SYNOPSIS
 
-Adds a list of British counties to the list of counties/state/provinces
+Adds a list of British counties to the list of counties/states/provinces
 which are known by the CGI::Untaint::CountyStateProvince validator so that
 an HTML form sent by CGI contains a valid county.
 
@@ -25,13 +25,14 @@ CGI::Untaint, otherwise it won't work.
     use CGI::Info;
     use CGI::Untaint;
     use CGI::Untaint::CountyStateProvince::GB;
+
     my $info = CGI::Info->new();
     my $u = CGI::Untaint->new($info->params());
     # Succeeds if state = 'Kent', fails if state = 'Queensland';
     $u->extract(-as_CountyStateProvince => 'state');
     # ...
 
-# SUBSOUTINES/METHODS
+# SUBROUTINES/METHODS
 
 ## is\_valid
 
@@ -39,8 +40,9 @@ Validates the data. See CGI::Untaint::is\_valid.
 
 ## value
 
-Sets the raw data which is to be validated.  Called by the superclass, you
-are unlikely to want to call it.
+Sets the raw data to be validated.
+Called by the superclass,
+you are unlikely to want to call it.
 
 # AUTHOR
 
@@ -48,13 +50,15 @@ Nigel Horne, `<njh at bandsman.co.uk>`
 
 # BUGS
 
-Please report any bugs or feature requests to `bug-cgi-untaint-csp-gb at rt.cpan.org`, or through
-the web interface at [http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CGI-Untaint-CountyStateProvince](http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CGI-Untaint-CountyStateProvince).  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests to `bug-cgi-untaint-csp-gb at rt.cpan.org`
+or through the web interface at [http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CGI-Untaint-CountyStateProvince](http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CGI-Untaint-CountyStateProvince).
+I will be notified,
+and then you'll
+automatically be notified of the progress on your bug as I make changes.
 
 # SEE ALSO
 
-CGI::Untaint::CountyStateProvince, CGI::Untaint
+[CGI::Untaint::CountyStateProvince](https://metacpan.org/pod/CGI%3A%3AUntaint%3A%3ACountyStateProvince), [CGI::Untaint](https://metacpan.org/pod/CGI%3A%3AUntaint), [Locale::SubCountry](https://metacpan.org/pod/Locale%3A%3ASubCountry)
 
 # SUPPORT
 
@@ -68,10 +72,6 @@ You can also look for information at:
 
     [http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Untaint-CountyStateProvince-GB](http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Untaint-CountyStateProvince-GB)
 
-- CPAN Ratings
-
-    [http://cpanratings.perl.org/d/CGI-Untaint-CountyStateProvince-GB](http://cpanratings.perl.org/d/CGI-Untaint-CountyStateProvince-GB)
-
 - Search CPAN
 
     [http://search.cpan.org/dist/CGI-Untaint-CountyStateProvince-GB](http://search.cpan.org/dist/CGI-Untaint-CountyStateProvince-GB)
@@ -80,6 +80,6 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2012-19 Nigel Horne.
+Copyright 2012-2025 Nigel Horne.
 
 This program is released under the following licence: GPL2

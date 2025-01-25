@@ -1,5 +1,45 @@
 Revision history for Perl extension Crypt::OpenSSL::PKCS10.
 
+0.34 -- Fri Jan 24 20:26:55 AST 2025
+
+    [Significant updates since 0.31]
+    - Updates for openssl 1.0 versions
+    - Merged a minor Fedora patch for the Change log for correct UTF-8 names
+    - Ah the good old days when SHA1 was good enough :-). RHEL, Fedora, SUSE
+    - etc. have more secure configurations so many of the digests and curves
+    - tested would fail - So test only a reduced set (based on Fedora 42+)
+
+    [Change Log]
+    - 47bea5b Increment version for a release
+    - 0acc30e v0.33
+    - 30872b6 Update repo version
+
+0.33 -- Thu Jan 23 22:33:34 AST 2025
+
+    [Significant updates since 0.31]
+    - Updates for openssl 1.0 versions
+    - Merged a minor Fedora patch for the Change log for correct UTF-8 names
+    - Ah the good old days when SHA1 was good enough :-). RHEL, Fedora, SUSE
+    - etc. have more secure configurations so many of the digests and curves
+    - tested would fail - So test only a reduced set (based on Fedora 42+)
+
+    [Change Log]
+    - c1c525e Test for a reduced subset of digests and curves reflecting newer congigurations
+    - 8fa0449 v0.32
+
+0.32 -- Wed Jan 22 23:44:37 AST 2025
+
+    [Significant updates since 0.31]
+    - Updates of openssl 1.0 versions
+    - Merged a minor Fedora patch for the Change log for correct UTF-8 names
+
+    [Change Log]
+    - 97cc793 Increment Repo Version
+    - 7ecf5a1 Fix tests for openssl 1.0 builds
+    - 7b68beb Convert changlog to UTF-8
+    - 14487c8 OpenSSL 1.0 fixes
+    - 1fc238a v0.31
+
 0.31 -- Wed Jan 22 06:40:39 AST 2025
 
     [Significant updates since 0.26]
@@ -179,10 +219,10 @@ Revision history for Perl extension Crypt::OpenSSL::PKCS10.
 
 0.18  Thu Mar 10 17:31:59 PST 2022
         - Improve Makefile.PL to detect LIBS and INC values automatically (thanks Michal Josef Špaček)
-        - Fix failing tests with OpenSSL 3 (Petr Pisar)
+        - Fix failing tests with OpenSSL 3 (Petr Písař)
 
 0.16  Mon Oct 17 09:36:48 PDT 2016
-        - OpenSSL 1.1.0 support (thanks Petr P�sar)
+        - OpenSSL 1.1.0 support (thanks Petr Písař)
 
 0.15  Fri Aug  7 23:12:46 PDT 2015
         - UTF-8 subject support. (Adam Osuchowski)

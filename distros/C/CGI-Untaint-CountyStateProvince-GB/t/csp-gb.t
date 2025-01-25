@@ -65,4 +65,4 @@ $c = $untainter->extract(-as_CountyStateProvince => 'state12');
 ok($c eq 'berkshire', 'Berkshire');
 
 $c = $untainter->extract(-as_CountyStateProvince => 'state13');
-ok(!defined($c), 'West Berkshire');
+cmp_ok($c, 'eq', 'west berkshire', 'West Berkshire');

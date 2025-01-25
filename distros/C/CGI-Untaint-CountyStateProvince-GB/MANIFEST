@@ -3,9 +3,11 @@ ignore.txt
 lib/CGI/Untaint/CountyStateProvince/GB.pm
 Makefile.PL
 MANIFEST
+MANIFEST.SKIP
 README
 README.md
 t/00-load.t
+t/30-basics.t
 t/boiler.t
 t/changes.t
 t/coverage.t

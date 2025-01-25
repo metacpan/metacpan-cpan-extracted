@@ -10,9 +10,36 @@ use Carp();
 
 use base qw(Exporter);
 our @EXPORT_OK = qw(is_holiday holidays);
-our $VERSION   = '0.32';
+our $VERSION   = '0.33';
 
-sub _DEFAULT_STATE { return 'VIC' }
+sub _DEFAULT_STATE                        { return 'VIC' }
+sub _LOCALTIME_YEAR_IDX                   { return 5 }
+sub _LOCALTIME_BASE_YEAR                  { return 1900 }
+sub _AUSTRALIA_DAY_IN_JANUARY             { return 26 }
+sub _THIRD_DAY_OF_EASTER                  { return 3 }
+sub _FOURTH_DAY_OF_EASTER                 { return 4 }
+sub _ANZAC_DAY_IN_APRIL                   { return 25 }
+sub _CHRISTMAS_DAY_IN_DECEMBER            { return 25 }
+sub _APRIL_MONTH_NUMBER                   { return 4 }
+sub _OCTOBER_MONTH_NUMBER                 { return 10 }
+sub _NOVEMBER_MONTH_NUMBER                { return 11 }
+sub _DECEMBER_MONTH_NUMBER                { return 12 }
+sub _YEAR_OF_QUEEN_ELIZABETHS_DEATH       { return 2022 }
+sub _DAYS_IN_JANUARY                      { return 31 }
+sub _DAYS_IN_MARCH                        { return 31 }
+sub _DAYS_IN_APRIL                        { return 30 }
+sub _DAYS_IN_MAY                          { return 31 }
+sub _DAYS_IN_JUNE                         { return 30 }
+sub _DAYS_IN_JULY                         { return 31 }
+sub _DAYS_IN_AUGUST                       { return 31 }
+sub _DAYS_IN_SEPTEMBER                    { return 30 }
+sub _DAYS_IN_OCTOBER                      { return 31 }
+sub _DAYS_IN_NOVEMBER                     { return 30 }
+sub _DAYS_IN_DECEMBER                     { return 31 }
+sub _THURSDAY                             { return 4 }
+sub _FRIDAY                               { return 5 }
+sub _SATURDAY                             { return 6 }
+sub _STARTING_YEAR_FOR_NSW_ADDITIONAL_DAY { return 2012 }
 
 my %allowed_states = (
     VIC => 1,
@@ -30,8 +57,8 @@ sub holidays {
     if ( ( exists $params{year} ) && ( defined $params{year} ) ) {
     }
     else {
-        $params{year} = (localtime)[5];
-        $params{year} += 1900;
+        $params{year} = (localtime)[ _LOCALTIME_YEAR_IDX() ];
+        $params{year} += _LOCALTIME_BASE_YEAR();
     }
     if ( $params{year} !~ /^\d{1,4}$/smx ) {
         Carp::croak(
@@ -75,21 +102,20 @@ sub holidays {
             if (   ( ref $params{holidays} )
                 && ( ( ref $params{holidays} ) eq 'ARRAY' ) )
             {
-                foreach my $allowed ( @{ $params{holidays} } ) {
-                    $allowed = lc $allowed;
-                    $allowed =~ s/\s*//smxg;
-                    if ( $allowed eq 'devonportcup' ) {
-                        foreach my $holiday ( _compute_devonport_cup($year) )
-                        {    # TAS devonport cup
-                            $holidays{$holiday} = 'Devonport Cup';
-                        }
-                    }
-                }
             }
             else {
                 Carp::croak(
                     q[Holidays parameter must be a reference to an array]);
             }
+        }
+        else {
+            $params{holidays} = [];
+        }
+        %holidays = _check_tas_holidays( $params{holidays}, $year, %holidays );
+    }
+    elsif ( $state eq 'ACT' ) {
+        foreach my $holiday ( _compute_canberra_day($year) ) {    # canberra day
+            $holidays{$holiday} = 'Canberra Day';
         }
     }
     foreach my $holiday ( _compute( 1, 1, $year, { 'day_in_lieu' => 1 } ) )
@@ -101,7 +127,12 @@ sub holidays {
             $holidays{$holiday} = 'New Years Day Holiday';
         }
     }
-    foreach my $holiday ( _compute( 26, 1, $year, { 'day_in_lieu' => 1 } ) )
+    foreach my $holiday (
+        _compute(
+            _AUSTRALIA_DAY_IN_JANUARY(),
+            1, $year, { 'day_in_lieu' => 1 }
+        )
+      )
     {    # australia day
         if ( $holiday eq '0126' ) {
             $holidays{$holiday} = 'Australia Day';
@@ -131,74 +162,33 @@ sub holidays {
             $holidays{$holiday} = 'Adelaide Cup Day';
         }
     }
-    elsif ( $state eq 'ACT' ) {
-        foreach my $holiday ( _compute_canberra_day($year) ) {    # canberra day
-            $holidays{$holiday} = 'Canberra Day';
-        }
-    }
-    elsif ( $state eq 'TAS' ) {
-        if ( exists $params{holidays} ) {
-            foreach my $allowed ( @{ $params{holidays} } ) {
-                $allowed = lc $allowed;
-                $allowed =~ s/\s*//smxg;
-                if ( $allowed eq 'devonportcup' ) {
-                    foreach my $holiday ( _compute_devonport_cup($year) )
-                    {    # TAS devonport cup
-                        $holidays{$holiday} = 'Devonport Cup';
-                    }
-                }
-                elsif ( $allowed eq 'hobartregatta' ) {
-                    foreach my $holiday ( _compute_hobart_regatta($year) )
-                    {    # TAS hobart regatta
-                        $holidays{$holiday} = 'Hobart Regatta';
-                    }
-                }
-                elsif ( $allowed eq 'launcestoncup' ) {
-                    foreach my $holiday ( _compute_launceston_cup($year) )
-                    {    # TAS launceston cup
-                        $holidays{$holiday} = 'Launceston Cup';
-                    }
-                }
-                elsif ( $allowed eq 'kingislandshow' ) {
-                    foreach my $holiday ( _compute_king_island_show($year) )
-                    {    # TAS king island show
-                        $holidays{$holiday} = 'King Island Show';
-                    }
-                }
-            }
-        }
-        foreach my $holiday ( _compute_eight_hours_day($year) )
-        {    # TAS eight hours day
-            $holidays{$holiday} = 'Eight Hours Day';
-        }
-    }
+    my %easter_day_name = (
+        0                       => 'Good Friday',
+        1                       => 'Easter Saturday',
+        2                       => 'Easter Sunday',
+        _THIRD_DAY_OF_EASTER()  => 'Easter Monday',
+        _FOURTH_DAY_OF_EASTER() => 'Easter Tuesday',
+    );
     my $count = 0;
     foreach my $holiday ( _compute_easter( $year, $state ) ) {    # easter
-        if ( $count == 0 ) {
-            $holidays{$holiday} = 'Good Friday';
-        }
-        elsif ( $count == 1 ) {
-            $holidays{$holiday} = 'Easter Saturday';
-        }
-        elsif ( $count == 2 ) {
-            $holidays{$holiday} = 'Easter Sunday';
-        }
-        elsif ( $count == 3 ) {
-            $holidays{$holiday} = 'Easter Monday';
-        }
-        else {
-            $holidays{$holiday} = 'Easter Tuesday';
-        }
+        $holidays{$holiday} = $easter_day_name{$count};
         $count += 1;
     }
     if ( ( $state eq 'VIC' ) || ( $state eq 'TAS' ) || ( $state eq 'NSW' ) ) {
-        foreach my $holiday ( _compute( 25, 4, $year ) ) {    # ANZAC day
+        foreach my $holiday (
+            _compute( _ANZAC_DAY_IN_APRIL(), _APRIL_MONTH_NUMBER(), $year ) )
+        {    # ANZAC day
             $holidays{$holiday} = 'Anzac Day';
         }
     }
     else {
-        foreach my $holiday ( _compute( 25, 4, $year, { 'day_in_lieu' => 1 } ) )
-        {                                                     # ANZAC day
+        foreach my $holiday (
+            _compute(
+                _ANZAC_DAY_IN_APRIL(), _APRIL_MONTH_NUMBER(),
+                $year, { 'day_in_lieu' => 1 }
+            )
+          )
+        {    # ANZAC day
             if ( $holiday eq '0425' ) {
                 $holidays{$holiday} = 'Anzac Day';
             }
@@ -241,7 +231,7 @@ sub holidays {
     else {
         foreach my $holiday ( _compute_royal_bday($year) )
         {    # King's Birthday day
-            if ( $year <= 2022 ) {
+            if ( $year <= _YEAR_OF_QUEEN_ELIZABETHS_DEATH() ) {
                 $holidays{$holiday} = q[Queen's Birthday];
             }
             else {
@@ -263,9 +253,11 @@ sub holidays {
         }
     }
     elsif ( $state eq 'QLD' ) {
-        unless ( ( exists $params{no_show_day} )
+        if (   ( exists $params{no_show_day} )
             && ( $params{no_show_day} ) )
         {
+        }
+        else {
             foreach my $holiday ( _compute_qld_show_day($year) )
             {    # Queensland Show day
                 $holidays{$holiday} = 'Queensland Show Day';
@@ -292,7 +284,7 @@ sub holidays {
     elsif ( $state eq 'WA' ) {
         foreach my $holiday ( _compute_wa_royal_bday($year) )
         {    # WA Queens Birthday day
-            if ( $year <= 2022 ) {
+            if ( $year <= _YEAR_OF_QUEEN_ELIZABETHS_DEATH() ) {
                 $holidays{$holiday} = q[Queen's Birthday];
             }
             else {
@@ -379,6 +371,55 @@ sub holidays {
     return ( \%holidays );
 }
 
+sub _check_tas_holidays {
+    my ( $param_holidays, $year, %holidays ) = @_;
+    foreach my $allowed ( @{$param_holidays} ) {
+        $allowed = lc $allowed;
+        $allowed =~ s/\s*//smxg;
+        if ( $allowed eq 'devonportcup' ) {
+            foreach my $holiday ( _compute_devonport_cup($year) )
+            {    # TAS devonport cup
+                $holidays{$holiday} = 'Devonport Cup';
+            }
+        }
+    }
+    if ( defined $param_holidays ) {
+        foreach my $allowed ( @{$param_holidays} ) {
+            $allowed = lc $allowed;
+            $allowed =~ s/\s*//smxg;
+            if ( $allowed eq 'devonportcup' ) {
+                foreach my $holiday ( _compute_devonport_cup($year) )
+                {    # TAS devonport cup
+                    $holidays{$holiday} = 'Devonport Cup';
+                }
+            }
+            elsif ( $allowed eq 'hobartregatta' ) {
+                foreach my $holiday ( _compute_hobart_regatta($year) )
+                {    # TAS hobart regatta
+                    $holidays{$holiday} = 'Hobart Regatta';
+                }
+            }
+            elsif ( $allowed eq 'launcestoncup' ) {
+                foreach my $holiday ( _compute_launceston_cup($year) )
+                {    # TAS launceston cup
+                    $holidays{$holiday} = 'Launceston Cup';
+                }
+            }
+            elsif ( $allowed eq 'kingislandshow' ) {
+                foreach my $holiday ( _compute_king_island_show($year) )
+                {    # TAS king island show
+                    $holidays{$holiday} = 'King Island Show';
+                }
+            }
+        }
+    }
+    foreach my $holiday ( _compute_eight_hours_day($year) )
+    {    # TAS eight hours day
+        $holidays{$holiday} = 'Eight Hours Day';
+    }
+    return %holidays;
+}
+
 sub is_holiday {
     my ( $year, $month, $day, $state, $params ) = @_;
     if ( !defined $state ) {
@@ -411,13 +452,19 @@ sub is_holiday {
     }
 }
 
-my @days_in_month = ( 31, 0, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 )
-  ;    # feb will be calculated locally
+my @days_in_month = (
+    _DAYS_IN_JANUARY(),   0,
+    _DAYS_IN_MARCH(),     _DAYS_IN_APRIL(),
+    _DAYS_IN_MAY(),       _DAYS_IN_JUNE(),
+    _DAYS_IN_JULY(),      _DAYS_IN_AUGUST(),
+    _DAYS_IN_SEPTEMBER(), _DAYS_IN_OCTOBER(),
+    _DAYS_IN_NOVEMBER(),  _DAYS_IN_DECEMBER(),
+);    # feb will be calculated locally
 
 sub _compute_christmas_hash {
     my ( $year, $state ) = @_;
-    my $day   = 25;
-    my $month = 12;
+    my $day   = _CHRISTMAS_DAY_IN_DECEMBER();
+    my $month = _DECEMBER_MONTH_NUMBER();
     my $date  = Time::Local::timelocal( 0, 0, 0, $day, ( $month - 1 ), $year );
     my ( $sec, $min, $hour, undef, undef, undef, $wday, $yday, $isdst ) =
       localtime $date;
@@ -438,14 +485,16 @@ sub _compute_christmas_hash {
         'date' => sprintf '%02d%02d',
         $month, ( $day + 1 ),
       };
-    if ( $wday == 5 ) {    # Christmas is on a Friday
+    if ( $wday == _FRIDAY() ) {    # Christmas is on a Friday
         push @holidays,
           {
             'name' => "$boxing_day Holiday",
             'date' => sprintf '%02d%02d',
             $month, ( $day + 2 ),
           };
-        if ( ( $state eq 'NSW' ) && ( $year > 2011 ) ) {
+        if (   ( $state eq 'NSW' )
+            && ( $year >= _STARTING_YEAR_FOR_NSW_ADDITIONAL_DAY() ) )
+        {
             push @holidays,
               {
                 'name' => 'Additional Day',
@@ -454,7 +503,7 @@ sub _compute_christmas_hash {
               };
         }
     }
-    elsif ( $wday == 6 ) {    # Christmas is on a Saturday
+    elsif ( $wday == _SATURDAY() ) {    # Christmas is on a Saturday
         push @holidays,
           {
             'name' => 'Christmas Day Holiday',
@@ -467,7 +516,9 @@ sub _compute_christmas_hash {
             'date' => sprintf '%02d%02d',
             $month, ( $day + 3 ),
           };
-        if ( ( $state eq 'NSW' ) && ( $year > 2011 ) ) {
+        if (   ( $state eq 'NSW' )
+            && ( $year >= _STARTING_YEAR_FOR_NSW_ADDITIONAL_DAY() ) )
+        {
             push @holidays,
               {
                 'name' => 'Additional Day',
@@ -483,7 +534,9 @@ sub _compute_christmas_hash {
             'date' => sprintf '%02d%02d',
             $month, ( $day + 2 ),
           };
-        if ( ( $state eq 'NSW' ) && ( $year > 2011 ) ) {
+        if (   ( $state eq 'NSW' )
+            && ( $year >= _STARTING_YEAR_FOR_NSW_ADDITIONAL_DAY() ) )
+        {
             push @holidays,
               {
                 'name' => 'Additional Day',
@@ -533,7 +586,7 @@ sub _compute_nt_show_day_hash {
     while ( $fridays < $num_fridays ) {
         ( $sec, $min, $hour, undef, undef, undef, $wday, $yday, $isdst ) =
           localtime $date;
-        if ( $wday == 5 ) {
+        if ( $wday == _FRIDAY() ) {
             $fridays += 1;
         }
         if ( $fridays < $num_fridays ) {
@@ -586,15 +639,15 @@ sub _compute_qld_show_day
 sub _compute_devonport_show
 { # friday nearest last day in november, but not later than first day in december
     my ($year) = @_;
-    my $month  = 10;
+    my $month  = _NOVEMBER_MONTH_NUMBER() - 1;
     my $day    = $days_in_month[$month];
     my $date   = Time::Local::timelocal( 0, 0, 0, $day, $month, $year );
     my ( $sec, $min, $hour, $wday, $yday, $isdst );
     ( $sec, $min, $hour, undef, undef, undef, $wday, $yday, $isdst ) =
       localtime $date;
-    if ( $wday == 4 ) {    # thursday
+    if ( $wday == _THURSDAY() ) {    # thursday
         $day   = 1;
-        $month = 11;
+        $month = _NOVEMBER_MONTH_NUMBER();
     }
     else {
         my %adjustment = ( 0 => 2, 1 => 3, 2 => 4, 3 => 5, 5 => 0, 6 => 1 );
@@ -606,7 +659,7 @@ sub _compute_devonport_show
 sub _compute_devonport_cup
 {  # wednesday not earlier than fifth and not later than the eleventh of January
     my ($year) = @_;
-    my $day    = 5;
+    my $day    = _FRIDAY();
     my $month  = 0;
     my $date   = Time::Local::timelocal( 0, 0, 0, $day, $month, $year );
     my ( $sec, $min, $hour, $wday, $yday, $isdst );
@@ -908,6 +961,7 @@ sub _compute_vic_grand_final_eve_day {    # i have no words ...
         2022 => { day => 23, month => 8 },
         2023 => { day => 29, month => 8 },
         2024 => { day => 27, month => 8 },
+        2025 => { day => 26, month => 8 },
     );
     if ( $year < 2015 ) {
         return ();
@@ -1166,12 +1220,14 @@ sub _compute_wa_royal_bday
         2023 => { day => 25, month => 8 },
         2024 => { day => 23, month => 8 },
         2025 => { day => 29, month => 8 },
+        2026 => { day => 28, month => 8 },
+        2027 => { day => 27, month => 8 },
     );
     if ( $wa_royal_bday{$year} ) {
         $day   = $wa_royal_bday{$year}{day};
         $month = $wa_royal_bday{$year}{month};
     }
-    elsif ( $year <= 2022 ) {
+    elsif ( $year <= _YEAR_OF_QUEEN_ELIZABETHS_DEATH() ) {
         Carp::croak(
             q[Don't know how to calculate Queen's Birthday in WA for this year]
         );
@@ -1281,7 +1337,7 @@ Date::Holidays::AU - Determine Australian Public Holidays
 
 =head1 VERSION
  
-Version 0.32
+Version 0.33
 
 =head1 SYNOPSIS
 
@@ -1309,9 +1365,9 @@ is a holiday according to the state and the additional parameters.
 
 =item holidays(year => $year, state => $state, %params)
 
-Returns a hashref of all defined holidays in the year according
-to the state and the additional parameters. Keys in the hashref
-are in 'mmdd' format, the values are the names of the
+Returns a hash reference of all defined holidays in the year according
+to the state and the additional parameters. Keys in the hash reference
+are in 'mm/dd' format, the values are the names of the
 holidays.
 
 The states must be one of the allowed L<ISO 3166-2:AU|https://en.wikipedia.org/wiki/ISO_3166-2:AU> codes; 'VIC','WA','NT','QLD','TAS','NSW','SA' or 'ACT'.  The
@@ -1330,7 +1386,7 @@ for each state;
 
 =head1 DEPENDENCIES
 
-Uses B<Date::Easter> for easter calculations. Makes use of the B<Time::Local>
+Uses B<Date::Easter> for Easter calculations. Makes use of the B<Time::Local>
 modules from the standard Perl distribution.
 
 =head1 CONFIGURATION AND ENVIRONMENT

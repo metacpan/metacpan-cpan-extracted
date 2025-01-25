@@ -339,8 +339,10 @@ int get_ec_curve_by_name(char * curve) {
 		nid = NID_X9_62_prime256v1;
 	} else
 		nid = OBJ_sn2nid(curve);
+#if OPENSSL_VERSION_NUMBER >= 0x10200000L
 		if (nid == 0)
 			nid = EC_curve_nist2nid(curve);
+#endif
 		if (nid == 0) {
 			croak("unknown curve name (%s)\n", curve);
 	}
@@ -443,17 +445,62 @@ _new(class, keylen, options )
 	if (pk == NULL)
 		croak ("%s: Unable to generate a %s key for %s", classname,
             type, ((strncmp(type, "rsa", strlen("rsa")) == 0) ? hash : curve) );
-#elif OPENSSL_VERSION_NUMBER <= 0x10000000L
-	if (strncmp (type, "ec", strlen("ec")) == 0)
-		croak("EC unsupported for your version of OpenSSL");
-    RSA *rsa;
-	if ((pk=EVP_PKEY_new()) == NULL)
-		croak ("%s - EVP_PKEY_new failed", classname);
+#elif OPENSSL_VERSION_NUMBER < 0x10200000L
+	if (strncmp (type, "rsa", strlen("ec")) == 0) {
+		RSA *rsa;
+		if ((pk=EVP_PKEY_new()) == NULL)
+			croak ("%s - EVP_PKEY_new failed", classname);
 
-	rsa=RSA_generate_key(keylen, RSA_F4, NULL, NULL);
-	if (!EVP_PKEY_assign_RSA(pk,rsa))
-		croak ("%s: Unable to generate a %s key for %s", classname,
-            type, ((strncmp(type, "rsa", strlen("rsa")) == 0) ? hash : curve) );
+		rsa=RSA_generate_key(keylen, RSA_F4, NULL, NULL);
+		if (!EVP_PKEY_assign_RSA(pk,rsa))
+			croak ("%s: Unable to generate a %s key for %s", classname,
+            	type, ((strncmp(type, "rsa", strlen("rsa")) == 0) ? hash : curve) );
+	} else { 
+		int asn1_flag = OPENSSL_EC_NAMED_CURVE;
+		int nid;
+		/*
+		 * workaround for the SECG curve names secp192r1 and secp256r1 (which
+		 * are the same as the curves prime192v1 and prime256v1 defined in
+		 * X9.62)
+		*/
+		if (!strcmp(curve, "secp192r1")) {
+			printf("using curve name prime192v1 instead of secp192r1\n");
+			nid = NID_X9_62_prime192v1;
+		} else if (!strcmp(curve, "secp256r1")) {
+			printf("using curve name prime256v1 instead of secp256r1\n");
+			nid = NID_X9_62_prime256v1;
+		} else
+			nid = OBJ_sn2nid(curve);
+		if (nid == 0) {
+			croak("unknown curve name (%s)\n", curve);
+		}
+		EC_GROUP *group = EC_GROUP_new_by_curve_name(nid);
+		point_conversion_form_t my_form = POINT_CONVERSION_UNCOMPRESSED;
+		if (group == NULL) {
+			croak("unable to create curve (%s)\n", curve);
+		}
+		EC_GROUP_set_asn1_flag(group, asn1_flag);
+		EC_GROUP_set_point_conversion_form(group, my_form);
+		EC_KEY *eckey = EC_KEY_new();
+		if (eckey == NULL)
+			croak("EC_KEY_new failed");
+		if (RAND_status() == 0)
+			croak("Insufficient Randomness");
+		if (EC_KEY_set_group(eckey, group) == 0)
+			croak("EC_KEY_set_group failed\n");
+		if (!EC_KEY_generate_key(eckey)) {
+			EC_KEY_free(eckey);
+			croak("EC_KEY_generate_key failed\n");
+		}
+		BIO *out = NULL;
+		out = BIO_new(BIO_s_mem());
+		if(!i2d_ECPrivateKey_bio(out, eckey))
+			croak("i2d_ECPrivateKey_bio failed");
+		pk = d2i_PrivateKey_bio(out, NULL);
+		if (pk == NULL)
+			croak("d2i_PrivateKey_bio failed");
+	        BIO_free(out);
+	}
 #else
 	if (RAND_status() == 0)
 		croak("%s: Insufficient Randomness", classname);

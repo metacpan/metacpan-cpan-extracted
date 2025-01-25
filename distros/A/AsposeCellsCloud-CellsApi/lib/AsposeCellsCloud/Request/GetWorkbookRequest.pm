@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2024 Aspose.Cells Cloud
+Copyright (c) 2025 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,19 +59,19 @@ sub new {
 
 
 # Run Operation Request
-# GetWorkbookRequest.name : The file name.  ,
-# GetWorkbookRequest.format : The conversion format(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers).  ,
-# GetWorkbookRequest.password : The password needed to open an Excel file.  ,
-# GetWorkbookRequest.isAutoFit : Specifies whether set workbook rows to be autofit.  ,
-# GetWorkbookRequest.onlySaveTable : Specifies whether only save table data.Only use pdf to excel.  ,
-# GetWorkbookRequest.folder : The folder where the file is situated.  ,
-# GetWorkbookRequest.outPath : Path to save the result. If it`s a single file, the `outPath` should encompass both the filename and extension. In the case of multiple files, the `outPath` should only include the folder.  ,
-# GetWorkbookRequest.storageName : The storage name where the file is situated.  ,
-# GetWorkbookRequest.outStorageName : The storage name where the output file is situated.  ,
-# GetWorkbookRequest.checkExcelRestriction : Whether check restriction of excel file when user modify cells related objects.  ,
-# GetWorkbookRequest.region : The regional settings for workbook.  ,
-# GetWorkbookRequest.pageWideFitOnPerSheet : The page wide fit on worksheet.  ,
-# GetWorkbookRequest.pageTallFitOnPerSheet : The page tall fit on worksheet.   
+# GetWorkbookRequest.name :   ,
+# GetWorkbookRequest.format :   ,
+# GetWorkbookRequest.password :   ,
+# GetWorkbookRequest.isAutoFit :   ,
+# GetWorkbookRequest.onlySaveTable :   ,
+# GetWorkbookRequest.folder :   ,
+# GetWorkbookRequest.outPath :   ,
+# GetWorkbookRequest.storageName :   ,
+# GetWorkbookRequest.outStorageName :   ,
+# GetWorkbookRequest.checkExcelRestriction :   ,
+# GetWorkbookRequest.region :   ,
+# GetWorkbookRequest.pageWideFitOnPerSheet :   ,
+# GetWorkbookRequest.pageTallFitOnPerSheet :    
 
 {
     my $params = {
@@ -82,7 +82,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_workbook' } = { 
-    	summary => 'Retrieve workbooks in various formats.',
+    	summary => '',
         params => $params,
         returns => 'string',
     };
@@ -173,91 +173,91 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The file name.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'format' => {
      	datatype => 'string',
      	base_name => 'format',
-     	description => 'The conversion format(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers).',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'password' => {
      	datatype => 'string',
      	base_name => 'password',
-     	description => 'The password needed to open an Excel file.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'is_auto_fit' => {
      	datatype => 'string',
      	base_name => 'isAutoFit',
-     	description => 'Specifies whether set workbook rows to be autofit.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'only_save_table' => {
      	datatype => 'string',
      	base_name => 'onlySaveTable',
-     	description => 'Specifies whether only save table data.Only use pdf to excel.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'The folder where the file is situated.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'out_path' => {
      	datatype => 'string',
      	base_name => 'outPath',
-     	description => 'Path to save the result. If it`s a single file, the `outPath` should encompass both the filename and extension. In the case of multiple files, the `outPath` should only include the folder.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'The storage name where the file is situated.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'out_storage_name' => {
      	datatype => 'string',
      	base_name => 'outStorageName',
-     	description => 'The storage name where the output file is situated.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'check_excel_restriction' => {
      	datatype => 'string',
      	base_name => 'checkExcelRestriction',
-     	description => 'Whether check restriction of excel file when user modify cells related objects.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'region' => {
      	datatype => 'string',
      	base_name => 'region',
-     	description => 'The regional settings for workbook.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'page_wide_fit_on_per_sheet' => {
      	datatype => 'string',
      	base_name => 'pageWideFitOnPerSheet',
-     	description => 'The page wide fit on worksheet.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'page_tall_fit_on_per_sheet' => {
      	datatype => 'string',
      	base_name => 'pageTallFitOnPerSheet',
-     	description => 'The page tall fit on worksheet.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},    

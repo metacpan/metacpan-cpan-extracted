@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2024 Aspose.Cells Cloud
+Copyright (c) 2025 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,10 +59,10 @@ sub new {
 
 
 # Run Operation Request
-# GetWorksheetPivotTablesRequest.name : The file name.  ,
-# GetWorksheetPivotTablesRequest.sheetName : The worksheet name.  ,
-# GetWorksheetPivotTablesRequest.folder : The folder where the file is situated.  ,
-# GetWorksheetPivotTablesRequest.storageName : The storage name where the file is situated.   
+# GetWorksheetPivotTablesRequest.name :   ,
+# GetWorksheetPivotTablesRequest.sheetName :   ,
+# GetWorksheetPivotTablesRequest.folder :   ,
+# GetWorksheetPivotTablesRequest.storageName :    
 
 {
     my $params = {
@@ -73,7 +73,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_pivot_tables' } = { 
-    	summary => 'Retrieve descriptions of pivottables  in the worksheet.',
+    	summary => '',
         params => $params,
         returns => 'PivotTablesResponse',
     };
@@ -130,28 +130,28 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The file name.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => 'The worksheet name.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'The folder where the file is situated.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'The storage name where the file is situated.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},    

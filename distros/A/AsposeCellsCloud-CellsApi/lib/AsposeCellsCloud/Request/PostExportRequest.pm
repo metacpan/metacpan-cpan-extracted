@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2024 Aspose.Cells Cloud
+Copyright (c) 2025 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -60,11 +60,11 @@ sub new {
 
 # Run Operation Request
 # PostExportRequest.File : File to upload  ,
-# PostExportRequest.objectType : Exported object type:workbook/worksheet/chart/comment/picture/shape/listobject/oleobject.  ,
-# PostExportRequest.format : The conversion format(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers).  ,
-# PostExportRequest.password : The password needed to open an Excel file.  ,
-# PostExportRequest.checkExcelRestriction : Whether check restriction of excel file when user modify cells related objects.  ,
-# PostExportRequest.region : The regional settings for workbook.   
+# PostExportRequest.objectType :   ,
+# PostExportRequest.format :   ,
+# PostExportRequest.password :   ,
+# PostExportRequest.checkExcelRestriction :   ,
+# PostExportRequest.region :    
 
 {
     my $params = {
@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_export' } = { 
-    	summary => 'Export Excel internal elements or the workbook itself to various format files.',
+    	summary => '',
         params => $params,
         returns => 'FilesResult',
     };
@@ -150,35 +150,35 @@ __PACKAGE__->method_documentation({
      'object_type' => {
      	datatype => 'string',
      	base_name => 'objectType',
-     	description => 'Exported object type:workbook/worksheet/chart/comment/picture/shape/listobject/oleobject.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'format' => {
      	datatype => 'string',
      	base_name => 'format',
-     	description => 'The conversion format(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers).',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'password' => {
      	datatype => 'string',
      	base_name => 'password',
-     	description => 'The password needed to open an Excel file.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'check_excel_restriction' => {
      	datatype => 'string',
      	base_name => 'checkExcelRestriction',
-     	description => 'Whether check restriction of excel file when user modify cells related objects.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'region' => {
      	datatype => 'string',
      	base_name => 'region',
-     	description => 'The regional settings for workbook.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},    

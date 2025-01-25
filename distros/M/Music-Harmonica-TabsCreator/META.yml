@@ -41,5 +41,5 @@ requires:
 resources:
   bugtracker: https://github.com/mkende/harmonica_tabs_creator/issues
   repository: https://github.com/mkende/harmonica_tabs_creator
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,6 +1,6 @@
 package SPVM::File::Copy;
 
-our $VERSION = "0.021";
+our $VERSION = "0.022";
 
 1;
 
@@ -10,9 +10,7 @@ SPVM::File::Copy - Copying and Moving Files
 
 =head1 Description
 
-C<SPVM::File::Copy> is the C<File::Copy> class in L<SPVM> language.
-
-C<File::Copy> providdes the features to copy and move files.
+File::Copy class in L<SPVM> has methods to move and copy files.
 
 =head1 Usage
 

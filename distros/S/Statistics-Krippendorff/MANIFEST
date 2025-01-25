@@ -1,0 +1,17 @@
+Changes
+lib/Statistics/Krippendorff.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-deltas.t
+t/02-example.t
+t/03-is_valid.t
+t/04-jaccard.t
+xt/changes.t
+xt/manifest.t
+xt/pod.t
+xt/pod-coverage.t
+xt/version.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

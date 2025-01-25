@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2024 Aspose.Cells Cloud
+Copyright (c) 2025 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -263,9 +263,9 @@ sub call_api {
     else {
     }
     #proxy####################################################################
-    #$self->{ua}=LWP::UserAgent->new(ssl_opts => { verify_hostname => 0 },);
-    #$self->{ua}->proxy(['https'], "http://127.0.0.1:8888"); 
-    #printf $self->{ua}->ssl_opts;############################################
+    # $self->{ua}=LWP::UserAgent->new(ssl_opts => { verify_hostname => 0 },);
+    # $self->{ua}->proxy(['https'], "http://127.0.0.1:8888"); 
+    # printf $self->{ua}->ssl_opts;############################################
     $self->{ua}->timeout($self->{http_timeout} || $self->{config}{http_timeout});
     $self->{ua}->agent($self->{http_user_agent} || $self->{config}{http_user_agent});
 

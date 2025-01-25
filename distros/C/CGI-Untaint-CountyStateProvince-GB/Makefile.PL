@@ -2,6 +2,15 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
+my $dist = {
+	COMPRESS => 'gzip -9f',
+	SUFFIX => 'gz'
+};
+
+if($^O eq 'darwin') {
+	$dist->{'TAR'} = 'gtar';
+}
+
 WriteMakefile(
     NAME                => 'CGI::Untaint::CountyStateProvince::GB',
     AUTHOR              => q{Nigel Horne <njh@bandsman.co.uk>},
@@ -13,6 +22,8 @@ WriteMakefile(
       : ()),
     PL_FILES            => {},
     BUILD_REQUIRES => {
+	'Test::DescribeMe' => 0,
+	'Test::Needs' => 0,
 	'Test::Most' => 0,
 	'Test::NoWarnings' => 0,
 	# 'Test::Kwalitee' => 0,
@@ -23,8 +34,7 @@ WriteMakefile(
 	'Locale::SubCountry' => 1.63,
 	'Carp' => 0,
 	'Test::Requires' => 0,
-    },
-    dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+    }, dist => $dist,
     clean               => { FILES => 'CGI-Untaint-CountyStateProvince-GB*' },
     META_MERGE		=> {
     	'meta-spec' => { version => 2 },

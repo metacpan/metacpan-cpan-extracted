@@ -1,4 +1,4 @@
-CGI::Untaint::CountyStateProvince::GB Version 0.12
+CGI::Untaint::CountyStateProvince::GB Version 0.13
 
 INSTALLATION
 
@@ -21,15 +21,12 @@ You can also look for information at:
     RT, CPAN's request tracker
         http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Untaint-CountyStateProvince-GB
 
-    CPAN Ratings
-        http://cpanratings.perl.org/d/CGI-Untaint-CountyStateProvince-GB
-
     Search CPAN
         http://search.cpan.org/dist/CGI-Untaint-CountyStateProvince-GB/
 
 
 LICENSE AND COPYRIGHT
 
-Copyright (C) 2012-19 Nigel Horne
+Copyright (C) 2012-2025 Nigel Horne
 
 This program is released under the following licence: GPL2

@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2024 Aspose.Cells Cloud
+Copyright (c) 2025 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,7 +59,7 @@ sub new {
 
 
 # Run Operation Request
-# PostBatchConvertRequest.batchConvertRequest : BatchConvertRequest Batch conversion file request.    
+# PostBatchConvertRequest.batchConvertRequest :    
 
 {
     my $params = {
@@ -70,7 +70,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_batch_convert' } = { 
-    	summary => 'Batch converting files that meet specific matching conditions.',
+    	summary => '',
         params => $params,
         returns => 'string',
     };
@@ -117,7 +117,7 @@ __PACKAGE__->method_documentation({
      'batch_convert_request' => {
      	datatype => 'BatchConvertRequest',
      	base_name => 'batchConvertRequest',
-     	description => 'BatchConvertRequest Batch conversion file request. ',
+     	description => '',
      	format => '',
      	read_only => '',
      		},    

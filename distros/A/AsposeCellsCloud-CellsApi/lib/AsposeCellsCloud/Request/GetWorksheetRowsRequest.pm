@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2024 Aspose.Cells Cloud
+Copyright (c) 2025 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,12 +59,12 @@ sub new {
 
 
 # Run Operation Request
-# GetWorksheetRowsRequest.name : The file name.  ,
-# GetWorksheetRowsRequest.sheetName : The worksheet name.  ,
-# GetWorksheetRowsRequest.offset : Row offset.  ,
-# GetWorksheetRowsRequest.count : Display rows number.  ,
-# GetWorksheetRowsRequest.folder : The folder where the file is situated.  ,
-# GetWorksheetRowsRequest.storageName : The storage name where the file is situated.   
+# GetWorksheetRowsRequest.name :   ,
+# GetWorksheetRowsRequest.sheetName :   ,
+# GetWorksheetRowsRequest.offset :   ,
+# GetWorksheetRowsRequest.count :   ,
+# GetWorksheetRowsRequest.folder :   ,
+# GetWorksheetRowsRequest.storageName :    
 
 {
     my $params = {
@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_rows' } = { 
-    	summary => 'Retrieve descriptions of rows in the worksheet.',
+    	summary => '',
         params => $params,
         returns => 'RowsResponse',
     };
@@ -140,42 +140,42 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The file name.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => 'The worksheet name.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'offset' => {
      	datatype => 'int',
      	base_name => 'offset',
-     	description => 'Row offset.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'count' => {
      	datatype => 'int',
      	base_name => 'count',
-     	description => 'Display rows number.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'The folder where the file is situated.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'The storage name where the file is situated.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},    

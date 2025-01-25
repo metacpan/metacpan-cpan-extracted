@@ -14,6 +14,10 @@ use SPVM 'TestCase::File::Copy';
 
 use SPVM 'File::Copy';
 
+my $api = SPVM::api();
+
+my $start_memory_blocks_count = $api->get_memory_blocks_count();
+
 ok(SPVM::TestCase::File::Copy->test);
 
 # copy
@@ -94,5 +98,10 @@ ok(SPVM::TestCase::File::Copy->test);
 {
   is($SPVM::File::Copy::VERSION, SPVM::Fn->get_version_string('File::Copy'));
 }
+
+SPVM::Fn->destroy_runtime_permanent_vars;
+
+my $end_memory_blocks_count = $api->get_memory_blocks_count();
+is($end_memory_blocks_count, $start_memory_blocks_count);
 
 done_testing;

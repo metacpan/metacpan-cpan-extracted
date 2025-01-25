@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2024 Aspose.Cells Cloud
+Copyright (c) 2025 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,10 +59,10 @@ sub new {
 
 
 # Run Operation Request
-# GetWorksheetChartsRequest.name : The file name.  ,
-# GetWorksheetChartsRequest.sheetName : The worksheet name.  ,
-# GetWorksheetChartsRequest.folder : The folder where the file is situated.  ,
-# GetWorksheetChartsRequest.storageName : The storage name where the file is situated.   
+# GetWorksheetChartsRequest.name :   ,
+# GetWorksheetChartsRequest.sheetName :   ,
+# GetWorksheetChartsRequest.folder :   ,
+# GetWorksheetChartsRequest.storageName :    
 
 {
     my $params = {
@@ -73,7 +73,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_charts' } = { 
-    	summary => 'Retrieve descriptions of charts in the worksheet.',
+    	summary => '',
         params => $params,
         returns => 'ChartsResponse',
     };
@@ -130,28 +130,28 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The file name.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => 'The worksheet name.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'The folder where the file is situated.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'The storage name where the file is situated.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},    

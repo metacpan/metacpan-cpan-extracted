@@ -15,7 +15,7 @@ Getopt::EX::Config - Getopt::EX module configuration interface
 
 # VERSION
 
-Version 0.99
+Version 0.9901
 
 # DESCRIPTION
 

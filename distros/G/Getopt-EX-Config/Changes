@@ -1,5 +1,9 @@
 Revision history for Perl extension Getopt-EX-Config
 
+0.9901 2025-01-25T05:52:26Z
+
+    - keep different object for each caller modules
+
 0.99 2025-01-24T04:08:35Z
 
     - original version

@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.89.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,24 +12,31 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 a3c40f3016e226640a7a01541fbc3f4b52c504f6 .gitignore
-SHA1 58c99dadf12f68b7c28eab29ddb30e996a2d5a4e Changes
-SHA1 1b944992c908d877c1e8d198ca7cd4ba1848e364 MANIFEST
-SHA1 f7b74772d2535a4438dd903398b30e1254ea9483 META.json
-SHA1 2629380c79f6ec5d0d2ec01da3b64d938684b60f META.yml
-SHA1 e4c695ba4c2832a84726a78900428f4bae912cb8 Makefile.PL
-SHA1 d8529a46cf9926e914775e6d8271943929e03a6e README
-SHA1 6f341dbdfecf46a71a4a9634f22ec3905d0a41de lib/Mock/Config.pm
-SHA1 40a6aad44aa209af85e36e54e9329776066ad103 t/0-basic.t
-SHA1 fae4034c67a6d78d2883ca9872aae7b8ae3bfe32 t/manifest.t
-SHA1 74f231713ee14772a166b02eebb58bc94d59e73f t/pod-coverage.t
-SHA1 6d6ee1e914426c6c5e16f4487578c610f0cdbce6 t/pod.t
+SHA256 9320d07bc82fd15add0d30b54aa8ee95801e8b4335171ac749331afe4ee7a3d0 .gitignore
+SHA256 435b32a5dcb0a237aa8e9181c0a60a9db687aaca813a033e3caac440046d8937 Changes
+SHA256 da76552279d583d665aa506aaa648dfaf1287d8b8663ff07e755428d165c7584 MANIFEST
+SHA256 4057971a5d20078c71da6ab85b88333f7d7ffeb0891e2285e8dce9ffd118e210 META.json
+SHA256 975ee305a63e136130102dc937de38199c57abb5e3b0efa47919baef305690dd META.yml
+SHA256 33f2c52228320c57a275f088ab78bf80c168cba0c3d92a8d66cba8487d3b663c Makefile.PL
+SHA256 40b69ee4a0e94dbe1548775a19fa84ec2157e3d5b1f4010ed2447adeb602a740 README
+SHA256 83eff86e70f27ea8813c70e9fcb5b1b41d1a5563167e3859008e88308c366a4b lib/Mock/Config.pm
+SHA256 22d82a50dd175a2412176c4dcec84dfb038063f7dfd8541ed05dae4ec0c14874 t/0-basic.t
+SHA256 29b38fb9471f8cf4e34e410472ac257c6a0d37e065a9f57ad6b4b58bee5e3815 t/manifest.t
+SHA256 9819b6b170aad225da1a8c7a464c04e9548b9a54e1b999ab47692a72bc626ca1 t/pod-coverage.t
+SHA256 00b03a9792c4037d124e023edf2ee91cf85eb9470a670cad0b4d07bc316eb17a t/pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iEYEARECAAYFAlcUzsQACgkQmm2SYo/9yULLVACghz02KP63u8KDPsxaec7ENnfi
-GAYAoIfHbQKgLbkI3CA27IvaKhMEtk4W
-=Bwld
+iQGzBAEBAwAdFiEEOKQWew22nknF9yFsuMKIZqsnp6IFAmeUtJ8ACgkQuMKIZqsn
+p6Kw5Av9EPLKlerL0zlN9idb50Wtnjgb3QMIr8dK3A/YFKhSdqZ0yoh4cYIV4gHA
+yjX8/gsLs1mwkrMzmObpmD/tOhiFpNpWQ7B9Blt67Eg7SlsgJ2cjAidhMGJsXknR
+hg/arGy2buwogvSdRajfyD0CQTF3Ljpx0ozhl1fDB4r3eRUsyfj3v/cON05g8k/a
+JqkigwVBcjMMNHOgb+/vOXZ/KSgT91/+UDyt0CbvZhPT8Nea1RN5ZbodJZe7H1nG
+YhV2/E1Cb2YceFLoFsHrh5e9+2Sh+FGDtu2z1PLRkrGXOn8YnjlHKcsrBz+O6j1H
+mwzMvbgs0kmpX/VIv/RocA6NYlg+H411IEE65sVEydtkoQcJwhYU33oOX5aP6N2i
+wP20Q6yHC7jaGsu1Wh9x4xaIO2uDpK6ZI7zFJd3qsiq/HIpBlb/U+12I8Da34YFj
+tRsPxCd+m/PUWHDBzBEx/IFSJc1yjh//J0/g5VQWMWjeGRL+s922m1V+GhFDhIu8
+HwTABfA7
+=hY5N
 -----END PGP SIGNATURE-----

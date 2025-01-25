@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2024 Aspose.Cells Cloud
+Copyright (c) 2025 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,7 +59,7 @@ sub new {
 
 
 # Run Operation Request
-# PostAnalyzeExcelRequest.analyzeExcelRequest : Excel files and analysis output requirements   
+# PostAnalyzeExcelRequest.analyzeExcelRequest :    
 
 {
     my $params = {
@@ -70,7 +70,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_analyze_excel' } = { 
-    	summary => 'Perform business analysis of data in Excel files.',
+    	summary => '',
         params => $params,
         returns => 'ARRAY[AnalyzedResult]',
     };
@@ -117,7 +117,7 @@ __PACKAGE__->method_documentation({
      'analyze_excel_request' => {
      	datatype => 'AnalyzeExcelRequest',
      	base_name => 'analyzeExcelRequest',
-     	description => 'Excel files and analysis output requirements',
+     	description => '',
      	format => '',
      	read_only => '',
      		},    

@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Play a MIDI score in real-time
 
-our $VERSION = '0.0202';
+our $VERSION = '0.0204';
 
 use strict;
 use warnings;
@@ -39,7 +39,7 @@ sub new {
 
     $opts{device} = RtMidiOut->new;
 
-    $opts{port} //= qr/wavetable|loopmidi|timidity|fluid/i;
+    $opts{port} //= qr/wavetable|loopmidi|timidity|fluid|iac/i;
 
     # For MacOS, DLSMusicDevice should receive input from this virtual port:
     $opts{device}->open_virtual_port('dummy') if $^O eq 'darwin';
@@ -156,7 +156,7 @@ MIDI::RtMidi::ScorePlayer - Play a MIDI score in real-time
 
 =head1 VERSION
 
-version 0.0202
+version 0.0204
 
 =head1 SYNOPSIS
 
@@ -173,7 +173,7 @@ version 0.0202
       my (%args) = @_;
       ...; # Setup things
       my $treble = sub {
-          for my $i (1 .. 8) {
+          for my $i (1 .. 8) { # 2 measures
               if ($i % 2) {
                   $args{score}->n('qn', '...');
               }
@@ -186,7 +186,7 @@ version 0.0202
   }
   sub bass {
       my (%args) = @_;
-      # to play alone, this is needed:
+      # to play alone, an arrayref defining 2 measures is needed:
       $common{'tick.durations'} = [ ('hn') x 4 ];
       my $bass = sub {
       ...; # As above but different!
@@ -205,6 +205,7 @@ version 0.0202
       deposit  => 'path/prefix-', # optionally make a file after each loop
       verbose  => 0, # print out text events (default: 0)
       dump     => 0, # dump the score before each play (default: 0)
+      port     => qr/iac/, # optional
   )->play;
 
 =head1 DESCRIPTION
@@ -280,7 +281,7 @@ Gene Boggs <gene.boggs@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024 by Gene Boggs.
+This software is Copyright (c) 2024-2025 by Gene Boggs.
 
 This is free software, licensed under:
 

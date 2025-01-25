@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps::Mapping;
 use strict;
 use warnings;
 
-our $VERSION = '0.79';
+our $VERSION = '0.80';
 
 # shortcuts
 #  os and distros
@@ -635,6 +635,12 @@ sub mapping {
      [cpanmod => 'Config::UCL',
       [os_freebsd,
        [package => 'libucl']],
+      ## libucl @ debian+fedora is probably something different
+      #[like_debian,
+      # [package => 'libucl-dev']],
+      #[like_fedora,
+      # [linuxdistro => 'fedora',
+      #	[package => 'libucl-devel']]],
      ],
 
      [cpanmod => 'Convert::Recode',
@@ -794,7 +800,7 @@ sub mapping {
        [package => 'libu2f-server-dev']],
       [os_darwin,
        [package => 'libu2f-server']],
-      [linuxdistro => 'fedora', # not available for CentOS6 or 7
+      [linuxdistro => 'fedora', # not available for CentOS6 or 7 or rockylinux 9
        [package => 'libu2f-server-devel']],
      ],
 
@@ -2957,7 +2963,7 @@ sub mapping {
        [package => 'pgplot']],
       [like_debian,
        [package => 'pgplot5']],
-      # no pgplot package for CentOS7
+      # fedora-like systems have a pgplot package in the (nonfree) RPM Fusion repository
      ],
 
      [cpanmod => 'Pod::Spelling',
@@ -3737,7 +3743,11 @@ sub mapping {
       [os_freebsd,
        [package => ['expat', 'pkgconf', 'xcb-proto', 'xcb-util-wm']]],
       [like_debian,
-       [package => ['libxcb-ewmh-dev', 'libxcb-icccm4-dev', 'libxcb-randr0-dev', 'libxcb-render0-dev', 'libxcb-util-dev', 'libxcb-util0-dev', 'libxcb-xinerama0-dev', 'libxcb-xinput-dev', 'libxcb-xkb-dev', 'libxcb-xtest0-dev', 'libxcb1-dev', 'xcb-proto', 'xsltproc']]]],
+       [before_ubuntu_focal,
+	[package => []]],
+       [package => ['libxcb-composite0-dev', 'libxcb-ewmh-dev', 'libxcb-icccm4-dev', 'libxcb-randr0-dev',
+        'libxcb-render0-dev', 'libxcb-util-dev', 'libxcb-util0-dev', 'libxcb-xinerama0-dev', 'libxcb-xinput-dev',
+        'libxcb-xkb-dev', 'libxcb-xtest0-dev', 'libxcb1-dev', 'xcb-proto', 'xsltproc']]]],
 
      [cpanmod => 'X11::Xlib',
       [os_freebsd,

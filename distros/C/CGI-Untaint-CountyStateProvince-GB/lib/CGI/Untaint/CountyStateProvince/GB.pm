@@ -14,11 +14,11 @@ CGI::Untaint::CountyStateProvince::GB - Add British counties to CGI::Untaint::Co
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =cut
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 our %counties = (
 	'aberdeenshire' => 1,
@@ -147,7 +147,7 @@ our %abbreviations = (
 
 =head1 SYNOPSIS
 
-Adds a list of British counties to the list of counties/state/provinces
+Adds a list of British counties to the list of counties/states/provinces
 which are known by the CGI::Untaint::CountyStateProvince validator so that
 an HTML form sent by CGI contains a valid county.
 
@@ -157,6 +157,7 @@ CGI::Untaint, otherwise it won't work.
     use CGI::Info;
     use CGI::Untaint;
     use CGI::Untaint::CountyStateProvince::GB;
+
     my $info = CGI::Info->new();
     my $u = CGI::Untaint->new($info->params());
     # Succeeds if state = 'Kent', fails if state = 'Queensland';
@@ -165,7 +166,7 @@ CGI::Untaint, otherwise it won't work.
 
 =cut
 
-=head1 SUBSOUTINES/METHODS
+=head1 SUBROUTINES/METHODS
 
 =head2 is_valid
 
@@ -176,7 +177,8 @@ Validates the data. See CGI::Untaint::is_valid.
 sub is_valid {
 	my $self = shift;
 
-	my $value = lc($self->value);
+	my $value = lc($self->value());
+	$value =~ s/^\s+|\s+$//g;	# Trim whitespace
 
 	if($value =~ /([a-z][a-z\s]+)/) {
 		$value = $1;
@@ -188,27 +190,22 @@ sub is_valid {
 		return $abbreviations{$value};
 	}
 
-	# Try using Locale::SubCountry first, but be aware of RT77735 - some
-	# counties are missing and some towns are listed as counties.
-	unless($self->{_validator}) {
-		$self->{_validator} = Locale::SubCountry->new('GB');
-		unless($self->{_validator}) {
-			carp 'Can\'t instantiate Locale::SubCountry';
-		}
+	# Attempt Locale::SubCountry validation
+	# Be aware of RT77735 - some
+	# counties are missing and some towns and unitary authorities are listed as counties
+	my $validator = $self->{_validator} ||= Locale::SubCountry->new('GB');
+	if($validator && (my $region_code = $validator->code($value))) {
+		return $value if($region_code ne 'unknown');
 	}
-
-	# my $county = $self->{_validator}->code($value);
-	# if($county && ($county ne 'unknown')) {
-		# return $value;
-	# }
 
 	return exists($counties{$value}) ? $value : 0;
 }
 
 =head2 value
 
-Sets the raw data which is to be validated.  Called by the superclass, you
-are unlikely to want to call it.
+Sets the raw data to be validated.
+Called by the superclass,
+you are unlikely to want to call it.
 
 =cut
 
@@ -234,14 +231,15 @@ Nigel Horne, C<< <njh at bandsman.co.uk> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-cgi-untaint-csp-gb at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CGI-Untaint-CountyStateProvince>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
+Please report any bugs or feature requests to C<bug-cgi-untaint-csp-gb at rt.cpan.org>
+or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CGI-Untaint-CountyStateProvince>.
+I will be notified,
+and then you'll
+automatically be notified of the progress on your bug as I make changes.
 
 =head1 SEE ALSO
 
-CGI::Untaint::CountyStateProvince, CGI::Untaint
+L<CGI::Untaint::CountyStateProvince>, L<CGI::Untaint>, L<Locale::SubCountry>
 
 =head1 SUPPORT
 
@@ -257,23 +255,17 @@ You can also look for information at:
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Untaint-CountyStateProvince-GB>
 
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/CGI-Untaint-CountyStateProvince-GB>
-
 =item * Search CPAN
 
 L<http://search.cpan.org/dist/CGI-Untaint-CountyStateProvince-GB>
 
 =back
 
-
 =head1 ACKNOWLEDGEMENTS
-
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012-19 Nigel Horne.
+Copyright 2012-2025 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

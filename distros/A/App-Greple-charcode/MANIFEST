@@ -5,6 +5,7 @@ META.json
 README.md
 cpanfile
 images/ka-ko.png
+lib/App/Greple/annotate.pm
 lib/App/Greple/charcode.pm
 minil.toml
 t/00_compile.t

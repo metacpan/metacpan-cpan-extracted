@@ -5,21 +5,21 @@ Crypt::PostgreSQL - Module for generating encrypted password for PostgreSQL
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =cut
 
 use strict;
 use warnings;
 package Crypt::PostgreSQL;
-$Crypt::PostgreSQL::VERSION = '0.01';
+$Crypt::PostgreSQL::VERSION = '0.02';
 BEGIN {
-        use Exporter ();
-        use vars qw ($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-        @ISA         = qw (Exporter);
-        @EXPORT      = qw ();
-        @EXPORT_OK   = qw ();
-        %EXPORT_TAGS = ();
+    use Exporter ();
+    use vars qw ($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
+    @ISA         = qw (Exporter);
+    @EXPORT      = qw ();
+    @EXPORT_OK   = qw ();
+    %EXPORT_TAGS = ();
 }
 
 use Carp;
@@ -40,7 +40,7 @@ use Digest::MD5 qw(md5_hex);
     my DBI;
     my $dbh = DBI->connect("dbi:Pg:dbname=...", '', '', {AutoCommit => 0});
     $dbh->do(q{
-        ALTER USER my_user SET ECRYPTION PASSWORD '$scram_hash';
+        ALTER USER my_user SET ENCRYPTION PASSWORD '$scram_hash';
     });
 
 
@@ -49,39 +49,6 @@ use Digest::MD5 qw(md5_hex);
 This module is for generating password suitable to generate password hashes in PostgreSQL format,
 using one of the two encrypted formats: scram_sha_256 and md5
 
-
-=head1 BUGS
-
-Please let the author know if any are caught
-
-=head1 AUTHOR
-
-	Guido Brugnara
-	gdo@leader.it
-
-
-=head1 COPYRIGHT
-
-This program is free software; you can redistribute
-it and/or modify it under the same terms as Perl itself.
-
-The full text of the license can be found in the
-LICENSE file included with this module.
-
-
-=head1 SEE ALSO
-
-=over
-
-=item L<https://www.postgresql.org/docs/current/auth-password.html>
-
-PostgreSQL documentation: 20.5. Password Authentication
-
-= iten L<https://www.leader.it/Blog/PostgreSQL_SCRAM-SHA-256_authentication>
-
-Blog article: PostgreSQL SCRAM-SHA-256 authentication with credits ...
-
-=back
 
 =head2 encrypt_md5
 
@@ -114,9 +81,9 @@ The function returns hash string suitalbe to use with ALTER USER SQL command.
 sub encrypt_scram {
     my($password, $salt) = @_;
     if(!defined $salt){
-      $salt = Crypt::URandom::urandom(16);
+        $salt = Crypt::URandom::urandom(16);
     }elsif(length($salt) != 16){
-      croak 'The salt length must be 16!';
+        croak 'The salt length must be 16!';
     }
     my $iterations = 4096;
     my $digest_key = pbkdf2($password, $salt, $iterations, 'SHA256', 32);
@@ -126,5 +93,41 @@ sub encrypt_scram {
     my $b64_salt = encode_base64($salt, '');
     return "SCRAM-SHA-256\$$iterations:$b64_salt\$$b64_client_key:$b64_server_key";
 }
+
+
+=head1 BUGS
+
+Please let the author know if any are caught
+
+=head1 AUTHOR
+
+	Guido Brugnara
+	gdo@leader.it
+
+
+=head1 COPYRIGHT
+
+This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+The full text of the license can be found in the
+LICENSE file included with this module.
+
+
+=head1 SEE ALSO
+
+=over
+
+=item L<https://www.postgresql.org/docs/current/auth-password.html>
+
+PostgreSQL documentation: 20.5. Password Authentication
+
+=item L<https://www.leader.it/Blog/PostgreSQL_SCRAM-SHA-256_authentication>
+
+Blog article: PostgreSQL SCRAM-SHA-256 authentication with credits ...
+
+=back
+
+=cut
 
 1;

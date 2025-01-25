@@ -4,7 +4,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = 0.5;
+our $VERSION = 0.7;
 
 use HTTP::Tiny;
 use JSON            qw/decode_json/;
@@ -375,7 +375,7 @@ to be set up. See the ENVIRONMENT section below to learn more.
   from_email=your-email-list@domain.tld
   reply_to=some-other-reply-to@domain.tld
 
-Save this file as C<$HOM/.sendy.ini>, and you may start to use the
+Save this file as C<$HOME/.sendy.ini>, and you may start to use the
 C<sendy> commandline utility.
 
 =head1 DESCRIPTION
@@ -574,6 +574,12 @@ To send right away, rather than just creating a draft; use the
 C<--send_campaign> flag. There is currently no support to schedule the
 sending of a campaign at a later time. Please let me know if you need this
 ability. Otherwise it'll get implemented if and when I needed it.
+
+C<--html_file> may be used to pass in the contents for the body of the
+message; it'll overrid C<--html_text> if both are used. If the body of
+the campaign body is large enough, passing it in via C<--html_text> on the
+command line will result in a shell error. C<--html_file> allows for bodies
+of a large size to be passed to the API client without any limitations.
 
 Usage,
 
