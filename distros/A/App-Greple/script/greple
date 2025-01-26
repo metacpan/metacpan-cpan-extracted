@@ -63,7 +63,7 @@ greple - extensible grep with lexical expression and region control
 =head1 VERSION
 
 
-Version 9.1703
+Version 9.2101
 
 
 =head1 SYNOPSIS
@@ -118,13 +118,13 @@ B<greple> [B<-M>I<module>] [ B<-options> ] pattern [ file... ]
     --colormap=color     R, G, B, C, M, Y etc.
     --colorsub=...       shortcut for --colormap="sub{...}"
     --colorful           use default multiple colors
-    --colorindex=flags   color index method: Ascend/Descend/Block/Random/Group
+    --colorindex=flags   color index method: Ascend/Descend/Block/Random/Unique/Group
+    --random             use random color each time (--colorindex=R)
+    --uniqcolor          use different color for unique string (--colorindex=U)
+    --uniqsub=func       preprocess function before check uniqueness
     --ansicolor=s        ANSI color 16, 256 or 24bit
     --[no]256            same as --ansicolor 256 or 16
     --regioncolor        use different color for inside/outside regions
-    --uniqcolor          use different color for unique string
-    --uniqsub=func       preprocess function before check uniqueness
-    --random             use random color each time
     --face               set/unset visual effects
   BLOCK
     -p, --paragraph      paragraph mode
@@ -278,7 +278,6 @@ newopt
     ' colorindex         |ci =s ' => \(my $opt_colorindex = '') ,
     ' ansicolor              =s ' => \(my $opt_ansicolor = '256') ,
     ' regioncolor        |rc !  ' => \ my $opt_regioncolor ,
-    ' uniqcolor          |uc !  ' => \(my $opt_uniqcolor) ,
     ' uniqsub            |us =s ' => \ my @opt_uniqsub ,
     ' face                   =s ' => \ my @opt_face ,
     ' nocolor | no-color ' => sub {
@@ -290,6 +289,9 @@ newopt
     ' random! ' => sub {
 	if ($_[1]) { opt('colorindex') .= 'R' }
 	else       { opt('colorindex') =~ s/R//gi }
+    },
+    ' uniqcolor |uc ' => sub {
+	opt('colorindex') = 'U';
     },
 
     ##
@@ -483,7 +485,7 @@ if ($opt_d{u}) {
 ## show man pages
 if ($opt_man or $opt_show or $opt_path) {
     my @module = map {
-	/^-M(\w+(::\w++(?!.))*)/ ? "App::Greple::$1" : ()
+	/^-M(\w+(::\w++(?![=(]))*)/ ? "App::Greple::$1" : ()
     } @ORIG_ARGV;
     if (@module) {
 	my $module = $module[-1];
@@ -810,25 +812,26 @@ sub dump_uniqcolor {
 }
 
 # --colorindex
+my %color_index = map { uc $_ => 1 } $opt_colorindex =~ /\w/g;
 my $indexer = do {
-    my %ci = map { uc $_ => 1 } $opt_colorindex =~ /\w/g;
-    if ($ci{S}) {
+    if ($color_index{S}) {
 	@colors = shuffle @colors;
     }
-    if ($ci{A} or $ci{D}) {
+    if ($color_index{A} or $color_index{D}) {
 	my $i = 0;
 	Indexer->new(
 	    index   => sub { $i++   },
 	    reset   => sub { $i = 0 },
-	    block   => $ci{B},
-	    reverse => $ci{D},
+	    block   => $color_index{B},
+	    reverse => $color_index{D},
 	    );
     }
-    elsif ($ci{R}) {
+    elsif ($color_index{R}) {
 	Indexer->new(index => sub { int rand @colors });
     }
     else { undef }
 };
+my $opt_uniqcolor = $color_index{U};
 
 # -dc
 if ($opt_d{c}) {
@@ -1253,22 +1256,25 @@ sub grep_data {
 	alert_time   =>  $opt_alert{time},
 	join_blocks  =>  $opt_join_blocks,
     )->run;
-    my $matched = $grep->matched;
 
     ## --postgrep
     for my $f (@opt_postgrep) {
 	$f->call($grep);
+	# remove emptied results
+	my $ref = $grep->result_ref;
+	@$ref = grep { @{$_} > 0 } @$ref;
     }
     ## -m
     for my $splice (@splicer) {
 	$splice->($grep->result_ref);
     }
 
+    my $matched = $grep->matched;
     if ($opt_l) {
 	if ($matched) {
 	    $progress_reset->() if $progress_reset;
 	    print $current_file;
-	    printf ":%d", scalar $grep->blocks if $opt_c;
+	    printf ":%d", scalar $grep->result if $opt_c;
 	    print "\n";
 	}
     }
@@ -1319,7 +1325,8 @@ sub output {
 	my $is_top    = $rix == 0;
 	my $is_bottom = $rix == $#results;
 
-	my($blk, @result) = @{$results[$rix]};
+	my $result = $results[$rix];
+	my($blk, @result) = @{$result};
 	my($block_start, $block_end) = @$blk;
 	my $block = $grep->cut($block_start, $block_end);
 
@@ -1360,9 +1367,7 @@ sub output {
 	    }
 	}
 
-	my $template = unpack_template(\@result, $block_start);
-	my @slice = unpack($template, $block);
-
+	my @slice = $grep->slice_result($result);
 	my $mark = "\001";
 	for my $i (keys @result) {
 	    my($start, $end, $pi, $callback) = @{$result[$i]};
@@ -1383,7 +1388,7 @@ sub output {
 			    match => $b);
 		    }
 		    else { die }
-		};
+		} // $b;
 	    }
 
 	    if ($opt_join) {
@@ -1436,21 +1441,6 @@ sub output {
 	    print "$_middle\n" if $_middle ne '';
 	}
     }
-}
-
-##
-## split text using match information
-##
-sub unpack_template {
-    my($matched, $offset) = @_;
-    my @len;
-    for (@$matched) {
-	my($s, $e) = @$_;
-	$s = $offset if $s < $offset;
-	push @len, $s - $offset, $e - $s;
-	$offset = $e;
-    }
-    join '', map "a$_", @len, '*';
 }
 
 __END__
@@ -1906,7 +1896,8 @@ extra elements besides start/end position.  Third element is index.
 Fourth element is a callback function pointer which will be called to
 produce string to be shown in command output.  Callback function is
 called with four arguments (start position, end position, index,
-matched string) and expected to return replacement string.
+matched string) and expected to return replacement string.  If the
+function returns C<undef>, the result is not changed.
 
 =item B<-E> I<pattern>, B<--re>=I<pattern>
 
@@ -2440,11 +2431,11 @@ to use user defined function for 'TEXT' field.
 C<--colorsub> or C<--cs> is a shortcut for subroutine colormap.  It
 simply enclose the argument by C<sub{ ... }> expression.  So
 
-    greple -cm 'sub{uc}'
+    greple --cm 'sub{uc}'
 
 can be written as simple as this.
 
-    greple -cs uc
+    greple --cs uc
 
 You can not use this option for labeled color.
 
@@ -2458,16 +2449,16 @@ When single pattern is specified, first color in colormap is used for
 the pattern.  If multiple patterns and multiple colors are specified,
 each pattern is colored with corresponding color cyclically.
 
-Option C<--regioncolor>, C<--uniqcolor> and C<--colorindex> change
-this behavior.
+Option C<--regioncolor> and C<--colorindex> change this behavior.
 
 =item B<--colorindex>=I<spec>, B<--ci>=I<spec>
 
-Specify color index method by combination of spec characters.  B<A>
-(ascend) and B<D> (descend) can be mixed with B<B> (block) and/or B<S>
-(shuffle) like C<--ci=ABS>.  B<R> (random) can be too but it does not
-make sense.  When B<S> is used alone, colormap is shuffled with normal
-behavior.
+Specify the color index method by combination of spec characters.
+B<A> (ascend) and B<D> (descend) can be mixed with B<B> (block) and/or
+B<S> (shuffle) like C<--ci=ABS>.  B<R> (random) can be too but it does
+not make sense.  When B<S> is used alone, colormap is shuffled with
+normal behavior.  B<U> (unique) assigns unique color for each
+identical string.
 
 =over 4
 
@@ -2498,10 +2489,15 @@ Use random color index every time.
 Valid only when used with the B<--capture-group> (or B<-G>)
 option. Assigns an index number corresponding to each capture group.
 
+=item U (Unique)
+
+Use different colors for different string matched.
+
 =item N (Normal)
 
-Reset to normal behavior.  Because the last option takes effect,
-C<--ci=N> can be used to reset the behavior set by previous options.
+Reset to normal behavior.  Because the last option overrides earlier
+ones, C<--ci=N> can be used to reset the behavior set by previous
+options.
 
 =back
 
@@ -2509,28 +2505,11 @@ C<--ci=N> can be used to reset the behavior set by previous options.
 
 Shortcut for C<--colorindex=R>.
 
-=item B<--ansicolor>=[C<16>,C<256>,C<24bit>]
+=item B<--uniqcolor>, B<--uc>
 
-If set as C<16>, use ANSI 16 colors as a default color set, otherwise
-ANSI 256 colors.  When set as C<24bit>, 6 hex digits notation produces
-24bit color sequence.  Default is C<256>.
-
-=item B<--[no]256>
-
-Shortcut for C<--ansicolor>=C<256> or C<16>.
-
-=item B<--[no]regioncolor>, B<--[no]rc>
-
-Use different colors for each C<--inside> and C<--outside> region.
-
-Disabled by default, but automatically enabled when only single search
-pattern is specified.  Use C<--no-regioncolor> to cancel automatic
-action.
-
-=item B<--[no]uniqcolor>, B<--[no]uc>
+Shortcut for C<--colorindex=U>.
 
 Use different colors for different string matched.
-Disabled by default.
 
 Next example prints all words start by C<color> and display them all
 in different colors.
@@ -2540,6 +2519,11 @@ in different colors.
 When used with option C<-i>, color is selected still in case-sensitive
 fashion.  If you want case-insensitive color selection, use next
 C<--uniqsub> option.
+
+In B<greple> versions 9.20 and later, the C<--colorindex> option
+resets the effect of earlier C<--uniqcolor> option.  If used in
+combination with other options, it is safer to specify like
+C<--ci=US>.
 
 =item B<--uniqsub>=I<function>, B<--us>=I<function>
 
@@ -2559,6 +2543,24 @@ Next command read the output from C<git blame> command and set unique
 color for each entire line by their commit ids.
 
     git blame ... | greple .+ --uc --us='sub{s/\s.*//r}' --face=E-D
+
+=item B<--ansicolor>=[C<16>,C<256>,C<24bit>]
+
+If set as C<16>, use ANSI 16 colors as a default color set, otherwise
+ANSI 256 colors.  When set as C<24bit>, 6 hex digits notation produces
+24bit color sequence.  Default is C<256>.
+
+=item B<--[no]256>
+
+Shortcut for C<--ansicolor>=C<256> or C<16>.
+
+=item B<--[no]regioncolor>, B<--[no]rc>
+
+Use different colors for each C<--inside> and C<--outside> region.
+
+Disabled by default, but automatically enabled when only single search
+pattern is specified.  Use C<--no-regioncolor> to cancel automatic
+action.
 
 =item B<--face>=[+-=]I<effect>
 
@@ -2925,13 +2927,18 @@ called with C<App::Greple::Grep> object which cotains all information
 about the search.  This interface highly depends on the internal
 structure, so use with the utmost caution.
 
+The search results are held as a list of blocks.  By emptying the
+contents of a block element, the matches for that block can be
+canceled.
+
 =item B<--callback>=I<function>(I<...>)
 
 Callback function is called before printing every matched pattern with
 four labeled parameters: B<start>, B<end>, B<index> and B<match>,
 which corresponds to start and end position in the text, pattern
 index, and the matched string.  Matched string in the text is replaced
-by returned string from the function.
+by returned string from the function.  If the function returns
+C<undef>, the result is not changed.
 
 Multiple functions can be specified, and if there are multiple search
 patterns, they are applied in order and cyclically.
@@ -3438,7 +3445,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 1991-2024 Kazumasa Utashiro
+Copyright 1991-2025 Kazumasa Utashiro
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

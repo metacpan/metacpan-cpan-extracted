@@ -11,7 +11,7 @@ our @EXPORT_OK   = qw();
 our @ISA = qw(App::Greple::Text);
 
 use Data::Dumper;
-use List::Util qw(min max reduce);
+use List::Util qw(min max reduce sum);
 
 use Getopt::EX::Func qw(callable);
 
@@ -71,7 +71,6 @@ sub prepare {
 
     $self->{RESULT} = [];
     $self->{BLOCKS} = [];
-    $self->{MATCHED} = 0;
 
     ##
     ## build match result list
@@ -259,7 +258,6 @@ sub compose {
 	    my $i = min map { $_->[2] // 0 } @matched;
 	    @matched = [ $b->[0], $b->[1], $i, $m->[3] ];
 	}
-	$self->{MATCHED} += @matched;
 	if ($self->{only}) {
 	    push @list, map({ [ $_, $_ ] } @matched);
 	} elsif ($self->{all}) {
@@ -333,12 +331,42 @@ sub result {
 
 sub matched {
     my $obj = shift;
-    $obj->{MATCHED};
+    sum(map { @{$_} - 1 } $obj->result) // 0;
 }
 
 sub blocks {
     my $obj = shift;
     @{ $obj->{BLOCKS} };
+}
+
+sub slice_result {
+    my $obj = shift;
+    my $result = shift;
+    my($block, @list) = @$result;
+    my $template = unpack_template(\@list, $block->[0]);
+    unpack($template, $obj->cut(@$block));
+}
+
+sub slice_index {
+    my $obj = shift;
+    my $result = shift;
+    my($block, @list) = @$result;
+    map { $_ * 2 + 1 } keys @list;
+}
+
+sub unpack_template {
+    ##
+    ## make template to split result text into matched and unmatched parts
+    ##
+    my($matched, $offset) = @_;
+    my @len;
+    for (@$matched) {
+	my($s, $e) = @$_;
+	$s = $offset if $s < $offset;
+	push @len, $s - $offset, $e - $s;
+	$offset = $e;
+    }
+    join '', map "a$_", @len, '*';
 }
 
 sub show_match_table {

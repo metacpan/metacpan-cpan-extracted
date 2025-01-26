@@ -1,7 +1,7 @@
 package Langertha::Role::ResponseSize;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: Role for an engine where you can specify the response size (in tokens)
-$Langertha::Role::ResponseSize::VERSION = '0.006';
+$Langertha::Role::ResponseSize::VERSION = '0.007';
 use Moose::Role;
 
 has response_size => (
@@ -31,7 +31,7 @@ Langertha::Role::ResponseSize - Role for an engine where you can specify the res
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

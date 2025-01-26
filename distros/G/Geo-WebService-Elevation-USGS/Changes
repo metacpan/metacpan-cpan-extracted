@@ -1,3 +1,10 @@
+0.201		2025-01-25	T. R. Wyant
+    Add a tolerance to the elevations tested in t/elev.t.
+    On January 18 2025 I experienced sporadic test failures. Direct queries
+    of the web interface showed that I could indeed get different results
+    for the same query. I found the documentation unhelpful, so I just
+    installed a 6-inch tolerance.
+
 0.200		2024-06-21	T. R. Wyant
     Convert to use https://epqs.nationalmap.gov/v1/json
 

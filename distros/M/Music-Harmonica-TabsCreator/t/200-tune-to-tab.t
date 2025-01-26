@@ -17,4 +17,28 @@ is({ tune_to_tab('C D Db E Gb F G B Bb A', max_bends => 2) }->{richter},
 # We test that we’re using 3 in the output and not -2.
 is({ tune_to_tab("CEGC'''") }->{richter}, { C => [[1, 2, 3, 10]] });
 
+{
+  my %t = tune_to_tab('C');
+  ok(exists $t{richter});
+  ok(exists $t{harmonic_minor});
+}
+
+{
+  my %t = tune_to_tab('C', tunings => ['foo']);
+  ok(!exists $t{richter});
+  ok(!exists $t{harmonic_minor});
+}
+
+{
+  my %t = tune_to_tab('C', tunings => ['richter']);
+  ok(exists $t{richter});
+  ok(!exists $t{harmonic_minor});
+}
+
+{
+  my %t = tune_to_tab('C', tunings => ['richter', 'harmonic_minor']);
+  ok(exists $t{richter});
+  ok(exists $t{harmonic_minor});
+}
+
 done_testing;

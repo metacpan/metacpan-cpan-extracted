@@ -90,7 +90,7 @@ sub get_settings {
     my ($self) = @_;
     {
         list => [$self->get_list],
-        value => $self->{'start_int'}->GetValue ? 1 : 0,
+        value => $self->{'start_int'}->GetValue ? $self->{'start_int'}->GetValue : 0,
         repeat => $self->{'repeat_start'}->GetValue ? 1 : 0,
     }
 }

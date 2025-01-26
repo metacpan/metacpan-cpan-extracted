@@ -1,8 +1,34 @@
+Revision history for Perl module Crypt::RSA
 
-                        CHANGELOG for Crypt::RSA
-           $Id: Changes,v 1.25 2001/05/30 13:10:32 vipul Exp $
+0.52 -- Sat Jan 25 09:13:41 AST 2025
 
---------------------------------------------------------------------------
+    [Significant updates since 0.50]
+    - New Maintainer
+    - Fairly small release however 5c19404 fixed what is arguably a security issue
+    - as previous builds would load modules from unsafe locations (@atoomic)
+
+    [Change Log]
+    - 2f5688e Increment repo version
+    - 0e4a6b1 v0.51
+
+0.51 -- Fri Jan 24 22:41:00 AST 2025
+
+    [Significant updates since 0.50]
+    - New Maintainer
+    - Fairly small release however 5c19404 fixed what is arguably a security issue
+    - as previous builds would load modules from unsafe locations (@atoomic)
+
+    [Change Log]
+    * 46c4337 (HEAD -> main) Add .gitignore
+    * 5951965 Add github Actions
+    * 7dda4d3 Manage build with Dist::Zilla
+    * c624da8 Add security policy
+    * 5e0cd7d Add use strict and warnings
+    * 7f3f50f Fixes #24554: Suppress "uninitialized value" warnings from Crypt::Primes
+    * 6865743 Fixes RT#86470 typo fixes
+    * 5c19404 Do not load modules from unsafe locations
+    * eed1821 Remove useless use lib from tests
+    * 62901bb (tag: 0.50) Import 0.50 from CPAN
 
 0.50                                                      January 16, 2003
 

@@ -1,0 +1,464 @@
+#!/usr/bin/perl
+
+# ------------------------------------------------------------------------
+# This program is only for use by the developer of this module.
+# ------------------------------------------------------------------------
+# Running "make test" should be good enough for everyone else!
+# ------------------------------------------------------------------------
+# Only modify file: full_developer_test.pl.src
+#              not: full_developer_test.pl
+# Run "make" to generate the PL file!
+# make does:   perl  full_developer_test.pl.src  full_developer_test.pl
+# ------------------------------------------------------------------------
+# Running:  full_developer_test.pl
+# ------------------------------------------------------------------------
+# It runs "make test" 2 times with changes to $ENV{FISH_OFF_FLAG}
+#   1) FISH_OFF_FLAG = 1    Run tests using Fred::Fish::DBUG qw /OFF/
+#   2) FISH_OFF_FLAG = 0    Run tests using Fred::Fish::DBUG qw /ON/
+#
+# If a "make test" fails, it won't run the next in the series!
+#
+# There will be fish logs generated in each case.  The only difference
+# is when FISH_OFF_FLAG is set, Advanced::Config itself won't use fish.
+# Only the test programs themselves will use it.  Which is how this
+# module is expected to be run by normal users.
+# It just proves that using Fred::Fish::DBUG "on" vs "off" doesn't change
+# the behaviour of my module.
+# ------------------------------------------------------------------------
+# Running:  full_developer_test.pl t/<name>.t
+# ------------------------------------------------------------------------
+# Forces a "make" first.
+# Runs just that one test program 2 times instead of the full "make test".
+# Does this via "prove -bv t/<name>.t"
+# Before each run it will reset FISH_OFF_FLAG.  It's just a quick and
+# dirty way to fully debug individual test progs.
+# ------------------------------------------------------------------------
+
+use strict;
+use warnings;
+
+use ExtUtils::MakeMaker 6.30;
+use File::Spec;
+use Cwd 'abs_path';
+use File::Basename;
+use File::Copy;
+use File::Glob qw (bsd_glob);
+
+# The number of fish log files to locate for each 'make test' run!
+use constant MAX => 28;
+
+my $fish_dir_summary;
+my $fish_dir_details;
+
+BEGIN {
+   eval {
+      require Time::HiRes;
+      Time::HiRes->import ( qw(time sleep) );
+   };
+}
+
+# Main Program ...
+
+{
+   $fish_dir_summary = File::Spec->catdir ("t", "log_summary");
+   $fish_dir_details = File::Spec->catdir ("t", "log_details");
+
+   unless ( -d "t" ) {
+      die ("No such sub-dir './t'.  Must run from the build dir!\n");
+   }
+   unless ( -d $fish_dir_summary ) {
+      die ("No such sub-dir '${fish_dir_summary}'.  Must run from the build dir!\n");
+   }
+   unless ( -d $fish_dir_details ) {
+      die ("No such sub-dir '${fish_dir_details}'.  Must run from the build dir!\n");
+   }
+
+   # Delete %ENV entry so t/99-failure.t will pass all it's tests!
+   delete $ENV{FAIL_TEST_99};
+
+   # Create %ENV entry so t/75-check_all_languages.t will fully write to fish.
+   # Also used by t/76-check_all_languages2.t
+   $ENV{FULL_75_TEST} = 1;
+
+   my $fail_test_msg = "";
+
+   my $one_test_prog;
+   my $one_fish_base;
+
+   # --------------------------------------------------------------------------
+   # This implements
+   #   PL_FILES => { 'full_developer_test.pl.src' => 'full_developer_test.pl' }
+   # from Makefile.PL ...
+   # --------------------------------------------------------------------------
+   # This is only true during "make".
+   # --------------------------------------------------------------------------
+   if ( defined $ARGV[0] ) {
+      my $prog = basename ( $0, ".src" );
+      if ( $prog eq $ARGV[0] ) {
+         my $file = File::Spec->catfile ( dirname ($0), $prog );
+         copy ( $0, $file ) or die ("Can't create file: $file\n");
+         chmod ( 0755, $file );     # Executable by everyone!
+         print STDERR "Created file: $file\n";
+         exit 0;
+
+      # Requesting that we run a specific test program in sub-dir "t" ...
+      # Must enforce since "prove" always reports failure if not true!
+      } elsif ( -f $ARGV[0] && -r _ ) {
+         $one_test_prog = $one_fish_base = $ARGV[0];
+
+         # Logic is from helper1234::turn_fish_on_off_for_advanced_config () ...
+         $one_fish_base =~ s/[.]t$//;
+         $one_fish_base =~ s/[.]pl$//;
+         $one_fish_base .= ".fish.txt";
+         $one_fish_base = basename ( $one_fish_base );
+
+         # Can't use prove if the program isn't in the "t" sub-dir.
+         if ( dirname ( $one_test_prog ) ne "t" ) {
+            print STDERR "Program \"${one_test_prog}\" must reside in the \"t\" sub-directory!\n";
+            exit 3;
+         }
+
+         $fail_test_msg = uc ($ARGV[1] || "");
+
+      } elsif ( uc ($ARGV[0]) eq "BOTH" ) {
+         $fail_test_msg = uc ($ARGV[0]);
+
+      } elsif ( uc ($ARGV[0]) eq "DETAIL" ) {
+         $fail_test_msg = uc ($ARGV[0]);
+
+      } elsif ( uc ($ARGV[0]) eq "SUMMARY" ) {
+         $fail_test_msg = uc ($ARGV[0]);
+
+      # Something unexpected on the command line ...
+      } else {
+         print STDERR "Unknown program '$ARGV[0]'\n";
+         exit 3;
+      }
+   }
+
+   # --------------------------------------------------------------------------
+   # If not building the *.pl file, lets run the requested tests ...
+   # Each test will be run 2 times.  Resetting the special environment
+   # variable between runs.  The 2nd run is much slower than the 1st run.
+   # --------------------------------------------------------------------------
+   # Locate the "make" variant & then run ${make} ...
+   my $make = find_and_run_make ();
+
+   my ( $fail_summary_flag, $fail_detail_flag ) = ( 0, 0 );
+   if ( $fail_test_msg eq "BOTH" ) {
+      $fail_summary_flag = $fail_detail_flag = 1;
+   } elsif ( $fail_test_msg eq "DETAIL" ) {
+      $fail_detail_flag = 1;
+   } elsif ( $fail_test_msg eq "SUMMARY" ) {
+      $fail_summary_flag = 1;
+   }
+
+   if ( $one_test_prog ) {
+      run_specific_test ( $one_test_prog, $one_fish_base, $fail_summary_flag, $fail_detail_flag );
+
+   } else {
+      delete_old_fish_logs ();
+      run_all_tests ( $make, $fail_summary_flag, $fail_detail_flag );   # Does via "make test".
+   }
+
+   exit (0);
+}
+
+
+# ==============================================================================
+# Start of the functions called ...
+# ==============================================================================
+
+# Run the test suite in both configurations ...
+sub run_all_tests
+{
+   my $make         = shift;
+   my $summary_flag = shift;
+   my $details_flag = shift;
+
+   my ( $summary_msg, $detail_msg );
+
+   my $t0 = time ();
+
+   # Run the summary test ...
+   eval {
+      local $ENV{FAIL_TEST_99} = 1   if ( $summary_flag );
+      run_make_test ( $make,  1, MAX, "=", "Fred::Fish::DBUG::OFF, just high level logs generated. (fast)" );
+   };
+   if ( $@ ) {
+      $summary_msg = $@;
+   }
+   my $t1 = time ();
+
+   # Run the detailed test ...
+   eval {
+      local $ENV{FAIL_TEST_99} = 1   if ( $details_flag );
+      run_make_test ( $make,  0, MAX, "-", "Fred::Fish::DBUG::ON, providing detailed logging. (slow)" );
+   };
+   if ( $@ ) {
+      $detail_msg = $@;
+   }
+   my $t2 = time ();
+
+   print_status ( $summary_msg, $detail_msg );
+
+   printf "Pass 1: %.1f second(s)\n", ($t1 - $t0);
+   printf "Pass 2: %.1f second(s)\n", ($t2 - $t1);
+   print "\n";
+
+   return;
+}
+
+
+# Run a test suite in the requested mode ...
+sub run_make_test
+{
+   my $make     = shift;    # Which make command to use.
+   my $off_flag = shift;    # Which setting to use: 0, 1.
+   my $num_fish = shift;    # The number of fish files to expect ...
+   my $sep_char = shift;
+   my $log_msg  = shift;
+
+   my $mk = basename ($make);
+
+   printf ("\n%s\n", ${sep_char}x50);
+   print "Running '${mk} test' for ${log_msg} ...\n";
+   printf ("%s\n\n", ${sep_char}x50);
+
+   # Determine the test mode to use ...
+   $ENV{FISH_OFF_FLAG} = ${off_flag};
+
+   # Run the tests ...
+   my $res = system ("${make} test");
+   my $cnt = show_fish_logs ( ${off_flag} ? $fish_dir_summary : $fish_dir_details );
+
+   # Check out the results ...
+   if ( $res != 0 ) {
+      die ("Failed one or more test cases!  FISH_OFF_FLAG == ${off_flag}  (${log_msg}!)\n\n");
+   }
+   if ( $cnt != ${num_fish} ) {
+      die ("Failed final test case!  FISH_OFF_FLAG == ${off_flag}  (${log_msg}!)\n",
+           "Wrong number of fish logs generated! (${cnt} vs ${num_fish})\n\n");
+   }
+
+   return;
+}
+
+# Run a single test in both modes using "prove" ...
+sub run_specific_test
+{
+   my $prog         = shift;
+   my $fish         = shift;   # The basename of the fish log file ...
+   my $summary_flag = shift;
+   my $details_flag = shift;
+
+
+   my $log_s = File::Spec->catfile ($fish_dir_summary, $fish);
+   my $log_d = File::Spec->catfile ($fish_dir_details, $fish);
+
+   # Delte both log files ...
+   unlink ( $log_s, $log_d );
+
+   my ( $summary_msg, $detail_msg );
+
+   my $prove = which_prove ( $prog );
+
+   # Run the summary test ...
+   eval {
+      local $ENV{FAIL_TEST_99} = 1   if ( $summary_flag );
+      run_that_test ( $prove, $prog, $log_s, 1, "=", "Fred::Fish::DBUG::OFF, just high level logs available. (fast)" );
+   };
+   if ( $@ ) {
+      $summary_msg = $@;
+   }
+
+   # Run the detailed test ...
+   eval {
+      local $ENV{FAIL_TEST_99} = 1   if ( $details_flag );
+      run_that_test ( $prove, $prog, $log_d, 0, "-", "Fred::Fish::DBUG, providing detailed logging. (slow)" );
+   };
+   if ( $@ ) {
+      $detail_msg = $@;
+   }
+
+   print_status ( $summary_msg, $detail_msg );
+
+   return;
+}
+
+sub run_that_test
+{
+   my $prove    = shift;     # Prove or Perl binary to use.
+   my $prog     = shift;
+   my $fish     = shift;
+   my $off_flag = shift;     # Which setting to use: 0, 1.
+   my $sep_char = shift;
+   my $log_msg  = shift;
+
+   my $p = basename ($prove);
+
+   # Determine the test mode to use ...
+   $ENV{FISH_OFF_FLAG} = ${off_flag};
+
+   # Running the test via prove ...
+   printf ("\n%s\n", ${sep_char}x50);
+   print "Running '${p} -bv ${prog}' for ${log_msg} ...\n";
+   printf ("%s\n\n", ${sep_char}x50);
+   my $res = system ("${prove} -bv ${prog}");
+
+   if ( $res != 0 ) {
+      die ("Failed test case ($res)!  FISH_OFF_FLAG == ${off_flag}  (${log_msg}!)\n\n");
+   }
+
+   if ( -f $fish ) {
+      print "Found fish file: ${fish}\n";
+   } else {
+      print "No fish file found: ${fish}\n";
+   }
+
+   return;
+}
+
+
+sub print_status
+{
+   my $summary = shift;
+   my $details = shift;
+
+   if ( $summary && $details ) {
+      die ( "\n", $summary, $details );
+
+   } elsif ( $summary ) {
+      my $msg = "Detail test cases passed!\n\n";
+      die ( "\n", $summary, $msg );
+
+   } elsif ( $details ) {
+      my $msg = "Summary test cases passed!\n\n";
+      die ( "\n", $msg, $details );
+
+   } else {
+      print "\nAll tests ran OK!\n\n";
+   }
+
+   return;
+}
+
+
+# Lists the fish files generated by "make test" ...
+sub show_fish_logs
+{
+   my $fish_dir = shift;
+
+   print "\nThe fish logs for: FISH_OFF_FLAG == $ENV{FISH_OFF_FLAG} ...\n";
+
+   my $wild = File::Spec->catfile ( $fish_dir, "*.fish.txt" );
+   my $cnt = 0;
+
+   foreach my $f ( bsd_glob ( $wild ) ) {
+      print "   $f\n";
+      ++$cnt;
+   }
+
+   print "Found ${cnt} fish logs ...\n\n";
+
+   return ( $cnt );
+}
+
+
+# Cleans up after previous runs of this program ...
+sub delete_old_fish_logs
+{
+   my $wild_1 = File::Spec->catfile ( $fish_dir_summary, "*.fish.txt" );
+   my $wild_2 = File::Spec->catfile ( $fish_dir_details, "*.fish.txt" );
+
+   foreach my $f ( bsd_glob ( $wild_1 ), bsd_glob ( $wild_2 ) ) {
+      unlink ( $f );
+   }
+
+   return;
+}
+
+
+# Tries to find out the proper 'make' program to use for your platform ...
+# Then runs it.  If it exits with a non-zero status it assumes it's the
+# wrong one and tries out the next one in the list!
+sub find_and_run_make
+{
+   my $cmd;
+
+   print "\nSearching for the correct 'make' variant to use ...\n\n";
+
+   # Keep dmake last since Strawberry perl depreciated it in favor of gmake.
+   # Assumes any depreciated make found will exit with a status of zero!
+   foreach my $make ( "make", "gmake", "dmake" ) {
+      $cmd = which ( $make );
+
+      if ( defined $cmd ) {
+         my $mk = basename ( $cmd );
+         print "\nRunning '${mk}' ...\n";
+
+         my $res = system ( $cmd );
+         if ( $res == 0 ) {
+            last;       # The command is good!
+         } else {
+            print "Failed '${mk}'.  Looking for the next make variant in the list.\n\n";
+            $cmd = undef;
+         }
+      }
+   }
+
+   unless ( defined $cmd ) {
+      die ("Can't locate a working 'make' program to run 'make test' with!\n");
+   }
+
+   print "Found: $cmd\n";
+
+   return ($cmd);
+}
+
+# Tries to find out the proper 'prove' program to use for your platform ...
+sub which_prove
+{
+   my $process = shift;
+
+   my $cmd;
+
+   print "\nSearching for the correct 'prove' variant to use ...\n\n";
+
+   foreach my $prove ( "prove" ) {
+      $cmd = which ( $prove );
+      last  if ( defined $cmd );
+   }
+
+   unless ( defined $cmd ) {
+      die ("Can't locate a 'prove' program to run 'prove -bv ${process}' with!\n");
+   }
+
+   print "Found: $cmd\n";
+
+   return ($cmd);
+}
+
+# A simple version of which() so I don't have to depend on an external module.
+sub which
+{
+   my $prog = shift;
+
+   my $cmd;
+
+   my @path = File::Spec->path ();
+
+   foreach my $d (@path) {
+      printf ("CHK-IN-DIR (%s): %s\n", $prog, $d);
+      my $f = File::Spec->catfile ( abs_path ($d), $prog );
+
+      # Now see if the file exists & is executable ...
+      $cmd = MM->maybe_command ( $f );   # Provided by ExtUtils::MakeMaker ...
+      last  if ( defined $cmd );
+   }
+
+   print "\n";
+
+   return ($cmd);
+}
+

@@ -1,5 +1,11 @@
 Revision history for Perl module PPI::App::ppi_version::BDFOY
 
+1.006 2025-01-25T16:56:29Z
+	* lets try PAUSE indexing with separate modules for each name
+
+1.005 2025-01-22T23:31:48Z
+	* add both namespaces to provides in META so PAUSE can see them both
+
 1.004 2025-01-22T16:43:12Z
 	* need to bump the version past that for the old ::BDFOY version
 

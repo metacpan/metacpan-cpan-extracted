@@ -1,47 +1,98 @@
 {
    "abstract" : "fast function for converting markdown to HTML (requires C compiler)",
    "author" : [
-      "Masayoshi Sekimura <sekimura@cpan.org>"
+      "Masayoshi Sekimura, <sekimura@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.23",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Text-Markdown-Discount",
    "no_index" : {
       "directory" : [
          "t",
-         "inc"
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
       ]
    },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::CBuilder" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Module::Build" : "0.4005"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7",
+            "Text::Diff" : "0"
          }
       },
       "runtime" : {
-         "requires" : {}
+         "requires" : {
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "Text::Markdown::Discount" : {
+         "file" : "lib/Text/Markdown/Discount.pm",
+         "version" : "0.18"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Songmu/text-markdown-discount/issues"
+      },
+      "homepage" : "https://github.com/Songmu/text-markdown-discount",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/sekimura/text-markdown-discount.git",
-         "web" : "https://github.com/sekimura/text-markdown-discount"
+         "url" : "https://github.com/Songmu/text-markdown-discount.git",
+         "web" : "https://github.com/Songmu/text-markdown-discount"
       }
    },
-   "version" : "0.17",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "0.18",
+   "x_contributors" : [
+      "Alessandro Ghedini <al3xbio@gmail.com>",
+      "Anirvan Chatterjee <anirvan@users.noreply.github.com>",
+      "Anirvan Chatterjee <x.github@chatterjee.net>",
+      "Atri Bhattacharya <badshah400@gmail.com>",
+      "Brian Fraser <brian.fraser@booking.com>",
+      "David Steinbrunner <dsteinbrunner@pobox.com>",
+      "David Triendl <david@triendl.name>",
+      "Furutsuki <7302203+theoremoon@users.noreply.github.com>",
+      "Gabor Szabo <gabor@szabgab.com>",
+      "Masayoshi Sekimura <msekimura@saymedia.com>",
+      "Masayoshi Sekimura <sekimura@gmail.com>",
+      "Masayoshi Sekimura <sekimura@sekimacmini.local>",
+      "Masayoshi Sekimura <sekimura@sunny2.(none)>",
+      "Masayuki Matsuki <y.songmu@gmail.com>",
+      "Neil Bowers <neil@bowers.com>",
+      "Shoichi Kaji <skaji@cpan.org>",
+      "harupong <harupong@gmail.com>",
+      "hitode909 <hitode909@gmail.com>",
+      "tokuhirom <tokuhirom@gmail.com>",
+      "utagawa kiki <utagawakiki@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_static_install" : 0
 }

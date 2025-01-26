@@ -1,6 +1,6 @@
 package Text::Markdown::Discount;
 
-use 5.008000;
+use 5.008001;
 use strict;
 use warnings;
 
@@ -25,7 +25,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 require XSLoader;
 XSLoader::load('Text::Markdown::Discount', $VERSION);
@@ -57,6 +57,8 @@ sub markdown {
 
 1;
 __END__
+
+=for stopwords testsuite html5 hgroup nav superset
 
 =head1 NAME
 

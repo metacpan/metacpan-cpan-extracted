@@ -1,3 +1,9 @@
+0.33 2025-01-25  lichtkind
+-------
+    * = bug fix release
+    * ! first row status is now saved in a settings file
+    * ! ensure config fils have ending .ini
+
 0.32 2023-11-17  lichtkind
 -------
     * = bug fix release

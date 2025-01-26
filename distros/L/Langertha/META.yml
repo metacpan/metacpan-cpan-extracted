@@ -20,6 +20,7 @@ requires:
   JSON::MaybeXS: '0'
   JSON::PP: '0'
   LWP::Protocol::https: '0'
+  MIME::Base64: '0'
   Module::Runtime: '0'
   Moose: '0'
   MooseX::NonMoose: '0'
@@ -32,7 +33,7 @@ requires:
 resources:
   homepage: https://github.com/Getty/langertha
   repository: https://github.com/Getty/langertha.git
-version: '0.006'
+version: '0.007'
 x_Dist_Zilla:
   perl:
     version: '5.036000'
@@ -111,7 +112,7 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^:^([0-9]+\.[0-9]+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.39.2
+          git_version: 2.39.5
           repo_root: .
       name: '@Author::GETTY/Git::NextVersion'
       version: '2.048'
@@ -147,7 +148,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.39.2
+          git_version: 2.39.5
           repo_root: .
       name: '@Author::GETTY/Git::CheckFor::CorrectBranch'
       version: '0.014'
@@ -263,7 +264,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.39.2
+          git_version: 2.39.5
           repo_root: .
       name: '@Author::GETTY/@Git/Check'
       version: '2.048'
@@ -281,7 +282,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.39.2
+          git_version: 2.39.5
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -294,11 +295,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.006'
+          tag: '0.007'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.39.2
+          git_version: 2.39.5
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -312,7 +313,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.39.2
+          git_version: 2.39.5
           repo_root: .
       name: '@Author::GETTY/@Git/Push'
       version: '2.048'

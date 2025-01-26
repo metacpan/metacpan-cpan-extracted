@@ -1,0 +1,222 @@
+# The Change Log for Advanced::Config
+
+# The basic algorithm was initially an attempt to allow Perl and Unix shell
+# scripts to share common configuration files.  And it just grew with a life
+# of it's own since then.
+
+# --------------------------------------------------------------------
+# Developer's Note:
+# By default, fish is turned off.  To turn it on do the following:
+#       1) On Unix:  export ADVANCED_CONFIG_FISH=1
+#       2) On Windows:  set ADVANCED_CONFIG_FISH=1
+# This is done by most of the test cases that use this module.
+# See the README files for more details on this.
+#
+# To turn fish back off, reset this variable to zero!
+# --------------------------------------------------------------------
+
+
+Version - YYYY/MM/DD
+---------------------
+1.10 2025-01-01 08:30:00
+  - Fixed so minimum version of 2.08 required for using Fred::Fish::DBUG.
+    So it's limitations with earlier Perl versions wouldn't affect this one.
+  - Updated copyrights to 2024 on all files, both *.PM & t/*.t.
+  - Fixed t/75-check_all_languages.t to ignore buggy language definitions.
+  - Fixed t/75-check_all_languages.t & t/76-check_all_languages2.t to
+    make sure it creates the fish log before it tries to load optional
+    modules.  So the developer tests will find the proper number of
+    fish files.  Also speeded up the test cases.
+  - Fixed POD NAME on all *.pm files to follow Perl standards.
+  - Corrected various typos in the POD.
+  - Updated stale links in the POD.
+  - Config.pm & Options.pm - Added On/Off to get_boolean() & updated the POD
+    to say so.
+  - Config.pm - removed depreciated function section().
+  - Makefile.PL - Fixed build script bug.
+  - Fixed to require Fred::Fish::DBUG v2.09 so I could use it's new Test module
+    in the t/*.t test scripts.   Simplified a lot of code.
+  - Updated copyright to 2025 in all files.
+
+1.09 2020-10-05 08:30:00
+  - Fixed so minimum version of 2.01 required for using Fred::Fish::DBUG.
+  - Modified all *.pm files to eliminate the BEGIN logic the older versions
+    of DBUG required.
+  - Modified all t/*.t test progs to use Fred::Fish::DBUG 2.01 qw / on /;
+
+1.08 2020-03-16 08:30:00
+  - Config.pm - Fixed most functions not exposed by POD to use a leading
+    underscore in their names to be more consistent.  The remaining exceptions
+    used to be exposed in POD and are being depreciated.  As always anything
+    beginning with an underscore is subject to change without notice.
+  - Date.pm - Major rewrite of parse_date() in advance of using Date::Manip as
+    an alternate source to getting foreign language support.
+  - Date.pm - Adding Date::Manip logic.  Greatly expands the number of languages
+    and date formats allowed.
+  - t/76-check_all_languages2.t - Test case to support using Date::Manip.
+
+1.07 2020-02-20 08:30:00
+  - Updated copyrights to 2020 on all files.
+  - Made some corrections to the README file.
+  - Reader.pm - Added an optional trim flag to expand_variables().
+  - Reader.pm - Fixed balanced quote bug in parse_line().
+  - Fixed t/60-recursion-test.t & 60-recursion-test.cfg to handle trim
+    properly.
+  - 40-validate-modifiers.cfg - Modified to highlight the parse_line()
+    balanced quote issue was fixed.
+  - Reader.pm - Fixed disable quotes bug by checking 1st in parse_line()
+    quote detection section.
+  - Config.pm - Changed section() to get_section(), depreciating section()
+    with a stub function that prints warning if used.
+  - Config.pm - Added create_section() and no longer exposed new_section()
+    in the POD.  Also added new flag SENSITIVE_SECTION to tell if the section
+    name was sensitive to fix bug in _base_set() & set_value().
+  - Reader.pm - Fixed to use get_section() & create_section().
+  - Reader.pm - Fixed hide section bug in read_config().
+  - t/*.t - Fixed several test cases to use get_section().
+  - t/11-manual_build.t - Fixed to use create_section() and to also create
+    a sensitive section to verify masking words correctly for set_value().
+  - Options.pm - Fixed floating point numeric checks in apply_get_rules().
+  - 13-alt-get-tests.t & 13-alt-get-tests.cfg - fixed to allow 1. and .1
+    as valid numeric test values.  Also added numeric flag to compare
+    arrays function.   Also added additional floating point tests.
+  - Options.pm - Fixed sudo bug returning wrong user in _get_user_id().
+  - Config.pm - Fixed issue with print_special_vars() when called incorrectly.
+  - Options.pm - Made corrections to the POD.
+  - Date.pm - Fixed issue with lc/uc.  IE: In German -- M RZ vs m rz
+  - Date.pm - Added wide char flag to _swap_common(), init_special_date_arrays()
+    and swap_language() to allow for wide char/utf8 support.
+  - New test case:  t/75-check_all_languages.t
+  - Date.pm - Fixed a lot of minor bugs now that I have a test case that tests
+    all the languages defined by Date::Language & realized just how inconsistent
+    that module's language files really are.  But I don't have a better source
+    for this data.
+  - Config.pm - Fixed bug in load_config & load_string where it was modifying
+    the default options instead of overriding them.
+  - Added new option use_utf8 to supports config files written in UTF-8 mode.
+  - Added new option to disable variable modifications when they cause
+    problems.
+  - Updated Makefille.PL to make DBUG v1.09 the minimum allowed version.
+    That's when DBUG supported writing Wide Chars to fish.  It also allowed
+    me to simplify all t/*.t test programs logging by removing support
+    for obsolete features.  The module itself will still work with DBUG
+    v1.03 or later as long as option 'use_utf8' isn't being used.
+  - t/00-basic.t - Fixed to enforce the same min version as Makefile.PL.
+  - helper1234.pm - Removed fixes for earlier DBUG versions.  No longer
+    any need for a lot of conditional logic in test cases.
+  - t/*.t - Removed calls to helper methods removed from helper1234.pm
+    as no longer needed after DBUG min version upgraded.
+  - Created full_developer_test.pl.src to make things easier for a
+    full test of the module.  Does a summary pass then a detailed pass.
+  - Created t/log_summary & t/log_details log dirs to hold the logs for
+    each pass.  By default "make test" uses t/log_details.
+  - Modified all t/*.t to call turn_fish_on_off_for_advanced_config()
+    in the helper package to calculate which log dir to put the log
+    file into.
+  - Reader.pm - fixed perl 5.28 bitwise exclusive or on Unicode strings being
+    depreciated.
+
+1.06 2019-11-01 08:30:00
+  - Removed the DBUG_REGISTER call from all modules since it's definition
+    changed in DBUG (v1.08) and was depreciated.
+  - Added the 3 back quote options for allowing your config files to run
+    commands to set a tag's value per a user request.  (Disabled by default)
+  - Then removed it for being too much of a security concern.  Left the options
+    in as comments so I can remember why I backed it out until I can figure out
+    better protection from malicious actors.
+  - Improved disable tests in t/20-sensitive.t & it's config file.
+  - Some minor POD corrections to all the modules.
+  - Fixed expand_variables() in Reader.pm to continue expanding non-encrypted
+    variables after an encrypted one was hit when option "disable_decryption"
+    is used.
+  - Fixed POD in Options.pm to reflect how "disable_decryption" now works
+    with variables enabled.
+  - Added 27-disable_decrypt_test.t to test out this feature.
+  - Fixed tests t/28-sensitive_tests.t & t/35-improper_tests.t which broke
+    when we fixed expand_variables().
+  Never uploaded to CPAN.
+
+1.05 2019-05-30 08:30:00
+  - Added print_special_vars() as a quick & dirty way to get a list of the
+    special variables supported by this module.
+  - Added "section" as a new special variable!
+  - Added "section" test to t/12-validate_sections.t to validate the new
+    variable works correctly.
+  - Options.pm - Added "use_gmt" as a new "Special Date Variable Formatting
+    Option" to allow the use of gmtime instead of localtime when calculating
+    the date variable values.
+  - Options.pm - Fixed bug calculating yesterday/tomorrow when going on/off
+    daylight savings time during today.  Also allowed for leap seconds.
+  - Config.pm - Removed DBUG code that conflicted with latest release of
+    the DBUG module (v1.06).  So still compatible with earlier releases.
+  - helper1234.pm - Provided a fix for the DBUG incompatibility issue.
+  - t/*.t - Fixed all test cases to call the new method in helper1234.pm
+    for when it would hit the incompatibility.
+  - Forced t/00-basic.t to enforce minimum module versions for "make test".
+  Never uploaded to CPAN.
+
+1.04 2019-03-13 08:30:00
+  - Broke circular references that was requiring the same logic in multiple
+    modules.  Now just done in Options.pm and referenced by the other modules.
+  - Examples.pm - Fixed more typos in the POD.
+  - Examples.pm - Added encrypt/decrypt example config file.
+  - Fixed t/13-alt-get-tests.t to explicitly use "date_format => 3" instead of
+    relying on it to remain the default value for this option for these date
+    tests to work in the future.
+  - Added clarification that the # char is only special to Test::More::ok in
+    t/01-basic_regexp.t, not for RegExpr.
+  Never uploaded to CPAN.
+
+1.03 2019-03-06 08:30:00
+  - Updated the VERSION in all *.pm files.
+  - Fixed some POD formatting errors in Options.pm
+  - Fixed some POD typos in Reader.pm
+  - Fixed some POD typos in Date.pm
+  - Fixed 2 digit year bug in parse_date() in Date.pm, parsing two digit years
+    are still problematic and quite frequently ambiguous.
+  - More enhancements for parsing 2 & 4 digit year dates in parse_date().
+  - Added more date tests in t/09-basic_date.t to further test various date
+    formats.
+  - Advanced::Config::Options now disallows 2 digit year dates by default
+    due to the ambiguity involved in trying to parse them.  Also updated
+    the POD to say so in Date.pm & Options.pm.
+  - Replaced option 'date_disable_yy' with "date_enable_yy" to make the 2 digit
+    date handling default more intuitive.
+  - Retired option 'date_reverse_test' in favor of option "date_format" to make
+    the parsing of numeric dates less ambiguous.  Required a reorg of the
+    arguments to all the parse date functions.  Also required to replace arg $up
+    with $order so we must pick & choose which format to use.
+  - Fixed t/13-alt-get-tests.t to explicitly use "date_enable_yy => 1"
+    during all calls to get_date() to allow 2-year dates in the tests!
+  - Fixed t/t/09-basic_date.t to explicitly allow 2-year dates in it's
+    tests as well.
+  - Added option date_dl_conversion to allow the use of Date:Language:str2time()
+    to optionally enhance parse_date().
+  - Fixed bug in the dynamic DBUG/DBUG::OFF module selection in all module BEGIN
+    blocks.
+  Never uploaded to CPAN.
+
+1.02 2019-01-08 08:30:00
+  - Corrected some significant errors in the POD text.
+  - Added some usage errors in move_tag, rename_tag, and delete_tag.
+  - Merged rule 5 & 6 tests in lookup_one_variable().  But left
+    separate in POD.
+  - Added toHash() method to convert object into a hash.
+  - Fixed sensitive bug in Options.pm.
+  - Now uses DBUG's built in argument masking method instead of hacking the
+    code to enforce masking.  Enables us to put the arguments in a more sane
+    order in the future and eliminated convoluted code for masking what wasn't
+    needed for module functionality.
+  - Updated min version of DBUG allowed in Makefile.PL so previous fix works!
+    (version: 1.03)
+  - Fixed jan/dec bug in Options.pm for next/previous month check.
+  - t/00-basic.t now uses BAIL_OUT() to force "make test" to abort if
+    it hits compile errors with my module.  Makes it easier to debug
+    changes.
+  - Added test case dependencies to Makefile.PL
+  Never uploaded to CPAN.
+
+1.01 2018-08-06 08:30:00
+  - Prepping for an Initial Public Release from a private personal baseline.
+  Never uploaded to CPAN.
+

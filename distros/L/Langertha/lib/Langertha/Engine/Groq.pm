@@ -1,7 +1,7 @@
 package Langertha::Engine::Groq;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: GroqCloud API
-$Langertha::Engine::Groq::VERSION = '0.006';
+$Langertha::Engine::Groq::VERSION = '0.007';
 use Moose;
 use Carp qw( croak );
 
@@ -41,7 +41,7 @@ Langertha::Engine::Groq - GroqCloud API
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 

@@ -1,7 +1,7 @@
 /*
  * Read MaxMind DB files
  *
- * Copyright (C) 2022 Andreas Vögele
+ * Copyright (C) 2025 Andreas Vögele
  *
  * This module is free software; you can redistribute it and/or modify it
  * under the same terms as Perl itself.
@@ -24,6 +24,8 @@
 #define dTHXfield(var)
 #endif
 
+#define is_ipv6_database(mmdb) (6 == (mmdb)->metadata.ip_version)
+
 typedef struct ip_geolocation_mmdb {
     MMDB_s mmdb;
     SV *file;
@@ -45,7 +47,7 @@ init_iterate_data(iterate_data *data, IP__Geolocation__MMDB self,
     data->self = self;
     data->data_callback = data_callback;
     data->node_callback = node_callback;
-    data->max_depth = (6 == self->mmdb.metadata.ip_version) ? 128 : 32;
+    data->max_depth = is_ipv6_database(&self->mmdb) ? 128 : 32;
 }
 
 static SV *
@@ -463,16 +465,22 @@ DESTROY(self)
     SvREFCNT_dec(self->file);
     Safefree(self);
 
-SV *
-record_for_address(self, ...)
+void
+get(self, ...)
     IP::Geolocation::MMDB self
+  ALIAS:
+    record_for_address = 1
   INIT:
     const char *ip_address;
     int gai_error, mmdb_error;
     const char *error;
     MMDB_lookup_result_s result;
     MMDB_entry_data_list_s *list;
-  CODE:
+    SV *data = &PL_sv_undef;
+    int wants_prefix_length = 0;
+    uint16_t prefix_length = 0;
+    U8 gimme = GIMME_V;
+  PPCODE:
     ip_address = NULL;
     if (items > 1) {
         ip_address = SvPVbyte_nolen(ST(1));
@@ -490,12 +498,11 @@ record_for_address(self, ...)
         error = MMDB_strerror(mmdb_error);
         croak("Error looking up IP address \"%s\": %s", ip_address, error);
     }
-    RETVAL = &PL_sv_undef;
     if (result.found_entry) {
         list = NULL;
         mmdb_error = MMDB_get_entry_data_list(&result.entry, &list);
         if (MMDB_SUCCESS == mmdb_error) {
-            (void) decode_entry_data_list(self, list, &RETVAL, &mmdb_error);
+            (void) decode_entry_data_list(self, list, &data, &mmdb_error);
         }
         MMDB_free_entry_data_list(list);
         if (MMDB_SUCCESS != mmdb_error) {
@@ -503,9 +510,20 @@ record_for_address(self, ...)
             croak("Entry data error looking up \"%s\": %s", ip_address,
                   error);
         }
+        if (0 == ix && G_SCALAR != gimme) {
+            wants_prefix_length = 1;
+            if (instr(ip_address, ".") && is_ipv6_database(&self->mmdb)) {
+                prefix_length = result.netmask - 96;
+            }
+            else {
+                prefix_length = result.netmask;
+            }
+        }
     }
-  OUTPUT:
-    RETVAL
+    XPUSHs(sv_2mortal(data));
+    if (wants_prefix_length) {
+        XPUSHs(sv_2mortal(newSVuv(prefix_length)));
+    }
 
 void
 iterate_search_tree(self, ...)

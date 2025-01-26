@@ -8,7 +8,6 @@
 ##
 ## $Id$
 
-use lib qw(../lib);
 use strict;
 use Test;
 

@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Glorified metronome
 
-our $VERSION = '0.5006';
+our $VERSION = '0.5007';
 
 use Moo;
 use strictures 2;
@@ -666,7 +666,7 @@ sub play_with_timidity {
     if ($self->soundfont) {
         $config ||= 'timidity-midi-util.cfg';
         timidity_conf($self->soundfont, $config);
-        @cmd = ('timidity', '-c', $config, $self->file);
+        @cmd = ('timidity', '-c', $config, '-Od', $self->file);
     }
     else {
         @cmd = ('timidity', $self->file);
@@ -703,7 +703,7 @@ MIDI::Drummer::Tiny - Glorified metronome
 
 =head1 VERSION
 
-version 0.5006
+version 0.5007
 
 =head1 SYNOPSIS
 

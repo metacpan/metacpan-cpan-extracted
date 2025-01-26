@@ -1,0 +1,33 @@
+---
+abstract: 'A powerfull pure perl config file manager.'
+author:
+  - 'Curtis Leach <cleach at cpan dot com>'
+build_requires:
+  Config: '0'
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Advanced-Config
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Cwd: '0'
+  File::Basename: '0'
+  File::Copy: '0'
+  File::Glob: '0'
+  File::Spec: '0'
+  Fred::Fish::DBUG: '2.09'
+  Perl::OSType: '0'
+  Sys::Hostname: '0'
+  perl: '5.008008'
+version: '1.10'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

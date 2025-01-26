@@ -7,13 +7,13 @@ use utf8;
 
 use English;
 use Exporter qw(import);
-use List::Util qw(min max);
+use List::Util qw(min max none);
 use Music::Harmonica::TabsCreator::NoteToToneConverter;
 use Music::Harmonica::TabsCreator::TabParser;
 use Readonly;
 use Scalar::Util qw(looks_like_number);
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 our @EXPORT_OK = qw(tune_to_tab get_tuning_details tune_to_tab_rendered
     transpose_tab transpose_tab_rendered list_tunings);
@@ -23,10 +23,6 @@ our @EXPORT_OK = qw(tune_to_tab get_tuning_details tune_to_tab_rendered
 
 Readonly my $TONES_PER_SCALE => 12;
 
-# TODO: don’t use separate tunings with and without bending, add the bending
-# information in the main tuning and generate the missing data (e.g. how many
-# max half-step can be bent on a given hole, plus how many is the user
-# accepting).
 Readonly my %ALL_TUNINGS => (
   # Written in the key of C to match the default key used in the note_to_tone
   # function.
@@ -61,15 +57,14 @@ Readonly my $MAX_BENDS => 6;  # Probably higher than any realistic value.
 sub tune_to_tab ($sheet, %options) {
   my $note_converter = Music::Harmonica::TabsCreator::NoteToToneConverter->new();
   my @tones = $note_converter->convert($sheet);
-  my $tunings = generate_tunings($options{max_bends} // 0);
+  my $tunings = generate_tunings($options{max_bends} // 0, $options{tunings} // []);
   return find_matching_tuning(\@tones, $tunings);
 }
 
 sub transpose_tab ($tab, $tuning_id, $key, %options) {
-  # TODO: error handling for missing tuning
   die "Unknown tuning: $tuning_id\n" unless exists $ALL_TUNINGS{$tuning_id};
   # For the input, we accept any level of bending.
-  my $tuning = generate_tunings($MAX_BENDS)->{$tuning_id};
+  my $tuning = generate_tunings($MAX_BENDS, [$tuning_id])->{$tuning_id};
   my $note_converter = Music::Harmonica::TabsCreator::NoteToToneConverter->new();
   my %tab_to_tones = map { $tuning->{tab}[$_] => $note_converter->convert($tuning->{notes}[$_]) }
       0 .. $#{$tuning->{tab}};
@@ -79,17 +74,17 @@ sub transpose_tab ($tab, $tuning_id, $key, %options) {
   return "Invalid key: $key" if $@ || @key_tone != 1;
   my $key_tone = $key_tone[0];
   @tones = map { looks_like_number($_) ? $_ + $key_tone : $_ } @tones;
-  my $tunings = generate_tunings($options{max_bends} // 0);
+  my $tunings = generate_tunings($options{max_bends} // 0, $options{tunings} // []);
   return find_matching_tuning(\@tones, $tunings);
 }
 
 # We take the global %ALL_TUNINGS and generate a %tunings hash with the same
 # keys but where the values only have the notes and tab entries. But we have
 # added the notes corresponding to the allowed bends.
-# TODO: add an option to filter down the tunings that we are keeping.
-sub generate_tunings ($max_bends) {
+sub generate_tunings ($max_bends, $tunings) {
   my %out;
   while (my ($k, $v) = each %ALL_TUNINGS) {
+    next if @{$tunings} && none { $_ eq $k } @{$tunings};
     for my $i (0 .. $#{$v->{notes}}) {
       my $note = $v->{notes}[$i];
       my $tab = $v->{tab}[$i];
@@ -140,7 +135,9 @@ sub render_tabs (%tabs) {
     for my $key (sort keys %{$tabs{$type}}) {
       $out .= "  In the key of ${key}:\n";
       for my $tab (@{$tabs{$type}{$key}}) {
-        $out .= '    '.join(' ', map { m/^\v+$/ ? $_.'   ' : $_ } @{$tab})."\n";
+        my $str_tab = join(' ', map { m/^\v+$/ ? $_.'   ' : $_ } @{$tab});
+        $str_tab =~ s/(\h|\v)+\Z//;
+        $out .= "    ${str_tab}\n\n";
       }
     }
   }
@@ -191,6 +188,8 @@ sub tab_from_tones($tones, $offset, %scale_tones) {
 }
 
 1;
+
+# TODO: document the options of the methods.
 
 __END__
 

@@ -18,16 +18,16 @@ name: Travel-Status-DE-DBRIS
 provides:
   Travel::Status::DE::DBRIS:
     file: lib/Travel/Status/DE/DBRIS.pm
-    version: '0.01'
+    version: '0.02'
   Travel::Status::DE::DBRIS::Journey:
     file: lib/Travel/Status/DE/DBRIS/Journey.pm
-    version: '0.01'
+    version: '0.02'
   Travel::Status::DE::DBRIS::JourneyAtStop:
     file: lib/Travel/Status/DE/DBRIS/JourneyAtStop.pm
-    version: '0.01'
+    version: '0.02'
   Travel::Status::DE::DBRIS::Location:
     file: lib/Travel/Status/DE/DBRIS/Location.pm
-    version: '0.01'
+    version: '0.02'
 recommends:
   Cache::File: '0'
 requires:
@@ -44,5 +44,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/derf/Travel-Status-DE-DBRIS
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

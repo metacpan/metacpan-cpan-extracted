@@ -1,5 +1,8 @@
 Revision history for MIDI-Drummer
 
+0.5007 2025-01-25 09:59:54
+    - Update timidity system command.
+
 0.5006 2025-01-23 14:35:56
     - Fix synopsis ...again.
 

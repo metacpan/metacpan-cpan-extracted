@@ -1,7 +1,7 @@
 package Langertha::Engine::OpenAI;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: OpenAI API
-$Langertha::Engine::OpenAI::VERSION = '0.006';
+$Langertha::Engine::OpenAI::VERSION = '0.007';
 use Moose;
 use File::ShareDir::ProjectDistDir qw( :all );
 use Carp qw( croak );
@@ -125,7 +125,7 @@ Langertha::Engine::OpenAI - OpenAI API
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 

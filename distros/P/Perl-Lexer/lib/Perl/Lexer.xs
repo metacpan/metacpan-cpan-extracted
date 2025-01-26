@@ -107,6 +107,7 @@ CODE:
             break;
         }
         /* PerlIO_printf(PerlIO_stderr(), "token: %d\n", token); */
+        PerlIO_printf(PerlIO_stderr(), "token: %d\n", token);
 
         int i=0;
         while (debug_tokens[i].token != 0) {

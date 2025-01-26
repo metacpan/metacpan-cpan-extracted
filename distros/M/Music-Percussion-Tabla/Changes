@@ -1,5 +1,32 @@
 Revision history for Music-Percussion-Tabla
 
+0.0405 2025-01-25 23:37:55
+    - Strike with a patch not with the index of a patch.
+
+0.0404 2025-01-25 14:12:24
+    - Improve documentation.
+
+0.0403 2025-01-25 12:50:06
+    - Fix the eg/ programs slightly.
+    - Updated the tests slightly, too.
+
+0.0402 2025-01-25 12:18:56
+    - Simplify the code even more!
+
+0.0401 2025-01-25 12:08:34
+    - Simplify the code a bit more.
+
+0.0400 2025-01-25 10:58:49
+    - Entirely refactor and simplify!
+
+0.0301 2025-01-25 10:33:17
+    - Improve documentation.
+
+0.0300 2025-01-25 10:05:02
+    - Entirely refactor and prune unknown bits.
+    - Improve documentation.
+    - Improve eg/ programs.
+
 0.0200 2023-05-17 19:57:40
     - Use the timidity methods of the latest M::D::T.
 

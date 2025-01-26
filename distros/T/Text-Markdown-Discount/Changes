@@ -1,5 +1,8 @@
 Revision history for Perl extension Text::Markdown::XS.
 
+0.18 2025-01-26T05:05:12Z
+	- maintenace release (just update toolchains)
+
 0.17 Tue Dec 31 06:24:03 UTC 2024
 	- update discount to v2.2.7d
 	- add latest MKD_* flags

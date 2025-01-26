@@ -1,10 +1,14 @@
 package Data::Dx;
 
+=encoding utf8
+
+=cut
+
 use 5.012;
 use utf8;
 use warnings;
 
-our $VERSION = '0.000010';
+our $VERSION = '0.000011';
 
 use Keyword::Declare;
 
@@ -151,7 +155,7 @@ Data::Dx - Dump data structures with name and point-of-origin
 
 =head1 VERSION
 
-This document describes Data::Dx version 0.000010
+This document describes Data::Dx version 0.000011
 
 
 =head1 SYNOPSIS
@@ -166,18 +170,20 @@ This document describes Data::Dx version 0.000010
     );
     Dx $baz;
     Dx $ref;
-    Dx @bar[do{1..2;}];
-    Dx 2*3;
-    Dx 'a+b';
-    Dx 100 * sqrt length $baz;
-    Dx $foo{q[;{{{]};
+
+    Dₓ @bar[do{1..2;}];
+    Dₓ 2*3;
+    Dₓ 'a+b';
+    Dₓ 100 * sqrt length $baz;
+    Dₓ $foo{q[;{{{]};
 
 
 =head1 DESCRIPTION
 
 This module provides a simple wrapper around the Data::Dump module.
 
-The C<Dx> keyword data-dumps its arguments, prefaced by a comment line
+The C<Dx> keyword (and its more-medically-correct alias: C<Dₓ>)
+data-dumps its arguments, prefaced by a comment line
 that reports the location from which C<Dx> was invoked.
 
 For example, the code in the L<SYNOPSIS> would produce
@@ -237,19 +243,33 @@ is specified as false...see below).
 
 =item C<Dx I<expr>>
 
-This is the only keyword provided by the module.
-It is always exported.
+=item C<Dₓ I<expr>>
 
-C<Dx> can be called with any number of arguments and data-dumps them all.
-C<Dx> is a keyword, not a function, so it cannot be used as an rvalue and
-does not return a useful value.
+These are the only keywords provided by the module.
+They are always exported.
+
+C<Dx>/C<Dₓ> can be called with any number of arguments and data-dumps them all.
+C<Dx> and C<Dₓ> are keywords, not functions, so they cannot be used as part of
+a larger expression, and they do not return a useful value.
+
+Note that, to support the non-ASCII C<Dₓ> variant of the keyword,
+loading the module also implicitly sets the C<use utf8> pragma.
+If you don't want those semantics, you can explicitly turn them off
+like so:
+
+    use Data::Dx;
+    no utf8;
+
+If you disable Unicode semantics in this way, any subsequent use of
+the C<Dₓ> variant of the keyword will probably raise a warning.
+
 
 =item C<no Data::Dx;>
 
 If the module is imported with C<no> instead of C<use>,
-it still exports the C<Dx> keyword, but as a no-op.
+it still exports the C<Dx> and C<Dₓ> keywords, but as no-ops.
 
-This means that you can leave every C<Dx> in your code
+This means that you can leave every C<Dx> and C<Dₓ> in your code
 but disable them all (or just all of them in a given scope)
 by changing the original C<use Data::Dx> to C<no Data::Dx>
 

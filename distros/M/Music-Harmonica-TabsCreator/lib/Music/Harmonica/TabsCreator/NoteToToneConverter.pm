@@ -8,7 +8,7 @@ use utf8;
 use List::Util qw(any);
 use Readonly;
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 # This class converts written note (accepting various syntax for the notes) into
 # tones (degrees) relative to the key of C4.
@@ -27,7 +27,9 @@ sub new ($class, %options) {
 Readonly my %NOTE_TO_TONE => (
   C => 0,
   Do => 0,
+  Ut => 0,
   D => 2,
+  'Re' => 2,
   'Ré' => 2,
   E => 4,
   Mi => 4,
@@ -41,6 +43,9 @@ Readonly my %NOTE_TO_TONE => (
   Si => 11,
   H => 11,
 );
+
+# TODO support Unicode representation of the sharp (♯), flat (♭), natural (♮)
+# and clef (𝄞) signs.
 
 Readonly my %ACCIDENTAL_TO_ALTERATION => (
   '#' => 1,
@@ -88,7 +93,9 @@ Readonly my %KEY_TO_ALTERATION => (
   'C#' => 7,
 );
 
-Readonly my $NOTE_NAME_RE => qr/ do|Do|ré|Ré|mi|Mi|fa|Fa|sol|Sol|la|La|si|Si | [A-H] /x;
+Readonly my @NOTE_NAMES => qw(do Do ut Ut ré Ré re Re mi Mi fa Fa sol Sol la La si Si);
+Readonly my $JOINED_NOTE_NAMES => join('|', @NOTE_NAMES);
+Readonly my $NOTE_NAME_RE => qr/ ${JOINED_NOTE_NAMES} | [A-H] /x;
 
 Readonly my $BASE_OCTAVE => 4;
 Readonly my $TONES_PER_SCALE => 12;
@@ -139,13 +146,14 @@ sub convert ($self, $symbols) {
       next;
     }
 
+    # TODO: Support specifying the key with a note name, e.g. KF#.
     if ($symbols =~ m/\GK(b{0,7}|#{0,7})?/gc) {
       $self->{key} = $SIGNATURE_TO_KEY{$1};
       next;
     }
 
     # There is a bug here that A-3 won’t be parsed as the - will be taken for a flat.
-    if ($symbols =~ m/\G ( ${NOTE_NAME_RE} ) ( \#+ | \++ | b+ | \-* ) ( \d+ )? (,+|'+)?/xgc) {
+    if ($symbols =~ m/\G ( ${NOTE_NAME_RE} ) ( \#+ | \++ | b+ | \-* ) ( \d+ )? (,+|’+|'+)?/xgc) {
       my ($note, $accidental, $octave, $rel_octave) =
           (ucfirst($1), $2, $3 // $self->{default_octave}, $4);
       if ($rel_octave) {
@@ -159,8 +167,9 @@ sub convert ($self, $symbols) {
     }
 
     my $pos = pos($symbols);
-    # TODO: print only the relevant part of symbols here
-    die "Invalid syntax at position ${pos} in: ${symbols}\n";
+    substr $symbols, $pos, 0, '-->';
+    $pos++;
+    die "Invalid syntax in the input music at character ${pos}: ${symbols}\n";
   }
   return wantarray ? @out : \@out;
 }

@@ -20,6 +20,7 @@ ex/embedding.pl
 ex/json_grammar.pl
 ex/logic.pl
 ex/ollama.pl
+ex/ollama_image.pl
 ex/sample.ogg
 ex/structured_code.pl
 ex/structured_output.pl
@@ -28,6 +29,7 @@ ex/synopsis.pl
 ex/transcription.pl
 lib/Langertha.pm
 lib/Langertha/Engine/Anthropic.pm
+lib/Langertha/Engine/DeepSeek.pm
 lib/Langertha/Engine/Groq.pm
 lib/Langertha/Engine/Ollama.pm
 lib/Langertha/Engine/OpenAI.pm

@@ -7,11 +7,10 @@ use Test::More;
 use_ok 'Music::Percussion::Tabla';
 
 subtest defaults => sub {
-    my $obj = new_ok 'Music::Percussion::Tabla' => [
-        verbose => 1,
-    ];
-    is $obj->verbose, 1, 'verbose';
+    my $obj = new_ok 'Music::Percussion::Tabla';
+    is $obj->verbose, 0, 'verbose';
     is $obj->channel, 0, 'channel';
+    isa_ok $obj->score, 'MIDI::Simple';
     diag 'Soundfont file: ', $obj->soundfont;
     like $obj->soundfont, qr/\/Tabla\.sf2$/, 'soundfont';
 };
@@ -28,10 +27,10 @@ subtest timidity_cfg => sub {
 
 subtest score => sub {
     my $obj = new_ok 'Music::Percussion::Tabla';
-    $obj->ta;
+    $obj->strike('tun');
     my @score = $obj->score->Score;
-    is $score[4][0], 'note', 'note added';
-    is $score[4][4], $obj->ta_num, 'is note_num';
+    is $score[4][0], 'note', 'note';
+    is $score[4][4], 73, 'tun';
 };
 
 done_testing();

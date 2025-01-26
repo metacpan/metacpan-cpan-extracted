@@ -1,4 +1,4 @@
-Geo-WebService-Elevation-USGS is Copyright (C) 2008-2022, 2024 Thomas R. Wyant, III
+Geo-WebService-Elevation-USGS is Copyright (C) 2008-2022, 2024-2025 Thomas R. Wyant, III
 
 This package contains class Geo::WebService::Elevation::USGS, which
 interfaces with the United States Geological Service's elevation query

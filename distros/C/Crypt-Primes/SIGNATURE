@@ -1,0 +1,54 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.89.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 3817f1c1a85cd6e59a81ef213e49391a72826d0e7937ee56260ef8f415db2297 Changes
+SHA256 415f3b9758fad38bb38286e6e77167de4a72ddaab0ebc4a961ffe6183a5e87db INSTALL
+SHA256 57d1a5d88c67db06f955411d414835ff8a25be5b9b68a86ecdaba87416b104f0 LICENSE
+SHA256 28abd5e23fbe77452b7833f2d76afb77bbad5781130cbe393fbe0f894e20cd9d MANIFEST
+SHA256 3cd7626baca0e08106673af93046eb3e3dbc8b6469ae31cc35839523b808206f META.json
+SHA256 bf4dc88a02f78ae0205b075dd4a6063b5dc0249df89db9129b47f1eea03ba86e META.yml
+SHA256 d677610b057e3ec7b1de90abbc489332e96f03235c13b07623ba936116048d38 Makefile.PL
+SHA256 a70af2c73fab8d1d08fbfa780d190f464df88e78a3126983a46c27ec3bfbe904 README
+SHA256 837753543bea990c4448d2c8bbce11c4b323f9fbcc77911adc2268dda204934f SECURITY.md
+SHA256 07fec076486f919e25735b1526a2d31f94b32ce097859059711ff13e70028a29 bin/largeprimes
+SHA256 63dc589c839f301dbd232be10db86de7c89610f024c0bf2313fb7caf19d716c6 cpanfile
+SHA256 90304a714da0ca0cf78de108312ce58e80f454f06015ae18ee0454e8dead08e4 dist.ini
+SHA256 6230a192a9b2114fa51ae3d1b9b32e5aaae0801413a055f8c7100a9808268e8b docs/1-Fast_Generation_Of_Primes-Ueli_Maurer.ps
+SHA256 903a983f7d9c5efc12ba6ff333bb9a62956fc101092c2e71e3ea321eb2749342 docs/4-8192-bit-random-prime
+SHA256 99296838b5d7154614f090e577cc72e3fc7c9a460c36273b9390b018697f301e lib/Crypt/Primes.pm
+SHA256 5bcf3171532bbc31ff85032016b75c68a85f7fcd81781923667b5af5dc4fcb92 t/author-pod-spell.t
+SHA256 305c657c6b73f10767a0ea286b8a73d693940f4cbb8b6a0a4d34e2b5a1c04635 t/author-pod-syntax.t
+SHA256 a5551f5120080c6bb95292e887e45174dd1fa40551205716c6f46ec5319faa89 t/genprime.t
+SHA256 2b48171bcb218fce966e8d7bbee8dc3775e69e9ee4fa21e20e9f1ec036bd0e20 t/genprime_elgamal.t
+SHA256 cc4f2c1c1271a351bbe3970caae0d69afeb9ad1f9aff098d4288810acdf57b18 t/intermediates.t
+SHA256 3e60d6abbee303709a8c178512c985bca115d83750235db24fcdc02dd98d5e08 t/release-kwalitee.t
+SHA256 c79f02d04a1db8a985e36276558117f21c35c660ebfafc59353679c0cb983e94 t/release-meta-json.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBAwAdFiEEMguXHBCUSzAt6mNu1fh7LgYGpfkFAmeU44YACgkQ1fh7LgYG
+pfmuuxAAzg27NregJLK6gT5DRXM+dtDlv+xZoIWZYH/IJLdEiPfIev4HWxoWhNEs
+Xt8WKXroIGsAsiteH1N6w68GS7nzNZ441nYZ7gE6lsOIWT/pKEGMmwsHtLdzTIea
++DQqiVTWffm7RZNpsdlRk4lLV+HEWW9b/v39yjxz7XZbuid6C7CGtXOsFT2VC09X
+687VNglTcWJR8XoNNiUPFTOwurbxvxX7MWOiLU0Bh6j1UqPXwnOvCSL30JRDWVna
+CCDeptVstvUe0wOrwDy2EZXv9kLJkBnnqypyPGYPXvwu5yiumT1TyjOOxCqWfHeU
+avXRIeivme9LGCyqCyrkIGkob7Si4GfBzDbRxGgYZav0V4iMM/Xz/Lfxj+/13zAQ
+XmDm5m9PU+AqOUNeDadF4OCTfYRlX8PntC1+7kTuL1YpSDibDmSZnBsyoZF1fmkA
+yw9pRJPB2FuOeoUE8l+3aBN6q49F1aFR07rQ8QcnqFoO9mV/ADIFCrtaMsfqa7on
+6tD1POChw95iy41wtyMYTXGZ97Tw71r5OFhCTLMT0NzjBTR2dbvKbELf3iZv6B9L
+uUpyWC0vhPPwC20qL9LB1isqqyXKODhdUyCA5CrdzmSLg3jDKxNhvch6BreSVFFx
+SPurqMjW9ncYQe+CNiSXRWOaCT9cuE/qIj9lI6ie6nCAuqbJKK0=
+=GaOB
+-----END PGP SIGNATURE-----

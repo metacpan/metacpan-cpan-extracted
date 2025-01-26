@@ -8,8 +8,6 @@
 ##
 ## $Id$
 
-use lib '../lib';
-use lib 'lib';
 use Crypt::Primes qw(maurer); 
 use Math::Pari qw(floor);
 

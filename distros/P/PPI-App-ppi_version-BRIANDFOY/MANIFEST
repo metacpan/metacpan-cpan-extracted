@@ -3,6 +3,7 @@ corpus/our.pm
 corpus/semantic.pm
 corpus/vars.pm
 INSTALL.SKIP
+lib/PPI/App/ppi_version/BDFOY.pm
 lib/PPI/App/ppi_version/BRIANDFOY.pm
 LICENSE
 Makefile.PL

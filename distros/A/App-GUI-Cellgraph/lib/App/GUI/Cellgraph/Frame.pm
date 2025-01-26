@@ -244,9 +244,6 @@ sub write_settings_dialog {
                ( join '|', 'INI files (*.ini)|*.ini', 'All files (*.*)|*.*' ), &Wx::wxFD_SAVE );
     return if $dialog->ShowModal == &Wx::wxID_CANCEL;
     my $path = $dialog->GetPath;
-    #my $i = rindex $path, '.';
-    #$path = substr($path, 0, $i - 1 ) if $i > -1;
-    #$path .= '.ini' unless lc substr ($path, -4) eq '.ini';
     return if -e $path and
               Wx::MessageDialog->new( $self, "\n\nReally overwrite the settings file?", 'Confirmation Question',
                                       &Wx::wxYES_NO | &Wx::wxICON_QUESTION )->ShowModal() != &Wx::wxID_YES;
@@ -304,6 +301,9 @@ sub open_setting_file {
 sub write_settings_file {
     my ($self, $file)  = @_;
     my $settings = $self->get_settings;
+    $file = substr ($file, 0, -4) if lc substr ($file, -4) eq '.ini';
+    $file .= '.ini' unless lc substr ($file, -4) eq '.ini';
+say "write $file";
     delete $settings->{'rules'}{'f'};
     delete $settings->{'mobile'}{'f'};
     delete $settings->{'start'}{'list'};

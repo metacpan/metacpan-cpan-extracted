@@ -1,0 +1,128 @@
+# Developer's notes for Advanced::Config ...
+
+# This module is a powerful config file manager that treats your config files
+# as objects to access.  It provides many different features that make it
+# more useful than many of the compeating config file modules.  And most of its
+# features are very configurable to meet your individual needs.
+
+# It's main goal is to be able to take config files from various sources and
+# products and to be able to use them natively in this module.  Making any
+# config file look the same to a Perl program!
+
+# See the many test cases and config files for how powerful things can be.
+# Once you start using it I don't see you going back to using any other
+# config file module.
+
+# This module makes heavy use of Fred::Fish::DBUG to provide tracing for the
+# test cases and to help with debugging this code.  But this logging feature is
+# turned off for normal operations.  But it's still a prerequisite for using
+# this module.
+
+# Run "perldoc Advanced::Config::Examples"  for more details & examples
+# in using Advaned::Config once this module has been installed.
+
+
+INSTALLATION
+=====================================================================
+
+To install this module in the default loation type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+To install this module in an alternate location do:
+
+   location=<install-location>
+   perl Makefile.PL INSTALL_BASE=${location}
+   make
+   make test
+   make install
+
+Then set PERL5LIB to "${location}/lib/perl5".
+
+
+# -----------------------------------------------------------------------------
+# Reporting a bug in Advanced::Config
+# -----------------------------------------------------------------------------
+Support is very limited, but I will do my best to help resolve any problems
+you have with my module if you provide the following files demonstrating the
+bug/issue you are hitting.
+ 1) A sample config file.
+ 2) A sample program that uses the config file and demonstrates the bug.
+ 3) The fish log generated.  (optional)  But I'll request one if the issue
+    isn't reproducable on my end with what you gave me.
+
+If it's a true bug, I'll probably use your sample program as the basis for a
+new test case in a future release.
+
+See a section below on how to turn on the logs of Fred::Fish::DBUG that
+Advanced::Config uses to trace it's functionality to show why the code is
+having issues.
+
+# -----------------------------------------------------------------------------
+# What if a test case fails?
+# -----------------------------------------------------------------------------
+In this case there should already be logs to send out.  Each and every test
+program that comes with this module generates very verbose logging of what's
+happening.  So just open a CPAN ticket and attach the log to the ticket.  Do
+not cut and paste the logs contents into the ticket!  It just makes the ticket
+unreadable.
+
+These logs can be found under t/log_details/*.txt
+
+# -----------------------------------------------------------------------------
+# What if it's your program that's failing?
+# Then you need to turn on Fred::Fish::DBUG tracing used by Advanced::Config.
+# This will generate the log file to attach to the CPAN ticket.
+# -----------------------------------------------------------------------------
+This module uses Fred::Fish::DBUG for logging the activity of this module.
+But this logging is disabled by default, even if you are using Fred::Fish::DBUG
+to trace your own code!
+
+So here's a list of steps needed to turn this tracing on.
+
+1) Set this special environment varible to 1. (tells my module to enable fish.)
+   a) Unix:    export ADVANCED_CONFIG_FISH=1
+   b) Windows: set ADVANCED_CONFIG_FISH=1
+   c) You can also set this variable in your test program's BEGIN block:
+         $ENV{ADVANCED_CONFIG_FISH} = 1;
+      Just make sure your BEGIN block appears before you source in
+      Advanced::Config via:  eval "use Advanced::Config";
+
+2) In your code source in the Fred::Fish::DBUG module.
+   use Fred::Fish::DBUG;
+
+3) Turn on fish logging at the start of your test program:
+   DBUG_PUSH ("my_fish_log.txt");   # Turns fish on ...
+
+4) Feel free to use the Fred::Fish::DBUG module in your test program as well
+   to help document the flow of your test code.
+
+Just be aware that turning on this logging can significantly slow down your
+program because of all the details being written to the logs by Advanced::Config.
+So only set the 'ADVANCED_CONFIG_FISH' environment variable when you really need
+to see detailed logging.
+
+# -----------------------------------------------------------------------------
+# Major features of this module:
+# -----------------------------------------------------------------------------
+   1) Supports simple config files.  (Tag/Value pairs with comments.)
+   2) Supports sourcing in other config files to dynamically create one big
+      config file to reference as a single object.
+   3) Supports the use of variables in the config file.
+   4) Supports the use of sections to better organize your config file's data.
+   5) Supports inheritance between sections.
+   6) Supports encrypting/decrypting values in your config files to keep
+      the contents of your config files safe from prying eyes but usable in
+      your code.
+   7) Supports the overriding of the default operators used.  Such as using
+      different comment indicators or other special symbols interpreted when
+      loading the config file into memory.
+   8) Detecting if a config file has been updated since your program first
+      loaded it for dynamic refreshes for long running processes.
+   9) Custom accessor functions (get_*), allowing you to do basic validation
+      that each tag contains the expected data type.
+  10) And many, many more features.
+

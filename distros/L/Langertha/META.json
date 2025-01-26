@@ -31,6 +31,7 @@
             "JSON::MaybeXS" : "0",
             "JSON::PP" : "0",
             "LWP::Protocol::https" : "0",
+            "MIME::Base64" : "0",
             "Module::Runtime" : "0",
             "Moose" : "0",
             "MooseX::NonMoose" : "0",
@@ -58,7 +59,7 @@
          "web" : "https://github.com/Getty/langertha"
       }
    },
-   "version" : "0.006",
+   "version" : "0.007",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.036000"
@@ -157,7 +158,7 @@
                   "version_regexp" : "(?^:^([0-9]+\\.[0-9]+)$)"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.39.2",
+                  "git_version" : "2.39.5",
                   "repo_root" : "."
                }
             },
@@ -203,7 +204,7 @@
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.39.2",
+                  "git_version" : "2.39.5",
                   "repo_root" : "."
                }
             },
@@ -353,7 +354,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.39.2",
+                  "git_version" : "2.39.5",
                   "repo_root" : "."
                }
             },
@@ -377,7 +378,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.39.2",
+                  "git_version" : "2.39.5",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -394,12 +395,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.006",
+                  "tag" : "0.007",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.39.2",
+                  "git_version" : "2.39.5",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -419,7 +420,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.39.2",
+                  "git_version" : "2.39.5",
                   "repo_root" : "."
                }
             },

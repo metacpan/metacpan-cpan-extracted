@@ -1,14 +1,13 @@
-#!/usr/bin/perl -s
 ##
 ## Crypt::Primes -- Provable Prime Number Generator
 ##                  for Cryptographic Applications. 
 ##
-## Copyright (c) 1998-2000, Vipul Ved Prakash.  All rights reserved.
+## Copyright (c) 1998-2025, Vipul Ved Prakash.  All rights reserved.
 ## This code is free software; you can redistribute it and/or modify
 ## it under the same terms as Perl itself.
 ##
-## $Id: Primes.pm,v 0.49 2001/06/11 01:04:23 vipul Exp vipul $
-
+use strict;
+use warnings;
 package Crypt::Primes;
 require Exporter; 
 use vars qw($VERSION @EXPORT_OK);
@@ -17,11 +16,11 @@ use Math::Pari qw( PARI Mod floor sqrt);
 *import      = \&Exporter::import;
 
 @EXPORT_OK   = qw( maurer trialdiv rsaparams );
-( $VERSION ) = '$Revision: 0.50 $' =~ /(\d+\.\d+)/; 
+our $VERSION = '0.52';
 
 ## list of small primes for trial division.
 
-@PRIMES = qw( 
+our @PRIMES = qw( 
   2 3 5 7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97 101
 103 107 109 113 127 131 137 139 149 151 157 163 167 173 179 181 191 193  197
 199 211 223 227 229 233 239 241 251 257 263 269 271 277 281 283 293 307  311
@@ -563,7 +562,8 @@ sub maurer {
     my ( %params ) = @_;
 
     my $k = $params { Size };         #-- bitsize of the required prime.
-    my $v = $params { Verbosity };    #-- process reporting verbosity.
+    my $v =
+        $params { Verbosity } || 0;   #-- process reporting verbosity.
                                       #-- whether to find intermediate generators.
     my $p0 = 20;                      #-- generate primes of bitsize less 
                                       #-- than $p0 with nextprime().
@@ -663,7 +663,7 @@ sub trialdiv {
     my ( $n, $limit, $v ) = @_; 
 
     my $end = _trialdiv_limit ( $n, $limit );
-    for ( $i=0; $i <= $end; $i++ ) {
+    for ( my $i=0; $i <= $end; $i++ ) {
         return undef unless Math::Pari::gmod ( $n, $PRIMES[ $i ] );
     }
 
@@ -700,11 +700,6 @@ sub _trialdiv_limit {
 =head1 NAME
 
 Crypt::Primes - Provable Prime Number Generator suitable for Cryptographic Applications.  
-
-=head1 VERSION
-
- $Revision: 0.49 $
- $Date: 2001/06/11 01:04:23 $
 
 =head1 SYNOPSIS
 
@@ -753,7 +748,7 @@ Random numbers are gathered with Crypt::Random, a perl interface to
 
 =head1 FUNCTIONS
 
-The following functions are availble for import.  They must be explicitely
+The following functions are available for import.  They must be explicitly
 imported.
 
 =over 4
@@ -767,7 +762,7 @@ Following hash keys are understood:
 
 =back
 
-=over 0 
+=over
 
 =item B<Size>
 
@@ -850,7 +845,7 @@ generator of the cyclic group Z*(2Rq).
 
 Crypt::Primes generates 512-bit primes in 7 seconds (on average), and
 1024-bit primes in 37 seconds (on average), on my PII 300 Mhz notebook.
-There are no computational limits by design; primes upto 8192-bits were
+There are no computational limits by design; primes up to 8192-bits were
 generated to stress test the code.  For detailed runtime analysis see [1].
 
 =head1 SEE ALSO

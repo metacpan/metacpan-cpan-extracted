@@ -16,12 +16,14 @@ use Langertha::Engine::OpenAI;
 use Langertha::Engine::Anthropic;
 use Langertha::Engine::vLLM;
 use Langertha::Engine::Groq;
+use Langertha::Engine::DeepSeek;
 
-if ($ENV{OPENAI_API_KEY} || $ENV{ANTHROPIC_API_KEY} || $ENV{GROQ_API_KEY}) {
+if ($ENV{OPENAI_API_KEY} || $ENV{ANTHROPIC_API_KEY} || $ENV{GROQ_API_KEY} || $ENV{DEEPSEEK_API_KEY}) {
   my @keys;
   push @keys, 'OPENAI_API_KEY' if $ENV{OPENAI_API_KEY};
   push @keys, 'ANTHROPIC_API_KEY' if $ENV{ANTHROPIC_API_KEY};
   push @keys, 'GROQ_API_KEY' if $ENV{GROQ_API_KEY};
+  push @keys, 'DEEPSEEK_API_KEY' if $ENV{DEEPSEEK_API_KEY};
   warn "Will be using your ".join(", ", @keys)." environment variable(s), which may produce cost.";
   sleep 5;
 }
@@ -250,13 +252,28 @@ __EOP__
       system_prompt => $system_prompt,
     );
 
-    use DDP; p($groq);
-
     my $prompt = 'Do you wanna build a snowman?';
 
     printf("\n\n%s\n\n", $prompt);
 
     print($groq->simple_chat($prompt));
+
+  }
+}
+
+{
+  if ($ENV{DEEPSEEK_API_KEY}) {
+
+    my $deepseek = Langertha::Engine::DeepSeek->new(
+      api_key => $ENV{DEEPSEEK_API_KEY},
+      system_prompt => $system_prompt,
+    );
+
+    my $prompt = 'Do you wanna build a snowman?';
+
+    printf("\n\n%s\n\n", $prompt);
+
+    print($deepseek->simple_chat($prompt));
 
   }
 }

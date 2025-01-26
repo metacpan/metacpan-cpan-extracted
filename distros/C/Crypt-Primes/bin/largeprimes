@@ -1,4 +1,4 @@
-#!/usr/bin/perl -sI.. -I../lib/ -Ilib/
+#!/usr/bin/perl
 ##
 ## largeprimes -- generates large provable primes, uniformally distributed
 ##                in random intervals, with maurer's recursive algorithm.
@@ -9,6 +9,7 @@
 ##
 ## $Id$
 
+our $VERSION = '0.52';
 
 use Crypt::Primes; 
 

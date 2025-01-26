@@ -1,5 +1,9 @@
 Revision history for IP::Geolocation::MMDB
 
+1.011  2025-01-22 09:09:04 CET
+
+  - Add a get method that returns the prefix length
+
 1.010  2022-12-24 07:15:32 CET
 
   - Implement the file method

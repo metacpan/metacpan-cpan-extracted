@@ -47,19 +47,19 @@
    "provides" : {
       "Travel::Status::DE::DBRIS" : {
          "file" : "lib/Travel/Status/DE/DBRIS.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Travel::Status::DE::DBRIS::Journey" : {
          "file" : "lib/Travel/Status/DE/DBRIS/Journey.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Travel::Status::DE::DBRIS::JourneyAtStop" : {
          "file" : "lib/Travel/Status/DE/DBRIS/JourneyAtStop.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Travel::Status::DE::DBRIS::Location" : {
          "file" : "lib/Travel/Status/DE/DBRIS/Location.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -71,6 +71,6 @@
          "url" : "https://github.com/derf/Travel-Status-DE-DBRIS"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,5 +1,8 @@
 Revision history for Perl extension Perl-Lexer
 
+0.38 2025-01-25T21:17:06Z
+    - Support 5.41.[0-8] (ANDK++)
+
 0.37 2024-10-20T12:29:21Z
     - Support 5.40 (SREZIC++)
 

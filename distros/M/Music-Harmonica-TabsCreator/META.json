@@ -90,6 +90,6 @@
          "web" : "https://github.com/mkende/harmonica_tabs_creator"
       }
    },
-   "version" : "0.02",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

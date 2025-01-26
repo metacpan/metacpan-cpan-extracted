@@ -56,4 +56,11 @@ Revision history for Data-Dx
     That is, the C<"colour"> option now defaults to: C<-t STDERR>
     (Thanks, Patrick!)
 
-    
+
+
+0.000011  Sun Jan 26 09:00:49 2025
+
+    Documented stealth "use utf8" behaviour and a workaround for it.
+    (Thanks Bernhard!)
+
+    Added utf8 encoding declaration to mollify POD parsers

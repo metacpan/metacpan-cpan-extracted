@@ -32,5 +32,5 @@ resources:
   bugtracker: https://github.com/briandfoy/ppi-app-ppi_version-briandfoy/issues
   homepage: https://github.com/briandfoy/ppi-app-ppi_version-briandfoy
   repository: https://github.com/briandfoy/ppi-app-ppi_version-briandfoy
-version: '1.004'
+version: '1.006'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

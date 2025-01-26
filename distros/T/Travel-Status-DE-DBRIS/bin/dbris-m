@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.020;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use utf8;
 use DateTime;
@@ -21,7 +21,8 @@ my $use_cache = 1;
 my $cache;
 my ( $json_output, $raw_json_output );
 
-my @output;
+my %known_mot = map { $_ => 1 }
+  (qw(ICE EC_IC IR REGIONAL SBAHN BUS SCHIFF UBAHN TRAM ANRUFPFLICHTIG));
 
 binmode( STDOUT, ':encoding(utf-8)' );
 for my $arg (@ARGV) {
@@ -61,9 +62,15 @@ if ($use_cache) {
 	}
 }
 
+my ( $station, $train_type, $train_no ) = @ARGV;
+
+if ( not $station ) {
+	show_help(1);
+}
+
 my %opt = (
 	cache          => $cache,
-	station        => shift || show_help(1),
+	station        => $station,
 	developer_mode => $developer_mode,
 );
 
@@ -145,16 +152,79 @@ if ( $date or $time ) {
 	$opt{datetime} = $dt;
 }
 
-if ($mots) {
-	$opt{modes_of_transit} = [ split( qr{, *}, $mots ) ];
+if ( $mots and $mots eq 'help' ) {
+	say "Supported modes of transmit (-m / --modes-of-transit):";
+	for my $mot (
+		qw(ICE EC_IC IR REGIONAL SBAHN BUS SCHIFF UBAHN TRAM ANRUFPFLICHTIG))
+	{
+		say $mot;
+	}
+	exit 0;
 }
 
-my $status = Travel::Status::DE::DBRIS->new(%opt);
+if ($mots) {
+
+	# Passing unknown MOTs to the backend results in HTTP 422 Unprocessable Entity
+	my @mots = split( qr{, *}, $mots );
+	my $found_unknown;
+	for my $mot (@mots) {
+		if ( not $known_mot{$mot} ) {
+			$found_unknown = 1;
+			say STDERR
+"-m / --modes-of-transit: skipping unknown mode of transit '$mot'";
+		}
+	}
+	if ($found_unknown) {
+		say STDERR 'supported modes of transit are: '
+		  . join( q{, }, sort keys %known_mot );
+	}
+	$opt{modes_of_transit} = [ grep { $known_mot{$_} } @mots ];
+}
+
+if ( $opt{station} and $train_type and $train_no ) {
+	my $dt = DateTime->now( time_zone => 'Europe/Berlin' )
+	  ->subtract( minutes => 15 );
+	my $status = Travel::Status::DE::DBRIS->new(
+		cache            => $cache,
+		datetime         => $opt{datetime} // $dt,
+		station          => $opt{station},
+		developer_mode   => $developer_mode,
+		modes_of_transit => [qw[ICE EC_IC IR REGIONAL SBAHN]],
+	);
+	my $found = 0;
+	for my $train ( $status->results ) {
+		if (
+			$train->train_short eq $train_type
+			and (  $train->maybe_train_no eq $train_no
+				or $train->maybe_line_no eq $train_no )
+		  )
+		{
+			$found = $train;
+			last;
+		}
+	}
+	if ($found) {
+		$opt{journey} = $found->id;
+		$train_no = {
+			eva          => $opt{station}->eva,
+			departure    => $found->dep,
+			train_type   => $found->train_short,
+			train_number => $found->maybe_train_no,
+		};
+		delete $opt{station};
+	}
+	else {
+		say STDERR "Did not find $train_type $train_no at "
+		  . $opt{station}->name;
+		exit 1;
+	}
+}
 
 sub show_help {
 	my ($code) = @_;
 
-	print "Usage: db-ris-m [-j] <station|journeyID|lat:lon>\n"
+	print
+	  "Usage: dbris-m [-d dd.mm.yyy] [-t hh:mm] [-j] <stop|journeyID|lat:lon>\n"
 	  . "See also: man dbris-m\n";
 
 	exit $code;
@@ -189,6 +259,9 @@ sub display_occupancy {
 	if ( $occupancy == 4 ) {
 		return q{!};
 	}
+	if ( $occupancy == 99 ) {
+		return q{!};
+	}
 	return q{?};
 }
 
@@ -206,6 +279,8 @@ sub format_delay {
 	}
 	return q{};
 }
+
+my $status = Travel::Status::DE::DBRIS->new(%opt);
 
 if ( my $err = $status->errstr ) {
 	say STDERR "Request error: ${err}";
@@ -238,7 +313,11 @@ if ( $opt{station} ) {
 
 	$max_delay += 1;
 
-	for my $result ( $status->results ) {
+	my @results = map { $_->[1] }
+	  sort { $a->[0] <=> $b->[0] }
+	  map { [ ( $_->dep // $_->arr )->epoch, $_ ] } $status->results;
+
+	for my $result (@results) {
 		printf(
 			"%s  %s  %${max_line}s  %${max_dest}s  %${max_platform}s\n",
 			$result->is_cancelled ? '--:--' : $result->dep->strftime('%H:%M'),
@@ -322,7 +401,12 @@ elsif ( $opt{journey} ) {
 		say q{};
 	}
 	for my $attr ( $trip->attributes ) {
-		say $attr->{value};
+		say $attr->{value}
+		  . (
+			$attr->{teilstreckenHinweis}
+			? q { } . $attr->{teilstreckenHinweis}
+			: q{}
+		  );
 	}
 	if ( $trip->messages ) {
 		say q{};
@@ -356,13 +440,15 @@ dbris-m - Interface to bahn.de public transit services
 
 B<dbris-m> [B<-d> I<DD.MM.YYYY>] [B<-t> I<HH:MM>] [B<-j>] I<station>
 
+B<dbris-m> I<station> I<train tpye> I<train number>
+
 B<dbris-m> I<JourneyID>
 
 B<dbris-m> B<?>I<query>|I<lat>B<:>I<lon>
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 DESCRIPTION
 
@@ -393,6 +479,14 @@ station ID.  For each departure, B<dbris-m> shows
 =item * platform, if known.
 
 =back
+
+=head2 Trip details (I<station> I<train type> I<train number>)
+
+List intermediate stops of I<train type> I<train number> with arrival/departure
+time, delay (if available), occupancy (if available), and stop name. Also
+includes some generic trip information. Only works if the specified train
+passes I<station> in the next few dozen minutes or B<-d> / B<-t> have been
+set to appropriate values.
 
 =head2 Trip details (I<JourneyID>)
 
@@ -429,6 +523,11 @@ B<dbris-m> invocations.
 Print result(s) as JSON and exit. This is a dump of internal data structures
 and not guaranteed to remain stable between minor versions. Please use the
 Travel::Status::DE::DBRIS(3pm) module if you need a proper API.
+
+=item B<-m>, B<--modes-of-transit> I<mot1>[,I<mot2>,...]
+
+Only return results for the specified modes of transit.
+Use C<<-m help>> to get a list of supported modes of transit.
 
 =item B<--no-cache>
 

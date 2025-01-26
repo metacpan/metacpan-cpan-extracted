@@ -1,0 +1,8 @@
+name = "Text-Markdown-Discount"
+module_maker = "ModuleBuild"
+
+[build]
+build_class = "builder::MyBuilder"
+
+[FileGatherer]
+exclude_match = ["^discount-.*/tests"]

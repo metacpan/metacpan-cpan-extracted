@@ -1,5 +1,29 @@
 Revision history for Perl application 'greple'.
 
+9.2101 2025-01-26T01:58:12Z
+
+    - calculate matched count on demand
+    - correct -lc behavior
+
+9.21 2025-01-25T15:37:37Z
+
+    - remove emptied item from result list after --postgrep call
+    - update t/00_load.t
+
+9.20 2025-01-23T03:03:09Z
+
+    - make --uniqcolor as a shortcut for --colorindex
+
+9.19 2025-01-20T07:34:44Z
+
+    - callback function can return "undef" to do nothing
+    - greple -Mline accept negative value w/o -L option
+
+9.18 2024-12-10T12:19:11Z
+
+    - fix bug of collecting module name from argv
+    - allow CRLF in -f pattern file
+
 9.1703 2024-11-08T11:58:43Z
 
     - --{man,show,path} option looks last module in the command line

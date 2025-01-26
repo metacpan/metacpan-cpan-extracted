@@ -1,7 +1,7 @@
 package Langertha::Engine::Whisper;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: Whisper compatible transcription server
-$Langertha::Engine::Whisper::VERSION = '0.006';
+$Langertha::Engine::Whisper::VERSION = '0.007';
 use Moose;
 use Carp qw( croak );
 
@@ -34,7 +34,7 @@ Langertha::Engine::Whisper - Whisper compatible transcription server
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 

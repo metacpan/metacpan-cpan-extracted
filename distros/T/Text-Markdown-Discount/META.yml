@@ -1,14 +1,14 @@
 ---
 abstract: 'fast function for converting markdown to HTML (requires C compiler)'
 author:
-  - 'Masayoshi Sekimura <sekimura@cpan.org>'
+  - 'Masayoshi Sekimura, <sekimura@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::CBuilder: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
-license: unknown
+  Module::Build: '0.4005'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -16,9 +16,44 @@ name: Text-Markdown-Discount
 no_index:
   directory:
     - t
+    - xt
     - inc
-requires: {}
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Text::Markdown::Discount:
+    file: lib/Text/Markdown/Discount.pm
+    version: '0.18'
+requires:
+  perl: '5.008001'
 resources:
-  repository: https://github.com/sekimura/text-markdown-discount.git
-version: '0.17'
+  bugtracker: https://github.com/Songmu/text-markdown-discount/issues
+  homepage: https://github.com/Songmu/text-markdown-discount
+  repository: https://github.com/Songmu/text-markdown-discount.git
+version: '0.18'
+x_contributors:
+  - 'Alessandro Ghedini <al3xbio@gmail.com>'
+  - 'Anirvan Chatterjee <anirvan@users.noreply.github.com>'
+  - 'Anirvan Chatterjee <x.github@chatterjee.net>'
+  - 'Atri Bhattacharya <badshah400@gmail.com>'
+  - 'Brian Fraser <brian.fraser@booking.com>'
+  - 'David Steinbrunner <dsteinbrunner@pobox.com>'
+  - 'David Triendl <david@triendl.name>'
+  - 'Furutsuki <7302203+theoremoon@users.noreply.github.com>'
+  - 'Gabor Szabo <gabor@szabgab.com>'
+  - 'Masayoshi Sekimura <msekimura@saymedia.com>'
+  - 'Masayoshi Sekimura <sekimura@gmail.com>'
+  - 'Masayoshi Sekimura <sekimura@sekimacmini.local>'
+  - 'Masayoshi Sekimura <sekimura@sunny2.(none)>'
+  - 'Masayuki Matsuki <y.songmu@gmail.com>'
+  - 'Neil Bowers <neil@bowers.com>'
+  - 'Shoichi Kaji <skaji@cpan.org>'
+  - 'harupong <harupong@gmail.com>'
+  - 'hitode909 <hitode909@gmail.com>'
+  - 'tokuhirom <tokuhirom@gmail.com>'
+  - 'utagawa kiki <utagawakiki@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 0

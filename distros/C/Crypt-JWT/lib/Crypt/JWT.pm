@@ -3,7 +3,7 @@ package Crypt::JWT;
 use strict;
 use warnings;
 
-our $VERSION = '0.035';
+our $VERSION = '0.036';
 
 use Exporter 'import';
 our %EXPORT_TAGS = ( all => [qw(decode_jwt encode_jwt)] );
@@ -163,6 +163,36 @@ sub _add_claims {
   $payload->{nbf} = $now + $args{relative_nbf} if defined $args{relative_nbf};
 }
 
+sub _verify_header {
+  my ($header, %args) = @_;
+
+  # currently we only check "typ" header parameter
+  my $check = $args{verify_typ};
+  return if !defined $check;
+
+  if (exists $header->{typ}) {
+    if (ref $check eq 'Regexp') {
+      my $value = $header->{typ};
+      $value = "" if !defined $value;
+      croak "JWT: typ header re check failed" unless $value =~ $check;
+    }
+    elsif (ref $check eq 'CODE') {
+      croak "JWT: typ header code check failed" unless $check->($header->{typ});
+    }
+    elsif (!ref $check) {
+      my $value = $header->{typ};
+      croak "JWT: typ header scalar check failed" unless defined $value && $value eq $check;
+    }
+    else {
+      croak "JWT: verify_typ must be Regexp, Scalar or CODE";
+    }
+  }
+  else {
+    croak "JWT: typ header required but missing"
+  }
+
+}
+
 sub _verify_claims {
   my ($payload, %args) = @_;
 
@@ -214,8 +244,34 @@ sub _verify_claims {
     }
   }
 
-  ### iss, sub, aud, jti
-  foreach my $claim (qw(iss sub aud jti)) {
+  ### aud
+  if (defined $args{verify_aud}) {
+    my $check = $args{verify_aud};
+    if (exists $payload->{aud}) {
+      my $match = 0;
+      # aud claim is a bit special as it can be either a string or an array of strings
+      my @aud_list = ref $payload->{aud} eq 'ARRAY' ? @{$payload->{aud}} : ( $payload->{aud} );
+      for my $value (@aud_list) {
+        if (ref $check eq 'Regexp') {
+          $value = "" if !defined $value;
+          $match = 1 if $value =~ $check;
+        }
+        elsif (ref $check eq 'CODE') {
+          $match = 1 if $check->($value);
+        }
+        elsif (!ref $check) {
+          $match = 1 if defined $value && $value eq $check;
+        }
+      }
+      croak "JWT: aud claim check failed" if !$match;
+    }
+    else {
+      croak "JWT: aud claim required but missing"
+    }
+  }
+
+  ### iss, sub, jti
+  foreach my $claim (qw(iss sub jti)) {
     my $check = $args{"verify_$claim"};
     next unless (defined $check);
 
@@ -539,6 +595,7 @@ sub _decode_jwe {
   $payload = _payload_unzip($payload, $header->{zip}) if $header->{zip};
   $payload = _payload_dec($payload, $args{decode_payload});
   _verify_claims($payload, %args); # croaks on error
+  _verify_header($header, %args); # croaks on error
   return ($header, $payload);
 }
 
@@ -696,6 +753,7 @@ sub _decode_jws {
   $payload = _payload_dec($payload, $args{decode_payload});
   _verify_claims($payload, %args); # croaks on error
   $header = { %$unprotected_header, %$header }; # merge headers
+  _verify_header($header, %args); # croaks on error
   return ($header, $payload);
 }
 
@@ -762,12 +820,13 @@ sub decode_jwt {
     croak "JWT: missing token";
   }
   elsif ($args{token} =~ /^([a-zA-Z0-9_-]+)=*\.([a-zA-Z0-9_-]*)=*\.([a-zA-Z0-9_-]*)=*(?:\.([a-zA-Z0-9_-]+)=*\.([a-zA-Z0-9_-]+)=*)?$/) {
-    if (length($5)) {
+    if (defined($5) && length($5) > 0) {
         # JWE token (5 segments)
-        ($header, $payload) = Crypt::JWT::_decode_jwe($1, $2, $3, $4, $5, undef, {}, {}, %args);
-    } else {
+        ($header, $payload) = _decode_jwe($1, $2, $3, $4, $5, undef, {}, {}, %args);
+    }
+    else {
         # JWS token (3 segments)
-        ($header, $payload) = Crypt::JWT::_decode_jws($1, $2, $3, {}, %args);
+        ($header, $payload) = _decode_jws($1, $2, $3, {}, %args);
     }
   }
   elsif ($args{token} =~ /^\s*\{.*?\}\s*$/s) {
@@ -1151,6 +1210,9 @@ C<Scalar> - 'aud' claim value has to be equal to given string (since 0.029)
 
 C<undef> (default) - do not verify 'aud' claim
 
+B<SINCE 0.036> we handle 'aud' claim when it contains an array of strings. In this case, the check should succeed if at least one
+value from the array matches. All checks (CODE, Regexp, Scalar) are performed individually against each member of the array of strings.
+
 =item verify_sub
 
 B<INCOMPATIBLE CHANGE in 0.024:> If C<verify_sub> is specified and
@@ -1210,6 +1272,18 @@ Tolerance in seconds related to C<verify_exp>, C<verify_nbf> and C<verify_iat>. 
 C<1> - do not check claims (iat, exp, nbf, iss, aud, sub, jti), B<BEWARE: DANGEROUS, UNSECURE!!!>
 
 C<0> (default) - check claims
+
+=item verify_typ
+
+B<SINCE 0.036>
+
+C<CODE ref> - subroutine (with 'typ' header parameter value passed as argument) should return C<true> otherwise verification fails
+
+C<Regexp ref> - 'typ' header parameter value has to match given regexp otherwise verification fails
+
+C<Scalar> - 'typ' header parameter value has to be equal to given string
+
+C<undef> (default) - do not verify 'typ' header parameter
 
 =back
 
@@ -1420,4 +1494,4 @@ This program is free software; you can redistribute it and/or modify it under th
 
 =head1 COPYRIGHT
 
-Copyright (c) 2015-2023 DCIT, a.s. L<https://www.dcit.cz> / Karel Miko
+Copyright (c) 2015-2025 DCIT, a.s. L<https://www.dcit.cz> / Karel Miko

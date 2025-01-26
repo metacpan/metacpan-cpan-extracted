@@ -1,7 +1,7 @@
 package Langertha::Role::SystemPrompt;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: Role for APIs with system prompt
-$Langertha::Role::SystemPrompt::VERSION = '0.006';
+$Langertha::Role::SystemPrompt::VERSION = '0.007';
 use Moose::Role;
 
 has system_prompt => (
@@ -24,7 +24,7 @@ Langertha::Role::SystemPrompt - Role for APIs with system prompt
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

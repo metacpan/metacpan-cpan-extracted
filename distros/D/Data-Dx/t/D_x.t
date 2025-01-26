@@ -7,7 +7,7 @@ use Data::Dx {colour=>0, to=>$fh};
 use Test::More;
 
 plan tests => 41;
-use utf8;
+
 
 my %foo = (foo => 1, food => 2, fool => 3, foop => 4, foon => [5..10]);
 my @bar = qw<b a r>;

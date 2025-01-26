@@ -2,15 +2,19 @@ bin/dbris-m
 Build.PL
 Changelog
 COPYING
+cpanfile
+Dockerfile
 lib/Travel/Status/DE/DBRIS.pm
 lib/Travel/Status/DE/DBRIS/Journey.pm
 lib/Travel/Status/DE/DBRIS/JourneyAtStop.pm
 lib/Travel/Status/DE/DBRIS/Location.pm
 MANIFEST			This list of files
-META.json
-META.yml
 README.md
+scripts/makedeb-docker
+scripts/makedeb-docker-helper
 xt/00-compile-pm.t
 xt/01-compile-pl.t
 xt/10-pod-coverage.t
+META.yml
+META.json
 SIGNATURE    Added here by Module::Build

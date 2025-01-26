@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = 1.010;
+our $VERSION = 1.011;
 
 use IP::Geolocation::MMDB::Metadata;
 use Math::BigInt 1.999806;
@@ -57,14 +57,14 @@ IP::Geolocation::MMDB - Read MaxMind DB files
 
 =head1 VERSION
 
-version 1.010
+version 1.011
 
 =head1 SYNOPSIS
 
   use IP::Geolocation::MMDB;
-  my $db = IP::Geolocation::MMDB->new(file => 'Country.mmdb');
+  my $db = IP::Geolocation::MMDB->new(file => '/path/to/Country.mmdb');
   my $metadata = $db->metadata;
-  my $data = $db->record_for_address('1.2.3.4');
+  my $data = $db->get('1.2.3.4');
   my $country_code = $db->getcc('2620:fe::9');
 
 =head1 DESCRIPTION
@@ -76,24 +76,19 @@ information such as country and city names.
 
 =head2 new
 
-  my $db = IP::Geolocation::MMDB->new(file => 'Country.mmdb');
+  my $db = IP::Geolocation::MMDB->new(file => '/path/to/Country.mmdb');
 
 Returns a new database object.  Dies if the specified file cannot be read.
 
-=head2 getcc
+=head2 get
 
-  my $country_code = $db->getcc($ip_address);
-
-Takes an IPv4 or IPv6 address as a string and returns a two-letter country
-code or the undefined value.  Dies if the address is not a valid IP address.
-
-=head2 record_for_address
-
-  my $data = $db->record_for_address($ip_address);
+  my $data = $db->get($ip_address);
+  my ($data, $prefix_length) = $db->get($ip_address);
 
 Takes an IPv4 or IPv6 address as a string and returns the data associated with
-the IP address or the undefined value.  Dies if the address is not a valid IP
-address.
+the IP address or the undefined value.  In list context, the data and the
+network prefix length associated with the IP address are returned.  Dies if
+the address is not a valid IP address.
 
 The returned data is usually a hash reference but could also be a an array
 reference or a scalar for custom databases.  Here's an example from an IP to
@@ -119,6 +114,19 @@ city database:
       longitude => 13.411
     }
   }
+
+=head2 getcc
+
+  my $country_code = $db->getcc($ip_address);
+
+Takes an IPv4 or IPv6 address as a string and returns a two-letter country
+code or the undefined value.  Dies if the address is not a valid IP address.
+
+=head2 record_for_address
+
+  my $data = $db->record_for_address($ip_address);
+
+An alias for C<get> that always returns a scalar.
 
 =head2 iterate_search_tree
 
@@ -208,12 +216,14 @@ None.
 
 =head1 DEPENDENCIES
 
-Requires L<Alien::libmaxminddb> from CPAN.  Requires L<Math::BigInt> version
-1.999806, which is distributed with Perl 5.26 and newer.  Requires
-libmaxminddb 1.2.0 or newer.
+Requires L<Math::BigInt> version 1.999806, which is distributed with Perl 5.26
+and newer.  Requires libmaxminddb 1.2.0 or newer.
 
-Requires an IP to country, city or ASN database in the MaxMind DB file format
-from L<MaxMind|https://www.maxmind.com/> or L<DP-IP.com|https://db-ip.com/>.
+Requires a database in the MaxMind DB file format from
+L<MaxMind|https://www.maxmind.com/> or L<DP-IP.com|https://db-ip.com/>.
+
+Alien::libmaxminddb from CPAN is a build dependency.  The built module does
+only depend on modules that are distributed with Perl.
 
 =head1 INCOMPATIBILITIES
 
@@ -222,9 +232,9 @@ None.
 =head1 BUGS AND LIMITATIONS
 
 If your Perl interpreter does not support 64-bit integers,
-MMDB_DATA_TYPE_UINT64 values are put into Math::BigInt objects;
+MMDB_DATA_TYPE_UINT64 values are put into Math::BigInt objects.
 
-MMDB_DATA_TYPE_UINT128 values are put into Math::BigInt objects;
+MMDB_DATA_TYPE_UINT128 values are put into Math::BigInt objects.
 
 IP::Geolocation::MMDB can replace MaxMind::DB::Reader in many cases with the
 following differences:
@@ -259,7 +269,7 @@ Andreas Vögele E<lt>voegelas@cpan.orgE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2022 Andreas Vögele
+Copyright (C) 2025 Andreas Vögele
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

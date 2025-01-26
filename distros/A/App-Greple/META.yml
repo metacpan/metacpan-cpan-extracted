@@ -26,7 +26,7 @@ no_index:
 provides:
   App::Greple:
     file: lib/App/Greple.pm
-    version: '9.1703'
+    version: '9.2101'
   App::Greple::Common:
     file: lib/App/Greple/Common.pm
   App::Greple::Filter:
@@ -66,13 +66,13 @@ requires:
   Hash::Util: '0'
   List::BinarySearch: '0'
   List::Util: '1.45'
-  Term::ANSIColor::Concise: '2.05'
+  Term::ANSIColor::Concise: '2.08'
   perl: v5.18.2
 resources:
   bugtracker: https://github.com/kaz-utashiro/greple/issues
   homepage: https://github.com/kaz-utashiro/greple
   repository: https://github.com/kaz-utashiro/greple.git
-version: '9.1703'
+version: '9.2101'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

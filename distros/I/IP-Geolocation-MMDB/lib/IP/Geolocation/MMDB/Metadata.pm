@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = 1.010;
+our $VERSION = 1.011;
 
 sub new {
     my ($class, %attrs) = @_;
@@ -81,12 +81,12 @@ IP::Geolocation::MMDB::Metadata - Metadata from a MaxMind DB file
 
 =head1 VERSION
 
-version 1.010
+version 1.011
 
 =head1 SYNOPSIS
 
   use IP::Geolocation::MMDB;
-  my $db = IP::Geolocation::MMDB->new(file => 'City.mmdb');
+  my $db = IP::Geolocation::MMDB->new(file => '/path/to/City.mmdb');
   my $metadata = $db->metadata;
 
 =head1 DESCRIPTION
@@ -206,7 +206,7 @@ Andreas Vögele E<lt>voegelas@cpan.orgE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2022 Andreas Vögele
+Copyright (C) 2025 Andreas Vögele
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

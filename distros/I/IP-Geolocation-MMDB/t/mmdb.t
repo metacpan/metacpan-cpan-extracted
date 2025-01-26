@@ -39,29 +39,35 @@ my $file = catfile(qw(t data Test-City.mmdb));
 my $reader = new_ok 'MaxMind::DB::Reader' => [file => $file];
 
 can_ok $reader,
-    qw(getcc record_for_address iterate_search_tree metadata file);
+    qw(get getcc record_for_address iterate_search_tree metadata file);
 
 is $reader->file, $file, 'file matches';
 
-ok !eval { $reader->record_for_address('-1') },
-    'invalid ip address throws exception';
+ok !eval { $reader->get('-1') }, 'invalid ip address throws exception';
 
 ok !$reader->record_for_address('127.0.0.1'), 'no data for localhost';
 
 my $uint64  = Math::BigInt->new('4702394921427289928');
 my $uint128 = Math::BigInt->new('86743875649080753100636639643044826960');
 
-my $r = $reader->record_for_address('176.9.54.163');
+my $r = $reader->get('176.9.54.163');
 isa_ok $r, 'HASH';
 is $reader->getcc('176.9.54.163'), 'DE', 'IPv4 address is in Germany';
 
+my ($s, $prefix_length) = $reader->get('176.9.54.163');
+is_deeply $r, $s, 'data matches';
+cmp_ok $prefix_length, '==', 16, 'IPv4 prefix length is 16';
+
 SKIP:
 {
-    skip 'IPv6 tests on Windows', 2 if $^O eq 'MSWin32';
+    skip 'IPv6 tests on Windows', 3 if $^O eq 'MSWin32';
 
     isa_ok $reader->record_for_address('2a01:4f8:150:74ab::2'), 'HASH';
     is $reader->getcc('2a01:4f8:150:74ab::2'), 'DE',
         'IPv6 address is in Germany';
+
+    my (undef, $prefix_length) = $reader->get('2a01:4f8:150:74ab::2');
+    cmp_ok $prefix_length, '==', 32, 'IPv6 prefix length is 32';
 }
 
 is_deeply $r->{x_array}, [-1, 0, 1], 'array matches';

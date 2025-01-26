@@ -202,6 +202,7 @@ $_ = ($#_) ? $_[1] : $_[0];
 
 __END__
 
+=encoding utf8
 
 =head1 NAME
 

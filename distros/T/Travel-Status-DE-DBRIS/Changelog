@@ -1,3 +1,8 @@
+Travel::Status::DE::DBRIS 0.02 - Sat Jan 25 2025
+
+    * dbris-m: Add -m / --modes-of-transit option
+    * dbirs-m: Fix --json
+
 Travel::Status::DE::DBRIS 0.01 - Mon Jan 06 2025
 
     * Initial release

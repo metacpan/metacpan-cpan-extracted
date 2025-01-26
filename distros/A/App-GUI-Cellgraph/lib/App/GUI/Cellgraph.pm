@@ -5,7 +5,7 @@ use utf8;
 
 package App::GUI::Cellgraph;
 our $NAME = __PACKAGE__;
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 use base qw/Wx::App/;
 use App::GUI::Cellgraph::Frame;
@@ -292,8 +292,6 @@ L<App::GUI::Harmonograph>
 L<App::GUI::Juliagraph>
 
 L<App::GUI::Chaosgraph>
-
-L<App::GUI::Dynagraph>
 
 L<App::GUI::Sierpingraph>
 

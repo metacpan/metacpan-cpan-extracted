@@ -208,8 +208,6 @@ SEE ALSO
 
     App::GUI::Chaosgraph
 
-    App::GUI::Dynagraph
-
     App::GUI::Sierpingraph
 
 AUTHOR

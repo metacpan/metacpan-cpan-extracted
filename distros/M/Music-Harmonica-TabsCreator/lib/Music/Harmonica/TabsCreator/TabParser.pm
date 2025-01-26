@@ -7,7 +7,7 @@ use utf8;
 
 use Readonly;
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 # This class converts a tab into tones (degrees) relative to the key of C4.
 # It accepts an input specifying the tuning of an harmonica.
@@ -43,9 +43,10 @@ sub parse ($self, $tab) {
       next;
     }
 
-    # TODO: print only the relevant part of symbols here
     my $pos = pos($tab);
-    die "Invalid syntax at position ${pos} in: ${tab}\n";
+    substr $tab, $pos, 0, '-->';
+    $pos++;
+    die "Invalid syntax in the input tab at character ${pos}: ${tab}\n";
   }
   return wantarray ? @out : \@out;
 }

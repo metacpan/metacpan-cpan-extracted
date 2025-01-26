@@ -9,7 +9,7 @@ use vars qw($VERSION @EXPORT_OK %EXPORT_TAGS %EthiopicClasses
 	                $ግዕዝ $ካዕብ $ሣልስ $ራብዕ $ኃምስ $ሳድስ $ሳብዕ
                 	$ዘመደ_ግዕዝ $ዘመደ_ካዕብ $ዘመደ_ሣልስ $ዘመደ_ራብዕ $ዘመደ_ኃምስ);
 
-	$VERSION = "0.16";
+	$VERSION = "0.16.1";
 	
 	@EXPORT_OK = qw(%EthiopicClasses &getForm &setForm &subForm &formatForms &isFamilyOf
 	                $ግዕዝ $ካዕብ $ሣልስ $ራብዕ $ኃምስ $ሳድስ $ሳብዕ
@@ -348,6 +348,7 @@ $_ = ($#_) ? $_[1] : $_[0];
 
 __END__
 
+=encoding utf8
 
 =head1 NAME
 

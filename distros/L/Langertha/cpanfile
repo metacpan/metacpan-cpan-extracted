@@ -3,6 +3,7 @@ requires 'File::ShareDir::ProjectDistDir';
 requires 'JSON::MaybeXS';
 requires 'JSON::PP';
 requires 'LWP::Protocol::https';
+requires 'MIME::Base64';
 requires 'Module::Runtime';
 requires 'Moose';
 requires 'MooseX::NonMoose';
