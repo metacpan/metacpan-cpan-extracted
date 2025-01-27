@@ -10,7 +10,7 @@ use Object::Pad;
 
 class Geo::Location::IP::Record::Traits;
 
-our $VERSION = 0.001;
+our $VERSION = 0.002;
 
 use Geo::Location::IP::Address;
 
@@ -79,7 +79,7 @@ Geo::Location::IP::Record::Traits - Various details about an IP address
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

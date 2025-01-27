@@ -6,7 +6,7 @@ use strict;
 use warnings;
 no warnings;
 
-our $VERSION = '1.024';
+our $VERSION = '1.025';
 
 use Carp qw(croak);
 use File::Spec::Functions qw(splitdir catfile);
@@ -346,7 +346,7 @@ created this module.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2008-2024, brian d foy <briandfoy@pobox.com>. All rights reserved.
+Copyright © 2008-2025, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 You may redistribute this under the Artistic License 2.0.
 

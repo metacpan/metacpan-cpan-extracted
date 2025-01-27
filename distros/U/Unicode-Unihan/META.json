@@ -4,7 +4,7 @@
       "Dan Kogai <dankogai@dan.co.jp>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "unicode",
       "unihan"
@@ -57,6 +57,6 @@
          "web" : "https://github.com/briandfoy/unicode-unihan"
       }
    },
-   "version" : "0.044",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.045",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -46,7 +46,7 @@ no_index:
 provides:
   Mojolicious::Plugin::OpenAPI::Modern:
     file: lib/Mojolicious/Plugin/OpenAPI/Modern.pm
-    version: '0.013'
+    version: '0.014'
 requires:
   Feature::Compat::Try: '0'
   JSON::Schema::Modern: '0.549'
@@ -65,10 +65,10 @@ resources:
   bugtracker: https://github.com/karenetheridge/Mojolicious-Plugin-OpenAPI-Modern/issues
   homepage: https://github.com/karenetheridge/Mojolicious-Plugin-OpenAPI-Modern
   repository: https://github.com/karenetheridge/Mojolicious-Plugin-OpenAPI-Modern.git
-version: '0.013'
+version: '0.014'
 x_Dist_Zilla:
   perl:
-    version: '5.041007'
+    version: '5.041008'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -484,7 +484,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.45.2
+          git_version: 2.47.1
           include_authors: 0
           include_releaser: 1
           order_by: commits
@@ -551,7 +551,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20241220'
+          Module::CoreList: '5.20250120'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.010'
     -
@@ -576,7 +576,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.45.2
+          git_version: 2.47.1
           repo_root: .
       name: '@Author::ETHER/initial check'
       version: '2.051'
@@ -584,7 +584,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.45.2
+          git_version: 2.47.1
           repo_root: .
       name: '@Author::ETHER/Git::CheckFor::MergeConflicts'
       version: '0.014'
@@ -592,7 +592,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.45.2
+          git_version: 2.47.1
           repo_root: .
       name: '@Author::ETHER/Git::CheckFor::CorrectBranch'
       version: '0.014'
@@ -618,7 +618,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.45.2
+          git_version: 2.47.1
           repo_root: .
       name: '@Author::ETHER/after tests'
       version: '2.051'
@@ -702,7 +702,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.45.2
+          git_version: 2.47.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -715,11 +715,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.013
+          tag: v0.014
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.45.2
+          git_version: 2.47.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -756,7 +756,7 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.45.2
+          git_version: 2.47.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -778,7 +778,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.45.2
+          git_version: 2.47.1
           repo_root: .
       name: '@Author::ETHER/Git::Push'
       version: '2.051'
@@ -889,7 +889,7 @@ x_Dist_Zilla:
       is_trial: 0
     version: '6.032'
 x_authority: cpan:ETHER
-x_generated_by_perl: v5.41.7
+x_generated_by_perl: v5.41.8
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 1

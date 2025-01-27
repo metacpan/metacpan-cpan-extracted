@@ -12,7 +12,6 @@ use utf8;
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use JSON::Schema::Modern::Utilities qw(jsonp get_type);
-use Test::Fatal;
 use Test::Warnings 0.033 qw(:no_end_test allow_patterns);
 
 use lib 't/lib';
@@ -529,7 +528,7 @@ YAML
           instanceLocation => '/request',
           keywordLocation => jsonp(qw(/paths /foo post parameters 0 $ref)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post parameters 0 $ref)))->to_string,
-          error => 'EXCEPTION: unable to find resource /api#/i_do_not_exist',
+          error => 'EXCEPTION: unable to find resource "/api#/i_do_not_exist"',
         },
       ],
     },
@@ -556,7 +555,7 @@ YAML
           instanceLocation => '/request',
           keywordLocation => jsonp(qw(/paths /foo parameters 0 $ref)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo parameters 0 $ref)))->to_string,
-          error => 'EXCEPTION: unable to find resource /api#/i_do_not_exist',
+          error => 'EXCEPTION: unable to find resource "/api#/i_do_not_exist"',
         },
       ],
     },
@@ -587,7 +586,7 @@ YAML
           instanceLocation => '/request',
           keywordLocation => jsonp(qw(/paths /foo post parameters 0 $ref $ref)),
           absoluteKeywordLocation => $doc_uri->clone->fragment('/components/parameters/foo/$ref')->to_string,
-          error => 'EXCEPTION: unable to find resource /api#/i_do_not_exist',
+          error => 'EXCEPTION: unable to find resource "/api#/i_do_not_exist"',
         },
       ],
     },
@@ -994,7 +993,7 @@ YAML
           instanceLocation => '/request/body',
           keywordLocation => jsonp(qw(/paths /foo get requestBody $ref)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get requestBody $ref)))->to_string,
-          error => 'EXCEPTION: unable to find resource /api#/i_do_not_exist',
+          error => 'EXCEPTION: unable to find resource "/api#/i_do_not_exist"',
         },
       ],
     },
@@ -2072,7 +2071,7 @@ YAML
           instanceLocation => '/request/header/ArrayWithBrokenRef',
           keywordLocation => jsonp(qw(/paths /foo get parameters 7 schema $ref)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get parameters 7 schema $ref)))->to_string,
-          error => 'EXCEPTION: unable to find resource /api#/components/schemas/i_do_not_exist',
+          error => 'EXCEPTION: unable to find resource "/api#/components/schemas/i_do_not_exist"',
         },
       ],
     },

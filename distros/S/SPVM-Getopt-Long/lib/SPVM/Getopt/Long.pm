@@ -1,6 +1,6 @@
 package SPVM::Getopt::Long;
 
-our $VERSION = "0.001";
+our $VERSION = "0.002";
 
 1;
 
@@ -10,7 +10,7 @@ SPVM::Getopt::Long - Parsing Command Line Options
 
 =head1 Description
 
-The Getopt::Long class of L<SPVM> has methods to parse command line options.
+Getopt::Long class in L<SPVM> has methods to parse command line options.
 
 =head1 Usage
 

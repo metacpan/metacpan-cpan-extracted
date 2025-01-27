@@ -9,6 +9,7 @@ Makefile.PL
 MANIFEST
 MANIFEST.SKIP
 README.pod
+SECURITY.md
 t/_get_rows.t
 t/compile.t
 t/load.t

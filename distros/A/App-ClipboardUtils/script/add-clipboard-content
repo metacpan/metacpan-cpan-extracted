@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-08-30'; # DATE
+our $DATE = '2025-01-27'; # DATE
 our $DIST = 'App-ClipboardUtils'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/ClipboardUtils/add_clipboard_content",
@@ -40,7 +40,7 @@ add-clipboard-content - Add a new content to the clipboard
 
 =head1 VERSION
 
-This document describes version 0.008 of add-clipboard-content (from Perl distribution App-ClipboardUtils), released on 2024-08-30.
+This document describes version 0.009 of add-clipboard-content (from Perl distribution App-ClipboardUtils), released on 2025-01-27.
 
 =head1 SYNOPSIS
 
@@ -48,7 +48,7 @@ B<add-clipboard-content> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h,
 
 B<add-clipboard-content> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<add-clipboard-content> [B<L<--clipboard-manager|/"--clipboard-manager=s, -m">>=I<str>|B<L<-m|/"--clipboard-manager=s, -m">>=I<str>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--split-by|/"--split-by=s">>=I<L<str_or_re|Sah::Schema::str_or_re>>] [B<L<--tee|/"--tee">>|B<L<--no-tee|/"--tee">>|B<L<--notee|/"--tee">>] -- [I<L<content|/"--content=s">>]
+B<add-clipboard-content> [B<L<--clipboard-manager|/"--clipboard-manager=s, -m">>=I<str>|B<L<-m|/"--clipboard-manager=s, -m">>=I<str>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--split-by|/"--split-by=s, -s">>=I<L<str_or_re|Sah::Schema::str_or_re>>|B<L<-s|/"--split-by=s, -s">>=I<L<str_or_re|Sah::Schema::str_or_re>>] [B<L<--tee|/"--tee, -t">>|B<L<-t|/"--tee, -t">>] -- [I<L<content|/"--content=s">>]
 
 
 
@@ -85,13 +85,17 @@ The default, when left undef, is to detect what clipboard manager is running.
 
 Can also be specified as the 1st command-line argument.
 
-=item B<--split-by>=I<s>
+=item B<--split-by>=I<s>, B<-s>
 
 Split content by specified string/regex, add the split content as multiple clipboard entries.
 
-=item B<--tee>
+Note that if you supply a regex, you should not have any capture groups in the
+regex.
 
-If set to true, will output content back to STDOUT.
+
+=item B<--tee>, B<-t>
+
+Pass stdin to stdout.
 
 =back
 
@@ -280,7 +284,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024, 2023, 2022 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

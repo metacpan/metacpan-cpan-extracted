@@ -31,6 +31,7 @@ my $e_par_open = '(';
 my $e_par_close = ')';
 my $e_col_aliases = 'alias';
 my $e_skip_col = ''; # no length
+my $e_multi_col = 'mc'; ##
 
 
 sub new {
@@ -57,12 +58,12 @@ sub column {
     else {
         $extensions = [ $e_subquery, $e_scalar_func, $e_case, $e_math ];
     }
+    if ( $clause =~ /^where\z/i ) {
+        push @$extensions, $e_multi_col, $e_skip_col; ##
+    }
     if ( $opt->{add_parentheses} ) {
         push @$extensions, $e_par_open, $e_par_close;
         delete $opt->{add_parentheses};
-    }
-    if ( $clause =~ /^where\z/i ) {
-        push @$extensions, $e_skip_col;
     }
     if ( length $opt->{from} ) {
         # no recursion:
@@ -307,10 +308,23 @@ sub __choose_extension {
             }
             return $col_aliases;
         }
+        elsif ( $extension eq $e_multi_col ) { ##
+            my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
+            # Choose
+            my $cols = $tu->choose_a_subset(
+                $qt_cols,
+                { info => $info, prompt => '', layout => 1, index => 0, all_by_default => 0,
+                  cs_label => 'Columns: ', cs_begin => '(', cs_separator => ',', cs_end => ')' }
+            );
+            $ax->print_sql_info( $info );
+            if ( ! defined $cols ) {
+                return if @$extensions == 1;
+                next EXTENSION;
+            }
+            return "(" . join( ",", @$cols ) . ")";
+        }
     }
 }
-
-
 
 
 

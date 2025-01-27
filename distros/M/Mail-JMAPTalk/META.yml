@@ -22,5 +22,5 @@ requires:
   File::LibMagic: '0'
   HTTP::Tiny: '0'
   JSON: '0'
-version: '0.16'
+version: '0.17'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

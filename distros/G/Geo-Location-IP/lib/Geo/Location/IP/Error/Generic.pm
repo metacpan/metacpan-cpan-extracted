@@ -10,7 +10,7 @@ use Object::Pad;
 
 class Geo::Location::IP::Error::Generic;
 
-our $VERSION = 0.001;
+our $VERSION = 0.002;
 
 field $message :param :reader;
 
@@ -40,7 +40,7 @@ Geo::Location::IP::Error::Generic - Generic error class
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

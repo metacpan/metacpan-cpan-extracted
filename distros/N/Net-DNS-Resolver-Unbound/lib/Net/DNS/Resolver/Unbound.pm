@@ -12,7 +12,7 @@ use base qw(Net::DNS::Resolver::Base DynaLoader), OS_CONF;
 our $VERSION;
 
 BEGIN {
-	$VERSION = '1.30';
+	$VERSION = '1.31';
 	eval { __PACKAGE__->bootstrap($VERSION) };
 }
 
@@ -27,7 +27,6 @@ use constant IRRELEVENT => qw(igntc nameserver4 nameserver6 nameservers
 		persistent_tcp persistent_udp port retrans retry
 		srcaddr4 srcaddr6 srcport tcp_timeout udp_timeout usevc);
 
-use constant IP_PREF	 => UB_VERSION > 11100;
 use constant ADD_TA_AUTR => UB_CONTEXT->can('add_ta_autr');
 use constant SET_STUB	 => UB_CONTEXT->can('set_stub');
 use constant SET_TLS	 => UB_CONTEXT->can('set_tls');
@@ -81,7 +80,7 @@ In particular, the queryID returned by Unbound is always zero.
 =back
 
 
-=head1 REPLACING Net::DNS::Resolver BASE CLASS
+=head2 Replacing Net::DNS::Resolver Base Class
 
 Placing C<-register> in the L<Net::DNS::Resolver::Unbound> import list, will
 cause it to register itself with L<Net::DNS> as the resolver base class.
@@ -108,17 +107,60 @@ sub import {
 
 =head2 new
 
+	# Use the default configuration
+	my $resolver = Net::DNS::Resolver::Unbound->new();
+
+	# Set options in the constructor
 	my $resolver = Net::DNS::Resolver::Unbound->new(
-				debug_level => 2,
-				defnames    => 1,
-				dnsrch,	    => 1,
-				domain	    => 'domain',
-				ndots	    => 1,
-				nameservers => [ ... ],
-				searchlist  => ['domain' ... ]
-				);
+		debug_level => 2,
+		defnames    => 1,
+		dnsrch,	    => 1,
+		domain	    => 'domain',
+		nameservers => [ '2001:DB8::1', ... ],
+		ndots	    => 1,
+		searchlist  => ['domain' ... ]
+		);
 
 Returns a new Net::DNS::Resolver::Unbound resolver object.
+If no arguments are supplied, C<new()>
+returns an object having the default configuration.
+
+On Unix and Linux systems,
+the default values are read from the following files,
+in the order indicated:
+
+=over
+
+F</etc/resolv.conf>,
+F<$HOME/.resolv.conf>,
+F<./.resolv.conf>
+
+=back
+
+The following keywords are recognised in resolver configuration files:
+
+=over
+
+=item B<nameserver> address
+
+IP address of a name server that the resolver should query.
+
+=item B<domain> localdomain
+
+The domain suffix to be appended to a short non-absolute name.
+
+=item B<search> domain ...
+
+A space-separated list of domains in the desired search path.
+
+=back
+
+Except for F</etc/resolv.conf>, files will only be read if owned by the
+effective userid running the program.
+
+Note that the domain and searchlist keywords are mutually exclusive.
+If both are present, the resulting behaviour is unspecified.
+If neither is present, the domain is determined from the local hostname.
 
 =cut
 
@@ -128,11 +170,12 @@ sub new {
 	$self->nameservers( $self->SUPER::nameservers );
 	delete $self->{$_} for IRRELEVENT;
 	$self->_finalise_config;				# default configuration
-	$self->{ub_upd} = {} if @args;				# force context rebuild
+	return $self unless @args;
 	while ( my $attr = shift @args ) {
 		my $value = shift @args;
 		$self->$attr( ref($value) ? @$value : $value );
 	}
+	$self->_finalise_config;				# force context rebuild
 	return $self;
 }
 
@@ -144,7 +187,7 @@ sub new {
 		add_ta_file => '/var/lib/unbound/root.key'
 		);
 
-	my $DoT_resolver = Net::DNS::Resolver->new(
+	my $DoT_resolver = Net::DNS::Resolver::Unbound->new(
 		nameserver => '2606:4700:4700::1111@853#cloudflare-dns.com',
 		nameserver => '1.1.1.1@853#cloudflare-dns.com',
 		nameserver => '2001:4860:4860::8888@853#dns.google',
@@ -416,7 +459,7 @@ sub trusted_keys {
 	$resolver->debug_out( out );
 
 Send debug output (and error output) to the specified stream.
-Pass a null argument to disable. Default is stderr.
+Pass a null argument to disable. The default is stderr.
 
 =cut
 
@@ -430,8 +473,9 @@ sub debug_out {
 
 	$resolver->debug_level(0);
 
-Set verbosity of the debug output directed to stderr.  Level 0 is off,
-1 minimal, 2 detailed, 3 lots, and 4 lots more.
+Set verbosity of the debug output directed to stderr.
+The default level 0 is off, 1 minimal, 2 detailed, 3 lots,
+and 4 lots more.
 
 =cut
 
@@ -474,15 +518,15 @@ sub string {
 
 	my ($force)  = ( grep( { $self->{$_} } qw(force_v6 force_v4) ),	  'force_v4' );
 	my ($prefer) = ( grep( { $self->{$_} } qw(prefer_v6 prefer_v4) ), 'prefer_v4' );
-	my $image    = <<END;
+	my @search   = grep { defined($_) } @{$self->{searchlist}};
+	my @image    = <<END;
 ;; RESOLVER state:
-;; searchlist	@{$self->{searchlist}}
+;; searchlist	@search
 ;; defnames	$self->{defnames}	dnsrch	$self->{dnsrch}
 ;; ${prefer}	$self->{$prefer}	ndots	$self->{ndots}
 ;; ${force}	$self->{$force}	debug	$self->{debug}
 END
-	$self->{ub_upd} ||= {};					# force config rebuild
-	$self->_finalise_config;
+	$self->_finalise_config;				# force config rebuild
 	my %config = %{$self->{ub_cfg}};
 	my $optref = $config{set_option} || [];
 	my @option = @$optref;					# pre-sorted option list
@@ -501,13 +545,13 @@ END
 		if ( ref $value ) {
 			foreach my $arg (@$value) {
 				my @arg = map { ref($_) ? @$_ : $_ } $arg;
-				$image .= sprintf( $format, $name, join ' ', @arg );
+				push @image, sprintf( $format, $name, join ' ', @arg );
 			}
 		} else {
-			$image .= sprintf( $format, $name, $value );
+			push @image, sprintf( $format, $name, $value );
 		}
 	}
-	return $image;
+	return join '', @image, "\n";
 }
 
 
@@ -584,12 +628,14 @@ my %IP_conf = (
 	force_v6  => ['do-ip4:'	    => 'no'],
 	prefer_v4 => ['prefer-ip4:' => 'yes'],
 	prefer_v6 => ['prefer-ip6:' => 'yes'] );
-my @IPpref = map {@$_} values %IP_conf;
-delete @IP_conf{qw(prefer_v4 prefer_v6)} unless IP_PREF;
-my @IPconf = sort keys %IP_conf;
+my @IPconf = map {@$_} values %IP_conf;
+my @IPoptn = sort keys %IP_conf;
 
 sub _finalise_config {
 	my $self = shift;
+
+	my @IPpref = grep { $self->{$_} } @IPoptn;		# from Net::DNS config
+	delete $self->{ub_upd}->{any} if @IPpref;		# force context rebuild
 
 	my $update = delete $self->{ub_upd};
 	return unless $update;
@@ -602,9 +648,9 @@ sub _finalise_config {
 	my %config = ( %$config, %$update );			# merge config updates
 
 	my %option = map {$_} @$cfgopt, @$updopt;		# merge option updates
-	delete @option{@IPpref};				# expunge IP preference
-	foreach my $key ( grep { $self->$_ } @IPconf ) {	# insert IP preference
-		my ( $key, $value ) = @{$IP_conf{$key}};
+	delete @option{@IPconf};				# expunge IP preference
+	foreach (@IPpref) {					# insert IP preference
+		my ( $key, $value ) = @{$IP_conf{$_}};
 		$option{$key} = $value;
 		last;
 	}
@@ -613,7 +659,7 @@ sub _finalise_config {
 	my $ctx = $self->{ub_ctx} = Net::DNS::Resolver::Unbound::Context->new();
 	foreach my $name ( keys %option ) {			# set unbound options
 		foreach my $value ( map { ref($_) ? @$_ : $_ } $option{$name} ) {
-			$ctx->set_option( $name, $value );
+			eval { $ctx->set_option( $name, $value ) };
 		}
 	}
 

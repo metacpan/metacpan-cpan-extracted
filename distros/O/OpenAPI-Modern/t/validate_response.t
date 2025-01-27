@@ -12,7 +12,6 @@ use utf8;
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use JSON::Schema::Modern::Utilities 'jsonp';
-use Test::Fatal;
 use Test::Warnings 0.033 qw(:no_end_test allow_patterns);
 
 use lib 't/lib';
@@ -589,7 +588,7 @@ YAML
           instanceLocation => '/response',
           keywordLocation => jsonp(qw(/paths /foo post responses 303 $ref $ref)),
           absoluteKeywordLocation => $doc_uri_rel->clone->fragment('/components/responses/foo/$ref')->to_string,
-          error => 'EXCEPTION: unable to find resource /api#/i_do_not_exist',
+          error => 'EXCEPTION: unable to find resource "/api#/i_do_not_exist"',
         },
       ],
     },

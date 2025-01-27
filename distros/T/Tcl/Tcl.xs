@@ -14,10 +14,6 @@
 #include "perl.h"
 #include "XSUB.h"
 
-#ifndef DEBUG_REFCOUNTS
-#define DEBUG_REFCOUNTS 0
-#endif
-
 #include <tcl.h>
 #if TCL_MAJOR_VERSION < 9
     typedef int Tcl_Size;
@@ -382,14 +378,6 @@ NpInitialize(pTHX_ SV *X)
 {
     static Tcl_Interp * (* createInterp)() = NULL;
     static void (* findExecutable)(char *) = NULL;
-    /*
-     * We want the Tcl_InitStubs func static to ourselves - before Tcl
-     * is loaded dynamically and possibly changes it.
-     * Variable initstubs have to be declared as volatile to prevent
-     * compiler optimizing it out.
-     */
-    static const char *(*volatile initstubs)(Tcl_Interp *, const char *, int)
-	= Tcl_InitStubs;
     char dllFilename[MAX_PATH];
     dllFilename[0] = '\0';
 
@@ -421,11 +409,8 @@ NpInitialize(pTHX_ SV *X)
 #endif
 	    return TCL_ERROR;
 	}
-	DLSYM(tclHandle, "Tcl_FindExecutable", void (*)(char *),
-		findExecutable);
-
-	DLSYM(tclHandle, "TclKit_AppInit", int (*)(Tcl_Interp *),
-		tclKit_AppInit);
+	DLSYM(tclHandle, "Tcl_FindExecutable", void (*)(char *), findExecutable);
+	DLSYM(tclHandle, "TclKit_AppInit", int (*)(Tcl_Interp *), tclKit_AppInit);
     }
 #else
     createInterp   = Tcl_CreateInterp;
@@ -452,7 +437,7 @@ NpInitialize(pTHX_ SV *X)
      * calls without grabbing them by symbol out of the dll.
      * This will be Tcl_PkgRequire for non-stubs builds.
      */
-    if (initstubs(g_Interp, NULL, 0) == NULL) {
+    if (Tcl_InitStubs(g_Interp, NULL, 0) == NULL) {
 	warn("Failed to initialize Tcl stubs!");
 	return TCL_ERROR;
     }
@@ -498,25 +483,6 @@ NpInitialize(pTHX_ SV *X)
      */
 
     return TCL_OK;
-}
-#endif
-
-#if DEBUG_REFCOUNTS
-static void
-check_refcounts(Tcl_Obj *objPtr) {
-    int rc = objPtr->refCount;
-    if (rc != 1) {
-	fprintf(stderr, "objPtr %p refcount %d\n", objPtr, rc); fflush(stderr);
-    }
-    if (objPtr->typePtr == tclListTypePtr) {
-	int objc, i;
-	Tcl_Obj **objv;
-
-	Tcl_ListObjGetElements(NULL, objPtr, &objc, &objv);
-	for (i = 0; i < objc; i++) {
-	    check_refcounts(objv[i]);
-	}
-    }
 }
 #endif
 
@@ -1261,9 +1227,6 @@ Tcl_invoke(interp, sv, ...)
 		 * Result interp result and invoke the command's object-based
 		 * Tcl_ObjCmdProc.
 		 */
-#if DEBUG_REFCOUNTS
-		for (i = 1; i < objc; i++) { check_refcounts(objv[i]); }
-#endif
 		Tcl_ResetResult(interp);
 		result = (*cmdinfo.objProc)(cmdinfo.objClientData, interp,
 			objc, objv);
@@ -1304,9 +1267,6 @@ Tcl_invoke(interp, sv, ...)
 		 * Result interp result and invoke the command's string-based
 		 * procedure.
 		 */
-#if DEBUG_REFCOUNTS
-		for (i = 1; i < objc; i++) { check_refcounts(objv[i]); }
-#endif
 		Tcl_ResetResult(interp);
 		result = (*cmdinfo.proc)(cmdinfo.clientData, interp,
 			objc, argv);
@@ -1377,9 +1337,6 @@ Tcl_icall(interp, sv, ...)
 	     * Reset current result and invoke using Tcl_EvalObjv.
 	     * This will trigger command traces and handle async signals.
 	     */
-#if DEBUG_REFCOUNTS
-	    for (i = 1;  i < objc;  i++) { check_refcounts(objv[i]); }
-#endif
 	    Tcl_ResetResult(interp);
 	    result = Tcl_EvalObjv(interp, objc, objv, 0);
 

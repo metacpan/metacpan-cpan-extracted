@@ -1,10 +1,10 @@
 use strictures 2;
-package Mojolicious::Plugin::OpenAPI::Modern; # git description: v0.012-2-ga5dc81d
+package Mojolicious::Plugin::OpenAPI::Modern; # git description: v0.013-3-g0ebee66
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Mojolicious plugin providing access to an OpenAPI document and parser
 # KEYWORDS: validation evaluation JSON Schema OpenAPI Swagger HTTP request response
 
-our $VERSION = '0.013';
+our $VERSION = '0.014';
 
 use 5.020;
 use if "$]" >= 5.022, experimental => 're_strict';
@@ -100,7 +100,7 @@ Mojolicious::Plugin::OpenAPI::Modern - Mojolicious plugin providing access to an
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 SYNOPSIS
 
@@ -151,7 +151,7 @@ for telemetry and logging.
 
   my $after_response = sub ($c) {
     my $result = $c->validate_response;
-    if ($result) {
+    if ($result->valid) {
       $c->log->debug('response is valid');
     }
     else {
@@ -272,7 +272,7 @@ L<https://learn.openapis.org/>
 
 =item *
 
-L<https://spec.openapis.org/oas/v3.1.0>
+L<https://spec.openapis.org/oas/latest.html>
 
 =back
 

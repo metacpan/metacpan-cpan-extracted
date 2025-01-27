@@ -44,6 +44,9 @@ METHODS
     $self->dsn($dsn)
         Get/Set dsn.
 
+    $self->dbh($dsn)
+        Get/Set dbh.
+
     $self->migrate($version)
         Migrate database to version.
 
@@ -54,10 +57,20 @@ METHODS
         Get/Set database username.
 
     $self->version
-        Get migration version from database.
+        Get migration version from database. Will be undef if no migration
+        has taken place yet.
 
 AUTHOR
-    Sebastian Riedel, "sri@oook.de"
+    Sebastian Riedel, <kraihx@gmail.com>
+
+CONTRIBUTORS
+    Dan Sully, <dan+github@sully.org>
+
+    Marcus Ramberg, <marcus@nordaaker.com>
+
+    Steven Jenkin, <sjenkin@venda.com>
+
+    Sven Willenbuecher, <sven.willenbuecher@gmx.de>
 
 COPYRIGHT
     This program is free software, you can redistribute it and/or modify it

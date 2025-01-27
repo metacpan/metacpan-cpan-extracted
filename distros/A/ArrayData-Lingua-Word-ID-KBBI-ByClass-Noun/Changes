@@ -1,3 +1,10 @@
+0.002   2024-11-19  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Mention WordList::ID::KBBI::ByClass::Noun.
+
+
 0.001   2024-11-19  Released-By: PERLANCAR
 
         - First release.

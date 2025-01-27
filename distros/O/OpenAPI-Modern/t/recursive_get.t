@@ -9,8 +9,6 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
-use Test::Fatal;
-
 use lib 't/lib';
 use Helper;
 
@@ -92,7 +90,7 @@ subtest recursive_get => sub {
 
   like(
     exception { $openapi->recursive_get('#/paths/~1foo/post/parameters/0') },
-    qr'^unable to find resource http://localhost:1234/api#/i_do_not_exist',
+    qr'^unable to find resource "http://localhost:1234/api#/i_do_not_exist"',
     'failure to resolve $ref',
   );
 

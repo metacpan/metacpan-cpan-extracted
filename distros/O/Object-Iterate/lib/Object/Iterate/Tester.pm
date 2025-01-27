@@ -6,7 +6,7 @@ use vars qw($VERSION);
 use warnings;
 no warnings;
 
-$VERSION     = '1.149';
+$VERSION     = '1.151';
 
 =encoding utf8
 
@@ -37,7 +37,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2002-2023, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2002-2025, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License 2.0.

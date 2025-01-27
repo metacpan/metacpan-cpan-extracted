@@ -2,6 +2,8 @@
 # MIT License
 
 class HTTP::Tiny::URL {
+  version_from HTTP::Tiny;
+  
   allow HTTP::Tiny;
   allow HTTP::Tiny::Handle;
   

@@ -11,7 +11,6 @@ no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use utf8;
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
-use Test::Fatal;
 use JSON::Schema::Modern::Utilities qw(jsonp get_type);
 
 use lib 't/lib';

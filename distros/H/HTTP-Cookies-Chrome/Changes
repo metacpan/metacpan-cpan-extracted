@@ -1,5 +1,8 @@
 Revision history for Perl module HTTP::Cookies::Chrome
 
+2.003 2025-01-26T21:05:56Z
+	* refresh distro and move to BRIANDFOY
+
 2.002 2021-02-19T20:30:09Z
 	* Fix some testing issues.
 

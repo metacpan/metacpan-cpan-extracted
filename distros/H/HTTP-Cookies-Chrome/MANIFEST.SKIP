@@ -69,3 +69,4 @@ test-corpus/Cookies\.save
 \.icloud$
 \A\.github\b
 
+\.gitattributes\b

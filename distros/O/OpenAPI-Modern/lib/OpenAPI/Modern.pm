@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.075-8-g306ffee
+package OpenAPI::Modern; # git description: v0.077-3-g01b51b1
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.1 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.1 Swagger HTTP request response
 
-our $VERSION = '0.076';
+our $VERSION = '0.078';
 
 use 5.020;
 use utf8;
@@ -302,7 +302,7 @@ sub validate_response ($self, $response, $options = {}) {
   }
   catch ($e) {
     if ($e->$_isa('JSON::Schema::Modern::Result')) {
-      $e->recommended_response(undef);
+      $e->recommended_response(undef);  # responses don't have responses
       return $e;
     }
     elsif ($e->$_isa('JSON::Schema::Modern::Error')) {
@@ -335,8 +335,7 @@ sub find_path ($self, $options, $state = {}) {
 
     # requests don't have response codes, so if 'error' is set, it is some sort of parsing error
     if (my $error = $options->{request}->error) {
-      ()= E({ %$state, data_path => '/request' }, 'Failed to parse request: %s', $error->{message});
-      return $self->_result($state);
+      return E({ %$state, data_path => '/request' }, 'Failed to parse request: %s', $error->{message});
     }
   }
 
@@ -513,7 +512,7 @@ sub recursive_get ($self, $uri_reference, $entity_type = undef) {
 
     my $schema_info = $self->evaluator->_fetch_from_uri($uri);
 
-    die('unable to find resource ', $uri) if not $schema_info;
+    die('unable to find resource "', $uri, '"') if not $schema_info;
     die sprintf('bad $ref to %s: not a%s "%s"', $schema_info->{canonical_uri}, ($entity_type =~ /^[aeiou]/ ? 'n' : ''), $entity_type)
       if $entity_type
         and $schema_info->{document}->get_entity_at_location($schema_info->{document_path}) ne $entity_type;
@@ -533,6 +532,9 @@ sub recursive_get ($self, $uri_reference, $entity_type = undef) {
 # given a request uri and a path_template, check that these match, and extract capture values.
 sub _match_uri ($self, $uri, $path_template) {
   my $uri_path = $uri->path->to_string;
+
+  # RFC9112 §3.2.1-3: If the target URI's path component is empty, the client MUST send "/" as the
+  # path within the origin-form of request-target.
   $uri_path = '/' if not length $uri_path;
 
   # §3.2: "The value for these path parameters MUST NOT contain any unescaped “generic syntax”
@@ -634,7 +636,7 @@ sub _validate_header_parameter ($self, $state, $header_name, $header_obj, $heade
 
   my $types = $self->_type_in_schema($header_obj->{schema}, { %$state, schema_path => $state->{schema_path}.'/schema' });
 
-  # RFC9112 §5.3-1: "A recipient MAY combine multiple field lines within a field section that have
+  # RFC9110 §5.3-1: "A recipient MAY combine multiple field lines within a field section that have
   # the same field name into one field line, without changing the semantics of the message, by
   # appending each subsequent field line value to the initial field line value in order, separated
   # by a comma (",") and optional whitespace (OWS, defined in Section 5.6.3). For consistency, use
@@ -767,14 +769,14 @@ sub _result ($self, $state, $is_exception = 0, $is_response = 0) {
     !$state->{errors}->@*
       ? (annotations => $state->{annotations}//[])
       : (errors => $state->{errors}),
-    $is_response ? ( recommended_response => undef ) : (),
+    $is_response ? ( recommended_response => undef ) : (),  # responses don't have responses
   );
 }
 
 sub _resolve_ref ($self, $entity_type, $ref, $state) {
   my $uri = Mojo::URL->new($ref)->to_abs($state->{initial_schema_uri});
   my $schema_info = $self->evaluator->_fetch_from_uri($uri);
-  abort({ %$state, keyword => '$ref' }, 'EXCEPTION: unable to find resource %s', $uri)
+  abort({ %$state, keyword => '$ref' }, 'EXCEPTION: unable to find resource "%s"', $uri)
     if not $schema_info;
 
   abort({ %$state, keyword => '$ref' }, 'EXCEPTION: maximum evaluation depth exceeded')
@@ -925,7 +927,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.1 d
 
 =head1 VERSION
 
-version 0.076
+version 0.078
 
 =head1 SYNOPSIS
 
@@ -1045,9 +1047,8 @@ than features that seem to work but actually cut corners for simplicity.
 =head1 CONSTRUCTOR ARGUMENTS
 
 If construction of the object is not successful, for example the document has a syntax error, the
-call to C<new()> will throw an exception. Be careful about examining this exception, for it might be
-a L<JSON::Schema::Modern::Result> object, which has a boolean overload of false when it contains
-errors! But you never do C<if ($@) { ... }>, right?
+call to C<new()> will throw an exception, which will likely be a L<JSON::Schema::Modern::Result>
+object containing details.
 
 =head2 openapi_uri
 
@@ -1194,11 +1195,9 @@ efficiently than if they were provided). All passed-in values MUST be consistent
 the request URI.
 
 When successful, the options hash will be populated with keys C<path_template>, C<path_captures>,
-C<method>, and C<operation_id>,
-and the return value is true.
+C<method>, and C<operation_id>, and the return value is true.
 When not successful, the options hash will be populated with key C<errors>, an arrayref containing
-a L<JSON::Schema::Modern::Error> object, and the return value is false. Other values may also be
-populated if they can be successfully calculated.
+a L<JSON::Schema::Modern::Error> object, and the return value is false.
 
 In addition, these values are populated in the options hash (when available):
 

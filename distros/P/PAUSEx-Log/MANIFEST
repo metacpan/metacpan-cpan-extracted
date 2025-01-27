@@ -1,0 +1,17 @@
+Changes
+examples/placeholder.pl
+INSTALL.SKIP
+lib/PAUSEx/Log.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.pod
+script/pause-log
+SECURITY.md
+t/load.t
+t/pod.t
+t/pod_coverage.t
+t/test_manifest
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

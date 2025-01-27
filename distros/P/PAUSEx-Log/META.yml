@@ -1,0 +1,33 @@
+---
+abstract: 'Access the PAUSE log'
+author:
+  - 'brian d foy <briandfoy@pobox.com>'
+build_requires:
+  Test::More: '1'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::Spec::Functions: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PAUSEx-Log
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Digest::SHA1: '0'
+  Getopt::Long: '0'
+  Mojolicious: '9'
+  String::Sprintf: '1.002'
+  perl: '5.036'
+resources:
+  bugtracker: https://github.com/briandfoy/pausex-log/issues
+  homepage: https://github.com/briandfoy/pausex-log
+  repository: https://github.com/briandfoy/pausex-log
+version: '0.002'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

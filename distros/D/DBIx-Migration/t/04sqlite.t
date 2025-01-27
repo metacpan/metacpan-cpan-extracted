@@ -1,11 +1,14 @@
 use strict;
-use Test::More tests => 7;
+use Test::More tests => 9;
 
 use DBIx::Migration;
 use DBI;
 
 eval { require DBD::SQLite };
 my $class = $@ ? 'SQLite2' : 'SQLite';
+
+eval { DBIx::Migration->new({dsn=>"dbi:$class:dbname=./t/missing/sqlite_test"})->version };
+ok( $@ =~ /^Couldn't connect to database/ );
 
 my $m = DBIx::Migration->new;
 $m->dsn("dbi:$class:dbname=./t/sqlite_test");
@@ -29,6 +32,11 @@ is( $m->version, 2 );
 
 $m->migrate(0);
 is( $m->version, 0 );
+
+my $m2 = DBIx::Migration->new({dbh=>$m->dbh,dir=>'./t/sql/'});
+
+is( $m2->version, 0 );
+
 
 END {
     unlink './t/sqlite_test';

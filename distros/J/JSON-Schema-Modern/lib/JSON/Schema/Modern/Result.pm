@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Result;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains the result of a JSON Schema evaluation
 
-our $VERSION = '0.598';
+our $VERSION = '0.599';
 
 use 5.020;
 use Moo;
@@ -23,14 +23,17 @@ use JSON::Schema::Modern::Annotation;
 use JSON::Schema::Modern::Error;
 use JSON::PP ();
 use List::Util 1.50 qw(any uniq all);
+use Carp 'croak';
 use builtin::compat qw(refaddr blessed);
 use Safe::Isa;
 use namespace::clean;
 
 use overload
-  'bool'  => sub { $_[0]->valid },
+  'bool'  => sub {
+    croak 'boolean overload is deprecated and could be removed anytime after 2026-02-01';
+    $_[0]->valid;
+  },
   '&'     => \&combine,
-  '0+'    => sub { refaddr($_[0]) },
   '""' => sub { $_[0]->stringify },
   fallback => 1;
 
@@ -263,7 +266,7 @@ JSON::Schema::Modern::Result - Contains the result of a JSON Schema evaluation
 
 =head1 VERSION
 
-version 0.598
+version 0.599
 
 =head1 SYNOPSIS
 
@@ -290,8 +293,9 @@ L<JSON::Schema::Modern>.
 
 =head1 OVERLOADS
 
-The object contains a I<boolean> overload, which evaluates to the value of L</valid>, so you can
-use the result of L<JSON::Schema::Modern/evaluate> in boolean context.
+The object contains a string overload, which evaluates to a potentially multi-line string
+summarizing the errors within (if any); this is intended to be used as a user-oriented error message
+that references data locations, but not schema locations.
 
 =for stopwords iff
 

@@ -53,6 +53,6 @@
          "web" : "https://github.com/briandfoy/object-iterate"
       }
    },
-   "version" : "1.149",
+   "version" : "1.151",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,16 +1,16 @@
 package SPVM::FindBin;
 
-our $VERSION = "0.031";
+our $VERSION = "0.032";
 
 1;
 
 =head1 Name
 
-SPVM::FindBin - Locate Directory of Original Program
+SPVM::FindBin - The Directory Path Where The Program Is Located
 
 =head1 Description
 
-C<SPVM::FindBin> is the C<FindBin> class in L<SPVM> language.
+FindBin class in L<SPVM> has method to get the directory path where the program is located.
 
 Locates the full path to the script bin directory to allow the use of paths relative to the bin directory.
 

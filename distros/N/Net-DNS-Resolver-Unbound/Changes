@@ -1,6 +1,10 @@
 Revision history for Perl extension Net::DNS::Resolver::Unbound.
 
 
+**** 1.31  Jan 27, 2025
+	Force context rebuild for options in new().
+
+
 **** 1.30  Jan 7, 2025
 	Reformat documentation.
 

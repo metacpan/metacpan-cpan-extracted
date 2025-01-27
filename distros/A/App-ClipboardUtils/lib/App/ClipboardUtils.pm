@@ -5,9 +5,9 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-08-30'; # DATE
+our $DATE = '2025-01-27'; # DATE
 our $DIST = 'App-ClipboardUtils'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use Clipboard::Any ();
 use Clone::PP qw(clone);
@@ -18,25 +18,51 @@ $SPEC{add_clipboard_content} = clone $Clipboard::Any::SPEC{add_clipboard_content
 $SPEC{add_clipboard_content}{args}{split_by} = {
     summary => 'Split content by specified string/regex, add the split content as multiple clipboard entries',
     schema => ['str_or_re*'],
+    description => <<'MARKDOWN',
+
+Note that if you supply a regex, you should not have any capture groups in the
+regex.
+
+MARKDOWN
+    cmdline_aliases => {s=>{}},
+};
+$SPEC{add_clipboard_content}{args}{tee} = {
+    summary => 'Pass stdin to stdout',
+    schema => ['true*'],
+    description => <<'MARKDOWN',
+
+MARKDOWN
+    cmdline_aliases => {t=>{}},
 };
 sub add_clipboard_content {
     my %args = @_;
     my $split_by = delete $args{split_by};
+    my $tee = delete $args{tee};
 
     if (defined $split_by) {
         my $content = delete $args{content};
-        my @split_contents = split $split_by, $content;
-        log_trace "split_by=%s, split_contents=%s", $split_by, \@split_contents;
+        my @split_parts = split /($split_by)/, $content;
+        log_trace "split_by=%s, split_contents=%s", $split_by, \@split_parts;
 
         my $res = [204, "OK (no content)"];
-        for my $part (@split_contents) {
-            $res = Clipboard::Any::add_clipboard_content(
-                %args, content => $part,
-            ); # currently we use the last add_clipboard_content status
+        my $i = 0;
+        while (my ($part, $separator) = splice @split_parts, 0, 2) {
+            if ($tee) {
+                print $part;
+                print $separator if defined $separator;
+            }
+
+            # do not add empty part to clipboard
+            if (length $part) {
+                $res = Clipboard::Any::add_clipboard_content(
+                    %args, content => $part,
+                ); # currently we use the last add_clipboard_content status
+            }
         }
-        $res->[3]{'func.parts'} = @split_contents;
+        $res->[3]{'func.parts'} = @split_parts;
         $res;
     } else {
+        print $args{content} if $tee;
         Clipboard::Any::add_clipboard_content(%args);
     }
 }
@@ -56,7 +82,7 @@ App::ClipboardUtils - CLI utilities related to clipboard
 
 =head1 VERSION
 
-This document describes version 0.008 of App::ClipboardUtils (from Perl distribution App-ClipboardUtils), released on 2024-08-30.
+This document describes version 0.009 of App::ClipboardUtils (from Perl distribution App-ClipboardUtils), released on 2025-01-27.
 
 =head1 DESCRIPTION
 
@@ -66,21 +92,25 @@ This distribution contains the following CLI utilities related to clipboard:
 
 =item 1. L<add-clipboard-content>
 
-=item 2. L<clear-clipboard-content>
+=item 2. L<ca>
 
-=item 3. L<clear-clipboard-history>
+=item 3. L<cg>
 
-=item 4. L<clipadd>
+=item 4. L<clear-clipboard-content>
 
-=item 5. L<clipget>
+=item 5. L<clear-clipboard-history>
 
-=item 6. L<detect-clipboard-manager>
+=item 6. L<clipadd>
 
-=item 7. L<get-clipboard-content>
+=item 7. L<clipget>
 
-=item 8. L<get-clipboard-history-item>
+=item 8. L<detect-clipboard-manager>
 
-=item 9. L<list-clipboard-history>
+=item 9. L<get-clipboard-content>
+
+=item 10. L<get-clipboard-history-item>
+
+=item 11. L<list-clipboard-history>
 
 =back
 
@@ -118,9 +148,13 @@ The default, when left undef, is to detect what clipboard manager is running.
 
 Split content by specified stringE<sol>regex, add the split content as multiple clipboard entries.
 
-=item * B<tee> => I<bool>
+Note that if you supply a regex, you should not have any capture groups in the
+regex.
 
-If set to true, will output content back to STDOUT.
+=item * B<tee> => I<true>
+
+Pass stdin to stdout.
+
 
 
 =back
@@ -168,7 +202,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024, 2023, 2022 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

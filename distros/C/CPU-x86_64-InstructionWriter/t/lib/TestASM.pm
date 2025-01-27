@@ -42,7 +42,7 @@ our @immed8=  $do_all? (0, map { (1 << $_, -1 << $_) } 0..6)
 	: (0, 1, -1, 0x7F, -0x80);
 
 sub new_writer {
-	CPU::x86_64::InstructionWriter->new
+	CPU::x86_64::InstructionWriter->new(@_)
 }
 
 sub iterate_mem_addr_combos {
@@ -123,7 +123,7 @@ sub show_bad_instructions {
 				diag "Can't get reference ASM for $asm_str: $@";
 				$found++;
 			} elsif ($out ne $ref) {
-				diag "$asm_text->[$_] was ".hex_dump($out)." but should be ".hex_dump($ref);
+				diag "$asm_text->[$_] was\n".hex_dump($out)."\n but should be\n".hex_dump($ref);
 				$found++;
 			}
 		}

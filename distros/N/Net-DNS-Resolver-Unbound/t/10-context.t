@@ -15,7 +15,7 @@ my $recursive = Net::DNS::Resolver::Unbound->new( nameservers => [] );
 ok( $recursive, 'create fully recursive resolver instance' );
 is( scalar( $recursive->nameservers ), 0, 'empty nameserver list' );
 
-my $resolver = Net::DNS::Resolver::Unbound->new( debug_level => 0, prefer_v4 => 1 );
+my $resolver = Net::DNS::Resolver::Unbound->new( debug_level => 0, force_v4 => 1 );
 ok( $resolver, 'create stub resolver instance' );
 
 $resolver->nameservers(qw(::1 127.0.0.1 127.0.0.53));

@@ -11,7 +11,7 @@ use Object::Pad;
 class Geo::Location::IP::Database::Reader
     :isa(Geo::Location::IP::Database::SimpleReader);
 
-our $VERSION = 0.001;
+our $VERSION = 0.002;
 
 use Geo::Location::IP::Address;
 use Geo::Location::IP::Error::Generic;
@@ -162,7 +162,7 @@ Geo::Location::IP::Database::Reader - Read MaxMind DB files
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

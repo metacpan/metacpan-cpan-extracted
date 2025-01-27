@@ -7,6 +7,7 @@ MANIFEST.SKIP
 META.yml			Module meta-data (added by MakeMaker)
 NOTES
 README
+SECURITY.md
 srctxt/AccountingNumeric.txt
 srctxt/BigFive.txt
 srctxt/Cangjie.txt

@@ -2,6 +2,8 @@
 # MIT License
 
 class HTTP::Tiny::Handle {
+  version_from HTTP::Tiny;
+  
   allow HTTP::Tiny;
   
   use HTTP::Tiny::Message::Request;

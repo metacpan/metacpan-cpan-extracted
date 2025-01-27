@@ -1,0 +1,277 @@
+#!/usr/bin/perl
+
+use v5.36;
+use open qw(:std :utf8);
+
+$|++;
+$SIG{INT} = sub { exit };
+
+=encoding utf8
+
+=head1 NAME
+
+pause-log - tail the PAUSE log to watch for messages for your upload
+
+=head1 SYNOPSIS
+
+	% pause-log
+
+=head1 DESCRIPTION
+
+I wrote this because there was a time when it appeared that my uplaods
+were not uploading. I watched the PAUSE log to see if the file got there
+and if it was queued for indexing.
+
+=head2 Options
+
+=over 4
+
+=item * --dist Foo-Bar-1.23.tgz
+
+Filter the messages that aren't for this distname
+
+	--dist Foo::Bar         # :: replaced by -
+	--dist Foo-Bar          # Matches at start of distname
+	--dist Foo-Bar-1.23     # ... same
+	--dist Foo-Bar-1.23.tgz # ... same
+
+=item * --duration N
+
+Keep running for N seconds (default 3600)
+
+=item * --format FORMAT
+
+The format for output lines. See the L</Formatting> section for details.
+(Default: C<%T %m>)
+
+=item * --interval N
+
+Sleep for N seconds between fetches (default 300)
+
+=item * --once
+
+Fetch once then stop
+
+=item * --pause-id BDFOY
+
+Filter messages on the given PAUSE ID
+
+=item * --quiet
+
+Suppress normal messages
+
+=item * --stop-on-dist
+
+Once the script finds the distribution in DIST. This requires the
+C<--dist> option:
+
+	--stop-on-dist --dist Foo::Bar
+
+=item * --types fetch,received,mldistwatch_start
+
+Filter messages on these types (comma-separated)
+
+The types are enqueue, fetch, get, renamed, received, entered,
+verified, mldistwatch_start, reaped, and unknown. By default, all
+types are shown.
+
+=item * --verbose
+
+Output extra information
+
+=back
+
+=head2 Formatting
+
+=over 4
+
+=item * %d - the dist name
+
+=item * %D - the date, in YYYY-MM-DD
+
+=item * %l - the log level
+
+=item * %m - the log message
+
+=item * %p - the PAUSE ID
+
+=item * %t - the message type
+
+=item * %T - the time
+
+=back
+
+=head1 TO DO
+
+Nothing so far
+
+=head1 SEE ALSO
+
+Nothing so far
+
+=head1 SOURCE AVAILABILITY
+
+This source is in Github:
+
+	http://github.com/briandfoy/pausex-log
+
+=head1 AUTHOR
+
+brian d foy, C<< <brian d foy> >>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright © 2023-2025, brian d foy, All Rights Reserved.
+
+You may redistribute this under the terms of the Artistic License 2.0.
+
+=cut
+
+use PAUSEx::Log;
+
+FETCH: while(1) {
+	state $opts      = process_options();
+	state $formatter = create_formatter();
+	state $filters   = setup_filters($opts);
+
+	if( defined $opts->{duration} and $opts->{duration} > 0 ) {
+		last FETCH if time - $^T > $opts->{duration};
+		}
+
+	my $entries = PAUSEx::Log->fetch_log;
+	verbose(sprintf "Fetched %s entries", scalar $entries->@*);
+
+	my $found_dist;
+	ENTRY: foreach my $entry ( $entries->@* ) {
+		my $filters_matched =  grep { $_->($entry) } $filters->@*;
+		next if $filters_matched;
+		say $formatter->sprintf( $opts->{'format'}, $entry );
+		$found_dist++ if eval { $opts->{dist} and $entry->can('distname') and $entry->distname =~ /\A\Q$opts->{dist}/ };
+		}
+
+	last FETCH if $opts->{'once'};
+
+	last FETCH if( $opts->{'stop-on-dist'} and $found_dist );
+
+	enjoy_the_interval($opts);
+	}
+
+sub create_formatter () {
+	state $rc = require String::Sprintf;
+	no warnings qw(uninitialized);
+
+	# all of these ignore $value and uses the first thing in $values
+	#    ->format( $format, $entry )
+	my $formatter = String::Sprintf->formatter(
+		'd' => sub ($width, $value, $values, $letter) {
+			sprintf "%${width}s", $values->[0]->distname;
+            },
+		'D' => sub ($width, $value, $values, $letter) {
+			sprintf "%${width}s", $values->[0]->pause_id;
+			},
+		'l' => sub ($width, $value, $values, $letter) {
+			sprintf "%${width}s", $values->[0]->level;
+			},
+		'm' => sub ($width, $value, $values, $letter) {
+			sprintf "%${width}s", $values->[0]->message;
+			},
+		'p' => sub ($width, $value, $values, $letter) {
+			sprintf "%${width}s", $values->[0]->pause_id;
+			},
+		't' => sub ($width, $value, $values, $letter) {
+			sprintf "%${width}s", $values->[0]->type;
+			},
+		'T' => sub ($width, $value, $values, $letter) {
+			sprintf "%${width}s", $values->[0]->time;
+			},
+		);
+	}
+
+sub enjoy_the_interval ($opts) {
+	use builtin qw(floor);
+	use experimental qw(builtin);
+	for( my $i = 0; $i <= $opts->{interval}; $i++ ) {
+		my $grand = $opts->{interval} - $i;
+		my $minutes = builtin::floor( $grand/60 );
+		my $seconds = $grand % 60;
+		quiet( sprintf "Next fetch in %2d:%02d\r", $minutes, $seconds );
+		sleep 1;
+		}
+	}
+
+sub filter_dist ($opts) {
+	return unless defined $opts->{'dist'};
+	sub ($e) {
+		state $pattern = qr/\A\Q$opts->{dist}/a;
+		return 1 unless $e->can('distname');
+		my $rc = 0 + ( $e->distname =~ $pattern );
+		return ! $rc;
+		};
+	}
+
+sub filter_pause_id ($opts) {
+	return unless defined $opts->{'pause-id'};
+	sub ($e) { ! $e->for_pause_id($opts->{'pause-id'}) }
+	}
+
+sub filter_seen ($opts) {
+	sub ($e) { state %Seen; $Seen{$e->id}++ > 0 },
+	}
+
+sub filter_types ($opts) {
+	return unless( defined $opts->{'types'} and keys $opts->{'types'}->%* );
+	sub ($e) {
+		return ! exists $opts->{'types'}{ $e->type };
+		};
+	}
+
+sub process_options () {
+	my $rc = require Getopt::Long;
+
+	my %opts = (
+		dist     => undef,
+		duration => 30 * 60,
+		'format' => '%T %m',
+		interval =>  5 * 60,
+		once     => 0,
+		quiet    => 0,
+		verbose  => 0,
+		);
+
+	Getopt::Long::GetOptions(
+		'dist=s'         => \$opts{dist},
+		'duration=i'     => \$opts{duration},
+		'format=s'       => \$opts{'format'},
+		'interval=i'     => \$opts{interval},
+		'once'           => \$opts{once},
+		'pause-id=s'     => \$opts{'pause-id'},
+		'quiet'          => \$opts{quiet},
+		'stop-on-dist'   => \$opts{'stop-on-dist'},
+		'types=s'        => \$opts{types},
+		'verbose'        => \$opts{verbose},
+		);
+
+	$opts{dist} =~ s/::/-/g if defined $opts{dist};
+	$opts{types} = { map { lc($_), 1 } split /\s*,\s*/, $opts{types} // '' };
+
+	{
+	no strict 'refs';
+	*{'verbose'} = $opts{verbose} ? sub ($m) { print $m } : sub ($m) { () };
+	*{'quiet'}   = ! $opts{quiet} ? sub ($m) { print $m } : sub ($m) { () };
+	}
+
+	return \%opts;
+	}
+
+sub setup_filters ($opts) {
+	no strict 'refs';
+
+	my @filters =
+		grep { defined }
+		map { &{"$_"}($opts) }
+		sort grep { /\Afilter_/ and defined &{"$_"} }
+		keys %main::;
+
+	\@filters;
+	}
+

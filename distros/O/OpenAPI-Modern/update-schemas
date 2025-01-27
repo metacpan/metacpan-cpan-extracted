@@ -10,6 +10,7 @@ no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use Path::Tiny;
 use HTTP::Tiny;
 use YAML::PP;
+use Digest::MD5 'md5_hex';
 use JSON::Schema::Modern;
 
 # note: the latest versions can always be found at https://spec.openapis.org/
@@ -32,6 +33,8 @@ my %files = (
   'oas/LICENSE' => 'https://raw.githubusercontent.com/OAI/OpenAPI-Specification/main/LICENSE',
 );
 
+my %checksums;
+
 foreach my $target (keys %files) {
   my $source = $files{$target};
   $target = path('share', $target);
@@ -40,8 +43,15 @@ foreach my $target (keys %files) {
   my $response = HTTP::Tiny->new->get($source);
   die "Failed to fetch $source: $response->{status} $response->{reason}" if not $response->{success};
 
-  $target->spew($response->{content});
+  $target->spew_raw($response->{content});
+  $checksums{$target} = md5_hex($response->{content});
 }
+
+# compute checksums and record them in the test
+path('t/checksums.t')->edit_raw(sub {
+  m/^__DATA__$/mg;
+  $_ = substr($_, 0, pos()+1).join("\n", map $_.' '.$checksums{$_}, sort keys %checksums)."\n";
+});
 
 my $yaml = YAML::PP->new(boolean => 'JSON::PP');
 my $js = JSON::Schema::Modern->new(validate_formats => 1);
@@ -54,5 +64,5 @@ foreach my $uri (values %files) {
   my $document = $js->_fetch_from_uri($uri)->{document};
   my $result = $js->evaluate($document->schema, $document->metaschema_uri);
 
-  die $js->_json_decoder->pretty->encode($result) if not $result;
+  die $js->_json_decoder->pretty->encode($result) if not $result->valid;
 }

@@ -2,6 +2,8 @@
 # MIT License
 
 class HTTP::Tiny::Message::Response extends HTTP::Tiny::Message {
+  version_from HTTP::Tiny;
+  
   allow HTTP::Tiny::Handle;
   allow HTTP::Tiny;
   

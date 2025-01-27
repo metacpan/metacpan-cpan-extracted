@@ -27,16 +27,16 @@
       },
       "configure" : {
          "requires" : {
-            "SPVM" : "0.9706"
+            "SPVM" : "0.989063"
          }
       },
       "runtime" : {
          "requires" : {
-            "SPVM" : "0.9706",
+            "SPVM" : "0.989063",
             "SPVM::File::Temp" : "0.021",
             "SPVM::IO" : "0.211",
             "SPVM::Mozilla::CA" : "0.001",
-            "SPVM::Regex" : "0.243",
+            "SPVM::Regex" : "0.246",
             "SPVM::Time::Piece" : "0.003"
          }
       }
@@ -44,9 +44,11 @@
    "release_status" : "stable",
    "resources" : {
       "repository" : {
-         "type" : "git"
+         "type" : "git",
+         "url" : "https://github.com/yuki-kimoto/SPVM-HTTP-Tiny.git",
+         "web" : "https://github.com/yuki-kimoto/SPVM-HTTP-Tiny"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

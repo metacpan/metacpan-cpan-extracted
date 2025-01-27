@@ -1,24 +1,19 @@
 Revision history for Perl module perlbench
 
+1.004 2025-01-26T22:15:23Z
+	* refresh distro and move to BRIANDFOY
+
 1.003 2024-01-05T14:50:56Z
 	* re-release for slight snafu in 1.002
 
-1.002 2024-01-05T14:36:55Z
-	* refresh distro
-
-1.002 2024-01-05T14:33:05Z
-	* Refresh module
-
-1.002 2020-02-16T04:08:02Z
+1.001 2017-04-23T13:53:06Z
 	* Note that you need to look at the perlbench* programs to see
 	what you need to do.
-
-1.001 2017-04-23T13:53:06Z
 	* Freshening the distro
 
 1.001 2016-04-09T18:24:43Z
 	* Reini Urban cleaned up a few minor things and adjusted some
-	time windows for Perl 5.22. 
+	time windows for Perl 5.22.
 
 0.96 - 2014-01-04
 	* Update Makefile.PL with meta info and no_index info

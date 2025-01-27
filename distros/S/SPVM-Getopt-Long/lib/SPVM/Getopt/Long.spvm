@@ -2,7 +2,7 @@
 # MIT License
 
 class Getopt::Long {
-  version "0.001";
+  version "0.002";
   
   use Array;
   use Regex;
@@ -245,6 +245,4 @@ class Getopt::Long {
     
     return $new_args;
   }
-  
-  # use Getopt::Long qw(:config posix_default no_ignore_case gnu_compat);
 }

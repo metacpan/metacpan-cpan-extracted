@@ -630,9 +630,11 @@ sub add_condition {
             }
             $AND_OR = ' ' . $choice;
         }
+        else {
+            $AND_OR = '';
+        }
         if ( $qt_col eq '(' ) {
             $sql->{$stmt} .= $AND_OR . " (";
-            $AND_OR = '';
             next COL;
         }
         if ( $clause eq 'having' ) {
@@ -642,7 +644,7 @@ sub add_condition {
                 next COL;
             }
         }
-        if ( $sql->{$stmt} =~ /\(\z/ ) { ##
+        if ( $sql->{$stmt} =~ /\(\z/ ) {
             $sql->{$stmt} .= $qt_col;
         }
         else {
@@ -688,7 +690,11 @@ sub get_prepared_aggr_func {
             }
             elsif ( $qt_col eq $sf->{i}{menu_addition} ) {
                 my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
+                my $bu_aggregate_mode = $tmp_sql->{aggregate_mode};
+                # use normal columns within aggregate functions
+                $tmp_sql->{aggregate_mode} = 0;
                 my $complex_col = $ext->column( $tmp_sql, $clause );
+                $tmp_sql->{aggregate_mode} = $bu_aggregate_mode;
                 if ( ! defined $complex_col ) {
                     next COLUMN;
                 }

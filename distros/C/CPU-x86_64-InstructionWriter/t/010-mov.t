@@ -61,6 +61,28 @@ sub test_mov_const {
 	done_testing;
 }
 
+sub test_mov_rip_rel {
+	my (@asm, @out);
+	my $label_n= 1;
+
+	for (['mov64', \@r64], ['mov32', \@r32], ['mov16', \@r16], ['mov8', \@r8]) {
+		my ($mov, $regs)= @$_;
+		my ($mov_reg_mem, $mov_mem_reg)= ("${mov}_reg_mem", "${mov}_mem_reg");
+		my $label= 'some_data_'.$label_n++;
+		my $asm= '';
+		my $writer= new_writer;
+		for (@$regs) {
+			$asm .= "mov $_, [ rel $label ]\n";
+			$asm .= "mov [ rel $label ], $_\n";
+			$writer->$mov_reg_mem($_, [ RIP => \$label ]);
+			$writer->$mov_mem_reg([ RIP => \$label ], $_);
+		}
+		push @asm, $asm . "$label: dq 42\n";
+		push @out, $writer->label($label)->data_i64(42)->bytes
+	}
+	asm_ok( \@out, \@asm, 'movXX_reg_[rel label]' );
+}
+
 sub test_mov_mem {
 	my (@asm, @out);
 	for my $reg (@r64) {
@@ -74,7 +96,8 @@ sub test_mov_mem {
 		);
 	}
 	asm_ok( \@out, \@asm, 'mov64_mem_*' );
-	
+
+	@asm= (); @out= ();
 	for my $reg (@r32) {
 		iterate_mem_addr_combos(
 			\@asm, sub { "mov $_[0], $reg" },
@@ -87,6 +110,7 @@ sub test_mov_mem {
 	}
 	asm_ok( \@out, \@asm, 'mov32_mem_*' );
 
+	@asm= (); @out= ();
 	for my $reg (@r16) {
 		iterate_mem_addr_combos(
 			\@asm, sub { "mov $_[0], $reg" },
@@ -99,6 +123,7 @@ sub test_mov_mem {
 	}
 	asm_ok( \@out, \@asm, 'mov16_mem_*' );
 
+	@asm= (); @out= ();
 	for my $reg (@r8) {
 		iterate_mem_addr_combos(
 			\@asm, sub { "mov $_[0], $reg" },
@@ -115,70 +140,30 @@ sub test_mov_mem {
 }
 
 sub test_mov_ax_addr {
-	my (@asm, @out, $w, $u);
-	push @asm, "mov RAX, [qword 0xFF00FF00FF00FF00]";
-	push @asm, "mov [qword 0xFF00FF00FF00FF00], RAX";
-	push @out, new_writer->mov64_reg_mem('rax', [undef, int64('0xFF00FF00FF00FF00')])->bytes;
-	push @out, new_writer->mov64_mem_reg([undef, int64('0xFF00FF00FF00FF00')], 'rax')->bytes;
-	asm_ok( \@out, \@asm, 'mov64_memaddr' );
-	
-	push @asm, "mov EAX, [qword 0xFF00FF00FF00FF00]";
-	push @asm, "mov [qword 0xFF00FF00FF00FF00], EAX";
-	push @out, new_writer->mov32_reg_mem('eax', [undef, int64('0xFF00FF00FF00FF00')])->bytes;
-	push @out, new_writer->mov32_mem_reg([undef, int64('0xFF00FF00FF00FF00')], 'eax')->bytes;
-	asm_ok( \@out, \@asm, 'mov32_memaddr' );
-	
-	push @asm, "mov AX, [qword 0xFF00FF00FF00FF00]";
-	push @asm, "mov [qword 0xFF00FF00FF00FF00], AX";
-	push @out, new_writer->mov16_reg_mem('ax', [undef, int64('0xFF00FF00FF00FF00')])->bytes;
-	push @out, new_writer->mov16_mem_reg([undef, int64('0xFF00FF00FF00FF00')], 'ax')->bytes;
-	asm_ok( \@out, \@asm, 'mov16_memaddr' );
-	
-	push @asm, "mov AL, [qword 0xFF00FF00FF00FF00]";
-	push @asm, "mov [qword 0xFF00FF00FF00FF00], AL";
-	push @out, new_writer->mov8_reg_mem('al', [undef, int64('0xFF00FF00FF00FF00')])->bytes;
-	push @out, new_writer->mov8_mem_reg([undef, int64('0xFF00FF00FF00FF00')], 'al')->bytes;
-	asm_ok( \@out, \@asm, 'mov8_memaddr' );
-	
-	push @asm, "mov RAX, [0x7FFFFFFF]";
-	$w= new_writer->mov64_reg_mem('rax', [undef, $u= unknown]);
-	$u->value(0x7FFFFFFF);
-	push @out, $w->bytes;
-	push @asm, "mov RAX, [qword 0x1FF00FF00]";
-	$w= new_writer->mov64_reg_mem('rax', [undef, $u= unknown]);
-	$u->value(int64('0x1FF00FF00'));
-	push @out, $w->bytes;
-	asm_ok( \@out, \@asm, 'mov64_memaddr (lazy)' );
+	for ([ mov64 => 'RAX' ], [ mov32 => 'EAX' ], [ mov16 => 'AX' ], [ mov8 => 'AL' ]) {
+		my ($mov, $reg)= @$_;
+		my ($mov_reg_mem, $mov_mem_reg)= ($mov."_reg_mem", $mov."_mem_reg");
+		my (@asm, @out);
+		push @asm, "mov $reg, [qword 0xFF00FF00FF00FF00]";
+		push @asm, "mov [qword 0xFF00FF00FF00FF00], $reg";
+		push @out, new_writer->$mov_reg_mem($reg, [undef, int64('0xFF00FF00FF00FF00')])->bytes;
+		push @out, new_writer->$mov_mem_reg([undef, int64('0xFF00FF00FF00FF00')], $reg)->bytes;
+		asm_ok( \@out, \@asm, $mov.'_memaddr' );
+	}
 
-	push @asm, "mov EAX, [0x7FFFFFFF]";
-	$w= new_writer->mov32_reg_mem('eax', [undef, $u= unknown]);
-	$u->value(0x7FFFFFFF);
-	push @out, $w->bytes;
-	push @asm, "mov EAX, [qword 0x1FF00FF00]";
-	$w= new_writer->mov32_reg_mem('eax', [undef, $u= unknown]);
-	$u->value(int64('0x1FF00FF00'));
-	push @out, $w->bytes;
-	asm_ok( \@out, \@asm, 'mov32_memaddr (lazy)' );
-
-	push @asm, "mov AX, [0x7FFFFFFF]";
-	$w= new_writer->mov16_reg_mem('ax', [undef, $u= unknown]);
-	$u->value(0x7FFFFFFF);
-	push @out, $w->bytes;
-	push @asm, "mov AX, [qword 0x1FF00FF00]";
-	$w= new_writer->mov16_reg_mem('ax', [undef, $u= unknown]);
-	$u->value(int64('0x1FF00FF00'));
-	push @out, $w->bytes;
-	asm_ok( \@out, \@asm, 'mov16_memaddr (lazy)' );
-
-	push @asm, "mov AL, [0x7FFFFFFF]";
-	$w= new_writer->mov8_reg_mem('al', [undef, $u= unknown]);
-	$u->value(0x7FFFFFFF);
-	push @out, $w->bytes;
-	push @asm, "mov AL, [qword 0x1FF00FF00]";
-	$w= new_writer->mov8_reg_mem('al', [undef, $u= unknown]);
-	$u->value(int64('0x1FF00FF00'));
-	push @out, $w->bytes;
-	asm_ok( \@out, \@asm, 'mov8_memaddr (lazy)' );
+	for ([ 'RAX', 'mov64_reg_mem' ], [ 'EAX', 'mov32_reg_mem' ], [ 'AX', 'mov16_reg_mem' ], [ 'AL', 'mov8_reg_mem' ]) {
+		my ($reg, $mov)= @$_;
+		my (@asm, @out, $w, $u);
+		push @asm, "mov $reg, [0x7FFFFFFF]";
+		$w= new_writer->$mov($reg, [undef, $u= unknown]);
+		$u->value(0x7FFFFFFF);
+		push @out, $w->bytes;
+		push @asm, "mov $reg, [qword 0x1FF00FF00]";
+		$w= new_writer->$mov($reg, [undef, $u= unknown]);
+		$u->value(0x1FF00FF00);
+		push @out, $w->bytes;
+		asm_ok( \@out, \@asm, "$mov (lazy)" );
+	}
 }
 
 sub test_mov_mem_imm {
@@ -188,16 +173,22 @@ sub test_mov_mem_imm {
 		\@out, sub { new_writer->mov8_mem_imm([@_], 42)->bytes },
 	);
 	asm_ok( \@out, \@asm, 'mov8_mem_imm' );
+
+	@asm= (); @out= ();
 	iterate_mem_addr_combos(
 		\@asm, sub { "mov word $_[0], 42" },
 		\@out, sub { new_writer->mov16_mem_imm([@_], 42)->bytes },
 	);
 	asm_ok( \@out, \@asm, 'mov16_mem_imm' );
+
+	@asm= (); @out= ();
 	iterate_mem_addr_combos(
 		\@asm, sub { "mov dword $_[0], 42" },
 		\@out, sub { new_writer->mov32_mem_imm([@_], 42)->bytes },
 	);
 	asm_ok( \@out, \@asm, 'mov32_mem_imm' );
+
+	@asm= (); @out= ();
 	iterate_mem_addr_combos(
 		\@asm, sub { "mov qword $_[0], 42" },
 		\@out, sub { new_writer->mov64_mem_imm([@_], 42)->bytes },
@@ -222,7 +213,8 @@ sub test_lea {
 			\@out, sub { new_writer->lea16_reg_mem($reg, [@_])->bytes }
 		);
 	}
-	asm_ok( \@out, \@asm, 'lea16_reg_mem' );
+
+	@asm= (); @out= ();
 	for my $reg (@r32) {
 		iterate_mem_addr_combos(
 			\@asm, sub { "lea $reg, $_[0]" },
@@ -230,6 +222,8 @@ sub test_lea {
 		);
 	}
 	asm_ok( \@out, \@asm, 'lea32_reg_mem' );
+
+	@asm= (); @out= ();
 	for my $reg (@r64) {
 		iterate_mem_addr_combos(
 			\@asm, sub { "lea $reg, $_[0]" },
@@ -237,9 +231,6 @@ sub test_lea {
 		);
 	}
 	asm_ok( \@out, \@asm, 'lea64_reg_mem' );
-	
-	push @asm,            "lea EAX, RBX\n    lea EAX [RBX]\n     lea EAX [RBX+RCX*2]\n";
-	push @out, new_writer->lea('EAX','EBX')->lea('EAX',['RBX'])->lea('EAX',['RBX',undef,'RCX',2])->bytes;
 
 	done_testing;
 }
@@ -247,6 +238,7 @@ sub test_lea {
 subtest mov_reg => \&test_mov_reg;
 subtest mov_const => \&test_mov_const;
 subtest mov_mem => \&test_mov_mem;
+subtest mov_rip_rel => \&test_mov_rip_rel;
 subtest mov_mem_imm => \&test_mov_mem_imm;
 subtest mov_ax_addr => \&test_mov_ax_addr;
 subtest mov => \&test_mov;

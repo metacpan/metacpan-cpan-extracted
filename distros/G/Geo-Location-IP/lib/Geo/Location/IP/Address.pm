@@ -10,7 +10,7 @@ use Object::Pad;
 
 class Geo::Location::IP::Address;
 
-our $VERSION = 0.001;
+our $VERSION = 0.002;
 
 use Geo::Location::IP::Network;
 use Scalar::Util qw();
@@ -92,7 +92,7 @@ Geo::Location::IP::Address - IP address details
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -107,7 +107,7 @@ version 0.001
 
 =head1 DESCRIPTION
 
-This class contains details on an IP address in a geolocation database.
+This class contains details about an IP address in a geolocation database.
 
 =head1 SUBROUTINES/METHODS
 
@@ -132,8 +132,8 @@ Objects also stringify to their address.
 
   my $network = $ip_address->network;
 
-Returns the network of the IP address in a geolocation database as a
-L<Geo::Location::IP::Network> object.
+Returns the network of the IP address as a L<Geo::Location::IP::Network>
+object.
 
 =head2 version
 

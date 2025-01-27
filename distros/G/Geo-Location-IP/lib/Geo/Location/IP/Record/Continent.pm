@@ -10,7 +10,7 @@ use Object::Pad;
 
 class Geo::Location::IP::Record::Continent;
 
-our $VERSION = 0.001;
+our $VERSION = 0.002;
 
 apply Geo::Location::IP::Role::Record::HasGeoNameId;
 apply Geo::Location::IP::Role::Record::HasNames;
@@ -46,7 +46,7 @@ Geo::Location::IP::Record::Continent - Continent details
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

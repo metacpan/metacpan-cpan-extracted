@@ -14,5 +14,6 @@ t/20-synchronous.t
 t/25-decode.t
 t/30-asynchronous.t
 t/35-bgread.t
+ex/TLSexample.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

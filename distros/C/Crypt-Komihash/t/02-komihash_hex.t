@@ -35,6 +35,17 @@ cmp_ok(komihash_hex("9999"                 , 215344578052703904) , 'eq', '3f4f81
 cmp_ok(komihash_hex("%%%%%%%%%%%%%%%%%%%%%", 3338573099725674496), 'eq', 'afa15284157cf01a');
 cmp_ok(komihash_hex("!!!!!!!!!!!"          , 377478480569193088) , 'eq', '5843ef32b3dda032');
 
+# Test vectors from the docs: https://github.com/avaneev/komihash/blob/main/README.md
+cmp_ok(komihash_hex("A 16-byte string", 0)                , 'eq', '467caa28ea3da7a6');
+cmp_ok(komihash_hex("The new string"  , 0)                , 'eq', 'f18e67bc90c43233');
+cmp_ok(komihash_hex(      "7 chars"   , 0)                , 'eq', '2c514f6e5dcb11cb');
+cmp_ok(komihash_hex("A 16-byte string", 256)              , 'eq', '11c31ccabaa524f1');
+cmp_ok(komihash_hex("The new string"  , 256)              , 'eq', '3a43b7f58281c229');
+cmp_ok(komihash_hex(      "7 chars"   , 256)              , 'eq', 'cff90b0466b7e3a2');
+cmp_ok(komihash_hex("A 16-byte string", 81985529216486895), 'eq', '26af914213d0c915');
+cmp_ok(komihash_hex("The new string"  , 81985529216486895), 'eq', '62d9ca1b73250cb5');
+cmp_ok(komihash_hex(      "7 chars"   , 81985529216486895), 'eq', '90ab7c9f831cd940');
+
 done_testing();
 
 #############################################################

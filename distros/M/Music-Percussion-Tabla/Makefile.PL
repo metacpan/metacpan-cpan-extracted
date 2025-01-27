@@ -25,6 +25,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Music::Percussion::Tabla",
   "PREREQ_PM" => {
     "File::ShareDir" => 0,
+    "List::Util" => 0,
     "MIDI::Drummer::Tiny" => "0.4302",
     "Moo" => 2,
     "namespace::clean" => 0,
@@ -39,7 +40,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.0405",
+  "VERSION" => "0.0604",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -51,6 +52,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "List::Util" => 0,
   "MIDI::Drummer::Tiny" => "0.4302",
   "Moo" => 2,
   "Test::More" => "0.88",

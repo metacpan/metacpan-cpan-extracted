@@ -10,7 +10,7 @@ use Object::Pad;
 
 class Geo::Location::IP::Model::City;
 
-our $VERSION = 0.001;
+our $VERSION = 0.002;
 
 use Geo::Location::IP::Record::City;
 use Geo::Location::IP::Record::Continent;
@@ -114,7 +114,7 @@ Geo::Location::IP::Model::City - Records associated with a city
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

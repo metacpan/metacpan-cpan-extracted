@@ -4,7 +4,7 @@ package IO::Interactive;
 use strict;
 use warnings;
 
-$IO::Interactive::VERSION = '1.025';
+$IO::Interactive::VERSION = '1.026';
 
 sub is_interactive {
     my ($out_handle) = (@_, select);    # Default to default output handle
@@ -272,7 +272,7 @@ This code is in GitHub:
 
 Damian Conway  C<< <DCONWAY@cpan.org> >>
 
-Currently maintained by brian d foy C<< <bdfoy@cpan.org> >>.
+Currently maintained by brian d foy C<< <briandfoy@pobox.com> >>.
 
 1.01 patch DMUEY C<< dmuey@cpan.org >>
 

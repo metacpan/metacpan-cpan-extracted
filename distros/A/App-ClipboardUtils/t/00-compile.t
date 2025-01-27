@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 10 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 12 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/ClipboardUtils.pm'
@@ -14,6 +14,8 @@ my @module_files = (
 
 my @scripts = (
     'script/add-clipboard-content',
+    'script/ca',
+    'script/cg',
     'script/clear-clipboard-content',
     'script/clear-clipboard-history',
     'script/clipadd',

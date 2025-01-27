@@ -3,10 +3,11 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Play the tabla!
 
-our $VERSION = '0.0405';
+our $VERSION = '0.0604';
 
 use Moo;
 use File::ShareDir qw(dist_dir);
+use List::Util qw(any);
 use strictures 2;
 use namespace::clean;
 
@@ -30,14 +31,20 @@ has patches => (
     is      => 'ro',
     default => sub {
         {
-            dhun => [qw(67 80)],
-            ge   => [qw(65 66 76)],
+            # single strikes
+            ga   => [qw(65)],
+            ge   => [qw(66 76)],
             ke   => [qw(64 77 79)],
             na   => [qw(78 81)],
-            ta   => [qw(71 75 85 88)],
+            ta   => [qw(71 75 85)],
             ti   => [qw(61 68 70 72 82 86)],
             tin  => [qw(60 63 83 87)],
-            tun  => [qw(73)],
+            tun  => [qw(88)],
+            # double strikes
+            dha  => [qw(ge ta)],
+            dhin => [qw(ge tin)],
+            dhit => [qw(ge ti)],
+            dhun => [qw(ge tun)],
         }
     },
 );
@@ -50,12 +57,91 @@ sub BUILD {
 
 
 sub strike {
-    my ($self, $bol, $dura, $patch) = @_;
+    my ($self, $bol, $dura) = @_;
     $dura ||= $self->quarter;
-    my $patches = $self->patches->{$bol};
-    $patch = $patches->[ int rand @$patches ]
-        if $patches && (!defined $patch || $patch < 0);
-    $self->note($dura, $patch);
+    my $bols = $self->patches->{$bol};
+    if (any { /[a-z]/ } @$bols) { # double-strike
+        my $patches = $self->patches->{ $bols->[0] };
+        my $baya = $patches->[ int rand @$patches ];
+        $patches = $self->patches->{ $bols->[1] };
+        my $daya = $patches->[ int rand @$patches ];
+        $self->note($dura, $baya, $daya);
+    }
+    else { # single-strike
+        my $patch = $bols->[ int rand @$bols ];
+        $self->note($dura, $patch);
+    }
+}
+
+
+sub teentaal {
+    my ($self, $dura) = @_;
+    $dura ||= $self->quarter;
+    for (1 .. 2) {
+        $self->strike('dha', $dura);
+        $self->strike('dhin', $dura);
+        $self->strike('dhin', $dura);
+        $self->strike('dha', $dura);
+    }
+    $self->strike('dha', $dura);
+    $self->strike('tin', $dura);
+    $self->strike('tin', $dura);
+    $self->strike('ta', $dura);
+    $self->strike('ta', $dura);
+    $self->strike('dhin', $dura);
+    $self->strike('dhin', $dura);
+    $self->strike('dha', $dura);
+}
+
+sub keherawa {
+    my ($self, $dura) = @_;
+    $dura ||= $self->quarter;
+    $self->strike('dha', $dura);
+    $self->strike('ge', $dura);
+    $self->strike('na', $dura);
+    $self->strike('tin', $dura);
+    $self->strike('na', $dura);
+    $self->strike('ke', $dura);
+    $self->strike('dhin', $dura);
+    $self->strike('na', $dura);
+}
+
+sub jhaptaal {
+    my ($self, $dura) = @_;
+    $dura ||= $self->quarter;
+    $self->strike('dhin', $dura);
+    $self->strike('na', $dura);
+    $self->strike('dhin', $dura);
+    $self->strike('dhin', $dura);
+    $self->strike('na', $dura);
+    $self->strike('tin', $dura);
+    $self->strike('na', $dura);
+    $self->strike('dhin', $dura);
+    $self->strike('dhin', $dura);
+    $self->strike('na', $dura);
+}
+
+sub dadra {
+    my ($self, $dura) = @_;
+    $dura ||= $self->quarter;
+    $self->strike('dha', $dura);
+    $self->strike('dhin', $dura);
+    $self->strike('na', $dura);
+    $self->strike('dha', $dura);
+    $self->strike('ti', $dura);
+    $self->strike('na', $dura);
+}
+
+sub rupaktaal {
+    my ($self, $dura) = @_;
+    $dura ||= $self->quarter;
+    $self->strike('tin', $dura);
+    $self->strike('tin', $dura);
+    $self->strike('na', $dura);
+    $self->strike('dhin', $dura);
+    $self->strike('na', $dura);
+    $self->strike('dhin', $dura);
+    $self->strike('na', $dura);
 }
 
 1;
@@ -72,7 +158,7 @@ Music::Percussion::Tabla - Play the tabla!
 
 =head1 VERSION
 
-version 0.0405
+version 0.0604
 
 =head1 SYNOPSIS
 
@@ -80,21 +166,25 @@ version 0.0405
 
   my $t = Music::Percussion::Tabla->new;
 
-  $t->timidity_cfg('/tmp/timidity.cfg'); # optional
-
-  say $t->soundfont;
-
   for (1 .. $t->bars) {
     $t->strike('ta', $t->eighth);
     $t->strike('ta', $t->eighth);
-    $t->strike('tun');
+    $t->strike('dha');
     $t->strike('ge');
     $t->rest($t->quarter);
   }
 
+  $t->teentaal($t->eighth)  for 1 .. $t->bars;
+  $t->keherawa($t->eighth)  for 1 .. $t->bars;
+  $t->jhaptaal($t->eighth)  for 1 .. $t->bars;
+  $t->dadra($t->eighth)     for 1 .. $t->bars;
+  $t->rupaktaal($t->eighth) for 1 .. $t->bars;
+
   $t->play_with_timidity;
   # OR:
   $t->write; # save the score as a MIDI file
+  $t->timidity_cfg('/Users/you/timidity.cfg');
+  # then run timidity with that config and MIDI file
 
 =head1 DESCRIPTION
 
@@ -103,41 +193,41 @@ drum sounds and the included soundfont file (which is B<4.1MB>).
 
 Here are my "non-tabla player" descriptions of the sounds:
 
-   # MIDI Bol  - Description
+   # MIDI Description
   ...
-   1  60  tin  - ringing mid
-   2  61  ti   - muted low
-   3  62  ?    - slap
-   4  63  tin  - ringing mid slap
-   5  64  ke   - low knock
-   6  65  ge   - muted ringing low
-   7  66  ge   - lower
-   8  67  dhun - low-up
-   9  68  ti   - muted slap
-  10  69  ?    - ringing low
-  11  70  ti   - flam slap
-  12  71  ta   - loud tap
-  13  72  ti   - lowest mute
-  14  73  tun  - ringing low
-  15  74  ?    - muted low
-  16  75  ta   - loud tap double
-  17  76  ge   - high-low
-  18  77  ke   - high slap
-  19  78  na   - tap
-  20  79  ?    - high knock
-  21  80  dhun - short low-up
-  22  81  na   - mid tap
-  23  82  ti   - muted tap
-  24  83  tin  - mid
-  25  84  ?    - muted
-  26  85  ta   - loud mid double
-  27  86  ti   - slightly more muted
-  28  87  tin  - low mid
-  29  88  ta   - ringing mid
+   1  60  ringing mid
+   2  61  muted low
+   3  62  slap
+   4  63  ringing mid slap
+   5  64  low knock
+   6  65  muted ringing low
+   7  66  lower
+   8  67  low-up
+   9  68  muted slap
+  10  69  ringing low
+  11  70  flam slap
+  12  71  loud tap
+  13  72  lowest mute
+  14  73  ringing low
+  15  74  muted low
+  16  75  loud tap double
+  17  76  high-low
+  18  77  high slap
+  19  78  tap
+  20  79  high knock
+  21  80  short low-up
+  22  81  mid tap
+  23  82  muted tap
+  24  83  mid
+  25  84  muted
+  26  85  loud mid double
+  27  86  slightly more muted
+  28  87  low mid
+  29  88  ringing mid
   ...
 
-To play patches by number (for the unknown bols, for instance), do
-this to add to the C<84>th MIDInum entry score:
+To play patches by number (e.g. for unknown bols), do this to add the
+C<84>th MIDInum entry score:
 
   $tabla->note($tabla->eighth, 84);
 
@@ -161,16 +251,23 @@ Default: C<dist_dir()/Tabla.sf2>
 
 Each bol can be 1 or more patch numbers.
 
-Default bol patches:
+Default single strike bol patches:
 
-  dhun: 67 80
-  ge:   65 66 76
+  ga:   65
+  ge:   66 76
   ke:   64 77 79
   na:   78 81
-  ta:   71 75 85 88
+  ta:   71 75 85
   ti:   61 68 70 72 82 86
   tin:  60 63 83 87
-  tun:  73
+  tun:  88
+
+Default double strike bols:
+
+  dha:  ge ta
+  dhin: ge tin
+  dhit: ge ti
+  dhun: ge tun
 
 =head1 METHODS
 
@@ -185,20 +282,52 @@ constructor attributes of L<MIDI::Drummer::Tiny>.
 
 =head2 strike
 
-  $tabla->strike('dhun');
-  $tabla->strike('ge', $duration);
-  $tabla->strike('ti', $duration, $patch);
+  $tabla->strike($bol);
+  $tabla->strike($bol, $duration);
 
-Bols:
+This method handles two types of strikes: single and double.
 
-  dhun, ge, ke, na, ta, ti, tin, tun
+A named B<bol> can have one or more B<patches> associated with it. For
+single strikes, the method will play one of the B<bol> patches at
+random.
 
 The B<duration> is a note length like C<$tabla-E<gt>eighth> (or
 C<'en'> in MIDI-Perl notation).
 
-Each bol can be 1 or more patch numbers. For bols with more than one
-patch possibility, calling that method with either no B<patch> or a
-B<patch> of C<-1> will play one of the patches at random.
+(If specific patches are desired, use the C<note> method, as shown
+above.)
+
+1. Single strike bols:
+
+  ga, ge, ke, na, ta, ti, tin, tun
+
+2. Double strike bols:
+
+  dha, dhin, dhit, dhun
+
+For a double strike, play both the baya and daya drums for the given
+B<bol> and B<duration>.
+
+Each of the individual bol patches, comprising the double-strike, are
+chosen at random, as with the single-strike.
+
+=head2 thekas
+
+Traditional "groove patterns":
+
+=over
+
+=item teentaal([$duration])
+
+=item keherawa([$duration])
+
+=item jhaptaal([$duration])
+
+=item dadra([$duration])
+
+=item rupaktaal([$duration])
+
+=back
 
 =head1 SEE ALSO
 
@@ -207,6 +336,8 @@ The F<t/01-methods.t> and F<eg/*> programs in this distribution.
 L<Moo>
 
 L<File::ShareDir>
+
+L<List::Util>
 
 L<https://gleitz.github.io/midi-js-soundfonts/Tabla/Tabla.sf2> (4.1MB)
 

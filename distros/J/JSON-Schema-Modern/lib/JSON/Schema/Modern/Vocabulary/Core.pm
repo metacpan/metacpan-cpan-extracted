@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Core;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Core vocabulary
 
-our $VERSION = '0.598';
+our $VERSION = '0.599';
 
 use 5.020;
 use Moo;
@@ -95,7 +95,7 @@ sub _traverse_keyword_id ($class, $schema, $state) {
 sub _eval_keyword_id ($class, $data, $schema, $state) {
   my $schema_info = $state->{document}->path_to_resource($state->{document_path}.$state->{schema_path});
   # this should never happen, if the pre-evaluation traversal was performed correctly
-  abort($state, 'failed to resolve %s to canonical uri', $state->{keyword}) if not $schema_info;
+  abort($state, 'failed to resolve "%s" to canonical uri', $state->{keyword}) if not $schema_info;
 
   $state->{initial_schema_uri} = $schema_info->{canonical_uri}->clone;
   $state->{traversed_schema_path} = $state->{traversed_schema_path}.$state->{schema_path};
@@ -342,7 +342,7 @@ JSON::Schema::Modern::Vocabulary::Core - Implementation of the JSON Schema Core 
 
 =head1 VERSION
 
-version 0.598
+version 0.599
 
 =head1 DESCRIPTION
 

@@ -27,13 +27,13 @@
       },
       "configure" : {
          "requires" : {
-            "SPVM" : "0.989063"
+            "SPVM" : "0.990042"
          }
       },
       "runtime" : {
          "requires" : {
-            "SPVM" : "0.989063",
-            "SPVM::Regex" : "0.243001"
+            "SPVM" : "0.990042",
+            "SPVM::Regex" : "0.246"
          }
       },
       "test" : {
@@ -43,9 +43,11 @@
    "release_status" : "stable",
    "resources" : {
       "repository" : {
-         "type" : "git"
+         "type" : "git",
+         "url" : "https://github.com/yuki-kimoto/SPVM-Getopt-Long.git",
+         "web" : "https://github.com/yuki-kimoto/SPVM-Getopt-Long"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

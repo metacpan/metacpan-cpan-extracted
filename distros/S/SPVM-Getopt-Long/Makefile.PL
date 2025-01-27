@@ -18,7 +18,7 @@ unless ($meta) {
   # Do something such as environment check.
 }
 
-my %configure_and_runtime_requires = ('SPVM' => '0.989063');
+my %configure_and_runtime_requires = ('SPVM' => '0.990042');
 WriteMakefile(
   NAME => 'SPVM::Getopt::Long',
   VERSION_FROM => 'lib/SPVM/Getopt/Long.pm',
@@ -33,8 +33,8 @@ WriteMakefile(
     resources => {
       repository => {
         type => 'git',
-        url  => '',
-        web  => '',
+        url  => 'https://github.com/yuki-kimoto/SPVM-Getopt-Long.git',
+        web  => 'https://github.com/yuki-kimoto/SPVM-Getopt-Long',
       },
     },
     no_index => {
@@ -47,7 +47,7 @@ WriteMakefile(
   },
   PREREQ_PM         => {
     %configure_and_runtime_requires,
-    'SPVM::Regex' => '0.243001',
+    'SPVM::Regex' => '0.246',
   },
   TEST_REQUIRES => {
     

@@ -15,7 +15,7 @@ Getopt::EX::Config - Getopt::EX module configuration interface
 
 # VERSION
 
-Version 0.9901
+Version 0.9902
 
 # DESCRIPTION
 
@@ -31,6 +31,7 @@ only for the module and to define module-specific command options.
 
 You can create config object like this:
 
+    use Getopt::EX::Config;
     my $config = Getopt::EX::Config->new(
         char  => 0,
         width => 0,

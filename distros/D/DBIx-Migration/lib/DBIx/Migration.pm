@@ -6,9 +6,9 @@ use DBI;
 use File::Slurp;
 use File::Spec;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
-__PACKAGE__->mk_accessors(qw/debug dir dsn password username/);
+__PACKAGE__->mk_accessors(qw/debug dir dsn password username dbh/);
 
 =head1 NAME
 
@@ -65,6 +65,10 @@ Get/Set directory.
 
 Get/Set dsn.
 
+=item $self->dbh($dsn)
+
+Get/Set dbh.
+
 =item $self->migrate($version)
 
 Migrate database to version.
@@ -76,7 +80,7 @@ sub migrate {
     $self->_connect;
     $wanted = $self->_newest unless defined $wanted;
     my $version = $self->_version;
-    if ( defined $version && ( $wanted eq $version ) ) {
+    if ( defined $version && ( $wanted == $version ) ) {
         print "Database is already at version $wanted\n" if $self->debug;
         return 1;
     }
@@ -139,7 +143,8 @@ Get/Set database username.
 
 =item $self->version
 
-Get migration version from database.
+Get migration version from database. Will be undef if no migration has taken
+place yet.
 
 =cut
 
@@ -153,6 +158,7 @@ sub version {
 
 sub _connect {
     my $self = shift;
+    return $self->{_dbh}= $self->dbh->clone({}) if $self->dbh;
     $self->{_dbh} = DBI->connect(
         $self->dsn,
         $self->username,
@@ -163,15 +169,16 @@ sub _connect {
             AutoCommit => 1
         }
       )
-      or die qq/Couldn't connect to database, "$!"/;
+      or die sprintf(qq/Couldn't connect to database %s: %s/, $self->dsn, $DBI::errstr);
+    $self->dbh($self->{_dbh})
 }
 
 sub _create_migration_table {
     my $self = shift;
     $self->{_dbh}->do(<<"EOF");
 CREATE TABLE dbix_migration (
-    name CHAR(64) PRIMARY KEY,
-    value CHAR(64)
+    name VARCHAR(64) PRIMARY KEY,
+    value VARCHAR(64)
 );
 EOF
     $self->{_dbh}->do(<<"EOF");
@@ -241,7 +248,17 @@ EOF
 
 =head1 AUTHOR
 
-Sebastian Riedel, C<sri@oook.de>
+Sebastian Riedel, <kraihx@gmail.com>
+
+=head1 CONTRIBUTORS
+
+Dan Sully, <dan+github@sully.org>
+
+Marcus Ramberg, <marcus@nordaaker.com>
+
+Steven Jenkin, <sjenkin@venda.com>
+
+Sven Willenbuecher, <sven.willenbuecher@gmx.de>
 
 =head1 COPYRIGHT
 

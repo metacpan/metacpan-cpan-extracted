@@ -18,7 +18,7 @@ unless ($meta) {
   # Do something such as environment check.
 }
 
-my %configure_and_runtime_requires = ('SPVM' => '0.989063');
+my %configure_and_runtime_requires = ('SPVM' => '0.990042');
 WriteMakefile(
   NAME              => 'SPVM::FindBin',
   VERSION_FROM      => 'lib/SPVM/FindBin.pm',
@@ -33,8 +33,8 @@ WriteMakefile(
     resources => {
       repository => {
         type => 'git',
-        url  => '',
-        web  => '',
+        url  => 'https://github.com/yuki-kimoto/SPVM-FindBin.git',
+        web  => 'https://github.com/yuki-kimoto/SPVM-FindBin',
       },
     },
     no_index => {

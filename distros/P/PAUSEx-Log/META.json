@@ -1,0 +1,62 @@
+{
+   "abstract" : "Access the PAUSE log",
+   "author" : [
+      "brian d foy <briandfoy@pobox.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "PAUSEx-Log",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::Spec::Functions" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Digest::SHA1" : "0",
+            "Getopt::Long" : "0",
+            "Mojolicious" : "9",
+            "String::Sprintf" : "1.002",
+            "perl" : "5.036"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/briandfoy/pausex-log/issues"
+      },
+      "homepage" : "https://github.com/briandfoy/pausex-log",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/briandfoy/pausex-log",
+         "web" : "https://github.com/briandfoy/pausex-log"
+      }
+   },
+   "version" : "0.002",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

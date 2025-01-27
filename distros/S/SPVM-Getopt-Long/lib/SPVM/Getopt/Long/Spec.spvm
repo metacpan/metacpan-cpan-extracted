@@ -2,6 +2,8 @@
 # MIT License
 
 class Getopt::Long::Spec {
+  version_from Getopt::Long;
+  
   allow Getopt::Long;
   
   # Enumerations

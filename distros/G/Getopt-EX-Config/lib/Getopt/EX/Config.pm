@@ -3,12 +3,9 @@ package Getopt::EX::Config;
 use v5.14;
 use warnings;
 
-our $VERSION = '0.9901';
+our $VERSION = '0.9902';
 
-use Exporter 'import';
-our @EXPORT = qw(&config);
-our @EXPORT_OK = qw(&config &getopt &split_argv &mod_argv);
-
+use Data::Dumper;
 use Getopt::Long qw(GetOptionsFromArray);
 Getopt::Long::Configure qw(bundling);
 
@@ -16,25 +13,59 @@ use List::Util qw(first);
 
 our %CONFIG;
 
+sub import {
+    my $class = shift;
+    my $caller = caller;
+    no strict 'refs';
+    *{"$caller\::config"} = sub {
+	$CONFIG{$caller}->config(@_);
+    };
+}
+
 sub new {
     my $class = shift;
     my $config = ref $_[0] eq 'HASH' ? shift : { @_ };
-    $CONFIG{caller} = bless $config, $class;
+    $CONFIG{+caller} = bless $config, $class;
 }
 
 sub deal_with {
     my $obj = shift;
     my($my_argv, $argv) = split_argv(shift);
-    getopt($my_argv, $obj, @_) if @$my_argv;
+    $obj->getopt($my_argv, @_) if @$my_argv;
     return $obj;
+}
+
+use Getopt::EX::Func;
+*arg2kvlist = \&Getopt::EX::Func::arg2kvlist;
+
+sub getopt {
+    my $obj = shift;
+    my $argv = shift;
+    return if @{ $argv //= [] } == 0;
+    GetOptionsFromArray(
+	$argv,
+	"config|C=s" => sub {
+	    $obj->config(arg2kvlist($_[1]));
+	},
+	@_ )
+	or die "Option parse error.\n";
+}
+
+sub config {
+    my $obj = shift;
+    if (@_ == 1) {
+	$obj->get(@_);
+    } else {
+	$obj->set(@_);
+    }
 }
 
 ######################################################################
 
-sub config {
+sub set {
+    my $c = shift;
     while (my($k, $v) = splice @_, 0, 2) {
 	my @names = split /\./, $k;
-	my $c = $CONFIG{caller} // die "config is not initialized.\n";
 	my $name = pop @names;
 	for (@names) {
 	    $c = $c->{$_} // die "$k: invalid name.\n";
@@ -49,18 +80,14 @@ sub config {
     ();
 }
 
-use Getopt::EX::Func;
-*arg2kvlist = \&Getopt::EX::Func::arg2kvlist;
-
-sub getopt {
-    my $argv = shift;
-    my $opt = shift;
-    return if @{ $argv //= [] } == 0;
-    GetOptionsFromArray(
-	$argv,
-	"config|C=s" => sub { config arg2kvlist($_[1]) },
-	@_ )
-	or die "Option parse error.\n";
+sub get :lvalue {
+    my $c = shift;
+    my $key = shift;
+    if (ref $c->{$key}) {
+	${$c->{$key}};
+    } else {
+	$c->{$key};
+    }
 }
 
 sub mod_argv {
@@ -100,7 +127,7 @@ Getopt::EX::Config - Getopt::EX module configuration interface
 
 =head1 VERSION
 
-Version 0.9901
+Version 0.9902
 
 =head1 DESCRIPTION
 
@@ -116,6 +143,7 @@ only for the module and to define module-specific command options.
 
 You can create config object like this:
 
+    use Getopt::EX::Config;
     my $config = Getopt::EX::Config->new(
         char  => 0,
         width => 0,

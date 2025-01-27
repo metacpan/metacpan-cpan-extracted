@@ -23,6 +23,7 @@ share/strict-dialect.json
 share/strict-schema.json
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
+t/checksums.t
 t/dialects.t
 t/discriminator.t
 t/document-parsing.t
@@ -41,6 +42,7 @@ t/recursive_get.t
 t/results/oas-vocabulary.txt
 t/validate_request.t
 t/validate_response.t
+t/zzz-check-breaks.t
 update-schemas
 weaver.ini
 xt/author/00-compile.t

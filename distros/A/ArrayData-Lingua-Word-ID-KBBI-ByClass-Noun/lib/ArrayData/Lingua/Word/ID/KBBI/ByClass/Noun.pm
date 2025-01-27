@@ -10,7 +10,7 @@ with 'ArrayDataRole::Source::LinesInDATA';
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2024-11-19'; # DATE
 our $DIST = 'ArrayData-Lingua-Word-ID-KBBI-ByClass-Noun'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 # STATS
 
@@ -27,7 +27,7 @@ ArrayData::Lingua::Word::ID::KBBI::ByClass::Noun - Indonesian noun words from KB
 
 =head1 VERSION
 
-This document describes version 0.001 of ArrayData::Lingua::Word::ID::KBBI::ByClass::Noun (from Perl distribution ArrayData-Lingua-Word-ID-KBBI-ByClass-Noun), released on 2024-11-19.
+This document describes version 0.002 of ArrayData::Lingua::Word::ID::KBBI::ByClass::Noun (from Perl distribution ArrayData-Lingua-Word-ID-KBBI-ByClass-Noun), released on 2024-11-19.
 
 =head1 SYNOPSIS
 
@@ -76,6 +76,8 @@ Please visit the project's homepage at L<https://metacpan.org/release/ArrayData-
 Source repository is at L<https://github.com/perlancar/perl-ArrayData-Lingua-Word-ID-KBBI-ByClass-Noun>.
 
 =head1 SEE ALSO
+
+L<WordList::ID::KBBI::ByClass::Noun> contains the same data.
 
 =head1 AUTHOR
 

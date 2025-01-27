@@ -27,6 +27,8 @@ if ($^O eq 'cygwin') {
 ok($tcl->Eval("info exists tcl_platform"), 1);
 
 my $tclversion = $tcl->Eval("info tclversion");
+# show version, patchlevel on test report:
+print STDERR "\$tclversion=$tclversion, patchlevel=" . $tcl->Eval("info patchlevel") . "\n";
 ok($tclversion, qr/^\d+\.\d+$/);
 ok(substr($tcl->Eval("info patchlevel"), 0, length($tclversion)), $tclversion);
 ok(length($tcl->Eval("info patchlevel")) > length($tclversion));

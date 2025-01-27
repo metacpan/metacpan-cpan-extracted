@@ -18,7 +18,7 @@ unless ($meta) {
   # Do something such as environment check.
 }
 
-my %configure_and_runtime_requires = ('SPVM' => '0.9706');
+my %configure_and_runtime_requires = ('SPVM' => '0.989063');
 
 WriteMakefile(
   NAME              => 'SPVM::HTTP::Tiny',
@@ -34,8 +34,8 @@ WriteMakefile(
     resources => {
       repository => {
         type => 'git',
-        url  => '',
-        web  => '',
+        url  => 'https://github.com/yuki-kimoto/SPVM-HTTP-Tiny.git',
+        web  => 'https://github.com/yuki-kimoto/SPVM-HTTP-Tiny',
       },
     },
     no_index => {
@@ -49,7 +49,7 @@ WriteMakefile(
   PREREQ_PM         => {
     %configure_and_runtime_requires,
     'SPVM::IO' => '0.211',
-    'SPVM::Regex' => '0.243',
+    'SPVM::Regex' => '0.246',
     'SPVM::Mozilla::CA' => '0.001',
     'SPVM::File::Temp' => '0.021',
     'SPVM::Time::Piece' => '0.003',

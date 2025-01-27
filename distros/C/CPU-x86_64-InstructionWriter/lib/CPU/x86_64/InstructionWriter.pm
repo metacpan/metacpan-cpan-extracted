@@ -1,5 +1,5 @@
 package CPU::x86_64::InstructionWriter;
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 use v5.10;
 use Moo 2;
 use Carp;
@@ -7,6 +7,7 @@ use Scalar::Util 'looks_like_number';
 use Exporter 'import';
 use CPU::x86_64::InstructionWriter::Unknown;
 use CPU::x86_64::InstructionWriter::Label;
+use CPU::x86_64::InstructionWriter::RipRelative;
 use if !eval{ pack('Q<',1) }, 'CPU::x86_64::InstructionWriter::_int32', qw/pack/;
 
 # ABSTRACT: Assemble x86-64 instructions using a pure-perl API
@@ -33,6 +34,7 @@ my %regnum64= (
 	rax => 0, rcx => 1, rdx => 2, rbx => 3,
 	RSP => 4, RBP => 5, RSI => 6, RDI => 7,
 	rsp => 4, rbp => 5, rsi => 6, rdi => 7,
+	RIP => 0x15, rip => 0x15,
 	map { $_ => $_, "R$_" => $_, "r$_" => $_ } 0..15
 );
 
@@ -143,15 +145,15 @@ sub bytes {
 }
 
 
-sub data     { $_[0]{_buf} .= $_[1] }
-sub data_i8  { $_[0]{_buf} .= chr($_[1]) }
-sub data_i16 { $_[0]{_buf} .= pack('v', $_[1]) }
-sub data_i32 { $_[0]{_buf} .= pack('V', $_[1]) }
-sub data_i64 { $_[0]{_buf} .= pack('Q<', $_[1]) }
+sub data     { $_[0]{_buf} .= $_[1];             $_[0] }
+sub data_i8  { $_[0]{_buf} .= chr($_[1]);        $_[0] }
+sub data_i16 { $_[0]{_buf} .= pack('v', $_[1]);  $_[0] }
+sub data_i32 { $_[0]{_buf} .= pack('V', $_[1]);  $_[0] }
+sub data_i64 { $_[0]{_buf} .= pack('Q<', $_[1]); $_[0] }
 
 
-sub data_f32 { $_[0]{_buf} .= pack('f', $_[1]) }
-sub data_f64 { $_[0]{_buf} .= pack('d', $_[1]) }
+sub data_f32 { $_[0]{_buf} .= pack('f', $_[1]); $_[0] }
+sub data_f64 { $_[0]{_buf} .= pack('d', $_[1]); $_[0] }
 
 
 sub align { # ( self, bytes, fill_byte)
@@ -1179,11 +1181,19 @@ sub _append_op64_reg_mem {
 	my ($base_reg, $disp, $index_reg, $scale)= @$mem;
 	$reg= $regnum64{$reg} // croak "$reg is not a valid 64-bit register"
 		if defined $reg;
-	$base_reg= $regnum64{$base_reg} // croak "$base_reg is not a valid 64-bit register"
-		if defined $base_reg;
 	$index_reg= $regnum64{$index_reg} // croak "$index_reg is not a valid 64-bit register"
 		if defined $index_reg;
+	my $rip;
+	if (defined $base_reg) {
+		$base_reg= $regnum64{$base_reg} // croak "$base_reg is not a valid 64-bit register";
+		if ($base_reg == 0x15 && ref $disp) { # RIP-relative
+			$disp= $self->get_label($$disp) if ref $disp eq 'SCALAR';
+			$rip= $self->get_label;
+			$disp= bless { rip => $rip, label => $disp }, 'CPU::x86_64::InstructionWriter::RipRelative';
+		}
+	}
 	$self->_append_possible_unknown('_encode_op_reg_mem', [$rex, $opcode, $reg, $base_reg, $disp, $index_reg, $scale], 4, 7);
+	$self->label($rip) if defined $rip;
 	$self;
 }
 
@@ -1192,11 +1202,20 @@ sub _append_op32_reg_mem {
 	my ($base_reg, $disp, $index_reg, $scale)= @$mem;
 	$reg= $regnum32{$reg} // croak "$reg is not a valid 32-bit register"
 		if defined $reg;
-	$base_reg= $regnum64{$base_reg} // croak "$base_reg is not a valid 64-bit register"
-		if defined $base_reg;
 	$index_reg= $regnum64{$index_reg} // croak "$index_reg is not a valid 64-bit register"
 		if defined $index_reg;
+	my $rip;
+	if (defined $base_reg) {
+		$base_reg= $regnum64{$base_reg} // croak "$base_reg is not a valid 64-bit register";
+		if ($base_reg == 0x15 && ref $disp) { # RIP-relative
+			$disp= $self->get_label($$disp) if ref $disp eq 'SCALAR';
+			$rip= $self->get_label;
+			$disp= bless { rip => $rip, label => $disp }, 'CPU::x86_64::InstructionWriter::RipRelative';
+		}
+	}
 	$self->_append_possible_unknown('_encode_op_reg_mem', [$rex, $opcode, $reg, $base_reg, $disp, $index_reg, $scale], 4, 7);
+	$self->label($rip) if defined $rip;
+	$self;
 }
 
 sub _append_op16_reg_mem {
@@ -1204,19 +1223,26 @@ sub _append_op16_reg_mem {
 	my ($base_reg, $disp, $index_reg, $scale)= @$mem;
 	$reg= $regnum16{$reg} // croak "$reg is not a valid 16-bit register"
 		if defined $reg;
-	$base_reg= $regnum64{$base_reg} // croak "$base_reg is not a valid 64-bit register"
-		if defined $base_reg;
 	$index_reg= $regnum64{$index_reg} // croak "$index_reg is not a valid 64-bit register"
 		if defined $index_reg;
+	my $rip;
+	if (defined $base_reg) {
+		$base_reg= $regnum64{$base_reg} // croak "$base_reg is not a valid 64-bit register";
+		if ($base_reg == 0x15 && ref $disp) { # RIP-relative
+			$disp= $self->get_label($$disp) if ref $disp eq 'SCALAR';
+			$rip= $self->get_label;
+			$disp= bless { rip => $rip, label => $disp }, 'CPU::x86_64::InstructionWriter::RipRelative';
+		}
+	}
 	$self->{_buf} .= "\x66";
 	$self->_append_possible_unknown('_encode_op_reg_mem', [$rex, $opcode, $reg, $base_reg, $disp, $index_reg, $scale], 4, 7);
+	$self->label($rip) if defined $rip;
+	$self;
 }
 
 sub _append_op8_reg_mem {
 	my ($self, $rex, $opcode, $reg, $mem)= @_;
 	my ($base_reg, $disp, $index_reg, $scale)= @$mem;
-	$base_reg= $regnum64{$base_reg} // croak "$base_reg is not a valid 64-bit register"
-		if defined $base_reg;
 	$index_reg= $regnum64{$index_reg} // croak "$index_reg is not a valid 64-bit register"
 		if defined $index_reg;
 	$reg= $regnum8{$reg};
@@ -1230,7 +1256,18 @@ sub _append_op8_reg_mem {
 	elsif ($reg > 3) {
 		$rex |= 0x40;
 	}
+	my $rip;
+	if (defined $base_reg) {
+		$base_reg= $regnum64{$base_reg} // croak "$base_reg is not a valid 64-bit register";
+		if ($base_reg == 0x15 && ref $disp) { # RIP-relative
+			$disp= $self->get_label($$disp) if ref $disp eq 'SCALAR';
+			$rip= $self->get_label;
+			$disp= bless { rip => $rip, label => $disp }, 'CPU::x86_64::InstructionWriter::RipRelative';
+		}
+	}
 	$self->_append_possible_unknown('_encode_op_reg_mem', [$rex, $opcode, $reg, $base_reg, $disp, $index_reg, $scale], 4, 7);
+	$self->label($rip) if defined $rip;
+	$self;
 }
 # Like above, but the first register is a constant and don't need to test it for
 # requiring a REX prefix if >3.
@@ -1305,6 +1342,12 @@ sub _encode_op_reg_mem {
 	
 	my $tail;
 	if (defined $base_reg) {
+		if ($base_reg == 0x15) {
+			defined $disp or croak "RIP-relative address requires displacement";
+			defined $scale || defined $immed and croak "RIP-relative address cannot have scale or immediate-value";
+			return $rex? pack('CCCV', ($rex|0x40), $opcode, (($reg & 7) << 3)|5, $disp)
+				: pack('CCV', $opcode, (($reg & 7) << 3)|5, $disp);
+		}
 		$rex |= ($base_reg & 8) >> 3;
 		
 		# RBP,R13 always gets mod_rm displacement to differentiate from Null base register
@@ -1672,7 +1715,8 @@ sub _append_jmp_cx {
 sub _append_possible_unknown {
 	my ($self, $encoder, $encoder_args, $unknown_pos, $estimated_length)= @_;
 	my $u= $encoder_args->[$unknown_pos];
-	if (ref $u && ref $u ne 'SCALAR' && !looks_like_number($u)) {
+	if (ref $u && !looks_like_number($u)) {
+		$u= $self->get_label($$u) if ref $u eq 'SCALAR';
 		ref($u)->can('value')
 			or croak "Expected object with '->value' method";
 		$self->_mark_unresolved(
@@ -1787,8 +1831,8 @@ sub _resolve {
 					$ofs += (length($enc) - $p->{len});
 					$p->{len}= length($enc);
 				}
-			};
-			if ($@) {
+				1
+			} or do {
 				if ($p->{caller}) {
 					croak "Failed to encode instruction $p->{caller}[3] from $p->{caller}[1] line $p->{caller}[2]:\n   $@";
 				} else {
@@ -1813,7 +1857,7 @@ CPU::x86_64::InstructionWriter - Assemble x86-64 instructions using a pure-perl 
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -2224,7 +2268,7 @@ Returns $self, for chaining.
 
 =over
 
-=item C<add##_reg_imm($reg, $const)>
+=item C<sub##_reg_imm($reg, $const)>
 
 =back
 
@@ -2706,7 +2750,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Michael Conrad.
+This software is copyright (c) 2025 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

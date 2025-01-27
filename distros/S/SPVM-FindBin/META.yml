@@ -1,11 +1,11 @@
 ---
-abstract: 'Locate Directory of Original Program'
+abstract: 'The Directory Path Where The Program Is Located'
 author:
   - USER_NAME<USER_MAIL>
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
-  SPVM: '0.989063'
+  SPVM: '0.990042'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: mit
@@ -18,10 +18,11 @@ no_index:
     - t
     - inc
 requires:
-  SPVM: '0.989063'
+  SPVM: '0.990042'
   SPVM::File::Basename: '0.02'
   SPVM::File::Spec: '0.03'
   SPVM::Sys: '0.509'
-resources: {}
-version: '0.031'
+resources:
+  repository: https://github.com/yuki-kimoto/SPVM-FindBin.git
+version: '0.032'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

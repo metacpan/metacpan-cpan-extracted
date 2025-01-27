@@ -1,4 +1,14 @@
-Tis file documents the revision history for Perl extension DBIx::Migration.
+This file documents the revision history for Perl extension DBIx::Migration.
+
+0.08  Mon Jan 27 07:26:05 CET 2025
+        - Fix insufficient _connect() error reporting [RT #158385]
+        - Correct for PSQL whitespace issue in CHAR columns
+          [Github #2], [RT #107220]
+        - Add support for accepting a dbh [Github #1]
+        - Rename testing context following Oslo consensus
+
+0.07  2010-10-22
+        - Added DBD::SQLite dependency
 
 0.06  Tue Oct 19 09:27:56 PDT 2010
 

@@ -961,8 +961,6 @@ class TestCase::Getopt::Long {
       }
     }
     
-    $@ = undef;
-    
     return 1;
   }
 }

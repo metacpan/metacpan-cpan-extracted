@@ -1,0 +1,7 @@
+# Changes for PAUSEx::Log
+0.001_01 2025-01-26T20:43:37Z
+	* first release of my little program to tail the PAUSE log
+
+0.002 2025-01-26T22:10:42Z
+	* move to BRIANDFOY
+

@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Geo::Location::IP",
   "PREREQ_PM" => {
     "IP::Geolocation::MMDB" => "1.011",
-    "Object::Pad" => "0.807",
+    "Object::Pad" => "0.810",
     "Scalar::Util" => 0,
     "Socket" => 0,
     "overload" => 0,
@@ -31,7 +31,7 @@ my %WriteMakefileArgs = (
     "File::Spec::Functions" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,7 +40,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "File::Spec::Functions" => 0,
   "IP::Geolocation::MMDB" => "1.011",
-  "Object::Pad" => "0.807",
+  "Object::Pad" => "0.810",
   "Scalar::Util" => 0,
   "Socket" => 0,
   "Test::More" => 0,

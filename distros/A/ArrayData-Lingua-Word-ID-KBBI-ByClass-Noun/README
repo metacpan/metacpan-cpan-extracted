@@ -3,7 +3,7 @@ NAME
     from KBBI (Kamus Besar Bahasa Indonesia)
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     ArrayData::Lingua::Word::ID::KBBI::ByClass::Noun (from Perl distribution
     ArrayData-Lingua-Word-ID-KBBI-ByClass-Noun), released on 2024-11-19.
 
@@ -54,6 +54,8 @@ SOURCE
     -Noun>.
 
 SEE ALSO
+    WordList::ID::KBBI::ByClass::Noun contains the same data.
+
 AUTHOR
     perlancar <perlancar@cpan.org>
 

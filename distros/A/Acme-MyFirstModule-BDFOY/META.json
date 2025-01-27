@@ -70,6 +70,6 @@
          "web" : "https://github.com/briandfoy/Acme-MyFirstModule-BDFOY"
       }
    },
-   "version" : "0.022",
+   "version" : "0.023",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

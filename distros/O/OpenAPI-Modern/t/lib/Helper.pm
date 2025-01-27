@@ -16,6 +16,7 @@ use Ref::Util 'is_hashref';
 use Mojo::Message::Request;
 use Mojo::Message::Response;
 use Test2::API 'context_do';
+use Test2::Tools::Exception 'lives';
 use Test::Needs;
 use Test::More 0.96;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
@@ -307,6 +308,41 @@ sub cmp_result ($got, $expected, $test_name) {
     }
     return $equal;
   } $got, $expected, $test_name;
+}
+
+sub lives_result ($sub, $test_name) {
+  my $ok = ok(lives(\&$sub), $test_name);
+  if (not $ok) {
+    context_do {
+      my ($ctx, $result) = @_;
+      my $method =
+        # be less noisy for expected failures
+        (grep $_->{todo}, Test2::API::test2_stack->top->{_pre_filters}->@*) ? 'note'
+          : $ENV{AUTHOR_TESTING} || $ENV{AUTOMATED_TESTING} ? 'diag' : 'note';
+      $ctx->$method("got result:\n".$encoder->encode($result));
+    } $@;
+  }
+}
+
+sub die_result ($sub, $pattern, $test_name) {
+  eval { $sub->() };
+  my $result = $@;
+  if (defined $result) {
+    like($result, $pattern, $test_name)
+    or context_do {
+      my ($ctx, $result) = @_;
+      my $method =
+        # be less noisy for expected failures
+        (grep $_->{todo}, Test2::API::test2_stack->top->{_pre_filters}->@*) ? 'note'
+          : $ENV{AUTHOR_TESTING} || $ENV{AUTOMATED_TESTING} ? 'diag' : 'note';
+      $ctx->$method("got result:\n".$encoder->encode($result));
+    } $result;
+  }
+}
+
+sub exception :prototype(&) {
+  eval { $_[0]->() };
+  return $@ eq '' ? undef : $@;
 }
 
 1;

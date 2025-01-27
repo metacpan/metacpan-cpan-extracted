@@ -30,7 +30,7 @@ subtest score => sub {
     $obj->strike('tun');
     my @score = $obj->score->Score;
     is $score[4][0], 'note', 'note';
-    is $score[4][4], 73, 'tun';
+    is $score[4][4], 88, 'tun';
 };
 
 done_testing();

@@ -24,6 +24,7 @@ meta-spec:
 name: Music-Percussion-Tabla
 requires:
   File::ShareDir: '0'
+  List::Util: '0'
   MIDI::Drummer::Tiny: '0.4302'
   Moo: '2'
   namespace::clean: '0'
@@ -32,7 +33,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Music-Percussion-Tabla
   repository: https://github.com/ology/Music-Percussion-Tabla.git
-version: '0.0405'
+version: '0.0604'
 x_Dist_Zilla:
   perl:
     version: '5.040000'
@@ -214,14 +215,17 @@ x_Dist_Zilla:
           spell_cmd: 'aspell list'
           stopwords:
             - MIDInum
+            - baya
             - bol
             - bols
             - cfg
+            - daya
             - dhun
             - ge
             - ke
             - na
             - soundfont
+            - thekas
           wordlist: Pod::Wordlist
       name: Test::PodSpelling
       version: '2.007005'

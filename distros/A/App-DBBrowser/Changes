@@ -1,6 +1,13 @@
 Revision history for App-DBBrowser
 
 
+2.423  2025-01-27
+        - Bugfix undefined data type.
+        - Bugfix where clause: reset and/or connector.
+        - Added multi-column extension.
+        - Bugfix extended columns: use normal columns if inside an aggregate functions.
+        - Subqueries in ctes: do not show ctes twice.
+
 2.422  2025-01-23
         - Extension 'Column': it is now possible to use a column from a chosen table.
         - A new way to create subqueries: build the subquery using the sql menu.

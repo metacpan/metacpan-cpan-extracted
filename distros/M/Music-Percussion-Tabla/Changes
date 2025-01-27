@@ -1,5 +1,32 @@
 Revision history for Music-Percussion-Tabla
 
+0.0604 2025-01-26 18:59:32
+    - Improve documentation.
+    - Remove the patch option from the strike method.
+
+0.0603 2025-01-26 18:46:02
+    - Improve documentation.
+
+0.0602 2025-01-26 15:55:56
+    - Improve documentation.
+
+0.0601 2025-01-26 15:23:13
+    - Simplified things by having the strike() method handle double-strikes.
+
+0.0600 2025-01-26 13:32:54
+    - Add thekas (groove patterns).
+
+0.0502 2025-01-26 12:55:07
+    - Fix the double_strike() method logic.
+    - Improve documentation.
+
+0.0501 2025-01-26 12:36:14
+    - Fix bol patches again.
+
+0.0500 2025-01-26 12:29:09
+    - Add the double_strike() method.
+    - Attempt to correct a couple bol patches.
+
 0.0405 2025-01-25 23:37:55
     - Strike with a patch not with the index of a patch.
 

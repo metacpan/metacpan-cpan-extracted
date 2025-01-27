@@ -24,9 +24,11 @@ MIDInum
 Music
 Percussion
 Tabla
+baya
 bol
 bols
 cfg
+daya
 dhun
 ge
 gene
@@ -34,3 +36,4 @@ ke
 lib
 na
 soundfont
+thekas

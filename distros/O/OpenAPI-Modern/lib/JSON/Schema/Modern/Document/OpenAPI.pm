@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document::OpenAPI;
 # ABSTRACT: One OpenAPI v3.1 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.076';
+our $VERSION = '0.078';
 
 use 5.020;
 use Moo;
@@ -124,7 +124,7 @@ sub traverse ($self, $evaluator) {
       },
     },
   );
-  if (not $top_result) {
+  if (not $top_result->valid) {
     $_->mode('evaluate') foreach $top_result->errors;
     push $state->{errors}->@*, $top_result->errors;
     return $state;
@@ -201,7 +201,7 @@ sub traverse ($self, $evaluator) {
     },
   );
 
-  if (not $result) {
+  if (not $result->valid) {
     $_->mode('evaluate') foreach $result->errors;
     push $state->{errors}->@*, $result->errors;
     return $state;
@@ -245,6 +245,7 @@ sub traverse ($self, $evaluator) {
 
     foreach my $server_idx (0 .. $servers->$#*) {
       my $normalized = $servers->[$server_idx]{url} =~ s/\{[^}]+\}/\x00/r;
+      # { for the editor
       my @url_variables = $servers->[$server_idx]{url} =~ /\{([^}]+)\}/g;
 
       if (my $first_url = $seen_url{$normalized}) {
@@ -409,7 +410,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.1 document
 
 =head1 VERSION
 
-version 0.076
+version 0.078
 
 =head1 SYNOPSIS
 

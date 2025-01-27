@@ -26,7 +26,7 @@ sub startup ($self) {
     my $result = $c->validate_request;
     $LAST_VALIDATE_REQUEST_STASH = $c->stash('openapi');
     $c->render(
-      status => $c->req->query_params->param('status') // ($result ? 200 : 400),
+      status => $c->req->query_params->param('status') // ($result->valid ? 200 : 400),
       json => {
         result => $result,
       },

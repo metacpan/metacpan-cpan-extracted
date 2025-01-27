@@ -1,6 +1,6 @@
 package SPVM::HTTP::Tiny;
 
-our $VERSION = "0.003";
+our $VERSION = "0.004";
 
 1;
 
@@ -10,9 +10,9 @@ SPVM::HTTP::Tiny - HTTP Client
 
 =head1 Description
 
-The HTTP::Tiny class of L<SPVM> has methods for a HTTP client.
+HTTP::Tiny class in L<SPVM> is a HTTP client.
 
-B<This class does not work well now. It will be fixed in the near future.>
+B<This class is highly experimental.>
 
 =head1 Usage
 

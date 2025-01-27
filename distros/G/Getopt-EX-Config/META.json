@@ -55,7 +55,7 @@
    "provides" : {
       "Getopt::EX::Config" : {
          "file" : "lib/Getopt/EX/Config.pm",
-         "version" : "0.9901"
+         "version" : "0.9902"
       }
    },
    "release_status" : "stable",
@@ -70,7 +70,7 @@
          "web" : "https://github.com/kaz-utashiro/Getopt-EX-Config"
       }
    },
-   "version" : "0.9901",
+   "version" : "0.9902",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"
    ],

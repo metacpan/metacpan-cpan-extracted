@@ -1,25 +1,35 @@
 ---
-name: DBIx-Migration
-version: 0.07
-author:
-  - 'Sebastian Riedel, C<sri@oook.de>'
 abstract: 'Seamless DB schema up- and downgrades'
-license: perl
-resources:
-  license: http://dev.perl.org/licenses/
-requires:
-  Class::Accessor::Fast: 0
-  DBD::SQLite: 0
-  DBI: 0
-  File::Slurp: 0
-  File::Spec: 0
+author:
+  - 'Sebastian Riedel, <kraihx@gmail.com>'
+build_requires:
+  Test::PostgreSQL: '0'
 configure_requires:
-  Module::Build: 0.340201
+  CPAN::Meta::Converter: '2.15'
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Migration
 provides:
   DBIx::Migration:
     file: lib/DBIx/Migration.pm
-    version: 0.07
-generated_by: Module::Build version 0.340201
-meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+    version: '0.08'
+recommends:
+  Test::Pod: '1.14'
+  Test::Pod::Coverage: '1.04'
+requires:
+  Class::Accessor::Fast: '0'
+  DBD::SQLite: '0'
+  DBI: '1.33'
+  File::Slurp: '0'
+  File::Spec: '0'
+resources:
+  bugtracker: https://github.com/XSven/perl-dbix-migration/issues
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/XSven/perl-dbix-migration.git
+version: '0.08'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

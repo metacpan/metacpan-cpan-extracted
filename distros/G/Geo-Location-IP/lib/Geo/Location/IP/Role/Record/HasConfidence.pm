@@ -10,7 +10,7 @@ use Object::Pad;
 
 role Geo::Location::IP::Role::Record::HasConfidence;
 
-our $VERSION = 0.001;
+our $VERSION = 0.002;
 
 field $confidence :param :reader = undef;
 
@@ -25,7 +25,7 @@ Geo::Location::IP::Role::Record::HasConfidence - Add a "confidence" field
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

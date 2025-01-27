@@ -71,9 +71,12 @@ sub __stmt_fold {
 
 sub __cte_stmts {
     my ( $sf, $used_for, $indent1 ) = @_;
-    #if ( ! @{$sf->{d}{cte_history}//[]} ) {
-    #    return wantarray ? () : '';
-    #}
+    if ( ! @{$sf->{d}{cte_history}//[]} ) {
+        return;
+    }
+    if ( length( $sf->{d}{main_info} ) && $used_for eq 'print' ) {
+        return;
+    }
     my $ctes = $sf->{d}{cte_history};
     my $with = "WITH";
     for my $cte ( @$ctes ) {
@@ -97,8 +100,9 @@ sub get_stmt {
     my $indent2 = 2;
     my $qt_table = $sql->{table};
     my @tmp;
-    if ( @{$sf->{d}{cte_history}} ) {
-        push @tmp, $sf->__cte_stmts( $used_for, $indent1 );
+    my $ctes = $sf->__cte_stmts( $used_for, $indent1 );
+    if ( defined $ctes ) {
+        push @tmp, $ctes;
     }
     if ( $sql->{case_stmt} ) {
         @tmp = ();
@@ -389,8 +393,9 @@ sub column_names_and_types {
     my $column_types = [];
     if ( ! eval {
         my $stmt = '';
-        if ( @{$sf->{d}{cte_history}} ) {
-            $stmt = $sf->__cte_stmts( 'prepare', 0 );
+        my $ctes = $sf->__cte_stmts( 'prepare', 0 );
+        if ( defined $ctes ) {
+            $stmt = $ctes;
         }
         $stmt .= "SELECT * FROM " . $qt_table . $sf->sql_limit( 0 );
         my $sth = $sf->{d}{dbh}->prepare( $stmt );
@@ -426,6 +431,9 @@ sub is_numeric_datatype {
 sub is_char_datatype {
     my ( $sf, $sql, $qt_col ) = @_;
     my $is_char = 0;
+    if ( ! defined $sql->{data_types}{$qt_col} ) {
+        return;
+    }
     # 1 -> CHAR, 12 -> VARCHAR
     if ( $sql->{data_types}{$qt_col} == 1 || $sql->{data_types}{$qt_col} == 12 ) {
         $is_char = 1;

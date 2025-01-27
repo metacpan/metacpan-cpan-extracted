@@ -16,6 +16,10 @@ use SPVM 'FindBin';
 
 use SPVM 'TestCase::FindBin';
 
+my $api = SPVM::api();
+
+my $start_memory_blocks_count = $api->get_memory_blocks_count();
+
 # init
 SPVM::FindBin->init;
 
@@ -37,5 +41,10 @@ is(SPVM::FindBin->RealScript, "$FindBin::RealScript");
 {
   is($SPVM::FindBin::VERSION, SPVM::Fn->get_version_string('FindBin'));
 }
+
+SPVM::Fn->destroy_runtime_permanent_vars;
+
+my $end_memory_blocks_count = $api->get_memory_blocks_count();
+is($end_memory_blocks_count, $start_memory_blocks_count);
 
 done_testing;

@@ -9,7 +9,6 @@ no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 
-use Test::Fatal;
 use Test::Memory::Cycle;
 use Feature::Compat::Try;
 
@@ -26,20 +25,20 @@ my $minimal_document = {
 };
 
 subtest 'missing arguments' => sub {
-  like(
-    exception { OpenAPI::Modern->new },
+  die_result(
+    sub { OpenAPI::Modern->new },
     qr/missing required constructor arguments: either openapi_document, or openapi_uri/,
     'need openapi_document or openapi_uri',
   );
 
-  like(
-    exception { OpenAPI::Modern->new(openapi_uri => 'foo') },
+  die_result(
+    sub { OpenAPI::Modern->new(openapi_uri => 'foo') },
     qr/missing required constructor arguments: either openapi_document, or openapi_uri and openapi_schema/,
     'need openapi_document or openapi_schema',
   );
 
-  is(
-    exception {
+  lives_result(
+    sub {
       my $openapi = OpenAPI::Modern->new(
         openapi_document => JSON::Schema::Modern::Document::OpenAPI->new(
           canonical_uri => 'openapi.yaml',
@@ -52,12 +51,11 @@ subtest 'missing arguments' => sub {
       ok(!$openapi->evaluator->validate_formats, 'original evaluator is still defined');
       memory_cycle_ok($openapi);
     },
-    undef,
     'no exception when the document itself is provided',
   );
 
-  is(
-    exception {
+  lives_result(
+    sub {
       my $openapi = OpenAPI::Modern->new(
         openapi_uri => 'openapi.yaml',
         openapi_schema => $minimal_document,
@@ -68,12 +66,11 @@ subtest 'missing arguments' => sub {
       ok(!$openapi->evaluator->validate_formats, 'evaluator overrides the default');
       memory_cycle_ok($openapi, 'no cycles');
     },
-    undef,
     'no exception when all other arguments are provided',
   );
 
-  is(
-    exception {
+  lives_result(
+    sub {
       my $openapi = OpenAPI::Modern->new(
         openapi_uri => 'openapi.yaml',
         openapi_schema => $minimal_document,
@@ -83,7 +80,6 @@ subtest 'missing arguments' => sub {
       ok($openapi->evaluator->validate_formats, 'default evaluator is used');
       memory_cycle_ok($openapi, 'no cycles');
     },
-    undef,
     'no exception when evaluator is not provided',
   );
 };
@@ -100,7 +96,7 @@ subtest 'document errors' => sub {
     $result = $e;
   }
 
-  cmp_deeply(
+  cmp_result(
     $result->TO_JSON,
     {
       valid => false,

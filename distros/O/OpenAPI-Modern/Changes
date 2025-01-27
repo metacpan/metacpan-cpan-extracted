@@ -1,5 +1,13 @@
 Revision history for OpenAPI-Modern
 
+0.078     2025-01-27 05:41:19Z
+          - remove use of prototypes combined with signatures (unstable on
+            perls 5.22 through 5.26)
+
+0.077     2025-01-26 21:05:06Z
+          - fix usage of JSON::Schema::Modern::Result objects, in preparation
+            for an upcoming deprecation of boolean overloads
+
 0.076     2024-12-27 22:25:32Z
           - now supporting $refs in path-item objects (e.g. those under
             /paths/<path template>)

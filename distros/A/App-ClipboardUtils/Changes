@@ -1,6 +1,21 @@
+0.009   2025-01-27  Released-By: PERLANCAR; Urgency: medium
+
+        - Release v0.008.
+
+
+0.009   2025-01-27  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Add even shorter aliases: ca (for add-clipboard-content) & cg
+          (for get-clipboard-content).
+
+        [cli add-clipboard-content]
+
+        - Add option --tee (-t).
+
+
 0.008   2024-08-30  Released-By: PERLANCAR; Urgency: medium
 
-        - [cli clipadd] Add option --split-by.
+        - Add option --split-by (-s).
 
 
 0.007   2023-04-13  Released-By: PERLANCAR; Urgency: medium

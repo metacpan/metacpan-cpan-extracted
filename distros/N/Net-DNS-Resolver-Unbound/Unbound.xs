@@ -268,21 +268,20 @@ async(struct ub_ctx* ctx, int dothread)
 
 
 Net::DNS::Resolver::Unbound::Result
-ub_resolve(struct ub_ctx* ctx, SV* name, int rrtype, int rrclass)
+ub_resolve(struct ub_ctx* ctx, const char* qname, int qtype, int qclass)
     CODE:
-	checkerr( ub_resolve(ctx, (const char*) SvPVX(name), rrtype, rrclass, &RETVAL) );
+	checkerr( ub_resolve(ctx, qname, qtype, qclass, &RETVAL) );
     OUTPUT:
 	RETVAL
 
 
 Net::DNS::Resolver::Unbound::Handle
-ub_resolve_async(struct ub_ctx* ctx, SV* name, int rrtype, int rrclass, int query_id=0)
+ub_resolve_async(struct ub_ctx* ctx, const char* qname, int qtype, int qclass, int query_id)
     INIT:
 	int async_id = 0;
     CODE:
 	RETVAL = newAV();
-	checkerr( ub_resolve_async(ctx, (const char*) SvPVX(name), rrtype, rrclass,
-					(void*) RETVAL, async_callback, &async_id) );
+	checkerr( ub_resolve_async(ctx, qname, qtype, qclass, (void*) RETVAL, async_callback, &async_id) );
 	av_push(RETVAL, newSViv(query_id) );
     OUTPUT:
 	RETVAL
@@ -303,12 +302,12 @@ ub_wait(struct ub_ctx* ctx)
 ########################
 
 Net::DNS::Resolver::Unbound::Result
-mock_resolve(struct ub_ctx* ctx, SV* name, int secure, int bogus)
+mock_resolve(struct ub_ctx* ctx, const char* qname, int secure, int bogus)
     CODE:
-	checkerr( ub_resolve(ctx, (const char*) SvPVX(name), 1, 1, &RETVAL) );
-	if (bogus) RETVAL->answer_packet = NULL;
+	checkerr( ub_resolve(ctx, qname, 1, 1, &RETVAL) );
 	RETVAL->secure = secure;
-	RETVAL->bogus  = bogus;
+	RETVAL->bogus = bogus;
+	if (bogus) RETVAL->answer_packet = NULL;
     OUTPUT:
 	RETVAL
 

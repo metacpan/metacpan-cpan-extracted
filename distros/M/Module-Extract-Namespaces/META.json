@@ -57,6 +57,6 @@
          "web" : "https://github.com/briandfoy/module-extract-namespaces"
       }
    },
-   "version" : "1.024",
+   "version" : "1.025",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.597-16-gd392946c
+package JSON::Schema::Modern; # git description: v0.598-8-ga3c37e8e
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema using a JSON Schema
 # KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.598';
+our $VERSION = '0.599';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -183,15 +183,12 @@ sub add_document {
   my $document = shift or croak 'insufficient arguments';
   croak 'wrong document type' if not $document->$_isa('JSON::Schema::Modern::Document');
 
-  if ($document->has_errors) {
-    my $result = JSON::Schema::Modern::Result->new(
-      output_format => $self->output_format,
-      valid => 0,
-      errors => [ $document->errors ],
-      exception => 1,
-    );
-    die $result;
-  }
+  die JSON::Schema::Modern::Result->new(
+    output_format => $self->output_format,
+    valid => 0,
+    errors => [ $document->errors ],
+    exception => 1,
+  ) if $document->has_errors;
 
   if (not grep refaddr($_->{document}) == refaddr($document), $self->_canonical_resources) {
     my $schema_checksum = $document->_checksum
@@ -1197,7 +1194,7 @@ JSON::Schema::Modern - Validate data against a schema using a JSON Schema
 
 =head1 VERSION
 
-version 0.598
+version 0.599
 
 =head1 SYNOPSIS
 

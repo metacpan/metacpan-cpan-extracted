@@ -4,7 +4,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = '0.044';
+our $VERSION = '0.045';
 our $DEBUG = 0;
 
 use Carp;
@@ -163,7 +163,7 @@ Unicode, Inc.
 
 =head1 COPYRIGHT AND LICENSE
 
-This module is currently maintained by brian d foy (C<bdfoy@cpan.org>)
+This module is currently maintained by brian d foy (C<briandfoy@pobox.com>)
 for legacy applications.
 
 =over 2

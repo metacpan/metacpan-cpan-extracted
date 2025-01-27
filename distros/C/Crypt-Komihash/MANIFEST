@@ -1,6 +1,7 @@
 LICENSE
 MANIFEST
 README
+README.md
 Changes
 Makefile.PL
 example.pl
@@ -10,5 +11,6 @@ lib/Crypt/komihash.h
 lib/Crypt/rdtsc_rand.h
 t/01-komihash.t
 t/02-komihash_hex.t
+t/build_tests.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

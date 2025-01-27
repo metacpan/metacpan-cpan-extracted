@@ -1,3 +1,7 @@
+0.003 - 2025-01-26
+  * Add support for RIP-relative addressing
+  * 'data_X' methods are now chainable
+
 0.002 - 2023-04-19
   * Add support for 32-bit perl
 

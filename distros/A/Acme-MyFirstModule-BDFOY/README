@@ -1,5 +1,7 @@
 Acme-MyFirstModule-BDFOY
 
+(Yeah, this is now under BRIANDFOY because I changed my PAUSE ID)
+
 The README is used to introduce the module and provide instructions on
 how to install the module, any machine dependencies it may have (for
 example C compilers and installed libraries) and any other information
@@ -16,10 +18,10 @@ INSTALLATION
 
 To install this module, run the following commands:
 
-	perl Build.PL
-	./Build
-	./Build test
-	./Build install
+	perl Makefile.PL
+	make
+	make test
+	make install
 
 SUPPORT AND DOCUMENTATION
 
@@ -30,14 +32,8 @@ perldoc command.
 
 You can also look for information at:
 
-    RT, CPAN's request tracker (report bugs here)
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Acme-MyFirstModule-BDFOY
-
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/Acme-MyFirstModule-BDFOY
-
-    CPAN Ratings
-        http://cpanratings.perl.org/d/Acme-MyFirstModule-BDFOY
+    GitHub Repo
+        https://github.com/briandfoy/acme-myfirstmodule-bdfoy
 
     MetaCPAN
         https://metacpan.org/pod/Acme::MyFirstModule::BDFOY
@@ -45,7 +41,7 @@ You can also look for information at:
 
 LICENSE AND COPYRIGHT
 
-Copyright (C) 2011-2018 brian d foy
+Copyright (C) 2011-2025 brian d foy
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

@@ -1,5 +1,8 @@
 Revision history for Perl module Module::Extract::Namespaces
 
+1.025 2025-01-26T20:44:58Z
+	* refresh distro
+
 1.024 2024-02-10T21:36:24Z
 	* refresh distro, update email address, release under new PAUSE ID
 	BRIANDOY.

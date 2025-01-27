@@ -70,6 +70,7 @@ perlbench-timeit
 README.pod
 res-run.pl
 res-summary.pl
+SECURITY.md
 style.css
 t/sec_f.t
 t/stats.t

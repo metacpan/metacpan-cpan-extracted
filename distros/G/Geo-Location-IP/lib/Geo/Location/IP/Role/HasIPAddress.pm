@@ -10,7 +10,7 @@ use Object::Pad;
 
 role Geo::Location::IP::Role::HasIPAddress;
 
-our $VERSION = 0.001;
+our $VERSION = 0.002;
 
 field $ip_address :param :reader;
 
@@ -25,7 +25,7 @@ Geo::Location::IP::Role::HasIPAddress - Add an "ip_address" field
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

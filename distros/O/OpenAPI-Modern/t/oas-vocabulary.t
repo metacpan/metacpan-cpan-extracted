@@ -57,7 +57,7 @@ $accepter->acceptance(
         grep +($_->{error} =~ /^EXCEPTION/),
           ($result->TO_JSON->{errors}//[])->@*;
 
-    $result;
+    $result->valid;
   },
   @ARGV ? (tests => { file => \@ARGV }) : (),
   todo_tests => [

@@ -1,23 +1,10 @@
-Acme-MyFirstModule-BDFOY-0.01/Changes
-Acme-MyFirstModule-BDFOY-0.01/lib/Acme/MyFirstModule/BDFOY.pm
-Acme-MyFirstModule-BDFOY-0.01/Makefile.PL
-Acme-MyFirstModule-BDFOY-0.01/MANIFEST
-Acme-MyFirstModule-BDFOY-0.01/META.json
-Acme-MyFirstModule-BDFOY-0.01/META.yml
-Acme-MyFirstModule-BDFOY-0.01/MYMETA.json
-Acme-MyFirstModule-BDFOY-0.01/MYMETA.yml
-Acme-MyFirstModule-BDFOY-0.01/README
-Acme-MyFirstModule-BDFOY-0.01/t/00-load.t
-Acme-MyFirstModule-BDFOY-0.01/t/boilerplate.t
-Acme-MyFirstModule-BDFOY-0.01/t/manifest.t
-Acme-MyFirstModule-BDFOY-0.01/t/pod-coverage.t
-Acme-MyFirstModule-BDFOY-0.01/t/pod.t
 Changes
 lib/Acme/MyFirstModule/BDFOY.pm
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 README
+SECURITY.md
 t/00-load.t
 t/boilerplate.t
 t/manifest.t

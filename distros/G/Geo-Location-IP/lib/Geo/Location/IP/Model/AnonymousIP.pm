@@ -10,7 +10,7 @@ use Object::Pad;
 
 class Geo::Location::IP::Model::AnonymousIP;
 
-our $VERSION = 0.001;
+our $VERSION = 0.002;
 
 apply Geo::Location::IP::Role::HasIPAddress;
 
@@ -56,11 +56,11 @@ __END__
 
 =head1 NAME
 
-Geo::Location::IP::Model::AnonymousIP - Anonymity details about an IP addresses
+Geo::Location::IP::Model::AnonymousIP - Anonymity details
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

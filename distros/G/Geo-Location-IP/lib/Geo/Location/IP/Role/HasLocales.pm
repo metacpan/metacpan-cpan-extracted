@@ -10,7 +10,7 @@ use Object::Pad;
 
 role Geo::Location::IP::Role::HasLocales;
 
-our $VERSION = 0.001;
+our $VERSION = 0.002;
 
 field $locales :param :reader = ['en'];
 
@@ -25,7 +25,7 @@ Geo::Location::IP::Role::HasLocales - Add a "locales" field
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

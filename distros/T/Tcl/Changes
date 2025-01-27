@@ -1,5 +1,9 @@
 Revision history for Perl extension Tcl.
 
+1.51	2025-01-26
+	- tcl version/patchlevel seen on test matrix
+	- remove some old unused now DEBUG_REFCOUNTS
+
 1.50	2025-01-06
 	- fix for Tcl9
 

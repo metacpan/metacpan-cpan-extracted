@@ -2,5 +2,6 @@
 # MIT License
 
 class HTTP::Tiny::CookieJar::Interface : interface_t {
+  version_from HTTP::Tiny;
   
 }

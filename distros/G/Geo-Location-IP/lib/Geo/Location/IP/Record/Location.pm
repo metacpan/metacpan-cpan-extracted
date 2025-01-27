@@ -10,7 +10,7 @@ use Object::Pad;
 
 class Geo::Location::IP::Record::Location;
 
-our $VERSION = 0.001;
+our $VERSION = 0.002;
 
 field $accuracy_radius :param :reader    = undef;
 field $average_income :param :reader     = undef;
@@ -55,7 +55,7 @@ Geo::Location::IP::Record::Location - Location details
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

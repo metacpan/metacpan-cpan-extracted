@@ -11,7 +11,7 @@ use Object::Pad;
 class Geo::Location::IP::Record::RepresentedCountry
     :isa(Geo::Location::IP::Record::Country);
 
-our $VERSION = 0.001;
+our $VERSION = 0.002;
 
 field $type :param :reader = undef;
 
@@ -47,7 +47,7 @@ Geo::Location::IP::Record::RepresentedCountry - Country details with a "type" fi
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

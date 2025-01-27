@@ -127,12 +127,16 @@
             "CPAN::Meta" : "2.120900"
          },
          "requires" : {
+            "CPAN::Meta::Check" : "0.011",
+            "CPAN::Meta::Requirements" : "0",
+            "Digest::MD5" : "0",
             "File::Spec" : "0",
             "Module::Metadata" : "0",
             "Mojolicious" : "0",
+            "Term::ANSIColor" : "0",
             "Test2::API" : "0",
+            "Test2::Tools::Exception" : "0",
             "Test::Deep" : "0",
-            "Test::Fatal" : "0",
             "Test::File::ShareDir" : "0",
             "Test::JSON::Schema::Acceptance" : "1.014",
             "Test::Memory::Cycle" : "0",
@@ -154,6 +158,7 @@
             "Dist::Zilla::Plugin::Authority" : "1.009",
             "Dist::Zilla::Plugin::AutoMetaResources" : "0",
             "Dist::Zilla::Plugin::AutoPrereqs" : "5.038",
+            "Dist::Zilla::Plugin::Breaks" : "0",
             "Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional" : "0.004",
             "Dist::Zilla::Plugin::CheckIssues" : "0",
             "Dist::Zilla::Plugin::CheckMetaResources" : "0",
@@ -202,11 +207,13 @@
             "Dist::Zilla::Plugin::RewriteVersion::Transitional" : "0.006",
             "Dist::Zilla::Plugin::Run::AfterBuild" : "0.041",
             "Dist::Zilla::Plugin::Run::AfterRelease" : "0.038",
+            "Dist::Zilla::Plugin::Run::BeforeRelease" : "0",
             "Dist::Zilla::Plugin::RunExtraTests" : "0.024",
             "Dist::Zilla::Plugin::ShareDir" : "0",
             "Dist::Zilla::Plugin::StaticInstall" : "0.005",
             "Dist::Zilla::Plugin::Test::CPAN::Changes" : "0.012",
             "Dist::Zilla::Plugin::Test::ChangesHasContent" : "0",
+            "Dist::Zilla::Plugin::Test::CheckBreaks" : "0",
             "Dist::Zilla::Plugin::Test::CleanNamespaces" : "0.006",
             "Dist::Zilla::Plugin::Test::Compile" : "2.039",
             "Dist::Zilla::Plugin::Test::EOL" : "0.17",
@@ -228,15 +235,15 @@
    "provides" : {
       "JSON::Schema::Modern::Document::OpenAPI" : {
          "file" : "lib/JSON/Schema/Modern/Document/OpenAPI.pm",
-         "version" : "0.076"
+         "version" : "0.078"
       },
       "JSON::Schema::Modern::Vocabulary::OpenAPI" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/OpenAPI.pm",
-         "version" : "0.076"
+         "version" : "0.078"
       },
       "OpenAPI::Modern" : {
          "file" : "lib/OpenAPI/Modern.pm",
-         "version" : "0.076"
+         "version" : "0.078"
       }
    },
    "release_status" : "stable",
@@ -251,12 +258,27 @@
          "web" : "https://github.com/karenetheridge/OpenAPI-Modern"
       }
    },
-   "version" : "0.076",
+   "version" : "0.078",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.041007"
+         "version" : "5.041008"
       },
       "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::Run::BeforeRelease",
+            "config" : {
+               "Dist::Zilla::Plugin::Run::Role::Runner" : {
+                  "eval" : [
+                     "do './update-schemas'; die $@ || $! if $@ || $!"
+                  ],
+                  "fatal_errors" : 1,
+                  "quiet" : 0,
+                  "version" : "0.050"
+               }
+            },
+            "name" : "Run::BeforeRelease",
+            "version" : "0.050"
+         },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
             "config" : {
@@ -895,7 +917,7 @@
             "class" : "Dist::Zilla::Plugin::EnsureLatestPerl",
             "config" : {
                "Dist::Zilla::Plugin::EnsureLatestPerl" : {
-                  "Module::CoreList" : "5.20241220"
+                  "Module::CoreList" : "5.20250120"
                }
             },
             "name" : "@Author::ETHER/EnsureLatestPerl",
@@ -1113,7 +1135,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.076",
+                  "tag" : "v0.078",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },
@@ -1301,6 +1323,26 @@
             "version" : "6.032"
          },
          {
+            "class" : "Dist::Zilla::Plugin::Breaks",
+            "name" : "Breaks",
+            "version" : "0.004"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::CheckBreaks",
+            "config" : {
+               "Dist::Zilla::Plugin::Test::CheckBreaks" : {
+                  "conflicts_module" : [],
+                  "no_forced_deps" : 0
+               },
+               "Dist::Zilla::Role::ModuleMetadata" : {
+                  "Module::Metadata" : "1.000038",
+                  "version" : "0.006"
+               }
+            },
+            "name" : "Test::CheckBreaks",
+            "version" : "0.020"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":InstallModules",
             "version" : "6.032"
@@ -1365,7 +1407,10 @@
       }
    },
    "x_authority" : "cpan:ETHER",
-   "x_generated_by_perl" : "v5.41.7",
+   "x_breaks" : {
+      "Test::Mojo::Role::OpenAPI::Modern" : "< 0.007"
+   },
+   "x_generated_by_perl" : "v5.41.8",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 1,

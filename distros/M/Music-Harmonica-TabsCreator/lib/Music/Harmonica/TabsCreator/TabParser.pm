@@ -7,7 +7,7 @@ use utf8;
 
 use Readonly;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 # This class converts a tab into tones (degrees) relative to the key of C4.
 # It accepts an input specifying the tuning of an harmonica.
@@ -33,7 +33,7 @@ sub parse ($self, $tab) {
       next;
     }
 
-    if ($tab =~ m/\G(#.*?(?:\v|$))/mgc) {
+    if ($tab =~ m/ \G \# \s* ( .*? (?:\r\n|\n|\r|\v|\z) )/xgc) {
       push @out, $1;
       next;
     }

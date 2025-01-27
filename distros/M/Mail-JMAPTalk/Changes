@@ -1,5 +1,8 @@
 Revision history for Perl extension Mail::JMAPTalk.
 
+0.17  Sun Jan 26 23:31:00 AEST 2025
+    - pass through SSL_options to HTTP::Tiny
+
 0.16  Thu Oct 17 20:01:00 EDT 2024
     - add the ability to pass extra headers to the Upload function
 

@@ -10,7 +10,7 @@ use Object::Pad;
 
 class Geo::Location::IP::Record::City;
 
-our $VERSION = 0.001;
+our $VERSION = 0.002;
 
 apply Geo::Location::IP::Role::Record::HasConfidence;
 apply Geo::Location::IP::Role::Record::HasGeoNameId;
@@ -45,7 +45,7 @@ Geo::Location::IP::Record::City - City details
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -60,7 +60,7 @@ version 0.001
 
 =head1 DESCRIPTION
 
-This class contains details about a city associated with an IP address.
+This class contains details about the city associated with an IP address.
 
 All fields may be undefined.
 

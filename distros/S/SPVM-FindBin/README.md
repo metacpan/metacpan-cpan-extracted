@@ -1,4 +1,3 @@
 # SPVM::FindBin
 
-SPVM::FindBin is a SPVM module.
-
+L<a href="https://metacpan.org/pod/SPVM::FindBin">SPVM::FindBin - CPAN</a>
