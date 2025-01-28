@@ -31,8 +31,9 @@ sub get_templates($self, $key) {
     my $template_fkey = $self->templates->get_data_section('foreign_key');
     $template_fkey =~ s/<<referenced_table>>/$referenced_table/ig;
     my $template_ind = $self->templates->get_data_section('index');
+    my $table_name = $self->tablename;
     $template_ind =~ s/<<type>>//ig;
-    $template_ind =~ s/<<table>>/$self->tablename/ig;
+    $template_ind =~ s/<<table>>/$table_name/ig;
     $template_ind =~ s/<<field_names>>/$key/ig;
     $template_ind =~ s/<<fields>>/$key/ig;
     $self->created(1);

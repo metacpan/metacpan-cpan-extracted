@@ -4,7 +4,7 @@
       "Joseph N. Hall <jnh@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -48,10 +48,10 @@
       "homepage" : "https://github.com/briandfoy/sort-fields",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/briandfoy/sort-fields.git",
+         "url" : "https://github.com/briandfoy/sort-fields",
          "web" : "https://github.com/briandfoy/sort-fields"
       }
    },
-   "version" : "1.001",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "1.002",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

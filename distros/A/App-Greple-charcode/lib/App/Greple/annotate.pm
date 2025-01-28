@@ -4,7 +4,7 @@ use 5.024;
 use warnings;
 use utf8;
 
-our $VERSION = "0.9901";
+our $VERSION = "0.9902";
 
 =encoding utf-8
 
@@ -18,7 +18,7 @@ B<greple> B<-Mannotate> ...
 
 =head1 VERSION
 
-Version 0.9901
+Version 0.9902
 
 =head1 DESCRIPTION
 
@@ -32,9 +32,20 @@ to display annotation for each matched text in the following style.
             │ ├─  14 \x{fe0e} \N{VARIATION SELECTOR-15}
     Copyright︎ ©︎ 2025 Kazumasa Utashiro.
 
-=for html<p>
+=for html <p>
 <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-charcode/refs/heads/main/images/ka-ko.png">
 </p>
+
+=head1 COMMAND OPTIONS
+
+=over 7
+
+=item B<--annotate>, B<--no-annotate>
+
+Print annotation or not.  Enabled by default, so use C<--no-annotate>
+to disable it.
+
+=back
 
 =head1 MODULE OPTIONS
 
@@ -45,6 +56,11 @@ to display annotation for each matched text in the following style.
 Align annotation messages.  Defaults to C<1>, which aligns to the
 rightmost column; C<0> means no align; if a value of C<2> or greater
 is given, it aligns to that numbered column.
+
+=item B<--split>, $B<--no-split>
+
+If a pattern matching multiple characters is given, annotate each
+character independently.
 
 =back
 
@@ -122,11 +138,13 @@ Kazumasa Utashiro
 
 =cut
 
-use Getopt::EX::Config qw(config);
+use Getopt::EX::Config;
 use Hash::Util qw(lock_keys);
 
 our $config = Getopt::EX::Config->new(
+    annotate => \(our $opt_annotate = 1),
     align => 1,
+    split => 0,
 );
 my %type = ( align => '=i', '*' => '!' );
 lock_keys %{$config};
@@ -160,6 +178,53 @@ package Local::Annon {
     sub annon :lvalue { shift->[2] }
 }
 
+package Local::Annon::List {
+    use strict;
+    use warnings;
+    use List::Util;
+    sub new {
+	my $class = shift;
+	bless {
+	    Annotation => [],
+	    Count      => [],
+	}, $class;
+    }
+    sub annotation { $_[0]->{Annotation} }
+    sub count { $_[0]->{Count} }
+    sub push {
+	my $obj = CORE::shift;
+	push @{$obj->annotation}, @_;
+	push @{$obj->count}, int @_;
+    }
+    sub append {
+	my $obj = CORE::shift;
+	CORE::push @{$obj->annotation}, @_;
+	$obj->count->[-1] += int @_;
+    }
+    sub shift {
+	my $obj = CORE::shift;
+	my $count = CORE::shift @{$obj->count};
+        splice @{$obj->annotation}, 0, $count
+    }
+    sub join {
+	my $obj = CORE::shift;
+	for (@_) {
+	    CORE::push @{$obj->annotation}, @{$_->annotation};
+	    CORE::push @{$obj->count}, @{$_->count};
+	}
+    }
+    sub total {
+	my $obj = CORE::shift;
+        List::Util::sum @{$obj->count} // 0;
+    }
+    sub last {
+	my $obj = CORE::shift;
+        $obj->annotation->[-1];
+    }
+}
+
+my $annotation = Local::Annon::List->new;
+
 our $ANNOTATE //= sub {
     my %param = @_;
     my($column, $str) = @param{qw(column match)};
@@ -167,7 +232,6 @@ our $ANNOTATE //= sub {
 };
 
 sub prepare {
-    our @annotation;
     my $grep = shift;
     for my $r ($grep->result) {
 	my($b, @match) = @$r;
@@ -175,7 +239,7 @@ sub prepare {
 	my $start = 0;
 	my $progress = '';
 	my $indent = '';
-	my @annon;
+	my $current = Local::Annon::List->new;
 	while (my($i, $slice) = each @slice) {
 	    next if $slice eq '';
 	    my $end = vwidth($progress . $slice);
@@ -186,47 +250,67 @@ sub prepare {
 		$indent_mark = '│';
 		my $head = '┌';
 		if ($gap == 0) {
-		    if (@annon > 0 and $annon[-1]->end == $start) {
+		    if ($start == 0) {
+			$head = '╾';
+			$indent_mark = '';
+		    } elsif ($current->total > 0 and $current->last->end == $start) {
 			$head = '├';
-			$start = $annon[-1]->start;
+			$start = $current->last->start;
 			substr($indent, $start) = '';
 		    } elsif ($start > 0) {
 			$start = vwidth($progress =~ s/\X\z//r);
 			substr($indent, $start) = '';
 		    }
 		}
-		my $out = sprintf("%s%s─ %s",
-				  $indent,
-				  $head,
-				  $ANNOTATE->(column => $start, match => $slice));
-		push @annon, Local::Annon->new($start, $end, $out);
+		my $sub = sub {
+		    my($head, $match) = @_;
+		    sprintf("%s%s─ %s", $indent, $head,
+			    $ANNOTATE->(column => $start, match => $match));
+		};
+		$current->push( do {
+		    if ($config->{split}) {
+			map {
+			    my $out = $sub->($head, $_);
+			    $head = '├';
+			    Local::Annon->new($start, $end, $out);
+			}
+			$slice =~ /./g;
+		    } else {
+			Local::Annon->new($start, $end, $sub->($head, $slice));
+		    }
+		} );
 	    }
 	    $indent .= sprintf("%-*s", $end - $start, $indent_mark);
 	    $progress .= $slice;
 	    $start = $end;
 	}
-	@annon or next;
-	if ((my $align = $config->{align}) and (my $max_pos = $annon[-1][0])) {
+	$current->count or next;
+	if ((my $align = $config->{align}) and (my $max_pos = $current->last->[0])) {
 	    $max_pos = $align if $align > 1;
-	    for (@annon) {
+	    for (@{$current->annotation}) {
 		if ((my $extend = $max_pos - $_->[0]) > 0) {
 		    $_->annon =~ s/(?=([─]))/$1 x $extend/e;
 		}
 	    }
 	}
-	push @annotation, map $_->annon, @annon;
+	$annotation->join($current);
     }
 }
 
 sub annotate {
-    our @annotation;
-    say shift(@annotation) if @annotation > 0;
+    config('annotate') or return;
+    use Data::Dumper;
+    if (my @annon = $annotation->shift) {
+	say $_->annon for @annon;
+    }
     undef;
 }
 
 1;
 
 __DATA__
+
+builtin annotate! $opt_annotate
 
 option default \
     --postgrep '&__PACKAGE__::prepare' \

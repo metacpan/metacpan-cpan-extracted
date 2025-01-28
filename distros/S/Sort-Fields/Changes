@@ -1,5 +1,8 @@
 Revision history for Perl extension Sort::Fields
 
+1.002 2025-01-27T12:38:26Z
+	* refresh distro and move to BRIANDFOY
+
 1.001 2021-01-04T23:52:23Z
 	* rt.cpan.org will shut down in March 2021, so it's a good time
 	to give this module different meta data

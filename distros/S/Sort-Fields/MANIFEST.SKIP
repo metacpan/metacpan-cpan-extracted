@@ -57,8 +57,13 @@
 ^MYMETA\.
 #!end included /usr/local/perls/perl-5.20.0/lib/5.20.0/ExtUtils/MANIFEST.SKIP
 
-\.travis\.yml
 \.?appveyor.yml
 \.releaserc
 \.lwpcookies
 \.github
+\bMANIFEST\s\d
+\bChanges\s\d
+\.icloud$
+\A\.github\b
+
+\.gitattributes\b

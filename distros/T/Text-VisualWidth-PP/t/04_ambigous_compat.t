@@ -14,5 +14,11 @@ my $AMBIGIOUSCHAR = "\x{2010}";
 
 is(Text::VisualWidth::PP::width($AMBIGIOUSCHAR), 2);
 
+my $AMBIGIOUSSTR = "\x{2010}" x 4;
+
+is(Text::VisualWidth::PP::trim($AMBIGIOUSSTR, 2), "\x{2010}");
+is(Text::VisualWidth::PP::trim($AMBIGIOUSSTR, 3), "\x{2010}");
+is(Text::VisualWidth::PP::trim($AMBIGIOUSSTR, 4), "\x{2010}" x 2);
+
 done_testing;
 

@@ -1,5 +1,13 @@
 Revision history for Perl extension App-Greple-charcode
 
+0.9902 2025-01-27T15:04:24Z
+
+    - add options for combined character match
+    - introduce "split" config parameter
+    - introduce --visible option
+    - use different mark for line-head insertion
+    - improve --ansicolor option
+
 0.9901 2025-01-25T07:17:31Z
 
     - option --align=# takes column number

@@ -1,5 +1,20 @@
 Revision history for Perl module Text::VisualWidth::PP
 
+0.06 2025-01-27T15:19:37Z
+
+    - Update trim() to handle ambiguous character properly. Resolves #6, #10
+      (kaz-utashiro)
+      https://github.com/tokuhirom/Text-VisualWidth-PP/pull/9
+    - Ignore Default_Ignorable Code Points #8
+      (DabeDotCom)
+      https://github.com/tokuhirom/Text-VisualWidth-PP/pull/8
+    - Fix combined character test to run with perl < 5.12 #7
+      (kaz-utashiro)
+      https://github.com/tokuhirom/Text-VisualWidth-PP/pull/7
+    - Load "charnames" and SKIP test when unicode name is not available. #5
+      (kaz-utashiro)
+      https://github.com/tokuhirom/Text-VisualWidth-PP/pull/5
+
 0.05 2017-11-22T02:30:45Z
 
     - Support unicode combining characters

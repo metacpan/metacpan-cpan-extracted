@@ -8,7 +8,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::Spec::Functions: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,6 +23,6 @@ requires:
 resources:
   bugtracker: https://github.com/briandfoy/sort-fields/issues
   homepage: https://github.com/briandfoy/sort-fields
-  repository: https://github.com/briandfoy/sort-fields.git
-version: '1.001'
+  repository: https://github.com/briandfoy/sort-fields
+version: '1.002'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

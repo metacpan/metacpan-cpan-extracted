@@ -14,10 +14,10 @@ sub create_sql($self) {
     for (my $i = 0; $i < $length; $i++) {
         my $type = $self->templates->get_section(@{$json}[$i]->{type});
         my $template = $self->templates->get_section($type);
-
+        my $table_name = $self->tablename;
         match ($type : eq) {
             case('insert') {
-                $template =~ s/<<tablename>>/$self->tablename/ig;
+                $template =~ s/<<tablename>>/$table_name/ig;
                 $template =~ s/<<fields>>/@{$json}[$i]->{fields}/ig;
                 $template =~ s/<<values>>/@{$json}[$i]->{values}/ig;
             }

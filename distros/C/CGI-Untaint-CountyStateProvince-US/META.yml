@@ -5,11 +5,13 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '3.4'
+  Test::DescribeMe: '0'
   Test::Most: '0'
+  Test::Needs: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.54, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,9 +22,14 @@ no_index:
     - t
     - inc
 requires:
+  CGI: '0'
   CGI::Untaint: '0'
   CGI::Untaint::CountyStateProvince: '0.04'
+  ExtUtils::MakeMaker: '6.64'
   Locale::SubCountry: '1.47'
   Test::NoWarnings: '0'
-version: '0.04'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+resources:
+  bugtracker: https://github.com/nigelhorne/CGI-Untaint-CountyStateProvince-US/issues
+  repository: git://github.com/nigelhorne/CGI-Untaint-CountyStateProvince.git
+version: '0.05'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

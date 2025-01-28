@@ -97026,3 +97026,13 @@ K/KI/KIMOTO/SPVM-IO-0.233.tar.gz
 K/KI/KIMOTO/SPVM-IO-Socket-SSL-0.009.tar.gz
 V/VK/VKON/Tcl-1.51.tar.gz
 B/BR/BRIANDFOY/Unicode-Unihan-0.045.tar.gz
+U/UT/UTASHIRO/App-Greple-charcode-0.9902.tar.gz
+L/LN/LNATION/Bijection-XS-0.05.tar.gz
+B/BR/BRIANDFOY/Business-ISSN-1.008.tar.gz
+N/NH/NHORNE/CGI-Untaint-CountyStateProvince-US-0.05.tar.gz
+D/DY/DYACOB/Convert-Number-Ethiopic-0.18.tar.gz
+J/JA/JANESKIL/Tools/Daje-Workflow-GenerateSQL-Activity-1.01.tar.gz
+B/BR/BRIANDFOY/Perl-Version-1.018.tar.gz
+B/BR/BRIANDFOY/Sort-Fields-1.002.tar.gz
+U/UT/UTASHIRO/Text-ANSI-Fold-2.28.tar.gz
+T/TO/TOKUHIROM/Text-VisualWidth-PP-0.06.tar.gz

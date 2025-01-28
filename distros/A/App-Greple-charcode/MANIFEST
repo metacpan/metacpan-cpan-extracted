@@ -4,12 +4,15 @@ LICENSE
 META.json
 README.md
 cpanfile
+images/ansicode.png
+images/homoglyph.png
 images/ka-ko.png
 lib/App/Greple/annotate.pm
 lib/App/Greple/charcode.pm
 minil.toml
 t/00_compile.t
 t/ainu.txt
+t/homoglyph
 t/ka-ko.out
 t/ka-ko.txt
 META.yml

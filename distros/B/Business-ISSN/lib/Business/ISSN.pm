@@ -12,7 +12,7 @@ use Exporter qw(import);
 our @EXPORT    = qw();
 our @EXPORT_OK = qw(is_valid_checksum);
 
-our $VERSION = '1.005';
+our $VERSION = '1.008';
 
 sub new {
 	my $class       = shift;
@@ -216,7 +216,7 @@ comparison routine.  Returns 1 if the ISSN is valid, 0 otherwise.
 
 =head1 AUTHOR
 
-Currently maintained by brian d foy C<< <brian.d.foy@gmail.com> >>.
+Currently maintained by brian d foy C<< <briandfoy@pobox.com> >>.
 
 Original module by Sami Poikonen, based on Business::ISBN by brian d foy.
 
@@ -224,7 +224,7 @@ This module is released under the terms of the Perl Artistic License.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 1999-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 1999-2025, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

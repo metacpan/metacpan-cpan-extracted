@@ -4,7 +4,7 @@
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.54, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -32,8 +32,10 @@
       },
       "runtime" : {
          "requires" : {
+            "CGI" : "0",
             "CGI::Untaint" : "0",
             "CGI::Untaint::CountyStateProvince" : "0.04",
+            "ExtUtils::MakeMaker" : "6.64",
             "Locale::SubCountry" : "1.47",
             "Test::NoWarnings" : "0"
          }
@@ -41,11 +43,26 @@
       "test" : {
          "requires" : {
             "File::Spec" : "3.4",
-            "Test::Most" : "0"
+            "Test::DescribeMe" : "0",
+            "Test::Most" : "0",
+            "Test::Needs" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.04",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-CGI-Untaint-CountyStateProvince-US@rt.cpan.org",
+         "web" : "https://github.com/nigelhorne/CGI-Untaint-CountyStateProvince-US/issues",
+         "x_url" : "https://github.com/nigelhorne/CGI-Untaint-CountyStateProvince-US/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/nigelhorne/CGI-Untaint-CountyStateProvince.git",
+         "web" : "https://github.com/nigelhorne/CGI-Untaint-CountyStateProvince",
+         "x_repository" : "https://github.com/nigelhorne/CGI-Untaint-CountyStateProvince"
+      }
+   },
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

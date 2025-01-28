@@ -1,5 +1,14 @@
 Revision history for Perl module Business::ISSN
 
+1.008 2025-01-27T13:08:21Z
+	* refresh distro and move to BRIANDFOY
+
+1.007 2025-01-03T23:31:57Z
+	* refresh distro and move to BRIANDFOY
+
+1.006 2024-02-10T21:59:55Z
+	* refresh distro, update email addresses, move to BRIANDFOY
+
 1.005 2022-02-18T02:19:46Z
 	* Refresh distro, fix license issue
 

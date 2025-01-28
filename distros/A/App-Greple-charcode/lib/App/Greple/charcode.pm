@@ -4,7 +4,7 @@ use 5.024;
 use warnings;
 use utf8;
 
-our $VERSION = "0.9901";
+our $VERSION = "0.9902";
 
 =encoding utf-8
 
@@ -12,25 +12,40 @@ our $VERSION = "0.9901";
 
 App::Greple::charcode - greple module to annotate unicode character data
 
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-charcode/refs/heads/main/images/homoglyph.png">
+</p>
+
 =head1 SYNOPSIS
 
 B<greple> B<-Mcharcode> ...
 
-B<greple> B<-Mcharcode> [ I<module option> ] -- [ I<greple option> ] ...
+B<greple> B<-Mcharcode> [ I<module option> ] -- [ I<command option> ] ...
 
-  MODULE OPTIONS
-    --[no-]column display column number
-    --[no-]char   display character itself
-    --[no-]width  display width
-    --[no-]code   display character code
-    --[no-]name   display character name
-    --align=#     align annotation
+  COMMAND OPTION
+    --no-annotate  do not print annotation
+    --composite    find composite character (combining character sequence)
+    --precomposed  find precomposed character
+    --combind      find both composite and precomposed characters
+    --dt=type      specify decomposition type
+    --ansicode     find ANSI terminal control sequences
 
-    --config KEY[=VALUE],... (KEY: column, char, width, code, name, align)
+  MODULE OPTION
+    --[no-]column  display column number
+    --[no-]char    display character itself
+    --[no-]width   display width
+    --[no-]code    display character code
+    --[no-]name    display character name
+    --[no-]visible display character name
+    --[no-]split   put annotattion for each character
+    --align=#      align annotation
+
+    --config KEY[=VALUE],...
+             (KEY: column char width code name visible align)
 
 =head1 VERSION
 
-Version 0.9901
+Version 0.9902
 
 =head1 DESCRIPTION
 
@@ -70,13 +85,77 @@ character.  This module allows you to see how it is done.
     │ │ │ │ ├─   8 \x{309a} \N{COMBINING KATAKANA-HIRAGANA SEMI-VOICED SOUND MARK}
     カ゚キ゚ク゚ケ゚コ゚
 
-=begin html
-
-<p>
+=for html <p>
 <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-charcode/refs/heads/main/images/ka-ko.png">
 </p>
 
-=end html
+=head1 COMMAND OPTIONS
+
+=over 7
+
+=item B<--annotate>, B<--no-annotate>
+
+Print annotation or not.  Enabled by default, so use C<--no-annotate>
+to disable it.
+
+=back
+
+=head2 CHARACTER CODE OPTIONS
+
+The following options are used to search for Unicode combining
+characters.
+
+If multiple patterns are given to B<greple>, it normally prints only
+the lines that match all of the patterns.  However, for the purposes
+of this module, it is desirable to display lines that match any of
+them, so the C<--need=1> option is specified by default.
+
+If multiple patterns are specified, the strings matching each pattern
+will be displayed in a different color.
+
+=over 7
+
+=item B<--composite>
+
+Search for composite characters (combining character sequence)
+composed of base and combining characters.
+
+=item B<--precomposed>
+
+Search for precomposed characters (C<\p{Dt=Canonical}>).
+
+=item B<--combind>
+
+Find both B<composite> and B<precomposed> characters.
+
+=item B<--dt>=I<type>, B<--decomposition-type>=I<type>
+
+Specifies the C<Decomposition_Type>.  It can take three values:
+C<Canonical>, C<Non_Canonical> (C<NonCanon>), or C<None>.
+
+=item B<--ansicode>
+
+Search ANSI terminal control sequence.  Automatically disables C<name>
+and C<code> parameter and activates C<visible>.  Colorized output is
+disabled too.
+
+To be precise, it searches for CSI Control sequences defined in
+ECMA-48.  Pattern is defined as this.
+
+    define ECMA-CSI <<EOL
+        (?x)
+        # see ECMA-48 5.4 Control sequences
+        (?: \e\[ | \x9b ) # csi
+        [\x30-\x3f]*      # parameter bytes
+        [\x20-\x2f]*      # intermediate bytes
+        [\x40-\x7e]       # final byte
+    EOL
+
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-charcode/refs/heads/main/images/ansicode.png">
+</p>
+
+=back
 
 =head1 MODULE OPTIONS
 
@@ -107,11 +186,21 @@ Default B<true>.
 Show the Unicode name of the character.
 Default B<true>.
 
+=item B<-->[B<no->]B<visible>
+
+Display invisible characters in a visible string representation.
+Default False.
+
 =item B<--align>=I<column>
 
 Align annotation messages.  Defaults to C<1>, which aligns to the
 rightmost column; C<0> means no align; if a value of C<2> or greater
 is given, it aligns to that numbered column.
+
+=item B<-->[B<no->]B<split>
+
+If a pattern matching multiple characters is given, annotate each
+character independently.
 
 =back
 
@@ -163,6 +252,12 @@ Show the character code in hex.
 (default 1)
 Show the Unicode name of the character.
 
+=item B<visible>
+
+(default 0)
+
+Display invisible characters in a visible string representation.
+
 =item B<align>=I<column>
 
 (default 1)
@@ -195,18 +290,23 @@ Kazumasa Utashiro
 
 =cut
 
-use Getopt::EX::Config qw(config);
+use Getopt::EX::Config;
 use Hash::Util qw(lock_keys);
+use Data::Dumper;
 
 use App::Greple::annotate;
 
-my $config = Getopt::EX::Config->new(
-    column => 1,
-    char   => 0,
-    width  => 0,
-    code   => 1,
-    name   => 1,
-    align  => \$App::Greple::annotate::config->{align},
+our $opt_annotate = 0;
+
+our $config = Getopt::EX::Config->new(
+    column   => 1,
+    char     => 0,
+    width    => 0,
+    visible  => 0,
+    code     => 1,
+    name     => 1,
+    align    => \$App::Greple::annotate::config->{align},
+    split    => \$App::Greple::annotate::config->{split},
 );
 my %type = ( align => '=i', '*' => '!' );
 lock_keys %{$config};
@@ -226,7 +326,6 @@ sub finalize {
 }
 
 use Unicode::UCD qw(charinfo);
-use Data::Dumper;
 
 sub charname {
     local $_ = @_ ? shift : $_;
@@ -250,11 +349,38 @@ sub code {
     sprintf($format->[$ord > 0xff], $ord);
 }
 
+my %cmap = (
+    "\t" => '\t',
+    "\n" => '\n',
+    "\r" => '\r',
+    "\f" => '\f',
+    "\b" => '\b',
+    "\a" => '\a',
+    "\e" => '\e',
+);
+
+sub control {
+    local $_ = @_ ? shift : $_;
+    if (s/\A([\t\n\r\f\b\a\e])/$cmap{$1}/e) {
+	$_;
+    } elsif (s/\A([\x00-\x1f])/sprintf "\\c%c", ord($1)+0x40/e) {
+	$_;
+    } else {
+	code($_);
+    }
+}
+
+sub visible {
+    local $_ = @_ ? shift : $_;
+    s{([^\pL\pN\pP\pS])}{control($1)}ger;
+}
+
 sub describe {
     local $_ = shift;
     my @s;
     push @s, "{$_}"                         if $config->{char};
     push @s, sprintf("\\w{%d}", vwidth($_)) if $config->{width};
+    push @s, visible($_)                    if $config->{visible};
     push @s, join '', map { charcode } /./g if $config->{code};
     push @s, join '', map { charname } /./g if $config->{name};
     join "\N{NBSP}", @s;
@@ -268,10 +394,82 @@ sub annotate {
     $annon;
 }
 
+#
+# Match with \X and then postgrep to remove any areas that are not
+# composed of multiple characters.  If you can write it in a regular
+# expression, that's better.
+#
+sub select_combined {
+    my $grep = shift;
+    for my $r ($grep->result) {
+	my($b, @match) = @$r;
+	my $matched = int @match;
+	if (@match = grep { ($_->[1] - $_->[0]) > 1 } @match) {
+	    @$r = ($b, @match);
+	} else {
+	    @$r = ();
+	}
+    }
+}
+
 $App::Greple::annotate::ANNOTATE = \&annotate;
 
 1;
 
 __DATA__
 
-option default -Mannotate --separate --uniqcolor
+option --load-annotate -Mannotate
+
+option default \
+    --need=1 \
+    --fs=once --ls=separate $<move> --load-annotate
+
+option --select-combined \
+    -E '\X' \
+    --postgrep '&__PACKAGE__::select_combined'
+
+define \p{CombinedChar} \p{Format}\p{Mark}
+define \p{Combined}     [\p{CombinedChar}]
+define \p{Base}         [^\p{CombinedChar}]
+
+option --composite -GE '(\p{Base})(\p{Combined}+)'
+
+option --decomposition-type -E '\p{Decomposition_Type=$<shift>}'
+option --dt --decomposition-type
+
+option --precomposed --decomposition-type=Canonical
+option --noncanon    --decomposition-type=NonCanon
+
+option --combined \
+    --precomposed --composite
+
+define ECMA-CSI <<EOL
+    (?x)
+    # see ECMA-48 5.4 Control sequences
+    (?: \e\[ | \x9b )	# csi
+    [\x30-\x3f]*	# parameter bytes
+    [\x20-\x2f]*	# intermediate bytes
+    [\x40-\x7e]		# final byte
+EOL
+
+define ECMA-RESET <<EOL
+    (?x)
+    (?: (?: \e\[ | \x9b ) [0;]* m )+
+    (?: (?: \e\[ | \x9b ) [0;]* K )*
+EOL
+
+expand --visible-option \
+    -Mcharcode --config code=0,name=0,visible=1 -- \
+    --cm=N
+
+option --ansicode \
+    --visible-option \
+    -E '(?:ECMA-RESET)+|(?:ECMA-CSI)'
+
+option --ansicode-each \
+    --visible-option \
+    -E ECMA-CSI
+
+option --ansicode-seq \
+    --visible-option \
+    -E '(?:ECMA-CSI)+'

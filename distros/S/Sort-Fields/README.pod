@@ -2,13 +2,13 @@
 
 =encoding utf8
 
-=for HTML <a href="https://github.com/briandfoy/sort-fields/actions?query=workflow%3Amacos"><img src="https://github.com/briandfoy/sort-fields/workflows/macos/badge.svg"></a>
+=for HTML <a href="https://www.github.com/briandfoy/sort-fields/actions?query=workflow%3Amacos"><img src="https://www.github.com/briandfoy/sort-fields/workflows/macos/badge.svg"></a>
 
-=for HTML <a href="https://github.com/briandfoy/sort-fields/actions?query=workflow%3Aubuntu"><img src="https://github.com/briandfoy/sort-fields/workflows/ubuntu/badge.svg"></a>
+=for HTML <a href="https://www.github.com/briandfoy/sort-fields/actions?query=workflow%3Aubuntu"><img src="https://www.github.com/briandfoy/sort-fields/workflows/ubuntu/badge.svg"></a>
 
-=for HTML <a href="https://github.com/briandfoy/sort-fields/actions?query=workflow%3Awindows"><img src="https://github.com/briandfoy/sort-fields/workflows/windows/badge.svg"></a>
+=for HTML <a href="https://www.github.com/briandfoy/sort-fields/actions?query=workflow%3Awindows"><img src="https://www.github.com/briandfoy/sort-fields/workflows/windows/badge.svg"></a>
 
-=for HTML <a href='https://ci.appveyor.com/project/briandfoy/data-constraint'><img src='https://ci.appveyor.com/api/projects/status/j9ce6dt5p2wbb5ps' /></a>
+=for HTML <a href='https://ci.appveyor.com/project/briandfoy/sort-fields'><img src='https://ci.appveyor.com/api/projects/status/l7vk7slf0npx3qj8?svg=true' /></a>
 
 =for HTML <a href='https://coveralls.io/github/briandfoy/sort-fields?branch=master'><img src='https://coveralls.io/repos/github/briandfoy/sort-fields/badge.svg?branch=master' alt='Coverage Status' /></a>
 
@@ -24,11 +24,15 @@ looking at this because you don't know where else to find what you're
 looking for. Read this once and you might never have to read one again
 for any Perl module.
 
+Joseph Hall wrote this module decades ago and it's basically on life
+support to make it fit in with modern packaging. The code is still
+what Joseph created, and no new development is intended.
+
 =head2 Documentation
 
 To read about L<Sort::Fields>, look at the embedded documentation
 in the module itself. Inside the distribution, you can format it
-with L<perldoc|https://perldoc.perl.orgperldoc.html>:
+with L<perldoc|https://perldoc.perl.org/perldoc.html>:
 
 	% perldoc lib/Sort/Fields.pm
 
@@ -73,22 +77,37 @@ module and only want to run the tests without installing anything.
 The meta data, such as the source repository and bug tracker, is in
 I<Makefile.PL> or the I<META.*> files it creates. You can find that on
 those CPAN web interfaces, but you can also look at files directly in
-the source repository:
-
-=over 4
-
-=item *	L<https://github.com/briandfoy/sort-fields>
-
-=back
+the source repository: L<https://github.com/briandfoy/sort-fields>
 
 If you find a problem, file a ticket in the L<issue
-tracker|https://github.com/briandfoy/sort-fields/issues>:
+tracker|https://github.com/briandfoy/sort-fields/issues>.
+
+There are also backup repositories hosted on other services. These
+reflect the state of the main repo and exist only for redundancy:
 
 =over 4
 
-=item *	L<https://github.com/briandfoy/sort-fields/issues>
+=item * L<https://bitbucket.com/briandfoy/sort-fields>
+
+=item * L<https://codeberg.org/briandfoy/sort-fields>
+
+=item * L<https://gitlab.com/briandfoy/sort-fields>
 
 =back
+
+=head2 GitHub Attestations
+
+This distribution now uses
+L<GitHub Attestations|https://github.blog/2024-05-02-introducing-artifact-attestations-now-in-public-beta/>,
+which allow you to verify that the archive file you have was made from
+the official repo.
+
+You need a GitHub account and the L<gh tool|https://github.com/larsks/ghcli>.
+
+	# download the distro file from GitHub, MetaCPAN, or a CPAN mirror
+	$ gh auth login
+	...follow instructions...
+	$ gh attestation verify Sort-Fields-1.23.tar.gz --owner briandfoy
 
 =head2 Getting help
 
@@ -103,7 +122,7 @@ They might not know the particulars of this module, but they can help
 you diagnose your problem.
 
 You might like to read L<brian's Guide to Solving Any Perl
-Problem|http://archive.oreilly.com/pub/a/perl/excerpts/9780596527242/brians-guide.html>.
+Problem|https://briandfoy.github.io/brians-guide-to-solving-any-perl-problem/>.
 
 =head2 Copyright and License
 
@@ -115,6 +134,6 @@ you wrote code that you didn't.
 
 Enjoy,
 
-brian d foy, bdfoy@cpan.org
+brian d foy, briandfoy@pobox.com
 
 =cut

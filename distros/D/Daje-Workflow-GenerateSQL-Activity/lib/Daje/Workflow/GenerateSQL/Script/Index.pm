@@ -9,7 +9,8 @@ sub create_index($self) {
     my $length = scalar @{$json};
     for (my $i = 0; $i < $length; $i++) {
         my $template = $self->templates->get_data_section('index');
-        $template =~ s/<<table>>/$self->tablename/ig;
+        my $table_name = $self->tablename;
+        $template =~ s/<<table>>/$table_name/ig;
         $template =~ s/<<type>>/@{$json}[$i]->{type}/ig;
         $template =~ s/<<fields>>/@{$json}[$i]->{fields}/ig;
         @{$json}[$i]->{fields} =~ s/,/_/ig;

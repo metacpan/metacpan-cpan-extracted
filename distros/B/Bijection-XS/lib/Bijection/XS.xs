@@ -4,8 +4,8 @@
 #include "XSUB.h"           // xsubpp functions and macros
 #include <math.h>
 
-AV * ALPHA;
-HV * INDEX;
+char * ALPHA[256];
+int INDEX[256];
 int OFFSET;
 int COUNT;
 
@@ -21,24 +21,23 @@ void reverse(char *s) {
 	}
 }
 
-
 static char * _biject (int id) {
 	dTHX;
 	id = id + OFFSET;
-	char out[100] = "";
+	char * outs = (char*) calloc(100, sizeof(char*));;
 	while (id > 0) {
-		sprintf(out, "%s%s", out, SvPV_nolen(*av_fetch(ALPHA, id % COUNT, 0))); 
+		sprintf(outs, "%s%s", outs, ALPHA[id % COUNT]); 
 		id = floor(id / COUNT);
 	}
-	reverse(out);
-	return out;
+	reverse(outs);
+	return outs;
 }
 
 static int _inverse (char * id) {
 	dTHX;
 	int out = 0;
 	for (int i = 0; i < strlen(id); i++) {
-		out = out * COUNT + SvIV(*hv_fetch(INDEX, &id[i], 1, 0));
+		out = out * COUNT + INDEX[(int)id[i]];
 	}
 	return out - OFFSET;
 }
@@ -50,24 +49,25 @@ PROTOTYPES: ENABLE
 SV *
 bijection_set(...)
 	CODE:
-		ALPHA = av_make(items, MARK+1);
+		AV * args = av_make(items, MARK+1);
 		
-		SV * first = *av_fetch(ALPHA, 0, 0);
+		SV * first = *av_fetch(args, 0, 0);
 	
 		if (SvTYPE(first) == SVt_IV &&  SvIV(first) > 0) {
-			OFFSET = SvIV(av_shift(ALPHA));
+			OFFSET = SvIV(first);
+			av_shift(args);
 		} else {
-			OFFSET = av_len(ALPHA) + 1;
+			OFFSET = av_len(args) + 1;
 		}
 
-		COUNT = av_len(ALPHA) + 1;
-		INDEX = newHV();
+		COUNT = av_len(args) + 1;
 		for (int i = 0; i < COUNT; i++) {
-			char * key = SvPV_nolen(*av_fetch(ALPHA, i, 0));
-			hv_store(INDEX, key, strlen(key), newSViv(i), 0); 
+			char * key = SvPV_nolen(*av_fetch(args, i, 0));
+			ALPHA[i] = key;
+			INDEX[(int)key[0]] = i;
 		}
 
-		RETVAL = newSViv(COUNT);
+		RETVAL = newSViv(OFFSET);
 	OUTPUT:
 		RETVAL
 

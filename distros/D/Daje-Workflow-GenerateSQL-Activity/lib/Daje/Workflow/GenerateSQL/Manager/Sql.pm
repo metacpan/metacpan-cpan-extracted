@@ -175,7 +175,7 @@ sub create_index($self, $json) {
 }
 
 sub create_fkeys($self, $json, $table_name) {
-    my $foreignkeys = {};
+    my $foreign_keys = {};
     my $foreign_key = Daje::Workflow::GenerateSQL::Script::ForeignKey->new(
         json      => $json,
         templates  => $self->templates,
@@ -184,9 +184,9 @@ sub create_fkeys($self, $json, $table_name) {
     );
     $foreign_key->create_foreign_keys();
     if ($foreign_key->created() == 1) {
-        $foreignkeys = $foreign_key->templates();
+        $foreign_keys = $foreign_key->templates();
     }
-    return $foreignkeys;
+    return $foreign_keys;
 }
 
 
