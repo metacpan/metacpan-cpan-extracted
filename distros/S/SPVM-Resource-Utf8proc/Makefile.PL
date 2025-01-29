@@ -18,7 +18,7 @@ unless ($meta) {
   # Do something such as environment check.
 }
 
-my %configure_and_runtime_requires = ('SPVM' => '0.990038');
+my %configure_and_runtime_requires = ('SPVM' => '0.990042');
 WriteMakefile(
   NAME => 'SPVM::Resource::Utf8proc',
   VERSION_FROM => 'lib/SPVM/Resource/Utf8proc.pm',

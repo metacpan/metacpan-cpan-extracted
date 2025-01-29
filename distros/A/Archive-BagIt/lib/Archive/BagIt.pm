@@ -11,7 +11,7 @@ use POSIX qw( strftime );
 use Moo;
 with "Archive::BagIt::Role::Portability";
 
-our $VERSION = '0.095'; # VERSION
+our $VERSION = '0.096'; # VERSION
 
 # ABSTRACT: The main module to handle bags.
 
@@ -925,12 +925,12 @@ sub create_baginfo {
 
 sub store {
     my($self) = @_;
-    $self->create_bagit();
-    $self->create_baginfo();
     # it is important to create all manifest files first, because tagmanifest should include all manifest-xxx.txt
     foreach my $algorithm ( keys %{ $self->manifests }) {
         $self->manifests->{$algorithm}->create_manifest();
     }
+    $self->create_bagit();
+    $self->create_baginfo();
     foreach my $algorithm ( keys %{ $self->manifests }) {
         $self->manifests->{$algorithm}->create_tagmanifest();
     }
@@ -992,7 +992,7 @@ Archive::BagIt - The main module to handle bags.
 
 =head1 VERSION
 
-version 0.095
+version 0.096
 
 =head1 NAME
 
@@ -1429,7 +1429,7 @@ Andreas Romeyke <cpan@andreas.romeyke.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Rob Schmidt <rjeschmi@gmail.com>, William Wueppelmann and Andreas Romeyke.
+This software is copyright (c) 2025 by Rob Schmidt <rjeschmi@gmail.com>, William Wueppelmann and Andreas Romeyke.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

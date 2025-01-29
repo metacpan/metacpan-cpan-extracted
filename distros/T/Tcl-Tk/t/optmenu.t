@@ -5,11 +5,6 @@ use Test;
 
 use Tcl::Tk qw/:perlTk/;
 
-if ($^O ne 'MSWin32' and !$ENV{DISPLAY}) {
-    print "1..0 # skip: no DISPLAY env var - how come?\n";
-    exit;
-}
-
 my $mw = MainWindow->new();
 
 plan test => 20, todo=>[12,20];

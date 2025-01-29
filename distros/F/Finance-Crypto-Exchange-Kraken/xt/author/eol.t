@@ -16,7 +16,8 @@ my @files = (
     'lib/Finance/Crypto/Exchange/Kraken/REST/Private/Websockets.pm',
     'lib/Finance/Crypto/Exchange/Kraken/REST/Public.pm',
     't/00-compile.t',
-    't/01-basic.t'
+    't/01-basic.t',
+    't/02-api-sign.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

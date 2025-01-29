@@ -1785,6 +1785,10 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
    MISCELLANEOUS
 
+   $rop = nv2mpfr($sv);
+    Return a new Math::MMPFR object whose value is the same as that
+    held by $sv, with the same precision as that of $Config{nvtype}.
+
    $str = doubletoa($double [, $x]); # Available only when
                                  # $Config{nvsize} == 8.
                                  # Else use nvtoa().
@@ -2573,14 +2577,13 @@ $str = anytoa($op); # $op precision must be 53 or 64 or 113 or 2098
    NOTE: Bear in mind that, if the variable to be formatted by
          Rmpfr_printf/Rmpfr_fprintf/Rmpfr_sprintf/Rmpfr_snprintf
          is a normal perl string or numeric scalar (ie PV or IV or
-         NV) then the formatting will actually be done by the
-         underlying C functionality.
-         For example, if perl's nvtype is 'long double' then doing:
-         Rmpfr_printf("%a", $nv);
-         will output rubbish. Instead, you would need to:
-         Rmpfr_printf("%La", $nv).
-         (But then ... why would you invoke Rmpfr_printf to do
-         something of which perl's printf function is capable ?)
+         NV) then the formatting will actually be handled by the
+         underlying gmp/mpfr C functionality, and not by the (more
+         lenient) perl formatting functionality.
+         For example, Rmpfr_printf("%.17g", 65416) will output
+         rubbish, while printf("%.17g", 65416) will output 65416.
+         But then ... why would you invoke Rmpfr_printf to do
+         something when you have perl to DWYM ?
 
    NOTE: When using the 'P' (precision) type specifier, instead of
          providing $prec to the 'P' specifier, it's now advisable

@@ -14,7 +14,7 @@ SPVM::Thread::ID - Thread ID
 
 =head1 Description
 
-The Thread::ID class of L<SPVM> has methods to compare thread IDs.
+Thread::ID class in L<SPVM> has methods to compare thread IDs.
 
 This class is a binding of L<std::thread::id in C++|https://en.cppreference.com/w/cpp/thread/thread/id>.
 

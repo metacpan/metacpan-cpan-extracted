@@ -1,6 +1,6 @@
 package SPVM::Resource::Zlib;
 
-our $VERSION = "1.002";
+our $VERSION = "1.003";
 
 1;
 
@@ -10,7 +10,7 @@ SPVM::Resource::Zlib - Resource of zlib Library
 
 =head1 Description
 
-SPVM::Resource::Zlib is a L<resource|SPVM::Document::Resource> of L<SPVM> for the L<zlib|https://github.com/madler/zlib> library.
+SPVM::Resource::Zlib class in L<SPVM> is a L<resource|SPVM::Document::Resource> class for L<zlib|https://github.com/madler/zlib> library.
 
 =head1 Usage
 
@@ -124,22 +124,22 @@ C99
 
 =head2 Download
 
-  mkdir -p original.tmp
-  git clone https://github.com/madler/zlib original.tmp/zlib
-  git -C original.tmp/zlib checkout tags/v1.2.13 -b branch_v1.2.13
-  git -C original.tmp/zlib branch
+  mkdir -p .tmp
+  git clone https://github.com/madler/zlib .tmp/zlib
+  git -C .tmp/zlib checkout tags/v1.2.13 -b branch_v1.2.13
+  git -C .tmp/zlib branch
 
 =head1 Extracting Header Files
 
 The header files of C<zlib> is copied into the C<include> directory by the following command.
 
-  rsync -av --include='*.h' --exclude='*' original.tmp/zlib/ lib/SPVM/Resource/Zlib.native/include/
+  rsync -av --include='*.h' --exclude='*' .tmp/zlib/ lib/SPVM/Resource/Zlib.native/include/
 
 =head2 Extracting Source Files
 
 The source files of C<zlib> are copied into the C<src> directory by the following command.
 
-  rsync -av --exclude='*.h' original.tmp/zlib/ lib/SPVM/Resource/Zlib.native/src/
+  rsync -av --exclude='*.h' .tmp/zlib/ lib/SPVM/Resource/Zlib.native/src/
 
 The used L<source files|/"Source Files"> are extracted by the following command.
 

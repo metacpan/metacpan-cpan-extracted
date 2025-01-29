@@ -30,7 +30,7 @@ unless ($meta) {
   }
 }
 
-my %spvm_requires = ('SPVM' => '0.990038');
+my %spvm_requires = ('SPVM' => '0.990042');
 WriteMakefile(
   NAME              => 'SPVM::Resource::RE2',
   VERSION_FROM      => 'lib/SPVM/Resource/RE2.pm',

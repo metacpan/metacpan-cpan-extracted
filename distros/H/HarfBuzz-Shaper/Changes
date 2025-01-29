@@ -1,5 +1,10 @@
 Revision history for HarfBuzz::Shaper.
 
+0.028 2025-01-28
+
+    - Fix building fallback lib.
+    - Add GitHub Actions.
+
 0.027 2024-05-07
 
     - Bump included harfuzz to 8.4.0.

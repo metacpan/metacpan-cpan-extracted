@@ -1,12 +1,13 @@
 package Tcl::Tk;
 
 use strict;
+use 5;
 use Tcl;
 use Exporter 'import';
 use vars qw(@EXPORT_OK %EXPORT_TAGS);
 
 @Tcl::Tk::ISA = qw(Tcl);
-$Tcl::Tk::VERSION = '1.29';
+$Tcl::Tk::VERSION = '1.51';
 
 sub WIDGET_CLEANUP() {0}
 
@@ -25,7 +26,7 @@ Tcl::Tk - Extension module for Perl giving access to Tk via the Tcl extension
     })->pack;
     $int->MainLoop;
 
-Or    
+Or
 
     use Tcl::Tk;
     my $int = new Tcl::Tk;
@@ -52,8 +53,8 @@ widgets using C<tile>).
 =head2 Prerequisites
 
 For full functionality you need the Tcl packages "snit", which is part
-of the standard tcl library (see L<core.tcl.tk/tcllib>), and the standard 
-tk library (see L<https://core.tcl.tk/tklib/home>).
+of the standard tcl library (see L<https://core.tcl.tk/tcllib>), and the standard
+Tk library (see L<https://core.tcl.tk/tklib/home>).
 
 Having correct installation of snit is much preferred. In case it isn't found -
 some predefined tcl/snit will be used.
@@ -112,7 +113,7 @@ to manipulate any Tcl objects behaving similarly)
 
 First way to manipulate widgets is identical to perl/Tk calling conventions,
 second one deploys Tcl syntax. Both ways are very interchangeable in that
-sence, a widget created with one way could be used by another way.
+sense, a widget created with one way could be used by another way.
 
 Usually Perl programs operate with Tcl/Tk via perl/Tk syntax, so user have no
 need to deal with Tcl language directly, only some basic understanding of
@@ -126,14 +127,14 @@ Perl, a bit of Tcl/Tk knowledge is needed, so we'll start from 2nd approach,
 with Tcl's Eval (C<< $int->Eval('...') >>) and then smoothly move to 1st,
 approach with perl/Tk syntax.
 
-=head4 Tcl/Tk syntax
+=head3 Tcl/Tk syntax
 
 =over
 
 =item * interpreter
 
 Tcl interpreter is used to process Tcl/Tk widgets; within C<Tcl::Tk> you
-create it with C<new>, and, given any widget object, you can retreive it by
+create it with C<new>, and, given any widget object, you can retrieve it by
 C<< $widget->interp >> method. Within pure Tcl/Tk it is already exist.
 
 =item * widget path
@@ -142,10 +143,10 @@ Widget path is a string starting with a dot and consisting of several
 names separated by dots. These names are widget names that comprise
 widget's hierarchy. As an example, if there exists a frame with a path
 C<.fram> and you want to create a button on it and name it C<butt> then
-you should specify name C<.fram.butt>. Widget paths are refered in
+you should specify name C<.fram.butt>. Widget paths are referred in
 miscellaneous widget operations, and geometry management is one of them.
 
-At any time widget's path could be retreived with C<< $widget->path; >>
+At any time widget's path could be retrieved with C<< $widget->path; >>
 within C<Tcl::Tk>.
 
 =item * widget as Tcl/Tk command
@@ -153,7 +154,7 @@ within C<Tcl::Tk>.
 when widget is created, a special command is created within Tk, the name of
 this command is widget's path. That said, C<.fr.b> is Tk's command and this
 command has subcommands, those will help manipulating widget. That is why
-C<< $int->Eval('.fr.b configure -text {new text}'); >> makes sence.
+C<< $int->Eval('.fr.b configure -text {new text}'); >> makes sense.
 Note that C<< $button->configure(-text=>'new text'); >> does exactly that,
 provided a fact C<$button> corresponds to C<.fr.b> widget.
 
@@ -162,10 +163,10 @@ provided a fact C<$button> corresponds to C<.fr.b> widget.
 C<use Tcl::Tk;> not only creates C<Tcl::Tk> package, but also it creates
 C<Tcl::Tk::Widget> package, responsible for widgets. Each widget (object
 blessed to C<Tcl::Tk::Widget>, or other widgets in ISA-relationship)
-behaves in such a way that its method will result in calling it's path on
+behaves in such a way that its method will result in calling its path on
 interpreter.
 
-=head4 Perl/Tk syntax
+=head3 Perl/Tk syntax
 
 C<Tcl::Tk::Widget> package within C<Tcl::Tk> module fully aware of perl/Tk
 widget syntax, which has long usage. This means that any C<Tcl::Tk> widget
@@ -195,7 +196,7 @@ which is isa-C<Tcl::Tk::Widget>
 =head3 OO explanations of Widget-s of Tcl::Tk
 
 C<Tcl::Tk> widgets use object-oriented approach, which means a quite concrete
-object hierarchy presents. Interesting point about this object system - 
+object hierarchy presents. Interesting point about this object system -
 it is very dynamic. Initially no widgets objects and no widget classes present,
 but they immediately appear at the time when they needed.
 
@@ -210,14 +211,14 @@ Let us look into following few lines of code:
   $text->windowCreate('end', -window=>$text->Label(-text=>'text of label'));
 
 Internally, following mechanics comes into play.
-Text method creates Text widget (known as C<text> in Tcl/Tk environment). 
-When this creation method invoked first time, a package 
+Text method creates Text widget (known as C<text> in Tcl/Tk environment).
+When this creation method invoked first time, a package
 C<Tcl::Tk::Widget::Text> is created, which will be OO presentation of all
 further Text-s widgets. All such widgets will be blessed to that package
 and will be in ISA-relationship with C<Tcl::Tk::Widget>.
 
 Second line calls method C<insert> of C<$text> object of type
-C<Tcl::Tk::Widget::Text>. When invoked first time, a method C<insert> is 
+C<Tcl::Tk::Widget::Text>. When invoked first time, a method C<insert> is
 created in package C<Tcl::Tk::Widget::Text>, with destiny to call
 C<invoke> method of our widget in Tcl/Tk world.
 
@@ -255,7 +256,7 @@ each array reference considered as callback, and proper actions will be taken
 
 =back
 
-After adoptation of C<@parameters> Tcl/Tk interpreter will be requested to
+After adaptation of C<@parameters> Tcl/Tk interpreter will be requested to
 perform following operation:
 
 =over
@@ -313,10 +314,10 @@ Syntax is
     @options);
 
 or, exactly the same,
- 
+
  $interp->Declare('perlTk_widget_method_name','tcl/tk-widget_method_name',
     @options);
- 
+
 Options are:
 
   -require => 'tcl-package-name'
@@ -326,14 +327,14 @@ Options are:
 of 'tcl-package-name';
 '-prefix' option used to specify a part of autogenerated widget name, usually
 used when Tcl widget name contain non-alphabet characters (e.g. ':') so
-to keep autogenerated names syntaxically correct.
+to keep autogenerated names syntactically correct.
 
 A typical example of such invocation is:
 
   $mw->Declare('BLTNoteBook','blt::tabnotebook',-require=>'BLT',-prefix=>'bltnbook');
 
-After such a call Tcl::Tk module will take a knowledge about tabnotebook widget
-from within BLT package and create proper widget creation method for it with a 
+After such a call the Tcl::Tk module will take knowledge about the tabnotebook widget
+from within BLT package and create proper widget creation method for it with a
 name BLTNoteBook. This means following statement:
 
  my $tab = $mw->BLTNoteBook;
@@ -372,7 +373,7 @@ Suppose it says:
 
   pathName method-name optional-parameters
      (some description)
-     
+
 you should understand, that widget in question has method C<method-name> and you could
 invoke it as
 
@@ -389,7 +390,7 @@ Widget options are same within Tcl::Tk and Tcl/Tk.
 
 =head3 C<< $int->widget( path, widget-type ) >> method
 
-When widgets are created they are stored internally and could be retreived
+When widgets are created they are stored internally and could be retrieved
 by C<widget()>, which takes widget path as first parameter, and optionally
 widget type (such as Button, or Text etc.). Example:
 
@@ -398,13 +399,13 @@ widget type (such as Button, or Text etc.). Example:
 
     # this will retrieve widget as Button (Tcl::Tk::Widget::Button object)
     my $button = widget(".fram.butt", 'Button');
-    
+
     # same but retrieved widget considered as general widget, without
     # concrete specifying its type (Tcl::Tk::Widget object)
     my $button = widget(".fram.butt");
 
 Please note that this method will return to you a widget object even if it was
-not created within this module, and check will not be performed whether a 
+not created within this module, and check will not be performed whether a
 widget with given path exists, despite of fact that checking for existence of
 a widget is an easy task (invoking C<< $interp->Eval("info commands $path"); >>
 will do this). Instead, you will receive perl object that will try to operate
@@ -416,7 +417,7 @@ subroutine. It queries Tcl/Tk for existence of said widget.
 
 =head3 C<widget_data> method
 
-If you need to associate any data with particular widget, you can do this with 
+If you need to associate any data with particular widget, you can do this with
 C<widget_data> method of either interpreter or widget object itself. This method
 returns same anonymous hash and it should be used to hold any keys/values pairs.
 
@@ -443,7 +444,7 @@ is returned, so to provide convenient way of chaining:
   $mw->Entry(-textvariable=>\my $e)->tooltip("enter the text here, m-kay")->pack;
 
 C<tooltip> method uses C<tooltip> package, which is a part of C<tklib> within
-Tcl/Tk, so be sure you have it installed.
+Tcl/Tk, so be sure you have it available to your Tcl/Tk.
 
 =head3 C<< $int->create_rotext() >> method
 
@@ -469,7 +470,7 @@ This way you can even create a perl/Tk-style widget to be initially scrollable:
 
 The scrolling is taken from snit (scrodgets), and the resulting widget have
 both scrolled options/methods and widget's options/methods.
-  
+
 =head1 Points of special care
 
 =over
@@ -498,22 +499,17 @@ if you find misbehaving widget method!
 
 =back
 
-=head1 BUGS
-
-Currently work is in progress, and some features could change in future
-versions.
-
 =head1 AUTHORS
 
 =over
 
-=item Malcolm Beattie.
+=item Malcolm Beattie
 
-=item Vadim Konovalov, vadim_tcltk@vkonovalov.ru 19 May 2003.
+=item Vadim Konovalov
 
-=item Jeff Hobbs, jeffh _a_ activestate com, February 2004.
+=item Jeff Hobbs
 
-=item Gisle Aas, gisle _a_ activestate . com, 14 Apr 2004.
+=item Gisle Aas
 
 =back
 
@@ -521,8 +517,6 @@ versions.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-
-See http://www.perl.com/perl/misc/Artistic.html
 
 =cut
 
@@ -572,12 +566,7 @@ sub new {
     $i->SetVar("tcl_interactive", 0, Tcl::GLOBAL_ONLY);
     $i->SUPER::Init();
 
-    unless ($i->pkg_require('Tk', $i->GetVar('tcl_version'))) {
-        warn $@; # in case of failure: warn to show this error for user
-        unless ($i->pkg_require('Tk')) { # try w/o version
-	    die $@; # ...and then re-die to have this error for user
-	}
-    }
+    $i->pkg_require('Tk') or die $@;
 
     my $mwid = $i->invoke('winfo','id','.');
     $W{PATH}->{$mwid} = '.';
@@ -661,7 +650,7 @@ sub widget_deletion_watcher {
     #print STDERR "[D:$path]";
 }
 
-# widget_data return anonymous hash that could be used to hold any 
+# widget_data return anonymous hash that could be used to hold any
 # user-specific data
 sub widget_data {
     my $int = shift;
@@ -742,7 +731,7 @@ sub pkg_require {
     return $preloaded_tk{$id} if $preloaded_tk{$id};
 
     eval {
-       	$preloaded_tk{$id} = $int->icall("package", "require", $pkg, (defined $ver? ($ver) : ()) ); 
+       	$preloaded_tk{$id} = $int->icall("package", "require", $pkg, (defined $ver? ($ver) : ()) );
     };
     if ($@) {
 	# Don't cache failures, as the package may become available by
@@ -772,7 +761,7 @@ sub create_rotext {
     $int->Eval(<<'EOS');
 # got 'rotext' code from https://wiki.tcl.tk/3963 and modified a bit
 # (insertion cursor unchanged, unlike was proposed by author of original code)
-if {[info proc rotext]==""} {
+if {[info commands rotext]==""} {
 
 ::snit::widgetadaptor rotext {
 
@@ -805,7 +794,7 @@ sub create_scrolled_widget {
     my $lwtype = shift;
     $int->ensure_scrolledwindow();
     $int->Eval(<<"EOS");
-if {[info proc scrolled_$lwtype]==""} {
+if {[info commands scrolled_$lwtype]==""} {
 
 # package require widget::scrolledwindow
 
@@ -865,7 +854,7 @@ sub AUTOLOAD {
 	s/(?<!_)__(?!_)/::/g;
 	s/(?<!_)___(?!_)/_/g;
     }
- 
+
     # if someone calls $interp->_method(...) then it is considered as faster
     # version of method, similar to calling $interp->method(...) but via
     # 'invoke' instead of 'call', thus faster
@@ -887,7 +876,7 @@ sub AUTOLOAD {
     # code below will always create subroutine that calls a method.
     # This could be changed to create only known methods and generate error
     # if method is, for example, misspelled.
-    # so following check will be like 
+    # so following check will be like
     #    if (exists $knows_method_names{$method}) {...}
     my $sub;
     if ($method =~ /^([a-z]+)([A-Z][a-z]+)$/) {
@@ -967,14 +956,14 @@ use overload
 
 # bypass_widget_sub:
 # given a widget method name and widget class, create subroutine with this
-# name in that widget's package, so that method of same name in 
+# name in that widget's package, so that method of same name in
 # Tcl::Tk::Widget package will not be called
 #
 # in other words, most widget methods work this way:
 #   $widget->method
 # transformed as
 #   .widget method
-# but there are several exclusions, where 
+# but there are several exclusions, where
 #   $widget->method
 # transformed as
 #   method .widget
@@ -988,7 +977,7 @@ use overload
 # e.g. $widget->raise is a geometry method for all widgets, but
 # BWNoteBook has method with this name
 #
-# so 
+# so
 #   raise .widget
 # versus
 #   .widget raise
@@ -1030,7 +1019,7 @@ sub interp {
     }
     return $Wint->{${$_[0]}};
 }
-# returns (and optionally creates) data hash assotiated with widget
+# returns (and optionally creates) data hash associated with widget
 sub widget_data {
     my $self = shift;
     return ($Wdata->{$self->path} || ($Wdata->{$self->path}={}));
@@ -1132,7 +1121,7 @@ sub tagBind {
     }
     my ($tag, $seq, $sub) = @_;
     # 'text'
-    # following code needs only to insert widget as a first argument to 
+    # following code needs only to insert widget as a first argument to
     # subroutine
     $sub = $self->_bind_widget_helper($sub);
     $self->interp->call($self, 'tag', 'bind', $tag, $seq, $sub);
@@ -1265,7 +1254,7 @@ sub Unbusy {
 #
 # Arguments:
 # color - Name of starting color.
-# perecent - Integer telling how much to brighten or darken as a
+# percent - Integer telling how much to brighten or darken as a
 # percent: 50 means darken by 50%, 110 means brighten
 # by 10%.
 sub Darken {
@@ -1388,7 +1377,7 @@ sub Getimage {
 #
 
 # global widget counter, only for autogenerated widget names.
-my $gwcnt = '01'; 
+my $gwcnt = '01';
 
 sub w_uniq {
     my ($self, $type) = @_;
@@ -1450,8 +1439,8 @@ my %ptk2tcltk = (
      ListBox     => ['ListBox', 'lb', 'BWidget'],
      BWTree      => ['Tree', 'bwtree', 'BWidget'],
 
-     BWNoteBook  => ['NoteBook', 'bwnb', 'BWidget', 
-			{getframe => 'Frame'}, 
+     BWNoteBook  => ['NoteBook', 'bwnb', 'BWidget',
+			{getframe => 'Frame'},
 			   # i.e. getframe returns 'Frame' widget
 		        ['raise']
 		    ],
@@ -1470,7 +1459,7 @@ my %ptk2tcltk = (
 
 # hash to track widget methods returning widgets, so we'll assign
 # widget path of returned by Tk into that widget, so it will be
-# bblessed into proper Tcl::Tk::xxxx package.
+# blessed into proper Tcl::Tk::xxxx package.
 my %methods_returning_widgets = ( );
 # NoteBook => {getframe=>'Frame'}
 
@@ -1510,7 +1499,7 @@ my %ptk2tcltk_wm =
      "title"         => 'wm',
      "transient"     => 'wm',
      "withdraw"      => 'wm',
-     ( 
+     (
 	 # list of widget pTk methods mapped to 'winfo' Tcl/Tk methods
 	 # following lines result in pairs  'method' => 'winfo'
 	 map {$_=>'winfo'} qw(
@@ -1676,7 +1665,7 @@ sub _prepare_ptk_Balloon {
 
 # Listbox
 sub _prepare_ptk_Listbox {
-    create_method_in_widget_package ('Listbox', 
+    create_method_in_widget_package ('Listbox',
 	bind => sub {
 	    my $self = shift;
 	    if ($#_=1 && ref($_[1]) =~ /^(?:ARRAY|CODE)$/) {
@@ -1693,7 +1682,7 @@ sub _prepare_ptk_Listbox {
 
 # Canvas
 sub _prepare_ptk_Canvas {
-    create_method_in_widget_package ('Canvas', 
+    create_method_in_widget_package ('Canvas',
 	bind => sub {
 	    my $self = shift;
 	    if ($#_==2) {
@@ -2139,7 +2128,7 @@ sub Scrolled {
 	    return $self->interp->invoke($self->path, "bind_path");
 	},
     );
-	
+
     my $w  = w_uniq($self, "scrw"); # return unique widget id
     my $scrw = $int->declare_widget($int->call("scrolled_$lwtype", $w, %args), "Tcl::Tk::Widget::$wtype");
     return $scrw;
@@ -2155,7 +2144,7 @@ sub Optionmenu {
     my $int = $self->interp;
     my %args = @_;
 
-    if ($int->invoke(qw(info proc optionmenu)) eq '') {
+    if ($int->invoke(qw(info commands optionmenu)) eq '') {
         $int->ensure_snit();
 	$int->Eval(<<'EOS'); # create proper Optionmenu megawidget with snit
 # package require snit
@@ -2281,7 +2270,7 @@ sub create_widget_package {
 		${"Tcl::Tk::Widget::"}{"_prepare_ptk_$widgetname"}->();
 	    }
 	}
-	# 2011-01-11 
+	# 2011-01-11
 	# if this widget has known widget returning methods, initiate them here
 	my $known_w_meths = $ptk2tcltk{$widgetname}->[3];
 	if ($known_w_meths) {
@@ -2419,7 +2408,7 @@ sub AUTOLOAD {
     # code below will always create subroutine that calls a method.
     # This could be changed to create only known methods and generate error
     # if method is, for example, misspelled.
-    # so following check will be like 
+    # so following check will be like
     #    if (exists $knows_method_names{$method}) {...}
     my $sub;
     if ($method =~ /^([a-z]+)([A-Z][a-z]+)$/) {

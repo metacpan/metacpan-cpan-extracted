@@ -12,7 +12,7 @@ cat-v [ options ] args ...
      -n   --reset         Disable all character conversion
      -c   --visible=#     Specify visualize characters
      -r   --repeat=#      Specify repeat characters
-     -R   --replicate     Replicate original line as is
+     -o   --original      Print original line as is
      -t   --expand[=#]    Expand tabs
      -T   --no-expand     Do not expand tabs
     --ts  --tabstyle=#    Set tab style
@@ -33,7 +33,7 @@ cat-v [ options ] args ...
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =head1 DESCRIPTION
 
@@ -215,10 +215,14 @@ existing configuration.
 
     cat-v -c esc --repeat +esc
 
-=item B<-R>, B<--replicate>
+=item B<-o>, B<-oo>, B<--original>
 
-Before printing the converted string, first output the original
-string.
+If the converted string is different from the original string, the
+original string is output before the converted string is output.  If
+specified twice, the original string is always printed.
+
+You can use this output with L<App::cdif>'s C<--line-by-line>
+(C<--lxl>) option.
 
 =item B<-t>[I<n>], B<--expand>[=I<n>]
 
@@ -305,7 +309,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright © 2024 Kazumasa Utashiro.
+Copyright © 2024-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

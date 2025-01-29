@@ -1,17 +1,19 @@
+.perltidyrc
 Build.PL
 Changes
 lib/DBIx/Migration.pm
+lib/DBIx/Migration.pod
 Makefile.PL
 MANIFEST			This list of files
 META.json
 META.yml
 README
 script/dbix-migration.pl
-t/01use.t
-t/02pod.t
-t/03podcoverage.t
-t/04sqlite.t
-t/05postgres.t
+t/01-load.t
+t/02-pod.t
+t/03-podcoverage.t
+t/04-sqlite.t
+t/05-postgres.t
 t/sql/sqlite_1_down.sql
 t/sql/sqlite_1_up.sql
 t/sql/sqlite_2_down.sql

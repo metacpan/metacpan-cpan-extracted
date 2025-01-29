@@ -1,5 +1,8 @@
 Revision history for Perl extension DBIx::Class::Schema::Loader::DBI::MariaDB
 
-1.0.0   - Forked from DBIx::Class::Schema::Loader::DBI::mysql 0.07052
+1.0.0
+        - Forked from DBIx::Class::Schema::Loader::DBI::mysql 0.07052
         - Resolve problem with importing current_timestamp()
           https://github.com/dbsrgits/dbix-class-schema-loader/issues/42
+1.0.1
+        - Have our own dbicdump for running tests.

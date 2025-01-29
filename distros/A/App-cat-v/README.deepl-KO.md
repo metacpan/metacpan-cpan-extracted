@@ -10,7 +10,7 @@ cat-v \[ 옵션 \] args ...
        -n   --reset         Disable all character conversion
        -c   --visible=#     Specify visualize characters
        -r   --repeat=#      Specify repeat characters
-       -R   --replicate     Replicate original line as is
+       -o   --original      Print original line as is
        -t   --expand[=#]    Expand tabs
        -T   --no-expand     Do not expand tabs
       --ts  --tabstyle=#    Set tab style
@@ -31,7 +31,7 @@ cat-v \[ 옵션 \] args ...
 
 # VERSION
 
-Version 1.01
+Version 1.02
 
 # DESCRIPTION
 
@@ -174,9 +174,11 @@ Version 1.01
 
         cat-v -c esc --repeat +esc
 
-- **-R**, **--replicate**
+- **-o**, **-oo**, **--original**
 
-    변환된 문자열을 인쇄하기 전에 먼저 원본 문자열을 출력합니다.
+    변환된 문자열이 원본 문자열과 다른 경우 변환된 문자열이 출력되기 전에 원본 문자열이 출력됩니다. 두 번 지정하면 항상 원래 문자열이 출력됩니다.
+
+    이 출력은 [App::cdif](https://metacpan.org/pod/App%3A%3Acdif)의 `--줄별`(`--lxl`) 옵션과 함께 사용할 수 있습니다.
 
 - **-t**\[_n_\], **--expand**\[=_n_\]
 - **-T**, **--no-expand**
@@ -241,7 +243,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright © 2024 Kazumasa Utashiro.
+Copyright © 2024-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

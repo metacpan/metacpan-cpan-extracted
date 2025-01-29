@@ -11,13 +11,22 @@ use SPVM 'TestCase::Thread';
 use SPVM 'Fn';
 use SPVM::Thread;
 
+my $api = SPVM::api();
+
+my $start_memory_blocks_count = $api->get_memory_blocks_count;
+
+ok(SPVM::TestCase::Thread->basic);
+
+ok(SPVM::TestCase::Thread->thread_id);
+
 # Version
 {
   is($SPVM::Thread::VERSION, SPVM::Fn->get_version_string('Thread'));
 }
 
-ok(SPVM::TestCase::Thread->basic);
+SPVM::Fn->destroy_runtime_permanent_vars;
 
-ok(SPVM::TestCase::Thread->thread_id);
+my $end_memory_blocks_count = $api->get_memory_blocks_count;
+is($end_memory_blocks_count, $start_memory_blocks_count);
 
 done_testing;

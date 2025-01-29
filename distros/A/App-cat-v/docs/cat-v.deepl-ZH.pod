@@ -12,7 +12,7 @@ cat-v [ 选项 ] args ...
      -n   --reset         Disable all character conversion
      -c   --visible=#     Specify visualize characters
      -r   --repeat=#      Specify repeat characters
-     -R   --replicate     Replicate original line as is
+     -o   --original      Print original line as is
      -t   --expand[=#]    Expand tabs
      -T   --no-expand     Do not expand tabs
     --ts  --tabstyle=#    Set tab style
@@ -33,7 +33,7 @@ cat-v [ 选项 ] args ...
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =head1 DESCRIPTION
 
@@ -184,9 +184,11 @@ C<cat-v> 命令可将空白和控制字符可视化，同时保留显示可显�
 
     cat-v -c esc --repeat +esc
 
-=item B<-R>, B<--replicate>
+=item B<-o>, B<-oo>, B<--original>
 
-在打印转换后的字符串之前，首先输出原始字符串。
+如果转换后的字符串与原始字符串不同，则先输出原始字符串，然后再输出转换后的字符串。如果指定两次，则始终打印原始字符串。
+
+您可以将此输出与 L<App::cdif> 的 C<--line-by-line> (C<--lxl>) 选项一起使用。
 
 =item B<-t>[I<n>], B<--expand>[=I<n>]
 
@@ -261,7 +263,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright © 2024 Kazumasa Utashiro.
+Copyright © 2024-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

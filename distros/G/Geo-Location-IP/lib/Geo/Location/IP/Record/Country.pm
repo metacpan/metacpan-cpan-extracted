@@ -10,7 +10,7 @@ use Object::Pad;
 
 class Geo::Location::IP::Record::Country;
 
-our $VERSION = 0.002;
+our $VERSION = 0.003;
 
 apply Geo::Location::IP::Role::Record::HasConfidence;
 apply Geo::Location::IP::Role::Record::HasGeoNameId;
@@ -50,7 +50,7 @@ Geo::Location::IP::Record::Country - Country details
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

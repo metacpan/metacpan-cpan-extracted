@@ -10,25 +10,26 @@ use Object::Pad;
 
 class Geo::Location::IP::Model::ASN;
 
-our $VERSION = 0.002;
+our $VERSION = 0.003;
 
 apply Geo::Location::IP::Role::HasIPAddress;
 
-field $autonomous_system_number :param :reader       = undef;
-field $autonomous_system_organization :param :reader = undef;
+field $autonomous_system_number :param :reader;
+field $autonomous_system_organization :param :reader;
 
-#<<<
-ADJUST :params (:$raw = {}) {
-    if (exists $raw->{autonomous_system_number}) {
-        $autonomous_system_number = $raw->{autonomous_system_number};
-    }
+sub _from_hash ($class, $hash_ref, $ip_address) {
+    my $autonomous_system_number = $hash_ref->{autonomous_system_number}
+        // undef;
 
-    if (exists $raw->{autonomous_system_organization}) {
-        $autonomous_system_organization
-            = $raw->{autonomous_system_organization};
-    }
+    my $autonomous_system_organization
+        = $hash_ref->{autonomous_system_organization} // undef;
+
+    return $class->new(
+        autonomous_system_number       => $autonomous_system_number,
+        autonomous_system_organization => $autonomous_system_organization,
+        ip_address                     => $ip_address,
+    );
 }
-#>>>
 
 1;
 __END__
@@ -41,7 +42,7 @@ Geo::Location::IP::Model::ASN - Autonomous System details
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

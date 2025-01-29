@@ -7,6 +7,7 @@ META.json
 META.yml
 Makefile.PL
 README
+README.pod
 cpanfile
 dist.ini
 lib/DBIx/Class/Schema/Loader/DBI/MariaDB.pm
@@ -32,6 +33,7 @@ t/65dbicdump_invocations.t
 t/70schema_base_dispatched.t
 t/80split_name.t
 t/90bug_58_mro.t
+t/bin/dbicdump
 t/bin/simple_filter
 t/lib/DBICTest/Schema/_no_skip_load_external/Foo.pm
 t/lib/DBICTest/Schema/_skip_load_external/Foo.pm

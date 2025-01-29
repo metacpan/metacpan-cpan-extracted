@@ -36,7 +36,8 @@ $override->override(
 ## Test data
 
 my %market_data = (
-    get_server_time => undef,
+    get_server_time   => undef,
+    get_system_status => undef,
     get_asset_info  => [
         undef,
         {

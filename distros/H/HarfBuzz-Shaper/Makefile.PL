@@ -4,7 +4,6 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 use lib 'inc';
-use Devel::CheckLib;
 use Config;
 
 my $master = 'lib/HarfBuzz/Shaper.pm';
@@ -25,6 +24,7 @@ my %args = (
   PREREQ_PM => {
       'ExtUtils::MakeMaker' => 6.46, # for META_MERGE, LICENSE
       'Test::More' => 0,
+      'Archive::Tar' => 0,
   },
 
   TEST_REQUIRES  => {
@@ -62,26 +62,44 @@ my %args = (
 # Check whether there is a harfbuzz library installed that we can use.
 
 my $hb_include;
-my $hb_src = "hb_src/harfbuzz/harfbuzz.cc";
+my $hb_src = "hb_src.tar.gz";
+my $got_hb = $ENV{INCHS} ? -1 : 0;
 
-if ( !$ENV{HB_PRIVATE}
-     && check_lib( lib      => "harfbuzz",
-		header   => "harfbuzz/hb.h",
-		function => <<EOF )
+# First, try pkg-config.
+my $res = `pkg-config --version`;
+if ( !$got_hb && $res =~ /\d+\.\d+/ ) {
+    $res = `pkg-config --libs harfbuzz`;
+    if ( $res =~ /(?:(-L.+)\s+)?(-l.+)/ ) {
+	$args{LIBS} = [ $res ];
+    }
+    $res = `pkg-config --cflags harfbuzz`;
+    if ( $res =~ /-I.+/ ) {
+	$args{INC} = $res;
+    }
+    warn("Using platform harfbuzz library (pkg-config)\n");
+    $got_hb = 1;
+}
+
+if ( !$got_hb ) {
+    require Devel::CheckLib;
+    Devel::CheckLib::check_lib( lib      => "harfbuzz",
+				header   => "harfbuzz/hb.h",
+				function => <<EOF );
 /* Need at least 1.7.7 */
 hb_blob_create_from_file("");
 return 0;
 EOF
-   ) {
+
     # Okay, the test program compiled and ran. We can use this library.
-    warn("Using platform harfbuzz library\n");
+    warn("Using platform harfbuzz library (checklib)\n");
+    $got_hb = 1;
 }
 
 # If not, try to include our own copy of the library.
 # Note that this requires a C++ compiler. Luckily, there is often (but
 # not always) a C++ compiler around when using the GNU C-compiler.
 
-elsif ( -s $hb_src ) {
+if ( $got_hb <= 0 && -s $hb_src ) {
     $hb_include = 1;
     warn(<<EOD);
 
@@ -102,19 +120,25 @@ EOD
     }
     elsif ( $^O =~ /darwin/i ) {
 	$args{LIBS} = [ '-lc++' ];
+	# https://github.com/Homebrew/homebrew-core/issues/145991
+	$args{LDDLFLAGS} = $Config{lddlflags} . ' -Wl,-ld_classic';
     }
     else {
 	$args{LIBS} = [ '-lstdc++' ];
     }
-    $args{INC}      = '-Ihb_src',
+    $args{INC}      = '-I. -Ihb_src -Ihb_src/harfbuzz';
+    $got_hb = 1;
+
+    require Archive::Tar;
+    Archive::Tar->new( $hb_src, undef, { extract => 1 } );
 }
 
 # Sorry, there is no point in continuing...
 
-else {
+unless ( $got_hb >= 1 ) {
     warn("HarfBuzz::Shaper needs the harfbuzz library, version 1.7.7 or later.\n",
          "Please install it first. See file INSTALL for details.\n");
-    exit(0);
+    exit(1);
 }
 
 # Write the Makefile.
@@ -126,9 +150,11 @@ sub MY::postamble {
     return unless $hb_include;
     my $cxx = $ENV{CXX} || "c++";
     return <<EOF;
-\$(MYEXTLIB) : $hb_src
+\$(MYEXTLIB) : hb_src/harfbuzz/harfbuzz.cc
 	$cxx -c -std=c++11 -fno-exceptions -o \$\@ -DHB_NO_MT \$(CCCDLFLAGS) \$<
 
+clean ::
+	\$(RM_RF) hb_src
 EOF
 }
 

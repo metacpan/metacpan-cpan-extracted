@@ -31,6 +31,7 @@ my %WriteMakefileArgs = (
     "Class::Unload" => 0,
     "DBD::MariaDB" => 0,
     "DBI" => 0,
+    "DBIx::Class::Storage" => 0,
     "File::Basename" => 0,
     "File::Copy" => 0,
     "File::Find" => 0,
@@ -50,7 +51,7 @@ my %WriteMakefileArgs = (
     "curry" => 0,
     "namespace::clean" => 0
   },
-  "VERSION" => "1.0.0",
+  "VERSION" => "1.0.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -64,6 +65,7 @@ my %FallbackPrereqs = (
   "DBI" => 0,
   "DBIx::Class::Schema::Loader::DBI" => "0.07052",
   "DBIx::Class::Schema::Loader::Table" => 0,
+  "DBIx::Class::Storage" => 0,
   "DBIx::Class::Storage::DBI::MariaDB" => 0,
   "File::Basename" => 0,
   "File::Copy" => 0,

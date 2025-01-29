@@ -10,35 +10,34 @@ use Object::Pad;
 
 class Geo::Location::IP::Model::ISP;
 
-our $VERSION = 0.002;
+our $VERSION = 0.003;
 
 apply Geo::Location::IP::Role::HasIPAddress;
 
-field $autonomous_system_number :param :reader       = undef;
-field $autonomous_system_organization :param :reader = undef;
-field $isp :param :reader                            = undef;
-field $organization :param :reader                   = undef;
+field $autonomous_system_number :param :reader;
+field $autonomous_system_organization :param :reader;
+field $isp :param :reader;
+field $organization :param :reader;
 
-#<<<
-ADJUST :params (:$raw = {}) {
-    if (exists $raw->{autonomous_system_number}) {
-        $autonomous_system_number = $raw->{autonomous_system_number};
-    }
+sub _from_hash ($class, $hash_ref, $ip_address) {
+    my $autonomous_system_number = $hash_ref->{autonomous_system_number}
+        // undef;
 
-    if (exists $raw->{autonomous_system_organization}) {
-        $autonomous_system_organization
-            = $raw->{autonomous_system_organization};
-    }
+    my $autonomous_system_organization
+        = $hash_ref->{autonomous_system_organization} // undef;
 
-    if (exists $raw->{isp}) {
-        $isp = $raw->{isp};
-    }
+    my $isp = $hash_ref->{isp} // undef;
 
-    if (exists $raw->{organization}) {
-        $organization = $raw->{organization};
-    }
+    my $organization = $hash_ref->{organization} // undef;
+
+    return $class->new(
+        autonomous_system_number       => $autonomous_system_number,
+        autonomous_system_organization => $autonomous_system_organization,
+        ip_address                     => $ip_address,
+        isp                            => $isp,
+        organization                   => $organization,
+    );
 }
-#>>>
 
 1;
 __END__
@@ -51,7 +50,7 @@ Geo::Location::IP::Model::ISP - ISP details
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -114,7 +113,7 @@ Returns the name of the ISP associated with the IP address.
 
 =head2 organization
 
-  my $organization = $traits->organization;
+  my $organization = $isp_model->organization;
 
 Returns the name of the organization associated with the IP address.
 

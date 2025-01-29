@@ -43,6 +43,6 @@
          "url" : "https://github.com/eserte/org-daemon.git"
       }
    },
-   "version" : "1.14",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "1.15",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

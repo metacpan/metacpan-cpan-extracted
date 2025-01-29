@@ -10,7 +10,7 @@ use Travel::Status::DE::EFA::Stop;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '3.06';
+our $VERSION = '3.07';
 
 Travel::Status::DE::EFA::Departure->mk_ro_accessors(
 	qw(countdown datetime delay destination is_cancelled key line lineref mot
@@ -178,7 +178,7 @@ sub id {
 	return $self->{id} = sprintf( '%s@%d(%s)%d',
 		$self->stateless =~ s{ }{}gr,
 		scalar $self->route_pre
-		? ( $self->route_pre )[0]->id
+		? ( $self->route_pre )[0]->id_num
 		: $self->stop_id_num,
 		$self->sched_datetime->strftime('%Y%m%d'),
 		$self->key );
@@ -303,7 +303,7 @@ departure received by Travel::Status::DE::EFA
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

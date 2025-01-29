@@ -70,10 +70,9 @@ sub image2_load_dir {
     my($e, $l, $dir_name) = @_;
 
     $l->delete(0, 'end');
-    my $i;
     local *DIR;
     opendir DIR, $$dir_name;
-    foreach $i (sort readdir DIR) {
+    foreach my $i (sort readdir DIR) {
        $l->insert('end', $i);
     }
     closedir DIR;

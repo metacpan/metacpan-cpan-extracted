@@ -1,0 +1,25 @@
+Changes
+ignore.txt
+lib/Colouring/In/XS.pm
+lib/Colouring/In/XS.xs
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-basics.t
+t/03-new-colours.t
+t/04-lighten.t
+t/05-darken.t
+t/06-fade.t
+t/07-white-black.t
+t/08-fadeout.t
+t/09-fadein.t
+t/11-rest.t
+t/12-validate.t
+t/13-hsla.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

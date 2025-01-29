@@ -9072,14 +9072,81 @@ int _has_bizarre_infnan(void) {
 }
 
 SV * _gmp_cflags(pTHX) {
+#if defined(__GMP_CFLAGS)
   return newSVpv(__GMP_CFLAGS, 0);
+#else
+  return &PL_sv_undef;
+#endif
 }
 
 SV * _gmp_cc(pTHX) {
+#if defined(__GMP_CC)
   return newSVpv(__GMP_CC, 0);
+#else
+  return &PL_sv_undef;
+#endif
 }
 
+/********************************************/
+/********************************************/
 
+SV * _gmp_printf_nv(pTHX_ SV * a, SV * b) {
+     int ret;
+
+     if(SV_IS_NOK(b)) {
+       ret = gmp_printf(SvPV_nolen(a), SvNVX(b));
+       fflush(stdout);
+       return newSViv(ret);
+     }
+
+     croak("Unrecognised type supplied as argument to _gmp_printf_nv");
+}
+
+SV * _gmp_fprintf_nv(pTHX_ FILE * stream, SV * a, SV * b) {
+     int ret;
+
+     if(SV_IS_NOK(b)) {
+       ret = gmp_fprintf(stream, SvPV_nolen(a), SvNVX(b));
+       fflush(stream);
+       return newSViv(ret);
+     }
+
+     croak("Unrecognised type supplied as argument to _gmp_fprintf_nv");
+}
+
+SV * _gmp_sprintf_nv(pTHX_ SV * s, SV * a, SV * b, int buflen) {
+     int ret;
+     char * stream;
+
+     Newx(stream, buflen, char);
+
+     if(SV_IS_NOK(b)) {
+       ret = gmp_sprintf(stream, SvPV_nolen(a), SvNVX(b));
+       sv_setpv(s, stream);
+       Safefree(stream);
+       return newSViv(ret);
+     }
+
+     Safefree(stream); /* In case the ensuing croak() is encased in an eval{} block */
+     croak("Unrecognised type supplied as argument to _gmp_sprintf_nv");
+}
+
+SV * _gmp_snprintf_nv(pTHX_ SV * s, SV * bytes, SV * a, SV * b, int buflen) {
+     int ret;
+     char * stream;
+
+     Newx(stream, buflen, char);
+
+     if(SV_IS_NOK(b)) {
+       ret = gmp_snprintf(stream, (size_t)SvUV(bytes), SvPV_nolen(a), SvNVX(b));
+       sv_setpv(s, stream);
+       Safefree(stream);
+       return newSViv(ret);
+     }
+
+     Safefree(stream); /* In case the ensuing croak() is encased in an eval{} block */
+     croak("Unrecognised type supplied as argument to _gmp_snprintf_nv");
+}
 
 
 
@@ -13304,4 +13371,42 @@ CODE:
   RETVAL = _gmp_cc (aTHX);
 OUTPUT:  RETVAL
 
+
+SV *
+_gmp_printf_nv (a, b)
+	SV *	a
+	SV *	b
+CODE:
+  RETVAL = _gmp_printf_nv (aTHX_ a, b);
+OUTPUT:  RETVAL
+
+SV *
+_gmp_fprintf_nv (stream, a, b)
+	FILE *	stream
+	SV *	a
+	SV *	b
+CODE:
+  RETVAL = _gmp_fprintf_nv (aTHX_ stream, a, b);
+OUTPUT:  RETVAL
+
+SV *
+_gmp_sprintf_nv (s, a, b, buflen)
+	SV *	s
+	SV *	a
+	SV *	b
+	int	buflen
+CODE:
+  RETVAL = _gmp_sprintf_nv (aTHX_ s, a, b, buflen);
+OUTPUT:  RETVAL
+
+SV *
+_gmp_snprintf_nv (s, bytes, a, b, buflen)
+	SV *	s
+	SV *	bytes
+	SV *	a
+	SV *	b
+	int	buflen
+CODE:
+  RETVAL = _gmp_snprintf_nv (aTHX_ s, bytes, a, b, buflen);
+OUTPUT:  RETVAL
 

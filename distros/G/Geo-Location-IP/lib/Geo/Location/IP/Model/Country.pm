@@ -10,7 +10,7 @@ use Object::Pad;
 
 class Geo::Location::IP::Model::Country;
 
-our $VERSION = 0.002;
+our $VERSION = 0.003;
 
 use Geo::Location::IP::Record::Continent;
 use Geo::Location::IP::Record::Country;
@@ -18,50 +18,45 @@ use Geo::Location::IP::Record::MaxMind;
 use Geo::Location::IP::Record::RepresentedCountry;
 use Geo::Location::IP::Record::Traits;
 
-field $continent :reader;
-field $country :reader;
-field $maxmind :reader;
-field $registered_country :reader;
-field $represented_country :reader;
-field $traits :reader;
+field $continent :param :reader;
+field $country :param :reader;
+field $maxmind :param :reader;
+field $registered_country :param :reader;
+field $represented_country :param :reader;
+field $traits :param :reader;
 
-#<<<
-ADJUST :params (:$raw = {}, :$ip_address = undef, :$locales = undef) {
-    if (!defined $locales) {
-        $locales = ['en'];
-    }
+sub _from_hash ($class, $hash_ref, $ip_address, $locales) {
+    my $continent = Geo::Location::IP::Record::Continent->_from_hash(
+        $hash_ref->{continent} // {}, $locales);
 
-    $continent = Geo::Location::IP::Record::Continent->_from_hash(
-        $raw->{continent} // {},
-        $locales,
-    );
+    my $country
+        = Geo::Location::IP::Record::Country->_from_hash($hash_ref->{country}
+            // {}, $locales);
 
-    $country = Geo::Location::IP::Record::Country->_from_hash(
-        $raw->{country} // {},
-        $locales,
-    );
+    my $maxmind
+        = Geo::Location::IP::Record::MaxMind->_from_hash($hash_ref->{maxmind}
+            // {});
 
-    $maxmind = Geo::Location::IP::Record::MaxMind->_from_hash(
-        $raw->{maxmind} // {},
-    );
+    my $registered_country = Geo::Location::IP::Record::Country->_from_hash(
+        $hash_ref->{registered_country} // {}, $locales);
 
-    $registered_country = Geo::Location::IP::Record::Country->_from_hash(
-        $raw->{registered_country} // {},
-        $locales,
-    );
-
-    $represented_country
+    my $represented_country
         = Geo::Location::IP::Record::RepresentedCountry->_from_hash(
-        $raw->{represented_country} // {},
-        $locales,
-    );
+        $hash_ref->{represented_country} // {}, $locales);
 
-    $traits = Geo::Location::IP::Record::Traits->_from_hash(
-        $raw->{traits} // {},
-        $ip_address,
+    my $traits
+        = Geo::Location::IP::Record::Traits->_from_hash($hash_ref->{traits}
+            // {}, $ip_address);
+
+    return $class->new(
+        continent           => $continent,
+        country             => $country,
+        maxmind             => $maxmind,
+        registered_country  => $registered_country,
+        represented_country => $represented_country,
+        traits              => $traits,
     );
 }
-#>>>
 
 1;
 __END__
@@ -74,7 +69,7 @@ Geo::Location::IP::Model::Country - Records associated with a country
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -92,29 +87,23 @@ version 0.002
 
 =head1 DESCRIPTION
 
-This class contains records from an IP address query in a country database.
+This class contains records from a country database.
 
 =head1 SUBROUTINES/METHODS
 
 =head2 new
 
   my $country_model = Geo::Location::IP::Model::Country->new(
-    raw => {
-        continent           => {names    => {en => 'Europe'}},
-        country             => {names    => {en => 'Germany'}},
-        maxmind             => {queries_remaining => 9999},
-        registered_country  => {names    => {en => 'Germany'}},
-        represented_country => {
-          names => {en => 'United States'},
-          type  => 'military',
-        },
-        traits => {domain => 'example.com'},
-    },
-    ip_address => $ip_address,
-    locales    => ['en'],
+    continent           => $continent,
+    country             => $country,
+    maxmind             => $maxmind,
+    registered_country  => $registered_country,
+    represented_country => $represented_country,
+    traits              => $traits,
   );
 
-Creates a new object.
+Creates a new object with records from an IP address query in a country
+database.
 
 All records may contain undefined values.
 

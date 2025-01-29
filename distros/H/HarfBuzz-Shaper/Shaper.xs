@@ -9,8 +9,8 @@
 #include "stdint.h"
 #include <string.h>
 #include <math.h>
-#include <harfbuzz/hb.h>
-#include <harfbuzz/hb-ot.h>
+#include <hb.h>
+#include <hb-ot.h>
 
 typedef const char * bytestring_t;
 typedef const char * bytestring_nolen_t;

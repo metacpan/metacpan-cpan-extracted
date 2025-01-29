@@ -12,19 +12,21 @@ use Bible::Reference;
 
 $Text::Wrap::unexpand = 0;
 
-our $VERSION = '2.07'; # VERSION
+our $VERSION = '2.08'; # VERSION
 
-has _load             => {};
+has _load             => sub { {} };
 has indent_width      => 4;
 has reference_acronym => 0;
 has fnxref_acronym    => 1;
 has wrap_at           => 80;
-has reference         => Bible::Reference->new(
-    bible                 => 'Protestant',
-    sorting               => 1,
-    require_chapter_match => 1,
-    require_book_ucfirst  => 1,
-);
+has reference         => sub {
+    Bible::Reference->new(
+        bible                 => 'Protestant',
+        sorting               => 1,
+        require_chapter_match => 1,
+        require_book_ucfirst  => 1,
+    );
+};
 
 sub __ocd_tree ($node) {
     my $new_node;
@@ -343,7 +345,7 @@ Bible::OBML - Open Bible Markup Language parser and renderer
 
 =head1 VERSION
 
-version 2.07
+version 2.08
 
 =for markdown [![test](https://github.com/gryphonshafer/Bible-OBML/workflows/test/badge.svg)](https://github.com/gryphonshafer/Bible-OBML/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Bible-OBML/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Bible-OBML)

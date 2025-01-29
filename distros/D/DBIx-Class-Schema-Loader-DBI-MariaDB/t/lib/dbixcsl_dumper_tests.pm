@@ -88,7 +88,7 @@ sub _dump_directly {
 sub _dump_dbicdump {
     my %tdata = @_;
 
-    my @cmd = (qw(dbicdump));
+    my @cmd = ($^X, 't/bin/dbicdump');
 
     $tdata{options}{quiet} = 1 unless exists $tdata{options}{quiet};
 

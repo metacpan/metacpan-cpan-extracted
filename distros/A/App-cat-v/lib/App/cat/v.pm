@@ -1,9 +1,10 @@
 package App::cat::v;
 
-our $VERSION = "1.01";
+our $VERSION = "1.02";
 
 use 5.024;
 use warnings;
+use open IO => ':utf8', ':std';
 
 use utf8;
 use Encode;
@@ -22,47 +23,48 @@ use Getopt::EX;
 use Text::ANSI::Tabs qw(ansi_expand);
 
 my %control = (
-    nul  => [ 'm', "\000", { s => "\x{2400}",      # ␀ SYMBOL FOR NULL
+    nul  => [ 'm', "\x00", { s => "\x{2400}",      # ␀ SYMBOL FOR NULL
 			     m => "\x{2205}", } ], # ∅ EMPTY SET
-    soh  => [ 's', "\001", { s => "\x{2401}", } ], # ␁ SYMBOL FOR START OF HEADING
-    stx  => [ 's', "\002", { s => "\x{2402}", } ], # ␂ SYMBOL FOR START OF TEXT
-    etx  => [ 's', "\003", { s => "\x{2403}", } ], # ␃ SYMBOL FOR END OF TEXT
-    eot  => [ 's', "\004", { s => "\x{2404}", } ], # ␄ SYMBOL FOR END OF TRANSMISSION
-    enq  => [ 's', "\005", { s => "\x{2405}", } ], # ␅ SYMBOL FOR ENQUIRY
-    ack  => [ 's', "\006", { s => "\x{2406}", } ], # ␆ SYMBOL FOR ACKNOWLEDGE
-    bel  => [ 's', "\007", { s => "\x{2407}",      # ␇ SYMBOL FOR BELL
+    soh  => [ 's', "\x01", { s => "\x{2401}", } ], # ␁ SYMBOL FOR START OF HEADING
+    stx  => [ 's', "\x02", { s => "\x{2402}", } ], # ␂ SYMBOL FOR START OF TEXT
+    etx  => [ 's', "\x03", { s => "\x{2403}", } ], # ␃ SYMBOL FOR END OF TEXT
+    eot  => [ 's', "\x04", { s => "\x{2404}", } ], # ␄ SYMBOL FOR END OF TRANSMISSION
+    enq  => [ 's', "\x05", { s => "\x{2405}", } ], # ␅ SYMBOL FOR ENQUIRY
+    ack  => [ 's', "\x06", { s => "\x{2406}", } ], # ␆ SYMBOL FOR ACKNOWLEDGE
+    bel  => [ 's', "\x07", { s => "\x{2407}",      # ␇ SYMBOL FOR BELL
 			     m => "\x{237E}", } ], # ⍾ BELL SYMBOL
-    bs   => [ 's', "\010", { s => "\x{2408}", } ], # ␈ SYMBOL FOR BACKSPACE
-    ht   => [ 's', "\011", { s => "\x{2409}", } ], # ␉ SYMBOL FOR HORIZONTAL TABULATION
-    nl   => [ 'm', "\012", { s => "\x{240A}",      # ␊ SYMBOL FOR LINE FEED
+    bs   => [ 's', "\x08", { s => "\x{2408}", } ], # ␈ SYMBOL FOR BACKSPACE
+    ht   => [ 's', "\x09", { s => "\x{2409}", } ], # ␉ SYMBOL FOR HORIZONTAL TABULATION
+    nl   => [ 'm', "\x0a", { s => "\x{240A}",      # ␊ SYMBOL FOR LINE FEED
 			     m => "\x{23CE}", } ], # ⏎ RETURN SYMBOL
-    vt   => [ 's', "\013", { s => "\x{240B}", } ], # ␋ SYMBOL FOR VERTICAL TABULATION
-    np   => [ 'm', "\014", { s => "\x{240C}",    , # ␌ SYMBOL FOR FORM FEED
+    vt   => [ 's', "\x0b", { s => "\x{240B}", } ], # ␋ SYMBOL FOR VERTICAL TABULATION
+    np   => [ 'm', "\x0c", { s => "\x{240C}",    , # ␌ SYMBOL FOR FORM FEED
 			     m => "\x{2398}", } ], # ⎘ NEXT PAGE
-    cr   => [ 's', "\015", { s => "\x{240D}", } ], # ␍ SYMBOL FOR CARRIAGE RETURN
-    so   => [ 's', "\016", { s => "\x{240E}", } ], # ␎ SYMBOL FOR SHIFT OUT
-    si   => [ 's', "\017", { s => "\x{240F}", } ], # ␏ SYMBOL FOR SHIFT IN
-    dle  => [ 's', "\020", { s => "\x{2410}", } ], # ␐ SYMBOL FOR DATA LINK ESCAPE
-    dc1  => [ 's', "\021", { s => "\x{2411}", } ], # ␑ SYMBOL FOR DEVICE CONTROL ONE
-    dc2  => [ 's', "\022", { s => "\x{2412}", } ], # ␒ SYMBOL FOR DEVICE CONTROL TWO
-    dc3  => [ 's', "\023", { s => "\x{2413}", } ], # ␓ SYMBOL FOR DEVICE CONTROL THREE
-    dc4  => [ 's', "\024", { s => "\x{2414}", } ], # ␔ SYMBOL FOR DEVICE CONTROL FOUR
-    nak  => [ 's', "\025", { s => "\x{2415}", } ], # ␕ SYMBOL FOR NEGATIVE ACKNOWLEDGE
-    syn  => [ 's', "\026", { s => "\x{2416}", } ], # ␖ SYMBOL FOR SYNCHRONOUS IDLE
-    etb  => [ 's', "\027", { s => "\x{2417}", } ], # ␗ SYMBOL FOR END OF TRANSMISSION BLOCK
-    can  => [ 's', "\030", { s => "\x{2418}", } ], # ␘ SYMBOL FOR CANCEL
-    em   => [ 's', "\031", { s => "\x{2419}", } ], # ␙ SYMBOL FOR END OF MEDIUM
-    sub  => [ 's', "\032", { s => "\x{241A}", } ], # ␚ SYMBOL FOR SUBSTITUTE
-    esc  => [ '0', "\033", { s => "\x{241B}", } ], # ␛ SYMBOL FOR ESCAPE
-    fs   => [ 's', "\034", { s => "\x{241C}", } ], # ␜ SYMBOL FOR FILE SEPARATOR
-    gs   => [ 's', "\035", { s => "\x{241D}", } ], # ␝ SYMBOL FOR GROUP SEPARATOR
-    rs   => [ 's', "\036", { s => "\x{241E}", } ], # ␞ SYMBOL FOR RECORD SEPARATOR
-    us   => [ 's', "\037", { s => "\x{241F}", } ], # ␟ SYMBOL FOR UNIT SEPARATOR
-    sp   => [ 'm', "\040", { s => "\x{2420}",      # ␠ SYMBOL FOR SPACE
+    cr   => [ 's', "\x0d", { s => "\x{240D}", } ], # ␍ SYMBOL FOR CARRIAGE RETURN
+    so   => [ 's', "\x0e", { s => "\x{240E}", } ], # ␎ SYMBOL FOR SHIFT OUT
+    si   => [ 's', "\x0f", { s => "\x{240F}", } ], # ␏ SYMBOL FOR SHIFT IN
+    dle  => [ 's', "\x10", { s => "\x{2410}", } ], # ␐ SYMBOL FOR DATA LINK ESCAPE
+    dc1  => [ 's', "\x11", { s => "\x{2411}", } ], # ␑ SYMBOL FOR DEVICE CONTROL ONE
+    dc2  => [ 's', "\x12", { s => "\x{2412}", } ], # ␒ SYMBOL FOR DEVICE CONTROL TWO
+    dc3  => [ 's', "\x13", { s => "\x{2413}", } ], # ␓ SYMBOL FOR DEVICE CONTROL THREE
+    dc4  => [ 's', "\x14", { s => "\x{2414}", } ], # ␔ SYMBOL FOR DEVICE CONTROL FOUR
+    nak  => [ 's', "\x15", { s => "\x{2415}", } ], # ␕ SYMBOL FOR NEGATIVE ACKNOWLEDGE
+    syn  => [ 's', "\x16", { s => "\x{2416}", } ], # ␖ SYMBOL FOR SYNCHRONOUS IDLE
+    etb  => [ 's', "\x17", { s => "\x{2417}", } ], # ␗ SYMBOL FOR END OF TRANSMISSION BLOCK
+    can  => [ 's', "\x18", { s => "\x{2418}", } ], # ␘ SYMBOL FOR CANCEL
+    em   => [ 's', "\x19", { s => "\x{2419}", } ], # ␙ SYMBOL FOR END OF MEDIUM
+    sub  => [ 's', "\x1a", { s => "\x{241A}", } ], # ␚ SYMBOL FOR SUBSTITUTE
+    esc  => [ '0', "\x1b", { s => "\x{241B}",      # ␛ SYMBOL FOR ESCAPE
+			     m => "\x{21B0}", } ], # ↰ UPWARDS ARROW WITH TIP LEFTWARDS
+    fs   => [ 's', "\x1c", { s => "\x{241C}", } ], # ␜ SYMBOL FOR FILE SEPARATOR
+    gs   => [ 's', "\x1d", { s => "\x{241D}", } ], # ␝ SYMBOL FOR GROUP SEPARATOR
+    rs   => [ 's', "\x1e", { s => "\x{241E}", } ], # ␞ SYMBOL FOR RECORD SEPARATOR
+    us   => [ 's', "\x1f", { s => "\x{241F}", } ], # ␟ SYMBOL FOR UNIT SEPARATOR
+    sp   => [ 'm', "\x20", { s => "\x{2420}",      # ␠ SYMBOL FOR SPACE
 			     m => "\x{00B7}", } ], # · MIDDLE DOT
-    del  => [ 'm', "\177", { s => "\x{2421}",    , # ␡ SYMBOL FOR DELETE
+    del  => [ 'm', "\x7f", { s => "\x{2421}",    , # ␡ SYMBOL FOR DELETE
 			     m => "\x{232B}", } ], # ⌫ ERASE TO THE LEFT
-    nbsp => [ 's', "\240", { s => "\x{2423}", } ], # ␣ OPEN BOX
+    nbsp => [ 's', "\xa0", { s => "\x{2423}", } ], # ␣ OPEN BOX
 );
 
 package #
@@ -103,7 +105,7 @@ use Getopt::EX::Hashed; {
     has expand     => ' t  :1  ' , default => 1 ;
     has no_expand  => ' T  !   ' ;
     has repeat     => ' r  =s  ' , default => 'nl,np' ;
-    has replicate  => ' R      ' ;
+    has original   => ' o  +   ' , default => 0 ;
     has debug      => ' d      ' ;
     has tabstop    => ' x  =i  ' , default => 8, min => 1 ;
     has tabhead    => '    =s  ' ;
@@ -255,10 +257,14 @@ sub doit {
 	}
     };
     while (<>) {
-	print if $app->replicate;
+	my $orig = $_;
 	$_ = ansi_expand($_) if $app->expand;
 	s{(?=(${repeat_re}?))([$replace]|(?#bug?)(?!))}{$convert->{$2}$1}g
 	    if $replace ne '';
+	if ($app->original > 1 or
+	    ($app->original and $_ ne $orig)) {
+	    print $orig;
+	}
 	print;
     }
 }
@@ -291,7 +297,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright ©︎ 2024- Kazumasa Utashiro.
+Copyright ©︎ 2024-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

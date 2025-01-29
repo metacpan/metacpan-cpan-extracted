@@ -1,5 +1,5 @@
 package Finance::Crypto::Exchange::Kraken::REST::Private::User::Data;
-our $VERSION = '0.002';
+our $VERSION = '0.004';
 # ABSTRACT: Role for Kraken "Prive user data" API calls
 
 use Moose::Role;
@@ -236,7 +236,7 @@ Finance::Crypto::Exchange::Kraken::REST::Private::User::Data - Role for Kraken "
 
 =head1 VERSION
 
-version 0.002
+version 0.004
 
 =head1 SYNOPSIS
 

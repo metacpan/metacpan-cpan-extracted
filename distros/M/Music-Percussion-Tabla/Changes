@@ -1,5 +1,10 @@
 Revision history for Music-Percussion-Tabla
 
+0.0605 2025-01-28 09:45:42
+    - Add more synopsis examples.
+    - Add the number of beats per theka.
+    - Add the eg/durations.pl example program.
+
 0.0604 2025-01-26 18:59:32
     - Improve documentation.
     - Remove the patch option from the strike method.

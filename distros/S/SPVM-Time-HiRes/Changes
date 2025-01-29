@@ -1,3 +1,8 @@
+0.005 2025-01-29
+  [Requirement Changes]
+    * Require SPVM 0.990042.
+  [Test Improvement]
+    * Call Fn#destroy_runtime_permanent_vars method in the end of tests.
 0.004 2023-11-30
   [Requrement Changes]
     * Require SPVM::Sys 0.504.

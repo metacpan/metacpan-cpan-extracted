@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl -w
+#!/usr/bin/perl
 
 require 5.004;
 
@@ -293,7 +293,7 @@ my $DIALOG_ABOUT = $MW->Dialog(
 		       "\nTk Version $Tk::VERSION\n\n      2000/07/07",
 );
 $help->cget(-menu)->entryconfigure('About',
-    -command => [$DIALOG_ABOUT => 'Show'],
+    -command => sub { $DIALOG_ABOUT->Show; },
 );
 
 my $DIALOG_ICON = $MW->Dialog(
@@ -346,7 +346,7 @@ sub invoke {
 
 sub lsearch {
 
-    # Search the list using the supplied regular expression and return it's
+    # Search the list using the supplied regular expression and return its
     # ordinal, or -1 if not found.
 
     my($regexp, @list) = @_;

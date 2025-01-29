@@ -4,10 +4,6 @@ BEGIN { $|=1; $^W=1; }
 use strict;
 use Test;
 
-if ($^O ne 'MSWin32' and !$ENV{DISPLAY}) {
-    print "1..0 # skip: no DISPLAY env var - how come?\n";
-    exit;
-}
 plan tests => 19-5; # implement formInfo, formForget?
 
 use Tcl::Tk qw(:perlTk);

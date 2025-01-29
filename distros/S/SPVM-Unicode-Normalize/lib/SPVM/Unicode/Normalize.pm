@@ -1,6 +1,6 @@
 package SPVM::Unicode::Normalize;
 
-our $VERSION = "0.004";
+our $VERSION = "0.005";
 
 1;
 
@@ -12,7 +12,7 @@ SPVM::Unicode::Normalize - Normalizing UTF-8
 
 =head1 Description
 
-The Unicode::Normalize class in L<SPVM> has methods to normalize UTF-8.
+Unicode::Normalize class in L<SPVM> has methods to normalize UTF-8.
 
 =head1 Usage
 

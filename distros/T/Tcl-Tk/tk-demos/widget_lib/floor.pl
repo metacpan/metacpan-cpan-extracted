@@ -58,8 +58,7 @@ sub floor {
 
     # Set up event bindings for canvas.
 
-    my $floor_number;
-    for $floor_number (1..3) {
+    for my $floor_number (1..3) {
 	$c->bind("floor${floor_number}", '<1>' =>
             [\&floor_display, $floor_number, \%floor_labels, \%floor_items,
 	    \%cinfo, \$active_floor, $c_entry],
@@ -1339,7 +1338,7 @@ sub TIESCALAR {
 
 sub FETCH {
 
-    # Method to handle reads of the tied variable:  simply return it's value.
+    # Method to handle reads of the tied variable:  simply return its value.
 
     my($current_room) = @_;
     return $$current_room;
@@ -1348,7 +1347,7 @@ sub FETCH {
 
 sub STORE {
 
-    # Method to handle writes to the tied variable:  simply store it's value.
+    # Method to handle writes to the tied variable:  simply store its value.
     # Call floor_room_changed() to highlight a room, if possible.
 
     my($current_room, $value) = @_;

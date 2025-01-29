@@ -5,7 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
-  SPVM: '0.989063'
+  SPVM: '0.990042'
   SPVM::Resource::Utf8proc: '0.001'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
@@ -19,9 +19,9 @@ no_index:
     - t
     - inc
 requires:
-  SPVM: '0.989063'
+  SPVM: '0.990042'
   SPVM::Resource::Utf8proc: '0.001'
 resources:
   repository: https://github.com/yuki-kimoto/SPVM-Unicode-Normalize.git
-version: '0.004'
+version: '0.005'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

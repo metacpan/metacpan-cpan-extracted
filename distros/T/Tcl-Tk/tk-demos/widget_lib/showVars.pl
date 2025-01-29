@@ -19,8 +19,7 @@ sub showVars {
     my $w_title = $w->Label(-text => 'Variable values:', -width => 20, -anchor, 'center',
 			     -font => '-Adobe-helvetica-medium-r-normal--*-180-*-*-*-*-*-*');
     $w_title->pack(-fill => 'x');
-    my $i;
-    foreach $i (@_) {
+    foreach my $i (@_) {
 	my $w_i = $w->Frame();
 	my $w_i_name = $w_i->Label(-text => "$i: ");
 	my $w_i_value = $w_i->Label(-textvariable => \${$i});

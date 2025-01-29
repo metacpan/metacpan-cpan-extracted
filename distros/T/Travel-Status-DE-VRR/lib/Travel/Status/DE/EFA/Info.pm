@@ -6,7 +6,7 @@ use 5.010;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '3.06';
+our $VERSION = '3.07';
 
 Travel::Status::DE::EFA::Info->mk_ro_accessors(
 	qw(link_url link_text subject content subtitle additional_text));
@@ -58,7 +58,7 @@ Travel::Status::DE::EFA::Info - Information about a public transit stop
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

@@ -7,13 +7,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [27.1.0] - 2025-01-28
+### Added
+- [cpp] use VERSION file to version ABI and shared libraries [#268](https://github.com/cucumber/messages/pull/268)
+
+### Changed
+- [JavaScript] Expand tested Node.js versions ([#274](https://github.com/cucumber/messages/pull/274))
+
 ## [27.0.2] - 2024-11-15
 ### Fixed
 - [Elixir] Fix release process
 
 ## [27.0.1] - 2024-11-15
 ### Fixed
-- 
 - [Elixir] Restored test and release process
 
 ## [27.0.0] - 2024-10-26
@@ -563,7 +569,8 @@ aggregated status.
 ### Added
 - Protobuf messages for Go, Java, JavaScript, TypeScript and Ruby
 
-[Unreleased]: https://github.com/cucumber/messages/compare/v27.0.2...HEAD
+[Unreleased]: https://github.com/cucumber/messages/compare/v27.1.0...HEAD
+[27.1.0]: https://github.com/cucumber/messages/compare/v27.0.2...v27.1.0
 [27.0.2]: https://github.com/cucumber/messages/compare/v27.0.1...v27.0.2
 [27.0.1]: https://github.com/cucumber/messages/compare/v27.0.0...v27.0.1
 [27.0.0]: https://github.com/cucumber/messages/compare/v26.0.1...v27.0.0

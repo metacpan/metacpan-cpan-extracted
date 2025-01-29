@@ -3,7 +3,7 @@
 
 class Time::HiRes {
   
-  version "0.004";
+  version "0.005";
   
   use Fn;
   use Sys::Time;

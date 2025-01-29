@@ -1,6 +1,6 @@
 #copied from tklib1.18-snit-main1.tcl; any changes here will be lost
 #
-# have '.\lib\tcllib1.18\snit\main1.tcl' . '.\lib\tcllib1.18\snit\validate.tcl' 
+# have '.\lib\tcllib1.18\snit\main1.tcl' . '.\lib\tcllib1.18\snit\validate.tcl'
 # ...and then:
 # package provide snit 1.4.2
 # ...this is what .\lib\tcllib1.18\snit\snit.tcl mainly do
@@ -1044,7 +1044,7 @@ proc ::snit::Comp.statement.option {optionDef args} {
                 }
                 -type {
                     set compile($optopt-$option) $val
-                    
+
                     if {[llength $val] == 1} {
                         # The type spec *is* the validation object
                         append compile(defs) \
@@ -4008,7 +4008,7 @@ main1.tcl
 #
 #-----------------------------------------------------------------------
 
-namespace eval ::snit:: { 
+namespace eval ::snit:: {
     namespace export \
         boolean \
         double \
@@ -4089,20 +4089,20 @@ snit::type ::snit::double {
         # FIRST, get the options
         $self configurelist $args
 
-        if {"" != $options(-min) && 
+        if {"" != $options(-min) &&
             ![string is double -strict $options(-min)]} {
             return -code error \
                 "invalid -min: \"$options(-min)\""
         }
 
-        if {"" != $options(-max) && 
+        if {"" != $options(-max) &&
             ![string is double -strict $options(-max)]} {
             return -code error \
                 "invalid -max: \"$options(-max)\""
         }
 
         if {"" != $options(-min) &&
-            "" != $options(-max) && 
+            "" != $options(-max) &&
             $options(-max) < $options(-min)} {
             return -code error "-max < -min"
         }
@@ -4128,7 +4128,7 @@ snit::type ::snit::double {
             } elseif {"" != $options(-max)} {
                 append msg " no greater than $options(-max)"
             }
-        
+
             return -code error -errorcode INVALID $msg
         }
 
@@ -4177,7 +4177,7 @@ snit::type ::snit::enum {
             return -code error -errorcode INVALID \
     "invalid value \"$value\", should be one of: [join $options(-values) {, }]"
         }
-        
+
         return $value
     }
 }
@@ -4226,20 +4226,20 @@ snit::type ::snit::fpixels {
         # FIRST, get the options
         $self configurelist $args
 
-        if {"" != $options(-min) && 
+        if {"" != $options(-min) &&
             [catch {winfo fpixels . $options(-min)} min]} {
             return -code error \
                 "invalid -min: \"$options(-min)\""
         }
 
-        if {"" != $options(-max) && 
+        if {"" != $options(-max) &&
             [catch {winfo fpixels . $options(-max)} max]} {
             return -code error \
                 "invalid -max: \"$options(-max)\""
         }
 
         if {"" != $min &&
-            "" != $max && 
+            "" != $max &&
             $max < $min} {
             return -code error "-max < -min"
         }
@@ -4250,7 +4250,7 @@ snit::type ::snit::fpixels {
 
     method validate {value} {
         $type validate $value
-        
+
         set val [winfo fpixels . $value]
 
         if {("" != $min && $val < $min) ||
@@ -4263,7 +4263,7 @@ snit::type ::snit::fpixels {
             } elseif {"" != $min} {
                 append msg " no less than $options(-min)"
             }
-        
+
             return -code error -errorcode INVALID $msg
         }
 
@@ -4309,20 +4309,20 @@ snit::type ::snit::integer {
         # FIRST, get the options
         $self configurelist $args
 
-        if {"" != $options(-min) && 
+        if {"" != $options(-min) &&
             ![string is integer -strict $options(-min)]} {
             return -code error \
                 "invalid -min: \"$options(-min)\""
         }
 
-        if {"" != $options(-max) && 
+        if {"" != $options(-max) &&
             ![string is integer -strict $options(-max)]} {
             return -code error \
                 "invalid -max: \"$options(-max)\""
         }
 
         if {"" != $options(-min) &&
-            "" != $options(-max) && 
+            "" != $options(-max) &&
             $options(-max) < $options(-min)} {
             return -code error "-max < -min"
         }
@@ -4344,7 +4344,7 @@ snit::type ::snit::integer {
             } elseif {"" != $options(-min)} {
                 append msg " no less than $options(-min)"
             }
-        
+
             return -code error -errorcode INVALID $msg
         }
 
@@ -4391,12 +4391,12 @@ snit::type ::snit::listtype {
 
     #-------------------------------------------------------------------
     # Constructor
-    
+
     constructor {args} {
         # FIRST, get the options
         $self configurelist $args
 
-        if {"" != $options(-minlen) && 
+        if {"" != $options(-minlen) &&
             (![string is integer -strict $options(-minlen)] ||
              $options(-minlen) < 0)} {
             return -code error \
@@ -4407,13 +4407,13 @@ snit::type ::snit::listtype {
             set options(-minlen) 0
         }
 
-        if {"" != $options(-maxlen) && 
+        if {"" != $options(-maxlen) &&
             ![string is integer -strict $options(-maxlen)]} {
             return -code error \
                 "invalid -maxlen: \"$options(-maxlen)\""
         }
 
-        if {"" != $options(-maxlen) && 
+        if {"" != $options(-maxlen) &&
             $options(-maxlen) < $options(-minlen)} {
             return -code error "-maxlen < -minlen"
         }
@@ -4446,7 +4446,7 @@ snit::type ::snit::listtype {
                 uplevel \#0 $cmd
             }
         }
-        
+
         return $value
     }
 }
@@ -4495,20 +4495,20 @@ snit::type ::snit::pixels {
         # FIRST, get the options
         $self configurelist $args
 
-        if {"" != $options(-min) && 
+        if {"" != $options(-min) &&
             [catch {winfo pixels . $options(-min)} min]} {
             return -code error \
                 "invalid -min: \"$options(-min)\""
         }
 
-        if {"" != $options(-max) && 
+        if {"" != $options(-max) &&
             [catch {winfo pixels . $options(-max)} max]} {
             return -code error \
                 "invalid -max: \"$options(-max)\""
         }
 
         if {"" != $min &&
-            "" != $max && 
+            "" != $max &&
             $max < $min} {
             return -code error "-max < -min"
         }
@@ -4519,7 +4519,7 @@ snit::type ::snit::pixels {
 
     method validate {value} {
         $type validate $value
-        
+
         set val [winfo pixels . $value]
 
         if {("" != $min && $val < $min) ||
@@ -4532,7 +4532,7 @@ snit::type ::snit::pixels {
             } elseif {"" != $min} {
                 append msg " no less than $options(-min)"
             }
-        
+
             return -code error -errorcode INVALID $msg
         }
 
@@ -4574,9 +4574,9 @@ snit::type ::snit::stringtype {
     # -regexp regexp
     #
     # Regular expression to match
-    
+
     option -regexp -readonly 1
-    
+
     #-------------------------------------------------------------------
     # Type Methods
 
@@ -4587,13 +4587,13 @@ snit::type ::snit::stringtype {
 
     #-------------------------------------------------------------------
     # Constructor
-    
+
     constructor {args} {
         # FIRST, get the options
         $self configurelist $args
 
         # NEXT, validate -minlen and -maxlen
-        if {"" != $options(-minlen) && 
+        if {"" != $options(-minlen) &&
             (![string is integer -strict $options(-minlen)] ||
              $options(-minlen) < 0)} {
             return -code error \
@@ -4604,13 +4604,13 @@ snit::type ::snit::stringtype {
             set options(-minlen) 0
         }
 
-        if {"" != $options(-maxlen) && 
+        if {"" != $options(-maxlen) &&
             ![string is integer -strict $options(-maxlen)]} {
             return -code error \
                 "invalid -maxlen: \"$options(-maxlen)\""
         }
 
-        if {"" != $options(-maxlen) && 
+        if {"" != $options(-maxlen) &&
             $options(-maxlen) < $options(-minlen)} {
             return -code error "-maxlen < -minlen"
         }
@@ -4621,14 +4621,14 @@ snit::type ::snit::stringtype {
         }
 
         # Validate the glob
-        if {"" != $options(-glob) && 
+        if {"" != $options(-glob) &&
             [catch {string match $options(-glob) ""} dummy]} {
             return -code error \
                 "invalid -glob: \"$options(-glob)\""
         }
 
         # Validate the regexp
-        if {"" != $options(-regexp) && 
+        if {"" != $options(-regexp) &&
             [catch {regexp $options(-regexp) ""} dummy]} {
             return -code error \
                 "invalid -regexp: \"$options(-regexp)\""
@@ -4663,13 +4663,13 @@ snit::type ::snit::stringtype {
             } else {
                 set result [string match $options(-glob) $value]
             }
-            
+
             if {!$result} {
                 return -code error -errorcode INVALID \
                     "invalid value \"$value\""
             }
         }
-        
+
         # NEXT, check regexp match with or without case
         if {"" != $options(-regexp)} {
             if {$options(-nocase)} {
@@ -4677,13 +4677,13 @@ snit::type ::snit::stringtype {
             } else {
                 set result [regexp -- $options(-regexp) $value]
             }
-            
+
             if {!$result} {
                 return -code error -errorcode INVALID \
                     "invalid value \"$value\""
             }
         }
-        
+
         return $value
     }
 }

@@ -13,11 +13,11 @@ use Mojo::UserAgent;
 use Mojo::URL;
 use Mojo::Util 'html_unescape';
 
-our $VERSION = '2.08'; # VERSION
+our $VERSION = '2.09'; # VERSION
 
 has translation => 'NIV';
-has reference   => Bible::Reference->new( bible => 'Protestant' );
-has url         => Mojo::URL->new('https://www.biblegateway.com/passage/');
+has reference   => sub { Bible::Reference->new( bible => 'Protestant' ) };
+has url         => sub { Mojo::URL->new('https://www.biblegateway.com/passage/') };
 has ua          => sub {
     my $ua = Mojo::UserAgent->new( max_redirects => 3 );
     $ua->transactor->name( __PACKAGE__ . '/' . ( __PACKAGE__->VERSION // '2.0' ) );
@@ -376,7 +376,7 @@ Bible::OBML::Gateway - Bible Gateway content conversion to Open Bible Markup Lan
 
 =head1 VERSION
 
-version 2.08
+version 2.09
 
 =for markdown [![test](https://github.com/gryphonshafer/Bible-OBML-Gateway/workflows/test/badge.svg)](https://github.com/gryphonshafer/Bible-OBML-Gateway/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Bible-OBML-Gateway/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Bible-OBML-Gateway)

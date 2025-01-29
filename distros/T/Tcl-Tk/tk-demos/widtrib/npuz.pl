@@ -1,11 +1,10 @@
 # A N-puzzle implemented via the Grid geometry manager.
 #
 # This program is described in the Perl/Tk column from Volume 1, Issue 4 of
-# The Perl Journal (http://tpj.com/tpj), and is included in the Perl/Tk
-# distribution with permission.  It has been modified slightly to conform
-# to the widget demo standard.
+# The Perl Journal, and is included in the Perl/Tk distribution with
+# permission.  It has been modified slightly to conform to the widget demo
+# standard.
 
-#!/usr/local/bin/perl -w
 #
 # puz - demonstrate the Grid geometry manager by implementing an n-puzzle.
 #

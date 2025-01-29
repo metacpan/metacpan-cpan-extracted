@@ -1,5 +1,11 @@
 This file documents the revision history for Perl extension DBIx::Migration.
 
+0.09 Wed Jan 29 09:09:14 CET 2025
+        - Consider CPAN testers feedback: fix Test::PostgreSQL::new()
+          exception handling in unit test script
+        - Configure and use perltidy
+        - Update prerequisite setup
+
 0.08  Mon Jan 27 07:26:05 CET 2025
         - Fix insufficient _connect() error reporting [RT #158385]
         - Correct for PSQL whitespace issue in CHAR columns
@@ -11,11 +17,9 @@ This file documents the revision history for Perl extension DBIx::Migration.
         - Added DBD::SQLite dependency
 
 0.06  Tue Oct 19 09:27:56 PDT 2010
-
-	- Fix for http://rt.cpan.org/Public/Bug/Display.html?id=35393
+	- Fix [RT #35393]
 
 0.05  2006-06-06 12:44:12 PDT 2006
-
 	- Fixed to work on Win32 (remove glob calls)
 	- Use 'name' instead of 'key' for the dbix_migration table, as 'key'
 	  is a reserved word in many/most databases.
@@ -28,7 +32,7 @@ This file documents the revision history for Perl extension DBIx::Migration.
         - Fixed the multiple sql statement bug
 
 0.02  2005-10-24 01:00:00
-        - default to newest version
+        - Default to newest version
 
 0.01  2005-10-24 00:00:00
-        - first release
+        - First release

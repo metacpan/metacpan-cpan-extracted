@@ -1,6 +1,6 @@
 package SPVM::Resource::RE2;
 
-our $VERSION = "0.042";
+our $VERSION = "0.043";
 
 1;
 
@@ -10,7 +10,7 @@ SPVM::Resource::RE2 - The Resource of Google/RE2
 
 =head1 Description
 
-SPVM::Resource::RE2 is a L<resource|SPVM::Document::Resource> of L<SPVM> for the L<Google/RE2|https://github.com/google/re2>.
+SPVM::Resource::RE2 class in L<SPVM> is a L<resource|SPVM::Document::Resource> class for the L<Google/RE2|https://github.com/google/re2>.
 
 =head1 Usage
 
@@ -229,16 +229,16 @@ Unix/Linux/Mac:
 
 =head2 Download
 
-  mkdir -p original.tmp
-  git clone https://github.com/google/re2.git original.tmp/re2
-  git -C original.tmp/re2 checkout tags/2023-02-01 -b branch_2023-02-01
-  git -C original.tmp/re2 branch
+  mkdir -p .tmp
+  git clone https://github.com/google/re2.git .tmp/re2
+  git -C .tmp/re2 checkout tags/2023-02-01 -b branch_2023-02-01
+  git -C .tmp/re2 branch
 
 =head2 Extracting Source Files
 
 All files of C<Google/RE2> is copied by the following steps into the C<src> directory.
 
-  rsync -av --exclude='*.h' original.tmp/re2/ lib/SPVM/Resource/RE2.native/src/
+  rsync -av --exclude='*.h' .tmp/re2/ lib/SPVM/Resource/RE2.native/src/
 
 The source files that is used in the config are extracted by the following command.
 
@@ -248,7 +248,7 @@ The source files that is used in the config are extracted by the following comma
 
 Header files of C<Google/RE2> is copied into the C<include> directory by the following way.
 
-  rsync -av --include='*/' --include='*.h' --exclude='*' original.tmp/re2/ lib/SPVM/Resource/RE2.native/include/
+  rsync -av --include='*/' --include='*.h' --exclude='*' .tmp/re2/ lib/SPVM/Resource/RE2.native/include/
 
 =head1 Repository
 

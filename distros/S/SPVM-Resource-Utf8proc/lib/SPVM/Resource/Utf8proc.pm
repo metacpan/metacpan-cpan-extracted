@@ -1,6 +1,6 @@
 package SPVM::Resource::Utf8proc;
 
-our $VERSION = "0.002";
+our $VERSION = "0.003";
 
 1;
 
@@ -10,7 +10,7 @@ SPVM::Resource::Utf8proc - Bundle of the utf8proc library
 
 =head1 Description
 
-The Resource::Utf8proc resource in L<SPVM> is a L<resouce|SPVM::Document::Resource> that bundles the L<utf8proc|https://github.com/JuliaStrings/utf8proc> library.
+Resource::Utf8proc class in L<SPVM> is a L<resouce|SPVM::Document::Resource> class for L<utf8proc|https://github.com/JuliaStrings/utf8proc> library.
 
 =head1 Usage
 

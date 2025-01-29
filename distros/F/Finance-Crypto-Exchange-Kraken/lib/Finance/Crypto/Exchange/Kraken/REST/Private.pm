@@ -1,5 +1,5 @@
 package Finance::Crypto::Exchange::Kraken::REST::Private;
-our $VERSION = '0.002';
+our $VERSION = '0.004';
 use Moose::Role;
 
 use Digest::SHA qw(hmac_sha512_base64 sha256);
@@ -32,10 +32,16 @@ sub _private {
 
 sub _hmac {
     my ($self, $path, $nonce, $content) = @_;
-    return hmac_sha512_base64(
+    my $hmac = hmac_sha512_base64(
         join("", $path, sha256($nonce . $content)),
         $self->secret
     );
+
+    while (length($hmac) % 4) {
+      $hmac .= '=';
+    }
+    return $hmac;
+
 }
 
 with qw(
@@ -59,7 +65,7 @@ Finance::Crypto::Exchange::Kraken::REST::Private - Role for Kraken "private" API
 
 =head1 VERSION
 
-version 0.002
+version 0.004
 
 =head1 SYNOPSIS
 

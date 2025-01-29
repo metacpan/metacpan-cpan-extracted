@@ -10,12 +10,7 @@ use DBIx::Fast;
 eval "use DBD::SQLite 1.74";
 plan skip_all => "DBD::SQLite 1.74" if $@;
 
-my $db = DBIx::Fast->new(
-    db     => 't/db/test.db',
-    driver => 'SQLite',
-    RaiseError => 0,
-    PrintError => 0,
-    quote  => '`' );
+my $db = DBIx::Fast->new( SQLite => 't/db/test.db' );
 
 ok $db->now,'DBIx::Fast now()';
 
@@ -26,16 +21,6 @@ for my $Driver (qw(Pg MariaDB mysql SQLite)) {
 
 $db->_Driver_dbd('NotDriver');
 isnt $db->dbd,'NotDriver',"_Driver_dbd NotDriver";
-
-is $db->args->{quote},'`',"dbi_args quote => '`'";
-
-$db->_set_args( { args => { RaiseError => 99, PrintError => 99 , AutoCommit => 99 } } );
-
-my $args = $db->args;
-
-is $args->{args}->{RaiseError},99,"dbi_args RaiseError => 99";
-is $args->{args}->{RaiseError},99,"dbi_args PrintError => 99";
-is $args->{args}->{RaiseError},99,"dbi_args AutoCommit => 99";
 
 is $db->_check_dsn('dbi:SQLite:dbname=t/db/test.db'),
     'dbi:SQLite:dbname=t/db/test.db',"_check_dsn SQLite";

@@ -1,0 +1,6 @@
+=head1 DBIx::Class::Schema::Loader::DBI::MariaDB
+
+This is the repository for
+L<DBIx::Class::Schema::Loader::DBI::MariaDB|https://metacpan.org/pod/DBIx::Class::Schema::Loader::DBI::MariaDB>
+
+L<Bugtracker|https://rt.cpan.org/Public/Dist/Display.html?Name=DBIx-Class-Schema-Loader-DBI-MariaDB>

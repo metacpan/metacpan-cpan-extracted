@@ -11,7 +11,7 @@ SYNOPSIS
         );
 
         my $version = $m->version;   # Get current version from database
-        $m->migrate(2);              # Migrate database to version 2
+        $m->migrate( 2 );            # Migrate database to version 2
 
         # /Users/sri/myapp/db/sqlite/schema_1_up.sql
         CREATE TABLE foo (
@@ -35,25 +35,25 @@ DESCRIPTION
     Seamless DB schema up- and downgrades.
 
 METHODS
-    $self->debug($debug)
+    $self->debug( $debug )
         Enable/Disable debug messages.
 
-    $self->dir($dir)
+    $self->dir( $dir )
         Get/Set directory.
 
-    $self->dsn($dsn)
+    $self->dsn( $dsn )
         Get/Set dsn.
 
-    $self->dbh($dsn)
+    $self->dbh( $dsn )
         Get/Set dbh.
 
-    $self->migrate($version)
+    $self->migrate( $version )
         Migrate database to version.
 
     $self->password
         Get/Set database password.
 
-    $self->username($username)
+    $self->username( $username )
         Get/Set database username.
 
     $self->version
@@ -73,6 +73,8 @@ CONTRIBUTORS
     Sven Willenbuecher, <sven.willenbuecher@gmx.de>
 
 COPYRIGHT
+    Copyright 2004-2005 Sebastian Riedel. All rights reserved.
+
     This program is free software, you can redistribute it and/or modify it
     under the same terms as Perl itself.
 

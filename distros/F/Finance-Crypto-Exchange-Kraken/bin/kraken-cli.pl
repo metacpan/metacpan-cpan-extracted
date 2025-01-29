@@ -17,6 +17,7 @@ use JSON;
 my @opts = qw(
     help
     create-config
+    list
     command=s@
 );
 my %opts = (
@@ -32,6 +33,14 @@ my %opts = (
 }
 
 pod2usage(0) if ($opts{help});
+
+if ($opts{list}) {
+    my @methods = Finance::Crypto::Exchange::Kraken->supported_methods;
+    foreach (@methods) {
+        print $_, $/;
+    }
+    exit 0;
+}
 
 if ($opts{'create-config'}) {
 
@@ -70,11 +79,15 @@ my $kraken = Finance::Crypto::Exchange::Kraken->new(%opts);
 
 sub _exec_kraken {
     my $command = shift;
+
     if ($kraken->can($command)) {
         print JSON::encode_json($kraken->$command), $/;
         return;
     }
-    die "Unable to execute command $command", $/;
+    die sprintf(
+        "Unable to execute command %s!\nPlease use one of the following: %s\n",
+        $command, join(", ", $kraken->supported_methods)
+    );
 }
 
 
@@ -99,7 +112,7 @@ kraken-cli - Kraken API via the CLI
 
 =head1 VERSION
 
-version 0.002
+version 0.004
 
 =head1 SYNOPSIS
 

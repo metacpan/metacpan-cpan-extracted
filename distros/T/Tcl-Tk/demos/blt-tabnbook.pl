@@ -3,13 +3,13 @@ use Tcl::Tk qw(:perlTk);
 
 my $mw = tkinit;
 
-# declare tabnotebook widgets rules to Tcl::Tk  
+# declare tabnotebook widgets rules to Tcl::Tk
 $mw->Declare('BLTNoteBook','blt::tabnotebook',-require=>'BLT',-prefix=>'bltnbook');
 
-# Create a tabnotebook widget.  
+# Create a tabnotebook widget.
 my $tab = $mw->BLTNoteBook->pack(-fill=>'both');
 
-# The notebook is initially empty.  Insert tabs (pages) into the notebook.  
+# The notebook is initially empty.  Insert tabs (pages) into the notebook.
 for my $label (qw{ First Second Third Fourth }) {
     $tab->insert('end', -text=>$label);
 }

@@ -1,5 +1,8 @@
 Revision history for DBIx-Fast
 
+0.15	06/09/24
+	- args : SQLite
+	
 0.14	03/09/24
 	- POD
 	

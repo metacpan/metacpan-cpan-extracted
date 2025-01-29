@@ -4,7 +4,7 @@
 #
 # Author: Slaven Rezic
 #
-# Copyright (C) 2009,2013,2014,2015,2016,2017,2019,2020,2021,2022,2024 Slaven Rezic. All rights reserved.
+# Copyright (C) 2009,2013,2014,2015,2016,2017,2019,2020,2021,2022,2024,2025 Slaven Rezic. All rights reserved.
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -18,7 +18,7 @@ package # hide from PAUSE indexer
 use strict;
 use 5.008; # scalar open
 
-our $VERSION = '1.14';
+our $VERSION = '1.15';
 
 use Getopt::Long;
 use List::Util qw(max);

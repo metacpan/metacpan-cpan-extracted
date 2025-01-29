@@ -1,5 +1,8 @@
 The following logs changes for the CPAN distribution Catalyst-View-EmbeddedPerl-PerRequest
 
+0.001019  28 January 2025
+          - 'view' helper now supports find views relative to the current namespace
+
 0.001018  23 December 2024
           - Updated dependencies to take advantage of downstream improvements
 

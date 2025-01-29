@@ -3,16 +3,18 @@ BEGIN { $|=1; $^W=1; }
 use strict;
 use Test;
 
-if ($^O ne 'MSWin32' and !$ENV{DISPLAY}) {
-    print "1..0 # skip: no DISPLAY env var - how come?\n";
-    exit;
-}
    plan test => 7;
 
 use Tcl::Tk;
 
 my $mw;
 eval {$mw = Tcl::Tk::MainWindow->new();};
+
+my $tcl = $mw->interp;
+my $tclversion = $tcl->Eval("info tclversion");
+# show version, patchlevel on test report:
+print STDERR "\$tclversion=$tclversion, patchlevel=" . $tcl->Eval("info patchlevel") . "\n";
+
 ok($@, "", "can't create MainWindow");
 ok(Tcl::Tk::Exists($mw), 1, "MainWindow creation failed");
 

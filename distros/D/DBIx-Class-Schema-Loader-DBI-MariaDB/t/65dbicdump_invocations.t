@@ -34,7 +34,7 @@ dbicdump(
 done_testing;
 
 sub dbicdump {
-    system 'dbicdump',
+    system $^X, 't/bin/dbicdump',
         '-o', "dump_directory=$tdir",
         '-o', 'quiet=1',
         @_;

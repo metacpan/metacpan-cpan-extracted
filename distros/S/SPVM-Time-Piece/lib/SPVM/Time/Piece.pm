@@ -1,6 +1,6 @@
 package SPVM::Time::Piece;
 
-our $VERSION = "0.004";
+our $VERSION = "0.005";
 
 1;
 
@@ -10,7 +10,7 @@ SPVM::Time::Piece - Dates and Times
 
 =head1 Description
 
-The Time::Piece class in L<SPVM> has methods to manipulate dates and times.
+Time::Piece class in L<SPVM> has methods to manipulate dates and times.
 
 =head1 Usage
 

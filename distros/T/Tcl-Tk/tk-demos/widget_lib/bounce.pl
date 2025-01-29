@@ -193,8 +193,7 @@ sub mkmb {
     my($menu) = $mb->Menu(-tearoff => 0);
     $mb->configure(-menu => $menu);
 
-    my $mb_list;
-    foreach $mb_list (@{$mb_list_ref}) {
+    foreach my $mb_list (@{$mb_list_ref}) {
         $mb->command(
             -label      => $mb_list->[0],
             -command    => $mb_list->[1] ,

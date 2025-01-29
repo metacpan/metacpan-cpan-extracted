@@ -1,5 +1,8 @@
 Revision history for Task-BeLike-SHLOMIF
 
+0.0.11     2025-01-29
+    - Add more, including Net::GitHub
+
 0.0.10     2023-02-27
     - Add more
 

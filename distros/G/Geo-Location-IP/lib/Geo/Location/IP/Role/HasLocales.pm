@@ -10,7 +10,7 @@ use Object::Pad;
 
 role Geo::Location::IP::Role::HasLocales;
 
-our $VERSION = 0.002;
+our $VERSION = 0.003;
 
 field $locales :param :reader = ['en'];
 
@@ -25,7 +25,7 @@ Geo::Location::IP::Role::HasLocales - Add a "locales" field
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -41,7 +41,7 @@ A mixin that adds the field C<locales> to a class.
 
   my @locales = @{$obj->locales};
 
-Returns an array reference of locale codes such as ['de', 'en', 'zh-CN'].
+Returns an array reference of locale codes such as ['zh-CN', 'en'].
 
 =for Pod::Coverage DOES META new
 

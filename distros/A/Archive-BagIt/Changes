@@ -1,10 +1,30 @@
 ==================================================
-Changes from 2021-12-28 00:00:00 +0000 to present.
+Changes from 2024-01-30 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.095 at 2022-12-28 14:24:31 +0000
+version 0.096 at 2025-01-29 08:01:30 +0000
 ------------------------------------------
+
+  Change: 679d662f6021a9f6fb78dcfd4e55aeebc3367400
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2025-01-29 08:10:32 +0000
+
+    - fix, if you store a bag with large payload-files, the bagit.txt and
+    bag-info.txt should be written after manifest-files to ensure, that a
+    partial written bagit is not processed before finished. 
+
+  Change: 1169e73e7522d9aa8b9f22b334d046d4899d070e
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2025-01-29 07:57:41 +0000
+
+    - fixed outdated README 
+
+  Change: 5184aae156e919d1d76afdcb95c480cfb4f98777
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2022-12-28 15:25:06 +0000
+
+    Released 0.095 
 
   Change: 68f16f156fbd29645c758a1aa4418bb316816bdd
   Author: Andreas Romeyke <art1@andreas-romeyke.de>
@@ -31,205 +51,6 @@ version 0.095 at 2022-12-28 14:24:31 +0000
 
     - minor, improved string compare 
 
-------------------------------------------
-version 0.094 at 2022-05-12 10:51:14 +0000
-------------------------------------------
-
-  Change: fb0535d04458e02f0c8463767ef434ab62e1c7d1
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2022-05-12 12:51:14 +0000
-
-    Released 0.094 
-
-  Change: 0e0fcd8ebfa69b3caa3a9ab544aad6a2ae683302
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2022-05-12 12:50:29 +0000
-
-    - removed unused module 
-
-------------------------------------------
-version 0.093 at 2022-05-10 08:45:52 +0000
-------------------------------------------
-
-  Change: 26ab8bd80c85cd5b5643a7e0bde16f103af7d0a2
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2022-05-10 10:45:52 +0000
-
-    Released 0.093 
-
-  Change: 92da8ff8d6900beed0eb34bc5ff54a8ef220fe3d
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2022-05-10 10:45:02 +0000
-
-    - fixes gathering issue with testfile 
-
-  Change: 4cbd4091c7042373ba35a47af6567174ed438597
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2022-05-10 10:10:25 +0000
-
-    - fixed issues with naughty strings 
-
-  Change: be5eb20e3c884e59d6e9a6c8ecfc185e7885b437
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2022-05-10 10:09:53 +0000
-
-    - added tests for naughty strings 
-
-------------------------------------------
-version 0.092 at 2022-02-03 12:43:15 +0000
-------------------------------------------
-
-  Change: d99ea9bcde706704539ad4dcd88638a5bf0634bb
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2022-02-03 13:43:15 +0000
-
-    Released 0.092 
-
-  Change: 6bed7c60d4ba7d13e91768ca17718d6761c79f10
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2022-02-03 13:42:06 +0000
-
-    - added TestRequires section 
-
-------------------------------------------
-version 0.091 at 2022-01-31 07:49:29 +0000
-------------------------------------------
-
-  Change: 813004e2b8f94b6bbe134bf592760074f09e5fcc
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2022-01-31 08:49:29 +0000
-
-    Released 0.091 
-
-  Change: ba5d493f8ec88c7ed6ea73f1cbfd2bd784e2fda5
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2022-01-31 08:48:47 +0000
-
-    - added missed dependency 
-
-  Change: d8e993cff00ba31383eb1bcaea4f53a53d023318
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2022-01-31 08:48:32 +0000
-
-    - fixed dependency - added autor test guard 
-
-------------------------------------------
-version 0.090 at 2022-01-28 16:54:50 +0000
-------------------------------------------
-
-  Change: 77d509e0aa67f3520077a1e051c9381ade880ea4
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2022-01-28 17:54:50 +0000
-
-    Released 0.090 
-
-  Change: a079dc5655072d21f981b057fe8e0dc9c95ca815
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2022-01-28 17:53:49 +0000
-
-    - removed unused module - minor fix order of modules 
-
-  Change: 5c340b9d336583225430bddc2af3dd7141bd1717
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2022-01-28 17:53:05 +0000
-
-    - fixed POD reference to Archive::BagIt::Fast 
-
-  Change: 5fd13258c672e7df97aedeae5e72a185c2907813
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2022-01-28 17:52:29 +0000
-
-    - fixed dependencies 
-
-  Change: 0c110951a3cfa155923923d81bf848f0cd4b4fff
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2022-01-28 17:52:04 +0000
-
-    - extracted Archive::BagIt::Fast from this distribution (in own
-    distribution) to minimize dependencies 
-
-------------------------------------------
-version 0.089 at 2022-01-04 13:54:16 +0000
-------------------------------------------
-
-  Change: 13456f3815d4b656f0cad81844c50994261b0b16
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2022-01-04 14:54:16 +0000
-
-    Released 0.089 
-
-  Change: 5412326d30139c5c9871bb72cac56c0663c9cc70
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2022-01-04 14:52:54 +0000
-
-    - make predicate explicite in sub has_forced_fixity_algorithm() -
-    minor improvements 
-
-  Change: 3f918b8c39d8f27488940f54090e96c9a0798254
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2022-01-04 14:38:25 +0000
-
-    - fixed 
-
-  Change: 79d2da74d6ec9c3d31e73502d7e14ddaa2b2c5ca
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2022-01-04 14:38:16 +0000
-
-    - fixed some predicates - fixed _build_forced_fixity_algorithm() - in
-    verify_bag() forced fixity file is only checked, if no use_plugin
-    option is used 
-
-------------------------------------------
-version 0.088 at 2022-01-04 12:42:59 +0000
-------------------------------------------
-
-  Change: 0efa6dd0dd48d10f3500772abca188d6b7c26a4d
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2022-01-04 13:42:59 +0000
-
-    Released 0.088 
-
-  Change: 514e6b0b1ce9fc9119bcc0f8b2d1ab48d1bc933a
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2022-01-04 13:40:58 +0000
-
-    - minor fix, fixed pod error 
-
-  Change: 259c215a64ecb3e48fe80be93959b40cdf79e204
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2022-01-04 13:37:33 +0000
-
-    - added base test for use_plugins option 
-
-  Change: 5b8239c18444cec7c37ebddc10bc44c245b8f5b1
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2022-01-04 13:36:57 +0000
-
-    - fixed order in BUILD() - fixed _build_checksum_algos() using
-    manifests() instead predefined array ref 
-
-  Change: 48907a376d763bdc1debee26b636ad2d61eb8bea
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2022-01-04 13:06:39 +0000
-
-    - added use_plugins to enforce plugin usage 
-
-------------------------------------------
-version 0.087 at 2022-01-04 09:59:00 +0000
-------------------------------------------
-
-  Change: 0d1403be87442689c2092afc656610b63a62a4e6
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2022-01-04 10:59:00 +0000
-
-    Released 0.087 
-
-  Change: 8b498f8ae38a71ec032134a860d5fd5acdbf74f9
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2022-01-04 10:57:49 +0000
-
-    - disabling Auto::Prereqs because we define requirements ourself 
-
 =================================================
-Plus 36 releases after 2021-12-28 00:00:00 +0000.
+Plus 44 releases after 2024-01-30 00:00:00 +0000.
 =================================================

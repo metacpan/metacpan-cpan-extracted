@@ -11,12 +11,12 @@ sub bitmapRow  {
     # args -	The names of one or more bitmaps, which will be displayed in frame $w
 
     my($w, @names) = @_;
-    my($bitmap, $wr, $wr_bit, $wr_bit_bitmap, $wr_bit_label);
+    my($wr, $wr_bit, $wr_bit_bitmap, $wr_bit_label);
 
     $wr = $w->Frame();
     $wr->pack(-side => 'top', -fill => 'both');
 
-    foreach $bitmap (@names) {
+    foreach my $bitmap (@names) {
 	$wr_bit = $wr->Frame();
 	$wr_bit->pack(-side => 'left', -fill => 'both', -pady => '.25c', -padx => '.25c');
 	$wr_bit_bitmap = $wr_bit->Label(-bitmap => $bitmap);

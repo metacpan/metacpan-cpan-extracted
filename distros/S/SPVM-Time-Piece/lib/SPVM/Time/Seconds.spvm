@@ -2,6 +2,8 @@
 # MIT License
 
 class Time::Seconds {
+  version_from Time::Piece;
+  
   allow Time::Piece;
   
   use StringBuffer;

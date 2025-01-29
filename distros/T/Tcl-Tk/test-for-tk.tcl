@@ -5,7 +5,8 @@ if {![catch {package require Tk}]} {
 if {![catch {package require snit}]} {
     puts {ok2}
 }
-if {![catch {package require tklib}]} {
+# detect tklib existence ('cursor' is a package in tklib)
+if {![catch {package require cursor}]} {
     puts {ok3}
 }
 if {![catch {package require tile}]} {

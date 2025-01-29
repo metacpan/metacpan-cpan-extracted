@@ -13,8 +13,7 @@ use SPVM 'Fn';
 
 my $api = SPVM::api();
 
-# Start objects count
-my $start_memory_blocks_count = $api->get_memory_blocks_count();
+my $start_memory_blocks_count = $api->get_memory_blocks_count;
 
 # timelocal
 {
@@ -32,8 +31,9 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count();
   is($SPVM::Time::Local::VERSION, $version_string);
 }
 
-# All object is freed
-my $end_memory_blocks_count = $api->get_memory_blocks_count();
+SPVM::Fn->destroy_runtime_permanent_vars;
+
+my $end_memory_blocks_count = $api->get_memory_blocks_count;
 is($end_memory_blocks_count, $start_memory_blocks_count);
 
 done_testing;

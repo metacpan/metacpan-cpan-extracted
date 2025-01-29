@@ -104,7 +104,7 @@ EOS
 #         -title    => 'Plot Demonstration',
 #         -iconname => 'plot',
 #     );
-# 
+#
 #     my $c = $TOP->Plot(
 #         -title_color        => 'Brown',
 #         -inactive_highlight => 'Skyblue2',

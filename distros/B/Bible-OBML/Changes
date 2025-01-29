@@ -1,5 +1,8 @@
 Revision history for Bible::OBML
 
+2.08      2025-01-28 11:45:32-08:00 America/Los_Angeles
+        - exact::class attr leak guard
+
 2.07      2024-05-02 11:56:45-07:00 America/Los_Angeles
         - Bug fix for handling Text::Wrap wanting to use tabs
         - Bug fix for OBML generation cleanup

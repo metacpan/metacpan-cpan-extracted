@@ -40,11 +40,10 @@ my %fields = (
     traits       => {domain => 'example.com'},
 );
 
-my $model = new_ok 'Geo::Location::IP::Model::City' => [
-    raw        => \%fields,
-    ip_address => $ip_address,
-    locales    => ['en']
-];
+my $locales = ['en'];
+
+my $model = Geo::Location::IP::Model::City->_from_hash(\%fields, $ip_address,
+    $locales);
 
 can_ok $model, keys %fields;
 
@@ -77,11 +76,8 @@ my $traits = $model->traits;
 is $traits->domain, 'example.com', 'domain is "example.com"';
 
 delete $fields{subdivisions};
-$model = new_ok 'Geo::Location::IP::Model::City' => [
-    raw        => \%fields,
-    ip_address => $ip_address,
-    locales    => ['en']
-];
+$model = Geo::Location::IP::Model::City->_from_hash(\%fields, $ip_address,
+    $locales);
 ok !defined $model->most_specific_subdivision->name,
     'subdivision name is undefined';
 

@@ -10,7 +10,7 @@ use Object::Pad;
 
 role Geo::Location::IP::Role::Record::HasNames;
 
-our $VERSION = 0.002;
+our $VERSION = 0.003;
 
 field $names :param :reader;
 field $name :reader;
@@ -37,7 +37,7 @@ Geo::Location::IP::Role::Record::HasConfidence - Add the fields "name" and "name
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -46,6 +46,8 @@ version 0.002
 =head1 DESCRIPTION
 
 A mixin that adds the fields C<name> and C<names> to a class.
+
+Requires a C<locales> parameter such as ['zh-CN', 'en'].
 
 =head1 SUBROUTINES/METHODS
 

@@ -16,6 +16,7 @@ on 'test' => sub {
   requires "Class::Unload" => "0";
   requires "DBD::MariaDB" => "0";
   requires "DBI" => "0";
+  requires "DBIx::Class::Storage" => "0";
   requires "File::Basename" => "0";
   requires "File::Copy" => "0";
   requires "File::Find" => "0";

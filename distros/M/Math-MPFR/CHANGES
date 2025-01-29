@@ -1,5 +1,11 @@
 Revision history for Perl module Math::MPFR
 
+4.34
+  - Fix http://www.cpantesters.org/cpan/report/b5e0d3db-6deb-1014-9c2b-9eec45d75318
+    Thanks @twata_1.
+  - Sanitize Rmpfr_*printf handling of "%a" formatting.
+  - Add new utility function nv2mpfr().
+
 4.33
   - Add new (in MPFR-4.3.0) function Rmpfr_trigamma and new test script t/trigamma.t
   - Add dragon_test() as a replacement for the (now) deprecated nvtoa_test().

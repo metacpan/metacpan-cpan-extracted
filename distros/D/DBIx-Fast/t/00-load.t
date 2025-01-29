@@ -1,11 +1,8 @@
 #!perl -T
 use strict;
-use warnings FATAL => 'all';
-use Test::More;
+use warnings;
 
-if ( $@ ) {
-    plan skip_all => "DBD::SQLite 1.74";
-}
+use Test::More;
 
 plan tests => 4;
 

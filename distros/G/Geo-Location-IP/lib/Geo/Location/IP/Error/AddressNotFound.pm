@@ -11,7 +11,7 @@ use Object::Pad;
 class Geo::Location::IP::Error::AddressNotFound
     :isa(Geo::Location::IP::Error::Generic);
 
-our $VERSION = 0.002;
+our $VERSION = 0.003;
 
 field $ip_address :param :reader;
 
@@ -26,7 +26,7 @@ Geo::Location::IP::Error::AddressNotFound - Error class for IP addresses
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -47,8 +47,8 @@ version 0.002
 
 =head1 DESCRIPTION
 
-An error class that signals a non-existing IP address in a geolocation
-database.
+A L<Geo::Location::IP::Error::Generic> subclass that signals a non-existing IP
+address in a geolocation database.
 
 =head1 SUBROUTINES/METHODS
 

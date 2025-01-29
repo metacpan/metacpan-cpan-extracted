@@ -8,7 +8,7 @@ use warnings;
 use Carp;
 use Encode;
 
-our $VERSION = '0.027';
+our $VERSION = '0.028';
 
 require XSLoader;
 XSLoader::load('HarfBuzz::Shaper', $VERSION);
@@ -560,7 +560,7 @@ HarfBuzz website and documentation: L<https://harfbuzz.github.io/index.html>.
 
 =head1 COPYRIGHT AND LICENCE
 
-Copyright (C) 2020 by Johan Vromans
+Copyright (C) 2020,2025 by Johan Vromans
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

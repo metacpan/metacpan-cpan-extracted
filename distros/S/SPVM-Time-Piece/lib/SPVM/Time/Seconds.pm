@@ -10,7 +10,7 @@ SPVM::Time::Seconds - Seconds
 
 =head1 Description
 
-The Time::Seconds class in L<SPVM> has methods to manipulate seconds to calculate dates and times.
+Time::Seconds class in L<SPVM> has methods to manipulate seconds to calculate dates and times.
 
 =head1 Usage
 

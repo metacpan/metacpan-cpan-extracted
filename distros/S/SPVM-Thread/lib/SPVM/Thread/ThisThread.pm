@@ -14,7 +14,7 @@ SPVM::Thread::ThisThread - Getting Current Thread Information
 
 =head1 Description
 
-The C<Thread::ThisThread> class of L<SPVM> has methods to get information of the current thread.
+Thread::ThisThread class in L<SPVM> has methods to get information of the current thread.
 
 This class is a binding of L<std::this_thread in C++|https://en.cppreference.com/w/cpp/thread>.
 

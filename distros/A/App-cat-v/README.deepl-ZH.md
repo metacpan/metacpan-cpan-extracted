@@ -10,7 +10,7 @@ cat-v \[ 选项 \] args ...
        -n   --reset         Disable all character conversion
        -c   --visible=#     Specify visualize characters
        -r   --repeat=#      Specify repeat characters
-       -R   --replicate     Replicate original line as is
+       -o   --original      Print original line as is
        -t   --expand[=#]    Expand tabs
        -T   --no-expand     Do not expand tabs
       --ts  --tabstyle=#    Set tab style
@@ -31,7 +31,7 @@ cat-v \[ 选项 \] args ...
 
 # VERSION
 
-Version 1.01
+Version 1.02
 
 # DESCRIPTION
 
@@ -174,9 +174,11 @@ Version 1.01
 
         cat-v -c esc --repeat +esc
 
-- **-R**, **--replicate**
+- **-o**, **-oo**, **--original**
 
-    在打印转换后的字符串之前，首先输出原始字符串。
+    如果转换后的字符串与原始字符串不同，则先输出原始字符串，然后再输出转换后的字符串。如果指定两次，则始终打印原始字符串。
+
+    您可以将此输出与 [App::cdif](https://metacpan.org/pod/App%3A%3Acdif) 的 `--line-by-line` (`--lxl`) 选项一起使用。
 
 - **-t**\[_n_\], **--expand**\[=_n_\]
 - **-T**, **--no-expand**
@@ -241,7 +243,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright © 2024 Kazumasa Utashiro.
+Copyright © 2024-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

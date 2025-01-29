@@ -1,5 +1,11 @@
 Revision history for Perl extension Onyphe.
 
+4.17 Tue 28 Jan 16:06:24 CET 2025
+   - BREAKING: onyphe: default to set -aslines to true
+   - New: Onyphe::Api: ASD Pivot, Top, Domain, Keyword, Domain2so, So2domain APIs
+   - New: onyphe: add -field, -keyword, -astask, -filter arguments
+   - New: onyphe: add -ports argument to select which ports to scan with On-demand APIs
+
 4.16 Thu 31 Oct 10:12:01 CET 2024
    - New: Onyphe::Api: ASD Mx API
    - New: Onyphe::Api: Ondemand Resolver Domain Bulk API

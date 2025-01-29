@@ -3,7 +3,7 @@ class TestCase::Thread {
   use Thread::ID;
   use Thread::ThisThread;
   
-  our $RESULT : public int[];
+  our $RESULT : public cache int[];
   
   static method basic : int () {
     

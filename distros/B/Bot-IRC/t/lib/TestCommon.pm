@@ -10,7 +10,7 @@ has mock_store => undef;
 has mock_bot   => undef;
 has bot        => undef;
 has hook_ref   => undef;
-has replies    => [];
+has replies    => sub { [] };
 
 around new => sub {
     my ( $orig, $self ) = @_;

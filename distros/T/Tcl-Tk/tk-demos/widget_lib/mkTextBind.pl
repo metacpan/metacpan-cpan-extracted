@@ -50,7 +50,7 @@ demonstrations that are available:');
     insert_with_tags($w_t, "\n\n5. A ruler with facilities for editing tab stops.", 'd5');
     insert_with_tags($w_t, "\n\n6. A grid that demonstrates how canvases can be scrolled.", 'd6');
 
-    foreach $tag (qw(d1 d2 d3 d4 d5 d6)) {
+    foreach my $tag (qw(d1 d2 d3 d4 d5 d6)) {
 	$w_t->tag('bind', $tag, '<Any-Enter>' => [sub {shift->tag('configure', shift, @_)}, $tag, @bold]);
 	$w_t->tag('bind', $tag, '<Any-Leave>' => [sub {shift->tag('configure', shift, @_)}, $tag, @normal]);
     }

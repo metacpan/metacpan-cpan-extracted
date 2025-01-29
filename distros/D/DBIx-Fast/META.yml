@@ -26,6 +26,6 @@ requires:
   perl: '5.008'
 resources:
   repository: https://github.com/SeHarrys/dbix-fast
-version: '0.14'
+version: '0.1401'
 x_homepage: ''
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

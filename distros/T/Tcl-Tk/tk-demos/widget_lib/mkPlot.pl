@@ -60,19 +60,19 @@ sub mkPlot {
     $c->create('line', 100, 250, 100, 50, -width => 2);
     $c->create('text', 225, 20, -text => 'A Simple Plot', -font => $font, -fill => 'brown');
 
-    my($i, $x, $y, $point, $item);
-    for($i = 0; $i <= 10; $i++) {
+    my($x, $y, $item);
+    for(my $i = 0; $i <= 10; $i++) {
 	$x = 100 + ($i * 30);
 	$c->create('line', $x, 250, $x, 245, -width => 2);
 	$c->create('text', $x, 254, -text => 10 * $i, -anchor => 'n', -font => $font);
     } # forend
-    for ($i = 0; $i <= 5; $i++) {
+    for (my $i = 0; $i <= 5; $i++) {
 	$y =  250 - ($i * 40);
 	$c->create('line', 100, $y, 105, $y, -width => 2);
 	$c->create('text', 96, $y, -text => $i * 50.0, -anchor => 'e',  -font => $font);
     } # forend
 
-    foreach $point ([12, 56], [20, 94], [33, 98], [32, 120], [61, 180], [75, 160], [98, 223]) {
+    foreach my $point ([12, 56], [20, 94], [33, 98], [32, 120], [61, 180], [75, 160], [98, 223]) {
 	$x = 100 + (3 * ${$point}[0]);
         $y = 250 - (4 * ${$point}[1]) / 5;
         $item = $c->create('oval', $x-6, $y-6, $x+6, $y+6, -width => 1, -outline => 'black', -fill => 'SkyBlue2');

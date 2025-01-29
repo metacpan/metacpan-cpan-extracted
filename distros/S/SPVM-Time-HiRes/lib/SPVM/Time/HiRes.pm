@@ -1,6 +1,6 @@
 package SPVM::Time::HiRes;
 
-our $VERSION = "0.004";
+our $VERSION = "0.005";
 
 1;
 
@@ -10,7 +10,7 @@ SPVM::Time::HiRes - High Resolution Time
 
 =head1 Description
 
-The Time::HiRes class in L<SPVM> has methods to manipulate high resolution time.
+Time::HiRes class in L<SPVM> has methods to manipulate high resolution time.
 
 =head1 Usage
 

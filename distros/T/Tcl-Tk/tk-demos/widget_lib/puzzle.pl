@@ -1,20 +1,17 @@
 # puzzle.pl
 
+use strict;
+use Tcl::Tk qw/:perlTk/;
 use subs qw/puzzle_switch/;
 use vars qw/$TOP/;
+
+our ($TOP, $WM);
 
 sub puzzle {
 
     # Create a top-level window containing a 15-puzzle game.
 
     my($demo) = @_;
-    $TOP = $MW->WidgetDemo(
-        -name     => $demo,
-        -text     => 'A 15-puzzle appears below as a collection of buttons.  Click on any of the pieces next to the space, and that piece will slide over the space.  Continue this until the pieces are arranged in numerical order from upper-left to lower-right.',
-        -title    => '15-Puzzle Demonstration',
-        -iconname => 'puzzle',
-    );
-
     # Special trick: select a darker color for the space by creating a
     # scrollbar widget and using its trough color.
 
@@ -28,6 +25,8 @@ sub puzzle {
     );
     $frame->pack(qw/-side top -padx 1c -pady 1c/);
     $s->destroy;
+
+    add_exit_button();
 
     my(@order) = (3, 1, 6, 2, 5, 7, 15, 13, 4, 11, 8, 9, 14, 10, 12);
     my %xpos = ();
@@ -82,5 +81,33 @@ sub puzzle_switch {
     }
 
 } # end puzzle_switch
+
+sub add_exit_button {
+    my $exit_button = $TOP->Button(
+        -text => 'Exit demo',
+        -command => \&close_demo,
+    );
+    $exit_button->pack(
+        -side => 'top',
+    );
+}
+
+sub close_demo {
+    $TOP->parent ? $TOP->parent->destroy : $TOP->destroy;
+}
+
+unless (defined caller) {
+    $TOP = Tcl::Tk::MainWindow->new;
+    puzzle();
+    MainLoop;
+}
+else {
+    $TOP = $main::MW->WidgetDemo(
+        -name     => $main::demo,
+        -text     => 'A 15-puzzle appears below as a collection of buttons.  Click on any of the pieces next to the space, and that piece will slide over the space.  Continue this until the pieces are arranged in numerical order from upper-left to lower-right.',
+        -title    => '15-Puzzle Demonstration',
+        -iconname => 'puzzle',
+    );
+}
 
 1;

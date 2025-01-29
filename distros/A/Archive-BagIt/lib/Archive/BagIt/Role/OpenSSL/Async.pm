@@ -6,7 +6,7 @@ use namespace::autoclean;
 use IO::Async::Loop;
 use IO::Async::Stream;
 use Net::SSLeay ();
-our $VERSION = '0.095'; # VERSION
+our $VERSION = '0.096'; # VERSION
 # ABSTRACT: handles asynchronous digest calculation using openssl
 
 sub BEGIN {
@@ -92,7 +92,7 @@ Archive::BagIt::Role::OpenSSL::Async - handles asynchronous digest calculation u
 
 =head1 VERSION
 
-version 0.095
+version 0.096
 
 =head1 AVAILABILITY
 
@@ -111,7 +111,7 @@ Andreas Romeyke <cpan@andreas.romeyke.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Rob Schmidt <rjeschmi@gmail.com>, William Wueppelmann and Andreas Romeyke.
+This software is copyright (c) 2025 by Rob Schmidt <rjeschmi@gmail.com>, William Wueppelmann and Andreas Romeyke.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

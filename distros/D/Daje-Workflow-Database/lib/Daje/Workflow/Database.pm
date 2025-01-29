@@ -40,7 +40,7 @@ use Mojo::Loader qw(load_class);
 # janeskil1525 E<lt>janeskil1525@gmail.comE<gt>
 #
 
-our $VERSION = "0.14";
+our $VERSION = "0.15";
 
 has 'pg';
 has 'migrations';
@@ -57,8 +57,8 @@ sub migrate($self) {
 
     return 1;
 }
-1;
 
+1;
 __DATA__
 
 @@ workflow

@@ -1,5 +1,15 @@
 Revision history for Finance-Crypto-Exchange-Kraken
 
+0.004     2025-01-28 19:10:18Z
+
+
+    * Add new method to public API (Árpád Szász)
+
+0.003     2025-01-28 15:05:01Z
+
+    * Fix CPAN testers by bumping the requirement to MIME::Base64 3.16
+    * Fix bug with API-Sign padding (Alexander Reinhold)
+
 0.002     2020-12-03 04:59:16Z
 
     * Fix hmac signing bug

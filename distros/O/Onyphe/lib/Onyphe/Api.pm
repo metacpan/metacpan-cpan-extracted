@@ -1,11 +1,11 @@
 #
-# $Id: Api.pm,v 462dcd9243b5 2024/10/31 09:09:10 gomor $
+# $Id: Api.pm,v cfbea05b0bc4 2025/01/28 15:06:19 gomor $
 #
 package Onyphe::Api;
 use strict;
 use warnings;
 
-our $VERSION = '4.16';
+our $VERSION = '4.17';
 
 use experimental qw(signatures);
 
@@ -710,6 +710,7 @@ sub ondemand ($self, $method, $api, $param, $post, $cb = undef, $cb_args = undef
       $post->{riskscan} = $param->{riskscan} ? 'true' : 'false' if defined $param->{riskscan};
       $post->{asm} = $param->{asm} ? 'true' : 'false' if defined $param->{asm};
       $post->{import} = $param->{import} ? 'true' : 'false' if defined $param->{import};
+      $post->{ports} = $param->{ports} if defined $param->{ports};
    }
 
    print STDERR "VERBOSE: Calling API: $path\n" if $self->verbose;
@@ -905,10 +906,16 @@ sub asd ($self, $method, $api, $param, $post, $cb = undef, $cb_args = undef) {
    if (defined($param)) {
       $post->{domain} = $param->{domain} if defined $param->{domain};
       $post->{aslines} = $param->{aslines} ? 'true' : 'false' if defined $param->{aslines};
+      $post->{astask} = $param->{astask} ? 'true' : 'false' if defined $param->{astask};
       $post->{trusted} = $param->{trusted} ? 'true' : 'false' if defined $param->{trusted};
+      $post->{field} = $param->{field} if defined $param->{field};
+      $post->{query} = $param->{query} if defined $param->{query};
+      $post->{keyword} = $self->_load_file($param->{keyword}) if defined($param->{keyword});
    }
 
    print STDERR "VERBOSE: Calling API: $path\n" if $self->verbose;
+   print STDERR "VERBOSE: Calling API with content: ".Data::Dumper::Dumper($post)."\n"
+      if $self->verbose;
 
    my $url = Mojo::URL->new($path);
 
@@ -962,16 +969,63 @@ RETRY:
    return 1;
 }
 
-sub asd_tld ($self, $target, $param = undef, $cb = undef, $cb_args = undef) {
-   return $self->asd('post', '/asd/tld', $param, { domain => $target }, $cb, $cb_args);
+sub _load_file ($self, $arg) {
+   if (-f $arg) {  # If its a file, we create the list of values to push
+      my $list = $self->asd_load_input($arg);
+      unless (defined($list) && @$list) {
+         print STDERR "VERBOSE: asd_load_input: failed from bad content or empty content\n";
+         return;
+      }
+      $arg = $list;
+   }
+   else {
+      $arg = [ split(',', $arg) ];
+   }
+
+   return $arg;
 }
 
-sub asd_ns ($self, $target, $param = undef, $cb = undef, $cb_args = undef) {
-   return $self->asd('post', '/asd/ns', $param, { domain => $target }, $cb, $cb_args);
+sub asd_tld ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
+   $arg = $self->_load_file($arg);
+   return $self->asd('post', '/asd/tld', $param, { domain => $arg }, $cb, $cb_args);
 }
 
-sub asd_mx ($self, $target, $param = undef, $cb = undef, $cb_args = undef) {
-   return $self->asd('post', '/asd/mx', $param, { domain => $target }, $cb, $cb_args);
+sub asd_ns ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
+   $arg = $self->_load_file($arg);
+   return $self->asd('post', '/asd/ns', $param, { domain => $arg }, $cb, $cb_args);
+}
+
+sub asd_mx ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
+   $arg = $self->_load_file($arg);
+   return $self->asd('post', '/asd/mx', $param, { domain => $arg }, $cb, $cb_args);
+}
+
+sub asd_pivot ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
+   return $self->asd('post', '/asd/pivot', $param, { query => $arg }, $cb, $cb_args);
+}
+
+sub asd_top ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
+   return $self->asd('post', '/asd/top', $param, { query => $arg }, $cb, $cb_args);
+}
+
+sub asd_domain ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
+   $arg = $self->_load_file($arg);
+   return $self->asd('post', '/asd/domain', $param, { keyword => $arg }, $cb, $cb_args);
+}
+
+sub asd_keyword ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
+   $arg = $self->_load_file($arg);
+   return $self->asd('post', '/asd/keyword', $param, { keyword => $arg }, $cb, $cb_args);
+}
+
+sub asd_domain2so ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
+   $arg = $self->_load_file($arg);
+   return $self->asd('post', '/asd/domain2so', $param, { domain => $arg }, $cb, $cb_args);
+}
+
+sub asd_so2domain ($self, $arg, $param = undef, $cb = undef, $cb_args = undef) {
+   $arg = $self->_load_file($arg);
+   return $self->asd('post', '/asd/so2domain', $param, { subjorg => $arg }, $cb, $cb_args);
 }
 
 sub asd_task ($self, $taskid, $param = undef, $cb = undef, $cb_args = undef) {
@@ -983,6 +1037,10 @@ sub asd_load_input ($self, $input) {
    my @lines = read_file($input);
    for (@lines) {
       chomp;
+      unless ($_ =~ m{[=:]}) {  # Need a key:value pair
+         print STDERR "ERROR: asd_loas_input: invalid line found[$_], skipping\n";
+         next;
+      }
       s{(?:^\s*|\s*)$}{}g;
       #utf8::encode($line);  # Not required, already in UTF-8
       my ($k, $v) = split(/\s*[=:]\s*/, $_, 2);
@@ -990,6 +1048,9 @@ sub asd_load_input ($self, $input) {
       $v =~ s{(?:^["']|["']$)}{}g;
       push @$docs, $v;
    }
+
+   print STDERR "VERBOSE: loaded ASD file: $input: ".Data::Dumper::Dumper($docs)."\n"
+      if $self->verbose;
 
    return $docs;
 }
@@ -1004,7 +1065,7 @@ Onyphe::Api - ONYPHE API
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2024, ONYPHE SAS
+Copyright (c) 2025, ONYPHE SAS
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

@@ -21,7 +21,7 @@ sub bind {
 
     # Set up display styles
 
-    my(@bold, @normal, $tag);
+    my(@bold, @normal);
     if ($TOP->depth > 1) {
 	@bold   = (-background => '#43ce80', qw/-relief raised -borderwidth 1/);
 	@normal = (-background => undef, qw/-relief flat/);
@@ -43,7 +43,7 @@ sub bind {
     $t->insert('end', "\n\n");
     $t->insert('end', '6. A grid that demonstrates how canvases can be scrolled.', 'd6');
 
-    foreach $tag (qw(d1 d2 d3 d4 d5 d6)) {
+    foreach my $tag (qw(d1 d2 d3 d4 d5 d6)) {
 	$t->tag('bind', $tag, '<Any-Enter>' =>
             sub {shift->tag('configure', $tag, @bold)}
         );

@@ -41,8 +41,7 @@ sub menus {
 
     my $b = $menubar->cascade(-label => '~Basic', -tearoff => 0);
     $b->command(-label => 'Long entry that does nothing');
-    my $label;
-    foreach $label (qw/A B C D E F/) {
+    foreach my $label (qw/A B C D E F/) {
 	$b->command(
              -label => "Print letter \"$label\"",
              -underline => 14,
@@ -89,7 +88,7 @@ sub menus {
 
     my $rc = $c->cascade(-label => '~Radio buttons');
 
-    foreach $label (qw/10 14 18 24 32/) {
+    foreach my $label (qw/10 14 18 24 32/) {
 	$rc->radiobutton(
             -label    => "$label point",
             -variable => \$POINT_SIZE,
@@ -97,7 +96,7 @@ sub menus {
         );
     }
     $rc->separator;
-    foreach $label (qw/Roman Bold Italic/) {
+    foreach my $label (qw/Roman Bold Italic/) {
 	$rc->radiobutton(
             -label    => $label,
             -variable => \$FONT_STYLE,
@@ -123,7 +122,7 @@ sub menus {
         -command => sub{$DIALOG_ICON -> Show},
 	-hidemargin => 1,
     );
-    foreach $label (qw/info questhead error/) {
+    foreach my $label (qw/info questhead error/) {
 	$i->command(
             -bitmap  => $label,
             -command => sub {print "You invoked the \"$label\" bitmap\n"},
@@ -133,7 +132,7 @@ sub menus {
     $i->cget(-menu)->entryconfigure(2, -columnbreak => 1);
 
     my $m = $menubar->cascade(-label => '~More', -tearoff => 0);
-    foreach $label ('An entry', 'Another entry', 'Does nothing',
+    foreach my $label ('An entry', 'Another entry', 'Does nothing',
 		    'Does almost nothing', 'Make life meaningful') {
 	$m->command(
             -label   => $label,
@@ -142,7 +141,7 @@ sub menus {
     }
 
     my $k = $menubar->cascade(-label => 'C~olors');
-    foreach $label (qw/red orange yellow green blue/) {
+    foreach my $label (qw/red orange yellow green blue/) {
 	$k->command(
             -label      => $label,
             -background => $label,

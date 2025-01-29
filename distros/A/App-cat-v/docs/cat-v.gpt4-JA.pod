@@ -12,7 +12,7 @@ cat-v [ オプション ] 引数 ...
      -n   --reset         Disable all character conversion
      -c   --visible=#     Specify visualize characters
      -r   --repeat=#      Specify repeat characters
-     -R   --replicate     Replicate original line as is
+     -o   --original      Print original line as is
      -t   --expand[=#]    Expand tabs
      -T   --no-expand     Do not expand tabs
     --ts  --tabstyle=#    Set tab style
@@ -33,7 +33,7 @@ cat-v [ オプション ] 引数 ...
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =head1 DESCRIPTION
 
@@ -184,9 +184,11 @@ I<name>がC<+>で始まる場合、既存の設定にその文字を追加しま
 
     cat-v -c esc --repeat +esc
 
-=item B<-R>, B<--replicate>
+=item B<-o>, B<-oo>, B<--original>
 
-変換された文字列を印刷する前に、まず元の文字列を出力してください。
+変換された文字列が元の文字列と異なる場合、変換された文字列が出力される前に元の文字列が出力されます。2回指定された場合、元の文字列は常に出力されます。
+
+この出力は、L<App::cdif>のC<--line-by-line>（C<--lxl>）オプションで使用できます。
 
 =item B<-t>[I<n>], B<--expand>[=I<n>]
 
@@ -261,7 +263,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright © 2024 Kazumasa Utashiro.
+Copyright © 2024-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

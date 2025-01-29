@@ -27,11 +27,11 @@ my %fields = (
     traits       => {domain => 'example.com', ip_address => $ip},
 );
 
-my $model = new_ok 'Geo::Location::IP::Model::Insights' => [
-    raw        => \%fields,
-    ip_address => undef,
-    locales    => undef,
-];
+my $locales = ['en'];
+
+my $model
+    = Geo::Location::IP::Model::Insights->_from_hash(\%fields, undef,
+    $locales);
 
 can_ok $model, keys %fields;
 

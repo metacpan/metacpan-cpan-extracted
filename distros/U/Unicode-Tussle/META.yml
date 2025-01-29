@@ -30,5 +30,5 @@ resources:
   bugtracker: https://github.com/briandfoy/unicode-tussle/issues
   homepage: https://github.com/briandfoy/unicode-tussle
   repository: https://github.com/briandfoy/unicode-tussle
-version: '1.119'
+version: '1.121'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

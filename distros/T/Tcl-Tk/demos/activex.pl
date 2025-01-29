@@ -1,5 +1,5 @@
 #####################################################
-# This file demonstrates the Calendar control being 
+# This file demonstrates the Calendar control being
 # integrated within a Tk widget
 #####################################################
 
@@ -40,7 +40,7 @@ $interp->call($$wcombo,qw/configure -width 300 -height 20/);
 $interp->call($acombo,'AddItem',$_) for qw/one two three five/;
 $interp->call($acombo, ':', 'Text', 'Bla-bla-bla-bla');
 
-# make a button to view the type information of 
+# make a button to view the type information of
 # the calendar
 #button ".b", -text=>'TypeInfo', -command=>{tlview::viewtype [optcl::class $cal]}
 #pack .b -side bottom -anchor se

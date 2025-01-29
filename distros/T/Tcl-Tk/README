@@ -2,7 +2,7 @@ NAME
     Tcl::Tk extension module for Perl5
 
 DESCRIPTION
-    
+
 The Tcl::Tk extension (not to be confused with the "native" perl5 Perl/Tk
 extension) provides a raw but complete interface to the whole of Tk via the Tcl
 extension.
@@ -10,7 +10,7 @@ extension.
 Tcl::Tk is pure-perl, with all binary bindings offloaded to Tcl perl module.
 
 Tcl::Tk has full support for perl/Tk syntax. This does not mean 100%
-compatibility though. perl/Tk syntax is taken, but it is not followed when it 
+compatibility though. perl/Tk syntax is taken, but it is not followed when it
 is not tcl/tk compatible. Do not expect full perl/tk compatibility, just use
 the same syntax.
 

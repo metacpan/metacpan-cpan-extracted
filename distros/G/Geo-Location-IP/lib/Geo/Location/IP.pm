@@ -6,7 +6,7 @@ use 5.026;
 use warnings;
 use utf8;
 
-our $VERSION = 0.002;
+our $VERSION = 0.003;
 
 1;
 __END__
@@ -19,7 +19,7 @@ Geo::Location::IP - Map IP addresses to location information
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

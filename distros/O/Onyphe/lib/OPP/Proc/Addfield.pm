@@ -1,5 +1,5 @@
 #
-# $Id: Addfield.pm,v 683f32a81df6 2024/03/07 08:31:39 gomor $
+# $Id: Addfield.pm,v cfbea05b0bc4 2025/01/28 15:06:19 gomor $
 #
 package OPP::Proc::Addfield;
 use strict;
@@ -55,7 +55,7 @@ OPP::Proc::Addfield - addfield processor
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2024, ONYPHE SAS
+Copyright (c) 2025, ONYPHE SAS
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

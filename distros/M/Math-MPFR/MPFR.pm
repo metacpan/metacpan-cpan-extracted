@@ -43,6 +43,8 @@
     use constant MPFR_PV_NV_BUG         => Math::MPFR::Random::_has_pv_nv_bug();
 
     # https://github.com/StrawberryPerl/Perl-Dist-Strawberry/issues/226
+    # Math::MPFR::Random::_buggy() was modified in version 4.34 to
+    # accommodate use of vcpkg-built gmp & mpfr libraries on MS Windows.
     use constant WIN32_FMT_BUG          => Math::MPFR::Random::_buggy();
 
     use constant NV_IS_DOUBLEDOUBLE     => 1 + (2 ** -200) > 1 ? 1 : 0;
@@ -192,13 +194,13 @@ Rmpfr_z_div Rmpfr_z_sub Rmpfr_zero_p Rmpfr_zeta Rmpfr_zeta_ui
 TRmpfr_inp_str TRmpfr_out_str
 anytoa atodouble atonum atonv
 check_exact_decimal decimalize doubletoa dragon_test
-fr_cmp_q_rounded mpfr_max_orig_len mpfr_min_inter_prec mpfrtoa numtoa nvtoa nvtoa_test
+fr_cmp_q_rounded mpfr_max_orig_len mpfr_min_inter_prec mpfrtoa numtoa nvtoa nv2mpfr nvtoa_test
 prec_cast q_add_fr q_cmp_fr q_div_fr q_mul_fr q_sub_fr rndna
 );
 
     @Math::MPFR::EXPORT_OK = (@tags, 'bytes');
 
-    our $VERSION = '4.33';
+    our $VERSION = '4.34';
     #$VERSION = eval $VERSION;
 
     Math::MPFR->DynaLoader::bootstrap($VERSION);
@@ -458,18 +460,14 @@ sub new {
 
 sub Rmpfr_printf {
     if(@_ == 3){
-      if(_itsa($_[1]) == 2) {wrap_mpfr_printf_rnd(@_)}
+      if(_itsa($_[1]) == 2) {wrap_mpfr_printf_rnd(@_)} # $_[1] is rounding argument (IOK).
       else {die "The second (of 3) arguments given to Rmpfr_printf() is not a valid rounding argument"}
     }
-    else {die "Rmpfr_printf must take 2 or 3 arguments: format string, [rounding,], and variable" if @_ != 2;
-      if(WIN32_FMT_BUG) {
-        my $revised = _rewrite_fmt_arg($_[0]);
-        if($revised) {
-          wrap_mpfr_printf($revised, _to_mpfr_object($_[1]));
-        }
-        else {
-          wrap_mpfr_printf(@_);
-        }
+    else {
+      die "Rmpfr_printf must take 2 or 3 arguments: format string, [rounding,], and variable" if @_ != 2;
+      my $revised = _rewrite_fmt_arg($_[0], $_[1]);
+      if($revised) {
+        wrap_mpfr_printf($revised, nv2mpfr($_[1]));
       }
       else {
         wrap_mpfr_printf(@_);
@@ -482,16 +480,11 @@ sub Rmpfr_fprintf {
       if(_itsa($_[2]) == 2) {wrap_mpfr_fprintf_rnd(@_)}
       else {die "The third (of 4) arguments given to Rmpfr_fprintf() is not a valid rounding argument"}
     }
-    else {die "Rmpfr_fprintf must take 3 or 4 arguments: filehandle, format string, [rounding,], and variable" if @_ != 3;
-
-      if(WIN32_FMT_BUG) {
-        my $revised = _rewrite_fmt_arg($_[1]);
-        if($revised) {
-          wrap_mpfr_fprintf($_[0], $revised, _to_mpfr_object($_[2]));
-        }
-        else {
-          wrap_mpfr_fprintf(@_);
-        }
+    else {
+      die "Rmpfr_fprintf must take 3 or 4 arguments: filehandle, format string, [rounding,], and variable" if @_ != 3;
+      my $revised = _rewrite_fmt_arg($_[1], $_[2]);
+      if($revised) {
+        wrap_mpfr_fprintf($_[0], $revised, nv2mpfr($_[2]));
       }
       else {
         wrap_mpfr_fprintf(@_);
@@ -510,15 +503,17 @@ sub Rmpfr_sprintf {
     }
     die "Rmpfr_sprintf must take 4 or 5 arguments: buffer, format string, [rounding,] variable and buffer size" if @_ != 4;
 
-    # If we've got to here then @_ should comprise of only 4 arguments.
-
-    if(WIN32_FMT_BUG) {
-      my $revised = _rewrite_fmt_arg($_[1]);
-      if($revised) {
-        $len = wrap_mpfr_sprintf($_[0], $revised, _to_mpfr_object($_[2]), $_[3]);
-        return $len;
-      }
+    my $revised = _rewrite_fmt_arg($_[1], $_[2]);
+    if($revised) {
+      $len = wrap_mpfr_sprintf($_[0], $revised, nv2mpfr($_[2]), $_[3]);
+      return $len;
     }
+
+# Alternatively, this should work, but it crashes intermittently
+#    if(!_hex_fmt_ok($_[1], $_[2])) {
+#      $len = _gmp_sprintf_nv(@_);
+#      return $len;
+#    }
 
     $len = wrap_mpfr_sprintf(@_);
     return $len;
@@ -535,14 +530,10 @@ sub Rmpfr_snprintf {
     }
     die "Rmpfr_snprintf must take 5 or 6 arguments: buffer, bytes written, format string, [rounding,], variable and buffer size" if @_ != 5;
 
-    # If we've got to here then @_ should comprise of only 5 arguments.
-
-    if(WIN32_FMT_BUG) {
-      my $revised = _rewrite_fmt_arg($_[2]);
-      if($revised) {
-        $len = wrap_mpfr_snprintf($_[0], $_[1], $revised, _to_mpfr_object($_[3]), $_[4]);
-        return $len;
-      }
+    my $revised = _rewrite_fmt_arg($_[2], $_[3]);
+    if($revised) {
+      $len = wrap_mpfr_snprintf($_[0], $_[1], $revised, nv2mpfr($_[3]), $_[4]);
+      return $len;
     }
 
     $len = wrap_mpfr_snprintf(@_);
@@ -1671,39 +1662,91 @@ sub _decrement {
   return $ret;
 }
 
-sub _rewrite_fmt_arg { # Called only if the constant WIN32_FMT_BUG is 1
+sub _rewrite_fmt_arg {
+  # Can Return a true value if and only if the constant
+  # WIN32_FMT_BUG is set to a true value, in which case it
+  # returns a rewritten format string.
+  # We allow "%a"/"%A" formatting only if nvtype is 'double' and
+  # we allow "%La"/"%LA" formatting only if nvtype is 'long double'.
+
   my $arg = shift;
   # First check for a match of (eg) "%La" or "%A"
   # at the beginning of $arg.
   if($arg =~ /^%L?[a,A]/) {
-    # Should not be multiple matches.
-    $arg =~ s/^%L?/%R/;
-    return $arg;
+    my $match = $&;
+    if(!Math::MPFR::_SvNOK($_[0])) { die "\"$match\" formatting applies only to NVs. Use \"%Ra\" for Math::MPFR objects." }
+    if($match =~ /L/) { die "\"$match\" formatting applies only to long doubles." unless $Config{nvtype} eq 'long double'; }
+    else { die "\"$match\" formatting applies only to doubles." unless $Config{nvtype} eq 'double'; }
+    if(WIN32_FMT_BUG) {
+      $arg =~ s/^%L?/%R/;
+      return $arg;
+    }
+    return '';
   }
 
   # Need to match (eg) "%La" or "%A", but also to NOT match (eg) "%%La" or "%%A".
   if($arg =~ /[^%]%L?[a,A]/) {
-    # Should not be multiple matches.
-    my $and_init = $&;
-    my $temp = $&;
-    my $start = substr($temp, 0, 1, '');
-    $temp =~ s/^%L?/%R/;
-    $start .= $temp;
-    $arg =~ s/$and_init/$start/;
-    return $arg;
+    my $match = $&;
+    if(!Math::MPFR::_SvNOK($_[0])) { die "\"", substr($match, 1), "\" formatting applies only to NVs. Use \"%Ra\" for Math::MPFR objects." }
+    if($match =~ /L/) { die "\"", substr($match, 1), "\" formatting applies only to long doubles." unless $Config{nvtype} eq 'long double'; }
+    else { die "\"", substr($match, 1), "\" formatting applies only to doubles." unless $Config{nvtype} eq 'double'; }
+    if(WIN32_FMT_BUG) {
+      my $and_init = $match;
+      my $temp = $match;
+      my $start = substr($temp, 0, 1, '');
+      $temp =~ s/^%L?/%R/;
+      $start .= $temp;
+      $arg =~ s/$and_init/$start/;
+      return $arg;
+    }
   }
   return ''; # Nothing to modify - no action necessary.
 }
 
-sub _to_mpfr_object { # Called only if the constant WIN32_FMT_BUG is 1
-                      # && _rewrite_fmt_arg returned a non-empty string.
+sub nv2mpfr {
   my $prec = Rmpfr_get_default_prec();
   Rmpfr_set_default_prec($Math::MPFR::NV_properties{bits});
-  my $arg = Math::MPFR->new($_[0]);
+  my $ret = Math::MPFR->new($_[0]);
   Rmpfr_set_default_prec($prec);
-  return $arg;
+  return $ret;
 }
 
+sub _win32_formatting_ok {   # Duplicated in Random/Random.pm
+    # Return 1 if either __GMP_CC or __GMP_CFLAGS
+    # include the string '-D__USE_MINGW_ANSI_STDIO'.
+    # Else return 0.
+
+    my $cc = _gmp_cc();		# __GMP_CC
+    my $cflags = _gmp_cflags();	# __GMP_CFLAGS
+
+    return 1 if ( defined($cc)     && $cc     =~/\-D__USE_MINGW_ANSI_STDIO/ );
+    return 1 if ( defined($cflags) && $cflags =~/\-D__USE_MINGW_ANSI_STDIO/ );
+    return 0;
+}
+
+sub _hex_fmt_ok {
+  # Return 1 if no hex ("%a") formatting is requested.
+  # Return 1 if the requested hex format ("%a"/"%A"/"%La"/"%LA") is appropriate.
+  # If we haven't died or returned by now, then return 0 if WIN32_FMT_BUG is set;
+  # otherwise return 1.
+  # A return of 1 tells the caller (Rmpfr_*printf) that no other action is necessary.
+  # A return of 0 tells the caller(Rmpfr_*printf) that it needs to call _rewrite_fmt_arg().
+
+  my $fmt = shift;
+
+  if($fmt =~ /^%L?[a,A]|[^%]%L?[a,A]/) {
+     $fmt = $&;
+     if(!Math::MPFR::_SvNOK($_[0])) { die "\"%a\" formatting applies only to NVs. Use \"%Ra\" for Math::MPFR objects." }
+     if($fmt =~ /L/) { die "\"%La\" formatting applies only to long doubles." unless $Config{nvtype} eq 'long double'; }
+     else { die "\"%a\" formatting applies only to doubles." unless $Config{nvtype} eq 'double'; }
+     return 0 if WIN32_FMT_BUG; # Tells the caller to call the relevant _gmp_*printf_nv() function
+     return 1;
+  }
+  else {return 1} # No %a formatting requested. Proceed as normal.
+
+
+
+}
 1;
 
 __END__

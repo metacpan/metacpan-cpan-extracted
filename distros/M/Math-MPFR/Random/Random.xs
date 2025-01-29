@@ -157,14 +157,31 @@ int _is_NOK_and_POK(SV * in) {
   return 0;
 }
 
-int _buggy(void) {
-#if defined(WIN32_FMT_BUG)
+int _win32_fmt_bug_ignore(void) {
+#if defined(WIN32_FMT_BUG_IGNORE)
   return 1;
 #else
   return 0;
 #endif
-
 }
+
+SV * _gmp_cflags(pTHX) {
+#if defined(__GMP_CFLAGS)
+  return newSVpv(__GMP_CFLAGS, 0);
+#else
+  return &PL_sv_undef;
+#endif
+}
+
+SV * _gmp_cc(pTHX) {
+#if defined(__GMP_CC)
+  return newSVpv(__GMP_CC, 0);
+#else
+  return &PL_sv_undef;
+#endif
+}
+
+
 
 MODULE = Math::MPFR::Random  PACKAGE = Math::MPFR::Random
 
@@ -217,6 +234,20 @@ _is_NOK_and_POK (in)
 	SV *	in
 
 int
-_buggy ()
+_win32_fmt_bug_ignore ()
+
+
+SV *
+_gmp_cflags ()
+CODE:
+  RETVAL = _gmp_cflags (aTHX);
+OUTPUT:  RETVAL
+
+
+SV *
+_gmp_cc ()
+CODE:
+  RETVAL = _gmp_cc (aTHX);
+OUTPUT:  RETVAL
 
 

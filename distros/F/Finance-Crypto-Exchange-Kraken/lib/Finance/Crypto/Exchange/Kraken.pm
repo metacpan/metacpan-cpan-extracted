@@ -1,15 +1,16 @@
 use utf8;
 
 package Finance::Crypto::Exchange::Kraken;
-our $VERSION = '0.002';
+our $VERSION = '0.004';
 use Moose;
 use namespace::autoclean;
 use LWP::UserAgent;
 use MooseX::Types::URI qw(Uri);
 use JSON qw(decode_json);
 use Try::Tiny;
-use MIME::Base64 qw(decode_base64url);
+use MIME::Base64 3.11 qw(decode_base64url);
 use Time::HiRes qw(gettimeofday);
+use Array::Utils 0.4 qw(array_minus);
 
 # ABSTRACT: A Perl implementation of the Kraken REST API
 
@@ -52,8 +53,16 @@ has secret => (
     predicate => 'has_secret',
 );
 
+has _nonce => (
+    is       => 'ro',
+    isa      => 'Str',
+    predicate => 'has_nonce',
+    init_arg => 'nonce'
+);
+
 sub nonce {
     my $self = shift;
+    return $self->_nonce if $self->has_nonce;
     return gettimeofday() * 100000;
 }
 
@@ -101,6 +110,23 @@ around 'BUILDARGS' => sub {
     return $class->$orig(%args);
 };
 
+sub supported_methods {
+    my $self = shift;
+
+    my @forbidden = qw(
+        call
+        meta
+        new
+        nonce
+        supported_methods
+    );
+    push(@forbidden, $self->meta->get_attribute_list);
+
+    my @list = grep { $_ =~ /^[a-z]/ && $_ !~ /^has_/ }
+        $self->meta->get_method_list;
+    return sort { $a cmp $b } array_minus(@list, @forbidden);
+}
+
 
 with qw(
     Finance::Crypto::Exchange::Kraken::REST::Public
@@ -121,7 +147,7 @@ Finance::Crypto::Exchange::Kraken - A Perl implementation of the Kraken REST API
 
 =head1 VERSION
 
-version 0.002
+version 0.004
 
 =head1 SYNOPSIS
 

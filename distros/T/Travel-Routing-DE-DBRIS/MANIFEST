@@ -1,6 +1,10 @@
 bin/dbris
+bork.json
+bork.raw.json
+bork.txt
 Build.PL
 Changelog
+Dockerfile
 lib/Travel/Routing/DE/DBRIS.pm
 lib/Travel/Routing/DE/DBRIS/Connection.pm
 lib/Travel/Routing/DE/DBRIS/Connection/Segment.pm

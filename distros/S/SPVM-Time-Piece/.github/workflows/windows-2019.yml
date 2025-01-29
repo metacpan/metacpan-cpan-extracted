@@ -13,10 +13,6 @@ jobs:
     runs-on: windows-2019
     steps:
       - uses: actions/checkout@v3
-      - name: Set timezone
-        run: tzutil /s "Tokyo Standard Time"
-      - name: Show timezone
-        run: tzutil /g
       - name: Perl version
         run: perl -V
       - name: Perl config

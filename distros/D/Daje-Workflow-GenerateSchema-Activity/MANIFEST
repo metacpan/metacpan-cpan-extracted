@@ -1,0 +1,13 @@
+Build.PL
+Changes
+LICENSE
+README.md
+cpanfile
+lib/Daje/Workflow/GenerateSchema/Activity.pm
+lib/Daje/Workflow/GenerateSchema/Create/Database.pm
+lib/Daje/Workflow/GenerateSchema/Create/Schema.pm
+minil.toml
+t/00_compile.t
+META.json
+META.yml
+MANIFEST

@@ -4,7 +4,7 @@
 #
 # Author: Slaven Rezic
 #
-# Copyright (C) 2017,2018,2024 Slaven Rezic. All rights reserved.
+# Copyright (C) 2017,2018,2024,2025 Slaven Rezic. All rights reserved.
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -29,7 +29,7 @@ use File::Temp     ();
 
 require "org-daemon"; # for App::orgdaemon::find_dates_in_org_file
 
-our $VERSION = '0.05';
+our $VERSION = '0.07';
 
 sub org2ical {
     my(%opts) = @_;
@@ -147,7 +147,7 @@ EOF
 		# (scheduled date, former state changes, properties...). It feels somewhat
 		# hacky, see XXXs below.
 		my $comment;
-		if ($todo_date->{seek} && open my $forward_fh, $todo_file) {
+		if (defined $todo_date->{seek} && open my $forward_fh, $todo_file) {
 		    seek $forward_fh, $todo_date->{seek}, SEEK_SET or die "seek failed: $!";
 		    scalar <$forward_fh>; # overread title line; already in the summary of the vevent
 		    while(defined(my $line = decode_utf8(scalar <$forward_fh>))) { # XXX should not assume utf-8 as org file encoding
@@ -163,6 +163,9 @@ EOF
 		    }
 		}
 		if ($comment) {
+		    # handle geo: URIs
+		    $comment =~ s{\[\[geo:([-+]?\d+(?:\.\d+)?),([-+]?\d+(?:\.\d+)?)(?:\?z=(\d+(?:\.\d+)?))?\](?:\[(.*?)\])?\]}{geo_to_url($1,$2,$3,$4)}eg;
+
 		    $comment =~ s{^\s+}{}gm;
 		    $comment =~ s{\n}{\\n}g;
 		    $comment =~ s{([,;])}{\\$1}g;
@@ -268,6 +271,17 @@ sub _get_old_or_new {
 	$old_vcal;
     } else {
 	$new_vcal;
+    }
+}
+
+sub geo_to_url {
+    my($lat,$lon,$zoom,$link_title) = @_;
+    $zoom = 15 if !defined $zoom;
+    my $url = sprintf "https://www.openstreetmap.org/?mlat=%s&mlon=%s#map=%s/%s/%s", $lat, $lon, $zoom, $lat, $lon;
+    if (defined $link_title) {
+	"$url ($link_title)";
+    } else {
+	$url;
     }
 }
 

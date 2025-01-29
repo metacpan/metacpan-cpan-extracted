@@ -1,6 +1,6 @@
 package SPVM::Thread;
 
-our $VERSION = "0.002";
+our $VERSION = "0.003";
 
 1;
 
@@ -21,7 +21,7 @@ SPVM::Thread - Native Thread
 
 =head1 Description
 
-The C<Thread> class has methods to create native threads.
+Thread class in L<SPVM> has methods to create native threads.
 
 This class is a binding of L<std::thread in C++|https://en.cppreference.com/w/cpp/thread/thread>.
 

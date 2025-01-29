@@ -36,11 +36,11 @@ my %fields = (
     traits => {domain => 'example.com'},
 );
 
-my $model = new_ok 'Geo::Location::IP::Model::Country' => [
-    raw        => \%fields,
-    ip_address => $ip_address,
-    locales    => ['en']
-];
+my $locales = ['en'];
+
+my $model
+    = Geo::Location::IP::Model::Country->_from_hash(\%fields, $ip_address,
+    $locales);
 
 can_ok $model, keys %fields;
 

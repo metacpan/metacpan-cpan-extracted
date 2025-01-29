@@ -10,7 +10,7 @@ use Object::Pad;
 
 class Geo::Location::IP::Record::Traits;
 
-our $VERSION = 0.002;
+our $VERSION = 0.003;
 
 use Geo::Location::IP::Address;
 
@@ -79,7 +79,7 @@ Geo::Location::IP::Record::Traits - Various details about an IP address
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -177,7 +177,7 @@ Satellite
 
   my $domain = $traits->domain;
 
-Returns the second-level domain associated with the IP address.
+Returns the second-level domain associated with the C<ip_address>.
 
 =head2 ip_address
 
@@ -190,73 +190,73 @@ object.
 
   my $is_anonymous = $traits->is_anonymous;
 
-Returns true if the IP address belongs to any sort of anonymous network.
+Returns true if the C<ip_address> belongs to any sort of anonymous network.
 
 =head2 is_anonymous_proxy
 
   my $is_anonymous_proxy = $traits->is_anonymous_proxy;
 
-Returns true if the IP address belongs to an anonymous proxy server.  This
+Returns true if the C<ip_address> belongs to an anonymous proxy server.  This
 field is deprecated.
 
 =head2 is_anonymous_vpn
 
   my $is_anonymous_vpn = $traits->is_anonymous_vpn;
 
-Returns true if the IP address is known to belong to an anonymous VPN
+Returns true if the C<ip_address> is known to belong to an anonymous VPN
 provider.
 
 =head2 is_anycast
 
   my $is_anycast = $traits->is_anycast;
 
-Returns true if the IP address belongs to an anycast network.
+Returns true if the C<ip_address> belongs to an anycast network.
 
 =head2 is_hosting_provider
 
   my $is_hosting_provider = $traits->is_hosting_provider;
 
-Returns true if the IP address belongs to a hosting provider.
+Returns true if the C<ip_address> belongs to a hosting provider.
 
 =head2 is_legitimate_proxy
 
   my $is_legitimate_proxy = $traits->is_legitimate_proxy;
 
-Returns true if the IP address is believed to be a legitimate proxy, such as
-an internal VPN used by a corporation.
+Returns true if the C<ip_address> is believed to belong to a legitimate proxy,
+such as an internal VPN used by a corporation.
 
 =head2 is_public_proxy
 
   my $is_public_proxy = $traits->is_public_proxy;
 
-Returns true if the IP address belongs to a public proxy.
+Returns true if the C<ip_address> belongs to a public proxy.
 
 =head2 is_residential_proxy
 
   my $is_residential_proxy = $traits->is_residential_proxy;
 
-Returns true if the IP address is on a suspected anonymizing network and
+Returns true if the C<ip_address> is on a suspected anonymizing network and
 belongs to a residential ISP.
 
 =head2 is_satellite_provider
 
   my $is_satellite_provider = $traits->is_satellite_provider;
 
-Returns true if the IP address is from a satellite provider that provides
+Returns true if the C<ip_address> is from a satellite provider that provides
 service to multiple countries.  This field is deprecated.
 
 =head2 is_tor_exit_node
 
   my $is_tor_exit_node = $traits->is_tor_exit_node;
 
-Returns true if the IP address is a Tor exit node.
+Returns true if the C<ip_address> belongs to a Tor exit node.
 
 =head2 isp
 
   my $isp = $traits->isp;
 
-Returns the name of the Internet Service Provider associated with the IP
-address.
+Returns the name of the Internet Service Provider associated with the
+C<ip_address>.
 
 =head2 mobile_country_code
 
@@ -274,27 +274,28 @@ Returns the mobile network code as a string.
 
   my $organization = $traits->organization;
 
-Returns the name of the organization associated with the IP address.
+Returns the name of the organization associated with the C<ip_address>.
 
 =head2 static_ip_score
 
   my $static_ip_score = $traits->static_ip_score;
 
-Indicates how static or dynamic an IP address is.  The value ranges from 0.0
-to 99.99 with higher values meaning a greater static association.
+Indicates how static or dynamic the C<ip_address> is.  The value ranges from
+0.0 for dynamic to 99.99 for static.
 
 =head2 user_count
 
   my $user_count = $traits->user_count;
 
-Returns the estimated number of users sharing the IP/network during the past
-24 hours.
+Returns the estimated number of users sharing the IP address/network during
+the past 24 hours.
 
 =head2 user_type
 
   my $user_type = $traits->user_type;
 
-Returns the user type associated with the IP address as a string.  Common values are:
+Returns the user type associated with the C<ip_address> as a string.  Common
+values are:
 
 =over
 

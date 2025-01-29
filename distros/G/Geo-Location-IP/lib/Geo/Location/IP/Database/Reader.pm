@@ -11,7 +11,7 @@ use Object::Pad;
 class Geo::Location::IP::Database::Reader
     :isa(Geo::Location::IP::Database::SimpleReader);
 
-our $VERSION = 0.002;
+our $VERSION = 0.003;
 
 use Geo::Location::IP::Address;
 use Geo::Location::IP::Error::Generic;
@@ -162,7 +162,7 @@ Geo::Location::IP::Database::Reader - Read MaxMind DB files
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -183,7 +183,7 @@ version 0.002
 Read MaxMind DB files and map IP addresses to location information such as
 country and city names.
 
-This is a L<Geo::Location::IP::Database::SimpleReader> subclass that throws
+This L<Geo::Location::IP::Database::SimpleReader> subclass throws
 L<Geo::Location::IP::Error::Generic> and
 L<Geo::Location::IP::Error::AddressNotFound> exceptions on unsuccessful
 queries.

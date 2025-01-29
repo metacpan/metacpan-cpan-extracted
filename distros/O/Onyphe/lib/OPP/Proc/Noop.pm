@@ -1,5 +1,5 @@
 #
-# $Id: Noop.pm,v 462dcd9243b5 2024/10/31 09:09:10 gomor $
+# $Id: Noop.pm,v cfbea05b0bc4 2025/01/28 15:06:19 gomor $
 #
 package OPP::Proc::Noop;
 use strict;
@@ -36,7 +36,7 @@ OPP::Proc::Noop - noop processor
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2024, ONYPHE SAS
+Copyright (c) 2025, ONYPHE SAS
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

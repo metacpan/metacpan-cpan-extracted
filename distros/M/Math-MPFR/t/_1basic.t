@@ -74,10 +74,10 @@ if(!$@) {
             : warn "# mpfr library thresholds file: $evaluate\n";
 }
 
-cmp_ok($Math::MPFR::VERSION, 'eq', '4.33', "Math::MPFR::VERSION ($Math::MPFR::VERSION) is as expected");
+cmp_ok($Math::MPFR::VERSION, 'eq', '4.34', "Math::MPFR::VERSION ($Math::MPFR::VERSION) is as expected");
 
 my $xs_version = Math::MPFR::_get_xs_version();
-cmp_ok($xs_version, 'eq', '4.33', "Math::MPFR::_get_xs_version returns $xs_version as expected");
+cmp_ok($xs_version, 'eq', '4.34', "Math::MPFR::_get_xs_version returns $xs_version as expected");
 
 my $l_ver = Rmpfr_get_version();
 my $h_ver = MPFR_VERSION_STRING;
@@ -126,11 +126,16 @@ else {
 
 if($^O =~ /^MSWin/) {
   if(WIN32_FMT_BUG) {
+    # Check that if WIN32_FMT_BUG is set, then "-D__USE_MINGW_ANSI_STDIO"
+    # is missing from both __GMP_CC and __GMP_CFLAGS
     unlike(Math::MPFR::_gmp_cflags(), qr/\-D__USE_MINGW_ANSI_STDIO/, "-D__USE_MINGW_ANSI_STDIO missing from __GMP_CFLAGS");
     unlike(Math::MPFR::_gmp_cc(),     qr/\-D__USE_MINGW_ANSI_STDIO/, "-D__USE_MINGW_ANSI_STDIO missing from __GMP_CC");
   }
+
   if(Math::MPFR::_gmp_cflags =~ /\-D__USE_MINGW_ANSI_STDIO/ ||
      Math::MPFR::_gmp_cc()   =~ /\-D__USE_MINGW_ANSI_STDIO/ ) {
+    # Check that if "-D__USE_MINGW_ANSI_STDIO" is present  in either
+    # of __GMP_CC and __GMP_CFLAGS then WIN32_FMT_BUG is set to 0.
     cmp_ok(WIN32_FMT_BUG, '==', 0, "WIN32_FMT_BUG set to zero");
   }
 }

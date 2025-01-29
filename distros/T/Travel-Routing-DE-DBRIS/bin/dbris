@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.020;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use utf8;
 use DateTime;
@@ -16,14 +16,18 @@ use Travel::Routing::DE::DBRIS;
 
 my ( $date, $time, $from, $to, $language );
 my $mots;
-my $discounts;
+my ( $first_class, $passengers );
 my $developer_mode;
 my ( $json_output, $raw_json_output );
 my $use_cache = 1;
 my $show_full_route;
 my $cache;
 
-my @output;
+my %known_mot = map { $_ => 1 }
+  (qw(ICE EC_IC IR REGIONAL SBAHN BUS SCHIFF UBAHN TRAM ANRUFPFLICHTIG));
+
+# Nur Preisangaben zeigen falls Passagierdaten vorhanden
+# -p/--passengers adult:bc25;junior:bc50;senior:bc25,...;...
 
 binmode( STDOUT, ':encoding(utf-8)' );
 for my $arg (@ARGV) {
@@ -35,11 +39,12 @@ my $output_reset = -t STDOUT ? "\033[0m" : q{};
 
 GetOptions(
 	'd|date=s'             => \$date,
-	'D|discounts=s'        => \$discounts,
 	'h|help'               => sub { show_help(0) },
 	'f|full-route'         => \$show_full_route,
+	'first-class!'         => \$first_class,
 	'm|modes-of-transit=s' => \$mots,
 	'l|language=s'         => \$language,
+	'p|passengers=s'       => \$passengers,
 	't|time=s'             => \$time,
 	'V|version'            => \&show_version,
 	'cache!'               => \$use_cache,
@@ -65,14 +70,26 @@ if ($use_cache) {
 	}
 }
 
-my ( $from_raw, $to_raw ) = @ARGV;
-
-if ( not( $from_raw and $to_raw ) ) {
+my ( $from_raw, @via_raw, $to_raw );
+if ( @ARGV < 2 ) {
 	show_help(1);
+}
+elsif ( @ARGV == 2 ) {
+	( $from_raw, $to_raw ) = @ARGV;
+}
+elsif ( @ARGV <= 4 ) {
+	( $from_raw, @via_raw ) = @ARGV;
+	$to_raw = pop(@via_raw);
 }
 
 sub get_stop {
-	my ($stop) = @_;
+	my ( $stop, $is_via ) = @_;
+	my $stopover_duration;
+
+	if ( $is_via and $stop =~ s{ : (?<duration> \d+ ) $ }{}x ) {
+		$stopover_duration = $+{duration};
+	}
+
 	my $ris = Travel::Status::DE::DBRIS->new(
 		cache          => $cache,
 		locationSearch => $stop,
@@ -85,6 +102,12 @@ sub get_stop {
 	my $found;
 	for my $result ( $ris->results ) {
 		if ( defined $result->eva ) {
+			if ($is_via) {
+				return {
+					stop     => $result,
+					duration => $stopover_duration,
+				};
+			}
 			return $result;
 		}
 	}
@@ -93,9 +116,11 @@ sub get_stop {
 }
 
 my %opt = (
-	from           => get_stop($from_raw),
-	to             => get_stop($to_raw),
+	from           => get_stop( $from_raw, 0 ),
+	to             => get_stop( $to_raw,   0 ),
+	via            => [ map { get_stop( $_, 1 ) } @via_raw ],
 	language       => $language,
+	first_class    => $first_class,
 	cache          => $cache,
 	developer_mode => $developer_mode,
 );
@@ -136,12 +161,45 @@ if ( $date or $time ) {
 	$opt{datetime} = $dt;
 }
 
-if ($mots) {
-	$opt{modes_of_transit} = [ split( qr{, *}, $mots ) ];
+if ( $mots and $mots eq 'help' ) {
+	say "Supported modes of transmit (-m / --modes-of-transit):";
+	for my $mot ( sort keys %known_mot ) {
+		say $mot;
+	}
+	exit 0;
 }
 
-if ($discounts) {
-	$opt{discounts} = [ split( qr{, *}, $discounts ) ];
+if ($mots) {
+
+	# Passing unknown MOTs to the backend results in HTTP 422 Unprocessable Entity
+	my @mots = split( qr{, *}, $mots );
+	my $found_unknown;
+	for my $mot (@mots) {
+		if ( not $known_mot{$mot} ) {
+			$found_unknown = 1;
+			say STDERR
+"-m / --modes-of-transit: skipping unknown mode of transit '$mot'";
+		}
+	}
+	if ($found_unknown) {
+		say STDERR 'supported modes of transit are: '
+		  . join( q{, }, sort keys %known_mot );
+	}
+	$opt{modes_of_transit} = [ grep { $known_mot{$_} } @mots ];
+}
+
+if ($passengers) {
+	for my $passenger ( split( qr{; *}, $passengers ) ) {
+		my ( $type, $discounts ) = split( qr{ *: *}, $passenger );
+		$discounts = $discounts ? [ split( qr{, *}, $discounts ) ] : [];
+		push(
+			@{ $opt{passengers} },
+			{
+				type      => $type,
+				discounts => $discounts,
+			}
+		);
+	}
 }
 
 sub show_help {
@@ -256,8 +314,8 @@ for my $connection ( $ris->connections ) {
 		$connection->duration->in_units( 'hours', 'minutes' ),
 		$connection->arr ? $connection->arr->strftime('%H:%M') : q{??:??},
 		format_occupancy($connection),
-		defined $connection->price
-		? sprintf( '  %s %s', $connection->price, $connection->price_unit )
+		( defined $passengers and defined $connection->price )
+		? sprintf( '  %.2f %s', $connection->price, $connection->price_unit )
 		: q{},
 		$header,
 	);
@@ -340,16 +398,19 @@ dbris - Interface to bahn.de public transit routing service
 
 =head1 SYNOPSIS
 
-B<dbris> [B<-d> I<DD.MM.YYYY>] [B<-t> I<HH:MM>] [...] I<from-stop> I<to-stop>
+B<dbris> [B<-d> I<DD.MM.YYYY>] [B<-t> I<HH:MM>] [...] I<from-stop>
+[I<via-stop>[:I<duration>] [I<via-stop>[:I<duration>]]] I<to-stop>
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 DESCRIPTION
 
 B<dbris> is an interface to the public transport routing service available on
-bahn.de. It requests connections between two stops and prints the results.
+bahn.de. It requests connections between I<from-stop> and I<to-stop> and prints
+the result. If one or two I<via-stop>s are specified, it only returns matching
+connections, with an optional minimum stopover I<duration> given in minutes.
 
 =head1 OPTIONS
 

@@ -381,4 +381,3 @@ Tcl::Tk::Widget::create_method_in_widget_package (
 );
 
 1;
-

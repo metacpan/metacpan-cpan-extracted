@@ -1,5 +1,5 @@
 package Finance::Crypto::Exchange::Kraken::REST::Private::Websockets;
-our $VERSION = '0.002';
+our $VERSION = '0.004';
 use Moose::Role;
 
 # ABSTRACT: Finance::Crypto::Exchange::Kraken::REST::Private::Websockets needs an abstract
@@ -28,7 +28,7 @@ Finance::Crypto::Exchange::Kraken::REST::Private::Websockets - Finance::Crypto::
 
 =head1 VERSION
 
-version 0.002
+version 0.004
 
 =head1 SYNOPSIS
 

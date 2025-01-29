@@ -64,8 +64,7 @@ sub arrows {
 
     # Bindings that select one of the 3 tiny resize boxes' "move code".
 
-    my $n;
-    for $n (1,2,3) {
+    for my $n (1,2,3) {
 	$c->bind("box${n}", '<1>' =>
             sub {$ainfo{move_sub} = \&{"arrow_move${n}"}}
         );

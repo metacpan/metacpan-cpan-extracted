@@ -3,11 +3,6 @@ BEGIN { $|=1; $^W=1; }
 use Test;
 use Tcl::Tk;
 
-if ($^O ne 'MSWin32' and !$ENV{DISPLAY}) {
-    print "1..0 # skip: no DISPLAY env var - how come?\n";
-    exit;
-}
-
 my $mw = Tcl::Tk::MainWindow->new;
 
 if (!$mw->interp->pkg_require('tile')) {

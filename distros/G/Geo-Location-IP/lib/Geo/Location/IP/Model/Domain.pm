@@ -10,19 +10,20 @@ use Object::Pad;
 
 class Geo::Location::IP::Model::Domain;
 
-our $VERSION = 0.002;
+our $VERSION = 0.003;
 
 apply Geo::Location::IP::Role::HasIPAddress;
 
-field $domain :param :reader = undef;
+field $domain :param :reader;
 
-#<<<
-ADJUST :params (:$raw = {}) {
-    if (exists $raw->{domain}) {
-        $domain = $raw->{domain};
-    }
+sub _from_hash ($class, $hash_ref, $ip_address) {
+    my $domain = $hash_ref->{domain} // undef;
+
+    return $class->new(
+        domain     => $domain,
+        ip_address => $ip_address,
+    );
 }
-#>>>
 
 1;
 __END__
@@ -35,7 +36,7 @@ Geo::Location::IP::Model::Domain - DNS domain details
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

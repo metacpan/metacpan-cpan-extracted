@@ -1,3 +1,10 @@
+Travel::Routing::DE::DBRIS 0.02 - Tue Jan 28 2025
+
+    * Add support for up to two stopovers
+    * Add first class option (--first-class / first_class)
+    * Add detailed passenger specification for price calculation
+      (--passengers / passengers)
+
 Travel::Routing::DE::DBRIS 0.01 - Sun Jan 19 2025
 
     * Initial release

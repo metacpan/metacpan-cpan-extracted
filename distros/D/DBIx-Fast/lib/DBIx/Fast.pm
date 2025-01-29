@@ -3,7 +3,7 @@ package DBIx::Fast;
 use strict;
 use warnings;
 
-our $VERSION = '0.14';
+our $VERSION = '0.1401';
 
 use Carp;
 use Moo;
@@ -21,6 +21,7 @@ has results => ( is => 'rw'  ); # Last return
 has sql     => ( is => 'rw'  ); # SQL Actual
 has p       => ( is => 'rw'  );
 has Q       => ( is => 'rw'  ); # SQL::Abstract
+has Tables  => ( is => 'rwp' );
 
 has last_id    => ( is => 'rw'  );
 has last_error => ( is => 'rwp' );
@@ -53,36 +54,56 @@ sub set_error {
 
 sub BUILD {
   my ($self,$args) = @_;
-  
+
+  # Force all
+  if ( $args->{Error} ) {
+      $args->{RaiseError} = 1;
+      $args->{PrintError} = 1;
+  }
+
+  # SQLite
+  if ( $args->{SQLite} ) {
+      $self->Exception("No DB Found : ".$args->{SQLite}) unless -e $args->{SQLite};
+      $args->{db} = $args->{SQLite};
+      $args->{driver} = 'SQLite'
+  }
+
   my $DConf = {
-	       DBI => {
-		       RaiseError => $args->{RaiseError} // 0,
-		       PrintError => $args->{PrintError} // 0,
-		       AutoCommit => $args->{AutoCommit} // 1
-		      },
-	       Auth => {
-			user     => $args->{user}     // '',
-			password => $args->{password} // '',
-			host     => $args->{host}     // ''
-		       }
-	      };
+      DBI => {
+	  RaiseError => $args->{RaiseError} // 0,
+	  PrintError => $args->{PrintError} // 0,
+	  AutoCommit => $args->{AutoCommit} // 1
+      },
+      Auth => {
+	  user     => $args->{user}     // '',
+	  password => $args->{password} // '',
+	  host     => $args->{host}     // ''
+      },
+      tn     => $args->{tn} // 1,
+      db     => $args->{db}  // '',
+      dsn    => $args->{dsn} // '',
+      driver => $args->{driver} // '',
+      quote  => $args->{quote}  // '',
+      trace  => $args->{trace}  // '',
+      profile => $args->{profile} // '',
+      abstract => $args->{abstract} // 1
+  };
 
   $DConf->{DBI}->{mysql_enable_utf8} = 1 if $args->{mysql_enable_utf8};
-  $DConf->{quote} = $args->{quote}       if $args->{quote};
 
   $self->_set_args($DConf);
+
+  $self->Q( SQL::Abstract->new ) if $self->args->{abstract};
   
-  ## No DSN or Host
-  unless ( defined($args->{dsn}) || defined($args->{db}) ) {
+  # No DSN or Host
+  unless ( $self->args->{dsn} || $self->args->{db} ) {
       $self->Exception("Need a DSN or Host");
   }
 
-  $self->_set_dsn($args->{dsn} ? $self->_check_dsn($args->{dsn}) : $self->_make_dsn($args));
-
-  $self->Q( SQL::Abstract->new );
+  $self->_set_dsn($self->args->{dsn} ? $self->_check_dsn($self->args->{dsn}) : $self->_make_dsn($self->args));
 
   $self->db( DBIx::Connector->new( $self->dsn, 
-				   $args->{user}, $args->{password},
+				   $self->args->{user}, $self->args->{password},
 				   $self->args->{DBI} ) );
 
   $self->db->mode('ping');
@@ -93,14 +114,25 @@ sub BUILD {
     $self->set_error($DBI::err,$DBI::errstr);
   };
 
-  $self->db->dbh->trace($args->{trace},'dbix-fast-trace') if $args->{trace};
+  $self->db->dbh->trace($self->args->{trace},'dbix-fast-trace') if $self->args->{trace};
 
-  $self->_profile($args->{profile}) if $args->{profile};
+  $self->_profile($self->args->{profile}) if $self->args->{profile};
+
+  ## Set TablesName
+  #$self->_TablesName() if $self->args->{tn};
+}
+
+sub _TablesName {
+    my $self = shift;
+
+    return $self->all('tables'); #SHOW TABLES()');
 }
 
 sub _Driver_dbd {
   my $self = shift;
   my $dbd  = shift;
+
+  $self->Exception("Error DBD Driver") unless $dbd;
 
   map { $self->_set_dbd($_) if lc($dbd) eq lc($_) } qw(SQLite Pg MariaDB mysql);
 
@@ -172,13 +204,25 @@ sub _dsn_to_dbi {
 
   $self->Exception("_dsn_to_dbi : schema")  unless $URI->{schema};
 
+  $self->_Driver_dbd($URI->{schema});
+  
   $self->Exception("_dsn_to_dbi : connect") unless $URI->{connect};
 
   $URI->{connect} =~ /:/ ? ($URI->{host},$URI->{port}) = split ':',$URI->{connect} : $URI->{host} = $URI->{connect};
-  $URI->{UI}      =~ /:/ ? ($URI->{user},$URI->{password}) = split ':',$URI->{UI}  : $URI->{user} = $URI->{UI};
+
+  # UserInfo
+  if ( $URI->{UI} =~ /:/ ) {
+      ($URI->{user},$URI->{password}) = split ':',$URI->{UI};
+      my $SetArgs = $self->args;
+      $SetArgs->{Auth}->{user} = $URI->{user};
+      $SetArgs->{Auth}->{password} = $URI->{password};
+      $self->_set_args($SetArgs);
+  } else {
+      $URI->{user} = $URI->{UI}
+  }
 
   $self->Exception('_dsn_to_dbi : No DB value') unless $URI->{db};
-
+  
   ## Loop Attrs + Value
   if ( $URI->{db} =~ s/^(.*)\?(.*)$/$1/ ) {
     ($URI->{attribute},$URI->{value}) = split '=',$2;
@@ -389,10 +433,10 @@ sub update {
 
   for my $K ( keys %{$skeel->{where}} ) {
     push @p,$skeel->{where}->{$K};
-    $sql .= $K.' = ? ,';
+    $sql .= $K.' = ? AND ';
   }
 
-  $sql =~ s/,$//;
+  $sql =~ s/AND $//;
 
   $self->sql($sql);
   $self->execute_prepare(@p);
@@ -505,6 +549,10 @@ sub TableName {
 
   $self->Exception("TableName not defined") unless $table;
 
+  if ( $self->args->{TableName} ) {
+
+  }
+  
   return $table unless $table =~ /\W/;
 
   $self->Exception("TableName not valid: $table");
@@ -575,6 +623,10 @@ __END__
 =head1 SUBROUTINES/METHODS
 
 =over
+
+=item Tables
+
+ Tables DB
 
 =item Q
 

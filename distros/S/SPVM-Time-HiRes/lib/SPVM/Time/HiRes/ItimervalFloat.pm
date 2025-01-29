@@ -10,7 +10,7 @@ SPVM::Time::HiRes::ItimervalFloat - Floating Point Representation of Sys::Time::
 
 =head1 Description
 
-The Time::HiRes::ItimervalFloat class of L<SPVM> represents floating point representation of L<Sys::Time::Itimerval|SPVM::Sys::Time::Itimerval>.
+Time::HiRes::ItimervalFloat class in L<SPVM> represents floating point representation of L<Sys::Time::Itimerval|SPVM::Sys::Time::Itimerval>.
 
 =head1 Usage
 

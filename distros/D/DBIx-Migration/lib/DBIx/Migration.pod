@@ -1,0 +1,102 @@
+=pod
+
+=head1 NAME
+
+DBIx::Migration - Seamless DB schema up- and downgrades
+
+=head1 SYNOPSIS
+
+    # migrate.pl
+    my $m = DBIx::Migration->new(
+        {
+            dsn => 'dbi:SQLite:/Users/sri/myapp/db/sqlite/myapp.db',
+            dir => '/Users/sri/myapp/db/sqlite'
+        }
+    );
+
+    my $version = $m->version;   # Get current version from database
+    $m->migrate( 2 );            # Migrate database to version 2
+
+    # /Users/sri/myapp/db/sqlite/schema_1_up.sql
+    CREATE TABLE foo (
+        id INTEGER PRIMARY KEY,
+        bar TEXT
+    );
+
+    # /Users/sri/myapp/db/sqlite/schema_1_down.sql
+    DROP TABLE foo;
+
+    # /Users/sri/myapp/db/sqlite/schema_2_up.sql
+    CREATE TABLE bar (
+        id INTEGER PRIMARY KEY,
+        baz TEXT
+    );
+
+    # /Users/sri/myapp/db/sqlite/schema_2_down.sql
+    DROP TABLE bar;
+
+=head1 DESCRIPTION
+
+Seamless DB schema up- and downgrades.
+
+=head1 METHODS
+
+=over 4
+
+=item $self->debug( $debug )
+
+Enable/Disable debug messages.
+
+=item $self->dir( $dir )
+
+Get/Set directory.
+
+=item $self->dsn( $dsn )
+
+Get/Set dsn.
+
+=item $self->dbh( $dsn )
+
+Get/Set dbh.
+
+=item $self->migrate( $version )
+
+Migrate database to version.
+
+=item $self->password
+
+Get/Set database password.
+
+=item $self->username( $username )
+
+Get/Set database username.
+
+=item $self->version
+
+Get migration version from database. Will be undef if no migration has taken
+place yet.
+
+=back
+
+=head1 AUTHOR
+
+Sebastian Riedel, <kraihx@gmail.com>
+
+=head1 CONTRIBUTORS
+
+Dan Sully, <dan+github@sully.org>
+
+Marcus Ramberg, <marcus@nordaaker.com>
+
+Steven Jenkin, <sjenkin@venda.com>
+
+Sven Willenbuecher, <sven.willenbuecher@gmx.de>
+
+=head1 COPYRIGHT
+
+Copyright 2004-2005 Sebastian Riedel. All rights reserved.
+
+This program is free software, you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut

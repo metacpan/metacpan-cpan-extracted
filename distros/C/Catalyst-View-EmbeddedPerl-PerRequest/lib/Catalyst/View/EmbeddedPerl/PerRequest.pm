@@ -18,7 +18,7 @@ Moose::Util::MetaRole::apply_metaroles(
 
 extends 'Catalyst::View::BasePerRequest';
 
-our $VERSION = 0.001018;
+our $VERSION = 0.001019;
 eval $VERSION;
 
 # Args that get passed cleanly to Template::EmbeddedPerl
@@ -481,6 +481,22 @@ sub attribute_exists_for_html {
 
 sub view {
   my ($self, $view, @args) = @_;
+
+  # If the $view is a part string like ::Foo, then convert it to a full class name
+  # by prepending the namespace of the current view.  For example if the current view
+  # is Example::View::Bar::Baz and the $view is ::Foo then the full class name will
+  # be Example::View::Bar::Foo.  This is useful for including views that are in the
+  # same namespace as the current view.
+  if($view =~ m/^::/) {
+    my $current_view = ref $self;
+    # chop off the last part of the namespace
+    $current_view =~ s/::[^:]+$//;
+    # chop off everything from the start to 'View::'
+    $current_view =~ s/.*View:://;
+    $self->ctx->log->debug("Resolving view: $view to ${current_view}${view}") if $self->ctx->debug;
+    $view = $current_view . $view;
+  }
+
   my $response = $self->ctx->view($view, @args)->get_rendered;
 
   ## If temple is auto escape, we need to mark the string as safe
@@ -648,6 +664,12 @@ Renders the currently created template to a string, passing addional arguments i
 
 Renders another view and returns its content. Useful for including the output of one 
 template within another or using another template as a layout or wrapper.
+
+$view_name is the name of the view to render.  If the view name starts with '::' then
+it is assumed to be a relative view name and the namespace of the current view is prepended
+to it.  This is useful for including views that are in the same namespace as the current
+view.  For example if the current view is Example::View::Foo and you want to include
+Example::View::Foo::Bar you can use the relative view name '::Bar'.
 
 =head1 INHERITED METHODS
 

@@ -23,13 +23,14 @@ no_index:
 provides:
   HarfBuzz::Shaper:
     file: lib/HarfBuzz/Shaper.pm
-    version: '0.027'
+    version: '0.028'
 requires:
+  Archive::Tar: '0'
   ExtUtils::MakeMaker: '6.46'
   Test::More: '0'
   perl: '5.010001'
 resources:
   bugtracker: https://github.com/sciurius/perl-HarfBuzz-Shaper/issues
   repository: https://github.com/sciurius/perl-HarfBuzz-Shaper.git
-version: '0.027'
+version: '0.028'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

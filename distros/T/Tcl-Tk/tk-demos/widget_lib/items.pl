@@ -333,8 +333,7 @@ sub items_under_area {
 
     my $area = $c->find('withtag', 'area');
     my @items  = ();
-    my $i;
-    foreach $i ($c->find('enclosed', $iinfo->{areaX1},
+    foreach my $i ($c->find('enclosed', $iinfo->{areaX1},
             $iinfo->{areaY1}, $iinfo->{areaX2}, $iinfo->{areaY2})) {
 	my @tags = $c->gettags($i);
 	if (defined($tags[0]) and grep $_ eq 'item', @tags) {
@@ -344,7 +343,7 @@ sub items_under_area {
     @items = 'None' unless @items;
     print STDOUT 'Items enclosed by area:  ', join(' ', @items), ".\n";
     @items = ();
-    foreach $i ($c->find('overlapping', $iinfo->{areaX1}, $iinfo->{areaY1},
+    foreach my $i ($c->find('overlapping', $iinfo->{areaX1}, $iinfo->{areaY1},
             $iinfo->{areaX2}, $iinfo->{areaY2})) {
 	my @tags = $c->gettags($i);
 	if (defined($tags[0]) and grep $_ eq 'item', @tags) {

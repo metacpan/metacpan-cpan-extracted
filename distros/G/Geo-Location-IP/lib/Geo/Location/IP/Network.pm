@@ -10,7 +10,7 @@ use Object::Pad;
 
 class Geo::Location::IP::Network;
 
-our $VERSION = 0.002;
+our $VERSION = 0.003;
 
 use Scalar::Util qw();
 use Socket       qw();
@@ -86,7 +86,7 @@ Geo::Location::IP::Network - IP network details
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

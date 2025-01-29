@@ -1,5 +1,5 @@
 package Finance::Crypto::Exchange::Kraken::REST::Public;
-our $VERSION = '0.002';
+our $VERSION = '0.004';
 use Moose::Role;
 
 # ABSTRACT: Role for Kraken "public" API calls
@@ -28,6 +28,11 @@ sub get_server_time {
     return $self->call($req);
 }
 
+sub get_system_status {
+    my $self = shift;
+    my $req  = $self->_public('SystemStatus');
+    return $self->call($req);
+}
 
 {
     my $validator = validation_for(
@@ -187,7 +192,7 @@ Finance::Crypto::Exchange::Kraken::REST::Public - Role for Kraken "public" API c
 
 =head1 VERSION
 
-version 0.002
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -206,6 +211,10 @@ L<Kraken API manual|https://www.kraken.com/features/api#public-market-data>
 =head2 get_server_time
 
 L<https://api.kraken.com/0/public/Time>
+
+=head2 get_system_status
+
+L<https://api.kraken.com/0/public/SystemStatus>
 
 =head2 get_asset_info
 

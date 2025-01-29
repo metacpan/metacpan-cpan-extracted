@@ -2,6 +2,7 @@
 # MIT License
 
 class Thread::ID : pointer {
+  version_from Thread;
   
   # Class Methods
   native static method eq : int ($thread_id1 : Thread::ID, $thread_id2 : Thread::ID);

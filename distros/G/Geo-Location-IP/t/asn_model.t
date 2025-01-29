@@ -27,14 +27,12 @@ my $ip_address = Geo::Location::IP::Address->new(
 my %fields = (
     autonomous_system_number       => 12345,
     autonomous_system_organization => 'Acme Corporation',
+    ip_address                     => $ip_address,
 );
 
-my $model = new_ok 'Geo::Location::IP::Model::ASN' => [
-    raw        => \%fields,
-    ip_address => $ip_address,
-];
+my $model = new_ok 'Geo::Location::IP::Model::ASN' => [%fields];
 
-can_ok $model, qw(ip_address), keys %fields;
+can_ok $model, keys %fields;
 
 cmp_ok $model->autonomous_system_number, '==',
     $fields{autonomous_system_number}, 'autonomous_system_number matches';

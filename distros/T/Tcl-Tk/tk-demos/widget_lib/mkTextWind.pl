@@ -30,19 +30,19 @@ sub textWindPlot {
     $mkTextWind_c->create('line', qw(100 250 100 50 -width 2));
     $mkTextWind_c->create('text', 225, 20, -text => 'A Simple Plot', -fill => 'brown', -font => $font);
 
-    my($i, $x, $y, $point, $item);
-    for ($i = 0; $i <= 10; $i++) {
+    my($x, $y, $item);
+    for (my $i = 0; $i <= 10; $i++) {
 	$x  = 100 + ($i*30);
 	$mkTextWind_c->create('line', $x, 250, $x, 245, -width => 2);
 	$mkTextWind_c->create('text', $x, 254, -text => 10*$i, -anchor => 'n', -font => $font);
     }
-    for ($i = 0; $i <= 5; $i++) {
+    for (my $i = 0; $i <= 5; $i++) {
 	$y  = 250 - ($i*40);
 	$mkTextWind_c->create('line', 100, $y, 105, $y, -width => 2);
 	$mkTextWind_c->create('text', 96, $y, -text => $i*50.0, -anchor => 'e', -font => $font);
     }
 
-    foreach $point ([12, 56], [20, 94], [33, 98], [32, 120], [61, 180], [75, 160], [98, 223]) {
+    foreach my $point ([12, 56], [20, 94], [33, 98], [32, 120], [61, 180], [75, 160], [98, 223]) {
 	$x = 100 + (3 * $point->[0]);
 	$y = 250 - (4 * $point->[1]) / 5;
 	$item  = $mkTextWind_c->create('oval', $x-6, $y-6, $x+6, $y+6, qw(-width 1 -outline black -fill SkyBlue2));
@@ -199,8 +199,8 @@ sub mkTextWind {
     my $w_t_toggle = $mkTextWind::w_t->Checkbutton(-textvariable => \$embToggle, -indicatoron => 0, -variable => \$embToggle,
 				      -onvalue => 'A much longer string', -offvalue => 'Short', -cursor => 'top_left_arrow');
     $mkTextWind::w_t->window('create', 'end', -window => $w_t_toggle, -padx => 3, -pady => 2);
-    my($i, $color) = (1, '');
-    foreach $color (qw(AntiqueWhite3 Bisque1 Bisque2 Bisque3 Bisque4 SlateBlue3 RoyalBlue1 SteelBlue2 DeepSkyBlue3 LightBlue1
+    my $i = 1;
+    foreach my $color (qw(AntiqueWhite3 Bisque1 Bisque2 Bisque3 Bisque4 SlateBlue3 RoyalBlue1 SteelBlue2 DeepSkyBlue3 LightBlue1
 		       DarkSlateGray1 Aquamarine2 DarkSeaGreen2 SeaGreen1 Yellow1 IndianRed1 IndianRed2 Tan1 Tan4)) {
 	my $color_name = "w_t_color${i}";
 	${$color_name} = $mkTextWind::w_t->Button(-text => "$color", -cursor => 'top_left_arrow');

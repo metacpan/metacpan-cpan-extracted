@@ -17,9 +17,19 @@ use LWP::UserAgent;
 use Travel::Status::DE::DBRIS;
 use Travel::Routing::DE::DBRIS::Connection;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 Travel::Routing::DE::DBRIS->mk_ro_accessors(qw(earlier later));
+
+# Ticketdetails:
+# https://www.bahn.de/web/api/angebote/recon (x-correlation-id?)
+# {"klasse":"KLASSE_2","reisende":[{"typ":"JUGENDLICHER","ermaessigungen":[{"art":"KEINE_ERMAESSIGUNG","klasse":"KLASSENLOS"}],"alter":[],"anzahl":1},{"typ":"SENIOR","ermaessigungen":[{"art":"KEINE_ERMAESSIGUNG","klasse":"KLASSENLOS"}],"alter":[],"anzahl":1}],"ctxRecon":"...","reservierungsKontingenteVorhanden":false,"nurDeutschlandTicketVerbindungen":false,"deutschlandTicketVorhanden":false}
+
+my %passenger_type_map = (
+	adult  => 'ERWACHSENER',
+	junior => 'JUGENDLICHER',
+	senior => 'SENIOR',
+);
 
 # {{{ Constructors
 
@@ -63,7 +73,7 @@ sub new {
 		ankunftsHalt     => $conf{to}->id,
 		anfrageZeitpunkt => $dt->strftime('%Y-%m-%dT%H:%M:00'),
 		ankunftSuche     => 'ABFAHRT',
-		klasse           => 'KLASSE_2',
+		klasse           => $conf{first_class} ? 'KLASSE_1' : 'KLASSE_2',
 		produktgattungen => \@mots,
 		reisende         => [
 			{
@@ -86,30 +96,60 @@ sub new {
 		deutschlandTicketVorhanden        => \0
 	};
 
-	if ( @{ $conf{discounts} // [] } ) {
-		$req->{reisende}[0]{ermaessigungen} = [];
+	# art : 'KEINE_ERMAESSIGUNG' / JUGENDLICHER / SENIOR
+
+	for my $via ( @{ $conf{via} } ) {
+		my $via_stop = { id => $via->{stop}->id };
+		if ( $via->{duration} ) {
+			$via_stop->{aufenthaltsdauer} = 0 + $via->{duration};
+		}
+		push( @{ $req->{zwischenhalte} }, $via_stop );
 	}
-	for my $discount ( @{ $conf{discounts} // [] } ) {
-		my ( $type, $class );
-		for my $num (qw(25 50 100)) {
-			if ( $discount eq "bc${num}" ) {
-				$type  = "BAHNCARD${num}";
-				$class = 'KLASSE_2';
-			}
-			elsif ( $discount eq "bc${num}-first" ) {
-				$type  = "BAHNCARD${num}";
-				$class = 'KLASSE_1';
-			}
+
+	if ( @{ $conf{passengers} // [] } ) {
+		$req->{reisende} = [];
+	}
+
+	for my $passenger ( @{ $conf{passengers} // [] } ) {
+		if ( not $passenger_type_map{ $passenger->{type} } ) {
+			die("Unknown passenger type: '$passenger->{type}'");
 		}
-		if ($type) {
-			push(
-				@{ $req->{reisende}[0]{ermaessigungen} },
-				{
-					art    => $type,
-					klasse => $class,
+		my $entry = {
+			typ    => $passenger_type_map{ $passenger->{type} },
+			alter  => [],
+			anzahl => 1
+		};
+		for my $discount ( @{ $passenger->{discounts} // [] } ) {
+			my ( $type, $class );
+			for my $num (qw(25 50 100)) {
+				if ( $discount eq "bc${num}" ) {
+					$type  = "BAHNCARD${num}";
+					$class = 'KLASSE_2';
 				}
-			);
+				elsif ( $discount eq "bc${num}-first" ) {
+					$type  = "BAHNCARD${num}";
+					$class = 'KLASSE_1';
+				}
+			}
+			if ($type) {
+				push(
+					@{ $entry->{ermaessigungen} },
+					{
+						art    => $type,
+						klasse => $class,
+					}
+				);
+			}
 		}
+		if ( not @{ $entry->{ermaessigungen} // [] } ) {
+			$entry->{ermaessigungen} = [
+				{
+					art    => 'KEINE_ERMAESSIGUNG',
+					klasse => 'KLASSENLOS'
+				}
+			];
+		}
+		push( @{ $req->{reisende} }, $entry );
 	}
 
 	$self->{strptime_obj} //= DateTime::Format::Strptime->new(
@@ -318,7 +358,7 @@ Travel::Routing::DE::DBRIS - Interface to the bahn.de itinerary service
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 DESCRIPTION
 
@@ -346,6 +386,13 @@ the requested itinerary.
 A Travel::Status::DE::DBRIS::Location(3pm) instance describing the destination
 of the requested itinerary.
 
+=item B<via> => I<arrayref>
+
+An arrayref containing up to two hashrefs that describe stopovers which must
+be part of the requested itinerary. Each hashref consists of two keys:
+B<stop> (Travel::Status::DE::DBRIS::Location(3pm) object, mandatory) and
+B<duration> (stopover duration in minutes, optional, default: 0).
+
 =item B<cache> => I<cache>
 
 A Cache::File(3pm) instance used for caching bahn.de requests.
@@ -366,11 +413,15 @@ Default: de.
 Only request connections using the modes of transit specified in I<arrayref>.
 Default: ICE, EC_IC, IR, REGIONAL, SBAHN, BUS, SCHIFF, UBAHN, TRAM, ANRUFPFLICHTIG.
 
-=item B<discounts> => I<arrayref>
+=item B<passengers> => I<arrayref>
 
-Consider discounts specified in I<arrayref> when determining offer prices.
-Supported items: bc25, bc25-first, bc50, bc50-first, bc100, bc100-first.
-Default: none.
+Use passengers as defined by I<arrayref> when determining offer prices.  Each
+entry describes a single person with a B<type> (string) and B<discounts>
+(arrayref). B<type> must be B<adult> (27 to 64 years old), B<junior> (15 to 26
+years old), or B<senior> (65 years or older). Supported discounts are: bc25,
+bc25-first, bc50, bc50-first, bc100, bc100-first.
+
+Default: single adult, no discounts.
 
 =item B<user_agent> => I<user agent>
 

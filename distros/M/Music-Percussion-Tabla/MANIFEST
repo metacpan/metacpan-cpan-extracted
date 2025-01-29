@@ -9,6 +9,7 @@ README
 README.md
 dist.ini
 eg/bols.pl
+eg/durations.pl
 eg/play-all.pl
 eg/synopsis.pl
 lib/Music/Percussion/Tabla.pm

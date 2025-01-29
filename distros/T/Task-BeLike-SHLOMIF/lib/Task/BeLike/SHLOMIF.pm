@@ -1,5 +1,5 @@
 package Task::BeLike::SHLOMIF;
-$Task::BeLike::SHLOMIF::VERSION = '0.0.10';
+$Task::BeLike::SHLOMIF::VERSION = '0.0.11';
 use strict;
 use warnings;
 
@@ -17,7 +17,7 @@ Task::BeLike::SHLOMIF - Be like SHLOMIF / Shlomi Fish.
 
 =head1 VERSION
 
-version 0.0.10
+version 0.0.11
 
 =head1 TASK CONTENTS
 
@@ -52,6 +52,8 @@ version 0.0.10
 =head3 L<Module::Format>
 
 =head3 L<Module::Format::AsHTML>
+
+=head3 L<Net::GitHub>
 
 =head3 L<Perl::Tidy>
 
@@ -108,6 +110,8 @@ version 0.0.10
 =head3 L<App::Timestamper>
 
 =head3 L<App::Timestamper::Format>
+
+=head3 L<App::Timestamper::Log::Process>
 
 =head3 L<App::Timestamper::WithElapsed>
 

@@ -13,11 +13,7 @@ plan skip_all => "DBD::SQLite 1.50" if $@;
 
 plan tests => 15;
 
-my $db = DBIx::Fast->new(
-    db     => 't/db/test.db',
-    driver => 'SQLite',
-    Error  => 1,
-    PrintError => 1 );
+my $db = DBIx::Fast->new( SQLite => 't/db/test.db' , Error => 1 );
 
 is ref $db->Q,'SQL::Abstract','Q() - SQL::Abstract ISA';
 

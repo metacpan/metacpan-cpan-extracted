@@ -1,0 +1,11 @@
+# "tightness" means the closeness with which pairs of enclosing tokens,
+# such as parentheses, contain the quantities within.
+--paren-tightness 0
+--square-bracket-tightness 0
+--brace-tightness 0
+--maximum-line-length 120
+--indent-columns 2
+--continuation-indentation 2
+--cuddled-else
+--static-side-comments
+--noblanks-before-comments

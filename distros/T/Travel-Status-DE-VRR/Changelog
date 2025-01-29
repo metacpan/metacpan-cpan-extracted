@@ -1,3 +1,8 @@
+Travel::Status::DE::VRR 3.07 - Mon Jan 27 2025
+
+    * Departure: Fix ->id accessor
+    * Add "Rolph" service definition
+
 Travel::Status::DE::VRR 3.06 - Sun Jan 05 2025
 
     * EFA APIs know two types of stop IDs: numbers and codes. This module now

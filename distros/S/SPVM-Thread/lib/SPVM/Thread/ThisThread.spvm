@@ -2,6 +2,8 @@
 # MIT License
 
 class Thread::ThisThread {
+  version_from Thread;
+  
   use Thread::ID;
   
   # Instance Methods

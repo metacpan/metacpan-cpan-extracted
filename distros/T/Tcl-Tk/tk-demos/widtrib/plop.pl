@@ -1,11 +1,10 @@
 # Plot a series of continuous functions on a Perl/Tk Canvas.
 #
 # This program is described in the Perl/Tk column from Volume 1, Issue 1 of
-# The Perl Journal (http://tpj.com/tpj), and is included in the Perl/Tk
-# distribution with permission.  It has been modified slightly to conform
-# to the widget demo standard.
+# The Perl Journal, and is included in the Perl/Tk distribution with
+# permission.  It has been modified slightly to conform to the widget demo
+# standard.
 
-#!/usr/local/bin/perl -w
 #
 # plot_program - plot a series of continuous functions on a Perl/Tk Canvas.
 #

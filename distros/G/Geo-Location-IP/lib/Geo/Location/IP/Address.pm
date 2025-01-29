@@ -10,7 +10,7 @@ use Object::Pad;
 
 class Geo::Location::IP::Address;
 
-our $VERSION = 0.002;
+our $VERSION = 0.003;
 
 use Geo::Location::IP::Network;
 use Scalar::Util qw();
@@ -92,7 +92,7 @@ Geo::Location::IP::Address - IP address details
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -103,6 +103,7 @@ version 0.002
   eval {
     my $asn_model  = $reader->asn(ip => '1.2.3.4');
     my $ip_address = $asn_model->ip_address;
+    my $network    = $ip_address->network;
   };
 
 =head1 DESCRIPTION
@@ -137,7 +138,7 @@ object.
 
 =head2 version
 
-  my $version = $network->version;
+  my $version = $ip_address->version;
 
 Returns 4 or 6.
 

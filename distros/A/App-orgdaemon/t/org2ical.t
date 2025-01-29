@@ -59,14 +59,14 @@ EOF
 
     {
 	# normalize stuff (e.g. prog version)
-	$ics_contents =~ s{^(PRODID.*org2ical )[\d.]+(.*)}{$1."0.00".$2}e;
+	$ics_contents =~ s{^(PRODID.*org2ical )[\d.]+(.*)}{$1."0.00".$2}egm;
 	$ics_contents =~ s{^(CREATED|DTSTAMP|LAST-MODIFIED):\d{8}T\d{6}Z$}{$1.":19700101T000000Z"}egm;
 
 	is_deeply [split /\n/, $ics_contents], [split /\n/, <<EOF], 'expected ics contents after initial creation';
 BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
-PRODID:-//Slaven Rezic//NONSGML rezic.de org2ical 0.05//EN
+PRODID:-//Slaven Rezic//NONSGML rezic.de org2ical 0.00//EN
 BEGIN:VEVENT
 UID:Blcatps/EWPbXGJBkLi7Iw\@example.org
 DTSTART:99990101T000000
@@ -75,6 +75,7 @@ DTSTAMP:19700101T000000Z
 LAST-MODIFIED:19700101T000000Z
 SUMMARY:normal date
 TRANSP:OPAQUE
+DESCRIPTION:Initial details.\\n
 BEGIN:VALARM
 ACTION:DISPLAY
 DESCRIPTION:Reminder
@@ -106,7 +107,7 @@ EOF
 	my $success = run [@full_script, '--domain-id=example.org', "--todo-file=$dir/test.org", "--ics-file=$dir/test.ics"];
 	ok $success, 'run on existing .ics file, with changes';
 	my $ics_contents = slurp "$dir/test.ics";
-	is $original_ics_contents, $ics_contents, 'no changes in ics file (only details changed)';
+	like $ics_contents, qr{Changes details}, 'details changed in ics file';
     }
 
     {
@@ -156,6 +157,35 @@ EOF
 	}
     }
 
+    {
+	# geo:...
+	for my $def (
+	    ['[[geo:52.51451,13.35011?z=19]]', 'https://www.openstreetmap.org/?mlat=52.51451&mlon=13.35011#map=19/52.51451/13.35011'],
+	    ["[[geo:52.51451,13.35011?z=19][Siegess\xe4ule Berlin]]", "https://www.openstreetmap.org/?mlat=52.51451&mlon=13.35011#map=19/52.51451/13.35011 (Siegess\xc3\xa4ule Berlin)"],
+	    ['[[geo:-22.9680,-43.1748]]',      'https://www.openstreetmap.org/?mlat=-22.9680&mlon=-43.1748#map=15/-22.9680/-43.1748'], # negative lat/lon + missing zoom
+	) {
+	    my($geo_osm_link, $osm_url) = @$def;
+
+	    {
+		open my $ofh, '>:encoding(utf-8)', "$dir/test.org" or die $!;
+		print $ofh <<EOF;
+* TODO date with geo location <9999-01-01 Fr 00:00>
+  Location: $geo_osm_link
+EOF
+		close $ofh or die $!;
+	    }
+
+	    {
+		my $success = run [@full_script, '--domain-id=example.org', "--todo-file=$dir/test.org", "--ics-file=$dir/test.ics"];
+		ok $success, 'org-mode file with geo location';
+	    }
+
+	    {
+		my $ics_contents = slurp "$dir/test.ics";
+		like $ics_contents, qr{\Q$osm_url}, 'found converted OSM URL';
+	    }
+	}
+    }
 }
 
 __END__

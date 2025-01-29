@@ -115,8 +115,8 @@ sub twind {
     );
     $t->window('create', 'end', -window => $t_toggle,
 			     -padx => 3, -pady => 2);
-    my($i, $color) = (1, '');
-    foreach $color (qw(AntiqueWhite3 Bisque1 Bisque2 Bisque3 Bisque4
+    my $i = 1;
+    foreach my $color (qw(AntiqueWhite3 Bisque1 Bisque2 Bisque3 Bisque4
 		       SlateBlue3 RoyalBlue1 SteelBlue2 DeepSkyBlue3
 		       LightBlue1 DarkSlateGray1 Aquamarine2 DarkSeaGreen2
 		       SeaGreen1 Yellow1 IndianRed1 IndianRed2 Tan1 Tan4)) {

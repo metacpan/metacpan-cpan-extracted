@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Play the tabla!
 
-our $VERSION = '0.0604';
+our $VERSION = '0.0605';
 
 use Moo;
 use File::ShareDir qw(dist_dir);
@@ -57,7 +57,7 @@ sub BUILD {
 
 
 sub strike {
-    my ($self, $bol, $dura) = @_;
+    my ($self, $bol, $dura, $return) = @_;
     $dura ||= $self->quarter;
     my $bols = $self->patches->{$bol};
     if (any { /[a-z]/ } @$bols) { # double-strike
@@ -158,7 +158,7 @@ Music::Percussion::Tabla - Play the tabla!
 
 =head1 VERSION
 
-version 0.0604
+version 0.0605
 
 =head1 SYNOPSIS
 
@@ -173,6 +173,13 @@ version 0.0604
     $t->strike('ge');
     $t->rest($t->quarter);
   }
+
+  for (1 .. 2) {
+    $t->strike('ke', $t->sixteenth) for 1 .. 3;
+    $t->strike('ti', $t->sixteenth) for 1 .. 4;
+  }
+
+  $t->rest($t->quarter);
 
   $t->teentaal($t->eighth)  for 1 .. $t->bars;
   $t->keherawa($t->eighth)  for 1 .. $t->bars;
@@ -319,13 +326,23 @@ Traditional "groove patterns":
 
 =item teentaal([$duration])
 
+16 beats
+
 =item keherawa([$duration])
+
+8 beats
 
 =item jhaptaal([$duration])
 
+10 beats
+
 =item dadra([$duration])
 
+6 beats
+
 =item rupaktaal([$duration])
+
+7 beats
 
 =back
 

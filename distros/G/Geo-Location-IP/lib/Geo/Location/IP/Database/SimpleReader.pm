@@ -10,7 +10,7 @@ use Object::Pad;
 
 class Geo::Location::IP::Database::SimpleReader;
 
-our $VERSION = 0.002;
+our $VERSION = 0.003;
 
 use Geo::Location::IP::Address;
 use Geo::Location::IP::Model::AnonymousIP;
@@ -37,10 +37,8 @@ ADJUST :params (:$file) {
 method anonymous_ip ($, $ip) {
     my ($hash_ref, $ip_address) = $self->_get($ip);
     if (defined $hash_ref) {
-        return Geo::Location::IP::Model::AnonymousIP->new(
-            raw        => $hash_ref,
-            ip_address => $ip_address,
-        );
+        return Geo::Location::IP::Model::AnonymousIP->_from_hash($hash_ref,
+            $ip_address);
     }
     return;
 }
@@ -48,10 +46,8 @@ method anonymous_ip ($, $ip) {
 method asn ($, $ip) {
     my ($hash_ref, $ip_address) = $self->_get($ip);
     if (defined $hash_ref) {
-        return Geo::Location::IP::Model::ASN->new(
-            raw        => $hash_ref,
-            ip_address => $ip_address,
-        );
+        return Geo::Location::IP::Model::ASN->_from_hash($hash_ref,
+            $ip_address);
     }
     return;
 }
@@ -59,11 +55,8 @@ method asn ($, $ip) {
 method city ($, $ip) {
     my ($hash_ref, $ip_address) = $self->_get($ip);
     if (defined $hash_ref) {
-        return Geo::Location::IP::Model::City->new(
-            raw        => $hash_ref,
-            ip_address => $ip_address,
-            locales    => $self->locales,
-        );
+        return Geo::Location::IP::Model::City->_from_hash($hash_ref,
+            $ip_address, $self->locales);
     }
     return;
 }
@@ -71,10 +64,8 @@ method city ($, $ip) {
 method connection_type ($, $ip) {
     my ($hash_ref, $ip_address) = $self->_get($ip);
     if (defined $hash_ref) {
-        return Geo::Location::IP::Model::ConnectionType->new(
-            raw        => $hash_ref,
-            ip_address => $ip_address,
-        );
+        return Geo::Location::IP::Model::ConnectionType->_from_hash($hash_ref,
+            $ip_address);
     }
     return;
 }
@@ -82,11 +73,8 @@ method connection_type ($, $ip) {
 method country ($, $ip) {
     my ($hash_ref, $ip_address) = $self->_get($ip);
     if (defined $hash_ref) {
-        return Geo::Location::IP::Model::Country->new(
-            raw        => $hash_ref,
-            ip_address => $ip_address,
-            locales    => $self->locales,
-        );
+        return Geo::Location::IP::Model::Country->_from_hash($hash_ref,
+            $ip_address, $self->locales);
     }
     return;
 }
@@ -94,10 +82,8 @@ method country ($, $ip) {
 method domain ($, $ip) {
     my ($hash_ref, $ip_address) = $self->_get($ip);
     if (defined $hash_ref) {
-        return Geo::Location::IP::Model::Domain->new(
-            raw        => $hash_ref,
-            ip_address => $ip_address,
-        );
+        return Geo::Location::IP::Model::Domain->_from_hash($hash_ref,
+            $ip_address);
     }
     return;
 }
@@ -105,11 +91,8 @@ method domain ($, $ip) {
 method enterprise ($, $ip) {
     my ($hash_ref, $ip_address) = $self->_get($ip);
     if (defined $hash_ref) {
-        return Geo::Location::IP::Model::Enterprise->new(
-            raw        => $hash_ref,
-            ip_address => $ip_address,
-            locales    => $self->locales,
-        );
+        return Geo::Location::IP::Model::Enterprise->_from_hash($hash_ref,
+            $ip_address, $self->locales);
     }
     return;
 }
@@ -117,10 +100,8 @@ method enterprise ($, $ip) {
 method isp ($, $ip) {
     my ($hash_ref, $ip_address) = $self->_get($ip);
     if (defined $hash_ref) {
-        return Geo::Location::IP::Model::ISP->new(
-            raw        => $hash_ref,
-            ip_address => $ip_address,
-        );
+        return Geo::Location::IP::Model::ISP->_from_hash($hash_ref,
+            $ip_address);
     }
     return;
 }
@@ -160,7 +141,7 @@ Geo::Location::IP::Database::SimpleReader - Read MaxMind DB files
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -193,7 +174,7 @@ L<Geo::Location::IP::Database::Reader> if you prefer exceptions.
       locales => ['de', 'en'],
   );
 
-Returns a new reader object.  Dies if the specified file cannot be read.
+Creates a new reader object.  Dies if the specified file cannot be read.
 
 The C<file> parameter is a path to a database in the MaxMind DB file format.
 

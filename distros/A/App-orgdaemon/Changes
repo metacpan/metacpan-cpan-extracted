@@ -1,5 +1,8 @@
 Revision history for org-daemon.
 
+1.15	2025-01-28
+	- support for geo: links
+
 1.14	2024-07-21
 	- org2ical: new options --include-tags and --exclude-tags
 	- ci work

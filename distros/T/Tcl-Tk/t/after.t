@@ -1,9 +1,5 @@
 #use Test::More (tests => 6);
 use Test;
-if ($^O ne 'MSWin32' and !$ENV{DISPLAY}) {
-    print "1..0 # skip: no DISPLAY env var - how come?\n";
-    exit;
-}
 plan tests=>6;
 
 use Tcl::Tk qw(:perlTk);

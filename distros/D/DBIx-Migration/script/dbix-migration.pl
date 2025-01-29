@@ -46,7 +46,10 @@ my $m = DBIx::Migration->new(
 $m->migrate( $ARGV[2] );
 
 1;
+
 __END__
+
+=pod
 
 =head1 NAME
 
@@ -77,7 +80,7 @@ L<DBIx::Migration>
 
 =head1 AUTHOR
 
-Sebastian Riedel, C<sri@oook.de>
+Sebastian Riedel, <kraihx@gmail.com>
 
 =head1 COPYRIGHT
 
