@@ -8,7 +8,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.52'
   File::ShareDir::Install: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,6 +34,6 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  repository: https://alexschroeder.ch/cgit/planet-jupiter
-version: 1.07
+  repository: https://src.alexschroeder.ch/planet-jupiter.git/
+version: 1.08
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

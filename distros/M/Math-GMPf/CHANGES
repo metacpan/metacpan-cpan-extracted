@@ -1,5 +1,12 @@
 Revision history for Perl module Math::GMPf
 
+0.53
+ - On Windows only: set the constant GMPF_WIN32_FMT_BUG to 0 if the gmp
+   library was built with -D__USE_MINGW_ANSI_STDIO; else set it to 1.
+ - Fix https://rt.cpan.org/Public/Bug/Display.html?id=158590
+   Thanks to @twata_1.
+ - Test "%a" and "%A"formatting in t/sprintf.t
+
 0.52
  - Division-by-zero now croaks, rather than die in silence.
  - Simplify overloading of '++' and '--'.

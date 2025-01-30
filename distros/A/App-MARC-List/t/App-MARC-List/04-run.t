@@ -6,7 +6,7 @@ use English;
 use Error::Pure::Utils qw(clean);
 use File::Object;
 use File::Spec::Functions qw(abs2rel);
-use Test::More 'tests' => 9;
+use Test::More 'tests' => 10;
 use Test::NoWarnings;
 use Test::Output;
 use Test::Warn;
@@ -41,6 +41,20 @@ stderr_is(
 
 # Test.
 @ARGV = (
+	$data_dir->file('ex1.xml')->s,
+);
+$right_ret = help();
+stderr_is(
+	sub {
+		App::MARC::List->new->run;
+		return;
+	},
+	$right_ret,
+	'Run help (only MARC file).',
+);
+
+# Test.
+@ARGV = (
 	'-x',
 );
 $right_ret = help();
@@ -52,6 +66,23 @@ stderr_is(
 	},
 	$right_ret,
 	'Run help (-x - bad option).',
+);
+
+# Test.
+@ARGV = (
+	$data_dir->file('ex1.xml')->s,
+	'008',
+);
+$right_ret = <<'END';
+830304s1982    xr a         u0|0 | cze
+END
+stdout_is(
+	sub {
+		App::MARC::List->new->run;
+		return;
+	},
+	$right_ret,
+	'Run list for MARC XML file with 1 record (008 = »830304s1982    xr a         u0|0 | cze«).',
 );
 
 # Test.
@@ -90,22 +121,12 @@ stderr_like(
 # Test.
 @ARGV = (
 	$data_dir->file('ex1.xml')->s,
-);
-eval {
-	App::MARC::List->new->run;
-};
-is($EVAL_ERROR, "Field and subfield is required.\n", "Field and subfield is required.");
-clean();
-
-# Test.
-@ARGV = (
-	$data_dir->file('ex1.xml')->s,
 	'015',
 );
 eval {
 	App::MARC::List->new->run;
 };
-is($EVAL_ERROR, "Field and subfield is required.\n", "Field and subfield is required.");
+is($EVAL_ERROR, "Subfield is required.\n", "Subfield is required.");
 clean();
 
 sub help {
@@ -115,12 +136,12 @@ sub help {
 		$script =~ s/\\/\//msg;
 	}
 	my $help = <<"END";
-Usage: $script [-h] [--version] marc_xml_file field subfield
+Usage: $script [-h] [--version] marc_xml_file field [subfield]
 	-h		Print help.
 	--version	Print version.
 	marc_xml_file	MARC XML file.
 	field		MARC field.
-	subfield	MARC subfield.
+	subfield	MARC subfield (for datafields).
 END
 
 	return $help;

@@ -1,6 +1,6 @@
 package SPVM::Resource::Libpng;
 
-our $VERSION = "0.012";
+our $VERSION = "0.013";
 
 1;
 
@@ -10,7 +10,7 @@ SPVM::Resource::Libpng - The Resource of The libpng Library
 
 =head1 Description
 
-SPVM::Resource::Libpng is a L<resource|SPVM::Document::Resource> of L<SPVM> for the L<libpng|https://github.com/glennrp/libpng> library.
+SPVM::Resource::Libpng class in L<SPVM> is a L<resource|SPVM::Document::Resource> class for the L<libpng|https://github.com/glennrp/libpng> library.
 
 =head1 Usage
 

@@ -1,6 +1,6 @@
 package SPVM::Getopt::Long;
 
-our $VERSION = "0.002";
+our $VERSION = "0.003";
 
 1;
 

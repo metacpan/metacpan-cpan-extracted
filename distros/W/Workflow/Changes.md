@@ -1,8 +1,21 @@
 # Revision history for the Workflow Perl Distribution
 
-## TO BE RELEASED
+## 2.04 2025-01-29 Feature and bug fix release, update not required
 
-## 2.03 2025-01-24 BUg fix release, update recommended
+### Added
+
+- Allow `$context` parameter in `create_workflow` and `fetch_workflow` to be
+  an unblessed hash (loosens requirement for it to me a `Workflow::Context`
+  instance)
+
+### Fixed
+
+- Conditions with a `test` attribute (i.e. without a `name` attribute),
+  declared 'inline' in the workflow->state->action definition
+- Conditions provided as examples in `eg/` should have been ported to 2.0
+- Broken URLs in documentation
+
+## 2.03 2025-01-24 Bug fix release, update recommended
 
 ### Fixed
 

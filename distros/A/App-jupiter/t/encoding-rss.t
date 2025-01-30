@@ -43,6 +43,13 @@ my $rss = <<'EOT';
          <link>http://hello/wiki?user=Alex&amp;lang=ar</link>
          <description>&lt;style&gt;some CSS, I guess&lt;/style&gt;&lt;em&gt;D&amp;D&lt;/em&gt; is not bad!&lt;br&gt;You'll like &lt;span class='p-name'&gt;Foo &amp; Bar&lt;/span&gt;.</description>
          <author>&lt;span class='p-author h-card'&gt;Alex Schroeder&lt;/span&gt;</author>
+         <pubDate>Mon, 13 Jan 2020 23:16:01 +0100</pubDate>
+      </item>
+      <item>
+         <title>CDATA</title>
+         <link>http://hello/cdata</link>
+         <description><![CDATA[1<2]]></description>
+         <pubDate>Tue, 14 Jan 2020 23:16:01 +0100</pubDate>
       </item>
    </channel>
 </rss>
@@ -58,21 +65,27 @@ Jupiter::make_html("test-$id/rss2sample.html", "test-$id/rss2sample.xml", "test-
 
 ok(-f "test-$id/rss2sample.html", "HTML was generated");
 my $doc = XML::LibXML->load_html(location => "test-$id/rss2sample.html");
-is($doc->findvalue('//h3/a[position()=2]'), "السّلام عليك", "Encoded item title matches");
 is($doc->findvalue('//li/a[position()=2]'), "Foo & Bar", "Encoded feed title matches");
-is($doc->findvalue('//h3/a[position()=1]'), "Foo & Bar", "Encoded feed title matches again");
-is($doc->findvalue('//h3/a[position()=2]/@href'), "http://hello/wiki?user=Alex&lang=ar", "Encoded link matches");
-is($doc->findnodes('//div[@class="content"]')->get_node(1)->toString(),
+is($doc->findvalue('//div[@class="post"][position()=2]/h3/a[position()=2]'), "السّلام عليك", "Encoded item title matches");
+is($doc->findvalue('//div[@class="post"][position()=2]/h3/a[position()=1]'), "Foo & Bar", "Encoded feed title matches again");
+is($doc->findvalue('//div[@class="post"][position()=2]/h3/a[position()=2]/@href'), "http://hello/wiki?user=Alex&lang=ar", "Encoded link matches");
+is($doc->findnodes('//div[@class="content"]')->get_node(2)->toString(),
    q(<div class="content">D&amp;D is not bad!<span class="paragraph">¶ </span>You'll like Foo &amp; Bar.</div>),
    "Content HTML matches");
-like($doc->findnodes('//div[@class="permalink"]')->get_node(1)->toString(),
+like($doc->findnodes('//div[@class="permalink"]')->get_node(2)->toString(),
      qr(by Alex Schroeder),
      "Author HTML matches");
 unlike($doc->findvalue('//div[@class="content"]'), qr/CSS/, "Style is stripped");
+is($doc->findnodes('//div[@class="content"]')->get_node(1)->toString(),
+   q(<div class="content">1&lt;2</div>),
+   "CDATA matches");
 
 ok(-f "test-$id/rss2sample.xml", "RSS was generated");
 $doc = XML::LibXML->load_xml(location => "test-$id/rss2sample.xml");
 like(($doc->findnodes('/rss/channel/item/description'))[0]->toString,
+     qr/<!\[CDATA\[1<2\]\]>/,
+     "Encoded content matches");
+like(($doc->findnodes('/rss/channel/item/description'))[1]->toString,
      qr/&lt;em&gt;D&amp;D&lt;\/em&gt; is not bad!&lt;br&gt;You'll like &lt;span class='p-name'&gt;Foo &amp; Bar&lt;\/span&gt;\./,
      "Encoded content matches");
 

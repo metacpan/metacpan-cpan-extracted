@@ -6,6 +6,7 @@ MANIFEST			This list of files
 t/00-load.t
 t/01-operations.t
 t/02-translator.t
+t/03-types.t
 t/lib/MyApp/Schema.pm
 t/manifest.t
 t/pod.t

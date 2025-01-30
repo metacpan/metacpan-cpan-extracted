@@ -2,7 +2,7 @@
 # MIT License
 
 class Mozilla::CA {
-  version "0.002";
+  version "0.003";
   
   static method SSL_ca : string () {
     

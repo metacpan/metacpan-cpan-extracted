@@ -28,7 +28,7 @@ ok(SPVM::TestCase::Net::DNS::Native->getaddrinfo_go);
   is($SPVM::Net::DNS::Native::VERSION, $version_string);
 }
 
-$api->set_exception(undef);
+SPVM::Fn->destroy_runtime_permanent_vars;
 
 my $end_memory_blocks_count = $api->get_memory_blocks_count;
 is($end_memory_blocks_count, $start_memory_blocks_count);

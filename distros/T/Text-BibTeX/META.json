@@ -44,7 +44,7 @@
    "provides" : {
       "Text::BibTeX" : {
          "file" : "lib/Text/BibTeX.pm",
-         "version" : "0.90"
+         "version" : "0.91"
       },
       "Text::BibTeX::BibEntry" : {
          "file" : "lib/Text/BibTeX/Bib.pm",
@@ -104,6 +104,6 @@
          "url" : "http://github.com/ambs/Text-BibTeX"
       }
    },
-   "version" : "0.90",
+   "version" : "0.91",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -21,11 +21,11 @@ recursive_author_tests('xt');
 requires 'Map::Tube' => 3.92;
 requires 'Map::Tube::API' => 0.08;
 requires 'Map::Tube::CLI' => 0.80;
+requires 'Map::Tube::Exception' => 3.24;
 requires 'Map::Tube::Graph' => 0.06;
 requires 'Map::Tube::GraphViz' => 0.07;
-requires 'Map::Tube::Exception' => 3.24;
 requires 'Map::Tube::Plugin::Formatter' => 0.17;
-requires 'Map::Tube::Plugin::FuzzyFind' => 0.81.1;
+requires 'Map::Tube::Plugin::FuzzyFind' => 0.081001;
 requires 'Map::Tube::Plugin::Graph' => 0.45;
 requires 'Map::Tube::Server' => 0.06;
 requires 'Map::Tube::Text::Shortest' => 0.02;
@@ -38,7 +38,7 @@ resources 'repository' => 'git://github.com/michal-josef-spacek/Task-Map-Tube';
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.48';
+version '0.49';
 
 # Run.
 WriteAll();

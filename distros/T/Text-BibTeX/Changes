@@ -1,7 +1,10 @@
 Revision history for Perl module Text::BibTeX
 
+0.91 2025-01-29
+ * Fix compilation issue with btparse code (Colin Mcdonald)
+
 0.90 2025-01-06
- * Added support to Haiku OS (thanks to Joachim Mairböc
+ * Added support to Haiku OS (thanks to Joachim Mairbö)
 
 0.89 2023-01-24
  * Fix Config::AutoConf dependency version

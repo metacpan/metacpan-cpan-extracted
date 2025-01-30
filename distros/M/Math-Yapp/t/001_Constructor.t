@@ -1,4 +1,4 @@
-#!/bin/perl.exe -w
+#!/bin/perl.exe -w #-d
 # 001_Constructor.t:    Test the Math::Yapp constructor in various forms.
 #                       Also serves as a test for the Ysprint() formatting
 #                       function.
@@ -6,15 +6,13 @@
 use strict;
 use warnings;
 
-use Test::More;     # No test count in advance
-
+use Test::More 'no_plan'; 
 BEGIN { use_ok('Math::Yapp') };
 
 use Carp;
 use Math::Complex;
 use Math::Yapp;
 use Data::Dumper;
-#use Test::More 'no_plan';      # Skip this; use done_testing()
 
 Yapp_testmode(0);
 my $margin = 1.0 / (10**10);    # When I consider results to be close enough
@@ -31,16 +29,19 @@ my $s_list1 = "3X^4 -3 + 2X^4 + (1-2i)X^3 - X +3x^2";   # Mixed up
 #
 #Math::Yapp->dec_places(2);              # Set to 2
 #my $places = Math::Yapp->dec_places();  # Did it stay 2?
+
+print ("Test setting of decimal places for output\n");
 Yapp_decimals(2);               # Set to 2
 my $places = Yapp_decimals();   # Did it stay 2?
 is($places, 2, "Check setting of decimal places (==2)");
 
-# Test constructor from an array
+print("Test constructor from an array of float numbers\n");
 #
 my $poly1 = Yapp(@y_list1);
+print explain $poly1, '\n';  # Like Data::Dumper($poly1). GREAT!
 my $outp1 = $poly1->Ysprint();
-print "List: ( @y_list1 ) Produces:\n";
-printf("<%s>\n", $outp1);
+print "List: ( @y_list1 ) Produces: ";
+print $outp1, "\n";
 is($outp1, $out_yapp1, "Construct from array");
 is($poly1->degree(), 6, "Correct degree setting (==6)");
 
@@ -66,6 +67,6 @@ my $expected_coutp1
 is($coutp1, $expected_coutp1,
    "Constructor from list with complex numbers");
 
-print "End of constructor tests\n";
+diag "End of constructor tests\n";
 done_testing();
 exit;

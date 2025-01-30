@@ -40,5 +40,15 @@ Revision history for Perl extension Math::Yapp.
 1.06  Fri, May 15, 2015 11:36:55 AM
       - Completed more on innr-product space issues
       - Added complete documentation on inner-product space functionality,
-        including a mea-culpa on what I have ot yet done
+        including a mea-culpa on what I have not yet done
+
+1.08  Mon Jan 6 2025 14:00
+      (I don't recall what I did for release 1.07 but I am adding info for
+       1.08.)
+      - Fixed some bugs in the constructor of a new polynomial.
+      - In the first 2 tests, replaced some printf calls with diag and
+        explain.  Later realized that "make test TEST_VERBOSE=1" displays
+        the output of printf calls but it was awkward to remove te diag and
+        explain commands.
+      - Found & fixed more typos in the POD.
 ----

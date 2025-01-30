@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 use overload;
 require XSLoader;
 XSLoader::load('smallnum::XS', $VERSION);
@@ -27,7 +27,7 @@ smallnum::XS - faster transparent "SmallNumber" support for Perl
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
@@ -55,6 +55,30 @@ Version 0.01
 	15 / 5.34, # 3
 	9 * 0.01, # 0
 
+=head1 BENCHMARK
+
+	use Benchmark qw(:all);
+	use smallnum;
+	use smallnum::XS;
+
+	timethese(10000000, {
+		'smallnum' => sub {
+			my $int = smallnum::_smallnum(10.42356);
+			my $int2 = smallnum::_smallnum(2.22);
+			$int = $int / $int2;
+		},
+		'XS' => sub {
+			my $int = smallnum::XS::_smallnum(10000);
+			my $int2 = smallnum::XS::_smallnum(2.22);
+			$int = $int / $int2;
+		}
+	});
+
+...
+
+	Benchmark: timing 10000000 iterations of XS, smallnum...
+		XS:  4 wallclock secs ( 3.50 usr +  0.12 sys =  3.62 CPU) @ 2762430.94/s (n=10000000)
+	  smallnum:  8 wallclock secs ( 7.42 usr +  0.06 sys =  7.48 CPU) @ 1336898.40/s (n=10000000)
 
 =head1 AUTHOR
 

@@ -30,7 +30,7 @@ __DATA__
     </tr>
   </thead>
   <tbody>
-% for my $i (sort { $elements->{$a}[19] <=> $elements->{$b}[19] || $elements->{$a}[20] <=> $elements->{$b}[20] } keys %$elements) {
+% for my $i (sort { $elements->{$a}[-2] <=> $elements->{$b}[-2] || $elements->{$a}[-1] <=> $elements->{$b}[-1] } keys %$elements) {
     <tr>
 %   for my $j (@{ $elements->{$i} }) {
       <td><%= $j %></td>

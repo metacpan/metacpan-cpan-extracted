@@ -1,3 +1,11 @@
+3.20250130 2025-01-30 Australia/Melbourne
+  - Tests: Add support 'Size' messages of Mail::BIMI::Indicator::app_validate().
+    Thanks to Norikatsu Shigemura
+  - Tests:  Getopt::Long::Descriptive::Usage @v0.113 breaks cmd output tests
+    Thanks to Norikatsu Shigemura
+  - VMC: Split root CA certs into distinct files
+  - VMC: Add support for the GlobalSign Verified Mark Root R42
+
 3.20241209 2024-12-10 Australia/Sydney
   - Tests: Fix test error when not running with AUTHOR_TEST.  
     Thanks to Kurt Starsinic

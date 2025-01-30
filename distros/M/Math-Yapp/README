@@ -25,6 +25,8 @@ To install this module type the following:
    perl Makefile.PL
    make
    make test TEST_VERBOSE=1 # The TEST_VERBOSE=1 is optional but suggested
+                            # because, by default, <make test> ignores
+                            # printf calls in the .t programs
    make install             # Must by root (*nix) or Administrator (Windows)
 
 DEPENDENCIES

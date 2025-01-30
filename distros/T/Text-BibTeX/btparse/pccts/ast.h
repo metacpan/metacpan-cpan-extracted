@@ -90,7 +90,7 @@ extern AST *zzastStack[];
 void zzlink(AST **, AST **, AST **);
 void zzsubchild(AST **, AST **, AST **);
 void zzsubroot(AST **, AST **, AST **);
-void zzpre_ast(AST *, void (*)(), void (*)(), void (*)());
+void zzpre_ast(AST *, void (*)(AST *), void (*)(AST *), void (*)(AST *));
 void zzfree_ast(AST *);
 AST *zztmake(AST *, ...);
 AST *zzdup_ast(AST *);

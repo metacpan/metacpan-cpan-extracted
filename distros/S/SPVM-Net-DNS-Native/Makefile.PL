@@ -18,7 +18,7 @@ unless ($meta) {
   # Do something such as environment check.
 }
 
-my %configure_and_runtime_requires = ('SPVM' => '0.990023');
+my %configure_and_runtime_requires = ('SPVM' => '0.990042');
 WriteMakefile(
   NAME => 'SPVM::Net::DNS::Native',
   VERSION_FROM => 'lib/SPVM/Net/DNS/Native.pm',

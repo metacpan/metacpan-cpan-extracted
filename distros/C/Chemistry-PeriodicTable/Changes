@@ -1,8 +1,10 @@
 Revision history for Chemistry-PeriodicTable
 
+0.0502 2025-01-29 07:57:46
+    - Add the very-cool element origin data.
+
 0.0501 2023-02-01 15:09:46
     - Add a crucial `last;` to the number() loop.
-    - Improve documentation and comments slightly.
 
 0.0500 2023-02-01 14:56:17
     - Remove misleading, redundant methods with attribute counterparts.

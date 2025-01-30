@@ -73,12 +73,13 @@ requires:
 resources:
   bugtracker: https://github.com/marcbradshaw/mail-bimi/issues
   repository: git://github.com/marcbradshaw/mail-bimi.git
-version: '3.20241209'
+version: '3.20250130'
 x_contributors:
   - 'Andrew Davis <adavis@fastmailteam.com>'
   - 'Freddie Leeman <freddie@freddieleeman.nl>'
   - 'Kurt Starsinic <kstarsinic@gmail.com>'
   - 'Marc Bradshaw <marc@fastmailteam.com>'
-x_generated_by_perl: v5.40.0
-x_serialization_backend: 'YAML::Tiny version 1.74'
+  - 'Norikatsu Shigemura <nork@ninth-nine.com>'
+x_generated_by_perl: v5.38.2
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

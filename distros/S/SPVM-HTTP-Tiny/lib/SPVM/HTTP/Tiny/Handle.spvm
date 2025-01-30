@@ -12,7 +12,7 @@ class HTTP::Tiny::Handle {
   use Fn;
   use StringBuffer;
   use Format;
-  use Regex;
+  use Re;
   use Regex::ReplaceInfo;
   use IO::Socket::INET;
   
@@ -161,13 +161,11 @@ class HTTP::Tiny::Handle {
     
     my $status_line = $self->readline;
     
-    my $status_line_re = Regex->new("\A(HTTP\/(0*\d+\.0*\d+))[\x09\x20]+([0-9]{3})(?:[\x09\x20]+([^\r\n]*))?\r?\n");
-    
     my $protocol = (string)undef;
     my $version = (string)undef;
     my $status = (string)undef;
     my $reason = (string)undef;
-    if (my $match = $status_line_re->match($status_line)) {
+    if (my $match = Re->m($status_line, "\A(HTTP\/(0*\d+\.0*\d+))[\x09\x20]+([0-9]{3})(?:[\x09\x20]+([^\r\n]*))?\r?\n")) {
       $protocol = $match->cap1;
       $version = $match->cap2;
       $status = $match->cap3;
@@ -180,7 +178,7 @@ class HTTP::Tiny::Handle {
       die "Malformed Status-Line: " . $self->to_printable($status_line);
     }
     
-    unless (Regex->new("0*1\.0*[01]")->match($version)) {
+    unless (Re->m($version, "0*1\.0*[01]")) {
       die "Unsupported HTTP protocol: $protocol";
     }
     
@@ -196,17 +194,15 @@ class HTTP::Tiny::Handle {
   private method read_response_headers : HTTP::Tiny::Headers ($response : HTTP::Tiny::Message::Response) {
     my $headers = $response->headers;
     
-    my $empty_line_re = Regex->new("\A\r?\n\z");
-    my $header_line_re = Regex->new("\A([^\x00-\x1F\x7F:]+):[\x09\x20]*([^\r\n]*)");
     while (1) {
       my $line = $self->readline;
       
-      if (my $match = $header_line_re->match($line)){
+      if (my $match = Re->m($line, "\A([^\x00-\x1F\x7F:]+):[\x09\x20]*([^\r\n]*)")){
         my $name = Fn->lc($match->cap1);
         my $value = $match->cap2;
         $headers->add($name, $value);
       }
-      elsif ($empty_line_re->match($line)) {
+      elsif (Re->m($line, "\A\r?\n\z")) {
         last;
       }
       else {
@@ -223,18 +219,19 @@ class HTTP::Tiny::Handle {
     
     my $read_buffer = (mutable string)new_string_len &READ_BUFFER_SIZE;
     
-    my $line_re = Regex->new("\A([^\r\n]*\r?\n)");
     my $line = (string)undef;
     while (1) {
       my $response_content = $self->{response_buffer}->to_string;
       
       my $replace_info_ref = new Regex::ReplaceInfo[1];
-      $response_content = $line_re->replace($response_content, "", 0, -1, {info => $replace_info_ref});
+      my $response_content_ref = [$response_content];
+      my $replace_info = Re->s($response_content_ref, "\A([^\r\n]*\r?\n)", "");
+      $response_content = $response_content_ref->[0];
       $self->{response_buffer} = StringBuffer->new($response_content);
       
-      my $match = $replace_info_ref->[0]->match;
-      
-      if ($match) {
+      if ($replace_info) {
+        my $match = $replace_info->match;
+        
         $line = $match->cap1;
         last;
       }
@@ -323,12 +320,14 @@ class HTTP::Tiny::Handle {
   }
   
   private method to_printable : string ($string : string) {
-    my $printable_string = Regex->new("([^\x20-\x7E])")->replace($string, method : string ($re : Regex, $match : Regex::Match) {
+    my $string_ref = [$string];
+    Re->s($string_ref, "([^\x20-\x7E])", method : string ($re : Regex, $match : Regex::Match) {
       
       my $replaced = Format->sprintf("\\x%.2X", [(object)Fn->ord($match->cap1)]);
       
       return $replaced;
     });
+    my $printable_string = $string_ref->[0];
     
     return $printable_string;
   }

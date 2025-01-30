@@ -1,3 +1,6 @@
+0.1.3
+  * Pass plain "BLOB" type as binary.
+
 0.1.2
   * Fix breaking of non-ASCII unicode in previous release.
 

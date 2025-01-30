@@ -1,15 +1,19 @@
 Revision history for CPANPLUS-Dist-Debora
 
-0.015  2024-12-11 17:03:41 CET 2024
+0.016  2025-01-27 17:51:32 CET
+
+  - Ignore CPANPLUS::Module::Author::Fake objects
+
+0.015  2024-12-11 17:03:41 CET
 
   - Don't build debug packages
   - Strip shared objects explicitly
 
-0.014  2024-10-30 16:49:12 CET 2024
+0.014  2024-10-30 16:49:12 CET
 
   - Call rpmbuild with --build-in-place
 
-0.013  2024-06-30 08:49:11 CEST 2024
+0.013  2024-06-30 08:49:11 CEST
 
   - Remove a workaround for CentOS 7
 

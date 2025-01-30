@@ -35,7 +35,7 @@ my $rss = <<'EOT';
       <title>Page</title>
       <description>Wikis are collaborative things.</description>
       <author>Alex</author>
-      <author>Berta</author>
+      <author>berta@example.org (Berta)</author>
       <pubDate>Sun, 19 Jan 2020 13:48:14 +0100</pubDate>
     </item>
     <item>

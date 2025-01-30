@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Provide access to chemical element properties
 
-our $VERSION = '0.0501';
+our $VERSION = '0.0502';
 
 use Moo;
 use strictures 2;
@@ -167,7 +167,7 @@ Chemistry::PeriodicTable - Provide access to chemical element properties
 
 =head1 VERSION
 
-version 0.0501
+version 0.0502
 
 =head1 SYNOPSIS
 
@@ -192,6 +192,7 @@ version 0.0501
   $pt->value('H', 'weight');               # 1.00794
   $pt->value(118, 'weight');               # 294
   $pt->value('hydrogen', 'Atomic Radius'); # 0.79
+  $pt->value('Mg', 'origin');              # Dying high-mass stars
 
 =head1 DESCRIPTION
 
@@ -232,8 +233,9 @@ These are:
   16 Isotopes
   17 Specific Heat Capacity
   18 Electron Configuration
-  19 Display Row
-  20 Display Column
+  19 Element origin
+  20 Display Row
+  21 Display Column
 
 =head1 METHODS
 
@@ -299,7 +301,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023 by Gene Boggs.
+This software is Copyright (c) 2023-2025 by Gene Boggs.
 
 This is free software, licensed under:
 

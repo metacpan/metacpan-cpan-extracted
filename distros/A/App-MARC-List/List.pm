@@ -11,7 +11,7 @@ use List::MoreUtils qw(uniq);
 use MARC::File::XML (BinaryEncoding => 'utf8', RecordFormat => 'MARC21');
 use Unicode::UTF8 qw(decode_utf8 encode_utf8);
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Constructor.
 sub new {
@@ -37,24 +37,24 @@ sub run {
 	};
 	if (! getopts('h', $self->{'_opts'})
 		|| $self->{'_opts'}->{'h'}
-		|| @ARGV < 1) {
+		|| @ARGV < 2) {
 
-		print STDERR "Usage: $0 [-h] [--version] marc_xml_file field subfield\n";
+		print STDERR "Usage: $0 [-h] [--version] marc_xml_file field [subfield]\n";
 		print STDERR "\t-h\t\tPrint help.\n";
 		print STDERR "\t--version\tPrint version.\n";
 		print STDERR "\tmarc_xml_file\tMARC XML file.\n";
 		print STDERR "\tfield\t\tMARC field.\n";
-		print STDERR "\tsubfield\tMARC subfield.\n";
+		print STDERR "\tsubfield\tMARC subfield (for datafields).\n";
 		return 1;
 	}
 	$self->{'_marc_xml_file'} = shift @ARGV;
 	$self->{'_marc_field'} = shift @ARGV;
 	$self->{'_marc_subfield'} = shift @ARGV;
 
-	if (! defined $self->{'_marc_field'}
-		|| ! defined $self->{'_marc_subfield'}) {
+	if (int($self->{'_marc_field'}) > 9
+		&& ! defined $self->{'_marc_subfield'}) {
 
-		err "Field and subfield is required.";
+		err 'Subfield is required.';
 	}
 
 	my $marc_file = MARC::File::XML->in($self->{'_marc_xml_file'});
@@ -82,11 +82,16 @@ sub run {
 
 		my @fields = $record->field($self->{'_marc_field'});
 		foreach my $field (@fields) {
-			my @subfield_values = $field->subfield($self->{'_marc_subfield'});
-			foreach my $subfield_value (@subfield_values) {
-				if (! exists $ret_hr->{$subfield_value}) {
-					$ret_hr->{$subfield_value} = $subfield_value;
+			if (defined $self->{'_marc_subfield'}) {
+				my @subfield_values = $field->subfield($self->{'_marc_subfield'});
+				foreach my $subfield_value (@subfield_values) {
+					if (! exists $ret_hr->{$subfield_value}) {
+						$ret_hr->{$subfield_value} = $subfield_value;
+					}
 				}
+			} else {
+				my $data = $field->data;
+				$ret_hr->{$data} = $data;
 			}
 		}
 		$num++;
@@ -146,7 +151,7 @@ Returns 1 for error, 0 for success.
                  Unknown parameter '%s'.
 
  run():
-         Field and subfield is required.
+         Subfield is required.
 
 =head1 EXAMPLE
 
@@ -329,12 +334,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2022-2024 Michal Josef Špaček
+© 2022-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

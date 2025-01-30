@@ -19,7 +19,7 @@ name: ArrayData-Lingua-Word-ID-KBBI-ByClass-Noun
 provides:
   ArrayData::Lingua::Word::ID::KBBI::ByClass::Noun:
     file: lib/ArrayData/Lingua/Word/ID/KBBI/ByClass/Noun.pm
-    version: '0.002'
+    version: '0.003'
 requires:
   ArrayDataRole::Source::LinesInDATA: '0.006'
   Role::Tiny::With: '0'
@@ -29,7 +29,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=ArrayData-Lingua-Word-ID-KBBI-ByClass-Noun
   homepage: https://metacpan.org/release/ArrayData-Lingua-Word-ID-KBBI-ByClass-Noun
   repository: git://github.com/perlancar/perl-ArrayData-Lingua-Word-ID-KBBI-ByClass-Noun.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.040000'

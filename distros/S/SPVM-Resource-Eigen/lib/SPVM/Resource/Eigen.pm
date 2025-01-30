@@ -1,6 +1,6 @@
 package SPVM::Resource::Eigen;
 
-our $VERSION = "0.003";
+our $VERSION = "0.004";
 
 1;
 
@@ -118,16 +118,16 @@ Unix/Linux/Mac:
 
 =head2 Donwload
 
-  mkdir -p original.tmp
-  git clone https://gitlab.com/libeigen/eigen.git original.tmp/eigen
-  git -C original.tmp/eigen checkout tags/3.4.0 -b branch_3.4.0
-  git -C original.tmp/eigen branch
+  mkdir -p .tmp
+  git clone https://gitlab.com/libeigen/eigen.git .tmp/eigen
+  git -C .tmp/eigen checkout tags/3.4.0 -b branch_3.4.0
+  git -C .tmp/eigen branch
 
 =head2 Extracting Header Files
 
 Header files of C<Eigen> and its dependent source files are copied into the C<include> directory by the following way.
 
-  rsync -av original.tmp/eigen/Eigen lib/SPVM/Resource/Eigen.native/include/
+  rsync -av .tmp/eigen/Eigen lib/SPVM/Resource/Eigen.native/include/
 
 =head1 Repository
 

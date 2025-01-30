@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 
 use Carp qw(croak);
 use Config;
@@ -250,7 +250,7 @@ sub build_number {
 sub author {
     my $self = shift;
 
-    my $author = $self->_read('author', sub { $self->module->author->author });
+    my $author = $self->_read('author', sub { $self->_get_author });
 
     return $author;
 }
@@ -637,6 +637,19 @@ sub _get_module_name {
     my $filename = catfile($self->builddir, 'lib', @module) . '.pm';
     if (-f $filename) {
         $name = join q{::}, @module;
+    }
+
+    return $name;
+}
+
+sub _get_author {
+    my $self = shift;
+
+    my $name;
+
+    my $author = $self->module->author;
+    if (defined $author && ref $author ne 'CPANPLUS::Module::Author::Fake') {
+        $name = $author->author;
     }
 
     return $name;
@@ -1221,7 +1234,7 @@ CPANPLUS::Dist::Debora::Package - Base class for package formats
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 
@@ -1574,7 +1587,7 @@ Andreas Vögele E<lt>voegelas@cpan.orgE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2024 Andreas Vögele
+Copyright (C) 2025 Andreas Vögele
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

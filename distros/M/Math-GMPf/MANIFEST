@@ -5,6 +5,7 @@ GMPf.pm
 GMPf.pod
 GMPf.xs
 math_gmpf_include.h
+math_gmpf_unused.h
 V/V.xs
 V/V.pm
 V/Makefile.PL
@@ -35,6 +36,8 @@ t/PV_NV_BUG.t
 t/pod.t
 t/random2.t
 t/random3.t
+t/snprintf.t
+t/sprintf.t
 t/test1.t
 t/TRmpf_out_str.t
 t/use64bitint.t

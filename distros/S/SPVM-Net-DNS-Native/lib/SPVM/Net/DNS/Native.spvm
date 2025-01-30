@@ -2,7 +2,7 @@
 # MIT License
 
 class Net::DNS::Native {
-  version "0.002";
+  version "0.003";
   
   use Go;
   use Go::Sync::WaitGroup;

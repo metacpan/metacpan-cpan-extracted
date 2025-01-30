@@ -1,2 +1,6 @@
+0.02 Wed Jan 29 07:00:20 EST 2025
+	- encoding fix for POD documentation.
+	- clarification text for examples added.
+
 0.01 Sat Apr 12 21:23:09 EDT 2003
 	- initial release.

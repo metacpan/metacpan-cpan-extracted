@@ -50,7 +50,7 @@
    "provides" : {
       "ArrayData::Lingua::Word::ID::KBBI::ByClass::Noun" : {
          "file" : "lib/ArrayData/Lingua/Word/ID/KBBI/ByClass/Noun.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -65,7 +65,7 @@
          "web" : "https://github.com/perlancar/perl-ArrayData-Lingua-Word-ID-KBBI-ByClass-Noun"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040000"

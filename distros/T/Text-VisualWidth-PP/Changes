@@ -1,5 +1,19 @@
 Revision history for Perl module Text::VisualWidth::PP
 
+0.07 2025-01-30T00:55:49Z
+
+    commit 84273797f32fc98eb05e90cca32967e37dd2e9df
+    Author: Kazumasa Utashiro <kaz@utashiro.com>
+    Date:   Wed Jan 29 16:10:54 2025 +0900
+
+        Support EMOJI MODIFIER and ZERO WIDTH JOINER
+
+        - do not count character width right after \N{ZERO WIDTH JOINER}
+        - make EMOJI MODIFIER as zero-width
+          * use \p{Emoji_Modifier} property
+          * define utf8::Is_Emoji_Modifier() if older than v5.32
+
+
 0.06 2025-01-27T15:19:37Z
 
     - Update trim() to handle ambiguous character properly. Resolves #6, #10

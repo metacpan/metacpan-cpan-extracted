@@ -3,7 +3,7 @@ use strict;
 
 package RT::Extension::RepeatTicket;
 
-our $VERSION = "2.03";
+our $VERSION = "2.04";
 
 use RT::Interface::Web;
 use DateTime;
@@ -574,8 +574,10 @@ sub _RepeatTicket {
     $repeat->{ReferredToBy} = $repeat->{'RefersTo-new'} = join ' ', @refers_by;
 
     my $cfs = $repeat_ticket->QueueObj->TicketCustomFields();
+    my @skip_custom_fields = @{ RT->Config->Get('RepeatTicketSkipCustomFields') || [] };
     while ( my $cf = $cfs->Next ) {
         next if $cf->Name eq 'Original Ticket';
+        next if grep { $cf->Name eq $_ } @skip_custom_fields;
         my $cf_id     = $cf->id;
         my $cf_values = $repeat_ticket->CustomFieldValues( $cf->id );
         my @cf_values;
@@ -988,6 +990,13 @@ C<$RepeatTicketPreviewNumber> option:
     Set($RepeatTicketPreviewNumber, 10);
 
 Set the C<$RepeatTicketPreviewNumber> option to 0 to hide the Recurrence Preview.
+
+=head2 C<@RepeatTicketSkipCustomFields>
+
+By default, all custom field values are carried over to the new ticket. Use this
+config option to skip some custom fields from being copied to the new ticket:
+
+    Set(@RepeatTicketSkipCustomFields, ('My Custom Field', 'Another Custom Field'));
 
 =head2 rt-repeat-ticket
 

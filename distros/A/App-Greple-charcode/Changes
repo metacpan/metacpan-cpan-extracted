@@ -1,5 +1,10 @@
 Revision history for Perl extension App-Greple-charcode
 
+0.9903 2025-01-29T17:41:47Z
+
+    - update default to column=1,visible=1,name=1
+    - option --align takes negative value
+
 0.9902 2025-01-27T15:04:24Z
 
     - add options for combined character match

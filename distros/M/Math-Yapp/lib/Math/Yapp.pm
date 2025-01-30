@@ -17,7 +17,7 @@ use overload
   '.'   => Yapp_innerProd   # Inner product, for vector operations.
 ;
 
-use 5.014002;
+# use 5.014002;         # Let's not tie ourselves to a release.
 use strict;
 use warnings;
 use Carp;
@@ -52,8 +52,8 @@ our @EXPORT = qw(Yapp Yapp_interpolate Yapp_by_roots
                  Yapp_Orthogonal
                  Csprint); # Unexport Csprint after debug
 
-our $VERSION = '1.07';
-
+our $VERSION = '1.08';
+#
 my $class_name = "Math::Yapp";  # So I don't have to use the literal in tests
 my $class_cplx = "Math::Complex";   # Same idea - avoid literal use
 
@@ -89,9 +89,9 @@ my $cplx_pat = qr/\([+-]?$real_pat[+-]($real_pat)i\)/; # Cplx: (+-real+-real-i)
 # may be:
 # - A sign alone => an implicit coefficient of 1.0        ($sign_only_pat)
 # - A complex or real number alone => implicit sign of +1 ($usigned_coef_pat)
-# = A real or complex number preceded by a sign.          ($signed_coef_pat)
+# - A real or complex number preceded by a sign.          ($signed_coef_pat)
 # The proper pattern tests for the most complicated possibility first
-#
+#
 my $signed_real_pat  = qr/^(($sign_pat)?($real_pat))$/;
 my $signed_coef_pat  = qr/((^$sign_pat)(($cplx_pat)|($real_pat)))/;
 my $usigned_coef_pat = qr/^(($cplx_pat)|($real_pat))/;
@@ -101,6 +101,7 @@ my $coef_pat = qr/($signed_coef_pat)|($usigned_coef_pat)|($sign_only_pat)/;
 my $varia_pat = qr/[A-Za-z]+/;  # The "variable" part of the term
 my $power_pat = qr/\^\d+$/;     # Power: caret (^) followed by am integer.
                                 # Must be at the end of the term
+#
 # With apologies: This is a patch to fix a bug in Ysprint(): It was printing
 # the 0-term as <coefficient>X^0 when formatting starting at low-degree terms.
 # This will help get rid of that.
@@ -115,7 +116,7 @@ my $const_pat = qr/^$coef_pat$/; # Coefficient only; no variable or exponent
 my $term_pat = qr/($coef_pat)?($varia_pat)?($power_pat)?/;
 
 # However, one pattern not allowed is a $power_pat (exponent) without a
-# variable.  Since, at the momemtn, I cannot think of a regex to test for
+# variable.  Since, at the moment, I cannot think of a regex to test for
 # this condition, I'll have to handle it in the code.  (Sigh)
 
 # Format strings for printf-ing the terms of the polynomial.
@@ -130,7 +131,7 @@ my $term_pat = qr/($coef_pat)?($varia_pat)?($power_pat)?/;
 my $zero_term_fmt  = "%+*.*f";      # No X term in here
 my $one_term_fmt   = "%+*.*f%s";    # For 1st degree term, omit the exponent
 my $term_fmt       = "%+*.*f%s^%d"; # For other terms, always use sign
-my $first_term_fmt = "%*.*f%s^%s";  # For first term, skip + for first if
+my $first_term_fmt = "%*.*f%s^%d";  # For first term, skip + for first if
                                     # it is positive anyway
 # Now for a complex coefficient: Here format gets a bit more, er, complex;
 # Each term includes the following in the data portion of printf:
@@ -171,6 +172,7 @@ BEGIN
 {
  #Math::BigFloat->accuracy(32);   # In case I decide on a way to use complex
                                   # numbers with BigFloat
+ #$DB::simple = 1;                #### Comment out after debugging
 }
 #
 #------------------------------------------------------------------------------
@@ -368,9 +370,9 @@ sub Yapp_copy
 # - In case it got omitted in a contructor, if a coefficient between 0 and
 #   the degree is still undefined, stick a 0.0 in there.
 # - If any complex coefficients have a 0 imaginary part, replace it with the
-#   real part only, as a real coefficient. e.g. cplx(-2.13,9) => -2.13
+#   real part only, as a real coefficient. e.g. cplx(-2.13,0.0) => -2.13
 # - It looks for any 0 coefficient in the highest-degree places so that a 5th
-#   degree polynomila with 0 coefficients in the6th and 7th dregee places
+#   degree polynomial with 0 coefficients in the 6th and 7th dregee places
 #   does not appear to be a 7th degree polynomial
 # Parameter:
 # - (Implicit) The Yapp to thus fixed up
@@ -379,11 +381,11 @@ sub Yapp_copy
 #
 sub refresh
 {
-  my $self = shift(@_);
+  my $self = shift(@_); #(Lose the class name; concentrate on the array)
   my $slc;              # Loop counter for counting up my own array
 
   # This first loop can handle the undefined coefficient problem as well as the
-  # disguised real-number propmlem
+  # disguised real-number problem
   #
   for ($slc = 0; $slc <= $self->{degree}; $slc++)
   {
@@ -405,8 +407,9 @@ sub refresh
     # Still here: The current high-order term is a degenerate term with a
     # zero-coefficient. Lose it!
     #
-    undef($self->{coeff}[$slc]);    # This loses the term
-    $self->{degree}--               # This insures (?) it won't be referenced
+   #undef($self->{coeff}[$slc]);    #(No, this does not lose the element)
+    delete($self->{coeff}[$slc]);   # *This* loses the element
+    $self->{degree}--;              # Make sure this coef will be skipped
   }
 
   # Finally: Since the coefficients may have been diddled, the coefficients of
@@ -431,7 +434,7 @@ sub refresh
 # Parameters:
 # - (Implicit) The Yapp opject
 # - (Optional) The number of decimal places to use for the coefficients. If
-#   omitted, we will use themodule global $dec_places.  See Yapp_decimals for
+#   omitted, we will use the module global $dec_places.  See Yapp_decimals for
 #   more information on that.
 # Default options:
 # - Use X as the variable
@@ -468,7 +471,7 @@ sub Ysprint
     $lc_finish = $self->{degree};   # End loop at high-degree term
     $lc_diff  = 1;                  # work my way UP the degrees
   }
-
+#
   for (my $lc = $lc_start; ; $lc += $lc_diff)   #(Check value of $lc inside
   {                                             # loop, not in loop header)
     last if ( ($lc > $self->{degree}) || ($lc < 0) );
@@ -478,47 +481,80 @@ sub Ysprint
     my $term = "";      # Start the term as a null string and build from there
     if (ref($self->{coeff}[$lc]) eq $class_cplx)
     {
+      # Note: The constructor should have set any "almost 0" complex
+      # coefficients to real 0.0 so there is no need to account here for a
+      # complex number with really tiny imaginary part.
+      #
       # First term should not have a + sign if coefficient is positive
       # Constant term should not dislay X to the 0th degree
       # First degree term should display as X, not X^1
       # All other terms should include both aspects.
       #
       if    ($lc == $lc_start)          # If I'm generating the first term
-      { $use_fmt = \$first_term_fmt_i;} # No + sign
-      elsif ($lc == 1)
-      { $use_fmt = \$one_term_fmt_i;  } # No exponent
-      elsif ($lc == 0 )
-      { $use_fmt = \$zero_term_fmt_i; } # No variable
-      else
-      { $use_fmt = \$term_fmt_i;      } # +/-,var and exponent
-
-      if ( ($self->{coeff}[$lc] != $czero) || ($print_zero) )
       {
-        $term =sprintf(${$use_fmt},
-                       $dwidth, $places, ($self->coefficient($lc))->Re(),
-                       $dwidth, $places, ($self->coefficient($lc))->Im(),
-                       $var_name, $lc);
-
+        $term = sprintf($first_term_fmt_i,
+                        $dwidth, $places, ($self->coefficient($lc))->Re(),
+                        $dwidth, $places, ($self->coefficient($lc))->Im(),
+                        $var_name, $lc);    # No + sign for first term
+      }
+      elsif ($lc == 1)
+      {
+        $term = sprintf($one_term_fmt_i,
+                        $dwidth, $places, ($self->coefficient($lc))->Re(),
+                        $dwidth, $places, ($self->coefficient($lc))->Im(),
+                        $var_name);         # No exponent for X^1 term
+      }
+      elsif ($lc == 0 )
+      {
+        $term = sprintf($zero_term_fmt_i,
+                        $dwidth, $places, ($self->coefficient($lc))->Re(),
+                        $dwidth, $places, ($self->coefficient($lc))->Im());
+                                # No variable or exponent in 0-degree term
+      }
+      else
+      {
+        $term = sprintf($term_fmt_i,
+                        $dwidth, $places, ($self->coefficient($lc))->Re(),
+                        $dwidth, $places, ($self->coefficient($lc))->Im(),
+                        $var_name, $lc);    # Always a + before a complex num-
+                                            # ber in a middle term
       }
     }
+#
     else                    # The ref() function did not say "Complex".  So it
     {                       # must be a real coefficient.
       # Note: Same sign, variable, exponent conventions apply as above
       #
       if    ($lc == $lc_start)          # If I'm generating the first term
-      { $use_fmt = \$first_term_fmt;}   # No +
-      elsif ($lc == 1)
-      { $use_fmt = \$one_term_fmt;  }   # No exponent
-      elsif ($lc == 0)
-      { $use_fmt = \$zero_term_fmt; }   # No variable
-      else
-      { $use_fmt = \$term_fmt;      }   # +/-,variable and exponent
-
-
-      if ( ($self->{coeff}[$lc] != 0.0) || ($print_zero) )
       {
-        $term = sprintf(${$use_fmt}, $dwidth, $places,
-                                     $self->coefficient($lc), $var_name, $lc);
+        $term = sprintf($first_term_fmt,
+                        $dwidth, $places, $self->coefficient($lc),
+                        $var_name, $lc);    # eg 34.145X^3
+      }
+      elsif ($lc == 1)
+      {
+        $term = sprintf($one_term_fmt,
+                        $dwidth, $places, $self->coefficient($lc),
+                        $var_name);         # eg. 34.145X (exponent == 1)
+      }
+      elsif ($lc == 0)
+      {
+        $term = sprintf($zero_term_fmt,
+                        $dwidth, $places,
+                        $self->coefficient($lc) );   # eg. 34.145
+      }
+      else
+      {
+        $term = sprintf($term_fmt,
+                        $dwidth, $places, $self->coefficient($lc),
+                        $var_name, $lc);    # eg. +34.145X^7
+      }
+      if ($self->coefficient($lc) == 0.0)   # What to do with a real 0.0
+      {                                     # coefficient?
+        # If $print_zero flag is set then the term has already been
+        # formatted.  If it is not set (default) I want to null the string.
+        #
+        $term = "" unless ($print_zero);
       }
     }
     # Second part of the patch I described when I defined $zero_power_pat:
@@ -2896,7 +2932,7 @@ Jacob Salomon, jakesalomon@yahoo.com
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2013, 2015 by Jacob Salomon
+Copyright (C) 2013, 2015, 2024 by Jacob Salomon
 
 =head1 SYNOPSIS
 
@@ -3010,7 +3046,7 @@ C<$yp += $yp3;>              # Add another polynomial to this one
 C<$yp = $yp1 + $yp2;>        # Add two polynomials, term-by-term
 
 Subtracting polynomials:  Behaves pretty much like the adds so we are
-not inclucing all possible examples
+not including all possible examples
 
 C<$yp -= $yp3;>              # Subtract $yp3 from $yp in place
 
@@ -3058,7 +3094,7 @@ the the inner product operator/method.
 Ysprint() formats a Yapp object into a string, suitable for printing:
 Example: C<< printf("My yapp is: %s\n", $yp1->Ysprint()); >>
 
-By default, Ysprint formats the polynmial as follows:
+By default, Ysprint formats the polynomial as follows:
 
 =over 3
 
@@ -3195,6 +3231,9 @@ C<< $cplx_num = Yapp_innerProd($Y1, $Y2);    # Another alternative form >>
 But it's really intended to be invoked by the first form, with the "dot"
 operator.
 
+Note: At this time I am not prepared to define the subclasses of polynomals
+that depend on the inner product, like the laGuerre, Hermite and some others.
+
 =head3 The norm function
 
 The simplest norm function in any inner-product space is simply the square
@@ -3208,7 +3247,10 @@ my $norm = $Yp->Yapp_Norm();    # Returns the (Legendre) norm of a polynomial
 my $perp = $Y1->Yapp_Orthogonal($Y2);   # True/False: Is $Y2 orthogonal to $Y1?
 my $perp = Yapp_Orthogonal($Y1, $Y2);   # Either form is just fine
 
-Note: With complex coefficients, $Y1 . $Y2 and $Y2 . $Y1 are conjugates.
+Note: With complex coefficients, $Y1 . $Y2 and $Y2 . $Y1 are conjugates.  This
+is consistent with the definition of the inner product of vectors over the
+field of complex numbers. (I still remember that from Finkbeiner's Linear
+Algebra.)
 
 =head3 Missing functions:
 
@@ -3216,7 +3258,7 @@ Note: With complex coefficients, $Y1 . $Y2 and $Y2 . $Y1 are conjugates.
 
 =item * A Gram-Schmidt orthogonalization process
 
-=item * Corrolary to above: A Gram-Schmidt orthogonalization process
+=item * Corrolary to above: A Gram-Schmidt orthonormalization process
 
 =item * Generation of a sequence of the first N orthogonal Yapp polynomials
 using the recursion relation common to all classes orthogonal polynomials.
@@ -3243,6 +3285,11 @@ At this stage, the plan is to provide the inner product algorithms for various
 classes of inner-product spaces but in separate modules, for example:
 Math::Yapp:Tchebycheff or Math::Yapp::Laguerre.
 These will use the overloaded "dot" operator.
+
+Once I get around to defining other inner product spaces, this might be a good
+place to exercise polymorphism: Use only one norm method and only one
+orthogonality test method and have the correct inner product method called
+depending on the class of polynomials in the operands.
 
 =head2 EXPORT
 
@@ -3279,7 +3326,7 @@ intenal global flag to print high-to-low (default: 1) or low-to-high (0).
 Note that the current release of Math::Yapp uses the default floating-point
 library of its host system.  It was developed in a Cygwin environment running
 under Windows-7.  I discovered some limitations to the 64-bit FP operations
-when solving polynomials of degree higher thatn 8 or using Hermite
+when solving polynomials of degree higher than 8 or using Hermite
 interpolation of more than 6 points.  I have researched Math::MPC a bit and
 hope to use that in a future release of this module.  However, I encountered
 some errors when trying to compile the required MPC, MPFR and GMP C libraries.

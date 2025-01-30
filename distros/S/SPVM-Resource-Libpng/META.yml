@@ -5,7 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
-  SPVM: '0.990038'
+  SPVM: '0.990042'
   SPVM::Resource::Zlib: '0.02'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
@@ -19,9 +19,9 @@ no_index:
     - t
     - inc
 requires:
-  SPVM: '0.990038'
+  SPVM: '0.990042'
   SPVM::Resource::Zlib: '0.02'
 resources:
   repository: https://github.com/yuki-kimoto/SPVM-Resource-Libpng.git
-version: '0.012'
+version: '0.013'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -4,7 +4,7 @@ use 5.024;
 use warnings;
 use utf8;
 
-our $VERSION = "0.9902";
+our $VERSION = "0.9903";
 
 =encoding utf-8
 
@@ -45,14 +45,14 @@ B<greple> B<-Mcharcode> [ I<module option> ] -- [ I<command option> ] ...
 
 =head1 VERSION
 
-Version 0.9902
+Version 0.9903
 
 =head1 DESCRIPTION
 
 C<App::Greple::charcode> displays Unicode information about the
 matched characters.  It can also visualize zero-width combining or
 hidden characters, which can be useful for examining text containing
-such characters.
+visually indistinguishable or imperceptible elements.
 
 The following output, retrieved from this document for non-ASCII
 characters (C<\P{ASCII}>), shows that the character C<\N{VARIATION
@@ -197,6 +197,10 @@ Align annotation messages.  Defaults to C<1>, which aligns to the
 rightmost column; C<0> means no align; if a value of C<2> or greater
 is given, it aligns to that numbered column.
 
+I<column> can be negative; if C<-1> is specified, align to the same
+column for all lines.  If C<-2> is specified, align to the longest
+line length, regardless of match position.
+
 =item B<-->[B<no->]B<split>
 
 If a pattern matching multiple characters is given, annotate each
@@ -255,7 +259,6 @@ Show the Unicode name of the character.
 =item B<visible>
 
 (default 0)
-
 Display invisible characters in a visible string representation.
 
 =item B<align>=I<column>
@@ -302,8 +305,8 @@ our $config = Getopt::EX::Config->new(
     column   => 1,
     char     => 0,
     width    => 0,
-    visible  => 0,
-    code     => 1,
+    visible  => 1,
+    code     => 0,
     name     => 1,
     align    => \$App::Greple::annotate::config->{align},
     split    => \$App::Greple::annotate::config->{split},
@@ -394,24 +397,6 @@ sub annotate {
     $annon;
 }
 
-#
-# Match with \X and then postgrep to remove any areas that are not
-# composed of multiple characters.  If you can write it in a regular
-# expression, that's better.
-#
-sub select_combined {
-    my $grep = shift;
-    for my $r ($grep->result) {
-	my($b, @match) = @$r;
-	my $matched = int @match;
-	if (@match = grep { ($_->[1] - $_->[0]) > 1 } @match) {
-	    @$r = ($b, @match);
-	} else {
-	    @$r = ();
-	}
-    }
-}
-
 $App::Greple::annotate::ANNOTATE = \&annotate;
 
 1;
@@ -424,15 +409,11 @@ option default \
     --need=1 \
     --fs=once --ls=separate $<move> --load-annotate
 
-option --select-combined \
-    -E '\X' \
-    --postgrep '&__PACKAGE__::select_combined'
-
 define \p{CombinedChar} \p{Format}\p{Mark}
 define \p{Combined}     [\p{CombinedChar}]
 define \p{Base}         [^\p{CombinedChar}]
 
-option --composite -GE '(\p{Base})(\p{Combined}+)'
+option --composite -E '(\p{Base})(\p{Combined}+)'
 
 option --decomposition-type -E '\p{Decomposition_Type=$<shift>}'
 option --dt --decomposition-type
@@ -443,19 +424,22 @@ option --noncanon    --decomposition-type=NonCanon
 option --combined \
     --precomposed --composite
 
-define ECMA-CSI <<EOL
-    (?x)
-    # see ECMA-48 5.4 Control sequences
-    (?: \e\[ | \x9b )	# csi
+option --outstand \
+    --combined -E '(?=\P{ASCII})\X'
+
+define ANSI-CSI <<EOL
+    (?xn)
+    # see ANSI-48 5.4 Control sequences
+    ( \e\[ | \x9b )	# csi
     [\x30-\x3f]*	# parameter bytes
     [\x20-\x2f]*	# intermediate bytes
     [\x40-\x7e]		# final byte
 EOL
 
-define ECMA-RESET <<EOL
-    (?x)
-    (?: (?: \e\[ | \x9b ) [0;]* m )+
-    (?: (?: \e\[ | \x9b ) [0;]* K )*
+define ANSI-RESET <<EOL
+    (?xn)
+    ( ( \e\[ | \x9b ) [0;]* m )+
+    ( ( \e\[ | \x9b ) [0;]* K )*
 EOL
 
 expand --visible-option \
@@ -463,13 +447,10 @@ expand --visible-option \
     --cm=N
 
 option --ansicode \
-    --visible-option \
-    -E '(?:ECMA-RESET)+|(?:ECMA-CSI)'
+    --visible-option -E '(?:ANSI-RESET)+|(?:ANSI-CSI)'
 
 option --ansicode-each \
-    --visible-option \
-    -E ECMA-CSI
+    --visible-option -E ANSI-CSI
 
 option --ansicode-seq \
-    --visible-option \
-    -E '(?:ECMA-CSI)+'
+    --visible-option -E '(?:ANSI-CSI)+'

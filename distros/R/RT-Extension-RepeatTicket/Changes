@@ -1,5 +1,8 @@
 Revision history for RT-Extension-RepeatTicket
 
+2.04 2025-01-29
+ - Add configuration to specify custom fields to be skipped on repeat
+
 2.03 2023-12-11
  - Allow RT::Ticket::Create to set the correct Status on create
 

@@ -1,3 +1,8 @@
+0.23 2025-01-29T13:35:17+01:00
+ - Fix MANIFEST file.
+ - Fix test with Krakatit book edition and Krameriuses.
+ - Improve tests.
+
 0.22 2025-01-23T08:37:25+01:00
  - Add cover cleanup use case.
  - Add edition number cleanup use case.

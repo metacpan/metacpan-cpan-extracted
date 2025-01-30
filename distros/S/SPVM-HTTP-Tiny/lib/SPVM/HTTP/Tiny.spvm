@@ -2,10 +2,10 @@
 # MIT License
 
 class HTTP::Tiny {
-  version "0.004";
+  version "0.005";
   
   use Fn;
-  use Regex;
+  use Re;
   use Hash;
   use Format;
   use Mozilla::CA;
@@ -275,8 +275,8 @@ class HTTP::Tiny {
   
   private static method _uri_escape : string ($input : string) {
     
-    my $regex = Regex->new("([^A-Za-z0-9\-\._~])");
-    my $output = $regex->replace_g($input, method : string ($re : Regex, $match : Regex::Match) {
+    my $input_ref = [$input];
+    Re->s($input_ref, "([^A-Za-z0-9\-\._~])", method : string ($re : Regex, $match : Regex::Match) {
       my $bytes = $match->cap1;
       
       my $escaped_char_buffer = StringBuffer->new;
@@ -291,6 +291,8 @@ class HTTP::Tiny {
       
       return $escaped_char;
     });
+    
+    my $output = $input_ref->[0];
     
     return $output;
   }
@@ -487,7 +489,7 @@ class HTTP::Tiny {
     
     my $tm = Sys->gmtime(0);
     
-    if (my $match = Regex->new("^[SMTWF][a-z]+, +(\d{1,2}) ($MoY) +(\d\d\d\d) +(\d\d):(\d\d):(\d\d) +GMT$")->match($http_date)) {
+    if (my $match = Re->m($http_date, "^[SMTWF][a-z]+, +(\d{1,2}) ($MoY) +(\d\d\d\d) +(\d\d):(\d\d):(\d\d) +GMT$")) {
       $tm->set_tm_sec(Fn->to_int($match->cap6));
       $tm->set_tm_min(Fn->to_int($match->cap5));
       $tm->set_tm_hour(Fn->to_int($match->cap4));
@@ -495,7 +497,7 @@ class HTTP::Tiny {
       $tm->set_tm_mon(Fn->index($MoY, Fn->to_int($match->cap2)) / 4);
       $tm->set_tm_year(Fn->to_int($match->cap3) - 1900);
     }
-    elsif (my $match = Regex->new("^[SMTWF][a-z]+, +(\d\d)-($MoY)-(\d{2,4}) +(\d\d):(\d\d):(\d\d) +GMT$")->match($http_date)) {
+    elsif (my $match = Re->m($http_date, "^[SMTWF][a-z]+, +(\d\d)-($MoY)-(\d{2,4}) +(\d\d):(\d\d):(\d\d) +GMT$")) {
       $tm->set_tm_sec(Fn->to_int($match->cap6));
       $tm->set_tm_min(Fn->to_int($match->cap5));
       $tm->set_tm_hour(Fn->to_int($match->cap4));
@@ -503,7 +505,7 @@ class HTTP::Tiny {
       $tm->set_tm_mon(Fn->index($MoY, Fn->to_int($match->cap2)) / 4);
       $tm->set_tm_year(Fn->to_int($match->cap3) - 1900);
     }
-    elsif (my $match = Regex->new("^[SMTWF][a-z]+ +($MoY) +(\d{1,2}) +(\d\d):(\d\d):(\d\d) +(?:[^0-9]+ +)?(\d\d\d\d)$")->match($http_date)) {
+    elsif (my $match = Re->m($http_date, "^[SMTWF][a-z]+ +($MoY) +(\d{1,2}) +(\d\d):(\d\d):(\d\d) +(?:[^0-9]+ +)?(\d\d\d\d)$")) {
       $tm->set_tm_sec(Fn->to_int($match->cap5));
       $tm->set_tm_min(Fn->to_int($match->cap4));
       $tm->set_tm_hour(Fn->to_int($match->cap3));

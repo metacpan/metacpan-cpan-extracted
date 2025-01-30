@@ -6,6 +6,7 @@ class HTTP::Tiny::Headers {
   
   allow HTTP::Tiny::Handle;
   
+  use Re;
   use StringList;
   use Hash;
   use Sort;
@@ -35,11 +36,11 @@ class HTTP::Tiny::Headers {
       die "\$value must be defined.";
     }
     
-    if (Regex->new("[\x0d\x0a]")->match($name)) {
+    if (Re->m($name, "[\x0d\x0a]")) {
       die "Invalid characters in the $name header.";
     }
     
-    if (Regex->new("[\x0d\x0a]")->match($value)) {
+    if (Re->m($value, "[\x0d\x0a]")) {
       die "Invalid characters in the value of the $name header.";
     }
     

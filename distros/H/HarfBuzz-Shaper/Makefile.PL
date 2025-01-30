@@ -82,6 +82,7 @@ if ( !$got_hb && $res =~ /\d+\.\d+/ ) {
 
 if ( !$got_hb ) {
     require Devel::CheckLib;
+    my $ok =
     Devel::CheckLib::check_lib( lib      => "harfbuzz",
 				header   => "harfbuzz/hb.h",
 				function => <<EOF );
@@ -90,9 +91,12 @@ hb_blob_create_from_file("");
 return 0;
 EOF
 
-    # Okay, the test program compiled and ran. We can use this library.
-    warn("Using platform harfbuzz library (checklib)\n");
-    $got_hb = 1;
+    if ( $ok ) {
+	# Okay, the test program compiled and ran. We can use this library.
+	warn("Using platform harfbuzz library (checklib)\n");
+	$got_hb = 1;
+	$args{CCFLAGS} = "-DHBDIR";
+    }
 }
 
 # If not, try to include our own copy of the library.

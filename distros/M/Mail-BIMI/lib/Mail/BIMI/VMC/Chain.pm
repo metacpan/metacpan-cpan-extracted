@@ -1,6 +1,6 @@
 package Mail::BIMI::VMC::Chain;
 # ABSTRACT: Class to model a VMC Chain
-our $VERSION = '3.20241209'; # VERSION
+our $VERSION = '3.20250130'; # VERSION
 use 5.20.0;
 use Moose;
 use Mail::BIMI::Prelude;
@@ -25,6 +25,15 @@ has is_valid => ( is => 'rw', lazy => 1, builder => '_build_is_valid',
   documentation => 'Does the VMC of this chain validate back to root?' );
 
 
+sub _default_root_certs($self) {
+  my @ca;
+  my $manifest = $self->get_data_from_file('CA.manifest');
+  for my $ca_file (split "\n", $manifest) {
+    push @ca, $self->get_data_from_file("CA/$ca_file");
+  }
+  return join "\n", @ca;
+}
+
 sub _build_is_valid($self) {
   # Start with root cert validations
   return 0 if !$self->vmc;
@@ -33,7 +42,7 @@ sub _build_is_valid($self) {
   my $unlink_root_cert_file = 0;
   if ( !$ssl_root_cert ) {
     my $mozilla_root = scalar read_file Mozilla::CA::SSL_ca_file;
-    my $bimi_root = $self->get_data_from_file('CA.pem');
+    state $bimi_root = $self->_default_root_certs;
     my $temp_fh = File::Temp->new(UNLINK=>0);
     $ssl_root_cert = $temp_fh->filename;
     $unlink_root_cert_file = 1;
@@ -195,7 +204,7 @@ Mail::BIMI::VMC::Chain - Class to model a VMC Chain
 
 =head1 VERSION
 
-version 3.20241209
+version 3.20250130
 
 =head1 DESCRIPTION
 

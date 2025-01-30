@@ -1,6 +1,6 @@
 package Mail::BIMI::CacheBackend::File;
 # ABSTRACT: Cache handling
-our $VERSION = '3.20241209'; # VERSION
+our $VERSION = '3.20250130'; # VERSION
 use 5.20.0;
 use Moose;
 use Mail::BIMI::Prelude;
@@ -54,7 +54,7 @@ Mail::BIMI::CacheBackend::File - Cache handling
 
 =head1 VERSION
 
-version 3.20241209
+version 3.20250130
 
 =head1 DESCRIPTION
 

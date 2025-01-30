@@ -1,3 +1,8 @@
+0.003   2024-11-19  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Sort and remove duplicate.
+
+
 0.002   2024-11-19  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

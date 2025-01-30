@@ -1,3 +1,7 @@
+0.033 2025-01-30
+  [Bug Fix]
+    * Fix a bug that cache class variables are not freed in INIT block.
+    
 0.032 2025-01-27
   [Requirement Changes]
     * Require SPVM 0.990042.

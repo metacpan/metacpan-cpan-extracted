@@ -60,11 +60,11 @@
    "provides" : {
       "App::Greple::annotate" : {
          "file" : "lib/App/Greple/annotate.pm",
-         "version" : "0.9902"
+         "version" : "0.9903"
       },
       "App::Greple::charcode" : {
          "file" : "lib/App/Greple/charcode.pm",
-         "version" : "0.9902"
+         "version" : "0.9903"
       },
       "Local::Annon" : {
          "file" : "lib/App/Greple/annotate.pm"
@@ -85,7 +85,7 @@
          "web" : "https://github.com/kaz-utashiro/greple-charcode"
       }
    },
-   "version" : "0.9902",
+   "version" : "0.9903",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"
    ],

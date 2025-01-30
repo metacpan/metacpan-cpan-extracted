@@ -29,7 +29,7 @@ requires:
   Map::Tube::Graph: 0.06
   Map::Tube::GraphViz: 0.07
   Map::Tube::Plugin::Formatter: 0.17
-  Map::Tube::Plugin::FuzzyFind: "\0Q\x01"
+  Map::Tube::Plugin::FuzzyFind: 0.081001
   Map::Tube::Plugin::Graph: 0.45
   Map::Tube::Server: 0.06
   Map::Tube::Text::Shortest: 0.02
@@ -41,4 +41,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Task-Map-Tube
   license: http://opensource.org/licenses/artistic-license-2.0.php
   repository: git://github.com/michal-josef-spacek/Task-Map-Tube
-version: '0.48'
+version: '0.49'

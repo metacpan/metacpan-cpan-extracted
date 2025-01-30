@@ -12,6 +12,10 @@ use SPVM 'Mozilla::CA';
 use SPVM::Mozilla::CA;
 use SPVM 'Fn';
 
+my $api = SPVM::api();
+
+my $start_memory_blocks_count = $api->get_memory_blocks_count;
+
 ok(SPVM::TestCase::Mozilla::CA->test);
 
 # Version
@@ -19,5 +23,10 @@ ok(SPVM::TestCase::Mozilla::CA->test);
   my $version_string = SPVM::Fn->get_version_string("Mozilla::CA");
   is($SPVM::Mozilla::CA::VERSION, $version_string);
 }
+
+SPVM::Fn->destroy_runtime_permanent_vars;
+
+my $end_memory_blocks_count = $api->get_memory_blocks_count;
+is($end_memory_blocks_count, $start_memory_blocks_count);
 
 done_testing;

@@ -9,13 +9,13 @@ use vars qw( @EXPORT_OK %IMCapsMismatch $VERSION );
 
 use Regexp::Ethiopic::Amharic ( 'getForm', 'setForm', ':forms' );
 
-	$VERSION = "0.01";
+	$VERSION = "0.02";
 	#
 	# This linking is done so that the export of "distance" works
 	# as before:
 	#
 	*distance = \&Text::WagnerFischer::distance;
-	@EXPORT_OK = qw( distance );
+	@EXPORT_OK = qw( &distance );
 
 
 	#
@@ -25,7 +25,7 @@ use Regexp::Ethiopic::Amharic ( 'getForm', 'setForm', ':forms' );
 
 
 	#
-	# Set a new default cossts:
+	# Set a new default penalty costs:
 	#
 	# WagnerFischer   :  equal, insert/delete, mismatch, 
 	# Right Family but:  phoneme/glyph equiv, zemene, wrong form
@@ -124,7 +124,7 @@ my ($x,$y,$refc)=@_;
 
 __END__
 
-
+=encoding utf8
 
 =head1 NAME
 
@@ -136,10 +136,14 @@ Text::WagnerFischer::Amharic - The Wagner-Fischer Algorithm for Amharic.
   use utf8;
   use Text::WagnerFischer::Amharic qw(distance);
 
-
+  # Calculate distance with the default penalty costs (weights):
   print distance ( "ፀሐይ", "ጸሀይ" ), "\n";  # prints "2"
 
+  # Calcualte distance with a supplied costs array:
   print distance ( [0,2,3, 1,2,1, 1,1,1, 1], "ፀሐይ", "ጸሀይ" ), "\n";  # prints "2"
+
+
+  # Calcualte distances between a word and a list of comparison words:
 
   my @words = ( "ፀሐይ",  "ፀሓይ", "ፀሀይ", "ፀሃይ", "ጸሐይ", "ጸሓይ", "ጸሀይ", "ጸሃይ" );
 
@@ -153,16 +157,16 @@ Text::WagnerFischer::Amharic - The Wagner-Fischer Algorithm for Amharic.
 =head1 DESCRIPTION
 
 This module implements the Wagner-Fischer edit distance algorithm for
-Ethiopic script under Amharic Amharic character classes.
+Ethiopic script under Amharic character classes.
 
 The edit distance is a measure of the degree of proximity between two strings,
 based on "edits". Each type of edit is given its own cost (weight).  In
 additional to the three initial Wagner-Fischer weights, the
 Amharic weight function recognizes 7 additional mismatch types:
 
-	    / a: x = y           (cost for letter match)
+            / a: x = y           (cost for letter match)
  w(x,y) =  |  b: x = - or y = -  (cost for insertion/deletion operation)
-	   |  c: x != y          (cost for letter mismatch)
+           |  c: x != y          (cost for letter mismatch)
            |  x =~ [#y#] and
            |    d: x =~ [=y=]                  (cost of decayed labiovelar)
            |    e: form(x) > 7 || form(y) > 7  (cost of labiovelar mismatch)
@@ -187,7 +191,7 @@ None presently known.
 
 =head1 AUTHOR
 
-Daniel Yacob,  L<Yacob@EthiopiaOnline.Net|mailto:Yacob@EthiopiaOnline.Net>
+Daniel Yacob,  L<dyacob@cpan.org|mailto:dyacob@cpan.org>
 
 
 =head1 SEE ALSO

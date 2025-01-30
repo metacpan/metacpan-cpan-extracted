@@ -3,12 +3,13 @@
 
 class FindBin {
   
-  version "0.032";
+  version "0.033";
   
   use Sys;
   use Cwd;
   use File::Spec;
   use File::Basename;
+  use Fn;
   
   our $Bin : ro string;
   our $Script : ro string;
@@ -62,8 +63,10 @@ class FindBin {
     $Bin = Cwd->abs_path($Bin);
     
     $RealBin = Cwd->abs_path($RealBin);
+    
+    Fn->destroy_runtime_permanent_vars;
   }
-
+  
   static method again : void () {
     &init();
   }

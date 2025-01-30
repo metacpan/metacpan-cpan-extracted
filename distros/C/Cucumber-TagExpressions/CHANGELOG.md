@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [6.1.2] - 2025-01-29
+### Added
+- [All] Run CI testing only for relevant areas of the codebase ([#186](https://github.com/cucumber/tag-expressions/pull/186))
+- [Python] Extended documentation and type hints within docstrings ([#182](https://github.com/cucumber/tag-expressions/pull/182))
+- [Ruby] Support the testing in CI on later rubies ([#185](https://github.com/cucumber/tag-expressions/pull/185))
+
 ## [6.1.1] - 2024-10-28
 ### Changed
 - [Python] Use the new action cucumber/action-publish-pypi in release process ([#147](https://github.com/cucumber/tag-expressions/pull/147) [#172](https://github.com/cucumber/tag-expressions/pull/172) [#178](https://github.com/cucumber/tag-expressions/pull/178))
@@ -197,7 +203,8 @@ by [aslakhellesoy](https://github.com/aslakhellesoy))
 ### Added
 - First stable release!
 
-[Unreleased]: https://github.com/cucumber/tag-expressions/compare/v6.1.1...HEAD
+[Unreleased]: https://github.com/cucumber/tag-expressions/compare/v6.1.2...HEAD
+[6.1.2]: https://github.com/cucumber/tag-expressions/compare/v6.1.1...v6.1.2
 [6.1.1]: https://github.com/cucumber/tag-expressions/compare/v6.1.0...v6.1.1
 [6.1.0]: https://github.com/cucumber/tag-expressions/compare/v6.0.0...v6.1.0
 [6.0.0]: https://github.com/cucumber/tag-expressions/compare/v5.0.6...v6.0.0

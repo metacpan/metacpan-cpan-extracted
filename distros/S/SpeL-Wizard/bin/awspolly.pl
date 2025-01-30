@@ -2,7 +2,7 @@
 # -*- cperl -*-
 # PODNAME: awspollymp3.pl
 # ABSTRACT: script converting textfile named $1
-   #                               into file $2
+#                                  into file $2
 #                          with engine:voice $3
 #           using AWS Polly
 
@@ -11,10 +11,10 @@ use IO::File;
 use IPC::Run;
 
 # Check arguments
-die( "Usage: $0 <input_text_file> <output_audio_file> <engine:voice>\n" )
+die( "Usage: $0 <input_text_file> <output_audio_file> <region:engine:voice>\n" )
   unless( 3 == @ARGV );
 
-my ( $textfilename, $audiofilename, $engvoice ) = @ARGV;
+my ( $textfilename, $audiofilename, $regionenginevoice ) = @ARGV;
 
 # determine format from audiofilename
 my $format = $audiofilename;
@@ -32,21 +32,16 @@ foreach ( $format ) {
 }
 
 # determine engine and voice
-my ( $engine, $voice ) = split( /:/, $engvoice );
-    die( "Invalid engine or voice format. Use <engine:voice>.\n" )
+my ( $region, $engine, $voice ) = split( /:/, $regionenginevoice );
+    die( "Invalid region, engine or voice format. Use <region:engine:voice>.\n" )
       
-  unless( defined $engine and defined $voice );
+  unless( defined $region and defined $engine and defined $voice );
 
 # read text file
 my $textfile = IO::File->new();
 $textfile->open( "<$textfilename" )
   or die( "Error: cannot open '$textfilename'\n" );
 my $text = do { local $/; <$textfile> };
-
-# Prepare for ssml
-# put harness around letters to spell...
-$text =~ s/\"a\"/"ey"/g;
-# say STDERR "|$text|";
 
 # Run polly, run!
 my $command = [
@@ -82,7 +77,7 @@ awspollymp3.pl - script converting textfile named $1
 
 =head1 VERSION
 
-version 20241023.0918
+version 20250129.1405
 
 =head1 AUTHOR
 
@@ -90,7 +85,7 @@ Walter Daems <wdaems@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024 by Walter Daems.
+This software is Copyright (c) 2025 by Walter Daems.
 
 This is free software, licensed under:
 

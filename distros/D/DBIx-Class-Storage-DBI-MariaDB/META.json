@@ -59,7 +59,7 @@
          "web" : "https://github.com/Siemplexus/DBIx-Class-Storage-DBI-MariaDB"
       }
    },
-   "version" : "v0.1.2",
+   "version" : "v0.1.3",
    "x_contributors" : [
       "Dave Lambley <dave@lambley.me.uk>"
    ],

@@ -12,7 +12,7 @@ my $got = $obj->as_file;
 ok -e $got, 'as_file';
 
 $got = $obj->header;
-is @$got, 21, 'header';
+is @$got, 22, 'header';
 
 $got = $obj->symbols;
 is_deeply [ @{ $got->{H} }[0,1] ], [1, 'Hydrogen'], 'symbols';

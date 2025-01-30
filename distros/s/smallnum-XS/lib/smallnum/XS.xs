@@ -9,10 +9,12 @@ double PRECISION = 0.01;
 double OFFSET = 0.5555555;
 
 static SV * new (double num) {
+	dTHX;
 	return sv_bless(newRV_noinc(newSVnv(num)), gv_stashsv(newSVpv("smallnum::XS", 12), 0));
 }
 
 static double _sref (SV * n) {
+	dTHX;
 	double num;
 	if ( SvROK(n) ) {
 		num = SvNV(SvRV(n));

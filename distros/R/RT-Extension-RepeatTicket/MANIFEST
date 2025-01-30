@@ -42,4 +42,3 @@ xt/on_complete.t
 xt/start_date.t
 xt/weekly.t
 xt/yearly.t
-SIGNATURE                                Public-key signature (added by MakeMaker)

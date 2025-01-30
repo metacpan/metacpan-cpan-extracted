@@ -1,4 +1,4 @@
-#Before!/bin/perl.exe -w
+#!/bin/perl.exe -w 
 # 002_Arithmetic.t: Test the Math::Yapp arithmetic functions: Add,
 #                   Subtract, Multiply, Divide; all via their overloaded
 #                   operators.  Also the unary operators for negation (!)
@@ -7,21 +7,20 @@
 use strict;
 use warnings;
 
-use Test::More;     # No test count
+use Test::More 'no_plan';      # Skip this? use done_testing()
 BEGIN { use_ok('Math::Yapp') };
 
 use Carp;
 use Math::Complex;
 use Math::Yapp;
 use Data::Dumper;
-#use Test::More 'no_plan';      # Skip this; use done_testing()
 
 Yapp_testmode(0);
 Yapp_decimals(2);
 Yapp_print0(1);     # Include zero coefficients in the output
 Yapp_start_high(0); # Start from low-order terms
 
-printf ("Testing addition\n");
+print ("Testing addition\n");
 my @y_list1 = (1, -2, 3, 0, 5, -6, 7);  # 6th degree poly
 my @y_list2 = (-2, 3, -4, 5);           # 3rd degree 
 my $poly1 = Yapp(\@y_list1);            # Create the Yapp objects I need
@@ -29,67 +28,72 @@ my $poly2 = Yapp(\@y_list2);            # for arithmetic
 my $poly3 = $poly1 + $poly2;
 my $expect_poly3
    = "-1.00 +1.00X -1.00X^2 +5.00X^3 +5.00X^4 -6.00X^5 +7.00X^6";
-printf("  < %s>\n+ <%s>:\n", $poly1->Ysprint(), $poly2->Ysprint());
-printf("  <%s>\n", $poly3->Ysprint());
-is($poly3->Ysprint(), $expect_poly3, "Test 2-Yapp addition");
+print $poly1->Ysprint(), "\n+  ", $poly2->Ysprint(),
+      "\n=  ", $poly3->Ysprint(), "\n";
+is($poly3->Ysprint(), $expect_poly3, "2-Yapp addition");
 
+print "Testing to just add a complex constant:\n";
 $poly3 = $poly1 + cplx(-4,3);                   # Just add a constant
 $expect_poly3
   = "(-3.00+3.00i) -2.00X +3.00X^2 +0.00X^3 +5.00X^4 -6.00X^5 +7.00X^6";
-printf("<%s> + (-4+3i) =\n<%s>\n",
-       $poly1->Ysprint(), $poly3->Ysprint());
+print cplx(-4,3), "\n+ ", $poly1->Ysprint(), "\n",
+      $poly3->Ysprint(), "\n";
 is($poly3->Ysprint(), $expect_poly3, "Test adding a constant to Yapp");
 
-
-printf ("\n\nTesting subtraction\n");
+print ("Test subtraction of polynomials:\n");
 $poly3 = $poly1 - $poly2;
-printf("  < %s>\n- <%s>:\n", $poly1->Ysprint(), $poly2->Ysprint());
-printf("  <%s>\n", $poly3->Ysprint());
-$expect_poly3
- = "3.00 -5.00X +7.00X^2 -5.00X^3 +5.00X^4 -6.00X^5 +7.00X^6";
+$expect_poly3 = "3.00 -5.00X +7.00X^2 -5.00X^3 +5.00X^4 -6.00X^5 +7.00X^6";
+print "  ", $poly1->Ysprint(), "\n- ", $poly2->Ysprint(), "\n",
+	  " = ", $poly3->Ysprint(), "\n";
 is($poly3->Ysprint(), $expect_poly3, "Test 2-Yapp subtraction");
 
-$poly3 = $poly1 -10;
+print "Subtract a constant from a polynomial\n";
+$poly3 = $poly1 - 10;
 printf("  <%s>\n- <%3.2f> =\n  <%s>\n",
        $poly1->Ysprint(), 10, $poly3->Ysprint());
+diag "  ", $poly1->Ysprint(), " - 10";
+diag "= ", $poly3->Ysprint();
 $expect_poly3
   = "-9.00 -2.00X +3.00X^2 +0.00X^3 +5.00X^4 -6.00X^5 +7.00X^6";
 is($poly3->Ysprint(), $expect_poly3, "Test Yapp minus constant");
 
+print "Test subtract polynomial from a constant\n";
 $poly3 = 10 - $poly1;
 printf(" <%3.2f>\n- <%s> =\n  <%s>\n",
         10,  $poly1->Ysprint(), $poly3->Ysprint());
+print "  10 - (", $poly1->Ysprint(), ")\n";
+print "= ", $poly3->Ysprint(), "\n";
 $expect_poly3
   = "9.00 +2.00X -3.00X^2 +0.00X^3 -5.00X^4 +6.00X^5 -7.00X^6";
 is($poly3->Ysprint(), $expect_poly3, "Test constant minus Yapp");
 
-
-printf ("\n\nTesting multiplication by a constant:\n");
+print ("\nTesting multiplication by a constant:\n");
 $poly3 = 10 * $poly1;
-printf(" <%3.2f> * <%s>\n = <%s>\n",
-        10, $poly1->Ysprint(), $poly3->Ysprint());
+diag "  10 * ", $poly1->Ysprint();
+diag "= ", $poly3->Ysprint();
 $expect_poly3
  = "10.00 -20.00X +30.00X^2 +0.00X^3 +50.00X^4 -60.00X^5 +70.00X^6";
 is($poly3->Ysprint(), $expect_poly3, "Test multiply by constant on left");
 
 my $poly4 = $poly1 * 10;
-printf(" <%s> * <%3.2f>\n = <%s>\n",
-        $poly1->Ysprint(), 10, $poly4->Ysprint());
 my $expect_poly4
  = "10.00 -20.00X +30.00X^2 +0.00X^3 +50.00X^4 -60.00X^5 +70.00X^6";
+diag "  ", $poly1->Ysprint(), " * 10";
+diag "= ", $poly3->Ysprint();
 is($poly4->Ysprint(), $expect_poly4, "Test multiply by constant on right");
 
-printf("\nTesting multiplication of two polynomials\n");
+diag("\nTesting multiplication of two polynomials");
 $poly3 = $poly1 * $poly2;
 printf("  <%s>\n* <%s>\n= <%s>\n",
        $poly1->Ysprint(), $poly2->Ysprint(), $poly3->Ysprint(),);
 $expect_poly3
 = "-2.00 +7.00X -16.00X^2 +22.00X^3 -32.00X^4 +42.00X^5 -52.00X^6 "
 . "+70.00X^7 -58.00X^8 +35.00X^9";
+diag "  ", $poly1->Ysprint(), "\n * ", $poly2->Ysprint();
+diag "= ", $poly3->Ysprint();
 is($poly3->Ysprint(), $expect_poly3, "Test multiply two polynomials");
 
-
-printf("\n\nTesting division by constant, real and complex\n");
+diag ("\nTesting division by constant, real and complex\n");
 $poly3 = $poly1 / 7;    # Make the top term a 1
 printf("  <%s> / <%3.2f>\n= <%s>\n",
        $poly1->Ysprint(), 7, $poly3->Ysprint());

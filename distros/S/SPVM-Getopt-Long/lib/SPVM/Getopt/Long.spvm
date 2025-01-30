@@ -2,10 +2,10 @@
 # MIT License
 
 class Getopt::Long {
-  version "0.002";
+  version "0.003";
   
   use Array;
-  use Regex;
+  use Re;
   use Fn;
   use StringList;
   use Getopt::Long::Spec;
@@ -33,9 +33,7 @@ class Getopt::Long {
     for (my $i = 0; $i < $spec_strings_length; $i++) {
       my $spec_string = $spec_strings->[$i];
       
-      my $spec_re = Regex->new("^(\w+(?:\|\w+)*)(?:=([\w]))?$");
-      
-      if (my $match = $spec_re->match($spec_string)) {
+      if (my $match = Re->m($spec_string, "^(\w+(?:\|\w+)*)(?:=([\w]))?$")) {
         my $names_str = $match->cap1;
         my $type_char = $match->cap2;
         
@@ -109,17 +107,13 @@ class Getopt::Long {
         die "The ${args_number}th argument must be defined.";
       }
       
-      my $option_start_re = Regex->new("^--?");
-      
-      if (my $match = $option_start_re->match($arg)) {
+      if (my $match = Re->m($arg, "^--?")) {
         if ($arg eq "--") {
           $options_end_index = $args_index + 1;
           last;
         }
         
-        my $option_re = Regex->new("(--?)(\w+)(?:=([\w\.\-]+))?");
-        
-        if (my $match = $option_re->match($arg)) {
+        if (my $match = Re->m($arg, "(--?)(\w+)(?:=([\w\.\-]+))?")) {
           
           my $option_hyphen = $match->cap1;
           

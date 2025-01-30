@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 
 use parent qw(Software::License);
 
@@ -138,7 +138,7 @@ CPANPLUS::Dist::Debora::License - Read license files
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 
@@ -219,7 +219,7 @@ Andreas Vögele E<lt>voegelas@cpan.orgE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2024 Andreas Vögele
+Copyright (C) 2025 Andreas Vögele
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

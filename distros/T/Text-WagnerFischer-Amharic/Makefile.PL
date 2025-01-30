@@ -5,7 +5,7 @@ WriteMakefile(
 	'NAME'		=> 'Text::WagnerFischer::Amharic',
 	'DISTNAME'	=> 'Text-WagnerFischer-Amharic',
 	'VERSION_FROM'	=> 'lib/Text/WagnerFischer/Amharic.pm', # finds $VERSION
-	'AUTHOR'	=> "Daniel Yacob <Yaocb\@EthiopiaOnline.Net>",
+	'AUTHOR'	=> "Daniel Yacob <dyacob\@cpan.org>",
 	'ABSTRACT'	=> "The WagnerFischer Algorithm Applied to Amharic.",
 	dist			=>	{
 		COMPRESS        =>	"gzip -9f",

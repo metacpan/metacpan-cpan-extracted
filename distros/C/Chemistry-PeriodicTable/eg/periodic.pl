@@ -44,12 +44,12 @@ __DATA__
 % for my $row (1 .. 9) {
     <tr>
 %   my $col = 0;
-%   for my $i (sort { $elements->{$a}[19] <=> $elements->{$b}[19] || $elements->{$a}[0] <=> $elements->{$b}[0] } keys %$elements) {
-%     next if $elements->{$i}[19] < $row;
-%     last if $elements->{$i}[19] > $row;
+%   for my $i (sort { $elements->{$a}[-2] <=> $elements->{$b}[-2] || $elements->{$a}[0] <=> $elements->{$b}[0] } keys %$elements) {
+%     next if $elements->{$i}[-2] < $row;
+%     last if $elements->{$i}[-2] > $row;
 %     $col++;
-%     if ($elements->{$i}[20] - 1 > $col) {
-%       for my $j ($col + 1 .. $elements->{$i}[20]) {
+%     if ($elements->{$i}[-1] - 1 > $col) {
+%       for my $j ($col + 1 .. $elements->{$i}[-1]) {
       <td>&nbsp;</td>
 %         $col++;
 %       }

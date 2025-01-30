@@ -195,6 +195,20 @@ sub do_tests{
   my $expected_error=scalar read_file('t/data/'.$file.'.error');
   my $expected_stderr=scalar read_file('t/data/'.$file.'.stderr');
   my $expected_stdout=scalar read_file('t/data/'.$file.'.stdout');
+
+  # Getopt::Long::Descriptive::Usage @v0.113 changes TAB to 4 SPACEs.
+  #
+  # 0.113 2023-12-15 16:55:46-05:00 America/New_York
+  # - improve line wrapping so spacers (non-option text lines) can use more
+  # horizontal characters
+  # - replace tabs (generally 8 space) indents in output with four spaces
+  #
+  # Make sure these tests work with all versions by replacing any tabs
+  # in the generated output with 4 spaces
+  $error =~ s/\t/    /g;
+  $stderr =~ s/\t/    /g;
+  $stdout =~ s/\t/    /g;
+
   eq_or_diff($error, $expected_error, 'No Exceptions as expected');
   eq_or_diff($stderr, $expected_stderr, 'STDERR as expected');
   eq_or_diff($stdout, $expected_stdout,'STDOUT as expected');

@@ -38,8 +38,8 @@ WriteMakefile(
     resources => {
       repository => {
 	type => 'git',
-	url  => 'https://alexschroeder.ch/cgit/planet-jupiter',
-	web  => 'https://alexschroeder.ch/cgit/planet-jupiter/about/',
+	url  => 'https://src.alexschroeder.ch/planet-jupiter.git/',
+	web  => 'https://src.alexschroeder.ch/planet-jupiter.git/',
       },
     },
   },
@@ -57,7 +57,6 @@ sub postamble {
   push @ret, <<'EOT';
 README.md: script/jupiter
 	pod2markdown $< $@
-	perl -e 'use File::Slurper qw(read_text write_text); $$_=read_text("README.md"); s/^(    .*)\n\n/$1\n```\n\n/gm; s/\n\n    </\n\n```xml\n    </g; s/\n\n    /\n\n```sh\n    /g; s/^    //gm; write_text("README.md", $$_)'
 	grep -L ERROR $@
 EOT
   return join "\n", @ret;

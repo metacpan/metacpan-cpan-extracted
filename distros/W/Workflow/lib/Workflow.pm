@@ -16,7 +16,7 @@ my @FIELDS   = qw( id type description state last_update time_zone
 my @INTERNAL = qw( _factory _observers );
 __PACKAGE__->mk_accessors( @FIELDS, @INTERNAL );
 
-$Workflow::VERSION = '2.03';
+$Workflow::VERSION = '2.04';
 
 use constant NO_CHANGE_VALUE => 'NOCHANGE';
 
@@ -80,14 +80,14 @@ sub context {
 
 sub get_current_actions {
     my ( $self, $group ) = @_;
-    $self->log->debug( "Getting current actions for wf '", $self->id, "'" );
+    $self->log->debug( "Getting current actions for wf '" . $self->id . "'" );
     my $wf_state = $self->_get_workflow_state;
     return $wf_state->get_available_action_names( $self, $group );
 }
 
 sub get_all_actions {
     my ( $self ) = @_;
-    $self->log->debug( "Getting all actions for wf '", $self->id, "'" );
+    $self->log->debug( "Getting all actions for wf '" . $self->id . "'" );
     my $wf_state = $self->_get_workflow_state;
     return $wf_state->get_all_action_names( $self );
 }
@@ -409,8 +409,8 @@ __END__
 =begin markdown
 
 [![CPAN version](https://badge.fury.io/pl/Workflow.svg)](http://badge.fury.io/pl/Workflow)
-[![Build status](https://github.com/jonasbn/perl-workflow/actions/workflows/ci.yml/badge.svg)](https://github.com/jonasbn/perl-workflow/actions/workflows/ci.yml)
-[![Coverage Status](https://coveralls.io/repos/github/jonasbn/perl-workflow/badge.svg?branch=master)](https://coveralls.io/github/jonasbn/perl-workflow?branch=master)
+[![Build status](https://github.com/perl-workflow/perl-workflow/actions/workflows/ci.yml/badge.svg)](https://github.com/perl-workflow/perl-workflow/actions/workflows/ci.yml)
+[![Coverage Status](https://coveralls.io/repos/github/perl-workflow/perl-workflow/badge.svg?branch=master)](https://coveralls.io/github/perl-workflow/perl-workflow?branch=master)
 
 =end markdown
 
@@ -420,7 +420,7 @@ Workflow - Simple, flexible system to implement workflows
 
 =head1 VERSION
 
-This documentation describes version 2.03 of Workflow
+This documentation describes version 2.04 of Workflow
 
 =head1 SYNOPSIS
 
@@ -1365,13 +1365,13 @@ Your L<XML::SAX> configuration is located in the file:
 
 Known bugs and limitations can be seen in the Github issue tracker:
 
-L<https://github.com/jonasbn/perl-workflow/issues>
+L<https://github.com/perl-workflow/perl-workflow/issues>
 
 =head1 BUG REPORTING
 
 Bug reporting should be done either via Github issues
 
-L<https://github.com/jonasbn/perl-workflow/issues>
+L<https://github.com/perl-workflow/perl-workflow/issues>
 
 A list of currently known issues can be seen via the same URL.
 
@@ -1403,7 +1403,7 @@ The Workflow project is currently hosted on GitHub
 
 =over
 
-=item GitHub: L<https://github.com/jonasbn/perl-workflow>
+=item GitHub: L<https://github.com/perl-workflow/perl-workflow>
 
 =back
 
@@ -1413,7 +1413,7 @@ The code is kept under revision control using Git:
 
 =over
 
-=item L<https://github.com/jonasbn/perl-workflow/tree/master/>
+=item L<https://github.com/perl-workflow/perl-workflow/tree/master/>
 
 =back
 

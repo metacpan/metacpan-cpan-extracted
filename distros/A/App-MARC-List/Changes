@@ -1,3 +1,7 @@
+0.04 2025-01-27T21:12:34+01:00
+ - Add support for control fields.
+ - Update copyright years.
+
 0.03 2024-12-20T13:26:01+01:00
  - Add tests.
  - Improve order of check in argument condition.

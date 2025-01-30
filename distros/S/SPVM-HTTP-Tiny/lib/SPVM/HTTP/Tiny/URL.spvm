@@ -8,6 +8,7 @@ class HTTP::Tiny::URL {
   allow HTTP::Tiny::Handle;
   
   use StringBuffer;
+  use Re;
   
   # Fields
   has scheme : string;
@@ -46,7 +47,7 @@ class HTTP::Tiny::URL {
     my $host = (string)undef;
     my $path_query = (string)undef;
     
-    if (my $match = Regex->new("\A([^:/?#]+)://([^/?#]*)([^#]*)")->match($url_string)) {
+    if (my $match = Re->m($url_string, "\A([^:/?#]+)://([^/?#]*)([^#]*)")) {
       $scheme = $match->cap1;
       $host = $match->cap2;
       $path_query = $match->cap3;
@@ -57,7 +58,7 @@ class HTTP::Tiny::URL {
     
     $scheme = Fn->lc($scheme);
     
-    unless (Regex->new("\A/")->match($path_query)) {
+    unless (Re->m($path_query, "\A/")) {
       $path_query = "/$path_query";
     }
     
@@ -68,18 +69,23 @@ class HTTP::Tiny::URL {
       &substr_replacement($host, 0, 1, "");          # knock the @ off the host
       
       # userinfo might be percent escaped, so recover real auth info
-      Regex->new("%([0-9A-Fa-f]{2})")->replace_g($auth, method : string ($re : Regex, $match : Regex::Match) {
+      my $auth_ref = [$auth];
+      Re->s($auth_ref, ["%([0-9A-Fa-f]{2})", "g"], method : string ($re : Regex, $match : Regex::Match) {
         return Fn->chr(Fn->hex($match->cap1));
       });
+      $auth = $auth_ref->[0];
     }
     
     my $port_string = (string)undef;
     
     my $replace_info_ref = [(Regex::ReplaceInfo)undef];
     
-    $host = Regex->new(":(\d*)\z")->replace($host, "", 0, -1, {info => $replace_info_ref});
-    my $match = $replace_info_ref->[0]->match;
-    if ($match) {
+    my $host_ref = [$host];
+    my $replace_info = Re->s($host_ref, ":(\d*)\z", "");
+    $host = $host_ref->[0];
+    
+    if ($replace_info) {
+      my $match = $replace_info->match;
       $port_string = $match->cap1;
     }
     

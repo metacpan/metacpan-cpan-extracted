@@ -1,5 +1,9 @@
 Revision history for HarfBuzz::Shaper.
 
+0.029
+
+   - Some more fixes in harfbuzz lib detection.
+
 0.028 2025-01-28
 
     - Fix building fallback lib.

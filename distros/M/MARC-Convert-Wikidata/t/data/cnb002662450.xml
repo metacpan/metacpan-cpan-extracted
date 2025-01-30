@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collection
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"
+  xmlns="http://www.loc.gov/MARC21/slim">
+
+<record>
+  <leader>02297cam a2200601 a 4500</leader>
+  <controlfield tag="001">nkc20152662450</controlfield>
+  <controlfield tag="003">CZ PrNK</controlfield>
+  <controlfield tag="005">20180822095029.0</controlfield>
+  <controlfield tag="007">ta</controlfield>
+  <controlfield tag="008">141125s2015    xr ac  e      000 1dcze  </controlfield>
+  <datafield tag="015" ind1=" " ind2=" ">
+    <subfield code="a">cnb002662450</subfield>
+  </datafield>
+  <datafield tag="020" ind1=" " ind2=" ">
+    <subfield code="a">978-80-7404-144-0</subfield>
+    <subfield code="q">(Česká televize ;</subfield>
+    <subfield code="q">brož.)</subfield>
+  </datafield>
+  <datafield tag="020" ind1=" " ind2=" ">
+    <subfield code="a">978-80-204-3500-2</subfield>
+    <subfield code="q">(Mladá fronta ;</subfield>
+    <subfield code="q">brož.)</subfield>
+  </datafield>
+  <datafield tag="020" ind1=" " ind2=" ">
+    <subfield code="a">978-80-204-4479-0</subfield>
+    <subfield code="q">(soubor ;</subfield>
+    <subfield code="q">krabice)</subfield>
+  </datafield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="a">(OCoLC)908821202</subfield>
+  </datafield>
+  <datafield tag="040" ind1=" " ind2=" ">
+    <subfield code="a">PNA001</subfield>
+    <subfield code="b">cze</subfield>
+    <subfield code="d">ABA001</subfield>
+  </datafield>
+  <datafield tag="043" ind1=" " ind2=" ">
+    <subfield code="a">e-cs---</subfield>
+  </datafield>
+  <datafield tag="045" ind1=" " ind2=" ">
+    <subfield code="a">x9x9</subfield>
+  </datafield>
+  <datafield tag="072" ind1=" " ind2="7">
+    <subfield code="a">94(437)</subfield>
+    <subfield code="x">Dějiny Česka a Slovenska</subfield>
+    <subfield code="2">Konspekt</subfield>
+    <subfield code="9">8</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">32-051</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">94(437)"1992"</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">328/329</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">(437)</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">(084.1)</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="100" ind1="1" ind2=" ">
+    <subfield code="a">Kosatík, Pavel,</subfield>
+    <subfield code="d">1962-</subfield>
+    <subfield code="7">jn19990201035</subfield>
+    <subfield code="4">aut</subfield>
+  </datafield>
+  <datafield tag="245" ind1="1" ind2="0">
+    <subfield code="a">Češi :</subfield>
+    <subfield code="b">1992 : jak Mečiar s Klausem rozdělili stát /</subfield>
+    <subfield code="c">text Pavel Kosatík ; výtvarné zpracování Dan Černý</subfield>
+  </datafield>
+  <datafield tag="246" ind1="3" ind2="0">
+    <subfield code="a">Jak Mečiar s Klausem rozdělili stát</subfield>
+  </datafield>
+  <datafield tag="246" ind1="1" ind2="8">
+    <subfield code="a">Češi 1992</subfield>
+  </datafield>
+  <datafield tag="250" ind1=" " ind2=" ">
+    <subfield code="a">1. vyd.</subfield>
+  </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="a">Praha :</subfield>
+    <subfield code="b">Česká televize :</subfield>
+    <subfield code="b">Mladá fronta,</subfield>
+    <subfield code="c">2015</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">[91] s. :</subfield>
+    <subfield code="b">vše barev. il., portréty ;</subfield>
+    <subfield code="c">25 cm</subfield>
+  </datafield>
+  <datafield tag="490" ind1="1" ind2=" ">
+    <subfield code="a">Edice ČT</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Soubor svazků 1-9 z roku 2017(dotisky prvního vydání) distribuován společně v kartonové krabici</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">ISBN souboru uvedeno pouze na krabici</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Název na krabici též: Češi 1918-1992</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Chronologický přehled</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Na hřbetu označení: 9</subfield>
+  </datafield>
+  <datafield tag="600" ind1="1" ind2="7">
+    <subfield code="a">Klaus, Václav,</subfield>
+    <subfield code="d">1941-</subfield>
+    <subfield code="7">jn19990218045</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="600" ind1="1" ind2="7">
+    <subfield code="a">Mečiar, Vladimír,</subfield>
+    <subfield code="d">1942-</subfield>
+    <subfield code="7">jn20000603976</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="648" ind1=" " ind2="7">
+    <subfield code="a">1992</subfield>
+    <subfield code="7">ch460666</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="7">
+    <subfield code="a">politici</subfield>
+    <subfield code="7">ph115781</subfield>
+    <subfield code="z">Československo</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="7">
+    <subfield code="a">rozdělení Československa (1992)</subfield>
+    <subfield code="7">ph120842</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="9">
+    <subfield code="a">politicians</subfield>
+    <subfield code="z">Czechoslovakia</subfield>
+    <subfield code="2">eczenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="9">
+    <subfield code="a">partition of Czechoslovakia (1992)</subfield>
+    <subfield code="2">eczenas</subfield>
+  </datafield>
+  <datafield tag="651" ind1=" " ind2="7">
+    <subfield code="a">Československo</subfield>
+    <subfield code="7">ge131689</subfield>
+    <subfield code="x">politika a vláda</subfield>
+    <subfield code="y">1992</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="651" ind1=" " ind2="9">
+    <subfield code="a">Czechoslovakia</subfield>
+    <subfield code="x">politics and government</subfield>
+    <subfield code="y">1992</subfield>
+    <subfield code="2">eczenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="7">
+    <subfield code="a">komiksy</subfield>
+    <subfield code="7">fd131978</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="9">
+    <subfield code="a">comics</subfield>
+    <subfield code="2">eczenas</subfield>
+  </datafield>
+  <datafield tag="700" ind1="1" ind2=" ">
+    <subfield code="a">Černý, Dan,</subfield>
+    <subfield code="d">1982-</subfield>
+    <subfield code="7">mzk2005286518</subfield>
+    <subfield code="4">ill</subfield>
+  </datafield>
+  <datafield tag="830" ind1=" " ind2="0">
+    <subfield code="a">Edice České televize</subfield>
+  </datafield>
+  <datafield tag="901" ind1=" " ind2=" ">
+    <subfield code="b">9788020435002</subfield>
+    <subfield code="f">1. vyd.</subfield>
+    <subfield code="o">20150408</subfield>
+  </datafield>
+  <datafield tag="910" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+  </datafield>
+  <datafield tag="998" ind1=" " ind2=" ">
+    <subfield code="a">002662450</subfield>
+  </datafield>
+</record>
+
+</collection>

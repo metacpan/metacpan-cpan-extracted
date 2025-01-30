@@ -2,6 +2,7 @@
     use strict;
     use warnings;
     use Math::GMPf::Random;
+    use Math::GMPf::V;
     require Exporter;
     *import = \&Exporter::import;
     require DynaLoader;
@@ -17,6 +18,7 @@
     use constant _MATH_GMP_T    => 9;
     use constant _MATH_MPC_T 	=> 10;
     use constant GMPF_PV_NV_BUG => Math::GMPf::Random::_has_pv_nv_bug();
+    use constant GMPF_WIN32_FMT_BUG => Math::GMPf::V::_buggy();
 
     # Inspired by https://github.com/Perl/perl5/issues/19550, which affects only perl-5.35.10:
     use constant ISSUE_19550    => Math::GMPf::Random::_issue_19550();
@@ -58,7 +60,7 @@ IOK_flag NOK_flag POK_flag
     );
 
     my @tagged = qw(
-GMPF_PV_NV_BUG
+GMPF_PV_NV_BUG GMPF_WIN32_FMT_BUG
 Rmpf_abs Rmpf_add Rmpf_add_ui Rmpf_ceil Rmpf_clear Rmpf_clear_mpf Rmpf_clear_ptr
 Rmpf_cmp Rmpf_cmp_d Rmpf_cmp_si Rmpf_cmp_ui Rmpf_cmp_NV Rmpf_cmp_IV
 Rmpf_deref2 Rmpf_div Rmpf_div_2exp Rmpf_div_ui
@@ -91,7 +93,7 @@ Rmpf_get_IV Rmpf_set_IV Rmpf_fits_IV_p
     );
 
     @Math::GMPf::EXPORT_OK = (@untagged, @tagged);
-    our $VERSION = '0.52';
+    our $VERSION = '0.53';
     #$VERSION = eval $VERSION;
 
     Math::GMPf->DynaLoader::bootstrap($VERSION);

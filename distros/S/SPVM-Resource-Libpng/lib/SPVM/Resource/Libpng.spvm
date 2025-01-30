@@ -2,5 +2,5 @@
 # MIT License
 
 class Resource::Libpng {
-  version "0.012";
+  version "0.013";
 }

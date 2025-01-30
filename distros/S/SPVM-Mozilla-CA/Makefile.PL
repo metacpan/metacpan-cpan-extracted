@@ -18,7 +18,7 @@ unless ($meta) {
   # Do something such as environment check.
 }
 
-my %configure_and_runtime_requires = ('SPVM' => '0.989038');
+my %configure_and_runtime_requires = ('SPVM' => '0.990042');
 WriteMakefile(
   NAME => 'SPVM::Mozilla::CA',
   VERSION_FROM => 'lib/SPVM/Mozilla/CA.pm',
@@ -33,8 +33,8 @@ WriteMakefile(
     resources => {
       repository => {
         type => 'git',
-        url  => '',
-        web  => '',
+        url  => 'https://github.com/yuki-kimoto/SPVM-Mozilla-CA.git',
+        web  => 'https://github.com/yuki-kimoto/SPVM-Mozilla-CA',
       },
     },
     no_index => {

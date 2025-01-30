@@ -75,7 +75,7 @@ SpeL::Object::Bracketconstruction - LaTeX bracketconstruction (math) object
 
 =head1 VERSION
 
-version 20241023.0918
+version 20250129.1405
 
 =head1 METHODS
 
@@ -103,7 +103,7 @@ Walter Daems <wdaems@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024 by Walter Daems.
+This software is Copyright (c) 2025 by Walter Daems.
 
 This is free software, licensed under:
 

@@ -1,7 +1,7 @@
 [![Actions Status](https://github.com/janeskil1525/Daje-Workflow-Savefile-Activity/actions/workflows/test.yml/badge.svg)](https://github.com/janeskil1525/Daje-Workflow-Savefile-Activity/actions)
 # NAME
 
-Daje::Workflow::Savefile::Activity - It's tool to save a n array of files
+Daje::Workflow::Savefile::Activity - It's a tool to save an array of files
 
 # SYNOPSIS
 

@@ -12,8 +12,10 @@ lib/App/Greple/charcode.pm
 minil.toml
 t/00_compile.t
 t/ainu.txt
+t/hello.txt
 t/homoglyph
 t/ka-ko.out
 t/ka-ko.txt
+t/vietnamese.txt
 META.yml
 MANIFEST

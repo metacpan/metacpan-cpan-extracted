@@ -3,7 +3,7 @@ package DBIx::Fast;
 use strict;
 use warnings;
 
-our $VERSION = '0.1401';
+our $VERSION = '0.1402';
 
 use Carp;
 use Moo;
@@ -103,7 +103,7 @@ sub BUILD {
   $self->_set_dsn($self->args->{dsn} ? $self->_check_dsn($self->args->{dsn}) : $self->_make_dsn($self->args));
 
   $self->db( DBIx::Connector->new( $self->dsn, 
-				   $self->args->{user}, $self->args->{password},
+				   $self->args->{Auth}->{user}, $self->args->{Auth}->{password},
 				   $self->args->{DBI} ) );
 
   $self->db->mode('ping');

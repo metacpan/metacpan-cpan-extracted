@@ -27,6 +27,6 @@ requires:
   perl: 5.10.1
 resources:
   license: http://opensource.org/licenses/gpl-license.php
-version: '2.03'
-x_module_install_rtx_version: '0.43'
+version: '2.04'
+x_module_install_rtx_version: '0.44'
 x_requires_rt: 5.0.0

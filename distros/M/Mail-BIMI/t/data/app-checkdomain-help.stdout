@@ -1,7 +1,7 @@
 05-cmd.t checkdomain [long options...] <DOMAIN>
 
 Check the BIMI assertion record for a given domain
-	--profile STR   SVG Profile to validate against
-	                (SVG_1.2_BIMI|SVG_1.2_PS|Tiny-1.2)
-	--selector STR  Optional selector
+    --profile STR   SVG Profile to validate against
+                    (SVG_1.2_BIMI|SVG_1.2_PS|Tiny-1.2)
+    --selector STR  Optional selector
 

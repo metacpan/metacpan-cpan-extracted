@@ -1,7 +1,0 @@
-format|ogg
-audiodir|spel
-chunkdir|spel
-language|english
-macad|text|1|-NoValue-|##1
-macpp|mathit|1|-NoValue-|\text{##1}
-chunk|longsubscript

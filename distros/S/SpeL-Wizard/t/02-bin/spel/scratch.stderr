@@ -1,6 +1,0 @@
-spel-wizard.pl - v0.9 - Walter Daems <walter.daems@uantwerpen.be>
-=================================================================
-- Reading configuration file from /home/wdaems/lab/spelbox/perl/.build/s6BNvykAai/blib/lib/auto/share/dist/SpeL-Wizard/tts.conf
-- no t/02-bin/spel/scratch.aux available at /home/wdaems/lab/spelbox/perl/.build/s6BNvykAai/blib/lib/SpeL/Wizard.pm line 65.
-- Treating t/02-bin/spel/spel/scratch.tex                          
-  Parsing t/02-bin/spel/spel/scratch.tex                    [  0%]

@@ -38,14 +38,14 @@ App::Greple::charcode - greple module to annotate unicode character data
 
 # VERSION
 
-Version 0.9902
+Version 0.9903
 
 # DESCRIPTION
 
 `App::Greple::charcode` displays Unicode information about the
 matched characters.  It can also visualize zero-width combining or
 hidden characters, which can be useful for examining text containing
-such characters.
+visually indistinguishable or imperceptible elements.
 
 The following output, retrieved from this document for non-ASCII
 characters (`\P{ASCII}`), shows that the character `\N{VARIATION
@@ -184,6 +184,10 @@ will be displayed in a different color.
     rightmost column; `0` means no align; if a value of `2` or greater
     is given, it aligns to that numbered column.
 
+    _column_ can be negative; if `-1` is specified, align to the same
+    column for all lines.  If `-2` is specified, align to the longest
+    line length, regardless of match position.
+
 - **--**\[**no-**\]**split**
 
     If a pattern matching multiple characters is given, annotate each
@@ -238,7 +242,6 @@ Module-specific options are specified between `-Mcharcode` and `--`.
 - **visible**
 
     (default 0)
-
     Display invisible characters in a visible string representation.
 
 - **align**=_column_

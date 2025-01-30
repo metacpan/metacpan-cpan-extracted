@@ -8,7 +8,7 @@ use Gherkin::Parser;
 use Gherkin::TokenFormatterBuilder;
 
 package App::GherkinGenerateTokens;
-$App::GherkinGenerateTokens::VERSION = '30.0.4';
+$App::GherkinGenerateTokens::VERSION = '31.0.0';
 sub run {
     my ( $class, $fh, @file_list ) = @_;
 

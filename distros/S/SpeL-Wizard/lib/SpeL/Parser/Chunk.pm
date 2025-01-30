@@ -46,8 +46,6 @@ our $elements = do {
       <objrule: SpeL::Object::ElementList = ElementList>
                 <[Element]>*
 
-      
-
       <objrule: SpeL::Object::Element = Element>
                 <!egroup> <!stray_etag>
                 (?: <MATCH=VerbatimEnv> |
@@ -379,7 +377,7 @@ our $elements = do {
 
       <rule: OptName>            [^][|\$%#_{}~^,=\s\\-]++
 
-      <rule: ComName>            [a-zA-Z@]++
+      <rule: ComName>            [a-zA-Z@]++\*?
 
       <token: Parameter>       [#]+ \d+
 
@@ -411,9 +409,9 @@ our $elements = do {
                 ( (?: [^\$%&#_{}|^\\] |
 		    \\ \& |
 		    \\ \" |
+		    \\ \, |
 		    \\ \' |
 		    \\ \` |
-		    \\ \, |
 		    \\ \{ |
                     \\ \} |
 		    \\ \$ |
@@ -514,7 +512,7 @@ our $chunk = do {
   use Regexp::Grammars;
   qr{
       #      <logfile: - >
-      # <debug: on>
+#      <debug: on>
       
       <Document> <.ws>? <Endinput>
 
@@ -564,7 +562,6 @@ sub parseDocumentString {
   }
   
   foreach my $entry (@$prepmacrolist) {
-    
     my $mac_regexp = qr/ ( \\ $entry->{macro} ) /x;
     my $optarg_regexp = qr/ (
 			      \[
@@ -789,7 +786,7 @@ SpeL::Parser::Chunk - LaTeX file parser
 
 =head1 VERSION
 
-version 20241023.0918
+version 20250129.1405
 
 =head1 METHODS
 
@@ -843,7 +840,7 @@ Walter Daems <wdaems@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024 by Walter Daems.
+This software is Copyright (c) 2025 by Walter Daems.
 
 This is free software, licensed under:
 

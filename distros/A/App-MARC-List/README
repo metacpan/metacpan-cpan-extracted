@@ -2,7 +2,7 @@ NAME
     marc-list - Script to get MARC field/subfield unique list.
 
 SYNOPSIS
-     marc-list [-h] [--version] marc_xml_file field subfield
+     marc-list [-h] [--version] marc_xml_file field [subfield]
 
 DESCRIPTION
     It supports MARC XML files now.
@@ -28,9 +28,15 @@ ARGUMENTS
 
             MARC subfield.
 
+            It's optional. Not needed for control fields. Required for data
+            fields.
+
     *       "module_version"
 
-EXAMPLE
+EXAMPLE1
+     marc-list __MARC.xml__ 008
+
+EXAMPLE2
      marc-list __MARC.xml__ 015 a
 
 REPOSITORY
@@ -42,10 +48,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2022-2024 Michal Josef Špaček
+    © 2022-2025 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.03
+    0.04
 

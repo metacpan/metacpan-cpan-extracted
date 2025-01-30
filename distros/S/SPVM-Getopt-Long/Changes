@@ -1,3 +1,7 @@
+0.003 2025-01-30
+  [Internal Changes]
+    * Use Re class instead of Regex class.
+    
 0.002 2025-01-27
   [Requirement Changes]
     * Require SPVM 0.990042.

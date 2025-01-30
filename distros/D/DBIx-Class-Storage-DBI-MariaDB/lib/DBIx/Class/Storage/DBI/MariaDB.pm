@@ -6,7 +6,7 @@ use warnings;
 use DBI;
 use base qw/DBIx::Class::Storage::DBI/;
 
-our $VERSION = '0.1.2';
+our $VERSION = '0.1.3';
 
 __PACKAGE__->sql_maker_class('DBIx::Class::SQLMaker::MySQL');
 __PACKAGE__->sql_limit_dialect('LimitXY');
@@ -175,7 +175,7 @@ sub lag_behind_master {
 }
 
 sub bind_attribute_by_data_type {
-    if ( $_[1] =~ /^(?:tiny|medium|long)blob$/i ) {
+    if ( $_[1] =~ /^(?:tiny|medium|long|)blob$/i ) {
         return DBI::SQL_BINARY;
     }
     return;
