@@ -79,6 +79,27 @@ sub doit{
 	ok(($rr cmp $b) == 0);
 
 	ok(($rr cmp $rz) == 0);
+
+	#
+	ok(BsDiPa::core_patch_zlib($a, $pz, \$rz, length($rz)) eq BsDiPa::OK);
+	ok(defined $rz);
+	ok(($rz cmp $b) == 0);
+	ok(BsDiPa::core_patch_zlib($a, $pz, \$rz, length($rz) - 1) eq BsDiPa::FBIG);
+	ok(!defined $rz);
+	ok(BsDiPa::core_patch_zlib($a, $pz, \$rz, "no") eq BsDiPa::INVAL);
+	ok(!defined $rz);
+	ok(BsDiPa::core_patch_zlib($a, $pz, \$rz, -44) eq BsDiPa::INVAL);
+	ok(!defined $rz);
+
+	ok(BsDiPa::core_patch_raw($a, $pr, \$rr, length($rr)) eq BsDiPa::OK);
+	ok(defined $rr);
+	ok(($rr cmp $b) == 0);
+	ok(BsDiPa::core_patch_raw($a, $pr, \$rr, length($rr) - 1) eq BsDiPa::FBIG);
+	ok(!defined $rr);
+	ok(BsDiPa::core_patch_raw($a, $pz, \$rr, "really not") eq BsDiPa::INVAL);
+	ok(!defined $rr);
+	ok(BsDiPa::core_patch_raw($a, $pz, \$rr, -33) eq BsDiPa::INVAL);
+	ok(!defined $rr);
 }
 
 sub ckit{

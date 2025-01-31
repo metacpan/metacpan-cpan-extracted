@@ -52,5 +52,4 @@ subtest 'validate args' => sub {
     };
 };
 
-rmtree './t/db_fixtures';
 done_testing();

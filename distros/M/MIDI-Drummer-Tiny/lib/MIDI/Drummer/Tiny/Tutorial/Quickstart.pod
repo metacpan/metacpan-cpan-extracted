@@ -12,7 +12,7 @@ MIDI::Drummer::Tiny::Tutorial::Quickstart
 
 =head1 VERSION
 
-version 0.5007
+version 0.5009
 
 =head1 Import the Module
 
@@ -37,6 +37,7 @@ version 0.5007
       reverb     => 0,
       kick       => 36, # Override default patch
       snare      => 40, # "
+      soundfont  => '/Users/you/Music/FluidR3_GM.sf2',
       verbose    => 1,
   );
 
@@ -44,53 +45,57 @@ version 0.5007
 
 =head2 Kick and snare-like things
 
-acoustic_bass, electric_bass ("kick")
+Bass drums ("kicks"):
 
-acoustic_snare, electric_snare, side_stick, clap
+  acoustic_bass & electric_bass (Generic: kick)
+
+Snare-like things:
+
+  acoustic_snare & electric_snare (Generic: snare), side_stick, clap
 
 =head2 Cymbals
 
-open_hh, closed_hh, pedal_hh
+  open_hh, closed_hh, pedal_hh
 
-crash1, crash2, splash, china
+  crash1, crash2, splash, china
 
-ride1, ride2, ride_bell
+  ride1, ride2, ride_bell
 
 =head2 Toms
 
-hi_tom, hi_mid_tom, low_mid_tom, low_tom, hi_floor_tom, low_floor_tom
+  hi_tom, hi_mid_tom, low_mid_tom, low_tom, hi_floor_tom, low_floor_tom
 
 =head2 Miscellaneous
 
-click, bell (metronome), tambourine, cowbell, vibraslap, etc.
+  click & bell (i.e. the metronome sounds), tambourine, cowbell, vibraslap, etc.
 
 =head1 Handy Duration Aliases
 
-whole, triplet_whole, dotted_whole, double_dotted_whole
+  whole, triplet_whole, dotted_whole, double_dotted_whole
 
-half, triplet_half, dotted_half, double_dotted_half
+  half, triplet_half, dotted_half, double_dotted_half
 
-quarter, triplet_quarter, dotted_quarter, double_dotted_quarter
+  quarter, triplet_quarter, dotted_quarter, double_dotted_quarter
 
-eighth, triplet_eighth, dotted_eighth, double_dotted_eighth
+  eighth, triplet_eighth, dotted_eighth, double_dotted_eighth, ...
 
-etc. up to 128th notes
+etc. down to double-dotted 128th notes!
 
 =head1 Basic Beats
 
 =head2 Rock
 
-  $d->metronome44;
+  $d->metronome3;
+  $d->metronome4;
+  $d->metronome5;
+  $d->metronome6;
+  $d->metronome7;
   # OR
-  $d->metronome44($d->bars, 1);
-
-That's it!
+  $d->metronome44($d->bars, 1); # nb: 1 is an optional flag
 
 =head2 Swing
 
-  $d->metronome44swing;
-
-That's it!
+  $d->metronome4($d->bars, $d->ride2, $d->eighth, 67);
 
 =head2 Viennese Waltz
 
@@ -99,8 +104,6 @@ That's it!
       $d->note($d->quarter, $d->ride1, $d->snare);
       $d->note($d->quarter, $d->ride1, $d->snare);
   }
-
-In 3/4 time
 
 =head2 Disco
 
@@ -119,27 +122,38 @@ This beat is extra-cheesy.
 
 =head1 And Finally...
 
-Either play the score with the built-in L<timidity++|https://timidity.sourceforge.net/|> functionality:
+Either play the score with the built-in
+L<timidity++|https://timidity.sourceforge.net/|>
+functionality, plus a defined C<soundfont>:
 
+  my $d = MIDI::Drummer::Tiny->new(
+    # ...,
+    soundfont => '/you/soundfonts/TR808.sf2',
+  );
+  # ...
   $d->play_with_timidity;
 
 Or write-out the score to a MIDI file:
 
+  my $d = MIDI::Drummer::Tiny->new(
+    # ...,
+    file => 'drums.mid',
+  );
+  # ...
   $d->write;
 
-And then play the score with timidity:
+And then play the score with timidity (where the C<cfg> file specifies
+the soundfont to be used):
 
-  > timidity drums.mid
+  > timidity -c ~/timidity.cfg -Od drums.mid
 
 You can also use the excellent, cross platform program, L<VLC|https://www.videolan.org/vlc/|>.
 
 You can also convert the MIDI file into MP3, or whatever format you like.
 
-Easy!
-
 =head1 AUTHOR
 
-Gene Boggs <gene@cpan.org>
+Gene Boggs <gene.boggs@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

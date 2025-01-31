@@ -29,6 +29,12 @@ use User::pwent;
 use Test::TempDir::Tiny;
 use Data::Record::Serialize;
 use List::Util 1.33 qw( any );
+use Path::Tiny;
+
+# for some reason during tests our new 'lib' dir does not have the
+# highest priority when Data::Record::Serialize searches for encoders,
+# and pre-installed versions of this module will get used.
+use lib Path::Tiny->cwd->child('lib');
 
 eval { require DBI; 1 }
   or plan skip_all => "Need DBI to run the DBI backend tests\n";
@@ -37,8 +43,8 @@ my @DBDs;
 
 my $DBD_SQLite_VERSION = 1.31;
 
-use constant TABLE     => 'drst-sttbl';
-use constant SQLITE_DB => 'test.db';
+use constant TABLE     => 'drst_sttbl';
+use constant SQLITE_DB => 'foo/bar/test.db';
 
 my @dsn_fields = qw(
   dbname
@@ -116,6 +122,7 @@ for my $dbinfo ( @DBDs ) {
         encode            => 'dbi',
         create_table      => !!1,
         quote_identifiers => !!1,
+        create_output_dir => !!1,
     );
     @constructor_args{ 'dsn', 'db_user', 'db_pass', 'schema', 'table' }
       = ( [ $dbd, \%dbinfo ], $user, $password, $schema, $table );
@@ -126,6 +133,7 @@ for my $dbinfo ( @DBDs ) {
     }
     else {
         $dbf      = sub { $dbinfo{dbname} };
+        clear_db( $dsn, $user, $password, $schema, $table );
         $after_cb = sub { clear_db( $dsn, $user, $password, $schema, $table ) };
         $after_cb->();
     }
@@ -317,6 +325,8 @@ sub dbi_connect {
     my ( $dsn, $user, $password, $attr ) = @_;
     my %attr = %$attr;
     $attr{syb_quoted_identifier} = 1 if $dsn =~ /^dbi:Sybase/;
+    path( SQLITE_DB )->parent->mkdir
+      if $dsn =~ /^dbi:SQLite/;
     return DBI->connect( $dsn, $user, $password, \%attr );
 }
 

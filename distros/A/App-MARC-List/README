@@ -2,19 +2,23 @@ NAME
     marc-list - Script to get MARC field/subfield unique list.
 
 SYNOPSIS
-     marc-list [-h] [--version] marc_xml_file field [subfield]
+     marc-list [-f] [-h] [--version] marc_xml_file field [subfield]
 
 DESCRIPTION
     It supports MARC XML files now.
 
 ARGUMENTS
+    *       "-f"
+
+            Print frequency.
+
     *       "-h"
 
-             Print help.
+            Print help.
 
     *       "--version"
 
-             Print version of script.
+            Print version of script.
 
     *       "marc_xml_file"
 
@@ -53,5 +57,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.04
+    0.05
 

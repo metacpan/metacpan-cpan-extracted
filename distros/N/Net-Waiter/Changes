@@ -1,5 +1,17 @@
 Revision history for Perl extension Net::Waiter
 
+1.18  2025-01-31
+
+    1. fixed allocation and release of nested shared memory segments 
+       for nested hash structures. this is not documented in IPC::Shareable.
+       if forked processes access shared hash and create nested hashref, it 
+       will create new shared memory segment with different owner and will
+       not be released by the parent process. so here it is preinitialised
+       explicitly.
+       
+    2. forked and preforked processes will also explicitly attach to existing
+       shared memory, expected to be created by the parnet process in advance.   
+
 1.17  2025-01-25
 
     1. added stop_all_kids() and optimizing restart and shutdown logic.

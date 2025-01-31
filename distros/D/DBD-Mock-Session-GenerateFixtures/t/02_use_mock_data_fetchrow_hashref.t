@@ -21,12 +21,12 @@ chomp $sql;
 
 my $expected = [
         {
-          'id' => 1,
-          'media_type' => 'video'
+          'id' => 2,
+          'media_type' => 'audio'
         },
         {
-          'media_type' => 'audio',
-          'id' => 2
+          'media_type' => 'video',
+          'id' => 1
         }
     ];
 
@@ -47,12 +47,12 @@ subtest 'preapare and execute with data from test' => sub {
    {
       "results" => [
          [
-            1,
-            "video"
-         ],
-         [
             2,
             "audio"
+         ],
+         [
+            1,
+            "video"
          ]
       ],
       "col_names" => [ "id", "media_type" ],
@@ -105,23 +105,21 @@ subtest 'Use named binds to bind parameters' => sub {
 
 subtest 'no bind params' => sub {
     
-    my $sth = $dbh->prepare('SELECT * FROM media_types');
+    my $sth = $dbh->prepare('SELECT * FROM media_types order by id');
     $sth->execute();
     my $got = [];
-    my $expected = [
-          {
-            'media_type' => 'video',
-            'id' => 1
-          },
-          {
-            'id' => 2,
-            'media_type' => 'audio'
-          },
-          {
-            'media_type' => 'image',
-            'id' => 3
-          }
-        ];
+    my $expected = [{
+			'media_type' => 'video',
+			'id'         => 1
+		},
+		{
+			'id'         => 2,
+			'media_type' => 'audio'
+		},
+		{
+			'media_type' => 'image',
+			'id'         => 3
+		}];
  
     while (my $row = $sth->fetchrow_hashref()) {
         push @{$got}, $row;

@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Glorified metronome",
-  "AUTHOR" => "Gene Boggs <gene\@cpan.org>",
+  "AUTHOR" => "Gene Boggs <gene.boggs\@gmail.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.5007",
+  "VERSION" => "0.5009",
   "test" => {
     "TESTS" => "t/*.t"
   }

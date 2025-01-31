@@ -62,7 +62,7 @@ use strict;
 use warnings;
 
 # The version of this module!
-our $VERSION = "1.10";
+our $VERSION = "1.11";
 
 use File::Basename;
 use File::Copy;
@@ -2206,7 +2206,7 @@ sub find_values
 
 #######################################
 
-=item @list = $cfg->find_sections ( $patern );
+=item @list = $cfg->find_sections ( $pattern );
 
 It returns a list of all section names which match this pattern.
 

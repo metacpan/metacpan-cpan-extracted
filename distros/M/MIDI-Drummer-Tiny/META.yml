@@ -1,7 +1,7 @@
 ---
 abstract: 'Glorified metronome'
 author:
-  - 'Gene Boggs <gene@cpan.org>'
+  - 'Gene Boggs <gene.boggs@gmail.com>'
 build_requires:
   File::Spec: '0'
   IO::Handle: '0'
@@ -36,7 +36,7 @@ requires:
 resources:
   homepage: https://github.com/ology/MIDI-Drummer-Tiny
   repository: https://github.com/ology/MIDI-Drummer-Tiny.git
-version: '0.5007'
+version: '0.5009'
 x_Dist_Zilla:
   perl:
     version: '5.040000'

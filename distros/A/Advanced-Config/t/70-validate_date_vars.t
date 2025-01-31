@@ -188,11 +188,13 @@ sub my_validation
       my $val3 = (defined $val2) ? $val2 : "";
       my $chk  = (defined $val2) && $val1 eq $val2;
 
-      # If we're unlucky, the timestamps can be a second off ...
+      # If we're unlucky, the timestamps can be several seconds off ...
       my $ts   = ( $_ =~ m/^[12]_timestamp$/ ) ? 1 : 0;
+      # if ($ts) { sleep(1); }
+
       if ( $ts && $val2 && ! $chk ) {
          my $diff = $val1 - $val2;
-         $chk = 1  if ( $diff <= 2 );
+         $chk = 1  if ( $diff <= 20 );
          DBUG_PRINT ("CHECK", "Checking if the timestamps are close enough! (%s) diff: %d", $val1, $diff);
       }
 
@@ -219,18 +221,20 @@ sub my_load_config
 
    DBUG_PAUSE ()   if ( $pause );
 
+   my $sep = (defined $dopts && exists $dopts->{date_sep}) ? $dopts->{date_sep} : "default";
+
    my $cfg;
    eval {
       $cfg = Advanced::Config->new ($file, $ropts, $gopts, $dopts);
       dbug_isa_ok ($cfg, 'Advanced::Config');
       my $ldr = $cfg->load_config ();
-      dbug_ok (defined $ldr, "Advanced::Config object has been loaded into memory!");
+      dbug_ok (defined $ldr, "Advanced::Config object has been loaded into memory!  [sep: ($sep)]");
    };
    if ( $@ ) {
       unless (defined $cfg) {
          dbug_isa_ok ($cfg, 'Advanced::Config');
       }
-      dbug_ok (0, "Advanced::Config object has been loaded into memory!");
+      dbug_ok (0, "Advanced::Config object has been loaded into memory!  [sep: ($sep)]");
       DBUG_LEAVE (3);
    }
 
@@ -246,7 +250,7 @@ sub init_validation_hash
 {
    DBUG_ENTER_FUNC (@_);
    my $dates_1 = shift;    # A hash reference ...
-   my $dates_2 = shift;    # An opional hash reference ...
+   my $dates_2 = shift;    # An optional hash reference ...
 
    my $total = 0;
    my %vars;

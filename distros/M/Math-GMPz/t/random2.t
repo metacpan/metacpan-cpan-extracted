@@ -1,12 +1,23 @@
+# Same as random3.t, but uses a different syntax (that doesn't port back
+# beyond perl-5.14) to create the Number package.
+
 # The following assignments to $second triggered an error in Math-GMPz-0.59.
 # Unfortunately, there were no tests in the test suite to detect those failures.
 # This script, which does detect the problem, was provided by Trizen. (Slightly
 # modified and expanded by sisyhpus.)
 # See https://github.com/sisyphus/math-gmpz/issues/5
 
-use 5.010;
 use Math::GMPz;
 use Test::More;
+
+BEGIN {
+  if($] < 5.014) {
+    warn "Skipping all tests - version 5.14.0 or later required\n";
+    is(1, 1,);
+    done_testing();
+    exit 0;
+  }
+};
 
 package Number {
 

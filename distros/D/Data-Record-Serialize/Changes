@@ -1,3 +1,14 @@
+2.00      2025-01-30 16:44:03-05:00 America/New_York
+
+  [API CHANGE]
+
+    * combined encoders and sinks must provide a close method.
+
+  [ENHANCEMENT]
+
+    * The Stream sink takes a 'create_output_dir' argument which, if true,
+      will create the directory containing the output file.
+
 1.07      2024-11-22 12:08:00-05:00 America/New_York
 
   [ENHANCEMENT]

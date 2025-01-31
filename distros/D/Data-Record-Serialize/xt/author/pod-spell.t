@@ -12,7 +12,6 @@ all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
 Astrophysical
 Base
-DSN
 Data
 Default
 Diab
@@ -30,18 +29,11 @@ Stream
 Types
 Util
 array
-bitbucket
-d'etre
 ddump
 djerius
-fh
 json
 lib
-msg
 null
-numified
-raison
 rdb
 stream
-truthy
 yaml

@@ -6,7 +6,7 @@ use v5.12;
 use strict;
 use warnings;
 
-our $VERSION = '1.07';
+our $VERSION = '2.00';
 
 use Exporter::Shiny qw( error );
 
@@ -95,7 +95,7 @@ __END__
 
 =pod
 
-=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory msg
 
 =head1 NAME
 
@@ -103,7 +103,7 @@ Data::Record::Serialize::Error - Error objects
 
 =head1 VERSION
 
-version 1.07
+version 2.00
 
 =head1 SYNOPSIS
 

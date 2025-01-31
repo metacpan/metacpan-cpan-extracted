@@ -6,7 +6,7 @@ use v5.12;
 use strict;
 use warnings;
 
-our $VERSION = '1.07';
+our $VERSION = '2.00';
 
 use Data::Record::Serialize::Error { errors => [qw( internal  )] }, -all;
 
@@ -16,7 +16,10 @@ use namespace::clean;
 
 ## no critic ( Subroutines::ProhibitBuiltinHomonyms )
 ## no critic(BuiltinFunctions::ProhibitComplexMappings)
-## no critic( NamingConventions::ProhibitAmbiguousNames )
+
+# These are not used for a combined encoder and sink; if
+# they are called it's an internal error, so create versions
+# to catch them.
 
 sub say;
 sub print;
@@ -26,8 +29,6 @@ sub encode;
     my $stub = $_;
     sub { error( 'internal', "internal error: stub method <$stub> invoked" ) }
 } qw( say print encode );
-
-sub close { }
 
 with 'Data::Record::Serialize::Role::Sink';
 with 'Data::Record::Serialize::Role::Encode';
@@ -56,7 +57,7 @@ Data::Record::Serialize::Role::EncodeAndSink - Both an Encode and Sink. handle u
 
 =head1 VERSION
 
-version 1.07
+version 2.00
 
 =head1 INTERNALS
 

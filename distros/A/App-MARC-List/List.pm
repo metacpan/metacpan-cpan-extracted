@@ -11,7 +11,7 @@ use List::MoreUtils qw(uniq);
 use MARC::File::XML (BinaryEncoding => 'utf8', RecordFormat => 'MARC21');
 use Unicode::UTF8 qw(decode_utf8 encode_utf8);
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Constructor.
 sub new {
@@ -33,17 +33,19 @@ sub run {
 
 	# Process arguments.
 	$self->{'_opts'} = {
+		'f' => 0,
 		'h' => 0,
 	};
-	if (! getopts('h', $self->{'_opts'})
+	if (! getopts('fh', $self->{'_opts'})
 		|| $self->{'_opts'}->{'h'}
 		|| @ARGV < 2) {
 
-		print STDERR "Usage: $0 [-h] [--version] marc_xml_file field [subfield]\n";
+		print STDERR "Usage: $0 [-f] [-h] [--version] marc_xml_file field [subfield]\n";
+		print STDERR "\t-f\t\tPrint frequency.\n";
 		print STDERR "\t-h\t\tPrint help.\n";
 		print STDERR "\t--version\tPrint version.\n";
 		print STDERR "\tmarc_xml_file\tMARC XML file.\n";
-		print STDERR "\tfield\t\tMARC field.\n";
+		print STDERR "\tfield\t\tMARC field (field number or 'leader' string).\n";
 		print STDERR "\tsubfield\tMARC subfield (for datafields).\n";
 		return 1;
 	}
@@ -51,7 +53,14 @@ sub run {
 	$self->{'_marc_field'} = shift @ARGV;
 	$self->{'_marc_subfield'} = shift @ARGV;
 
-	if (int($self->{'_marc_field'}) > 9
+	if ($self->{'_marc_field'} ne 'leader'
+		&& $self->{'_marc_field'} !~ m/^\d+$/ms) {
+
+		err "Bad field definition. Must be a 'leader' or numeric value of the field.";
+	}
+
+	if ($self->{'_marc_field'} ne 'leader'
+		&& int($self->{'_marc_field'}) > 9
 		&& ! defined $self->{'_marc_subfield'}) {
 
 		err 'Subfield is required.';
@@ -80,18 +89,21 @@ sub run {
 		}
 		$previous_record = $record;
 
-		my @fields = $record->field($self->{'_marc_field'});
-		foreach my $field (@fields) {
-			if (defined $self->{'_marc_subfield'}) {
-				my @subfield_values = $field->subfield($self->{'_marc_subfield'});
-				foreach my $subfield_value (@subfield_values) {
-					if (! exists $ret_hr->{$subfield_value}) {
-						$ret_hr->{$subfield_value} = $subfield_value;
+		if ($self->{'_marc_field'} eq 'leader') {
+			my $leader = $record->leader;
+			$ret_hr->{"'".$leader."'"}++;
+		} else {
+			my @fields = $record->field($self->{'_marc_field'});
+			foreach my $field (@fields) {
+				if (defined $self->{'_marc_subfield'}) {
+					my @subfield_values = $field->subfield($self->{'_marc_subfield'});
+					foreach my $subfield_value (@subfield_values) {
+						$ret_hr->{$subfield_value}++;
 					}
+				} else {
+					my $data = $field->data;
+					$ret_hr->{$data}++;
 				}
-			} else {
-				my $data = $field->data;
-				$ret_hr->{$data} = $data;
 			}
 		}
 		$num++;
@@ -99,7 +111,12 @@ sub run {
 
 	# Print out.
 	if (%{$ret_hr}) {
-		print join "\n", map { encode_utf8($_) } uniq sort keys %{$ret_hr};
+		if ($self->{'_opts'}->{'f'}) {
+			print join "\n", reverse sort map { encode_utf8($ret_hr->{$_}.' '.$_) }
+				keys %{$ret_hr};
+		} else {
+			print join "\n", map { encode_utf8($_) } sort keys %{$ret_hr};
+		}
 		print "\n";
 	}
 	
@@ -151,6 +168,7 @@ Returns 1 for error, 0 for success.
                  Unknown parameter '%s'.
 
  run():
+         Bad field definition. Must be a 'leader' or numeric value of the field.
          Subfield is required.
 
 =head1 EXAMPLE
@@ -340,6 +358,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

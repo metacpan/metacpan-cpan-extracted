@@ -5,7 +5,7 @@ package Data::Record::Serialize::Role::Default;
 use v5.12;
 use Moo::Role;
 
-our $VERSION = '1.07';
+our $VERSION = '2.00';
 
 use Hash::Util qw[ hv_store ];
 use Ref::Util  qw[ is_coderef ];
@@ -177,7 +177,7 @@ Data::Record::Serialize::Role::Default - Default methods for Data::Record::Seria
 
 =head1 VERSION
 
-version 1.07
+version 2.00
 
 =head1 DESCRIPTION
 

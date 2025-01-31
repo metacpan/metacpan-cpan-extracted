@@ -2,7 +2,7 @@
  *
  * SPDX-License-Identifier: BSD-2-Clause
  *
- * Copyright (c) 2024 Steffen Nurpmeso <steffen@sdaoden.eu>.
+ * Copyright (c) 2024 - 2025 Steffen Nurpmeso <steffen@sdaoden.eu>.
  * (Only technical surroundings, algorithm is solely Colin Percival.)
  *
  * Copyright 2003-2005 Colin Percival
@@ -192,9 +192,16 @@ s_bsdipa_patch(struct s_bsdipa_patch_ctx *pcp){
 	/* The effective limit is smaller, but that is up to diff generation: "just do it" */
 	if(pcp->pc_after_len >= s_BSDIPA_OFF_MAX)
 		goto jleave;
-	if(pcp->pc_header.h_before_len >= s_BSDIPA_OFF_MAX)
+
+	/* (We document "no verification if patch_dat!=NULL case", and parse_header() already tested that, but..) */
+	if(pcp->pc_header.h_before_len < 0 || pcp->pc_header.h_before_len >= s_BSDIPA_OFF_MAX)
 		goto jleave;
 
+	if(pcp->pc_max_allowed_restored_len != 0 &&
+			pcp->pc_max_allowed_restored_len < (uint64_t)pcp->pc_header.h_before_len){
+		rv = s_BSDIPA_FBIG;
+		goto jleave;
+	}
 	pcp->pc_restored_len = pcp->pc_header.h_before_len;
 
 	/* Ensure room for one additional byte, as documented. */

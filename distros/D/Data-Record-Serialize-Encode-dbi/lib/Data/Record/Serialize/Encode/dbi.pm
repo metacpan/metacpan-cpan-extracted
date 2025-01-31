@@ -18,7 +18,7 @@ use Data::Record::Serialize::Error {
   },
   -all;
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 use Data::Record::Serialize::Types -types;
 
@@ -110,6 +110,20 @@ has drop_table => (
     isa     => Bool,
     default => 0,
 );
+
+
+
+
+
+
+
+has create_output_dir => (
+    is      => 'ro',
+    isa     => Bool,
+    default => 0,
+);
+
+
 
 
 
@@ -302,14 +316,19 @@ has _dsn_components => (
     is       => 'lazy',
     init_arg => undef,
     builder  => sub {
-        my @dsn = DBI->parse_dsn( $_[0]->dsn )
+        my %dsn;
+        @dsn{ 'scheme', 'driver', 'attr_string', 'attr_hash', 'driver_dsn' } = DBI->parse_dsn( $_[0]->dsn )
           or error( 'param', 'unable to parse DSN: ', $_[0]->dsn );
-        \@dsn;
+
+        my @driver_dsn = split( /;/, $dsn{driver_dsn} );
+        my %driver_dsn = map { split( /=/, $_, 2 ) } @driver_dsn;
+        $dsn{driver_dsn} = \%driver_dsn;
+        \%dsn;
     },
 );
 
 sub _dbi_driver {
-    $_[0]->_dsn_components->[1];
+    $_[0]->_dsn_components->{driver};
 }
 
 my %producer = (
@@ -331,13 +350,22 @@ has _producer => (
     },
 );
 
+has _is_file_based => (
+    is       => 'lazy',
+    init_arg => undef,
+    builder  => sub {
+        my $dbi_driver = $_[0]->_dbi_driver;
+        return $dbi_driver eq 'SQLite';
+    },
+);
 
 
 
 
 
 
-sub setup {
+
+sub setup {    ## no critic (Subroutines::ProhibitExcessComplexity)
     my $self = shift;
 
     return if $self->_has_dbh;
@@ -357,6 +385,15 @@ sub setup {
     }
 
     my $connect = $self->_cached ? 'connect_cached' : 'connect';
+
+    if ( $self->create_output_dir && $self->_is_file_based ) {
+        my $dbname = $self->_dsn_components->{driver_dsn}{dbname}
+          // error( 'param', "unable to parse dbname from DSN (@{[ $self->dsn ]}) to create output dir" );
+
+        require Path::Tiny;
+        my $dir = Path::Tiny::path( $dbname )->parent;
+        eval { $dir->mkdir; } or error( '::create', "unable to create output directory '$dir': $@" );
+    }
 
     $self->_set__dbh( DBI->$connect( $self->dsn, $self->db_user, $self->db_pass, \%attr ) )
       or error( 'connect', 'error connecting to ', $self->dsn, "\n" );
@@ -730,7 +767,7 @@ Data::Record::Serialize::Encode::dbi - store a record in a database
 
 =head1 VERSION
 
-version 1.06
+version 1.07
 
 =head1 SYNOPSIS
 
@@ -807,6 +844,10 @@ The value passed to the constructor.
 The value passed to the constructor.
 
 =head2 C<drop_table>
+
+The value passed to the constructor.
+
+=head2 create_output_dir
 
 The value passed to the constructor.
 
@@ -991,6 +1032,15 @@ It will be created if it does not exist.
 =item C<schema>
 
 The schema to which the table belongs.  Optional.
+
+=item C<create_output_dir>
+
+Some databases are accessed directly as files (e.g. SQLite).  Normally those files
+are created by the database backend, but the directory containing the files may not be.  If this
+flag is true, the directory which will contain the database file is created.  This flag is
+ignored for non file-based backends.
+
+Defaults to false.
 
 =item C<drop_table>
 

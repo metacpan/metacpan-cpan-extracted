@@ -12,7 +12,7 @@ MIDI::Drummer::Tiny::Tutorial::Basics
 
 =head1 VERSION
 
-version 0.5007
+version 0.5009
 
 =head1 Methods and Techniques
 
@@ -106,11 +106,9 @@ These are the time signature, beats per minute, MIDI channel, and the volume.
   $d->set_volume;      # set to 0 - mute
   $d->set_volume(127); # or any number up to 127
 
-=cut
-
 =head1 AUTHOR
 
-Gene Boggs <gene@cpan.org>
+Gene Boggs <gene.boggs@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

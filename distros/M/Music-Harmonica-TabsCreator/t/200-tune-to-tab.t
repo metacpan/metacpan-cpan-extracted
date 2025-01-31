@@ -43,4 +43,8 @@ is({ tune_to_tab('CDEGA>F#>>C') }->{melody_maker}, { G => [[1, -1, 2, -2, 3, -5,
   ok(exists $t{harmonic_minor});
 }
 
+is({ tune_to_tab('C D Db E Gb', tunings => ['solo_16']) }->{solo_16}, { C => [['1', '-1', '(1)', '2', '(-2)']] });
+is({ tune_to_tab('C D Db E Gb', tunings => ['solo_16'], preferred_key => 'E#') }->{solo_16}, { F => [['3', '-3', '(3)', '-4', '(5)']] });
+is({ tune_to_tab('C > C > C > C > C D', tunings => ['solo_16']) }->{solo_16}, { C => [['1°', '1', '5', '9', '12', '(-12)' ]] });
+
 done_testing;

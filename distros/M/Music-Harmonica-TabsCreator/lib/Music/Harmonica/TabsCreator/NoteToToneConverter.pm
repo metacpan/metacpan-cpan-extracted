@@ -8,7 +8,7 @@ use utf8;
 use List::Util qw(any);
 use Readonly;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 # This class converts written note (accepting various syntax for the notes) into
 # tones (degrees) relative to the key of C4.
@@ -147,7 +147,7 @@ sub convert ($self, $symbols) {
     }
 
     # TODO: Support specifying the key with a note name, e.g. KF#.
-    if ($symbols =~ m/\GK(b{0,7}|#{0,7})?/gc) {
+    if ($symbols =~ m/\GK(b{1,7}|#{0,7})?/gc) {
       $self->{key} = $SIGNATURE_TO_KEY{$1};
       next;
     }

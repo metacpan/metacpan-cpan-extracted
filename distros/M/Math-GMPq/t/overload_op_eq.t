@@ -6,7 +6,8 @@
 # to a true value.
 # A fatal error occurs if $Math::GMPq::RETYPE is
 # set to a false value. The initial value of
-# $Math::GMPq::RETYPE is 0 (false).
+# $Math::GMPq::RETYPE is now 1 (true), but was 0
+# in Math-GMPq-0.56 and earlier.
 
 use strict;
 use warnings;
@@ -22,7 +23,9 @@ my $q  = Math::GMPq->new('1/11');
 my $fr = 0;
 $fr = Math::MPFR->new(17.1) if $have_mpfr;
 
-cmp_ok($Math::GMPq::RETYPE, '==', 0, "retyping not allowed");
+cmp_ok($Math::GMPq::RETYPE, '==', 1, "retyping allowed");
+
+$Math::GMPq::RETYPE = 0; # Disallow retyping
 
 eval {$q *= $fr;};
 if(ref($fr)) {

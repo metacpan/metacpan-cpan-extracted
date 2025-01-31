@@ -6,7 +6,8 @@
 # if $Math::GMPz::RETYPE is set to a true value.
 # Else a fatal error occurs if $Math::GMPz::RETYPE
 # is set to a false value. The initial value of
-# $Math::GMPz::RETYPE is 0 (false).
+# $Math::GMPz::RETYPE is now 1, but was 0 in
+# Math-GMPz-0.61 and earlier.
 
 use strict;
 use warnings;
@@ -33,7 +34,9 @@ $fr = Math::MPFR->new(17.1) if $have_mpfr;
 eval {$z1 /= 0;};
 like($@, qr/^Division by 0 not allowed/, 'division by 0 is illegal');
 
-cmp_ok($Math::GMPz::RETYPE, '==', 0, "retyping not allowed");
+cmp_ok($Math::GMPz::RETYPE, '==', 1, "retyping allowed");
+
+$Math::GMPz::RETYPE = 0;
 
 eval {$z1 *= $q;};
 if(ref($q)) {
@@ -117,7 +120,7 @@ else {
 $Math::GMPz::RETYPE = 1;
 
 if($have_gmpq) {
-  if($Math::GMPq::VERSION < 0.35) {
+  if($Math::GMPq::VERSION < 0.43) {
     warn "\n  Skipping Math::GMPq tests -  Math::GMPq version 0.35(or later)\n" .
           "  is needed. We have only version $Math::GMPq::VERSION\n";
   }

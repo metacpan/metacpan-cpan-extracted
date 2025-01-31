@@ -1,5 +1,10 @@
 Revision history for Perl extension App-Greple-charcode
 
+0.9904 2025-01-31T02:50:15Z
+
+    - check multiple callback function call
+    - use Text::ANSI::Fold@2.29
+
 0.9903 2025-01-29T17:41:47Z
 
     - update default to column=1,visible=1,name=1

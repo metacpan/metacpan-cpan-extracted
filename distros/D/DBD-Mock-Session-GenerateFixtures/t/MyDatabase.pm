@@ -7,7 +7,11 @@ use warnings;
 use DBI;
 use Carp 'croak';
 use Exporter::NoWork;
+use Rose::DB::Object::Loader;
+
+use DB;
 use autodie;
+
 sub db_handle {
 	my $db_file = shift
 		or croak "db_handle() requires a database name";
@@ -27,6 +31,27 @@ sub db_handle {
 
 
 	return $dbh;
+}
+
+sub build_rose_db {
+
+
+	my $db = DB->new(
+		domain => 'development',
+		type   => 'main'
+	) or die 'can not generetae db oject';
+	my $dbh = $db->dbh();
+
+
+	my $loader = Rose::DB::Object::Loader->new(
+		db           => $db,
+		class_prefix => 'DB'
+	) or die "Failed to create loader: $@";
+	#die 'aici';
+	$loader->make_modules(module_dir => './t') or die 'Failed to make classes:';
+
+	return ($db, $dbh);
+
 }
 
 sub build_tests_db {

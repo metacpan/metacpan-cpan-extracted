@@ -4,6 +4,7 @@ Makefile.PL
 GMPz.pm
 GMPz.pod
 math_gmpz_include.h
+math_gmpz_unused.h
 GMPz.xs
 V/V.xs
 V/V.pm
@@ -26,6 +27,7 @@ t/alloc.t
 t/arith.t
 t/bits.t
 t/bitwise.t
+t/bitwise_lvalue.t
 t/cmp.t
 t/cmp_q.t
 t/constants.t
@@ -42,6 +44,9 @@ t/power.t
 t/primes.t
 t/random.t
 t/random2.t
+t/random3.t
+t/snprintf.t
+t/sprintf.t
 t/theoretic.t
 t/div2.t
 t/divby0.t

@@ -11,6 +11,8 @@ sub send {
     push @{ $self->output }, @_;
 }
 
+sub close { }
+
 with 'Data::Record::Serialize::Role::EncodeAndSink';
 
 1;

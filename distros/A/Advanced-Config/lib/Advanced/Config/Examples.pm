@@ -13,7 +13,7 @@ use Exporter;
 
 use Fred::Fish::DBUG 2.09  qw / on_if_set  ADVANCED_CONFIG_FISH /;
 
-$VERSION   = "1.10";
+$VERSION   = "1.11";
 @ISA       = qw ( Exporter );
 @EXPORT    = qw ();
 @EXPORT_OK = qw ();

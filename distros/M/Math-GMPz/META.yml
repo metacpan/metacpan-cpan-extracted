@@ -22,5 +22,5 @@ no_index:
     - inc
 resources:
   repository: https://github.com/sisyphus/math-gmpz.git
-version: '0.61'
+version: '0.62'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

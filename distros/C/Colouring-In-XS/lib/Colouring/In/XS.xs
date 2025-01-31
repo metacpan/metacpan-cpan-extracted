@@ -37,6 +37,7 @@ static SV * new (SV * class, HV * hash) {
 }
 
 static AV * colour_array (SV * self) {
+	dTHX;
 	AV * colour = (AV*)SvRV(*hv_fetch((HV*)SvRV(self), "colour", 6, 0));
 
 	SV * r = *av_fetch(colour, 0, 0);
@@ -59,13 +60,14 @@ static AV * colour_array (SV * self) {
 }
 
 void croak_message (char * key, char * fb) {
+	dTHX;
 	if (hv_exists(MESSAGES, key, strlen(key))) {
 		SV * msg  = *hv_fetch(MESSAGES, key, strlen(key), 0);
 		if (SvTRUE(msg)) {
 			fb = SvPV_nolen(msg);
 		}
 	}
-	croak(fb);
+	croak("%s", fb);
 }
 
 static double min (double first, double second) {
@@ -177,28 +179,19 @@ int hex2int(char *hex) {
 	return val;
 }
 
-char * int2hex(int value) {
-	int buffer[2];
-	int a = value&16;
-	int b = (value>>4)&16;
-	buffer[0] = (a<10)?'0'+a:'A'-(a-10);
-	buffer[1] = (b<10)?'0'+b:'A'-(b-10);
-	return buffer;
-}
-
 static SV * hex2rgb (char * colour) {
 	dTHX;
 	AV * color = newAV();
 	int l = strlen(colour);
 	if (l == 3) {
 		for (int i = 0; i < 3; i++) {
-			char * hex[2];
+			char * hex = malloc(sizeof(char)*22);
 			sprintf(hex, "%c%c", colour[i], colour[i]);
 			av_push(color, newSViv(hex2int(hex)));
 		}
 	} else if (l == 6) {
 		for (int i = 0; i < 6; i += 2) {
-			char * hex[2];
+			char * hex = malloc(sizeof(char)*22);;
 			sprintf(hex, "%c%c", colour[i], colour[i + 1]);
 			av_push(color, newSViv(hex2int(hex)));
 		}
@@ -212,7 +205,7 @@ static AV * numbers (char * colour) {
 	dTHX;
 	AV * color = newAV();
 	int len = strlen(colour);
-	char * temp[5] = {};
+	char * temp = malloc(sizeof(char)*6);
 	for (int i = 0; i < len; i++) {
 		if ((colour[i] >= '0' && colour[i] <= '9')) {
 			sprintf(temp, "%s%c", temp, colour[i]);
@@ -269,6 +262,7 @@ static SV * convertColour (char * colour) {
 		return hsl2rgb(h, s, l, a);
 	}
 	croak_message("INVALID_COLOUR", "Cannot convert the colour format");
+	return newSVpv("never", 5);
 }
 
 static void sprintf_colour (SV * self, char * css, char * pattern) {
@@ -282,9 +276,8 @@ static void sprintf_colour (SV * self, char * css, char * pattern) {
 	sprintf(css, pattern, colour[0], colour[1], colour[2]);
 }
 
-static char * sprintf_rgba (SV * self) {
+static void sprintf_rgba (SV * self, char * css) {
 	dTHX;
-	char * css[22];
 	int colour[3] = { 255, 255, 255 };
 	AV * color = colour_array(self);
 	double alpha = SvNV(*hv_fetch((HV*)SvRV(self), "alpha", 5, 0));
@@ -293,10 +286,10 @@ static char * sprintf_rgba (SV * self) {
 	colour[1] = len >= 1 ? SvIV(*av_fetch(color, 1, 0)) : 255;
 	colour[2] = len >= 2 ? SvIV(*av_fetch(color, 2, 0)) : 255;
 	sprintf(css, "rgba(%d,%d,%d,%.2g)", colour[0], colour[1], colour[2], alpha);
-	return css;
 }
 
 static struct HS rgb2hs (SV * self) {
+	dTHX;
 	struct HS hs;
 	AV * color = colour_array(self);
 	int len = av_len(color);
@@ -310,6 +303,7 @@ static struct HS rgb2hs (SV * self) {
 }
 
 static struct HSL asHSL (SV * self) {
+	dTHX;
 	struct HS hs = rgb2hs(self);
 
 	hs.l = ( hs.max + hs.min ) / 2;
@@ -351,6 +345,50 @@ static SV * new_color (SV * class, SV * colour, SV * a) {
 	}
 	hv_store(hash, "alpha", 5, numIs(a) ? newSVsv(a) : newSViv(1), 0);
 	return new(class, hash);
+}
+
+static SV * mix (SV * colour1, SV * colour2, int weight) {
+	dTHX;
+
+	SV * class = newSVpv("Colouring::In::XS", 17);
+	if (SvTYPE(colour1) == SVt_PV) {
+		colour1 = new_color(class, colour1, newSVnv(1));
+	}
+	if (SvTYPE(colour2) == SVt_PV) {
+		colour2 = new_color(class, colour2, newSVnv(1));
+	}
+	struct HSL hsl1 = asHSL(colour1);
+	struct HSL hsl2 = asHSL(colour2);
+
+	double w = weight / 100.;
+
+	double a = hsl1.a - hsl2.a;
+
+	w = (w * 2) - 1;
+	double w1 = (((w * a == -1) ? w : (w + a) / ( 1 + w * a )) + 1 ) / 2;
+	double w2 = 1 - w1;
+
+	AV * c = newAV();
+
+	AV * c1 = (AV*)SvRV(*hv_fetch((HV*)SvRV(colour1), "colour", 6, 0));
+	AV * c2 = (AV*)SvRV(*hv_fetch((HV*)SvRV(colour2), "colour", 6, 0));
+
+	double r1 = SvNV(*av_fetch(c1, 0, 0));
+	double g1 = SvNV(*av_fetch(c1, 1, 0));
+	double b1 = SvNV(*av_fetch(c1, 2, 0));
+	double a1 = SvNV(*hv_fetch((HV*)SvRV(colour1), "alpha", 5, 0));
+
+	double r2 = SvNV(*av_fetch(c2, 0, 0));
+	double g2 = SvNV(*av_fetch(c2, 1, 0));
+	double b2 = SvNV(*av_fetch(c2, 2, 0));
+	double a2 = SvNV(*hv_fetch((HV*)SvRV(colour2), "alpha", 5, 0));
+
+	
+	av_push(c, newSVnv((r1 * w1) + (r2 * w2)));
+	av_push(c, newSVnv((g1 * w1) + (g2 * w2)));
+	av_push(c, newSVnv((b1 * w1) + (b2 * w2)));
+
+	return new_color(class, newRV_noinc((SV*)c), newSVnv((a1 * w) + (a2 * 1 - w)));
 }
 
 
@@ -462,8 +500,8 @@ toCSS(self, ...)
 			}
 			RETVAL = newSVpvn(css, strlen(css));
 		} else {
-			char * css;
-			css = sprintf_rgba(self);
+			char * css = malloc(sizeof(char)*22);
+			sprintf_rgba(self, css);
 			RETVAL = newSVpvn(css, strlen(css));
 		}
 	OVERLOAD: \"\"
@@ -474,7 +512,7 @@ SV *
 toTerm(self)
 	SV * self
 	CODE:
-		char * css[12];
+		char * css = malloc(sizeof(char)*12);
 		sprintf_colour(self, css, "r%dg%db%d");
 		RETVAL = newSVpvn(css, strlen(css));
 	OUTPUT:
@@ -484,7 +522,7 @@ SV *
 toOnTerm(self)
 	SV * self
 	CODE:
-		char * css[15];
+		char * css = malloc(sizeof(char)*15);
 		sprintf_colour(self, css, "on_r%dg%db%d");
 		RETVAL = newSVpvn(css, strlen(css));
 	OUTPUT:
@@ -496,10 +534,11 @@ toRGB(self, ...)
 	CODE:
 		SV * alpha = *hv_fetch((HV*)SvRV(self), "alpha", 5, 0);
 		if (numIs(alpha) && SvIV(alpha) != 1) {
-			char * css = sprintf_rgba(self);
+			char * css = malloc(sizeof(char)*22);
+			sprintf_rgba(self, css);
 			RETVAL = newSVpvn(css, strlen(css));
 		} else {
-			char * css[15];
+			char * css = malloc(sizeof(char)*24);
 			sprintf_colour(self, css, "rgb(%d,%d,%d)");
 			RETVAL = newSVpvn(css, strlen(css));
 		}
@@ -510,8 +549,8 @@ SV *
 toRGBA(self, ...)
 	SV * self
 	CODE:
-		char * css;
-		css = sprintf_rgba(self);
+		char * css = malloc(sizeof(char)*22);
+		sprintf_rgba(self, css);
 		RETVAL = newSVpvn(css, strlen(css));
 	OUTPUT:
 		RETVAL
@@ -673,6 +712,97 @@ fadein(colour, amt, ...)
 	OUTPUT:
 		RETVAL
 
+SV *
+mix (colour1, colour2, ...)
+	SV * colour1
+	SV * colour2
+	CODE:
+		int weight = 50;
+		if (SvOK(ST(2)) && SvIV(ST(2)) != 0) {
+			weight = SvIV(ST(2));
+		}
+		RETVAL = mix(colour1, colour2, weight);
+	OUTPUT:
+		RETVAL
+
+SV *
+tint (colour, ...)
+	SV * colour
+	CODE:
+		int weight = 50;
+		if (SvOK(ST(2)) && SvIV(ST(2)) != 0) {
+			weight = SvIV(ST(2));
+		}
+		SV * white = newSVpv("rgb(255,255,255)", 16);
+		RETVAL = mix(white, colour, weight);
+	OUTPUT:
+		RETVAL
+
+SV *
+shade (colour, ...)
+	SV * colour
+	CODE:
+		int weight = 50;
+		if (SvOK(ST(2)) && SvIV(ST(2)) != 0) {
+			weight = SvIV(ST(2));
+		}
+		SV * black = newSVpv("rgb(0,0,0)", 10);
+		RETVAL = mix(black, colour, weight);
+	OUTPUT:
+		RETVAL
+
+
+SV * 
+saturate (colour, amt, ...)
+	SV * colour
+	SV * amt
+	CODE:
+		SV * class = newSVpv("Colouring::In::XS", 17);
+		if (SvTYPE(colour) == SVt_PV) {
+			colour = new_color(class, colour, newSVnv(1));
+		}
+		struct HSL hsl = asHSL(colour);
+		double amount = depercent(SvPV_nolen(amt));
+		hsl.s += clamp((items > 2 && strcmp(SvPV_nolen(ST(2)), "relative") == 0) ? hsl.s * amount : amount, 1);
+		colour = hsl2rgb(hsl.h, hsl.s, hsl.l, hsl.a);
+		RETVAL = new_color(class, colour, newSVnv(hsl.a)); 
+	OUTPUT:
+		RETVAL	
+
+SV *
+desaturate (colour, amt, ...)
+	SV * colour
+	SV * amt
+	CODE:
+		SV * class = newSVpv("Colouring::In::XS", 17);
+		if (SvTYPE(colour) == SVt_PV) {
+			colour = new_color(class, colour, newSVnv(1));
+		}
+		struct HSL hsl = asHSL(colour);
+		double amount = depercent(SvPV_nolen(amt));
+		hsl.s -= clamp((items > 2 && strcmp(SvPV_nolen(ST(2)), "relative") == 0) ? hsl.s * amount : amount, 1);
+		colour = hsl2rgb(hsl.h, hsl.s, hsl.l, hsl.a);
+		RETVAL = new_color(class, colour, newSVnv(hsl.a)); 
+	OUTPUT:
+		RETVAL	
+
+
+SV *
+greyscale (colour)
+	SV * colour
+	CODE:
+		SV * class = newSVpv("Colouring::In::XS", 17);
+		if (SvTYPE(colour) == SVt_PV) {
+			colour = new_color(class, colour, newSVnv(1));
+		}
+		struct HSL hsl = asHSL(colour);
+		hsl.s -= 1.;
+		colour = hsl2rgb(hsl.h, hsl.s, hsl.l, hsl.a);
+		RETVAL = new_color(class, colour, newSVnv(hsl.a)); 
+	OUTPUT:
+		RETVAL
+
+	
 void
 colour(self)
         SV * self

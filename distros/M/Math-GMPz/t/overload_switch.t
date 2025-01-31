@@ -37,6 +37,20 @@ cmp_ok(-4, '<=', $two, "IV <= Math::GMPz object");
 cmp_ok($two <=> 6, '<', 0, "Math::GMPz object <=> IV");
 cmp_ok(6 <=> $two, '>', 0, "IV <=> Math::GMPz object");
 
+my $iv = 50000;
+eval {my $res = $iv << Math::GMPz->new(5);};
+like($@, qr/^The argument that specifies the number of bits to be/, "Right hand operand of '<<' can't be a Math::GMPz object");
+
+eval {my $res = $iv >> Math::GMPz->new(5);};
+like($@, qr/^The argument that specifies the number of bits to be/, "Right hand operand of '>>' can't be a Math::GMPz object");
+
+eval {$iv <<= Math::GMPz->new(5);};
+like($@, qr/^The argument that specifies the number of bits to be/, "Right hand operand of '<<=' can't be a Math::GMPz object");
+
+eval {$iv >>= Math::GMPz->new(5);};
+like($@, qr/^The argument that specifies the number of bits to be/, "Right hand operand of '>>=' can't be a Math::GMPz object");
+
+
 
 # These next 2 subs will cause failures here on perl-5.20.0
 # and later if &PL_sv_yes or &PL_sv_no is encountered in the

@@ -4,7 +4,7 @@ use 5.024;
 use warnings;
 use utf8;
 
-our $VERSION = "0.9903";
+our $VERSION = "0.9904";
 
 =encoding utf-8
 
@@ -18,7 +18,7 @@ B<greple> B<-Mannotate> ...
 
 =head1 VERSION
 
-Version 0.9903
+Version 0.9904
 
 =head1 DESCRIPTION
 
@@ -144,6 +144,7 @@ Kazumasa Utashiro
 
 use Getopt::EX::Config;
 use Hash::Util qw(lock_keys);
+use List::Util qw(max);
 use Data::Dumper;
 
 our $config = Getopt::EX::Config->new(
@@ -173,6 +174,8 @@ Text::ANSI::Fold->configure(expand => 1);
 *vwidth = \&ansi_width;
 
 package Local::Annon {
+    use strict;
+    use warnings;
     sub new {
 	my $class = shift;
 	@_ == 3 or die;
@@ -264,18 +267,29 @@ sub visible {
     s{([^\pL\pN\pP\pS])}{control($1)}ger;
 }
 
-my $annotation = Local::Annon::List->new;
-
 our $ANNOTATE //= sub {
     my %param = @_;
     my($column, $str) = @param{qw(column match)};
     sprintf("%3d %s", $column, visible($str));
 };
 
+my $annotation;
+
 sub prepare {
     config('annotate') or return;
+    state $target;
+    if (defined $target and \$_ == $target) {
+	return;
+    } else {
+	$target = \$_;
+    }
+    $annotation = Local::Annon::List->new;
+    goto &_prepare;
+}
+sub _prepare {
     my $grep = shift;
-    for my $r ($grep->result) {
+    my @result = $grep->result or return;
+    for my $r (@result) {
 	my($b, @match) = @$r;
 	my @slice = $grep->slice_result($r);
 	my $start = 0;
@@ -332,8 +346,7 @@ sub prepare {
 	@{$current->count} == 0 and next;
 	my $align = $config->{align};
 	if ($align > 0 and $current->total > 0) {
-	    align($current,
-		  $align > 1 ? $align : $current->last->[0]);
+	    align($current, $align > 1 ? $align : $current->last->[0]);
 	}
 	$annotation->join($current);
     }
@@ -341,10 +354,9 @@ sub prepare {
 	align($annotation, $annotation->maxpos);
     }
     elsif ($config->{align} == -2) {
-	my $maxlen = List::Util::max(
-	    map { vwidth($grep->cut($_->[0]->@*)) } $grep->result
-	);
-	align($annotation, $maxlen - 1);
+	if (my $maxlen = max map { vwidth($grep->cut($_->[0]->@*)) } @result) {
+	    align($annotation, $maxlen - 1);
+	}
     }
 }
 

@@ -40,6 +40,7 @@ BEGIN {
 my $transpose;
 my $max_bends = 0;
 my $list_tunings = 0;
+my $preferred_key = 'C';
 
 # TODO: add a command line option to specify the tuning filtering.
 
@@ -50,6 +51,7 @@ GetOptions(
   'transpose|transpose-from|t=s' => \$transpose,
   'max-bends|b=i' => \$max_bends,
   'list-tunings|l' => sub { $list_tunings = 1 },
+  'preferred-key|k=s' => \$preferred_key,
 ) or pod2usage(-verbose => 0, -exitval => 2);
 
 if ($list_tunings) {
@@ -66,13 +68,18 @@ my $input;
   $input = <>;
 }
 
+my %options = (
+  max_bends => $max_bends,
+  preferred_key => $preferred_key,
+);
+
 if (defined $transpose) {
   $transpose =~ m/^(.*?)(:?:.*)?$/
       or die "Invalid argument for the --transpose option: ${transpose}\n";
   my ($tuning, $key) = ($1, $2 // 'C');
-  say transpose_tab_rendered($input, $tuning, $key, max_bends => $max_bends);
+  say transpose_tab_rendered($input, $tuning, %options);
 } else {
-  say tune_to_tab_rendered($input, max_bends => $max_bends);
+  say tune_to_tab_rendered($input, %options);
 }
 
 exit 0;
@@ -121,6 +128,12 @@ omitted, the key of C is assumed for the input.
 
 Maximum number of half-step of bending allowed to use in the generated tabs.
 Default to 0.
+
+=item --preferred-key=KEY, -k
+
+Specify what is the preferred key to use in the output. This option is only used
+for Chromatic harmonicas, to avoid too many duplicated tabs. If no tabs can be
+generated with the preferred key, then all 12 keys will be tried. Default to C.
 
 =item --list-tunings, -l
 

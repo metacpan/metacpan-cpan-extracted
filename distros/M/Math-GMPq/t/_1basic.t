@@ -1,9 +1,16 @@
 use warnings;
 use strict;
+use Config;
 use Math::GMPq qw(__GNU_MP_VERSION __GNU_MP_VERSION_MINOR __GNU_MP_VERSION_PATCHLEVEL);
 use Math::GMPq::V;
 
-print "1..9\n";
+my $tests = 9;
+# Skip 2 tests for MSVC-built perls as vcpkg-builds of gmp
+# may not define __GMP_CC and__GMP_CFLAGS.
+my $skip = $^O =~ /MSWin/ && $Config{cc} eq 'cl' ? 2 : 0;
+$tests -= $skip;
+
+print "1..$tests\n";
 
 warn "\n# Using Math::GMPq version ", $Math::GMPq::VERSION, "\n";
 warn "# Using gmp library version ", Math::GMPq::gmp_v(), "\n";
@@ -18,9 +25,10 @@ warn "# LONG_MIN : ", Math::GMPq::_long_min(),  "\n";
 warn "# LONG_MAX : ", Math::GMPq::_long_max(),  "\n";
 warn "# ULONG_MAX: ", Math::GMPq::_ulong_max(), "\n";
 warn "# REQUIRED_LDBL_MANT_DIG: ", Math::GMPq::_required_ldbl_mant_dig(), "\n";
+warn "# GMPQ_WIN32_FMT_BUG: ", Math::GMPq::V::_buggy(), "\n";
 
-if($Math::GMPq::VERSION eq '0.56' && $Math::GMPq::Random::VERSION eq '0.56' &&
-   $Math::GMPq::V::VERSION eq '0.56' &&
+if($Math::GMPq::VERSION eq '0.57' && $Math::GMPq::Random::VERSION eq '0.57' &&
+   $Math::GMPq::V::VERSION eq '0.57' &&
    Math::GMPq::_get_xs_version() eq $Math::GMPq::VERSION) {print "ok 1\n"}
 else {print "not ok 1 $Math::GMPq::VERSION $Math::GMPq::Random::VERSION ", Math::GMPq::_get_xs_version(), "\n"}
 
@@ -52,13 +60,15 @@ else {
   print "not ok 7\n"
 }
 
-my $version_num = version_num(__GNU_MP_VERSION, __GNU_MP_VERSION_MINOR, __GNU_MP_VERSION_PATCHLEVEL);
+unless($skip) {
+  my $version_num = version_num(__GNU_MP_VERSION, __GNU_MP_VERSION_MINOR, __GNU_MP_VERSION_PATCHLEVEL);
 
-print $version_num < 262659 ? !defined(Math::GMPq::__GMP_CC) ? "ok 8\n" : "not ok 8\n"
-                            :  defined(Math::GMPq::__GMP_CC) ? "ok 8\n" : "not ok 8\n";
+  print $version_num < 262659 ? !defined(Math::GMPq::__GMP_CC) ? "ok 8\n" : "not ok 8\n"
+                              :  defined(Math::GMPq::__GMP_CC) ? "ok 8\n" : "not ok 8\n";
 
-print $version_num < 262659 ? !defined(Math::GMPq::__GMP_CFLAGS) ? "ok 9\n" : "not ok 9\n"
-                            :  defined(Math::GMPq::__GMP_CFLAGS) ? "ok 9\n" : "not ok 9\n";
+  print $version_num < 262659 ? !defined(Math::GMPq::__GMP_CFLAGS) ? "ok 9\n" : "not ok 9\n"
+                              :  defined(Math::GMPq::__GMP_CFLAGS) ? "ok 9\n" : "not ok 9\n";
+}
 
 sub version_num {
     return ($_[0] << 16) | ($_[1] << 8) | $_[2];

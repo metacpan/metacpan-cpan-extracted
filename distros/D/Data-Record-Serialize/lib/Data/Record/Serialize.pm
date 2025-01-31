@@ -11,7 +11,7 @@ use warnings::register qw( Encode::dbi::queue );
 
 use Data::Record::Serialize::Error -all;
 
-our $VERSION = '1.07';
+our $VERSION = '2.00';
 
 use Package::Variant
   importing => [
@@ -309,7 +309,8 @@ __END__
 
 =pod
 
-=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory deterministically
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory deterministically d'etre
+raison truthy numified
 
 =head1 NAME
 
@@ -317,7 +318,7 @@ Data::Record::Serialize - Flexible serialization of a record
 
 =head1 VERSION
 
-version 1.07
+version 2.00
 
 =head1 SYNOPSIS
 

@@ -2,6 +2,7 @@
     use strict;
     use warnings;
     use Math::GMPq::Random;
+    use Math::GMPq::V;
     require Exporter;
     *import = \&Exporter::import;
     require DynaLoader;
@@ -17,6 +18,7 @@
     use constant _MATH_GMP_T    => 9;
     use constant _MATH_MPC_T    => 10;
     use constant GMPQ_PV_NV_BUG => Math::GMPq::Random::_has_pv_nv_bug();
+    use constant GMPQ_WIN32_FMT_BUG => Math::GMPq::V::_buggy();
 
 use subs qw( __GNU_MP_VERSION __GNU_MP_VERSION_MINOR __GNU_MP_VERSION_PATCHLEVEL
              __GNU_MP_RELEASE __GMP_CC __GMP_CFLAGS GMP_LIMB_BITS GMP_NAIL_BITS);
@@ -55,7 +57,7 @@ IOK_flag NOK_flag POK_flag
     );
 
 my @tagged = qw(
-GMPQ_PV_NV_BUG
+GMPQ_PV_NV_BUG GMPQ_WIN32_FMT_BUG
 Rmpq_abs Rmpq_add Rmpq_canonicalize Rmpq_clear Rmpq_cmp Rmpq_cmp_si Rmpq_cmp_ui
 Rmpq_cmp_z Rmpq_add_z Rmpq_sub_z Rmpq_z_sub Rmpq_mul_z Rmpq_div_z Rmpq_z_div
 Rmpq_pow_ui
@@ -80,7 +82,7 @@ qgmp_urandomb_ui qgmp_urandomm_ui
     );
 
     @Math::GMPq::EXPORT_OK = (@untagged, @tagged);
-    our $VERSION = '0.56';
+    our $VERSION = '0.57';
     #$VERSION = eval $VERSION;
 
     Math::GMPq->DynaLoader::bootstrap($VERSION);
@@ -89,12 +91,14 @@ qgmp_urandomb_ui qgmp_urandomm_ui
 
 sub dl_load_flags {0} # Prevent DynaLoader from complaining and croaking
 
-    $Math::GMPq::RETYPE = 0; # set to 1 to enable a Math::GMPq object to be coerced to
+    $Math::GMPq::RETYPE = 1; # This variable used to be initially set to 0, but
+                             # this has changed, beginning with Math::GMPq-0.57.
+                             # This enables a Math::GMPq object to be coerced to
                              # a Math::MPFR object in certain overloaded operations.
                              # (See the 'OPERATOR OVERLOADING' section of the POD
                              # documentation for details.)
-                             # With this variable set to 0, these "certain overloaded
-                             # operations" alluded to will throw a fatal error.
+                             # Setting this variable to 0 will cause these "certain
+                             # overloaded operations" to throw a fatal error.
 
 sub new {
 

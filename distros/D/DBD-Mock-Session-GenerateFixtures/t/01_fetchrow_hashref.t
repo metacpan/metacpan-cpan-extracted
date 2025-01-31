@@ -81,7 +81,7 @@ subtest 'Use named binds to bind parameters' => sub {
 
 subtest 'no bind params' => sub {
 
-	my $sth = $dbh->prepare('SELECT * FROM media_types');
+	my $sth = $dbh->prepare('SELECT * FROM media_types order by id');
 	$sth->execute();
 	my $got      = [];
 	my $expected = [{

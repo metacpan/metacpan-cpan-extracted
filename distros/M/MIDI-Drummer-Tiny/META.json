@@ -1,7 +1,7 @@
 {
    "abstract" : "Glorified metronome",
    "author" : [
-      "Gene Boggs <gene@cpan.org>"
+      "Gene Boggs <gene.boggs@gmail.com>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
@@ -68,7 +68,7 @@
          "web" : "https://github.com/ology/MIDI-Drummer-Tiny"
       }
    },
-   "version" : "0.5007",
+   "version" : "0.5009",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040000"

@@ -40,4 +40,6 @@ is (convert('DodoFaFA'), [12, 12, 17, 17, 21]);
 is (convert('C # foo C'), [12, 'foo C']);
 is (convert("C # foo\nD"), [12, "foo\n", 14]);
 
+is (convert('K## C'), [13]);
+
 done_testing;

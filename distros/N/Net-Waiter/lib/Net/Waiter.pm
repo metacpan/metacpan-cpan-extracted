@@ -16,7 +16,7 @@ use Sys::SigAction qw( set_sig_handler );
 use IPC::Shareable;
 use Data::Dumper;
 
-our $VERSION = '1.17';
+our $VERSION = '1.18';
 
 $Data::Dumper::Terse = 1;
  
@@ -98,6 +98,8 @@ sub run
   $SIG{ 'RTMIN' } = sub { $self->__sig_kid_idle()   };
   $SIG{ 'RTMAX' } = sub { $self->__sig_kid_busy()   };
 
+  srand();
+
   $self->on_server_begin();
 
   my $server_socket;
@@ -156,7 +158,7 @@ sub run
 
     eval
       {
-      $self->__sha_lock_ro( 'MASTER STATS UPDATE' );
+      $self->__sha_lock_rw( 'MASTER STATS UPDATE' );
 
       $self->{ 'KIDS_BUSY'   } = 0;
       for my $cpid ( keys %{ $self->{ 'SHA' }{ 'PIDS' } } )
@@ -182,6 +184,12 @@ sub run
       $self->log( "error: main loop kids stats management: $@" );
       $self->log( "status: reinstalling SHA, trying to recover..." );
 
+      eval
+        {
+        $self->__sha_unlock( 'MASTER STATS UPDATE' );
+        };
+      # do not need result, if cannot be unlocked there is far bigger problem  
+
       $self->stop_all_kids( 'TERM' );
       $self->stop_all_kids( 'KILL' );
       sleep(1);
@@ -195,7 +203,7 @@ sub run
 
   $self->stop_all_kids( 'TERM' );
   
-  tied( %{ $self->{ 'SHA' } } )->remove();
+  tied( %{ $self->{ 'SHA' } } )->clean_up();
   delete $self->{ 'SHA' };
 
   $self->on_server_close( $server_socket );
@@ -275,10 +283,9 @@ sub __run_forking
   $SIG{ 'RTMIN' } = sub { $self->__sig_kid_idle()   };
   $SIG{ 'RTMAX' } = sub { $self->__sig_kid_busy()   };
 
-  srand();
+  $self->{ 'SHA' } = new IPC::Shareable key => $self->{ 'SHA_KEY' } or die "fatal: cannot attach shared memory segment\n";
 
-  my $sha_key = $self->{ 'SHA_KEY' };
-  $self->{ 'SHA' } = new IPC::Shareable key => $sha_key or die "fatal: cannot attach shared memory segment\n";
+  srand();
 
   $client_socket->autoflush( 1 );
   $self->on_child_start();
@@ -359,7 +366,11 @@ sub __run_prefork
       $SIG{ 'USR2'  } = sub { $self->__child_sig_usr2();  };
       $SIG{ 'RTMIN' } = sub { $self->__sig_kid_idle()   };
       $SIG{ 'RTMAX' } = sub { $self->__sig_kid_busy()   };
+
+      $self->{ 'SHA' } = new IPC::Shareable key => $self->{ 'SHA_KEY' } or die "fatal: cannot attach shared memory segment\n";
       
+      srand();
+
       $self->on_child_start();
       
       $self->im_idle();
@@ -405,8 +416,6 @@ sub __run_preforked_child
   my $sockport = $client_socket->sockport();
 
   $self->on_accept_ok( $client_socket );
-
-  srand();
 
   $self->{ 'BUSY_COUNT' }++;
   $self->im_busy();
@@ -471,9 +480,16 @@ sub __reinstall_sha
 {
   my $self = shift;
 
+  tied( %{ $self->{ 'SHA' } } )->clean_up() if $self->{ 'SHA' };
+
   my $tm = time();
   my $sha_key = $self->{ 'SHA_KEY' } = "$0.$$.$tm";
   $self->{ 'SHA' } = new IPC::Shareable key => $sha_key, size => 256*1024, mode => 0600, create => 1 or die "fatal: cannot create shared memory segment\n";
+  
+  # must be initialized, otherwise kids will create own shared memory segments and parent cannot release them! undocumented
+  $self->{ 'SHA' }{ 'PIDS' } = {}; 
+  $self->{ 'SHA' }{ 'STAT' } = {};
+  
   return 1;
 }
 
@@ -589,14 +605,16 @@ sub __im_in_state
   my $ppid = $self->get_parent_pid();
   return 0 if $ppid == $$; # states are available only for kids
 
+  my $set_state = $state . ":" . $self->{ 'BUSY_COUNT' };
+
   $self->__sha_lock_rw( 'KID STATE' );
-  $self->{ 'SHA' }{ 'PIDS' }{ $$ } = $state . ":" . $self->{ 'BUSY_COUNT' };
+  $self->{ 'SHA' }{ 'PIDS' }{ $$ } = $set_state;
   $self->{ 'SHA' }{ 'STAT' }{ 'BUSY_COUNT' }++ if $state eq '*';
   $self->__sha_unlock( 'KID STATE' );
 
   my $tt = $0;
   $tt =~ s/ \| .+//;
-  $0 = $tt . ' | ' . $self->{ 'SHA' }{ 'PIDS' }{ $$ };
+  $0 = $tt . ' | ' . $set_state;
   
   return kill( 'RTMIN', $ppid ) if $state eq '-';
   return kill( 'RTMAX', $ppid ) if $state eq '*';
@@ -921,11 +939,12 @@ MAXFORK counts.
 
 if SSL is enabled then additional IO::Socket::SSL options can be added:
 
-   SSL_cert_file => 'cert.pem',
-   SSL_key_file  => 'key.pem', 
-   SSL_ca_file   => 'ca.pem',
+   SSL_cert_file   => 'cert.pem',
+   SSL_key_file    => 'key.pem', 
+   SSL_ca_file     => 'ca.pem',
+   SSL_verify_mode => 1,
 
-for further details, check IO::Socket::SSL docs.   
+for further details, check IO::Socket::SSL docs. all SSL_ options are allowed.
    
 =head2 run()
 
@@ -942,7 +961,7 @@ Run returns exit code:
 
 Breaks main server loop. Calling break_main_loop() is possible from parent 
 server process handler functions (see HANDLER FUNCTIONS below) but it will 
-not break the main loop immediately. It will just rise flag which will stop 
+not break the main loop immediately. It will just raise flag which will stop 
 when control is returned to the next server loop.
 
 =head2 ssl_in_use()
@@ -977,7 +996,7 @@ Returns list of forked child pids. Available only in parent processes.
 
 Sends signal 'SIGNAME' to all child processes.
 
-=head1 HANDLER FUNCTIONS
+=head1 EVENT HANDLING FUNCTIONS
 
 All of the following methods are empty in the base implementation and are
 expected to be reimplemented. The list order below is chronological but the
@@ -1074,6 +1093,14 @@ reimplemented empty to supress any messages.
                                                                                         
 =head1 NOTES
 
+in PREFORK mode, fixed initial number of processes will be forked. each will
+accept socket and wait for connection. if waiting time for accept reaches a
+limit (default to 31 seconds, see PX_IDLE option above) the process will exit
+and main process will decide if new one should be forked or not.
+
+PREFORK process count may momentarily fall under the initial/lower count limit 
+if several processes exit on idle.
+
 SIG_CHLD handler defaults to IGNORE in child processes. 
 whoever forks further here, should reinstall signal handler if needed. 
 
@@ -1111,9 +1138,9 @@ GITHUB repository:
 
   Vladi Belperchinov-Shabanski "Cade"
 
-  <cade@biscom.net> <cade@cpan.org> <cade@datamax.bg>
+  <cade@noxrun.com> <cade@bis.bg> <cade@cpan.org>
 
-  http://cade.datamax.bg
+  http://cade.noxrun.com
 
 =cut
 

@@ -27,5 +27,6 @@ t/App-MARC-List/03-new.t
 t/App-MARC-List/04-run.t
 t/data/ex1.xml
 t/data/ex2.xml
+t/data/ex3.xml
 xt/App-MARC-List/01-pod_coverage.t
 xt/App-MARC-List/02-pod.t

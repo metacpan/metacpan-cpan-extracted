@@ -2,7 +2,7 @@
  *
  * SPDX-License-Identifier: BSD-2-Clause
  *
- * Copyright (c) 2024 Steffen Nurpmeso <steffen@sdaoden.eu>.
+ * Copyright (c) 2024 - 2025 Steffen Nurpmeso <steffen@sdaoden.eu>.
  * (Only technical surroundings, algorithm is solely Colin Percival.)
  *
  * Copyright 2003-2005 Colin Percival

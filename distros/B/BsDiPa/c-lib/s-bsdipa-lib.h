@@ -37,8 +37,20 @@
  *@ With control block being a set of triples (x,y,z) meaning "read x bytes of
  *@ diff data into NEW, then add x bytes from OLD to these x bytes in NEW;
  *@ copy y bytes from the extra block onto NEW; seek forwards in OLD by z".
+ */
+#define s_BSDIPA_COPYRIGHT \
+	"S-bsdipa is\n" \
+	"	Copyright (c) 2024 - 2025 Steffen Nurpmeso\n" \
+	"	SPDX-License-Identifier: ISC\n" \
+	"The used BSDiff algorithm is\n" \
+	"	Copyright 2003-2005 Colin Percival\n" \
+	"	SPDX-License-Identifier: BSD-2-Clause\n" \
+	"and it uses libdivsufsort that is\n" \
+	"	Copyright (c) 2003 Yuta Mori All rights reserved.\n" \
+	"	SPDX-License-Identifier: MIT\n"
+/*@ S-bsdipa copyright:
  *
- * Copyright (c) 2024 Steffen Nurpmeso <steffen@sdaoden.eu>.
+ * Copyright (c) 2024 - 2025 Steffen Nurpmeso <steffen@sdaoden.eu>.
  * SPDX-License-Identifier: ISC
  *
  * Permission to use, copy, modify, and/or distribute this software for any
@@ -121,18 +133,6 @@
 extern "C" {
 #endif
 
-/* (Here so sharing is easy and official) */
-#define s_BSDIPA_COPYRIGHT \
-	"S-bsdipa is\n" \
-	"	Copyright (c) 2024 Steffen Nurpmeso\n" \
-	"	SPDX-License-Identifier: ISC\n" \
-	"The used BSDiff algorithm is\n" \
-	"	Copyright 2003-2005 Colin Percival\n" \
-	"	SPDX-License-Identifier: BSD-2-Clause\n" \
-	"and it uses libdivsufsort that is\n" \
-	"	Copyright (c) 2003 Yuta Mori All rights reserved.\n" \
-	"	SPDX-License-Identifier: MIT\n"
-
 /* Integer type for header and control block triples: file size / offsets.
  * For easy overflow avoidance (left hand value) we also test >s_BSDOFF_MAX-1.
  * The real limit is even smaller (patch preparation ~SIZE_MAX/sizeof(s_bsdipa_off_t)). */
@@ -196,10 +196,8 @@ struct s_bsdipa_diff_ctx{
 	uint64_t dc_before_len;
 	uint8_t const *dc_after_dat; /* New data after changes, plus length. */
 	uint64_t dc_after_len;
-	/* Number of bytes in "a window".  If <=0 a built-in default (32) is assigned and used.
-	 * For binary data sizeof(void*) is useful, higher values (16, 32) impose major savings for text.
-	 * For text values greater than 64 usually make no sense, the decision in between 16 and 32 is
-	 * a tradeoff in between processing time and saving: the former increases massively.
+	/* Number of bytes in "a window".  If <=0 s_BSDIPA_MAGIC_WINDOW is assigned and used.
+	 * For binary data sizeof(void*) is useful, higher values (16, 32) impose savings for text.
 	 * There is no maximum imposed, but the algorithm does *not* perform integer overflow checks! */
 	s_bsdipa_off_t dc_magic_window;
 	/* Allocated result data (freed by s_bsdipa_diff_free()) */
@@ -226,6 +224,9 @@ struct s_bsdipa_patch_ctx{
 	/* Inputs (64-bit type for easy user assignment, effective limit is s_BSDIPA_OFF_MAX): */
 	uint8_t const *pc_after_dat; /* Source: after ("current") data, plus length. */
 	uint64_t pc_after_len;
+	/* 0=unlimited, otherwise upper limit in bytes.
+	 * This does not change the effective limit, but it may constrain it further. */
+	uint64_t pc_max_allowed_restored_len;
 	/* Patch data: one can *either* set .pc_patch_dat plus length, *or* the individual fields.
 	 * For the former case s_bsdipa_patch_parse_header() can be used to create .pc_header,
 	 * and .pc_patch_dat and .pc_patch_len are to be set thereafter.

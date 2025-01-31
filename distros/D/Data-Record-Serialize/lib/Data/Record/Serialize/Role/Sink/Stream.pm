@@ -7,8 +7,9 @@ use Scalar::Util;
 use Moo::Role;
 
 use Data::Record::Serialize::Error { errors => [ '::create', '::parameter', '::internal' ] }, -all;
+use Types::Standard qw[ Bool ];
 
-our $VERSION = '1.07';
+our $VERSION = '2.00';
 
 use IO::File;
 
@@ -106,6 +107,11 @@ sub _build_fh {
         return \*STDOUT if $output eq q{-};
 
         $self->_set__passed_fh( 0 );
+        if ( $self->create_output_dir ) {
+            require Path::Tiny;
+            my $dir = Path::Tiny::path( $output )->parent;
+            eval { $dir->mkdir; } or error( '::create', "unable to create output directory '$dir': $@" );
+        }
         return (
             IO::File->new( $output, 'w' )
               or error( '::create', "unable to create output file: '$output'" ) );
@@ -124,6 +130,18 @@ sub _build_fh {
     error( '::internal', q{can't get here} );
 }
 
+
+
+
+
+
+
+
+has create_output_dir => (
+    is      => 'ro',
+    isa     => Bool,
+    default => 0,
+);
 
 
 
@@ -179,7 +197,7 @@ __END__
 
 =pod
 
-=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory fh
 
 =head1 NAME
 
@@ -187,7 +205,7 @@ Data::Record::Serialize::Role::Sink::Stream - output encoded data to a stream.
 
 =head1 VERSION
 
-version 1.07
+version 2.00
 
 =head1 SYNOPSIS
 
@@ -233,6 +251,11 @@ The file handle to which the data will be output
 =head2 _passed_fh
 
 Will be true if L</output> was not a file name.
+
+=head2 create_output_dir
+
+Boolean; if true, the directory which will contain the
+output file is created.  Defaults to false.
 
 =head1 CLASS METHODS
 

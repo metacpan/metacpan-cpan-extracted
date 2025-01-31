@@ -5,7 +5,7 @@ package Data::Record::Serialize::Encode::ddump;
 use v5.12;
 use Moo::Role;
 
-our $VERSION = '1.07';
+our $VERSION = '2.00';
 
 use Scalar::Util;
 use Data::Dumper;
@@ -113,7 +113,7 @@ Data::Record::Serialize::Encode::ddump - encoded a record using Data::Dumper
 
 =head1 VERSION
 
-version 1.07
+version 2.00
 
 =head1 SYNOPSIS
 

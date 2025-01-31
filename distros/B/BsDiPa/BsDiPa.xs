@@ -3,7 +3,7 @@
  *@ Remarks:
  *@ - code requires ISO STD C99 (for now).
  *
- * Copyright (c) 2024 Steffen Nurpmeso <steffen@sdaoden.eu>.
+ * Copyright (c) 2024 - 2025 Steffen Nurpmeso <steffen@sdaoden.eu>.
  * SPDX-License-Identifier: ISC
  *
  * Permission to use, copy, modify, and/or distribute this software for any
@@ -56,7 +56,7 @@ static SV *a_core_diff(int what, SV *before_sv, SV *after_sv, SV *patch_sv, SV *
 static enum s_bsdipa_state a_core_diff__write(void *user_cookie, uint8_t const *dat, s_bsdipa_off_t len,
 		s_bsdipa_off_t is_last);
 
-static SV *a_core_patch(int what, SV *after_sv, SV *patch_sv, SV *before_sv);
+static SV *a_core_patch(int what, SV *after_sv, SV *patch_sv, SV *before_sv, SV *max_allowed_restored_len);
 
 static void *
 a_alloc(size_t size){
@@ -185,7 +185,7 @@ jleave:
 }
 
 static SV *
-a_core_patch(int what, SV *after_sv, SV *patch_sv, SV *before_sv){
+a_core_patch(int what, SV *after_sv, SV *patch_sv, SV *before_sv, SV *max_allowed_restored_len){
 	struct s_bsdipa_patch_ctx p;
 	SV *bref;
 	enum s_bsdipa_state s;
@@ -202,6 +202,21 @@ a_core_patch(int what, SV *after_sv, SV *patch_sv, SV *before_sv){
 
 	if(/*!SvOK(patch_sv) ||*/ !SvPOK(patch_sv))
 		goto jleave;
+
+	p.pc_max_allowed_restored_len = 0;
+	if(max_allowed_restored_len != NULL && SvOK(max_allowed_restored_len)){
+		if(!SvIOK(max_allowed_restored_len))
+			goto jleave;
+		else{
+			IV i;
+
+			i = SvIV(max_allowed_restored_len);
+			if(i < 0 || (uint64_t)i != (s_bsdipa_off_t)i ||
+					(s_bsdipa_off_t)i >= s_BSDIPA_OFF_MAX)
+				goto jleave;
+			p.pc_max_allowed_restored_len = (uint64_t)i;
+		}
+	}
 
 	p.pc_mem.mc_alloc = &a_alloc;
 	p.pc_mem.mc_free = &a_free;
@@ -328,21 +343,23 @@ OUTPUT:
 	RETVAL
 
 SV *
-core_patch_raw(after_sv, patch_sv, before_sv)
+core_patch_raw(after_sv, patch_sv, before_sv, max_allowed_restored_len=NULL)
 	SV *after_sv
 	SV *patch_sv
 	SV *before_sv
+	SV *max_allowed_restored_len
 CODE:
-	RETVAL = a_core_patch(s_BSDIPA_IO_RAW, after_sv, patch_sv, before_sv);
+	RETVAL = a_core_patch(s_BSDIPA_IO_RAW, after_sv, patch_sv, before_sv, max_allowed_restored_len);
 OUTPUT:
 	RETVAL
 
 SV *
-core_patch_zlib(after_sv, patch_sv, before_sv)
+core_patch_zlib(after_sv, patch_sv, before_sv, max_allowed_restored_len=NULL)
 	SV *after_sv
 	SV *patch_sv
 	SV *before_sv
+	SV *max_allowed_restored_len
 CODE:
-	RETVAL = a_core_patch(s_BSDIPA_IO_ZLIB, after_sv, patch_sv, before_sv);
+	RETVAL = a_core_patch(s_BSDIPA_IO_ZLIB, after_sv, patch_sv, before_sv, max_allowed_restored_len);
 OUTPUT:
 	RETVAL

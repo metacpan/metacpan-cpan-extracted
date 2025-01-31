@@ -1,9 +1,16 @@
 Revision history for Perl module Math::GMPq
 
+0.57
+ - On Windows only: set the constant GMPQ_WIN32_FMT_BUG to 0 if the gmp
+   library was built with -D__USE_MINGW_ANSI_STDIO; else set it to 1.
+ - Fix https://rt.cpan.org/Public/Bug/Display.html?id=158590
+   Thanks to @twata_1.
+ - Change initial setting of Math::GMPq::RETYPE from 0 to 1.
+
 0.56
  - Skip Math::MPFR checks in t/overload_cross_class.t and t/overload_op_eq.t if
    $Math::MPFR::VERSION < 4.19
- - Avoid monitoring PL_markstack_ptr in GMPq.xs
+ - Avoid monitoring PL_markstack_ptr in GMPq.xs and Random/Random.xs
 
 0.55
  - Fix bugs in t/overload_op_eq.t

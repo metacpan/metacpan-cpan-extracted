@@ -5,7 +5,7 @@ use warnings;
 
 use App::MARC::List;
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Run.
 exit App::MARC::List->new->run;
@@ -28,7 +28,7 @@ marc-list - Script to get MARC field/subfield unique list.
 
 =head1 SYNOPSIS
 
- marc-list [-h] [--version] marc_xml_file field [subfield]
+ marc-list [-f] [-h] [--version] marc_xml_file field [subfield]
 
 =head1 DESCRIPTION
 
@@ -38,13 +38,17 @@ It supports MARC XML files now.
 
 =over 8
 
+=item * C<-f>
+
+Print frequency.
+
 =item * C<-h>
 
- Print help.
+Print help.
 
 =item * C<--version>
 
- Print version of script.
+Print version of script.
 
 =item * C<marc_xml_file>
 
@@ -91,6 +95,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

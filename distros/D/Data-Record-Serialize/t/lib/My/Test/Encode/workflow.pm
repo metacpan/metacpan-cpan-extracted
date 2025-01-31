@@ -22,6 +22,8 @@ sub finalize {
     push @{ $self->output }, 'finalize';
 }
 
+sub close { }
+
 with 'Data::Record::Serialize::Role::EncodeAndSink';
 
 1;

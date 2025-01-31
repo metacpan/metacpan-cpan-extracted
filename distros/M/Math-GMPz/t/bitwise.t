@@ -44,11 +44,14 @@ Rmpz_set_ui($x, 1231); # restore to original value
 cmp_ok(71, '==',   $x & $mbiy, "TEST 9");
 cmp_ok(1279, '==', $x | $mbiy, "TEST 10");
 cmp_ok(1208, '==', $x ^ $mbiy, "TEST 11");
-cmp_ok($x - (~$mbix), '==', 2463, "TEST 4");
-cmp_ok($y - (~$mbiy), '==', 239, "TEST 5");
+cmp_ok($x - (~$mbix), '==', 2463, "TEST 12");
+cmp_ok($y - (~$mbiy), '==', 239, "TEST 13");
 
-
-
+cmp_ok($x, '==', 1231, "TEST 14");
+($x <<= 3) >>= 3;
+cmp_ok($x, '==', 1231, "TEST 15");
+($x >>= 2) <<= 2;
+cmp_ok($x, '==', 1228, "TEST 16");
 
 done_testing();
 

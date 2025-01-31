@@ -18,6 +18,12 @@
 
 Version - YYYY/MM/DD
 ---------------------
+1.11 2025-01-29 08:30:00
+  - Fixed t/70-validate_date_vars.t to handle timestamp test on slow running
+    machines.
+  - Fixed t/10-validate_simple_cfg.t to properly get the userid for all
+    platforms.
+
 1.10 2025-01-01 08:30:00
   - Fixed so minimum version of 2.08 required for using Fred::Fish::DBUG.
     So it's limitations with earlier Perl versions wouldn't affect this one.

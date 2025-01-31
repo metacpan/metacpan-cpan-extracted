@@ -446,8 +446,10 @@
    Rmpz_divexact($rop, $op1, $op2);
    Rmpz_divexact_ui($rop, $op, $ui);
     $rop = 2nd arg / 3rd arg.
-    These 2 functions provide correct results only when it
-    is known that the 3rd arg divides the 2nd arg.
+    These 2 functions provide correct results only when the
+    2nd arg is exactly divisible by the 3rd arg.
+    (Exactness can be checked by using Rmpz_divisible_p and
+    Rmpz_divisible_ui_p, below.)
 
    $bool = Rmpz_divisible_p($op1, $op2);
    $bool = Rmpz_divisible_ui_p($op, $ui);
@@ -1109,36 +1111,38 @@
 
     Attempting to use the overloaded operators with objects that
     have been blessed into some package other than 'Math::BigInt',
-   'Math::GMPz', 'Math::GMPq' (limited operations), or 'Math::MPFR'
-    (limited operations) will not work.
+   'Math::GMPz', 'Math::GMP', 'Math::GMPq' (limited operations), or
+   'Math::MPFR' (limited operations) will not work.
 
-    Math::MPFR objects can be used  with '+', '-', '*', '/' and '**'
-    operators - in which case the operation will return a Math::MPFR
-    object.
-    If $Math::GMPz::RETYPE is set to 1, then Math::MPFR objects can
-    also be used with '+=', '*=', '-=', '/=' and '**=' operators.
-    In such instances, the Math::GMPz object is set ("retyped") to a
-    Math::MPFR object that contains the result of the operation,
-    subject to the precision of the Math::MPFR object and the
-    default rounding mode being used.
+    Math::MPFR objects can be provided as the second arg  with '+',
+    '-', '*', '/' and '**' operators - in which case the operation will
+    return a Math::MPFR object (calculated using default Math::MPFR
+    precision and default Math::MPFR rounding mode).
+    For comparisons (==, !=, <, <=, >, >=, <=>) between Math::MPFR and
+    Math::GMPz objects, you need to invoke the Math::MPFR overloading
+    as the Math::GMPz overloading does not accommodate such comparisons.
+    eg - do ($mpfr_obj > $mpz_obj), not ($mpz_obj < $mpfr_obj).
 
-    Math::GMPq objects can be used with the comparison operators
-    ( == != < <= > >= <=> ) and also, iff Math-GMPq-0.43 or later is
-    installed, with '+', '-', '/', and '*' operators (in which case
-    a Math::GMPq object is returned).
+    If $Math::GMPz:RETYPE is set to 1, then Math::MPFR objects can also
+    be provided as the second arg with '+=', '*=', '-=', '/=' and '**='
+    operators. In such instances, the Math::GMPz object becomes
+    (is "retyped" to) a Math::MPFR object that contains the result of
+    the operation, using default Math::MPFR precision and default
+    Math::MPFR rounding mode.
+    $Math::GMPz::RETYPE is initially set to 1.
+
+    Math::GMPq objects can be provided as the second arg with the
+    comparison operators ( == != < <= > >= <=> ) and also, iff
+    Math-GMPq-0.43 or later is installed, with '+', '-', '/', and '*'
+    operators (in which case a Math::GMPq object is returned).
     If $Math::GMPz::RETYPE is set to 1, then Math::GMPq objects can
     also be used with '+=', '*=', '-=', and '/=' and operators.
-    In such instances, the Math::GMPz object is set "retyped" to a
-    Math::GMPq object containing the exact result of the operation.
+    In such instances, the Math::GMPz object becomes (is "retyped" to)
+    a Math::GMPq object containing the exact result of the operation.
 
-    NOTE: $Math::GMPz::RETYPE is initially set to 0 (false).
-
-    In those situations where the overload subroutine operates on 2
-    perl variables, then obviously one of those perl variables is
-    a Math::GMPz object. To determine the value of the other variable
-    the subroutine works through the following steps (in order),
-    using the first value it finds, or croaking if it gets
-    to step 6:
+    To determine the type and value of the second argument the subroutine
+    works through the following steps (in order), using the first value
+    it  finds, or croaking if it gets to step 6:
 
     1. If the variable is a UV then that value is used. The variable
        is considered to be a UV if the IOK and IsUV flags are set.
@@ -1154,25 +1158,17 @@
        number, the subroutine croaks with an appropriate error
        message.
 
-    4. If the variable is an NV, then that value is used. The variable
-       is considered to be an NV if the NOK flag is set.
+    4. If the variable is an NV, then that value is truncated to an
+       integer value and used. The variable is  considered to be an
+       NV if the NOK flag is set.
 
     5. If the variable is a Math::GMPz object (or, for operators
-       specified above, a Math::MPFR/Math::GMPq object) then the value
-       of that object is used.
+       specified above, a Math::MPFR/Math::GMP/Math::GMPq/Math::BigInt
+       object) then the value of that object is used.
 
     6. If none of the above is true, then the second variable is
        deemed to be of an invalid type. The subroutine croaks with
        an appropriate error message.
-
-    If the second operand is a 'double' (ie if the other
-    operand's NOK flag is set) then it is first truncated
-    to an integer value before the operation is performed.
-
-    For example:
-    my $x = Rmpz_init_set_ui(112);
-    $x *= 2.9;
-    print "$x"; # prints 224
 
    #####
 
@@ -1290,7 +1286,7 @@
 
     This program is free software; you may redistribute it and/or
     modify it under the same terms as Perl itself.
-    Copyright 2006-20011, 2013-23, Sisyphus
+    Copyright 2006-20011, 2013-24, Sisyphus
 
 =head1 AUTHOR
 

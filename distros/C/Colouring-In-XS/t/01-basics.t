@@ -67,7 +67,6 @@ subtest 'basics' => sub {
 
 sub basic_tests {
         my %args = @_;
-        
         my $color = Colouring::In::XS->new($args{start});
 
         is($color->toCSS, $args{toCSS}, "$args{toCSS}");
@@ -76,13 +75,16 @@ sub basic_tests {
         is($color->toHEX(1), $args{toHEXfull}, "$args{toHEXfull}");
   
         is($color->toHSL, $args{toHSL}, "$args{toHSL}");
-        is($color->toHSV, $args{toHSV}, "$args{toHSV}");
+        
+	is($color->toHSV, $args{toHSV}, "$args{toHSV}");
         
 	is($color->toRGB, $args{toRGB}, "$args{toRGB}");
+	
 	is($color->toRGBA(1), $args{toRGBA}, "$args{toRGBA}");
 
         is($color->toTerm, $args{toTerm}, "$args{toTerm}");
         is($color->toOnTerm, $args{toOnTerm}, "$args{toTerm}");
+
 }
 
 done_testing();

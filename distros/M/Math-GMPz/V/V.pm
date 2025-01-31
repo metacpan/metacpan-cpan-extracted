@@ -7,12 +7,22 @@ require Exporter;
 *import = \&Exporter::import;
 require DynaLoader;
 
-our $VERSION = '0.61';
+our $VERSION = '0.62';
 #$VERSION = eval $VERSION;
 Math::GMPz::V->DynaLoader::bootstrap($VERSION);
 
 @Math::GMPz::V::EXPORT = ();
 @Math::GMPz::V::EXPORT_OK = ();
+
+sub _buggy {
+  return 0 unless $^O =~ /MSWin/;
+  my $cc = ___GMP_CC();		# __GMP_CC
+  my $cflags = ___GMP_CFLAGS();	# __GMP_CFLAGS
+
+  return 0 if ( defined($cc)     && $cc     =~/\-D__USE_MINGW_ANSI_STDIO/ );
+  return 0 if ( defined($cflags) && $cflags =~/\-D__USE_MINGW_ANSI_STDIO/ );
+  return 1;
+}
 
 sub dl_load_flags {0} # Prevent DynaLoader from complaining and croaking
 

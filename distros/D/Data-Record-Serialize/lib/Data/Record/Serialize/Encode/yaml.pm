@@ -12,7 +12,7 @@ use JSON::PP;    # needed for JSON::PP::true/false
 
 use namespace::clean;
 
-our $VERSION = '1.07';
+our $VERSION = '2.00';
 
 BEGIN {
     my $YAML_XS_VERSION = 0.67;
@@ -72,7 +72,7 @@ __END__
 
 =pod
 
-=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory truthy
 
 =head1 NAME
 
@@ -80,7 +80,7 @@ Data::Record::Serialize::Encode::yaml - encode a record as YAML
 
 =head1 VERSION
 
-version 1.07
+version 2.00
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,6 @@
 #!perl
 
+use v5.12;
 use Test2::V0;
 use Data::Record::Serialize;
 use Test::TempDir::Tiny;
@@ -18,12 +19,18 @@ sub config {
         Sortkeys  => 1,
         Indent    => 0,
         Quotekeys => 0,
-    }
+    };
 }
 
 sub serialize {
 
-    my ( $label, $output, $get_output ) = @_;
+    my %pars       = @_;
+    my $output     = delete $pars{output};
+    my $label      = delete $pars{label};
+    my $get_output = delete $pars{get_output};
+    my $config     = delete( $pars{config} ) // {};
+
+    die 'extra pars' if %pars;
 
     in_tempdir $label => sub {
         subtest $label => sub {
@@ -40,9 +47,10 @@ sub serialize {
                         encode    => 'ddump',
                         output    => $output,
                         dd_config => config(),
+                        %{$config},
                     );
                 },
-                "create serializer"
+                "create serializer",
             ) or do { bail_out( $@ ) };
 
             my ( $stdout, $stderr, $exit ) = eval {
@@ -61,8 +69,10 @@ sub serialize {
 }
 
 serialize(
-    'FileHandle' => sub { FileHandle->new( 'ddump.pl', '>' ) },
-    sub { $_[0]->close; read_text( 'ddump.pl' ) } );
+    label      => 'FileHandle',
+    output     => sub { FileHandle->new( 'ddump.pl', '>' ) },
+    get_output => sub { $_[0]->close; read_text( 'ddump.pl' ) },
+);
 
 # this works with a direct run of this script, or with prove, but not
 # yath or dzil test
@@ -72,21 +82,35 @@ serialize(
 #     sub { $_[1] } );
 
 serialize(
-    'IO::File' => sub { IO::File->new( 'ddump.pl', '>' ) },
-    sub { $_[0]->close; read_text( 'ddump.pl' ) },
+    label      => 'IO::File',
+    output     => sub { IO::File->new( 'ddump.pl', '>' ) },
+    get_output => sub { $_[0]->close; read_text( 'ddump.pl' ) },
 );
 
 serialize(
-    filename => 'ddump.pl',
-    sub { read_text( $_[0] ) } );
+    label      => 'filename',
+    output     => 'ddump.pl',
+    get_output => sub { read_text( $_[0] ) },
+);
 
 serialize(
-    'filehandle glob' => *STDOUT,
-    sub { $_[1] } );
+    label      => 'filehandle glob',
+    output     => *STDOUT,
+    get_output => sub { $_[1] },
+);
 
 serialize(
-    'reference filehandle glob' => \*STDOUT,
-    sub { $_[1] } );
+    label      => 'reference filehandle glob',
+    output     => \*STDOUT,
+    get_output => sub { $_[1] },
+);
+
+serialize(
+    label      => 'create output dir',
+    output     => 'foo/bar/fff.pl',
+    get_output => sub { read_text( $_[0] ) },
+    config     => { create_output_dir => 1 },
+);
 
 
 

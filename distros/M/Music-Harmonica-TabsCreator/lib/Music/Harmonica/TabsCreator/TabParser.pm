@@ -7,7 +7,7 @@ use utf8;
 
 use Readonly;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 # This class converts a tab into tones (degrees) relative to the key of C4.
 # It accepts an input specifying the tuning of an harmonica.

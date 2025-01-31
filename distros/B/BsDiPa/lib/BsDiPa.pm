@@ -54,7 +54,7 @@ The perl package only uses C<s_BSDIPA_32> mode (31-bit size limits).
 
 =over
 
-=item C<VERSION> (string, eg, '0.5.3')
+=item C<VERSION> (string, eg, '0.6.0')
 
 A version string.
 
@@ -81,7 +81,7 @@ Allocation failure.
 
 =item C<INVAL> (number)
 
-Any other error.
+Any other error, like invalid argument.
 
 =item C<core_diff_zlib($before_sv, $after_sv, $patch_sv, $magic_window=0)>
 
@@ -89,9 +89,9 @@ Create a compressed binary diff
 from the memory backing C<$before_sv>
 to the memory backing C<$after_sv>,
 and place the result in the (de-)reference(d) C<$patch_sv>.
-On error C<undef> is stored if only C<$patch_sv> is accessible.
+On error C<undef> is stored if at least C<$patch_sv> is accessible.
 C<$magic_window> specifies lookaround bytes,
-if 0 the built-in default is used (16 at the time of this writing);
+if <=0 the built-in default is used (16 at the time of this writing);
 the already unreasonable value 4096 is the maximum supported.
 
 =item C<core_diff_raw($before_sv, $after_sv, $patch_sv, $magic_window=0)>
@@ -100,14 +100,17 @@ Exactly like C<core_diff_zlib()>, but without compression.
 As compression is absolutely necessary, only meant for testing,
 or as a foundation for other compression methods.
 
-=item C<core_patch_zlib($after_sv, $patch_sv, $before_sv)>
+=item C<core_patch_zlib($after_sv, $patch_sv, $before_sv, $max_allowed_restored_len=0)>
 
 Apply a compressed binary diff C<$patch_sv>
 to the memory backing C<$after_sv>
 in order to restore original content in the (de-)reference(d) C<$before_sv>.
-On error C<undef> is stored if only C<$before_sv> is accessible.
+C<$max_allowed_restored_len> specifies the maximum allowed size of the restored
+data in bytes,
+if 0 the effective limit is 31-bit.
+On error C<undef> is stored if at least C<$before_sv> is accessible.
 
-=item C<core_patch_raw($after_sv, $patch_sv, $before_sv)>
+=item C<core_patch_raw($after_sv, $patch_sv, $before_sv, $max_allowed_restored_len=0)>
 
 Exactly like C<core_patch_zlib()>, but expects raw uncompressed patch.
 

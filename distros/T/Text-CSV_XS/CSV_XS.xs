@@ -1947,9 +1947,11 @@ EOLX:
 		_pretty_strl (csv->bptr + csv->used), _pretty_strl (csv->eol), csv->strict_eol, c, c0);
 #endif
 	    c0 = 0;
-	    if (csv->strict_eol && csv->eol_type && csv->eol_type != eolt)
-		ERROR_EOL;
-	    SET_EOL_TYPE (csv, eolt);
+	    unless (f & CSV_FLAGS_QUO) {
+		if (csv->strict_eol && csv->eol_type && csv->eol_type != eolt)
+		    ERROR_EOL;
+		SET_EOL_TYPE (csv, eolt);
+		}
 
 	    if (fnum == 1 && f == 0 && SvCUR (sv) == 0 && csv->skip_empty_rows) {
 		SkipEmptyRow;
@@ -2401,7 +2403,7 @@ static int cx_c_xsParse (pTHX_ csv_t csv, HV *hv, AV *av, AV *avf, SV *src, bool
     (void)hv_store (hv, "_EOF",   4, &PL_sv_no,             0);
 
     if (csv.strict) {
-	STRLEN nf = csv.is_bound ? csv.fld_idx : av_len (av);
+	STRLEN nf = csv.is_bound ? csv.fld_idx ? csv.fld_idx - 1 : 0 : av_len (av);
 #if MAINT_DEBUG > 6
 	(void)fprintf (stderr, "# %04d Strict nf = %2d, n = %2d, idx = %2d, recno = %2d, res = %d\n",
 	    __LINE__, nf, csv.strict_n, csv.fld_idx, csv.recno, result);

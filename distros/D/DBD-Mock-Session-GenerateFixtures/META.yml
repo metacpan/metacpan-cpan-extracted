@@ -7,6 +7,11 @@ build_requires:
   DBI: '1.643'
   Exporter::NoWork: '0.03'
   ExtUtils::MakeMaker: 6.36
+  Rose::DB: '0.786'
+  Rose::DB::Object: '0.822'
+  Rose::DB::Object::Loader: '0.799'
+  Rose::DB::Object::Manager: '0.813'
+  Sub::Override: '0.12'
   Test2::V0: '0.000145'
 configure_requires:
   ExtUtils::MakeMaker: 6.36
@@ -32,8 +37,8 @@ requires:
   File::Slurper: '0.014'
   File::Spec: '3.84'
   Readonly: '2.05'
-  Sub::Override: '0.10'
+  Sub::Override: '0.12'
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/DragosTrif/DBD-Fixtures
-version: 0.04
+version: 0.05

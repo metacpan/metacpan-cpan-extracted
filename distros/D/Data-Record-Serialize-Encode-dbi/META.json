@@ -102,13 +102,17 @@
             "DBI" : "0",
             "Data::Record::Serialize" : "0",
             "Data::Record::Serialize::Error" : "0",
+            "Hash::Util" : "0",
             "List::Util" : "1.33",
             "Monkey::Patch" : "0",
             "Moo::Role" : "2.003004",
+            "Path::Tiny" : "0",
             "SQL::Translator" : "0",
             "SQL::Translator::Schema" : "0",
             "Types::Common::String" : "0",
             "Types::Standard" : "1.010003",
+            "custom::failures" : "0",
+            "enum" : "0",
             "namespace::clean" : "0",
             "perl" : "5.012"
          }
@@ -125,6 +129,7 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
+            "Path::Tiny" : "0",
             "Test2::Plugin::NoWarnings" : "0",
             "Test2::Tools::AfterSubtest" : "0",
             "Test2::V0" : "0",
@@ -136,7 +141,7 @@
    "provides" : {
       "Data::Record::Serialize::Encode::dbi" : {
          "file" : "lib/Data/Record/Serialize/Encode/dbi.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       }
    },
    "release_status" : "stable",
@@ -151,7 +156,7 @@
          "web" : "https://gitlab.com/djerius/data-record-serialize-encode-dbi"
       }
    },
-   "version" : "1.06",
+   "version" : "1.07",
    "x_generated_by_perl" : "v5.38.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "GPL-3.0-only"
