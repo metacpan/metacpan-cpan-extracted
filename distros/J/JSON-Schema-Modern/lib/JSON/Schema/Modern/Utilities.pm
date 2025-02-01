@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.599';
+our $VERSION = '0.600';
 
 use 5.020;
 use strictures 2;
@@ -310,6 +310,7 @@ sub canonical_uri ($state, @extra_path) {
 # - exception (set by abort())
 # - recommended_response
 # - depth
+# - traverse (boolean, used for mode)
 # returns defined-false, so callers can use 'return;' to differentiate between
 # failed-with-no-error from failed-with-error.
 sub E ($state, $error_string, @args) {
@@ -337,6 +338,7 @@ sub E ($state, $error_string, @args) {
     error => @args ? sprintf($error_string, @args) : $error_string,
     $state->{exception} ? ( exception => $state->{exception} ) : (),
     $state->{recommended_response} ? ( recommended_response => $state->{recommended_response} ) : (),
+    mode => $state->{traverse} ? 'traverse' : 'evaluate',
   );
 
   return 0;
@@ -475,7 +477,7 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.599
+version 0.600
 
 =head1 SYNOPSIS
 

@@ -84,9 +84,9 @@ YAML
   cmp_deeply(
     [ map $_->TO_JSON, $doc->errors ],
     [ map +{
-        instanceLocation => $_.'/operationId',
-        keywordLocation => '',
-        absoluteKeywordLocation => DEFAULT_METASCHEMA,
+        instanceLocation => '',
+        keywordLocation => $_.'/operationId',
+        absoluteKeywordLocation => str(Mojo::URL->new('http://localhost:1234/api#'.$_.'/operationId')),
         error => 'duplicate of operationId at /components/callbacks/callback_a/$url_a/patch/callbacks/callback_z/$url_z/delete',
       },
       (

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [27.2.0] - 2025-01-31
+### Added
+- [python] Added Python implementation ([#165](https://github.com/cucumber/messages/pull/165))
+
 ## [27.1.0] - 2025-01-28
 ### Added
 - [cpp] use VERSION file to version ABI and shared libraries [#268](https://github.com/cucumber/messages/pull/268)
@@ -35,8 +39,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - [Go] Switch to Google's UUID module ([#251](https://github.com/cucumber/messages/pull/251))
 
 ### Fixed
-- [Dotnet] Fixed code generation for types that accept List as parameters. Constructors were not properly handling null input. ([#249](https://github.com/cucumber/messages/pull/249) [clrudolphi])
-- Moved contents of the description of the StepDefinitionIds field from the StepMatchArgumentsList field where it had been mistakenly placed. ([#252](https://github.com/cucumber/messages/pull/252) [clrudolphi])
+- [Dotnet] Fixed code generation for types that accept List as parameters. Constructors were not properly handling null input. ([#249](https://github.com/cucumber/messages/pull/249) [clrudolphi](https://github.com/clrudolphi)))
+- Moved contents of the description of the StepDefinitionIds field from the StepMatchArgumentsList field where it had been mistakenly placed. ([#252](https://github.com/cucumber/messages/pull/252) [clrudolphi](https://github.com/clrudolphi)))
 
 ## [26.0.0] - 2024-08-15
 ### Added
@@ -569,7 +573,8 @@ aggregated status.
 ### Added
 - Protobuf messages for Go, Java, JavaScript, TypeScript and Ruby
 
-[Unreleased]: https://github.com/cucumber/messages/compare/v27.1.0...HEAD
+[Unreleased]: https://github.com/cucumber/messages/compare/v27.2.0...HEAD
+[27.2.0]: https://github.com/cucumber/messages/compare/v27.1.0...v27.2.0
 [27.1.0]: https://github.com/cucumber/messages/compare/v27.0.2...v27.1.0
 [27.0.2]: https://github.com/cucumber/messages/compare/v27.0.1...v27.0.2
 [27.0.1]: https://github.com/cucumber/messages/compare/v27.0.0...v27.0.1

@@ -6,14 +6,17 @@ use Pod::Usage;
 
 use HTTP::Request::FromCurl;
 
-our $VERSION = '0.54';
+our $VERSION = '0.55';
 
 Getopt::Long::Configure('pass_through');
 GetOptions(
     'no-tidy'        => \my $no_tidy,
     'no-read-files'  => \my $no_read_files,
     'type|t=s'       => \my $ua_type,
+    'help|h'         => \my $show_help,
 ) or pod2usage(2);
+
+pod2usage(1) if $show_help;
 
 =head1 NAME
 

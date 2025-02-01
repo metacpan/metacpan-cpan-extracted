@@ -9,7 +9,7 @@ use Parser::FIT::Profile;
 
 #require "Profile.pm";
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 sub new {
 	my $class = shift;
@@ -331,10 +331,12 @@ sub _parse_defintion_message_fields {
 
 	foreach(1..$numberOfFields) {
 		my $fieldDefinitionData = $self->_readBytes(3); # Every Field has 3 Bytes
-		my ($fieldDefinition, $size, $baseTypeData)  = unpack("Ccc", $fieldDefinitionData);
+		my ($fieldDefinition, $size, $baseTypeData)  = unpack("CCc", $fieldDefinitionData);
 		my ($baseTypeEndian, $baseTypeNumber) = ($baseTypeData & 128, $baseTypeData & 15);
 		my $baseType = $self->_get_base_type($baseTypeNumber);
 		my $fieldDescriptor = $fieldDefinitions->{$fieldDefinition};
+
+		die "Failed to parse file: Size=$size cannot be 0 or less" if($size <= 0);
 
 		if(!defined $fieldDescriptor) {
 			$fieldDescriptor = {

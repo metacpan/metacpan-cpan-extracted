@@ -71,13 +71,13 @@ if ( !$got_hb && $res =~ /\d+\.\d+/ ) {
     $res = `pkg-config --libs harfbuzz`;
     if ( $res =~ /(?:(-L.+)\s+)?(-l.+)/ ) {
 	$args{LIBS} = [ $res ];
+	$res = `pkg-config --cflags harfbuzz`;
+	if ( $res =~ /-I.+/ ) {
+	    $args{INC} = $res;
+	}
+	warn("Using platform harfbuzz library (pkg-config)\n");
+	$got_hb = 1;
     }
-    $res = `pkg-config --cflags harfbuzz`;
-    if ( $res =~ /-I.+/ ) {
-	$args{INC} = $res;
-    }
-    warn("Using platform harfbuzz library (pkg-config)\n");
-    $got_hb = 1;
 }
 
 if ( !$got_hb ) {
@@ -95,7 +95,7 @@ EOF
 	# Okay, the test program compiled and ran. We can use this library.
 	warn("Using platform harfbuzz library (checklib)\n");
 	$got_hb = 1;
-	$args{CCFLAGS} = "-DHBDIR";
+	$args{CCFLAGS} = $Config{ccflags} . " -DHBDIR";
     }
 }
 

@@ -9,7 +9,7 @@ use vars qw( @EXPORT_OK %IMCapsMismatch $VERSION );
 
 use Regexp::Ethiopic::Amharic ( 'getForm', 'setForm', ':forms' );
 
-	$VERSION = "0.02";
+	$VERSION = "0.03";
 	#
 	# This linking is done so that the export of "distance" works
 	# as before:
@@ -192,6 +192,14 @@ None presently known.
 =head1 AUTHOR
 
 Daniel Yacob,  L<dyacob@cpan.org|mailto:dyacob@cpan.org>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2003-2025, Daniel Yacob C<< <dyacob@cpan.org> >>. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
 
 
 =head1 SEE ALSO

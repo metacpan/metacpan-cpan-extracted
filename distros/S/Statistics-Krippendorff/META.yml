@@ -22,7 +22,7 @@ no_index:
 provides:
   Statistics::Krippendorff:
     file: lib/Statistics/Krippendorff.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   List::Util: '0'
   Moo: '0'
@@ -33,5 +33,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/choroba/statistics-krippendorff.git
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

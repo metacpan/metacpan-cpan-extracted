@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.163-9-g9f23ff1
+package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.164-4-g0ee379e
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: A plugin bundle for distributions built by ETHER
 # KEYWORDS: author bundle distribution tool
 
-our $VERSION = '0.164';
+our $VERSION = '0.165';
 
 use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -202,12 +202,13 @@ sub _pause_download_url {
   my ($username, $password) = @{$self->_pause_config}{qw(user password)};
   return if not $username or not $password;
   $password = uri_escape($password) =~ s/%/%%/gr;
-  'http://'.$username.':'.$password.'@pause.perl.org/pub/PAUSE/authors/id/'.substr($username, 0, 1).'/'.substr($username,0,2).'/'.$username.'/%a';
+  'https://'.$username.':'.$password.'@pause.perl.org/pub/PAUSE/authors/id/'.substr($username, 0, 1).'/'.substr($username,0,2).'/'.$username.'/%a';
 }
 
 # configs are applied when plugins match ->isa($key) or ->does($key)
 my %extra_args = (
     'Dist::Zilla::Plugin::MakeMaker' => { 'eumm_version' => '0' },
+    'Dist::Zilla::Plugin::MakeMaker::Awesome' => { 'eumm_version' => '0' },
     'Dist::Zilla::Plugin::ModuleBuildTiny' => { ':version' => '0.012', version_method => 'conservative', static => 'auto' },
     'Dist::Zilla::Plugin::MakeMaker::Fallback' => { ':version' => '0.029' },
     # default_jobs is no-op until Dist::Zilla 5.014
@@ -668,7 +669,7 @@ Dist::Zilla::PluginBundle::Author::ETHER - A plugin bundle for distributions bui
 
 =head1 VERSION
 
-version 0.164
+version 0.165
 
 =head1 SYNOPSIS
 

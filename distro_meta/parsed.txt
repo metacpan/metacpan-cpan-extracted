@@ -97137,3 +97137,16 @@ T/TA/TANIGUCHI/Number-ZipCode-JP-0.20250131.tar.gz
 K/KI/KIMOTO/SPVM-Regex-0.247.tar.gz
 H/HM/HMBRAND/Text-CSV_XS-1.60.tgz
 I/IN/INGY/YAMLScript-0.1.90.tar.gz
+V/VV/VVELOX/Check-NetworkSpans-0.0.2.tar.gz
+D/DY/DYACOB/Convert-Number-Ethiopic-0.19.tar.gz
+C/CU/CUKEBOT/Cucumber-Messages-27.2.0.tar.gz
+J/JA/JANESKIL/Tools/Daje-Workflow-GenerateSQL-Activity-1.02.tar.gz
+E/ET/ETHER/Dist-Zilla-PluginBundle-Author-ETHER-0.165.tar.gz
+J/JV/JV/HarfBuzz-Shaper-0.031.tar.gz
+C/CO/CORION/HTTP-Request-FromCurl-0.55.tar.gz
+E/ET/ETHER/JSON-Schema-Modern-0.600.tar.gz
+E/ET/ETHER/OpenAPI-Modern-0.079.tar.gz
+G/GE/GENE/Music-Percussion-Tabla-0.0701.tar.gz
+G/GH/GHANDI/Parser-FIT-0.07.tar.gz
+C/CH/CHOROBA/Statistics-Krippendorff-0.02.tar.gz
+D/DY/DYACOB/Text-WagnerFischer-Amharic-0.03.tar.gz

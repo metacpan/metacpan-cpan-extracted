@@ -364,22 +364,34 @@ ERRORS
         configs => {},
       },
       # the oas vocabulary, and the dialect that uses it
-      (map +($_ => {
+      DEFAULT_DIALECT() => {
         canonical_uri => str(DEFAULT_DIALECT),
         path => '',
         specification_version => 'draft2020-12',
         document => ignore,
         vocabularies => ignore,
         configs => {},
-      }), DEFAULT_DIALECT, DEFAULT_DIALECT.'#meta'),
-      (map +($_ => {
+        anchors => {
+          meta => {
+            path => '',
+            canonical_uri => str(DEFAULT_DIALECT),
+          },
+        },
+      },
+      OAS_VOCABULARY() => {
         canonical_uri => str(OAS_VOCABULARY),
         path => '',
         specification_version => 'draft2020-12',
         document => ignore,
         vocabularies => ignore,
         configs => {},
-      }), OAS_VOCABULARY, OAS_VOCABULARY.'#meta'),
+        anchors => {
+          meta => {
+            path => '',
+            canonical_uri => str(OAS_VOCABULARY),
+          },
+        },
+      },
     }),
     'resources are properly stored on the evaluator',
   );

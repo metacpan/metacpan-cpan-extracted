@@ -18,11 +18,11 @@ Check::NetworkSpans - See if bidirectional traffic is being seen on spans.
 
 =head1 VERSION
 
-Version 0.0.1
+Version 0.0.2
 
 =cut
 
-our $VERSION = '0.0.1';
+our $VERSION = '0.0.2';
 
 =head1 SYNOPSIS
 
@@ -184,13 +184,14 @@ sub new {
 			if ( ref( $opts{$alert_type} ) ne '' ) {
 				die( '$opts{' . $alert_type . '} should be ref "" and not ' . ref( $opts{$alert_type} ) );
 			}
-			if (   $opts{$alert_type} eq '0'
-				|| $opts{$alert_type} eq '1'
-				|| $opts{$alert_type} eq '2'
-				|| $opts{$alert_type} eq '3' )
+			if (   $opts{$alert_type} ne '0'
+				&& $opts{$alert_type} ne '1'
+				&& $opts{$alert_type} ne '2'
+				&& $opts{$alert_type} ne '3' )
 			{
 				die( '$opts{' . $alert_type . '} should be either 0, 1, 2, or 3 and not ' . $opts{$alert_type} );
 			}
+			$self->{$alert_type} = $opts{$alert_type};
 
 		} ## end if ( defined( $opts{$alert_type} ) )
 		if ( defined( $opts{ $alert_type . '_to_ignore' } ) ) {

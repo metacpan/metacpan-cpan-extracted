@@ -1,4 +1,4 @@
-package HTTP::Request::CurlParameters 0.54;
+package HTTP::Request::CurlParameters 0.55;
 use 5.020;
 use HTTP::Request;
 use HTTP::Request::Common;
@@ -616,7 +616,7 @@ sub as_lwp_snippet( $self, %options ) {
                                maybe max_size      => $self->max_filesize,
                                maybe timeout       => $self->timeout,
                                maybe cookie_jar    => $init_cookie_jar->{code},
-                               maybe SSL_options   => keys %ssl_options ? \%ssl_options : undef,
+                               maybe SSL_opts      => keys %ssl_options ? \%ssl_options : undef,
                            ], '')
                            ;
     if( defined( my $credentials = $self->credentials )) {
@@ -708,7 +708,7 @@ sub as_http_tiny_snippet( $self, %options ) {
     };
     if( $self->cert ) {
         push @preamble, 'use IO::Socket::SSL;';
-        $ssl_options{ SSL_ca_file } = $self->cert;
+        $ssl_options{ SSL_cert_file } = $self->cert;
     };
     if( $self->show_error ) {
         push @postamble,
@@ -1114,7 +1114,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2018-2023 by Max Maischein C<corion@cpan.org>.
+Copyright 2018-2025 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

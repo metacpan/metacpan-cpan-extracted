@@ -9,7 +9,7 @@ use HTTP::Request::FromWget;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.54';
+our $VERSION = '0.55';
 
 my $has_tidy;
 BEGIN { eval { require Perl::Tidy; $has_tidy = 1; } }
@@ -19,7 +19,10 @@ GetOptions(
     'no-tidy'   => \my $no_tidy,
     'type|t=s'  => \my $ua_type,
     'agent|a=s' => \my $ua_input,
+    'help|h'    => \my $show_help,
 ) or pod2usage(2);
+
+pod2usage(1) if $show_help;
 
 $ua_type //= 'Tiny';
 $ua_input //= 'curl';

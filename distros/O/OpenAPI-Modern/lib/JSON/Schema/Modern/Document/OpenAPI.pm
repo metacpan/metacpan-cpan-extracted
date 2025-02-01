@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document::OpenAPI;
 # ABSTRACT: One OpenAPI v3.1 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.078';
+our $VERSION = '0.079';
 
 use 5.020;
 use Moo;
@@ -16,7 +16,8 @@ use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
-use JSON::Schema::Modern::Utilities qw(E canonical_uri jsonp);
+use JSON::Schema::Modern::Utilities qw(E canonical_uri jsonp is_equal);
+use Carp 'croak';
 use Safe::Isa;
 use File::ShareDir 'dist_dir';
 use Path::Tiny;
@@ -74,7 +75,10 @@ has _operationIds => (
 sub get_operationId_path { $_[0]->_operationIds->{$_[1]} }
 sub _add_operationId { $_[0]->_operationIds->{$_[1]} = Str->($_[2]) }
 
-sub traverse ($self, $evaluator) {
+sub traverse ($self, $evaluator, $config_override = {}) {
+  croak join(', ', sort keys %$config_override), ' not supported as a config override in traverse'
+    if keys %$config_override;
+
   $self->_add_vocab_and_default_schemas;
 
   my $schema = $self->schema;
@@ -85,13 +89,14 @@ sub traverse ($self, $evaluator) {
     data_path => '',
     errors => [],
     evaluator => $evaluator,
-    identifiers => [],
+    identifiers => {},
     configs => {},
     # note that this is the JSON Schema specification version, not OpenAPI
     spec_version => $evaluator->SPECIFICATION_VERSION_DEFAULT,
     vocabularies => [],
     subschemas => [],
     depth => 0,
+    traverse => 1,
   };
 
   # this is an abridged form of https://spec.openapis.org/oas/3.1/schema/2024-10-25
@@ -125,7 +130,6 @@ sub traverse ($self, $evaluator) {
     },
   );
   if (not $top_result->valid) {
-    $_->mode('evaluate') foreach $top_result->errors;
     push $state->{errors}->@*, $top_result->errors;
     return $state;
   }
@@ -141,11 +145,11 @@ sub traverse ($self, $evaluator) {
     my $check_metaschema_state = $evaluator->traverse({}, {
       metaschema_uri => $json_schema_dialect,
       initial_schema_uri => $self->canonical_uri->clone->fragment('/jsonSchemaDialect'),
+      traversed_schema_path => '/jsonSchemaDialect',
     });
 
     # we cannot continue if the metaschema is invalid
     if ($check_metaschema_state->{errors}->@*) {
-      # these errors should be mode=traverse
       push $state->{errors}->@*, $check_metaschema_state->{errors}->@*;
       return $state;
     }
@@ -202,7 +206,6 @@ sub traverse ($self, $evaluator) {
   );
 
   if (not $result->valid) {
-    $_->mode('evaluate') foreach $result->errors;
     push $state->{errors}->@*, $result->errors;
     return $state;
   }
@@ -214,16 +217,14 @@ sub traverse ($self, $evaluator) {
     my %seen_names;
     foreach my $name ($path =~ m!\{([^}]+)\}!g) {
       if (++$seen_names{$name} == 2) {
-        ()= E({ %$state, data_path => jsonp('/paths', $path),
-          initial_schema_uri => Mojo::URL->new(DEFAULT_METASCHEMA) },
+        ()= E({ %$state, schema_path => jsonp('/paths', $path) },
           'duplicate path template variable "%s"', $name);
       }
     }
 
     my $normalized = $path =~ s/\{[^}]+\}/\x00/r;
     if (my $first_path = $seen_path{$normalized}) {
-      ()= E({ %$state, data_path => jsonp('/paths', $path),
-        initial_schema_uri => Mojo::URL->new(DEFAULT_METASCHEMA) },
+      ()= E({ %$state, schema_path => jsonp('/paths', $path) },
         'duplicate of templated path "%s"', $first_path);
       next;
     }
@@ -231,8 +232,7 @@ sub traverse ($self, $evaluator) {
   }
 
   foreach my $path_item (sort keys %bad_path_item_refs) {
-    ()= E({ %$state, data_path => $path_item,
-        initial_schema_uri => Mojo::URL->new(DEFAULT_METASCHEMA) },
+    ()= E({ %$state, schema_path => $path_item },
       'invalid keywords used adjacent to $ref in a path-item: %s', $bad_path_item_refs{$path_item});
   }
 
@@ -249,8 +249,7 @@ sub traverse ($self, $evaluator) {
       my @url_variables = $servers->[$server_idx]{url} =~ /\{([^}]+)\}/g;
 
       if (my $first_url = $seen_url{$normalized}) {
-        ()= E({ %$state, data_path => jsonp($servers_location, $server_idx, 'url'),
-          initial_schema_uri => Mojo::URL->new(DEFAULT_METASCHEMA) },
+        ()= E({ %$state, schema_path => jsonp($servers_location, $server_idx, 'url') },
           'duplicate of templated server url "%s"', $first_url);
       }
       $seen_url{$normalized} = $servers->[$server_idx]{url};
@@ -258,8 +257,7 @@ sub traverse ($self, $evaluator) {
       my $variables_obj = $servers->[$server_idx]{variables};
       if (@url_variables and not $variables_obj) {
         # missing 'variables': needs variables/$varname/default
-        ()= E({ %$state, data_path => jsonp($servers_location, $server_idx),
-          initial_schema_uri => Mojo::URL->new(DEFAULT_METASCHEMA) },
+        ()= E({ %$state, schema_path => jsonp($servers_location, $server_idx) },
           '"variables" property is required for templated server urls');
         next;
       }
@@ -269,26 +267,21 @@ sub traverse ($self, $evaluator) {
       foreach my $varname (keys $variables_obj->%*) {
         if (exists $variables_obj->{$varname}{enum}
             and not grep $variables_obj->{$varname}{default} eq $_, $variables_obj->{$varname}{enum}->@*) {
-          ()= E({ %$state, data_path => jsonp($servers_location, $server_idx, 'variables', $varname, 'default'),
-            initial_schema_uri => Mojo::URL->new(DEFAULT_METASCHEMA) },
+          ()= E({ %$state, schema_path => jsonp($servers_location, $server_idx, 'variables', $varname, 'default') },
             'servers default is not a member of enum');
         }
       }
 
       if (@url_variables
           and my @missing_definitions = grep !exists $variables_obj->{$_}, @url_variables) {
-        ()= E({ %$state, data_path => jsonp($servers_location, $server_idx, 'variables'),
-          initial_schema_uri => Mojo::URL->new(DEFAULT_METASCHEMA) },
+        ()= E({ %$state, schema_path => jsonp($servers_location, $server_idx, 'variables') },
           'missing "variables" definition for templated variable%s "%s"',
           @missing_definitions > 1 ? 's' : '', join('", "', @missing_definitions));
       }
     }
   }
 
-  if ($state->{errors}->@*) {
-    $_->mode('evaluate') foreach $state->{errors}->@*;
-    return $state;
-  }
+  return $state if $state->{errors}->@*;
 
   # disregard paths that are not the root of each embedded subschema.
   # Because the callbacks are executed after the keyword has (recursively) finished evaluating,
@@ -302,18 +295,16 @@ sub traverse ($self, $evaluator) {
         eq $real_json_schema_paths[-1].'/';
 
     push @real_json_schema_paths, $json_schema_paths[$idx];
-    $self->_traverse_schema($self->get($json_schema_paths[$idx]), { %$state, schema_path => $json_schema_paths[$idx] });
   }
 
+  $self->_traverse_schema({ %$state, schema_path => $_ }) foreach reverse @real_json_schema_paths;
   $self->_add_entity_location($_, 'schema') foreach $state->{subschemas}->@*;
 
   foreach my $pair (@operation_paths) {
     my ($operation_id, $path) = @$pair;
     if (my $existing = $self->get_operationId_path($operation_id)) {
-      ()= E({ %$state, data_path => $path .'/operationId',
-          initial_schema_uri => Mojo::URL->new(DEFAULT_METASCHEMA) },
+      ()= E({ %$state, schema_path => $path .'/operationId' },
         'duplicate of operationId at %s', $existing);
-      $state->{errors}[-1]->mode('evaluate');
     }
     else {
       $self->_add_operationId($operation_id => $path);
@@ -367,7 +358,8 @@ sub _add_vocab_and_default_schemas ($self) {
 }
 
 # https://spec.openapis.org/oas/v3.1#schema-object
-sub _traverse_schema ($self, $schema, $state) {
+sub _traverse_schema ($self, $state) {
+  my $schema = $self->get($state->{schema_path});
   return if not is_plain_hashref($schema) or not keys %$schema;
 
   my $subschema_state = $self->evaluator->traverse($schema, {
@@ -376,15 +368,39 @@ sub _traverse_schema ($self, $schema, $state) {
     metaschema_uri => $self->json_schema_dialect,
   });
 
-  foreach my $error ($subschema_state->{errors}->@*) {
-    $error->mode('traverse') if not defined $error->mode;
-  }
-
   push $state->{errors}->@*, $subschema_state->{errors}->@*;
-  return if $subschema_state->{errors}->@*;
-
-  push $state->{identifiers}->@*, $subschema_state->{identifiers}->@*;
   push $state->{subschemas}->@*, $subschema_state->{subschemas}->@*;
+
+  foreach my $new_uri (sort keys $subschema_state->{identifiers}->%*) {
+    if (not $state->{identifiers}{$new_uri}) {
+      $state->{identifiers}{$new_uri} = $subschema_state->{identifiers}{$new_uri};
+      next;
+    }
+
+    my $existing = $state->{identifiers}{$new_uri};
+    my $new = $subschema_state->{identifiers}{$new_uri};
+
+    if (not is_equal(
+        { canonical_uri => $new->{canonical_uri}.'', map +($_ => $new->{$_}), qw(path specification_version vocabularies configs) },
+        { canonical_uri => $existing->{canonical_uri}.'', map +($_ => $existing->{$_}), qw(path specification_version vocabularies configs) })) {
+      ()= E({ %$state, schema_path => $new->{path} },
+        'duplicate canonical uri "%s" found (original at path "%s")',
+        $new_uri, $existing->{path});
+      next;
+    }
+
+    foreach my $anchor (sort keys $new->{anchors}->%*) {
+      if (my $existing_anchor = $existing->{anchors}{$anchor}) {
+        ()= E({ %$state, schema_path => $new->{anchors}{$anchor}{path} },
+          'duplicate anchor uri "%s" found (original at path "%s")',
+          $new->{canonical_uri}->clone->fragment($anchor),
+          $existing->{anchors}{$anchor}{path});
+        next;
+      }
+
+      $existing->{anchors}{$anchor} = $new->{anchors}{$anchor};
+    }
+  }
 }
 
 # callback hook for Sereal::Decoder
@@ -410,7 +426,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.1 document
 
 =head1 VERSION
 
-version 0.078
+version 0.079
 
 =head1 SYNOPSIS
 
@@ -435,7 +451,7 @@ L<https://spec.openapis.org/oas/3.1/schema-base/2024-10-25>.
 
 and the L<OpenAPI v3.1 specification|https://spec.openapis.org/oas/v3.1>.
 
-=for Pod::Coverage THAW get_entity_at_location
+=for Pod::Coverage THAW
 
 =head1 ATTRIBUTES
 

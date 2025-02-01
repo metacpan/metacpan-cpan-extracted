@@ -1,3 +1,8 @@
+0.03 Fri Jan 31 07:07:12 EST 2025
+	- Fixes as per CPANTS:
+	  + LICENSE added.
+	  + packaged with GNU tar.
+
 0.02 Wed Jan 29 07:00:20 EST 2025
 	- encoding fix for POD documentation.
 	- clarification text for examples added.

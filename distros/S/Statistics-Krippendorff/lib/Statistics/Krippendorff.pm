@@ -4,7 +4,7 @@ Statistics::Krippendorff - Calculate Krippendorff's alpha
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
@@ -16,9 +16,9 @@ use Moo;
 
 use experimental qw( signatures );
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
-use List::Util qw{ sum };
+use List::Util qw{ min sum };
 
 use namespace::clean;
 
@@ -26,7 +26,12 @@ has units       => (is       => 'ro',
                     required => 1,
                     coerce   => \&_units_array2hash);
 
-has delta       => (is => 'rw', default => sub { \&delta_nominal });
+has delta       => (is      => 'rw',
+                    default => sub { \&delta_nominal },
+                    trigger => sub ($self, $d) {
+                        $self->delta($self->_deltas->{$d})
+                            if exists $self->_deltas->{$d};
+                    });
 
 has coincidence => (is => 'lazy', init_arg => undef);
 
@@ -41,6 +46,17 @@ has _frequency  => (is => 'lazy',
 has _expected   => (is => 'lazy',
                     init_arg => undef,
                     builder => '_build_expected');
+
+has _deltas     => (is => 'ro',
+                    init_arg => undef,
+                    default => sub { +{
+                        nominal  => \&delta_nominal,
+                        interval => \&delta_interval,
+                        ordinal  => \&delta_ordinal,
+                        ratio    => \&delta_ratio,
+                        jaccard  => \&delta_jaccard,
+                        masi     => \&delta_masi
+                    } });
 
 sub alpha($self) {
     my $d_o = sum(map {
@@ -87,7 +103,7 @@ sub delta_ordinal($self, $v0, $v1) {
      - ($self->frequency($from) + $self->frequency($to))/ 2) ** 2
 }
 
-sub delta_ratio($self, $v0, $v1) { (($v0 - $v1) / ($v0 + $v1)) ** 2}
+sub delta_ratio($, $v0, $v1) { (($v0 - $v1) / ($v0 + $v1)) ** 2}
 
 sub delta_jaccard($, $s1, $s2) {
     my @s1 = split /,/, $s1;
@@ -100,6 +116,26 @@ sub delta_jaccard($, $s1, $s2) {
     @intersection{@s1} = ();
 
     return 1 - (grep exists $intersection{$_}, @s2) / keys %union
+}
+
+sub delta_masi($, $v0, $v1) {
+        my @v0 = split /,/, $v0;
+        my @v1 = split /,/, $v1;
+        my %union;
+        @union{ @v0, @v1 } = ();
+        my $union = keys %union;
+
+        my %intersection;
+        @intersection{ @v0 } = ();
+        my $intersection = grep exists $intersection{$_}, @v1;
+
+        # Python's nltk uses 0.67 and 0.33 which gives a different result for
+        # precission 4.
+        my $m = (@v0 == @v1 && @v0 == $intersection)         ? 1
+              : $intersection == min(scalar @v0, scalar @v1) ? 2 / 3
+              : $intersection > 0                            ? 1 / 3
+              :                                                0;
+        return 1 - $intersection / $union * $m
 }
 
 sub _units_array2hash($units) {
@@ -172,7 +208,7 @@ sub _build_expected($self) {
                {coder2 => 3, coder3 => 2});
   my $sk = 'Statistics::Krippendorff'->new(units => \@units);
   my $alpha1 = $sk->alpha;
-  $sk->delta(\&Statistics::Krippendorff::delta_nominal);  # Same as default.
+  $sk->delta('nominal');  # Same as default.
   my $alpha2 = $sk->alpha;
 
   my $ski = 'Statistics::Krippendorff'->new(
@@ -186,7 +222,7 @@ sub _build_expected($self) {
 
   my $sk = 'Statistics::Krippendorff'->new(
                units => \@units,
-               delta => \&Statistics::Krippendorff::delta_nominal);
+               delta => 'nominal');
 
 The constructor. It accepts the following named arguments:
 
@@ -223,7 +259,7 @@ to validate this precondition, call C<is_valid>.
 An optional argument defaulting to delta_nominal. You can specify any function
 C<f($self, $v1, $v2)> that compares the two values C<$v1> and C<$v2> and
 returns their distance (a number between 0 and 1). Several common methods are
-predefined:
+predefined, you can use a code reference like C<&Statistics::Krippendorff::delta_nominal> or just a string C<nominal>:
 
 =head4 delta_nominal
 
@@ -253,6 +289,13 @@ union_size>. If you sort the values before joining them, the expected
 coincidence matrix is smaller and the algorithm runs faster, but the resulting
 coefficient should be the same.
 
+=head4 delta_masi
+
+The weighted metric for measuring agreement on set-valued items introduced by
+R. Passonneau (2006). Use comma separated values as above in C<delta_jaccard>.
+Note that the Python implementation in L<nltk|https://www.nltk.org> uses the
+weights rounded with precision 2, so the resutls might be slightly different.
+
 =head2 alpha
 
   my $alpha = $sk->alpha;
@@ -262,6 +305,7 @@ Returns Krippendorff's alpha.
 =head2 delta
 
   $sk->delta(sub($self, $v1, $v2) {});
+  $sk->delta('jaccard');
 
 The difference function used to calculate the alpha. You can specify it in the
 constructor (see above), but you can later change it so something else, too.

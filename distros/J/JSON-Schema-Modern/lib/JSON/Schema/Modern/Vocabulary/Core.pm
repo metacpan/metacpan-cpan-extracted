@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Core;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Core vocabulary
 
-our $VERSION = '0.599';
+our $VERSION = '0.600';
 
 use 5.020;
 use Moo;
@@ -51,20 +51,22 @@ sub keywords ($class, $spec_version) {
 # this is used by the Document constructor to build its resource_index.
 
 sub _traverse_keyword_id ($class, $schema, $state) {
-  return if not assert_keyword_type($state, $schema, 'string')
-    or not assert_uri_reference($state, $schema);
+  return if not assert_keyword_type($state, $schema, 'string');
 
   my $uri = Mojo::URL->new($schema->{$state->{keyword}});
 
   if ($state->{spec_version} =~ /^draft[467]$/) {
+    # technically the draft4 spec allows this form, but we are not supporting it.
     if (length($uri->fragment)) {
       return E($state, '%s cannot change the base uri at the same time as declaring an anchor', $state->{keyword})
         if length($uri->clone->fragment(undef));
 
-      return $class->_traverse_keyword_anchor({ %$schema, $state->{keyword} => $uri->fragment }, $state);
+      return $class->_traverse_keyword_anchor($schema, $state);
     }
   }
   else {
+    return if not assert_uri_reference($state, $schema);
+
     return E($state, '%s value "%s" cannot have a non-empty fragment', $state->{keyword}, $schema->{$state->{keyword}})
       if length $uri->fragment;
   }
@@ -72,7 +74,13 @@ sub _traverse_keyword_id ($class, $schema, $state) {
   $uri->fragment(undef);
   return E($state, '%s cannot be empty', $state->{keyword}) if not length $uri;
 
-  $state->{initial_schema_uri} = $uri->is_abs ? $uri : $uri->to_abs($state->{initial_schema_uri});
+  $uri = $uri->to_abs($state->{initial_schema_uri}) if not $uri->is_abs;
+
+  return E($state, 'duplicate canonical uri "%s" found (original at path "%s")',
+      $uri, $state->{identifiers}{$uri}{path})
+    if exists $state->{identifiers}{$uri};
+
+  $state->{initial_schema_uri} = $uri;
   $state->{traversed_schema_path} = $state->{traversed_schema_path}.$state->{schema_path};
   # we don't set or update document_path because it is identical to traversed_schema_path
   $state->{schema_path} = '';
@@ -81,27 +89,32 @@ sub _traverse_keyword_id ($class, $schema, $state) {
   # already parsed the '$schema' keyword (before we even started looping through all vocabularies)
   # and therefore this data (specification_version and vocabularies) is known to be correct.
 
-  push $state->{identifiers}->@*,
-    $state->{initial_schema_uri} => {
-      path => $state->{traversed_schema_path},
-      canonical_uri => $state->{initial_schema_uri}->clone,
-      specification_version => $state->{spec_version}, # note! $schema keyword can change this
-      vocabularies => $state->{vocabularies}, # reference, not copy
-      configs => $state->{configs},
-    };
+  $state->{identifiers}{$uri} = {
+    path => $state->{traversed_schema_path},
+    canonical_uri => $uri,
+    specification_version => $state->{spec_version}, # note! $schema keyword can change this
+    vocabularies => $state->{vocabularies}, # reference, not copy
+    configs => $state->{configs},
+  };
   return 1;
 }
 
 sub _eval_keyword_id ($class, $data, $schema, $state) {
+  # we already indexed the anchor uri, so there is nothing more to do at evaluation time.
+  # we explicitly do NOT set $state->{initial_schema_uri} or change any other $state values.
+  return 1
+    if $state->{spec_version} =~ /^draft[467]$/ and $schema->{$state->{keyword}} =~ /^#/;
+
   my $schema_info = $state->{document}->path_to_resource($state->{document_path}.$state->{schema_path});
   # this should never happen, if the pre-evaluation traversal was performed correctly
   abort($state, 'failed to resolve "%s" to canonical uri', $state->{keyword}) if not $schema_info;
 
   $state->{initial_schema_uri} = $schema_info->{canonical_uri}->clone;
+  # these will already be set in all cases: at document root, or if we are here via a $ref
   $state->{traversed_schema_path} = $state->{traversed_schema_path}.$state->{schema_path};
   $state->{document_path} = $state->{document_path}.$state->{schema_path};
   $state->{schema_path} = '';
-  # these will already be set if there is an adjacent $schema keyword
+  # these will already be set if there is an adjacent $schema keyword, or if we are here via a $ref
   $state->{spec_version} = $schema_info->{specification_version};
   $state->{vocabularies} = $schema_info->{vocabularies};
 
@@ -173,23 +186,60 @@ sub _eval_keyword_schema ($class, $data, $schema, $state) {
 sub _traverse_keyword_anchor ($class, $schema, $state) {
   return if not assert_keyword_type($state, $schema, 'string');
 
-  return E($state, '%s value "%s" does not match required syntax',
-      $state->{keyword}, ($state->{keyword} eq '$anchor' ? '' : '#').$schema->{$state->{keyword}})
-    if $state->{spec_version} =~ /^draft(?:7|2019-09)$/
-        and $schema->{$state->{keyword}} !~ /^[A-Za-z][A-Za-z0-9_:.-]*$/
-      or $state->{spec_version} eq 'draft2020-12'
-        and $schema->{$state->{keyword}} !~ /^[A-Za-z_][A-Za-z0-9._-]*$/;
+  my $anchor = $schema->{$state->{keyword}};
+  return E($state, '%s value "%s" does not match required syntax', $state->{keyword}, $anchor)
+    if $state->{spec_version} =~ /^draft[467]$/ and $anchor !~ /^#[A-Za-z][A-Za-z0-9_:.-]*$/
+      or $state->{spec_version} eq 'draft2019-09' and $anchor !~ /^[A-Za-z][A-Za-z0-9_:.-]*$/
+      or $state->{spec_version} eq 'draft2020-12' and $anchor !~ /^[A-Za-z_][A-Za-z0-9._-]*$/;
 
   my $canonical_uri = canonical_uri($state);
 
-  push $state->{identifiers}->@*,
-    Mojo::URL->new->to_abs($canonical_uri)->fragment($schema->{$state->{keyword}}) => {
-      path => $state->{traversed_schema_path}.$state->{schema_path},
+  $anchor =~ s/^#// if $state->{spec_version} =~ /^draft[467]$/;
+  my $uri = Mojo::URL->new->to_abs($canonical_uri)->fragment($anchor);
+  my $base_uri = $canonical_uri->clone->fragment(undef);
+
+  if (exists $state->{identifiers}{$base_uri}) {
+    return E($state, 'duplicate anchor uri "%s" found (original at path "%s")',
+        $uri, $state->{identifiers}{$base_uri}{anchors}{$anchor}{path})
+      if exists(($state->{identifiers}{$base_uri}{anchors}//{})->{$anchor});
+
+    use autovivification 'store';
+    $state->{identifiers}{$base_uri}{anchors}{$anchor} = {
       canonical_uri => $canonical_uri,
+      path => $state->{traversed_schema_path}.$state->{schema_path},
+    };
+  }
+  # we need not be at the root of the resource schema, and we need not even have an entry
+  # in 'identifiers' for our current base uri (if there was no $id at the root, or if
+  # initial_schema_uri was overridden in the call to traverse())
+  else {
+    my $base_path = '';
+    if (my $fragment = $canonical_uri->fragment) {
+      # this shouldn't happen, as we also check this at the start of traverse
+      return E($state, 'something is wrong; "%s" is not the suffix of "%s"', $fragment, $state->{traversed_schema_path}.$state->{schema_path})
+        if substr($state->{traversed_schema_path}.$state->{schema_path}, -length($fragment))
+          ne $fragment;
+      $base_path = substr($state->{traversed_schema_path}.$state->{schema_path}, 0, -length($fragment));
+    }
+
+    $state->{identifiers}{$base_uri} = {
+      # if we aren't at the starting point of the traversal, we have no idea where the base is located:
+      # this is an invalid resource entry, so it must be merged with the real base before being
+      # added to the document's resource index.
+      canonical_uri => $base_uri,
+      path => $base_path,
       specification_version => $state->{spec_version},
       vocabularies => $state->{vocabularies}, # reference, not copy
       configs => $state->{configs},
+      anchors => {
+        $anchor => {
+          canonical_uri => $canonical_uri,
+          path => $state->{traversed_schema_path}.$state->{schema_path},
+        },
+      },
     };
+  }
+
   return 1;
 }
 
@@ -342,7 +392,7 @@ JSON::Schema::Modern::Vocabulary::Core - Implementation of the JSON Schema Core 
 
 =head1 VERSION
 
-version 0.599
+version 0.600
 
 =head1 DESCRIPTION
 

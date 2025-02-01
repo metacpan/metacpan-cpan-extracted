@@ -7,7 +7,7 @@ do { my $x = {
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.164',
+                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.165',
                                         'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
@@ -40,7 +40,7 @@ do { my $x = {
                                       'Encode' => '2.89',
                                       'Feature::Compat::Try' => '0',
                                       'File::ShareDir' => '0',
-                                      'JSON::Schema::Modern' => '0.593',
+                                      'JSON::Schema::Modern' => '0.600',
                                       'JSON::Schema::Modern::Document' => '0',
                                       'JSON::Schema::Modern::Utilities' => '0',
                                       'JSON::Schema::Modern::Vocabulary' => '0',

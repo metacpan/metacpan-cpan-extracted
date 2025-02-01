@@ -1,7 +1,7 @@
 HTTP::Request::FromCurl - create a HTTP::Request from a curl command line
 
 
-This document describes version 0.54.
+This document describes version 0.55.
 
 
 INSTALLATION
@@ -68,4 +68,4 @@ This module is released under the same terms as Perl itself.
 
 COPYRIGHT (c)
 
-Copyright 2018-2023 by Max Maischein C<corion@cpan.org>.
+Copyright 2018-2025 by Max Maischein C<corion@cpan.org>.

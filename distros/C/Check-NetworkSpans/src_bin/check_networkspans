@@ -125,7 +125,7 @@ between IPs found.
 
 Default :: 2
 
-=head -D <span>
+=head2 -D <span>
 
 A span name or span to ignore for no streams.
 
@@ -139,7 +139,7 @@ Missing interface.
 
 Default :: 2
 
-=head -M <interface>
+=head2 -M <interface>
 
 A interface to ignore for missing interface.
 
@@ -147,7 +147,7 @@ My be specified multiple times for more than one.
 
 Default :: undef
 
-=head -c <level>
+=head2 -c <level>
 
 Port check.
 
@@ -332,7 +332,7 @@ if ( defined( $results->{errors}[0] ) ) {
 	$exit_val = 3;
 }
 if ( defined( $results->{ignored}[0] ) ) {
-	$status = $status . 'IGNORED - ' . join( "\nIGNORED - ", @{ $results->{errors} } ) . "\n";
+	$status = $status . 'IGNORED - ' . join( "\nIGNORED - ", @{ $results->{ignored} } ) . "\n";
 }
 
 if ( $status eq '' ) {

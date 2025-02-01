@@ -7,10 +7,11 @@ WriteMakefile(
 	'VERSION_FROM'	=> 'lib/Text/WagnerFischer/Amharic.pm', # finds $VERSION
 	'AUTHOR'	=> "Daniel Yacob <dyacob\@cpan.org>",
 	'ABSTRACT'	=> "The WagnerFischer Algorithm Applied to Amharic.",
-	dist			=>	{
-		COMPRESS        =>	"gzip -9f",
-		SUFFIX          =>	"gz",
-		POSTOP          =>	'mv $(DISTNAME)-$(VERSION).tar.gz ../'
+	'dist'		=>	{
+		'COMPRESS'        =>	"gzip -9f",
+		'SUFFIX'          =>	"gz",
+		'POSTOP'          =>	'mv $(DISTNAME)-$(VERSION).tar.gz ../'
 	},
-	PREREQ_PM 	=> { 'Regexp::Ethiopic' => 0.06, 'Text::WagnerFischer' => 0.03 },
+	'PREREQ_PM' 	=> { 'Regexp::Ethiopic' => 0.06, 'Text::WagnerFischer' => 0.03 },
+	'LICENSE'	=> "perl"
 );

@@ -7,9 +7,10 @@ WriteMakefile(
 	'VERSION_FROM'	=> 'lib/Convert/Number/Ethiopic.pm', # finds $VERSION
 	'AUTHOR'	=> "Daniel Yacob <dyacob\@cpan.org>",
 	'ABSTRACT'	=> "Conversion For Ethiopic Numerals in Perl.",
-	dist			=>	{
-		COMPRESS        =>	"gzip -9f",
-		SUFFIX          =>	"gz",
-		POSTOP          =>	'mv $(DISTNAME)-$(VERSION).tar.gz ../'
-	}
+	'dist'			=>	{
+		'COMPRESS'        =>	"gzip -9f",
+		'SUFFIX'          =>	"gz",
+		'POSTOP'          =>	'mv $(DISTNAME)-$(VERSION).tar.gz ../'
+	},
+	'LICENSE'	=> "perl"
 );

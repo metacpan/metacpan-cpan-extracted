@@ -55,8 +55,7 @@ my @tests = (
     },
 );
 
-subtest "$_->{name}, has_config_plugin = $_->{has_config_plugin}" => sub
-{
+subtest "$_->{name}, has_config_plugin = $_->{has_config_plugin}" => sub {
     my $testcase = $_;
     my $tempdir = no_git_tempdir();
 

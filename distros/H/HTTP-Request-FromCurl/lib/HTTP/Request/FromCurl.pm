@@ -1,4 +1,4 @@
-package HTTP::Request::FromCurl 0.54;
+package HTTP::Request::FromCurl 0.55;
 use 5.020;
 use File::Basename 'basename';
 use HTTP::Request;
@@ -168,7 +168,8 @@ our @option_spec = (
     'basic',
     'buffer!',
     'capath=s',
-    'cert|E=s',
+    # 'cacert=s', # to be added
+    'cert|E=s', # this is the client certificate
     'compressed',
     'cookie|b=s',
     'cookie-jar|c=s',
@@ -713,7 +714,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2018-2023 by Max Maischein C<corion@cpan.org>.
+Copyright 2018-2025 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

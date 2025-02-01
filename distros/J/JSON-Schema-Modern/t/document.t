@@ -73,22 +73,26 @@ subtest 'boolean document' => sub {
 
 subtest 'object document' => sub {
   cmp_deeply(
-    JSON::Schema::Modern::Document->new(schema => {}),
+    JSON::Schema::Modern::Document->new(
+      defined $_ ? ( canonical_uri => $_ ) : (),
+      schema => {},
+    ),
     listmethods(
       resource_index => [
-        '' => {
+        str($_//'') => {
           path => '',
-          canonical_uri => str(''),
+          canonical_uri => str($_//''),
           specification_version => 'draft2020-12',
           vocabularies => $vocabularies{'draft2020-12'},
           configs => {},
         },
       ],
-      canonical_uri => [ str('') ],
+      canonical_uri => [ str($_//'') ],
       _entities => [ { '' => 0 } ],
     ),
-    'object schema with no canonical_uri, no root $id',
-  );
+    'object schema with originally provided uri = \''.($_//'<undef>').'\' and no root $id',
+  )
+  foreach (undef, '', '0', Mojo::URL->new(''), Mojo::URL->new('0'));
 
   cmp_deeply(
     JSON::Schema::Modern::Document->new(
@@ -115,11 +119,34 @@ subtest 'object document' => sub {
   cmp_deeply(
     JSON::Schema::Modern::Document->new(
       defined $_ ? ( canonical_uri => $_ ) : (),
+      schema => { '$id' => 'https://foo.com' },
+    ),
+    listmethods(
+      resource_index => unordered_pairs(
+        # note: no '' entry
+        'https://foo.com' => {
+          path => '',
+          canonical_uri => str('https://foo.com'),
+          specification_version => 'draft2020-12',
+          vocabularies => $vocabularies{'draft2020-12'},
+          configs => {},
+        },
+      ),
+      canonical_uri => [ str('https://foo.com') ], # note canonical_uri has been overwritten
+      _entities => [ { '' => 0 } ],
+    ),
+    'object schema with originally provided uri = \''.($_//'<undef>').'\' and absolute root $id',
+  )
+  foreach (undef, '', Mojo::URL->new);
+
+  cmp_deeply(
+    JSON::Schema::Modern::Document->new(
+      canonical_uri => $_,
       schema => { '$id' => 'https://bar.com' },
     ),
     listmethods(
       resource_index => [
-        # note: no '' entry!
+        # note: no '' entry
         'https://bar.com' => {
           path => '',
           canonical_uri => str('https://bar.com'),
@@ -131,9 +158,51 @@ subtest 'object document' => sub {
       canonical_uri => [ str('https://bar.com') ], # note canonical_uri has been overwritten
       _entities => [ { '' => 0 } ],
     ),
-    'object schema with no canonical_uri, and absolute root $id',
+    'originally provided uri is not indexed when overridden by an absolute root $id',
   )
-  foreach (undef, '', Mojo::URL->new);
+  foreach ('0', Mojo::URL->new('0'), 'https://foo.com');
+
+  cmp_deeply(
+    JSON::Schema::Modern::Document->new(
+      schema => {
+        '$defs' => { foo => {} },
+      },
+      canonical_uri => 'https://example.com',
+    ),
+    listmethods(
+      resource_index => unordered_pairs(
+        'https://example.com' => {
+          path => '',
+          canonical_uri => str('https://example.com'),
+          specification_version => 'draft2020-12',
+          vocabularies => $vocabularies{'draft2020-12'},
+          configs => {},
+        },
+      ),
+    ),
+    'when canonical_uri provided, the empty uri is not added as a referenceable uri',
+  );
+
+  cmp_deeply(
+    JSON::Schema::Modern::Document->new(
+      canonical_uri => Mojo::URL->new('https://foo.com'),
+      schema => { '$id' => 'https://foo.com' },
+    ),
+    listmethods(
+      resource_index => unordered_pairs(
+        'https://foo.com' => {
+          path => '',
+          canonical_uri => str('https://foo.com'),
+          specification_version => 'draft2020-12',
+          vocabularies => $vocabularies{'draft2020-12'},
+          configs => {},
+        },
+      ),
+      canonical_uri => [ str('https://foo.com') ],
+      _entities => [ { '' => 0 } ],
+    ),
+    'object schema with originally provided uri equal to root $id',
+  );
 
   cmp_deeply(
     JSON::Schema::Modern::Document->new(
@@ -148,26 +217,18 @@ subtest 'object document' => sub {
     ),
     listmethods(
       resource_index => unordered_pairs(
-        'https://foo.com' => {  # the originally-provided uri is only used for the root schema
-          path => '',
-          canonical_uri => str('https://bar.com'),
-          specification_version => 'draft2020-12',
-          vocabularies => $vocabularies{'draft2020-12'},
-          configs => {},
-        },
         'https://bar.com' => {
           path => '',
           canonical_uri => str('https://bar.com'),
           specification_version => 'draft2020-12',
           vocabularies => $vocabularies{'draft2020-12'},
           configs => {},
-        },
-        'https://bar.com#my_anchor' => {
-          path => '/allOf/0',
-          canonical_uri => str('https://bar.com#/allOf/0'),
-          specification_version => 'draft2020-12',
-          vocabularies => $vocabularies{'draft2020-12'},
-          configs => {},
+          anchors => {
+            my_anchor => {
+              path => '/allOf/0',
+              canonical_uri => str('https://bar.com#/allOf/0'),
+            },
+          },
         },
         'https://bar.com/x/y/z.json' => {
           path => '/allOf/1',
@@ -181,6 +242,29 @@ subtest 'object document' => sub {
       _entities => [ { map +($_ => 0), '', '/allOf/0', '/allOf/1' } ],
     ),
     'object schema with canonical_uri and root $id, and additional resource schemas as well',
+  );
+
+  cmp_deeply(
+    JSON::Schema::Modern::Document->new(
+      schema => {
+        '$id' => 'relative',
+      },
+      canonical_uri => 'https://my-base.com',
+    ),
+    listmethods(
+      resource_index => [
+        'https://my-base.com/relative' => {
+          path => '',
+          canonical_uri => str('https://my-base.com/relative'),
+          specification_version => 'draft2020-12',
+          vocabularies => $vocabularies{'draft2020-12'},
+          configs => {},
+        },
+      ],
+      canonical_uri => [ str('https://my-base.com/relative') ],
+      _entities => [ { '' => 0 } ],
+    ),
+    'relative $id at root is resolved against provided canonical_id',
   );
 
   cmp_deeply(
@@ -212,7 +296,7 @@ subtest 'object document' => sub {
       ),
       _entities => [ { map +($_ => 0), '', '/$defs/foo' } ],
     ),
-    'relative uri for root $id',
+    'relative uri for inner $id',
   );
 
   cmp_deeply(
@@ -244,6 +328,115 @@ subtest 'object document' => sub {
       _entities => [ { map +($_ => 0), '', '/$defs/foo' } ],
     ),
     'no root $id; absolute uri with path in subschema resource',
+  );
+
+  cmp_deeply(
+    JSON::Schema::Modern::Document->new(
+      schema => {
+        '$anchor' => 'my_anchor',
+      },
+    ),
+    listmethods(
+      resource_index => unordered_pairs(
+        '' => {
+          path => '', canonical_uri => str(''), specification_version => 'draft2020-12',
+          vocabularies => $vocabularies{'draft2020-12'},
+          configs => {},
+          anchors => {
+            my_anchor => {
+              path => '',
+              canonical_uri => str(''),
+            },
+          },
+        },
+      ),
+    ),
+    'no root $id or canonical_uri provided; anchor is indexed at the root',
+  );
+
+  cmp_deeply(
+    JSON::Schema::Modern::Document->new(
+      schema => {
+        '$anchor' => 'my_anchor',
+      },
+      canonical_uri => 'https://example.com',
+    ),
+    listmethods(
+      resource_index => unordered_pairs(
+        'https://example.com' => {
+          path => '',
+          canonical_uri => str('https://example.com'),
+          specification_version => 'draft2020-12',
+          vocabularies => $vocabularies{'draft2020-12'},
+          configs => {},
+          anchors => {
+            my_anchor => {
+              path => '',
+              canonical_uri => str('https://example.com'),
+            },
+          },
+        },
+      ),
+    ),
+    'canonical_uri provided; empty uri not added as a referenceable uri when an anchor exists',
+  );
+
+  cmp_deeply(
+    JSON::Schema::Modern::Document->new(
+      schema => {
+        '$id' => 'https://my-base.com',
+        '$anchor' => 'my_anchor',
+      },
+    ),
+    listmethods(
+      resource_index => unordered_pairs(
+        'https://my-base.com' => {
+          path => '',
+          canonical_uri => str('https://my-base.com'),
+          specification_version => 'draft2020-12',
+          vocabularies => $vocabularies{'draft2020-12'},
+          configs => {},
+          anchors => {
+            my_anchor => {
+              path => '',
+              canonical_uri => str('https://my-base.com'),
+            },
+          },
+        },
+      ),
+    ),
+    'absolute uri provided at root; adjacent anchor has the same canonical uri',
+  );
+
+  cmp_deeply(
+    JSON::Schema::Modern::Document->new(
+      schema => {
+        '$id' => 'https://my-base.com',
+        '$defs' => {
+          foo => {
+            '$anchor' => 'my_anchor',
+          },
+        },
+      },
+    ),
+    listmethods(
+      resource_index => unordered_pairs(
+        'https://my-base.com' => {
+          path => '',
+          canonical_uri => str('https://my-base.com'),
+          specification_version => 'draft2020-12',
+          vocabularies => $vocabularies{'draft2020-12'},
+          configs => {},
+          anchors => {
+            my_anchor => {
+              path => '/$defs/foo',
+              canonical_uri => str('https://my-base.com#/$defs/foo'),
+            },
+          },
+        },
+      ),
+    ),
+    'absolute uri provided at root; anchor lower down has its own canonical uri',
   );
 };
 
@@ -363,6 +556,70 @@ subtest '$anchor not conforming to syntax' => sub {
     ),
     'did not index an $anchor with invalid characters',
   );
+
+  cmp_deeply(
+    JSON::Schema::Modern::Document->new(
+      specification_version => 'draft7',
+      schema => {
+        definitions => {
+          foo => {
+            '$id' => '#my_$bad_anchor',
+          },
+          qux => {
+            '$id' => 'https://foo.com#my_bad_id',
+          },
+        },
+      },
+    ),
+    listmethods(
+      resource_index => [],
+      errors => [
+        methods(TO_JSON => {
+          instanceLocation => '',
+          keywordLocation => '/definitions/foo/$id',
+          error => '$id value "#my_$bad_anchor" does not match required syntax',
+        }),
+        methods(TO_JSON => {
+          instanceLocation => '',
+          keywordLocation => '/definitions/qux/$id',
+          error => '$id cannot change the base uri at the same time as declaring an anchor',
+        }),
+      ],
+    ),
+    'did not index a draft7 fragment-only $id with invalid characters, or non-fragment-only $id',
+  );
+
+  cmp_deeply(
+    JSON::Schema::Modern::Document->new(
+      specification_version => 'draft4',
+      schema => {
+        definitions => {
+          foo => {
+            id => '#my_$bad_anchor',
+          },
+          qux => {
+            id => 'https://foo.com#my_bad_id',
+          },
+        },
+      },
+    ),
+    listmethods(
+      resource_index => [],
+      errors => [
+        methods(TO_JSON => {
+          instanceLocation => '',
+          keywordLocation => '/definitions/foo/id',
+          error => 'id value "#my_$bad_anchor" does not match required syntax',
+        }),
+        methods(TO_JSON => {
+          instanceLocation => '',
+          keywordLocation => '/definitions/qux/id',
+          error => 'id cannot change the base uri at the same time as declaring an anchor',
+        }),
+      ],
+    ),
+    'did not index a draft4 fragment-only $id with invalid characters, or non-fragment-only id',
+  );
 };
 
 subtest '$schema not conforming to syntax' => sub {
@@ -414,18 +671,16 @@ subtest '$anchor and $id below an $id that is not at the document root' => sub {
           specification_version => 'draft2020-12',
           vocabularies => $vocabularies{'draft2020-12'},
           configs => {},
-        },
-        'https://bar.com#my_anchor' => {
-          path => '/allOf/0', canonical_uri => str('https://bar.com'),
-          specification_version => 'draft2020-12',
-          vocabularies => $vocabularies{'draft2020-12'},
-          configs => {},
-        },
-        'https://bar.com#my_not' => {
-          path => '/allOf/0/not', canonical_uri => str('https://bar.com#/not'),
-          specification_version => 'draft2020-12',
-          vocabularies => $vocabularies{'draft2020-12'},
-          configs => {},
+          anchors => {
+            my_anchor => {
+              path => '/allOf/0',
+              canonical_uri => str('https://bar.com'),
+            },
+            my_not => {
+              path => '/allOf/0/not',
+              canonical_uri => str('https://bar.com#/not'),
+            },
+          },
         },
         'https://bar.com/inner_id' => {
           path => '/allOf/0/not/not', canonical_uri => str('https://bar.com/inner_id'),
@@ -489,6 +744,12 @@ subtest 'JSON pointer and URI escaping' => sub {
           specification_version => 'draft2020-12',
           vocabularies => $vocabularies{'draft2020-12'},
           configs => {},
+          anchors => {
+            tilde => {
+              path => '/$defs/foo/patternProperties/~0/properties/~0~1',
+              canonical_uri => str('http://localhost:4242/~username#/properties/~0~1'),
+            },
+          },
         },
         'http://localhost:4242/my_slash' => {
           path => '/$defs/foo/patternProperties/~1',
@@ -496,6 +757,12 @@ subtest 'JSON pointer and URI escaping' => sub {
           specification_version => 'draft2020-12',
           vocabularies => $vocabularies{'draft2020-12'},
           configs => {},
+          anchors => {
+            slash => {
+              path => '/$defs/foo/patternProperties/~1/properties/~0~1',
+              canonical_uri => str('http://localhost:4242/my_slash#/properties/~0~1'),
+            },
+          },
         },
         'http://localhost:4242/~username/my_slash' => {
           path => '/$defs/foo/patternProperties/[~0~1]',
@@ -503,27 +770,12 @@ subtest 'JSON pointer and URI escaping' => sub {
           specification_version => 'draft2020-12',
           vocabularies => $vocabularies{'draft2020-12'},
           configs => {},
-        },
-        'http://localhost:4242/~username#tilde' => {
-          path => '/$defs/foo/patternProperties/~0/properties/~0~1',
-          canonical_uri => str('http://localhost:4242/~username#/properties/~0~1'),
-          specification_version => 'draft2020-12',
-          vocabularies => $vocabularies{'draft2020-12'},
-          configs => {},
-        },
-        'http://localhost:4242/my_slash#slash' => {
-          path => '/$defs/foo/patternProperties/~1/properties/~0~1',
-          canonical_uri => str('http://localhost:4242/my_slash#/properties/~0~1'),
-          specification_version => 'draft2020-12',
-          vocabularies => $vocabularies{'draft2020-12'},
-          configs => {},
-        },
-        'http://localhost:4242/~username/my_slash#tildeslash' => {
-          path => '/$defs/foo/patternProperties/[~0~1]/properties/~0~1',
-          canonical_uri => str('http://localhost:4242/~username/my_slash#/properties/~0~1'),
-          specification_version => 'draft2020-12',
-          vocabularies => $vocabularies{'draft2020-12'},
-          configs => {},
+          anchors => {
+            tildeslash => {
+              path => '/$defs/foo/patternProperties/[~0~1]/properties/~0~1',
+              canonical_uri => str('http://localhost:4242/~username/my_slash#/properties/~0~1'),
+            },
+          },
         },
       ),
       _entities => [ { map +($_ => 0),
@@ -552,6 +804,17 @@ subtest 'JSON pointer and URI escaping' => sub {
 };
 
 subtest 'resource collisions' => sub {
+  is(
+    exception {
+      JSON::Schema::Modern::Document->new(
+        canonical_uri => Mojo::URL->new('https://foo.com/x/y/z'),
+        schema => { '$id' => '/x/y/z' },
+      );
+    },
+    undef,
+    'no collision when adding an identical resource (after resolving with base uri)',
+  );
+
   like(
     exception {
       JSON::Schema::Modern::Document->new(
@@ -568,21 +831,51 @@ subtest 'resource collisions' => sub {
     'detected collision between document\'s initial uri and a subschema\'s uri',
   );
 
-  like(
-    exception {
-      JSON::Schema::Modern::Document->new(
-        canonical_uri => Mojo::URL->new('https://foo.com'),
-        schema => {
-          allOf => [
-            { '$id' => '/x/y/z' },
-            { '$id' => '/x/y/z' },
-          ],
-        },
-      );
-    },
-    qr{^\Quri "https://foo.com/x/y/z" conflicts with an existing schema resource\E},
+  cmp_deeply(
+    JSON::Schema::Modern::Document->new(
+      canonical_uri => Mojo::URL->new('https://foo.com'),
+      schema => {
+        allOf => [
+          { '$id' => '/x/y/z' },
+          { '$id' => '/x/y/z' },
+        ],
+      },
+    ),
+    all(
+      listmethods(
+        resource_index => [],
+        errors => [
+          methods(TO_JSON => {
+            instanceLocation => '',
+            keywordLocation => '/allOf/1/$id',
+            absoluteKeywordLocation => 'https://foo.com#/allOf/1/$id',
+            error => 'duplicate canonical uri "https://foo.com/x/y/z" found (original at path "/allOf/0")',
+          }),
+        ],
+      ),
+    ),
     'detected collision between two subschema uris in a document',
   );
+
+
+  my $doc1 = JSON::Schema::Modern::Document->new(schema => { '$id' => 'a/b' });
+  my $doc2 = JSON::Schema::Modern::Document->new(schema => { '$id' => 'b' });
+  my $js = JSON::Schema::Modern->new;
+
+  is(
+    # id resolves to https://foo.com/a/b
+    exception { $js->add_document('https://foo.com' => $doc1) },
+    undef,
+    'add first document, resolving resources to a base uri',
+  );
+
+  like(
+    # id resolves to https://foo.com/a/b
+    exception { $js->add_document('https://foo.com/a/' => $doc2) },
+    qr{^uri "https://foo.com/a/b" conflicts with an existing schema resource},
+    'the resource in the second document resolves to the same uri as from the first document',
+  );
+
 
   is(
     exception {

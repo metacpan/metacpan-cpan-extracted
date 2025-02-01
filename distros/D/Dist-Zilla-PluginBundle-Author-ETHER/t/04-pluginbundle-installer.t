@@ -316,8 +316,7 @@ subtest 'installer = ModuleBuildTiny, StaticInstall.mode = off' => sub {
         if not Test::Builder->new->is_passing;
 };
 
-foreach my $static (undef, 'off', 'on')
-{
+foreach my $static (undef, 'off', 'on') {
     subtest 'default installer (MakeMaker::Fallback, ModuleBuildTiny::Fallback), StaticInstall.mode = ' . ($static // '<undef>') => sub {
         my $tempdir = no_git_tempdir();
         my $tzil = Builder->from_config(

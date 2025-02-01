@@ -4,7 +4,7 @@ package Pod::Weaver::PluginBundle::Author::ETHER;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: A plugin bundle for pod woven by ETHER
 
-our $VERSION = '0.164';
+our $VERSION = '0.165';
 
 use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -172,7 +172,7 @@ Pod::Weaver::PluginBundle::Author::ETHER - A plugin bundle for pod woven by ETHE
 
 =head1 VERSION
 
-version 0.164
+version 0.165
 
 =head1 SYNOPSIS
 

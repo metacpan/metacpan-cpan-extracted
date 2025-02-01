@@ -1,4 +1,4 @@
-package HTTP::Request::FromFetch 0.54;
+package HTTP::Request::FromFetch 0.55;
 use 5.020;
 use feature 'signatures';
 no warnings 'experimental::signatures';

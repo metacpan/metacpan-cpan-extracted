@@ -1,3 +1,8 @@
+0.19 Fri Jan 31 13:28:44 EST 2025
+	- Fixes as per CPANTS:
+	  + LICENSE added.
+	  + packaged with GNU tar.
+
 0.18 Mon Jan 27 07:43:51 EST 2025
 	- reorganized _fromEthiopic for clarity.
 

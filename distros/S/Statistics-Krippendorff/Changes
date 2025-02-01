@@ -1,5 +1,8 @@
 Revision history for Statistics-Krippendorff
 
+0.02    2025-01-30
+        - Include the MASI distance.
+
 0.01    2025-01-23
         - First version, released on an unsuspecting world.
 

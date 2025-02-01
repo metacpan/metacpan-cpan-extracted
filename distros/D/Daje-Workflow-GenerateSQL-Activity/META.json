@@ -44,6 +44,7 @@
          "requires" : {
             "Daje::Config" : "0",
             "Daje::Workflow::Common::Activity::Base" : "0",
+            "Daje::Workflow::Templates" : "0",
             "Mojo::Base" : "0",
             "Mojo::File" : "0",
             "Syntax::Keyword::Match" : "0",
@@ -59,7 +60,7 @@
    "provides" : {
       "Daje::Workflow::GenerateSQL::Activity" : {
          "file" : "lib/Daje/Workflow/GenerateSQL/Activity.pm",
-         "version" : "1.01"
+         "version" : "1.02"
       },
       "Daje::Workflow::GenerateSQL::Base::Common" : {
          "file" : "lib/Daje/Workflow/GenerateSQL/Base/Common.pm"
@@ -93,7 +94,7 @@
          "web" : "https://github.com/janeskil1525/Daje-Workflow-GenerateSQL-Activity"
       }
    },
-   "version" : "1.01",
+   "version" : "1.02",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

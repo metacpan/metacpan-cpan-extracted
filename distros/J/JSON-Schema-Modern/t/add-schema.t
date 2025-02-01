@@ -245,14 +245,7 @@ subtest 'add a schema associated with a uri' => sub {
     all(
       isa('JSON::Schema::Modern::Document'),
       listmethods(
-        resource_index => unordered_pairs(
-          'https://foo.com' => {
-            path => '',
-            canonical_uri => str('https://bar.com'),
-            specification_version => 'draft2020-12',
-            vocabularies => $vocabularies{'draft2020-12'},
-            configs => {},
-          },
+        resource_index => [
           'https://bar.com' => {
             path => '',
             canonical_uri => str('https://bar.com'),
@@ -260,15 +253,15 @@ subtest 'add a schema associated with a uri' => sub {
             vocabularies => $vocabularies{'draft2020-12'},
             configs => {},
           },
-        ),
+        ],
         canonical_uri => [ str('https://bar.com') ],
       ),
     ),
-    'added the schema data with an associated uri',
+    'added the schema data with an associated uri; the document does not see the overridden uri',
   );
 
   cmp_result(
-    my $result = $js->evaluate(1, 'https://bar.com#/allOf/0')->TO_JSON,
+    $js->evaluate(1, 'https://bar.com#/allOf/0')->TO_JSON,
     {
       valid => false,
       errors => [
@@ -325,6 +318,7 @@ subtest 'add a schema associated with a uri' => sub {
     'warned when using deprecated form of add_schema',
   );
 
+  # this actually does nothing, via the duplicate check in _add_resource
   cmp_result(
     $js->add_document($document),
     shallow($document),
@@ -343,8 +337,28 @@ subtest 'add a schema associated with a uri' => sub {
         configs => {},
       } ), qw(https://foo.com https://bar.com https://bloop.com)
     },
-    'now the document is available as all three uris',
+    'now the document is available as all three uris, with the same canonical_uri',
   );
+};
+
+subtest 'multiple anonymous schemas' => sub {
+  my $js = JSON::Schema::Modern->new;
+
+  cmp_result(
+    $js->evaluate(1, { minimum => 1 })->TO_JSON,
+    { valid => true },
+    'evaluate an anonymous schema',
+  );
+
+  cmp_deeply([ keys $js->{_resource_index}->%* ], [ '' ], 'one resource is indexed');
+
+  cmp_result(
+    $js->evaluate(2, { minimum => 2 })->TO_JSON,
+    { valid => true },
+    'evaluate another anonymous schema',
+  );
+
+  cmp_deeply([ keys $js->{_resource_index}->%* ], [ '' ], 'still only one resource is indexed');
 };
 
 subtest 'add a document without associating it with a uri' => sub {
@@ -574,39 +588,72 @@ subtest '$ref to non-canonical uri' => sub {
   );
 };
 
-subtest 'register a document against multiple uris; do not allow duplicate uris' => sub {
+subtest 'register a document against multiple uris, with absolute root uri' => sub {
   my $js = JSON::Schema::Modern->new;
   my $document = JSON::Schema::Modern::Document->new(
     schema => {
       '$id' => 'https://foo.com',
+      '$anchor' => 'my_anchor',
       maximum => 1,
       '$defs' => {
         foo => {
-          '$anchor' => 'fooanchor',
+          '$id' => 'my_dir',
           allOf => [ true ],
         },
       },
     });
+
+  my %more_configs;
+
+  cmp_result(
+    { $document->resource_index },
+    my $doc_resource_index = {
+      'https://foo.com' => {
+        path => '',
+        canonical_uri => str('https://foo.com'),
+        do { %more_configs = (
+          specification_version => 'draft2020-12',
+          vocabularies => $vocabularies{'draft2020-12'},
+          configs => {},
+        ) },
+        anchors => {
+          my_anchor => {
+            path => '',
+            canonical_uri => str('https://foo.com'),
+          },
+        },
+      },
+      'https://foo.com/my_dir' => {
+        path => '/$defs/foo',
+        canonical_uri => str('https://foo.com/my_dir'),
+        %more_configs,
+      },
+    },
+    'identifiers stored for the document',
+  );
+
   $js->add_document($document);
 
   cmp_result(
     { $js->_resource_index },
-    {
+    my $main_resource_index = {
       'https://foo.com' => {
         path => '',
         canonical_uri => str('https://foo.com'),
         document => shallow($document),
-        specification_version => 'draft2020-12',
-        vocabularies => $vocabularies{'draft2020-12'},
-        configs => {},
+        %more_configs,
+        anchors => {
+          my_anchor => {
+            path => '',
+            canonical_uri => str('https://foo.com'),
+          },
+        },
       },
-      'https://foo.com#fooanchor' => {
+      'https://foo.com/my_dir' => {
         path => '/$defs/foo',
-        canonical_uri => str('https://foo.com#/$defs/foo'),
+        canonical_uri => str('https://foo.com/my_dir'),
         document => shallow($document),
-        specification_version => 'draft2020-12',
-        vocabularies => $vocabularies{'draft2020-12'},
-        configs => {},
+        %more_configs,
       },
     },
     'resource index from the document is copied to the main object',
@@ -616,30 +663,19 @@ subtest 'register a document against multiple uris; do not allow duplicate uris'
 
   cmp_result(
     { $js->_resource_index },
-    my $main_resource_index = {
-      'https://foo.com' => {
-        path => '',
-        canonical_uri => str('https://foo.com'),
-        document => shallow($document),
-        specification_version => 'draft2020-12',
-        vocabularies => $vocabularies{'draft2020-12'},
-        configs => {},
-      },
-      'https://foo.com#fooanchor' => {
-        path => '/$defs/foo',
-        canonical_uri => str('https://foo.com#/$defs/foo'),
-        document => shallow($document),
-        specification_version => 'draft2020-12',
-        vocabularies => $vocabularies{'draft2020-12'},
-        configs => {},
-      },
+    $main_resource_index = {
+      %$main_resource_index,
       'https://uri2.com' => {
         path => '',
         canonical_uri => str('https://foo.com'),
         document => shallow($document),
-        specification_version => 'draft2020-12',
-        vocabularies => $vocabularies{'draft2020-12'},
-        configs => {},
+        %more_configs,
+        anchors => {
+          my_anchor => {
+            path => '',
+            canonical_uri => str('https://foo.com'),
+          },
+        },
       },
     },
     'add a secondary uri for the same document',
@@ -647,22 +683,7 @@ subtest 'register a document against multiple uris; do not allow duplicate uris'
 
   cmp_result(
     { $document->resource_index },
-    my $doc_resource_index = {
-      'https://foo.com' => {
-        path => '',
-        canonical_uri => str('https://foo.com'),
-        specification_version => 'draft2020-12',
-        vocabularies => $vocabularies{'draft2020-12'},
-        configs => {},
-      },
-      'https://foo.com#fooanchor' => {
-        path => '/$defs/foo',
-        canonical_uri => str('https://foo.com#/$defs/foo'),
-        specification_version => 'draft2020-12',
-        vocabularies => $vocabularies{'draft2020-12'},
-        configs => {},
-      },
-    },
+    $doc_resource_index,
     'secondary uri not also added to the document',
   );
 
@@ -684,44 +705,26 @@ subtest 'register a document against multiple uris; do not allow duplicate uris'
     'resource index remains unchanged after erroneous add_schema calls',
   );
 
-  is(
-    $js->add_schema('https://uri4.com', +{ $document->schema->%* }),
-    $document,
-    'adding the same schema *content* again does not fail, and returns the original document object',
-  );
-
-  cmp_result(
-    { $document->resource_index },
-    $doc_resource_index,
-    'original document remains unchanged - the new uri was not added to it',
-  );
+  $js->add_schema('https://uri4.com', +{ $document->schema->%* });
 
   cmp_result(
     { $js->_resource_index },
     {
+      %$main_resource_index,
       'https://uri4.com' => {
         path => '',
         canonical_uri => str('https://foo.com'),
         document => shallow($document),
-        specification_version => 'draft2020-12',
-        vocabularies => $vocabularies{'draft2020-12'},
-        configs => {},
+        %more_configs,
+        anchors => {
+          my_anchor => {
+            path => '',
+            canonical_uri => str('https://foo.com'),
+          },
+        },
       },
-      %$main_resource_index,
     },
-    'new uri was added against the original document (no new document created)',
-  );
-
-  cmp_result(
-    scalar $js->get('https://foo.com#fooanchor'),
-    $js->_get_resource('https://foo.com#fooanchor')->{document}->schema->{'$defs'}{foo},
-    '->get in scalar context on a secondary URI with a plain-name fragment',
-  );
-  cmp_result(
-    [ $js->get('https://foo.com#fooanchor') ],
-    [ $js->_get_resource('https://uri2.com')->{document}->schema->{'$defs'}{foo},
-      all(isa('Mojo::URL'), str('https://foo.com#/$defs/foo')) ],
-    '->get in list context on a URI with a plain-name fragment includes the canonical uri',
+    'adding the same schema content again is permitted',
   );
 
   is(
@@ -733,6 +736,333 @@ subtest 'register a document against multiple uris; do not allow duplicate uris'
     [ $js->get('https://foo.com#i_do_not_exist') ],
     [],
     '->get in list context for a nonexistent resource returns empty list',
+  );
+};
+
+subtest 'register a document against multiple uris, with relative root uri' => sub {
+  my $js = JSON::Schema::Modern->new;
+  my $document = JSON::Schema::Modern::Document->new(
+    schema => {
+      '$id' => 'my_dir/',
+      '$anchor' => 'my_anchor',
+      maximum => 1,
+      '$defs' => {
+        foo => {
+          '$id' => 'my_dir2',
+          allOf => [ true ],
+        },
+      },
+    });
+
+  my %more_configs;
+
+  cmp_result(
+    { $document->resource_index },
+    my $doc_resource_index = {
+      'my_dir/' => {
+        path => '',
+        canonical_uri => str('my_dir/'),
+        do { %more_configs = (
+          specification_version => 'draft2020-12',
+          vocabularies => $vocabularies{'draft2020-12'},
+          configs => {},
+        ) },
+        anchors => {
+          my_anchor => {
+            path => '',
+            canonical_uri => str('my_dir/'),
+          },
+        },
+      },
+      'my_dir/my_dir2' => {
+        path => '/$defs/foo',
+        canonical_uri => str('my_dir/my_dir2'),
+        %more_configs,
+      },
+    },
+    'identifiers stored for the document',
+  );
+
+  $js->add_document($document);
+
+  cmp_result(
+    { $js->_resource_index },
+    my $main_resource_index = {
+      'my_dir/' => {
+        path => '',
+        canonical_uri => str('my_dir/'),
+        document => shallow($document),
+        %more_configs,
+        anchors => {
+          my_anchor => {
+            path => '',
+            canonical_uri => str('my_dir/'),
+          },
+        },
+      },
+      'my_dir/my_dir2' => {
+        path => '/$defs/foo',
+        canonical_uri => str('my_dir/my_dir2'),
+        document => shallow($document),
+        %more_configs,
+      },
+    },
+    'resource index from the document is copied to the main object',
+  );
+
+  $js->add_document('https://uri2.com', $document);
+
+  cmp_result(
+    { $js->_resource_index },
+    $main_resource_index = {
+      %$main_resource_index,
+      'https://uri2.com' => {
+        path => '',
+        canonical_uri => str('https://uri2.com/my_dir/'),
+        document => shallow($document),
+        %more_configs,
+        anchors => {
+          my_anchor => {
+            path => '',
+            canonical_uri => str('https://uri2.com/my_dir/'),
+          },
+        },
+      },
+      'https://uri2.com/my_dir/' => {
+        path => '',
+        canonical_uri => str('https://uri2.com/my_dir/'),
+        document => shallow($document),
+        %more_configs,
+        anchors => {
+          my_anchor => {
+            path => '',
+            canonical_uri => str('https://uri2.com/my_dir/'),
+          },
+        },
+      },
+      'https://uri2.com/my_dir/my_dir2' => {
+        path => '/$defs/foo',
+        canonical_uri => str('https://uri2.com/my_dir/my_dir2'),
+        document => shallow($document),
+        %more_configs,
+      },
+    },
+    'add a secondary (absolute) uri for the same document',
+  );
+
+  cmp_result(
+    { $document->resource_index },
+    $doc_resource_index,
+    'secondary uri not also added to the document',
+  );
+
+  like(
+    exception { $js->add_schema('https://uri2.com', { x => 1 }) },
+    qr!^\Quri "https://uri2.com" conflicts with an existing schema resource\E!,
+    'cannot call add_schema with the same URI as for another schema',
+  );
+
+  like(
+    exception { $js->add_schema('https://uri3.com', { '$id' => 'https://uri2.com', x => 1 }) },
+    qr!^\Quri "https://uri2.com" conflicts with an existing schema resource\E!,
+    'cannot reuse the same $id in another document',
+  );
+
+  cmp_result(
+    { $js->_resource_index },
+    $main_resource_index,
+    'resource index remains unchanged after erroneous add_schema calls',
+  );
+
+  $js->add_schema('https://uri4.com', +{ $document->schema->%* });
+
+  cmp_result(
+    { $js->_resource_index },
+    {
+      %$main_resource_index,
+      'https://uri4.com' => {
+        path => '',
+        canonical_uri => str('https://uri4.com/my_dir/'),
+        document => shallow($document),
+        %more_configs,
+        anchors => {
+          my_anchor => {
+            path => '',
+            canonical_uri => str('https://uri4.com/my_dir/'),
+          },
+        },
+      },
+      'https://uri4.com/my_dir/' => {
+        path => '',
+        canonical_uri => str('https://uri4.com/my_dir/'),
+        document => shallow($document),
+        %more_configs,
+        anchors => {
+          my_anchor => {
+            path => '',
+            canonical_uri => str('https://uri4.com/my_dir/'),
+          },
+        },
+      },
+      'https://uri4.com/my_dir/my_dir2' => {
+        path => '/$defs/foo',
+        canonical_uri => str('https://uri4.com/my_dir/my_dir2'),
+        document => shallow($document),
+        %more_configs,
+      },
+    },
+    'adding the same schema content again is permitted',
+  );
+};
+
+subtest 'register a document against multiple uris, with no root uri' => sub {
+  my $js = JSON::Schema::Modern->new;
+  my $document = JSON::Schema::Modern::Document->new(
+    schema => {
+      '$anchor' => 'my_anchor',
+      maximum => 1,
+      '$defs' => {
+        foo => {
+          '$id' => 'my_dir',
+          allOf => [ true ],
+        },
+      },
+    });
+
+  my %more_configs;
+
+  cmp_result(
+    { $document->resource_index },
+    my $doc_resource_index = {
+      '' => {
+        path => '',
+        canonical_uri => str(''),
+        do { %more_configs = (
+          specification_version => 'draft2020-12',
+          vocabularies => $vocabularies{'draft2020-12'},
+          configs => {},
+        ) },
+        anchors => {
+          my_anchor => {
+            path => '',
+            canonical_uri => str(''),
+          },
+        },
+      },
+      'my_dir' => {
+        path => '/$defs/foo',
+        canonical_uri => str('my_dir'),
+        %more_configs,
+      },
+    },
+    'identifiers stored for the document',
+  );
+
+  $js->add_document($document);
+
+  cmp_result(
+    { $js->_resource_index },
+    my $main_resource_index = {
+      '' => {
+        path => '',
+        canonical_uri => str(''),
+        document => shallow($document),
+        %more_configs,
+        anchors => {
+          my_anchor => {
+            path => '',
+            canonical_uri => str(''),
+          },
+        },
+      },
+      'my_dir' => {
+        path => '/$defs/foo',
+        canonical_uri => str('my_dir'),
+        document => shallow($document),
+        %more_configs,
+      },
+    },
+    'resource index from the document is copied to the main object',
+  );
+
+  $js->add_document('https://uri2.com', $document);
+
+  cmp_result(
+    { $js->_resource_index },
+    $main_resource_index = {
+      %$main_resource_index,
+      'https://uri2.com' => {
+        path => '',
+        canonical_uri => str('https://uri2.com'),
+        document => shallow($document),
+        %more_configs,
+        anchors => {
+          my_anchor => {
+            path => '',
+            canonical_uri => str('https://uri2.com'),
+          },
+        },
+      },
+      'https://uri2.com/my_dir' => {
+        path => '/$defs/foo',
+        canonical_uri => str('https://uri2.com/my_dir'),
+        document => shallow($document),
+        %more_configs,
+      },
+    },
+    'add a secondary (absolute) uri for the same document',
+  );
+
+  cmp_result(
+    { $document->resource_index },
+    $doc_resource_index,
+    'secondary uri not also added to the document',
+  );
+
+  like(
+    exception { $js->add_schema('https://uri2.com', { x => 1 }) },
+    qr!^\Quri "https://uri2.com" conflicts with an existing schema resource\E!,
+    'cannot call add_schema with the same URI as for another schema',
+  );
+
+  like(
+    exception { $js->add_schema('https://uri3.com', { '$id' => 'https://uri2.com', x => 1 }) },
+    qr!^\Quri "https://uri2.com" conflicts with an existing schema resource\E!,
+    'cannot reuse the same $id in another document',
+  );
+
+  cmp_result(
+    { $js->_resource_index },
+    $main_resource_index,
+    'resource index remains unchanged after erroneous add_schema calls',
+  );
+
+  $js->add_schema('https://uri4.com', +{ $document->schema->%* });
+
+  cmp_result(
+    { $js->_resource_index },
+    {
+      %$main_resource_index,
+      'https://uri4.com' => {
+        path => '',
+        canonical_uri => str('https://uri4.com'),
+        document => shallow($document),
+        %more_configs,
+        anchors => {
+          my_anchor => {
+            path => '',
+            canonical_uri => str('https://uri4.com'),
+          },
+        },
+      },
+      'https://uri4.com/my_dir' => {
+        path => '/$defs/foo',
+        canonical_uri => str('https://uri4.com/my_dir'),
+        document => shallow($document),
+        %more_configs,
+      },
+    },
+    'adding the same schema content again is permitted',
   );
 };
 
@@ -776,12 +1106,6 @@ subtest 'external resource with externally-supplied uri; main resource with mult
     $js->evaluate('string', 'https://main.com')->TO_JSON,
     $result,
     'all uris in result are correct, using main uri as the target',
-  );
-
-  cmp_result(
-    $js->evaluate('string', $schema)->TO_JSON,
-    $result,
-    'all uris in result are correct, using the literal schema as the target',
   );
 };
 

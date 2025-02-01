@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: One JSON Schema document
 
-our $VERSION = '0.599';
+our $VERSION = '0.600';
 
 use 5.020;
 use Moo;
@@ -22,7 +22,7 @@ use List::Util 1.29 'pairs';
 use Ref::Util 0.100 'is_plain_hashref';
 use Safe::Isa 1.000008;
 use MooX::TypeTiny;
-use Types::Standard 1.016003 qw(InstanceOf HashRef Str Dict ArrayRef Enum ClassName Undef Slurpy);
+use Types::Standard 1.016003 qw(InstanceOf HashRef Str Map Dict ArrayRef Enum ClassName Undef Slurpy Optional);
 use Types::Common::Numeric 'PositiveOrZeroInt';
 use namespace::clean;
 
@@ -43,7 +43,7 @@ has canonical_uri => (
 
 has metaschema_uri => (
   is => 'rwp',
-  isa => InstanceOf['Mojo::URL'],
+  isa => (InstanceOf['Mojo::URL'])->where(q{not length $_->fragment}), # allow for .../draft-07/schema#
   coerce => sub { $_[0]->$_isa('Mojo::URL') ? $_[0] : Mojo::URL->new($_[0]) },
 );
 
@@ -55,15 +55,21 @@ has evaluator => (
 
 # "A JSON Schema resource is a schema which is canonically identified by an absolute URI."
 # https://json-schema.org/draft/2020-12/json-schema-core.html#rfc.section.4.3.5
+my $path_type = Str->where('m{^(?:/|$)}');  # JSON pointer relative to the document root
 has resource_index => (
   is => 'bare',
-  isa => HashRef[my $resource_type = Dict[
-      canonical_uri => InstanceOf['Mojo::URL'],
-      path => Str,  # always a JSON pointer, relative to the document root
-      specification_version => Str, # not an Enum due to module load ordering
+  isa => Map[my $resource_key_type = Str->where('!/#/'), my $resource_type = Dict[
+      # always stringwise-equal to the top level key
+      canonical_uri => (InstanceOf['Mojo::URL'])->where(q{not defined $_->fragment}),
+      path => $path_type,
+      specification_version => Enum[qw(draft4 draft6 draft7 draft2019-09 draft2020-12)],
       # the vocabularies used when evaluating instance data against schema
       vocabularies => ArrayRef[ClassName->where(q{$_->DOES('JSON::Schema::Modern::Vocabulary')})],
       configs => HashRef,
+      anchors => Optional[HashRef[Dict[
+        canonical_uri => (InstanceOf['Mojo::URL'])->where(q{not defined $_->fragment or substr($_->fragment, 0, 1) eq '/'}),
+        path => $path_type,
+      ]]],
       Slurpy[HashRef[Undef]],  # no other fields allowed
     ]],
   init_arg => undef,
@@ -72,9 +78,12 @@ has resource_index => (
 
 sub resource_index { $_[0]->{resource_index}->%* }
 sub resource_pairs { pairs $_[0]->{resource_index}->%* }
-sub _add_resources { $_[0]->{resource_index}{$_[1]} = $resource_type->($_[2]) }
 sub _get_resource { $_[0]->{resource_index}{$_[1]} }
 sub _canonical_resources { values $_[0]->{resource_index}->%* }
+sub _add_resource {
+  croak 'uri "'.$_[1].'" conflicts with an existing schema resource' if $_[0]->{resource_index}{$_[1]};
+  $_[0]->{resource_index}{$resource_key_type->($_[1])} = $resource_type->($_[2]);
+}
 
 has _path_to_resource => (
   is => 'ro',
@@ -138,30 +147,6 @@ sub get_entity_locations ($self, $entity) {
   grep $self->{_entities}{$_} == $index, keys $self->{_entities}->%*;
 }
 
-around _add_resources => sub {
-  my $orig = shift;
-  my $self = shift;
-
-  foreach my $pair (pairs @_) {
-    my ($key, $value) = @$pair;
-
-    $resource_type->($value); # check type of hash value against Dict
-
-    if (my $existing = $self->_get_resource($key)) {
-      croak 'uri "'.$key.'" conflicts with an existing schema resource'
-        if $existing->{path} ne $value->{path}
-          or $existing->{canonical_uri} ne $value->{canonical_uri}
-          or $existing->{specification_version} ne $value->{specification_version};
-    }
-
-    # this will never happen, if we parsed $id correctly
-    croak sprintf('a resource canonical uri cannot contain a plain-name fragment (%s)', $value->{canonical_uri})
-      if ($value->{canonical_uri}->fragment // '') =~ m{^[^/]};
-
-    $self->$orig($key, $value);
-  }
-};
-
 # shims for Mojo::JSON::Pointer
 sub data { shift->schema(@_) }
 sub FOREIGNBUILDARGS { () }
@@ -172,38 +157,42 @@ sub TO_JSON { shift->schema }
 # note that this is always called, even in subclasses
 sub BUILD ($self, $args) {
   my $original_uri = $self->canonical_uri->clone;
-  my $state = $self->traverse($self->evaluator // $self->_set_evaluator(JSON::Schema::Modern->new));
+  my $state = $self->traverse(
+    $self->evaluator // $self->_set_evaluator(JSON::Schema::Modern->new),
+    $args->{specification_version} ? +{ $args->%{specification_version} } : (),
+  );
 
   # if the schema identified a canonical uri for itself, it overrides the initial value
   $self->_set_canonical_uri($state->{initial_schema_uri}) if $state->{initial_schema_uri} ne $original_uri;
 
   if ($state->{errors}->@*) {
-    foreach my $error ($state->{errors}->@*) {
-      $error->mode('traverse') if not defined $error->mode;
-    }
-
     $self->_set_errors($state->{errors});
     return;
   }
 
-  # make sure the root schema is always indexed against *something*.
-  $self->_add_resources($original_uri => {
+  my $seen_root;
+  foreach my $key (keys $state->{identifiers}->%*) {
+    my $value = $state->{identifiers}{$key};
+    $self->_add_resource($key => $value);
+
+    # we're adding a non-anchor entry for the document root
+    ++$seen_root if $value->{path} eq '' and $key !~ /#./
+  }
+
+  $self->_add_resource($original_uri.'' => {
       path => '',
       canonical_uri => $self->canonical_uri,
       specification_version => $state->{spec_version},
       vocabularies => $state->{vocabularies},
       configs => $state->{configs},
     })
-    if (not "$original_uri" and $original_uri eq $self->canonical_uri)
-      or "$original_uri";
-
-  $self->_add_resources($state->{identifiers}->@*);
+  if not $seen_root;
 
   $self->_add_entity_location($_, 'schema') foreach $state->{subschemas}->@*;
 }
 
 # a subclass's method will override this one
-sub traverse ($self, $evaluator) {
+sub traverse ($self, $evaluator, $config_override = {}) {
   die 'wrong class - use JSON::Schema::Modern::Document::OpenAPI instead'
     if is_plain_hashref($self->schema) and exists $self->schema->{openapi};
 
@@ -211,6 +200,7 @@ sub traverse ($self, $evaluator) {
     {
       initial_schema_uri => $self->canonical_uri->clone,
       $self->metaschema_uri ? ( metaschema_uri => $self->metaschema_uri ) : (),
+      %$config_override,
     }
   );
 
@@ -257,7 +247,7 @@ JSON::Schema::Modern::Document - One JSON Schema document
 
 =head1 VERSION
 
-version 0.599
+version 0.600
 
 =head1 SYNOPSIS
 
@@ -286,8 +276,8 @@ The actual raw data representing the schema.
 =head2 canonical_uri
 
 When passed in during construction, this represents the initial URI by which the document should
-be known. It is overwritten with the root schema's C<$id> property when one exists, and as such
-can be considered the canonical URI for the document as a whole.
+be known. It is overwritten with the (resolved form of the) root schema's C<$id> property when one
+exists, and as such can be considered the canonical URI for the document as a whole.
 
 =head2 metaschema_uri
 
@@ -297,6 +287,41 @@ Sets the metaschema that is used to describe the document (or more specifically,
 contained within the document), which determines the
 specification version and vocabularies used during evaluation. Does not override any
 C<$schema> keyword actually present in the schema document.
+
+=head2 specification version
+
+Indicates which version of the JSON Schema specification is used during evaluation. This value is
+overridden by the value determined from the C<$schema> keyword in the schema used in evaluation
+(when present), or defaults to the latest version (currently C<draft2020-12>).
+
+The use of the C<$schema> keyword in your schema is I<HIGHLY> encouraged to ensure continued correct
+operation of your schema. The current default value will not stay the same over time.
+
+May be one of:
+
+=over 4
+
+=item *
+
+L<C<draft2020-12> or C<2020-12>|https://json-schema.org/specification-links.html#2020-12>, corresponding to metaschema C<https://json-schema.org/draft/2020-12/schema>
+
+=item *
+
+L<C<draft2019-09> or C<2019-09>|https://json-schema.org/specification-links.html#2019-09-formerly-known-as-draft-8>, corresponding to metaschema C<https://json-schema.org/draft/2019-09/schema>
+
+=item *
+
+L<C<draft7> or C<7>|https://json-schema.org/specification-links.html#draft-7>, corresponding to metaschema C<http://json-schema.org/draft-07/schema#>
+
+=item *
+
+L<C<draft6> or C<6>|https://json-schema.org/specification-links.html#draft-6>, corresponding to metaschema C<http://json-schema.org/draft-06/schema#>
+
+=item *
+
+L<C<draft4> or C<4>|https://json-schema.org/specification-links.html#draft-4>, corresponding to metaschema C<http://json-schema.org/draft-04/schema#>
+
+=back
 
 =head2 evaluator
 

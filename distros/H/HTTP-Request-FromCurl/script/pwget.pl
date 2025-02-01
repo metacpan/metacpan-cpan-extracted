@@ -5,13 +5,17 @@ use warnings;
 use HTTP::Request::FromWget;
 use LWP::UserAgent;
 use Getopt::Long ':config','pass_through';
+use Pod::Usage;
 
-our $VERSION = '0.54';
+our $VERSION = '0.55';
 
 # parse output options from @ARGV
 GetOptions(
     'output-file|O=s' => \my $outfilename,
-);
+    'help|h'         => \my $show_help,
+) or pod2usage(2);
+
+pod2usage(1) if $show_help;
 
 my @output_options;
 if( $outfilename ) {

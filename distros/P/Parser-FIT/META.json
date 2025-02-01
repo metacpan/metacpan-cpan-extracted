@@ -4,7 +4,7 @@
       "Sven Eppler <ghandi@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -53,6 +53,6 @@
          "web" : "https://github.com/ghandmann/parser-fit"
       }
    },
-   "version" : 0.06,
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : 0.07,
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

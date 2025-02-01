@@ -11,6 +11,7 @@ dist.ini
 eg/bols.pl
 eg/durations.pl
 eg/play-all.pl
+eg/simple.pl
 eg/synopsis.pl
 lib/Music/Percussion/Tabla.pm
 share/Tabla.sf2

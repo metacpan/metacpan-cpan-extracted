@@ -1,5 +1,26 @@
 Revision history for JSON-Schema-Modern
 
+0.600     2025-01-31 23:23:21Z
+          BREAKING CHANGES: OpenAPI::Modern must be updated to 0.079 after
+          installing this version.
+          - the specification version can now be overridden when constructing
+            Documents directly (rather than via the evaluator), if not
+            specified by the "$schema" keyword
+          - some fixes for $id handling in earlier drafts
+          - rework of document management and URI resolution:
+            $jsm->add_schema($uri, $schema) no longer sets the $uri in the
+            document object, allowing the document to be added to the index
+            under multiple URIs. Instead, we resolve the document's indexed
+            resources against the base URI and only store the resolved form in
+            the evaluator itself. This allows the same document to be reused
+            with different base URIs if it only contains relative $ids
+            internally.  add_document($uri, $document) now resolves all URI
+            resources against the provided URI, rather than adding document
+            resources as-is and adding $uri as one more resource URI.
+          - further restructuring of internal resource indexes, anchor
+            management, and traversal of subschemas from embedded non-JSON
+            Schema documents (e.g. OpenAPI documents)
+
 0.599     2025-01-26 22:54:02Z
           - the boolean overload in JSON::Schema::Modern::Result is now
             deprecated: it will warn on use, and will be removed no sooner
