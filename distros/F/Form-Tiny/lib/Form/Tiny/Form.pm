@@ -1,5 +1,5 @@
 package Form::Tiny::Form;
-$Form::Tiny::Form::VERSION = '2.25';
+$Form::Tiny::Form::VERSION = '2.26';
 use v5.10;
 use strict;
 use warnings;
@@ -102,7 +102,7 @@ sub _ft_validate_flat
 			$dirty->{$curr_f} = $validator->get_default($self);
 		}
 		elsif ($validator->required) {
-			$self->add_error($self->form_meta->build_error(Required => field => $curr_f));
+			$self->add_error($self->form_meta->build_error(Required => field_def => $validator));
 		}
 	}
 }
@@ -112,8 +112,6 @@ sub _ft_validate_nested
 	my ($self, $fields, $dirty, $inline_hook) = @_;
 
 	foreach my $validator (@{$self->field_defs}) {
-		my $curr_f = $validator->name;
-
 		my $current_data = Form::Tiny::Utils::_find_field($fields, $validator);
 		if (defined $current_data) {
 			my $all_ok = 1;
@@ -142,7 +140,7 @@ sub _ft_validate_nested
 			);
 		}
 		elsif ($validator->required) {
-			$self->add_error($self->form_meta->build_error(Required => field => $curr_f));
+			$self->add_error($self->form_meta->build_error(Required => field_def => $validator));
 		}
 	}
 }
@@ -224,6 +222,11 @@ sub add_error
 			$error = shift @error;
 			croak 'error passed to add_error must be an instance of Form::Tiny::Error'
 				unless $error->isa('Form::Tiny::Error');
+
+			# validate field name and set field definition
+			if (!$error->has_field_def && $error->has_field) {
+				$error->set_field_def($self->_ft_find_field($error->field, 1));
+			}
 		}
 		else {
 			$error = Form::Tiny::Error->new(error => @error);
@@ -231,17 +234,13 @@ sub add_error
 	}
 	elsif (@error == 2) {
 		$error = Form::Tiny::Error->new(
-			field => $error[0],
+			field_def => $self->_ft_find_field($error[0], 1),
 			error => $error[1],
 		);
 	}
 	else {
 		croak 'invalid arguments passed to $form->add_error';
 	}
-
-	# check if the field exists
-	$self->_ft_find_field($error->field, 1)
-		if $error->has_field;
 
 	# unwrap nested form errors
 	$error = $error->get_error
@@ -258,7 +257,8 @@ sub errors_hash
 
 	my %ret;
 	for my $error (@{$self->errors}) {
-		push @{$ret{$error->field // ''}}, $error->get_error;
+		my $field_name = $error->field_def ? $error->field_def->name : '';
+		push @{$ret{$field_name}}, $error->get_error;
 	}
 
 	return \%ret;

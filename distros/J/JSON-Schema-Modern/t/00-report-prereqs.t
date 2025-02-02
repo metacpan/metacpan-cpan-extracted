@@ -77,6 +77,7 @@ my @include = qw(
   Math::BigInt
   Math::BigFloat
   builtin
+  builtin::Backport
 );
 
 my @exclude = qw(

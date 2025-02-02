@@ -5,6 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
+  Term::ANSIColor: '0'
   Test::More: '0.94'
   if: '0'
   perl: '5.006'
@@ -30,10 +31,10 @@ no_index:
 provides:
   Test2::Warnings:
     file: lib/Test2/Warnings.pm
-    version: '0.037'
+    version: '0.038'
   Test::Warnings:
     file: lib/Test/Warnings.pm
-    version: '0.037'
+    version: '0.038'
 requires:
   Carp: '0'
   Exporter: '0'
@@ -48,10 +49,10 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Warnings
   homepage: https://github.com/karenetheridge/Test-Warnings
   repository: https://github.com/karenetheridge/Test-Warnings.git
-version: '0.037'
+version: '0.038'
 x_Dist_Zilla:
   perl:
-    version: '5.041007'
+    version: '5.041008'
   plugins:
     -
       class: Dist::Zilla::Plugin::FileFinder::Filter
@@ -523,7 +524,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20241220'
+          Module::CoreList: '5.20250120'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.010'
     -
@@ -687,7 +688,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.037
+          tag: v0.038
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -842,7 +843,7 @@ x_Dist_Zilla:
           Module::Metadata: '1.000038'
           version: '0.006'
       name: Test::CheckBreaks
-      version: '0.019'
+      version: '0.020'
     -
       class: Dist::Zilla::Plugin::GenerateFile
       name: synopsis_1
@@ -916,7 +917,7 @@ x_contributors:
   - 'Tina Müller <cpan2@tinita.de>'
   - 'A. Sinan Unur <nanis@cpan.org>'
   - 'Leon Timmermans <fawaka@gmail.com>'
-x_generated_by_perl: v5.41.7
+x_generated_by_perl: v5.41.8
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 1

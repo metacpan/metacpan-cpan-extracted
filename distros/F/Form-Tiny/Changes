@@ -1,5 +1,10 @@
 Revision history for Perl extension Form::Tiny.
 
+2.26 Sat Feb 1 2025
+	- add field_def attribute to Error class (gh#18)
+	- attribute field from Error class is no longer used for anything other than producing an error message
+	- add a note about lack of support for roles and a link to a possible workaround (gh#17)
+
 2.25 Sat Sep 7 2024
 	- strict plugin now collects and reports the names of fields which are unexpected (each field in its own error)
 	- Error class has new method get_error, which returns full error message (old error method result may be incomplete)

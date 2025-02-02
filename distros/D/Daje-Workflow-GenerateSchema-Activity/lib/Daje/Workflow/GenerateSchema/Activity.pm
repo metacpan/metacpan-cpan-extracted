@@ -38,7 +38,7 @@ use Mojo::Pg;
 #
 #
 
-our $VERSION = "0.07";
+our $VERSION = "0.10";
 
 has 'pg';
 has 'dbname';
@@ -50,7 +50,17 @@ sub process ($self) {
 
     $self->_save_json($schema);
 
+    $self->_drop_database();
+
     return 1;
+}
+
+sub _drop_database($self) {
+
+    my $database = Daje::Workflow::GenerateSchema::Create::Database->new(
+        context => $self->context,
+        dbname  => $self->dbname(),
+    );
 }
 
 sub _create_database($self) {
@@ -68,7 +78,8 @@ sub _create_database($self) {
 sub _load_db_schema($self) {
 
     my $dbschema = Daje::Workflow::GenerateSchema::Create::Schema->new(
-        db => $self->pg->db
+        db       => $self->pg->db,
+        excludes => $self->activity_data->{excludes},
     )->get_db_schema('public');
 
     return $dbschema;
@@ -85,6 +96,7 @@ sub _save_json($self, $schema) {
 
 1;
 __END__
+
 
 
 
@@ -115,6 +127,8 @@ Daje::Workflow::GenerateSchema::Activity is ...
 =head1 REQUIRES
 
 L<Mojo::Pg> 
+
+L<Daje::Workflow::GenerateSchema::Create::Database> 
 
 L<Daje::Workflow::GenerateSchema::Create::Schema> 
 

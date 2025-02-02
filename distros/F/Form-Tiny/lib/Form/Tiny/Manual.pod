@@ -739,7 +739,8 @@ No extra values not defined in the subform will be copied.
 
 It is possible for Form::Tiny forms to inherit from one another, but the
 feature is experimental (meaning it does work, but is not tested enough and may
-not work properly for certain configurations).
+not work properly for certain configurations). It also does not support
+multiple inheritance.
 
 	# ParentForm.pm
 	package ParentForm;
@@ -768,6 +769,17 @@ not work properly for certain configurations).
 It is required that class parents are specified before any calls to Form::Tiny
 DSL have been made. If there are no DSL calls, a special keyword must be used:
 see L<Form::Tiny::Manual::Cookbook/"Empty forms">.
+
+=head4 What about roles?
+
+Form::Tiny uses a completely custom system for form inheritance. Roles are not
+implemented as a part of this system, hence they are not officially supported
+at the moment. Trying to compose a form by using C<with> keyword from L<Moo>
+will not merge Form::Tiny-specific data.
+
+If you really want the capabilities of roles, Diab Jerius has managed to
+emulate them using Package::Variant. Take a look at L<this github
+issue|https://github.com/bbrtj/perl-form-tiny/issues/17>.
 
 =head1 SEE ALSO
 

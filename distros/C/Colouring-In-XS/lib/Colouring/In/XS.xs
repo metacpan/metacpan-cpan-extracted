@@ -139,10 +139,6 @@ char* join(char* strings[], char* seperator, int count) {
 	return str;
 }
 
-static char * joinRgb (char * strings[]) {
-	return join(strings, ",", 3);
-}
-
 static double hue (double h, double m1, double m2) {
 	h = h < 0 ? h + 1 : h > 1 ? h - 1 : h;
 	if ( h * 6. < 1 ) {
@@ -205,13 +201,13 @@ static AV * numbers (char * colour) {
 	dTHX;
 	AV * color = newAV();
 	int len = strlen(colour);
-	char * temp = malloc(sizeof(char)*6);
+	char temp[6] = "";
 	for (int i = 0; i < len; i++) {
-		if ((colour[i] >= '0' && colour[i] <= '9')) {
-			sprintf(temp, "%s%c", temp, colour[i]);
+		if ((colour[i] >= '0' && colour[i] <= '9') || colour[i] == '.') {
+			strncat(temp, &colour[i], 1);
 		} else if (strlen(temp) >= 1 && atol(temp) >= 0) {
 			av_push(color, newSVnv(atol(temp)));
-			sprintf(temp, "");
+			memset(temp,0,strlen(temp));
 		}
 	}
 
@@ -224,7 +220,6 @@ static AV * numbers (char * colour) {
 
 static SV * rgb2rgb (char * colour) {
 	dTHX;
-	AV * color = newAV();
 	return newRV_noinc((SV*)numbers(colour));
 }
 
@@ -406,7 +401,7 @@ SV *
 new(...)
         CODE:
 		SV * colour = ST(1);
-		SV * a = (items > 2) ? ST(2) : newSViv(1);
+		SV * a = (items > 2) && SvOK(ST(2)) ? ST(2) : newSViv(1);
 		RETVAL = new_color(ST(0), colour, a);
         OUTPUT:
                 RETVAL
@@ -821,14 +816,5 @@ get_message(msg)
 	CODE:
 		char * key = SvPV_nolen(msg);
 		RETVAL = *hv_fetch(MESSAGES, key, strlen(key), 0);
-	OUTPUT:
-		RETVAL
-
-char * 
-rounding(self)
-	SV * self
-	CODE: 
-		char * arr[3] = {"255", "200", "150"};
-		RETVAL = joinRgb(arr);
 	OUTPUT:
 		RETVAL

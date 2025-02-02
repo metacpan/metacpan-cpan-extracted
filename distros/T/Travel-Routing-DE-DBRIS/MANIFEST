@@ -1,7 +1,4 @@
 bin/dbris
-bork.json
-bork.raw.json
-bork.txt
 Build.PL
 Changelog
 Dockerfile

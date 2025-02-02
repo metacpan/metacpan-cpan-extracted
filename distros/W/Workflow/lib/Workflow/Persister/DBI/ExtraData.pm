@@ -7,7 +7,7 @@ use parent qw( Workflow::Persister::DBI );
 use Workflow::Exception qw( configuration_error persist_error );
 use Syntax::Keyword::Try;
 
-$Workflow::Persister::DBI::ExtraData::VERSION = '2.04';
+$Workflow::Persister::DBI::ExtraData::VERSION = '2.05';
 
 my @FIELDS = qw( table data_field context_key );
 __PACKAGE__->mk_accessors(@FIELDS);
@@ -50,7 +50,7 @@ sub init {
 sub fetch_workflow {
     my ( $self, $wf_id ) = @_;
     my $wf_info = $self->SUPER::fetch_workflow( $wf_id );
-    my $context = $wf_info->{context} // {};
+    my $context = ($wf_info->{context} //= {});
 
     $self->log->debug( "Fetching extra workflow data for '", $wf_id, "'" );
 
@@ -82,17 +82,17 @@ sub fetch_workflow {
         foreach my $i ( 0 .. $#{$data_field} ) {
             $context->{$data_field->[$i]} = $row->[$i];
             $self->log->info(
-                sub { sprintf "Set data from %s.%s into context key %s ok",
-                          $self->table, $data_field->[$i],
-                          $data_field->[$i] } );
+                sprintf( "Set data from %s.%s into context key %s ok",
+                         $self->table, $data_field->[$i],
+                         $data_field->[$i] ) );
         }
     } else {
         my $value = $row->[0];
         $context->{ $self->context_key } = $value;
         $self->log->info(
-            sub { sprintf "Set data from %s.%s into context key %s ok",
-                      $self->table, $self->data_field,
-                      $self->context_key } );
+            sprintf( "Set data from %s.%s into context key %s ok",
+                     $self->table, $self->data_field,
+                     $self->context_key ) );
     }
 
     return $wf_info;
@@ -110,7 +110,7 @@ Workflow::Persister::DBI::ExtraData - Fetch extra data with each workflow and pu
 
 =head1 VERSION
 
-This documentation describes version 2.04 of this package
+This documentation describes version 2.05 of this package
 
 =head1 SYNOPSIS
 

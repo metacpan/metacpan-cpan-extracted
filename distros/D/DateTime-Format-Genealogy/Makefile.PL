@@ -2,6 +2,15 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker 6.64;	# 6.64 for TEST_REQUIRES
 
+my $dist = {
+	COMPRESS => 'gzip -9f',
+	SUFFIX => 'gz'
+};
+
+if($^O eq 'darwin') {
+	$dist->{'TAR'} = 'gtar';
+}
+
 WriteMakefile(
 	NAME		=> 'DateTime::Format::Genealogy',
 	AUTHOR		=> q{Nigel Horne <njh@bandsman.co.uk>},
@@ -20,6 +29,7 @@ WriteMakefile(
 		'Test::Carp' => 0,
 		'Test::Compile' => 0,
 		'Test::Deep' => 0,
+		'Test::DescribeMe' => 0,
 		'Test::Most' => 0,
 		'Test::Needs' => 0,
 		'Test::NoWarnings' => 0,
@@ -31,8 +41,8 @@ WriteMakefile(
 		'Carp' => 0,
 		'DateTime::Format::Natural' => 0,
 		'Genealogy::Gedcom::Date' => 2.01,
-	},
-	dist		=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+		'Scalar::Util' => 0
+	}, dist => $dist,
 	clean		=> { FILES => 'DateTime-Format-Genealogy-*' },
 	# META_ADD => {
 		# provides => {}

@@ -20,6 +20,7 @@ use namespace::clean;
 use Carp;
 use DateTime::Format::Natural;
 use Genealogy::Gedcom::Date 2.01;
+use Scalar::Util;
 
 our %months = (
 	'January' => 'Jan',
@@ -46,11 +47,11 @@ DateTime::Format::Genealogy - Create a DateTime object from a Genealogy Date
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =cut
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 =head1 SYNOPSIS
 
@@ -66,17 +67,32 @@ Creates a DateTime::Format::Genealogy object.
 
 =cut
 
-sub new {
-	my($proto, %args) = @_;
-	my $class = ref($proto) || $proto;
+sub new
+{
+	my $class = shift;
+
+	# Handle hash or hashref arguments
+	my %args;
+	if((@_ == 1) && (ref $_[0] eq 'HASH')) {
+		# If the first argument is a hash reference, dereference it
+		%args = %{$_[0]};
+	} elsif((@_ % 2) == 0) {
+		# If there is an even number of arguments, treat them as key-value pairs
+		%args = @_;
+	} else {
+		# If there is an odd number of arguments, treat it as an error
+		carp(__PACKAGE__, ': Invalid arguments passed to new()');
+		return;
+	}
 
 	if(!defined($class)) {
 		# FIXME: this only works when no arguments are given
 		$class = __PACKAGE__;
-	} elsif(ref($class)) {
-		# clone the given object
+	} elsif(Scalar::Util::blessed($class)) {
+		# If $class is an object, clone it with new arguments
 		return bless { %{$class}, %args }, ref($class);
 	}
+	# Return the blessed object
 	return bless { %args }, $class;
 }
 
@@ -129,7 +145,7 @@ sub parse_datetime {
 				unless($quiet);
 			return;
 		}
-		if($date =~ /^31 Nov/) {
+		if($date =~ /^31\s+Nov/) {
 			Carp::carp("$date is invalid, there are only 30 days in November");
 			return;
 		}
@@ -172,6 +188,9 @@ sub parse_datetime {
 			} elsif($date =~ /^(\d{1,2})\s+Mai\s+(\d{3,4})$/i) {
 				# I've seen a tree that uses some French months
 				$date = "$1 May $2";
+			} elsif($date =~ /^(\d{1,2})\s+Août\s+(\d{3,4})$/i) {
+				# I've seen a tree that uses some French months
+				$date = "$1 Aug $2";
 			} elsif($date =~ /^(\d{1,2})\-([A-Z]{3})\-(\d{3,4})$/i) {
 				# 29-Aug-1938
 				$date = "$1 $2 $3";
@@ -209,34 +228,34 @@ sub parse_datetime {
 # Genealogy::Gedcom::Date is expensive, so cache results
 sub _date_parser_cached
 {
-	my $self = shift;
-	my $date = shift;
+	my ($self, $date) = @_;
 
-	if(!defined($date)) {
-		Carp::croak('Usage: _date_parser_cached(date => $date)');
-	}
+	Carp::croak('Usage: _date_parser_cached(date => $date)') unless defined $date;
 
-	if($self->{'all_dates'}{$date}) {
-		return $self->{'all_dates'}{$date};
-	}
-	my $date_parser = $self->{'date_parser'};
-	if(!defined($date_parser)) {
-		$date_parser = $self->{'date_parser'} = Genealogy::Gedcom::Date->new();
-	}
+	# Check and return if date already parsed and cached
+	return $self->{'all_dates'}{$date} if exists $self->{'all_dates'}{$date};
 
-	my $d;
+	# Initialize the date parser if not already set
+	my $date_parser = $self->{'date_parser'} ||= Genealogy::Gedcom::Date->new();
+
+	# Parse the date
+	my $parsed_date;
 	eval {
-		$d = $date_parser->parse(date => $date);
+		$parsed_date = $date_parser->parse(date => $date);
 	};
+
+	# Check for errors
 	if(my $error = $date_parser->error()) {
-		Carp::carp("$date: '$error'") unless($self->{'quiet'});
+		Carp::carp("$date: '$error'") unless $self->{'quiet'};
 		return;
 	}
-	if($d && (ref($d) eq 'ARRAY')) {
-		$d = @{$d}[0];
-		$self->{'all_dates'}{$date} = $d;
+
+	# Cache and return the first parsed date if it's an array reference
+	if((ref($parsed_date) eq 'ARRAY') && @{$parsed_date}) {
+		return $self->{'all_dates'}{$date} = $parsed_date->[0];
 	}
-	return $d;
+
+	return;
 }
 
 # From https://github.com/nigelhorne/DateTime-Format-Genealogy/commit/dd61fefde3d037e251df34654a67e241c4117461
@@ -270,6 +289,9 @@ Nigel Horne, C<< <njh at bandsman.co.uk> >>
 
 =head1 BUGS
 
+Please report any bugs or feature requests to the author.
+This module is provided as-is without any warranty.
+
 I can't get L<DateTime::Format::Natural> to work on dates before AD100,
 so this module rejects dates that old.
 
@@ -296,7 +318,7 @@ L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=DateTime-Format-Genealogy>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2018-2024 Nigel Horne.
+Copyright 2018-2025 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

@@ -16,7 +16,8 @@ my $breaks = {
   "JSON::Schema::Modern::Vocabulary::OpenAPI" => "< 0.017",
   "Mojolicious::Plugin::OpenAPI::Modern" => "< 0.014",
   "OpenAPI::Modern" => "< 0.077",
-  "Test::Mojo::Role::OpenAPI::Modern" => "< 0.007"
+  "Test::Mojo::Role::OpenAPI::Modern" => "< 0.007",
+  "builtin::Backport" => "<= 0.02"
 };
 
 use CPAN::Meta::Requirements;

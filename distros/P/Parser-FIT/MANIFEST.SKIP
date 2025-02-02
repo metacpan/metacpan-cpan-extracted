@@ -21,3 +21,5 @@ examples/
 README.md
 my_test.pl
 MANIFEST.bak
+FitSDKRelease*
+test.pl

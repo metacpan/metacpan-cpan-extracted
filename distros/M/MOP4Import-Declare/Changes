@@ -1,5 +1,11 @@
 Revision history for Perl extension MOP4Import::Declare
 
+0.061 2025-02-02
+    * GH-95 - new pragma `[code_attributes => @names]`
+    * GH-93 - MOP4Import::Declare now respects `@EXPORT`
+    * GH-90 - zsh_completer field spec and ZshCompleter code attribute
+    * GH-89 - MOP4Import::Util::Inspector is now Modulino
+
 0.060 2024-08-16
     * GH-86 - MOP4Import::Types [extends => 'Type']
     * MOP4Import::Util::maybe_fields_hash and maybe_globref

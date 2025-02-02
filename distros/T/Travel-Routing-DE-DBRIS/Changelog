@@ -1,3 +1,14 @@
+Travel::Routing::DE::DBRIS 0.03 - Sun Feb 02 2025
+
+    * Connection: Add is_cancelled, is_unscheduled, is_unlikely accessors
+    * Segment: Add is_unlikely and transfer_duration accessors
+    * Parse and expose messages related to connections and connection segments
+    * dbris: Indicate connections that include cancelled segments or
+      segments that will likely not be reached due to insufficient layover
+      time
+    * dbris: add -j / --with-jid option
+    * dbris: add -v / --verbose option
+
 Travel::Routing::DE::DBRIS 0.02 - Tue Jan 28 2025
 
     * Add support for up to two stopovers

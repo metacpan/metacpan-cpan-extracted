@@ -1,5 +1,13 @@
 Revision history for Geo-Coder-US-Census
 
+0.07	Sat Feb  1 12:15:50 EST 2025
+	geocode(): croak when input is just a set of numbers
+	TODO in t/us.t is now working
+	Tell you which package doesn't support reverse
+	Use Test::DescribeMe to simplify tests
+	Use Test::Needs
+	Use gtar to create a distribution on Macs
+
 0.06	Tue Jan 31 16:47:30 EST 2023
 	Compress the traffic
 	state and city are no longer optional

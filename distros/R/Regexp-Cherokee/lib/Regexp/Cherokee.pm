@@ -5,9 +5,10 @@ use utf8;
 BEGIN
 {
 use strict;
+use warnings;
 use vars qw($VERSION @EXPORT_OK %EXPORT_TAGS %CherokeeClasses %CherokeeEquivalence $pseudoMatrix);
 
-	$VERSION = "0.04";
+	$VERSION = "0.05";
 	
 	@EXPORT_OK = qw(%CherokeeClasses %CherokeeEquivalence &getForm &setForm &subForm &formatForms);
 	%EXPORT_TAGS = ( utils => [qw(&getForm &setForm &subForm &formatForms)] );
@@ -445,6 +446,13 @@ None presently known.
 =head1 AUTHOR
 
 Daniel Yacob,  L<dyacob@cpan.org|mailto:dyacob@cpan.org>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2003-2025, Daniel Yacob C<< <dyacob@cpan.org> >>. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
 
 =head1 SEE ALSO
 

@@ -3,14 +3,14 @@ use strict;
 use warnings;
 use 5.020;
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 use utf8;
 use DateTime;
 use Encode qw(decode);
 use JSON;
 use Getopt::Long qw(:config no_ignore_case);
-use List::Util   qw(max);
+use List::Util   qw(min max);
 use Travel::Status::DE::DBRIS;
 
 my ( $date, $time );
@@ -31,6 +31,11 @@ for my $arg (@ARGV) {
 
 my $output_bold  = -t STDOUT ? "\033[1m" : q{};
 my $output_reset = -t STDOUT ? "\033[0m" : q{};
+
+my $cf_first  = "\e[38;5;11m";
+my $cf_mixed  = "\e[38;5;208m";
+my $cf_second = "\e[0m";          #"\e[38;5;9m";
+my $cf_reset  = "\e[0m";
 
 GetOptions(
 	'd|date=s'             => \$date,
@@ -171,12 +176,13 @@ if ($mots) {
 		if ( not $known_mot{$mot} ) {
 			$found_unknown = 1;
 			say STDERR
-"-m / --modes-of-transit: skipping unknown mode of transit '$mot'";
+			  "-m / --modes-of-transit: unknown mode of transit '$mot'";
 		}
 	}
 	if ($found_unknown) {
 		say STDERR 'supported modes of transit are: '
 		  . join( q{, }, sort keys %known_mot );
+		exit 1;
 	}
 	$opt{modes_of_transit} = [ grep { $known_mot{$_} } @mots ];
 }
@@ -430,6 +436,120 @@ elsif ( $opt{locationSearch} ) {
 	}
 }
 
+if ($train_no) {
+	$status = Travel::Status::DE::DBRIS->new(
+		cache          => $cache,
+		developer_mode => $developer_mode,
+		formation      => $train_no
+	);
+
+	my $wr = $status->result;
+
+	if ( not $wr ) {
+		say STDERR
+"Carriage formation for $train_type $train_no->{train_number} at $station is not available";
+		exit 1;
+	}
+
+	printf(
+		"\n%s → %s\n",
+		join( ' / ',
+			map { $wr->train_type . ' ' . $_->{name} } $wr->train_numbers ),
+		join(
+			' / ',
+			map {
+				sprintf( '%s (%s)',
+					$_->{name}, join( q{}, @{ $_->{sectors} } ) )
+			} $wr->destinations
+		),
+	);
+
+	printf( "Gleis %s\n\n", $wr->platform );
+
+	for my $sector ( $wr->sectors ) {
+		my $sector_length = $sector->length_percent;
+		my $spacing_left  = int( ( $sector_length - 2 ) / 2 ) - 1;
+		my $spacing_right = int( ( $sector_length - 2 ) / 2 );
+
+		if ( $sector_length % 2 ) {
+			$spacing_left++;
+		}
+
+		printf( "▏%s%s%s▕",
+			( $spacing_left >= 0 ) ? ' ' x $spacing_left : q{},
+			$sector->name,
+			( $spacing_right >= 0 ) ? ' ' x $spacing_right : q{} );
+	}
+	print "\n";
+
+	my @start_percentages = map { $_->start_percent } $wr->carriages;
+	if ( my $min_percentage = min @start_percentages ) {
+		print ' ' x ( $min_percentage - 1 );
+	}
+	print $wr->direction == 100 ? '>' : '<';
+
+	for my $wagon ( $wr->carriages ) {
+		my $wagon_length  = $wagon->length_percent;
+		my $spacing_left  = int( $wagon_length / 2 ) - 2;
+		my $spacing_right = int( $wagon_length / 2 ) - 1;
+
+		if ( $wagon_length % 2 ) {
+			$spacing_left++;
+		}
+
+		my $wagon_desc = $wagon->number || '?';
+
+		if ( $wagon->is_closed ) {
+			$wagon_desc = 'X';
+		}
+
+		if ( $wagon->is_locomotive or $wagon->is_powercar ) {
+			$wagon_desc = ' ■ ';
+		}
+
+		my $class_color = '';
+		if ( $wagon->class_type == 1 ) {
+			$class_color = $cf_first;
+		}
+		elsif ( $wagon->class_type == 2 ) {
+			$class_color = $cf_second;
+		}
+		elsif ( $wagon->class_type == 12 ) {
+			$class_color = $cf_mixed;
+		}
+
+		printf( "%s%s%3s%s%s",
+			' ' x $spacing_left, $class_color, $wagon_desc,
+			$cf_reset,           ' ' x $spacing_right );
+	}
+	print $wr->direction == 100 ? '>' : '<';
+	print "\n\n";
+
+	for my $group ( $wr->groups ) {
+		printf( "%s%s%s\n",
+			$group->description || 'Zug',
+			$group->designation ? ' „' . $group->designation . '“' : q{},
+			$group->has_sectors
+			? ' (' . join( q{}, $group->sectors ) . ')'
+			: q{} );
+		printf( "%s %s  → %s\n\n",
+			$group->train_type, $group->train_no, $group->destination );
+
+		for my $wagon ( $group->carriages ) {
+			printf(
+				"%3s: %3s %10s  %s\n",
+				$wagon->is_closed       ? 'X'
+				: $wagon->is_locomotive ? 'Lok'
+				: $wagon->number || '?',
+				$wagon->model || '???',
+				$wagon->type,
+				join( q{  }, $wagon->attributes )
+			);
+		}
+		say "";
+	}
+}
+
 __END__
 
 =head1 NAME
@@ -438,9 +558,9 @@ dbris-m - Interface to bahn.de public transit services
 
 =head1 SYNOPSIS
 
-B<dbris-m> [B<-d> I<DD.MM.YYYY>] [B<-t> I<HH:MM>] [B<-j>] I<station>
+B<dbris-m> [B<-d> I<DD.MM.>] [B<-t> I<HH:MM>] [B<-j>] [I<opt>] I<station>
 
-B<dbris-m> I<station> I<train tpye> I<train number>
+B<dbris-m> [I<opt>] I<station> I<train type> I<train number>
 
 B<dbris-m> I<JourneyID>
 
@@ -448,7 +568,7 @@ B<dbris-m> B<?>I<query>|I<lat>B<:>I<lon>
 
 =head1 VERSION
 
-version 0.02
+version 0.04
 
 =head1 DESCRIPTION
 
@@ -482,11 +602,11 @@ station ID.  For each departure, B<dbris-m> shows
 
 =head2 Trip details (I<station> I<train type> I<train number>)
 
-List intermediate stops of I<train type> I<train number> with arrival/departure
-time, delay (if available), occupancy (if available), and stop name. Also
-includes some generic trip information. Only works if the specified train
-passes I<station> in the next few dozen minutes or B<-d> / B<-t> have been
-set to appropriate values.
+Show trip details and carriage formation of I<train type> I<train number> at
+I<station>, if available. Includes everything that is available via
+I<JourneyID> (see below). The train must pass I<station> within the next
+60-or-so minutes; use B<-d> and/or B<-t> to adjust the requested timestamp if
+needed.
 
 =head2 Trip details (I<JourneyID>)
 

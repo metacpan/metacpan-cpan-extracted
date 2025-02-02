@@ -50,6 +50,7 @@
          "requires" : {
             "Capture::Tiny" : "0",
             "Test::Fatal" : "0",
+            "Test::MockTime::HiRes" : "0",
             "Test::More" : "0.98"
          }
       }
@@ -57,7 +58,7 @@
    "provides" : {
       "Log::Mini" : {
          "file" : "lib/Log/Mini.pm",
-         "version" : "v0.5.1"
+         "version" : "v0.5.3"
       },
       "Log::Mini::Logger::Base" : {
          "file" : "lib/Log/Mini/Logger/Base.pm"
@@ -87,9 +88,9 @@
          "web" : "https://github.com/alpha6/Log-Mini"
       }
    },
-   "version" : "0.5.1",
+   "version" : "0.5.3",
    "x_contributors" : [
-      "Denis Fedoseev <denis@fedoseev.work>",
+      "Denis alpha6 Fedoseev <denis@fedoseev.work>",
       "medvedych <medvedych@whataco.de>"
    ],
    "x_serialization_backend" : "JSON::PP version 4.16",

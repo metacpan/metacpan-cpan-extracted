@@ -1,5 +1,5 @@
 package Form::Tiny::FieldDefinition;
-$Form::Tiny::FieldDefinition::VERSION = '2.25';
+$Form::Tiny::FieldDefinition::VERSION = '2.26';
 use v5.10;
 use strict;
 use warnings;
@@ -141,7 +141,7 @@ sub get_coerced
 			$form->add_error(
 				Form::Tiny::Error::DoesNotValidate->new(
 					{
-						field => $self->name,
+						field_def => $self,
 						error => $self->has_message ? $self->message : $error,
 					}
 				)
@@ -227,7 +227,7 @@ sub validate
 
 				$form->add_error(
 					$class->new(
-						field => $self->name,
+						field_def => $self,
 						error => $exception,
 					)
 				);
@@ -237,7 +237,7 @@ sub validate
 			$form->add_error(
 				Form::Tiny::Error::DoesNotValidate->new(
 					{
-						field => $self->name,
+						field_def => $self,
 						error => $error,
 					}
 				)

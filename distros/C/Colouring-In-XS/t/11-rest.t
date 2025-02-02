@@ -2,7 +2,7 @@ use Test::More;
 
 use Colouring::In::XS;
 
-my $color = Colouring::In::XS->new([0, 0, 0], 'a');
+my $color = Colouring::In::XS->new([0, 0, 0], 1);
 is($color->toRGB(1), 'rgb(0,0,0)');
 
 is_deeply($color->rgb(0,0,0,1)->toCSS, '#000');

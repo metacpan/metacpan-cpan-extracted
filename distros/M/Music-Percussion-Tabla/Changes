@@ -1,7 +1,12 @@
 Revision history for Music-Percussion-Tabla
 
+0.0702 2025-02-02 00:14:11
+    - Add the eg/simple-breaks.pl program.
+    - Improve documentation.
+
 0.0701 2025-01-31 23:05:25
     - Fix strike() logic.
+    - Fix up the eg/simple.pl example program.
 
 0.0700 2025-01-31 22:38:23
     - Add the ability to double-strike with an arrayref bol.

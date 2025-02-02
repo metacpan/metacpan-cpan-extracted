@@ -9,7 +9,7 @@ BEGIN
 	use warnings;
 	use vars qw($VERSION @ENumbers %ENumbers);
 
-	$VERSION = "0.19";
+	$VERSION = "0.20";
 
 	require 5.000;
 

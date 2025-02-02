@@ -10,10 +10,10 @@ use parent 'Class::Accessor';
 use DateTime::Duration;
 use Travel::Routing::DE::DBRIS::Connection::Segment;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 Travel::Routing::DE::DBRIS::Connection->mk_ro_accessors(
-	qw(changes
+	qw(changes feasibility is_cancelled is_unscheduled is_unlikely
 	  duration sched_duration rt_duration
 	  sched_dep rt_dep dep
 	  sched_arr rt_arr arr
@@ -30,11 +30,14 @@ sub new {
 	my $strptime = $opt{strptime_obj};
 
 	my $ref = {
-		changes      => $json->{umstiegsAnzahl},
-		id           => $json->{tripId},
-		price        => $json->{angebotsPreis}{betrag},
-		price_unit   => $json->{angebotsPreis}{waehrung},
-		strptime_obj => $strptime,
+		changes     => $json->{umstiegsAnzahl},
+		feasibility => $json->{ereignisZusammenfassung}{anschlussBewertungCode}
+		  // -1,
+		is_unscheduled => $json->{isAlternativeVerbindung},
+		id             => $json->{tripId},
+		price          => $json->{angebotsPreis}{betrag},
+		price_unit     => $json->{angebotsPreis}{waehrung},
+		strptime_obj   => $strptime,
 	};
 
 	if ( $ref->{price_unit} and $ref->{price_unit} eq 'EUR' ) {
@@ -87,11 +90,42 @@ sub new {
 		);
 	}
 
+	for my $i ( 0 .. $#{ $ref->{segments} // [] } - 1 ) {
+		if ( $ref->{segments}[$i]{train_short} ) {
+			my $arr = $ref->{segments}[$i]->arr;
+			for my $j ( $i + 1 .. $#{ $ref->{segments} // [] } ) {
+				if ( $ref->{segments}[$j]{train_short} ) {
+					my $dep = $ref->{segments}[$j]->dep;
+					if ( $arr and $dep ) {
+						$ref->{segments}[$j]{transfer_duration} = $dep - $arr;
+						if ( $dep < $arr ) {
+							$ref->{segments}[$i]{is_unlikely} = 1;
+						}
+					}
+					last;
+				}
+			}
+		}
+	}
+
 	for my $key (qw(sched_dep rt_dep dep)) {
 		$ref->{$key} = $ref->{segments}[0]{$key};
 	}
 	for my $key (qw(sched_arr rt_arr arr)) {
 		$ref->{$key} = $ref->{segments}[-1]{$key};
+	}
+
+	for my $note ( @{ $json->{risNotizen} // [] } ) {
+		push( @{ $ref->{notes} }, $note );
+		if ( $note->{key} eq 'text.realtime.connection.cancelled' ) {
+			$ref->{is_cancelled} = 1;
+		}
+		elsif ( $note->{key} eq 'text.realtime.connection.brokentrip' ) {
+			$ref->{is_unlikely} = 1;
+		}
+	}
+	for my $message ( @{ $json->{messages} // [] } ) {
+		push( @{ $ref->{messages} }, $message );
 	}
 
 	bless( $ref, $obj );
@@ -103,6 +137,18 @@ sub segments {
 	my ($self) = @_;
 
 	return @{ $self->{segments} // [] };
+}
+
+sub notes {
+	my ($self) = @_;
+
+	return @{ $self->{notes} // [] };
+}
+
+sub messages {
+	my ($self) = @_;
+
+	return @{ $self->{messages} // [] };
 }
 
 sub TO_JSON {

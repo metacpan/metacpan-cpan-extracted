@@ -6,9 +6,10 @@ use utf8;  # can't find a way to conditionally load this with
 BEGIN
 {
 	use strict;
+	use warnings;
 	use vars qw($VERSION %RomanDigits);
 
-	$VERSION = '0.01';
+	$VERSION = '0.02';
 
 	require 5.000;
 
@@ -103,7 +104,8 @@ sub _fromRoman
 	#
 	# make into math:
 	#
-	s/̿/̄̄/og;
+	# s/̿/̄̄/og;
+	s/\x{033F}/\x{0304}/og;
 	while ( /[Ⅰ-ↂ](̄+)/ ) {
 		my $power = $1;
 		my $group;
@@ -159,7 +161,8 @@ if ( $number >= 40000 ) {
 		$lines .= "̄";
 	}
 
-	$roman =~ s/̄̄/̿/g;
+	# $roman =~ s/̄̄/̿/g;
+	$roman =~ s/\x{0304}/\x{033F}/g;
 
 } else {
 	while ( $number ) {
@@ -380,6 +383,13 @@ None presently known.
 =head1 AUTHOR
 
 Daniel Yacob,  L<dyacob@cpan.org|mailto:dyacob@cpan.org>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2003-2025, Daniel Yacob C<< <dyacob@cpan.org> >>. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
 
 =head1 SEE ALSO
 

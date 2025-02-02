@@ -17,7 +17,7 @@ use LWP::UserAgent;
 use Travel::Status::DE::DBRIS;
 use Travel::Routing::DE::DBRIS::Connection;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 Travel::Routing::DE::DBRIS->mk_ro_accessors(qw(earlier later));
 
@@ -358,7 +358,7 @@ Travel::Routing::DE::DBRIS - Interface to the bahn.de itinerary service
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 DESCRIPTION
 

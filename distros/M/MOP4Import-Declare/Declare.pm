@@ -3,7 +3,7 @@ package MOP4Import::Declare;
 use 5.010;
 use strict;
 use warnings qw(FATAL all NONFATAL misc);
-our $VERSION = '0.060';
+our $VERSION = '0.061';
 use Carp;
 use mro qw/c3/;
 
@@ -27,6 +27,7 @@ use MOP4Import::NamedCodeAttributes
   qw(MODIFY_CODE_ATTRIBUTES
      FETCH_CODE_ATTRIBUTES
      /^m4i_CODE_ATTR_/
+     declare_code_attributes
   );
 
 #========================================
@@ -40,9 +41,9 @@ sub import :MetaOnly {
 
   my Opts $opts = m4i_opts([caller]);
 
-  @decls = $myPack->default_exports unless @decls;
+  @decls = $myPack->default_exports($opts) unless @decls;
 
-  $myPack->dispatch_declare($opts, $myPack->always_exports, @decls);
+  $myPack->dispatch_declare($opts, $myPack->always_exports($opts), @decls);
 
   my $tasks;
   if ($tasks = $opts->{delayed_tasks} and @$tasks) {
@@ -53,24 +54,54 @@ sub import :MetaOnly {
   m4i_log_end($opts->{callpack}) if DEBUG;
 }
 
-sub file_line_of {
+sub m4i_file_line_of :method :MetaOnly {
   (my $myPack, my Opts $opts) = @_;
   " at $opts->{filename} line $opts->{line}";
 }
 
+sub m4i_stash :method :MetaOnly {
+  (my $myPack, my Opts $opts) = @_;
+  $opts->{stash}{$myPack} //= +{};
+}
+
 #
-# This serves as @EXPORT
+# `default_exports` is a hook to list exported symbols
+# when the module is used without arguments, like "use Foo".
+# Default implementation get them from `@EXPORT`.
 #
 sub default_exports {
-  ();
+  (my $myPack, my Opts $opts) = @_;
+  my $symtab = MOP4Import::Util::symtab($myPack);
+  my $sym = $symtab->{EXPORT};
+  if ($sym and my $export = *{$sym}{ARRAY}) {
+    print STDERR "HAS \@EXPORT: $myPack" if DEBUG;
+    @$export
+  } else {
+    print STDERR "NO \@EXPORT: $myPack"  if DEBUG;
+    ();
+  }
+}
+
+sub declare_default_exports {
+  (my $myPack, my Opts $opts, my (@decls)) = m4i_args(@_);
+
+  my $export = MOP4Import::Util::ensure_symbol_has_array(
+    globref($opts->{objpkg}, 'EXPORT')
+  );
+
+  push @$export, @decls;
 }
 
 sub always_exports {
+  (my $myPack, my Opts $opts) = @_;
   qw(-strict);
 }
 
 sub dispatch_declare :MetaOnly {
   (my $myPack, my Opts $opts, my (@decls)) = m4i_args(@_);
+
+  print STDERR "$myPack->dispatch_declare("
+    .terse_dump($opts, @decls).")\n" if DEBUG;
 
   foreach my $declSpec (@decls) {
 
@@ -193,7 +224,7 @@ sub dispatch_declare_pragma :MetaOnly {
     $sub->($myPack, $opts, @args);
   } else {
     croak "No such pragma: \`use $myPack\ [".terse_dump($pragma)."]`"
-      . $myPack->file_line_of($opts);
+      . $myPack->m4i_file_line_of($opts);
   }
 }
 
@@ -543,6 +574,8 @@ sub declare_defaults :MetaOnly {
     $myPack->declare_private_constant($opts, $fn, $v);
   }
 }
+*declare_override_defaults = *declare_defaults;
+*declare_override_defaults = *declare_defaults;
 
 sub declare_map_methods :MetaOnly {
   (my $myPack, my Opts $opts, my (@pairs)) = m4i_args(@_);
@@ -574,7 +607,7 @@ sub declare_carp_not :MetaOnly {
   #
   # Below does equiv of `our @CARP_NOT = qw/ MOP4Import::Util /;`
   #
-  __PACKAGE__->declare_carp_not(MOP4Import::Opts::m4i_fake(__PACKAGE__),
+  __PACKAGE__->declare_carp_not(MOP4Import::Opts::m4i_fake_opts(__PACKAGE__),
                                 qw/
                                    MOP4Import::Util
                                    /

@@ -35,6 +35,7 @@
             "Carp" : "0",
             "DateTime::Format::Natural" : "0",
             "Genealogy::Gedcom::Date" : "2.01",
+            "Scalar::Util" : "0",
             "perl" : "5.006002"
          }
       },
@@ -47,6 +48,7 @@
             "Test::CleanNamespaces" : "0",
             "Test::Compile" : "0",
             "Test::Deep" : "0",
+            "Test::DescribeMe" : "0",
             "Test::Most" : "0",
             "Test::Needs" : "0",
             "Test::NoWarnings" : "0",
@@ -70,6 +72,6 @@
          "web" : "https://github.com/nigelhorne/DateTime-Format-Genealogy"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

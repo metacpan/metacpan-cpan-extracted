@@ -5,6 +5,7 @@ author:
 build_requires:
   Capture::Tiny: '0'
   Test::Fatal: '0'
+  Test::MockTime::HiRes: '0'
   Test::More: '0.98'
 configure_requires:
   Module::Build::Tiny: '0.035'
@@ -28,7 +29,7 @@ no_index:
 provides:
   Log::Mini:
     file: lib/Log/Mini.pm
-    version: v0.5.1
+    version: v0.5.3
   Log::Mini::Logger::Base:
     file: lib/Log/Mini/Logger/Base.pm
   Log::Mini::Logger::FILE:
@@ -46,9 +47,9 @@ resources:
   bugtracker: https://github.com/alpha6/Log-Mini/issues
   homepage: https://github.com/alpha6/Log-Mini
   repository: https://github.com/alpha6/Log-Mini.git
-version: 0.5.1
+version: 0.5.3
 x_contributors:
-  - 'Denis Fedoseev <denis@fedoseev.work>'
+  - 'Denis alpha6 Fedoseev <denis@fedoseev.work>'
   - 'medvedych <medvedych@whataco.de>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

@@ -6,10 +6,11 @@ use utf8;
 BEGIN
 {
 use strict;
+use warnings;
 use vars qw($VERSION @EXPORT_OK %GeezEquivalence);
 
 
-	$VERSION = "0.06";
+	$VERSION = "0.19";
 	
 	@EXPORT_OK = qw(%GeezEquivalence);
 
@@ -178,5 +179,12 @@ None presently known.
 =head1 AUTHOR
 
 Daniel Yacob,  L<dyacob@cpan.org|mailto:dyacob@cpan.org>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2003-2025, Daniel Yacob C<< <dyacob@cpan.org> >>. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
 
 =cut

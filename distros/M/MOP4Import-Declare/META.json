@@ -47,6 +47,7 @@
          "requires" : {
             "Capture::Tiny" : "0",
             "Cpanel::JSON::XS" : "4.05",
+            "Test::Differences" : "0",
             "Test::Exit" : "0",
             "Test::Kantan" : "0",
             "Test::More" : "1.3021",
@@ -73,7 +74,7 @@
       },
       "MOP4Import::Declare" : {
          "file" : "Declare.pm",
-         "version" : "0.060"
+         "version" : "0.061"
       },
       "MOP4Import::Declare::Type" : {
          "file" : "Declare/Type.pm"
@@ -136,6 +137,6 @@
          "url" : "https://github.com/hkoba/perl-mop4import-declare"
       }
    },
-   "version" : "0.060",
+   "version" : "0.061",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

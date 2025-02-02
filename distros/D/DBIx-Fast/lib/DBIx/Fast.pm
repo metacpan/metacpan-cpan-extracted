@@ -3,7 +3,7 @@ package DBIx::Fast;
 use strict;
 use warnings;
 
-our $VERSION = '0.1402';
+our $VERSION = '0.1404';
 
 use Carp;
 use Moo;
@@ -307,7 +307,11 @@ sub val {
 
   $self->q(@_);
 
-  return $self->db->dbh->selectrow_array($self->sql, undef, @{$self->p});
+  my $ret = $self->db->dbh->selectrow_array($self->sql, undef, @{$self->p});
+
+  $self->Exception("val()") if $DBI::err;
+
+  return $ret;
 }
 
 sub array {
@@ -540,6 +544,8 @@ sub execute_prepare {
 
   $sth->execute(@p);
 
+  $self->Exception("execute_prepare()") if $DBI::err;
+  
   $self->last_sql($self->sql);
 }
 
@@ -568,7 +574,7 @@ sub Exception {
 
   $out .= " - Last error: ".$self->last_error if $self->last_error;
 
-  carp $out;
+  croak $out;
 }
 
 1;

@@ -1,3 +1,20 @@
+0.19 Sat Feb  1 22:46:49 EST 2025
+	- Fixes as per CPANTS:
+	  + Added MIN_PERL_VERSION to Makefile.PL
+
+0.18 Sat Feb  1 10:48:18 EST 2025
+	- Fixes as per CPANTS:
+	  + Fixed incomplete license statement in source.
+	  + Added a minimal Perl statement to META.yml
+	  + Added a 'provides' statements to META.yml and META.json
+
+0.17 Sat Feb  1 07:43:33 EST 2025
+	- Fixes as per CPANTS:
+	  + LICENSE added.
+	  + packaged with GNU tar.
+	  + Added 'use warnings'.
+	  + Synched all module versions.
+
 0.16 Mon Jan 20 22:11:24 EST 2025
 	- fixes for modern Perl.
 

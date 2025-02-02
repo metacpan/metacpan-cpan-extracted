@@ -1,4 +1,5 @@
 Changes
+LICENSE
 MANIFEST
 Makefile.PL
 README
@@ -6,3 +7,5 @@ examples/numbers.pl
 examples/roman.pl
 lib/Convert/Number/Roman.pm
 t/numbers.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

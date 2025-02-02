@@ -1,3 +1,10 @@
+Travel::Status::DE::DBRIS 0.04 - Sat Feb 01 2025
+
+    * Add Travel::Status::DE::DBRIS::Formation and submodules to this
+      distribution (formerly Travel::Status::DE::DBWagenreihung)
+    * dbris-m: Run "dbris-m station train_type train_no" to list train
+      details and (if available) carriage formation
+
 Travel::Status::DE::DBRIS 0.02 - Sat Jan 25 2025
 
     * dbris-m: Add -m / --modes-of-transit option

@@ -4,7 +4,6 @@ lib/Colouring/In/XS.pm
 lib/Colouring/In/XS.xs
 Makefile.PL
 MANIFEST			This list of files
-none/Colouring::In::XS.3
 README
 t/00-load.t
 t/01-basics.t

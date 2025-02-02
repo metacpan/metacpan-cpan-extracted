@@ -1,6 +1,7 @@
 build-profile.pl
 Changes
 cpanfile
+developer.md
 FIT-Profile.csv
 lib/Parser/FIT.pm
 lib/Parser/FIT/Profile.pm
@@ -9,13 +10,21 @@ Makefile.PL
 MANIFEST
 MANIFEST.SKIP
 README
+t/data-record-result-fields.t
+t/developer-data.t
+t/field_size_unsigned.t
 t/handler-registration.t
 t/happy_path.t
+t/in-memory-parsing.t
 t/parse_data_header.t
 t/parse_header.t
 t/parse_record_header.t
 t/parser-fit-simple.t
+t/postProcessRawValue.t
 t/test-files/Activity.fit
+t/test-files/activity_developerdata.fit
 t/test-files/activity_multisport.fit
+t/test-files/edge-1050.fit
+t/unknown-global-message-types.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

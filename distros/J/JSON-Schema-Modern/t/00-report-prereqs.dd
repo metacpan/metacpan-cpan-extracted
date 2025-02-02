@@ -1,18 +1,20 @@
 do { my $x = {
        'configure' => {
                         'requires' => {
+                                        'Dist::CheckConflicts' => '0.02',
                                         'Module::Build::Tiny' => '0.034',
                                         'perl' => '5.020'
                                       }
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.164',
+                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.165',
                                         'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
                                       'Data::Validate::Domain' => '0',
                                       'DateTime::Format::RFC3339' => '0',
+                                      'Dist::Zilla::Plugin::Conflicts' => '0',
                                       'Email::Address::XS' => '1.04',
                                       'Encode' => '0',
                                       'File::Spec' => '0',
@@ -44,6 +46,7 @@ do { my $x = {
                                       'Carp' => '0',
                                       'Cpanel::JSON::XS' => '4.38',
                                       'Digest::MD5' => '0',
+                                      'Dist::CheckConflicts' => '0.02',
                                       'Exporter' => '0',
                                       'Feature::Compat::Try' => '0',
                                       'File::ShareDir' => '0',

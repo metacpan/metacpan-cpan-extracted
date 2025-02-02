@@ -1,7 +1,12 @@
+0.20 Sat Feb  1 16:34:19 EST 2025
+	- Fixes as per CPANTS:
+	  + Added MIN_PERL_VERSION
+
 0.19 Fri Jan 31 13:28:44 EST 2025
 	- Fixes as per CPANTS:
 	  + LICENSE added.
 	  + packaged with GNU tar.
+	  + Added 'use warnings'.
 
 0.18 Mon Jan 27 07:43:51 EST 2025
 	- reorganized _fromEthiopic for clarity.

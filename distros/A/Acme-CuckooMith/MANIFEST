@@ -5,5 +5,5 @@ META.yml
 Makefile.PL
 README
 dist.ini
-lib/DBIx/Class.pm
+lib/Acme/CuckooMith.pm
 t/basic.t

@@ -5,6 +5,10 @@ COPYING
 cpanfile
 Dockerfile
 lib/Travel/Status/DE/DBRIS.pm
+lib/Travel/Status/DE/DBRIS/Formation.pm
+lib/Travel/Status/DE/DBRIS/Formation/Carriage.pm
+lib/Travel/Status/DE/DBRIS/Formation/Group.pm
+lib/Travel/Status/DE/DBRIS/Formation/Sector.pm
 lib/Travel/Status/DE/DBRIS/Journey.pm
 lib/Travel/Status/DE/DBRIS/JourneyAtStop.pm
 lib/Travel/Status/DE/DBRIS/Location.pm

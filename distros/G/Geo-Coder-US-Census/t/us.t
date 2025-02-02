@@ -41,9 +41,9 @@ US: {
 		delta_ok($location->{result}{addressMatches}[0]->{coordinates}{y}, 38.90);	# Lat
 		delta_ok($location->{result}{addressMatches}[0]->{coordinates}{x}, -77.04);	# Long
 
-		TODO: {
+		# TODO: {
 			# Test counties
-			local $TODO = "geocoding.geo.census.gov doesn't support counties";
+			# local $TODO = "geocoding.geo.census.gov doesn't support counties";
 
 			if($location = $geocoder->geocode('1363 Kelly Road, Coal City, Owen, Indiana, USA')) {
 				if($location->{result}{addressMatches}) {
@@ -62,7 +62,7 @@ US: {
 				fail('Counties Lat');
 				fail('Counties Long');
 			}
-		}
+		# }
 
 		$location = $geocoder->geocode({ location => '6502 SW. 102nd Avenue, Bushnell, Florida, USA' });
 		delta_ok($location->{result}{addressMatches}[0]->{coordinates}{y}, 28.61);	# Lat

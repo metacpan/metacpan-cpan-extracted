@@ -11,6 +11,7 @@ build_requires:
   Test::CleanNamespaces: '0'
   Test::Compile: '0'
   Test::Deep: '0'
+  Test::DescribeMe: '0'
   Test::Most: '0'
   Test::Needs: '0'
   Test::NoWarnings: '0'
@@ -35,9 +36,10 @@ requires:
   Carp: '0'
   DateTime::Format::Natural: '0'
   Genealogy::Gedcom::Date: '2.01'
+  Scalar::Util: '0'
   perl: '5.006002'
 resources:
   bugtracker: https://github.com/nigelhorne/DateTime-Format-Genealogy/issues
   repository: git://github.com/nigelhorne/DateTime-Format-Genealogy.git
-version: '0.09'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '0.10'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

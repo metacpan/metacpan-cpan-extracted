@@ -5,11 +5,12 @@ use utf8;
 BEGIN
 {
 use strict;
+use warnings;
 use vars qw( @EXPORT_OK %IMCapsMismatch $VERSION );
 
 use Regexp::Ethiopic::Amharic ( 'getForm', 'setForm', ':forms' );
 
-	$VERSION = "0.03";
+	$VERSION = "0.04";
 	#
 	# This linking is done so that the export of "distance" works
 	# as before:
@@ -199,8 +200,6 @@ Copyright (c) 2003-2025, Daniel Yacob C<< <dyacob@cpan.org> >>. All rights reser
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic>.
-
-
 
 =head1 SEE ALSO
 

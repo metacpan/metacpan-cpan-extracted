@@ -2,15 +2,9 @@
 
 use strict;
 use warnings;
-use Test::Most;
 
-if(not $ENV{AUTHOR_TESTING}) {
-	plan(skip_all => 'Author tests not required for installation');
-}
+use Test::DescribeMe qw(author);
+use Test::Needs 'Test::Pod::LinkCheck';
 
-eval "use Test::Pod::LinkCheck";
-if($@) {
-	plan skip_all => 'Test::Pod::LinkCheck required for testing POD';
-} else {
-	Test::Pod::LinkCheck->new->all_pod_ok();
-}
+Test::Pod::LinkCheck->import();
+Test::Pod::LinkCheck->new->all_pod_ok();

@@ -13,11 +13,13 @@ use DateTime::Format::Strptime;
 use Encode qw(decode encode);
 use JSON;
 use LWP::UserAgent;
+
+use Travel::Status::DE::DBRIS::Formation;
 use Travel::Status::DE::DBRIS::JourneyAtStop;
 use Travel::Status::DE::DBRIS::Journey;
 use Travel::Status::DE::DBRIS::Location;
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 # {{{ Constructors
 
@@ -87,6 +89,22 @@ sub new {
 		$req
 		  = "https://www.bahn.de/web/api/reiseloesung/fahrt?journeyId=${journey_id}&poly=${poly}";
 	}
+	elsif ( my $cf = $conf{formation} ) {
+		my $datetime = $cf->{departure}->clone->set_time_zone('UTC');
+		my $date     = $datetime->strftime('%Y-%m-%d');
+		my $time     = $datetime->rfc3339 =~ s{(?=Z)}{.000}r;
+		my %param    = (
+			administrationId => 80,
+			category         => $cf->{train_type},
+			date             => $date,
+			evaNumber        => $cf->{eva},
+			number           => $cf->{train_number},
+			time             => $time
+		);
+		$req
+		  = 'https://www.bahn.de/web/api/reisebegleitung/wagenreihung/vehicle-sequence?'
+		  . join( '&', map { $_ . '=' . $param{$_} } sort keys %param );
+	}
 	else {
 		confess(
 			'station / geoSearch  / locationSearch / journey must be specified'
@@ -140,6 +158,9 @@ sub new {
 	}
 	elsif ( $conf{geoSearch} or $conf{locationSearch} ) {
 		$self->parse_search;
+	}
+	elsif ( $conf{formation} ) {
+		$self->parse_formation( $conf{formation} );
 	}
 
 	return $self;
@@ -310,6 +331,15 @@ sub parse_stationboard {
 	return $self;
 }
 
+sub parse_formation {
+	my ( $self, $conf ) = @_;
+
+	$self->{result} = Travel::Status::DE::DBRIS::Formation->new(
+		json       => $self->{raw_json},
+		train_type => $conf->{train_type}
+	);
+}
+
 # }}}
 # {{{ Public Functions
 
@@ -381,7 +411,7 @@ Non-blocking variant;
 
 =head1 VERSION
 
-version 0.02
+version 0.04
 
 =head1 DESCRIPTION
 

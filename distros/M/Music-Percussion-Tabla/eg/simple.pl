@@ -6,8 +6,8 @@ use Music::Percussion::Tabla ();
 
 my $t = Music::Percussion::Tabla->new(
   signature => '3/4',
-  bars      => 8,
-  bpm       => 200,
+  bars      => 64,
+  bpm       => 320,
 );
 
 for (1 .. $t->bars) {
@@ -19,6 +19,6 @@ for (1 .. $t->bars) {
   $t->strike('dha');
 }
 
-$t->play_with_timidity;
-# $t->write;
+# $t->play_with_timidity;
+$t->write;
 # $t->timidity_cfg('/Users/you/timidity.cfg');

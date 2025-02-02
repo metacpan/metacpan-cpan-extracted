@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Play the tabla!
 
-our $VERSION = '0.0701';
+our $VERSION = '0.0702';
 
 use Moo;
 use File::ShareDir qw(dist_dir);
@@ -184,7 +184,7 @@ Music::Percussion::Tabla - Play the tabla!
 
 =head1 VERSION
 
-version 0.0701
+version 0.0702
 
 =head1 SYNOPSIS
 
@@ -226,49 +226,53 @@ version 0.0701
 C<Music::Percussion::Tabla> provides named associations between tabla
 drum sounds and the included soundfont file (which is B<4.1MB>).
 
-Here are my "non-tabla player" descriptions of the sounds:
+Here are my "non-tabla player" descriptions of the sounds. And the
+proper "syllable" names for the items with a C<*> are unknown to me,
+as of yet...
 
-   # MIDI Description
-  ...
-   1  60  ringing mid
-   2  61  muted low
-   3  62  slap
-   4  63  ringing mid slap
-   5  64  low knock
-   6  65  muted ringing low
-   7  66  lower
-   8  67  low-up
-   9  68  muted slap
-  10  69  ringing low
-  11  70  flam slap
-  12  71  loud tap
-  13  72  lowest mute
-  14  73  ringing low
-  15  74  muted low
-  16  75  loud tap double
-  17  76  high-low
-  18  77  high slap
-  19  78  tap
-  20  79  high knock
-  21  80  short low-up
-  22  81  mid tap
-  23  82  muted tap
-  24  83  mid
-  25  84  muted
-  26  85  loud mid double
-  27  86  slightly more muted
-  28  87  low mid
-  29  88  ringing mid
+     # MIDI Description
+    ...
+     1  60  ringing mid
+     2  61  muted low
+  *  3  62  slap
+     4  63  ringing mid slap
+     5  64  low knock
+     6  65  muted ringing low
+     7  66  lower
+  *  8  67  low-up
+     9  68  muted slap
+  * 10  69  ringing low
+    11  70  flam slap
+    12  71  loud tap
+    13  72  lowest mute
+  * 14  73  ringing low
+  * 15  74  muted low
+    16  75  loud tap double
+    17  76  high-low
+    18  77  high slap
+  * 19  78  tap
+    20  79  high knock
+  * 21  80  short low-up
+    22  81  mid tap
+    23  82  muted tap
+    24  83  mid
+  * 25  84  muted
+    26  85  loud mid double
+    27  86  slightly more muted
+    28  87  low mid
+    29  88  ringing mid
   ...
 
-To play patches by number (e.g. for unknown bols), do this to add the
-C<84>th MIDInum entry score:
+Edit and run the F<eg/bols.pl> example program to hear each of these.
+
+To play patches by number instead of name (e.g. for the C<*> unknown
+bols), do this to add the C<84>th MIDInum entry score:
 
   $tabla->note($tabla->eighth, 84);
 
 To play patches simultaneously, that would be:
 
-  $tabla->note($tabla->eighth, 84, 79);
+  $tabla->note($tabla->eighth, 84, 80);
 
 =head1 ATTRIBUTES
 

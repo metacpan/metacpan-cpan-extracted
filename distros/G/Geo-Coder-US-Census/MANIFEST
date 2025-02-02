@@ -10,6 +10,7 @@ README
 README.md
 t/00-load.t
 t/10-new.t
+t/30-basics.t
 t/bin.t
 t/boiler.t
 t/carp.t
@@ -31,6 +32,7 @@ t/no404s.t
 t/noplan.t
 t/pod-cm.t
 t/pod-spelling.t
+t/pod-synopsis.t
 t/pod.t
 t/port.t
 t/prereq.t

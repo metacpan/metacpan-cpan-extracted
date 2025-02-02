@@ -4,7 +4,7 @@ DateTime::Format::Genealogy - Create a DateTime object from a Genealogy Date
 
 # VERSION
 
-Version 0.09
+Version 0.10
 
 # SYNOPSIS
 
@@ -42,6 +42,9 @@ Nigel Horne, `<njh at bandsman.co.uk>`
 
 # BUGS
 
+Please report any bugs or feature requests to the author.
+This module is provided as-is without any warranty.
+
 I can't get [DateTime::Format::Natural](https://metacpan.org/pod/DateTime%3A%3AFormat%3A%3ANatural) to work on dates before AD100,
 so this module rejects dates that old.
 
@@ -64,6 +67,6 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2018-2024 Nigel Horne.
+Copyright 2018-2025 Nigel Horne.
 
 This program is released under the following licence: GPL2

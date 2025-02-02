@@ -1,3 +1,10 @@
+0.05 Sat Feb  1 16:52:30 EST 2025
+	- Fixes as per CPANTS:
+	  + LICENSE added.
+	  + packaged with GNU tar.
+	  + Added 'use warnings'.
+	  + Added a minimal Perl statement to META.yml
+
 0.04 Wed Jan 22 09:47:40 EST 2025
 	- update for output encoding only.
 

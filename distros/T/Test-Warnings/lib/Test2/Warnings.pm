@@ -5,7 +5,7 @@ package Test2::Warnings;
 # ABSTRACT: Test for warnings and the lack of them
 # KEYWORDS: testing tests warnings Test2
 
-our $VERSION = '0.037';
+our $VERSION = '0.038';
 
 use parent 'Exporter';
 use Test::Warnings;
@@ -28,7 +28,7 @@ Test2::Warnings - Test for warnings and the lack of them
 
 =head1 VERSION
 
-version 0.037
+version 0.038
 
 =head1 SYNOPSIS
 

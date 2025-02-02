@@ -13,5 +13,6 @@ WriteMakefile(
 		'POSTOP'          =>	'mv $(DISTNAME)-$(VERSION).tar.gz ../'
 	},
 	'PREREQ_PM' 	=> { 'Regexp::Ethiopic' => 0.06, 'Text::WagnerFischer' => 0.03 },
-	'LICENSE'	=> "perl"
+	'LICENSE'	=> 'perl',
+	'MIN_PERL_VERSION' => '5.8.0'
 );

@@ -12,5 +12,6 @@ WriteMakefile(
 		'SUFFIX'          =>	"gz",
 		'POSTOP'          =>	'mv $(DISTNAME)-$(VERSION).tar.gz ../'
 	},
-	'LICENSE'	=> "perl"
+	'LICENSE'	=> 'perl',
+	'MIN_PERL_VERSION' => '5.8.0'
 );

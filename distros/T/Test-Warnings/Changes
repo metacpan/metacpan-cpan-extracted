@@ -1,8 +1,12 @@
 Revision history for Test-Warnings
 
+0.038     2025-02-02 00:27:04Z
+          - no longer swap out done_testing method if :no_end_test is
+            configured
+
 0.037     2025-01-05 20:38:16Z
           - remove unneeded use of Import::Into
-          - fix tests that invoke Test::Warnings->import directly
+          - fix for tests that invoke Test::Warnings->import directly
 
 0.036     2025-01-03 18:30:28Z
           - avoid redefinition warnings when $^W is enabled in tests

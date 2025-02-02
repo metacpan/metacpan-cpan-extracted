@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.020;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use utf8;
 use DateTime;
@@ -18,16 +18,15 @@ my ( $date, $time, $from, $to, $language );
 my $mots;
 my ( $first_class, $passengers );
 my $developer_mode;
+my $show_jid;
 my ( $json_output, $raw_json_output );
+my $verbose;
 my $use_cache = 1;
 my $show_full_route;
 my $cache;
 
 my %known_mot = map { $_ => 1 }
   (qw(ICE EC_IC IR REGIONAL SBAHN BUS SCHIFF UBAHN TRAM ANRUFPFLICHTIG));
-
-# Nur Preisangaben zeigen falls Passagierdaten vorhanden
-# -p/--passengers adult:bc25;junior:bc50;senior:bc25,...;...
 
 binmode( STDOUT, ':encoding(utf-8)' );
 for my $arg (@ARGV) {
@@ -37,15 +36,29 @@ for my $arg (@ARGV) {
 my $output_bold  = -t STDOUT ? "\033[1m" : q{};
 my $output_reset = -t STDOUT ? "\033[0m" : q{};
 
+my $output_fyi      = -t STDOUT ? "\033[40;36m" : q{};
+my $output_unknown  = -t STDOUT ? "\033[40;35m" : q{};
+my $output_good     = -t STDOUT ? "\033[40;32m" : q{};
+my $output_warning  = -t STDOUT ? "\033[40;33m" : q{};
+my $output_critical = -t STDOUT ? "\033[40;31m" : q{};
+
+my $output_bold_fyi      = -t STDOUT ? "\033[1;40;36m" : q{};
+my $output_bold_unknown  = -t STDOUT ? "\033[1;40;35m" : q{};
+my $output_bold_good     = -t STDOUT ? "\033[1;40;32m" : q{};
+my $output_bold_warning  = -t STDOUT ? "\033[1;40;33m" : q{};
+my $output_bold_critical = -t STDOUT ? "\033[1;40;31m" : q{};
+
 GetOptions(
 	'd|date=s'             => \$date,
 	'h|help'               => sub { show_help(0) },
 	'f|full-route'         => \$show_full_route,
 	'first-class!'         => \$first_class,
+	'j|with-jid'           => \$show_jid,
 	'm|modes-of-transit=s' => \$mots,
 	'l|language=s'         => \$language,
 	'p|passengers=s'       => \$passengers,
 	't|time=s'             => \$time,
+	'v|verbose'            => \$verbose,
 	'V|version'            => \&show_version,
 	'cache!'               => \$use_cache,
 	'devmode'              => \$developer_mode,
@@ -277,7 +290,39 @@ if ($json_output) {
 for my $connection ( $ris->connections ) {
 
 	my $header = q{};
+	my $format = $output_bold;
+
+	if ( $connection->is_unlikely ) {
+		if ( $connection->feasibility >= 4 ) {
+			$header .= "  ${output_critical}XX${output_reset}";
+			$format = $output_bold_critical;
+		}
+		else {
+			$header .= "  ${output_warning}X?${output_reset}";
+			$format = $output_bold_warning;
+		}
+	}
+	if ( $connection->is_cancelled ) {
+		$format = $output_bold_critical;
+	}
+
+	if ( defined $passengers and defined $connection->price ) {
+		$header .= sprintf( '  %.2f %s', $connection->price,
+			$connection->price_unit );
+	}
+
 	for my $segment ( $connection->segments ) {
+		if ( defined $segment->transfer_duration ) {
+			if ( $segment->transfer_duration->in_units('minutes') >= 0 ) {
+				$header .= sprintf( '  (%01d:%02d)',
+					$segment->transfer_duration->in_units( 'hours', 'minutes' )
+				);
+			}
+			else {
+				$header .= sprintf( "  ${output_critical}(%02d)${output_reset}",
+					$segment->transfer_duration->in_units('minutes') );
+			}
+		}
 		if ( $segment->train_short ) {
 			$header .= sprintf( '  %s', $segment->train_short );
 		}
@@ -308,17 +353,34 @@ for my $connection ( $ris->connections ) {
 
 	say q{};
 	printf(
-		"%s  (%02d:%02d)  %s  %s%s%s\n\n",
-		$connection->dep ? $connection->dep->strftime('%d.%m. %H:%M')
-		: q{??.??. ??:??},
+		"%s %s%s%s  (%02d:%02d)  %s%s%s  %s%s\n",
+		$connection->dep ? $connection->dep->strftime('%d.%m.')
+		: q{??.??.},
+		$format,
+		$connection->dep ? $connection->dep->strftime('%H:%M')
+		: q{??:??},
+		$output_reset,
 		$connection->duration->in_units( 'hours', 'minutes' ),
+		$format,
 		$connection->arr ? $connection->arr->strftime('%H:%M') : q{??:??},
-		format_occupancy($connection),
-		( defined $passengers and defined $connection->price )
-		? sprintf( '  %.2f %s', $connection->price, $connection->price_unit )
-		: q{},
+		$output_reset,
+		$connection->is_cancelled ? "${output_critical}XX${output_reset}"
+		: format_occupancy($connection),
 		$header,
 	);
+
+	if ($verbose) {
+		for my $note ( $connection->notes ) {
+			printf( "| %s (%s)\n", $note->{value}, $note->{key} );
+		}
+
+		for my $msg ( $connection->messages ) {
+			printf( "| %s\n", $msg->{text} );
+		}
+	}
+
+	say q{};
+
 	for my $segment ( $connection->segments ) {
 		if ( $segment->is_transfer ) {
 			for my $note ( $segment->transfer_notes ) {
@@ -377,14 +439,33 @@ for my $connection ( $ris->connections ) {
 		}
 
 		printf(
-			"%s%s  an  %s%s\n",
+			"%s%s%s%s  an  %s%s\n",
+			$segment->is_unlikely ? $output_critical : q{},
 			$segment->arr->strftime('%H:%M'),
+			$segment->is_unlikely ? $output_reset : q{},
 			$max_delay_digits
 			? q{ } . format_delay( $segment->arr_delay, $max_delay_digits )
 			: q{},
 			$segment->arr_name,
 			$segment->arr_platform ? q{  } . $segment->arr_platform : q{},
 		);
+
+		if ($show_jid) {
+			say $segment->journey_id =~ s{ }{}gr;
+		}
+
+		if ($verbose) {
+			for my $msg ( $segment->messages_ris ) {
+				printf( "| %s (%s)\n", $msg->{value}, $msg->{key} );
+			}
+			for my $msg ( $segment->messages_him ) {
+				printf( "| %s\n", $msg->{text} );
+			}
+			for my $msg ( $segment->messages_prio ) {
+				printf( "| %s\n", $msg->{text} );
+			}
+		}
+
 		say q{};
 	}
 	say q{---------------------------------------};
@@ -403,7 +484,7 @@ B<dbris> [B<-d> I<DD.MM.YYYY>] [B<-t> I<HH:MM>] [...] I<from-stop>
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 DESCRIPTION
 
@@ -424,6 +505,16 @@ Default: today.
 =item B<-f>, B<--full-route>
 
 Show intermediate stops rather than just start/end of connection legs.
+
+=item B<--first-class>
+
+Request first class offers.
+Only useful when combined with B<--passengers>.
+
+=item B<-j>, B<--with-jid>
+
+Show JourneyID for each connection segment.
+The JourneyID can be passed to dbris-m(1) to obtain details about the segment.
 
 =item B<--json>
 
@@ -451,6 +542,21 @@ for 90 seconds in F<~/.cache/Travel-Routing-DE-DBRIS> (or a path relative to
 C<$XDG_CACHE_HOME>, if set). Use this option to disable caching. You can use
 B<--cache> to re-enable it.
 
+=item B<-p>, B<--passengers> I<type>[:I<discounts>,...][B<;>I<type>[:I<discounts>,...]B<;>...]
+
+Use the specified passenger information to request ticket offers and show the
+corresponding price for each connection. I<type> must be adult, junior, or
+senior. I<discounts> can be one or more of bc25, bc50, bc100, bc25-first,
+bc50-first, bc100-first. See also B<--first-class>.
+
+Note that B<dbris> only has access to a single offer per connection. It is
+typically the cheapest, but there is no information about what kind of ticket
+it is. Lack of a listed price either means that ticket offers are not available
+or (for bc100) that the connection does not require a ticket. There is no way
+to distinguish between these two cases. B<dbris> does not guarantee accuracy of
+the provided information and must not be relied upon to determine whether a
+given connection is free or not.
+
 =item B<--raw-json>
 
 Print unprocessed API response as JSON and exit.
@@ -460,6 +566,11 @@ Useful for debugging and development purposes.
 
 Request connections on or after I<HH:MM>.
 Default: now.
+
+=item B<-v>, B<--verbose>
+
+Include free-text messages related to delays, platform changes, and other
+quality of service issues or announcements.
 
 =item B<-V>, B<--version>
 

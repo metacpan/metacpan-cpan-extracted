@@ -25,6 +25,7 @@ my $hook = sub {
   Carp::cluck("orig_modfn=$orig_modfn\n") if $ENV{DEBUG_INC};
   return unless -r (my $realfn = "$dir/../$modfn");
   warn "=> found $realfn" if $ENV{DEBUG_INC};
+  $INC{$orig_modfn} = $realfn;
   open my $fh, '<', $realfn or die "Can't open $realfn:$!";
   $fh;
 };

@@ -309,9 +309,15 @@ X<dispatch_declare>
 
 This implements C<MOP4Import::Declare> style type-based pragma dispatching.
 
+If you write the following:
+
+  use YourExporter -foo, [bar => 'baz'], '*FOO';
+
+C<dispatch_declare> is called like below:
+
   YourExporter->dispatch_declare($opts, -foo, [bar => 'baz'], '*FOO');
 
-is same as
+Which in turn dispatches following pragma methods:
 
   YourExporter->declare_foo($opts);
   YourExporter->declare_bar($opts, 'baz');

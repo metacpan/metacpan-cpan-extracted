@@ -33,11 +33,12 @@
       "runtime" : {
          "requires" : {
             "Regexp::Ethiopic" : "0.06",
-            "Text::WagnerFischer" : "0.03"
+            "Text::WagnerFischer" : "0.03",
+            "perl" : "5.008000"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

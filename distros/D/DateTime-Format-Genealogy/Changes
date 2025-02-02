@@ -1,5 +1,11 @@
 Revision history for DateTime::Format::Genealogy
 
+0.10	Sat Feb  1 21:01:54 EST 2025
+	Use Test::DescribeMe to simplify tests
+	refactor _date_parser_cached
+	Added t/30-basics.t
+	Handle August in French
+
 0.09	Wed Jul 10 08:53:31 EDT 2024
 	Fix https://www.cpantesters.org/cpan/report/a12f8d3a-3d93-11ef-8086-6cc8c30391f4
 

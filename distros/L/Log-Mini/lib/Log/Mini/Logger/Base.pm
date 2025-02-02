@@ -100,7 +100,6 @@ sub clear_context {
 sub _build_context_string {
     my $self = shift;
 
-
     my $context_string = ' '.join ' ', @{$self->{_context}};
     $context_string .= ':';
 
@@ -127,11 +126,11 @@ sub _print { croak 'Not implemented!' }
 
 sub _getCurrentTime
 {
-    my ($seconds, $miliseconds) = Time::HiRes::gettimeofday();
+    my ($seconds, $milliseconds) = Time::HiRes::gettimeofday();
 
     my ($sec,$min,$hour,$mday,$mon,$year) = localtime($seconds);
 
-    return sprintf('%i-%02i-%02i %02i:%02i:%02i.%03i', 1900+$year, $mon, $mday, $hour, $min, $sec, substr($miliseconds, 0, 3));
+    return sprintf('%i-%02i-%02i %02i:%02i:%02i.%03i', 1900+$year, ++$mon, $mday, $hour, $min, $sec, substr($milliseconds, 0, 3));
 }
 
 1;

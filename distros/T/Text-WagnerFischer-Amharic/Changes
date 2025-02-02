@@ -1,3 +1,8 @@
+0.04 Sat Feb  1 22:40:51 EST 2025
+	- Fixes as per CPANTS:
+	  + Added 'use warnings'.
+	  + Added MIN_PERL_VERSION to Makefile.PL
+
 0.03 Fri Jan 31 07:07:12 EST 2025
 	- Fixes as per CPANTS:
 	  + LICENSE added.

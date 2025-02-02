@@ -4,10 +4,12 @@ use warnings qw(FATAL all NONFATAL misc);
 use Carp;
 use Exporter qw/import/;
 
-use MOP4Import::Util ();
+require MOP4Import::Util; # Delay loading
 
-our @EXPORT_OK = qw/FieldSpec/;
-our @EXPORT = @EXPORT_OK;
+BEGIN {
+  our @EXPORT_OK = qw/FieldSpec/;
+  our @EXPORT = @EXPORT_OK;
+}
 
 use fields
   ('name'
@@ -16,6 +18,10 @@ use fields
    , 'no_getter'
    , 'package'
    , 'json_type'
+   , 'isa'
+   , 'validator'
+   , 'zsh_completer'
+   , 'extra'
    # file? line? package?
  );
 
