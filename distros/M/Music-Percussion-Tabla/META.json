@@ -38,6 +38,7 @@
             "File::ShareDir" : "0",
             "List::Util" : "0",
             "MIDI::Drummer::Tiny" : "0.4302",
+            "MIDI::Util" : "0",
             "Moo" : "2",
             "namespace::clean" : "0",
             "perl" : "5.006",
@@ -66,7 +67,7 @@
          "web" : "https://github.com/ology/Music-Percussion-Tabla"
       }
    },
-   "version" : "0.0702",
+   "version" : "0.0704",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040000"

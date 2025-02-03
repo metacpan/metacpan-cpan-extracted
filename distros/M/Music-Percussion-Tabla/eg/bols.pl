@@ -27,7 +27,7 @@ for (1 .. $t->beats) {
     # $t->note($t->quarter, 64); # ke quiet
     # $t->note($t->quarter, 77); # ke
     # $t->note($t->quarter, 79); # ke
-    # $t->note($t->quarter, 65); # ga
+    # $t->note($t->quarter, 65); # ge
     # $t->note($t->quarter, 66); # ge
     # $t->note($t->quarter, 76); # ge
     # $t->note($t->quarter, 71); # ta

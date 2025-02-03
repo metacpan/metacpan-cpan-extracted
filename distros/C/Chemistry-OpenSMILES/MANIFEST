@@ -45,3 +45,5 @@ t/29_trigonal_bipyramidal_chirality.t
 t/30_trigonal_bipyramidal_chirality.t
 t/31_write.t
 t/32_write.t
+t/33_allene_graph.t
+t/34_validate_allenes.t

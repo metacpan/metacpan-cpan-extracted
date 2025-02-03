@@ -1,3 +1,10 @@
+0.14 Sun Feb  2 07:47:40 EST 2025
+	- Fixes as per CPANTS:
+	  + LICENSE added.
+	  + packaged with GNU tar.
+	  + Added 'use warnings'.
+	  + Added MIN_PERL_VERSION to Makefile.PL
+
 0.13 Sun Jun 22 16:45:22 EDT 2003
 	- added optimization flags to REs.
 

@@ -1,5 +1,5 @@
 package Games::Solitaire::BlackHole::Solver::App;
-$Games::Solitaire::BlackHole::Solver::App::VERSION = '0.10.0';
+$Games::Solitaire::BlackHole::Solver::App::VERSION = '0.12.0';
 use 5.014;
 use Moo;
 
@@ -17,36 +17,48 @@ sub run
         }
     );
 
-    $self->_set_up_solver( 0, [ 1, $RANK_KING ] );
-
-    my $verdict = 0;
-
-    $self->_next_task;
-
-QUEUE_LOOP:
-    while ( my $state = $self->_get_next_state_wrapper )
+    STDOUT->autoflush(1);
+    my $global_verdict = 1;
+    foreach my $board_fn (@ARGV)
     {
-        # The foundation
-        my $no_cards = 1;
+        delete $self->{_BOARD_CTR};
+        my $verdict = 0;
+        $self->_calc_lines( $board_fn, );
+        $self->_set_up_solver( 0, [ 1, $RANK_KING ] );
 
-        my @_pending;
+        $self->_next_task;
 
-        if (1)
+    QUEUE_LOOP:
+        while ( my $state = $self->_get_next_state_wrapper )
         {
-            $self->_find_moves( \@_pending, $state, \$no_cards );
-        }
+            # The foundation
+            my $no_cards = 1;
 
-        if ($no_cards)
-        {
-            $self->_trace_solution( $state, );
-            $verdict = 1;
-            last QUEUE_LOOP;
+            my @_pending;
+
+            if (1)
+            {
+                $self->_find_moves( \@_pending, $state, \$no_cards );
+            }
+
+            if ($no_cards)
+            {
+                $self->_trace_solution( $state, );
+                $verdict = 1;
+
+                # $self->_output_handle->print("END solved run\n");
+                last QUEUE_LOOP;
+            }
+            last QUEUE_LOOP
+                if not $self->_process_pending_items( \@_pending, $state );
         }
-        last QUEUE_LOOP
-            if not $self->_process_pending_items( \@_pending, $state );
+        $self->_end_report( $verdict, );
+        if ( not $verdict )
+        {
+            $global_verdict = 0;
+        }
     }
-
-    return $self->_my_exit( $verdict, );
+    return $self->_my_exit( $global_verdict, );
 }
 
 
@@ -65,7 +77,7 @@ implemented as a class to solve the Black Hole solitaire.
 
 =head1 VERSION
 
-version 0.10.0
+version 0.12.0
 
 =head1 SYNOPSIS
 
@@ -291,7 +303,7 @@ Shlomi Fish <shlomif@cpan.org>
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/games-solitaire-blackhole-solver/issues>
+L<https://github.com/shlomif/black-hole-solitaire/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

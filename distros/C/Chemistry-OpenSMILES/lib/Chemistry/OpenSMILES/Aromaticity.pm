@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Aromaticity handling routines
-our $VERSION = '0.11.2'; # VERSION
+our $VERSION = '0.11.3'; # VERSION
 
 use Chemistry::OpenSMILES qw(
     is_aromatic
@@ -141,7 +141,7 @@ sub electron_cycles
         my %seen;
         my %prev;
         my $operations = {
-            start      => sub { return $start },
+            start      => sub { $start },
             pre        => sub { $seen{$_[0]} = 1 },
             pre_edge   => sub {
                 my( $u, $v ) = @_;

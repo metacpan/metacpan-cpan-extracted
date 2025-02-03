@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version v0.0.3
+    version v0.0.4
 
 SYNOPSIS
 
@@ -387,11 +387,7 @@ REPORT AND FILTER STREAMS
 
 	rdns
 
-	fcrdns
-
 	src
-
-	dest
 
       helo
 

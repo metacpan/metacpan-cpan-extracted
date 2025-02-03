@@ -1,5 +1,5 @@
 package Games::Solitaire::BlackHole::Solver::App::Base;
-$Games::Solitaire::BlackHole::Solver::App::Base::VERSION = '0.10.0';
+$Games::Solitaire::BlackHole::Solver::App::Base::VERSION = '0.12.0';
 use Moo;
 use Getopt::Long     qw/ GetOptions /;
 use Pod::Usage       qw/ pod2usage /;
@@ -8,23 +8,77 @@ use List::Util 1.34  qw/ any first max /;
 
 extends('Exporter');
 
+# These attributes should remain constant during a solver's run.
 has '_num_foundations' => ( default => 1, is => 'rw', );
 
+my $solver_const_attrs = [
+    '_bits_offset',        '_display_boards',
+    '_init_tasks_configs', '_is_good_diff',
+    '_max_iters_limit',    '_prelude',
+    '_prelude_string',     '_talon_cards',
+    '_quiet',              '_output_handle',
+    '_output_fn',          '_should_show_maximal_num_played_cards',
+];
+
+my $board_const_attrs = [
+    '_board_cards',           '_board_lines',
+    '_board_values',          '_init_foundation',
+    '_init_foundation_cards', '_init_queue',
+];
+
+my $CHECK_SET_ONLY_ONCE_KEY = "BLACK_HOLE_SOLVER_RUNTIME_CHECKS";
+my $CHECK_SET_ONLY_ONCE     = $ENV{$CHECK_SET_ONLY_ONCE_KEY};
+if ( not $CHECK_SET_ONLY_ONCE )
+{
+    has [ @$board_const_attrs, @$solver_const_attrs ] => ( is => 'rw', );
+}
+else
+{
+    foreach my $const_attr (@$solver_const_attrs)
+    {
+        has $const_attr => (
+            is => 'rw',
+            (
+                $CHECK_SET_ONLY_ONCE
+                ? (
+                    trigger => sub {
+                        my ( $self, $newval ) = @_;
+                        die "self=$self const_attr=$const_attr"
+                            if ( $self->{_SOLVER_CTR}->{$const_attr}++ );
+                        return;
+                    }
+                    )
+                : ()
+            )
+        );
+    }
+    foreach my $const_attr (@$board_const_attrs)
+    {
+        has $const_attr => (
+            is => 'rw',
+            (
+                $CHECK_SET_ONLY_ONCE
+                ? (
+                    trigger => sub {
+                        my ( $self, $newval ) = @_;
+                        die "self=$self const_attr=$const_attr"
+                            if ( $self->{_BOARD_CTR}->{$const_attr}++ );
+                        return;
+                    }
+                    )
+                : ()
+            )
+        );
+    }
+}
+
+# These attributes mutate during a solver's run.
 has [
-    '_active_record',                            '_active_task',
-    '_bits_offset',                              '_board_cards',
-    '_board_lines',                              '_board_values',
-    '_display_boards',                           '_init_foundation',
-    '_init_foundation_cards',                    '_init_queue',
-    '_init_tasks_configs',                       '_is_good_diff',
-    '_maximal_num_played_cards__from_all_tasks', '_max_iters_limit',
-    '_prelude',                                  '_prelude_iter',
-    '_prelude_string',                           '_talon_cards',
-    '_positions',                                '_quiet',
-    '_output_handle',                            '_output_fn',
-    '_should_show_maximal_num_played_cards',     '_tasks',
-    '_tasks_by_names',                           '_task_idx',
+    '_active_record', '_active_task',
+    '_maximal_num_played_cards__from_all_tasks',
+    '_prelude_iter', '_positions', '_tasks', '_task_idx',
 ] => ( is => 'rw' );
+
 our %EXPORT_TAGS = ( 'all' => [qw($card_re)] );
 our @EXPORT_OK   = ( @{ $EXPORT_TAGS{'all'} } );
 
@@ -80,6 +134,49 @@ sub _update_max_num_played_cards
     return;
 }
 
+sub _output_board
+{
+    my (
+        $self,               $prev_state, $moves,
+        $changed_foundation, $col_idx,    $foundation_str_ref
+    ) = @_;
+    if ( not $self->_display_boards )
+    {
+        return;
+    }
+    my $_num_foundations = $self->_num_foundations();
+    my $offset           = $self->_bits_offset();
+    my $ret              = '';
+    my $foundation_val;
+    while ( my ( $i, $col ) = each( @{ $self->_board_cards } ) )
+    {
+        my $prevlen = vec( $prev_state, $offset + $i, 4 );
+        my $height  = $prevlen - 1;
+        my $iscurr  = ( $col_idx == $i );
+        my @c       = @$col[ 0 .. $height ];
+        if ($iscurr)
+        {
+            $foundation_val = $self->_board_values->[$col_idx][$height];
+            foreach my $x ( $c[-1] )
+            {
+                $$foundation_str_ref = $x;
+                $x                   = "[ $x -> ]";
+            }
+        }
+        $ret .= join( " ", ":", @c ) . "\n";
+    }
+
+    push @$moves,
+        +{
+        type               => "board",
+        str                => $ret,
+        foundation_str     => $$foundation_str_ref,
+        foundation_val     => $foundation_val,
+        changed_foundation => $changed_foundation,
+        };
+    return;
+}
+
 sub _trace_solution
 {
     my ( $self, $final_state ) = @_;
@@ -94,58 +191,25 @@ sub _trace_solution
     return if $self->_quiet;
 
     my $state = $final_state;
-    my ( $prev_state, $col_idx );
 
     my @moves;
 LOOP:
-    while ( ( $prev_state, $col_idx ) = @{ $self->_positions->{$state} } )
+    while ( my ( $prev_state, $col_idx ) = @{ $self->_positions->{$state} } )
     {
-        my $foundation_str;
-        my $changed_foundation;
-        my $outboard = sub {
-            if ( not $self->_display_boards )
-            {
-                return;
-            }
-            my $ret = '';
-            my $foundation_val;
-            while ( my ( $i, $col ) = each( @{ $self->_board_cards } ) )
-            {
-                my $prevlen = vec( $prev_state, $offset + $i, 4 );
-                my $height  = $prevlen - 1;
-                my $iscurr  = ( $col_idx == $i );
-                my @c       = @$col[ 0 .. $height ];
-                if ($iscurr)
-                {
-                    $foundation_val = $self->_board_values->[$col_idx][$height];
-                    foreach my $x ( $c[-1] )
-                    {
-                        $foundation_str = $x;
-                        $x              = "[ $x -> ]";
-                    }
-                }
-                $ret .= join( " ", ":", @c ) . "\n";
-            }
-            $changed_foundation =
-                first { vec( $state, $_, 8 ) ne vec( $prev_state, $_, 8 ) }
-                ( 0 .. $_num_foundations - 1 );
-            if ( not defined $changed_foundation )
-            {
-                die;
-            }
-
-            push @moves,
-                +{
-                type               => "board",
-                str                => $ret,
-                foundation_str     => $foundation_str,
-                foundation_val     => $foundation_val,
-                changed_foundation => $changed_foundation,
-                };
-            return;
-        };
         last LOOP if not defined $prev_state;
-        $outboard->();
+        my $changed_foundation =
+            first { vec( $state, $_, 8 ) ne vec( $prev_state, $_, 8 ) }
+            ( 0 .. $_num_foundations - 1 );
+        if ( not defined($changed_foundation) )
+        {
+            die
+"ERROR! Could not find changed_foundation. It must not have happened!";
+        }
+        my $foundation_str;
+        $self->_output_board(
+            $prev_state, \@moves, $changed_foundation,
+            $col_idx,    \$foundation_str
+        );
         push @moves,
             +{
             type => "card",
@@ -213,7 +277,7 @@ sub get_max_num_played_cards
     return $self->_maximal_num_played_cards__from_all_tasks() - 1;
 }
 
-sub _my_exit
+sub _end_report
 {
     my ( $self, $verdict, ) = @_;
     my $output_handle = $self->_output_handle;
@@ -230,9 +294,16 @@ sub _my_exit
         );
     }
 
+    return;
+}
+
+sub _my_exit
+{
+    my ( $self, $verdict, ) = @_;
+
     if ( defined( $self->_output_fn ) )
     {
-        close($output_handle);
+        close( $self->_output_handle );
     }
 
     exit( !$verdict );
@@ -339,11 +410,12 @@ sub _process_cmd_line
 {
     my ( $self, $args ) = @_;
 
-    $self->_set_bits_offset();
-    $self->_max_iters_limit( ( 1 << 31 ) );
-    $self->_should_show_maximal_num_played_cards(0);
-    my $display_boards = '';
-    my $quiet          = '';
+    my $_max_iters_limit = ( 1 << 31 );
+    my $_num_foundations = 1;
+    my $_prelude_string;
+    my $_should_show_maximal_num_played_cards = 0;
+    my $display_boards                        = '';
+    my $quiet                                 = '';
     my $output_fn;
     my ( $help, $man, $version );
     my @tasks;
@@ -371,8 +443,7 @@ sub _process_cmd_line
             {
                 die;
             }
-            $self->_num_foundations($val);
-            $self->_set_bits_offset();
+            $_num_foundations = $val;
             return;
         },
         "prelude=s" => sub {
@@ -381,7 +452,7 @@ sub _process_cmd_line
             {
                 die "Invalid prelude string '$val' !";
             }
-            $self->_prelude_string($val);
+            $_prelude_string = $val;
             return;
         },
         "task-name=s" => sub {
@@ -400,12 +471,12 @@ sub _process_cmd_line
         },
         "show-max-num-played-cards!" => sub {
             my ( undef, $val ) = @_;
-            $self->_should_show_maximal_num_played_cards($val);
+            $_should_show_maximal_num_played_cards = $val;
             return;
         },
         "max-iters=i" => sub {
             my ( undef, $val ) = @_;
-            $self->_max_iters_limit($val);
+            $_max_iters_limit = $val;
             return;
         },
         'help|h|?' => \$help,
@@ -434,7 +505,17 @@ sub _process_cmd_line
     }
 
     $self->_display_boards($display_boards);
+    $self->_max_iters_limit($_max_iters_limit);
+    $self->_num_foundations($_num_foundations);
+    if ( defined($_prelude_string) )
+    {
+        $self->_prelude_string($_prelude_string);
+    }
     $self->_quiet($quiet);
+    $self->_should_show_maximal_num_played_cards(
+        $_should_show_maximal_num_played_cards);
+    $self->_set_bits_offset();
+
     my $output_handle;
 
     if ( defined($output_fn) )
@@ -445,13 +526,15 @@ sub _process_cmd_line
     else
     {
         ## no critic
-        open( $output_handle, ">&STDOUT" );
+        # open( $output_handle, ">&STDOUT" );
+        $output_handle = \*STDOUT;
         ## use critic
+        # die $output_handle;"applj";
     }
-    binmode( $output_handle, ":encoding(utf8)" );
     $self->_output_fn($output_fn);
     $self->_output_handle($output_handle);
-    $self->_calc_lines( shift(@ARGV) );
+
+    # $self->_calc_lines( shift(@ARGV) );
 
     return;
 }
@@ -488,42 +571,44 @@ sub _set_up_tasks
     }
     $self->_task_idx(0);
     $self->_tasks( \@tasks );
-    $self->_tasks_by_names( \%tasks_by_names );
-    my @prelude;
-    my $process_item = sub {
-        my $s = shift;
-        if ( my ( $quota, $name ) = $s =~ /\A([0-9]+)\@($TASK_NAME_RE)\z/ )
-        {
-            if ( not exists $self->_tasks_by_names->{$name} )
+    if ( not $self->_prelude )
+    {
+        my @prelude;
+        my $process_item = sub {
+            my $s = shift;
+            if ( my ( $quota, $name ) = $s =~ /\A([0-9]+)\@($TASK_NAME_RE)\z/ )
             {
-                die "Unknown task name $name in prelude!";
-            }
-            my $task_obj = $self->_tasks_by_names->{$name};
-            return
-                Games::Solitaire::BlackHole::Solver::App::Base::PreludeItem
-                ->new(
+                if ( not exists $self->_tasks_by_names->{$name} )
                 {
-                    _quota     => $quota,
-                    _task      => $task_obj,
-                    _task_idx  => $task_obj->_task_idx,
-                    _task_name => $task_obj->_name,
+                    die "Unknown task name $name in prelude!";
                 }
+                my $task_obj = $self->_tasks_by_names->{$name};
+                return
+                    Games::Solitaire::BlackHole::Solver::App::Base::PreludeItem
+                    ->new(
+                    {
+                        _quota     => $quota,
+                        _task      => $task_obj,
+                        _task_idx  => $task_obj->_task_idx,
+                        _task_name => $task_obj->_name,
+                    }
+                    );
+            }
+            else
+            {
+                die "foo";
+            }
+        };
+        if ( my $_prelude_string = $self->_prelude_string )
+        {
+            push @prelude,
+                (
+                map { $process_item->($_) }
+                    split /,/, $_prelude_string
                 );
         }
-        else
-        {
-            die "foo";
-        }
-    };
-    if ( my $_prelude_string = $self->_prelude_string )
-    {
-        push @prelude,
-            (
-            map { $process_item->($_) }
-                split /,/, $_prelude_string
-            );
+        $self->_prelude( \@prelude );
     }
-    $self->_prelude( \@prelude );
     $self->_prelude_iter(0);
     if ( @{ $self->_prelude } )
     {
@@ -714,13 +799,16 @@ sub _set_up_solver
     $self->_parse_board;
     $self->_set_up_initial_position($talon_ptr);
     $self->_set_up_tasks;
-    $self->_is_good_diff( +{ map { $_ => 1 } map { $_, -$_ } @$diffs, } );
+    if ( not $self->_is_good_diff )
+    {
+        $self->_is_good_diff( +{ map { $_ => 1 } map { $_, -$_ } @$diffs, } );
+    }
 
     return;
 }
 
 package Games::Solitaire::BlackHole::Solver::App::Base::Task;
-$Games::Solitaire::BlackHole::Solver::App::Base::Task::VERSION = '0.10.0';
+$Games::Solitaire::BlackHole::Solver::App::Base::Task::VERSION = '0.12.0';
 use Moo;
 
 has '_queue'        => ( is => 'ro', default => sub { return []; }, );
@@ -745,7 +833,7 @@ sub _push_to_queue
 }
 
 package Games::Solitaire::BlackHole::Solver::App::Base::PreludeItem;
-$Games::Solitaire::BlackHole::Solver::App::Base::PreludeItem::VERSION = '0.10.0';
+$Games::Solitaire::BlackHole::Solver::App::Base::PreludeItem::VERSION = '0.12.0';
 use Moo;
 
 has [ '_quota', '_task', '_task_idx', '_task_name', ] => ( is => 'rw' );
@@ -764,7 +852,7 @@ Games::Solitaire::BlackHole::Solver::App::Base - base class.
 
 =head1 VERSION
 
-version 0.10.0
+version 0.12.0
 
 =head1 METHODS
 
@@ -862,7 +950,7 @@ Shlomi Fish <shlomif@cpan.org>
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/games-solitaire-blackhole-solver/issues>
+L<https://github.com/shlomif/black-hole-solitaire/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

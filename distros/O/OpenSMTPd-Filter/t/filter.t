@@ -28,7 +28,13 @@ is CLASS->new(
     on        => {
         filter => {
             'smtp-in' => {
-                connect => sub {'proceed'}
+                connect => sub {
+                    my ( $event, $session ) = @_;
+                    my $e = $session->{events}->[0];
+                    is $e->{rdns}, 'localhost', "Parsed expected rdns";
+                    is $e->{src},  '[::1]',     "Parsed expected src";
+                    return "proceed";
+                },
             }
         }
 })->_handle_filter('0.6|123|smtp-in|connect|abc|def|localhost|[::1]'), {

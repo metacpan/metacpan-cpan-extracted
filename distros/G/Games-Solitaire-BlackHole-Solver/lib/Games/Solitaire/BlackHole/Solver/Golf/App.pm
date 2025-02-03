@@ -1,5 +1,5 @@
 package Games::Solitaire::BlackHole::Solver::Golf::App;
-$Games::Solitaire::BlackHole::Solver::Golf::App::VERSION = '0.10.0';
+$Games::Solitaire::BlackHole::Solver::Golf::App::VERSION = '0.12.0';
 use 5.014;
 use Moo;
 
@@ -29,6 +29,7 @@ sub run
     {
         $place_queens_on_kings = 1;
     }
+    $self->_calc_lines( shift(@ARGV), );
 
     my $talon_line = shift( @{ $self->_board_lines } );
     my @talon_values;
@@ -128,7 +129,7 @@ implemented as a class to solve the “Golf” variant of solitaire.
 
 =head1 VERSION
 
-version 0.10.0
+version 0.12.0
 
 =head1 SYNOPSIS
 
@@ -335,7 +336,7 @@ Shlomi Fish <shlomif@cpan.org>
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/games-solitaire-blackhole-solver/issues>
+L<https://github.com/shlomif/black-hole-solitaire/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

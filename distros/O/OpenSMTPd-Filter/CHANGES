@@ -1,6 +1,13 @@
 Changelog for OpenSMTPd-Filter
 
-v0.0.3 2023-06-29T02:01:33
+v0.0.4 2025-02-03T00:10:45
+ - Correct "connect" parameters (Andrew Hewus Fresh)
+ - Simplify internal _fields_for interface (Andrew Hewus Fresh)
+ - Only use carton if we have it (Andrew Hewus Fresh)
+ - Fall through to default return (Andrew Hewus Fresh)
+ - Update README (Andrew Hewus Fresh)
+
+v0.0.3 2023-06-24T21:14:08
  - Mention which API protocol we support (Andrew Hewus Fresh)
  - Support report smtp-in link-auth 0.7 protocol (Andrew Hewus Fresh)
  - Don't reuse instance in test (Andrew Hewus Fresh)

@@ -1,5 +1,5 @@
 package Games::Solitaire::BlackHole::Solver;
-$Games::Solitaire::BlackHole::Solver::VERSION = '0.10.0';
+$Games::Solitaire::BlackHole::Solver::VERSION = '0.12.0';
 use 5.014;
 use strict;
 use warnings;
@@ -19,7 +19,7 @@ Games::Solitaire::BlackHole::Solver - A solver for Black Hole Solitaire
 
 =head1 VERSION
 
-version 0.10.0
+version 0.12.0
 
 =head1 SYNOPSIS
 
@@ -125,7 +125,7 @@ Shlomi Fish <shlomif@cpan.org>
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/games-solitaire-blackhole-solver/issues>
+L<https://github.com/shlomif/black-hole-solitaire/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

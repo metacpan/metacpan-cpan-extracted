@@ -1,3 +1,10 @@
+0.04 Sun Feb  2 08:24:23 EST 2025
+	- Fixes as per CPANTS:
+	  + LICENSE added.
+	  + packaged with GNU tar.
+	  + Added 'use warnings'.
+	  + Added MIN_PERL_VERSION to Makefile.PL
+
 0.03 Sun Jun 22 16:45:22 EDT 2003
 	- added Linbu and Osmanya digits (Unicode 4.0).
 

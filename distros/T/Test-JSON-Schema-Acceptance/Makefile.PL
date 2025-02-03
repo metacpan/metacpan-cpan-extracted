@@ -62,12 +62,13 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.88",
     "Test::Simple" => "1.302176",
     "Test::Warnings" => 0,
+    "Tie::Hash" => 0,
     "feature" => 0,
     "lib" => 0,
     "open" => 0,
     "utf8" => 0
   },
-  "VERSION" => "1.026",
+  "VERSION" => "1.027",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -100,6 +101,7 @@ my %FallbackPrereqs = (
   "Test::More" => "0.88",
   "Test::Simple" => "1.302176",
   "Test::Warnings" => 0,
+  "Tie::Hash" => 0,
   "Types::Common::Numeric" => 0,
   "Types::Standard" => "1.016003",
   "constant" => 0,

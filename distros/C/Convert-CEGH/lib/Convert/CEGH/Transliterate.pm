@@ -1,4 +1,6 @@
 package Convert::CEGH::Transliterate;
+use warnings;
+use strict;
 use utf8;
 use Regexp::Ethiopic qw(:forms setForm);
 
@@ -9,7 +11,7 @@ use vars qw( $COPTIC @EXPORT_OK $VERSION );
 
 	@EXPORT_OK = qw( transliterate );
 
-	$VERSION = "0.01";
+	$VERSION = "0.04";
 
 	$COPTIC = qr/[ϚCϢϤϦϨϬϮϪ]/;
 }
@@ -132,7 +134,7 @@ my ( $to, @strings ) = @_;
 
 __END__
 
-
+=encoding utf8
 
 =head1 NAME
 
@@ -141,6 +143,7 @@ Convert::CEGH::Transliterate - Coptic/Ethiopic/Greek/Hebrew Transliteration.
 =head1 SYNOPSIS
 
   use utf8;
+  binmode (STDOUT, ":utf8");
   use Convert::CEGH::Transliterate 'transliterate';
 
   print transliterate ( "he", "አዳም" ), "\n";
@@ -149,7 +152,7 @@ Convert::CEGH::Transliterate - Coptic/Ethiopic/Greek/Hebrew Transliteration.
 
 This package makes available a single function C<transliterate> which will
 convert a word (or list of words) into the script specified in the first
-arguement.  Valid scripts values are "cop", "eth", "ell", "heb" and
+argument.  Valid scripts values are "cop", "eth", "ell", "heb" and
 "co", "et", "el", "he".  These are the 3 and 2 letter ISO 15924 script
 codes for Coptic, Ethiopic, Greek and Hebrew.
 
@@ -205,6 +208,13 @@ None presently known.
 =head1 AUTHOR
 
 Daniel Yacob,  L<dyacob@cpan.org|mailto:dyacob@cpan.org>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2003-2025, Daniel Yacob C<< <dyacob@cpan.org> >>. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
 
 =head1 SEE ALSO
 

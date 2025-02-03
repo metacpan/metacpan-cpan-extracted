@@ -2,6 +2,15 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
+my $dist = {
+	COMPRESS => 'gzip -9f',
+	SUFFIX => 'gz'
+};
+
+if($^O eq 'darwin') {
+	$dist->{'TAR'} = 'gtar';
+}
+
 WriteMakefile(
     NAME                => 'Locale::AU',
     AUTHOR              => q{Nigel Horne <njh@bandsman.co.uk>},
@@ -11,17 +20,20 @@ WriteMakefile(
      ($ExtUtils::MakeMaker::VERSION >= 6.3002))
       ? ('LICENSE'=> 'GPL')
       : ()),
-    PL_FILES            => {},
+    PL_FILES => {},
     BUILD_REQUIRES => {
-	'Test::Most' => 0,
-	'Test::NoWarnings' => 0,
-	# 'Test::Kwalitee' => 0,
-    },
-    PREREQ_PM => {
+    }, PREREQ_PM => {
 	'Data::Section::Simple' => 0,
+    }, TEST_REQUIRES => {
+	# 'Test::Kwalitee' => 0,
+	'Test::DescribeMe' => 0,
+	'Test::Most' => 0,
+	'Test::Needs' => 0,
+	'Test::Needs' => 0,
+	'Test::NoWarnings' => 0,
     },
-    dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'Locale-AU-*' },
+    dist => $dist,
     META_MERGE		=> {
     	'meta-spec' => { version => 2 },
     	resources => {

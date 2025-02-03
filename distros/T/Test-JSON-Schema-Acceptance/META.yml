@@ -15,6 +15,7 @@ build_requires:
   Test::More: '0.88'
   Test::Simple: '1.302176'
   Test::Warnings: '0'
+  Tie::Hash: '0'
   feature: '0'
   lib: '0'
   open: '0'
@@ -42,7 +43,7 @@ no_index:
 provides:
   Test::JSON::Schema::Acceptance:
     file: lib/Test/JSON/Schema/Acceptance.pm
-    version: '1.026'
+    version: '1.027'
 requires:
   Feature::Compat::Try: '0'
   File::ShareDir: '0'
@@ -72,10 +73,10 @@ resources:
   bugtracker: https://github.com/karenetheridge/Test-JSON-Schema-Acceptance/issues
   homepage: https://github.com/karenetheridge/Test-JSON-Schema-Acceptance
   repository: https://github.com/karenetheridge/Test-JSON-Schema-Acceptance.git
-version: '1.026'
+version: '1.027'
 x_Dist_Zilla:
   perl:
-    version: '5.040000'
+    version: '5.041008'
   plugins:
     -
       class: Dist::Zilla::Plugin::Run::BeforeBuild
@@ -282,8 +283,9 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::Test::CPAN::Changes:
           changelog: Changes
+          filename: xt/release/cpan-changes.t
       name: '@Author::ETHER/Test::CPAN::Changes'
-      version: '0.012'
+      version: '0.013'
     -
       class: Dist::Zilla::Plugin::Test::ChangesHasContent
       name: '@Author::ETHER/Test::ChangesHasContent'
@@ -294,7 +296,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Test::MinimumVersion:
           max_target_perl: '5.020'
       name: '@Author::ETHER/Test::MinimumVersion'
-      version: '2.000010'
+      version: '2.000011'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::ETHER/PodSyntaxTests'
@@ -318,7 +320,7 @@ x_Dist_Zilla:
             - irc
           wordlist: Pod::Wordlist
       name: '@Author::ETHER/Test::PodSpelling'
-      version: '2.007005'
+      version: '2.007006'
     -
       class: Dist::Zilla::Plugin::Test::Kwalitee
       config:
@@ -341,7 +343,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Test::Portability:
           options: ''
       name: '@Author::ETHER/Test::Portability'
-      version: '2.001001'
+      version: '2.001003'
     -
       class: Dist::Zilla::Plugin::Test::CleanNamespaces
       config:
@@ -547,7 +549,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.45.2
+          git_version: 2.47.1
           include_authors: 0
           include_releaser: 1
           order_by: commits
@@ -614,7 +616,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20240609'
+          Module::CoreList: '5.20250120'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.010'
     -
@@ -639,7 +641,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.45.2
+          git_version: 2.47.1
           repo_root: .
       name: '@Author::ETHER/initial check'
       version: '2.051'
@@ -647,7 +649,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.45.2
+          git_version: 2.47.1
           repo_root: .
       name: '@Author::ETHER/Git::CheckFor::MergeConflicts'
       version: '0.014'
@@ -655,7 +657,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.45.2
+          git_version: 2.47.1
           repo_root: .
       name: '@Author::ETHER/Git::CheckFor::CorrectBranch'
       version: '0.014'
@@ -681,7 +683,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.45.2
+          git_version: 2.47.1
           repo_root: .
       name: '@Author::ETHER/after tests'
       version: '2.051'
@@ -765,7 +767,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.45.2
+          git_version: 2.47.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -778,11 +780,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.026
+          tag: v1.027
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.45.2
+          git_version: 2.47.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -819,7 +821,7 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.45.2
+          git_version: 2.47.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -841,7 +843,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.45.2
+          git_version: 2.47.1
           repo_root: .
       name: '@Author::ETHER/Git::Push'
       version: '2.051'
@@ -979,8 +981,8 @@ x_authority: cpan:RELEQUEST
 x_contributors:
   - 'Karen Etheridge <ether@cpan.org>'
   - 'Daniel Perrett <dp13@sanger.ac.uk>'
-x_generated_by_perl: v5.40.0
-x_serialization_backend: 'YAML::Tiny version 1.74'
+x_generated_by_perl: v5.41.8
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: MIT
 x_static_install: 0
 x_use_unsafe_inc: 0

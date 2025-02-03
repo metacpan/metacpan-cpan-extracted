@@ -7,7 +7,6 @@ binmode(STDOUT, ":utf8");
 binmode(STDERR, ":utf8");
 use utf8;
 use strict;
-use encoding 'utf8';
 use Test::More qw(no_plan);
 
 require String::Equivalence::Amharic;

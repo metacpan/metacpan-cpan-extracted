@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,5 +22,5 @@ resources:
   bugtracker: https://github.com/libwww-perl/Mozilla-CA/issues
   license: https://www.mozilla.org/media/MPL/2.0/index.txt
   repository: https://github.com/libwww-perl/Mozilla-CA.git
-version: '20240924'
+version: '20250202'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

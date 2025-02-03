@@ -6,9 +6,10 @@ use utf8;  # can't find a way to conditionally load this with
 BEGIN
 {
 	use strict;
+	use warnings;
 	use vars qw($VERSION @CNumbers %CNumbers);
 
-	$VERSION = "0.13";
+	$VERSION = "0.14";
 
 	require 5.000;
 
@@ -258,6 +259,13 @@ None presently known.
 =head1 AUTHOR
 
 Daniel Yacob,  L<dyacob@cpan.org|mailto:dyacob@cpan.org>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2003-2025, Daniel Yacob C<< <dyacob@cpan.org> >>. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
 
 =head1 SEE ALSO
 

@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
 	NAME		=> 'Convert::CEGH',
 	DISTNAME	=> 'Convert-CEGH',
-	VERSION		=> "0.02",
+	'VERSION_FROM'	=> 'lib/Convert/CEGH.pm', # finds $VERSION
 	AUTHOR		=> "Daniel Yacob <dyacob\@cpan.org>",
 	ABSTRACT	=> "Gematria and Transliteration for Coptic, Ethiopic, Greek and Hebrew.",
 	PREREQ_PM 	=> { 'Regexp::Ethiopic' => '0.10' },
@@ -13,4 +13,6 @@ WriteMakefile(
 		SUFFIX          =>	"gz",
 		POSTOP          =>	'mv $(DISTNAME)-$(VERSION).tar.gz ../'
 	},
+	'LICENSE'	=> 'perl',
+	'MIN_PERL_VERSION' => '5.6.1'
 );

@@ -1,4 +1,11 @@
 Revision history for Locale-AU
 
+0.02	Sun Feb  2 16:15:18 EST 2025
+	Added t/40-basics.t
+	Use Test::DescribeMe to simplify tests
+	Use Test::Needs
+	Allow new to be called both as a class method (Locale::AU->new())
+		and as an object method ($object->new()).
+
 0.01	Mon May 18 17:19:55 EDT 2020
 	First draft

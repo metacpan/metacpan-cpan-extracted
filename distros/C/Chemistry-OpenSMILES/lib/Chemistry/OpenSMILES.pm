@@ -1,7 +1,7 @@
 package Chemistry::OpenSMILES;
 
 # ABSTRACT: OpenSMILES format reader and writer
-our $VERSION = '0.11.2'; # VERSION
+our $VERSION = '0.11.3'; # VERSION
 
 use strict;
 use warnings;
@@ -9,7 +9,7 @@ use 5.0100;
 
 use Chemistry::OpenSMILES::Stereo::Tables qw( @OH @TB );
 use Graph::Traversal::BFS;
-use List::Util qw( all any first none sum0 );
+use List::Util qw( all any first max min none sum0 );
 
 require Exporter;
 our @ISA = qw( Exporter );
@@ -362,38 +362,95 @@ sub _validate($@)
 {
     my( $moiety, $color_sub ) = @_;
 
+    # Identify islands of allene systems
+    my $allenes = _allene_graph( $moiety );
+
+    my $color_by_element = sub { $_[0]->{symbol} };
+
     for my $atom (sort { $a->{number} <=> $b->{number} } $moiety->vertices) {
-        # TODO: AL chiral centers also have to be checked
-        if( is_chiral_tetrahedral( $atom ) ) {
-            if( $moiety->degree($atom) < 3 ) {
-                # FIXME: there should be a strict mode to forbid lone pairs
-                # FIXME: tetrahedral allenes are false-positives
-                warn sprintf 'chiral center %s(%d) has %d bonds while ' .
-                             'at least 3 is required' . "\n",
+        if( is_chiral_allenal($atom) ) {
+            if( $moiety->degree($atom) != 2 ) {
+                warn sprintf 'tetrahedral chiral allenal setting for %s(%d) ' .
+                             'has %d bonds while 2 are needed' . "\n",
                              $atom->{symbol},
                              $atom->{number},
                              $moiety->degree($atom);
-            } elsif( $moiety->degree($atom) == 4 && $color_sub ) {
-                my %colors = map { ($color_sub->( $_ ) => 1) }
-                                 $moiety->neighbours($atom);
-                if( scalar keys %colors != 4 &&
-                    !is_ring_atom( $moiety, $atom, scalar $moiety->edges ) ) {
-                    warn sprintf 'tetrahedral chiral setting for %s(%d) ' .
-                                 'is not needed as not all 4 neighbours ' .
-                                 'are distinct' . "\n",
-                                 $atom->{symbol},
-                                 $atom->{number};
-                }
+                next;
             }
-        }
+            if( !$allenes->has_vertex($atom) ) {
+                warn sprintf 'tetrahedral chiral allenal setting for %s(%d) ' .
+                             'is not a part of any allenal system' . "\n",
+                             $atom->{symbol},
+                             $atom->{number};
+                next;
+            }
+            if( none { $allenes->has_edge_attribute( $atom, $_, 'allene' ) &&
+                       $allenes->get_edge_attribute( $atom, $_, 'allene' ) eq 'mid' }
+                     $allenes->neighbours($atom) ) {
+                warn sprintf 'tetrahedral chiral allenal setting for %s(%d) ' .
+                             'observed for an atom which is not a center of ' .
+                             'an allenal system' . "\n",
+                             $atom->{symbol},
+                             $atom->{number};
+                next;
+            }
+            next unless $color_sub;
+            next if is_ring_atom( $moiety, $atom, scalar $moiety->edges );
 
-        # Warn about unmarked tetrahedral chiral centers
-        if( !is_chiral( $atom ) && $moiety->degree( $atom ) == 4 ) {
-            my $color_sub_local = $color_sub;
-            if( !$color_sub_local ) {
-                $color_sub_local = sub { return $_[0]->{symbol} };
+            my @ends = grep { $allenes->has_edge_attribute( $atom, $_, 'allene' ) &&
+                              $allenes->get_edge_attribute( $atom, $_, 'allene' ) eq 'mid' }
+                            $allenes->neighbours($atom);
+            my @neighbours = grep { $_ ne $ends[0] && $_ ne $ends[1] }
+                             map  { @$_ }
+                             grep { !$allenes->has_edge( @$_ ) }
+                             map  { $moiety->edges_at($_) } @ends;
+            my %colors = map { ($color_sub->( $_ ) => 1) } @neighbours;
+            if( scalar keys %colors != 4 ) {
+                # FIXME: Emits false positives for coordinating metals.
+                # Need to think of a heuristic to exclude them.
+                warn sprintf 'tetrahedral chiral allenal setting for ' .
+                             '%s(%d) is not needed as not all 4 neighbours ' .
+                             'are distinct' . "\n",
+                             $atom->{symbol},
+                             $atom->{number};
             }
-            my %colors = map { ($color_sub_local->( $_ ) => 1) }
+        } elsif( is_chiral_tetrahedral($atom) ) {
+            if( $moiety->degree($atom) < 3 ) {
+                # TODO: there should be a strict mode to forbid lone pairs
+                warn sprintf 'tetrahedral chiral center %s(%d) has %d bonds ' .
+                             'while at least 3 are required' . "\n",
+                             $atom->{symbol},
+                             $atom->{number},
+                             $moiety->degree($atom);
+                next;
+            }
+            if( $moiety->degree($atom) > 4 ) {
+                warn sprintf 'tetrahedral chiral center %s(%d) has %d bonds ' .
+                             'while at most 4 are allowed' . "\n",
+                             $atom->{symbol},
+                             $atom->{number},
+                             $moiety->degree($atom);
+                next;
+            }
+
+            next unless $color_sub;
+            next if is_ring_atom( $moiety, $atom, scalar $moiety->edges );
+
+            my $has_lone_pair = $moiety->degree($atom) == 3;
+            my %colors = map { ($color_sub->( $_ ) => 1) }
+                             $moiety->neighbours($atom);
+            if( scalar keys %colors != 4 - $has_lone_pair ) {
+                warn sprintf 'tetrahedral chiral setting for %s(%d) ' .
+                             'is not needed as not all 4 neighbours ' .
+                             '(including possible lone pair) are distinct' . "\n",
+                             $atom->{symbol},
+                             $atom->{number};
+            }
+        } elsif( !is_chiral($atom) && $moiety->degree($atom) == 4 ) {
+            # Warn about unmarked tetrahedral chiral centers
+            my %colors = map { $color_sub
+                                ? ($color_sub->($_) => 1)
+                                : ($color_by_element->($_) => 1) }
                              $moiety->neighbours($atom);
             if( scalar keys %colors == 4 ) {
                 warn sprintf 'atom %s(%d) has 4 distinct neighbours, ' .
@@ -404,62 +461,131 @@ sub _validate($@)
         }
     }
 
-    # FIXME: establish deterministic order
-    for my $bond ($moiety->edges) {
+    for my $bond (sort { min( map { $_->{number} } @$a ) <=> min( map { $_->{number} } @$b ) ||
+                         max( map { $_->{number} } @$a ) <=> max( map { $_->{number} } @$b ) }
+                       $moiety->edges) {
         my( $A, $B ) = sort { $a->{number} <=> $b->{number} } @$bond;
         if( $A eq $B ) {
             warn sprintf 'atom %s(%d) has bond to itself' . "\n",
                          $A->{symbol},
                          $A->{number};
+            next;
         }
 
-        if( $moiety->has_edge_attribute( @$bond, 'bond' ) ) {
-            my $bond_type = $moiety->get_edge_attribute( @$bond, 'bond' );
-            if( $bond_type eq '=' ) {
-                # Test cis/trans bonds
-                # FIXME: Not sure how to check which definition belongs to
-                # which of the double bonds. See COD entry 1547257.
-                for my $atom (@$bond) {
-                    my %bond_types = _neighbours_per_bond_type( $moiety,
-                                                                $atom );
-                    foreach ('/', '\\') {
-                        if( $bond_types{$_} && @{$bond_types{$_}} > 1 ) {
-                            warn sprintf 'atom %s(%d) has %d bonds of type \'%s\', ' .
-                                         'cis/trans definitions must not conflict' . "\n",
-                                         $atom->{symbol},
-                                         $atom->{number},
-                                         scalar @{$bond_types{$_}},
-                                         $_;
-                        }
+        if( is_double_bond( $moiety, @$bond ) ) {
+            # Test cis/trans bonds
+            # Detect conflicting cis/trans markers, see COD entry 1547257, r297409
+            my $cis_trans_bonds = 0;
+            for my $atom (@$bond) {
+                my %bond_types = _neighbours_per_bond_type( $moiety, $atom );
+                foreach ('/', '\\') {
+                    $cis_trans_bonds += @{$bond_types{$_}} if $bond_types{$_};
+                    if( $bond_types{$_} && @{$bond_types{$_}} > 1 ) {
+                        warn sprintf 'atom %s(%d) has %d bonds of type \'%s\', ' .
+                                     'cis/trans definitions must not conflict' . "\n",
+                                     $atom->{symbol},
+                                     $atom->{number},
+                                     scalar @{$bond_types{$_}},
+                                     $_;
                     }
-                }
-            } elsif( $bond_type =~ /^[\\\/]$/ ) {
-                # Test if next to a double bond.
-                # FIXME: Yields false-positives for delocalised bonds,
-                # see COD entry 1501863.
-                # FIXME: What about triple bond? See COD entry 4103591.
-                my %bond_types;
-                for my $atom (@$bond) {
-                    my %bond_types_now = _neighbours_per_bond_type( $moiety,
-                                                                    $atom );
-                    for my $key (keys %bond_types_now) {
-                        push @{$bond_types{$key}}, @{$bond_types_now{$key}};
-                    }
-                }
-                if( !$bond_types{'='} ) {
-                    warn sprintf 'cis/trans bond is defined between atoms ' .
-                                 '%s(%d) and %s(%d), but neither of them ' .
-                                 'is attached to a double bond' . "\n",
-                                 $A->{symbol},
-                                 $A->{number},
-                                 $B->{symbol},
-                                 $B->{number};
                 }
             }
+            next if $allenes->has_edge( @$bond ); # Allene systems are checked below
+            if( $cis_trans_bonds == 1 ) {
+                # FIXME: Source of false-positives.
+                # Cis/trans bond is out of place if none of neighbouring double bonds have other cis/trans bonds.
+                # This has to include allenal systems.
+                warn sprintf 'double bond between atoms %s(%d) and %s(%d) ' .
+                             'has only one cis/trans marker' . "\n",
+                             $A->{symbol}, $A->{number},
+                             $B->{symbol}, $B->{number};
+            }
+        } elsif( is_cis_trans_bond( $moiety, @$bond ) ) {
+            # Test if next to a double bond.
+            # FIXME: Yields false-positives for delocalised bonds,
+            # see COD entry 1501863.
+            # FIXME: What about triple bond? See COD entry 4103591.
+            my %bond_types;
+            for my $atom (@$bond) {
+                my %bond_types_now = _neighbours_per_bond_type( $moiety, $atom );
+                for my $key (keys %bond_types_now) {
+                    push @{$bond_types{$key}}, @{$bond_types_now{$key}};
+                }
+            }
+            if( !$bond_types{'='} ) {
+                warn sprintf 'cis/trans bond is defined between atoms ' .
+                             '%s(%d) and %s(%d), but neither of them ' .
+                             'is attached to a double bond' . "\n",
+                             $A->{symbol},
+                             $A->{number},
+                             $B->{symbol},
+                             $B->{number};
+            }
+        }
+
+        # Check allene systems
+        for my $system (sort { min( map { $_->{number} } @$a ) <=>
+                               min( map { $_->{number} } @$b ) }
+                             $allenes->connected_components) {
+            next if @$system % 2;
+
+            my @ends = sort { $a->{number} <=> $b->{number} }
+                       map  { @$_ }
+                       grep { $allenes->has_edge_attribute( @$_, 'allene' ) &&
+                              $allenes->get_edge_attribute( @$_, 'allene' ) eq 'end' }
+                            $allenes->subgraph($system)->edges;
+            my $cis_trans_bonds = grep { is_cis_trans_bond( $moiety, @$_ ) }
+                                  map  { $moiety->edges_at( $_ ) } @ends;
+            if( $cis_trans_bonds == 1 ) {
+                warn sprintf 'allene system between atoms %s(%d) and %s(%d) ' .
+                             'has only one cis/trans marker' . "\n",
+                             $ends[0]->{symbol}, $ends[0]->{number},
+                             $ends[1]->{symbol}, $ends[1]->{number};
+            }
+            next if $cis_trans_bonds;
+
+            my @neighbours_at_ends = grep { $_ ne $ends[0] && $_ ne $ends[1] }
+                                     map  { @$_ }
+                                     grep { !is_double_bond( $moiety, @$_ ) }
+                                     map  { $moiety->edges_at( $_ ) } @ends;
+            next unless @neighbours_at_ends == 4;
+            warn sprintf 'allene system between atoms %s(%d) and %s(%d) ' .
+                         'has 4 neighbours, but does not have cis/trans ' .
+                         'setting' . "\n",
+                         $ends[0]->{symbol}, $ends[0]->{number},
+                         $ends[1]->{symbol}, $ends[1]->{number};
         }
     }
 
     # TODO: SP, TB, OH chiral centers
+}
+
+sub _allene_graph
+{
+    my( $moiety ) = @_;
+
+    my $graph = $moiety->copy;
+    $graph->delete_edges( map  { @$_ }
+                          grep { !is_double_bond( $moiety, @$_ ) }
+                               $moiety->edges );
+    $graph->delete_vertices( grep { !$graph->degree( $_ ) } $graph->vertices );
+
+    for my $system ($graph->connected_components) {
+        my @d1 = grep { $graph->degree( $_ ) == 1 } @$system;
+        my @d2 = grep { $graph->degree( $_ ) == 2 } @$system;
+        if (@d1 == 2 && @d2 && @d1 + @d2 == @$system ) {
+            if( @d2 % 2 ) {
+                my( $center ) = $graph->subgraph( $system )->center_vertices;
+                $graph->set_edge_attribute( $center, $d1[0], 'allene', 'mid' );
+                $graph->set_edge_attribute( $center, $d1[1], 'allene', 'mid' );
+            }
+            $graph->set_edge_attribute( @d1, 'allene', 'end' );
+        } else {
+            $graph->delete_vertices( @$system );
+        }
+    }
+
+    return $graph;
 }
 
 sub _neighbours_per_bond_type

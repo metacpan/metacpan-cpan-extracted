@@ -1,5 +1,11 @@
 Revision history for Test-JSON-Schema-Acceptance
 
+1.027     2025-02-02 18:40:55Z
+        - fix double json-encoding of schema and data diagnostics
+        - fix a test for latest Test2::*
+        - updated test suite:
+          https://github.com/json-schema-org/JSON-Schema-Test-Suite/compare/9fc880bfb6d8ccd093bc82431f17d13681ffae8e...e524505b8ac4a61c5dc162b51d68c2385a134706
+
 1.026     2024-06-19 04:02:15Z
         - declare Mojolicious minimum version needed for JSON_XS logic
         - also print data and schema for failed tests

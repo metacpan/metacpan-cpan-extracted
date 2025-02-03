@@ -1,7 +1,7 @@
 package Chemistry::OpenSMILES::Writer;
 
 # ABSTRACT: OpenSMILES format writer
-our $VERSION = '0.11.2'; # VERSION
+our $VERSION = '0.11.3'; # VERSION
 
 use strict;
 use warnings;
@@ -28,6 +28,10 @@ our @EXPORT_OK = qw(
 my %shape_to_SP = ( 'U' => '@SP1', '4' => '@SP2', 'Z' => '@SP3' );
 my %SP_to_shape = reverse %shape_to_SP;
 
+# write_SMILES() does not necessary respect the order subroutine: if performs DFS guided by the requested order.
+# Thus before calling write_SMILES(), the exact post-order is not known.
+# Only pre-order is known, thus relative properties, such as cis/trans markers, have to be adjusted to pre-order.
+# Thus order-dependent markers have to be adjusted to pre-order.
 sub write_SMILES
 {
     my( $what, $options ) = @_;
@@ -221,10 +225,9 @@ sub write_SMILES
                 for my $j (sort { $a <=> $b } keys %{$rings->{$i}}) {
                     next if $i > $j;
                     if( !@ring_ids ) {
-                        # All 100 rings are open now. There is no other
-                        # solution but to terminate the program.
-                        die 'cannot represent more than 100 open ring' .
-                            ' bonds';
+                        # All 100 rings are open now.
+                        # There is no other solution but to terminate the program.
+                        die 'cannot represent more than 100 open ring bonds' . "\n";
                     }
                     $symbols[$i] .= $rings->{$i}{$j} .
                                     ($ring_ids[0] < 10 ? '' : '%') .
@@ -310,6 +313,8 @@ sub _pre_vertex
     return $is_simple ? $atom : "[$atom]";
 }
 
+# _depict_bond() gets vertices in order of their appearance in the post-order.
+# It flips '/' <=> '\' if post-order is opposite from pre-order.
 sub _depict_bond
 {
     my( $u, $v, $graph ) = @_;
@@ -359,7 +364,7 @@ sub _square_planar_chirality
 
     if( join( ',', sort @_ ) ne '0,1,2,3' ) {
         die '_square_planar_chirality() accepts only permutations of ' .
-            "numbers '0', '1', '2' and '3', unexpected input received";
+            "numbers '0', '1', '2' and '3', unexpected input received\n";
     }
 
     # Rotations until 0 is first
@@ -397,7 +402,7 @@ sub _trigonal_bipyramidal_chirality
 
     if( join( ',', sort @target ) ne '0,1,2,3,4' ) {
         die '_trigonal_bipyramidal_chirality() accepts only permutations of ' .
-            "numbers '0', '1', '2', '3' and '4', unexpected input received";
+            "numbers '0', '1', '2', '3' and '4', unexpected input received\n";
     }
 
     $chirality =~ s/^\@TB//;
@@ -442,7 +447,7 @@ sub _octahedral_chirality
 
     if( join( ',', sort @target ) ne '0,1,2,3,4,5' ) {
         die '_octahedral_chirality() accepts only permutations of ' .
-            "numbers '0', '1', '2', '3', '4' and '5, unexpected input received";
+            "numbers '0', '1', '2', '3', '4' and '5, unexpected input received\n";
     }
 
     $chirality =~ s/^\@OH//;
@@ -503,7 +508,7 @@ sub _octahedral_chirality
     } elsif( $target[0] == $sides[2] && $target[1] == $sides[1] ) {
         ( $shape, $order ) = ( 'U', '@' );
     } else {
-        die 'unexpected situation achieved in _octahedral_chirality()';
+        die 'unexpected situation achieved in _octahedral_chirality()' . "\n";
     }
     $chirality = 1 + first { $OH[$_]->{shape}   eq $shape &&
                              $OH[$_]->{order}   eq $order &&

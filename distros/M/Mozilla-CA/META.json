@@ -4,7 +4,7 @@
       "Gisle Aas <gisle@activestate.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -48,6 +48,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#lwp"
    },
-   "version" : "20240924",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "20250202",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

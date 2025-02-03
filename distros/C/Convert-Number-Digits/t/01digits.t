@@ -4,6 +4,7 @@
 ######################### We start with some black magic to print on failure.
 
 binmode(STDOUT, ":utf8");  # but we still get wide char errors
+binmode(STDERR, ":utf8");  # but we still get wide char errors
 use Test::More qw(no_plan);
 use utf8;
 use strict;

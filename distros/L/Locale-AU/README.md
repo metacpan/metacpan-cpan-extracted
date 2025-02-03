@@ -4,7 +4,7 @@ Locale::AU - abbreviations for territory and state identification in Australia a
 
 # VERSION
 
-Version 0.01
+Version 0.02
 
 # SYNOPSIS
 
@@ -23,6 +23,8 @@ Version 0.01
 ## new
 
 Creates a Locale::AU object.
+
+Can be called both as a class method (Locale::AU->new()) and as an object method ($object->new()).
 
 ## all\_state\_codes
 
@@ -64,17 +66,21 @@ You can find documentation for this module with the perldoc command.
 
 You can also look for information at:
 
+- MetaCPAN
+
+    [https://metacpan.org/dist/Local-AU](https://metacpan.org/dist/Local-AU)
+
 - RT: CPAN's request tracker
 
-    [http://rt.cpan.org/NoAuth/Bugs.html?Dist=Locale-AU](http://rt.cpan.org/NoAuth/Bugs.html?Dist=Locale-AU)
+    [https://rt.cpan.org/NoAuth/Bugs.html?Dist=Local-AU](https://rt.cpan.org/NoAuth/Bugs.html?Dist=Local-AU)
 
-- CPAN Ratings
+- CPAN Testers' Matrix
 
-    [http://cpanratings.perl.org/d/Locale-AU](http://cpanratings.perl.org/d/Locale-AU)
+    [http://matrix.cpantesters.org/?dist=Local-AU](http://matrix.cpantesters.org/?dist=Local-AU)
 
-- Search CPAN
+- CPAN Testers Dependencies
 
-    [http://search.cpan.org/dist/Locale-AU/](http://search.cpan.org/dist/Locale-AU/)
+    [http://deps.cpantesters.org/?module=Locale::AU](http://deps.cpantesters.org/?module=Locale::AU)
 
 # ACKNOWLEDGEMENTS
 
@@ -82,6 +88,6 @@ Based on [Locale::US](https://metacpan.org/pod/Locale%3A%3AUS) - Copyright (c) 2
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2020 Nigel Horne.
+Copyright 2020-2025 Nigel Horne.
 
 This program is released under the following licence: GPL2

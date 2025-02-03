@@ -7,4 +7,4 @@ use Test::Most tests => 2;
 use Locale::AU;
 
 isa_ok(Locale::AU->new(), 'Locale::AU', 'Creating Locale::AU object');
-ok(!defined(Locale::AU::new()));
+isa_ok(Locale::AU::new(), 'Locale::AU', 'Creating Locale::AU object');

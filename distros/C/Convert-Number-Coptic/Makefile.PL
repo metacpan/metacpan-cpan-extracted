@@ -7,9 +7,11 @@ WriteMakefile(
 	'VERSION_FROM'	=> 'lib/Convert/Number/Coptic.pm', # finds $VERSION
 	'AUTHOR'	=> "Daniel Yacob <dyacob\@cpan.org>",
 	'ABSTRACT'	=> "Conversion for Coptic Numerals in Perl.",
-	dist			=>	{
-		COMPRESS        =>	"gzip -9f",
-		SUFFIX          =>	"gz",
-		POSTOP          =>	'mv $(DISTNAME)-$(VERSION).tar.gz ../'
-	}
+	'dist'		=>	{
+		'COMPRESS'        =>	"gzip -9f",
+		'SUFFIX'          =>	"gz",
+		'POSTOP'          =>	'mv $(DISTNAME)-$(VERSION).tar.gz ../'
+	},
+	'LICENSE'	=> 'perl',
+	'MIN_PERL_VERSION' => '5.6.1'
 );

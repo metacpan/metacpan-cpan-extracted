@@ -2,6 +2,8 @@
 
 use strict;
 use utf8;
+binmode(STDOUT, ":utf8");
+binmode(STDERR, ":utf8");
 use String::Equivalence::Amharic;
 
 my @list = downgrade ( "ዓለም" );

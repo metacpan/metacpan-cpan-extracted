@@ -1,5 +1,13 @@
 Revision history for MIDI-Util
 
+0.1304 2025-02-02 18:44:37
+    - Fix copyright and email.
+    - Improve documentation.
+
+0.1303 2025-02-02 18:28:17
+    - Fix the play_timidity() function.
+    - Add fluidsynth support.
+
 0.1302 2024-05-15 18:58:57
     - Micro- not milliseconds!
 

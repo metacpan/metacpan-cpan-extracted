@@ -1,5 +1,12 @@
 Revision history for Music-Percussion-Tabla
 
+0.0704 2025-02-02 15:44:22
+    - Make 'ga' a 'ge' strike.
+
+0.0703 2025-02-02 11:25:34
+    - Add the ektaal and arachartaal thekas.
+    - Add the tirakita.
+
 0.0702 2025-02-02 00:14:11
     - Add the eg/simple-breaks.pl program.
     - Improve documentation.

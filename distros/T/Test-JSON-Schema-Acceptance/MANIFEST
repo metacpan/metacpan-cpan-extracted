@@ -93,9 +93,21 @@ share/remotes/draft2020-12/ref-and-defs.json
 share/remotes/draft2020-12/subSchemas-defs.json
 share/remotes/draft2020-12/subSchemas.json
 share/remotes/draft2020-12/tree.json
+share/remotes/draft3/subSchemas.json
+share/remotes/draft4/locationIndependentIdentifier.json
+share/remotes/draft4/name.json
+share/remotes/draft4/subSchemas.json
 share/remotes/draft6/detached-ref.json
+share/remotes/draft6/locationIndependentIdentifier.json
+share/remotes/draft6/name.json
+share/remotes/draft6/ref-and-definitions.json
+share/remotes/draft6/subSchemas.json
 share/remotes/draft7/detached-ref.json
 share/remotes/draft7/ignore-dependentRequired.json
+share/remotes/draft7/locationIndependentIdentifier.json
+share/remotes/draft7/name.json
+share/remotes/draft7/ref-and-definitions.json
+share/remotes/draft7/subSchemas.json
 share/remotes/extendible-dynamic-ref.json
 share/remotes/folder/folderInteger.json
 share/remotes/integer.json
@@ -159,6 +171,7 @@ share/tests/draft-next/optional/format-assertion.json
 share/tests/draft-next/optional/format/date-time.json
 share/tests/draft-next/optional/format/date.json
 share/tests/draft-next/optional/format/duration.json
+share/tests/draft-next/optional/format/ecmascript-regex.json
 share/tests/draft-next/optional/format/email.json
 share/tests/draft-next/optional/format/hostname.json
 share/tests/draft-next/optional/format/idn-email.json
@@ -321,6 +334,7 @@ share/tests/draft2020-12/optional/format-assertion.json
 share/tests/draft2020-12/optional/format/date-time.json
 share/tests/draft2020-12/optional/format/date.json
 share/tests/draft2020-12/optional/format/duration.json
+share/tests/draft2020-12/optional/format/ecmascript-regex.json
 share/tests/draft2020-12/optional/format/email.json
 share/tests/draft2020-12/optional/format/hostname.json
 share/tests/draft2020-12/optional/format/idn-email.json
@@ -381,6 +395,7 @@ share/tests/draft3/optional/format.json
 share/tests/draft3/optional/format/color.json
 share/tests/draft3/optional/format/date-time.json
 share/tests/draft3/optional/format/date.json
+share/tests/draft3/optional/format/ecmascript-regex.json
 share/tests/draft3/optional/format/email.json
 share/tests/draft3/optional/format/host-name.json
 share/tests/draft3/optional/format/ip-address.json

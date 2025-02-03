@@ -1,6 +1,7 @@
 #!/usr/bin/perl -w
 
 use utf8;
+binmode(STDOUT, ":utf8");
 
 require Convert::Number::Digits;
 

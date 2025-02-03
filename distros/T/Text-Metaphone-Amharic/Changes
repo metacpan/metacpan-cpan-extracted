@@ -1,3 +1,11 @@
+0.13 Sun Feb  2 13:57:42 EST 2025
+	- Fixes as per CPANTS:
+	  + LICENSE added.
+	  + packaged with GNU tar.
+	  + Added 'use warnings'.
+	  + Added META documents.
+	  + Added MIN_PERL_VERSION to Makefile.PL
+
 0.12 Wed Jan 22 13:20:28 EST 2025
 	- fix for output encoding in examples and POD.
 

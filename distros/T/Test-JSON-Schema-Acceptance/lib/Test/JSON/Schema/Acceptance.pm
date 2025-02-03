@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-package Test::JSON::Schema::Acceptance; # git description: v1.025-4-gcdf8f65
+package Test::JSON::Schema::Acceptance; # git description: v1.026-9-g3ff6b2c
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Acceptance testing for JSON-Schema based validators
 
-our $VERSION = '1.026';
+our $VERSION = '1.027';
 
 use 5.020;
 use Moo;
@@ -55,6 +55,7 @@ has supported_specifications => (
   default => sub { [ shift->specification ] },
 );
 
+# this comes from the tests/<spec version> directories in the JSON-Schema-Test-Suite repository
 has test_dir => (
   is => 'ro',
   isa => InstanceOf['Path::Tiny'],
@@ -65,6 +66,7 @@ has test_dir => (
 );
 sub _build_test_dir { path(dist_dir('Test-JSON-Schema-Acceptance'), 'tests', $_[0]->specification) };
 
+# this comes from the remotes/ directory in the JSON-Schema-Test-Suite repository
 has additional_resources => (
   is => 'ro',
   isa => InstanceOf['Path::Tiny'],
@@ -252,8 +254,7 @@ sub acceptance {
   $self->_set_results(\@results);
 
   my $diag = $self->verbose ? 'diag' : 'note';
-  $ctx->$diag("\n\n".$self->results_text);
-  $ctx->$diag('');
+  $ctx->$diag("\n".$self->results_text."\n");
 
   if ($self->test_dir !~ m{\boptional\b}
       and grep +($_->{file} !~ m{^optional/} && $_->{todo_fail} + $_->{fail}), @results) {
@@ -293,10 +294,9 @@ sub _run_test ($self, $one_file, $test_group, $test, $options) {
         # skip the ugly matrix comparison
         my $expected = $test->{valid} ? 'true' : 'false';
         if ($result xor $test->{valid}) {
-          my $got = $result ? 'true' : 'false';
-          $ctx->fail('evaluation result is incorrect', 'expected '.$expected.'; got '.$got);
-          $ctx->${ $self->verbose ? \'diag' : \'note' }('data: '.$self->json_prettyprint($data_after));
-          $ctx->${ $self->verbose ? \'diag' : \'note' }('schema: '.$self->json_prettyprint($schema_after));
+          $ctx->fail('evaluation result is incorrect', 'expected '.$expected.'; got '.($result ? 'true' : 'false'));
+          $ctx->${ $self->verbose ? \'diag' : \'note' }('schema: '.$self->json_prettyprint($test_group->{schema}));
+          $ctx->${ $self->verbose ? \'diag' : \'note' }('data: '.$self->json_prettyprint($test->{data}));
 
           $ctx->${ $self->verbose ? \'diag' : \'note' }('result: '.$self->json_prettyprint($result));
           $pass = 0;
@@ -545,7 +545,7 @@ Test::JSON::Schema::Acceptance - Acceptance testing for JSON-Schema based valida
 
 =head1 VERSION
 
-version 1.026
+version 1.027
 
 =head1 SYNOPSIS
 
@@ -675,7 +675,7 @@ L<https://github.com/json-schema-org/JSON-Schema-Test-Suite/blob/main/README.md>
 =head2 additional_resources
 
 A directory of additional resources which should be made available to the implementation under the
-base URI C<http://localhost:1234>. This is automatically provided if you did not override
+base URI C<http://localhost:1234>. This dataset is automatically provided if you did not override
 L</test_dir>; otherwise, you need to supply it yourself, if any tests require it (for example by
 containing C<< {"$ref": "http://localhost:1234/foo.json/#a/b/c"} >>). If you supply an
 L</add_resource> value to L</acceptance> (see below), this will be done for you.

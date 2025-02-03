@@ -1,13 +1,16 @@
 package Convert::Number::Digits;
 
 use utf8;
+binmode(STDERR, ":utf8");
+binmode(STDOUT, ":utf8");
 
 BEGIN
 {
 use strict;
+use warnings;
 use vars qw( %Digits $VERSION );
 
-$VERSION = "0.03";
+$VERSION = "0.04";
 
 %Digits =(
 	toWestern	=> "0-9",
@@ -52,8 +55,8 @@ my ($self, $number) = @_;
 		warn (  "too many arguments." );
 		return;
 	}
-	unless ( $number =~ /^\d+$/ ) {
-		warn (  "$number is not a number." );
+	unless ( $number =~ /^\d+$/ || ($number =~ /[$Digits{toRomanUpper}]/) || ($number =~ /[$Digits{toRomanLower}]/) || ($number =~ /[$Digits{toEthiopic}]/) ) {
+		warn (  "$number is not a digit." );
 		return;
 	}
 
@@ -147,6 +150,7 @@ my ($self, $number) = @_;
 
 __END__
 
+=encoding utf8
 
 =head1 NAME
 
@@ -184,6 +188,7 @@ for all scripts.
 =item C<toMethods> - get a list of the following conversion methods:
 
 =over 4
+
 =item C<toArabic> - output digits in Arabic script (١-٢).
 
 =item C<toArabicIndic> - output digits in ArabicIndic script (۱-۲).
@@ -239,6 +244,7 @@ for all scripts.
 =item C<toThai> - output digits in Thai script (๑-๒).
 
 =item C<toTibetan> - output digits in Tibetan script (༡-༢).
+
 =back
 
 =back
@@ -272,6 +278,13 @@ None presently known.
 =head1 AUTHOR
 
 Daniel Yacob,  L<dyacob@cpan.org|mailto:dyacob@cpan.org>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2003-2025, Daniel Yacob C<< <dyacob@cpan.org> >>. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
 
 =head1 SEE ALSO
 

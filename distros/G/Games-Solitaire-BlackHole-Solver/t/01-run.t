@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 14;
+use Test::More tests => 16;
 
 use Path::Tiny           qw/ path cwd /;
 use Dir::Manifest::Slurp qw/ as_lf /;
@@ -1217,6 +1217,26 @@ EOF
     unlink($sol_fn);
 }
 
+{
+    my $sol_fn = _filename("26464608654870335080.bh-disp.sol.txt");
+
+    # TEST
+    ok(
+        !system(
+            $^X, "-Mblib", $BHS, "--display-boards", "--max-iters=10000", "-o",
+            $sol_fn, _filename("26464608654870335080.bh.board.txt")
+        )
+    );
+
+    # TEST
+    is(
+        as_lf( path($sol_fn)->slurp_utf8 ),
+        as_lf($solution2), "Testing for correct --max-iters solution.",
+    );
+
+    unlink($sol_fn);
+}
+
 my $GOLF_35_SOLUTION = <<'EOF';
 Solved!
 8D
@@ -1273,7 +1293,7 @@ EOF
     # TEST
     ok(
         !system(
-            $^X, "-Mblib", $GOLF_S, "--queens-on-kings",, "-o", $sol_fn,
+            $^X, "-Mblib", $GOLF_S, "--queens-on-kings", "-o", $sol_fn,
             _filename("35.golf.board.txt")
         )
     );

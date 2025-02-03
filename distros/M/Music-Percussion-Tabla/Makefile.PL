@@ -27,6 +27,7 @@ my %WriteMakefileArgs = (
     "File::ShareDir" => 0,
     "List::Util" => 0,
     "MIDI::Drummer::Tiny" => "0.4302",
+    "MIDI::Util" => 0,
     "Moo" => 2,
     "namespace::clean" => 0,
     "strictures" => 2
@@ -40,7 +41,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.0702",
+  "VERSION" => "0.0704",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,6 +55,7 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "List::Util" => 0,
   "MIDI::Drummer::Tiny" => "0.4302",
+  "MIDI::Util" => 0,
   "Moo" => 2,
   "Test::More" => "0.88",
   "namespace::clean" => 0,

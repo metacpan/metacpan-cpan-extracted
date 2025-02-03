@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: MIDI Utilities
 
-our $VERSION = '0.1302';
+our $VERSION = '0.1304';
 
 use strict;
 use warnings;
@@ -26,6 +26,7 @@ our @EXPORT = qw(
     ticks
     timidity_conf
     play_timidity
+    play_fluidsynth
     get_microseconds
     score2events
 );
@@ -260,16 +261,33 @@ sub timidity_conf {
 
 sub play_timidity {
     my ($score, $midi, $soundfont, $config) = @_;
+    $score->write_score($midi);
     my @cmd;
     if ($soundfont) {
         $config ||= 'timidity-midi-util.cfg';
         timidity_conf($soundfont, $config);
-        @cmd = ('timidity', '-c', $config, $midi);
+        @cmd = ('timidity', '-c', $config, '-Od', $midi);
     }
     else {
-        @cmd = ('timidity', $midi);
+        @cmd = ('timidity', '-Od', $midi);
     }
-    $score->write_score($midi);
+    system(@cmd) == 0 or die "system(@cmd) failed: $?";
+}
+
+
+sub play_fluidsynth {
+    my ($score, $midi, $soundfont, $config) = @_;
+    if (!$config && $^O eq 'darwin') {
+        $config = [qw(-a coreaudio -m coremidi -i)];
+    }
+    elsif (!$config && $^O eq 'MSWin32') {
+        $config = [];
+    }
+    elsif (!$config) { # linux
+        $config = [qw(-a alsa -m alsa_seq -i)];
+    }
+    my @cmd;
+    @cmd = ('fluidsynth', @$config, $soundfont, $midi);
     system(@cmd) == 0 or die "system(@cmd) failed: $?";
 }
 
@@ -300,7 +318,7 @@ MIDI::Util - MIDI Utilities
 
 =head1 VERSION
 
-version 0.1302
+version 0.1304
 
 =head1 SYNOPSIS
 
@@ -315,6 +333,7 @@ version 0.1302
     ticks
     timidity_conf
     play_timidity
+    play_fluidsynth
     get_microseconds
     score2events
   );
@@ -473,15 +492,27 @@ configuration is written to that file.
 
 =head2 play_timidity
 
-  play_timidity($score_obj, $midi_file, $sf_file, $config_file);
+  play_timidity($score_obj, $midi_file, $soundfont, $config_file);
 
-Play a given B<score> named B<midi_file> with C<timidity> and an
-optional soundfont B<sf_file>.
+Play a given B<score> named B<midi_file> with C<timidity> and a
+B<soundfont> file.
 
 If a soundfont is given, then if a B<config_file> is given, that is
 used for the timidity configuration. If not, C<timidity-midi-util.cfg>
 is used. If a soundfont is not given, a timidity configuration file is
 not rendered and used.
+
+=head2 play_fluidsynth
+
+  play_fluidsynth($score_obj, $midi_file, $soundfont, \@config);
+
+Play a given B<score> named B<midi_file> with C<fluidsynth> and a
+B<soundfont> file and optional system B<config>.
+
+For C,darwin> is is C<-a coreaudio -m coremidi>. For linux systems,
+this is C<-a alsa -m alsa_seq>.
+
+Of course you'll need to have C<fludisynth> installed.
 
 =head2 get_microseconds
 
@@ -514,11 +545,11 @@ L<Music::Tempo>
 
 =head1 AUTHOR
 
-Gene Boggs <gene@cpan.org>
+Gene Boggs <gene.boggs@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019-2024 by Gene Boggs.
+This software is copyright (c) 2019-2025 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,3 +1,8 @@
+0.11.3 2025-02-03
+
+    - Respecting and validating allene systems in _validate().
+    - Better validation of cis/trans and chirality settings in _validate().
+
 0.11.2 2025-01-16
 
     - Fixing nondeterminism in relative cis/trans marker placement.

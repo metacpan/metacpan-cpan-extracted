@@ -5,17 +5,16 @@ package String::Equivalence::Amharic;
 #
 binmode(STDOUT, ":utf8");
 use strict;
+use warnings;
 use utf8;
-use encoding 'utf8';
 use Regexp::Ethiopic::Amharic qw(:forms overload setForm subForm %AmharicEquivalence);
 
 BEGIN
 {
-	use strict;
 	use base qw( Exporter );
 	use vars qw( $VERSION @EXPORT %HaMaps );
 
-	$VERSION = "0.04";
+	$VERSION = "0.06";
 
 	@EXPORT = qw( &downgrade &inflate &isEquivalentTo &isReducible &hasEquivalence );
 
@@ -218,7 +217,7 @@ my ($self, $a, $b) = @_;
 
 __END__
 
-
+=encoding utf8
 
 =head1 NAME
 
@@ -268,7 +267,7 @@ The doc/index.html file presents a development of the downgrade rules applied.
 The package is useful for some problems, it will produce orthographically
 "legal" simplification and avoids improbable naive simplifications.
 L<Text::Metaphone::Amharic> of course over simplifies as it addresses a
-different problem.  So while not to promote level 2 orthographies, in some
+different problem.  So, while not to promote level 2 orthographies, in some
 instances it is useful to generate level 2 renderings given a canonical
 form.
 
@@ -278,17 +277,38 @@ a shorter word list than you would have starting from the top.
 
 =head2  Equivalence Utilities
 
-=head3  downgrade
-=head3  isReducible
-=head3  hasEquivalence
-=head3  isEquivalentTo
-=head3  inflate
+=over 4
+
+=item  downgrade ( $word )
+
+Generates a list of the phonetically "decayed" written forms of the provided $word.
+
+=item  isReducible ( $word )
+
+Returns true if the provided $word can be reduced to an equivalent decayed form.
+
+=item  hasEquivalence ( $word )
+
+Returns true if a phonetically equivalent written form is possible for the provided $word.
+
+=item  isEquivalentTo ( $wordA, $wordB )
+
+Returns true if $wordA is phonetically equivalent to $wordB under Amharic rules.
+
+=item  inflate ( $word )
+
+Returns a list of all phonetically equivalent written forms of the provided $word.
+The compliment to "downgrade".
+
+=item getForm
 
 A utility function to query the "form" of an Ethiopic syllable.  It
 will return an integer between 1 and 12 corresponding to the [#\d+#]
 classes.
 
   print getForm ( "አ" ), "\n";  # prints 1
+
+=back
 
 =head1 REQUIRES
 
@@ -306,6 +326,13 @@ None presently known.
 =head1 AUTHOR
 
 Daniel Yacob,  L<dyacob@cpan.org|mailto:dyacob@cpan.org>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2003-2025, Daniel Yacob C<< <dyacob@cpan.org> >>. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
 
 =head1 SEE ALSO
 

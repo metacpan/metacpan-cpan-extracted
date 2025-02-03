@@ -1,11 +1,11 @@
+Special Note
+------------
+This package was previously named "String::Amharic::Downgrade" and packaged
+in a String-Downgrade-0.03.tar.gz archive up until version 0.03 after which
+time the module was renamed String::Equivalence::Amharic.
 
-I don't yet have a good name for this package.  String::Amharic::Simplify
-might be more immediately understandable.  However, "simplification" is
-generally considered a good thing, something desirable, but this would
-give quite the wrong impression.  String::Amharic::Pencanonicalize was a
-working name for a while, now its String::Amharic::Downgrade which seems
-to have the best tone.
-
+Overview
+--------
 Under the "three levels of Amharic spelling" theory, this package will
 take a canonical word (level 1) and generate level two words (the level
 of popular use).  Hence "pencanonical", though think spherically and the

@@ -21,11 +21,16 @@ for (1 .. 2) {
 
 $t->rest($t->quarter);
 
-$t->teentaal($t->eighth)  for 1 .. $t->bars;
+$t->tirakita($t->sixteenth) for 1 .. 2;
+
+$t->teentaal;
 $t->keherawa($t->eighth)  for 1 .. $t->bars;
 $t->jhaptaal($t->eighth)  for 1 .. $t->bars;
 $t->dadra($t->eighth)     for 1 .. $t->bars;
 $t->rupaktaal($t->eighth) for 1 .. $t->bars;
+$t->rupaktaal($t->eighth) for 1 .. $t->bars;
+$t->ektaal;
+$t->arachartaal;
 
 $t->play_with_timidity;
 # $t->write;

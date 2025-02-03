@@ -1,16 +1,18 @@
 package Convert::CEGH::Gematria;
+use warnings;
+use strict;
 use utf8;
 use Regexp::Ethiopic qw(:forms setForm);
 
 BEGIN
 {
 use base qw( Exporter );
-use vars qw( $አበገደሀ $תיבפלא $ΑΛΦΑΒΕΤ %Gematria @EXPORT_OK $VERSION $use_halehame );
+use vars qw( $አበገደ $ሀለሐመ  $תיבפלא $ΑΛΦΑΒΕΤ %Gematria @EXPORT_OK $VERSION $use_halehame );
 
 
 	@EXPORT_OK = qw( enumerate );
 
-	$VERSION = "0.02";
+	$VERSION = "0.04";
 
 	#
 	# Gematria Data:
@@ -127,7 +129,7 @@ my ( @strings ) = @_;
 
 __END__
 
-
+=encoding utf8
 
 =head1 NAME
 
@@ -136,6 +138,7 @@ Convert::CEGH::Gematria - Coptic/Ethiopic/Greek/Hebrew Gematria.
 =head1 SYNOPSIS
 
   use utf8;
+  binmode (STDOUT, ":utf8");
   use Convert::CEGH::Gematria 'enumerate';
 
   print "Hebrew: מדא  => ", enumerate ( "מדא" ), "\n";
@@ -148,7 +151,7 @@ This package makes available a single function C<enumerate> which will
 compute a numeric value based on Gematria rules.  Gematria calculations
 are applicable to Coptic, Ethiopic, Greek and Hebrew scripts.
 
-The enumerate function will accept a single word as an arguement or a
+The enumerate function will accept a single word as an argument or a
 list of words.
 
 =head1 COPYRIGHT
@@ -173,6 +176,13 @@ None presently known.
 =head1 AUTHOR
 
 Daniel Yacob,  L<dyacob@cpan.org|mailto:dyacob@cpan.org>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2003-2025, Daniel Yacob C<< <dyacob@cpan.org> >>. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
 
 =head1 SEE ALSO
 

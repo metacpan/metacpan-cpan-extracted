@@ -3,11 +3,12 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Play the tabla!
 
-our $VERSION = '0.0702';
+our $VERSION = '0.0704';
 
 use Moo;
 use File::ShareDir qw(dist_dir);
 use List::Util qw(any);
+use MIDI::Util qw(dura_size ticks);
 use strictures 2;
 use namespace::clean;
 
@@ -32,8 +33,7 @@ has patches => (
     default => sub {
         {
             # single strikes
-            ga   => [qw(65)],
-            ge   => [qw(66 76)],
+            ge   => [qw(65 66 76)],
             ke   => [qw(64 77 79)],
             na   => [qw(78 81)],
             ta   => [qw(71 75 85)],
@@ -170,6 +170,55 @@ sub rupaktaal {
     $self->strike('na', $dura);
 }
 
+sub ektaal {
+    my ($self, $dura) = @_;
+    $dura ||= $self->quarter;
+    my $ticks = ticks($self->score);
+    my $dura4 = 'd' . ($ticks * dura_size($dura) / 4);
+    $self->strike('dhin', $dura);
+    $self->strike('dhin', $dura);
+    $self->strike('dha', $dura);
+    $self->tirakita($dura4);
+    $self->strike('ti', $dura);
+    $self->strike('na', $dura);
+    $self->strike('ke', $dura);
+    $self->strike('ta', $dura);
+    $self->strike('dha', $dura);
+    $self->tirakita($dura4);
+    $self->strike('dhin', $dura);
+    $self->strike('na', $dura);
+}
+
+sub arachartaal {
+    my ($self, $dura) = @_;
+    $dura ||= $self->quarter;
+    my $ticks = ticks($self->score);
+    my $dura4 = 'd' . ($ticks * dura_size($dura) / 4);
+    $self->strike('dhin', $dura);
+    $self->tirakita($dura4);
+    $self->strike('dhit', $dura);
+    $self->strike('na', $dura);
+    $self->strike('ti', $dura);
+    $self->strike('na', $dura);
+    $self->strike('ke', $dura);
+    $self->strike('ta', $dura);
+    $self->tirakita($dura4);
+    $self->strike('dhit', $dura);
+    $self->strike('na', $dura);
+    $self->strike('dhit', $dura);
+    $self->strike('dhit', $dura);
+    $self->strike('na', $dura);
+}
+
+sub tirakita {
+    my ($self, $dura) = @_;
+    $dura ||= $self->quarter;
+    $self->strike('ti', $dura);
+    $self->strike('na', $dura);
+    $self->strike('ke', $dura);
+    $self->strike('ta', $dura);
+}
+
 1;
 
 __END__
@@ -184,7 +233,7 @@ Music::Percussion::Tabla - Play the tabla!
 
 =head1 VERSION
 
-version 0.0702
+version 0.0704
 
 =head1 SYNOPSIS
 
@@ -209,11 +258,16 @@ version 0.0702
 
   $t->rest($t->quarter);
 
-  $t->teentaal($t->eighth)  for 1 .. $t->bars;
+  $t->tirakita($t->sixteenth) for 1 .. 2;
+
+  $t->teentaal;
   $t->keherawa($t->eighth)  for 1 .. $t->bars;
   $t->jhaptaal($t->eighth)  for 1 .. $t->bars;
   $t->dadra($t->eighth)     for 1 .. $t->bars;
   $t->rupaktaal($t->eighth) for 1 .. $t->bars;
+  $t->rupaktaal($t->eighth) for 1 .. $t->bars;
+  $t->ektaal;
+  $t->arachartaal;
 
   $t->play_with_timidity;
   # OR:
@@ -292,8 +346,7 @@ Each bol can be 1 or more patch numbers.
 
 Default single strike bol patches:
 
-  ga:   65
-  ge:   66 76
+  ge:   65 66 76
   ke:   64 77 79
   na:   78 81
   ta:   71 75 85
@@ -342,7 +395,7 @@ above.)
 
 1. Single strike bols:
 
-  ga, ge, ke, na, ta, ti, tin, tun
+  ge, ke, na, ta, ti, tin, tun
 
 2. Double strike bols:
 
@@ -379,6 +432,18 @@ Traditional "groove patterns":
 =item rupaktaal([$duration])
 
 7 beats
+
+=item ektaal([$duration])
+
+12 beats
+
+=item arachartaal([$duration])
+
+14 beats
+
+=item tirakita([$duration])
+
+4 beats
 
 =back
 

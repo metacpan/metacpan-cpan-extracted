@@ -1,27 +1,39 @@
 use utf8;
 use strict;
+if ( $] >= 5.007 ) {
+	binmode (STDOUT, ":utf8");
+}
+
+# use Convert::CEGH; # this will import both the "enumerate" and "transliterate" functions.
+#
+# Import "enumerate" only:
+#
 use Convert::CEGH::Gematria 'enumerate';
 
 print "פלא => ", enumerate ( "פלא" ), "\n";
-
-print "מדא => ", enumerate ( "מדא" ), "\n";
 print "አዳም => ", enumerate ( "አዳም" ), "\n";
+print "מדא => ", enumerate ( "מדא" ), "\n";
 print "ΑΔΑΜ => ", enumerate ( "ΑΔΑΜ" ), "\n";
 
 print "עשוהי => ", enumerate ( "עשוהי" ), "\n";
 
-print "ኢየሱስ => ", enumerate ( "ኢየሱስ" ), "\n";
-print "ክርስቶስ => ", enumerate ( "ክርስቶስ" ), "\n";
-
-$Convert::CEGH::Gematria::use_halehame = 1;
-print "አዳም => ", enumerate ( "አዳም" ), "\n";
-print "ኢየሱስ => ", enumerate ( "ኢየሱስ" ), "\n";
-print "ክርስቶስ => ", enumerate ( "ክርስቶስ" ), "\n";
-print "አብርሃም => ", enumerate ( "አብርሃም " ), "\n";
-$Convert::CEGH::Gematria::use_halehame = 0;
-
 print "ΙΕΟΥΣ => ", enumerate ( "ΙΕΟΥΣ" ), "\n";
 print "ΧΡΙΣΤΟΣ => ", enumerate ( "ΧΡΙΣΤΟΣ" ), "\n";
+
+print "\nUsing አበገደ enumeration (the default):\n";
+print "  አዳም => ", enumerate ( "አዳም" ), "\n";
+print "  ኢየሱስ => ", enumerate ( "ኢየሱስ" ), "\n";
+print "  ክርስቶስ => ", enumerate ( "ክርስቶስ" ), "\n";
+print "  አብርሃም => ", enumerate ( "አብርሃም " ), "\n";
+
+$Convert::CEGH::Gematria::use_halehame = 1;
+print "\nUsing ሀለሐመ enumeration:\n";
+print "  አዳም => ", enumerate ( "አዳም" ), "\n";
+print "  ኢየሱስ => ", enumerate ( "ኢየሱስ" ), "\n";
+print "  ክርስቶስ => ", enumerate ( "ክርስቶስ" ), "\n";
+print "  አብርሃም => ", enumerate ( "አብርሃም " ), "\n";
+$Convert::CEGH::Gematria::use_halehame = 0;
+
 
 
 __END__

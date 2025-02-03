@@ -10,11 +10,11 @@ Locale::AU - abbreviations for territory and state identification in Australia a
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 
@@ -35,23 +35,34 @@ our $VERSION = '0.01';
 
 Creates a Locale::AU object.
 
+Can be called both as a class method (Locale::AU->new()) and as an object method ($object->new()).
+
 =cut
 
 sub new {
 	my $proto = shift;
 	my $class = ref($proto) || $proto;
 
-	return unless(defined($class));
+	# If the class is undefined, fallback to the current package name
+	if(!defined($class)) {
+		# Use Locale::AU->new(), not Locale::AU::new()
+		# Carp::carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+		# return;
 
+		# FIXME: this only works when no arguments are given
+		$class = __PACKAGE__;
+	}
+
+	# Parse the data into bidirectional mappings
 	my $self = {};
 
-	my $data = Data::Section::Simple::get_data_section('states');
-
-	my @line = split /\n/, $data;
+	my @line = split /\n/, Data::Section::Simple::get_data_section('states');
 
 	for (@line) {
 		my($code, $state) = split /:/;
+		# Map codes to states
 		$self->{code2state}{$code} = $state;
+		# Map states to codes
 		$self->{state2code}{$state} = $code;
 	}
 
@@ -122,17 +133,21 @@ You can also look for information at:
 
 =over 4
 
+=item * MetaCPAN
+
+L<https://metacpan.org/dist/Local-AU>
+
 =item * RT: CPAN's request tracker
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Locale-AU>
+L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Local-AU>
 
-=item * CPAN Ratings
+=item * CPAN Testers' Matrix
 
-L<http://cpanratings.perl.org/d/Locale-AU>
+L<http://matrix.cpantesters.org/?dist=Local-AU>
 
-=item * Search CPAN
+=item * CPAN Testers Dependencies
 
-L<http://search.cpan.org/dist/Locale-AU/>
+L<http://deps.cpantesters.org/?module=Locale::AU>
 
 =back
 
@@ -142,7 +157,7 @@ Based on L<Locale::US> - Copyright (c) 2002 - C<< $present >> Terrence Brannon.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2020 Nigel Horne.
+Copyright 2020-2025 Nigel Horne.
 
 This program is released under the following licence: GPL2
 
