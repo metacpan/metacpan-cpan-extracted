@@ -2,7 +2,7 @@ package Mail::DMARC::Policy;
 use strict;
 use warnings;
 
-our $VERSION = '1.20240314';
+our $VERSION = '1.20250203';
 
 use Carp;
 
@@ -54,6 +54,19 @@ sub parse {
         $policy{lc $tag} = $value;
     }
     return bless \%policy, ref $self;    # inherited defaults + overrides
+}
+
+sub stringify {
+    my $self = shift;
+
+    my %dmarc_record = %{$self};
+    delete $dmarc_record{domain};
+
+    my $dmarc_txt = 'v=' . (delete $dmarc_record{v}); # "v" tag must be first
+    foreach my $key ( keys %dmarc_record ) {
+     $dmarc_txt .= "; $key=$dmarc_record{$key}";
+    }
+    return $dmarc_txt;
 }
 
 sub apply_defaults {
@@ -195,7 +208,7 @@ Mail::DMARC::Policy - a DMARC policy in object format
 
 =head1 VERSION
 
-version 1.20240314
+version 1.20250203
 
 =head1 SYNOPSIS
 
@@ -268,6 +281,13 @@ via DNS.
     my $pol = Mail::DMARC::Policy->new;
     $pol->parse( 'v=DMARC1; p=none; rua=mailto:dmarc@example.com' );
     $pol->parse( 'v=DMARC1' );       # external reporting record
+
+=head2 stringify
+
+Returns the textual representation of the DMARC record.
+
+    my $pol = Mail::DMARC::Policy->new('v=DMARC1; p=none;');
+    print $pol->stringify;
 
 =head1 Record Tags
 
@@ -450,7 +470,7 @@ Marc Bradshaw <marc@marcbradshaw.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Matt Simerson.
+This software is copyright (c) 2025 by Matt Simerson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

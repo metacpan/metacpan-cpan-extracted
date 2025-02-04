@@ -2,7 +2,7 @@ package Mail::DMARC;
 use strict;
 use warnings;
 
-our $VERSION = '1.20240314';
+our $VERSION = '1.20250203';
 
 use Carp;
 our $psl_loads = 0;
@@ -45,19 +45,19 @@ sub source_ip {
 
 sub envelope_to {
     return $_[0]->{envelope_to} if 1 == scalar @_;
-    croak "invalid envelope_to" if !$_[0]->is_valid_domain( $_[1] );
+    croak "invalid envelope_to" if !$_[0]->is_valid_domain( lc $_[1] );
     return $_[0]->{envelope_to} = $_[1];
 }
 
 sub envelope_from {
     return $_[0]->{envelope_from} if 1 == scalar @_;
-    croak "invalid envelope_from" if !$_[0]->is_valid_domain( $_[1] );
+    croak "invalid envelope_from" if !$_[0]->is_valid_domain( lc $_[1] );
     return $_[0]->{envelope_from} = $_[1];
 }
 
 sub header_from {
     return $_[0]->{header_from} if 1 == scalar @_;
-    croak "invalid header_from" if !$_[0]->is_valid_domain( $_[1] );
+    croak "invalid header_from" if !$_[0]->is_valid_domain( lc $_[1] );
     return $_[0]->{header_from} = lc $_[1];
 }
 
@@ -309,7 +309,7 @@ Mail::DMARC - Perl implementation of DMARC
 
 =head1 VERSION
 
-version 1.20240314
+version 1.20250203
 
 =head1 SYNOPSIS
 
@@ -655,7 +655,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Matt Simerson.
+This software is copyright (c) 2025 by Matt Simerson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

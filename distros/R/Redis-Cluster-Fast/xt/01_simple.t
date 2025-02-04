@@ -86,4 +86,71 @@ for my $case (
     like $@, qr/$case->[1]/, 'startup_nodes validation';
 }
 
+{
+    my $redis = Redis::Cluster::Fast->new(
+        startup_nodes => get_startup_nodes,
+    );
+    $redis->del('pipeline');
+
+    $redis->set('pipeline', 12345, sub {
+        my ($result, $error) = @_;
+        ok $result;
+    });
+    $redis->get('pipeline', sub {
+        my ($result, $error) = @_;
+        is $result, 12345;
+    });
+    $redis->get('pipeline', sub {
+        my ($result, $error) = @_;
+        is $result, 12345;
+    });
+    ok $redis->wait_all_responses;
+    is $redis->wait_all_responses, 0;
+}
+
+{
+    my $redis = Redis::Cluster::Fast->new(
+        startup_nodes => get_startup_nodes,
+    );
+    $redis->del('pipeline');
+
+    $redis->set('pipeline', 12345, sub {
+        my ($result, $error) = @_;
+        ok $result;
+    });
+    $redis->get('pipeline', sub {
+        my ($result, $error) = @_;
+        is $result, 12345;
+    });
+    $redis->get('pipeline', sub {
+        my ($result, $error) = @_;
+        is $result, 12345;
+    });
+    ok $redis->wait_one_response;
+    is $redis->wait_one_response, 0;
+}
+
+{
+    my $redis = Redis::Cluster::Fast->new(
+        startup_nodes => get_startup_nodes,
+    );
+    $redis->del('pipeline');
+
+    $redis->set('pipeline', 12345, sub {
+        my ($result, $error) = @_;
+        ok $result;
+    });
+    $redis->get('pipeline', sub {
+        my ($result, $error) = @_;
+        is $result, 12345;
+    });
+    $redis->get('pipeline', sub {
+        my ($result, $error) = @_;
+        is $result, 12345;
+    });
+    ok $redis->run_event_loop;
+    ok $redis->run_event_loop;
+    is $redis->run_event_loop, 0;
+}
+
 done_testing;

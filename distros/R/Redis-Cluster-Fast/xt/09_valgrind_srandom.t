@@ -115,4 +115,24 @@ eval {
     is $redis->wait_one_response, 0;
 }
 
+{
+    my $redis = Redis::Cluster::Fast->new(
+        startup_nodes => get_startup_nodes,
+    );
+    $redis->del('pipeline');
+
+    $redis->set('pipeline', 12345, sub {
+        my ($result, $error) = @_;
+    });
+    $redis->get('pipeline', sub {
+        my ($result, $error) = @_;
+    });
+    $redis->get('pipeline', sub {
+        my ($result, $error) = @_;
+    });
+    ok $redis->run_event_loop;
+    ok $redis->run_event_loop;
+    is $redis->run_event_loop, 0;
+}
+
 done_testing;

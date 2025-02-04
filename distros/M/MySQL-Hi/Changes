@@ -1,3 +1,10 @@
+1.03 2025
+
+  - Remove unnecessary files from Manifest
+  - Get rid of Moose dependency
+  - Add "--version" command key
+  - Improved documentation
+
 1.02 2025-01-22
 
   - Remove redundant files from the distribution

@@ -1,7 +1,7 @@
 package Chemistry::OpenSMILES;
 
 # ABSTRACT: OpenSMILES format reader and writer
-our $VERSION = '0.11.3'; # VERSION
+our $VERSION = '0.11.4'; # VERSION
 
 use strict;
 use warnings;
@@ -475,23 +475,27 @@ sub _validate($@)
         if( is_double_bond( $moiety, @$bond ) ) {
             # Test cis/trans bonds
             # Detect conflicting cis/trans markers, see COD entry 1547257, r297409
-            my $cis_trans_bonds = 0;
-            for my $atom (@$bond) {
-                my %bond_types = _neighbours_per_bond_type( $moiety, $atom );
-                foreach ('/', '\\') {
-                    $cis_trans_bonds += @{$bond_types{$_}} if $bond_types{$_};
-                    if( $bond_types{$_} && @{$bond_types{$_}} > 1 ) {
-                        warn sprintf 'atom %s(%d) has %d bonds of type \'%s\', ' .
-                                     'cis/trans definitions must not conflict' . "\n",
-                                     $atom->{symbol},
-                                     $atom->{number},
-                                     scalar @{$bond_types{$_}},
-                                     $_;
+            my $cis_trans_A = grep { is_cis_trans_bond( $moiety, $A, $_ ) }
+                                   $moiety->neighbours($A);
+            my $cis_trans_B = grep { is_cis_trans_bond( $moiety, $B, $_ ) }
+                                   $moiety->neighbours($B);
+            if( $cis_trans_A && $cis_trans_B ) {
+                # If any of the bond atoms lack cis/trans markers, it means that the other markers are from some other bond
+                for my $atom (@$bond) {
+                    my %bond_types = _neighbours_per_bond_type( $moiety, $atom );
+                    for ('/', '\\') {
+                        if( $bond_types{$_} && @{$bond_types{$_}} > 1 ) {
+                            warn sprintf 'atom %s(%d) has %d bonds of type \'%s\', ' .
+                                         'cis/trans definitions must not conflict' . "\n",
+                                         $atom->{symbol},
+                                         $atom->{number},
+                                         scalar @{$bond_types{$_}},
+                                         $_;
+                        }
                     }
                 }
-            }
-            next if $allenes->has_edge( @$bond ); # Allene systems are checked below
-            if( $cis_trans_bonds == 1 ) {
+            } elsif( !$allenes->has_edge( @$bond ) && # Allene systems are checked below
+                     $cis_trans_A + $cis_trans_B == 1 ) {
                 # FIXME: Source of false-positives.
                 # Cis/trans bond is out of place if none of neighbouring double bonds have other cis/trans bonds.
                 # This has to include allenal systems.
@@ -522,39 +526,39 @@ sub _validate($@)
                              $B->{number};
             }
         }
+    }
 
-        # Check allene systems
-        for my $system (sort { min( map { $_->{number} } @$a ) <=>
-                               min( map { $_->{number} } @$b ) }
-                             $allenes->connected_components) {
-            next if @$system % 2;
+    # Check allene systems
+    for my $system (sort { min( map { $_->{number} } @$a ) <=>
+                           min( map { $_->{number} } @$b ) }
+                         $allenes->connected_components) {
+        next if @$system % 2;
 
-            my @ends = sort { $a->{number} <=> $b->{number} }
-                       map  { @$_ }
-                       grep { $allenes->has_edge_attribute( @$_, 'allene' ) &&
-                              $allenes->get_edge_attribute( @$_, 'allene' ) eq 'end' }
-                            $allenes->subgraph($system)->edges;
-            my $cis_trans_bonds = grep { is_cis_trans_bond( $moiety, @$_ ) }
-                                  map  { $moiety->edges_at( $_ ) } @ends;
-            if( $cis_trans_bonds == 1 ) {
-                warn sprintf 'allene system between atoms %s(%d) and %s(%d) ' .
-                             'has only one cis/trans marker' . "\n",
-                             $ends[0]->{symbol}, $ends[0]->{number},
-                             $ends[1]->{symbol}, $ends[1]->{number};
-            }
-            next if $cis_trans_bonds;
-
-            my @neighbours_at_ends = grep { $_ ne $ends[0] && $_ ne $ends[1] }
-                                     map  { @$_ }
-                                     grep { !is_double_bond( $moiety, @$_ ) }
-                                     map  { $moiety->edges_at( $_ ) } @ends;
-            next unless @neighbours_at_ends == 4;
+        my @ends = sort { $a->{number} <=> $b->{number} }
+                   map  { @$_ }
+                   grep { $allenes->has_edge_attribute( @$_, 'allene' ) &&
+                          $allenes->get_edge_attribute( @$_, 'allene' ) eq 'end' }
+                        $allenes->subgraph($system)->edges;
+        my $cis_trans_bonds = grep { is_cis_trans_bond( $moiety, @$_ ) }
+                              map  { $moiety->edges_at( $_ ) } @ends;
+        if( $cis_trans_bonds == 1 ) {
             warn sprintf 'allene system between atoms %s(%d) and %s(%d) ' .
-                         'has 4 neighbours, but does not have cis/trans ' .
-                         'setting' . "\n",
+                         'has only one cis/trans marker' . "\n",
                          $ends[0]->{symbol}, $ends[0]->{number},
                          $ends[1]->{symbol}, $ends[1]->{number};
         }
+        next if $cis_trans_bonds;
+
+        my @neighbours_at_ends = grep { $_ ne $ends[0] && $_ ne $ends[1] }
+                                 map  { @$_ }
+                                 grep { !is_double_bond( $moiety, @$_ ) }
+                                 map  { $moiety->edges_at( $_ ) } @ends;
+        next unless @neighbours_at_ends == 4;
+        warn sprintf 'allene system between atoms %s(%d) and %s(%d) ' .
+                     'has 4 neighbours, but does not have cis/trans ' .
+                     'setting' . "\n",
+                     $ends[0]->{symbol}, $ends[0]->{number},
+                     $ends[1]->{symbol}, $ends[1]->{number};
     }
 
     # TODO: SP, TB, OH chiral centers

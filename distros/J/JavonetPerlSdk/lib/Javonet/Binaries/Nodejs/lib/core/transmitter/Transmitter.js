@@ -1,10 +1,6 @@
 const wrapper = require('./TransmitterWrapper')
 
 class Transmitter {
-    static initialize() {
-        return wrapper.initialize()
-    }
-
     static sendCommand(messageArray) {
         return wrapper.sendCommand(messageArray)
     }
@@ -15,6 +11,10 @@ class Transmitter {
 
     static setConfigSource(configSource) {
         return wrapper.setConfigSource(configSource)
+    }
+
+    static setJavonetWorkingDirectory(workingDirectory) {
+        return wrapper.setJavonetWorkingDirectory(workingDirectory)
     }
 }
 

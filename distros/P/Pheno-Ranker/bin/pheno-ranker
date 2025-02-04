@@ -2,7 +2,7 @@
 #
 #   A script that performs semantic similarity in PXF|BFF data structures
 #
-#   Last Modified: Aug/09/2024
+#   Last Modified: Feb/01/2025
 #
 #   $VERSION taken from Pheno::Ranker
 #
@@ -17,15 +17,15 @@ package main;
 use strict;
 use warnings;
 use autodie;
-use feature qw(say);
+use feature      qw(say);
 use Getopt::Long qw(:config no_ignore_case);
 use Pod::Usage;
 use Data::Dumper;
 use Sys::Hostname;
-use POSIX qw(strftime);
-use Term::ANSIColor qw(:constants);
+use POSIX                          qw(strftime);
+use Term::ANSIColor                qw(:constants);
 use File::ShareDir::ProjectDistDir qw(dist_dir);
-use FindBin qw($Bin);
+use FindBin                        qw($Bin);
 use lib "$Bin/../lib";
 use Pheno::Ranker qw($VERSION write_json);
 
@@ -43,54 +43,89 @@ my $cli                  = 1;
 
 # Reading arguments
 GetOptions(
-    'reference|r=s{1,}'              => \my @reference_files,             # array
-    'target|t=s'                     => \my $target_file,                 # string
-    'weights|w=s'                    => \my $weights_file,                # string
-    'append-prefixes=s{1,}'          => \my @append_prefixes,             # array
-    'out-file|o=s'                   => \my $out_file_arg,                # string
-    'max-out:i'                      => \my $max_out,                     # integer
-    'max-number-var:i'               => \my $max_number_var,              # integer
-    'include-hpo-ascendants'         => \my $include_hpo_ascendants,      # flag
-    'export|e:s'                     => \my $export,                      # opt-string (defined)
-    'align|a:s'                      => \my $align,                       # opt-string (defined)
-    'cytoscape-json:s'               => \my $cytoscape_json,              # opt-string (defined)
-    'graph-stats:s'                  => \my $graph_stats,                 # opt-string (defined)
-    'sort-by=s'                      => \my $sort_by,                     # string
-    'similarity-metric-cohort=s'     => \my $similarity_metric_cohort,    # string
-    'patients-of-interest|poi=s{1,}' => \my @patients_of_interest,        # array
-    'poi-out-dir=s'                  => \my $poi_out_dir,                 # string
-    'include-terms=s{1,11}'          => \my @include_terms,               # array
-    'exclude-terms=s{1,11}'          => \my @exclude_terms,               # array
-    'config=s'                       => \my $config_file,                 # string
-    'age!'                           => \$age,                            # flag
-    'help|?'                         => \my $help,                        # flag
-    'log:s'                          => \my $log,                         # opt-string (defined)
-    'man'                            => \my $man,                         # flag
-    'debug=i'                        => \my $debug,                       # integer
-    'verbose|'                       => \my $verbose,                     # flag
-    'color!'                         => \$color,                          # flag
-    'version|V'                      => sub { say "$0 Version $VERSION"; exit; }
+    'reference|r=s{1,}'                  => \my @reference_files,             # array
+    'target|t=s'                         => \my $target_file,                 # string
+    'weights|w=s'                        => \my $weights_file,                # string
+    'append-prefixes=s{1,}'              => \my @append_prefixes,             # array
+    'out-file|o=s'                       => \my $out_file_arg,                # string
+    'max-out:i'                          => \my $max_out,                     # integer
+    'max-number-vars:i'                  => \my $max_number_vars,             # integer
+    'include-hpo-ascendants'             => \my $include_hpo_ascendants,      # flag
+    'export|e:s'                         => \my $export,                      # opt-string (defined)
+    'align|a:s'                          => \my $align,                       # opt-string (defined)
+    'cytoscape-json:s'                   => \my $cytoscape_json,              # opt-string (defined)
+    'graph-stats:s'                      => \my $graph_stats,                 # opt-string (defined)
+    'sort-by=s'                          => \my $sort_by,                     # string
+    'similarity-metric-cohort=s'         => \my $similarity_metric_cohort,    # string
+    'patients-of-interest|poi=s{1,}'     => \my @patients_of_interest,        # array
+    'poi-out-dir=s'                      => \my $poi_out_dir,                 # string
+    'include-terms=s{1,11}'              => \my @include_terms,               # array
+    'exclude-terms=s{1,11}'              => \my @exclude_terms,               # array
+    'retain-excluded-phenotypicFeatures' => \
+      my $retain_excluded_phenotypicFeatures,                                 # flag
+    'precomputed-ref-prefix=s' => \my $precomputed_ref_prefix,                # string
+    'max-matrix-items-in-ram=i' => \my $max_matrix_items_in_ram,            # integer
+    'config=s'                 => \my $config_file,                           # string
+    'age!'                     => \$age,                                      # flag
+    'help|?'                   => \my $help,                                  # flag
+    'log:s'                    => \my $log,                                   # opt-string (defined)
+    'man'                      => \my $man,                                   # flag
+    'debug=i'                  => \my $debug,                                 # integer
+    'verbose|'                 => \my $verbose,                               # flag
+    'color!'                   => \$color,                                    # flag
+    'version|V'                => sub { say "$0 Version $VERSION"; exit; }
 ) or pod2usage(2);
 pod2usage(1)                              if $help;
 pod2usage( -verbose => 2, -exitval => 0 ) if $man;
 pod2usage(
     -message => "Please specify a reference-cohort(s) with <--r>\n",
     -exitval => 1
-) unless @reference_files;
+) unless ( @reference_files || $precomputed_ref_prefix );
 pod2usage(
     -message =>
       "<--graph_stats> only works in conjunction with <--cytoscape-json>\n",
     -exitval => 1
 ) if ( defined $graph_stats && !defined $cytoscape_json );
 pod2usage(
-    -message =>
-      "Weights file <$weights_file> does not exist\n",
+    -message => "Weights file <$weights_file> does not exist\n",
     -exitval => 1
 ) if ( defined $weights_file && !-f $weights_file );
 
 # Set the name of the output
 my $out_file = $out_file_arg
   // ( $target_file ? $out_file_patient : $out_file_cohort );
+
+# Set import data
+my ( $glob_hash_file, $ref_hash_file, $ref_binary_hash_file );
+if ( defined $precomputed_ref_prefix ) {
+
+    # Check if any incompatible parameters are provided
+    my $has_incompatible_options =
+         @reference_files
+      || @append_prefixes
+      || $age
+      || defined $include_hpo_ascendants
+      || defined $retain_excluded_phenotypicFeatures
+      || defined $weights_file;
+
+    if ($has_incompatible_options) {
+        pod2usage(
+            -message =>
+"Sorry, but <--reference/age/hpo-ascendants/retain-excluded-phenotypicFeatures/weights/append-prefixes> are incompatible with --import <$precomputed_ref_prefix>\n",
+            -exitval => 1
+        );
+    }
+
+    # Generate file names based on precomputed_ref_prefix
+    my $base_glob       = $precomputed_ref_prefix . '.glob_hash.json';
+    my $base_ref        = $precomputed_ref_prefix . '.ref_hash.json';
+    my $base_ref_binary = $precomputed_ref_prefix . '.ref_binary_hash.json';
+
+    # Use the helper to check for .gz versions if needed.
+    $glob_hash_file       = resolve_file($base_glob);
+    $ref_hash_file        = resolve_file($base_ref);
+    $ref_binary_hash_file = resolve_file($base_ref_binary);
+}
 
 # Set cytoscape-json logic
 handle_option( \$cytoscape_json, "<--cytoscape-json> only works in cohort-mode",
@@ -112,33 +147,39 @@ say BOLD CYAN program_header($VERSION), RESET if $verbose;
 
 # Load data as hashref
 my $data = {
-    reference_files          => \@reference_files,
-    target_file              => $target_file,
-    weights_file             => $weights_file,
-    include_hpo_ascendants   => $include_hpo_ascendants,
-    hpo_file                 => undef,
-    align                    => $align,
-    align_basename           => $align_basename,
-    export                   => $export,
-    export_basename          => $export_basename,
-    out_file                 => $out_file,
-    cytoscape_json           => $cytoscape_json,
-    graph_stats              => $graph_stats,
-    max_out                  => $max_out,
-    max_number_var           => $max_number_var,
-    sort_by                  => $sort_by,
-    similarity_metric_cohort => $similarity_metric_cohort,
-    patients_of_interest     => \@patients_of_interest,
-    poi_out_dir              => $poi_out_dir,
-    include_terms            => \@include_terms,
-    exclude_terms            => \@exclude_terms,
-    config_file              => $config_file,
-    age                      => $age,                        # Solution, use ageRange in PXF/BFF, measures' values more difficult
-    cli                      => $cli,
-    append_prefixes          => \@append_prefixes,
-    log                      => $log,
-    debug                    => $debug,
-    verbose                  => $verbose
+    reference_files                    => \@reference_files,
+    target_file                        => $target_file,
+    weights_file                       => $weights_file,
+    include_hpo_ascendants             => $include_hpo_ascendants,
+    hpo_file                           => undef,
+    align                              => $align,
+    align_basename                     => $align_basename,
+    export                             => $export,
+    export_basename                    => $export_basename,
+    out_file                           => $out_file,
+    cytoscape_json                     => $cytoscape_json,
+    graph_stats                        => $graph_stats,
+    max_out                            => $max_out,
+    max_number_vars                    => $max_number_vars,
+    sort_by                            => $sort_by,
+    similarity_metric_cohort           => $similarity_metric_cohort,
+    patients_of_interest               => \@patients_of_interest,
+    poi_out_dir                        => $poi_out_dir,
+    include_terms                      => \@include_terms,
+    exclude_terms                      => \@exclude_terms,
+    retain_excluded_phenotypicFeatures => $retain_excluded_phenotypicFeatures,
+    precomputed_ref_prefix             => $precomputed_ref_prefix,
+    max_matrix_items_in_ram            => $max_matrix_items_in_ram,
+    glob_hash_file                     => $glob_hash_file,
+    ref_hash_file                      => $ref_hash_file,
+    ref_binary_hash_file               => $ref_binary_hash_file,
+    config_file                        => $config_file,
+    age                                => $age,                                # Solution, use ageRange in PXF/BFF, measures' values more difficult
+    cli                                => $cli,
+    append_prefixes                    => \@append_prefixes,
+    log                                => $log,
+    debug                              => $debug,
+    verbose                            => $verbose
 };
 
 # Create object
@@ -162,6 +203,21 @@ sub handle_option {
         pod2usage( -message => $message, -exitval => 1 ) if $target_file;
         $$option_ref = $$option_ref ? $$option_ref : $default;
     }
+}
+
+sub resolve_file {
+
+    my $base = shift;
+
+    # If the base file exists, use it.
+    return $base if -e $base;
+
+    # If a gzipped version exists, use that.
+    my $gz = $base . '.gz';
+    return $gz if -e $gz;
+
+    # If neither exists, just return the base file (you might want to warn or error here)
+    return $base;
 }
 
 sub write_log {
@@ -232,10 +288,10 @@ pheno-ranker: A script that performs semantic similarity in PXF/BFF data structu
 
    Arguments:
      * Cohort mode:
-       -r, --reference <file>         BFF/PXF file(s) in JSON or YAML format (array or object)
+       -r, --reference <file>         JSON/YAML BFF/PXF file(s) (array/object), supports .gz
 
      * Patient mode:
-       -t, --target <file>            BFF/PXF file in JSON or YAML format (object or array of 1 object)
+       -t, --target <file>            JSON/YAML BFF/PXF file (object or single-object array), supports .gz 
 
    Options:
      -age                             Include age-related variables; excludes agent-like terms (BFF/PXF-only) [>no-age|age]
@@ -246,13 +302,16 @@ pheno-ranker: A script that performs semantic similarity in PXF/BFF data structu
      -e, --export [path/basename]     Export miscellaneous JSON files. If not specified, default filenames are used [default: export.*]
      -exclude-terms <terms>           Exclude BFF/PXF terms (e.g., --exclude-terms sex, id) or column names in JSON-derived from CSV 
      -graph-stats [file]              Generates a text file with key graph metrics, for use with <-cytoscape-json> [default: graph_stats.txt]
+     -prp, --precomputed-ref-prefix [path/basename]   Use precomputed data for the reference cohort(s). No need to use --r
      -include-hpo-ascendants          Include ascendant terms from the Human Phenotype Ontology (HPO)
      -include-terms <terms>           Include BFF/PXF terms (e.g., --include-terms diseases) or column names in JSON-derived from CSV
-     -max-number-var <number>         Maximum variables for binary string [default: 10000]
+     -max-matrix-items-in-ram <number>   In cohort mode, set max items before switching to RAM-efficient mode (default: 5000)
+     -max-number-vars <number>        Maximum number of variables for binary string [default: 10000]
      -max-out <number>                Print only N comparisons [default: 50]
      -o, --out-file <file>            Output file path [default: -r matrix.txt | -t rank.txt]
      -poi, --patients-of-interest <id_list>   Export JSON files for the selected individual IDs during a dry-run
      -poi-out-dir <directory>         Directory for JSON files (used with --poi)
+     -retain-excluded-phenotypicFeatures     Retains features set to "excluded": true by appending '_excluded' to their IDs
      -similarity-metric-cohort <metric>  Similarity metric for cohort mode [>hamming|jaccard]
      -sort-by <metric>                Sort by Hamming distance or Jaccard index [>hamming|jaccard]
      -w, --weights <file>             YAML file with weights
@@ -341,7 +400,7 @@ I<Optional:> If you want to use C<utils/barcode> or C<utils/bff_pxf_plot>:
 
 =head3 Method 4: From Docker Hub
 
-Download a docker image (latest version - amd64|x86-64) from L<Docker Hub|https://hub.docker.com/r/manuelrueda/pheno-ranker> by executing:
+Download the latest version of the Docker image (supports both amd64 and arm64 architectures) from L<Docker Hub|https://hub.docker.com/r/manuelrueda/pheno-ranker> by executing:
 
   docker pull manuelrueda/pheno-ranker:latest
   docker image tag manuelrueda/pheno-ranker:latest cnag/pheno-ranker:latest

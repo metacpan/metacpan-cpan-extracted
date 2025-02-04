@@ -1,5 +1,5 @@
 package ExtUtils::Typemaps::Signal;
-$ExtUtils::Typemaps::Signal::VERSION = '0.006';
+$ExtUtils::Typemaps::Signal::VERSION = '0.007';
 use strict;
 use warnings;
 
@@ -13,7 +13,6 @@ sub new {
 TYPEMAP
 	sigset_t*	T_SIGSET
 	signo_t		T_SIGNO
-	siginfo_t	T_SIGINFO
 	struct timespec T_TIMESPEC
 
 INPUT
@@ -22,12 +21,12 @@ T_SIGSET
 		if (!sv_derived_from($arg, \"POSIX::SigSet\")) {
 			Perl_croak(aTHX_ \"$var is not of type POSIX::SigSet\");
 		} else {
-	%:if PERL_VERSION > 15 || PERL_VERSION == 15 && PERL_SUBVERSION > 2
+	\x{23}if PERL_VERSION > 15 || PERL_VERSION == 15 && PERL_SUBVERSION > 2
 			$var = (sigset_t *) SvPV_nolen(SvRV($arg));
-	%:else
+	\x{23}else
 			IV tmp = SvIV((SV*)SvRV($arg));
 			$var = INT2PTR(sigset_t*, tmp);
-	%:endif
+	\x{23}endif
 		}
 	} else if (SvOK($arg)) {
 		int signo = (SvIOK($arg) || looks_like_number($arg)) && SvIV($arg) ? SvIV($arg) : whichsig(SvPV_nolen($arg));
@@ -53,26 +52,6 @@ T_TIMESPEC
 OUTPUT
 T_TIMESPEC
 	sv_setnv($arg, $var.tv_sec + $var.tv_nsec / 1000000000.0);
-
-T_SIGINFO
-	{
-	HV* ret = newHV();
-	hv_stores(ret, \"signo\", newSViv($var.si_signo));
-	hv_stores(ret, \"code\", newSViv($var.si_code));
-	hv_stores(ret, \"errno\", newSViv($var.si_errno));
-	hv_stores(ret, \"pid\", newSViv($var.si_pid));
-	hv_stores(ret, \"uid\", newSViv($var.si_uid));
-	hv_stores(ret, \"status\", newSViv($var.si_status));
-	hv_stores(ret, \"band\", newSViv($var.si_band));
-	%:ifdef si_fd
-	hv_stores(ret, \"fd\", newSViv($var.si_fd));
-	%:endif
-	hv_stores(ret, \"value\", newSViv($var.si_value.sival_int));
-	hv_stores(ret, \"ptr\", newSVuv(PTR2UV($var.si_value.sival_ptr)));
-	hv_stores(ret, \"addr\", newSVuv(PTR2UV($var.si_addr)));
-
-	$arg = newRV_noinc((SV*)ret);
-	}
 END
 
 	return $self;
@@ -94,7 +73,7 @@ ExtUtils::Typemaps::Signal - A typemap for dealing with signal related types
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -122,10 +101,6 @@ Input only. This turns a signal name (e.g. C<TERM>) or number (C<15>) into a sig
 =item * sigset_t*
 
 Input only. This turns a C<POSIX::SigSet> object into a C<sigset_t*>. Alternatively, it will convert a signal name/number into a signal set.
-
-=item * siginfo_t
-
-Output only. This turns a C<siginfo_t> into a hash containing the various values
 
 =item * struct timespec
 

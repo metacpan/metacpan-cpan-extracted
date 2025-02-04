@@ -1,5 +1,5 @@
 package Mail::DMARC::Base;
-our $VERSION = '1.20240314';
+our $VERSION = '1.20250203';
 use strict;
 use warnings;
 use 5.10.0;
@@ -194,14 +194,13 @@ sub find_psl_file {
         print "using $file for Public Suffix List\n" if $self->verbose;
         return $file;
     }
-    my $path;
-    foreach $path ($self->get_prefix('share/' . $file)) {    ## no critic
-        last if ( -f $path && -r $path );
+
+    foreach my $path ($self->get_prefix($file)) {
+        if ( -f $path && -r $path ) {
+            print "using $path for Public Suffix List\n"; # if $self->verbose;
+            return $path;
+        }
     }
-    if ($path && -r $path) {
-        print "using $path for Public Suffix List\n" if $self->verbose;
-        return $path;
-    };
 
     # Fallback to included suffic list
     return $self->get_sharefile('public_suffix_list');
@@ -282,8 +281,10 @@ sub is_valid_ip {
 sub is_valid_domain {
     my ( $self, $domain ) = @_;
     return 0 if $domain !~ /^$RE{net}{domain}{-rfc1101}{-nospace}$/x;
-    my $tld = ( split /\./, lc $domain )[-1];
+    my $tld = ( split /\./, $domain )[-1];
     return 1 if $self->is_public_suffix($tld);
+    return 0 if $domain eq 'localhost';
+    return 0 if $tld eq 'localdomain';
     $tld = join( '.', ( split /\./, $domain )[ -2, -1 ] );
     return 1 if $self->is_public_suffix($tld);
     return 0;
@@ -329,7 +330,7 @@ Mail::DMARC::Base - DMARC utility functions
 
 =head1 VERSION
 
-version 1.20240314
+version 1.20250203
 
 =head1 METHODS
 
@@ -389,7 +390,7 @@ Marc Bradshaw <marc@marcbradshaw.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Matt Simerson.
+This software is copyright (c) 2025 by Matt Simerson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

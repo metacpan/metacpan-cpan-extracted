@@ -33,14 +33,14 @@
             {
                 "bodySite": {
                     "id": "NCIT:C12736"
-                },
-                "procedureCode": {
-                    "id": "NCIT:C157823"
                 }
             },
             {
                 "bodySite": {
                     "id": "NCIT:C12736"
+                },
+                "procedureCode": {
+                    "id": "NCIT:C157823"
                 }
             }
         ],

@@ -1,5 +1,9 @@
 Revision history for MIDI-Drummer
 
+0.5010 2025-02-03 08:54:31
+    - Simplify play_with_timidity().
+    - Add play_with_fluidsynth().
+
 0.5009 2025-01-30 07:26:40
     - Repaired and improved the tutorial POD more.
 

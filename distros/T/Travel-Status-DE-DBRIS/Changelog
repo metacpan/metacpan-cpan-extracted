@@ -1,3 +1,8 @@
+Travel::Status::DE::DBRIS 0.05 - Mon Feb 03 2025
+
+    * Journey, Location: Add missing conversions to TO_JSON
+    * dbris-m: Fix --json
+
 Travel::Status::DE::DBRIS 0.04 - Sat Feb 01 2025
 
     * Add Travel::Status::DE::DBRIS::Formation and submodules to this

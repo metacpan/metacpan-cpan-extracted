@@ -1,0 +1,43 @@
+---
+abstract: 'Add a SECURITY.md to your dzil distribution'
+author:
+  - 'Leon Timmermans <fawaka@gmail.com>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-SecurityPolicy
+provides:
+  Dist::Zilla::Plugin::SecurityPolicy:
+    file: lib/Dist/Zilla/Plugin/SecurityPolicy.pm
+    version: '0.001'
+requires:
+  Carp: '0'
+  Dist::Zilla::File::InMemory: '0'
+  Dist::Zilla::Role::FileGatherer: '0'
+  Dist::Zilla::Role::FilePruner: '0'
+  Dist::Zilla::Role::PrereqSource: '0'
+  Module::Runtime: '0'
+  Moose: '0'
+  MooseX::Types::Moose: '0'
+  MooseX::Types::Perl: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: git://github.com/CPAN-Security/Dist-Zilla-Plugin-SecurityPolicy.git
+version: '0.001'
+x_generated_by_perl: v5.38.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

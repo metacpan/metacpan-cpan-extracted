@@ -1,5 +1,5 @@
 package ExtUtils::Typemaps::Misc;
-$ExtUtils::Typemaps::Misc::VERSION = '0.002';
+$ExtUtils::Typemaps::Misc::VERSION = '0.003';
 use strict;
 use warnings;
 
@@ -39,7 +39,7 @@ ExtUtils::Typemaps::Misc - A collection of miscelaneous typemap templates
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 DESCRIPTION
 

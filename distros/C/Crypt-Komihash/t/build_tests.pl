@@ -7,16 +7,21 @@ use v5.16;
 use Getopt::Long;
 use Crypt::Komihash qw(komihash_hex komihash);
 
-my $debug   = 0;
-my $hex     = 0;
-my $decimal = 0;
-my $GLOBAL_SEED    = undef;
+my $debug       = 0;
+my $hex         = 0;
+my $decimal     = 0;
+my $GLOBAL_SEED = "";
 GetOptions(
 	'debug'   => \$debug,
 	'hex'     => \$hex,
 	'decimal' => \$decimal,
-	'seed=i'  => \$GLOBAL_SEED,
+	'seed=s'  => \$GLOBAL_SEED,
 );
+
+# If seed has '0x' in it, convert the hex
+if ($GLOBAL_SEED =~ /0x/){
+	$GLOBAL_SEED = hex($GLOBAL_SEED);
+}
 
 ###############################################################################
 ###############################################################################
@@ -39,7 +44,7 @@ foreach my $l (@lines) {
 	my $func  = '';
 	my $seed  = perl_rand64();
 
-	if (defined($GLOBAL_SEED)) {
+	if (length($GLOBAL_SEED) > 0) {
 		$seed = $GLOBAL_SEED;
 	}
 

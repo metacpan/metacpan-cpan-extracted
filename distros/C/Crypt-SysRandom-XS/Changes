@@ -1,0 +1,20 @@
+Revision history for Crypt-SysRandom-XS
+
+0.006     2025-02-04 02:58:41+01:00 Europe/Brussels
+          - Rename to Crypt::SysRandom::XS
+          - Simplify error message
+
+0.005     2025-01-15 14:25:11+01:00 Europe/Brussels
+          - Fix linking on Windows
+
+0.004     2025-01-14 21:26:35+01:00 Europe/Brussels
+          - Link to Bcrypt.dll on Windows
+
+0.003     2025-01-14 13:18:37+01:00 Europe/Brussels
+          - Fix typo in Windows feature check
+
+0.002     2025-01-13 00:03:03+01:00 Europe/Brussels
+          - fix UNISTD_GETENTROPY feature detection
+
+0.001     2025-01-12 17:51:05+01:00 Europe/Brussels
+          Initial release to an unsuspecting world

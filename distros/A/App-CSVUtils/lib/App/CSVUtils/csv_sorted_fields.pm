@@ -6,9 +6,9 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-01-14'; # DATE
+our $DATE = '2025-02-04'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.035'; # VERSION
+our $VERSION = '1.036'; # VERSION
 
 use App::CSVUtils qw(
                         gen_csv_util
@@ -91,7 +91,7 @@ App::CSVUtils::csv_sorted_fields - Check that CSV fields are sorted
 
 =head1 VERSION
 
-This document describes version 1.035 of App::CSVUtils::csv_sorted_fields (from Perl distribution App-CSVUtils), released on 2025-01-14.
+This document describes version 1.036 of App::CSVUtils::csv_sorted_fields (from Perl distribution App-CSVUtils), released on 2025-02-04.
 
 =head1 FUNCTIONS
 
@@ -192,6 +192,29 @@ Defaults to C<"> (double quote). Overrides C<--input-tsv> option.
 Specify field separator character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<,> (comma). Overrides C<--input-tsv> option.
+
+=item * B<input_skip_num_lines> => I<posint>
+
+Number of lines to skip before header row.
+
+This can be useful if you have a CSV files (usually some generated reports,
+sometimes converted from spreadsheet) that have additional header lines or info
+before the CSV header row.
+
+See also the alternative option: C<--input-skip-until-pattern>.
+
+=item * B<input_skip_until_pattern> => I<re_from_str>
+
+Skip rows until the first header row matches a regex pattern.
+
+This is an alternative to the C<--input-skip-num-lines> and can be useful if you
+have a CSV files (usually some generated reports, sometimes converted from
+spreadsheet) that have additional header lines or info before the CSV header
+row.
+
+With C<--input-skip-num-lines>, you skip a fixed number of lines. With this
+option, rows will be skipped until the first field matches the specified regex
+pattern.
 
 =item * B<input_tsv> => I<true>
 

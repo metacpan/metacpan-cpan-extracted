@@ -1,3 +1,8 @@
+v0.08 - 2025-02-03
+	- Autoseed Komirand if it is not manually seeded
+	- Convert komihash_hex() to Perl for simpler updates
+	- Add some Github workflows
+
 v0.06 - 2025-01-26
 	- Update unit tests to include test vectors from documentation
 	- Made C functions static

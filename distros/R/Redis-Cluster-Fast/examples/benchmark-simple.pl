@@ -1,103 +1,114 @@
 use strict;
 use warnings FATAL => 'all';
+use feature qw/say/;
+use lib ".";
+use lib "./_build/lib";
+use lib "./blib/arch";
+use lib "./blib/lib";
 use lib './xt/lib';
-use Benchmark;
+
+use Time::HiRes qw/gettimeofday tv_interval/;
 use Redis::Cluster::Fast;
 use Redis::ClusterRider;
-use Test::More; # for Test::RedisCluster
-use Test::Docker::RedisCluster qw/get_startup_nodes/;
 
-print "Redis::Cluster::Fast is " . $Redis::Cluster::Fast::VERSION . "\n";
-print "Redis::ClusterRider is " . $Redis::ClusterRider::VERSION . "\n";
-
-my $nodes = get_startup_nodes;
+my $nodes_str = $ENV{REDIS_NODES};
+my $nodes = [
+    split(/,/, $nodes_str)
+];
 
 my $xs = Redis::Cluster::Fast->new(
     startup_nodes => $nodes,
+    route_use_slots => 1,
 );
 
 my $pp = Redis::ClusterRider->new(
     startup_nodes => $nodes,
 );
 
-my $cc = 0;
-my $dd = 0;
-
 my $loop = 100000;
-print "### mset ###\n";
-Benchmark::cmpthese($loop, {
-    "Redis::ClusterRider" => sub {
-        $cc++;
-        $pp->mset("{pp$cc}atest", $cc, "{pp$cc}btest", $cc, "{pp$cc}ctest", $cc);
-    },
-    "Redis::Cluster::Fast" => sub {
-        $dd++;
-        $xs->mset("{xs$dd}atest", $dd, "{xs$dd}btest", $dd, "{xs$dd}ctest", $dd);
-    },
-});
 
-$cc = 0;
-$dd = 0;
+######
+# set
+######
+sleep 1;
+for my $num (1 .. $loop) {
+    my $start_time = [ gettimeofday ];
 
-print "### mget ###\n";
-Benchmark::cmpthese($loop, {
-    "Redis::ClusterRider" => sub {
-        $cc++;
-        $pp->mget("{pp$cc}atest", "{pp$cc}btest", "{pp$cc}ctest");
-    },
-    "Redis::Cluster::Fast" => sub {
-        $dd++;
-        $xs->mget("{xs$dd}atest", "{xs$dd}btest", "{xs$dd}ctest");
-    },
-});
+    $xs->set('1' . $num, 123);
 
-print "### incr ###\n";
-Benchmark::cmpthese(-2, {
-    "Redis::ClusterRider" => sub {
-        $pp->incr("incr_1");
-    },
-    "Redis::Cluster::Fast" => sub {
-        $xs->incr("incr_2");
-    },
-});
+    my $elapsed_time = tv_interval($start_time);
+    printf "set_xs,%.10f\n", $elapsed_time * 1000;
+}
+sleep 1;
+for my $num (1 .. $loop) {
+    my $start_time = [ gettimeofday ];
 
-print "### new and ping ###\n";
-Benchmark::cmpthese(-2, {
-    "Redis::ClusterRider" => sub {
-        my $tmp = Redis::ClusterRider->new(
-            startup_nodes => $nodes,
-        );
-        $tmp->ping;
-    },
-    "Redis::Cluster::Fast" => sub {
-        my $tmp = Redis::Cluster::Fast->new(
-            startup_nodes => $nodes,
-        );
-        $tmp->ping;
-    },
-});
+    $xs->set('2' . $num, 123, sub {});
+    $xs->run_event_loop;
 
-is 1, 1;
-done_testing;
+    my $elapsed_time = tv_interval($start_time);
+    printf "set_xs_pipeline,%.10f\n", $elapsed_time * 1000;
+}
+sleep 1;
+for my $num (1 .. $loop) {
+    my $start_time = [ gettimeofday ];
+
+    $xs->set('3' . $num, 123, sub {});
+    $xs->run_event_loop if $num % 100 == 0;
+
+    my $elapsed_time = tv_interval($start_time);
+    printf "set_xs_pipeline_batched_100,%.10f\n", $elapsed_time * 1000;
+}
+sleep 1;
+for my $num (1 .. $loop) {
+    my $start_time = [ gettimeofday ];
+
+    $pp->set('4' . $num, 123);
+
+    my $elapsed_time = tv_interval($start_time);
+    printf "set_pp,%.10f\n", $elapsed_time * 1000;
+}
+
+######
+# get
+######
+sleep 1;
+for my $num (1 .. $loop) {
+    my $start_time = [ gettimeofday ];
+
+    $xs->get('1' . $num);
+
+    my $elapsed_time = tv_interval($start_time);
+    printf "get_xs,%.10f\n", $elapsed_time * 1000;
+}
+sleep 1;
+for my $num (1 .. $loop) {
+    my $start_time = [ gettimeofday ];
+
+    $xs->get('2' . $num, sub {});
+    $xs->run_event_loop;
+
+    my $elapsed_time = tv_interval($start_time);
+    printf "get_xs_pipeline,%.10f\n", $elapsed_time * 1000;
+}
+sleep 1;
+for my $num (1 .. $loop) {
+    my $start_time = [ gettimeofday ];
+
+    $xs->get('3' . $num, sub {});
+    $xs->run_event_loop if $num % 100 == 0;
+
+    my $elapsed_time = tv_interval($start_time);
+    printf "get_xs_pipeline_batched_100,%.10f\n", $elapsed_time * 1000;
+}
+sleep 1;
+for my $num (1 .. $loop) {
+    my $start_time = [ gettimeofday ];
+
+    $pp->get('4' . $num);
+
+    my $elapsed_time = tv_interval($start_time);
+    printf "get_pp,%.10f\n", $elapsed_time * 1000;
+}
+
 __END__
-% AUTHOR_TESTING=1 perl ./examples/benchmark-simple.pl
-Redis::Cluster::Fast is 0.084
-Redis::ClusterRider is 0.26
-### mset ###
-                        Rate  Redis::ClusterRider Redis::Cluster::Fast
-Redis::ClusterRider  13245/s                   --                 -34%
-Redis::Cluster::Fast 20080/s                  52%                   --
-### mget ###
-                        Rate  Redis::ClusterRider Redis::Cluster::Fast
-Redis::ClusterRider  14641/s                   --                 -40%
-Redis::Cluster::Fast 24510/s                  67%                   --
-### incr ###
-                        Rate  Redis::ClusterRider Redis::Cluster::Fast
-Redis::ClusterRider  18367/s                   --                 -44%
-Redis::Cluster::Fast 32879/s                  79%                   --
-### new and ping ###
-                       Rate  Redis::ClusterRider Redis::Cluster::Fast
-Redis::ClusterRider   146/s                   --                 -96%
-Redis::Cluster::Fast 3941/s                2598%                   --
-ok 1
-1..1

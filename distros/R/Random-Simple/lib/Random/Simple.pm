@@ -6,7 +6,7 @@ use Time::HiRes;
 use Carp qw(croak);
 
 # https://pause.perl.org/pause/query?ACTION=pause_operating_model#3_5_factors_considering_in_the_indexing_phase
-our $VERSION = '0.18';
+our $VERSION = '0.20';
 our $debug   = 0;
 
 #############################################################
@@ -213,11 +213,8 @@ sub random_int {
 sub random_float {
 	if (!$has_been_seeded) { seed_with_os_random(); }
 
-	my $max = 2**32 - 1;
-	my $num = Random::Simple::_rand32(); # C API
-	my $ret = $num / $max;
-
-	#print "$num / $max = $ret\n";
+	my $num = Random::Simple::_rand64();
+	my $ret = Random::Simple::_uint64_to_double($num);
 
 	return $ret;
 }
@@ -253,8 +250,8 @@ sub srand {
 	}
 
 	# Convert the one 32bit seed into 2x 64bit seeds
-	my $seed1 = _hash64($seed , 64); # C API
-	my $seed2 = _hash64($seed1, 64); # C API
+	my $seed1 = _hash_mur3($seed);  # C API
+	my $seed2 = _hash_mur3($seed1); # C API
 
 	Random::Simple::seed($seed1, $seed2);
 

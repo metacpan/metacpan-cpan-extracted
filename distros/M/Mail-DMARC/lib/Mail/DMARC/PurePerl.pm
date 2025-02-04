@@ -1,5 +1,5 @@
 package Mail::DMARC::PurePerl;
-our $VERSION = '1.20240314';
+our $VERSION = '1.20250203';
 use strict;
 use warnings;
 
@@ -35,7 +35,15 @@ sub validate {
     # 9.6. reject email if the domain appears to not exist
     $self->exists_in_dns() or return $self->result;
     $policy ||= $self->discover_policy();  # 11.2.2 Query DNS for DMARC policy
-    $policy or return $self->result;
+    if (!$policy) {
+        # RFC7489 section 4.3 step 8:
+        #  If a policy is found, it is combined with the Author's domain
+        #  and the SPF and DKIM results to produce a DMARC policy result (a
+        #  "pass" or "fail")
+        # Hence, if no (valid) policy has been found, produce "none" instead.
+        $self->result->result('none');
+        return $self->result;
+    }
 
     #   3.5 Out of Scope  DMARC has no "short-circuit" provision, such as
     #         specifying that a pass from one authentication test allows one
@@ -264,7 +272,8 @@ sub is_spf_aligned {
     $self->result->spf('fail');
     return 0 if !$spf_dom;
 
-    my $from_dom = $self->header_from or croak "header_from not set!";
+    my $from_dom = lc $self->header_from or croak "header_from not set!";
+    $spf_dom = lc $spf_dom;
 
     if ( $spf_dom eq $from_dom ) {
         $self->result->spf('pass');
@@ -589,7 +598,7 @@ Mail::DMARC::PurePerl - Pure Perl implementation of DMARC
 
 =head1 VERSION
 
-version 1.20240314
+version 1.20250203
 
 =head1 METHODS
 
@@ -754,7 +763,7 @@ Marc Bradshaw <marc@marcbradshaw.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Matt Simerson.
+This software is copyright (c) 2025 by Matt Simerson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

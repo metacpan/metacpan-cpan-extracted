@@ -9,7 +9,8 @@ use File::Basename;
 use File::Spec::Functions qw(catdir catfile);
 use List::Util qw(any);
 use Hash::Util qw(lock_hash);
-use YAML::XS qw(LoadFile DumpFile);
+use IO::Uncompress::Gunzip qw(gunzip $GunzipError);
+use YAML::XS qw(Load LoadFile DumpFile);
 use JSON::XS;
 #use Data::Dumper;
 
@@ -63,42 +64,67 @@ sub io_yaml_or_json {
     my $mode = $arg->{mode};
     my $data = $mode eq 'write' ? $arg->{data} : undef;
 
-    # Checking only for qw(.yaml .yml .json)
+    # Check if the file is gzipped
+    my $is_gz = $file =~ /\.gz$/ ? 1 : 0;
+
+    # Remove .gz for extension recognition if present
+    my $file_for_ext = $is_gz ? ($file =~ s/\.gz$//r) : $file;
+
+    # Allowed extensions
     my @exts = qw(.yaml .yml .json);
-    my $msg  = qq(Can't recognize <$file> extension. Extensions allowed are: )
-      . join ',', @exts;
-    my ( undef, undef, $ext ) = fileparse( $file, @exts );
+
+    # Use fileparse on the file name without the .gz suffix
+    my ( undef, undef, $ext ) = fileparse( $file_for_ext, @exts );
+    my $msg = qq(Can't recognize <$file> extension. Extensions allowed are: )
+              . join ',', @exts;
     die $msg unless any { $_ eq $ext } @exts;
 
-    # To simplify return values, we create a hash
-    $ext =~ tr/a.//d;    # Unify $ext (delete 'a' and '.')
+    # Unify extension by removing "a" and "."
+    $ext =~ tr/a.//d;  # so ".yaml" or ".yml" become "yml" and ".json" becomes "json"
+
+    # Dispatch table for read/write operations
     my $return = {
         read  => { json => \&read_json,  yml => \&read_yaml },
-        write => { json => \&write_json, yml => \&write_yaml }
+        write => { json => \&write_json, yml => \&write_yaml },
     };
 
-    # We return according to the mode (read or write) and format
+    # Call the appropriate function based on the mode and extension
     return $mode eq 'read'
       ? $return->{$mode}{$ext}->($file)
-      : $return->{$mode}{$ext}->( { filepath => $file, data => $data } );
+      : $return->{$mode}{$ext}->({ filepath => $file, data => $data });
 }
 
 sub read_json {
 
     my $file = shift;
-
-    # NB: file -bi hp.json
-    # text/plain; charset=utf-8
-    # malformed UTF-8 character in JSON string, at character offset 680 (before "\x{fffd}r"\n      },...")
-
-    # Load file contents
-    my $str = path($file)->slurp;
-    return decode_json($str);    # Decode (utf-8) to Perl data structure
+    my $str;
+    if ($file =~ /\.gz$/) {
+        gunzip $file => \$str
+          or die "gunzip failed for $file: $GunzipError\n";
+    }
+    else {
+        $str = path($file)->slurp;
+    }
+    return decode_json($str);
 }
 
 sub read_yaml {
+    my $file = shift;
+    my $data;
 
-    return LoadFile(shift);      # Decode to Perl data structure
+    # Check if the file ends with .gz
+    if ($file =~ /\.gz$/) {
+        my $yaml_str;
+        gunzip $file => \$yaml_str
+            or die "gunzip failed for $file: $GunzipError\n";
+        # Decode the YAML from the string
+        $data = Load($yaml_str);
+    }
+    else {
+        # Directly load from the file
+        $data = LoadFile($file);
+    }
+    return $data;
 }
 
 sub write_json {

@@ -45,4 +45,14 @@ class Transmitter
       return set_config_result
     end
   end
+
+  def self.set_javonet_working_directory(config_path)
+    set_working_directory_result = TransmitterWrapper.SetWorkingDirectory(config_path)
+    if set_working_directory_result < 0
+      error_message = get_native_error
+      raise Exception.new "Javonet set working directory result: " + set_working_directory_result.to_s + ". Native error message: " + error_message
+    else
+      return set_working_directory_result
+    end
+  end
 end

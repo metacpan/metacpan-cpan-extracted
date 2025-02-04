@@ -9,9 +9,9 @@ use Cwd;
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-01-14'; # DATE
+our $DATE = '2025-02-04'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.035'; # VERSION
+our $VERSION = '1.036'; # VERSION
 
 our @EXPORT_OK = qw(
                        gen_csv_util
@@ -396,6 +396,35 @@ _
         cmdline_aliases => {
         },
         tags => ['category:input'],
+    },
+    input_skip_num_lines => {
+        summary => 'Number of lines to skip before header row',
+        schema => 'posint*',
+        description => <<'MARKDOWN',
+
+This can be useful if you have a CSV files (usually some generated reports,
+sometimes converted from spreadsheet) that have additional header lines or info
+before the CSV header row.
+
+See also the alternative option: `--input-skip-until-pattern`.
+
+MARKDOWN
+    },
+    input_skip_until_pattern => {
+        summary => 'Skip rows until the first header row matches a regex pattern',
+        schema => 're_from_str*',
+        description => <<'MARKDOWN',
+
+This is an alternative to the `--input-skip-num-lines` and can be useful if you
+have a CSV files (usually some generated reports, sometimes converted from
+spreadsheet) that have additional header lines or info before the CSV header
+row.
+
+With `--input-skip-num-lines`, you skip a fixed number of lines. With this
+option, rows will be skipped until the first field matches the specified regex
+pattern.
+
+MARKDOWN
     },
     input_tsv => {
         summary => "Inform that input file is in TSV (tab-separated) format instead of CSV",
@@ -1631,6 +1660,7 @@ sub gen_csv_util {
                     for my $input_filename (@input_filenames) {
                         $r->{input_filenum}++;
                         $r->{input_filename} = $input_filename;
+                        $r->{input_file_input_has_been_skipped} = 0;
 
                         if ($r->{input_filenum} == 1 && $before_open_input_files) {
                             log_trace "[csvutil] Calling before_open_input_files handler ...";
@@ -1678,7 +1708,29 @@ sub gen_csv_util {
                                     $r->{input_data_row_count}++ if $row;
                                     return $row;
                                 }
-                            } elsif ($i == 0 && !$has_header) {
+                            }
+
+                            # handle skipping lines before the first row
+                            unless ($r->{input_file_input_has_been_skipped}++) {
+                                if ($r->{util_args}{input_skip_num_lines}) {
+                                    for my $j (1 .. $r->{util_args}{input_skip_num_lines}) {
+                                        my $line = readline($r->{input_fh});
+                                        return unless $line;
+                                    }
+                                } elsif ($r->{util_args}{input_skip_until_pattern}) {
+                                    while (1) {
+                                        my $row0 = $input_parser->getline($r->{input_fh});
+                                        return unless $row0;
+                                        if ($row0->[0] =~ $r->{util_args}{input_skip_until_pattern}) {
+                                            # this is the header row
+                                            $r->{input_header_row_count}++;
+                                            return $row0;
+                                        }
+                                    }
+                                }
+                            }
+
+                            if ($i == 0 && !$has_header) {
                                 # this is the first line of a file and user
                                 # specifies there is no input header. we save
                                 # the line and return the generated field names
@@ -1985,7 +2037,7 @@ App::CSVUtils - CLI utilities related to CSV
 
 =head1 VERSION
 
-This document describes version 1.035 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2025-01-14.
+This document describes version 1.036 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2025-02-04.
 
 =head1 DESCRIPTION
 

@@ -57,6 +57,6 @@
          "web" : "https://gitlab.com/as_pushkin/mysqlhi"
       }
    },
-   "version" : "1.02",
+   "version" : "1.03",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

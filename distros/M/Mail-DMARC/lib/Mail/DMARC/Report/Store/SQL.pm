@@ -1,5 +1,5 @@
 package Mail::DMARC::Report::Store::SQL;
-our $VERSION = '1.20240314';
+our $VERSION = '1.20250203';
 use strict;
 use warnings;
 
@@ -531,6 +531,8 @@ sub db_connect {
     my $needs_tables;
 
     $self->{grammar} = undef;
+    my %opts;
+
     if ($dsn =~ /sqlite/i) {
         my ($db) = ( split /=/, $dsn )[-1];
         if ( !$db || $db eq ':memory:' || !-e $db ) {
@@ -541,6 +543,7 @@ sub db_connect {
         }
         $self->{grammar} = Mail::DMARC::Report::Store::SQL::Grammars::SQLite->new();
     } elsif ($dsn =~ /mysql/i) {
+        $opts{'mysql_enable_utf8mb4'} = 1;
         $self->{grammar} = Mail::DMARC::Report::Store::SQL::Grammars::MySQL->new();
     } elsif ($dsn =~ /pg/i) {
         $self->{grammar} = Mail::DMARC::Report::Store::SQL::Grammars::PostgreSQL->new();
@@ -548,7 +551,7 @@ sub db_connect {
         croak "can't determine database type, so unable to load grammar.\n";
     }
 
-    $self->{dbix} = DBIx::Simple->connect( $dsn, $user, $pass )
+    $self->{dbix} = DBIx::Simple->connect( $dsn, $user, $pass, \%opts )
         or return $self->error( DBIx::Simple->error );
 
     if ($needs_tables) {
@@ -682,7 +685,7 @@ Mail::DMARC::Report::Store::SQL - store and retrieve reports from a SQL RDBMS
 
 =head1 VERSION
 
-version 1.20240314
+version 1.20250203
 
 =head1 DESCRIPTION
 
@@ -716,7 +719,7 @@ Marc Bradshaw <marc@marcbradshaw.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Matt Simerson.
+This software is copyright (c) 2025 by Matt Simerson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

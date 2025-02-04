@@ -63,7 +63,7 @@
    "provides" : {
       "Redis::Cluster::Fast" : {
          "file" : "lib/Redis/Cluster/Fast.pm",
-         "version" : "0.093"
+         "version" : "0.095"
       }
    },
    "release_status" : "stable",
@@ -78,7 +78,7 @@
          "web" : "https://github.com/plainbanana/Redis-Cluster-Fast"
       }
    },
-   "version" : "0.093",
+   "version" : "0.095",
    "x_contributors" : [
       "Masahiro Honma <hiratara@cpan.org>"
    ],

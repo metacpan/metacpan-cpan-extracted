@@ -36,6 +36,7 @@ static void S_die_sys(pTHX_ const char* format, int errnum) {
 #define undef &PL_sv_undef
 
 typedef int signo_t;
+typedef siginfo_t* Signal__Info;
 
 MODULE = POSIX::RT::Signal				PACKAGE = POSIX::RT::Signal
 
@@ -44,44 +45,34 @@ int sigwait(sigset_t* sigset)
 		int val;
 	CODE:
 		val = sigwait(sigset, &RETVAL);
-		if (val != 0 && GIMME_V == G_VOID && val != EAGAIN)
-			die_sys("Couldn't sigwaitinfo: %s", val);
+		if (val != 0)
+			XSRETURN_UNDEF;
 	OUTPUT:
 		RETVAL
 
-siginfo_t sigwaitinfo(sigset_t* set)
-	ALIAS:
-		sigtimedwait = 0
+Signal::Info sigwaitinfo(sigset_t* set)
 	PREINIT:
 		int val;
 		siginfo_t info;
 	CODE:
-		val = sigwaitinfo(set, &RETVAL);
+		val = sigwaitinfo(set, &info);
 
-		if (val <= 0) {
-			if (GIMME_V == G_VOID && errno != EAGAIN)
-				die_sys("Couldn't sigwaitinfo: %s", errno);
-			else
-				XSRETURN_UNDEF;
-		}
+		if (val < 0)
+			XSRETURN_UNDEF;
+		RETVAL = &info;
 	OUTPUT:
 		RETVAL
 
-siginfo_t sigtimedwait(sigset_t* set, struct timespec timeout)
-	ALIAS:
-		sigtimedwait = 0
+Signal::Info sigtimedwait(sigset_t* set, struct timespec timeout)
 	PREINIT:
 		int val;
 		siginfo_t info;
 	CODE:
-		val = sigtimedwait(set, &RETVAL, &timeout);
+		val = sigtimedwait(set, &info, &timeout);
 
-		if (val <= 0) {
-			if (GIMME_V == G_VOID && errno != EAGAIN)
-				die_sys("Couldn't sigwaitinfo: %s", errno);
-			else
-				XSRETURN_UNDEF;
-		}
+		if (val < 0)
+			XSRETURN_UNDEF;
+		RETVAL = &info;
 	OUTPUT:
 		RETVAL
 
@@ -92,10 +83,7 @@ bool sigqueue(int pid, signo_t signo, int number = 0)
 	CODE:
 		number_val.sival_int = number;
 		ret = sigqueue(pid, signo, number_val);
-		if (ret == 0)
-			RETVAL = TRUE;
-		else
-			die_sys("Couldn't sigqueue: %s", errno);
+		RETVAL = ret == 0;
 	OUTPUT:
 		RETVAL
 

@@ -10,7 +10,7 @@ use warnings;
 use feature 'current_sub';
 use experimental 'signatures', 'lexical_subs', 'postderef';
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use base 'Exporter::Tiny';
 use Hash::Util 'lock_hash', 'unlock_hash', 'unlock_value';
@@ -38,13 +38,17 @@ use constant {
     RESULT_CONTINUE          => 1,
     RESULT_REVISIT_CONTAINER => 2,
     RESULT_REVISIT_ELEMENT   => 3,
+    RESULT_STOP_DESCENT      => 4,
 };
 
 use constant { PASS_VISIT_ELEMENT => 1, PASS_REVISIT_ELEMENT => 2 };
 
 our %EXPORT_TAGS = (
-    funcs     => [qw( visit )],
-    results   => [qw( RESULT_RETURN RESULT_CONTINUE RESULT_REVISIT_CONTAINER RESULT_REVISIT_ELEMENT )],
+    funcs   => [qw( visit )],
+    results => [
+        qw( RESULT_RETURN RESULT_CONTINUE RESULT_REVISIT_CONTAINER
+          RESULT_REVISIT_ELEMENT RESULT_STOP_DESCENT ),
+    ],
     cycles    => [qw( CYCLE_DIE CYCLE_CONTINUE CYCLE_TRUNCATE )],
     visits    => [qw( VISIT_ARRAY VISIT_HASH VISIT_CONTAINER VISIT_LEAF VISIT_ALL )],
     passes    => [qw( PASS_VISIT_ELEMENT PASS_REVISIT_ELEMENT )],
@@ -127,6 +131,8 @@ my sub _visit ( $node, $code, $context, $cycle, $visit, $meta ) {
             {
                 redo SCAN  if $result == RESULT_REVISIT_CONTAINER;
                 return !!0 if $result == RESULT_RETURN;
+                next       if $result == RESULT_STOP_DESCENT;        # this works for both leaves and containers
+
                 if ( $result == RESULT_REVISIT_ELEMENT ) {
                     $revisit_element = !!1;
                 }
@@ -422,14 +428,19 @@ my sub _visit ( $node, $code, $context, $cycle, $visit, $meta ) {
 
 
 
+
+
+
+
+
+
+
 sub visit ( $struct, $callback, %opts ) {
 
     is_coderef( $callback )
       or croak( q{parameter 'callback' must be a coderef} );
 
     my $context = delete $opts{context} // {};
-    is_plain_hashref( $context )
-      or croak( q{parameter 'context' must be a plain hash} );
 
     my %metadata = (
         path          => [],
@@ -489,7 +500,7 @@ CXC::Data::Visitor - Invoke a callback on every element at every level of a data
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -600,9 +611,9 @@ L</visit> returns the following:
 I<true> if all elements were visited, I<false> if
 B<$callback> requested a premature return.
 
-=item B<$context> => I<hash>
+=item B<$context>
 
-a hash made available to B<$callback> to stash data
+The variable of the same name passed to B<$callback>; see the L</context> option to L</visit>.
 
 =item B<$metadata> => I<hash>
 
@@ -625,6 +636,13 @@ The process of visiting elements should continue.
 =item RESULT_RETURN
 
 L</visit> should return immediately to the caller.
+
+=item RESULT_STOP_DESCENT
+
+If the current element is a container, do not visit the container's contents
+(containers are visited before their contents).
+
+For leaf elements, this is equivalent to L</RESULT_CONTINUE>.
 
 =item RESULT_REVISIT_CONTAINER
 
@@ -676,7 +694,7 @@ to get the actual value.
 
 =item B<$context>
 
-A hash which can be used by the caller to stash data.
+See the L</context> option to L</visit>.
 
 =item B<$metadata>
 
@@ -710,10 +728,10 @@ B<%opts> may contain the following entries:
 
 =over
 
-=item B<context> => I<hashref>
+=item B<context>
 
-A reference to a hash passed to L</$callback>, for the caller's
-use. It defaults to a freshly created hash.
+Arbitrary data to be passed to L</$callback> via the C<$context> argument. Use it
+for whatever you'd like.  If not specified, it defaults to a freshly created hash.
 
 =item B<cycle> => CYCLE_TRUNCATE | CYCLE_DIE | CYCLE_CONTINUE | <$coderef>
 
@@ -810,11 +828,17 @@ This module uses L<Exporter::Tiny>, which provides enhanced import utilities.
 
 The following symbols may be exported:
 
-  visit
-  VISIT_CONTAINER VISIT_LEAF VISIT_ALL
-  CYCLE_DIE CYCLE_CONTINUE CYCLE_TRUNCATE
-  RESULT_RETURN RESULT_CONTINUE RESULT_REVISIT_CONTAINER RESULT_REVISIT_ELEMENT
-  PASS_VISIT_ELEMENT PASS_REVISIT_ELEMENT
+ visit
+
+ VISIT_CONTAINER VISIT_LEAF VISIT_ALL
+
+ CYCLE_DIE CYCLE_CONTINUE CYCLE_TRUNCATE
+
+ RESULT_RETURN RESULT_CONTINUE
+ RESULT_REVISIT_CONTAINER RESULT_REVISIT_ELEMENT
+ RESULT_STOP_DESCENT
+
+ PASS_VISIT_ELEMENT PASS_REVISIT_ELEMENT
 
 The available tags and their respective imported symbols are:
 
@@ -828,6 +852,7 @@ Import all symbols.
 
  RESULT_RETURN RESULT_CONTINUE
  RESULT_REVISIT_CONTAINER RESULT_REVISIT_ELEMENT
+ RESULT_STOP_DESCENT
 
 =item B<cycles>
 

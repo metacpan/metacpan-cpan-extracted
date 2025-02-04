@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-01-14'; # DATE
+our $DATE = '2025-02-04'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.035'; # VERSION
+our $VERSION = '1.036'; # VERSION
 
 use App::CSVUtils qw(gen_csv_util);
 
@@ -151,7 +151,7 @@ App::CSVUtils::paras2csv - Convert paragraphs to CSV
 
 =head1 VERSION
 
-This document describes version 1.035 of App::CSVUtils::paras2csv (from Perl distribution App-CSVUtils), released on 2025-01-14.
+This document describes version 1.036 of App::CSVUtils::paras2csv (from Perl distribution App-CSVUtils), released on 2025-02-04.
 
 =head1 FUNCTIONS
 

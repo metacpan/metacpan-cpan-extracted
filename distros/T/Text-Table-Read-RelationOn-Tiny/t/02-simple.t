@@ -281,21 +281,28 @@ EOT
                                  'empty'   => 0,
                                  'this'    => 1
                                 }
-                    );
-    $obj->get(src => catfile(TEST_DIR, '02-table.txt'));
-    is_deeply($obj->matrix,    $expected{matrix},   'matrix()');
-    is_deeply($obj->elems,     $expected{elems},    'elems()');
-    is_deeply($obj->elem_ids,  $expected{elem_ids}, 'elem_ids()');
-    is_deeply($obj->tab_elems, $expected{elem_ids}, 'tab_elems()');
-    is_deeply($obj->eq_ids,    {},                  'eq_ids()');
+                   );
+    my $table_file = catfile(TEST_DIR, '02-table.txt');
+    my $check_methods = sub {
+      local $Test::Builder::Level = $Test::Builder::Level + 1;
+      is_deeply($obj->matrix,    $expected{matrix},   'matrix()');
+      is_deeply($obj->elems,     $expected{elems},    'elems()');
+      is_deeply($obj->elem_ids,  $expected{elem_ids}, 'elem_ids()');
+      is_deeply($obj->tab_elems, $expected{elem_ids}, 'tab_elems()');
+      is_deeply($obj->eq_ids,    {},                  'eq_ids()');
+    };
+
+    $obj->get(src => $table_file);
+    $check_methods->();
+
+    open(my $hndl, '<', $table_file);
+    $obj->get(src => $table_file);
+    close($hndl);
+    $check_methods->();
 
     note("Same input, but with 'weird' use of horizontal rules");
     $obj->get(src => catfile(TEST_DIR, '02-table-weird.txt'));
-    is_deeply($obj->matrix,    $expected{matrix},   'matrix()');
-    is_deeply($obj->elems,     $expected{elems},    'elems()');
-    is_deeply($obj->elem_ids,  $expected{elem_ids}, 'elem_ids()');
-    is_deeply($obj->tab_elems, $expected{elem_ids}, 'tab_elems()');
-    is_deeply($obj->eq_ids,    {},                  'eq_ids()');
+    $check_methods->();
   }
 }
 

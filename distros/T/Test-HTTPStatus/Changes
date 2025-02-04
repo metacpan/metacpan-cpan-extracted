@@ -1,5 +1,8 @@
 Revision history for Perl module Test::HTTPStatus
 
+2.07	Mon Feb  3 07:55:20 EST 2025
+	HTTP::SimpleLinkChecker has been removed from CPAN
+
 2.06	Sun Jan 12 07:55:57 EST 2025
 	Apache::Constants no longer exists
 	Use gtar to create a distribution on Macs

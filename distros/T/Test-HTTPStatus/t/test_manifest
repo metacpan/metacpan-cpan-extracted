@@ -1,5 +1,14 @@
-load.t
-pod.t
-pod_coverage.t
+changes.t
+comment-spelling.t
+eof.t
+eol.t
 get_status.t
+links.t
+load.t
+no404s.t
+pod-cm.t
+pod-coverage.t
+pod-spelling.t
+pod.t
 status.t
+vars.t

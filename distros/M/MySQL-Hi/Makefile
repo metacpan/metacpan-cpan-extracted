@@ -62,11 +62,11 @@ DIRFILESEP = /
 DFSEP = $(DIRFILESEP)
 NAME = MySQL::Hi
 NAME_SYM = MySQL_Hi
-VERSION = 1.02
+VERSION = 1.03
 VERSION_MACRO = VERSION
-VERSION_SYM = 1_02
+VERSION_SYM = 1_03
 DEFINE_VERSION = -D$(VERSION_MACRO)=\"$(VERSION)\"
-XS_VERSION = 1.02
+XS_VERSION = 1.03
 XS_VERSION_MACRO = XS_VERSION
 XS_DEFINE_VERSION = -D$(XS_VERSION_MACRO)=\"$(XS_VERSION)\"
 INST_ARCHLIB = blib/arch
@@ -262,7 +262,7 @@ RCS_LABEL = rcs -Nv$(VERSION_SYM): -q
 DIST_CP = best
 DIST_DEFAULT = tardist
 DISTNAME = MySQL-Hi
-DISTVNAME = MySQL-Hi-1.02
+DISTVNAME = MySQL-Hi-1.03
 
 
 # --- MakeMaker macro section:
@@ -546,7 +546,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '  warnings: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) 'resources:' >> META_new.yml
 	$(NOECHO) $(ECHO) '  repository: https://gitlab.com/as_pushkin/mysqlhi.git' >> META_new.yml
-	$(NOECHO) $(ECHO) 'version: '\''1.02'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) 'version: '\''1.03'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) 'x_serialization_backend: '\''CPAN::Meta::YAML version 0.018'\''' >> META_new.yml
 	-$(NOECHO) $(MV) META_new.yml $(DISTVNAME)/META.yml
 	$(NOECHO) $(ECHO) Generating META.json
@@ -609,7 +609,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '         "web" : "https://gitlab.com/as_pushkin/mysqlhi"' >> META_new.json
 	$(NOECHO) $(ECHO) '      }' >> META_new.json
 	$(NOECHO) $(ECHO) '   },' >> META_new.json
-	$(NOECHO) $(ECHO) '   "version" : "1.02",' >> META_new.json
+	$(NOECHO) $(ECHO) '   "version" : "1.03",' >> META_new.json
 	$(NOECHO) $(ECHO) '   "x_serialization_backend" : "JSON::PP version 4.16"' >> META_new.json
 	$(NOECHO) $(ECHO) '}' >> META_new.json
 	-$(NOECHO) $(MV) META_new.json $(DISTVNAME)/META.json
@@ -895,7 +895,7 @@ testdb_static :: static pure_all
 # --- MakeMaker ppd section:
 # Creates a PPD (Perl Package Description) for a binary distribution.
 ppd :
-	$(NOECHO) $(ECHO) '<SOFTPKG NAME="MySQL-Hi" VERSION="1.02">' > MySQL-Hi.ppd
+	$(NOECHO) $(ECHO) '<SOFTPKG NAME="MySQL-Hi" VERSION="1.03">' > MySQL-Hi.ppd
 	$(NOECHO) $(ECHO) '    <ABSTRACT>Credentials for MySQL/MariaDB from config files</ABSTRACT>' >> MySQL-Hi.ppd
 	$(NOECHO) $(ECHO) '    <AUTHOR>Andrei Pratasavitski &lt;andrei.protasovitski@gmail.com&gt;</AUTHOR>' >> MySQL-Hi.ppd
 	$(NOECHO) $(ECHO) '    <IMPLEMENTATION>' >> MySQL-Hi.ppd

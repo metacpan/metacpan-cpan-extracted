@@ -91,3 +91,22 @@ class TransmitterWrapper:
                     error_message))
         else:
             return set_config_result
+
+    @staticmethod
+    def set_javonet_working_directory(path):
+        set_working_directory = TransmitterWrapper.python_lib.SetWorkingDirectory
+        set_working_directory.restype = c_int
+        set_working_directory.argtypes = [c_char_p]
+
+        set_working_directory_result = set_working_directory(path.encode('utf-8'))
+
+        if set_working_directory_result < 0:
+            get_native_error = TransmitterWrapper.python_lib.GetNativeError
+            get_native_error.restype = c_char_p
+            get_native_error.argtypes = []
+            error_message = get_native_error()
+            raise RuntimeError(
+                "Javonet set working directory result: " + str(set_working_directory_result) + ". Native error message: " + str(
+                    error_message))
+        else:
+            return set_working_directory_result

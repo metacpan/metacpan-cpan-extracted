@@ -101,16 +101,6 @@ All setters EXCEPT the LOCK routines,
     PerlOMP_UPDATE_WITH_ENV__NUM_THREADS                    \
     PerlOMP_UPDATE_WITH_ENV__SCHEDULE
 
-#define PerlOMP_GETENV_ALL                                  \
-    PerlOMP_UPDATE_WITH_ENV__DEFAULT_DEVICE                 \
-    PerlOMP_UPDATE_WITH_ENV__TEAMS_THREAD_LIMIT             \
-    PerlOMP_UPDATE_WITH_ENV__NUM_TEAMS                      \
-    PerlOMP_UPDATE_WITH_ENV__MAX_ACTIVE_LEVELS              \
-    PerlOMP_UPDATE_WITH_ENV__NUM_THREADS                    \
-    PerlOMP_UPDATE_WITH_ENV__DYNAMIC                        \
-    PerlOMP_UPDATE_WITH_ENV__NESTED                         \
-    PerlOMP_UPDATE_WITH_ENV__SCHEDULE
-
 // ... add all of them from OpenMP::Environment, add unit tests
 
 /* Output Init Macros (needed?) */

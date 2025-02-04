@@ -1,5 +1,5 @@
 package ExtUtils::Typemaps::IntObj;
-$ExtUtils::Typemaps::IntObj::VERSION = '0.002';
+$ExtUtils::Typemaps::IntObj::VERSION = '0.003';
 use strict;
 use warnings;
 
@@ -44,7 +44,7 @@ END
 
 1;
 
-# ABSTRACT: Typemap for storing objects as a string reference
+# ABSTRACT: Typemap for storing int-like handles as objects
 
 __END__
 
@@ -54,11 +54,11 @@ __END__
 
 =head1 NAME
 
-ExtUtils::Typemaps::IntObj - Typemap for storing objects as a string reference
+ExtUtils::Typemaps::IntObj - Typemap for storing int-like handles as objects
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

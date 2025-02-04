@@ -2,7 +2,7 @@ package Mail::DMARC::Report::Send::SMTP;
 use strict;
 use warnings;
 
-our $VERSION = '1.20240314';
+our $VERSION = '1.20250203';
 
 use Carp;
 use English '-no_match_vars';
@@ -175,6 +175,7 @@ sub assemble_message_object {
         ],
         parts => [@parts],
     ) or croak "unable to assemble message\n";
+    $email->header_str_set( 'Message-ID' => $self->get_message_id );
 
     return $email;
 }
@@ -196,6 +197,24 @@ sub get_helo_hostname {
     return Sys::Hostname::hostname;
 };
 
+sub get_message_id {
+    my $self = shift;
+    my $host = $self->get_helo_hostname;
+
+    my ($ss, $mm, $hh, $mday, $mon, $year, $wday, $yday, $isdst) = localtime(time);
+
+    # Generate a "random" Message-ID
+    return sprintf("<%04d%02d%02d%02d%02d.%s\@%s>\n",
+             $year + 1900,
+             $mon  + 1,
+             $mday,
+             $hh,
+             $mm,
+             rand(),
+             $host
+    );
+}
+
 1;
 
 __END__
@@ -208,7 +227,7 @@ Mail::DMARC::Report::Send::SMTP - utility methods for sending reports via SMTP
 
 =head1 VERSION
 
-version 1.20240314
+version 1.20250203
 
 =head2 SUBJECT FIELD
 
@@ -290,7 +309,7 @@ Marc Bradshaw <marc@marcbradshaw.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Matt Simerson.
+This software is copyright (c) 2025 by Matt Simerson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

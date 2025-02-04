@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-01-14'; # DATE
+our $DATE = '2025-02-04'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.035'; # VERSION
+our $VERSION = '1.036'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/CSVUtils/csv_delete_fields/csv_delete_fields",
@@ -41,7 +41,7 @@ csv-delete-fields - Delete one or more fields from CSV file
 
 =head1 VERSION
 
-This document describes version 1.035 of csv-delete-fields (from Perl distribution App-CSVUtils), released on 2025-01-14.
+This document describes version 1.036 of csv-delete-fields (from Perl distribution App-CSVUtils), released on 2025-02-04.
 
 =head1 SYNOPSIS
 
@@ -49,7 +49,7 @@ B<csv-delete-fields> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?"
 
 B<csv-delete-fields> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<csv-delete-fields> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--exclude-field-pat|/"--exclude-field-pat=s">>=I<re>|B<L<-A|/"--exclude-field-pat=s">>|B<L<--exclude-all-fields|/"--exclude-field-pat=s">>] [(B<L<--exclude-field|/"--exclude-fields-json=s">>=I<str>)+|B<L<--exclude-fields-json|/"--exclude-fields-json=s">>=I<json>|(B<L<-F|/"--exclude-fields-json=s">>=I<str>)+] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--ignore-unknown-fields|/"--ignore-unknown-fields">>|B<L<--no-ignore-unknown-fields|/"--ignore-unknown-fields">>|B<L<--noignore-unknown-fields|/"--ignore-unknown-fields">>] [B<L<--include-field-pat|/"--include-field-pat=s, --field-pat">>=I<re>|B<L<-a|/"--include-field-pat=s, --field-pat">>|B<L<--field-pat|/"--include-field-pat=s, --field-pat">>=I<re>|B<L<--include-all-fields|/"--include-field-pat=s, --field-pat">>] [(B<L<--include-field|/"--include-fields-json=s">>=I<str>)+|B<L<--include-fields-json|/"--include-fields-json=s">>=I<json>|(B<L<-f|/"--include-fields-json=s">>=I<str>)+|(B<L<--field|/"--include-fields-json=s">>=I<str>)+] [B<L<--inplace|/"--inplace">>] [B<L<--inplace-backup-ext|/"--inplace-backup-ext=s, -b">>=I<str>|B<L<-b|/"--inplace-backup-ext=s, -b">>=I<str>] [B<L<--input-escape-char|/"--input-escape-char=s">>=I<str>] [B<L<--input-header|/"--no-input-header">>|B<L<--no-input-header|/"--no-input-header">>|B<L<--noinput-header|/"--no-input-header">>] [B<L<--input-quote-char|/"--input-quote-char=s">>=I<str>] [B<L<--input-sep-char|/"--input-sep-char=s">>=I<str>] [B<L<--input-tsv|/"--input-tsv">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--output-always-quote|/"--output-always-quote">>|B<L<--no-output-always-quote|/"--output-always-quote">>|B<L<--nooutput-always-quote|/"--output-always-quote">>] [B<L<--output-escape-char|/"--output-escape-char=s">>=I<str>] [B<L<--output-header|/"--output-header">>|B<L<--no-output-header|/"--output-header">>|B<L<--nooutput-header|/"--output-header">>] [B<L<--output-quote-char|/"--output-quote-char=s">>=I<str>] [B<L<--output-quote-empty|/"--output-quote-empty">>|B<L<--no-output-quote-empty|/"--output-quote-empty">>|B<L<--nooutput-quote-empty|/"--output-quote-empty">>] [B<L<--output-sep-char|/"--output-sep-char=s">>=I<str>] [B<L<--output-tsv|/"--output-tsv">>|B<L<--no-output-tsv|/"--output-tsv">>|B<L<--nooutput-tsv|/"--output-tsv">>] [B<L<--overwrite|/"--overwrite, -O">>|B<L<-O|/"--overwrite, -O">>|B<L<--no-overwrite|/"--overwrite, -O">>|B<L<--nooverwrite|/"--overwrite, -O">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--show-selected-fields|/"--show-selected-fields">>] -- [I<L<input_filename|/"--input-filename=s">>] [I<L<output_filename|/"--output-filename=s, -o">>]
+B<csv-delete-fields> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--exclude-field-pat|/"--exclude-field-pat=s">>=I<re>|B<L<-A|/"--exclude-field-pat=s">>|B<L<--exclude-all-fields|/"--exclude-field-pat=s">>] [(B<L<--exclude-field|/"--exclude-fields-json=s">>=I<str>)+|B<L<--exclude-fields-json|/"--exclude-fields-json=s">>=I<json>|(B<L<-F|/"--exclude-fields-json=s">>=I<str>)+] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--ignore-unknown-fields|/"--ignore-unknown-fields">>|B<L<--no-ignore-unknown-fields|/"--ignore-unknown-fields">>|B<L<--noignore-unknown-fields|/"--ignore-unknown-fields">>] [B<L<--include-field-pat|/"--include-field-pat=s, --field-pat">>=I<re>|B<L<-a|/"--include-field-pat=s, --field-pat">>|B<L<--field-pat|/"--include-field-pat=s, --field-pat">>=I<re>|B<L<--include-all-fields|/"--include-field-pat=s, --field-pat">>] [(B<L<--include-field|/"--include-fields-json=s">>=I<str>)+|B<L<--include-fields-json|/"--include-fields-json=s">>=I<json>|(B<L<-f|/"--include-fields-json=s">>=I<str>)+|(B<L<--field|/"--include-fields-json=s">>=I<str>)+] [B<L<--inplace|/"--inplace">>] [B<L<--inplace-backup-ext|/"--inplace-backup-ext=s, -b">>=I<str>|B<L<-b|/"--inplace-backup-ext=s, -b">>=I<str>] [B<L<--input-escape-char|/"--input-escape-char=s">>=I<str>] [B<L<--input-header|/"--no-input-header">>|B<L<--no-input-header|/"--no-input-header">>|B<L<--noinput-header|/"--no-input-header">>] [B<L<--input-quote-char|/"--input-quote-char=s">>=I<str>] [B<L<--input-sep-char|/"--input-sep-char=s">>=I<str>] [B<L<--input-skip-num-lines|/"--input-skip-num-lines=s">>=I<L<posint|Sah::Schema::posint>>] [B<L<--input-skip-until-pattern|/"--input-skip-until-pattern=s">>=I<L<re_from_str|Sah::Schema::re_from_str>>] [B<L<--input-tsv|/"--input-tsv">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--output-always-quote|/"--output-always-quote">>|B<L<--no-output-always-quote|/"--output-always-quote">>|B<L<--nooutput-always-quote|/"--output-always-quote">>] [B<L<--output-escape-char|/"--output-escape-char=s">>=I<str>] [B<L<--output-header|/"--output-header">>|B<L<--no-output-header|/"--output-header">>|B<L<--nooutput-header|/"--output-header">>] [B<L<--output-quote-char|/"--output-quote-char=s">>=I<str>] [B<L<--output-quote-empty|/"--output-quote-empty">>|B<L<--no-output-quote-empty|/"--output-quote-empty">>|B<L<--nooutput-quote-empty|/"--output-quote-empty">>] [B<L<--output-sep-char|/"--output-sep-char=s">>=I<str>] [B<L<--output-tsv|/"--output-tsv">>|B<L<--no-output-tsv|/"--output-tsv">>|B<L<--nooutput-tsv|/"--output-tsv">>] [B<L<--overwrite|/"--overwrite, -O">>|B<L<-O|/"--overwrite, -O">>|B<L<--no-overwrite|/"--overwrite, -O">>|B<L<--nooverwrite|/"--overwrite, -O">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--show-selected-fields|/"--show-selected-fields">>] -- [I<L<input_filename|/"--input-filename=s">>] [I<L<output_filename|/"--output-filename=s, -o">>]
 
 
 
@@ -70,6 +70,31 @@ C<*> marks required options.
 =item B<--ignore-unknown-fields>
 
 When unknown fields are specified in --include-field (--field) or --exclude-field options, ignore them instead of throwing an error.
+
+=item B<--input-skip-num-lines>=I<s>
+
+Number of lines to skip before header row.
+
+This can be useful if you have a CSV files (usually some generated reports,
+sometimes converted from spreadsheet) that have additional header lines or info
+before the CSV header row.
+
+See also the alternative option: C<--input-skip-until-pattern>.
+
+
+=item B<--input-skip-until-pattern>=I<s>
+
+Skip rows until the first header row matches a regex pattern.
+
+This is an alternative to the C<--input-skip-num-lines> and can be useful if you
+have a CSV files (usually some generated reports, sometimes converted from
+spreadsheet) that have additional header lines or info before the CSV header
+row.
+
+With C<--input-skip-num-lines>, you skip a fixed number of lines. With this
+option, rows will be skipped until the first field matches the specified regex
+pattern.
+
 
 =item B<--show-selected-fields>
 
@@ -125,17 +150,17 @@ Field names to include, takes precedence over --exclude-field-pat (JSON-encoded)
 
 See C<--include-field>.
 
-=item B<-A>
-
-Shortcut for --exclude-field-pat=.*, effectively excluding all fields.
-
-See C<--exclude-field-pat>.
-
 =item B<-a>
 
 Shortcut for --field-pat=.*, effectively selecting all fields.
 
 See C<--include-field-pat>.
+
+=item B<-A>
+
+Shortcut for --exclude-field-pat=.*, effectively excluding all fields.
+
+See C<--exclude-field-pat>.
 
 =back
 

@@ -66,3 +66,7 @@
         that will unpack AVs and AVs of AVs into regular C arrays, both
         integer and floating point types - after determining that av_fetch
         is thread-safe provided the option to "grow" the array of off 
+
+0.1.8  02/04/2025 01:08:00 AM MST
+      - removed PerlOMP_GETENV_ALL due to failing test and dubious
+        utility;

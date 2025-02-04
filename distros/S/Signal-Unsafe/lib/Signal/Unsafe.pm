@@ -1,7 +1,7 @@
 package Signal::Unsafe;
-$Signal::Unsafe::VERSION = '0.006';
+$Signal::Unsafe::VERSION = '0.007';
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 
 use XSLoader;
 XSLoader::load(__PACKAGE__, Signal::Unsafe->VERSION);
@@ -11,14 +11,16 @@ our @EXPORT_OK = qw/sigaction/;
 
 use Config;
 use IPC::Signal qw/sig_num sig_name/;
+use Scalar::Util 'blessed';
 use List::Util 'reduce';
-use POSIX qw/SA_SIGINFO/;
+use POSIX ();
+use Signal::Info;
 
 {
 	no warnings 'once';
 	tie %Signal::Unsafe, __PACKAGE__;
 }
-our $Flags = SA_SIGINFO;
+our $Flags = POSIX::SA_SIGINFO;
 our $Mask  = POSIX::SigSet->new;
 
 my $sig_max = $Config{sig_count} - 1;
@@ -51,23 +53,24 @@ my %flag_values = (
 	nocldwait => POSIX::SA_NOCLDWAIT,
 );
 
-sub get_args {
+sub make_action {
 	my $value = shift;
-	if (ref $value eq 'ARRAY') {
+	if (blessed($value) && $value->isa('POSIX::SigAction')) {
+		return $value;
+	} elsif (ref $value eq 'ARRAY') {
 		my ($handler, $flags, $mask) = @{$value};
 		$mask = $Mask if not defined $mask;
 		$flags = not defined $flags ? $Flags : ref($flags) ne 'ARRAY' ? $flags : reduce { $a | $b } map { $flag_values{$_} } @{$flags};
-		return ($handler, $mask, $flags);
+		return POSIX::SigAction->new($handler, $mask, $flags);
 	}
 	else {
-		return ($value, $Flags, $Mask);
+		return POSIX::SigAction->new($value, $Mask, $Flags);
 	}
 }
 
 sub STORE {
 	my ($self, $key, $value) = @_;
-	my ($handler, $flags, $mask) = get_args($value);
-	sigaction(sig_num($key), POSIX::SigAction->new($handler, $mask, $flags));
+	sigaction(sig_num($key), make_action($value));
 	return;
 }
 
@@ -137,7 +140,7 @@ Signal::Unsafe - Unsafe signal handlers made convenient
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -192,6 +195,8 @@ This hash contains handlers for signals. It accepts various values:
 
 =back
 
+=item * If a C<POSIX::SigAction> object is written to is, it will be used as-is.
+
 =item * If an undefined value is written to it, the handler is reset to default.
 
 =back
@@ -216,47 +221,9 @@ The signal handler will be called as soon as the signal is dispatched to the pro
 
 This is simple the number of the signal
 
-=item * The signal information hash
+=item * The L<Signal::Info|Signal::Info> object with the information about the signal.
 
-This is a hash containing the following entries:
-
-=over 4
-
-=item * signo
-
-=item * code
-
-=item * errno
-
-=item * pid
-
-=item * uid
-
-=item * status
-
-=item * utime
-
-=item * stime
-
-=item * int
-
-=item * ptr
-
-=item * overrun
-
-=item * timerid
-
-=item * addr
-
-=item * band
-
-=item * fd
-
-=back
-
-Most values are not meaningful for most signal events.
-
-=item * The signal information as a binary blob
+=item * The context pointer (as an unsigned integer)
 
 =back
 

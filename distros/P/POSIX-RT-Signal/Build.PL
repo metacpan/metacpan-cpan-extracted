@@ -19,8 +19,9 @@ my $builder = Module::Build->new(
   },
   'requires' => {
     'Carp' => '0',
+    'Exporter' => '0',
     'POSIX' => '0',
-    'Sub::Exporter::Progressive' => '0',
+    'Signal::Info' => '0',
     'XSLoader' => '0',
     'strict' => '0',
     'threads::shared' => '0',

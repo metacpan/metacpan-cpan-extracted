@@ -2,6 +2,7 @@
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
+#include "ppport.h"
 
 #define MY_CXT_KEY "Signal::Unsafe" XSVERSION
 typedef struct {
@@ -12,41 +13,10 @@ START_MY_CXT;
 
 typedef int SysRet;
 
-#define add_iv(name) hv_stores(args, #name, newSViv(info->si_##name))
-#define add_uv(name) hv_stores(args, #name, newSVuv(info->si_##name))
-#define add_ptr(name) hv_stores(args, #name, newSVuv(PTR2UV(info->si_##name)))
-
-#ifndef si_int
-#define si_int si_value.sival_int
-#endif
-#ifndef si_ptr
-#define si_ptr si_value.sival_ptr
-#endif
-
 static SV* S_make_args(pTHX_ siginfo_t* info) {
-	HV* args = newHV();
-	add_iv(signo);
-	add_iv(errno);
-	add_iv(code);
-#ifdef si_utime
-	add_uv(utime);
-	add_uv(stime);
-#endif
-	add_iv(pid);
-	add_iv(uid);
-	add_iv(status);
-	add_ptr(addr);
-	add_iv(int);
-	add_ptr(ptr);
-#ifdef si_timerid
-	add_iv(timerid);
-	add_iv(overrun);
-#endif
-#if defined(si_fd) && !defined(__OpenBSD__)
-	add_iv(fd);
-	add_iv(band);
-#endif
-	return newRV_noinc((SV*)args);
+	SV* result = newSV(0);
+	sv_setref_pvn(result, "Signal::Info", (const char*)info, sizeof(*info));
+	return result;
 }
 #define make_args(info) S_make_args(aTHX_ info)
 
@@ -63,9 +33,9 @@ static void smart_handler(int signo, siginfo_t* info, void* context) {
 	SAVETMPS;
 	PUSHMARK(SP);
 	EXTEND(SP, 3);
-	PUSHs(sv_2mortal(newSViv(signo)));
-	PUSHs(sv_2mortal(make_args(info)));
-	PUSHs(sv_2mortal(newSVpvn((const char*)info, sizeof *info)));
+	mPUSHi(signo);
+	mPUSHs(make_args(info));
+	mPUSHu(PTR2UV(context));
 	PUTBACK;
 	call_sv((SV*)callback, G_VOID | G_DISCARD);
 	FREETMPS;

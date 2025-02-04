@@ -1,5 +1,5 @@
 package ExtUtils::Typemaps::Slurp;
-$ExtUtils::Typemaps::Slurp::VERSION = '0.002';
+$ExtUtils::Typemaps::Slurp::VERSION = '0.003';
 use strict;
 use warnings;
 
@@ -19,7 +19,7 @@ sub new {
 
 1;
 
-# ABSTRACT: Typemap for storing objects as a string reference
+# ABSTRACT: Typemap for slurping arguments
 
 __END__
 
@@ -29,11 +29,11 @@ __END__
 
 =head1 NAME
 
-ExtUtils::Typemaps::Slurp - Typemap for storing objects as a string reference
+ExtUtils::Typemaps::Slurp - Typemap for slurping arguments
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -44,7 +44,7 @@ In typemap
 
 In your XS:
 
- static void my_init_t_gather(my_init_t* init, size_t count, SV** args) {
+ static void my_init_t_gather(my_init_t* init, SV** args, size_t count) {
      ...;
  }
 

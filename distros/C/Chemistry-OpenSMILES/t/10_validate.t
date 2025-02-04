@@ -27,7 +27,11 @@ my %cases = (
     'B(C(=CC(C)(C)C)c1c(F)c(F)c(F)c(F)c1F)(c1c(F)c(F)c(F)c(F)c1F)/c1c(F)c(F)c(F)c(F)c1F' => 'cis/trans bond is defined between atoms B(0) and c(29), but neither of them is attached to a double bond',
 
     # COD entry 1547257, r297409
-    'O=C(/C=C/c1c(OC)cccc1OC)/C=C(O)/C=C/c1c(OC)cccc1OC' => 'atom C(1) has 2 bonds of type \'/\', cis/trans definitions must not conflict',
+    'O=C(/C=C/c1c(OC)cccc1OC)/C=C(O)/C=C/c1c(OC)cccc1OC' => undef,
+
+    # From COD entry 4501115, r297562
+    'OC(=C\C(=O)/C=C/c1ccc(O)c(OC)c1)/C=C/c1cc(OC)c(cc1)O' => undef,
+    'OC(=C\C/C=C/c1ccc(O)c(OC)c1)/C=C/c1cc(OC)c(cc1)O' => undef,
 );
 
 plan tests => scalar keys %cases;

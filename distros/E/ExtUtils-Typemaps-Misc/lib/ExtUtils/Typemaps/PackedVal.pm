@@ -1,5 +1,5 @@
 package ExtUtils::Typemaps::PackedVal;
-$ExtUtils::Typemaps::PackedVal::VERSION = '0.002';
+$ExtUtils::Typemaps::PackedVal::VERSION = '0.003';
 use strict;
 use warnings;
 
@@ -18,7 +18,7 @@ sub new {
 
 1;
 
-# ABSTRACT: Typemap for storing objects as a string reference
+# ABSTRACT: Typemap for storing objects using external helper functions
 
 __END__
 
@@ -28,11 +28,11 @@ __END__
 
 =head1 NAME
 
-ExtUtils::Typemaps::PackedVal - Typemap for storing objects as a string reference
+ExtUtils::Typemaps::PackedVal - Typemap for storing objects using external helper functions
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

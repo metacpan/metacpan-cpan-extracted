@@ -1,9 +1,10 @@
 package Mail::DMARC::Report::Store;
-our $VERSION = '1.20240314';
+our $VERSION = '1.20250203';
 use strict;
 use warnings;
 
 use Carp;
+use Module::Load;
 
 use parent 'Mail::DMARC::Base';
 
@@ -40,7 +41,7 @@ sub backend {
 
     return $self->{$backend} if ref $self->{$backend};
     my $module = "Mail::DMARC::Report::Store::$backend";
-    eval "use $module";    ## no critic (Eval)
+    load $module;
     if ($@) {
         croak "Unable to load backend $backend: $@\n";
     }
@@ -60,7 +61,7 @@ Mail::DMARC::Report::Store - persistent storage broker for reports
 
 =head1 VERSION
 
-version 1.20240314
+version 1.20250203
 
 =head1 SYNOPSIS
 
@@ -92,7 +93,7 @@ Marc Bradshaw <marc@marcbradshaw.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Matt Simerson.
+This software is copyright (c) 2025 by Matt Simerson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

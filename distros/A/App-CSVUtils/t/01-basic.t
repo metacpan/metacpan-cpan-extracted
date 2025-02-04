@@ -27,6 +27,8 @@ write_text("$dir/1.tsv", "f1\tf2\tf3\n1\t2\t3\n4\t5\t6\n7\t8\t9\n");
 
 write_text("$dir/sep_char-semicolon.csv", "f1;f2\n1;2\n3;4\n");
 
+write_text("$dir/input-skip-lines.csv", "first line\nsecond line\nthird line\nf1,f2\n1,2\n2,4\n3,6\n");
+
 write_text("$dir/sort-rows.csv", qq(f1,f2\n2,andy\n1,Andy\n10,Chuck\n));
 write_text("$dir/sort-fields.csv", qq(four,two,eighteen\n4,2,18));
 
@@ -36,6 +38,24 @@ subtest "common option: input_sep_char" => sub {
     require App::CSVUtils::csv_dump;
     $res = App::CSVUtils::csv_dump::csv_dump(input_filename=>"$dir/sep_char-semicolon.csv", input_sep_char=>";");
     is_deeply($res, [200,"OK",[["f1","f2"],[1,2],[3,4]]])
+        or diag explain $res;
+};
+
+subtest "common option: input_skip_num_lines" => sub {
+    my $res;
+
+    require App::CSVUtils::csv_dump;
+    $res = App::CSVUtils::csv_dump::csv_dump(input_filename=>"$dir/input-skip-lines.csv", input_skip_num_lines => 3);
+    is_deeply($res, [200,"OK",[["f1","f2"],[1,2],[2,4],[3,6]]])
+        or diag explain $res;
+};
+
+subtest "common option: input_skip_until_pattern" => sub {
+    my $res;
+
+    require App::CSVUtils::csv_dump;
+    $res = App::CSVUtils::csv_dump::csv_dump(input_filename=>"$dir/input-skip-lines.csv", input_skip_until_pattern => qr/f1/);
+    is_deeply($res, [200,"OK",[["f1","f2"],[1,2],[2,4],[3,6]]])
         or diag explain $res;
 };
 

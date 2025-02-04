@@ -14,3 +14,7 @@ class Transmitter:
     @staticmethod
     def set_config_source(source_path):
         return TransmitterWrapper.set_config_source(source_path)
+
+    @staticmethod
+    def set_javonet_working_directory(path):
+        return TransmitterWrapper.set_javonet_working_directory(path)

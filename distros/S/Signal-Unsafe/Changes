@@ -1,5 +1,10 @@
 Revision history for Signal-Unsafe
 
+0.007     2025-02-04 04:34:58+01:00 Europe/Brussels
+          - Make second signal handler argument a Signal::Info object
+          - Make third signal handler argument an opaque pointer
+          - Allow POSIX::SigAction objects as hash value
+
 0.006     2014-08-28 14:51:59+02:00 Europe/Amsterdam
           Export sigaction optionally
 

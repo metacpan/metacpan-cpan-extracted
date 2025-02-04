@@ -1,7 +1,7 @@
 {
-   "abstract" : "check an HTTP status",
+   "abstract" : "Test HTTP status codes of URLs",
    "author" : [
-      "brian d foy <bdfoy@cpan.org>"
+      "brian d foy <bdfoy@cpan.org>, Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
@@ -21,44 +21,44 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {}
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.64",
-            "File::Spec::Functions" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "HTTP::SimpleLinkChecker" : "1.165",
             "Mojo::URL" : "0",
-            "Mojolicious" : "6",
-            "perl" : "5.010"
+            "Mojo::UserAgent" : "0",
+            "Test::Builder::Module" : "0",
+            "perl" : "5.010001",
+            "warnings" : "0"
          }
       },
       "test" : {
          "requires" : {
-            "Test::Builder::Module" : "0",
             "Test::DescribeMe" : "0",
             "Test::Most" : "0",
-            "Test::Needs" : "0"
+            "Test::Needs" : "0",
+            "Test::RequiresInternet" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/nigelhorne/Test-HTTPStatus/issues"
+         "web" : "https://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-HTTPStatus"
       },
-      "homepage" : "https://github.com/nigelhorne/Test-HTTPStatus",
+      "homepage" : "https://metacpan.org/release/Test-HTTPStatus",
       "repository" : {
-         "type" : "git",
-         "url" : "https://github.com/nigelhorne/Test-HTTPStatus.git",
-         "web" : "https://github.com/nigelhorne/Test-HTTPStatus"
+         "url" : "https://github.com/username/Test-HTTPStatus"
       }
    },
-   "version" : "2.06",
+   "version" : "2.07",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

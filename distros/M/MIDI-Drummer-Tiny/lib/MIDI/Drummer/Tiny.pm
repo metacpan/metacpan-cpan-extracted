@@ -3,14 +3,14 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Glorified metronome
 
-our $VERSION = '0.5009';
+our $VERSION = '0.5010';
 
 use Moo;
 use strictures 2;
 use Data::Dumper::Compact qw(ddc);
 use List::Util qw(sum0);
 use Math::Bezier ();
-use MIDI::Util qw(dura_size reverse_dump set_time_signature timidity_conf play_timidity);
+use MIDI::Util qw(dura_size reverse_dump set_time_signature timidity_conf play_timidity play_fluidsynth);
 use Music::Duration ();
 use Music::RhythmSet::Util qw(upsize);
 use namespace::clean;
@@ -661,17 +661,13 @@ sub timidity_cfg {
 
 sub play_with_timidity {
     my ($self, $config) = @_;
-    $self->write;
-    my @cmd;
-    if ($self->soundfont) {
-        $config ||= 'timidity-midi-util.cfg';
-        timidity_conf($self->soundfont, $config);
-        @cmd = ('timidity', '-c', $config, '-Od', $self->file);
-    }
-    else {
-        @cmd = ('timidity', $self->file);
-    }
-    system(@cmd) == 0 or die "system(@cmd) failed: $?";
+    play_timidity($self->score, $self->file, $self->soundfont, $config);
+}
+
+
+sub play_with_fluidsynth {
+    my ($self, $config) = @_;
+    play_fluidsynth($self->score, $self->file, $self->soundfont, $config);
 }
 
 # lifted from https://www.perlmonks.org/?node_id=56906
@@ -703,7 +699,7 @@ MIDI::Drummer::Tiny - Glorified metronome
 
 =head1 VERSION
 
-version 0.5009
+version 0.5010
 
 =head1 SYNOPSIS
 
@@ -762,10 +758,10 @@ version 0.5009
   $d->timidity_cfg('timidity-drummer.cfg');
 
   $d->write;
-
   # OR:
-
   $d->play_with_timidity;
+  # OR:
+  $d->play_with_fluidsynth;
 
 =head1 DESCRIPTION
 
@@ -1218,6 +1214,17 @@ If there is a B<soundfont> attribute, either the given B<config_file>
 or C<timidity-midi-util.cfg> is used for the timidity configuration.
 If a soundfont is not defined, a timidity configuration file is not
 rendered.
+
+See L<MIDI::Util/play_timidity> for more details.
+
+=head2 play_with_fluidsynth
+
+  $d->play_with_fluidsynth;
+  $d->play_with_fluidsynth(\@config);
+
+Play the score with C<fluidsynth>.
+
+See L<MIDI::Util/play_fluidsynth> for more details.
 
 =head1 SEE ALSO
 

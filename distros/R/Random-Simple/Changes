@@ -1,3 +1,7 @@
+0.20 2025-02-03
+	- Calculate random floating point without bias
+	- Use a better hashing function for srand()
+
 0.18 2025-01-15
 	- Drop `nanos()` for seeding because it isn't well supported on Windows
 	- Document how to manually seed the PRNG

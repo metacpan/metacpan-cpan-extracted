@@ -3,6 +3,7 @@ use warnings;
 use utf8;
 use ExtUtils::MakeMaker;
 use File::ShareDir::Install;
+use File::Find;
 
 install_share dist => 'share';
 

@@ -1,5 +1,11 @@
 Revision history for CXC-Data-Visitor
 
+0.06      2025-02-03 22:59:00-05:00 America/New_York
+
+  [ENHANCEMENT]
+
+    * descent into a container can be avoided via RETURN_STOP_DESCENT
+
 0.05      2024-06-18 18:21:55-04:00 America/New_York
 
   [ENHANCEMENTS]

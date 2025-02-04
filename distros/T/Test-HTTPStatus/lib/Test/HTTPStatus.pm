@@ -2,7 +2,7 @@ package Test::HTTPStatus;
 use strict;
 
 use warnings;
-no warnings;
+# no warnings;
 
 =encoding utf8
 
@@ -25,12 +25,13 @@ Check the HTTP status for a resource.
 =cut
 
 use v5.10.1;  # Mojolicious is v5.10.1 and later
-our $VERSION = '2.06';
+our $VERSION = '2.07';
 
 use parent 'Test::Builder::Module';
 
 use Carp qw(carp);
-use HTTP::SimpleLinkChecker;
+# use HTTP::SimpleLinkChecker;
+use Mojo::UserAgent;
 use Test::Builder::Module;
 use Mojo::URL;
 
@@ -152,6 +153,10 @@ sub http_ok {
 		}
 	}
 
+my $UA ||= Mojo::UserAgent->new();
+$UA->proxy->detect();
+$UA->max_redirects(3);
+
 sub _get_status {
 	my $string = shift;
 
@@ -160,9 +165,34 @@ sub _get_status {
 	my $url = Mojo::URL->new( $string );
 	return { status => undef } unless $url->host;
 
-	my $status = HTTP::SimpleLinkChecker::check_link( $url );
+	my $status = _check_link( $url );
 
 	return { url => $url, status => $status };
+	}
+
+# From HTTP::SimpleLinkChecker, which has been deleted
+sub _check_link {
+	my( $link ) = @_;
+	say STDERR "Link is $link";
+	unless( defined $link ) {
+		# $ERROR = 'Received no argument';
+		return;
+		}
+
+	my $transaction = $UA->head($link);
+	my $response = $transaction->res;
+
+	if( !($response and $response->code >= 400) ) {
+		$transaction = $UA->get($link);
+		$response = $transaction->res;
+		}
+
+	unless( ref $response ) {
+		# $ERROR = 'Could not get response';
+		return;
+		}
+
+	return $response->code;
 	}
 
 =head1 SEE ALSO

@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-01-14'; # DATE
+our $DATE = '2025-02-04'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.035'; # VERSION
+our $VERSION = '1.036'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/CSVUtils/csv2vcf/csv2vcf",
@@ -41,7 +41,7 @@ csv2vcf - Create a VCF from selected fields of the CSV
 
 =head1 VERSION
 
-This document describes version 1.035 of csv2vcf (from Perl distribution App-CSVUtils), released on 2025-01-14.
+This document describes version 1.036 of csv2vcf (from Perl distribution App-CSVUtils), released on 2025-02-04.
 
 =head1 SYNOPSIS
 
@@ -49,7 +49,7 @@ B<csv2vcf> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?
 
 B<csv2vcf> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<csv2vcf> [B<L<--cell-vcf-field|/"--cell-vcf-field=s">>=I<str>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--email-vcf-field|/"--email-vcf-field=s">>=I<str>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--input-escape-char|/"--input-escape-char=s">>=I<str>] [B<L<--input-header|/"--no-input-header">>|B<L<--no-input-header|/"--no-input-header">>|B<L<--noinput-header|/"--no-input-header">>] [B<L<--input-quote-char|/"--input-quote-char=s">>=I<str>] [B<L<--input-sep-char|/"--input-sep-char=s">>=I<str>] [B<L<--input-tsv|/"--input-tsv">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--name-vcf-field|/"--name-vcf-field=s">>=I<str>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- [I<L<input_filename|/"--input-filename=s">>]
+B<csv2vcf> [B<L<--cell-vcf-field|/"--cell-vcf-field=s">>=I<str>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--email-vcf-field|/"--email-vcf-field=s">>=I<str>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--input-escape-char|/"--input-escape-char=s">>=I<str>] [B<L<--input-header|/"--no-input-header">>|B<L<--no-input-header|/"--no-input-header">>|B<L<--noinput-header|/"--no-input-header">>] [B<L<--input-quote-char|/"--input-quote-char=s">>=I<str>] [B<L<--input-sep-char|/"--input-sep-char=s">>=I<str>] [B<L<--input-skip-num-lines|/"--input-skip-num-lines=s">>=I<L<posint|Sah::Schema::posint>>] [B<L<--input-skip-until-pattern|/"--input-skip-until-pattern=s">>=I<L<re_from_str|Sah::Schema::re_from_str>>] [B<L<--input-tsv|/"--input-tsv">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--name-vcf-field|/"--name-vcf-field=s">>=I<str>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- [I<L<input_filename|/"--input-filename=s">>]
 
 
 
@@ -75,6 +75,31 @@ Select field to use as VCF CELL field.
 =item B<--email-vcf-field>=I<s>
 
 Select field to use as VCF EMAIL field.
+
+=item B<--input-skip-num-lines>=I<s>
+
+Number of lines to skip before header row.
+
+This can be useful if you have a CSV files (usually some generated reports,
+sometimes converted from spreadsheet) that have additional header lines or info
+before the CSV header row.
+
+See also the alternative option: C<--input-skip-until-pattern>.
+
+
+=item B<--input-skip-until-pattern>=I<s>
+
+Skip rows until the first header row matches a regex pattern.
+
+This is an alternative to the C<--input-skip-num-lines> and can be useful if you
+have a CSV files (usually some generated reports, sometimes converted from
+spreadsheet) that have additional header lines or info before the CSV header
+row.
+
+With C<--input-skip-num-lines>, you skip a fixed number of lines. With this
+option, rows will be skipped until the first field matches the specified regex
+pattern.
+
 
 =item B<--name-vcf-field>=I<s>
 

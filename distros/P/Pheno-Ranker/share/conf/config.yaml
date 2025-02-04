@@ -15,9 +15,12 @@ primary_key: id
 allowed_terms: [biosamples,diseases,ethnicity,exposures,files,geographicOrigin,id,info,interpretations,interventionsOrProcedures,karyotypicSex,measurements,measures,medicalActions,metaData,pedigrees,phenotypicFeatures,sex,subject,treatments]
 
 # Set the limit on the maximum number of variables to be used; if exceeded, selection of variables will be random
-max_number_var: 10000
+max_number_vars: 10000
 
-# Set the seed number to initialize a pseudorandom number generator for max_number_var
+# Set the limit of number of individuals before switch to RAM efficient calculation in cohort mode
+max_matrix_items_in_ram: 5000
+
+# Set the seed number to initialize a pseudorandom number generator for max_number_vars
 seed: 123456789 
 
 # Set the regex to exclude variables matching a specific pattern

@@ -9,7 +9,7 @@ use Carp;
 
 # The following must be on the same line to ensure that $VERSION is read
 # correctly by PAUSE and installer tools. See docu of 'version'.
-use version 0.77; our $VERSION = version->declare("v2.3.3");
+use version 0.77; our $VERSION = version->declare("v2.3.4");
 
 
 sub new {
@@ -359,12 +359,17 @@ sub get {
   my $src          = delete $args{src}          // croak("Invalid value argument for 'src'");
   croak(join(", ", sort(keys(%args))) . ": unexpected argument") if %args;
   my $inputArray;
-  if (ref($src)) {
-    croak("Invalid value argument for 'src'") if ref($src) ne 'ARRAY';
-    foreach my $e (@{$src}) {
-      croak("src: each entry must be a defined scalar") if (ref($e) || !defined($e));
+  if (my $ref_str = ref($src)) {
+    if ($ref_str eq 'ARRAY') {
+      foreach my $e (@{$src}) {
+        croak("src: each entry must be a defined scalar") if (ref($e) || !defined($e));
+      }
+      $inputArray = $src;
+    } elsif ($ref_str eq 'GLOB') {
+      $inputArray = [<$src>];
+    } else {
+      croak("Invalid value argument for 'src'");
     }
-    $inputArray = $src;
   } elsif ($src !~ /\n/) {
     open(my $h, '<', $src);
     $inputArray = [<$h>];
@@ -484,7 +489,7 @@ Text::Table::Read::RelationOn::Tiny - Read binary "relation on (over) a set" fro
 
 =head1 VERSION
 
-Version v2.3.3
+Version v2.3.4
 
 
 =head1 SYNOPSIS
@@ -497,12 +502,10 @@ Version v2.3.3
 
 =head1 DESCRIPTION
 
-Minimum version of perl required to use this module: C<v5.10.1>.
-
 This module implements a class that reads a binary I<relation on a set>
 (I<homogeneous relation>, see
 L<https://en.wikipedia.org/wiki/Binary_relation#Homogeneous_relation>) from a
-text table.
+text table, which could be described as a "two-valued cross table".
 
 The table format must look like this:
 
@@ -561,6 +564,8 @@ the set of the header names and the set of the row names must be equal, but
 this can be changed by argument C<allow_subset> of method C<get>.
 
 =back
+
+Minimum version of perl required to use this module: C<v5.10.1>.
 
 
 =head2 METHODS
@@ -703,13 +708,18 @@ The method reads and parses a table. It takes the following named arguments:
 =item C<src>
 
 Mandatory. The source from which the table is to be read. May be either a file
-name, an array reference or a string containing newline characters.
+name, a file handle, an array reference or a string containing newline characters.
 
 =over
 
 =item Argument is an array reference
 
 The method treats the array entries as the rows of the table.
+
+=item Argument is an open file handle (C<GLOB>)
+
+The method tries to read the table from that file handle.
+The handle is not closed.
 
 =item Argument is a string containing newlines
 

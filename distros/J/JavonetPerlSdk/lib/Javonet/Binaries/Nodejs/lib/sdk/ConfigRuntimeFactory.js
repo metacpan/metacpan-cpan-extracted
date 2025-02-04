@@ -127,7 +127,7 @@ class ConfigRuntimeFactory {
     #loadModules(runtime, configName, jfr, rtmCtx) {
         const modules = jfr
             .getModules(RuntimeNameHandler.getName(runtime), configName)
-            .split(';')
+            .split(',')
             .filter((module) => module.trim() !== '')
 
         const configDirectoryAbsolutePath = require('path').dirname(this.path)

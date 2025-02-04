@@ -1,12 +1,16 @@
 package POSIX::RT::Signal;
-$POSIX::RT::Signal::VERSION = '0.017';
+$POSIX::RT::Signal::VERSION = '0.018';
 use strict;
-use warnings FATAL => 'all';
+use warnings;
+
+use Exporter 'import';
+our @EXPORT = qw/sigwaitinfo sigtimedwait sigwait sigqueue allocate_signal deallocate_signal/;
+our %EXPORT_TAGS = (all => \@EXPORT);
 
 use Carp qw/croak/;
 use POSIX qw//;
 use XSLoader;
-use Sub::Exporter::Progressive -setup => { exports => [qw/sigwaitinfo sigtimedwait sigwait sigqueue allocate_signal deallocate_signal/] };
+use Signal::Info;
 use threads::shared;
 
 XSLoader::load(__PACKAGE__, __PACKAGE__->VERSION);
@@ -43,7 +47,7 @@ POSIX::RT::Signal - POSIX Real-time signal handling functions
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 SYNOPSIS
 
@@ -66,57 +70,11 @@ Queue a signal $sig to process C<$pid>, optionally with the additional argument 
 
 =head2 sigwaitinfo($signals)
 
-Wait for a signal in C<$signals> to arrive and return information on it. The signal handler (if any) will not be called. Unlike signal handlers it is not affected by signal masks, in fact you are expected to mask signals you're waiting for. C<$signals> must either be a POSIX::SigSet object, a signal number or a signal name. If interrupted in non-void context it returns false, on any other error it throws an exception.
-
-=over 4
-
-=item * signo
-
-The signal number
-
-=item * code
-
-The signal code, a signal-specific code that gives the reason why the signal was generated
-
-=item * errno
-
-If non-zero, an errno value associated with this signal
-
-=item * pid
-
-Sending process ID
-
-=item * uid
-
-Real user ID of sending process
-
-=item * addr
-
-The address of faulting instruction
-
-=item * status
-
-Exit value or signal
-
-=item * band
-
-Band event for SIGPOLL
-
-=item * value
-
-Signal integer value as passed to sigqueue
-
-=item * ptr
-
-The pointer integer as passed to sigqueue
-
-=back
-
-Note that not all of these will have meaningful values for all or even most signals
+Wait for a signal in C<$signals> to arrive and return information on it as a L<Signal::Info> object. The signal handler (if any) will not be called. Unlike signal handlers it is not affected by signal masks, in fact you are expected to mask signals you're waiting for. C<$signals> must either be a POSIX::SigSet object, a signal number or a signal name. On error it returns an C<undef> and C<$!> should be consulted.
 
 =head2 sigtimedwait($signals, $timeout)
 
-This is like C<sigwaitinfo>, except it has an additional timeout that indicates the maximal time the thread is suspended in fractional seconds; if no signal is received it returns an empty list, or in void context an exception. Otherwise it behaves exactly the same as C<sigwaitinfo>.
+This is like C<sigwaitinfo>, except it has an additional timeout that indicates the maximal time the thread is suspended in fractional seconds; if no signal is received C<$!> will be C<EAGAIN>. Otherwise it behaves exactly the same as C<sigwaitinfo>.
 
 =head2 sigwait($signals)
 
@@ -136,13 +94,23 @@ Deallocate the signal to be reused for C<allocate_signal>.
 
 =item * L<Signal::Mask|Signal::Mask>
 
+An easy interface to signal masks
+
 =item * L<IPC::Signal|IPC::Signal>
+
+Utility functions dealing with signals
 
 =item * L<POSIX::RT::Timer|POSIX::RT::Timer>
 
-=item * L<POSIX|POSIX>
+POSIX real-time timers. These will produce signals on timeout.
 
 =item * L<Linux::FD::Signal|Linux::FD::Signal>
+
+Linux signal file descriptors. This is an alternative interface to signals that allows for polling alongside
+
+=item * L<POSIX|POSIX>
+
+This core module contains various used in dealing with signals.
 
 =back
 

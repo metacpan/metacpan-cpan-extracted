@@ -6,12 +6,12 @@ use lib 'lib';
 use Try::Tiny;
 use threads;
 use aliased 'Javonet::Sdk::Internal::RuntimeFactory' => 'RuntimeFactory';
-use aliased 'Javonet::Core::Transmitter::PerlTransmitter' => 'Transmitter', qw(activate_with_license_file activate_with_credentials activate_with_credentials_and_proxy);
+use aliased 'Javonet::Core::Transmitter::PerlTransmitter' => 'Transmitter', qw(activate send_command set_config_source set_javonet_working_directory);
 use aliased 'Javonet::Core::Exception::SdkExceptionHelper' => 'SdkExceptionHelper';
 use aliased 'Javonet::Sdk::Core::RuntimeLogger' => 'RuntimeLogger', qw(get_runtime_info);
 
 BEGIN {
-    SdkExceptionHelper->send_exception_to_app_insights("SdkMessage","Javonet Sdk initialized");
+    SdkExceptionHelper->send_exception_to_app_insights("SdkMessage", "Javonet Sdk initialized");
 }
 
 sub activate {
@@ -40,7 +40,7 @@ sub with_config {
         Transmitter->set_config_source($config_path);
         return RuntimeFactory->new(Javonet::Sdk::Internal::ConnectionType::get_connection_type('WithConfig'), undef, $config_path);
     } catch {
-        SdkExceptionHelper->send_exception_to_app_insights($_,"withConfig");
+        SdkExceptionHelper->send_exception_to_app_insights("SdkException", $_);
         die $_;
     };
 }
@@ -54,9 +54,27 @@ sub set_config_source {
     try {
         Transmitter->set_config_source($config_path);
     } catch {
-        SdkExceptionHelper->send_exception_to_app_insights($_,"setConfigSource");
+        SdkExceptionHelper->send_exception_to_app_insights("SdkException", $_);
         die $_;
     };
 }
+
+# Sets the working directory for the Javonet SDK.
+# @param $path [String] The working directory path.
+sub set_javonet_working_directory {
+    my ($self, $path) = @_;
+    try {
+        $path =~ s{\\}{/}g;
+        $path .= '/' unless $path =~ m{/$};
+        mkdir $path, 0700 unless -d $path;
+        #ActivationHelper->working_directory($path);
+        Transmitter->set_javonet_working_directory($path);
+    } catch {
+        SdkExceptionHelper->send_exception_to_app_insights("SdkException", $_);
+        die $_;
+    };
+}
+
+
 
 1;

@@ -47,3 +47,4 @@ t/31_write.t
 t/32_write.t
 t/33_allene_graph.t
 t/34_validate_allenes.t
+t/35_chirality_to_pseudograph.t

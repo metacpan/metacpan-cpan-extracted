@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Alien::OpenMP;
 
-our $VERSION = q{0.1.7};
+our $VERSION = q{0.1.8};
 
 # This module is a wrapper around a ".h" file that is injected into Alien::OpenMP
 # via Inline:C's AUTO_INCLUDE feature. This header file constains C MACROs for reading
@@ -125,19 +125,6 @@ Equivalent of using,
 The purpose of this bundled approach is to make it easier to get started
 quickly. This list may be updated between versions. This is the recommended
 one to use when starting with this module. See the L<SYNOPSIS> example.
-
-=item C<PerlOMP_GETENV_ALL>
-
-Equivalent of using,
-
-    PerlOMP_UPDATE_WITH_ENV__DEFAULT_DEVICE
-    PerlOMP_UPDATE_WITH_ENV__TEAMS_THREAD_LIMIT
-    PerlOMP_UPDATE_WITH_ENV__NUM_TEAMS
-    PerlOMP_UPDATE_WITH_ENV__MAX_ACTIVE_LEVELS
-    PerlOMP_UPDATE_WITH_ENV__NUM_THREADS
-    PerlOMP_UPDATE_WITH_ENV__DYNAMIC
-    PerlOMP_UPDATE_WITH_ENV__NESTED
-    PerlOMP_UPDATE_WITH_ENV__SCHEDULE
 
 =item C<PerlOMP_UPDATE_WITH_ENV__NUM_THREADS>
 

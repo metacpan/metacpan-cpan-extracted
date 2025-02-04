@@ -1,15 +1,15 @@
 ---
-abstract: 'check an HTTP status'
+abstract: 'Test HTTP status codes of URLs'
 author:
-  - 'brian d foy <bdfoy@cpan.org>'
+  - 'brian d foy <bdfoy@cpan.org>, Nigel Horne <njh@bandsman.co.uk>'
 build_requires:
-  Test::Builder::Module: '0'
+  ExtUtils::MakeMaker: '0'
   Test::DescribeMe: '0'
   Test::Most: '0'
   Test::Needs: '0'
+  Test::RequiresInternet: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '6.64'
-  File::Spec::Functions: '0'
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
@@ -23,13 +23,14 @@ no_index:
     - inc
 requires:
   Carp: '0'
-  HTTP::SimpleLinkChecker: '1.165'
   Mojo::URL: '0'
-  Mojolicious: '6'
-  perl: '5.010'
+  Mojo::UserAgent: '0'
+  Test::Builder::Module: '0'
+  perl: '5.010001'
+  warnings: '0'
 resources:
-  bugtracker: https://github.com/nigelhorne/Test-HTTPStatus/issues
-  homepage: https://github.com/nigelhorne/Test-HTTPStatus
-  repository: https://github.com/nigelhorne/Test-HTTPStatus.git
-version: '2.06'
+  bugtracker: https://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-HTTPStatus
+  homepage: https://metacpan.org/release/Test-HTTPStatus
+  repository: https://github.com/username/Test-HTTPStatus
+version: '2.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

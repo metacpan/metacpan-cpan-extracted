@@ -1,14 +1,43 @@
 package Crypt::SysRandom;
-$Crypt::SysRandom::VERSION = '0.005';
+$Crypt::SysRandom::VERSION = '0.006';
 use strict;
 use warnings;
 
-use XSLoader;
-
-XSLoader::load(__PACKAGE__, __PACKAGE__->VERSION);
-
 use Exporter 'import';
 our @EXPORT_OK = 'random_bytes';
+
+use Carp ();
+use Errno ();
+
+if (eval { require Crypt::SysRandom::XS }) {
+	*random_bytes = \&Crypt::SysRandom::XS::random_bytes;
+} elsif (eval { require Win32::API }) {
+	my $genrand = Win32::API->new('advapi32', 'INT SystemFunction036(PVOID RandomBuffer, ULONG RandomBufferLength)')
+		or die "Could not import SystemFunction036: $^E";
+
+	*random_bytes = sub {
+		my ($count) = @_;
+		return '' if $count == 0;
+		my $buffer = chr(0) x $count;
+		$genrand->Call($buffer, $count) or Carp::croak("Could not read random bytes");
+		return $buffer;
+	};
+} elsif (-e '/dev/urandom') {
+	open my $fh, '<:raw', '/dev/urandom' or die "Couldn't open /dev/urandom: $!";
+	*random_bytes = sub {
+		my ($count) = @_;
+		my ($result, $offset) = ('', 0);
+		while ($offset < $count) {
+			my $read = sysread $fh, $result, $count - $offset, $offset;
+			next if not defined $read and $!{EINTR};
+			Carp::croak("Could not read random bytes") if not defined $read or $read == 0;
+			$offset += $read;
+		}
+		return $result;
+	};
+} else {
+	die "No source of randomness found";
+}
 
 1;
 
@@ -26,7 +55,7 @@ Crypt::SysRandom - Perl interface to system randomness
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -35,13 +64,27 @@ version 0.005
 
 =head1 DESCRIPTION
 
-This module uses whatever C interface is available to procure cryptographically random data from the system.
+This module uses whatever interface is available to procure cryptographically random data from the system.
 
 =head1 FUNCTIONS
 
 =head2 random_bytes($count)
 
 This will fetch a string of C<$count> random bytes containing cryptographically secure random date.
+
+=head1 Backends
+
+The current backends are tried in order:
+
+=over 4
+
+=item * L<Crypt::SysRandom::XS|Crypt::SysRandom::XS>
+
+=item * C<RtlGenRandom> using L<Win32::API|Win32::API>
+
+=item * C</dev/urandom>
+
+=back
 
 =head1 AUTHOR
 

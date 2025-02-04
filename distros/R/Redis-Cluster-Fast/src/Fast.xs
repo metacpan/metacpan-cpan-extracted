@@ -440,24 +440,42 @@ void run_cmd_impl_pipeline(pTHX_ Redis__Cluster__Fast self, int argc, const char
             node = get_node_by_random(aTHX_ self);
             if (node == NULL) {
                 reply_t->error = newSVpvf("%s", "No node found");
-                return;
+                goto error;
             }
 
             status = redisClusterAsyncCommandArgvToNode(self->acc, node, replyCallbackPipeline, reply_pipeline_t, argc, argv, argvlen);
             if (status != REDIS_OK) {
                 DEBUG_MSG("error: err=%d errstr=%s", self->acc->err, self->acc->errstr);
                 reply_t->error = newSVpvf("%s", self->acc->errstr);
-                return;
+                goto error;
             }
         } else {
             DEBUG_MSG("error: err=%d errstr=%s", self->acc->err, self->acc->errstr);
             reply_t->error = newSVpvf("%s", self->acc->errstr);
-            return;
+            goto error;
         }
     }
 
     self->pipeline_callback_remain++;
     DEBUG_MSG("pipeline callback remain: %ld", self->pipeline_callback_remain);
+    return;
+
+error:
+    SvREFCNT_dec(reply_pipeline_t->cb);
+    Safefree(reply_pipeline_t);
+}
+
+int Redis__Cluster__Fast_run_event_loop(pTHX_ Redis__Cluster__Fast self) {
+    int event_loop_error;
+    if (self->pipeline_callback_remain <= 0) {
+        return 0;
+    }
+    DEBUG_EVENT_BASE();
+    event_loop_error = event_base_loop(self->cluster_event_base, EVLOOP_ONCE);
+    if (event_loop_error != 0) {
+        return -1;
+    }
+    return 1;
 }
 
 int Redis__Cluster__Fast_wait_one_response(pTHX_ Redis__Cluster__Fast self) {
@@ -680,6 +698,13 @@ PPCODE:
     Safefree(result_context);
 
     XSRETURN(2);
+
+int
+__run_event_loop(Redis::Cluster::Fast self)
+CODE:
+    RETVAL = Redis__Cluster__Fast_run_event_loop(aTHX_ self);
+OUTPUT:
+    RETVAL
 
 int
 __wait_one_response(Redis::Cluster::Fast self)

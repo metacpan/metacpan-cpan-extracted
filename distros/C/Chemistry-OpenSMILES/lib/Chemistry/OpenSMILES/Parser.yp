@@ -334,9 +334,14 @@ sub parse
 
                 # Unify the representation of chirality
                 if( is_chiral $atom ) {
-                    if( $atom->{chirality} =~ /^@@?$/ &&
-                        $graph->degree( $atom ) == 2 ) {
-                        $atom->{chirality} =~ s/@+/'@AL' . length $&/e;
+                    if( $atom->{chirality} =~ /^@@?$/ ) {
+                        if(      $graph->degree( $atom ) == 2 ) {
+                            $atom->{chirality} =~ s/@+/'@AL' . length $&/e;
+                        } elsif( $graph->degree( $atom ) == 5 ) {
+                            $atom->{chirality} =~ s/@+/'@TB' . length $&/e;
+                        } elsif( $graph->degree( $atom ) == 6 ) {
+                            $atom->{chirality} =~ s/@+/'@OH' . length $&/e;
+                        }
                     }
 
                     $atom->{chirality} =~ s/^\@TH1$/@/;
@@ -399,8 +404,8 @@ sub _add_ring_bond
         }
         delete $self->{USER}{RINGBONDS}{$ring_bond};
 
-        if( is_chiral $ring_atom &&  $ring_atom->{chirality_neighbours} ) {
-            my $pos = first { !ref $ring_atom->{chirality_neighbours}[$_] &&
+        if( is_chiral $ring_atom && $ring_atom->{chirality_neighbours} ) {
+            my $pos = first { !ref  $ring_atom->{chirality_neighbours}[$_] &&
                               $ring_atom->{chirality_neighbours}[$_] == $ring_bond }
                             0..$#{$ring_atom->{chirality_neighbours}};
             $ring_atom->{chirality_neighbours}[$pos] = $atom if defined $pos;

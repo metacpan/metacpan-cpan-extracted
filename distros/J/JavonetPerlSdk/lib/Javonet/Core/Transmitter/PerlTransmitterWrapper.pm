@@ -15,6 +15,7 @@ my $read_response_native;
 my $activate_native;
 my $get_native_error_native;
 my $set_config_source_native;
+my $set_working_directory_native;
 
 sub initialize {
     my $osname = $^O;
@@ -53,6 +54,7 @@ sub initialize {
         $activate_native = $ffi->function('Activate' => ['string'] => 'int');
         $get_native_error_native = $ffi->function('GetNativeError' => [] => 'string');
         $set_config_source_native = $ffi->function('SetConfigSource' => ['string'] => 'int');
+        $set_working_directory_native = $ffi->function('SetWorkingDirectory' => ['string'] => 'int');
     }
 }
 
@@ -99,6 +101,19 @@ sub set_config_source {
     }
     else {
         return $set_config_result;
+    }
+}
+
+sub set_javonet_working_directory {
+    my ($self, $working_directory) = @_;
+    initialize();
+    my $set_working_directory_result = $set_working_directory_native->($working_directory);
+    if ($set_working_directory_result < 0) {
+        my $error_message = $get_native_error_native->();
+        die "Javonet set working directory result: $set_working_directory_result. Native error message: $error_message";
+    }
+    else {
+        return $set_working_directory_result;
     }
 }
 

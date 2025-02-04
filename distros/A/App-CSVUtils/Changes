@@ -1,3 +1,12 @@
+1.036   2025-02-04  Released-By: PERLANCAR; Urgency: medium
+
+        - Add options: --input-skip-num-lines, --input-skip-until-pattern.
+
+        [cli csv-concat]
+
+        - [doc][internal] Add more code comments on how csv_concat works.
+
+
 1.035   2025-01-14  Released-By: PERLANCAR; Urgency: medium
 
         - [cli csv-concat] Add --overlay mode & --overwrite-fields option.

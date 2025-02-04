@@ -30,7 +30,7 @@ requires:
 resources:
   homepage: https://github.com/Perl-OpenMP/p5-OpenMP-Simple
   repository: https://github.com/Perl-OpenMP/p5-OpenMP-Simple.git
-version: 0.1.7
+version: 0.1.8
 x_generated_by_perl: v5.40.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

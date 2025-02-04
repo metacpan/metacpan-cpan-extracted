@@ -28,4 +28,5 @@ module TransmitterWrapper
   attach_function :Activate, [:pointer], :int
   attach_function :GetNativeError, [], :string
   attach_function :SetConfigSource, [:pointer], :int
+  attach_function :SetWorkingDirectory, [:pointer], :int
 end

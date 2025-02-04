@@ -4,15 +4,17 @@ Random::Simple - Generate good random numbers in a user consumable way.
 
 # SYNOPSIS
 
-    use Random::Simple;
+use Random::Simple;
 
-    my $coin_flip      = random_int(1, 2);
-    my $die_roll       = random_int(1, 6);
-    my $random_percent = random_float() * 100;
-    my $buffer         = random_bytes(8);
+```perl
+my $coin_flip      = random_int(1, 2);
+my $die_roll       = random_int(1, 6);
+my $random_percent = random_float() * 100;
+my $buffer         = random_bytes(8);
 
-    my @arr            = ('red', 'green', 'blue');
-    my $rand_item      = random_elem(@arr);
+my @arr            = ('red', 'green', 'blue');
+my $rand_item      = random_elem(@arr);
+```
 
 # DESCRIPTION
 
@@ -24,8 +26,11 @@ better PRNG.
 
 `Random::Simple` is automatically seeded with entropy directly
 from your OS. On Linux this is `/dev/urandom` and on Windows it uses
-CryptGenRandom. You will get statistically unique random numbers
-automatically.
+CryptGenRandom.
+
+When you `use Random::Simple` we automatically upgrade `rand()` and `srand()`
+to use a modern PRNG with better statistical properties. As a bonus you also
+get a handful of other useful random related methods.
 
 # METHODS
 

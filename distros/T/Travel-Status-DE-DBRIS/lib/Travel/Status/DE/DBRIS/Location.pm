@@ -6,7 +6,7 @@ use 5.020;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 Travel::Status::DE::DBRIS::Location->mk_ro_accessors(
 	qw(eva id lat lon name products type is_cancelled is_additional is_separation display_priority
@@ -115,6 +115,12 @@ sub TO_JSON {
 	my ($self) = @_;
 
 	my $ret = { %{$self} };
+
+	for my $k (qw(sched_dep rt_dep dep sched_arr rt_arr arr)) {
+		if ( $ret->{$k} ) {
+			$ret->{$k} = $ret->{$k}->epoch;
+		}
+	}
 
 	return $ret;
 }

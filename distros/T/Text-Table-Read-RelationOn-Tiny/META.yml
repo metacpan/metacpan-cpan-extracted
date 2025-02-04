@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Text-Table-Read-RelationOn-Tiny
-version:            v2.3.3
+version:            v2.3.4
 abstract:           Read binary "relation on (over) a set" from a text table.
 author:
     - Abdul al Hazred <451@gmx.eu>

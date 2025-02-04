@@ -1,5 +1,10 @@
           Revision history for POSIX-RT-Signal
 
+0.018     2025-02-04 04:34:38+01:00 Europe/Brussels
+          - Use Signal::Info objects in sigwaitinfo/sigtimedinfo
+          - Simplify error handling in sigwaitinfo/sigtimedwait
+          - Use Exporter instead of Sub::Exporter::Progressive
+
 0.017     2024-01-31 22:02:46+01:00 Europe/Brussels
           - Use updated typemap
 

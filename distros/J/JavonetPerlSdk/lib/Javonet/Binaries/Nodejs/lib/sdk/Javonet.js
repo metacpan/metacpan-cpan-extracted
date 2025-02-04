@@ -4,6 +4,7 @@ const Transmitter = require('../core/transmitter/Transmitter')
 const ConfigRuntimeFactory = require('./ConfigRuntimeFactory')
 const RuntimeLogger = require('../utils/RuntimeLogger')
 const TcpConnectionData = require('../utils/connectionData/TcpConnectionData')
+const { mkdirSync } = require('node:fs')
 
 /**
  * The Javonet class is a singleton class that serves as the entry point for interacting with Javonet.
@@ -14,7 +15,6 @@ const TcpConnectionData = require('../utils/connectionData/TcpConnectionData')
 class Javonet {
     // Static block to initialize the Transmitter
     static {
-        Transmitter.initialize()
         //SDKExceptionHelper.sendExceptionToAppInsights("SdkMessage", "Javonet SDK initialized");
     }
 
@@ -80,6 +80,22 @@ class Javonet {
     static setConfigSource(configSource) {
         Transmitter.setConfigSource(configSource)
     }
+
+    /**
+     * Sets the working directory for the Javonet SDK.
+     *
+     * @param {string} path - The working directory.
+     */
+    static setJavonetWorkingDirectory(path) {
+        path = path.replace(/\\/g, "/");
+        if (!path.endsWith("/")) {
+            path += "/";
+        }
+
+        mkdirSync(path, { recursive: true, mode: 0o700 });
+        Transmitter.setJavonetWorkingDirectory(path)
+    }
+
 }
 
 module.exports = {

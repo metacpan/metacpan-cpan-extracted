@@ -36,7 +36,7 @@
             "Algorithm::Combinatorics" : "0",
             "Data::Dumper::Compact" : "0",
             "List::Util" : "0",
-            "MIDI::Util" : "0.1302",
+            "MIDI::Util" : "0.1304",
             "Math::Bezier" : "0",
             "Moo" : "2",
             "Music::Duration" : "0.0900",
@@ -68,7 +68,7 @@
          "web" : "https://github.com/ology/MIDI-Drummer-Tiny"
       }
    },
-   "version" : "0.5009",
+   "version" : "0.5010",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040000"

@@ -173,6 +173,38 @@ subtest 'revisit element' => sub {
     );
 };
 
+subtest 'stop descent' => sub {
+
+    my %hash = myhash;
+
+    my $visited = 0;
+    my ( $completed ) = visit(
+        \%hash,
+        sub ( $kydx, $vref, $context, $meta ) {
+            $$vref = [ @{$$vref}, ['XX'] ];
+            RESULT_STOP_DESCENT;
+        },
+        visit => VISIT_ARRAY,
+    );
+
+    is( $completed, T(), 'completed' );
+
+    is(
+        \%hash,
+        hash {
+            field a => 1;
+            field b => [ 2, 3, 4, ['XX'] ];
+            field c => hash {
+                field d => [ 5, 6, 7, ['XX'] ];
+                field e => 8;
+                end;
+            };
+            end;
+        } );
+};
+
+
+
 subtest 'cycle' => sub {
 
     subtest 'two parents' => sub {

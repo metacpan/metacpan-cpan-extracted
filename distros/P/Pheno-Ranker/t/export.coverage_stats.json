@@ -1,0 +1,15 @@
+{
+   "cohort_size" : 36,
+   "coverage_terms" : {
+      "diseases" : 36,
+      "ethnicity" : 8,
+      "exposures" : 8,
+      "id" : 36,
+      "info" : 0,
+      "interventionsOrProcedures" : 27,
+      "measures" : 36,
+      "phenotypicFeatures" : 35,
+      "sex" : 36,
+      "treatments" : 8
+   }
+}

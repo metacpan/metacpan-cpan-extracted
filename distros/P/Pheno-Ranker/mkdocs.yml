@@ -14,6 +14,8 @@ extra_javascript:
   - js/katex.js
   - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.js
   - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/contrib/auto-render.min.js
+  - https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.23.0/cytoscape.min.js
+  - js/cytoscape-render.js
 
 plugins:
   - search
@@ -67,41 +69,44 @@ markdown_extensions:
         generic: true
 
 nav:
-  - Introduction:
-      - What is Pheno-Ranker?: what-is-pheno-ranker.md
-      - Input formats:
-          - BFF: bff.md
-          - PXF: pxf.md
-          - Other formats: other-formats.md
-  - 'Download & Installation': download-and-installation.md
-  - Web App User interface: https://pheno-ranker.cnag.eu
-  - Modes of operation:
-      - Cohort mode: cohort.md 
-      - Patient mode: patient.md
-  - Technical details:
-      - Implementation: implementation.md
-      - Algorithm: algorithm.md
-      - User workflow: user-workflow.md
-  - Utilities:
-      - BFF/PXF plot: bff-pxf-plot.md 
-      - BFF/PXF simulator: bff-pxf-simulator.md
-      - CSV import: csv-import.md
-      - QR code generator: qr-code-generator.md
-  - Formats Beyond BFF/PXF: 
-      - Generic JSON: generic-json.md
-      - CSV: csv-import.md
-      - openEHR: open-ehr.md
-      - OMOP-CDM: omop-cdm.md 
-      - VCF: vcf.md
-  - Help:
-      - Google colab: https://colab.research.google.com/drive/1n3Etu4fnwuDWNveSMb1SzuN50O2a05Rg#scrollTo=8tbJ0f5-hJAB
-      - Usage: usage.md
-      - FAQs: faq.md
-  - Addendum:
-      - Federated version proposal: federated-version-proposal.md
-  - About:
-      - About: about.md
-      - Citation: citation.md
+  - "🏠 Introduction":
+      - "❓ What is Pheno-Ranker?": what-is-pheno-ranker.md
+      - "📂 Input formats":
+          - "🗂 BFF": bff.md
+          - "📜 PXF": pxf.md
+          - "🔄 Other formats": other-formats.md
+  - "⬇️ Download & Installation": download-and-installation.md
+  - "🌐 Web App User Interface": https://pheno-ranker.cnag.eu
+  - "⚙️ Modes of operation":
+      - "📊 Cohort mode": cohort.md 
+      - "👤 Patient mode": patient.md
+  - "🛠 Technical details":
+      - "🏗 Implementation": implementation.md
+      - "📊 Algorithm": algorithm.md
+      - "🧭 User workflow": user-workflow.md
+  - "🧰 Utilities":
+      - "📈 BFF/PXF plot": bff-pxf-plot.md 
+      - "🧪 BFF/PXF simulator": bff-pxf-simulator.md
+      - "📑 CSV import": csv-import.md
+      - "🔲 QR code generator": qr-code-generator.md
+  - "🚀 Use Cases":
+      - "🏥 Phenopacket Corpus": phenopackets-corpus.md
+      - "🧬 OMIM Database": omim-database.md
+  - "🔗 Formats Beyond BFF/PXF": 
+      - "📜 Generic JSON": generic-json.md
+      - "📑 CSV": csv-import.md
+      - "🏥 openEHR": open-ehr.md
+      - "🗄 OMOP-CDM": omop-cdm.md 
+      - "🧬 VCF": vcf.md
+  - "❓ Help":
+      - "📖 Google Colab": https://colab.research.google.com/drive/1n3Etu4fnwuDWNveSMb1SzuN50O2a05Rg#scrollTo=8tbJ0f5-hJAB
+      - "🛠 Usage": usage.md
+      - "🤔 FAQs": faq.md
+  - "🏗 Addendum":
+      - "🔄 Federated version proposal": federated-version-proposal.md
+  - "ℹ️ About":  # ✅ Now collapsed until clicked!
+      - "📄 About": about.md
+      - "📖 Citation": citation.md
 
 theme:
   name: material

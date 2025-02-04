@@ -1,5 +1,5 @@
 package ExtUtils::Typemaps::OpaqueObj;
-$ExtUtils::Typemaps::OpaqueObj::VERSION = '0.002';
+$ExtUtils::Typemaps::OpaqueObj::VERSION = '0.003';
 use strict;
 use warnings;
 
@@ -46,7 +46,7 @@ ExtUtils::Typemaps::OpaqueObj - Typemap for storing objects as a string referenc
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

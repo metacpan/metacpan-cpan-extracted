@@ -128,6 +128,8 @@ sub cytoscape2graph {
         $graph->add_weighted_edge(
             $edge->{data}{source},
             $edge->{data}{target},
+          
+            # Convert to distances if Jaccard
             $jaccard ? 1 - $edge->{data}{weight} : $edge->{data}{weight}
         );
     }

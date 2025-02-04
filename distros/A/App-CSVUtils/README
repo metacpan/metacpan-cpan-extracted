@@ -2,8 +2,8 @@ NAME
     App::CSVUtils - CLI utilities related to CSV
 
 VERSION
-    This document describes version 1.035 of App::CSVUtils (from Perl
-    distribution App-CSVUtils), released on 2025-01-14.
+    This document describes version 1.036 of App::CSVUtils (from Perl
+    distribution App-CSVUtils), released on 2025-02-04.
 
 DESCRIPTION
     This distribution contains the following CLI utilities:
