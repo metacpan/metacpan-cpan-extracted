@@ -5,8 +5,10 @@
 use strict;
 use FindBin qw($Bin);
 
+use File::Temp;
+use Test::Most tests => 33;
+
 use lib 't/lib';
-use Test::Most tests => 19;
 
 use_ok('MyLogger');
 use_ok('Database::test1');
@@ -46,8 +48,34 @@ is($test2->number('four'), undef, 'PSV AUTOLOAD works not found');
 # set_logger with subroutine ref
 {
 	my $logger = sub {
+		unlike($_[0]->{'line'}, qr/\D/, 'Line numbers are valid');
 		diag($_[0]->{'level'}, ': ', @{$_[0]->{'message'}}) if($ENV{'TEST_VERBOSE'});
+		# diag(Data::Dumper->new([\@_])->Dump());
 	};
 	my $test4 = new_ok('Database::test4' => [{ directory => "$Bin/../data", logger => $logger }] );
 	ok(!defined($test4->ordinal(cardinal => 'four')), 'CSV AUTOLOAD works');
+}
+
+# set_logger with file
+{
+	# Create temporary files for testing
+	my $file = File::Temp->new();
+	my $filename = $file->filename();
+
+	my $test1 = new_ok('Database::test1' => [{ directory => "$Bin/../data", logger => $filename }] );
+
+	# Get some data
+	cmp_ok($test1->number('two'), '==', 2, 'CSV AUTOLOAD works found');
+
+	# Verify the contents of the file
+	open(my $fin, '<', $filename) or die "$filename: Cannot open file: $!";
+	my $content = do { local $/; <$fin> };
+	close($fin);
+
+	# Test contents of the file
+	like($content, qr/^DEBUG: /sm, 'File contains some debugging');
+	like($content, qr/^TRACE: /sm, 'File contains some tracing');
+	unlike($content, qr/^FOO: /sm, 'Sanity check for the regex, that it is actually searching for something');
+
+	diag($content) if($ENV{'TEST_VERBOSE'});
 }

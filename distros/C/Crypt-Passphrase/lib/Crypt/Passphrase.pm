@@ -1,9 +1,7 @@
 package Crypt::Passphrase;
-$Crypt::Passphrase::VERSION = '0.020';
+$Crypt::Passphrase::VERSION = '0.021';
 use strict;
 use warnings;
-
-use mro ();
 
 use Carp ();
 use Scalar::Util ();
@@ -18,16 +16,12 @@ sub import {
 		if ($arg eq '-encoder') {
 			require Crypt::Passphrase::Encoder;
 			no strict 'refs';
-			no warnings 'once';
 			push @{"$caller\::ISA"}, 'Crypt::Passphrase::Encoder' unless $caller->isa('Crypt::Passphrase::Encoder');
-			push @{"$caller\::CARP_NOT"}, __PACKAGE__, mro::get_linear_isa($caller);
 		}
 		elsif ($arg eq '-validator') {
 			require Crypt::Passphrase::Validator;
 			no strict 'refs';
-			no warnings 'once';
 			push @{"$caller\::ISA"}, 'Crypt::Passphrase::Validator' unless $caller->isa('Crypt::Passphrase::Validator');
-			push @{"$caller\::CARP_NOT"}, __PACKAGE__, mro::get_linear_isa($caller);
 		}
 		elsif ($arg eq '-integration') {
 			push @CARP_NOT, $caller;
@@ -156,7 +150,7 @@ Crypt::Passphrase - A module for managing passwords in a cryptographically agile
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 

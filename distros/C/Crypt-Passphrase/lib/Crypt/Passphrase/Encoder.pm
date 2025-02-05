@@ -1,15 +1,15 @@
 package Crypt::Passphrase::Encoder;
-$Crypt::Passphrase::Encoder::VERSION = '0.020';
+$Crypt::Passphrase::Encoder::VERSION = '0.021';
 use strict;
 use warnings;
 
 use parent 'Crypt::Passphrase::Validator';
 
-use Crypt::URandom 0.37;
+use Crypt::SysRandom;
 
 sub random_bytes {
 	my ($self, $count) = @_;
-	return Crypt::URandom::urandom_ub($count);
+	return Crypt::SysRandom::random_bytes($count);
 }
 
 sub crypt_subtypes;
@@ -45,7 +45,7 @@ Crypt::Passphrase::Encoder - Base class for Crypt::Passphrase encoders
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,18 @@
 Revision history for Perl extension Software::Security::Policy
 
+0.09 -- Tue Feb 04 22:42:18 AST 2025
+
+    [Major items]
+    - Minor fixes
+
+    [Detailed Change Log]
+    - cf78132 Update repo version
+    - 67d15e9 Fixes #13 duplicate copyright notice in Software::Security::Policy::Individual
+    - d55f292 Fixes #7: Default URL leads to nonsensical output.
+    - 6321735 Fixes #8 Default program value leads to weird output
+    - 9fdd782 Files #9 Default behaviors are not documented
+    - 22a22aa v0.08
+
 0.08 -- Tue Jan 14 21:55:47 AST 2025
 
     [Major items]

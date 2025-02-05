@@ -52,15 +52,6 @@ static int sll_maxaddr;
 
 #if defined(HAVE_TPACKET) || defined(HAVE_TPACKET2)
 # define HAVE_RX_RING
-static int free_rxring_state(pTHX_ SV *, MAGIC *);
-
-static MGVTBL vtbl = {
-  NULL, /* get */
-  NULL, /* set */
-  NULL, /* len */
-  NULL, /* clear */
-  &free_rxring_state, /* free */
-};
 
 struct packet_rxring_state
 {
@@ -72,22 +63,34 @@ struct packet_rxring_state
 
 static int free_rxring_state(pTHX_ SV *sv, MAGIC *mg)
 {
-  free(mg->mg_ptr);
+  Safefree(mg->mg_ptr);
   return 0;
 }
 
-static struct packet_rxring_state *get_rxring_state(SV *sv)
-{
-  MAGIC *magic;
+static const MGVTBL vtbl = {
+  NULL, /* get */
+  NULL, /* set */
+  NULL, /* len */
+  NULL, /* clear */
+  &free_rxring_state, /* free */
+};
 
-  for(magic = mg_find(sv, PERL_MAGIC_ext); magic; magic = magic->mg_moremagic) {
-    if(magic->mg_type == PERL_MAGIC_ext && magic->mg_virtual == &vtbl) {
-      return (struct packet_rxring_state *)magic->mg_ptr;
-    }
-  }
+static void S_apply_rxring_state(pTHX_ SV *sv, struct packet_rxring_state *state)
+{
+  sv_magicext(sv, NULL, PERL_MAGIC_ext, &vtbl, (char *)state, 0);
+}
+
+static struct packet_rxring_state *S_get_rxring_state(pTHX_ SV *sv)
+{
+  MAGIC *mg = mg_findext(sv, PERL_MAGIC_ext, &vtbl);
+  if(mg)
+    return (struct packet_rxring_state *)mg->mg_ptr;
 
   croak("Cannot find rxring state - call setup_rx_ring() first");
 }
+
+#define apply_rxring_state(sv, state)  S_apply_rxring_state(aTHX_ sv, state)
+#define get_rxring_state(sv)           S_get_rxring_state(aTHX_ sv)
 
 static void *frame_ptr(struct packet_rxring_state *state)
 {
@@ -473,14 +476,15 @@ setup_rx_ring(sock, frame_size, frame_nr, block_size)
       XSRETURN_UNDEF;
 
     {
-      struct packet_rxring_state *state = malloc(sizeof *state);
+      struct packet_rxring_state *state;
+      Newx(state, 1, struct packet_rxring_state);
 
       state->buffer     = addr;
       state->frame_size = frame_size;
       state->frame_nr   = frame_nr;
       state->frame_idx  = 0;
 
-      sv_magicext((SV*)sv_2io(ST(0)), NULL, PERL_MAGIC_ext, &vtbl, (char *)state, 0);
+      apply_rxring_state((SV *)sv_2io(ST(0)), state);
     }
 
     ST(0) = sv_2mortal(newSViv(size));

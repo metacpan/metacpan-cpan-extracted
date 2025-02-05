@@ -5,7 +5,7 @@ package Workflow::Inotify;
 use strict;
 use warnings;
 
-our $VERSION = '1.0.6';  ## no critic (RequireInterpolation)
+our $VERSION = '1.0.7';  ## no critic (RequireInterpolation)
 
 1;
 
@@ -75,13 +75,16 @@ the script. All of the values in the C<global> section are optional.
 
 =item * sleep
 
-Amount of time in seconds to sleep after polling for a watch event.
+Amount of time in seconds to sleep after polling for a watch event. If
+you do not specify a value for sleep and you set C<block> to a false
+value, then the sleep time will automatically be 1 second otherwise
+this script would consume 100% of the CPU. ;-)
 
 =item * block
 
 Boolean that indicates if the watcher should block waiting for an
 event. If you set C<block> to a false value, you should also consider
-a sleep value.
+a sleep value of a least 1 second.
 
 default: true
 
@@ -109,9 +112,10 @@ default: true
 
 =item * daemonize
 
-Boolean that indicates whether the script should be daemonize using L<Proc::Daemon>.
+Boolean that indicates whether the script should be daemonized using
+L<Proc::Daemon>.
 
-default: false
+default: true
 
 =back
 
@@ -129,7 +133,11 @@ Example:
 
  [watch_example]
 
- dir =  I</var/spool/junk>.
+ dir =  /var/spool/junk
+
+I<Note: events on files in subdirectories will not generate
+events. You must explicitly include those subdirectories if you want
+them watched.>
 
 =item * mask
 
@@ -142,6 +150,9 @@ Example:
  mask = IN_MOVED_FROM | IN_MOVED_TO
 
 These are also described in L<Workflow::Inotify::Handler>.
+
+You can also use the mask value of 'IN_ALL' which will trigger your
+handler for all events that are supported by C<inotify>.
 
 =item * handler
 
@@ -200,7 +211,7 @@ See L<Workflow::Inotify::Handler> for more details.
 
 =head1 VERSION
 
-This documentation refers to version 1.0.6
+This documentation refers to version 1.0.7
 
 =head1 REPOSITORY
 

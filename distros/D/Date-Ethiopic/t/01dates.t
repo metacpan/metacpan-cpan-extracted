@@ -6,6 +6,8 @@
 use Test::More qw(no_plan);
 use strict;
 
+$ENV{TZ} = 'UTC';
+
 require Date::Ethiopic;
 
 is ( 1, 1, "loaded." );

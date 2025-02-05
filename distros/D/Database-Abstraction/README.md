@@ -3,7 +3,8 @@
 Database::Abstraction - read-only database abstraction layer (ORM)
 
 # VERSION
-Version 0.15
+
+Version 0.17
 
 # SYNOPSIS
 
@@ -125,7 +126,11 @@ Takes different argument formats (hash or positional)
 
 - `cache_duration`
 
-    How long to store results in the cache (default is 1 hour)
+    How long to store results in the cache (default is 1 hour).
+
+- `expires_in`
+
+    Synonym of `cache_duration`, for compatibility with `CHI`.
 
 - `dbname`
 
@@ -135,6 +140,21 @@ Takes different argument formats (hash or positional)
 - `directory`
 
     Where the database file is held
+
+- `filename`
+
+    Filename containing the data.
+    When not given,
+    the filename is derived from the tablename
+    which in turn comes from the class name.
+
+- `logger`
+
+    Takes an optional parameter logger, which is used for warnings and traces.
+    Can be an object that understands warn() and trace() messages,
+    such as a [Log::Log4perl](https://metacpan.org/pod/Log%3A%3ALog4perl) or [Log::Any](https://metacpan.org/pod/Log%3A%3AAny) object,
+    a reference to code,
+    or a filename.
 
 - `max_slurp_size`
 
@@ -157,7 +177,7 @@ Uses Carp::carp to log warnings for incorrect usage or potential mistakes.
 
 ## set\_logger
 
-Sets class or code reference that will be used for logging.
+Sets the class, code reference, or file that will be used for logging.
 
 ## selectall\_hashref
 
@@ -179,6 +199,8 @@ Returns a hash reference for a single row in a table.
 
 Special argument: table: determines the table to read from if not the default,
 which is worked out from the class name
+
+When no\_entry is not set allow just one argument to be given: the entry value.
 
 ## execute
 

@@ -1,7 +1,7 @@
 ##########################################################################
 #                                                                        #
 # (C) Copyright IBM Corporation 2001, 2016.  All Rights Reserved.        #
-# (C) Copyright HCL Technologies Ltd. 2016, 2022. All rights reserved.   #
+# (C) Copyright HCL Technologies Ltd. 2016, 2024. All rights reserved.   #
 #                                                                        #
 # This program and the accompanying materials are made available under   #
 # the terms of the Common Public License v1.0 which accompanies this     #
@@ -18,6 +18,8 @@
 
 use ExtUtils::MakeMaker;
 use File::Basename;
+use Cwd qw(abs_path);
+use lib abs_path();
 
 BEGIN {
 	# On Windows fix the Config.pm based on where ratlperl is installed.
@@ -82,7 +84,6 @@ my $cleartool = $ATRIA_ROOT.'/bin/cleartool';
 $cleartool = 'cleartool' if($os =~ /MSWin32/ || $os =~ /Windows/);
 my $osver;
 
-
 die "Cannot find ClearCase 7.0 or higher or cannot find $cleartool" 
 unless $ctver = CheckVer('cleartool',
 		'7.0',
@@ -123,8 +124,7 @@ if($has_atriacmi){
         $atriacmi_libs = '-latriacmi -latriajson';
 }
 
-
-# Check if cleartool is 32 or 64 bit; perl and IBM Rational ClearCase must match on 'x86_64'
+# Check if cleartool is 32 or 64 bit; perl and DevOps Code ClearCase must match on 'x86_64'
     my $ct_file = qx(file $cleartool 2>&1);
 	my $ratlperl_ptrsize = qx(ratlperl -MConfig -e "print $Config{ptrsize};");
     if( $ct_file =~ /64-bit/ || $ct_file =~ /ELF-64/ || $ratlperl_ptrsize == 8){
@@ -272,23 +272,48 @@ elsif  ($os =~ /hpux/){
 	}
 }
 elsif  ($os =~ /MSWin32/ || $os =~ /Windows/){
-     die
+    if($Config{cc} =~ /cl/) {
+	die
          'Cannot find  '
          .$Config{cc}.
          ' -> Microsoft (R) 32-bit C/C++ Optimizing Compiler Version 12'
                  unless CheckVer('Version','12',$Config{cc}.' 2>&1' );
-     $opts{CCFLAGS} = $Config{ccflags}.' -DATRIA_WIN32_COMMON';
+	 $opts{CCFLAGS} = $Config{ccflags}.' -DATRIA_WIN32_COMMON';
          my $machinearch = $archname =~ /x64/ ? '/machine:AMD64' : '/machine:i386';
+	 my @ar = split ' ',$Config{'ar'};
          while($opts{LIBS} =~ /-l(atria[^ ]+)/g) {
                  my $lib = $1;
                  my $machinetype =
                  system($^X, 'autoDef', "win32/$lib.conf")
-                 || system($Config{'ar'}, '/nologo', $machinearch, "/def:$lib.def");
+                 || system(@ar, '/nologo', $machinearch, "/def:$lib.def");
          }
-     #$opts{LIBS}.=' /defaultlib:WS2_32.LIB';
-     $opts{LDDLFLAGS}=$Config{lddlflags};
-     $opts{LDDLFLAGS} =~ s/-nodefaultlib//;
-     require 'Win32C_O';   
+    } elsif($Config{cc} =~ /gcc/) {
+	die 'Cannot find '
+	    .$Config{cc}.
+	    ' -> MinGW C/C++ Compiler'
+	    unless CheckMinGWTool('gcc --version 2>&1');
+
+	# Check existence of dlltool executable. This tool is not used in building perl
+	# executable and hence not configured in perl $Config
+	die
+	    'Cannot find  MinGW -> dlltool'
+	    unless CheckMinGWTool('dlltool -V 2>&1');
+
+	$opts{CCFLAGS} = $Config{ccflags}.' -DATRIA_WIN32_COMMON';
+        my $machinearch = $archname =~ /x64/ ? '/machine:AMD64' : '/machine:i386';
+	while($opts{LIBS} =~ /-l(atria[^ ]+)/g) {
+                my $lib = $1;
+                my $machinetype =
+		    system($^X, 'autoDef', "win32/$lib.conf", "MinGW")
+		   # dlltool is MinGW toolchain executable required to generate .lib and .exp files from .def
+                || system("dlltool", "-d", "$lib.def", "-l", "$lib.lib", "-e", "$lib.exp");
+        }
+    } else {
+       print "Unsupported toolchain\n";
+    }
+    $opts{LDDLFLAGS}=$Config{lddlflags};
+    $opts{LDDLFLAGS} =~ s/-nodefaultlib//;
+    require 'Win32C_O';
 }else{print "Unsupported Platform\n"}
 
 if($has_atriacmi) {
@@ -296,6 +321,14 @@ if($has_atriacmi) {
 }
 
 WriteMakefile(%opts);
+
+sub CheckMinGWTool{
+    # Check if MinGW executable is present in PATH
+    $cmd = shift;
+    $prog_output = `$cmd`;
+    $exit_code = $? >> 8;
+    return $exit_code ? 0 : 1;
+}
 
 sub CheckVer{
     my $expected_string = shift;

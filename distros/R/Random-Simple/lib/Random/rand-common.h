@@ -37,6 +37,13 @@ static double _uint64_to_double(uint64_t num) {
 	return ret;
 }
 
+// Why This Works
+//   (x + 0.5) offsets each uint32_t value into the center of its floating-point "bin," reducing bias.
+//   Multiplying by 1.0 / 4294967296.0 scales it into the range [0,1).
+static double _uint32_to_double(uint32_t x) {
+    return (x + 0.5) * (1.0 / 4294967296.0);  // 1/2^32
+}
+
 // Use the C rand() function to return a 64 bit number
 static uint64_t _crand64() {
 	uint64_t high = rand();

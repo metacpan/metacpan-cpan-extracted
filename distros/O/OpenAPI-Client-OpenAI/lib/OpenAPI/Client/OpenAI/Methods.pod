@@ -59,6 +59,144 @@ The ID of the Upload.
 
 The request body is complicated. See L<OpenAPI::Client::OpenAI::Schema> for details.
 
+=head2 admin-api-keys-create
+
+Create an organization admin API key
+
+This method does not take any path or URL parameters.
+
+
+=head3 Request Body
+
+The request body is complicated. See L<OpenAPI::Client::OpenAI::Schema> for details.
+
+=head2 admin-api-keys-delete
+
+Delete an organization admin API key
+
+=head3 Parameters
+
+
+=head4 key_id
+
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head2 admin-api-keys-get
+
+Retrieve a single organization API key
+
+=head3 Parameters
+
+
+=head4 key_id
+
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head2 admin-api-keys-list
+
+List organization API keys
+
+=head3 Parameters
+
+
+=head4 after
+
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 order
+
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  asc
+
+=item * Example:  N/A
+
+=item * Enum:     asc, desc
+
+=back
+
+
+=head4 limit
+
+
+=over 4
+
+=item * Type:     integer
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  20
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
 =head2 archive-project
 
 Archives a project in the organization. Archived projects cannot be
@@ -414,6 +552,26 @@ The ID of the project.
 
 The request body is complicated. See L<OpenAPI::Client::OpenAI::Schema> for details.
 
+=head2 create-realtime-session
+
+Create an ephemeral API token for use in client-side applications with
+the
+Realtime API. Can be configured with the same session parameters as the
+C<session.update> client event.
+
+It responds with a session object, plus a C<client_secret> key which
+contains
+a usable ephemeral API token that can be used to authenticate browser
+clients
+for the Realtime API.
+
+This method does not take any path or URL parameters.
+
+
+=head3 Request Body
+
+The request body is complicated. See L<OpenAPI::Client::OpenAI::Schema> for details.
+
 =head2 createAssistant
 
 Create an assistant with a model and instructions.
@@ -438,7 +596,22 @@ The request body is complicated. See L<OpenAPI::Client::OpenAI::Schema> for deta
 
 =head2 createChatCompletion
 
-Creates a model response for the given chat conversation.
+Creates a model response for the given chat conversation. Learn more in
+the
+L<text
+generation|https://platform.openai.com/docs/guides/text-generation>,
+L<vision|https://platform.openai.com/docs/guides/vision>,
+and L<audio|https://platform.openai.com/docs/guides/audio> guides.
+
+Parameter support can differ depending on the model used to generate
+the
+response, particularly for newer reasoning models. Parameters that are
+only
+supported for reasoning models are noted below. For the current state
+of 
+unsupported parameters in reasoning models, 
+L<refer to the reasoning
+guide|https://platform.openai.com/docs/guides/reasoning>.
 =head3 Examples
 
 See the following files in the distribution for examples:
@@ -481,6 +654,16 @@ The request body is complicated. See L<OpenAPI::Client::OpenAI::Schema> for deta
 =head2 createEmbedding
 
 Creates an embedding vector representing the input text.
+=head3 Examples
+
+See the following files in the distribution for examples:
+
+=over 4
+
+=item *	examples/get-embeddings.pl
+
+=back
+
 
 This method does not take any path or URL parameters.
 
@@ -506,7 +689,7 @@ input> or
 L<completions|https://platform.openai.com/docs/api-reference/fine-tunin
 g/completions-input> models.
 
-The Batch API only supports C<.jsonl> files up to 100 MB in size. The
+The Batch API only supports C<.jsonl> files up to 200 MB in size. The
 input also has a specific required
 L<format|https://platform.openai.com/docs/api-reference/batch/request-i
 nput>.
@@ -611,7 +794,9 @@ The request body is complicated. See L<OpenAPI::Client::OpenAI::Schema> for deta
 
 =head2 createModeration
 
-Classifies if text is potentially harmful.
+Classifies if text and/or image inputs are potentially harmful. Learn
+more in the L<moderation
+guide|https://platform.openai.com/docs/guides/moderation>.
 
 This method does not take any path or URL parameters.
 
@@ -657,7 +842,7 @@ the file search result content.
 
 See the L<file search tool
 documentation|https://platform.openai.com/docs/assistants/tools/file-se
-arch/customizing-file-search-settings> for more information.
+arch#customizing-file-search-settings> for more information.
 
 =over 4
 
@@ -766,7 +951,7 @@ Please refer to documentation for the supported MIME types for your use
 case:
 -
 L<Assistants|https://platform.openai.com/docs/assistants/tools/file-sea
-rch/supported-files>
+rch#supported-files>
 
 For guidance on the proper filename extensions for each purpose, please
 follow the documentation on L<creating a
@@ -1578,7 +1763,7 @@ the file search result content.
 
 See the L<file search tool
 documentation|https://platform.openai.com/docs/assistants/tools/file-se
-arch/customizing-file-search-settings> for more information.
+arch#customizing-file-search-settings> for more information.
 
 =over 4
 
@@ -1937,10 +2122,10 @@ between 1 and 100, and the default is 20.
 
 =head4 after
 
-A cursor for use in pagination. C is an object ID that defines
+A cursor for use in pagination. C<after> is an object ID that defines
 your place in the list. For instance, if you make a list request and
-receive 100 objects, ending with objIfoo in order to fetch the next
-page of the list.
+receive 100 objects, ending with objI<foo, your subsequent call can
+include after=obj>foo in order to fetch the next page of the list.
 
 =over 4
 
@@ -1961,10 +2146,10 @@ page of the list.
 
 =head4 before
 
-A cursor for use in pagination. C is an object ID that defines
+A cursor for use in pagination. C<before> is an object ID that defines
 your place in the list. For instance, if you make a list request and
-receive 100 objects, ending with objIfoo in order to fetch the previous
-page of the list.
+receive 100 objects, starting with objI<foo, your subsequent call can
+include before=obj>foo in order to fetch the previous page of the list.
 
 =over 4
 
@@ -2016,10 +2201,10 @@ between 1 and 100, and the default is 20.
 
 =head4 after
 
-A cursor for use in pagination. C is an object ID that defines
+A cursor for use in pagination. C<after> is an object ID that defines
 your place in the list. For instance, if you make a list request and
-receive 100 objects, ending with objIfoo in order to fetch the next
-page of the list.
+receive 100 objects, ending with objI<foo, your subsequent call can
+include after=obj>foo in order to fetch the next page of the list.
 
 =over 4
 
@@ -2092,10 +2277,109 @@ between 1 and 100, and the default is 20.
 
 =head4 after
 
-A cursor for use in pagination. C is an object ID that defines
+A cursor for use in pagination. C<after> is an object ID that defines
 your place in the list. For instance, if you make a list request and
-receive 100 objects, ending with objIfoo in order to fetch the next
-page of the list.
+receive 100 objects, ending with objI<foo, your subsequent call can
+include after=obj>foo in order to fetch the next page of the list.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head2 list-project-rate-limits
+
+Returns the rate limits per model for a project.
+
+=head3 Parameters
+
+
+=head4 project_id
+
+The ID of the project.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 limit
+
+A limit on the number of objects to be returned. The default is 100.
+
+=over 4
+
+=item * Type:     integer
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  100
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 after
+
+A cursor for use in pagination. C<after> is an object ID that defines
+your place in the list. For instance, if you make a list request and
+receive 100 objects, ending with objI<foo, your subsequent call can
+include after=obj>foo in order to fetch the next page of the list.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 before
+
+A cursor for use in pagination. C<before> is an object ID that defines
+your place in the list. For instance, if you make a list request and
+receive 100 objects, beginning with objI<foo, your subsequent call can
+include before=obj>foo in order to fetch the previous page of the list.
 
 =over 4
 
@@ -2168,10 +2452,10 @@ between 1 and 100, and the default is 20.
 
 =head4 after
 
-A cursor for use in pagination. C is an object ID that defines
+A cursor for use in pagination. C<after> is an object ID that defines
 your place in the list. For instance, if you make a list request and
-receive 100 objects, ending with objIfoo in order to fetch the next
-page of the list.
+receive 100 objects, ending with objI<foo, your subsequent call can
+include after=obj>foo in order to fetch the next page of the list.
 
 =over 4
 
@@ -2244,10 +2528,10 @@ between 1 and 100, and the default is 20.
 
 =head4 after
 
-A cursor for use in pagination. C is an object ID that defines
+A cursor for use in pagination. C<after> is an object ID that defines
 your place in the list. For instance, if you make a list request and
-receive 100 objects, ending with objIfoo in order to fetch the next
-page of the list.
+receive 100 objects, ending with objI<foo, your subsequent call can
+include after=obj>foo in order to fetch the next page of the list.
 
 =over 4
 
@@ -2299,10 +2583,10 @@ between 1 and 100, and the default is 20.
 
 =head4 after
 
-A cursor for use in pagination. C is an object ID that defines
+A cursor for use in pagination. C<after> is an object ID that defines
 your place in the list. For instance, if you make a list request and
-receive 100 objects, ending with objIfoo in order to fetch the next
-page of the list.
+receive 100 objects, ending with objI<foo, your subsequent call can
+include after=obj>foo in order to fetch the next page of the list.
 
 =over 4
 
@@ -2376,14 +2660,35 @@ between 1 and 100, and the default is 20.
 
 =head4 after
 
-A cursor for use in pagination. C is an object ID that defines
+A cursor for use in pagination. C<after> is an object ID that defines
 your place in the list. For instance, if you make a list request and
-receive 100 objects, ending with objIfoo in order to fetch the next
-page of the list.
+receive 100 objects, ending with objI<foo, your subsequent call can
+include after=obj>foo in order to fetch the next page of the list.
 
 =over 4
 
 =item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 emails
+
+Filter by the email address of users.
+
+=over 4
+
+=item * Type:     array
 
 =item * In:       query
 
@@ -2431,8 +2736,8 @@ between 1 and 100, and the default is 20.
 
 =head4 order
 
-Sort order by the C timestamp of the objects. C for
-ascending order and C for descending order.
+Sort order by the C<created_at> timestamp of the objects. C<asc> for
+ascending order and C<desc> for descending order.
 
 =over 4
 
@@ -2453,10 +2758,10 @@ ascending order and C for descending order.
 
 =head4 after
 
-A cursor for use in pagination. C is an object ID that defines
+A cursor for use in pagination. C<after> is an object ID that defines
 your place in the list. For instance, if you make a list request and
-receive 100 objects, ending with objIfoo in order to fetch the next
-page of the list.
+receive 100 objects, ending with objI<foo, your subsequent call can
+include after=obj>foo in order to fetch the next page of the list.
 
 =over 4
 
@@ -2477,10 +2782,10 @@ page of the list.
 
 =head4 before
 
-A cursor for use in pagination. C is an object ID that defines
+A cursor for use in pagination. C<before> is an object ID that defines
 your place in the list. For instance, if you make a list request and
-receive 100 objects, ending with objIfoo in order to fetch the previous
-page of the list.
+receive 100 objects, starting with objI<foo, your subsequent call can
+include before=obj>foo in order to fetch the previous page of the list.
 
 =over 4
 
@@ -2510,10 +2815,10 @@ List your organization's batches.
 
 =head4 after
 
-A cursor for use in pagination. C is an object ID that defines
+A cursor for use in pagination. C<after> is an object ID that defines
 your place in the list. For instance, if you make a list request and
-receive 100 objects, ending with objIfoo in order to fetch the next
-page of the list.
+receive 100 objects, ending with objI<foo, your subsequent call can
+include after=obj>foo in order to fetch the next page of the list.
 
 =over 4
 
@@ -2558,7 +2863,7 @@ between 1 and 100, and the default is 20.
 
 =head2 listFiles
 
-Returns a list of files that belong to the user's organization.
+Returns a list of files.
 
 =head3 Parameters
 
@@ -2566,6 +2871,74 @@ Returns a list of files that belong to the user's organization.
 =head4 purpose
 
 Only return files with the given purpose.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 limit
+
+A limit on the number of objects to be returned. Limit can range
+between 1 and 10,000, and the default is 10,000.
+
+=over 4
+
+=item * Type:     integer
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  10000
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 order
+
+Sort order by the C<created_at> timestamp of the objects. C<asc> for
+ascending order and C<desc> for descending order.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  desc
+
+=item * Example:  N/A
+
+=item * Enum:     asc, desc
+
+=back
+
+
+=head4 after
+
+A cursor for use in pagination. C<after> is an object ID that defines
+your place in the list. For instance, if you make a list request and
+receive 100 objects, ending with objI<foo, your subsequent call can
+include after=obj>foo in order to fetch the next page of the list.
 
 =over 4
 
@@ -2659,8 +3032,8 @@ between 1 and 100, and the default is 20.
 
 =head4 order
 
-Sort order by the C timestamp of the objects. C for
-ascending order and C for descending order.
+Sort order by the C<created_at> timestamp of the objects. C<asc> for
+ascending order and C<desc> for descending order.
 
 =over 4
 
@@ -2681,10 +3054,10 @@ ascending order and C for descending order.
 
 =head4 after
 
-A cursor for use in pagination. C is an object ID that defines
+A cursor for use in pagination. C<after> is an object ID that defines
 your place in the list. For instance, if you make a list request and
-receive 100 objects, ending with objIfoo in order to fetch the next
-page of the list.
+receive 100 objects, ending with objI<foo, your subsequent call can
+include after=obj>foo in order to fetch the next page of the list.
 
 =over 4
 
@@ -2705,10 +3078,10 @@ page of the list.
 
 =head4 before
 
-A cursor for use in pagination. C is an object ID that defines
+A cursor for use in pagination. C<before> is an object ID that defines
 your place in the list. For instance, if you make a list request and
-receive 100 objects, ending with objIfoo in order to fetch the previous
-page of the list.
+receive 100 objects, starting with objI<foo, your subsequent call can
+include before=obj>foo in order to fetch the previous page of the list.
 
 =over 4
 
@@ -2950,8 +3323,8 @@ between 1 and 100, and the default is 20.
 
 =head4 order
 
-Sort order by the C timestamp of the objects. C for
-ascending order and C for descending order.
+Sort order by the C<created_at> timestamp of the objects. C<asc> for
+ascending order and C<desc> for descending order.
 
 =over 4
 
@@ -2972,10 +3345,10 @@ ascending order and C for descending order.
 
 =head4 after
 
-A cursor for use in pagination. C is an object ID that defines
+A cursor for use in pagination. C<after> is an object ID that defines
 your place in the list. For instance, if you make a list request and
-receive 100 objects, ending with objIfoo in order to fetch the next
-page of the list.
+receive 100 objects, ending with objI<foo, your subsequent call can
+include after=obj>foo in order to fetch the next page of the list.
 
 =over 4
 
@@ -2996,10 +3369,10 @@ page of the list.
 
 =head4 before
 
-A cursor for use in pagination. C is an object ID that defines
+A cursor for use in pagination. C<before> is an object ID that defines
 your place in the list. For instance, if you make a list request and
-receive 100 objects, ending with objIfoo in order to fetch the previous
-page of the list.
+receive 100 objects, starting with objI<foo, your subsequent call can
+include before=obj>foo in order to fetch the previous page of the list.
 
 =over 4
 
@@ -3152,8 +3525,8 @@ between 1 and 100, and the default is 20.
 
 =head4 order
 
-Sort order by the C timestamp of the objects. C for
-ascending order and C for descending order.
+Sort order by the C<created_at> timestamp of the objects. C<asc> for
+ascending order and C<desc> for descending order.
 
 =over 4
 
@@ -3174,10 +3547,10 @@ ascending order and C for descending order.
 
 =head4 after
 
-A cursor for use in pagination. C is an object ID that defines
+A cursor for use in pagination. C<after> is an object ID that defines
 your place in the list. For instance, if you make a list request and
-receive 100 objects, ending with objIfoo in order to fetch the next
-page of the list.
+receive 100 objects, ending with objI<foo, your subsequent call can
+include after=obj>foo in order to fetch the next page of the list.
 
 =over 4
 
@@ -3198,10 +3571,10 @@ page of the list.
 
 =head4 before
 
-A cursor for use in pagination. C is an object ID that defines
+A cursor for use in pagination. C<before> is an object ID that defines
 your place in the list. For instance, if you make a list request and
-receive 100 objects, ending with objIfoo in order to fetch the previous
-page of the list.
+receive 100 objects, starting with objI<foo, your subsequent call can
+include before=obj>foo in order to fetch the previous page of the list.
 
 =over 4
 
@@ -3295,8 +3668,8 @@ between 1 and 100, and the default is 20.
 
 =head4 order
 
-Sort order by the C timestamp of the objects. C for
-ascending order and C for descending order.
+Sort order by the C<created_at> timestamp of the objects. C<asc> for
+ascending order and C<desc> for descending order.
 
 =over 4
 
@@ -3317,10 +3690,10 @@ ascending order and C for descending order.
 
 =head4 after
 
-A cursor for use in pagination. C is an object ID that defines
+A cursor for use in pagination. C<after> is an object ID that defines
 your place in the list. For instance, if you make a list request and
-receive 100 objects, ending with objIfoo in order to fetch the next
-page of the list.
+receive 100 objects, ending with objI<foo, your subsequent call can
+include after=obj>foo in order to fetch the next page of the list.
 
 =over 4
 
@@ -3341,10 +3714,10 @@ page of the list.
 
 =head4 before
 
-A cursor for use in pagination. C is an object ID that defines
+A cursor for use in pagination. C<before> is an object ID that defines
 your place in the list. For instance, if you make a list request and
-receive 100 objects, ending with objIfoo in order to fetch the previous
-page of the list.
+receive 100 objects, starting with objI<foo, your subsequent call can
+include before=obj>foo in order to fetch the previous page of the list.
 
 =over 4
 
@@ -3372,7 +3745,7 @@ the file search result content.
 
 See the L<file search tool
 documentation|https://platform.openai.com/docs/assistants/tools/file-se
-arch/customizing-file-search-settings> for more information.
+arch#customizing-file-search-settings> for more information.
 
 =over 4
 
@@ -3445,8 +3818,8 @@ between 1 and 100, and the default is 20.
 
 =head4 order
 
-Sort order by the C timestamp of the objects. C for
-ascending order and C for descending order.
+Sort order by the C<created_at> timestamp of the objects. C<asc> for
+ascending order and C<desc> for descending order.
 
 =over 4
 
@@ -3467,10 +3840,10 @@ ascending order and C for descending order.
 
 =head4 after
 
-A cursor for use in pagination. C is an object ID that defines
+A cursor for use in pagination. C<after> is an object ID that defines
 your place in the list. For instance, if you make a list request and
-receive 100 objects, ending with objIfoo in order to fetch the next
-page of the list.
+receive 100 objects, ending with objI<foo, your subsequent call can
+include after=obj>foo in order to fetch the next page of the list.
 
 =over 4
 
@@ -3491,10 +3864,10 @@ page of the list.
 
 =head4 before
 
-A cursor for use in pagination. C is an object ID that defines
+A cursor for use in pagination. C<before> is an object ID that defines
 your place in the list. For instance, if you make a list request and
-receive 100 objects, ending with objIfoo in order to fetch the previous
-page of the list.
+receive 100 objects, starting with objI<foo, your subsequent call can
+include before=obj>foo in order to fetch the previous page of the list.
 
 =over 4
 
@@ -3568,8 +3941,8 @@ between 1 and 100, and the default is 20.
 
 =head4 order
 
-Sort order by the C timestamp of the objects. C for
-ascending order and C for descending order.
+Sort order by the C<created_at> timestamp of the objects. C<asc> for
+ascending order and C<desc> for descending order.
 
 =over 4
 
@@ -3590,10 +3963,10 @@ ascending order and C for descending order.
 
 =head4 after
 
-A cursor for use in pagination. C is an object ID that defines
+A cursor for use in pagination. C<after> is an object ID that defines
 your place in the list. For instance, if you make a list request and
-receive 100 objects, ending with objIfoo in order to fetch the next
-page of the list.
+receive 100 objects, ending with objI<foo, your subsequent call can
+include after=obj>foo in order to fetch the next page of the list.
 
 =over 4
 
@@ -3614,10 +3987,10 @@ page of the list.
 
 =head4 before
 
-A cursor for use in pagination. C is an object ID that defines
+A cursor for use in pagination. C<before> is an object ID that defines
 your place in the list. For instance, if you make a list request and
-receive 100 objects, ending with objIfoo in order to fetch the previous
-page of the list.
+receive 100 objects, starting with objI<foo, your subsequent call can
+include before=obj>foo in order to fetch the previous page of the list.
 
 =over 4
 
@@ -3642,7 +4015,30 @@ page of the list.
 
 Modifies a project in the organization.
 
-This method does not take any path or URL parameters.
+=head3 Parameters
+
+
+=head4 project_id
+
+The ID of the project.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
 
 
 =head3 Request Body
@@ -3653,7 +4049,51 @@ The request body is complicated. See L<OpenAPI::Client::OpenAI::Schema> for deta
 
 Modifies a user's role in the project.
 
-This method does not take any path or URL parameters.
+=head3 Parameters
+
+
+=head4 project_id
+
+The ID of the project.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 user_id
+
+The ID of the user.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
 
 
 =head3 Request Body
@@ -3664,7 +4104,30 @@ The request body is complicated. See L<OpenAPI::Client::OpenAI::Schema> for deta
 
 Modifies a user's role in the organization.
 
-This method does not take any path or URL parameters.
+=head3 Parameters
+
+
+=head4 user_id
+
+The ID of the user.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
 
 
 =head3 Request Body
@@ -4311,6 +4774,1969 @@ The ID of the run that requires the tool output submission.
 =head3 Request Body
 
 The request body is complicated. See L<OpenAPI::Client::OpenAI::Schema> for details.
+
+=head2 update-project-rate-limits
+
+Updates a project rate limit.
+
+=head3 Parameters
+
+
+=head4 project_id
+
+The ID of the project.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 rate_limit_id
+
+The ID of the rate limit.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       path
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head3 Request Body
+
+The request body is complicated. See L<OpenAPI::Client::OpenAI::Schema> for details.
+
+=head2 usage-audio-speeches
+
+Get audio speeches usage details for the organization.
+
+=head3 Parameters
+
+
+=head4 start_time
+
+Start time (Unix seconds) of the query time range, inclusive.
+
+=over 4
+
+=item * Type:     integer
+
+=item * In:       query
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 end_time
+
+End time (Unix seconds) of the query time range, exclusive.
+
+=over 4
+
+=item * Type:     integer
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 bucket_width
+
+Width of each time bucket in response. Currently C<1m>, C<1h> and C<1d>
+are supported, default to C<1d>.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  1d
+
+=item * Example:  N/A
+
+=item * Enum:     1m, 1h, 1d
+
+=back
+
+
+=head4 project_ids
+
+Return only usage for these projects.
+
+=over 4
+
+=item * Type:     array
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 user_ids
+
+Return only usage for these users.
+
+=over 4
+
+=item * Type:     array
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 api_key_ids
+
+Return only usage for these API keys.
+
+=over 4
+
+=item * Type:     array
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 models
+
+Return only usage for these models.
+
+=over 4
+
+=item * Type:     array
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 group_by
+
+Group the usage data by the specified fields. Support fields include
+C<project_id>, C<user_id>, C<api_key_id>, C<model> or any combination
+of them.
+
+=over 4
+
+=item * Type:     array
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 limit
+
+Specifies the number of buckets to return.
+- C<bucket_width=1d>: default: 7, max: 31
+- C<bucket_width=1h>: default: 24, max: 168
+- C<bucket_width=1m>: default: 60, max: 1440
+
+=over 4
+
+=item * Type:     integer
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 page
+
+A cursor for use in pagination. Corresponding to the C<next_page> field
+from the previous response.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head2 usage-audio-transcriptions
+
+Get audio transcriptions usage details for the organization.
+
+=head3 Parameters
+
+
+=head4 start_time
+
+Start time (Unix seconds) of the query time range, inclusive.
+
+=over 4
+
+=item * Type:     integer
+
+=item * In:       query
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 end_time
+
+End time (Unix seconds) of the query time range, exclusive.
+
+=over 4
+
+=item * Type:     integer
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 bucket_width
+
+Width of each time bucket in response. Currently C<1m>, C<1h> and C<1d>
+are supported, default to C<1d>.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  1d
+
+=item * Example:  N/A
+
+=item * Enum:     1m, 1h, 1d
+
+=back
+
+
+=head4 project_ids
+
+Return only usage for these projects.
+
+=over 4
+
+=item * Type:     array
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 user_ids
+
+Return only usage for these users.
+
+=over 4
+
+=item * Type:     array
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 api_key_ids
+
+Return only usage for these API keys.
+
+=over 4
+
+=item * Type:     array
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 models
+
+Return only usage for these models.
+
+=over 4
+
+=item * Type:     array
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 group_by
+
+Group the usage data by the specified fields. Support fields include
+C<project_id>, C<user_id>, C<api_key_id>, C<model> or any combination
+of them.
+
+=over 4
+
+=item * Type:     array
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 limit
+
+Specifies the number of buckets to return.
+- C<bucket_width=1d>: default: 7, max: 31
+- C<bucket_width=1h>: default: 24, max: 168
+- C<bucket_width=1m>: default: 60, max: 1440
+
+=over 4
+
+=item * Type:     integer
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 page
+
+A cursor for use in pagination. Corresponding to the C<next_page> field
+from the previous response.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head2 usage-code-interpreter-sessions
+
+Get code interpreter sessions usage details for the organization.
+
+=head3 Parameters
+
+
+=head4 start_time
+
+Start time (Unix seconds) of the query time range, inclusive.
+
+=over 4
+
+=item * Type:     integer
+
+=item * In:       query
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 end_time
+
+End time (Unix seconds) of the query time range, exclusive.
+
+=over 4
+
+=item * Type:     integer
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 bucket_width
+
+Width of each time bucket in response. Currently C<1m>, C<1h> and C<1d>
+are supported, default to C<1d>.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  1d
+
+=item * Example:  N/A
+
+=item * Enum:     1m, 1h, 1d
+
+=back
+
+
+=head4 project_ids
+
+Return only usage for these projects.
+
+=over 4
+
+=item * Type:     array
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 group_by
+
+Group the usage data by the specified fields. Support fields include
+C<project_id>.
+
+=over 4
+
+=item * Type:     array
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 limit
+
+Specifies the number of buckets to return.
+- C<bucket_width=1d>: default: 7, max: 31
+- C<bucket_width=1h>: default: 24, max: 168
+- C<bucket_width=1m>: default: 60, max: 1440
+
+=over 4
+
+=item * Type:     integer
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 page
+
+A cursor for use in pagination. Corresponding to the C<next_page> field
+from the previous response.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head2 usage-completions
+
+Get completions usage details for the organization.
+
+=head3 Parameters
+
+
+=head4 start_time
+
+Start time (Unix seconds) of the query time range, inclusive.
+
+=over 4
+
+=item * Type:     integer
+
+=item * In:       query
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 end_time
+
+End time (Unix seconds) of the query time range, exclusive.
+
+=over 4
+
+=item * Type:     integer
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 bucket_width
+
+Width of each time bucket in response. Currently C<1m>, C<1h> and C<1d>
+are supported, default to C<1d>.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  1d
+
+=item * Example:  N/A
+
+=item * Enum:     1m, 1h, 1d
+
+=back
+
+
+=head4 project_ids
+
+Return only usage for these projects.
+
+=over 4
+
+=item * Type:     array
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 user_ids
+
+Return only usage for these users.
+
+=over 4
+
+=item * Type:     array
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 api_key_ids
+
+Return only usage for these API keys.
+
+=over 4
+
+=item * Type:     array
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 models
+
+Return only usage for these models.
+
+=over 4
+
+=item * Type:     array
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 batch
+
+If C<true>, return batch jobs only. If C<false>, return non-batch jobs
+only. By default, return both.
+
+=over 4
+
+=item * Type:     boolean
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 group_by
+
+Group the usage data by the specified fields. Support fields include
+C<project_id>, C<user_id>, C<api_key_id>, C<model>, C<batch> or any
+combination of them.
+
+=over 4
+
+=item * Type:     array
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 limit
+
+Specifies the number of buckets to return.
+- C<bucket_width=1d>: default: 7, max: 31
+- C<bucket_width=1h>: default: 24, max: 168
+- C<bucket_width=1m>: default: 60, max: 1440
+
+=over 4
+
+=item * Type:     integer
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 page
+
+A cursor for use in pagination. Corresponding to the C<next_page> field
+from the previous response.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head2 usage-costs
+
+Get costs details for the organization.
+
+=head3 Parameters
+
+
+=head4 start_time
+
+Start time (Unix seconds) of the query time range, inclusive.
+
+=over 4
+
+=item * Type:     integer
+
+=item * In:       query
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 end_time
+
+End time (Unix seconds) of the query time range, exclusive.
+
+=over 4
+
+=item * Type:     integer
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 bucket_width
+
+Width of each time bucket in response. Currently only C<1d> is
+supported, default to C<1d>.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  1d
+
+=item * Example:  N/A
+
+=item * Enum:     1d
+
+=back
+
+
+=head4 project_ids
+
+Return only costs for these projects.
+
+=over 4
+
+=item * Type:     array
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 group_by
+
+Group the costs by the specified fields. Support fields include
+C<project_id>, C<line_item> and any combination of them.
+
+=over 4
+
+=item * Type:     array
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 limit
+
+A limit on the number of buckets to be returned. Limit can range
+between 1 and 180, and the default is 7.
+
+=over 4
+
+=item * Type:     integer
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  7
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 page
+
+A cursor for use in pagination. Corresponding to the C<next_page> field
+from the previous response.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head2 usage-embeddings
+
+Get embeddings usage details for the organization.
+
+=head3 Parameters
+
+
+=head4 start_time
+
+Start time (Unix seconds) of the query time range, inclusive.
+
+=over 4
+
+=item * Type:     integer
+
+=item * In:       query
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 end_time
+
+End time (Unix seconds) of the query time range, exclusive.
+
+=over 4
+
+=item * Type:     integer
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 bucket_width
+
+Width of each time bucket in response. Currently C<1m>, C<1h> and C<1d>
+are supported, default to C<1d>.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  1d
+
+=item * Example:  N/A
+
+=item * Enum:     1m, 1h, 1d
+
+=back
+
+
+=head4 project_ids
+
+Return only usage for these projects.
+
+=over 4
+
+=item * Type:     array
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 user_ids
+
+Return only usage for these users.
+
+=over 4
+
+=item * Type:     array
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 api_key_ids
+
+Return only usage for these API keys.
+
+=over 4
+
+=item * Type:     array
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 models
+
+Return only usage for these models.
+
+=over 4
+
+=item * Type:     array
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 group_by
+
+Group the usage data by the specified fields. Support fields include
+C<project_id>, C<user_id>, C<api_key_id>, C<model> or any combination
+of them.
+
+=over 4
+
+=item * Type:     array
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 limit
+
+Specifies the number of buckets to return.
+- C<bucket_width=1d>: default: 7, max: 31
+- C<bucket_width=1h>: default: 24, max: 168
+- C<bucket_width=1m>: default: 60, max: 1440
+
+=over 4
+
+=item * Type:     integer
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 page
+
+A cursor for use in pagination. Corresponding to the C<next_page> field
+from the previous response.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head2 usage-images
+
+Get images usage details for the organization.
+
+=head3 Parameters
+
+
+=head4 start_time
+
+Start time (Unix seconds) of the query time range, inclusive.
+
+=over 4
+
+=item * Type:     integer
+
+=item * In:       query
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 end_time
+
+End time (Unix seconds) of the query time range, exclusive.
+
+=over 4
+
+=item * Type:     integer
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 bucket_width
+
+Width of each time bucket in response. Currently C<1m>, C<1h> and C<1d>
+are supported, default to C<1d>.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  1d
+
+=item * Example:  N/A
+
+=item * Enum:     1m, 1h, 1d
+
+=back
+
+
+=head4 sources
+
+Return only usages for these sources. Possible values are
+C<image.generation>, C<image.edit>, C<image.variation> or any
+combination of them.
+
+=over 4
+
+=item * Type:     array
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 sizes
+
+Return only usages for these image sizes. Possible values are
+C<256x256>, C<512x512>, C<1024x1024>, C<1792x1792>, C<1024x1792> or any
+combination of them.
+
+=over 4
+
+=item * Type:     array
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 project_ids
+
+Return only usage for these projects.
+
+=over 4
+
+=item * Type:     array
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 user_ids
+
+Return only usage for these users.
+
+=over 4
+
+=item * Type:     array
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 api_key_ids
+
+Return only usage for these API keys.
+
+=over 4
+
+=item * Type:     array
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 models
+
+Return only usage for these models.
+
+=over 4
+
+=item * Type:     array
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 group_by
+
+Group the usage data by the specified fields. Support fields include
+C<project_id>, C<user_id>, C<api_key_id>, C<model>, C<size>, C<source>
+or any combination of them.
+
+=over 4
+
+=item * Type:     array
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 limit
+
+Specifies the number of buckets to return.
+- C<bucket_width=1d>: default: 7, max: 31
+- C<bucket_width=1h>: default: 24, max: 168
+- C<bucket_width=1m>: default: 60, max: 1440
+
+=over 4
+
+=item * Type:     integer
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 page
+
+A cursor for use in pagination. Corresponding to the C<next_page> field
+from the previous response.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head2 usage-moderations
+
+Get moderations usage details for the organization.
+
+=head3 Parameters
+
+
+=head4 start_time
+
+Start time (Unix seconds) of the query time range, inclusive.
+
+=over 4
+
+=item * Type:     integer
+
+=item * In:       query
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 end_time
+
+End time (Unix seconds) of the query time range, exclusive.
+
+=over 4
+
+=item * Type:     integer
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 bucket_width
+
+Width of each time bucket in response. Currently C<1m>, C<1h> and C<1d>
+are supported, default to C<1d>.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  1d
+
+=item * Example:  N/A
+
+=item * Enum:     1m, 1h, 1d
+
+=back
+
+
+=head4 project_ids
+
+Return only usage for these projects.
+
+=over 4
+
+=item * Type:     array
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 user_ids
+
+Return only usage for these users.
+
+=over 4
+
+=item * Type:     array
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 api_key_ids
+
+Return only usage for these API keys.
+
+=over 4
+
+=item * Type:     array
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 models
+
+Return only usage for these models.
+
+=over 4
+
+=item * Type:     array
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 group_by
+
+Group the usage data by the specified fields. Support fields include
+C<project_id>, C<user_id>, C<api_key_id>, C<model> or any combination
+of them.
+
+=over 4
+
+=item * Type:     array
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 limit
+
+Specifies the number of buckets to return.
+- C<bucket_width=1d>: default: 7, max: 31
+- C<bucket_width=1h>: default: 24, max: 168
+- C<bucket_width=1m>: default: 60, max: 1440
+
+=over 4
+
+=item * Type:     integer
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 page
+
+A cursor for use in pagination. Corresponding to the C<next_page> field
+from the previous response.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
+
+=head2 usage-vector-stores
+
+Get vector stores usage details for the organization.
+
+=head3 Parameters
+
+
+=head4 start_time
+
+Start time (Unix seconds) of the query time range, inclusive.
+
+=over 4
+
+=item * Type:     integer
+
+=item * In:       query
+
+=item * Required: True
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 end_time
+
+End time (Unix seconds) of the query time range, exclusive.
+
+=over 4
+
+=item * Type:     integer
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 bucket_width
+
+Width of each time bucket in response. Currently C<1m>, C<1h> and C<1d>
+are supported, default to C<1d>.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  1d
+
+=item * Example:  N/A
+
+=item * Enum:     1m, 1h, 1d
+
+=back
+
+
+=head4 project_ids
+
+Return only usage for these projects.
+
+=over 4
+
+=item * Type:     array
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 group_by
+
+Group the usage data by the specified fields. Support fields include
+C<project_id>.
+
+=over 4
+
+=item * Type:     array
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 limit
+
+Specifies the number of buckets to return.
+- C<bucket_width=1d>: default: 7, max: 31
+- C<bucket_width=1h>: default: 24, max: 168
+- C<bucket_width=1m>: default: 60, max: 1440
+
+=over 4
+
+=item * Type:     integer
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+=head4 page
+
+A cursor for use in pagination. Corresponding to the C<next_page> field
+from the previous response.
+
+=over 4
+
+=item * Type:     string
+
+=item * In:       query
+
+=item * Required: False
+
+=item * Default:  N/A
+
+=item * Example:  N/A
+
+=item * Enum:     N/A
+
+=back
+
+
+
 
 =head1 COPYRIGHT AND LICENSE
 

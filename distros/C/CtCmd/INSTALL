@@ -1,7 +1,7 @@
 ##########################################################################
 #                                                                        #
-# © Copyright IBM Corporation 2001, 2008 All rights reserved.            #
-# © Copyright HCL Technologies Ltd. 2016, 2022 All rights reserved.      #
+# (C) Copyright IBM Corporation 2001, 2016. All Rights Reserved.         #
+# (C) Copyright HCL Technologies Ltd. 2016, 2024. All rights reserved.   #
 #                                                                        #
 # This program and the accompanying materials are made available under   #
 # the terms of the Common Public License v1.0 which accompanies this     #
@@ -15,11 +15,6 @@
 _________________________________________
 
 The ClearCase::CtCmd module requires Perl v5.6.1 or v5.8 or later.
-Information on supported platforms for IBM Rational ClearCase is available at:
-
-IBM Software Product Compatibility Reports
-https://www.ibm.com/software/reports/compatibility/clarity/index.html
-
 __________________________________________
 
 Build and Install
@@ -61,7 +56,7 @@ __________________________________________
 UNIX/Linux:
 
 Set environment variable CLEARCASE_ROOT to the
-IBM Rational ClearCase installation path if different from /opt/rational/clearcase:
+DevOps Code ClearCase installation path if different from /opt/rational/clearcase:
 
 If /var/tmp is not available, set environment variable CC_CTCMD_TMP
 to the path of an alternative directory.
@@ -95,25 +90,26 @@ the library link order changed to have -lc before -lnsl.
 
 Windows:
 
-Substitute "nmake" for "make" when building and installing.
+Substitute "nmake" (MS Visual Studio cl compiler) or "gmake" (GNU gcc compiler) for "make" 
+when building and installing.
 
 There must be an environment variable:
 TMP=<path to system temporary storage, full control by everyone>.
 
 The path to Microsoft Visual Studio and to Perl must be in the PATH.
 
-The user must be able to run "Perl", "cleartool", "cl" and "dumpbin"
+The user must be able to run "Perl", "cleartool", "cl"/"gcc" and "dumpbin"/"Objdump" 
 from the command line without error messages before attempting
 installation.  The environment variables "inc" and "lib" must be set to
 the paths where the MS Visual Studio C include files and libraries are
 kept.  The user's PATH must include the path to the MSDEV ...\common\bin
-and ...\bin directories, as well as the path to cleartool and the IBM Rational ClearCase
+and ...\bin directories, as well as the path to cleartool and the DevOps Code ClearCase
 *.dll's.  Perl, version 5.6.1 or greater must be installed, and the
 installed Perl must have the necessary header and other files to allow
 installation of a Perl Module.
 
 If cmdsyn.lib or ks.lib is not being created it may be because the path to
-"dumpbin" or the path to the IBM Rational ClearCase libraries is not in the user's PATH.
+"dumpbin" or the path to the DevOps Code ClearCase libraries is not in the user's PATH.
 
 An error message "This shared resource does not exist" at the beginning
 of t/t1_createArch when nmaking test indicates that a view previously mapped

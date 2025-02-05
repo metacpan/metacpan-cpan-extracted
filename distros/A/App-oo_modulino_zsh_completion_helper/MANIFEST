@@ -21,3 +21,5 @@ t/00_compile.t
 t/10_method_list.t
 t/20_option_list.t
 t/30_m4i_d.t
+t/40_misc.d/lib/Foo/Bar/Baz.pm
+t/40_misc.t

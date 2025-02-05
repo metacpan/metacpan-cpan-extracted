@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use lib 't/lib';
 
-use Test::Most tests => 17;
+use Test::Most tests => 19;
 use FindBin qw($Bin);
 use Test::Needs 'CHI';
 
@@ -59,6 +59,9 @@ CHI: {
 	cmp_ok(scalar $cache->get_keys(), '==', 2, 'cache hit');
 	cmp_ok(ref($rc[1]), 'eq', 'HASH', 'selectall hashref returns a reference to an array');
 	cmp_ok(scalar @rc, '==', 4, 'selectall_hashref returns all matches');
+
+	cmp_ok($test1->number('three'), '==', 3, 'AUTOLOAD with cache works');
+	cmp_ok($test1->number('three'), '==', 3, 'AUTOLOAD retrieves from the cache');
 
 	if($ENV{'TEST_VERBOSE'}) {
 		foreach my $key($cache->get_keys()) {

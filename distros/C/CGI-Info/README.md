@@ -1,3 +1,6 @@
+CGI-Info
+========
+
 -[![Travis Status](https://travis-ci.org/nigelhorne/CGI-Info.svg?branch=master)](https://travis-ci.org/nigelhorne/CGI-Info)
 -[![Appveyor Status](https://ci.appveyor.com/api/projects/status/1t1yhvagx00c2qi8?svg=true)](https://ci.appveyor.com/project/nigelhorne/cgi-info)
 [![CircleCI](https://dl.circleci.com/status-badge/img/circleci/8CE7w65gte4YmSREC2GBgW/THucjGauwLPtHu1MMAueHj/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/circleci/8CE7w65gte4YmSREC2GBgW/THucjGauwLPtHu1MMAueHj/tree/main)
@@ -15,7 +18,7 @@ CGI::Info gets information about the system that a CGI script is running on.
 
 # VERSION
 
-Version 0.89
+Version 0.90
 
 # SYNOPSIS
 
@@ -179,11 +182,11 @@ Upload\_dir is a string containing a directory where files being uploaded are to
 be stored.
 It must be a writeable directory in the temporary area.
 
-Takes optional parameter logger, an object which is used for warnings and
-traces.
-This logger object is an object that understands warn() and trace() messages,
+Takes an optional parameter logger, which is used for warnings and traces.
+It can be an object that understands warn() and trace() messages,
 such as a [Log::Log4perl](https://metacpan.org/pod/Log%3A%3ALog4perl) or [Log::Any](https://metacpan.org/pod/Log%3A%3AAny) object,
-or a reference to code.
+a reference to code,
+or a filename.
 
 The allow, expect, logger and upload\_dir arguments can also be passed to the
 constructor.
@@ -237,6 +240,8 @@ CGI::Info will put the request into the params element 'XML', thus:
         my $paramsref = $info->params();        # See BUGS below
         my $xml = $$paramsref{'XML'};
         # ... parse and process the XML request in $xml
+
+Carp if logger is not set and we detect something serious:w
 
 ## param
 
@@ -423,6 +428,8 @@ Returns the warnings that the object has generated as a ref to an array of hashe
 
 ## set\_logger
 
+Sets the class, code reference, or file that will be used for logging.
+
 Sometimes you don't know what the logger is until you've instantiated the class.
 This function fixes the catch22 situation.
 
@@ -437,6 +444,9 @@ but nowhere else.
 Nigel Horne, `<njh at bandsman.co.uk>`
 
 # BUGS
+
+Please report any bugs or feature requests to the author.
+This module is provided as-is without any warranty.
 
 is\_tablet() only currently detects the iPad and Windows PCs. Android strings
 don't differ between tablets and smart-phones.

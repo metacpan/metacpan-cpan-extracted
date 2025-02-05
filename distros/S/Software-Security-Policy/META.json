@@ -47,11 +47,11 @@
    "provides" : {
       "Software::Security::Policy" : {
          "file" : "lib/Software/Security/Policy.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       },
       "Software::Security::Policy::Individual" : {
          "file" : "lib/Software/Security/Policy/Individual.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
@@ -65,12 +65,12 @@
          "web" : "https://github.com/CPAN-Security/Software-Security-Policy"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_generated_by_perl" : "v5.38.2",
    "x_maintainers" : [
       "Timothy Legge <timlegge@gmail.com>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

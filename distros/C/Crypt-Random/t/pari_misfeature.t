@@ -1,14 +1,11 @@
-#!/usr/bin/perl -sw
 ##
-## Copyright (c) 2000, Vipul Ved Prakash.  All rights reserved.
+## Copyright (c) 2000-2025, Vipul Ved Prakash.  All rights reserved.
 ## This code is free software; you can redistribute it and/or modify
 ## it under the same terms as Perl itself.
 ##
-## $Id: pari_misfeature.t,v 1.2 2001/06/22 18:17:19 vipul Exp $
 
-use lib 'lib';
-use lib '../lib';
-
+use strict;
+use warnings;
 print "1..1\n";
 
 use Crypt::Random qw(makerandom makerandom_itv); 

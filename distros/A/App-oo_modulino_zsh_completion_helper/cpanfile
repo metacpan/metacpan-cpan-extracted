@@ -1,6 +1,6 @@
 requires 'perl', '5.010';
 
-requires 'MOP4Import::Declare', '>= 0.052';
+requires 'MOP4Import::Declare', '>= 0.061';
 
 requires 'Module::Runtime';
 

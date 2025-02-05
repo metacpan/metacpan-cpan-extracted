@@ -46,7 +46,7 @@ PARAM: {
 			$obj->warnings()->[0]->{'warning'},
 			qr/param: invalid isn't in the allow list/,
 			'Warning generated for disallowed parameter'
-		 );
+		);
 
 		delete $ENV{'QUERY_STRING'};
 		$obj = CGI::Info->new();

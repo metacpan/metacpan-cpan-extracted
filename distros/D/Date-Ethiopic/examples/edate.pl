@@ -1,6 +1,12 @@
 #!/usr/bin/perl -w
 
 require Date::Ethiopic::ET::am;
+use strict;
+
+if ( $] >= 5.007 ) {
+	binmode (STDOUT, ":utf8");
+	binmode (STDERR, ":utf8");
+}
 
 my $edate = new Date::Ethiopic::ET::am ( epoch => time, calscale => "gregorian" );
 

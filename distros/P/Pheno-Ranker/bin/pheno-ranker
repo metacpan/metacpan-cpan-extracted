@@ -22,6 +22,7 @@ use Getopt::Long qw(:config no_ignore_case);
 use Pod::Usage;
 use Data::Dumper;
 use Sys::Hostname;
+use File::Path qw(remove_tree);
 use POSIX                          qw(strftime);
 use Term::ANSIColor                qw(:constants);
 use File::ShareDir::ProjectDistDir qw(dist_dir);
@@ -63,7 +64,7 @@ GetOptions(
     'exclude-terms=s{1,11}'              => \my @exclude_terms,               # array
     'retain-excluded-phenotypicFeatures' => \
       my $retain_excluded_phenotypicFeatures,                                 # flag
-    'precomputed-ref-prefix=s' => \my $precomputed_ref_prefix,                # string
+    'prp|precomputed-ref-prefix=s' => \my $precomputed_ref_prefix,                # string
     'max-matrix-items-in-ram=i' => \my $max_matrix_items_in_ram,            # integer
     'config=s'                 => \my $config_file,                           # string
     'age!'                     => \$age,                                      # flag
@@ -192,6 +193,9 @@ $ranker->run();
 write_log( $log ? $log : $log_file, $data, $VERSION )
   if defined $log;
 
+# Delete '_Inline' dir
+remove_tree('_Inline') if -d '_Inline';
+
 ####################
 # END PHENO-RANKER #
 ####################
@@ -302,7 +306,6 @@ pheno-ranker: A script that performs semantic similarity in PXF/BFF data structu
      -e, --export [path/basename]     Export miscellaneous JSON files. If not specified, default filenames are used [default: export.*]
      -exclude-terms <terms>           Exclude BFF/PXF terms (e.g., --exclude-terms sex, id) or column names in JSON-derived from CSV 
      -graph-stats [file]              Generates a text file with key graph metrics, for use with <-cytoscape-json> [default: graph_stats.txt]
-     -prp, --precomputed-ref-prefix [path/basename]   Use precomputed data for the reference cohort(s). No need to use --r
      -include-hpo-ascendants          Include ascendant terms from the Human Phenotype Ontology (HPO)
      -include-terms <terms>           Include BFF/PXF terms (e.g., --include-terms diseases) or column names in JSON-derived from CSV
      -max-matrix-items-in-ram <number>   In cohort mode, set max items before switching to RAM-efficient mode (default: 5000)
@@ -311,6 +314,7 @@ pheno-ranker: A script that performs semantic similarity in PXF/BFF data structu
      -o, --out-file <file>            Output file path [default: -r matrix.txt | -t rank.txt]
      -poi, --patients-of-interest <id_list>   Export JSON files for the selected individual IDs during a dry-run
      -poi-out-dir <directory>         Directory for JSON files (used with --poi)
+     -prp, --precomputed-ref-prefix [path/basename]   Use precomputed data for the reference cohort(s). No need to use --r
      -retain-excluded-phenotypicFeatures     Retains features set to "excluded": true by appending '_excluded' to their IDs
      -similarity-metric-cohort <metric>  Similarity metric for cohort mode [>hamming|jaccard]
      -sort-by <metric>                Sort by Hamming distance or Jaccard index [>hamming|jaccard]

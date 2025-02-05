@@ -1,5 +1,9 @@
 Revision history for Crypt-Passphrase
 
+0.021     2025-02-04 20:20:48+01:00 Europe/Brussels
+          - Use Crypt::SysRandom as source of randomness
+          - Fix skipping of internal packages in error messages
+
 0.020     2025-01-10 20:08:38+01:00 Europe/Brussels
           - Add support for more legacy algorithms in Crypt::Passphrase::System
           - Allow unknown algorithms in settings argument of Crypt::Passphrase::System

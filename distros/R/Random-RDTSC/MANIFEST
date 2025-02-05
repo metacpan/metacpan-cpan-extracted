@@ -1,0 +1,15 @@
+example.pl
+lib/Random/RDTSC.bs
+lib/Random/RDTSC.c
+lib/Random/RDTSC.o
+lib/Random/RDTSC.pm
+lib/Random/RDTSC.xs
+lib/Random/rdtsc_rand.h
+Makefile.PL
+MANIFEST
+README
+README.md
+LICENSE
+t/01-main.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

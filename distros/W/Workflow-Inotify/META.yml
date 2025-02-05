@@ -9,7 +9,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::ShareDir::Install: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,10 +22,10 @@ no_index:
 provides:
   Workflow::Inotify:
     file: lib/Workflow/Inotify.pm
-    version: v1.0.6
+    version: v1.0.7
   Workflow::Inotify::Handler:
     file: lib/Workflow/Inotify/Handler.pm
-    version: v1.0.6
+    version: v1.0.7
 requires:
   Class::Accessor::Fast: '0'
   Config::IniFiles: '0'
@@ -39,5 +39,5 @@ resources:
   bugtracker: http://github.com/rlauer6/perl-Workflow-Inotify/issues
   homepage: http://github.com/rlauer6/perl-Workflow-Inotify
   repository: git://github.com/rlauer6/perl-Workflow-Inotify.git
-version: v1.0.6
+version: v1.0.7
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

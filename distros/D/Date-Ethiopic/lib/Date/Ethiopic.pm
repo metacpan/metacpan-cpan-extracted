@@ -1,11 +1,13 @@
 package Date::Ethiopic;
 use base (Date::ICal);
+use utf8;
 
 BEGIN
 {
 	require 5.000;
-
 	use strict;
+	use warnings;
+
 	use vars qw(
 		$VERSION
 		$EPOCH
@@ -52,7 +54,7 @@ BEGIN
 		$n
 	);
 
-	$VERSION = "0.13";
+	$VERSION = "0.14";
 
 	$EPOCH = 2796;
 
@@ -1083,12 +1085,21 @@ for updates as they come in.
 
 =head1 CREDITS
 
-=item Calendrical Calculations: L<http://www.calendarists.com/>
-=item Bahra Hasab: L<http://www.hmml.org/events/>
-=item LibEth: L<http://libeth.sourceforge.net/>
-=item Ethiopica: L<http://ethiopica.sourceforge.net/>
-=item Saint Gebriel Ethiopian Orthodox Church of Seattle: L<http://www.st-gebriel.org/>
-=item Aklile Birhan Wold Kirkos, Metsaheit Tibeb, Neged Publishers, Addis Ababa, 1955 (1948 EC).
+=over 4
+
+=item * Calendrical Calculations: L<http://www.calendarists.com/>
+
+=item * Bahra Hasab: L<http://www.hmml.org/events/>
+
+=item * LibEth: L<http://libeth.sourceforge.net/>
+
+=item * Ethiopica: L<http://ethiopica.sourceforge.net/>
+
+=item * Saint Gebriel Ethiopian Orthodox Church of Seattle: L<http://www.st-gebriel.org/>
+
+=item * Aklile Birhan Wold Kirkos, Metsaheit Tibeb, Neged Publishers, Addis Ababa, 1955 (1948 EC).
+
+=back
 
 =head1 REQUIRES
 
@@ -1096,7 +1107,9 @@ Date::ICal and L<Convert::Number::Ethiopic>.  It should work with
 any version of Perl.  L<Convert::Number::Ethiopic> is only required
 if you want to display years and days in Ethiopic numerals.
 
-=head1 COPYRIGHT
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2003-2025, Daniel Yacob C<< <dyacob@cpan.org> >>. All rights reserved.
 
 The conversion algorithms are derived from the original work in Emacs
 Lisp by Reingold, Dershowitz and Clamen which later grew into the
@@ -1115,7 +1128,9 @@ the following message:
  ;; This code is in the public domain, but any use of it
  ;; should publically acknowledge its source.
 
-Otherwise, this module is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+Otherwise, this module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
 
 =head1 BUGS
 

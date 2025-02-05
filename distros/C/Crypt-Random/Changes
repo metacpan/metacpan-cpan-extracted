@@ -1,6 +1,40 @@
+Revision history Crypt::Random
 
-                       CHANGELOG for Crypt::Random
-           $Id: Changes,v 1.6 2001/07/12 15:59:46 vipul Exp $
+1.56 -- Tue Feb 04 21:47:59 AST 2025
+
+    [Significant updates since 1.54]
+    - New Maintainer
+    - Implement new Win32API provider
+    - Switch rand provider to use Crypt::URandom instead of rand()
+    - A number of packaging and build updates
+
+    [Change Log]
+    - ad803b2 Increment repo version
+    - 82b7643 Fix regex for version creation
+    - e7c687b v1.55
+
+1.55 -- Wed Jan 29 23:41:05 AST 2025
+
+    [Significant updates since 1.54]
+    - New Maintainer
+    - Implement new Win32API provider
+    - Switch rand provider to use Crypt::URandom instead of rand()
+    - A number of packaging and build updates
+
+    [Change Log]
+    - 6e032b0 Add missing use strict and add LICENSE in pod
+    - 95ea54a Add spelling exceptions
+    - 1858c59 Update copyright information
+    - 1f8b29e Switch rand provider to use Crypt::URandom
+    - 424ef40 Add new Win32API Provider for Windows
+    - 2f5afba Move rand and egd providers to the low strength list
+    - 3fed3a9 Modernize calls to new
+    - 90e1040 remove unnecessary use lib, add strict and warnings and remove the perl command Remove shebang line
+    - b196c21 Add github action for testing
+    - b2bc3b6 .gitignore
+    - e89a896 Move build process to Dist::Zilla
+    - 70446cd Remove archive of previous release
+    - 533f310 (tag: 1.54) Import Crypt-Random-1.54 from cpan
 
 --------------------------------------------------------------------------
 1.54                                                     June 3, 2021

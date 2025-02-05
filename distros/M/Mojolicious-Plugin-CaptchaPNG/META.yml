@@ -1,0 +1,40 @@
+---
+abstract: 'PNG captcha generation and validation Mojolicious plugin'
+author:
+  - 'Gryphon Shafer <gryphon@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Mojolicious::Lite: '0'
+  Test2::MojoX: '0'
+  Test2::V0: '0'
+  Test::More: '0'
+  perl: '5.024'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.024'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-CaptchaPNG
+requires:
+  GD: '2.83'
+  GD::Image: '0'
+  Math::Random::Secure: '0'
+  Mojo::Base: '0'
+  Mojo::Exception: '0'
+  perl: '5.024'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/gryphonshafer/Mojo-Plugin-Captcha/issues
+  homepage: https://github.com/gryphonshafer/Mojo-Plugin-Captcha
+  repository: https://github.com/gryphonshafer/Mojo-Plugin-Captcha.git
+version: '1.02'
+x_generated_by_perl: v5.40.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: Artistic-2.0

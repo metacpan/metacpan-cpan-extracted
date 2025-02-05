@@ -16,7 +16,7 @@ use List::Util                     qw(all);
 use Hash::Util                     qw(lock_hash);
 use Pheno::Ranker::IO;
 use Pheno::Ranker::Compare;
-use Pheno::Ranker::Stats;
+use Pheno::Ranker::Metrics;
 use Pheno::Ranker::Graph;
 
 use Exporter 'import';
@@ -28,7 +28,7 @@ $SIG{__DIE__}  = sub { die BOLD RED "Error: ", @_ };
 
 # Global variables:
 $Data::Dumper::Sortkeys = 1;
-our $VERSION   = '1.02';
+our $VERSION   = '1.03';
 our $share_dir = dist_dir('Pheno-Ranker');
 
 # Set development mode

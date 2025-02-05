@@ -1,5 +1,12 @@
 Revision history for Socket-Packet
 
+0.12    2025-02-04
+        [CHANGES]
+         * General module style refreshes/updates to build structure,
+           code formatting, Pod, unit tests, ...
+         * Use `mg_findext()` to avoid needing low-level access to
+           `mg->mg_moremagic`
+
 0.11    2020-06-01
         [CHANGES]
          * General update of module docs style

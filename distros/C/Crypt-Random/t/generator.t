@@ -1,8 +1,7 @@
-#!/usr/bin/perl -sw
 ##
 ##
 ##
-## Copyright (c) 2001, Vipul Ved Prakash.  All rights reserved.
+## Copyright (c) 2001-2025, Vipul Ved Prakash.  All rights reserved.
 ## This code is free software; you can redistribute it and/or modify
 ## it under the same terms as Perl itself.
 ##
@@ -17,15 +16,16 @@
 # cat /proc/sys/kernel/random/read_wakeup_threshold
 #
 # To enable /dev/random test, bump plan_tests to 15 and add this to the list of tests: 
-#tests( new Crypt::Random::Generator Strength => 1 );
+#tests( Crypt::Random::Generator->new( (Strength => 1) );
 
-
+use strict;
+use warnings;
 use Test;
 use Crypt::Random::Generator;
-BEGIN { plan tests => 10 };
+BEGIN { plan tests => 16 };
 
-tests( new Crypt::Random::Generator Strength => 0 );
-tests( new Crypt::Random::Generator Provider => 'rand' );
+tests( Crypt::Random::Generator->new( (Strength => 0) ));
+tests( Crypt::Random::Generator->new ( (Provider => 'rand') ));
 
 sub tests { 
 
@@ -38,4 +38,27 @@ sub tests {
     ok($gen->integer (Size => 128));
     ok(length($gen->string (Length => 30)), 30);
 
+}
+
+if($^O =~ /MSWin32/) {
+    provider( Crypt::Random::Generator->new( (Strength => 0)), 'Win32API');
+} else{
+    provider( Crypt::Random::Generator->new( (Strength => 0)), 'rand');
+}
+provider( Crypt::Random::Generator->new( (Strength => 0, Provider=>'rand')), 'rand');
+provider( Crypt::Random::Generator->new( (Strength => 0, Provider=>'Win32API')), 'Win32API');
+
+sub provider {
+    my $gen = shift;
+    my $provider = shift;
+    ok($gen->{Provider}, $provider);
+}
+
+uniform( Crypt::Random::Generator->new( ), 0);
+uniform( Crypt::Random::Generator->new( (Uniform => 0)), 0);
+uniform( Crypt::Random::Generator->new( (Uniform => 1)), 1);
+sub uniform {
+    my $gen = shift;
+    my $uniform = shift;
+    ok($gen->{Uniform}, $uniform);
 }

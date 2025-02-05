@@ -1,4 +1,5 @@
 Changes
+LICENSE
 MANIFEST
 Makefile.PL
 README
@@ -31,3 +32,5 @@ lib/Date/Ethiopic/ET.pm
 lib/Date/Ethiopic/gez.pm
 lib/Date/Ethiopic/ti.pm
 t/01dates.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

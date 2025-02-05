@@ -12,7 +12,7 @@ configure_requires:
   Module::Build::Tiny: '0.034'
   perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,12 +21,12 @@ name: Crypt-ECDH_ES
 provides:
   Crypt::ECDH_ES:
     file: lib/Crypt/ECDH_ES.pm
-    version: '0.005'
+    version: '0.006'
 requires:
   Carp: '0'
   Crypt::Curve25519: '0'
   Crypt::Rijndael: '1.16'
-  Crypt::URandom: '0'
+  Crypt::SysRandom: '0'
   Digest::SHA: '0'
   Exporter: '5.57'
   perl: '5.006'
@@ -35,7 +35,7 @@ requires:
 resources:
   bugtracker: https://github.com/Leont/crypt-ecdh_es/issues
   repository: git://github.com/Leont/crypt-ecdh_es.git
-version: '0.005'
-x_generated_by_perl: v5.38.0
-x_serialization_backend: 'YAML::Tiny version 1.74'
+version: '0.006'
+x_generated_by_perl: v5.40.0
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

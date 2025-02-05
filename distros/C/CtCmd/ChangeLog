@@ -14,6 +14,9 @@
 #                                                                        #
 ##########################################################################
 
+1.18  Modify CtCmd to support Windows for Microsoft VS and GCC compilers.
+1.17  Modify CtCmd for new 64-bit Unix platforms(AIX, HP-UX, Linux, Solaris).
+1.16  Modify CtCmd to support the LBE platforms.
 1.15  Modify CtCmd to honor changed umask (requires a companion ClearCase fix).
 1.14  Enable Perl 64 bit for linux_x86_64
 1.13  Repair routine signatures

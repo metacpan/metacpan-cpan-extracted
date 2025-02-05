@@ -6,9 +6,10 @@ use warnings;
 use Config::IniFiles;
 use Data::Dumper;
 use List::Util qw(any);
+use Linux::Inotify2;
 
 __PACKAGE__->follow_best_practice;
-__PACKAGE__->mk_accessors(qw(config));
+__PACKAGE__->mk_accessors(qw(config events masks));
 
 use parent qw(Exporter Class::Accessor::Fast);
 
@@ -17,9 +18,30 @@ use Readonly;
 Readonly our $TRUE  => 1;
 Readonly our $FALSE => 0;
 
-our @EXPORT_OK = qw(boolean);
+our @EXPORT_OK = qw(boolean %EVENTS %MASKS);
 
-our $VERSION = '1.0.6';  ## no critic (RequireInterpolation)
+our $VERSION = '1.0.7';  ## no critic (RequireInterpolation)
+
+our %EVENTS = (
+  IN_ACCESS        => IN_ACCESS,
+  IN_ATTRIB        => IN_ATTRIB,
+  IN_CLOSE_WRITE   => IN_CLOSE_WRITE,
+  IN_CLOSE_NOWRITE => IN_CLOSE_NOWRITE,
+  IN_CREATE        => IN_CREATE,
+  IN_DELETE        => IN_DELETE,
+  IN_DELETE_SELF   => IN_DELETE_SELF,
+  IN_MODIFY        => IN_MODIFY,
+  IN_MOVE_SELF     => IN_MOVE_SELF,
+  IN_MOVED_FROM    => IN_MOVED_FROM,
+  IN_MOVED_TO      => IN_MOVED_TO,
+  IN_OPEN          => IN_OPEN,
+);
+
+our %MASKS = reverse %EVENTS;
+
+for ( keys %EVENTS ) {
+  $EVENTS{IN_ALL} |= $EVENTS{$_};
+}
 
 ########################################################################
 sub boolean {
@@ -60,7 +82,12 @@ sub new {
     }
   }
 
-  my $self = $class->SUPER::new( { config => $config } );
+  my $self = $class->SUPER::new(
+    { config => $config,
+      events => \%EVENTS,
+      masks  => \%MASKS
+    }
+  );
 
   $self->get_app_config();
 
@@ -76,10 +103,7 @@ sub get_app_config {
   $section_name =~ s/::/_/xsmg;
 
   my $config = $self->get_config;
-
-  if ( $config->SectionExists( lc $section_name ) ) {
-    $section_name = lc $section_name;
-  }
+  $section_name = lc $section_name;
 
   return
     if !$config->SectionExists($section_name);
@@ -87,7 +111,7 @@ sub get_app_config {
   my %section_config;
 
   foreach ( $self->get_config->Parameters($section_name) ) {
-    $section_config{$_} = $self->get_config->val( $section_name, $_ );
+    $section_config{$_} = $self->get_config->val( $section_name => $_ );
   }
 
   my @extra_vars = keys %section_config;

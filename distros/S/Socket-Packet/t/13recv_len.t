@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 # MSG_TRUNC started only works on 2.4.27 or 2.6.8 or newer
 my @ver = split( m/[.-]/, do { my $ver = `uname -r`; chomp $ver; $ver } );

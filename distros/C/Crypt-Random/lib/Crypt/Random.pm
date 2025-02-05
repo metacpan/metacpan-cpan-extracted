@@ -1,4 +1,3 @@
-#!/usr/bin/perl -s
 ##
 ## Crypt::Random -- Interface to /dev/random and /dev/urandom.
 ##
@@ -6,6 +5,8 @@
 ## This code is free software; you can redistribute it and/or modify
 ## it under the same terms as Perl itself.
 
+use strict;
+use warnings;
 package Crypt::Random; 
 require Exporter;
 use vars qw($VERSION @EXPORT_OK); 
@@ -21,16 +22,15 @@ use Data::Dumper;
 use Class::Loader;
 use Crypt::Random::Generator;
 
-$VERSION     = 1.54;
-
+our $VERSION = '1.56';
 
 sub _pickprovider { 
 
     my (%params) = @_;
 
     return $params{Provider} if $params{Provider};
-    $params{Strength} ||= 0;
-    my $gen = new Crypt::Random::Generator Strength => $params{Strength};
+    $params{Strength} = defined $params{Strength} ? $params{Strength} : 1;
+    my $gen = Crypt::Random::Generator->new( ( Strength => $params{Strength} ));
     return $gen->{Provider};
 
 }
@@ -44,7 +44,7 @@ sub makerandom {
     local $| = 1;
 
     my $provider = _pickprovider(%params);
-    my $loader = new Class::Loader;
+    my $loader = Class::Loader->new();
     my $po = $loader->_load ( Module => "Crypt::Random::Provider::$provider", 
                               Args => [ map { $_ => $params{$_} }
                                 qw(Strength Provider) ] )
@@ -57,6 +57,7 @@ sub makerandom {
 
     my $down     = $size - 1;
 
+    my $y;
     unless ($uniform) { 
 
         # We always set the high bit of the random number if 
@@ -118,7 +119,7 @@ sub makerandom_octet  {
     $params{Verbosity} = 0 unless $params{Verbosity};
 
     my $provider = _pickprovider(%params); 
-    my $loader = new Class::Loader;
+    my $loader = Class::Loader->new();
     my $po = $loader->_load ( Module => "Crypt::Random::Provider::$provider", 
                               Args => [ %params ] );
     return $po->get_data( %params );
@@ -133,11 +134,6 @@ sub makerandom_octet  {
 
 Crypt::Random - Cryptographically Secure, True Random Number Generator. 
 
-=head1 VERSION
-
- $Revision: 1.11 $
- $Date: 2001/07/12 15:59:47 $
-
 =head1 SYNOPSIS
 
  use Crypt::Random qw( makerandom ); 
@@ -145,34 +141,35 @@ Crypt::Random - Cryptographically Secure, True Random Number Generator.
 
 =head1 DESCRIPTION
 
-Crypt::Random is an interface module to the /dev/random device found on
-most modern unix systems. It also interfaces with egd, a user space
-entropy gathering daemon, available for systems where /dev/random (or
-similar) devices are not available. When Math::Pari is installed,
-Crypt::Random can generate random integers of arbitrary size of a given
-bitsize or in a specified interval.
+Crypt::Random is an interface module to the /dev/random and /dev/urandom
+device found on most modern unix systems. It also interfaces with egd,
+a user space entropy gathering daemon, available for systems where
+/dev/random (or similar) devices are not available. When Math::Pari is
+installed, Crypt::Random can generate random integers of arbitrary size
+of a given bitsize or in a specified interval.
+
+=head1 ALTERNATIVES
+
+Crypt::Random has numerous options for obtaining randomness.  If you would
+prefer a simpler module that provides cryptographic grade randomness
+Crypt::URandom should be considered.
+
+The CPANSec group has developed the L<CPAN Author's Guide to Random Data for Security|https://security.metacpan.org/docs/guides/random-data-for-security.html> that should be reviewed before dealing with randomness. 
 
 =head1 BLOCKING BEHAVIOUR
 
-The /dev/random driver maintains an estimate of true randomness in the
-pool and decreases it every time random strings are requested for use.
-When the estimate goes down to zero, the routine blocks and waits for the
-occurrence of non-deterministic events to refresh the pool.
-
-When the routine is blocked, Crypt::Random's read() will be blocked till
-desired amount of random bytes have been read off of the device. The
-/dev/random kernel module also provides another interface, /dev/urandom,
-that does not wait for the entropy-pool to recharge and returns as many
-bytes as requested. For applications that must not block (for a
-potentially long time) should use /dev/urandom. /dev/random should be
-reserved for instances where very high quality randomness is desired.
+Since kernel version 5.6 in 2020, /dev/random is no longer blocking and
+there is effectively no difference between /dev/random and /dev/urandom.
+Indeed there has been no difference in the quality of randomness from
+either in many years.  /dev/random now only blocks on startup of the
+system and only for a very short time.
 
 =head1 HARDWARE RNG
 
-If there's a hardware random number generator available, for instance the
-Intel i8x0 random number generator, please use it instead of /dev/random!.
-It'll be high quality, a lot faster and it won't block! Usually your OS
-will provide access to the RNG as a device, eg (/dev/intel_rng).
+If there's a hardware random number generator available, for instance
+the Intel i8x0 random number generator, you can use it instead of
+/dev/random or /dev/urandom.  Usually your OS will provide access to the
+RNG as a device, eg (/dev/intel_rng).
 
 =head1 METHODS 
 
@@ -189,10 +186,46 @@ arguments can be specified.
 
 Bitsize of the random number. 
 
+=item B<Provider> 
+
+Specifies the name of the Provider to be used. B<Specifying a Provider overrides Strength>.
+
+Options are:
+
+=over 4
+
+=item devrandom
+
+Uses /dev/random to generate randomness.
+
+=item devurandom
+
+Uses /dev/urandom to generate randomness.
+
+=item Win32API
+
+Uses the Windows API SystemFunction036 (RtlGenRandom) to generate
+randomness on Windows Operating Systems.
+
+=item egd (INSECURE)
+
+An Entropy Gathering Daemon (egd) daemon is read to obtain randomness.
+As egd has not been updated since 2002 it has been moved to the low
+strength provider list.
+
+=item rand
+
+Generates randomness based on Perl's Crypt::URandom urandom function.
+
+=back
+
 =item B<Strength> 0 || 1 
 
-Value of 1 implies that /dev/random should be used
-for requesting random bits while 0 implies /dev/urandom.
+Value of 1 implies that /dev/random or /dev/urandom should be used
+for requesting random bits while 0 implies insecure including rand.
+
+As of release 1.55 Strength defaults to 1 (/dev/random or
+/dev/urandom or rand (using Crypt::URandom::urandom))
 
 =item B<Device> 
 
@@ -250,6 +283,13 @@ the random device.
 
 Crypt::Random needs Math::Pari 2.001802 or higher. 
 
+=head1 SEE ALSO
+
+Crypt::URandom should be considered as simpler module for obtaining
+cryptographically secure source of Randomness.
+
+The CPANSec group has developed the L<CPAN Author's Guide to Random Data for Security|https://security.metacpan.org/docs/guides/random-data-for-security.html> that should be reviewed before dealing with randomness. 
+
 =head1 BIBLIOGRAPHY 
 
 =over 4
@@ -261,6 +301,11 @@ the Linux kernel sources.
 and Scott Vanstone.
 
 =back
+
+=head1 LICENSE
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =head1 AUTHOR
 

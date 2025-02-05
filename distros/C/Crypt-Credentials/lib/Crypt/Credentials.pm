@@ -1,11 +1,11 @@
 package Crypt::Credentials;
-$Crypt::Credentials::VERSION = '0.004';
+$Crypt::Credentials::VERSION = '0.005';
 use strict;
 use warnings;
 
 use Carp 'croak';
 use Crypt::AuthEnc::GCM qw/gcm_encrypt_authenticate gcm_decrypt_verify/;
-use Crypt::PRNG 'random_bytes';
+use Crypt::SysRandom 'random_bytes';
 use File::Basename 'dirname';
 use File::Path 'make_path';
 use File::Slurper qw/read_binary write_binary/;
@@ -179,7 +179,7 @@ Crypt::Credentials - Manage credential files
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

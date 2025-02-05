@@ -2,7 +2,8 @@
 
 ##########################################################################
 #                                                                        #
-# © Copyright IBM Corporation 2001, 2004. All rights reserved.           #
+# © Copyright IBM Corporation 2001, 2016.  All Rights Reserved.          #
+# © Copyright HCL Technologies Ltd. 2016, 2024. All rights reserved.     #
 #                                                                        #
 # This program and the accompanying materials are made available under   #
 # the terms of the Common Public License v1.0 which accompanies this     #
@@ -23,6 +24,8 @@
 $| = 1;
 
 $debug = $ENV{AUTODEF_DEBUG};
+
+$isMinGW = $ARGV[1] =~ /MinGW/ ? 1 : 0;
 
 open(CONFIG, $ARGV[0])||die "Missing conf file $ARGV[0]\n";
 while(<CONFIG>){
@@ -48,7 +51,7 @@ print DefFile "LIBRARY $libName\n"; #first two lines of .def file
 print DefFile "EXPORTS\n";
 my $ordinal;
 for $funcName (@funcArray){
-    $ordinal = getOrdinal($funcName);
+    $ordinal = $isMinGW ? getOrdinalMinGW($funcName) : getOrdinal($funcName);
     if($ordinal != -1){       #each exports ordinal
         if ($funcName eq 'cmdsyn_proc_table') {
             print DefFile "\t$funcName=_$funcName\tDATA\n";
@@ -106,3 +109,29 @@ sub getOrdinal{
     }
     return -1;
 }
+
+sub getOrdinalMinGW{
+    my $name =shift;
+    $libFP = $libDir.$libName . '.dll';
+    my $line = "";
+
+    $cmd = "objdump -p  \"$libFP\" ";
+    print STDERR "Objdump command: $cmd\n" if $debug;
+
+    @screen = `$cmd`;
+    for(@screen){
+	if(/$name/){
+	    $line = $_;
+	    last; #as break in C
+	}
+    }
+    if($line){
+	$line=~ tr/[]//d;  #remove square brackets
+	$line=~ tr/[0-9]/x/c;  #change all the non-digit to x
+	$line=~ tr/x/y/s;      #squeeze to multiple x to single y
+	@aa = split(/y/,$line); #split the string to digit array
+	return $aa[1];          #take the second one as ordinal
+    }
+    return -1;
+}
+

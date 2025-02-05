@@ -1,7 +1,7 @@
 package Acme::Crap;
 use 5.010;
 
-our $VERSION = '0.001002';
+our $VERSION = '0.001003';
 
 use warnings;
 use strict;
@@ -39,11 +39,9 @@ sub new {
 sub value {
     my ($self) = @_;
     if ($Acme::Crap::no_negation) {
-        given ($self->{degree}) {
-            when (1) { return ucfirst "$self->{val}!" }
-            when (2) { return join q{}, map { ucfirst $_ } split /(\s+)/, "$self->{val}!!" }
-            default  { return uc $self->{val} . '!' x $_ }
-        }
+        return $self->{degree} == 1 ? ucfirst "$self->{val}!"
+             : $self->{degree} == 2 ? join q{}, map { ucfirst $_ } split /(\s+)/, "$self->{val}!!"
+             : uc $self->{val} . '!' x $self->{degree};
     }
     return !$self->{val} if $self->{degree} % 2;
     return !!$self->{val};
@@ -69,7 +67,7 @@ Acme::Crap - Carp with more feeling
 
 =head1 VERSION
 
-This document describes Acme::Crap version 0.001002
+This document describes Acme::Crap version 0.001003
 
 
 =head1 SYNOPSIS

@@ -3,7 +3,7 @@ use warnings;
 package Software::Security::Policy;
 # ABSTRACT: packages that provide templated Security Policys
 
-our $VERSION = '0.08'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 
 sub name {
@@ -26,6 +26,7 @@ sub version  {
 }
 
 
+
 1;
 
 __END__
@@ -40,7 +41,7 @@ Software::Security::Policy - packages that provide templated Security Policys
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -122,6 +123,10 @@ of a sentence, generally with a leading capitalized "The."
 
 This method returns the version of the policy.  If the security
 policy is not versioned, this method will return undef.
+
+=head1 ACKNOWLEDGMENT
+
+This module is based extensively on Software::License.
 
 =head1 SEE ALSO
 

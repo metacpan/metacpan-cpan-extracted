@@ -13,6 +13,7 @@ requires 'Statistics::Descriptive';
 requires 'JSON::Validator';
 requires 'File::ShareDir::ProjectDistDir';
 requires 'Graph';
+requires 'Inline::C';
 
 # t
 requires 'Test::Exception';

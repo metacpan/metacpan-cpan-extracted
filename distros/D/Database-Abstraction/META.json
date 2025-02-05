@@ -51,6 +51,7 @@
             "DBD::CSV" : "0",
             "DBD::XMLSimple" : "0.07",
             "File::Spec" : "0",
+            "File::Temp" : "0",
             "FindBin" : "0",
             "Test::Carp" : "0",
             "Test::Compile" : "0",
@@ -77,6 +78,6 @@
          "x_repository" : "https://github.com/nigelhorne/Database-Abstraction"
       }
    },
-   "version" : "0.16",
+   "version" : "0.17",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

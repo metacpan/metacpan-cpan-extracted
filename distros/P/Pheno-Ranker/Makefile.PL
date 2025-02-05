@@ -46,7 +46,8 @@ WriteMakefile(
         'Hash::Fold'                     => 0,
         'Math::CDF'                      => 0,
         'Data::Fake'                     => '0.006',
-        'Graph'                          => '0.9727'
+        'Graph'                          => '0.9727',
+        'Inline::C'                      => '0.82'
     },
     EXE_FILES => [
         'bin/pheno-ranker',

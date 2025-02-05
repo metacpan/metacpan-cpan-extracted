@@ -1,3 +1,6 @@
+0.22 2025-02-04
+	- BUGFIX: rand_float() on 32bit platforms was broken
+
 0.20 2025-02-03
 	- Calculate random floating point without bias
 	- Use a better hashing function for srand()

@@ -1,16 +1,17 @@
-#!/usr/bin/perl -sw
 ##
-## Copyright (c) 1998-2018, Vipul Ved Prakash.  All rights reserved.
+## Copyright (c) 1998-2025, Vipul Ved Prakash.  All rights reserved.
 ## This code is free software; you can redistribute it and/or modify
 ## it under the same terms as Perl itself.
 
-package Crypt::Random::Provider::egd;
 use strict;
+use warnings;
+package Crypt::Random::Provider::egd;
 
 use IO::Socket;
 use Carp;
 use Math::Pari qw(pari2num);
 
+our $VERSION = '1.56';
 
 sub _defaultsource { 
 

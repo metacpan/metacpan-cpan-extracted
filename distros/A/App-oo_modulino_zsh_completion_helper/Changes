@@ -1,5 +1,9 @@
 Revision history for Perl extension App-oo_modulino_zsh_completion_helper
 
+0.05 2025-02-05
+    - GH-3 Add support for `zsh_completer` field spec. See https://github.com/hkoba/perl-mop4import-declare/issues/90
+    - GH-2 Add support for `$PATH` lookup of modulino
+
 0.04
     - Fixed test failures
 

@@ -15,11 +15,11 @@
 ##########################################################################
 
  
-ClearCase::CtCmd is an interface to IBM Rational ClearCase.  For support, 
+ClearCase::CtCmd is an interface to DevOps Code ClearCase.  For support, 
 go to http://www.ibm.com/software/support.  For installation 
 instructions, see INSTALL.
 
-ClearCase::CtCmd is supported on all platforms that IBM Rational ClearCase
+ClearCase::CtCmd is supported on all platforms that DevOps Code ClearCase
 supports. 
 
 

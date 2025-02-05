@@ -1,13 +1,18 @@
 package Date::Ethiopic::ET::gru;
 use base ( "Date::Ethiopic::ET", "Date::Ethiopic" );
+use utf8;
 
 BEGIN
 {
 	use strict;
+	use warnings;
 	use vars qw(
 		@Days
 		@ShortDays
 	);
+
+	$VERSION = "0.14";
+
 	@Days =(
 		[ "ውርሰንበት",	"Wirsenbet"   ],
 		[ "ውጠት",	"Witet"       ],
@@ -129,10 +134,6 @@ Yeha: L<http://yeha.sourceforge.net>
 Date::Ethiopic, which is distributed in the same package with
 this file.
 
-=head1 COPYRIGHT
-
-This module is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
-
 
 =head1 BUGS
 
@@ -141,6 +142,13 @@ None presently known.
 =head1 AUTHOR
 
 Daniel Yacob,  L<dyacob@cpan.org|mailto:dyacob@cpan.org>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2003-2025, Daniel Yacob C<< <dyacob@cpan.org> >>. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
 
 =head1 SEE ALSO
 

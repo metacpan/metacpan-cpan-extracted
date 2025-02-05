@@ -39,6 +39,7 @@
             "File::ShareDir::ProjectDistDir" : "1.000009",
             "Graph" : "0.9727",
             "Hash::Fold" : "0",
+            "Inline::C" : "0.82",
             "JSON::Validator" : "5.14",
             "JSON::XS" : "4.03",
             "Math::CDF" : "0",
@@ -82,7 +83,7 @@
          "web" : "https://github.com/CNAG-Biomedical-Informatics/pheno-ranker"
       }
    },
-   "version" : "1.02",
+   "version" : "1.03",
    "x_contributors" : [],
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

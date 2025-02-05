@@ -1,5 +1,10 @@
 Revision history for CGI-Info
 
+0.90	Tue Feb  4 08:57:49 EST 2025
+	Ensure status is set before calling _warn so it's not lost (some 403s were being lost)
+	Try harder to call Google a search_engine
+	Allow the logger to be a filename
+
 0.89	Tue Jan 14 15:45:16 EST 2025
 	Fix http://www.cpantesters.org/cpan/report/048c5109-6c77-1014-8029-e79fc7de0390
 

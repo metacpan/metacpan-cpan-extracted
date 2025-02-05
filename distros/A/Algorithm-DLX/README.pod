@@ -1,0 +1,50 @@
+=head1 NAME
+
+DLX - Dancing Links Algorithm for Exact Cover Problems
+
+=head1 SYNOPSIS
+
+  use DLX;
+  my $dlx = DLX->new();
+  my $col_A = $dlx->add_column('A');
+  my $col_B = $dlx->add_column('B');
+  my $col_C = $dlx->add_column('C');
+  my $col_D = $dlx->add_column('D');
+  $dlx->add_row('row1', $col_A, $col_C);
+  $dlx->add_row('row2', $col_B, $col_D);
+  $dlx->add_row('row3', $col_A, $col_D);
+  my $solutions = $dlx->solve();
+
+=head1 DESCRIPTION
+
+This module implements the Dancing Links (DLX) algorithm for solving exact cover problems.
+
+=head1 METHODS
+
+=head2 new
+
+Constructor.
+
+=head2 add_column($col_name)
+
+Add a column with the given name.
+
+=head2 add_row($row, @cols)
+
+Add a row with the given identifier and columns.
+
+=head2 solve
+
+Solve the exact cover problem and return the solutions.
+
+=head1 AUTHOR
+
+James Hammer <james.hammer3@gmail.com>
+
+=head1 LICENSE
+
+This module is licensed under the same terms as Perl itself.
+
+
+=cut
+

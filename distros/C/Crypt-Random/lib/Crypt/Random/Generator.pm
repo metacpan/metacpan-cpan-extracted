@@ -1,15 +1,18 @@
-#!/usr/bin/perl -sw
 ##
-## Copyright (c) 1998-2018, Vipul Ved Prakash.  All rights reserved.
+## Copyright (c) 1998-2025, Vipul Ved Prakash.  All rights reserved.
 ## This code is free software; you can redistribute it and/or modify
 ## it under the same terms as Perl itself.
 
+use strict;
+use warnings;
 package Crypt::Random::Generator; 
 use Crypt::Random qw(makerandom makerandom_itv makerandom_octet);
 use Carp;
 
-my @PROVIDERS = qw(devrandom devurandom egd rand);
-my %STRENGTH  = ( 0 => [ qw(devurandom egd rand) ], 1 => [ qw(devrandom egd rand) ] );
+our $VERSION = '1.56';
+
+my @PROVIDERS = qw(devrandom devurandom Win32API egd rand);
+my %STRENGTH  = ( 0 => [ qw(egd Win32API rand) ], 1 => [ qw(devrandom devurandom Win32API rand) ] );
 
 sub new { 
 
@@ -17,10 +20,10 @@ sub new {
   
     my $self = { _STRENGTH => \%STRENGTH, _PROVIDERS => \@PROVIDERS  };
 
-    $$self{Strength} = $params{Strength} || 0;
+    $$self{Strength} = defined $params{Strength} ? $params{Strength} : 1;
     $$self{Uniform} = $params{Uniform} || 0;
     $$self{Provider} = $params{Provider} || "";  
-    $$self{ProviderParams} = $params{ProviderParams} || "";
+    $$self{ProviderParams} = $params{ProviderParams} || ();
 
     bless $self, $class;
 
@@ -35,7 +38,6 @@ sub new {
             }
         } 
     }
-
     croak "No provider available.\n" unless $$self{Provider};
     return $self;
 

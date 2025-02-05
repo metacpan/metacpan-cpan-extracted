@@ -26,7 +26,7 @@ static char * _biject (int id) {
 	id = id + OFFSET;
 	char * outs = (char*) calloc(100, sizeof(char*));;
 	while (id > 0) {
-		sprintf(outs, "%s%s", outs, ALPHA[id % COUNT]); 
+		strncat(outs, ALPHA[id % COUNT], 1);
 		id = floor(id / COUNT);
 	}
 	reverse(outs);

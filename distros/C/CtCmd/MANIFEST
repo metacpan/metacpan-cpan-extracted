@@ -52,5 +52,7 @@ win32/atriatbs.conf
 win32/atriaview.conf
 win32/atriavob.conf
 win32/atriaxdr.conf
+win32/atriajson.conf
+win32/atriacmi.conf
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

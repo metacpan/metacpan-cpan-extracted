@@ -8,7 +8,7 @@ lib/Pheno/Ranker.pm
 lib/Pheno/Ranker/Compare.pm
 lib/Pheno/Ranker/Graph.pm
 lib/Pheno/Ranker/IO.pm
-lib/Pheno/Ranker/Stats.pm
+lib/Pheno/Ranker/Metrics.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files

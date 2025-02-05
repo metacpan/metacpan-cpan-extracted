@@ -4,10 +4,14 @@ use strict;
 use warnings;
 use Time::HiRes;
 use Carp qw(croak);
+use Config;
 
 # https://pause.perl.org/pause/query?ACTION=pause_operating_model#3_5_factors_considering_in_the_indexing_phase
-our $VERSION = '0.20';
+our $VERSION = '0.22';
 our $debug   = 0;
+
+# Check if the UV (unsigned value) Perl type is 64bit
+my $has_64bit = ($Config{uvsize} == 8);
 
 #############################################################
 
@@ -47,7 +51,7 @@ sub seed {
 
 # Fetch random bytes from the OS supplied method
 # /dev/urandom = Linux, Unix, FreeBSD, Mac, Android
-# Windows requires the Win32::API call to call CryptGenRandom()
+# Windows requires the Win32::API call to call RtlGenRandom()
 sub os_random_bytes {
 	my $count  = shift();
 	my $ret    = "";
@@ -92,35 +96,6 @@ sub str_split {
 sub bin2hex {
 	my $bytes = shift();
 	my $ret   = (unpack("h* ", $bytes));
-
-	return $ret;
-}
-
-# Fetch random bytes from the OS supplied method
-# /dev/urandom = Linux, Unix, FreeBSD, Mac, Android
-# Windows requires the Win32::API call to call CryptGenRandom()
-sub _get_os_random_bytes_perl {
-	my $count  = shift();
-	my $ret    = "";
-
-	if ($^O eq 'MSWin32') {
-		require Win32::API;
-
-		my $rand = Win32::API->new('advapi32', 'INT SystemFunction036(PVOID RandomBuffer, ULONG RandomBufferLength)') or croak("Could not import SystemFunction036: $^E");
-
-		$ret = chr(0) x $count;
-		$rand->Call($ret, $count) or croak("Could not read from csprng: $^E");
-	} elsif (-r "/dev/urandom") {
-		open my $urandom, '<:raw', '/dev/urandom' or croak("Couldn't open /dev/urandom: $!");
-
-		sysread($urandom, $ret, $count) or croak("Couldn't read from csprng: $!");
-	} else {
-		croak("Unknown operating systen $^O");
-	};
-
-	if (length($ret) != $count) {
-		croak("Unable to read $count bytes from OS");
-	}
 
 	return $ret;
 }
@@ -214,7 +189,14 @@ sub random_float {
 	if (!$has_been_seeded) { seed_with_os_random(); }
 
 	my $num = Random::Simple::_rand64();
-	my $ret = Random::Simple::_uint64_to_double($num);
+	my $ret = 0;
+
+	if ($has_64bit) {
+		$ret = Random::Simple::_uint64_to_double($num);
+	} else {
+		$ret = Random::Simple::_uint32_to_double($num);
+	}
+
 
 	return $ret;
 }
@@ -307,9 +289,9 @@ better PRNG.
 
 C<Random::Simple> is automatically seeded with entropy directly
 from your OS. On Linux this is C</dev/urandom> and on Windows it uses
-CryptGenRandom.
+RtlGenRandom.
 
-When you `use Random::Simple` we automatically upgrade `rand()` and `srand()`
+When you C<use Random::Simple> we automatically upgrade C<rand()> and C<srand()>
 to use a modern PRNG with better statistical properties. As a bonus you also
 get a handful of other useful random related methods.
 

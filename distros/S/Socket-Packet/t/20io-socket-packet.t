@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Socket qw( SOCK_RAW );
 use Socket::Packet qw( PF_PACKET ETH_P_ALL );
@@ -22,8 +22,8 @@ my $sock = IO::Socket::Packet->new(
    IfIndex => 0,
 );
 
-isa_ok( $sock, 'IO::Socket::Packet', '$sock isa IO::Socket::Packet' );
-isa_ok( $sock, 'IO::Socket',         '$sock isa IO::Socket' );
+isa_ok( $sock, [ 'IO::Socket::Packet' ], '$sock isa IO::Socket::Packet' );
+isa_ok( $sock, [ 'IO::Socket' ],         '$sock isa IO::Socket' );
 
 is( $sock->sockdomain, PF_PACKET, '$sock->sockdomain is PF_PACKET' );
 is( $sock->socktype,   SOCK_RAW,  '$sock->socktype is SOCK_RAW' );
@@ -74,6 +74,6 @@ SKIP: {
    is( $sock->origdev, 1, '$sock->origdev works to retrieve' );
 }
 
-is_deeply( [ sort keys %{ $sock->statistics } ], [qw( drops packets )], '$sock->statistics' );
+is( [ sort keys %{ $sock->statistics } ], [qw( drops packets )], '$sock->statistics' );
 
 done_testing;

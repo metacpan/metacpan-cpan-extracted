@@ -1,6 +1,8 @@
 Revision history for Perl extension Daje-Workflow-Savefile-Activity
 
-1.01 2025-01-30T03:47:27Z
+1.10 2025-02-04T16:52:48Z
 
+    - 2025-02-01 Added path tag to indicate if file contains full path
+    - 2025-02-30 Added possibility to check if file exits and should not be replaced
     - original version
 

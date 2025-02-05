@@ -24,6 +24,7 @@ t/csv_id.t
 t/eof.t
 t/eol.t
 t/init.t
+t/lib/Database/passwd.pm
 t/lib/Database/test1.pm
 t/lib/Database/test2.pm
 t/lib/Database/test3.pm
@@ -34,6 +35,7 @@ t/lib/Database/test7.pm
 t/lib/MyLogger.pm
 t/logger.t
 t/no_entry.t
+t/passwd.t
 t/pod-cm.t
 t/pod-coverage.t
 t/pod-links.t

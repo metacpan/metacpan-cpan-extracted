@@ -7,12 +7,12 @@ build_requires:
   ExtUtils::CChecker: '0'
   IO::Socket::INET: '0'
   Module::Build: '0.4004'
-  Test::More: '0.88'
+  Test2::V0: '0'
 configure_requires:
   ExtUtils::CChecker: '0.04'
   Module::Build: '0.4004'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,13 +21,14 @@ name: Socket-Packet
 provides:
   IO::Socket::Packet:
     file: lib/IO/Socket/Packet.pm
-    version: '0.11'
+    version: '0.12'
   Socket::Packet:
     file: lib/Socket/Packet.pm
-    version: '0.11'
+    version: '0.12'
 requires:
   Exporter: '5.57'
+  perl: '5.014'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.11'
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -58,8 +58,7 @@ use Mojo::Loader qw {data_section load_class};
 # Copyright (C) 2024 Jan Eskilsson.
 #
 
-our $VERSION = '0.09';
-
+our $VERSION = '0.11';
 
 has 'data_sec';
 has 'data_sections';
@@ -70,6 +69,8 @@ has 'error';
 sub load_data_sections($self) {
 
     eval {
+        my $data_sec = {};
+        $self->data_sec($data_sec);
         my $class = $self->source();
         my $c = load_class($class);
         my @data_sec = split(',', $self->data_sections) ;

@@ -8,7 +8,7 @@ use List::Util qw(any shuffle first);
 use Data::Dumper;
 use Sort::Naturally qw(nsort);
 use Hash::Fold fold => { array_delimiter => ':' };
-use Pheno::Ranker::Stats;
+use Pheno::Ranker::Metrics;
 
 use Exporter 'import';
 our @EXPORT =

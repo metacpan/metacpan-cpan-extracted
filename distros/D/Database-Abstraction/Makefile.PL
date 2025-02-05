@@ -27,6 +27,7 @@ WriteMakefile(
 		'DBD::CSV' => 0,
 		'DBD::XMLSimple' => 0.07,
 		'File::Spec' => 0,
+		'File::Temp' => 0,
 		'FindBin' => 0,
 		'Test::Carp' => 0,
 		'Test::Compile' => 0,

@@ -1,7 +1,7 @@
 ##########################################################################
 #                                                                        #
 # © Copyright IBM Corporation 2001, 2016.  All Rights Reserved.          #
-# © Copyright HCL Technologies Ltd. 2016, 2022 All rights reserved.      #
+# © Copyright HCL Technologies Ltd. 2016, 2024 All rights reserved.      #
 #                                                                        #
 # This program and the accompanying materials are made available under   #
 # the terms of the Common Public License v1.0 which accompanies this     #
@@ -24,8 +24,8 @@ require AutoLoader;
 
 @ISA = qw(Exporter DynaLoader);
 @EXPORT_OK = qw(cleartool);
-$ctcmd_current_version::CtCmd = '1.17';
-$ClearCase::CtCmd::VERSION = '1.17';
+$ctcmd_current_version::CtCmd = '1.18';
+$ClearCase::CtCmd::VERSION = '1.18';
 bootstrap ClearCase::CtCmd $VERSION;
 
 
@@ -51,11 +51,11 @@ __END__
 
 =head1 NAME
 
-ClearCase::CtCmd - Perl extension for IBM Rational ClearCase
+ClearCase::CtCmd - Perl extension for DevOps Code ClearCase
 
 =head1 PLATFORMS/VERSIONS
 
-See INSTALL for a list of supported platforms and IBM Rational ClearCase versions.
+See INSTALL for a list of supported platforms and DevOps Code ClearCase versions.
 
 =head1 SYNOPSIS
 

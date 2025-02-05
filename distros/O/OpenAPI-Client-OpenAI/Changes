@@ -1,5 +1,9 @@
 Revision history for OpenAPI-Client-OpenAI
 
+0.14    2025-02-05
+        - Update to latest version of OpenAI API spec. Amongst many changes,
+          this includes the new o3-mini model.
+
 0.13    2025-01-02
         - Happy New Year!
         - Update assistance header to v2 https://platform.openai.com/docs/assistants/migration

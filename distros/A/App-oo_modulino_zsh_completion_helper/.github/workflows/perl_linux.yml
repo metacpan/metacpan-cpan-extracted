@@ -16,8 +16,8 @@ jobs:
     strategy:
       matrix:
         perl-version:
-          - '5.10'
-          - '5.16'
+          - '5.12-buster'
+          - '5.16-buster'
           - '5.30'
           - '5.32'
           - 'latest'
@@ -30,7 +30,11 @@ jobs:
       - uses: actions/checkout@v2
       - name: perl -V
         run: perl -V
+      - name: Install cpm if missing
+        run: if ! which cpm; then curl -fsSL --compressed https://git.io/cpm > cpm; chmod +x cpm; fi
       - name: Install Dependencies
-        run: curl -sL https://git.io/cpm | perl - install -g --show-build-log-on-failure
+        run: PATH=.:$PATH cpm install -g
+      - name: build
+        run: perl Build.PL && ./Build build
       - name: Run Tests
-        run: prove -l t
+        run: ./Build test

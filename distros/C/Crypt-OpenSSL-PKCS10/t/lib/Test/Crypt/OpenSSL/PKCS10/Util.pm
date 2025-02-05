@@ -24,8 +24,8 @@ $config_loc =~ m/OPENSSLDIR: "(.*)"/;
 my $configfile = catfile($1, 'openssl.cnf');
 
 if (! -e "$configfile") {
-	$configfile = ' -config t\\openssl.cnf';
-    $ENV{'OPENSSL_CONF'} = 't\\openssl.cnf';
+    $configfile = ' -config ' . catfile('t', 'openssl.cnf');
+    $ENV{'OPENSSL_CONF'} = catfile('t', 'openssl.cnf');
 } else {
     $configfile = '';
 }

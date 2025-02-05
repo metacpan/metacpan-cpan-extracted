@@ -15,29 +15,14 @@ use List::Util qw(none any);
 use Proc::Daemon;
 use Proc::PID::File;
 use Pod::Usage;
-use Workflow::Inotify::Handler qw(boolean);
+use Workflow::Inotify::Handler qw(boolean %EVENTS %MASKS);
 
 use Readonly;
 
 Readonly our $TRUE  => 1;
 Readonly our $FALSE => 0;
 
-Readonly::Hash our %EVENTS => (
-  IN_ACCESS        => IN_ACCESS,
-  IN_ATTRIB        => IN_ATTRIB,
-  IN_CLOSE_WRITE   => IN_CLOSE_WRITE,
-  IN_CLOSE_NOWRITE => IN_CLOSE_NOWRITE,
-  IN_CREATE        => IN_CREATE,
-  IN_DELETE        => IN_DELETE,
-  IN_DELETE_SELF   => IN_DELETE_SELF,
-  IN_MODIFY        => IN_MODIFY,
-  IN_MOVE_SELF     => IN_MOVE_SELF,
-  IN_MOVED_FROM    => IN_MOVED_FROM,
-  IN_MOVED_TO      => IN_MOVED_TO,
-  IN_OPEN          => IN_OPEN,
-);
-
-our $VERSION = '1.0.6';  ## no critic (RequireInterpolationOfMetachars)
+our $VERSION = '1.0.7';
 
 our %WATCH_HANDLERS;
 our $KEEP_GOING = $TRUE;
@@ -45,6 +30,7 @@ our $CONFIG;
 our $VERBOSE;
 our %OPTIONS;
 our $INOTIFY;
+our %HANDLERS;
 
 ########################################################################
 sub setup_signal_handlers {
@@ -158,12 +144,20 @@ sub setup_watch_handlers {
       $handler_path = "$handler_path.pm";
     }
 
-    eval { require $handler_path; };
+    eval {
+      if ( !$INC{$handler_path} ) {
+        require $handler_path;
+      }
+    };
 
     die $EVAL_ERROR
       if $EVAL_ERROR;
 
-    my $handler = $handler_class->new($CONFIG);
+    my $handler = $HANDLERS{$handler_path};
+
+    if ( !$handler ) {
+      $HANDLERS{$handler_path} = $handler = $handler_class->new($CONFIG);
+    }
 
     die $EVAL_ERROR
       if $EVAL_ERROR;
@@ -204,6 +198,11 @@ sub init_from_config {
 
   my $config = Config::IniFiles->new( -file => $options->{config} );
 
+  if ( !$config ) {
+    my $errors = join "\n", @Config::IniFiles::errors;
+    die sprintf "could not read config file %s\n", $options->{config}, $errors;
+  }
+
   $VERBOSE = boolean( $config->val( global => 'verbose' ), $TRUE );
 
   my $perl5lib = $config->val( global => 'perl5lib' );
@@ -233,7 +232,10 @@ sub init_from_config {
 ########################################################################
 sub help {
 ########################################################################
-  return pod2usage(1);
+  return pod2usage(1)
+    if !$OPTIONS{version};
+
+  return print {*STDOUT} sprintf "%s v%s\n", $PROGRAM_NAME, $VERSION;
 }
 
 ########################################################################
@@ -244,19 +246,20 @@ sub main {
     config|c=s
     daemonize|d
     help|h
+    version|v
   );
 
   my $retval = GetOptions( \%OPTIONS, @option_specs );
 
   return help()
-    if !$retval || $OPTIONS{help};
+    if !$retval || $OPTIONS{help} || $OPTIONS{version};
 
   die "no config file found!\n"
     if !-s $OPTIONS{config};
 
   $CONFIG = init_from_config( \%OPTIONS );
 
-  my $logfile = $OPTIONS{LOGFILE} // $CONFIG->val( global => 'logfile' );
+  my $logfile = $OPTIONS{logfile} // $CONFIG->val( global => 'logfile' );
 
   my $daemonize = $OPTIONS{daemonize} // boolean( $CONFIG->val( global => 'daemonize' ), $TRUE );
 
@@ -279,8 +282,9 @@ sub main {
   # closes all file handles
 
   if ($logfile) {
-    open STDOUT, '+>>', $logfile;
-    open STDERR, '+>>', \&STDOUT;
+    no strict 'subs';
+    open STDOUT, '+>>',  $logfile;
+    open STDERR, '+>>&', STDOUT;
   }
 
   # If already running, then exit
@@ -324,6 +328,10 @@ sub run {
     msg( "      \@INC:\n          :", join "\n          : ", @INC );
 
     msg("---------------------------\n");
+  }
+
+  if ( !$block && !$sleep ) {
+    $sleep = 1;
   }
 
   # support for non-blocking, polling mode

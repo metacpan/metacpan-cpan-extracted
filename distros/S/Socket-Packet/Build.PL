@@ -1,3 +1,4 @@
+use v5;
 use strict;
 use warnings;
 
@@ -79,6 +80,8 @@ EOF
 my $build = $cc->new_module_build(
    module_name => 'Socket::Packet',
    requires => {
+      'perl' => '5.014',
+
       'Exporter' => '5.57',
    },
    configure_requires => {
@@ -91,7 +94,7 @@ my $build = $cc->new_module_build(
    },
    test_requires => {
       'IO::Socket::INET' => 0,
-      'Test::More' => '0.88', # done_testing
+      'Test2::V0' => 0,
    },
    license => 'perl',
    create_license => 1,

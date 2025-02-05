@@ -1,0 +1,61 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.89.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 0a84218cadd92d9c5c18f23a00956f06a9d86480035dcfee6419402c1863bb6d Changes
+SHA256 33fd6c05c5249bc5e001eb4e8ec5196600a21419435344a6d2299ddc0a7f0bb8 LICENSE
+SHA256 bcc4708672e4011dee57b40b97b66325a6384b4154ddb06ab43445fb1e5e6b5b MANIFEST
+SHA256 0e4350c920f090b73669c394c402cc7d27d0e839427d172170b34cf6b59057e0 META.json
+SHA256 ab93b78d4b02150d6d9bb24af28951ca1465e4d6fbcabc2b9b95d35929bc2445 META.yml
+SHA256 dde91c474dc09e266bf1d870413728ba2fd2e0baf8e3cb92f41359b5c15a923c Makefile.PL
+SHA256 11f100c12c5a3bfd7c7b0177692c05ede7541b25fb0b7e05fb235e5d18bbbf95 README
+SHA256 46f9c2cc981012fbb8e72d8db5e3cd295fdac4fa8371e54f1aebe6a437e6a085 bin/makerandom
+SHA256 d6d992266912e243960a3237866a6bbbf20e015dc0adbdafa106bb34aea83c82 cpanfile
+SHA256 19242b0b42962c5caf2f9d4a8dacdc59573d231c6597edb77c13f1d6d76aaf11 dist.ini
+SHA256 c3ba23c0fd1c8cabe55d6ffdc83dc0ff520a7a284548e11aa52f48c1dc893283 lib/Crypt/Random.pm
+SHA256 ec032fa7594d8225d6b52a6b4c830f1a9d5a945c929c14f49473ff22a5ef9fb5 lib/Crypt/Random/Generator.pm
+SHA256 1249a79f68913aab2136c6a902b9061957702ac453b2fbfaa83d307b089ae5e8 lib/Crypt/Random/Provider/File.pm
+SHA256 6fcce17f38b2a62a8d422e6e933d459441330476121c3409d4e2c1afe5ed236f lib/Crypt/Random/Provider/Win32API.pm
+SHA256 e3229e2475115f1bd292913b0ad4f123f96225057a57b0402c648d72345a8ab4 lib/Crypt/Random/Provider/devrandom.pm
+SHA256 6ffcace9828d51e10abd13460417c1ef4f136d52381a89a1ff518f6bf5a0382d lib/Crypt/Random/Provider/devurandom.pm
+SHA256 5a7f363568e641b2ed5396f356e773f25a8820db6818ba8336a7c86f1aa413ec lib/Crypt/Random/Provider/egd.pm
+SHA256 ce4ebc808494bf489fbcd02a1c3d1925b6ad746c3ac38f6398dc2ba44097a2b9 lib/Crypt/Random/Provider/rand.pm
+SHA256 252702785411fc542649a3630233966ad91b87ff8a528159e758ae1d9ac8aa02 t/Win32API.t
+SHA256 d9fb9699207bfa07ccf98027930073bba6340a73c8cbd5ba0152a0152204e40c t/author-pod-spell.t
+SHA256 305c657c6b73f10767a0ea286b8a73d693940f4cbb8b6a0a4d34e2b5a1c04635 t/author-pod-syntax.t
+SHA256 96f6812b69cb224305965a8c8f545c4049f3442c470481c702c015ee1fdfa291 t/chisquare.t
+SHA256 c16ee053711730cbdbe4eda84e43945463221532cb11bd361fbaf7ea294fe670 t/generator.t
+SHA256 44e54f3c34b19a339508a176e8c0c6bd82b97af81ba172d92b81da5efafaf54f t/makerandom_itv.t
+SHA256 e0b0dee6a429549f3c3f1bd7c0a4444c213932b8d290d66b1cfa735e20eaa415 t/octet_string.t
+SHA256 06ed60fff45182399e2ab03fccae3904afb6bd7d185f381dc4e7d5828fe30674 t/pari_misfeature.t
+SHA256 a351cf7150d085f50cf64881ddc1e6e7ffcfa33993374580322cd895970bf151 t/random.t
+SHA256 3e60d6abbee303709a8c178512c985bca115d83750235db24fcdc02dd98d5e08 t/release-kwalitee.t
+SHA256 c79f02d04a1db8a985e36276558117f21c35c660ebfafc59353679c0cb983e94 t/release-meta-json.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBAwAdFiEEMguXHBCUSzAt6mNu1fh7LgYGpfkFAmeiw1AACgkQ1fh7LgYG
+pfnlVxAAps9OYK/Oi2tXvf0uFicW2iqjr6ucEEI2qRRmylYnXKWG6w8reIw2FZPw
+UBIuFqYRCVnZlUvfuhGe+bdTUiPPs4iHH944lae1mCB0dJ3iJAqi0oTL5XlhCg5E
+ypJ810EJ2u+uJDzYMzVTkCgGh82Y9a+lHldv5tKYciItv480lFqV/mszi7+5mT88
+TPk5WLTcck3/IHcx2rmTSARmlkL/ppiXoQCTaK33toLRkTDoXM0e3fLFjYfbWs3p
+fwBXan9PHZro73fUID1rViKBdZLYzkwFqaMoogXxvAKUL06vwfMlGcUtGTWKGv1T
+9SAT0BUHw2mPA2J/r4ePI58zT93twQZIJhKbkjVwSDqV0ozjiti21zrhi73ynlr2
+tZ1Bc+cCDcwdn4IJFHAVSCAuqpbi2wuG1u1kzdB8wv+2jXwaAKHLAqpYpSDXUCkk
+mHK6W5BwuEUzp9lCxVmiBRzMk/BsNpQTr9bGG6e8Uk6WZI1f1tYtUL8I58hi/xA0
+XaP60dUz2ubUVM/lBYAfmTpxvnXCVpFSxEUZmmWsJTE4m6B18vpGZqZMmlvlyjRK
+xJUnxBblL3J/328M2hrQbaBD9Eyj6OpGx9QG0PbmdgpIP3hp3ISWI97I7rd5ZyFF
++Okl0mo80g9roErk0fcRcSHo+kzXNGsyiEbg6IN/2QNVotk1XXA=
+=ZFjR
+-----END PGP SIGNATURE-----

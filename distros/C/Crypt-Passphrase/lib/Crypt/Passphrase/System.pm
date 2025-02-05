@@ -1,9 +1,9 @@
 package Crypt::Passphrase::System;
-$Crypt::Passphrase::System::VERSION = '0.020';
+$Crypt::Passphrase::System::VERSION = '0.021';
 use strict;
 use warnings;
 
-use Crypt::Passphrase -encoder;
+use parent 'Crypt::Passphrase::Encoder';
 
 use Carp 'croak';
 
@@ -142,7 +142,7 @@ Crypt::Passphrase::System - An system crypt() encoder for Crypt::Passphrase
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 

@@ -3,7 +3,7 @@ NAME
     Policys
 
 VERSION
-    version 0.08
+    version 0.09
 
 SYNOPSIS
       use strict;
@@ -87,6 +87,9 @@ METHODS
   version
     This method returns the version of the policy. If the security policy is
     not versioned, this method will return undef.
+
+ACKNOWLEDGMENT
+    This module is based extensively on Software::License.
 
 SEE ALSO
     The specific policy:

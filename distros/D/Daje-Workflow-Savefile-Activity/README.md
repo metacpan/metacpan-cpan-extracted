@@ -14,6 +14,18 @@ Daje::Workflow::Savefile::Activity - It's a tool to save an array of files
                 "file_list_tag": "sql"
               }
 
+     Mandatory meta data
+
+- file contains file name or name an path
+
+- data content to write to disk
+
+     Possible meta data
+
+- path if set to 1 the file tag contains full path
+
+- new\_only if set to 1 dont replace existing file
+
 # DESCRIPTION
 
 Daje::Workflow::Savefile::Activity is a file saver

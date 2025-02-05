@@ -19,6 +19,18 @@ use Mojo::Base 'Daje::Workflow::Common::Activity::Base', -base, -signatures;
 #                 "file_list_tag": "sql"
 #               }
 #
+#      Mandatory meta data
+#
+#      - file contains file name or name an path
+#
+#      - data content to write to disk
+#
+#
+#      Possible meta data
+#
+#      - path if set to 1 the file tag contains full path
+#
+#      - new_only if set to 1 dont replace existing file
 #
 #
 # DESCRIPTION
@@ -42,21 +54,31 @@ use Mojo::Base 'Daje::Workflow::Common::Activity::Base', -base, -signatures;
 
 use Mojo::File;
 
-our $VERSION = "1.01";
+our $VERSION = "1.10";
 
 
 
 sub save($self) {
 
     eval {
-        my $filepath = $self->context->{context}->{$self->activity_data->{file}->{target_dir_tag}};
+
         my $files = $self->context->{context}->{$self->activity_data->{file}->{file_list_tag}};
         my $length = scalar @{$files};
         for (my $i = 0; $i < $length; $i++) {
-            my $file = $filepath . @{$files}[$i]->{file} . $self->activity_data->{file}->{filetype};
-            open(my $fh, ">", $file);
-            print $fh @{$files}[$i]->{data};
-            close $fh;
+            my $file = "";
+            if (exists @{$files}[$i]->{path} and @{$files}[$i]->{path} == 1) {
+                $file = @{$files}[$i]->{file};
+            } else {
+                my $filepath = $self->context->{context}->{$self->activity_data->{file}->{target_dir_tag}};
+                $file = $filepath . @{$files}[$i]->{file} . $self->activity_data->{file}->{filetype};
+            }
+            if (exists @{$files}[$i]->{new_only} and @{$files}[$i]->{new_only} == 1) {
+                if (!-e $file) {
+                    $self->_save_file($file, @{$files}[$i]->{data});
+                }
+            } else {
+                $self->_save_file($file, @{$files}[$i]->{data});
+            }
         }
     };
     $self->error->add_error($@) if defined $@ and length($@) > 0;
@@ -64,8 +86,15 @@ sub save($self) {
     return;
 }
 
+sub _save_file($self, $file, $data) {
+    open(my $fh, ">", $file);
+    print $fh $data;
+    close $fh;
+}
+
 1;
 __END__
+
 
 
 
@@ -92,6 +121,38 @@ Daje::Workflow::Savefile::Activity - It's a tool to save an array of files
                 "file_list_tag": "sql"
               }
 
+     Mandatory meta data
+
+=over
+
+=item *
+file contains file name or name an path
+
+=back
+
+=over
+
+=item *
+data content to write to disk
+
+=back
+
+
+     Possible meta data
+
+=over
+
+=item *
+path if set to 1 the file tag contains full path
+
+=back
+
+=over
+
+=item *
+new_only if set to 1 dont replace existing file
+
+=back
 
 
 

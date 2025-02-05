@@ -10,6 +10,8 @@
 
 use Crypt::Random qw( makerandom makerandom_itv );
 
+our $VERSION = '1.56';
+
 unless ( $size || $lower )  { 
     my $name = $0; 
     $name =~ s:.*/::;

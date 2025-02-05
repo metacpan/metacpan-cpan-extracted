@@ -1,0 +1,58 @@
+{
+   "abstract" : "RDTSC Random in Perl",
+   "author" : [
+      "Scott Baker <bakerscot@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Random-RDTSC",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.12"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.12",
+            "perl" : "5.016"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/scottchiefbaker/perl-Random-RDTSC/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/scottchiefbaker/perl-Random-RDTSC.git",
+         "web" : "https://github.com/scottchiefbaker/perl-Random-RDTSC"
+      }
+   },
+   "version" : "0.1",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

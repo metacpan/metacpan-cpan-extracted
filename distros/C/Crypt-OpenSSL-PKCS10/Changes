@@ -1,5 +1,14 @@
 Revision history for Perl extension Crypt::OpenSSL::PKCS10.
 
+0.35 -- Tue Feb 04 22:59:04 AST 2025
+    [Significant updates since 0.34]
+    - Minor update to test lib
+
+    [Change Log]
+    - 93c7a82 Update repo version
+    - ef7aa0b Fix path separator issue
+    - 4055160 v0.34
+
 0.34 -- Fri Jan 24 20:26:55 AST 2025
 
     [Significant updates since 0.31]

@@ -6,7 +6,7 @@ use warnings;
 use File::Temp qw(tempdir);
 use File::Spec;
 use FindBin qw($Bin);
-use Test::Most tests => 15;
+use Test::Most tests => 19;
 
 use constant	DEFAULT_MAX_SLURP_SIZE => 16 * 1024;	# CSV files <= than this size are read into memory
 
@@ -64,5 +64,17 @@ use_ok('Database::test1');
 	cmp_ok($obj->{directory}, 'eq', $tmpdir, 'Default directory used when no argument is given');
 	is($obj->{no_entry}, 0, 'Default no_entry is set');
 	is($obj->{cache_duration}, '1 hour', 'Default cache_duration is set');
+	is($obj->{max_slurp_size}, DEFAULT_MAX_SLURP_SIZE, 'Default max_slurp_size is set');
+}
+
+# Test cache duraction
+{
+	my $tmpdir = File::Spec->tmpdir();
+
+	Database::Abstraction::init(directory => $tmpdir, expires_in => '5 days');
+	my $obj = Database::test1->new();
+	cmp_ok($obj->{directory}, 'eq', $tmpdir, 'Default directory used when no argument is given');
+	is($obj->{no_entry}, 0, 'Default no_entry is set');
+	is($obj->{cache_duration}, '5 days', 'cache_duration is set');
 	is($obj->{max_slurp_size}, DEFAULT_MAX_SLURP_SIZE, 'Default max_slurp_size is set');
 }

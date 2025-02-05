@@ -21,6 +21,8 @@ inherited methods/options are included too.
 
 App::oo\_modulino\_zsh\_completion\_helper provides underlying implementation of \`\_perl\_oo\_modulino\` zsh completer.
 
+[![OO Modulino completer demo](https://img.youtube.com/vi/1UlTmIHMVfA/0.jpg)](https://www.youtube.com/watch?v=1UlTmIHMVfA)
+
 # LICENSE
 
 Copyright (C) Kobayasi, Hiroaki.

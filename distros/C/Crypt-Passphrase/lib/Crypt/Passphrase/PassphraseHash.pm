@@ -1,5 +1,5 @@
 package Crypt::Passphrase::PassphraseHash;
-$Crypt::Passphrase::PassphraseHash::VERSION = '0.020';
+$Crypt::Passphrase::PassphraseHash::VERSION = '0.021';
 use strict;
 use warnings;
 
@@ -43,7 +43,7 @@ Crypt::Passphrase::PassphraseHash - An object representing a hash for password c
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 DESCRIPTION
 

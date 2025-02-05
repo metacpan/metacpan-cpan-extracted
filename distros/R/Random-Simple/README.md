@@ -26,7 +26,7 @@ better PRNG.
 
 `Random::Simple` is automatically seeded with entropy directly
 from your OS. On Linux this is `/dev/urandom` and on Windows it uses
-CryptGenRandom.
+RtlGenRandom.
 
 When you `use Random::Simple` we automatically upgrade `rand()` and `srand()`
 to use a modern PRNG with better statistical properties. As a bonus you also

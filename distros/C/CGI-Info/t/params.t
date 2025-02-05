@@ -2,16 +2,14 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 192;
+use Test::Most tests => 197;
 use File::Spec;
 use lib 't/lib';
 use MyLogger;
 
 eval 'use autodie qw(:all)';	# Test for open/close failures
 
-BEGIN {
-	use_ok('CGI::Info');
-}
+BEGIN { use_ok('CGI::Info') }
 
 PARAMS: {
 	$ENV{'GATEWAY_INTERFACE'} = 'CGI/1.1';
@@ -456,8 +454,19 @@ EOF
 
 	@ARGV= ('file=/../../../../etc/passwd%00');
 	$i = new_ok('CGI::Info');
-	%p = %{$i->params()};
-	like($p{'file'}, qr/passwd$/, 'strip null byte poison');
+	dies_ok { %p = %{$i->params()} };	# Warns because logger isn't set
+	like($@, qr/Blocked directory traversal attack/);
+	diag(Data::Dumper->new([$i->warnings()])->Dump()) if($ENV{'TEST_VERBOSE'});
+	like(
+		$i->warnings()->[0]->{'warning'},
+		qr/Blocked directory traversal attack for 'file'/,
+		'Warning generated for disallowed parameter'
+	);
+
+	@ARGV= ('file=/etc/passwd%00');
+	$i = new_ok('CGI::Info');
+	lives_ok { %p = %{$i->params()}; };
+	like($p{'file'}, qr/passwd$/, 'strip NUL byte poison');
 
 	@ARGV = ('--mobile', 'foo=bar', 'fred=wilma' );
 	$i = new_ok('CGI::Info');

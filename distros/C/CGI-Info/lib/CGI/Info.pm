@@ -31,11 +31,11 @@ CGI::Info gets information about the system that a CGI script is running on.
 
 =head1 VERSION
 
-Version 0.89
+Version 0.90
 
 =cut
 
-our $VERSION = '0.89';
+our $VERSION = '0.90';
 
 =head1 SYNOPSIS
 
@@ -96,10 +96,13 @@ sub new
 	# Handle hash or hashref arguments
 	my %args;
 	if((@_ == 1) && (ref $_[0] eq 'HASH')) {
+		# If the first argument is a hash reference, dereference it
 		%args = %{$_[0]};
 	} elsif((@_ % 2) == 0) {
+		# If there is an even number of arguments, treat them as key-value pairs
 		%args = @_;
 	} else {
+		# If there is an odd number of arguments, treat it as an error
 		carp(__PACKAGE__, ': Invalid arguments passed to new()');
 		return;
 	}
@@ -423,11 +426,11 @@ Upload_dir is a string containing a directory where files being uploaded are to
 be stored.
 It must be a writeable directory in the temporary area.
 
-Takes optional parameter logger, an object which is used for warnings and
-traces.
-This logger object is an object that understands warn() and trace() messages,
+Takes an optional parameter logger, which is used for warnings and traces.
+It can be an object that understands warn() and trace() messages,
 such as a L<Log::Log4perl> or L<Log::Any> object,
-or a reference to code.
+a reference to code,
+or a filename.
 
 The allow, expect, logger and upload_dir arguments can also be passed to the
 constructor.
@@ -481,6 +484,8 @@ CGI::Info will put the request into the params element 'XML', thus:
 	my $paramsref = $info->params();	# See BUGS below
 	my $xml = $$paramsref{'XML'};
 	# ... parse and process the XML request in $xml
+
+Carp if logger is not set and we detect something serious:w
 
 =cut
 
@@ -745,7 +750,7 @@ sub params {
 		if($self->{allow}) {
 			# Is this a permitted argument?
 			if(!exists($self->{allow}->{$key})) {
-				$self->_info("discard $key");
+				$self->_info("Discard unallowed argument '$key'");
 				$self->status(422);
 				next;
 			}
@@ -753,7 +758,7 @@ sub params {
 			# Do we allow any value, or must it be validated?
 			if(defined($self->{allow}->{$key})) {
 				if($value !~ $self->{allow}->{$key}) {
-					$self->_info("block $key = $value");
+					$self->_info("Block $key = $value");
 					$self->status(422);
 					next;
 				}
@@ -778,23 +783,28 @@ sub params {
 			   ($value =~ /\sOR\s.+\sAND\s/) ||
 			   ($value =~ /\/\*\*\/ORDER\/\*\*\/BY\/\*\*/ix) ||
 			   ($value =~ /exec(\s|\+)+(s|x)p\w+/ix)) {
+				$self->status(403);
 				if($ENV{'REMOTE_ADDR'}) {
 					$self->_warn($ENV{'REMOTE_ADDR'} . ": SQL injection attempt blocked for '$value'");
 				} else {
 					$self->_warn("SQL injection attempt blocked for '$value'");
 				}
-				$self->status(403);
 				return;
 			}
 			if(($value =~ /((\%3C)|<)((\%2F)|\/)*[a-z0-9\%]+((\%3E)|>)/ix) ||
 			   ($value =~ /((\%3C)|<)[^\n]+((\%3E)|>)/i)) {
-				$self->_warn("XSS injection attempt blocked for '$value'");
 				$self->status(403);
+				$self->_warn("XSS injection attempt blocked for '$value'");
 				return;
 			}
-			if($value eq '../') {
-				$self->_warn("Blocked directory traversal attack for $key");
+			if($value =~ /\.\.\//) {
 				$self->status(403);
+				$self->_warn("Blocked directory traversal attack for '$key'");
+				return;
+			}
+			if($value =~ /mustleak\.com\//) {
+				$self->status(403);
+				$self->_warn("Blocked mustleak attack for '$key'");
 				return;
 			}
 		}
@@ -1559,8 +1569,11 @@ sub is_search_engine {
 	}
 	if(my $browser = $self->{browser_detect}) {
 		my $is_search = ($browser->google() || $browser->msn() || $browser->baidu() || $browser->altavista() || $browser->yahoo() || $browser->bingbot());
-		if((!$is_search) && $agent =~ /SeznamBot\//) {
-			$is_search = 1;
+		if(!$is_search) {
+			if(($agent =~ /SeznamBot\//) ||
+			   ($agent =~ /Googlebot\//)) {
+				$is_search = 1;
+			}
 		}
 		if($is_search && $self->{cache}) {
 			$self->{cache}->set($key, 'search', '1 day');
@@ -1708,7 +1721,7 @@ sub status
 	my $status = shift;
 
 	# Set status if provided
-	return $self->{status} = $status if defined $status;
+	return $self->{status} = $status if(defined($status));
 
 	# Determine status based on request method if status is not set
 	unless (defined $self->{status}) {
@@ -1747,6 +1760,8 @@ sub warnings
 
 =head2 set_logger
 
+Sets the class, code reference, or file that will be used for logging.
+
 Sometimes you don't know what the logger is until you've instantiated the class.
 This function fixes the catch22 situation.
 
@@ -1762,13 +1777,28 @@ sub set_logger {
 }
 
 # Helper routines for logger()
-sub _log {
+sub _log
+{
 	my ($self, $level, @messages) = @_;
 
 	if(my $logger = $self->{'logger'}) {
 		if(ref($logger) eq 'CODE') {
-			$logger->({ level => $level, message => \@messages });
+			# Code reference
+			$logger->({
+				class => ref($self) // __PACKAGE__,
+				function => (caller(2))[3],
+				line => (caller(1))[2],
+				level => $level,
+				message => \@messages
+			});
+		} elsif(!ref($logger)) {
+			# File
+			if(open(my $fout, '>>', $logger)) {
+				print $fout uc($level), ': ', ref($self) // __PACKAGE__, ' ', (caller(2))[3], (caller(1))[2], join(' ', @messages), "\n";
+				close $fout;
+			}
 		} else {
+			# Object
 			$logger->$level(@messages);
 		}
 	}
@@ -1802,7 +1832,7 @@ sub _warn {
 
 	if($self eq __PACKAGE__) {
 		# Called from class method
-		carp($warning);
+		Carp::carp($warning);
 		return;
 	}
 	# return if($self eq __PACKAGE__);  # Called from class method
@@ -1825,11 +1855,7 @@ sub _warn {
 
 	# Handle logger-based logging
 	if(my $logger = $self->{logger}) {
-		if(ref($logger) eq 'CODE') {
-			$logger->({ level => 'warn', message => [ $warning ] });
-		} else {
-			$logger->warn($warning);
-		}
+		$self->_log('warn', $warning);
 	} elsif(!defined($self->{syslog})) {
 		# Fallback to Carp warnings
 		Carp::carp($warning);
@@ -1838,7 +1864,6 @@ sub _warn {
 
 # Ensure all environment variables are sanitized and validated before use.
 # Use regular expressions to enforce strict input formats.
-
 sub _get_env
 {
 	my ($self, $var) = @_;
@@ -1896,6 +1921,9 @@ sub AUTOLOAD
 Nigel Horne, C<< <njh at bandsman.co.uk> >>
 
 =head1 BUGS
+
+Please report any bugs or feature requests to the author.
+This module is provided as-is without any warranty.
 
 is_tablet() only currently detects the iPad and Windows PCs. Android strings
 don't differ between tablets and smart-phones.

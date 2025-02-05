@@ -1,17 +1,18 @@
-#!/usr/bin/perl -sw -I../lib/ -Ilib/
 ##
 ##
 ##
-## Copyright (c) 2001, Vipul Ved Prakash.  All rights reserved.
+## Copyright (c) 2001-2025, Vipul Ved Prakash.  All rights reserved.
 ## This code is free software; you can redistribute it and/or modify
 ## it under the same terms as Perl itself.
 
+use strict;
+use warnings;
 use Test;
 use Crypt::Random::Generator;
 use Statistics::ChiSquare;
 BEGIN { plan tests => 1 };
 
-tests( new Crypt::Random::Generator Strength => 0, Uniform => 1 );
+tests( Crypt::Random::Generator->new( (Strength => 1, Uniform => 1) ));
 
 sub tests { 
 

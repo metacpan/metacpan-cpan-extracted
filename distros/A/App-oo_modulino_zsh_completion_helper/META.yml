@@ -9,7 +9,7 @@ configure_requires:
   Module::Build: '0'
   Module::CPANfile: '0'
 dynamic_config: 0
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,12 +18,12 @@ name: App-oo_modulino_zsh_completion_helper
 provides:
   App::oo_modulino_zsh_completion_helper:
     file: lib/App/oo_modulino_zsh_completion_helper.pm
-    version: '0.04'
+    version: '0.05'
 requires:
-  MOP4Import::Declare: '0.052'
+  MOP4Import::Declare: '0.061'
   Module::Runtime: '0'
   perl: '5.010'
 resources:
   repository: https://github.com/hkoba/perl-App-oo_modulino_zsh_completion_helper.git
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

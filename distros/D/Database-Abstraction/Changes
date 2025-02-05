@@ -1,5 +1,13 @@
 Revision history for Database-Abstraction
 
+0.17	Tue Feb  4 15:32:43 EST 2025
+	Support expires_in for compatability with CHI
+	Added cache support to AUTOLOAD
+	Allow the logger to be a filename
+	When the logger is a reference to code, give more information
+	Added the 'filename' property
+	Don't attempt to slurp files when col_names is set
+
 0.16	Sun Jan 12 12:15:01 EST 2025
 	fetchrow_hashref() - when no_entry is not set allow just one argument to be given: the entry value
 

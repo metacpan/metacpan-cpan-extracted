@@ -1,3 +1,13 @@
+0.14 ሰኞ፣ ፌብ  3 ቀን 21:44:34 EST 2025 ዓ/ም
+	- Set TZ in tester it UTC
+	- Fixes as per CPANTS:
+	  + POD encoding is set to utf8.
+	  + Added 'use warnings'.
+	  + Added 'use strict'.
+	  + Added MIN_PERL_VERSION to Makefile.PL
+	  + Synched module versions.
+	  + Added META documents.
+
 0.13 ዓርብ፣ ጁን 20 ቀን 09:00:55 ጡዋት EDT 2003 ዓ/ም
 	- updates for Convert::Number::Ethiopic.
 

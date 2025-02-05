@@ -1,10 +1,9 @@
 package Crypt::Passphrase::Pepper::Simple;
-$Crypt::Passphrase::Pepper::Simple::VERSION = '0.020';
+$Crypt::Passphrase::Pepper::Simple::VERSION = '0.021';
 use strict;
 use warnings;
 
 use parent 'Crypt::Passphrase::Pepper::Base';
-use Crypt::Passphrase -encoder;
 
 use Carp 'croak';
 use Digest::SHA;
@@ -55,7 +54,7 @@ Crypt::Passphrase::Pepper::Simple - A pepper-wrapper for Crypt::Passphrase
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 

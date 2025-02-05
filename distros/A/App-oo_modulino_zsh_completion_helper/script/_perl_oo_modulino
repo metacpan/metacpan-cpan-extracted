@@ -8,9 +8,14 @@
 : ${_perl_oo_modulino_inspector:=oo_modulino_zsh_completion_helper.pl}
 
 function _perl_oo_modulino_inspect {
-    local method=$1 pmfile
+    local method=$1 pmword pmfile
     shift || return 1
-    pmfile=$words[1]
+    pmword=$~words[1]
+    if (($+commands[$pmword])); then
+        pmfile=$commands[$pmword]
+    else
+        pmfile=$pmword
+    fi
     shift words || return 1
     local words_json;
     words_json=$($_perl_oo_modulino_inspector cli_array "$words[@]")
@@ -51,12 +56,19 @@ function _perl_oo_modulino {
         fi
     fi
 
-    if ! [[ -e ${~words[1]} ]]; then
+    local pmword=${~words[1]} pmfile
+    if (($+commands[$pmword])); then
+        pmfile=$commands[$pmword]
+    else
+        pmfile=$pmword
+    fi
+
+    if ! [[ -e $pmfile ]]; then
         # _message "No such module: $words[1]"
-        print "No such module: $words[1]"
+        print "No such module: $pmfile"
         return 0
-    elif ! [[ -x ${~words[1]} ]]; then
-        print "Module is not an executable: $words[1]"
+    elif ! [[ -x $pmfile ]]; then
+        print "Module is not an executable: $pmfile"
         return 0
     fi
 

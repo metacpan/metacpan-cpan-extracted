@@ -1,3 +1,27 @@
+Tue Jan 28 12:16:21 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.7]:
+	* VERSION: bump
+	* README.md: generated
+	* src/main/perl/bin/inotify.pl.in:
+	- moved %EVENTS, %MASKS to Workflow::Inotify::Handler
+	(setup_watch_handlers)
+	- allow multiple directories to use same handler
+	(init_from_config)
+	- die w/reasons if can't read the config
+	(help)
+	- add --version option
+	(main)
+	- logfile, not LOGFILE
+	- append properly to STDOUT
+	- force 1s delay if not block and no sleep value provide
+	* src/main/perl/lib/Workflow/Inotify.pm.in
+	- pod updates
+	* src/main/perl/lib/Workflow/Inotify/Handler.pm.in
+	- + %EVENTS, %MASKS
+	- add getter/setters for events, masks
+	(get_app_config): minor refactoring
+
 Sun Oct 27 15:30:28 2024  Rob Lauer  <rlauer6@comcast.net>
 
 	[1.0.6]:

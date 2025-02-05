@@ -1,0 +1,10 @@
+Revision history for String-Compile-Tr
+
+0.03    2025/02/05
+        Separate test requiring option 'r'
+
+0.02    2025/02/04
+        New approach: compile anonymous sub
+
+0.01    2025/02/01
+        First attempt, abandoning

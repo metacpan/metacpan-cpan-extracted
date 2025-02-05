@@ -3,6 +3,11 @@
 require Date::Ethiopic;
 use strict;
 
+if ( $] >= 5.007 ) {
+	binmode (STDOUT, ":utf8");
+	binmode (STDERR, ":utf8");
+}
+
 print "Testing[01]:  ( day => 29, month => 6, year => 1995 )\n";
 my $ethio = new Date::Ethiopic ( day => 29, month => 6, year => 1995 );
 my ($d,$m,$y) = $ethio->gregorian;
