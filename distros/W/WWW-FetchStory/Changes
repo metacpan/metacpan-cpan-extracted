@@ -1,33 +1,41 @@
 Revision History for WWW-FetchStory
 ===================================
 
-v0.2307 2022-07-19
+v0.2501 2025-02-06
 ------------------
 
-* 2022-07-19 01:33:22 +1000
-  Fixed the problem with EPUB descriptions.
-* 2022-07-19 01:27:36 +1000
-  Disabling the replacement of EPUB descriptions.
-* 2022-07-19 00:43:46 +1000
-  problems with HTML in AO3 summaries
-* 2022-07-19 00:30:23 +1000
-  problems with HTML in AO3 summaries
+* 2025-02-06 14:04:29 +1100
+  Fixing a few bugs in parsing
 
-v0.2303 2022-07-14
-------------------
+v0.25 2025-02-06
+----------------
 
-* 2022-07-14 01:02:37 +1000
-  fixing wordcount
-* 2022-07-12 18:30:38 +1000
-  I think I got it
-* 2022-07-12 17:51:01 +1000
-  still bothering AO3 EPUB
-* 2022-07-12 17:33:18 +1000
-  fetching AO3 epub
-* 2022-01-30 10:33:53 +1100
-  version bump
-* 2022-01-30 10:33:29 +1100
-  tweak
+* 2025-02-06 12:18:25 +1100
+  Enable AO3 fetcher to parse pre-fetched EPUB files
+* 2025-02-06 10:16:55 +1100
+  Various tweaks in prep for more stuff
+* 2025-02-05 19:57:20 +1100
+  tweaking docs
+* 2023-09-01 16:16:05 +1000
+  fixed bug with AO3 parsing of rating
+* 2023-08-25 21:48:06 +1000
+  Fixing the parse-from-a-pre-downloaded file thing.
+* 2023-08-14 22:52:25 +1000
+  Can use local files.
+* 2023-08-01 04:49:12 +1000
+  fixed bug with AO3 EPUB url
+* 2023-06-10 10:14:12 +1000
+  Multiple fixes for Twisting The Hellmouth
+* 2023-06-10 10:12:04 +1000
+  Fixing error with wordcount.
+* 2023-06-09 19:36:36 +1000
+  Fixed the wordcount and author bug
+* 2023-06-09 19:13:22 +1000
+  may this fix the wordcount bug
+* 2023-01-08 10:43:40 +1100
+  more tweaking
+* 2023-01-08 10:38:01 +1100
+  tweaking AO3 character parsing
 
 ===================================
 End of changes in the last 365 days

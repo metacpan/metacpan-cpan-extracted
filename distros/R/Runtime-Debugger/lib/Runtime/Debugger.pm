@@ -33,7 +33,7 @@ use feature qw( say );
 use parent  qw( Exporter );
 use subs    qw( uniq );
 
-our $VERSION = '1.09';
+our $VERSION = '1.10';
 our @EXPORT  = qw( run repl d dd np p );
 our %PEEKS;
 
@@ -717,17 +717,25 @@ sub _define_regex {
 
     # Some are mainly defined here just to
     # keep my editor code folding functional.
-    my $var_name = qr{ [_A-Za-z]\w* }x;
-    my $any_3    = qr{ .{0,3} }x;
-    my $qq       = '"';
-    my $q        = "'";
+    my $var_name       = qr{ :{0,2} [_A-Za-z] [\w:]* }x;
+    my $any_3          = qr{ .{0,3} }x;
+    my $qq             = '"';
+    my $q              = "'";
+    my $is_curly_open  = '{';
+    my $is_curly_close = '}';
 
     {
 
         var_unquoted => qr{
             (?<var>
                 (?<sigil> [\$\@%] )
-                (?<name> $var_name )
+                (?:
+                    (?<name> $var_name )
+                    |
+                    $is_curly_open              # For simple scalar: ${scalar}
+                    (?<name> $var_name )
+                    $is_curly_close
+                )
             )
             (?= (?<next> $any_3 ) )
         }x,
@@ -736,7 +744,13 @@ sub _define_regex {
             (?<! \\ )  # Should not be escaped.
             (?<var>
                 (?<sigil> [\$\@] )
-                (?<name> $var_name )
+                (?:
+                    (?<name> $var_name )
+                    |
+                    $is_curly_open
+                    (?<name> $var_name )
+                    $is_curly_close
+                )
             )
             (?= (?<next> $any_3 ) )
         }x,
@@ -864,13 +878,25 @@ sub _to_peek {
     my $name  = $match{name};
     my $next  = $match{next} // "";
 
-    my $is_curly = '{';    # To make my editor happy.
+    my $is_curly_open  = qr{ \{ }x;    # To make my editor happy.
+    my $is_curly_close = qr{ \} }x;    # To make my editor happy.
+
+    if ( $repl->debug ) {
+        say "var:   $var";
+        say "name:  $name";
+        say "sigil: $sigil";
+        say "next:  $next";
+    }
+
+    if ( $var =~ s/ ^ \$ \K $is_curly_open //x ) {    # Var in curlies.
+        $var =~ s/ $is_curly_close $ //x;
+    }
 
     # Find the true variable with sigil.
-    if ( $next =~ / ^ \[ /x ) {    # Array ref.
+    if ( $next =~ / ^ \[ /x ) {                       # Array ref.
         $var = "\@$name";
     }
-    elsif ( $next =~ / ^ $is_curly /x ) {    # Hash ref.
+    elsif ( $next =~ / ^ $is_curly_open /x ) {        # Hash ref.
         $var = "\%$name";
     }
 
@@ -878,9 +904,8 @@ sub _to_peek {
     my $val = sprintf( '$%s::PEEKS{qq(%s)}', __PACKAGE__, quotemeta( $var ), );
 
     if ( $repl->debug ) {
-        say "var:   $var";
-        say "sigil: $sigil";
-        say "next:  $next";
+        say "";
+        say "var2   $var";
         say "ref:   $ref";
     }
 

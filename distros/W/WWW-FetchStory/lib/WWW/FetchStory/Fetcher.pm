@@ -1,5 +1,5 @@
 package WWW::FetchStory::Fetcher;
-$WWW::FetchStory::Fetcher::VERSION = '0.2307';
+$WWW::FetchStory::Fetcher::VERSION = '0.2501';
 use strict;
 use warnings;
 =head1 NAME
@@ -8,7 +8,7 @@ WWW::FetchStory::Fetcher - fetching module for WWW::FetchStory
 
 =head1 VERSION
 
-version 0.2307
+version 0.2501
 
 =head1 DESCRIPTION
 
@@ -237,6 +237,18 @@ Build a table-of-contents file if this is true.
 
 Build a YAML file with meta-data about this story if this is true.
 
+=item meta_only
+
+Don't download the story, just parse the meta-data from the web page.
+This is useful if you've had to download the story separately due
+to security restrictions.
+
+=item use_file I<filename>
+
+Use the given file to parse the meta-data from rather than from
+the web page. (This is usually a pre-downloaded EPUB file)
+Implies meta_only.
+
 =item urls
 
 The URLs of the story.
@@ -259,7 +271,7 @@ sub fetch {
     $self->{verbose} = $args{verbose};
 
     my $first_url = $args{urls}[0];
-    my $toc_content = $self->get_toc($first_url);
+    my $toc_content = $self->get_toc(%args, first_url=>$first_url);
     my %story_info = $self->parse_toc(%args, content=>$toc_content,
 	url=>$first_url);
 
@@ -269,7 +281,13 @@ sub fetch {
     $story_info{basename} = $basename;
     my @storyfiles = ();
 
-    if (!$args{meta_only})
+    $args{meta_only} = 1 if $args{use_file};
+    if ($args{meta_only})
+    {
+        $self->derive_values(info=>\%story_info);
+        warn Dump(\%story_info) if ($self->{verbose} > 1);
+    }
+    else
     {
         if ($args{epub} and exists $story_info{epub_url} and $story_info{epub_url})
         {
@@ -520,7 +538,8 @@ Get a table-of-contents page.
 =cut
 sub get_toc {
     my $self = shift;
-    my $url = shift;
+    my %args = @_;
+    my $url = $args{first_url};
 
     return $self->get_page($url);
 } # get_toc
@@ -538,7 +557,18 @@ sub get_page {
     warn "getting $url\n" if $self->{verbose};
     my $content = '';
 
-    if ($self->{use_wget})
+    # The "url" might be a file instead
+    if ($url !~ /http/ and -f $url)
+    {
+	my $ifh;
+	open($ifh, $url) or die "FAILED to read ${url}: $!";
+	while(<$ifh>)
+	{
+	    $content .= $_;
+	}
+	close($ifh);
+    }
+    elsif ($self->{use_wget})
     {
 	my $cmd = sprintf("%s -O %s '%s'", $self->{wget_cmd}, '-', $url);
 	warn "$cmd\n" if ($self->{verbose} > 1);
@@ -1163,6 +1193,7 @@ sub get_epub {
 	delete $meta{epub_url};
 	delete $meta{basename};
 	delete $meta{toc_first};
+        warn "EPUB meta: ", Dump(\%meta) if ($self->{verbose} > 1);
 	$self->epub_add_meta(meta=>\%meta, xml=>$dom);
 
 	my $str = $dom->toString;

@@ -1,5 +1,5 @@
 package WWW::FetchStory::Fetcher::Dreamwidth;
-$WWW::FetchStory::Fetcher::Dreamwidth::VERSION = '0.2307';
+$WWW::FetchStory::Fetcher::Dreamwidth::VERSION = '0.2501';
 use strict;
 use warnings;
 =head1 NAME
@@ -8,7 +8,7 @@ WWW::FetchStory::Fetcher::Dreamwidth - fetching module for WWW::FetchStory
 
 =head1 VERSION
 
-version 0.2307
+version 0.2501
 
 =head1 DESCRIPTION
 
@@ -16,7 +16,7 @@ This is the Dreamwidth story-fetching plugin for WWW::FetchStory.
 
 =cut
 
-our @ISA = qw(WWW::FetchStory::Fetcher);
+use parent qw(WWW::FetchStory::Fetcher);
 
 =head1 METHODS
 
@@ -191,7 +191,8 @@ Get a table-of-contents page.
 =cut
 sub get_toc {
     my $self = shift;
-    my $url = shift;
+    my %args = @_;
+    my $url = $args{first_url};
 
     return $self->get_page("${url}?format=light");
 } # get_toc

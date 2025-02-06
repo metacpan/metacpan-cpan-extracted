@@ -1,5 +1,5 @@
 package WWW::FetchStory::Fetcher::TardisBigBang3;
-$WWW::FetchStory::Fetcher::TardisBigBang3::VERSION = '0.2307';
+$WWW::FetchStory::Fetcher::TardisBigBang3::VERSION = '0.2501';
 use strict;
 use warnings;
 =head1 NAME
@@ -8,7 +8,7 @@ WWW::FetchStory::Fetcher::TardisBigBang3 - fetching module for WWW::FetchStory
 
 =head1 VERSION
 
-version 0.2307
+version 0.2501
 
 =head1 DESCRIPTION
 
@@ -16,7 +16,7 @@ This is the TardisBigBang3 story-fetching plugin for WWW::FetchStory.
 
 =cut
 
-our @ISA = qw(WWW::FetchStory::Fetcher);
+use parent qw(WWW::FetchStory::Fetcher);
 
 =head2 info
 

@@ -1,5 +1,5 @@
 package Crypt::SysRandom::XS;
-$Crypt::SysRandom::XS::VERSION = '0.006';
+$Crypt::SysRandom::XS::VERSION = '0.007';
 use strict;
 use warnings;
 
@@ -26,7 +26,7 @@ Crypt::SysRandom::XS - Perl interface to system randomness, XS version
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 

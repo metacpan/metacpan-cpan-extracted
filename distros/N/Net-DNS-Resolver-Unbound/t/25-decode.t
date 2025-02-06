@@ -4,11 +4,15 @@
 use strict;
 use warnings;
 use IO::File;
-use Test::More tests => 4;
+use Test::More;
 
 use Net::DNS::Resolver::Unbound;
 
 my $resolver = Net::DNS::Resolver::Unbound->new();
+
+plan skip_all => 'resolver not loaded' unless $resolver;
+plan tests    => 4;
+
 
 my $qname = 'www.net-dns.org';
 

@@ -48,14 +48,37 @@ foreach my $test (@tests) {
       }
     }
 
-    # Compare results (bearing in mind that some tests produce zero output, and
-    # thus cannot be parsed as XML)
-    if ($received || $expected) {
-        is_xml $received, $expected, $test
-          or diag "GOT: ", explain($received);
-    }
-    else {
-        is $received, $expected, $test
-          or diag "GOT: ", explain($received);
+    # Skip this test if it is a bailout test, and we have a broken version of
+    # Test::Harness
+    SKIP: {
+        # Should we be skipping "bailout" tests, because of a broken
+        # Test::Harness?
+        #
+        # A handful of Test::Harness releases contained a bug which resulted in
+        # a double-summary being output on BAIL_OUT, and which affect our
+        # expected test output.
+        my $SKIP_BAILOUT = 0;
+        {
+            my $v_harness   = version->parse($TAP::Harness::VERSION);
+            my $v_broken_at = version->parse("3.45_01");
+            my $v_fixed_at  = version->parse("3.50");
+            $SKIP_BAILOUT = 1 if (
+                ($v_harness >= $v_broken_at)
+                &&
+                ($v_harness < $v_fixed_at)
+            );
+        }
+        skip "Broken Test::Harness installed; skipping BAIL_OUT test", 1 if ($SKIP_BAILOUT && ($test =~ /bailout/));
+
+        # Compare results (bearing in mind that some tests produce zero output, and
+        # thus cannot be parsed as XML)
+        if ($received || $expected) {
+            is_xml $received, $expected, $test
+                or diag "GOT: ", explain($received);
+        }
+        else {
+            is $received, $expected, $test
+                or diag "GOT: ", explain($received);
+        }
     }
 }

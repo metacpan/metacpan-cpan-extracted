@@ -6,10 +6,10 @@ use warnings;
 load_module('Dist::Build::XS');
 load_module('Dist::Build::XS::Conf');
 
-my $libraries;
+my %options;
 
 my @possibilities = (
-	[ 'getrandom in sys/random.h', 'SYS_RANDOM_GETRANDOM', [], <<EOF ],
+	[ 'getrandom in sys/random.h', 'SYS_RANDOM_GETRANDOM', {}, <<EOF ],
 #include <sys/types.h>
 #include <sys/random.h>
 
@@ -20,7 +20,7 @@ int main(void)
         return 0;
 }
 EOF
-	['getrandom in sys/syscall.h', 'SYSCALL_GETRANDOM', [], <<EOF],
+	['getrandom in sys/syscall.h', 'SYSCALL_GETRANDOM', {}, <<EOF],
 #define _GNU_SOURCE
 #include <sys/syscall.h>
 #include <unistd.h>
@@ -32,7 +32,7 @@ int main(void)
         return 0;
 }
 EOF
-	['getentropy in sys/random.h', 'SYS_RANDOM_GETENTROPY', [], <<EOF ],
+	['getentropy in sys/random.h', 'SYS_RANDOM_GETENTROPY', {}, <<EOF ],
 #include <sys/types.h>
 #include <sys/random.h>
 
@@ -43,7 +43,7 @@ int main(void)
         return 0;
 }
 EOF
-	['getentropy in unistd.h', 'UNISTD_GETENTROPY', [], <<EOF ],
+	['getentropy in unistd.h', 'UNISTD_GETENTROPY', {}, <<EOF ],
 #include <unistd.h>
 
 int main(void)
@@ -53,7 +53,7 @@ int main(void)
         return 0;
 }
 EOF
-	['Microsoft BcryptGenRandom', 'BCRYPT_GENRANDOM', ['Bcrypt'], <<EOF ],
+	['Microsoft BcryptGenRandom', 'BCRYPT_GENRANDOM', { libraries => ['Bcrypt'] }, <<EOF ],
 #define WIN32_NO_STATUS
 #include <windows.h>
 #undef WIN32_NO_STATUS
@@ -69,12 +69,32 @@ int main(void)
         return 0;
 }
 EOF
+	[ 'rdrandom64 in immintrin.h', 'RDRAND64', { run => 0, extra_compiler_flags => [ '-mrdrnd' ] }, <<EOF ],
+#include <immintrin.h>
+
+int main(void) {
+	char buf[16];
+	int i;
+	for (i = 0; i < sizeof buf; i+= sizeof(unsigned long long))
+		_rdrand64_step((unsigned long long*)(buf + i));
+}
+EOF
+	[ 'rdrandom32 in immintrin.h', 'RDRAND32', { run => 0, extra_compiler_flags => [ '-mrdrnd' ] }, <<EOF ],
+#include <immintrin.h>
+
+int main(void) {
+	char buf[16];
+	int i;
+	for (i = 0; i < sizeof buf; i+= sizeof(unsigned long))
+		_rdrand32_step((unsigned *)(buf + i));
+}
+EOF
 );
 
 for my $possibility (@possibilities) {
-	my ($name, $define, $libs, $code) = @{ $possibility };
-	if (try_compile_run(source => $code, define => "HAVE_\U$define", libraries => $libs, quiet => 1)) {
-		$libraries = $libs;
+	my ($name, $define, $options, $code) = @{ $possibility };
+	if (try_compile_run(source => $code, define => "HAVE_\U$define", %$options, quiet => 1)) {
+		%options = %$options;
 		print "Found $name\n";
 		last;
 	}
@@ -82,6 +102,4 @@ for my $possibility (@possibilities) {
 
 die "No suitable implementation found" unless defines() > 0;
 
-add_xs(
-	libraries => $libraries,
-);
+add_xs(%options);

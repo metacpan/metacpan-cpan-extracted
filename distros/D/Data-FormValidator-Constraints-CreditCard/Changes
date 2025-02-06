@@ -1,5 +1,8 @@
 Revision history for perl extension Data::FormValidator::Constraints::CreditCard:
 
+0.04      2025-02-05 09:27:18-08:00 America/Vancouver
+    - updated expiry date in "t/creditcard.t" to reflect a date in the future
+
 0.03      2021-01-12 21:16:36-08:00 America/Vancouver
     - Switch to Dist::Zilla for release management
     - POD cleanups; spelling

@@ -7,7 +7,7 @@ package Rex::Test::Base::has_output_matching;
 use v5.12.5;
 use warnings;
 
-our $VERSION = '1.15.0'; # VERSION
+our $VERSION = '1.16.0'; # VERSION
 
 use Rex -minimal;
 use Rex::Helper::Run;

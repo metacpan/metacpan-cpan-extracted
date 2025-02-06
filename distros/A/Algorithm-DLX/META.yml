@@ -4,6 +4,7 @@ author:
   - 'James Hammer'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  List::Util: '1.68'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -22,5 +23,5 @@ requires:
   strict: '1'
   warnings: '1'
 resources: {}
-version: 0.02
+version: 0.03
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

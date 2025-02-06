@@ -36,10 +36,15 @@
             "strict" : "1",
             "warnings" : "1"
          }
+      },
+      "test" : {
+         "requires" : {
+            "List::Util" : "1.68"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {},
-   "version" : 0.02,
+   "version" : 0.03,
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

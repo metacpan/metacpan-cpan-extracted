@@ -36,7 +36,7 @@ use warnings;
 use Data::Dumper;
 use Time::HiRes qw(time);
 
-our $VERSION = '1.15.0'; # VERSION
+our $VERSION = '1.16.0'; # VERSION
 
 use Rex::Logger;
 use Rex::TaskList;

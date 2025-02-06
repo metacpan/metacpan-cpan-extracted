@@ -46,8 +46,8 @@ my @sorted_by_value = (
   '7' => '20',
   '0' => '100',
   '1' => '123string',
-  '3' => '001000',
   '2' => '1000',
+  '3' => '001000',
   '8' => '1001',
   'ark' => 'ark',
   'code' => 'bee',
@@ -55,9 +55,5 @@ my @sorted_by_value = (
 );
 
 my @result = sort_by_value @values;
-
-for (my $i = 0; $i < @result; $i += 2) {
-  pl qq['$result[$i]' => '$result[$i + 1]',];
-}
 
 is_deeply \@result, \@sorted_by_value, 'right order';

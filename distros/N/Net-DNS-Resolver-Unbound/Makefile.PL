@@ -183,19 +183,18 @@ sub postamble {
 	return <<"PlanA" if `gcov -v 2>$devnull`;
 test_cover :
 	cover -delete
-	cover -test
+	HARNESS_PERL_SWITCHES=-MDevel::Cover \$(MAKE) -W Unbound.xs test CCFLAGS="$ccflags" OTHERLDFLAGS="$ldflags"
+	cover
 	\$(NOECHO) \$(TOUCH) Unbound.c	# force XS rebuild before install
 PlanA
 
 	return <<'PlanB';
 test_cover :
 	cover -delete
-	HARNESS_PERL_SWITCHES=-MDevel::Cover $(MAKE) test
-	cover
+	cover -test
 PlanB
 }
 
 
-	#HARNESS_PERL_SWITCHES=-MDevel::Cover \$(MAKE) -W Unbound.xs test CCFLAGS="$ccflags" OTHERLDFLAGS="$ldflags"
 __END__
 

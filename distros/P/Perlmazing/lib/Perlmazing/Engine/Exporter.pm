@@ -60,7 +60,7 @@ sub _expand_names {
   my $found_symbols = {map {$_ => 1} @{"${self}::found_symbols"}};
   for my $i (@final) {
     (my $name = $i) =~ s/^!//;
-    croak "Unknown symbol '$name' from package '$self'" unless exists $found_symbols->{$name};
+    croak "Unknown symbol '$name' from package '$self'" unless defined(&{"${self}::$name"}) or exists $found_symbols->{$name};
   }
   @final;
 }

@@ -47,10 +47,12 @@ describe "use File::AddInc", sub {
 
       return unless -l $exe; # Only test for symbolic link.
 
+      my $expect = File::Spec->catfile($testDir, 'obscure-lib-dir');
+
       it "should resolve symlink, emit correct libdir even for obscure-dir and can use other lib", sub {
 
         expect([qx($^X -I$FindBin::Bin/../lib $exe)])
-          ->to_be([lines("$testDir/obscure-lib-dir", qw/OK YES!/)]);
+          ->to_be([lines($expect, qw/OK YES!/)]);
       };
     };
   }

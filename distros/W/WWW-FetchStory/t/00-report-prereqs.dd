@@ -39,6 +39,8 @@ do { my $x = {
                                       'WWW::Mechanize::Sleepy' => '0',
                                       'XML::LibXML' => '0',
                                       'YAML::Any' => '0',
+                                      'common::sense' => '0',
+                                      'parent' => '0',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }

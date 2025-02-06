@@ -1,5 +1,11 @@
 Revision history for Perl extension TAP::Formatter::JUnit.
 
+0.17      2025-02-05 17:01:10-08:00 America/Vancouver
+    - Bump minimum required Perl to 5.010; XML::Generator v1.11 now requires
+      that as a minimum acceptable Perl.
+    - Skip BAIL_OUT test when using Test::Harness 3.45_01-3.48, as those
+      versions contained a bug which output a double summary.  Fixes GH#15
+
 0.16      2022-05-14 21:50:19-07:00 America/Vancouver
     - Sigh... neglected to consider development versions of Test::Harness in the
       recent updates to "t/formatter.t"; although the fixes were released in

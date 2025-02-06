@@ -476,6 +476,7 @@ t/rexfiles/Rexfile_warnings_print.stderr
 t/rexfiles/Rexfile_warnings_print.stdout
 t/rexfiles/no_Rexfile.log
 t/rsync.t
+t/run.t
 t/runlist.t
 t/scm/git.t
 t/shared.t

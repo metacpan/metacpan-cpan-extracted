@@ -1,5 +1,8 @@
 Revision history for Parser-FIT
-
+0.09    2025-02-05
+        - Add 'use strict' to missing modules
+        - Added Mojolicious dev-dependency
+        
 0.08    2025-02-01
         - Add missing files to MANIFEST
         - Update MANIFEST.SKIP

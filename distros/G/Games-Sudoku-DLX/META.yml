@@ -1,0 +1,28 @@
+---
+abstract: "Solve Sudoku type puzzles with Donald Knuth's DLX Algorithm"
+author:
+  - 'James Hammer'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '1.302199'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Games-Sudoku-DLX
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Algorithm::DLX: '0.02'
+  perl: '5.008004'
+  strict: '1'
+  warnings: '1'
+resources: {}
+version: 0.02
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

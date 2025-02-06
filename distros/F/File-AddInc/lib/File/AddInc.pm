@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use mro qw/c3/;
 
-our $VERSION = "0.002";
+our $VERSION = "0.003";
 
 use File::Spec;
 use File::Basename;
@@ -17,7 +17,7 @@ use constant DEBUG => $ENV{DEBUG_MOP4IMPORT};
 {
   package
     File::AddInc::Opts;
-  use fields qw/caller callpack filename line/;
+  use fields qw/caller callpack filename line stash/;
 
   # This Opts->new does not bless the hash.
   sub new {
@@ -38,9 +38,11 @@ sub import {
 
   my Opts $opts = $pack->Opts->new(caller => [caller]);
 
-  @pragma = (-file_inc) unless @pragma;
+  $pack->dispatch_declare($opts, $pack->always_exports, @pragma);
+}
 
-  $pack->dispatch_declare($opts, @pragma);
+sub always_exports {
+  (-file_inc)
 }
 
 sub dispatch_declare {
@@ -70,10 +72,16 @@ sub dispatch_declare {
   }
 }
 
+sub get_libdir {
+  (my $pack, my Opts $opts) = @_;
+  $opts->{stash}{$pack}{libdir}
+    //= libdir($pack, $opts->{callpack}, $opts->{filename});
+}
+
 sub declare_file_inc {
   (my $pack, my Opts $opts) = @_;
 
-  my $libdir = libdir($pack, $opts->{callpack}, $opts->{filename});
+  my $libdir = $pack->get_libdir($opts);
 
   $pack->add_inc_if_necessary($libdir);
 }
@@ -109,7 +117,7 @@ sub add_inc_if_necessary {
 sub declare_libdir_var {
   (my $pack, my Opts $opts, my $varname) = @_;
 
-  my $libdir = libdir($pack, $opts->{callpack}, $opts->{filename});
+  my $libdir = $pack->get_libdir($opts);
 
   $varname =~ s/^\$//;
 
@@ -125,7 +133,7 @@ sub declare_libdir_var {
 sub declare_these_libdirs {
   (my $pack, my Opts $opts, my @dirSpec) = @_;
 
-  my $libdir = libdir($pack, $opts->{callpack}, $opts->{filename});
+  my $libdir = $pack->get_libdir($opts);
 
   my @libdir = map {
     if (ref $_) {
@@ -173,6 +181,10 @@ sub libdir {
   my $realFn = -l $filename
     ? resolve_symlink($pack, $filename)
     : $filename;
+
+  if ($^O eq 'MSWin32') {
+    $packfn =~ s#/#\\#g;
+  }
 
   my $absfn = File::Spec->rel2abs($realFn);
 

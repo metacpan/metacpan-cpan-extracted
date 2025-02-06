@@ -7,7 +7,7 @@ package Rex::Interface::Exec::Local;
 use v5.12.5;
 use warnings;
 
-our $VERSION = '1.15.0'; # VERSION
+our $VERSION = '1.16.0'; # VERSION
 
 use Rex::Logger;
 use Rex::Commands;
@@ -39,7 +39,7 @@ sub set_env {
     if ( ref $env ne "HASH" );
 
   while ( my ( $k, $v ) = each(%$env) ) {
-    $cmd .= "export $k='$v'; ";
+    $cmd .= $OSNAME eq 'MSWin32' ? "set $k=$v && " : "export $k='$v'; ";
   }
   $self->{env} = $cmd;
 }
@@ -86,6 +86,11 @@ sub exec {
     }
 
     $cmd = $new_cmd;
+  }
+  else {
+    if ( $self->{env} ) {
+      $cmd = $self->{env} . " $cmd";
+    }
   }
 
   Rex::Logger::debug("Executing: $cmd");

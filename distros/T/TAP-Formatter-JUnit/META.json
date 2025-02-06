@@ -4,7 +4,7 @@
       "Graham TerMarsch <cpan@howlingfrog.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -43,8 +43,9 @@
             "Test::NoTabs" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
-            "Test::Spelling" : "0.12",
-            "Test::Synopsis" : "0"
+            "Test::Spelling" : "0.17",
+            "Test::Synopsis" : "0",
+            "Test::Vars" : "0"
          }
       },
       "runtime" : {
@@ -55,7 +56,7 @@
             "TAP::Harness" : "3.12",
             "XML::Generator" : "0",
             "namespace::clean" : "0",
-            "perl" : "5.008"
+            "perl" : "5.010"
          }
       },
       "test" : {
@@ -89,9 +90,9 @@
          "web" : "https://github.com/bleargh45/TAP-Formatter-JUnit"
       }
    },
-   "version" : "0.16",
-   "x_generated_by_perl" : "v5.34.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "version" : "0.17",
+   "x_generated_by_perl" : "v5.40.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 1
 }

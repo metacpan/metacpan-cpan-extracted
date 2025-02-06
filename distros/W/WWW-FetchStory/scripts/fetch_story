@@ -5,7 +5,7 @@ fetch_story - fetch a story from the internet
 
 =head1 VERSION
 
-version 0.2307
+version 0.2501
 
 =head1 SYNOPSIS
 
@@ -144,6 +144,7 @@ sub process_args ($) {
 	       'epub!',
 	       'yaml!',
 	       'use_wget!',
+	       'use_file=s',
 	       'manpage',
 	      ) or pod2usage(2);
 

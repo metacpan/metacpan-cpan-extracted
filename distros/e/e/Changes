@@ -1,6 +1,14 @@
 Revision history for e
 
 =================
+1.34 - 2025-01-05
+=================
+
+Improved repl:
+- Able to use curlies with scalars in double quotes:
+    say "${scalar}-more-text";
+
+=================
 1.33 - 2024-11-05
 =================
 

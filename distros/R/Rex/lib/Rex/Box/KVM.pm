@@ -70,7 +70,7 @@ use Rex::Commands::Fs;
 use Rex::Commands::Virtualization;
 use Rex::Commands::SimpleCheck;
 
-our $VERSION = '1.15.0'; # VERSION
+our $VERSION = '1.16.0'; # VERSION
 
 BEGIN {
   LWP::UserAgent->use;

@@ -14,6 +14,7 @@ t/20_import/1.d/MyApp/Deep/Runnable/Module.pm
 t/20_import/1.d/MyApp/Util.pm
 t/20_import/2.d/obscure-lib-dir/MyApp2/Baz/Qux.pm
 t/20_import/2.d/obscure-lib-dir/MyApp2/Foo/Bar.pm
+t/20_import/3.d/lib/Baz.pm
 t/20_import/3.d/lib/Foo.pm
 t/20_import/3.d/local/lib/perl5/Bar.pm
 t/gh/2-libdir_var/MyApp.pm

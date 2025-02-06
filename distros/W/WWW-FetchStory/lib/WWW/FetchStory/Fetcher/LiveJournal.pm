@@ -1,5 +1,5 @@
 package WWW::FetchStory::Fetcher::LiveJournal;
-$WWW::FetchStory::Fetcher::LiveJournal::VERSION = '0.2307';
+$WWW::FetchStory::Fetcher::LiveJournal::VERSION = '0.2501';
 use strict;
 use warnings;
 use HTML::Entities;
@@ -9,7 +9,7 @@ WWW::FetchStory::Fetcher::LiveJournal - fetching module for WWW::FetchStory
 
 =head1 VERSION
 
-version 0.2307
+version 0.2501
 
 =head1 DESCRIPTION
 
@@ -17,7 +17,7 @@ This is the LiveJournal story-fetching plugin for WWW::FetchStory.
 
 =cut
 
-our @ISA = qw(WWW::FetchStory::Fetcher);
+use parent qw(WWW::FetchStory::Fetcher);
 
 =head1 METHODS
 
@@ -295,7 +295,8 @@ Get a table-of-contents page.
 =cut
 sub get_toc {
     my $self = shift;
-    my $url = shift;
+    my %args = @_;
+    my $url = $args{first_url};
 
     return $self->get_page("${url}?format=light");
 } # get_toc

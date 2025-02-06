@@ -6,6 +6,7 @@ use warnings;
 use IO::File;
 use Test::More tests => 10;
 
+use Net::DNS;
 use Net::DNS::Resolver::Unbound -register;
 
 

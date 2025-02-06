@@ -1,5 +1,5 @@
 package WWW::FetchStory::Fetcher::SSHGExchange;
-$WWW::FetchStory::Fetcher::SSHGExchange::VERSION = '0.2307';
+$WWW::FetchStory::Fetcher::SSHGExchange::VERSION = '0.2501';
 use strict;
 use warnings;
 =head1 NAME
@@ -8,7 +8,7 @@ WWW::FetchStory::Fetcher::SSHGExchange - fetching module for WWW::FetchStory
 
 =head1 VERSION
 
-version 0.2307
+version 0.2501
 
 =head1 DESCRIPTION
 
@@ -16,7 +16,7 @@ This is the SSHGExchange story-fetching plugin for WWW::FetchStory.
 
 =cut
 
-our @ISA = qw(WWW::FetchStory::Fetcher::LiveJournal);
+use parent qw(WWW::FetchStory::Fetcher::LiveJournal);
 
 =head1 METHODS
 

@@ -61,7 +61,7 @@ use v5.12.5;
 use warnings;
 use Fcntl;
 
-our $VERSION = '1.15.0'; # VERSION
+our $VERSION = '1.16.0'; # VERSION
 
 require Rex::Exporter;
 use Data::Dumper;

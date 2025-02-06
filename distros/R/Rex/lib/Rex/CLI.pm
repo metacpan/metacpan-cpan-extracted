@@ -7,7 +7,7 @@ package Rex::CLI;
 use v5.12.5;
 use warnings;
 
-our $VERSION = '1.15.0'; # VERSION
+our $VERSION = '1.16.0'; # VERSION
 
 use English qw(-no_match_vars);
 use FindBin;
@@ -221,7 +221,8 @@ CHECK_OVERWRITE: {
       Rex::Commands::private_key( $opts{'P'} );
 
       for my $task ( Rex::TaskList->create()->get_tasks ) {
-        Rex::TaskList->create()->get_task($task)
+        Rex::TaskList->create()
+          ->get_task($task)
           ->set_auth( "private_key", $opts{'P'} );
       }
     }
@@ -230,7 +231,8 @@ CHECK_OVERWRITE: {
       Rex::Commands::public_key( $opts{'K'} );
 
       for my $task ( Rex::TaskList->create()->get_tasks ) {
-        Rex::TaskList->create()->get_task($task)
+        Rex::TaskList->create()
+          ->get_task($task)
           ->set_auth( "public_key", $opts{'K'} );
       }
     }

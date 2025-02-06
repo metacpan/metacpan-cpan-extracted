@@ -32,6 +32,9 @@
 #include <ntstatus.h>
 #include <bcrypt.h>
 
+#elif defined(HAVE_RDRAND32) || defined(HAVE_RDRAND64)
+#include <immintrin.h>
+
 #else
 #error "No suitable implementation found"
 #endif
@@ -60,6 +63,22 @@ SV* random_bytes(size_t wanted)
 			SvREFCNT_dec(RETVAL);
 			croak(error_string);
 		}
+#elif defined(HAVE_RDRAND64)
+		if (wanted % 8)
+			SvGROW(RETVAL, wanted + (8 - (wanted % 8)) + 1);
+		int i;
+		for (i = 0; i < wanted; i += 8)
+			_rdrand64_step((unsigned long long*)(data + i));
+		if (wanted % 4)
+			data[wanted] = '\0';
+#elif defined(HAVE_RDRAND32)
+		if (wanted % 4)
+			SvGROW(RETVAL, wanted + (4 - (wanted % 4)) + 1);
+		int i;
+		for (i = 0; i < wanted; i += 4)
+			_rdrand32_step((unsigned*)(data + i));
+		if (wanted % 4)
+			data[wanted] = '\0';
 #else
 		size_t received = 0;
 		while (received < wanted) {

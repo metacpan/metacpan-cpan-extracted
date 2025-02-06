@@ -4,7 +4,7 @@ package MyTest;
 
 use 5.006;
 use strict;
-use Test::More tests => 3321;
+use Test::More tests => 3585;
 use Runtime::Debugger;
 use feature qw( say );
 
@@ -54,6 +54,17 @@ sub run_suite {
             },
         },
         {
+            name     => "Get scalar in curlies",
+            input    => '${s}',
+            expected => {
+                apply_peeks => '${$Runtime::Debugger::PEEKS{qq(\$s)}}',
+                eval_result => 777,
+                vars_after  => sub {
+                    is $s, 777, shift;
+                },
+            },
+        },
+        {
             name     => "Set scalar",
             input    => '$s = 555',
             expected => {
@@ -65,13 +76,24 @@ sub run_suite {
             },
         },
         {
+            name     => "Set scalar with curlies",
+            input    => '${s} = 444',
+            expected => {
+                apply_peeks => '${$Runtime::Debugger::PEEKS{qq(\$s)}} = 444',
+                eval_result => 444,
+                vars_after  => sub {
+                    is $s, 444, shift;
+                },
+            },
+        },
+        {
             name     => "Get scalar again",
             input    => '$s',
             expected => {
                 apply_peeks => '${$Runtime::Debugger::PEEKS{qq(\$s)}}',
-                eval_result => 555,
+                eval_result => 444,
                 vars_after  => sub {
-                    is $s, 555, shift;
+                    is $s, 444, shift;
                 },
             },
             cleanup => sub {
@@ -432,11 +454,33 @@ sub run_suite {
             },
         },
         {
+            name     => "Double quoted scalar with curlies",
+            input    => '"${s}"',
+            expected => {
+                apply_peeks => '"${$Runtime::Debugger::PEEKS{qq(\$s)}}"',
+                eval_result => "777",
+                vars_after  => sub {
+                    is $s, 777, shift;
+                },
+            },
+        },
+        {
             name     => "Double quoted escaped scalar",
             input    => '"\$s"',
             expected => {
                 apply_peeks => '"\$s"',
                 eval_result => '$s',
+                vars_after  => sub {
+                    is $s, 777, shift;
+                },
+            },
+        },
+        {
+            name     => "Double quoted escaped scalar with curlies",
+            input    => '"\${s}"',
+            expected => {
+                apply_peeks => '"\${s}"',
+                eval_result => '${s}',
                 vars_after  => sub {
                     is $s, 777, shift;
                 },
@@ -610,11 +654,33 @@ sub run_suite {
             },
         },
         {
+            name     => "Single quoted scalar with curlies",
+            input    => q('${s}'),
+            expected => {
+                apply_peeks => q('${s}'),
+                eval_result => q(${s}),
+                vars_after  => sub {
+                    is $s, 777, shift;
+                },
+            },
+        },
+        {
             name     => "Single quoted escaped scalar",
             input    => q('\$s'),
             expected => {
                 apply_peeks => q('\$s'),
                 eval_result => q(\$s),
+                vars_after  => sub {
+                    is $s, 777, shift;
+                },
+            },
+        },
+        {
+            name     => "Single quoted escaped scalar with curlies",
+            input    => q('\${s}'),
+            expected => {
+                apply_peeks => q('\${s}'),
+                eval_result => q(\${s}),
                 vars_after  => sub {
                     is $s, 777, shift;
                 },
@@ -786,6 +852,17 @@ sub run_suite {
             },
         },
         {
+            name     => "qq parens scalar with curlies",
+            input    => 'qq(${s})',
+            expected => {
+                apply_peeks => 'qq(${$Runtime::Debugger::PEEKS{qq(\$s)}})',
+                eval_result => "777",
+                vars_after  => sub {
+                    is $s, 777, shift;
+                },
+            },
+        },
+        {
             name     => "qq parens array ref",
             input    => 'qq($ar->[1])',
             expected => {
@@ -916,6 +993,17 @@ sub run_suite {
         {
             name     => "qq curly scalar",
             input    => 'qq{$s}',
+            expected => {
+                apply_peeks => 'qq{${$Runtime::Debugger::PEEKS{qq(\$s)}}}',
+                eval_result => "777",
+                vars_after  => sub {
+                    is $s, 777, shift;
+                },
+            },
+        },
+        {
+            name     => "qq curly scalar with curlies",
+            input    => 'qq{${s}}',
             expected => {
                 apply_peeks => 'qq{${$Runtime::Debugger::PEEKS{qq(\$s)}}}',
                 eval_result => "777",
@@ -1064,6 +1152,17 @@ sub run_suite {
             },
         },
         {
+            name     => "qq square scalar with curlies",
+            input    => 'qq[${s}]',
+            expected => {
+                apply_peeks => 'qq[${$Runtime::Debugger::PEEKS{qq(\$s)}}]',
+                eval_result => "777",
+                vars_after  => sub {
+                    is $s, 777, shift;
+                },
+            },
+        },
+        {
             name     => "qq square array ref",
             input    => 'qq[$ar->[1]]',
             expected => {
@@ -1194,6 +1293,17 @@ sub run_suite {
         {
             name     => "qq angle scalar",
             input    => 'qq<$s>',
+            expected => {
+                apply_peeks => 'qq<${$Runtime::Debugger::PEEKS{qq(\$s)}}>',
+                eval_result => "777",
+                vars_after  => sub {
+                    is $s, 777, shift;
+                },
+            },
+        },
+        {
+            name     => "qq angle scalar with curlies",
+            input    => 'qq<${s}>',
             expected => {
                 apply_peeks => 'qq<${$Runtime::Debugger::PEEKS{qq(\$s)}}>',
                 eval_result => "777",
@@ -1356,6 +1466,17 @@ sub run_suite {
             },
         },
         {
+            name     => "q parens scalar with curlies",
+            input    => 'q(${s})',
+            expected => {
+                apply_peeks => 'q(${s})',
+                eval_result => '${s}',
+                vars_after  => sub {
+                    is $s, 777, shift;
+                },
+            },
+        },
+        {
             name     => "q parens array ref",
             input    => 'q($ar->[1])',
             expected => {
@@ -1495,6 +1616,17 @@ sub run_suite {
             expected => {
                 apply_peeks => 'q{$s}',
                 eval_result => '$s',
+                vars_after  => sub {
+                    is $s, 777, shift;
+                },
+            },
+        },
+        {
+            name     => "q curly scalar with curlies",
+            input    => 'q{${s}}',
+            expected => {
+                apply_peeks => 'q{${s}}',
+                eval_result => '${s}',
                 vars_after  => sub {
                     is $s, 777, shift;
                 },
@@ -1647,6 +1779,17 @@ sub run_suite {
             },
         },
         {
+            name     => "q square scalar with curlies",
+            input    => 'q[${s}]',
+            expected => {
+                apply_peeks => 'q[${s}]',
+                eval_result => '${s}',
+                vars_after  => sub {
+                    is $s, 777, shift;
+                },
+            },
+        },
+        {
             name     => "q square array ref",
             input    => 'q[$ar->[1]]',
             expected => {
@@ -1787,6 +1930,17 @@ sub run_suite {
             expected => {
                 apply_peeks => 'q<$s>',
                 eval_result => '$s',
+                vars_after  => sub {
+                    is $s, 777, shift;
+                },
+            },
+        },
+        {
+            name     => "q angle scalar with curlies",
+            input    => 'q<${s}>',
+            expected => {
+                apply_peeks => 'q<${s}>',
+                eval_result => '${s}',
                 vars_after  => sub {
                     is $s, 777, shift;
                 },
@@ -1950,6 +2104,17 @@ sub run_suite {
             },
         },
         {
+            name     => "qr parens scalar with curlies",
+            input    => 'qr(${s})',
+            expected => {
+                apply_peeks => 'qr(${$Runtime::Debugger::PEEKS{qq(\$s)}})',
+                eval_result => qr{:777},
+                vars_after  => sub {
+                    is $s, 777, shift;
+                },
+            },
+        },
+        {
             name     => "qr parens array ref",
             input    => 'qr($ar->[1])',
             expected => {
@@ -2080,6 +2245,17 @@ sub run_suite {
         {
             name     => "qr curly scalar",
             input    => 'qr{$s}',
+            expected => {
+                apply_peeks => 'qr{${$Runtime::Debugger::PEEKS{qq(\$s)}}}',
+                eval_result => qr{:777},
+                vars_after  => sub {
+                    is $s, 777, shift;
+                },
+            },
+        },
+        {
+            name     => "qr curly scalar curlies",
+            input    => 'qr{${s}}',
             expected => {
                 apply_peeks => 'qr{${$Runtime::Debugger::PEEKS{qq(\$s)}}}',
                 eval_result => qr{:777},
@@ -2228,6 +2404,17 @@ sub run_suite {
             },
         },
         {
+            name     => "qr square scalar curlies",
+            input    => 'qr[${s}]',
+            expected => {
+                apply_peeks => 'qr[${$Runtime::Debugger::PEEKS{qq(\$s)}}]',
+                eval_result => qr{:777},
+                vars_after  => sub {
+                    is $s, 777, shift;
+                },
+            },
+        },
+        {
             name     => "qr square array ref",
             input    => 'qr[$ar->[1]]',
             expected => {
@@ -2358,6 +2545,17 @@ sub run_suite {
         {
             name     => "qr angle scalar",
             input    => 'qr<$s>',
+            expected => {
+                apply_peeks => 'qr<${$Runtime::Debugger::PEEKS{qq(\$s)}}>',
+                eval_result => qr{:777},
+                vars_after  => sub {
+                    is $s, 777, shift;
+                },
+            },
+        },
+        {
+            name     => "qr angle scalar with curlies",
+            input    => 'qr<${s}>',
             expected => {
                 apply_peeks => 'qr<${$Runtime::Debugger::PEEKS{qq(\$s)}}>',
                 eval_result => qr{:777},
@@ -2525,6 +2723,17 @@ sub run_suite {
             },
         },
         {
+            name     => "qw parens scalar with curlies",
+            input    => 'qw(${s})',
+            expected => {
+                apply_peeks => 'qw(${s})',
+                eval_result => '${s}',
+                vars_after  => sub {
+                    is $s, 777, shift;
+                },
+            },
+        },
+        {
             name     => "qw parens array ref",
             input    => 'qw($ar->[1])',
             expected => {
@@ -2675,6 +2884,17 @@ sub run_suite {
             expected => {
                 apply_peeks => 'qw{$s}',
                 eval_result => '$s',
+                vars_after  => sub {
+                    is $s, 777, shift;
+                },
+            },
+        },
+        {
+            name     => "qw curly scalar with curlies",
+            input    => 'qw{${s}}',
+            expected => {
+                apply_peeks => 'qw{${s}}',
+                eval_result => '${s}',
                 vars_after  => sub {
                     is $s, 777, shift;
                 },
@@ -2838,6 +3058,17 @@ sub run_suite {
             },
         },
         {
+            name     => "qw square scalar with curlies",
+            input    => 'qw[${s}]',
+            expected => {
+                apply_peeks => 'qw[${s}]',
+                eval_result => '${s}',
+                vars_after  => sub {
+                    is $s, 777, shift;
+                },
+            },
+        },
+        {
             name     => "qw square array ref",
             input    => 'qw[$ar->[1]]',
             expected => {
@@ -2989,6 +3220,17 @@ sub run_suite {
             expected => {
                 apply_peeks => 'qw<$s>',
                 eval_result => '$s',
+                vars_after  => sub {
+                    is $s, 777, shift;
+                },
+            },
+        },
+        {
+            name     => "qw angle scalar with curlies",
+            input    => 'qw<${s}>',
+            expected => {
+                apply_peeks => 'qw<${s}>',
+                eval_result => '${s}',
                 vars_after  => sub {
                     is $s, 777, shift;
                 },

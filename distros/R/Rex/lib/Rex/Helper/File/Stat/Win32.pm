@@ -7,7 +7,7 @@ package Rex::Helper::File::Stat::Win32;
 use v5.12.5;
 use warnings;
 
-our $VERSION = '1.15.0'; # VERSION
+our $VERSION = '1.16.0'; # VERSION
 
 use Fcntl;
 

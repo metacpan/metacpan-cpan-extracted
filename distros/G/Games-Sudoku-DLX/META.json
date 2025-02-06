@@ -1,0 +1,51 @@
+{
+   "abstract" : "Solve Sudoku type puzzles with Donald Knuth's DLX Algorithm",
+   "author" : [
+      "James Hammer"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "freebsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Games-Sudoku-DLX",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Algorithm::DLX" : "0.02",
+            "perl" : "5.008004",
+            "strict" : "1",
+            "warnings" : "1"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1.302199"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {},
+   "version" : 0.02,
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

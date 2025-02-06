@@ -5,7 +5,9 @@ use strict;
 
 use File::AddInc -local_lib;
 
-use Bar;
+use Bar; # From local/lib
+
+use Baz; # From lib/
 
 unless (caller) {
   print "OK\n";

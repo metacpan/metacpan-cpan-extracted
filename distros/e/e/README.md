@@ -26,7 +26,7 @@
               ⠹⡽⣾⣿⠹⣿⣆⣾⢯⣿⣿ ⡞ ⠻⣿⣿⣿⠁ ⢠⣿⢏  ⡀ ⡟  ⢀⣴⣿⠃⢁⡼⠁ ⠈
                 ⠈⠛ ⢻⣿⣧⢸⢟⠶⢾⡇  ⣸⡿⠁ ⢠⣾⡟⢼  ⣷ ⡇ ⣰⠋⠙⠁
                    ⠈⣿⣻⣾⣦⣇⢸⣇⣀⣶⡿⠁⣀⣀⣾⢿⡇⢸  ⣟⡦⣧⣶⠏ unleashed
-                    ⠸⢿⡍⠛⠻⠿⠿⠿⠋⣠⡾⢋⣾⣏⣸⣷⡸⣇⢰⠟⠛⠻⡄  v1.32
+                    ⠸⢿⡍⠛⠻⠿⠿⠿⠋⣠⡾⢋⣾⣏⣸⣷⡸⣇⢰⠟⠛⠻⡄  v1.34
                       ⢻⡄   ⠐⠚⠋⣠⡾⣧⣿⠁⠙⢳⣽⡟
                       ⠈⠳⢦⣤⣤⣀⣤⡶⠛ ⠈⢿⡆  ⢿⡇
                             ⠈    ⠈⠓  ⠈
@@ -247,6 +247,67 @@ Benchmark and compare different pieces of code.
     list   144927536/s   162%   148%     --
 
 ## Format Conversions
+
+### csv
+
+CSV parser.
+
+Syntax:
+
+    csv ( ARRAYREF_OF_ARRAYREFS )
+    csv ( ARRAYREF, [ARRAYREF] )
+    csv ( STRING )
+    csv ( )
+
+Convert Perl object to CSV string:
+
+    $ perl -Me -e 'say csv [ "A1", "B1", "C1" ], [ "A2", "B2", "C2" ]'
+    A1,B1,C1
+    A2,B2,C2
+
+Convert CSV string to Perl object:
+
+    # Single row:
+    perl -Me -e 'p csv "A1,B1,C1"'
+    [
+        [0] [
+                [0] "A1",
+                [1] "B1",
+                [2] "C1",
+            ],
+    ]
+
+    # Multiple rows at once:
+    $ perl -Me -e 'p csv "A1,B1,C1\nA2,B2,C2"'
+    [
+        [0] [
+                [0] "A1",
+                [1] "B1",
+                [2] "C1",
+            ],
+        [1] [
+                [0] "A2",
+                [1] "B2",
+                [2] "C2",
+            ],
+    ]
+
+    # Can use default variable:
+    $ perl -Me -e 'p csv for "A1,B1,C1", "A2,B2,C2"'
+    [
+        [0] [
+                [0] "A1",
+                [1] "B1",
+                [2] "C1",
+            ],
+    ]
+    [
+        [0] [
+                [0] "A2",
+                [1] "B2",
+                [2] "C2",
+            ],
+    ]
 
 ### j
 

@@ -1,4 +1,9 @@
 Revision history for Signal-Info
 
+0.002     2025-02-05 20:57:17+01:00 Europe/Brussels
+          - Add Time::Spec
+          - Fix memory leak in Signal::Info constructor
+          - Work around parsing but in old ParseXS
+
 0.001     2025-02-04 04:32:36+01:00 Europe/Brussels
           Initial release to an unsuspecting world

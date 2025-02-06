@@ -1,0 +1,89 @@
+TYPEMAP
+IO::Uring	T_MAGIC
+Signal::Info	T_OPAQUEOBJ
+Time::Spec	T_OPAQUEOBJ
+FileDescriptor	T_FILE_DESCRIPTOR
+DirDescriptor	T_DIR_DESCRIPTOR
+sigset_t*	T_SIGSET
+signo_t	T_SIGNO
+struct timespec	T_TIMESPEC
+
+INPUT
+T_FILE_DESCRIPTOR
+	{
+		PerlIO* ${var}_io = IoIFP(sv_2io($arg));
+		$var = ${var}_io ? PerlIO_fileno(${var}_io) : -1;
+	}
+T_DIR_DESCRIPTOR
+	if (SvOK($arg)) {
+		IO* ${var}_io = sv_2io($arg);
+		if (IoDIRP(${var}_io)) {
+			$var = dirfd(IoDIRP(${var}_io));
+		} else
+			$var = -1;
+	} else
+		$var = AT_FDCWD;
+T_MAGIC
+	{
+	%:ifdef mg_findext
+	MAGIC* magic = SvROK($arg) && SvMAGICAL(SvRV($arg)) ? mg_findext(SvRV($arg), PERL_MAGIC_ext, NULL) : NULL;
+	%:else
+	MAGIC* magic = SvROK($arg) && SvMAGICAL(SvRV($arg)) ? mg_find(SvRV($arg), PERL_MAGIC_ext) : NULL;
+	%:endif
+	if (magic)
+		$var = ($type)magic->mg_ptr;
+	else
+		Perl_croak(aTHX_ \"$ntype object is lacking magic\");
+	}
+
+T_SIGSET
+	if (SvROK($arg)) {
+		if (!sv_derived_from($arg, \"POSIX::SigSet\")) {
+			Perl_croak(aTHX_ \"$var is not of type POSIX::SigSet\");
+		} else {
+	\x{23}if PERL_VERSION > 15 || PERL_VERSION == 15 && PERL_SUBVERSION > 2
+			$var = (sigset_t *) SvPV_nolen(SvRV($arg));
+	\x{23}else
+			IV tmp = SvIV((SV*)SvRV($arg));
+			$var = INT2PTR(sigset_t*, tmp);
+	\x{23}endif
+		}
+	} else if (SvOK($arg)) {
+		int signo = (SvIOK($arg) || looks_like_number($arg)) && SvIV($arg) ? SvIV($arg) : whichsig(SvPV_nolen($arg));
+		SV* buffer = sv_2mortal(newSVpvn(\"\", 0));
+		sv_grow(buffer, sizeof(sigset_t));
+		$var = (sigset_t*)SvPV_nolen(buffer);
+		sigemptyset($var);
+		sigaddset($var, signo);
+	} else {
+		$var = NULL;
+	}
+T_SIGNO
+	$var = (SvIOK($arg) || looks_like_number($arg)) && SvIV($arg) ? SvIV($arg) : whichsig(SvPV_nolen($arg));
+T_TIMESPEC
+	{
+	NV input = SvNV($arg);
+	$var.tv_sec  = (time_t) floor(input);
+	$var.tv_nsec = (long) ((input - $var.tv_sec) * 1000000000);
+	}
+T_OPAQUEOBJ
+    {
+		SV * sv = $arg;
+		if (SvROK(sv) && sv_derived_from(sv, \"$ntype\"))
+			$var = ($type)SvPV_nolen(SvRV(sv));
+		else
+			croak(\"%s: %s is not of type %s\", ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]}, \"$var\", \"$ntype\");
+    }
+
+
+OUTPUT
+T_MAGIC
+	sv_magic(newSVrv($arg, "$ntype"), NULL, PERL_MAGIC_ext, (const char*)$var, 0);
+T_TIMESPEC
+	sv_setnv($arg, $var.tv_sec + $var.tv_nsec / 1000000000.0);
+T_OPAQUEOBJ
+	{
+		sv_setref_pvn($arg, \"$ntype\", (const char*)$var, sizeof(*$var));
+		SvREADONLY_on(SvRV($arg));
+	}
+

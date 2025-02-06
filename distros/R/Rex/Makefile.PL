@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use 5.012005;
+use 5.014004;
 use ExtUtils::MakeMaker 7.1101;
 
 if ( $^O eq 'MSWin32' ) {
@@ -39,7 +39,7 @@ my %WriteMakefileArgs = (
     "bin/rexify"
   ],
   "LICENSE" => "apache",
-  "MIN_PERL_VERSION" => "5.012005",
+  "MIN_PERL_VERSION" => "5.014004",
   "NAME" => "Rex",
   "PREREQ_PM" => {
     "AWS::Signature4" => 0,
@@ -112,7 +112,7 @@ my %WriteMakefileArgs = (
     "autodie" => 0,
     "utf8" => 0
   },
-  "VERSION" => "1.15.0",
+  "VERSION" => "1.16.0",
   "test" => {
     "TESTS" => "t/*.t t/commands/*.t t/issue/*.t t/scm/*.t"
   }

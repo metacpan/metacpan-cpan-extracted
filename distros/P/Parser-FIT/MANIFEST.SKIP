@@ -2,8 +2,6 @@ Makefile$
 Makefile.old
 Build
 Build.bat
-META.*
-MYMETA.*
 .build/
 _build/
 cover_db/
@@ -23,3 +21,4 @@ my_test.pl
 MANIFEST.bak
 FitSDKRelease*
 test.pl
+MAINTAINER.md

@@ -3,7 +3,7 @@ package Rex::SCM::Git;
 use v5.12.5;
 use warnings;
 
-our $VERSION = '1.15.0'; # VERSION
+our $VERSION = '1.16.0'; # VERSION
 
 use Cwd qw(getcwd);
 use Rex::Commands::Fs;
@@ -34,7 +34,16 @@ sub checkout {
   my $clone_args = join( " ", @{ $checkout_opt->{clone_args} || [''] } );
 
   if ( is_dir("$checkout_to/.git") ) {
-    my $branch = $checkout_opt->{"branch"} || "master";
+    my $head_ref = i_run 'git symbolic-ref refs/remotes/origin/HEAD',
+      cwd => $checkout_to,
+      %run_opt;
+
+    ( my $default_origin_branch = $head_ref ) =~ s{refs/remotes/origin/}{}msx;
+
+    my $branch = $checkout_opt->{"branch"} || $default_origin_branch;
+
+    i_run "git checkout -B $branch", cwd => $checkout_to, %run_opt;
+
     Rex::Logger::info( "Pulling "
         . $repo_info->{"url"} . " to "
         . ( $checkout_to ? $checkout_to : "." ) );

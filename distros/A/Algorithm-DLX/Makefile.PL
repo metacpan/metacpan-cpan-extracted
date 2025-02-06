@@ -12,9 +12,12 @@ WriteMakefile(
     'strict'   => 1,
     'warnings' => 1,
   },
+  TEST_REQUIRES => {
+      List::Util => 1.68,
+  },
   test         => {TESTS => 't/*.t'},
   (eval { ExtUtils::MakeMaker->VERSION(7.70) } ? (META_MERGE => {
-      'meta-spec' => { version => 0.01 },
+      'meta-spec' => { version => 0.03 },
       resources => {
           repository => {
               type => 'git',

@@ -1,8 +1,7 @@
 package App::rdapper;
 use Getopt::Long qw(GetOptionsFromArray :config pass_through);
 use JSON;
-use List::Util qw(min max);
-use List::MoreUtils qw(any);
+use List::Util qw(any min max);
 use Net::ASN;
 use Net::DNS::Domain;
 use Net::IP;
@@ -26,7 +25,7 @@ use constant {
 use vars qw($VERSION);
 use strict;
 
-$VERSION = '1.05';
+$VERSION = '1.06';
 
 #
 # global arg variables (note: nopager is now ignored)
@@ -488,8 +487,13 @@ sub print_domain {
     $package->print_kv('Handle', $domain->handle, $indent) if ($domain->handle);
 
     foreach my $ns (sort { lc($a->name->name) cmp lc($b->name->name) } $domain->nameservers) {
-        $package->print_kv('Nameserver', uc($ns->name->name), $indent);
-        $package->print_nameserver($ns, 1+$indent);
+        if ($short) {
+            $package->print_kv('Nameserver', uc($ns->name->name) . ' ' . join(' ', map { $_->short } $ns->addresses), $indent);
+
+        } else {
+            $package->print_kv('Nameserver', uc($ns->name->name), $indent);
+            $package->print_nameserver($ns, 1+$indent);
+        }
     }
 
     foreach my $ds ($domain->ds) {
@@ -556,7 +560,7 @@ sub print_jcard_property {
         $package->print_jcard_adr($property, $indent);
 
     } else {
-        my $label = $VCARD_NODE_NAMES{$property->type} || ucfirst(lc($property->type));
+        my $label = $VCARD_NODE_NAMES{uc($property->type)} || ucfirst(lc($property->type));
 
         if ('TEL' eq uc($property->type)) {
             if (any { 'fax' eq lc($_) } @{$property->param('type')}) {
@@ -603,6 +607,10 @@ sub print_jcard_adr {
             }
         }
     }
+
+    if ($property->param('cc')) {
+        $package->print_kv('Country', $property->param('cc'), $indent+1);
+    }
 }
 
 sub print_nameserver {
@@ -611,7 +619,7 @@ sub print_nameserver {
     $package->print_kv('Handle', $nameserver->handle, $indent) if ($nameserver->handle);
 
     foreach my $ip ($nameserver->addresses) {
-        $package->print_kv('IP Address', $ip->ip, $indent);
+        $package->print_kv('IP Address', $ip->short, $indent);
     }
 }
 
@@ -906,7 +914,7 @@ As of writing, search is only available for domain names.
 
 Copyright (c) 2012-2023 CentralNic Ltd.
 
-Copyright (c) 2023-2024 Gavin Brown.
+Copyright (c) 2023-2025 Gavin Brown.
 
 All rights reserved. This program is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.

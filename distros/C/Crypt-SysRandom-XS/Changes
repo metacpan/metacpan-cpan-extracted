@@ -1,5 +1,8 @@
 Revision history for Crypt-SysRandom-XS
 
+0.007     2025-02-05 20:45:53+01:00 Europe/Brussels
+          - Add RDRAND support as final fallback
+
 0.006     2025-02-04 02:58:41+01:00 Europe/Brussels
           - Rename to Crypt::SysRandom::XS
           - Simplify error message

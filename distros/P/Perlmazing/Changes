@@ -85,3 +85,19 @@ Revision history for Perlmazing
   Fixed a test for rmdir for a very small set of cases where testers seem to have permission issues when creating a symlink on Win32.
 2.0014  2024-11-28
   Added localtime_ts and gmtime_ts functions.
+2.0016  2025-02-05
+  Added an encoding parameter to slurp. It now can be asked to read utf8 or any other valid encoding correctly.
+  Removed an accidental =cut in POD that was causing a problem with it.
+  Adjusted rmdir behavior on errors to be as close as possible to CORE::rmdir in such cases
+  Added missing dependency on File::Copy::Recursive to Makefile.PL
+  Fixed numeric() (used for sort) to correctly sort version strings in cases where the code module version was failing to do so
+  Added new function fout, a quick way to write content to a file. Opposite of slurp.
+  Updated POD to reflect current (and some previous) changes.
+  Added function decimals($number) to return only de decimals value of a given number.
+  Added function ceil($number) to round up a number (or ceil(@list) to round all elements up).
+  Added function avg(@list) to obtain the average value of numbers in a list.
+  Added all functions from List::Util, importable individually or via :list import tag.
+  Added function is_integer($number) to identify numbers that are not floating point numbers.
+  Added function flatten($ref_of_refs), which makes a flat array out of a list/array containing nested scalars, arrayrefs, hashrefs and objects.
+  Added function columnize($columns, @array), which orders an array in a given number of columns with a vertical order of elements.
+  

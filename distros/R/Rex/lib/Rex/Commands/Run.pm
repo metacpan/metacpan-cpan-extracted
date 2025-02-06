@@ -42,7 +42,7 @@ package Rex::Commands::Run;
 use v5.12.5;
 use warnings;
 
-our $VERSION = '1.15.0'; # VERSION
+our $VERSION = '1.16.0'; # VERSION
 
 #require Exporter;
 require Rex::Exporter;
@@ -56,6 +56,7 @@ use Rex::Helper::SSH2::Expect;
 use Rex::Config;
 use Rex::Interface::Exec;
 use Rex::Interface::Fs;
+use English qw(-no_match_vars);
 
 BEGIN {
   if ( $^O !~ m/^MSWin/ ) {
@@ -132,7 +133,7 @@ Die if the command returns with an exit code indicating failure. It can be set g
 
 =item command => $command_to_run
 
-If present, Rex will execute C<$command_to_run>, and treat the first arugment as an identifier for the given C<run()> block (e.g. to be triggered with notify).
+If present, Rex will execute C<$command_to_run>, and treat the first argument as an identifier for the given C<run()> block (e.g. to be triggered with notify).
 
 =item creates => $file_to_create
 
@@ -297,7 +298,10 @@ sub run {
     my $exec = Rex::Interface::Exec->create;
 
     if ( $args && ref($args) eq "ARRAY" ) {
-      my $quoter = Net::OpenSSH::ShellQuoter->quoter( $exec->shell->name );
+      my $shell =
+        Rex::is_local() && $OSNAME eq 'MSWin32' ? 'MSWin' : $exec->shell->name;
+
+      my $quoter = Net::OpenSSH::ShellQuoter->quoter($shell);
       $cmd = "$cmd " . join( " ", map { $quoter->quote($_) } @{$args} );
     }
 

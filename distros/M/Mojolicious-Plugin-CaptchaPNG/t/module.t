@@ -22,4 +22,7 @@ is( $c->get_captcha_value, 42, 'get_captcha_value still exists' );
 ok( $c->check_captcha_value(42), 'check_captcha_value good' );
 is( $c->get_captcha_value, undef, 'get_captcha_value no longer exists' );
 
+$c->set_captcha_value(12345);
+ok( $c->check_captcha_value(12345), 'check_captcha_value good' );
+
 done_testing;

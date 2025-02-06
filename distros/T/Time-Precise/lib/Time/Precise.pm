@@ -8,7 +8,7 @@ use Time::HiRes;
 
 use vars qw( $VERSION @ISA @EXPORT @EXPORT_OK $PRECISION );
 use subs qw(localtime gmtime time sleep );
-$VERSION   = '1.0012';
+$VERSION   = '1.0014';
 
 @ISA    = qw(Exporter);
 @EXPORT = qw(time localtime gmtime sleep timegm timelocal is_valid_date is_leap_year time_hashref gmtime_hashref get_time_from get_gmtime_from localtime_ts gmtime_ts);
@@ -84,7 +84,8 @@ else {
 %Cheat = ();    # clear the cache as epoc has changed
 
 sub time () {
-	sprintf '%0.'.$PRECISION.'f', Time::HiRes::time();
+  return CORE::time unless $PRECISION;
+	return sprintf '%0.'.$PRECISION.'f', Time::HiRes::time();
 }
 
 sub _localtime {
@@ -292,7 +293,7 @@ sub _time_hashref {
 	my @lt = $gmt ? gmtime(int $time) : localtime(int $time);
 	(my $microseconds = sprintf '%0.'.$PRECISION.'f', ($time - int $time)) =~ s/^.+\.//;
 	return {
-		second			=> sprintf("%02d.$microseconds", $lt[0]),
+		second			=> ($PRECISION ? sprintf("%02d.$microseconds", $lt[0]) : $lt[0]),
 		minute			=> sprintf("%02d", $lt[1]),
 		hour			=> sprintf("%02d", $lt[2]),
 		day				=> sprintf("%02d", $lt[3]),

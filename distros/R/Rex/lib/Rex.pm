@@ -49,7 +49,7 @@ package Rex;
 use v5.12.5;
 use warnings;
 
-our $VERSION = '1.15.0'; # VERSION
+our $VERSION = '1.16.0'; # VERSION
 
 BEGIN {
   use Rex::Logger;

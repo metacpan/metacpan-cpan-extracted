@@ -7,10 +7,11 @@ use Test::More;
 
 use Net::DNS::Resolver::Unbound;
 
-plan tests => 12;
-
-
 my $resolver = Net::DNS::Resolver::Unbound->new();
+
+plan skip_all => 'resolver not loaded' unless $resolver;
+plan tests    => 12;
+
 
 for ( my $handle = undef ) {
 	ok( !$resolver->bgbusy($handle), 'not bgbusy' );

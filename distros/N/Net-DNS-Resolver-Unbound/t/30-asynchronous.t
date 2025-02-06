@@ -7,8 +7,9 @@ use Test::More;
 
 use Net::DNS::Resolver::Unbound;
 
-my $resolver = Net::DNS::Resolver::Unbound->new( debug_level => 0 );
+my $resolver = Net::DNS::Resolver::Unbound->new();
 
+plan skip_all => 'resolver not loaded' unless $resolver;
 plan skip_all => 'no local nameserver' unless $resolver->nameserver;
 plan tests    => 7;
 

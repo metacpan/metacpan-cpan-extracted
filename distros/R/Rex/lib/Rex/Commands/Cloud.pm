@@ -53,7 +53,7 @@ package Rex::Commands::Cloud;
 use v5.12.5;
 use warnings;
 
-our $VERSION = '1.15.0'; # VERSION
+our $VERSION = '1.16.0'; # VERSION
 
 require Rex::Exporter;
 use base qw(Rex::Exporter);
@@ -379,7 +379,7 @@ sub get_cloud_regions {
 
 =head2 cloud_volume($action , $data)
 
-This function controlls all aspects of a cloud volume.
+This function controls all aspects of a cloud volume.
 
 =cut
 

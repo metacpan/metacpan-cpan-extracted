@@ -1,6 +1,13 @@
 Revision history for Runtime-Debugger
 
 =================
+1.10 - 2025-01-05
+=================
+
+Able to use curlies with scalars in double quotes:
+    say "${scalar}-more-text";
+
+=================
 1.09 - 2025-01-13
 =================
 

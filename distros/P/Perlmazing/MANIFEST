@@ -13,12 +13,15 @@ lib/Perlmazing/Perlmazing/abs2rel.pm
 lib/Perlmazing/Perlmazing/abs_path.pm
 lib/Perlmazing/Perlmazing/aes_decrypt.pm
 lib/Perlmazing/Perlmazing/aes_encrypt.pm
+lib/Perlmazing/Perlmazing/avg.pm
 lib/Perlmazing/Perlmazing/basename.pm
 lib/Perlmazing/Perlmazing/carp.pm
 lib/Perlmazing/Perlmazing/catdir.pm
 lib/Perlmazing/Perlmazing/catfile.pm
 lib/Perlmazing/Perlmazing/catpath.pm
+lib/Perlmazing/Perlmazing/ceil.pm
 lib/Perlmazing/Perlmazing/cluck.pm
+lib/Perlmazing/Perlmazing/columnize.pm
 lib/Perlmazing/Perlmazing/commify.pm
 lib/Perlmazing/Perlmazing/confess.pm
 lib/Perlmazing/Perlmazing/copy.pm
@@ -35,6 +38,8 @@ lib/Perlmazing/Perlmazing/escape_quote.pm
 lib/Perlmazing/Perlmazing/escape_quotes.pm
 lib/Perlmazing/Perlmazing/escape_uri.pm
 lib/Perlmazing/Perlmazing/find_parent_classes.pm
+lib/Perlmazing/Perlmazing/flatten.pm
+lib/Perlmazing/Perlmazing/fout.pm
 lib/Perlmazing/Perlmazing/get_aes_cipher.pm
 lib/Perlmazing/Perlmazing/is_email_address.pm
 lib/Perlmazing/Perlmazing/longmess.pm
@@ -44,6 +49,7 @@ lib/Perlmazing/Perlmazing/mkdir.pm
 lib/Perlmazing/Perlmazing/move.pm
 lib/Perlmazing/Perlmazing/no_void.pm
 lib/Perlmazing/Perlmazing/pl.pm
+lib/Perlmazing/Perlmazing/Precompile/decimals.pm
 lib/Perlmazing/Perlmazing/Precompile/eval_string.pm
 lib/Perlmazing/Perlmazing/Precompile/get_time_from.pm
 lib/Perlmazing/Perlmazing/Precompile/gmtime.pm
@@ -70,6 +76,7 @@ lib/Perlmazing/Perlmazing/Precompile/is_filehandle.pm
 lib/Perlmazing/Perlmazing/Precompile/is_format.pm
 lib/Perlmazing/Perlmazing/Precompile/is_glob.pm
 lib/Perlmazing/Perlmazing/Precompile/is_hash.pm
+lib/Perlmazing/Perlmazing/Precompile/is_integer.pm
 lib/Perlmazing/Perlmazing/Precompile/is_io.pm
 lib/Perlmazing/Perlmazing/Precompile/is_leap_year.pm
 lib/Perlmazing/Perlmazing/Precompile/is_lvalue.pm
@@ -95,7 +102,6 @@ lib/Perlmazing/Perlmazing/Precompile/time.pm
 lib/Perlmazing/Perlmazing/Precompile/timegm.pm
 lib/Perlmazing/Perlmazing/Precompile/timelocal.pm
 lib/Perlmazing/Perlmazing/Precompile/time_hashref.pm
-lib/Perlmazing/Perlmazing/Precompile/truncate_text.pm
 lib/Perlmazing/Perlmazing/Precompile/void_context.pm
 lib/Perlmazing/Perlmazing/Precompile/_isa_ref.pm
 lib/Perlmazing/Perlmazing/Precompile/_is_ref.pm
@@ -114,6 +120,7 @@ lib/Perlmazing/Perlmazing/to_number.pm
 lib/Perlmazing/Perlmazing/to_string.pm
 lib/Perlmazing/Perlmazing/to_utf8.pm
 lib/Perlmazing/Perlmazing/trim.pm
+lib/Perlmazing/Perlmazing/truncate_text.pm
 lib/Perlmazing/Perlmazing/unbless.pm
 lib/Perlmazing/Perlmazing/unescape_html.pm
 lib/Perlmazing/Perlmazing/unescape_uri.pm
@@ -131,9 +138,13 @@ t/02-dumped.t
 t/03-time.t
 t/04-rmdir.t
 t/10-aes_encrypt-aes_decrypt.t
+t/10-avg.t
 t/10-basename.t
+t/10-ceil.t
+t/10-columnize.t
 t/10-commify.t
 t/10-copy.t
+t/10-decimals.t
 t/10-define.t
 t/10-dir.t
 t/10-dirname.t
@@ -145,6 +156,8 @@ t/10-escape_uri.t
 t/10-eval_string.t
 t/10-file_spec_related.t
 t/10-find_parent_classes.t
+t/10-flatten.t
+t/10-fout.t
 t/10-in_array.t
 t/10-isa_array.t
 t/10-isa_code.t
@@ -167,6 +180,7 @@ t/10-is_filehandle.t
 t/10-is_format.t
 t/10-is_glob.t
 t/10-is_hash.t
+t/10-is_integer.t
 t/10-is_io.t
 t/10-is_lvalue.t
 t/10-is_number.t

@@ -1,14 +1,12 @@
 package WWW::FetchStory::Fetcher::TwistingHellmouth;
-$WWW::FetchStory::Fetcher::TwistingHellmouth::VERSION = '0.2307';
-use strict;
-use warnings;
+$WWW::FetchStory::Fetcher::TwistingHellmouth::VERSION = '0.2501';
 =head1 NAME
 
 WWW::FetchStory::Fetcher::TwistingHellmouth - fetching module for WWW::FetchStory
 
 =head1 VERSION
 
-version 0.2307
+version 0.2501
 
 =head1 DESCRIPTION
 
@@ -16,7 +14,10 @@ This is the TwistingHellmouth story-fetching plugin for WWW::FetchStory.
 
 =cut
 
-our @ISA = qw(WWW::FetchStory::Fetcher);
+use parent qw(WWW::FetchStory::Fetcher);
+
+use common::sense;
+use YAML::Any qw(Dump);
 
 =head1 METHODS
 
@@ -121,20 +122,87 @@ sub parse_toc {
     my $content = $args{content};
     my %info = ();
     $info{url} = $args{url};
+
+    my $sid='';
+    if ($args{url} =~ m!Story-(\d+)!)
+    {
+        $sid = $1;
+    }
+    else
+    {
+	print STDERR "did not find SID for $args{url}";
+	return $self->SUPER::parse_toc(%args);
+    }
+
     $info{title} = $self->parse_title(%args);
     $info{author} = $self->parse_author(%args);
     $info{summary} = $self->parse_summary(%args);
     $info{characters} = $self->parse_characters(%args);
     $info{universe} = 'Buffy';
+    my $epub_url = $self->parse_epub_url(%args, sid=>$sid);
+    if ($epub_url)
+    {
+        $info{epub_url} = $epub_url;
+    }
+    if ($args{epub}) # need to parse the wordcount
+    {
+        $info{wordcount} = $self->parse_wordcount(%args);
+    }
 
     if ($content =~ m{<td>(No|Yes)\s*</td>\s*</tr>}s)
     {
 	$info{complete} = $1;
     }
-    $info{chapters} = $self->parse_chapter_urls(%args);
+    $info{chapters} = $self->parse_chapter_urls(%args, sid=>$sid);
 
     return %info;
 } # parse_toc
+
+=head2 parse_author
+
+Get the author.
+
+=cut
+sub parse_author {
+    my $self = shift;
+    my %args = @_;
+
+    my $content = $args{content};
+
+    my $author = '';
+    # <a href="/AuthorStories-5487/janusi.htm">janusi</a>
+    if ($content =~ m!/AuthorStories-\d+/[a-zA-Z0-9_]+\.htm["']>([^<]+)</a>!)
+    {
+	$author = $1;
+    }
+    else
+    {
+	$author = $self->SUPER::parse_author(%args);
+    }
+    $author =~ s/_/ /g;
+    return $author;
+} # parse_author
+
+=head2 parse_wordcount
+
+Get the wordcount.
+
+=cut
+sub parse_wordcount {
+    my $self = shift;
+    my %args = @_;
+
+    my $content = $args{content};
+
+    my $words = '';
+    # <td><a href='/Story-22230-4/janusi+Iron+Buffy.htm' >4</a></td><td>56,481</td>
+    if ($content =~ m!</a></td><td>([0-9][0-9,]+)</td>!)
+    {
+	$words = $1;
+        $words =~ s/,//;
+    }
+    return $words;
+} # parse_wordcount
 
 =head2 parse_chapter_urls
 
@@ -149,23 +217,39 @@ sub parse_chapter_urls {
 	@_
     );
     my $content = $args{content};
+    my $sid = $args{sid};
+
     my @chapters = ();
     if (defined $args{urls})
     {
 	@chapters = @{$args{urls}};
     }
-    if (@chapters == 1)
+    if (@chapters <= 1)
     {
-	if ($args{url} =~ m{http://www.tthfanfic.org/Story-(\d+)})
-	{
-	    my $sid = $1;
-	    @chapters =
-	    ("http://www.tthfanfic.org/wholestory.php?no=${sid}&format=print");
-	}
+        @chapters =
+        ("http://www.tthfanfic.org/wholestory.php?no=${sid}&format=offlinehtml");
     }
 
     return \@chapters;
 } # parse_chapter_urls
+
+=head2 parse_epub_url
+
+Figure out the URL for the EPUB version of this story.
+
+=cut
+sub parse_epub_url {
+    my $self = shift;
+    my %args = (
+	url=>'',
+	content=>'',
+	@_
+    );
+    my $content = $args{content};
+    my $sid = $args{sid};
+    my $epub_url = "http://www.tthfanfic.org/wholestory.php?no=${sid}&format=epub";
+
+} # parse_epub_url
 
 1; # End of WWW::FetchStory::Fetcher::TwistingHellmouth
 __END__

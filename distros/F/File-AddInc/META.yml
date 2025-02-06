@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,7 +28,7 @@ no_index:
 provides:
   File::AddInc:
     file: lib/File/AddInc.pm
-    version: '0.002'
+    version: '0.003'
 requires:
   Carp: '0'
   Cwd: '0'
@@ -39,10 +39,11 @@ requires:
 resources:
   bugtracker: https://github.com/hkoba/p5-File-AddInc/issues
   homepage: https://github.com/hkoba/p5-File-AddInc
-  repository: git://github.com/hkoba/p5-File-AddInc.git
-version: '0.002'
+  repository: https://github.com/hkoba/p5-File-AddInc.git
+version: '0.003'
 x_authority: cpan:HKOBA
 x_contributors:
+  - 'Alexandr Ciornii <alexchorny@gmail.com>'
   - 'Kobayasi, Hiroaki <hkoba@ssri.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

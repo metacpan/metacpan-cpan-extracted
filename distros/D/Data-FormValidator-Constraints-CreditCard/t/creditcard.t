@@ -71,7 +71,7 @@ test_FV_cc_expiry: {
           'mmyy-bad-month-invalid'      => 'xx/25',
           'mmyy-bad-year-invalid'       => '02/xx',
 
-          'mmyyyy-future'               => '02/2025',
+          'mmyyyy-future'               => '02/2050',
           'mmyyyy-current'              => join('/', $now[4]+1, $now[5]+1900),
           'mmyyyy-past'                 => '02/1970',
           'mmyyyy-bad-month-low'        => '00/2025',

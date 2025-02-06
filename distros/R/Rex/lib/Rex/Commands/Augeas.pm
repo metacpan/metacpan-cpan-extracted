@@ -37,7 +37,7 @@ package Rex::Commands::Augeas;
 use v5.12.5;
 use warnings;
 
-our $VERSION = '1.15.0'; # VERSION
+our $VERSION = '1.16.0'; # VERSION
 
 require Exporter;
 

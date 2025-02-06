@@ -1,5 +1,8 @@
 Revision history for Crypt-SysRandom
 
+0.007     2025-02-05 21:07:16+01:00 Europe/Brussels
+          - Put implementations into named subs
+
 0.006     2025-02-04 03:24:28+01:00 Europe/Brussels
           - Split off XS functionality to Crypt::SysRandom::XS
 

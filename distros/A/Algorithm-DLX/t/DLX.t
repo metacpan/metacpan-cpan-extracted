@@ -5,7 +5,6 @@ use warnings;
 use Test::More tests => 5;
 
 use List::Util  qw( any );
-use Data::Dump  qw( pp );
 
 use Algorithm::DLX;
 

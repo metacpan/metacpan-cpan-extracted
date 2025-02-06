@@ -9,8 +9,9 @@ use warnings;
 use Carp;
 use Rex::Helper::Run;
 use Rex::Commands::Fs;
+use Rex::Interface::Shell;
 
-our $VERSION = '1.15.0'; # VERSION
+our $VERSION = '1.16.0'; # VERSION
 
 sub new {
   my $that  = shift;

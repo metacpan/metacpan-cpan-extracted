@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v0.3.1
-#                   and LibVirt version v10.10.0
+#                   and LibVirt version v11.0.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -15,7 +15,7 @@ use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
 
-package Sys::Async::Virt::Connection v0.0.13;
+package Sys::Async::Virt::Connection v0.0.14;
 
 use parent qw(IO::Async::Notifier);
 
@@ -81,7 +81,7 @@ Sys::Async::Virt::Connection - Connection to LibVirt server (abstract
 
 =head1 VERSION
 
-v0.0.13
+v0.0.14
 
 =head1 SYNOPSIS
 

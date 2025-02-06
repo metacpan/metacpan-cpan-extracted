@@ -3,18 +3,22 @@ package Net::DNS::Resolver::Unbound;
 use strict;
 use warnings;
 use integer;
-use Net::DNS;
 
-use constant OS_SPEC => defined eval "require Net::DNS::Resolver::$^O";	## no critic
-use constant OS_CONF => join '::', 'Net::DNS::Resolver', OS_SPEC ? $^O : 'UNIX';
-use base qw(Net::DNS::Resolver::Base DynaLoader), OS_CONF;
+use Net::DNS;
+use base qw(Net::DNS::Resolver::Base DynaLoader);
+
+use constant OS_SPEC => "Net::DNS::Resolver::$^O";
+use constant OS_UNIX => "Net::DNS::Resolver::UNIX";
+use constant OS_CONF => grep eval "require $_", OS_SPEC, OS_UNIX;	## no critic
+use base (OS_CONF)[0];			## backward compatibility only
 
 our $VERSION;
 
 BEGIN {
-	$VERSION = '1.31';
+	$VERSION = '1.32';
 	eval { __PACKAGE__->bootstrap($VERSION) };
 }
+
 
 use constant UB_VERSION => scalar eval {
 	my $version = Net::DNS::Resolver::libunbound->VERSION();
@@ -100,6 +104,7 @@ sub import {
 	my ( $class, @argument ) = @_;
 	my $register = grep {/^-register$/i} @argument;
 	@Net::DNS::Resolver::ISA = $class if $register;
+	return;
 }
 
 
@@ -141,15 +146,15 @@ The following keywords are recognised in resolver configuration files:
 
 =over
 
-=item B<nameserver> address
+=item B<nameserver>
 
 IP address of a name server that the resolver should query.
 
-=item B<domain> localdomain
+=item B<domain>
 
 The domain suffix to be appended to a short non-absolute name.
 
-=item B<search> domain ...
+=item B<search>
 
 A space-separated list of domains in the desired search path.
 
@@ -200,7 +205,7 @@ sub new {
 	@nameservers = $resolver->nameservers;
 
 By default, DNS queries are sent to the IP addresses listed in
-/etc/resolv.conf or similar platform-specific sources.
+F</etc/resolv.conf> or similar platform-specific sources.
 
 =cut
 
@@ -219,7 +224,7 @@ sub nameservers {
 	return;
 }
 
-sub nameserver { &nameservers; }
+sub nameserver { return &nameservers }
 
 
 =head2 search, query, send, bgsend, bgbusy, bgread
@@ -367,7 +372,7 @@ sub set_stub {
 Extract nameserver list from resolv.conf(5) format configuration file.
 Any domain, searchlist, ndots or other settings are ignored.
 
-Note that Net::DNS builds its own nameserver list using /etc/resolv.conf
+Note that Net::DNS builds its own nameserver list using F</etc/resolv.conf>
 or other platform-specific sources.
 
 =cut
@@ -382,7 +387,7 @@ sub resolv_conf {
 
 	$resolver->hosts( 'filename' );
 
-Read list of hosts from the filename given, usually "/etc/hosts".
+Read list of hosts from the filename given, usually F</etc/hosts>.
 These addresses are not flagged as DNSSEC secure when queried.
 
 =cut

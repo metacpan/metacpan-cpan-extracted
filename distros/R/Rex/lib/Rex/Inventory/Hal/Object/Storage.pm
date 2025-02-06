@@ -8,7 +8,7 @@ use v5.12.5;
 use warnings;
 use Data::Dumper;
 
-our $VERSION = '1.15.0'; # VERSION
+our $VERSION = '1.16.0'; # VERSION
 
 use Rex::Inventory::Hal::Object;
 use Rex::Commands::Gather;

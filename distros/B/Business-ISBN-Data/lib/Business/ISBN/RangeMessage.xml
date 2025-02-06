@@ -17,8 +17,8 @@
 ]>
 <ISBNRangeMessage>
   <MessageSource>International ISBN Agency</MessageSource>
-  <MessageSerialNumber>4f137993-7a67-478a-a109-f56801bac488</MessageSerialNumber>
-  <MessageDate>Sat, 18 Jan 2025 03:41:04 GMT</MessageDate>
+  <MessageSerialNumber>64374d67-c376-4c3e-8080-aa832668e5fb</MessageSerialNumber>
+  <MessageDate>Wed, 5 Feb 2025 03:42:39 GMT</MessageDate>
   <EAN.UCCPrefixes>
     <EAN.UCC>
       <Prefix>978</Prefix>
@@ -201,8 +201,12 @@
           <Length>4</Length>
         </Rule>
         <Rule>
-          <Range>0400000-0499999</Range>
+          <Range>0400000-0489999</Range>
           <Length>3</Length>
+        </Rule>
+        <Rule>
+          <Range>0490000-0499999</Range>
+          <Length>4</Length>
         </Rule>
         <Rule>
           <Range>0500000-0599999</Range>
@@ -4185,8 +4189,12 @@
       <Agency>Bangladesh</Agency>
       <Rules>
         <Rule>
-          <Range>0000000-3999999</Range>
+          <Range>0000000-3899999</Range>
           <Length>2</Length>
+        </Rule>
+        <Rule>
+          <Range>3900000-3999999</Range>
+          <Length>4</Length>
         </Rule>
         <Rule>
           <Range>4000000-7999999</Range>

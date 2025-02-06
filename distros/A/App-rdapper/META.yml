@@ -20,8 +20,7 @@ no_index:
 requires:
   Getopt::Long: '0'
   JSON: '0'
-  List::MoreUtils: '0'
-  List::Util: '0'
+  List::Util: '1.33'
   Net::ASN: '0'
   Net::DNS::Domain: '0'
   Net::IP: '0'
@@ -34,5 +33,5 @@ requires:
 resources:
   bugtracker: https://github.com/gbxyz/rdapper/issues
   repository: https://github.com/gbxyz/rdapper.git
-version: '1.05'
+version: '1.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
