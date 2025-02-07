@@ -1,5 +1,5 @@
-=== README for MIME-Types version 2.18
-=   Generated on Wed Dec  9 10:29:07 2020 by OODoc 2.02
+=== README for MIME-Types version 2.27
+=   Generated on Fri Feb  7 11:08:33 2025 by OODoc 2.03
 
 There are various ways to install this module:
 
@@ -9,16 +9,16 @@ There are various ways to install this module:
  (2) if you use Windows, have a look at http://ppm.activestate.com/
 
  (3) if you have downloaded this module manually (as root/administrator)
-       gzip -d MIME-Types-2.18.tar.gz
-       tar -xf MIME-Types-2.18.tar
-       cd MIME-Types-2.18
+       gzip -d MIME-Types-2.27.tar.gz
+       tar -xf MIME-Types-2.27.tar
+       cd MIME-Types-2.27
        perl Makefile.PL
        make          # optional
        make test     # optional
        make install
 
 For usage, see the included manual-pages or
-    http://search.cpan.org/dist/MIME-Types-2.18/
+    http://search.cpan.org/dist/MIME-Types-2.27/
 
 Please report problems to
     http://rt.cpan.org/Dist/Display.html?Queue=MIME-Types

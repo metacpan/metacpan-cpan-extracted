@@ -1,166 +1,189 @@
-package DBIx::Migration;
-
 use strict;
 use warnings;
+
+package DBIx::Migration;
+
+our $VERSION = '0.10';
+
 use parent qw( Class::Accessor::Fast );
 
-use DBI;
-use File::Slurp;
-use File::Spec;
+use DBI                   qw();
+use File::Slurp           qw();
+use File::Spec::Functions qw();
+use Try::Tiny             qw();
 
-our $VERSION = '0.09';
+__PACKAGE__->mk_accessors( qw( debug dir dsn password username ) );
 
-__PACKAGE__->mk_accessors( qw( debug dir dsn password username dbh  ) );
+sub dbh {
+  my $self = shift;
 
-sub migrate {
-  my ( $self, $wanted ) = @_;
-  $self->_connect;
-  $wanted = $self->_newest unless defined $wanted;
-  my $version = $self->_version;
-  if ( defined $version && ( $wanted == $version ) ) {
-    print "Database is already at version $wanted\n" if $self->debug;
-    return 1;
+  if ( @_ ) {
+    $self->{ dbh } = $_[ 0 ];
+  }
+  unless ( defined $self->{ dbh } ) {
+    $self->{ dbh } = $self->_build_dbh;
   }
 
-  unless ( defined $version ) {
-    $self->_create_migration_table;
-    $version = 0;
-  }
-
-  # Up- or downgrade
-  my @need;
-  my $type = 'down';
-  if ( $wanted > $version ) {
-    $type = 'up';
-    $version += 1;
-    @need = $version .. $wanted;
-  } else {
-    $wanted += 1;
-    @need = reverse( $wanted .. $version );
-  }
-  my $files = $self->_files( $type, \@need );
-  if ( defined $files ) {
-    for my $file ( @$files ) {
-      my $name = $file->{ name };
-      my $ver  = $file->{ version };
-      print qq/Processing "$name"\n/ if $self->debug;
-      next unless $file;
-      my $text = read_file( $name );
-      $text =~ s/\s*--.*$//g;
-      for my $sql ( split /;/, $text ) {
-        next unless $sql =~ /\w/;
-        print "$sql\n" if $self->debug;
-        $self->{ _dbh }->do( $sql );
-        if ( $self->{ _dbh }->err ) {
-          die "Database error: " . $self->{ _dbh }->errstr;
-        }
-      }
-      $ver -= 1 if ( ( $ver > 0 ) && ( $type eq 'down' ) );
-      $self->_update_migration_table( $ver );
-    }
-  } else {
-    my $newver = $self->_version;
-    print "Database is at version $newver, couldn't migrate to $wanted\n"
-      if ( $self->debug && ( $wanted != $newver ) );
-    return 0;
-  }
-  $self->_disconnect;
-  return 1;
+  return $self->{ dbh };
 }
 
-sub version {
+sub _build_dbh {
   my $self = shift;
-  $self->_connect;
-  my $version = $self->_version;
-  $self->_disconnect;
-  return $version;
-}
 
-sub _connect {
-  my $self = shift;
-  return $self->{ _dbh } = $self->dbh->clone( {} ) if $self->dbh;
-  $self->{ _dbh } = DBI->connect(
+  return DBI->connect(
     $self->dsn,
     $self->username,
     $self->password,
     {
-      RaiseError => 0,
+      RaiseError => 1,
       PrintError => 0,
-      AutoCommit => 1
+      AutoCommit => 1    # see below "begin_work" based transaction handling
     }
-  ) or die sprintf( qq/Couldn't connect to database %s: %s/, $self->dsn, $DBI::errstr );
-  $self->dbh( $self->{ _dbh } );
+  );
 }
 
-sub _create_migration_table {
-  my $self = shift;
-  $self->{ _dbh }->do( <<"EOF");
-CREATE TABLE dbix_migration (
-    name VARCHAR(64) PRIMARY KEY,
-    value VARCHAR(64)
-);
-EOF
-  $self->{ _dbh }->do( <<"EOF");
-    INSERT INTO dbix_migration ( name, value ) VALUES ( 'version', '0' );
-EOF
+sub migrate {
+  my ( $self, $wanted ) = @_;
+
+  $wanted = $self->_newest unless defined $wanted;
+
+  my $fatal_error;
+  my $return_value = Try::Tiny::try {
+    my $version = $self->version;
+
+    # enable transaction turning AutoCommit off
+    $self->{ _dbh } = $self->dbh->clone( {} );
+    $self->{ _dbh }->begin_work;
+
+    $self->_create_migration_table, $version = 0 unless defined $version;
+
+    my @need;
+    my $type;
+    if ( $wanted == $version ) {
+      print qq/Database is already at version $wanted\n/ if $self->debug;
+      return 1;
+    } elsif ( $wanted > $version ) {    # upgrade
+      $type = 'up';
+      $version += 1;
+      @need = $version .. $wanted;
+    } else {                            # downgrade
+      $type = 'down';
+      $wanted += 1;
+      @need = reverse( $wanted .. $version );
+    }
+    my $files = $self->_files( $type, \@need );
+    if ( defined $files ) {
+      for my $file ( @$files ) {
+        my $name = $file->{ name };
+        my $ver  = $file->{ version };
+        print qq/Processing "$name"\n/ if $self->debug;
+        my $text = File::Slurp::read_file( $name );
+        $text =~ s/\s*--.*$//g;
+        # https://docs.liquibase.com/change-types/enddelimiter-sql.html
+        for my $sql ( split /;/, $text ) {
+          $sql =~ s/\A\s*//;
+          next unless $sql =~ /\w/;
+          print qq/$sql\n/ if $self->debug;
+          # prepend $sql to error message
+          local $self->{ _dbh }->{ HandleError } = sub { $_[ 0 ] = "$sql\n$_[0]"; return 0; };
+          $self->{ _dbh }->do( $sql );
+        }
+        $ver -= 1 if ( ( $ver > 0 ) && ( $type eq 'down' ) );
+        $self->_update_migration_table( $ver );
+      }
+      return 1;
+    } else {
+      my $newver = $self->version;
+      print qq/Database is at version $newver, couldn't migrate to version $wanted\n/
+        if ( $self->debug && ( $wanted != $newver ) );
+      return 0;
+    }
+  }
+  Try::Tiny::catch {
+    $fatal_error = $_;
+  };
+
+  if ( $fatal_error ) {
+    # rollback transaction turning AutoCommit on again
+    $self->{ _dbh }->rollback;
+    # rethrow exception
+    die $fatal_error;
+  }
+  # commit transaction turning AutoCommit on again
+  $self->{ _dbh }->commit;
+  return $return_value;
 }
 
-sub _disconnect {
+sub version {
   my $self = shift;
-  $self->{ _dbh }->disconnect;
+
+  my $dbh = $self->dbh;
+  eval {
+    my $sth = $dbh->prepare( <<'EOF');
+SELECT value FROM dbix_migration WHERE name = ?;
+EOF
+    $sth->execute( 'version' );
+    my $version = undef;
+    for my $val ( $sth->fetchrow_arrayref ) {
+      $version = $val->[ 0 ];
+    }
+    $version;
+  };
 }
 
 sub _files {
   my ( $self, $type, $need ) = @_;
+
   my @files;
   for my $i ( @$need ) {
-    opendir( DIR, $self->dir ) or die $!;
-    while ( my $file = readdir( DIR ) ) {
-      next unless $file =~ /(^|\D)${i}_$type\.sql$/;
-      $file = File::Spec->catdir( $self->dir, $file );
+    no warnings 'uninitialized';
+    opendir( my $dh, $self->dir )
+      or die sprintf( qq/Cannot open directory '%s': %s/, $self->dir, $! );
+    while ( my $file = readdir( $dh ) ) {
+      next unless $file =~ /\D*${i}_$type\.sql\z/;
+      $file = File::Spec::Functions::catfile( $self->dir, $file );
+      print qq/Found "$file"\n/ if $self->debug;
       push @files, { name => $file, version => $i };
     }
-    closedir( DIR );
+    closedir( $dh );
   }
-  return undef unless @$need == @files;
-  return @files ? \@files : undef;
+
+  return ( @files and @$need == @files ) ? \@files : undef;
 }
 
 sub _newest {
-  my $self   = shift;
-  my $newest = 0;
+  my $self = shift;
 
-  opendir( DIR, $self->dir ) or die $!;
-  while ( my $file = readdir( DIR ) ) {
-    next unless $file =~ /_up\.sql$/;
-    $file =~ /\D*(\d+)_up.sql$/;
+  opendir( my $dh, $self->dir )
+    or die sprintf( qq/Cannot open directory '%s': %s/, $self->dir, $! );
+  my $newest = 0;
+  while ( my $file = readdir( $dh ) ) {
+    next unless $file =~ /_up\.sql\z/;
+    $file =~ /\D*(\d+)_up.sql\z/;
     $newest = $1 if $1 > $newest;
   }
-  closedir( DIR );
+  closedir( $dh );
 
   return $newest;
 }
 
-sub _update_migration_table {
-  my ( $self, $version ) = @_;
-  $self->{ _dbh }->do( <<"EOF");
-UPDATE dbix_migration SET value = '$version' WHERE name = 'version';
+sub _create_migration_table {
+  my $self = shift;
+
+  $self->{ _dbh }->do( <<'EOF');
+CREATE TABLE dbix_migration ( name VARCHAR(64) PRIMARY KEY, value VARCHAR(64) );
+EOF
+  $self->{ _dbh }->do( <<'EOF', undef, 'version', 0 );
+INSERT INTO dbix_migration ( name, value ) VALUES ( ?, ? );
 EOF
 }
 
-sub _version {
-  my $self    = shift;
-  my $version = undef;
-  eval {
-    my $sth = $self->{ _dbh }->prepare( <<"EOF");
-SELECT value FROM dbix_migration WHERE name = ?;
+sub _update_migration_table {
+  my ( $self, $version ) = @_;
+
+  $self->{ _dbh }->do( <<'EOF', undef, $version, 'version' );
+UPDATE dbix_migration SET value = ? WHERE name = ?;
 EOF
-    $sth->execute( 'version' );
-    for my $val ( $sth->fetchrow_arrayref ) {
-      $version = $val->[ 0 ];
-    }
-  };
-  return $version;
 }
 
 1;

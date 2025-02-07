@@ -1,5 +1,5 @@
 package Bitcoin::Secp256k1;
-$Bitcoin::Secp256k1::VERSION = '0.003';
+$Bitcoin::Secp256k1::VERSION = '0.004';
 use v5.10;
 use strict;
 use warnings;
@@ -30,6 +30,13 @@ sub _random_bytes
 	carp
 		'Caution: no supported PRNG module is installed. For extra security, please install CryptX or Bytes::Random::Secure';
 	return undef;
+}
+
+our $FORCED_SCHNORR_AUX_RAND;
+
+sub _schnorr_aux_random
+{
+	return $FORCED_SCHNORR_AUX_RAND // _random_bytes(32);
 }
 
 # LOW LEVEL API
@@ -84,6 +91,13 @@ sub sign_message
 	return $self->sign_digest($private_key, sha256(sha256($message)));
 }
 
+sub sign_message_schnorr
+{
+	my ($self, $private_key, $message) = @_;
+
+	return $self->sign_digest_schnorr($private_key, sha256($message));
+}
+
 sub sign_digest
 {
 	my ($self, $private_key, $digest) = @_;
@@ -92,11 +106,26 @@ sub sign_digest
 	return $self->_signature;
 }
 
+sub sign_digest_schnorr
+{
+	my ($self, $private_key, $digest) = @_;
+
+	$self->_sign_schnorr($private_key, $digest);
+	return $self->_signature_schnorr;
+}
+
 sub verify_message
 {
 	my ($self, $public_key, $signature, $message) = @_;
 
 	return $self->verify_digest($public_key, $signature, sha256(sha256($message)));
+}
+
+sub verify_message_schnorr
+{
+	my ($self, $public_key, $signature, $message) = @_;
+
+	return $self->verify_digest_schnorr($public_key, $signature, sha256($message));
 }
 
 sub verify_digest
@@ -111,6 +140,16 @@ sub verify_digest
 	}
 
 	return $self->_verify($digest);
+}
+
+sub verify_digest_schnorr
+{
+	my ($self, $public_key, $signature, $digest) = @_;
+
+	$self->_xonly_pubkey($public_key);
+	$self->_signature_schnorr($signature);
+
+	return $self->_verify_schnorr($digest);
 }
 
 sub negate_public_key
@@ -128,6 +167,16 @@ sub negate_private_key
 	my ($self, $private_key) = @_;
 
 	return $self->_privkey_negate($private_key);
+}
+
+sub xonly_public_key
+{
+	my ($self, $public_key) = @_;
+
+	$self->_pubkey($public_key);
+	$self->_convert_pubkey_xonly;
+
+	return $self->_xonly_pubkey;
 }
 
 sub add_public_key
@@ -198,6 +247,11 @@ Bitcoin::Secp256k1 - Perl interface to libsecp256k1
 	my $public_key = $secp256k1->create_public_key($private_key);
 	my $signature = $secp256k1->sign_message($private_key, $message);
 	my $valid = $secp256k1->verify_message($public_key, $signature, $message);
+
+	# Schnorr signatures are implemented
+	my $schnorr_signature = $secp256k1->sign_message_schnorr($private_key, $message);
+	my $xonly_public_key = $secp256k1->xonly_public_key($public_key);
+	my $valid = $secp256k1->verify_message_schnorr($xonly_public_key, $schnorr_signature, $message);
 
 =head1 DESCRIPTION
 
@@ -288,12 +342,36 @@ before passing it to signing algorithm (which expects length C<32> bytestrings).
 This method always produces normalized, deterministic signatures suitable to
 use inside a Bitcoin transaction.
 
+=head3 sign_message_schnorr
+
+	$signature = $secp256k1->sign_message_schnorr($private_key, $message)
+
+Signs C<$message>, which may be a bytestring of any length, with
+C<$private_key>, which must be a bytestring of length C<32>. Returns
+a Schnorr C<$signature> as a bytestring.
+
+C<$message> is first hashed with SHA256 before passing it to signing algorithm.
+
+This signature is not deterministic, since signing with Schnorr uses 32 bytes
+of auxiliary randomness as an additional security measure. You can set a fixed
+value to be used instead by setting package variable
+C<$Bitcoin::Secp256k1::FORCED_SCHNORR_AUX_RAND> to any bytestring of length
+C<32>.
+
 =head3 sign_digest
 
 	$signature = $secp256k1->sign_digest($private_key, $message_digest)
 
 Same as L</sign_message>, but it does not perform double SHA256 on its input.
 Because of that, C<$message_digest> must be a bytestring of length C<32>.
+
+=head3 sign_digest_schnorr
+
+	$signature = $secp256k1->sign_digest_schnorr($private_key, $message_digest)
+
+Same as L</sign_message_schnorr>, but it does not perform SHA256 on its input.
+While Schnorr allows any length message, this method requires
+C<$message_digest> to be a bytestring of length C<32>.
 
 =head3 verify_message
 
@@ -310,12 +388,37 @@ Raises a warning if C<$siganture> is not normalized. It is recommended to
 perform signature normalization using L</normalize_signature> first and either
 accept or reject malleable signatures explicitly.
 
+=head3 verify_message_schnorr
+
+	$valid = $secp256k1->verify_message_schnorr($xonly_public_key, $signature, $message)
+
+Verifies C<$signature> (Schnorr, bytestring) of C<$message> (bytestring of any
+length) against C<$xonly_public_key> (bytestring). Returns true is verification
+is successful.
+
+C<$message> is first hashed with SHA256 before passing it to verification
+algorithm.
+
 =head3 verify_digest
 
 	$valid = $secp256k1->verify_digest($public_key, $signature, $message_digest)
 
 Same as L</verify_message>, but it does not perform double SHA256 on its input.
 Because of that, C<$message_digest> must be a bytestring of length C<32>.
+
+=head3 verify_digest_schnorr
+
+	$valid = $secp256k1->verify_digest_schnorr($xonly_public_key, $signature, $message_digest)
+
+Same as L</verify_message_schnorr>, but it does not perform SHA256 on its
+input. While Schnorr allows any length message, this method requires
+C<$message_digest> to be a bytestring of length C<32>.
+
+=head3 xonly_public_key
+
+	$xonly_public_key = $secp256k1->xonly_public_key($public_key)
+
+Returns a xonly form of C<$public_key>. This form is used in Taproot.
 
 =head3 negate_private_key
 
@@ -397,15 +500,17 @@ also part of the low-level API, yet public.
 The module also needs a cryptographically-secure source of pseudo-randomness to
 deliver the highest level of security. It will try to obtain it from L<CryptX>
 or L<Bytes::Random::Secure>. If none of these modules is installed, a warning
-will be issued every time a constructor is called. The library will continue to
-work as intended, but randomization is a security feature which protects against
-some types of attacks. Refer to libsecp256k1 documentation for details.
+will be issued every time randomness is requested by the internals. The library
+will continue to work as intended, but randomization is a security feature
+which protects against some types of attacks. Refer to libsecp256k1
+documentation for details.
 
 =head2 TODO
 
-This module currently covers most usage paths of the base libsecp256k1. In the
-future, new methods to also cover some of its optional modules may be
-introduces, most notably the Schnorr module.
+This module currently covers most usage paths of the base libsecp256k1 and the
+Schnorr module. It currently does not aim to cover every usage path, most
+notably signing variable length messages with Schnorr (without digesting
+first).
 
 =head1 CAVEATS
 

@@ -4,7 +4,9 @@ The laziest perl arg parser around
 
 
 SYNOPSIS
-    my ($opt, @DARG) = Getopt::Lazier->new(@ARGV);
+    use Getopt::Lazier "opt";
+
+    use Data::Dumper; print Dumper([$varname, \@ARGV]);
 
 INSTALLATION
 

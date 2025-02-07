@@ -72,6 +72,7 @@ do { my $x = {
                                       'Catalyst::Response' => '0',
                                       'Class::XSAccessor' => '0',
                                       'Cpanel::JSON::XS' => '0',
+                                      'HTTP::Headers' => '6.07',
                                       'HTTP::Headers::Fast' => '0.21',
                                       'HTTP::Headers::Fast::XS' => '0',
                                       'HTTP::Message::PSGI' => '0',

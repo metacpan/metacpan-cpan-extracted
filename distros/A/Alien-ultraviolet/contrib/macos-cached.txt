@@ -1,0 +1,11 @@
+"~/Library/Application Support/pypoetry"
+"~/Library/Caches/pypoetry"
+"~/Library/Caches/com.apple.python/Users/oliver/Library/Application Support/pypoetry"
+"~/Library/Caches/com.apple.python/Users/oliver/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-poetry/venv/lib/python3.9/site-packages/poetry"
+"~/perl5/lib/perl5/darwin-thread-multi-2level/auto/Alien/poetry"
+"~/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-poetry"
+
+find ~/Library -name pypoetry 2>/dev/null
+find ~/Library -name poetry 2>/dev/null
+find ~/perl5 -name pypoetry 2>/dev/null
+find ~/perl5 -name poetry 2>/dev/null

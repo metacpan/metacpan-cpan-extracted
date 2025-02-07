@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use lib 't/lib';
 
-use Test::Most tests => 19;
+use Test::Most tests => 21;
 use FindBin qw($Bin);
 use Test::Needs 'CHI';
 
@@ -20,7 +20,7 @@ CHI: {
 		cache => $cache,
 		directory => "$Bin/../data",
 		logger => new_ok('MyLogger'),
-		max_slurp_size => 1,	# force to not use slurp and therefore to use SQL and cache
+		max_slurp_size => 0,	# force to not use slurp and therefore to use SQL and cache
 	}]);
 
 	cmp_ok(scalar $cache->get_keys(), '==', 0, 'cache is empty');
@@ -68,4 +68,11 @@ CHI: {
 			diag(__LINE__, " $key");
 		}
 	}
+
+	@rc = $test1->number();
+	cmp_ok(scalar(@rc), '==', 4, 'AUTOLOAD returns all of an array');
+	diag(Data::Dumper->new([\@rc])->Dump()) if($ENV{'TEST_VERBOSE'});
+	@rc = $test1->number();
+	cmp_ok(scalar(@rc), '==', 4, 'AUTOLOAD returns all of an array from the cache');
+	diag(Data::Dumper->new([\@rc])->Dump()) if($ENV{'TEST_VERBOSE'});
 }

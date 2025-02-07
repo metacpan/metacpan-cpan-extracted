@@ -214,12 +214,12 @@ L<MIME::Types::httpAcceptSelect()|MIME::Types/"HTTP support"> to replace this br
 
 =head1 SEE ALSO
 
-This module is part of MIME-Types distribution version 2.26,
-built on February 06, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of MIME-Types distribution version 2.27,
+built on February 07, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 1999-2024 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+Copyrights 1999-2025 by [Mark Overmeer <mark@overmeer.net>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

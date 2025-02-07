@@ -1,6 +1,7 @@
-package Text::HTML::CollapseWhitespace 0.01;
+package Text::HTML::CollapseWhitespace 0.02;
 use 5.020;
 use experimental 'signatures';
+use stable 'postderef';
 use Exporter 'import';
 
 require Text::HTML::Turndown::Node;

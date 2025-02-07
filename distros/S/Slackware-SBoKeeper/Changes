@@ -1,5 +1,23 @@
 Revision history for sbokeeper.
 
+2.04 (2/6/2025):
+  Added:
+    * Blacklist config option: Specify a list of packages that sbokeeper will
+      ignore. Added corresponding --blacklist option.
+  Changes:
+    * Changed tack{ish} output message.
+  Fixes:
+    * Fixed some grammatical errors in the documentation.
+  Removed:
+    * Removed data file documentation from manpage. The original reason I
+      documented the format was so that users could edit the data files
+      themselves if they had to, although it was greatly discouraged. Now with
+      the addition of blacklists, there are even more footguns when it comes to
+      editting data files, so I'd thought it would be better to not even
+      suggest the idea to users. The documentation has been moved to
+      Database.pm's POD, so those who are interested in the format still have
+      access to it.
+
 2.03 (1/16/2025):
   Added:
     * rdeps command: Print reverse dependencies for specified package.

@@ -1,7 +1,8 @@
-package Text::HTML::Turndown::Node 0.01;
+package Text::HTML::Turndown::Node 0.02;
 use 5.020;
 use Moo;
 use experimental 'signatures';
+use stable 'postderef';
 
 our @blockElements = (
   'ADDRESS', 'ARTICLE', 'ASIDE', 'AUDIO', 'BLOCKQUOTE', 'BODY', 'CANVAS',

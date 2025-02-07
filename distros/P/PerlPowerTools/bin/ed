@@ -47,6 +47,7 @@ use strict;
 
 use File::Temp qw();
 use Getopt::Std qw(getopts);
+use Text::ParseWords qw(quotewords);
 
 use constant A_NOMATCH => -1;
 use constant A_NOPAT   => -2;
@@ -83,7 +84,7 @@ my $Error = undef;              # saved error string for h command
 my $Prompt = undef;             # saved prompt string for -p option
 my $SearchPat;                  # saved pattern for repeat search
 my $Scripted = 0;
-my @lines;                      # buffer for file being edited.
+my @lines = ( 0 );              # buffer for file being edited.
 my $command;                    # single letter command entered by user
 my $commandsuf;                 # single letter modifier of command
 my @adrs;                       # 1 or 2 line numbers for commands to operate on
@@ -96,16 +97,10 @@ my $UndoLine;
 
 # constants
 
-my $NO_APPEND_MODE = 0;
-my $NO_INSERT_MODE = 0;
-my $INSERT_MODE = 1;
-my $APPEND_MODE = 2;
-my $QUESTIONS_MODE = 1;
-my $NO_QUESTIONS_MODE = 0;
 my $PRINT_NUM = 1;
 my $PRINT_BIN = 2;
 
-our $VERSION = '0.22';
+our $VERSION = '0.29';
 
 my @ESC = (
     '\\000', '\\001', '\\002', '\\003', '\\004', '\\005', '\\006', '\\a',
@@ -222,7 +217,7 @@ $args[0] = shift;
 $args[0] = undef if (defined($args[0]) && $args[0] eq '-');
 Usage() if @ARGV;
 $Scripted = $opt{'s'};
-edEdit($NO_QUESTIONS_MODE, $NO_APPEND_MODE);
+edEdit(0);
 input() while 1;
 
 sub input {
@@ -323,18 +318,18 @@ sub edPrompt {
     return;
 }
 
-sub edHelp {
-    my $toggle = shift;
-
+sub edSetHelp {
     return E_ADDREXT if defined $adrs[0];
     return E_ARGEXT if defined $args[0];
+    $HelpMode = !$HelpMode;
+    print "$Error\n" if $HelpMode && defined($Error);
+    return;
+}
 
-    if ($toggle) {
-        $HelpMode ^= 1;
-    }
-    if (defined($Error) && ($HelpMode || !$toggle)) {
-         print "$Error\n";
-    }
+sub edHelp {
+    return E_ADDREXT if defined $adrs[0];
+    return E_ARGEXT if defined $args[0];
+    print "$Error\n" if defined($Error);
     return;
 }
 
@@ -346,6 +341,7 @@ sub edMark {
     my $ad = $adrs[1];
     $ad = $adrs[0] unless defined $ad;
     $ad = $CurrentLineNum unless defined $ad;
+    return E_ADDRBAD if $ad == 0;
     $marks{$c} = $ad;
     return;
 }
@@ -384,7 +380,7 @@ sub edPrint {
         if ($do_bin) {
             print escape_line($i);
         } else {
-            print $lines[$i];
+            print get_terminated_line($i);
         }
     }
     $CurrentLineNum = $adrs[-1];
@@ -394,10 +390,15 @@ sub edPrint {
 sub escape_line {
     my $idx = shift;
 
-    my @chars = unpack 'C*', $lines[$idx];
+    my @chars = unpack 'C*', get_terminated_line($idx);
     die 'internal error: unpack' unless @chars;
     my @s = map { $ESC[$_] } @chars;
     return join '', @s;
+}
+
+sub get_terminated_line {
+    my $i = shift;
+    return $lines[$i] . "\n";
 }
 
 # does not modify buffer
@@ -405,7 +406,10 @@ sub edPipe {
     return E_ADDREXT if defined $adrs[0];
 
     if (defined $args[0]) {
-        my $rc = system $args[0];
+        return E_SUFFBAD if $args[0] =~ m/\0/;
+        $args[0] =~ s/(\A\s+)|(\s+\z)//g;
+        my @arglist = quotewords('\s+', 0, $args[0]);
+        my $rc = system @arglist;
         print "$args[0]: $!\n" if ($rc == -1);
     }
     print "!\n";
@@ -434,15 +438,12 @@ sub edJoin {
     if ($adrs[0] == $adrs[1]) { # nop
         return;
     }
-
-    my $buf = $lines[$adrs[0]];
-    my $start = $adrs[0] + 1;
-    for my $i ($start .. $adrs[1]) {
-        chomp $buf;
-        $buf .= $lines[$i];
-    }
-    $lines[$adrs[0]] = $buf;
-    splice @lines, $start, $adrs[1] - $adrs[0];
+    my $i = $adrs[0];
+    my $j = $adrs[1];
+    my $delcount = $j - $i;
+    my @tmp = splice @lines, $i + 1, $delcount;
+    my $buf = join '', @tmp;
+    $lines[$i] .= $buf;
     $NeedToSave = 1;
     $UserHasBeenWarned = 0;
     $CurrentLineNum = $adrs[0];
@@ -486,13 +487,11 @@ sub edMove {
 
     my $count = $end - $start + 1;
     my @copy = @lines[$start .. $end];
-    if ($start > $dst && $end > $dst) {
-        splice(@lines, $start, $count) if $delete;
-        splice @lines, $dst + 1, 0, @copy;
-    } else {
-        # avoid $dst referring to the wrong line
-        splice @lines, $dst + 1, 0, @copy;
-        splice(@lines, $start, $count) if $delete;
+    splice @lines, $dst + 1, 0, @copy;
+    if ($delete) {
+        my $i = $start;
+        $i += $count if $dst < $start; # lines moved up
+        splice @lines, $i, $count;
     }
 
     $NeedToSave = 1;
@@ -502,14 +501,12 @@ sub edMove {
 }
 
 sub edMoveDel { edMove(1); }
-sub edSetHelp { edHelp(1); }
 sub edPrintNum { edPrint($PRINT_NUM); }
 sub edPrintBin { edPrint($PRINT_BIN); }
 sub edQuitAsk { edQuit(1); }
 sub edAppend { edInsert(1); }
 sub edWriteAppend { edWrite(1); }
-sub edEditAsk { edEdit(!$Scripted, $NO_INSERT_MODE); }
-sub edRead { edEdit($QUESTIONS_MODE,$INSERT_MODE); }
+sub edEditAsk { edEdit(!$Scripted); }
 
 #
 # Perform text substitution
@@ -550,7 +547,7 @@ sub edSubstitute {
         $PrintLastLine = 1;
     }
 
-    # do the search and substitution
+    $args[0] =~ s/\\n/n/g; # newline is not permitted
     for my $lineno (@adrs) {
         my $evalstring = "\$lines[\$lineno] =~ s$args[0]";
 
@@ -606,9 +603,7 @@ sub edFilename {
         return E_ADDREXT;
     }
     if (defined($args[0])) {
-        return E_FNAME if $args[0] =~ m/\A\!/;
-        return E_FNAME if $args[0] =~ m/\/\Z/;
-        return E_FNAME if ($args[0] eq '.' || $args[0] eq '..');
+        return E_FNAME if illegal_file($args[0]);
         $RememberedFilename = $args[0];
     }
     if (defined($RememberedFilename)) {
@@ -620,15 +615,22 @@ sub edFilename {
     return;
 }
 
+sub illegal_file {
+    my $name = shift;
+    return 1 if length($name) == 0;
+    return 1 if $name eq '.' or $name eq '..';
+    return 1 if $name =~ m/\A\!/;
+    return 1 if $name =~ m/\/\Z/;
+    return 0;
+}
+
 #
 # Write requested lines
 #
 
 sub edWrite {
     my($AppendMode) = @_;
-    my($fh, $filename, $chars, $qflag);
-
-    $chars = 0;
+    my($fh, $filename, $chars, $qflag, $do_pipe);
 
     if (!defined($adrs[0]) && !defined($adrs[1])) {
         $adrs[0] = 1;
@@ -647,22 +649,30 @@ sub edWrite {
     }
 
     if (defined $args[0]) {
-        $filename = $RememberedFilename = $args[0];
+        if ($args[0] =~ s/\A\!//) {
+            $do_pipe = 1;
+            $fh = init_pipe($args[0], 1);
+            return E_OPEN unless $fh;
+        } else {
+            $filename = $args[0];
+        }
     } elsif (defined $RememberedFilename) {
         $filename = $RememberedFilename;
     } else {
         return E_NOFILE;
     }
-    if ($filename =~ s/\A\!//) {
-        return unless (open $fh, "| $filename"); # no error
-    } else {
+
+    unless ($do_pipe) {
+        return E_FNAME if illegal_file($filename);
         my $mode = $AppendMode ? '>>' : '>';
         unless (open $fh, $mode, $filename) {
             warn "$filename: $!\n";
             return E_OPEN;
         }
     }
-    for my $line (@lines[$adrs[0]..$adrs[1]]) {
+    $chars = 0;
+    for my $i ($adrs[0] .. $adrs[1]) {
+        my $line = get_terminated_line($i);
         print {$fh} $line;
         $chars += length($line);
     }
@@ -670,13 +680,62 @@ sub edWrite {
         warn "$filename: $!\n";
         return E_CLOSE;
     }
-
-    $NeedToSave = $UserHasBeenWarned = 0;
+    unless ($do_pipe) {
+        my $lcount = $adrs[1] - $adrs[0] + 1;
+        if ($lcount == maxline()) {
+            $NeedToSave = $UserHasBeenWarned = 0;
+        }
+    }
     print "$chars\n" unless $Scripted;
     exit getrc() if $qflag;
     return;
 }
 
+sub edRead {
+    my(@tmp_lines, $chars, $fh, $filename, $do_pipe, $targ);
+
+    $targ = $adrs[1];
+    $targ = $adrs[0] unless defined $targ;
+    $targ = maxline() unless defined $targ;
+
+    if (defined $args[0]) {
+        return E_FNAME unless (length $args[0]);
+        if ($args[0] =~ s/\A\!//) {
+            $do_pipe = 1;
+            $fh = init_pipe($args[0]);
+            return E_OPEN unless $fh;
+        }
+        $filename = $args[0];
+    } elsif (defined $RememberedFilename) {
+        $filename = $RememberedFilename;
+    } else {
+        return E_NOFILE;
+    }
+
+    unless ($do_pipe) {
+        return E_FNAME if illegal_file($filename);
+        $fh = open_file_ro($filename);
+        return E_OPEN unless $fh;
+    }
+    @tmp_lines = readin_lines($fh, 0);
+    $chars = 0;
+    foreach (@tmp_lines) {
+        $chars += length;
+    }
+    unless (close $fh) {
+        warn "$filename: $!\n";
+        return E_CLOSE;
+    }
+    print "$chars\n" unless $Scripted;
+    return unless @tmp_lines; # nothing to add
+
+    splice @lines, $targ + 1, 0, @tmp_lines;
+    $CurrentLineNum = $targ + scalar(@tmp_lines);
+
+    $NeedToSave = 1;
+    $UserHasBeenWarned = 0;
+    return;
+}
 
 #
 # Read in the named file
@@ -686,29 +745,24 @@ sub edWrite {
 #        1 - success
 
 sub edEdit {
-    my($QuestionsMode,$InsertMode) = @_;
+    my $QuestionsMode = shift;
     my(@tmp_lines, $chars, $fh, $filename);
 
-    if ($InsertMode) {
-        if (defined $adrs[1]) {
-            $adrs[0] = $adrs[1];
-        }
-        if (!defined($adrs[0])) {
-            $adrs[0] = maxline();
-        }
-    } else {
-        if (defined($adrs[0]) or defined($adrs[1])) {
-            return E_ADDREXT;
-        }
-        if ($NeedToSave && $QuestionsMode && !$UserHasBeenWarned) {
-            $UserHasBeenWarned = 1;
-            return E_UNSAVED;
-        }
+    return E_ADDREXT if defined($adrs[0]) or defined($adrs[1]);
+    if ($NeedToSave && $QuestionsMode && !$UserHasBeenWarned && !$Scripted) {
+        $UserHasBeenWarned = 1;
+        return E_UNSAVED;
     }
-
+    my $do_pipe = 0;
     if (defined $args[0]) {
         return E_FNAME unless (length $args[0]);
-        $filename = $RememberedFilename = $args[0];
+        if ($args[0] =~ s/\A\!//) {
+            $do_pipe = 1;
+            $fh = init_pipe($args[0]);
+            return E_OPEN unless $fh;
+        } else {
+            $filename = $RememberedFilename = $args[0];
+        }
     } elsif (defined $RememberedFilename) {
         $filename = $RememberedFilename;
     } else {
@@ -717,61 +771,70 @@ sub edEdit {
         return;
     }
 
-    if (-d $filename) {
-        warn "$filename: is a directory\n";
-        return E_READ;
+    unless ($do_pipe) {
+        return E_FNAME if illegal_file($filename);
+        $fh = open_file_ro($filename);
+        return E_OPEN unless $fh;
     }
-    if ($filename =~ s/\A\!//) {
-        return unless (open $fh, "$filename |"); # no error
-    } else {
-        unless (open $fh, '<', $filename) {
-            warn "$filename: $!\n";
-            return E_OPEN;
-        }
-    }
+    @tmp_lines = readin_lines($fh, 0);
     $chars = 0;
-    while (<$fh>) {
-        push @tmp_lines, $_;
+    foreach (@tmp_lines) {
         $chars += length;
     }
     unless (close $fh) {
         warn "$filename: $!\n";
         return E_CLOSE;
     }
-    if ($chars == 0) {
-        $UserHasBeenWarned = 0;
-        $CurrentLineNum = 0;
-        @lines = (0);
-        print "0\n" unless $Scripted;
+    print "$chars\n" unless $Scripted;
+
+    @lines = (undef, @tmp_lines); # tmp_lines can be empty
+    $CurrentLineNum = maxline();
+    $NeedToSave = $UserHasBeenWarned = 0;
+    return;
+}
+
+sub init_pipe {
+    my ($cmd, $writemode) = @_;
+
+    return if $cmd =~ m/\0/;
+    return unless $cmd =~ m/\S/;
+    $cmd =~ s/(\A\s+)|(\s+\z)//g;
+    my @arglist = quotewords('\s+', 0, $cmd);
+    my $fh;
+    my $mode = $writemode ? '|-' : '-|';
+    unless (open $fh, $mode, @arglist) {
+        warn "open: $!\n";
         return;
     }
-    if (substr($tmp_lines[-1], -1, 1) ne "\n") {
-        $tmp_lines[-1] .= "\n";
-        $chars++;
+    return $fh;
+}
+
+sub readin_lines {
+    my ($fh, $dot) = @_;
+    my @tmp;
+    while (<$fh>) {
+        last if $dot && m/\A\.\Z/;
+        push @tmp, $_;
+    }
+    if (@tmp && substr($tmp[-1], -1, 1) ne "\n") {
         print "Newline appended\n";
     }
+    chomp @tmp;
+    return @tmp;
+}
 
-    # now that we've got it, figure out what to do with it
-
-    if ($InsertMode) {
-        if (maxline() != 0 && $adrs[0] == maxline()) {
-            push(@lines,@tmp_lines);
-        } elsif ($adrs[0] == 0) {
-            splice @lines, 1, 0, @tmp_lines;
-        } else {
-            splice @lines, $adrs[0] + 1, 0, @tmp_lines;
-        }
-        $CurrentLineNum = $adrs[0] + scalar(@tmp_lines);
-        $NeedToSave = 1;
-    } else {
-        @lines = (undef, @tmp_lines);
-        $NeedToSave = 0;
-        $CurrentLineNum = maxline();
+sub open_file_ro {
+    my $path = shift;
+    my $fh;
+    if (-d $path) {
+        warn "$path: is a directory\n";
+        return;
     }
-
-    $UserHasBeenWarned = 0;
-    print "$chars\n" unless $Scripted;
-    return;
+    unless (open $fh, '<', $path) {
+        warn "$path: $!\n";
+        return;
+    }
+    return $fh;
 }
 
 #
@@ -780,7 +843,6 @@ sub edEdit {
 
 sub edInsert {
     my $append = shift;
-    my(@tmp_lines);
 
     return E_ARGEXT if defined $args[0];
 
@@ -791,11 +853,7 @@ sub edInsert {
         $adrs[0] = $CurrentLineNum;
     }
 
-    # suck the text into a temp array
-    while (<>) {
-        last if (/^\.$/);
-        push(@tmp_lines,$_);
-    }
+    my @tmp_lines = readin_lines(*STDIN, 1);
     return unless (@tmp_lines); # no change
 
     my $src = $adrs[0];
@@ -830,8 +888,8 @@ sub edPrintLineNum {
 
 sub write_undo {
     my $fh = File::Temp->new;
-    foreach (@lines) {
-         print {$fh} $_;
+    for my $i (1 .. maxline()) {
+         print {$fh} get_terminated_line($i);
     }
     seek $fh, 0, 0;
     return $fh;
@@ -844,6 +902,7 @@ sub edUndo {
 
     $CurrentLineNum = $UndoLine;
     @lines = <$UndoFile>;
+    chomp @lines;
     unshift @lines, undef;
     $UserHasBeenWarned = 0;
     $NeedToSave = 1; # new tmpfile
@@ -860,7 +919,7 @@ sub edQuit {
     return E_ADDREXT if defined $adrs[0];
     return E_ARGEXT if defined $args[0];
 
-    if ($QuestionMode && $NeedToSave && !$UserHasBeenWarned) {
+    if ($QuestionMode && $NeedToSave && !$UserHasBeenWarned && !$Scripted) {
         $UserHasBeenWarned = 1;
         return E_UNSAVED;
     }
@@ -895,7 +954,7 @@ sub edSetCurrentLine {
         $CurrentLineNum++;
     }
 
-    print $lines[$CurrentLineNum];
+    print get_terminated_line($CurrentLineNum);
     return;
 }
 
@@ -974,13 +1033,10 @@ sub edParse {
 
 sub getAddr {
     my $n;
-    if (s/\A([\-\^\+]+)//) { # '++--' == current+0
-        $n = $CurrentLineNum;
-        foreach my $c (split //, $1) {
-            $n += $c eq '+' ? 1 : -1;
-        }
-    } elsif (s/\A\'([a-z])//) {
-        $n = exists $marks{$1} ? $marks{$1} : A_NOMARK;
+    if (s/\A\'([a-z])//) {
+        my $letter = $1;
+        return A_NOMARK unless exists $marks{$letter};
+        $n = $marks{$letter};
     } elsif (s/\A([0-9]+)//) { # '10' == 10
         $n = $1;
     } elsif (s/\A\.//) { # '.' == current line
@@ -996,7 +1052,20 @@ sub getAddr {
             $re = $SearchPat;
         }
         $n = edSearch($re, $delim eq '?');
-        $n = A_NOMATCH unless $n;
+        return A_NOMATCH unless $n;
+    }
+    while (s/\A([\-\+])([0-9]+)//) { # '+1' or '-1'
+        $n = $CurrentLineNum unless defined $n;
+        my $is_neg = $1 eq '-';
+        my $x = $2;
+        $x = -$x if $is_neg;
+        $n += $x;
+    }
+    while (s/\A([\-\^\+]+)//) { # '++--' == current+0
+        $n = $CurrentLineNum unless defined $n;
+        foreach my $c (split //, $1) {
+            $n += $c eq '+' ? 1 : -1;
+        }
     }
     if (defined $n) {
         return A_RANGE if $n < 0 || $n > maxline();

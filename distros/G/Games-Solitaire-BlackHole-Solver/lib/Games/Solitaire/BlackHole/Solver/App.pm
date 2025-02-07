@@ -1,5 +1,5 @@
 package Games::Solitaire::BlackHole::Solver::App;
-$Games::Solitaire::BlackHole::Solver::App::VERSION = '0.12.0';
+$Games::Solitaire::BlackHole::Solver::App::VERSION = '0.14.0';
 use 5.014;
 use Moo;
 
@@ -18,6 +18,12 @@ sub run
     );
 
     STDOUT->autoflush(1);
+    if ( @ARGV > 1 )
+    {
+        $self->_do_not_err_on_exceeding_max_iters_limit(1);
+        return $self->_multi_filename_run();
+    }
+    $self->_do_not_err_on_exceeding_max_iters_limit(0);
     my $global_verdict = 1;
     foreach my $board_fn (@ARGV)
     {
@@ -61,6 +67,73 @@ sub run
     return $self->_my_exit( $global_verdict, );
 }
 
+sub _multi_filename_run
+{
+    my $self      = shift;
+    my $RANK_KING = $self->_RANK_KING;
+
+    my $SOFT_EXCEEDED  = $self->_do_not_err_on_exceeding_max_iters_limit();
+    my $global_verdict = 1;
+    foreach my $board_fn (@ARGV)
+    {
+        my $board_display_fn = $board_fn;
+        $board_display_fn =~
+            s#([^A-Za-z0-9_\-/\.=\\\:])#sprintf("%%{%x}", ord($1))#egms;
+        if (0)
+        {
+            die "dangerous board filename '${board_fn}'!";
+        }
+        $self->_output_handle->printf( "[= Starting file %s =]\n",
+            $board_display_fn );
+        delete $self->{_BOARD_CTR};
+        my $verdict = 0;
+        $self->_calc_lines( $board_fn, );
+        $self->_set_up_solver( 0, [ 1, $RANK_KING ] );
+
+        $self->_next_task;
+
+    MFN_QUEUE_LOOP:
+        while ( my $state = $self->_get_next_state_wrapper )
+        {
+            # The foundation
+            my $no_cards = 1;
+
+            my @_pending;
+
+            if (1)
+            {
+                $self->_find_moves( \@_pending, $state, \$no_cards );
+            }
+
+            if ($no_cards)
+            {
+                $self->_trace_solution( $state, );
+                $verdict = 1;
+
+                # $self->_output_handle->print("END solved run\n");
+                last MFN_QUEUE_LOOP;
+            }
+            last MFN_QUEUE_LOOP
+                if not $self->_process_pending_items( \@_pending, $state );
+        }
+        if ($SOFT_EXCEEDED)
+        {
+            if ( $SOFT_EXCEEDED and $self->_max_iters_limit_exceeded() )
+            {
+                $verdict = 0;
+            }
+        }
+        $self->_end_report( $verdict, );
+        if ( not $verdict )
+        {
+            $global_verdict = 0;
+        }
+        $self->_output_handle->printf( "[= END of file %s =]\n",
+            $board_display_fn );
+    }
+    return $self->_my_exit( $global_verdict, );
+}
+
 
 1;
 
@@ -77,7 +150,7 @@ implemented as a class to solve the Black Hole solitaire.
 
 =head1 VERSION
 
-version 0.12.0
+version 0.14.0
 
 =head1 SYNOPSIS
 

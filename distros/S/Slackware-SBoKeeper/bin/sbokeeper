@@ -10,7 +10,6 @@ my $sbokeeper = Slackware::SBoKeeper->init();
 $sbokeeper->run();
 
 
-
 =head1 NAME
 
 sbokeeper - SlackBuild package manager helper
@@ -66,7 +65,7 @@ Absolute path to file where package database will be stored. A '~' can be
 expanded into the running user's home directory, but other kinds of shell
 expansion are not performed.
 
-Can be overrided by the B<-d> option.
+Can be overridden by the B<-d> option.
 
 Default value is I<~/.local/share/sbokeeper/data.sbokeeper>.
 
@@ -94,7 +93,7 @@ git repository then you should be good.
 A '~' can be expanded into the running user's home directory, but other kinds
 of shell expansion are not performed.
 
-Can be overrided with the B<-s> option.
+Can be overridden with the B<-s> option.
 
 The default value depends on what SlackBuild package management tools are
 installed on your system. If you are using one the following:
@@ -125,9 +124,34 @@ manually.
 Packge tag used by your SlackBuild repo. The package tag is the string at the
 end of a package name, usually beginning with an underscore.
 
-Can be overrided with the B<-t> option.
+Can be overridden with the B<-t> option.
 
 The default value is '_SBo'.
+
+=item B<Blacklist>
+
+List of packages or path to blacklist file that tells what packages to ignore.
+
+If B<Blacklist> starts with a slash or tilde (C<'/'> or C<'~'>), B<sbokeeper>
+will interpret the option as a path to a blacklist file and read the blacklist
+from that. Otherwise, B<sbokeeper> will treat B<Blacklist> as a white-space
+seperated list of packages to blacklist.
+
+A blacklist file is a text file that contains a list of packages to blacklist,
+with each package having its own line. Blank lines and lines starting with
+hashes (C<'#'>) are ignored.
+
+  # This will blacklist mpv, lua, and avahi
+  mpv
+  lua
+  avahi
+
+Can be overridden with the B<-b> option.
+
+B<sbokeeper> does not use a blacklist by default.
+
+The B</CAVEATS> section of this manpage details some warnings when using
+blacklists.
 
 =back
 
@@ -372,6 +396,18 @@ these categories mean.
 
 =over 4
 
+=item B<-B> I<list>, B<--blacklist>=I<list>
+
+Specify what packages to blacklist. If I<list> is a file, B<sbokeeper> tries to
+read the blacklist from that. Otherwise, B<sbokeeper> treats I<list> as a
+whitespace-seperated list of packages to blacklist.
+
+See the documentation for the C<Blacklist> config file option for more
+information on the format of a blacklist file.
+
+The B</CAVEATS> section of this manpage details some warnings when using
+blacklists.
+
 =item B<-c> I<path>, B<--config>=I<path>
 
 Specify the path to the configuration file.
@@ -402,48 +438,13 @@ Print version and copyright information, then exit.
 
 =back
 
-=head1 DATA FILES
+=head1 CAVEATS
 
-B<sbokeeper> stores SlackBuild information in data files. B<sbokeeper> is
-designed so that you would ideally never have to edit these files by hand. It is
-strongly discouraged that you edit these files, however if you do anyway,
-carefully make sure that your edits are valid according to the data file format,
-which will be described below.
-
-B<sbokeeper> data files are text files. Data files contain packages, which are
-a series of lines that contain package information ended by a pair of percentage
-signs (%%). A package entry should look something like this:
-
- PACKAGE: libreoffice
- DEPS: avahi zulu-openjdk8
- MANUAL: 1
- %%
-
-=over 4
-
-=item PACKAGE
-
-Name of the package, which must have a corresponding SlackBuild in the
-configured SlackBuild repo. This must be the first line in a package entry.
-
-=item DEPS
-
-Whitespace-seperated list of packages that PACKAGE depends on. Each package
-must be present in the SlackBuild repo.
-
-=item MANUAL
-
-Specifies whether the package was manually added or not. 1 for yes, 0 for no.
-
-=item %%
-
-Marks the end of the current package entry.
-
-=back
-
-=head1 AUTHOR
-
-Written by Samuel Young E<lt>samyoung12788@gmail.comE<gt>.
+Whenever B<sbokeeper> encounters a blacklisted package while reading a
+pre-existing database, B<sbokeeper> will skip over reading that entry. That
+means that when B<sbokeeper> rewrites the database, any blacklisted package
+entry will be lost. This behavior may change in the future, if there is demand
+for it to be changed.
 
 =head1 RESTRICTIONS
 
@@ -459,6 +460,10 @@ the wild. Circular dependencies can easily be introduced if one does not use
 depadd carefully. So beware.
 
 Report bugs on my Codeberg, L<https://codeberg.org/1-1sam>.
+
+=head1 AUTHOR
+
+Written by Samuel Young E<lt>samyoung12788@gmail.comE<gt>.
 
 =head1 COPYRIGHT
 

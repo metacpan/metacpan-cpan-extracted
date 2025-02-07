@@ -34,6 +34,7 @@ requires:
   Carp: '0'
   DBD::SQLite::Constants: '0'
   Data::Dumper: '0'
+  ExtUtils::MakeMaker: '6.64'
   File::Basename: '0'
   File::Spec: '0'
   File::Temp: '0'
@@ -46,5 +47,5 @@ requires:
 resources:
   bugtracker: https://github.com/nigelhorne/Database-Abstraction/issues
   repository: git://github.com/nigelhorne/Database-Abstraction.git
-version: '0.17'
+version: '0.20'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -1,6 +1,6 @@
 package Slackware::SBoKeeper;
 use 5.016;
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 use strict;
 use warnings;
 
@@ -46,6 +46,7 @@ Commands:
   help      <cmd>        Print cmd help message.
 
 Options:
+  -B <list>   --blacklist=<list>      Blacklist string/file of packages
   -c <path>   --config=<path>         Specify config file location.
   -d <path>   --datafile=<path>       Specify data file location.
   -s <path>   --sbodir=<path>         Specify SBo directory.
@@ -67,6 +68,8 @@ Software Foundation; or the Artistic License.
 See <https://dev.perl.org/licenses/> for more information.
 END
 
+# TODO: Is there a way I can have all of these command help blurbs without this
+# long list of HERE docs?
 my %COMMAND_HELP = (
 	'add' => <<END,
 Usage: add <pkg> ...
@@ -383,6 +386,23 @@ my $CONFIG_READERS = {
 		return shift;
 
 	},
+	'Blacklist' => sub {
+
+		my $val = shift;
+
+		$val =~ s/^~/$HOME/;
+
+		my %blacklist;
+
+		if ($val =~ /^\//) {
+			%blacklist = read_blacklist($val);
+		} else {
+			%blacklist = map { $_ => 1 } split /\s/, $val;
+		}
+
+		return \%blacklist;
+
+	},
 	'PkgtoolLogs' => sub {
 
 		warn "'PkgtoolLogs' is deprecated\n";
@@ -456,6 +476,39 @@ my %PKG_CATEGORIES = (
 
 	},
 );
+
+sub read_blacklist {
+
+	my $file = shift;
+
+	open my $fh, '<', $file
+		or die "Failed to open $file for reading: $!\n";
+
+	my %blacklist;
+
+	while (my $l = readline $fh) {
+
+		chomp $l;
+
+		if ($l =~ /^#/ or $l =~ /^\s*$/) {
+			next;
+		}
+
+		$l =~ s/^\s*|\s*$//g;
+
+		if ($l =~ /\s/) {
+			die "Blacklist entry cannot contain whitespace\n";
+		}
+
+		$blacklist{$l} = 1;
+
+	}
+
+	close $fh;
+
+	return %blacklist;
+
+}
 
 sub get_default_sbopath {
 
@@ -618,7 +671,8 @@ sub add {
 
 	my $sbokeeper = Slackware::SBoKeeper::Database->new(
 		-s $self->{DataFile} ? $self->{DataFile} : '',
-		$self->{SBoPath}
+		$self->{SBoPath},
+		$self->{Blacklist}
 	);
 
 	my @pkgs = alias_expand($sbokeeper, $self->{Args});
@@ -649,17 +703,16 @@ sub tack {
 
 	my $sbokeeper = Slackware::SBoKeeper::Database->new(
 		-s $self->{DataFile} ? $self->{DataFile} : '',
-		$self->{SBoPath}
+		$self->{SBoPath},
+		$self->{Blacklist}
 	);
 
 	my @pkgs = alias_expand($sbokeeper, $self->{Args});
 
 	my @add = $sbokeeper->tack(\@pkgs, 1);
 
-	printf "The following packages will be added:\n";
+	printf "The following packages will be tacked:\n";
 	print_package_list('  ', @add);
-	printf "The following packages will be marked as manually added:\n";
-	print_package_list('  ', sort @pkgs);
 	my $ok = $self->{YesAll} ? 1 : yesno("Is this okay?");
 
 	unless ($ok) {
@@ -670,7 +723,7 @@ sub tack {
 	backup($self->{DataFile});
 	$sbokeeper->write($self->{DataFile});
 
-	printf "%d packages added\n", scalar @add;
+	printf "%d packages tacked\n", scalar @add;
 
 }
 
@@ -680,7 +733,8 @@ sub addish {
 
 	my $sbokeeper = Slackware::SBoKeeper::Database->new(
 		-s $self->{DataFile} ? $self->{DataFile} : '',
-		$self->{SBoPath}
+		$self->{SBoPath},
+		$self->{Blacklist}
 	);
 
 	my @pkgs = alias_expand($sbokeeper, $self->{Args});
@@ -713,7 +767,8 @@ sub tackish {
 
 	my $sbokeeper = Slackware::SBoKeeper::Database->new(
 		-s $self->{DataFile} ? $self->{DataFile} : '',
-		$self->{SBoPath}
+		$self->{SBoPath},
+		$self->{Blacklist}
 	);
 
 	my @pkgs = alias_expand($sbokeeper, $self->{Args});
@@ -724,7 +779,7 @@ sub tackish {
 		die "No packages could be added\n";
 	}
 
-	printf "The following packages will be added:\n";
+	printf "The following packages will be tacked:\n";
 	print_package_list('  ', @add);
 	my $ok = $self->{YesAll} ? 1 : yesno("Is this okay?");
 
@@ -736,7 +791,7 @@ sub tackish {
 	backup($self->{DataFile});
 	$sbokeeper->write($self->{DataFile});
 
-	printf "%d packages added\n", scalar @add;
+	printf "%d packages tacked\n", scalar @add;
 
 }
 
@@ -746,7 +801,8 @@ sub rm {
 
 	my $sbokeeper = Slackware::SBoKeeper::Database->new(
 		$self->{DataFile},
-		$self->{SBoPath}
+		$self->{SBoPath},
+		$self->{Blacklist}
 	);
 
 	my @pkgs = alias_expand($sbokeeper, $self->{Args});
@@ -789,7 +845,8 @@ sub deps {
 
 	my $sbokeeper = Slackware::SBoKeeper::Database->new(
 		$self->{DataFile},
-		$self->{SBoPath}
+		$self->{SBoPath},
+		$self->{Blacklist}
 	);
 
 	my $pkg = shift @{$self->{Args}};
@@ -810,7 +867,8 @@ sub rdeps {
 
 	my $sbokeeper = Slackware::SBoKeeper::Database->new(
 		$self->{DataFile},
-		$self->{SBoPath}
+		$self->{SBoPath},
+		$self->{Blacklist}
 	);
 
 	my $pkg = shift @{$self->{Args}};
@@ -831,7 +889,8 @@ sub depadd {
 
 	my $sbokeeper = Slackware::SBoKeeper::Database->new(
 		$self->{DataFile},
-		$self->{SBoPath}
+		$self->{SBoPath},
+		$self->{Blacklist}
 	);
 
 	my $pkg = shift @{$self->{Args}};
@@ -869,7 +928,8 @@ sub deprm {
 
 	my $sbokeeper = Slackware::SBoKeeper::Database->new(
 		$self->{DataFile},
-		$self->{SBoPath}
+		$self->{SBoPath},
+		$self->{Blacklist}
 	);
 
 	my $pkg = shift @{$self->{Args}};
@@ -903,7 +963,8 @@ sub pull {
 
 	my $sbokeeper = Slackware::SBoKeeper::Database->new(
 		-s $self->{DataFile} ? $self->{DataFile} : '',
-		$self->{SBoPath}
+		$self->{SBoPath},
+		$self->{Blacklist}
 	);
 
 	my @installed = Slackware::SBoKeeper::System->packages_by_tag($self->{Tag});
@@ -952,7 +1013,8 @@ sub diff {
 
 	my $sbokeeper = Slackware::SBoKeeper::Database->new(
 		$self->{DataFile},
-		$self->{SBoPath}
+		$self->{SBoPath},
+		$self->{Blacklist}
 	);
 
 	my %installed =
@@ -1008,7 +1070,8 @@ sub depwant {
 
 	my $sbokeeper = Slackware::SBoKeeper::Database->new(
 		$self->{DataFile},
-		$self->{SBoPath}
+		$self->{SBoPath},
+		$self->{Blacklist}
 	);
 
 	my %missing = $sbokeeper->missing();
@@ -1032,7 +1095,8 @@ sub depextra {
 
 	my $sbokeeper = Slackware::SBoKeeper::Database->new(
 		$self->{DataFile},
-		$self->{SBoPath}
+		$self->{SBoPath},
+		$self->{Blacklist}
 	);
 
 	my %extra = $sbokeeper->extradeps();
@@ -1056,7 +1120,8 @@ sub unmanual {
 
 	my $sbokeeper = Slackware::SBoKeeper::Database->new(
 		$self->{DataFile},
-		$self->{SBoPath}
+		$self->{SBoPath},
+		$self->{Blacklist}
 	);
 
 	my @pkgs = alias_expand($sbokeeper, $self->{Args});
@@ -1098,7 +1163,8 @@ sub sbokeeper_print {
 
 	my $sbokeeper = Slackware::SBoKeeper::Database->new(
 		$self->{DataFile},
-		$self->{SBoPath}
+		$self->{SBoPath},
+		$self->{Blacklist}
 	);
 
 	my @pkgs;
@@ -1128,7 +1194,8 @@ sub tree {
 
 	my $sbokeeper = Slackware::SBoKeeper::Database->new(
 		$self->{DataFile},
-		$self->{SBoPath}
+		$self->{SBoPath},
+		$self->{Blacklist}
 	);
 
 	my @pkgs;
@@ -1160,7 +1227,8 @@ sub rtree {
 
 	my $sbokeeper = Slackware::SBoKeeper::Database->new(
 		$self->{DataFile},
-		$self->{SBoPath}
+		$self->{SBoPath},
+		$self->{Blacklist}
 	);
 
 	my @pkgs = alias_expand($sbokeeper, $self->{Args});
@@ -1177,6 +1245,7 @@ sub rtree {
 
 }
 
+# TODO: Blacklisted packages might still show up in dump.
 sub dump {
 
 	my $self = shift;
@@ -1216,6 +1285,7 @@ sub init {
 	my $class = shift;
 
 	my $self = {
+		Blacklist   => 0,
 		ConfigFile  => '',
 		DataFile    => '',
 		SBoPath     => '',
@@ -1225,8 +1295,11 @@ sub init {
 		Args        => [],
 	};
 
+	my $blacklist = undef;
+
 	Getopt::Long::config('bundling');
 	GetOptions(
+		'blacklist|B=s'    => \$blacklist,
 		'config|c=s'       => \$self->{ConfigFile},
 		'datafile|d=s'     => \$self->{DataFile},
 		'sbodir|s=s'       => \$self->{SBoPath},
@@ -1254,6 +1327,18 @@ sub init {
 	$self->{Command} = lc shift @ARGV;
 
 	$self->{Args} = [@ARGV];
+
+	if (defined $blacklist) {
+
+		if (-f $blacklist) {
+			$self->{Blacklist} = { read_blacklist($blacklist) };
+		} else {
+			$self->{Blacklist} = { map { $_ => 1 } split /\s/, $blacklist };
+		}
+
+	}
+
+	$self->{Blacklist} ||= {};
 
 	unless ($self->{DataFile}) {
 		make_path($DEFAULT_DATADIR) unless -d $DEFAULT_DATADIR;
@@ -1356,6 +1441,10 @@ Runs L<sbokeeper>.
 Get the value of attribute C<$get>. The following are valid attributes:
 
 =over 4
+
+=item Blacklist
+
+Hash ref of blacklisted packages.
 
 =item ConfigFile
 

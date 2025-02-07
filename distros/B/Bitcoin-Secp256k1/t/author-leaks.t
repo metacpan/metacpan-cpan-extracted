@@ -34,6 +34,10 @@ Test::MemoryGrowth::no_growth {
 
 	my $signature = $secp->sign_message($private_key, $message);
 	die 'invalid sig?' unless $secp->verify_message($public_key, $signature, $message);
+
+	my $schnorr_signature = $secp->sign_message_schnorr($private_key, $message);
+	my $xonly_pubkey = $secp->xonly_public_key($public_key);
+	die 'invalid sig?' unless $secp->verify_message_schnorr($xonly_pubkey, $schnorr_signature, $message);
 }
 calls => 1000, 'construction/destruction of Bitcoin::Secp256k1 does not leak';
 

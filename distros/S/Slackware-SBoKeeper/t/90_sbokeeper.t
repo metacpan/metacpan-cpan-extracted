@@ -28,12 +28,13 @@ use Slackware::SBoKeeper::System;
 # on the system's state:
 # * pull
 
-plan tests => 96;
+plan tests => 102;
 
 my $TMP_DATA = 'tmp-data.txt';
 my $DATA_DIR = File::Spec->catfile(qw(t data datafiles));
 my $TEST_REPO = File::Spec->catfile(qw(t data repo));
 my $TEST_CONF = 'test.conf';
+my $TEST_BLACKLIST = File::Spec->catfile(qw(t data test.blacklist));
 
 my @COMMON_OPTS = (
 	'-d', $TMP_DATA,
@@ -75,13 +76,14 @@ sub slurp {
 sub create_test_config {
 
 	my $config = shift;
+	my $param  = shift;
 
 	open my $fh, '>', $config
 		or die "Failed to open $config for writing: $!";
 
-	say { $fh } "DataFile = " . File::Spec->catfile(cwd(), $TMP_DATA);
-	say { $fh } "SBoPath = "  . File::Spec->catfile(cwd(), $TEST_REPO);
-	say { $fh } "Tag = _SBo";
+	for my $k (keys %{$param}) {
+		say { $fh } "$k = $param->{$k}";
+	}
 
 	close $fh;
 
@@ -267,7 +269,50 @@ $obj = new_test_obj(qw(print
 ));
 ok($obj->run(), "'print' with all categories runs ok");
 
-create_test_config($TEST_CONF);
+unlink $TMP_DATA;
+
+$obj = new_test_obj('-B', $TEST_BLACKLIST, qw(add mpv));
+ok($obj->run(), "'add' with blacklist runs ok");
+
+is(
+	slurp($TMP_DATA),
+	slurp(File::Spec->catfile($DATA_DIR, 'blacklist.txt')),
+	"'add' w/ blacklist file added correct packages"
+);
+
+unlink $TMP_DATA;
+
+$obj = new_test_obj(
+	'-B',
+	qq(
+		python3-setuptools-opt
+		python3-packaging-opt
+		python3-build
+		python3-pyproject-hooks
+		python3-installer
+		python3-flit_core
+		python3-meson-opt
+		python3-wheel
+	),
+	qw(add mpv)
+);
+ok($obj->run(), "'add' with blacklist runs ok");
+
+is(
+	slurp($TMP_DATA),
+	slurp(File::Spec->catfile($DATA_DIR, 'blacklist.txt')),
+	"'add' w/ blacklist string added correct packages"
+);
+
+create_test_config(
+	$TEST_CONF,
+	{
+		DataFile  => File::Spec->catfile(cwd(), $TMP_DATA),
+		SBoPath   => File::Spec->catfile(cwd(), $TEST_REPO),
+		Tag       => '_SBo',
+		Blacklist => 'mpv lua luajit'
+	}
+);
 
 @ARGV = ('-c', $TEST_CONF, 'help');
 $obj = Slackware::SBoKeeper->init();
@@ -291,6 +336,42 @@ is(
 	$obj->get('Tag'),
 	'_SBo',
 	"Tag config file option is ok"
+);
+is_deeply(
+	$obj->get('Blacklist'),
+	{
+		'mpv'    => 1,
+		'lua'    => 1,
+		'luajit' => 1,
+	},
+	"Blacklist config file option is ok"
+);
+
+create_test_config(
+	$TEST_CONF,
+	{
+		DataFile  => File::Spec->catfile(cwd(), $TMP_DATA),
+		SBoPath   => File::Spec->catfile(cwd(), $TEST_REPO),
+		Blacklist => File::Spec->catfile(cwd(), $TEST_BLACKLIST),
+	}
+);
+
+@ARGV = ('-c', $TEST_CONF, 'help');
+$obj = Slackware::SBoKeeper->init();
+
+is_deeply(
+	$obj->get('Blacklist'),
+	{
+		'python3-setuptools-opt'  => 1,
+		'python3-packaging-opt'   => 1,
+		'python3-build'           => 1,
+		'python3-pyproject-hooks' => 1,
+		'python3-installer'       => 1,
+		'python3-flit_core'       => 1,
+		'python3-meson-opt'       => 1,
+		'python3-wheel'           => 1,
+	},
+	"Blacklist config option w/ blacklist file is ok"
 );
 
 END {

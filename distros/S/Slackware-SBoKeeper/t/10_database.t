@@ -6,7 +6,7 @@ use Test::More;
 
 use Slackware::SBoKeeper::Database;
 
-plan tests => 47;
+plan tests => 49;
 
 my $TEST_REPO = 't/data/repo';
 my $TEST_FILE = 'test-data-file.txt';
@@ -62,7 +62,8 @@ foreach my $p (qw(a b c d e f)) {
 
 ok(!$db->exists('@fakepkg'), 'exists() does not find fake packages');
 ok(!$db->has('@fakepkg'),    'has() does not find fake packages');
-ok($db->exists('%README%'),  '%README% is considered real');
+
+ok($db->blacklist('%README%'), '%README% is blacklisted');
 
 foreach my $p (qw(a b c d e)) {
 	ok($db->is_dependency($p, 'f'), 'is_dependency() works');
@@ -190,6 +191,22 @@ is_deeply(
 	{ 'a' => [ qw(c d) ] },
 	'extradeps() works'
 );
+
+my $db = Slackware::SBoKeeper::Database->new(
+	'',
+	$TEST_REPO,
+	{ e => 1 }
+);
+
+$db->add([ qw(f) ]);
+
+is_deeply(
+	[ $db->packages() ],
+	[ qw(a b f) ],
+	'blacklisted packages are ignored'
+);
+
+ok($db->blacklist('e'), 'blacklist() works');
 
 END {
 	unlink $TEST_FILE if -e $TEST_FILE;

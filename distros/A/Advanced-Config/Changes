@@ -18,6 +18,13 @@
 
 Version - YYYY/MM/DD
 ---------------------
+1.12 2025-02-06 08:30:00
+  - Fixed typo in POD link in Date.pm.
+  - Fixed t/70-validate_date_vars.t to handle timestamp test on even slower
+    running machines.  Increased delay allowed from 20 sec to 2 min & modified
+    test msg to say how close it is.  Grabbing the current timestamp during the
+    test is proving problematic.  (Problem is with the test, not the module.)
+
 1.11 2025-01-29 08:30:00
   - Fixed t/70-validate_date_vars.t to handle timestamp test on slow running
     machines.

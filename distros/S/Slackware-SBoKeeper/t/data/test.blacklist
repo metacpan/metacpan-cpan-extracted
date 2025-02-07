@@ -1,0 +1,10 @@
+# This file tests sbokeeper's blacklisting capabilities.
+
+python3-setuptools-opt
+python3-packaging-opt
+python3-build
+python3-pyproject-hooks
+python3-installer
+python3-flit_core
+python3-meson-opt
+python3-wheel

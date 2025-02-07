@@ -30,3 +30,10 @@ Revision history for Test-Simpler
 0.000007  Mon Nov 11 07:02:55 2013
 
     - Lobotomized for Perl 5.18 compatibility
+
+
+0.000008  Fri Feb  7 10:25:54 2025
+
+    - Handle smartmatch 3.18 retro-experimentality,
+      5.38 deprecation and (possible) 5.42 removal
+      (thanks, Andreas!)

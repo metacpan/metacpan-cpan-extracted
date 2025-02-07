@@ -4,19 +4,26 @@
 
 #define SECP256K1_STATIC
 #include <secp256k1.h>
+#include <secp256k1_extrakeys.h>
+#include <secp256k1_schnorrsig.h>
 
 #define CURVE_SIZE 32
+#define SCHNORR_SIGNATURE_SIZE 64
 
 typedef struct {
 	secp256k1_context *ctx;
 	secp256k1_pubkey *pubkey;
+	secp256k1_xonly_pubkey *xonly_pubkey;
 	secp256k1_pubkey **pubkeys;
 	unsigned int pubkeys_count;
 	secp256k1_ecdsa_signature *signature;
+	unsigned char *schnorr_signature;
 } secp256k1_perl;
 
 void secp256k1_perl_replace_pubkey(secp256k1_perl *perl_ctx, secp256k1_pubkey *new_pubkey);
+void secp256k1_perl_replace_xonly_pubkey(secp256k1_perl *perl_ctx, secp256k1_xonly_pubkey *new_pubkey);
 void secp256k1_perl_replace_signature(secp256k1_perl *perl_ctx, secp256k1_ecdsa_signature *new_signature);
+void secp256k1_perl_replace_schnorr_signature(secp256k1_perl *perl_ctx, unsigned char *new_signature);
 
 secp256k1_perl* secp256k1_perl_create()
 {
@@ -24,7 +31,9 @@ secp256k1_perl* secp256k1_perl_create()
 	secp256k1_perl *perl_ctx = malloc(sizeof *perl_ctx);
 	perl_ctx->ctx = secp_ctx;
 	perl_ctx->pubkey = NULL;
+	perl_ctx->xonly_pubkey = NULL;
 	perl_ctx->signature = NULL;
+	perl_ctx->schnorr_signature = NULL;
 	perl_ctx->pubkeys = NULL;
 	perl_ctx->pubkeys_count = 0;
 	return perl_ctx;
@@ -33,7 +42,9 @@ secp256k1_perl* secp256k1_perl_create()
 void secp256k1_perl_clear(secp256k1_perl *perl_ctx)
 {
 	secp256k1_perl_replace_pubkey(perl_ctx, NULL);
+	secp256k1_perl_replace_xonly_pubkey(perl_ctx, NULL);
 	secp256k1_perl_replace_signature(perl_ctx, NULL);
+	secp256k1_perl_replace_schnorr_signature(perl_ctx, NULL);
 
 	if (perl_ctx->pubkeys_count > 0) {
 		int i;
@@ -63,6 +74,15 @@ void secp256k1_perl_replace_pubkey(secp256k1_perl *perl_ctx, secp256k1_pubkey *n
 	perl_ctx->pubkey = new_pubkey;
 }
 
+void secp256k1_perl_replace_xonly_pubkey(secp256k1_perl *perl_ctx, secp256k1_xonly_pubkey *new_pubkey)
+{
+	if (perl_ctx->xonly_pubkey != NULL) {
+		free(perl_ctx->xonly_pubkey);
+	}
+
+	perl_ctx->xonly_pubkey = new_pubkey;
+}
+
 void secp256k1_perl_replace_signature(secp256k1_perl *perl_ctx, secp256k1_ecdsa_signature *new_signature)
 {
 	if (perl_ctx->signature != NULL) {
@@ -70,6 +90,15 @@ void secp256k1_perl_replace_signature(secp256k1_perl *perl_ctx, secp256k1_ecdsa_
 	}
 
 	perl_ctx->signature = new_signature;
+}
+
+void secp256k1_perl_replace_schnorr_signature(secp256k1_perl *perl_ctx, unsigned char *new_signature)
+{
+	if (perl_ctx->schnorr_signature != NULL) {
+		free(perl_ctx->schnorr_signature);
+	}
+
+	perl_ctx->schnorr_signature = new_signature;
 }
 
 /* HELPERS */
@@ -128,6 +157,29 @@ secp256k1_pubkey* pubkey_from_sv(secp256k1_perl *ctx, SV *data)
 	return result_pubkey;
 }
 
+secp256k1_xonly_pubkey* xonly_pubkey_from_sv(secp256k1_perl *ctx, SV *data)
+{
+	if (!SvOK(data) || SvROK(data)) {
+		croak("xonly public key must be defined and not a reference");
+	}
+
+	unsigned char *key = size_bytestr_from_sv(data, CURVE_SIZE, "xonly pubkey");
+
+	secp256k1_xonly_pubkey *result_pubkey = malloc(sizeof *result_pubkey);
+	int result = secp256k1_xonly_pubkey_parse(
+		ctx->ctx,
+		result_pubkey,
+		key
+	);
+
+	if (!result) {
+		free(result_pubkey);
+		croak("the input does not appear to be a valid xonly public key");
+	}
+
+	return result_pubkey;
+}
+
 void copy_bytestr(unsigned char *to, unsigned char *from, size_t size)
 {
 	int i;
@@ -154,7 +206,7 @@ SV*
 new(classname)
 		SV *classname
 	CODE:
-		/* Calling Bytes::Random::Secure to randomize context */
+		/* Calling perl function to randomize context */
 		dSP;
 		PUSHMARK(SP);
 
@@ -243,6 +295,34 @@ _pubkey(self, ...)
 	OUTPUT:
 		RETVAL
 
+# Getter / setter for the xonly public key
+SV*
+_xonly_pubkey(self, ...)
+		SV *self
+	CODE:
+		secp256k1_perl *ctx = ctx_from_sv(self);
+		if (items > 1 && SvOK(ST(1))) {
+			SV *pubkey_data = ST(1);
+			secp256k1_xonly_pubkey *new_pubkey = xonly_pubkey_from_sv(ctx, pubkey_data);
+			secp256k1_perl_replace_xonly_pubkey(ctx, new_pubkey);
+		}
+
+		if (ctx->xonly_pubkey != NULL) {
+			unsigned char key_output[CURVE_SIZE];
+			secp256k1_xonly_pubkey_serialize(
+				ctx->ctx,
+				key_output,
+				ctx->xonly_pubkey
+			);
+
+			RETVAL = newSVpv((char*) key_output, CURVE_SIZE);
+		}
+		else {
+			RETVAL = &PL_sv_undef;
+		}
+	OUTPUT:
+		RETVAL
+
 # Getter / setter for the signature
 SV*
 _signature(self, ...)
@@ -292,6 +372,35 @@ _signature(self, ...)
 	OUTPUT:
 		RETVAL
 
+# Getter / setter for the schnorr signature
+SV*
+_signature_schnorr(self, ...)
+		SV *self
+	CODE:
+		secp256k1_perl *ctx = ctx_from_sv(self);
+		if (items > 1 && SvOK(ST(1))) {
+			SV *new_signature = ST(1);
+			if (SvROK(new_signature)) {
+				croak("signature must not be a reference");
+			}
+
+			unsigned char *signature = size_bytestr_from_sv(new_signature, SCHNORR_SIGNATURE_SIZE, "Schnorr signature");
+
+			unsigned char *result_signature = malloc(sizeof *result_signature * SCHNORR_SIGNATURE_SIZE);
+			memcpy(result_signature, signature, sizeof *result_signature * SCHNORR_SIGNATURE_SIZE);
+
+			secp256k1_perl_replace_schnorr_signature(ctx, result_signature);
+		}
+
+		if (ctx->schnorr_signature != NULL) {
+			RETVAL = newSVpv((char*) ctx->schnorr_signature, SCHNORR_SIGNATURE_SIZE);
+		}
+		else {
+			RETVAL = &PL_sv_undef;
+		}
+	OUTPUT:
+		RETVAL
+
 void
 _push_pubkey(self)
 		SV *self
@@ -330,6 +439,31 @@ _create_pubkey(self, privkey)
 		}
 
 		secp256k1_perl_replace_pubkey(ctx, result_pubkey);
+
+# Convert pubkey to xonly pubkey
+void
+_convert_pubkey_xonly(self)
+		SV *self
+	CODE:
+		secp256k1_perl *ctx = ctx_from_sv(self);
+		if (ctx->pubkey == NULL) {
+			croak("converting pubkey to xonly requires a pubkey");
+		}
+
+		secp256k1_xonly_pubkey *xonly_pubkey = malloc(sizeof *xonly_pubkey);
+		int result = secp256k1_xonly_pubkey_from_pubkey(
+			ctx->ctx,
+			xonly_pubkey,
+			NULL,
+			ctx->pubkey
+		);
+
+		if (!result) {
+			free(xonly_pubkey);
+			croak("converting pubkey failed");
+		}
+
+		secp256k1_perl_replace_xonly_pubkey(ctx, xonly_pubkey);
 
 # Normalizes a signature. Returns false value if signature was already normalized
 SV*
@@ -377,6 +511,31 @@ _verify(self, message)
 	OUTPUT:
 		RETVAL
 
+# Verifies a Schnorr signature
+SV*
+_verify_schnorr(self, message)
+		SV *self
+		SV *message
+	CODE:
+		secp256k1_perl *ctx = ctx_from_sv(self);
+		if (ctx->xonly_pubkey == NULL || ctx->schnorr_signature == NULL) {
+			croak("verification requires both xonly pubkey and schnorr signature");
+		}
+
+		unsigned char *message_str = size_bytestr_from_sv(message, CURVE_SIZE, "digest");
+
+		int result = secp256k1_schnorrsig_verify(
+			ctx->ctx,
+			ctx->schnorr_signature,
+			message_str,
+			CURVE_SIZE,
+			ctx->xonly_pubkey
+		);
+
+		RETVAL = result ? &PL_sv_yes : &PL_sv_no;
+	OUTPUT:
+		RETVAL
+
 # Signs a digest
 void
 _sign(self, privkey, message)
@@ -405,6 +564,70 @@ _sign(self, privkey, message)
 		}
 
 		secp256k1_perl_replace_signature(ctx, result_signature);
+
+# Signs a digest with Schnorr
+void
+_sign_schnorr(self, privkey, message)
+		SV* self
+		SV* privkey
+		SV* message
+	CODE:
+		secp256k1_perl *ctx = ctx_from_sv(self);
+
+		unsigned char *message_str = size_bytestr_from_sv(message, CURVE_SIZE, "digest");
+		unsigned char *seckey_str = size_bytestr_from_sv(privkey, CURVE_SIZE, "private key");
+
+		secp256k1_keypair keypair;
+		int result = secp256k1_keypair_create(
+			ctx->ctx,
+			&keypair,
+			seckey_str
+		);
+
+		if (!result) {
+			croak("creating a keypair failed");
+		}
+
+		/* Calling perl function to get auxiliary randomness */
+		dSP;
+		PUSHMARK(SP);
+
+		SV *tmp = newSViv(CURVE_SIZE);
+
+		EXTEND(SP, 1);
+		PUSHs(tmp);
+		PUTBACK;
+
+		size_t count = call_pv("Bitcoin::Secp256k1::_schnorr_aux_random", G_SCALAR);
+		SvREFCNT_dec(tmp);
+
+		SPAGAIN;
+
+		if (count != 1) {
+			croak("fetching randomness went wrong in Bitcoin::Secp256k1::_sign_schnorr");
+		}
+
+		tmp = POPs;
+		PUTBACK;
+
+		/* Randomness dump */
+		/* for (int i = 0; i < len; ++i) { warn("%d: %d", i, randomize[i]); } */
+
+		unsigned char *result_signature = malloc(sizeof *result_signature * SCHNORR_SIGNATURE_SIZE);
+		result = secp256k1_schnorrsig_sign32(
+			ctx->ctx,
+			result_signature,
+			message_str,
+			&keypair,
+			SvOK(tmp) ? size_bytestr_from_sv(tmp, CURVE_SIZE, "auxiliary randomness") : NULL
+		);
+
+		if (!result) {
+			free(result_signature);
+			croak("Schnorr signing failed");
+		}
+
+		secp256k1_perl_replace_schnorr_signature(ctx, result_signature);
 
 # Checks whether a private key is valid
 SV*

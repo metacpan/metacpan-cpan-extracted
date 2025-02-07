@@ -17,7 +17,7 @@ open my $out_fh, '>', \$output;
 my $start_time;
 
 # Long form, non-zero delay fail...
-if (prompt q{}, -timeout=>1.5, -out=>$out_fh) {
+if (prompt q{}, -verbatim, -timeout=>1.5, -out=>$out_fh) {
     fail 'Time-out of -timeout=>1.5'; 
 }
 else {
@@ -25,7 +25,7 @@ else {
 }
 
 # Long form, instantaneous fail...
-if (prompt q{}, -timeout=>0, -out=>$out_fh) {
+if (prompt q{}, -verbatim, -timeout=>0, -out=>$out_fh) {
     fail 'Time-out of -timeout=>0'; 
 }
 else {
@@ -33,7 +33,7 @@ else {
 }
 
 # Short form, non-zero delay fail...
-if (prompt q{}, -t1, -out=>$out_fh) {
+if (prompt q{}, -verbatim, -t1, -out=>$out_fh) {
     fail 'Time-out of -t1'; 
 }
 else {
@@ -41,7 +41,7 @@ else {
 }
 
 # Short form, instantaneous fail...
-if (prompt q{}, -t0, -out=>$out_fh) {
+if (prompt q{}, -verbatim, -t0, -out=>$out_fh) {
     fail 'Time-out of -t0'; 
 }
 else {

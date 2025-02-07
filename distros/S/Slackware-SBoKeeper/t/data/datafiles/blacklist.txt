@@ -1,0 +1,24 @@
+PACKAGE: libass
+DEPS: 
+MANUAL: 0
+%%
+PACKAGE: libplacebo
+DEPS: python3-glad
+MANUAL: 0
+%%
+PACKAGE: luajit
+DEPS: 
+MANUAL: 0
+%%
+PACKAGE: mpv
+DEPS: libass libplacebo luajit mujs
+MANUAL: 1
+%%
+PACKAGE: mujs
+DEPS: 
+MANUAL: 0
+%%
+PACKAGE: python3-glad
+DEPS: 
+MANUAL: 0
+%%

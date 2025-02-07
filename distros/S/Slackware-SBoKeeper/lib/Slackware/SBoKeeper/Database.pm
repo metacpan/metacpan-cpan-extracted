@@ -1,19 +1,10 @@
 package Slackware::SBoKeeper::Database;
 use 5.016;
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 use strict;
 use warnings;
 
 use List::Util qw(any uniq);
-
-my @VALID_FIELDS = qw(Deps Manual);
-
-my $DELIMIT = '%%';
-
-# SlackBuilds can put %README% in the REQUIRES to indicate the user should read
-# the README for important information regarding dependencies. Since %README%
-# doesn't actually exist as a package, we need to ignore it when it comes up.
-my $DEP_README = '%README%';
 
 sub write_data {
 
@@ -27,7 +18,7 @@ sub write_data {
 		say { $fh } "PACKAGE: $p";
 		say { $fh } "DEPS: ", join(' ', @{$data->{$p}->{Deps}});
 		say { $fh } "MANUAL: $data->{$p}->{Manual}";
-		say { $fh } $DELIMIT;
+		say { $fh } '%%';
 
 	}
 
@@ -37,7 +28,9 @@ sub write_data {
 
 sub read_data {
 
-	my $file = shift;
+	my $file      = shift;
+	my $blacklist = shift // {};
+
 	my $data = {};
 
 	open my $fh, '<', $file or die "Failed to open $file for reading: $!\n";
@@ -49,7 +42,7 @@ sub read_data {
 
 		chomp $l;
 
-		if ($l eq $DELIMIT) {
+		if ($l eq '%%') {
 			$pkg = '';
 		} elsif ($l =~ /^PACKAGE: /) {
 			$pkg = $l =~ s/^PACKAGE: //r;
@@ -58,7 +51,9 @@ sub read_data {
 			die "Bad line in $file at line $lnum: PACKAGE not set\n";
 		} elsif ($l =~ /^DEPS: /) {
 			my $depstr = $l =~ s/^DEPS: //r;
-			@{$data->{$pkg}->{Deps}} = split /\s/, $depstr;
+			@{$data->{$pkg}->{Deps}} =
+				grep { not exists $blacklist->{$_} }
+				split /\s/, $depstr;
 		} elsif ($l =~ /^MANUAL: /) {
 			my $manual = $l =~ s/^MANUAL: //r;
 			$data->{$pkg}->{Manual} = $manual eq '1' ? 1 : 0;
@@ -72,23 +67,32 @@ sub read_data {
 
 	close $fh;
 
+	# Weed out blacklisted packages
+	for my $p (keys %{$blacklist}) {
+		delete $data->{$p};
+	}
+
 	return $data;
 
 }
 
 sub new {
 
-	my $class  = shift;
-	my $file   = shift;
-	my $sbodir = shift;
+	my $class     = shift;
+	my $file      = shift;
+	my $sbodir    = shift;
+	my $blacklist = shift // {};
+
+	$blacklist->{'%README%'} = 1;
 
 	my $self = {
-		_data   => {},
-		_sbodir => '',
+		_data      => {},
+		_sbodir    => '',
+		_blacklist => $blacklist,
 	};
 
 	if ($file) {
-		$self->{_data} = read_data($file);
+		$self->{_data} = read_data($file, $self->{_blacklist});
 	}
 
 	$self->{_sbodir} = $sbodir;
@@ -107,6 +111,8 @@ sub add {
 	my @added;
 
 	foreach my $p (@{$pkgs}) {
+
+		next if $self->blacklist($p);
 
 		unless ($self->exists($p)) {
 			die "$p does not exist in SlackBuild repo\n";
@@ -140,24 +146,30 @@ sub tack {
 	my $pkgs   = shift;
 	my $manual = shift;
 
+	my @tack;
+
 	foreach my $p (@{$pkgs}) {
+
+		next if $self->blacklist($p);
 
 		unless ($self->exists($p)) {
 			die "$p does not exist in SlackBuild repo\n";
 		}
 
-		if (defined $self->{_data}->{$p}) {
-			$self->{_data}->{$p}->{Manual} = $manual if $manual;
+		if (defined $self->{_data}->{$p} and $manual) {
+			$self->{_data}->{$p}->{Manual} = $manual;
+			push @tack, $p;
 		} else {
 			$self->{_data}->{$p} = {
 				Deps   => [],
 				Manual => $manual,
-			}
+			};
+			push @tack, $p;
 		}
 
 	}
 
-	return @{$pkgs};
+	return @tack;
 
 }
 
@@ -197,6 +209,8 @@ sub depadd {
 
 	my @add;
 	foreach my $d (@{$deps}) {
+
+		next if $self->blacklist($d);
 
 		unless ($self->has($d)) {
 			warn "$d not present in database, skipping\n";
@@ -372,13 +386,22 @@ sub exists {
 	my $self = shift;
 	my $pkg  = shift;
 
-	return 1 if $pkg eq $DEP_README;
+	return 0 if $self->blacklist($pkg);
 
 	if (() = glob "$self->{_sbodir}/*/$pkg/$pkg.info") {
 		return 1;
 	} else {
 		return 0;
 	}
+
+}
+
+sub blacklist {
+
+	my $self = shift;
+	my $pkg  = shift;
+
+	return exists $self->{_blacklist}->{$pkg};
 
 }
 
@@ -447,7 +470,7 @@ sub real_immediate_dependencies {
 
 		my ($depstr) = $l =~ /^REQUIRES="(.*)("|\\)/;
 
-		@deps = grep { $_ ne $DEP_README } split(/\s/, $depstr);
+		@deps = grep { !$self->blacklist($_) } split /\s/, $depstr;
 
 		while (substr($l, -1) eq '\\') {
 
@@ -456,7 +479,7 @@ sub real_immediate_dependencies {
 
 			($depstr) = $l =~ /(^.*)("|\\)/;
 
-			push @deps, grep { $_ ne $DEP_README } split(" ", $depstr);
+			push @deps, grep { !$self->blacklist($_) } split(" ", $depstr);
 
 		}
 
@@ -528,11 +551,14 @@ L<sbokeeper>. For user documentation of L<sbokeeper>, please consult its manual.
 
 =head1 SUBROUTINES/METHODS
 
-=head2 new($path, $sbodir)
+=head2 new($path, $sbodir, [ $blacklist ])
 
 Returns blessed Slackware::SBoKeeper::Database object. $path is the path to a
 file containing B<sbokeeper> data. If $path is '', creates an empty
 database. $sbodir is the directory where the SBo repository is stored.
+
+$blacklist is a hash ref of packages to ignore. Defaults to empty hash ref if
+no hash is supplied.
 
 =head2 add($pkgs, $manual)
 
@@ -612,6 +638,10 @@ Checks if $pkg is manually installed. Returns 1 for yes, 0 no.
 
 Checks if $pkg is present in repo. Returns 1 for yes, 0 for no.
 
+=head2 blacklist($pkg)
+
+Checks if $pkg is in the blacklist. Returns 1 for yes, 0 for no.
+
 =head2 dependencies($pkg)
 
 Returns list of packages that are a dependency of $pkg, according to the
@@ -645,6 +675,39 @@ Unset $pkg as manually installed. Returns 1 if successful, 0 if not.
 =head2 write($path)
 
 Write data file to $path.
+
+=head1 DATA FILES
+
+B<sbokeeper> data files are text files. Data files contain packages, which are
+a series of lines that contain package information ended by a pair of percentage
+signs (%%). A package entry should look something like this:
+
+ PACKAGE: libreoffice
+ DEPS: avahi zulu-openjdk8
+ MANUAL: 1
+ %%
+
+=over 4
+
+=item PACKAGE
+
+Name of the package, which must have a corresponding SlackBuild in the
+configured SlackBuild repo. This must be the first line in a package entry.
+
+=item DEPS
+
+Whitespace-seperated list of packages that PACKAGE depends on. Each package
+must be present in the SlackBuild repo.
+
+=item MANUAL
+
+Specifies whether the package was manually added or not. 1 for yes, 0 for no.
+
+=item %%
+
+Marks the end of the current package entry.
+
+=back
 
 =head1 AUTHOR
 

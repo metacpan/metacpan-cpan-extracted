@@ -1,3 +1,8 @@
+0.004 - 2025-02-06
+  * New features for constructing string tables, see ->data and ->data_str
+  * No longer using Moo
+  * Hello World example script for Linux
+
 0.003 - 2025-01-26
   * Add support for RIP-relative addressing
   * 'data_X' methods are now chainable

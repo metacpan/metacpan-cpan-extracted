@@ -1,5 +1,14 @@
 This file documents the revision history for Perl extension DBIx::Migration.
 
+0.10 Fri Feb  7 10:11:04 CET 2025
+        - Add API test
+        - Describe tests
+        - Use bind parameters consistently
+        - Don't use bareword directory handles
+        - Fix to version 0 migrate
+        - Use database transactions
+        - Update documentation
+
 0.09 Wed Jan 29 09:09:14 CET 2025
         - Consider CPAN testers feedback: fix Test::PostgreSQL::new()
           exception handling in unit test script
@@ -17,12 +26,12 @@ This file documents the revision history for Perl extension DBIx::Migration.
         - Added DBD::SQLite dependency
 
 0.06  Tue Oct 19 09:27:56 PDT 2010
-	- Fix [RT #35393]
+        - Fix [RT #35393]
 
 0.05  2006-06-06 12:44:12 PDT 2006
-	- Fixed to work on Win32 (remove glob calls)
-	- Use 'name' instead of 'key' for the dbix_migration table, as 'key'
-	  is a reserved word in many/most databases.
+        - Fixed to work on Win32 (remove glob calls)
+        - Use 'name' instead of 'key' for the dbix_migration table, as 'key'
+          is a reserved word in many/most databases.
 
 0.04  2005-11-18 00:00:00
         - Fixed multi-digit revisions (David Christensen)

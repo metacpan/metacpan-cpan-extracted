@@ -12,7 +12,7 @@ use YAML::PP;
 use Capture::Tiny ':all';
 use File::Basename;
 
-$Qiime2::Artifact::VERSION = '0.10.7';
+$Qiime2::Artifact::VERSION = '0.12.0';
 
 sub _crash($ $);
 
@@ -342,24 +342,25 @@ sub _verbose {
   }
   return 0;
 }
+
+
+
 sub _YAMLLoad {
   my ($string, $info) = @_;
   my $ypp = YAML::PP->new;
-
   unless (length($string)) {
     _crash undef, "YAML string empty: unexpected error";
   }
-
   my $result = eval {
     $ypp->load_string($string);
   };
-
   if ($@) {
     _crash undef, "YAMLLoad failed on string $info:\n------------------------------------------------\n$string";
   } else {
     return $result;
   }
 }
+
 
 sub _crash($ $) {
   my ($self, $msg) = @_;
@@ -388,7 +389,7 @@ Qiime2::Artifact - A parser for Qiime2 artifact files
 
 =head1 VERSION
 
-version 0.10.7
+version 0.12.0
 
 =head1 Wiki
 

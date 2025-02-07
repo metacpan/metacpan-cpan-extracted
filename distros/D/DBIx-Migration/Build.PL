@@ -13,6 +13,10 @@ my $build = Module::Build->new(
   },
   test_requires => {
     'DBD::SQLite'      => 0,
+    'Test::API'        => 0,
+    'Test::Deep'       => 0,
+    'Test::Fatal'      => 0,
+    'Test::More'       => 1.001005,    # Subtests accept args
     'Test::PostgreSQL' => 0
   },
   recommends => {
@@ -21,10 +25,12 @@ my $build = Module::Build->new(
     'Test::Pod::Coverage' => 1.04
   },
   requires => {
+    'perl'                  => '5.8.9',
+    'Class::Accessor::Fast' => 0,
+    'DBI'                   => 1.33,      # DBI::clone() is in use
     'File::Slurp'           => 0,
     'File::Spec'            => 0,
-    'DBI'                   => 1.33,    # DBI::clone() is in use
-    'Class::Accessor::Fast' => 0
+    'Try::Tiny'             => 0
   },
   create_readme => 1,
   script_files  => [ glob( 'script/*' ) ],

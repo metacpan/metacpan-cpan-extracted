@@ -38,20 +38,47 @@ subtest 'should normalize a signature' => sub {
 subtest 'should sign and verify a message' => sub {
 	is $secp->sign_message($t{privkey}, $t{preimage}), $t{sig}, 'message signed ok';
 	ok $secp->verify_message($t{pubkey}, $t{sig}, $t{preimage}), 'message verified ok';
+	ok !$secp->verify_message($t{pubkey}, $t{bad_sig}, $t{preimage}), 'bad signature ok';
 
 	is warns {
 		ok $secp->verify_message($t{pubkey}, $t{sig_unn}, $t{preimage}), 'unnormalized signature verified ok';
 	}, 1, 'unnormalized signature warning ok';
 };
 
+subtest 'should sign and verify a message (schnorr)' => sub {
+	local $Bitcoin::Secp256k1::FORCED_SCHNORR_AUX_RAND = $t{rand};
+	is $secp->sign_message_schnorr($t{privkey}, $t{preimage}), $t{sig_schnorr}, 'message signed ok';
+	ok $secp->verify_message_schnorr($t{xonly_pubkey}, $t{sig_schnorr}, $t{preimage}), 'message verified ok';
+	ok !$secp->verify_message_schnorr($t{xonly_pubkey}, $t{bad_sig_schnorr}, $t{preimage}), 'bad signature ok';
+};
+
 subtest 'should sign and verify a digest' => sub {
 	is $secp->sign_digest($t{privkey}, sha256(sha256($t{preimage}))), $t{sig}, 'digest signed ok';
 	ok $secp->verify_digest($t{pubkey}, $t{sig}, sha256(sha256($t{preimage}))), 'digest verified ok';
+	ok !$secp->verify_digest($t{pubkey}, $t{bad_sig}, sha256(sha256($t{preimage}))), 'digest verified ok';
 
 	is warns {
 		ok $secp->verify_digest($t{pubkey}, $t{sig_unn}, sha256(sha256($t{preimage}))),
 			'unnormalized signature verified ok';
 	}, 1, 'unnormalized signature warning ok';
+};
+
+subtest 'should sign and verify a digest (schnorr)' => sub {
+	local $Bitcoin::Secp256k1::FORCED_SCHNORR_AUX_RAND = $t{rand};
+	is $secp->sign_digest_schnorr($t{privkey}, sha256($t{preimage})), $t{sig_schnorr}, 'digest signed ok';
+	ok $secp->verify_digest_schnorr($t{xonly_pubkey}, $t{sig_schnorr}, sha256($t{preimage})), 'digest verified ok';
+	ok !$secp->verify_digest_schnorr($t{xonly_pubkey}, $t{bad_sig_schnorr}, sha256($t{preimage})),
+		'bad signature ok';
+};
+
+subtest 'should sign and verify a message (schnorr) with auxiliary randomness' => sub {
+	my $sig = $secp->sign_message_schnorr($t{privkey}, $t{preimage});
+	isnt $sig, $t{sig_schnorr}, 'message signed ok';
+	ok $secp->verify_message_schnorr($t{xonly_pubkey}, $sig, $t{preimage}), 'message verified ok';
+};
+
+subtest 'should get a xonly public key' => sub {
+	is $secp->xonly_public_key($t{pubkey}), $t{xonly_pubkey}, 'xonly public key ok';
 };
 
 subtest 'should negate' => sub {

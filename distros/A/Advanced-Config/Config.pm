@@ -62,7 +62,7 @@ use strict;
 use warnings;
 
 # The version of this module!
-our $VERSION = "1.11";
+our $VERSION = "1.12";
 
 use File::Basename;
 use File::Copy;

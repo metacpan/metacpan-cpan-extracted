@@ -19,7 +19,13 @@ my @files = (
     't/data/10.golf.board.txt',
     't/data/26464608654870335080.bh.board.txt',
     't/data/27.bh.board.txt',
-    't/data/35.golf.board.txt'
+    't/data/35.golf.board.txt',
+    't/data/run-2-to-3-with-3-unsolved/bh2.board',
+    't/data/run-2-to-3-with-3-unsolved/bh3.board',
+    't/data/run-with-max-iters-2000/bh11.board',
+    't/data/run-with-max-iters-2000/bh12.board',
+    't/data/run-with-max-iters-2000/bh13.board',
+    't/data/run-with-max-iters-2000/bh25.board'
 );
 
 notabs_ok($_) foreach @files;

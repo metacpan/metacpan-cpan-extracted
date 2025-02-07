@@ -75,6 +75,8 @@ my @include = qw(
   Mojolicious
   Plack
   Catalyst
+  builtin
+  builtin::Backport
 );
 
 my @exclude = qw(

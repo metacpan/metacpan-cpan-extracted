@@ -1,6 +1,13 @@
 # NOTE THAT v0.xx ARE PRE-RELEASES
 
-0.10.7	2020-02
+0.12.0	2024-02-04
+	* Added "qzoom" binary 
+
+0.11.0  2024-02-01
+	* Require YAML::PP 0.38 (will not work with 0.38.1+)
+	* Removed old documentation
+
+0.10.7	2020-02-01
 	* get() method to retrieve artifact data dying if the key is not found
 	* Code cleanup, POD updates
 	* added test artifacts and improved tests coverage

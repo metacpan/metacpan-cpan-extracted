@@ -6,6 +6,7 @@ data/test4.csv
 data/test5.csv
 data/test6.xml
 data/test7.csv
+data/test8.psv
 lib/Database/Abstraction.pm
 LICENSE
 Makefile.PL
@@ -32,6 +33,7 @@ t/lib/Database/test4.pm
 t/lib/Database/test5.pm
 t/lib/Database/test6.pm
 t/lib/Database/test7.pm
+t/lib/Database/test8.pm
 t/lib/MyLogger.pm
 t/logger.t
 t/no_entry.t
@@ -46,6 +48,7 @@ t/pod.t
 t/psv.t
 t/tabs.t
 t/test7.t
+t/test8.t
 t/two_databases.t
 t/vars.t
 t/version.t

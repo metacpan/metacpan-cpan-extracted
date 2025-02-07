@@ -502,7 +502,7 @@ use warnings;
 use vars qw( @ISA @EXPORT @EXPORT_OK $VERSION );
 use Exporter;
 
-$VERSION = "1.11";
+$VERSION = "1.12";
 @ISA = qw( Exporter );
 
 @EXPORT = qw( get_read_opts  get_get_opts  get_date_opts

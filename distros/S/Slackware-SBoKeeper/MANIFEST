@@ -19,6 +19,7 @@ t/40_home.t
 t/90_sbokeeper.t
 t/data/datafiles/add.txt
 t/data/datafiles/addish.txt
+t/data/datafiles/blacklist.txt
 t/data/datafiles/depadd.txt
 t/data/datafiles/deprm.txt
 t/data/datafiles/rm.txt
@@ -61,4 +62,5 @@ t/data/repo/mpv/python3-setuptools-opt/python3-setuptools-opt.SlackBuild
 t/data/repo/mpv/python3-wheel/python3-wheel.info
 t/data/repo/mpv/python3-wheel/python3-wheel.SlackBuild
 t/data/repo/README
+t/data/test.blacklist
 t/data/test.conf

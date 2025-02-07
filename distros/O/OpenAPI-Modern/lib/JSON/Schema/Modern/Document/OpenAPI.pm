@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document::OpenAPI;
 # ABSTRACT: One OpenAPI v3.1 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.079';
+our $VERSION = '0.080';
 
 use 5.020;
 use Moo;
@@ -75,6 +75,9 @@ has _operationIds => (
 sub get_operationId_path { $_[0]->_operationIds->{$_[1]} }
 sub _add_operationId { $_[0]->_operationIds->{$_[1]} = Str->($_[2]) }
 
+# called by this class's base class constructor, in order to validate the integrity of the document
+# and identify all important details about this document, such as entity locations, referenceable
+# identifiers, operationIds, etc.
 sub traverse ($self, $evaluator, $config_override = {}) {
   croak join(', ', sort keys %$config_override), ' not supported as a config override in traverse'
     if keys %$config_override;
@@ -358,6 +361,8 @@ sub _add_vocab_and_default_schemas ($self) {
 }
 
 # https://spec.openapis.org/oas/v3.1#schema-object
+# traverse this JSON Schema and identify all errors, subschema locations, and referenceable
+# identifiers
 sub _traverse_schema ($self, $state) {
   my $schema = $self->get($state->{schema_path});
   return if not is_plain_hashref($schema) or not keys %$schema;
@@ -426,7 +431,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.1 document
 
 =head1 VERSION
 
-version 0.079
+version 0.080
 
 =head1 SYNOPSIS
 

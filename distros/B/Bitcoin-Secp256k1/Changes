@@ -1,5 +1,12 @@
 Revision history for Bitcoin-Secp256k1
 
+0.004 - 2025-02-06
+	[New interface]
+	- Added methods sign_message_schnorr, sign_digest_schnorr
+	- Added methods verify_message_schnorr, verify_digest_schnorr
+	- Added package variable $FORCED_SCHNORR_AUX_RAND
+	- Added method xonly_public_key
+
 0.003 - 2024-10-22
 	[New interface]
 	- Added method combine_public_keys

@@ -82,7 +82,7 @@ use vars qw( @ISA @EXPORT @EXPORT_OK $VERSION );
 use Exporter;
 
 use Fred::Fish::DBUG 2.09 qw / on_if_set  ADVANCED_CONFIG_FISH /;
-$VERSION = "1.11";
+$VERSION = "1.12";
 @ISA = qw( Exporter );
 
 @EXPORT = qw( get_languages
@@ -1925,7 +1925,7 @@ L<Advanced::Config::Reader> - Handles the parsing of the config file.
 
 L<Advanced::Config::Examples> - Provides some sample config files and commentary.
 
-L<Date::Languase> - Provides foreign language support.
+L<Date::Language> - Provides foreign language support.
 
 L<Date::Manip> - Provides additional foreign language support.
 

@@ -17,21 +17,19 @@ use lib 't/lib';
 use Helper;
 
 my $accepter = Test::JSON::Schema::Acceptance->new(
-  include_optional => 1,
   verbose => 1,
   test_schemas => 0,  # some schemas are not valid, as we are testing error handling in traverse()
   specification => 'draft2020-12',
-  include_optional => 0,
   test_dir => 't/oas-vocabulary',
 );
-$accepter->_json_decoder->allow_bignum; # TODO: switch to public accessor with TJSA 1.015
+$accepter->json_decoder->allow_bignum if Test::JSON::Schema::Acceptance->VERSION < '1.022';
 
 my $js = JSON::Schema::Modern->new(
   specification_version => 'draft2020-12',
   validate_formats => 1,
 );
 
-# construct a minimal document in order to get the vocabulary and formats added
+# construct a minimal document in order to get the vocabulary and formats loaded
 my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
   evaluator => $js,
   schema => {
@@ -60,14 +58,11 @@ $accepter->acceptance(
     $result->valid;
   },
   @ARGV ? (tests => { file => \@ARGV }) : (),
-  todo_tests => [
-    # this was added to the schema in https://github.com/OAI/OpenAPI-Specification/pulls/3137 but
-    # needs to be backed out because these keywords need not be adjacent to 'discriminator'.
-    { file => 'discriminator.json', test_description => 'missing oneOf, anyOf, allOf' },
-  ],
 );
 
 path('t/results/oas-vocabulary.txt')->spew_utf8($accepter->results_text)
   if -d '.git' or $ENV{AUTHOR_TESTING} or $ENV{RELEASE_TESTING};
 
 done_testing;
+__END__
+see t/results/oas-vocabulary.txt for test results

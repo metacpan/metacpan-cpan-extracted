@@ -7,4 +7,6 @@ lib/Test/Simpler.pm
 t/00.load.t
 t/basic.t
 t/basic_fail.t
-META.yml                                 Module meta-data (added by MakeMaker)
+t/smartmatch.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

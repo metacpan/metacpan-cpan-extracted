@@ -1,23 +1,12 @@
-#! /usr/bin/env polyperl
-use 5.014; use warnings; use autodie;
+use 5.014;
+use warnings;
+use autodie;
 
 use Test::More;
-use Test::Simpler tests => 7;
+use Test::Simpler tests => 6;
 
 TODO:{
     local $TODO = 'These are supposed to fail';
-
-    {
-        my $expected = [ { a => 1, b => 2, c => 3 }, 'c' ];
-        my @got      = ( { a => 1, b => 2 }, 'c' );
-
-        ok
-            @got
-            ~~
-            $expected
-
-        => 'Test 1';
-    }
 
     {
         my @got = ( { a => 1, b => 2222 }, 'c' );
@@ -31,13 +20,13 @@ TODO:{
         my $got = [ { a => 1, b => 2 }, 'c' ];
 
         ok $got->[0]{'B'} =~ $expected
-        => 'Test 3';
+        => 'Test 2';
     }
 
     {
         my $got = 1.5;
 
-        ok +(0 < $got && $got < 1), 'Test 4';
+        ok +(0 < $got && $got < 1), 'Test 3';
     }
 
     {

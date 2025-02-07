@@ -23,10 +23,11 @@ use constant EX_FAILURE => 1;
 use constant LINESZ => 16;
 use constant PRINTMAX => 126;
 
-use vars qw/ $opt_A $opt_a $opt_B $opt_b $opt_c $opt_d $opt_e $opt_F $opt_f
-$opt_H $opt_i $opt_j $opt_l $opt_N $opt_O $opt_o $opt_s $opt_v $opt_X $opt_x /;
+use vars qw/ $opt_A $opt_a $opt_B $opt_b $opt_c $opt_D $opt_d $opt_e $opt_F
+    $opt_f $opt_H $opt_h $opt_i $opt_j $opt_l $opt_N $opt_O $opt_o $opt_s
+    $opt_t $opt_v $opt_X $opt_x /;
 
-our $VERSION = '1.1';
+our $VERSION = '1.4';
 
 my ($offset1, $radix, $data, @arr, $lim);
 my ($lastline, $strfmt, $ml);
@@ -43,6 +44,7 @@ my %charescs = (
     92 => ' \\\\',
 );
 
+# embedded space allows formatting without sprintf
 my %charname = (
     0  => 'nul',
     1  => 'soh',
@@ -52,14 +54,14 @@ my %charname = (
     5  => 'enq',
     6  => 'ack',
     7  => 'bel',
-    8  => 'bs',
-    9  => 'ht',
-    10 => 'nl',
-    11 => 'vt',
-    12 => 'ff',
-    13 => 'cr',
-    14 => 'so',
-    15 => 'si',
+    8  => ' bs',
+    9  => ' ht',
+    10 => ' nl',
+    11 => ' vt',
+    12 => ' ff',
+    13 => ' cr',
+    14 => ' so',
+    15 => ' si',
     16 => 'dle',
     17 => 'dc1',
     18 => 'dc2',
@@ -69,14 +71,14 @@ my %charname = (
     22 => 'syn',
     23 => 'etb',
     24 => 'can',
-    25 => 'em',
+    25 => ' em',
     26 => 'sub',
     27 => 'esc',
-    28 => 'fs',
-    29 => 'gs',
-    30 => 'rs',
-    31 => 'us',
-    32 => 'sp',
+    28 => ' fs',
+    29 => ' gs',
+    30 => ' rs',
+    31 => ' us',
+    32 => ' sp',
     127 => 'del',
 );
 
@@ -85,7 +87,7 @@ $lastline = '';
 
 my $Program = basename($0);
 
-getopts('A:aBbcdeFfHij:lN:OosvXx') or help();
+getopts('A:aBbcDdeFfHhij:lN:Oost:vXx') or help();
 if (defined $opt_A) {
     if ($opt_A !~ m/\A[doxn]\z/) {
 	warn "$Program: unexpected radix: '$opt_A'\n";
@@ -123,20 +125,26 @@ elsif ($opt_b) {
 elsif ($opt_c) {
     $fmt = \&char1;
 }
+elsif ($opt_D) {
+    $fmt = \&udecimal4;
+}
 elsif ($opt_d) {
-    $fmt = \&udecimal;
+    $fmt = \&udecimal2;
 }
 elsif ($opt_e || $opt_F) {
     $fmt = \&float8;
 }
 elsif ($opt_f) {
-    $fmt = \&float;
+    $fmt = \&float4;
 }
 elsif ($opt_H || $opt_X) {
     $fmt = \&hex4;
 }
+elsif ($opt_h || $opt_x) {
+    $fmt = \&hex2;
+}
 elsif ($opt_i || $opt_s) {
-    $fmt = \&decimal;
+    $fmt = \&decimal2;
 }
 elsif ($opt_l) {
     $fmt = \&long;
@@ -147,11 +155,65 @@ elsif ($opt_O) {
 elsif ($opt_B || $opt_o) {
     $fmt = \&octal2;
 }
-elsif ($opt_x) {
-    $fmt = \&hex2;
-}
 else {
     $fmt = \&octal2;
+}
+
+if (defined $opt_t) {
+    if ($opt_t eq 'x1') {
+        $fmt = \&hex1;
+    } elsif ($opt_t eq 'x2') {
+        $fmt = \&hex2;
+    } elsif ($opt_t eq 'x4') {
+        $fmt = \&hex4;
+    } elsif ($opt_t eq 'x8') {
+        $fmt = \&hex8;
+    } elsif ($opt_t eq 'o1') {
+        $fmt = \&octal1;
+    } elsif ($opt_t eq 'o2') {
+        $fmt = \&octal2;
+    } elsif ($opt_t eq 'o4') {
+        $fmt = \&octal4;
+    } elsif ($opt_t eq 'o8') {
+        $fmt = \&octal8;
+    } elsif ($opt_t eq 'd1') {
+        $fmt = \&decimal1;
+    } elsif ($opt_t eq 'd2') {
+        $fmt = \&decimal2;
+    } elsif ($opt_t eq 'd4') {
+        $fmt = \&decimal4;
+    } elsif ($opt_t eq 'd8') {
+        $fmt = \&decimal8;
+    } elsif ($opt_t eq 'u1') {
+        $fmt = \&udecimal1;
+    } elsif ($opt_t eq 'u2') {
+        $fmt = \&udecimal2;
+    } elsif ($opt_t eq 'u4') {
+        $fmt = \&udecimal4;
+    } elsif ($opt_t eq 'u8') {
+        $fmt = \&udecimal8;
+    } elsif ($opt_t eq 'f4') {
+        $fmt = \&float4;
+    } elsif ($opt_t eq 'f8') {
+        $fmt = \&float8;
+    } elsif ($opt_t eq 'a') {
+        $fmt = \&char7bit;
+    } elsif ($opt_t eq 'c') {
+        $fmt = \&char1;
+    } else {
+        warn "$Program: unexpected output format specifier\n";
+        exit EX_FAILURE;
+    }
+    if ($opt_t =~ m/\A[doux]8\Z/) {
+        my $has_quad = eval {
+            unpack 'Q', '';
+            1;
+        };
+        unless ($has_quad) {
+            warn "$Program: 64-bit perl needed for $opt_t format\n";
+            exit EX_FAILURE;
+        }
+    }
 }
 
 my $nread = 0;
@@ -258,6 +320,21 @@ sub octal1 {
     $strfmt = '%.3o ' x (scalar @arr);
 }
 
+sub decimal1 {
+    @arr = unpack 'c*', $data;
+    $strfmt = '%4d ' x (scalar @arr);
+}
+
+sub udecimal1 {
+    @arr = unpack 'C*', $data;
+    $strfmt = '%3u ' x (scalar @arr);
+}
+
+sub hex1 {
+    @arr = unpack 'C*', $data;
+    $strfmt = '%.2x ' x (scalar @arr);
+}
+
 sub char1 {
     @arr = ();
     my @arr1 = unpack 'C*', $data;
@@ -266,7 +343,7 @@ sub char1 {
 	    $arr[0] .= $charescs{$val} . " ";
 	}
 	elsif ($val > PRINTMAX || chr($val) !~ m/[[:print:]]/) {
-	    $arr[0] .= sprintf(' %03o', $val);
+	    $arr[0] .= sprintf('%03o ', $val);
 	}
 	else {
 	    $arr[0] .= "  " . chr($val) . " ";
@@ -281,7 +358,7 @@ sub char7bit {
     for my $val (@arr1) {
         my $n = $val & 0x7f;
         if (exists $charname{$n}) {
-            $arr[0] .= sprintf '%4s', $charname{$n};
+            $arr[0] .= $charname{$n} . " ";
         }
         else {
 	    $arr[0] .= "  " . chr($n) . " ";
@@ -290,12 +367,12 @@ sub char7bit {
     $strfmt = '%s';
 }
 
-sub udecimal {
+sub udecimal2 {
     @arr = unpack 'S*', $data . zeropad(length($data), 2);
     $strfmt = '%5u ' x (scalar @arr);
 }
 
-sub float {
+sub float4 {
     @arr = unpack 'f*', $data . zeropad(length($data), 4);
     $strfmt = '%15.7e ' x (scalar @arr);
 }
@@ -305,9 +382,9 @@ sub float8 {
     $strfmt = '%24.16e ' x (scalar @arr);
 }
 
-sub decimal {
+sub decimal2 {
     @arr = unpack 's*', $data . zeropad(length($data), 2);
-    $strfmt = '%5d ' x (scalar @arr);
+    $strfmt = '%6d ' x (scalar @arr);
 }
 
 sub long {
@@ -325,6 +402,16 @@ sub octal4 {
     $strfmt = '%.11o ' x (scalar @arr);
 }
 
+sub decimal4 {
+    @arr = unpack 'L*', $data . zeropad(length($data), 4);
+    $strfmt = '%11d ' x (scalar @arr);
+}
+
+sub udecimal4 {
+    @arr = unpack 'L*', $data . zeropad(length($data), 4);
+    $strfmt = '%11u ' x (scalar @arr);
+}
+
 sub hex2 {
     @arr = unpack 'S*', $data . zeropad(length($data), 2);
     $strfmt = '%.4x ' x (scalar @arr);
@@ -333,6 +420,26 @@ sub hex2 {
 sub hex4 {
     @arr = unpack 'L*', $data . zeropad(length($data), 4);
     $strfmt = '%.8x ' x (scalar @arr);
+}
+
+sub hex8 {
+    @arr = unpack 'Q*', $data . zeropad(length($data), 8);
+    $strfmt = '%.16x ' x (scalar @arr);
+}
+
+sub octal8 {
+    @arr = unpack 'Q*', $data . zeropad(length($data), 8);
+    $strfmt = '%.22o ' x (scalar @arr);
+}
+
+sub udecimal8 {
+    @arr = unpack 'Q*', $data . zeropad(length($data), 8);
+    $strfmt = '%22u ' x (scalar @arr);
+}
+
+sub decimal8 {
+    @arr = unpack 'Q*', $data . zeropad(length($data), 8);
+    $strfmt = '%22d ' x (scalar @arr);
 }
 
 sub zeropad {
@@ -348,7 +455,8 @@ sub diffdata {
 }
 
 sub help {
-    print "usage: od [-aBbcdeFfHilOosXxv] [-A radix] [-j skip_bytes] [-N limit_bytes] [file]...\n";
+    print "usage: od [-aBbcDdeFfHhilOosXxv] [-A radix] [-j skip_bytes] ",
+        "[-N limit_bytes] [-t type] [file]...\n";
     exit EX_FAILURE;
 }
 __END__
@@ -359,7 +467,8 @@ od - dump files in octal and other formats
 
 =head1 SYNOPSIS
 
-B<od> [ I<-aBbcdeFfHilOosXxv> ] [I<-j skip_n_bytes>] [I<-N read_n_bytes>] [ I<-A radix> ] [ F<file>... ]
+B<od> [ I<-aBbcDdeFfHhilOosXxv> ] [I<-j skip_bytes>] [I<-N limit_bytes>]
+      [ I<-A radix> ] [ I<-t type> ] [ F<file>... ]
 
 =head1 DESCRIPTION
 
@@ -397,6 +506,10 @@ Single-byte octal display.
 
 Display characters literally, with non-printable characters displayed as C escape sequences.
 
+=item -D
+
+Four-byte unsigned decimal display.
+
 =item -d
 
 Two-byte unsigned decimal display.
@@ -416,6 +529,10 @@ Show input as floating point numbers in exponent form.
 =item -H
 
 Four-byte hex display.
+
+=item -h
+
+Two-byte hex display.
 
 =item -i
 
@@ -445,13 +562,40 @@ Format input as two-byte octal numbers.
 
 Same as -i
 
+=item -t Type
+
+Select output format as one of the following:
+
+    a      ASCII character names. Same as -a
+    c      Characters with C escapes. Same as -c
+    o1     1-byte unsigned octal
+    o2     2-byte unsigned octal
+    o4     4-byte unsigned octal
+    o8     8-byte unsigned octal
+    d1     1-byte signed decimal
+    d2     2-byte signed decimal
+    d4     4-byte signed decimal
+    d8     8-byte signed decimal
+    u1     1-byte unsigned decimal
+    u2     2-byte unsigned decimal
+    u4     4-byte unsigned decimal
+    u8     8-byte unsigned decimal
+    x1     1-byte unsigned hexadecimal
+    x2     2-byte unsigned hexadecimal
+    x4     4-byte unsigned hexadecimal
+    x8     8-byte unsigned hexadecimal
+    f4     4-byte floating point. Same as -f
+    f8     8-byte floating point. Same as -F
+
+This option overrides other formatting options.
+
 =item -X
 
 Same as -H
 
 =item -x
 
-Use two-byte hexadecimal format.
+Same as -h
 
 =item -v
 

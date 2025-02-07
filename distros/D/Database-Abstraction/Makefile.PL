@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use ExtUtils::MakeMaker 6.64;	# 6.64 for TEST_REQUIRES
+use ExtUtils::MakeMaker;
 
 my $dist = {
 	COMPRESS => 'gzip -9f',
@@ -45,6 +45,7 @@ WriteMakefile(
 		'Data::Dumper' => 0,
 		# 'Error' => 0,
 		'DBD::SQLite::Constants' => 0,
+		'ExtUtils::MakeMaker' => 6.64,	# 6.64 for TEST_REQUIRES
 		'File::Basename' => 0,
 		'File::Spec' => 0,
 		'File::pfopen' => 0.03,

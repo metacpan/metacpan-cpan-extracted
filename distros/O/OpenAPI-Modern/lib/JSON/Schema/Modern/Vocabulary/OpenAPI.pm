@@ -3,7 +3,7 @@ package JSON::Schema::Modern::Vocabulary::OpenAPI;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema OpenAPI vocabulary
 
-our $VERSION = '0.079';
+our $VERSION = '0.080';
 
 use 5.020;
 use Moo;
@@ -32,7 +32,7 @@ sub _traverse_keyword_discriminator ($self, $schema, $state) {
   return if not assert_keyword_type($state, $schema, 'object');
 
   # "the discriminator field MUST be a required field"
-  return E($state, 'missing required field propertyName')
+  return E($state, 'missing required property "propertyName"')
     if not exists $schema->{discriminator}{propertyName};
   return E({ %$state, _schema_path_suffix => 'propertyName' }, 'discriminator propertyName is not a string')
     if not is_type('string', $schema->{discriminator}{propertyName});
@@ -48,7 +48,7 @@ sub _traverse_keyword_discriminator ($self, $schema, $state) {
     }
   }
 
-  return 1;
+  return $valid;
 }
 
 sub _eval_keyword_discriminator ($self, $data, $schema, $state) {
@@ -58,7 +58,7 @@ sub _eval_keyword_discriminator ($self, $data, $schema, $state) {
   my $discriminator_key = $schema->{discriminator}{propertyName};
 
   # property with name <propertyName> MUST be present in the data payload
-  return E($state, 'missing required discriminator field "%s"', $discriminator_key)
+  return E($state, 'missing required discriminator property "%s"', $discriminator_key)
     if not exists $data->{$discriminator_key};
 
   my $discriminator_value = $data->{$discriminator_key};
@@ -67,7 +67,7 @@ sub _eval_keyword_discriminator ($self, $data, $schema, $state) {
     # use 'mapping' to determine which schema to use.
     # Note that the spec uses an example that assumes that the mapping value can be appended to
     # /components/schemas/, _as well as_ being treated as a uri-reference, but this is ambiguous.
-    # For now we will handle it by preprending '#/components/schemas' if it is not already a
+    # For now we will handle it by prepending '#/components/schemas' if it is not already a
     # fragment-only uri reference.
     my $mapping = $schema->{discriminator}{mapping}{$discriminator_value};
 
@@ -82,8 +82,8 @@ sub _eval_keyword_discriminator ($self, $data, $schema, $state) {
     );
   }
   else {
-    # If the discriminator value does not match an implicit or explicit mapping, no schema can be
-    # determined and validation SHOULD fail.
+    # §4.8.25.4: If the discriminator value does not match an implicit or explicit mapping, no
+    # schema can be determined and validation SHOULD fail.
     return E({ %$state, data_path => jsonp($state->{data_path}, $discriminator_key) },
       'invalid %s: "%s"', $discriminator_key, $discriminator_value);
   }
@@ -119,7 +119,7 @@ JSON::Schema::Modern::Vocabulary::OpenAPI - Implementation of the JSON Schema Op
 
 =head1 VERSION
 
-version 0.079
+version 0.080
 
 =head1 DESCRIPTION
 

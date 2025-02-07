@@ -60,11 +60,11 @@ YAML
           instanceLocation => '',
           keywordLocation => '/discriminator',
           absoluteKeywordLocation => '/api#/components/schemas/pet/discriminator',
-          error => 'missing required discriminator field "petType"',
+          error => 'missing required discriminator property "petType"',
         },
       ],
     },
-    'missing required discriminator field "petType"',
+    'missing required discriminator property "petType"',
   );
 
   cmp_deeply(

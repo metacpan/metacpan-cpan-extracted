@@ -11,7 +11,7 @@ use Scalar::Util qw< openhandle looks_like_number >;
 use Symbol       qw< qualify_to_ref >;
 use match::smart qw< match >;
 
-our $VERSION = '0.005001';
+our $VERSION = '0.005002';
 
 my $fake_input;     # Flag that we're faking input from the source
 
@@ -251,14 +251,16 @@ sub prompt {
 
     # Provide default value if available and necessary...
     my $defaulted = 0;
-    if (defined $input && $input =~ /\A\R?\Z/ && exists $opt_ref->{-def}) {
-        $input = $opt_ref->{-def};
-        $defaulted = 1;
-    }
+    { no warnings 'uninitialized';
+        if (defined $input && $input =~ /\A\R?\Z/ && exists $opt_ref->{-def}) {
+            $input = $opt_ref->{-def};
+            $defaulted = 1;
+        }
 
-    # The input line is usually chomped before being returned...
-    if (defined $input && !$opt_ref->{-line}) {
-        chomp $input;
+        # The input line is usually chomped before being returned...
+        if (defined $input && !$opt_ref->{-line}) {
+            chomp $input;
+        }
     }
 
     # Check for a value indicating failure...
@@ -280,6 +282,7 @@ sub prompt {
 
     # "Those who remember history are enabled to repeat it"...
     if (defined $input and $opt_ref->{-history} ne 'NONE') {
+        no warnings 'uninitialized';
         my $history_set = $history_cache{ $opt_ref->{-history} } //= [] ;
         @{ $history_set } = ($input, grep { $_ ne $input } @{ $history_set });
     }
@@ -1254,7 +1257,7 @@ sub _generate_unbuffered_reader_from {
         # Set up direct reading, and prepare to clean up on abnormal exit...
         Term::ReadKey::ReadMode('raw', $in_fh);
         my $prev_SIGINT = $SIG{INT};
-        local $SIG{INT} = sub { return if $prev_SIGINT eq 'IGNORE';
+        local $SIG{INT} = sub { return if defined $prev_SIGINT && $prev_SIGINT eq 'IGNORE';
                                 Term::ReadKey::ReadMode('restore', $in_fh);
                                 exit(1) if !defined $prev_SIGINT
                                         || $prev_SIGINT eq 'DEFAULT';
@@ -1824,7 +1827,7 @@ IO::Prompter - Prompt for input, read it, clean it, return it.
 
 =head1 VERSION
 
-This document describes IO::Prompter version 0.005001
+This document describes IO::Prompter version 0.005002
 
 
 =head1 SYNOPSIS

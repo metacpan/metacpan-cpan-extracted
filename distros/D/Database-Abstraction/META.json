@@ -35,6 +35,7 @@
             "Carp" : "0",
             "DBD::SQLite::Constants" : "0",
             "Data::Dumper" : "0",
+            "ExtUtils::MakeMaker" : "6.64",
             "File::Basename" : "0",
             "File::Spec" : "0",
             "File::Temp" : "0",
@@ -78,6 +79,6 @@
          "x_repository" : "https://github.com/nigelhorne/Database-Abstraction"
       }
    },
-   "version" : "0.17",
+   "version" : "0.20",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

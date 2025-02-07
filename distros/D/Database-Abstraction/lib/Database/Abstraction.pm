@@ -48,11 +48,11 @@ use constant	DEFAULT_MAX_SLURP_SIZE => 16 * 1024;	# CSV files <= than this size 
 
 =head1 VERSION
 
-Version 0.17
+Version 0.20
 
 =cut
 
-our $VERSION = '0.17';
+our $VERSION = '0.20';
 
 =head1 SYNOPSIS
 
@@ -386,6 +386,7 @@ sub _open {
 			}
 		}
 		if(my $filename = $self->{'filename'} || $defaults{'filename'}) {
+			$self->_debug("Looking for $filename in $dir");
 			$slurp_file = File::Spec->catfile($dir, $filename);
 		}
 		if(defined($slurp_file) && (-r $slurp_file)) {
@@ -590,7 +591,10 @@ sub selectall_hash
 	if($self->{'data'}) {
 		if(scalar(keys %{$params}) == 0) {
 			$self->_trace("$table: selectall_hash fast track return");
-			return values %{$self->{'data'}};
+			if(ref($self->{'data'}) eq 'HASH') {
+				return values %{$self->{'data'}};
+			}
+			return @{$self->{'data'}};
 			# my @rc = values %{$self->{'data'}};
 			# return @rc;
 		} elsif((scalar(keys %{$params}) == 1) && defined($params->{'entry'}) && !$self->{'no_entry'}) {
@@ -663,11 +667,12 @@ sub selectall_hash
 		}
 		if(my $rc = $c->get($key)) {
 			$self->_debug('cache HIT');
+			return @{$rc};	# We stored a ref to the array
+
 			# This use of a temporary variable is to avoid
 			#	"Implicit scalar context for array in return"
-			# return @{$rc};
-			my @rc = @{$rc};
-			return @rc;
+			# my @rc = @{$rc};
+			# return @rc;
 		}
 		$self->_debug('cache MISS');
 	} else {
@@ -686,7 +691,7 @@ sub selectall_hash
 			push @rc, $href;
 		}
 		if($c && wantarray) {
-			$c->set($key, \@rc, $self->{'cache_duration'});
+			$c->set($key, \@rc, $self->{'cache_duration'});	# Store a ref to the array
 		}
 
 		return @rc;
@@ -790,6 +795,9 @@ sub fetchrow_hashref {
 	my $c;
 	if($c = $self->{cache}) {
 		if(my $rc = $c->get($key)) {
+			if(wantarray) {
+				return @{$rc};	# We stored a ref to the array
+			}
 			return $rc;
 		}
 	}
@@ -1063,6 +1071,9 @@ sub AUTOLOAD {
 		}
 		if(my $rc = $cache->get($key)) {
 			$self->_debug('cache HIT');
+			if(wantarray) {
+				return @{$rc};	# We stored a ref to the array
+			}
 			return $rc;
 		}
 		$self->_debug('cache MISS');
@@ -1077,7 +1088,7 @@ sub AUTOLOAD {
 	if(wantarray) {
 		my @rc = map { $_->[0] } @{$sth->fetchall_arrayref()};
 		if($cache) {
-			$cache->set($key, \@rc, $self->{'cache_duration'});
+			$cache->set($key, \@rc, $self->{'cache_duration'});	# Store a ref to the array
 		}
 		return @rc;
 	}

@@ -70,7 +70,7 @@ use Fred::Fish::DBUG 2.09 qw / on_if_set  ADVANCED_CONFIG_FISH /;
 
 use File::Basename;
 
-$VERSION = "1.11";
+$VERSION = "1.12";
 @ISA = qw( Exporter );
 
 @EXPORT = qw( read_config  source_file  make_new_section  parse_line

@@ -1,0 +1,18 @@
+use alienfile;
+
+# idiomatic way to make sure we always install/update?
+probe [ q{ sh -c 'exit 127' } ];
+ 
+share {
+  start_url 'https://astral.sh/uv/install.sh';
+  plugin 'Download';
+  plugin 'Extract::File';
+
+  build [
+    [ q{ mkdir -p %{alien.install.prefix}/bin } ],
+
+    [ q{ INSTALLER_NO_MODIFY_PATH=1 UV_INSTALL_DIR=%{alien.install.prefix}/bin . %{alien.install.extract}/uv-installer.sh } ],
+  ];
+};
+
+# vim: set ft=perl:

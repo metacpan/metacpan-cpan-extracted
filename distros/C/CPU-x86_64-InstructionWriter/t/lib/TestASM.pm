@@ -15,6 +15,7 @@ our @EXPORT_OK= qw( int64 pack reference_assemble iterate_mem_addr_combos
 	hex_diff have_nasm asm_ok new_writer
 	@r64 @r32 @r16 @r8 @r8h @immed64 @immed32 @immed16 @immed8
 	unknown unknown8 unknown16 unknown32 unknown64 unknown7 unknown15 unknown31 unknown63
+	hex_dump hex_diff
 );
 
 my $do_all= $ENV{TEST_EXHAUSTIVE}
@@ -96,6 +97,9 @@ sub nasm_cache_file {
 	catpath($vol, catdir(@dirs), $md5);
 }
 
+# For an arrayref of assembled instructions and a matching arrayref of assembly language
+# snippets, assemble everything and ensure they are identical.  If not, show diagnostics
+# about which ones didn't match.
 sub asm_ok {
 	my ($output, $asm_text, $message)= @_;
 	# Run a test as one giant block of asm
@@ -110,6 +114,9 @@ sub asm_ok {
 	}
 }
 
+# This attempts to take an arrayref of processor instructions and corresponding arrayref of
+# assembly language and perform a binary search for the single element that is getting
+# assembled incorrectly.
 sub show_bad_instructions {
 	my ($output, $asm_text, $min, $max)= @_;
 	if ($max - $min < 8) {
@@ -144,6 +151,8 @@ sub show_bad_instructions {
 	}
 }
 
+# Given a string of assembly code (language) check the disk cache to see if we know
+# how it assembles, and if not, shell out to nasm to populate the cache file.
 sub reference_assemble {
 	my $asm_source= shift;
 	my $md5= md5_hex($asm_source);

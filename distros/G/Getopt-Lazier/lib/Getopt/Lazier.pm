@@ -11,11 +11,11 @@ Getopt::Lazier - Lazy Getopt-like command-line options and argument parser
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 
 =head1 SYNOPSIS
@@ -23,6 +23,8 @@ our $VERSION = '0.04';
    my ($opt, @DARG) = Getopt::Lazier->new(@ARGV);
 
 =head2 EXAMPLE USAGE
+
+Lazy:
 
    use Getopt::Lazier;
 
@@ -47,6 +49,45 @@ our $VERSION = '0.04';
       ]
    ];
 
+Lazier:
+
+   use Getopt::Lazier;
+
+   my $opt = Getopt::Lazier->new();
+
+   use Data::Dumper; print Dumper([$opt, \@ARGV])."\n";
+
+   # perl lazierscript.pl -o -p ok
+
+   $VAR1 = [
+      {
+         'o' => 1,
+         'p' => 1
+      },
+      [
+         'ok'
+      ]
+   ];
+
+Laziest:
+
+   use Getopt::Lazier "ovar";
+
+   use Data::Dumper; print Dumper([$ovar, \@ARGV])."\n";
+
+   # perl t.pl --opt1=val arg --opt2 arg2
+
+   $VAR1 = [
+      {
+         'opt1' => 'val',
+         'opt2' => 1
+      },
+      [
+         'arg',
+         'arg2'
+      ]
+   ];
+
 =cut
 
 =head1 SUBROUTINES/METHODS
@@ -55,11 +96,23 @@ our $VERSION = '0.04';
 
 The laziest way to parse arguments tho
 
+Now with namespace fuckery!
+
 =cut
+
+sub import {
+   my ($exporter, $fuckery) = @_;
+
+   if ($fuckery) {
+      my $opt = new();
+      no strict 'refs'; # so naughty!
+      *{"main::$fuckery"} = \$opt;
+   }
+}
 
 sub new {        # DNM: I <3 this function.
    my $self = shift;
-   my @ARGA = @_;
+   my @ARGA = @_ || @main::ARGV;
    my $opt  = {};
    my @DARG;
    my $var = uc(basename($0));
@@ -76,7 +129,9 @@ sub new {        # DNM: I <3 this function.
          push @DARG, $ar;
       }
    }
-   return ($opt, @DARG);
+   return ($opt, @DARG) if wantarray;
+   @main::ARGV = @DARG;
+   return($opt);
 }
 
 =head1 AUTHOR

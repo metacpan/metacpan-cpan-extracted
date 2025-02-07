@@ -57,9 +57,9 @@ END {
 
    my $now = time ();
    my ($hr1, $min1, $sec1) = (localtime ($now))[2,1,0];
-   my ($hr2, $min2, $sec2) = (localtime ($now + 120))[2,1,0];
+   my ($hr2, $min2, $sec2) = (localtime ($now + 240))[2,1,0];
 
-   # If 2 minutes in the future is tomorrow ...
+   # If 4 minutes in the future is tomorrow ...
    # Skip all tests so that the smoke testers won't complain!
    if ( $hr1 > $hr2 ) {
       dbug_ok (1, "Skipping all date tests.  The current time is too close to midnight!  ($hr1:$min1:$sec1, $hr2:$min2:$sec2)");
@@ -188,17 +188,19 @@ sub my_validation
       my $val3 = (defined $val2) ? $val2 : "";
       my $chk  = (defined $val2) && $val1 eq $val2;
 
-      # If we're unlucky, the timestamps can be several seconds off ...
+      # If we're unlucky, the timestamps can be dozens of seconds off ...
       my $ts   = ( $_ =~ m/^[12]_timestamp$/ ) ? 1 : 0;
       # if ($ts) { sleep(1); }
 
       if ( $ts && $val2 && ! $chk ) {
-         my $diff = $val1 - $val2;
-         $chk = 1  if ( $diff <= 20 );
-         DBUG_PRINT ("CHECK", "Checking if the timestamps are close enough! (%s) diff: %d", $val1, $diff);
+         my $diff = $val1 - $val3;
+         $chk = 1  if ( $diff <= 120 );
+         dbug_ok ( $chk, "Validating tag \"$_\" in config file is close enough.  ($val3) [Diff: $diff sec(s)]" );
+      }
+      else {
+        dbug_ok ( $chk, "Validating tag \"$_\" matches config file.  ($val3)" );
       }
 
-      dbug_ok ( $chk, "Validating tag \"$_\" matches config file.  ($val3)" );
       unless ( $chk ) {
          DBUG_PRINT ("ERROR", "Value should have been: %s", $val1);
       }

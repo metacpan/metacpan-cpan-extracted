@@ -6,6 +6,14 @@ Mark Overmeer.
 TODO:
 	. Add source http://www.ltsw.se/knbase/internet/mime.htp ?
 
+version 2.27: Fri  7 Feb 11:08:22 CET 2025
+
+	Changes:
+	- iana updates.
+
+	Fixes:
+	- explicitly set $/ before reading the file by line [Jan Kratochvil]
+
 version 2.26: Tue  6 Feb 10:08:33 CET 2024
 
 	Changes:

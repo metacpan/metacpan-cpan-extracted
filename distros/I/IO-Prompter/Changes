@@ -211,3 +211,9 @@ Revision history for IO-Prompter
 
     * Removed all uses of continue;
       (Thanks, Alexander!)
+
+
+0.005002  Fri Feb  7 20:36:27 2025
+
+    * Worked around odd 'uninitialized' warning under timeouts
+      (thanks Diab!)

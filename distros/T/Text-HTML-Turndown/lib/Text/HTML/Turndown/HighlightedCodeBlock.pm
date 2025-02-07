@@ -1,4 +1,4 @@
-package Text::HTML::Turndown::HighlightedCodeBlock 0.01;
+package Text::HTML::Turndown::HighlightedCodeBlock 0.02;
 use 5.020;
 use experimental 'signatures';
 use List::MoreUtils 'all';

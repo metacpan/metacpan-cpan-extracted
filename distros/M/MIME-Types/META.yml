@@ -1,13 +1,13 @@
 ---
 abstract: 'Definition of MIME types'
 author:
-  - 'Mark Overmeer <markov@cpan.org>'
+  - 'Mark Overmeer <mark@overmeer.net>'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,5 +26,5 @@ resources:
   homepage: http://perl.overmeer.net/CPAN/
   license: http://dev.perl.org/licenses/
   repository: https://github.com/markov2/perl5-MIME-Types.git
-version: '2.26'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.011'
+version: '2.27'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -2,42 +2,58 @@
 
 =head1 NAME
 
-DBIx::Migration - Seamless DB schema up- and downgrades
+DBIx::Migration - Seamless database schema up- and downgrades
 
 =head1 SYNOPSIS
 
-    # migrate.pl
-    my $m = DBIx::Migration->new(
-        {
-            dsn => 'dbi:SQLite:/Users/sri/myapp/db/sqlite/myapp.db',
-            dir => '/Users/sri/myapp/db/sqlite'
-        }
-    );
+  my $m = DBIx::Migration->new(
+      {
+          dsn => 'dbi:SQLite:~/Projects/myapp/db/myapp.db',
+          dir => '~/Projects/myapp/db/migrations'
+      }
+  );
 
-    my $version = $m->version;   # Get current version from database
-    $m->migrate( 2 );            # Migrate database to version 2
+  # Get current version from database
+  my $version = $m->version;
 
-    # /Users/sri/myapp/db/sqlite/schema_1_up.sql
-    CREATE TABLE foo (
-        id INTEGER PRIMARY KEY,
-        bar TEXT
-    );
+  # Migrate database to version 1
+  $m->migrate( 1 );
 
-    # /Users/sri/myapp/db/sqlite/schema_1_down.sql
-    DROP TABLE foo;
+  # Migrate database to the newest/highest version
+  $m->migrate;
 
-    # /Users/sri/myapp/db/sqlite/schema_2_up.sql
-    CREATE TABLE bar (
-        id INTEGER PRIMARY KEY,
-        baz TEXT
-    );
+  # ~/Projects/myapp/db/migrations/schema_1_up.sql
+  CREATE TABLE foo (
+      id INTEGER PRIMARY KEY,
+      bar TEXT
+  );
 
-    # /Users/sri/myapp/db/sqlite/schema_2_down.sql
-    DROP TABLE bar;
+  # ~/Projects/myapp/db/migrations/schema_1_down.sql
+  DROP TABLE foo;
+
+  # ~/Projects/myapp/db/migrations/schema_2_up.sql
+  CREATE TABLE bar (
+      id INTEGER PRIMARY KEY,
+      baz TEXT
+  );
+
+  # ~/Projects/myapp/db/migrations/schema_2_down.sql
+  DROP TABLE bar;
 
 =head1 DESCRIPTION
 
-Seamless DB schema up- and downgrades.
+This module provides seamless database schema up- and downgrades. The
+implementation is based on migrations. A migration is a ".sql" script.
+Although not mandatory the script name begins with a prefix like for example
+"schema_". It follows a version number that is a positive integer. After an
+underscore "_" the script name ends with the migration type that is either "up"
+or "down". Migrations are stored in a directory and are applied in order to a
+database. Usually the version number of the first migration is 1. The version
+numbers of the other migrations have to be ascending without gaps. During
+processing the content of each migration is read with the C<binmode> of C<:raw>
+into a scalar. The content is split into sections using the default SQL
+delimiter ";". Each section is executed independently. All related sections are
+encapsulated in a database transaction.
 
 =head1 METHODS
 
@@ -49,21 +65,23 @@ Enable/Disable debug messages.
 
 =item $self->dir( $dir )
 
-Get/Set directory.
+Get/Set directory that contains migrations.
 
 =item $self->dsn( $dsn )
 
 Get/Set dsn.
 
-=item $self->dbh( $dsn )
+=item $self->dbh( $dbh )
 
 Get/Set dbh.
 
 =item $self->migrate( $version )
 
-Migrate database to version.
+Migrate database to version. Returns true in case of success; otherwise false.
+If called without the version argument the newest migration version will be
+used.
 
-=item $self->password
+=item $self->password( $password )
 
 Get/Set database password.
 
@@ -77,6 +95,13 @@ Get migration version from database. Will be undef if no migration has taken
 place yet.
 
 =back
+
+=head1 CAVEATS
+
+After the C<dbh> was used for the first time changing the C<dsn>, C<password>,
+or C<username> has no impact. The reason is the mutable (offering setter
+methods) design of this module. Changing this will break the backwards
+compatibility.
 
 =head1 AUTHOR
 

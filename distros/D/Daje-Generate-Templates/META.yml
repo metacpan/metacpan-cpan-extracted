@@ -26,10 +26,16 @@ no_index:
 provides:
   Daje::Generate::Templates:
     file: lib/Daje/Generate/Templates.pm
-    version: '0.03'
+    version: '0.06'
+  Daje::Generate::Templates::Angular:
+    file: lib/Daje/Generate/Templates/Angular.pm
+    version: '0.01'
+  Daje::Generate::Templates::Mithril:
+    file: lib/Daje/Generate/Templates/Mithril.pm
+    version: '0.01'
   Daje::Generate::Templates::Perl:
     file: lib/Daje/Generate/Templates/Perl.pm
-    version: '0.01'
+    version: '0.02'
   Daje::Generate::Templates::Sql:
     file: lib/Daje/Generate/Templates/Sql.pm
 requires:
@@ -39,6 +45,6 @@ resources:
   bugtracker: https://github.com/janeskil1525/Daje-Generate-Templates/issues
   homepage: https://github.com/janeskil1525/Daje-Generate-Templates
   repository: https://github.com/janeskil1525/Daje-Generate-Templates.git
-version: '0.03'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

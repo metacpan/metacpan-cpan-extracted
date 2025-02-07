@@ -1,5 +1,5 @@
 package CPU::x86_64::InstructionWriter::RipRelative;
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 use strict;
 use warnings;
 use Carp;
@@ -38,7 +38,7 @@ CPU::x86_64::InstructionWriter::RipRelative - Object representing an offset to a
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 DESCRIPTION
 

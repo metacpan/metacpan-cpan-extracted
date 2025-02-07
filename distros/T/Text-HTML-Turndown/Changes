@@ -1,2 +1,5 @@
+0.02 2025-02-07
+    * declare that we use postderef in some locations, no other code changes
+
 0.01 2025-01-19
     * Released on an unsuspecting world

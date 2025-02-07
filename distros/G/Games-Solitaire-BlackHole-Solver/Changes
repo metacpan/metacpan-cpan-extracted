@@ -1,5 +1,12 @@
 Revision history for Games-Solitaire-BlackHole-Solver
 
+0.14.0  2025-02-06
+        - Experimental support for solving several deal-filenames
+        in the same executable invocation was improved with a oneline-header
+        and oneline footer for every filename (in the output stream)
+        - Fix reporting "0" played cards as ULONG_MAX .
+        - More tests, especially for "Unsolved" vs. "Exceeded" verdicts.
+
 0.12.0  2025-02-02
         - Experimental support for solving several deal-filenames
         in the same executable invocation. E.g:

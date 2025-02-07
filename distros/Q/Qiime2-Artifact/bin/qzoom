@@ -1,0 +1,247 @@
+#!/usr/bin/env perl
+# PODNAME: qzoom
+# ABSTRACT: A script to print metadata from Qiime2 artifacts
+use 5.014;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use Qiime2::Artifact;
+use File::Basename;
+use File::Path qw(make_path);
+use Term::ANSIColor qw(:constants);
+use File::Spec;
+
+my $VERSION = '0.12.0';
+
+# Command line options
+my $opt = {
+    'info'     => 0,
+    'cite'     => 0,
+    'extract'  => 0,
+    'data'     => 0,
+    'outdir'   => './',
+    'bibtex'   => undef,
+    'rename'   => 0,
+    'verbose'  => 0,
+    'help'     => 0,
+    'version'  => 0,
+    'tabular'  => 0,
+};
+
+GetOptions(
+    'i|info'     => \$opt->{info},
+    'c|cite'     => \$opt->{cite},
+    'x|extract'  => \$opt->{extract},
+    'd|data'     => \$opt->{data},
+    'o|outdir=s' => \$opt->{outdir},
+    'b|bibtex=s' => \$opt->{bibtex},
+    'r|rename'   => \$opt->{rename},
+    't|tabular'  => \$opt->{tabular},
+    'verbose'    => \$opt->{verbose},
+    'help'       => \$opt->{help},
+    'version'    => \$opt->{version},
+) or pod2usage(-verbose => 1, -exitval => 1);
+
+pod2usage(-verbose => 2, -exitval => 0) if $opt->{help};
+if ($opt->{version}) {
+    say "qzoom.pl v$VERSION";
+    exit 0;
+}
+
+# If no specific action is requested, default to info
+$opt->{info} = 1 if (!$opt->{cite} && !$opt->{extract} && !$opt->{data});
+
+# Need at least one file
+pod2usage(-verbose => 1, -exitval => 1) if scalar(@ARGV) == 0;
+
+# Print table header if tabular mode is enabled
+if ($opt->{tabular}) {
+    printf "%-30s %-36s %-8s %-15s %s\n",
+        "FILENAME", "UUID", "TYPE", "VERSION", "FILES";
+    printf "%s\n", "-" x 100;
+}
+
+# Process each artifact
+for my $file (@ARGV) {
+    process_artifact($file, $opt);
+}
+
+sub process_artifact {
+    my ($file, $opt) = @_;
+    my $artifact;
+    
+    # Try to load artifact
+    eval {
+        $artifact = Qiime2::Artifact->new({
+            filename => $file,
+            verbose  => $opt->{verbose}
+        });
+    };
+    if ($@) {
+        warn "Error processing $file: $@\n";
+        return;
+    }
+
+    my $basename = basename($file);
+    my $id = $artifact->get('id');
+    my $is_viz = $artifact->get('visualization');
+    my @data_files = @{$artifact->get('data')};
+    
+    # Show basic info
+    if ($opt->{info}) {
+        if ($opt->{tabular}) {
+            printf "%-30s %-36s %-8s %-15s %d\n",
+                substr($basename, 0, 30),
+                $id,
+                $is_viz ? "VIZ" : "DATA",
+                $artifact->get('version'),
+                scalar(@data_files);
+        } else {
+            printf "%s%s%s [%s]\n", 
+                BOLD, $basename, RESET,
+                $is_viz ? 'HTML Visualization' : 'Data Artifact';
+            printf "  UUID: %s\n", $id;
+            printf "  QIIME2 version: %s\n", $artifact->get('version');
+            printf "  Files: %s\n", scalar(@data_files);
+            print "\n" if $opt->{verbose};
+        }
+    }
+    
+    # Show data files
+    if ($opt->{data}) {
+        say "Files in $basename:";
+        for my $data_file (@data_files) {
+            say "  $data_file";
+        }
+        print "\n" if $opt->{verbose};
+    }
+    
+    # Extract data
+    if ($opt->{extract}) {
+        my $target_dir = $opt->{outdir};
+        make_path($target_dir) unless -d $target_dir;
+        
+        for my $data_file (@data_files) {
+            my $output_file = $data_file;
+            
+            # Handle rename option
+            if ($opt->{rename} && scalar(@data_files) == 1) {
+                my ($name, $path, $suffix) = fileparse($data_file, qr/\.[^.]*/);
+                my ($artifact_name, $artifact_path, $artifact_suffix) = 
+                    fileparse($basename, qr/\.qz[av]/);
+                $output_file = $artifact_name . $suffix;
+            }
+            
+            my $target_path = File::Spec->catfile($target_dir, $output_file);
+            
+            if ($opt->{verbose}) {
+                say "Extracting: $data_file -> $target_path";
+            }
+            
+            # Here you would add the actual extraction code
+            # This would require additional methods in the Qiime2::Artifact module
+            # to extract files from the zip archive
+        }
+    }
+    
+    # Handle citations (placeholder - would need citation data from artifact)
+    if ($opt->{cite}) {
+        if ($opt->{bibtex}) {
+            # Append citations to bibtex file
+            # Would need to implement citation extraction from artifact
+        } else {
+            say "Citation information for $basename:";
+            # Would print citation information here
+        }
+    }
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+qzoom - A script to print metadata from Qiime2 artifacts
+
+=head1 VERSION
+
+version 0.12.0
+
+=head1 SYNOPSIS
+
+qzoom.pl [options] <artifact1.qza/v> [<artifact2.qza ...]
+
+=head1 NAME
+
+qzoom.pl - a helper utility to extract data from Qiime2 artifacts
+
+=head1 OPTIONS
+
+=head2 Main Actions
+
+=over 4
+
+=item B<-i, --info>
+
+Print artifact information to STDOUT. Enabled by default if no other action specified.
+
+=item B<-c, --cite>
+
+Print artifact citation to STDOUT or to file.
+
+=item B<-x, --extract>
+
+Extract the content of the 'data' directory.
+
+=item B<-d, --data>
+
+List all the files contained in the ./data directory of the artifacts.
+
+=back
+
+=head2 Other Parameters
+
+=over 4
+
+=item B<-o, --outdir> I<OUTDIR>
+
+Directory where to extract files (default: ./).
+
+=item B<-b, --bibtex> I<FILE>
+
+Save citations to a file (append).
+
+=item B<-r, --rename>
+
+Rename extracted files to {artifactbasename}.{ext}.
+
+=item B<-t, --tabular>
+
+Print output in tabular format.
+
+=item B<--verbose>
+
+Print verbose output.
+
+=back
+
+=head1 AUTHOR
+
+Andrea Telatin <andrea@telatin.com>
+
+=head1 AUTHOR
+
+Andrea Telatin <andrea@telatin.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2020 by Andrea Telatin.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

@@ -16,7 +16,7 @@ License: artistic2
 
 use POSIX;
 
-my $VERSION = '1.0.4';
+my $VERSION = '1.0.5';
 
 # set this if we do anything to select a timezone abbreviation, then
 # prefer this if it is defined.
@@ -59,7 +59,13 @@ sub run {
 	   if( grep { $_ eq '-h' } @$args ) { usage(0) }
 	elsif( grep { $_ eq '-v' } @$args ) { print "$0 $VERSION\n"; exit 0; }
 
-	my $formats = get_formats();
+	my $formats = eval { get_formats() };
+	my $at = $@;
+	if( length $at ) {
+		print $at;
+		exit 1;
+		}
+
 	my %allowed = map { ("-$_" => 1) } split( //, 'u' );
 	@allowed{ keys %$formats } = (1) x (keys %$formats);
 
@@ -80,8 +86,11 @@ sub run {
 	}
 
 sub select_format {
-	my( $supplied ) = grep { /\A\+/ } @_;
-	return $1 if $supplied =~ /\A\+(.+)/;
+	my @format_args = grep { /\A\+/ } @_;
+	die "Extra operands: " . join( ' ', @format_args[1..$#format_args] ) . "\n"
+		if @format_args > 1;
+
+ 	return $1 if $format_args[0] =~ /\A\+(.+)/;
 
 	my $formats = get_formats();
 

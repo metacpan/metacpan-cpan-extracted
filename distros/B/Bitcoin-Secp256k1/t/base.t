@@ -29,10 +29,22 @@ subtest 'should import and export pubkey' => sub {
 	is $secp->_pubkey($t{pubkey_unc}), $t{pubkey}, 'setter with uncompressed input, compressed output ok';
 };
 
+subtest 'should import and export xonly pubkey' => sub {
+	is $secp->_xonly_pubkey, undef, 'starting xonly pubkey ok';
+	is $secp->_xonly_pubkey($t{xonly_pubkey}), $t{xonly_pubkey}, 'setter ok';
+	is $secp->_xonly_pubkey, $t{xonly_pubkey}, 'getter ok';
+};
+
 subtest 'should import and export signature' => sub {
 	is $secp->_signature, undef, 'starting sig ok';
 	is $secp->_signature($t{sig}), $t{sig}, 'setter ok';
 	is $secp->_signature, $t{sig}, 'getter ok';
+};
+
+subtest 'should import and export schnorr signature' => sub {
+	is $secp->_signature_schnorr, undef, 'starting sig ok';
+	is $secp->_signature_schnorr($t{sig_schnorr}), $t{sig_schnorr}, 'setter ok';
+	is $secp->_signature_schnorr, $t{sig_schnorr}, 'getter ok';
 };
 
 subtest 'should normalize a signature' => sub {

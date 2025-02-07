@@ -46,6 +46,11 @@ subtest 'should die with invalid public key' => sub {
 	like $ex, qr/the input does not appear to be a valid public key/, 'exception ok';
 };
 
+subtest 'should die with invalid xonly public key' => sub {
+	my $ex = dies { $secp->verify_digest_schnorr("\x12" x 33, $t{sig_schnorr}, "\x12" x 32) };
+	like $ex, qr/xonly pubkey must be a bytestring of length 32/, 'exception ok';
+};
+
 subtest 'should die with invalid signature' => sub {
 	my $ex = dies { $secp->verify_digest($t{pubkey}, "\x12" x 65, "\x12" x 32) };
 	like $ex, qr/the input does not appear to be a valid signature/, 'exception ok';
@@ -70,6 +75,20 @@ subtest 'should die on invalid multiplication' => sub {
 subtest 'should die on invalid combination of public keys' => sub {
 	my $ex = dies { $secp->combine_public_keys($t{pubkey}, "\02" . "\xff" x 32) };
 	like $ex, qr/the input does not appear to be a valid public key/, 'exception ok';
+};
+
+# cases in api.t are tweaked, use at least one case from a BIP for Schnorr
+subtest 'should generate the same signatures as BIP340 test cases' => sub {
+	my $priv = pack 'H*', 'b7e151628aed2a6abf7158809cf4f3c762e7160f38b4da56a784d9045190cfef';
+	my $pub = pack 'H*', 'dff1d77f2a671c5f36183726db2341be58feae1da2deced843240f7b502ba659';
+	my $aux_rand = pack 'H*', '0000000000000000000000000000000000000000000000000000000000000001';
+	my $message = pack 'H*', '243f6a8885a308d313198a2e03707344a4093822299f31d0082efa98ec4e6c89';
+	my $sig = pack 'H*',
+		'6896bd60eeae296db48a229ff71dfe071bde413e6d43f917dc8dcf8c78de33418906d11ac976abccb20b091292bff4ea897efcb639ea871cfa95f6de339e4b0a';
+
+	local $Bitcoin::Secp256k1::FORCED_SCHNORR_AUX_RAND = $aux_rand;
+	is $secp->sign_digest_schnorr($priv, $message), $sig, 'digest signed ok';
+	ok $secp->verify_digest_schnorr($pub, $sig, $message), 'digest verified ok';
 };
 
 done_testing;

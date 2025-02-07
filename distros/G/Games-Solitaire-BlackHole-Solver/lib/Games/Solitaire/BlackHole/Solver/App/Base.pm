@@ -1,5 +1,5 @@
 package Games::Solitaire::BlackHole::Solver::App::Base;
-$Games::Solitaire::BlackHole::Solver::App::Base::VERSION = '0.12.0';
+$Games::Solitaire::BlackHole::Solver::App::Base::VERSION = '0.14.0';
 use Moo;
 use Getopt::Long     qw/ GetOptions /;
 use Pod::Usage       qw/ pod2usage /;
@@ -12,12 +12,13 @@ extends('Exporter');
 has '_num_foundations' => ( default => 1, is => 'rw', );
 
 my $solver_const_attrs = [
-    '_bits_offset',        '_display_boards',
-    '_init_tasks_configs', '_is_good_diff',
-    '_max_iters_limit',    '_prelude',
-    '_prelude_string',     '_talon_cards',
-    '_quiet',              '_output_handle',
-    '_output_fn',          '_should_show_maximal_num_played_cards',
+    '_bits_offset',                             '_display_boards',
+    '_do_not_err_on_exceeding_max_iters_limit', '_init_tasks_configs',
+    '_is_good_diff',                            '_max_iters_limit',
+    '_prelude',                                 '_prelude_string',
+    '_talon_cards',                             '_quiet',
+    '_output_handle',                           '_output_fn',
+    '_should_show_maximal_num_played_cards',
 ];
 
 my $board_const_attrs = [
@@ -74,9 +75,10 @@ else
 
 # These attributes mutate during a solver's run.
 has [
-    '_active_record', '_active_task',
-    '_maximal_num_played_cards__from_all_tasks',
-    '_prelude_iter', '_positions', '_tasks', '_task_idx',
+    '_active_record',            '_active_task',
+    '_max_iters_limit_exceeded', '_maximal_num_played_cards__from_all_tasks',
+    '_prelude_iter',             '_positions',
+    '_tasks',                    '_task_idx',
 ] => ( is => 'rw' );
 
 our %EXPORT_TAGS = ( 'all' => [qw($card_re)] );
@@ -274,7 +276,8 @@ sub get_max_num_played_cards
 
     $self->_update_max_num_played_cards();
 
-    return $self->_maximal_num_played_cards__from_all_tasks() - 1;
+    my $ret = $self->_maximal_num_played_cards__from_all_tasks();
+    return ( ( $ret == 0 ) ? $ret : ( $ret - 1 ) );
 }
 
 sub _end_report
@@ -284,7 +287,15 @@ sub _end_report
 
     if ( !$verdict )
     {
-        $output_handle->print("Unsolved!\n");
+        my $SOFT_EXCEEDED = $self->_do_not_err_on_exceeding_max_iters_limit();
+        if ( $SOFT_EXCEEDED and $self->_max_iters_limit_exceeded() )
+        {
+            $output_handle->print("Exceeded max_iters_limit !\n");
+        }
+        else
+        {
+            $output_handle->print("Unsolved!\n");
+        }
     }
     if ( $self->_should_show_maximal_num_played_cards() )
     {
@@ -348,6 +359,8 @@ sub _parse_board
 sub _set_up_initial_position
 {
     my ( $self, $talon_ptr ) = @_;
+
+    $self->_max_iters_limit_exceeded(0);
 
     my $init_state = "";
 
@@ -638,9 +651,9 @@ sub _next_task
     {
         my $alloc = $self->_prelude->[ $self->{_prelude_iter}++ ];
         my $task  = $alloc->_task;
+        $self->_update_max_reached_depths_stack_len($task);
         if ( !@{ $task->_queue } )
         {
-            $self->_update_max_reached_depths_stack_len($task);
             return $self->_next_task;
         }
         $task->_remaining_iters( $alloc->_quota );
@@ -655,6 +668,7 @@ sub _next_task
         return $self->_next_task;
     }
     my $task = $tasks->[ $self->_task_idx ];
+    $self->_update_max_reached_depths_stack_len($task);
     $self->_task_idx( ( $self->_task_idx + 1 ) % @$tasks );
     $task->_remaining_iters(100);
     $self->_active_task($task);
@@ -772,6 +786,12 @@ sub _find_moves
                         $positions->{$next_s} = [ $state, $col_idx, 1, 0 ];
                         if ( keys(%$positions) > $max_iters_limit )
                         {
+                            $self->_max_iters_limit_exceeded(1);
+                            if ( $self->_do_not_err_on_exceeding_max_iters_limit
+                                )
+                            {
+                                return;
+                            }
                             die "Exceeded max_iters_limit !";
                         }
                         $to_add = 1;
@@ -808,7 +828,7 @@ sub _set_up_solver
 }
 
 package Games::Solitaire::BlackHole::Solver::App::Base::Task;
-$Games::Solitaire::BlackHole::Solver::App::Base::Task::VERSION = '0.12.0';
+$Games::Solitaire::BlackHole::Solver::App::Base::Task::VERSION = '0.14.0';
 use Moo;
 
 has '_queue'        => ( is => 'ro', default => sub { return []; }, );
@@ -833,7 +853,7 @@ sub _push_to_queue
 }
 
 package Games::Solitaire::BlackHole::Solver::App::Base::PreludeItem;
-$Games::Solitaire::BlackHole::Solver::App::Base::PreludeItem::VERSION = '0.12.0';
+$Games::Solitaire::BlackHole::Solver::App::Base::PreludeItem::VERSION = '0.14.0';
 use Moo;
 
 has [ '_quota', '_task', '_task_idx', '_task_name', ] => ( is => 'rw' );
@@ -852,7 +872,7 @@ Games::Solitaire::BlackHole::Solver::App::Base - base class.
 
 =head1 VERSION
 
-version 0.12.0
+version 0.14.0
 
 =head1 METHODS
 

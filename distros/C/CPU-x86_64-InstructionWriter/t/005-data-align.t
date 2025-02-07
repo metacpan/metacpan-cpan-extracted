@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use FindBin;
 use lib "$FindBin::Bin/lib";
-use TestASM qw( new_writer iterate_mem_addr_combos asm_ok @r64 @r32 @r16 @r8 @r8h @immed32 @immed16 @immed8 );
+use TestASM qw( new_writer iterate_mem_addr_combos asm_ok @r64 @r32 @r16 @r8 @r8h @immed32 @immed16 @immed8 hex_dump );
 use Test::More;
 
 subtest data => \&test_data;
@@ -28,6 +28,25 @@ sub test_data {
 	is( $w->bytes, "AXXX\x90\x90\x90\x90", 'align8' );
 	$w->align(16, "\x00");
 	is( $w->bytes, "AXXX\x90\x90\x90\x90" . ("\x00" x 8), 'align(16)' );
+}
+
+subtest string_tables => \&test_string_tables;
+sub test_string_tables {
+	my %labels= map +($_ => undef), qw( test testing atest );
+	my $w= new_writer->data_str(\%labels);
+	is( $w->bytes, "testing\0atest\0", 'combined strings in table' );
+	is( $labels{test}->offset, 9, 'test merged with atest' );
+	
+	%labels= map +($_ => undef), qw( test testing atest );
+	$w= new_writer->data_str(\%labels, nul_terminate => 0);
+	is( $w->bytes, "testingatest", 'combined strings in table' );
+	is( $labels{test}->offset, 0, 'test merged with testing' );
+
+	%labels= map +($_ => undef), qw( test testing atest );
+	$w= new_writer->data_str(\%labels, encoding => 'UTF-16LE');
+	is( $w->bytes, "t\0e\0s\0t\0i\0n\0g\0\0\0a\0t\0e\0s\0t\0\0\0", 'combined strings in table' )
+		or diag hex_dump($w->bytes);
+	is( $labels{test}->offset, 18, 'test merged with atest' );
 }
 
 done_testing;
