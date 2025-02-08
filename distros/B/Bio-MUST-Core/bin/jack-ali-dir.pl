@@ -38,11 +38,10 @@ for my $indir (@ARGV_indirs) {
     $dir->mkpath();
 
     # setup replicate numbering format
-    # TODO: fix bug with 100!
     my $field = ceil( log($ARGV_replicates) / log(10) );
 
     # build replicates
-    for my $rep (1..$ARGV_replicates) {
+    for my $rep (0..$ARGV_replicates-1) {
         my @pool = shuffle @infiles;
 
         my @alis;
@@ -90,7 +89,7 @@ jack-ali-dir.pl - Jackknife a directory of ALI files
 
 =head1 VERSION
 
-version 0.250200
+version 0.250380
 
 =head1 USAGE
 

@@ -1,0 +1,21 @@
+# You can manually install these dependencies with the command:
+#
+#   $  cpanm --installdeps .
+#
+
+requires 'perl', '5.036';
+
+on test => sub {
+    requires 'Test::More', '0.96';
+};
+
+requires "Getopt::Long";
+requires "Org::Parser";
+requires "Text::CSV";
+requires "Spreadsheet::Read";
+requires "Spreadsheet::ParseXLSX";
+requires "Mojolicious";
+requires "Mojolicious::Plugin::Config";
+requires "Mojolicious::Types";
+requires "Mojo::SQLite";
+

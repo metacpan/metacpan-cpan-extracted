@@ -1,5 +1,11 @@
 # This file documents the revision history for Perl extension CatalystX-RequestModel.
 
+0.020 - 07 February 2025
+  - added new 'as_data' method that lets you retreive the model model
+    selectively based on a specification.   Useful if you need just some
+    attributes from the model and not all of them, or when just calling
+    ->nested_params on the model feels like too loose a contract.
+
 0.019 - 27 October 2024
   - fixed issue where omit_empty=0 was not setting empty values to []
     as documented.

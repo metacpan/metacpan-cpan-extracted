@@ -1,184 +1,246 @@
 #!/usr/bin/env perl
-# ABSTRACT: A demo implementation to filter fastx files by length
+# ABSTRACT: Filter FASTA/FASTQ files by sequence length
 # PODNAME: fu-len
 
 use 5.014;
+use strict;
+use warnings;
 use FASTX::Reader;
-use Getopt::Long;
+use Getopt::Long qw(:config no_ignore_case);
 use File::Basename;
 use FindBin qw($RealBin);
-my $PROGRAM = 'fu-len';
+use Carp qw(croak);
+use Try::Tiny;
+
 # The following placeholder is to be programmatically replaced with 'use lib "$RealBin/../lib"' if needed
 #~loclib~
 if ( -e "$RealBin/../lib/Proch/N50.pm" and -e "$RealBin/../Changes" ) {
     use lib "$RealBin/../lib";
 }
 use Proch::Seqfu;
+
 my $BASENAME = basename($0);
 my $VERSION = $Proch::Seqfu::VERSION // "<Dev>";
-my $DESCR   = 'Select sequences by size';
-my $AUTHOR  = 'Andrea Telatin (proch)';
 
-
-
+# Valid name schemes
 my %schemes = (
-	'raw' => 'Do not change sequence name (default)',
-	'num' => 'Numbered sequence (see also -p)',
-	'file'=> 'Use file basename as prefix',
+    'raw'  => 'Do not change sequence name (default)',
+    'num'  => 'Numbered sequence (see also -p)',
+    'file' => 'Use file basename as prefix',
 );
+
+# Command line options
 my (
-  $opt_minlen,
-  $opt_maxlen,
-  $opt_fasta_format,
-  $opt_fasta_width,
-  $opt_verbose,
-  $opt_prefix,
-  $opt_strip_comment,
-  $opt_addlength,
-  $opt_version
+    $opt_minlen,
+    $opt_maxlen,
+    $opt_fasta_format,
+    $opt_fasta_width,
+    $opt_verbose,
+    $opt_prefix,
+    $opt_strip_comment,
+    $opt_addlength,
+    $opt_version
 );
-my  $opt_name = 'raw';
-my  $opt_separator = '.';
-my $_opt = GetOptions(
- 'm|min=i'           => \$opt_minlen,
- 'x|max=i'           => \$opt_maxlen,
- 'f|fasta'           => \$opt_fasta_format,
- 'w|fasta-width=i'   => \$opt_fasta_width,
- 'c|strip-comment'   => \$opt_strip_comment,
- 'n|namescheme=s'    => \$opt_name,
- 'v|verbose'         => \$opt_verbose,
- 'l|len'             => \$opt_addlength,
- 's|separator=s'     => \$opt_separator,
- 'p|prefix=s'        => \$opt_prefix,
- 'version'           => \$opt_version,
-);
+my $opt_name = 'raw';
+my $opt_separator = '.';
+
+# Process command line options with error handling
+try {
+    GetOptions(
+        'm|min=i'         => \$opt_minlen,
+        'x|max=i'         => \$opt_maxlen,
+        'f|fasta'         => \$opt_fasta_format,
+        'w|fasta-width=i' => \$opt_fasta_width,
+        'c|strip-comment' => \$opt_strip_comment,
+        'n|namescheme=s'  => \$opt_name,
+        'v|verbose'       => \$opt_verbose,
+        'l|len'          => \$opt_addlength,
+        's|separator=s'   => \$opt_separator,
+        'p|prefix=s'      => \$opt_prefix,
+        'version'         => \$opt_version,
+    ) or usage();
+} catch {
+    croak "Error processing command line options: $_";
+};
 
 sub version {
-	say $BASENAME, " ", $VERSION;
-	say STDERR "Using Proch::Seqfu=", $Proch::Seqfu::VERSION, " and FASTX::Reader=", $FASTX::Reader::VERSION;
-	exit();
+    say $BASENAME, " ", $VERSION;
+    say STDERR "Using Proch::Seqfu=", $Proch::Seqfu::VERSION, " and FASTX::Reader=", $FASTX::Reader::VERSION;
+    exit(0);
 }
+
 version() if ($opt_version);
 usage() unless defined $ARGV[0];
 
-# Check schemes
-if (not defined $schemes{$opt_name}) {
-	usage();
-	die "Name scheme -n '$opt_name' is not valid [choose: ", join(",", keys %schemes), "]\n";
+# Validate name scheme
+croak "ERROR: Name scheme -n '$opt_name' is not valid. Choose from: " . join(", ", sort keys %schemes)
+    unless exists $schemes{$opt_name};
+
+# Validate length parameters
+if (defined $opt_minlen and defined $opt_maxlen) {
+    croak "ERROR: Minimum length ($opt_minlen) cannot be greater than maximum length ($opt_maxlen)"
+        if $opt_minlen > $opt_maxlen;
+}
+croak "ERROR: Minimum length must be positive"
+    if defined $opt_minlen and $opt_minlen < 0;
+croak "ERROR: Maximum length must be positive"
+    if defined $opt_maxlen and $opt_maxlen < 0;
+croak "ERROR: FASTA width must be positive"
+    if defined $opt_fasta_width and $opt_fasta_width < 1;
+
+# Set separator based on prefix
+my $sep = $opt_prefix ? $opt_separator : '';
+my $global_counter = 0;
+my %check_reads;
+
+# Process each input file
+foreach my $input_file (@ARGV) {
+    my $filename = $input_file;
+    
+    # Handle STDIN
+    if ($input_file eq "-") {
+        $filename = "{{STDIN}}";
+    } else {
+        # Check file existence and readability
+        unless (-e $input_file) {
+            verbose(qq(Skipping "$input_file": file not found));
+            next;
+        }
+        unless (-r $input_file) {
+            verbose(qq(Skipping "$input_file": file not readable));
+            next;
+        }
+    }
+
+    # Initialize FASTX reader with error handling
+    my $reader;
+    try {
+        $reader = FASTX::Reader->new({ filename => $filename });
+    } catch {
+        croak "ERROR: Failed to initialize FASTX reader for $input_file: $_";
+    };
+
+    my $local_counter = 0;
+    
+    # Process sequences
+    while (my $seq = $reader->getRead()) {
+        my $len = length($seq->{seq});
+        
+        # Length filtering
+        next if defined $opt_minlen and $len < $opt_minlen;
+        next if defined $opt_maxlen and $len > $opt_maxlen;
+
+        $global_counter++;
+        $local_counter++;    
+
+        # Generate sequence name based on scheme
+        my $name = generate_name($seq, $input_file, $local_counter, $global_counter);
+        
+        # Add optional components
+        $name .= " " . $seq->{comment} unless $opt_strip_comment and defined $seq->{comment};
+        $name .= " length=" . $len if $opt_addlength;
+
+        # Check for duplicate names
+        if ($check_reads{$name}) {
+            croak sprintf("Duplicate read name <%s> using scheme %s\n" .
+                         "Reading <%s>, sequence number %d (total sequences %d)",
+                         $name, $opt_name, $input_file, $local_counter, $global_counter);
+        }
+        $check_reads{$name}++;
+
+        # Output sequence with error handling
+        try {
+            if ($opt_fasta_format or not defined $seq->{qual}) {
+                print '>', $name, "\n", format_dna($seq->{seq}, $opt_fasta_width);
+            } else {
+                print '@', $name, "\n", $seq->{seq}, "\n+\n", $seq->{qual}, "\n";
+            }
+        } catch {
+            croak "ERROR: Failed to write sequence: $_";
+        };
+    }
 }
 
-# Separator for read name is '' if no prefix is given
-my $sep = '';
-$sep = $opt_separator if ($opt_prefix);
-
-my $global_counter++;
-
-my %check_reads;
-foreach my $input_file (@ARGV) {
-	if (! -e "$input_file" and $input_file ne "-") {
-		verbose(qq(Skipping "$input_file": file not found));
-		next;
-	}
-	$input_file = "{{STDIN}}" if ($input_file eq "-");
-	my $reader = FASTX::Reader->new({ filename => "$input_file" });
-	my $local_counter = 0;
-	while (my $s = $reader->getRead() ) {
-	
-		my $len = length($s->{seq});
-		
-		# Length Check
-		next if (defined $opt_minlen and $len < $opt_minlen);
-		next if (defined $opt_maxlen and $len > $opt_maxlen);
-
-		$global_counter++;
-		$local_counter++;	
-		# Read name
-		my $name;
-		if ($opt_name eq 'raw') {
-			$name = $s->{name};		
-		} elsif ($opt_name eq 'file') {
-			$name = basename($input_file) . $opt_separator . $local_counter;
-		} elsif ($opt_name eq 'num') {
-			$name = $opt_prefix . $sep . $global_counter;
-		}
-	
-
-		# Comment
-		$name  .= " " .$s->{comment} unless ($opt_strip_comment);
-		# Add length
-		$name  .= " length=" . $len if ($opt_addlength);
-		my $sequence = $s->{seq};
-		my $quality  = $s->{qual};
-
-		if ($check_reads{$name}) {
-			die "Duplicate read name <$name> using scheme $opt_name.\nReading <$input_file>, sequence number $local_counter (total sequences $global_counter)\n";
-		}
-
-		$check_reads{$name}++;
-
-		# Print
-		if ($opt_fasta_format or not defined $s->{quality}) {
-			# In fasta format
-			print '>', $name, "\n", format_dna($sequence, $opt_fasta_width);
-		} else {
-			# In fastq format
-			print '@', $name, "\n", $sequence, "\n+\n", $quality, "\n";
-		}
-	}
-
+# Subroutines
+sub generate_name {
+    my ($seq, $file, $local_count, $global_count) = @_;
+    
+    if ($opt_name eq 'raw') {
+        return $seq->{name};
+    } elsif ($opt_name eq 'file') {
+        return basename($file) . $opt_separator . $local_count;
+    } elsif ($opt_name eq 'num') {
+        return $opt_prefix . $sep . $global_count;
+    }
 }
 
 sub format_dna {
-	my ($sequence, $width) = @_;
-	if (not defined $width) {
-		return "$sequence\n";
-	}
+    my ($sequence, $width) = @_;
+    return "$sequence\n" unless defined $width;
 
-	my $formatted;
-	my $line = $width; 
-	for (my $i=0; $i<length($sequence); $i+=$line) {
-		my $frag = substr($sequence, $i, $line);
-		$formatted.=$frag."\n";
-	}
-	return $formatted;
+    my $formatted = '';
+    for (my $i = 0; $i < length($sequence); $i += $width) {
+        $formatted .= substr($sequence, $i, $width) . "\n";
+    }
+    return $formatted;
 }
 
 sub verbose {
-	return unless $opt_verbose;
-	say STDERR " - $_[0]";
+    say STDERR " - $_[0]" if $opt_verbose;
 }
 
 sub usage {
- print STDERR<<END;
- ------------------------------------------------------------------------------- 
-  $PROGRAM - $DESCR (ver. $VERSION)
- -------------------------------------------------------------------------------
-  Synopsis:
-    fu-len [options] FILE1 FILE2 ... FILEn
+    print STDERR<<END;
+fu-len - Filter FASTA/FASTQ files by sequence length
 
-  -m, --min INT                   Minimum length to print a sequence
-  -x, --max INT                   Maximum length to print a sequence
-  -l, --len                       Add read length as comment
-  -f, --fasta                     Force FASTA output (default: as INPUT)
-  -w, --fasta-width INT           Paginate FASTA sequences (default: no)
+SYNOPSIS
+    fu-len [options] FILE1 [FILE2 ...]
 
+DESCRIPTION
+    This tool filters sequences from FASTA/FASTQ files based on their length.
+    It can also reformat sequences and modify sequence names according to
+    different schemes.
 
-  -n, --namescheme                Sequence name scheme:
-END
- foreach my $scheme (sort keys %schemes) {
-	say "\t\t- \"$scheme\" ($schemes{$scheme})";
- }
-say STDERR<<END;
-  -p, --prefix STR                Use as sequence name prefix this string
-  -c, --strip-comment             Remove sequence comment (default: no)
+OPTIONS
+    Input/Output Control:
+    -m, --min INT          Minimum length to keep a sequence
+    -x, --max INT          Maximum length to keep a sequence
+    -f, --fasta           Force FASTA output (default: same as input)
+    -w, --fasta-width INT Wrap FASTA sequences to specified width
     
-  FILEn                           A FASTA or FASTQ file, gzipped is ok
-
-  Note that usage with multiple files can raise errors (eg. duplicate sequence
-  name). Also, wrong formatting if mixing fasta and fastq files without 
-  specifying --fasta.
- -------------------------------------------------------------------------------
+    Sequence Naming:
+    -n, --namescheme STR  Sequence name scheme:
 END
+    foreach my $scheme (sort keys %schemes) {
+        say STDERR sprintf("\t%-12s %s", "\"$scheme\":", $schemes{$scheme});
+    }
+    print STDERR<<END;
+    -p, --prefix STR      Prefix for sequence names (used with --namescheme)
+    -s, --separator STR   Separator between prefix and number (default: '.')
+    
+    Sequence Annotation:
+    -l, --len            Add sequence length as comment
+    -c, --strip-comment  Remove sequence comments
+    
+    Other Options:
+    -v, --verbose        Print verbose output
+    --version           Print version information and exit
+
+EXAMPLES
+    # Keep sequences between 100 and 1000 bp
+    fu-len -m 100 -x 1000 input.fa > filtered.fa
+
+    # Convert to FASTA and wrap sequences to 60 characters
+    fu-len -f -w 60 input.fastq > output.fa
+
+    # Number sequences and add length information
+    fu-len -n num -p 'seq' -l input.fa > numbered.fa
+
+EXIT STATUS
+    Returns 0 on success, non-zero on error.
+
+END
+    exit(0);
 }
 
 __END__
@@ -189,63 +251,152 @@ __END__
 
 =head1 NAME
 
-fu-len - A demo implementation to filter fastx files by length
+fu-len - Filter FASTA/FASTQ files by sequence length
 
 =head1 VERSION
 
-version 1.5.8
+version 1.7.0
 
-=head1 USAGE
+=head1 SYNOPSIS
 
-  fqlen [options] FILE1 FILE2 ... FILEn
+    fu-len [options] FILE1 [FILE2 ...]
 
-=head2 PARAMETERS
+=head1 DESCRIPTION
+
+fu-len is a versatile tool for filtering sequences from FASTA/FASTQ files based on
+their length. It provides additional functionality for sequence reformatting and
+name manipulation. The tool can process both FASTA and FASTQ files, including
+gzipped files, and can handle input from standard input using '-' as the filename.
+
+=head1 NAME
+
+fu-len - Filter and manipulate FASTA/FASTQ files based on sequence length
+
+=head1 OPTIONS
+
+=head2 Input/Output Control
 
 =over 4
 
-=item C<-m>, C<--min> INT                   
+=item B<-m>, B<--min> I<INT>
 
-Minimum length to print a sequence
+Minimum length to keep a sequence. Sequences shorter than this will be filtered out.
 
-=item C<-x>, C<--max> INT                   
+=item B<-x>, B<--max> I<INT>
 
-Maximum length to print a sequence
+Maximum length to keep a sequence. Sequences longer than this will be filtered out.
 
-=item C<-l>, C<--len>                       
+=item B<-f>, B<--fasta>
 
-Add read length as comment
+Force output in FASTA format, regardless of input format.
 
-=item C<-f>, C<--fasta>                     
+=item B<-w>, B<--fasta-width> I<INT>
 
-Force FASTA output (default: as INPUT)
-
-=item C<-w>, C<--fasta-width> INT           
-
-Paginate FASTA sequences (default: no)
-
-=item C<-n>, C<--namescheme>                
-
-Sequence name scheme: B<"file"> (Use file basename as prefix),
-B<"num"> (Numbered sequence (see also -p)) and
-B<"raw"> (Do not change sequence name, default)
-
-=item C<-p>, C<--prefix> STR
-
-Use as sequence name prefix this string
-
-=item C<-c>, C<--strip-comment>
-
-Remove sequence comment (default: no)
+Wrap FASTA sequence lines to the specified width. If not specified, sequences will
+be written as single lines.
 
 =back
 
-=head1 LIMITATIONS
+=head2 Sequence Naming
 
-Note that usage with multiple files can raise errors (eg. duplicate sequence name). 
-Also, wrong formatting if mixing fasta and fastq files without 
-specifying --fasta.
+=over 4
 
-We recommend considering SeqFu to overcome these limitations: L<https://github.com/telatin/seqfu2>.
+=item B<-n>, B<--namescheme> I<STR>
+
+Choose how sequence names should be generated. Available schemes:
+
+=over 4
+
+=item * B<raw> - Use original sequence names (default)
+
+=item * B<num> - Number sequences sequentially (see B<--prefix>)
+
+=item * B<file> - Use input filename as prefix followed by sequence number
+
+=back
+
+=item B<-p>, B<--prefix> I<STR>
+
+Prefix to use for sequence names when using the 'num' name scheme.
+
+=item B<-s>, B<--separator> I<STR>
+
+Separator to use between prefix and number (default: '.').
+
+=back
+
+=head2 Sequence Annotation
+
+=over 4
+
+=item B<-l>, B<--len>
+
+Add sequence length as a comment to each sequence header.
+
+=item B<-c>, B<--strip-comment>
+
+Remove existing sequence comments.
+
+=back
+
+=head2 Other Options
+
+=over 4
+
+=item B<-v>, B<--verbose>
+
+Print verbose information to STDERR.
+
+=item B<--version>
+
+Print version information and exit.
+
+=back
+
+=head1 EXAMPLES
+
+Filter sequences by length:
+
+    # Keep sequences between 100 and 1000 bp
+    fu-len -m 100 -x 1000 input.fa > filtered.fa
+
+Convert FASTQ to wrapped FASTA:
+
+    # Convert to FASTA and wrap to 60 characters per line
+    fu-len -f -w 60 input.fastq > output.fa
+
+Number sequences with custom prefix:
+
+    # Add sequential numbers and length information
+    fu-len -n num -p 'seq' -l input.fa > numbered.fa
+
+Process multiple files:
+
+    # Filter all sequences and force FASTA output
+    fu-len -m 500 -f file1.fq file2.fa > combined.fa
+
+=head1 NOTES
+
+When processing multiple files, be aware that:
+
+=over 4
+
+=item * Duplicate sequence names can cause errors
+
+=item * Mixing FASTA and FASTQ files without B<--fasta> may cause formatting issues
+
+=item * Memory usage increases when checking for duplicate names
+
+=back
+
+=head1 MODERN ALTERNATIVE
+
+This suite of tools has been superseded by B<SeqFu>, a compiled program providing
+faster and safer tools for sequence analysis. This suite is maintained for the
+higher portability of Perl scripts under certain circumstances.
+
+SeqFu is available at L<https://github.com/telatin/seqfu2>, and can be installed
+with BioConda C<conda install -c bioconda seqfu>
 
 =head1 CITING
 
@@ -253,13 +404,15 @@ Telatin A, Fariselli P, Birolo G.
 I<SeqFu: A Suite of Utilities for the Robust and Reproducible Manipulation of Sequence Files>.
 Bioengineering 2021, 8, 59. L<https://doi.org/10.3390/bioengineering8050059>
 
+=cut
+
 =head1 AUTHOR
 
 Andrea Telatin <andrea@telatin.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2023 by Andrea Telatin.
+This software is Copyright (c) 2018-2027 by Quadram Institute Bioscience.
 
 This is free software, licensed under:
 

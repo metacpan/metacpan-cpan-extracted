@@ -1,3 +1,11 @@
+0.250380  2025-02-07 22:32:00+01:00 Europe/Brussels
+    - Additions
+      - binaries: new script resample-ali.pl (for bootstrap and jackknife)
+      - SeqMask::Weights: new class to implement bootstrap and jackknife masks
+    - Fixes
+      - binaries: improved robustness of change-ids-ali.pl towards mixed ids
+      - binaries: fixed replicate numbering in jack-ali-dir.pl
+      
 0.250200  2025-01-20 17:13:21+01:00 Europe/Brussels
     - Additions
       - SeqId and SeqId::Filter: refactored and expanded filters based on SeqId components

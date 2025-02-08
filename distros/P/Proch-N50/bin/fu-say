@@ -1,29 +1,49 @@
 #!/usr/bin/env perl
-# ABSTRACT: Testing module
+# ABSTRACT: SeqFu testkit
 # PODNAME: fu-say
 
 use 5.012;
 use warnings FATAL => 'all';
 use Getopt::Long;
-use FASTX::Reader;
 use File::Basename;
 use FindBin qw($RealBin);
+use Pod::Usage;
+# The following placeholder is to be programmatically replaced with 'use lib "$RealBin/../lib"' if needed
+#~loclib~
+if ( -e "$RealBin/../lib/Proch/N50.pm" and -e "$RealBin/../Changes" ) {
+    use lib "$RealBin/../lib";
+}
+use FASTX::Reader;
+use Proch::Seqfu;
 
+
+my $VERSION = $Proch::Seqfu::VERSION // '0.1';
+my $BASENAME = basename($0);
+
+# Default output
 my $STDOUT = "OK";
+
 GetOptions(
-    'fail' => \my $opt_fail,
-    'version' => \my $opt_version,
+    'f|fail'     => \my $opt_fail,
+    'v|version'  => \my $opt_version,
     's|string=s' => \$STDOUT,
-) || die "Unknown/Wrong parameters\n";
+    'h|help'     => \my $opt_help,
+) or pod2usage(2);
+
+pod2usage(1) if $opt_help;
 
 if ($opt_version) {
-    say "fu-say";
-    say STDERR "Using FASTX::Reader=", $FASTX::Reader::VERSION;
+    say "$BASENAME v$VERSION";
+    say STDERR "Using FASTX::Reader v", $FASTX::Reader::VERSION;
+    my $got = has_seqfu() ? "Seqfu detected:" : "Seqfu binary not available";
+    my $ver = seqfu_version() ? seqfu_version() : "<version unavailable>";
+    say STDERR "$got $ver";
     exit(0);
 }
-say STDERR $FASTX::Reader::VERSION;
-say STDOUT "$STDOUT";
-defined $opt_fail ? exit(1) : exit(0);
+
+say STDERR "FASTX::Reader version: ", $FASTX::Reader::VERSION if $ENV{DEBUG};
+say STDOUT $STDOUT;
+exit($opt_fail ? 1 : 0);
 
 __END__
 
@@ -33,11 +53,72 @@ __END__
 
 =head1 NAME
 
-fu-say - Testing module
+fu-say - SeqFu testkit
 
 =head1 VERSION
 
-version 1.5.8
+version 1.7.0
+
+=head1 SYNOPSIS
+
+  fu-say [options]
+  fu-say --version
+  fu-say -s "Hello world"
+  fu-say --fail
+
+=head1 DESCRIPTION
+
+Testing tool. Check FASTX::Reader version and availability of SeqFu binary to Proch::Seqfu.
+
+=head1 NAME
+
+fu-say - SeqFu testing tool.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-s>, B<--string> STRING
+
+Text to output (default: "OK")
+
+=item B<-f>, B<--fail>
+
+Exit with code 1 (failure)
+
+=item B<-v>, B<--version>
+
+Print version information on FASTX::Reader [to check what library is active]
+
+=item B<-h>, B<--help>
+
+Show this help message
+
+=back
+
+=head1 ENVIRONMENT
+
+=over 4
+
+=item B<DEBUG>
+
+If set, prints FASTX::Reader version to STDERR
+
+=back
+
+=head1 EXIT STATUS
+
+Returns 0 unless --fail is specified, then returns 1
+
+=head1 EXAMPLES
+
+Print custom message:
+  fu-say -s "Process completed"
+
+Simulate failure:
+  fu-say --fail -s "Error occurred"
+
+=cut
 
 =head1 AUTHOR
 
@@ -45,7 +126,7 @@ Andrea Telatin <andrea@telatin.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2023 by Andrea Telatin.
+This software is Copyright (c) 2018-2027 by Quadram Institute Bioscience.
 
 This is free software, licensed under:
 

@@ -6,7 +6,7 @@ use Storable; # RT117983
 use Class::Autouse qw{Carp Locale::Language Locale::Object::Country Locale::Object::DB I18N::AcceptLanguage I18N::LangTags::Detect};
 
 use vars qw($VERSION);
-our $VERSION = '0.66';
+our $VERSION = '0.67';
 
 =head1 NAME
 
@@ -14,11 +14,14 @@ CGI::Lingua - Create a multilingual web page
 
 =head1 VERSION
 
-Version 0.66
+Version 0.67
 
 =cut
 
 =head1 SYNOPSIS
+
+CGI::Lingua is a powerful module for multilingual web applications
+offering extensive language/country detection strategies.
 
 No longer does your website need to be in English only.
 CGI::Lingua provides a simple basis to determine which language to display a
@@ -31,7 +34,7 @@ to use.
     my $l = CGI::Lingua->new(supported => ['en', 'fr', 'en-gb', 'en-us']);
     my $language = $l->language();
     if ($language eq 'English') {
-       print '<P>Hello</P>';
+	print '<P>Hello</P>';
     } elsif($language eq 'French') {
 	print '<P>Bonjour</P>';
     } else {	# $language eq 'Unknown'
@@ -53,7 +56,7 @@ to use.
     use CGI::Lingua;
     # ...
     my $cache = CHI->new(driver => 'File', root_dir => '/tmp/cache', namespace => 'CGI::Lingua-countries');
-    my $l = CGI::Lingua->new({ supported => ['en', 'fr'], cache => $cache });
+    $l = CGI::Lingua->new({ supported => ['en', 'fr'], cache => $cache });
 
 =head1 SUBROUTINES/METHODS
 
@@ -66,11 +69,30 @@ that the website supports.
 Language codes are of the form primary-code [ - country-code ] e.g.
 'en', 'en-gb' for English and British English respectively.
 
-For a list of primary-codes refer to ISO-639 (e.g. 'en' for English).
-For a list of country-codes refer to ISO-3166 (e.g. 'gb' for United Kingdom).
+For a list of primary codes refer to ISO-639 (e.g. 'en' for English).
+For a list of country codes refer to ISO-3166 (e.g. 'gb' for United Kingdom).
+
+    # Sample web page
+    use CGI::Lingua;
+    use CHI;
+    use Log::Log4perl;
+
+    my $cache = CHI->new(driver => 'File', root_dir => '/tmp/cache');
+    Log::Log4perl->easy_init({ level => $Log::Log4perl::DEBUG });
 
     # We support English, French, British and American English, in that order
-    my $l = CGI::Lingua->new(supported => ['en', 'fr', 'en-gb', 'en-us']);
+    my $lingua = CGI::Lingua->new(
+        supported => ['en', 'fr', 'en-gb', 'en-us'],
+        cache     => $cache,
+        logger    => Log::Log4perl->get_logger(),
+    );
+
+    print "Content-Type: text/plain\n\n";
+    print 'Language: ', $lingua->language(), "\n";
+    print 'Country: ', $lingua->country(), "\n";
+    print 'Time Zone: ', $lingua->time_zone(), "\n";
+
+Supported_languages is the same as supported.
 
 Takes optional parameter cache, an object which is used to cache country
 lookups.
@@ -82,34 +104,33 @@ L<Sys::Syslog>.
 It can be a boolean to enable/disable logging to syslog, or a reference
 to a hash to be given to Sys::Syslog::setlogsock.
 
-Takes optional parameter logger, an object which is used for warnings
-and traces.
-This logger object is an object that understands warn() and trace()
-messages, such as a L<Log::Log4perl> object.
+Takes an optional parameter logger, which is used for warnings and traces.
+It can be an object that understands warn() and trace() messages,
+such as a L<Log::Log4perl> or L<Log::Any> object,
+a reference to code,
+or a filename.
 
-Takes optional parameter info, an object which can be used to see if a CGI
-parameter is set, for example an L<CGI::Info> object.
+Takes an optional parameter info, an object which can be used to see if a CGI
+parameter is set, for example, an L<CGI::Info> object.
 
 Since emitting warnings from a CGI class can result in messages being lost (you
-may forget to look in your server's log), or appearing to the client in
-amongst HTML causing invalid HTML, it is recommended either either syslog
+may forget to look in your server's log), or appear to the client in
+amongst HTML causing invalid HTML, it is recommended either syslog
 or logger (or both) are set.
 If neither is given, L<Carp> will be used.
 
 Takes an optional parameter dont_use_ip.  By default, if none of the
 requested languages is supported, CGI::Lingua->language() looks in the IP
-address for the language to use.  This may be not what you want, so use this
-option to disable the feature.
+address for the language to use.
+This may not be what you want,
+so use this option to disable the feature.
 
 The optional parameter debug is passed on to L<I18N::AcceptLanguage>.
 
 =cut
 
 sub new {
-	my $class = $_[0];
-
-	shift;
-
+	my $class = shift;
 	my %params = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
 	if(!defined($class)) {
@@ -128,6 +149,7 @@ sub new {
 	# unless($params{supported} && ($#params{supported} > 0)) {
 		# croak('You must give a list of supported languages');
 	# }
+	$params{'supported'} ||= $params{'supported_languages'};
 	unless($params{supported}) {
 		Carp::croak('You must give a list of supported languages');
 	}
@@ -146,11 +168,11 @@ sub new {
 		}
 		$key .= join('/', @{$params{supported}});
 		if($logger) {
-			$logger->debug("Looking in cache for $key");
+			# $self->debug("Looking in cache for $key");
 		}
 		if(my $rc = $cache->get($key)) {
 			if($logger) {
-				$logger->debug('Found - thawing');
+				# $logger->debug('Found - thawing');
 			}
 			$rc = Storable::thaw($rc);
 			$rc->{_logger} = $logger;
@@ -172,6 +194,7 @@ sub new {
 	}
 
 	return bless {
+		%params,
 		_supported => $params{supported}, # List of languages (two letters) that the application
 		_cache => $cache,	# CHI
 		_info => $info,
@@ -213,9 +236,7 @@ sub DESTROY {
 	$key .= join('/', @{$self->{_supported}});
 	return if($cache->get($key));
 
-	if(my $logger = $self->{_logger}) {
-		$logger->trace("Storing self in cache as $key");
-	}
+	$self->_debug("Storing self in cache as $key");
 
 	my $copy = bless {
 		_slanguage => $self->{_slanguage},
@@ -237,42 +258,10 @@ sub DESTROY {
 	$cache->set($key, Storable::nfreeze($copy), '1 month');
 }
 
-# Emit a warning message somewhere
-sub _warn {
-	my ($self, $params) = @_;
-
-	my $warning = $$params{'warning'};
-
-	return unless($warning);
-
-	if(my $syslog = $self->{_syslog}) {
-		require Sys::Syslog;
-		require CGI::Info;
-
-		Sys::Syslog->import();
-		CGI::Info->import();
-		if(ref($syslog) eq 'HASH') {
-			Sys::Syslog::setlogsock($syslog);
-		}
-		if(my $info = $self->{_info}) {
-			openlog($info->script_name(), 'cons,pid', 'user');
-		} else {
-			openlog(CGI::Info->new(syslog => $syslog)->script_name(), 'cons,pid', 'user');
-		}
-		syslog('warning', $warning);
-		closelog();
-	}
-
-	if($self->{_logger}) {
-		$self->{_logger}->warn($warning);
-	} elsif(!defined($self->{_syslog})) {
-		Carp::carp($warning);
-	}
-}
 
 =head2 language
 
-Tells the CGI application what language to display its messages in.
+Tells the CGI application in what language to display its messages.
 The language is the natural name e.g. 'English' or 'Japanese'.
 
 Sublanguages are handled sensibly, so that if a client requests U.S. English
@@ -285,16 +274,12 @@ language() returns 'Unknown'.
     # Site supports English and British English
     my $l = CGI::Lingua->new(supported => ['en', 'fr', 'en-gb']);
 
-    # If the browser requests 'en-us' , then language will be 'English' and
-    # sublanguage will be undefined because we weren't able to satisfy the
-    # request
+If the browser requests 'en-us', then language will be 'English' and
+sublanguage will also be undefined, which may seem strange, but it
+ensures that sites behave sensibly.
 
     # Site supports British English only
-    my $l = CGI::Lingua->new({supported => ['fr', 'en-gb']});
-
-    # If the browser requests 'en-us' , then language will be 'English' and
-    # sublanguage will also be undefined, which may seem strange, but it
-    # ensures that sites behave sensibly.
+    my $l = CGI::Lingua->new({ supported => ['fr', 'en-gb']} );
 
 If the script is not being run in a CGI environment, perhaps to debug it, the
 locale is used via the LANG environment variable.
@@ -308,6 +293,19 @@ sub language {
 		$self->_find_language();
 	}
 	return $self->{_slanguage};
+}
+
+=head2 preferred_language
+
+Same as language().
+
+=cut
+
+sub preferred_language
+{
+	my $self = shift;
+
+	$self->language(@_);
 }
 
 =head2 name
@@ -343,7 +341,7 @@ sub sublanguage {
 
 =head2 language_code_alpha2
 
-Gives the two character representation of the supported language, e.g. 'en'
+Gives the two-character representation of the supported language, e.g. 'en'
 when you've asked for en-gb.
 
 If none of the requested languages is included within the supported lists,
@@ -354,15 +352,11 @@ language_code_alpha2() returns undef.
 sub language_code_alpha2 {
 	my $self = shift;
 
-	if($self->{_logger}) {
-		$self->{_logger}->trace('Entered language_code_alpha2');
-	}
+	$self->_trace('Entered language_code_alpha2');
 	unless($self->{_slanguage}) {
 		$self->_find_language();
 	}
-	if($self->{_logger}) {
-		$self->{_logger}->trace('language_code_alpha2 returns ', $self->{_slanguage_code_alpha2});
-	}
+	$self->_trace('language_code_alpha2 returns ', $self->{_slanguage_code_alpha2});
 	return $self->{_slanguage_code_alpha2};
 }
 
@@ -380,7 +374,7 @@ sub code_alpha2 {
 
 =head2 sublanguage_code_alpha2
 
-Gives the two character representation of the supported language, e.g. 'gb'
+Gives the two-character representation of the supported language, e.g. 'gb'
 when you've asked for en-gb, or undef.
 
 =cut
@@ -397,7 +391,7 @@ sub sublanguage_code_alpha2 {
 
 =head2 requested_language
 
-Gives a human readable rendition of what language the user asked for whether
+Gives a human-readable rendition of what language the user asked for whether
 or not it is supported.
 
 Returns the sublanguage (if appropriate) in parentheses,
@@ -417,34 +411,47 @@ sub requested_language {
 # The language cache is stored as country_2_letter -> $language_human_readable_name=$language_2_letter
 # The IP cache is stored as ip -> country_human_readable_name
 
-# Returns the human readable language, such as 'English'
+# Returns the human-readable language, such as 'English'
 
-sub _find_language {
+sub _find_language
+{
 	my $self = shift;
 
-	if($self->{_logger}) {
-		$self->{_logger}->trace('Entered _find_language');
-	}
+	$self->_trace('Entered _find_language');
+
+	# Initialize defaults
 	$self->{_rlanguage} = 'Unknown';
 	$self->{_slanguage} = 'Unknown';
 
 	# Use what the client has said
 	my $http_accept_language = $self->_what_language();
 	if(defined($http_accept_language)) {
-		if($self->{_logger}) {
-			$self->{_logger}->debug("language wanted: $http_accept_language");
-		}
+		$self->_debug("language wanted: $http_accept_language, languages supported: ", join(', ', @{$self->{_supported}}));
 
+		if($http_accept_language eq 'en-uk') {
+			$self->_debug("Resetting country code to GB for $http_accept_language");
+			$http_accept_language = 'en-gb';
+		}
 		# Workaround for RT 74338
 		local $SIG{__WARN__} = sub {
 			if($_[0] !~ /^Use of uninitialized value/) {
 				warn $_[0];
 			}
 		};
-		my $i18n = I18N::AcceptLanguage->new(debug => $self->{_debug});
+		my $i18n = I18N::AcceptLanguage->new(debug => $self->{_debug}, strict => 1);
 		my $l = $i18n->accepts($http_accept_language, $self->{_supported});
 		local $SIG{__WARN__} = 'DEFAULT';
-		if((!$l) && ($http_accept_language =~ /(.+)-.+/)) {
+		if($l && ($http_accept_language =~ /-/) && ($http_accept_language !~ qr/$l/i)) {
+			# I18N-AcceptLanguage strict mode doesn't work as I'd expect it to,
+			# if you support 'en' and 'en-gb' and request 'en-US,en;q=0.8',
+			# it actually returns 'en-gb'
+			$self->_debug('Forcing fallback');
+			undef $l;
+		}
+
+		my $requested_sublanguage;
+		if((!$l) && ($http_accept_language =~ /(..)\-(..)/)) {
+			$requested_sublanguage = $2;
 			# Fall back position, e,g. we want US English on a site
 			# only giving British English, so allow it as English.
 			# The calling program can detect that it's not the
@@ -452,20 +459,18 @@ sub _find_language {
 			# requested_language
 			if($i18n->accepts($1, $self->{_supported})) {
 				$l = $1;
+				$self->_debug("Fallback to $l as sublanguage is not supported");
 			}
 		}
 
 		if($l) {
-			if($self->{_logger}) {
-				$self->{_logger}->debug("l: $l");
-			}
+			$self->_debug("l: $l");
 
 			if($l !~ /^..-..$/) {
 				$self->{_slanguage} = $self->_code2language($l);
 				if($self->{_slanguage}) {
-					if($self->{_logger}) {
-						$self->{_logger}->debug("_slanguage: $self->{_slanguage}");
-					}
+					$self->_debug("_slanguage: $self->{_slanguage}");
+
 					# We have the language, but not the right
 					# sublanguage, e.g. they want US English but we
 					# only support British English or English
@@ -475,7 +480,9 @@ sub _find_language {
 
 					my $sl;
 					if($http_accept_language =~ /..-(..)$/) {
+						$self->_debug($1);
 						$sl = $self->_code2country($1);
+						$requested_sublanguage = $1 if(!defined($requested_sublanguage));
 					} elsif($http_accept_language =~ /..-([a-z]{2,3})$/i) {
 						$sl = Locale::Object::Country->new(code_alpha3 => $1);
 					}
@@ -484,19 +491,24 @@ sub _find_language {
 						# The requested sublanguage
 						# isn't supported so don't
 						# define that
+					} elsif($requested_sublanguage) {
+						if(my $c = $self->_code2countryname($requested_sublanguage)) {
+							$self->{_rlanguage} .= " ($c)";
+						} else {
+							$self->{_rlanguage} .= " (Unknown: $requested_sublanguage)";
+						}
 					}
 					return;
 				}
 			} elsif($l =~ /(.+)-(..)$/) {	# TODO: Handle es-419 "Spanish (Latin America)"
 				my $alpha2 = $1;
 				my $variety = $2;
-				# my $accepts = $i18n->accepts($l, $self->{_supported});
-				my $accepts = $l;
+				my $accepts = $i18n->accepts($l, $self->{_supported});
+				$self->_debug("accepts = $accepts");
 
 				if($accepts) {
-					if($self->{_logger}) {
-						$self->{_logger}->debug("accepts: $accepts");
-					}
+					$self->_debug("accepts: $accepts");
+
 					if($accepts =~ /\-/) {
 						delete $self->{_slanguage};
 					} else {
@@ -505,9 +517,7 @@ sub _find_language {
 							$from_cache = $self->{_cache}->get($accepts);
 						}
 						if($from_cache) {
-							if($self->{_logger}) {
-								$self->{_logger}->debug("$accepts is in cache as $from_cache");
-							}
+							$self->_debug("$accepts is in cache as $from_cache");
 							$self->{_slanguage} = (split(/=/, $from_cache))[0];
 						} else {
 							$self->{_slanguage} = $self->_code2language($accepts);
@@ -520,22 +530,17 @@ sub _find_language {
 								});
 								$variety = 'gb';
 							}
-							my $c = $self->_code2countryname($variety);
-							if(defined($c)) {
+							if(defined(my $c = $self->_code2countryname($variety))) {
 								$self->{_sublanguage} = $c;
 							}
 							$self->{_slanguage_code_alpha2} = $accepts;
 							if($self->{_sublanguage}) {
 								$self->{_rlanguage} = "$self->{_slanguage} ($self->{_sublanguage})";
-								if($self->{_logger}) {
-									$self->{_logger}->debug("_rlanguage: $self->{_rlanguage}");
-								}
+								$self->_debug("_rlanguage: $self->{_rlanguage}");
 							}
 							$self->{_sublanguage_code_alpha2} = $variety;
 							unless($from_cache) {
-								if($self->{_logger}) {
-									$self->{_logger}->debug("Set $variety to $self->{_slanguage}=$self->{_slanguage_code_alpha2}");
-								}
+								$self->_debug("Set $variety to $self->{_slanguage}=$self->{_slanguage_code_alpha2}");
 								$self->{_cache}->set($variety, "$self->{_slanguage}=$self->{_slanguage_code_alpha2}", '1 month');
 							}
 							return;
@@ -543,18 +548,18 @@ sub _find_language {
 					}
 				}
 				$self->{_rlanguage} = $self->_code2language($alpha2);
-				if($self->{_logger}) {
-					$self->{_logger}->debug("_rlanguage: $self->{_rlanguage}");
-				}
+				$self->_debug("_rlanguage: $self->{_rlanguage}");
+
 				if($accepts) {
-					$http_accept_language =~ /(.{2})-(..)/;
+					$self->_debug("http_accept_language = $http_accept_language");
+					# $http_accept_language =~ /(.{2})-(..)/;
+					$l =~ /(..)-(..)/;
 					$variety = lc($2);
 					# Ignore en-029 etc (Caribbean English)
 					if(($variety =~ /[a-z]{2,3}/) && !defined($self->{_sublanguage})) {
 						$self->_get_closest($alpha2, $alpha2);
-						if($self->{_logger}) {
-							$self->{_logger}->debug("Find the country code for $variety");
-						}
+						$self->_debug("Find the country code for $variety");
+
 						if($variety eq 'uk') {
 							# ???
 							$self->_warn({
@@ -568,9 +573,8 @@ sub _find_language {
 							$from_cache = $self->{_cache}->get($variety);
 						}
 						if(defined($from_cache)) {
-							if($self->{_logger}) {
-								$self->{_logger}->debug("$variety is in cache as $from_cache");
-							}
+							$self->_debug("$variety is in cache as $from_cache");
+
 							my $language_code2;
 							($language_name, $language_code2) = split(/=/, $from_cache);
 							$language_name = $self->_code2countryname($variety);
@@ -586,8 +590,8 @@ sub _find_language {
 								eval {
 									$language_name = $self->_code2countryname($variety);
 								};
-							} elsif($self->{_logger}) {
-								$self->{_logger}->debug("Can't find the country code for $variety in Locale::Object::DB");
+							} else {
+								$self->_debug("Can't find the country code for $variety in Locale::Object::DB");
 							}
 						}
 						if($@ || !defined($language_name)) {
@@ -597,14 +601,9 @@ sub _find_language {
 							});
 						} else {
 							$self->{_sublanguage} = $language_name;
-							if($self->{_logger}) {
-								# Don't use ',' or else t/logger.t will fail
-								$self->{_logger}->debug('variety name ' . $self->{_sublanguage});
-							}
+							$self->_debug('variety name ', $self->{_sublanguage});
 							if($self->{_cache} && !defined($from_cache)) {
-								if($self->{_logger}) {
-									$self->{_logger}->debug("Set $variety to $self->{_slanguage}=$self->{_slanguage_code_alpha2}");
-								}
+								$self->_debug("Set $variety to $self->{_slanguage}=$self->{_slanguage_code_alpha2}");
 								$self->{_cache}->set($variety, "$self->{_slanguage}=$self->{_slanguage_code_alpha2}", '1 month');
 							}
 						}
@@ -616,8 +615,10 @@ sub _find_language {
 					}
 				}
 			}
-		} elsif(($http_accept_language =~ /;/) && (defined($self->{_logger}))) {
-			$self->{_logger}->warn(__PACKAGE__, ": lower priority supported language may be missed HTTP_ACCEPT_LANGUAGE=$http_accept_language");
+		} elsif($http_accept_language =~ /;/) {
+			# e.g. HTTP_ACCEPT_LANGUAGE=de-DE,de;q=0.9
+			# and we don't support DE at all
+			$self->_warn(__PACKAGE__, ': ', __LINE__, ": lower priority supported language may be missed HTTP_ACCEPT_LANGUAGE=$http_accept_language");
 		}
 		if($self->{_slanguage} && ($self->{_slanguage} ne 'Unknown')) {
 			if($self->{_rlanguage} eq 'Unknown') {
@@ -650,7 +651,7 @@ sub _find_language {
 		return;
 	}
 
-	# The client hasn't said which to use, guess from their IP address,
+	# The client hasn't said which to use, so guess from their IP address,
 	# or the requested language(s) isn't/aren't supported so use the IP
 	# address for an alternative
 	my $country = $self->country();
@@ -664,9 +665,7 @@ sub _find_language {
 	}
 
 	if(defined($country)) {
-		if($self->{_logger}) {
-			$self->{_logger}->debug("country: $country");
-		}
+		$self->_debug("country: $country");
 		# Determine the first official language of the country
 
 		my $from_cache;
@@ -676,9 +675,7 @@ sub _find_language {
 		my $language_name;
 		my $language_code2;
 		if($from_cache) {
-			if($self->{_logger}) {
-				$self->{_logger}->debug("$country is in cache as $from_cache");
-			}
+			$self->_debug("$country is in cache as $from_cache");
 			($language_name, $language_code2) = split(/=/, $from_cache);
 		} else {
 			my $l = $self->_code2country(uc($country));
@@ -687,8 +684,8 @@ sub _find_language {
 				if(defined($l)) {
 					$language_name = $l->name;
 					$language_code2 = $l->code_alpha2;
-					if($self->{_logger} && $language_name) {
-						$self->{_logger}->debug("Official language: $language_name");
+					if($language_name) {
+						$self->_debug("Official language: $language_name");
 					}
 				}
 			}
@@ -705,30 +702,25 @@ sub _find_language {
 
 				if($language_name && $language_code2 && !defined($http_accept_language)) {
 					# This sort of thing speeds up search engine access a lot
-					if($self->{_logger}) {
-						$self->{_logger}->debug("Fast assign to $language_code2");
-					}
+					$self->_debug("Fast assign to $language_code2");
 					$code = $language_code2;
 				} else {
-					if($self->{_logger}) {
-						$self->{_logger}->debug("Call language2code on $self->{_rlanguage}");
-					}
+					$self->_debug("Call language2code on $self->{_rlanguage}");
+
 					$code = Locale::Language::language2code($self->{_rlanguage});
 					unless($code) {
 						if($http_accept_language && ($http_accept_language ne $self->{_rlanguage})) {
-							if($self->{_logger}) {
-								$self->{_logger}->debug("Call language2code on $http_accept_language");
-							}
+							$self->_debug("Call language2code on $http_accept_language");
+
 							$code = Locale::Language::language2code($http_accept_language);
 						}
 						unless($code) {
-							# If language is Norwegian (Nynorsk)
+							# If the language is Norwegian (Nynorsk)
 							# lookup Norwegian
 							if($self->{_rlanguage} =~ /(.+)\s\(.+/) {
 								if((!defined($http_accept_language)) || ($1 ne $self->{_rlanguage})) {
-									if($self->{_logger}) {
-										$self->{_logger}->debug("Call language2code on $1");
-									}
+									$self->_debug("Call language2code on $1");
+
 									$code = Locale::Language::language2code($1);
 								}
 							}
@@ -773,21 +765,35 @@ sub _find_language {
 # Try our very best to give the right country - if they ask for en-us and
 # we only have en-gb then give it to them
 
-sub _get_closest {
+# Old code - more readable
+# sub _get_closest {
+	# my ($self, $language_string, $alpha2) = @_;
+#
+	# foreach (@{$self->{_supported}}) {
+		# my $s;
+		# if(/^(.+)-.+/) {
+			# $s = $1;
+		# } else {
+			# $s = $_;
+		# }
+		# if($language_string eq $s) {
+			# $self->{_slanguage} = $self->{_rlanguage};
+			# $self->{_slanguage_code_alpha2} = $alpha2;
+			# last;
+		# }
+	# }
+# }
+
+sub _get_closest
+{
 	my ($self, $language_string, $alpha2) = @_;
 
-	foreach (@{$self->{_supported}}) {
-		my $s;
-		if(/^(.+)-.+/) {
-			$s = $1;
-		} else {
-			$s = $_;
-		}
-		if($language_string eq $s) {
-			$self->{_slanguage} = $self->{_rlanguage};
-			$self->{_slanguage_code_alpha2} = $alpha2;
-			last;
-		}
+	# Create a hash mapping base languages to their full language codes
+	my %base_languages = map { /^(.+)-/ ? ($1 => $_) : ($_ => $_) } @{$self->{_supported}};
+
+	if(exists($base_languages{$language_string})) {
+		$self->{_slanguage} = $self->{_rlanguage};
+		$self->{_slanguage_code_alpha2} = $alpha2;
 	}
 }
 
@@ -796,24 +802,25 @@ sub _what_language {
 	my $self = shift;
 
 	if(ref($self)) {
-		if($self->{_logger}) {
-			$self->{_logger}->trace('Entered _what_language');
-		}
+		$self->_trace('Entered _what_language');
 		if($self->{_what_language}) {
-			if($self->{_logger}) {
-				$self->{_logger}->trace('_what_language: returning cached value: ', $self->{_what_language});
-			}
+			$self->_trace('_what_language: returning cached value: ', $self->{_what_language});
 			return $self->{_what_language};	# Useful in case something changes the $info hash
 		}
 		if(my $info = $self->{_info}) {
 			if(my $rc = $info->lang()) {
 				# E.g. cgi-bin/script.cgi?lang=de
-				if($self->{_logger}) {
-					$self->{_logger}->trace("_what_language set language to $rc from the lang argument");
-				}
+				$self->_trace("_what_language set language to $rc from the lang argument");
 				return $self->{_what_language} = $rc;
 			}
 		}
+	}
+
+	if(my $rc = $ENV{'HTTP_ACCEPT_LANGUAGE'}) {
+		if(ref($self)) {
+			return $self->{_what_language} = $rc;
+		}
+		return $rc;
 	}
 
 	if(defined($ENV{'LANG'})) {
@@ -824,22 +831,15 @@ sub _what_language {
 		}
 		return $ENV{'LANG'};
 	}
-
-	if($ENV{'HTTP_ACCEPT_LANGUAGE'}) {
-		if(ref($self)) {
-			return $self->{_what_language} = $ENV{'HTTP_ACCEPT_LANGUAGE'};
-		}
-		return $ENV{'HTTP_ACCEPT_LANGUAGE'};
-	}
 }
 
 =head2 country
 
-Returns the two character country code of the remote end in lower case.
+Returns the two-character country code of the remote end in lowercase.
 
 If L<IP::Country>, L<Geo::IPfree> or L<Geo::IP> is installed,
-CGI::Lingua will make use of that, otherwise it will do a Whois lookup.
-If you do not have any of those installed I recommend you make use of the
+CGI::Lingua will make use of that, otherwise, it will do a Whois lookup.
+If you do not have any of those installed I recommend you use the
 caching capability of CGI::Lingua.
 
 =cut
@@ -879,26 +879,26 @@ sub country {
 	require Data::Validate::IP;
 	Data::Validate::IP->import();
 
-	unless(is_ipv4($ip)) {
+	if(!is_ipv4($ip)) {
 		if($ip eq '::1') {
 			# special case that is easy to handle
 			$ip = '127.0.0.1';
-		} else {
+		} elsif(!is_ipv6($ip)) {
 			$self->_warn({
-				warning => "$ip isn't a valid IPv4 address\n"
+				warning => "$ip isn't a valid IP address\n"
 			});
 			return;
 		}
 	}
 	if(is_private_ip($ip)) {
 		if($self->{_logger}) {
-			$self->{_logger}->trace("Can't determine country from LAN connection $ip");
+			$self->{_logger}->debug("Can't determine country from LAN connection $ip");
 		}
 		return;
 	}
 	if(is_loopback_ip($ip)) {
 		if($self->{_logger}) {
-			$self->{_logger}->trace("Can't determine country from loopback connection $ip");
+			$self->{_logger}->debug("Can't determine country from loopback connection $ip");
 		}
 		return;
 	}
@@ -934,7 +934,8 @@ sub country {
 		$self->{_country} = $self->{_ipcountry}->inet_atocc($ip);
 		if($self->{_country}) {
 			$self->{_country} = lc($self->{_country});
-		} else {
+		} elsif(is_ipv4($ip)) {
+			# Although it doesn't say so, it looks like IP::Country is IPv4 only
 			$self->_warn({
 				warning => "$ip is not known by IP::Country"
 			});
@@ -961,7 +962,9 @@ sub country {
 				}
 			}
 			if($self->{_have_geoipfree} == 1) {
-				$self->{_country} = lc(($self->{_geoipfree}->LookUp($ip))[0]);
+				if(my $country = ($self->{_geoipfree}->LookUp($ip))[0]) {
+					$self->{_country} = lc($country);
+				}
 			}
 		}
 	}
@@ -1070,9 +1073,8 @@ sub country {
 			}
 		}
 		if($self->{_cache}) {
-			if($self->{_logger}) {
-				$self->{_logger}->debug("Set $ip to $self->{_country}");
-			}
+			$self->_debug("Set $ip to $self->{_country}");
+
 			$self->{_cache}->set($ip, $self->{_country}, '1 hour');
 		}
 	}
@@ -1109,7 +1111,7 @@ sub _load_geoip
 =head2 locale
 
 HTTP doesn't have a way of transmitting a browser's localisation information
-which would be useful for default currency, date formatting etc.
+which would be useful for default currency, date formatting, etc.
 
 This method attempts to detect the information, but it is a best guess
 and is not 100% reliable.  But it's better than nothing ;-)
@@ -1207,13 +1209,10 @@ CGI::Lingua will make use of that, otherwise it will use ip-api.com
 sub time_zone {
 	my $self = shift;
 
-	if($self->{_logger}) {
-		$self->{_logger}->trace('Entered time_zone');
-	}
+	$self->_trace('Entered time_zone');
+
 	if($self->{_timezone}) {
-		if($self->{_logger}) {
-			$self->{_logger}->trace('quick return: ', $self->{_timezone});
-		}
+		$self->_trace('quick return: ', $self->{_timezone});
 		return $self->{_timezone};
 	}
 
@@ -1228,9 +1227,7 @@ sub time_zone {
 		}
 		if(!$self->{_timezone}) {
 			if(eval { require LWP::Simple::WithCache; require JSON::Parse } ) {
-				if($self->{_logger}) {
-					$self->{_logger}->debug("Look up $ip on ip-api.com");
-				}
+				$self->_debug("Look up $ip on ip-api.com");
 
 				LWP::Simple::WithCache->import();
 				JSON::Parse->import();
@@ -1253,8 +1250,8 @@ sub time_zone {
 		}
 	}
 
-	if($self->{_logger} && !defined($self->{_timezone})) {
-		$self->{_logger}->warn("Couldn't determine the timezone");
+	if(!defined($self->{_timezone})) {
+		$self->_warn("Couldn't determine the timezone");
 	}
 	return $self->{_timezone};
 }
@@ -1267,24 +1264,19 @@ sub _code2language
 	return unless($code);
 	if($self->{_logger}) {
 		if(defined($self->{_country})) {
-			$self->{_logger}->trace("_code2language $code, country ", $self->{_country});
+			$self->_debug("_code2language $code, country ", $self->{_country});
 		} else {
-			$self->{_logger}->trace("_code2language $code");
+			$self->_debug("_code2language $code");
 		}
 	}
 	unless($self->{_cache}) {
 		return Locale::Language::code2language($code);
 	}
-	my $from_cache = $self->{_cache}->get("code2language/$code");
-	if($from_cache) {
-		if($self->{_logger}) {
-			$self->{_logger}->trace("_code2language found in cache $from_cache");
-		}
+	if(my $from_cache = $self->{_cache}->get("code2language/$code")) {
+		$self->_trace("_code2language found in cache $from_cache");
 		return $from_cache;
 	}
-	if($self->{_logger}) {
-		$self->{_logger}->trace('_code2language not in cache, storing');
-	}
+	$self->_trace('_code2language not in cache, storing');
 	return $self->{_cache}->set("code2language/$code", Locale::Language::code2language($code), '1 month');
 }
 
@@ -1294,12 +1286,10 @@ sub _code2country
 	my ($self, $code) = @_;
 
 	return unless($code);
-	if($self->{_logger}) {
-		if($self->{_country}) {
-			$self->{_logger}->trace("_code2country $code, country ", $self->{_country});
-		} else {
-			$self->{_logger}->trace("_code2country $code");
-		}
+	if($self->{_country}) {
+		$self->_trace("_code2country $code, country ", $self->{_country});
+	} else {
+		$self->_trace("_code2country $code");
 	}
 	local $SIG{__WARN__} = sub {
 		if($_[0] !~ /No result found in country table/) {
@@ -1317,9 +1307,7 @@ sub _code2countryname
 	my ($self, $code) = @_;
 
 	return unless($code);
-	if($self->{_logger}) {
-		$self->{_logger}->trace("_code2countryname $code");
-	}
+	$self->_trace("_code2countryname $code");
 	unless($self->{_cache}) {
 		my $country = $self->_code2country($code);
 		if(defined($country)) {
@@ -1327,20 +1315,139 @@ sub _code2countryname
 		}
 		return;
 	}
-	my $from_cache = $self->{_cache}->get("code2countryname/$code");
-	if($from_cache) {
-		if($self->{_logger}) {
-			$self->{_logger}->trace("_code2countryname found in cache $from_cache");
-		}
+	if(my $from_cache = $self->{_cache}->get("code2countryname/$code")) {
+		$self->_trace("_code2countryname found in cache $from_cache");
 		return $from_cache;
 	}
-	if($self->{_logger}) {
-		$self->{_logger}->trace('_code2countryname not in cache, storing');
-	}
-	my $country = $self->_code2country($code);
-	if(defined($country)) {
+	$self->_trace('_code2countryname not in cache, storing');
+	if(my $country = $self->_code2country($code)) {
 		return $self->{_cache}->set("code2countryname/$code", $country->name, '1 month');
 	}
+}
+
+# Helper routines for logger()
+sub _log
+{
+	my ($self, $level, @messages) = @_;
+
+	if(my $logger = $self->{'logger'}) {
+		if(ref($logger) eq 'CODE') {
+			# Code reference
+			$logger->({
+				class => ref($self) // __PACKAGE__,
+				function => (caller(2))[3],
+				line => (caller(1))[2],
+				level => $level,
+				message => \@messages
+			});
+		} elsif(!ref($logger)) {
+			# File
+			if(open(my $fout, '>>', $logger)) {
+				print $fout uc($level), ': ', ref($self) // __PACKAGE__, ' ', (caller(2))[3], (caller(1))[2], join(' ', @messages), "\n";
+				close $fout;
+			}
+		} else {
+			# Object
+			$logger->$level(@messages);
+		}
+	}
+}
+
+sub _debug {
+	my $self = shift;
+	$self->_log('debug', @_);
+}
+
+sub _info {
+	my $self = shift;
+	$self->_log('info', @_);
+}
+
+sub _trace {
+	my $self = shift;
+	$self->_log('trace', @_);
+}
+
+# Emit a warning message somewhere
+sub _warn {
+	my $self = shift;
+
+	my $params = $self->_get_params('warning', @_);
+
+	# Validate input parameters
+	return unless($params && (ref($params) eq 'HASH'));
+	my $warning = $params->{'warning'};
+	return unless($warning);
+
+	if($self eq __PACKAGE__) {
+		# Called from class method
+		Carp::carp($warning);
+		return;
+	}
+	# return if($self eq __PACKAGE__);  # Called from class method
+
+	# FIXME: add caller's function
+	push @{$self->{'warnings'}}, { warning => $warning };
+
+	# Handle syslog-based logging
+	if($self->{syslog}) {
+		require Sys::Syslog;
+
+		Sys::Syslog->import();
+		if(ref($self->{syslog} eq 'HASH')) {
+			Sys::Syslog::setlogsock($self->{syslog});
+		}
+		if(my $info = $self->{_info}) {
+			openlog($info->script_name(), 'cons,pid', 'user');
+		} else {
+			openlog(__PACKAGE__, 'cons,pid', 'user');
+		}
+		syslog('warning', $warning);
+		closelog();
+	}
+
+	# Handle logger-based logging
+	if(my $logger = $self->{logger}) {
+		$self->_log('warn', $warning);
+	} elsif(!defined($self->{syslog})) {
+		# Fallback to Carp warnings
+		Carp::carp($warning);
+	}
+}
+
+# Helper routine to parse the arguments given to a function.
+# Processes arguments passed to methods and ensures they are in a usable format,
+#	allowing the caller to call the function in anyway that they want
+#	e.g. foo('bar'), foo(arg => 'bar'), foo({ arg => 'bar' }) all mean the same
+#	when called _get_params('arg', @_);
+sub _get_params
+{
+	shift;  # Discard the first argument (typically $self)
+	my $default = shift;
+
+	# Directly return hash reference if the first parameter is a hash reference
+	return $_[0] if(ref $_[0] eq 'HASH');
+
+	my %rc;
+	my $num_args = scalar @_;
+
+	# Populate %rc based on the number and type of arguments
+	if(($num_args == 1) && (defined $default)) {
+		# %rc = ($default => shift);
+		return { $default => shift };
+	} elsif($num_args == 1) {
+		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '()');
+	} elsif(($num_args == 0) && (defined($default))) {
+		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], "($default => \$val)");
+	} elsif(($num_args % 2) == 0) {
+		%rc = @_;
+	} elsif($num_args == 0) {
+		return;
+	} else {
+		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '()');
+	}
+
+	return \%rc;
 }
 
 =head1 AUTHOR
@@ -1348,6 +1455,9 @@ sub _code2countryname
 Nigel Horne, C<< <njh at bandsman.co.uk> >>
 
 =head1 BUGS
+
+Please report any bugs or feature requests to the author.
+This module is provided as-is without any warranty.
 
 If HTTP_ACCEPT_LANGUAGE is 3 characters, e.g., es-419,
 sublanguage() returns undef.
@@ -1403,7 +1513,7 @@ L<http://deps.cpantesters.org/?module=CGI::Lingua>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010-2024 Nigel Horne.
+Copyright 2010-2025 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

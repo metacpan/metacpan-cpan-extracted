@@ -13,6 +13,7 @@ cat-v \[ 选项 \] args ...
        -o   --original      Print original line as is
        -t   --expand[=#]    Expand tabs
        -T   --no-expand     Do not expand tabs
+       -E                   Escape backslash character
       --ts  --tabstyle=#    Set tab style
             --tabstop=#     Set tab width
             --tabhead=#     Set tab-head character
@@ -31,7 +32,7 @@ cat-v \[ 选项 \] args ...
 
 # VERSION
 
-Version 1.02
+Version 1.03
 
 # DESCRIPTION
 
@@ -110,13 +111,14 @@ Version 1.02
 
 - **-n**, **--reset**
 
-    禁用所有字符转换并重置重复字符。
+    禁用所有字符转换和制表符扩展，并重置重复字符。因此，`cat-v -n`实际上什么也不做，就像 `cat` 命令一样。
 
 - **-c**, **--visible** _name_=_flag_,...
 
     将字符类型和标记作为参数，以指定要可视化的字符和转换格式。
 
         c  control style
+        e  escape style
         s  symbol style
         m  Unicode mark (if exists)
         0  do not convert
@@ -135,6 +137,14 @@ Version 1.02
     如果为名称指定了 `all`，则该值适用于所有字符类型。下面的命令将所有字符设置为 `s`，然后将 `nl`、`nl`、`np` 和 `sp` 设置为 `m`，并禁用 `esc`。这是默认状态。
 
         cat-v -c all=s,nul=nl=np=sp=m,esc=0
+
+    如果没有指定任何名称标签，则假定给出的是 `all`。下面的命令以转义形式打印除换行符以外的所有控制字符，这与 Perl 的字符串字面形式兼容。
+
+        cat-v -n -ce,nl=0
+
+    上述命令与此完全相同。
+
+        cat-v --no-expand --reset --visible all=e,nl=0
 
 - **--**_name_\[=_replacement_\]
 
@@ -214,6 +224,16 @@ Version 1.02
     设置制表符展开的样式。例如选择 `symbol` 或 `shade`。如果组合了两个样式名称，如 `squat-arrow,middle-dot`，则在制表符头使用 `squat-arrow`，在制表符空间使用 `middle-dot`。
 
     如果调用时不带参数，则显示可用样式表。样式在 [Text::ANSI::Fold](https://metacpan.org/pod/Text%3A%3AANSI%3A%3AFold) 库中定义。
+
+- **-E**, **--escape-backslash**
+
+    将反斜线字符转换为转义形式 `//`。
+
+    虽然反斜杠不是控制字符，但通过这种方式，将其他控制字符转换为转义表达式的结果可以完全解释为各种编程语言的字符串字面意义。
+
+    下面的命令可以重现原始文件的全部内容。
+
+        echo -ne "$(cat-v -Ence FILE)"
 
 # INSTALL
 

@@ -1,5 +1,8 @@
 Revision history for String-Compile-Tr
 
+0.04    2025/02/07
+        Reorganize tests
+
 0.03    2025/02/05
         Separate test requiring option 'r'
 

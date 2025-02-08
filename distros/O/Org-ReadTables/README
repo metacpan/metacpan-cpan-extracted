@@ -1,0 +1,246 @@
+NAME
+
+    Org::ReadTables - Import Org Mode tables into arrays, or directly into
+    database tables
+
+SYNOPSIS
+
+        use Org::ReadTables;
+    
+        my $op = Org::ReadTables->new( dbh => $dbh,
+                                       table => 'example',
+                                       tables => ['a_table']
+                                     );
+        # or:
+        # When called without a 'dbh' argument, saves values
+        # which can be retrieved via the 'saved' method.
+        #
+        my $op = Org::ReadTables->new( cb => \&row_callback,
+                                       cb_table => \&table_callback,
+                                     );
+        # then:
+        $op->parse( $mojo_file->slurp );
+
+DESCRIPTION
+
+    Org::ReadTables loads data from one or more Emacs Org Mode tables in an
+    org file into a DBI style database which supports the
+    SQL::Abstract/insert method. The underlying DBD must also support the
+    returning option for insertion.
+
+    For example, given the following .org file:
+
+      #+NAME: LCCN_Serial
+      | LCCN       | Publication           | City    | Start_Date |   End_Date |
+      |------------+-----------------------+---------+------------+------------|
+      | sn92024097 | Adahooniłigii         | Phoenix |            |            |
+      | sn87062098 | Arizona Daily Citizen | Tucson  |            |            |
+      | sn84020558 | Arizona Republican    | Phoenix |            | 1930-11-10 |
+      | sn83045137 | Arizona Republic      | Phoenix | 1930-11-11 |            |
+
+    and a database containing a table called lccn_serial, the parse method
+    would insert four rows into it, in the fields whose names are given in
+    the column headings.
+
+    The NAME: org attribute specifies the table name; a default value may
+    be passed in the table parameter to the new method. Additionally, a
+    tables array may be passed by reference against which the names of such
+    tables will be validated; table names not listed will have their org
+    tables skipped.
+
+    Table names may also be specified in a Name property (not
+    case-sensitive) in an Orgmode Drawer preceding the table. For example:
+
+        :PROPERTIES:
+        :Name: Locos
+        :END:
+        | Wheel Arrangement | Locomotive Type |
+        |-------------------+-----------------|
+        | oo-oo>            | American        |
+        | ooo-oo>           | Mogul           |
+
+    Additionally, with the Drawer format, fixed column values may
+    optionally be specified:
+
+        :PROPERTIES:
+        :Name: Locos
+        :Country: .us
+        :END:
+        | Wheel Arrangement | Locomotive Type |
+        |-------------------+-----------------|
+        | oo-oo>            | American        |
+        | ooo-oo>           | Mogul           |
+
+    which would have the effect of adding a 'country' column to the right
+    of each record, all having the value '.us'.
+
+ Pivot Tables
+
+    NOTE: This is a future feature, not yet fully implemented.
+
+    When it is desirable to enter data two-dimensionally, a construct like
+    this may be used:
+
+        :PROPERTIES:
+        :Name: sizes
+        :Data: size_desc
+        |     class> |     A |   B   |  C  |
+        |  size_code |       |       |     |
+        |------------+-------+-------+-----|
+        |          1 |   1-2 | 22-26 |     |
+        |          2 |   3-4 | 26-30 | XS  |
+        |          3 |   5-6 | 30-34 | S   |
+
+    where the `Data` property determines which field (column) is assigned
+    the pivoted value. The above table would generate eight data records
+    for the `sizes` table:
+
+        size_code='1', class='A', size_desc='1-2'
+        size_code='2', class='A', size_desc='3-4'
+        size_code='3', class='A', size_desc='5-6'
+        size_code='1', class='B', size_desc='22-26'
+        size_code='2', class='B', size_desc='26-30'
+        size_code='3', class='B', size_desc='30-34'
+        size_code='2', class='C', size_desc='XS'
+        size_code='3', class='C', size_desc='S'
+
+    Note that no record is created for class 'C' with size_code '1' as that
+    entry in the pivot table is blank.
+
+ATTRIBUTES
+
+    Org::ReadTables implements the following attributes.
+
+ inserted
+
+    Returns a hashref, each element's key being the name of a table into
+    which rows were inserted, and its value being the number of rows
+    inserted into that table.
+
+ errors
+
+    Returns a reference to an array, each entry in which itself be an array
+    whose values are:
+
+    a hash (the column names and values to be inserted), and
+
+    the resulting error report from that insertion
+
+METHODS
+
+ new
+
+    Creates a new Org::ReadTables object. Parameters include:
+
+  dbh
+
+    should be an open database handle from, e.g., DBD::SQLite, Mojo::SQLite
+    or Mojo::Pg. Each row to be saved will invoke the 'insert' method of
+    this handle (or, more generally, class instance); no other methods will
+    be called, so any object that has provides 'insert' may be used. For
+    each found record, the insert() method of this object will be called.
+    Note that no protection is given here against invalid column names or
+    other database errors.
+
+  cb
+
+    Reference to a callback function to be called for each found record, in
+    tables which are processed. Parameters passed are the name of the
+    table, and a reference to a hash of the record's column-names and
+    values. The function should return the count of records successfully
+    saved (either 0 or 1, usually).
+
+  cb_table
+
+    Reference to a callback function to be called at the start of
+    processing of a new table, as they are found in the orgfile. The
+    callback will be passed one argument, a hash with keys:
+
+      * name: A string with the name of the table
+
+      * nameref: A reference to the table-name string. This may be changed
+      by the callback.
+
+      * columns: A reference to the array of the names of the columns in
+      the table. The contents of the referred array may be maniuplated to
+      match the actual database field names, for example.
+
+      * fixed: A reference to a hash of fixed column key/values. This may
+      also be changed by the callback.
+
+      * caption: The caption, if any, attached above the table itself
+
+      * data_column: The name of the data column in a pivot table
+
+    ...and should return a true value if the table is to be processed or
+    saved, or a false or 'undef' value to skip the table (the 'cb' callback
+    will not be called for rows in such tables).
+
+  table
+
+    (optional) the default table name, which will be used for all unnamed
+    tables. Use an Orgmode property NAME before each table to name it, as:
+
+        #+NAME: PostalAbbrev
+        | Code | State   |
+        |------+---------|
+        | AZ   | Arizona |
+        | FL   | Florida |
+        | KS   | Kansas  |
+
+  tables
+
+    (optional) a reference to a list of valid table names to process
+    (others will be ignored). If tables is not given, table should be
+    present; otherwise for input not containing an Orgmode NAME property,
+    no processing will occur.
+
+ parse
+
+      $op->parse($text, [$default_table]);
+
+    Parses the given text which should be in Org Mode format. It is the
+    caller's responsibility to slurp a file or other data source. The
+    optional second parameter will be used as the default name of any table
+    not having an Orgmode NAME property, overriding any table value
+    provided via the new method.
+
+ saved
+
+      $op->saved();
+      $op->saved->($selected_table);
+
+    Returns a hash of the tables read; each key is a table name, the value
+    being an array of hashes of the rows. If a table name is passed,
+    returns the array of hashes only for that particular table, or undef if
+    no such table existed in any input.
+
+ inserted
+
+      $op->inserted();
+      $op->inserted->($selected_table);
+
+    With no parameter, returns a hash of the tables processed and a count
+    of rows found (and presumably inserted) in each. With a parameter,
+    returns the count of rows for that table, or undef if no such table was
+    processed.
+
+BUGS
+
+    Report any issues to the author.
+
+AUTHOR
+
+    William Lindley, wlindley@cpan.org
+
+COPYRIGHT AND LICENSE
+
+    Copyright 2025, William Lindley.
+
+    This library is free software; you may redistribute it and/or modify it
+    under the terms of the Artistic License version 2.0.
+
+SEE ALSO
+
+    Org::Parser, https://orgmode.org/
+

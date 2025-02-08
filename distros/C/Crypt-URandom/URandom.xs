@@ -39,6 +39,11 @@ crypt_urandom_getrandom(length)
         int result;
     CODE:
         Newx(data, length + 1u, char);
+#if defined(__sun) && defined(__SVR4)
+        if (length == 0) {
+            result = 0;
+        } else {
+#endif
       GETRANDOM:
 #ifdef HAVE_CRYPT_URANDOM_NATIVE_GETRANDOM
         result = getrandom(data, length, GRND_NONBLOCK);
@@ -72,6 +77,9 @@ crypt_urandom_getrandom(length)
                 croak("Failed to getrandom:%s", strerror(errno));
             }
         }
+#if defined(__sun) && defined(__SVR4)
+        }
+#endif
         data[result] = '\0';
         RETVAL = newSVpv(data, result);
         Safefree(data);

@@ -1,0 +1,32 @@
+#+constants: kmax=7.3
+
+
+* Farms 5 -
+
+#+PROPERTY: comment Foobar
+:PROPERTIES:
+:constants: kmax=7.3 gkmax=15.678 comment=betaQuartz
+:comment: blech
+:END:
+#+CONSTANTS: kmax=6.1
+|   | r5 | 1x1x1_24116_7220 | Fleur.sc_i0_w3 | 6.1 | #ERROR | Foobar |
+|   | r6 | 1x1x1_24116_7223 | Fleur.sc_i0_w3 | 6.1 | #ERROR | Foobar |
+| $ |    | Xcomment=Boo     |                |     |        |        |
+#+TBLFM: $5=$kmax::$6=$gkmax::$7=$PROP_comment
+
+
+|---+---------+--------+--------+--------+-------+------|
+|   | Student | Prob 1 | Prob 2 | Prob 3 | Total | Note |
+|---+---------+--------+--------+--------+-------+------|
+| ! |         |     P1 |     P2 |     P3 |   Tot |      |
+| # | Maximum |     10 |     15 |     25 |    50 | 10.0 |
+| ^ |         |     m1 |     m2 |     m3 |    mt |      |
+|---+---------+--------+--------+--------+-------+------|
+| # | Peter   |     10 |      8 |     22 |    40 |  8.0 |
+| # | Sam     |      2 |      4 |      7 |     9 |  1.8 |
+|---+---------+--------+--------+--------+-------+------|
+|   | Average |        |        |        |  24.5 |      |
+| ^ |         |        |        |        |    at |      |
+| $ | max=50  |        |        |        |       |      |
+|---+---------+--------+--------+--------+-------+------|
+#+TBLFM: $6=vsum($P1..$P3)::$7=10*$Tot/$max;%.1f::$at=vmean(@-II..@-I);%.1f

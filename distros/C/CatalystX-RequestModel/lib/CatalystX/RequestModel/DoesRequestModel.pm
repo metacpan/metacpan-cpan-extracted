@@ -138,7 +138,84 @@ sub get_content_body_parser_class {
 
 sub get_attribute_value_for {
   my ($self, $attr) = @_;
+  die "Can't get attribute value for $attr" unless $self->can($attr);
   return $self->$attr;
+}
+
+sub as_data {
+  my $self = shift;
+  my (@namespace, $spec);
+
+  # separate out the namespace from data spec pattern
+  foreach my $arg (@_) {
+    if(ref($arg) eq 'ARRAY') {
+      $spec = $arg;
+    } else {
+      push @namespace, $arg;
+    }
+  }
+
+  # Get property info as a hash
+  my %property_info = map { %$_ } $self->properties;
+
+  # if we have a namespace, we need to descend into the data structure
+  if(@namespace){
+    my $value = $self;
+    foreach my $ns (@namespace) {
+      $value = $value->$ns;
+    }
+    $self = $value;
+  }
+
+  # loop over the spec and get the data
+  my %return;
+  foreach my $field_proto (@$spec) {
+    my ($field, $sub_spec);
+    if(ref($field_proto) eq 'HASH') {
+      ($field, $sub_spec) = %$field_proto;
+    } else {
+      $field = $field_proto;
+    }
+    if(exists $property_info{$field}) {
+      # Its a property, so process correctly
+      my $meta = $property_info{$field};
+      if(my $predicate = $meta->{attr_predicate}) {
+        if($meta->{omit_empty}) {
+          next unless $self->$predicate;  # skip empties when omit_empty=>1
+        }
+      }
+
+      # get the attribute value
+      my $value = $self->get_attribute_value_for($field);
+
+      # it can be an array, an object or a plain scalar value
+      if( (ref($value)||'') eq 'ARRAY') {
+        my @gathered = ();
+        foreach my $v (@$value) {
+          if(Scalar::Util::blessed($v)) {
+            my $params = $v->as_data($sub_spec);
+            push @gathered, $params if keys(%$params);
+          } else {
+            push @gathered, $v;
+          }
+        }
+        $return{$field} = \@gathered;
+      } elsif(Scalar::Util::blessed($value) && $value->can('as_data')) { 
+        my $params = $value->as_data($sub_spec);
+        next unless keys(%$params);
+        $return{$field} = $params;
+      } else {
+        $return{$field} = $value;
+      }
+    } else {
+      # Its not a property, so just return the value.  This is to let
+      # you customize the return data structure with your own non property
+      # attributes or methods.
+      $return{$field} = $self->get_attribute_value_for($field);
+    }
+  }
+
+  return \%return;
 }
 
 sub nested_params {
@@ -235,6 +312,128 @@ Attributes that are empty will be left out of the return data structure.
 
 Easiest way to get all your data but then again you get a structure that is very tightly tied to
 your request model.  
+
+=head2 as_data
+
+  my $data = $object->as_data(@namespace, $spec);
+
+This method serializes the object into a data structure (hash reference) based on the provided specification.
+ It allows for selective extraction of object properties and supports nested structures.
+
+=over 4
+
+=item @namespace
+
+An optional list of method names to call on the object to navigate to the desired sub-object. 
+Each method in the namespace should return an object or value that the next method in the namespace 
+can be called on.
+
+=item $spec
+
+An array reference that defines which properties to include in the serialized data. Each element 
+in the array can be either a string (property name) or a hash reference (property name 
+and sub-specification).
+
+=back
+
+The method performs the following steps:
+
+=over 4
+
+=item 1.
+
+Separates the namespace from the data specification pattern.
+
+=item 2.
+
+Retrieves property information as a hash.
+
+=item 3.
+
+If a namespace is provided, navigates through the object structure to the desired sub-object.
+
+=item 4.
+
+Iterates over the specification array and extracts the corresponding data from the object.
+
+=back
+
+The method handles properties that are arrays, objects, or plain scalar values. It also respects the 
+`omit_empty` attribute for properties, skipping them if they are empty and `omit_empty` is set to true.
+
+Returns a hash reference containing the serialized data.
+
+=head3 Examples
+
+=over 4
+
+=item Basic Usage
+
+  # Example 1: Converting a flat structure of incoming parameters
+  # Imagine these are parameters from an HTTP request (e.g., form submission)
+  my %incoming_params = (
+    property1 => 'Alice',
+    property2 => 'Engineer',
+  );
+
+  # Create the request model object with the incoming parameters
+  my $object = My::RequestModel->new(%incoming_params);
+
+  # Convert the request model into a simple hash reference.
+  # This will only include 'property1' and 'property2' from the object.
+  my $data = $object->as_data(['property1', 'property2']);
+
+  use Data::Dumper;
+  print "Flat conversion:\n", Dumper($data);
+
+  $VAR1 = {
+            'property1' => 'Alice',
+            'property2' => 'Engineer'
+          };
+
+  # Example 2: Converting a nested structure
+  # Here, the incoming parameters include a nested hash for address details.
+  my %incoming_nested = (
+    property1 => 'Alice',
+    property2 => 'Engineer',
+    address   => {
+      street => '123 Main St',
+      city   => 'Anytown',
+    },
+  );
+
+  # Re-create the request model object with nested parameters.
+  my $nested_object = My::RequestModel->new(%incoming_nested);
+
+  # Convert into a hash reference.
+  # The first argument 'address' directs as_data to navigate into the nested address object.
+  # The spec ['street', 'city'] lists the properties to extract from that nested object.
+  my $nested_data = $nested_object->as_data([
+    'property1', 'property2',   # top-level properties
+    {'address' => ['street', 'city'] }
+  ]
+  );
+
+  print "Nested conversion:\n", Dumper($nested_data);
+
+  $VAR1 = {
+            'property1' => 'Alice',
+            'property2' => 'Engineer',
+            'address' => {
+                           'street' => '123 Main St',
+                           'city' => 'Anytown'
+                         }
+          };
+
+=item Nested Structures
+
+  my $data = $object->as_data('sub_object', [
+    'property1',
+    { 'nested_property' => ['sub_property1', 'sub_property2'] }
+  ]);
+
+This will navigate to the 'sub_object' within the main object and serialize 'property1' and 'nested_property', 
+where 'nested_property' includes 'sub_property1' and 'sub_property2'.
 
 =head2 get
 

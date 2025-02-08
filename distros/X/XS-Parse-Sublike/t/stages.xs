@@ -106,7 +106,7 @@ static void stage_finish_signature(pTHX_ struct XSParseSublikeContext *ctx, void
     if(!SvPOK(sv))
       sv_setpv(sv, "");
 
-    sv_catpvf(sv, "[n=%" UVuf "])", PL_parser->sig_elems);
+    sv_catpvf(sv, "[n=%" UVuf "])", xps_signature_query_params(ctx));
   }
 }
 #endif

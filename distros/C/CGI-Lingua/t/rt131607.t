@@ -4,16 +4,14 @@ use strict;
 use warnings;
 use Test::More;
 use Test::Without::Module qw(LWP::Simple::WithCache);
+use Test::Needs 'Geo::IP', 'JSON::Parse';
 
 use lib 't/lib';
 use MyLogger;
 
 # See https://rt.cpan.org/Public/Bug/Display.html?id=79214
 
-unless(-e 't/online.enabled') {
-	plan skip_all => 'On-line tests disabled';
-} elsif((eval { require Geo::IP; }) ||
-	(eval { require JSON::Parse } )) {
+if(-e 't/online.enabled') {
 	plan tests => 4;
 
 	use_ok('CGI::Lingua');
@@ -43,5 +41,5 @@ unless(-e 't/online.enabled') {
 	};
 	like($@, qr/^You must have LWP::Simple::WithCache/, 'Need connection to ip-api.com');
 } else {
-	plan(skip_all => 'Need either Geo::IP or JSON::Parse to test t/rt131607.t');
+	plan skip_all => 'On-line tests disabled';
 }

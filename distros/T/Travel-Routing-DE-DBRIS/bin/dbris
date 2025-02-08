@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.020;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use utf8;
 use DateTime;
@@ -14,15 +14,14 @@ use List::Util   qw(max);
 use Travel::Status::DE::DBRIS;
 use Travel::Routing::DE::DBRIS;
 
-my ( $date, $time, $from, $to, $language );
+my ( $date, $time, $arrival, $from, $to, $language );
 my $mots;
-my ( $first_class, $passengers );
-my $developer_mode;
-my $show_jid;
-my ( $json_output, $raw_json_output );
-my $verbose;
+my ( $show_jid,       $show_full_route );
+my ( $show_offers,    $show_upsell_offers, $show_cross_offers );
+my ( $first_class,    $passengers );
+my ( $developer_mode, $verbose );
+my ( $json_output,    $raw_json_output );
 my $use_cache = 1;
-my $show_full_route;
 my $cache;
 
 my %known_mot = map { $_ => 1 }
@@ -49,6 +48,7 @@ my $output_bold_warning  = -t STDOUT ? "\033[1;40;33m" : q{};
 my $output_bold_critical = -t STDOUT ? "\033[1;40;31m" : q{};
 
 GetOptions(
+	'a|arrive=s'           => sub { $arrival = 1; $time = $_[1] },
 	'd|date=s'             => \$date,
 	'h|help'               => sub { show_help(0) },
 	'f|full-route'         => \$show_full_route,
@@ -56,6 +56,9 @@ GetOptions(
 	'j|with-jid'           => \$show_jid,
 	'm|modes-of-transit=s' => \$mots,
 	'l|language=s'         => \$language,
+	'o|with-offers'        => \$show_offers,
+	'with-upsell-offers'   => \$show_upsell_offers,
+	'with-cross-offers'    => \$show_cross_offers,
 	'p|passengers=s'       => \$passengers,
 	't|time=s'             => \$time,
 	'v|verbose'            => \$verbose,
@@ -171,6 +174,7 @@ if ( $date or $time ) {
 			exit 1;
 		}
 	}
+	$opt{arrival}  = $arrival;
 	$opt{datetime} = $dt;
 }
 
@@ -369,6 +373,47 @@ for my $connection ( $ris->connections ) {
 		$header,
 	);
 
+	if ($show_offers) {
+		my $offers_req = Travel::Routing::DE::DBRIS->new(
+			developer_mode => $developer_mode,
+			offers         => {
+				recon => $connection->recon,
+			},
+			passengers  => $opt{passengers},
+			first_class => $opt{first_class},
+		);
+		if ( my $err = $offers_req->errstr ) {
+			say STDERR "Request error while looking up offers: ${err}";
+		}
+		for my $offer ( $offers_req->offers ) {
+			if ( $offer->needs_context ) {
+
+				# offers that are only valid when also bying, e.g., a BC25 or BC50
+				# Note that this automatically skips cross-sell offers.
+				next;
+			}
+			if ( $offer->is_upsell and not $show_upsell_offers ) {
+				next;
+			}
+			if ( $offer->is_cross_sell and not $show_cross_offers ) {
+				next;
+			}
+			printf( '- %5.2f %s %s',
+				$offer->price, $offer->price_unit =~ s{EUR}{€}r,
+				$offer->name );
+			if ( $first_class and $offer->class == 2
+				or not $first_class and $offer->class == 1 )
+			{
+				printf( " %d. Klasse", $offer->class );
+			}
+			if ( scalar $offer->conditions ) {
+				printf( ' (%s)',
+					join( q{ · }, map { $_->{textKurz} } $offer->conditions ) );
+			}
+			say q{};
+		}
+	}
+
 	if ($verbose) {
 		for my $note ( $connection->notes ) {
 			printf( "| %s (%s)\n", $note->{value}, $note->{key} );
@@ -479,12 +524,12 @@ dbris - Interface to bahn.de public transit routing service
 
 =head1 SYNOPSIS
 
-B<dbris> [B<-d> I<DD.MM.YYYY>] [B<-t> I<HH:MM>] [...] I<from-stop>
+B<dbris> [B<-d> I<DD.MM.YYYY>] [B<-a>|B<-t> I<HH:MM>] [...] I<from-stop>
 [I<via-stop>[:I<duration>] [I<via-stop>[:I<duration>]]] I<to-stop>
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 DESCRIPTION
 
@@ -496,6 +541,11 @@ connections, with an optional minimum stopover I<duration> given in minutes.
 =head1 OPTIONS
 
 =over
+
+=item B<-a>, B<--arrive> I<HH:MM>
+
+Request connections that arrive on or after I<HH:MM>.
+Overrides B<--time>.
 
 =item B<-d>, B<--date> I<dd.mm.>[I<yyyy>]
 
@@ -542,6 +592,16 @@ for 90 seconds in F<~/.cache/Travel-Routing-DE-DBRIS> (or a path relative to
 C<$XDG_CACHE_HOME>, if set). Use this option to disable caching. You can use
 B<--cache> to re-enable it.
 
+=item B<-o>, B<--with-offers>
+
+(EXPERIMENTAL)
+Request offers (e.g. local transit tickets, super saver tickets, flex tickets)
+and list their prices, terms, and conditions for each connection.
+Note that this option is still work-in-progress and may miss important details.
+Offers consisting of multiple components (e.g. "buy a BahnCard 25 and then buy
+a cheaper ticket for this connection") are not supported yet.
+See also B<--with-upsell-offers>.
+
 =item B<-p>, B<--passengers> I<type>[:I<discounts>,...][B<;>I<type>[:I<discounts>,...]B<;>...]
 
 Use the specified passenger information to request ticket offers and show the
@@ -564,7 +624,7 @@ Useful for debugging and development purposes.
 
 =item B<-t>, B<--time> I<HH:MM>
 
-Request connections on or after I<HH:MM>.
+Request connections that depart on or after I<HH:MM>.
 Default: now.
 
 =item B<-v>, B<--verbose>
@@ -575,6 +635,11 @@ quality of service issues or announcements.
 =item B<-V>, B<--version>
 
 Show version information and exit.
+
+=item B<--with-upsell-offers>
+
+Include upsell offers such as "travel first class instead of second class".
+Must be used with B<-o> / B<--with-offers>.
 
 =back
 

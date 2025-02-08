@@ -1,6 +1,6 @@
 package App::cat::v;
 
-our $VERSION = "1.02";
+our $VERSION = "1.03";
 
 use 5.024;
 use warnings;
@@ -81,6 +81,21 @@ Visibility {
 };
 bless $_, 'Visibility' for values %control;
 
+# setup 'e' map
+for my $v (values %control) {
+    my %map = (
+	"\t" => '\t',
+	"\n" => '\n',
+	"\r" => '\r',
+	"\f" => '\f',
+	"\b" => '\b',
+	"\a" => '\a',
+	"\e" => '\e',
+    );
+    my $code = $v->code;
+    $v->cmap->{e} = $map{$code} // sprintf "\\x%02x", ord($code);
+}
+
 my %code = pairmap { $a => $b->code } %control;
 
 our $DEFAULT_TABSTYLE = 'needle';
@@ -113,6 +128,7 @@ use Getopt::EX::Hashed; {
     has tabstyle   => ' ts :s  ' , default => $DEFAULT_TABSTYLE ;
     has help       => ' h      ' ;
     has version    => ' v      ' ;
+    has escape_backslash => 'E!' ;
 
     # -n
     has '+reset' => sub {
@@ -120,6 +136,7 @@ use Getopt::EX::Hashed; {
 	    $_->flags->{$name} = '0';
 	}
 	$_->repeat = '';
+	$_->expand = 0;
     };
 
     has '+expand' => sub {
@@ -177,6 +194,9 @@ use Getopt::EX::Hashed; {
 
     has '+visible' => sub {
 	my $param = $_[1];
+	if ($param !~ /^\w+=/) {
+	    $param = "all=$param";
+	}
 	$param =~ s{ \ball\b }{ join('=', keys $_->flags->%*) }xe;
 	push @{$_->visible}, $param;
     };
@@ -232,7 +252,9 @@ sub setup {
 	my $char = $control{$name};
 	my $code = $char->code;
 	if ($flag eq 'c') {
-	    $convert->{$code} = '^' . pack('c',ord($code)+64);
+	    if ($code =~ /[\x00-\x1f]/) {
+		$convert->{$code} = '^' . pack('c',ord($code)+64);
+	    }
 	}
 	elsif ($flag =~ /^([a-z\d])$/i) {
 	    $convert->{$code} = $char->visible($flag);
@@ -241,6 +263,7 @@ sub setup {
 	    $convert->{$char->code} = $flag;
 	}
     }
+    $convert->{"\\"} = "\\\\" if $app->escape_backslash;
     return $app;
 }
 
@@ -251,7 +274,7 @@ sub doit {
     my $repeat_re = do {
 	if (my @c = map { $code{$_} } $app->repeat =~ /\w+/g) {
 	    local $" = "";
-	    qr/[@c]/;
+	    qr/[\Q@c\E]/;
 	} else {
 	    qr/(?!)/;
 	}
@@ -259,7 +282,7 @@ sub doit {
     while (<>) {
 	my $orig = $_;
 	$_ = ansi_expand($_) if $app->expand;
-	s{(?=(${repeat_re}?))([$replace]|(?#bug?)(?!))}{$convert->{$2}$1}g
+	s{(?=(${repeat_re}?))([\Q$replace\E]|(?#bug?)(?!))}{$convert->{$2}$1}g
 	    if $replace ne '';
 	if ($app->original > 1 or
 	    ($app->original and $_ ne $orig)) {

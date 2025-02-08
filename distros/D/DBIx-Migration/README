@@ -3,10 +3,8 @@ NAME
 
 SYNOPSIS
       my $m = DBIx::Migration->new(
-          {
-              dsn => 'dbi:SQLite:~/Projects/myapp/db/myapp.db',
-              dir => '~/Projects/myapp/db/migrations'
-          }
+        dsn => 'dbi:SQLite:~/Projects/myapp/db/myapp.db',
+        dir => '~/Projects/myapp/db/migrations'
       );
 
       # Get current version from database
@@ -45,11 +43,25 @@ DESCRIPTION
     type that is either "up" or "down". Migrations are stored in a directory
     and are applied in order to a database. Usually the version number of
     the first migration is 1. The version numbers of the other migrations
-    have to be ascending without gaps. During processing the content of each
-    migration is read with the "binmode" of ":raw" into a scalar. The
-    content is split into sections using the default SQL delimiter ";". Each
-    section is executed independently. All related sections are encapsulated
-    in a database transaction.
+    have to be ascending without gaps.
+
+    During processing the content of each migration is read with the
+    "binmode" of ":raw" into a scalar. The content is split into sections
+    using the default SQL delimiter ";" (semicolon). Each section is
+    executed independently. All related sections are encapsulated in a
+    database transaction. If a migration embeds stored logic containing one
+    or more semicolons (a PostgreSQL trigger function for example), the
+    "migrate()" method incorrectly splits the migration into sections,
+    causing an error. You can set a different delimiter to overcome this
+    problem. Add the "dbix_migration_delimiter" annotation as an SQL comment
+    to the migration
+
+      -- dbix_migration_delimiter: /
+      ...
+
+    The annotation has to be specified in the first line. The delimiter has
+    to be a single printable ASCII character, excluding the space character.
+    In the previous example it is the "/" (slash) character.
 
 METHODS
     $self->debug( $debug )
@@ -77,13 +89,21 @@ METHODS
 
     $self->version
         Get migration version from database. Will be undef if no migration
-        has taken place yet.
+        has taken place yet. The version is stored in the table
+        dbix_migration. The name of this table may change in the future so
+        don't rely on it.
 
 CAVEATS
     After the "dbh" was used for the first time changing the "dsn",
     "password", or "username" has no impact. The reason is the mutable
     (offering setter methods) design of this module. Changing this will
     break the backwards compatibility.
+
+SEE ALSO
+    *   Liquibase endDelimiter
+        <https://docs.liquibase.com/change-types/enddelimiter-sql.html>
+
+    *   Using pgTAP <https://pgtap.org/documentation.html#usingpgtap>
 
 AUTHOR
     Sebastian Riedel, <kraihx@gmail.com>

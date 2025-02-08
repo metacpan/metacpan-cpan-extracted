@@ -6,8 +6,8 @@ requires 'Pod::Usage';
 requires 'Getopt::Long';
 requires 'Getopt::EX';
 requires 'Getopt::EX::Hashed';
-requires 'Text::ANSI::Fold', '2.23';
-requires 'Text::ANSI::Tabs', '1.0501';
+requires 'Text::ANSI::Fold', '2.29';
+requires 'Text::ANSI::Tabs', '1.06';
 
 on 'develop' => sub {
     recommends 'App::Greple::xlate';

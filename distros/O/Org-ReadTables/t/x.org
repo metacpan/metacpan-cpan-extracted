@@ -1,0 +1,53 @@
+| Code | State   |
+|------+---------|
+| AZ   | Arizona |
+| FL   | Florida |
+| KS   | Kansas  |
+
+#+NAME: Colors
+| Letter | Color   |
+|--------+---------|
+| C      | Cyan    |
+| M      | Magenta |
+| Y      | Yellow  |
+| K      | Black   |
+
+#+NAME: LCCN_Serial
+| LCCN       | Publication           | City    | Start_Date |   End_Date |
+|------------+-----------------------+---------+------------+------------|
+| sn92024097 | Adahooniłigii         | Phoenix |            |            |
+| sn87062098 | Arizona Daily Citizen | Tucson  |            |            |
+| sn84020558 | Arizona Republican    | Phoenix |            | 1930-11-10 |
+| sn83045137 | Arizona Republic      | Phoenix | 1930-11-11 |            |
+
+* Locomotives
+:PROPERTIES:
+:Name: Locos
+:END:
+| Wheel Arrangement | Locomotive Type |
+|-------------------+-----------------|
+| oo-oo>            | American        |
+| ooo-oo>           | Mogul           |
+
+:PROPERTIES:
+:Name: sizes
+:Data: size_desc
+|   |           |     |       |    |
+| > |     class |   A |     B | C  |
+|   |   boo foo |     |       |    |
+|   | size_code |     |       |    |
+|---+-----------+-----+-------+----|
+|   |         1 | 1-2 | 22-26 |    |
+|   |         2 | 3-4 | 26-30 | XS |
+|   |         3 | 5-6 | 30-34 | S  |
+
+
+| > | 19      |     |       | Train Number                     |          |     | 20       |
+| ^ |         |     |       | label                            |          |     |          |
+|   | Daily   | ▼   | Miles | Station                          | Services | ▲   | Daily    |
+| ^ | Freq    | Dir |       |                                  |          | Dir | Freq     |
+|---+---------+-----+-------+----------------------------------+----------+-----+----------|
+|   | 5 50P   | Dp  |     0 | Chicago, IL (Union Station) (CT) | C R      | Ar  | 8 50A    |
+|   | R 6 41P |     |    37 | Elgin, IL                        | C        |     | DF 7 50A |
+|   | 7 00P   |     |    51 | Hampshire, IL                    |          |     | 7 27A    |
+|   | F 7 09P |     |    59 | Genoa, IL                        |          |     | F 7 14A  |

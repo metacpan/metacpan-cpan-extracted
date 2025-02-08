@@ -1,3 +1,4 @@
+-- dbix_migration_delimiter:/ bar
 CREATE TABLE product_price_changes (
   id INT GENERATED ALWAYS AS IDENTITY,
   product_id INT NOT NULL,
@@ -5,7 +6,8 @@ CREATE TABLE product_price_changes (
   new_price NUMERIC(10,2) NOT NULL,
   changed_on TIMESTAMP(6) NOT NULL
 );
-
+/
+-- some usual comment
 CREATE OR REPLACE FUNCTION log_price_changes()
   RETURNS TRIGGER 
   LANGUAGE PLPGSQL
@@ -19,7 +21,7 @@ BEGIN
   RETURN NEW;
 END;
 $$
-
+/
 CREATE TRIGGER price_changes
   BEFORE UPDATE
   ON products

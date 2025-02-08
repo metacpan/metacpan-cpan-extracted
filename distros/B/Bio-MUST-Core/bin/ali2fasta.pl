@@ -35,7 +35,7 @@ ali2fasta.pl - Convert ALI files to FASTA files
 
 =head1 VERSION
 
-version 0.250200
+version 0.250380
 
 =head1 USAGE
 

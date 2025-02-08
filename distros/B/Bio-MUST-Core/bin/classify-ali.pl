@@ -80,7 +80,7 @@ classify-ali.pl - Classify ALI files based on taxonomic filters
 
 =head1 VERSION
 
-version 0.250200
+version 0.250380
 
 =head1 USAGE
 

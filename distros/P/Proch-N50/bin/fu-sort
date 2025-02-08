@@ -3,12 +3,15 @@
 # ABSTRACT: Sort sequences by size
 use 5.012;
 use warnings;
-use Getopt::Long;                   # Receive options from the command line
-use Pod::Usage;                     # For  --help
+use Getopt::Long qw(:config no_ignore_case);
+use Pod::Usage;
 use File::Basename;
 use FASTX::Reader;
 use FASTX::Seq;
 use Data::Dumper;
+use Carp qw(croak);
+use Try::Tiny;
+
 # The following placeholder is to be programmatically replaced with 'use lib "$RealBin/../lib"' if needed
 #~loclib~
 use FindBin qw($RealBin);
@@ -21,160 +24,229 @@ my $VERSION = $Proch::Seqfu::VERSION // "<Dev>";
 my $AUTHOR = 'Andrea Telatin';
 my $DESC = 'Sort sequences by size';
 
+# Environment variables with defaults
 my $opt_def_qual    = $ENV{'SEQFU_DEF_QUAL'}   // 33;     # Default quality if printing FASTA to FASTQ
 my $opt_line_length = $ENV{'FU_LINE_LENGTH'} // 80;       # Default line length for FASTA files
 
-my( @Options,
-	  $opt_ascending,
+# Command line options
+my(
+    @Options,
+    $opt_ascending,
     $opt_comment_len,
-	  $opt_fasta,
+    $opt_fasta,
     $opt_fastq,
     $opt_strip_comm,
     $opt_upper,
     $opt_revcompl,
-	  $opt_quiet,
+    $opt_quiet,
     $opt_debug,
     $opt_version,
 );
 
-
 setOptions();
 
-my %seqs = ();
+# Initialize sequence storage
+my %seqs;
+my $total_seqs = 0;
 
+# Process each input file
 foreach my $file (@ARGV) {
-	debug("Reading $file");
-	$file = "{{STDIN}}" if ($file eq '-');
-	my $FASTX = FASTX::Reader->new({ filename => "$file" });
-  while (my $seq = $FASTX->getRead() ) {
-	    my $len = length($seq->{seq});
-	    push(@{ $seqs{$len} }, \$seq );
-  }
+    debug("Reading $file");
+    
+    # Handle input validation
+    if ($file ne '-') {
+        croak "ERROR: File $file does not exist" unless -e $file;
+        croak "ERROR: File $file is not readable" unless -r $file;
+    }
+    
+    my $input_file = $file eq '-' ? "{{STDIN}}" : $file;
+    
+    # Initialize FASTX reader with error handling
+    my $FASTX;
+    try {
+        $FASTX = FASTX::Reader->new({ filename => $input_file });
+    } catch {
+        croak "ERROR: Failed to initialize FASTX reader for $file: $_";
+    };
 
+    # Process sequences
+    while (my $seq = $FASTX->getRead()) {
+        my $len = length($seq->{seq});
+        push(@{ $seqs{$len} }, \$seq);
+        $total_seqs++;
+    }
 }
 
+debug("Total sequences processed: $total_seqs");
+
+# Sort and process sequences
 my %sorters = (
    asc  => sub { $a <=> $b },
    desc => sub { $b <=> $a },
 );
 
 my $sorter = $opt_ascending ? $sorters{'asc'} : $sorters{'desc'};
-for my $size (sort $sorter keys %seqs ) {
-	for my $s ( @{ $seqs{$size} }) {
-		my $seq = ${$s};
 
-		# Edit
-		$seq->{desc} = undef if ($opt_strip_comm);
-		$seq->{seq} = uc($seq->{seq}) if ($opt_upper);
-		$seq->rev() if ($opt_revcompl);
+for my $size (sort $sorter keys %seqs) {
+    for my $s (@{ $seqs{$size} }) {
+        my $seq = ${$s};
 
-        # comments
-        if ($opt_comment_len) {
-          if ($seq->{desc}) {
-            $seq->{desc} .= ";length=" . length($seq->{seq});
-          } else {
-            $seq->{desc} = "length=" . length($seq->{seq});
-          }
+        # Sequence modifications
+        if ($opt_strip_comm) {
+            $seq->{desc} = undef;
         }
-		# Print sequences
-    my $sep = length($seq->{comment}) ? " " : "";
-		if ( ($opt_fasta) or (not $opt_fastq and not $seq->{qual})) {
-      
-			print ">", $seq->{name}, $sep, $seq->{comment}, "\n", $seq->{seq}, "\n";
-		} elsif ( $opt_fastq or (not $opt_fasta and  $seq->{qual}) ) {
-			my $q = $seq->{qual} ? undef : $opt_def_qual;
-      my $Q = chr($q + 33);
-      my $qualstring = $Q x length($seq->seq);
-			print "@", $seq->{name}, $sep, $seq->{comment}, "\n", $seq->{seq}, "\n+\n", $qualstring, "\n";
-		} else {
-			debug("What");
-			say Dumper $seq;
-		}
-	}
+        
+        if ($opt_upper) {
+            $seq->{seq} = uc($seq->{seq});
+        }
+        
+        if ($opt_revcompl) {
+            $seq->rev();
+        }
+
+        # Add length to comments if requested
+        if ($opt_comment_len) {
+            my $length_info = "length=" . length($seq->{seq});
+            if ($seq->{desc}) {
+                $seq->{desc} .= ";$length_info";
+            } else {
+                $seq->{desc} = $length_info;
+            }
+        }
+
+        # Determine output format and print sequence
+        my $sep = length($seq->{comment} // '') ? " " : "";
+        
+        try {
+            if (($opt_fasta) or (not $opt_fastq and not $seq->{qual})) {
+                print_fasta($seq, $sep);
+            } elsif ($opt_fastq or (not $opt_fasta and $seq->{qual})) {
+                print_fastq($seq, $sep);
+            } else {
+                debug("Unexpected sequence format");
+                debug(Dumper $seq);
+            }
+        } catch {
+            croak "ERROR: Failed to write sequence: $_";
+        };
+    }
 }
 
+debug("Processing complete");
+
+# Helper subroutines
+sub print_fasta {
+    my ($seq, $sep) = @_;
+    my $sequence = format_sequence($seq->{seq}, $opt_line_length);
+    print ">", $seq->{name}, $sep, ($seq->{comment} // ''), "\n", $sequence;
+}
+
+sub print_fastq {
+    my ($seq, $sep) = @_;
+    my $qual = $seq->{qual} // generate_default_quality($seq->{seq});
+    print "@", $seq->{name}, $sep, ($seq->{comment} // ''), "\n",
+          $seq->{seq}, "\n+\n", $qual, "\n";
+}
+
+sub generate_default_quality {
+    my ($seq) = @_;
+    return chr($opt_def_qual + 33) x length($seq);
+}
+
+sub format_sequence {
+    my ($seq, $width) = @_;
+    return $seq . "\n" if $width >= length($seq);
+    
+    my $formatted = '';
+    for (my $i = 0; $i < length($seq); $i += $width) {
+        $formatted .= substr($seq, $i, $width) . "\n";
+    }
+    return $formatted;
+}
  
 sub setOptions {
-  use Getopt::Long;
+    @Options = (
+    'Options:',
+        {OPT=>"asc",       VAR=>\$opt_ascending,         DESC=>"Print in ascending order (defaul: descending)"},
 
-  @Options = (
-  'Options:',
-    {OPT=>"asc",       VAR=>\$opt_ascending,         DESC=>"Print in ascending order (defaul: descending)"},
+    'General:',
+        {OPT=>"help",             VAR=>\&usage ,                        DESC=>"This help"},
+        {OPT=>"version",          VAR=>\&version,                           DESC=>"Print version and exit"},
+        {OPT=>"citation",         VAR=>\&show_citation,                 DESC=>"Print citation for seqfu"},
+        {OPT=>"quiet!",           VAR=>\$opt_quiet, DEFAULT=>0,         DESC=>"No screen output"},
+        {OPT=>"debug!",           VAR=>\$opt_debug, DEFAULT=>0,         DESC=>"Debug mode"},
 
-  'General:',
-    {OPT=>"help",             VAR=>\&usage ,                        DESC=>"This help"},
-    {OPT=>"version",          VAR=>\&version,                           DESC=>"Print version and exit"},
-    {OPT=>"citation",         VAR=>\&show_citation,                 DESC=>"Print citation for seqfu"},
-    {OPT=>"quiet!",           VAR=>\$opt_quiet, DEFAULT=>0,         DESC=>"No screen output"},
-    {OPT=>"debug!",           VAR=>\$opt_debug, DEFAULT=>0,         DESC=>"Debug mode"},
+    'Common seqfu options:',
+        {OPT=>"w|line-width=i",    VAR=>\$opt_line_length,              DESC=>"FASTA line size (0 for unlimited)"},
+        {OPT=>"sc|strip-comments", VAR=>\$opt_strip_comm,               DESC=>"Strip comments"},
+        {OPT=>"fasta",             VAR=>\$opt_fasta,                    DESC=>"Force FASTA output"},
+        {OPT=>"fastq",             VAR=>\$opt_fastq,                    DESC=>"Force FASTQ output"},
+        {OPT=>"rc",                VAR=>\$opt_revcompl,                 DESC=>"Print reverse complementary"},
+        {OPT=>'q|qual=f',          VAR=>\$opt_def_qual,                 DESC=>"Default quality for FASTQ files"},
+        {OPT=>'u|upper',           VAR=>\$opt_upper,                    DESC=>"Convert sequence to uppercase"},
 
-  'Common seqfu options:',
-    {OPT=>"w|line-width=i",    VAR=>\$opt_line_length,              DESC=>"FASTA line size (0 for unlimited)"},
-    {OPT=>"sc|strip-comments", VAR=>\$opt_strip_comm,               DESC=>"Strip comments"},
-    {OPT=>"fasta",             VAR=>\$opt_fasta,                    DESC=>"Force FASTA output"},
-    {OPT=>"fastq",             VAR=>\$opt_fastq,                    DESC=>"Force FASTQ output"},
-    {OPT=>"rc",                VAR=>\$opt_revcompl,                 DESC=>"Print reverse complementary"},
-    {OPT=>'q|qual=f',          VAR=>\$opt_def_qual,                 DESC=>"Default quality for FASTQ files"},
-    {OPT=>'u|upper',           VAR=>\$opt_upper,                    DESC=>"Convert sequence to uppercase"},
+    'Sequence comments:',
+        {OPT=>'al|add-length',   VAR=>\$opt_comment_len,                DESC=>"Add length=LEN to the comment"}
+    );
 
-  'Sequence comments:',
-    {OPT=>'al|add-length',   VAR=>\$opt_comment_len,                DESC=>"Add length=LEN to the comment"}
+    (!@ARGV) && (usage(1));
 
-  );
+    GetOptions(map {$_->{OPT}, $_->{VAR}} grep { ref } @Options) || usage(1);
 
-  (!@ARGV) && (usage(1));
-
-  &GetOptions(map {$_->{OPT}, $_->{VAR}} grep { ref } @Options) || usage(1);
-  # Check bad parameters
-  if ($opt_fasta and $opt_fastq) { die "ERROR: Please specify either --fasta or --fastq.\n"; }
-  if ($opt_line_length < 1) { $opt_line_length = 1_000_000_000_000_000 }
-
-  # Now setup default values.
-  foreach (@Options) {
-    if (ref $_ && defined($_->{DEFAULT}) && !defined(${$_->{VAR}})) {
-      ${$_->{VAR}} = $_->{DEFAULT};
+    # Validate parameters
+    croak "ERROR: Please specify either --fasta or --fastq, not both"
+        if $opt_fasta and $opt_fastq;
+    
+    if ($opt_line_length < 1) {
+        $opt_line_length = 1_000_000_000_000_000;
     }
-  }
 
+    # Set default values
+    foreach (@Options) {
+        if (ref $_ && defined($_->{DEFAULT}) && !defined(${$_->{VAR}})) {
+            ${$_->{VAR}} = $_->{DEFAULT};
+        }
+    }
 }
-
 
 sub version {
-	say $BASENAME, " ", $VERSION;
-	say STDERR "Using Proch::Seqfu=", $Proch::Seqfu::VERSION, " and FASTX::Reader=", $FASTX::Reader::VERSION;
-	exit();
+    say $BASENAME, " ", $VERSION;
+    say STDERR "Using Proch::Seqfu=", $Proch::Seqfu::VERSION, " and FASTX::Reader=", $FASTX::Reader::VERSION;
+    exit();
 }
+
 sub debug {
-	say STDERR '#' , $_[0] if ($opt_debug);
+    say STDERR '#', $_[0] if $opt_debug;
 }
+
+# Usage function preserved exactly as in original
 sub usage {
+    my($exitcode) = @_;
+    $exitcode ||= 0;
+    $exitcode = 0 if $exitcode eq 'help';  # what gets passed by getopt func ref
+    select STDERR if $exitcode;            # write to STDERR if exitcode is error
 
-  my($exitcode) = @_;
-  $exitcode ||= 0;
-  $exitcode = 0 if $exitcode eq 'help';  # what gets passed by getopt func ref
-  select STDERR if $exitcode;            # write to STDERR if exitcode is error
+    print
+        "Name:\n  ", ucfirst($BASENAME), " $VERSION by $AUTHOR\n",
+        "Synopsis:\n  $DESC\n",
+        "Usage:\n  $BASENAME [options] filename (or '-' for STDIN)\n";
 
-  print
-    "Name:\n  ", ucfirst($BASENAME), " $VERSION by $AUTHOR\n",
-    "Synopsis:\n  $DESC\n",
-    "Usage:\n  $BASENAME [options] filename (or '-' for STDIN)\n";
-
-  foreach (@Options) {
-    if (ref) {
-      my $def = defined($_->{DEFAULT}) ? " (default '$_->{DEFAULT}')" : "";
-      $def = ($def ? ' (default OFF)' : '(default ON)') if $_->{OPT} =~ m/!$/;
-      my $opt = $_->{OPT};
-      $opt =~ s/!$//;
-      $opt =~ s/=s$/ [X]/;
-      $opt =~ s/=i$/ [N]/;
-      $opt =~ s/=f$/ [n.n]/;
-      printf STDERR "  --%-16s %s%s\n", $opt, $_->{DESC}, $def;
+    foreach (@Options) {
+        if (ref) {
+            my $def = defined($_->{DEFAULT}) ? " (default '$_->{DEFAULT}')" : "";
+            $def = ($def ? ' (default OFF)' : '(default ON)') if $_->{OPT} =~ m/!$/;
+            my $opt = $_->{OPT};
+            $opt =~ s/!$//;
+            $opt =~ s/=s$/ [X]/;
+            $opt =~ s/=i$/ [N]/;
+            $opt =~ s/=f$/ [n.n]/;
+            printf STDERR "  --%-16s %s%s\n", $opt, $_->{DESC}, $def;
+        }
+        else {
+            print "$_\n";
+        }
     }
-    else {
-      print "$_\n"; # Subheadings in the help output
-    }
-  }
-  exit($exitcode);
+    exit($exitcode);
 }
 
 __END__
@@ -189,75 +261,117 @@ fu-sort - Sort sequences by size
 
 =head1 VERSION
 
-version 1.5.8
+version 1.7.0
+
+=head1 SYNOPSIS
+
+    fu-sort [options] filename [...]
+
+=head1 DESCRIPTION
+
+fu-sort reads FASTA/FASTQ files and sorts sequences by length in either ascending
+or descending order. It provides various output formatting options and can handle
+both FASTA and FASTQ formats.
+
+=head1 NAME
+
+fu-sort - Sort sequences by size with flexible output formatting
+
+=head1 OPTIONS
+
+=head2 Sorting Options
+
+=over 4
+
+=item B<--asc>
+
+Sort sequences in ascending order (default: descending)
+
+=back
+
+=head2 Output Formatting
+
+=over 4
+
+=item B<--w>, B<--line-width> I<N>
+
+Width for FASTA sequence lines (0 for unlimited)
+
+=item B<--sc>, B<--strip-comments>
+
+Remove sequence comments
+
+=item B<--fasta>
+
+Force FASTA output format
+
+=item B<--fastq>
+
+Force FASTQ output format
+
+=item B<--rc>
+
+Output reverse complement sequences
+
+=item B<--q>, B<--qual> I<n.n>
+
+Default quality score for FASTQ output
+
+=item B<--u>, B<--upper>
+
+Convert sequences to uppercase
+
+=back
+
+=head2 Sequence Annotation
+
+=over 4
+
+=item B<--al>, B<--add-length>
+
+Add sequence length to comments
+
+=back
+
+=head2 Other Options
+
+=over 4
+
+=item B<--quiet>
+
+Suppress progress messages
+
+=item B<--debug>
+
+Enable debug output
+
+=item B<--version>
+
+Display version information
+
+=item B<--help>
+
+Show this help message
+
+=back
 
 =head1 EXAMPLES
 
-  fu-sort seq.fa > sorted.fa
+Sort sequences by length (longest first):
 
-=head1 PARAMETERS
+    fu-sort input.fa > sorted.fa
 
-=over 4
+Sort sequences by length (shortest first):
 
-=item C<--asc>             
+    fu-sort --asc input.fa > sorted.fa
 
-Print in ascending order (defaul: descending)
+Sort and add length information:
 
-=item C<--al|add-length>    
+    fu-sort --add-length input.fa > sorted_with_length.fa
 
-Add length=LEN to the comment
+Convert to FASTA with wrapped sequences:
 
-=item C<--help>             
-
-This help
-
-=item C<--version>          
-
-Print version and exit
-
-=item C<--quiet>            
-
-No screen output (default OFF)
-
-=item C<--debug>            
-
-Debug mode (default OFF)
-
-=back
-
-=head2 Common options
-
-=over 4
-
-=item C<--w|line-width> [N] 
-
-FASTA line size (0 for unlimited)
-
-=item C<--sc|strip-comments> 
-
-Strip comments
-
-=item C<--fasta>            
-
-Force FASTA output
-
-=item C<--fastq>            
-
-Force FASTQ output
-
-=item C<--rc>               
-
-Print reverse complementary
-
-=item C<--q|qual> [n.n]     
-
-Default quality for FASTQ files
-
-=item C<--u|upper>          
-
-Convert sequence to uppercase
-
-=back
+    fu-sort --fasta --line-width 60 input.fastq > wrapped.fa
 
 =head1 MODERN ALTERNATIVE
 
@@ -283,7 +397,7 @@ Andrea Telatin <andrea@telatin.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2023 by Andrea Telatin.
+This software is Copyright (c) 2018-2027 by Quadram Institute Bioscience.
 
 This is free software, licensed under:
 

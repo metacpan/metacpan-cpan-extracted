@@ -892,6 +892,7 @@ BOOT:
   sv_setuv(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/parseany()@4", 1), PTR2UV(&IMPL_xs_parse_sublike_any_v4));
   sv_setuv(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/parseany()@6", 1), PTR2UV(&IMPL_xs_parse_sublike_any_v6));
   sv_setuv(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/signature_add_param()@7", 1), PTR2UV(&XPS_signature_add_param));
+  sv_setuv(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/signature_query()@8", 1),     PTR2UV(&XPS_signature_query));
 
   sv_setuv(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/register_sigattr()@5", 1), PTR2UV(&IMPL_register_xps_signature_attribute));
 #ifdef HAVE_FEATURE_CLASS

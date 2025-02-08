@@ -1,10 +1,12 @@
 package Bio::MUST::Core::Roles::Listable;
 # ABSTRACT: Listable Moose role for objects with implied id lists
-$Bio::MUST::Core::Roles::Listable::VERSION = '0.250200';
+$Bio::MUST::Core::Roles::Listable::VERSION = '0.250380';
 use Moose::Role;
 
 use autodie;
 use feature qw(say);
+
+use Smart::Comments;
 
 use Carp;
 use Const::Fast;
@@ -301,7 +303,7 @@ sub org_mapper_from_long_ids {
 
     ID:
     for my $seq_id ( $self->all_seq_ids ) {
-        next ID if $seq_id->is_foreign;
+        next ID if $seq_id->is_foreign;     # needed to skip already abbr_ids
 
         push @long_ids, $seq_id->full_id;
         push @abbr_ids, $mapper->abbr_id_for( $seq_id->full_org )
@@ -326,7 +328,7 @@ sub org_mapper_from_abbr_ids {
     for my $seq_id ( $self->all_seq_ids ) {
         my $abbr_id = $seq_id->full_id;
         my ($abbr_org, $accession) = split /\|/xms, $abbr_id, 2;
-        next ID unless $abbr_org;
+        next ID unless $accession;          # needed to skip already long_ids
 
         push @long_ids, $mapper->long_id_for($abbr_org) . '@' . $accession;
         push @abbr_ids, $abbr_id;
@@ -387,7 +389,7 @@ Bio::MUST::Core::Roles::Listable - Listable Moose role for objects with implied 
 
 =head1 VERSION
 
-version 0.250200
+version 0.250380
 
 =head1 SYNOPSIS
 

@@ -60,8 +60,9 @@ INSERT INTO <<tablename>> (<<fields>>) VALUES (<<values>>);
 @@ view
 
 CREATE OR REPLACE VIEW <<<name>>> AS
-    SELECT <<<fields>>> FROM <<<tables>>>
-        WHERE <<<conditions>>>
+    SELECT <<<fields>>>
+        FROM <<<tables>>>
+            WHERE <<<conditions>>>;
 
 __END__
 

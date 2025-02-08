@@ -1,70 +1,96 @@
 # NAME
 
-fu-sort - Sort sequences by size
+fu-sort - Sort sequences by size with flexible output formatting
 
-# VERSION
+# SYNOPSIS
 
-version 1.5.0
+    fu-sort [options] filename [...]
+
+# DESCRIPTION
+
+fu-sort reads FASTA/FASTQ files and sorts sequences by length in either ascending
+or descending order. It provides various output formatting options and can handle
+both FASTA and FASTQ formats.
+
+# OPTIONS
+
+## Sorting Options
+
+- **--asc**
+
+    Sort sequences in ascending order (default: descending)
+
+## Output Formatting
+
+- **--w**, **--line-width** _N_
+
+    Width for FASTA sequence lines (0 for unlimited)
+
+- **--sc**, **--strip-comments**
+
+    Remove sequence comments
+
+- **--fasta**
+
+    Force FASTA output format
+
+- **--fastq**
+
+    Force FASTQ output format
+
+- **--rc**
+
+    Output reverse complement sequences
+
+- **--q**, **--qual** _n.n_
+
+    Default quality score for FASTQ output
+
+- **--u**, **--upper**
+
+    Convert sequences to uppercase
+
+## Sequence Annotation
+
+- **--al**, **--add-length**
+
+    Add sequence length to comments
+
+## Other Options
+
+- **--quiet**
+
+    Suppress progress messages
+
+- **--debug**
+
+    Enable debug output
+
+- **--version**
+
+    Display version information
+
+- **--help**
+
+    Show this help message
 
 # EXAMPLES
 
-    fu-sort seq.fa > sorted.fa
+Sort sequences by length (longest first):
 
-# PARAMETERS
+    fu-sort input.fa > sorted.fa
 
-- `--asc`             
+Sort sequences by length (shortest first):
 
-    Print in ascending order (defaul: descending)
+    fu-sort --asc input.fa > sorted.fa
 
-- `--al|add-length`    
+Sort and add length information:
 
-    Add length=LEN to the comment
+    fu-sort --add-length input.fa > sorted_with_length.fa
 
-- `--help`             
+Convert to FASTA with wrapped sequences:
 
-    This help
-
-- `--version`          
-
-    Print version and exit
-
-- `--quiet`            
-
-    No screen output (default OFF)
-
-- `--debug`            
-
-    Debug mode (default OFF)
-
-## Common options
-
-- `--w|line-width` \[N\] 
-
-    FASTA line size (0 for unlimited)
-
-- `--sc|strip-comments` 
-
-    Strip comments
-
-- `--fasta`            
-
-    Force FASTA output
-
-- `--fastq`            
-
-    Force FASTQ output
-
-- `--rc`               
-
-    Print reverse complementary
-
-- `--q|qual` \[n.n\]     
-
-    Default quality for FASTQ files
-
-- `--u|upper`          
-
-    Convert sequence to uppercase
+    fu-sort --fasta --line-width 60 input.fastq > wrapped.fa
 
 # MODERN ALTERNATIVE
 
@@ -81,15 +107,3 @@ can be installed with BioConda `conda install -c bioconda seqfu`
 Telatin A, Fariselli P, Birolo G.
 _SeqFu: A Suite of Utilities for the Robust and Reproducible Manipulation of Sequence Files_.
 Bioengineering 2021, 8, 59. [https://doi.org/10.3390/bioengineering8050059](https://doi.org/10.3390/bioengineering8050059)
-
-# AUTHOR
-
-Andrea Telatin <andrea@telatin.com>
-
-# COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2018-2022 by Andrea Telatin.
-
-This is free software, licensed under:
-
-    The MIT (X11) License

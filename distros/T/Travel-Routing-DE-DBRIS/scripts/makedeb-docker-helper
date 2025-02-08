@@ -13,7 +13,7 @@ apt-get -y install \
 	liblist-moreutils-perl \
 	libwww-perl \
 	libtest-compile-perl libtest-pod-perl \
-	libtest-simple-perl
+	libtest-simple-perl wget
 
 wget https://lib.finalrewind.org/deb/libtravel-status-de-dbris-perl_0.04-1_all.deb
 dpkg -i libtravel-status-de-dbris-perl_0.04-1_all.deb

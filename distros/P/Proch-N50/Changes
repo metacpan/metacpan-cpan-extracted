@@ -1,5 +1,12 @@
-1.5.8	2023-07-22
-	* POD documentation fix
+1.7.0	2025-02-03
+	* General code refactoring
+	* Improved has_seqfu() handling when seqfu is not installed
+	* Updated docs
+	* Updated dist.ini with copyrights
+  	* Fixed bug in fu-grep (-n was attempting to reverse complement the string; invalid operation but output was fine)
+
+1.6.1	2024-01-20
+	* Seqfu.pm updates
 
 1.5.7	2023-01-22
 	* Minor updates on Seqfu.pm, which is a legacy module and should not be adopted for new projects

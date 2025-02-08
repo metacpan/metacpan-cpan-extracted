@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020-2024 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Sublike 0.36;
+package XS::Parse::Sublike 0.37;
 
 use v5.14;
 use warnings;
@@ -138,6 +138,24 @@ the pad offset for a pad variable to store the value into. The caller is
 At the present version, this API cannot create optional, or named parameters.
 These abilities may be added in a later version which expands on the
 structure's definition to add new fields to support this.
+
+=head2 xps_signature_query_*
+
+   IV xps_signature_query_params(struct XSParseSublikeContext *ctx);
+
+   IV xps_signature_query_optparams(struct XSParseSublikeContext *ctx);
+
+   char xps_signature_query_slurpy(struct XSParseSublikeContext *ctx);
+
+I<Since version 0.37; experimental.>
+
+These B<experimental> functions may only be called during the
+C<start_signature> or C<finish_signature> hook stages. They are used to query
+details about the accumulated set of signature parameters. The C<_params>
+query returns the total number of defined parameters - counting all mandatory,
+optional, and a final slurpy if present. C<_optparams> returns a count of only
+the optional parameters. C<_slurpy> returns the sigil character of a final
+slurpy parameter (C<@> or C<%>), or zero if no slurpy parameter is present.
 
 =head1 PARSE CONTEXT
 
@@ -406,7 +424,7 @@ been parsed, the C<finish_signature> stage is invoked.
    void (*finish_signature)(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata);
 
 Code in either of these hook stages is permitted to call
-L</xps_signature_add_param>.
+L</xps_signature_add_param>, or any of the C<xps_signature_query_*()> functions.
 
 =head2 Parse Body
 

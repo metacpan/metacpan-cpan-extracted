@@ -1,11 +1,3 @@
-# NAME
-
-fu-extract - Get sequences by name (also using lists)
-
-# VERSION
-
-version 1.5.0
-
 # PARAMETERS
 
 - `-p, --pattern` PATTERN
@@ -69,15 +61,3 @@ can be installed with BioConda `conda install -c bioconda seqfu`
 Telatin A, Fariselli P, Birolo G.
 _SeqFu: A Suite of Utilities for the Robust and Reproducible Manipulation of Sequence Files_.
 Bioengineering 2021, 8, 59. [https://doi.org/10.3390/bioengineering8050059](https://doi.org/10.3390/bioengineering8050059)
-
-# AUTHOR
-
-Andrea Telatin <andrea@telatin.com>
-
-# COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2018-2022 by Andrea Telatin.
-
-This is free software, licensed under:
-
-    The MIT (X11) License

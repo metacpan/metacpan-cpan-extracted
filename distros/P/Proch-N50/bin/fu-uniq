@@ -1,176 +1,225 @@
 #!/usr/bin/env perl
 # PODNAME: fu-uniq
-# ABSTRACT: Dereplicate sequences
+# ABSTRACT: Dereplicate sequences and generate abundance information
 use 5.012;
 use warnings;
-use Getopt::Long;
+use Getopt::Long qw(:config no_ignore_case);
 use File::Basename;
 use FASTX::Reader;
 use FASTX::Seq;
 use Data::Dumper;
-use Digest::MD5 qw( md5_hex );
+use Digest::MD5 qw(md5_hex);
+use Carp qw(croak);
+use Try::Tiny;
 use FindBin qw($RealBin);
+
 # The following placeholder is to be programmatically replaced with 'use lib "$RealBin/../lib"' if needed
 #~loclib~
 if ( -e "$RealBin/../lib/Proch/N50.pm" and -e "$RealBin/../Changes" ) {
     use lib "$RealBin/../lib";
 }
 use Proch::Seqfu;
+
 my $VERSION = $Proch::Seqfu::VERSION // "<Dev>";
 my $BASENAME = basename($0);
-
 my $AUTHOR = 'Andrea Telatin';
 my $DESC = 'Print unique sequence with USEARCH labels';
 
+# Default settings from environment or hardcoded values
 my $opt_def_qual;
 my $opt_line_length = $ENV{'FU_LINE_LENGTH'} // 80;
-my( @Options,
-  $opt_sep_size, 			# Print cluster size as a comment and not in the sequence name (;size=NN;)
-	$opt_min_size, 			# Print only clusters of size >= N
-	$opt_no_label,			# Do not print cluster size
-  $opt_keep_name, 		# Use the name of the first sequence as cluster Name
-	$opt_prefix, 				# Default cluster name (prefix, separator, progressiveID)
-	$opt_separator,			# Default cluster name separator (default: ".")
-	$opt_fasta, 				# IGNORED
-	$opt_fastq, 				# IGNORED
-	$opt_strip_comm, 		# IGNORED
-	$opt_upper, 				# DEFAULT
-	$opt_revcompl,			# IGNORED
-	$opt_quiet, 				# IGNORED
-	$opt_debug, 				
-	$opt_citation,
-	$outdir,
-  $opt_version,
-	$force,
+
+# Command line options
+my(
+    @Options,
+    $opt_sep_size,      # Print cluster size as a comment not in sequence name
+    $opt_min_size,      # Print only clusters of size >= N
+    $opt_no_label,      # Do not print cluster size
+    $opt_keep_name,     # Use first sequence name as cluster Name
+    $opt_prefix,        # Default cluster name prefix
+    $opt_separator,     # Default cluster name separator
+    $opt_fasta,         # Force FASTA output (IGNORED)
+    $opt_fastq,         # Force FASTQ output (IGNORED)
+    $opt_strip_comm,    # Strip comments (IGNORED)
+    $opt_upper,         # Convert to uppercase
+    $opt_revcompl,      # Reverse complement (IGNORED)
+    $opt_quiet,         # Quiet mode
+    $opt_debug,         # Debug mode
+    $opt_citation,      # Show citation
+    $outdir,           
+    $opt_version,
+    $force,
 );
+
 setOptions();
 
-
 sub version {
-	say $BASENAME, " ", $VERSION;
-	say STDERR "Using Proch::Seqfu=", $Proch::Seqfu::VERSION, " and FASTX::Reader=", $FASTX::Reader::VERSION;
-	exit();
+    say $BASENAME, " ", $VERSION;
+    say STDERR "Using Proch::Seqfu=", $Proch::Seqfu::VERSION, " and FASTX::Reader=", $FASTX::Reader::VERSION;
+    exit(0);
 }
 version() if ($opt_version);
+
 my $optional_spacer = $opt_sep_size ? "\t" : ";";
 
+# Initialize storage
+my %counter;  # Store sequence counts
+my %labels;   # Store sequence labels
+my $total_seqs = 0;
+my $unique_seqs = 0;
 
-
-
-my %counter = ();
-my %labels  = ();
+# Process each input file
 foreach my $file (@ARGV) {
-	debug("Reading $file");
-	
-  $file = "{{STDIN}}" if ($file eq '-');
-	my $FASTX = FASTX::Reader->new({ filename => "$file"});
-   
-  while (my $seq = $FASTX->getRead()) {
-       
-			my $size = $seq->{seq} =~/size=(\d+)/ ?  $1  : 1;
+    debug("Reading $file");
+    
+    # Handle input validation
+    if ($file ne '-') {
+        croak "ERROR: File $file does not exist" unless -e $file;
+        croak "ERROR: File $file is not readable" unless -r $file;
+    }
+    
+    my $input_file = $file eq '-' ? "{{STDIN}}" : $file;
+    
+    # Initialize FASTX reader with error handling
+    my $FASTX;
+    try {
+        $FASTX = FASTX::Reader->new({ filename => $input_file });
+    } catch {
+        croak "ERROR: Failed to initialize FASTX reader for $file: $_";
+    };
 
-			$counter{uc( $seq->{seq} )} += $size;
-			next unless ($opt_keep_name);
-
-			$labels{uc( $seq->{seq} )}  = $seq->{id};
-	}
-
+    # Process sequences
+    while (my $seq = $FASTX->getRead()) {
+        $total_seqs++;
+        
+        # Extract size if present, default to 1
+        my $size = $seq->{seq} =~ /size=(\d+)/ ? $1 : 1;
+        
+        # Store uppercase sequence and count
+        my $sequence = uc($seq->{seq});
+        $counter{$sequence} += $size;
+        
+        # Store label if keeping names
+        if ($opt_keep_name) {
+            $labels{$sequence} //= $seq->{id};  # Store first occurrence only
+        }
+    }
 }
 
-my $counter = 0;
-for my $seq (sort { $counter{$b} <=> $counter{$a} } keys %counter ) {
-	$counter++;
-	my $name;
-	if ($opt_keep_name) {
+debug("Total sequences processed: $total_seqs");
 
-		$name = $labels{$seq};
-	} else {
-		$name = $opt_prefix . $opt_separator . $counter;
-	}
-  last if ($counter{$seq} < $opt_min_size);
-	my $size_string = $opt_no_label ? '' : $optional_spacer . 'size='.$counter{$seq} . ";";
-	print '>' , $name, $size_string, "\n", $seq, "\n";
+# Output sequences
+my $seq_counter = 0;
+for my $seq (sort { $counter{$b} <=> $counter{$a} } keys %counter) {
+    # Skip if below minimum size
+    next if ($counter{$seq} < $opt_min_size);
+    
+    $seq_counter++;
+    $unique_seqs++;
+    
+    # Generate sequence name
+    my $name = $opt_keep_name 
+        ? $labels{$seq} 
+        : $opt_prefix . $opt_separator . $seq_counter;
+    
+    # Add size information unless disabled
+    my $size_string = $opt_no_label ? '' : $optional_spacer . 'size=' . $counter{$seq} . ";";
+    
+    # Output sequence
+    try {
+        print '>', $name, $size_string, "\n", $seq, "\n";
+    } catch {
+        croak "ERROR: Failed to write sequence: $_";
+    };
 }
+
+debug(sprintf("Found %d unique sequences from %d total sequences", $unique_seqs, $total_seqs));
 
 sub ver {
- say "$BASENAME $VERSION";
- exit;
+    say "$BASENAME $VERSION";
+    exit(0);
 }
 
 sub setOptions {
-  use Getopt::Long;
+    @Options = (
+        'Options:',
+        {OPT=>"k|keepname!",      VAR=>\$opt_keep_name,                  DESC=>"Use first sequence name as cluster name"},
+        {OPT=>"p|prefix=s",       VAR=>\$opt_prefix,     DEFAULT=>'seq', DESC=>"Sequence prefix"},
+        {OPT=>"s|separator=s",    VAR=>\$opt_separator,  DEFAULT=>'.',   DESC=>"Prefix and counter separator"},
+        {OPT=>"m|min-size=i",     VAR=>\$opt_min_size,   DEFAULT=>0,    DESC=>"Print only sequences found at least N times"},
+        {OPT=>'size-as-comment!', VAR=>\$opt_sep_size,   DEFAULT=>0,    DESC=>"Add size as comment, not as part of sequence name"},
+        
+        'General:',
+        {OPT=>"help",      VAR=>\&usage,                 DESC=>"This help"},
+        {OPT=>"version",   VAR=>\&version,               DESC=>"Print version and exit"},
+        {OPT=>"citation",  VAR=>\&show_citation,         DESC=>"Print citation for seqfu"},
+        {OPT=>"quiet!",    VAR=>\$opt_quiet, DEFAULT=>0, DESC=>"No screen output"},
+        {OPT=>"debug!",    VAR=>\$opt_debug, DEFAULT=>0, DESC=>"Debug mode: keep all temporary files"},
+        
+        'Common seqfu options:',
+        {OPT=>"w|line-width=i", VAR=>\$opt_line_length, DEFAULT=>80, DESC=>"FASTA line size (0 for unlimited)"},
+        {OPT=>"strip",          VAR=>\$opt_strip_comm,               DESC=>"Strip comments"},
+        {OPT=>"fasta",          VAR=>\$opt_fasta,                   DESC=>"Force FASTA output"},
+        {OPT=>"fastq",          VAR=>\$opt_fastq,                   DESC=>"Force FASTQ output"},
+        {OPT=>"rc",             VAR=>\$opt_revcompl,                DESC=>"Print reverse complementary"},
+        {OPT=>'q|qual=f',       VAR=>\$opt_def_qual,   DEFAULT=>32, DESC=>"Default quality for FASTQ files"},
+        {OPT=>'upper',          VAR=>\$opt_upper,                   DESC=>"Convert sequence to uppercase"},
+    );
 
-  @Options = (
-     'Options:',
-		{OPT=>"k|keepname!",      VAR=>\$opt_keep_name ,                 DESC=>"Use first sequence name as cluster name"},
-		{OPT=>"p|prefix=s",      VAR=>\$opt_prefix,  DEFAULT=>'seq',   DESC=>"Sequence prefix"},
-		{OPT=>"s|separator=s",   VAR=>\$opt_separator,  DEFAULT=>'.',  DESC=>"Prefix and counter separator"},
-		{OPT=>"m|min-size=i",    VAR=>\$opt_min_size,   DEFAULT=>0,    DESC=>"Print only sequences found at least N times"},
-		{OPT=>'size-as-comment!' ,VAR=>\$opt_sep_size,   DEFAULT=>0,    DESC=>"Add size as comment, not as part of sequence name" },
-    'General:',
-    {OPT=>"help",      VAR=>\&usage ,                DESC=>"This help"},
-    {OPT=>"version",   VAR=>\&version,               DESC=>"Print version and exit"},
-    {OPT=>"citation",  VAR=>\&show_citation,         DESC=>"Print citation for seqfu"},
-    {OPT=>"quiet!",    VAR=>\$opt_quiet, DEFAULT=>0, DESC=>"No screen output"},
-    {OPT=>"debug!",    VAR=>\$opt_debug, DEFAULT=>0, DESC=>"Debug mode: keep all temporary files"},
-     'Common seqfu options:',
-    {OPT=>"w|line-width=i",  VAR=>\$opt_line_length, DEFAULT=>80, DESC=>"FASTA line size (0 for unlimited)"},
-    {OPT=>"strip",           VAR=>\$opt_strip_comm,               DESC=>"Strip comments"},
-    {OPT=>"fasta",           VAR=>\$opt_fasta,                    DESC=>"Force FASTA output"},
-    {OPT=>"fastq",           VAR=>\$opt_fastq,                    DESC=>"Force FASTQ output"},
-    {OPT=>"rc",              VAR=>\$opt_revcompl,                 DESC=>"Print reverse complementary"},
-    {OPT=>'q|qual=f',        VAR=>\$opt_def_qual, DEFAULT=>32,    DESC=>"Default quality for FASTQ files"},
-    {OPT=>'upper',           VAR=>\$opt_upper,                    DESC=>"Convert sequence to uppercase"},
+    (!@ARGV) && (usage(1));
 
+    GetOptions(map {$_->{OPT}, $_->{VAR}} grep { ref } @Options) || usage(1);
 
-  );
-
-  (!@ARGV) && (usage(1));
-
-  &GetOptions(map {$_->{OPT}, $_->{VAR}} grep { ref } @Options) || usage(1);
-  # Check bad parameters
-  if ($opt_fasta and $opt_fastq) { die "ERROR: Please specify either --fasta or --fastq.\n"; }
-  if ($opt_line_length < 1) { $opt_line_length = 1_000_000_000_000_000 }
-
-  # Now setup default values.
-  foreach (@Options) {
-    if (ref $_ && defined($_->{DEFAULT}) && !defined(${$_->{VAR}})) {
-      ${$_->{VAR}} = $_->{DEFAULT};
+    # Validate parameters
+    croak "ERROR: Please specify either --fasta or --fastq, not both"
+        if $opt_fasta and $opt_fastq;
+    croak "ERROR: Minimum size must be non-negative"
+        if defined $opt_min_size && $opt_min_size < 0;
+    
+    if ($opt_line_length < 1) {
+        $opt_line_length = 1_000_000_000_000_000;
     }
-  }
 
+    # Set default values
+    foreach (@Options) {
+        if (ref $_ && defined($_->{DEFAULT}) && !defined(${$_->{VAR}})) {
+            ${$_->{VAR}} = $_->{DEFAULT};
+        }
+    }
 }
-
 
 sub debug {
-	say STDERR '#' , $_[0] if ($opt_debug);
+    say STDERR '#', $_[0] if $opt_debug;
 }
-sub usage {
-  my($exitcode) = @_;
-  $exitcode ||= 0;
-  $exitcode = 0 if $exitcode eq 'help';  # what gets passed by getopt func ref
-  select STDERR if $exitcode;            # write to STDERR if exitcode is error
 
-  print
-    "Name:\n  ", ucfirst($BASENAME), " $VERSION by $AUTHOR\n",
-    "Synopsis:\n  $DESC\n",
-    "Usage:\n  $BASENAME [options] filename (or '-' for STDIN)\n";
-  foreach (@Options) {
-    if (ref) {
-      my $def = defined($_->{DEFAULT}) ? " (default '$_->{DEFAULT}')" : "";
-      $def = ($def ? ' (default OFF)' : '(default ON)') if $_->{OPT} =~ m/!$/;
-      my $opt = $_->{OPT};
-      $opt =~ s/!$//;
-      $opt =~ s/=s$/ [X]/;
-      $opt =~ s/=i$/ [N]/;
-      $opt =~ s/=f$/ [n.n]/;
-      printf STDERR "  --%-16s %s%s\n", $opt, $_->{DESC}, $def;
+# Usage function preserved exactly as in original for API compatibility
+sub usage {
+    my($exitcode) = @_;
+    $exitcode ||= 0;
+    $exitcode = 0 if $exitcode eq 'help';
+    select STDERR if $exitcode;
+
+    print
+        "Name:\n  ", ucfirst($BASENAME), " $VERSION by $AUTHOR\n",
+        "Synopsis:\n  $DESC\n",
+        "Usage:\n  $BASENAME [options] filename (or '-' for STDIN)\n";
+    
+    foreach (@Options) {
+        if (ref) {
+            my $def = defined($_->{DEFAULT}) ? " (default '$_->{DEFAULT}')" : "";
+            $def = ($def ? ' (default OFF)' : '(default ON)') if $_->{OPT} =~ m/!$/;
+            my $opt = $_->{OPT};
+            $opt =~ s/!$//;
+            $opt =~ s/=s$/ [X]/;
+            $opt =~ s/=i$/ [N]/;
+            $opt =~ s/=f$/ [n.n]/;
+            printf STDERR "  --%-16s %s%s\n", $opt, $_->{DESC}, $def;
+        }
+        else {
+            print "$_\n";
+        }
     }
-    else {
-      print "$_\n"; # Subheadings in the help output
-    }
-  }
-  exit($exitcode);
+    exit($exitcode);
 }
 
 __END__
@@ -181,99 +230,117 @@ __END__
 
 =head1 NAME
 
-fu-uniq - Dereplicate sequences
+fu-uniq - Dereplicate sequences and generate abundance information
 
 =head1 VERSION
 
-version 1.5.8
+version 1.7.0
 
 =head1 SYNOPSIS
 
-  fu-uniq [options] input.fa > uniq.fa
+    fu-uniq [options] input.fa > uniq.fa
 
-=head1 PARAMETERS
+=head1 DESCRIPTION
+
+fu-uniq is a tool for dereplicating DNA sequences and generating abundance
+information. It identifies unique sequences and can track their abundance
+using USEARCH-style labels. The tool supports both exact sequence matching
+and customizable output formats.
+
+Key features:
+- Dereplicates sequences while maintaining abundance information
+- Supports USEARCH-style size annotations
+- Flexible sequence naming options
+- Handles both FASTA and FASTQ inputs
+- Processes gzipped files automatically
+
+=head1 NAME
+
+fu-uniq - Dereplicate sequences and generate abundance information
+
+=head1 OPTIONS
+
+=head2 Sequence Processing
 
 =over 4
 
-=item C<--k|keepname>
+=item B<-k>, B<--keepname>
 
-Use first sequence name as cluster name(default ON)
+Use the name of the first occurrence of each unique sequence as the cluster name.
+This is useful for maintaining meaningful identifiers. Default: ON
 
-=item C<--p|prefix> [X]
+=item B<-m>, B<--min-size> I<N>
 
-Sequence prefix (default 'seq')
+Only output sequences that appear at least N times. This helps filter out
+rare sequences or potential sequencing errors. Default: 0 (no filtering)
 
-=item C<--s|separator> [X]
+=item B<--size-as-comment>
 
-Prefix and counter separator (default '.')
+Add size information as a comment rather than part of the sequence name.
+This affects the format of the output headers. Default: OFF
 
-=item C<--m|min-size> [N]
-
-Print only sequences found at least N times (default '0')
-
-=item C<--size-as-comment>
-
-Add size as comment, not as part of sequence name (default OFF)
+Example with option OFF:
+    >seq1;size=10;
+Example with option ON:
+    >seq1    size=10;
 
 =back
 
-=head2 General
+=head2 Output Formatting
 
 =over 4
 
-=item C<--help>
+=item B<-p>, B<--prefix> I<STR>
 
-This help
+Prefix for sequence names when not using --keepname. Default: 'seq'
 
-=item C<--version>
+=item B<-s>, B<--separator> I<STR>
 
-Print version and exit
+Character(s) to separate prefix from sequence number. Default: '.'
 
-=item C<--citation>
+=item B<-w>, B<--line-width> I<N>
 
-Print citation for seqfu
-
-=item C<--quiet>
-
-No screen output (default OFF)
-
-=item C<--debug>
-
-Debug mode: keep all temporary files (default OFF)
+Width for wrapping FASTA sequence lines. Use 0 for single-line sequences.
+Default: 80
 
 =back
 
-=head2 Common seqfu options
+=head1 EXAMPLES
+
+Basic deduplication:
+
+    # Find unique sequences and add abundance information
+    fu-uniq input.fa > uniq.fa
+
+Keep only abundant sequences:
+
+    # Keep sequences that appear at least 10 times
+    fu-uniq -m 10 input.fa > abundant.fa
+
+Custom sequence naming:
+
+    # Use custom prefix and separator
+    fu-uniq -p 'cluster' -s '_' input.fa > clusters.fa
+
+Process multiple files:
+
+    # Combine and deduplicate multiple files
+    fu-uniq file1.fa file2.fa > combined_uniq.fa
+
+Add size as comment:
+
+    # Place size information in sequence comment
+    fu-uniq --size-as-comment input.fa > commented.fa
+
+=head1 NOTES
 
 =over 4
 
-=item C<--w|line-width> [N]
+=item * Memory usage scales with the number of unique sequences
 
-FASTA line size (0 for unlimited) (default '80')
+=item * Sequence comparison is case-insensitive
 
-=item C<--strip>
-
-Strip comments
-
-=item C<--fasta>
-
-Force FASTA output
-
-=item C<--fastq>
-
-Force FASTQ output
-
-=item C<--rc>
-
-Print reverse complementary
-
-=item C<--q|qual> [n.n]
-
-Default quality for FASTQ files (default '32')
-
-=item C<--upper>
-
-Convert sequence to uppercase
+=item * Size annotations in input files (;size=N;) are respected and combined
 
 =back
 
@@ -301,7 +368,7 @@ Andrea Telatin <andrea@telatin.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2023 by Andrea Telatin.
+This software is Copyright (c) 2018-2027 by Quadram Institute Bioscience.
 
 This is free software, licensed under:
 

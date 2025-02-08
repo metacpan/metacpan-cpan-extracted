@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 19;
+use Test::Most tests => 23;
 
 BEGIN {
 	require_ok('CGI::Lingua');
@@ -43,7 +43,7 @@ CLOUDFLARE: {
 	$l = new_ok('CGI::Lingua' => [
 		supported => ['en-gb', 'da', 'fr', 'nl', 'de', 'it', 'cy', 'pt', 'pl', 'ja']
 	]);
-	ok(defined $l);
+	ok(defined($l));
 	ok($l->isa('CGI::Lingua'));
 	$ENV{'HTTP_CF_IPCOUNTRY'} = 'XX';
 	SKIP: {
@@ -52,4 +52,20 @@ CLOUDFLARE: {
 	}
 	ok(defined($l->requested_language()));
 	ok($l->requested_language() eq 'English (United Kingdom)');
+
+	if(-e 't/online.enabled') {
+		local $ENV{'REMOTE_ADDR'} = '2a06:98c0:3600::103';
+		delete local $ENV{'HTTP_CF_IPCOUNTRY'};
+
+		$l = new_ok('CGI::Lingua' => [
+			supported => ['en-gb', 'da', 'fr', 'nl', 'de', 'it', 'cy', 'pt', 'pl', 'ja']
+		]);
+		ok(defined($l));
+		ok($l->isa('CGI::Lingua'));
+		ok($l->country() eq 'us');
+	} else {
+		SKIP: {
+			skip 'Test requires Internet access', 4 unless(-e 't/online.enabled');
+		}
+	}
 }

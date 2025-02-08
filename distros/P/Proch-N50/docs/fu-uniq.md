@@ -1,88 +1,96 @@
 # NAME
 
-fu-uniq - Dereplicate sequences
-
-# VERSION
-
-version 1.5.0
+fu-uniq - Dereplicate sequences and generate abundance information
 
 # SYNOPSIS
 
     fu-uniq [options] input.fa > uniq.fa
 
-# PARAMETERS
+# DESCRIPTION
 
-- `--k|keepname`
+fu-uniq is a tool for dereplicating DNA sequences and generating abundance
+information. It identifies unique sequences and can track their abundance
+using USEARCH-style labels. The tool supports both exact sequence matching
+and customizable output formats.
 
-    Use first sequence name as cluster name(default ON)
+Key features:
+\- Dereplicates sequences while maintaining abundance information
+\- Supports USEARCH-style size annotations
+\- Flexible sequence naming options
+\- Handles both FASTA and FASTQ inputs
+\- Processes gzipped files automatically
 
-- `--p|prefix` \[X\]
+# OPTIONS
 
-    Sequence prefix (default 'seq')
+## Sequence Processing
 
-- `--s|separator` \[X\]
+- **-k**, **--keepname**
 
-    Prefix and counter separator (default '.')
+    Use the name of the first occurrence of each unique sequence as the cluster name.
+    This is useful for maintaining meaningful identifiers. Default: ON
 
-- `--m|min-size` \[N\]
+- **-m**, **--min-size** _N_
 
-    Print only sequences found at least N times (default '0')
+    Only output sequences that appear at least N times. This helps filter out
+    rare sequences or potential sequencing errors. Default: 0 (no filtering)
 
-- `--size-as-comment`
+- **--size-as-comment**
 
-    Add size as comment, not as part of sequence name (default OFF)
+    Add size information as a comment rather than part of the sequence name.
+    This affects the format of the output headers. Default: OFF
 
-## General
+    Example with option OFF:
+        >seq1;size=10;
+    Example with option ON:
+        >seq1    size=10;
 
-- `--help`
+## Output Formatting
 
-    This help
+- **-p**, **--prefix** _STR_
 
-- `--version`
+    Prefix for sequence names when not using --keepname. Default: 'seq'
 
-    Print version and exit
+- **-s**, **--separator** _STR_
 
-- `--citation`
+    Character(s) to separate prefix from sequence number. Default: '.'
 
-    Print citation for seqfu
+- **-w**, **--line-width** _N_
 
-- `--quiet`
+    Width for wrapping FASTA sequence lines. Use 0 for single-line sequences.
+    Default: 80
 
-    No screen output (default OFF)
+# EXAMPLES
 
-- `--debug`
+Basic deduplication:
 
-    Debug mode: keep all temporary files (default OFF)
+    # Find unique sequences and add abundance information
+    fu-uniq input.fa > uniq.fa
 
-## Common seqfu options
+Keep only abundant sequences:
 
-- `--w|line-width` \[N\]
+    # Keep sequences that appear at least 10 times
+    fu-uniq -m 10 input.fa > abundant.fa
 
-    FASTA line size (0 for unlimited) (default '80')
+Custom sequence naming:
 
-- `--strip`
+    # Use custom prefix and separator
+    fu-uniq -p 'cluster' -s '_' input.fa > clusters.fa
 
-    Strip comments
+Process multiple files:
 
-- `--fasta`
+    # Combine and deduplicate multiple files
+    fu-uniq file1.fa file2.fa > combined_uniq.fa
 
-    Force FASTA output
+Add size as comment:
 
-- `--fastq`
+    # Place size information in sequence comment
+    fu-uniq --size-as-comment input.fa > commented.fa
 
-    Force FASTQ output
+# NOTES
 
-- `--rc`
-
-    Print reverse complementary
-
-- `--q|qual` \[n.n\]
-
-    Default quality for FASTQ files (default '32')
-
-- `--upper`
-
-    Convert sequence to uppercase
+- Memory usage scales with the number of unique sequences
+- Sequence comparison is case-insensitive
+- Size annotations in input files (;size=N;) are respected and combined
 
 # MODERN ALTERNATIVE
 
@@ -99,15 +107,3 @@ can be installed with BioConda `conda install -c bioconda seqfu`
 Telatin A, Fariselli P, Birolo G.
 _SeqFu: A Suite of Utilities for the Robust and Reproducible Manipulation of Sequence Files_.
 Bioengineering 2021, 8, 59. [https://doi.org/10.3390/bioengineering8050059](https://doi.org/10.3390/bioengineering8050059)
-
-# AUTHOR
-
-Andrea Telatin <andrea@telatin.com>
-
-# COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2018-2022 by Andrea Telatin.
-
-This is free software, licensed under:
-
-    The MIT (X11) License

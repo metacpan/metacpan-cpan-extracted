@@ -1,24 +1,34 @@
 ---
 abstract: 'Gematria and Transliteration for Coptic, Ethiopic, Greek and Hebrew.'
 author:
-  - 'Daniel Yacob <dyacob@cpan.org>'
-build_requires:
-  ExtUtils::MakeMaker: '0'
+  - 'Daniel Yacob <dyacob\@cpan.org>'
+build_requires: {}
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Convert-CEGH
-no_index:
-  directory:
-    - t
-    - inc
+provides:
+  Convert::CEGH:
+    file: lib/Convert/CEGH.pm
+    version: '0.06'
+  Convert::CEGH::Gematria:
+    file: lib/Convert/CEGH/Gematria.pm
+    version: '0.06'
+  Convert::CEGH::Transliterate:
+    file: lib/Convert/CEGH/Transliterate.pm
+    version: '0.06'
 requires:
   Regexp::Ethiopic: '0.10'
-  perl: '5.006001'
-version: '0.04'
+  perl: v5.6.1
+resources:
+  bugtracker: https://github.com/dyacob/Convert-CEGH/issues
+  homepage: https://github.com/dyacob/Convert-CEGH
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/dyacob/Convert-CEGH.git
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

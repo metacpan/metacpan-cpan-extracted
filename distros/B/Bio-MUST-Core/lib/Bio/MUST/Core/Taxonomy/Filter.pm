@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Taxonomy::Filter;
 # ABSTRACT: Helper class for filtering seqs according to taxonomy
-$Bio::MUST::Core::Taxonomy::Filter::VERSION = '0.250200';
+$Bio::MUST::Core::Taxonomy::Filter::VERSION = '0.250380';
 use Moose;
 use namespace::autoclean;
 
@@ -60,7 +60,7 @@ Bio::MUST::Core::Taxonomy::Filter - Helper class for filtering seqs according to
 
 =head1 VERSION
 
-version 0.250200
+version 0.250380
 
 =head1 SYNOPSIS
 

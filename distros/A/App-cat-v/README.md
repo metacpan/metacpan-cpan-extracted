@@ -14,6 +14,7 @@ cat-v \[ options \] args ...
        -o   --original      Print original line as is
        -t   --expand[=#]    Expand tabs
        -T   --no-expand     Do not expand tabs
+       -E                   Escape backslash character
       --ts  --tabstyle=#    Set tab style
             --tabstop=#     Set tab width
             --tabhead=#     Set tab-head character
@@ -32,7 +33,7 @@ cat-v \[ options \] args ...
 
 # VERSION
 
-Version 1.02
+Version 1.03
 
 # DESCRIPTION
 
@@ -125,7 +126,9 @@ characters
 
 - **-n**, **--reset**
 
-    Disables all character conversions and resets repeat characters.
+    Disables all character conversions and tab expansion, and resets
+    repeat characters.  Therefore, the `cat-v -n` effectively does
+    nothing, just like the `cat` command.
 
 - **-c**, **--visible** _name_=_flag_,...
 
@@ -133,6 +136,7 @@ characters
     character to be visualized and the conversion format.
 
         c  control style
+        e  escape style
         s  symbol style
         m  Unicode mark (if exists)
         0  do not convert
@@ -158,6 +162,17 @@ characters
     This is the default state.
 
         cat-v -c all=s,nul=nl=np=sp=m,esc=0
+
+    If none of the name labels are specified, it is assumed that `all` is
+    given.  The following command prints all control characters except
+    newlines in escaped form, which is compatible with the Perl's string
+    literal.
+
+        cat-v -n -ce,nl=0
+
+    The above command is identical to this.
+
+        cat-v --no-expand --reset --visible all=e,nl=0
 
 - **--**_name_\[=_replacement_\]
 
@@ -260,6 +275,19 @@ characters
 
     Show available style list if called without parameter.  Styles are
     defined in [Text::ANSI::Fold](https://metacpan.org/pod/Text%3A%3AANSI%3A%3AFold) library.
+
+- **-E**, **--escape-backslash**
+
+    Convert backslash character to the escaped form `\\`.
+
+    Although backslash is not a control character, this way the result of
+    converting other control characters to escape expressions can be fully
+    interpreted as string literal of various programming language.
+
+    The following command reproduces the complete contents of the original
+    file.
+
+        echo -ne "$(cat-v -Ence FILE)"
 
 # INSTALL
 

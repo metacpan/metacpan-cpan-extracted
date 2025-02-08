@@ -58,7 +58,7 @@
    "provides" : {
       "Daje::Workflow::GenerateSchema::Activity" : {
          "file" : "lib/Daje/Workflow/GenerateSchema/Activity.pm",
-         "version" : "0.10"
+         "version" : "0.12"
       },
       "Daje::Workflow::GenerateSchema::Create::Database" : {
          "file" : "lib/Daje/Workflow/GenerateSchema/Create/Database.pm"
@@ -79,7 +79,7 @@
          "web" : "https://github.com/janeskil1525/Daje-Workflow-GenerateSchema-Activity"
       }
    },
-   "version" : "0.10",
+   "version" : "0.12",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

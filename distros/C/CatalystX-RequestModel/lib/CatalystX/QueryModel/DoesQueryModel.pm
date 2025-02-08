@@ -124,6 +124,82 @@ sub get_attribute_value_for {
   return $self->$attr;
 }
 
+sub as_data {
+  my $self = shift;
+  my (@namespace, $spec);
+
+  # separate out the namespace from data spec pattern
+  foreach my $arg (@_) {
+    if(ref($arg) eq 'ARRAY') {
+      $spec = $arg;
+    } else {
+      push @namespace, $arg;
+    }
+  }
+
+  # Get property info as a hash
+  my %property_info = map { %$_ } $self->properties;
+
+  # if we have a namespace, we need to descend into the data structure
+  if(@namespace){
+    my $value = $self;
+    foreach my $ns (@namespace) {
+      $value = $value->$ns;
+    }
+    $self = $value;
+  }
+
+  # loop over the spec and get the data
+  my %return;
+  foreach my $field_proto (@$spec) {
+    my ($field, $sub_spec);
+    if(ref($field_proto) eq 'HASH') {
+      ($field, $sub_spec) = %$field_proto;
+    } else {
+      $field = $field_proto;
+    }
+    if(exists $property_info{$field}) {
+      # Its a property, so process correctly
+      my $meta = $property_info{$field};
+      if(my $predicate = $meta->{attr_predicate}) {
+        if($meta->{omit_empty}) {
+          next unless $self->$predicate;  # skip empties when omit_empty=>1
+        }
+      }
+
+      # get the attribute value
+      my $value = $self->get_attribute_value_for($field);
+
+      # it can be an array, an object or a plain scalar value
+      if( (ref($value)||'') eq 'ARRAY') {
+        my @gathered = ();
+        foreach my $v (@$value) {
+          if(Scalar::Util::blessed($v)) {
+            my $params = $v->as_data($sub_spec);
+            push @gathered, $params if keys(%$params);
+          } else {
+            push @gathered, $v;
+          }
+        }
+        $return{$field} = \@gathered;
+      } elsif(Scalar::Util::blessed($value) && $value->can('as_data')) { 
+        my $params = $value->as_data($sub_spec);
+        next unless keys(%$params);
+        $return{$field} = $params;
+      } else {
+        $return{$field} = $value;
+      }
+    } else {
+      # Its not a property, so just return the value.  This is to let
+      # you customize the return data structure with your own non property
+      # attributes or methods.
+      $return{$field} = $self->get_attribute_value_for($field);
+    }
+  }
+
+  return \%return;
+}
+
 sub nested_params {
   my $self = shift;
   my %return;
@@ -204,6 +280,12 @@ Attributes that are empty will be left out of the return data structure.
 
 Easiest way to get all your data but then again you get a structure that is very tightly tied to
 your request model.  
+
+=head2 as_data
+
+Accepts specification of what data to return and returns a hashref of the data.  The specification
+is a list of fields to return.  If you want to return nested data, you can specify a hashref
+where the key is the field name and the value is the nested data spec.
 
 =head2 get
 

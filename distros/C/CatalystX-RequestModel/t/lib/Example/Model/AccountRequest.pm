@@ -20,6 +20,8 @@ has profile => (is=>'ro', property=>+{model=>'AccountRequest::Profile' });
 has person_roles => (is=>'ro', property=>+{ indexed=>1, model=>'AccountRequest::PersonRole' });
 has credit_cards => (is=>'ro', property=>+{ indexed=>1, model=>'::CreditCard' });
 
+sub aaa { 'bbb' }
+
 __PACKAGE__->meta->make_immutable();
 
 package Example::Model::AccountRequest::Profile;

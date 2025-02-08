@@ -2,7 +2,7 @@ package Crypt::PRNG;
 
 use strict;
 use warnings;
-our $VERSION = '0.084';
+our $VERSION = '0.085';
 
 require Exporter; our @ISA = qw(Exporter); ### use Exporter 5.57 'import';
 our %EXPORT_TAGS = ( all => [qw(random_bytes random_bytes_hex random_bytes_b64 random_bytes_b64u random_string random_string_from rand irand)] );
@@ -100,7 +100,7 @@ Crypt::PRNG - Cryptographically secure random number generator
    ### OO interface:
    use Crypt::PRNG;
 
-   $prng = Crypt::PRNG->new;
+   $prng = Crypt::PRNG->new;  # defaults to ChaCha20
    #or
    $prng = Crypt::PRNG->new("RC4");
    #or
@@ -180,13 +180,13 @@ Returns a random unsigned 32bit integer - range C<0 .. 0xFFFFFFFF>.
 
 =head2 new
 
-   $prng = Crypt::PRNG->new;
+   $prng = Crypt::PRNG->new;  # defaults to ChaCha20
    #or
    $prng = Crypt::PRNG->new($alg);
    #or
    $prng = Crypt::PRNG->new($alg, $seed);
 
-   # $alg  ... algorithm name 'Frotuna' (DEFAULT), 'RC4', 'Sober128' or 'Yarrow'
+   # $alg  ... algorithm name 'ChaCha20' (DEFAULT), 'Fortuna', 'RC4', 'Sober128' or 'Yarrow'
    # $seed ... will be used as an initial entropy for seeding PRNG
 
 If C<$seed> is not specified the PRNG is automatically seeded with 32bytes random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32)

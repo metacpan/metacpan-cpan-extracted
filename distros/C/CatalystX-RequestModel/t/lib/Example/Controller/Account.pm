@@ -13,6 +13,33 @@ sub root :Chained('/') PathPart('account') CaptureArgs(0) { }
     $c->res->body(Dumper $request->nested_params);
   }
 
+  sub two :Chained(root) PathPart('two') Args(0) Does(RequestModel) BodyModel(AccountRequest) {
+    my ($self, $c, $request) = @_;
+    my $data = $request->as_data([
+      'username', 'first_name', 'last_name',
+      'notes', 'maybe_array', 'maybe_array2', 'empty', 'empty_array', 'indexed',
+      { profile => [qw/id address city state_id zip phone_number birthday status registered/] },
+      { person_roles =>['role_id'] },
+      { credit_cards => [qw/id card_number expiration _add _delete/] },
+    ]);
+    $c->res->body(Dumper $data);
+  }
+
+  sub three :Chained(root) PathPart('three') Args(0) Does(RequestModel) BodyModel(AccountRequest) {
+    my ($self, $c, $request) = @_;
+    my $data = $request->as_data([
+      'username', 'first_name', 'last_name', 'aaa',
+      { profile => [qw/id birthday status registered/] },
+    ]);
+    $c->res->body(Dumper $data);
+  }
+
+  sub four :Chained(root) PathPart('four') Args(0) Does(RequestModel) BodyModel(AccountRequest) {
+    my ($self, $c, $request) = @_;
+    my $data = $request->as_data('profile', [qw/id birthday status registered/]);
+    $c->res->body(Dumper $data);
+  }
+
   sub json :Chained(root) PathPart('json') Args(0) Does(RequestModel) RequestModel(API::AccountRequest) {
     my ($self, $c, $request) = @_;
     $c->res->body(Dumper $request->nested_params);

@@ -8,130 +8,171 @@ use FindBin qw($RealBin);
 use FASTX::Reader;
 use File::Basename;
 use Data::Dumper;
+use Carp qw(croak);
+
 # The following placeholder is to be programmatically replaced with 'use lib "$RealBin/../lib"' if needed
 #~loclib~
 if ( -e "$RealBin/../lib/Proch/N50.pm" and -e "$RealBin/../Changes" ) {
     use lib "$RealBin/../lib";
 }
+
+# Import the main module and set up basic variables
 my $BASENAME = basename($0);
 use Proch::Seqfu;
 my $VERSION = $Proch::Seqfu::VERSION // "<Dev>";
 my $warnings = 0;
+
+# Command line options with defaults
 my ($opt_verbose, $opt_debug);
-my $opt_separator   = ".";
-my $opt_version     = 0;
-my $opt_prefix      = "{b}";
-my $opt_reset       = 0;
-my $opt_fasta;
-my $opt_nocomm;
-my $opt_help;
+my $opt_separator   = ".";     # Separator between prefix and counter
+my $opt_version     = 0;      # Show version information
+my $opt_prefix      = "{b}";  # Default prefix pattern
+my $opt_reset       = 0;      # Reset counter for each file
+my $opt_fasta;               # Force FASTA output
+my $opt_nocomm;              # Suppress comments in headers
+my $opt_help;                # Show help message
 
-my $_opt          = GetOptions(
-	'p|prefix=s'    => \$opt_prefix,
-	'r|reset'       => \$opt_reset,
-	's|separator=s' => \$opt_separator,
-	'f|fasta'       => \$opt_fasta,
-	'v|verbose'     => \$opt_verbose,
-	'version'       => \$opt_version,
-	'n|nocomments'  => \$opt_nocomm,
-	'd|debug'		    => \$opt_debug,
-	'h|help'        => \$opt_help,
-);
+# Parse command line options
+my $_opt = GetOptions(
+    'p|prefix=s'    => \$opt_prefix,
+    'r|reset'       => \$opt_reset,
+    's|separator=s' => \$opt_separator,
+    'f|fasta'       => \$opt_fasta,
+    'v|verbose'     => \$opt_verbose,
+    'version'       => \$opt_version,
+    'n|nocomments'  => \$opt_nocomm,
+    'd|debug'       => \$opt_debug,
+    'h|help'        => \$opt_help,
+) or usage();
 
+# Handle immediate exit conditions
 $opt_version && version(); 
 $opt_help && usage();
 
-my $total_seqs = 0;
-for my $file (@ARGV) {
-	my $seq_filename = $file;
-
-	my $seqs = 0;
-	vprint(" - Processing \"$file\"");
-	if ($file eq '-') {
-		$seq_filename = '{{STDIN}}';
-		$file = 'stream'
-	}
-	my $reader = FASTX::Reader->new({ filename => "$seq_filename"});
-
-	# Prepare {b} or {B}
-	my $basename = basename($file);
-	$basename =~s/\.\w+\.?g?z?$// if ($opt_prefix =~/{b}/);
-
-	while (my $seq = $reader->getRead() ) {
-		$seqs++;
-		$total_seqs++;
-
-		# Prepare prefix
-		my $seqname = $opt_prefix;
-		$seqname =~s/\{[bB]\}/$basename/;
-
-		if (index($seqname, $opt_separator) != -1) {
-			$warnings++;
-			say STDERR " [WARNING!] The prefix <$seqname> contains the separator <$opt_separator>!";
-		}
-
-		$seqname .= $opt_separator;
-
-		# Counter
-		if ($opt_reset) {
-			$seqname .= $seqs;
-		} else {
-			$seqname .= $total_seqs;
-		}
-
-		my $comments = '';
-		$comments .= " ".$seq->{comment} if (defined $seq->{comment} and not $opt_nocomm);
-		if ($seq->{qual} and not $opt_fasta) {
-			say '@', $seqname, $comments, "\n", $seq->{seq}, "\n+\n", $seq->{qual};
-		} else {
-			say '>', $seqname, $comments, "\n", $seq->{seq};
-		}
-	}
+# Validate input arguments
+if (!@ARGV) {
+    warn "No input files provided. Use -h for help.\n";
+    exit 1;
 }
 
+# Process each input file
+my $total_seqs = 0;
+for my $file (@ARGV) {
+    # Validate file existence unless it's STDIN
+    if ($file ne '-' && !-e $file) {
+        warn "File not found: $file\n";
+        next;
+    }
+
+    my $seq_filename = $file;
+    my $seqs = 0;
+    vprint(" - Processing \"$file\"");
+
+    # Handle STDIN special case
+    if ($file eq '-') {
+        $seq_filename = '{{STDIN}}';
+        $file = 'stream'
+    }
+
+    # Initialize sequence reader
+    my $reader = eval { 
+        FASTX::Reader->new({ filename => "$seq_filename"}) 
+    };
+    if ($@) {
+        warn "Failed to open $seq_filename: $@\n";
+        next;
+    }
+
+    # Prepare basename for placeholders
+    my $basename = basename($file);
+    $basename =~s/\.\w+\.?g?z?$// if ($opt_prefix =~/{b}/);
+
+    # Process sequences
+    while (my $seq = $reader->getRead()) {
+        $seqs++;
+        $total_seqs++;
+
+        # Generate new sequence name
+        my $seqname = $opt_prefix;
+        $seqname =~s/\{[bB]\}/$basename/;
+
+        # Check for separator conflicts
+        if (index($seqname, $opt_separator) != -1) {
+            $warnings++;
+            warn " [WARNING!] The prefix <$seqname> contains the separator <$opt_separator>!\n";
+        }
+
+        $seqname .= $opt_separator;
+
+        # Add appropriate counter
+        if ($opt_reset) {
+            $seqname .= $seqs;
+        } else {
+            $seqname .= $total_seqs;
+        }
+
+        # Handle sequence comments
+        my $comments = '';
+        $comments .= " ".$seq->{comment} if (defined $seq->{comment} and not $opt_nocomm);
+
+        # Output sequence in appropriate format
+        eval {
+            if ($seq->{qual} and not $opt_fasta) {
+                say '@', $seqname, $comments, "\n", $seq->{seq}, "\n+\n", $seq->{qual};
+            } else {
+                say '>', $seqname, $comments, "\n", $seq->{seq};
+            }
+        };
+        if ($@) {
+            warn "Error writing sequence $seqname: $@\n";
+        }
+    }
+}
+
+# Report any warnings encountered
 say STDERR "$warnings warnings emitted" if ($warnings);
 
-
+# Utility Functions
 sub usage {
-	say STDERR<<END;
-	$BASENAME $VERSION
+    say STDERR<<END;
+    $BASENAME $VERSION
 
-	Usage:
-	$BASENAME [options] InputFile.fa [...]
+    Usage:
+    $BASENAME [options] InputFile.fa [...]
 
-	-p, --prefix STRING
-		New sequence name (accept placehodlers),
-		default is "{b}"
+    -p, --prefix STRING
+        New sequence name (accept placehodlers),
+        default is "{b}"
 
-	-s, --separator STRING
-		Separator between prefix and sequence
-		number
+    -s, --separator STRING
+        Separator between prefix and sequence
+        number
 
-	-r, --reset
-		Reset counter at each file
+    -r, --reset
+        Reset counter at each file
 
-	example:
-	$BASENAME -p '{b}' test.fa test2.fa > renamed.fa
+    example:
+    $BASENAME -p '{b}' test.fa test2.fa > renamed.fa
 
-	Placeholders:
-	{b} = File basename without extensions
-	{B} = File basename with extension
+    Placeholders:
+    {b} = File basename without extensions
+    {B} = File basename with extension
 END
-	exit 0;
+    exit 0;
 }
 
 sub version {
-	say $BASENAME, " ", $VERSION;
-	say STDERR "Using Proch::Seqfu=", $Proch::Seqfu::VERSION, " and FASTX::Reader=", $FASTX::Reader::VERSION;
-	exit();
+    say $BASENAME, " ", $VERSION;
+    say STDERR "Using Proch::Seqfu=", $Proch::Seqfu::VERSION, " and FASTX::Reader=", $FASTX::Reader::VERSION;
+    exit();
 }
 
 sub vprint {
-	say $_[0] if ($opt_verbose or $opt_debug) ;
+    say $_[0] if ($opt_verbose or $opt_debug);
 }
 
 sub dprint {
-	say "#$_[0]" if ($opt_debug);
+    say "#$_[0]" if ($opt_debug);
 }
 
 __END__
@@ -146,11 +187,27 @@ fu-rename - rename sequences
 
 =head1 VERSION
 
-version 1.5.8
+version 1.7.0
 
 =head1 SYNOPSIS
 
-  fu-cat [options] [FILE1 FILE2 FILE3...]
+    fu-rename [options] InputFile.fa [InputFile2.fa ...]
+
+    # Rename sequences in a single file
+    fu-rename input.fa > renamed.fa
+
+    # Process multiple files with custom prefix
+    fu-rename -p 'sample' file1.fa file2.fa > renamed.fa
+
+    # Reset counter for each file
+    fu-rename -r file1.fa file2.fa > renamed.fa
+
+=head1 DESCRIPTION
+
+A tool for systematic renaming of sequences in FASTA/FASTQ files. It provides
+flexible options for naming patterns and maintains sequence quality when
+processing FASTQ files. The program can handle multiple input files and
+supports reading from standard input.
 
 =head1 PARAMETERS
 
@@ -158,24 +215,52 @@ version 1.5.8
 
 =item C<-p>, C<--prefix> STRING
 
-New sequence name (accept placehodlers), default is "{b}"
+New sequence name (accepts placeholders). Default value is "{b}". 
+Available placeholders:
+    {b} = File basename without extensions
+    {B} = File basename with extension
 
 =item C<-s>, C<--separator> STRING
 
-Separator between prefix and sequence number
+Separator between prefix and sequence number. Default is "."
 
 =item C<-r>, C<--reset>
 
-Reset counter at each file
+Reset counter at each file. By default, the counter continues across all files.
+
+=item C<-f>, C<--fasta>
+
+Force FASTA output even for FASTQ input files.
+
+=item C<-n>, C<--nocomments>
+
+Suppress comments in sequence headers.
+
+=item C<-v>, C<--verbose>
+
+Enable verbose output for debugging.
+
+=item C<--version>
+
+Display version information.
 
 =back
 
-=head1 EXAMPLE
+=head1 FEATURES
 
-  fu-rename -p '{b}' test.fa test2.fa > renamed.fa
+=over 4
 
-Placeholders: C<{b}> = File basename without extensions, and 
-C<{B}> = File basename with extension
+=item * Preserves quality scores when processing FASTQ files
+
+=item * Supports multiple input files
+
+=item * Flexible naming patterns with placeholders
+
+=item * Optional counter reset for each input file
+
+=item * Maintains compatibility with both FASTA and FASTQ formats
+
+=back
 
 =head1 MODERN ALTERNATIVE
 
@@ -193,13 +278,15 @@ Telatin A, Fariselli P, Birolo G.
 I<SeqFu: A Suite of Utilities for the Robust and Reproducible Manipulation of Sequence Files>.
 Bioengineering 2021, 8, 59. L<https://doi.org/10.3390/bioengineering8050059>
 
+=cut
+
 =head1 AUTHOR
 
 Andrea Telatin <andrea@telatin.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2023 by Andrea Telatin.
+This software is Copyright (c) 2018-2027 by Quadram Institute Bioscience.
 
 This is free software, licensed under:
 

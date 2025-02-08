@@ -1,13 +1,16 @@
-#!perl -Tw
+#!/usr/bin/env perl
 
 use strict;
 use warnings;
+
+use CGI::Info;
 use Test::Most;
+
 use lib 't/lib';
 use MyLogger;
 
 if(-e 't/online.enabled') {
-	plan(tests => 149);
+	plan(tests => 154);
 
 	use_ok('CGI::Lingua');
 	require_ok('Test::NoWarnings');
@@ -38,7 +41,7 @@ if(-e 't/online.enabled') {
 	$ENV{'HTTP_ACCEPT_LANGUAGE'} = '';
 	$ENV{'REMOTE_ADDR'} = '66.249.67.232';	# Google
 	$l = CGI::Lingua->new(supported => ['en', 'fr', 'en-gb', 'en-us']);
-	ok(defined $l);
+	ok(defined($l));
 	ok($l->isa('CGI::Lingua'));
 	ok($l->language() eq 'English');
 	ok($l->requested_language() eq 'English');
@@ -168,7 +171,7 @@ if(-e 't/online.enabled') {
 	]);
 	local $SIG{__WARN__} = sub { die $_[0] };
 	eval { $l->language() };
-	ok($@ =~ /a\.b\.c\.d isn't a valid IPv4 address/);
+	like($@, qr/a\.b\.c\.d isn't a valid IP address/);
 	ok(defined($l->requested_language()));
 	ok($l->requested_language() eq 'Unknown');
 	ok(!defined($l->language_code_alpha2()));
@@ -190,24 +193,32 @@ if(-e 't/online.enabled') {
 	$ENV{'HTTP_ACCEPT_LANGUAGE'} = 'en-US,en;q=0.8';
 	$ENV{'REMOTE_ADDR'} = '74.92.149.57';
 	$l = new_ok('CGI::Lingua' => [
-		supported => [ 'en-gb', 'da', 'fr', 'nl', 'de', 'it', 'cy', 'pt', 'pl', 'ja' ]
+		supported => [ 'en-gb', 'da', 'fr', 'nl', 'de', 'it', 'cy', 'pt', 'pl', 'ja' ],
+		# logger => sub {
+			# my $params = $_[0];
+			# diag($params->{'function'}, ': line ', $params->{'line'}, ': ', @{$params->{'message'}})
+		# }
 	]);
-	ok($l->sublanguage_code_alpha2() eq 'us');
+	ok(!defined($l->sublanguage_code_alpha2()));
 	ok($l->language() eq 'English');
-	ok($l->requested_language() eq 'English (United States)');
-	ok($l->sublanguage() eq 'United States');
+	cmp_ok($l->requested_language(), 'eq', 'English (United States)');
+	ok(!defined($l->sublanguage()));
 	ok($l->language_code_alpha2() eq 'en');
 
 	$ENV{'HTTP_ACCEPT_LANGUAGE'} = 'en-ZZ,en;q=0.8';
 	$l = new_ok('CGI::Lingua' => [
 		supported => [ 'en-gb', 'da', 'fr', 'nl', 'de', 'it', 'cy', 'pt', 'pl', 'ja' ],
-		syslog => 1
+		syslog => 1,
+		# logger => sub {
+			# my $params = $_[0];
+			# diag($params->{'function'}, ': line ', $params->{'line'}, ': ', @{$params->{'message'}})
+		# }
 	]);
 	ok($l->language() eq 'English');
-	ok($l->sublanguage() eq 'Unknown');
+	ok(!defined($l->sublanguage()));
 	ok($l->language_code_alpha2() eq 'en');
-	ok($l->sublanguage_code_alpha2() eq 'zz');
-	ok($l->requested_language() eq 'English (Unknown)');
+	ok(!defined($l->sublanguage_code_alpha2()));
+	cmp_ok($l->requested_language(), 'eq', 'English (Unknown: ZZ)');
 
 	# Asking for French in the US should return French not English
 	$ENV{'HTTP_ACCEPT_LANGUAGE'} = 'fr';
@@ -219,7 +230,7 @@ if(-e 't/online.enabled') {
 	ok(!defined($l->sublanguage()));
 	ok($l->language_code_alpha2() eq 'fr');
 	ok(!defined($l->sublanguage_code_alpha2()));
-	ok($l->requested_language() eq 'French');
+	cmp_ok($l->requested_language(), 'eq', 'French');
 
 	$ENV{'HTTP_ACCEPT_LANGUAGE'} = 'fr-fr';
 	$l = new_ok('CGI::Lingua' => [
@@ -331,6 +342,52 @@ if(-e 't/online.enabled') {
 	]);
 	cmp_ok($l->language(), 'eq', 'French', 'Check order of preference is honoured');
 	is($l->sublanguage(), undef, 'No sublanguage has been requested');
+
+	$ENV{'HTTP_ACCEPT_LANGUAGE'} = 'en;q=0.5, ja;q=0.1';
+	$l = new_ok('CGI::Lingua' => [{
+		supported => ['ja', 'en'],
+		syslog => 1,
+		dont_use_ip => 1,
+		logger => MyLogger->new()
+	}]);
+	cmp_ok($l->language(), 'eq', 'English', 'Checking quality value');
+	$ENV{'HTTP_ACCEPT_LANGUAGE'} = 'en;q=0.1, ja;q=0.5';
+	$l = new_ok('CGI::Lingua' => [{
+		supported => ['ja', 'en'],
+		syslog => 1,
+		dont_use_ip => 1,
+		logger => MyLogger->new()
+	}]);
+	cmp_ok($l->language(), 'eq', 'Japanese', 'Checking quality value');
+
+	# Cover edge case: malformed Accept-Language headers
+	subtest 'Malformed Accept-Language headers' => sub {
+		my $test_cases = {
+			'Empty language tag' => '";q=0.8,en;q=0.9"',
+			'Invalid quality values' => 'en-US;q=1.1,es;q=-0.2,fr;q=abc',
+			'Extra delimiters' => 'en,,es;q=0.8;;fr;q=0.5',
+			'Missing q value' => 'en;q=,es;q=0.8;q=0.5',
+			'Non-standard format' => 'lang=fr;q=0.8,language=en;q=0.7',
+			'Unexpected characters' => 'en-US;q=0.9,@es;q=0.8,#fr;q=0.5',
+			'Duplicated entries' => 'en-US,en-US;q=0.9,es;q=0.8',
+			'Overly long header' => 'en;q=0.9,' . ('fr;q=0.8,' x 1000),
+			'Mixed case and invalid' => 'EN-us;q=0.8,123;q=0.7,xx;q=0.6',
+			'Empty header' => '',
+		};
+
+		foreach my $case (keys %$test_cases) {
+			my $accept = $test_cases->{$case};
+			local $ENV{'HTTP_ACCEPT_LANGUAGE'} = $accept;
+			my $lingua = CGI::Lingua->new(
+				supported_languages => [qw(en es fr)],
+			);
+
+			my $result = eval { $lingua->preferred_language() };
+			ok(!$@, "No crash for case: $case");
+			ok(defined($result));
+			diag("Handled malformed header: $case ($accept)") if $@;
+		}
+	};
 } else {
 	plan(skip_all => 'On-line tests disabled');
 }

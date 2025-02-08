@@ -1,5 +1,13 @@
 Revision history for Perl extension App-cat-v
 
+1.03 2025-02-07T11:09:59Z
+
+    - make control-style effective only for [\x00-\x1f]
+    - implement escape-style as "e"
+    - label-less entry for -c option set the style for "all"
+    - introduce -E option to escape backslash
+    - option -n disables tab expansion
+
 1.02 2025-01-29T07:08:34Z
 
     - rename -R to -o and update behavior

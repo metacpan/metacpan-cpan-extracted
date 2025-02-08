@@ -1,35 +1,63 @@
-# NAME
-
-fu-rename - rename sequences
-
-# VERSION
-
-version 1.5.0
-
 # SYNOPSIS
 
-    fu-cat [options] [FILE1 FILE2 FILE3...]
+    fu-rename [options] InputFile.fa [InputFile2.fa ...]
+
+    # Rename sequences in a single file
+    fu-rename input.fa > renamed.fa
+
+    # Process multiple files with custom prefix
+    fu-rename -p 'sample' file1.fa file2.fa > renamed.fa
+
+    # Reset counter for each file
+    fu-rename -r file1.fa file2.fa > renamed.fa
+
+# DESCRIPTION
+
+A tool for systematic renaming of sequences in FASTA/FASTQ files. It provides
+flexible options for naming patterns and maintains sequence quality when
+processing FASTQ files. The program can handle multiple input files and
+supports reading from standard input.
 
 # PARAMETERS
 
 - `-p`, `--prefix` STRING
 
-    New sequence name (accept placehodlers), default is "{b}"
+    New sequence name (accepts placeholders). Default value is "{b}". 
+    Available placeholders:
+        {b} = File basename without extensions
+        {B} = File basename with extension
 
 - `-s`, `--separator` STRING
 
-    Separator between prefix and sequence number
+    Separator between prefix and sequence number. Default is "."
 
 - `-r`, `--reset`
 
-    Reset counter at each file
+    Reset counter at each file. By default, the counter continues across all files.
 
-# EXAMPLE
+- `-f`, `--fasta`
 
-    fu-rename -p '{b}' test.fa test2.fa > renamed.fa
+    Force FASTA output even for FASTQ input files.
 
-Placeholders: `{b}` = File basename without extensions, and 
-`{B}` = File basename with extension
+- `-n`, `--nocomments`
+
+    Suppress comments in sequence headers.
+
+- `-v`, `--verbose`
+
+    Enable verbose output for debugging.
+
+- `--version`
+
+    Display version information.
+
+# FEATURES
+
+- Preserves quality scores when processing FASTQ files
+- Supports multiple input files
+- Flexible naming patterns with placeholders
+- Optional counter reset for each input file
+- Maintains compatibility with both FASTA and FASTQ formats
 
 # MODERN ALTERNATIVE
 
@@ -46,15 +74,3 @@ can be installed with BioConda `conda install -c bioconda seqfu`
 Telatin A, Fariselli P, Birolo G.
 _SeqFu: A Suite of Utilities for the Robust and Reproducible Manipulation of Sequence Files_.
 Bioengineering 2021, 8, 59. [https://doi.org/10.3390/bioengineering8050059](https://doi.org/10.3390/bioengineering8050059)
-
-# AUTHOR
-
-Andrea Telatin <andrea@telatin.com>
-
-# COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2018-2022 by Andrea Telatin.
-
-This is free software, licensed under:
-
-    The MIT (X11) License

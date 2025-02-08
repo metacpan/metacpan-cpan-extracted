@@ -27,6 +27,7 @@
       },
       "configure" : {
          "requires" : {
+            "Config" : "0",
             "ExtUtils::MakeMaker" : "0"
          }
       },
@@ -40,6 +41,7 @@
       },
       "test" : {
          "requires" : {
+            "Scalar::Util" : "0",
             "Test2::V0" : "0",
             "Test::More" : "0"
          }
@@ -53,6 +55,6 @@
          "web" : "https://github.com/jo-37/String-Compile-Tr.git"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

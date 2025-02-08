@@ -31,7 +31,7 @@ else {
   $try_aes_ni = 1 if $Config{archname} =~ /x86_64/;      # x86_64-cygwin-threads-multi / x86_64-linux-thread-multi
   $try_aes_ni = 1 if $Config{archname} =~ /MSWin32-x64/; # MSWin32-x64-multi-thread
   $try_aes_ni = 1 if $Config{archname} =~ /amd64/;       # OpenBSD.amd64-openbsd-thread-multi / amd64-freebsd
-  $try_aes_ni = 1 if $Config{archname} =~ /darwin/ && $Config{myuname} =~ /x86_64/; # darwin-thread-multi-2level / darwin-2level
+  $try_aes_ni = 1 if $Config{archname} =~ /darwin/ && qx(uname -m) =~ /x86_64/; # darwin-thread-multi-2level / darwin-2level
   $try_aes_ni = 1 if $Config{archname} =~ /i86pc-solaris(-.+)?-64/; # i86pc-solaris-thread-multi-64 / i86pc-solaris-64
   if ($try_aes_ni && $Config{gccversion}) {
     my $ver1;
@@ -93,7 +93,7 @@ my %eumm_args = (
   AUTHOR           => 'Karel Miko',
   ABSTRACT         => 'Cryptographic toolkit',
   MIN_PERL_VERSION => '5.006',
-  LICENSE          => 'perl_5',
+  LICENSE          => 'perl',
   PREREQ_PM        => { 'Math::BigInt' => 0 },
   TEST_REQUIRES    => { 'Test::More' => 0 },
   META_MERGE       => { resources  => { repository => 'https://github.com/DCIT/perl-CryptX', bugtracker => 'https://github.com/DCIT/perl-CryptX/issues' } },

@@ -40,7 +40,7 @@ use Mojo::Base 'Daje::Workflow::Common::Activity::Base', -base, -signatures;
 # janeskil1525 E<lt>janeskil1525@gmail.comE<gt>
 #
 
-our $VERSION = "1.02";
+our $VERSION = "1.05";
 
 use Mojo::File;
 use Daje::Workflow::GenerateSQL::Manager::Sql;

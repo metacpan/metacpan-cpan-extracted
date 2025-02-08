@@ -13,6 +13,7 @@ cat-v \[ 옵션 \] args ...
        -o   --original      Print original line as is
        -t   --expand[=#]    Expand tabs
        -T   --no-expand     Do not expand tabs
+       -E                   Escape backslash character
       --ts  --tabstyle=#    Set tab style
             --tabstop=#     Set tab width
             --tabhead=#     Set tab-head character
@@ -31,7 +32,7 @@ cat-v \[ 옵션 \] args ...
 
 # VERSION
 
-Version 1.02
+Version 1.03
 
 # DESCRIPTION
 
@@ -110,13 +111,14 @@ Version 1.02
 
 - **-n**, **--reset**
 
-    모든 문자 변환을 비활성화하고 반복 문자를 재설정합니다.
+    모든 문자 변환과 탭 확장을 비활성화하고 반복 문자를 초기화합니다. 따라서 `cat-v -n`은 `cat` 명령과 마찬가지로 사실상 아무 작업도 수행하지 않습니다.
 
 - **-c**, **--visible** _name_=_flag_,...
 
     문자 유형과 플래그를 매개변수로 지정하여 시각화할 문자와 변환 형식을 지정합니다.
 
         c  control style
+        e  escape style
         s  symbol style
         m  Unicode mark (if exists)
         0  do not convert
@@ -135,6 +137,14 @@ Version 1.02
     이름에 `all`을 지정하면 이 값은 모든 문자 유형에 적용됩니다. 다음 명령은 모든 문자를 `s`로 설정한 다음 `nl`, `nl`, `np` 및 `sp`를 `m`으로 설정하고 `esc`를 비활성화합니다. 이것이 기본 상태입니다.
 
         cat-v -c all=s,nul=nl=np=sp=m,esc=0
+
+    이름 레이블을 지정하지 않으면 `all`이 주어진 것으로 간주합니다. 다음 명령은 개행 문자를 제외한 모든 제어 문자를 이스케이프 형식으로 출력하며, 이는 Perl의 문자열 리터럴과 호환됩니다.
+
+        cat-v -n -ce,nl=0
+
+    위의 명령은 이와 동일합니다.
+
+        cat-v --no-expand --reset --visible all=e,nl=0
 
 - **--**_name_\[=_replacement_\]
 
@@ -214,6 +224,16 @@ Version 1.02
     탭이 펼쳐지는 스타일을 설정합니다. 예를 들어 `기호` 또는 `음영`을 선택합니다. `스쿼트 화살표, 가운데 점`과 같이 두 가지 스타일 이름이 결합된 경우 탭헤드에는 `스쿼트 화살표`, 탭스페이스에는 `가운데 점`을 사용합니다.
 
     매개변수 없이 호출하면 사용 가능한 스타일 목록을 표시합니다. 스타일은 [Text::ANSI::Fold](https://metacpan.org/pod/Text%3A%3AANSI%3A%3AFold) 라이브러리에 정의되어 있습니다.
+
+- **-E**, **--escape-backslash**
+
+    백슬래시 문자를 이스케이프 형식 `\\`로 변환합니다.
+
+    백슬래시는 제어 문자는 아니지만 다른 제어 문자를 이스케이프 표현식으로 변환한 결과는 다양한 프로그래밍 언어의 문자열 리터럴로 완벽하게 해석할 수 있습니다.
+
+    다음 명령은 원본 파일의 전체 내용을 재현합니다.
+
+        echo -ne "$(cat-v -Ence FILE)"
 
 # INSTALL
 

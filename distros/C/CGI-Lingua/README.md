@@ -1,3 +1,15 @@
+CGI-Lingua
+==========
+
+[![Appveyor Status](https://ci.appveyor.com/api/projects/status/1t1yhvagx00c2qi8?svg=true)](https://ci.appveyor.com/project/nigelhorne/cgi-lingua)
+[![CircleCI](https://dl.circleci.com/status-badge/img/circleci/8CE7w65gte4YmSREC2GBgW/THucjGauwLPtHu1MMAueHj/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/circleci/8CE7w65gte4YmSREC2GBgW/THucjGauwLPtHu1MMAueHj/tree/main)
+[![Coveralls Status](https://coveralls.io/repos/github/nigelhorne/CGI-Lingua/badge.svg?branch=master)](https://coveralls.io/github/nigelhorne/CGI-Lingua?branch=master)
+[![CPAN](https://img.shields.io/cpan/v/CGI-Lingua.svg)](http://search.cpan.org/~nhorne/CGI-Lingua/)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/nigelhorne/cgi-lingua/test.yml?branch=master)
+![Perl Version](https://img.shields.io/badge/perl-5.8+-blue)
+[![Travis Status](https://travis-ci.org/nigelhorne/CGI-Lingua.svg?branch=master)](https://travis-ci.org/nigelhorne/CGI-Lingua)
+[![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://x.com/intent/tweet?text=Information+about+the+CGI+Environment+#perl+#CGI&url=https://github.com/nigelhorne/cgi-lingua&via=nigelhorne)
+
 # NAME
 
 CGI::Lingua - Create a multilingual web page
@@ -7,6 +19,9 @@ CGI::Lingua - Create a multilingual web page
 Version 0.66
 
 # SYNOPSIS
+
+CGI::Lingua is a powerful module for multilingual web applications
+offering extensive language/country detection strategies.
 
 No longer does your website need to be in English only.
 CGI::Lingua provides a simple basis to determine which language to display a
@@ -19,7 +34,7 @@ to use.
     my $l = CGI::Lingua->new(supported => ['en', 'fr', 'en-gb', 'en-us']);
     my $language = $l->language();
     if ($language eq 'English') {
-       print '<P>Hello</P>';
+        print '<P>Hello</P>';
     } elsif($language eq 'French') {
         print '<P>Bonjour</P>';
     } else {    # $language eq 'Unknown'
@@ -41,7 +56,7 @@ to use.
     use CGI::Lingua;
     # ...
     my $cache = CHI->new(driver => 'File', root_dir => '/tmp/cache', namespace => 'CGI::Lingua-countries');
-    my $l = CGI::Lingua->new({ supported => ['en', 'fr'], cache => $cache });
+    $l = CGI::Lingua->new({ supported => ['en', 'fr'], cache => $cache });
 
 # SUBROUTINES/METHODS
 
@@ -54,11 +69,30 @@ that the website supports.
 Language codes are of the form primary-code \[ - country-code \] e.g.
 'en', 'en-gb' for English and British English respectively.
 
-For a list of primary-codes refer to ISO-639 (e.g. 'en' for English).
-For a list of country-codes refer to ISO-3166 (e.g. 'gb' for United Kingdom).
+For a list of primary codes refer to ISO-639 (e.g. 'en' for English).
+For a list of country codes refer to ISO-3166 (e.g. 'gb' for United Kingdom).
+
+    # Sample web page
+    use CGI::Lingua;
+    use CHI;
+    use Log::Log4perl;
+
+    my $cache = CHI->new(driver => 'File', root_dir => '/tmp/cache');
+    Log::Log4perl->easy_init({ level => $Log::Log4perl::DEBUG });
 
     # We support English, French, British and American English, in that order
-    my $l = CGI::Lingua->new(supported => ['en', 'fr', 'en-gb', 'en-us']);
+    my $lingua = CGI::Lingua->new(
+        supported => ['en', 'fr', 'en-gb', 'en-us'],
+        cache     => $cache,
+        logger    => Log::Log4perl->get_logger(),
+    );
+
+    print "Content-Type: text/plain\n\n";
+    print 'Language: ', $lingua->language(), "\n";
+    print 'Country: ', $lingua->country(), "\n";
+    print 'Time Zone: ', $lingua->time_zone(), "\n";
+
+Supported\_languages is the same as supported.
 
 Takes optional parameter cache, an object which is used to cache country
 lookups.
@@ -70,30 +104,32 @@ Takes an optional parameter syslog, to log messages to
 It can be a boolean to enable/disable logging to syslog, or a reference
 to a hash to be given to Sys::Syslog::setlogsock.
 
-Takes optional parameter logger, an object which is used for warnings
-and traces.
-This logger object is an object that understands warn() and trace()
-messages, such as a [Log::Log4perl](https://metacpan.org/pod/Log%3A%3ALog4perl) object.
+Takes an optional parameter logger, which is used for warnings and traces.
+It can be an object that understands warn() and trace() messages,
+such as a [Log::Log4perl](https://metacpan.org/pod/Log%3A%3ALog4perl) or [Log::Any](https://metacpan.org/pod/Log%3A%3AAny) object,
+a reference to code,
+or a filename.
 
 Takes optional parameter info, an object which can be used to see if a CGI
-parameter is set, for example an [CGI::Info](https://metacpan.org/pod/CGI%3A%3AInfo) object.
+parameter is set, for example, an [CGI::Info](https://metacpan.org/pod/CGI%3A%3AInfo) object.
 
 Since emitting warnings from a CGI class can result in messages being lost (you
-may forget to look in your server's log), or appearing to the client in
-amongst HTML causing invalid HTML, it is recommended either either syslog
+may forget to look in your server's log), or appear to the client in
+amongst HTML causing invalid HTML, it is recommended either syslog
 or logger (or both) are set.
 If neither is given, [Carp](https://metacpan.org/pod/Carp) will be used.
 
 Takes an optional parameter dont\_use\_ip.  By default, if none of the
 requested languages is supported, CGI::Lingua->language() looks in the IP
-address for the language to use.  This may be not what you want, so use this
-option to disable the feature.
+address for the language to use.
+This may not be what you want,
+so use this option to disable the feature.
 
 The optional parameter debug is passed on to [I18N::AcceptLanguage](https://metacpan.org/pod/I18N%3A%3AAcceptLanguage).
 
 ## language
 
-Tells the CGI application what language to display its messages in.
+Tells the CGI application in what language to display its messages.
 The language is the natural name e.g. 'English' or 'Japanese'.
 
 Sublanguages are handled sensibly, so that if a client requests U.S. English
@@ -106,19 +142,19 @@ language() returns 'Unknown'.
     # Site supports English and British English
     my $l = CGI::Lingua->new(supported => ['en', 'fr', 'en-gb']);
 
-    # If the browser requests 'en-us' , then language will be 'English' and
-    # sublanguage will be undefined because we weren't able to satisfy the
-    # request
+If the browser requests 'en-us', then language will be 'English' and
+sublanguage will also be undefined, which may seem strange, but it
+ensures that sites behave sensibly.
 
     # Site supports British English only
-    my $l = CGI::Lingua->new({supported => ['fr', 'en-gb']});
-
-    # If the browser requests 'en-us' , then language will be 'English' and
-    # sublanguage will also be undefined, which may seem strange, but it
-    # ensures that sites behave sensibly.
+    my $l = CGI::Lingua->new({ supported => ['fr', 'en-gb']} );
 
 If the script is not being run in a CGI environment, perhaps to debug it, the
 locale is used via the LANG environment variable.
+
+## preferred\_language
+
+Same as language().
 
 ## name
 
@@ -134,7 +170,7 @@ on a site that only serves British English, sublanguage() will return undef.
 
 ## language\_code\_alpha2
 
-Gives the two character representation of the supported language, e.g. 'en'
+Gives the two-character representation of the supported language, e.g. 'en'
 when you've asked for en-gb.
 
 If none of the requested languages is included within the supported lists,
@@ -146,12 +182,12 @@ Synonym for language\_code\_alpha2, kept for historical reasons.
 
 ## sublanguage\_code\_alpha2
 
-Gives the two character representation of the supported language, e.g. 'gb'
+Gives the two-character representation of the supported language, e.g. 'gb'
 when you've asked for en-gb, or undef.
 
 ## requested\_language
 
-Gives a human readable rendition of what language the user asked for whether
+Gives a human-readable rendition of what language the user asked for whether
 or not it is supported.
 
 Returns the sublanguage (if appropriate) in parentheses,
@@ -159,17 +195,17 @@ e.g. "English (United Kingdom)"
 
 ## country
 
-Returns the two character country code of the remote end in lower case.
+Returns the two-character country code of the remote end in lowercase.
 
 If [IP::Country](https://metacpan.org/pod/IP%3A%3ACountry), [Geo::IPfree](https://metacpan.org/pod/Geo%3A%3AIPfree) or [Geo::IP](https://metacpan.org/pod/Geo%3A%3AIP) is installed,
-CGI::Lingua will make use of that, otherwise it will do a Whois lookup.
-If you do not have any of those installed I recommend you make use of the
+CGI::Lingua will make use of that, otherwise, it will do a Whois lookup.
+If you do not have any of those installed I recommend you use the
 caching capability of CGI::Lingua.
 
 ## locale
 
 HTTP doesn't have a way of transmitting a browser's localisation information
-which would be useful for default currency, date formatting etc.
+which would be useful for default currency, date formatting, etc.
 
 This method attempts to detect the information, but it is a best guess
 and is not 100% reliable.  But it's better than nothing ;-)
@@ -192,6 +228,9 @@ CGI::Lingua will make use of that, otherwise it will use ip-api.com
 Nigel Horne, `<njh at bandsman.co.uk>`
 
 # BUGS
+
+Please report any bugs or feature requests to the author.
+This module is provided as-is without any warranty.
 
 If HTTP\_ACCEPT\_LANGUAGE is 3 characters, e.g., es-419,
 sublanguage() returns undef.
@@ -243,6 +282,6 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2010-2024 Nigel Horne.
+Copyright 2010-2025 Nigel Horne.
 
 This program is released under the following licence: GPL2

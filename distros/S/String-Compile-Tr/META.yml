@@ -4,9 +4,11 @@ author:
   - 'JÃ¶rg Sommrey <git@sommrey.de>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Scalar::Util: '0'
   Test2::V0: '0'
   Test::More: '0'
 configure_requires:
+  Config: '0'
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
@@ -26,5 +28,5 @@ requires:
   perl: '5.006'
 resources:
   repository: git://github.com/jo-37/String-Compile-Tr.git
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

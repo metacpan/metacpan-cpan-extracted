@@ -16,7 +16,5 @@ CARP: {
 	} else {
 		does_croak_that_matches(sub { CGI::Lingua->new(); }, qr/You must give a list of supported languages/);
 		does_croak_that_matches(sub { CGI::Lingua->new(supported => undef); }, qr/You must give a list of supported languages/);
-
-		done_testing();
 	}
 }

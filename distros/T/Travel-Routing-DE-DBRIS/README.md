@@ -1,8 +1,12 @@
 # dbris - Command Line Interface to bahn.de Public Transit Routing Service
 
 **dbris** provides a commandline client and Perl module for the bahn.de public
-transit routing interface. It requests connections between two stops and prints
-the results as text or JSON.
+transit routing interface. It requests connections between two or more stops
+and prints the results as text or JSON. Features include
+
+* configurable modes of transit (e.g. no ICE or IC/EC services),
+* price information for configurable passengers and discounts,
+* and compatibility with [dbris-m](https://finalrewind.org/projects/Travel-Status-DE-DBRIS) for connection segment details.
 
 This README documents installation of dbris and the associated
 Travel::Routing::DE::DBRIS Perl module.  See the [Travel::Routing::DE::DBRIS

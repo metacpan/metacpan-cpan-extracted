@@ -26,7 +26,7 @@ no_index:
 provides:
   App::cat::v:
     file: lib/App/cat/v.pm
-    version: '1.02'
+    version: '1.03'
 requires:
   Getopt::EX: '0'
   Getopt::EX::Hashed: '0'
@@ -34,14 +34,14 @@ requires:
   Hash::Util: '0'
   List::Util: '1.29'
   Pod::Usage: '0'
-  Text::ANSI::Fold: '2.23'
-  Text::ANSI::Tabs: '1.0501'
+  Text::ANSI::Fold: '2.29'
+  Text::ANSI::Tabs: '1.06'
   perl: '5.024'
 resources:
   bugtracker: https://github.com/tecolicom/App-cat-v/issues
   homepage: https://github.com/tecolicom/App-cat-v
   repository: https://github.com/tecolicom/App-cat-v.git
-version: '1.02'
+version: '1.03'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

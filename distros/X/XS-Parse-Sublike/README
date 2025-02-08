@@ -130,6 +130,25 @@ XS FUNCTIONS
     expands on the structure's definition to add new fields to support
     this.
 
+ xps_signature_query_*
+
+       IV xps_signature_query_params(struct XSParseSublikeContext *ctx);
+    
+       IV xps_signature_query_optparams(struct XSParseSublikeContext *ctx);
+    
+       char xps_signature_query_slurpy(struct XSParseSublikeContext *ctx);
+
+    Since version 0.37; experimental.
+
+    These experimental functions may only be called during the
+    start_signature or finish_signature hook stages. They are used to query
+    details about the accumulated set of signature parameters. The _params
+    query returns the total number of defined parameters - counting all
+    mandatory, optional, and a final slurpy if present. _optparams returns
+    a count of only the optional parameters. _slurpy returns the sigil
+    character of a final slurpy parameter (@ or %), or zero if no slurpy
+    parameter is present.
+
 PARSE CONTEXT
 
     The various hook stages all share state about the ongoing parse process
@@ -392,7 +411,8 @@ PARSE HOOKS
        void (*finish_signature)(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata);
 
     Code in either of these hook stages is permitted to call
-    "xps_signature_add_param".
+    "xps_signature_add_param", or any of the xps_signature_query_*()
+    functions.
 
  Parse Body
 

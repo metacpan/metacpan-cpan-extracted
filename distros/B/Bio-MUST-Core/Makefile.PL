@@ -36,6 +36,7 @@ my %WriteMakefileArgs = (
     "bin/phylip2ali.pl",
     "bin/prune-ali.pl",
     "bin/prune-tree.pl",
+    "bin/resample-ali.pl",
     "bin/rest-ids-ali.pl",
     "bin/setup-taxdir.pl",
     "bin/split-matrix.pl",
@@ -111,7 +112,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::Deep" => 0
   },
-  "VERSION" => "0.250200",
+  "VERSION" => "0.250380",
   "test" => {
     "TESTS" => "t/*.t"
   }

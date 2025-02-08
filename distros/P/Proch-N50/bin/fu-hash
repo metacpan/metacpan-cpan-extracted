@@ -142,7 +142,7 @@ fu-hash - Print sequence hashes
 
 =head1 VERSION
 
-version 1.5.8
+version 1.7.0
 
 =head1 SYNOPSIS
 
@@ -168,7 +168,7 @@ Andrea Telatin <andrea@telatin.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2023 by Andrea Telatin.
+This software is Copyright (c) 2018-2027 by Quadram Institute Bioscience.
 
 This is free software, licensed under:
 

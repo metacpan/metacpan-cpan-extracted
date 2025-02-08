@@ -10,7 +10,7 @@ use parent 'Class::Accessor';
 use DateTime::Duration;
 use Travel::Routing::DE::DBRIS::Connection::Segment;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 Travel::Routing::DE::DBRIS::Connection->mk_ro_accessors(
 	qw(changes feasibility is_cancelled is_unscheduled is_unlikely
@@ -18,7 +18,7 @@ Travel::Routing::DE::DBRIS::Connection->mk_ro_accessors(
 	  sched_dep rt_dep dep
 	  sched_arr rt_arr arr
 	  occupancy occupancy_first occupancy_second
-	  price price_unit
+	  price price_unit recon
 	)
 );
 
@@ -35,6 +35,7 @@ sub new {
 		  // -1,
 		is_unscheduled => $json->{isAlternativeVerbindung},
 		id             => $json->{tripId},
+		recon          => $json->{ctxRecon},
 		price          => $json->{angebotsPreis}{betrag},
 		price_unit     => $json->{angebotsPreis}{waehrung},
 		strptime_obj   => $strptime,
@@ -155,6 +156,20 @@ sub TO_JSON {
 	my ($self) = @_;
 
 	my $ret = { %{$self} };
+
+	delete $ret->{strptime_obj};
+
+	for my $k (qw(sched_dep rt_dep dep sched_arr rt_arr arr)) {
+		if ( $ret->{$k} ) {
+			$ret->{$k} = $ret->{$k}->epoch;
+		}
+	}
+
+	for my $k (qw(sched_duration rt_duration duration)) {
+		if ( $ret->{$k} ) {
+			$ret->{$k} = $ret->{$k}->in_units('minutes');
+		}
+	}
 
 	return $ret;
 }

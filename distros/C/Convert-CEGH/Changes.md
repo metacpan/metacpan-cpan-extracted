@@ -1,0 +1,31 @@
+# Revision History for the Convert::CEGH Perl Distribution
+
+## 0.06 Fri Feb  7 22:37:20 EST 2025
+	- Fixes as per CPANTS:
+	  + Adding SECURITY.md to distribution.
+	  + Resetting minimum Perl version.
+
+## 0.05 Fri Feb  7 21:07:10 EST 2025
+	- Attempting migration to Build.PL & a GitHub repo.
+
+## 0.04 Sun Feb  2 17:05:25 EST 2025
+	- Fixes as per CPANTS:
+	  + Adding a CEGH.pm package module.
+
+## 0.03 Sun Feb  2 11:53:47 EST 2025
+	- Fixes as per CPANTS:
+	  + LICENSE added.
+	  + POD encoding is set to utf8.
+	  + Added 'use warnings'.
+	  + Added 'use strict'.
+	  + Added MIN_PERL_VERSION to Makefile.PL
+	  + Synched module versions.
+	  + Added META documents.
+	  + Clarified examples.
+
+## 0.02 Thu Jun 12 12:43:10 EDT 2003
+	- added PREREQ_PM to Makefile for Regexp::Ethiopic.
+	- added Halehame bassed Gematria system (basic usage).
+
+## 0.01 Sat Jun  7 11:55:06 EDT 2003
+	- initial release.

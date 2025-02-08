@@ -10,6 +10,7 @@ lib/Daje/Workflow/GenerateSQL/Script/Fields.pm
 lib/Daje/Workflow/GenerateSQL/Script/ForeignKey.pm
 lib/Daje/Workflow/GenerateSQL/Script/Index.pm
 lib/Daje/Workflow/GenerateSQL/Script/Sql.pm
+lib/Daje/Workflow/GenerateSQL/Script/View.pm
 minil.toml
 t/00_compile.t
 META.json

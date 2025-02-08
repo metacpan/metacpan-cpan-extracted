@@ -56,8 +56,8 @@ SKIP: {
     }     
     my ($status, $out, $err) = run_bin("fu-grep", ("Seq1", "-n", "$file"));
     my $lines = scalar ( split "\n", $out);
-    ok($? == 0, "[fu-grep: -n] Exit status OK for grep: $?");
-    ok($lines == 2*1, "[fu-grep: -n] output sequences expected: 1=$lines");
+    ok($? == 0, "[fu-grep: -n] (\"Seq1\", \"-n\", \"$file\")Exit status OK for grep: $?");
+    ok($lines == 2*1, "[fu-grep: -n] (\"Seq1\", \"-n\", \"$file\") output sequences expected: 1=$lines");
 }
 
 done_testing();

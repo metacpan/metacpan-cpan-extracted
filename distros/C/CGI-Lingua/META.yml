@@ -8,6 +8,7 @@ build_requires:
   LWP::Simple::WithCache: '0.04'
   Test::Carp: '0'
   Test::Compile: '0'
+  Test::DescribeMe: '0'
   Test::Most: '0'
   Test::Needs: '0'
   Test::NoWarnings: '0'
@@ -49,5 +50,5 @@ requires:
 resources:
   bugtracker: https://github.com/nigelhorne/CGI-Lingua/issues
   repository: git://github.com/nigelhorne/CGI-Lingua.git
-version: '0.66'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '0.67'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

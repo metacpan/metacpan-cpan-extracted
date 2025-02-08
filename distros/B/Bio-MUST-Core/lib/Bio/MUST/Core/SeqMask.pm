@@ -2,7 +2,7 @@ package Bio::MUST::Core::SeqMask;
 # ABSTRACT: Sequence mask for selecting specific sites
 # CONTRIBUTOR: Catherine COLSON <ccolson@doct.uliege.be>
 # CONTRIBUTOR: Raphael LEONARD <rleonard@doct.uliege.be>
-$Bio::MUST::Core::SeqMask::VERSION = '0.250200';
+$Bio::MUST::Core::SeqMask::VERSION = '0.250380';
 use Moose;
 use namespace::autoclean;
 
@@ -590,8 +590,8 @@ sub filtered_ali {
         my $new_seq;
         my $site = 0;
         for my $state ($self->all_states) {
-            $new_seq .= $state ? $seq->state_at($site) : $char;
-            $site++;
+            $new_seq .= $state ? $seq->state_at($site) x $state : $char;
+            $site++;             # x $state is for Weights objects
         }
 
         # add Seq to new Ali
@@ -770,7 +770,7 @@ Bio::MUST::Core::SeqMask - Sequence mask for selecting specific sites
 
 =head1 VERSION
 
-version 0.250200
+version 0.250380
 
 =head1 SYNOPSIS
 

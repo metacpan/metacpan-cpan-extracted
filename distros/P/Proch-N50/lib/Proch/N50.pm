@@ -1,177 +1,149 @@
 package Proch::N50;
-#ABSTRACT: a small module to calculate N50 (total size, and total number of sequences) for a FASTA or FASTQ file. It's easy to install, with minimal dependencies.
+#ABSTRACT: Calculate N50 and related statistics for FASTA/FASTQ files with minimal dependencies
 
-use 5.012;
+use strict;
 use warnings;
-my  $opt_digits = 2;
-$Proch::N50::VERSION = '1.5.8';
+use 5.012;
+use Carp qw(croak);
 use File::Spec;
 use JSON::PP;
 use FASTX::Reader;
 use File::Basename;
 use Exporter qw(import);
 
+our $VERSION = '1.7.0';
 our @EXPORT = qw(getStats getN50 jsonStats);
 
+# Configuration
+our $DEFAULT_DIGITS = 2;
+our $MIN_CUSTOM_N = 0;
+our $MAX_CUSTOM_N = 100;
+ 
+
 sub getStats {
-    # Parses a FASTA/FASTQ file and returns stats
-    # Parameters:
-    # * filename (Str)
-    # * Also return JSON string (Bool)
-
-    my ( $file, $wantJSON, $customN ) = @_;
-    if (defined $customN and ($customN > 100 or $customN < 0) ) {
-      die "[Proch::N50] Custom value must be 0 < x < 100\n";
-    }
-    my $answer;
-    $answer->{status} = 1;
-    $answer->{N50}    = undef;
-
-    # Check file existence
-    # uncoverable condition right
-    if ( !-e "$file" and $file ne '-' ) {
-        $answer->{status}  = 0;
-        $answer->{message} = "Unable to find <$file>";
-    }
-
-    # Return failed status if file not found or not readable
-    if ( $answer->{status} == 0 ) {
-        return $answer;
-    }
-
-    # my @aux = undef;
-    my $Reader;
-    if ($file ne '-') {
-       $Reader = FASTX::Reader->new({ filename => "$file" });
-    } else {
-       $Reader = FASTX::Reader->new({ filename => '{{STDIN}}' });
-    }
-    my %sizes;
-    my ( $n, $slen ) = ( 0, 0 );
-
-    # Parse FASTA/FASTQ file
-    while ( my $seq = $Reader->getRead() ) {
-        ++$n;
-        my $size = length($seq->{seq});
-        $slen += $size;
-        $sizes{$size}++;
-    }
-
-    my ($n50, $min, $max, $auN, $n75, $n90, $nx);
-    unless ($n) {
-      ($n50, $min, $max, $auN, $n75, $n90, $nx) =
-      (   0,    0,    0,    0,    0,    0,   0);
-       say STDERR "[n50] WARNING: Not a sequence file: $file";
-    } else {
-      # Invokes core _n50fromHash() routine
-      ($n50, $min, $max, $auN, $n75, $n90, $nx) = _n50fromHash( \%sizes, $slen, $customN );
-    }
-    my $basename = basename($file);
-
-    $answer->{N50}      = $n50 + 0;
-    $answer->{N75}      = $n75 + 0;
-    $answer->{N90}      = $n90 + 0;
+    my ($file, $wantJSON, $customN) = @_;
+    
+    # Input validation
+    croak "Missing input file parameter" unless defined $file;
+    
     if (defined $customN) {
-      $answer->{Ne}       = $nx  + 0;
-      $answer->{"N$customN"} = $nx  + 0;
+        croak sprintf("Custom N value must be between %d and %d", 
+                     $MIN_CUSTOM_N, $MAX_CUSTOM_N)
+            if ($customN > $MAX_CUSTOM_N || $customN < $MIN_CUSTOM_N);
     }
 
-    $answer->{auN}      = sprintf("%.${opt_digits}f", $auN + 0);
-    $answer->{min}      = $min + 0;
-    $answer->{max}      = $max + 0;
-    $answer->{seqs}     = $n;
-    $answer->{size}     = $slen;
-    $answer->{filename} = $basename;
-    $answer->{dirname}  = dirname($file);
-    $answer->{path   }  = File::Spec->rel2abs(dirname($file));
+    my $stats = {
+        status   => 1,
+        N50      => undef,
+        filename => basename($file),
+        dirname  => dirname($file),
+        path     => File::Spec->rel2abs($file)
+    };
 
-    # If JSON is required return JSON
-    if ( defined $wantJSON and $wantJSON ) {
-
-        my $json = JSON::PP->new->ascii->pretty->allow_nonref;
-        my $pretty_printed = $json->encode( $answer );
-        $answer->{json} = $pretty_printed;
-
+    # File existence check
+    unless ($file eq '-' || -e $file) {
+        $stats->{status} = 0;
+        $stats->{message} = "File not found: $file";
+        return $stats;
     }
-    return $answer;
+
+    # Initialize sequence reader
+    my $reader = ($file eq '-') 
+        ? FASTX::Reader->new({ filename => '{{STDIN}}' })
+        : FASTX::Reader->new({ filename => $file });
+
+    # Process sequences
+    my %sizes;
+    my ($total_seqs, $total_size) = (0, 0);
+    
+    while (my $seq = $reader->getRead()) {
+        $total_seqs++;
+        my $length = length($seq->{seq});
+        $sizes{$length}++;
+        $total_size += $length;
+    }
+
+    # Calculate statistics
+    my ($n50, $min, $max, $auN, $n75, $n90, $nx) = 
+        _calculateMetrics(\%sizes, $total_size, $customN);
+
+    # Populate results
+    $stats->{size}  = $total_size;
+    $stats->{seqs}  = $total_seqs;
+    $stats->{N50}   = $n50;
+    $stats->{N75}   = $n75;
+    $stats->{N90}   = $n90;
+    $stats->{min}   = $min;
+    $stats->{max}   = $max;
+    $stats->{auN}   = sprintf("%.${DEFAULT_DIGITS}f", $auN);
+    $stats->{Nx}    = $nx if defined $customN;
+
+    # Generate JSON if requested
+    if ($wantJSON) {
+        $stats->{json} = JSON::PP->new->pretty->encode($stats);
+    }
+
+    return $stats;
 }
 
-sub _n50fromHash {
-    # _n50fromHash(): calculate stats from hash of lengths
-    #
-    # Parameters:
-    # * A hash of  key={contig_length} and value={no_contigs}
-    # * Sum of all contigs sizes
-    my ( $hash_ref, $total_size, $custom_n ) = @_;
+sub _calculateMetrics {
+    my ($sizes, $total_size, $custom_n) = @_;
+
+    my ($n50, $n75, $n90, $nx) = (0, 0, 0, 0);
     my $progressive_sum = 0;
     my $auN = 0;
-    my $n50 = undef;
-    my $n75 = undef;
-    my $n90 = undef;
-    my $nx  = undef;
-    my @sorted_keys = sort { $a <=> $b } keys %{$hash_ref};
 
-    # Added in v. 0.039
-    my $max =  $sorted_keys[-1];
-    my $min =  $sorted_keys[0] ;
-    # N50 definition: https://en.wikipedia.org/wiki/N50_statistic
-    # Was '>=' in my original implementation of N50. Now complies with 'seqkit'
-    # N50 Calculation
+    # Sort lengths in DESCENDING order
+    my @sorted_lengths = sort { $b <=> $a } keys %$sizes;
 
-    foreach my $s ( @sorted_keys ) {
-        my $ctgs_length = $s * ${$hash_ref}{$s};
-        $progressive_sum +=  $ctgs_length;
+    # Get min and max lengths
+    my $min = $sorted_lengths[-1];
+    my $max = $sorted_lengths[0];
 
+    # Iterate over sorted lengths
+    foreach my $length (@sorted_lengths) {
+        my $count = $sizes->{$length};            # Number of sequences of this length
+        my $total_length = $length * $count;     # Total length contributed by these sequences
+        $progressive_sum += $total_length;       # Add to cumulative sum
+        $auN += $total_length * ($total_length / $total_size);  # auN calculation
 
-        $auN += ( $ctgs_length ) * ( $ctgs_length / $total_size);
+        # Check thresholds for N50, N75, N90
+        if (!$n50 && $progressive_sum >= ($total_size * 0.5)) {
+            $n50 = $length;
+        }
+        if (!$n75 && $progressive_sum >= ($total_size * 0.75)) {
+            $n75 = $length;
+        }
+        if (!$n90 && $progressive_sum >= ($total_size * 0.9)) {
+            $n90 = $length;
+        }
 
-       if ( !$n50 and $progressive_sum > ( $total_size * ((100 - 50) / 100) ) ) {
-         $n50 = $s;
-       }
-
-       if ( !$n75 and $progressive_sum > ( $total_size * ((100 - 75) / 100) ) ) {
-         $n75 = $s;
-       }
-       if ( !$n90 and $progressive_sum > ( $total_size * ((100 - 90) / 100) ) ) {
-         $n90 = $s;
-       }
-       if ( !$nx and defined $custom_n) {
-         $nx = $s if ( $progressive_sum > ( $total_size * ((100 - $custom_n) / 100) ));
-       }
+        # Custom Nx calculation
+        if (!$nx && defined $custom_n) {
+            my $threshold = $total_size * ($custom_n / 100);
+            if ($progressive_sum >= $threshold) {
+                $nx = $length;
+            }
+        }
     }
-    return ($n50, $min, $max, $auN, $n75, $n90, $nx);
 
+    return ($n50, $min, $max, $auN, $n75, $n90, $nx);
 }
+
+
 
 sub getN50 {
-
-    # Invokes the full getStats returning N50 or 0 in case of error;
     my ($file) = @_;
     my $stats = getStats($file);
-
-# Verify status and return
-# uncoverable branch false
-    if ( $stats->{status} ) {
-        return $stats->{N50};
-    } else {
-        return 0;
-    }
+    return $stats->{status} ? $stats->{N50} : 0;
 }
+
 
 sub jsonStats {
-  my ($file) = @_;
-  my $stats = getStats($file,  'JSON');
-
-# Return JSON object if getStats() was able to reduce one
-# uncoverable branch false
-  if (defined $stats->{json}) {
-    return $stats->{json}
-  } else {
-    # Return otherwise
-    return ;
-  }
+    my ($file) = @_;
+    my $stats = getStats($file, 'JSON');
+    return $stats->{json};
 }
-
 
 1;
 
@@ -183,173 +155,79 @@ __END__
 
 =head1 NAME
 
-Proch::N50 - a small module to calculate N50 (total size, and total number of sequences) for a FASTA or FASTQ file. It's easy to install, with minimal dependencies.
+Proch::N50 - Calculate N50 and related statistics for FASTA/FASTQ files with minimal dependencies
 
 =head1 VERSION
 
-version 1.5.8
+version 1.7.0
 
 =head1 SYNOPSIS
 
-  use Proch::N50 qw(getStats getN50);
-  my $filepath = '/path/to/assembly.fasta';
+    use Proch::N50 qw(getStats getN50);
+    
+    # Get basic N50
+    my $n50 = getN50('assembly.fasta');
+    
+    # Get comprehensive statistics
+    my $stats = getStats('assembly.fasta');
+    
+    # Get statistics with JSON output
+    my $stats_json = getStats('assembly.fasta', 'JSON');
+    
+    # Get only JSON output
+    my $json = jsonStats('assembly.fasta');
 
-  # Get N50 only: getN50(file) will return an integer
-  print "N50 only:\t", getN50($filepath), "\n";
+=head1 DESCRIPTION
 
-  # Full stats
-  my $seq_stats = getStats($filepath);
-  print Data::Dumper->Dump( [ $seq_stats ], [ qw(*FASTA_stats) ] );
-  # Will print:
-  # %FASTA_stats = (
-  #               'N50' => 65,
-  #               'N75' => 50,
-  #               'N90' => 4,
-  #               'min' => 4,
-  #               'max' => 65,
-  #               'dirname' => 'data',
-  #               'auN' => 45.02112,
-  #               'size' => 130,
-  #               'seqs' => 6,
-  #               'filename' => 'test.fa',
-  #               'status' => 1
-  #             );
+A lightweight module to calculate assembly statistics from FASTA/FASTQ files.
+Provides N50, N75, N90, auN metrics, and sequence length distributions.
 
-  # Get also a JSON object
-  my $seq_stats_with_JSON = getStats($filepath, 'JSON');
-  print $seq_stats_with_JSON->{json}, "\n";
-  # Will print:
-  # {
-  #    "status" : 1,
-  #    "seqs" : 6,
-  #    <...>
-  #    "filename" : "small_test.fa",
-  #    "N50" : 65,
-  # }
-  # Directly ask for the JSON object only:
-  my $json = jsonStats($filepath);
-  print $json;
+=head2 getStats()
 
-=head1 METHODS
+Calculate N50, N75, N90, auN, and other statistics for a FASTA/FASTQ file.
 
-=head2 getN50(filepath)
+Parameters:
+    $file      - Path to FASTA/FASTQ file
+    $wantJSON  - Optional flag to return JSON output
+    $customN   - Optional custom N-metric to calculate
 
-This function returns the N50 for a FASTA/FASTQ file given, or 0 in case of error(s).
+Example:
+    my $stats = getStats('assembly.fasta', 'JSON', 80);
+    print $stats->{json};
 
-=head2 getStats(filepath, alsoJSON)
+=head2 _calculateMetrics
 
-Calculates N50 and basic stats for <filepath>. Returns also JSON if invoked
-with a second parameter.
-This function return a hash reporting:
+Internal function to calculate N50, N75, N90, and other metrics
 
-=over 4
+Parameters:
+    \%sizes     - Hash reference of sequence lengths and their frequencies
+    $total_size - Total size of all sequences
+    $custom_n   - Optional custom N-metric to calculate
 
-=item I<size> (int)
+Returns: ($n50, $min, $max, $auN, $n75, $n90, $nx)
 
-total number of bp in the files
+=head2 getN50
 
-=item I<N50>, I<N75>, I<N90> (int)
+Quick function to get only the N50 value for a file.
 
-the actual N50, N75, and N90 metrices
+Parameters:
+    $file - Path to FASTA/FASTQ file
 
-=item I<auN> (float)
+Returns: N50 value or 0 on error
 
-the area under the Nx curve, as described in L<https://lh3.github.io/2020/04/08/a-new-metric-on-assembly-contiguity>.
-Returs with 5 decimal digits.
+=head2 jsonStats
 
-=item I<min> (int)
+Get statistics in JSON format.
 
-Minimum length observed in FASTA/Q file
+Parameters:
+    $file - Path to FASTA/FASTQ file
 
-=item I<max> (int)
+Returns: JSON string with statistics or undef on error
 
-Maximum length observed in FASTA/Q file
+=head1 BUGS
 
-=item I<seqs> (int)
-
-total number of sequences in the files
-
-=item I<filename> (string)
-
-file basename of the input file
-
-=item I<dirname> (string)
-
-name of the directory containing the input file (as received)
-
-=item I<path> (string)
-
-name of the directory containing the input file (resolved to its absolute path)
-
-=back
-
-=over 4
-
-=item I<json> (string: JSON pretty printed)
-
-(pretty printed) JSON string of the object (only if JSON is installed)
-
-=back
-
-=head2 jsonStats(filepath)
-
-Returns the JSON string with basic stats (same as $result->{json} from I<getStats>(File, JSON)).
-Requires JSON::PP installed.
-
-=head2 _n50fromHash(hash, totalsize)
-
-This is an internal helper subroutine that perform the actual N50 calculation, hence its addition
-to the documentation.
-Expects the reference to an hash of sizes C<$size{SIZE} = COUNT> and the total sum of sizes obtained
-parsing the sequences file.
-Returns N50, min and max lengths.
-
-=head1 Dependencies
-
-=head2 Module (N50.pm)
-
-=over 4
-
-=item L<FASTX::Reader> (required)
-
-=item L<JSON::PP>, <File::Basename> (core modules)
-
-=back
-
-=head2 Stantalone program (n50.pl)
-
-=over 4
-
-=item L<Term::ANSIColor>
-
-=back
-
-=over 4
-
-=item L<JSON>
-
-(optional) when using C<--format JSON>
-
-=back
-
-=over 4
-
-=item L<Text::ASCIITable>
-
-(optional) when using C<--format screen>. This might be substituted by a different module in the future.
-
-=back
-
-=head1 SUPPORT
-
-This module and the n50 program have limited support.
-SeqFu (L<https://telatin.github.io/seqfu2>) is a compiled suite of 
-utilities that includes a B<seqfu stats> module, a faster replacement
-for the C<n50> program.
-
-If you are interested in contributing to the development of this module, or
-in reporting bugs, please refer to repository
-L<https://github.com/telatin/proch-n50/issues>.
+Please report any bugs or feature requests at:
+L<https://github.com/telatin/proch-n50/issues>
 
 =head1 AUTHOR
 
@@ -357,7 +235,7 @@ Andrea Telatin <andrea@telatin.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2023 by Andrea Telatin.
+This software is Copyright (c) 2018-2027 by Quadram Institute Bioscience.
 
 This is free software, licensed under:
 

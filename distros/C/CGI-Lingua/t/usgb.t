@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 use Test::More tests => 54;
+use Test::Needs 'CHI';
 use Test::NoWarnings;
 
 BEGIN {
@@ -20,21 +21,7 @@ USGB: {
 		$ENV{'IGNORE_WIN32_LOCALE'} = 1;
 	}
 
-	my $cache;
-
-	eval {
-		require CHI;
-
-		CHI->import;
-	};
-	if($@) {
-		diag('CHI not installed');
-		$cache = undef;
-	} else {
-		diag("Using CHI $CHI::VERSION");
-		$cache = CHI->new(driver => 'Memory', global => 1);
-	}
-
+	my $cache = CHI->new(driver => 'Memory', global => 1);
 	$ENV{'HTTP_ACCEPT_LANGUAGE'} = 'en-GB,en-US;q=0.8,en;q=0.6';
 	$ENV{'REMOTE_ADDR'} = '95.147.222.177';
 	my $l = new_ok('CGI::Lingua' => [
@@ -49,7 +36,7 @@ USGB: {
 		ok($l->locale()->code_alpha2() eq 'gb');
 	}
 	ok(defined($l->requested_language()));
-	ok($l->requested_language() eq 'English (United Kingdom)');
+	cmp_ok($l->requested_language(), 'eq', 'English (United Kingdom)');
 	ok($l->language() eq 'English');
 	ok($l->sublanguage() eq 'United Kingdom');
 

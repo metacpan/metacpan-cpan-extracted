@@ -7,10 +7,8 @@ DBIx::Migration - Seamless database schema up- and downgrades
 =head1 SYNOPSIS
 
   my $m = DBIx::Migration->new(
-      {
-          dsn => 'dbi:SQLite:~/Projects/myapp/db/myapp.db',
-          dir => '~/Projects/myapp/db/migrations'
-      }
+    dsn => 'dbi:SQLite:~/Projects/myapp/db/myapp.db',
+    dir => '~/Projects/myapp/db/migrations'
   );
 
   # Get current version from database
@@ -49,11 +47,24 @@ Although not mandatory the script name begins with a prefix like for example
 underscore "_" the script name ends with the migration type that is either "up"
 or "down". Migrations are stored in a directory and are applied in order to a
 database. Usually the version number of the first migration is 1. The version
-numbers of the other migrations have to be ascending without gaps. During
-processing the content of each migration is read with the C<binmode> of C<:raw>
-into a scalar. The content is split into sections using the default SQL
-delimiter ";". Each section is executed independently. All related sections are
-encapsulated in a database transaction.
+numbers of the other migrations have to be ascending without gaps.
+
+During processing the content of each migration is read with the C<binmode> of
+C<:raw> into a scalar. The content is split into sections using the default SQL
+delimiter ";" (semicolon). Each section is executed independently. All related
+sections are encapsulated in a database transaction.  If a migration embeds
+stored logic containing one or more semicolons (a PostgreSQL trigger function
+for example), the C<migrate()> method incorrectly splits the migration into
+sections, causing an error. You can set a different delimiter to overcome this
+problem. Add the C<dbix_migration_delimiter> annotation as an SQL comment to
+the migration
+
+  -- dbix_migration_delimiter: /
+  ...
+
+The annotation has to be specified in the first line. The delimiter has to be
+a single printable ASCII character, excluding the space character. In the
+previous example it is the "/" (slash) character.
 
 =head1 METHODS
 
@@ -92,7 +103,8 @@ Get/Set database username.
 =item $self->version
 
 Get migration version from database. Will be undef if no migration has taken
-place yet.
+place yet. The version is stored in the table B<dbix_migration>. The name of
+this table may change in the future so don't rely on it.
 
 =back
 
@@ -102,6 +114,16 @@ After the C<dbh> was used for the first time changing the C<dsn>, C<password>,
 or C<username> has no impact. The reason is the mutable (offering setter
 methods) design of this module. Changing this will break the backwards
 compatibility.
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<Liquibase endDelimiter|https://docs.liquibase.com/change-types/enddelimiter-sql.html>
+
+=item * L<Using pgTAP|https://pgtap.org/documentation.html#usingpgtap>
+
+=back
 
 =head1 AUTHOR
 

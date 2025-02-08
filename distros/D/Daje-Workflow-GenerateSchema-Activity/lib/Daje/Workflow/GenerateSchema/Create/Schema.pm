@@ -74,7 +74,7 @@ sub get_db_schema($self, $schema) {
     $length = scalar @views;
     for (my $i = 0; $i < $length; $i++ ) {
         my $view->{view} = $views[$i];
-        my $column_names = $self->get_table_column_names($view->{view}->{table_name}, $schema);
+        my $column_names = $self->_get_table_column_names($view->{view}->{table_name}, $schema);
         $view->{view}->{column_names} = $column_names;
         $view->{view}->{keys} = $self->_get_keys($column_names);
         push (@vie, $view);

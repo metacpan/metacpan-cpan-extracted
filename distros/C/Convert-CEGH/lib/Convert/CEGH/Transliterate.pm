@@ -11,7 +11,7 @@ use vars qw( $COPTIC @EXPORT_OK $VERSION );
 
 	@EXPORT_OK = qw( transliterate );
 
-	$VERSION = "0.04";
+	$VERSION = "0.06";
 
 	$COPTIC = qr/[ϚCϢϤϦϨϬϮϪ]/;
 }

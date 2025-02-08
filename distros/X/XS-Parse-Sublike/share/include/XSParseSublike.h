@@ -1,7 +1,7 @@
 #ifndef __XS_PARSE_SUBLIKE_H__
 #define __XS_PARSE_SUBLIKE_H__
 
-#define XSPARSESUBLIKE_ABI_VERSION 7
+#define XSPARSESUBLIKE_ABI_VERSION 8
 
 struct XSParseSublikeContext {
   SV *name;  /* may be NULL for anon subs */
@@ -124,6 +124,23 @@ static void S_xps_signature_add_param(pTHX_ struct XSParseSublikeContext *ctx, s
   (*signature_add_param_func)(aTHX_ ctx, details);
 }
 
+/* Easier to define one query function that takes a `q` parameter, that
+ * indicates which question we are asking. This saves us having to export
+ * lots of functions. This is internal implementation detail, not exposed
+ * API.
+ */
+static IV (*signature_query_func)(pTHX_ struct XSParseSublikeContext *ctx, int q);
+#define xps_signature_query_params(ctx)     S_xps_signature_query(aTHX_ ctx, 0)
+#define xps_signature_query_optparams(ctx)  S_xps_signature_query(aTHX_ ctx, 1)
+#define xps_signature_query_slurpy(ctx)     ((char)S_xps_signature_query(aTHX_ ctx, 2))
+static IV S_xps_signature_query(pTHX_ struct XSParseSublikeContext *ctx, int q)
+{
+  if(!signature_query_func)
+    croak("Must call boot_xs_parse_sublike() first");
+
+  return (*signature_query_func)(aTHX_ ctx, q);
+}
+
 /* Experimental support for subroutine parameter attributes.
  * Only supported on Perl v5.26 or later
  */
@@ -200,6 +217,9 @@ static void S_boot_xs_parse_sublike(pTHX_ double ver) {
 
   signature_add_param_func = INT2PTR(void (*)(pTHX_ struct XSParseSublikeContext *ctx, struct XPSSignatureParamDetails *details),
       SvUV(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/signature_add_param()@7", 0)));
+
+  signature_query_func = INT2PTR(IV (*)(pTHX_ struct XSParseSublikeContext *ctx, int q),
+      SvUV(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/signature_query()@8", 0)));
 }
 
 #endif

@@ -41,6 +41,7 @@ use Daje::Workflow::GenerateSQL::Script::Fields;
 use Daje::Workflow::GenerateSQL::Script::Index;
 use Daje::Workflow::GenerateSQL::Script::ForeignKey;
 use Daje::Workflow::GenerateSQL::Script::Sql;
+use Daje::Workflow::GenerateSQL::Script::View;
 
 sub generate_table($self) {
     my $sections = "";
@@ -68,8 +69,16 @@ sub _version($self, $version) {
                 my $table = $self->shift_section($tables);
                 $sql .= $self->create_table_sql($table);
             }
-            $sections .= $self->create_section($sql, @{$version}[$i]->{number});
         }
+        if (exists(@{$version}[$i]->{views})) {
+            my $views = @{$version}[$i]->{views};
+            my $len = scalar @{$views};
+            for(my $j = 0; $j < $len; $j++){
+                my $view = $self->shift_section($views);
+                $sql .= $self->create_view_sql($view);
+            }
+        }
+        $sections .= $self->create_section($sql, @{$version}[$i]->{number});
     }
     return $sections
 }
@@ -88,6 +97,15 @@ sub create_section($self, $sql, $number) {
     $section =~ s/<<version>>/$number/ig;
     $section =~ s/<<table>>/$sql/ig;
     return $section;
+}
+
+sub create_view_sql($self, $view) {
+    my $sql = Daje::Workflow::GenerateSQL::Script::View->new(
+        json      => $view->{view},,
+        templates  => $self->templates,
+    )->generate();
+
+    return $sql
 }
 
 sub create_table_sql($self, $table) {
@@ -117,15 +135,15 @@ sub create_table_sql($self, $table) {
 
 }
 
-sub create_sql($self, $json, $tablename) {
-    my $sql_stmt = Daje::Workflow::GenerateSQL::Manager::Sql->new(
-        json      => $json,
-        templates  => $self->templates,
-        tablename => $tablename,
-    );
-    my $result = $sql_stmt->create_sql();
-    return $result;
-}
+# sub create_sql($self, $json, $tablename) {
+#     my $sql_stmt = Daje::Workflow::GenerateSQL::Manager::Sql->new(
+#         json      => $json,
+#         templates  => $self->templates,
+#         tablename => $tablename,
+#     );
+#     my $result = $sql_stmt->create_sql();
+#     return $result;
+# }
 
 sub fill_template($self, $name, $fields, $foreignkeys, $indexes, $sql) {
     my $template = $self->templates->get_data_section('table');

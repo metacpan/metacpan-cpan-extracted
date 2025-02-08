@@ -1,5 +1,13 @@
 Revision history for XS-Parse-Sublike
 
+0.37    2025-02-07
+        [CHANGES]
+         * Added `xps_signature_query_*()` API
+
+        [BUGFIXES]
+         * Don't store signature parsing state in the `PL_parser->sig_*` vars,
+           so as to cope when Perl v5.41.9 removes them
+
 0.36    2025-01-15
         [BUGFIXES]
          * Handle the new shape of `PL_compiling.cop_features` in perl 5.41.8

@@ -1,5 +1,14 @@
 Revision history for CGI-Lingua
 
+0.67	Fri Feb  7 07:52:22 EST 2025
+	Improved handling of IPv6
+	Allow the logger to be a ref to code
+	Better handling of en-uk
+	Use gtar to create a distribution on Macs
+	Use Test::DescribeMe to simplify tests
+	Added t/30-basics.t
+	Added coveralls and codecov
+
 0.66	Wed Feb 14 10:06:25 EST 2024
 	time_zone(): Don't load Geo::IP for local connections
 	time_zone(): Don't fail on "Usage" message from Geo::IP

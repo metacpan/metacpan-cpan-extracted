@@ -12,7 +12,7 @@ use Test::PgTAP import => [ qw( tables_are ) ];
 eval { require Test::PostgreSQL };
 plan skip_all => 'Test::PostgresSQL required' unless $@ eq '';
 
-my $pgsql = eval { Test::PostgreSQL->new() } or do {
+my $pgsql = eval { Test::PostgreSQL->new } or do {
   no warnings 'once';
   plan skip_all => $Test::PostgreSQL::errstr;
 };
@@ -70,7 +70,7 @@ is $m->version, $target_version, 'check version';
 $target_version = 0;
 subtest "migrate to version $target_version" => \&migrate_to_version_assertion, $target_version;
 
-my $m1 = DBIx::Migration->new( { dbh => $m->dbh, dir => $m->dir } );
+my $m1 = DBIx::Migration->new( dbh => $m->dbh, dir => $m->dir );
 
 is $m1->version, 0, '"dbix_migration" table exists and its "version" value is 0';
 

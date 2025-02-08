@@ -44,7 +44,7 @@ extract-ali.pl - Extract sequences from a FASTA database file based on id lists
 
 =head1 VERSION
 
-version 0.250200
+version 0.250380
 
 =head1 USAGE
 

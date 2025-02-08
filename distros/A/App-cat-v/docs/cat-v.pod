@@ -15,6 +15,7 @@ cat-v [ options ] args ...
      -o   --original      Print original line as is
      -t   --expand[=#]    Expand tabs
      -T   --no-expand     Do not expand tabs
+     -E                   Escape backslash character
     --ts  --tabstyle=#    Set tab style
           --tabstop=#     Set tab width
           --tabhead=#     Set tab-head character
@@ -33,7 +34,7 @@ cat-v [ options ] args ...
 
 =head1 VERSION
 
-Version 1.02
+Version 1.03
 
 =head1 DESCRIPTION
 
@@ -134,7 +135,9 @@ characters
 
 =item B<-n>, B<--reset>
 
-Disables all character conversions and resets repeat characters.
+Disables all character conversions and tab expansion, and resets
+repeat characters.  Therefore, the C<cat-v -n> effectively does
+nothing, just like the C<cat> command.
 
 =item B<-c>, B<--visible> I<name>=I<flag>,...
 
@@ -142,6 +145,7 @@ Give the character type and flags as parameters to specify the
 character to be visualized and the conversion format.
 
     c  control style
+    e  escape style
     s  symbol style
     m  Unicode mark (if exists)
     0  do not convert
@@ -167,6 +171,17 @@ then sets C<nl>, C<nl>, C<np>, and C<sp> to C<m> and disables C<esc>.
 This is the default state.
 
     cat-v -c all=s,nul=nl=np=sp=m,esc=0
+
+If none of the name labels are specified, it is assumed that C<all> is
+given.  The following command prints all control characters except
+newlines in escaped form, which is compatible with the Perl's string
+literal.
+
+    cat-v -n -ce,nl=0
+
+The above command is identical to this.
+
+    cat-v --no-expand --reset --visible all=e,nl=0
 
 =item B<-->I<name>[=I<replacement>]
 
@@ -273,6 +288,19 @@ C<middle-dot> for tabspace.
 
 Show available style list if called without parameter.  Styles are
 defined in L<Text::ANSI::Fold> library.
+
+=item B<-E>, B<--escape-backslash>
+
+Convert backslash character to the escaped form C<\\>.
+
+Although backslash is not a control character, this way the result of
+converting other control characters to escape expressions can be fully
+interpreted as string literal of various programming language.
+
+The following command reproduces the complete contents of the original
+file.
+
+    echo -ne "$(cat-v -Ence FILE)"
 
 =back
 

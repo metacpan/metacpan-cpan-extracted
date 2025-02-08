@@ -1,3 +1,11 @@
+Travel::Routing::DE::DBRIS 0.04 - Fri Feb 07 2025
+
+    * Connection, Segment: TO_JSON: convert DateTime and Duration objects
+    * dbris: Fix --json
+    * dbris: Add -a / --arrival option
+    * dbris: Add -o / --with-offers option (work in progress)
+    * dbris: Add --with-upsell-offers option
+
 Travel::Routing::DE::DBRIS 0.03 - Sun Feb 02 2025
 
     * Connection: Add is_cancelled, is_unscheduled, is_unlikely accessors

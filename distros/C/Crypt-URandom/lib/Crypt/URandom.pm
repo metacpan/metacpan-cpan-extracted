@@ -17,7 +17,7 @@ our %EXPORT_TAGS = ( 'all' => \@EXPORT_OK, );
 our @CARP_NOT = ('Crypt::URandom');
 
 BEGIN {
-    our $VERSION = '0.52';
+    our $VERSION = '0.53';
     eval {
         require XSLoader;
 
@@ -226,8 +226,7 @@ sub _read_urandom_fs {
             redo BUFFER_FILLED;
         }
         else {
-            my $returned_bytes = length $urandom;
-            my $error          = $EXTENDED_OS_ERROR;
+            my $error = $EXTENDED_OS_ERROR;
             $_urandom_handle = undef;
             $_initialised    = undef;
             Carp::croak( q[Failed to read from ] . PATH() . qq[:$error] );
@@ -246,7 +245,7 @@ Crypt::URandom - Provide non blocking randomness
 
 =head1 VERSION
 
-This document describes Crypt::URandom version 0.52
+This document describes Crypt::URandom version 0.53
 
 
 =head1 SYNOPSIS

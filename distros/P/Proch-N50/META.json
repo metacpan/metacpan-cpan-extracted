@@ -1,16 +1,16 @@
 {
-   "abstract" : "a small module to calculate N50 (total size, and total number of sequences) for a FASTA or FASTQ file. It's easy to install, with minimal dependencies.",
+   "abstract" : "Calculate N50 and related statistics for FASTA/FASTQ files with minimal dependencies",
    "author" : [
       "Andrea Telatin <andrea@telatin.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Proch-N50",
    "prereqs" : {
@@ -43,11 +43,11 @@
    "provides" : {
       "Proch::N50" : {
          "file" : "lib/Proch/N50.pm",
-         "version" : "v1.5.8"
+         "version" : "v1.7.0"
       },
       "Proch::Seqfu" : {
          "file" : "lib/Proch/Seqfu.pm",
-         "version" : "v1.5.8"
+         "version" : "v1.7.0"
       }
    },
    "release_status" : "stable",
@@ -57,9 +57,9 @@
          "url" : "https://github.com/telatin/proch-n50.git"
       }
    },
-   "version" : "1.5.8",
-   "x_generated_by_perl" : "v5.30.3",
-   "x_serialization_backend" : "JSON::XS version 4.02",
+   "version" : "1.7.0",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
    "x_spdx_expression" : "MIT"
 }
 

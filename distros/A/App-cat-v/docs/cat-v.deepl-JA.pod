@@ -15,6 +15,7 @@ cat-v [ オプション ] args ...
      -o   --original      Print original line as is
      -t   --expand[=#]    Expand tabs
      -T   --no-expand     Do not expand tabs
+     -E                   Escape backslash character
     --ts  --tabstyle=#    Set tab style
           --tabstop=#     Set tab width
           --tabhead=#     Set tab-head character
@@ -33,7 +34,7 @@ cat-v [ オプション ] args ...
 
 =head1 VERSION
 
-Version 1.02
+Version 1.03
 
 =head1 DESCRIPTION
 
@@ -120,13 +121,14 @@ C<cat-v>を使うと、タブ文字は表示上のスペースが変わらない
 
 =item B<-n>, B<--reset>
 
-すべての文字変換を無効にし、繰り返し文字をリセットします。
+すべての文字変換とタブ展開を無効にし、繰り返し文字をリセットします。したがって、C<cat-v -n>は、C<cat>コマンドと同様に、事実上何もしないです。
 
 =item B<-c>, B<--visible> I<name>=I<flag>,...
 
 可視化する文字と変換形式を指定するために、パラメータとして文字タイプとフラグを与えます。
 
     c  control style
+    e  escape style
     s  symbol style
     m  Unicode mark (if exists)
     0  do not convert
@@ -145,6 +147,14 @@ C<cat-v>を使うと、タブ文字は表示上のスペースが変わらない
 名前に C<all> を指定すると、その値はすべての文字タイプに適用されます。次のコマンドは、すべての文字をC<s>に設定し、C<nl>、C<nl>、C<np>、C<sp>をC<m>に設定し、C<esc>を無効にします。これがデフォルトの状態です。
 
     cat-v -c all=s,nul=nl=np=sp=m,esc=0
+
+名前ラベルが何も指定されていない場合は、C<all>が与えられたものとみなされます。次のコマンドは、Perlの文字列リテラルと互換性のあるエスケープされた形式で、改行を除くすべての制御文字を表示します。
+
+    cat-v -n -ce,nl=0
+
+上のコマンドはこれと同じです。
+
+    cat-v --no-expand --reset --visible all=e,nl=0
 
 =item B<-->I<name>[=I<replacement>]
 
@@ -228,6 +238,16 @@ C<~/.cat-vrc>ファイルに以下の設定を記述することで、デフォ�
 タブの展開方法を設定します。例えば、C<記号>またはC<影>を選択します。C<squat-arrow,middle-dot>のように2つのスタイル名を組み合わせた場合、タブヘッドにはC<squat-arrow>を、タブスペースにはC<middle-dot>を使用します。
 
 パラメータなしで呼ばれた場合、利用可能なスタイルリストを表示します。スタイルは L<Text::ANSI::Fold> ライブラリで定義されています。
+
+=item B<-E>, B<--escape-backslash>
+
+バックスラッシュ文字をエスケープされた形式C<all>に変換します。
+
+バックスラッシュは制御文字ではませんが、このように他の制御文字をエスケープ表現に変換した結果は、様々なプログラミング言語の文字列リテラルとして完全に解釈することができます。
+
+次のコマンドは、元のファイルの内容を完全に再現します。
+
+    echo -ne "$(cat-v -Ence FILE)"
 
 =back
 

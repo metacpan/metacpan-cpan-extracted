@@ -5,6 +5,7 @@ Dockerfile
 lib/Travel/Routing/DE/DBRIS.pm
 lib/Travel/Routing/DE/DBRIS/Connection.pm
 lib/Travel/Routing/DE/DBRIS/Connection/Segment.pm
+lib/Travel/Routing/DE/DBRIS/Offer.pm
 MANIFEST			This list of files
 README.md
 scripts/makedeb-docker

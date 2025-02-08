@@ -1,18 +1,10 @@
 # NAME
 
-fu-hash - Print sequence hashes
-
-# VERSION
-
-version 1.5.0
+fu-hash - hash sequences (dereplicate and rename)
 
 # SYNOPSIS
 
     fu-hash [options] [FILE1 FILE2 FILE3...]
-
-# NAME
-
-fu-hash - hash sequences (dereplicate and rename)
 
 # OUTPUT
 
@@ -23,15 +15,4 @@ sequence like
     ACAGCGTACGTGATCGACGTAGCTAGCTGACGAGCTAGCTACACACGATCGTAGCTGGTAGTCAGTCGAT
     CGACGTAGCTAGCAACAGCGTACGTGATCGACGTAGCTAGCTGACGAGCTAGCTACACACGATCGTAGCTGG
     TAGTCAGTCGATCGACGTAGCTAGCA
-
-# AUTHOR
-
-Andrea Telatin <andrea@telatin.com>
-
-# COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2018-2022 by Andrea Telatin.
-
-This is free software, licensed under:
-
-    The MIT (X11) License
+    
