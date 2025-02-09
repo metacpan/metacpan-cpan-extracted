@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw( $VERSION );
-$VERSION = 0.14;
+$VERSION = 0.17;
 
 use File::Basename;
 use File::Path qw(make_path);
@@ -158,28 +158,23 @@ sub backupSave {
 }
 
 sub closeDocAfter {
-	my $self = shift;
-	my ($name) = @_;
+	my ($self, $name) = @_;
 	if ((defined $name) and $name) {
 		$self->jobEnd($name) if $self->jobExists($name);
 		$self->backupRemove($name);
 	}
-	return @_
 }
 
 sub docRenameBefore {
-	my $self = shift;
-	my ($name, $new) = @_;
+	my ($self, $name, $new) = @_;
 	croak 'Name not defined' unless defined $name;
 	croak 'New name not defined' unless defined $new;
 	$self->jobEnd($name);
 	$self->jobStart($new, 'backupCheck', $self, $new);
-	return @_;
 }
 
 sub openDocBefore {
-	my $self = shift;
-	my ($name) = @_;
+	my ($self, $name) = @_;
 	if ((defined $name) and $name) {
 		if ($self->backupExists($name)) {
 			my $title = 'Backup exists';
@@ -190,17 +185,14 @@ sub openDocBefore {
 		}
 		$self->jobStart($name, 'backupCheck', $self, $name)
 	}
-	return @_;
 }
 
 sub saveDocAfter {
-	my $self = shift;
-	my ($name) = @_;
+	my ($self, $name) = @_;
 	if ((defined $name) and $name) {
 		$self->backupRemove($name);
 		delete $self->{MODIFIED}->{$name};
 	}
-	return @_;
 }
 
 sub Quit {

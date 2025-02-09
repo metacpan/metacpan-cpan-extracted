@@ -25,5 +25,5 @@ requires:
   Tk::PopList: '0.09'
 resources:
   repository: git://github.com/haje61/Tk-ColorEntry.git
-version: '0.09'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

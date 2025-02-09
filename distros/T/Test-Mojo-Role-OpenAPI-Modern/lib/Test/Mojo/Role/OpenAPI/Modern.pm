@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Test::Mojo::Role::OpenAPI::Modern; # git description: v0.006-4-g641c108
+package Test::Mojo::Role::OpenAPI::Modern; # git description: v0.008-2-gef324c3
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Test::Mojo role providing access to an OpenAPI document and parser
 # KEYWORDS: validation evaluation JSON Schema OpenAPI Swagger HTTP request response
 
-our $VERSION = '0.007';
+our $VERSION = '0.009';
 
 use 5.020;  # for fc, unicode_strings features
 use strictures 2;
@@ -168,7 +168,7 @@ Test::Mojo::Role::OpenAPI::Modern - Test::Mojo role providing access to an OpenA
 
 =head1 VERSION
 
-version 0.007
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -334,10 +334,6 @@ Lots of features are still to come, including:
 
 =item *
 
-C<request_invalid>, C<response_invalid> test methods, including a mechanism for providing the expected validation error(s)
-
-=item *
-
 stashing the validation results on the test object for reuse or diagnostic printing
 
 =item *
@@ -388,7 +384,7 @@ L<https://learn.openapis.org/>
 
 =item *
 
-L<https://spec.openapis.org/oas/v3.1.0>
+L<https://spec.openapis.org/oas/latest.html>
 
 =back
 

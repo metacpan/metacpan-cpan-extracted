@@ -10,7 +10,7 @@ Tk::AppWindow::Ext::Art - Use icon libraries quick & easy
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION="0.20";
+$VERSION="0.21";
 use Config;
 my $mswin = 0;
 $mswin = 1 if $Config{'osname'} eq 'MSWin32';
@@ -463,20 +463,22 @@ my %genicons = (
 sub getFileIcon {
 	my $self = shift;
 	my $file = shift;
-	my $mime = mimetype($file);
-	if (defined $mime) {
-		if ($mime =~ /^([^\/]+)\//) {
-			my $ico = $genicons{$1};
-			if (defined $ico) {
-				my $icon = $self->getIcon($ico, @_);
-				return $icon if defined $icon
+	if (-e $file) {
+		my $mime = mimetype($file);
+		if (defined $mime) {
+			if ($mime =~ /^([^\/]+)\//) {
+				my $ico = $genicons{$1};
+				if (defined $ico) {
+					my $icon = $self->getIcon($ico, @_);
+					return $icon if defined $icon
+				}
 			}
+			$mime =~ s/\//-/;
+			my $icon = $self->getIcon($mime, @_);
+			return $icon if defined $icon;
 		}
-		$mime =~ s/\//-/;
-		my $icon = $self->getIcon($mime, @_);
-		return $icon if defined $icon;
+		return $self->getIcon('text-x-generic', @_) if -T $file;
 	}
-	return $self->getIcon('text-x-generic', @_) if -T $file;
 	return $self->getIcon('text-plain', @_);
 }
 

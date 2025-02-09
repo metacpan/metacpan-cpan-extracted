@@ -1,3 +1,8 @@
+Travel::Routing::DE::DBRIS 0.05 - Sat Feb 08 2025
+
+    * dbris: Bump dependency version to really fix --json
+    * dbris: Handle segments without duration
+
 Travel::Routing::DE::DBRIS 0.04 - Fri Feb 07 2025
 
     * Connection, Segment: TO_JSON: convert DateTime and Duration objects

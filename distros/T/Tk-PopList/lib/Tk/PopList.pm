@@ -9,12 +9,12 @@ Tk::PopList - Popping a selection list relative to a widget
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.09';
+$VERSION = '0.10';
 
 use base qw(Tk::Derived Tk::Poplevel);
 
 use Tk;
-use Tie::Watch;
+require Tk::HList;
 
 Construct Tk::Widget 'PopList';
 
@@ -55,6 +55,10 @@ Specifies if a filter entry is added. Practical for a long list of values.
 Default value 1
 
 When set hoovering over a list item selects it.
+
+=item B<-nofocus>
+
+Default value false. If set the list widget will not take focus when popping up.
 
 =item B<-selectcall>
 
@@ -99,45 +103,44 @@ sub Populate {
 	$self->{LIST} = [];
 	$self->{VALUES} = [];
 	
-	my $listbox = $self->Scrolled('Listbox',
-		-selectmode => 'single',
+	my $list = $self->Scrolled('HList',
+		-browsecmd => ['Select', $self],
+		-command => ['Select', $self],
+		-highlightthickness => 0,
 		-scrollbars => 'oe',
-		-listvariable => $self->{LIST},
-		-xscrollcommand => sub {},
+		-selectmode => 'single',
 	)->pack(-expand => 1, -fill => 'both');
-	$self->Advertise('Listbox', $listbox);
-	$listbox->bind('<ButtonRelease-1>', [$self, 'Select']);
-	$listbox->bind('<Down>', [$self, 'NavDown']);
-	$listbox->bind('<Escape>', [$self, 'popDown']);
-	$listbox->bind('<End>', [$self, 'NavLast']);
-	$listbox->bind('<Home>', [$self, 'NavFirst']);
-	$listbox->bind('<Return>', [$self, 'Select']);
-	$listbox->bind('<Up>', [$self, 'NavUp']);
-	$listbox->bind('<Motion>', [$self, 'MotionSelect', Ev('x'), Ev('y')]) if $motionselect;
+	$list->bind('<Down>', [$self, 'NavDown']);
+	$list->bind('<End>', [$self, 'NavLast']);
+	$list->bind('<Home>', [$self, 'NavFirst']);
+	$list->bind('<Up>', [$self, 'NavUp']);
+	$list->bind('<Escape>', [$self, 'popDown']);
+	
+	$self->Advertise(List => $list);
+	$list->bind('<Motion>', [$self, 'MotionSelect', Ev('x'), Ev('y')]) if $motionselect;
 
 	$self->ConfigSpecs(
 		-background => ['SELF', 'DESCENDATNS'],
 		-filter => ['PASSIVE', undef, undef, 0],
 		-maxheight => ['PASSIVE', undef, undef, 10],
+		-nofocus => ['PASSIVE', undef, undef, 0],
 		-selectcall => ['CALLBACK', undef, undef, sub {}],
 		-values => ['METHOD', undef, undef, []],
-		DEFAULT => [ $listbox ],
+		DEFAULT => [ $list ],
 	);
 }
 
 sub calculateHeight {
 	my $self = shift;
-	my $list = $self->{LIST};
-	my $lb = $self->Subwidget('Listbox');
+	my $list = $self->cget('-values');
+	my $lb = $self->Subwidget('List');
 	my $lheight = $self->cget('-maxheight');
 	if (@$list < $lheight) { $lheight = @$list }
 	my $font = $lb->cget('-font');
+	my $lineheight = $self->fontMetrics($font, '-linespace') * 1.50;
 
-	my $fontheight = $lb->fontActual($font, '-size');
-	$fontheight = $fontheight * -1 if $fontheight < 0;
-
-	my $height = $lheight * $fontheight * 2;
-	$height = $height + $self->{FE}->reqheight if defined $self->{FE};
+	my $height = int($lheight * $lineheight) + 2;
+	$height = $height + $self->{FE}->reqheight + 2 if defined $self->{FE};
 	return $height
 }
 
@@ -150,26 +153,77 @@ Filters the list of values on $filter.
 sub filter {
 	my ($self, $filter) = @_;
 	$filter = quotemeta($filter);
-	my $values = $self->{VALUES};
-	my @new = ();
-	my $len = length($filter);
-	for (@$values) {
-		push @new, $_ if $_ =~ /$filter/i;
+	my $l = $self->Subwidget('List');
+	my $values = $self->cget('-values');
+	for (0 .. @$values - 1) {
+		my $val = $l->entrycget($_, '-text');
+		if ($val =~ /$filter/i) {
+			$l->show(-entry => $_)
+		} else {
+			$l->hide(-entry => $_)
+		}
 	}
-	my $size = @new;
-	my $list = $self->{LIST};
-	#this is a hack. doing it the crude way somehow gives crashes
-	while (@$list) { pop @$list }
-	push @$list, @new;
 }
 
 sub MotionSelect {
 	my ($self, $x, $y) = @_;
-	my $list = $self->Subwidget('Listbox');
-	$list->selectionClear(0, 'end');
-	my $i = $list->index('@' . "$x,$y");
+	my $list = $self->Subwidget('List');
+	$list->selectionClear;
+	my $i = $list->nearest($y);
 	$list->selectionSet($i);
-	$list->selectionAnchor($i);
+	$list->anchorSet($i);
+}
+
+sub NavDown {
+	my $self = shift;
+	my $l = $self->Subwidget('List');
+	my ($sel) = $l->infoSelection;
+	my $val = $self->cget('-values');
+	my $last = @$val - 1;
+	$sel ++;
+	return if $sel > $last;
+	$sel ++ while ($l->infoHidden($sel)) and ($sel < $last);
+	unless ($sel > $last) {
+		$l->selectionClear;
+		$l->selectionSet($sel);
+		$l->anchorSet($sel);
+		$l->see($sel);
+	}
+}
+
+sub NavFirst {
+	my $self = shift;
+	my $l = $self->Subwidget('List');
+	$l->selectionClear;
+	$l->selectionSet(0);
+	$l->anchorSet(0);
+	$l->see(0);
+}
+
+sub NavLast {
+	my $self = shift;
+	my $l = $self->Subwidget('List');
+	my $val = $self->cget('-values');
+	my $last = @$val - 1;
+	$l->selectionClear;
+	$l->selectionSet($last);
+	$l->anchorSet($last);
+	$l->see($last);
+}
+
+sub NavUp {
+	my $self = shift;
+	my $l = $self->Subwidget('List');
+	my ($sel) = $l->infoSelection;
+	$sel--;
+	return if $sel < 0;
+	$sel -- while ($l->infoHidden($sel)) and ($sel >= 0);
+	unless ($self < 0) { 
+		$l->selectionClear;
+		$l->selectionSet($sel);
+		$l->anchorSet($sel);
+		$l->see($sel);
+	}
 }
 
 sub popDown {
@@ -182,53 +236,6 @@ sub popDown {
 		$self->{FE} = undef;
 	}
 	$self->SUPER::popDown;
-}
-
-sub NavDown {
-	my $self = shift;
-	my $l = $self->Subwidget('Listbox');
-	my $val = $self->{VALUES};
-	my ($sel) = $l->curselection;
-	$sel ++;
-	unless ($sel >= @$val) {
-		$l->selectionClear(0, 'end');
-		$l->selectionSet($sel);
-		$l->selectionAnchor($sel);
-		$l->see($sel);
-	}
-}
-
-sub NavFirst {
-	my $self = shift;
-	my $l = $self->Subwidget('Listbox');
-	$l->selectionClear(0, 'end');
-	$l->selectionSet(0);
-	$l->selectionAnchor(0);
-	$l->see(0);
-}
-
-sub NavLast {
-	my $self = shift;
-	my $l = $self->Subwidget('Listbox');
-	my $val = $self->{VALUES};
-	my $last = $l->index('end') - 1;
-	$l->selectionClear(0, 'end');
-	$l->selectionSet($last);
-	$l->selectionAnchor($last);
-	$l->see($last);
-}
-
-sub NavUp {
-	my $self = shift;
-	my $l = $self->Subwidget('Listbox');
-	my ($sel) = $l->curselection;
-	$sel--;
-	unless ($self < 0) { 
-		$l->selectionClear(0, 'end');
-		$l->selectionSet($sel);
-		$l->selectionAnchor($sel);
-		$l->see($sel);
-	}
 }
 
 sub popUp {
@@ -257,10 +264,10 @@ sub popUp {
 #	$self->calculateHeight;
 	$self->SUPER::popUp;
 
-	my $lb = $self->Subwidget('Listbox');
-	$lb->selectionClear(0, 'end');
-	$lb->selectionSet('@0,0');
-	$lb->focus;
+	my $lb = $self->Subwidget('List');
+	$lb->selectionClear;
+	$lb->selectionSet(0) if $lb->infoExists(0);
+	$lb->focus unless $self->cget('-nofocus');
 
 	my @filterpack = ();
 	my $direction = $self->popDirection;
@@ -277,17 +284,32 @@ sub popUp {
 sub Select {
 	my $self = shift;
 
-	my $list = $self->Subwidget('Listbox');
+	my $list = $self->Subwidget('List');
 
-	my $item = $list->get($list->curselection);
+	my ($item) = $list->infoSelection;
+	$item = $list->entrycget($item, '-text');
 	$self->Callback('-selectcall', $item);
 	$self->popDown;
 }
 
 sub values {
-	my ($self, $new) = @_;
-	$self->{VALUES} = $new if defined $new;
-	return $self->{VALUES}
+	my $self = shift;
+	my $l = $self->Subwidget('List');
+	if (@_) {
+		my $new = shift;
+		$l->deleteAll;
+		my $count = 0;
+		for (@$new) {
+			$l->add($count, -text => $_);
+			$count ++;
+		}
+	}
+	my @v = $l->infoChildren('');
+	my @values = ();
+	for (@v) {
+		push @values, $l->entrycget($_, '-text');
+	}
+	return \@values
 }
 
 =back
@@ -314,7 +336,7 @@ Unknown. If you find any, please contact the author.
 
 =item L<Tk::Toplevel>
 
-=item L<Tk::Listbox>
+=item L<Tk::HList>
 
 =back
 

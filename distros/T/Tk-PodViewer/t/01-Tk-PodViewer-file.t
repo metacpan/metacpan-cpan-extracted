@@ -32,8 +32,9 @@ if (defined $app) {
 		-command => sub { $viewer->zoomReset },
 	)->pack(-side => 'left', -padx => 2, -pady => 2);
 	$viewer = $app->PodViewer(
-		-font => 'Helvetica 14',
+		-font => 'Helvetica 10',
 		-fixedfontfamily => 'Hack',
+		-zoom => 3,
 	)->pack(-expand => 1, -fill => 'both');
 	$app->geometry('800x600+200+200');
 }

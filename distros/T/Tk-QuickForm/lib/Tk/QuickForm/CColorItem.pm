@@ -10,7 +10,7 @@ Tk::QuickForm::CColorItem - ColorEntry widget for Tk::QuickForm.
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.07';
+$VERSION = '0.08';
 
 use base qw(Tk::Derived Tk::QuickForm::CTextItem);
 Construct Tk::Widget 'CColorItem';
@@ -37,6 +37,8 @@ All options, except I<-variable>, of L<Tk::Checkbutton> are available.
 sub Populate {
 	my ($self,$args) = @_;
 	$args->{'-regex'} = '^#(?:[0-9a-fA-F]{3}){1,4}$';
+	my $popcolor = delete $args->{'-popcolor'};
+	$self->{POPCOLOR} = $popcolor;
 	$self->SUPER::Populate($args);
 	$self->ConfigSpecs(
 		-background => ['SELF', 'DESCENDANTS'],
@@ -46,7 +48,9 @@ sub Populate {
 
 sub createHandler {
 	my ($self, $var) = @_;
+	my $popcolor = $self->{POPCOLOR};
 	my $e = $self->ColorEntry(
+		-popcolor => $popcolor,
 		-variable => $var,
 	)->pack(-side => 'left', -padx => 2, -expand => 1, -fill => 'x');
 	$self->Advertise(Entry => $e);

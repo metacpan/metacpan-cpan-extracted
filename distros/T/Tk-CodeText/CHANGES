@@ -1,5 +1,9 @@
 Tk::CodeText module changes log
 
+0.63 08 Feb 2025
+	- Method 'see' calls the yscrollcmd.
+	- Line numbers font changes with the widget font.
+
 0.62 19 Jan 2025
 	- Removed unneccessary print statements.
 	- Added events <<LowerCase>> and <<UpperCase>>, their key bindings and method caseChange.

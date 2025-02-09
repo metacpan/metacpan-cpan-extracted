@@ -1,5 +1,8 @@
 Revision history for Perl extension Tk::ListEntry.
 
+0.03  Sat Feb 08 2025
+	- added -filter option. The entry now can be used to filter the list.
+
 0.02  Fri Mar 22 2024
 	added -command option
 	updated and corrected documentation

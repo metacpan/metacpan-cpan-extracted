@@ -41,12 +41,15 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/haje61/Tk-PodViewer/issues"
+      },
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/haje61/Tk-PodViewer.git",
          "web" : "https://github.com/haje61/Tk-PodViewer"
       }
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

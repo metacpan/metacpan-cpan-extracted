@@ -1,5 +1,11 @@
 Revision history for Geo-Coder-CA
 
+0.15	Sat Feb  8 08:23:11 EST 2025
+	geocode(): croak when input is just a set of numbers
+	Use Test::Needs
+	Use Test::DescribeMe to simplify tests
+	Use gtar to create a distribution on Macs
+
 0.14	Fri Apr 21 13:49:22 EDT 2023
 	Calling new on an object now returns a clone rather than setting the defaults in the new object
 	geocoder.ca is now HTTPS

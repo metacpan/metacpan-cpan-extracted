@@ -3,7 +3,7 @@ package Tk::PodViewer;
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.06';
+$VERSION = '0.07';
 use base qw(Tk::Derived Tk::Frame);
 
 Construct Tk::Widget 'PodViewer';
@@ -104,6 +104,7 @@ sub Populate {
 	$text->bind('<Up>', [$text, 'yviewScroll', -1, 'units']);
 	$self->Advertise('txt', $text);
 	
+	$self->{BULLET} = 0;
 	$self->{CURRENT} = undef;
 	$self->{TAGS} = {};
 	$self->{ZOOM} = 0;
@@ -129,6 +130,13 @@ sub Populate {
 		DEFAULT => $self,
 	);
 	$self->after(10, ['postConfig', $self]);
+}
+
+
+sub bullet {
+	my $self = shift;
+	$self->{BULLET} = shift if @_;
+	return $self->{BULLET}
 }
 
 =item B<clear>
@@ -271,8 +279,11 @@ sub configureTags {
 	#composing text font
 	my $tfont = $self->fontCompose($font, -size => $zoomsize);
 
-	#configuring item-text tag
+	#configuring item tags
 	$self->tagConfigure('item-text', -font => $tfont);
+	$self->tagConfigure('item-bullet', -font => $tfont);
+	$self->tagConfigure('over-text', -font => $tfont);
+	$self->tagConfigure('over-bullet', -font => $tfont);
 
 	#configuring paragraph tag
 	$self->tagConfigure('Para', -font => $tfont);
@@ -487,9 +498,10 @@ sub load {
 				my $indent = $token->attr('indent');
 				$self->indentUp($indent);
 
-			} elsif ($name eq 'over-text') {
+			} elsif (($name eq 'over-text') or ($name eq 'over-bullet')) {
 				my $indent = $token->attr('indent');
 				$self->indentUp($indent);
+				$self->bullet(1) if $name eq 'over-bullet';
 
 				$self->inItem(1);
 
@@ -502,6 +514,7 @@ sub load {
 				$self->stackPush($name);
 
 			} else {
+				$self->bullet(1) if $name eq 'item-bullet';
 				$self->stackPush($name) if $self->stackable($name)
 			}
 
@@ -516,6 +529,8 @@ sub load {
 			
 			my @blob = ();
 			my $text = $token->text;
+			$text = "* $text" if $self->bullet;
+			$self->bullet(0);
 			if (exists $self->{'nbspaces'}) {
 				while ($text ne '') {
 					if ($text =~ s/^([^\s]+)//) {
@@ -534,11 +549,13 @@ sub load {
 			if ($self->ignore($name)) { #do nothing
 			} elsif ($name eq 'over-block') {
 				$self->indentDown;
-			} elsif ($name eq 'over-text') {
+			} elsif (($name eq 'over-text') or ($name eq 'over-bullet')) {
 				$self->inItem(0);
 				$self->indentDown;
-			} elsif ($name eq 'item-text') {
+				$self->insert('end', "\n") if $name eq 'over-bullet';
+			} elsif (($name eq 'item-text') or ($name eq 'item-bullet')) {
 				$self->insert('end', "\n");
+				$self->insert('end', "\n") if $name eq 'item-bullet';
 			} elsif ($name =~ /^Para/) {
 				$self->indentDown if $self->inItem;
 				$self->insert('end', "\n\n");
@@ -579,7 +596,6 @@ sub next {
 
 sub openURL {
 	my ($self, $url) = @_;
-#	print "is web $url\n" if $url =~ /^[A-Za-z]+:\/\//;
 	if ($mswin) {
 		if ($url =~ /^[A-Za-z]+:\/\//) { #is a web document
 			system("explorer \"$url\"");
@@ -622,6 +638,7 @@ sub stackable {
 	my ($self, $item) = @_;
 	return '' if $item eq 'over-text';
 	return '' if $item eq 'over-block';
+	return '' if $item eq 'over-bullet';
 	return '' if $item eq 'Document';
 	return 1
 }

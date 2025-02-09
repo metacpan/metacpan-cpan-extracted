@@ -18,7 +18,7 @@ use Feature::Compat::Try;
 use Future::AsyncAwait;
 use Sublike::Extended; # From XS-Parse-Sublike, used by Future::AsyncAwait
 
-package Sys::Async::Virt v0.0.14;
+package Sys::Async::Virt v0.0.15;
 
 use parent qw(IO::Async::Notifier);
 
@@ -36,22 +36,22 @@ use Protocol::Sys::Virt::Remote v11.0.0;
 use Protocol::Sys::Virt::Transport v11.0.0;
 use Protocol::Sys::Virt::URI v11.0.0; # imports parse_url
 
-use Sys::Async::Virt::Connection::Factory v0.0.14;
-use Sys::Async::Virt::Domain v0.0.14;
-use Sys::Async::Virt::DomainCheckpoint v0.0.14;
-use Sys::Async::Virt::DomainSnapshot v0.0.14;
-use Sys::Async::Virt::Network v0.0.14;
-use Sys::Async::Virt::NetworkPort v0.0.14;
-use Sys::Async::Virt::NwFilter v0.0.14;
-use Sys::Async::Virt::NwFilterBinding v0.0.14;
-use Sys::Async::Virt::Interface v0.0.14;
-use Sys::Async::Virt::StoragePool v0.0.14;
-use Sys::Async::Virt::StorageVol v0.0.14;
-use Sys::Async::Virt::NodeDevice v0.0.14;
-use Sys::Async::Virt::Secret v0.0.14;
+use Sys::Async::Virt::Connection::Factory v0.0.15;
+use Sys::Async::Virt::Domain v0.0.15;
+use Sys::Async::Virt::DomainCheckpoint v0.0.15;
+use Sys::Async::Virt::DomainSnapshot v0.0.15;
+use Sys::Async::Virt::Network v0.0.15;
+use Sys::Async::Virt::NetworkPort v0.0.15;
+use Sys::Async::Virt::NwFilter v0.0.15;
+use Sys::Async::Virt::NwFilterBinding v0.0.15;
+use Sys::Async::Virt::Interface v0.0.15;
+use Sys::Async::Virt::StoragePool v0.0.15;
+use Sys::Async::Virt::StorageVol v0.0.15;
+use Sys::Async::Virt::NodeDevice v0.0.15;
+use Sys::Async::Virt::Secret v0.0.15;
 
-use Sys::Async::Virt::Callback v0.0.14;
-use Sys::Async::Virt::Stream v0.0.14;
+use Sys::Async::Virt::Callback v0.0.15;
+use Sys::Async::Virt::Stream v0.0.15;
 
 use constant {
     CLOSE_REASON_ERROR                                  => 0,
@@ -416,7 +416,7 @@ my @reply_translators = (
     sub { 72; my $client = shift; _translated_reply($client, undef, {  }, @_) },
     sub { 73; my $client = shift; _translated_reply($client, undef, {  }, @_) },
     sub { 74; my $client = shift; _translated_reply($client, undef, {  }, @_) },
-    \&_no_translation,
+    sub { 75; my $client = shift; _translated_reply($client, undef, {  }, @_) },
     sub { 76; my $client = shift; _translated_reply($client, undef, { pool => \&_translate_remote_nonnull_storage_pool }, @_) },
     sub { 77; my $client = shift; _translated_reply($client, undef, { pool => \&_translate_remote_nonnull_storage_pool }, @_) },
     \&_no_translation,
@@ -444,8 +444,8 @@ my @reply_translators = (
     sub { 100; my $client = shift; _translated_reply($client, undef, {  }, @_) },
     \&_no_translation,
     sub { 102; my $client = shift; _translated_reply($client, undef, {  }, @_) },
-    \&_no_translation,
-    \&_no_translation,
+    sub { 103; my $client = shift; _translated_reply($client, undef, {  }, @_) },
+    sub { 104; my $client = shift; _translated_reply($client, undef, {  }, @_) },
     \&_no_translation,
     \&_no_translation,
     sub { 107; my $client = shift; _translated_msg($client, { dom => \&_translate_remote_nonnull_domain }, @_) },
@@ -486,7 +486,7 @@ my @reply_translators = (
     sub { 142; my $client = shift; _translated_reply($client, undef, { secret => \&_translate_remote_nonnull_secret }, @_) },
     sub { 143; my $client = shift; _translated_reply($client, undef, {  }, @_) },
     \&_no_translation,
-    \&_no_translation,
+    sub { 145; my $client = shift; _translated_reply($client, undef, {  }, @_) },
     \&_no_translation,
     sub { 147; my $client = shift; _translated_reply($client, undef, { secret => \&_translate_remote_nonnull_secret }, @_) },
     \&_no_translation,
@@ -706,7 +706,7 @@ my @reply_translators = (
     undef,
     sub { 363; my $client = shift; _translated_msg($client, { dom => \&_translate_remote_nonnull_domain }, @_) },
     \&_no_translation,
-    \&_no_translation,
+    sub { 365; my $client = shift; _translated_reply($client, undef, {  }, @_) },
     \&_no_translation,
     sub { 367; my $client = shift; _translated_msg($client, { dom => \&_translate_remote_nonnull_domain }, @_) },
     \&_no_translation,
@@ -737,7 +737,7 @@ my @reply_translators = (
     sub { 393; my $client = shift; _translated_reply($client, undef, {  }, @_) },
     sub { 394; my $client = shift; _translated_reply($client, undef, {  }, @_) },
     sub { 395; my $client = shift; _translated_reply($client, undef, {  }, @_) },
-    \&_no_translation,
+    sub { 396; my $client = shift; _translated_reply($client, undef, {  }, @_) },
     sub { 397; my $client = shift; _translated_reply($client, undef, { nwfilter => \&_translate_remote_nonnull_nwfilter_binding }, @_) },
     sub { 398; my $client = shift; _translated_reply($client, undef, {  }, @_) },
     sub { 399; my $client = shift; _translated_reply($client, undef, { nwfilter => \&_translate_remote_nonnull_nwfilter_binding }, @_) },
@@ -903,6 +903,10 @@ sub new($class, %args) {
         _substate => '', # when _state=='CONNECTED'
         _replies  => {},
         _streams  => {},
+
+        # cached host data:
+        _maplen   => 0, # length of the cpu map in bytes
+        _cpus     => 0, # number of cpus in the hypervisor
 
         domain_factory            => \&_domain_factory,
         domain_checkpoint_factory => \&_domain_checkpoint_factory,
@@ -1128,12 +1132,32 @@ extended async sub _call($self, $proc, $args = {}, :$unwrap = '', :$stream = '',
     return @rv;
 }
 
+async sub _from_cpumap($self, $cpumap, $offset = 0) {
+    my $cpus = await $self->_cpus;
+    return [ map { vec( $cpumap, $offset+$_, 1 ) } 0 .. ($cpus - 1) ];
+}
+
+async sub _to_cpumap($self, $cpuarray) {
+    my $maplen = await $self->_maplen;
+    my $map = "\0" x $maplen;
+    vec( $map, $cpuarray->[$_] ? 1 : 0, 1 )
+        for ( 0 .. scalar($cpuarray->@*) );
+
+    return $map
+}
+
+async sub _cpus($self) {
+    return $self->{_cpus} if $self->{_cpus};
+
+    await $self->get_cpu_map;
+    return $self->{_cpus};
+}
+
 async sub _maplen($self) {
     return $self->{_maplen} if $self->{_maplen};
 
-    my $info = await $self->node_get_info;
-    return ($self->{_maplen} =
-            $info->{nodes}*$info->{sockets}*$info->{cores}*$info->{threads});
+    await $self->get_cpu_map;
+    return $self->{_maplen};
 }
 
 async sub _send($self, $proc, $serial, %args) {
@@ -1606,6 +1630,70 @@ async sub close($self) {
     await $self->_close( $self->CLOSE_REASON_CLIENT );
 }
 
+# ENTRYPOINT: REMOTE_PROC_NODE_ALLOC_PAGES
+async sub alloc_pages($self, $page_counts, $start_cell, $cell_count, $flags ) {
+    my $rv = await $self->_call(
+        $remote->PROC_NODE_ALLOC_PAGES,
+        { pageSizes  => [ map { $_->{size} } $page_counts->@* ],
+          pageCounts => [ map { $_->{count} } $page_counts->@* ],
+          startCell  => $start_cell,
+          cellCount  => $cell_count,
+          flags      => $flags } );
+
+    return $rv->{ret};
+}
+
+# ENTRYPOINT: REMOTE_PROC_NODE_GET_CELLS_FREE_MEMORY
+async sub get_cells_free_memory($self, $start_cell, $max_cells) {
+    my $rv = await $self->_call(
+        $remote->PROC_NODE_GET_CELLS_FREE_MEMORY,
+        { startCell => $start_cell, maxcells => $max_cells } );
+
+    return $rv->{cells};
+}
+
+# ENTRYPOINT: REMOTE_PROC_NODE_GET_CPU_MAP
+async sub get_cpu_map($self) {
+    my $rv = await $self->_call(
+        $remote->PROC_NODE_GET_CPU_MAP,
+        { need_map => 1, need_online => 1, flags => 0 } );
+
+    $self->{_cpus} = $rv->{ret};
+    $self->{_maplen} = length($rv->{cpumap});
+
+    return {
+        totcpus => $rv->{ret},
+        totonline => $rv->{online},
+        maplen    => length($rv->{cpumap}),
+        onlinemap => $self->_from_cpumap( $rv->{cpumap} )
+    };
+}
+
+# ENTRYPOINT: REMOTE_PROC_NODE_GET_FREE_PAGES
+async sub get_free_pages($self, $pages, $start_cell, $cell_count, $flags = 0) {
+    my $rv = await $self->_call(
+        $remote->PROC_NODE_GET_FREE_PAGES,
+        { pages => $pages, startCell => $start_cell,
+          cellCount => $cell_count, flags => $flags // 0 } );
+
+    my @rv;
+    my $cell_counts = [];
+    while (1) {
+        my $count = shift $rv->{counts}->@*;
+        push $cell_counts->@*, $count;
+
+        if (scalar($cell_counts->@*) == scalar($pages->@*)) {
+            push @rv, $cell_counts;
+            $cell_counts = [];
+        }
+        if (scalar($rv->{counts}->@*) == 0) {
+            last;
+        }
+    }
+
+    return \@rv;
+}
+
 async sub _domain_migrate_finish($self, $dname, $cookie, $uri, $flags = 0) {
     return await $self->_call(
         $remote->PROC_DOMAIN_MIGRATE_FINISH,
@@ -1731,6 +1819,12 @@ async sub domain_xml_to_native($self, $nativeFormat, $domainXml, $flags = 0) {
     return await $self->_call(
         $remote->PROC_CONNECT_DOMAIN_XML_TO_NATIVE,
         { nativeFormat => $nativeFormat, domainXml => $domainXml, flags => $flags // 0 }, unwrap => 'nativeConfig' );
+}
+
+async sub find_storage_pool_sources($self, $type, $srcSpec, $flags = 0) {
+    return await $self->_call(
+        $remote->PROC_CONNECT_FIND_STORAGE_POOL_SOURCES,
+        { type => $type, srcSpec => $srcSpec, flags => $flags // 0 }, unwrap => 'xml' );
 }
 
 async sub get_all_domain_stats($self, $doms, $stats, $flags = 0) {
@@ -2025,6 +2119,12 @@ async sub node_get_memory_stats($self, $cellNum, $flags = 0) {
         { nparams => $nparams, cellNum => $cellNum, flags => $flags // 0 }, unwrap => 'params' );
 }
 
+sub node_get_security_model($self) {
+    return $self->_call(
+        $remote->PROC_NODE_GET_SECURITY_MODEL,
+        {  } );
+}
+
 async sub node_get_sev_info($self, $flags = 0) {
     $flags |= await $self->_typed_param_string_okay();
     my $nparams = await $self->_call(
@@ -2234,7 +2334,7 @@ Sys::Async::Virt - LibVirt protocol implementation for clients
 
 =head1 VERSION
 
-v0.0.14
+v0.0.15
 
 Based on LibVirt tag v11.0.0
 
@@ -2268,6 +2368,28 @@ An important difference with the C API is that this API only lists the
 C<INPUT> and C<INPUT|OUTPUT (as input)> arguments for its functions.  The
 C<OUTPUT> and C<INPUT|OUTPUT (as output)> arguments will be returned in the
 C<on_reply> event.
+
+=head2 Data type differences between C and Perl API
+
+=head3 cpumap
+
+In the C API, C<cpumap> and C<cpumaps> parameters are bitmap fields. In the
+Perl API, these bitmap fields are converted to arrays of booleans:
+
+  # use:
+  $cpumap->[$cpu_index]
+
+  # to achieve this from the C API:
+  cpumap & (1 << cpu_index)
+
+=head3 Typed parameter values
+
+The C API returns (arrays of) typed parameters in several places. The Perl API
+represents typed parameters as a hash with two keys: C<field> (a string, the
+name of the parameter) and C<value>. The C<value> is itself a hash with two
+keys: C<type> (indicating the type, from L<virTypedParameterType|https://libvirt.org/html/libvirt-libvirt-common.html#virTypedParameterType>)
+and one of C<i>, C<ui>, C<l>, C<ul>, C<d>, C<b> or C<s>, the actual typed
+value.
 
 =head2 RUNNING AGAINST OLDER SERVERS
 
@@ -2519,6 +2641,51 @@ Announces to the remote the intent to close the connection. The client will
 receive a confirmation message from the server after which the server will
 close the connection.
 
+=head2 alloc_pages
+
+  $adjusted_cells = await $client->alloc_pages( $page_counts, $start_cell, $cell_count, $flags );
+
+The C<pageSizes> and C<pageCounts> parameters of the C API have been combined into the C<$page_counts>
+parameter, which is an array of hashes with a C<size> and C<count> key:
+
+  $page_counts = [ { size => 4,    count => 800 },
+                   { size => 2048, count => 400 } ];
+
+Also see documentation of L<virNodeAllocPages|https://libvirt.org/html/libvirt-libvirt-host.html#virNodeAllocPages>.
+
+=head2 get_cells_free_memory
+
+  $cell_free_mem = await $client->get_cells_free_memory( $start_cell_no, $max_cells );
+
+Returns an array of available memory per NUMA cell starting at number C<$start_cell_no>;
+returns data of at most C<$max_cells> NUMA cells.
+
+Also see documentation of L<virNodeGetCellsFreeMemory|https://libvirt.org/html/libvirt-libvirt-host.html#virNodeGetCellsFreeMemory>.
+
+=head2 get_cpu_map
+
+  await $client->get_cpu_map;
+  # -> { maplen => $numbytes, totcpus => $cpu_count, totonline => $onl_count, onlinemap => \@online }
+
+Returns the total number of CPUs C<$cpu_count> in the hypervisor, where the number of online
+CPUs is C<$onl_count>. C<@online> is an array of length C<$cpu_count>, indicating for each CPU number
+whether or not it is online.
+
+In addition to the LibVirt and Sys::Virt APIs, this API returns C<maplen>: the length (in bytes) of CPU
+maps on this hypervisor.
+
+Also see documentation of L<virNodeGetCPUMap|https://libvirt.org/html/libvirt-libvirt-host.html#virNodeGetCPUMap>.
+
+=head2 get_free_pages
+
+  $pages = [ 4, 2048 ];
+  $free_cell_pages = await $client->get_free_pages( $pages, $start_cell, $cell_count );
+
+Returns a reference to an array (one element per NUMA cell) of arrays with the number of
+free pages of the sizes listed in C<$pages>.
+
+Also see documentation of L<virNodeGetFreePages|https://libvirt.org/html/libvirt-libvirt-host.html#virNodeGetFreePages>.
+
 =head2 baseline_cpu
 
   $cpu = await $client->baseline_cpu( $xmlCPUs, $flags = 0 );
@@ -2640,6 +2807,13 @@ See documentation of L<virConnectDomainXMLFromNative|https://libvirt.org/html/li
   $nativeConfig = await $client->domain_xml_to_native( $nativeFormat, $domainXml, $flags = 0 );
 
 See documentation of L<virConnectDomainXMLToNative|https://libvirt.org/html/libvirt-libvirt-domain.html#virConnectDomainXMLToNative>.
+
+
+=head2 find_storage_pool_sources
+
+  $xml = await $client->find_storage_pool_sources( $type, $srcSpec, $flags = 0 );
+
+See documentation of L<virConnectFindStoragePoolSources|https://libvirt.org/html/libvirt-libvirt-storage.html#virConnectFindStoragePoolSources>.
 
 
 =head2 get_all_domain_stats
@@ -2980,6 +3154,14 @@ See documentation of L<virNodeGetMemoryParameters|https://libvirt.org/html/libvi
   $params = await $client->node_get_memory_stats( $cellNum, $flags = 0 );
 
 See documentation of L<virNodeGetMemoryStats|https://libvirt.org/html/libvirt-libvirt-host.html#virNodeGetMemoryStats>.
+
+
+=head2 node_get_security_model
+
+  await $client->node_get_security_model;
+  # -> { doi => $doi, model => $model }
+
+See documentation of L<virNodeGetSecurityModel|https://libvirt.org/html/libvirt-libvirt-host.html#virNodeGetSecurityModel>.
 
 
 =head2 node_get_sev_info
@@ -3718,6 +3900,11 @@ replies.
 
 =end fill-templates
 
+=item * Closing the server connection generates an error in the
+ server logs (C<End of file while reading data: Input/output error>)
+ which C<virt-manager> doesn't. Help figuring out what's going on
+ is much appreciated.
+
 =back
 
 =head2 TODO
@@ -3765,67 +3952,15 @@ towards implementation are greatly appreciated.
 
 =over 8
 
-=item * REMOTE_PROC_DOMAIN_BLOCK_PEEK
-
 =item * REMOTE_PROC_DOMAIN_CREATE_WITH_FILES
 
 =item * REMOTE_PROC_DOMAIN_CREATE_XML_WITH_FILES
 
 =item * REMOTE_PROC_DOMAIN_FD_ASSOCIATE
 
-=item * REMOTE_PROC_DOMAIN_GET_BLOCK_JOB_INFO
-
-=item * REMOTE_PROC_DOMAIN_GET_EMULATOR_PIN_INFO
-
-=item * REMOTE_PROC_DOMAIN_GET_IOTHREAD_INFO
-
-=item * REMOTE_PROC_DOMAIN_GET_LAUNCH_SECURITY_INFO
-
-=item * REMOTE_PROC_DOMAIN_GET_PERF_EVENTS
-
-=item * REMOTE_PROC_DOMAIN_GET_SECURITY_LABEL
-
-=item * REMOTE_PROC_DOMAIN_GET_SECURITY_LABEL_LIST
-
-=item * REMOTE_PROC_DOMAIN_GET_TIME
-
-=item * REMOTE_PROC_DOMAIN_GET_VCPUS
-
-=item * REMOTE_PROC_DOMAIN_GET_VCPU_PIN_INFO
-
-=item * REMOTE_PROC_DOMAIN_MEMORY_PEEK
-
 =item * REMOTE_PROC_DOMAIN_OPEN_GRAPHICS
 
 =item * REMOTE_PROC_DOMAIN_OPEN_GRAPHICS_FD
-
-=item * REMOTE_PROC_DOMAIN_PIN_EMULATOR
-
-=back
-
-
-
-=item * @generate: none (include/libvirt/libvirt-host.h)
-
-=over 8
-
-=item * REMOTE_PROC_NODE_ALLOC_PAGES
-
-=item * REMOTE_PROC_NODE_GET_CPU_MAP
-
-=item * REMOTE_PROC_NODE_GET_FREE_PAGES
-
-=item * REMOTE_PROC_NODE_GET_SECURITY_MODEL
-
-=back
-
-
-
-=item * @generate: none (include/libvirt/libvirt-secret.h)
-
-=over 8
-
-=item * REMOTE_PROC_SECRET_GET_VALUE
 
 =back
 
@@ -3860,44 +3995,6 @@ towards implementation are greatly appreciated.
 =item * REMOTE_PROC_DOMAIN_MIGRATE_PREPARE3_PARAMS
 
 =item * REMOTE_PROC_DOMAIN_MIGRATE_PREPARE_TUNNEL3_PARAMS
-
-=back
-
-
-
-=item * @generate: server (include/libvirt/libvirt-host.h)
-
-=over 8
-
-=item * REMOTE_PROC_NODE_GET_CELLS_FREE_MEMORY
-
-=back
-
-
-
-=item * @generate: server (include/libvirt/libvirt-nodedev.h)
-
-=over 8
-
-=item * REMOTE_PROC_NODE_DEVICE_DETACH_FLAGS
-
-=item * REMOTE_PROC_NODE_DEVICE_DETTACH
-
-=item * REMOTE_PROC_NODE_DEVICE_RESET
-
-=item * REMOTE_PROC_NODE_DEVICE_RE_ATTACH
-
-=back
-
-
-
-=item * @generate: server (include/libvirt/libvirt-storage.h)
-
-=over 8
-
-=item * REMOTE_PROC_CONNECT_FIND_STORAGE_POOL_SOURCES
-
-=item * REMOTE_PROC_STORAGE_VOL_GET_INFO_FLAGS
 
 =back
 

@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Tk;
 use vars qw($VERSION);
-$VERSION="0.20";
+$VERSION="0.21";
 
 use base qw( Tk::AppWindow::BaseClasses::Extension );
 
@@ -194,8 +194,12 @@ sub dialogCreate {
 		$qopts{$opt} = $img if defined $img;
 	}
 
+	my $historyfile;
+	my $cf = $self->extGet('ConfigFolder');
+	$historyfile = $cf->ConfigFolder . '/color_history' if defined $cf;
 	$f = $m->QuickForm(%qopts,
 		-acceptempty => 1,
+		-colorhistoryfile => $historyfile,
 # 		-listcall => ['cmdExecute', $self],
 		-structure => $self->configGet('-useroptions'),
 		-postvalidatecall => sub {

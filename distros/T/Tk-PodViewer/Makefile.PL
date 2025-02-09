@@ -24,6 +24,9 @@ WriteMakefile(
             url  => 'git://github.com/haje61/Tk-PodViewer.git',
             web  => 'https://github.com/haje61/Tk-PodViewer',
          },
+         bugtracker => {
+            web  => "https://github.com/haje61/Tk-PodViewer/issues",
+         },
       }}
     ) : () ),
 );

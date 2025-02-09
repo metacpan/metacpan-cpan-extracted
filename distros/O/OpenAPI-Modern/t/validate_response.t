@@ -147,7 +147,7 @@ START:
 $::TYPE = $::TYPES[$type_index];
 note 'REQUEST/RESPONSE TYPE: '.$::TYPE;
 
-subtest 'subset of options provided for operation lookup' => sub {
+subtest $::TYPE.': subset of options provided for operation lookup' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
@@ -396,7 +396,7 @@ YAML
   );
 };
 
-subtest 'validation errors in responses' => sub {
+subtest $::TYPE.': validation errors in responses' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
@@ -1088,7 +1088,7 @@ YAML
   );
 };
 
-subtest 'unevaluatedProperties and annotations' => sub {
+subtest $::TYPE.': unevaluatedProperties and annotations' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
     evaluator => JSON::Schema::Modern->new(validate_formats => 1),
@@ -1133,7 +1133,7 @@ YAML
   );
 };
 
-subtest 'writeOnly' => sub {
+subtest $::TYPE.': writeOnly' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
     evaluator => JSON::Schema::Modern->new(validate_formats => 1),
@@ -1175,7 +1175,7 @@ YAML
   );
 };
 
-subtest 'custom error messages for false schemas' => sub {
+subtest $::TYPE.': custom error messages for false schemas' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
     evaluator => JSON::Schema::Modern->new(validate_formats => 1),

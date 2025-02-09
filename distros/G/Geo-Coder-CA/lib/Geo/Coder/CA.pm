@@ -17,11 +17,11 @@ Geo::Coder::CA - Provides a Geo-Coding functionality using L<https://geocoder.ca
 
 =head1 VERSION
 
-Version 0.14
+Version 0.15
 
 =cut
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 =head1 SYNOPSIS
 
@@ -79,22 +79,17 @@ sub new {
 
 sub geocode {
 	my $self = shift;
-	my %param;
+	my $params = $self->_get_params('location', @_);
 
-	if(ref($_[0]) eq 'HASH') {
-		%param = %{$_[0]};
-	} elsif(ref($_[0])) {
-		Carp::croak('Usage: geocode(location => $location)');
-		return;
-	} elsif(@_ % 2 == 0) {
-		%param = @_;
-	} else {
-		$param{location} = shift;
-	}
-
-	my $location = $param{location};
+	my $location = $params->{location};
 	if((!defined($location)) || (length($location) == 0)) {
 		Carp::croak('Usage: geocode(location => $location)');
+		return;
+	}
+
+	# Fail when the input is just a set of numbers
+	if($params->{'location'} !~ /\D/) {
+		Carp::croak('Usage: ', __PACKAGE__, ': invalid input to geocode(), ', $params->{location});
 		return;
 	}
 
@@ -180,15 +175,9 @@ Similar to geocode except it expects a latitude/longitude parameter.
 
 sub reverse_geocode {
 	my $self = shift;
+	my $params = $self->_get_params('latlng', @_);
 
-	my %param;
-	if (@_ % 2 == 0) {
-		%param = @_;
-	} else {
-		$param{latlng} = shift;
-	}
-
-	my $latlng = $param{latlng}
+	my $latlng = $params->{latlng}
 		or Carp::croak('Usage: reverse_geocode(latlng => $latlng)');
 
 	return $self->geocode(location => $latlng, reverse => 1);
@@ -220,6 +209,40 @@ sub run {
 	}
 }
 
+# Helper routine to parse the arguments given to a function.
+# Processes arguments passed to methods and ensures they are in a usable format,
+#	allowing the caller to call the function in anyway that they want
+#	e.g. foo('bar'), foo(arg => 'bar'), foo({ arg => 'bar' }) all mean the same
+#	when called _get_params('arg', @_);
+sub _get_params
+{
+	shift;  # Discard the first argument (typically $self)
+	my $default = shift;
+
+	# Directly return hash reference if the first parameter is a hash reference
+	return $_[0] if(ref $_[0] eq 'HASH');
+
+	my %rc;
+	my $num_args = scalar @_;
+
+	# Populate %rc based on the number and type of arguments
+	if(($num_args == 1) && (defined $default)) {
+		# %rc = ($default => shift);
+		return { $default => shift };
+	} elsif($num_args == 1) {
+		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '()');
+	} elsif(($num_args == 0) && (defined($default))) {
+		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], "($default => \$val)");
+	} elsif(($num_args % 2) == 0) {
+		%rc = @_;
+	} elsif($num_args == 0) {
+		return;
+	} else {
+		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '()');
+	}
+
+	return \%rc;
+}
 =head1 AUTHOR
 
 Nigel Horne, C<< <njh@bandsman.co.uk> >>
@@ -233,6 +256,9 @@ Lots of thanks to the folks at geocoder.ca.
 
 =head1 BUGS
 
+Please report any bugs or feature requests to the author.
+This module is provided as-is without any warranty.
+
 Should be called Geo::Coder::NA for North America.
 
 =head1 SEE ALSO
@@ -241,7 +267,7 @@ L<Geo::Coder::GooglePlaces>, L<HTML::GoogleMaps::V3>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2023 Nigel Horne.
+Copyright 2017-2025 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

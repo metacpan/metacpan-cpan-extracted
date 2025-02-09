@@ -99,4 +99,19 @@ Some text blah blih bluh.
 
 Some text blah blih bluh.
 
+The B<validateCommand> and B<invalidCommand> are called with the following
+arguments:
 
+=over 4
+
+=item * The proposed value of the entry.  If you are configuring the
+entry widget to have a new textvariable, this will be the value of that
+textvariable.
+
+=item * The characters to be added (or deleted). This will be C<undef>
+if validation is due to focus, explcit call to validate or if change
+is due to C<-textvariable> changing.
+
+=back
+
+And the story continues

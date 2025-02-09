@@ -1,10 +1,10 @@
 {
    "abstract" : "Count lines in Perl source code",
    "author" : [
-      "brian d foy <bdfoy@cpan.org>"
+      "brian d foy <briandfoy@pobox.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -49,10 +49,10 @@
       "homepage" : "https://github.com/briandfoy/sourcecode-linecounter-perl",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/briandfoy/sourcecode-linecounter-perl.git",
+         "url" : "https://github.com/briandfoy/sourcecode-linecounter-perl",
          "web" : "https://github.com/briandfoy/sourcecode-linecounter-perl"
       }
    },
-   "version" : "1.022",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "1.023",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

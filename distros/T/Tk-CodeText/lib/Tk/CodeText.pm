@@ -9,7 +9,7 @@ Tk::CodeText - Programmer's Swiss army knife Text widget.
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.62';
+$VERSION = '0.63';
 
 use base qw(Tk::Derived Tk::Frame);
 
@@ -532,6 +532,7 @@ sub Populate {
 		-bookmarkcolor => [qw/PASSIVE bookmarkColor BookmarkColor/, '#71D0CC'],
 		-bookmarksize => [qw/PASSIVE bookmarkSize BookmarkSize/, 20],
 		-configdir => [qw/PASSIVE configdir ConfigDir/, ''],
+		-font => ['METHOD', undef, undef, 'Courier 10'],
 		-highlightinterval => [qw/METHOD highlightInterval HighlightInterval/, 1],
 		-linespercycle => ['METHOD', undef, undef, 10],
 		-minusimg => ['PASSIVE', undef, undef, $self->Bitmap(
@@ -1041,6 +1042,24 @@ sub foldsMenuPop {
 	my ($self, $x, $y) = @_;
 	$self->Subwidget('Foldsmenu')->post($x - 2, $y - 2);
 }
+
+sub font {
+	my $self = shift;
+	my $xt = $self->Subwidget('XText');
+	if (@_) {
+		my $new = shift;
+		$xt->configure('-font', $new);
+		my $inf = $self->{NUMBERINF};
+		for (@$inf) {
+			$_->configure('-font', $new);
+		}
+		$self->update if $self->{POSTCONFIG};
+		$self->lnumberCheck(1);
+	}
+	return $xt->cget('-font');
+}
+
+
 
 =item B<fontCompose>I<($font, %options)>
 

@@ -1,5 +1,8 @@
 Revision history for Statistics-Krippendorff
 
+0.03    2025-02-08
+        - Require minimal version of Test2::V0 to have float(precision => ...)
+
 0.02    2025-01-30
         - Include the MASI distance.
 

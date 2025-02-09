@@ -1,7 +1,11 @@
 Revision history for Perl extension Tk::PopList.
 
-0.08 Sat Jun 08 2024
-	- widget option no longer mandatory
+0.10 Date
+	- Added option -nofocus to Tk::PopList.
+	- Using Tk::HList instead of Tk::Listbox.
+
+0.09 Sat Jun 08 2024
+	- -widget option no longer mandatory
 	- updated documentation
 
 0.08 Sat Jun 08 2024

@@ -9,7 +9,7 @@ App::Codit::Plugins::FileBrowser - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.14;
+$VERSION = 0.17;
 
 use base qw( Tk::AppWindow::BaseClasses::Plugin );
 
@@ -146,8 +146,7 @@ sub new {
 }
 
 sub closeDocAfter {
-	my $self = shift;
-	my ($file) = @_;
+	my ($self, $file) = @_;
 	if ($file ne 0) {
 		#does the file belong to a project?
 		my $project = $self->fileInAnyProject($file);
@@ -156,7 +155,6 @@ sub closeDocAfter {
 			$self->projectRemove($project) unless $self->filesOpenInProject($project);
 		}
 	}
-	return @_
 }
 
 sub doPostConfig {
@@ -316,7 +314,6 @@ sub openDocAfter {
 			$self->projectAdd($name, $folder);
 		}
 	}
-	return @_
 }
 
 sub prj { return $_[0]->{PROJECTS} }
@@ -427,10 +424,8 @@ sub projectSelect {
 }
 
 sub selectDocBefore {
-	my $self = shift;
-	my ($file) = @_;
+	my ($self, $file) = @_;
 	$self->selectExternal($file);
-	return @_
 }
 
 sub selectExternal {

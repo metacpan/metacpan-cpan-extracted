@@ -1,3 +1,8 @@
+Travel::Status::DE::VRR 3.08 - Sat Feb 08 2025
+
+    * EFA->new_p: Return $efa instance in rejected promise if it was
+      rejected after parsing (e.g. due to ambiguous name/place parameter)
+
 Travel::Status::DE::VRR 3.07 - Mon Jan 27 2025
 
     * Departure: Fix ->id accessor

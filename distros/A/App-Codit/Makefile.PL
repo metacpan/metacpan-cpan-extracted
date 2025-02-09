@@ -14,11 +14,11 @@ my %prereq = (
 	'Getopt::Long'        => '2.54',
 	'Test::Tk'            => '3.04',
 	'Tk'                  => '804.032',
-	'Tk::AppWindow'       => '0.20',
-	'Tk::CodeText'        => '0.62',
+	'Tk::AppWindow'       => '0.21',
+	'Tk::CodeText'        => '0.63',
 	'Tk::FileBrowser'     =>	'0.09',
 	'Tk::PodViewer'       =>	'0.06',
-	'Tk::QuickForm'       =>	'0.07',
+	'Tk::QuickForm'       =>	'0.08',
 	'Tk::Terminal'        =>	'0.03',
 );
 

@@ -77,7 +77,7 @@ START:
 $::TYPE = $::TYPES[$type_index];
 note 'REQUEST/RESPONSE TYPE: '.$::TYPE;
 
-subtest 'request is parsed to get path information' => sub {
+subtest $::TYPE.': request is parsed to get path information' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
@@ -1072,7 +1072,7 @@ YAML
   );
 };
 
-subtest 'no request is provided: options are relied on as the sole source of truth' => sub {
+subtest $::TYPE.': no request is provided: options are relied on as the sole source of truth' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));

@@ -3,7 +3,7 @@ package Tk::ColorPicker;
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.09';
+$VERSION = '0.10';
 use Tk;
 
 use base qw(Tk::Derived Tk::Frame);
@@ -495,6 +495,8 @@ sub historyLoad {
 			push @$history, $line;
 		}
 		close INFILE;
+	} else {
+		warn "can not load file '$file'";
 	}
 }
 
@@ -546,6 +548,8 @@ sub historySave{
 			print OUTFILE "$color\n";
 		}
 		close OUTFILE;
+	} else {
+		warn "can not save file '$file'";
 	}
 }
 
@@ -734,6 +738,7 @@ sub PostConfig {
 	$self->historyUpdate;
 	$self->ConfigMode(0);
 	$self->sliderheight($self->sliderheight);
+	my $file = $self->cget('-historyfile');
 }
 
 =item B<put>(I<$color>)

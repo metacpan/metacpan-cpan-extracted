@@ -5,11 +5,11 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   FindBin: '0'
-  Test2::V0: '0'
+  Test2::V0: '0.000098'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,7 +22,7 @@ no_index:
 provides:
   Statistics::Krippendorff:
     file: lib/Statistics/Krippendorff.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   List::Util: '0'
   Moo: '0'
@@ -33,5 +33,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/choroba/statistics-krippendorff.git
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

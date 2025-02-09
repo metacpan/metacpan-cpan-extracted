@@ -13,3 +13,13 @@ Revision history for Switch-Back
         Fixed line-number issues caused by preprocessing of given/when/default blocks
         (Thanks, Graham!)
 
+
+
+0.000004  Sun Feb  9 09:38:02 2025
+
+        Removed spurious dependencies on Test2::V0 and Test::Fatal
+        (Thanks, Andreas)
+
+        Skip all comparisons with actual ~~ behaviours (in t/smartmatch_complex.t)
+        in versions of Perl that no longer support the ~~ operator
+        (Thanks, Andreas)

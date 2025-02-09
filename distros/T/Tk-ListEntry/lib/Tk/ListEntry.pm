@@ -9,7 +9,7 @@ Tk::ListEntry - BrowseEntry like widget without button
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.02';
+$VERSION = '0.03';
 
 use Tk;
 require Tk::PopList;
@@ -36,6 +36,10 @@ You can use all config options and methods of the Entry widget.
 =item Switch: B<-command>
 
 Callback to be executed when you press the B<Return> button or select an item in the list.
+
+=item Switch: B<-filter>
+
+By default set to false. If you set it you can use the entry widget to filter the list.
 
 =item Switch: B<-motionselect>
 
@@ -71,21 +75,29 @@ sub Populate {
 
 	my $entry = $self->Entry->pack(-expand => 1, -fill => 'both');
 	my $list = $self->PopList(
+		-nofocus => 1,
 		-confine => 1,
 		-selectcall => ['EntrySelect', $self],
 		-widget => $entry,
 	);
 	$self->Advertise(Entry => $entry);
 	$self->Advertise(List => $list);
+	$list->Subwidget('List')->bind('<Button-1>', [$list, 'Select']);
 	$entry->bind('<Button-1>', [$list, 'popFlip']);
-	$entry->bind('<Down>', [$list, 'popUp']);
-	$entry->bind('<FocusOut>', [$self, 'EntryFocusOut', Ev('d')]);
-	$entry->bind('<Return>', [$self, 'EntrySelect', Ev('d')]);
+	$entry->bind('<Down>', [$self, 'keyDown']);
+	$entry->bind('<End>', [$self, 'keyEnd']);
+	$entry->bind('<Home>', [$self, 'keyHome']);
+	$entry->bind('<FocusOut>', [$list, 'popDown']);
+	$entry->bind('<KeyRelease>', [$self, 'filter']);
+	$entry->bind('<Return>', [$self, 'keyReturn']);
+	$entry->bind('<Up>', [$self, 'keyUp']);
 
 
 	$self->ConfigSpecs(
 		-background => ['SELF', 'DESCENDANTS'],
 		-command => ['CALLBACK', undef, undef, sub {}],
+		-filter => ['PASSIVE', undef, undef, 0],
+		-foreground => [$entry],
 		-motionselect => [$list],
 		-popdirection => [$list],
 		-values => [$list],
@@ -102,28 +114,76 @@ sub Populate {
 
 =cut
 
-sub EntryFocusOut {
-	my ($self, $detail) = @_;
-	my $pl = $self->Subwidget('List');
-	my $l = $pl->Subwidget('Listbox')->Subwidget('listbox');
-	my $fc = $self->focusCurrent;
-	unless (defined $fc) {
-		$pl->popDown;
-	} else {
-		unless ($fc->focusCurrent eq $l) {
-			$pl->popDown;
-		} 
-	}
-}
-
 sub EntrySelect {
 	my ($self, $select) = @_;
+#	print "EntrySelect\n";
 	my $entry = $self->Subwidget('Entry');
 	if (defined $select) {
+#		print "selected $select\n";
 		$entry->delete(0, 'end');
 		$entry->insert('end', $select);
 	}
 	$self->Callback('-command', $entry->get);
+}
+
+sub filter {
+	my $self = shift;
+	return unless $self->cget('-filter');
+	my $l = $self->Subwidget('List');
+	my $e = $self->Subwidget('Entry');
+	$l->filter($e->get);
+}
+
+sub keyDown {
+	my $self = shift;
+	my $l = $self->Subwidget('List');
+	if ($l->ismapped) {
+		$l->NavDown
+	} else {
+		$l->popUp
+	}
+}
+
+sub keyEnd {
+	my $self = shift;
+	my $l = $self->Subwidget('List');
+	my $e = $self->Subwidget('Entry');
+	if ($l->ismapped) {
+		$l->NavLast
+	} else {
+		$e->icursor('end');
+	}
+}
+
+sub keyHome {
+	my $self = shift;
+	my $l = $self->Subwidget('List');
+	my $e = $self->Subwidget('Entry');
+	if ($l->ismapped) {
+		$l->NavFirst
+	} else {
+		$e->icursor(0);
+	}
+}
+
+sub keyReturn {
+	my $self = shift;
+	my $l = $self->Subwidget('List');
+	if ($l->ismapped) {
+		$l->Select
+	} else {
+		my $e = $self->Subwidget('Entry');
+		$self->Callback('-command', $e->get);
+	}
+
+}
+
+sub keyUp {;
+	my $self = shift;
+	my $l = $self->Subwidget('List');
+	if ($l->ismapped) {
+		$l->NavUp
+	} 
 }
 
 =item B<validate>
@@ -168,5 +228,3 @@ Unknown. If you find any, please contact the author.
 =cut
 
 1;
-
-

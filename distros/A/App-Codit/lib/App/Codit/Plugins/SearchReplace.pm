@@ -9,7 +9,7 @@ App::Codit::Plugins::SearchReplace - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.16;
+$VERSION = 0.17;
 
 use base qw( Tk::AppWindow::BaseClasses::Plugin );
 use Tk;
@@ -648,7 +648,6 @@ sub ShowResults {
 		my $ndocs = @e;
 		$self->log("$nhits hits in $ndocs documents");
 	}
-	return @_;
 }
 
 sub Skip {

@@ -69,9 +69,9 @@ sub Populate {
 			$self->Callback('-validatecall');
 		},
 	);
-	$self->createHandler(\$var);
 	$self->{VARIABLE} = \$var;
 	$self->{QUICKFORM} = $quickform;
+	$self->createHandler(\$var);
 
 	$self->ConfigSpecs(
 		-regex => ['PASSIVE', undef, undef, '.*'],

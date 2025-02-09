@@ -26,7 +26,7 @@ START:
 $::TYPE = $::TYPES[$type_index];
 note 'REQUEST/RESPONSE TYPE: '.$::TYPE;
 
-subtest 'missing or invalid arguments' => sub {
+subtest $::TYPE.': missing or invalid arguments' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
@@ -65,7 +65,7 @@ YAML
   );
 };
 
-subtest 'path lookup' => sub {
+subtest $::TYPE.': path lookup' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
@@ -243,7 +243,7 @@ YAML
   );
 };
 
-subtest 'validation errors, request uri paths' => sub {
+subtest $::TYPE.': validation errors, request uri paths' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
@@ -493,7 +493,7 @@ YAML
   );
 };
 
-subtest 'validation errors in requests' => sub {
+subtest $::TYPE.': validation errors in requests' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
@@ -1421,7 +1421,7 @@ YAML
   );
 };
 
-subtest 'document errors' => sub {
+subtest $::TYPE.': document errors' => sub {
   my $request = request('GET', 'http://example.com/foo?alpha=1');
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
@@ -1550,7 +1550,7 @@ YAML
   );
 };
 
-subtest 'type handling of values for evaluation' => sub {
+subtest $::TYPE.': type handling of values for evaluation' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
@@ -1896,7 +1896,7 @@ YAML
   );
 };
 
-subtest 'parameter parsing' => sub {
+subtest $::TYPE.': parameter parsing' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
@@ -2079,7 +2079,7 @@ YAML
   );
 };
 
-subtest 'max_depth' => sub {
+subtest $::TYPE.': max_depth' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
     evaluator => JSON::Schema::Modern->new(max_traversal_depth => 15, validate_formats => 1),
@@ -2115,7 +2115,7 @@ YAML
   );
 };
 
-subtest 'unevaluatedProperties and annotations' => sub {
+subtest $::TYPE.': unevaluatedProperties and annotations' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
     evaluator => JSON::Schema::Modern->new(validate_formats => 1),
@@ -2157,7 +2157,7 @@ YAML
   );
 };
 
-subtest 'readOnly' => sub {
+subtest $::TYPE.': readOnly' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
     evaluator => JSON::Schema::Modern->new(validate_formats => 1),
@@ -2207,7 +2207,7 @@ YAML
   );
 };
 
-subtest 'no bodies in GET or HEAD requests without requestBody' => sub {
+subtest $::TYPE.': no bodies in GET or HEAD requests without requestBody' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
     evaluator => JSON::Schema::Modern->new(validate_formats => 1),
@@ -2274,7 +2274,7 @@ SKIP: {
 } # end SKIP
 };
 
-subtest 'custom error messages for false schemas' => sub {
+subtest $::TYPE.' custom error messages for false schemas' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
     evaluator => JSON::Schema::Modern->new(validate_formats => 1),

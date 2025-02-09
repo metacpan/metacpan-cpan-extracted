@@ -63,6 +63,6 @@
          "web" : "https://github.com/briandfoy/distribution-cooker"
       }
    },
-   "version" : "2.003",
+   "version" : "2.004",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,5 +1,8 @@
 Revision history for OpenAPI-Modern
 
+0.081     2025-02-08 19:12:50Z
+          - fix a prereq declaration
+
 0.080     2025-02-07 06:24:48Z
           - fix incorrect discriminator test, that was added for a change
             reverted before the OpenAPI v3.1.1 release

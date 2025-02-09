@@ -7,6 +7,12 @@ use warnings;
 no warnings 'uninitialized';
 use Test::More;
 
+BEGIN {
+    if ($] > 41) {
+        plan skip_all => "Can't test against former ~~ operator in Perl $]";
+    }
+}
+
 use Switch::Back;
 
 use Tie::Array;

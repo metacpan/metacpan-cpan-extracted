@@ -35,5 +35,5 @@ resources:
   bugtracker: https://github.com/briandfoy/distribution-cooker/issues
   homepage: https://github.com/briandfoy/distribution-cooker
   repository: https://github.com/briandfoy/distribution-cooker
-version: '2.003'
+version: '2.004'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

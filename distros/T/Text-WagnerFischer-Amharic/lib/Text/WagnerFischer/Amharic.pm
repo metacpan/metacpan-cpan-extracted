@@ -10,7 +10,7 @@ use vars qw( @EXPORT_OK %IMCapsMismatch $VERSION );
 
 use Regexp::Ethiopic::Amharic ( 'getForm', 'setForm', ':forms' );
 
-	$VERSION = "0.04";
+	$VERSION = "0.06";
 	#
 	# This linking is done so that the export of "distance" works
 	# as before:
@@ -176,7 +176,7 @@ Amharic weight function recognizes 7 additional mismatch types:
            |    g: x =~ [=y=]                  (cost of grapheme mismatch)
            |    h: x is a shift-slip of y      (cost of shift key mismatch)
            |    i: else                        (cost of wrong base)
-           \  j: x =~ [=y=]  (cost of wrong grapheme and form, right phoneme)
+            \ j: x =~ [=y=]  (cost of wrong grapheme and form, right phoneme)
 
 These costs are given through an array reference as an option first argument
 of the C<distance> subroutine (see SYNOPSIS).

@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION='0.16';
+$VERSION='0.17';
 use Tk;
 require Tk::CodeText;
 
@@ -54,7 +54,9 @@ sub Populate {
 		-contentmatchbg => ['PASSIVE'],
 		-contentmatchfg => ['PASSIVE'],
 		-contentforeground => [{-foreground => $xt}],
-		-contentfont => [{-font => $xt}],
+#		-contentfont => [{-font => $xt}],
+		-contentfontfamily => ['PASSIVE'],
+		-contentfontsize => ['PASSIVE'],
 		-contentindent => [{-indentstyle => $xt}],
 		-contentposition => [{-position => $text}],
 		-contentsyntax => [{-syntax => $text}],
@@ -129,6 +131,14 @@ sub configureTags {
 	
 	#configuring insert background
 	$widg->configure('-insertbackground', $widg->cget('-foreground'));
+	
+	#configuring font
+	my $xt = $widg->Subwidget('XText');
+	my $fam = $self->cget('-contentfontfamily');
+	$fam = 'Courier' unless defined $fam;
+	my $siz = $self->cget('-contentfontsize');
+	$siz = 10 unless defined $siz;
+	$widg->configure(-font => "{$fam} $siz");
 }
 
 sub doClear {

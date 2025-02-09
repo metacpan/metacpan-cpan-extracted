@@ -1,5 +1,8 @@
 # Revision History for the Convert::CEGH Perl Distribution
 
+## 0.07 Sat Feb  8 11:26:47 EST 2025
+	- Added x_authority to Build.PL
+
 ## 0.06 Fri Feb  7 22:37:20 EST 2025
 	- Fixes as per CPANTS:
 	  + Adding SECURITY.md to distribution.

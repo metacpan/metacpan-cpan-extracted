@@ -1,8 +1,11 @@
+Build.PL
 Changes
+Changes.md
+CONTRIBUTING.md
 LICENSE
 MANIFEST
-Makefile.PL
-README
+SECURITY.md
+README.md
 examples/demo.pl
 lib/Text/WagnerFischer/Amharic.pm
 t/01words.t

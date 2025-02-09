@@ -15,12 +15,12 @@ use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
 
-package Sys::Async::Virt::Secret v0.0.14;
+package Sys::Async::Virt::Secret v0.0.15;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v0.0.14;
+use Protocol::Sys::Virt::Remote::XDR v0.0.15;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 use constant {
@@ -34,6 +34,13 @@ sub new($class, %args) {
         id => $args{id},
         client => $args{client},
     }, $class;
+}
+
+
+async sub get_value($self, $flags = 0) {
+    return await $self->{client}->_call(
+        $remote->PROC_SECRET_GET_VALUE,
+        { secret => $self->{id}, flags => $flags // 0 }, unwrap => 'value' );
 }
 
 async sub get_xml_desc($self, $flags = 0) {
@@ -67,7 +74,7 @@ Sys::Async::Virt::Secret - Client side proxy to remote LibVirt secret
 
 =head1 VERSION
 
-v0.0.14
+v0.0.15
 
 =head1 SYNOPSIS
 
@@ -80,6 +87,13 @@ v0.0.14
 =head2 new
 
 =head1 METHODS
+
+=head2 get_value
+
+  $value = await $secret->get_value( $flags = 0 );
+
+See documentation of L<virSecretGetValue|https://libvirt.org/html/libvirt-libvirt-secret.html#virSecretGetValue>.
+
 
 =head2 get_xml_desc
 

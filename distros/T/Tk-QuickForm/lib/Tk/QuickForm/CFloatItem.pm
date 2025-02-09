@@ -9,7 +9,7 @@ Tk::QuickForm::CFloatItem - Floating numbers entry widget for Tk::QuickForm.
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.07';
+$VERSION = '0.08';
 
 use Tk;
 use base qw(Tk::Derived Tk::QuickForm::CTextItem);
@@ -45,8 +45,6 @@ sub validate {
 	$self->validUpdate($flag);
 	return $flag
 }
-
-=back
 
 =head1 LICENSE
 

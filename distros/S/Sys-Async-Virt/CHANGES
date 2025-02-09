@@ -1,5 +1,13 @@
 -----
 
+0.0.15   2025-02-08
+    [Added]
+       * Implemented 25 additional entrypoints;
+         now 21 entrypoints remain unimplemented, mostly
+         relating to migrations.
+       * Added documentation on the difference between
+         C API 'cpumap'-s and the Perl API
+
 0.0.14   2025-02-05
     [Changed]
        * Updated to libvirt tag v11.0.0 (from v10.10.0)

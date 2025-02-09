@@ -4,7 +4,7 @@ use utf8;
 package Distribution::Cooker;
 use experimental qw(signatures);
 
-our $VERSION = '2.003';
+our $VERSION = '2.004';
 
 use Carp                  qw(croak carp);
 use Cwd;
@@ -70,42 +70,26 @@ My own templates are at L<https://github.com/briandfoy/module_templates>.
 
 =item * cook
 
-Take the templates and cook them. This version uses L<Mojo::Template>
-Toolkit, but you can make a subclass to override it. See the notes
-about Mojo::Template.
+Take the templates and cook them. This version uses L<Mojo::Template>,
+but you can make a subclass to override it. See the notes about
+L<Mojo::Template>.
 
 I assume my own favorite values, and haven't made these
 customizable yet.
 
 =over 4
 
-=item * Your distribution template directory is F<~/.templates/dist_cooker>
+=item * Your distribution template directory is F<~/.templates/modules>
 
 =item * Your module template name is F<lib/Foo.pm>, which will be moved into place later
 
 =back
 
-This uses L<Mojo::Template> to render the templates, and various
-settings. The values from C<template_vars> are passed to the templates
-and its keys are available as named variables.
-
-By default, these tag settings are used because these characters
-are unlikely to appear in Perl code:
-
-	* the line_start is ϕ (U+03D5)
-	* the tag start is »
-	* the line start is «
-
-For example:
-
-	This is module « $module »
-
 When C<cook> processes the templates, it provides definitions for
 these template variables listed for C<template_vars>.
 
-While processing the templates, C<cook> ignores F<.git>, F<.svn>, and
+While processing the templates, F<dist_cooker> ignores F<.git>, F<.svn>, and
 F<CVS> directories.
-
 
 =cut
 
@@ -283,10 +267,16 @@ sub config_file_name { '.dist_cooker.ini' }
 Returns the last resort values for author name or email. These are
 C<Frank Serpico> and C<serpico@example.com>.
 
+=item * default_github_user
+
+Returns C<GITHUB_USER>, which should be easy to find for global
+search and replace.
+
 =cut
 
 sub default_author_email ( $class ) { 'serpico@example.com' }
 sub default_author_name  ( $class ) { 'Frank Serpico' }
+sub default_github_user  ( $class ) { $ENV{'GITHUB_USER'} }
 
 =item * description( [ DESCRIPTION ] )
 
@@ -326,6 +316,7 @@ Returns a hash reference of the config values.
 
 	* author_name
 	* email
+	* github_user
 	* line_start
 	* tag_end
 	* tag_start
@@ -334,7 +325,9 @@ This looks for values in this order, and in any combination:
 
 	* take values from the env: DIST_COOKER_AUTHOR and DIST_COOKER_EMAIL
 	* look at git config for C<user.name> and C<user.email>
-	* use default values from the method C<default_author_name> and C<default_author_email>
+	* look in the env for DIST_COOKER_GITHUB_USER
+	* use default values from the method C<default_author_name>,
+	C<default_author_email>, or C<default_github_user>
 
 =cut
 
@@ -353,14 +346,16 @@ sub _git_user_email {
 	}
 
 sub default_config ( $class ) {
-	my( $author, $email ) = (
+	my( $author, $email, $github_user ) = (
 		$ENV{DIST_COOKER_AUTHOR} // _git_user_name()  // $class->default_author_name,
 		$ENV{DIST_COOKER_EMAIL}  // _git_user_email() // $class->default_author_email,
+		$ENV{GITHUB_ACCOUNT_NAME}  // $class->default_github_user,
 		);
 
 	{
 		author_name => $author,
 		email       => $email,
+		github_user => $github_user,
 		line_start  => 'ϕ',
 		tag_end     => '»',
 		tag_start   => '«',
@@ -480,6 +475,8 @@ is passed to the L<Mojo::Template> renderer.
 
 =item email          => author email
 
+=item github_user    => the GitHub account name
+
 =item module         => the package name (Foo::Bar)
 
 =item module_path    => module path under lib/ (Foo/Bar.pm)
@@ -503,6 +500,7 @@ sub template_vars ( $self ) {
 		dir            => catfile( 'lib', dirname( $self->module_path ) ),
 		dist           => $self->dist,
 		email          => $self->{email},
+		github_user    => $self->{github_user},
 		module         => $self->module,
 		module_path    => $self->module_path,
 		repo_name      => $self->repo_name,
@@ -559,6 +557,7 @@ sub get_config ( $class ) {
 	my @table = (
 		[ qw( author_name  author    name       ) ],
 		[ qw( author_email author    email      ) ],
+		[ qw( github_user  author    github     ) ],
 		[ qw( line_start   templates line_start ) ],
 		[ qw( tag_end      templates tag_end    ) ],
 		[ qw( tag_start    templates tag_start  ) ],
@@ -622,7 +621,7 @@ brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2008-2024, brian d foy <briandfoy@pobox.com>. All rights reserved.
+Copyright © 2008-2025, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 You may redistribute this under the same terms as Perl itself.
 

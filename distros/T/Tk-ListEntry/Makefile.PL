@@ -6,7 +6,7 @@ WriteMakefile(
 	PREREQ_PM			=> {
 		'Test::Tk'		=> '3.02',
 		'Tk'				=> '804.033',
-		'Tk::PopList'	=> '0.06',
+		'Tk::PopList'	=> '0.10',
 	},
 	ABSTRACT_FROM		=> 'lib/Tk/ListEntry.pm',
 	AUTHOR				=> 'Hans Jeuken <hanje at cpan dot org>',

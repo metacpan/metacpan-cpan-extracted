@@ -9,7 +9,7 @@ Tk::Poplevel - Popping a toplevel without decoration relative to a widget
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.09';
+$VERSION = '0.10';
 
 use base qw(Tk::Derived Tk::Toplevel);
 
@@ -89,6 +89,7 @@ sub Populate {
 	} else {
 		$parent->bind('<Button-1>',  [$self, 'popDown'] );
 	}
+	$self->bind('<Configure>', [$self, 'ConfigureSizeAndPos']);
 	
 	$self->ConfigSpecs(
 		-borderwidth => [$self, 'borderWidth', 'BorderWidth', 1],
@@ -127,6 +128,7 @@ sub ConfigureSizeAndPos {
 	my $self = shift;
 
 	my $widget = $self->cget('-widget');
+	return unless (defined $widget) and (Exists $widget);
 	my $screenheight = $self->vrootheight;
 	my $screenwidth = $self->vrootwidth;
 	my $confine = $self->cget('-confine');

@@ -13,7 +13,7 @@ use vars qw( @EXPORT $VERSION );
 
 	@EXPORT    = qw( enumerate transliterate );
 
-	$VERSION = "0.06";
+	$VERSION = "0.07";
 }
 
 

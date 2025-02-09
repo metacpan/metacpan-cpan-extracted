@@ -44,6 +44,7 @@ sub Populate {
 	$self->ConfigSpecs(
 #		-borderwidth => [$self, 'borderWidth', 'BorderWidth', 1],
 #		-relief => [$self, 'relief', 'Relief', 'raised'],
+#		-widget => [ $self ],
 		DEFAULT => [ $picker ],
 	);
 

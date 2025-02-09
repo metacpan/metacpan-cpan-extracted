@@ -164,8 +164,7 @@ they can be loaded and unloaded by the end user at request. By default
 they live in B<Tk::AppWindow::Plugins>. You may define an extra name space using the
 B<-namespace> option. Plugins are handled by the Plugins extension.
 
-Plugins can add commands, menu entries, panel entries and toolbar entries. Plugins can
-not add config variables.
+Plugins can add commands, config variables, menu entries, panel entries and toolbar entries.
 
 =head1 AUTHOR
 

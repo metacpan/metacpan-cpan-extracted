@@ -22,8 +22,8 @@ my $builder = Module::Build->new(
 			repository => 'https://github.com/dyacob/Convert-CEGH.git',
 			homepage => 'https://github.com/dyacob/Convert-CEGH'
 		},
+		x_authority	=> 'cpan:dyacob'
 	},
-	x_authority	=> 'cpan:dyacob'
 );
 
 $builder->create_build_script();

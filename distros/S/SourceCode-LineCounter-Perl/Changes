@@ -1,5 +1,8 @@
 Revision history for Perl module Sourcecode::LineCounter::Perl
 
+1.023 2025-02-09T02:01:42Z
+	* refresh dist and move to BRIANDFOY
+
 1.022 2021-02-06T00:46:04Z
 	* freshen distro, remove Travis CI, add Github Actions
 

@@ -4,13 +4,13 @@
       "E. Choroba <choroba@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Statistics-Krippendorff",
    "no_index" : {
@@ -44,14 +44,14 @@
       "test" : {
          "requires" : {
             "FindBin" : "0",
-            "Test2::V0" : "0"
+            "Test2::V0" : "0.000098"
          }
       }
    },
    "provides" : {
       "Statistics::Krippendorff" : {
          "file" : "lib/Statistics/Krippendorff.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -62,6 +62,6 @@
          "web" : "https://github.com/choroba/statistics-krippendorff"
       }
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

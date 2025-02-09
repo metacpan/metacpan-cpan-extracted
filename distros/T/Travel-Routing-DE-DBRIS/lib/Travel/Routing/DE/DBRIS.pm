@@ -18,7 +18,7 @@ use Travel::Status::DE::DBRIS;
 use Travel::Routing::DE::DBRIS::Connection;
 use Travel::Routing::DE::DBRIS::Offer;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 Travel::Routing::DE::DBRIS->mk_ro_accessors(qw(earlier later));
 
@@ -61,13 +61,13 @@ sub new {
 		@mots = @{ $conf{modes_of_transit} // [] };
 	}
 
-	my ($req_url, $req);
+	my ( $req_url, $req );
 
-	if ($conf{from} and $conf{to}) {
+	if ( $conf{from} and $conf{to} ) {
 		$req_url
-		= $self->{language} eq 'de'
-		? 'https://www.bahn.de/web/api/angebote/fahrplan'
-		: 'https://int.bahn.de/web/api/angebote/fahrplan';
+		  = $self->{language} eq 'de'
+		  ? 'https://www.bahn.de/web/api/angebote/fahrplan'
+		  : 'https://int.bahn.de/web/api/angebote/fahrplan';
 		$req = {
 			abfahrtsHalt     => $conf{from}->id,
 			ankunftsHalt     => $conf{to}->id,
@@ -96,15 +96,15 @@ sub new {
 			deutschlandTicketVorhanden        => \0
 		};
 	}
-	elsif ($conf{offers}) {
+	elsif ( $conf{offers} ) {
 		$req_url
-		= $self->{language} eq 'de'
-		? 'https://www.bahn.de/web/api/angebote/recon'
-		: 'https://int.bahn.de/web/api/angebote/recon';
+		  = $self->{language} eq 'de'
+		  ? 'https://www.bahn.de/web/api/angebote/recon'
+		  : 'https://int.bahn.de/web/api/angebote/recon';
 		$req = {
-			klasse           => $conf{first_class} ? 'KLASSE_1' : 'KLASSE_2',
+			klasse   => $conf{first_class} ? 'KLASSE_1' : 'KLASSE_2',
 			ctxRecon => $conf{offers}{recon},
-			reisende         => [
+			reisende => [
 				{
 					typ            => 'ERWACHSENER',
 					ermaessigungen => [
@@ -215,10 +215,10 @@ sub new {
 		}
 
 		$self->{raw_json} = $json->decode($content);
-		if ($conf{from} and $conf{to}) {
+		if ( $conf{from} and $conf{to} ) {
 			$self->parse_connections;
 		}
-		elsif ($conf{offers}) {
+		elsif ( $conf{offers} ) {
 			$self->parse_offers;
 		}
 	}
@@ -332,10 +332,13 @@ sub parse_connections {
 sub parse_offers {
 	my ($self) = @_;
 
-	for my $offer (@{$self->{raw_json}{verbindungen}[0]{reiseAngebote} // []}) {
-		push(@{$self->{offers}}, Travel::Routing::DE::DBRIS::Offer->new(
-			json => $offer
-		));
+	for
+	  my $offer ( @{ $self->{raw_json}{verbindungen}[0]{reiseAngebote} // [] } )
+	{
+		push(
+			@{ $self->{offers} },
+			Travel::Routing::DE::DBRIS::Offer->new( json => $offer )
+		);
 	}
 }
 
@@ -350,12 +353,12 @@ sub errstr {
 
 sub connections {
 	my ($self) = @_;
-	return @{ $self->{connections} // []};
+	return @{ $self->{connections} // [] };
 }
 
 sub offers {
 	my ($self) = @_;
-	return @{$self->{offers} // [] };
+	return @{ $self->{offers} // [] };
 }
 
 # }}}
@@ -402,7 +405,7 @@ Travel::Routing::DE::DBRIS - Interface to the bahn.de itinerary service
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 DESCRIPTION
 

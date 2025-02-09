@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 
-use Test2::V0;
+use Test::More;
 
 plan tests => 5;
 
@@ -17,13 +17,13 @@ use Switch::Back;
 given ( my $par = shift ) {
     is __LINE__, 18;
     when ('url') {
-        say 'parameter passed is "url"';
+        diag 'parameter passed is "url"';
         fail 'Incorrect branch (url) chosen';
     }
     is __LINE__, 23;
     when ('get') {
         is __LINE__, 25;
-        say 'parameter passed is "get"';
+        diag 'parameter passed is "get"';
         pass 'Correct branch (get) chosen';
     }
 

@@ -29,15 +29,15 @@
    "provides" : {
       "Convert::CEGH" : {
          "file" : "lib/Convert/CEGH.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       },
       "Convert::CEGH::Gematria" : {
          "file" : "lib/Convert/CEGH/Gematria.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       },
       "Convert::CEGH::Transliterate" : {
          "file" : "lib/Convert/CEGH/Transliterate.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -53,6 +53,7 @@
          "url" : "https://github.com/dyacob/Convert-CEGH.git"
       }
    },
-   "version" : "0.06",
+   "version" : "0.07",
+   "x_authority" : "cpan:dyacob",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

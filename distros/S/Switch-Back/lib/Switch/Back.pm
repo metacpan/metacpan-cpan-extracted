@@ -1,7 +1,7 @@
 package Switch::Back;
 
 use 5.036;
-our $VERSION = '0.000003';
+our $VERSION = '0.000004';
 
 use experimental qw< builtin refaliasing try >;
 use builtin      qw< true false blessed created_as_number >;
@@ -995,7 +995,7 @@ Switch::Back - C<given>/C<when> for a post-C<given>/C<when> Perl
 
 =head1 VERSION
 
-This document describes Switch::Back version 0.000003
+This document describes Switch::Back version 0.000004
 
 
 =head1 SYNOPSIS

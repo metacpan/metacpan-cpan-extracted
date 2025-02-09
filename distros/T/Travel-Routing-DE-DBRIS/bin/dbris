@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.020;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use utf8;
 use DateTime;
@@ -433,10 +433,14 @@ for my $connection ( $ris->connections ) {
 			}
 		}
 		elsif ( $segment->is_walk ) {
-			if ( $segment->distance_m ) {
+			if ( $segment->distance_m and $segment->duration ) {
 				printf( "${output_bold}%s${output_reset} %dm  (≈ %d min.)\n",
 					$segment->walk_name, $segment->distance_m,
 					$segment->duration->in_units('minutes') );
+			}
+			elsif ( $segment->distance_m ) {
+				printf( "${output_bold}%s${output_reset} %dm\n",
+					$segment->walk_name, $segment->distance_m );
 			}
 			elsif ( $segment->duration->in_units('minutes') ) {
 				printf( "${output_bold}%s${output_reset} ≈ %d min.\n",
@@ -529,7 +533,7 @@ B<dbris> [B<-d> I<DD.MM.YYYY>] [B<-a>|B<-t> I<HH:MM>] [...] I<from-stop>
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 DESCRIPTION
 

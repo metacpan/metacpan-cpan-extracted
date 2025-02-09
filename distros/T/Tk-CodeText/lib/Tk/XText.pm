@@ -7,7 +7,7 @@ Tk::XText - Extended Text widget
 =cut
 
 use vars qw($VERSION);
-$VERSION = '0.62';
+$VERSION = '0.63';
 use strict;
 use warnings;
 use Carp;
@@ -1858,6 +1858,12 @@ sub saveExport {
 	}
 	close OUTFILE;
 	return 1
+}
+
+sub see {
+	my $self = shift;
+	$self->SUPER::see(@_);
+	$self->Callback('-yscrollcmd', @_);
 }
 
 #fix for selectAll of Tk::Text. 

@@ -5,7 +5,7 @@ use warnings;
 use 5.010;
 use utf8;
 
-our $VERSION = '3.07';
+our $VERSION = '3.08';
 
 use Carp qw(confess cluck);
 use DateTime;
@@ -45,7 +45,7 @@ sub new_p {
 			$self->check_for_ambiguous();
 
 			if ( $self->{errstr} ) {
-				$promise->reject( $self->{errstr} );
+				$promise->reject( $self->{errstr}, $self );
 				return;
 			}
 
@@ -524,7 +524,7 @@ sub parse_line {
 		mot        => $mode->{product},
 		operator   => $mode->{diva}{operator},
 		identifier => $mode->{diva}{globalId},
-		,
+
 	);
 }
 
@@ -680,7 +680,7 @@ Travel::Status::DE::EFA - unofficial EFA departure monitor
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 
@@ -771,8 +771,14 @@ Default: 10 seconds. Set to 0 or a negative value to disable it.
 =item my $status_p = Travel::Status::DE::EFA->new_p(I<%opt>)
 
 Returns a promise that resolves into a Travel::Status::DE::EFA instance
-($status) on success and rejects with an error message on failure. In addition
-to the arguments of B<new>, the following mandatory arguments must be set.
+($status) on success and rejects with an error message on failure. In case
+the error occured after construction of the Travel::Status::DE::EFA object
+(e.g. due to an ambiguous name/place parameter), the second argument of the
+rejected promise holds a Travel::Status::DE::EFA instance that can be used
+to query place/name candidates (see name_candidates and place_candidates).
+
+In addition to the arguments of B<new>, the following mandatory arguments must
+be set.
 
 =over
 

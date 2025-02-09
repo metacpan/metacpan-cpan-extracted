@@ -1,0 +1,105 @@
+{
+   "abstract" : "It creates perl code",
+   "author" : [
+      "janeskil1525 <janeskil1525@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.25",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Daje-Workflow-GeneratePerl-Activity",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Daje::Workflow::Templates" : "0",
+            "Mojo::Base" : "0",
+            "String::CamelCase" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Daje::Generate::Perl::Generate::Methods" : {
+         "file" : "lib/Daje/Workflow/GeneratePerl/Generate/Methods.pm",
+         "version" : "0.01"
+      },
+      "Daje::Workflow::GeneratePerl::Activity" : {
+         "file" : "lib/Daje/Workflow/GeneratePerl/Activity.pm",
+         "version" : "0.06"
+      },
+      "Daje::Workflow::GeneratePerl::Base::Common" : {
+         "file" : "lib/Daje/Workflow/GeneratePerl/Base/Common.pm"
+      },
+      "Daje::Workflow::GeneratePerl::Generate::BaseClass" : {
+         "file" : "lib/Daje/Workflow/GeneratePerl/Generate/BaseClass.pm",
+         "version" : "0.01"
+      },
+      "Daje::Workflow::GeneratePerl::Generate::Class" : {
+         "file" : "lib/Daje/Workflow/GeneratePerl/Generate/Class.pm",
+         "version" : "0.01"
+      },
+      "Daje::Workflow::GeneratePerl::Generate::Fields" : {
+         "file" : "lib/Daje/Workflow/GeneratePerl/Generate/Fields.pm",
+         "version" : "0.01"
+      },
+      "Daje::Workflow::GeneratePerl::Generate::Interface" : {
+         "file" : "lib/Daje/Workflow/GeneratePerl/Generate/Interface.pm",
+         "version" : "0.01"
+      },
+      "Daje::Workflow::GeneratePerl::Generate::View" : {
+         "file" : "lib/Daje/Workflow/GeneratePerl/Generate/View.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/janeskil1525/Daje-Workflow-GeneratePerl-Activity/issues"
+      },
+      "homepage" : "https://github.com/janeskil1525/Daje-Workflow-GeneratePerl-Activity",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/janeskil1525/Daje-Workflow-GeneratePerl-Activity.git",
+         "web" : "https://github.com/janeskil1525/Daje-Workflow-GeneratePerl-Activity"
+      }
+   },
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_static_install" : 1
+}

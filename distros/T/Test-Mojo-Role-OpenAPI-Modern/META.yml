@@ -47,7 +47,7 @@ no_index:
 provides:
   Test::Mojo::Role::OpenAPI::Modern:
     file: lib/Test/Mojo/Role/OpenAPI/Modern.pm
-    version: '0.007'
+    version: '0.009'
 recommends:
   Mojolicious::Plugin::OpenAPI::Modern: '0.007'
 requires:
@@ -55,7 +55,7 @@ requires:
   List::Util: '0'
   Mojo::Base: '0'
   Mojolicious: '9.0'
-  OpenAPI::Modern: '0.068'
+  OpenAPI::Modern: '0.079'
   Role::Tiny: '2.000001'
   if: '0'
   namespace::clean: '0'
@@ -68,10 +68,10 @@ resources:
   bugtracker: https://github.com/karenetheridge/Test-Mojo-Role-OpenAPI-Modern/issues
   homepage: https://github.com/karenetheridge/Test-Mojo-Role-OpenAPI-Modern
   repository: https://github.com/karenetheridge/Test-Mojo-Role-OpenAPI-Modern.git
-version: '0.007'
+version: '0.009'
 x_Dist_Zilla:
   perl:
-    version: '5.041007'
+    version: '5.041008'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -553,7 +553,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20241220'
+          Module::CoreList: '5.20250120'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.010'
     -
@@ -717,7 +717,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.007
+          tag: v0.009
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -903,7 +903,7 @@ x_Dist_Zilla:
       is_trial: 0
     version: '6.032'
 x_authority: cpan:ETHER
-x_generated_by_perl: v5.41.7
+x_generated_by_perl: v5.41.8
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 1

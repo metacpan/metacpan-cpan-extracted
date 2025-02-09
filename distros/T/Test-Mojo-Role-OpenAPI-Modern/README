@@ -1,5 +1,5 @@
 This archive contains the distribution Test-Mojo-Role-OpenAPI-Modern,
-version 0.007:
+version 0.009:
 
   Test::Mojo role providing access to an OpenAPI document and parser
 

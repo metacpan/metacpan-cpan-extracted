@@ -3,7 +3,7 @@ package Tk::ColorEntry;
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.09';
+$VERSION = '0.10';
 use Tk;
 
 use base qw(Tk::Derived Tk::Frame);
@@ -117,6 +117,7 @@ sub Populate {
 		-entryforeground => ['PASSIVE', undef, undef, $self->Subwidget('Entry')->cget('-foreground')],
 		-font => [$entry],
 		-foreground => [$entry],
+		-historyfile => [$pop->Subwidget('Picker')],
 		-indborderwidth => [{-borderwidth => $indicator}, undef, undef, 2],
 		-indicatorwidth => [{-width => $indicator}, undef, undef, 4],
 		-indrelief => [{-relief => $indicator}, undef, undef, 'sunken'],

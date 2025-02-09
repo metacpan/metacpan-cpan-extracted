@@ -1,5 +1,9 @@
 Revision history for Perl extension App::Codit.
 
+0.17 Sat Feb 08 2025
+	- Modified font selection in settings.
+	- Adapted plugins to the modifications in base class Callback of Tk::AppWindow 0.21
+
 0.16 Sun Jan 19 2025
 	- Corrected bug in pod
 	- Plugin PodViewer has sytem link color

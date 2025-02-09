@@ -1,5 +1,10 @@
 Revision history for Perl extension Tk::AppWindow.
 
+0.21 Sat Feb 08 2025
+	- Added -colorhistoryfile option to Tk::QuickForm creation in extension Settings.
+	- Hooks can no longer manipulate parameters for callbacks in base class Callback.
+	- Updated documentation.
+
 0.20 Tue Jan 14 2025
 	- Fixed bug in extension Plugins, ReConfigure method.
 	- Fixed error in pod of extension Settings and Help.

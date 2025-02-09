@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.16";
+$VERSION="0.17";
 
 use base qw( Tk::AppWindow::Ext::MDI );
 
@@ -888,7 +888,7 @@ sub SettingsPage {
 		},
 		-defaultbackground => $doc->cget('-contentbackground'),
 		-defaultforeground => $doc->cget('-contentforeground'),
-		-defaultfont => $doc->cget('-contentfont'),
+		-defaultfont => $doc->CWidg->Subwidget('XText')->cget('-font'),
 		-historyfile => $historyfile,
 		-extension => $self,
 		-themefile => $themefile,

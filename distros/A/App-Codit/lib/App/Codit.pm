@@ -4,9 +4,11 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.16";
+$VERSION="0.17";
 use Tk;
 use App::Codit::CodeTextManager;
+use Config;
+my $mswin = $Config{'osname'} eq 'MSWin32';
 
 use base qw(Tk::Derived Tk::AppWindow);
 Construct Tk::Widget 'Codit';
@@ -252,6 +254,14 @@ sub Populate {
 	$self->geometry('800x600+150+150');
 
 	my $rawdir = Tk::findINC('App/Codit/Icons');
+	my @fontfamily = ();
+	if ($mswin) {
+		@fontfamily = 	(-contentfontfamily => ['text', 'Family'])
+	} else {
+		@fontfamily = 	(-contentfontfamily => ['list', 'Family', -filter => 1,
+			-values => sub { return sort $self->fontFamilies }
+		])
+	}
 	my %opts = (
 #		-appname => 'Codit',
 		-logo => Tk::findINC('App/Codit/codit_logo.png'),
@@ -369,7 +379,9 @@ sub Populate {
 			'-contentbookmarkcolor',
 			'-contentfindbg',
 			'-contentfindfg',
-			'-contentfont',
+#			'-contentfont',
+			'-contentfontfamily',
+			'-contentfontsize',
 			'-contentforeground',
 			'-contentindent',
 			'-contentmatchbg',
@@ -386,8 +398,12 @@ sub Populate {
 		#configure the settings panel
 		-useroptions => [
 			'*page' => 'Editing',
+			'*section' => 'Font',
+			@fontfamily,
+			'*column',
+			-contentfontsize => ['spin', 'Size'],
+			'*end',
 			'*section' => 'Editor settings',
-			-contentfont => ['font', 'Font'],
 			'*frame',
 			-contentautoindent => ['boolean', 'Auto indent'],
 			-contenttabs => ['text', 'Tab size', -regex => qr/^\d+\.?\d*[c|i|m|p]$/, -width => 4],

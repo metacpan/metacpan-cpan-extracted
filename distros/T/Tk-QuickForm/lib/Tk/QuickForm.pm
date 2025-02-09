@@ -9,7 +9,7 @@ Tk::QuickForm - Quickly set up a form.
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.07';
+$VERSION = '0.08';
 
 use Tk;
 use base qw(Tk::Frame);
@@ -18,7 +18,7 @@ Construct Tk::Widget 'QuickForm';
 require Tk::LabFrame;
 require Tk::NoteBook;
 require Tk::PopColor;
-require Tk::FilePicker;
+#require Tk::FilePicker;
 use Tk::PNG;
 
 
@@ -149,7 +149,7 @@ A number of config variables are forwarded to the file dialog widget used
 in this module. Look in L<Tk::FilePicker> and L<Tk::FileBrowser> for their meaning.
 They are:
 
-=over4
+=over 4
 
 =item B<-diriconcall>
 
@@ -378,6 +378,7 @@ sub Populate {
 		-acceptempty => ['PASSIVE', undef, undef, 0],
 		-autovalidate => ['PASSIVE', undef, undef, 1],
 		-background => ['SELF', 'DESCENDANTS'],
+		-colorhistoryfile => ['PASSIVE'],
 		-diriconcall => ['PASSIVE'],
 		-fileiconcall => ['PASSIVE'],
 		-fileimage => ['PASSIVE', undef, undef, $fil_icon],
@@ -427,6 +428,7 @@ sub createForm {
 		type => 'root',
 	});
 	my $notebook;
+	my $popcolor;
 
 	my $structure = $self->cget('-structure');
 	my @options = @$structure;
@@ -448,7 +450,6 @@ sub createForm {
 	my @padding = (-padx => 2, -pady => 2);
 
 	@options = @$structure;
-	my $popcolor;
 	while (@options) {
 		my $key = shift @options;
 
@@ -553,9 +554,11 @@ sub createForm {
 			my $row = $holderstack[0]->{row};
 			my $holder = $holderstack[0]->{holder};
 			my $offset = $holderstack[0]->{offset};
+
 			if ($type eq 'color') {
-				$popcolor = $self->PopColor(-widget => '') unless defined $popcolor;
-				push @opt, -popcolor => $popcolor;
+				my $file = $self->cget('-colorhistoryfile');
+				$popcolor = $self->PopColor() unless defined $popcolor;
+				push @opt, -popcolor => $popcolor, -historyfile => $file;
 			}
 
 
@@ -627,13 +630,14 @@ sub createForm {
 						$opthash{'-values'} = \@vals;
 					}
 				}
-
+				
 				my $widg = $self->CreateClass($holder, $class, %opthash, -quickform => $self)->grid(
 					-column => 1 + $offset, 
 					-row => $row,
 					-sticky => 'nsew', 
 					-padx => 2, -pady => 2
 				);
+
 				$options{$key} = $widg;
 				$labels{$key} = $l;
 				$holderstack[0]->{row} ++;

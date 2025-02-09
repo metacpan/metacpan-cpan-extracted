@@ -3,6 +3,8 @@
 [![Coverage Status](https://coveralls.io/repos/github/nigelhorne/Geo-Coder-CA/badge.svg?branch=master)](https://coveralls.io/github/nigelhorne/Geo-Coder-CA?branch=master)
 [![Dependency Status](https://dependencyci.com/github/nigelhorne/Geo-Coder-CA/badge)](https://dependencyci.com/github/nigelhorne/Geo-Coder-CA)
 [![CPAN](https://img.shields.io/cpan/v/Geo-Coder-CA.svg)](http://search.cpan.org/~nhorne/Geo-Coder-CA/)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/nigelhorne/geo-coder-ca/test.yml?branch=master)
+![Perl Version](https://img.shields.io/badge/perl-5.8+-blue)
 [![Kritika Analysis Status](https://kritika.io/users/nigelhorne/repos/8113837670534727/heads/master/status.svg)](https://kritika.io/users/nigelhorne/repos/8113837670534727/heads/master/)
 
 # NAME
@@ -11,7 +13,7 @@ Geo::Coder::CA - Provides a Geo-Coding functionality using [https://geocoder.ca]
 
 # VERSION
 
-Version 0.14
+Version 0.15
 
 # SYNOPSIS
 
@@ -81,6 +83,9 @@ Lots of thanks to the folks at geocoder.ca.
 
 # BUGS
 
+Please report any bugs or feature requests to the author.
+This module is provided as-is without any warranty.
+
 Should be called Geo::Coder::NA for North America.
 
 # SEE ALSO
@@ -89,6 +94,6 @@ Should be called Geo::Coder::NA for North America.
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2017-2023 Nigel Horne.
+Copyright 2017-2025 Nigel Horne.
 
 This program is released under the following licence: GPL2

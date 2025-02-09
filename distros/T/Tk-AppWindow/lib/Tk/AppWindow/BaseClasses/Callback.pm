@@ -11,7 +11,7 @@ use warnings;
 use Carp;
 
 use vars qw($VERSION);
-$VERSION="0.02";
+$VERSION="0.21";
 
 use Data::Compare;
 use Scalar::Util qw(blessed);
@@ -125,14 +125,14 @@ sub execute {
 
 	my $before = $self->{HOOKSBEFORE};
 	for (@$before) {
-		@param = $self->Callback($_, @param);
+		$self->Callback($_, @param);
 	}
 	
 	my @result = $self->Callback($self->{CMD}, @param);
 
 	my $after = $self->{HOOKSAFTER};
 	for (@$after) {
-		@result = $self->Callback($_, @result);
+		$self->Callback($_, @result);
 	}
 	return if @result eq 0;
 	return $result[0] if @result eq 1;
@@ -141,8 +141,8 @@ sub execute {
 
 =item B<hookAfter>I<(@callback)>
 
-Adds a hook to the after section. The items in I<@callback> are exactly as creating a new instance.
-The callback will be called after the main callback is fed what the main callback returns as parameters.
+Adds a hook to the after section. The items in I<@callback> are exactly as creating a new instance of this package.
+The callback will be called after the main callback is fed with what the main callback returns as parameters.
 
 =cut
 
@@ -155,8 +155,8 @@ sub hookAfter {
 
 =item B<hookBefore>(I<@callback>)
 
-Adds a hook to the before section. The items in I<@callback> are exactly as creating a new instance.
-The callback will be called before the main callback and feeds it what it returns as parameters.
+Adds a hook to the before section. The items in I<@callback> are exactly as creating a new instance of this package.
+The callback will be called before the main callback and is fed with the same parameters.
 
 =cut
 
@@ -171,7 +171,7 @@ sub hookBefore {
 =item B<unhookAfter>I<(@callback)>
 
 Removes a hook from the after section. The items in I<@callback> are exactly as when adding the hook.
-If multiple identical items are present it removes them alls.
+If multiple identical items are present it removes them all.
 
 =cut
 

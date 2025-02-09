@@ -15,12 +15,12 @@ use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
 
-package Sys::Async::Virt::NodeDevice v0.0.14;
+package Sys::Async::Virt::NodeDevice v0.0.15;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v0.0.14;
+use Protocol::Sys::Virt::Remote::XDR v0.0.15;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 use constant {
@@ -63,6 +63,18 @@ async sub define_xml($self, $flags = 0) {
 sub destroy($self) {
     return $self->{client}->_call(
         $remote->PROC_NODE_DEVICE_DESTROY,
+        { name => $self->{id} }, empty => 1 );
+}
+
+sub detach_flags($self, $driverName, $flags = 0) {
+    return $self->{client}->_call(
+        $remote->PROC_NODE_DEVICE_DETACH_FLAGS,
+        { name => $self->{id}, driverName => $driverName, flags => $flags // 0 }, empty => 1 );
+}
+
+sub dettach($self) {
+    return $self->{client}->_call(
+        $remote->PROC_NODE_DEVICE_DETTACH,
         { name => $self->{id} }, empty => 1 );
 }
 
@@ -120,6 +132,18 @@ async sub num_of_caps($self) {
         { name => $self->{id} }, unwrap => 'num' );
 }
 
+sub reattach($self) {
+    return $self->{client}->_call(
+        $remote->PROC_NODE_DEVICE_RE_ATTACH,
+        { name => $self->{id} }, empty => 1 );
+}
+
+sub reset($self) {
+    return $self->{client}->_call(
+        $remote->PROC_NODE_DEVICE_RESET,
+        { name => $self->{id} }, empty => 1 );
+}
+
 sub set_autostart($self, $autostart) {
     return $self->{client}->_call(
         $remote->PROC_NODE_DEVICE_SET_AUTOSTART,
@@ -151,7 +175,7 @@ Sys::Async::Virt::NodeDevice - Client side proxy to remote LibVirt host device
 
 =head1 VERSION
 
-v0.0.14
+v0.0.15
 
 =head1 SYNOPSIS
 
@@ -193,6 +217,22 @@ See documentation of L<virNodeDeviceDefineXML|https://libvirt.org/html/libvirt-l
   # -> (* no data *)
 
 See documentation of L<virNodeDeviceDestroy|https://libvirt.org/html/libvirt-libvirt-nodedev.html#virNodeDeviceDestroy>.
+
+
+=head2 detach_flags
+
+  await $dev->detach_flags( $driverName, $flags = 0 );
+  # -> (* no data *)
+
+See documentation of L<virNodeDeviceDetachFlags|https://libvirt.org/html/libvirt-libvirt-nodedev.html#virNodeDeviceDetachFlags>.
+
+
+=head2 dettach
+
+  await $dev->dettach;
+  # -> (* no data *)
+
+See documentation of L<virNodeDeviceDettach|https://libvirt.org/html/libvirt-libvirt-nodedev.html#virNodeDeviceDettach>.
 
 
 =head2 get_autostart
@@ -256,6 +296,22 @@ See documentation of L<virNodeDeviceLookupSCSIHostByWWN|https://libvirt.org/html
   $num = await $dev->num_of_caps;
 
 See documentation of L<virNodeDeviceNumOfCaps|https://libvirt.org/html/libvirt-libvirt-nodedev.html#virNodeDeviceNumOfCaps>.
+
+
+=head2 reattach
+
+  await $dev->reattach;
+  # -> (* no data *)
+
+See documentation of L<virNodeDeviceReAttach|https://libvirt.org/html/libvirt-libvirt-nodedev.html#virNodeDeviceReAttach>.
+
+
+=head2 reset
+
+  await $dev->reset;
+  # -> (* no data *)
+
+See documentation of L<virNodeDeviceReset|https://libvirt.org/html/libvirt-libvirt-nodedev.html#virNodeDeviceReset>.
 
 
 =head2 set_autostart

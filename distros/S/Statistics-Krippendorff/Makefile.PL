@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
         'ExtUtils::MakeMaker' => '0',
     },
     TEST_REQUIRES => {
-        'Test2::V0' => '0',
+        'Test2::V0' => '0.000098',  # Support precision in float().
         'FindBin' => 0,
     },
     PREREQ_PM => {

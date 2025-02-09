@@ -35,10 +35,10 @@
             "Scalar::Util::Numeric" : "0",
             "Test::Tk" : "3.02",
             "Tk" : "804.033",
-            "Tk::ColorEntry" : "0.08",
-            "Tk::FileBrowser" : "0.06",
+            "Tk::ColorEntry" : "0.10",
+            "Tk::FileBrowser" : "0.09",
             "Tk::FontDialog" : "0.15",
-            "Tk::ListEntry" : "0.01"
+            "Tk::ListEntry" : "0.03"
          }
       }
    },
@@ -53,6 +53,6 @@
          "web" : "https://github.com/haje61/Tk-QuickForm"
       }
    },
-   "version" : "0.07",
+   "version" : "0.08",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,8 +1,11 @@
+Build.PL
 Changes
+Changes.md
+CONTRIBUTING.md
 LICENSE
 MANIFEST
-Makefile.PL
-README
+README.md
+SECURITY.md
 doc/index.html
 examples/downgrade.pl
 examples/functional.pl

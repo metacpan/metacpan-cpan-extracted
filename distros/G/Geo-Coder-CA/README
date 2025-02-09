@@ -1,4 +1,4 @@
-Geo::Coder::CA Version 0.14
+Geo::Coder::CA Version 0.15
 
 INSTALLATION
 
@@ -24,15 +24,11 @@ You can also look for information at:
     AnnoCPAN, Annotated CPAN documentation
         http://annocpan.org/dist/Geo-Coder-CA
 
-    CPAN Ratings
-        http://cpanratings.perl.org/d/Geo-Coder-CA
-
     Search CPAN
         http://search.cpan.org/dist/Geo-Coder-CA/
 
-
 LICENSE AND COPYRIGHT
 
-Copyright (C) 2017-2023 Nigel Horne
+Copyright (C) 2017-2025 Nigel Horne
 
 This program is released under the following licence: GPL2

@@ -92,8 +92,6 @@ sub new {
 		-command => ['snippetCreate', $self],
 	)->pack(@padding, -fill => 'x');
 	my @to = ();
-	my $font = $self->configGet('-contentfont');
-	push @to, -font => $font if $font ne '';
 	my $text = $sf->Scrolled('XText', @to,
 		-scrollbars => 'osoe',
 		-tabs => '8m',
@@ -101,6 +99,9 @@ sub new {
 		-height => 4,
 		-width => 20,
 	)->pack(@padding, -expand => 1, -fill => 'both');
+	$self->after(200, sub {
+		$text->configure('-font', $self->mdi->docWidget->cget('-font'))
+	});
 	$self->{TEXT} = $text;
 
 	$self->listRefresh;

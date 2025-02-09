@@ -52,50 +52,35 @@ Tk::AppWindow::CookBook::Plugin - Write your own plugin
  }
  
  sub Hook1 {
-   my $self = shift;
+   my ($self, @param) = @_;
    print "before command1\n"
  	
-   #sometimes you want to keep the parameters for use in Hook2
-   $self->{'safe_param'} = [@_];
  	
-   #when there is no parameter but you know it concerns a document
-   $self->{'safe_param'} = [$self->extGet('CoditMDI)->docSelected];
+   #when there is no parameters but you know it concerns a document
+   my $doc = $self->extGet('CoditMDI)->docSelected;
    
-   #use passed on parameters
-   my ($first, $second) = @_;
  
    #do your thing
    
-   return @_
  }
  
  sub Hook2 {
-   my $self = shift;
+   my ($self, @parameters) = @_;
    print "after command1\n"
    
-   #use passed on parameters
-   my ($first, $second) = @_;
-   
-   #if you have saved parameters 
-   my $param = $self->{'safe_param'};
-   delete $self->{'safe_param} #important!
-   my ($first, $second) = @$param;
    
    #do your thing
 
-   return @_
  }
  
  sub Hook3 {
    my $self = shift;
    print "before -configvariable\n"
-   return @_
  }
  
  sub Hook4 {
     my $self = shift;
     print "after -configvariable\n"
-    return @_
  }
  
  sub Unload {

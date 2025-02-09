@@ -2,6 +2,7 @@
 use strict;
 use warnings;
 use Test::Tk;
+use File::Spec;
 use Tk;
 
 # use Tk::GtkSettings;
@@ -23,6 +24,9 @@ BEGIN {
 	use_ok('Tk::QuickForm::CTextItem');
 	use_ok('Tk::QuickForm');
 };
+
+my $colorhistoryfile = File::Spec->rel2abs('./t/colorhistory');
+print "historyfile $colorhistoryfile\n";
 
 my @listvalues = sort qw(
 	Yellow Red Brown Green Blue Purple Beige Magenta Grey Black Cyan White Orange Pink Violet
@@ -83,7 +87,7 @@ $delay = 1000;
 
 my @coltests1 = ();
 for (0 .. 3) {
-	push @coltests1, "-color1_$_", ['color', "Color1 $_"],
+	push @coltests1, "-color1_$_", ['color', "Color1 $_",],
 }
 
 my @coltests2 = ();
@@ -110,6 +114,7 @@ if (defined $app) {
 	my $wframe = $app->Frame(-relief => 'groove', -borderwidth => 3)->pack(-expand => 1, -fill => 'both');
 	$form = $wframe->QuickForm(
 		-acceptempty => 1,
+		-colorhistoryfile => $colorhistoryfile,
 		-postvalidatecall => sub {
 			my $flag = shift;
 			return unless defined $rbut;
@@ -130,20 +135,20 @@ if (defined $app) {
 			'*end',
 			'*section' => 'Radio',
 			-set_radio_command => ['radio', 'Radio Command test', -values => sub { return @radiovalues },
-				-enables => {
-					Up => ['-set_list_command', '-set_list_values'],
-				},
-				-disables => {
-					Down => ['Scalars'],
-				},
+#				-enables => {
+#					Up => ['-set_list_command', '-set_list_values'],
+#				},
+#				-disables => {
+#					Down => ['Scalars'],
+#				},
 			],
 			-set_radio_values => ['radio', 'Radio values test', -values => \@radiovalues],
 			'*end',
 			'*page' => 'Scalars',
 			'*section' => 'Numbers',
 			-set_boolean => ['boolean', 'Boolean test', 
-				-disables => ['-set_scale', '-set_spin', '-set_folder', '-set_color', 'External', ],
-				-enables => ['-set_float', '-set_integer', '-set_file', '-set_font', '-set_text', 'Colors', ],
+#				-disables => ['-set_scale', '-set_spin', '-set_folder', '-set_color', 'External', ],
+#				-enables => ['-set_float', '-set_integer', '-set_file', '-set_font', '-set_text', 'Colors', ],
 			],
 			-set_float => ['float', 'Float test'],
 			-set_integer => ['integer', 'Integer test'],
@@ -158,7 +163,7 @@ if (defined $app) {
 			'*end',
 			'*column',
 			'*section' => 'Colors and fonts',
-			-set_color => ['color', 'Color test'],
+#			-set_color => ['color', 'Color test'],
 			-set_font => ['font', 'Font test'],
 			'*end',
 			'*section' => 'Free text',
@@ -175,9 +180,9 @@ if (defined $app) {
 			-set_https => ['https', 'Web link'],
 			'*end',
 			'*page' => 'External',
-			'*section' => 'Single column',
-			-set_ext1 => ['ext1', 'External color test', 'Tk::QuickForm::CColorItem'],
-			'*end',
+#			'*section' => 'Single column',
+#			-set_ext1 => ['ext1', 'External color test', 'Tk::QuickForm::CColorItem'],
+#			'*end',
 			'*expand',
 			'*section' => 'Double column',
 			'*expand',

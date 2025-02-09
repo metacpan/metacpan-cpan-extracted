@@ -1,3 +1,8 @@
+0.03 2025-02-09
+    * fix HTML entities in the test suite - different libxml2 versions handle
+      unencoded entities differently, leading to test failures
+    . Test suite only change, no need to upgrade
+
 0.02 2025-02-07
     * declare that we use postderef in some locations, no other code changes
 

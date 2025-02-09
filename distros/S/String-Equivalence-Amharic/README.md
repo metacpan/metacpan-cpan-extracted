@@ -1,3 +1,6 @@
+# String-Equivalence-Amharic
+Normalization Utilities for Amharic
+
 Special Note
 ------------
 This package was previously named "String::Amharic::Downgrade" and packaged
@@ -25,5 +28,5 @@ can occur.  Starting with a near canonical form and downgrading will generate
 a shorter word list than you would have starting from the top.
 
 TODO:
-
-Better handle old amharic
+----
+* Better handle old amharic

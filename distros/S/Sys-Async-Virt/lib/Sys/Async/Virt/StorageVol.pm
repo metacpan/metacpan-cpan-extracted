@@ -15,12 +15,12 @@ use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
 
-package Sys::Async::Virt::StorageVol v0.0.14;
+package Sys::Async::Virt::StorageVol v0.0.15;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v0.0.14;
+use Protocol::Sys::Virt::Remote::XDR v0.0.15;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 use constant {
@@ -78,6 +78,12 @@ sub get_info($self) {
         { vol => $self->{id} } );
 }
 
+sub get_info_flags($self, $flags = 0) {
+    return $self->{client}->_call(
+        $remote->PROC_STORAGE_VOL_GET_INFO_FLAGS,
+        { vol => $self->{id}, flags => $flags // 0 } );
+}
+
 async sub get_path($self) {
     return await $self->{client}->_call(
         $remote->PROC_STORAGE_VOL_GET_PATH,
@@ -133,7 +139,7 @@ Sys::Async::Virt::StorageVol - Client side proxy to remote LibVirt storage volum
 
 =head1 VERSION
 
-v0.0.14
+v0.0.15
 
 =head1 SYNOPSIS
 
@@ -170,6 +176,16 @@ See documentation of L<virStorageVolDownload|https://libvirt.org/html/libvirt-li
   #      type => $type }
 
 See documentation of L<virStorageVolGetInfo|https://libvirt.org/html/libvirt-libvirt-storage.html#virStorageVolGetInfo>.
+
+
+=head2 get_info_flags
+
+  await $vol->get_info_flags( $flags = 0 );
+  # -> { allocation => $allocation,
+  #      capacity => $capacity,
+  #      type => $type }
+
+See documentation of L<virStorageVolGetInfoFlags|https://libvirt.org/html/libvirt-libvirt-storage.html#virStorageVolGetInfoFlags>.
 
 
 =head2 get_path

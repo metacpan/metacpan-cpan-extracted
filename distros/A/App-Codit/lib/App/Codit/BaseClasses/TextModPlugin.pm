@@ -43,7 +43,6 @@ sub activate {
 	my $id = $self->{'active_id'};
 	$self->afterCancel($id) if defined $id;
 	$self->{'active_id'} = $self->after($self->activeDelay, ['Refresh', $self]);
-	return @_;
 }
 
 sub activeDelay {
@@ -60,15 +59,13 @@ sub docSelect {
 
 	if (exists $self->{'select_block'}) {
 		$self->after(100, sub { delete $self->{'select_block'} });
-		return @_;
 	}
 
 	my $mdi = $self->extGet('CoditMDI');
-	return @_ if $mdi->selectDisabled;
+	return if $mdi->selectDisabled;
 	$self->after(10, sub {
 		$self->Refresh(0);
 	});
-	return @_
 }
 
 sub Refresh {
@@ -79,7 +76,6 @@ sub Refresh {
 sub selectBlock {
 	my $self = shift;
 	$self->{'select_block'} = 1;
-	return @_;
 }
 
 sub Unload {

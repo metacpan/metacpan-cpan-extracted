@@ -66,7 +66,7 @@ if (defined $app) {
 @tests = (
 	[sub { return $ext->Name }, 'Plugins', 'extension Plugins loaded'],
 	[sub { return $ext->plugGet('Test')->Name }, 'Test', 'plugin Test loaded',],
-	[sub { return $app->cmdExecute('plusser') }, 4, 'Hook loaded'],
+	[sub { return $app->cmdExecute('plusser') }, 2, 'Hook loaded'],
 	[sub { 
 		$ext->plugGet('Test')->Quitter(0); 
 		$app->cmdExecute('quit'); 
