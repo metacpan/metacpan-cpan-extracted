@@ -100,4 +100,7 @@ Revision history for Perlmazing
   Added function is_integer($number) to identify numbers that are not floating point numbers.
   Added function flatten($ref_of_refs), which makes a flat array out of a list/array containing nested scalars, arrayrefs, hashrefs and objects.
   Added function columnize($columns, @array), which orders an array in a given number of columns with a vertical order of elements.
-  
+2.0018 2025-02-09
+  Fixed a bug in Perlmazing::Engine::Exporter where some times symbols marked with ! were still getting exported.
+  Fixed some small problems in POD.
+  Removed tabs from some places in course code where they were still present.

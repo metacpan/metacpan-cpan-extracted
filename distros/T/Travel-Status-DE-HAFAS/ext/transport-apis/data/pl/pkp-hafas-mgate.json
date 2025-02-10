@@ -20,7 +20,7 @@
             "id": "HAFAS",
             "type": "AND"
         },
-        "endpoint": "https://bilkom.pl/podroz",
+        "endpoint": "https://mobil.rozklad-pkp.pl:8019/bin/mgate.exe",
         "products": [
             {
                 "id": "high-speed-train",

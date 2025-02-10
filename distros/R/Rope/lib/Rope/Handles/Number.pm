@@ -36,7 +36,7 @@ Rope::Handles::Number - Rope handles numbers
 
 =head1 VERSION
 
-Version 0.41
+Version 0.42
 
 =cut
 

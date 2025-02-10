@@ -46,7 +46,7 @@ Rope::Conditional - Rope conditional properties
 
 =head1 VERSION
 
-Version 0.41
+Version 0.42
 
 =cut
 
@@ -112,7 +112,7 @@ Version 0.41
         #	b => { one => 123 },
         #	c => { two => 456 },
         #	d => { three => 789 },
-       	#	def => 123
+       	#	four => 123
         # }
 
 

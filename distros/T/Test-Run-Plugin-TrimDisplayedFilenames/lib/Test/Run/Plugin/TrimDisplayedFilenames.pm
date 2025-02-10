@@ -10,7 +10,7 @@ use Moose;
 use MRO::Compat;
 use File::Spec ();
 use File::Basename qw/ basename dirname /;
-use List::MoreUtils ();
+use List::SomeUtils ();
 
 extends('Test::Run::Base');
 
@@ -21,11 +21,11 @@ of the displayed filename to deal with excessively long ones.
 
 =head1 VERSION
 
-Version 0.0126
+Version 0.0127
 
 =cut
 
-our $VERSION = '0.0126';
+our $VERSION = '0.0127';
 
 has 'trim_displayed_filenames_query' => ( is => "rw", isa => "Str" );
 
@@ -60,8 +60,8 @@ sub _get_search_from_callback
     my ( $self, $options ) = @_;
 
     return +( $options->{search_from} eq "start" )
-        ? \&List::MoreUtils::firstidx
-        : \&List::MoreUtils::lasttidx;
+        ? \&List::SomeUtils::firstidx
+        : \&List::SomeUtils::lasttidx;
 }
 
 sub _get_array_portion

@@ -5,15 +5,17 @@ use String::CamelCase qw(camelize);
 
 
 our $VERSION = '0.01';
-
+has 'name_space';
 has 'table' ;
+has 'name_interface';
+has 'interface_space_dir';
 
 sub generate($self) {
     $self->table(camelize($self->table));
 
     my $tpl = $self->templates->get_data_section('interface');
-    my $name_space = $self->context->{context}->{perl}->{name_space};
-    my $interface = $self->context->{context}->{perl}->{name_interface};
+    my $name_space = $self->context->{context}->{perl}->{$self->name_space()};
+    my $interface = $self->context->{context}->{perl}->{$self->name_interface()};
     my $date = localtime();
     my $table = $self->table();
 
@@ -22,7 +24,7 @@ sub generate($self) {
     $tpl =~ s/<<classname>>/$table/ig;
     $tpl =~ s/<<name_space>>/$name_space/ig;
 
-    my $data->{file} = $self->context->{context}->{perl}->{interface_space_dir} . "$table.pm";
+    my $data->{file} = $self->context->{context}->{perl}->{$self->interface_space_dir} . "$table.pm";
     $data->{data} = $tpl;
     $data->{only_new} = 1;
     $data->{path} = 1;

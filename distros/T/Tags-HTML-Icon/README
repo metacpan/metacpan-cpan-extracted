@@ -1,0 +1,186 @@
+NAME
+    Tags::HTML::Icon - Tags helper for HTML icon.
+
+DESCRIPTION
+    Tags helper to print HTML code of icon defined by Data::Icon.
+
+    The HTML code contains icon defined by URL and alternate text (optional)
+    or by UTF-8 character with foregroun and backround colors (optional).
+
+SYNOPSIS
+     use Tags::HTML::Icon;
+
+     my $obj = Tags::HTML::Icon->new(%params);
+     $obj->cleanup;
+     $obj->init($icon);
+     $obj->prepare;
+     $obj->process;
+     $obj->process_css;
+
+METHODS
+  "new"
+     my $obj = Tags::HTML::Icon->new(%params);
+
+    Constructor.
+
+    *       "css"
+
+            CSS::Struct::Output object for process_css processing.
+
+            Default value is undef.
+
+    *       "css_class"
+
+            Default value is 'info-box'.
+
+    *       "lang"
+
+            Language in ISO 639-1 code.
+
+            Default value is undef.
+
+    *       "tags"
+
+            Tags::Output object.
+
+            Default value is undef.
+
+  "cleanup"
+     $obj->cleanup;
+
+    Process cleanup after page run.
+
+    In this case cleanup internal representation of a set by init.
+
+    Returns undef.
+
+  "init"
+     $obj->init($icon);
+
+    Process initialization in page run.
+
+    Accepted $icon is Data::Icon.
+
+    Returns undef.
+
+  "prepare"
+     $obj->prepare;
+
+    Do nothing in case of this object.
+
+    Returns undef.
+
+  "process"
+     $obj->process;
+
+    Process Tags structure for HTML a element to output.
+
+    Do nothing in case without inicialization by init.
+
+    Returns undef.
+
+  "process_css"
+     $obj->process_css;
+
+    Process CSS::Struct structure for HTML a element to output.
+
+    Default CSS doesn't exist.
+
+    Do nothing in case without inicialization by init.
+
+    Returns undef.
+
+ERRORS
+     new():
+             From Mo::utils::CSS::check_css_class():
+                     Parameter '%s' has bad CSS class name.
+                             Value: %s
+                     Parameter '%s' has bad CSS class name (number on begin).
+                             Value: %s
+             From Tags::HTML::new():
+                     Parameter 'css' must be a 'CSS::Struct::Output::*' class.
+                     Parameter 'tags' must be a 'Tags::Output::*' class.
+
+     init():
+             Icon object is required.
+             Icon object must be a instance of 'Data::Icon'.
+
+     process():
+             From Tags::HTML::process():
+                     Parameter 'tags' isn't defined.
+
+     process_css():
+             From Tags::HTML::process_css():
+                     Parameter 'css' isn't defined.
+
+EXAMPLE
+     use strict;
+     use warnings;
+
+     use CSS::Struct::Output::Indent;
+     use Data::Icon;
+     use Tags::HTML::Icon;
+     use Tags::Output::Indent;
+     use Unicode::UTF8 qw(decode_utf8 encode_utf8);
+
+     # Object.
+     my $css = CSS::Struct::Output::Indent->new;
+     my $tags = Tags::Output::Indent->new(
+             'xml' => 1,
+     );
+     my $obj = Tags::HTML::Icon->new(
+             'css' => $css,
+             'tags' => $tags,
+     );
+
+     # Data object for icon.
+     my $icon = Data::Icon->new(
+             'bg_color' => 'grey',
+             'char' => decode_utf8('†'),
+             'color' => 'red',
+     );
+
+     # Initialize.
+     $obj->init($icon);
+
+     # Process.
+     $obj->process;
+     $obj->process_css;
+
+     # Print out.
+     print "HTML:\n";
+     print encode_utf8($tags->flush);
+     print "\n\n";
+     print "CSS:\n";
+     print $css->flush;
+
+     # Output:
+     # HTML:
+     # <span class="icon">
+     #   <span style="background-color:grey;color:red;">
+     #     †
+     #   </span>
+     # </span>
+     # 
+     # CSS:
+     #
+
+DEPENDENCIES
+    Class::Utils, Error::Pure, Mo::utils::CSS, Scalar::Util, Tags::HTML.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Tags-HTML-Icon>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2025 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

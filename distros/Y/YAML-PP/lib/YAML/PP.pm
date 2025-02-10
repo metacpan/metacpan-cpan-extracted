@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package YAML::PP;
 
-our $VERSION = 'v0.38.1'; # VERSION
+our $VERSION = 'v0.39.0'; # VERSION
 
 use YAML::PP::Schema;
 use YAML::PP::Schema::JSON;
@@ -30,6 +30,7 @@ sub new {
     my $writer = delete $args{writer};
     my $header = delete $args{header};
     my $footer = delete $args{footer};
+    my $require_footer = delete $args{require_footer};
     my $duplicate_keys = delete $args{duplicate_keys};
     my $yaml_version = $class->_arg_yaml_version(delete $args{yaml_version});
     my $default_yaml_version = $yaml_version->[0];
@@ -69,6 +70,7 @@ sub new {
         default_yaml_version => $default_yaml_version,
         preserve => $preserve,
         duplicate_keys => $duplicate_keys,
+        require_footer => $require_footer,
     );
     my $dumper = YAML::PP::Dumper->new(
         schema => $default_schema,
@@ -667,6 +669,29 @@ This option is for dumping.
 
 Print document footer C<...>
 
+=item require_footer
+
+Default: 0
+
+Will require a C<...> at the end of each document.
+This can be useful in a context where you want to make sure you received
+the complete content, for example over network.
+
+    # Good
+    ---
+    a: 1
+    ...
+    ---
+    a: 2
+    ...
+
+    # Bad
+    ---
+    a: 1
+    ---
+    a: 2
+
+
 =item yaml_version
 
 Since version 0.020
@@ -1035,9 +1060,10 @@ YAML 1.1 merge keys for mappings
 
 =item L<YAML::PP::Schema::Catchall>
 
-Adding this allows (and ignores) all unknown tags, like
+Experimental.
 
-    key: !something value
+It was accidentally added in 0.38.1, and unknown tags forbidden.
+This was reverted in 0.39.0
 
 By default they will result in an error.
 

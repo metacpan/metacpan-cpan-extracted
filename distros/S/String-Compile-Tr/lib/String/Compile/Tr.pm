@@ -1,4 +1,4 @@
-use 5.006;
+use 5.010;
 use strict;
 use warnings;
 
@@ -12,12 +12,12 @@ String::Compile::Tr - compile tr/// expressions
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
 our
-$VERSION = '0.04';
+$VERSION = '0.05';
 
 
 =head1 SYNOPSIS
@@ -42,6 +42,8 @@ by the variables' content, e.g.
 
 C<String::Compile::Tr> offers an alternative where the content of a
 variable can be used as operand without C<eval>'ing it. 
+Instead the operands of a C<tr///> operator are overloaded at runtime
+inside an constant C<eval '...'>.
 
 C<trgen(*SEARCH*, *REPLACE*, *OPT*)> compiles an anonymous sub that
 performs almost the same operation as C<tr/*SEARCH*/*REPLACE*/*OPT*>,
@@ -64,10 +66,8 @@ or is the default input C<$_> otherwise.
 
 =head1 ERRORS
 
-C<trgen> will throw an exception if an invalid option is specified.
-
-When the C<tr> operation cannot be compiled, C<trgen> will return
-C<undef>.
+C<trgen> will throw an exception if an invalid option is specified
+or the C<tr> operation cannot be compiled.
 
 =head1 EXAMPLES
 
@@ -95,6 +95,8 @@ All characters are interpreted literally.
 This is caused by the fact that C<tr> does not support these neither.
 It's the compiler that expands character ranges in C<tr>'s operands
 before handing them over.
+
+Overloading constants in C<eval '...'> requires perl v5.10.
 
 =head1 AUTHOR
 
@@ -137,15 +139,17 @@ sub trgen {
     my ($opt) = $options =~ /^([cdsr]*)$/;
     $opt = '' unless defined $opt;
     croak "options invalid: $options" if $options && $options ne $opt;
+    my $ret;
     my $template = <<'EOS';
-    sub {
+    $ret = sub {
         local *_ = \$_[0] if @_;
         tr/:search:/:replace:/%s;
-    }
+    }; 1
 EOS
     my $code = sprintf $template, $opt;
 
-    eval $code;
+    eval $code or croak $@;
+    $ret;
 }
 
 1;

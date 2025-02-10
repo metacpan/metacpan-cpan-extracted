@@ -6,7 +6,7 @@ use warnings;
 use Mo qw(build is);
 use Mo::utils 0.21 qw(check_array_object check_array_required);
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 has items => (
 	is => 'ro',
@@ -33,6 +33,12 @@ __END__
 =head1 NAME
 
 Data::InfoBox - Data object for info box.
+
+=head1 DESCRIPTION
+
+Data objects for definition of common infobox which contains structured
+informations. The informations are in form of text description (optionaly with icon)
+and some value. It's used on e.g. Wikipedia article as table on top of the page.
 
 =head1 SYNOPSIS
 
@@ -137,12 +143,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2024 Michal Josef Špaček
+© 2024-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

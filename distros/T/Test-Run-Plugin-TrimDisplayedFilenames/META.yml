@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.39'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,11 +19,12 @@ name: Test-Run-Plugin-TrimDisplayedFilenames
 provides:
   Test::Run::CmdLine::Plugin::TrimDisplayedFilenames:
     file: lib/Test/Run/CmdLine/Plugin/TrimDisplayedFilenames.pm
-    version: '0.0126'
+    version: '0.0127'
   Test::Run::Plugin::TrimDisplayedFilenames:
     file: lib/Test/Run/Plugin/TrimDisplayedFilenames.pm
-    version: '0.0126'
+    version: '0.0127'
 requires:
+  List::SomeUtils: '0'
   MRO::Compat: '0'
   Moose: '0'
   Test::Run::CmdLine: '0.0121'
@@ -33,5 +34,5 @@ resources:
   homepage: http://web-cpan.shlomifish.org/modules/Test-Run/
   license: http://www.opensource.org/licenses/mit-license.php
   repository: https://github.com/shlomif/perl-test-run
-version: '0.0126'
+version: '0.0127'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

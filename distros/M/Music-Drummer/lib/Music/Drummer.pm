@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Use MIDI::Drummer::Tiny
 
-our $VERSION = '0.5010';
+our $VERSION = '0.5011';
 
 use parent 'MIDI::Drummer::Tiny';
 
@@ -22,7 +22,7 @@ Music::Drummer - Use MIDI::Drummer::Tiny
 
 =head1 VERSION
 
-version 0.5010
+version 0.5011
 
 =head1 SYNOPSIS
 

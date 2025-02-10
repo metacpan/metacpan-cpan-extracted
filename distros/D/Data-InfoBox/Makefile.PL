@@ -25,6 +25,7 @@ requires 'Mo::utils::URI' => 0.02;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Data-InfoBox/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Data-InfoBox';
 resources 'repository' => 'git://github.com/michal-josef-spacek/Data-InfoBox';
+test_requires 'Data::Icon' => 0;
 test_requires 'Data::Text::Simple' => 0;
 test_requires 'English' => 0;
 test_requires 'Error::Pure::Utils' => 0;
@@ -32,7 +33,7 @@ test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 test_requires 'Unicode::UTF8' => 0;
 tests_recursive;
-version '0.02';
+version '0.03';
 
 # Run.
 WriteAll();

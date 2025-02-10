@@ -3,19 +3,19 @@ abstract: 'minimal mailing list manager'
 author:
   - 'Gianni Ceccarelli <dakkar@thenautilus.net>'
 build_requires:
-  Data::Printer: '1.001000'
-  Email::Sender::Transport::Test: '2.600'
+  Data::Printer: '1.002001'
+  Email::Sender::Transport::Test: '2.601'
   Import::Into: '1.002005'
   Net::DNS::Resolver::Mock: '1.20230216'
-  Path::Tiny: '0.144'
-  Test2::API: '1.302192'
-  Test2::V0: '0.000145'
-  URI: '5.17'
+  Path::Tiny: '0.146'
+  Test2::API: '1.302209'
+  Test2::V0: '1.302209'
+  URI: '5.31'
   lib: '0.65'
 configure_requires:
-  ExtUtils::MakeMaker: '7.66'
+  ExtUtils::MakeMaker: '7.70'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,29 +29,29 @@ requires:
   App::Spec::Run: '0.013'
   Digest::SHA: '6.04'
   Email::Address: '1.913'
-  Email::MIME: '1.953'
-  Email::Sender::Simple: '2.600'
+  Email::MIME: '1.954'
+  Email::Sender::Simple: '2.601'
   Email::Stuffer: '0.020'
   List::AllUtils: '0.19'
-  Mail::DMARC::PurePerl: '1.20230215'
+  Mail::DMARC::PurePerl: '1.20250203'
   Moo: '2.005005'
   Moo::Role: '2.005005'
   MooX::Traits: '0.005'
-  Type::Library: '2.002001'
-  Type::Params: '2.002001'
-  Type::Utils: '2.002001'
+  Type::Library: '2.006000'
+  Type::Params: '2.006000'
+  Type::Utils: '2.006000'
   Types::Path::Tiny: '0.006'
-  Types::Standard: '2.002001'
+  Types::Standard: '2.006000'
   Types::URI: '0.007'
-  feature: '1.72'
+  feature: '0'
   namespace::clean: '0.27'
   perl: v5.36.0
-  strict: '1.12'
-  warnings: '1.58'
+  strict: '0'
+  warnings: '0'
 resources:
   homepage: https://www.thenautilus.net/SW/Sietima/
   repository: https://www.thenautilus.net/cgit/Sietima
-version: 1.1.2
-x_generated_by_perl: v5.36.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+version: 1.1.4
+x_generated_by_perl: v5.40.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

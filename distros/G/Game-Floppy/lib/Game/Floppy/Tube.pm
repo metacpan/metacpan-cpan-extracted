@@ -1,7 +1,9 @@
 use 5.38.0;
 use experimental 'class';
 
+package Game::Floppy::Tube 0.07;
 class Game::Floppy::Tube {
+	our $VERSION = 0.07;
 	use Raylib::FFI;
 	use Game::Floppy::Sprite;
 	field $x : param;

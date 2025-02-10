@@ -1,0 +1,193 @@
+#!/usr/bin/perl
+use 5.016;
+use strict;
+use warnings;
+
+use EBook::Ishmael;
+
+my $ishmael = EBook::Ishmael->init();
+
+$ishmael->run();
+
+
+=head1 NAME
+
+ishmael - Convert ebook documents to plain text
+
+=head1 SYNOPSIS
+
+  ishmael [options] file
+
+=head1 DESCRIPTION
+
+B<ishmael> is a Perl program that reads given ebook documents and converts
+their contents to formatted plain text, which should be suitable for piping into
+other programs for further processing. It accomplishes this by converting the
+ebook contents to HTML and then formatting that HTML using the dump feature found
+in many text web browsers, like L<lynx(1)>.
+
+B<ishmael> currently supports the following ebook formats:
+
+=over 4
+
+=item EPUB
+
+=item FictionBook2
+
+=item HTML
+
+=item XHTML
+
+=item Mobi
+
+=item PalmDoc
+
+=item PDF
+
+=item zTXT
+
+=item Text
+
+=back
+
+B<ishmael> is also capable of dumping some of the metadata of an ebook via the
+C<-m> and C<-j> options.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-d>|B<--dumper>=I<dumper>
+
+Specify the program to use for formatting ebook text. The following are valid
+options, as long they're installed on your system:
+
+=over 4
+
+=item elinks
+
+=item links
+
+=item lynx
+
+=item w3m
+
+=back
+
+By default, B<ishmael> will either use the dumper specified by the
+C<ISHMAEL_DUMPER> environment variable if set, or the first one it finds
+installed on your system otherwise.
+
+=item B<-f>|B<--format>=I<format>
+
+Instead of trying to determine the given ebook format via a series of
+heuristics, manually specify the format. The following are valid options
+(caes does not matter):
+
+=over 4
+
+=item epub
+
+=item fictionbook2
+
+=item html
+
+=item mobi
+
+=item palmdoc
+
+=item pdf
+
+=item ztxt
+
+=item text
+
+=back
+
+=item B<-o>|B<--output>=I<file>
+
+Instead of writing output to F<stdout>, write output to I<file>.
+
+=item B<-w>|B<--width>=I<width>
+
+Specify the outputted line width. Defaults to C<80>.
+
+=item B<-H>|B<--html>
+
+Dump the HTML-ified contents of the ebook instead of the formatted plain text.
+
+=item B<-i>|B<--identify>
+
+Instead of dumping the text contents of an ebook, try to identify its format
+instead.
+
+=item B<-j>|B<--meta-json>
+
+Dump the ebook's metadata in JSON form.
+
+=item B<-m>|B<--metadata>
+
+Dump the ebook's metadata.
+
+=item B<-h>|B<--help>
+
+Print help message and exit.
+
+=item B<-v>|B<--version>
+
+Print version and copyright info, then exit.
+
+=back
+
+=head1 ENVIRONMENT
+
+=over 4
+
+=item ISHMAEL_DUMPER
+
+Name of dumper program to use by default.
+
+=back
+
+=head1 RESTRICTIONS
+
+PDF processing is inefficient and the output is ugly.
+
+=head1 AUTHOR
+
+Written by Samuel Young, E<lt>samyoung12788@gmail.comE<gt>.
+
+This project's source can be found on its
+L<Codeberg Page|https://codeberg.org/1-1sam/ishmael>. Comments and pull
+requests are welcome!
+
+=head1 HISTORY
+
+This is the fifth iteration of this program, and hopefully the last :-).
+
+This program originally went by the name of B<ebread>. The first iteration was
+written in C and only supported EPUBs, it was quite buggy. The second
+iteration was written as a learning exercise for Perl, it too only supported
+EPUBs, it was also where I got the idea to delegate the text formatting task to
+another program. The third iteration was again in C, but this time supported
+a bunch of other ebook formats. It wasn't nearly as buggy as the first, but the
+code was quite sloppy and had gotten to the point where I couldn't extend it
+much. The fourth iteration was written in Raku, it only supported EPUBs. This
+iteration, I renamed the project to B<ishmael> because I got bored of the last
+name. This iteration supports multiple different ebook formats, but is written
+in Perl so it should (hopefully) be less buggy and more maintainable.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2025 Samuel Young
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+=head1 SEE ALSO
+
+L<elinks(1)>, L<links(1)>, L<lynx(1)>, L<w3m(1)>
+
+=cut

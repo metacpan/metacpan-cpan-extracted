@@ -1,5 +1,5 @@
 {
-   "abstract" : "Work in GitHub Actions using Perl",
+   "abstract" : "Work in GitHub Actions using native Perl",
    "author" : [
       "JJ Merelo <jmerelo@CPAN.org>"
    ],
@@ -38,6 +38,7 @@
       },
       "test" : {
          "requires" : {
+            "Test::Exit" : "0",
             "Test::File::Contents" : "0",
             "Test::Output" : "0",
             "Test::Perl::Critic" : "0"
@@ -55,6 +56,6 @@
          "web" : "https://github.com/JJ/perl-GitHub-Actions/"
       }
    },
-   "version" : "0.1.2",
+   "version" : "0.2.0",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

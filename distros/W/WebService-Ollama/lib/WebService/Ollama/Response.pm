@@ -45,7 +45,7 @@ WebService::Ollama::Response - ollama response
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 

@@ -91,7 +91,7 @@ Rope::Handles::Hash - Rope handles hashes
 
 =head1 VERSION
 
-Version 0.41
+Version 0.42
 
 =cut
 

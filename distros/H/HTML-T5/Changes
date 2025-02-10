@@ -1,5 +1,10 @@
 Revision history for HTML-T5
 
+0.014  2025-02-09
+    - try fixing https://github.com/shlomif/html-tidy5/issues/7
+        - thanks to @pjacklam
+        - remove stale CPAN ratings link.
+
 0.013  2022-04-10
     - try fixing https://github.com/shlomif/html-tidy5/issues/6
         - thanks to @eserte

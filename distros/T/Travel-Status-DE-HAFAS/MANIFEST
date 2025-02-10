@@ -83,6 +83,7 @@ ext/transport-apis/data/lu/mobiliteit-lu-hafas-mgate.json
 ext/transport-apis/data/nl/ns-hafas-query.json
 ext/transport-apis/data/no/entur-otp.json
 ext/transport-apis/data/pl/pkp-hafas-mgate.json
+ext/transport-apis/data/pl/pkp-hafas-mgate.json_
 ext/transport-apis/data/se/resrobot-hafas-mgate.json
 ext/transport-apis/data/un/transitous.json
 ext/transport-apis/data/us/bart-hafas-mgate.json

@@ -1,3 +1,10 @@
+0.03 2025-02-09T17:08:43+01:00
+ - Add DESCRIPTION section to doc.
+ - Change API: Add 'icon' parameter with Data::Icon object.
+ - Deprecate 'icon_char' and 'icon_url' parameters.
+ - Fix doc.
+ - Update copyright years.
+
 0.02 2024-09-16T21:57:04+02:00
  - API Change: Rename 'url' parameter to 'uri' and fix validity.
  - Add SEE ALSO sections to doc.

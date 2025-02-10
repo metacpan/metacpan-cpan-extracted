@@ -12,200 +12,200 @@ my $precompile_symbols;
 my $parameters;
 
 sub found_symbols {
-	my $self = shift;
-	my $package = (shift or caller);
-	return unless exists $found_symbols->{$package};
-	sort keys %{$found_symbols->{$package}};
+  my $self = shift;
+  my $package = (shift or caller);
+  return unless exists $found_symbols->{$package};
+  sort keys %{$found_symbols->{$package}};
 }
 
 sub loaded_symbols {
-	my $self = shift;
-	my $package = (shift or caller);
-	return unless exists $loaded_symbols->{$package};
+  my $self = shift;
+  my $package = (shift or caller);
+  return unless exists $loaded_symbols->{$package};
     return sort keys %{$loaded_symbols->{$package}};
 }
 
 sub preload {
-	my $self = shift;
-	my $package = caller;
-	for my $i (@_) {
-		_debug("Preloading symbol $i", $package);
-		_load_symbol($package, $i);
-	}
+  my $self = shift;
+  my $package = caller;
+  for my $i (@_) {
+    _debug("Preloading symbol $i", $package);
+    _load_symbol($package, $i);
+  }
 }
 
 sub import {
-	my $self = shift;
-	carp "If passing arguments to this module, it most be using named arguments" if @_ % 2;
-	my $package = caller;
-	my $p = {@_};
-	$parameters->{$package} = {} unless $parameters->{$package};
-	$parameters->{$package} = {%{$parameters->{$package}}, %$p};
-	return if exists $found_symbols->{$package};
-	$found_symbols->{$package} = {};
-	_debug("Importing $self");
-	$self->_find_symbols($package);
+  my $self = shift;
+  carp "If passing arguments to this module, it most be using named arguments" if @_ % 2;
+  my $package = caller;
+  my $p = {@_};
+  $parameters->{$package} = {} unless $parameters->{$package};
+  $parameters->{$package} = {%{$parameters->{$package}}, %$p};
+  return if exists $found_symbols->{$package};
+  $found_symbols->{$package} = {};
+  _debug("Importing $self");
+  $self->_find_symbols($package);
 }
 
 sub _is_compile_phase {
-	my $code = q[
-		BEGIN {
-			use warnings 'FATAL' => 'all';
-			eval 'INIT{} 1' or die;
-		}
-	];
-	eval $code;
-	return 0 if $@;
-	1;
+  my $code = q[
+    BEGIN {
+      use warnings 'FATAL' => 'all';
+      eval 'INIT{} 1' or die;
+    }
+  ];
+  eval $code;
+  return 0 if $@;
+  1;
 }
 
 sub _debug {
-	my $msg = shift;
-	my $caller = (shift or caller);
-	print STDERR __PACKAGE__." DEBUG: Package $caller, $msg\n" if $parameters->{$caller}->{debug};
+  my $msg = shift;
+  my $caller = (shift or caller);
+  print STDERR __PACKAGE__." DEBUG: Package $caller, $msg\n" if $parameters->{$caller}->{debug};
 }
 
 sub _find_symbols {
-	my $self = shift;
-	my $package = shift;
-	my @paths;
-	my $seen_paths;
-	_debug("Looking for symbols", $package);
-	for my $i (Submodules->find("${package}::Perlmazing")) {
-		next if $i->{Clobber};
-		_debug("Found file $i->{AbsPath} for symbol $i->{Name}", $package);
-		$found_symbols->{$package}->{$i->Name} = {%$i};
-		if ($i->Module eq "${package}::Perlmazing::Precompile::$i->{Name}") {
-			$precompile_symbols->{$package}->{$i->Name} = $i;
-		}
-		no strict 'refs';
-		no warnings; # prevents during-cleanup warnings when Submodules was destroyed and $i is undefined
-		my $name = $i->Name;
-		*{"${package}::$i->{Name}"} = sub {
-			unshift @_, $package, $name;
-			goto &_autoload;
-		};
-	}
+  my $self = shift;
+  my $package = shift;
+  my @paths;
+  my $seen_paths;
+  _debug("Looking for symbols", $package);
+  for my $i (Submodules->find("${package}::Perlmazing")) {
+    next if $i->{Clobber};
+    _debug("Found file $i->{AbsPath} for symbol $i->{Name}", $package);
+    $found_symbols->{$package}->{$i->Name} = {%$i};
+    if ($i->Module eq "${package}::Perlmazing::Precompile::$i->{Name}") {
+      $precompile_symbols->{$package}->{$i->Name} = $i;
+    }
+    no strict 'refs';
+    no warnings; # prevents during-cleanup warnings when Submodules was destroyed and $i is undefined
+    my $name = $i->Name;
+    *{"${package}::$i->{Name}"} = sub {
+      unshift @_, $package, $name;
+      goto &_autoload;
+    };
+  }
 }
 
 sub precompile {
-	my $self = shift;
-	my $package = caller;
-	return unless exists $precompile_symbols->{$package};
-	for my $name (sort keys %{$precompile_symbols->{$package}}) {
-		# We detect already precompiled symbols by undefining this variable
-		# Note that symbols can in some cases (by internal recursion) be called
-		# more than once, not allowing _load_symbol to complete and mark it as loaded
-		# before being called again, so this part comes handy in those cases.
-		next if not defined $precompile_symbols->{$package}->{$name};
-		undef $precompile_symbols->{$package}->{$name};
-		_debug("Precompiling symbol $name", $package);
-		_load_symbol($package, $name);
-	}
+  my $self = shift;
+  my $package = caller;
+  return unless exists $precompile_symbols->{$package};
+  for my $name (sort keys %{$precompile_symbols->{$package}}) {
+    # We detect already precompiled symbols by undefining this variable
+    # Note that symbols can in some cases (by internal recursion) be called
+    # more than once, not allowing _load_symbol to complete and mark it as loaded
+    # before being called again, so this part comes handy in those cases.
+    next if not defined $precompile_symbols->{$package}->{$name};
+    undef $precompile_symbols->{$package}->{$name};
+    _debug("Precompiling symbol $name", $package);
+    _load_symbol($package, $name);
+  }
 }
 
 sub _preload {
-	my $self = shift;
-	my $package = shift;
-	for my $i (@_) {
-		_debug("Preloading symbol $i", $package);
-		_load_symbol($package, $i);
-	}
+  my $self = shift;
+  my $package = shift;
+  for my $i (@_) {
+    _debug("Preloading symbol $i", $package);
+    _load_symbol($package, $i);
+  }
 }
 
 sub _autoload {
-	my ($package, $symbol) = (shift, shift);
-	_debug("Autoloading symbol $symbol", $package);
-	my $code = _load_symbol($package, $symbol);
-	goto $code;
+  my ($package, $symbol) = (shift, shift);
+  _debug("Autoloading symbol $symbol", $package);
+  my $code = _load_symbol($package, $symbol);
+  goto $code;
 }
 
 sub _load_symbol {
-	my ($package, $symbol) = (shift, shift);
-	local $@;
-	return $loaded_symbols->{$package}->{$symbol} if exists $loaded_symbols->{$package} and exists $loaded_symbols->{$package}->{$symbol};
-	croak "File $package/Perlmazing/$symbol.pm cannot be found in \@INC for symbol \&${package}::$symbol - \@INC contains: @INC" unless exists $found_symbols->{$package} and exists $found_symbols->{$package}->{$symbol};
-	_debug("Reading file $found_symbols->{$package}->{$symbol}", $package);
-	my $code = Submodules::Result::read($found_symbols->{$package}->{$symbol});
-	_debug("Parsing contents of $found_symbols->{$package}->{$symbol}->{AbsPath}", $package);
-	my $stderr = '';
-	my $eval_string = "\n#line 1 $found_symbols->{$package}->{$symbol}->{AbsPath}\npackage ${package}::Perlmazing::$symbol; $code";
-	{
-		local *STDERR;
-		open STDERR, '>>', \$stderr;
-		untaint $eval_string;
-		eval $eval_string;
-	}
-	if (my $e = $@) {
-		croak "While attempting to load symbol '$symbol': $e";
-	}
-	print STDERR $stderr if length $stderr;
-	$loaded_symbols->{$package}->{$symbol} = "${package}::Perlmazing::${symbol}"->can('main');
-	die "Unable to find sub 'main' at $found_symbols->{$package}->{$symbol}->{AbsPath} line 1 to EOF\n" unless $loaded_symbols->{$package}->{$symbol};
-	_debug("Replacing skeleton symbol with actual code from $found_symbols->{$package}->{$symbol}->{AbsPath}", $package);
-	if ("${package}::Perlmazing::${symbol}"->isa('Perlmazing::Listable')) {
-		_debug("Symbol &${package}::$symbol isa Perlmazing::Listable, creating wrapper sub around it", $package);
-		my $sub_main = $loaded_symbols->{$package}->{$symbol};
-		my $sub_pre = sub {
-			for my $i (@_) {
-				$sub_main->($i);
-			}
-		};
-		$loaded_symbols->{$package}->{$symbol} = sub {
-			my $wantarray = wantarray;
-			my @call = caller(1);
-			my @res = eval {
-				(@_) = ($_) if not @_;
-				if ($wantarray) {
-					my @res = @_;
-					foreach my $i (@res) {
-						$sub_pre->($i);
-					}
-					return @res;
-				} elsif (defined $wantarray) {
-					my $i = $_[0];
-					$sub_pre->($i);
-					return $i;
-				} else {
-					foreach my $i (@_) {
-						$sub_pre->($i);
-					}
-				}
-			};
-			if (my $e = $@) {
-				if ($e =~ /^Modification of a read\-only value attempted/) {
-					die "Modification of a read-only value attempted at $call[1] line $call[2]\n";
-				} else {
-					die "Unhandled error in listable function ${package}::$symbol: $e\n";
-				}
-			}
-			return @res if $wantarray;
-			$res[0];
-		};
-	}
-	no strict 'refs';
-	no warnings qw(redefine once);
-	my $skeleton = *{"${package}::$symbol"}{CODE};
-	my ($callers, $offset);
-	while (my $caller = caller($offset++)) {
-		$callers->{$caller}++;
-	}
-	$callers->{$package}++;
-	for my $i (keys %$callers) {
-		next if $i eq __PACKAGE__;
-		if (my $ref = *{"${i}::$symbol"}{CODE}) {
-			my $proto_old = prototype \&{"${i}::$symbol"};
-			my $proto_new = prototype $loaded_symbols->{$package}->{$symbol};
-			if ((defined $proto_new and defined $proto_old and $proto_old ne $proto_new) or (defined $proto_old and not defined $proto_new) or (defined $proto_new and not defined $proto_old)) {
-				# Disabling this as it is noisy and seems to be somewhat unimportant for general use. Leaving it commented in case I change my mind in a future version.
-				#carp "Warning: Too late to apply prototype ($proto_new) to symbol &${i}::$symbol - perl compilation phase has passed already" unless _is_compile_phase();
-				set_prototype \&{"${i}::$symbol"}, $proto_new;
-			}
-			*{"${i}::$symbol"} = $loaded_symbols->{$package}->{$symbol} if $ref eq $skeleton;
-		}
-	}
-	_debug(__PACKAGE__." no longer has power over symbol &${package}::$symbol (it's now loaded on it's own code)", $package);
-	$loaded_symbols->{$package}->{$symbol};
+  my ($package, $symbol) = (shift, shift);
+  local $@;
+  return $loaded_symbols->{$package}->{$symbol} if exists $loaded_symbols->{$package} and exists $loaded_symbols->{$package}->{$symbol};
+  croak "File $package/Perlmazing/$symbol.pm cannot be found in \@INC for symbol \&${package}::$symbol - \@INC contains: @INC" unless exists $found_symbols->{$package} and exists $found_symbols->{$package}->{$symbol};
+  _debug("Reading file $found_symbols->{$package}->{$symbol}->{AbsPath}", $package);
+  my $code = Submodules::Result::read($found_symbols->{$package}->{$symbol});
+  _debug("Parsing contents of $found_symbols->{$package}->{$symbol}->{AbsPath}", $package);
+  my $stderr = '';
+  my $eval_string = "\n#line 1 $found_symbols->{$package}->{$symbol}->{AbsPath}\npackage ${package}::Perlmazing::$symbol; $code";
+  {
+    local *STDERR;
+    open STDERR, '>>', \$stderr;
+    untaint $eval_string;
+    eval $eval_string;
+  }
+  if (my $e = $@) {
+    croak "While attempting to load symbol '$symbol': $e";
+  }
+  print STDERR $stderr if length $stderr;
+  $loaded_symbols->{$package}->{$symbol} = "${package}::Perlmazing::${symbol}"->can('main');
+  die "Unable to find sub 'main' at $found_symbols->{$package}->{$symbol}->{AbsPath} line 1 to EOF\n" unless $loaded_symbols->{$package}->{$symbol};
+  _debug("Replacing skeleton symbol with actual code from $found_symbols->{$package}->{$symbol}->{AbsPath}", $package);
+  if ("${package}::Perlmazing::${symbol}"->isa('Perlmazing::Listable')) {
+    _debug("Symbol &${package}::$symbol isa Perlmazing::Listable, creating wrapper sub around it", $package);
+    my $sub_main = $loaded_symbols->{$package}->{$symbol};
+    my $sub_pre = sub {
+      for my $i (@_) {
+        $sub_main->($i);
+      }
+    };
+    $loaded_symbols->{$package}->{$symbol} = sub {
+      my $wantarray = wantarray;
+      my @call = caller(1);
+      my @res = eval {
+        (@_) = ($_) if not @_;
+        if ($wantarray) {
+          my @res = @_;
+          foreach my $i (@res) {
+            $sub_pre->($i);
+          }
+          return @res;
+        } elsif (defined $wantarray) {
+          my $i = $_[0];
+          $sub_pre->($i);
+          return $i;
+        } else {
+          foreach my $i (@_) {
+            $sub_pre->($i);
+          }
+        }
+      };
+      if (my $e = $@) {
+        if ($e =~ /^Modification of a read\-only value attempted/) {
+          die "Modification of a read-only value attempted at $call[1] line $call[2]\n";
+        } else {
+          die "Unhandled error in listable function ${package}::$symbol: $e\n";
+        }
+      }
+      return @res if $wantarray;
+      $res[0];
+    };
+  }
+  no strict 'refs';
+  no warnings qw(redefine once);
+  my $skeleton = *{"${package}::$symbol"}{CODE};
+  my ($callers, $offset);
+  while (my $caller = caller($offset++)) {
+    $callers->{$caller}++;
+  }
+  $callers->{$package}++;
+  for my $i (keys %$callers) {
+    next if $i eq __PACKAGE__;
+    if (exists ${"${i}::"}{$symbol} and my $ref = *{"${i}::$symbol"}{CODE}) {
+      my $proto_old = prototype \&{"${i}::$symbol"};
+      my $proto_new = prototype $loaded_symbols->{$package}->{$symbol};
+      if ((defined $proto_new and defined $proto_old and $proto_old ne $proto_new) or (defined $proto_old and not defined $proto_new) or (defined $proto_new and not defined $proto_old)) {
+        # Disabling this as it is noisy and seems to be somewhat unimportant for general use. Leaving it commented in case I change my mind in a future version.
+        #carp "Warning: Too late to apply prototype ($proto_new) to symbol &${i}::$symbol - perl compilation phase has passed already" unless _is_compile_phase();
+        set_prototype \&{"${i}::$symbol"}, $proto_new;
+      }
+      *{"${i}::$symbol"} = $loaded_symbols->{$package}->{$symbol} if $ref eq $skeleton;
+    }
+  }
+  _debug(__PACKAGE__." no longer has power over symbol &${package}::$symbol (it's now loaded on its own code)", $package);
+  $loaded_symbols->{$package}->{$symbol};
 }
 
 package Perlmazing::Listable;

@@ -22,7 +22,7 @@ use Travel::Status::DE::HAFAS::Product;
 use Travel::Status::DE::HAFAS::Services;
 use Travel::Status::DE::HAFAS::StopFinder;
 
-our $VERSION = '6.17';
+our $VERSION = '6.18';
 
 # {{{ Endpoint Definition
 
@@ -42,6 +42,16 @@ sub new {
 
 	if ( not $ua ) {
 		my %lwp_options = %{ $conf{lwp_options} // { timeout => 10 } };
+		if ( $service and $hafas_instance->{$service}{ua_string} ) {
+			$lwp_options{agent} = $hafas_instance->{$service}{ua_string};
+		}
+		if ( $service
+			and my $geoip_service = $hafas_instance->{$service}{geoip_lock} )
+		{
+			if ( my $proxy = $ENV{"HAFAS_PROXY_${geoip_service}"} ) {
+				$lwp_options{proxy} = [ [ 'http', 'https' ] => $proxy ];
+			}
+		}
 		$ua = LWP::UserAgent->new(%lwp_options);
 		$ua->env_proxy;
 	}
@@ -137,7 +147,7 @@ sub new {
 								y => int( $conf{geoSearch}{lat} * 1e6 ),
 							},
 							maxDist => -1,
-							minDist => 0,
+							minDist =>  0,
 						},
 						locFltrL => [
 							{
@@ -462,7 +472,20 @@ sub post_with_cache_p {
 		say '  cache miss';
 	}
 
-	$self->{ua}->post_p( $url, $self->{post} )->then(
+	my $headers      = {};
+	my $service_desc = $hafas_instance->{ $self->{active_service} };
+
+	if ( $service_desc->{ua_string} ) {
+		$headers->{'User-Agent'} = $service_desc->{ua_string};
+	}
+	if ( my $geoip_service = $service_desc->{geoip_lock} ) {
+		if ( my $proxy = $ENV{"HAFAS_PROXY_${geoip_service}"} ) {
+			$self->{ua}->proxy->http($proxy);
+			$self->{ua}->proxy->https($proxy);
+		}
+	}
+
+	$self->{ua}->post_p( $url, $headers, $self->{post} )->then(
 		sub {
 			my ($tx) = @_;
 			if ( my $err = $tx->error ) {
@@ -881,7 +904,7 @@ monitors
 
 =head1 VERSION
 
-version 6.17
+version 6.18
 
 =head1 DESCRIPTION
 
@@ -1132,6 +1155,14 @@ Area in which the service provides near-optimal coverage. Typically, this means
 a (nearly) complete list of departures and real-time data. The hashref contains
 two optional keys: B<area> (GeoJSON) and B<regions> (list of strings, e.g. "DE"
 or "CH-BE").
+
+=item B<geoip_lock> => I<proxy_id>
+
+If present: the service filters requests based on the estimated location of the
+requesting IP address, and may return errors or time out when the requesting IP
+address does not satisfy its requirements. Set the B<HAFAS_PROXY_>I<proxy_id>
+environment variable to a proxy string (e.g. C<< socks://localhost:12345 >>) if
+needed to work around this.
 
 =item B<homepage> => I<string>
 

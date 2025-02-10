@@ -9,7 +9,7 @@ BEGIN
 	use warnings;
 	use vars qw($VERSION @CNumbers %CNumbers);
 
-	$VERSION = "0.14";
+	$VERSION = "0.15";
 
 	require 5.000;
 

@@ -1,0 +1,7 @@
+0.02 2025-02-09T18:36:39+01:00
+ - API change: Add 'bg_color' parameter.
+ - Add DESCRIPTION section to doc.
+ - Add tests.
+
+0.01 2025-02-09T15:37:11+01:00
+ - First version.

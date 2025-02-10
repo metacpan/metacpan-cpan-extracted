@@ -1,6 +1,6 @@
 #!perl
 
-use 5.006;
+use 5.010;
 use Test2::V0;
 
 use String::Compile::Tr;
@@ -17,10 +17,12 @@ subtest 'run on arg' => sub {
     my $tr;
 
     plan 4;
-    ok lives {$tr = trgen($x, $y)}, 'compile', $@;
-    ref_ok $tr, 'CODE', 'is sub';
-    ok lives {$tr->($s)}, 'call', $@;
-    is $s, 'ed321', 'result';
+    SKIP: {
+        ok lives {$tr = trgen($x, $y)}, 'compile', $@ or skip 'gen failed', 3;
+        ref_ok $tr, 'CODE', 'is sub' or skip 'no code', 2;
+        ok lives {$tr->($s)}, 'call', $@ or skip 'call failed';
+        is $s, 'ed321', 'result';
+    }
 };
 
 subtest 'run on default' => sub {
@@ -30,10 +32,13 @@ subtest 'run on default' => sub {
     my @arr = qw(axy bxy cxy);
 
     plan 3 + @arr;
-    ok lives {$tr = trgen($x, $y)}, 'compile', $@;
-    ref_ok $tr, 'CODE', 'is sub';
-    ok lives {$tr->()}, "call on $_" for @arr;
-    is [@arr], [qw(Axy Bxy Cxy)], 'result';
+    SKIP: {
+        ok lives {$tr = trgen($x, $y)}, 'compile', $@
+            or skip 'gen failed', 2 + @arr;
+        ref_ok $tr, 'CODE', 'is sub' or skip 'no code', 1 + @arr;
+        ok lives {$tr->()}, "call on $_", $@ for @arr;
+        is [@arr], [qw(Axy Bxy Cxy)], 'result';
+    }
 };
 
 subtest 'use options' => sub {
@@ -42,8 +47,11 @@ subtest 'use options' => sub {
     my $tr;
 
     plan 4;
-    ok lives {$tr = trgen($x, '', 'dc')}, 'compile', $@;
-    ref_ok $tr, 'CODE', 'is sub';
-    ok lives {$tr->($s)}, 'call', $@;
-    is $s, 'cb', 'result';
+    SKIP: {
+        ok lives {$tr = trgen($x, '', 'dc')}, 'compile', $@
+            or skip 'gen failed', 3;
+        ref_ok $tr, 'CODE', 'is sub' or skip 'no code', 2;
+        ok lives {$tr->($s)}, 'call', $@ or skip 'call failed';
+        is $s, 'cb', 'result';
+    }
 };

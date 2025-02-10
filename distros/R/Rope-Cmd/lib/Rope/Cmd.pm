@@ -4,7 +4,8 @@ use 5.006;
 use strict;
 use warnings;
 use Term::ANSI::Sprintf qw/sprintf/;
-use 5.006; use strict; use warnings; use Rope;our $VERSION = '0.05';
+use 5.006; use strict; use warnings; use Rope;
+our $VERSION = '0.07';
 our (%PRO, %OPTIONS);
 
 BEGIN {
@@ -125,7 +126,7 @@ Rope::Cmd - Command Line Applications via Rope
 
 =head1 VERSION
 
-Version 0.05
+Version 0.07
 
 =cut
 

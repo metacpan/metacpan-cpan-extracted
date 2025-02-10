@@ -1,3 +1,6 @@
+0.15 Sat Feb  8 14:30:23 EST 2025
+	- Migration to a Build.PL & GitHub system.
+
 0.14 Sun Feb  2 07:47:40 EST 2025
 	- Fixes as per CPANTS:
 	  + LICENSE added.

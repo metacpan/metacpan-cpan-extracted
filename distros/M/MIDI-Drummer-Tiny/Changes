@@ -1,5 +1,8 @@
 Revision history for MIDI-Drummer
 
+0.5011 2025-02-09 12:55:04
+    - Use the M::U::ticks() function instead of a hardcoded constant.
+
 0.5010 2025-02-03 08:54:31
     - Simplify play_with_timidity().
     - Add play_with_fluidsynth().

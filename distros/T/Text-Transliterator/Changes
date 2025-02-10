@@ -1,5 +1,9 @@
 Revision history for Text-Transliterator
 
+
+1.05 09.02.2025
+  - support for the 'r' modifier (returning the list of transliterated strings)
+
 1.04 13.06.2023
   - better presentation for Unaccenter->char_map_descr()
   - move pod tests to xt/

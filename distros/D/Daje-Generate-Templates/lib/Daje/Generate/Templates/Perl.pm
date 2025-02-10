@@ -17,12 +17,12 @@ use Mojo::Base '<<base_name_space>><<base_class_name>>', -base, -signatures;
 
 <<fields>>
 
-    <<pkey>>
-    <<fkey>>
-    <<insert>>
-    <<update>>
-    <<select>>
-    <<methods>>
+<<pkey>>
+<<fkey>>
+<<insert>>
+<<update>>
+<<select>>
+<<methods>>
 
 
 @@ fields_method
@@ -32,7 +32,7 @@ has 'table_name' => "<<table_name>>";
 
 @@ method
 
-sub <<method_name>> (<<parameters>>) {
+sub <<method_name>> ($self, <<parameters>>) {
     <<method_content>>
 };
 
@@ -45,7 +45,7 @@ use Mojo::Base -base, -signatures;
 
 has 'db';
 
-sub load_pk($table, $select, $primary_key_name, $primary_key) {
+sub load_pk($self, $table, $select, $primary_key_name, $primary_key) {
     my $result->{result} = 1;
     eval {
         my $load = $self->db->select(
@@ -64,7 +64,7 @@ sub load_pk($table, $select, $primary_key_name, $primary_key) {
     return $result;
 };
 
-sub load_fkey($table, $select, $foreign_key_name, $foreign_key) {
+sub load_fkey($self, $table, $select, $foreign_key_name, $foreign_key) {
     my $result->{result} = 1;
     eval {
         my $load = $self->db->select(
@@ -83,7 +83,7 @@ sub load_fkey($table, $select, $foreign_key_name, $foreign_key) {
     return $result;
 }
 
-sub load_a_list($table, $select, $key_value) {
+sub load_a_list($self, $table, $select, $key_value) {
     my $result->{result} = 1;
      eval {
         my $load = $self->db->select(
@@ -103,7 +103,7 @@ sub load_a_list($table, $select, $key_value) {
     return $result;
 }
 
-sub insert($table, $data) {
+sub insert($self, $table, $data) {
     my $result->{result} = 1;
     eval {
         $self->db->insert($table, $data);
@@ -115,7 +115,7 @@ sub insert($table, $data) {
     return $result;
 }
 
-sub update($table, $data, $keys) {
+sub update($self, $table, $data, $keys) {
     my $result->{result} = 1;
     eval {
         $self->db->update($table, $data, $keys);
@@ -140,23 +140,23 @@ use Mojo::Base '<<name_space>><<classname>>', -base, -signatures;
 
 
 @@ load_from_pkey
-sub load_pkey($<<primary_key>>) {
+sub load_pkey($self, $<<primary_key>>) {
 
     my $result = $self->load_pk(
-        $table_name,
-        $fields,
-        $primary_key_name,
+        $self->table_name,
+        $self->fields,
+        $self->primary_key_name,
         $<<primary_key>>
     );
     return $result;
 }
 
 @@ load_from_fkey
-sub load_<<foreign_key>>($<<foreign_key>> ) {
+sub load_<<foreign_key>>($self, $<<foreign_key>> ) {
 
     my $result = $self->load_fkey(
-        $table_name,
-        $fields,
+        $self->table_name,
+        $self->fields,
         '<<foreign_key>>',
         $<<foreign_key>>
     );
@@ -164,24 +164,24 @@ sub load_<<foreign_key>>($<<foreign_key>> ) {
 }
 
 @@ load_list
-sub load_list($key_value) {
+sub load_list($self, $key_value) {
     my $result = $self->load_a_list(
-        $table_name,
-        $fields,
+        $self->table_name,
+        $self->fields,
         $key_value
     );
     return $result;
 }
 
 @@ insert_data
-sub insert_<<table_name>>($data) {
-    my $result = $self->insert($table_name, $data);
+sub insert_<<table_name>>($self, $data) {
+    my $result = $self->insert($self->table_name, $data);
     return $result;
 }
 
 @@ update_data
-sub update_<<table_name>>($data, $keys) {
-    my $result = $self->update($table_name, $data, $keys)
+sub update_<<table_name>>($self, $data, $keys) {
+    my $result = $self->update($self->table_name, $data, $keys)
     return $result;
 }
 
@@ -201,9 +201,7 @@ use Mojo::Base '<<base_name_space>><<base_class_name>>', -base, -signatures;
 # Any manual changes to this class will be overwritten next time its generated
 
 <<fields>>
-<<pkey>>
-<<fkey>>
-<<select>>
+
 <<methods>>
 
 @@ view_fields_method

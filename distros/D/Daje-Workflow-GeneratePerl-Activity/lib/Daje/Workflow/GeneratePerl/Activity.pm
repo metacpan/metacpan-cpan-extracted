@@ -43,7 +43,7 @@ use Daje::Workflow::GeneratePerl::Generate::Interface;
 use Daje::Workflow::GeneratePerl::Generate::View;
 use Daje::Workflow::Templates;
 
-our $VERSION = '0.06';
+our $VERSION = '0.11';
 
 has 'success' ;
 has 'templates';
@@ -65,7 +65,12 @@ sub generate_classes($self) {
     $length = scalar @{$self->json->{views}};
     for (my $i = 0; $i < $length; $i++) {
         $self->_generate_view_class(@{$self->json->{views}}[$i]);
-        $self->_generate_interface_class(@{$self->json->{views}}[$i]->{view}->{table_name});
+        $self->_generate_interface_class(
+            @{$self->json->{views}}[$i]->{view}->{table_name},
+            'view_name_space',
+            'view_name_interface',
+            'view_interface_space_dir'
+        );
     }
     return 1;
 }
@@ -91,12 +96,19 @@ sub _load_template($self) {
     $self->error->add_error($@) if defined $@;
 }
 
-sub _generate_interface_class($self, $table_name) {
+sub _generate_interface_class($self, $table_name,
+                              $name_space = 'name_space',
+                              $name_interface = 'name_interface',
+                              $interface_space_dir =  'interface_space_dir') {
+
     my $template = $self->templates();
     Daje::Workflow::GeneratePerl::Generate::Interface->new(
-        templates => $template,
-        context   => $self->context,
-        table    => $table_name,
+        templates           => $template,
+        context             => $self->context,
+        table               => $table_name,
+        name_space          => $name_space,
+        name_interface      => $name_interface,
+        interface_space_dir => $interface_space_dir,
     )->generate();
 }
 
@@ -116,9 +128,9 @@ sub _generate_table_class($self, $table) {
     $self->_save_class($perl, $table->{table});
 }
 
-sub _save_class($self, $perl, $table) {
+sub _save_class($self, $perl, $table, $name_space_dir =  "name_space_dir") {
 
-    my $data->{file} = $self->context->{context}->{perl}->{name_space_dir} . camelize($table->{table_name}) . ".pm";
+    my $data->{file} = $self->context->{context}->{perl}->{$name_space_dir} . camelize($table->{table_name}) . ".pm";
     $data->{data} = $perl;
     $data->{only_new} = 0;
     $data->{path} = 1;
@@ -161,7 +173,7 @@ sub _generate_view_class($self, $view) {
         context     => $self->context,
     )->generate();
 
-    $self->_save_class($perl, $view->{view});
+    $self->_save_class($perl, $view->{view}, "view_name_space_dir");
 }
 
 sub _get_fields($self, $json) {

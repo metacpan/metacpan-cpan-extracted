@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Moo;
 
@@ -137,7 +137,7 @@ sub completion {
 		die "No prompt defined for completion";
 	}
 
-	$args{stream} = !!$args{stream};
+	$args{stream} = $args{stream} ? \1 : \0;
 
 	if ( defined $args{image_files} ) {
 		$args{images} = [];
@@ -198,7 +198,7 @@ sub chat {
 		die "No messsages defined for chat";
 	}
 
-	$args{stream} = !!$args{stream};
+	$args{stream} = $args{stream} ? \1 : \0;
 
 	for my $message (@{$args{messages}}) {
 		if ($message->{image_files}) {
@@ -238,7 +238,7 @@ WebService::Ollama - ollama client
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
@@ -253,7 +253,6 @@ Version 0.02
 
 	my $why = $ollama->completion(
 		prompt => 'Why is the sky blue?',
-		stream => 0
 	);
 
 	$ollama->unload_completion_model;
@@ -335,7 +334,6 @@ name of the model to create
 				content => 'Hello, Tell me a story.',
 			}
 		],
-		stream => !!0
 	);
 
 =head2 copy_model
@@ -483,17 +481,15 @@ the context parameter returned from a previous request to /generate, this can be
 		image_files => [
 			"t/pingu.png"
 		]
-	); # $image is an array of responses
+	); 
 
 	my $json = $ollama->completion(
 		prompt => "What color is the sky at different times of the day? Respond using JSON",
 		format => "json",
-		stream => 0
 	)->json_response;
 
 	my $json2 = $ollama->completion(
 		prompt => "Ollama is 22 years old and is busy saving the world. Respond using JSON",
-		stream => 0,
 		format => {
 			type => "object",
 			properties => {
@@ -595,13 +591,11 @@ controls how long the model will stay loaded into memory following the request (
 				content => 'Why is the sky blue?',
 			}
 		],
-		stream => !!0
 	);
 
 
 	my $image = $ollama->chat(
 		model => 'llava',
-		stream => 0,
 		messages => [
 			{
 				role => 'user',
@@ -620,7 +614,6 @@ controls how long the model will stay loaded into memory following the request (
 				"content" => "Ollama is 22 years old and is busy saving the world. Respond using JSON",
 			}
 		],
-		stream => 0,
 		format => {
 			type => "object",
 			properties => {

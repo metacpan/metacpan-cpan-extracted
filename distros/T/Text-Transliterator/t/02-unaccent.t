@@ -1,4 +1,5 @@
 use Test::More;
+use utf8;
 use strict;
 use warnings;
 
@@ -8,16 +9,18 @@ my $want_benchmarks
   = $ENV{BENCHMARK_TESTS} 
   && eval "use Text::Unaccent; use Text::StripAccents; use Time::HiRes; 1";
 
-my $n_tests = 1;
-$n_tests += 1 if $want_benchmarks;
-
-plan tests => $n_tests;
-
-my $string = "il �tait une berg�re";
+my $string = "il était une bergère";
 my $tr = Text::Transliterator::Unaccent->new;
 
-$tr->($string);
-is($string, "il etait une bergere");
+$tr->(my $copy = $string);
+is $copy, "il etait une bergere", "basic test";
+
+
+$tr = Text::Transliterator::Unaccent->new(modifiers => 'r');
+
+my @results = $tr->(  "la belle hétaïre", "était sans vêtements");
+is_deeply \@results, ["la belle hetaire", "etait sans vetements"], "with 'r' modifier";
+
 
 if ($want_benchmarks) {
   my $latin_ranges    = Unicode::UCD::charscript('Latin');
@@ -48,3 +51,6 @@ if ($want_benchmarks) {
   ok($timings{'Text::Transliterator::Unaccent'} < $timings{'Text::StripAccents'});
   diag("timing for $_ is $timings{$_}") for keys %timings;
 }
+
+
+done_testing;

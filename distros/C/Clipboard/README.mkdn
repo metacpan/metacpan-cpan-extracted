@@ -4,7 +4,7 @@ Clipboard - Copy and paste with any OS
 
 # VERSION
 
-version 0.31
+version 0.32
 
 # SYNOPSIS
 

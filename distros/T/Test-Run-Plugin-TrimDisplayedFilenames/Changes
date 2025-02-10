@@ -1,5 +1,11 @@
 Revision history for Test::Run::Plugin::TrimDisplaysFilenames
 
+0.0127   2025-02-09
+
+        - Use List::SomeUtils instead of List::MoreUtils
+            - https://github.com/shlomif/perl-test-run/pull/2
+            - Thanks to @plicease
+
 0.0126   2020-10-22
 
     - Avoid stale POD

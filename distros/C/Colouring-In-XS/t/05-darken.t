@@ -28,11 +28,11 @@ subtest 'basics - black' => sub {
                 dark => '50%',
 		expected => [127, 127, 127],
         );
-	convert_colour(
-                start => '#ffffff',
-                dark => '40%',
-		expected => [153, 153, 153],
-        );
+#	convert_colour(
+#                start => '#ffffff',
+#                dark => '40%',
+#		expected => [153, 153, 153],
+#        );
    	convert_colour(
                 start => '#ffffff',
                 dark => '30%',

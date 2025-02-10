@@ -14,8 +14,18 @@ my %map = qw(
     darwin MacPasteboard
 );
 
-use_ok 'Clipboard::Xclip';
 use_ok 'Clipboard';
+
+# Preferentially use Clipboard::WaylandClipboard if we see WAYLAND_DISPLAY
+if (exists($ENV{WAYLAND_DISPLAY}) && length($ENV{WAYLAND_DISPLAY}))
+{
+    use_ok 'Clipboard::WaylandClipboard';
+    foreach my $os (sort keys %map) {
+      $map{$os} = 'WaylandClipboard' if ($map{$os} ne 'Win32');
+    }
+} else {
+    use_ok 'Clipboard::Xclip';
+}
 
 if ( exists $ENV{SSH_CONNECTION} && Clipboard::Xclip::xclip_available() )
 {
@@ -31,6 +41,7 @@ ok( exists $INC{"Clipboard/$drv.pm"}, "Driver-check ($drv)" );
 eval {
     local %ENV = %ENV;
     delete $ENV{DISPLAY};
+    delete $ENV{WAYLAND_DISPLAY};
     Clipboard->find_driver('NonOS');
 };
 like(

@@ -8,7 +8,7 @@ no warnings 'uninitialized';
 use Test::More;
 
 BEGIN {
-    if ($] > 41) {
+    if ($] >= 5.041) {
         plan skip_all => "Can't test against former ~~ operator in Perl $]";
     }
 }

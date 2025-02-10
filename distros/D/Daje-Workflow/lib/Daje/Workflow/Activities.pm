@@ -38,7 +38,11 @@ sub activity($self, $context, $activity, $workflow_data) {
     my $result = 1;
     if ($self->_pre_checks($activity->{pre_checks}
         and $self->error->has_error() == 0)) {
-        my $class = load_class $activity->{activity};
+        if (my $e = load_class $activity->{activity}) {
+            $self->error->add_error($e);
+            $self->error->add_error($activity->{activity} . " Not found ");
+        }
+        return 0 if $self->error->has_error();
 
         my $activity_data;
         $activity_data = $activity->{activity_data}
@@ -57,11 +61,13 @@ sub activity($self, $context, $activity, $workflow_data) {
             eval {
                 $object->$method
             };
-            $self->error->error($@) if defined $@;
+            $self->error->add_error($@) if defined $@;
         }
         else {
-            $self->error->error(
-                $activity->{activity} . " does not have a method called " . $activity->{method}
+            $self->error->add_error(
+                $activity->{activity} .
+                    " does not have a method called '" .
+                    $activity->{method} . "'"
             );
         }
         if ($self->error->has_error() == 0) {
@@ -74,7 +80,6 @@ sub activity($self, $context, $activity, $workflow_data) {
             $workflow_data->{state} = $activity->{resulting_state};
         }
     }
-    my $test = 1;
 
     return 1;
 }

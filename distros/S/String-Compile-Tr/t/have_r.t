@@ -16,11 +16,14 @@ subtest 'non-destructive on arg' => sub {
     my $result;
 
     plan 5;
-    ok lives {$tr = trgen($x, $y, 'r')}, 'compile', $@;
-    ref_ok $tr, 'CODE', 'is sub';
-    ok lives {$result = $tr->($s)}, 'call', $@;
-    is $result, 'ed321', 'result';
-    is $s, 'edcba', 'arg not modified';
+    SKIP: {
+        ok lives {$tr = trgen($x, $y, 'r')}, 'compile', $@
+            or skip 'gen failed', 4;
+        ref_ok $tr, 'CODE', 'is sub' or skip 'no code', 3;
+        ok lives {$result = $tr->($s)}, 'call', $@ or skip 'call failed', 2;
+        is $result, 'ed321', 'result';
+        is $s, 'edcba', 'arg not modified';
+    }
 };
 
 subtest 'non-destructive on default' => sub {
@@ -31,9 +34,13 @@ subtest 'non-destructive on default' => sub {
     my $result;
 
     plan 5;
-    ok lives {$tr = trgen($x, $y, 'r')}, 'compile', $@;
-    ref_ok $tr, 'CODE', 'is sub';
-    ok lives {$result = $tr->()}, 'call', $@ for $s;
-    is $result, 'ed321', 'result';
-    is $s, 'edcba', 'arg not modified';
+    SKIP: {
+        ok lives {$tr = trgen($x, $y, 'r')}, 'compile', $@
+            or skip 'gen failed', 4;
+        ref_ok $tr, 'CODE', 'is sub' or skip 'no code', 3;
+        ok lives {$result = $tr->()}, 'call', $@ or skip 'call failed', 2
+            for $s;
+        is $result, 'ed321', 'result';
+        is $s, 'edcba', 'arg not modified';
+    }
 };

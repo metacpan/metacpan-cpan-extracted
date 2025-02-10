@@ -1,0 +1,61 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 6c0ff66bdcc803d8fdecf5b3fb58ba194b3d6cff12de3f6f0b329b7f96ca5096 CONCEPT
+SHA256 80556b600cb275a4428979be4239a36f1aad76d790759e39d1db8d00f1be36ce Changes
+SHA256 f1494c020b5d310b0a59778e62539d5cffae4e3e66d0cdc769871d95a364d265 Icon.pm
+SHA256 553db1b292757f331d25abe52bd1b57c9deb4e4e9e2512fa4e9972c7b0f6a85f LICENSE
+SHA256 8fa7be057f96efb9908979278d3eb075e46c16d9e1be3af422d13ec9ee75fe69 MANIFEST
+SHA256 15d9f0c22238d5581de74cfd497f55960f43aeb93d47685fcd8853b25c841ef2 META.yml
+SHA256 3f499d8e44b3311fbff9a19ff2cee333feaec9ca998a5b5ddb17a27a6ecb15cc Makefile.PL
+SHA256 36417425c470cfb7efad5c391ab7467263f457b19093ac2e12dd9af1c084fecd README
+SHA256 90d49110f52eb5b1fb0cdd4538d806859a13668001f8040b46f8f570085f184c examples/create_char_icon_and_print.pl
+SHA256 fab3830ef5d1a1dce4bf045cd9d1b574eda30cc3f9c26b70a66e785a81b8b4c4 examples/create_image_icon_and_print.pl
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 119cea4cfef4e000a63b1c0b46e46785614eed5786763fe2a57c7255c74c79d1 t/Data-Icon/01-use.t
+SHA256 c78743f2c18e5b8c72f8135f4e826882cfc583467189e784d756766983b8c383 t/Data-Icon/02-version.t
+SHA256 b5410e1089a86ab99ca34986f2042cbe63819f9713c62f66e83da472be3a4886 t/Data-Icon/03-new.t
+SHA256 d9371f7b5d9757fb9ae2b4a9e5d25953a45d1047b2e50c63508f95ecc5c1ba44 t/Data-Icon/04-alt.t
+SHA256 5869f15f917b1dc9a64a914638919a574785e437f23886a5ccf4e3e8198b3212 t/Data-Icon/05-bg_color.t
+SHA256 ed3ae95efd4fdaf5dc28214619637470d35a7d829afc4be66ee5db20cd03ae02 t/Data-Icon/06-char.t
+SHA256 c431f8ac20604dffb9aec057205d28506b36e588c3123adff3fe52dc2529f3d5 t/Data-Icon/07-color.t
+SHA256 dc297aec5ac30859c1e401e574c46798ca884d6850789a65cc213788316d52f6 t/Data-Icon/08-url.t
+SHA256 db7a0d0ace040487e0ee4c64b2fd9029f193453c1e07ffd181f5e7859445cf23 xt/Data-Icon/01-pod_coverage.t
+SHA256 1fe8458e8810f1597b5a28c6025fa3ca5eeb5c696b7cbc4ac17b525d4340b81b xt/Data-Icon/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEE7CqvgROezncwcOKionze/HtIOPAFAmeo56gACgkQonze/HtI
+OPAedAv9FQtpyVQK/UyTQeBLFhAWlq1Pc90XUvNDIA7+zWoD9hCDhTyAmXTWzIzB
+FdGyRKcWZvtD3aL+iv9Kln2t0SlsChScFps+KUro7o3HYmn0N96CgrLtv6Om/iTV
+AblEXuzQIhDE7jQYAaX2igPR/Opq202BQu91Ij4y8+ImVeUcDPBJdd7GJkfqqJFO
+FBrE2IuOvPEACk/hvphvBsKFo9fuWFjVSxKLFuylEK1ukTFgB/Lezmx8sG2Q5VRg
+TCyGLpDrRvIMkrDaM+gkYdqSGWtWLeE80EQgHj5nlUB1j7UWTSX752mF6461ujo+
+PHsJl+I65zKOnQw8kVtlgsCfGy0ERzBoicirUW+rrt3pFT45SmlfHepugErGf1p9
+h6W8FUGefWBuwhROTe99hKcM/nRhX5dW7tioIL+l+9ZDCauKlyIqzv3cpgRu4396
+vykLQ368qJ9RDpD/vTY/e49XzNAJI57ZE18vR6qvTRp/12maJLfb8Oe+NRaz8x0K
+07fdI0zk
+=wozL
+-----END PGP SIGNATURE-----

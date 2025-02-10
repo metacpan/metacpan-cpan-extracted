@@ -18,7 +18,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "Clipboard",
-  "dist_version" => "0.31",
+  "dist_version" => "0.32",
   "license" => "perl",
   "module_name" => "Clipboard",
   "recursive_test_files" => 1,

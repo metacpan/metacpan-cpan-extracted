@@ -3,6 +3,7 @@ abstract: 'Data objects for info box.'
 author:
   - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
+  Data::Icon: 0
   Data::Text::Simple: 0
   English: 0
   Error::Pure::Utils: 0
@@ -37,4 +38,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Data-InfoBox
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Data-InfoBox
-version: '0.02'
+version: '0.03'

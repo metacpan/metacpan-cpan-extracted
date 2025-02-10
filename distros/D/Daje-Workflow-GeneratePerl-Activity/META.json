@@ -61,7 +61,7 @@
       },
       "Daje::Workflow::GeneratePerl::Activity" : {
          "file" : "lib/Daje/Workflow/GeneratePerl/Activity.pm",
-         "version" : "0.06"
+         "version" : "0.11"
       },
       "Daje::Workflow::GeneratePerl::Base::Common" : {
          "file" : "lib/Daje/Workflow/GeneratePerl/Base/Common.pm"
@@ -99,7 +99,7 @@
          "web" : "https://github.com/janeskil1525/Daje-Workflow-GeneratePerl-Activity"
       }
    },
-   "version" : "0.06",
+   "version" : "0.11",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

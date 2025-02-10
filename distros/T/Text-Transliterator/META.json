@@ -4,7 +4,7 @@
       "Laurent Dami <dami@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4232",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -34,11 +34,11 @@
    "provides" : {
       "Text::Transliterator" : {
          "file" : "lib/Text/Transliterator.pm",
-         "version" : "1.04"
+         "version" : "1.05"
       },
       "Text::Transliterator::Unaccent" : {
          "file" : "lib/Text/Transliterator/Unaccent.pm",
-         "version" : "1.04"
+         "version" : "1.05"
       }
    },
    "release_status" : "stable",
@@ -53,6 +53,6 @@
          "url" : "https://github.com/damil/Text-Transliterator"
       }
    },
-   "version" : "1.04",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "1.05",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

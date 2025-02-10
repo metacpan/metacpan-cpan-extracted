@@ -5,7 +5,7 @@ use Email::Address;
 use Mail::DMARC::PurePerl;
 use namespace::clean;
 
-our $VERSION = '1.1.2'; # VERSION
+our $VERSION = '1.1.4'; # VERSION
 # ABSTRACT: send out messages from subscribers' addresses only if DMARC allows it
 
 
@@ -19,36 +19,38 @@ around munge_mail => sub ($orig,$self,$incoming_mail) {
     my ($from) = Email::Address->parse($incoming_mail->header_str('From'));
     my $from_domain = $from->host;
 
-    my $dmarc = Mail::DMARC::PurePerl->new(
-        resolver => $self->dmarc_resolver,
-    );
-    $dmarc->header_from($from_domain);
+    if ($from_domain ne $self->post_address->host) {
+        my $dmarc = Mail::DMARC::PurePerl->new(
+            resolver => $self->dmarc_resolver,
+        );
+        $dmarc->header_from($from_domain);
 
-    if (my $policy = $dmarc->discover_policy) {
-        # sp applies to sub-domains, defaults to p; p applies to the
-        # domain itself, and is required
-        my $relevant_value = $dmarc->is_subdomain
-            ? ( $policy->sp // $policy->p )
-            : $policy->p;
+        if (my $policy = $dmarc->discover_policy) {
+            # sp applies to sub-domains, defaults to p; p applies to
+            # the domain itself, and is required
+            my $relevant_value = $dmarc->is_subdomain
+                ? ( $policy->sp // $policy->p )
+                : $policy->p;
 
-        if ($relevant_value ne 'none') {
-            $incoming_mail->header_str_set(
-                'Original-From' => $from,
-            );
+            if ($relevant_value ne 'none') {
+                $incoming_mail->header_str_set(
+                    'Original-From' => $from,
+                );
 
-            $from->address($sender);
+                $from->address($sender);
 
-            $incoming_mail->header_str_set(
-                From => $from,
-            );
+                $incoming_mail->header_str_set(
+                    From => $from,
+                );
 
-            return $self->$orig($incoming_mail);
+                return $self->$orig($incoming_mail);
+            }
         }
     }
 
     $incoming_mail->header_str_set(
         Sender => $sender,
-    );
+    ) if $sender ne $from->address;
 
     return $self->$orig($incoming_mail);
 
@@ -68,7 +70,7 @@ Sietima::Role::NoSpoof::DMARC - send out messages from subscribers' addresses on
 
 =head1 VERSION
 
-version 1.1.2
+version 1.1.4
 
 =head1 SYNOPSIS
 
@@ -80,7 +82,8 @@ A L<< C<Sietima> >> list with this role applied will replace the
 C<From> address with its own L<<
 C<post_address>|Sietima::Role::WithPostAddress >> (this is a
 "sub-role" of L<< C<WithPostAddress>|Sietima::Role::WithPostAddress
->>) I<if> the originating address's DMARC policy requires it.
+>>) I<if> the C<From> is on a different domain and the originating
+address's DMARC policy requires it.
 
 This will make the list DMARC-compliant while minimising the changes
 to the messages.
@@ -105,13 +108,15 @@ a C<Sender> header with the list's own address.
 
 This role does exactly that.
 
+=for Pod::Coverage dmarc_resolver
+
 =head1 AUTHOR
 
 Gianni Ceccarelli <dakkar@thenautilus.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Gianni Ceccarelli <dakkar@thenautilus.net>.
+This software is copyright (c) 2025 by Gianni Ceccarelli <dakkar@thenautilus.net>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

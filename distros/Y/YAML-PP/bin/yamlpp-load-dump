@@ -21,7 +21,8 @@ GetOptions(
     'header!' => \my $header,
     'footer!' => \my $footer,
     'merge' => \my $merge,
-    'catchall' => \my $catchall,
+    #'catchall' => \my $catchall,
+    'require-footer' => \my $require_footer,
     'perl' => \my $perl,
     'preserve|P=s' => \my $preserve,
     'module|M=s' => \my $module,
@@ -51,9 +52,9 @@ if ($merge) {
 if ($perl) {
     push @schema, 'Perl';
 }
-if ($catchall) {
-    push @schema, 'Catchall';
-}
+#if ($catchall) {
+#    push @schema, 'Catchall';
+#}
 
 my $preserve_order = 1;
 if (defined $preserve) {
@@ -144,6 +145,7 @@ sub _yamlpp {
         footer => $footer ? 1 : 0,
         yaml_version => \@yaml_versions,
         version_directive => $version_directive || 0,
+        require_footer => $require_footer,
     );
     if ($inc) {
         $inc->yp($ypp);
@@ -291,7 +293,7 @@ Options:
     --[no-]header         Print '---' (default)
     --[no-]footer         Print '...'
     --merge               Enable loading merge keys '<<'
-    --catchall            Ignore any unknown tags
+    --require-footer      Require '...' and the end of each document
     --perl                Enable loading perl types and objects (use only
                           on trusted input!)
     --preserve, -P        Comma separated: 'order', 'scalar', 'flow', 'alias'.
@@ -307,5 +309,6 @@ Options:
     --include-absolute    Allow absolute paths and ../../../ in includes (use
                           only on trusted input!)
 EOM
+#    --catchall            Ignore any unknown tags
     exit $rc;
 }

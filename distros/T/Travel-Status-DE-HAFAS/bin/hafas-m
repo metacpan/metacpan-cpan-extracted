@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.014;
 
-our $VERSION = '6.17';
+our $VERSION = '6.18';
 
 use utf8;
 use DateTime;
@@ -59,7 +59,7 @@ GetOptions(
 
 if ($list_services) {
 	printf(
-		"%-40s %-14s %-15s %s\n\n",
+		"%-40s  %-14s %-15s %s\n\n",
 		'operator', 'abbr. (-s)', 'languages (-l)',
 		'time zone'
 	);
@@ -70,8 +70,10 @@ if ($list_services) {
 			next;
 		}
 		printf(
-			"%-40s %-14s %-15s %s\n",
-			@{$service}{qw(name shortname)},
+			"%-40s%1s %-14s %-15s %s\n",
+			$service->{name},
+			$service->{geoip_lock} ? q{!} : q{ },
+			$service->{shortname},
 			join( q{ }, @{ $service->{languages} // [] } ),
 			$service->{time_zone} // q{},
 		);
@@ -657,8 +659,8 @@ else {
 		}
 
 		my $entry = [
-			  ( $d->is_cancelled ? '--:--' : $d->datetime->strftime('%H:%M') )
-			. ( $d->tz_offset    ? q{*}    : ( q{ } x $offset_len ) ),
+			( $d->is_cancelled  ? '--:--' : $d->datetime->strftime('%H:%M') )
+			  . ( $d->tz_offset ? q{*}    : ( q{ } x $offset_len ) ),
 			$d->is_cancelled
 			? q{}
 			: format_delay( $d->delay, $delay_len ),
@@ -721,7 +723,7 @@ B<hafas-m> [B<-s> I<service>] [B<-l> I<language>] B<!>I<query>|I<journeyID>
 
 =head1 VERSION
 
-version 6.17
+version 6.18
 
 =head1 DESCRIPTION
 
@@ -816,6 +818,10 @@ Note that requesting an invalid/unsupported language may lead to garbage output.
 
 List known HAFAS instances and exit. Use B<-s>|B<--service> to select a
 service from this list for a HAFAS request.
+
+Instances marked with an exclamation mark (C<< ! >>) are behind a GeoIP filter
+and may need a proxy to work. See the documentation of get_active_service in
+Travel::Status::DE::HAFAS(3pm) for details.
 
 =item B<-m>, B<--mot> I<motlist> (monitor)
 

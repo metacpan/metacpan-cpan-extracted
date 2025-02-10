@@ -21,6 +21,7 @@ eg/patterns
 eg/purdie-shuffle
 eg/reggae
 eg/swing
+eg/swing-fills.pl
 eg/syncopation/lesson-01.pl
 eg/syncopation/lesson-02.pl
 eg/syncopation/lesson-03.pl
@@ -37,6 +38,7 @@ eg/syncopation/patterns
 eg/tomorrow-never-knows
 eg/waltz
 lib/MIDI/Drummer/Tiny.pm
+lib/MIDI/Drummer/Tiny/SwingFills.pm
 lib/MIDI/Drummer/Tiny/Syncopate.pm
 lib/MIDI/Drummer/Tiny/Tutorial/Advanced.pod
 lib/MIDI/Drummer/Tiny/Tutorial/Basics.pod

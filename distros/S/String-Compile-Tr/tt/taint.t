@@ -1,6 +1,6 @@
 #!perl -T
 
-use 5.006;
+use 5.010;
 use Test2::V0;
 
 use String::Compile::Tr;
@@ -17,10 +17,15 @@ subtest 'run on tainted' => sub {
     my $tr;
 
     plan 6;
-    ok tainted($x), 'x is tainted';
-    ok tainted($opt), 'opt is tainted';
-    ok lives {$tr = trgen($x, $y, $opt)}, 'compile', $@;
-    ref_ok $tr, 'CODE', 'is sub';
-    ok lives {$tr->($s)}, 'call', $@;
-    is $s, 'eedd321', 'result';
+    SKIP: {
+        my $todo = 'should support taint mode';
+        ok tainted($x), 'x is tainted';
+        ok tainted($opt), 'opt is tainted';
+        undef $todo;
+        ok lives {$tr = trgen($x, $y, $opt)}, 'compile', $@
+            or skip 'gen failed', 3;
+        ref_ok $tr, 'CODE', 'is sub' or skip 'no code', 2;
+        ok lives {$tr->($s)}, 'call', $@ or skip 'call failed';
+        is $s, 'eedd321', 'result';
+    }
 };

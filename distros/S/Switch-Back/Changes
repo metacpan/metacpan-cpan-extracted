@@ -23,3 +23,10 @@ Revision history for Switch-Back
         Skip all comparisons with actual ~~ behaviours (in t/smartmatch_complex.t)
         in versions of Perl that no longer support the ~~ operator
         (Thanks, Andreas)
+
+
+0.000005  Sun Feb  9 22:29:55 2025
+
+        Correct thinko with Perl versioning
+        (Sorry, Andreas!)
+

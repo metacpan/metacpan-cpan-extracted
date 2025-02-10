@@ -1,0 +1,39 @@
+==================================================
+Changes from 2024-02-10 00:00:00 +0000 to present.
+==================================================
+
+----------------------------------------
+version 0.2 at 2025-02-09 19:21:01 +0000
+----------------------------------------
+
+  Change: 2773812a6bc70d844365d58db461793d17fac5d4
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2025-02-09 20:19:25 +0000
+
+    chore: ignore more files 
+
+  Change: 45f16307ccab87245926c8214a58bcb85bb283ad
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2025-02-09 20:18:26 +0000
+
+    fix: fixed package name 
+
+----------------------------------------
+version 0.1 at 2025-02-09 19:07:14 +0000
+----------------------------------------
+
+  Change: 2deabe834afd3c9307b95086341032315750908b
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2025-02-09 20:07:14 +0000
+
+    chore: ignore some files 
+
+  Change: 21f8cddca69bc3ab14c190e05ad52b75a5be610d
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2025-02-09 20:05:26 +0000
+
+    chore: initial commit 
+
+================
+End of releases.
+================

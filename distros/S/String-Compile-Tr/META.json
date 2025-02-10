@@ -36,13 +36,13 @@
             "Carp" : "0",
             "Exporter::Shiny" : "0",
             "overload" : "0",
-            "perl" : "5.006"
+            "perl" : "5.010"
          }
       },
       "test" : {
          "requires" : {
             "Scalar::Util" : "0",
-            "Test2::V0" : "0",
+            "Test2::V0" : "0.000060",
             "Test::More" : "0"
          }
       }
@@ -55,6 +55,6 @@
          "web" : "https://github.com/jo-37/String-Compile-Tr.git"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

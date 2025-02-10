@@ -15,7 +15,8 @@ GetOptions(
     'cyclic' => \my $cyclic,
     'duplicate-keys' => \my $duplicate_keys,
     'merge' => \my $merge,
-    'catchall' => \my $catchall,
+    #'catchall' => \my $catchall,
+    'require-footer' => \my $require_footer,
     'perl' => \my $perl,
     'module|M=s' => \my $module,
     'yaml-version=s' => \my $yaml_version,
@@ -34,9 +35,9 @@ if ($merge) {
 if ($perl) {
     push @schema, 'Perl';
 }
-if ($catchall) {
-    push @schema, 'Catchall';
-}
+#if ($catchall) {
+#    push @schema, 'Catchall';
+#}
 
 my ($file) = @ARGV;
 my $yaml;
@@ -78,6 +79,7 @@ sub _yamlpp {
         duplicate_keys => $duplicate_keys ? 1 : 0,
         preserve => PRESERVE_ORDER,
         yaml_version => \@yaml_versions,
+        require_footer => $require_footer,
     );
     my @docs = $ypp->load_string($yaml);
     return @docs;
@@ -141,12 +143,13 @@ Options:
     --cyclic              Allow cyclic references
     --duplicate-keys      Allow duplicate keys
     --merge               Enable loading merge keys '<<'
-    --catchall            Ignore any unknown tags
+    --require-footer      Require '...' and the end of each document
     --perl                Enable loading perl types and objects (use only
                           on trusted input!)
     --module -M           YAML::PP (default), YAML, YAML::PP::LibYAML,
                           YAML::Syck, YAML::Tiny, YAML::XS, YAML::PP::Ref
     --yaml-version=       '1.2' (default), '1.1', '1.2,1.1', '1.1,1.2'
 EOM
+    #--catchall            Ignore any unknown tags
     exit $rc;
 }

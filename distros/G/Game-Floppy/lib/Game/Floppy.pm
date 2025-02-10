@@ -1,8 +1,9 @@
 use 5.38.0;
 use experimental 'class';
-our $VERSION = 0.05;
 
+package Game::Floppy 0.07;
 class Game::Floppy {
+	our $VERSION = 0.07;
 	use Raylib::App;
 	use Raylib::FFI;
 	use Raylib::Color;
@@ -115,7 +116,7 @@ class Game::Floppy {
 				if ($score > $hi_score) {
 					 $hi_score = $score;
 				}
-				unshift @tubes;
+				shift @tubes if scalar @tubes;
 			}
 
 
@@ -143,7 +144,7 @@ Game::Floppy - Floppy bird using raylib
 
 =head1 VERSION
 
-Version 0.05
+Version 0.07
 
 =cut
 

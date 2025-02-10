@@ -1,5 +1,5 @@
 package Clipboard::WaylandClipboard;
-$Clipboard::WaylandClipboard::VERSION = '0.31';
+$Clipboard::WaylandClipboard::VERSION = '0.32';
 # First written 04/11/2024 by Lester Hightower (PAUSE ID hightowe)
 
 use strict;
@@ -99,7 +99,7 @@ __END__
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

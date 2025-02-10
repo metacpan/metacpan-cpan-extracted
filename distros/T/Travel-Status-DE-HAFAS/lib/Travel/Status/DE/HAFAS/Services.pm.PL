@@ -72,8 +72,15 @@ sub load_instance {
 		$ret{request}{ver} = $data->{options}{version};
 	}
 
+	if ( $opt{geoip_lock} ) {
+		$ret{geoip_lock} = $opt{geoip_lock};
+	}
+
 	if ( $opt{lang} ) {
 		$ret{request}{lang} = $opt{lang};
+	}
+	if ( $opt{ua_string} ) {
+		$ret{ua_string} = $opt{ua_string};
 	}
 	if ( $opt{ver} ) {
 		$ret{request}{ver} = $opt{ver};
@@ -179,6 +186,11 @@ my %hafas_instance = (
 		),
 		stopfinder => 'https://fahrplan.oebb.at/bin/ajax-getstop.exe',
 	},
+	PKP => {
+		load_instance( 'pl/pkp', lang => 'pol' ),
+		ua_string  => 'Dalvik/2.1.0',
+		geoip_lock => 'PKP'
+	},
 	Resrobot => { load_instance( 'se/resrobot', lang => 'sve' ), },
 	RMV      => { load_instance( 'de/rmv',      lang => 'deu' ), },
 	RSAG     => { load_instance( 'de/rsag',     lang => 'deu' ), },
@@ -235,7 +247,7 @@ use warnings;
 use 5.014;
 use utf8;
 
-our $VERSION = '6.17';
+our $VERSION = '6.18';
 
 # Most of these have been adapted from
 # <https://github.com/public-transport/transport-apis> and

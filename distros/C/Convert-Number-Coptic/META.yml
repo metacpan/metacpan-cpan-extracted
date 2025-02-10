@@ -1,23 +1,29 @@
 ---
 abstract: 'Conversion for Coptic Numerals in Perl.'
 author:
-  - 'Daniel Yacob <dyacob@cpan.org>'
-build_requires:
-  ExtUtils::MakeMaker: '0'
+  - 'Daniel Yacob <dyacob\@cpan.org>'
+build_requires: {}
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Convert-Number-Coptic
-no_index:
-  directory:
-    - t
-    - inc
+provides:
+  Convert::Number::Coptic:
+    file: lib/Convert/Number/Coptic.pm
+    version: '0.15'
 requires:
-  perl: '5.006001'
-version: '0.14'
+  Regexp::Ethiopic: '0.10'
+  perl: v5.6.1
+resources:
+  bugtracker: https://github.com/dyacob/Convert-Number-Coptic/issues
+  homepage: https://github.com/dyacob/Convert-Number-Coptic
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/dyacob/Convert-Number-Coptic.git
+version: '0.15'
+x_authority: cpan:dyacob
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

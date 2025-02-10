@@ -7,7 +7,7 @@ use Types::Standard qw(Object CodeRef);
 use Type::Params -sigs;
 use namespace::clean;
 
-our $VERSION = '1.1.2'; # VERSION
+our $VERSION = '1.1.4'; # VERSION
 # ABSTRACT: base role for "closed" lists
 
 
@@ -51,7 +51,7 @@ Sietima::Role::SubscriberOnly - base role for "closed" lists
 
 =head1 VERSION
 
-version 1.1.2
+version 1.1.4
 
 =head1 SYNOPSIS
 
@@ -114,7 +114,7 @@ Gianni Ceccarelli <dakkar@thenautilus.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Gianni Ceccarelli <dakkar@thenautilus.net>.
+This software is copyright (c) 2025 by Gianni Ceccarelli <dakkar@thenautilus.net>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

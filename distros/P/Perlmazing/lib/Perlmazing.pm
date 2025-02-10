@@ -9,7 +9,7 @@ use List::Util qw(
   pairs unpairs pairkeys pairvalues pairfirst pairgrep pairmap
   uniq uniqint uniqnum uniqstr head tail zip mesh
 );
-our $VERSION = '2.0016';
+our $VERSION = '2.0018';
 our @found_symbols = Perlmazing::Engine->found_symbols;
 our %EXPORT_TAGS = (
   all => \@found_symbols,
@@ -146,9 +146,11 @@ You have these export tags available for convenience (since version 2.008):
   columnize, in_array, merge, remove_duplicates, shuffle, sort_by_key, sort_by_value, taint, tainted, untaint
 
 :number
+
   avg, ceil, decimals, is_integer, min, max
 
 :list
+
   all, any, avg, columnize, first, head, max, maxstr, mesh, min, minstr, none, notall, pairfirst, pairgrep, pairkeys, pairmap, pairs, pairvalues, product, reduce, reductions, shuffle, sum, sum0, tail, uniq, uniqint, uniqnum, uniqstr, unpairs, zip
 
 All this doesn't mean you have to work like that in your own module when using L<Perlmazing::Engine>. It also doesn't mean
@@ -651,7 +653,9 @@ For example:
 =head2 fout
 
 C<fout($filename, $data)>
+
 C<fout($filename, $data, $binmode)>
+
 C<fout($filename, $data, $encoding)>
 
 This function is the opposite of L<slurp|Perlmazing/slurp>. It's just a fast, practical way to write content to a file. If the third argument equals 1, it means to write the file with binmode enabled. If the value of that third argument is true and different to 1, then it's taken as a valid encoding name to be used while writting to the file.
@@ -678,7 +682,7 @@ Same as L<List::Util::first|List::Util>.
 
 =head2 get_time_from
 
-C<get_time_from(year => $year, month => $month, day => $day)>
+C<get_time_from(year =E<gt> $year, month =E<gt> $month, day =E<gt> $day)>
 
 Same as L<Time::Precise::get_time_from()|Time::Precise/get_time_from>. Returns time in seconds including nanoseconds.
 
@@ -1019,7 +1023,7 @@ return the I<md5> representation (in hexadecimal) of that file's contents.
 
 =head2 merge
 
-C<merge(%hash, key1 => $value1, key2 => $value2, ...)>
+C<merge(%hash, key1 =E<gt> $value1, key2 =E<gt> $value2, ...)>
 
 This function is to a hash what C<push> is to an array. It will allow you to add as many keys as you want to an existing hash
 without having to create an splice or having to use the name of the hash for each assignment. If keys are repeated or existent,
@@ -1683,7 +1687,9 @@ Same as L<List::Util::unpairs|List::Util>.
 =head2 truncate_text
 
 C<truncate_text($string, $length)>
+
 C<truncate_text($string, $length, '...')>
+
 C<truncate_text($string, $length, '...', '...')>
 
 This is I<almost> the same as C<substr($string, 0, $length)>, except this function will try not to cut words in the middle. Instead, it will look for the longest possible substring (according to C<$length>) where no word is cut in half.

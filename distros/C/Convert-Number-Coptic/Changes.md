@@ -1,0 +1,26 @@
+# Revision History for the Convert::Number::Coptic Perl Distribution
+
+## 0.15 Sat Feb  8 14:30:23 EST 2025
+	- Migration to a Build.PL & GitHub system.
+
+## 0.14 Sun Feb  2 07:47:40 EST 2025
+	- Fixes as per CPANTS:
+	  + LICENSE added.
+	  + packaged with GNU tar.
+	  + Added 'use warnings'.
+	  + Added MIN_PERL_VERSION to Makefile.PL
+
+## 0.13 Sun Jun 22 16:45:22 EDT 2003
+	- added optimization flags to REs.
+
+## 0.12 Thu Jun 19 08:36:42 EDT 2003
+	- Renamed Convert::Number::Coptic.
+	- cleaned up some documentation.
+
+## 0.11 Sun Oct 13 21:46:45 EDT 2002
+	- Perl 5.8 didn't like the utf-8 qr// that 5.6
+          had no problem with.  Removed the qr and hard
+	  coded the regex.
+
+## 0.10  Sat Oct 12 16:10:31 EDT 2002
+	- Initial release.

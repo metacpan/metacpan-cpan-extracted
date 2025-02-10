@@ -16,6 +16,7 @@ use Test::EOL;
 
 my @files = (
     'lib/MIDI/Drummer/Tiny.pm',
+    'lib/MIDI/Drummer/Tiny/SwingFills.pm',
     'lib/MIDI/Drummer/Tiny/Syncopate.pm',
     'lib/MIDI/Drummer/Tiny/Tutorial/Advanced.pod',
     'lib/MIDI/Drummer/Tiny/Tutorial/Basics.pod',

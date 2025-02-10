@@ -35,21 +35,21 @@ $Perlmazing::Feature::VERSION to $] or to any other limit.
 
 This aims to be the equivalent of:
 
-	use strict;
-	use warnings;
-	use $]; # your Perl version - this doesn't work as written, by the way.
-	
+  use strict;
+  use warnings;
+  use $]; # your Perl version - this doesn't work as written, by the way.
+  
 Instead of that, all you have to do is:
 
-	use Perlmazing::Feature;
-	
+  use Perlmazing::Feature;
+  
 And, if you want the same thing for any module or scrit calling your module, then you can simply do this:
 
-	use Perlmazing::Feature
-	
-	sub import {
-		Perlmazing::Feature->import;
-	}
+  use Perlmazing::Feature
+  
+  sub import {
+    Perlmazing::Feature->import;
+  }
 
 
 =head1 AUTHOR

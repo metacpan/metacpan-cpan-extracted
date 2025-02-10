@@ -65,7 +65,6 @@ sub convert_colour {
         my %args = @_;
         
         my $colour = fadein($args{start}, $args{fade});
-
 	is($colour->toRGBA, $args{expected}, $args{expected});
 }
 

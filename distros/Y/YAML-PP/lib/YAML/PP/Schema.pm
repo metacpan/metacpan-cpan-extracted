@@ -4,7 +4,7 @@ package YAML::PP::Schema;
 use B;
 use Module::Load qw//;
 
-our $VERSION = 'v0.38.1'; # VERSION
+our $VERSION = 'v0.39.0'; # VERSION
 
 use YAML::PP::Common qw/ YAML_PLAIN_SCALAR_STYLE /;
 
@@ -320,9 +320,9 @@ sub load_scalar {
                 }
             }
         }
-        unless ($res) {
-            croak "Unknown tag '$tag'. Use schema 'Catchall' to ignore unknown tags";
-        }
+        #unless ($res) {
+        #    croak "Unknown tag '$tag'. Use schema 'Catchall' to ignore unknown tags";
+        #}
     }
     else {
         $res = $resolvers->{value};
@@ -383,7 +383,7 @@ sub create_sequence {
                 }
             }
         }
-        croak "Unknown tag '$tag'. Use schema 'Catchall' to ignore unknown tags";
+        #croak "Unknown tag '$tag'. Use schema 'Catchall' to ignore unknown tags";
     }
 
     return ($data, $on_data);
@@ -414,7 +414,7 @@ sub create_mapping {
                 }
             }
         }
-        croak "Unknown tag '$tag'. Use schema 'Catchall' to ignore unknown tags";
+        #croak "Unknown tag '$tag'. Use schema 'Catchall' to ignore unknown tags";
     }
 
     return ($data, $on_data);

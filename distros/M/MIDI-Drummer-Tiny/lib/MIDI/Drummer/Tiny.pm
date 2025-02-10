@@ -3,19 +3,18 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Glorified metronome
 
-our $VERSION = '0.5010';
+our $VERSION = '0.5011';
 
 use Moo;
 use strictures 2;
 use Data::Dumper::Compact qw(ddc);
 use List::Util qw(sum0);
 use Math::Bezier ();
-use MIDI::Util qw(dura_size reverse_dump set_time_signature timidity_conf play_timidity play_fluidsynth);
+use MIDI::Util qw(dura_size reverse_dump set_time_signature timidity_conf play_timidity play_fluidsynth ticks);
 use Music::Duration ();
 use Music::RhythmSet::Util qw(upsize);
 use namespace::clean;
 
-use constant TICKS    => 96; # Per quarter note
 use constant STRAIGHT => 50; # Swing percent
 
 
@@ -142,7 +141,7 @@ has double_dotted_onetwentyeighth => (is => 'ro', default => sub { 'ddzn' });
 
 sub note {
     my ($self, @spec) = @_;
-    my $size = $spec[0] =~ /^d(\d+)$/ ? $1 / TICKS : dura_size($spec[0]);
+    my $size = $spec[0] =~ /^d(\d+)$/ ? $1 / ticks($self->score) : dura_size($spec[0]);
     # warn __PACKAGE__,' L',__LINE__,' ',,"$spec[0]\n";
     # warn __PACKAGE__,' L',__LINE__,' ',,"$size\n";
     $self->counter( $self->counter + $size );
@@ -162,7 +161,7 @@ sub accent_note {
 
 sub rest {
     my ($self, @spec) = @_;
-    my $size = $spec[0] =~ /^d(\d+)$/ ? $1 / TICKS : dura_size($spec[0]);
+    my $size = $spec[0] =~ /^d(\d+)$/ ? $1 / ticks($self->score) : dura_size($spec[0]);
     #warn __PACKAGE__,' L',__LINE__,' ',,"$spec[0] => $size\n";
     $self->counter( $self->counter + $size );
     return $self->score->r(@spec);
@@ -204,7 +203,7 @@ sub metronome3 {
     my $cymbal = shift || $self->closed_hh;
     my $tempo  = shift || $self->quarter;
     my $swing  = shift || 50; # percent
-    my $x = dura_size($tempo) * TICKS;
+    my $x = dura_size($tempo) * ticks($self->score);
     my $y = sprintf '%0.f', ($swing / 100) * $x;
     my $z = $x - $y;
     for ( 1 .. $bars ) {
@@ -227,7 +226,7 @@ sub metronome4 {
     my $cymbal = shift || $self->closed_hh;
     my $tempo  = shift || $self->quarter;
     my $swing  = shift || 50; # percent
-    my $x = dura_size($tempo) * TICKS;
+    my $x = dura_size($tempo) * ticks($self->score);
     my $y = sprintf '%0.f', ($swing / 100) * $x;
     my $z = $x - $y;
     for my $n ( 1 .. $bars ) {
@@ -257,7 +256,7 @@ sub metronome5 {
     my $cymbal = shift || $self->closed_hh;
     my $tempo  = shift || $self->quarter;
     my $swing  = shift || 50; # percent
-    my $x = dura_size($tempo) * TICKS;
+    my $x = dura_size($tempo) * ticks($self->score);
     my $half = $x / 2;
     my $y = sprintf '%0.f', ($swing / 100) * $x;
     my $z = $x - $y;
@@ -295,7 +294,7 @@ sub metronome6 {
     my $cymbal = shift || $self->closed_hh;
     my $tempo  = shift || $self->quarter;
     my $swing  = shift || 50; # percent
-    my $x = dura_size($tempo) * TICKS;
+    my $x = dura_size($tempo) * ticks($self->score);
     my $y = sprintf '%0.f', ($swing / 100) * $x;
     my $z = $x - $y;
     for my $n (1 .. $bars) {
@@ -327,7 +326,7 @@ sub metronome7 {
     my $cymbal = shift || $self->closed_hh;
     my $tempo  = shift || $self->quarter;
     my $swing  = shift || 50; # percent
-    my $x = dura_size($tempo) * TICKS;
+    my $x = dura_size($tempo) * ticks($self->score);
     my $y = sprintf '%0.f', ($swing / 100) * $x;
     my $z = $x - $y;
     for my $n (1 .. $bars) {
@@ -400,7 +399,7 @@ sub flam {
     $patch ||= $self->snare;
     my $x = $MIDI::Simple::Length{$spec};
     my $y = $MIDI::Simple::Length{ $self->sixtyfourth };
-    my $z = sprintf '%0.f', ($x - $y) * TICKS;
+    my $z = sprintf '%0.f', ($x - $y) * ticks($self->score);
     $accent ||= sprintf '%0.f', $self->score->Volume / 2;
     if ($grace eq 'r') {
         $self->rest($self->sixtyfourth);
@@ -699,7 +698,7 @@ MIDI::Drummer::Tiny - Glorified metronome
 
 =head1 VERSION
 
-version 0.5010
+version 0.5011
 
 =head1 SYNOPSIS
 

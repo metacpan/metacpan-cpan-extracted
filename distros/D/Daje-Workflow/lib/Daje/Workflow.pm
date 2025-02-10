@@ -36,7 +36,7 @@ use Daje::Workflow::Errors::Error;
 # janeskil1525 E<lt>janeskil1525@gmail.comE<gt>
 #
 
-our $VERSION = "0.04";
+our $VERSION = "0.05";
 
 has 'workflow_name';    #
 has 'workflow_pkey';    #
@@ -101,6 +101,12 @@ sub _activity($self, $db, $activity_name) {
             model => $self->model,
         )->activity(
             $self->context, $activity, $self->workflow_data()
+        );
+    } else {
+        $self->error->add_error("The workflow '" .
+            $self->workflow_name . "' in state '" .
+            $self->workflow_data->{state} . "' don't have an activity called '" .
+            $activity_name . "'"
         );
     }
 

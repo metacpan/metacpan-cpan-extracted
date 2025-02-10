@@ -28,5 +28,5 @@ requires:
   Struct::Conditional: '1.01'
   Want: '0'
   perl: '5.018'
-version: '0.41'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+version: '0.42'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

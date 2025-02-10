@@ -24,11 +24,11 @@ Test::HTML::T5 - Test::More-style wrapper around HTML::T5
 
 =head1 VERSION
 
-Version 0.013
+Version 0.014
 
 =cut
 
-our $VERSION = '0.013';
+our $VERSION = '0.014';
 
 my $TB = Test::Builder->new;
 
@@ -183,7 +183,7 @@ sub _parse_and_complain
 
 All bugs and requests are now being handled through GitHub.
 
-    https://github.com/petdance/html-lint/issues
+    http://github.com/shlomif/html-tidy5/issues
 
 DO NOT send bug reports to http://rt.cpan.org/.
 

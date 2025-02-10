@@ -22,13 +22,8 @@ sub import {
     return if $imports->{$pack}->{$self};
     my @export = (@_, @{"${self}::EXPORT"});
     @export = $self->_expand_names(@export);
-    my (@yes, $no);
-    for my $i (@export) {
-      if ($i =~ s/^!//) {
-        $no->{$i} = 1;
-      }
-      push (@yes, $i) unless $no->{$i};
-    }
+    my $no = {map {$_ => 1} grep {$_ =~ /^!/} @export};
+    my @yes = grep {!$no->{"!$_"}} grep {$_ !~ /^!/} @export;
     for my $i (@yes) {
       $package->export($self, $i, $pack);
     }

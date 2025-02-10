@@ -62,4 +62,8 @@ test_rewriting    'foo@sub.none-q-pol.com';
 test_rewriting    'foo@q-q-pol.com';
 test_rewriting    'foo@sub.q-q-pol.com';
 
+test_no_rewriting 'foo@example.com';
+
+test_no_rewriting 'foo@' . $s->post_address->host;
+
 done_testing;

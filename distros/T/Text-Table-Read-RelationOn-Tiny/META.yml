@@ -1,28 +1,31 @@
---- #YAML:1.0
-name:               Text-Table-Read-RelationOn-Tiny
-version:            v2.3.4
-abstract:           Read binary "relation on (over) a set" from a text table.
+---
+abstract: 'Read binary "relation on (over) a set" from a text table.'
 author:
-    - Abdul al Hazred <451@gmx.eu>
-license:            artistic_2
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Abdul al Hazred <451@gmx.eu>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    autodie:     0
-    Carp:        0
-    perl:        5.010001
-    strict:      0
-    Test::More:  0
-    version:     0.77
-    warnings:    0
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.55_02
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-Table-Read-RelationOn-Tiny
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  autodie: '0'
+  perl: '5.010001'
+  strict: '0'
+  version: '0.77'
+  warnings: '0'
+version: v2.3.5
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

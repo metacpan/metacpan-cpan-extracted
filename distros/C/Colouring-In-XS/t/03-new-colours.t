@@ -21,7 +21,7 @@ subtest 'basics - black' => sub {
                 expected => '#000',
                 start => 'rgb(0,0,0)',
         );   
-       
+        
 	new_colour_test(
                 expected => '#000',
                 start => 'rgba(0,0,0,1)',
@@ -31,12 +31,12 @@ subtest 'basics - black' => sub {
                 expected => '#000',
                 start => 'hsla(0, 0%, 0%, 1)',
         );
-
 };
 
 sub new_colour_test {
         my %args = @_;
         my $colour = Colouring::In::XS->new($args{start});
+
         is($colour->toCSS, $args{expected}, '*\o/* success');
 }
 

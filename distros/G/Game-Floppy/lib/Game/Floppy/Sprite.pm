@@ -1,8 +1,9 @@
 use 5.38.0;
 use experimental 'class';
-our $VERSION = 0.03;
 
+package Game::Floppy::Sprite 0.07;
 class Game::Floppy::Sprite {
+	our $VERSION = 0.07;
 	use Raylib::FFI;
 	use Raylib::Color;
 

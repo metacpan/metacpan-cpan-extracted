@@ -32,15 +32,19 @@ sub check($self, $context, $checks) {
     for (my $i = 0; $i < $length; $i++) {
         if (length(@{$checks}[$i]->{class})) {
             $self->model->insert_history(@{$checks}[$i]->{checks}, @{$checks}[$i]->{class}, 1);
-            my $class = load_class @{$checks}[$i]->{class};
-            # $class->import();
-            $result = @{$checks}[$i]->{class}->new(
-                context => $context,
-                checks  => @{$checks}[$i]->{checks},
-                error   => $self->error,
-                model => $self->model,
-                db      => $self->db,
-            )->check();
+            if (my $e = load_class @{$checks}[$i]->{class}) {
+                $self->error->add_error($e)
+            }
+            if ($self->error->has_error() == 0) {
+                # $class->import();
+                $result = @{$checks}[$i]->{class}->new(
+                    context => $context,
+                    checks  => @{$checks}[$i]->{checks},
+                    error   => $self->error,
+                    model   => $self->model,
+                    db      => $self->db,
+                )->check();
+            }
         }
     }
     return $result;

@@ -1,11 +1,12 @@
 use strict;
 use warnings;
 
+use Data::Icon;
 use Data::InfoBox::Item;
 use Data::Text::Simple;
 use English;
 use Error::Pure::Utils qw(clean);
-use Test::More 'tests' => 10;
+use Test::More 'tests' => 14;
 use Test::NoWarnings;
 use Unicode::UTF8 qw(decode_utf8);
 
@@ -49,6 +50,42 @@ isa_ok($obj, 'Data::InfoBox::Item');
 
 # Test.
 $obj = Data::InfoBox::Item->new(
+	'icon' => Data::Icon->new(
+		'url' => 'https://example.com/icon.ico',
+	),
+	'text' => Data::Text::Simple->new(
+		'text' => 'Text',
+	),
+	'uri' => 'https://example.com',
+);
+isa_ok($obj, 'Data::InfoBox::Item');
+
+# Test.
+$obj = Data::InfoBox::Item->new(
+	'icon' => Data::Icon->new(
+		'url' => 'images/icon.ico',
+	),
+	'text' => Data::Text::Simple->new(
+		'text' => 'Text',
+	),
+	'uri' => 'https://example.com',
+);
+isa_ok($obj, 'Data::InfoBox::Item');
+
+# Test.
+$obj = Data::InfoBox::Item->new(
+	'icon' => Data::Icon->new(
+		'char' => decode_utf8('⌂'),
+	),
+	'text' => Data::Text::Simple->new(
+		'text' => 'Text',
+	),
+	'uri' => 'https://example.com',
+);
+isa_ok($obj, 'Data::InfoBox::Item');
+
+# Test.
+$obj = Data::InfoBox::Item->new(
 	'text' => Data::Text::Simple->new(
 		'text' => 'john@example.com',
 	),
@@ -80,6 +117,19 @@ eval {
 };
 is($EVAL_ERROR, "Parameter 'icon_url' doesn't contain valid location.\n",
 	"Parameter 'icon_url' doesn't contain valid location (urn:isbn:0451450523).");
+clean();
+
+# Test.
+eval {
+	Data::InfoBox::Item->new(
+		'icon' => 'bad',
+		'text' => Data::Text::Simple->new(
+			'text' => 'Text',
+		),
+	);
+};
+is($EVAL_ERROR, "Parameter 'icon' must be a 'Data::Icon' object.\n",
+	"Parameter 'icon' must be a 'Data::Icon' object. (bad).");
 clean();
 
 # Test.

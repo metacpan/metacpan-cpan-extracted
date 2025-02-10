@@ -13,11 +13,11 @@ HTML::T5 - HTML validation in a Perl object
 
 =head1 VERSION
 
-Version 0.013
+Version 0.014
 
 =cut
 
-our $VERSION = '0.013';
+our $VERSION = '0.014';
 
 =head1 SYNOPSIS
 
@@ -421,10 +421,6 @@ You can also look for information at:
 =item * HTML::T5's issue queue at github
 
 L<http://github.com/shlomif/html-tidy5/issues>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/HTML-T5>
 
 =item * Git source code repository
 

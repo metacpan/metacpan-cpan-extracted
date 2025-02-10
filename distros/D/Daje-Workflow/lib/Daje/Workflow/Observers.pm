@@ -31,14 +31,18 @@ sub observer($self, $context, $observers) {
     my $length = scalar @{$observers};
     for (my $i = 0; $i < $length; $i++) {
         $self->model->insert_history('Observer', @{$observers}[$i]->{observer}, 1);
-        my $class = load_class @{$observers}[$i]->{observer};
+        if(my $e = load_class @{$observers}[$i]->{observer}) {
+            $self->error->add_error($e)
+        }
         # $class->import();
-        my $object = @{$observers}[$i]->new(
-            context => $context,
-            db      => $self->db,
-            error   => $self->error,
-            model   => $self->model,
-        )->observe();
+        if ($self->error->has_error() == 0) {
+            my $object = @{$observers}[$i]->new(
+                context => $context,
+                db      => $self->db,
+                error   => $self->error,
+                model   => $self->model,
+            )->observe();
+        }
     }
 
     return $result;

@@ -1,9 +1,8 @@
 package Text::Transliterator::Unaccent;
-
 use warnings;
 use strict;
 
-our $VERSION = "1.04";
+our $VERSION = "1.05";
 
 use Text::Transliterator;
 use Unicode::UCD        qw(charinfo charscript charblock);
@@ -18,21 +17,21 @@ sub char_map {
   my $ignore_lower = 0;
 
   # decode arguments to get character ranges and boolean flags
-  while (my ($kind, $arg) = splice(@_, 0, 2)) {
+  while (my ($arg_name, $arg_val) = splice(@_, 0, 2)) {
     my $ranges;
 
-    my $todo = {
-      script   => sub { $ranges = charscript($arg)
-                          or die "$arg is not a valid Unicode script" },
-      block    => sub { $ranges = charblock($arg)
-                          or die "$arg is not a valid Unicode block"  },
-      ranges   => sub { $ranges = $arg },
-      wide     => sub { $ignore_wide  = !$arg                         },
-      upper    => sub { $ignore_upper = !$arg                         },
-      lower    => sub { $ignore_lower = !$arg                         },
+    my $handle_arg = {
+      script   => sub { $ranges = charscript($arg_val)
+                          or die "$arg_val is not a valid Unicode script" },
+      block    => sub { $ranges = charblock($arg_val)
+                          or die "$arg_val is not a valid Unicode block"  },
+      ranges   => sub { $ranges = $arg_val },
+      wide     => sub { $ignore_wide  = !$arg_val                         },
+      upper    => sub { $ignore_upper = !$arg_val                         },
+      lower    => sub { $ignore_lower = !$arg_val                         },
      };
-    my $coderef = $todo->{$kind}
-      or die "invalid argument: $kind";
+    my $coderef = $handle_arg->{$arg_name}
+      or die "invalid argument: $arg_name";
     $coderef->();
     push @all_ranges, @$ranges if $ranges;
   }
@@ -75,7 +74,6 @@ sub char_map_descr {
   my $map = $class->char_map(@_);
 
   my $txt = "";
-  # while (my ($k, $v) = each %$map) {
   foreach my $k (sort {$a cmp $b} keys %$map) {
     my $v = $map->{$k};
     my $accented = ord($k);
@@ -90,9 +88,11 @@ sub char_map_descr {
 }
 
 sub new {
-  my $class = shift;
-  my $map = $class->char_map(@_);
-  return Text::Transliterator->new($map)
+  my ($class, %args) = @_;
+
+  my $modifiers = delete $args{modifiers} || "";
+  my $map       = $class->char_map(%args);
+  return Text::Transliterator->new($map, $modifiers);
 }
 
 1; # End of Text::Transliterator::Unaccent
@@ -106,9 +106,11 @@ Text::Transliterator::Unaccent - Compile a transliterator from Unicode tables, t
 
 =head1 SYNOPSIS
 
-  my $unaccenter = Text::Transliterator::Unaccent->new(script => 'Latin',
-                                                       wide   => 0,
-                                                       upper  => 0);
+  my $unaccenter = Text::Transliterator::Unaccent->new(script    => 'Latin',
+                                                       wide      => 0,
+                                                       upper     => 0,
+                                                       modifiers => 'r');
+
   $unaccenter->($string);
 
   my $map   = Text::Transliterator::Unaccent->char_map(script => 'Latin');
@@ -137,13 +139,11 @@ also makes sense for other scripts as well, but I'm not able to test.
 
 =head2 new
 
-  my $unaccenter = Text::Transliterator::Unaccent->new(@range_description);
+  my $unaccenter = Text::Transliterator::Unaccent->new(%options);
   # or
   my $unaccenter = Text::Transliterator::Unaccent->new(); # script => 'Latin'
 
-Compiles a new 'unaccenter' function. The C<@range_description>
-argument specifies which ranges of characters will be handled, and is
-comprised of pairs of shape :
+Compiles a new 'unaccenter' function. Valide C<%options> are :
 
 =over
 
@@ -183,23 +183,34 @@ default is I<true>.
 Decides if lowercase characters are kept or not within the map. The
 default is I<true>.
 
+
+=item C<< modifiers => $string >>
+
+Any combination of the C<cdsr> modifiers to the C<tr/.../.../> operator.
+In particular, the C<'r'> modifier may be used to specify that transliterated strings
+should be returned as new strings instead of modifying the input strings in place.
+
+
 =back
 
-The C<@range_description> may contain a list of several scripts,
+C<%options> may contain a list of several scripts,
 blocks and/or ranges; all will get concatenated into a single
 correspondance map.  If the list is empty, the default range is
 C<< script => 'Latin' >>.
 
-The return value from that C<new> method is actually
-a reference to a function, not an object. That function is called as 
+Unlike usual object-oriented modules, here the return value from
+the C<new> method is a reference to a function, not an object.
+That function should be called as 
 
   $unaccenter->(@strings);
 
-and modifies every member of C<@strings> I<in place>, 
-like the C<tr/.../.../> operator.
-The return value is the number of transliterated characters
-in the last member of C<@strings>.
+By default every member of C<@strings> is modified I<in place>, like with the C<tr/.../.../> operator,
+unless the C<r> modifier is present.
 
+The function returns the list of results of the C<tr/.../.../> operation on each of the input strings.
+By default this will be the number of transliterated characters for each string.
+If the C<r> modifier is present, the return value is the list of transliterated strings.
+In scalar context, the last member of the list is returned (for compatibility with the previous API).
 
 =head2 char_map
 
@@ -244,49 +255,10 @@ an C<unaccent> tokenizer.
 
 Laurent Dami, C<< <dami@cpan.org> >>
 
-=head1 BUGS
-
-Please report any bugs or feature requests to
-C<bug-text-transliterator at rt.cpan.org>, or through the web
-interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Text-Transliterator>.
-I will be notified, and then you'll automatically be notified of
-progress on your bug as I make changes.
-
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc Text::Transliterator::Unaccent
-
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-Transliterator>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Text-Transliterator>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Text-Transliterator>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Text-Transliterator/>
-
-=back
-
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010, 2017, 2023 Laurent Dami.
+Copyright 2010-2025 Laurent Dami.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

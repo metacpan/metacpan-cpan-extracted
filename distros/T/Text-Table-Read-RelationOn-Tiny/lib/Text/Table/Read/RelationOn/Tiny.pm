@@ -9,7 +9,7 @@ use Carp;
 
 # The following must be on the same line to ensure that $VERSION is read
 # correctly by PAUSE and installer tools. See docu of 'version'.
-use version 0.77; our $VERSION = version->declare("v2.3.4");
+use version 0.77; our $VERSION = version->declare("v2.3.5");
 
 
 sub new {
@@ -262,7 +262,7 @@ my $_parse_table = sub {
   }
   my $elem_ids;
   my %rows;
-  my @rowElems;                 # To keep oder of additional row elements, if any.
+  my @rowElems;                 # To keep order of additional row elements, if any.
   for (++$index; $index < @$lines; ++$index) {
     (my $line = $lines->[$index]) =~ s/\s+$//;
     last if $line eq q{};
@@ -489,7 +489,7 @@ Text::Table::Read::RelationOn::Tiny - Read binary "relation on (over) a set" fro
 
 =head1 VERSION
 
-Version v2.3.4
+Version v2.3.5
 
 
 =head1 SYNOPSIS
@@ -590,7 +590,7 @@ A string. Table entry that flags that the corresponding elements are B<not>
 related. C<|> is not allowed, the value must be different from value of
 C<inc>. Heading and trailing spaces are removed.
 
-Default is the empty set.
+Default is the empty string.
 
 =item C<set>
 
@@ -648,8 +648,10 @@ Method C<tab_elems> will return:
 
 And method C<eq_ids> will return:
 
+  {
    0 => [1, 2, 3],
    5 => [6]
+  }
 
 =item C<eqs>
 
@@ -905,7 +907,7 @@ description of C<new>), then the keys are the indices (see C<elem_ids> and
 C<elems>) of the representatives and each value is an array of indices of the
 corresponding equivalent elements (without the representative).
 
-If you did not specify equivalent elements, the this method return C<undef>
+If you did not specify equivalent elements, then this method returns C<undef>
 after the constructor call, but the first call to C<get> sets it to an empty
 hash.
 

@@ -16,38 +16,50 @@ sub generate($self) {
 
     my $tpl = $self->templates->get_data_section('view_list_class');
     my $table_name = $self->json->{view}->{table_name};
-    my $name_space = $self->context->{context}->{perl}->{name_space};
+    my $name_space = $self->context->{context}->{perl}->{view_name_space};
     my $base_name_space = $self->context->{context}->{perl}->{base_name_space};
     my $class_name = camelize($table_name);
     my $base_class_name = "Base";
 
     my $date = localtime();
-
     $self->_get_fields();
-    $self->_keys();
     $self->_methods();
     my $methods = $self->methods();
 
-    my $select_fields = $self->select();
-
-    my $pkey = $self->primary_keys();
-    my $fkey = $self->foreign_keys();
-
-    $pkey = " " unless $pkey;
-    $fkey = " " unless $fkey;
+    my $fields = $self->_has_methods($self->json->{view}->{table_name});
 
     $tpl =~ s/<<date>>/$date/ig;
-    $tpl =~ s/<<fields>>/$select_fields/ig;
+    $tpl =~ s/<<fields>>/$fields/ig;
     $tpl =~ s/<<name_space>>/$name_space/ig;
     $tpl =~ s/<<classname>>/$class_name/ig;
     $tpl =~ s/<<base_name_space>>/$base_name_space/ig;
     $tpl =~ s/<<base_class_name>>/$base_class_name/ig;
-    $tpl =~ s/<<pkey>>/$pkey/ig;
-    $tpl =~ s/<<fkey>>/$fkey/ig;
+
     $tpl =~ s/<<methods>>/$methods/ig;
 
     return $tpl;
 
+}
+
+sub _has_methods($self, $view) {
+    my $tpl = $self->templates->get_data_section('view_fields_method');
+
+
+    $self->_keys();
+
+    my $pkey = $self->primary_keys();
+    my $fkey = $self->foreign_keys();
+    my $select = $self->select();
+
+    $pkey = " " unless $pkey;
+    $fkey = " " unless $fkey;
+
+    $tpl =~ s/<<select_fields>>/$select/ig;
+    $tpl =~s/<<primary_keys>>/$pkey/ig;
+    $tpl =~s/<<foreign_keys>>/$fkey/ig;
+    $tpl =~s/<<view_name>>/$view/ig;
+
+    return $tpl;
 }
 
 sub _methods($self) {
@@ -77,6 +89,7 @@ sub _methods($self) {
 
 sub _keys($self) {
 
+    my $tpl = $self->templates->get_data_section('view_fields_method');
     my $p_keys = "";
     my $length = 0;
     if($self->primary_keys_arr and scalar @{$self->primary_keys_arr} > 0) {
