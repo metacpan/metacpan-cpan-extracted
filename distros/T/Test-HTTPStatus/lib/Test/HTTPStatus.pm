@@ -25,7 +25,7 @@ Check the HTTP status for a resource.
 =cut
 
 use v5.10.1;  # Mojolicious is v5.10.1 and later
-our $VERSION = '2.07';
+our $VERSION = '2.08';
 
 use parent 'Test::Builder::Module';
 
@@ -43,18 +43,18 @@ use constant HTTP_OK            => 200;
 use constant HTTP_NOT_FOUND     => 404;
 
 sub import {
-    my $self = shift;
-    my $caller = caller;
-    no strict 'refs';
-    *{$caller.'::http_ok'}         = \&http_ok;
-    *{$caller.'::NO_URL'}          = \&NO_URL;
-    *{$caller.'::INVALID_URL'}     = \&INVALID_URL;
-    *{$caller.'::HTTP_OK'}         = \&HTTP_OK;
-    *{$caller.'::HTTP_NOT_FOUND'}  = \&HTTP_NOT_FOUND;
+	my $self = shift;
+	my $caller = caller;
+	no strict 'refs';
+	*{$caller.'::http_ok'}         = \&http_ok;
+	*{$caller.'::NO_URL'}          = \&NO_URL;
+	*{$caller.'::INVALID_URL'}     = \&INVALID_URL;
+	*{$caller.'::HTTP_OK'}         = \&HTTP_OK;
+	*{$caller.'::HTTP_NOT_FOUND'}  = \&HTTP_NOT_FOUND;
 
-    $Test->exported_to($caller);
-    $Test->plan(@_);
-	}
+	$Test->exported_to($caller);
+	$Test->plan(@_);
+}
 
 =head1 FUNCTIONS
 
@@ -132,30 +132,24 @@ Instead, it reports success or failure using the underlying test builder's C<ok>
 =cut
 
 sub http_ok {
-	my $url      = shift;
+	my $url = shift;
 	my $expected = shift || HTTP_OK;
 
-	my $hash = _get_status( $url );
+	# Always succeed when NO_NETWOK_TESTING is set
+	my $hash = $ENV{'NO_NETWORK_TESTING'} ? { status => $expected, url => $url } : _get_status( $url );
 
 	my $status = $hash->{status};
 
-	if( defined $expected and $expected eq $status ) {
+	if(defined $expected and $expected eq $status ) {
 		$Test->ok( 1, "Expected [$expected], got [$status] for [$url]" );
-		}
-	elsif( $status == NO_URL ) {
+	} elsif( $status == NO_URL ) {
 		$Test->ok( 0, "[$url] does not appear to be anything" );
-		}
-	elsif( $status == INVALID_URL ) {
+	} elsif( $status == INVALID_URL ) {
 		$Test->ok( 0, "[$url] does not appear to be a valid URL" );
-		}
-	else {
+	} else {
 		$Test->ok( 0, "Mysterious failure for [$url] with status [$status]" );
-		}
 	}
-
-my $UA ||= Mojo::UserAgent->new();
-$UA->proxy->detect();
-$UA->max_redirects(3);
+}
 
 sub _get_status {
 	my $string = shift;
@@ -168,19 +162,37 @@ sub _get_status {
 	my $status = _check_link( $url );
 
 	return { url => $url, status => $status };
-	}
+}
 
-# From HTTP::SimpleLinkChecker, which has been deleted
+=head2 _check_link
+
+Verify the accessibility of a given URL by checking its HTTP status code using L<Mojo::UserAgent>.
+It first attempts to send a HEAD request to the provided link,
+which is useful for quickly checking if the resource exists without downloading its content.
+If the response indicates no error (i.e., status code is below 400),
+the function proceeds with a GET request to ensure a proper response is received.
+The function then validates whether a valid HTTP response was obtained and returns the corresponding status code.
+If the link is undefined or if no valid response is received, the function returns C<undef>.
+
+It is taken from the old module HTTP::SimpleLinkChecker.
+
+=cut
+
+our $UA ||= Mojo::UserAgent->new();
+$UA->proxy->detect();
+$UA->max_redirects(3);
+
 sub _check_link {
-	my( $link ) = @_;
+	my $link = shift;
+
 	say STDERR "Link is $link";
 	unless( defined $link ) {
 		# $ERROR = 'Received no argument';
 		return;
-		}
+	}
 
 	my $transaction = $UA->head($link);
-	my $response = $transaction->res;
+	my $response = $transaction->res();
 
 	if( !($response and $response->code >= 400) ) {
 		$transaction = $UA->get($link);
@@ -193,7 +205,9 @@ sub _check_link {
 		}
 
 	return $response->code;
-	}
+}
+
+sub user_agent { $UA }
 
 =head1 SEE ALSO
 

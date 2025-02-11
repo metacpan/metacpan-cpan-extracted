@@ -19,7 +19,7 @@ $ENV{'QUERY_STRING'} = 'foo=bar&fred=wilma&i=123';
 my $i = new_ok('CGI::Info');
 my %p = %{$i->params()};
 ok($p{i} == 123);
-ok($i->as_string() eq 'foo=bar;fred=wilma;i=123');
+ok($i->as_string() eq 'foo=bar; fred=wilma; i=123');
 
 my $u = CGI::Untaint->new(%p);
 

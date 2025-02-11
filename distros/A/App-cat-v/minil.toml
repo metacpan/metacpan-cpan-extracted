@@ -11,6 +11,7 @@ static_install = "auto"
 [release]
 branch = "main"
 hooks = [
+    "make -C script",
     "make -C docs",
 ]
 do_not_upload_to_cpan = 0

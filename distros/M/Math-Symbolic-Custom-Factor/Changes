@@ -1,5 +1,9 @@
 Revision history for Math-Symbolic-Custom-Factor
 
+0.11    Mon Feb 10 13:00 2025
+
+        - Fixed bug affecting Perls compiled with -Duselongdouble
+
 0.1     Thu Jan 16 10:00 2025
         
         - First version

@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use vars qw( %Digits $VERSION );
 
-$VERSION = "0.05";
+$VERSION = "0.06";
 
 %Digits =(
 	toWestern	=> "0-9",

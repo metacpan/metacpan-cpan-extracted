@@ -1,0 +1,11 @@
+Revision history for Locale-Codes-Country-FR
+
+0.02	Mon Feb 10 07:57:40 EST 2025
+	Use gtar to create a distribution on Macs
+	Use Test::DescribeMe to simplify tests
+	Calling new on an object now returns a clone rather than setting the defaults in the new object
+	Only load the DATA section once
+	Add a couple of edge cases
+
+0.01    Thu Sep 12 21:30:46 EDT 2019
+        First draft - POC

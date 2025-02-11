@@ -32,7 +32,7 @@ cat-v \[ 옵션 \] args ...
 
 # VERSION
 
-Version 1.03
+Version 1.04
 
 # DESCRIPTION
 
@@ -105,6 +105,7 @@ Version 1.03
     nl    \x{23CE}  ⏎  RETURN SYMBOL
     np    \x{2398}  ⎘  NEXT PAGE
     sp    \x{00B7}  ·  MIDDLE DOT
+    esc   \x{21B0}  ↰  UPWARDS ARROW WITH TIP LEFTWARDS
     del   \x{232B}  ⌫  ERASE TO THE LEFT
 
 # OPTIONS
@@ -112,6 +113,10 @@ Version 1.03
 - **-n**, **--reset**
 
     모든 문자 변환과 탭 확장을 비활성화하고 반복 문자를 초기화합니다. 따라서 `cat-v -n`은 `cat` 명령과 마찬가지로 사실상 아무 작업도 수행하지 않습니다.
+
+    기본 동작이 재설정되면 그 이후에 지정된 옵션만 적용됩니다. 예를 들어 다음 명령은 탭 문자만 시각화합니다.
+
+        cat-v -nt
 
 - **-c**, **--visible** _name_=_flag_,...
 
@@ -256,6 +261,14 @@ GIT 리포지토리에서:
 - [App::optex::util::filter](https://metacpan.org/pod/App%3A%3Aoptex%3A%3Autil%3A%3Afilter)
 
     `cat-v` 명령의 이전 버전은 원래 [App::optex](https://metacpan.org/pod/App%3A%3Aoptex) 명령의 필터 모듈로 만들어졌습니다.
+
+- [https://harmful.cat-v.org/cat-v/](https://harmful.cat-v.org/cat-v/)
+
+    UNIX 스타일 또는 cat -v 유해한 것으로 간주됨
+
+- [https://harmful.cat-v.org/cat-v/unix\_prog\_design.pdf](https://harmful.cat-v.org/cat-v/unix_prog_design.pdf)
+
+    UNIX 환경에서의 프로그램 디자인
 
 # AUTHOR
 

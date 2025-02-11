@@ -73,13 +73,13 @@ PARAM: {
 	$i = new_ok('CGI::Info');
 	ok($i->param('foo') eq 'bar');
 	ok($i->param('fred') eq 'wilma');
-	ok($i->as_string() eq 'foo=bar;fred=wilma');
+	ok($i->as_string() eq 'foo=bar; fred=wilma');
 
 	$ENV{'QUERY_STRING'} = 'foo=bar&fred=wilma&foo=baz';
 	$i = new_ok('CGI::Info');
 	ok($i->param('foo') eq 'bar,baz');
 	ok($i->param('fred') eq 'wilma');
-	ok($i->as_string() eq 'foo=bar,baz;fred=wilma');
+	ok($i->as_string() eq 'foo=bar,baz; fred=wilma');
 
 	# Reading twice should yield the same result
 	ok($i->param('foo') eq 'bar,baz');
@@ -98,14 +98,16 @@ PARAM: {
 	# Don't pass XSS through
 	$ENV{'QUERY_STRING'} = 'foo=<script>alert(hello)</script>';
 	$i = new_ok('CGI::Info');
-	ok(defined($i->param('foo')));
-	ok($i->as_string() eq 'foo=&lt\;script&gt\;alert(hello)&lt\;/script&gt\;');
+	# ok(defined($i->param('foo')));
+	# ok($i->as_string() eq 'foo=&lt\;script&gt\;alert(hello)&lt\;/script&gt\;');
+	ok(!defined($i->param('foo')));
+	ok($i->as_string() eq '');
 
 	$ENV{'QUERY_STRING'} = 'foo=&fred=wilma&foo=bar';
 	$i = new_ok('CGI::Info');
 	ok($i->param('foo', logger => MyLogger->new()) eq 'bar');
 	ok($i->param('fred') eq 'wilma');
-	ok($i->as_string() eq 'foo=bar;fred=wilma');
+	ok($i->as_string() eq 'foo=bar; fred=wilma');
 
 	subtest 'SQL injection is blocked' => sub {
 		# Preserve the current %ENV, so changes are local to this subtest

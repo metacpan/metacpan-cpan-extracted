@@ -1,0 +1,44 @@
+Changes
+examples/data/generalized_example.txt
+examples/data/knuth_example.txt
+examples/data/knuth_example_sparse.txt
+examples/data/sudoku.txt
+examples/dlx.pl
+examples/langford/langford.pl
+examples/langford/Langford.pm
+examples/npieces/npieces-solutions.txt
+examples/npieces/npieces.pl
+examples/npieces/NPieces.pm
+examples/nqueens/nqueens.pl
+examples/nqueens/NQueens.pm
+examples/polyomino/polyomino.pl
+examples/polyomino/Polyomino.pm
+examples/polyomino/Shape.pm
+examples/polyomino/solutions-to-scotts-pentomino.txt
+examples/sudoku/output.txt
+examples/sudoku/sudoku.pl
+examples/sudoku/Sudoku.pm
+examples/sudoku/SudokuFormat.pm
+examples/sudoku/SudokuGenerator.pm
+examples/sudoku/SudokuSolver.pm
+examples/sudoku/SudokuType.pm
+examples/t/langford/01-langford.t
+examples/t/npieces/01-npieces.t
+examples/t/nqueens/01-nqueens.t
+examples/t/polyomino/01-polyomino.t
+examples/t/sudoku/01-sudoku.t
+examples/t/sudoku/02-sudokutype.t
+examples/t/sudoku/03-sudokusolver.t
+examples/t/sudoku/04-sudokugenerator.t
+lib/Algorithm/X/DLX.pm
+lib/Algorithm/X/ExactCoverProblem.pm
+lib/Algorithm/X/Examples.pod
+lib/Algorithm/X/LinkedMatrix.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01-linkedmatrix.t
+t/02-exactcoverproblem.t
+t/03-algorithmdlx.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

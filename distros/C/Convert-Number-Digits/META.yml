@@ -15,7 +15,7 @@ name: Convert-Number-Digits
 provides:
   Convert::Number::Digits:
     file: lib/Convert/Number/Digits.pm
-    version: '0.05'
+    version: '0.06'
 requires:
   perl: v5.6.1
 resources:
@@ -23,6 +23,6 @@ resources:
   homepage: https://github.com/dyacob/Convert-Number-Digits
   license: http://dev.perl.org/licenses/
   repository: https://github.com/dyacob/Convert-Number-Digits.git
-version: '0.05'
+version: '0.06'
 x_authority: cpan:dyacob
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -3,6 +3,10 @@ abstract: 'cat-v command implementation'
 author:
   - 'Kazumasa Utashiro'
 build_requires:
+  App::sdif: '0'
+  Data::Section::Simple: '0'
+  File::Slurper: '0'
+  File::Spec: '0'
   Test::More: '0.98'
 configure_requires:
   Module::Build::Tiny: '0.035'
@@ -26,7 +30,7 @@ no_index:
 provides:
   App::cat::v:
     file: lib/App/cat/v.pm
-    version: '1.03'
+    version: '1.04'
 requires:
   Getopt::EX: '0'
   Getopt::EX::Hashed: '0'
@@ -41,7 +45,7 @@ resources:
   bugtracker: https://github.com/tecolicom/App-cat-v/issues
   homepage: https://github.com/tecolicom/App-cat-v
   repository: https://github.com/tecolicom/App-cat-v.git
-version: '1.03'
+version: '1.04'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

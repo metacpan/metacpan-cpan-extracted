@@ -1,5 +1,11 @@
 Revision history for CGI-Info
 
+0.91	Mon Feb 10 14:32:57 EST 2025
+	Added t/waf.t to test the Web Application Firewall
+	params(): instead of cleaning up XSS, now sets them to 403 and doesn't pass the values back
+	Added warnings_as_string()
+	Added the raw option to as_string()
+
 0.90	Tue Feb  4 08:57:49 EST 2025
 	Ensure status is set before calling _warn so it's not lost (some 403s were being lost)
 	Try harder to call Google a search_engine

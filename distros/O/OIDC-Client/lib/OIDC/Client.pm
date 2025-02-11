@@ -19,7 +19,7 @@ use OIDC::Client::ResponseParser;
 use OIDC::Client::TokenResponseParser;
 use OIDC::Client::Error::TokenValidation;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 with 'OIDC::Client::Role::LoggerWrapper';
 
@@ -56,8 +56,19 @@ OIDC::Client - OpenID Connect Client
 Client module for OpenID Connect protocol.
 
 Use this module directly from a batch or a simple script. For use from within
-an application, you should instead use the framework plugin included in the
-L<OIDC-Client|https://metacpan.org/dist/OIDC-Client> distribution.
+an application, you should instead use the framework plugin :
+
+=over 2
+
+=item Mojolicious
+
+L<Mojolicious::Plugin::OIDC>
+
+=item Catalyst
+
+L<Catalyst::Plugin::OIDC>
+
+=back
 
 =cut
 
@@ -1250,7 +1261,7 @@ This program is free software, you can redistribute it and/or modify it under th
 
 =over 2
 
-=item * L<OIDC::Lite>
+=item * L<OIDC::Lite::Client::WebServer>
 
 =back
 

@@ -69,6 +69,7 @@ my @include = qw(
   YAML
   autodie
   JSON::PP
+  HTTP::Headers::Fast::XS
   Cpanel::JSON::XS
   JSON::XS
   JSON::MaybeXS

@@ -8,8 +8,6 @@ Makefile.PL
 README.md
 cpanfile
 dist.ini
-lib/Catalyst/Plugin/OIDC.pm
-lib/Mojolicious/Plugin/OIDC.pm
 lib/OIDC/Client.pm
 lib/OIDC/Client/Config.pod
 lib/OIDC/Client/Error.pm
@@ -25,16 +23,9 @@ lib/OIDC/Client/TokenResponseParser.pm
 lib/OIDC/Client/User.pm
 perlcritic.rc
 t/00-compile.t
-t/catalyst-plugin-auth-code-flow-IT.t
 t/client.t
 t/error-provider.t
-t/lib/MyCatalystApp/lib/MyCatalystApp.pm
-t/lib/MyCatalystApp/lib/MyCatalystApp/Controller/Root.pm
-t/lib/MyCatalystApp/lib/MyCatalystApp/View/JSON.pm
-t/lib/MyCatalystApp/mycatalystapp.conf
 t/lib/OIDCClientTest.pm
-t/mojolicious-plugin-auth-code-flow-IT.t
-t/mojolicious-plugin-resource-server-IT.t
 t/plugin.t
 t/response-parser.t
 t/token-response-parser.t

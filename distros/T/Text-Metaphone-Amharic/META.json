@@ -1,10 +1,10 @@
 {
    "abstract" : "The Metaphone Algorithm for Amharic.",
    "author" : [
-      "Daniel Yacob <dyacob@cpan.org>"
+      "Daniel Yacob <dyacob\\@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
@@ -13,31 +13,39 @@
       "version" : 2
    },
    "name" : "Text-Metaphone-Amharic",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc"
-      ]
-   },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Module::Build" : "0.42"
          }
       },
       "runtime" : {
          "requires" : {
             "Regexp::Ethiopic" : "0.06",
-            "perl" : "5.008000"
+            "perl" : "v5.8.0"
          }
       }
    },
+   "provides" : {
+      "Text::Metaphone::Amharic" : {
+         "file" : "lib/Text/Metaphone/Amharic.pm",
+         "version" : "0.14"
+      }
+   },
    "release_status" : "stable",
-   "version" : "0.13",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/dyacob/Text-Metaphone-Amharic/issues"
+      },
+      "homepage" : "https://github.com/dyacob/Text-Metaphone-Amharic",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/dyacob/Text-Metaphone-Amharic.git"
+      }
+   },
+   "version" : "0.14",
+   "x_authority" : "cpan:dyacob",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

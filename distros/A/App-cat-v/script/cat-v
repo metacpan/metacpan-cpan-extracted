@@ -44,7 +44,7 @@ cat-v [ options ] args ...
 
 =head1 VERSION
 
-Version 1.03
+Version 1.04
 
 =head1 DESCRIPTION
 
@@ -137,6 +137,7 @@ characters
     nl    \x{23CE}  ⏎  RETURN SYMBOL
     np    \x{2398}  ⎘  NEXT PAGE
     sp    \x{00B7}  ·  MIDDLE DOT
+    esc   \x{21B0}  ↰  UPWARDS ARROW WITH TIP LEFTWARDS
     del   \x{232B}  ⌫  ERASE TO THE LEFT
 
 =head1 OPTIONS
@@ -148,6 +149,12 @@ characters
 Disables all character conversions and tab expansion, and resets
 repeat characters.  Therefore, the C<cat-v -n> effectively does
 nothing, just like the C<cat> command.
+
+Once the default behavior is reset, only options specified after it
+will have any effect.  For example, the following command will only
+visualize tab characters.
+
+    cat-v -nt
 
 =item B<-c>, B<--visible> I<name>=I<flag>,...
 
@@ -338,6 +345,14 @@ Git repository.
 
 The predecessor of the C<cat-v> command was originally created as the 
 filter module of the L<App::optex> command.
+
+=item L<https://harmful.cat-v.org/cat-v/>
+
+UNIX Style, or cat -v Considered Harmful
+
+=item L<https://harmful.cat-v.org/cat-v/unix_prog_design.pdf>
+
+Program design in the UNIX environment
 
 =back
 

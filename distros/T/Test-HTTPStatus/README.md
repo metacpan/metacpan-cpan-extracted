@@ -75,6 +75,18 @@ On failure, the test will fail with one of the following messages:
 The routine does not return any value.
 Instead, it reports success or failure using the underlying test builder's `ok` method.
 
+## \_check\_link
+
+Verify the accessibility of a given URL by checking its HTTP status code using [Mojo::UserAgent](https://metacpan.org/pod/Mojo%3A%3AUserAgent).
+It first attempts to send a HEAD request to the provided link,
+which is useful for quickly checking if the resource exists without downloading its content.
+If the response indicates no error (i.e., status code is below 400),
+the function proceeds with a GET request to ensure a proper response is received.
+The function then validates whether a valid HTTP response was obtained and returns the corresponding status code.
+If the link is undefined or if no valid response is received, the function returns `undef`.
+
+It is taken from the old module HTTP::SimpleLinkChecker.
+
 # SEE ALSO
 
 [HTTP::SimpleLinkChecker](https://metacpan.org/pod/HTTP%3A%3ASimpleLinkChecker), [Mojo::URL](https://metacpan.org/pod/Mojo%3A%3AURL)

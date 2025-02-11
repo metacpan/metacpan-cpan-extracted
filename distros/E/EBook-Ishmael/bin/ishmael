@@ -88,9 +88,11 @@ heuristics, manually specify the format. The following are valid options
 
 =item epub
 
-=item fictionbook2
+=item fictionbook2 (or fb2)
 
 =item html
+
+=item xhtml
 
 =item mobi
 

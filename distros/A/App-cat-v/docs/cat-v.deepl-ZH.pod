@@ -34,7 +34,7 @@ cat-v [ 选项 ] args ...
 
 =head1 VERSION
 
-Version 1.03
+Version 1.04
 
 =head1 DESCRIPTION
 
@@ -113,6 +113,7 @@ C<cat-v> 命令可将空白和控制字符可视化，同时保留显示可显�
     nl    \x{23CE}  ⏎  RETURN SYMBOL
     np    \x{2398}  ⎘  NEXT PAGE
     sp    \x{00B7}  ·  MIDDLE DOT
+    esc   \x{21B0}  ↰  UPWARDS ARROW WITH TIP LEFTWARDS
     del   \x{232B}  ⌫  ERASE TO THE LEFT
 
 =head1 OPTIONS
@@ -122,6 +123,10 @@ C<cat-v> 命令可将空白和控制字符可视化，同时保留显示可显�
 =item B<-n>, B<--reset>
 
 禁用所有字符转换和制表符扩展，并重置重复字符。因此，C<cat-v -n>实际上什么也不做，就像 C<cat> 命令一样。
+
+一旦重置了默认行为，只有在其后指定的选项才会有效果。例如，以下命令将只显示制表符。
+
+    cat-v -nt
 
 =item B<-c>, B<--visible> I<name>=I<flag>,...
 
@@ -274,6 +279,14 @@ Git 仓库。
 =item L<App::optex::util::filter>
 
 C<cat-v> 命令的前身最初是作为 L<App::optex> 命令的过滤器模块创建的。
+
+=item L<https://harmful.cat-v.org/cat-v/>
+
+UNIX 风格，或 cat -v 被认为是有害的
+
+=item L<https://harmful.cat-v.org/cat-v/unix_prog_design.pdf>
+
+UNIX 环境下的程序设计
 
 =back
 

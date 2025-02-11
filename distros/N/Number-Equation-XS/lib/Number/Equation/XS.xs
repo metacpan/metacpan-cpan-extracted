@@ -194,7 +194,7 @@ SV * equation (self, ...)
 	SV * self
 	CODE:
 		AV * s = (AV*)SvRV(self);
-		char * query = malloc(sizeof(char)*5432);
+		char query[4321] = "";
 		int closing = 0;
 		int l = av_len(s);
 		for (int i = 1; i <= l; i++) {

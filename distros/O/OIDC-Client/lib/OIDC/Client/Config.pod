@@ -7,8 +7,8 @@ OIDC::Client::Config - Configuration Documentation
 
 =head1 DESCRIPTION
 
-These configuration entries apply to all framework plugins included
-in the L<OIDC-Client|https://metacpan.org/dist/OIDC-Client> distribution.
+These configuration entries apply to all framework plugins using
+the L<OIDC-Client|https://metacpan.org/dist/OIDC-Client> distribution.
 
 For direct use with the L<OIDC::Client> module, all entries beginning
 with C<provider."provider".> apply, but this prefix must be removed from

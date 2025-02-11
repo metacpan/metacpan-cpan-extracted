@@ -1,5 +1,12 @@
 Revision history for Perl extension App-cat-v
 
+1.04 2025-02-11T02:27:17Z
+
+    - add link to "UNIX Style, or cat -v Considered Harmful"
+    - use (*F) instead of (?!)
+    - add "week" test
+    - make and install "App/cat/v.pod" file
+
 1.03 2025-02-07T11:09:59Z
 
     - make control-style effective only for [\x00-\x1f]

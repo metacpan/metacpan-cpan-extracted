@@ -15,8 +15,15 @@ docs/cat-v.deepl-ZH.pod
 docs/cat-v.gpt4-JA.pod
 docs/cat-v.pod
 lib/App/cat/v.pm
+lib/App/cat/v.pod
 minil.toml
+script/Makefile
 script/cat-v
 t/00_compile.t
+t/02_week.sh
+t/02_week.t
+t/Command.pm
+t/week-tab.txt
+t/week.txt
 META.yml
 MANIFEST

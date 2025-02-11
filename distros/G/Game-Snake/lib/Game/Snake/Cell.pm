@@ -1,7 +1,9 @@
 use 5.38.0;
 use experimental 'class';
-our $VERSION = 0.09;
+
+package Game::Snake::Cell 0.10;
 class Game::Snake::Cell {
+	our $VERSION = 0.10;
 	use Raylib::FFI;
 	use Raylib::Color;
 	field $x : param = 0;

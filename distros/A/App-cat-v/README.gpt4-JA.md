@@ -32,7 +32,7 @@ cat-v \[ オプション \] 引数 ...
 
 # VERSION
 
-Version 1.03
+Version 1.04
 
 # DESCRIPTION
 
@@ -105,6 +105,7 @@ Version 1.03
     nl    \x{23CE}  ⏎  RETURN SYMBOL
     np    \x{2398}  ⎘  NEXT PAGE
     sp    \x{00B7}  ·  MIDDLE DOT
+    esc   \x{21B0}  ↰  UPWARDS ARROW WITH TIP LEFTWARDS
     del   \x{232B}  ⌫  ERASE TO THE LEFT
 
 # OPTIONS
@@ -112,6 +113,10 @@ Version 1.03
 - **-n**, **--reset**
 
     文字変換やタブ展開を無効にし、繰り返し文字をリセットします。したがって、`cat-v -n` は何も行わないのと同じです、`cat` コマンドのように。
+
+    デフォルトの動作がリセットされると、それ以降に指定されたオプションのみが効果を持ちます。例えば、次のコマンドはタブ文字のみを視覚化します。
+
+        cat-v -nt
 
 - **-c**, **--visible** _name_=_flag_,...
 
@@ -256,6 +261,14 @@ GITリポジトリから：
 - [App::optex::util::filter](https://metacpan.org/pod/App%3A%3Aoptex%3A%3Autil%3A%3Afilter)
 
     `cat-v`コマンドの前身は、もともと[App::optex](https://metacpan.org/pod/App%3A%3Aoptex)コマンドのフィルターモジュールとして作成されました。
+
+- [https://harmful.cat-v.org/cat-v/](https://harmful.cat-v.org/cat-v/)
+
+    UNIXスタイル、または cat -v は有害と考えられています
+
+- [https://harmful.cat-v.org/cat-v/unix\_prog\_design.pdf](https://harmful.cat-v.org/cat-v/unix_prog_design.pdf)
+
+    UNIX環境でのプログラム設計
 
 # AUTHOR
 

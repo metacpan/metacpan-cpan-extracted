@@ -71,7 +71,6 @@ sub request ($method, $uri_string, $headers = [], $body_content = undef) {
 
     if ($TYPE eq 'plack' or $TYPE eq 'catalyst') {
       test_needs('Plack::Request', 'HTTP::Message::PSGI', { 'HTTP::Headers::Fast' => 0.21 });
-      eval { +require HTTP::Headers::Fast::XS };
 
       $req = Plack::Request->new($req->to_psgi);
 
@@ -93,7 +92,6 @@ sub request ($method, $uri_string, $headers = [], $body_content = undef) {
     }
   }
   elsif ($TYPE eq 'mojo') {
-    my $uri = Mojo::URL->new($uri_string);
     $req = Mojo::Message::Request->new(method => $method, url => Mojo::URL->new($uri_string));
     $req->headers->add(@$_) foreach pairs @$headers;
     $req->body($body_content) if defined $body_content;
@@ -131,7 +129,6 @@ sub response ($code, $headers = [], $body_content = undef) {
   }
   elsif ($TYPE eq 'plack') {
     test_needs('Plack::Response', 'HTTP::Message::PSGI', { 'HTTP::Headers::Fast' => 0.21 });
-    eval { +require HTTP::Headers::Fast::XS };
 
     $res = Plack::Response->new($code, $headers, $body_content);
     $res->headers->header('Content-Length' => length $body_content)

@@ -5,7 +5,7 @@ use Carp;
 use Math::Pari qw(pari2num);
 use Fcntl;
 
-our $VERSION = '1.56';
+our $VERSION = '1.57';
 
 sub _defaultsource { 
     return;

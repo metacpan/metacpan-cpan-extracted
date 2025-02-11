@@ -1,4 +1,4 @@
-package Org::ReadTables v0.0.1 {
+package Org::ReadTables v0.0.2 {
 
     use v5.38;
     use List::Util qw(any);

@@ -17,7 +17,7 @@ BEGIN
 		%EthiopianHolidaysTranscribed
 	);
 
-	$VERSION = "0.14";
+	$VERSION = "0.15";
 
 	#
 	# Legal Holidays, this will be localized later.

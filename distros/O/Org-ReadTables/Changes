@@ -1,4 +1,7 @@
 Revision history for Org-ReadTables
 
+v0.0.2  2025-02-10 09:15:13 CST
+        - Remove unnecessary dependencies
+
 v0.0.1  2025-02-07 12:40:39 CST
         - Initial release

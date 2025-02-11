@@ -54,6 +54,7 @@
       },
       "test" : {
          "requires" : {
+            "File::Temp" : "0",
             "IPC::System::Simple" : "0",
             "JSON::PP" : "4.02",
             "LWP::UserAgent" : "0",
@@ -88,6 +89,6 @@
          "x_repository" : "https://github.com/nigelhorne/CGI-Info"
       }
    },
-   "version" : "0.90",
+   "version" : "0.91",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

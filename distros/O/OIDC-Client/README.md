@@ -1,45 +1,30 @@
 # OIDC-Client
 
-This distribution makes it easy to integrate the OpenID Connect protocol into different types of Perl applications.  
-It includes :
+This distribution makes it easy to integrate the OpenID Connect protocol into different types of Perl applications.
 
-- specific plugins for applications using the Mojolicious or Catalyst frameworks. Other plugins could be added for other frameworks.
-- a module for use with a batch or any script
+You can use the [OIDC::Client](https://metacpan.org/pod/OIDC::Client) module directly for any batch or script. For use from within an application, you should instead use the framework plugin :
+
+- [Mojolicious](https://metacpan.org/pod/Mojolicious::Plugin::OIDC)
+- [Catalyst](https://metacpan.org/pod/Catalyst::Plugin::OIDC)
 
 ## Features
 
-- creates the endpoint used by the provider to redirect the user back to your application
+- builds the authorization URL
 - retrieves the provider metadata and JWK keys when the application is launched
-- redirects the browser to the authorize URL to initiate an authorization code flow
 - gets the token(s) from the provider
-- manages the session : the tokens are stored to be used for next requests
-- refreshes access token if needed
+- refreshes the access token
 - verifies a JWT token with support for automatic JWK key rotation
 - gets the user information from the *userinfo* endpoint
 - exchanges the access token
-- redirects the browser to the logout URL
 
 ## Documentation Index
 
-- Mojolicious Application
-
-    [Plugin documentation](https://metacpan.org/pod/Mojolicious::Plugin::OIDC)
-
-- Catalyst Application
-
-    [Plugin documentation](https://metacpan.org/pod/Catalyst::Plugin::OIDC)
-
-- Batch or script
-
-    [Client module documentation](https://metacpan.org/pod/OIDC::Client)
-
-## Note on Dependencies
-
-To ensure a smooth and consistent installation process, all dependencies for both the Mojolicious and Catalyst plugins are included in this distribution. Even if you only use one of these plugins, the other dependencies will not be loaded into memory at runtime, as Perl only loads modules explicitly required by the application. This approach prioritizes simplicity and ensures compatibility across different environments.
+- [Client module documentation](https://metacpan.org/pod/OIDC::Client)
+- [Configuration](https://metacpan.org/pod/OIDC::Client::Config)
 
 ## Security Recommendation
 
-When using OIDC-Client with one of its framework plugins (e.g., for Mojolicious or Catalyst), it is highly recommended to configure the framework to store session data, including sensitive tokens such as access and refresh tokens, on the backend rather than in client-side cookies. Although cookies can be signed and encrypted, storing tokens in the client exposes them to potential security threats.
+When using OIDC-Client with an application, it is highly recommended to configure the framework to store session data, including sensitive tokens such as access and refresh tokens, on the backend rather than in client-side cookies. Although cookies can be signed and encrypted, storing tokens in the client exposes them to potential security threats.
 
 ## Limitations
 

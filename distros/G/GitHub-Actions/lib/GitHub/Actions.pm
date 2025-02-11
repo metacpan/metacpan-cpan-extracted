@@ -24,9 +24,13 @@ BEGIN {
       $github{$nogithub} = $ENV{$k} ;
     }
   }
+  if ($ENV{'GITHUB_REPOSITORY'}) {
+    my @repo_parts = split("/", $ENV{'GITHUB_REPOSITORY'});
+    $github{'REPO_NAME'} = pop @repo_parts;
+  }
 }
 
-use version; our $VERSION = qv('0.2.0');
+use version; our $VERSION = qv('0.2.1');
 
 sub _write_to_github_file {
   my ($github_var, $content) = @_;
@@ -117,7 +121,7 @@ GitHub::Actions - Work in GitHub Actions using native Perl
 
 =head1 VERSION
 
-This document describes GitHub::Actions version 0.1.2
+This document describes GitHub::Actions version 0.2.0
 
 
 =head1 SYNOPSIS
@@ -133,6 +137,11 @@ this code for instructions.
     for my $g (keys %github ) {
        say "GITHUB_$g -> ", $github{$g}
     }
+
+    # The name of the repository itself, without the name part, is stored in a new variable
+    say $github{'REPO_NAME'};
+
+    # These are commands that mirror those in GitHub actions
 
     # Set step output
     set_output("FOO", "BAR");

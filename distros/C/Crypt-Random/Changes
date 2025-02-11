@@ -1,5 +1,18 @@
 Revision history Crypt::Random
 
+1.57 -- Mon Feb 10 19:27:19 AST 2025
+
+    [Significant updates since 1.54]
+    - Add a Security Policy
+    - Fix an issue on RHEL8 (/dev/random is still blocking so change order of providers)
+
+    [Change Log]
+    - 2f6a51d Increment repo version
+    - e839940 Fixes #3: Prefer devurandom over devrandom
+    - 46f004d Fixes #2: Add Security Policy
+    - 7741193 v1.56
+    - ad803b2 Increment repo version
+
 1.56 -- Tue Feb 04 21:47:59 AST 2025
 
     [Significant updates since 1.54]

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::Most tests => 10;
+use Test::Most tests => 11;
 use Test::NoWarnings;
 
 BEGIN { use_ok('CGI::Info') }
@@ -24,8 +24,9 @@ is($obj->as_string(), 'key=value', 'Single key-value pair without special charac
 
 $ENV{'QUERY_STRING'} = 'a=1&b=2';
 $obj = new_ok('CGI::Info');
-cmp_ok($obj->as_string(), 'eq', 'a=1;b=2', 'More than one key-value pair sorted by key');
+cmp_ok($obj->as_string(), 'eq', 'a=1; b=2', 'More than one key-value pair sorted by key');
 
 $ENV{'QUERY_STRING'} = 'value=1&with=special\\chars';
 $obj = new_ok('CGI::Info');
-cmp_ok($obj->as_string(), 'eq', 'value=1;with=special\\\\chars', 'Handles special characters (;, =, \\) in values');
+cmp_ok($obj->as_string(), 'eq', 'value=1; with=special\\\\chars', 'Handles special characters (;, =, \\) in values');
+cmp_ok($obj->as_string(raw => 1), 'eq', 'value=1; with=special\\chars', 'Handles raw does not escape special characters (;, =, \\) in values');

@@ -59,6 +59,10 @@
       },
       "test" : {
          "requires" : {
+            "App::sdif" : "0",
+            "Data::Section::Simple" : "0",
+            "File::Slurper" : "0",
+            "File::Spec" : "0",
             "Test::More" : "0.98"
          }
       }
@@ -66,7 +70,7 @@
    "provides" : {
       "App::cat::v" : {
          "file" : "lib/App/cat/v.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       }
    },
    "release_status" : "stable",
@@ -81,7 +85,7 @@
          "web" : "https://github.com/tecolicom/App-cat-v"
       }
    },
-   "version" : "1.03",
+   "version" : "1.04",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

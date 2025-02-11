@@ -11,7 +11,7 @@ use IO::Socket;
 use Carp;
 use Math::Pari qw(pari2num);
 
-our $VERSION = '1.56';
+our $VERSION = '1.57';
 
 sub _defaultsource { 
 

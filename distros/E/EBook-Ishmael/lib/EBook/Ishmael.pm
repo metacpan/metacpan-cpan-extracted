@@ -1,6 +1,6 @@
 package EBook::Ishmael;
 use 5.016;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 use strict;
 use warnings;
 
@@ -42,12 +42,6 @@ Options:
 
   -h|--help      Print help message
   -v|--version   Print version/copyright info
-
-Valid dumpers (as long as they're installed):
-  elinks
-  links
-  lynx
-  w3m
 HERE
 
 my $VERSION_MSG = <<"HERE";
@@ -60,6 +54,11 @@ it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 HERE
+
+my %FORMAT_ALTS = (
+	'fb2'   => 'fictionbook2',
+	'xhtml' => 'html',
+);
 
 sub init {
 
@@ -91,10 +90,17 @@ sub init {
 	$self->{Ebook} = shift @ARGV or die $HELP;
 
 	if (defined $self->{Format}) {
+
 		$self->{Format} = lc $self->{Format};
+
+		if (exists $FORMAT_ALTS{ $self->{Format} }) {
+			$self->{Format} = $FORMAT_ALTS{ $self->{Format} };
+		}
+
 		unless (exists $EBOOK_FORMATS{ $self->{Format} }) {
 			die "$self->{Format} is not a recognized ebook format\n";
 		}
+
 	}
 
 	bless $self, $class;
@@ -280,6 +286,10 @@ Dumps ebook metadata in JSON form, C<--meta-json> mode.
 =head2 $i->id()
 
 Identify the format of the given ebook, C<--identify> mode.
+
+=head2 $i->html()
+
+Dump the HTML-ified contents of a given ebook, C<--html> mode.
 
 =head2 $i->run()
 

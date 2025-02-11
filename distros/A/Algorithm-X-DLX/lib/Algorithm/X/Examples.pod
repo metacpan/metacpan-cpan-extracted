@@ -1,0 +1,198 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Algorithm::X::Examples - Application of Algorithm-X to various exact cover problems
+
+=head1 DESCRIPTION
+
+The modules under Algorithm::X come without a detailed documentation towards their usage, 
+specifically on how to turn a problem into a matrix.
+Pls. refer to the sources under the distro's L<examples/|https://metacpan.org/dist/Algorithm-X-DLX/source/examples/> directory and their usages given below.
+
+The modules can also solve generalized exact cover problems (see Knuth's paper). 
+The columns of the matrix should be sorted so that all secondary columns are on the left, before primary columns. Beside dlx, N-queens is a good example of this.
+
+=head1 Running examples/...
+
+These modules are not installed. 
+Extract the C<examples> directory from the distribution and put the resp. script's directory into C<@INC> where necessary.
+
+=head2 Testing examples
+
+All example modules come with their resp. tests, which are not run at installation time. 
+You would have to call them manually.
+
+  $ prove examples/t/*
+
+=head2 Example: dlx
+
+L<examplesE<sol>dlx.pl|https://metacpan.org/dist/Algorithm-X-DLX/source/examples/dlx.pl> is a simple command-line program that reads an exact cover problem from stdin and solves it.
+
+The first line of stdin contains the number of columns, and the following lines contain the rows of the matrix.
+
+Output can be controlled by flags. By default, only the number of solutions is printed. 
+If C<-p> is given, every solution is printed on its own line by giving the indices of the selected rows. 
+With C<-v>, the full rows are printed.
+
+  examples$ ./dlx.pl -pv < data/knuth_example.txt
+  1 0 0 1 0 0 0
+  0 0 1 0 1 1 0
+  0 1 0 0 0 0 1
+  
+  solutions: 1
+
+With C<-s>, input can be given as a sparse matrix.
+
+  examples$ ./dlx.pl -ps < data/knuth_example_sparse.txt
+  3 0 4
+  solutions: 1
+
+To solve a generalized exact cover problem, put the number of secondary columns on the first line, after the number of all columns. The default value is zero, in other words, a regular exact cover problem.
+
+  examples$ ./dlx.pl -pv < data/generalized_example.txt
+  0 1 1
+  
+  solutions: 1
+
+=head2 Example: Sudoku
+
+This program can solve and generate various types of Sudokus.
+If something is worth doing, it's worth doing well.
+
+The L<solver|https://metacpan.org/dist/Algorithm-X-DLX/source/examples/sudoku/SudokuSolver.pm> itself is quite simple. The exact cover problem has four types of columns, n*n of each type. (For standard Sudoku, n = 9.)
+
+=over
+
+=item * Cell (I<x>, I<y>) needs to contain a digit.
+
+=item * Column I<x> needs to contain digit I<d>.
+
+=item * Row I<y> needs to contain digit I<d>.
+
+=item * Region I<i> needs to contain digit I<d>.
+
+=back
+
+The first one can actually be either a secondary or a primary column; if all other conditions are met, every cell will naturally contain I<at most one> digit.
+
+Each row of the matrix hits exactly one column of each type.
+
+For the standard 9x9 Sudoku, all regions are 3x3 squares. But it is straight-forward to generalize this so that the regions can form an arbitrary partition of the grid to subsets of size n. This also makes it possible to create Sudokus of any size; with square regions, the closest alternatives to 9x9 are 4x4 and 16x16.
+
+=head3 Usage
+
+The executable tries to infer as much as possible from the input data, requiring no flags or meta data about the Sudoku types. It expects to find Sudokus separated by empty lines. Empty cells can be either dots (C<'.'>) or zeros (C<'0'>). All non-zero digits and letters can be used as labels. Regions can be drawn with any non-space non-label characters.
+
+The given Sudokus will be solved, unless they are invalid or unsolvable; in that case, an error message is printed. A completely empty Sudoku will be replaced with a randomly generated (and usually quite difficult) one, which is also solved.
+
+=head3 Examples
+
+  examples/sudoku$ perl -I. ./sudoku.pl < ../data/sudoku.txt*
+  
+  examples/sudoku$ perl -I. ./sudoku.pl -s -l -f oneline < sudoku17** > sudoku17_solutions
+  
+  examples/sudoku$ yes . | head -n81 | perl -I. ./sudoku.pl -f default
+
+(E<nbsp>*) L<input|https://metacpan.org/dist/Algorithm-X-DLX/source/examples/data/sudoku.txt>,  L<output|https://metacpan.org/dist/Algorithm-X-DLX/source/examples/sudoku/output.txt>
+
+(**) L<https://drive.google.com/file/d/1StS_Sm_Eh9ZJTapOsrRJccM6UP6PmQ3B/view>
+
+=head2 Example: N-queens
+
+Place N queens on an NxN chessboard so that they don't attack each other. This is a good example of a generalized exact cover problem: each diagonal must contain at most one queen, but zero is ok.
+
+  examples/nqueens$ perl -I. nqueens.pl 8 12
+  Solutions for n=8: 92
+  Solutions for n=12: 14200
+
+  examples/nqueens$ perl -I. nqueens.pl -v 1 2 3 4
+  Solutions for n=1: 1
+  Q
+
+  Solutions for n=2: 0
+  Solutions for n=3: 0
+  Solutions for n=4: 2
+  ..Q.
+  Q...
+  ...Q
+  .Q..
+
+  .Q..
+  ...Q
+  Q...
+  ..Q.
+
+=head2 Example: Langford pairings
+
+See L<https://en.wikipedia.org/wiki/Langford_pairing>.
+
+  examples/langford$ perl -I. langford.pl -v 1 2 3 4 5
+  Solutions for n = 1: 0
+  Solutions for n = 2: 0
+  Solutions for n = 3: 1
+  3 1 2 1 3 2
+  Solutions for n = 4: 1
+  4 1 3 1 2 4 3 2
+  Solutions for n = 5: 0
+
+=head2 Example: N-pieces
+
+Generalized version of N-queens: place N knights and Q queens on an AxB board. Quite slow, unfortunately.
+
+  examples/npieces$ perl -I. npieces.pl 8 8 5 5
+  Solution 1
+  NN......
+  ....Q...
+  ......Q.
+  NN......
+  N.......
+  .......Q
+  .....Q..
+  ..Q.....
+  < snip >
+  Solutions for 8x8, N=5, Q=5: 16
+
+entire L<output|https://metacpan.org/dist/Algorithm-X-DLX/source/examples/npieces/npieces-solutions.txt>
+
+=head2 Example: Polyominoes
+
+The code can solve any polyomino puzzle, but for now the executable simply prints all solutions to Scott's pentomino problem:
+
+  examples/polyomino$ perl -I. polyomino.pl | head -n8
+  LLXCCVVV
+  LXXXCVZZ
+  LNXCCVZY
+  LNT  ZZY
+  NNT  WYY
+  NTTTWWFY
+  PPPWWFFF
+  PPIIIIIF
+
+entire L<output|https://metacpan.org/dist/Algorithm-X-DLX/source/examples/polyomino/solutions-to-scotts-pentomino.txt>
+
+=head1 DISCLAIMER
+
+Author of the originating C++ sources, of which this distribution is mostly a direct translation, 
+is Johannes Laire at L<https://github.com/jlaire/dlx-cpp>.
+Even all the examples, tests and most of the documentation are his.
+
+=head1 COPYRIGHT AND LICENSE
+
+The following copyright notice applies to all the files provided in
+this distribution, unless explicitly noted otherwise.
+
+This software is copyright (c) 2025 by Steffen Heinrich
+
+This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.
+
+=head1 SEE ALSO
+
+Donald E. Knuth, Stanford University 2000 L<Dancing Links|http://arxiv.org/pdf/cs/0011047v1> 
+
+L<Introduction to Exact Cover Problem and Algorithm X|https://www.geeksforgeeks.org/introduction-to-exact-cover-problem-and-algorithm-x/>
+
+Peter Pfeiffer BSc, Linz 2023 L<Uncovering Exact Cover Encodings|https://epub.jku.at/obvulihs/download/pdf/9260418>
+
+=cut
+

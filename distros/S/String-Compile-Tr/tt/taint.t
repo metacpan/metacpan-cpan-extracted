@@ -18,7 +18,7 @@ subtest 'run on tainted' => sub {
 
     plan 6;
     SKIP: {
-        my $todo = 'should support taint mode';
+        my $todo = todo 'should support taint mode';
         ok tainted($x), 'x is tainted';
         ok tainted($opt), 'opt is tainted';
         undef $todo;

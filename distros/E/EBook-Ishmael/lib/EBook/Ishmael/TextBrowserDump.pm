@@ -1,6 +1,6 @@
 package EBook::Ishmael::TextBrowserDump;
 use 5.016;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 use strict;
 use warnings;
 
@@ -90,7 +90,7 @@ sub browser_dump {
 		die "'$browser' is not installed on your system\n";
 	}
 
-	unless ($WIDTH_MIN <= $width <= $WIDTH_MAX) {
+	unless ($width >= $WIDTH_MIN and $width <= $WIDTH_MAX) {
 		die "Width cannot be greater than $WIDTH_MAX or less than $WIDTH_MIN\n";
 	}
 

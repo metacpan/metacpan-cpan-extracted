@@ -19,7 +19,7 @@ Convert Digits Between the Scripts of Unicode
 
 #  DESCRIPTION
 
-The 1Convert::Number::Digits1 will convert a sequence of digits from one
+The `Convert::Number::Digits` module will convert a sequence of digits from one
 script supported in Unicode, into another.  UTF-8 encoding is used
 for all scripts.
 
@@ -27,9 +27,9 @@ for all scripts.
 ## METHODS
 
 
-* `convert> - outputs digits in Western script (0-9).
+* `convert` - outputs digits in Western script (0-9).
 
-* `toMethods> - get a list of the following conversion methods:
+* `toMethods` - get a list of the following conversion methods:
 
   * `toArabic` - output digits in Arabic script (١-٢).
   * `toArabicIndic` - output digits in ArabicIndic script (۱-۲).

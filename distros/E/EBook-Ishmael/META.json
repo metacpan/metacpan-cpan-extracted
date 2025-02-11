@@ -64,6 +64,6 @@
          "web" : "https://codeberg.org/1-1sam/ishmael"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

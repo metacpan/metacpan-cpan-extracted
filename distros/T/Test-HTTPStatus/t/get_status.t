@@ -1,7 +1,7 @@
 use strict;
 
 use Test::More;
-use Test::RequiresInternet ('example.com' => 'http');
+use Test::RequiresInternet ('www.perl.org' => 'http');
 
 BEGIN { use_ok('Test::HTTPStatus') }
 

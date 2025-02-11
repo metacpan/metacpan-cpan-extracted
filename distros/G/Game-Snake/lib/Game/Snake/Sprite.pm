@@ -1,8 +1,8 @@
 use 5.38.0;
 use experimental 'class';
-our $VERSION = 0.09;
-
+package Game::Snake::Sprite 0.10;
 class Game::Snake::Sprite {
+	our $VERSION = 0.10;
 	use Raylib::FFI;
 	use Raylib::Color;
 

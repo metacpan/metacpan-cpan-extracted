@@ -23,7 +23,8 @@ if ( $ENV{CI} ) { # We're in an actual Github Action
   for my $n (qw(RUN_ID RUN_NUMBER) ) {
     like( $github{$n}, qr/\d+/, 'Run-related numbers are numbers' );
   }
-  like( $github{'WORKSPACE'}, qr/GitHub/, "Workspace includes repo name" );
+  like( $github{'REPOSITORY'}, qr/$github{'REPO_NAME'}/, "Github repository name includes just the repo" );
+  like( $github{'WORKSPACE'}, qr/$github{'REPO_NAME'}/, "Workspace includes repo name" );
 }
 
 

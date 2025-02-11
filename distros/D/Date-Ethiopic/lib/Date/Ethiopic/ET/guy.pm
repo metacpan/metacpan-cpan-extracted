@@ -13,7 +13,7 @@ BEGIN
 		@ShortMonths
 	);
 
-	$VERSION = "0.14";
+	$VERSION = "0.15";
 
 	@Days =(
 		[ "ውርሰምበት",	"Wirsenbet"    ],

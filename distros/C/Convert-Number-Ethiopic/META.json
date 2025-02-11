@@ -1,10 +1,10 @@
 {
    "abstract" : "Conversion For Ethiopic Numerals in Perl.",
    "author" : [
-      "Daniel Yacob <dyacob@cpan.org>"
+      "Daniel Yacob <dyacob\\@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
@@ -13,30 +13,38 @@
       "version" : 2
    },
    "name" : "Convert-Number-Ethiopic",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc"
-      ]
-   },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Module::Build" : "0.42"
          }
       },
       "runtime" : {
          "requires" : {
-            "perl" : "5.008000"
+            "perl" : "v5.8.0"
          }
       }
    },
+   "provides" : {
+      "Convert::Number::Ethiopic" : {
+         "file" : "lib/Convert/Number/Ethiopic.pm",
+         "version" : "0.21"
+      }
+   },
    "release_status" : "stable",
-   "version" : "0.20",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/dyacob/Convert-Number-Ethiopic/issues"
+      },
+      "homepage" : "https://github.com/dyacob/Convert-Number-Ethiopic",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/dyacob/Convert-Number-Ethiopic.git"
+      }
+   },
+   "version" : "0.21",
+   "x_authority" : "cpan:dyacob",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

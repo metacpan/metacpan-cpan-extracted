@@ -1,5 +1,8 @@
 Revision history for String-Compile-Tr
 
+0.06    2025/02/11
+        Minor adjustments
+
 0.05    2025/02/09
         Require 5.010
         Improve exception handling

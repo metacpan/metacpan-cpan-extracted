@@ -32,7 +32,7 @@ cat-v \[ 选项 \] args ...
 
 # VERSION
 
-Version 1.03
+Version 1.04
 
 # DESCRIPTION
 
@@ -105,6 +105,7 @@ Version 1.03
     nl    \x{23CE}  ⏎  RETURN SYMBOL
     np    \x{2398}  ⎘  NEXT PAGE
     sp    \x{00B7}  ·  MIDDLE DOT
+    esc   \x{21B0}  ↰  UPWARDS ARROW WITH TIP LEFTWARDS
     del   \x{232B}  ⌫  ERASE TO THE LEFT
 
 # OPTIONS
@@ -112,6 +113,10 @@ Version 1.03
 - **-n**, **--reset**
 
     禁用所有字符转换和制表符扩展，并重置重复字符。因此，`cat-v -n`实际上什么也不做，就像 `cat` 命令一样。
+
+    一旦重置了默认行为，只有在其后指定的选项才会有效果。例如，以下命令将只显示制表符。
+
+        cat-v -nt
 
 - **-c**, **--visible** _name_=_flag_,...
 
@@ -256,6 +261,14 @@ Version 1.03
 - [App::optex::util::filter](https://metacpan.org/pod/App%3A%3Aoptex%3A%3Autil%3A%3Afilter)
 
     `cat-v` 命令的前身最初是作为 [App::optex](https://metacpan.org/pod/App%3A%3Aoptex) 命令的过滤器模块创建的。
+
+- [https://harmful.cat-v.org/cat-v/](https://harmful.cat-v.org/cat-v/)
+
+    UNIX 风格，或 cat -v 被认为是有害的
+
+- [https://harmful.cat-v.org/cat-v/unix\_prog\_design.pdf](https://harmful.cat-v.org/cat-v/unix_prog_design.pdf)
+
+    UNIX 环境下的程序设计
 
 # AUTHOR
 

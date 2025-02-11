@@ -33,7 +33,7 @@ cat-v \[ options \] args ...
 
 # VERSION
 
-Version 1.03
+Version 1.04
 
 # DESCRIPTION
 
@@ -120,6 +120,7 @@ characters
     nl    \x{23CE}  ⏎  RETURN SYMBOL
     np    \x{2398}  ⎘  NEXT PAGE
     sp    \x{00B7}  ·  MIDDLE DOT
+    esc   \x{21B0}  ↰  UPWARDS ARROW WITH TIP LEFTWARDS
     del   \x{232B}  ⌫  ERASE TO THE LEFT
 
 # OPTIONS
@@ -129,6 +130,12 @@ characters
     Disables all character conversions and tab expansion, and resets
     repeat characters.  Therefore, the `cat-v -n` effectively does
     nothing, just like the `cat` command.
+
+    Once the default behavior is reset, only options specified after it
+    will have any effect.  For example, the following command will only
+    visualize tab characters.
+
+        cat-v -nt
 
 - **-c**, **--visible** _name_=_flag_,...
 
@@ -311,6 +318,14 @@ From GIT repository:
 
     The predecessor of the `cat-v` command was originally created as the 
     filter module of the [App::optex](https://metacpan.org/pod/App%3A%3Aoptex) command.
+
+- [https://harmful.cat-v.org/cat-v/](https://harmful.cat-v.org/cat-v/)
+
+    UNIX Style, or cat -v Considered Harmful
+
+- [https://harmful.cat-v.org/cat-v/unix\_prog\_design.pdf](https://harmful.cat-v.org/cat-v/unix_prog_design.pdf)
+
+    Program design in the UNIX environment
 
 # AUTHOR
 

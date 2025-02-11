@@ -1,0 +1,4 @@
+Changes for Catalyst-Plugin-OIDC distribution
+
+0.01 2025-02-10
+  - The plugin is extracted from the OIDC-Client distribution for dependency reasons

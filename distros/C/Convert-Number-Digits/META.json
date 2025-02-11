@@ -28,7 +28,7 @@
    "provides" : {
       "Convert::Number::Digits" : {
          "file" : "lib/Convert/Number/Digits.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -44,7 +44,7 @@
          "url" : "https://github.com/dyacob/Convert-Number-Digits.git"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_authority" : "cpan:dyacob",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

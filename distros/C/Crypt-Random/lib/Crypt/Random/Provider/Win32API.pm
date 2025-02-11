@@ -11,7 +11,7 @@ package Crypt::Random::Provider::Win32API;
 use Math::Pari qw(pari2num);
 use Crypt::URandom qw/urandom/;
 
-our $VERSION = '1.56';
+our $VERSION = '1.57';
 
 sub new { 
 

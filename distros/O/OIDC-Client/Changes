@@ -1,5 +1,8 @@
 Changes for OIDC-Client distribution
 
+0.07 2025-02-10
+  - Catalyst and Mojolicious plugins are extracted from this distribution to their own distributions for dependency reasons
+
 0.06 2025-01-17
   - No change. Retry after that PAUSE indexer failure for v0.05
 

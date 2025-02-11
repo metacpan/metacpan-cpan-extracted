@@ -23,6 +23,7 @@ on 'configure' => sub {
 };
 
 on 'develop' => sub {
+  requires "Software::Security::Policy::Individual" => "0";
   requires "Test::CPAN::Meta::JSON" => "0.16";
   requires "Test::Kwalitee" => "1.21";
   requires "Test::Pod" => "1.41";

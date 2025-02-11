@@ -1,0 +1,45 @@
+# Revision History for the Convert::Number::Ethiopic Perl Distribution
+
+## 0.21 Mon Feb 10 20:28:41 EST 2025
+	- Migration to a Build.PL & GitHub system.
+
+## 0.20 Sat Feb  1 16:34:19 EST 2025
+	- Fixes as per CPANTS:
+	  + Added MIN_PERL_VERSION
+
+## 0.19 Fri Jan 31 13:28:44 EST 2025
+	- Fixes as per CPANTS:
+	  + LICENSE added.
+	  + packaged with GNU tar.
+	  + Added 'use warnings'.
+
+## 0.18 Mon Jan 27 07:43:51 EST 2025
+	- reorganized _fromEthiopic for clarity.
+
+## 0.17 Thu Oct  5 14:33:03 EDT 2017
+	- /...\b/ changed back to /...$/ to work with perl 5.18.2, a perl version check is applied.
+
+## 0.16 Sun Jun 22 16:45:22 EDT 2003
+	- added optimization flags to REs.
+
+## 0.15 Thu Jun 19 12:02:30 EDT 2003
+	- package renamed Convert::Number::Ethiopic.
+	- /...$/ changed to /...\b/ to work around perl 5.8.0 problem.
+
+## 0.14  Sat Oct 12 11:30:01 EDT 2002
+	- added an "int" casting to insure integer division.
+
+## 0.13  Mon Oct  7 13:42:49 EDT 2002
+	- tuned _toEthiopic to be faster for single digit numbers.
+	- fixed typos in comments.
+	- tweaked example script formatting.
+
+## 0.12  Sun Oct  6 18:26:22 EDT 2002
+	- simplified Convert::Ethiopic::Lite::Number::_toEthiopic.
+	- more test cases added.
+
+## 0.11  Thu Aug  8 17:09:02 EDT 2002
+	- fixed a truth test that tripped over 0 when we meant "defined".
+
+## 0.10  Wed Aug  7 18:36:57 EDT 2002
+	- Initial release.

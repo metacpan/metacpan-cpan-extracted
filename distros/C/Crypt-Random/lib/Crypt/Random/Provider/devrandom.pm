@@ -10,7 +10,7 @@ use Crypt::Random::Provider::File;
 use vars qw(@ISA);
 @ISA = qw(Crypt::Random::Provider::File);
 
-our $VERSION = '1.56';
+our $VERSION = '1.57';
 
 sub _defaultsource { return "/dev/random" } 
 

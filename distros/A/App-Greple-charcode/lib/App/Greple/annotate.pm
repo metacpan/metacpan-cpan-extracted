@@ -4,7 +4,7 @@ use 5.024;
 use warnings;
 use utf8;
 
-our $VERSION = "0.9904";
+our $VERSION = "0.9905";
 
 =encoding utf-8
 
@@ -14,11 +14,11 @@ App::Greple::annotate - greple module for generic annotation
 
 =head1 SYNOPSIS
 
-B<greple> B<-Mannotate> ...
+B<greple> B<-Mannotate> [ I<module option> ] -- [ I<command option> ] ...
 
 =head1 VERSION
 
-Version 0.9904
+Version 0.9905
 
 =head1 DESCRIPTION
 
@@ -45,13 +45,23 @@ to display annotation for each matched text in the following style.
 Print annotation or not.  Enabled by default, so use C<--no-annotate>
 to disable it.
 
+=item B<--annotate::config>=I<params>
+
+Set configuration paarameters.
+
 =back
 
-=head1 MODULE OPTIONS
+=head1 MODULE OPTIONS and PARAMS
 
 =over 7
 
-=item B<--align>=I<column>
+=item B<--config>=I<params>
+
+Set configuration parameters.
+
+=item B<--alignto>=I<column>
+
+=item B<config>(B<alignto>=I<column>)
 
 Align annotation messages.  Defaults to C<1>, which aligns to the
 rightmost column; C<0> means no align; if a value of C<2> or greater
@@ -63,8 +73,10 @@ line length, regardless of match position.
 
 =item B<--split>, B<--no-split>
 
-If a pattern matching multiple characters is given, annotate each
-character independently.
+=item config(B<split>=[I<#>])
+
+Defaults to C<0>.  If a pattern matching multiple characters is given,
+annotate each character individually.
 
 =back
 
@@ -96,32 +108,28 @@ Configuration parameters can be set in several ways.
 The start function of a module can be specified at the same time as
 the module declaration.
 
-    greple -Mannotate::config(align=0)
+    greple -Mannotate::config(alignto=0)
 
-    greple -Mannotate::config=align=80
+    greple -Mannotate::config=alignto=80
 
 =head2 PRIVATE MODULE OPTION
 
 Module-specific options are specified between C<-Mannotate> and C<-->.
 
-    greple -Mannotate --config align=80 -- ...
+    greple -Mannotate --config alignto=80 -- ...
 
-    greple -Mannotate --align=80 -- ...
+    greple -Mannotate --alignto=80 -- ...
 
-=head1 CONFIGURATION PARAMETERS
+=head2 GENERIC MODULE OPTION
 
-=over 7
+Module-specific C<---config> option can be called by normal command
+line option C<--annotate::config>.
 
-=item B<align>
-
-(default 1) Align the description on the rightmost column, or numbered
-column if the value is greater than 2.
-
-=back
+    greple -Mannotate --annotate::config alignto=80 ...
 
 =head1 INSTALL
 
-cpanm -n B<App::Greple::annotate>
+    cpanm -n B<App::Greple::annotate>
 
 =head1 SEE ALSO
 
@@ -149,10 +157,10 @@ use Data::Dumper;
 
 our $config = Getopt::EX::Config->new(
     annotate => \(our $opt_annotate = 1),
-    align => 1,
+    alignto => 1,
     split => 0,
 );
-my %type = ( align => '=i', '*' => '!' );
+my %type = ( alignto => '=i', '*' => '!' );
 lock_keys %{$config};
 
 sub finalize {
@@ -231,7 +239,7 @@ package Local::Annon::List {
     }
     sub maxpos {
 	my $obj = CORE::shift;
-        List::Util::max map { $_->end } @{$obj->annotation};
+        List::Util::max map { $_->end - 1 } @{$obj->annotation};
     }
 }
 
@@ -344,23 +352,23 @@ sub _prepare {
 	    $start = $end;
 	}
 	@{$current->count} == 0 and next;
-	my $align = $config->{align};
-	if ($align > 0 and $current->total > 0) {
-	    align($current, $align > 1 ? $align : $current->last->[0]);
+	my $alignto = $config->{alignto};
+	if ($alignto > 0 and $current->total > 0) {
+	    alignto($current, $alignto > 1 ? $alignto : $current->last->[0]);
 	}
 	$annotation->join($current);
     }
-    if ($config->{align} == -1) {
-	align($annotation, $annotation->maxpos);
+    if ($config->{alignto} == -1) {
+	alignto($annotation, $annotation->maxpos);
     }
-    elsif ($config->{align} == -2) {
+    elsif ($config->{alignto} == -2) {
 	if (my $maxlen = max map { vwidth($grep->cut($_->[0]->@*)) } @result) {
-	    align($annotation, $maxlen - 1);
+	    alignto($annotation, $maxlen - 1);
 	}
     }
 }
 
-sub align {
+sub alignto {
     my($list, $pos) = @_;
     for (@{$list->annotation}) {
 	if ((my $extend = $pos - $_->[0]) > 0) {
@@ -391,3 +399,10 @@ option --annotate::config \
     --prologue &__PACKAGE__::config($<shift>)
 
 option --config --annotate::config
+
+option --split      --annotate::config split=1
+option --alignto    --annotate::config alignto=$<shift>
+option --align      --annotate::config alignto=1
+option --no-align   --annotate::config alignto=0
+option --align-all  --annotate::config alignto=-1
+option --align-side --annotate::config alignto=-2

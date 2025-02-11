@@ -1,0 +1,32 @@
+# Revision History for the Date::Ethiopic Perl Distribution
+
+## 0.15 ሰኞ፣ ፌብ 10 ቀን 20:58:13 EST 2025 ዓ/ም
+	- Migration to a Build.PL & GitHub system.
+
+## 0.14 ሰኞ፣ ፌብ  3 ቀን 21:44:34 EST 2025 ዓ/ም
+	- Set TZ in tester it UTC
+	- Fixes as per CPANTS:
+	  + POD encoding is set to utf8.
+	  + Added 'use warnings'.
+	  + Added 'use strict'.
+	  + Added MIN_PERL_VERSION to Makefile.PL
+	  + Synched module versions.
+	  + Added META documents.
+
+## 0.13 ዓርብ፣ ጁን 20 ቀን 09:00:55 ጡዋት EDT 2003 ዓ/ም
+	- updates for Convert::Number::Ethiopic.
+
+## 0.12 ቅዳሜ ኤፕረ  5 18:23:30 EDT 2003
+	- updates to Tigre data.
+	- typo fix.
+
+## 0.11 እሑድ ማርች 16 09:23:44 EST 2003
+	- merged most UTF-8 and Transcribed arrays.
+	- Makefile.PL now adds "use utf8;" for Perl v5.6 and above.
+	- fixed bug in ET::har.
+	- moved Amharic data into ET.pm as a default.
+	- miscellaneous fixes.
+
+## 0.10 ዓርብ ማርች 14 07:04:49 EST 2003
+	- initial release.
+

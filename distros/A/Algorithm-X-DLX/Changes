@@ -1,0 +1,16 @@
+
+Changes for Algorithm::X::DLX
+
+v0.03 2025/02/10
+
+    declare Test::Exception in build_requires,
+    fixed another pod link
+
+v0.02 2025/02/10
+
+    fixed broken pod links to files outside of lib/
+
+v0.01 2025/02/10
+
+    Releasing first version of Algorithm::X::DLX
+

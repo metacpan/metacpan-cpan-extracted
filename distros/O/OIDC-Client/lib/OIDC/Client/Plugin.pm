@@ -25,8 +25,8 @@ OIDC::Client::Plugin - Main module for the plugins
 
 =head1 DESCRIPTION
 
-Main module instanciated for the current request by the application plugin
-(L<Mojolicious::Plugin::OIDC> or L<Catalyst::Plugin::OIDC>).
+Main module instanciated for the current request by an application plugin
+(for example: L<Mojolicious::Plugin::OIDC>).
 
 It contains all the methods available in the application.
 

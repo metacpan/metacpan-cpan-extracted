@@ -1,3 +1,10 @@
+0.04 Mon Feb 10 20:36:39 EST 2025
+	- Fixes to markdown.
+	- Adding CONTRIBUTING.md to MANIFEEST.
+
+0.03 Mon Feb 10 18:19:51 EST 2025
+	- Migration to a Build.PL & GitHub system.
+
 0.02 Sat Feb  1 23:21:25 EST 2025
 	- Fixes as per CPANTS:
 	  + LICENSE added.

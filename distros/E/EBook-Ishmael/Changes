@@ -1,4 +1,16 @@
 Revision history for Perl module EBook::Ishmael.
 
+0.02  Feb 10 2025
+  Added:
+    - --format can now recognize some alternative format names.
+      - fb2 for FictionBook2
+      - xhtml for HTML
+  Changes:
+    - Removed dumper list from help message.
+  Fixes:
+    - Fix the syntax of the width check in browser_dump() to make it compatible
+      with older Perl versions.
+    - Add missing developer documentation.
+
 0.01  Feb 09 2025
   - Initial release.

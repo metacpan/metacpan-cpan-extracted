@@ -1,0 +1,68 @@
+# Revision History for the Text::Metaphone::Amharic Perl Distribution
+
+0.14 Mon Feb 10 08:45:02 EST 2025
+	- Migration to a Build.PL & GitHub system.
+
+0.13 Sun Feb  2 13:57:42 EST 2025
+	- Fixes as per CPANTS:
+	  + LICENSE added.
+	  + packaged with GNU tar.
+	  + Added 'use warnings'.
+	  + Added META documents.
+	  + Added MIN_PERL_VERSION to Makefile.PL
+
+0.12 Wed Jan 22 13:20:28 EST 2025
+	- fix for output encoding in examples and POD.
+
+0.11 Sun May 30 15:31:18 EDT 2004
+	- fix typo in examples/matchtext.pl.
+	- fix typo in granularity variable in lib/Text/Metaphone/Amharic.pm.
+	- adjustment to the regex key created in the "im" method.
+
+0.10 Sun Oct 26 06:12 EDT 2003
+	- documentation tweaks only -thanks Mike Castle!
+
+0.09 Tue Jun  3 08:53:40 EDT 2003
+	- added the "o" optimizer everywhere applicable,
+	  lets hope this doesn't break anything.
+	- changed "grandularity" to "granularity" everywhere.
+	- documentation fixes.
+
+0.08 Sun Jun 1 10:51:20 EDT 2003
+	- moved IPA code into new _formatStyle method.
+	- added SERA "style" option.
+	- enhanced documentation.
+	- added examples/matchtest.pl.
+
+0.07 Fri May 30 07:57:23 EDT 2003
+	- added "medium" grandularity.
+	- fixed grandularity bugs.
+	- enhanced regex key generation.
+	- added examples/grandularity.pl.
+
+0.06 Fri May 23 12:11:07 EDT 2003
+	- added  "v" ->  "b" mapping.
+	- added "fm" -> "fn" mapping. 
+	- a bit of a regex hack to avoid nested brackets,
+	  should clean this up later.
+	- added "N" in IM susbstitutions, review why it was
+	  left out earlier.
+
+0.05 Wed May 21 18:42:15 EDT 2003
+	- added parens to the $keyboard re and removed from
+	  while loop, this is somehow more portable.
+
+0.04 Wed May 21 14:17:49 EDT 2003
+	- fixed test script.
+
+0.03 Tue May 20 08:08:10 EDT 2003
+	- this Changes file (forgotten in 0.02).
+	- fixed names in examples scripts.
+
+0.02 Mon May 19 11:37:03 EDT 2003
+	- added "grandularity" mode.
+	- "style" and "grandularity" can be during at import.
+	- added example scripts
+
+0.01 Sat Apr 12 21:23:09 EDT 2003
+	- initial release.

@@ -11,7 +11,7 @@ BEGIN
 		@ShortDays
 	);
 
-	$VERSION = "0.14";
+	$VERSION = "0.15";
 
 	@Days =(
 		[ "ውርሰንበት",	"Wirsenbet"   ],

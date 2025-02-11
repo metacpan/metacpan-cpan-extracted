@@ -1,7 +1,11 @@
+Build.PL
 Changes
+Changes.md
+CONTRIBUTING.md
+LICENSE
 MANIFEST
-Makefile.PL
-README
+README.md
+SECURITY.md
 examples/amphone-high.pl
 examples/amphone.pl
 examples/granularity.pl
@@ -10,5 +14,5 @@ examples/ipa-phone.pl
 examples/matchtest.pl
 lib/Text/Metaphone/Amharic.pm
 t/01phones.t
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)
+META.yml
+META.json

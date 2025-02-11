@@ -1,0 +1,16 @@
+
+ Algorithm::X::DLX - Solve exact cover problems, with several example applications
+
+ Applies the usual D. Knuth's Algorithm X with dancing links technique (DLX, iteratively!), 
+ to find all solutions to an exact cover problem.
+ 
+ https://en.wikipedia.org/wiki/Knuth%27s_Algorithm_X
+
+ DISCLAIMER: 
+ This distribution is a translation of the cpp sources at 
+    https://github.com/jlaire/dlx-cpp
+ into Perl.
+    Johannes Laire is the original author of all these libs, alltogether with their comprehensive examples and tests.
+ 
+ Steffen Heinrich, Feb. 2025
+ 

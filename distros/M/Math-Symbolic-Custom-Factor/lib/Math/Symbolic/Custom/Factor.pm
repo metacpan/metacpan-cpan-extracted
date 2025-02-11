@@ -15,11 +15,11 @@ Math::Symbolic::Custom::Factor - Re-arrange a Math::Symbolic expression into a p
 
 =head1 VERSION
 
-Version 0.1
+Version 0.11
 
 =cut
 
-our $VERSION = '0.1';
+our $VERSION = '0.11';
 
 use Math::Symbolic qw(:all);
 use Math::Symbolic::Custom::Base;
@@ -601,7 +601,7 @@ sub factorize {
                     my $MS_root = parse_from_string($root);                        
                     my $p_val = $nt->value($var => $MS_root->value());
 
-                    if ( $p_val == 0 ) {
+                    if ( abs($p_val) < 1e-11 ) {    # fix failing test on uselongdouble systems.
 
                         $MS_root = $MS_root->to_collected();
                         my ($full_expr, $divisor, $quotient, $remainder) = $nt->apply_synthetic_division($MS_root, $var);  

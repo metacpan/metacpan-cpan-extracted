@@ -34,7 +34,7 @@ cat-v [ オプション ] args ...
 
 =head1 VERSION
 
-Version 1.03
+Version 1.04
 
 =head1 DESCRIPTION
 
@@ -113,6 +113,7 @@ C<cat-v>を使うと、タブ文字は表示上のスペースが変わらない
     nl    \x{23CE}  ⏎  RETURN SYMBOL
     np    \x{2398}  ⎘  NEXT PAGE
     sp    \x{00B7}  ·  MIDDLE DOT
+    esc   \x{21B0}  ↰  UPWARDS ARROW WITH TIP LEFTWARDS
     del   \x{232B}  ⌫  ERASE TO THE LEFT
 
 =head1 OPTIONS
@@ -122,6 +123,10 @@ C<cat-v>を使うと、タブ文字は表示上のスペースが変わらない
 =item B<-n>, B<--reset>
 
 すべての文字変換とタブ展開を無効にし、繰り返し文字をリセットします。したがって、C<cat-v -n>は、C<cat>コマンドと同様に、事実上何もしないです。
+
+デフォルトの動作がリセットされると、その後に指定されたオプションだけが効果を持つようになります。例えば、以下のコマンドはタブ文字だけを表示します。
+
+    cat-v -nt
 
 =item B<-c>, B<--visible> I<name>=I<flag>,...
 
@@ -274,6 +279,14 @@ Gitリポジトリ。
 =item L<App::optex::util::filter>
 
 C<cat-v>コマンドの前身は、もともとL<App::optex>コマンドのフィルタモジュールとして作られたものです。
+
+=item L<https://harmful.cat-v.org/cat-v/>
+
+UNIXスタイル、または有害と考えられるcat -v
+
+=item L<https://harmful.cat-v.org/cat-v/unix_prog_design.pdf>
+
+UNIX環境でのプログラム設計
 
 =back
 

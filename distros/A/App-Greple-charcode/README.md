@@ -17,10 +17,20 @@ App::Greple::charcode - greple module to annotate unicode character data
 
     COMMAND OPTION
       --no-annotate  do not print annotation
+      --[no-]align   align annotations
+      --align-all    align to the same column for all lines
+      --align-side   align to the longest line
+
+    UNICODE
       --composite    find composite character (combining character sequence)
       --precomposed  find precomposed character
-      --combind      find both composite and precomposed characters
+      --combined     find both composite and precomposed characters
       --dt=type      specify decomposition type
+      --surrogate    find character in UTF-16 surrogate pair range
+      --outstand     find non-ASCII combining characters
+      -p/-P prop     find \p{prop} or \P{prop} characters
+
+    ANSI
       --ansicode     find ANSI terminal control sequences
 
     MODULE OPTION
@@ -31,14 +41,14 @@ App::Greple::charcode - greple module to annotate unicode character data
       --[no-]name    display character name
       --[no-]visible display character name
       --[no-]split   put annotattion for each character
-      --align=#      align annotation
+      --alignto=#    align annotation to #
 
       --config KEY[=VALUE],...
                (KEY: column char width code name visible align)
 
 # VERSION
 
-Version 0.9904
+Version 0.9905
 
 # DESCRIPTION
 
@@ -91,10 +101,20 @@ character.  This module allows you to see how it is done.
     Print annotation or not.  Enabled by default, so use `--no-annotate`
     to disable it.
 
-## CHARACTER CODE OPTIONS
+- **--**\[**no-**\]**align**
 
-The following options are used to search for Unicode combining
-characters.
+    Align annotation or not.
+    Default true.
+
+- **--align-all**
+
+    Align to the same column for all lines
+
+- **--align-side**
+
+    Align to the longest line length, regardless of match position.
+
+# PATTERN OPTIONS
 
 If multiple patterns are given to **greple**, it normally prints only
 the lines that match all of the patterns.  However, for the purposes
@@ -113,7 +133,7 @@ will be displayed in a different color.
 
     Search for precomposed characters (`\p{Dt=Canonical}`).
 
-- **--combind**
+- **--combined**
 
     Find both **composite** and **precomposed** characters.
 
@@ -121,6 +141,23 @@ will be displayed in a different color.
 
     Specifies the `Decomposition_Type`.  It can take three values:
     `Canonical`, `Non_Canonical` (`NonCanon`), or `None`.
+
+- **--outstand**
+
+    Matches outstanding characters, those are non-ASCII combining
+    characters.
+
+- **--surrogate**
+
+    Matches to characters in UTF-16 surragate pair range (U+10000 to
+    U+10FFFF).
+
+- **-p** _prop_, **-P** _prop_
+
+    Short cut for `-E '\p{prop}'` and  `-E '\P{prop}'`.
+
+    You will not be able to use greple's `-p` option, but it probably
+    won't be a problem.  If you must use it, use `--pargraph`.
 
 - **--ansicode**
 
@@ -131,14 +168,12 @@ will be displayed in a different color.
     To be precise, it searches for CSI Control sequences defined in
     ECMA-48.  Pattern is defined as this.
 
-        define ECMA-CSI <<EOL
-            (?x)
-            # see ECMA-48 5.4 Control sequences
-            (?: \e\[ | \x9b ) # csi
-            [\x30-\x3f]*      # parameter bytes
-            [\x20-\x2f]*      # intermediate bytes
-            [\x40-\x7e]       # final byte
-        EOL
+        (?x)
+        # see ECMA-48 5.4 Control sequences
+        (?: \e\[ | \x9b ) # csi
+        [\x30-\x3f]*      # parameter bytes
+        [\x20-\x2f]*      # intermediate bytes
+        [\x40-\x7e]       # final byte
 
     <div>
             <p>
@@ -146,39 +181,58 @@ will be displayed in a different color.
             </p>
     </div>
 
-# MODULE OPTIONS
+# MODULE OPTIONS and PARAMS
 
+Module-specific options are specified between `-Mcharcode` and `--`.
+
+    greple -Mcharcode --config width,name=0 -- ...
+
+Parameters can be set in two ways, one using the `--config` option
+and the other using dedicated options.  See the ["CONFIGURATION"](#configuration)
+section for more information.
+
+- **--config**=_params_
+
+    Set configuration parameters.
+
+- **column**
 - **--**\[**no-**\]**column**
 
     Show column number.
-    Default **true**.
+    Default `1`.
 
+- **char**
 - **--**\[**no-**\]**char**
 
     Show the character itself.
-    Default **false**.
+    Default `0`.
 
+- **width**
 - **--**\[**no-**\]**width**
 
     Show the width.
-    Default **false**.
+    Default `0`.
 
+- **code**
 - **--**\[**no-**\]**code**
 
     Show the character code in hex.
-    Default **true**.
+    Default `1`.
 
+- **name**
 - **--**\[**no-**\]**name**
 
     Show the Unicode name of the character.
-    Default **true**.
+    Default `1`.
 
+- **visible**
 - **--**\[**no-**\]**visible**
 
     Display invisible characters in a visible string representation.
-    Default False.
+    Default `0`.
 
-- **--align**=_column_
+- **alignto**=_column_
+- **--alignto**=_column_
 
     Align annotation messages.  Defaults to `1`, which aligns to the
     rightmost column; `0` means no align; if a value of `2` or greater
@@ -188,6 +242,7 @@ will be displayed in a different color.
     column for all lines.  If `-2` is specified, align to the longest
     line length, regardless of match position.
 
+- **split**
 - **--**\[**no-**\]**split**
 
     If a pattern matching multiple characters is given, annotate each
@@ -202,52 +257,24 @@ Configuration parameters can be set in several ways.
 The start function of a module can be specified at the same time as
 the module declaration.
 
-    greple -Mcharcode::config(width,name=0)
+    greple -Mannotate::config(alignto=0)
 
-    greple -Mcharcode::config=width,name=0
+    greple -Mannotate::config=alignto=80
 
 ## PRIVATE MODULE OPTION
 
-Module-specific options are specified between `-Mcharcode` and `--`.
+Module-specific options are specified between `-Mannotate` and `--`.
 
-    greple -Mcharcode --config width,name=0 -- ...
+    greple -Mannotate --config alignto=80 -- ...
 
-# CONFIGURATION PARAMETERS
+    greple -Mannotate --alignto=80 -- ...
 
-- **column**
+## GENERIC MODULE OPTION
 
-    (default 1)
-    Show column number.
+Module-specific `---config` option can be called by normal command
+line option `--annotate::config`.
 
-- **char**
-
-    (default 0)
-    Show the character itself.
-
-- **width**
-
-    (default 0)
-    Show the width.
-
-- **code**
-
-    (default 1)
-    Show the character code in hex.
-
-- **name**
-
-    (default 1)
-    Show the Unicode name of the character.
-
-- **visible**
-
-    (default 0)
-    Display invisible characters in a visible string representation.
-
-- **align**=_column_
-
-    (default 1)
-    Align the description on the same column.
+    greple -Mannotate --annotate::config alignto=80 ...
 
 # INSTALL
 

@@ -1,5 +1,8 @@
 Revision history for Perl module Test::HTTPStatus
 
+2.08	Mon Feb 10 15:22:59 EST 2025
+	Honour NO_NETWORK_TESTING - always succeed when that is set
+
 2.07	Mon Feb  3 07:55:20 EST 2025
 	HTTP::SimpleLinkChecker has been removed from CPAN
 

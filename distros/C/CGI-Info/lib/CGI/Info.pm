@@ -25,17 +25,13 @@ sub _sanitise_input($);
 
 CGI::Info - Information about the CGI environment
 
-=head1 DESCRIPTION
-
-CGI::Info gets information about the system that a CGI script is running on.
-
 =head1 VERSION
 
-Version 0.90
+Version 0.91
 
 =cut
 
-our $VERSION = '0.90';
+our $VERSION = '0.91';
 
 =head1 SYNOPSIS
 
@@ -485,7 +481,13 @@ CGI::Info will put the request into the params element 'XML', thus:
 	my $xml = $$paramsref{'XML'};
 	# ... parse and process the XML request in $xml
 
-Carp if logger is not set and we detect something serious:w
+Carp if logger is not set and we detect something serious.
+
+Blocks some attacks,
+such as SQL and XSS injections,
+mustleak and directory traversals,
+thus creating a primitive web application firewall (WAF).
+Warning - this is an extra layer, not a replacement for your other security layers.
 
 =cut
 
@@ -616,6 +618,7 @@ sub params {
 				$self->_warn({
 					warning => "upload_dir $self->{upload_dir} isn't a full pathname"
 				});
+				$self->status(500);
 				delete $self->{upload_dir};
 				return;
 			}
@@ -623,6 +626,7 @@ sub params {
 				$self->_warn({
 					warning => "upload_dir $self->{upload_dir} isn't a directory"
 				});
+				$self->status(500);
 				delete $self->{upload_dir};
 				return;
 			}
@@ -631,6 +635,7 @@ sub params {
 				$self->_warn({
 					warning => "upload_dir $self->{upload_dir} isn't writeable"
 				});
+				$self->status(500);
 				delete $self->{upload_dir};
 				return;
 			}
@@ -639,6 +644,7 @@ sub params {
 				$self->_warn({
 					warning => 'upload_dir ' . $self->{'upload_dir'} . " isn't somewhere in the temporary area $tmpdir"
 				});
+				$self->status(500);
 				delete $self->{upload_dir};
 				return;
 			}
@@ -768,6 +774,7 @@ sub params {
 		if($self->{expect} && (List::Util::none { $_ eq $key } @{$self->{expect}})) {
 			next;
 		}
+		my $orig_value = $value;
 		$value = _sanitise_input($value);
 
 		if((!defined($ENV{'REQUEST_METHOD'})) || ($ENV{'REQUEST_METHOD'} eq 'GET')) {
@@ -791,8 +798,21 @@ sub params {
 				}
 				return;
 			}
+			if(my $agent = $ENV{'HTTP_USER_AGENT'}) {
+				if(($agent =~ /SELECT.+AND.+/) || ($agent =~ /ORDER BY /) || ($agent =~ / OR NOT /) || ($agent =~ / AND \d+=\d+/) || ($agent =~ /THEN.+ELSE.+END/) || ($agent =~ /.+AND.+SELECT.+/) || ($agent =~ /\sAND\s.+\sAND\s/)) {
+					$self->status(403);
+					if($ENV{'REMOTE_ADDR'}) {
+						$self->_warn($ENV{'REMOTE_ADDR'} . ": SQL injection attempt blocked for '$agent'");
+					} else {
+						$self->_warn("SQL injection attempt blocked for '$agent'");
+					}
+					return 1;
+				}
+			}
 			if(($value =~ /((\%3C)|<)((\%2F)|\/)*[a-z0-9\%]+((\%3E)|>)/ix) ||
-			   ($value =~ /((\%3C)|<)[^\n]+((\%3E)|>)/i)) {
+			   ($value =~ /((\%3C)|<)[^\n]+((\%3E)|>)/i) ||
+			   ($orig_value =~ /((\%3C)|<)((\%2F)|\/)*[a-z0-9\%]+((\%3E)|>)/ix) ||
+			   ($orig_value =~ /((\%3C)|<)[^\n]+((\%3E)|>)/i)) {
 				$self->status(403);
 				$self->_warn("XSS injection attempt blocked for '$value'");
 				return;
@@ -1136,8 +1156,11 @@ sub is_tablet {
 
 =head2 as_string
 
-Returns the parameters as a string, which is useful for debugging or
-generating keys for a cache.
+Converts CGI parameters into a formatted string representation with optional raw mode (no escaping of special characters).
+Useful for debugging or generating keys for a cache.
+
+    my $string_representation = $info->as_string();
+    my $raw_string = $info->as_string({ raw => 1 });
 
 =cut
 
@@ -1145,14 +1168,26 @@ sub as_string
 {
 	my $self = shift;
 
+	# Retrieve object parameters
 	my $params = $self->params() || return '';
+	my $args = $self->_get_params(undef, @_);
+	my $rc;
 
-	my $rc = join ';', map {
-		my $value = $params->{$_};
-			$value =~ s/\\/\\\\/g;
-			$value =~ s/(;|=)/\\$1/g;
+	if($args->{'raw'}) {
+		# Raw mode: return key=value pairs without escaping
+		$rc = join '; ', map {
+			"$_=" . $params->{$_}
+		} sort keys %{$params};
+	} else {
+		# Escaped mode: escape special characters
+		$rc = join '; ', map {
+			my $value = $params->{$_};
+
+			$value =~ s/\\/\\\\/g;	# Escape backslashes
+			$value =~ s/(;|=)/\\$1/g;	# Escape semicolons and equals signs
 			"$_=$value"
-		} sort keys %$params;
+		} sort keys %{$params};
+	}
 
 	$self->_trace("as_string: returning '$rc'") if($rc);
 
@@ -1376,6 +1411,10 @@ Is the visitor a real person or a robot?
 		# update site visitor statistics
 	}
 
+If the client is seen to be attempting an SQL injection,
+set the HTTP status to 403,
+and return 1.
+
 =cut
 
 sub is_robot {
@@ -1393,6 +1432,7 @@ sub is_robot {
 		return 0;
 	}
 
+	# See also params()
 	if(($agent =~ /SELECT.+AND.+/) || ($agent =~ /ORDER BY /) || ($agent =~ / OR NOT /) || ($agent =~ / AND \d+=\d+/) || ($agent =~ /THEN.+ELSE.+END/) || ($agent =~ /.+AND.+SELECT.+/) || ($agent =~ /\sAND\s.+\sAND\s/)) {
 		$self->status(403);
 		$self->{is_robot} = 1;
@@ -1756,6 +1796,22 @@ sub warnings
 	my $self = shift;
 
 	return $self->{'warnings'};
+}
+
+=head2	warnings_as_string
+
+Returns the warnings that the object has generated as a string.
+
+=cut
+
+sub warnings_as_string
+{
+	my $self = shift;
+
+	if(scalar($self->{'warnings'})) {
+		my @warnings = map { $_->{'warning'} } @{$self->{'warnings'}};
+		return join('; ', @warnings);
+	}
 }
 
 =head2 set_logger

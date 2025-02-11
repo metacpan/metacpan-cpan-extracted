@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 197;
+use Test::Most tests => 200;
 use File::Spec;
 use lib 't/lib';
 use MyLogger;
@@ -18,6 +18,7 @@ PARAMS: {
 
 	my $i = new_ok('CGI::Info');
 	ok(!defined($i->warnings()));
+	ok(!defined($i->warnings_as_string()));
 	my %p = %{$i->params()};
 	ok($p{foo} eq 'bar');
 	ok(!defined($p{fred}));
@@ -35,7 +36,7 @@ PARAMS: {
 	%p = %{$i->params()};
 	ok($p{foo} eq 'bar');
 	ok($p{fred} eq 'wilma');
-	ok($i->as_string() eq 'foo=bar;fred=wilma');
+	ok($i->as_string() eq 'foo=bar; fred=wilma');
 
 	$ENV{'QUERY_STRING'} = 'name=nigel+horne';
 	%p = %{new_ok('CGI::Info')->params()};
@@ -51,7 +52,8 @@ PARAMS: {
 	%p = %{$i->params()};
 	ok($p{foo} eq 'bar,=baz');
 	ok($p{fred} eq 'wilma');
-	ok($i->as_string() eq 'foo=bar,\\=baz;fred=wilma');
+	ok($i->as_string() eq 'foo=bar,\\=baz; fred=wilma');
+	ok($i->as_string(raw => 1) eq 'foo=bar,=baz; fred=wilma');
 
 	%p = %{$i->params()};
 	is($p{foo}, 'bar,=baz', 'Reading twice should yield the same result');
@@ -61,7 +63,7 @@ PARAMS: {
 	%p = %{$i->params()};
 	is($p{foo}, 'bar', "Don't add if it's already there");
 	ok($p{fred} eq 'wilma');
-	ok($i->as_string() eq 'foo=bar;fred=wilma');
+	ok($i->as_string() eq 'foo=bar; fred=wilma');
 
 	$ENV{'QUERY_STRING'} = 'foo=&fred=wilma';
 	$i = new_ok('CGI::Info');
@@ -76,7 +78,7 @@ PARAMS: {
 	ok($p{foo} eq 'bar');
 	ok($p{fred} eq 'wilma');
 	cmp_ok($i->foo(), 'eq', 'bar', 'Test AUTOLOAD');
-	ok($i->as_string() eq 'foo=bar;fred=wilma');
+	ok($i->as_string() eq 'foo=bar; fred=wilma');
 
 	$ENV{'QUERY_STRING'} = 'page=submit&country=Singapore&county=';
 	$i = new_ok('CGI::Info');
@@ -89,8 +91,9 @@ PARAMS: {
 	# Catch XSS attempts
 	$ENV{'QUERY_STRING'} = 'foo=bar&fred=<script>alert(123)</script>';
 	$i = new_ok('CGI::Info');
-	%p = %{$i->params()};
-	ok($p{fred} eq '&lt;script&gt;alert(123)&lt;/script&gt;');
+	# %p = %{$i->params()};
+	# ok($p{fred} eq '&lt;script&gt;alert(123)&lt;/script&gt;');
+	ok(!defined($i->params()));
 
 	# SQL Injection is prevented
 	$ENV{'QUERY_STRING'} = "foo=bar&userName=' OR '1'='1&fred=wilma";
@@ -449,7 +452,7 @@ EOF
 	$i = new_ok('CGI::Info');
 	%p = %{$i->params(logger => MyLogger->new())};
 	ok($p{fred} eq 'wilma');
-	ok($i->as_string() eq 'foo=bar;fred=wilma');
+	ok($i->as_string() eq 'foo=bar; fred=wilma');
 	ok(!$i->is_mobile());
 
 	@ARGV= ('file=/../../../../etc/passwd%00');
@@ -459,9 +462,10 @@ EOF
 	diag(Data::Dumper->new([$i->warnings()])->Dump()) if($ENV{'TEST_VERBOSE'});
 	like(
 		$i->warnings()->[0]->{'warning'},
-		qr/Blocked directory traversal attack for 'file'/,
+		qr/^Blocked directory traversal attack for 'file'/,
 		'Warning generated for disallowed parameter'
 	);
+	like($i->warnings_as_string(), qr/^Blocked directory traversal attack/, 'warnings_as_string works');
 
 	@ARGV= ('file=/etc/passwd%00');
 	$i = new_ok('CGI::Info');
@@ -472,14 +476,14 @@ EOF
 	$i = new_ok('CGI::Info');
 	%p = %{$i->params()};
 	ok($p{fred} eq 'wilma');
-	ok($i->as_string() eq 'foo=bar;fred=wilma');
+	ok($i->as_string() eq 'foo=bar; fred=wilma');
 	ok($i->is_mobile());
 
 	@ARGV = ('--tablet', 'foo=bar', 'fred=wilma' );
 	$i = new_ok('CGI::Info');
 	%p = %{$i->params()};
 	ok($p{fred} eq 'wilma');
-	ok($i->as_string() eq 'foo=bar;fred=wilma');
+	ok($i->as_string() eq 'foo=bar; fred=wilma');
 	ok(!$i->is_mobile());
 	ok($i->is_tablet());
 
@@ -487,7 +491,7 @@ EOF
 	$i = new_ok('CGI::Info');
 	%p = %{$i->params()};
 	ok($p{fred} eq 'wilma');
-	ok($i->as_string() eq 'foo=bar;fred=wilma');
+	ok($i->as_string() eq 'foo=bar; fred=wilma');
 	ok(!$i->is_mobile());
 	ok($i->is_search_engine());
 
@@ -495,7 +499,7 @@ EOF
 	$i = new_ok('CGI::Info');
 	%p = %{$i->params()};
 	ok($p{fred} eq 'wilma');
-	ok($i->as_string() eq 'foo=bar;fred=wilma');
+	ok($i->as_string() eq 'foo=bar; fred=wilma');
 	ok(!$i->is_mobile());
 	ok(!$i->is_search_engine());
 	ok($i->is_robot());

@@ -1,7 +1,8 @@
 use 5.38.0;
 use experimental 'class';
-our $VERSION = 0.09;
+package Game::Snake::Food 0.10;
 class Game::Snake::Food {
+	our $VERSION = 0.10;
 	use Raylib::App;
 	use Raylib::FFI;
 

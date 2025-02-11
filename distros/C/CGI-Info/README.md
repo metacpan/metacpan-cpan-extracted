@@ -1,24 +1,22 @@
 CGI-Info
 ========
 
--[![Travis Status](https://travis-ci.org/nigelhorne/CGI-Info.svg?branch=master)](https://travis-ci.org/nigelhorne/CGI-Info)
--[![Appveyor Status](https://ci.appveyor.com/api/projects/status/1t1yhvagx00c2qi8?svg=true)](https://ci.appveyor.com/project/nigelhorne/cgi-info)
+[![Appveyor Status](https://ci.appveyor.com/api/projects/status/1t1yhvagx00c2qi8?svg=true)](https://ci.appveyor.com/project/nigelhorne/cgi-info)
 [![CircleCI](https://dl.circleci.com/status-badge/img/circleci/8CE7w65gte4YmSREC2GBgW/THucjGauwLPtHu1MMAueHj/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/circleci/8CE7w65gte4YmSREC2GBgW/THucjGauwLPtHu1MMAueHj/tree/main)
--[![Coveralls Status](https://coveralls.io/repos/github/nigelhorne/CGI-Info/badge.svg?branch=master)](https://coveralls.io/github/nigelhorne/CGI-Info?branch=master)
--[![CPAN](https://img.shields.io/cpan/v/CGI-Info.svg)](http://search.cpan.org/~nhorne/CGI-Info/)
--[![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://x.com/intent/tweet?text=Information+about+the+CGI+Environment+#perl+#CGI&url=https://github.com/nigelhorne/cgi-info&via=nigelhorne)
+[![Coveralls Status](https://coveralls.io/repos/github/nigelhorne/CGI-Info/badge.svg?branch=master)](https://coveralls.io/github/nigelhorne/CGI-Info?branch=master)
+[![CPAN](https://img.shields.io/cpan/v/CGI-Info.svg)](http://search.cpan.org/~nhorne/CGI-Info/)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/nigelhorne/cgi-info/test.yml?branch=master)
+![Perl Version](https://img.shields.io/badge/perl-5.8+-blue)
+[![Travis Status](https://travis-ci.org/nigelhorne/CGI-Info.svg?branch=master)](https://travis-ci.org/nigelhorne/CGI-Info)
+[![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://x.com/intent/tweet?text=Information+about+the+CGI+Environment+#perl+#CGI&url=https://github.com/nigelhorne/cgi-info&via=nigelhorne)
 
 # NAME
 
 CGI::Info - Information about the CGI environment
 
-# DESCRIPTION
-
-CGI::Info gets information about the system that a CGI script is running on.
-
 # VERSION
 
-Version 0.90
+Version 0.91
 
 # SYNOPSIS
 
@@ -241,7 +239,13 @@ CGI::Info will put the request into the params element 'XML', thus:
         my $xml = $$paramsref{'XML'};
         # ... parse and process the XML request in $xml
 
-Carp if logger is not set and we detect something serious:w
+Carp if logger is not set and we detect something serious.
+
+Blocks some attacks,
+such as SQL and XSS injections,
+mustleak and directory traversals,
+thus creating a primitive web application firewall (WAF).
+Warning - this is an extra layer, not a replacement for your other security layers.
 
 ## param
 
@@ -278,8 +282,11 @@ Returns a boolean if the website is being viewed on a tablet such as an iPad.
 
 ## as\_string
 
-Returns the parameters as a string, which is useful for debugging or
-generating keys for a cache.
+Converts CGI parameters into a formatted string representation with optional raw mode (no escaping of special characters).
+Useful for debugging or generating keys for a cache.
+
+    my $string_representation = $info->as_string();
+    my $raw_string = $info->as_string({ raw => 1 });
 
 ## protocol
 
@@ -346,6 +353,10 @@ Is the visitor a real person or a robot?
         unless($info->is_robot()) {
                 # update site visitor statistics
         }
+
+If the client is seen to be attempting an SQL injection,
+set the HTTP status to 403,
+and return 1.
 
 ## is\_search\_engine
 
@@ -425,6 +436,10 @@ Returns the warnings that the object has generated as a ref to an array of hashe
         @warnings = ();
     }
     print STDERR join(';', @warnings), "\n";
+
+## warnings\_as\_string
+
+Returns the warnings that the object has generated as a string.
 
 ## set\_logger
 

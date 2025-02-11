@@ -1,11 +1,6 @@
 requires 'perl', '5.20.0';
 requires 'Carp';
-requires 'Catalyst::Action';
-requires 'Catalyst::ClassData';
-requires 'Catalyst::Runtime', '5.90084';
-
-requires 'Clone';
-requires 'Crypt::JWT';
+requires 'Crypt::JWT', '0.035';
 requires 'Data::UUID';
 requires 'List::Util';
 requires 'List::MoreUtils', '0.423';
@@ -15,17 +10,10 @@ requires 'Moose';
 requires 'Moose::Util::TypeConstraints';
 requires 'MooseX::Params::Validate';
 requires 'Readonly';
-requires 'Scalar::Util';
 requires 'Throwable::Error';
 requires 'Try::Tiny';
 requires 'namespace::autoclean';
 
-test_requires 'Catalyst::Action::RenderView';
-test_requires 'Catalyst::Plugin::ConfigLoader';
-test_requires 'Catalyst::Plugin::Session::Store::FastMmap';
-test_requires 'Catalyst::Plugin::Static::Simple';
-test_requires 'Catalyst::View::JSON';
-test_requires 'Config::General';
 test_requires 'Log::Any';
 test_requires 'Log::Any::Test';
 test_requires 'Test::Deep';
@@ -33,7 +21,6 @@ test_requires 'Test::Exception';
 test_requires 'Test::MockModule', '0.177.0';
 test_requires 'Test::MockObject';
 test_requires 'Test::More';
-test_requires 'Test::WWW::Mechanize::Catalyst::WithContext', '0.03';
 
 author_requires 'Test::CPAN::Meta';
 author_requires 'Test::Perl::Critic';

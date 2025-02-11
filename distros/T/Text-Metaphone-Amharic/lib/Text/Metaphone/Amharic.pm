@@ -12,7 +12,7 @@ BEGIN
 	use warnings;
 	use vars qw( $VERSION %IMExpected %IMError %plosives $GRANULARITY $STYLE );
 
-	$VERSION = "0.13";
+	$VERSION = "0.14";
 
 	%plosives = (
 		ቅ => 'k',

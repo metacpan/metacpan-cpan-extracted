@@ -3,7 +3,7 @@
 ## This code is free software; you can redistribute it and/or modify
 ## it under the same terms as Perl itself.
 
-our $VERSION = '1.56';
+our $VERSION = '1.57';
 
 use strict;
 use warnings;

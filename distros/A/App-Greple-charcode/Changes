@@ -1,5 +1,13 @@
 Revision history for Perl extension App-Greple-charcode
 
+0.9905 2025-02-11T06:00:26Z
+
+    - change param "align" to "alignto"
+    - add some options
+      * --align, --align-all, --align-side
+      * --surrogate
+      * -p, -P
+
 0.9904 2025-01-31T02:50:15Z
 
     - check multiple callback function call

@@ -6,11 +6,9 @@ use warnings;
 
 use Test::More;
 
-plan tests => 14 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 12 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
-    'Catalyst/Plugin/OIDC.pm',
-    'Mojolicious/Plugin/OIDC.pm',
     'OIDC/Client.pm',
     'OIDC/Client/Error.pm',
     'OIDC/Client/Error/Authentication.pm',

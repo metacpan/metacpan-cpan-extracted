@@ -22,7 +22,7 @@ use Data::Dumper;
 use Class::Loader;
 use Crypt::Random::Generator;
 
-our $VERSION = '1.56';
+our $VERSION = '1.57';
 
 sub _pickprovider { 
 

@@ -1,3 +1,6 @@
+0.15 ሰኞ፣ ፌብ 10 ቀን 20:58:13 EST 2025 ዓ/ም
+	- Migration to a Build.PL & GitHub system.
+
 0.14 ሰኞ፣ ፌብ  3 ቀን 21:44:34 EST 2025 ዓ/ም
 	- Set TZ in tester it UTC
 	- Fixes as per CPANTS:

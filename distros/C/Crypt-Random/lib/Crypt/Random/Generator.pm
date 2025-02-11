@@ -9,10 +9,10 @@ package Crypt::Random::Generator;
 use Crypt::Random qw(makerandom makerandom_itv makerandom_octet);
 use Carp;
 
-our $VERSION = '1.56';
+our $VERSION = '1.57';
 
 my @PROVIDERS = qw(devrandom devurandom Win32API egd rand);
-my %STRENGTH  = ( 0 => [ qw(egd Win32API rand) ], 1 => [ qw(devrandom devurandom Win32API rand) ] );
+my %STRENGTH  = ( 0 => [ qw(egd Win32API rand) ], 1 => [ qw(devurandom devrandom Win32API rand) ] );
 
 sub new { 
 
