@@ -1,5 +1,9 @@
 Revision history for DateTime::Format::Genealogy
 
+0.11	Tue Feb 11 14:05:44 EST 2025
+	Handle "from xxx to yyy" as well as the more correct "bet xxx and yyy"
+	Added _get_params()
+
 0.10	Sat Feb  1 21:01:54 EST 2025
 	Use Test::DescribeMe to simplify tests
 	refactor _date_parser_cached

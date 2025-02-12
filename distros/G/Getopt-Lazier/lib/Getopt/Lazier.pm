@@ -11,11 +11,11 @@ Getopt::Lazier - Lazy Getopt-like command-line options and argument parser
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 
 =head1 SYNOPSIS
@@ -69,15 +69,19 @@ Lazier:
       ]
    ];
 
-Laziest:
+More Lazier:
 
    use Getopt::Lazier "ovar";
 
-   use Data::Dumper; print Dumper([$ovar, \@ARGV])."\n";
+   use Data::Dumper; print Dumper([{%ovar}, $ovar, \@ARGV])."\n";
 
    # perl t.pl --opt1=val arg --opt2 arg2
 
    $VAR1 = [
+      {
+         'opt1' => 'val',
+         'opt2' => 1
+      },
       {
          'opt1' => 'val',
          'opt2' => 1
@@ -94,9 +98,22 @@ Laziest:
 
 =head2 new
 
-The laziest way to parse arguments tho
+The laziest way to parse arguments tho.
+Returns a hashref of parsed options, and (if called in list context) an array of remaining arguments.
+C<new> takes a list/array as an argument, and if unspecified will use @ARGV by default.
 
-Now with namespace fuckery!
+=head2 import
+
+Now with namespace fuckery!  Passing a string to the C<use> pragma will make the import method
+run C<new> automatically on C<@ARGV> and import the string as variable names in package C<main>.
+
+For example:
+
+   use Getopt::Lazier "options";
+
+Will import both C<%options> (a hash of the parsed options), and (for backwards compatability) C<$options> (a
+reference to the hash).  If the script was passed C<--help> on the command line, both C<$options{help}> and C<$options-E<gt>{help}>
+would be set to C<1>.
 
 =cut
 
@@ -106,13 +123,16 @@ sub import {
    if ($fuckery) {
       my $opt = new();
       no strict 'refs'; # so naughty!
-      *{"main::$fuckery"} = \$opt;
+      # Create hash in main.
+      *{"main::$fuckery"} = \%$opt;
+      # Create hashref in main (for backwards compatability)
+      *{"main::$fuckery"} = \\%{"main::$fuckery"};
    }
 }
 
 sub new {        # DNM: I <3 this function.
    my $self = shift;
-   my @ARGA = @_ || @main::ARGV;
+   my @ARGA = scalar(@_) ? @_ : @main::ARGV;
    my $opt  = {};
    my @DARG;
    my $var = uc(basename($0));

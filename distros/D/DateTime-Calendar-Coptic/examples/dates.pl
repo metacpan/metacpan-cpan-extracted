@@ -1,7 +1,10 @@
 #!/usr/bin/perl -I. -w
 
 use strict;
+use utf8;
 require DateTime::Calendar::Coptic;
+
+binmode(STDOUT, ":utf8");
 
 print "Testing[01]:  ( day => 28, month => 7, year => 1719 )\n";
 my $coptic = new DateTime::Calendar::Coptic ( day => 28, month => 7, year => 1719 );

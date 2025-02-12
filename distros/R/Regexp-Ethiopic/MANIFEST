@@ -1,8 +1,10 @@
+Build.PL
 Changes
+Changes.md
 LICENSE
 MANIFEST
-Makefile.PL
-README
+README.md
+SECURITY.md
 doc/index.html
 examples/overload.pl
 examples/asfunction.pl

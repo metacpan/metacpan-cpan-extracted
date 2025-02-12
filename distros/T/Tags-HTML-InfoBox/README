@@ -1,0 +1,203 @@
+NAME
+    Tags::HTML::InfoBox - Tags helper for HTML info box.
+
+SYNOPSIS
+     use Tags::HTML::InfoBox;
+
+     my $obj = Tags::HTML::InfoBox->new(%params);
+     $obj->cleanup;
+     $obj->init($infobox);
+     $obj->prepare($infobox);
+     $obj->process;
+     $obj->process_css;
+
+METHODS
+  "new"
+     my $obj = Tags::HTML::InfoBox->new(%params);
+
+    Constructor.
+
+    *       "css"
+
+            CSS::Struct::Output object for process_css processing.
+
+            Default value is undef.
+
+    *       "css_class"
+
+            Default value is 'info-box'.
+
+    *       "lang"
+
+            Language in ISO 639-1 code.
+
+            Default value is undef.
+
+    *       "tags"
+
+            Tags::Output object.
+
+            Default value is undef.
+
+  "cleanup"
+     $obj->cleanup;
+
+    Process cleanup after page run.
+
+    In this case cleanup internal representation of a set by init.
+
+    Returns undef.
+
+  "init"
+     $obj->init($infobox);
+
+    Process initialization in page run.
+
+    Accepted $infobox is Data::InfoBox.
+
+    Returns undef.
+
+  "prepare"
+     $obj->prepare($infobox);
+
+    Process initialization before page run.
+
+    Accepted $infobox is Data::InfoBox.
+
+    Returns undef.
+
+  "process"
+     $obj->process;
+
+    Process Tags structure for HTML a element to output.
+
+    Do nothing in case without inicialization by init.
+
+    Returns undef.
+
+  "process_css"
+     $obj->process_css;
+
+    Process CSS::Struct structure for HTML a element to output.
+
+    Do nothing in case without inicialization by init.
+
+    Returns undef.
+
+ERRORS
+     new():
+             From Mo::utils::CSS::check_css_class():
+                     Parameter '%s' has bad CSS class name.
+                             Value: %s
+                     Parameter '%s' has bad CSS class name (number on begin).
+                             Value: %s
+             From Tags::HTML::new():
+                     Parameter 'css' must be a 'CSS::Struct::Output::*' class.
+                     Parameter 'tags' must be a 'Tags::Output::*' class.
+
+     init():
+             Info box object must be a instance of 'Data::InfoBox'.
+
+     prepare():
+             Info box object must be a instance of 'Data::InfoBox'.
+
+     process():
+             From Tags::HTML::process():
+                     Parameter 'tags' isn't defined.
+
+     process_css():
+             From Tags::HTML::process_css():
+                     Parameter 'css' isn't defined.
+
+EXAMPLE
+     use strict;
+     use warnings;
+
+     use CSS::Struct::Output::Indent;
+     use Tags::HTML::InfoBox;
+     use Tags::Output::Indent;
+     use Test::Shared::Fixture::Data::InfoBox::Street;
+     use Unicode::UTF8 qw(encode_utf8);
+
+     # Object.
+     my $css = CSS::Struct::Output::Indent->new;
+     my $tags = Tags::Output::Indent->new(
+             'xml' => 1,
+     );
+     my $obj = Tags::HTML::InfoBox->new(
+             'css' => $css,
+             'tags' => $tags,
+     );
+
+     # Data object for info box.
+     my $infobox = Test::Shared::Fixture::Data::InfoBox::Street->new;
+
+     # Initialize.
+     $obj->init($infobox);
+
+     # Process.
+     $obj->process;
+     $obj->process_css;
+
+     # Print out.
+     print "HTML:\n";
+     print encode_utf8($tags->flush);
+     print "\n\n";
+     print "CSS:\n";
+     print $css->flush;
+
+     # Output:
+     # HTML:
+     # <table class="info-box">
+     #   <tr>
+     #     <td />
+     #     <td>
+     #       Nábřeží Rudoarmějců
+     #     </td>
+     #   </tr>
+     #   <tr>
+     #     <td />
+     #     <td>
+     #       Příbor
+     #     </td>
+     #   </tr>
+     #   <tr>
+     #     <td />
+     #     <td>
+     #       Česká republika
+     #     </td>
+     #   </tr>
+     # </table>
+     # 
+     # CSS:
+     # .info-box {
+     #         background-color: #32a4a8;
+     #         padding: 1em;
+     # }
+     # .info-box .icon {
+     #         text-align: center;
+     # }
+     # .info-box a {
+     #         text-decoration: none;
+     # }
+
+DEPENDENCIES
+    Class::Utils, Error::Pure, Mo::utils::CSS, Scalar::Util, Tags::HTML,
+    Tags::HTML::Icon.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Tags-HTML-InfoBox>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2023-2025 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

@@ -1,11 +1,5 @@
 package Database::Abstraction;
 
-=head1 NAME
-
-Database::Abstraction - read-only database abstraction layer (ORM)
-
-=cut
-
 # Author Nigel Horne: njh@bandsman.co.uk
 # Copyright (C) 2015-2025, Nigel Horne
 
@@ -46,13 +40,17 @@ use Scalar::Util;
 our %defaults;
 use constant	DEFAULT_MAX_SLURP_SIZE => 16 * 1024;	# CSV files <= than this size are read into memory
 
+=head1 NAME
+
+Database::Abstraction - read-only database abstraction layer (ORM)
+
 =head1 VERSION
 
-Version 0.20
+Version 0.21
 
 =cut
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 =head1 SYNOPSIS
 
@@ -796,9 +794,12 @@ sub fetchrow_hashref {
 	if($c = $self->{cache}) {
 		if(my $rc = $c->get($key)) {
 			if(wantarray) {
-				return @{$rc};	# We stored a ref to the array
+				if(ref($rc) eq 'ARRAY') {
+					return @{$rc};	# We stored a ref to the array
+				}
+			} else {
+				return $rc;
 			}
-			return $rc;
 		}
 	}
 

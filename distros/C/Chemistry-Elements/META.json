@@ -52,6 +52,6 @@
          "web" : "https://github.com/briandfoy/chemistry-elements"
       }
    },
-   "version" : "1.078",
+   "version" : "1.079",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

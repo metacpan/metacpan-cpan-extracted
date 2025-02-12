@@ -1,12 +1,13 @@
 package EBook::Ishmael::EBook::Text;
 use 5.016;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 use strict;
 use warnings;
 
 use File::Basename;
 use File::Spec;
 
+use EBook::Ishmael::EBook::Metadata;
 use EBook::Ishmael::TextToHtml;
 
 # Check for txt suffix, as that is the only indicator that a file is just a
@@ -27,14 +28,16 @@ sub new {
 
 	my $self = {
 		Source   => undef,
-		Metadata => {},
+		Metadata => EBook::Ishmael::EBook::Metadata->new,
 	};
 
 	bless $self, $class;
 
 	$self->{Source} = File::Spec->rel2abs($file);
 
-	$self->{Metadata}->{title} = [ basename($self->{Source}) ];
+	$self->{Metadata}->title([ basename($self->{Source}) ]);
+	$self->{Metadata}->modified([ scalar gmtime((stat $self->{Source})[9]) ]);
+	$self->{Metadata}->format([ 'Text' ]);
 
 	return $self;
 
@@ -67,7 +70,7 @@ sub metadata {
 
 	my $self = shift;
 
-	return $self->{Metadata};
+	return $self->{Metadata}->hash;
 
 }
 

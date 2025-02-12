@@ -90,11 +90,9 @@ note( "methods" );
 ok( !$file->update,'update without args' );
 ok( $file->update( contents => \'new contents' ),'update with args' );
 
-is(
+like(
     $file->signed_url( 1406712744 ),
-	$leading_slashes
-		? 'http://maibucket.s3.baz.com//path/to/' . uri_escape( $key ) . '?AWSAccessKeyId=foo&Expires=1406712744&Signature=UFQFjzGYbijgPryEInzjT8EdmDU%3D'
-		: 'http://maibucket.s3.baz.com/path/to/'. uri_escape( $key ) . '?AWSAccessKeyId=foo&Expires=1406712744&Signature=%2BEfymm%2BhjUfRLdQ3bS%2FJWrg9dc0%3D',
+	qr/X-Amz-Algorithm.*X-Amz-Credential.*X-Amz-Date.*X-Amz-Signature/,
     'signed_url'
 );
 

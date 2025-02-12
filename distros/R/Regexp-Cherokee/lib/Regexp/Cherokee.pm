@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use vars qw($VERSION @EXPORT_OK %EXPORT_TAGS %CherokeeClasses %CherokeeEquivalence $pseudoMatrix);
 
-	$VERSION = "0.05";
+	$VERSION = "0.07";
 	
 	@EXPORT_OK = qw(%CherokeeClasses %CherokeeEquivalence &getForm &setForm &subForm &formatForms);
 	%EXPORT_TAGS = ( utils => [qw(&getForm &setForm &subForm &formatForms)] );
@@ -458,7 +458,7 @@ modify it under the same terms as Perl itself. See L<perlartistic>.
 
 Included with this package:
 
-  examples/overload.pl    examples/utils.p
+  examples/overload.pl    examples/utils.pl
 
 
 =cut

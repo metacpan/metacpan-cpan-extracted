@@ -1,5 +1,9 @@
 Revision history for Perl distribution Pheno-Ranker
 
+1.04 2025-02-11:00:00Z (Manuel Rueda <mrueda@cpan.org>)
+
+ - Set .Inline at user's home dir
+
 1.03 2025-02-04:00:00Z (Manuel Rueda <mrueda@cpan.org>)
 
  - Renamed 'Stats.pm' to 'Metrics.pm'

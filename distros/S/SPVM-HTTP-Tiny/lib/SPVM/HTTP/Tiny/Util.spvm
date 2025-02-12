@@ -1,0 +1,60 @@
+# Copyright (c) 2025 Yuki Kimoto
+# MIT License
+
+class HTTP::Tiny::Util {
+  version_from HTTP::Tiny;
+  
+  use Re;
+  use Hash;
+  
+  static method url_escape : string ($string : string, $pattern : string = undef) {
+    
+    unless ($string) {
+      die "The string \$string must be defined.";
+    }
+    
+    my $char_class = (string)undef;
+    if ($pattern) {
+      $char_class = "[$pattern]";
+    }
+    else {
+      $char_class = "[^A-Za-z0-9\-._~]";
+    }
+    
+    my $string_ref = [$string];
+    Re->s($string_ref, ["($char_class)", "g"], method : string ($regex : Regex, $match : Regex::Match) {
+      
+      my $ret = Fn->sprintf("%%%02X", [(object)Fn->ord($match->cap1)]);
+      
+      return $ret;
+    });
+    
+    return $string_ref->[0];
+  }
+  
+  static method url_unescape : string ($string : string) {
+    
+    unless ($string) {
+      die "The string \$string muse be defined.";
+    }
+    
+    my $string_ref = [$string];
+    Re->s($string_ref, ["%([0-9a-fA-F]{2})", "g"], method : string ($regex : Regex, $match : Regex::Match) {
+      
+      my $ret = Fn->chr(Fn->hex($match->cap1));
+      
+      return $ret;
+    });
+    
+    return $string_ref->[0];
+  }
+  
+  static method punycode_decode : string ($string : string) {
+    die "TODO.";
+  }
+  
+  static method punycode_encode : string ($string : string) {
+    die "TODO.";
+  }
+  
+}

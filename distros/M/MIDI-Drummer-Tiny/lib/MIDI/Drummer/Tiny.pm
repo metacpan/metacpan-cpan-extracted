@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Glorified metronome
 
-our $VERSION = '0.5011';
+our $VERSION = '0.5012';
 
 use Moo;
 use strictures 2;
@@ -698,7 +698,7 @@ MIDI::Drummer::Tiny - Glorified metronome
 
 =head1 VERSION
 
-version 0.5011
+version 0.5012
 
 =head1 SYNOPSIS
 
@@ -765,7 +765,9 @@ version 0.5011
 =head1 DESCRIPTION
 
 This module provides handy defaults and tools to produce a MIDI score
-with drum parts.
+with drum parts. It is full of tools to construct a score with drum
+parts. It is not a traditional "drum machine." Rather, it contains
+methods to construct a drum machine, or play "as a drummer might."
 
 Below, the term "spec" refers to a note length duration, like an
 eighth or quarter note, for instance.

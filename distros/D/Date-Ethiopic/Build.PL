@@ -43,7 +43,8 @@ my $builder = Module::Build->new(
 	release_status		=> 'stable',
 	configure_requires	=> { 'Module::Build' => 0.42 },
 	requires 		=> {
-		'Date::ICal' => 0,
+		'perl'		=> '5.6.1',
+		'Date::ICal'	=> 0,
 		'Convert::Number::Ethiopic' => '0.15'
 	},
 	license			=> 'perl',

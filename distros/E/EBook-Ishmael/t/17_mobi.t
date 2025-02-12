@@ -78,12 +78,13 @@ TODO: {
 is_deeply(
 	$ebook->metadata,
 	{
-		contributor => [ 'calibre (7.16.0) [https://calibre-ebook.com]' ],
-		creator => [ 'Unknown' ],
-		date => [ '0101-01-01T00:00:00+00:00' ],
-		language => [ 'en' ],
-		source => [ 'calibre:e3f35c22-0889-4539-9f97-eebf0d391b18' ],
-		title => [ 'gpl3' ],
+		Contributor => [ 'calibre (7.16.0) [https://calibre-ebook.com]' ],
+		Author => [ 'Unknown' ],
+		Created => [ '0101-01-01T00:00:00+00:00' ],
+		Language => [ 'en' ],
+		Title => [ 'gpl3' ],
+		Format => [ 'MOBI' ],
+		Modified => [ scalar gmtime $ebook->{_pdb}->mdate ],
 	},
 	"metadata ok"
 );

@@ -1,7 +1,7 @@
 package DateTime::Format::Genealogy;
 
 # Author Nigel Horne: njh@bandsman.co.uk
-# Copyright (C) 2018-2024, Nigel Horne
+# Copyright (C) 2018-2025, Nigel Horne
 
 # Usage is subject to licence terms.
 # The licence terms of this software are as follows:
@@ -47,13 +47,16 @@ DateTime::Format::Genealogy - Create a DateTime object from a Genealogy Date
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 =head1 SYNOPSIS
+
+C<DateTime::Format::Genealogy> is a Perl module designed to parse genealogy-style date formats and convert them into L<DateTime> objects.
+It uses L<Genealogy::Gedcom::Date> to parse dates commonly found in genealogical records while also handling date ranges and approximate dates.
 
     use DateTime::Format::Genealogy;
     my $dtg = DateTime::Format::Genealogy->new();
@@ -100,7 +103,7 @@ sub new
 
 Given a date,
 runs it through L<Genealogy::Gedcom::Date> to create a L<DateTime> object.
-If a date range is given, return a two element array in array context, or undef in scalar context
+If a date range is given, return a two-element array in array context, or undef in scalar context
 
 Returns undef if the date can't be parsed,
 is before AD100,
@@ -109,16 +112,36 @@ Can be called as a class or object method.
 
     my $dt = DateTime::Format::Genealogy->new()->parse_datetime('25 Dec 2022');
 
+Mandatory arguments:
+
+=over 4
+
+=item * C<date>
+
+The date to be parsed.
+
+=back
+
 Optional arguments:
-date: the date to be parsed
-quiet: set to fail silently if there is an error with the date
-strict: more strictly enforce the Gedcom standard, for example don't allow long month names
+
+=over 4
+
+=item * C<quiet>
+
+Set to fail silently if there is an error with the date.
+
+=item * C<strict>
+
+More strictly enforce the Gedcom standard,
+for example,
+don't allow long month names.
+
+=back
 
 =cut
 
 sub parse_datetime {
 	my $self = shift;
-	my %params;
 
 	if(!ref($self)) {
 		if(scalar(@_)) {
@@ -127,18 +150,13 @@ sub parse_datetime {
 		return(__PACKAGE__->new()->parse_datetime($self));
 	} elsif(ref($self) eq 'HASH') {
 		return(__PACKAGE__->new()->parse_datetime($self));
-	} elsif(ref($_[0]) eq 'HASH') {
-		%params = %{$_[0]};
-	} elsif(ref($_[0])) {
-		Carp::croak('Usage: ', __PACKAGE__, '::parse_datetime(date => $date)');
-	} elsif(scalar(@_) && (scalar(@_) % 2 == 0)) {
-		%params = @_;
-	} else {
-		$params{'date'} = shift;
 	}
-	my $quiet = $params{'quiet'};
 
-	if(my $date = $params{'date'}) {
+	my $params = $self->_get_params('date', @_);
+
+	if((!ref($params->{'date'})) && (my $date = $params->{'date'})) {
+		my $quiet = $params->{'quiet'};
+
 		# TODO: Needs much more sanity checking
 		if(($date =~ /^bef\s/i) || ($date =~ /^aft\s/i) || ($date =~ /^abt\s/i)) {
 			Carp::carp("$date is invalid, need an exact date to create a DateTime")
@@ -166,8 +184,15 @@ sub parse_datetime {
 			return;
 		}
 
+		my $strict = $params->{'strict'};
+		if((!$strict) && ($date =~ /^from (.+) to (.+)/i)) {
+			if(wantarray) {
+				return $self->parse_datetime($1), $self->parse_datetime($2);
+			}
+			return;
+		}
+
 		if($date !~ /^\d{3,4}$/) {
-			my $strict = $params{'strict'};
 			if($strict) {
 				if($date !~ /^(\d{1,2})\s+([A-Z]{3})\s+(\d{3,4})$/i) {
 					Carp::carp("Unparseable date $date - often because the month name isn't 3 letters") unless($quiet);
@@ -219,20 +244,21 @@ sub parse_datetime {
 			}
 		}
 		return;	# undef
-	} else {
-		Carp::croak('Usage: ', __PACKAGE__, '::parse_datetime(date => $date)');
 	}
+	Carp::croak('Usage: ', __PACKAGE__, '::parse_datetime(date => $date)');
 }
 
 # Parse Gedcom format dates
 # Genealogy::Gedcom::Date is expensive, so cache results
 sub _date_parser_cached
 {
-	my ($self, $date) = @_;
+	my $self = shift;
+	my $params = $self->_get_params('date', @_);
+	my $date = $params->{'date'};
 
 	Carp::croak('Usage: _date_parser_cached(date => $date)') unless defined $date;
 
-	# Check and return if date already parsed and cached
+	# Check and return if the date has already been parsed and cached
 	return $self->{'all_dates'}{$date} if exists $self->{'all_dates'}{$date};
 
 	# Initialize the date parser if not already set
@@ -258,28 +284,40 @@ sub _date_parser_cached
 	return;
 }
 
-# From https://github.com/nigelhorne/DateTime-Format-Genealogy/commit/dd61fefde3d037e251df34654a67e241c4117461
-# TODO: I have not been able to get this to work, but it's a good idea so I'm leaving it here for future investigation
-# sub _fetch_params {
-	# my $self = shift;
-	# my $sub_name = shift;
-	# my %params;
-#
-	# if(!ref($self)) {
-		# %params = ( 'date' => $self );
-		# $self = __PACKAGE__->new();
-	# } elsif(ref($_[0]) eq 'HASH') {
-		# %params = %{$_[0]};
-	# } elsif(ref($_[0])) {
-		# Carp::croak("Usage: $sub_name(date => \$date)");
-	# } elsif(scalar(@_) % 2 == 0) {
-		# %params = @_;
-	# } else {
-		# $params{'date'} = shift;
-	# }
-#
-	# return ($self, \%params);
-# }
+# Helper routine to parse the arguments given to a function.
+# Processes arguments passed to methods and ensures they are in a usable format,
+#	allowing the caller to call the function in anyway that they want
+#	e.g. foo('bar'), foo(arg => 'bar'), foo({ arg => 'bar' }) all mean the same
+#	when called _get_params('arg', @_);
+sub _get_params
+{
+	shift;  # Discard the first argument (typically $self)
+	my $default = shift;
+
+	# Directly return hash reference if the first parameter is a hash reference
+	return $_[0] if(ref($_[0]) eq 'HASH');
+
+	my %rc;
+	my $num_args = scalar @_;
+
+	# Populate %rc based on the number and type of arguments
+	if(($num_args == 1) && (defined $default)) {
+		# %rc = ($default => shift);
+		return { $default => shift };
+	} elsif($num_args == 1) {
+		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '()');
+	} elsif(($num_args == 0) && (defined($default))) {
+		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], "($default => \$val)");
+	} elsif(($num_args % 2) == 0) {
+		%rc = @_;
+	} elsif($num_args == 0) {
+		return;
+	} else {
+		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '()');
+	}
+
+	return \%rc;
+}
 
 1;
 
@@ -293,7 +331,7 @@ Please report any bugs or feature requests to the author.
 This module is provided as-is without any warranty.
 
 I can't get L<DateTime::Format::Natural> to work on dates before AD100,
-so this module rejects dates that old.
+so this module rejects dates that are that old.
 
 =head1 SEE ALSO
 

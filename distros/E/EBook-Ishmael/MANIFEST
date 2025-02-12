@@ -6,6 +6,7 @@ lib/EBook/Ishmael/EBook.pm
 lib/EBook/Ishmael/EBook/Epub.pm
 lib/EBook/Ishmael/EBook/FictionBook2.pm
 lib/EBook/Ishmael/EBook/HTML.pm
+lib/EBook/Ishmael/EBook/Metadata.pm
 lib/EBook/Ishmael/EBook/Mobi.pm
 lib/EBook/Ishmael/EBook/PalmDoc.pm
 lib/EBook/Ishmael/EBook/PDB.pm

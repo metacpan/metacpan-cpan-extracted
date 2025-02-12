@@ -6,7 +6,8 @@ The laziest perl arg parser around
 SYNOPSIS
     use Getopt::Lazier "opt";
 
-    use Data::Dumper; print Dumper([$varname, \@ARGV]);
+    use Data::Dumper; print Dumper([$opt, \@ARGV]);
+    
 
 INSTALLATION
 

@@ -1,3 +1,7 @@
+0.5.3 2025-02-11
+
+    - Prevent segmentation faults when dealing with self-loops in graphs.
+
 0.5.2 2025-01-21
 
     - Fixed a bug in orbits() which caused incorrect extraction of orbits

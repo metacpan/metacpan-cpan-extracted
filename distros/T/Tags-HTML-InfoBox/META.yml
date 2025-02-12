@@ -1,0 +1,44 @@
+---
+abstract: 'Tags helper for info box.'
+author:
+  - 'Michal Josef Spacek <skim@cpan.org>'
+build_requires:
+  English: 0
+  Error::Pure::Utils: 0
+  ExtUtils::MakeMaker: 6.36
+  Tags::Output::Structure: 0
+  Test::MockObject: 0
+  Test::More: 0
+  Test::NoWarnings: 0
+  Test::Shared::Fixture::Data::InfoBox::Items: 0.04
+  Test::Shared::Fixture::Data::InfoBox::Street: 0.02
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.21'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tags-HTML-InfoBox
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+    - xt
+requires:
+  Class::Utils: 0.02
+  Error::Pure: 0.07
+  Mo::utils::CSS: 0.02
+  Scalar::Util: 0
+  Tags::HTML: 0.08
+  Tags::HTML::Icon: 0
+  perl: 5.8.0
+resources:
+  bugtracker: https://github.com/michal-josef-spacek/Tags-HTML-InfoBox/issues
+  homepage: https://github.com/michal-josef-spacek/Tags-HTML-InfoBox
+  license: http://opensource.org/licenses/bsd-license.php
+  repository: git://github.com/michal-josef-spacek/Tags-HTML-InfoBox
+version: '0.01'

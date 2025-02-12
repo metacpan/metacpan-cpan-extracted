@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::Epub;
 use 5.016;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 use strict;
 use warnings;
 
@@ -11,6 +11,8 @@ use File::Temp qw(tempdir);
 
 use Archive::Zip qw(:ERROR_CODES :CONSTANTS);
 use XML::LibXML;
+
+use EBook::Ishmael::EBook::Metadata;
 
 my $MAGIC = pack 'C4', ( 0x50, 0x4b, 0x03, 0x04 );
 my $CONTAINER = File::Spec->catfile(qw/META-INF container.xml/);
@@ -66,6 +68,20 @@ sub _read_rootfile {
 
 	my $self = shift;
 
+	# Hash of epub metadata items and their corresponding Metadata method
+	# accessors.
+	my %dcmeta = (
+		'contributor' => 'contributor',
+		'creator'     => 'author',
+		'date',       => 'created',
+		'description' => 'description',
+		'identifier'  => 'id',
+		'language'    => 'language',
+		'publisher'   => 'contributor',
+		'subject'     => 'genre',
+		'title',      => 'title',
+	);
+
 	$self->{_contdir} = dirname($self->{_rootfile});
 
 	my $dom = XML::LibXML-> load_xml(location => $self->{_rootfile});
@@ -103,9 +119,13 @@ sub _read_rootfile {
 		my $name = $dc->nodeName =~ s/^dc://r;
 		my $text = $dc->textContent();
 
+		next unless exists $dcmeta{ $name };
+
 		$text =~ s/\s+/ /g;
 
-		push @{ $self->{Metadata}->{ $name } }, $text;
+		my $method = $dcmeta{ $name };
+
+		push @{ $self->{Metadata}->$method }, $text;
 
 	}
 
@@ -138,7 +158,7 @@ sub new {
 
 	my $self = {
 		Source     => undef,
-		Metadata   => {},
+		Metadata   => EBook::Ishmael::EBook::Metadata->new,
 		_unzip     => undef,
 		_container => undef,
 		_rootfile  => undef,
@@ -152,6 +172,8 @@ sub new {
 	bless $self, $class;
 
 	$self->read($file);
+
+	$self->{Metadata}->format([ 'EPUB' ]);
 
 	return $self;
 
@@ -231,7 +253,7 @@ sub metadata {
 
 	my $self = shift;
 
-	return $self->{Metadata};
+	return $self->{Metadata}->hash;
 
 }
 

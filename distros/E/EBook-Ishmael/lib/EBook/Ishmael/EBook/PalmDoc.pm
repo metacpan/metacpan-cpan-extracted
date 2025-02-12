@@ -1,10 +1,11 @@
 package EBook::Ishmael::EBook::PalmDoc;
 use 5.016;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 use strict;
 use warnings;
 
 use EBook::Ishmael::Decode qw(lz77_decode);
+use EBook::Ishmael::EBook::Metadata;
 use EBook::Ishmael::EBook::PDB;
 use EBook::Ishmael::TextToHtml;
 
@@ -66,7 +67,7 @@ sub new {
 
 	my $self = {
 		Source       => undef,
-		Metadata     => {},
+		Metadata     => EBook::Ishmael::EBook::Metadata->new,
 		_pdb         => undef,
 		_compression => undef,
 		_textlen     => undef,
@@ -100,12 +101,21 @@ sub new {
 		die "$self->{Source} is not a PalmDoc file\n";
 	}
 
-	$self->{Metadata}->{title} = [ $self->{_pdb}->name ];
-	$self->{Metadata}->{date} = [
-		$self->{_pdb}->cdate
-			? scalar gmtime $self->{_pdb}->cdate
-			: 'Unknown'
-	];
+	$self->{Metadata}->title([ $self->{_pdb}->name ]);
+	$self->{Metadata}->created([ scalar gmtime $self->{_pdb}->cdate ]);
+	$self->{Metadata}->modified([ scalar gmtime $self->{_pdb}->mdate ]);
+
+	if ($self->{_pdb}->version) {
+		$self->{Metadata}->format([
+			sprintf(
+				"PalmDOC %s.%s",
+				($self->{_pdb}->version >> 8) & 0xff,
+				$self->{_pdb}->version & 0xff
+			)
+		]);
+	} else {
+		$self->{Metadata}->format([ 'PalmDOC' ]);
+	}
 
 	return $self;
 
@@ -135,7 +145,7 @@ sub metadata {
 
 	my $self = shift;
 
-	return $self->{Metadata};
+	return $self->{Metadata}->hash;
 
 }
 

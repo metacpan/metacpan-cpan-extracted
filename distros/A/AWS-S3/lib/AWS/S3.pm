@@ -13,9 +13,23 @@ use AWS::S3::ResponseParser;
 use AWS::S3::Owner;
 use AWS::S3::Bucket;
 
-our $VERSION = '0.19';
+our $VERSION = '1.00';
 
 has [qw/access_key_id secret_access_key/] => ( is => 'ro', isa => 'Str' );
+
+has 'session_token' => (
+    is      => 'ro',
+    isa     => 'Maybe[Str]',
+    lazy    => 1,
+    default => sub { $ENV{AWS_SESSION_TOKEN} },
+);
+
+has 'region' => (
+    is      => 'ro',
+    isa     => 'Maybe[Str]',
+    lazy    => 1,
+    default => sub { $ENV{AWS_REGION} },
+);
 
 has 'secure' => (
     is      => 'ro',
@@ -28,7 +42,15 @@ has 'endpoint' => (
     is      => 'ro',
     isa     => 'Str',
     lazy    => 1,
-    default => sub { 's3.amazonaws.com' },
+    default => sub {
+        my ( $s ) = @_;
+
+        if ( my $region = $s->region ) {
+            return "s3.$region.amazonaws.com"
+        } else {
+            return "s3.amazonaws.com"
+        }
+    },
 );
 
 has 'ua' => (
@@ -100,7 +122,11 @@ sub add_bucket {
     my $request  = $s->request(
         $type,
         bucket => $args{name},
-        ( $args{location} ? ( location => $args{location} ) : () ),
+        (
+            $args{location} ? ( location => $args{location} )
+                : $s->region ? ( location => $s->region )
+                : ()
+        ),
     );
     my $response = $request->request();
 
@@ -132,6 +158,8 @@ AWS::S3 - Lightweight interface to Amazon S3 (Simple Storage Service)
   my $s3 = AWS::S3->new(
     access_key_id     => 'E654SAKIASDD64ERAF0O',
     secret_access_key => 'LgTZ25nCD+9LiCV6ujofudY1D6e2vfK0R4GLsI4H',
+    session_token     => 'IQob3JpJZ2luXJ2VjJEL7//////////wE...',
+    region            => 'eu-west-1', # set to relevant AWS region
     honor_leading_slashes => 0, # set to allow leading slashes in bucket names, defaults to 0
   );
 

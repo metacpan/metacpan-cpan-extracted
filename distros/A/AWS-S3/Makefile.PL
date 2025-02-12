@@ -27,6 +27,11 @@ WriteMakefile(
         'Digest::HMAC_SHA1'          => 0,
         'Test::Deep'                 => 0,
         'JSON::XS'                   => 0,
+        'LWP'             => 5.835,
+        'Digest::SHA'     => '5.47',
+        'URI'             => 1.59,
+        'URI::QueryParam' => 0,
+        'Date::Parse'     => 0,
       },
     BUILD_REQUIRES => {
         'Test::More'       => 0.31,

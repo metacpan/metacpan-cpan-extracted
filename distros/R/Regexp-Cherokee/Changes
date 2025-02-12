@@ -1,3 +1,9 @@
+0.07 Tue Feb 11 21:21:52 EST 2025
+	- Fix for title in Changes.md.
+
+0.06 Tue Feb 11 20:46:59 EST 2025
+	- Migration to a Build.PL & GitHub system.
+
 0.05 Sat Feb  1 16:52:30 EST 2025
 	- Fixes as per CPANTS:
 	  + LICENSE added.

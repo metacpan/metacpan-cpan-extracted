@@ -3,14 +3,16 @@ use base qw( DateTime::Calendar::CopticEthiopic );
 
 BEGIN
 {
+use strict;
+use warnings;
 use vars qw(
 		$VERSION
 		$n
 	);
 
-	$VERSION = "0.03";
+	$VERSION = "0.05";
 
-	require DateTime::Calendar::Coptic::Language;
+	require DateTime::Calendar::Coptic::Languages;
 
 	require Convert::Number::Coptic;
 	$n = new Convert::Number::Coptic;
@@ -57,7 +59,7 @@ my $language = "cop";
 	}
 	else {
 		# print "Loading $language\n";
-		$self->{language} = DateTime::Calendar::Coptic::Language->new ( language => $language );
+		$self->{language} = DateTime::Calendar::Coptic::Languages->new ( language => $language );
 	}
 
 	my $blessing = bless ( $self, $class );
@@ -260,6 +262,13 @@ None presently yet.
 =head1 AUTHOR
 
 Daniel Yacob,  L<dyacob@cpan.org|mailto:dyacob@cpan.org>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2003-2025, Daniel Yacob C<< <dyacob@cpan.org> >>. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
 
 =head1 SEE ALSO
 

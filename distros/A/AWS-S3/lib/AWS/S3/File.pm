@@ -161,7 +161,12 @@ sub _set_contents {
 
 sub signed_url {
     my $s       = shift;
-    my $expires = shift || time + 3600;
+    my $expires = shift || 3600;
+
+    # expiry for v4 signature is in seconds, not epoch time
+    if ( $expires > time ) {
+        $expires -= time;
+    }
 
 	my $key = $s->key;
 

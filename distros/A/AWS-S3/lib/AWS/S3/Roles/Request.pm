@@ -4,6 +4,7 @@ use HTTP::Request;
 use AWS::S3::ResponseParser;
 use MooseX::Types::URI qw(Uri);
 use URI::Escape qw/ uri_escape /;
+use AWS::S3::Signer::V4;
 
 has 's3' => (
     is       => 'ro',
@@ -81,13 +82,29 @@ has '_uri' => (
     }
 );
 
+has 'signerv4' => (
+    is       => 'ro',
+    isa      => 'AWS::S3::Signer::V4',
+    lazy     => 1,
+    default  => sub {
+        my $s = shift;
+        AWS::S3::Signer::V4->new(
+            -access_key => $s->s3->access_key_id,
+            -secret_key => $s->s3->secret_access_key,
+        );
+    }
+);
+
 sub _send_request {
     my ( $s, $method, $uri, $headers, $content ) = @_;
 
     my $req = HTTP::Request->new( $method => $uri );
     $req->content( $content ) if $content;
+
+    delete($headers->{Authorization}); # we will use a v4 signature
     map { $req->header( $_ => $headers->{$_} ) } keys %$headers;
 
+    $s->_sign($req);
     my $res = $s->s3->ua->request( $req );
 
     # After creating a bucket and setting its location constraint, we get this
@@ -97,6 +114,18 @@ sub _send_request {
         $res = $s->s3->ua->request( $req );
     }
     return $s->parse_response( $res );
+}
+
+sub _sign {
+  my ($s, $request) = @_;
+  my $signer = $s->signerv4;
+  if (defined $s->s3->session_token) {
+    $request->header('X-Amz-Security-Token', $s->s3->session_token);
+  }
+  my $digest = Digest::SHA::sha256_hex($request->content);
+  $request->header('X-Amz-Content-SHA256', $digest);
+  $signer->sign($request, $s->s3->region, $digest);
+  $request;
 }
 
 sub parse_response {

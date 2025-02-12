@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,11 +21,12 @@ no_index:
 provides:
   Moonshine::Element:
     file: lib/Moonshine/Element.pm
-    version: '0.12'
+    version: '0.13'
 requires:
   Autoload::AUTOCAN: '0.004'
   Data::GUID: '0.048'
   Ref::Util: '0.113'
+  Switch::Again: '1.01'
   UNIVERSAL::Object: '0.06'
   feature: '0'
   perl: '5.006'
@@ -33,5 +34,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/ThisUsedToBeAnEmail/Moonshine-Element.git
-version: '0.12'
+version: '0.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -6,11 +6,9 @@ use Ref::Util qw/is_scalarref is_arrayref is_hashref is_blessed_ref/;
 use UNIVERSAL::Object;
 use Data::GUID;
 use Autoload::AUTOCAN;
+use Switch::Again qw/switch/;
 
-our $VERSION = '0.12';
-
-use feature qw/switch/;
-no if $] >= 5.017011, warnings => 'experimental::smartmatch';
+our $VERSION = '0.13';
 
 our @ISA;
 BEGIN { @ISA = ('UNIVERSAL::Object') }
@@ -273,29 +271,29 @@ sub _attribute_value {
     my ( $self, $attribute, $has_action ) = @_;
 
     $has_action //= sprintf( 'has_%s', $attribute );
-    given ( ref $_[0]->{$attribute} ) {
-        when (/HASH/) {
+    
+    return switch ref $self->{$attribute},
+	HASH => sub {
             my $value = '';
             map {
                 $value and $value .= ' ';
-                $value .= $_[0]->{$attribute}->{$_};
-            } $_[0]->$has_action;
+                $value .= $self->{$attribute}->{$_};
+            } $self->$has_action;
             return $value;
-        }
-        when (/ARRAY/) {
+        },
+       	ARRAY => sub {
             my $value = '';
-            for ( @{ $_[0]->{$attribute} } ) {
+            for ( @{ $self->{$attribute} } ) {
                 $value and $value .= ' ';
                 is_scalarref( \$_ ) and $value .= $_ and next;
                 $value .= $self->build_element($_)->render;
                 next;
             }
             return $value;
-        }
-        default {
-            return $_[0]->{$attribute};
-        }
-    }
+        },
+        default => sub {
+            return $self->{$attribute};
+        };
 }
 
 sub _tidy_html {
@@ -313,7 +311,7 @@ Moonshine::Element - Build some more html.
 
 =head1 VERSION
 
-Version 0.12 
+Version 0.13 
 
 =head1 DESCRIPTION
 

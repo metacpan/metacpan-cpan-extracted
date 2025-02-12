@@ -13,9 +13,9 @@ use URI::Escape 'uri_escape';
 use Convert::Base32 qw( encode_base32 decode_base32 );
 use Carp 'croak';
 
-our $VERSION = '1.05'; # VERSION
+our $VERSION = '1.06'; # VERSION
 
-my @accessors = qw( secret secret32 issuer key_id otpauth );
+my @accessors = qw( secret secret32 issuer key_id );
 __PACKAGE__->mk_accessors(@accessors);
 
 sub generate_secret32 {
@@ -30,22 +30,26 @@ sub clear {
     return;
 }
 
-sub qr_code {
-    my ( $self, $secret32, $key_id, $issuer, $return_otpauth ) = @_;
+sub otpauth {
+    my ( $self, $secret32, $key_id, $issuer ) = @_;
+
     $self->_secret_check($secret32);
 
-    $self->key_id($key_id) if ($key_id);
-    $self->issuer($issuer) if ($issuer);
+    $self->key_id($key_id) if ( defined $key_id );
+    $self->issuer($issuer) if ( defined $issuer );
 
     $self->key_id('Undefined') unless ( $self->key_id );
     $self->issuer('Undefined') unless ( $self->issuer );
 
-    $self->otpauth(
+    return
         'otpauth://totp/' .
         uri_escape( $self->issuer ) . ':' . uri_escape( $self->key_id ) .
-        '?secret=' . $self->secret32 . '&issuer=' . uri_escape( $self->issuer )
-    );
+        '?secret=' . $self->secret32 . '&issuer=' . uri_escape( $self->issuer );
+}
 
+sub qr_code {
+    my ( $self, $secret32, $key_id, $issuer, $return_otpauth ) = @_;
+    my $otpauth = $self->otpauth( $secret32, $key_id, $issuer );
     return ($return_otpauth)
         ? $self->otpauth
         : 'https://quickchart.io/chart?chs=200x200&cht=qr&chl=' . uri_escape( $self->otpauth );
@@ -136,7 +140,7 @@ Auth::GoogleAuth - Google Authenticator TBOT Abstraction
 
 =head1 VERSION
 
-version 1.05
+version 1.06
 
 =for markdown [![test](https://github.com/gryphonshafer/Auth-GoogleAuth/workflows/test/badge.svg)](https://github.com/gryphonshafer/Auth-GoogleAuth/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Auth-GoogleAuth/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Auth-GoogleAuth)
@@ -160,7 +164,12 @@ version 1.05
 
     my $secret32 = $auth->generate_secret32;
 
-    $auth->clear;
+    my $otpauth_0 = $auth->otpauth;
+    my $otpauth_1 = $auth->otpauth(
+        'bv5o3disbutz4tl3', # secret32
+        'gryphon@cpan.org', # key_id
+        'Gryphon Shafer',   # issuer
+    );
 
     my $url_0 = $auth->qr_code;
     my $url_1 = $auth->qr_code(
@@ -171,8 +180,6 @@ version 1.05
     my $url_2 = $auth->qr_code(
         'bv5o3disbutz4tl3', 'gryphon@cpan.org', 'Gryphon Shafer', 1,
     );
-
-    my $otpauth = $auth->otpauth;
 
     my $code_0 = $auth->code;
     my $code_1 = $auth->code( 'utz4tl3bv5o3disb', 1438643789, 30 );
@@ -185,6 +192,8 @@ version 1.05
         1438643820,         # timestamp (defaults to now)
         30,                 # interval (default 30)
     );
+
+    $auth->clear;
 
 =head1 DESCRIPTION
 
@@ -241,11 +250,6 @@ See the
 L<key URI format wiki page|https://github.com/google/google-authenticator/wiki/Key-Uri-Format>
 for more information.
 
-=head3 otpauth
-
-This method returns the otpauth key URI generated when you call
-C<qr_code>.
-
 =head2 generate_secret32
 
 This method will generate a reasonable random "secret32" value, store it in the
@@ -253,13 +257,16 @@ get/set method, and return it.
 
     my $secret32 = $auth->generate_secret32;
 
-=head2 clear
+=head2 otpauth
 
-Given that the "secret" and "secret32" values may persist in this object, which
-could be a bad idea in some contexts, this C<clear> method lets your clear out
-all attribute values.
+This method returns a generated otpauth key URI.
 
-    $auth->clear;
+    my $otpauth_0 = $auth->otpauth;
+    my $otpauth_1 = $auth->otpauth(
+        'bv5o3disbutz4tl3', # secret32
+        'gryphon@cpan.org', # key_id
+        'Gryphon Shafer',   # issuer
+    );
 
 =head2 qr_code
 
@@ -317,6 +324,14 @@ a code based on a time 1 iteration plus or minus should verify.
         1438643820,         # timestamp (defaults to now)
         30,                 # interval (default 30)
     );
+
+=head2 clear
+
+Given that the "secret" and "secret32" values may persist in this object, which
+could be a bad idea in some contexts, this C<clear> method lets your clear out
+all attribute values.
+
+    $auth->clear;
 
 =head1 TYPICAL USE-CASE
 

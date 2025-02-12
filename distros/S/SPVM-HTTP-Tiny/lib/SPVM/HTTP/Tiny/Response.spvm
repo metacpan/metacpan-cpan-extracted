@@ -1,0 +1,77 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class HTTP::Tiny::Response {
+  version_from HTTP::Tiny;
+  
+  allow HTTP::Tiny::Handle;
+  allow HTTP::Tiny;
+  
+  use HTTP::Tiny::Headers;
+  use HTTP::Tiny::Status;
+  
+  has response : HTTP::Tiny::Message::Response;
+  
+  # Class Methods
+  private static method new : HTTP::Tiny::Response ($response : HTTP::Tiny::Message::Response) {
+    
+    my $self = new HTTP::Tiny::Response;
+    
+    $self->{response} = $response;
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  method protocol : string () {
+    
+    my $res = $self->{response};
+    
+    return $res->protocol;
+  }
+  
+  method status : int () {
+    
+    my $res = $self->{response};
+    
+    return $res->status;
+  }
+  
+  method success : int () {
+    
+    my $status = $self->status;
+    
+    my $success = 0;
+    if ($status >= 200 & $status < 300) {
+      $success = 1;
+    }
+    
+    return $success;
+  }
+  
+  method reason : string () {
+    
+    my $status = $self->status;
+    
+    my $reason = HTTP::Tiny::Status->status_message($status);
+    
+    return $reason;
+  }
+  
+  method headers : HTTP::Tiny::Headers () {
+    
+    my $res = $self->{response};
+    
+    return $res->headers;
+  }
+  
+  method content : string () {
+    
+    my $res = $self->{response};
+    
+    my $content = $res->content;
+    
+    return $content;
+  }
+  
+}

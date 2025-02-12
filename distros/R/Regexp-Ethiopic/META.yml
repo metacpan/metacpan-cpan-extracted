@@ -1,23 +1,37 @@
 ---
 abstract: 'Regular Expressions Support for Ethiopic Script and the Languages that use it.'
 author:
-  - 'Daniel Yacob <dyacob@cpan.org>'
-build_requires:
-  ExtUtils::MakeMaker: '0'
+  - 'Daniel Yacob <dyacob\@cpan.org>'
+build_requires: {}
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Regexp-Ethiopic
-no_index:
-  directory:
-    - t
-    - inc
+provides:
+  Regexp::Ethiopic:
+    file: lib/Regexp/Ethiopic.pm
+    version: '0.20'
+  Regexp::Ethiopic::Amharic:
+    file: lib/Regexp/Ethiopic/Amharic.pm
+    version: '0.20'
+  Regexp::Ethiopic::Geez:
+    file: lib/Regexp/Ethiopic/Geez.pm
+    version: '0.20'
+  Regexp::Ethiopic::Tigrigna:
+    file: lib/Regexp/Ethiopic/Tigrigna.pm
+    version: '0.20'
 requires:
-  perl: '5.008000'
-version: '0.19'
+  perl: v5.8.0
+resources:
+  bugtracker: https://github.com/dyacob/Regexp-Ethiopic/issues
+  homepage: https://github.com/dyacob/Regexp-Ethiopic
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/dyacob/Regexp-Ethiopic.git
+version: '0.20'
+x_authority: cpan:dyacob
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

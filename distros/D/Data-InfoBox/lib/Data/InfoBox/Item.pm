@@ -4,20 +4,12 @@ use strict;
 use warnings;
 
 use Mo qw(build is);
-use Mo::utils 0.08 qw(check_isa check_length check_required);
-use Mo::utils::URI 0.02 qw(check_location check_uri);
+use Mo::utils 0.08 qw(check_isa check_required);
+use Mo::utils::URI 0.02 qw(check_uri);
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 has icon => (
-	is => 'ro',
-);
-
-has icon_url => (
-	is => 'ro',
-);
-
-has icon_char => (
 	is => 'ro',
 );
 
@@ -34,13 +26,6 @@ sub BUILD {
 
 	# Check icon.
 	check_isa($self, 'icon', 'Data::Icon');
-
-	# Check icon_url.
-	check_location($self, 'icon_url');
-	# TODO Check image
-
-	# Check icon_char.
-	check_length($self, 'icon_char', 1);
 
 	# Check text.
 	check_required($self, 'text');
@@ -64,14 +49,17 @@ __END__
 
 Data::InfoBox::Item - Data object for info box item.
 
+=head1 DESCRIPTION
+
+Data object for one common item in info box. Item could contains icon, text and
+URL.
+
 =head1 SYNOPSIS
 
  use Data::InfoBox::Item;
 
  my $obj = Data::InfoBox::Item->new(%params);
  my $icon = $obj->icon;
- my $icon_url = $obj->icon_url;
- my $icon_char = $obj->icon_char;
  my $text = $obj->text;
  my $uri = $obj->uri;
 
@@ -90,22 +78,6 @@ Constructor.
 Icon for item.
 
 It's L<Data::Icon> object.
-
-It's optional.
-
-=item * C<icon_url>
-
-I<Parameter will be deprecated. Use 'icon' parameter.>
-
-Icon URL.
-
-It's optional.
-
-=item * C<icon_char>
-
-I<Parameter will be deprecated. Use 'icon' parameter.>
-
-Icon character. Could be UTF-8 character. Only one character.
 
 It's optional.
 
@@ -133,22 +105,6 @@ Get icon.
 
 Returns L<Data::Icon> instance.
 
-=head2 C<icon_url>
-
- my $icon_url = $obj->icon_url;
-
-Get icon URL.
-
-Returns string.
-
-=head2 C<icon_char>
-
- my $icon_char = $obj->icon_char;
-
-Get icon character.
-
-Returns string.
-
 =head2 C<text>
 
  my $text = $obj->text;
@@ -172,15 +128,10 @@ Returns string.
                  Parameter 'icon' must be a 'Data::Icon' object.
                          Value: %s
                          Reference: %s
-                 Parameter 'icon_char' has length greater than '1'.
-                         Value: %s
                  Parameter 'text' is required.
                  Parameter 'text' must be a 'Data::Text::Simple' object.
                          Value: %s
                          Reference: %s
-         From Mo::utils::URI::check_location():
-                 Parameter 'icon_url' doesn't contain valid location.
-                         Value: %s
          From Mo::utils::URI::check_uri():
                  Parameter 'uri' doesn't contain valid URI.
                          Value: %s
@@ -254,6 +205,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

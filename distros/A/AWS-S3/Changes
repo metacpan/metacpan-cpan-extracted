@@ -1,6 +1,10 @@
 
 Changelog for perl module AWS::S3
 
+1.00 2025-02-11
+  - Start using v4 signatures (resolves GH #18, GH #17, GH #16, GH #14, GH #13, GH #7)
+  - Adds new session_token and region attributes to the constructor (see perldoc)
+
 0.19 2024-01-08
   - Fix "bad hostname" test may fail in presence of wildcard DNS records (GH #19)
 

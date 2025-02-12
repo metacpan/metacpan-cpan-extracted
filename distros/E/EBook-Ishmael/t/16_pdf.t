@@ -24,32 +24,21 @@ isa_ok($ebook, 'EBook::Ishmael::EBook::PDF');
 
 like($ebook->{Source}, qr/\Q$PDF\E$/, "source ok");
 
+is($ebook->metadata->{Author}[0], 'Unknown', 'metadata author ok');
+is($ebook->metadata->{Format}[0], 'PDF 1.4', 'metadata format ok');
+
 is_deeply(
-	$ebook->metadata,
-	{
-		'author' => [ 'Unknown' ],
-		'creationdate' => [ 'Fri Feb  7 15:47:14 2025 CST' ],
-		'creator' => [ 'calibre 7.16.0' ],
-		'custom metadata' => [ 'no' ],
-		'encrypted' => [ 'no' ],
-		'file size' => [ '85226 bytes' ],
-		'form' => [ 'none' ],
-		'javascript' => [ 'no' ],
-		'metadata stream' => [ 'yes' ],
-		'moddate' => [ 'Fri Feb  7 15:47:14 2025 CST' ],
-		'optimized' => [ 'no' ],
-		'page rot' => [ '0' ],
-		'page size' => [ '612 x 792 pts (letter)' ],
-		'pages' => [ '28' ],
-		'pdf version' => [ '1.4' ],
-		'producer' => [ 'calibre 7.16.0' ],
-		'suspects' => [ 'no' ],
-		'tagged' => [ 'no' ],
-		'title' => [ 'gpl3' ],
-		'userproperties' => [ 'no' ],
-	},
-	"metadata ok"
+	$ebook->metadata->{Contributor},
+	[ 'calibre 7.16.0', 'calibre 7.16.0' ],
+	'metadata software ok'
 );
+
+is($ebook->metadata->{Title}[0], 'gpl3', 'metadata title ok');
+
+# The dates can differ between pdfinfo versions, so just check to make sure
+# they are present.
+ok($ebook->metadata->{Created}[0], 'metadata creation date ok');
+ok($ebook->metadata->{Modified}[0], 'metadata modification date ok');
 
 ok($ebook->html, "html ok");
 

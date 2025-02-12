@@ -1,5 +1,5 @@
 package TOML::Tiny::Writer;
-$TOML::Tiny::Writer::VERSION = '0.18';
+$TOML::Tiny::Writer::VERSION = '0.19';
 use strict;
 use warnings;
 no warnings qw(experimental);
@@ -17,6 +17,8 @@ my @KEYS;
 sub to_toml {
   my $data  = shift;
   my $param = ref($_[1]) eq 'HASH' ? $_[1] : undef;
+
+  die 'toml: found undefined value, which is unsupported by TOML' if ! defined $data;
 
   my $ref = ref $data;
   if ($ref eq 'HASH') {
@@ -280,7 +282,7 @@ TOML::Tiny::Writer
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 AUTHOR
 
@@ -288,7 +290,7 @@ Jeff Ober <sysread@fastmail.fm>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Jeff Ober.
+This software is copyright (c) 2025 by Jeff Ober.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -11,7 +11,7 @@ BEGIN
 		@ShortDays
 	);
 
-	$VERSION = "0.15";
+	$VERSION = "0.16";
 
 	@Days =(
 		[ "ሰንበት ዓባይ",	"Senbet Abay" ],

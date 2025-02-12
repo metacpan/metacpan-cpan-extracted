@@ -23,4 +23,5 @@ t/10_edge_attributes.t
 t/11_to_dreadnaut.t
 t/12_chorded_cycle.t
 t/13_chorded_cycle.t
+t/14_self_loop.t
 typemap

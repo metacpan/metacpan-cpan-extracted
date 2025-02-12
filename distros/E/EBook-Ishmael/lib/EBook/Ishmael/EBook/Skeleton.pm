@@ -1,8 +1,10 @@
 package EBook::Ishmael::EBook::Skeleton;
 use 5.016;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 use strict;
 use warnings;
+
+use EBook::Ishmael::EBook::Metadata;
 
 #     ,--.
 #    ([ oo]
@@ -39,7 +41,7 @@ sub new {
 
 	my $self = {
 		Source   => undef,
-		Metadata => {},
+		Metadata => EBook::Ishmael::EBook::Metadata->new,
 	};
 
 	bless $self, $class;
@@ -74,7 +76,7 @@ sub metadata {
 
 	my $self = shift;
 
-	return $self->{Metadata};
+	return $self->{Metadata}->hash;
 
 }
 
@@ -110,7 +112,7 @@ format or not. It should take a single file as argument.
 The constructor method should be named C<new()> and take a single file as
 argument. It should return a blessed ebook object, and at the very minimum
 have a C<Source> field (absolute path to C<$file>) and a C<Metadata> field
-(hash ref of ebook metadata).
+(an L<Ebook::Ishmael::EBook::Metadata> object).
 
 =head2 $html = $obj->html()
 

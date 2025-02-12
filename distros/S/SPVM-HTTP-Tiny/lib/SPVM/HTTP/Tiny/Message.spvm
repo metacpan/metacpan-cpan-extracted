@@ -2,9 +2,20 @@
 # MIT License
 
 class HTTP::Tiny::Message {
+  allow HTTP::Tiny::Daemon;
+  
   version_from HTTP::Tiny;
   
   use HTTP::Tiny::Headers;
   
+  # Fields
   has headers : ro protected HTTP::Tiny::Headers;
+  
+  has content_buffer : protected StringBuffer;
+  
+  # Instance Methods
+  method content : string () {
+    return $self->{content_buffer}->to_string;
+  }
+  
 }

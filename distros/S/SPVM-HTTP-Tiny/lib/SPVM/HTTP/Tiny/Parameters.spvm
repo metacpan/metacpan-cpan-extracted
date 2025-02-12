@@ -1,0 +1,353 @@
+# Copyright (c) 2025 Yuki Kimoto
+# MIT License
+
+class HTTP::Tiny::Parameters {
+  version_from HTTP::Tiny;
+  
+  use HTTP::Tiny::Util;
+  use Hash;
+  use Sort;
+  
+  # Fields
+  has string : string;
+  
+  has pairs_list : StringList;
+  
+  # Class Methods
+  static method new : HTTP::Tiny::Parameters ($string : string = undef) {
+    
+    my $self = new HTTP::Tiny::Parameters;
+    
+    if ($string) {
+      $self->parse($string);
+    }
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  method append : void ($pairs : object of object[]|HTTP::Tiny::Parameters) {
+    
+    unless ($pairs) {
+      die "The pairs \$pairs must be defined.";
+    }
+    
+    my $pairs_array = (object[])undef;
+    if ($pairs isa object[]) {
+      $pairs_array = (object[])$pairs;
+    }
+    elsif ($pairs isa HTTP::Tiny::Parameters) {
+      $pairs_array = $pairs->(HTTP::Tiny::Parameters)->pairs;
+    }
+    else {
+      die "The type of \$pairs must be object[] or HTTP::Tiny::Parameters.";
+    }
+    
+    my $pairs_array_length = @$pairs_array;
+    
+    unless ($pairs_array_length % 2 == 0) {
+      die "The length of \$pairs must be an even number if it is an array.";
+    }
+    
+    my $old_list = $self->{pairs_list};
+    
+    my $new = $pairs_array;
+    
+    for (my $i = 0; $i < @$new; $i += 2) {
+      my $new_name = $new->[0];
+      my $new_value = $new->[1];
+      
+      if ($new_value) {
+        if ($new_value isa string) {
+          $old_list->push((string)$new_name);
+          $old_list->push((string)$new_value);
+        }
+        elsif ($new_value isa string[]) {
+          for my $one_new_value (@(string[])$new_value) {
+            $old_list->push((string)$new_name);
+            $old_list->push($one_new_value);
+          }
+        }
+        else {
+          die "The type of the value \$pairs->[$i] must be string or string[].";
+        }
+      }
+    }
+    
+  }
+  
+  method clone : HTTP::Tiny::Parameters () {
+    
+    my $clone = HTTP::Tiny::Parameters->new;
+    
+    if ($self->{string}) {
+      $clone->{string} = copy $self->{string};
+    }
+    else {
+      $clone->{pairs_list} = StringList->new(Array->copy_string($self->pairs));
+    }
+    
+    return $clone;
+  }
+  
+  method every_param : string[] ($name : string) {
+    
+    my $values_list = StringList->new;
+    
+    my $pairs_list = StringList->new($self->pairs);
+    
+    for (my $i = 0; $i < $pairs_list->length; $i += 2) {
+      if ($pairs_list->get($i) eq $name) {
+        $values_list->push($pairs_list->get($i + 1));
+      }
+    }
+    
+    my $values = $values_list->to_array;
+    
+    return $values;
+  }
+  
+  method merge : void ($parameters : object of object[]|HTTP::Tiny::Parameters)  {
+    
+    unless ($parameters) {
+      die "The parameters \$parameters must be defined.";
+    }
+    
+    my $parameters_hash = (Hash)undef;
+    if ($parameters isa object[]) {
+      $parameters_hash = Hash->new((object[])$parameters);
+    }
+    elsif ($parameters isa HTTP::Tiny::Parameters) {
+      $parameters_hash = $parameters->(HTTP::Tiny::Parameters)->to_hash;
+    }
+    else {
+      die "The type of the parameters \$parameters must be object[] or HTTP::Tiny::Parameters.";
+    }
+    
+    my $merge = $parameters_hash;
+    my $merge_keys = $merge->keys;
+    Sort->sort_string_asc($merge_keys);
+    
+    for my $name (@$merge_keys) {
+      my $value = $merge->get($name);
+      if ($value) {
+        $self->set_param($name => $value);
+      }
+      else {
+        $self->remove($name);
+      }
+    }
+    
+  }
+  
+  method names : string[] () {
+    
+    my $hash = $self->to_hash;
+    my $keys = $hash->keys;
+    Sort->sort_string_asc($keys);
+    
+    return $keys;
+  }
+  
+  method pairs : string[] () {
+    
+    $self->_parse;
+    
+    return $self->{pairs_list}->to_array;
+  }
+  
+  method _parse : void () {
+    
+    my $string = $self->{string};
+    $self->{string} = undef;
+    
+    $self->{pairs_list} = StringList->new;
+    
+    my $pairs_list = $self->{pairs_list};
+    
+    if (length $string) {
+      for my $pair (@{Fn->split("&", $string)}) {
+        if (my $match = Re->m($pair, "^([^=]+)(?:=(.*))?$")) {
+          my $name = $match->cap1;
+          my $value = $match->cap2;
+          
+          my $name_ref = [$name];
+          Re->s($name_ref, ["\+", "g"], " ");
+          $name = $name_ref->[0];
+          
+          my $value_ref = [$value];
+          Re->s($value_ref, ["\+", "g"], " ");
+          $value = $value_ref->[0];
+          unless ($value) {
+            $value = "";
+          }
+          
+          $name  = HTTP::Tiny::Util->url_unescape($name);
+          $value = HTTP::Tiny::Util->url_unescape($value);
+          
+          $pairs_list->push($name);
+          $pairs_list->push($value);
+        }
+      }
+    }
+    
+  }
+  
+  method set_pairs : void ($pairs : string[])  {
+    
+    unless ($pairs) {
+      die "The paris \$pairs must be defined.";
+    }
+    
+    $self->{pairs_list} = StringList->new($pairs);
+    
+    $self->{string} = undef;
+    
+  }
+
+  method param : string ($name : string) {
+    
+    my $every_param = $self->every_param($name);
+    
+    my $param = (string)undef;
+    if (@$every_param) {
+      $param = $every_param->[0];
+    }
+    
+    return $param;
+  }
+  
+  method set_param : void ($name : string, $value : object of string|string[]) {
+    
+    unless ($name) {
+      die "The name \$name must be defined.";
+    }
+    
+    unless ($value) {
+      die "The value \$value must be defined.";
+    }
+    
+    $self->remove($name);
+    
+    if ($value isa string) {
+      $self->append([(string)$value]);
+    }
+    elsif ($value isa string[]) {
+      $self->append((string[])$value);
+    }
+    else {
+      die "The type of value \$value must be string or string[].";
+    }
+    
+  }
+  
+  method parse : void ($string : string) {
+    
+    $self->{string} = $string;
+    
+  }
+  
+  method remove : void ($name : string) {
+    
+    unless ($name) {
+      die "The name \$name must be defined.";
+    }
+    
+    $self->_parse;
+    
+    my $pairs_list = $self->{pairs_list};
+    
+    my $i     = 0;
+    while ($i < $pairs_list->length) {
+      if ($pairs_list->get($i) eq $name) {
+        $pairs_list->remove($i);
+        $pairs_list->remove($i + 1);
+      }
+      else {
+        $i += 2;
+      }
+    }
+    
+  }
+  
+  method to_hash : Hash () {
+
+    my $hash = Hash->new;
+    
+    $self->_parse;
+    
+    my $pairs_list = $self->{pairs_list};
+    
+    for (my $i = 0; $i < $pairs_list->length; $i += 2) {
+      my $name = $pairs_list->get($i);
+      my $value = $pairs_list->get($i + 1);
+      
+      # Array
+      if ($hash->exists($name)) {
+        my $hash_value = $hash->get($name);
+        
+        my $hash_value_array = (string[])undef;
+        if ($hash_value isa string[]) {
+          $hash_value_array = (string[])$hash_value;
+        }
+        elsif ($hash_value isa string) {
+          $hash_value_array = [(string)$hash_value];
+        }
+        else {
+          die "[Unexpected Error]Invalid hash value type.";
+        }
+        
+        $hash_value_array = Array->merge_string($hash_value_array, [$value]);
+        
+        $hash->set($name, $hash_value_array);
+      }
+      
+      # String
+      else {
+        $hash->set($name, $value);
+      }
+    }
+    
+    return $hash;
+  }
+  
+  method to_string : string () {
+    
+    # String (RFC 3986)
+    if (my $string = $self->{string}) {
+      return HTTP::Tiny::Util->url_escape($string, q'^A-Za-z0-9\\-._~%!$&\'()*+,;=:@/?');
+    }
+    
+    # Build pairs (HTML Living Standard)
+    $self->_parse;
+    
+    my $pairs_list = $self->{pairs_list};
+    
+    unless ($pairs_list->length) {
+      return "";
+    }
+    
+    my $key_values_list = StringList->new;
+    for (my $i = 0; $i < $pairs_list->length; $i += 2) {
+      my $name = $pairs_list->get($i);
+      my $value = $pairs_list->get($i + 1);
+      
+      # Escape and replace whitespace with "+"
+      $name  = HTTP::Tiny::Util->url_escape($name, q'^*\\-.0-9A-Z_a-z');
+      $value = HTTP::Tiny::Util->url_escape($value, q'^*\\-.0-9A-Z_a-z');
+      
+      my $name_ref = [$name];
+      Re->s($name_ref, ["%20", "g"], "+");
+      $name = $name_ref->[0];
+      
+      my $value_ref = [$value];
+      Re->s($value_ref, ["%20", "g"], "+");
+      $value = $value_ref->[0];
+      
+      $key_values_list->push("$name=$value");
+    }
+    
+    return Fn->join("&", $key_values_list->to_array);
+  }
+  
+}

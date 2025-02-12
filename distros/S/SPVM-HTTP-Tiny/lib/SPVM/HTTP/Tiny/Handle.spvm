@@ -99,7 +99,7 @@ class HTTP::Tiny::Handle {
     
     my $url = $request->{url};
     
-    my $path = $url->{path};
+    my $path = $url->{path}->to_string;
     
     my $request_line = "$method $path HTTP/1.1\r\n";
     
@@ -184,7 +184,6 @@ class HTTP::Tiny::Handle {
     
     $response->{protocol} = $protocol;
     $response->{status} = Fn->to_int($status);
-    $response->{reason} = $reason;
     
     if ($status && $status->[0] == '2') {
       $response->{success} = 1;

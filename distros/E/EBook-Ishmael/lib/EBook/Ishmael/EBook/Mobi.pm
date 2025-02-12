@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::Mobi;
 use 5.016;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 use strict;
 use warnings;
 
@@ -16,32 +16,15 @@ my $CREATOR = 'MOBI';
 my $RECSIZE = 4096;
 
 my %EXTH_RECORDS = (
-	100 => 'creator',
-	101 => 'publisher',
-	102 => 'imprint',
-	103 => 'description',
-	104 => 'isbn',
-	105 => 'subject',
-	106 => 'date',
-	107 => 'review',
-	108 => 'contributor',
-	109 => 'rights',
-	110 => 'subjectcode',
-	111 => 'type',
-	112 => 'source',
-	114 => 'version',
-	115 => 'sample',
-	117 => 'adult',
-	118 => 'retailprice',
-	119 => 'retailcurrency',
-	122 => 'fixed-layout',
-	123 => 'book-type',
-	124 => 'orientation',
-	126 => 'resolution',
-	127 => 'zero-gutter',
-	128 => 'zero-margin',
-	524 => 'language',
-	535 => 'buildnumber',
+	100 => sub { author      => shift },
+	101 => sub { contributor => shift },
+	103 => sub { description => shift },
+	104 => sub { id          => shift },
+	105 => sub { genre       => shift },
+	106 => sub { created     => shift },
+	108 => sub { contributor => shift },
+	114 => sub { format      => "MOBI " . shift },
+	524 => sub { language    => shift },
 );
 
 sub heuristic {
@@ -158,7 +141,8 @@ sub _read_exth {
 		my ($id, undef, $content) = unpack "N N a$contlen", substr $exth, $pos;
 
 		if (exists $EXTH_RECORDS{ $id }) {
-			push @{ $self->{Metadata}->{ $EXTH_RECORDS{ $id } } }, $content;
+			my ($k, $v) = $EXTH_RECORDS{ $id }->($content);
+			push @{ $self->{Metadata}->$k }, $v;
 		}
 
 		$pos += $size;
@@ -176,7 +160,7 @@ sub new {
 
 	my $self = {
 		Source       => undef,
-		Metadata     => {},
+		Metadata     => EBook::Ishmael::EBook::Metadata->new,
 		_pdb         => undef,
 		_compression => undef,
 		_textlen     => undef,
@@ -238,10 +222,20 @@ sub new {
 	$self->{_exth_flag}  = unpack "N", substr $mobihdr, 0x70;
 	$self->{_extra_data} = unpack "n", substr $mobihdr, 0xf2 - 16;
 
-	push @{ $self->{Metadata}->{title} }, substr $hdr, $toff, $tlen;
+	$self->{Metadata}->title([ substr $hdr, $toff, $tlen ]);
 
 	if ($self->{_exth_flag}) {
 		$self->_read_exth(substr $mobihdr, $self->{_length});
+	}
+
+	unless (@{ $self->{Metadata}->created }) {
+		$self->{Metadata}->created([ scalar gmtime $self->{_pdb}->cdate ]);
+	}
+
+	$self->{Metadata}->modified([ scalar gmtime $self->{_pdb}->mdate ]);
+
+	unless (@{ $self->{Metadata}->format }) {
+		$self->{Metadata}->format([ 'MOBI' ]);
 	}
 
 	return $self;
@@ -281,7 +275,7 @@ sub metadata {
 
 	my $self = shift;
 
-	return $self->{Metadata};
+	return $self->{Metadata}->hash;
 
 }
 

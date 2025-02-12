@@ -1,0 +1,95 @@
+# Revision History for the `Regexp::Ethiopic` Perl Distribution
+
+## 0.20 Tue Feb 11 21:04:46 EST 2025
+	- Migration to a Build.PL & GitHub system.
+
+## 0.19 Sat Feb  1 22:46:49 EST 2025
+	- Fixes as per CPANTS:
+	  + Added MIN_PERL_VERSION to Makefile.PL
+
+## 0.18 Sat Feb  1 10:48:18 EST 2025
+	- Fixes as per CPANTS:
+	  + Fixed incomplete license statement in source.
+	  + Added a minimal Perl statement to META.yml
+	  + Added a 'provides' statements to META.yml and META.json
+
+## 0.17 Sat Feb  1 07:43:33 EST 2025
+	- Fixes as per CPANTS:
+	  + LICENSE added.
+	  + packaged with GNU tar.
+	  + Added 'use warnings'.
+	  + Synched all module versions.
+
+## 0.16 Mon Jan 20 22:11:24 EST 2025
+	- fixes for modern Perl.
+
+## 0.15 Sun Jul  2 23:37:37 EDT 2006
+	- added "use encoding 'utf8';" to test script to avoid warns.
+	- added Regexp::Ethiopic::isFamilyOf method to check if to chars are in the same family.
+	- added support for family equivalence where in [=#x#=] the "x" can be a list.
+	- tweaked syllabic limitter notation so that in x{#3,7#} the "x" can be other than the Ge'ez form.
+	
+## 0.14 Sun May 30 13:12:50 EDT 2004
+	- updated limit notation to match range notation.
+
+## 0.13 Sat Nov  8 16:49:08 EST 2003
+	- added more to documentation doc/index.html.
+	- Removed %GeezClassEquivalence since it isn't used.
+	- Removed test 31 from overload.pl, its either a typo or I
+	  don't know what I was thinking...
+
+## 0.12 Mon Jun 12 17:52:22 EDT 2003
+	- added Tigrigna and Ge'ez modules.
+	- changed rule to replace [=x=] with x if x is ethiopic and an
+	  unknown class.
+
+## 0.11 Mon Jun  2 10:17:58 EDT 2003
+	- added :utils export option for all functions.
+	- added documentation for export functions.
+	- added examples/utils.pl.
+	- added new function "formatForms" (like sprintf for syllables).
+	- added the "o" optimizer everywhere applicable,
+	  lets hope this doesn't break anything.
+	- Changed \p{InEthiopic} to \p{Ethiopic} which (I think) will
+	  match only Ethiopic letter chars.
+
+## 0.10 Mon May19 12:33:39 EDT 2003
+	- fixed "subForm" export problem in Regexp::Ethiopic::Amharic,
+	  an oversite from the 0.09 release.
+
+## 0.09 Sun May 18 05:12:46 EDT 2003
+	- addition of "subForm".
+
+## 0.08 Sat Apr 19 11:50:38 EDT 2003
+	- tweaked RE language so that the % operator must appear inside {}.
+          Which is a simplification for interpretation, %'s scope as an operator
+          is now restricted, this should fit in with traditional REs more readily.
+
+## 0.07 Thu Apr 17 12:04:45 EDT 2003
+	- a one char doc fix.
+
+## 0.06 Sat Apr 12 21:23:09 EDT 2003
+	- fixes to setForm.
+
+## 0.05 Fri Apr 11 17:07:07 EDT 2003
+	- added exportable getForm and setForm which I keep using in
+	  other packages.
+	- Exportable ":forms" added which exports a list of classic variable
+	  names for the Ethiopic letter forms and their numeric value.
+	- fixed examples at end of examples/overload.pl
+	- documentation fixes.
+ 
+## 0.04 Tue Mar 18 21:06:57 EST 2003
+	- added sat-sewt family equivalence that was overlooked.
+	- fixed comma between letters problem with a zero width insertion. 
+
+## 0.03 Mon Mar 17 15:30:26 EST 2003
+	- ranges added for forms equivalence.
+	- ranges added for family equivalence.
+
+## 0.02 Mon Mar 17 09:33:06 EST 2003
+	- overloading and functional use play together nicely.
+	- "use utf8" statement moved outside of "BEGIN" block.
+
+## 0.01 Fri Mar 7 14:23:48 EST 2003
+	- initial release.

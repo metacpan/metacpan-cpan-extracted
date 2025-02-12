@@ -58,6 +58,6 @@
          "web" : "https://github.com/briandfoy/http-cookies-chrome"
       }
    },
-   "version" : "2.003",
+   "version" : "2.004",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

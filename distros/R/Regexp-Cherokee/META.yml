@@ -1,23 +1,28 @@
 ---
 abstract: 'Regular Expressions Support for Cherokee Script and the Languages that use it.'
 author:
-  - 'Daniel Yacob <dyacob@cpan.org>'
-build_requires:
-  ExtUtils::MakeMaker: '0'
+  - 'Daniel Yacob <dyacob\@cpan.org>'
+build_requires: {}
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Regexp-Cherokee
-no_index:
-  directory:
-    - t
-    - inc
+provides:
+  Regexp::Cherokee:
+    file: lib/Regexp/Cherokee.pm
+    version: '0.07'
 requires:
-  perl: '5.008000'
-version: '0.05'
+  perl: v5.8.0
+resources:
+  bugtracker: https://github.com/dyacob/Regexp-Cherokee/issues
+  homepage: https://github.com/dyacob/Regexp-Cherokee
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/dyacob/Regexp-Cherokee.git
+version: '0.07'
+x_authority: cpan:dyacob
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -6,8 +6,10 @@ class HTTP::Tiny::Message::Response extends HTTP::Tiny::Message {
   
   allow HTTP::Tiny::Handle;
   allow HTTP::Tiny;
+  allow HTTP::Tiny::Daemon;
   
   use HTTP::Tiny::Headers;
+  use HTTP::Tiny::Status;
   
   # Fields
   has protocol : ro string;
@@ -16,14 +18,12 @@ class HTTP::Tiny::Message::Response extends HTTP::Tiny::Message {
   
   has success : ro byte;
   
-  has reason : ro string;
-  
-  has content_buffer : StringBuffer;
-  
   # Class Methods
   private static method new : HTTP::Tiny::Message::Response () {
     
     my $self = new HTTP::Tiny::Message::Response;
+    
+    $self->{protocol} = "HTTP/1.1";
     
     $self->{content_buffer} = StringBuffer->new;
     
@@ -33,7 +33,41 @@ class HTTP::Tiny::Message::Response extends HTTP::Tiny::Message {
   }
   
   # Instance Methods
-  method content : string () {
-    return $self->{content_buffer}->to_string;
+  method reason : string () {
+    
+    my $status = $self->{status};
+    
+    my $reason = HTTP::Tiny::Status->status_message($status);
+    
+    return $reason;
   }
+  
+  method build_start_line : string () {
+    
+    my $status = $self->{status};
+    
+    my $reason = $self->reason;
+    
+    my $start_line = "HTTP/1.1 $status $reason\x0d\x0a";
+    
+    return $start_line;
+  }
+  
+  method build_headers : string () {
+    # TODO
+    
+    return undef;
+  }
+  
+  method build_body : string (){
+    # TODO
+    
+    return undef;
+  }
+  
+  private method message : string () {
+    
+    return $self->reason;
+  }
+  
 }

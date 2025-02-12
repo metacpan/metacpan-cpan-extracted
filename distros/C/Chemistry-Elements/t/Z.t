@@ -1,34 +1,56 @@
 #!/usr/bin/perl
 
-use Test::More 'no_plan';
+use Test::More;
 
 my $class = 'Chemistry::Elements';
+my $method = 'Z';
+my @methods = qw(Z symbol name error);
 
-use_ok( $class );
-ok( defined &{"${class}::can"}, "$class defines its own can" );
+subtest 'sanity' => sub {
+	use_ok $class;
+	ok defined &{"${class}::can"}, "$class defines its own can";
+	};
 
-my $element = $class->new( 'U' );
-isa_ok( $element, $class );
+subtest 'new object' => sub {
+	my $symbol = 'U';
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# try something that should return true
-ok( $element->can('Z'), 'Object can call the Z method' );
+	my $element = $class->new( $symbol );
+	isa_ok $element, $class ;
+	ok $element->can($method), "Object can call the $method method";
+	can_ok $element, @methods;
 
-is( $element->Z,       92, "Got right Z for U" );
-is( $element->symbol, 'U', "Got right symbol for U" );
-is( $element->name, 'Uranium', "Got right name for U (Default)" );
+	subtest 'read values' => sub {
+		is $element->$method(),   92,       "Got right Z for $symbol";
+		is $element->symbol,     $symbol,   "Got right symbol for $symbol";
+		is $element->name,       'Uranium', "Got right name for $symbol (Default)";
+		};
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Change the Z
-is( $element->Z(94),   94, "Got right Z for Pu after U decay" );
-is( $element->symbol, 'Pu', "Got right symbol for Pu" );
-is( $element->name,   'Plutonium', "Got right name for Pu (Default)" );
+	subtest 'change element' => sub {
+		my $symbol = 'Pu';
+		is $element->$method(94),   94,   "Got right Z for $symbol after U decay";
+		is $element->symbol, $symbol,     "Got right symbol for $symbol";
+		is $element->name,   'Plutonium', "Got right name for $symbol (Default)";
+		};
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Change the Z to nonsense
-ok( ! $element->Z('Pa'),          "Could not change Z to symbol"       );
-ok( ! $element->Z('Technetium'),  "Could not change Z to symbol"       );
-ok( ! $element->Z(''),            "Could not change Z to empty string" );
-ok( ! $element->Z(undef),         "Could not change Z to undef"        );
-ok( ! $element->Z(0),             "Could not change Z to 0"            );
-ok( ! $element->Z(200),           "Could not change Z to 200"          );
+	subtest 'change to nonsense' => sub {
+		my @table = (
+			[ qw(Pa symbol) ],
+			[ qw(Technetium name) ],
+			[ '', 'empty string' ],
+			[ undef, 'undef' ],
+			[ 0, 'out of range (0)' ],
+			[ 200, 'out of range (200)' ],
+			[ -1,  'out of range (-1)' ],
+			);
+
+		foreach my $row ( @table ) {
+			my( $arg, $label ) = @$row;
+			subtest $label => sub {
+				ok ! $element->$method($arg), "Could not change Z to $label";
+				like $element->error, qr/\Q$arg\E is not a valid proton/,   "error notes invalid argument";
+				};
+			}
+		};
+	};
+
+done_testing();

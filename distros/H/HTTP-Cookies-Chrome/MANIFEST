@@ -1,7 +1,6 @@
 Changes
 examples/load_and_save.pl
 examples/load_cookies.t
-examples/placeholder.pl
 INSTALL.SKIP
 lib/HTTP/Cookies/Chrome.pm
 LICENSE

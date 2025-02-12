@@ -15,63 +15,64 @@ name: Date-Ethiopic
 provides:
   Date::Ethiopic:
     file: lib/Date/Ethiopic.pm
-    version: '0.15'
+    version: '0.16'
   Date::Ethiopic::ER:
     file: lib/Date/Ethiopic/ER.pm
-    version: '0.15'
+    version: '0.16'
   Date::Ethiopic::ER::byn:
     file: lib/Date/Ethiopic/ER/byn.pm
-    version: '0.15'
+    version: '0.16'
   Date::Ethiopic::ER::gez:
     file: lib/Date/Ethiopic/ER/gez.pm
-    version: '0.15'
+    version: '0.16'
   Date::Ethiopic::ER::ti:
     file: lib/Date/Ethiopic/ER/ti.pm
-    version: '0.15'
+    version: '0.16'
   Date::Ethiopic::ER::tig:
     file: lib/Date/Ethiopic/ER/tig.pm
-    version: '0.15'
+    version: '0.16'
   Date::Ethiopic::ET:
     file: lib/Date/Ethiopic/ET.pm
-    version: '0.15'
+    version: '0.16'
   Date::Ethiopic::ET::am:
     file: lib/Date/Ethiopic/ET/am.pm
-    version: '0.15'
+    version: '0.16'
   Date::Ethiopic::ET::gez:
     file: lib/Date/Ethiopic/ET/gez.pm
-    version: '0.15'
+    version: '0.16'
   Date::Ethiopic::ET::gru:
     file: lib/Date/Ethiopic/ET/gru.pm
-    version: '0.15'
+    version: '0.16'
   Date::Ethiopic::ET::guy:
     file: lib/Date/Ethiopic/ET/guy.pm
-    version: '0.15'
+    version: '0.16'
   Date::Ethiopic::ET::har:
     file: lib/Date/Ethiopic/ET/har.pm
-    version: '0.15'
+    version: '0.16'
   Date::Ethiopic::ET::qim:
     file: lib/Date/Ethiopic/ET/qim.pm
-    version: '0.15'
+    version: '0.16'
   Date::Ethiopic::ET::ti:
     file: lib/Date/Ethiopic/ET/ti.pm
-    version: '0.15'
+    version: '0.16'
   Date::Ethiopic::ET::zgu:
     file: lib/Date/Ethiopic/ET/zgu.pm
-    version: '0.15'
+    version: '0.16'
   Date::Ethiopic::gez:
     file: lib/Date/Ethiopic/gez.pm
-    version: '0.15'
+    version: '0.16'
   Date::Ethiopic::ti:
     file: lib/Date/Ethiopic/ti.pm
-    version: '0.15'
+    version: '0.16'
 requires:
   Convert::Number::Ethiopic: '0.15'
   Date::ICal: '0'
+  perl: v5.6.1
 resources:
   bugtracker: https://github.com/dyacob/Date-Ethiopic/issues
   homepage: https://github.com/dyacob/Date-Ethiopic
   license: http://dev.perl.org/licenses/
   repository: https://github.com/dyacob/Date-Ethiopic.git
-version: '0.15'
+version: '0.16'
 x_authority: cpan:dyacob
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

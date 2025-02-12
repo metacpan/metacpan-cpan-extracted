@@ -1,6 +1,6 @@
 package EBook::Ishmael::TextBrowserDump;
 use 5.016;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 use strict;
 use warnings;
 
@@ -42,7 +42,7 @@ my %Browsers = (
 	'w3m' => {
 		Bins  => [ qw(w3m) ],
 		Bin   => undef,
-		Opts  => [ qw(-dump) ],
+		Opts  => [ qw(-dump -T text/html) ],
 		Width => '-cols',
 		Xhtml => [],
 	},

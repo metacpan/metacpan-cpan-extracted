@@ -77,7 +77,7 @@ use vars qw( $VERSION );
 use constant TRUE  => 1;
 use constant FALSE => 0;
 
-$VERSION = '2.003';
+$VERSION = '2.004';
 
 use DBI;
 
@@ -400,9 +400,7 @@ sub new {
 
 	return $self unless defined $pass;
 
-	print STDERR "Making cipher\n";
 	$self->_make_cipher( $pass );
-	print STDERR "Made cipher\n";
 
 	if( $file ) {
 		$self->{file} = $file;

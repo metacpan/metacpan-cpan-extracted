@@ -1,38 +1,57 @@
 #!/usr/bin/perl
 
-use Test::More 'no_plan';
+#!/usr/bin/perl
+
+use Test::More;
 
 my $class = 'Chemistry::Elements';
+my $method = 'name';
+my @methods = qw(Z symbol name error);
 
-use_ok( $class );
-ok( defined &{"${class}::can"}, "$class defines its own can" );
+subtest 'sanity' => sub {
+	use_ok $class;
+	ok defined &{"${class}::can"}, "$class defines its own can";
+	};
 
-my $element = $class->new( 'U' );
-isa_ok( $element, $class );
+subtest 'new object' => sub {
+	my $symbol = 'U';
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# try something that should return true
-ok( $element->can('name'), 'Object can call the name method' );
+	my $element = $class->new( $symbol );
+	isa_ok $element, $class ;
+	ok $element->can($method), "Object can call the $method method";
+	can_ok $element, @methods;
 
-is( $element->Z,       92, "Got right Z for U" );
-is( $element->symbol, 'U', "Got right symbol for U" );
-is( $element->name, 'Uranium', "Got right name for U (Default)" );
+	subtest 'read values' => sub {
+		is $element->Z,         92,        "Got right Z for $symbol";
+		is $element->symbol,    $symbol,   "Got right symbol for $symbol";
+		is $element->$method(), 'Uranium', "Got right name for $symbol (Default)";
+		};
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Change the name to something that will work
-is( $element->name('Plutonium'),  'Plutonium', "Got right name for Pu after U decay" );
-is( $element->symbol, 'Pu', "Got right symbol for Pu" );
-is( $element->Z,  94, "Got right Z for Pu (Default)" );
+	subtest 'change element' => sub {
+		my $symbol = 'Pu';
+		is $element->Z(94),     94,          "Got right Z for $symbol after U decay";
+		is $element->symbol,    $symbol,     "Got right symbol for $symbol";
+		is $element->$method(), 'Plutonium', "Got right name for $symbol (Default)";
+		};
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Change the name to something that won't work
-ok( ! $element->name(''),    "Can't change name to empty string" );
-ok( ! $element->name(undef), "Can't change name to undef"        );
-ok( ! $element->name(0),     "Can't change name to 0"            );
-ok( ! $element->name(-1),    "Can't change name to -1"           );
+	subtest 'change to nonsense' => sub {
+		my @table = (
+			[ qw(Te symbol) ],
+			[ '',    'empty string' ],
+			[ undef, 'undef' ],
+			[ 0,     'number' ],
+			[ 200,   'number' ],
+			[ -1,    'number' ],
+			);
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# This should still be the same element
-is( $element->name,  'Plutonium', "Got right name for Pu after U decay" );
-is( $element->symbol, 'Pu', "Got right symbol for Pu" );
-is( $element->Z,  94, "Got right Z for Pu (Default)" );
+		foreach my $row ( @table ) {
+			my( $arg, $label ) = @$row;
+			subtest $label => sub {
+				ok ! $element->$method($arg), "Could not change name to $label";
+				like $element->error, qr/\Q$arg\E is not a valid element name/,   "error notes invalid argument";
+				};
+			}
+		};
+	};
+
+done_testing();

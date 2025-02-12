@@ -1,6 +1,6 @@
 package EBook::Ishmael;
 use 5.016;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 use strict;
 use warnings;
 
@@ -150,7 +150,7 @@ sub meta {
 
 	my %meta = %{ $ebook->metadata };
 
-	return unless %meta;
+	return 1 unless %meta;
 
 	# Make room for colon and extra space
 	my $klen = max map { length($_) + 2 } keys %meta;

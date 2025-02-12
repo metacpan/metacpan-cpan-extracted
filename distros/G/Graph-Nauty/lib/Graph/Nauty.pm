@@ -13,7 +13,7 @@ our @EXPORT_OK = qw(
     orbits_are_same
 );
 
-our $VERSION = '0.5.2'; # VERSION
+our $VERSION = '0.5.3'; # VERSION
 
 our $worksize = 0;
 our $warn_deprecated = 1;
@@ -47,6 +47,8 @@ sub _nauty_graph
 
     $color_sub = sub { "$_[0]" } unless $color_sub;
     $order_sub = sub { "$_[0]" } unless $order_sub;
+
+    die "cannot handle graphs with self-loops\n" if $graph->self_loop_vertices;
 
     if( grep { $graph->has_edge_attributes( @$_ ) } $graph->edges ) {
         # colored bonds detected, need to transform the graph

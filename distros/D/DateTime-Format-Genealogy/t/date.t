@@ -49,6 +49,7 @@ DATE: {
 	cmp_deeply($f->parse_datetime(date => '1 Janv 1752'), methods('dmy' => '01-01-1752'));
 	cmp_deeply($f->parse_datetime({ date => '8 Juli 1817' }), methods('dmy' => '08-07-1817'));
 	cmp_deeply($f->parse_datetime({ date => '29-Aug-1938' }), methods('dmy' => '29-08-1938'));
+	# cmp_deeply($f->parse_datetime(['29-Sep-1939']), methods('dmy' => '29-09-1939'));
 
 	# cmp_deeply(DateTime::Format::Genealogy::parse_datetime({ date => '1637-10-17', quiet => 1}), methods('dmy' => '17-10-1637'));
 }

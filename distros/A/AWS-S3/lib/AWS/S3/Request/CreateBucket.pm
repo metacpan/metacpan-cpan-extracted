@@ -15,7 +15,9 @@ has 'bucket' => (
 has 'location' => (
     is       => 'ro',
     isa      => 'Maybe[Str]',
+    lazy     => 1,
     required => 0,
+    default  => sub { shift->s3->region || $ENV{AWS_REGION} },
 );
 
 has '+_expect_nothing' => ( default => 1 );

@@ -53,6 +53,7 @@ WriteMakefile(
     'SPVM::Mozilla::CA' => '0.001',
     'SPVM::File::Temp' => '0.021',
     'SPVM::Time::Piece' => '0.003',
+    'SPVM::Time::Local' => '0.112',
   },
 );
 

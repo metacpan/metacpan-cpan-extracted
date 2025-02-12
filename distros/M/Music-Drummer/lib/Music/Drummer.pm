@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Use MIDI::Drummer::Tiny
 
-our $VERSION = '0.5011';
+our $VERSION = '0.5012';
 
 use parent 'MIDI::Drummer::Tiny';
 
@@ -22,7 +22,7 @@ Music::Drummer - Use MIDI::Drummer::Tiny
 
 =head1 VERSION
 
-version 0.5011
+version 0.5012
 
 =head1 SYNOPSIS
 
@@ -37,7 +37,8 @@ version 0.5011
 =head1 DESCRIPTION
 
 C<Music::Drummer> uses the L<MIDI::Drummer::Tiny> module. It is simply
-a module alias with a friendlier, searchable name.
+a module alias with a friendlier, searchable name and description
+keywords like B<drum>, B<drums>, and B<drumming>.
 
 =head1 SEE ALSO
 

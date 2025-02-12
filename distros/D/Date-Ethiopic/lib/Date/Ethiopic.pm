@@ -54,7 +54,7 @@ BEGIN
 		$n
 	);
 
-	$VERSION = "0.15";
+	$VERSION = "0.16";
 
 	$EPOCH = 2796;
 

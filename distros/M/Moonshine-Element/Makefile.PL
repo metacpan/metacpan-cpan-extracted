@@ -27,6 +27,7 @@ WriteMakefile(
         'feature' => 0,
         'strict' => 0,
         'warnings' => 0,
+	'Switch::Again' => '1.01'
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Moonshine-Element-*' },

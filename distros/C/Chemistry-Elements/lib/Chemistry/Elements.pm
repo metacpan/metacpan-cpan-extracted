@@ -19,7 +19,7 @@ use Exporter qw(import);
 
 our @EXPORT_OK = qw(get_Z get_symbol get_name);
 our @EXPORT    = qw();
-our $VERSION   = '1.078';
+our $VERSION   = '1.079';
 
 use subs qw(
 	_get_name_by_Z
@@ -36,8 +36,8 @@ use subs qw(
 	);
 
 BEGIN {
-my @class_methods  = qw(can isa);
-my @object_methods = qw(new Z name symbol can);
+my @class_methods  = qw(can isa new);
+my @object_methods = qw(new Z name symbol can error);
 my %class_methods  = map { $_, 1 } @class_methods;
 my %object_methods = map { $_, 1 } @object_methods;
 
@@ -216,7 +216,7 @@ Na Mg                                                                         Al
 K  Ca                                           Sc Ti  V Cr Mn Fe Co Ni Cu Zn Ga Ge As Se Br Kr
 Rb Sr                                            Y Zr Nb Mo Tc Ru Rh Pd Ag Cd In Sn Sb Te  I Xe
 Cs Ba La Ce Pr Nd Pm Sm Eu Gd Tb Dy Ho Er Tm Yb Lu Hf Ta W  Re Os Ir Pt Au Hg Tl Pb Bi Po At Rn
-Fr Ra Ac Th Pa U  Np Pu Am Cm Bk Cf Es Fm Md No Lr Rf Ha Sg Bh Hs Mt Ds Rg Cn Nh Fl Mc Lv Ts Og
+Fr Ra Ac Th Pa U  Np Pu Am Cm Bk Cf Es Fm Md No Lr Rf Db Sg Bh Hs Mt Ds Rg Cn Nh Fl Mc Lv Ts Og
 );
 
 sub new {
@@ -240,7 +240,7 @@ sub Z {
 	my $data = shift;
 
 	unless( _is_Z $data ) {
-		$self->error('$data is not a valid proton number');
+		$self->error("$data is not a valid proton number");
 		return;
 		}
 
@@ -258,7 +258,7 @@ sub name {
 	my $data = shift;
 
 	unless( _is_name $data ) {
-		$self->error('$data is not a valid element name');
+		$self->error("$data is not a valid element name");
 		return;
 		}
 
@@ -276,7 +276,7 @@ sub symbol {
 	my $data = shift;
 
 	unless( _is_symbol $data ) {
-		$self->error('$data is not a valid element symbol');
+		$self->error("$data is not a valid element symbol");
 		return;
 		}
 

@@ -2,10 +2,9 @@ NAME
     Data::InfoBox - Data object for info box.
 
 DESCRIPTION
-    Data objects for definition of common infobox which contains structured
+    Data object for definition of common infobox which contains lines with
     informations. The informations are in form of text description
-    (optionaly with icon) and some value. It's used on e.g. Wikipedia
-    article as table on top of the page.
+    (optionaly with icon and link).
 
 SYNOPSIS
      use Data::InfoBox;
@@ -93,5 +92,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.03
+    0.04
 

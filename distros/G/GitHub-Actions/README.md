@@ -1,7 +1,7 @@
 # GitHub::Actions [![Checks the github action using itself](https://github.com/JJ/perl-GitHub-Actions/actions/workflows/self-test.yml/badge.svg)](https://github.com/JJ/perl-GitHub-Actions/actions/workflows/self-test.yml)
 
 Use GitHub Actions workflow commands directly from Perl, generally using the
-system Perl included in the runners. It's also available [from CPAN](https://metacpan.org/pod/GitHub::Actions)
+system Perl included in the runners. It's also available [from CPAN](https://metacpan.org/pod/GitHub::Actions).
 
 ## INSTALLATION
 

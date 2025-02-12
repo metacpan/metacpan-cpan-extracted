@@ -1,5 +1,8 @@
 # Revision History for the Date::Ethiopic Perl Distribution
 
+## 0.16 ማክሰ፣ ፌብ 11 ቀን 09:41:05 EST 2025 ዓ/ም
+	- Add missing required perl version to Build.PL.
+
 ## 0.15 ሰኞ፣ ፌብ 10 ቀን 20:58:13 EST 2025 ዓ/ም
 	- Migration to a Build.PL & GitHub system.
 

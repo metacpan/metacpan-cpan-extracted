@@ -10,7 +10,7 @@ use warnings;
 use vars qw($VERSION @EXPORT_OK %GeezEquivalence);
 
 
-	$VERSION = "0.19";
+	$VERSION = "0.20";
 	
 	@EXPORT_OK = qw(%GeezEquivalence);
 

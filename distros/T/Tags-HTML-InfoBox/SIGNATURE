@@ -1,0 +1,59 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 0893178d476c151e4f57c97992f7a907695560d899096612fdbf60420ec37640 Changes
+SHA256 af6bf92c817881a329fe198903d4381e4397bef8c7b8f8c3570c676c020b4adb InfoBox.pm
+SHA256 50cc0acdbd0c823530f3aced1dd2931d1b4adaf88e286da1cbf4ec8f01c0b1dc LICENSE
+SHA256 36af23cab5554efda3d0cb8ed5f4b906a729836c93af83847d369327d55f74e4 MANIFEST
+SHA256 b16a149e4a24beaeea642fb0a381359d1c37234c67962a81e0c68510f1c43e69 META.yml
+SHA256 1cf70ad4bc55be182aa1b2a957caa000f754a1b14426cc2369d9bded04ccfacd Makefile.PL
+SHA256 b47b4be3cd1c0d97c72de671fec2f294fb2370d2493214efaa31e93070beb77a README
+SHA256 ec30bb96d900c4bff1706210d0d30c946afe85b87c85d7ed34f6c1f42b211d58 examples/create_and_print_infobox.pl
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 56a15baffbeaadffc5a769e5a1b1553ccec0d48d99b72e96ecb4d672ff4abe66 t/Tags-HTML-InfoBox/01-use.t
+SHA256 27ebf97098813fb40a472e7250bbe444af773f76b82c3a55250aff0fb827199e t/Tags-HTML-InfoBox/02-version.t
+SHA256 f99d248a37c6cd6a654551e94f2736490dc288aed3faa8eec595e91bc265daa2 t/Tags-HTML-InfoBox/03-new.t
+SHA256 8baf27e6298e2ad28797821b4e26d6960b8b2588827785b683879520aecca104 t/Tags-HTML-InfoBox/04-cleanup.t
+SHA256 4852b2272469213ee9250b140029373e1219f09daf528bc0dc1ce543d8557536 t/Tags-HTML-InfoBox/05-init.t
+SHA256 f2db0e43f7afe108f4fe083029b02891cc00ce5c27beb4904e9a85ac56d739e1 t/Tags-HTML-InfoBox/06-prepare.t
+SHA256 ea6b94dcc73aedf07814a58498667c43735bdd6a8b6fe458d253845487e8db22 t/Tags-HTML-InfoBox/07-process.t
+SHA256 c484a35f3bad4b866146fcf1a7c8e37f0999c4d202ffd7233ab1ea0d9652cfb5 t/Tags-HTML-InfoBox/08-process_css.t
+SHA256 fad471b7517a6fdfe21a651235e5f151a4a723018ca8387d7588abf43e4e862d xt/Tags-HTML-InfoBox/01-pod_coverage.t
+SHA256 0d82e488bc95868dd99c819a30e9119aa865af3f0fb82e20fc1093900646d424 xt/Tags-HTML-InfoBox/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEE7CqvgROezncwcOKionze/HtIOPAFAmerdJcACgkQonze/HtI
+OPAfmgwArVzuLn8+fj8eHF5gA9hGwq80i/ueP3lCw9hrjsa/D8kzbxTFMtGsOQAe
+7+flSJvWGpzsyrICX2VCLJDZ4EFzg4qdAoZ78n77CjLNycQaJ6MtMGIJ2omfPLKG
+c1Z6H+JuwD04qjMw/2SXhUpeqD/kY/bVq6IWxGPzBAbLAOf1OeXpPuIhmejnGQyc
+VBmoIU1BvHaJBL696BfazKsZe7hSC2VSE2/fvnufcxT8N2845c1ZUgG9UztChLxx
+1rMh0AVKG5EsX782USK4kd82BGiBF08w0IWewn+666bZC4P8iulIjj1MQPQWTR8B
+C59Tk9EqExjWn0x8Pq7DevejQDdNS1dZOTd9916RBxXp/pXsDK9HKLkt/GT6x4DC
+1l+apTMO2zScVs0HY74xfCBfbAn+D+k+ZiAlUfBqGy4k0pxejvGwZOvFBhMUKzwe
+STUeDQpJuSxkoI7jKZnHlbLHxfuR65cCFTIcK1mKgU1EwG8Ur15L1crHfFGlqIzh
+bJPFt4Z1
+=VR41
+-----END PGP SIGNATURE-----

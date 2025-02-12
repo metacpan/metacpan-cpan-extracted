@@ -6,4 +6,4 @@ use Test::NoWarnings;
 use Test::Shared::Fixture::Data::InfoBox::Street;
 
 # Test.
-is($Test::Shared::Fixture::Data::InfoBox::Street::VERSION, 0.03, 'Version.');
+is($Test::Shared::Fixture::Data::InfoBox::Street::VERSION, 0.04, 'Version.');

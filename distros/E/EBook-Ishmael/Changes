@@ -1,5 +1,16 @@
 Revision history for Perl module EBook::Ishmael.
 
+0.03  Feb 11 2025
+  Changes:
+    - ishmael now uses a format-agnostic interface for handling ebook metadata.
+      This means that although the metadata ishmael gathers will now be less
+      detailed, it should at least be consistent across different formats.
+  Fixes:
+    - Modify PDF tests to account for differing output between different
+      verions of pdfinfo.
+    - Use '-T text/html' option for w3m, so that it recognizes given data as
+      HTML and actually tries to format it.
+
 0.02  Feb 10 2025
   Added:
     - --format can now recognize some alternative format names.

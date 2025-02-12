@@ -63,6 +63,15 @@ subtest 'oddballs and regressions' => sub{
         $data->{not_a_dt};
 
    };
+
+  subtest 'values which are undefined' => sub {
+
+      my $data = { deep => { in => { an => [ undef ] } } };
+
+      eval { to_toml( $data ) };
+      like $@, qr/found undefined value/;
+
+  };
 };
 
 subtest 'to_toml_array' => sub{

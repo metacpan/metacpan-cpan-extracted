@@ -3,7 +3,7 @@ use base ( "Date::Ethiopic::gez", "Date::Ethiopic::ET" );
 use strict;
 use warnings;
 
-$VERSION = "0.15";
+$VERSION = "0.16";
 
 
 

@@ -1,12 +1,14 @@
 package EBook::Ishmael::EBook::FictionBook2;
 use 5.016;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 use strict;
 use warnings;
 
 use File::Spec;
 
 use XML::LibXML;
+
+use EBook::Ishmael::EBook::Metadata;
 
 # The following 3 hashes each correspond to an entry in a FictionBook's
 # description node, which contains all of the metadata of a FictionBook
@@ -18,7 +20,7 @@ my %TITLE = (
 
 		my $node = shift;
 
-		return subject => $node->textContent;
+		return genre => $node->textContent;
 
 	},
 	'author' => sub {
@@ -29,7 +31,7 @@ my %TITLE = (
 			grep { /\S/ } map { $_->textContent } $node->childNodes
 		);
 
-		return creator => $name;
+		return author => $name;
 
 	},
 	'book-title' => sub {
@@ -57,35 +59,35 @@ my %DOCUMENT = (
 			grep { /\S/ } map { $_->textContent } $node->childNodes
 		);
 
-		return creator => $name;
+		return contributor => $name;
 
 	},
 	'program-used' => sub {
 
 		my $node = shift;
 
-		return contributor => $node->textContent;
+		return software => $node->textContent;
 
 	},
 	'date' => sub {
 
 		my $node = shift;
 
-		return date => $node->textContent;
+		return created => $node->textContent;
 
 	},
 	'id' => sub {
 
 		my $node = shift;
 
-		return identifier => $node->textContent;
+		return id => $node->textContent;
 
 	},
 	'version' => sub {
 
 		my $node = shift;
 
-		return version => $node->textContent;
+		return format => "FictionBook2 " . $node->textContent;
 
 	},
 );
@@ -95,7 +97,7 @@ my %PUBLISH = (
 
 		my $node = shift;
 
-		return date => $node->textContent;
+		return created => $node->textContent;
 
 	},
 );
@@ -133,7 +135,7 @@ sub _read_metadata {
 		for my $n ($title->childNodes) {
 			next unless exists $TITLE{ $n->nodeName };
 			my ($k, $v) = $TITLE{ $n->nodeName }->($n);
-			push @{ $self->{Metadata}->{ $k } }, $v;
+			push @{ $self->{Metadata}->$k }, $v;
 		}
 	}
 
@@ -141,7 +143,7 @@ sub _read_metadata {
 		for my $n ($doc->childNodes) {
 			next unless exists $DOCUMENT{ $n->nodeName };
 			my ($k, $v) = $DOCUMENT{ $n->nodeName }->($n);
-			push @{ $self->{Metadata}->{ $k } }, $v;
+			push @{ $self->{Metadata}->$k }, $v;
 		}
 	}
 
@@ -149,7 +151,7 @@ sub _read_metadata {
 		for my $n ($publish->childNodes) {
 			next unless exists $PUBLISH{ $n->nodeName };
 			my ($k, $v) = $PUBLISH{ $n->nodeName }->($n);
-			push @{ $self->{Metadata}->{ $k } }, $v;
+			push @{ $self->{Metadata}->$k }, $v;
 		}
 	}
 
@@ -164,7 +166,7 @@ sub new {
 
 	my $self = {
 		Source   => undef,
-		Metadata => {},
+		Metadata => EBook::Ishmael::EBook::Metadata->new,
 		_dom     => undef,
 	};
 
@@ -175,6 +177,10 @@ sub new {
 	$self->{_dom} = XML::LibXML->load_xml(location => $file);
 
 	$self->_read_metadata;
+
+	unless (@{ $self->{Metadata}->format }) {
+		$self->{Metadata}->format([ 'FictionBook2' ]);
+	}
 
 	return $self;
 
@@ -215,7 +221,7 @@ sub metadata {
 
 	my $self = shift;
 
-	return $self->{Metadata};
+	return $self->{Metadata}->hash;
 
 }
 

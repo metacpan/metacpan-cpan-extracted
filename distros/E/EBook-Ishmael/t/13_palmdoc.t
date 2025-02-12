@@ -57,8 +57,10 @@ is(
 is_deeply(
 	$ebook->metadata,
 	{
-		title => [ 'gpl3' ],
-		date => [ scalar gmtime $ebook->{_pdb}->cdate ],
+		Title => [ 'gpl3' ],
+		Created => [ scalar gmtime $ebook->{_pdb}->cdate ],
+		Modified => [ scalar gmtime $ebook->{_pdb}->mdate ],
+		Format => [ 'PalmDOC' ],
 	},
 	"metadata ok"
 );

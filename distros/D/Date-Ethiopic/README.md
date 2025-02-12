@@ -4,7 +4,7 @@ ICalendar for the Ethiopic Calendar System
 ## About This Release
 
 This is the first release of `Date::Ethiopic` submitted to CPAN.
-The package was originally intended to be a part of `Convert::Ethiopic::Lite.
+The package was originally intended to be a part of `Convert::Ethiopic::Lite`.
 but has inflated to the point where maintenance will be easier
 in its own package.  The package will be a work in progress for
 quite a while.  It is fully functional for basic date conversions

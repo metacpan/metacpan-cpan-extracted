@@ -1,5 +1,8 @@
 Revision history for Auth::GoogleAuth
 
+1.06      2025-02-11 09:13:33-08:00 America/Los_Angeles
+        - Can now call otpauth without first calling qr_code
+
 1.05      2024-04-18 15:00:06-07:00 America/Los_Angeles
         - Switch from Google Chart API to Quick Chart API
 

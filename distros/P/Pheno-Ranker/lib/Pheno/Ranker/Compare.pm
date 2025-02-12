@@ -187,6 +187,8 @@ sub compare_and_rank {
         push @{ $stat->{hamming_data} }, $score->{$key}{hamming};
         push @{ $stat->{jaccard_data} }, $score->{$key}{jaccard};
     }
+ 
+    # Stats are only computed once (no overhead)
     $stat->{hamming_stats} = add_stats( $stat->{hamming_data} );
     $stat->{jaccard_stats} = add_stats( $stat->{jaccard_data} );
 

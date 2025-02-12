@@ -11,7 +11,7 @@ BEGIN
 	# default, the data is in the parent class.
 	#
 
-	$VERSION = "0.15";
+	$VERSION = "0.16";
 }
 
 

@@ -15,6 +15,8 @@ AWS::S3 - Lightweight interface to Amazon S3 (Simple Storage Service)
     my $s3 = AWS::S3->new(
       access_key_id     => 'E654SAKIASDD64ERAF0O',
       secret_access_key => 'LgTZ25nCD+9LiCV6ujofudY1D6e2vfK0R4GLsI4H',
+      session_token     => 'IQob3JpJZ2luXJ2VjJEL7//////////wE...',
+      region            => 'eu-west-1', # set to relevant AWS region
       honor_leading_slashes => 0, # set to allow leading slashes in bucket names, defaults to 0
     );
 

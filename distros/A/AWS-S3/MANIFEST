@@ -28,6 +28,7 @@ lib/AWS/S3/Roles/BucketAction.pm
 lib/AWS/S3/Roles/Bucket.pm
 lib/AWS/S3/Roles/Request.pm
 lib/AWS/S3/Signer.pm
+lib/AWS/S3/Signer/V4.pm
 t/001_compiles_pod.t
 t/002_changes.t
 t/010_basic.t
@@ -37,5 +38,7 @@ t/aws/s3/signer.t
 t/aws/s3/bucket.t
 t/aws/s3/file_iterator.t
 t/aws/s3/http_request.t
+t/aws/s3/signer/v4.t
+t/aws/s3/signer/v4_parse_host.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

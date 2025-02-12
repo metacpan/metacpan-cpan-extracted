@@ -1,11 +1,13 @@
 package EBook::Ishmael::EBook::PDF;
 use 5.016;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 use strict;
 use warnings;
 
 use File::Which;
 use XML::LibXML;
+
+use EBook::Ishmael::EBook::Metadata;
 
 # This module basically delegates the task of processing PDFs to some of
 # Poppler's utilities. The processing is quite inefficient, and the output is
@@ -35,6 +37,16 @@ sub _get_metadata {
 
 	my $self = shift;
 
+	my %meta = (
+		'Author'       => sub { author      => shift },
+		'CreationDate' => sub { created     => shift },
+		'Creator'      => sub { contributor => shift },
+		'ModDate'      => sub { modified    => shift },
+		'PDF version'  => sub { format      => 'PDF ' . shift },
+		'Producer'     => sub { contributor => shift },
+		'Title'        => sub { title       => shift },
+	);
+
 	unless (defined $PDFINFO) {
 		die "Cannot read PDF $self->{Source}: pdfinfo not installed\n";
 	}
@@ -47,9 +59,15 @@ sub _get_metadata {
 
 	for my $l (split /\n/, $info) {
 
-		my ($k, $v) = split /:\s*/, $l, 2;
+		my ($field, $content) = split /:\s*/, $l, 2;
 
-		push @{ $self->{Metadata}->{ lc $k } }, $v;
+		unless (exists $meta{ $field } and $content) {
+			next;
+		}
+
+		my ($k, $v) = $meta{ $field }->($content);
+
+		push @{ $self->{Metadata}->$k }, $v;
 
 	}
 
@@ -64,7 +82,7 @@ sub new {
 
 	my $self = {
 		Source   => undef,
-		Metadata => {},
+		Metadata => EBook::Ishmael::EBook::Metadata->new,
 	};
 
 	bless $self, $class;
@@ -72,6 +90,10 @@ sub new {
 	$self->{Source} = File::Spec->rel2abs($file);
 
 	$self->_get_metadata();
+
+	unless (@{ $self->{Metadata}->format }) {
+		$self->{Metadata}->format([ 'PDF' ]);
+	}
 
 	return $self;
 
@@ -116,7 +138,7 @@ sub metadata {
 
 	my $self = shift;
 
-	return $self->{Metadata};
+	return $self->{Metadata}->hash;
 
 }
 

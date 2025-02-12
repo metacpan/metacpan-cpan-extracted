@@ -13,7 +13,7 @@ ok( defined &{"${class}::$sub"}, "$sub defined" );
 
 ok( _is_symbol( 'Po' ), "Po is a symbol" );
 ok( _is_symbol( 'Sg' ), "Sg is a symbol" );
-ok( _is_symbol( 'Ha' ), "Ha is a symbol" );
+ok( _is_symbol( 'Db' ), "Db is a symbol" );
 
 ok( ! _is_symbol( '' ),    "empty string isn't a symbol" );
 ok( ! _is_symbol( undef ), "undef isn't a symbol"        );

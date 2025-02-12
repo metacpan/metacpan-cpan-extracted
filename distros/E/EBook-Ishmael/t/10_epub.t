@@ -32,14 +32,15 @@ subtest "spine ok" => sub {
 };
 
 is_deeply(
-	$ebook->{Metadata},
+	$ebook->metadata,
 	{
-		title => [ 'gpl3' ],
-		language => [ 'en' ],
-		creator => [ 'Unknown' ],
-		identifier => [ 'e3f35c22-0889-4539-9f97-eebf0d391b18', 'e3f35c22-0889-4539-9f97-eebf0d391b18' ],
-		contributor => [ 'calibre (7.16.0) [https://calibre-ebook.com]' ],
-		date => [ '0101-01-01T00:00:00+00:00' ],
+		Title => [ 'gpl3' ],
+		Language => [ 'en' ],
+		Author => [ 'Unknown' ],
+		ID => [ 'e3f35c22-0889-4539-9f97-eebf0d391b18', 'e3f35c22-0889-4539-9f97-eebf0d391b18' ],
+		Contributor => [ 'calibre (7.16.0) [https://calibre-ebook.com]' ],
+		Created => [ '0101-01-01T00:00:00+00:00' ],
+		Format => [ 'EPUB' ],
 	},
 	"metadata ok"
 );

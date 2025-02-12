@@ -22,7 +22,6 @@ use Getopt::Long qw(:config no_ignore_case);
 use Pod::Usage;
 use Data::Dumper;
 use Sys::Hostname;
-use File::Path qw(remove_tree);
 use POSIX                          qw(strftime);
 use Term::ANSIColor                qw(:constants);
 use File::ShareDir::ProjectDistDir qw(dist_dir);
@@ -193,9 +192,6 @@ $ranker->run();
 write_log( $log ? $log : $log_file, $data, $VERSION )
   if defined $log;
 
-# Delete '_Inline' dir
-remove_tree('_Inline') if -d '_Inline';
-
 ####################
 # END PHENO-RANKER #
 ####################
@@ -365,14 +361,24 @@ To ensure Perl recognizes your local modules every time you start a new terminal
 
   echo 'eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)' >> ~/.bashrc
 
+To B<update> to the newest version (showing commands for Option 2):
+    
+  cpanm Pheno::Ranker
+
 =head3 Method 2: From CPAN in a CONDA environment
 
 Please follow L<these instructions|https://cnag-biomedical-informatics.github.io/pheno-ranker/download-and-installation/#__tabbed_1_2>.
 
 =head3 Method 3: From GitHub
 
+To clone the repository for the first time:
+
   git clone https://github.com/cnag-biomedical-informatics/pheno-ranker.git
   cd pheno-ranker
+
+To update an existing clone, navigate to the repository folder and run:
+
+  git pull
 
 Install system level dependencies:
   
@@ -402,7 +408,9 @@ I<Optional:> If you want to use C<utils/barcode> or C<utils/bff_pxf_plot>:
 
 =head2 Containerized
 
-=head3 Method 4: From Docker Hub
+=head3 Method 4: From Docker Hub 
+
+(Estimated Time: Approximately 10 seconds)
 
 Download the latest version of the Docker image (supports both amd64 and arm64 architectures) from L<Docker Hub|https://hub.docker.com/r/manuelrueda/pheno-ranker> by executing:
 
@@ -412,6 +420,8 @@ Download the latest version of the Docker image (supports both amd64 and arm64 a
 See additional instructions below.
 
 =head3 Method 5: With Dockerfile
+
+(Estimated Time: Approximately 1 minute)
 
 Please download the C<Dockerfile> from the repo:
 

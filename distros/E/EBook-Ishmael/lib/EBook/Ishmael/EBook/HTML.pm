@@ -1,12 +1,16 @@
 package EBook::Ishmael::EBook::HTML;
 use 5.016;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 use strict;
 use warnings;
 
 use File::Spec;
 
 use XML::LibXML;
+
+use EBook::Ishmael::EBook::Metadata;
+
+my $XHTML_NS = 'http://www.w3.org/1999/xhtml';
 
 # Nothing fancy, just check if the file has an html suffix.
 sub heuristic {
@@ -25,10 +29,18 @@ sub _read_metadata {
 
 	my $self = shift;
 
+	my ($ns) = $self->{_dom}->findnodes('/html/@xmlns');
+
+	if (defined $ns and $ns->value eq $XHTML_NS) {
+		$self->{Metadata}->format([ 'XHTML' ]);
+	} else {
+		$self->{Metadata}->format([ 'HTML' ]);
+	}
+
 	my ($lang) = $self->{_dom}->findnodes('/html/@lang');
 
 	if (defined $lang) {
-		push @{ $self->{Metadata}->{language} }, $lang->value;
+		$self->{Metadata}->language([ $lang->value ]);
 	}
 
 	my ($head) = $self->{_dom}->findnodes('/html/head');
@@ -41,7 +53,7 @@ sub _read_metadata {
 
 	if (defined $title) {
 		my $str = $title->textContent =~ s/\s+/ /gr;
-		push @{ $self->{Metadata}->{title} }, $str;
+		$self->{Metadata}->title([ $str ]);
 	}
 
 	return 1;
@@ -55,7 +67,7 @@ sub new {
 
 	my $self = {
 		Source   => undef,
-		Metadata => {},
+		Metadata => EBook::Ishmael::EBook::Metadata->new,
 		_dom     => undef,
 	};
 
@@ -99,7 +111,7 @@ sub metadata {
 
 	my $self = shift;
 
-	return $self->{Metadata};
+	return $self->{Metadata}->hash;
 
 }
 

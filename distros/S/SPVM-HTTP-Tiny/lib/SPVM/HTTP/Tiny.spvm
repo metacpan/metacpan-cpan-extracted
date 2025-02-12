@@ -2,7 +2,7 @@
 # MIT License
 
 class HTTP::Tiny {
-  version "0.005";
+  version "0.006";
   
   use Fn;
   use Re;
@@ -17,10 +17,13 @@ class HTTP::Tiny {
   use HTTP::Tiny::Handle;
   use HTTP::Tiny::Message::Request;
   use HTTP::Tiny::Message::Response;
+  use HTTP::Tiny::Response;
   use HTTP::Tiny::Headers;
   use HTTP::Tiny::URL;
   use HTTP::Tiny::CookieJar::Interface;
   use HTTP::Tiny::Headers;
+  use HTTP::Tiny::Path;
+  use HTTP::Tiny::Parameters;
   
   # Fields
   has agent : rw string;
@@ -36,14 +39,6 @@ class HTTP::Tiny {
   has max_redirect : rw int;
   
   has max_size : rw int;
-  
-  has http_proxy : rw string;
-  
-  has https_proxy : rw string;
-  
-  has proxy : rw string;
-  
-  has no_proxy : rw string[];
   
   has timeout : rw double;
   
@@ -153,49 +148,49 @@ class HTTP::Tiny {
   }
   
   # Instance Methods
-  method get : HTTP::Tiny::Message::Response ($url : string, $options : object[] = undef) {
+  method get : HTTP::Tiny::Response ($url : string, $options : object[] = undef) {
     
     my $response = $self->request("GET", $url, $options);
     
     return $response;
   }
   
-  method head : HTTP::Tiny::Message::Response ($url : string, $options : object[] = undef) {
+  method head : HTTP::Tiny::Response ($url : string, $options : object[] = undef) {
     
     my $response = $self->request("HEAD", $url, $options);
     
     return $response;
   }
   
-  method put : HTTP::Tiny::Message::Response ($url : string, $options : object[] = undef) {
+  method put : HTTP::Tiny::Response ($url : string, $options : object[] = undef) {
     
     my $response = $self->request("PUT", $url, $options);
     
     return $response;
   }
   
-  method post : HTTP::Tiny::Message::Response ($url : string, $options : object[] = undef) {
+  method post : HTTP::Tiny::Response ($url : string, $options : object[] = undef) {
     
     my $response = $self->request("POST", $url, $options);
     
     return $response;
   }
   
-  method patch : HTTP::Tiny::Message::Response ($url : string, $options : object[] = undef) {
+  method patch : HTTP::Tiny::Response ($url : string, $options : object[] = undef) {
     
     my $response = $self->request("PATCH", $url, $options);
     
     return $response;
   }
   
-  method delete : HTTP::Tiny::Message::Response ($url : string, $options : object[] = undef) {
+  method delete : HTTP::Tiny::Response ($url : string, $options : object[] = undef) {
     
     my $response = $self->request("DELETE", $url, $options);
     
     return $response;
   }
   
-  method post_form : HTTP::Tiny::Message::Response ($url : string, $data : object[], $options : object[] = undef) {
+  method post_form : HTTP::Tiny::Response ($url : string, $data : object[], $options : object[] = undef) {
     
     my $options_h = Hash->new($options);
     
@@ -308,7 +303,7 @@ class HTTP::Tiny {
     return $default_agent;
   }
   
-  private method request : HTTP::Tiny::Message::Response ($method : string, $url_string : string, $options : object[])  {
+  private method request : HTTP::Tiny::Response ($method : string, $url_string : string, $options : object[])  {
     
     my $options_h = Hash->new($options);
     
@@ -331,7 +326,9 @@ class HTTP::Tiny {
       $headers->add("user-agent" => $agent);
     }
     
-    my $url = HTTP::Tiny::URL->parse($url_string);
+    my $url = HTTP::Tiny::URL->new($url_string);
+    
+    $url->set_port(80);
     
     my $request = HTTP::Tiny::Message::Request->new({
       method    => $method,
@@ -350,7 +347,9 @@ class HTTP::Tiny {
     
     my $response = $socket->read_response;
     
-    return $response;
+    my $result = HTTP::Tiny::Response->new($response);
+    
+    return $result;
   }
   
   method _ssl_args : object[] ($host : string) {
@@ -412,7 +411,7 @@ class HTTP::Tiny {
     return $ca_file;
   }
   
-  method mirror : HTTP::Tiny::Message::Response ($url : string, $file : string, $options : object[] = undef) {
+  method mirror : HTTP::Tiny::Response ($url : string, $file : string, $options : object[] = undef) {
     
     unless ($file) {
       die "\$file must be defined.";
@@ -450,27 +449,33 @@ class HTTP::Tiny {
     
     $options_h->set(data_callback => [$io_file : IO::File] method : void ($chunk : string) { $io_file->print($chunk); });
     
-    my $response = $self->request("GET", $url, $options_h->to_array);
+    my $result = $self->request("GET", $url, $options_h->to_array);
     
-    if ($response->success) {
+    if ($result->success) {
       Sys->rename($tempfile, $file);
       
-      my $lm = $response->headers->header("last-modified");
+      my $lm = $result->headers->header("last-modified");
       
       if ($lm) {
-        if (my $mtime = &_parse_http_date($lm)) {
+        my $http_date = (HTTP::Tiny::Date)undef;
+        eval { $http_date = HTTP::Tiny::Date->new($lm); }
+        
+        if ($http_date) {
+          my $mtime = $http_date->epoch;
           Sys->utime($mtime, $mtime, $file);
         }
       }
     }
-    
+
+=pod TODO
+
     unless ($response->success) {
       $response->{success} = (byte)($response->{status} == 304);
     }
-    
-    return $response;
-    
-    return undef;
+
+=cut
+
+    return $result;
   }
  
   static method _http_date : string ($epoch : long) {
@@ -482,50 +487,4 @@ class HTTP::Tiny {
     return $http_date;
   }
   
-  static method _parse_http_date : long ($http_date : string) {
-    
-    my $DoW = "Sun|Mon|Tue|Wed|Thu|Fri|Sat";
-    my $MoY = "Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec";
-    
-    my $tm = Sys->gmtime(0);
-    
-    if (my $match = Re->m($http_date, "^[SMTWF][a-z]+, +(\d{1,2}) ($MoY) +(\d\d\d\d) +(\d\d):(\d\d):(\d\d) +GMT$")) {
-      $tm->set_tm_sec(Fn->to_int($match->cap6));
-      $tm->set_tm_min(Fn->to_int($match->cap5));
-      $tm->set_tm_hour(Fn->to_int($match->cap4));
-      $tm->set_tm_mday(Fn->to_int($match->cap1));
-      $tm->set_tm_mon(Fn->index($MoY, Fn->to_int($match->cap2)) / 4);
-      $tm->set_tm_year(Fn->to_int($match->cap3) - 1900);
-    }
-    elsif (my $match = Re->m($http_date, "^[SMTWF][a-z]+, +(\d\d)-($MoY)-(\d{2,4}) +(\d\d):(\d\d):(\d\d) +GMT$")) {
-      $tm->set_tm_sec(Fn->to_int($match->cap6));
-      $tm->set_tm_min(Fn->to_int($match->cap5));
-      $tm->set_tm_hour(Fn->to_int($match->cap4));
-      $tm->set_tm_mday(Fn->to_int($match->cap1));
-      $tm->set_tm_mon(Fn->index($MoY, Fn->to_int($match->cap2)) / 4);
-      $tm->set_tm_year(Fn->to_int($match->cap3) - 1900);
-    }
-    elsif (my $match = Re->m($http_date, "^[SMTWF][a-z]+ +($MoY) +(\d{1,2}) +(\d\d):(\d\d):(\d\d) +(?:[^0-9]+ +)?(\d\d\d\d)$")) {
-      $tm->set_tm_sec(Fn->to_int($match->cap5));
-      $tm->set_tm_min(Fn->to_int($match->cap4));
-      $tm->set_tm_hour(Fn->to_int($match->cap3));
-      $tm->set_tm_mday(Fn->to_int($match->cap2));
-      $tm->set_tm_mon(Fn->index($MoY, Fn->to_int($match->cap1)) / 4);
-      $tm->set_tm_year(Fn->to_int($match->cap6) - 1900);
-    }
-    else {
-      die "\$http_date is an invalid format.";
-    }
-    
-    my $epoch = -1L;
-    
-    eval { $epoch = Time::Local->timegm($tm); }
-    
-    if ($epoch < 0) {
-      die "\$http_date is an invalid time.";
-    }
-    
-    return $epoch;
-  }
-
 }
