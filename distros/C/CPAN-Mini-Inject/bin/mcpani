@@ -192,9 +192,27 @@ By default, B<mcpani> uses a simple configuration file in the following format:
 
 =over 4
 
+=item C<dirmode>
+
+Set the permissions of created directories to the specified mode
+(octal value). The default value is based on the umask (if supported).
+
+=item C<force>
+
+Update modules even if the module list is out of data. This is from
+L<CPAN::Mini>.
+
 =item C<local> (required)
 
-location to store local CPAN::Mini mirror
+Location to store local CPAN::Mini mirror
+
+=item C<log_level>
+
+The logging level for L<CPAN::Mini>.
+
+=item C<passive>
+
+Enable passive FTP.
 
 =item C<remote> (required)
 
@@ -205,14 +223,17 @@ between them.
 
 Location to store modules to add to the local CPAN::Mini mirror.
 
-=item C<passive>
+=item C<skip_cleanup>
 
-Enable passive FTP.
+Do not remove old files in the local directory. this is from L<CPAN::Mini>.
 
-=item C<dirmode>
+=item C<skip_perl>
 
-Set the permissions of created directories to the specified mode
-(octal value). The default value is based on the umask (if supported).
+Do not mirror B<perl> distributions. This is from L<CPAN::Mini>.
+
+=item C<trace>
+
+Enable trace logging. This is from L<CPAN::Mini>
 
 =back
 

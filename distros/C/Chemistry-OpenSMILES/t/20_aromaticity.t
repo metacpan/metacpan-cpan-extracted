@@ -11,6 +11,10 @@ my @cases = (
     [ 'C1=CC=CC=C1',
       'c:1(:c(:c(:c(:c(:c:1([H]))([H]))([H]))([H]))([H]))([H])',
       'C=1(C(=C(C(=C(C=1([H]))([H]))([H]))([H]))([H]))([H])' ],
+
+    [ 'C1=CC=CC=C1C1=CC=CC=C1',
+      'c:1(:c(:c(:c(:c(:c:1(-c:1(:c(:c(:c(:c(:c:1([H]))([H]))([H]))([H]))([H]))))([H]))([H]))([H]))([H]))([H])',
+      'C=1(C(=C(C(=C(C=1(C=1(C(=C(C(=C(C=1([H]))([H]))([H]))([H]))([H]))))([H]))([H]))([H]))([H]))([H])' ],
 );
 
 plan tests => 2 * scalar @cases;
@@ -23,9 +27,9 @@ for my $case (@cases) {
 
     aromatise( $moiety );
     $result = write_SMILES( [ $moiety ] );
-    is( $result, $case->[1] );
+    is $result, $case->[1];
 
     kekulise( $moiety );
     $result = write_SMILES( [ $moiety ] );
-    is( $result, $case->[2] );
+    is $result, $case->[2];
 }

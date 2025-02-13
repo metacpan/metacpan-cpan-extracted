@@ -1,7 +1,7 @@
 ---
 abstract: 'find your application home and config your process for it'
 author:
-  - 'Tom Christiansen <tchrist@perl.com>'
+  - 'Tom Christiansen <tchrist53147@gmail.com>'
 build_requires:
   Capture::Tiny: '0'
   Carp: '0'
@@ -76,5 +76,5 @@ requires:
   subs: '0'
   vars: '0'
   warnings: '0'
-version: v0.0.6
+version: v0.0.7
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

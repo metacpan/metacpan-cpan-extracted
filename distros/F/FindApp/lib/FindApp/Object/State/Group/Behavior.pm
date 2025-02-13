@@ -102,7 +102,7 @@ sub export_man_to_env { &ENTER_TRACE_2;
     $self->expected_name("man");
     return unless my @mandirs = $self->found;
     if ($self->have_exported) { debug "already exported man to env" }
-    unless ($MANPATH && @MANPATH) {
+    unless ($MANPATH) {
         local $/ = "\n";
         # temp variable so we don't clobber real one on error
         my $manpath = `manpath 2>&1`;
@@ -116,12 +116,13 @@ sub export_man_to_env { &ENTER_TRACE_2;
         debug("\$MANPATH = $MANPATH;");
         $self->bump_exports;
     } 
-    my @old_path = @MANPATH;
-    my @new_path = uniq @mandirs, @MANPATH;
+    my @old_path = split /:/, $MANPATH, -1;
+    my @new_path = uniq @mandirs, @old_path;
     return if @old_path  ==  @new_path   &&
              "@old_path" eq "@new_path";
+    $MANPATH = join ":", @new_path;
+    debug("\$MANPATH = $MANPATH;");
     debug("\@MANPATH = (@new_path);");
-    @MANPATH = @new_path;
     $self->bump_exports;
 }
 

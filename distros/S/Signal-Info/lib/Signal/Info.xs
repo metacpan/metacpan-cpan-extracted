@@ -4,7 +4,6 @@
 #include "XSUB.h"
 
 typedef siginfo_t* Signal__Info;
-typedef struct timespec* Time__Spec;
 
 #define siginfo_signo(self) (self)->si_signo
 #define siginfo_code(self) (self)->si_code
@@ -119,13 +118,3 @@ BOOT:
 	CONSTANT(SI_TIMER);
 	CONSTANT(SI_ASYNCIO);
 	CONSTANT(SI_MESGQ);
-
-MODULE = Signal::Info    PACKAGE = Time::Spec    PREFIX = timespec_
-
-Time::Spec timespec_new(class, struct timespec value)
-
-UV timespec_sec(Time::Spec self)
-
-UV timespec_nsec(Time::Spec self)
-
-NV timespec_to_float(Time::Spec self)

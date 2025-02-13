@@ -4,15 +4,16 @@ use strict;
 use warnings;
 
 # ABSTRACT: Aromaticity handling routines
-our $VERSION = '0.11.4'; # VERSION
+our $VERSION = '0.11.5'; # VERSION
 
 use Chemistry::OpenSMILES qw(
     is_aromatic
+    is_aromatic_bond
     is_double_bond
     is_single_bond
 );
 use Graph::Traversal::DFS;
-use List::Util qw( all );
+use List::Util qw( all first );
 
 =head1 NAME
 
@@ -65,61 +66,50 @@ sub aromatise
     }
 }
 
-=item kekulise( $moiety )
+=item kekulise( $moiety, $order_sub )
 
-Find nonfused even-length aromatic cycles consisting only of B, C, N, P, S
-and mark them with aliterating single and double bonds.
+Find nonfused even-length aromatic cycles consisting only of B, C, N, P, S and mark them with alternating single and double bonds.
+Subroutine as well accepts an optional subroutine reference C<$order_sub>, providing external order for atoms.
+This is needed to stabilise the algorithm, as otherwise the outcomes of bond assignment may turn out different.
+C<$order_sub> is called with an atom as C<$_[0]> and is expected to return a value providing a distinct order indication for every atom.
+These can be any scalar values, comparable using Perl's C<cmp> operator.
+If C<$order_sub> is not given, initial atom order in input is consulted.
 
 =cut
 
 sub kekulise
 {
-    my( $moiety ) = @_;
+    my( $moiety, $order_sub ) = @_;
+
+    $order_sub = sub { $_[0]->{number} } unless $order_sub;
 
     my $aromatic_only = $moiety->copy_graph;
     $aromatic_only->delete_vertices( grep { !is_aromatic $_ }
                                           $aromatic_only->vertices );
+    $aromatic_only->delete_edges( map  { @$_ }
+                                  grep { !is_aromatic_bond( $moiety, @$_ ) }
+                                       $aromatic_only->edges );
 
-    my @components;
-    my $get_root = sub {
-        my( $self, $unseen ) = @_;
-        my( $next ) = sort { $unseen->{$a}{number} <=> $unseen->{$b}{number} }
-                           keys %$unseen;
-        return unless defined $next;
-
-        push @components, [];
-        return $unseen->{$next};
-    };
-
-    my $operations = {
-        first_root => $get_root,
-        next_root  => $get_root,
-        pre => sub { push @{$components[-1]}, $_[0] },
-    };
-    my $traversal = Graph::Traversal::DFS->new( $aromatic_only, %$operations );
-    $traversal->dfs;
-
-    for my $component (@components) {
+    for my $component ($aromatic_only->connected_components) {
         # Taking only simple even-length cycles into consideration
         next unless all { $aromatic_only->degree( $_ ) == 2 } @$component;
         next unless all { $moiety->degree( $_ ) <= 3 }   @$component;
         next unless all { $_->{symbol} =~ /^[BCNPS]$/i } @$component;
         next if @$component % 2;
 
-        my( $first  ) = sort { $a->{number} <=> $b->{number} } @$component;
-        my( $second ) = sort { $a->{number} <=> $b->{number} }
+        my( $first  ) = sort { $order_sub->($a) cmp $order_sub->($b) }
+                             @$component;
+        my( $second ) = sort { $order_sub->($a) cmp $order_sub->($b) }
                              $aromatic_only->neighbours( $first );
-        my $n = 0;
-        while( $n < @$component ) {
+        for my $i (0..$#$component) {
             $first->{symbol} = ucfirst $first->{symbol};
-            if( $n % 2 ) {
+            if( $i % 2 ) {
                 $moiety->set_edge_attribute( $first, $second, 'bond', '=' );
             } else {
                 $moiety->delete_edge_attribute( $first, $second, 'bond' );
             }
             ( $first, $second ) =
-                ( $second, grep { $_ ne $first } $aromatic_only->neighbours( $second ) );
-            $n++;
+                ( $second, first { $_ ne $first } $aromatic_only->neighbours( $second ) );
         }
     }
 }

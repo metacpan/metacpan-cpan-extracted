@@ -93,6 +93,7 @@ sub export_my_man {
     my $me = shift;
     selfnote $me;
     my $path = "/tmp/fake_manny";
+    local $SIG{__WARN__} = sub {};
     cmp_ok scalar grep($_ eq $path, @MANPATH), "==", 0, "MANPATH doesn't have $path yet";
     my $op = $Class->new($me);
     lives_ok { $op->found($path) }                      "$me found $path";

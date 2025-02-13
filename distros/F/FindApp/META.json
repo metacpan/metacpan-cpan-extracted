@@ -1,7 +1,7 @@
 {
    "abstract" : "find your application home and config your process for it",
    "author" : [
-      "Tom Christiansen <tchrist@perl.com>"
+      "Tom Christiansen <tchrist53147@gmail.com>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
@@ -94,6 +94,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.0.6",
+   "version" : "v0.0.7",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

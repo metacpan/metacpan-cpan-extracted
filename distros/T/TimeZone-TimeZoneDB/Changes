@@ -1,5 +1,10 @@
 Revision history for TimeZone::TimeZoneDB
 
+0.03	Wed Feb 12 07:36:10 EST 2025
+	Added rate-limiting and caching support
+	Use Test::DescribeMe to simplify tests
+	Better handling of JSON decode errors
+
 0.02	Fri May 31 09:33:15 EDT 2024
 	Fix usage message
 	Test error conditions

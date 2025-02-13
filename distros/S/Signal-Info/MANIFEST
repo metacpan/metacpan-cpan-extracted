@@ -10,7 +10,6 @@ README
 dist.ini
 lib/Signal/Info.pm
 lib/Signal/Info.xs
-lib/Time/Spec.pm
 ppport.h
 t/00-compile.t
 typemap

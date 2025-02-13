@@ -15,5 +15,5 @@ $graph->add_vertex( { symbol => 'O', number => 2 } );
 my $warning;
 local $SIG{__WARN__} = sub { $warning = $_[0] };
 
-is( write_SMILES( [ $graph ] ), '[C]' );
-is( $warning, '1 unreachable atom(s) detected in moiety' . "\n" );
+is write_SMILES( [ $graph ] ), '[C]';
+is $warning, '1 unreachable atom(s) detected in moiety' . "\n";

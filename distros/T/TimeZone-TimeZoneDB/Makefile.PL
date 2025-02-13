@@ -1,6 +1,7 @@
 use strict;
 use warnings;
-use ExtUtils::MakeMaker 6.64;	# 6.64 for TEST_REQUIRES
+
+use ExtUtils::MakeMaker;
 use Getopt::Long;	# Technique inspired by IO::Lambda
 use IO::Socket::INET;
 
@@ -26,6 +27,8 @@ my $test_requires = {
 	'IPC::System::Simple' => 0,	# http://www.cpantesters.org/cpan/report/0b994acc-7a03-11e8-a944-5f7713bf8fb6
 	'Test::Carp' => 0,
 	'Test::Compile' => 0,
+	'Test::DescribeMe' => 0,
+	'Test::MockModule' => 0,
 	'Test::Most' => 0,
 	'Test::Needs' => 0,
 	'Test::NoWarnings' => 0,
@@ -40,6 +43,15 @@ if($online_tests) {
 	unlink('t/online.enabled');
 }
 
+my $dist = {
+	COMPRESS => 'gzip -9f',	# Compress tarball using gzip
+	SUFFIX => 'gz',	# File suffix for tarball
+};
+
+if($^O eq 'darwin') {
+	$dist->{'TAR'} = 'gtar';
+}
+
 WriteMakefile(
 	NAME		=> 'TimeZone::TimeZoneDB',
 	AUTHOR		=> q{Nigel Horne <njh@bandsman.co.uk>},
@@ -52,13 +64,15 @@ WriteMakefile(
 	PL_FILES	=> {},
 	TEST_REQUIRES => $test_requires,
 	PREREQ_PM => {
+		'CHI' => 0,
 		'Encode' => 0,
+		'ExtUtils::MakeMaker' => 6.64,	# for TEST_REQUIRES
 		'JSON::MaybeXS' => 0,
 		'LWP::UserAgent' => 0,
 		'LWP::Protocol::https' => 0,
+		'Time::HiRes' => 0,
 		'URI' => 0,
-	},
-	dist		=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+	}, dist => $dist,
 	clean		=> { FILES => 'TimeZone-TimeZoneDB-*' },
 	META_MERGE => {	# https://perldoc.perl.org/CPAN::Meta::Spec
 		'meta-spec' => { version => 2 },
@@ -81,16 +95,13 @@ WriteMakefile(
 
 sub are_online
 {
-	return 0 if($ENV{'NO_NETWORK_TESTING'} || $ENV{'TRAVIS_PERL_VERSION'});
-	return 0 if(!-t STDIN);
-	return 0 if(!defined($ENV{'TIMEZONEDB_KEY'}));
+	return 0 if($ENV{'NO_NETWORK_TESTING'} || $ENV{'CIRCLECI'} || $ENV{'TRAVIS_PERL_VERSION'} || $ENV{'AUTOMATED_TESTING'} || $ENV{'NONINTERACTIVE_TESTING'} || (!-t STDIN));
 
-	my $s = IO::Socket::INET->new(
+	if(my $s = IO::Socket::INET->new(
 		PeerAddr => 'timezonedb.com:443',
 		Timeout => 10
-	);
-	if($s) {
-		if($ENV{'PERL_MM_USE_DEFAULT'} || $ENV{'AUTOMATED_TESTING'}) {
+	)) {
+		if($ENV{'PERL_MM_USE_DEFAULT'}) {
 			close($s);
 			return 0;	# Don't overload the server by default
 		}

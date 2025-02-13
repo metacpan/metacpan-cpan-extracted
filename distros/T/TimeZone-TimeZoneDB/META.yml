@@ -8,6 +8,9 @@ build_requires:
   IPC::System::Simple: '0'
   Test::Carp: '0'
   Test::Compile: '0'
+  Test::DescribeMe: '0'
+  Test::LWP::UserAgent: '0'
+  Test::MockModule: '0'
   Test::Most: '0'
   Test::Needs: '0'
   Test::NoWarnings: '0'
@@ -27,14 +30,17 @@ no_index:
     - t
     - inc
 requires:
+  CHI: '0'
   Encode: '0'
+  ExtUtils::MakeMaker: '6.64'
   JSON::MaybeXS: '0'
   LWP::Protocol::https: '0'
   LWP::UserAgent: '0'
+  Time::HiRes: '0'
   URI: '0'
   perl: '5.006002'
 resources:
   bugtracker: https://github.com/nigelhorne/TimeZone-TimeZoneDB/issues
   repository: git://github.com/nigelhorne/TimeZone-TimeZoneDB.git
-version: '0.02'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

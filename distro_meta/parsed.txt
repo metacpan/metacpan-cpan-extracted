@@ -97414,3 +97414,15 @@ K/KI/KIMOTO/SPVM-HTTP-Tiny-0.006.tar.gz
 S/SK/SKIM/Tags-HTML-InfoBox-0.01.tar.gz
 O/OA/OALDERS/TOML-Tiny-0.19.tar.gz
 S/SC/SCESANO/Type-Guess-0.001.tar.gz
+U/UT/UTASHIRO/App-ansicolumn-1.45.tar.gz
+U/UT/UTASHIRO/App-ansifold-1.31.tar.gz
+U/UT/UTASHIRO/App-sdif-4.41.tar.gz
+D/DA/DAVECROSS/App-LastStats-0.0.10.tar.gz
+P/PE/PERLANCAR/App-orgadb-0.019.tar.gz
+T/TO/TOMC/FindApp-v0.0.7.tar.gz
+M/ME/MERKYS/Chemistry-OpenSMILES-0.11.5.tar.gz
+B/BR/BRIANDFOY/CPAN-Mini-Inject-1.011.tar.gz
+D/DY/DYACOB/Regexp-Ethiopic-0.21.tar.gz
+L/LE/LEONT/Signal-Info-0.003.tar.gz
+L/LE/LEONT/Time-Spec-0.003.tar.gz
+N/NH/NHORNE/TimeZone-TimeZoneDB-0.03.tar.gz

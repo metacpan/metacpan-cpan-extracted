@@ -1,3 +1,14 @@
+0.11.5 2025-02-13
+
+    - Fixing a bug failing to recognise @TB10.
+    - Forbidding unknown chemical elements.
+    - Forbidding ring bonds to self.
+    - Accepting order subroutine in kekulise() in order to make the
+      algorithm stable.
+    - Supporting octahedral chirality in chirality_to_pseudograph().
+    - Introducing Chemistry::OpenSMILES::is_aromatic_bond().
+    - Reporting aromatic bonds outside aromatic rings in _validate().
+
 0.11.4 2025-02-04
 
     - Reducing false-positive cis/trans conflicts detected in _validate().

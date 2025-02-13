@@ -4,7 +4,9 @@ package FindApp::Behavior::Exporter;
 # Class importer and its helpers.
 ################################################################
 
-use v5.10;
+# Guarantee feature.pm already loaded, which
+# is now unlike use v5.10, which no longer does so!
+use feature ":5.10";
 use strict;
 use warnings;
 use mro "c3";
@@ -31,7 +33,10 @@ sub import { &ENTER_TRACE;
     my $caller  = caller;
     my $self    = shift;
 
-    feature->import(":5.10");
+    # Future-proof the feature load, just in case they yet
+    # again add new sneaky compiler optimization someday.
+    require feature;
+    feature::->import(":5.10");
 
     # Can't operate on @_ itself because
     # its values are readonly in an import!

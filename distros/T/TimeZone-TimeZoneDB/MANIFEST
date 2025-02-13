@@ -7,11 +7,13 @@ MANIFEST.SKIP
 README.md
 t/00-load.t
 t/10-compile.t
+t/30-basics.t
 t/carp.t
 t/comment-spelling.t
 t/eof.t
 t/eol.t
 t/get_time_zone.t
+t/limiting.t
 t/links.t
 t/no404s.t
 t/noopentickets.t

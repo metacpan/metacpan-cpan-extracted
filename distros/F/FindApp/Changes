@@ -1,5 +1,9 @@
 Revision history for FindApp
 
+0.0.7   2025-02-12 12:26:47 -0700 (MST)
+  - Compensate for Env.pm bugs and splitting on an undefined MANPATH.
+  - Compensate for use v5.10 no longer leading feature.pm for us.
+
 0.0.6   2021-11-01 09:46:40 -0600 (MDT)
   - Quote the $VERSION v-string so it can be indexed 
     properly by the toolchain and placed on metacpan &c.

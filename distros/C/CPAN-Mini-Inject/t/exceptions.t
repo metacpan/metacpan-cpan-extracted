@@ -63,6 +63,7 @@ HERE
 
 		my $mcpi = $class->new;
 		isa_ok $mcpi, $class;
+		local $SIG{__WARN__} = sub {1}; # suppress warning about "This line will be ignored"
 		dies_ok { $mcpi->parsecfg( $tmp_config_file ); } 'Missing local setting blows up';
 		};
 
@@ -124,7 +125,7 @@ HERE
 			  file     => 'test-0.01.tar.gz'
 			);
 			} 'Missing config repository';
-		like $@, qr/No repository configured/, 'exception has expected message';
+		like $@, qr/no repository configured/, 'exception has expected message';
 		};
 
 	subtest 'read-only repo' => sub {
@@ -171,7 +172,7 @@ HERE
 					);
 				  }
 				  'read-only repository';
-				like $@, qr/Can not write to repository/, 'exception has expected message';
+				like $@, qr/cannot write to repository/, 'exception has expected message';
 				};
 
 			chmod 755, $repo_dir;
@@ -222,7 +223,7 @@ HERE
 				version  => '0.01'
 				);
 			} 'Missing add param';
-		like $@, qr/Required option not specified: file/,  'exception has expected message';
+		like $@, qr/required option not specified: file/,  'exception has expected message';
 		};
 
 	subtest 'module file is missing' => sub {
@@ -234,7 +235,7 @@ HERE
 				file     => 'blahblah'
 				);
 		} 'Module file not readable';
-		like $@, qr/Can not read module file: blahblah/,  'exception has expected message';
+		like $@, qr/cannot read module file: blahblah/,  'exception has expected message';
 		};
 
 	subtest 'discoverable' => sub {
@@ -312,7 +313,7 @@ HERE
 			lives_ok { $mcpi->parsecfg( $tmp_config_file ) } 'parsecfg works';
 			diag "trying to connect to a bad site: this might take a minute";
 			dies_ok { $mcpi->testremote } 'No reachable site';
-			like $@, qr/Unable to connect/, 'exception has expected message';
+			like $@, qr/unable to connect/, 'exception has expected message';
 			}
 		};
 	};

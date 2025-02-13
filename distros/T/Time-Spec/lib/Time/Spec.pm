@@ -1,9 +1,15 @@
 package Time::Spec;
-$Time::Spec::VERSION = '0.002';
+$Time::Spec::VERSION = '0.003';
 use strict;
 use warnings;
 
-use Signal::Info;
+use overload
+	'0+'     => \&to_float,
+	fallback => 1;
+
+use XSLoader;
+
+XSLoader::load(__PACKAGE__, __PACKAGE__->VERSION);
 
 1;
 
@@ -21,7 +27,7 @@ Time::Spec - a wrapper arount struct timespec
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -33,11 +39,17 @@ version 0.002
 
 This holds a time specification, broken down into seconds and nanoseconds. This is typically used by XS modules and not by pure-perl ones.
 
+The object overloads numification to act like a fractional seconds when used as such.
+
 =head1 METHODS
 
 =head2 new($fractional)
 
 This creates a new C<Time::Spec> object from a fractional amount of time.
+
+=head2 new_from_pair($seconds, $nano_seconds)
+
+This creates a new C<Time::Spec> object from the second and nano second values.
 
 =head2 sec()
 
@@ -50,6 +62,10 @@ This returns the fractional part of the time specification in nanoseconds.
 =head2 to_float()
 
 Convert the time back into fractional seconds.
+
+=head2 to_pair()
+
+This returns a pair of seconds an nanoseconds of the object.
 
 =head1 AUTHOR
 

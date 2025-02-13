@@ -48,9 +48,6 @@ my %cases = (
     'c1c2c3c4cc1.Br2.Cl3.Cl4' => [ 1,  9,  9 ],
 
     'C(C(C1))C1' => [ 4, 4 ],
-
-    # FIXME: self-bond is obviously incorrect and should be reported.
-    'C11' => [ 1, 1 ],
 );
 
 plan tests => 3 * scalar keys %cases;

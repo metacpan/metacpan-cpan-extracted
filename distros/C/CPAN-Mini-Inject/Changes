@@ -1,5 +1,23 @@
 Revision history for CPAN-Mini-Inject
 
+1.011 2025-02-13T02:38:03Z
+	* you can now inject into an empty directory. Previously the module
+	would throw an error about a missing 02packages file. Now the module
+	just ignores that missing file and will recreate it. (#9)
+	* document skip_cleanup and several other config values passed through
+	to CPAN::Mini (#16, #17)
+	* write the new 02packages data to a temp file first, then move it into
+	place when it's complete. This keeps parallel processes from trying to
+	edit the same file at the same time (#18)
+	* error messages now include the name of the program and the names of
+	any files involved. If you are testing for certain strings, you should
+	check for the new strings. 
+
+1.009_01 2025-02-01T18:02:55Z
+	* create 02packages as a temp file first, then move it into place.
+	This is one of probably many problems with running several mcpani
+	processes at the same time (#18)
+
 1.008 2025-01-17T13:45:32Z
 	* Fix indexing problem while not hiding CPAN::Meta::Convertor
 	correctly.

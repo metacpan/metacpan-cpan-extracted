@@ -4,7 +4,7 @@ TimeZone::TimeZoneDB - Interface to [https://timezonedb.com](https://timezonedb.
 
 # VERSION
 
-Version 0.02
+Version 0.03
 
 # SYNOPSIS
 
@@ -15,8 +15,38 @@ Version 0.02
 
 # DESCRIPTION
 
-TimeZone::TimeZoneDB provides an interface to timezonedb.com
-to look up timezones.
+The `TimeZone::TimeZoneDB` Perl module provides an interface to the [https://timezonedb.com](https://timezonedb.com) API,
+enabling users to retrieve timezone data based on geographic coordinates.
+It supports configurable HTTP user agents, allowing for proxy settings and request throttling.
+The module includes robust error handling, ensuring proper validation of input parameters and secure API interactions.
+JSON responses are safely parsed with error handling to prevent crashes.
+Designed for flexibility,
+it allows users to override default configurations while maintaining a lightweight and efficient structure for querying timezone information.
+
+- Caching
+
+    Identical requests are cached (using [CHI](https://metacpan.org/pod/CHI) or a user-supplied caching object),
+    reducing the number of HTTP requests to the API and speeding up repeated queries.
+
+    This module leverages [CHI](https://metacpan.org/pod/CHI) for caching geocoding responses.
+    When a geocode request is made,
+    a cache key is constructed from the request.
+    If a cached response exists,
+    it is returned immediately,
+    avoiding unnecessary API calls.
+
+- Rate-Limiting
+
+    A minimum interval between successive API calls can be enforced to ensure that the API is not overwhelmed and to comply with any request throttling requirements.
+
+    Rate-limiting is implemented using [Time::HiRes](https://metacpan.org/pod/Time%3A%3AHiRes).
+    A minimum interval between API
+    calls can be specified via the `min_interval` parameter in the constructor.
+    Before making an API call,
+    the module checks how much time has elapsed since the
+    last request and,
+    if necessary,
+    sleeps for the remaining time.
 
 # METHODS
 
@@ -28,14 +58,14 @@ to look up timezones.
     $tzdb = TimeZone::TimeZoneDB->new(ua => $ua, key => 'XXXXX');
 
     my $tz = $tzdb->tz({ latitude => 51.34, longitude => 1.42 })->{'zoneName'};
-    print "Ramsgate's timezone is $tz.\n";
+    print "Ramsgate's time zone is $tz.\n";
 
 ## get\_time\_zone
 
     use Geo::Location::Point;
 
     my $ramsgate = Geo::Location::Point->new({ latitude => 51.34, longitude => 1.42 });
-    # Find Ramsgate's timezone
+    # Find Ramsgate's time zone
     $tz = $tzdb->get_time_zone($ramsgate)->{'zoneName'}, "\n";
 
 ## ua
@@ -78,6 +108,6 @@ TimezoneDB API: [https://timezonedb.com/api](https://timezonedb.com/api)
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2023-2024 Nigel Horne.
+Copyright 2023-2025 Nigel Horne.
 
 This program is released under the following licence: GPL2

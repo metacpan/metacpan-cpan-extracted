@@ -1,4 +1,14 @@
+use Test::More;
+BEGIN {
+my @needs = grep { ! eval "require $_; 1" } qw(HTTP::Daemon Net::EmptyPort);
+
+if( @needs ) {
+	plan 'skip_all' => "Local::localversion needs " . join ' and ', @needs;
+	}
+}
+
 use File::Spec::Functions qw(catfile);
+use HTTP::Response;
 use Net::EmptyPort;
 
 sub start_server {
@@ -32,11 +42,12 @@ sub start_server {
 				}
 			elsif ($r->method eq 'HEAD') { # update_mirror does this
 				if( -e $path ) {
-					my $last_modified = (stat $path)[9];
-					$c->send_header(
-						'Last-Modified'  => HTTP::Date::time2str($last_modified),
-						'Content-Length' => (-s $path),
-						);
+					my $res = HTTP::Response->new;
+					$res->code(200);
+					$res->content('');
+					$res->header('Last-Modified'  => HTTP::Date::time2str( (stat $path)[9] )),
+					$res->header('Content-Length' => (-s $path));
+					$c->send_response($res);
 					}
 				else {
 					$c->send_error(HTTP::Status::RC_NOT_FOUND())

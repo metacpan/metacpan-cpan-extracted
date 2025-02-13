@@ -14,7 +14,7 @@ class App::LastStats {
   use Getopt::Long;
   use JSON;
 
-  our $VERSION = '0.0.9';
+  our $VERSION = '0.0.10';
 
   field $username   :param = 'davorg';
   field $period     :param = '7day';
@@ -57,11 +57,13 @@ class App::LastStats {
 
     my @valid_periods = qw(overall 7day 1month 3month 6month 12month);
     unless (grep { $_ eq $period } @valid_periods) {
-      die "Invalid period: $period\n";
+      die "Invalid period: $period\n",
+          'Valid periods are: ', join(', ', @valid_periods), "\n";
     }
 
     unless (exists $renderer->{$format}) {
-      die "Invalid format: $format\n";
+      die "Invalid format: $format\n",
+          'Valid formats are: ', join(', ', keys %$renderer), "\n";
     }
   }
 

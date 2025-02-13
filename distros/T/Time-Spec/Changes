@@ -1,0 +1,9 @@
+Revision history for Time-Spec
+
+0.003     2025-02-12 15:52:03+01:00 Europe/Brussels
+          - Re-release with correct version
+
+0.001     2025-02-12 15:47:58+01:00 Europe/Brussels
+          - Split Time::Spec out of Signal-Info distribution
+          - Add new_from_pair and to_pair methods
+          - Add numification overloading

@@ -28,7 +28,7 @@ my $url;
 my $port;
 my $pid;
 subtest 'start local server' => sub {
-	$port =  empty_port();
+	$port = empty_port();
 	( $pid ) = start_server($port);
 
 	diag( "$$: PORT: $port" ) if $ENV{TEST_VERBOSE};
@@ -37,11 +37,11 @@ subtest 'start local server' => sub {
 	$url = "http://localhost:$port/";
 
 	foreach ( 1 .. 4 ) {
-	  my $sleep = $_ * 2;
-	  sleep $sleep;
-	  diag("Sleeping $sleep seconds waiting for server") if $ENV{TEST_VERBOSE};
-	  last if can_fetch($url);
-	  }
+		my $sleep = $_ * 2;
+		sleep $sleep;
+		diag("Sleeping $sleep seconds waiting for server") if $ENV{TEST_VERBOSE};
+		last if can_fetch($url);
+		}
 
 	ok can_fetch($url), "URL $url is available";
 	};
@@ -90,13 +90,13 @@ subtest 'update mirror' => sub {
 	ok can_fetch($url), "URL $url is available";
 
 	eval {
-		diag( "updating mirror, which can take a couple minutes" );
 		$mcpi->update_mirror(
-		  remote => $url,
-		  local  => $tmp_dir,
-		  trace  => 1,
-		  log_level => 'info',
-		  );
+			remote    => $url,
+			local     => $tmp_dir,
+			trace     => 1,
+			log_level => 'error',
+			verbose   => 0,
+			);
 		} or diag( "update_mirror died: $@" );
 	};
 
@@ -121,9 +121,3 @@ sleep 1; # allow locks to expire
 kill( 9, $pid );
 
 done_testing();
-
-
-
-
-
-

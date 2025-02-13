@@ -10,7 +10,7 @@ use warnings;
 use vars qw($VERSION @EXPORT_OK %AmharicEquivalence %AmharicClassEquivalence);
 
 
-	$VERSION = "0.20";
+	$VERSION = "0.21";
 	
 	@EXPORT_OK = qw(%AmharicEquivalence %AmharicClassEquivalence);
 

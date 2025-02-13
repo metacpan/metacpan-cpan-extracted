@@ -44,10 +44,8 @@
             "File::Spec::Functions" : "0",
             "File::Temp" : "0",
             "Getopt::Long" : "0",
-            "HTTP::Daemon" : "0",
             "IO::Zlib" : "0",
             "LWP::Simple" : "0",
-            "Net::EmptyPort" : "0",
             "Pod::Usage" : "0",
             "YAML" : "0",
             "perl" : "5.016",
@@ -56,6 +54,8 @@
       },
       "test" : {
          "requires" : {
+            "HTTP::Daemon" : "0",
+            "Net::EmptyPort" : "0",
             "Test::More" : "1"
          }
       }
@@ -72,6 +72,6 @@
          "web" : "https://github.com/briandfoy/cpan-mini-inject"
       }
    },
-   "version" : "1.008",
+   "version" : "1.011",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

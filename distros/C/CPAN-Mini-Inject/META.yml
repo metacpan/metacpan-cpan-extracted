@@ -3,6 +3,8 @@ abstract: 'Inject modules into a CPAN::Mini mirror.'
 author:
   - 'Shawn Sorichetti <ssoriche@cpan.org>'
 build_requires:
+  HTTP::Daemon: '0'
+  Net::EmptyPort: '0'
   Test::More: '1'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
@@ -32,10 +34,8 @@ requires:
   File::Spec::Functions: '0'
   File::Temp: '0'
   Getopt::Long: '0'
-  HTTP::Daemon: '0'
   IO::Zlib: '0'
   LWP::Simple: '0'
-  Net::EmptyPort: '0'
   Pod::Usage: '0'
   YAML: '0'
   perl: '5.016'
@@ -44,5 +44,5 @@ resources:
   bugtracker: https://github.com/briandfoy/cpan-mini-inject/issues
   homepage: https://github.com/briandfoy/cpan-mini-inject
   repository: https://github.com/briandfoy/cpan-mini-inject
-version: '1.008'
+version: '1.011'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -2,8 +2,8 @@ NAME
     App::orgadb - An opinionated Org addressbook toolset
 
 VERSION
-    This document describes version 0.017 of App::orgadb (from Perl
-    distribution App-orgadb), released on 2023-08-05.
+    This document describes version 0.019 of App::orgadb (from Perl
+    distribution App-orgadb), released on 2025-02-13.
 
 SYNOPSIS
 DESCRIPTION
@@ -61,6 +61,46 @@ FUNCTIONS
     *   entry => *str_or_re*
 
         Find entry by string or regex search against its title.
+
+    *   entry_match_mode => *str* (default: "default")
+
+        How entry should be matched.
+
+        The default matching mode is as follow:
+
+         str       Substring matching
+         /re/      Regular expression matching
+
+        If matching mode is set to "exact", then matching will be done by
+        string equality test. This mode is basically a shorter alternative
+        to having to specify:
+
+         /^\Qre\E$/
+
+        Matching mode "exact-ci" is like "exact" except case-insensitive. It
+        is equivalent to:
+
+         /^\Qre\E$/i
+
+    *   field_match_mode => *str* (default: "default")
+
+        How entry should be matched.
+
+        The default matching mode is as follow:
+
+         str       Substring matching
+         /re/      Regular expression matching
+
+        If matching mode is set to "exact", then matching will be done by
+        string equality test. This mode is basically a shorter alternative
+        to having to specify:
+
+         /^\Qre\E$/
+
+        Matching mode "exact-ci" is like "exact" except case-insensitive. It
+        is equivalent to:
+
+         /^\Qre\E$/i
 
     *   field_value_formatter_rules => *array[hash]*
 
@@ -249,8 +289,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023, 2022 by perlancar
-    <perlancar@cpan.org>.
+    This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

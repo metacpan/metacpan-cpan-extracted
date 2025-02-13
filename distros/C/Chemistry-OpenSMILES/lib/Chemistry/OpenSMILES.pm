@@ -1,7 +1,7 @@
 package Chemistry::OpenSMILES;
 
 # ABSTRACT: OpenSMILES format reader and writer
-our $VERSION = '0.11.4'; # VERSION
+our $VERSION = '0.11.5'; # VERSION
 
 use strict;
 use warnings;
@@ -19,6 +19,7 @@ our @EXPORT_OK = qw(
     %normal_valence
     clean_chiral_centers
     is_aromatic
+    is_aromatic_bond
     is_chiral
     is_chiral_allenal
     is_chiral_octahedral
@@ -150,6 +151,13 @@ sub is_aromatic($)
     return $atom->{symbol} ne ucfirst $atom->{symbol};
 }
 
+sub is_aromatic_bond
+{
+    my( $moiety, $a, $b ) = @_;
+    return $moiety->has_edge_attribute( $a, $b, 'bond' ) &&
+           $moiety->get_edge_attribute( $a, $b, 'bond' ) eq ':';
+}
+
 sub is_chiral($)
 {
     my( $what ) = @_;
@@ -195,7 +203,7 @@ sub is_chiral_trigonal_bipyramidal($)
 {
     my( $what ) = @_;
     if( ref $what eq 'HASH' ) { # Single atom
-        return $what->{chirality} && $what->{chirality} =~ /^\@TB(1?[1-9]|20)$/;
+        return $what->{chirality} && $what->{chirality} =~ /^\@TB([1-9]|1[0-9]|20)$/;
     } else {                    # Graph representing moiety
         return any { is_chiral_trigonal_bipyramidal( $_ ) } $what->vertices;
     }
@@ -249,7 +257,7 @@ sub is_ring_bond
 
     # A couple of shortcuts to reduce the complexity
     return '' if any { $moiety->degree( $_ ) == 1 } ( $a, $b );
-    return '' if scalar( $moiety->vertices ) > scalar( $moiety->edges );
+    return '' if $moiety->vertices > $moiety->edges;
 
     if( $max_length < 0 ) {
         # Due to the issue in Graph, bridges() returns strings instead of real objects.
@@ -271,12 +279,12 @@ sub is_ring_bond
         return '' if @seen != 1; # Can this be 0?
 
         my $seen = shift @seen;
-        my( $unseen ) = grep { !exists $distance{$_} } ( $u, $v );
+        my $unseen = first { !exists $distance{$_} } ( $u, $v );
         $distance{$unseen} = $distance{$seen} + 1;
     };
 
     my $operations = {
-        start     => sub { return $a },
+        start     => sub { $a },
         tree_edge => $record_length,
     };
 
@@ -561,6 +569,21 @@ sub _validate($@)
                      $ends[1]->{symbol}, $ends[1]->{number};
     }
 
+    # Check for bridging aromatic bonds
+    my $aromatic = $moiety->copy_graph;
+    $aromatic->delete_edges( map  { @$_ }
+                             grep { !is_aromatic_bond( $moiety, @$_ ) }
+                                  $moiety->edges );
+
+    for my $bridge (sort { min( map { $_->{number} } @$a ) <=> min( map { $_->{number} } @$b ) ||
+                           max( map { $_->{number} } @$a ) <=> max( map { $_->{number} } @$b ) }
+                         $aromatic->bridges) {
+        my( $A, $B ) = sort { $a->{number} <=> $b->{number} } @$bridge;
+        warn sprintf 'aromatic bond between atoms %s(%d) and %s(%d) ' .
+                     'is outside an aromatic ring' . "\n",
+                     $A->{symbol}, $A->{number}, $B->{symbol}, $B->{number};
+    }
+
     # TODO: SP, TB, OH chiral centers
 }
 
@@ -721,9 +744,6 @@ be instructed to expect raw data structure:
 =back
 
 =head1 CAVEATS
-
-Element symbols in square brackets are not limited to the ones known to
-chemistry. Currently any single or two-letter symbol is allowed.
 
 Deprecated charge notations (C<--> and C<++>) are supported.
 

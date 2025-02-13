@@ -5,6 +5,7 @@
 use warnings;
 use 5.0100;
 
+use Chemistry::Elements;
 use Chemistry::OpenSMILES qw(
     %bond_symbol_to_order
     %normal_valence
@@ -230,6 +231,15 @@ sub _Lexer
         $self->{USER}{ATOMNO} ++;
         $self->{USER}{CHARNO} += length $&;
 
+        # Check for existence of the seen element
+        # Due to https://github.com/briandfoy/chemistry-elements/issues/16, Chemistry::Elements < 1.079 has 'Ha' instead of 'Db'
+        if(      $atom->{symbol} eq '*'  || $atom->{symbol} eq 'Db' ) {
+            # OK
+        } elsif( $atom->{symbol} eq 'Ha' ||
+                 !Chemistry::Elements->new( $atom->{symbol} ) ) {
+            die "chemical element with symbol '$atom->{symbol}' is unknown\n";
+        }
+
         if( $atom->{charge} ) {
             $atom->{charge} =~ s/^([-+])$/${1}1/;
             $atom->{charge} =~ s/^([-+])\1$/${1}2/;
@@ -391,6 +401,7 @@ sub _add_ring_bond
         }
 
         my $ring_atom = $self->{USER}{RINGBONDS}{$ring_bond}{atom};
+        die "atom cannot be bonded to itself\n" if $atom == $ring_atom;
         if( !$bond && is_aromatic $ring_atom && is_aromatic $atom ) {
             $bond = ':';
         }

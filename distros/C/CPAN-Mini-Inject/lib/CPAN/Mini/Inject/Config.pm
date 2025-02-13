@@ -44,27 +44,50 @@ the same hash:
 
 =over 4
 
+=item * dirmode
+
+Set the permissions of created directories to the specified mode. The default
+value is based on umask if supported.
+
+=item * force
+
+passthrough to L<CPAN::Mini>.
+
 =item * local
 
-location to store local CPAN::Mini mirror (*REQUIRED*)
+(required) location to store local CPAN::Mini mirror
 
-=item * remote
+=item * log_level
 
-CPAN site(s) to mirror from. Multiple sites can be listed space separated.
-(*REQUIRED*)
+passthrough to L<CPAN::Mini>
 
-=item * repository
+=item * module_filters
 
-Location to store modules to add to the local CPAN::Mini mirror.
+passthrough to L<CPAN::Mini>
 
 =item * passive
 
 Enable passive FTP.
 
-=item * dirmode
+=item * remote
 
-Set the permissions of created directories to the specified mode. The default
-value is based on umask if supported.
+(required) CPAN site(s) to mirror from. Multiple sites can be listed space separated.
+
+=item * repository
+
+Location to store modules to add to the local CPAN::Mini mirror.
+
+=item * skip_cleanup
+
+passthrough to L<CPAN::Mini>
+
+=item * skip_perl
+
+passthrough to L<CPAN::Mini>
+
+=item * trace
+
+passthrough to L<CPAN::Mini>
 
 =back
 
@@ -122,7 +145,7 @@ sub load_config {
 
   my $cfgfile = shift || $self->_find_config;
 
-  croak 'Unable to find config file' unless $cfgfile;
+  croak "$0: unable to find config file" unless $cfgfile;
   $self->config_file( $cfgfile );
 
   return $cfgfile;
@@ -160,7 +183,7 @@ creates a hash in config with each setting.
 parsecfg expects the config file in the following format:
 
  local: /www/CPAN
- remote: ftp://ftp.cpan.org/pub/CPAN ftp://ftp.kernel.org/pub/CPAN
+ remote: http://cpan.metacpan.org/
  repository: /work/mymodules
  passive: yes
  dirmode: 0755
@@ -180,20 +203,25 @@ sub parse_config {
 
   if ( -r $self->config_file ) {
     open my ( $fh ), "<", $self->config_file
-     or croak( "Could not open config file: $!" );
+     or croak sprintf "$0: cannot open config file <%s>: $!", $self->config_file;
 
     while ( <$fh> ) {
       next if /^\s*#/;
-      $self->{$1} = $2 if /^\s*([^:\s]+)\s*:\s*(.*?)\s*$/;
-      delete $required{$1} if defined $required{$1};
+      chomp;
+      if( /^\s*([^:\s]+)\s*:\s*(.*?)\s*$/ ) {
+      	$self->{$1} = $2;
+      	delete $required{$1} if defined $required{$1};
+      } else {
+      	carp sprintf "$0: %s:%d ignoring invalid configuration line: %s\n",
+      		$self->config_file, $., $_;
+      }
     }
 
     close $fh;
 
-    croak 'Required parameter(s): '
-     . join( ' ', keys %required )
-     . ' missing.'
-     if keys %required;
+    if( keys %required ) {
+      croak sprintf "$0: missing required parameter(s): %s", join ' ', keys %required;
+    }
   }
 
   return $self;

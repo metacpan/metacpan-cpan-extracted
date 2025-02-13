@@ -1,5 +1,8 @@
 # Revision History for the `Regexp::Ethiopic` Perl Distribution
 
+## 0.21 Wed Feb 12 06:34:39 EST 2025
+	- MANIFEST update for missing CONTRIBUTING.md file.
+
 ## 0.20 Tue Feb 11 21:04:46 EST 2025
 	- Migration to a Build.PL & GitHub system.
 

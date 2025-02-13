@@ -7,7 +7,7 @@ eval "use Test::Manifest 2.00";
 
 WriteMakefile(
     NAME             => "FindApp",
-    AUTHOR           => q{Tom Christiansen <tchrist@perl.com>},
+    AUTHOR           => q{Tom Christiansen <tchrist53147@gmail.com>},
     VERSION_FROM     => "lib/FindApp.pm",
     ABSTRACT_FROM    => "lib/FindApp.pm",
     LICENSE          => "perl_5",

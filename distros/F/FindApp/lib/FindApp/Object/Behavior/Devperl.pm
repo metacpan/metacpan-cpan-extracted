@@ -140,7 +140,8 @@ sub find_devperl_man {  &ENTER_TRACE_2;
 sub forgotten_devperl_man {  &ENTER_TRACE_3;
     my $self = &myself;
     my @men = $self->find_devperl_man;
-    firsts_not_in_second(@men, @MANPATH);
+    my @manpath = split /:/, $MANPATH || "", -1;
+    firsts_not_in_second(@men, @manpath);
 }
 
 1;

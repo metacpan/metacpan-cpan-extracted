@@ -20,11 +20,12 @@ my %module_build_args = (
     "Andrius Merkys <merkys\@cpan.org>"
   ],
   "dist_name" => "Chemistry-OpenSMILES",
-  "dist_version" => "0.11.4",
+  "dist_version" => "0.11.5",
   "license" => "bsd",
   "module_name" => "Chemistry::OpenSMILES",
   "recursive_test_files" => 1,
   "requires" => {
+    "Chemistry::Elements" => 0,
     "Graph" => "0.97",
     "List::Util" => "1.45",
     "Parse::Yapp" => 0,

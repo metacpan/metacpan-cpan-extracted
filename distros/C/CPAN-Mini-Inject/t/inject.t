@@ -110,25 +110,8 @@ sub get_module_details {
 		);
 	}
 
-subtest 'inject the modules' => sub {
-	my $dist_sources = catfile $t_local, 'mymodules';
-	ok -d $dist_sources, 'Dist sources directory exists';
-	my @modules = get_module_details( $dist_sources );
-
-	my $tmp_config_file;
-	subtest 'make config' => sub {
-		$tmp_config_file = write_config(
-			local      => $temp_dir,
-			repository => catfile( $temp_dir, 'injects' ),
-			);
-		ok -e $tmp_config_file, 'configuration file exists';
-		};
-
-	my $mcpi = $class->new;
-	isa_ok $mcpi, $class;
-
-	$mcpi = $mcpi->loadcfg( $tmp_config_file )->parsecfg->readlist;
-
+sub test_inject {
+	my( $mcpi, @modules ) = @_;
 	foreach my $module ( @modules ) {
 		ok -e $module->{file}, "module file <$module->{file}> exists";
 		$mcpi = $mcpi->add( %$module );
@@ -140,6 +123,32 @@ subtest 'inject the modules' => sub {
 
 	subtest 'inject' => sub {
 		ok $mcpi->inject( $ENV{TEST_VERBOSE} // 0 ), 'copy modules';
+		};
+
+	subtest 'packages' => sub {
+		my $packages = catfile $temp_dir, 'modules', '02packages.details.txt.gz';
+		ok -e $packages, '02packages exists';
+		my $gz = gzopen($packages, 'rb');
+
+		my $line;
+		my $expected_lines;
+		HEADER: while( $gz->gzreadline($line) > 0 ) {
+			last HEADER if $line eq "\n";
+			my $rc = like $line, qr/\A ([a-z-]+) : \x{20}+ (.*)/ix, 'header format is correct';
+			if( $line =~ m/\A ([a-z-]+) : \x{20}+ (.*)/ix and $1 eq 'Line-Count') {
+				$expected_lines = $2;
+				}
+			}
+
+		my $count = 0;
+		PACKAGES: while( $gz->gzreadline($line) > 0 ) {
+			$count++;
+			chomp($line);
+			my( $module, $version, $path ) = split /\s+/, $line;
+			like $module, qr/\A [A-Za-z0-9_]+ (:: [A-Za-z0-9_]+ )* \z/x, 'module name matches';
+			}
+
+		is $count, $expected_lines, 'Line-Count matches lines';
 		};
 
 	subtest 'check the result' => sub {
@@ -181,6 +190,28 @@ subtest 'inject the modules' => sub {
 				};
 			}
 		};
+	};
+
+subtest 'inject the modules' => sub {
+	my $dist_sources = catfile $t_local, 'mymodules';
+	ok -d $dist_sources, 'Dist sources directory exists';
+	my @modules = get_module_details( $dist_sources );
+
+	my $tmp_config_file;
+	subtest 'make config' => sub {
+		$tmp_config_file = write_config(
+			local      => $temp_dir,
+			repository => catfile( $temp_dir, 'injects' ),
+			);
+		ok -e $tmp_config_file, 'configuration file exists';
+		};
+
+	my $mcpi = $class->new;
+	isa_ok $mcpi, $class;
+
+	$mcpi = $mcpi->loadcfg( $tmp_config_file )->parsecfg->readlist;
+
+	test_inject( $mcpi, @modules );
 	};
 
 subtest 'packages updated' => sub {
@@ -229,6 +260,34 @@ subtest 'mailrc updated' => sub {
 		ok exists $found_authors{$author}, "Found $author in $mailrc";
 		}
 	};
+
+subtest 'empty local' => sub {
+	my $dist_sources = catfile $t_local, 'mymodules';
+	ok -d $dist_sources, 'Dist sources directory exists';
+	my @modules = get_module_details( $dist_sources );
+
+	my $empty_temp_dir = File::Temp::tempdir(CLEANUP=>1);
+
+	my $tmp_config_file;
+	subtest 'make config' => sub {
+		$tmp_config_file = write_config(
+			local      => $empty_temp_dir,
+			repository => catfile( $temp_dir, 'injects' ),
+			);
+		ok -e $tmp_config_file, 'configuration file exists';
+		};
+
+	my $mcpi = $class->new;
+	isa_ok $mcpi, $class;
+
+	$mcpi = $mcpi->loadcfg( $tmp_config_file )->parsecfg->readlist;
+
+	my $warnings;
+	local $SIG{__WARN__} = sub { $warnings = $_[0] };
+	test_inject( $mcpi, @modules );
+	like $warnings, qr/02packages.details.txt.gz> does not exist/, 'saw warning about missing package file';
+	};
+
 
 done_testing();
 

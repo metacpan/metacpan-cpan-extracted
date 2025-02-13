@@ -1,5 +1,5 @@
 package Signal::Info;
-$Signal::Info::VERSION = '0.002';
+$Signal::Info::VERSION = '0.003';
 use strict;
 use warnings;
 
@@ -26,7 +26,7 @@ Signal::Info - A wrapper around siginfo_t
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 DESCRIPTION
 

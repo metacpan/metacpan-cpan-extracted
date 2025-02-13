@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-08-05'; # DATE
+our $DATE = '2025-02-13'; # DATE
 our $DIST = 'App-orgadb'; # DIST
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 use Perinci::CmdLine::Any;
 
@@ -35,11 +35,11 @@ orgadb-sel - Select entries and fields from Org addressbook
 
 =head1 VERSION
 
-This document describes version 0.017 of orgadb-sel (from Perl distribution App-orgadb), released on 2023-08-05.
+This document describes version 0.019 of orgadb-sel (from Perl distribution App-orgadb), released on 2025-02-13.
 
 =head1 SYNOPSIS
 
-B<B<orgadb-sel>> [B<L<--category|/"--category=s, -c">>=I<L<str_or_re|Sah::Schema::str_or_re>>|B<L<-c|/"--category=s, -c">>=I<L<str_or_re|Sah::Schema::str_or_re>>] [B<L<--clipboard|/"-y">>=I<str>|B<L<-Y|/"-y">>|B<L<--clipboard-only|/"-y">>|B<L<-y|/"-y">>] [B<L<--color-theme|/"--color-theme=s">>=I<L<perl::colortheme::modname_with_optional_args|Sah::Schema::perl::colortheme::modname_with_optional_args>>] [B<L<--color|/"--color=s">>=I<str>] [(B<L<--config-path|/"--config-path=s">>=I<path>)+|B<L<--no-config|/"--no-config">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--count|/"--count">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--detail|/"--detail, -l">>|B<L<-l|/"--detail, -l">>|B<L<--no-detail|/"--detail, -l">>|B<L<--nodetail|/"--detail, -l">>] [B<L<--field-value-formatter-rules|/"--field-value-formatter-rules=s">>=I<hash>] [(B<L<--field-value-formatter|/"--remove-whitespaces">>=I<str>)+|(B<L<-f|/"--remove-whitespaces">>=I<str>)+|B<L<--format-phone|/"--remove-whitespaces">>|(B<L<--fvfmt|/"--remove-whitespaces">>=I<str>)+|B<L<--remove-comments|/"--remove-whitespaces">>|B<L<--remove-nondigits|/"--remove-whitespaces">>|B<L<--remove-whitespaces|/"--remove-whitespaces">>] [(B<L<--field|/"--field=s@">>=I<L<str_or_re|Sah::Schema::str_or_re>>)+] [(B<L<--file|/"--file=s@">>=I<L<filename|Sah::Schema::filename>>)+] [(B<L<--filter-entries-by-field|/"--filter-entries-by-field=s@">>=I<str>)+] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--hide-category|/"--hide-category, -C">>|B<L<-C|/"--hide-category, -C">>] [B<L<--hide-entry|/"--hide-entry, -E">>|B<L<-E|/"--hide-entry, -E">>] [B<L<--hide-field-name|/"--hide-field-name, -N">>|B<L<-N|/"--hide-field-name, -N">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--no-field-value-formatters|/"--no-field-value-formatters, --raw-field-values, -F">>|B<L<-F|/"--no-field-value-formatters, --raw-field-values, -F">>|B<L<--raw-field-values|/"--no-field-value-formatters, --raw-field-values, -F">>] [B<L<--num-entries|/"--num-entries=s">>=I<L<uint|Sah::Schema::uint>>] [B<L<--num-fields|/"--num-fields=s, -n">>=I<L<uint|Sah::Schema::uint>>|B<L<-1|/"--num-fields=s, -n">>|B<L<-n|/"--num-fields=s, -n">>=I<L<uint|Sah::Schema::uint>>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--reload-files-on-change|/"--no-reload-files-on-change">>|B<L<--no-reload-files-on-change|/"--no-reload-files-on-change">>|B<L<--noreload-files-on-change|/"--no-reload-files-on-change">>] [B<L<--shell|/"--shell, -s">>|B<L<-s|/"--shell, -s">>] -- [I<L<entry|/"--entry=s">>] [I<L<field|/"--field=s@">>] ...
+B<B<orgadb-sel>> [B<L<--category|/"--category=s, -c">>=I<L<str_or_re|Sah::Schema::str_or_re>>|B<L<-c|/"--category=s, -c">>=I<L<str_or_re|Sah::Schema::str_or_re>>] [B<L<--clipboard|/"-y">>=I<str>|B<L<-Y|/"-y">>|B<L<--clipboard-only|/"-y">>|B<L<-y|/"-y">>] [B<L<--color-theme|/"--color-theme=s">>=I<L<perl::colortheme::modname_with_optional_args|Sah::Schema::perl::colortheme::modname_with_optional_args>>] [B<L<--color|/"--color=s">>=I<str>] [(B<L<--config-path|/"--config-path=s">>=I<path>)+|B<L<--no-config|/"--no-config">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--count|/"--count">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--detail|/"--detail, -l">>|B<L<-l|/"--detail, -l">>|B<L<--no-detail|/"--detail, -l">>|B<L<--nodetail|/"--detail, -l">>] [B<L<--entry-match-mode|/"-x">>=I<str>|B<L<-x|/"-x">>] [B<L<--field-match-mode|/"--field-match-mode=s">>=I<str>|B<L<-X|/"--field-match-mode=s">>] [B<L<--field-value-formatter-rules|/"--field-value-formatter-rules=s">>=I<hash>] [(B<L<--field-value-formatter|/"--remove-whitespaces">>=I<str>)+|(B<L<-f|/"--remove-whitespaces">>=I<str>)+|B<L<--format-phone|/"--remove-whitespaces">>|(B<L<--fvfmt|/"--remove-whitespaces">>=I<str>)+|B<L<--remove-comments|/"--remove-whitespaces">>|B<L<--remove-nondigits|/"--remove-whitespaces">>|B<L<--remove-whitespaces|/"--remove-whitespaces">>] [(B<L<--field|/"--field=s@">>=I<L<str_or_re|Sah::Schema::str_or_re>>)+] [(B<L<--file|/"--file=s@">>=I<L<filename|Sah::Schema::filename>>)+] [(B<L<--filter-entries-by-field|/"--filter-entries-by-field=s@">>=I<str>)+] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--hide-category|/"--hide-category, -C">>|B<L<-C|/"--hide-category, -C">>] [B<L<--hide-entry|/"--hide-entry, -E">>|B<L<-E|/"--hide-entry, -E">>] [B<L<--hide-field-name|/"--hide-field-name, -N">>|B<L<-N|/"--hide-field-name, -N">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--no-field-value-formatters|/"--no-field-value-formatters, --raw-field-values, -F">>|B<L<-F|/"--no-field-value-formatters, --raw-field-values, -F">>|B<L<--raw-field-values|/"--no-field-value-formatters, --raw-field-values, -F">>] [B<L<--num-entries|/"--num-entries=s">>=I<L<uint|Sah::Schema::uint>>] [B<L<--num-fields|/"--num-fields=s, -n">>=I<L<uint|Sah::Schema::uint>>|B<L<-1|/"--num-fields=s, -n">>|B<L<-n|/"--num-fields=s, -n">>=I<L<uint|Sah::Schema::uint>>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--reload-files-on-change|/"--no-reload-files-on-change">>|B<L<--no-reload-files-on-change|/"--no-reload-files-on-change">>|B<L<--noreload-files-on-change|/"--no-reload-files-on-change">>] [B<L<--shell|/"--shell, -s">>|B<L<-s|/"--shell, -s">>] -- [I<L<entry|/"--entry=s">>] [I<L<field|/"--field=s@">>] ...
 
 First, create a configuration file F<~/.config/orgadb.conf> containing something
 like the following (use INI syntax, or L<IOD> to be more exact):
@@ -125,6 +125,11 @@ To hide the category prefix, use C<-C> (C<--hide-category>):
  % orgadb-sel -C sa
  ** satya
  ** lisa
+
+To find exact entry (C<-x>):
+
+ % orgadb-sel -Cx satya
+ ** satya
 
 =head2 Filtering entries by categories
 
@@ -387,6 +392,76 @@ C<*> marks required options.
 =item B<--count>
 
 Return just the number of matching entries instead of showing them.
+
+=item B<--entry-match-mode>=I<s>
+
+How entry should be matched.
+
+Default value:
+
+ "default"
+
+Valid values:
+
+ ["default","exact","exact-ci"]
+
+The default matching mode is as follow:
+
+ str       Substring matching
+ /re/      Regular expression matching
+
+If matching mode is set to C<exact>, then matching will be done by string
+equality test. This mode is basically a shorter alternative to having to
+specify:
+
+ /^\Qre\E$/
+
+Matching mode C<exact-ci> is like C<exact> except case-insensitive. It is
+equivalent to:
+
+ /^\Qre\E$/i
+
+
+=item B<--field-match-mode>=I<s>
+
+How entry should be matched.
+
+Default value:
+
+ "default"
+
+Valid values:
+
+ ["default","exact","exact-ci"]
+
+The default matching mode is as follow:
+
+ str       Substring matching
+ /re/      Regular expression matching
+
+If matching mode is set to C<exact>, then matching will be done by string
+equality test. This mode is basically a shorter alternative to having to
+specify:
+
+ /^\Qre\E$/
+
+Matching mode C<exact-ci> is like C<exact> except case-insensitive. It is
+equivalent to:
+
+ /^\Qre\E$/i
+
+
+=item B<-X>
+
+Turn on exact entry matching (shortcut for `--field-match-mode=exact`).
+
+See C<--field-match-mode>.
+
+=item B<-x>
+
+Turn on exact entry matching (shortcut for `--entry-match-mode=exact`).
+
+See C<--entry-match-mode>.
 
 =back
 
@@ -861,15 +936,15 @@ Shortcut for --num-fields=1.
 
 See C<--num-fields>.
 
-=item B<-y>
-
-Shortcut for --clipboard=tee.
-
-See C<--clipboard>.
-
 =item B<-Y>
 
 Shortcut for --clipboard=only.
+
+See C<--clipboard>.
+
+=item B<-y>
+
+Shortcut for --clipboard=tee.
 
 See C<--clipboard>.
 
@@ -1021,6 +1096,8 @@ List of available configuration parameters:
  count (see --count)
  detail (see --detail)
  entry (see --entry)
+ entry_match_mode (see --entry-match-mode)
+ field_match_mode (see --field-match-mode)
  field_value_formatter_rules (see --field-value-formatter-rules)
  field_value_formatters (see --field-value-formatter)
  fields (see --field)
@@ -1112,7 +1189,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

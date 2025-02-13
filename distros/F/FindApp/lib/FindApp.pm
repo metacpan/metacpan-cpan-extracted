@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use mro "c3";
 
-our $VERSION = "v0.0.6";
+our $VERSION = "v0.0.7";
 
 use FindApp::Vars       qw(:all);
 use FindApp::Utils      qw(:package);

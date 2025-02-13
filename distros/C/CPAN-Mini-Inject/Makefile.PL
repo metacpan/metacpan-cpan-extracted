@@ -60,6 +60,8 @@ my %WriteMakefile = (
 		},
 
 	'TEST_REQUIRES' => {
+		'HTTP::Daemon'          => '0',
+		'Net::EmptyPort'        => '0',
 		'Test::More'            => '1',
 		},
 
@@ -78,10 +80,8 @@ my %WriteMakefile = (
 		'File::Spec'                => '2.07',
 		'File::Temp'                => '0',
 		'Getopt::Long'              => '0',
-		'HTTP::Daemon'              => '0',
 		'IO::Zlib'                  => '0',
 		'LWP::Simple'               => '0',
-		'Net::EmptyPort'            => '0',
 		'Pod::Usage'                => '0',
 		'YAML'                      => '0',
 		'version'                   => '0.9915', # see briandfoy/cpan-mini-inject#11

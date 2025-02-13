@@ -8,11 +8,39 @@ use Log::ger;
 use App::orgadb::Common;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-08-05'; # DATE
+our $DATE = '2025-02-13'; # DATE
 our $DIST = 'App-orgadb'; # DIST
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 our %SPEC;
+
+our %FEATURES = (
+    set_v => {PasswordManager => 1},
+    features => {
+        PasswordManager => {
+            can_add_password                         => 0,
+            can_add_note                             => 0,
+            can_add_custom_fields                    => 0,
+
+            can_edit_password                        => 0,
+            can_record_edit_history                  => 0,
+
+            can_delete_password                      => 0,
+
+            can_retrieve_password                    => 1,
+            can_dump_passwords                       => 1,
+
+            can_encrypt_password                     => 1,
+            can_encrypt_label                        => 1,
+            can_encrypt_other_fields                 => 1,
+
+            database_format                          => 'Org',
+            database_format_is_open_standard         => 1,
+            encryption_format                        => 'OpenPGP',
+            encryption_format_is_open_standard       => 1,
+        },
+    },
+);
 
 $SPEC{':package'} = {
     v => 1.1,
@@ -98,7 +126,10 @@ sub _select_single {
         $expr .= (length $expr ? " " : "") . 'Headline[level=2]';
         if (defined $args{entry}) {
             $expr .= '[title.as_string';
-            if (ref $args{entry} eq 'Regexp') {
+            if ($args{entry_match_mode} =~ /exact/) {
+                $re_entry = quotemeta($args{entry});
+                $re_entry = $args{entry_match_mode} =~ /-ci/ ? qr/^$re_entry$/i : qr/^$re_entry$/;
+            } elsif (ref $args{entry} eq 'Regexp') {
                 $re_entry = $args{entry};
             } else {
                 $re_entry = quotemeta($args{entry});
@@ -179,7 +210,10 @@ sub _select_single {
                         $expr_field .= ($expr_field ? ' > List > ' : 'Headline[level=2] > List > ');
                         $expr_field .= 'ListItem[desc_term.text';
                         my $re_field;
-                        if (ref $field_term eq 'Regexp') {
+                        if ($args{field_match_mode} =~ /exact/) {
+                            $re_field = quotemeta($field_term);
+                            $re_field = $args{field_match_mode} =~ /-ci/ ? qr/^$re_field$/i : qr/^$re_field$/;
+                        } elsif (ref $field_term eq 'Regexp') {
                             $re_field = $field_term;
                         } else {
                             $re_field = quotemeta($field_term);
@@ -491,7 +525,7 @@ App::orgadb - An opinionated Org addressbook toolset
 
 =head1 VERSION
 
-This document describes version 0.017 of App::orgadb (from Perl distribution App-orgadb), released on 2023-08-05.
+This document describes version 0.019 of App::orgadb (from Perl distribution App-orgadb), released on 2025-02-13.
 
 =head1 SYNOPSIS
 
@@ -560,6 +594,46 @@ version of C<--detail>, as in I<ls> Unix command.
 =item * B<entry> => I<str_or_re>
 
 Find entry by string or regex search against its title.
+
+=item * B<entry_match_mode> => I<str> (default: "default")
+
+How entry should be matched.
+
+The default matching mode is as follow:
+
+ str       Substring matching
+ /re/      Regular expression matching
+
+If matching mode is set to C<exact>, then matching will be done by string
+equality test. This mode is basically a shorter alternative to having to
+specify:
+
+ /^\Qre\E$/
+
+Matching mode C<exact-ci> is like C<exact> except case-insensitive. It is
+equivalent to:
+
+ /^\Qre\E$/i
+
+=item * B<field_match_mode> => I<str> (default: "default")
+
+How entry should be matched.
+
+The default matching mode is as follow:
+
+ str       Substring matching
+ /re/      Regular expression matching
+
+If matching mode is set to C<exact>, then matching will be done by string
+equality test. This mode is basically a shorter alternative to having to
+specify:
+
+ /^\Qre\E$/
+
+Matching mode C<exact-ci> is like C<exact> except case-insensitive. It is
+equivalent to:
+
+ /^\Qre\E$/i
 
 =item * B<field_value_formatter_rules> => I<array[hash]>
 
@@ -754,7 +828,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

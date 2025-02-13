@@ -15,16 +15,16 @@ name: Regexp-Ethiopic
 provides:
   Regexp::Ethiopic:
     file: lib/Regexp/Ethiopic.pm
-    version: '0.20'
+    version: '0.21'
   Regexp::Ethiopic::Amharic:
     file: lib/Regexp/Ethiopic/Amharic.pm
-    version: '0.20'
+    version: '0.21'
   Regexp::Ethiopic::Geez:
     file: lib/Regexp/Ethiopic/Geez.pm
-    version: '0.20'
+    version: '0.21'
   Regexp::Ethiopic::Tigrigna:
     file: lib/Regexp/Ethiopic/Tigrigna.pm
-    version: '0.20'
+    version: '0.21'
 requires:
   perl: v5.8.0
 resources:
@@ -32,6 +32,6 @@ resources:
   homepage: https://github.com/dyacob/Regexp-Ethiopic
   license: http://dev.perl.org/licenses/
   repository: https://github.com/dyacob/Regexp-Ethiopic.git
-version: '0.20'
+version: '0.21'
 x_authority: cpan:dyacob
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

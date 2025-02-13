@@ -20,7 +20,7 @@ CARP: {
 		does_carp_that_matches(sub { my $tz = $tzdb->get_time_zone(latitude => undef); }, qr/^Usage: /);
 		does_carp_that_matches(sub { my $tz = $tzdb->get_time_zone({ longitude => undef }); }, qr/^Usage: /);
 
-		does_carp_that_matches(sub { my $tzdb = TimeZone::TimeZoneDB->new(); }, qr/argument not given/);
+		does_croak_that_matches(sub { TimeZone::TimeZoneDB->new() }, qr/is required/);
 		done_testing();
 	}
 }

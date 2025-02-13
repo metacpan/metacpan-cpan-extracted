@@ -56,8 +56,8 @@ for my $case (@cases) {
     for (@graphs) {
         chirality_to_pseudograph( $_ );
     }
-    ok  are_isomorphic( $graphs[0], $graphs[1], \&depict );
-    ok !are_isomorphic( $graphs[0], $graphs[2], \&depict );
+    ok  are_isomorphic( $graphs[0], $graphs[1], \&depict ), $case->[0] . ' <=> ' . $case->[2];
+    ok !are_isomorphic( $graphs[0], $graphs[2], \&depict ), $case->[0] . ' <=> ' . $case->[0];
 }
 
 sub depict
